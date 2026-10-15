@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, describe, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-const mocks = vi.hoisted(() => ({ courses: vi.fn(), applications: vi.fn(), approve: vi.fn(), approveApplication: vi.fn(), rejectApplication: vi.fn(), success: vi.fn(), error: vi.fn() }));
+const mocks = vi.hoisted(() => ({ courses: vi.fn(), applications: vi.fn(), approve: vi.fn(), reject: vi.fn(), approveApplication: vi.fn(), rejectApplication: vi.fn(), success: vi.fn(), error: vi.fn() }));
 vi.mock('../../api/lecture', () => ({ operatorApi: mocks, errorMessage: (_err: unknown, fallback: string) => fallback }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: mocks.success, error: mocks.error }) }));
 import OperatorCoursesPage from './OperatorCoursesPage';
@@ -52,14 +52,40 @@ describe.each([
   });
 });
 
-it.each([null, ''])('instructor rejection keeps the optional-reason policy (prompt=%j)', async reason => {
-  mocks.applications.mockResolvedValue({ data: [row('반려 검증 강사', 'pending')] });
-  mocks.rejectApplication.mockResolvedValue({});
-  vi.spyOn(window, 'prompt').mockReturnValue(reason);
-  render(<MemoryRouter><OperatorInstructorsPage /></MemoryRouter>);
-  await screen.findByText('반려 검증 강사');
-  const button = screen.getAllByRole('button', { name: '반려' }).find(element => element.classList.contains('btn'))!;
-  fireEvent.click(button);
-  if (reason === null) expect(mocks.rejectApplication).not.toHaveBeenCalled();
+it.each(['cancel', 'confirm'])('instructor rejection keeps the optional-reason policy (%s)', async action => {
+  mocks.applications.mockResolvedValue({ data: [row('반려 검증 강사', 'pending')] }); mocks.rejectApplication.mockResolvedValue({});
+  render(<MemoryRouter><OperatorInstructorsPage /></MemoryRouter>); await screen.findByText('반려 검증 강사');
+  fireEvent.click(screen.getAllByRole('button', { name: '반려' }).find(element => element.classList.contains('btn'))!);
+  const dialog = within(screen.getByRole('dialog'));
+  fireEvent.click(dialog.getByRole('button', { name: action === 'cancel' ? '취소' : '처리 확인' }));
+  if (action === 'cancel') expect(mocks.rejectApplication).not.toHaveBeenCalled();
   else await waitFor(() => expect(mocks.rejectApplication).toHaveBeenCalledWith('반려 검증 강사', ''));
+});
+
+describe.each([
+  { name: '강좌', Page: OperatorCoursesPage, fetch: mocks.courses, reject: mocks.reject, pending: 'pending_review' },
+  { name: '강사', Page: OperatorInstructorsPage, fetch: mocks.applications, reject: mocks.rejectApplication, pending: 'pending' },
+])('$name 반려 입력·결과', ({ Page, fetch, reject, pending }) => {
+  it('retains the decision target and reason on failure and closes only after success', async () => {
+    fetch.mockResolvedValue({ data: [row('검증 대상', pending)] }); reject.mockRejectedValueOnce(new Error('fixture')).mockResolvedValue({});
+    render(<MemoryRouter><Page /></MemoryRouter>); await screen.findByText('검증 대상');
+    fireEvent.click(screen.getAllByRole('button', { name: '반려' }).find(element => element.classList.contains('btn'))!);
+    fireEvent.change(within(screen.getByRole('dialog')).getByRole('textbox'), { target: { value: '조건 보완 요청' } });
+    const confirm = () => within(screen.getByRole('dialog')).getByRole('button', { name: '처리 확인' });
+    fireEvent.click(confirm()); await within(screen.getByRole('dialog')).findByRole('alert');
+    expect((within(screen.getByRole('dialog')).getByRole('textbox') as HTMLTextAreaElement).value).toBe('조건 보완 요청');
+    fireEvent.click(confirm()); await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(reject).toHaveBeenNthCalledWith(2, '검증 대상', '조건 보완 요청');
+  });
+  it('reports a saved decision with a failed list read and retries without another write', async () => {
+    fetch.mockResolvedValueOnce({ data: [row('검증 대상', pending)] }).mockRejectedValueOnce(new Error('read')).mockResolvedValue({ data: [] }); reject.mockResolvedValue({});
+    render(<MemoryRouter><Page /></MemoryRouter>); await screen.findByText('검증 대상');
+    fireEvent.click(screen.getAllByRole('button', { name: '반려' }).find(element => element.classList.contains('btn'))!);
+    fireEvent.change(within(screen.getByRole('dialog')).getByRole('textbox'), { target: { value: '보완' } });
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: '처리 확인' }));
+    await screen.findByRole('status'); expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '다시 조회' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(reject).toHaveBeenCalledTimes(1);
+  });
 });

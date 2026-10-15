@@ -26,6 +26,11 @@ import { MultilingualContentBadge, localeLabel } from '../../components/Multilin
 // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 고객용 링크/QR
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
 import { QrCode, X as XIcon } from 'lucide-react';
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { getActiveServiceKey } from '../../lib/serviceContext';
+import { getActiveStoreOrganizationId } from '../../lib/storeOrganizationHeader';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { saveWorktablePreselection } from '../../utils/worktablePreselection';
 
 // ── 공급유형 탭 ──
 // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1 (사용자 확정 권위 기준):
@@ -62,6 +67,8 @@ const PAGE_LIMIT = 20;
 
 export function PharmacyB2BPage() {
   const navigate = useNavigate();
+  const { organizationId } = useUnifiedStore();
+  const serviceKey = getActiveServiceKey();
   const [searchParams, setSearchParams] = useSearchParams();
   const sourceFromUrl = searchParams.get('source');
   const initialSource: OrderableSourceTab = SOURCE_TABS.some(t => t.id === sourceFromUrl)
@@ -86,18 +93,31 @@ export function PharmacyB2BPage() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const isEventTab = activeSource === 'event';
+  const listRequest = useLatestStoreRequest(`${organizationId ?? ''}:${serviceKey}:${activeSource}:${search}:${page}`);
+  const hasContext = useCallback(() => !!organizationId && getActiveStoreOrganizationId() === organizationId && getActiveServiceKey() === serviceKey, [organizationId, serviceKey]);
+  useEffect(() => {
+    setProducts([]); setSelectedIds(new Set()); setQuantities({}); setPage(1);
+    setQrPanel(null); setMlcSummary(new Map());
+  }, [organizationId, serviceKey]);
 
   const loadData = useCallback(async () => {
+    const isLatest = listRequest.begin();
+    const isCurrent = () => isLatest() && hasContext();
+    if (!hasContext()) { setLoading(false); setProducts([]); setError('forbidden'); return; }
     // 이벤트·특가 탭은 기존 이벤트 패널이 자체 조회/주문(장바구니)을 담당 — orderable 조회 생략.
     if (isEventTab) { setLoading(false); setError(null); return; }
     try {
       setLoading(true);
+      setProducts([]);
       setError(null);
       const res = await getOrderable({ source: activeSource, search: search || undefined, page, limit: PAGE_LIMIT });
+      if (!isCurrent()) return;
+      if (res.success !== true) throw new Error('Unconfirmed products');
       setProducts(res.data || []);
       setTotal(res.pagination?.total || 0);
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (err: any) {
+      if (!isCurrent()) return;
       const status = err?.response?.status || err?.status;
       if (status === 401) setError('unauthorized');
       else if (status === 403) setError('forbidden');
@@ -107,9 +127,9 @@ export function PharmacyB2BPage() {
       setTotal(0);
       setTotalPages(1);
     } finally {
-      setLoading(false);
+      if (isLatest()) setLoading(false);
     }
-  }, [activeSource, search, page, isEventTab]);
+  }, [activeSource, search, page, isEventTab, listRequest, hasContext]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -132,7 +152,7 @@ export function PharmacyB2BPage() {
       .then((map) => { if (!cancelled) setMlcSummary(map); })
       .catch(() => { /* 보조 정보 — 실패해도 목록 동작에 영향 없음 */ });
     return () => { cancelled = true; };
-  }, []);
+  }, [organizationId, serviceKey]);
 
   const handleTabChange = (tabId: OrderableSourceTab) => {
     setActiveSource(tabId);
@@ -165,6 +185,7 @@ export function PharmacyB2BPage() {
   // ── 작업대 담기 (B2B / 운영자 승인 / 판매자 모집 → /checkout) ──
   // 이벤트·특가는 별도 장바구니 흐름이라 선택 대상이 아니다(체크박스 미노출).
   const handleAddToWorktable = useCallback(() => {
+    if (!organizationId || !hasContext() || loading || error) return;
     if (selectedIds.size === 0) {
       toast.error('상품을 선택해주세요.');
       return;
@@ -191,10 +212,13 @@ export function PharmacyB2BPage() {
     }
 
     const preselect = Object.fromEntries(validItems);
-    sessionStorage.setItem('worktable_preselect', JSON.stringify(preselect));
+    if (!saveWorktablePreselection(organizationId, serviceKey, preselect)) {
+      toast.error('작업대에 선택을 전달하지 못했습니다. 브라우저 저장 설정을 확인해 주세요.');
+      return;
+    }
     toast.success(`${validItems.length}건의 상품을 작업대에 담았습니다.`);
     navigate('/work/kpa-society/commerce/order-worktable');
-  }, [selectedIds, quantities, products, navigate]);
+  }, [selectedIds, quantities, products, navigate, organizationId, serviceKey, hasContext, loading, error]);
 
   // ── 포맷 ──
 

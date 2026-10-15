@@ -43,9 +43,14 @@ import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 import { CreateContentFromResourcesModal, type CreateContentProductContext } from './CreateContentFromResourcesModal';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
+import { useLibraryScope } from './library/useLibraryScope';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
 export default function StoreLibraryContentsPage() {
+  const { scope } = useLibraryScope();
+  return <LibraryContents key={scope} />;
+}
+function LibraryContents() {
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -97,8 +102,11 @@ export default function StoreLibraryContentsPage() {
 
   const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
     if (snapshotIds.length === 0) return 0;
-    await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
-    return snapshotIds.length;
+    const results = await Promise.allSettled(snapshotIds.map(async (id) => {
+      const result = await storeAssetControlApi.updatePublishStatus(id, 'hidden');
+      if (!result.success || result.data?.snapshotId !== id || result.data.publishStatus !== 'hidden') throw new Error('Not hidden');
+    }));
+    return results.filter(result => result.status === 'fulfilled').length;
   }, []);
 
   return (

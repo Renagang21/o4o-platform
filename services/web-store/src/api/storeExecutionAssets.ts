@@ -106,7 +106,7 @@ export interface UpdateStoreAssetParams {
   fileName?: string;
   fileSize?: number;
   mimeType?: string;
-  category?: string;
+  category?: string | null;
   usageType?: UsageType;
   url?: string;
   htmlContent?: string;

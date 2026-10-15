@@ -12,7 +12,7 @@
  */
 
 import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -29,72 +29,14 @@ import {
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { BlockRenderer } from '@o4o/block-renderer';
-import { directContentApi, type DirectContentItem } from '../../api/assetSnapshot';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { getActiveServiceKey } from '../../lib/serviceContext';
+import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
+import { emptyTextDraft, loadDirect, saveDirect, removeDirect, textDraftFromRecord } from './authoring/contentAuthoringAdapters';
+import { parseDirectBlocks } from './authoring/contentAuthoringModels';
+import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
 import { TagInput } from '../../components/store/TagInput';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type ContentBlock = {
-  type: 'text' | 'image' | 'link' | 'list';
-  value: string;
-  label?: string;
-  items?: string[];
-};
-
-function parseBlocks(contentJson: Record<string, unknown>): ContentBlock[] {
-  // contentJson이 배열인 경우 (o4o/youtube, o4o/paragraph 등 직접 블록 배열)
-  if (Array.isArray(contentJson)) {
-    return (contentJson as any[]).map((b) => {
-      if (b.type === 'o4o/youtube' || b.type === 'o4o/video') {
-        const url = b.attributes?.url || b.url || '';
-        return { type: 'link' as const, value: url, label: '▶ YouTube 영상 보기' };
-      }
-      if (b.type === 'o4o/image' || b.type === 'image') {
-        return { type: 'image' as const, value: b.attributes?.url || b.url || '' };
-      }
-      if (b.type === 'o4o/list' || b.type === 'list') {
-        // items는 b.items 또는 b.content.items (htmlToForumBlocks 저장 형식)
-        const items = Array.isArray(b.items) ? b.items
-          : (b.content && Array.isArray(b.content.items) ? b.content.items : []);
-        return { type: 'list' as const, value: '', items };
-      }
-      // o4o/paragraph, o4o/heading, text 등 텍스트 계열
-      // content가 객체인 경우(content.items 등) 무시하고 빈 문자열
-      const textVal = typeof b.content === 'string' ? b.content : (b.text || b.value || '');
-      return { type: 'text' as const, value: textVal };
-    });
-  }
-  if (Array.isArray(contentJson.blocks)) {
-    return (contentJson.blocks as any[]).map((b) => {
-      if ('content' in b && !('value' in b)) return { type: b.type === 'text' ? 'text' : b.type, value: b.content || '' } as ContentBlock;
-      if ('url' in b && !('value' in b)) return { type: 'image', value: b.url || '' } as ContentBlock;
-      if (b.type === 'list' && Array.isArray(b.items)) return { type: 'list' as const, value: '', items: b.items };
-      return { type: b.type || 'text', value: b.value || '', label: b.label, items: b.items } as ContentBlock;
-    });
-  }
-  if (typeof contentJson.html === 'string' && contentJson.html) {
-    return [{ type: 'text', value: contentJson.html }];
-  }
-  return [{ type: 'text', value: JSON.stringify(contentJson, null, 2) }];
-}
-
-// WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
-//   저장된 contentJson 을 o4o 표준 편집기(html)용으로 정규화. direct 콘텐츠는 contentJson.html 이 표준.
-//   레거시 블록/배열 형태도 html 로 정규화해 표준 편집기에 진입(유형 분기 없이 동일 편집기 사용).
-function contentJsonToHtml(contentJson: Record<string, unknown>): string {
-  if (typeof contentJson?.html === 'string') return contentJson.html;
-  const blocks = parseBlocks(contentJson);
-  return blocks
-    .map((b) => {
-      if (b.type === 'image' && b.value) return `<p><img src="${b.value}" alt="" /></p>`;
-      if (b.type === 'link' && b.value) return `<p><a href="${b.value}">${b.label || b.value}</a></p>`;
-      if (b.type === 'list' && b.items?.length) return `<ul>${b.items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
-      return b.value ? `<p>${b.value}</p>` : '';
-    })
-    .filter(Boolean)
-    .join('\n');
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -103,70 +45,37 @@ export default function StoreDirectContentPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [content, setContent] = useState<DirectContentItem | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Edit state
+  const { organizationId } = useStoreOrganizationId();
+  const serviceKey = getActiveServiceKey();
   const [editing, setEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
-  //   레거시 블록 편집기(editBlocks) 대신 o4o 표준 RichTextEditor(html) 사용. 유형 구분 없이 균일 적용.
-  const [editorContent, setEditorContent] = useState<EditorContent>({ html: '' });
-  const [editorInitialHtml, setEditorInitialHtml] = useState('');
-  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 편집 state
-  const [editTags, setEditTags] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
-
-  // Delete state
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const showToast = (msg: string, ok: boolean) => {
-    setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const fetchContent = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await directContentApi.get(id);
-      setContent(res.data);
-    } catch (e: any) {
-      setError(e.message || '콘텐츠를 불러올 수 없습니다');
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => { fetchContent(); }, [fetchContent]);
-
-  // 표준 편집기는 html 로 동작 — 저장된 contentJson 을 html 로 정규화해 주입(유형 분기 아님).
-  const startEdit = () => {
-    if (!content) return;
-    setEditTitle(content.title);
-    const html = contentJsonToHtml(content.contentJson);
-    setEditorInitialHtml(html);
-    setEditorContent({ html });
-    setEditTags(Array.isArray(content.tags) ? content.tags : []);
-    setEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setEditing(false);
-    setEditTitle('');
-    setEditorContent({ html: '' });
-    setEditorInitialHtml('');
-    setEditTags([]);
-  };
+  const session = useContentAuthoringSession({
+    organizationId, serviceKey, target: `direct:${id ?? ''}`, initialDraft: emptyTextDraft,
+    load: () => id ? loadDirect(id) : Promise.reject(new Error('Missing content')),
+    toDraft: textDraftFromRecord,
+    persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
+    onSaved: (_record, unchanged) => { if (unchanged) setEditing(false); },
+    onRemoved: () => navigate('/store/library/contents', { replace: true }),
+  });
+  const { record: content, loading, error, saving, deleting, reload: fetchContent, save: handleSave, remove: handleDelete } = session;
+  const editTitle = session.draft.title, editTags = session.draft.tags;
+  const editorContent = { html: session.draft.html }, editorInitialHtml = session.seed.html;
+  const setEditTitle = (title: string) => session.changeDraft({ title });
+  const setEditTags = (tags: string[]) => session.changeDraft({ tags });
+  const setEditorContent = (value: EditorContent) => session.changeDraft({ html: value.html });
+  const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);
+  const toast = session.notice ? { msg: session.notice.message, ok: session.notice.ok } : null;
+  const showToast = (msg: string, ok: boolean) => session.notify(msg, ok);
+  const startEdit = () => { if (content) { session.resetDraft(); setEditing(true); } };
+  const cancelEdit = () => { session.resetDraft(); setEditing(false); };
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-EDIT-ROUTE-UNIFY-V1:
   //   목록의 [편집] 은 ?edit=1 로 진입한다 → 상세 보기를 거치지 않고 편집기를 바로 연다.
   //   콘텐츠 로딩 완료 후 1회만 자동 진입(사용자가 취소하면 재진입하지 않음).
   const autoEditRef = useRef(false);
+  useEffect(() => {
+    setEditing(false); setConfirmDelete(false); autoEditRef.current = false;
+  }, [id, organizationId, serviceKey]);
   useEffect(() => {
     if (content && !autoEditRef.current && searchParams.get('edit') === '1') {
       autoEditRef.current = true;
@@ -175,42 +84,6 @@ export default function StoreDirectContentPage() {
     // startEdit 는 매 렌더 재생성되지만 content 로딩 시 1회만 호출 — autoEditRef 가드.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, searchParams]);
-
-  const handleSave = async () => {
-    if (!id || !content) return;
-    setSaving(true);
-    try {
-      // html 이 authoritative — 기존 contentJson 의 부가 키(presets/generatedBy 등)는 보존하고
-      // 레거시 blocks 키는 제거(중복 시 렌더 우선순위 충돌 방지).
-      const contentJson: Record<string, unknown> = {
-        ...(content.contentJson as Record<string, unknown>),
-        html: editorContent.html,
-      };
-      delete contentJson.blocks;
-      const res = await directContentApi.update(id, { title: editTitle, contentJson, tags: editTags });
-      setContent(res.data);
-      setEditing(false);
-      showToast('저장되었습니다', true);
-    } catch (e: any) {
-      showToast(e.message || '저장 실패', false);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!id) return;
-    setDeleting(true);
-    try {
-      await directContentApi.remove(id);
-      // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: canonical 허브로 복귀
-      navigate('/store/library/contents', { replace: true });
-    } catch (e: any) {
-      showToast(e.message || '삭제 실패', false);
-      setDeleting(false);
-      setConfirmDelete(false);
-    }
-  };
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
@@ -227,7 +100,7 @@ export default function StoreDirectContentPage() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex flex-col items-center py-20 text-red-500">
           <AlertCircle className="w-6 h-6 mb-2" />
-          <p className="text-sm">{error || '콘텐츠를 찾을 수 없습니다'}</p>
+          <p role="alert" className="text-sm">{error || '콘텐츠를 찾을 수 없습니다'}</p>
           <button onClick={fetchContent} className="mt-3 text-sm text-blue-600 hover:underline">
             다시 시도
           </button>
@@ -236,14 +109,14 @@ export default function StoreDirectContentPage() {
     );
   }
 
-  const viewBlocks = parseBlocks(content.contentJson);
+  const viewBlocks = parseDirectBlocks(content.contentJson);
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       {!editing && <StoreContentNextSteps contentId={id} title={content.title} />}
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
+        <div role={toast.ok ? 'status' : 'alert'} className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
           toast.ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
           <CheckCircle className="w-4 h-4" />
@@ -258,7 +131,7 @@ export default function StoreDirectContentPage() {
       </Link>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           {editing ? (
             <input
@@ -266,7 +139,7 @@ export default function StoreDirectContentPage() {
               value={editTitle}
               onChange={e => setEditTitle(e.target.value)}
               className="text-xl font-bold text-slate-900 border-b-2 border-blue-500 outline-none bg-transparent w-full"
-              placeholder="콘텐츠 제목"
+              aria-label="콘텐츠 제목" placeholder="콘텐츠 제목"
             />
           ) : (
             <h1 className="text-xl font-bold text-slate-900 m-0">{content.title}</h1>
@@ -283,7 +156,8 @@ export default function StoreDirectContentPage() {
           <div className="mt-2">
             {editing ? (
               <div style={{ maxWidth: 520 }}>
-                <TagInput tags={editTags} onChange={setEditTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
+                <label htmlFor="direct-content-tags" className="sr-only">콘텐츠 태그</label>
+                <TagInput id="direct-content-tags" tags={editTags} onChange={setEditTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
               </div>
             ) : (
               Array.isArray(content.tags) && content.tags.length > 0 && (
@@ -312,7 +186,7 @@ export default function StoreDirectContentPage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || deleting}
                 className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -358,7 +232,7 @@ export default function StoreDirectContentPage() {
                 additionalInstruction,
               })}
               currentHtml={editorContent.html}
-              onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
+              onApplyHtml={setEditorInitialHtml}
               onNotify={(message, kind) => showToast(message, kind === 'success')}
             />
           </div>
@@ -390,21 +264,21 @@ export default function StoreDirectContentPage() {
 
       {/* Delete confirm modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-            <h2 className="text-base font-semibold text-slate-800 mb-2">콘텐츠를 삭제하시겠습니까?</h2>
+        <AuthoringDialog labelId="direct-delete-title" onClose={() => setConfirmDelete(false)} className="max-w-sm">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full">
+            <h2 id="direct-delete-title" className="text-base font-semibold text-slate-800 mb-2">콘텐츠를 삭제하시겠습니까?</h2>
             <p className="text-sm text-slate-500 mb-5">삭제하면 복구할 수 없습니다.</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setConfirmDelete(false)}
-                disabled={deleting}
+                disabled={deleting || saving}
                 className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
               >
                 취소
               </button>
               <button
                 onClick={handleDelete}
-                disabled={deleting}
+                disabled={deleting || saving}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -412,7 +286,7 @@ export default function StoreDirectContentPage() {
               </button>
             </div>
           </div>
-        </div>
+        </AuthoringDialog>
       )}
     </div>
   );

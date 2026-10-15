@@ -9,10 +9,10 @@ import PharmacyContentSourcesPage from '../neture-pharmacy/PharmacyContentSource
 import PharmacyOrdersPage from '../neture-pharmacy/PharmacyOrdersPage';
 
 const mocks = vi.hoisted(() => ({
-  serviceKey: 'kpa-society', products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
+  organizationId: 'store-a', serviceKey: 'kpa-society', products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
   businesses: vi.fn(), supply: vi.fn(), contents: vi.fn(), orders: vi.fn(), copy: vi.fn(),
 }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: 'store-a', effectiveServiceKey: mocks.serviceKey }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));
 vi.mock('../../api/localProducts', () => ({ createLocalProduct: mocks.create, updateLocalProduct: mocks.update, getLocalProduct: mocks.single }));
@@ -20,7 +20,7 @@ vi.mock('../../api/neturePharmacy', () => ({
   neturePharmacyApi: { listSemiFranchises: mocks.businesses, listSupplyOptions: mocks.supply, listContents: mocks.contents, listOrders: mocks.orders, copyContent: mocks.copy },
   pharmacyErrorMessage: (e: Error) => e.message, pharmacyErrorCode: () => null,
 }));
-vi.mock('../pharmacy/StoreLocalProductsPage', () => ({ ProductFormModal: ({ onSave }: { onSave: (v: unknown) => void }) => <button onClick={() => onSave({ name: '직접 등록 샘플' })}>제품 저장</button> }));
+vi.mock('../pharmacy/StoreLocalProductsPage', () => ({ ProductFormModal: ({ onSave, product }: { onSave: (v: unknown) => void; product: { name: string } | null }) => <div><output data-testid="local-form">{product?.name ?? '신규 제품'}</output><button onClick={() => onSave({ name: '직접 등록 샘플' })}>제품 저장</button></div> }));
 vi.mock('../pharmacy/StoreDescriptionViewModal', () => ({ StoreDescriptionViewModal: () => null }));
 vi.mock('../pharmacy/StoreProductQrModal', () => ({ StoreProductQrModal: () => null }));
 vi.mock('../pharmacy/AddO4oStandardProductModal', () => ({ AddO4oStandardProductModal: () => null }));
@@ -38,7 +38,7 @@ const businesses = [
 function LocationProbe() { const location = useLocation(); return <output data-testid="location">{location.pathname + location.search}</output>; }
 function mount(node: React.ReactNode, path = '/') { return render(<MemoryRouter initialEntries={[path]}>{node}<LocationProbe /></MemoryRouter>); }
 beforeEach(() => {
-  cleanup(); vi.clearAllMocks(); mocks.serviceKey = 'kpa-society';
+  cleanup(); vi.clearAllMocks(); mocks.organizationId = 'store-a'; mocks.serviceKey = 'kpa-society';
   mocks.products.mockResolvedValue({ items: [], pagination: { total: 0 } });
   mocks.create.mockResolvedValue({ id: 'local-new' });
   mocks.businesses.mockResolvedValue(businesses);
@@ -172,4 +172,64 @@ describe('제작·사본 동선', () => {
     await waitFor(() => expect(mocks.copy).toHaveBeenCalledWith('복사 자료'));
     expect((await screen.findByRole('link', { name: '내 매장 자료함에서 보기' })).getAttribute('href')).toBe('/store/library/contents');
   });
+});
+
+const localRow = (id: string) => ({ sourceType: 'local', sourceId: id, name: id, imageUrl: null, price: null, originLabel: '직접 등록', ownerLabel: '내 매장', isActive: true, classificationCode: '', classificationLabel: '', updatedAt: '', managePath: '' });
+it('늦은 제품 조회가 새 직접 등록 양식을 덮어쓰지 않는다', async () => {
+  const pending = deferred<{ id: string; name: string }>(); mocks.single.mockReturnValue(pending.promise);
+  mocks.products.mockResolvedValue({ items: [localRow('local-a')], pagination: { total: 1 } });
+  mount(<StoreHandledProductsPage />);
+  fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-a 선택' }));
+  fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
+  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  await act(async () => pending.resolve({ id: 'local-a', name: '이전 제품' }));
+  expect(screen.getByTestId('local-form').textContent).toBe('신규 제품');
+});
+it('제품 변경 후 늦은 이전 조회가 현재 수정 대상을 덮어쓰지 않는다', async () => {
+  const old = deferred<{ id: string; name: string }>();
+  mocks.single.mockReturnValueOnce(old.promise).mockResolvedValueOnce({ id: 'local-b', name: '현재 제품' });
+  mocks.products.mockResolvedValue({ items: [localRow('local-a'), localRow('local-b')], pagination: { total: 2 } });
+  mount(<StoreHandledProductsPage />);
+  const first = await screen.findByRole('checkbox', { name: 'local:local-a 선택' });
+  fireEvent.click(first); fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
+  fireEvent.click(first); fireEvent.click(screen.getByRole('checkbox', { name: 'local:local-b 선택' }));
+  fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
+  await screen.findByText('현재 제품');
+  await act(async () => old.resolve({ id: 'local-a', name: '이전 제품' }));
+  expect(screen.getByTestId('local-form').textContent).toBe('현재 제품');
+});
+it('매장 전환 후 이전 제품 조회 실패를 표시하지 않는다', async () => {
+  const pending = deferred<{ id: string; name: string }>(); mocks.single.mockReturnValue(pending.promise);
+  mocks.products.mockResolvedValue({ items: [localRow('local-a')], pagination: { total: 1 } });
+  const view = mount(<StoreHandledProductsPage />);
+  fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-a 선택' }));
+  fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
+  mocks.organizationId = 'store-b'; view.rerender(<MemoryRouter><StoreHandledProductsPage /></MemoryRouter>);
+  await act(async () => pending.reject(new Error('이전 제품 조회 실패')));
+  const { toast } = await import('@o4o/error-handling');
+  expect(toast.error).not.toHaveBeenCalled();
+  expect(screen.queryByTestId('local-form')).toBeNull();
+});
+it('저장 중 중복 제출과 다른 등록 화면 진입을 막는다', async () => {
+  const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
+  mount(<StoreHandledProductsPage />);
+  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  const save = screen.getByRole('button', { name: '제품 저장' });
+  fireEvent.click(save); fireEvent.click(save);
+  expect(mocks.create).toHaveBeenCalledTimes(1);
+  expect((screen.getByRole('button', { name: /^직접 등록하기$/ }) as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => pending.resolve({ id: 'new-local' }));
+  expect(screen.queryByTestId('local-form')).toBeNull();
+});
+it('매장 전환 후 이전 저장 완료가 성공 알림이나 새 목록 갱신을 만들지 않는다', async () => {
+  const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
+  const view = mount(<StoreHandledProductsPage />);
+  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  fireEvent.click(screen.getByRole('button', { name: '제품 저장' }));
+  mocks.organizationId = 'store-b'; view.rerender(<MemoryRouter><StoreHandledProductsPage /></MemoryRouter>);
+  await waitFor(() => expect(mocks.products).toHaveBeenCalledTimes(2));
+  await act(async () => pending.resolve({ id: 'new-local' }));
+  const { toast } = await import('@o4o/error-handling');
+  expect(toast.success).not.toHaveBeenCalled();
+  expect(mocks.products).toHaveBeenCalledTimes(2);
 });

@@ -7,7 +7,7 @@
  *   POST   /api/v1/neture/pharmacy/cart/checkout      주문 확정 → 결제 그룹(수취 주체별) · 실패 항목
  * 단가 · 이용 가능 여부는 주문 확정 시 서버가 다시 판정한다. 화면의 금액은 표시용이다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   neturePharmacyApi,
@@ -17,40 +17,36 @@ import {
 } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, SUPPLY_KIND_LABEL, btn, formatWon, pharmacyStorePath } from './shared';
 import { PaymentGroupPay, usePaymentMode } from './PaymentGroupPay';
+import { useLatestList } from '../../hooks/useLatestList';
+
+const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '장바구니를 불러오지 못했습니다.');
 
 export default function PharmacyCartPage() {
   const mode = usePaymentMode();
-  const [items, setItems] = useState<PharmacyCartItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [qty, setQty] = useState<Record<string, string>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
   const [result, setResult] = useState<CheckoutResult | null>(null);
+  const mutation = useRef(false);
+  const mutationBusy = busyId !== null || checkingOut;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const rows = await neturePharmacyApi.getCart();
-      setItems(rows);
-      setQty(Object.fromEntries(rows.map((r) => [r.id, String(r.quantity)])));
-    } catch (e) {
-      setError(pharmacyErrorMessage(e, '장바구니를 불러오지 못했습니다.'));
-    } finally {
-      setLoading(false);
-    }
+  const fetchList = useCallback(async () => {
+    const items = await neturePharmacyApi.getCart();
+    return { items, total: items.length };
   }, []);
-
-  useEffect(() => { void load(); }, [load]);
+  const { items, loading, error, setError, load } = useLatestList<PharmacyCartItem>(fetchList, listErrorMessage);
+  useEffect(() => { setQty(Object.fromEntries(items.map((item) => [item.id, String(item.quantity)]))); }, [items]);
+  const unappliedQuantity = items.some(item => qty[item.id] !== undefined && Number(qty[item.id]) !== item.quantity);
 
   const updateQty = async (item: PharmacyCartItem) => {
+    if (mutation.current || loading) return;
     const n = Number(qty[item.id]);
     if (!Number.isInteger(n) || n < 1) {
       setError('수량을 1 이상의 정수로 입력해 주세요.');
       return;
     }
     if (n === item.quantity) return;
+    mutation.current = true;
     setBusyId(item.id);
     setError(null);
     try {
@@ -59,11 +55,14 @@ export default function PharmacyCartPage() {
     } catch (e) {
       setError(pharmacyErrorMessage(e, '수량을 바꾸지 못했습니다.'));
     } finally {
+      mutation.current = false;
       setBusyId(null);
     }
   };
 
   const remove = async (item: PharmacyCartItem) => {
+    if (mutation.current || loading) return;
+    mutation.current = true;
     setBusyId(item.id);
     setError(null);
     try {
@@ -72,6 +71,7 @@ export default function PharmacyCartPage() {
     } catch (e) {
       setError(pharmacyErrorMessage(e, '삭제하지 못했습니다.'));
     } finally {
+      mutation.current = false;
       setBusyId(null);
     }
   };
@@ -81,7 +81,8 @@ export default function PharmacyCartPage() {
   const estimate = available.reduce((s, i) => s + (i.unitPrice ?? 0) * i.quantity, 0);
 
   const checkout = async () => {
-    if (checkingOut || available.length === 0) return;
+    if (mutation.current || loading || unappliedQuantity || available.length === 0) return;
+    mutation.current = true;
     setCheckingOut(true);
     setError(null);
     setResult(null);
@@ -91,6 +92,7 @@ export default function PharmacyCartPage() {
     } catch (e) {
       setError(pharmacyErrorMessage(e, '주문을 확정하지 못했습니다.'));
     } finally {
+      mutation.current = false;
       setCheckingOut(false);
     }
   };
@@ -102,6 +104,7 @@ export default function PharmacyCartPage() {
       actions={<>
         <Link className={btn.secondary} to={pharmacyStorePath('supply')}>공급 상품</Link>
         <Link className={btn.secondary} to={pharmacyStorePath('orders')}>주문 내역</Link>
+        <button className={btn.secondary} disabled={loading || mutationBusy} onClick={load}>새로고침</button>
       </>}
     >
       {error && <Notice tone="error">{error}</Notice>}
@@ -134,7 +137,7 @@ export default function PharmacyCartPage() {
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : items.length === 0 ? (
+      ) : error && items.length === 0 ? null : items.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
           <p>장바구니가 비어 있습니다.</p>
           <p className="mt-1"><Link className="underline" to={pharmacyStorePath('supply')}>공급 상품 보기</Link></p>
@@ -145,7 +148,7 @@ export default function PharmacyCartPage() {
             <Notice tone="warn">지금 주문할 수 없는 항목이 {unavailableCount}건 있습니다(공급 종료 · 기간 만료 · 세미프랜차이즈 가입 변경 등). 이 항목은 주문 확정에서 제외됩니다.</Notice>
           )}
           <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[720px] text-sm" aria-label="장바구니 항목">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-600">
                   <th className="px-4 py-3 font-medium">제품</th>
@@ -178,15 +181,15 @@ export default function PharmacyCartPage() {
                           aria-label={`${i.productName} 수량`}
                           value={qty[i.id] ?? String(i.quantity)}
                           onChange={(e) => setQty((prev) => ({ ...prev, [i.id]: e.target.value }))}
-                          disabled={!i.available || busyId === i.id}
+                          disabled={!i.available || mutationBusy}
                           className="w-16 rounded border border-gray-300 px-2 py-1 text-right"
                         />
-                        <button className={btn.secondary} disabled={!i.available || busyId === i.id || qty[i.id] === String(i.quantity)} onClick={() => updateQty(i)}>변경</button>
+                        <button className={btn.secondary} disabled={!i.available || mutationBusy || qty[i.id] === String(i.quantity)} onClick={() => updateQty(i)}>변경</button>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right">{i.unitPrice != null ? formatWon(i.unitPrice * i.quantity) : '-'}</td>
                     <td className="px-4 py-3 text-center">
-                      <button className={btn.danger} disabled={busyId === i.id} onClick={() => remove(i)}>삭제</button>
+                      <button className={btn.danger} disabled={mutationBusy} onClick={() => remove(i)}>삭제</button>
                     </td>
                   </tr>
                 ))}
@@ -195,10 +198,11 @@ export default function PharmacyCartPage() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-end gap-4">
             <span className="text-sm text-gray-700">주문 가능 {available.length}건 · 예상 상품 금액 {formatWon(estimate)} <span className="text-xs text-gray-500">(배송비 별도 · 확정 시 재계산)</span></span>
-            <button className={btn.primary} disabled={checkingOut || available.length === 0} onClick={checkout} data-testid="cart-checkout">
+            <button className={btn.primary} disabled={mutationBusy || unappliedQuantity || available.length === 0} onClick={checkout} data-testid="cart-checkout">
               {checkingOut ? '주문 확정 중...' : '주문 확정'}
             </button>
           </div>
+          {unappliedQuantity && <p className="mt-2 text-right text-sm text-amber-700">수량 변경을 적용한 후 주문을 확정해 주세요.</p>}
         </>
       )}
     </PharmacyPage>
