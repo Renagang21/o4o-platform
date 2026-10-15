@@ -1068,6 +1068,10 @@ export function createMemberController(
 
         const oldRole = member.role;
         const newRole = req.body.role;
+        if (newRole !== 'member' && newRole !== oldRole) {
+          res.status(403).json({ error: { code: 'OPERATOR_INVITATION_REQUIRED', message: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하세요.' } });
+          return;
+        }
 
         // WO-KPA-ROLE-POLICY-ENFORCEMENT-V1: Self-escalation prevention
         if (req.user!.id === member.user_id && newRole === 'admin') {

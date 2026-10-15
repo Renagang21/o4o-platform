@@ -10,10 +10,10 @@
  * 반대로 요청 배열에 빠진 서비스 회원 역할은 조용히 지워졌다.
  *
  * 이 모듈의 계약:
- *   - 새로 **추가**할 수 있는 역할은 `ASSIGNABLE_OPERATOR_ROLES`(서비스 범위 운영자)뿐이다.
+ *   - 카탈로그상 **추가** 대상으로 인정하는 역할은 `ASSIGNABLE_OPERATOR_ROLES`(서비스 범위 운영자)뿐이다.
  *   - 카탈로그 밖 역할(일반 회원 역할 · platform:* · legacy 등)은 **건드리지 않는다** —
  *     요청에 없어도 지우지 않고, 요청에 새로 있으면 거절한다. 기존 역할 데이터는 일괄 삭제하지 않는다.
- *   - 카탈로그 역할만 요청 배열과의 차이로 추가·해제한다.
+ *   - 실행 시 신규 추가는 이메일 초대·수락 절차로만 처리한다. 배열 편집은 보존·해제만 가능하다.
  */
 import type { EntityManager } from 'typeorm';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
@@ -31,7 +31,7 @@ import {
   SELF_ROLE_REVOKE_FORBIDDEN_CODE,
   SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
 } from '../../utils/role-revoke-safety.js';
-import { ensureServiceMembershipsForRoles, type MembershipEnsureResult } from './service-membership-ensure.js';
+import { type MembershipEnsureResult } from './service-membership-ensure.js';
 
 export interface AdminRoleEditPlan {
   add: string[];
@@ -104,7 +104,7 @@ export class AdminRoleEditForbiddenError extends Error {
  *   - 해제는 `revokeRoleAssignment` 와 같은 안전장치를 거친다: 자기 역할 해제는 `canRevokeOwnRole`,
  *     서비스 admin 해제는 `revokeServiceAdminRoleWithLock`(마지막 admin 보호 · 잠금). 자기 해제 판정은
  *     쓰기 전에 끝내고, 실패할 수 있는 서비스 admin 해제를 먼저 실행한다.
- *   - 추가한 운영자 역할의 서비스 membership 은 없을 때만 active 로 만든다(기존 pending · suspended 불변).
+ *   - 신규 추가가 있으면 어떤 쓰기보다 먼저 OPERATOR_INVITATION_REQUIRED 로 거절한다.
  */
 export async function applyAdminRoleEdit(
   userId: string,
@@ -114,6 +114,10 @@ export async function applyAdminRoleEdit(
 ): Promise<AdminRoleEditResult> {
   const current = await roleAssignmentService.getRoleNames(userId);
   const plan = planAdminRoleEdit(current, requested);
+
+  if (plan.add.length) {
+    throw new AdminRoleEditForbiddenError('OPERATOR_INVITATION_REQUIRED', '새 운영 권한은 운영자 초대 메일의 확인·수락 후에만 부여됩니다. 운영자 지정 화면에서 초대하세요.');
+  }
 
   if (requester.id === userId) {
     const blocked = plan.remove.filter(
@@ -135,7 +139,5 @@ export async function applyAdminRoleEdit(
     }
   }
   for (const role of otherRemovals) await roleAssignmentService.removeRole(userId, role);
-  for (const role of plan.add) await roleAssignmentService.assignRole({ userId, role }, manager);
-  const membership = plan.add.length > 0 ? await ensureServiceMembershipsForRoles(userId, plan.add, manager) : null;
-  return { ...plan, membership };
+  return { ...plan, membership: null };
 }

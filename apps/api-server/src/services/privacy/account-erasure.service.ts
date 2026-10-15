@@ -43,6 +43,7 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   assistant_run_frames: ['user_id'], assistant_procedural_patterns: ['user_id'], assistant_tasks: ['requested_by_user_id'],
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
+  service_operator_invitations: ['target_user_id', 'accepted_user_id'],
 };
 
 export function calendarExpiry(created: Date, years: 1 | 2): Date {
@@ -289,7 +290,16 @@ export class AccountErasureService {
     for (const t of await this.tables(m)) {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      if (t.schema_name === 'public' && t.table_name === 'service_operator_invitations') {
+        predicate = `(${predicate}) OR (r.target_user_id IS NULL AND lower(r.invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
+        // Typed invitation ownership: preserve peer invitations. The inviter FK is attribution only
+        // and ON DELETE SET NULL clears it; token hashes/role names are not copied identities.
+        const [other] = await m.query(`SELECT count(*)::int AS n FROM service_operator_invitations r
+          WHERE NOT COALESCE((${predicate}),false) AND lower(r.invited_email)=ANY($2::text[])`, [user.id, tokens.map(v=>v.toLowerCase())]);
+        if (other.n) codes.push('REVIEW:public.service_operator_invitations');
+        continue;
+      }
       // Null-only FK attribution can be cleared by the final FK action. Its JSON/free text
       // is still found by the full-row identity scan; business/branch records remain explicit reviews.
       if (t.table_name === 'community_membership_changes') {
@@ -348,7 +358,10 @@ export class AccountErasureService {
     for (const [table, owners] of Object.entries(PRIVATE_OWNERS)) {
       const t = tables.find(x => x.schema_name === 'public' && x.table_name === table);
       if (!t) continue;
-      const where = owners.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
+      let where = owners.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
+      if (table === 'service_operator_invitations') {
+        where = `(${where}) OR (target_user_id IS NULL AND lower(invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
+      }
       if (where) await m.query(`DELETE FROM public.${quote(table)} WHERE ${where}`, [userId]);
     }
   }

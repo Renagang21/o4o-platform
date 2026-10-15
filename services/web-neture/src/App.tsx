@@ -1,3 +1,4 @@
+import OperatorInvitePage from './pages/OperatorInvitePage';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
@@ -674,6 +675,7 @@ function App() {
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
+            <Route path="/operator-invite" element={<OperatorInvitePage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterRedirect />} />
             {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.
