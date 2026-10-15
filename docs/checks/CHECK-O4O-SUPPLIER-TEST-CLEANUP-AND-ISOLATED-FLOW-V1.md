@@ -137,3 +137,12 @@ DB를 만들기 전에 존재하지 않음을 확인하고 실행별 ownership m
 기록용 branch push·PR까지 수행하며 병합·배포는 통합 담당에게 인계한다. worktree는 PR 병합 전까지 KEEP한다.
 
 문서 정합: 실계정 승인·기록 보존 계획을 철회하고 운영자 완전 삭제 결과와 후속 조회를 반영해 COMPLETED로 갱신했다. 현행 사업·정산 정책 변경 없음.
+
+
+## 통합 후속 — 실행 가능한 소유권·finally 정리 (2026-10-16 KST)
+
+#618 리뷰에서 SETUP 예시가 lifecycle 설명과 달리 bootstrap/test를 별도 프로세스로 실행하던 결함을 확인했다. `scripts/dev/run-supplier-store-fixture.ts` 한 프로세스가 전용 loopback URL을 검증하고 DB 존재 시 거절, 생성 후 무작위 database comment marker 기록, canonical bootstrap·incremental prefix fingerprint 확인, 합성 업무 테스트 실행, finally에서 소유권 확인·DROP·잔여0 검증을 수행한다. 기존 DB·타 연결 강제 종료·FORCE DROP은 없다. 연결값은 출력하지 않는다. SIGKILL/호스트 종료의 finally 한계와 잔여 확인도 명시했다.
+
+격리 PostgreSQL15에서 실제 공급자→매장 통합 **2 PASS**, bootstrap 전체 fingerprint 일치, 성공 후 DB0을 외부 control 조회로 확인했다. 기존 동일 이름 DB는 실행 거절 후 보존(1건), 검증 하네스가 만든 DB만 직접 정리했다. 테스트 자식 프로세스 실패를 주입했을 때도 wrapper 실패 코드와 finally cleanup·DB0을 확인했다. 컨테이너는 종료·제거했다. 실제 운영 DB·계정·PG 결제·메일·배송 요청은 실행하지 않았다. build:packages·script lint·문서 민감정보·diff 검사 PASS.
+
+같은 문서 통합 branch는 #611 인증 후속 TODO와 #633 My Home UX 계획의 전체 이력도 포함한다. 계획 문서를 병합해도 그 계획의 구현·운영 검증이 완료되는 것은 아니다. 실제 인증 계정 비교의 로그 접근 제한은 유지한다.

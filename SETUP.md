@@ -396,43 +396,21 @@ pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules
   migration runner는 `DB_*`를 읽으므로, 저장소 루트에서 아래 대상 검증·명시적 환경 전달로만
   전용 fixture의 baseline과 incremental schema를 적용합니다. 기존 개발·운영 DB를 사용하지 않습니다.
 
+공통 패키지를 먼저 빌드한 뒤, **DB 생성·bootstrap·테스트·정리를 하나의 프로세스**로 실행합니다.
+같은 이름의 DB가 이미 있으면 재사용·삭제하지 않고 거절합니다. wrapper가 생성한 DB에만
+무작위 소유권 marker를 남기고, 성공·실패 모두 `finally`에서 marker 확인 후 제거합니다.
+
 ```bash
-node --input-type=module <<'NODE'
-import { spawnSync } from 'node:child_process';
-const raw = process.env.NETURE_SUPPLIER_STORE_IT_DATABASE_URL;
-if (!raw) throw new Error('Dedicated fixture URL is required');
-const target = new URL(raw);
-if (target.protocol !== 'postgresql:' || target.hostname !== '127.0.0.1' ||
-    target.port !== '55432' || target.pathname !== '/o4o_supplier_store_integration' ||
-    target.search || target.hash || !target.username || !target.password) {
-  throw new Error('Refusing migration outside the dedicated loopback fixture');
-}
-const result = spawnSync('pnpm', ['--filter', '@o4o/api-server', 'run', 'migration:run'], {
-  stdio: 'inherit',
-  env: { ...process.env, NODE_ENV: 'development', DB_HOST: '127.0.0.1', DB_PORT: '55432',
-    DB_NAME: 'o4o_supplier_store_integration', DB_USERNAME: decodeURIComponent(target.username),
-    DB_PASSWORD: decodeURIComponent(target.password) },
-});
-if (result.error) throw new Error('Fixture migration could not start');
-process.exit(result.status ?? 1);
-NODE
+pnpm run build:packages
+pnpm exec tsx scripts/dev/run-supplier-store-fixture.ts
 ```
 
-- `pnpm run build:packages`를 실행한 뒤 저장소 루트에서 다음 명령을 사용합니다.
-
-```text
-pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts
-```
-
-변수가 없으면 두 integration test는 skip입니다. skip을 DB 통합 검증 PASS로 보고하지 않습니다.
-테스트는 합성 데이터만 생성하며 실행 후 연결을 닫습니다. 종료 후 자신이 만든 전용 DB를 제거해
-fixture를 정리합니다. 다른 PostgreSQL DB나 컨테이너를 삭제하지 않습니다.
-
-테스트 시작 전에 같은 이름의 DB가 없음을 확인하고, 이번 실행이 생성한 DB의 소유권 표시를 남깁니다.
-기존 DB가 있으면 재사용하거나 삭제하지 않습니다. bootstrap·테스트의 성공/실패와 관계없이 `finally`에서
-소유권을 다시 확인한 뒤 이번 실행의 전용 DB만 제거하고, `pg_database`의 해당 이름 건수가 0인지 확인합니다.
-테스트 PASS와 데이터 정리 완료를 따로 기록하며, 삭제에 실패하면 미정리 상태로 보고합니다.
-다른 세션의 연결을 강제로 끊거나 다른 DB·운영 기록을 지워 정리 성공으로 만들지 않습니다.
+wrapper는 canonical baseline과 전체 incremental manifest의 매 prefix fingerprint를 확인합니다.
+전용 URL 변수가 없으면 wrapper는 실패하며, Jest를 직접 실행해 skip된 결과는 통합 PASS가 아닙니다.
+`Fixture tests PASS`와 `Fixture cleanup PASS: database count 0`을 각각 확인합니다.
+소유권이 바뀌었거나 다른 연결 때문에 DROP이 실패하면 미정리 상태로 보고합니다. 다른 세션의
+연결을 강제로 끊거나 다른 DB·컨테이너·운영 기록을 지우지 않습니다. SIGKILL·호스트 종료는
+finally 실행을 보장할 수 없으므로 중단 시 소유권과 잔여 DB를 별도로 확인합니다.
 
 약국 매장(`neture-pharmacy`) 주문의 Neture 정산 제외 정책은 유지합니다. 약국 구매·배송과
 기존 Neture 정산 대상 주문의 계산·승인·지급을 구분해 검증하며, 정산 범위를 임의 확대하지 않습니다.
