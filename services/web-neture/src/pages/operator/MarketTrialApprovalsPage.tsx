@@ -11,8 +11,9 @@
  *   - 포럼 연계 실패: 포럼 자동 연계 실패 이력 조회 + resolve
  */
 
+import { OperatorDialog } from './OperatorDialog';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type RefObject } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
 import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from '../../api/trial';
@@ -48,12 +49,13 @@ type PageTab = 'trials' | 'forum-failures';
 // ============================================================================
 
 export default function MarketTrialApprovalsPage() {
+  const dialogFallback = useRef<HTMLHeadingElement>(null);
   const [pageTab, setPageTab] = useState<PageTab>('trials');
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold text-gray-900">유통참여형 펀딩 관리</h1>
+        <h1 ref={dialogFallback} tabIndex={-1} className="text-xl font-bold text-gray-900">유통참여형 펀딩 관리</h1>
       </div>
 
       {/* 상단 페이지 탭 */}
@@ -66,7 +68,7 @@ export default function MarketTrialApprovalsPage() {
         </PageTabButton>
       </div>
 
-      {pageTab === 'trials' ? <TrialsPanel /> : <ForumSyncFailuresPanel />}
+      {pageTab === 'trials' ? <TrialsPanel /> : <ForumSyncFailuresPanel dialogFallback={dialogFallback} />}
     </div>
   );
 }
@@ -311,7 +313,7 @@ const STAGE_LABEL: Record<string, string> = {
 
 type ResolvedFilter = 'all' | 'unresolved' | 'resolved';
 
-function ForumSyncFailuresPanel() {
+function ForumSyncFailuresPanel({ dialogFallback }: { dialogFallback: RefObject<HTMLElement | null> }) {
   const navigate = useNavigate();
   const [items, setItems] = useState<ForumSyncFailure[]>([]);
   const [total, setTotal] = useState(0);
@@ -513,13 +515,12 @@ function ForumSyncFailuresPanel() {
 
       {/* Resolve 모달 */}
       {resolveTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <dialog open aria-modal="true" aria-label="해결 처리" className="relative m-0 bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <OperatorDialog label="해결 처리" fallbackFocus={dialogFallback} busy={resolving} onCancel={() => setResolveTarget(null)} className="bg-white rounded-xl shadow-xl max-w-md p-6">
             <h3 className="font-semibold text-gray-900 mb-1">해결 처리</h3>
             <p className="text-sm text-gray-500 mb-4 truncate">
               {resolveTarget.trialTitle}
             </p>
-            <textarea
+            <textarea data-dialog-initial-focus
               value={resolveNote}
               onChange={(e) => setResolveNote(e.target.value)}
               placeholder="운영 메모 (선택)"
@@ -547,8 +548,7 @@ function ForumSyncFailuresPanel() {
                 {resolving ? '처리 중...' : '해결 완료'}
               </button>
             </div>
-          </dialog>
-        </div>
+          </OperatorDialog>
       )}
 
       {/* 에러 메시지 전체보기 모달 */}
