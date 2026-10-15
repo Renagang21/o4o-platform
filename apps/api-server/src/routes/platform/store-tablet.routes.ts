@@ -35,6 +35,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource, In } from 'typeorm';
+import { retiredServiceKeySql } from '../../utils/retired-organization.js';
 import { StoreTablet } from './entities/store-tablet.entity.js';
 import { StoreTabletDisplay } from './entities/store-tablet-display.entity.js';
 import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-interest-request.entity.js';
@@ -290,6 +291,7 @@ export function createStoreTabletRoutes(
       const rows = await dataSource.query(
         `SELECT service_key AS "serviceKey" FROM platform_store_slugs
           WHERE store_id = $1 AND is_active = true
+            AND NOT ${retiredServiceKeySql('service_key')}
           ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
         [organizationId],
       );
@@ -364,6 +366,7 @@ export function createStoreTabletRoutes(
     const rows = await dataSource.query(
       `SELECT slug, service_key AS "serviceKey" FROM platform_store_slugs
         WHERE store_id = $1 AND is_active = true
+          AND NOT ${retiredServiceKeySql('service_key')}
         ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
       [organizationId],
     );
@@ -1848,6 +1851,7 @@ export function createStoreTabletRoutes(
           const slugRows = await dataSource.query(
             `SELECT slug, service_key AS "serviceKey" FROM platform_store_slugs
               WHERE store_id = $1 AND is_active = true
+                AND NOT ${retiredServiceKeySql('service_key')}
               ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
             [organizationId],
           );

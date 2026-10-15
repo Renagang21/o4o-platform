@@ -144,14 +144,16 @@ describe('slot updates preserve content/service boundaries', () => {
     jest.mocked(roleAssignmentService.hasAnyRole).mockResolvedValue(true);
     const slot = { id: 'slot-a', slotKey: 'home', contentId: 'content-a', serviceKey: 'kpa-society', isLocked: false };
     const save = jest.fn(async (value: unknown) => value);
+    const remove = jest.fn();
+    const deleteSlots = jest.fn();
     const dataSource: any = { getRepository: (entity: { name: string }) => entity.name === 'CmsContentSlot'
-      ? { findOne: jest.fn(async () => ({ ...slot })), save }
+      ? { findOne: jest.fn(async () => ({ ...slot })), find: jest.fn(async () => [{ ...slot }]), save, remove, delete: deleteSlots }
       : { findOne: jest.fn(async () => ({ id: 'content-a', serviceKey: contentService })) } };
     const app = express();
     app.use(express.json());
     app.use((req: any, _res, next) => { req.user = { id: 'admin-a', roles: ['platform:super_admin'] }; next(); });
     app.use('/cms', createCmsContentSlotRoutes({ dataSource }));
-    return { app, save };
+    return { app, save, remove, deleteSlots };
   }
 
   it.each([{ serviceKey: 'neture' }, { serviceKey: 'neture', contentId: 'content-a' }])(
@@ -169,6 +171,20 @@ describe('slot updates preserve content/service boundaries', () => {
     const response = await request(app).put('/cms/slots/slot-a').send({ contentId: 'content-a' });
     expect(response.status).toBe(410);
     expect(save).not.toHaveBeenCalled();
+  });
+
+  it.each([{ sortOrder: 2 }, { isActive: false }])('rejects metadata-only changes to a slot linked to retired content: %j', async body => {
+    const { app, save } = updateApp('pharmacy-hub');
+    expect((await request(app).put('/cms/slots/slot-a').send(body)).status).toBe(410);
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('rejects direct and empty bulk deletion of a live-service slot linked to retired content', async () => {
+    const { app, remove, deleteSlots } = updateApp('pharmacy-hub:legacy');
+    expect((await request(app).delete('/cms/slots/slot-a')).status).toBe(410);
+    expect((await request(app).put('/cms/slots/home/contents').send({ contents: [] })).status).toBe(410);
+    expect(remove).not.toHaveBeenCalled();
+    expect(deleteSlots).not.toHaveBeenCalled();
   });
 
   it('preserves aliases and permits moving platform content to a service slot', async () => {

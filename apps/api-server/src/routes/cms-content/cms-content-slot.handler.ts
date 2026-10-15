@@ -192,6 +192,15 @@ export function createCmsContentSlotRoutes(deps: {
   const router = Router();
   const { dataSource } = deps;
 
+  const hasRetiredStoredSlot = async (slot: { serviceKey: string | null; contentId?: string }): Promise<boolean> => {
+    if (isRetiredServiceValue(slot.serviceKey)) return true;
+    if (!slot.contentId) return false;
+    const content = await dataSource.getRepository(CmsContent).findOne({
+      where: { id: slot.contentId }, select: ['serviceKey'],
+    });
+    return isRetiredServiceValue(content?.serviceKey);
+  };
+
   /**
    * GET /cms/slots/:slotKey
    * Get content items assigned to a specific slot
@@ -570,7 +579,7 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
-      if (isRetiredServiceValue(slot.serviceKey)) {
+      if (await hasRetiredStoredSlot(slot)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }
@@ -711,7 +720,7 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
-      if (isRetiredServiceValue(slot.serviceKey)) {
+      if (await hasRetiredStoredSlot(slot)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }
@@ -835,8 +844,9 @@ export function createCmsContentSlotRoutes(deps: {
       }
 
       // 퇴역 서비스 slot 은 교체(삭제 후 재생성) 대상이 아니다 — serviceKey 없이 호출한 admin 의 일괄 삭제 포함.
-      const existingScopeSlots = await slotRepo.find({ where: scopeWhere, select: ['id', 'serviceKey'] });
-      if (isRetiredServiceValue(serviceKey) || existingScopeSlots.some((s) => isRetiredServiceValue(s.serviceKey))) {
+      const existingScopeSlots = await slotRepo.find({ where: scopeWhere, select: ['id', 'serviceKey', 'contentId'] });
+      const retiredExistingSlots = await Promise.all(existingScopeSlots.map(hasRetiredStoredSlot));
+      if (isRetiredServiceValue(serviceKey) || retiredExistingSlots.some(Boolean)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }

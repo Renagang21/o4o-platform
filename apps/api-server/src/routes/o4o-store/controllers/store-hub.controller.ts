@@ -22,6 +22,7 @@ import { StoreCapabilityService } from '../../../modules/store-core/services/sto
 import { getCapabilityMeta } from '@o4o/capabilities';
 // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change endpoint reuses existing core service.
 import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
+import { retiredServiceKeySql } from '../../../utils/retired-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -284,7 +285,7 @@ export function createStoreHubController(
         let organizationCode: string | null = null;
         try {
           const slugRow = await dataSource.query(
-            `SELECT slug FROM platform_store_slugs WHERE store_id = $1 AND is_active = true ORDER BY created_at ASC LIMIT 1`,
+            `SELECT slug FROM platform_store_slugs WHERE store_id = $1 AND is_active = true AND NOT ${retiredServiceKeySql('service_key')} ORDER BY created_at ASC LIMIT 1`,
             [organizationId]
           );
           organizationCode = slugRow[0]?.slug || null;

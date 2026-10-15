@@ -6,6 +6,7 @@
  * Core Freeze 준수: KPA 엔티티 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
+import { retiredServiceKeySql } from '../../utils/retired-organization.js';
 import { AppDataSource } from '../../database/connection.js';
 import { StoreCapabilityService } from '../../modules/store-core/services/store-capability.service.js';
 import { StoreChannelService } from '../../modules/store-core/services/store-channel.service.js';
@@ -135,7 +136,7 @@ export class StoreConsoleController {
                 o."createdAt", o."updatedAt",
                 u.email as owner_email, u.name as owner_name,
                 (SELECT pss.slug FROM platform_store_slugs pss
-                 WHERE pss.store_id = o.id AND pss.is_active = true LIMIT 1) as slug,
+                 WHERE pss.store_id = o.id AND pss.is_active = true AND NOT ${retiredServiceKeySql('pss.service_key')} LIMIT 1) as slug,
                 (SELECT COUNT(*)::int FROM organization_channels oc
                  WHERE oc.organization_id = o.id) as channel_count,
                 (SELECT COUNT(*)::int FROM organization_product_listings opl
@@ -242,7 +243,7 @@ export class StoreConsoleController {
                 o.metadata, o."createdAt", o."updatedAt",
                 u.email as owner_email, u.name as owner_name,
                 (SELECT pss.slug FROM platform_store_slugs pss
-                 WHERE pss.store_id = o.id AND pss.is_active = true LIMIT 1) as slug
+                 WHERE pss.store_id = o.id AND pss.is_active = true AND NOT ${retiredServiceKeySql('pss.service_key')} LIMIT 1) as slug
          FROM organizations o
          LEFT JOIN users u ON o.created_by_user_id = u.id
          WHERE o.id = $1`,

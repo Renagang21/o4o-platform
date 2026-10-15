@@ -29,6 +29,8 @@ API 타입 검사도 통과했다. 전체 Jest의 최종 판정은 이 통합 he
 
 ## 실제 삭제와 분리
 
+공유 조직의 상품 풀·runtime 정보·preview·채널 링크·운영자 Store Console이 고르는 활성 slug6곳에도 같은 helper를 적용했다. raw slug SELECT 소비처를 대조했으며 provisioning/회원 권한 근거의 기존 특정 서비스 조건과 migration·삭제 도구는 변경하지 않았다. CMS slot PUT/DELETE 및 일괄 교체는 저장된 contentId의 서비스까지 확인해 PH 연결 slot의 일반 변경·삭제를 차단한다. metadata-only PUT2건과 DELETE/빈 일괄 교체 회귀를 추가했으며 관련 API4 suites/47 tests PASS.
+
 KPA 공용 settings/channels/template/layout의 slug 직접 조회도 퇴역 키이면 조직을 읽기 전에 기존 STORE_NOT_FOUND(404)로 닫았다. 같은 findBySlug 소비처를 전체 검색했으며 나머지 공개 경로는 기존 서비스 귀속 일치 또는 퇴역 판정으로 차단됨을 대조했다. PH key3종×조회/쓰기8경로의 HTTP 회귀와 정상 KPA 조회를 포함한 API2 suites/15 tests PASS, 타입 검사 PASS, lint0errors/기존 catch warning4개. 초기 layout 테스트는 비어 있는 blocks를 보내 입력 검증400이 먼저 발생했으므로 유효한 HERO 블록 요청으로 수정해 퇴역 경계를 검증했다.
 
 공개 QR의 별도 slug 선택 쿼리도 접두사 판정 helper로 통일했고 관련 QR·PH API2 suites/44 tests 및 타입 검사 PASS. 퇴역 키 상수를 직접 소비하는 SQL 경로를 전체 검색해 남은 exact-only slug 필터가 없는 것을 확인했다.

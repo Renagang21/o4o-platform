@@ -122,15 +122,15 @@ describe('CMS — 저장된 퇴역 serviceKey', () => {
     // 공개 조회 1 + 생성 · 수정 · 일괄 교체 3
     expect(slot.match(/findCmsSlotContentConflict\(/g)?.length).toBe(4);
     // 수정(PUT) · 삭제(DELETE) 모두 퇴역 slot 을 410 으로 거절한다
-    expect(slot.match(/isRetiredServiceValue\(slot\.serviceKey\)/g)?.length).toBe(2);
+    expect(slot.match(/await hasRetiredStoredSlot\(slot\)/g)?.length).toBe(2);
   });
 
   it('slot 일괄 교체는 삭제 전에 기존 퇴역 slot 을 확인해 410 으로 거절한다', () => {
     const slot = src('routes/cms-content/cms-content-slot.handler.ts');
-    const guard = slot.indexOf('existingScopeSlots.some((s) => isRetiredServiceValue(s.serviceKey))');
+    const guard = slot.indexOf('retiredExistingSlots.some(Boolean)');
     expect(guard).toBeGreaterThan(-1);
     expect(guard).toBeLessThan(slot.indexOf('await slotRepo.delete(scopeWhere);'));
-    expect(slot).toContain('isRetiredServiceValue(serviceKey) || existingScopeSlots');
+    expect(slot).toContain('isRetiredServiceValue(serviceKey) || retiredExistingSlots');
   });
 
   it('공개 slot 조회는 저장된 퇴역 · 타 서비스 콘텐츠를 응답에서 뺀다', () => {
