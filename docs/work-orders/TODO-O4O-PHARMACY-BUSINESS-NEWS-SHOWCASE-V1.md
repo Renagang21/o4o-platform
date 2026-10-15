@@ -1,6 +1,6 @@
 # TODO-O4O-PHARMACY-BUSINESS-NEWS-SHOWCASE-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-15 (KST)
 > **근거**: 이전 가입 사업 진입 개선 후 다음 작업도 TODO·대조·구현·검증·push·배포 순서로 진행 요청
 
@@ -31,9 +31,9 @@
 - [x] My Home 사업별 고정 공지·최근 글 요약, 사업/계정/매장 전환 격리·오류/재시도.
 - [x] 사업 홈 공급 상품 미리보기, 현재 사업·약국 검증과 내 매장 이동.
 - [x] 집중 회귀·영향 앱 테스트·타입/빌드·lint·PC/모바일 browser 검증.
-- [ ] 문서 정합·민감정보·scope 검증 후 commit·push·PR.
-- [ ] 실제 ruleset·CI·리뷰 확인 후 main 통합.
-- [ ] Delivery 배포·운영 코드·readiness 확인·완료 기록.
+- [x] 문서 정합·민감정보·scope 검증 후 commit·push·PR.
+- [x] 실제 ruleset·CI·리뷰 확인 후 main 통합.
+- [x] Delivery 배포·운영 코드·readiness 확인·완료 기록.
 
 ## 범위
 
@@ -43,7 +43,7 @@ API·가입/운영 원장·권한·DB·dependency·CI 계약을 변경하지 않
 사업별 특별 서비스·별도 전시 편집/순위 설정·새 알림 원장·저작권/동기화 체계는 이번 범위가 아니다.
 
 DEPLOYMENT: AUTOMATIC — 영향 웹 대상은 최종 diff와 실제 Delivery에서 확인한다.
-WORKTREE_DISPOSITION: KEEP — 개발·통합·배포 진행 중.
+WORKTREE_DISPOSITION: KEEP — 동일 WO 배포 기록 PR 통합과 종료 정리 전까지 보존.
 
 ## 검증 진행
 
@@ -75,3 +75,36 @@ My Home 고정/최근 글·선택 약국 변경·게시글 handoff, 사업 공�
 최종 Neture 전체 재실행 104 files / 987 tests PASS이며 약국 협력사업 150건과 합해
 1,137건이다. 변경 lint 최종 오류/경고 0, 두 앱 production build와 Chromium 14흐름 PASS다.
 실제 ruleset은 PR 필수·CI Gate 필수·human approval 0이며 admin bypass를 사용하지 않는다.
+
+## 통합·운영 배포 결과
+
+PR #626의 source HEAD `277a238e1990454fc363d7eb80e1f10753036475`에서
+Codex 리뷰 완료와 미해결 스레드 0을 확인했다. PR CI는
+[38725795342](https://github.com/Renagang21/o4o-platform/actions/runs/38725795342)다.
+main 통합·post-merge CI·실제 Delivery 결과는 아래에 확정 사실만 기록한다.
+
+배포 전 공식 Neture·약국 협력사업 HTML/entry JS는 HTTP 200이었지만 신규 기능 문구는 없었고,
+API readiness는 200/ready였다. 배포 전 asset은 각각 `index-JtBA43Hp.js`와
+`index-hBQUkljV.js`였다. 이 기준과 최종 serving SHA·제공 코드 확인을 함께 사용한다.
+
+PR CI는 SUCCESS이며 CI Gate·Code Quality·API 3 shard·웹 build·CodeQL·SonarCloud를 통과했다.
+실제 ruleset과 미해결 리뷰 0·main 위치를 재확인한 뒤 우회 없이 main
+`7c53af8ca38bcccc6aad362ccc23ebda59e61f20`에 병합했다. 병합 결과의 앱 소스는 검증한 branch와 같다.
+post-merge CI는 [38727028028](https://github.com/Renagang21/o4o-platform/actions/runs/38727028028)이다.
+동일 WO의 통합·배포 closure 기록을 기존 전용 branch에서 연속 작성한다.
+
+post-merge CI 38727028028은 재실행 없이 최종 SUCCESS다. 자동 Delivery는
+[38728117800](https://github.com/Renagang21/o4o-platform/actions/runs/38728117800)이다.
+
+Delivery 실제 판정은 neture·kpa-society 두 웹 서비스 자동 배포이며 API·Store는 대상이 아니다.
+두 deploy job의 `Smoke new revision and switch traffic (verified rollout)`과
+`Verify deployment`가 모두 PASS했다. 이후 공식 도메인의 HTML·entry JS를 읽어
+Neture `index-DKygMaPr.js`, 약국 협력사업 `index-CDnYbJLB.js` 모두 HTTP 200 및
+신규 소식/공급 상품 기능 코드를 확인했다. 배포 전에는 두 신규 문구가 없었다.
+API `/health/ready`도 HTTP 200 / ready다. API 신규 revision 배포를 의미하지 않는다.
+운영 업무 데이터 생성·수정·삭제는 없었고 실제 OAuth·운영 계정 업무 접근 검증과 구분한다.
+
+최종 Delivery는 SUCCESS이며 main `7c53af8ca38bcccc6aad362ccc23ebda59e61f20`의
+`production` commit status는 `success / DEPLOYED · deploy: neture,kpa-society`다.
+이번 소식·공급 미리보기 단계는 완료했다. 실제 사업별 특별 서비스·전시 편집/순위 설정은 후속 범위다.
+이 완료 기록만 갱신하는 문서 PR은 DEPLOYMENT: NOT_APPLICABLE이며 별도 운영 재배포 대상이 아니다.
