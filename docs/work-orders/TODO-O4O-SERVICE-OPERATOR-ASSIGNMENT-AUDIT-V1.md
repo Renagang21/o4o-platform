@@ -104,7 +104,8 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 - [x] Core 목록 유효기간 조건 두 곳의 최소 수정 범위 확인·실제 PostgreSQL 회귀.
 - [x] 후속 변경의 API/안전 회귀·CI/review·push·main 통합(PR #600).
 - [ ] 운영 데이터 불일치가 확인되면 before/after 계획을 별도로 검토하고 전체 관리자 지정 경로로 수정.
-- [ ] 필요한 main 통합·배포 후 실제 운영 화면 검증. 현재 첫 UI 수정은 로컬 검증이며 배포 완료가 아니다.
+- [x] main 통합·자동 API verified rollout과 4개 웹 origin의 수정 메뉴 map 제공 확인.
+- [ ] 본인 운영자 Google 로그인 후 실제 운영 메뉴/업무 접근 확인(사용자 담당).
 
 ## 운영 조회 경로 — 2026-10-15 사용자 승인·구현
 
@@ -187,5 +188,27 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 
 WORKTREE_DISPOSITION: KEEP — 같은 미완료 WO의 실제 결과 기록을 이어 진행한다. 원래 checkout의
 shared object 참조와 후속 원장 비교·배포 검증이 남아 있어 삭제하지 않는다. 새 독립 작업으로 재사용하지 않는다.
-DEPLOYMENT: MANUAL/GATED — 소스 수정 배포·실제 운영 화면 확인 대기. 이 결과 기록만의 배포는 NOT_APPLICABLE.
+DEPLOYMENT: AUTOMATIC — 기존 Delivery의 API verified rollout SUCCESS. 웹 수정 map 제공 확인,
+실제 운영자 OAuth/업무 접근은 사용자 확인 대기. 이 결과 기록만의 배포는 NOT_APPLICABLE.
 문서 정합: 현재 원장 결과와 과거 명시 연결 기록을 구분하고 서비스 추적표·후속 TODO를 실제 결과로 갱신했다.
+
+### 실제 웹 제공 코드 확인 — 2026-10-15
+
+공식 대표·supplier·community·funding 4 origin의 HTML과 각 HTML이 참조하는 JS를
+기존 프록시·검증된 TLS로 직접 GET했다. 모두 HTML/JS HTTP 200이며 공통 entry
+`/assets/index-YTr_TncS.js`(SHA256 `f0d1afb6ecc92fbbbd3fcb123a0138c134eac4e6b4c7bc13479e7a6f2dc7eaaa`)에
+이번 main/supplier/funding/community/carepharm별 운영 메뉴 경로 map이 포함돼 있다.
+따라서 수정 map의 실제 웹 제공은 확인됐다. 문구/링크 존재만의 OAuth 회귀나 사용자의
+기존 브라우저 cache 갱신 완료를 뜻하지 않는다. 본인 운영자 로그인·최종 메뉴 접근은 별도 확인한다.
+API `/health/ready`도 HTTP 200 / ready다. 조회 시 자동 Delivery는 migration step SUCCESS,
+verified traffic switch 단계 진행 중이었다. standalone census는 쓰기 0이며 자동 배포 workflow의
+migration 실행과 분리해 기록한다.
+
+### 자동 API 배포 검증
+
+기존 [Delivery #38666079640](https://github.com/Renagang21/o4o-platform/actions/runs/38666079640)의
+`API / build-and-deploy` job SUCCESS를 확인했다. 대상은 main `d83b291cd6`이며 신규 revision
+readiness smoke·verified traffic switch·전환 후 readiness 검증 모두 SUCCESS다. 이것은 기존
+workflow_run 배포의 결과 확인이며 새 promote/deploy dispatch나 IAM/권한/Google 연결 수정이 아니다.
+현재 목록의 유효기간 조건은 해당 배포 소스에 포함된다. 인증이 필요한 전체 관리자 목록과 실제
+운영자 OAuth를 직접 검증했다고 주장하지 않는다.
