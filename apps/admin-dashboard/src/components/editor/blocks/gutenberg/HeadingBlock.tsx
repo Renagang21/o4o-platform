@@ -201,7 +201,6 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
     editor,
     handleEnterKey,
     handleBackspaceKey,
-    onToggleLink: () => {}, // TODO: Link editor
   });
 
   // Render element (heading)
@@ -258,7 +257,6 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
           isItalic={isMarkActive(editor, 'italic')}
           onToggleBold={() => toggleMark(editor, 'bold')}
           onToggleItalic={() => toggleMark(editor, 'italic')}
-          onToggleLink={() => {}} // TODO: Link editor
           // Three-dot menu actions
           onCopy={onCopy}
           onDuplicate={onDuplicate}
