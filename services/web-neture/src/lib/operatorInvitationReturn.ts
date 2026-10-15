@@ -1,21 +1,23 @@
 /** Tokens remain tab-local and never enter login/signup URLs. */
 export const OPERATOR_INVITATION_KEY = 'o4o_operator_invite';
 let volatileToken = '';
+let memoryOnly = false;
 const validToken = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 export function readOperatorInvitation(): string {
+  if (memoryOnly) return volatileToken;
   try {
     const stored = sessionStorage.getItem(OPERATOR_INVITATION_KEY);
     return validToken(stored) ? stored : '';
-  } catch { return volatileToken; }
+  } catch { memoryOnly = true; return volatileToken; }
 }
 export function rememberOperatorInvitation(token: string): void {
   if (!validToken(token)) return;
   volatileToken = token;
-  try { sessionStorage.setItem(OPERATOR_INVITATION_KEY, token); } catch { /* In-memory continuation only. */ }
+  try { sessionStorage.setItem(OPERATOR_INVITATION_KEY, token); memoryOnly = false; } catch { memoryOnly = true; }
 }
 export function clearOperatorInvitationEntry(): void {
   volatileToken = '';
-  try { sessionStorage.removeItem(OPERATOR_INVITATION_KEY); } catch { /* In-memory state is already clear. */ }
+  try { sessionStorage.removeItem(OPERATOR_INVITATION_KEY); memoryOnly = false; } catch { memoryOnly = true; }
 }
 export function operatorInvitationReturnPath(): '/' | '/operator-invite' {
   return validToken(readOperatorInvitation()) ? '/operator-invite' : '/';

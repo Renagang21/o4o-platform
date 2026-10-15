@@ -115,3 +115,5 @@ inspect의 INVALID_OR_EXPIRED_INVITATION과 수락 완료 시 해당 token만 �
 inspect 이후 실제 수락에서 INVALID_OR_EXPIRED_INVITATION이 반환되는 경우에도 해당 token을 종료 처리한다. 다른 계정·일시 오류는 보존한다. incoming fragment는 storage 접근 전에 즉시 제거하며, sessionStorage가 SecurityError를 내는 환경에서는 tab의 메모리로만 명시 수락과 SPA 가입 복귀를 이어간다. StrictMode 재초기화도 원래 token을 유지한다. reload나 탭 종료 후 복구를 약속하지 않으며 token을 URL·localStorage·cookie에 쓰지 않는다.
 
 수락 만료/다른 계정/일시 오류와 storage get/set/remove 차단 StrictMode를 포함한 focused25 PASS, Neture 전체1036 PASS, production build PASS, 변경 lint 오류0/기존 경고1. API·schema 변경 없고 운영 DB·SMTP·메일 발송·DDL은 미실행이다. 최종 CI·Codex는 새 head로 다시 확인한다.
+
+후속 경계 확인: storage 읽기는 가능하지만 쓰기만 quota 오류가 나는 경우 기존 다른 token으로 되돌아가지 않도록 메모리 상태를 우선하고, remove만 실패해도 종료 token이 부활하지 않게 했다. 이 두 회귀를 포함한 focused27 PASS, 최종 Neture build·변경 lint PASS. 전체1036은 앞 단계 결과다.
