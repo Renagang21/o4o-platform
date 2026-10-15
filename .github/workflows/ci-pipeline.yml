@@ -229,6 +229,14 @@ jobs:
     - name: Run tests (PharmacyHub QR cutover safety)
       run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/pharmacy-hub-resource-retirement.test.mjs
 
+    # PH retirement V4: fixed timeout SQL hashes + complete keyset safety regressions.
+    - name: Run tests (PH purge reference safety)
+      run: >-
+        node --test scripts/deployment/pharmacy-hub-development-purge.test.mjs
+        scripts/deployment/pharmacy-hub-media-purge.test.mjs
+        scripts/deployment/pharmacy-hub-administrative-purge-job.test.mjs
+        scripts/deployment/pharmacy-hub-reference-batches.test.mjs
+
     - name: Run tests (o4o-local-agent node:test)
       run: node --test tools/o4o-local-agent/test/local-db.test.mjs tools/o4o-local-agent/test/native-bridge.test.mjs tools/o4o-local-agent/test/browser-dom.test.mjs
 

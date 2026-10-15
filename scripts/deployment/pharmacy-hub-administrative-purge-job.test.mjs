@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {jobArguments,restrictedWifCondition,assertRestrictedWif} from './pharmacy-hub-administrative-purge-job.mjs';
+import {jobArguments,restrictedWifCondition,assertRestrictedWif,loadPurgeSource} from './pharmacy-hub-administrative-purge-job.mjs';
 import {createRequire} from 'node:module';
 import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -116,3 +116,20 @@ test('worker diagnostics preserve failing SQL fingerprint and redact database pa
     assert.ok(calls.includes('ROLLBACK'));
   }
 });
+
+for(const [purge,exportName] of [['development','countDevelopmentReferences'],['media','countMediaReferences']])
+  test(`${purge}: actual worker source embeds and executes the shared scanner without checkout files`,async()=>{
+    const source=await loadPurgeSource(purge);
+    assert.doesNotMatch(source,/from ['"]\.\//);
+    assert.match(source,/from 'data:text\/javascript;base64,/);
+    const packed=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+    let calls=0;
+    assert.equal(await packed[exportName]({async query(sql,args){
+      calls++;assert.equal(args[1],null);assert.match(sql,/reference_source/);
+      return [{count:'0',scanned:'0',last_id:null}];
+    }},{schema:'public',table:'notes',column:'metadata',type:'jsonb',scan_key:'id'}),0);
+    assert.equal(calls,1);
+    const {args}=jobArguments({...input,purge,source});
+    const executable=Buffer.from(args.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
+    assert.ok(executable.startsWith(source));
+  });

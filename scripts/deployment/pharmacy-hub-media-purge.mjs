@@ -1,3 +1,4 @@
+import {countReferenceBatches,referenceBatchQuery} from './pharmacy-hub-reference-batches.mjs';
 /** PH-only media retirement. GCS deletes cannot roll back with PostgreSQL.
  * Missing objects may resume a failed attempt, but replacements are generation-protected.
  * No asset identifiers, URLs, object names or credentials leave the worker.
@@ -63,15 +64,25 @@ async function references(q,locked) {
       throw new Error(`PH_MEDIA_SHARED_FK:${f.schema}.${f.table}`);
   }
   // IDs, full public URLs and object paths are all checked across application data.
-  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type FROM pg_attribute a
+  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type,
+      (SELECT ka.attname FROM pg_index ki JOIN pg_attribute ka ON ka.attrelid=ki.indrelid AND ka.attnum=ki.indkey[0]
+        JOIN pg_type kt ON kt.oid=ka.atttypid WHERE ki.indrelid=c.oid AND ki.indisprimary AND ki.indisvalid AND ki.indisready AND ki.indnkeyatts=1 AND kt.typname='uuid'
+        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key FROM pg_attribute a
     JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_type t ON t.oid=a.atttypid
     WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
     AND n.nspname NOT LIKE 'pg_%' AND (t.typcategory IN ('S','A') OR t.typname IN ('uuid','json','jsonb'))`);
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_MEDIA_SCHEMA_CHANGED');
-    if(await count(q,mediaReferenceQuery(c)))
+    if(await countMediaReferences(q,c))
       throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
   }
+}
+// Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
+// partition parents retain the complete scan (including foreign descendants).
+export async function countMediaReferences(q,c) {
+  const sql=mediaReferenceQuery(c);
+  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH');
 }
 export function mediaReferenceQuery(c) {
     const owned=c.schema==='public'&&c.table==='media_assets'?assetScope('s'):
@@ -101,6 +112,11 @@ ${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.tabl
             AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
         ) references_found`;
     }
+    if(c.scan_key)return referenceBatchQuery(c,`WITH target_patterns AS MATERIALIZED (
+        SELECT string_agg(regexp_replace(v,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
+        FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
+          UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')}) a
+        CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL)`,owned);
     // Freeze target discovery and scan each large payload once. Escaping every
     // punctuation character keeps ID/full-URL/object-path matching literal.
     return `WITH target_patterns AS MATERIALIZED (
