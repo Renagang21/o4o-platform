@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'plan = read/validate only; apply = redirect and HTTP verification'
+        description: 'plan = read/validate; apply = existing operation; operator-census = standalone read-only assignments'
         type: choice
-        options: [plan, apply]
+        options: [plan, apply, operator-census]
         default: plan
       demo_census:
         description: "Read-only canonical Demo/store relationship census; no QR operation"
@@ -101,7 +101,7 @@ on:
         type: string
         required: false
       probe_paths:
-        description: '(optional) real QR and tablet paths; other families optional; blank collects read-only inventory'
+        description: 'plan/apply: QR paths or blank inventory; operator-census: SHA256 of normalized target email (no raw email)'
         type: string
         required: false
 
@@ -133,6 +133,8 @@ jobs:
       RETIRE_PH_HOST: ${{ inputs.retire_host }}
       DEMO_CENSUS_FLAG: ${{ inputs.demo_census }}
       DEMO_ACCOUNTS_FLAG: ${{ inputs.demo_accounts }}
+      OPERATOR_CENSUS_FLAG: ${{ inputs.mode == 'operator-census' }}
+      OPERATOR_IDENTITY_SHA256: ${{ inputs.mode == 'operator-census' && inputs.probe_paths || '' }}
       DEMO_RELINK_FLAG: ${{ inputs.demo_relink }}
       DEMO_CLEANUP_FLAG: ${{ inputs.demo_cleanup }}
       COPY_CLEANUP_FLAG: ${{ inputs.copy_cleanup }}
@@ -148,6 +150,25 @@ jobs:
           echo "CUTOVER_DEADLINE_MS=$(( $(date +%s) * 1000 + 29 * 60 * 1000 ))" >> "$GITHUB_ENV"
           if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
             echo 'Production inventory requires main.'
+            exit 1
+          fi
+          if [ "${OPERATOR_CENSUS_FLAG:-false}" = 'true' ]; then
+            if [ "$CUTOVER_MODE" != 'operator-census' ] || [ "$WORKFLOW_ACTOR" != "$REPOSITORY_OWNER" ] || [ "$QR_PROBE_PATHS" != "${OPERATOR_IDENTITY_SHA256:-}" ]; then
+              echo 'Operator census requires standalone owner read-only plan.'
+              exit 1
+            fi
+            for flag in "$PH_MEDIA_PURGE" "$PH_DEVELOPMENT_PURGE" "$PH_ADMIN_PURGE" "$CERTIFICATE_RETIREMENT" "$DOMAIN_DETACHMENT" "$RETIREMENT_INVENTORY" "$RESOURCE_RETIREMENT" "$RETIRE_PH_HOST" "$DEMO_CENSUS_FLAG" "$DEMO_RELINK_FLAG" "$DEMO_CLEANUP_FLAG" "$COPY_CLEANUP_FLAG" "$DEMO_ACCOUNTS_FLAG"; do
+              if [ "$flag" = 'true' ]; then
+                echo 'Operator census cannot be combined with another operation.'
+                exit 1
+              fi
+            done
+            if ! [[ "${OPERATOR_IDENTITY_SHA256:-}" =~ ^[a-f0-9]{64}$ ]]; then
+              echo 'Operator census requires a valid identity fingerprint.'
+              exit 1
+            fi
+          elif [ -n "${OPERATOR_IDENTITY_SHA256:-}" ]; then
+            echo 'Operator identity fingerprint requires the census option.'
             exit 1
           fi
           ph_count=0
@@ -209,7 +230,7 @@ jobs:
           build-packages: 'false'
           strict-lockfile: 'true'
       - name: Test cutover safety
-        run: node --test scripts/deployment/pharmacy-hub-media-purge.test.mjs scripts/deployment/pharmacy-hub-development-purge.test.mjs scripts/deployment/pharmacy-hub-domain-detachment.test.mjs scripts/deployment/pharmacy-hub-certificate-retirement.test.mjs scripts/deployment/pharmacy-hub-retirement-references.test.mjs scripts/deployment/demo-account-operation-gate.test.mjs scripts/deployment/pharmacy-hub-administrative-purge.test.mjs scripts/deployment/pharmacy-hub-administrative-purge-job.test.mjs scripts/deployment/pharmacy-hub-domain-inventory.test.mjs scripts/deployment/pharmacy-hub-resource-retirement.test.mjs scripts/deployment/pharmacy-hub-retirement-inventory.test.mjs scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs scripts/deployment/demo-store-cleanup.test.mjs scripts/deployment/store-verification-copy-cleanup.test.mjs
+        run: node --test scripts/deployment/service-operator-census.test.mjs scripts/deployment/service-operator-operation-gate.test.mjs scripts/deployment/pharmacy-hub-media-purge.test.mjs scripts/deployment/pharmacy-hub-development-purge.test.mjs scripts/deployment/pharmacy-hub-domain-detachment.test.mjs scripts/deployment/pharmacy-hub-certificate-retirement.test.mjs scripts/deployment/pharmacy-hub-retirement-references.test.mjs scripts/deployment/demo-account-operation-gate.test.mjs scripts/deployment/pharmacy-hub-administrative-purge.test.mjs scripts/deployment/pharmacy-hub-administrative-purge-job.test.mjs scripts/deployment/pharmacy-hub-domain-inventory.test.mjs scripts/deployment/pharmacy-hub-resource-retirement.test.mjs scripts/deployment/pharmacy-hub-retirement-inventory.test.mjs scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs scripts/deployment/demo-store-cleanup.test.mjs scripts/deployment/store-verification-copy-cleanup.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
@@ -257,7 +278,7 @@ jobs:
           path: ${{ runner.temp }}/pharmacyhub-qr-cutover/
           retention-days: 7
       - name: Start authenticated Cloud SQL proxy for read-only inventory
-        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && (inputs.retirement_inventory == true || inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || inputs.copy_cleanup == true || inputs.demo_accounts == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')))
+        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && (inputs.mode == 'operator-census' || inputs.retirement_inventory == true || inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || inputs.copy_cleanup == true || inputs.demo_accounts == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')))
         run: |
           docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
             --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
@@ -280,7 +301,7 @@ jobs:
             process.exit(1);
           '
       - name: Collect existing active public paths without database writes
-        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
+        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.retirement_inventory != true && inputs.mode != 'operator-census' && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
         env:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
@@ -297,6 +318,16 @@ jobs:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
         run: node scripts/deployment/demo-store-census.mjs
+      - name: Build existing service scope mapper for operator census
+        if: inputs.mode == 'operator-census'
+        run: pnpm --filter @o4o/security-core build
+      - name: Read-only service operator assignment census
+        if: inputs.mode == 'operator-census'
+        env:
+          DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
+          DB_NAME: ${{ secrets.GCP_DB_NAME }}
+          OPERATOR_IDENTITY_SHA256: ${{ inputs.probe_paths }}
+        run: pnpm --filter @o4o/api-server exec tsx src/scripts/service-operator-census.ts
       - name: Build canonical public Demo config
         if: inputs.demo_accounts == true
         run: pnpm --filter @o4o/auth-utils build
@@ -348,7 +379,7 @@ jobs:
           COPY_CLEANUP_DIGEST: ${{ inputs.copy_digest }}
         run: node scripts/deployment/store-verification-copy-cleanup.mjs
       - name: Inventory, validate, optionally apply and verify
-        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true
+        if: inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.mode != 'operator-census' && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true
         run: node scripts/deployment/pharmacy-hub-qr-cutover.mjs
       - name: Plan or apply fixed PharmacyHub infrastructure retirement
         if: inputs.resource_retirement == true
@@ -356,7 +387,7 @@ jobs:
           PRODUCTION_GATE_TOKEN: ${{ github.token }}
         run: node scripts/deployment/pharmacy-hub-resource-retirement.mjs
       - name: Save backup and verification evidence
-        if: always() && inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true
+        if: always() && inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.mode != 'operator-census' && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true
         uses: actions/upload-artifact@v4
         with:
           name: pharmacyhub-url-map-${{ github.run_id }}

@@ -3,7 +3,7 @@
 > **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
 
 
-> **상태**: ACTIVE · **일자**: 2026-10-13
+> **상태**: ACTIVE · **일자**: 2026-10-15
 > **WO**: WO-O4O-REPOSITORY-DB-IDENTITY-AND-LEGACY-OPERATIONAL-SCRIPTS-CLEANUP-V1
 > **범위**: `apps/api-server/src/scripts/**` — 운영 DB 에 직접 접속하는 CLI · 일회성 데이터 생산 스크립트
 
@@ -30,6 +30,7 @@
 | `package.json` 에 등록된 CLI (`drug:candidate-import` · `hff:*` · `medical-device:*` · `guard:product-description` · `drug-master:promotion:*` · `migration:roles*` · `migration:member-dedup*` 등) | 실행 명령 존재 | `o4o_api` 로그인 없음 (계약 테스트 ③) |
 | `seed-lecture-service-and-roles.ts` · `community-catalog-promotion.ts` · `encryption-key-rotation.ts` · `cafe24-product-census.ts` · `pharmacy-hub-store-subject-provisioning.ts` · `audit-roles.ts` · `productmaster-landing-bulk-apply.ts` | 2026-08~09 WO 의 현행 CLI | `DB_USERNAME` env |
 | `demo-account-reconcile.ts` (`demo-account-reconcile.service.ts`는 import되는 구현 모듈이며 독립 실행 도구가 아님) | [인증 WO T01~T08](../../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md),2026-10-12 사용자 제공3계정·버튼·연결 데이터 전환 지시. main/owner workflow의 standalone `demo_accounts=true` 경로. 기본 read-only plan, 정확한 digest, ACTIVE registry UUID 보존·등록된 경영자 레거시 `kpa:store_owner`만 감사 transaction에서 비활성화·다른 역할/provider 보호·제한 membership 유지·감사/rollback/멱등 검토 완료. 현행 Test Demo 범위만 실행 후보이며 migration은 별도 gate | `DB_USERNAME`·`DB_NAME` 필수, 기존 Cloud SQL/WIF/Secret Manager binding. 로그인 identity 기본값 없음 |
+| `service-operator-census.ts` (`scripts/deployment/service-operator-census.mjs`는 집계 구현 모듈) | [운영자 지정 조사 TODO](../../work-orders/TODO-O4O-SERVICE-OPERATOR-ASSIGNMENT-AUDIT-V1.md),2026-10-15 사용자 승인. 기존 main/owner WIF workflow의 standalone `mode=operator-census`. 원문 대신 대상 이메일 SHA256를 받아 현재 지정/유효기간/membership/Google 연결 존재를 숫자로 집계. 기존 서버 role catalog·서비스 key mapper 사용, REPEATABLE READ READ ONLY·반드시 ROLLBACK·허용 필드만 출력. 실제 ID/이메일/Google ID·credential·원본 SQL 오류는 출력하지 않음. role/계정/DB/schema/배포/IAM 쓰기 0 | `requireDbUsername()`·공백 아닌 `DB_NAME`·`OPERATOR_IDENTITY_SHA256` 필수. 기존 Cloud SQL/WIF/DB secret binding. 로그인 identity 기본값 없음 |
 
 `package.json` 등록 CLI 중 현재도 쓰이는지는 개별 판정하지 않았다(실행 전 해당 WO 에서 확인).
 
