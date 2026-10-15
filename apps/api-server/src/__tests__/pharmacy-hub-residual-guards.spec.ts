@@ -67,6 +67,12 @@ describe('seller recruitment — 저장된 퇴역 serviceId', () => {
     expect(applicationRepo.save).not.toHaveBeenCalled();
   });
 
+  it('공급자 본인 모집 목록 · 신청자 상세에서도 퇴역 서비스 모집은 보이지 않는다', async () => {
+    expect((await service.getSupplierRecruitments('supplier-user')).map((r) => r.id)).toEqual(['live']);
+    expect(await service.getRecruitmentApplications('retired', 'supplier-user')).toBeNull();
+    expect(AppDataSource.query).not.toHaveBeenCalledWith(expect.stringContaining('LEFT JOIN users u'), ['retired']);
+  });
+
   it('controller 는 RetiredServiceError 를 410 으로 응답한다', () => {
     for (const path of [
       'modules/neture/controllers/seller-recruitment.controller.ts',

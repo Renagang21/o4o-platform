@@ -350,9 +350,11 @@ async function acceptStoreInvitationUnlocked(
   input: { userId: string; organizationId: string },
 ): Promise<{ organizationId: string; role: string; services: StoreOwnerServiceKey[] }> {
   const [invitation]: Array<{ is_pharmacy: boolean }> = await dataSource.query(
-    `SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm WHERE pm.organization_id = om.organization_id) AS is_pharmacy
+    `SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm
+                     WHERE pm.organization_id = om.organization_id AND pm.status = 'active') AS is_pharmacy
        FROM organization_members om
-      WHERE om.organization_id = $1 AND om.user_id = $2 AND om.left_at IS NULL AND om.role = $3`,
+      WHERE om.organization_id = $1 AND om.user_id = $2 AND om.left_at IS NULL AND om.role = $3
+        AND NOT ${retiredServiceOnlyOrganizationSql('om.organization_id')}`,
     [input.organizationId, input.userId, STORE_INVITED_ROLE],
   );
   if (!invitation) fail('INVITATION_NOT_FOUND', 404);

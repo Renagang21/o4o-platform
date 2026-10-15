@@ -62,7 +62,7 @@ const OUTSIDER = 'outsider-1';
 type Row = Record<string, any>;
 
 /** organization_members · users 를 메모리로 둔 가짜 DataSource. SQL 모양으로 분기한다. */
-function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {}) {
+function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean; retiredOnly?: boolean } = {}) {
   const members: Row[] = seed.members ?? [];
   const users: Row[] = seed.users ?? [];
   const sql: string[] = [];
@@ -73,6 +73,8 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
     if (s.startsWith('SELECT pg_advisory_xact_lock')) return [];
 
     if (s.startsWith('SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm')) {
+      // 퇴역 서비스 전용 조직은 SQL 의 retired 판정이 행을 걸러낸다
+      if (seed.retiredOnly) return [];
       return members.filter(m => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null && m.role === p[2]).map(() => ({ is_pharmacy: seed.pharmacy !== false }));
     }
     if (s.startsWith('SELECT om.organization_id FROM organization_members om')) {
@@ -538,6 +540,16 @@ it('은퇴 서비스만 연결된 초대는 새 권한을 발급하지 않는다
   linkedMock.mockImplementation(async (_ds, _org, key) => key === 'pharmacy-hub');
   const { ds, members } = makeDs({ pharmacy: false, members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
   await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+  expect(members[0].role).toBe(STORE_INVITED_ROLE);
+  expect(assignRoleMock).not.toHaveBeenCalled();
+});
+
+it('직접 수락 요청도 퇴역 서비스 전용 조직과 비활성 약국 membership 을 매장 근거로 쓰지 않는다', async () => {
+  const { ds, members, sql } = makeDs({ retiredOnly: true, members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+  await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'INVITATION_NOT_FOUND');
+  const lookup = sql.find(q => q.startsWith('SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm'))!;
+  expect(lookup).toContain("pm.status = 'active'");
+  expect(lookup).toContain("rse.service_code IN ('pharmacy-hub'");
   expect(members[0].role).toBe(STORE_INVITED_ROLE);
   expect(assignRoleMock).not.toHaveBeenCalled();
 });

@@ -199,10 +199,11 @@ export class SellerRecruitmentService {
    * 공급자(모집 주체) 본인이 생성한 모집 목록 + 신청 카운트(전체/대기/승인/반려).
    */
   async getSupplierRecruitments(supplierUserId: string) {
-    const recruitments = await this.recruitmentRepo.find({
+    // 퇴역 서비스 모집은 공급자 본인 목록에도 나오지 않는다 (요청 guard 는 저장된 serviceId 를 보지 못한다)
+    const recruitments = (await this.recruitmentRepo.find({
       where: { sellerId: supplierUserId },
       order: { createdAt: 'DESC' },
-    });
+    })).filter((r) => !isRetiredServiceValue(r.serviceId));
     if (!recruitments.length) return [];
 
     const ids = recruitments.map((r) => r.id);
@@ -473,6 +474,7 @@ export class SellerRecruitmentService {
   async getRecruitmentApplications(recruitmentId: string, supplierUserId: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment || recruitment.sellerId !== supplierUserId) return null;
+    if (isRetiredServiceValue(recruitment.serviceId)) return null;
 
     const rows: Array<{
       id: string; applicant_id: string; applicant_name: string | null; status: string;
