@@ -8,7 +8,7 @@
  *   - 비로그인은 목록을 부르지 않는다
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { act, render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, cleanup, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
@@ -126,19 +126,18 @@ describe('MyCommunityOperatorPage', () => {
     expect(await screen.findByText(/가입을 승인했습니다/)).toBeTruthy();
   });
 
-  it('거절은 사유(선택)를 함께 보낸다 · prompt 취소면 요청하지 않는다', async () => {
-    const prompt = vi.spyOn(window, 'prompt');
+  it('반려 입력의 취소는 요청하지 않고 확인 시 사유를 함께 보낸다', async () => {
     mount();
     const reject = (await screen.findAllByRole('button', { name: '거절' }))[0];
-    prompt.mockReturnValueOnce(null);
     fireEvent.click(reject);
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '취소할 사유' } });
+    fireEvent.click(screen.getByRole('button', { name: '취소' }));
     expect(post).not.toHaveBeenCalled();
-    prompt.mockReturnValueOnce('  중복 가입  ');
     fireEvent.click(reject);
-    await waitFor(() =>
-      expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/reject', { reason: '중복 가입' }),
-    );
-    prompt.mockRestore();
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '  중복 가입  ' } });
+    fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/reject', { reason: '중복 가입' }));
+    expect(await screen.findByText(/가입 신청을 반려했습니다/)).toBeTruthy();
   });
 
   it('backend 거부(403 등)는 삼키지 않고 그 메시지를 보인다', async () => {
@@ -180,10 +179,11 @@ describe('MyCommunityOperatorPage', () => {
       expect(screen.queryByRole('button', { name: '커뮤니티 탈퇴' })).toBeNull();
       return;
     }
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('회원 관리 사유');
     fireEvent.click(screen.getByRole('button', { name: '정지', exact: true }));
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '회원 관리 사유' } });
+    fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
     await waitFor(() => expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/suspend', { reason: '회원 관리 사유' }));
-    expect(await screen.findByText('회원 상태를 변경했습니다.')).toBeTruthy(); prompt.mockRestore();
+    expect(await screen.findByText('활성회원 님을 정지했습니다.')).toBeTruthy();
   });
 
   it('상태를 변경하면 늦게 도착한 이전 필터 결과를 표시하지 않는다', async () => {
@@ -284,6 +284,254 @@ describe('MyCommunityOperatorPage', () => {
     await screen.findByText('총 20명 · 1 / 1 페이지');
     expect((screen.getByLabelText('이름 검색') as HTMLInputElement).value).toBe('검색');
     expect(screen.queryByText('검색 회원-2')).toBeNull();
+    expect(screen.getByText('검색 회원-2 님의 가입을 승인했습니다.')).toBeTruthy();
+  });
+
+  function adminRows(status = 'active') {
+    get.mockImplementation((url: string, config?: { params?: { status?: string } }) => {
+      if (url.endsWith('/operating')) return ok({ communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2, canRestrictMembers: true }] });
+      if (url.endsWith('/history')) return ok({ changes: [] });
+      return ok({ memberships: pendingRows.map(row => ({ ...row, status: config?.params?.status === 'pending' ? status : config?.params?.status })) });
+    });
+  }
+  function inputReason(reason: string) {
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: reason } });
+    fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+  }
+  function deferred() {
+    let resolve!: (value: unknown) => void;
+    let reject!: (reason: unknown) => void;
+    const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+    return { promise, resolve, reject };
+  }
+
+  it('반려 사유를 비워도 기존 선택 계약대로 null을 전송한다', async () => {
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '거절' }))[0]);
+    inputReason('   ');
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/reject', { reason: null }));
+  });
+
+  it('1000자 초과 입력은 사유를 보존하고 서버로 보내지 않는다', async () => {
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '거절' }))[0]);
+    const reason = '사'.repeat(1001);
+    inputReason(reason);
+    expect(screen.getByText('처리 사유는 1000자 이내로 입력하세요.')).toBeTruthy();
+    expect((screen.getByLabelText('처리 사유') as HTMLTextAreaElement).value).toBe(reason);
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it('반려 실패는 대상과 사유를 보존하고 동일 입력으로 재시도한다' , async () => {
+    post.mockRejectedValueOnce({ response: { data: { error: '반려 저장 실패' } } });
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '거절' }))[0]);
+    inputReason('  중복 신청 사유  ');
+    expect(await screen.findByText('반려 저장 실패')).toBeTruthy();
+    expect(within(screen.getByRole('dialog')).getByText(/처리 대상: 홍길동/)).toBeTruthy();
+    expect((screen.getByLabelText('처리 사유') as HTMLTextAreaElement).value).toBe('  중복 신청 사유  ');
+    fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+    await screen.findByText(/가입 신청을 반려했습니다/);
+    expect(post).toHaveBeenCalledTimes(2);
+    expect(post.mock.calls[0]).toEqual(post.mock.calls[1]);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it.each(['정지', '정지 해제', '커뮤니티 탈퇴'])('%s는 사유 필수이며 빈 입력을 전송하지 않는다', async action => {
+    adminRows(action === '정지 해제' ? 'suspended' : 'active');
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: action, exact: true }))[0]);
+    inputReason('   ');
+    expect(screen.getByText('처리 사유를 입력하세요.')).toBeTruthy();
+    expect(post).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog')).toBeTruthy();
+  });
+
+  it.each([
+    ['정지', 'active', 'suspend'], ['정지 해제', 'suspended', 'restore'], ['커뮤니티 탈퇴', 'suspended', 'withdraw'],
+  ])('%s 실패는 사유·대상과 기존 서버 거부 메시지를 보존한다', async (label, status, action) => {
+    adminRows(status);
+    post.mockRejectedValueOnce({ response: { data: { error: '마지막 유효 admin을 먼저 지정하세요.', code: 'LAST_ADMIN_PROTECTED' } } });
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: label, exact: true }))[0]);
+    inputReason('회원 운영 사유');
+    expect(await screen.findByText('마지막 유효 admin을 먼저 지정하세요.')).toBeTruthy();
+    expect((screen.getByLabelText('처리 사유') as HTMLTextAreaElement).value).toBe('회원 운영 사유');
+    expect(post).toHaveBeenCalledWith(`/communities/alpha/memberships/m1/${action}`, { reason: '회원 운영 사유' });
+    fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(post).toHaveBeenCalledTimes(2);
+  });
+
+  it('폼을 연 동안 필터·다른 행을 잠그고 중복 submit을 동기적으로 막는다', async () => {
+    const saving = deferred(); post.mockReturnValue(saving.promise);
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '거절' }))[0]);
+    expect((screen.getByLabelText('회원 상태') as HTMLSelectElement).disabled).toBe(true);
+    expect((screen.getAllByRole('button', { name: '승인' })[0] as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '사유' } });
+    const form = screen.getByLabelText('처리 사유').closest('form')!;
+    fireEvent.submit(form); fireEvent.submit(form);
+    expect(post).toHaveBeenCalledTimes(1);
+    expect((screen.getByRole('button', { name: '취소' }) as HTMLButtonElement).disabled).toBe(true);
+    await act(async () => saving.resolve({ data: { data: {} } }));
+    await screen.findByText(/가입 신청을 반려했습니다/);
+  });
+
+  it('성공 후 목록 실패는 처리 성공을 유지하고 재조회가 mutation을 재전송하지 않는다', async () => {
+    mount(); await screen.findByText('홍길동');
+    let fail = true;
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/memberships') && fail
+      ? Promise.reject({ response: { data: { error: '갱신 목록 실패' } } }) : original(url, ...args));
+    fireEvent.click(screen.getAllByRole('button', { name: '승인' })[0]);
+    await screen.findByText(/처리는 완료했지만 최신 목록/);
+    expect(screen.getByText('홍길동 님의 가입을 승인했습니다.')).toBeTruthy();
+    expect(screen.getByText('갱신 목록 실패')).toBeTruthy();
+    fail = false;
+    fireEvent.click(screen.getByRole('button', { name: '최신 목록 다시 조회' }));
+    await screen.findByText('홍길동');
+    await waitFor(() => expect(screen.queryByText(/처리는 완료했지만 최신 목록/)).toBeNull());
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('홍길동 님의 가입을 승인했습니다.')).toBeTruthy();
+  });
+
+  it('처리 후 운영 목록 실패도 저장 실패로 표시하지 않는다', async () => {
+    mount(); await screen.findByText('홍길동');
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/operating')
+      ? Promise.reject({ response: { data: { error: '운영 목록 갱신 실패' } } }) : original(url, ...args));
+    fireEvent.click(screen.getAllByRole('button', { name: '승인' })[0]);
+    await screen.findByText(/처리는 완료했지만 최신 목록/);
+    expect(screen.getByText('홍길동 님의 가입을 승인했습니다.')).toBeTruthy();
+    expect(screen.getByText('운영 목록 갱신 실패')).toBeTruthy();
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it('처리 성공 후 재조회가 진행되는 동안 다른 mutation을 잠근다', async () => {
+    mount(); await screen.findByText('홍길동');
+    const refreshed = deferred();
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/operating') ? refreshed.promise : original(url, ...args));
+    fireEvent.click(screen.getAllByRole('button', { name: '승인' })[0]);
+    await screen.findByText('홍길동 님의 가입을 승인했습니다.');
+    await screen.findByText('홍길동');
+    expect((screen.getAllByRole('button', { name: '승인' })[0] as HTMLButtonElement).disabled).toBe(true);
+    await act(async () => refreshed.resolve({ data: { data: { communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 1 }] } } }));
+    await waitFor(() => expect((screen.getAllByRole('button', { name: '승인' })[0] as HTMLButtonElement).disabled).toBe(false));
+  });
+
+  it.each(['resolve', 'reject'] as const)('커뮤니티 전환 뒤 이전 mutation의 늦은 %s를 무시한다', async outcome => {
+    const saving = deferred(); post.mockReturnValue(saving.promise);
+    get.mockImplementation((url: string) => url.endsWith('/operating') ? ok({ communities: [
+      { id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2 }, { id: 'c2', slug: 'beta', name: 'Beta', pendingCount: 0 },
+    ] }) : ok({ memberships: [{ ...pendingRows[0], name: url.includes('/beta/') ? '다른 회원' : '이전 회원' }] }));
+    mount(); fireEvent.click(await screen.findByRole('button', { name: '승인' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Beta' }));
+    await screen.findByText('다른 회원');
+    const getCount = get.mock.calls.length;
+    await act(async () => { if (outcome === 'resolve') saving.resolve({ data: {} }); else saving.reject({ response: { data: { error: '이전 실패' } } }); });
+    expect(screen.queryByText(/가입을 승인했습니다/)).toBeNull();
+    expect(screen.queryByText('이전 실패')).toBeNull();
+    expect(get).toHaveBeenCalledTimes(getCount);
+    expect((screen.getByRole('button', { name: '승인' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('사용자 전환 뒤 이전 처리 결과로 새 사용자의 목록을 갱신하지 않는다', async () => {
+    const saving = deferred(); post.mockReturnValue(saving.promise);
+    const view = mount(); fireEvent.click((await screen.findAllByRole('button', { name: '승인' }))[0]);
+    authState.user = { id: 'op2', email: 'other@example.test', name: '다른 운영자', roles: ['user'] };
+    view.rerender(<MemoryRouter><MyCommunityOperatorPage /></MemoryRouter>);
+    await screen.findByText('홍길동');
+    const getCount = get.mock.calls.length;
+    await act(async () => saving.resolve({ data: {} }));
+    expect(screen.queryByText(/가입을 승인했습니다/)).toBeNull();
+    expect(get).toHaveBeenCalledTimes(getCount);
+  });
+
+  it('이력은 대상·로딩을 표시하고 실패 시 이력만 다시 조회한다', async () => {
+    adminRows();
+    const response = deferred();
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/history') ? response.promise : original(url, ...args));
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '이력' }))[0]);
+    expect(screen.getByText('홍길동 님의 변경 이력 (최근 50건)')).toBeTruthy();
+    expect(screen.getByText('변경 이력을 불러오는 중입니다…')).toBeTruthy();
+    await act(async () => response.reject({ response: { data: { error: '이력 조회 실패' } } }));
+    await screen.findByText('이력 조회 실패');
+    const listCount = get.mock.calls.filter(([url]) => url.endsWith('/memberships')).length;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/history') ? ok({ changes: [{
+      id: 'h1', action: 'suspend', before_role: 'member', after_role: 'member', before_status: 'active', after_status: 'suspended',
+      reason: '검증용 사유', created_at: '2026-10-15T00:00:00Z', actor_name: null,
+    }] }) : original(url, ...args));
+    fireEvent.click(screen.getByRole('button', { name: '이력 다시 조회' }));
+    await screen.findByText('검증용 사유');
+    expect(screen.getByText(/시스템 · 정지/)).toBeTruthy();
+    expect(screen.getByText('상태: 이용 중 → 이용 정지')).toBeTruthy();
+    expect(get.mock.calls.filter(([url]) => url.endsWith('/memberships'))).toHaveLength(listCount);
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it('다른 대상의 이력을 열면 이전 대상의 늦은 응답을 무시한다', async () => {
+    adminRows();
+    const old = deferred();
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/m1/history') ? old.promise : original(url, ...args));
+    mount(); const buttons = await screen.findAllByRole('button', { name: '이력' });
+    fireEvent.click(buttons[0]); fireEvent.click(buttons[1]);
+    await screen.findByText('변경 이력이 없습니다.');
+    expect(screen.getByText('정지회원 님의 변경 이력 (최근 50건)')).toBeTruthy();
+    await act(async () => old.resolve({ data: { data: { changes: [{ id: 'h1', reason: '이전 대상 이력', created_at: '2026-10-15T00:00:00Z' }] } } }));
+    expect(screen.queryByText('이전 대상 이력')).toBeNull();
+  });
+
+  it('이력 닫기 뒤 늦은 응답은 이력 창을 다시 열지 않는다', async () => {
+    adminRows(); const old = deferred();
+    const original = get.getMockImplementation()!;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/history') ? old.promise : original(url, ...args));
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '이력' }))[0]);
+    fireEvent.click(screen.getByRole('button', { name: '이력 닫기' }));
+    await act(async () => old.resolve({ data: { data: { changes: [] } } }));
+    expect(screen.queryByText('변경 이력이 없습니다.')).toBeNull();
+    expect(screen.queryByLabelText('회원 변경 이력')).toBeNull();
+  });
+
+  it('운영 권한 재조회에서 제재 권한이 회수되면 작성 중 제재를 닫는다', async () => {
+    let approved = false;
+    let failOperating = false;
+    let canRestrictMembers = true;
+    get.mockImplementation((url: string, config?: { params?: { status?: string } }) => {
+      if (url.endsWith('/operating')) {
+        if (failOperating) return Promise.reject({ response: { data: { error: '운영 목록 갱신 실패' } } });
+        return ok({ communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 1, canRestrictMembers }] });
+      }
+      return ok({ memberships: approved ? (config?.params?.status === 'active' ? [{ ...pendingRows[0], status: 'active' }] : []) : [pendingRows[0]] });
+    });
+    post.mockImplementation(() => { approved = true; failOperating = true; return ok({}); });
+    mount(); fireEvent.click(await screen.findByRole('button', { name: '승인' }));
+    await screen.findByText('운영 목록 갱신 실패');
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'active' } });
+    fireEvent.click(await screen.findByRole('button', { name: '정지', exact: true }));
+    fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '작성 중인 사유' } });
+    failOperating = false; canRestrictMembers = false;
+    fireEvent.click(screen.getByRole('button', { name: '다시 조회', exact: true }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.queryByRole('button', { name: '정지', exact: true })).toBeNull();
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it('제재 권한이 회수되면 같은 커뮤니티의 진행 중 이력도 버린다', async () => {
+    adminRows(); const old = deferred();
+    const original = get.getMockImplementation()!;
+    let admin = true;
+    get.mockImplementation((url: string, ...args: unknown[]) => url.endsWith('/history') ? old.promise : url.endsWith('/operating')
+      ? ok({ communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2, canRestrictMembers: admin }] }) : original(url, ...args));
+    mount(); fireEvent.click((await screen.findAllByRole('button', { name: '이력' }))[0]);
+    // 가입 승인은 권한 재조회도 수행한다.
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'pending' } });
+    const originalAfter = get.getMockImplementation()!;
+    get.mockImplementation((url: string, config?: { params?: { status?: string } }) => url.endsWith('/memberships')
+      ? ok({ memberships: [{ ...pendingRows[0], status: 'pending' }] }) : originalAfter(url, config));
+    fireEvent.click(screen.getByRole('button', { name: '검색', exact: true }));
+    fireEvent.click(await screen.findByRole('button', { name: '승인' }));
+    admin = false;
+    await act(async () => old.resolve({ data: { data: { changes: [{ id: 'h1', reason: '회수 전 이력', created_at: '2026-10-15T00:00:00Z' }] } } }));
+    await waitFor(() => expect(screen.queryByRole('button', { name: '이력' })).toBeNull());
+    expect(screen.queryByText('회수 전 이력')).toBeNull();
   });
 
 });
