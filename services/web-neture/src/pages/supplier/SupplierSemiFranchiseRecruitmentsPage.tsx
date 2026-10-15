@@ -36,7 +36,7 @@ export default function SupplierSemiFranchiseRecruitmentsPage() {
     if (!requestedProduct || options.loading || options.error) return;
     const target = options.products.find((p) => p.masterId === requestedProduct);
     setSelectionError(!target);
-    if (target) setForm((prev) => ({ ...prev, masterId: target.masterId }));
+    setForm((prev) => ({ ...prev, masterId: target?.masterId ?? '' }));
   }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {

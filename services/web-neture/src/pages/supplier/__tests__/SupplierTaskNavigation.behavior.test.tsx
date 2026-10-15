@@ -6,7 +6,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Link, MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import SupplierOrdersListPage from "../../account/SupplierOrdersListPage";
 import SupplierOrderDetailPage from "../../account/SupplierOrderDetailPage";
@@ -104,10 +104,11 @@ function Location() {
     </output>
   );
 }
-function mount(path: string) {
+function mount(path: string, nextPath?: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Location />
+      {nextPath && <Link to={nextPath}>검증 대상 변경</Link>}
       <Routes>
         <Route
           path="/supplier/orders/manage"
@@ -232,6 +233,26 @@ describe("supplier task navigation", () => {
       ).toBe("");
     },
   );
+
+  it.each([
+    ['/supplier/supply-proposals', 'offer', 'offer-a'],
+    ['/supplier/semi-franchise-events', 'offer', 'offer-a'],
+    ['/supplier/semi-franchise-recruitments', 'masterId', 'master-a'],
+  ])('clears the previous selection when the requested product changes to missing at %s', async (path, key, value) => {
+    mount(`${path}?${key}=${value}`, `${path}?${key}=missing`);
+    await waitFor(() => expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe(value));
+    fireEvent.click(screen.getByRole('link', { name: '검증 대상 변경' }));
+    await screen.findByRole('alert');
+    expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe('');
+  });
+
+  it('closes the previous signage creation form when the requested product becomes missing', async () => {
+    mount('/supplier/signage?product=offer-a', '/supplier/signage?product=missing');
+    await screen.findByRole('button', { name: '취소', exact: true });
+    fireEvent.click(screen.getByRole('link', { name: '검증 대상 변경' }));
+    await screen.findByRole('alert');
+    expect(screen.queryByRole('button', { name: '취소', exact: true })).toBeNull();
+  });
 
   it("restores the order status, search and page when returning from a detail", async () => {
     mount("/supplier/orders/manage?status=preparing&page=2&q=Fixture");

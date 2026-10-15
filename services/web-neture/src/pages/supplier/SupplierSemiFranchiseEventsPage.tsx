@@ -46,7 +46,7 @@ export default function SupplierSemiFranchiseEventsPage() {
     if (!requestedProduct || options.loading || options.error) return;
     const target = options.products.find((p) => p.id === requestedProduct);
     setSelectionError(!target);
-    if (target) setForm((prev) => ({ ...prev, offerId: target.id }));
+    setForm((prev) => ({ ...prev, offerId: target?.id ?? '' }));
   }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {

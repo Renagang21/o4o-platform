@@ -118,6 +118,7 @@ export default function SupplierSignagePage() {
     const target = products.find((p) => p.id === productId);
     setTargetError(!target);
     if (target) { setEditing(null); setForm({ ...EMPTY_FORM, linkedProductId: target.id }); setEditorOpen(true); }
+    else setEditorOpen(false);
   }, [productId, editId, productsError, productsLoading, products]);
 
   const handleSave = async () => {
