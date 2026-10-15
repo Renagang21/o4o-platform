@@ -149,6 +149,28 @@ describe('MyCommunityOperatorPage', () => {
     expect(await screen.findByText('이 커뮤니티의 운영자만 할 수 있습니다.')).toBeTruthy();
   });
 
+  it('상태·검색·페이지를 직접 바꾸면 이전 처리 실패·성공 문구를 지운다', async () => {
+    const initial = get.getMockImplementation()!;
+    get.mockImplementation((url: string, config: { params?: { page?: number; pageSize?: number } } = {}) => {
+      if (!url.endsWith('/memberships')) return initial(url);
+      const { page = 1, pageSize = 20 } = config.params ?? {};
+      return ok({ memberships: pendingRows, pagination: { page, pageSize, total: 41, totalPages: 3 } });
+    });
+    post.mockImplementationOnce(() => Promise.reject({ response: { data: { error: '이 커뮤니티의 운영자만 할 수 있습니다.' } } }));
+    mount();
+    fireEvent.click((await screen.findAllByRole('button', { name: '승인' }))[0]);
+    expect(await screen.findByText('이 커뮤니티의 운영자만 할 수 있습니다.')).toBeTruthy();
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'active' } });
+    await waitFor(() => expect(screen.queryByText('이 커뮤니티의 운영자만 할 수 있습니다.')).toBeNull());
+
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'pending' } });
+    fireEvent.click((await screen.findAllByRole('button', { name: '승인' }))[0]);
+    expect(await screen.findByText(/가입을 승인했습니다/)).toBeTruthy();
+    await waitFor(() => expect((screen.getByRole('button', { name: '다음 페이지' }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole('button', { name: '다음 페이지' }));
+    await waitFor(() => expect(screen.queryByText(/가입을 승인했습니다/)).toBeNull());
+  });
+
   it('운영자로 지정된 커뮤니티가 없으면 심사 목록을 부르지 않는다', async () => {
     get.mockImplementation((url: string) =>
       url === '/communities/operating' ? ok({ communities: [] }) : Promise.reject(new Error(url)),

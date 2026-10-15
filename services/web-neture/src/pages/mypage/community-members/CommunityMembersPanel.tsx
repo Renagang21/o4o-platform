@@ -53,12 +53,14 @@ export function CommunityMembersPanel({
         onFilter={(next) => {
           if (!actions.locked) {
             history.close();
+            actions.clearFeedback();
             list.changeFilter(next);
           }
         }}
         onPage={(next) => {
           if (!actions.locked) {
             history.close();
+            actions.clearFeedback();
             list.changePage(next);
           }
         }}

@@ -130,6 +130,14 @@ export function useCommunityMemberActions({
   const submit = () => {
     if (draft) void execute(draft.row, draft.action, draft.reason);
   };
+  // 사용자가 목록 뷰(필터·검색·페이지)를 명시적으로 바꾸면 이전 대상의 처리 결과를 지운다.
+  // 처리 직후 서버의 자동 페이지 보정은 이 경로를 거치지 않으므로 notice 가 보존된다.
+  // refreshWarning 은 운영 목록 재조회 실패도 포함하므로 재조회 성공 전까지 유지한다.
+  const clearFeedback = () => {
+    if (processing.current) return;
+    setError(null);
+    setNotice(null);
+  };
   const setReason = (reason: string) => {
     if (!processing.current)
       setDraft((prev) => (prev ? { ...prev, reason } : prev));
@@ -145,6 +153,7 @@ export function useCommunityMemberActions({
     submit,
     setReason,
     retryRefresh,
+    clearFeedback,
     locked: busyId !== null || refreshing || draft !== null,
   };
 }
