@@ -36,6 +36,7 @@ AI 외 신규 기능·정책·DB·migration·공통 프레임워크 변경 잔�
 - 최종 Sonar 분석에서 신규 코드 Reliability B와 annotation 14건을 확인했다. URL 갱신의 조건문 중괄호·중첩 빈 상태 문구·readonly props·state setter 이름을 정리하고, 상품/설명서 닫기 overlay를 native button으로 바꾼다. 상품 상세의 후속 작업/상태, 제품 검토 접수 완료, 설명서 언어/읽기 전용 안내를 표시 책임별로 분리한다. 가져오기 이미지 반영은 기존 media hook이 담당하며 필드·파일 보존 동작은 유지한다.
 - 공용 Drawer 소비처를 다시 전수 검색했다: SupplierProductsPage·OperatorProductApprovalPage·행동 회귀. 기존 helper의 공급자 이미지/편집 hook과 media hook의 입력/제출 type 소비처도 확인했다. 운영자 승인 callback과 공급자 전용 링크 비노출을 함께 검증한다.
 - 로컬 SonarJS cognitive-complexity 검사: 대상 7파일의 함수가 모두 기준 15 이하, 오류 0. 검사 도구는 `/tmp`에 별도 설치했고 저장소 dependency/lockfile은 변경하지 않았다. 최종 원격 Sonar 결과는 다음 push 뒤 확인한다.
+- HEAD `1ed6aa069`의 PR CI **38737723941 SUCCESS**, required CI Gate·CodeQL·Guard·Sonar 모두 PASS, review thread 미해결 0. Sonar에 자료 현황 중첩 조건식의 표시 권고 1건이 남아 목록 표시를 순차 반환하는 별도 함수로 정리했다. DOM·필터·조회/재시도 동작은 보존했다. 관련 행동 **25/25**, ESLint·인지복잡도·빌드 PASS. 이 보완 뒤의 최신 HEAD로 통합 gate를 다시 확인한다.
 
 ## 로컬 검증
 

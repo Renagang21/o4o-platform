@@ -122,6 +122,80 @@ interface SourceState<T> {
 
 const EMPTY = { rows: [], failed: false };
 
+function MaterialsStatusList({ loading, allFailed, filteredRows, emptyMessage, onReload }: Readonly<{
+  loading: boolean;
+  allFailed: boolean;
+  filteredRows: StatusRow[];
+  emptyMessage: string;
+  onReload: () => void;
+}>) {
+  if (loading) return (
+    <div className="py-16 text-center text-sm text-slate-400">불러오는 중…</div>
+  );
+  if (allFailed) return (
+    <div className="py-16 text-center">
+      <p className="text-sm text-slate-500">현황을 불러오지 못했습니다.</p>
+      <button
+        type="button"
+        onClick={onReload}
+        className="mt-3 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
+      >
+        다시 시도
+      </button>
+    </div>
+  );
+  if (filteredRows.length === 0) return (
+    <div className="py-16 text-center text-sm text-slate-400">
+      {emptyMessage}
+    </div>
+  );
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[720px] text-sm">
+        <thead className="bg-slate-50 text-left text-xs text-slate-500">
+          <tr>
+            <th className="px-4 py-2 font-medium">자료 유형</th>
+            <th className="px-4 py-2 font-medium">제목</th>
+            <th className="px-4 py-2 font-medium">상태</th>
+            <th className="px-4 py-2 font-medium">게시 대상</th>
+            <th className="px-4 py-2 font-medium">최종 수정</th>
+            <th className="px-4 py-2" />
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {filteredRows.map((r) => {
+            const kind = KIND_META[r.kind];
+            return (
+              <tr key={r.key} className="align-top">
+                <td className="whitespace-nowrap px-4 py-3">
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${kind.cls}`}>{kind.label}</span>
+                </td>
+                <td className="px-4 py-3 text-slate-800">
+                  {r.title}
+                  {r.note && <div className="mt-1 text-xs text-orange-700">{r.note}</div>}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3">
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${TONE_CLS[r.tone]}`}>
+                    {r.statusLabel}
+                  </span>
+                </td>
+                {/* 대상 개념이 없는 자료는 '—' 로 비운다. 약국/비약국을 임의로 채우지 않는다. */}
+                <td className="whitespace-nowrap px-4 py-3 text-slate-500">{r.target ?? '—'}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-slate-500">{formatDate(r.updatedAt)}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right">
+                  <Link to={r.editPath} className="text-sm font-medium text-emerald-700 hover:underline">
+                    관리
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function SupplierStoreMaterialsStatusPage() {
   const location = useLocation();
   const [params, setParams] = useSearchParams();
@@ -318,68 +392,7 @@ export default function SupplierStoreMaterialsStatusPage() {
       {stateFilter && <button type="button" onClick={() => setParams({})} className="mb-3 text-sm text-blue-700 underline">전체 자료 보기</button>}
       {/* 현황 목록 */}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        {loading ? (
-          <div className="py-16 text-center text-sm text-slate-400">불러오는 중…</div>
-        ) : allFailed ? (
-          <div className="py-16 text-center">
-            <p className="text-sm text-slate-500">현황을 불러오지 못했습니다.</p>
-            <button
-              type="button"
-              onClick={reload}
-              className="mt-3 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
-            >
-              다시 시도
-            </button>
-          </div>
-        ) : filteredRows.length === 0 ? (
-          <div className="py-16 text-center text-sm text-slate-400">
-            {emptyMessage}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className="bg-slate-50 text-left text-xs text-slate-500">
-                <tr>
-                  <th className="px-4 py-2 font-medium">자료 유형</th>
-                  <th className="px-4 py-2 font-medium">제목</th>
-                  <th className="px-4 py-2 font-medium">상태</th>
-                  <th className="px-4 py-2 font-medium">게시 대상</th>
-                  <th className="px-4 py-2 font-medium">최종 수정</th>
-                  <th className="px-4 py-2" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredRows.map((r) => {
-                  const kind = KIND_META[r.kind];
-                  return (
-                    <tr key={r.key} className="align-top">
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <span className={`rounded px-2 py-0.5 text-xs font-medium ${kind.cls}`}>{kind.label}</span>
-                      </td>
-                      <td className="px-4 py-3 text-slate-800">
-                        {r.title}
-                        {r.note && <div className="mt-1 text-xs text-orange-700">{r.note}</div>}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <span className={`rounded px-2 py-0.5 text-xs font-medium ${TONE_CLS[r.tone]}`}>
-                          {r.statusLabel}
-                        </span>
-                      </td>
-                      {/* 대상 개념이 없는 자료는 '—' 로 비운다. 약국/비약국을 임의로 채우지 않는다. */}
-                      <td className="whitespace-nowrap px-4 py-3 text-slate-500">{r.target ?? '—'}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-slate-500">{formatDate(r.updatedAt)}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-right">
-                        <Link to={r.editPath} className="text-sm font-medium text-emerald-700 hover:underline">
-                          관리
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <MaterialsStatusList loading={loading} allFailed={allFailed} filteredRows={filteredRows} emptyMessage={emptyMessage} onReload={reload} />
       </div>
 
       <p className="mt-3 text-xs text-slate-400">
