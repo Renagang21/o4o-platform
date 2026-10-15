@@ -16,8 +16,8 @@
 | frozen offline 설치와 소비 workspace package build | PASS |
 | `pnpm --filter @o4o/web-neture build` | TypeScript + Vite PASS |
 | 최종 modal 스타일 변경 후 `pnpm --filter @o4o/web-neture exec vite build` | PASS |
-| `pnpm exec vitest run --config services/web-neture/vitest.config.mjs` | 102 files / 932 tests PASS |
-| dialog focused suite | 8 tests PASS, 최종 selector 수정 후 재확인 |
+| `pnpm exec vitest run --config services/web-neture/vitest.config.mjs` | 최종 통합 기준 103 files / 957 tests PASS |
+| dialog focused suite | 최종 11 tests PASS; backdrop idle/busy 2건·대기 검색 초점 1건 포함 |
 | dialog test 별도 TypeScript 검사 | PASS; Vite ambient types 포함 |
 | 변경 TS/TSX 4개 ESLint | PASS |
 | 실제 Chromium, React StrictMode, 1440/390/320 px, 두 페이지 | 6 scenarios PASS |
@@ -26,6 +26,14 @@
 브라우저 검증은 초기 초점·양방향 Tab 순환·빈 후보 목록·Escape 단계별 닫기·중첩 확인 취소·호출 버튼 복귀·처리 중 초점 유지·실패 alert·재시도 성공·갱신 후 fallback·성공 toast를 포함한다. 요청 payload를 합성 fixture와 비교했으며 페이지 오류와 문서 가로 overflow는 0건이었다. 스크린샷으로 mobile dialog의 버튼·입력과 확인 창을 확인했다. Unit의 jsdom dialog mock은 lifecycle만 모사하며 native containment 판정은 Chromium 결과에 근거한다.
 
 로컬 fixture는 실제 페이지·CSS·UI 및 toast provider를 사용하고 API 요청을 전부 합성 응답으로 대체했다. 실제 로그인, 운영 API/DB 쓰기, 운영 배포 smoke는 수행하지 않았다. 기존 Browserslist 데이터 및 큰 chunk 경고는 비차단이며 의존성 변경은 하지 않았다.
+
+## 통합 검증 보완 — PR #606
+
+최신 main `d83b291cd6` 위에서 원본 #602를 통합하고 리뷰 결함을 수정했다. 병합 확인창의 backdrop 경계 밖 pointer release는 idle일 때만 확인창을 닫으며, 내부 클릭·처리 중 backdrop/Escape는 취소하지 않는다. 부모 dialog와 대상 버튼 초점을 유지한다. 부모 검색 debounce와 목록 응답이 도착해도 다른 열린 dialog의 활성 버튼 초점을 가져오지 않는다.
+
+최종 focused suite 11건과 전체 Neture 103 files / 957건을 실제 재실행해 PASS를 확인했다. 앱 TypeScript 및 production build, 변경 TS/TSX ESLint도 PASS다. 실제 두 페이지와 compiled CSS, synthetic API를 사용하는 Chromium StrictMode 1440/390/320px의 6개 시나리오가 PASS다. 지연 검색 도중 중첩 버튼 초점 보존, backdrop idle/busy, 중첩 Escape, 양방향 Tab, 교체된 호출 row 대신 검색 초점 fallback을 확인했고 pageerror/가로 overflow는 0건이다. 브라우저 fixture의 초기 toast provider 배치 및 교체 row의 기대값을 고쳐 최종 재실행했다. 이 fixture 수정은 애플리케이션 변경이 아니다.
+
+운영 데이터 쓰기는 실행하지 않았다. 통합 head의 CI/재리뷰 및 main 병합·배포는 별도 확인 대상이며 로컬 PH 운영 변경 동시 실행 여부가 확인되기 전 자동 배포를 시작하지 않는다.
 
 ## 개발 인계
 
