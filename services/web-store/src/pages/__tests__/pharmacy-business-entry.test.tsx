@@ -83,3 +83,35 @@ it('복사 실패는 자료 목록을 숨기지 않고 같은 자료에서 바�
   await screen.findByRole('link', { name: '내 매장 자료함에서 보기' });
   expect(mocks.copyContent).toHaveBeenCalledTimes(2);
 });
+
+it.each(['page', 'search'])('링크 선택 자료는 %s 변경 뒤 결과에 다시 삽입하지 않는다', async mode => {
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByText('선택한 자료');
+  expect(mocks.getContent).toHaveBeenCalledTimes(1);
+  if (mode === 'page') fireEvent.click(screen.getByRole('button', { name: '다음' }));
+  else {
+    fireEvent.change(screen.getByPlaceholderText('제목 · 요약 검색'), { target: { value: '새 검색' } });
+    fireEvent.click(screen.getByRole('button', { name: '검색' }));
+  }
+  await screen.findByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
+  expect(screen.queryByText('선택한 자료')).toBeNull();
+  expect(mocks.getContent).toHaveBeenCalledTimes(1);
+});
+it('새 조회가 시작되면 이전 복사 오류와 늦은 복사 응답을 버린다', async () => {
+  mocks.listContents.mockResolvedValue({ items: [content], total: 1 });
+  mocks.copyContent.mockRejectedValueOnce(new Error('Unavailable'));
+  render(<MemoryRouter><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByText('선택한 자료');
+  fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
+  await screen.findByRole('alert');
+  fireEvent.click(screen.getByRole('button', { name: /새로고침/ }));
+  await screen.findByText('선택한 자료');
+  expect(screen.queryByRole('alert')).toBeNull();
+  let reject!: (error: Error) => void;
+  mocks.copyContent.mockReturnValueOnce(new Promise((_yes, no) => { reject = no; }));
+  fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
+  fireEvent.click(screen.getByRole('button', { name: /새로고침/ }));
+  await screen.findByText('선택한 자료');
+  await act(async () => reject(new Error('Old request')));
+  expect(screen.queryByRole('alert')).toBeNull();
+});

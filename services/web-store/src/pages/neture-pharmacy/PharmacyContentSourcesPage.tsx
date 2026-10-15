@@ -7,6 +7,7 @@
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
  */
 import { useLatestList } from '../../hooks/useLatestList';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
@@ -44,6 +45,7 @@ export default function PharmacyContentSourcesPage() {
 }
 
 function PharmacyContentSources() {
+  const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
@@ -64,33 +66,40 @@ function PharmacyContentSources() {
   }, []);
 
   const fetchList = useCallback(async () => {
+    invalidateCopy();
+    setCopyError(null); setCopied(null); setBusyId(null);
     const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
-    if (!selectedContentId || result.items.some(item => item.id === selectedContentId)) return result;
+    if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
     // A linked material may not be on this page. The existing detail API rechecks store membership.
     const selected = await neturePharmacyApi.getContent(selectedContentId);
     if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
     return { ...result, items: [selected, ...result.items] };
-  }, [sf, q, page, selectedContentId]);
+  }, [sf, q, page, selectedContentId, invalidateCopy]);
   const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
   useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
+  const clearSelectedContent = () => {
+    setParams(previous => { const next = new URLSearchParams(previous); next.delete('content'); return next; });
+  };
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
+    clearSelectedContent();
     setPage(1);
     setQ(qInput.trim());
   };
 
   const copy = async (c: SemiFranchiseContent) => {
+    const isCurrent = beginCopy();
     setBusyId(c.id);
     setCopyError(null);
     setCopied(null);
     try {
       await neturePharmacyApi.copyContent(c.id);
-      setCopied(c.title);
+      if (isCurrent()) setCopied(c.title);
     } catch (e) {
-      setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
+      if (isCurrent()) setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
     } finally {
-      setBusyId(null);
+      if (isCurrent()) setBusyId(null);
     }
   };
 
@@ -176,9 +185,9 @@ function PharmacyContentSources() {
 
       {!loading && total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button className={btn.secondary} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>이전</button>
+          <button className={btn.secondary} disabled={page <= 1} onClick={() => { clearSelectedContent(); setPage((p) => p - 1); }}>이전</button>
           <span className="text-gray-600">{page} / {totalPages}</span>
-          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>다음</button>
+          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => { clearSelectedContent(); setPage((p) => p + 1); }}>다음</button>
         </div>
       )}
     </PharmacyPage>
