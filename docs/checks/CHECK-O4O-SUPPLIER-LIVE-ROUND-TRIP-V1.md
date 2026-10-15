@@ -85,11 +85,21 @@
 
 | 단계 | 상태 |
 |---|---|
+| G. 공유 자원 독점 게이트(아래) | 1~7 의 선행 조건. 미충족이면 1 에 들어가지 않는다 |
 | 0. 이미 실행한 등록·수정·재고 설정(위 표) | 완료 · 산출물 1건(Offer)만 보존 중 |
 | 1. 운영자 제품 등록 승인 | **BLOCKED** — 결정 A~D 확정과 이 계획 승인 전 실행 금지 |
 | 2~5. 장바구니 · checkout · 결제 준비/확인 | **BLOCKED** |
 | 6. 공급자 준비 · 송장 · 배송 완료 | **BLOCKED** |
 | 7. 정리 · 잔존 0 검증 | 계획 승인 후 1~6 과 한 묶음으로만 실행 |
+
+**공유 자원 독점 게이트(G).** Production DB · 실제 browser session 은 worktree 로 격리되지 않는 공유 mutable 자원이다
+([`AGENTS.md` §4-1(g)](../../AGENTS.md#4-1-parallel-session--worktree-policy)). 1 단계 직전에 아래를 모두 충족해야 한다.
+
+1. 다른 세션이 같은 운영 DB 영역(이 공급자의 Offer · 대상 약국의 장바구니·주문 · Neture 운영자 승인 큐)을 변경 중이 아님을 사용자에게 확인한다. 불명이면 진행하지 않고 묻는다.
+2. 같은 테스트 계정 · 같은 browser 프로필(Playwright 포함)을 다른 세션이 쓰지 않음을 확인한다.
+3. 이번 실행이 1~7 이 끝날 때까지 위 자원을 **독점**한다고 사용자 지시 공간(PR 코멘트 또는 대화)에 선언하고, 종료·중단 시 해제를 같은 곳에 기록한다.
+4. 선언 직후 · 1 단계 직전에 상태를 다시 조회한다: Offer 상태(PENDING · 비활성 · 공급가 100 · 재고 2 · 예약 0 · 추적 true), 대상 약국 장바구니 비어 있음, 이 Offer 를 담은 장바구니·주문 0, 결제 모드 `test`. 하나라도 다르면 중단한다.
+5. 각 단계 사이에도 다음 mutation 직전에 해당 ID 상태를 재조회한다(위 재시도 규칙과 동일).
 
 ### 단계별 write 인벤토리
 
@@ -99,7 +109,7 @@
 | 가격 수정·원복(실행됨) | `PATCH /supplier/products/:id` → `modules/neture/services/supplier-offer-write.service.ts:28-184` | 같은 Offer 행 UPDATE. 이력 테이블 없음. PUBLIC·APPROVED·active 일 때만 `organization_product_listings` 자동 생성(`:178-184`) — 현재 PENDING 이라 해당 없음 | 값 재PATCH(실행됨: 100 복원) |
 | 재고(실행됨) | `PATCH /supplier/inventory/:offerId` → `modules/neture/services/inventory.service.ts:53-113` | Offer 행의 `stock_quantity` · `track_inventory` UPDATE. `inventory_version` 은 저장값이 아닌 계산값. 이력 없음 | 값 재PATCH |
 | 서비스 승인 요청(실행됨) | `POST /supplier/products/submit-approval` → `modules/neture/services/offer-lifecycle.service.ts:266-348` | `NO_ELIGIBLE_SERVICE_KEYS` 로 **write 없음**(`:336-340`) | 해당 없음 |
-| 1. 운영자 승인 | `POST /operator/products/:id/approve` → `modules/neture/controllers/operator-product-approval.controller.ts:178-197` · `offer-lifecycle.service.ts:28-90` | 공급처 미지정 Offer: Offer 행 `APPROVED` · `is_active=true`(`:82-87`), OSA · listing · `product_approvals` 생성 없음. **`action_logs` 1행** `neture.operator.product_approve`, meta `productId`(controller `:194`). 알림 없음 | "승인 취소" 없음. `POST /operator/products/:id/reject` 는 `REJECTED` · 비활성으로 바꾸고 `action_logs` 1행을 **추가**한다(controller `:209-226`) |
+| 1. 운영자 승인 | `POST /operator/products/:id/approve` → `modules/neture/controllers/operator-product-approval.controller.ts:178-197` · `offer-lifecycle.service.ts:28-90` | 공급처 미지정 Offer: Offer 행 `APPROVED` · `is_active=true`(`:82-87`), OSA · listing · `product_approvals` 생성 없음. **`action_logs` 0 또는 1행** `neture.operator.product_approve`, meta `productId` — `logSuccess(...).catch(() => {})` 로 응답과 분리된 **fire-and-forget** 이라 실패하면 조용히 누락된다(controller `:194-196`). 알림 없음 | "승인 취소" 없음. `POST /operator/products/:id/reject` 는 `REJECTED` · 비활성으로 바꾸고 `action_logs` 를 같은 fire-and-forget 방식으로 0 또는 1행 **추가**한다(controller `:226-228`) |
 | 1-부작용. 노출 | `modules/neture-pharmacy/services/supply-access.ts:51-71` | 승인 즉시 기본 세미프랜차이즈의 **모든 활성 약국**에 `default` 공급 옵션으로 노출(대상 약국 한정 아님) | 비활성화 시 노출 종료. 노출 중 다른 매장 주문은 막지 못함 |
 | 2. 장바구니 | `POST /pharmacy/cart/items` → `modules/neture-pharmacy/services/pharmacy-cart.service.ts:136-177` | `store_cart_items` 1행(`buyer_id` · `organization_id` · `service_key='neture-pharmacy'` · `supplier_product_offer_id`) | `DELETE /pharmacy/cart/items/:id`(`:190-196`) — 실제 행 삭제 |
 | 3. checkout | `POST /pharmacy/cart/checkout` → `pharmacy-cart.service.ts:198-378` → `services/checkout.service.ts:159-216` | `checkout_orders` 1행(`status=created` · metadata `serviceKey='neture-pharmacy'` · `paymentGroupId` · `cartItemIds` · `buyerOrganizationName`). **구매 조직 이름·전화·주소가 `shippingAddress` 로 복사**(cart `:226-237`). `checkout_order_logs` 1행(CREATED). 사용한 cart 행 삭제(`:338-342`). 기본 공급 line 은 재고 예약 없음(재고 확인만, `:220`) | 결제 전: `POST /pharmacy/orders/:id/cancel` → `services/checkout/store-order-cancel.service.ts:183-197` — **행은 남고 `cancelled` 로 전이만** |
@@ -117,7 +127,11 @@ GCS · 미디어 업로드, role assignment, outbox, KPI 이벤트, DB trigger �
 ### 식별·태깅
 
 - **ID 를 생성 시점에 수집한다.** 로컬 비공개 journal 에 단계별로 기록한다:
-  Offer id, cart item id, checkout order id · orderNumber, paymentGroupId, o4o_payments id, neture order id, shipment id, action_logs id(승인 직후 조회).
+  Offer id, cart item id, checkout order id · orderNumber, paymentGroupId, o4o_payments id, neture order id, shipment id, action_logs id.
+- **비동기 write 는 대기 후 재조회한다.** 이 인벤토리의 fire-and-forget write 는 승인·반려의 `action_logs`(controller `:194-196` · `:226-228`, 일괄 경로 `:113` · `:159`)와,
+  PUBLIC·APPROVED·active Offer 수정 시의 `autoExpandPublicProduct` listing 생성(`supplier-offer-write.service.ts:178-184`, 이번 Offer 는 PUBLIC 아님 → 해당 없음을 재확인)이다. 서비스별 승인(OSA)의 공급자 `notifications`(`offer-service-approval.service.ts:636-641`)도 fire-and-forget 이지만 공급처 미지정 Offer 에는 OSA 가 없어 이 흐름에서 생기지 않아야 한다 — 승인 후 0 건임을 같은 방식으로 재조회한다. 결제 확인의 bridge 는 응답 전에 await 되며 결과(`deliveries[].delivered`)로 확인한다.
+  응답 직후 결과를 단정하지 않고, 수 초 간격으로 최대 3회 `productId`(또는 offer id) 기준으로 재조회해 journal 에 `0`(누락 · write 실패 추정) 또는 `1`(id 기록)로 남긴다.
+  누락은 검증 실패로 세지 않되 "감사 기록 미생성" 으로 보고하고, 나중에 늦게 생긴 행이 잔존 집계와 어긋나지 않도록 정리 직전에 한 번 더 재조회한다.
   공개 문서·커밋에는 ID 원문을 쓰지 않는다.
 - **결정적 태그를 붙일 수 있는 곳은 제한적이다.** checkout 은 사용자 입력 metadata 를 받지 않고, 서버가 `testPayment=true` · `paymentMethod='TEST'` · `transactionId='npc_…'` 를 남긴다.
   `testPayment` 는 같은 test 모드의 다른 주문에도 붙으므로 **단독 식별자로 쓰지 않는다** — 항상 journal 의 ID + 경계 조건(아래 SELECT)으로 좁힌다.
@@ -142,7 +156,7 @@ GCS · 미디어 업로드, role assignment, outbox, KPI 이벤트, DB trigger �
 
 | 데이터 | 이유 | 처리 |
 |---|---|---|
-| `action_logs`(승인 1 · 반려 시 +1) | 감사 기록. API 삭제 경로 없음 | 수용 — `productId` 로 식별 가능한 잔존으로 기록 |
+| `action_logs`(승인 0~1 · 반려 시 0~1 추가, fire-and-forget) | 감사 기록. API 삭제 경로 없음 | 수용 — `productId` 로 식별 가능한 잔존으로 기록 |
 | `checkout_order_logs`(CREATED) | 주문 이력. API 삭제 경로 없음 | 결정 A 에 따름 |
 | 결제 후 `checkout_orders` · `o4o_payments` · `neture_orders` · `neture_order_items` · `neture_shipments` | 취소·환불·삭제 API 없음 | 결정 A 에 따름 |
 | 결제 전 취소된 `checkout_orders`, 닫히지 않은 `o4o_payments`(CREATED) | 취소는 상태 전이만 | 결정 A 에 따름 |
@@ -201,7 +215,7 @@ SELECT count(*) FROM neture_settlement_orders nso
   JOIN neture_orders o ON o.id = nso.order_id
  WHERE o.service_key = 'neture-pharmacy' AND o.metadata->>'checkoutOrderId' = ANY($5::text[]);
 
--- 감사 기록 (기대 = 수용한 건수: 승인 1, 반려 시 +1)
+-- 감사 기록 (기대 = journal 에 기록한 실측 건수 — 승인 0 또는 1, 반려 시 0 또는 1 추가. 기대값을 고정 1 로 두지 않는다)
 SELECT count(*) FROM action_logs
  WHERE service_key = 'neture' AND action_key LIKE 'neture.operator.product_%' AND meta->>'productId' = $1::text;
 ```
