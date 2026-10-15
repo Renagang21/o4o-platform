@@ -15,6 +15,7 @@ import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, typ
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { BusinessTabs } from '../../components/BusinessTabs';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
+import { useUnifiedStore } from '../../contexts/StoreContext';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
 
 const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '콘텐츠 목록을 불러오지 못했습니다.');
@@ -38,6 +39,11 @@ function ContentBody({ body }: { body: string | null }) {
 }
 
 export default function PharmacyContentSourcesPage() {
+  const { organizationId } = useUnifiedStore();
+  return <PharmacyContentSources key={organizationId} />;
+}
+
+function PharmacyContentSources() {
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
@@ -129,7 +135,7 @@ export default function PharmacyContentSourcesPage() {
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : items.length === 0 ? (
+      ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
           <p>이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.</p>
           <p className="mt-1">세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.</p>

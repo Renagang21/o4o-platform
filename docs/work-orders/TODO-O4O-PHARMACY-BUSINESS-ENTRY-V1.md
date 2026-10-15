@@ -43,7 +43,7 @@ My Home에는 선택 약국의 가입 사업이 보이고 사업 공간으로 �
 - [x] 일반 사업별 홈과 사업 이름·기존 게시판/자료 연결.
 - [x] 사업 자료에서 내 매장 자료 가져오기 연결 및 선택 자료 펼치기.
 - [x] 집중 회귀·영향 앱 타입/빌드·lint·PC/모바일 합성 browser 검증.
-- [ ] 민감정보·diff·staged scope 확인 후 commit·push·PR.
+- [x] 민감정보·diff·staged scope 확인 후 commit·push·PR.
 - [ ] 실제 ruleset·CI·리뷰 확인 후 순차 병합 및 현재 Delivery 배포.
 - [ ] 운영 서빙 코드·readiness 확인과 결과 기록.
 
@@ -95,3 +95,17 @@ My Home의 사업별 최신 소식 집계와 사업 홈의 상품 전시 구성,
 실제 main ruleset은 PR 필수·CI Gate 필수·필수 승인 0이다.
 현재 GitHub actor는 소유자이나 DEPLOY_FREEZE 변수 조회 API는 integration 권한 403이므로
 동결 해제 여부를 추정하거나 변수를 바꾸지 않고 실제 Delivery 게이트를 확인한다.
+
+
+### 최신 main 반영과 추가 범위 검증
+
+push 직전 main에 #607 Store 다국어 개선이 통합돼 자기 branch에 merge했다.
+이번 가입 사업 경로와 충돌은 없었다. 변경된 Store 전체 485건과 production build를 재검증했다.
+최초 병렬 실행에서 기존 cart 수량 검사 1건이 실패했다. 해당 파일·업무 코드에는 이번 diff가 없고,
+수량 state를 items 변경 effect로 초기화하는 기존 경로가 있다. 해당 suite 단독 8건과 저장소의
+표준 Store test 명령(`--maxWorkers=2`) 전체 485건은 PASS했다. 기존 cart 코드는 수정하지 않았다.
+자료 화면도 선택 매장별로 초기화해 이전 매장의 늦은 응답·복사 상태가 남지 않도록 보완하고
+조회 실패를 자료 없음으로 함께 표시하지 않도록 했다. 해당 회귀를 추가했다.
+PR #622의 CI·리뷰를 확인한 뒤 최신 HEAD로 통합한다.
+
+선택 매장 변경 회귀 추가 후 Store 표준 전체 검증은 37 files / 486 tests PASS다.

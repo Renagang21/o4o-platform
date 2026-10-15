@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-const mocks = vi.hoisted(() => ({ listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
+const mocks = vi.hoisted(() => ({ organizationId: 'store-a', listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
 vi.mock('../../api/neturePharmacy', () => ({ neturePharmacyApi: mocks, pharmacyErrorCode: () => '', pharmacyErrorMessage: (_e: unknown, fallback: string) => fallback || '요청 실패' }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: 'store-a', effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: 'kpa-society' }) }));
 vi.mock('../../lib/apiClient', () => ({ api: {} }));
 vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: mocks.handoff }));
 vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
@@ -13,6 +13,7 @@ const business = (key: string, membershipStatus: string | null = 'active') => ({
 const content = { id: 'selected', title: '선택한 자료', body: '선택 자료 본문', semiFranchiseKey: 'network-a' };
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.organizationId = 'store-a';
   mocks.listSemiFranchises.mockResolvedValue([business('network-a'), business('pending', 'pending'), business('none', null)]);
   mocks.listContents.mockResolvedValue({ items: [], total: 30 });
   mocks.getContent.mockResolvedValue(content);
@@ -46,5 +47,18 @@ it('사업과 맞지 않는 선택 자료를 표시하거나 복사하지 않는
   render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
   await screen.findByRole('alert');
   expect(screen.queryByText('선택한 자료')).toBeNull();
+  expect(screen.queryByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.')).toBeNull();
   expect(mocks.copyContent).not.toHaveBeenCalled();
+});
+
+it('매장을 바꾸면 이전 매장의 늦은 자료 응답을 버린다', async () => {
+  let release!: (value: unknown) => void;
+  mocks.listContents.mockReturnValueOnce(new Promise(resolve => { release = resolve; })).mockResolvedValue({ items: [], total: 0 });
+  const tree = () => <MemoryRouter><PharmacyContentSourcesPage /></MemoryRouter>;
+  const { rerender } = render(tree());
+  mocks.organizationId = 'store-b';
+  rerender(tree());
+  await screen.findByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
+  await act(async () => release({ items: [content], total: 1 }));
+  expect(screen.queryByText('선택한 자료')).toBeNull();
 });
