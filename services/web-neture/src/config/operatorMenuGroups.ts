@@ -80,6 +80,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '정산 관리', path: '/admin/settlements', adminOnly: true },
   ],
   content: [
+    { label: 'Hero · 광고 관리', path: '/operator/home-presentation/neture' },
     { label: '홈페이지 CMS', path: '/operator/homepage-cms' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
     { label: '커뮤니티 광고', path: '/admin/community-admin', adminOnly: true },

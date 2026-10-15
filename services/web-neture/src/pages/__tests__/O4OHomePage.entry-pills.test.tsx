@@ -36,7 +36,8 @@ vi.mock('../../components/home/HomeServiceNews', () => ({
   default: (p: { hideWhenEmpty?: boolean }) => <div data-testid="news" data-hide-when-empty={String(!!p.hideWhenEmpty)} />,
 }));
 vi.mock('../../components/home/HomeEntryPanel', () => ({ default: () => <div data-testid="entry-panel" /> }));
-vi.mock('@o4o/shared-space-ui', () => ({ PublicLegalFooterInfo: () => null }));
+vi.mock('@o4o/shared-space-ui', async (importOriginal) => ({ ...await importOriginal<typeof import('@o4o/shared-space-ui')>(), PublicLegalFooterInfo: () => null }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: async () => ({ data: { success: true, data: null } }) } }));
 vi.mock('../../lib/footerLegal', () => ({ loadFooterLegal: vi.fn() }));
 
 import O4OHomePage from '../O4OHomePage';

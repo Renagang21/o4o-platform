@@ -1,3 +1,5 @@
+import { api as homePresentationApi } from '../lib/apiClient';
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 /**
  * O4O representative home. Canonical policy: O4O-HOME-SERVICE-DISCOVERY-V1.
  * AI → personal workspace → public service discovery → news.
@@ -639,6 +641,7 @@ export default function O4OHomePage() {
             onReload={entry.reload}
           />
 
+          <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h2" />
           <ServiceDiscovery />
           <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-3xl" />
         </main>
@@ -660,6 +663,7 @@ export default function O4OHomePage() {
             {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
           </section>
 
+          <div className="mt-8 w-full max-w-5xl"><ServiceHomeHero surface="neture" client={homePresentationApi} heading="h2" /></div>
           <section aria-labelledby="home-ai-title" className="mt-8 flex w-full max-w-xl flex-col items-center text-center">
             <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
             <p className="mt-2 mb-0 text-sm text-slate-500">질문하거나 필요한 업무를 요청할 수 있습니다.</p>
@@ -671,6 +675,8 @@ export default function O4OHomePage() {
           <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-2xl text-left" />
         </main>
       )}
+
+      <div className="mx-auto w-full max-w-5xl px-4"><ServiceHomePromotion surface="neture" client={homePresentationApi} /></div>
 
       {/* 법정 고지 링크만. 홍보·뉴스·통계 섹션 없음. */}
       <footer className="px-4 pb-6 text-center text-xs text-slate-400 sm:px-6">

@@ -1,3 +1,4 @@
+import { presentationHandlers } from '../home-presentation/home-presentation.routes.js';
 /**
  * KPA Branch Routes
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -153,6 +154,8 @@ const wrap =
 export function createKpaBranchRoutes(): Router {
   const router = Router();
 
+  const home = presentationHandlers(AppDataSource, req => ({ surface: 'branch', organizationId: req.branch!.id }));
+
   // ── public ────────────────────────────────────────────────────────────────
 
   router.get('/service-info', (_req, res) => {
@@ -197,6 +200,13 @@ export function createKpaBranchRoutes(): Router {
 
   router.get('/branches/:branchSlug', resolveBranch, wrap(BranchDirectoryController.detail));
   router.get('/branches/:branchSlug/site', resolveBranch, wrap(BranchSiteController.publicSite));
+  router.get('/branches/:branchSlug/home-presentation', resolveBranch, async (req, res, next) => {
+    try {
+      const sites = await AppDataSource.query('SELECT 1 FROM branch_sites WHERE organization_id = $1 AND is_published = true', [req.branch!.id]);
+      if (!sites.length) { res.status(404).json({ success: false }); return; }
+      await home.publicRead(req, res);
+    } catch (error) { next(error); }
+  });
   router.get('/branches/:branchSlug/posts', resolveBranch, wrap(BranchSiteController.publicPosts));
 
   // 공개 행사 (WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1)
@@ -386,6 +396,9 @@ export function createKpaBranchRoutes(): Router {
     ...operatorGuards,
     wrap(BranchMemberController.leave),
   );
+
+  router.get('/branches/:branchSlug/operator/home-presentation', ...operatorGuards, home.manageRead);
+  router.put('/branches/:branchSlug/operator/home-presentation', apiLimiter, ...operatorGuards, home.save);
 
   router.get('/branches/:branchSlug/operator/site', ...operatorGuards, wrap(BranchSiteController.operatorSite));
   router.put('/branches/:branchSlug/operator/site', ...operatorGuards, wrap(BranchSiteController.upsertSite));

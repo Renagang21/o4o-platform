@@ -22,7 +22,7 @@ export default function SiteShell() {
           <summary>업무 메뉴</summary>
           <nav aria-label="강의 업무 메뉴">
             {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
-            {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/contact">문의 관리</Link><Link to="/operator/members">회원 관리</Link></>}
+            {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/home-presentation">Hero · 광고 관리</Link><Link to="/operator/contact">문의 관리</Link><Link to="/operator/members">회원 관리</Link></>}
           </nav>
         </details>}
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}

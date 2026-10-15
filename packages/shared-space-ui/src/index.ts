@@ -326,3 +326,7 @@ export type {
   SignagePreviewSectionProps,
   ContentHighlightSectionProps,
 } from './types';
+
+export { ServiceHomeHero, ServiceHomePromotion, HomeHeroView, HomePromotionView, homePresentationPath, homePresentationManagePath } from "./home-presentation/HomePresentation";
+export type { HomePresentationClient } from "./home-presentation/HomePresentation";
+export { HomePresentationEditor } from "./home-presentation/HomePresentationEditor";
