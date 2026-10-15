@@ -61,3 +61,27 @@ main 병합·운영 배포는 통합 담당에게 인계한다. Neture 프런트
 실제 deployment 대상·등급·skip 여부는 현재 Delivery의 affected 판정과 required CI로 통합 담당이 확인한다.
 신고/소유자 승계/이력 자동 삭제/새 정책/서비스 간 공통화, 약사회 분회, 강의 PR #587 및 수료증 폐기 사유 보관은 제외한다.
 GitHub API는 환경의 api.github.com 정책 차단으로 조회/PR 생성이 미확인이다. 허용 도메인 초안만 저장됐으며 runtime 적용·게시를 뜻하지 않는다.
+
+## 최종 개발 검증·인계 (2026-10-15)
+
+검증 중 `origin/main`이 `761fb49e3`(#595)으로 이동했다. 새 main에는 앞선 강의 #587과 펀딩 정비가 포함됐다.
+자기 변경을 commit한 뒤 아직 push하지 않은 자기 branch를 해당 main 위로 rebase했다.
+충돌은 공통 TODO 1파일뿐이며 새 main의 강의/펀딩 완료 기록 전부와 이번 커뮤니티 항목을 함께 보존했다.
+다른 branch/worktree나 main 이력은 수정하지 않았다. 코드의 충돌·신규 dependency/lockfile 변경은 없다.
+
+최신 기준에서 프런트 5파일 72건(회원 운영 46건), Neture TypeScript/production build와 Chromium PC/모바일의 각 8개 흐름이 다시 PASS했다.
+pageerror·문서 가로 넘침 0, mutation 재전송 없이 목록 재조회 복구를 확인했다. API의 관련 소스·6개 테스트는 main 이동에서 변하지 않아 기존 183건 PASS를 유지한다.
+문서 민감정보 3파일과 diff 검사, 변경 TypeScript/TSX ESLint PASS다.
+
+구현 commit `518feb511`을 `origin/wo/community-member-workflow-refinement`에 정상 push했다.
+`gh pr create --base main --head wo/community-member-workflow-refinement --body-file ...`는 api.github.com GraphQL 요청의 403 Forbidden으로 실패했다.
+PR 생성과 필수 CI 상태는 확인하지 못했다. PR title/body는 준비했으며 아래 링크에서 생성할 수 있다.
+
+[PR 생성 화면](https://github.com/Renagang21/o4o-platform/pull/new/wo/community-member-workflow-refinement)
+
+환경 설정의 api.github.com 허용 초안은 저장됐으나 현재 runtime의 적용은 확인되지 않았다.
+설정 변경을 저장·Publish한 후 API 접근을 다시 확인하고 PR 생성·필수 CI 조회를 재개한다. Git read/push 인증은 현재 HTTPS proxy로 정상 동작한다.
+추가 토큰은 요청하지 않았으며 domain 차단 해소가 GitHub API 인증/권한까지 보장하지는 않는다.
+
+`WORKTREE_DISPOSITION`: 전용 worktree/branch KEEP. 이번 작업 변경·untracked 0을 확인한 뒤 인계하며 다른 작업공간은 정리하지 않는다.
+main 통합·운영 배포·실계정 검증은 미실행이다. 개발 코드와 원격 branch는 보존됐고 외부 차단으로 PR 인계만 남는다.

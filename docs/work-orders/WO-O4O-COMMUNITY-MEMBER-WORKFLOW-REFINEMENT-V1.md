@@ -25,7 +25,8 @@
 - [x] 처리 성공 후 재조회 실패를 분리하며 저장 성공 안내 유지. 현재 검색과 페이지 보정 유지.
 - [x] 이력 대상·행동·전후 상태 표시, 독립 재시도·닫기·늦은 응답 방어.
 - [x] 기존 API·권한·마지막 admin 보호 회귀, 화면 tests·타입·build·ESLint·PC/모바일 격리 fixture 검증.
-- [ ] 전체 TODO·CHECK 정합, commit/push·PR 생성 후 통합 담당에게 인계 (현재 GitHub API 차단).
+- [x] 전체 TODO·CHECK 정합, commit/push 완료.
+- [ ] PR 생성·필수 CI 확인 후 통합 담당에게 인계 (api.github.com 403 차단).
 
 ## 실행 경계
 
@@ -40,3 +41,7 @@ GitHub API 도메인 차단은 환경 설정 초안으로 추가하되 실제 �
 공통 packages와 Neture TypeScript/production build, 변경 파일 ESLint·문서 민감정보·diff 검사 PASS.
 production build/격리 API 응답으로 PC 1440·모바일 390에서 각각 8개 운영 흐름 PASS, pageerror·화면 가로 넘침 0.
 실계정·운영 API/DB 검증은 하지 않았다. 세부 증거·잔여 인계는 [CHECK](../checks/CHECK-O4O-COMMUNITY-MEMBER-WORKFLOW-REFINEMENT-V1.md)에서 구분한다.
+
+최종 기준 `761fb49e3`의 강의·펀딩 기록을 보존하며 전용 branch를 동기화했고 프런트 72건·Neture 타입/빌드·PC/모바일 검증을 재확인했다.
+구현 `518feb511` push 완료, PR 생성은 실제 시도했으나 GitHub API 정책 403으로 실패했다. 코드 구현 완료와 PR/CI·main·운영 미완료를 구분한다.
+환경 설정의 api.github.com 허용 초안을 저장·Publish한 뒤 PR 생성을 재개한다. [CHECK의 최종 인계](../checks/CHECK-O4O-COMMUNITY-MEMBER-WORKFLOW-REFINEMENT-V1.md#최종-개발-검증인계-2026-10-15)를 따른다.
