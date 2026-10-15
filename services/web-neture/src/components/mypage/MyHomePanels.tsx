@@ -523,12 +523,12 @@ const BUSINESS_STATUS: Record<string, string> = {
   pending: "승인 대기", active: "이용 중", rejected: "반려", suspended: "이용 정지", terminated: "탈퇴",
 };
 type StoreBusiness = { key: string; name: string; status: string; active: boolean; hasCommunity: boolean };
-export function MyHomeStoreBusinesses({ accountId, organizationId, compact = false }: {
-  accountId: string; organizationId: string; compact?: boolean;
+export function MyHomeStoreBusinesses({ accountId, organizationId, canEnterCommunity = false, compact = false }: {
+  accountId: string; organizationId: string; canEnterCommunity?: boolean; compact?: boolean;
 }) {
-  return <StoreBusinessRecords key={`${accountId}:${organizationId}:${compact}`} accountId={accountId} organizationId={organizationId} compact={compact} />;
+  return <StoreBusinessRecords key={`${accountId}:${organizationId}:${compact}:${canEnterCommunity}`} accountId={accountId} organizationId={organizationId} canEnterCommunity={canEnterCommunity} compact={compact} />;
 }
-function StoreBusinessRecords({ accountId, organizationId, compact }: { accountId: string; organizationId: string; compact: boolean }) {
+function StoreBusinessRecords({ accountId, organizationId, compact, canEnterCommunity }: { accountId: string; organizationId: string; compact: boolean; canEnterCommunity: boolean }) {
   const [page, setPage] = useState(1);
   const result = useMyHomeResource<StoreBusiness[] | { denied: true }>(`${accountId}:${organizationId}`, async () => {
     try {
@@ -557,7 +557,7 @@ function StoreBusinessRecords({ accountId, organizationId, compact }: { accountI
     {!result.data ? <ResourceNotice error={result.error} reload={result.reload} /> : !items ?
       <p className="mt-3 text-sm text-amber-800">선택한 매장의 사업 참여 정보를 조회할 수 없습니다. 내 매장에서 이용 권한을 확인해 주세요.</p> :
       items.length === 0 ? <p className="mt-3 text-sm text-slate-500">운영 중인 약국 협력사업에 표시할 참여 기록이 없습니다.</p> : <>
-        <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="py-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></div>{item.active && <MyHomeBusinessEntry key={`${item.key}:${item.hasCommunity}`} businessKey={item.key} hasCommunity={item.hasCommunity} />}</li>)}</ul>
+        <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="py-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></div>{item.active && <MyHomeBusinessEntry key={`${item.key}:${item.hasCommunity}`} businessKey={item.key} organizationId={organizationId} hasCommunity={item.hasCommunity && canEnterCommunity} />}</li>)}</ul>
         {compact ? <p className="mt-2 text-xs text-slate-500">참여 기록 {items.length}건 중 최대 3건을 표시합니다.</p> : <RecordPages page={page} total={items.length} limit={10} label="협력사업 참여" onChange={setPage} />}
       </>}
     {compact && <Link to="/mypage/services" className="mt-3 inline-block text-sm text-blue-700 underline">협력사업 참여 현황 더 보기 →</Link>}
@@ -815,7 +815,7 @@ function StoreManagement({
           ))}
         </select>
       </label>
-      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} compact={!participationOnly} />
+      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} canEnterCommunity={['owner', 'admin', 'manager'].includes((data.workspaceStores ?? data.stores).find(s => s.organizationId === store.organizationId)?.memberRole ?? '')} compact={!participationOnly} />
       {!participationOnly && <StoreMetrics accountId={accountId} store={store} compact={compact} />}
       {!compact && renderStoreWorkspace?.(store)}
       {!participationOnly && <Link

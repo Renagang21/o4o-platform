@@ -3,7 +3,7 @@ import { requestServiceHandoff } from '@o4o/auth-react';
 import { api } from '../../lib/apiClient';
 
 /** Membership is read for the selected store; destination APIs recheck the current store. */
-export function MyHomeBusinessEntry({ businessKey, hasCommunity }: { businessKey: string; hasCommunity: boolean }) {
+export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity }: { businessKey: string; organizationId: string; hasCommunity: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const generation = useRef(0);
@@ -22,7 +22,7 @@ export function MyHomeBusinessEntry({ businessKey, hasCommunity }: { businessKey
     setBusy(true); setError(false);
     const key = encodeURIComponent(businessKey);
     const target = destination === 'community'
-      ? { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: businessKey === 'pharmacy' ? '/' : `/businesses/${key}` }
+      ? { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${businessKey === 'pharmacy' ? '/' : `/businesses/${key}`}?store=${encodeURIComponent(organizationId)}` }
       : { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: destination === 'supply' ? `/store/pharmacy/supply?source=${encodeURIComponent(`sf:${businessKey}`)}` : `/store/pharmacy/contents?business=${key}` };
     try {
       const href = await requestServiceHandoff(api, target);

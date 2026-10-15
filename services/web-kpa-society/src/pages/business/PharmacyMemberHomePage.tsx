@@ -5,6 +5,7 @@ import type { ForumPostResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import BusinessStoreShortcut from './BusinessStoreShortcut';
+import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 import { businessApi, businessError, businessPath, communityApiBase, pharmacyApiBase, type BusinessContent } from './api';
 
 interface LoadedSection<T> { scope: string; data: T[]; error: string; loading: boolean }
@@ -15,7 +16,8 @@ const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
   const { user } = useAuth();
-  const scope = `${user?.id}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
+  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage);
+  const scope = `${user?.id}:${materialStore.organizationId}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [noticesState, setNoticesState] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [materials, setMaterials] = useState<LoadedSection<BusinessContent>>(() => pending(scope));
@@ -40,12 +42,12 @@ export default function PharmacyMemberHomePage() {
   useEffect(() => {
     let alive = true;
     setMaterials(pending(scope));
-    if (!access?.allowed || access.canManage) return;
-    void businessApi.get<{ items: BusinessContent[] }>(`${pharmacyApiBase}/store/contents`, { sf: business.key, page: 1, limit: 3 })
+    if (!access?.allowed || access.canManage || !materialStore.organizationId) return;
+    void businessApi.get<{ items: BusinessContent[] }>(`${pharmacyApiBase}/store/contents`, { sf: business.key, page: 1, limit: 3 }, materialStore.organizationId)
       .then(data => { if (alive) setMaterials({ scope, data: data.items.filter(item => item.semiFranchiseKey === business.key), error: '', loading: false }); })
       .catch(error => { if (alive) setMaterials({ scope, data: [], error: businessError(error), loading: false }); });
     return () => { alive = false; };
-  }, [scope, access?.allowed, access?.canManage, business.key, retryMaterials]);
+  }, [scope, access?.allowed, access?.canManage, business.key, materialStore.organizationId, retryMaterials]);
   const currentPosts = posts.scope === scope ? posts : pending<ForumPostResponse>(scope);
   const currentNotices = noticesState.scope === scope ? noticesState : pending<ForumPostResponse>(scope);
   const currentMaterials = materials.scope === scope ? materials : pending<BusinessContent>(scope);
@@ -94,11 +96,12 @@ export default function PharmacyMemberHomePage() {
           <Link to={`${forumPath}/write`} className="mt-4 inline-flex min-h-11 items-center rounded-lg border px-4 py-2 text-sm font-medium text-blue-700">이야기 나누기</Link>
         </section>
         <section aria-labelledby="materials-title" className="rounded-xl border bg-white p-5 sm:p-6">
-          <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="사업 자료" to={materialsPath} linkLabel="전체 자료" />
+          <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="사업 자료" to={materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '')} linkLabel="전체 자료" />
+          {materialStore.selection}
           {access.canManage ? <div className="py-3 text-sm leading-6 text-slate-600"><p>자료 등록과 게시 상태는 사업 운영 화면에서 확인합니다.</p><Link to="/operator/semi-franchises" className="mt-3 inline-block text-blue-700">사업 자료 관리 →</Link></div> :
-            <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="등록된 사업 자료가 없습니다.">
+            materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="등록된 사업 자료가 없습니다.">
               <ul className="divide-y">{currentMaterials.data.map(item => <li key={item.id} className="py-4">
-                <Link className="font-medium text-slate-900 hover:text-blue-700" to={`${materialsPath}?content=${encodeURIComponent(item.id)}`}>{item.title}</Link>
+                <Link className="font-medium text-slate-900 hover:text-blue-700" to={`${materialsPath}?${new URLSearchParams({ content: item.id, store: materialStore.organizationId ?? '' })}`}>{item.title}</Link>
                 {item.summary && <p className="mt-2 text-sm leading-6 text-slate-500">{item.summary}</p>}
               </li>)}</ul>
             </DataState>}

@@ -20,11 +20,12 @@ import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type SemiFr
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate } from './shared';
 
 export default function SemiFranchisesPage() {
-  const { organizationId } = useUnifiedStore();
-  return <SemiFranchiseRecords key={organizationId} />;
+  const { organizationId, stores } = useUnifiedStore();
+  const canEnterCommunity = ['owner', 'admin', 'manager'].includes(stores?.find(s => s.organizationId === organizationId)?.memberRole ?? '');
+  return <SemiFranchiseRecords key={organizationId} organizationId={organizationId} canEnterCommunity={canEnterCommunity} />;
 }
 
-function SemiFranchiseRecords() {
+function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizationId: string | null; canEnterCommunity: boolean }) {
   const { begin: beginMove } = useLatestRequest();
   const [rows, setRows] = useState<SemiFranchiseRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,11 +77,11 @@ function SemiFranchiseRecords() {
   };
 
   const enterCommunity = async (row: SemiFranchiseRow) => {
-    if (!row.communityKey) return;
+    if (!row.communityKey || !canEnterCommunity || !organizationId) return;
     const isCurrent = beginMove();
     setBusyKey(row.key); setError(null);
     try {
-      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: row.key === 'pharmacy' ? '/' : `/businesses/${encodeURIComponent(row.key)}` });
+      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${row.key === 'pharmacy' ? '/' : `/businesses/${encodeURIComponent(row.key)}`}?store=${encodeURIComponent(organizationId)}` });
       if (isCurrent()) window.location.assign(href);
     } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); } }
   };
@@ -105,7 +106,7 @@ function SemiFranchiseRecords() {
           {rows.filter(r => r.membershipStatus === 'active').map(r => <article key={r.key} className="min-w-0 rounded-xl border bg-white p-5">
             <h3 className="break-words font-semibold">{r.name}</h3>
             <div className="mt-3 flex flex-wrap gap-2 text-sm text-blue-700">
-              {r.communityKey && <button type="button" className="min-h-11 rounded-lg border px-3 py-2" disabled={busyKey !== null} onClick={() => void enterCommunity(r)}>가입자 공간</button>}
+              {r.communityKey && canEnterCommunity && <button type="button" className="min-h-11 rounded-lg border px-3 py-2" disabled={busyKey !== null} onClick={() => void enterCommunity(r)}>가입자 공간</button>}
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/supply?source=${encodeURIComponent(`sf:${r.key}`)}`}>공급 상품</Link>
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/contents?business=${encodeURIComponent(r.key)}`}>자료 가져오기</Link>
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/orders?business=${encodeURIComponent(r.key)}`}>주문 내역</Link>
@@ -133,7 +134,7 @@ function SemiFranchiseRecords() {
             <tbody>
               {rows.map((r) => {
                 const st = r.membershipStatus;
-                const participantStatus = r.communityKey ? '가입 승인 후 이용' : '-';
+                const participantStatus = !canEnterCommunity ? '약국 경영자 이용' : r.communityKey ? '가입 승인 후 이용' : '-';
                 const canApply = !st || st === 'rejected' || st === 'terminated';
                 const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
@@ -148,7 +149,7 @@ function SemiFranchiseRecords() {
                       {r.decidedAt ? ` · 처리 ${formatDate(r.decidedAt)}` : ''}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      {r.communityKey && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
+                      {r.communityKey && canEnterCommunity && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {canApply && (

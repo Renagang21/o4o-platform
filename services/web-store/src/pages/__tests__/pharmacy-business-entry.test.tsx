@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-const mocks = vi.hoisted(() => ({ organizationId: 'store-a', listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
+const mocks = vi.hoisted(() => ({ organizationId: 'store-a', role: 'owner', listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
 vi.mock('../../api/neturePharmacy', () => ({ neturePharmacyApi: mocks, pharmacyErrorCode: () => '', pharmacyErrorMessage: (_e: unknown, fallback: string) => fallback || '요청 실패' }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, stores: [{ organizationId: mocks.organizationId, memberRole: mocks.role }], effectiveServiceKey: 'kpa-society' }) }));
 vi.mock('../../lib/apiClient', () => ({ api: {} }));
 vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: mocks.handoff }));
 vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
@@ -13,7 +13,7 @@ const business = (key: string, membershipStatus: string | null = 'active') => ({
 const content = { id: 'selected', title: '선택한 자료', body: '선택 자료 본문', semiFranchiseKey: 'network-a' };
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.organizationId = 'store-a';
+  mocks.organizationId = 'store-a'; mocks.role = 'owner';
   mocks.listSemiFranchises.mockResolvedValue([business('network-a'), business('pending', 'pending'), business('none', null)]);
   mocks.listContents.mockResolvedValue({ items: [], total: 30 });
   mocks.getContent.mockResolvedValue(content);
@@ -31,7 +31,7 @@ it('활성 가입 사업만 카드로 제공하고 신청 관리 표는 보존�
   expect(screen.getByRole('table')).toBeTruthy();
   fireEvent.click(within(section).getByRole('button', { name: '가입자 공간' }));
   await screen.findByRole('alert');
-  expect(mocks.handoff).toHaveBeenCalledWith({}, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: '/businesses/network-a' });
+  expect(mocks.handoff).toHaveBeenCalledWith({}, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: '/businesses/network-a?store=store-a' });
 });
 it('첫 목록 밖의 선택 자료도 기존 권한 검사 상세 API로 읽고 내 매장으로 복사한다', async () => {
   render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
@@ -61,4 +61,12 @@ it('매장을 바꾸면 이전 매장의 늦은 자료 응답을 버린다', asy
   await screen.findByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
   await act(async () => release({ items: [content], total: 1 }));
   expect(screen.queryByText('선택한 자료')).toBeNull();
+});
+
+it('직원에게는 가입자 공간 대신 매장 상품·자료 진입을 유지한다', async () => {
+  mocks.role = 'staff';
+  render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
+  const section = await screen.findByRole('region', { name: '가입한 약국 협력사업' });
+  expect(within(section).queryByRole('button', { name: '가입자 공간' })).toBeNull();
+  expect(within(section).getByRole('link', { name: '자료 가져오기' })).toBeTruthy();
 });

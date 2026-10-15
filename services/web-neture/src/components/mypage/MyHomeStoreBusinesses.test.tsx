@@ -10,7 +10,7 @@ afterEach(cleanup);
 beforeEach(() => { get.mockReset(); post.mockReset(); });
 const response = (data: unknown) => ({ data: { success: true, data } });
 const row = (name: string, membershipStatus: string | null = "active") => ({ key: name, name, membershipStatus });
-const view = (accountId = "first", organizationId = "store-one", compact = false) => <MemoryRouter><MyHomeStoreBusinesses accountId={accountId} organizationId={organizationId} compact={compact} /></MemoryRouter>;
+const view = (accountId = "first", organizationId = "store-one", compact = false) => <MemoryRouter><MyHomeStoreBusinesses accountId={accountId} organizationId={organizationId} canEnterCommunity compact={compact} /></MemoryRouter>;
 
 it("reads the explicitly selected store and separates store memberships from the available catalogue", async () => {
   get.mockResolvedValue(response([row("이용 사업"), row("신청 사업", "pending"), row("미가입 사업", null), row("확인할 사업", "future-status")]));
@@ -77,7 +77,7 @@ it('only active memberships expose scoped business actions; a failed move can be
   const active = (await screen.findByText('network-a')).closest('li')!;
   fireEvent.click(within(active).getByRole('button', { name: '가입자 공간' }));
   await screen.findByRole('alert');
-  expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/businesses/network-a' });
+  expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/businesses/network-a?store=store-one' });
   fireEvent.click(within(active).getByRole('button', { name: '자료 가져오기' }));
   await waitFor(() => expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store/pharmacy/contents?business=network-a' }));
   for (const name of ['pending', 'suspended', 'terminated']) expect(within(screen.getByText(name).closest('li')!).queryByRole('button')).toBeNull();
@@ -92,4 +92,12 @@ it('drops a handoff failure after changing the selected store', async () => {
   await screen.findByRole('button', { name: '가입자 공간' });
   await act(async () => reject(new Error('Old store')));
   expect(screen.queryByRole('alert')).toBeNull();
+});
+
+it('직원은 가입자 공간 없이 내 매장 상품과 자료만 이용한다', async () => {
+  get.mockResolvedValue(response([{ ...row('network-a'), communityKey: 'forum-a' }]));
+  render(<MemoryRouter><MyHomeStoreBusinesses accountId="staff" organizationId="store-one" canEnterCommunity={false} /></MemoryRouter>);
+  await screen.findByRole('button', { name: '자료 가져오기' });
+  expect(screen.queryByRole('button', { name: '가입자 공간' })).toBeNull();
+  expect(screen.getByRole('button', { name: '공급 상품' })).toBeTruthy();
 });
