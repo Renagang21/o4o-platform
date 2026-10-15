@@ -216,9 +216,12 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   };
 
   const refreshPublication = async () => {
-    if (!group || !isCurrent()) return;
+    // Serialize with editor writes: a save/unpublish that starts during this GET supersedes it, and the
+    // late response must not overwrite the newer result. Skip while a write is already in flight.
+    if (!group || lock.current || !isCurrent()) return;
+    const current = writes.begin();
     const saved = verifyGroup(await getStoreMlcGroup(group.id));
-    if (!isCurrent()) return;
+    if (!current() || !isCurrent()) return;
     setGroup(saved);
     setDrafts(prev => Object.fromEntries(STORE_MLC_LOCALES.map(loc => [loc, {
       ...(prev[loc] ?? draftFromPage()), status: saved.pages.find(p => p.locale === loc)?.status ?? 'draft',

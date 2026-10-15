@@ -179,6 +179,15 @@ it('clears old QR and copy status when the group changes', async () => {
   const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
   h.rerender(wrap(<MultilingualPublicActions groupId="other" publishable />)); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
 });
+it('drops a late publication refresh when an editor write finished during it', async () => {
+  const published = group({ pages: [localePage('ko', 'Saved KO', 'published'), localePage('en', 'Saved EN')] });
+  api.list.mockResolvedValue([published]); const refresh = deferred<StoreMlcGroupDetail>(); api.get.mockResolvedValueOnce(published).mockReturnValue(refresh.promise);
+  api.status.mockResolvedValue(group({ pages: [localePage('ko', 'Saved KO', 'draft'), localePage('en', 'Saved EN')] }));
+  editor(); fireEvent.click(await screen.findByRole('button', { name: 'QR 보기' })); await waitFor(() => expect(api.get.mock.calls.length).toBeGreaterThanOrEqual(2));
+  fireEvent.click(screen.getByRole('button', { name: '초안으로 내리기' })); await waitFor(() => expect(api.status).toHaveBeenCalledWith('group', 'ko', 'draft'));
+  await waitFor(() => expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull());
+  await act(async () => refresh.resolve(published)); expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull();
+});
 it('opens a tab synchronously and closes a stale pending popup on unmount', async () => {
   const pending = deferred<{ url: string }>(); api.key.mockReturnValue(pending.promise); const popup = { opener: {}, close: vi.fn(), location: { replace: vi.fn() } };
   vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window); const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
