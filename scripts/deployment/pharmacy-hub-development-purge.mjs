@@ -128,7 +128,10 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
-  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type
+  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type,
+      (SELECT ka.attname FROM pg_index ki JOIN pg_attribute ka ON ka.attrelid=ki.indrelid AND ka.attnum=ki.indkey[0]
+        JOIN pg_type kt ON kt.oid=ka.atttypid WHERE ki.indrelid=c.oid AND ki.indisprimary AND ki.indisvalid AND ki.indisready AND ki.indnkeyatts=1 AND kt.typname='uuid'
+        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')
     AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
@@ -136,8 +139,29 @@ async function references(q,fks,tables) {
   const locked=new Set(tables.map(t=>`${t.schema}.${t.table}`));
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
-    if(await count(q,developmentReferenceQuery(c)))
+    if(await countDevelopmentReferences(q,c))
       throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
+  }
+}
+// Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
+// partition parents retain the complete scan (including foreign descendants).
+const referenceBatchSize=1024;
+export async function countDevelopmentReferences(q,c) {
+  if(!c.scan_key||c.type==='uuid')return count(q,developmentReferenceQuery(c));
+  let previous=null;
+  for(;;) {
+    const rows=await q.query(developmentReferenceQuery(c),[keys,previous]);
+    const row=rows?.[0];
+    if(rows?.length!==1||!row||typeof row.count!=='string'||!/^\d+$/.test(row.count)||
+      typeof row.scanned!=='string'||!/^\d+$/.test(row.scanned))throw new Error('PH_DEV_REFERENCE_BATCH');
+    const found=Number(row.count),scanned=Number(row.scanned);
+    if(!Number.isSafeInteger(found)||!Number.isSafeInteger(scanned)||scanned>referenceBatchSize||found>scanned||
+      (scanned===0?row.last_id!==null:typeof row.last_id!=='string'||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(row.last_id)||
+        (previous!==null&&row.last_id<=previous)))throw new Error('PH_DEV_REFERENCE_BATCH');
+    if(found)return found;
+    if(scanned<referenceBatchSize)return 0;
+    previous=row.last_id;
   }
 }
 export function developmentReferenceQuery(c) {
@@ -165,6 +189,19 @@ ${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.tabl
             AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
         ) references_found`;
     }
+    if(c.scan_key)return `WITH target_patterns AS MATERIALIZED (
+        SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
+        FROM (${targetIds}) ids),
+        reference_source AS MATERIALIZED (
+          SELECT s.${id(c.scan_key)} AS scan_id,s.${id(c.column)}::text AS scan_value,(${owned??'FALSE'}) AS owned
+          FROM ONLY ${id(c.schema)}.${id(c.table)} s
+          WHERE ($2::uuid IS NULL OR s.${id(c.scan_key)}>$2::uuid)
+          ORDER BY s.${id(c.scan_key)} LIMIT ${referenceBatchSize})
+      SELECT count(*) FILTER(WHERE NOT COALESCE(source.owned,FALSE)
+        AND (source.scan_value COLLATE "C") ~ targets.pattern)::text AS count,
+        (SELECT count(*)::text FROM reference_source) AS scanned,
+        (SELECT scan_id::text FROM reference_source ORDER BY scan_id DESC LIMIT 1) AS last_id
+      FROM reference_source source CROSS JOIN target_patterns targets`;
     // Discover IDs once and search the source text with one compiled expression.
     // LIKE ANY still rescans large JSON for every ID. Escape every punctuation
     // character so the alternation preserves literal substring semantics.
