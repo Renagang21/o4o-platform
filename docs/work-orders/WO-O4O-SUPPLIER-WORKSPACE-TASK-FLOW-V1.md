@@ -1,6 +1,6 @@
 # WO-O4O-SUPPLIER-WORKSPACE-TASK-FLOW-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-15
+> 상태: COMPLETED · 작성일: 2026-10-15
 > 목적: 공급자가 상품·주문·자료의 대상을 다시 찾지 않고 업무를 완료하도록 화면을 재배치한다.
 > 승인: 사용자 지시 — TODO 작성, 문서·코드 점검 후 구현·검증·push·PR까지 진행.
 > 기준: `352df65dd` (`origin/main`, 2026-10-15 조사 기준).
@@ -43,6 +43,8 @@
 - [x] 의미 있는 행동 회귀: 실행/대기 구분, 주문 필터·복귀, 자료 ID·언어와 잘못된 대상, 입력 왕복·계정 경계, 메뉴 도달성.
 - [x] web-neture 테스트·타입 검사·빌드, Supplier boundary 계약, 문서 민감정보·diff 점검.
 - [x] 로컬 desktop/mobile 브라우저 검증: 격리된 응답 fixture로 실제 화면·URL·재진입을 확인한다. 운영 DB 업무 데이터 생성 없음.
-- [ ] 검증 결과와 미확인 범위를 기록하고 커밋·push·PR 생성·CI 결과를 인계한다. 병합·배포는 이번 범위 밖이다.
+- [x] 검증 결과와 미확인 범위를 기록하고 커밋·push·PR 생성·CI 결과를 인계한다. 병합·배포는 이번 범위 밖이다.
 
 검증 결과: [CHECK](../checks/CHECK-O4O-SUPPLIER-WORKSPACE-TASK-FLOW-V1.md). 웹 1,004건·경계 41건·빌드·desktop/mobile 검증 통과.
+
+개발 인계: [PR #629](https://github.com/Renagang21/o4o-platform/pull/629), branch `wo/supplier-workspace-task-flow`. CI의 현재 결과는 PR checks에서 확인한다. 병합·배포는 수행하지 않았다.

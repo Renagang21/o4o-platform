@@ -70,4 +70,4 @@ API는 브라우저 route fixture로 격리했고 외부 요청은 차단했다.
 
 개발 종료점은 branch push·PR 생성이며 병합·배포는 수행하지 않는다.
 작업 공간은 PR의 후속 검토·수정을 위해 보존한다(`KEEP`).
-PR·CI 상태는 PR 자체와 완료 보고를 기준으로 확인한다.
+[PR #629](https://github.com/Renagang21/o4o-platform/pull/629)의 CI 상태는 PR checks와 완료 보고를 기준으로 확인한다.
