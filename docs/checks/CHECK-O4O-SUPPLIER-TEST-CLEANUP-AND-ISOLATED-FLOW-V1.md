@@ -146,3 +146,10 @@ DB를 만들기 전에 존재하지 않음을 확인하고 실행별 ownership m
 격리 PostgreSQL15에서 실제 공급자→매장 통합 **2 PASS**, bootstrap 전체 fingerprint 일치, 성공 후 DB0을 외부 control 조회로 확인했다. 기존 동일 이름 DB는 실행 거절 후 보존(1건), 검증 하네스가 만든 DB만 직접 정리했다. 테스트 자식 프로세스 실패를 주입했을 때도 wrapper 실패 코드와 finally cleanup·DB0을 확인했다. 컨테이너는 종료·제거했다. 실제 운영 DB·계정·PG 결제·메일·배송 요청은 실행하지 않았다. build:packages·script lint·문서 민감정보·diff 검사 PASS.
 
 같은 문서 통합 branch는 #611 인증 후속 TODO와 #633 My Home UX 계획의 전체 이력도 포함한다. 계획 문서를 병합해도 그 계획의 구현·운영 검증이 완료되는 것은 아니다. 실제 인증 계정 비교의 로그 접근 제한은 유지한다.
+
+
+### 같은 통합 PR 리뷰 후속 — 서버 준비와 중단 시 정리
+
+SETUP의 앞부분도 wrapper 소유권 모델에 맞춰, PostgreSQL 서버만 준비하고 대상 DB는 없는 상태로 유지하도록 고쳤다. 로컬 role의 CREATEDB 및 postgres 관리 DB 접속 권한을 명시했다. 동기식 테스트 자식 호출을 비동기 spawn으로 바꾸고 SIGINT/SIGTERM을 받아 이번 실행의 자식만 중지한 뒤 소유권 확인·DB 정리·잔여0 확인을 수행한다. Linux는 생성한 자식 process group, Windows는 해당 자식 PID의 task tree만 대상으로 한다. 다른 DB 연결을 강제로 끊지 않는다.
+
+Linux 격리 PostgreSQL15에서 성공2 tests/DB0, 기존 DB 거절·보존, 자식 실패/DB0을 다시 확인했다. 실제 장기 대기 자식 프로세스 실행 중 SIGINT와 SIGTERM 각각을 전달해 비정상 종료 코드 및 finally cleanup PASS·외부 DB count0을 확인했다. 컨테이너 제거 완료. Windows taskkill 분기는 이 Linux 환경에서 실행하지 않았으며, SIGKILL/호스트 종료의 한계는 유지한다.

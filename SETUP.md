@@ -388,7 +388,8 @@ pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules
 매장 장바구니·checkout·테스트 결제·fulfillment bridge·배송·재고·정산 서비스를 함께 실행합니다.
 외부 알림 전달은 대체하며 실제 PG 결제나 운영 계정의 HTTP round-trip을 실행하지 않습니다.
 
-- 별도로 만든 PostgreSQL 15의 `127.0.0.1:55432`에 **전용 빈 DB** `o4o_supplier_store_integration`을 준비합니다.
+- PostgreSQL 15 서버만 `127.0.0.1:55432`에 준비하고 `o4o_supplier_store_integration` DB는 **없는 상태**로 둡니다.
+  wrapper가 DB를 생성·삭제하므로 로컬 전용 role에 `CREATEDB`와 관리 DB `postgres` 접속 권한이 필요합니다.
 - 그 DB의 로컬 전용 접속값으로 `NETURE_SUPPLIER_STORE_IT_DATABASE_URL`을 설정합니다.
   프로토콜은 `postgresql:`이며, query/hash 없이 위 host·port·DB명과 정확히 일치해야 합니다.
   접속값은 로컬 비공개 환경에만 보관하고 로그·문서·Git에 기록하지 않습니다.
