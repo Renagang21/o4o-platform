@@ -1,7 +1,7 @@
 # TODO-O4O-PHARMACY-BUSINESS-NEWS-SHOWCASE-V1
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-15 (KST)
+> **작성일**: 2026-10-15 (KST) · **최종 갱신**: 2026-10-15
 > **근거**: 이전 가입 사업 진입 개선 후 다음 작업도 TODO·대조·구현·검증·push·배포 순서로 진행 요청
 
 ## 기준
@@ -108,3 +108,7 @@ API `/health/ready`도 HTTP 200 / ready다. API 신규 revision 배포를 의미
 `production` commit status는 `success / DEPLOYED · deploy: neture,kpa-society`다.
 이번 소식·공급 미리보기 단계는 완료했다. 실제 사업별 특별 서비스·전시 편집/순위 설정은 후속 범위다.
 이 완료 기록만 갱신하는 문서 PR은 DEPLOYMENT: NOT_APPLICABLE이며 별도 운영 재배포 대상이 아니다.
+
+완료 기록 리뷰의 lifecycle 지적에 따라 헤더에 최종 갱신일을 추가했다.
+기록 통합 전 최신 main #627의 purge 점검 스크립트·문서 변경을 merge했다.
+이번 두 웹 앱 소스에는 차이가 없고 운영 정리 스크립트는 실행하지 않았다.
