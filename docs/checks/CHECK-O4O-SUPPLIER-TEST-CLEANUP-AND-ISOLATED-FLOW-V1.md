@@ -153,3 +153,10 @@ DB를 만들기 전에 존재하지 않음을 확인하고 실행별 ownership m
 SETUP의 앞부분도 wrapper 소유권 모델에 맞춰, PostgreSQL 서버만 준비하고 대상 DB는 없는 상태로 유지하도록 고쳤다. 로컬 role의 CREATEDB 및 postgres 관리 DB 접속 권한을 명시했다. 동기식 테스트 자식 호출을 비동기 spawn으로 바꾸고 SIGINT/SIGTERM을 받아 이번 실행의 자식만 중지한 뒤 소유권 확인·DB 정리·잔여0 확인을 수행한다. Linux는 생성한 자식 process group, Windows는 해당 자식 PID의 task tree만 대상으로 한다. 다른 DB 연결을 강제로 끊지 않는다.
 
 Linux 격리 PostgreSQL15에서 성공2 tests/DB0, 기존 DB 거절·보존, 자식 실패/DB0을 다시 확인했다. 실제 장기 대기 자식 프로세스 실행 중 SIGINT와 SIGTERM 각각을 전달해 비정상 종료 코드 및 finally cleanup PASS·외부 DB count0을 확인했다. 컨테이너 제거 완료. Windows taskkill 분기는 이 Linux 환경에서 실행하지 않았으며, SIGKILL/호스트 종료의 한계는 유지한다.
+
+
+### 최종 통합 #646 Sonar 후속 — 고정 Node 실행 경로
+
+Sonar Security B 원인은 Windows 정리 명령을 PATH에서 찾던 코드였다. OS 명령·pnpm 중간 프로세스를 없애고 고정 `process.execPath`와 frozen 설치된 API Jest entry를 직접 실행한다. `--runInBand`이므로 정리 대상은 생성한 Jest Node 자식 하나이며, SIGINT/SIGTERM 뒤 필요하면 그 자식만 종료한다. 플랫폼별 taskkill/process group 분기는 현재 코드에서 제거했다.
+
+최종 결합본에서 전용 PostgreSQL15로 실제 업무2 tests·전체 schema fingerprint·성공 후 DB0, 기존 DB 거절/보존, 실제 Jest 자식 초기화 실패·SIGINT·SIGTERM 각각 finally cleanup·외부 DB0을 확인했다. 컨테이너 제거 완료. 운영 데이터·외부 결제·메일은 실행하지 않았다. UI·API runtime 파일은 이 후속에서 바꾸지 않았으며 결합본의2780 tests/6앱 build/합성 browser27 근거는 최종 통합 PR 본문에 있다. 새 head의 Sonar·CI·Codex는 다시 확인한다.

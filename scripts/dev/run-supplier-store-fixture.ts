@@ -2,6 +2,8 @@
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
 import { spawn, type ChildProcess } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../../apps/api-server/src/database/bootstrap/canonical-schema-baseline.js';
 import { CANONICAL_SCHEMA_BASELINE_META } from '../../apps/api-server/src/database/bootstrap/canonical-schema-baseline.meta.js';
@@ -27,12 +29,8 @@ async function run() {
   let child: ChildProcess | undefined;
   let killTimer: ReturnType<typeof setTimeout> | undefined;
   function stopChild(signal: NodeJS.Signals) {
-    if (!child?.pid) return;
-    if (process.platform === 'win32') {
-      spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }).on('error', () => {});
-    } else {
-      try { process.kill(-child.pid, signal); } catch { /* already exited */ }
-    }
+    // Direct --runInBand Jest process: no pnpm shell or worker process tree.
+    child?.kill(signal);
   }
   const onSignal = () => {
     interrupted = true;
@@ -94,9 +92,11 @@ async function run() {
     console.log('Fixture schema fingerprints match; starting synthetic integration tests.');
     checkInterrupted();
     await new Promise<void>((resolve, reject) => {
-      child = spawn('pnpm', ['--filter', '@o4o/api-server', 'exec', 'jest', '--runInBand',
+      const apiRoot = fileURLToPath(new URL('../../apps/api-server/', import.meta.url));
+      const jestEntry = createRequire(new URL('../../apps/api-server/package.json', import.meta.url)).resolve('jest/bin/jest');
+      child = spawn(process.execPath, [jestEntry, '--runInBand',
         '--runTestsByPath', 'src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts'],
-      { stdio: 'inherit', detached: process.platform !== 'win32', env: { ...process.env, NODE_ENV: 'test' } });
+      { cwd: apiRoot, stdio: 'inherit', env: { ...process.env, NODE_ENV: 'test' } });
       child.once('error', reject);
       child.once('close', (code) => {
         child = undefined;
