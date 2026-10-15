@@ -10,6 +10,8 @@
  * 정책: 연결 상품은 참고 정보(metadata)일 뿐 — 상품 분류로 콘텐츠 조회·가져오기를 제한하지 않는다.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import SupplierContentNavigation from '../../components/supplier/SupplierContentNavigation';
 import { extractYouTubeVideoId } from '@o4o/types/signage';
 import {
   fetchSupplierSignageList,
@@ -44,6 +46,11 @@ function linkedProductName(m: SupplierSignageMedia): string | null {
 }
 
 export default function SupplierSignagePage() {
+  const [params, setParams] = useSearchParams();
+  const editId = params.get('edit');
+  const productId = params.get('product');
+  const [targetError, setTargetError] = useState(false);
+  const closeEditor = () => { setEditorOpen(false); setParams((prev) => { const next = new URLSearchParams(prev); next.delete('edit'); next.delete('product'); return next; }, { replace: true }); };
   const [items, setItems] = useState<SupplierSignageMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<SupplierProduct[]>([]);
@@ -60,6 +67,7 @@ export default function SupplierSignagePage() {
   const [loadError, setLoadError] = useState(false);
   // 연결 상품 목록(선택 입력) 조회 실패 — 사이니지 목록과 독립. 실패를 '상품 0건'으로 위장하지 않는다.
   const [productsError, setProductsError] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(true);
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -75,7 +83,7 @@ export default function SupplierSignagePage() {
     // WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
     //   조회 실패를 삼키면 '연결 상품' 선택지가 비어 "등록 상품 없음"으로 오인된다.
     setProductsError(false);
-    supplierApi.getProducts().then(setProducts).catch(() => setProductsError(true));
+    supplierApi.getProducts().then(setProducts).catch(() => setProductsError(true)).finally(() => setProductsLoading(false));
   }, [reload]);
 
   const formVideoId = useMemo(() => extractYouTubeVideoId(form.sourceUrl), [form.sourceUrl]);
@@ -96,6 +104,22 @@ export default function SupplierSignagePage() {
     });
     setEditorOpen(true);
   };
+
+  useEffect(() => {
+    if (!editId || loading || loadError) return;
+    const target = items.find((m) => m.id === editId);
+    setTargetError(!target);
+    if (target) openEdit(target);
+    else setEditorOpen(false);
+  }, [editId, loading, loadError, items]);
+
+  useEffect(() => {
+    if (!productId || editId || productsError || productsLoading) return;
+    const target = products.find((p) => p.id === productId);
+    setTargetError(!target);
+    if (target) { setEditing(null); setForm({ ...EMPTY_FORM, linkedProductId: target.id }); setEditorOpen(true); }
+    else setEditorOpen(false);
+  }, [productId, editId, productsError, productsLoading, products]);
 
   const handleSave = async () => {
     if (!form.name.trim()) { setMessage({ type: 'error', text: '제목을 입력해 주세요.' }); return; }
@@ -119,7 +143,7 @@ export default function SupplierSignagePage() {
         await createSupplierSignage(input);
         setMessage({ type: 'success', text: '사이니지를 만들었습니다. 게시하면 매장 HUB에 노출됩니다.' });
       }
-      setEditorOpen(false);
+      closeEditor();
       reload();
     } catch (e: any) {
       setMessage({ type: 'error', text: e?.message || '저장에 실패했습니다.' });
@@ -148,6 +172,8 @@ export default function SupplierSignagePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      <SupplierContentNavigation />
+      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 사이니지를 찾을 수 없습니다. 목록에서 대상을 확인해 주세요.</p>}
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">디지털 사이니지</h1>
@@ -333,7 +359,7 @@ export default function SupplierSignagePage() {
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={() => setEditorOpen(false)} disabled={saving} className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50">취소</button>
+              <button type="button" onClick={closeEditor} disabled={saving} className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50">취소</button>
               <button type="button" onClick={handleSave} disabled={saving} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50">
                 {saving ? '저장 중…' : editing ? '저장' : '만들기'}
               </button>

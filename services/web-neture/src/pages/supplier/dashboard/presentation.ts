@@ -124,13 +124,13 @@ export const QUICK_LINK_GROUPS = [
     label: '상품',
     links: [
       { label: '상품 목록', path: '/supplier/products' },
-      { label: '상품 등록', path: '/supplier/products/register' },
+      { label: '상품 추가', path: '/supplier/products/register' },
     ],
   },
   {
     label: '주문',
     links: [
-      { label: '주문 현황', path: '/supplier/orders' },
+      { label: '주문 처리·배송', path: '/supplier/orders/manage' },
       { label: '재고 관리', path: '/supplier/inventory' },
       { label: '정산 내역', path: '/supplier/settlements' },
     ],
@@ -138,9 +138,9 @@ export const QUICK_LINK_GROUPS = [
   {
     label: '콘텐츠',
     links: [
-      { label: '콘텐츠 라이브러리', path: '/supplier/library' },
+      { label: '자료 보관함', path: '/supplier/library' },
       { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
-      { label: '검수·게시 현황', path: '/supplier/store-materials-status' },
+      { label: '자료 현황', path: '/supplier/store-materials-status' },
     ],
   },
 ];

@@ -71,6 +71,21 @@ describe('supplier workspace read and proposal contracts', () => {
     fireEvent.click(screen.getByRole('button', { name: '이벤트/서비스 주문' }));
     await waitFor(() => expect(api.unified).toHaveBeenLastCalledWith({ page: 1, limit: 20, source: 'checkout' }));
   });
+  it('separates actionable work from waiting and opens shipping at its exact status', async () => {
+    api.orders.mockResolvedValue({ pending_processing: 2, pending_shipping: 3 });
+    api.approval.mockResolvedValue({ total: 4, pending: 4, approved: 0, unrequested: 0, rejected: 0 });
+    api.settlements.mockResolvedValue({ pending_count: 5 });
+    mount(<SupplierDashboardPage />);
+    await screen.findByText('기다리는 일');
+    const actions = screen.getByRole('heading', { name: '지금 할 일' }).closest('section')!;
+    const waiting = screen.getByRole('heading', { name: '기다리는 일' }).closest('section')!;
+    expect(actions.textContent).not.toContain('상품 승인 대기');
+    expect(waiting.textContent).toContain('상품 승인 대기');
+    expect(waiting.textContent).toContain('정산 대기');
+    expect(actions.querySelector('a[href="/supplier/orders/manage?status=preparing"]')).toBeTruthy();
+    expect(actions.querySelector('a[href="/supplier/orders/manage"]')).toBeTruthy();
+  });
+
   it('stops dashboard secondary requests when the primary permission request fails', async () => {
     api.kpi.mockRejectedValue(new Error('403'));
     mount(<SupplierDashboardPage />);

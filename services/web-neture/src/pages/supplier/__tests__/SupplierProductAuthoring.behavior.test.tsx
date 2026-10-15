@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
     getMasterByBarcode: vi.fn(),
   },
   media: { upload: vi.fn() },
-  toast: { error: vi.fn() },
+  toast: { error: vi.fn(), success: vi.fn() },
 }));
 vi.mock('../../../lib/api', () => ({
   supplierApi: mocks.supplier,
@@ -331,6 +331,38 @@ describe('Candidate creation existing workflow', () => {
 });
 
 describe('Import existing workflow', () => {
+  it.each(['top', 'bottom'])('returns from the %s import cancel without losing fields or selected files', async (exit) => {
+    const view = await createStep3('?productType=non_drug');
+    const file = new File(['fixture'], 'retained.png', { type: 'image/png' });
+    const fileInput = view.container.querySelector('input[type="file"][accept="image/*"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    fireEvent.click(screen.getByRole('button', { name: /상세페이지 소스로 자동 입력/ }));
+    fireEvent.change(screen.getByLabelText('관리자 HTML *'), { target: { value: firstmallHtml } });
+    fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
+    fireEvent.click(screen.getByRole('button', { name: exit === 'top' ? '입력 내용 유지하고 돌아가기' : '취소', exact: true }));
+    expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    await screen.findByText('제품 정보 검토 요청 완료');
+    expect(mocks.media.upload.mock.calls.some(([selected]) => selected === file)).toBe(true);
+    expect(mocks.supplier.submitProductCandidate.mock.lastCall?.[0]).toMatchObject({ name: '검증 상품', offerDraft: { priceGeneral: 2000 } });
+  });
+
+  it('applies imported data into the same draft without replacing prior input or submitting', async () => {
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.change(screen.getByLabelText(/^상품명/), { target: { value: '유지할 이름' } });
+    fireEvent.change(screen.getByLabelText('규제 구분'), { target: { value: 'COSMETIC' } });
+    fireEvent.click(screen.getByRole('button', { name: /상세페이지 소스로 자동 입력/ }));
+    fireEvent.change(screen.getByLabelText('관리자 HTML *'), { target: { value: firstmallHtml } });
+    fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
+    fireEvent.click(screen.getByRole('button', { name: '상품 등록 페이지로 이동 →' }));
+    await waitFor(() => expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('유지할 이름'));
+    expect((screen.getByLabelText('규제 구분') as HTMLSelectElement).value).toBe('COSMETIC');
+    expect(sessionStorage.getItem('neture-import-draft')).toBeNull();
+    expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
+    expect(mocks.toast.success).toHaveBeenCalled();
+  });
+
   it('requires a product type and rejects unrelated HTML', async () => {
     mount('import');
     fireEvent.change(screen.getByPlaceholderText('관리자 상품 수정 페이지의 HTML을 붙여넣으세요'), {

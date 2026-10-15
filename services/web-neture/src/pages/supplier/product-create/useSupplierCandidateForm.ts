@@ -291,33 +291,24 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
 
   // WO-O4O-NETURE-SUPPLIER-PRODUCT-SOURCE-IMPORT-ENTRY-AUDIT-V1:
   //   기존 Import Assistant(등록 도우미) 재연결 — 외부 상세페이지 소스를 붙여넣어 폼을 자동 채운다.
-  //   입력 중인 값이 있으면 명시적 확인 후 이동(이동 시 현재 입력은 도우미 흐름으로 대체됨).
-  const goToSourceImport = () => {
-    const hasInput =
-      !!form.marketingName.trim() ||
-      !!form.packagingName.trim() ||
-      !!form.brandName.trim() ||
-      !!form.manufacturerName.trim() ||
-      !!consumerShortDesc.trim();
-    if (
-      hasInput &&
-      !window.confirm(
-        '현재 입력한 내용이 있습니다. 상세페이지 소스 자동 입력으로 이동하면 지금까지 입력한 값은 저장되지 않습니다. 계속할까요?',
-      )
-    ) {
-      return;
-    }
-    // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
-    //   앞 단계에서 선택된 제품 유형을 도우미로 전달 → 도우미가 미리 선택해 보여준다(재선택 불필요).
-    const params = new URLSearchParams();
-    if (productType) {
-      params.set('productType', productType.key);
-      if (productType.regulatoryType) params.set('regulatoryType', productType.regulatoryType);
-    }
-    const qs = params.toString();
-    navigate(
-      qs ? `/supplier/products/import-assistant?${qs}` : '/supplier/products/import-assistant',
-    );
+  // 같은 폼을 유지한 채 도우미를 연다. 초안·파일·AI 결과를 저장소에 복제하지 않는다.
+  const [sourceImportOpen, setSourceImportOpen] = useState(false);
+  const goToSourceImport = () => setSourceImportOpen(true);
+  const applySourceImport = (draft: ImportDraft) => {
+    setForm((prev) => ({ ...prev,
+      marketingName: prev.marketingName || draft.marketingName,
+      brandName: prev.brandName || draft.brandName,
+      manufacturerName: prev.manufacturerName || draft.manufacturerName,
+      specification: prev.specification || draft.specification,
+      originCountry: prev.originCountry || draft.originCountry,
+      categoryId: prev.categoryId || draft.categoryId || '',
+      priceGeneral: prev.priceGeneral || draft.priceGeneral || '',
+      consumerReferencePrice: prev.consumerReferencePrice || draft.consumerReferencePrice,
+      regulatoryType: prev.regulatoryType,
+    }));
+    setConsumerShortDesc((prev) => prev || draft.consumerDetailDesc || draft.consumerShortDesc);
+    setCurrentStep(1);
+    setSourceImportOpen(false);
   };
 
   return {
@@ -351,5 +342,8 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     goBack,
     goToFromMaster,
     goToSourceImport,
+    sourceImportOpen,
+    setSourceImportOpen,
+    applySourceImport,
   };
 }

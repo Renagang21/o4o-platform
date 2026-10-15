@@ -4,8 +4,10 @@ import type { useSupplierProductImport } from './useSupplierProductImport';
 
 export default function SupplierImportSettings({
   controller,
+  onCancel,
 }: {
   controller: ReturnType<typeof useSupplierProductImport>;
+  onCancel?: () => void;
 }) {
   const formId = useId();
   const {
@@ -148,7 +150,8 @@ export default function SupplierImportSettings({
           {navStatus === 'copying' ? '이미지 O4O 복사 중…' : '상품 등록 페이지로 이동 →'}
         </button>
         <button
-          onClick={() => navigate('/supplier/products')}
+          onClick={onCancel ?? (() => navigate('/supplier/products'))}
+          disabled={navStatus === 'copying'}
           className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           취소

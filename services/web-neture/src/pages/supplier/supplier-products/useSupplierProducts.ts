@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supplierApi, type SupplierProduct } from '../../../lib/api';
 import type { SupplierApprovalCounts } from '../../../lib/api/supplier';
 import { REGULATORY_TYPE_LABELS, getVisibilityStatus } from '../../../lib/productConstants';
@@ -13,6 +14,23 @@ import {
 } from './productListFeedback';
 
 export function useSupplierProducts() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryPage = Number(searchParams.get('page'));
+  const requestedPage = Number.isSafeInteger(queryPage) && queryPage > 0 ? queryPage : 1;
+  const setQueryValue = (key: string, value: React.SetStateAction<string>) => setSearchParams((prev) => {
+    const next = new URLSearchParams(prev);
+    const resolved = typeof value === 'function' ? value(prev.get(key) ?? '') : value;
+    if (resolved) next.set(key, resolved); else next.delete(key);
+    next.delete('page');
+    next.delete('offer');
+    return next;
+  }, { replace: true });
+  const setPage = (page: number) => setSearchParams((prev) => {
+    const next = new URLSearchParams(prev);
+    next.set('page', String(page));
+    next.delete('offer');
+    return next;
+  });
   // Search/filter requests may finish out of order. Rows and counts stay independent.
   const productsRequest = useRef(0);
   const countsRequest = useRef(0);
@@ -22,7 +40,16 @@ export function useSupplierProducts() {
   }, []);
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
-  const [keyword, setKeyword] = useState('');
+  const queryKeyword = searchParams.get('q') ?? '';
+  const [keyword, setKeyword] = useState(queryKeyword);
+  const searchDraft = useRef(queryKeyword);
+  const updateKeyword = useCallback((value: React.SetStateAction<string>) => {
+    const next = typeof value === 'function' ? value(searchDraft.current) : value;
+    searchDraft.current = next;
+    setKeyword(next);
+  }, []);
+  // Typing stays local; SearchBar commits q only on debounce/Enter. URL navigation restores the input.
+  useEffect(() => updateKeyword(queryKeyword), [queryKeyword, updateKeyword]);
   const [loading, setLoading] = useState(true);
   // 조회 실패(loadError) 와 정상 0건을 구분한다 — 실패 시 빈 상태 문구를 표시하지 않는다.
   const [loadError, setLoadError] = useState(false);
@@ -38,14 +65,21 @@ export function useSupplierProducts() {
   const [approvalResult, setApprovalResult] = useState<ApprovalResultView | null>(null);
 
   // Filter state
-  const [filterHasImage, setFilterHasImage] = useState('');
-  const [filterHasDescription, setFilterHasDescription] = useState('');
-  const [filterBarcodeSource, setFilterBarcodeSource] = useState('');
-  const [filterCompleteness, setFilterCompleteness] = useState('');
-  const [filterVisibility, setFilterVisibility] = useState('');
+  const filterHasImage = searchParams.get('hasImage') ?? '';
+  const setFilterHasImage = (value: React.SetStateAction<string>) => setQueryValue('hasImage', value);
+  const filterHasDescription = searchParams.get('hasDescription') ?? '';
+  const setFilterHasDescription = (value: React.SetStateAction<string>) => setQueryValue('hasDescription', value);
+  const filterBarcodeSource = searchParams.get('barcodeSource') ?? '';
+  const setFilterBarcodeSource = (value: React.SetStateAction<string>) => setQueryValue('barcodeSource', value);
+  const filterCompleteness = searchParams.get('completeness') ?? '';
+  const setFilterCompleteness = (value: React.SetStateAction<string>) => setQueryValue('completeness', value);
+  const filterVisibility = searchParams.get('visibility') ?? '';
+  const setFilterVisibility = (value: React.SetStateAction<string>) => setQueryValue('visibility', value);
 
   // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: 승인요청 전 탭 추가
-  const [activeTab, setActiveTab] = useState<ApprovalTab>('all');
+  const requestedTab = searchParams.get('approval');
+  const activeTab: ApprovalTab = ['all', 'unrequested', 'pending', 'approved', 'rejected'].includes(requestedTab ?? '') ? requestedTab as ApprovalTab : 'all';
+  const setActiveTab = (tab: ApprovalTab) => setQueryValue('approval', tab === 'all' ? '' : tab);
   // WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1:
   //   null = 아직 못 불러옴(로딩/실패). 0 카운트와 구분한다.
   const [tabCounts, setTabCounts] = useState<SupplierApprovalCounts | null>(null);
@@ -53,6 +87,21 @@ export function useSupplierProducts() {
 
   // Drawer state (WO-O4O-NETURE-SUPPLIER-DRAWER-V1)
   const [drawerProduct, setDrawerProduct] = useState<SupplierProduct | null>(null);
+
+  const restoredOffer = useRef<string | null>(null);
+  useEffect(() => {
+    const offerId = searchParams.get('offer');
+    if (!offerId) { restoredOffer.current = null; return; }
+    if (loading || loadError || restoredOffer.current === offerId) return;
+    restoredOffer.current = offerId;
+    const target = products.find((p) => p.id === offerId);
+    if (target) setDrawerProduct(target);
+    else setToast('요청한 상품을 현재 목록에서 찾을 수 없습니다. 검색·필터를 확인해 주세요.');
+  }, [searchParams, loading, loadError, products]);
+  const closeDrawer = () => {
+    setDrawerProduct(null);
+    setSearchParams((prev) => { const next = new URLSearchParams(prev); next.delete('offer'); return next; }, { replace: true });
+  };
 
   // Continuous workflow state
   const [autoNext, setAutoNext] = useState(true);
@@ -119,14 +168,9 @@ export function useSupplierProducts() {
   );
 
   const resetAllFilters = useCallback(() => {
-    setKeyword('');
-    setFilterHasImage('');
-    setFilterHasDescription('');
-    setFilterBarcodeSource('');
-    setFilterCompleteness('');
-    setFilterVisibility('');
-    setActiveTab('all');
-  }, []);
+    updateKeyword('');
+    setSearchParams({});
+  }, [setSearchParams, updateKeyword]);
 
   // WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1:
   // getProductsPaginated 는 조회 실패 시 throw 한다. 실패를 빈 목록으로 렌더하지 않고 loadError 로 분리한다.
@@ -134,7 +178,7 @@ export function useSupplierProducts() {
     async (page = 1, searchKeyword?: string) => {
       const request = ++productsRequest.current;
       setLoading(true);
-      const kw = searchKeyword !== undefined ? searchKeyword : keyword;
+      const kw = searchKeyword ?? queryKeyword;
       try {
         const result = await supplierApi.getProductsPaginated({
           page,
@@ -163,7 +207,7 @@ export function useSupplierProducts() {
       }
     },
     [
-      keyword,
+      queryKeyword,
       filterHasImage,
       filterHasDescription,
       filterBarcodeSource,
@@ -183,7 +227,7 @@ export function useSupplierProducts() {
     setCountsError(false);
     try {
       const counts = await supplierApi.getApprovalCounts({
-        keyword: keyword || undefined,
+        keyword: queryKeyword || undefined,
         hasImage: filterHasImage || undefined,
         hasDescription: filterHasDescription || undefined,
         barcodeSource: filterBarcodeSource || undefined,
@@ -196,11 +240,11 @@ export function useSupplierProducts() {
       setTabCounts(null);
       setCountsError(true);
     }
-  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
+  }, [queryKeyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
 
   useEffect(() => {
-    fetchProducts(1);
-  }, [fetchProducts]);
+    fetchProducts(requestedPage);
+  }, [fetchProducts, requestedPage]);
 
   useEffect(() => {
     fetchTabCounts();
@@ -255,12 +299,11 @@ export function useSupplierProducts() {
     }
   }, [products, autoNext, loading]);
 
-  const handleSearch = useCallback(
-    (value: string) => {
-      fetchProducts(1, value);
-    },
-    [fetchProducts],
-  );
+  const handleSearch = (value: string) => {
+    // A pending SearchBar timer must not restore input discarded by reset or URL navigation.
+    if (value !== searchDraft.current) return;
+    setQueryValue('q', value);
+  };
 
   const handleSave = async (changedRows: SupplierProduct[]) => {
     setSaving(true);
@@ -348,7 +391,7 @@ export function useSupplierProducts() {
     products,
     pagination,
     keyword,
-    setKeyword,
+    setKeyword: updateKeyword,
     loading,
     loadError,
     saving,
@@ -376,6 +419,8 @@ export function useSupplierProducts() {
     countsError,
     drawerProduct,
     setDrawerProduct,
+    closeDrawer,
+    setPage,
     autoNext,
     setAutoNext,
     highlightRowId,

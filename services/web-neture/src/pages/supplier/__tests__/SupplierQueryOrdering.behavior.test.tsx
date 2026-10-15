@@ -1,4 +1,6 @@
-import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import { SearchBar } from '@o4o/operator-ux-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSupplierOrders } from '../orders/useSupplierOrders';
 import { useEventOfferLists } from '../event-offer/useEventOfferLists';
@@ -37,7 +39,7 @@ beforeEach(() => {
   api.proposals.mockResolvedValue([]);
   api.events.mockResolvedValue(events(0));
 });
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe('supplier query response ordering', () => {
   it.each(['resolve', 'reject'] as const)('keeps the selected order source after a late previous %s', async (outcome) => {
@@ -120,8 +122,8 @@ describe('supplier query response ordering', () => {
     const oldCounts = deferred<ReturnType<typeof counts>>();
     api.products.mockReturnValueOnce(oldRows.promise).mockResolvedValueOnce(products(7));
     api.counts.mockReturnValueOnce(oldCounts.promise).mockResolvedValueOnce(counts(7));
-    const { result } = renderHook(useSupplierProducts);
-    act(() => result.current.setKeyword('new query'));
+    const { result } = renderHook(useSupplierProducts, { wrapper: MemoryRouter });
+    act(() => { result.current.setKeyword('new query'); result.current.handleSearch('new query'); });
     await waitFor(() => expect(result.current.pagination.total).toBe(7));
     await waitFor(() => expect(result.current.tabCounts?.total).toBe(7));
     await act(async () => {
@@ -137,12 +139,26 @@ describe('supplier query response ordering', () => {
     expect(api.counts.mock.lastCall?.[0].keyword).toBe('new query');
   });
 
+  it('restores a product list URL and resets page and all filters together', async () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => <MemoryRouter initialEntries={['/supplier/products?q=old&page=2&hasImage=false&completeness=INCOMPLETE&approval=pending']}>{children}</MemoryRouter>;
+    const { result } = renderHook(useSupplierProducts, { wrapper });
+    await waitFor(() => expect(api.products.mock.lastCall?.[0]).toMatchObject({ page: 2, keyword: 'old', hasImage: 'false', completenessStatus: 'INCOMPLETE' }));
+    expect(result.current.activeTab).toBe('pending');
+    act(() => { result.current.setKeyword('new'); result.current.handleSearch('new'); });
+    await waitFor(() => expect(api.products.mock.lastCall?.[0]).toMatchObject({ page: 1, keyword: 'new' }));
+    act(() => result.current.resetAllFilters());
+    await waitFor(() => expect(result.current.hasAnyFilter).toBe(false));
+    expect(result.current.activeTab).toBe('all');
+    expect(result.current.keyword).toBe('');
+    expect(api.products.mock.lastCall?.[0].hasImage).toBeUndefined();
+  });
+
   it('keeps product loading and selection while older results arrive', async () => {
     const old = deferred<ReturnType<typeof products>>();
     const latest = deferred<ReturnType<typeof products>>();
     api.products.mockReturnValueOnce(old.promise).mockReturnValueOnce(latest.promise);
-    const { result } = renderHook(useSupplierProducts);
-    act(() => { result.current.setKeyword('new query'); result.current.toggleSelect('new-offer'); });
+    const { result } = renderHook(useSupplierProducts, { wrapper: MemoryRouter });
+    act(() => { result.current.setKeyword('new query'); result.current.handleSearch('new query'); result.current.toggleSelect('new-offer'); });
     await act(async () => old.resolve(products(99)));
     expect(result.current.loading).toBe(true);
     expect(result.current.selectedIds.has('new-offer')).toBe(true);
@@ -150,5 +166,48 @@ describe('supplier query response ordering', () => {
     expect(result.current.loading).toBe(false);
     expect(result.current.loadError).toBe(true);
     expect(result.current.selectedIds.size).toBe(0);
+  });
+
+  it('debounces actual search input, fetches once on commit and restores URL navigation', async () => {
+    vi.useFakeTimers();
+    function Search() {
+      const state = useSupplierProducts();
+      const location = useLocation();
+      const navigate = useNavigate();
+      return <>
+        <SearchBar value={state.keyword} onChange={state.setKeyword} onSearch={state.handleSearch} placeholder="검증 검색" />
+        <output>{location.search}</output><button onClick={() => navigate(-1)}>뒤로</button><button onClick={state.resetAllFilters}>초기화</button>
+      </>;
+    }
+    await act(async () => { render(<MemoryRouter initialEntries={['/supplier/products?q=first', '/supplier/products?q=old&page=2']}><Search /></MemoryRouter>); });
+    const input = screen.getByPlaceholderText('검증 검색') as HTMLInputElement;
+    expect(input.value).toBe('old');
+    expect(api.products).toHaveBeenCalledTimes(1);
+    expect(api.counts).toHaveBeenCalledTimes(1);
+    fireEvent.change(input, { target: { value: 'n' } });
+    fireEvent.change(input, { target: { value: 'ne' } });
+    fireEvent.change(input, { target: { value: 'new' } });
+    await act(async () => { vi.advanceTimersByTime(299); });
+    expect(api.products).toHaveBeenCalledTimes(1);
+    expect(api.counts).toHaveBeenCalledTimes(1);
+    await act(async () => { vi.advanceTimersByTime(1); });
+    expect(api.products).toHaveBeenCalledTimes(2);
+    expect(api.counts).toHaveBeenCalledTimes(2);
+    expect(api.products.mock.lastCall?.[0]).toMatchObject({ keyword: 'new', page: 1 });
+    expect(screen.getByRole('status').textContent).toBe('?q=new');
+    await act(async () => { fireEvent.keyDown(input, { key: 'Enter' }); });
+    expect(api.products).toHaveBeenCalledTimes(2);
+    expect(api.counts).toHaveBeenCalledTimes(2);
+    fireEvent.change(input, { target: { value: 'discard on navigation' } });
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: '뒤로' })); });
+    expect(input.value).toBe('first');
+    await act(async () => { vi.advanceTimersByTime(300); });
+    expect(api.products.mock.lastCall?.[0]).toMatchObject({ keyword: 'first', page: 1 });
+    fireEvent.change(input, { target: { value: 'discard on reset' } });
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: '초기화' })); });
+    await act(async () => { vi.advanceTimersByTime(300); });
+    expect(input.value).toBe('');
+    expect(screen.getByRole('status').textContent).toBe('');
+    expect(api.products.mock.lastCall?.[0].keyword).toBeUndefined();
   });
 });
