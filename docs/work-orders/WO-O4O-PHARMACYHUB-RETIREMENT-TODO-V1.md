@@ -462,4 +462,4 @@ V3 #627 병합 후 최신 main e6202355a에서 개발 plan38730535162와 미디�
 
 ### 2026-10-15 후속 V5 — 전체600초 제한
 
-V4 개발 plan run38738916090은 Cloud Logging에서 task 전체600초 종료를 확인했다. 성공 census가 없어 WIF/apply는 계속 보류한다. V5에서 leaf UUID PK 테이블의 비UUID 열을 한 번에 순회하고 PH 대상 집합을 한 번 읽어 재사용한다. 검사 범위·timeout·보호 조건은 유지한다. 검증과 운영 재실행은 [V5 CHECK](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-GROUPS-V5.md)에 구분해 기록한다. #610·#615는 PH 운영 창 뒤 통합한다.
+V4 개발 plan run38738916090은 Cloud Logging에서 task 전체600초 종료를 확인했다. 성공 census가 없어 WIF/apply는 계속 보류한다. V5에서 leaf UUID PK 테이블의 비UUID 열을 한 번에 순회하고 PH 대상 집합을 한 번 읽어 재사용한다. 검사 범위·timeout·보호 조건은 유지한다. 검증과 운영 재실행은 [참조 검사 CHECK의 후속 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 구분해 기록한다. #610·#615는 PH 운영 창 뒤 통합한다.
