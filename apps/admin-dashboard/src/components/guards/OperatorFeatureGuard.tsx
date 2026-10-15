@@ -162,7 +162,7 @@ export function OperatorContentTypeGuard({
 // ============================================================================
 
 /**
- * 포럼 생성 가드 (glycocare는 숨김)
+ * 포럼 생성 가드 (canCreateForum 정책이 없으면 숨김)
  */
 export function ForumCreateGuard({
   children,
@@ -190,23 +190,6 @@ export function KpaOnlyGuard({
 }) {
   return (
     <OperatorScopeGuard allowedScopes={['kpa_society']} fallback={fallback}>
-      {children}
-    </OperatorScopeGuard>
-  );
-}
-
-/**
- * GlycoCare 전용 가드
- */
-export function GlycoCareOnlyGuard({
-  children,
-  fallback,
-}: {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  return (
-    <OperatorScopeGuard allowedScopes={['glycocare']} fallback={fallback}>
       {children}
     </OperatorScopeGuard>
   );

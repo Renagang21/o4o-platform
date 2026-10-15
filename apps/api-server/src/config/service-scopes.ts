@@ -179,7 +179,6 @@ export interface ServiceEntryConfig {
  *
  * WO-KPA-SERVICE-ENTRY-SCOPE-DEFAULTS-V1:
  * - 각 서비스 진입 시 자동으로 적용될 기본 스코프
- * - glycocare는 프로그램 스코프로, 단독 서비스가 아님
  */
 export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfig> = {
   pharmacy: {

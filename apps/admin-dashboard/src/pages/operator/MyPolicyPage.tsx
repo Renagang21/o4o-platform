@@ -23,7 +23,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Shield, Info, CheckCircle2, XCircle, Users, Activity, MapPin, AlertTriangle } from 'lucide-react';
+import { Shield, Info, CheckCircle2, XCircle, Users, MapPin, AlertTriangle } from 'lucide-react';
 
 export default function MyPolicyPage() {
   const {
@@ -186,11 +186,7 @@ export default function MyPolicyPage() {
                 활성 스코프
               </p>
               <div className="flex items-center gap-2">
-                {activeScopeKey === 'glycocare' ? (
-                  <Activity className="h-5 w-5 text-blue-600" />
-                ) : (
-                  <Users className="h-5 w-5 text-green-600" />
-                )}
+                <Users className="h-5 w-5 text-green-600" />
                 <span className="font-medium">
                   {activePolicy?.displayName || activeScopeKey}
                 </span>
@@ -201,9 +197,7 @@ export default function MyPolicyPage() {
                 인증 기준
               </p>
               <Badge variant="outline">
-                {activePolicy?.certificationCriteria === 'program'
-                  ? '프로그램 기반'
-                  : '협회 기반'}
+                협회 기반
               </Badge>
             </div>
           </div>

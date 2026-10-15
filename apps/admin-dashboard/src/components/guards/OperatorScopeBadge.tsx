@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Shield, Activity, Users } from 'lucide-react';
+import { Shield, Users } from 'lucide-react';
 
 // ============================================================================
 // Types
@@ -42,10 +42,6 @@ export interface OperatorScopeBadgeProps {
 // ============================================================================
 
 const SCOPE_COLORS = {
-  glycocare: {
-    badge: 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-300',
-    icon: 'text-blue-600',
-  },
   kpa_society: {
     badge: 'bg-green-100 text-green-800 hover:bg-green-200 border-green-300',
     icon: 'text-green-600',
@@ -53,7 +49,6 @@ const SCOPE_COLORS = {
 } as const;
 
 const SCOPE_ICONS = {
-  glycocare: Activity,
   kpa_society: Users,
 } as const;
 
@@ -116,7 +111,7 @@ export function OperatorScopeBadge({
             </p>
             <div className="pt-1 border-t text-xs">
               <p className="text-muted-foreground">
-                인증 기준: {activePolicy.certificationCriteria === 'program' ? '프로그램 기반' : '협회 기반'}
+                인증 기준: 협회 기반
               </p>
             </div>
           </div>

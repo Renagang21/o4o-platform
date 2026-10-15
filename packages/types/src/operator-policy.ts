@@ -8,7 +8,7 @@
  * 핵심 원칙:
  * 1. 운영자 Role은 단 하나 ('operator')
  * 2. 기능 차이는 스코프와 정책으로만 처리
- * 3. 혈당관리(glycocare) / kpa-society는 정책 스코프 차이로만 구분
+ * 3. 서비스 차이는 정책 스코프로만 구분
  */
 
 // ============================================================================
@@ -17,10 +17,9 @@
 
 /**
  * 운영자 스코프 키
- * - glycocare: 혈당관리 지원약국 전용
  * - kpa_society: kpa-society 전체 서비스
  */
-export type OperatorScopeKey = 'glycocare' | 'kpa_society';
+export type OperatorScopeKey = 'kpa_society';
 
 /**
  * 운영자 대상 타입
@@ -77,42 +76,12 @@ export interface OperatorPolicy {
   contentTypes: string[];
 
   /** 인증 기준 */
-  certificationCriteria: 'program' | 'association';
+  certificationCriteria: 'association';
 }
 
 // ============================================================================
 // Default Policies
 // ============================================================================
-
-/**
- * 혈당관리(GlycoCare) 운영자 정책
- */
-export const GLYCOCARE_OPERATOR_POLICY: OperatorPolicy = {
-  scopeKey: 'glycocare',
-  displayName: '혈당관리 운영자',
-  description: '혈당관리 지원약국 운영자',
-
-  joinRequirements: {
-    strictness: 'strict',
-    requiredFields: ['license_number', 'pharmacy_name', 'pharmacy_address', 'chapter_id'],
-    requiresApproval: true,
-  },
-
-  targetTypes: ['pharmacy'],
-
-  features: {
-    canCreateForum: false,
-    canManageContent: true,
-    canManageCertification: true,
-    canManagePolicy: true,
-    canManageJoinRequirements: true,
-    canManageServiceActivation: true,
-  },
-
-  contentTypes: ['glucose_management', 'health_education', 'pharmacy_guide'],
-
-  certificationCriteria: 'program',
-};
 
 /**
  * KPA Society 운영자 정책
@@ -148,7 +117,6 @@ export const KPA_SOCIETY_OPERATOR_POLICY: OperatorPolicy = {
  * 스코프별 운영자 정책 맵
  */
 export const OPERATOR_POLICIES: Record<OperatorScopeKey, OperatorPolicy> = {
-  glycocare: GLYCOCARE_OPERATOR_POLICY,
   kpa_society: KPA_SOCIETY_OPERATOR_POLICY,
 };
 
@@ -167,7 +135,7 @@ export function getOperatorPolicy(scopeKey: OperatorScopeKey): OperatorPolicy {
  * 유효한 운영자 스코프 키인지 확인
  */
 export function isValidOperatorScope(scope: string): scope is OperatorScopeKey {
-  return scope === 'glycocare' || scope === 'kpa_society';
+  return scope === 'kpa_society';
 }
 
 /**

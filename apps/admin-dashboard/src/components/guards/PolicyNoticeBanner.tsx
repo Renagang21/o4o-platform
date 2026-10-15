@@ -26,7 +26,6 @@ import {
   type PolicyNoticeType,
   getFeatureDisabledMessage,
   getScopeMismatchMessage,
-  getProgramRequiredMessage,
   getContentTypeUnavailableMessage,
   getNotOperatorMessage,
   SCOPE_DISPLAY_NAMES,
@@ -61,7 +60,6 @@ export interface PolicyNoticeBannerProps {
 const NOTICE_ICONS: Record<PolicyNoticeType, React.ComponentType<{ className?: string }>> = {
   feature_disabled: Lock,
   scope_mismatch: AlertTriangle,
-  program_required: Info,
   content_type_unavailable: Lock,
   not_operator: Lock,
 };
@@ -69,7 +67,6 @@ const NOTICE_ICONS: Record<PolicyNoticeType, React.ComponentType<{ className?: s
 const NOTICE_VARIANTS: Record<PolicyNoticeType, 'default' | 'destructive'> = {
   feature_disabled: 'default',
   scope_mismatch: 'default',
-  program_required: 'default',
   content_type_unavailable: 'default',
   not_operator: 'destructive',
 };
@@ -86,11 +83,6 @@ const NOTICE_VARIANTS: Record<PolicyNoticeType, 'default' | 'destructive'> = {
  * <PolicyNoticeBanner
  *   type="feature_disabled"
  *   feature="canCreateForum"
- * />
- *
- * <PolicyNoticeBanner
- *   type="program_required"
- *   helpText="혈당관리 프로그램 참여 조건에 대해 알아보세요."
  * />
  * ```
  */
@@ -123,9 +115,6 @@ export function PolicyNoticeBanner({
         return activeScopeKey && serviceDefaultScopeKey
           ? getScopeMismatchMessage(activeScopeKey, serviceDefaultScopeKey)
           : POLICY_NOTICES.featureNotAvailable;
-
-      case 'program_required':
-        return getProgramRequiredMessage();
 
       case 'content_type_unavailable':
         return contentType
@@ -212,33 +201,6 @@ export function FeatureDisabledBanner({
       className={className}
       compact={compact}
       helpText={helpText}
-    />
-  );
-}
-
-export interface ProgramRequiredBannerProps {
-  programName?: string;
-  className?: string;
-  compact?: boolean;
-  helpText?: string;
-}
-
-/**
- * 프로그램 참여 필요 안내 배너
- */
-export function ProgramRequiredBanner({
-  programName = '혈당관리 프로그램',
-  className,
-  compact,
-  helpText,
-}: ProgramRequiredBannerProps) {
-  return (
-    <PolicyNoticeBanner
-      type="program_required"
-      message={getProgramRequiredMessage(programName)}
-      className={className}
-      compact={compact}
-      helpText={helpText || `${programName} 참여 조건에 대해 자세히 알아보세요.`}
     />
   );
 }

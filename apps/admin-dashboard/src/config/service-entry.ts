@@ -19,7 +19,6 @@ import type { OperatorScopeKey } from '@o4o/types';
 export type ServiceEntryPoint =
   | 'branch'           // 분회 서비스
   | 'pharmacy'         // 약국 서비스
-  | 'glucosecare'      // 혈당관리 프로그램
   | 'forum'            // 약사 포럼
   | 'lms'              // 콘텐츠 안내 (WO-ADMIN-NETURE-LMS-REFACTOR-V1)
   | 'admin';           // 관리자 대시보드
@@ -66,14 +65,6 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
     isProgram: false,
     routePatterns: ['/admin/pharmacy', '/admin/yakguk'],
   },
-  glucosecare: {
-    entry: 'glucosecare',
-    defaultScopeKey: 'glycocare',
-    displayName: '혈당관리 프로그램',
-    description: '약국 서비스의 특수 프로그램 (혈당관리)',
-    isProgram: true,
-    routePatterns: ['/admin/glucosecare', '/admin/glycocare'],
-  },
   forum: {
     entry: 'forum',
     defaultScopeKey: 'kpa_society',
@@ -112,7 +103,7 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
 export function detectServiceEntryFromPath(path: string): ServiceEntryPoint | null {
   const pathLower = path.toLowerCase();
 
-  // 구체적인 패턴부터 매칭 (glucosecare가 admin보다 먼저)
+  // 구체적인 패턴부터 매칭 (admin은 마지막)
   for (const [entry, config] of Object.entries(SERVICE_ENTRY_DEFAULTS)) {
     if (entry === 'admin') continue; // admin은 마지막에 체크
 

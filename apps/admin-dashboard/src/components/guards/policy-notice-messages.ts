@@ -5,7 +5,6 @@
  *
  * 정책 기반 UX 안내 메시지 상수
  * - 기능 제한 안내
- * - 프로그램 참여 안내
  * - 스코프 불일치 안내
  */
 
@@ -18,7 +17,6 @@ import type { OperatorScopeKey, OperatorPolicy } from '@o4o/types';
 export type PolicyNoticeType =
   | 'feature_disabled'
   | 'scope_mismatch'
-  | 'program_required'
   | 'content_type_unavailable'
   | 'not_operator';
 
@@ -51,7 +49,6 @@ export const FEATURE_DISPLAY_NAMES: Record<keyof OperatorPolicy['features'], str
 // ============================================================================
 
 export const SCOPE_DISPLAY_NAMES: Record<OperatorScopeKey, string> = {
-  glycocare: '혈당관리 프로그램',
   kpa_society: '약사회 서비스',
 };
 
@@ -92,20 +89,6 @@ export function getScopeMismatchMessage(
     title: '스코프 불일치',
     description: `현재 스코프(${activeScopeName})가 서비스 기본 스코프(${serviceScopeName})와 다릅니다.`,
     guidance: '일부 기능이 제한될 수 있습니다.',
-  };
-}
-
-/**
- * 프로그램 참여 필요 메시지 생성
- */
-export function getProgramRequiredMessage(
-  programName: string = '혈당관리 프로그램'
-): PolicyNoticeMessage {
-  return {
-    type: 'program_required',
-    title: '프로그램 참여 필요',
-    description: `이 기능은 ${programName} 참여 약국만 이용할 수 있습니다.`,
-    guidance: '프로그램 참여를 원하시면 관리자에게 문의하세요.',
   };
 }
 
@@ -151,20 +134,12 @@ export const POLICY_NOTICES = {
     guidance: '적용 정책: 약사회 서비스 전용 기능',
   },
 
-  /** 포럼 개설 - glycocare 불가 */
+  /** 포럼 개설 불가 */
   forumCreateNotAvailable: {
     type: 'feature_disabled' as PolicyNoticeType,
     title: '포럼 개설 제한',
     description: '현재 서비스에서는 새 포럼을 개설할 수 없습니다.',
-    guidance: '적용 정책: 혈당관리 프로그램 스코프',
-  },
-
-  /** 혈당관리 프로그램 미참여 */
-  glucosecareNotParticipating: {
-    type: 'program_required' as PolicyNoticeType,
-    title: '혈당관리 프로그램 참여 필요',
-    description: '이 기능은 혈당관리 프로그램 참여 약국만 이용할 수 있습니다.',
-    guidance: '프로그램 참여를 원하시면 관리자에게 문의하세요.',
+    guidance: '적용 정책: 현재 서비스 스코프',
   },
 
   /** 일반 기능 제한 */
