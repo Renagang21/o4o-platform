@@ -9,7 +9,7 @@
  * 게시글 삭제 기능은 포함하지 않음(카테고리 삭제와 구분).
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import {
   Search,
@@ -99,25 +99,36 @@ export function OperatorForumCategoriesPage({
   const [tagEditInput, setTagEditInput] = useState('');
   const [isTagSaving, setIsTagSaving] = useState(false);
 
-  useEffect(() => {
-    loadCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadCategories = async () => {
-    setIsCatsLoading(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const read = useRef({ mounted: false, sequence: 0 });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, sequence: 0 };
+    read.current = scope;
+    setCategories([]); setSelectedCatIds(new Set()); setSelectedCategory(null);
+    setDeactivateTarget(null); setHardDeleteTarget(null); setTagEditTarget(null);
+    return () => { scope.mounted = false; scope.sequence++; };
+  }, [client, tableId]);
+  const loadCategories = useCallback(async () => {
+    const scope = read.current;
+    const sequence = ++scope.sequence;
+    const current = () => scope.mounted && sequence === scope.sequence;
+    setIsCatsLoading(true); setLoadError(null);
     try {
       const result = await client.getCategories();
-      setCategories(result.data || []);
-    } catch {
-      setCategories([]);
-    } finally {
-      setIsCatsLoading(false);
-    }
-  };
+      if (result?.success === false || !Array.isArray(result?.data)) throw new Error(result?.error || '포럼 목록 응답이 올바르지 않습니다.');
+      if (!current()) return false;
+      setCategories(result.data); setSelectedCatIds(new Set());
+      return true;
+    } catch (e) {
+      const err = e as { response?: { data?: { error?: string } }; message?: string };
+      if (current()) setLoadError(err?.response?.data?.error || err?.message || '포럼 목록을 불러오지 못했습니다.');
+      return false;
+    } finally { if (current()) setIsCatsLoading(false); }
+  }, [client]);
+  useEffect(() => { void loadCategories(); }, [loadCategories, tableId]);
 
   const handleDirectDeactivate = async () => {
-    if (!deactivateTarget || !deactivateReason.trim() || !nameConfirmOk) return;
+    if (isCatsLoading || loadError || !deactivateTarget || !deactivateReason.trim() || !nameConfirmOk) return;
     setIsDeactivating(true);
     try {
       const result = await client.directDeactivate(deactivateTarget.id, {
@@ -140,6 +151,7 @@ export function OperatorForumCategoriesPage({
   };
 
   const handleActivate = async (cat: CategoryData) => {
+    if (isCatsLoading || loadError) return;
     if (!confirm(`'${cat.name}' 포럼을 활성화하시겠습니까?\n활성화하면 사용자에게 다시 노출됩니다.`)) return;
     try {
       const result = await client.activate(cat.id);
@@ -155,6 +167,7 @@ export function OperatorForumCategoriesPage({
   };
 
   const openHardDeleteModal = async (cat: CategoryData) => {
+    if (isCatsLoading || loadError) return;
     setHardDeleteTarget(cat);
     setHardDeleteCheck(null);
     setHardDeleteReason('');
@@ -171,7 +184,7 @@ export function OperatorForumCategoriesPage({
   };
 
   const handleHardDelete = async () => {
-    if (!hardDeleteTarget || !hardDeleteReason.trim()) return;
+    if (isCatsLoading || loadError || !hardDeleteTarget || !hardDeleteReason.trim()) return;
     setIsHardDeleting(true);
     try {
       const result = await client.hardDelete(hardDeleteTarget.id, { reason: hardDeleteReason.trim() });
@@ -194,6 +207,7 @@ export function OperatorForumCategoriesPage({
   };
 
   const openTagEditModal = (cat: CategoryData) => {
+    if (isCatsLoading || loadError) return;
     setTagEditTarget(cat);
     setTagEditTags([...(cat.tags || [])]);
     setTagEditInput('');
@@ -418,6 +432,7 @@ export function OperatorForumCategoriesPage({
       onCellClick: () => {},
       render: (_v, row) => (
         <RowActionMenu
+          disabled={isCatsLoading || !!loadError}
           actions={buildRowActions(forumCategoryPolicy, row, {
             editTags: () => openTagEditModal(row),
             activate: () => handleActivate(row),
@@ -482,8 +497,13 @@ export function OperatorForumCategoriesPage({
         </div>
       </div>
 
+      {loadError && <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p>포럼 목록을 불러오지 못했습니다. {loadError}</p>
+        <p>표가 남아 있으면 마지막 조회 결과입니다. 다시 조회한 뒤 처리해 주세요.</p>
+        <button type="button" disabled={isCatsLoading} onClick={() => void loadCategories()} className="mt-2 min-h-11 rounded border px-3">포럼 목록 다시 조회</button>
+      </div>}
       {/* canonical ActionBar */}
-      <ActionBar
+      {!loadError && !isCatsLoading && <ActionBar
         selectedCount={selectedCatIds.size}
         onClearSelection={() => setSelectedCatIds(new Set())}
         actions={[
@@ -516,10 +536,10 @@ export function OperatorForumCategoriesPage({
             group: 'danger',
           },
         ]}
-      />
+      />}
 
       {/* DataTable (selectable) */}
-      <DataTable<CategoryData>
+      {(!loadError || categories.length > 0) && <DataTable<CategoryData>
         columns={categoryColumns}
         data={filteredCategories}
         rowKey="id"
@@ -528,18 +548,18 @@ export function OperatorForumCategoriesPage({
         tableId={tableId}
         selectable
         selectedKeys={selectedCatIds}
-        onSelectionChange={setSelectedCatIds}
-        onRowClick={(row) => setSelectedCategory(row)}
-      />
+        onSelectionChange={(keys) => { if (!loadError && !isCatsLoading) setSelectedCatIds(keys); }}
+        onRowClick={(row) => { if (!loadError && !isCatsLoading) setSelectedCategory(row); }}
+      />}
 
       {/* 목록 하단 요약 */}
-      <div className="flex items-center justify-between text-sm text-slate-500">
+      {!loadError && <div className="flex items-center justify-between text-sm text-slate-500">
         <span>총 {filteredCategories.length}개 포럼</span>
         <span>
           활성 {categories.filter((c) => c.isActive).length} /
           비활성 {categories.filter((c) => !c.isActive).length}
         </span>
-      </div>
+      </div>}
 
       {/* 포럼 카테고리 상세 Drawer */}
       <BaseDetailDrawer

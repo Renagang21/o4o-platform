@@ -925,12 +925,8 @@ export const forumOperatorApi = {
   // ── 포럼 직접 삭제(soft) — WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
   //    ForumCategoriesClient 어댑터. Neture Operator 는 soft delete 만 사용(disableHardDelete).
   getCategories: async () => {
-    try {
-      const res = await api.get(`${OPERATOR_BASE}/categories?${SVC}`);
-      return res.data;
-    } catch {
-      return { success: true, data: [], count: 0 };
-    }
+    const res = await api.get(`${OPERATOR_BASE}/categories?${SVC}`);
+    return res.data;
   },
   updateCategory: async (id: string, data: { name?: string; description?: string; tags?: string[] }) => {
     const res = await api.patch(`${OPERATOR_BASE}/categories/${id}?${SVC}`, data);
