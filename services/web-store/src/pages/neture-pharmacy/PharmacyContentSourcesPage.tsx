@@ -41,12 +41,13 @@ export default function PharmacyContentSourcesPage() {
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
-  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); return p; }); };
+  const selectedContentId = params.get('content') || '';
+  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); p.delete('content'); return p; }); };
   const [qInput, setQInput] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,9 +56,16 @@ export default function PharmacyContentSourcesPage() {
       .catch(() => setFranchises([]));
   }, []);
 
-  const fetchList = useCallback(() => neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE }), [sf, q, page]);
+  const fetchList = useCallback(async () => {
+    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
+    if (!selectedContentId || result.items.some(item => item.id === selectedContentId)) return result;
+    // A linked material may not be on this page. The existing detail API rechecks store membership.
+    const selected = await neturePharmacyApi.getContent(selectedContentId);
+    if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
+    return { ...result, items: [selected, ...result.items] };
+  }, [sf, q, page, selectedContentId]);
   const { items, total, loading, error, setError, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
-
+  useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();

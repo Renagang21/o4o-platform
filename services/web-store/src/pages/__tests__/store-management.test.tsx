@@ -80,7 +80,7 @@ describe('내 매장 경영지원', () => {
   });
   it('실제 사업 상태와 조건·업무 진입을 표시하며 대기 사업에는 공급 진입을 주지 않는다', async () => {
     mount(<MyServicesPage />, '/services');
-    await screen.findByText('혈당관리 사업');
+    await screen.findByRole('heading', { name: '혈당관리 사업' });
     expect(screen.getByRole('heading', { name: '이용 사업 · 가입 관리' })).toBeTruthy();
     expect(screen.getAllByRole('link', { name: '공급 상품' }).map(x => x.getAttribute('href'))).toEqual([
       '/store/pharmacy/supply?source=sf%3Apharmacy', '/store/pharmacy/supply?source=sf%3Adiabetes',

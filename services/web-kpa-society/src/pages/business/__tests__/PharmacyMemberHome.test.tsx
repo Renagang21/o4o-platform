@@ -18,6 +18,7 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
   <Route element={<BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout />}><Route path="/" element={<PharmacyMemberHomePage />} /></Route>
   <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
   <Route path="/businesses/:businessKey" element={<LegacyAwareBusinessWorkspace />}>
+    <Route index element={<PharmacyMemberHomePage />} />
     <Route path="forum/post/:slug" element={<p>전환되지 않은 이전 게시글 화면</p>} />
   </Route>
   <Route path="*" element={<Destination />} />
@@ -142,4 +143,19 @@ describe('약국 회원 초기화면', () => {
     ['/businesses/pharmacy/materials', '/materials'], ['/businesses/pharmacy/tools', '/tools'],
     ['/businesses/pharmacy/forum/owned/board/members', '/community/owned/board/members'],
   ])('이전 주소 %s를 %s로 전환한다', (old, next) => expect(pharmacyLegacyPath(old)).toBe(next));
+});
+
+it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표시한다', async () => {
+  mocks.get.mockImplementation(async (path: string) => {
+    if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
+    if (path.endsWith('/access')) return { data: { data: { ...access, businessKey: 'network-a' } } };
+    if (path.endsWith('/forum/posts')) return { data: { data: [] } };
+    if (path.endsWith('/store/contents')) return { data: { data: { items: [{ id: 'a', title: '사업 A 자료', semiFranchiseKey: 'network-a' }, { id: 'b', title: '다른 사업 자료', semiFranchiseKey: 'network-b' }] } } };
+    throw new Error(path);
+  });
+  render(tree('/businesses/network-a'));
+  expect(await screen.findByText('네트워크 A · 회원 커뮤니티')).toBeTruthy();
+  expect(await screen.findByText('사업 A 자료')).toBeTruthy();
+  expect(screen.queryByText('다른 사업 자료')).toBeNull();
+  expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a');
 });

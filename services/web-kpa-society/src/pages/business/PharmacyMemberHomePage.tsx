@@ -59,7 +59,7 @@ export default function PharmacyMemberHomePage() {
     <section aria-labelledby="member-home-title" className="overflow-hidden rounded-2xl bg-slate-900 text-white">
       <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.7fr_1fr] lg:gap-12">
         <div>
-          <p className="mb-3 text-sm font-semibold tracking-wide text-blue-200">O4O 약국 경영지원 · 회원 커뮤니티</p>
+          <p className="mb-3 text-sm font-semibold tracking-wide text-blue-200">{business.name} · 회원 커뮤니티</p>
           <h1 id="member-home-title" className="text-2xl font-bold leading-snug sm:text-3xl">함께 나누는 경험,<br />더 나은 약국 경영</h1>
           <p className="mt-4 max-w-lg text-sm leading-7 text-slate-200">약국 운영의 소식과 경험을 함께 나눕니다.<br className="hidden sm:block" /> 공지와 회원들의 이야기를 확인하고, 필요한 사업 자료를 찾아보세요.</p>
         </div>

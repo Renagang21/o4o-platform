@@ -1,0 +1,50 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+const mocks = vi.hoisted(() => ({ listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
+vi.mock('../../api/neturePharmacy', () => ({ neturePharmacyApi: mocks, pharmacyErrorCode: () => '', pharmacyErrorMessage: (_e: unknown, fallback: string) => fallback || '요청 실패' }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: 'store-a', effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../lib/apiClient', () => ({ api: {} }));
+vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: mocks.handoff }));
+vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
+import SemiFranchisesPage from '../neture-pharmacy/SemiFranchisesPage';
+import PharmacyContentSourcesPage from '../neture-pharmacy/PharmacyContentSourcesPage';
+const business = (key: string, membershipStatus: string | null = 'active') => ({ key, name: key, communityKey: `forum-${key}`, membershipStatus });
+const content = { id: 'selected', title: '선택한 자료', body: '선택 자료 본문', semiFranchiseKey: 'network-a' };
+beforeEach(() => {
+  vi.resetAllMocks();
+  mocks.listSemiFranchises.mockResolvedValue([business('network-a'), business('pending', 'pending'), business('none', null)]);
+  mocks.listContents.mockResolvedValue({ items: [], total: 30 });
+  mocks.getContent.mockResolvedValue(content);
+  mocks.copyContent.mockResolvedValue({ snapshotId: 'copy' });
+  mocks.handoff.mockRejectedValue(new Error('Synthetic'));
+});
+afterEach(cleanup);
+it('활성 가입 사업만 카드로 제공하고 신청 관리 표는 보존한다', async () => {
+  render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
+  const section = await screen.findByRole('region', { name: '가입한 약국 협력사업' });
+  expect(within(section).getByRole('heading', { name: 'network-a' })).toBeTruthy();
+  expect(within(section).queryByText('pending')).toBeNull();
+  expect(within(section).getByRole('link', { name: '공급 상품' }).getAttribute('href')).toBe('/store/pharmacy/supply?source=sf%3Anetwork-a');
+  expect(within(section).getByRole('link', { name: '자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents?business=network-a');
+  expect(screen.getByRole('table')).toBeTruthy();
+  fireEvent.click(within(section).getByRole('button', { name: '가입자 공간' }));
+  await screen.findByRole('alert');
+  expect(mocks.handoff).toHaveBeenCalledWith({}, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: '/businesses/network-a' });
+});
+it('첫 목록 밖의 선택 자료도 기존 권한 검사 상세 API로 읽고 내 매장으로 복사한다', async () => {
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByText('선택 자료 본문');
+  expect(mocks.getContent).toHaveBeenCalledWith('selected');
+  const copy = screen.getByRole('button', { name: /사본|가져오기/ });
+  fireEvent.click(copy);
+  await waitFor(() => expect(mocks.copyContent).toHaveBeenCalledWith('selected'));
+  expect(await screen.findByRole('link', { name: '내 매장 자료함에서 보기' })).toBeTruthy();
+});
+it('사업과 맞지 않는 선택 자료를 표시하거나 복사하지 않는다', async () => {
+  mocks.getContent.mockResolvedValue({ ...content, semiFranchiseKey: 'network-b' });
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.queryByText('선택한 자료')).toBeNull();
+  expect(mocks.copyContent).not.toHaveBeenCalled();
+});

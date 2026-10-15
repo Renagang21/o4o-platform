@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
-const transport = vi.hoisted(() => ({ get: vi.fn() }));
+const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ authClient: { api: transport } }));
 vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
 import BusinessMaterialsPage from '../BusinessMaterialsPage';
@@ -30,4 +30,14 @@ it('조회 실패를 빈 자료로 표시하지 않고 재시도하여 복구한
   transport.get.mockRejectedValueOnce({ response: { data: { error: '샘플 조회 실패' } } }); mount();
   expect(await screen.findByRole('alert')).toBeTruthy(); expect(screen.queryByText('등록된 자료가 없습니다.')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '다시 시도' })); expect(await screen.findByText('샘플 자료')).toBeTruthy();
+});
+
+it('선택한 사업과 자료를 내 매장 이동 경로에 유지한다', async () => {
+  transport.post.mockResolvedValue({});
+  mount();
+  fireEvent.click(await screen.findByRole('button', { name: '내 매장으로 자료 가져오기' }));
+  await screen.findByRole('alert');
+  expect(transport.post).toHaveBeenCalledWith('/auth/handoff', {
+    targetWorkspace: 'store', returnPath: '/store/pharmacy/contents?business=pharmacy&content=resource',
+  });
 });
