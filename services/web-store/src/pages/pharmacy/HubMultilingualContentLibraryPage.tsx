@@ -16,33 +16,33 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Download, Languages, X, Loader2, Search } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Download, Languages, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import {
   listMlcHub,
-  importMlcFromHub,
   type StoreMlcHubItem,
-  type StoreMlcTargetKind,
 } from '../../api/multilingualProductContentStore';
-import { fetchLocalProducts, type LocalProduct } from '../../api/localProducts';
-import { getListings, type ProductListing } from '../../api/pharmacyProducts';
-import { getActiveServiceShortKey } from '../../lib/serviceContext';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { MultilingualImportDialog } from './multilingual/MultilingualImportDialog';
 
 const PAGE_LIMIT = 20;
 const LOCALE_LABELS: Record<string, string> = {
   ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa',
 };
 
-interface TargetOption {
-  kind: StoreMlcTargetKind;
-  id: string;
-  name: string;
+export function HubMultilingualContentLibraryPage() {
+  const scope = useStoreOperationScope();
+  return <HubLibrarySession key={scope.key} isCurrent={scope.isCurrent} />;
 }
 
-export function HubMultilingualContentLibraryPage() {
+function HubLibrarySession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
   const [items, setItems] = useState<StoreMlcHubItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -51,86 +51,33 @@ export function HubMultilingualContentLibraryPage() {
 
   // Import modal
   const [importTarget, setImportTarget] = useState<StoreMlcHubItem | null>(null);
-  const [targetKind, setTargetKind] = useState<StoreMlcTargetKind>('local');
-  const [targetOptions, setTargetOptions] = useState<TargetOption[]>([]);
-  const [targetsLoading, setTargetsLoading] = useState(false);
-  const [selectedTargetId, setSelectedTargetId] = useState<string>('');
-  const [importing, setImporting] = useState(false);
+  const requests = useLatestStoreRequest(String(page));
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
   const loadData = useCallback(async () => {
+    if (!isCurrent()) return;
+    const current = requests.begin();
     setIsLoading(true);
     setError(null);
     try {
       const res = await listMlcHub({ page, limit: PAGE_LIMIT });
-      setItems(res.data ?? []);
+      if (!current() || !isCurrent()) return;
+      const last = Math.max(1, Math.ceil(res.meta.total / PAGE_LIMIT));
+      if (page > last) { setPage(last); return; }
+      setItems(res.data);
       setTotal(res.meta?.total ?? 0);
-    } catch (e: any) {
-      setError(e?.message || 'HUB 다국어 콘텐츠를 불러올 수 없습니다');
+    } catch {
+      if (current() && isCurrent()) setError('제공 자료를 불러오지 못했습니다. 다시 시도해 주세요.');
     } finally {
-      setIsLoading(false);
+      if (current() && isCurrent()) setIsLoading(false);
     }
-  }, [page]);
+  }, [page, requests, isCurrent]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Load store products for the selected target kind when the modal is open.
-  const loadTargets = useCallback(async (kind: StoreMlcTargetKind) => {
-    setTargetsLoading(true);
-    setSelectedTargetId('');
-    try {
-      if (kind === 'local') {
-        const res = await fetchLocalProducts({ limit: 100, activeOnly: 'true' });
-        setTargetOptions((res.items as LocalProduct[]).map((p) => ({ kind, id: p.id, name: p.name })));
-      } else {
-        const res = await getListings({ service_key: getActiveServiceShortKey() });
-        setTargetOptions((res.data as ProductListing[]).map((p) => ({ kind, id: p.id, name: p.product_name })));
-      }
-    } catch (e: any) {
-      toast.error(e?.message || '매장 상품 목록을 불러올 수 없습니다');
-      setTargetOptions([]);
-    } finally {
-      setTargetsLoading(false);
-    }
-  }, []);
-
-  const openImport = (item: StoreMlcHubItem) => {
-    setImportTarget(item);
-    setTargetKind('local');
-    setTargetOptions([]);
-    setSelectedTargetId('');
-    loadTargets('local');
-  };
-
-  const handleChangeKind = (kind: StoreMlcTargetKind) => {
-    setTargetKind(kind);
-    loadTargets(kind);
-  };
-
-  const handleImport = async () => {
-    if (!importTarget || !selectedTargetId) {
-      toast.error('연결할 매장 상품을 선택하세요');
-      return;
-    }
-    setImporting(true);
-    try {
-      const group = await importMlcFromHub({
-        sourceGroupId: importTarget.id,
-        targetKind,
-        targetId: selectedTargetId,
-      });
-      toast.success(`"${importTarget.title}" 가져오기 완료 — 내 약국 콘텐츠(초안)에 복사되었습니다`);
-      setImportTarget(null);
-      navigate(`/store/library/multilingual-product-contents/my?groupId=${group.id}`);
-    } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
-    } finally {
-      setImporting(false);
-    }
-  };
+    void loadData();
+    return requests.cancel;
+  }, [loadData, requests]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -146,6 +93,7 @@ export function HubMultilingualContentLibraryPage() {
           가져온 자료는 내 매장의 독립 사본으로 저장되어 이후 원본과 분리됩니다.
           같은 상품에 다시 가져오면 새 사본이 생기지 않고 기존 사본이 원본의 최신 내용으로 덮어쓰기 됩니다.
         </p>
+        <button onClick={() => navigate(`${base}/library/multilingual-product-contents/my`)} className="mt-3 min-h-11 text-sm text-blue-700 underline">내 매장 다국어 콘텐츠 확인</button>
       </header>
 
       {error && (
@@ -188,7 +136,7 @@ export function HubMultilingualContentLibraryPage() {
                   <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50">
                     <span className="text-[11px] text-slate-400">지원 언어 {item.localeCount}개</span>
                     <button
-                      onClick={() => openImport(item)}
+                      onClick={() => setImportTarget(item)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -207,78 +155,12 @@ export function HubMultilingualContentLibraryPage() {
         </>
       )}
 
-      {/* Import target-selection modal */}
-      {importTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => !importing && setImportTarget(null)}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">가져오기 — 매장 상품 연결</h2>
-                <p className="text-xs text-slate-500 mt-1">"{importTarget.title}" 을(를) 내 약국 상품에 연결합니다.</p>
-              </div>
-              <button onClick={() => !importing && setImportTarget(null)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"><X className="w-4 h-4" /></button>
-            </div>
+      {importTarget && <MultilingualImportDialog key={importTarget.id} item={importTarget} isCurrent={isCurrent}
+        onClose={() => setImportTarget(null)} onImported={group => {
+          toast.success('내 매장 콘텐츠로 가져왔습니다.');
+          navigate(`${base}/library/multilingual-product-contents/my?groupId=${encodeURIComponent(group.id)}`);
+        }} />}
 
-            {/* Target kind */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">상품 종류</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleChangeKind('local')}
-                  className={`px-3 py-2.5 rounded-lg border text-sm text-left ${targetKind === 'local' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                >
-                  {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 취급 상품' → '매장 경영활용 제품' */}
-                  <div className="font-medium">매장 경영활용 제품</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">매장 진열용</div>
-                </button>
-                <button
-                  onClick={() => handleChangeKind('listing')}
-                  className={`px-3 py-2.5 rounded-lg border text-sm text-left ${targetKind === 'listing' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                >
-                  <div className="font-medium">O4O 주문 가능 상품</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">진열 상품</div>
-                </button>
-              </div>
-            </div>
-
-            {/* Target select */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">연결할 상품</label>
-              {targetsLoading ? (
-                <div className="flex items-center gap-2 text-sm text-slate-400 py-3"><Loader2 className="w-4 h-4 animate-spin" /> 상품 불러오는 중…</div>
-              ) : targetOptions.length === 0 ? (
-                <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
-                  <Search className="w-4 h-4 shrink-0" />
-                  연결 가능한 {targetKind === 'local' ? '매장 경영활용 제품' : 'O4O 주문 가능 상품'}이 없습니다.
-                </div>
-              ) : (
-                <select
-                  value={selectedTargetId}
-                  onChange={(e) => setSelectedTargetId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">상품을 선택하세요</option>
-                  {targetOptions.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button onClick={() => setImportTarget(null)} disabled={importing} className="px-4 py-2 text-sm text-slate-600 rounded-lg hover:bg-slate-100 disabled:opacity-50">취소</button>
-              <button
-                onClick={handleImport}
-                disabled={importing || !selectedTargetId}
-                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                가져오기 실행
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

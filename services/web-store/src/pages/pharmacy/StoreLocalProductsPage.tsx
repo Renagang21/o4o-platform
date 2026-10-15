@@ -35,7 +35,7 @@ import {
   STORE_LLM_ASSIST_LABEL,
 } from '@o4o/store-ui-core';
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
-import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
+import { getMlcSummaryMap, hasPublishableMlcSummary, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
 // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 고객용 보기 / QR / URL 복사
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
@@ -267,7 +267,7 @@ function ProductFormModal({
                   ))}
                 </div>
                 {/* WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 고객용 보기 / QR / URL 복사 */}
-                <MultilingualPublicActions groupId={mlcSummary.groupId} />
+                <MultilingualPublicActions groupId={mlcSummary.groupId} publishable={hasPublishableMlcSummary(mlcSummary)} />
                 <p className="text-[11px] text-slate-400 mt-2">타블렛 노출은 후속 단계에서 연결됩니다.</p>
               </div>
             ) : (
