@@ -457,6 +457,8 @@ export class SellerRecruitmentService {
       return { success: true as const, data: { applicationId, alreadyCancelled: true } };
     }
     if (application.status !== ApplicationStatus.PENDING) return { success: false as const, error: 'NOT_PENDING' };
+    const owningRecruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
+    if (owningRecruitment && isRetiredServiceValue(owningRecruitment.serviceId)) throw new RetiredServiceError();
 
     application.status = ApplicationStatus.CANCELLED;
     application.decidedAt = new Date();
@@ -579,6 +581,7 @@ export class SellerRecruitmentService {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.sellerId !== supplierUserId) throw new Error('NOT_RECRUITMENT_OWNER');
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
 
     application.status = ApplicationStatus.REJECTED;
     application.decidedAt = new Date();
@@ -611,6 +614,8 @@ export class SellerRecruitmentService {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_OWNER' };
     if (application.status !== ApplicationStatus.APPROVED) return { success: false as const, error: 'NOT_APPROVED' };
+    // 퇴역 모집은 공용 offer · listing bridge 를 건드리지 않는다
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
 
     application.status = ApplicationStatus.CANCELLED;
     application.decidedAt = new Date();

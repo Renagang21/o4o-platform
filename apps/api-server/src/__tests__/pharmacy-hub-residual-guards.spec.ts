@@ -67,6 +67,16 @@ describe('seller recruitment — 저장된 퇴역 serviceId', () => {
     expect(applicationRepo.save).not.toHaveBeenCalled();
   });
 
+  it('반려 · 참여 해지 · 신청 철회도 퇴역 모집이면 거절하고 공용 offer · listing 을 건드리지 않는다', async () => {
+    await expect(service.rejectApplication('app', 'supplier-user', 'r')).rejects.toBeInstanceOf(RetiredServiceError);
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', recruitmentId: 'retired', status: 'approved', applicantId: 'user' });
+    await expect(service.terminateParticipation('app', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', recruitmentId: 'retired', status: 'pending', applicantId: 'user', applicantOrganizationId: null });
+    await expect(service.cancelApplication('app', 'user')).rejects.toBeInstanceOf(RetiredServiceError);
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+    expect(AppDataSource.query).not.toHaveBeenCalled();
+  });
+
   it('공급자 본인 모집 목록 · 신청자 상세에서도 퇴역 서비스 모집은 보이지 않는다', async () => {
     expect((await service.getSupplierRecruitments('supplier-user')).map((r) => r.id)).toEqual(['live']);
     expect(await service.getRecruitmentApplications('retired', 'supplier-user')).toBeNull();
@@ -87,6 +97,8 @@ describe('seller recruitment — 저장된 퇴역 serviceId', () => {
       'modules/neture/controllers/operator-recruitment-exposure.controller.ts',
       'modules/neture/controllers/service-recruitment-exposure-proxy.controller.ts',
     ]) expect(src(path)).toContain('sendRetiredServiceError(res, error)');
+    // 승인 · 반려(decisionErrors) · 철회 · 참여 해지
+    expect(src('modules/neture/controllers/seller-recruitment.controller.ts').match(/sendRetiredServiceError\(res, error\)/g)?.length).toBeGreaterThanOrEqual(5);
   });
 });
 
