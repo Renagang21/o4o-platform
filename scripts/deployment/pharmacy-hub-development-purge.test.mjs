@@ -1,11 +1,21 @@
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-import {PharmacyHubDevelopmentPurge} from './pharmacy-hub-development-purge.mjs';
+import {PharmacyHubDevelopmentPurge,developmentReferenceQuery} from './pharmacy-hub-development-purge.mjs';
+import {createHash} from 'node:crypto';
 import {jobArguments} from './pharmacy-hub-administrative-purge-job.mjs';
 const fenceBody=readFileSync(new URL('../../apps/api-server/src/database/migrations/1791795139475-RetireLegacyErasureIdentityHashes.ts',import.meta.url),'utf8').match(/AS \$\$(.*?)\$\$/s)[1];
 const fence={table_name:'supplier_product_offers',trigger_name:'account_erasure_write_fence',event_type:23,enabled:'O',function_schema:'public',function_name:'account_erasure_write_fence',function_body:fenceBody,expected_shape:true};
 const counts={checkout_order_logs:6,o4o_payments:6,offer_service_approvals:18,offer_service_prices:1,supplier_product_offers:19,cms_contents:3,forum_category_requests:1,checkout_orders:6};
+test('production timeout query uses native UUID equality while other columns retain literal scans',()=>{
+  const c={schema:'public',table:'product_landings',column:'product_master_id'};
+  assert.equal(createHash('sha256').update(developmentReferenceQuery(c)).digest('hex'),'ebe51eccc65c1f19d906cfedbacc199b9408b784f8274cb7c9b1ce59b64e1fa0');
+  const sql=developmentReferenceQuery({...c,type:'uuid'});
+  assert.match(sql,/s\."product_master_id" = ANY\(ARRAY\(SELECT id::uuid/);
+  assert.match(sql,/targets.pattern IS NOT NULL/);
+  assert.match(sql,/id ~ '\^\[0-9a-f-\]\{1,36\}\$'/);
+  assert.match(developmentReferenceQuery({...c,type:'jsonb'}),/~ targets.pattern/);
+});
 function fixture(problem) {
   const calls=[],deleted=new Set();
   return {calls,isTransactionActive:true,async query(sql) {

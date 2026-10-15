@@ -63,26 +63,54 @@ async function references(q,locked) {
       throw new Error(`PH_MEDIA_SHARED_FK:${f.schema}.${f.table}`);
   }
   // IDs, full public URLs and object paths are all checked across application data.
-  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column FROM pg_attribute a
+  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type FROM pg_attribute a
     JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_type t ON t.oid=a.atttypid
     WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
     AND n.nspname NOT LIKE 'pg_%' AND (t.typcategory IN ('S','A') OR t.typname IN ('uuid','json','jsonb'))`);
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_MEDIA_SCHEMA_CHANGED');
+    if(await count(q,mediaReferenceQuery(c)))
+      throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
+  }
+}
+export function mediaReferenceQuery(c) {
     const owned=c.schema==='public'&&c.table==='media_assets'?assetScope('s'):
       c.schema==='public'&&c.table==='media_entity_links'?linkScope('s'):'FALSE';
+    if(c.type==='uuid') {
+      const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+      // Partition live/deleted landings to use the partial index without omitting references.
+      const partitions=c.schema==='public'&&c.table==='product_landings'&&c.column==='product_master_id'
+        ? ['s.deleted_at IS NULL','s.deleted_at IS NOT NULL'] : ['TRUE'];
+      // Include every original token. URL/path tokens cannot match UUID text,
+      // but hypothetical short hexadecimal legacy IDs still use the gated fallback.
+      return `WITH target_values AS MATERIALIZED (
+          SELECT v AS id FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
+            UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')}) a
+          CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL),
+        target_patterns AS MATERIALIZED (
+          SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
+          FROM target_values WHERE id ~ '^[0-9a-f-]{1,36}$' AND id !~ '${canonical}')
+        SELECT count(*)::text AS count FROM (
+${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
+          WHERE NOT COALESCE((${owned}),FALSE)
+            AND s.${id(c.column)} = ANY(ARRAY(SELECT id::uuid FROM target_values WHERE id ~ '${canonical}'))
+            AND ${partition}`).join('\n          UNION ALL\n')}
+          UNION ALL
+          SELECT 1 FROM target_patterns targets CROSS JOIN ${id(c.schema)}.${id(c.table)} s
+          WHERE targets.pattern IS NOT NULL AND NOT COALESCE((${owned}),FALSE)
+            AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
+        ) references_found`;
+    }
     // Freeze target discovery and scan each large payload once. Escaping every
     // punctuation character keeps ID/full-URL/object-path matching literal.
-    if(await count(q,`WITH target_patterns AS MATERIALIZED (
+    return `WITH target_patterns AS MATERIALIZED (
         SELECT string_agg(regexp_replace(v,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
         FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
           UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')}) a
         CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL)
       SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s CROSS JOIN target_patterns targets
       WHERE NOT COALESCE((${owned}),FALSE)
-      AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern`))
-      throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
-  }
+      AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern`;
 }
 export function validateMediaObject(asset) {
   // Fixed existing media bucket and path namespace. Never enumerate/delete a bucket or prefix.
