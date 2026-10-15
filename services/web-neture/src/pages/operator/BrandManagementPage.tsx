@@ -245,6 +245,14 @@ export default function BrandManagementPage() {
       {pendingMergeTarget && mergeSource && (
         <dialog ref={confirmDialogRef} aria-labelledby={`${dialogId}-confirm-title`}
           onCancel={(event) => { event.preventDefault(); if (!merging) setPendingMergeTarget(null); }}
+          onPointerUp={(event) => {
+            if (merging || event.target !== event.currentTarget) return;
+            const bounds = event.currentTarget.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                event.clientY < bounds.top || event.clientY > bounds.bottom) {
+              setPendingMergeTarget(null);
+            }
+          }}
           className="!m-auto w-[calc(100%-2rem)] max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto border-0 p-0 bg-white rounded-xl shadow-xl text-inherit backdrop:bg-black/50">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h2 id={`${dialogId}-confirm-title`} className="text-lg font-semibold text-gray-900">브랜드 병합 확인</h2>

@@ -158,6 +158,38 @@ describe('taxonomy dialog keyboard lifecycle', () => {
     expect(within(confirm).getByRole('alert').textContent).toBe('MERGE_FAILED');
   });
 
+  it('dismisses only the confirmation on an idle backdrop release and restores the target', async () => {
+    const { parent, target, confirm } = await selectBrand();
+    vi.spyOn(confirm, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 100, 300, 200));
+    // jsdom does not expose PointerEvent coordinates; native browser coverage is separate.
+    const release = (x: number, y: number) => {
+      const event = new Event('pointerup', { bubbles: true });
+      Object.defineProperties(event, { clientX: { value: x }, clientY: { value: y } });
+      fireEvent(confirm, event);
+    };
+    release(150, 150);
+    expect(screen.getByRole('dialog', { name: '브랜드 병합 확인' })).toBe(confirm);
+    release(20, 20);
+    expect(screen.queryByRole('dialog', { name: '브랜드 병합 확인' })).toBeNull();
+    expect(screen.getByRole('dialog', { name: '브랜드 병합' })).toBe(parent);
+    await waitFor(() => expect(document.activeElement).toBe(target));
+    expect(mocks.merge).not.toHaveBeenCalled();
+  });
+
+  it('ignores a backdrop release while the merge is pending', async () => {
+    let finish!: (value: { success: boolean; error: string }) => void;
+    mocks.merge.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const { confirm } = await selectBrand();
+    vi.spyOn(confirm, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 100, 300, 200));
+    click(within(confirm).getByRole('button', { name: '병합' }));
+    const event = new Event('pointerup', { bubbles: true });
+    Object.defineProperties(event, { clientX: { value: 20 }, clientY: { value: 20 } });
+    fireEvent(confirm, event);
+    expect(screen.getByRole('dialog', { name: '브랜드 병합 확인' })).toBe(confirm);
+    await act(async () => finish({ success: false, error: 'MERGE_FAILED' }));
+    expect(within(confirm).getByRole('alert').textContent).toBe('MERGE_FAILED');
+  });
+
   it('closes both levels after success and focuses search if the source row reloads', async () => {
     let finish!: (value: typeof brands) => void;
     mocks.brands.mockResolvedValueOnce(brands).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
