@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * CreateContentFromResourcesModal — 빈 편집기 직접 작성 → direct 콘텐츠 제작
  *
@@ -50,6 +51,7 @@ interface Props {
 
 export function CreateContentFromResourcesModal({ open, onClose, onCreated, product }: Props) {
   const navigate = useNavigate();
+  const { base, returnState } = useStoreLibraryRoute();
 
   const { organizationId } = useStoreOrganizationId();
   const session = useContentAuthoringSession<TextContentDraft, CreatedContent>({
@@ -60,7 +62,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
     validate: validateNewContent,
     onSaved: (saved, unchanged) => {
       onCreated?.(saved.id);
-      if (unchanged) { onClose(); navigate(`/store/content/direct/${saved.id}`); }
+      if (unchanged) { onClose(); navigate(`${base}/content/direct/${saved.id}`, { state: returnState }); }
     },
   });
   const { title, tags, html: editorHtml } = session.draft;
@@ -70,18 +72,24 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   const setEditorHtml = (html: string) => session.changeDraft({ html }, true);
   const handleEditorChange = (content: EditorContent) => session.changeDraft({ html: content.html });
 
+  const requestClose = () => {
+    if (saving) return;
+    if ((title.trim() || editorHtml.trim() && editorHtml !== '<p></p>' || tags.length > 0) &&
+      !window.confirm('저장하지 않은 작성 내용을 버리고 닫으시겠습니까?')) return;
+    onClose();
+  };
   if (!open) return null;
 
   const canSave = !!title.trim() && !!editorHtml.trim() && !saving && !session.loading && !session.error;
 
   return (
-    <AuthoringDialog labelId="create-content-title" onClose={onClose} className="max-w-3xl">
+    <AuthoringDialog labelId="create-content-title" onClose={requestClose} className="max-w-3xl">
       <div style={styles.modal}>
         <header style={styles.header}>
           <div style={styles.headerLeft}>
             <h2 id="create-content-title" style={styles.title}>콘텐츠 작성</h2>
           </div>
-          <button type="button" onClick={onClose} style={styles.iconBtn} aria-label="닫기">
+          <button type="button" onClick={requestClose} style={styles.iconBtn} disabled={saving} aria-label="닫기">
             <X size={16} />
           </button>
         </header>
@@ -155,7 +163,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
         <footer style={styles.footer}>
           <span style={styles.footerHint}>본문을 직접 작성하거나 붙여넣은 뒤 저장하세요</span>
           <div style={styles.footerActions}>
-            <button type="button" onClick={onClose} style={styles.secondaryBtn} disabled={saving}>
+            <button type="button" onClick={requestClose} style={styles.secondaryBtn} disabled={saving}>
               취소
             </button>
             <button

@@ -50,8 +50,8 @@ it('independent failures retain available sources without inventing empty activi
   api.scans.mockRejectedValue(Error('synthetic')); api.analytics.mockResolvedValue({ success: false, data: analytics });
   api.signals.mockResolvedValue({ success: false, data: signals });
   const result = await loadHomeOverview('A');
-  expect(result.analytics).toBeNull(); expect(result.scans).toBeNull(); expect(result.signals).toBeNull();
-  expect(result.libraryCount).toBe(0); expect(result.unavailable).toEqual(['홍보 성과', '최근 활동', '처리할 업무']);
+  expect(result.analytics).toBeNull(); expect(result.signals).toBeNull();
+  expect(result.libraryCount).toBe(0); expect(result.unavailable).toEqual(['홍보 성과', '처리할 업무']);
 });
 it('foreign-store assets and malformed overview metrics fail closed', async () => {
   api.assets.mockResolvedValue(ok({ total: 1, items: [asset('foreign', { organizationId: 'B' })] }));

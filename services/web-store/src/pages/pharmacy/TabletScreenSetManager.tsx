@@ -1,3 +1,7 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { useStoreResource } from './hooks/useStoreResource';
+import { createScreenSetSession } from './tablet/screenSetSession';
 /**
  * TabletScreenSetManager — 매장(store) 태블릿 콘텐츠 라이브러리 페이지(리스트 + 제작 셸 진입)
  *
@@ -6,11 +10,11 @@
  *   `@o4o/tablet-screen-set-editor` 공유 패키지로 추출됨. 이 파일에는 **매장 전용 리스트 페이지**와
  *   **매장 API 인스턴스(defaultStoreBuilderApi)** 만 잔류한다. store 동작·저장 payload·5섹션 계약 불변.
  */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Layers } from 'lucide-react';
 import {
-  fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
-  archiveScreenSet, saveScreenSetBlocks,
+  fetchScreenSets, fetchScreenSet, updateScreenSet,
+  archiveScreenSet, captureScreenSetWrites,
   // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1
   searchTabletStoreContents, searchTabletO4oDescriptions,
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft → sections resolve(read-only)
@@ -35,16 +39,13 @@ import type { QrScreenSet } from '../../api/storeQr';
 // 공유 편집기 + 라벨/상수/계약을 패키지에서 소비.
 import {
   TabletContentStepBuilder, templateLabel, LEGACY_ONLY_TEMPLATE_KEYS,
-  type ScreenSetBuilderApi, type Toast,
+  type Toast,
 } from '@o4o/tablet-screen-set-editor';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 
 // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 제작 셸에 주입할 **매장(store) API 인스턴스**.
 //   공유 편집기는 api 를 필수 주입받는다(앱 런타임 함수 의존 없음). 매장 제작기는 이 인스턴스를 주입.
-const defaultStoreBuilderApi: ScreenSetBuilderApi = {
-  create: (input) => createScreenSet({ ...input, tabletId: null }),
-  update: (id, input) => updateScreenSet(id, input),
-  saveBlocks: saveScreenSetBlocks,
+const defaultStoreBuilderReads = {
   preview: previewScreenSet,
   searchO4oDescriptions: searchTabletO4oDescriptions,
   searchStoreContents: searchTabletStoreContents,
@@ -115,13 +116,27 @@ interface Props {
   autoEditId?: string | null;
 }
 
-export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId }: Props) {
-  const [sets, setSets] = useState<ScreenSet[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function TabletScreenSetManager(props: Readonly<Props>) {
+  const scope = useStoreOperationScope();
+  return <ScreenSetManagerSession key={scope.key} {...props} isCurrent={scope.isCurrent} />;
+}
+async function loadScreenSets() {
+  const sets = await fetchScreenSets({ includeArchived: true });
+  if (!Array.isArray(sets)) throw new Error('Invalid screen sets');
+  return sets;
+}
+function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId, isCurrent }: Props & { isCurrent: () => boolean }) {
+  const onToast = useCallback((notice: Toast) => { if (isCurrent()) notify(notice); }, [notify, isCurrent]);
+  const { data: sets, loading, error: listError, reload } = useStoreResource(loadScreenSets, []);
+  const refresh = useCallback(() => { if (isCurrent()) void reload(); }, [isCurrent, reload]);
+  const edits = useLatestStoreRequest();
+  const sessions = useLatestStoreRequest();
+  const [openingId, setOpeningId] = useState<string | null>(null);
+  const mutation = useRef(false);
   const [busy, setBusy] = useState(false);
 
   // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 인라인 생성/편집 UI → 단계형 제작 셸.
-  const [builder, setBuilder] = useState<{ detail: ScreenSetDetail | null } | null>(null);
+  const [builder, setBuilder] = useState<{ detail: ScreenSetDetail | null; current: () => boolean } | null>(null);
 
   // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
   //   코너 내용 편집기(RichTextEditor)에 이미지 업로드 / 공용 미디어 라이브러리를 연결한다.
@@ -129,22 +144,19 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.');
     const res = await mediaApi.upload(file, true, getActiveServiceKey(), 'tablet-screen-set');
+    if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.');
     if (res.success && res.data) return res.data.url;
     throw new Error(res.error || '이미지 업로드에 실패했습니다.');
-  }, []);
+  }, [builder]);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    try {
-      setSets(await fetchScreenSets({ includeArchived: true }));
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
-      setSets([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [onToast]);
+  const builderOptions = useMemo(() => ({
+    pool: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreProductPool(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
+    qr: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreQrOptions(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
+  }), [builder]);
+  const builderApi = useMemo(() => createScreenSetSession({ ...defaultStoreBuilderReads, ...captureScreenSetWrites() }, builder?.current ?? (() => false)), [builder]);
+  const closeBuilder = () => { sessions.cancel(); setBuilder(null); setMediaPickerTarget(null); };
 
   // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
   const usageBySet = (() => {
@@ -155,18 +167,26 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
     return m;
   })();
 
-  useEffect(() => { reload(); }, [reload]);
 
   const openEdit = useCallback(async (id: string) => {
+    if (mutation.current || !isCurrent()) return;
+    const current = edits.begin(); setOpeningId(id);
     try {
       const detail = await fetchScreenSet(id);
-      setBuilder({ detail });
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '세트 상세를 불러오지 못했습니다.' });
-    }
-  }, [onToast]);
+      if (!current() || !isCurrent()) return;
+      if (detail.id !== id) throw new Error('Invalid screen set');
+      const session = sessions.begin();
+      setBuilder({ detail, current: () => session() && isCurrent() });
+    } catch { if (current() && isCurrent()) onToast({ type: 'error', message: '화면 상세를 불러오지 못했습니다. 다시 수정 버튼을 눌러 주세요.' }); }
+    finally { if (current() && isCurrent()) setOpeningId(null); }
+  }, [edits, sessions, isCurrent, onToast]);
 
-  const openCreate = useCallback(() => setBuilder({ detail: null }), []);
+  const openCreate = useCallback(() => {
+    if (mutation.current || !isCurrent()) return;
+    edits.cancel(); setOpeningId(null);
+    const session = sessions.begin();
+    setBuilder({ detail: null, current: () => session() && isCurrent() });
+  }, [edits, sessions, isCurrent]);
 
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1:
   //   QR 목록에서 넘어온 화면 세트 편집기를 1회만 자동 오픈한다(호출부가 history state 를 즉시 비우므로
@@ -174,17 +194,23 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
   const autoEditDone = useRef(false);
   useEffect(() => {
     if (!autoEditId || autoEditDone.current) return;
-    autoEditDone.current = true;
-    openEdit(autoEditId);
-  }, [autoEditId, openEdit]);
+    let disposed = false;
+    void Promise.resolve().then(async () => {
+      if (disposed) return;
+      await openEdit(autoEditId);
+      if (!disposed) autoEditDone.current = true;
+    });
+    return () => { disposed = true; edits.cancel(); };
+  }, [autoEditId, openEdit, edits]);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1: 사용자 문구 '보관' → '리스트에서 제거'(내부는 archived/soft-delete 그대로).
   const handleArchive = async (set: ScreenSet) => {
-    if (busy) return;
+    if (mutation.current || !isCurrent()) return;
     if (!window.confirm(`“${set.name}” 을(를) 리스트에서 제거하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다.`)) return;
-    setBusy(true);
+    mutation.current = true; setBusy(true);
     try {
       await archiveScreenSet(set.id);
+      if (!isCurrent()) return;
       onToast({ type: 'success', message: '리스트에서 제거했습니다.' });
       await reload();
     } catch (e: any) {
@@ -192,22 +218,23 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
         ? '이 콘텐츠는 현재 코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제해 주세요.'
         : (e?.message || '리스트에서 제거하지 못했습니다.');
       onToast({ type: 'error', message: msg });
-    } finally { setBusy(false); }
+    } finally { mutation.current = false; if (isCurrent()) setBusy(false); }
   };
 
   // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 해제(복원).
   //   보관해도 slug 는 그대로 남으므로 복원하면 기존 코너 QR 이 같은 주소로 다시 살아난다.
   const handleRestore = async (set: ScreenSet) => {
-    if (busy) return;
+    if (mutation.current || !isCurrent()) return;
     if (!window.confirm(`“${set.name}” 의 보관을 해제하시겠습니까?\n목록에 다시 나타나고, 이 콘텐츠의 코너 QR 주소도 다시 열립니다.`)) return;
-    setBusy(true);
+    mutation.current = true; setBusy(true);
     try {
       await updateScreenSet(set.id, { status: 'active' });
+      if (!isCurrent()) return;
       onToast({ type: 'success', message: '보관을 해제했습니다.' });
       await reload();
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '보관을 해제하지 못했습니다.' });
-    } finally { setBusy(false); }
+    } finally { mutation.current = false; if (isCurrent()) setBusy(false); }
   };
 
   // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 제작/수정은 단계형 제작 셸이 화면을 전환(takeover).
@@ -217,18 +244,18 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
       <>
         <TabletContentStepBuilder
           initialDetail={builder.detail}
-          onCancel={() => setBuilder(null)}
-          onSaved={() => { setBuilder(null); reload(); }}
-          onToast={onToast}
+          onCancel={closeBuilder}
+          onSaved={() => { if (isCurrent()) { if (builder.current()) closeBuilder(); void reload(); } }}
+          onToast={(notice) => { if (builder.current()) onToast(notice); }}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}
-          api={defaultStoreBuilderApi}
+          api={builderApi}
           // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1
-          fetchProductPool={fetchStoreProductPool}
+          fetchProductPool={builderOptions.pool}
           // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
-          fetchStoreQrCodes={fetchStoreQrOptions}
+          fetchStoreQrCodes={builderOptions.qr}
           onImageUpload={handleImageUpload}
-          onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
+          onMediaLibraryPick={(insertMedia) => { if (builder.current()) setMediaPickerTarget(() => insertMedia); }}
           // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 뷰어 주입.
           renderMobilePreview={renderQrMobilePreview}
           // WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내 매장 = 내부 AI OFF
@@ -238,7 +265,7 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           open={!!mediaPickerTarget}
           onClose={() => setMediaPickerTarget(null)}
           onSelect={(asset) => {
-            mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
+            if (builder.current()) mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
             setMediaPickerTarget(null);
           }}
           title="코너 내용 이미지"
@@ -263,7 +290,9 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(코너에서 사용/연결 중이면 먼저 해제해야 합니다).</p>
         </div>
 
-        <TabletContentLibraryList
+        {openingId && <p role="status">화면 상세 불러오는 중… <button type="button" onClick={() => { edits.cancel(); setOpeningId(null); }}>불러오기 취소</button></p>}
+        {listError ? <div role="alert">{listError}<button type="button" onClick={() => void reload()} className="min-h-11 underline ml-2">다시 시도</button></div> : <TabletContentLibraryList
+          isCurrent={isCurrent}
           sets={sets}
           loading={loading}
           busy={busy}
@@ -274,14 +303,14 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onEdit={openEdit}
           onArchive={handleArchive}
           onRestore={handleRestore}
-          onRefresh={reload}
+          onRefresh={refresh}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}
           onPreviewContext={onPreviewContext}
           tablets={tablets}
           onApplyToTablet={onApplyToTablet}
           highlightId={highlightId}
-        />
+        />}
       </div>
     </div>
   );

@@ -34,8 +34,8 @@ export function StoreWorkflowNavigation({
         </Link>
         {(
           [
-            ["studio", "제작·편집"],
-            ["use", "매장에서 활용"],
+            ["studio", "안내 만들기"],
+            ["use", "매장 운영"],
           ] as const
         ).map(([area, label]) => {
           let target = location.pathname;

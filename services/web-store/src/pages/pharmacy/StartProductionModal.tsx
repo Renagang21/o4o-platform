@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 /**
  * StartProductionModal — KPA wrapper
  *
@@ -32,10 +34,13 @@ export type { ProductionTarget, ProductionSource, ProductionSourceItem };
 type KpaStartProductionModalProps = Omit<StartProductionModalProps, 'targets' | 'getTemplates'>;
 
 export function StartProductionModal(props: KpaStartProductionModalProps) {
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
+  const targets = PRODUCTION_TARGET_CATALOG.map(item => ({ ...item, route: base + item.route.slice('/store'.length) }));
   return (
     <SharedStartProductionModal
       {...props}
-      targets={PRODUCTION_TARGET_CATALOG}
+      targets={targets}
       getTemplates={getTemplatesForTarget}
     />
   );

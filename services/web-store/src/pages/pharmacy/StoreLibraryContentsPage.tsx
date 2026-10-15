@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
  *
@@ -33,7 +34,7 @@
 
 import { STORE_CONTENTS_HEADING } from '../../config/storeLibraryLabels';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
@@ -51,6 +52,8 @@ export default function StoreLibraryContentsPage() {
   return <LibraryContents key={scope} />;
 }
 function LibraryContents() {
+  const { organizationId } = useLibraryScope();
+  const { base } = useStoreLibraryRoute();
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -65,7 +68,7 @@ function LibraryContents() {
   //   (URL 기반 전달 → 새로고침 후에도 연결 대상 유실 없음)
   const [searchParams, setSearchParams] = useSearchParams();
   const productCtx = useMemo<CreateContentProductContext | null>(() => {
-    if (searchParams.get('create') !== '1') return null;
+    if (searchParams.get('create') !== '1' || (searchParams.has('pStore') && searchParams.get('pStore') !== organizationId)) return null;
     const pType = searchParams.get('pType');
     const pId = searchParams.get('pId');
     const pName = searchParams.get('pName');
@@ -73,7 +76,7 @@ function LibraryContents() {
       return { sourceType: pType, sourceId: pId, name: pName || '선택한 제품' };
     }
     return null;
-  }, [searchParams]);
+  }, [searchParams, organizationId]);
 
   useEffect(() => {
     if (productCtx) setCreateFromResourcesOpen(true);
@@ -86,7 +89,7 @@ function LibraryContents() {
       setSearchParams(
         (prev) => {
           const p = new URLSearchParams(prev);
-          ['create', 'pType', 'pId', 'pName'].forEach((k) => p.delete(k));
+          ['create', 'pType', 'pId', 'pName', 'pStore'].forEach((k) => p.delete(k));
           return p;
         },
         { replace: true },
@@ -139,6 +142,7 @@ function LibraryContents() {
       }
     >
       <StoreLibraryNavigation section="mine" />
+      {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주세요. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector

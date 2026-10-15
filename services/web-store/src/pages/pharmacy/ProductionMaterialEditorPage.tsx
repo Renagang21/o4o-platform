@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * ProductionMaterialEditorPage — 매장 제작 자료 편집기(외부 LLM 결과 검토/수정)
  *
@@ -70,6 +71,7 @@ interface EditorPageState {
 
 export default function ProductionMaterialEditorPage() {
   const navigate = useNavigate();
+  const { libraryPath } = useStoreLibraryRoute();
   const location = useLocation();
   const state = (location.state as EditorPageState | null) ?? {};
 
@@ -107,7 +109,7 @@ export default function ProductionMaterialEditorPage() {
     organizationId, serviceKey: getActiveServiceKey(), target: `material:${editId ?? `new:${location.key}`}`,
     initialDraft, load: editId ? () => loadMaterial(editId, organizationId) : undefined,
     toDraft: materialDraftFromRecord, persist: (draft, record) => saveMaterial(draft, record, organizationId), validate: validateNewContent,
-    onSaved: (_record, unchanged) => { if (unchanged) navigate('/store/library/contents'); },
+    onSaved: (_record, unchanged) => { if (unchanged) navigate(libraryPath); },
   });
   const { title, category: selectedType } = session.draft;
   const editorContent = { html: session.draft.html }, editorInitialHtml = session.seed.html;
@@ -134,7 +136,7 @@ export default function ProductionMaterialEditorPage() {
       <div style={{ ...styles.page, alignItems: 'center', paddingTop: '80px', gap: '12px' }}>
         <p role="alert" style={{ color: colors.neutral600, fontSize: '14px' }}>{loadError}</p>
         <button type="button" onClick={() => void session.reload()} style={styles.cancelBtn}>다시 시도</button>
-        <button onClick={() => navigate('/store/library/contents')} style={styles.cancelBtn}>
+        <button onClick={() => navigate(libraryPath)} style={styles.cancelBtn}>
           내 자료함 콘텐츠로 돌아가기
         </button>
       </div>

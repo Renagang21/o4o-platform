@@ -1,3 +1,5 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 /**
  * PharmacyBlogPage — Staff Blog Management
  *
@@ -8,7 +10,7 @@
  * 게시글 목록/작성/수정/발행/보관/삭제
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   fetchStaffBlogPosts,
   createBlogPost,
@@ -44,7 +46,7 @@ import {
   storeBlogBtnStyle,
   storeBlogSmallBtnStyle,
 } from '@o4o/store-ui-core';
-import { getActiveServiceKey } from '../../lib/serviceContext';
+import { getActiveServiceKey, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
 type ViewMode = 'list' | 'editor' | 'settings';
@@ -66,12 +68,20 @@ function formatDate(dateStr: string): string {
 }
 
 export function PharmacyBlogPage({ service }: { service?: string }) {
+  const scope = useStoreOperationScope();
+  return <BlogSession key={scope.key} service={service} isCurrent={scope.isCurrent} />;
+}
+function BlogSession({ service, isCurrent }: { service?: string; isCurrent: () => boolean }) {
+  const mutation = useRef(false);
+  const [slugError, setSlugError] = useState(false), [slugLoading, setSlugLoading] = useState(true), [slugRetry, setSlugRetry] = useState(0);
+  const [saveNotice, setSaveNotice] = useState('');
   const location = useLocation();
   // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 원본 자료(source)를 최초 create 까지 보존
   const [pendingSourceItems, setPendingSourceItems] = useState<{ kind: string; id: string; title?: string }[]>([]);
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listFailed, setListFailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<ViewMode>('list');
   const [editingPost, setEditingPost] = useState<StaffBlogPost | null>(null);
@@ -100,50 +110,41 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     heroImage: '',
     defaultTemplate: 'professional',
   });
+  const settingsReads = useLatestStoreRequest();
+  const settingsReady = useRef(false), settingsWriting = useRef(false), settingsVersion = useRef('');
+  settingsVersion.current = JSON.stringify(settingsForm);
   const [settingsMessage, setSettingsMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
-  // Resolve slug from KPA pharmacy info
+  const draftVersion = useRef('');
+  draftVersion.current = JSON.stringify([editorTitle, editorContent, editorExcerpt, editorSlug]);
+  const reads = useLatestStoreRequest(`${slug}:${statusFilter}`);
+  // Resolve the selected store's public identity; failed reads are not an unlinked store.
   useEffect(() => {
-    const fetchSlug = async () => {
-      try {
-        const resolved = await getStoreSlug();
-        if (resolved) {
-          setSlug(resolved);
-        } else {
-          // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 시 slug=null 유지 → inline 안내
-          // (navigate('/pharmacy') 사용 금지 — PharmacyPage의 hasStoreRole→/store redirect와 무한루프 발생)
-          setLoading(false);
-          return;
-        }
-      } catch {
-        // 오류 시 slug=null 유지 → inline 안내
-        setLoading(false);
-        return;
-      }
-    };
-    fetchSlug();
-  }, []);
+    let cancelled = false;
+    setSlugLoading(true); setSlugError(false);
+    getStoreSlug().then(value => {
+      if (!cancelled && isCurrent()) setSlug(value);
+    }).catch(() => {
+      if (!cancelled && isCurrent()) setSlugError(true);
+    }).finally(() => {
+      if (!cancelled && isCurrent()) setSlugLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [slugRetry, isCurrent]);
 
   const loadPosts = useCallback(async () => {
-    if (!slug) return;
+    if (!slug || !isCurrent()) return;
+    const current = reads.begin();
+    setLoading(true); setError(null); setListFailed(false);
     try {
-      setLoading(true);
-      const res = await fetchStaffBlogPosts(slug, {
-        status: statusFilter === 'all' ? undefined : statusFilter,
-        limit: 50,
-      }, service);
-      setPosts(res.data);
-      setError(null);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug, statusFilter]);
-
-  useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
+      const res = await fetchStaffBlogPosts(slug, { status: statusFilter === 'all' ? undefined : statusFilter, limit: 50 }, service);
+      if (!Array.isArray(res.data)) throw new Error('게시글 목록을 확인하지 못했습니다.');
+      if (current() && isCurrent()) setPosts(res.data);
+    } catch (e) {
+      if (current() && isCurrent()) { setListFailed(true); setError(e instanceof Error ? e.message : '게시글을 불러오지 못했습니다.'); }
+    } finally { if (current() && isCurrent()) setLoading(false); }
+  }, [slug, statusFilter, service, reads, isCurrent]);
+  useEffect(() => { void loadPosts(); return reads.cancel; }, [loadPosts, reads]);
 
   // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
   //   "내 자료함 → 제작 시작 → 블로그" 진입 시 source 항목 기반 신규 에디터 자동 오픈.
@@ -198,6 +199,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openEditor = (post?: StaffBlogPost) => {
+    if (mutation.current || !isCurrent()) return;
+    setError(null); setSaveNotice('');
     // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 직접 진입(목록→글쓰기)은 템플릿 없이 시작
     setSelectedTemplate(null);
     if (post) {
@@ -217,64 +220,34 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   };
 
   const handleSave = async () => {
-    if (!slug || !editorTitle.trim() || !editorContent.trim()) return;
-    setSaving(true);
+    if (!slug || !editorTitle.trim() || !editorContent.trim() || mutation.current || !isCurrent()) return;
+    mutation.current = true; setSaving(true); setError(null); setSaveNotice('');
+    const submitted = draftVersion.current;
     try {
-      if (editingPost) {
-        await updateBlogPost(slug, editingPost.id, {
-          title: editorTitle,
-          content: editorContent,
-          excerpt: editorExcerpt || undefined,
-          slug: editorSlug !== editingPost.slug ? editorSlug : undefined,
-        }, service);
-      } else {
-        await createBlogPost(slug, {
-          title: editorTitle,
-          content: editorContent,
-          excerpt: editorExcerpt || undefined,
-          slug: editorSlug || undefined,
-          // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 최초 create 시에만 원본 관계 전달
-          sourceItems: pendingSourceItems.length > 0 ? pendingSourceItems : undefined,
-        }, service);
-        setPendingSourceItems([]);
-      }
-      setMode('list');
-      await loadPosts();
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
+      const saved = editingPost
+        ? await updateBlogPost(slug, editingPost.id, { title: editorTitle, content: editorContent, excerpt: editorExcerpt || undefined, slug: editorSlug !== editingPost.slug ? editorSlug : undefined }, service)
+        : await createBlogPost(slug, { title: editorTitle, content: editorContent, excerpt: editorExcerpt || undefined, slug: editorSlug || undefined, sourceItems: pendingSourceItems.length ? pendingSourceItems : undefined }, service);
+      if (!isCurrent()) return;
+      if (!saved?.id) throw new Error('저장 결과를 확인하지 못했습니다.');
+      setEditingPost(saved); setPendingSourceItems([]);
+      if (submitted !== draftVersion.current) { setSaveNotice('제출한 글은 저장되었습니다. 이후 수정한 내용은 아직 저장되지 않았습니다.'); return; }
+      setMode('list'); await loadPosts();
+    } catch (e) {
+      if (isCurrent()) setError(e instanceof Error ? e.message : '저장하지 못했습니다. 작성 내용을 유지했습니다.');
+    } finally { mutation.current = false; if (isCurrent()) setSaving(false); }
   };
 
-  const handlePublish = async (postId: string) => {
-    if (!slug) return;
-    try {
-      await publishBlogPost(slug, postId, service);
-      await loadPosts();
-    } catch (e: any) {
-      setError(e.message);
-    }
+  const runPostAction = async (task: () => Promise<unknown>) => {
+    if (mutation.current || !isCurrent()) return;
+    mutation.current = true;
+    try { await task(); if (isCurrent()) await loadPosts(); }
+    catch (e) { if (isCurrent()) setError(e instanceof Error ? e.message : '게시글 상태를 변경하지 못했습니다.'); }
+    finally { mutation.current = false; }
   };
-
-  const handleArchive = async (postId: string) => {
-    if (!slug) return;
-    try {
-      await archiveBlogPost(slug, postId, service);
-      await loadPosts();
-    } catch (e: any) {
-      setError(e.message);
-    }
-  };
-
-  const handleDelete = async (postId: string) => {
-    if (!slug || !confirm('이 게시글을 삭제하시겠습니까?')) return;
-    try {
-      await deleteBlogPost(slug, postId, service);
-      await loadPosts();
-    } catch (e: any) {
-      setError(e.message);
-    }
+  const handlePublish = (id: string) => { if (slug) void runPostAction(() => publishBlogPost(slug, id, service)); };
+  const handleArchive = (id: string) => { if (slug) void runPostAction(() => archiveBlogPost(slug, id, service)); };
+  const handleDelete = (id: string) => {
+    if (slug && !mutation.current && isCurrent() && confirm('이 게시글을 삭제하시겠습니까?')) void runPostAction(() => deleteBlogPost(slug, id, service));
   };
 
   // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: Bulk action — fan-out 패턴
@@ -302,13 +275,13 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   };
 
   const runBulk = async (ids: string[], op: BulkOp, confirmMsg?: string) => {
-    if (ids.length === 0) return;
+    if (ids.length === 0 || mutation.current || !isCurrent()) return;
     if (confirmMsg && !window.confirm(confirmMsg)) return;
-    const result = await batch.executeBatch(batchBlogOp, ids, { op });
-    if (result.successCount > 0) {
-      setSelectedKeys([]);
-      await loadPosts();
-    }
+    mutation.current = true;
+    try {
+      const result = await batch.executeBatch(batchBlogOp, ids, { op });
+      if (isCurrent() && result.successCount > 0) { setSelectedKeys([]); await loadPosts(); }
+    } finally { mutation.current = false; }
   };
 
   // status별 가능한 selection 분류 (서버 거절 사전 차단)
@@ -324,7 +297,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   // WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기
   const buildPublicUrl = (postSlug: string): string | null => {
     if (!slug || typeof window === 'undefined') return null;
-    return `${window.location.origin}/store/${slug}/blog/${postSlug}`;
+    return `${getActiveServicePublicOrigin()}/store/${slug}/blog/${postSlug}`;
   };
 
   const handleCopyUrl = async (postSlug: string) => {
@@ -357,12 +330,16 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
 
   // WO-O4O-KPA-STORE-BLOG-META-V1: settings 화면 진입 핸들러
   const openSettings = useCallback(async () => {
-    if (!slug) return;
+    if (!slug || !isCurrent()) return;
+    const current = settingsReads.begin();
+    settingsReady.current = false;
     setSettingsMessage(null);
     setSettingsLoading(true);
     setMode('settings');
     try {
       const data = await fetchBlogSettings(slug, service);
+      if (!current() || !isCurrent()) return;
+      settingsReady.current = true;
       setSettings(data);
       setSettingsForm({
         blogName: data?.blogName ?? '',
@@ -371,14 +348,16 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         defaultTemplate: data?.defaultTemplate ?? 'professional',
       });
     } catch (e: any) {
-      setSettingsMessage({ kind: 'error', text: e?.message || '설정을 불러오지 못했습니다.' });
+      if (current() && isCurrent()) setSettingsMessage({ kind: 'error', text: e?.message || '설정을 불러오지 못했습니다.' });
     } finally {
-      setSettingsLoading(false);
+      if (current() && isCurrent()) setSettingsLoading(false);
     }
-  }, [slug, service]);
+  }, [slug, service, isCurrent, settingsReads]);
 
   const handleSaveSettings = async () => {
-    if (!slug) return;
+    if (!slug || !isCurrent() || !settingsReady.current || settingsWriting.current) return;
+    settingsWriting.current = true;
+    const submitted = settingsVersion.current;
     setSettingsSaving(true);
     setSettingsMessage(null);
     try {
@@ -388,18 +367,20 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         heroImage: settingsForm.heroImage.trim() || null,
         defaultTemplate: settingsForm.defaultTemplate || 'professional',
       }, service);
+      if (!isCurrent()) return;
       setSettings(saved);
-      setSettingsForm({
+      if (submitted === settingsVersion.current) setSettingsForm({
         blogName: saved.blogName ?? '',
         description: saved.description ?? '',
         heroImage: saved.heroImage ?? '',
         defaultTemplate: saved.defaultTemplate ?? 'professional',
       });
-      setSettingsMessage({ kind: 'success', text: '설정이 저장되었습니다.' });
+      setSettingsMessage({ kind: 'success', text: submitted === settingsVersion.current ? '설정이 저장되었습니다.' : '제출한 설정은 저장되었습니다. 이후 수정한 설정은 아직 저장되지 않았습니다.' });
     } catch (e: any) {
-      setSettingsMessage({ kind: 'error', text: e?.message || '저장에 실패했습니다.' });
+      if (isCurrent()) setSettingsMessage({ kind: 'error', text: e?.message || '저장에 실패했습니다.' });
     } finally {
-      setSettingsSaving(false);
+      settingsWriting.current = false;
+      if (isCurrent()) setSettingsSaving(false);
     }
   };
 
@@ -415,6 +396,9 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   };
 
   // WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: AI 초안 생성 결과 주입(handleAiInsert) 제거.
+
+  if (slugLoading) return <p role="status" className="p-6 text-sm text-slate-600">매장 연결 정보를 불러오는 중…</p>;
+  if (slugError) return <div role="alert" className="p-6 text-sm text-red-700">매장 연결 정보를 불러오지 못했습니다. <button className="min-h-11 underline" onClick={() => setSlugRetry(value => value + 1)}>매장 연결 다시 시도</button></div>;
 
   // Editor view
   // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
@@ -433,7 +417,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         saving={saving}
         canSave={!!editorTitle.trim() && !!editorContent.trim()}
         onSave={handleSave}
-        onCancel={() => setMode('list')}
+        onCancel={() => { if (!mutation.current) setMode('list'); }}
         /* WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 제작 흐름 진입 시 선택된 템플릿 배지 */
         headerBadge={selectedTemplate ? (
           <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -448,6 +432,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
            WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: 편집기 내부 AI(aiRequestHeaders)도 은퇴 — 외부 LLM 경로만 남는다. */
         beforeEditor={(
           <div>
+            {error && <p role="alert" className="mb-3 text-sm text-red-700">{error} 작성 내용은 유지됩니다. 다시 저장해 주세요.</p>}
+            {saveNotice && <p role="status" className="mb-3 text-sm text-teal-800">{saveNotice}</p>}
             {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16: 외부 LLM 블로그 본문 작업 — Prompt 는 store-ui-core(task='blog').
                 자료함에서 넘어온 원본(pendingSourceItems) 제목이 있으면 Source Context 로만 첨부한다. */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
@@ -493,6 +479,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   //   settings 화면 본체를 공통 StoreBlogSettingsPanel 로 이관(KCos 와 동일 Core).
   //   KPA 고유 요소(대표 이미지 업로드 버튼)는 slot 으로 그대로 보존한다.
   if (mode === 'settings') {
+    if (!settingsLoading && !settingsReady.current) return <div role="alert" className="p-6 text-sm text-red-700">{settingsMessage?.text || '블로그 설정을 확인하지 못했습니다.'}<button className="block min-h-11 underline" onClick={() => void openSettings()}>블로그 설정 다시 시도</button><button className="min-h-11 underline" onClick={() => setMode('list')}>목록으로</button></div>;
     return (
       <StoreBlogSettingsPanel
         form={settingsForm}
@@ -509,7 +496,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           heroImageHint: '공개 블로그 목록 페이지 상단에 column masthead 로 표시됩니다.',
         }}
         onSave={handleSaveSettings}
-        onBack={() => setMode('list')}
+        onBack={() => { if (!settingsWriting.current) { settingsReads.cancel(); setMode('list'); } }}
         heroUploadSlot={(
           <label style={{ ...storeBlogBtnStyle, backgroundColor: '#f1f5f9', color: '#475569', cursor: 'pointer', whiteSpace: 'nowrap' }}>
             업로드
@@ -533,8 +520,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   if (!slug) {
     return (
       <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '80px 0' }}>
-        <p style={{ fontSize: '16px', fontWeight: 600, color: '#374151' }}>약국 매장이 아직 연결되지 않았습니다</p>
-        <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>약국 경영지원 서비스 신청 후 매장이 활성화됩니다.</p>
+        <p style={{ fontSize: '16px', fontWeight: 600, color: '#374151' }}>선택한 매장의 공개 주소가 아직 없습니다</p>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>매장 정보에서 공개 주소 설정을 확인해 주세요.</p>
       </div>
     );
   }
@@ -591,15 +578,16 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       </div>
 
       {error && (
-        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
+        <div role="alert" style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
           {error}
+          <button type="button" onClick={() => void loadPosts()} className="ml-3 min-h-11 underline">게시글 다시 시도</button>
         </div>
       )}
 
       {/* WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: ActionBar bulk action */}
       <div style={{ marginBottom: '12px' }}>
         <ActionBar
-          selectedCount={selectedKeys.length}
+          selectedCount={listFailed ? 0 : selectedKeys.length}
           onClearSelection={() => setSelectedKeys([])}
           actions={[
             {
@@ -645,7 +633,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       />
 
       {/* WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 카드형 → @o4o/ui DataTable */}
-      <DataTable<StaffBlogPost>
+      {!listFailed && <DataTable<StaffBlogPost>
         rowSelection={{
           selectedRowKeys: selectedKeys,
           onChange: setSelectedKeys,
@@ -749,7 +737,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         emptyText={
           posts.length === 0 ? '게시글이 없습니다.' : '검색 결과가 없습니다.'
         }
-      />
+      />}
     </div>
   );
 }
