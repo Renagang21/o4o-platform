@@ -1,5 +1,6 @@
 /** Explicit local-only integration. Uses its own ephemeral PostgreSQL 15 container/database. */
 import { randomUUID } from "node:crypto";
+import { cmsMutationRows, ORDINARY_CMS_CONTENT_SQL } from "../../cms-content/cms-reserved-presentation.js";
 import { DataSource } from "typeorm";
 import { initialHomePresentation } from "@o4o/types";
 import {
@@ -50,6 +51,21 @@ run("home presentation PostgreSQL persistence", () => {
       if (created) await ds.query(`DROP SCHEMA "${schema}" CASCADE`);
       await ds.destroy();
     }
+  });
+  it("keeps reserved draft/published state out of ordinary CMS list, publish and delete", async () => {
+    const neture: PresentationScope = { surface: 'neture', organizationId: null };
+    await service.save(neture, initialHomePresentation('neture'), 0, false, actor);
+    const [reserved] = await ds.query('SELECT id FROM cms_contents');
+    const ordinaryId = randomUUID();
+    await ds.query(`INSERT INTO cms_contents(id, "serviceKey", type, title) VALUES ($1, 'neture', 'hero', 'Ordinary')`, [ordinaryId]);
+    const where = `"serviceKey" = 'neture' AND ${ORDINARY_CMS_CONTENT_SQL}`;
+    expect(await ds.query(`SELECT id FROM cms_contents WHERE ${where}`)).toEqual([{ id: ordinaryId }]);
+    expect(cmsMutationRows(await ds.query(`UPDATE cms_contents SET status='published' WHERE id=$1 AND ${where} RETURNING id`, [reserved.id]))).toEqual([]);
+    expect(cmsMutationRows(await ds.query(`DELETE FROM cms_contents WHERE id=$1 AND ${where} RETURNING id`, [reserved.id]))).toEqual([]);
+    expect((await service.read(neture)).revision).toBe(1);
+    expect(await service.publicRead(neture)).toBeNull();
+    expect(cmsMutationRows(await ds.query(`UPDATE cms_contents SET status='published' WHERE id=$1 AND ${where} RETURNING id`, [ordinaryId]))).toEqual([{ id: ordinaryId }]);
+    expect(cmsMutationRows(await ds.query(`DELETE FROM cms_contents WHERE id=$1 AND ${where} RETURNING id`, [ordinaryId]))).toEqual([{ id: ordinaryId }]);
   });
   it("starts without any persisted or published configuration", async () => {
     expect(await service.read(scope)).toEqual({

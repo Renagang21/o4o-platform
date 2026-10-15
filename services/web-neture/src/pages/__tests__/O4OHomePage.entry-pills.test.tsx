@@ -163,3 +163,11 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
   expect(screen.queryByTestId("home-google-start")).toBeNull();
   expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
 });
+
+
+it('keeps the anonymous AI composer before the added service Hero', () => {
+  mount();
+  const hero = document.querySelector('main .home-presentation');
+  expect(hero).toBeTruthy();
+  expect(before(screen.getByTestId('home-composer'), hero!)).toBe(true);
+});

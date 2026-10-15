@@ -79,3 +79,16 @@ base: 7c53af8ca3
 main integration: 미수행 / deployment: 미수행 / production smoke: 미수행
 other session usage: 없음 / verdict: KEEP (PR 후속 검토·수정용)
 ```
+
+
+## 통합 리뷰 후속 (2026-10-16 KST)
+
+최신 main df5f28a와 #631 전체 이력을 통합한 전용 branch에서 P1 두 건을 보완했다. home-presentation metadata section은 revision-checked 전용 API가 소유한다. 옛 Neture 홈페이지 목록·수정·상태·삭제 SQL은 reserved row를 제외하고, 예약 section의 신규/변경 입력을 거절한다. 일반 CMS 목록·집계·상세에서도 제외하며 일반 생성·수정·상태 변경과 중앙 transition 서비스로 우회하지 못한다. Frozen Core·schema는 바꾸지 않았다. 실제 PG 검사에서 확인한 TypeORM UPDATE/DELETE의 [rows,affected] 결과도 정규화해 미변경을 정확한 404로 반환한다.
+
+대표 홈의 비로그인 Hero를 AI 입력 다음에 배치해 canonical AI 우선 순서를 유지했다. 기존 권한·가입·업무 실행 조건은 바꾸지 않았다.
+
+- CMS 관련5 suite143 PASS, 홈 표현 route 포함 focused3 suite84 PASS(서로 중복 포함하므로 합산하지 않음). API 타입·production build PASS.
+- 격리 PostgreSQL15 실제 저장11 PASS: reserved row의 목록 제외·publish/delete 무변경, ordinary row의 기존 publish/delete 유지, draft/public revision 유지. 테스트 schema0 확인, 컨테이너 제거 완료.
+- Neture 전체1020 PASS(실제 Hero 앞에 AI composer가 오는 회귀 포함), shared-space-ui 전체118 PASS, Neture production build PASS.
+- 실제 대표 홈·빌드 CSS와 합성 인증/공개 응답으로 Chromium PC1440x900/mobile390x844/짧은390x480의3 viewport에서 AI 입력이 첫 viewport에 보이고 Hero보다 앞에 있는지 확인했다. pageerror0·외부 write0·문서 가로 overflow0. 소식은 합성 빈 응답에 대한 실패 안내이며 실제 소식 API 성공 검증이 아니다. screenshot3장·측정 JSON은 /tmp에 보관했다. 임시 서버·symlink 정리 완료.
+- 원개발의 다른 소비 앱 build·30 browser 기록은 앞 절에 보존하며 이번에 전체 재실행한 것으로 보고하지 않는다. 실제 계정·운영 DB write·메일·배포는 미실행이다. 최종 CI·Sonar·Codex·최신 main 정렬은 후속 판정이다.

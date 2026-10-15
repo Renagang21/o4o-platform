@@ -48,6 +48,7 @@ import { createCmsContentMutationRoutes } from '../routes/cms-content/cms-conten
 
 /** 프로덕션 분포를 축약한 픽스처 (canonical + legacy alias row 동거) */
 const BASE_ROWS = [
+  { id: 'reserved-home', serviceKey: 'neture', type: 'hero', title: 'Reserved', metadata: { section: 'home-presentation', presentation: { draft: {}, published: null } } },
   { id: 'kpa-canon', serviceKey: 'kpa-society', type: 'notice', title: 'KPA' },
   { id: 'kpa-legacy', serviceKey: 'kpa', type: 'notice', title: 'KPA legacy' },
   { id: 'ph2', serviceKey: 'pharmacy-hub', type: 'notice', title: 'PH 2' },
@@ -267,5 +268,22 @@ describe('비인가 / 비인증 계약 유지', () => {
   it('존재하지 않는 content 는 404 (인가 이전 계약 유지)', async () => {
     expect((await put('nope', KPA_OP)).status).toBe(404);
     expect((await patchStatus('nope', KPA_OP)).status).toBe(404);
+  });
+});
+
+
+describe('home presentation rows belong to the revision-checked API', () => {
+  it.each(['put', 'patch'])('rejects %s for a reserved row even for platform admin', async (method) => {
+    const app = makeApp();
+    const response = method === 'put'
+      ? await request(app).put('/cms/contents/reserved-home').set('x-test-roles', 'platform:super_admin').send({ title: 'Changed' })
+      : await request(app).patch('/cms/contents/reserved-home/status').set('x-test-roles', 'platform:super_admin').send({ status: 'published' });
+    expect(response.status).toBe(404);
+    expect(saved).toBeNull();
+    expect(transitioned).toBeNull();
+  });
+  it('rejects creating reserved metadata through ordinary CMS', async () => {
+    const response = await request(makeApp()).post('/cms/contents').set('x-test-roles', 'platform:super_admin').send({ serviceKey: 'neture', type: 'hero', title: 'Forged', metadata: { section: 'home-presentation' } });
+    expect(response.status).toBe(400); expect(saved).toBeNull();
   });
 });

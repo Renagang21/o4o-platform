@@ -13,7 +13,7 @@ export interface PresentationScope {
   organizationId: string | null;
 }
 export class PresentationConflict extends Error {}
-const SECTION = "home-presentation";
+import { HOME_PRESENTATION_SECTION as SECTION } from "../cms-content/cms-reserved-presentation.js";
 
 /** Existing CMS metadata storage. Draft rows never enter the ordinary published content feeds. */
 export class HomePresentationService {
