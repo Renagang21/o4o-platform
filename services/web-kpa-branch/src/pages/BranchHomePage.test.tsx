@@ -9,10 +9,10 @@ vi.mock('../lib/api/branch', () => ({
 vi.mock('../lib/api/branchEvent', () => ({ listPublicEvents: vi.fn(async () => []) }));
 import BranchHomePage from './BranchHomePage';
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
-it('분회 진입은 소개 대신 공지·행사·자료 목록으로 시작한다', async () => {
+it('분회 이름을 안내하며 공지·행사·자료 진입을 유지한다', async () => {
  vi.stubGlobal('React', React);
  render(<MemoryRouter><BranchHomePage slug="sample" basePath="/sample" /></MemoryRouter>);
- expect(await screen.findByRole('heading', { name: '공지 · 행사' })).toBeTruthy();
+ expect(await screen.findByRole('heading', { name: '샘플 분회', level: 1 })).toBeTruthy();
  expect(screen.getByRole('heading', { name: '다가오는 행사' })).toBeTruthy();
  expect(screen.getByRole('heading', { name: '공지' })).toBeTruthy();
  expect(screen.getByRole('heading', { name: '자료실' })).toBeTruthy();

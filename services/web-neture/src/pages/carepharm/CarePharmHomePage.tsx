@@ -1,3 +1,4 @@
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, useLoginModal } from '../../contexts';
@@ -23,13 +24,10 @@ export default function CarePharmHomePage() {
   }, [user?.id, retry]);
 
   return <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
-    <section className="rounded-3xl bg-teal-950 px-6 py-12 text-white sm:px-12 sm:py-16">
-      <p className="text-sm font-semibold tracking-widest text-teal-200">CarePharm</p>
-      <h1 className="mt-5 text-3xl font-semibold leading-tight sm:text-5xl">만성질환 관리,<br />약국이 함께합니다</h1>
-      <p className="mt-6 max-w-xl text-base leading-7 text-teal-100">만성질환 관리에 함께하는 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.</p>
-      {!isAuthenticated && <button type="button" onClick={() => openLoginModal('/')}
-        className="mt-8 min-h-11 rounded-xl bg-white px-6 py-3 font-semibold text-teal-950">로그인하기</button>}
-    </section>
+    <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm"
+      title={['만성질환 관리,', '약국이 함께합니다']}
+      description={['만성질환 관리에 함께하는 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.']}
+      actions={!isAuthenticated && <button type="button" onClick={() => openLoginModal('/')} className="o4o-cta">로그인하기</button>} />
 
     <section aria-labelledby="carepharm-activities" className="mt-12">
       <h2 id="carepharm-activities" className="text-2xl font-semibold text-slate-900">함께 나누는 활동</h2>
@@ -45,6 +43,7 @@ export default function CarePharmHomePage() {
       </div>
     </section>
 
+    <ServiceHomePromotion surface="carepharm" client={api} />
     <section aria-labelledby="carepharm-entry" className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
       <h2 id="carepharm-entry" className="text-2xl font-semibold text-slate-900">모임 참여</h2>
       {loading ? <p role="status" className="mt-4 text-slate-600">모임 참여 안내를 확인하고 있습니다…</p>

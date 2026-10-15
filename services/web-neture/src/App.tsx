@@ -1,3 +1,4 @@
+import HomePresentationPage from './pages/operator/HomePresentationPage';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
@@ -1135,6 +1136,7 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
               <Route path="/operator/service-members/supplier" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/service-members/supplier/:id" element={<ServiceMembersPage serviceKey="supplier" />} />
+              <Route path="/operator/home-presentation/supplier" element={<HomePresentationPage surface="supplier" />} />
               <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
             <Route element={
@@ -1147,6 +1149,7 @@ function App() {
               <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
+              <Route path="/operator/home-presentation/funding" element={<HomePresentationPage surface="funding" />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1157,6 +1160,7 @@ function App() {
             }>
               <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
+              <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
               <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
             </Route>
             <Route element={
@@ -1209,6 +1213,7 @@ function App() {
               <Route path="/operator/ai-operations" element={<Navigate to="/admin/ai-operations" replace />} />
               {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
+              <Route path="/operator/home-presentation/neture" element={<HomePresentationPage surface="neture" />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />

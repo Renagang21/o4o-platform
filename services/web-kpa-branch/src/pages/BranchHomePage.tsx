@@ -1,3 +1,5 @@
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { authClient } from '../lib/apiClient';
 /** Branch entry displays current notices, events and resources without a separate introduction page. */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -60,7 +62,7 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
 
   return (
     <div className="space-y-10">
-      <h1 className="text-2xl font-bold text-gray-900">공지 · 행사</h1>
+      <ServiceHomeHero surface="branch" branchSlug={slug} client={authClient.api} eyebrow={state.site.branchName} title={[state.site.title]} description={[state.site.tagline || '우리 분회의 공지·행사·자료를 확인하세요.']} />
 
       <section>
         <div className="mb-2 flex items-center justify-between">
@@ -88,7 +90,7 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
         <PostPreview title="공지" to={`${basePath}/notices`} items={notices} />
         <PostPreview title="자료실" to={`${basePath}/resources`} items={resources} />
       </div>
-
+      <ServiceHomePromotion surface="branch" branchSlug={slug} client={authClient.api} />
     </div>
   );
 }
