@@ -1,6 +1,6 @@
 # CHECK-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1
 
-> 상태: COMPLETED · 작성일: 2026-10-15
+> 상태: COMPLETED · 작성일: 2026-10-15 · 최종 갱신: 2026-10-15
 > 실행 WO: [WO-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1](../work-orders/WO-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1.md)
 > 이력: 기존 #629의 코드·fixture 검증은 [선행 CHECK](CHECK-O4O-SUPPLIER-WORKSPACE-TASK-FLOW-V1.md)에 보존한다. 이 기록은 추가 review 보완·통합·배포 결과다.
 
