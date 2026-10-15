@@ -135,7 +135,8 @@ describe('Demo 계정 보호 계약', () => {
     ['controllers/admin/AdminUserController.ts', /isDemoAccount\(user\.id\)/, /applyAdminRoleEdit\(user\.id/],
     ['controllers/UserManagementController.ts', /isDemoAccount\(/, /applyAdminRoleEdit\(/],
     ['routes/admin/platform-accounts.routes.ts', /isDemoAccount\(/, /assignRole\(/],
-    ['services/admin/operator-assignment.service.ts', /assertNotDemoAccount\(/, /assignRole\(/],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.target\(m, input\.targetUserId\)/, /INSERT INTO service_operator_invitations/, 'async create('],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.target\(m, userId\)/, /roleAssignmentService\.assignRole\(/, 'async accept('],
     ['modules/auth/controllers/auth-account.controller.ts', /assertNotDemoAccount\(/, /UPDATE role_assignments/],
     ['modules/lms/controllers/InstructorController.ts', /isDemoAccount\(/, /repo\.save\(/, 'async approveApplication('],
     ['modules/neture/services/operator-registration.service.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
@@ -154,6 +155,15 @@ describe('Demo 계정 보호 계약', () => {
     ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
     ['controllers/operator/MembershipConsoleController.ts', /rejectDemoAccountTarget\(|isDemoAccount\(/, /UPDATE service_memberships/],
   ];
+
+  it('retired direct operator assignment performs no role or identity writes', () => {
+    const source = read('services/admin/operator-assignment.service.ts');
+    const assignment = source.slice(source.indexOf('async assign('));
+    expect(assignment).toContain("throw new OperatorAssignmentError('OPERATOR_INVITATION_REQUIRED')");
+    expect(assignment).not.toMatch(/assignRole\(|\.save\(|\.query\(|\.transaction\(/);
+    const target = read('services/admin/service-operator-invitation.service.ts');
+    expect(target).toContain('await demoAccountService.assertNotDemoAccount(id, m)');
+  });
 
   it('D5 이메일 · role · ownership write 경로에 판정이 write 보다 앞에 있다', () => {
     const problems: string[] = [];

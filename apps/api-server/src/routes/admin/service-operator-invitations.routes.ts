@@ -32,20 +32,17 @@ export function invitationFailure(res: Response, error: unknown): void {
     });
 }
 
-export const adminServiceOperatorInvitations = Router();
-adminServiceOperatorInvitations.use(
-  authenticate,
-  requireRole(['platform:super_admin']),
-  apiLimiter,
-);
-adminServiceOperatorInvitations.get('/', async (_req, res) => {
+const adminServiceOperatorInvitationsRouter = Router();
+export { adminServiceOperatorInvitationsRouter as adminServiceOperatorInvitations };
+adminServiceOperatorInvitationsRouter.use(authenticate, requireRole(['platform:super_admin']), apiLimiter);
+adminServiceOperatorInvitationsRouter.get('/', async (_req, res) => {
   try {
     res.json({ success: true, data: await service.list() });
   } catch (e) {
     invitationFailure(res, e);
   }
 });
-adminServiceOperatorInvitations.post('/', async (req: AuthRequest, res) => {
+adminServiceOperatorInvitationsRouter.post('/', async (req: AuthRequest, res) => {
   try {
     const { email, targetUserId, serviceKey, role } = req.body ?? {};
     if (
@@ -76,7 +73,7 @@ adminServiceOperatorInvitations.post('/', async (req: AuthRequest, res) => {
   }
 });
 for (const action of ['resend', 'cancel'] as const) {
-  adminServiceOperatorInvitations.post(
+  adminServiceOperatorInvitationsRouter.post(
     `/:id/${action}`,
     async (req: AuthRequest, res) => {
       try {

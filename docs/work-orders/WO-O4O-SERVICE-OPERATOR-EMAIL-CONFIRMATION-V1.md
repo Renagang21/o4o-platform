@@ -78,3 +78,13 @@ OPERATOR_INVITE_TEST_PORT=55432 pnpm --filter @o4o/api-server exec jest --runInB
 - 최신 main `c9b72ee2ae` 반영 후 Neture build와 수락 화면 5 tests를 다시 통과했다.
 - CI 진행 상태는 PR Checks가 기준이다. main 병합·배포·운영 메일 발송은 미실행이다.
 - WORKTREE_DISPOSITION: 기존 cloud checkout / 전용 branch / main integration 없음 / 보존 판정 KEEP (미병합 PR 검토용).
+
+
+## 통합 후속 검증 (2026-10-16 KST)
+
+통합 담당 공간에서 최신 main df5f28a 기반 별도 worktree에 #617 전체 이력을 merge했다. 이전 CI의 Jest 실패를 재현해, 은퇴한 직접 지정 API의 400/무쓰기 계약으로 기존 상태 보존 테스트를 정렬했다. 실제 쓰기 경로인 초대 생성·수락의 Demo 보호를 검증하고, 관리자 router 이름을 guard inventory가 읽을 수 있게 정리했다. 인증·role middleware와 공개 수락 API는 그대로다.
+
+- 수정 focused 5 suite 39 PASS. 영향 API 13 suite 151 PASS(별도 opt-in DB suite 제외).
+- 격리 PostgreSQL15에 canonical bootstrap과 전체 incremental manifest를 적용해 prefix schema fingerprint 일치를 확인했다. 실제 DB 통합 23 PASS: 이미 active인 membership 포함 상태 보존, 비활성 사용자 수락 거절/무쓰기. 컨테이너·fixture DB 제거 완료. 운영 DB 접속·DDL·메일 발송 없음.
+- API 타입 검사·production build PASS. 관리자 초대/role UI 12 PASS, Neture 수락 UI 5 PASS.
+- 전체 CI·Sonar·Codex는 새 통합 PR head로 판정한다. 신규 migration의 운영 적용 및 실제 계정 초대 발송은 미실행이다.

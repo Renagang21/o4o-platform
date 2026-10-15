@@ -273,7 +273,7 @@ integration(
       });
       expect(assignRole).not.toHaveBeenCalled();
     });
-    it.each(['pending', 'suspended', 'rejected', 'withdrawn'])(
+    it.each(['pending', 'suspended', 'rejected', 'withdrawn', 'active'])(
       'preserves %s membership on acceptance',
       async (status) => {
         await query(
@@ -380,6 +380,9 @@ integration(
       await expect(service.accept(token(), target)).rejects.toMatchObject({
         code: 'ACCOUNT_INACTIVE',
       });
+      expect((await query('SELECT "isActive" FROM users WHERE id=$1', [target]))[0]).toEqual({ isActive: false });
+      expect(await query('SELECT id FROM role_assignments WHERE user_id=$1', [target])).toHaveLength(0);
+      expect(await query('SELECT id FROM service_memberships WHERE user_id=$1', [target])).toHaveLength(0);
     });
     it('serializes simultaneous acceptances and never regrants a subsequently revoked role', async () => {
       await create();
