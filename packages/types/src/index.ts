@@ -119,3 +119,4 @@ export * from './ai-provider-guardrail.js';
 // 의 공통 사업자 등록 정보 type. 계좌 정보 제외 / 세금계산서 정보 별도.
 // 선행: IR-O4O-BUSINESS-REGISTRATION-FIELDS-CROSSSERVICE-AUDIT-V1
 export * from './business-registration.js';
+export * from "./home-presentation.js";

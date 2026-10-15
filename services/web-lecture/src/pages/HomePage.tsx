@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { O4OPublicHero } from '@o4o/auth-react';
+import { ServiceHomeHero as O4OPublicHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { authClient } from '../lib/apiClient';
 import { BRAND, STUDY_HERO } from '../config/service';
 import { useAuth } from '../contexts/AuthContext';
 // WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 공통 O4OPublicHero · 확정 문구.
@@ -7,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
   return <main>
-    <O4OPublicHero
+    <O4OPublicHero surface="lecture" client={authClient.api}
       eyebrow={BRAND.name}
       title={STUDY_HERO.title}
       description={STUDY_HERO.description}
@@ -19,5 +20,6 @@ export default function HomePage() {
     >
       <p className="muted">공개 강의는 누구나 볼 수 있고, 수강·진행·수료증은 {BRAND.name} 회원에게 열립니다.</p>
     </O4OPublicHero>
+    <ServiceHomePromotion surface="lecture" client={authClient.api} />
   </main>;
 }

@@ -1,3 +1,4 @@
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
@@ -20,6 +21,7 @@ export default function CommunityHostHomePage() {
   }, [user?.id, retry]);
   return <div className="mx-auto max-w-6xl px-4 py-8">
     <h1 className="text-2xl font-semibold">커뮤니티 · 단체활동</h1>
+    <div className="mt-6"><ServiceHomeHero surface="community" client={api} heading="h2" /></div>
     {loading && <output aria-live="polite" className="mt-6">커뮤니티 목록을 확인하고 있습니다…</output>}
     {error && <div className="mt-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)} className="mt-3 text-blue-700">다시 시도</button></div>}
     <ul className="mt-6 divide-y border-y">
@@ -31,6 +33,7 @@ export default function CommunityHostHomePage() {
       </li>)}
     </ul>
     {!loading && !error && !rows.some(c => c.kind === 'independent') && <p className="mt-4">등록된 커뮤니티가 없습니다.</p>}
+    <ServiceHomePromotion surface="community" client={api} />
     <Link to="/mypage/communities" className="mt-6 inline-block text-sm text-blue-700">커뮤니티 개설 신청 · 운영</Link>
   </div>;
 }

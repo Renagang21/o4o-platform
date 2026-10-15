@@ -149,6 +149,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   { path: '/operator/legal/supplier', key: 'supplier', level: 'admin' },
   { path: '/operator/legal/community', key: 'community', level: 'admin' },
   { path: '/operator/legal/funding', key: 'funding', level: 'admin' },
+  { path: '/operator/home-presentation/supplier', key: 'supplier', level: 'operator' },
+  { path: '/operator/home-presentation/funding', key: 'funding', level: 'operator' },
+  { path: '/operator/home-presentation/community', key: 'community', level: 'operator' },
 ]);
 
 const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>

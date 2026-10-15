@@ -36,7 +36,8 @@ vi.mock('../../components/home/HomeServiceNews', () => ({
   default: (p: { hideWhenEmpty?: boolean }) => <div data-testid="news" data-hide-when-empty={String(!!p.hideWhenEmpty)} />,
 }));
 vi.mock('../../components/home/HomeEntryPanel', () => ({ default: () => <div data-testid="entry-panel" /> }));
-vi.mock('@o4o/shared-space-ui', () => ({ PublicLegalFooterInfo: () => null }));
+vi.mock('@o4o/shared-space-ui', async (importOriginal) => ({ ...await importOriginal<typeof import('@o4o/shared-space-ui')>(), PublicLegalFooterInfo: () => null }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: async () => ({ data: { success: true, data: null } }) } }));
 vi.mock('../../lib/footerLegal', () => ({ loadFooterLegal: vi.fn() }));
 
 import O4OHomePage from '../O4OHomePage';
@@ -161,4 +162,12 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
   expect(screen.queryByTestId("home-composer")).toBeNull();
   expect(screen.queryByTestId("home-google-start")).toBeNull();
   expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
+});
+
+
+it('keeps the anonymous AI composer before the added service Hero', () => {
+  mount();
+  const hero = document.querySelector('main .home-presentation');
+  expect(hero).toBeTruthy();
+  expect(before(screen.getByTestId('home-composer'), hero!)).toBe(true);
 });
