@@ -97,7 +97,8 @@ export default function LoginModal() {
 
   return (
     <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label="O4O 약국 로그인"
-      onClick={(event) => event.target === event.currentTarget && closeModal()}>
+    >
+      <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={closeModal} />
       <LoginCard brand="O4O 약국" tone="blue" heading="h2" title="O4O 약국 로그인" description="약국의 일상과 비즈니스를 연결하세요." onClose={closeModal}>
 
           {error && !isNotMember && (

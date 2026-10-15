@@ -1,6 +1,6 @@
 # 서비스 로그인 디자인 검증
 
-> **상태**: ACTIVE · **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-15
+> **상태**: ACTIVE · **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-16
 > **연결 WO**: [WO](../work-orders/WO-O4O-SERVICE-LOGIN-DESIGN-V1.md)
 
 ## 변경과 영향 범위
@@ -23,3 +23,22 @@
 서비스별 실제 호출 callback과 복귀 링크는 유지했다. 브라우저에서는 이메일·비밀번호 payload, 보기/숨기기, 실패 alert, 필드 공백 시 제출 차단, 계정 도움말 링크, 강의 returnPath, 관리자 수단 제한, 모달 스크롤과 카드 너비를 검사한다. CSS·스크린샷·fixture는 `/tmp/o4o-login-browser`에 두고 저장소에 추가하지 않는다. 기존 Browserslist·큰 chunk 경고는 비차단이며 dependency/lockfile은 변경하지 않았다.
 
 문서 정합: WO·CHECK만 추가했다. 현행 정본은 변경하지 않았다. 병합·배포·운영 확인은 통합 담당에게 인계한다.
+
+
+## 통합 후속 (2026-10-16 KST)
+
+통합 전용 branch에서 최신 main df5f28a와 #621 전체 이력을 결합했다. Sonar가 지적한 두 모달의 mouse-only backdrop을 native button으로 교체했다. 외곽 dialog의 클릭 listener를 없애고 배경 버튼과 카드의 쌓임 순서를 분리했다. 인증 callback·role·route·복귀·메일·OAuth·Demo 동작을 바꾸지 않았다.
+
+| 소비처 | 영향 / route·role·capability | 이번 통합 검증 / 한계 |
+|---|---|---|
+| Neture main·supplier·funding·community·carepharm | 로그인 modal 배경 닫기, 기존 호스트·계정·return URL 유지 | 전체 1019 tests, production build; 실제 OAuth·운영 로그인 미실행 |
+| 약국 | 로그인 modal 배경 닫기, 기존 membership 안내·복귀 유지 | 전체 150 tests, production build; 실제 계정 미실행 |
+| 내 매장 | 원본 LoginLayout 적용, 이번 후속 overlay CSS 소비 없음 | 원개발 436 tests·build·browser 기록 유지; 이번 통합 재실행 아님 |
+| 분회 | 원본 LoginLayout 적용, 가입의 LoginMethods는 카드 범위 밖 | 원개발 39 tests·build·browser 기록 유지; 이번 통합 재실행 아님 |
+| 강의 | 원본 LoginLayout 적용, 기존 returnPath 유지 | 원개발 40 tests·build·browser 기록 유지; 이번 통합 재실행 아님 |
+| 관리자 | Google 전용 수단·세션 충돌 안내 유지, overlay CSS 소비 없음 | 원개발 386 tests·build·browser 기록 유지; 이번 통합 재실행 아님 |
+| 공통 auth-react / 가입·재설정·계정센터 | CSS는 새 카드/overlay 범위, 공통 인증 계약 불변 | auth-react 229 tests; 실제 인증은 검증하지 않음 |
+
+이번 통합 재실행 합계는 **1398 tests PASS**(auth-react229/Neture1019/약국150), 두 앱 production build PASS다. 위 원개발 2249개 전체를 이번 통합에서 재실행했다고 보고하지 않는다. CI·Sonar·Codex는 새 head에서 확인한다.
+
+추가 브라우저 검증: Chromium의 실제 Neture·약국 modal과 빌드 CSS·합성 인증으로 PC1440/mobile390×배경 클릭·배경 버튼 Enter·Escape·카드 닫기 16시나리오 PASS. pageerror0, 실제 인증 write0, 가로 overflow0, 닫힌 후 body scroll 복구 확인. 임시 서버 종료·node_modules symlink 해제 완료.

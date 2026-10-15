@@ -170,7 +170,8 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
   return (
     <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}
-      onClick={(event) => event.target === event.currentTarget && onClose()}>
+    >
+      <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
       <LoginCard brand={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm' : 'Neture'} tone="green" heading="h2" title={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
 
               {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
