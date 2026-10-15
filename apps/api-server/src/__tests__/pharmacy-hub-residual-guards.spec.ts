@@ -105,8 +105,16 @@ describe('CMS — 저장된 퇴역 serviceKey', () => {
     expect(mutation).toContain('isRetiredServiceValue(content.serviceKey)');
     expect(mutation).toContain('isRetiredServiceValue(existing.serviceKey)');
     const slot = src('routes/cms-content/cms-content-slot.handler.ts');
-    expect(slot.match(/findCmsSlotContentConflict\(/g)?.length).toBe(3);
-    expect(slot).toContain('isRetiredServiceValue(slot.serviceKey)');
+    // 공개 조회 1 + 생성 · 수정 · 일괄 교체 3
+    expect(slot.match(/findCmsSlotContentConflict\(/g)?.length).toBe(4);
+    // 수정(PUT) · 삭제(DELETE) 모두 퇴역 slot 을 410 으로 거절한다
+    expect(slot.match(/isRetiredServiceValue\(slot\.serviceKey\)/g)?.length).toBe(2);
+  });
+
+  it('공개 slot 조회는 저장된 퇴역 · 타 서비스 콘텐츠를 응답에서 뺀다', () => {
+    const slot = src('routes/cms-content/cms-content-slot.handler.ts');
+    expect(slot).toContain('findCmsSlotContentConflict(slot.content.serviceKey, slot.serviceKey) === null');
+    expect(slot).toContain(': placeableSlots;');
   });
 });
 
@@ -137,5 +145,12 @@ describe('store slug · 조직 경로', () => {
       'services/store/store-qr.service.ts',
     ]) expect(src(path)).toContain('retiredServiceOnlyOrganizationSql(');
     expect(src('utils/store-organization.resolver.ts').match(/retiredServiceOnlyOrganizationSql\(/g)?.length).toBe(2);
+  });
+
+  it('태블릿 기기 토큰 경로(페어링 조회 · claim · heartbeat · 런타임)도 퇴역 조직을 막는다', () => {
+    const device = src('routes/platform/store-tablet-device.routes.ts');
+    expect(device.match(/retiredServiceOnlyOrganizationSql\(/g)?.length).toBe(3);
+    expect(device).toMatch(/pairing_expires_at > NOW\(\)\s+AND NOT \$\{retiredServiceOnlyOrganizationSql\('d\.organization_id'\)\}/);
+    expect(device).toMatch(/ps\.is_active = TRUE\)\s+AND NOT \$\{retiredServiceOnlyOrganizationSql\('d\.organization_id'\)\}/);
   });
 });

@@ -38,6 +38,7 @@ import type { DataSource } from 'typeorm';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { getTrustedClientIp } from '../../utils/trusted-client-ip.js';
+import { retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 import {
   applyScreenSetProductList,
@@ -362,7 +363,10 @@ export function registerStoreTabletDeviceRoutes(
         res.status(400).json({ success: false, error: 'Tablet device token required', code: 'DEVICE_TOKEN_REQUIRED' }); return;
       }
       const dev: DeviceRow[] = await dataSource.query(
-        `SELECT ${deviceCols('')} FROM store_tablet_devices WHERE device_token_hash = $1 AND is_active = TRUE LIMIT 1`,
+        `SELECT ${deviceCols('')} FROM store_tablet_devices
+          WHERE device_token_hash = $1 AND is_active = TRUE
+            AND NOT ${retiredServiceOnlyOrganizationSql('store_tablet_devices.organization_id')}
+          LIMIT 1`,
         [hashDeviceToken(rawToken)],
       );
       const device = dev?.[0];
@@ -483,6 +487,7 @@ async function findPendingByCode(dataSource: DataSource, code: string) {
           ORDER BY updated_at DESC NULLS LAST LIMIT 1
        ) ps ON TRUE
       WHERE d.pairing_code = $1 AND d.device_token_hash IS NULL AND d.pairing_expires_at > NOW()
+        AND NOT ${retiredServiceOnlyOrganizationSql('d.organization_id')}
       LIMIT 1`,
     [code],
   );
@@ -569,6 +574,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
         `UPDATE store_tablet_devices d SET last_seen_at = NOW()
           WHERE d.device_token_hash = $1 AND d.is_active = TRUE
             AND EXISTS (SELECT 1 FROM platform_store_slugs ps WHERE ps.store_id = d.organization_id AND ps.slug = $2 AND ps.is_active = TRUE)
+            AND NOT ${retiredServiceOnlyOrganizationSql('d.organization_id')}
           RETURNING ${deviceCols('d.')}`,
         [hashDeviceToken(rawToken), req.params.slug],
       );

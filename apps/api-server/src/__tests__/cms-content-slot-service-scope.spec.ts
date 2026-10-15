@@ -48,10 +48,28 @@ const SLOTS = [
   {
     id: 's-2',
     slotKey: 'home-hero',
+    serviceKey: 'neture',
+    isActive: true,
+    sortOrder: 0,
+    content: { id: 'c-2', title: 'Neture hero', status: 'published' },
+  },
+  {
+    // 퇴역 서비스(PharmacyHub)에 저장된 slot — 공개 응답에 실리지 않아야 한다
+    id: 's-3',
+    slotKey: 'home-hero',
     serviceKey: 'pharmacy-hub',
     isActive: true,
     sortOrder: 0,
-    content: { id: 'c-2', title: 'PH hero', status: 'published' },
+    content: { id: 'c-3', title: 'PH hero', status: 'published' },
+  },
+  {
+    // KPA slot 에 저장된 퇴역 서비스 콘텐츠 — 공개 응답에 실리지 않아야 한다
+    id: 's-4',
+    slotKey: 'home-hero',
+    serviceKey: 'kpa-society',
+    isActive: true,
+    sortOrder: 1,
+    content: { id: 'c-4', title: 'PH content', status: 'published', serviceKey: 'pharmacy-hub' },
   },
 ];
 
@@ -87,8 +105,8 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     expect(lastWhere).toBeNull();
   });
 
-  it('serviceKey=pharmacy-hub 는 타 서비스 slot 을 반환하지 않는다', async () => {
-    const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=pharmacy-hub');
+  it('serviceKey=neture 는 타 서비스 slot 을 반환하지 않는다', async () => {
+    const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=neture');
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(1);
     expect(res.body.data[0].content.id).toBe('c-2');
@@ -99,7 +117,15 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=kpa');
     expect(res.status).toBe(200);
     expect(res.body.meta.serviceKeys).toEqual(['kpa-society', 'kpa']);
-    expect(res.body.data[0].content.id).toBe('c-1');
+    expect(res.body.data.map((d: any) => d.content.id)).toEqual(['c-1']);
+  });
+
+  it('저장된 퇴역 서비스 slot · 콘텐츠는 cross-service 조회에서도 빠진다', async () => {
+    const res = await request(makeApp())
+      .get('/cms/slots/home-hero?activeOnly=false')
+      .set('x-test-admin', '1');
+    expect(res.status).toBe(200);
+    expect(res.body.data.map((d: any) => d.content.id)).toEqual(['c-1', 'c-2']);
   });
 
   it('platform:super_admin 은 serviceKey 없이 cross-service 조회 가능', async () => {

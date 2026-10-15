@@ -244,15 +244,20 @@ export function createCmsContentSlotRoutes(deps: {
         order: { sortOrder: 'ASC' },
       });
 
+      // 저장된 퇴역 · 타 서비스 콘텐츠는 공개 응답에 싣지 않는다 (배치 시점 판정과 같은 기준)
+      const placeableSlots = slots.filter(
+        slot => !slot.content || findCmsSlotContentConflict(slot.content.serviceKey, slot.serviceKey) === null,
+      );
+
       // Filter by time window if active
       const filteredSlots = activeOnly === 'true'
-        ? slots.filter(slot => {
+        ? placeableSlots.filter(slot => {
             const startsOk = !slot.startsAt || slot.startsAt <= now;
             const endsOk = !slot.endsAt || slot.endsAt >= now;
             const contentPublished = slot.content?.status === 'published';
             return startsOk && endsOk && contentPublished;
           })
-        : slots;
+        : placeableSlots;
 
       res.json({
         success: true,
@@ -703,6 +708,11 @@ export function createCmsContentSlotRoutes(deps: {
           success: false,
           error: { code: 'SERVICE_SCOPE_DENIED', message: `Not authorized to manage slots for service: ${slot.serviceKey}` },
         });
+        return;
+      }
+
+      if (isRetiredServiceValue(slot.serviceKey)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }
 
