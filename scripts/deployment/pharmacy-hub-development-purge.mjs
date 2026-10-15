@@ -138,15 +138,15 @@ async function references(q,fks,tables) {
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
     const owned=c.schema==='public'?deletedScope(c.table,'s'):undefined;
-    // Discover IDs once and evaluate the source text once per row, rather than
-    // repeating seven scoped queries / JSON serialization for every target ID.
-    // Escape LIKE metacharacters so matching remains literal substring search.
+    // Discover IDs once and search the source text with one compiled expression.
+    // LIKE ANY still rescans large JSON for every ID. Escape every punctuation
+    // character so the alternation preserves literal substring semantics.
     if(await count(q,`WITH target_patterns AS MATERIALIZED (
-        SELECT array_agg('%'||replace(replace(replace(id,chr(92),chr(92)||chr(92)),
-          '%',chr(92)||'%'),'_',chr(92)||'_')||'%') AS patterns FROM (${targetIds}) ids)
+        SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
+        FROM (${targetIds}) ids)
       SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s CROSS JOIN target_patterns targets
       WHERE NOT COALESCE((${owned??'FALSE'}),FALSE)
-      AND (s.${id(c.column)}::text COLLATE "C") LIKE ANY(targets.patterns)`))
+      AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern`))
       throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
   }
 }
