@@ -131,3 +131,8 @@ Artifacts는 checkout 밖 `/workspace/.o4o-non-ai-browser`에 보존했다.
 ### 통합 CI 후속 — 장바구니 첫 입력 회귀
 
 다른 소비처 CI에서 드러난 공통 baseline 장바구니 입력 경쟁을 같은 통합 공간에서 수정한 commit 2ef246c99를 이 branch에 cherry-pick했다. 초기 동기화를 layout effect로 완료하고 이벤트 값을 updater 밖에서 복사한다. 신규 회귀는 수정 전 첫 입력 유실을 재현했다. 이 후속은 앞 절의 원본 runtime tree 동일성 확인 이후 추가한 변경이다. 현재 Store 전체 **570 PASS**, production build PASS. 기존 API 계약 142 PASS는 이전 절 기록과 같으며 실제 주문·결제를 실행하지 않았다.
+
+
+### 통합 리뷰 후속 — 제공 자료 CTA의 실제 route ranking
+
+#640 리뷰는 서비스 문맥에서 `/store/library/content`가 UnifiedStoreLayout을 거쳐 잘못된 `/work/...`로 rewrite된다고 지적했다. 실제 App의 route element tree를 `createRoutesFromElements`와 `matchRoutes`로 평가한 회귀3개에서 content·multilingual-product-contents·그 하위 my 모두 sibling `/store/library` branch가 선택되고 `/store` branch는 선택되지 않았다. 따라서 해당 이동에서는 UnifiedStoreLayout 자체가 실행되지 않으며, 서비스 scope를 지우거나 불필요한 mount를 추가하지 않는다. 이 검증은 축약 fixture router가 아니라 실제 App 선언을 사용한다. 신규3개 PASS, 기존 Store570개는 앞 절 결과다. 실제 브라우저 전체120개를 다시 실행한 결과는 아니다.
