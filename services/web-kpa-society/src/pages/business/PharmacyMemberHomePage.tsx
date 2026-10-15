@@ -5,6 +5,7 @@ import type { ForumPostResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import BusinessStoreShortcut from './BusinessStoreShortcut';
+import BusinessProductsPreview from './BusinessProductsPreview';
 import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 import { businessApi, businessError, businessPath, communityApiBase, pharmacyApiBase, type BusinessContent } from './api';
 
@@ -16,7 +17,7 @@ const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
   const { user } = useAuth();
-  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage, business.key);
+  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage, business.key, '상품·자료를 이용할 약국');
   const scope = `${user?.id}:${materialStore.organizationId}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [noticesState, setNoticesState] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
@@ -86,6 +87,8 @@ export default function PharmacyMemberHomePage() {
             {!!recentNotices.length && <div className={pinnedNotices.length ? 'mt-4 border-t border-blue-100 pt-4' : ''}><h3 className="text-sm font-semibold text-blue-900">최근 공지</h3><PostRows posts={recentNotices} base={forumPath} notice /></div>}
           </DataState>}
       </section>
+      {materialStore.selection}
+      <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
         <section aria-labelledby="conversations-title" className="rounded-xl border bg-white p-5 sm:p-6">
           <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원들의 이야기" to={forumPath} linkLabel="전체 게시글" />
@@ -97,7 +100,6 @@ export default function PharmacyMemberHomePage() {
         </section>
         <section aria-labelledby="materials-title" className="rounded-xl border bg-white p-5 sm:p-6">
           <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="사업 자료" to={materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '')} linkLabel="전체 자료" />
-          {materialStore.selection}
           {access.canManage ? <div className="py-3 text-sm leading-6 text-slate-600"><p>자료 등록과 게시 상태는 사업 운영 화면에서 확인합니다.</p><Link to="/operator/semi-franchises" className="mt-3 inline-block text-blue-700">사업 자료 관리 →</Link></div> :
             materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="등록된 사업 자료가 없습니다.">
               <ul className="divide-y">{currentMaterials.data.map(item => <li key={item.id} className="py-4">

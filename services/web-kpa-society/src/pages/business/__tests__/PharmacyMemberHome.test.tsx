@@ -31,6 +31,7 @@ beforeEach(() => {
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
     if (path.endsWith('/access')) return { data: { data: access } };
     if (path.endsWith('/forum/posts')) return { data: { data: config?.params?.isPinned === 'true' ? [post('notice', true)] : config?.params?.isPinned === 'false' ? [] : [post('notice', true), post('conversation')] } };
+    if (path.endsWith('/store/supply-options')) return { data: { data: { items: [] } } };
     if (path.endsWith('/store/contents')) return { data: { data: { items: [
       { id: 'guide', title: '게시된 실제 자료', summary: '사업 자료 요약', semiFranchiseKey: 'pharmacy' },
       { id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'other' },
@@ -154,6 +155,7 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
     if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
     if (path.endsWith('/access')) return { data: { data: { ...access, businessKey: 'network-a' } } };
     if (path.endsWith('/forum/posts')) return { data: { data: [] } };
+    if (path.endsWith('/store/supply-options')) return { data: { data: { items: [] } } };
     if (path.endsWith('/store/contents')) return { data: { data: { items: [{ id: 'a', title: '사업 A 자료', semiFranchiseKey: 'network-a' }, { id: 'b', title: '다른 사업 자료', semiFranchiseKey: 'network-b' }] } } };
     throw new Error(path);
   });
