@@ -30,7 +30,6 @@ import type {
   TaskUnderstanding,
 } from '../ai-tools/work-agent-contract.js';
 import { WORK_GOAL_MAX_LENGTH } from '../ai-tools/work-agent-contract.js';
-import { WORK_RUN_TTL_MS } from '../ai-tools/work-run-coordination-service.js';
 
 export const UNDERSTANDING_LIMITS = Object.freeze({
   maxCriteria: 4,
