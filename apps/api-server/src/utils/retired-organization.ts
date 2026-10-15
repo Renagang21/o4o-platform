@@ -29,6 +29,7 @@ export function retiredServiceOnlyOrganizationSql(orgIdExpr: string): string {
     AND NOT EXISTS (SELECT 1 FROM platform_store_slugs lss
                      WHERE lss.store_id = ${orgIdExpr} AND lss.is_active = true
                        AND lss.service_key NOT IN (${keyList}))
-    AND NOT EXISTS (SELECT 1 FROM neture_pharmacy_memberships lnm WHERE lnm.organization_id = ${orgIdExpr})
+    AND NOT EXISTS (SELECT 1 FROM neture_pharmacy_memberships lnm
+                     WHERE lnm.organization_id = ${orgIdExpr} AND lnm.status = 'active')
   )`;
 }

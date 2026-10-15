@@ -34,6 +34,7 @@ jest.mock(
 );
 
 import { createCmsContentSlotRoutes } from '../routes/cms-content/cms-content-slot.handler.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 const SLOTS = [
   {
@@ -108,5 +109,47 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     expect(res.status).toBe(200);
     expect(res.body.meta.crossService).toBe(true);
     expect(res.body.data).toHaveLength(2);
+  });
+});
+
+/** Platform scope changes must validate existing content, not only replacements. */
+describe('slot updates preserve content/service boundaries', () => {
+  function updateApp(contentService: string | null = 'kpa-society') {
+    jest.mocked(roleAssignmentService.hasAnyRole).mockResolvedValue(true);
+    const slot = { id: 'slot-a', slotKey: 'home', contentId: 'content-a', serviceKey: 'kpa-society', isLocked: false };
+    const save = jest.fn(async (value: unknown) => value);
+    const dataSource: any = { getRepository: (entity: { name: string }) => entity.name === 'CmsContentSlot'
+      ? { findOne: jest.fn(async () => ({ ...slot })), save }
+      : { findOne: jest.fn(async () => ({ id: 'content-a', serviceKey: contentService })) } };
+    const app = express();
+    app.use(express.json());
+    app.use((req: any, _res, next) => { req.user = { id: 'admin-a', roles: ['platform:super_admin'] }; next(); });
+    app.use('/cms', createCmsContentSlotRoutes({ dataSource }));
+    return { app, save };
+  }
+
+  it.each([{ serviceKey: 'neture' }, { serviceKey: 'neture', contentId: 'content-a' }])(
+    'rejects moving existing KPA content to a Neture slot: %j', async body => {
+      const { app, save } = updateApp();
+      const response = await request(app).put('/cms/slots/slot-a').send(body);
+      expect(response.status).toBe(400);
+      expect(response.body.error.code).toBe('SERVICE_SCOPE_MISMATCH');
+      expect(save).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a stored retired content reference even when the content ID is resent', async () => {
+    const { app, save } = updateApp('pharmacy-hub');
+    const response = await request(app).put('/cms/slots/slot-a').send({ contentId: 'content-a' });
+    expect(response.status).toBe(410);
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('preserves aliases and permits moving platform content to a service slot', async () => {
+    const alias = updateApp();
+    expect((await request(alias.app).put('/cms/slots/slot-a').send({ serviceKey: 'kpa' })).status).toBe(200);
+    const global = updateApp(null);
+    expect((await request(global.app).put('/cms/slots/slot-a').send({ serviceKey: 'neture' })).status).toBe(200);
+    expect(global.save).toHaveBeenCalledWith(expect.objectContaining({ serviceKey: 'neture', contentId: 'content-a' }));
   });
 });

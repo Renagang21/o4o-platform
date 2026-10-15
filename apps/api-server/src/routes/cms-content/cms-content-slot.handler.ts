@@ -610,10 +610,11 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
-      // Verify content if being changed
-      if (contentId && contentId !== slot.contentId) {
+      // Validate the resulting pair even when only the slot's service is changed.
+      const nextContentId = contentId || slot.contentId;
+      if (nextContentId && (contentId !== undefined || serviceKey !== undefined)) {
         const contentRepo = dataSource.getRepository(CmsContent);
-        const content = await contentRepo.findOne({ where: { id: contentId } });
+        const content = await contentRepo.findOne({ where: { id: nextContentId } });
         if (!content) {
           res.status(400).json({
             success: false,
@@ -633,7 +634,7 @@ export function createCmsContentSlotRoutes(deps: {
           });
           return;
         }
-        slot.contentId = contentId;
+        slot.contentId = nextContentId;
       }
 
       // Update fields
