@@ -8,8 +8,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 왜 추출하는가 — store-qr.service.ts / store-library.service.ts 와 동일한 이유다.
  *   공통 controller 는 매장을 **slug 로** 찾고 소유를 `created_by_user_id` (KPA 는 role 축)로
- *   확인한다. Pharmacy-Hub 매장은 프로비저닝이 만든 조직이라 created_by 가 경영자와 일치한다는
- *   보장이 없고, PH 는 enrollment 기준 resolvePharmacyHubStoreOrganization() 으로 조직을 정한다.
+ *   확인한다.
  *   **조직 결정만 서비스 경계별로 하고(공통 가드·slug 해석 무변경), 검증·SQL 계약은 공유한다.**
  *
  * 계약
@@ -18,8 +17,8 @@
  *     이 service 의 조회·수정·삭제 경로에 절대 걸리지 않는다 (import 의 source 로만 읽는다).
  *   - 경계는 (store_id, service_key) 복합이다 — 매장 간·서비스 간 사본 접근을 함께 막는다.
  *   - 검증 실패는 예외가 아니라 결과 객체로 돌려준다 (라우트가 상태코드를 그대로 매핑).
- *   - 응답 envelope 은 만들지 않는다 — 공통 라우트는 nested({error:{code,message}}),
- *     Pharmacy-Hub 는 flat({error,code}) 로 서로 다르기 때문이다.
+ *   - 응답 envelope 은 만들지 않는다 — 라우트마다 형태(예: nested({error:{code,message}}))가
+ *     다를 수 있기 때문이다.
  *
  * 원본·사본 독립성 (작업요청서 §자산 소유·복사 원칙)
  *   import 는 **값 복사**다. 새 id · 매장 store_id · status='draft' 로 INSERT 하며,

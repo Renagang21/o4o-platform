@@ -241,7 +241,7 @@ async function validateDisplayItems(
  */
 export interface StoreTabletRoutesOptions {
   /**
-   * 조직 해석기 주입 (Pharmacy-Hub 등 service-scoped 마운트용).
+   * 조직 해석기 주입 (service-scoped 마운트용).
    *
    *   - 반환 `string`: 그 조직으로 핸들러 실행
    *   - 반환 `null`  : **이미 응답을 보낸 상태**(미연결·모호·권한 없음 등) → 핸들러 미실행
@@ -263,7 +263,7 @@ export interface StoreTabletRoutesOptions {
    * **타 서비스 조직**이 선택될 수 있다(같은 My Store 문맥의 local-products 와 조직 불일치).
    *
    * 지정 시 해당 서비스에 등록된 조직만 후보가 되며 2개 이상이면 409(AMBIGUOUS)로 차단된다.
-   * `resolveOrganizationId` 가 주입된 경로(Pharmacy-Hub)에서는 이 옵션이 쓰이지 않는다.
+   * `resolveOrganizationId` 가 주입된 경로에서는 이 옵션이 쓰이지 않는다.
    */
   storeOwnerServiceKey?: StoreOwnerServiceKey;
 }

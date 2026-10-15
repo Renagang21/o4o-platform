@@ -45,6 +45,8 @@ const OTHER_ORG = '22222222-2222-4222-8222-222222222222';
 /** 호출 순서대로 응답을 돌려주는 최소 DataSource 스텁. */
 function makeDataSource(opts: {
   queryResults?: any[][];
+  /** 퇴역 서비스 전용 조직 판정 결과 — 순서 큐와 별개로 응답한다. */
+  retiredOrganization?: boolean;
   repo?: Partial<{
     findOne: jest.Mock;
     create: jest.Mock;
@@ -52,7 +54,10 @@ function makeDataSource(opts: {
   }>;
 }) {
   const queue = [...(opts.queryResults ?? [])];
-  const query = jest.fn(async () => (queue.length ? queue.shift() : []));
+  const query = jest.fn(async (sql?: string) => {
+    if (String(sql ?? '').includes('organization_service_enrollments rse')) return [{ retired: opts.retiredOrganization ?? false }];
+    return queue.length ? queue.shift() : [];
+  });
   const repo = {
     findOne: opts.repo?.findOne ?? jest.fn(async () => null),
     create: opts.repo?.create ?? jest.fn((v: any) => ({ ...v })),
@@ -316,7 +321,7 @@ describe('resolvePublicQrLanding', () => {
       ],
     });
 
-    const result = await resolvePublicQrLanding(ds, 's', 'pharmacy-hub', scan);
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', scan);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -395,6 +400,25 @@ describe('resolvePublicQrLanding', () => {
     expect(insertCallOf(query)?.[1]).toEqual([ORG, 'q', 'tablet', 'UA/1.0', 'https://ref', 'hashed-ip']);
   });
 
+  it('퇴역 서비스 전용 매장의 QR 은 410 이고 스캔을 기록하지 않는다', async () => {
+    const { ds, query } = makeDataSource({
+      queryResults: [[{ id: 'q', landingType: 'link', landingTargetId: 'https://x', isActive: true, organizationId: ORG, slug: 's' }]],
+      retiredOrganization: true,
+    });
+    const result = (await resolvePublicQrLanding(ds, 's', 'kpa', scan)) as QrFailure;
+    expect(result.status).toBe(410);
+    expect(result.code).toBe('SERVICE_RETIRED');
+    expect(insertCallOf(query)).toBeUndefined();
+  });
+
+  it('매장 slug 조회는 퇴역 서비스 slug 를 제외한다', async () => {
+    const { ds, query } = landingDataSource();
+    await resolvePublicQrLanding(ds, 's', 'kpa', scan);
+    const slugCall = query.mock.calls.find((c: any[]) => String(c[0]).includes('FROM platform_store_slugs') && !String(c[0]).includes('AS retired'));
+    expect(String(slugCall?.[0])).toContain('NOT (service_key = ANY($2::text[]))');
+    expect(slugCall?.[1]?.[1]).toEqual(expect.arrayContaining(['pharmacy-hub', 'pharmacy-hub-event-offer']));
+  });
+
   it('스캔 INSERT 가 실패해도 랜딩 응답은 정상이다 (fire-and-forget)', async () => {
     const { ds } = landingDataSource();
     const original = ds.query;
@@ -430,7 +454,7 @@ describe('resolvePublicQrLanding', () => {
   it('product QR 랜딩은 STORE/canonical 설명서 본문을 additive 로 함께 내려준다', async () => {
     const { ds, query } = productLandingDataSource([{ content: '<p>본문</p>', summary: '한 줄 요약' }]);
 
-    const result = await resolvePublicQrLanding(ds, 's', 'pharmacy-hub', scan);
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', scan);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -464,7 +488,7 @@ describe('resolvePublicQrLanding', () => {
   });
 });
 
-// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: pharmacyhub.co.kr QR 착지 이전 — 다른 호스트에서 열어도 매장 서비스 축으로 화면을 구성한다.
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 다른 호스트에서 열어도 매장 서비스 축으로 화면을 구성한다.
 describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (호스트 무관)', () => {
   const { resolveScreenSetSections } = jest.requireMock('../../../routes/platform/store-public/store-public-screen-set-resolve.js') as {
     resolveScreenSetSections: jest.Mock;
@@ -481,11 +505,11 @@ describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (
 
   beforeEach(() => resolveScreenSetSections.mockClear());
 
-  it('옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr(kpa) 에서 열면 pharmacy-hub 축으로 해석한다', async () => {
-    const { ds } = screenSetDs('pharmacy-hub');
+  it('호출 서비스 slug 가 없는 매장 QR 은 매장의 최신 slug 서비스 축으로 해석한다', async () => {
+    const { ds } = screenSetDs('neture');
     await resolvePublicQrLanding(ds, 's', 'kpa', scanMeta);
     expect(resolveScreenSetSections).toHaveBeenCalledTimes(1);
-    expect(resolveScreenSetSections.mock.calls[0][1]).toMatchObject({ serviceKey: 'pharmacy-hub', screenSetId: 'set-1' });
+    expect(resolveScreenSetSections.mock.calls[0][1]).toMatchObject({ serviceKey: 'neture', screenSetId: 'set-1' });
   });
 
   it('같은 서비스 매장이면 호출 서비스 키 그대로다 (종전 동작)', async () => {
@@ -495,7 +519,7 @@ describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (
   });
 
   it('여러 서비스에 slug 가 있는 매장은 호출 서비스 slug 가 있으면 호출 축 — 최신 slug 가 다른 서비스여도 바꾸지 않는다', async () => {
-    const { ds } = screenSetDs('pharmacy-hub', 'kpa');
+    const { ds } = screenSetDs('neture', 'kpa');
     await resolvePublicQrLanding(ds, 's', 'kpa', scanMeta);
     expect(resolveScreenSetSections.mock.calls[0][1]).toMatchObject({ serviceKey: 'kpa', storeSlug: 'store-slug-0' });
   });

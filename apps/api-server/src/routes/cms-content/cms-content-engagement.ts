@@ -10,7 +10,6 @@
  *   migration `20260210000001-AddContentViewCountAndRecommendations` 로 **이미 존재**한다.
  *   지금까지 소비하는 route 가 하나도 없어 dead schema 였을 뿐이다.
  *   따라서 이 파일은 schema/migration 을 0 으로 두고 **소비자만** 추가한다.
- *   (§6 "`pharmacy_hub_contents` 신규 table 을 만들지 않는다" 와 같은 결론)
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 왜 서비스 분기가 없는가

@@ -38,6 +38,7 @@ import { ServiceAudienceService } from './service-audience.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
+import { isRetiredServiceValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
 import { DEFAULT_SEMI_FRANCHISE_KEY, PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
@@ -93,7 +94,7 @@ export class SellerRecruitmentService {
     if (filters?.publicOnly) where.semiFranchiseId = IsNull();
 
     let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
-    recruitments = recruitments.filter((r) => (!filters?.publicOnly || isPublicRecruitment(r))
+    recruitments = recruitments.filter((r) => !isRetiredServiceValue(r.serviceId) && (!filters?.publicOnly || isPublicRecruitment(r))
       && (isPublicRecruitment(r) || !filters?.exposureStatus || r.exposureStatus === filters.exposureStatus));
     if (filters?.storeOrganizationId !== undefined) {
       const memberships: Array<{ semi_franchise_id: string; key: string }> = filters.storeOrganizationId
@@ -141,7 +142,8 @@ export class SellerRecruitmentService {
     if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
     if (filters?.status) where.status = filters.status;
 
-    const rows = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
+    const rows = (await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } }))
+      .filter((r) => !isRetiredServiceValue(r.serviceId));
     return rows.map((r) => ({
       id: r.id,
       productId: r.productId,
@@ -176,6 +178,7 @@ export class SellerRecruitmentService {
   ) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) return { success: false as const, error: 'RECRUITMENT_NOT_FOUND' };
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
     if (serviceKey && recruitment.serviceId !== serviceKey) {
       return { success: false as const, error: 'SERVICE_MISMATCH' };
     }
@@ -258,6 +261,7 @@ export class SellerRecruitmentService {
   async reopenRecruitment(recruitmentId: string, supplierUserId: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_FOUND' };
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
     if (recruitment.status !== RecruitmentStatus.RECRUITING) {
       recruitment.status = RecruitmentStatus.RECRUITING;
       await this.recruitmentRepo.save(recruitment);
@@ -361,6 +365,7 @@ export class SellerRecruitmentService {
   async createApplication(recruitmentId: string, applicantId: string, applicantName: string, storeOrganizationId?: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // 세미프랜차이즈 모집에만 노출 승인 조건을 적용한다.
     if (!isPublicRecruitment(recruitment) && recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
@@ -532,6 +537,7 @@ export class SellerRecruitmentService {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.sellerId !== supplierUserId) throw new Error('NOT_RECRUITMENT_OWNER');
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
 
     application.status = ApplicationStatus.APPROVED;
     application.decidedAt = new Date();

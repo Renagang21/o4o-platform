@@ -9,7 +9,7 @@
  *
  * serviceKey 를 서비스별로 쪼개지 않는 이유: 실제 서비스 경계 축은 checkout_order 의
  * `metadata.serviceKey` 이고, payment event serviceKey 는 **구독 라우팅 키**일 뿐이다.
- * 단일 키를 쓰면 handler 를 1개만 유지하면 된다(Neture B2B · Pharmacy-Hub 는 기존 키 유지 · 무회귀).
+ * 단일 키를 쓰면 handler 를 1개만 유지하면 된다(Neture B2B 는 기존 키 유지 · 무회귀).
  */
 
 /** payment.completed 구독 키 (PaymentCoreService.prepare 의 sourceService) */
@@ -23,7 +23,7 @@ export const EVENT_OFFER_CART_ORDER_SOURCE = 'store_cart_checkout';
 
 /**
  * 이 결제 축이 결제를 허용하는 checkout_order `metadata.source` 집합.
- * 여기에 없는 source 는 다른 축(neture_b2b_checkout · pharmacy_hub_cart)이 담당한다.
+ * 여기에 없는 source 는 다른 축(neture_b2b_checkout 등)이 담당한다.
  */
 export const STORE_B2B_PAYABLE_ORDER_SOURCES: readonly string[] = [
   STORE_B2B_CART_ORDER_SOURCE,

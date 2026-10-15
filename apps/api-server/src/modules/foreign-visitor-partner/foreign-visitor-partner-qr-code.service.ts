@@ -16,7 +16,7 @@ import { getServicePublicOrigin } from '../../config/service-catalog.js';
 
 /**
  * 서비스별 public web origin (landing 도메인). multilingual landing 과 동일 정책 —
- * 서비스 카탈로그에서 파생한다(kpa · cosmetics · pharmacy-hub alias 해석).
+ * 서비스 카탈로그에서 파생한다(kpa · cosmetics alias 해석).
  * 파일별 호스트 표는 존재하지 않는 `cosmetics.neture.co.kr` 을 찍었다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
  */
 export function buildAffiliateLandingUrl(serviceKey: string, shortCode: string): string {

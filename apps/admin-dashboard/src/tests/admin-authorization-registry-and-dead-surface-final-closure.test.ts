@@ -86,7 +86,6 @@ const SERVICE_ROLES = [
   'neture:operator',
   'cosmetics:admin',
   'cosmetics:operator',
-  'pharmacy-hub:operator',
   'kpa:store_owner',
 ];
 const LEGACY_ROLES = ['admin', 'administrator', 'super_admin', 'operator'];

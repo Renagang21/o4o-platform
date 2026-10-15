@@ -165,7 +165,7 @@ function generatePublicKey(): string {
 }
 
 // Public web origin per store service — landing page lives on the service's own domain.
-//   호스트는 서비스 카탈로그에서 파생한다(kpa · cosmetics · pharmacy-hub 모두 alias 해석).
+//   호스트는 서비스 카탈로그에서 파생한다(kpa · cosmetics 모두 alias 해석).
 //   파일별 호스트 표는 카탈로그와 어긋나 존재하지 않는 호스트를 QR 에 찍었다
 //   (`cosmetics.neture.co.kr` NXDOMAIN — CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
 function buildLandingUrl(serviceKey: string | undefined, publicKey: string): string {

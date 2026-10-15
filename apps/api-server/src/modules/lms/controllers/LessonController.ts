@@ -30,7 +30,7 @@ import {
  * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
  * - All write operations verify parent course.instructorId === userId
  * - lecture:admin bypasses ownership check (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)
- * - PR #225 merge-gate: 대상 course 가 lecture 가 아니면(legacy KPA/PH) 소유자·lecture:admin 여부와 무관하게
+ * - PR #225 merge-gate: 대상 course 가 lecture 가 아니면(legacy KPA 등) 소유자·lecture:admin 여부와 무관하게
  *   non-disclosure 404 — Lecture runtime 이 타 서비스 강의를 ID 로 변경할 수 없다.
  */
 export class LessonController extends BaseController {

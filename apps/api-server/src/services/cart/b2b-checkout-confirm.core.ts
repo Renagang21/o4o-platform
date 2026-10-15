@@ -12,17 +12,16 @@
  *   canonical price 재확정 → quantity 검증 → 공급자별 grouping →
  *   `checkoutService.createOrder()` → 성공 그룹 cart 정리
  *
- *   이 전부가 서비스와 무관하다. Neture / Pharmacy-Hub / 승인축 서비스에서
+ *   이 전부가 서비스와 무관하다. Neture / 승인축 서비스에서
  *   실제로 다른 것은 **공급 노출 정책 하나**이며 그것만 `OfferExposureStrategy` 로 분리한다.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 무엇이 여전히 서비스별인가 (adapter)
  *
  *   · 실패 code/문구 어휘 — 기존 API 소비자가 code 로 분기하므로 절대 통일하지 않는다.
- *     (Neture `UNSUPPORTED_CART_ITEM_SOURCE`/`OFFER_NOT_FOUND`/`GROUP_PARTIAL_FAILURE`
- *      vs Pharmacy-Hub `UNSUPPORTED_SOURCE_TYPE`/`NOT_DELIVERED`/`SUPPLIER_GROUP_FAILED`)
+ *     (예: Neture `UNSUPPORTED_CART_ITEM_SOURCE`/`OFFER_NOT_FOUND`/`GROUP_PARTIAL_FAILURE`)
  *   · order metadata (`source` tag 포함) 와 seller 축
- *   · 빈 선택 시 동작 (PH 는 EMPTY_CART throw, Neture 는 빈 결과 반환)
+ *   · 빈 선택 시 동작 (onEmptySelection 구현 시 throw, 미구현이면 빈 결과 반환)
  *   · cart supplierId 요구/일치 강제 여부
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -142,7 +141,7 @@ export interface B2BConfirmAdapter {
   requireCartSupplierId: boolean;
   /** cart 의 supplierId 와 서버 offer.supplier_id 불일치를 실패로 볼 것인가 (Neture 계약) */
   enforceCartSupplierMatch: boolean;
-  /** paymentGroupId 접두사 — 기존 식별 형태를 보존한다 (Neture 'pg_', Pharmacy-Hub 없음) */
+  /** paymentGroupId 접두사 — 기존 식별 형태를 보존한다 (예: 'pg_') */
   paymentGroupIdPrefix?: string;
 
   unsupportedSourceType(item: StoreCartItem): { code: string; reason: string };
@@ -153,12 +152,12 @@ export interface B2BConfirmAdapter {
   groupPoisoned(v: CoreValidItem): { code: string; reason: string };
   orderCreateFailed(error: unknown, ctx: CoreGroupContext): { code: string; reason: string };
 
-  /** 주문 대상이 하나도 없을 때. throw 하면 그대로 전파된다(PH EMPTY_CART). */
+  /** 주문 대상이 하나도 없을 때. throw 하면 그대로 전파된다. */
   onEmptySelection?(scope: B2BConfirmScope): void;
 
   /**
    * 서버가 확정한 매장 조직의 공급 이용 자격(선택). throw 하면 주문을 하나도 만들지 않는다.
-   * 구현하지 않은 adapter(Neture · Pharmacy-Hub)는 종전과 같다.
+   * 구현하지 않은 adapter(Neture)는 종전과 같다.
    */
   assertSupplyAccess?(exec: DataSource, scope: B2BConfirmScope, organizationId: string | null): Promise<void>;
 

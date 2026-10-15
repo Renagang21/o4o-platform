@@ -6,7 +6,7 @@
  * 정책:
  *   - 가입 write-path 는 공통 SSOT(ServiceJoinService.apply)를 사용한다.
  *     이 컨트롤러는 serviceKey 강제 + 중복 상태 코드 분기만 담당하는 얇은 래퍼다
- *     (pharmacy-hub 선례). service_memberships 를 직접 INSERT 하지 않는다.
+ *     service_memberships 를 직접 INSERT 하지 않는다.
  *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 가입은 Google 인증을 전제한다.
  *     users 생성 · service_credentials 생성이 이 경로에서 사라졌다.
  *   - serviceKey 는 항상 서버가 'kpa-branch' 로 강제한다. 클라이언트 값은 무시된다.

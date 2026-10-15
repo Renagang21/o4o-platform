@@ -23,8 +23,7 @@ import {
 /**
  * Service keys for policy ownership (same as slug)
  */
-// WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 'pharmacy-hub' 추가.
-//   위 주석대로 이 union 은 StoreSlugServiceKey 와 **동일 집합을 유지해야 한다** —
+// 이 union 은 StoreSlugServiceKey 와 **동일 집합을 유지해야 한다** —
 //   store-policy.routes.ts 가 slugRecord.serviceKey 를 그대로 getActivePolicy 에 넘긴다.
 //   한쪽만 넓히면 그 지점이 타입 오류가 난다. DB 컬럼은 varchar(50) 이라 migration 불필요.
 export type StorePolicyServiceKey =

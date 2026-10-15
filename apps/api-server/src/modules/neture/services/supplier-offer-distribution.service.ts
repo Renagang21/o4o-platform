@@ -35,11 +35,11 @@ export class SupplierOfferDistributionService {
     const currentKeys: string[] = offer.service_keys || [];
     // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1:
     //   이 경로는 **승인 대상 키(SSOT) 2개만 책임진다**. 그 밖의 키
-    //   (pharmacy-hub / neture 등)는 다른 경로가 소유하므로 그대로 보존한다.
+    //   (neture 등)는 다른 경로가 소유하므로 그대로 보존한다.
     //
     //   이전 구현은 nextKeys = filterApprovalEligibleServiceKeys(input.serviceKeys) 였다.
     //   승인 대상이 아닌 키는 입력에 담겨 있든 없든 전부 탈락 → 공급자가 유통 화면을
-    //   한 번 저장하면 pharmacy-hub / neture 가 조용히 삭제되었다.
+    //   한 번 저장하면 neture 등 비승인 키가 조용히 삭제되었다.
     //
     //   approval 생성·취소 diff 는 여전히 승인 대상 키에서만 계산하므로
     //   기존 3개 서비스의 승인·listing 거동은 변하지 않는다.
@@ -122,7 +122,4 @@ export class SupplierOfferDistributionService {
       await queryRunner.release();
     }
   }
-
-  // ==================== 단일 서비스 제공 토글 (WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1) ====================
-
 }

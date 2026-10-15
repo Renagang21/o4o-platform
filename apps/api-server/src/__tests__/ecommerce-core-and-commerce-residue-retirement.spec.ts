@@ -225,10 +225,10 @@ describe('WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT
       expect(fs.existsSync(path.join(SRC, 'services', 'toss-payments.service.ts'))).toBe(true);
     });
 
-    it('살아 있는 payment producer serviceKey 3종이 유지된다', () => {
+    // PharmacyHub 결제 producer 는 서비스 퇴역과 함께 제거됐다 — 살아 있는 producer 는 아래 2종이다.
+    it('살아 있는 payment producer serviceKey 2종이 유지된다', () => {
       expect(hits(/['"`]store-service-subscription['"`]/).length).toBeGreaterThan(0);
       expect(hits(/['"`]neture-b2b['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]pharmacy-hub['"`]/).length).toBeGreaterThan(0);
     });
 
     it('소비자 commerce 은퇴 410 계약이 유지된다', () => {

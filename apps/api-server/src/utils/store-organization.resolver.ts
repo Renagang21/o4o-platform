@@ -51,6 +51,7 @@
 
 import type { DataSource } from 'typeorm';
 import logger from './logger.js';
+import { retiredServiceOnlyOrganizationSql } from './retired-organization.js';
 
 /**
  * organization_members 중 "매장 접근"으로 인정되는 role.
@@ -224,6 +225,7 @@ async function findUnscopedStoreOrganizationRows(
       WHERE om.user_id = $1
         AND om.role = ANY($2::text[])
         AND om.left_at IS NULL
+        AND NOT ${retiredServiceOnlyOrganizationSql('om.organization_id')}
       ORDER BY om.organization_id, om.role`,
     [userId, STORE_MEMBER_ROLES],
   );
@@ -269,6 +271,7 @@ export async function findStoreMemberOrganizationCandidates(
     `SELECT organization_id, role
        FROM organization_members
       WHERE user_id = $1 AND left_at IS NULL AND role = 'staff'
+        AND NOT ${retiredServiceOnlyOrganizationSql('organization_members.organization_id')}
       ORDER BY is_primary DESC, joined_at ASC, organization_id ASC`,
     [userId],
   )) as Array<{ organization_id: string; role: string }>;

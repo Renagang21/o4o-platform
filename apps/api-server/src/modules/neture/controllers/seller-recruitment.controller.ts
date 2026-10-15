@@ -29,6 +29,7 @@ import type { AuthenticatedRequest } from '../middleware/neture-identity.middlew
 import type { SellerRecruitmentService } from '../services/seller-recruitment.service.js';
 import { RecruitmentStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { sendRetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { requireNetureMainMembership } from '../../../middleware/neture-main-membership.middleware.js';
@@ -106,6 +107,7 @@ export function createSellerRecruitmentController(deps: {
       }
       res.json({ success: true, data: result.data });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[SellerRecruitment API] Error reopening recruitment:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to reopen recruitment' });
     }
@@ -185,6 +187,7 @@ export function createSellerRecruitmentController(deps: {
       const result = await service.createApplication(recruitmentId, userId, req.user?.name || '', organizationId);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       const msg = (error as Error).message;
       if (msg === 'RECRUITMENT_NOT_FOUND') {
         return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '모집 공고를 찾을 수 없습니다.' });
@@ -253,6 +256,7 @@ export function createSellerRecruitmentController(deps: {
   });
 
   const decisionErrors = (res: Response, error: unknown, verb: string): void => {
+    if (sendRetiredServiceError(res, error)) return;
     const msg = (error as Error).message;
     if (msg === 'APPLICATION_NOT_FOUND') {
       res.status(404).json({ success: false, error: 'NOT_FOUND', message: '신청을 찾을 수 없습니다.' });

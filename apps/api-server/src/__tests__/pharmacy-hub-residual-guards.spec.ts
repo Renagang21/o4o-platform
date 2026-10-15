@@ -1,0 +1,127 @@
+/**
+ * PharmacyHub 퇴역 — 저장된 데이터 경로의 잔여 guard.
+ *
+ * 요청 경로 guard(`rejectRetiredService`)는 path · query · body 만 본다. DB 에 이미 저장된
+ * 모집 · CMS 콘텐츠 · slug · 조직은 이 파일의 guard 가 막는다.
+ */
+jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
+jest.mock('../modules/neture/entities/index.js', () => ({
+  SellerRecruitment: class {}, SellerRecruitmentApplication: class {},
+  RecruitmentStatus: { RECRUITING: 'recruiting', CLOSED: 'closed' }, ExposureStatus: { APPROVED: 'approved', REJECTED: 'rejected' },
+  ApplicationStatus: { PENDING: 'pending', APPROVED: 'approved', CANCELLED: 'cancelled' },
+  SELLER_RECRUITMENT_TABLE: 'seller_recruitments', SELLER_RECRUITMENT_APPLICATION_TABLE: 'seller_recruitment_applications',
+}));
+jest.mock('../modules/neture/services/service-audience.service.js', () => ({}));
+jest.mock('../services/NotificationService.js', () => ({ notificationService: { createNotification: jest.fn().mockResolvedValue({}) } }));
+jest.mock('../modules/neture/middleware/supplier-context.resolver.js', () => ({ listOwnedSupplierIds: jest.fn().mockResolvedValue(['owned-supplier']) }));
+
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { AppDataSource } from '../database/connection.js';
+import { SellerRecruitmentService } from '../modules/neture/services/seller-recruitment.service.js';
+import { RetiredServiceError } from '../middleware/retired-service.middleware.js';
+import { retiredServiceOnlyOrganizationSql } from '../utils/retired-organization.js';
+import { findCmsSlotContentConflict } from '../routes/cms-content/cms-content-utils.js';
+
+const src = (path: string) => readFileSync(resolve(__dirname, '..', path), 'utf8');
+
+const recruitment = (id: string, serviceId: string) => ({
+  id, serviceId, semiFranchiseId: null, sellerId: 'supplier-user', status: 'recruiting', exposureStatus: 'approved',
+  consumerPrice: 100, commissionRate: 0,
+});
+
+describe('seller recruitment — 저장된 퇴역 serviceId', () => {
+  let service: SellerRecruitmentService;
+  let recruitmentRepo: any;
+  let applicationRepo: any;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (AppDataSource.query as jest.Mock).mockResolvedValue([]);
+    recruitmentRepo = {
+      find: jest.fn().mockResolvedValue([recruitment('live', 'kpa-society'), recruitment('retired', 'pharmacy-hub')]),
+      findOne: jest.fn().mockResolvedValue(recruitment('retired', 'pharmacy-hub')),
+      save: jest.fn(async (x) => x),
+    };
+    applicationRepo = {
+      findOne: jest.fn().mockResolvedValue({ id: 'app', recruitmentId: 'retired', status: 'pending' }),
+      save: jest.fn(async (x) => x),
+    };
+    service = new SellerRecruitmentService();
+    (service as any)._recruitmentRepo = recruitmentRepo;
+    (service as any)._applicationRepo = applicationRepo;
+  });
+
+  it('공개 목록 · 노출 심사 큐에서 퇴역 서비스 모집을 뺀다', async () => {
+    expect((await service.getRecruitments({ publicOnly: true })).map((r) => r.id)).toEqual(['live']);
+    expect((await service.getRecruitmentsForExposureReview()).map((r) => r.id)).toEqual(['live']);
+  });
+
+  it('신청 · 승인 · 재개 · 노출 결정은 SERVICE_RETIRED 로 거절하고 아무것도 저장하지 않는다', async () => {
+    recruitmentRepo.findOne.mockResolvedValue({ ...recruitment('retired', 'pharmacy-hub'), status: 'closed' });
+    await expect(service.reopenRecruitment('retired', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
+    recruitmentRepo.findOne.mockResolvedValue(recruitment('retired', 'pharmacy-hub'));
+    await expect(service.createApplication('retired', 'user', '사용자')).rejects.toBeInstanceOf(RetiredServiceError);
+    await expect(service.approveApplication('app', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
+    await expect(service.setRecruitmentExposure('retired', 'operator', 'approved' as any)).rejects.toBeInstanceOf(RetiredServiceError);
+    expect(recruitmentRepo.save).not.toHaveBeenCalled();
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('controller 는 RetiredServiceError 를 410 으로 응답한다', () => {
+    for (const path of [
+      'modules/neture/controllers/seller-recruitment.controller.ts',
+      'modules/neture/controllers/operator-recruitment-exposure.controller.ts',
+      'modules/neture/controllers/service-recruitment-exposure-proxy.controller.ts',
+    ]) expect(src(path)).toContain('sendRetiredServiceError(res, error)');
+  });
+});
+
+describe('CMS — 저장된 퇴역 serviceKey', () => {
+  it('slot 배치 판정: 퇴역 서비스는 retired, 서로 다른 서비스는 mismatch, platform 콘텐츠·alias 는 허용', () => {
+    expect(findCmsSlotContentConflict('pharmacy-hub', 'kpa-society')).toBe('retired');
+    expect(findCmsSlotContentConflict('kpa-society', 'pharmacy-hub')).toBe('retired');
+    expect(findCmsSlotContentConflict('neture', 'kpa-society')).toBe('mismatch');
+    expect(findCmsSlotContentConflict('kpa', 'kpa-society')).toBeNull();
+    expect(findCmsSlotContentConflict(null, 'kpa-society')).toBeNull();
+    expect(findCmsSlotContentConflict('neture', null)).toBeNull();
+  });
+
+  it('콘텐츠 수정 · 상태 전이는 platform admin 이라도 퇴역 콘텐츠를 410 으로 거절한다', () => {
+    const mutation = src('routes/cms-content/cms-content-mutation.handler.ts');
+    expect(mutation).toContain('isRetiredServiceValue(content.serviceKey)');
+    expect(mutation).toContain('isRetiredServiceValue(existing.serviceKey)');
+    const slot = src('routes/cms-content/cms-content-slot.handler.ts');
+    expect(slot.match(/findCmsSlotContentConflict\(/g)?.length).toBe(3);
+    expect(slot).toContain('isRetiredServiceValue(slot.serviceKey)');
+  });
+});
+
+describe('store slug · 조직 경로', () => {
+  it('slug 와 옛 slug redirect 모두 퇴역 서비스면 410 이다', () => {
+    expect(src('routes/platform/store-public/store-public-utils.ts')).toContain('isRetiredServiceValue(redirect.serviceKey)');
+    const policy = src('routes/platform/store-policy.routes.ts');
+    expect(policy.match(/isRetiredServiceValue\(redirect\.serviceKey\)/g)?.length).toBe(2);
+    expect(policy).toContain('isRetiredServiceValue(slugRecord.serviceKey)');
+    expect(policy).toContain('isRetiredServiceValue(current.serviceKey)');
+  });
+
+  it('퇴역 서비스 전용 조직 판정은 살아 있는 연결이 있으면 퇴역으로 보지 않는다', () => {
+    const sql = retiredServiceOnlyOrganizationSql('o.id');
+    expect(sql).toContain("IN ('pharmacy-hub', 'pharmacy-hub-event-offer')");
+    expect(sql).toContain("LIKE 'pharmacy-hub:%'");
+    expect(sql).toContain("lse.status = 'active'");
+    expect(sql).toContain('lss.is_active = true');
+    expect(sql).toContain('neture_pharmacy_memberships');
+    expect(sql).not.toMatch(/\$\d/);
+  });
+
+  it('매장 후보 · 초대 목록 · KPA 콘텐츠 fallback · 공개 QR 이 같은 판정을 쓴다', () => {
+    for (const path of [
+      'utils/store-organization.resolver.ts',
+      'services/store/store-membership.service.ts',
+      'routes/o4o-store/controllers/kpa-content-organization.ts',
+      'services/store/store-qr.service.ts',
+    ]) expect(src(path)).toContain('retiredServiceOnlyOrganizationSql(');
+    expect(src('utils/store-organization.resolver.ts').match(/retiredServiceOnlyOrganizationSql\(/g)?.length).toBe(2);
+  });
+});

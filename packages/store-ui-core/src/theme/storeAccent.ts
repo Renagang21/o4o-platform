@@ -12,7 +12,6 @@
  * 서비스별 현행 accent:
  *   KPA-Society  blue
  *   K-Cosmetics  pink
- *   PharmacyHub  blue
  */
 
 export type StoreAccent = 'blue' | 'pink' | 'teal';

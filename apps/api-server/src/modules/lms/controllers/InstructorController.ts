@@ -25,9 +25,8 @@ import { CourseService } from '../services/CourseService.js';
  * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§13
  *
  * 강사 목록 API 는 `instructorId` 만으로 좁혀 왔다. 한 사람이 여러 서비스에서
- * 강사인 경우 Pharmacy-Hub 화면에 kpa-society 강의가 그대로 노출됐다
- * (production 실측: PH `/instructor/courses` 총 7건 중 6건이 kpa-society —
- * §20 완료 조건 `cross-service leakage = 0` 위반).
+ * 강사인 경우 한 서비스 화면에 다른 서비스 강의가 그대로 노출됐다
+ * (§20 완료 조건 `cross-service leakage = 0` 위반).
  *
  * 계약은 공개 목록(WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1)과 동일하다:
  *   - `serviceKey` 미전달 → 무경계(종전 동작). 기존 소비처 불변.
@@ -870,7 +869,7 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
-      // 재검토 P1-11: legacy(KPA/PH) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
+      // 재검토 P1-11: legacy(KPA 등) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
       if (!isLectureCourse(enrollment.course?.serviceKey)) {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
@@ -923,7 +922,7 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
-      // 재검토 P1-11: legacy(KPA/PH) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
+      // 재검토 P1-11: legacy(KPA 등) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
       if (!isLectureCourse(enrollment.course?.serviceKey)) {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }

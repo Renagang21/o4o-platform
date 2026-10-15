@@ -9,7 +9,7 @@
  *
  *   조직 · 소유 관계 · 서비스 참여를 만드는 일은 이미 공용 helper 가 한다:
  *   `organizationOpsService.ensureOrganizationWithOwnerAndService()`
- *   (PharmacyHub · Cafe24 B2B 프로비저닝이 쓰는 바로 그 함수).
+ *   (Cafe24 B2B 프로비저닝이 쓰는 바로 그 함수).
  *   이 모듈은 **그 helper 를 호출하는 새 진입 채널**일 뿐이고, 같은 축을 같은 순서로 쓴다.
  *
  *     매장 정보      organizations
@@ -18,7 +18,7 @@
  *     서비스 가입    service_memberships
  *     서비스 역할    role_assignments ({prefix}:store_owner)
  *
- *   채널이 다른 이유: Cafe24 는 외부 로그인이, PharmacyHub 는 운영자 승인이 계기다.
+ *   채널이 다른 이유: Cafe24 는 외부 로그인이 계기다.
  *   여기서는 **이미 로그인한 사용자가 직접** 매장을 열겠다고 한다. 그 계기만 다르다.
  *
  * ─────────────────────────────────────────────────────────────────────────────

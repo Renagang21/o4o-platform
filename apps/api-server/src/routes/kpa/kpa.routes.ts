@@ -85,7 +85,7 @@ import { createStoreContentController } from '../o4o-store/controllers/store-con
 import { createStoreLibraryFeedController } from '../o4o-store/controllers/store-library-feed.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
-// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: 공통 POP V2 Core (KPA/PH 공용)
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: 공통 POP V2 Core (서비스 공용)
 import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
@@ -461,7 +461,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
   //   POP V2 (canonical Document 모델) — internal: /pharmacy/pop-v2/*
-  //   PH 와 **같은 공통 Core factory** 를 mount 한다 (서비스별 본체 복제 없음).
+  //   **공통 Core factory** 를 mount 한다 (서비스별 본체 복제 없음).
   //   legacy 즉시 PDF(createStorePopController · POST /pharmacy/pop/generate) 는 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거 —
   //   과거 산출물(store_execution_assets usage_type='pop') row 는 보존.
   router.use('/pharmacy/pop-v2', createStorePopV2Controller(dataSource, coreRequireAuth as any, 'kpa'));
@@ -660,8 +660,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-FORUM-SCOPE-SEPARATION-V1: community scope — organizationId 미설정
   // 커뮤니티 포럼은 organizationId IS NULL인 글만 조회/생성
   // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
-  //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface — Pharmacy-Hub `/pharmacy-hub/forum` 과
-  //   같은 독립 Community(저장 코드 kpa-society + pharmacy-hub). 읽기·쓰기는 현재 독립
+  //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface — 독립 Community
+  //   (저장 코드 kpa-society + pharmacy-hub). 읽기·쓰기는 현재 독립
   //   커뮤니티 승인으로 판정하며 pharmacy 사업 가입과 별개다. 구조 변경·중재는 기존 guard를 유지한다.
   forumRouter.use(forumContextMiddleware({
     serviceCode: 'kpa',

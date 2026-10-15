@@ -450,7 +450,7 @@ export class MembershipApprovalService {
       await demoAccountService.assertNotDemoAccount(userId, queryRunner);
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4:
-      // K-Cosmetics / PharmacyHub store_owner 는 활성화 직전 사업자정보 5항목을 서버에서 재검증한다.
+      // K-Cosmetics store_owner 는 활성화 직전 사업자정보 5항목을 서버에서 재검증한다.
       // pending 신청 자체는 허용하되 불완전한 정보로 active role 이 부여되는 경로는 차단한다.
       await assertStoreOwnerBusinessInfo(queryRunner, membership);
 

@@ -6,7 +6,7 @@
  *
  *          공통 POP V2 Core (이 파일)
  *                  ↑
- *          KPA adapter / PH adapter  — mount 만 다르다
+ *          서비스 adapter (KPA)  — mount 만 다르다
  *
  * (legacy `store-pop.controller.ts` · POST /pharmacy/pop/generate 는 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거됨.)
  * 과거 산출물(store_execution_assets usage_type='pop') 도 그대로 둔다 — V2 는 append 만 한다.

@@ -87,7 +87,7 @@ export class ProductImportCommonService {
     //   `distribution_type` 은 그 범위의 **파생 표기**다(offer.service.ts deriveDistributionType).
     //   이 import 경로는 파생 필드를 독립 입력처럼 써서 `is_public` 을 건드리지 않았다.
     //   그러면 `distribution_type='PUBLIC'` + `is_public=false` 같은 모순 행이 생기고,
-    //   distribution_type 을 읽는 소비처(Pharmacy-Hub 노출 · 대시보드 집계)와
+    //   distribution_type 을 읽는 소비처(대시보드 집계 등)와
     //   is_public 을 읽는 소비처(공급자 화면)가 같은 행을 다르게 판정한다.
     //   여기서는 요청값을 **입력축으로 환원**한 뒤 같은 규칙으로 파생시킨다.
     //     PUBLIC  → is_public = true

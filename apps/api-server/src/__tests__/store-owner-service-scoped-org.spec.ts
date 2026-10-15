@@ -15,6 +15,7 @@ import {
   readPreferredStoreOrganizationId,
 } from '../utils/store-organization.resolver.js';
 import { isStoreOwner, createRequireStoreOwner } from '../utils/store-owner.utils.js';
+import { retiredServiceOnlyOrganizationSql } from '../utils/retired-organization.js';
 
 type Row = Record<string, unknown>;
 
@@ -112,8 +113,10 @@ describe('store organization resolution — service scoped', () => {
     // is_primary 우선 → org-a
     expect(result.organizationId).toBe('org-a');
     expect(result.candidateCount).toBe(2);
-    // 서비스 조건은 걸지 않는다 (허용 집합 불변)
-    expect(calls[0].sql).not.toContain('organization_service_enrollments');
+    // 서비스 조건은 걸지 않는다 (허용 집합 불변) — 퇴역 서비스 전용 조직만 뺀다
+    expect(calls[0].sql).not.toContain('service_code = ANY');
+    expect(calls[0].sql).not.toContain('service_key = ANY');
+    expect(calls[0].sql).toContain(`AND NOT ${retiredServiceOnlyOrganizationSql('om.organization_id')}`);
   });
 
   it('F. store_owner role 없음 → isOwner=false, 조직 조회조차 하지 않는다 (cosmetics)', async () => {

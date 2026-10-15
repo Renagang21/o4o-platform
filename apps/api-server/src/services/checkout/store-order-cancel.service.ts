@@ -6,11 +6,10 @@
  * ## 배경
  *
  * Store Hub 장바구니(`checkout-confirm`)로 만들어진 이벤트 오퍼 주문에는
- * 매장측 취소 경로가 없었다. Pharmacy-Hub 에만 결제 전 취소가 존재했고
- * (`POST /pharmacy-hub/store-owner/orders/:orderId/cancel`)
+ * 매장측 취소 경로가 없었다.
  * KPA·K-Cosmetics 의 checkout 컨트롤러에는 취소 route 자체가 없었다.
  *
- * ## 계약 (Pharmacy-Hub `cancelBeforePayment` 와 동일 의미)
+ * ## 계약
  *
  *   · **결제 전 단건 취소만** 수행한다. 결제 상태를 직접 조작하지 않는다.
  *   · 이미 취소된 주문은 **멱등 성공**(alreadyCancelled=true).
@@ -36,7 +35,7 @@ import { EventOfferService } from '../../routes/kpa/services/event-offer.service
 import { isEventOfferOrderServiceKey } from '../../constants/buyer-order-service-scope.js';
 import logger from '../../utils/logger.js';
 
-/** 결제 전 취소가 허용되는 주문 상태 (Pharmacy-Hub 와 동일). */
+/** 결제 전 취소가 허용되는 주문 상태. */
 const CANCELLABLE_STATUSES = new Set(['created', 'pending_payment']);
 
 export interface CancelStoreOrderInput {

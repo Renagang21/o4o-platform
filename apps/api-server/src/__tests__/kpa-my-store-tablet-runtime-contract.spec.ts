@@ -50,7 +50,7 @@ const makeDataSource = () => {
   });
   const base = stub.dataSource.query;
   stub.dataSource.query = jest.fn(async (sql: string, params: any[] = []) => {
-    if (sql.includes('neture_pharmacy_memberships')) {
+    if (sql.includes('neture_pharmacy_memberships') && !sql.includes('is_primary')) {
       return LEDGER_ACTIVE_ORGS.map((organization_id) => ({ organization_id, role: 'owner' }));
     }
     return base(sql, params);

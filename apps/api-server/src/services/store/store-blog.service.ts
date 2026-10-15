@@ -8,8 +8,7 @@
  * 왜 추출하는가
  *   공통 blog.controller 는 매장을 **slug**(platform_store_slugs → OrganizationStore)로
  *   찾고, 소유 확인도 서비스별로 갈린다(KPA=role_assignments / 그 외=created_by_user_id).
- *   Pharmacy-Hub 는 enrollment 기준 resolvePharmacyHubStoreOrganization() 으로 조직을 정하므로
- *   slug 경유가 필요 없다. 조직 결정만 서비스 경계별로 하고, 저작 로직은 공유한다.
+ *   조직 결정만 서비스 경계별로 하고, 저작 로직은 공유한다.
  *
  * 계약
  *   - 인증·조직 결정·소유 확인을 하지 않는다. storeId 는 호출자가 해석해서 넘긴다.

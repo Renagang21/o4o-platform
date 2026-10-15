@@ -11,10 +11,8 @@
  *   - **새 queue/framework/DB schema 를 만들지 않는다.** 기존 `CheckoutFulfillmentBridgeService`
  *     를 그대로 재호출한다 — payment-first guard · idempotency(`metadata.checkoutOrderId`) ·
  *     source registry 판정이 전부 bridge 안에 이미 있다.
- *   - 대상 producer 는 `BRIDGE_SOURCES` 가 SSOT 다(Neture B2B · Pharmacy-Hub · 승인축 B2B ·
+ *   - 대상 producer 는 `BRIDGE_SOURCES` 가 SSOT 다(Neture B2B · 승인축 B2B ·
  *     Event Offer 특가). registry 에 없는 source 는 조회·복구 대상이 아니다.
- *   - 기존 Pharmacy-Hub 전용 recovery(`PharmacyHubOperatorFulfillmentController`)는
- *     **접촉하지 않는다**(회귀 기준). 이 서비스는 그와 같은 동작을 전 producer 로 일반화한 것이다.
  *
  * 안전:
  *   - 결제 상태를 **절대 바꾸지 않는다**. paid 가 아니면 복구 대상이 아니다.

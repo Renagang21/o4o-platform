@@ -234,8 +234,7 @@ export function createKpaCheckoutController(
    *
    * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
    *   이벤트 오퍼 주문에 매장측 취소 경로가 없어 생성 후 되돌릴 수 없었다.
-   *   Pharmacy-Hub `cancelBeforePayment` 와 동일 계약이며,
-   *   이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
+   *   결제 전 단건 취소 계약이며, 이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
    */
   router.post(
     '/orders/:orderId/cancel',

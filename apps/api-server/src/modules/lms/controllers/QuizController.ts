@@ -198,7 +198,7 @@ export class QuizController extends BaseController {
         targetCourseId = lessonCourseId;
       }
 
-      // legacy(KPA/PH) · 타 강사 course 에는 quiz 를 만들 수 없다 (non-disclosure 404 / 403).
+      // legacy(KPA 등) · 타 강사 course 에는 quiz 를 만들 수 없다 (non-disclosure 404 / 403).
       const ownership = await QuizController.resolveCourseOwnership(req, targetCourseId);
       if (ownership === 'not_found') {
         return BaseController.notFound(res, lessonId ? 'Lesson not found' : 'Course not found');

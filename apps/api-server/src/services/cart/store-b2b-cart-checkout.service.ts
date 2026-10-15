@@ -6,7 +6,7 @@
  *
  * 대상: `APPROVAL_ELIGIBLE_SERVICE_KEYS` = kpa-society / k-cosmetics.
  * 이 서비스들에서 공급자 상품이 노출되려면 `offer_service_approvals` 의 **승인 행**이 있어야
- * 한다. Pharmacy-Hub 식 `service_keys` opt-in 만으로는 우회되지 않는다
+ * 한다. `service_keys` opt-in 만으로는 우회되지 않는다
  * (`OfferExposureStrategy('approval')` 참조).
  *
  * 이 클래스는 wrapper 다 — 승격 로직은 전부 `B2BCheckoutConfirmCore` 에 있다. 여기 남는 것은
@@ -38,7 +38,7 @@ import type {
  *
  * 서비스별로 tag 를 쪼개지 않는다 — 공급자 workspace 의 실제 스코프 축은
  * `metadata.serviceKey` → `neture_orders.service_key` 이고, `source` 는 bridge 진입 자격
- * 판정용이다. 기존 tag(`neture_b2b_checkout` · `pharmacy_hub_cart`)는 건드리지 않는다.
+ * 판정용이다. 기존 tag(`neture_b2b_checkout`)는 건드리지 않는다.
  */
 export const STORE_B2B_ORDER_SOURCE = 'store_b2b_cart';
 

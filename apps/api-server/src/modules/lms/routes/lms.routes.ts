@@ -36,7 +36,7 @@ const router: Router = Router();
 //   - Learner   : requireAuth + requireLectureLearner  (active lecture membership · role 불요)
 //   - Instructor: requireAuth + requireInstructor      (membership + lecture:instructor)
 //   - Operator  : requireAuth + requireLectureOperator (membership + lecture:operator ⊂ lecture:admin)
-//   - kpa:admin / cosmetics:* / pharmacy-hub:* / legacy lms:instructor 는 어떤 경로도 통과하지 못한다.
+//   - kpa:admin / cosmetics:* / 퇴역 서비스 role / legacy lms:instructor 는 어떤 경로도 통과하지 못한다.
 //   - 운영 대상 강의는 course.serviceKey === 'lecture' 만. 그 외는 non-disclosure 404.
 // ========================================
 router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));

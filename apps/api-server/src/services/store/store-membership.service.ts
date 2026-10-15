@@ -1,4 +1,5 @@
 import { findActiveStoreMemberCandidates, resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
+import { retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
 /**
  * Store Membership — 사업자가 허가한 사용자(Store Member)의 **단일 정본**
  *
@@ -327,6 +328,7 @@ export async function listMyInvitations(
        FROM organization_members om
        JOIN organizations o ON o.id = om.organization_id
       WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = ANY($2::text[])
+        AND NOT ${retiredServiceOnlyOrganizationSql('om.organization_id')}
       ORDER BY om.joined_at ASC`,
     [userId, [STORE_INVITED_ROLE, STORE_ACCEPTED_ROLE]],
   );

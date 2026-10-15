@@ -13,7 +13,7 @@
  *   - admin/operator 는 instructor 를 자동 포함하지 않는다 (강의 생성·편집은 강사 계약).
  *   - role 이 있어도 membership 이 없으면 deny (Foundation `createMembershipScopeGuard` 계약).
  *   - `platform:super_admin` break-glass 는 Foundation `LECTURE_SCOPE_CONFIG.platformBypass` 를 따른다.
- *   - KPA / K-Cosmetics / PharmacyHub / legacy `lms:*` role 은 어떤 층에서도 인정하지 않는다.
+ *   - KPA / K-Cosmetics / 퇴역 서비스 / legacy `lms:*` role 은 어떤 층에서도 인정하지 않는다.
  *
  * 새 권한 엔진을 만들지 않는다 — `requireLectureScope`(Phase 1) 와
  * `getServiceMembershipStatusFromDb`(Core util) 만 재사용한다.
@@ -138,7 +138,7 @@ export async function isActiveLectureLearner(req: Request): Promise<boolean> {
 /**
  * 운영·강사 write 대상 강의 판정 — `course.serviceKey === 'lecture'` 만 Lecture runtime 의 대상이다.
  * approve/reject/unpublish/archive/hard-delete(routes) 와 publish/update/delete/submit-review(controller)
- * 가 같은 규칙을 공유한다. legacy(KPA/PH/null) 강의는 non-disclosure 404. data cutover 는 §21 에서 취소됐다(테스트 데이터 삭제로 대상 소멸) — legacy row 자체가 0건이므로 이 404 는 이제 평상 상태다.
+ * 가 같은 규칙을 공유한다. legacy(KPA/null) 강의는 non-disclosure 404. data cutover 는 §21 에서 취소됐다(테스트 데이터 삭제로 대상 소멸) — legacy row 자체가 0건이므로 이 404 는 이제 평상 상태다.
  */
 export function isLectureCourse(courseServiceKey: string | null | undefined): boolean {
   return courseServiceKey === SERVICE_KEYS.LECTURE;

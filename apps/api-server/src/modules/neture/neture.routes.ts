@@ -21,8 +21,6 @@ import { ActionLogService } from '@o4o/action-log-core';
 import { createSupplierManagementController } from './controllers/supplier-management.controller.js';
 import { createSupplierProductController } from './controllers/supplier-product.controller.js';
 import { createSupplierProductCandidateController } from './controllers/supplier-product-candidate.controller.js';
-// WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
-// 공급자 직접 opt-in 서비스(운영자 승인 없음) 제공 설정·주문 처리 — Pharmacy-Hub 에서 이전.
 import { createSupplierStoreDescriptionController } from './controllers/supplier-store-description.controller.js';
 import { createSupplierOrderController } from './controllers/supplier-order.controller.js';
 import { createShipmentController } from './controllers/shipment.controller.js';

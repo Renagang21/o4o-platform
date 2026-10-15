@@ -4,7 +4,7 @@
  * WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 §5 · §6 · §7
  * 선행 IR: docs/investigations/CHECK-O4O-CAFE24-B2B-STORE-MEMBER-INTEGRATION-AND-OWNERSHIP-AUDIT-V1.md
  *
- * SSOT 는 PharmacyHubStoreProvisioningService 와 동일한 기존 축을 그대로 쓴다 (§5 — 패턴 재사용).
+ * SSOT 는 기존 매장 프로비저닝 축을 그대로 쓴다 (§5 — 패턴 재사용).
  * Cafe24 전용 조직/매장 테이블을 만들지 않는다.
  *
  *   매장 정보      = organizations
@@ -17,9 +17,9 @@
  *   Cafe24 연결    = cafe24_member_links   ← 이번 WO 가 추가하는 유일한 테이블
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * PharmacyHub 와 다른 점 하나: 조직 "재사용 후보 탐색"을 하지 않는다.
+ * 조직 "재사용 후보 탐색"을 하지 않는다.
  *
- *   PharmacyHub 는 사람이 이미 O4O 에 가입해 다른 서비스 조직을 가진 상태에서 승인되므로
+ *   이미 O4O 에 가입해 다른 서비스 조직을 가진 사람을 승인하는 경로라면
  *   기존 조직 재사용/모호성(AMBIGUOUS_ORGANIZATION) 판정이 필요하다. 여기서는
  *   **O4O 별도 가입 자체가 없다**(§2). 회원은 Cafe24 쪽에만 존재하고 O4O 내부 user 는 이
  *   서비스가 만든 합성 계정이므로, `member_hash` 하나가 user·organization 을 결정론적으로
@@ -35,7 +35,7 @@
  *   user → organization → membership → role → link → capability 를 **하나의 트랜잭션**으로
  *   묶는다. 중간 실패 시 전부 롤백되어 "user 는 있는데 매장이 없는" 상태가 남지 않는다.
  *   slug 만 트랜잭션 밖에서 보강한다 — 실패해도 매장 identity 는 이미 확정이고 다음
- *   로그인이 채운다 (PharmacyHub 와 동일 정책).
+ *   로그인이 채운다.
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
@@ -315,7 +315,7 @@ export class Cafe24B2bStoreProvisioningService {
    *
    * 제약이 `unique_active_role_per_user UNIQUE (user_id, role, is_active)` 이므로 단순 upsert 는
    * 비활성 row `(u, r, false)` 와 충돌하지 않아 중복 INSERT 를 만든다.
-   * PharmacyHub / MembershipApprovalService 와 **동일한 3단계 순서**를 따른다:
+   * MembershipApprovalService 와 **동일한 3단계 순서**를 따른다:
    *   활성 row 확인 → 비활성 row 재활성화 → 없을 때만 INSERT.
    *
    * @returns 이번 호출이 role 을 새로 활성화했으면 true
@@ -373,7 +373,7 @@ export class Cafe24B2bStoreProvisioningService {
     try {
       const slugService = new StoreSlugService(this.dataSource);
       // 매장명이 한글/기호뿐이면 정규화 결과가 비거나 너무 짧아 generateUniqueSlug 가
-      // 충돌 재시도만 반복한다. 그때는 결정적 조직 코드를 base 로 쓴다 (PharmacyHub 선례).
+      // 충돌 재시도만 반복한다. 그때는 결정적 조직 코드를 base 로 쓴다.
       const normalized = generateSlugFromName(storeName);
       const base = normalized && normalized.length >= 3 ? normalized : orgCode;
       const generated = await slugService.generateUniqueSlug(base);
