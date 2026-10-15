@@ -25,6 +25,7 @@
  */
 
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SupplierProductImportPage from './SupplierProductImportPage';
 import { toast } from '@o4o/error-handling';
 import { ProductForm } from '../../components/product';
@@ -40,6 +41,64 @@ import { useSupplierCandidateSubmission } from './product-create/useSupplierCand
 import { useSupplierCandidateGuide } from './product-create/useSupplierCandidateGuide';
 import SupplierCandidateBasicFields from './product-create/SupplierCandidateBasicFields';
 import SupplierCandidateMediaFields from './product-create/SupplierCandidateMediaFields';
+
+function CandidateRequestComplete({ registered, productType }: Readonly<{
+  registered: NonNullable<ReturnType<typeof useSupplierCandidateSubmission>['registered']>;
+  productType: ReturnType<typeof useSupplierCandidateForm>['productType'];
+}>) {
+  const navigate = useNavigate();
+  return (
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+        <h1 className="text-xl font-bold text-blue-800">제품 정보 검토 요청 완료</h1>
+        <p className="text-sm text-blue-700 mt-1">
+          <strong>{registered.name || '제품'}</strong>의 제품 정보가 검토 대기열에 접수되었습니다
+          {productType ? ` (유형: ${productType.label})` : ''}.
+        </p>
+        <p className="text-xs text-blue-700/80 mt-2">
+          아직 <strong>공급 상품(Offer)으로 등록된 것은 아닙니다.</strong> 운영자가 제품 정보를
+          검토해 표준 제품(ProductMaster)으로 확정하면, 제품 라이브러리에서 해당 제품을 선택해
+          공급가·공급 방식을 설정하고 공급을 시작할 수 있습니다.
+          {productType?.rx && ' 처방의약품은 승격 후에도 약국 대상 서비스 공급으로만 연결됩니다.'}
+        </p>
+        {(registered.candidateId || registered.identifierValue) && (
+          <p className="mt-2 text-[11px] text-blue-600/70 font-mono">
+            {registered.identifierValue ? `식별자 ${registered.identifierValue} · ` : ''}요청 ID{' '}
+            {registered.candidateId ?? '-'}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <div className="text-xs font-semibold text-slate-500 mb-2">다음 작업</div>
+        <div className="grid sm:grid-cols-2 gap-2">
+          <button
+            onClick={() => navigate('/supplier/products/register')}
+            className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
+          >
+            다른 제품 검토 요청
+          </button>
+          <button
+            onClick={() => navigate('/supplier/products/library')}
+            className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
+          >
+            제품 라이브러리에서 기존 제품 공급 연결
+          </button>
+          <button
+            onClick={() => navigate('/supplier/products')}
+            className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
+          >
+            내 공급 상품 목록
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-slate-400">
+          검토 결과는 운영자 승격 후 제품 라이브러리 검색에 반영됩니다. 공급 오퍼·이벤트
+          오퍼·펀딩은 공급 상품 등록 후의 별도 활동입니다.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function SupplierProductCreatePage() {
   const importDraft = useMemo(() => loadAndClearDraft(), []);
@@ -76,66 +135,13 @@ export default function SupplierProductCreatePage() {
       onCancel={() => formState.setSourceImportOpen(false)}
       onApplyDraft={(draft) => {
         formState.applySourceImport(draft);
-        if (!media.thumbnailSource && draft.thumbnailUrl) media.setThumbnailSource({ kind: 'library', url: draft.thumbnailUrl });
-        media.setContentItems((prev) => [...prev, ...[...new Set([...draft.detailImageUrls, ...draft.contentImageUrls])].filter((url) => !prev.some((item) => item.kind === 'library' && item.url === url)).map((url) => ({ kind: 'library' as const, url }))]);
+        media.applyImportImages(draft);
         toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하세요.');
       }}
     />;
   }
   // 검토 요청 완료 — Candidate 상태임을 분명히 한다 (Master/Offer 아직 없음 · HUB 미노출)
-  if (registered) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
-          <h1 className="text-xl font-bold text-blue-800">제품 정보 검토 요청 완료</h1>
-          <p className="text-sm text-blue-700 mt-1">
-            <strong>{registered.name || '제품'}</strong>의 제품 정보가 검토 대기열에 접수되었습니다
-            {productType ? ` (유형: ${productType.label})` : ''}.
-          </p>
-          <p className="text-xs text-blue-700/80 mt-2">
-            아직 <strong>공급 상품(Offer)으로 등록된 것은 아닙니다.</strong> 운영자가 제품 정보를
-            검토해 표준 제품(ProductMaster)으로 확정하면, 제품 라이브러리에서 해당 제품을 선택해
-            공급가·공급 방식을 설정하고 공급을 시작할 수 있습니다.
-            {productType?.rx && ' 처방의약품은 승격 후에도 약국 대상 서비스 공급으로만 연결됩니다.'}
-          </p>
-          {(registered.candidateId || registered.identifierValue) && (
-            <p className="mt-2 text-[11px] text-blue-600/70 font-mono">
-              {registered.identifierValue ? `식별자 ${registered.identifierValue} · ` : ''}요청 ID{' '}
-              {registered.candidateId ?? '-'}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <div className="text-xs font-semibold text-slate-500 mb-2">다음 작업</div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            <button
-              onClick={() => navigate('/supplier/products/register')}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
-            >
-              다른 제품 검토 요청
-            </button>
-            <button
-              onClick={() => navigate('/supplier/products/library')}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
-            >
-              제품 라이브러리에서 기존 제품 공급 연결
-            </button>
-            <button
-              onClick={() => navigate('/supplier/products')}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50"
-            >
-              내 공급 상품 목록
-            </button>
-          </div>
-          <p className="mt-3 text-xs text-slate-400">
-            검토 결과는 운영자 승격 후 제품 라이브러리 검색에 반영됩니다. 공급 오퍼·이벤트
-            오퍼·펀딩은 공급 상품 등록 후의 별도 활동입니다.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (registered) return <CandidateRequestComplete registered={registered} productType={productType} />;
 
   return (
     <SupplierActivationGate mode="gate">

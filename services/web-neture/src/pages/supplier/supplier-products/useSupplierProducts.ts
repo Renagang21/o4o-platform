@@ -41,15 +41,15 @@ export function useSupplierProducts() {
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
   const queryKeyword = searchParams.get('q') ?? '';
-  const [keyword, setKeywordValue] = useState(queryKeyword);
+  const [keyword, setKeyword] = useState(queryKeyword);
   const searchDraft = useRef(queryKeyword);
-  const setKeyword = useCallback((value: React.SetStateAction<string>) => {
+  const updateKeyword = useCallback((value: React.SetStateAction<string>) => {
     const next = typeof value === 'function' ? value(searchDraft.current) : value;
     searchDraft.current = next;
-    setKeywordValue(next);
+    setKeyword(next);
   }, []);
   // Typing stays local; SearchBar commits q only on debounce/Enter. URL navigation restores the input.
-  useEffect(() => setKeyword(queryKeyword), [queryKeyword, setKeyword]);
+  useEffect(() => updateKeyword(queryKeyword), [queryKeyword, updateKeyword]);
   const [loading, setLoading] = useState(true);
   // 조회 실패(loadError) 와 정상 0건을 구분한다 — 실패 시 빈 상태 문구를 표시하지 않는다.
   const [loadError, setLoadError] = useState(false);
@@ -168,9 +168,9 @@ export function useSupplierProducts() {
   );
 
   const resetAllFilters = useCallback(() => {
-    setKeyword('');
+    updateKeyword('');
     setSearchParams({});
-  }, [setSearchParams, setKeyword]);
+  }, [setSearchParams, updateKeyword]);
 
   // WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1:
   // getProductsPaginated 는 조회 실패 시 throw 한다. 실패를 빈 목록으로 렌더하지 않고 loadError 로 분리한다.
@@ -178,7 +178,7 @@ export function useSupplierProducts() {
     async (page = 1, searchKeyword?: string) => {
       const request = ++productsRequest.current;
       setLoading(true);
-      const kw = searchKeyword !== undefined ? searchKeyword : queryKeyword;
+      const kw = searchKeyword ?? queryKeyword;
       try {
         const result = await supplierApi.getProductsPaginated({
           page,
@@ -391,7 +391,7 @@ export function useSupplierProducts() {
     products,
     pagination,
     keyword,
-    setKeyword,
+    setKeyword: updateKeyword,
     loading,
     loadError,
     saving,

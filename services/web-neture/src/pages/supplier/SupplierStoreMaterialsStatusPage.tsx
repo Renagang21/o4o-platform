@@ -251,6 +251,7 @@ export default function SupplierStoreMaterialsStatusPage() {
   ].filter(Boolean) as string[];
 
   const allFailed = failedSources.length === 3;
+  const emptyMessage = rows.length ? '선택한 상태의 자료가 없습니다.' : '아직 매장에 제공한 자료가 없습니다. 위에서 자료 만들기를 선택하세요.';
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -303,7 +304,11 @@ export default function SupplierStoreMaterialsStatusPage() {
           { state: 'working', label: '작성 중·임시저장', value: summary.working, cls: 'text-slate-600' },
           { state: 'closed', label: '숨김·보관·만료', value: summary.closed, cls: 'text-slate-400' },
         ].map((c) => (
-          <button type="button" key={c.label} aria-pressed={stateFilter === c.state} onClick={() => setParams((prev) => { const next = new URLSearchParams(prev); if (stateFilter === c.state) next.delete('state'); else next.set('state', c.state); return next; })} className={`rounded-xl border bg-white p-3 text-left ${stateFilter === c.state ? 'border-blue-500 ring-1 ring-blue-300' : 'border-slate-200'}`}>
+          <button type="button" key={c.label} aria-pressed={stateFilter === c.state} onClick={() => setParams((prev) => {
+            const next = new URLSearchParams(prev);
+            if (stateFilter === c.state) { next.delete('state'); } else { next.set('state', c.state); }
+            return next;
+          })} className={`rounded-xl border bg-white p-3 text-left ${stateFilter === c.state ? 'border-blue-500 ring-1 ring-blue-300' : 'border-slate-200'}`}>
             <div className="text-xs text-slate-500">{c.label}</div>
             <div className={`mt-1 text-2xl font-semibold ${c.cls}`}>{loading ? '–' : c.value}</div>
           </button>
@@ -328,7 +333,7 @@ export default function SupplierStoreMaterialsStatusPage() {
           </div>
         ) : filteredRows.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400">
-            {rows.length ? '선택한 상태의 자료가 없습니다.' : '아직 매장에 제공한 자료가 없습니다. 위에서 자료 만들기를 선택하세요.'}
+            {emptyMessage}
           </div>
         ) : (
           <div className="overflow-x-auto">

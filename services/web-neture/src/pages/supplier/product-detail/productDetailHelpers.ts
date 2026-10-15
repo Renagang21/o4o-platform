@@ -46,6 +46,12 @@ export function formatDate(dateString: string | null | undefined): string {
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
+export function completenessColors(score: number): { text: string; background: string } {
+  if (score >= 80) return { text: 'text-green-600', background: 'bg-green-500' };
+  if (score >= 40) return { text: 'text-amber-600', background: 'bg-amber-500' };
+  return { text: 'text-red-500', background: 'bg-red-500' };
+}
+
 export function toFormData(p: SupplierProduct): Partial<ProductFormData> {
   return {
     marketingName: p.name || p.masterName || '',

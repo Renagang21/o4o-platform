@@ -140,8 +140,17 @@ export default function SupplierOrdersListPage() {
   const statusFilter = Object.prototype.hasOwnProperty.call(STATUS_MAP, params.get('status') ?? '') ? params.get('status')! : '';
   const search = params.get('q') ?? '';
   const setPage = (next: number | ((prev: number) => number)) => setParams((prev) => { const p = new URLSearchParams(prev); p.set('page', String(typeof next === 'function' ? next(page) : next)); return p; });
-  const setStatusFilter = (value: string) => setParams((prev) => { const p = new URLSearchParams(prev); if (value) p.set('status', value); else p.delete('status'); p.delete('page'); return p; });
-  const setSearch = (value: string) => setParams((prev) => { const p = new URLSearchParams(prev); if (value) p.set('q', value); else p.delete('q'); return p; }, { replace: true });
+  const setStatusFilter = (value: string) => setParams((prev) => {
+    const p = new URLSearchParams(prev);
+    if (value) { p.set('status', value); } else { p.delete('status'); }
+    p.delete('page');
+    return p;
+  });
+  const setSearch = (value: string) => setParams((prev) => {
+    const p = new URLSearchParams(prev);
+    if (value) { p.set('q', value); } else { p.delete('q'); }
+    return p;
+  }, { replace: true });
   const detailLink = (id: string) => `/supplier/orders/${id}?${new URLSearchParams({ returnTo: location.pathname + location.search })}`;
   const requestRef = useRef(0);
   useEffect(() => () => { requestRef.current += 1; }, []);

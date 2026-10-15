@@ -18,7 +18,7 @@ import { useSupplierProductImport } from './product-import/useSupplierProductImp
 import SupplierImportResult from './product-import/SupplierImportResult';
 import SupplierImportSettings from './product-import/SupplierImportSettings';
 
-export default function SupplierProductImportPage({ onApplyDraft, onCancel }: { onApplyDraft?: (draft: ImportDraft) => void; onCancel?: () => void }) {
+export default function SupplierProductImportPage({ onApplyDraft, onCancel }: Readonly<{ onApplyDraft?: (draft: ImportDraft) => void; onCancel?: () => void }>) {
   const fieldId = useId();
   const controller = useSupplierProductImport(onApplyDraft);
   const {

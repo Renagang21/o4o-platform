@@ -40,6 +40,7 @@ AI 기능·내부 LLM·새 프레임워크·새 상태머신·DB/migration·권�
 - [x] 상품 검색 debounce·URL·목록 복귀·폐기된 지연 검색 차단 및 행동 회귀.
 - [x] 모바일 설명서 목록 상태 칩의 줄바꿈 보완.
 - [x] URL 대상 전환 실패 시 판매활동·사이니지의 이전 선택/편집 잔류 차단. 관련 행동 25건·빌드·desktop/mobile fixture 재통과.
+- [x] Sonar 14개 지적의 코드 보완: URL 조건문 중괄호·닫기 영역 접근성·props/state 명명·중첩 조건·상품/설명서 표시 책임 분리. 로컬 복잡도·ESLint·전체 1,019건·경계 41건·빌드·PC/mobile 회귀 PASS. 원격 Sonar 재분석은 통합 gate에서 확인한다.
 - [x] 실제 잔여 census 결과와 수정 범위를 [CHECK](../checks/CHECK-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1.md)에 기록.
 - [x] web-neture 관련 테스트·타입/빌드·Supplier boundary·문서 민감정보·diff 검증.
 - [x] desktop/mobile 격리 브라우저 smoke: 원문 입력 왕복, 상품/주문/자료/판매활동 대상·복귀·실패/재시도 확인.

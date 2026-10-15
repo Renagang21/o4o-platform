@@ -31,15 +31,19 @@ AI 외 신규 기능·정책·DB·migration·공통 프레임워크 변경 잔�
 - Codex P2(검색): 입력과 확정 URL 검색어를 분리한다. 실제 공유 SearchBar의 debounce/Enter로 확정할 때 목록·카운트가 각각 한 번 조회된다. 동일 검색 반복으로 추가 조회하지 않는다. 초기화/URL 뒤로가기 후 남은 타이머는 폐기된 검색어를 복원하지 않는다.
 - 모바일 설명서 목록: 언어별 상태 칩이 편집 버튼을 390px 화면 밖으로 밀어내는 것을 브라우저에서 재현했다. 상태를 상품명 아래에서 줄바꿈한다.
 - 추가 대상 전환 점검: 판매활동 3종에서 URL을 정상 상품→없는 상품으로 바꿀 때 이전 선택을 비우고, 사이니지는 이전 제작 폼을 닫는다. fresh mount뿐 아니라 같은 컴포넌트의 URL 변경을 검증했다. 다른 상품에 잘못 제출할 수 있는 잔류를 차단한다.
+- 최종 Sonar 분석에서 신규 코드 Reliability B와 annotation 14건을 확인했다. URL 갱신의 조건문 중괄호·중첩 빈 상태 문구·readonly props·state setter 이름을 정리하고, 상품/설명서 닫기 overlay를 native button으로 바꾼다. 상품 상세의 후속 작업/상태, 제품 검토 접수 완료, 설명서 언어/읽기 전용 안내를 표시 책임별로 분리한다. 가져오기 이미지 반영은 기존 media hook이 담당하며 필드·파일 보존 동작은 유지한다.
+- 공용 Drawer 소비처를 다시 전수 검색했다: SupplierProductsPage·OperatorProductApprovalPage·행동 회귀. 기존 helper의 공급자 이미지/편집 hook과 media hook의 입력/제출 type 소비처도 확인했다. 운영자 승인 callback과 공급자 전용 링크 비노출을 함께 검증한다.
+- 로컬 SonarJS cognitive-complexity 검사: 대상 7파일의 함수가 모두 기준 15 이하, 오류 0. 검사 도구는 `/tmp`에 별도 설치했고 저장소 dependency/lockfile은 변경하지 않았다. 최종 원격 Sonar 결과는 다음 push 뒤 확인한다.
 
 ## 로컬 검증
 
 - Node `22.18.0`, pnpm `10.25.0` — 저장소 pin과 일치. 기존 설치된 전용 worktree 의존성을 사용하며 lockfile 변경 없음.
-- web-neture Vitest: **1,015/1,015 PASS**, 실패/skip 0. 최종 결과 `/tmp/supplier-closure-final-vitest.json`.
-- web-neture `tsc && vite build`: **PASS**. 모바일 배치 보완 후 해당 행동 회귀 **21/21 PASS**와 빌드도 재확인했다. 기존 Browserslist 갱신·큰 chunk 경고는 유지. 로그 `/tmp/supplier-closure-layout-build.log`.
+- web-neture Vitest: 최종 품질 보완 후 **1,019/1,019 PASS**, 실패/skip 0. 최종 결과 `/tmp/supplier-closure-quality-final-vitest.json`.
+- web-neture `tsc && vite build`: **PASS**. 최종 품질 보완 후 로그 `/tmp/supplier-closure-quality-final-build.log`. 기존 Browserslist 갱신·큰 chunk 경고는 유지.
 - Supplier boundary Jest: **41/41 PASS**. 문서 민감정보 guard와 `git diff --check` PASS.
 - 초기 전체 실행에서 즉시 검색을 가정한 기존 테스트 1건이 실패했다. 검색 확정 동작을 실행하도록 테스트를 수정했고 위 최종 전체 실행에서 통과했다.
-- 추가 URL 대상 전환 보완 후 관련 행동 회귀 **25/25 PASS**, `tsc && vite build` 재통과. 로그 `/tmp/supplier-closure-target-tests.log`·`/tmp/supplier-closure-target-build.log`. 전체 1,015건 결과는 그 보완 직전의 기준선이며 이후 전체 검증은 최종 PR CI로 확인한다.
+- 추가 URL 대상 전환 보완 후 관련 행동 회귀 **25/25 PASS**, `tsc && vite build` 재통과. 초기 전체 1,015건에 URL 전환 4건을 더한 최종 전체 1,019건도 통과했다.
+- 최종 변경 11개 소스 파일의 저장소 ESLint PASS. 표시 책임 분리 후 Supplier 행동 회귀 113건·전체 1,019건·경계 41건·PC/mobile fixture를 재확인했다. 최종 browser 로그 `/tmp/supplier-closure-quality-browser.log`.
 - 격리 브라우저 **1440px/390px PASS**: 상품 추가·위/아래 가져오기 취소·주문 목록/상세 복귀·자료 ID/언어·읽기 전용/현재 작업본·태블릿/사이니지·3종 판매활동 상품 전달·URL 대상 정상→없는 상품 전환 4종·검색 요청 횟수·조회 실패/재시도. page error 0, 업무 write 0, 홈/태블릿/설명서 전체 가로 넘침 없음. `/tmp/supplier-closure-browser.json`. 초기 fixture의 잘못된 HTML/오류 주입은 고쳤으며 마지막 실행만 완료 근거로 사용했다. 실제 API는 fixture로 차단한다.
 
 ## 통합·배포·운영 확인

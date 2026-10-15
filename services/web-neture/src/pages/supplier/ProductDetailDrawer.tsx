@@ -12,8 +12,6 @@
  */
 
 import { useState } from 'react';
-import { getAllowedOfferActions } from '../../lib/supplierProductTypes';
-import { supplierEditLink } from '../../lib/supplierNavigation';
 import { useNavigate } from 'react-router-dom';
 import { X, Pencil } from 'lucide-react';
 import type { SupplierProduct } from '../../lib/api';
@@ -21,6 +19,8 @@ import { Section, InfoRow } from '@o4o/operator-ux-core';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import SupplierProductStatusSection from './product-detail/SupplierProductStatusSection';
+import SupplierProductTaskLinks from './product-detail/SupplierProductTaskLinks';
 import SupplierImageSection from './product-detail/SupplierImageSection';
 import MasterReadOnlySection from './product-detail/MasterReadOnlySection';
 import OfferDistributionSection from './product-detail/OfferDistributionSection';
@@ -34,8 +34,8 @@ import SupplierSpotPolicySection from './product-detail/SupplierSpotPolicySectio
 import SupplierDescriptionSections from './product-detail/SupplierDescriptionSections';
 import SupplierDistributionModal from './product-detail/SupplierDistributionModal';
 import SupplierServicePricesModal from './product-detail/SupplierServicePricesModal';
-import { formatPrice, formatDate, toFormData } from './product-detail/productDetailHelpers';
-import { DISTRIBUTION_TYPE_BADGE, REGULATORY_TYPE_LABELS, REGULATORY_TYPE_BADGE, VISIBILITY_STATUS, getVisibilityStatus } from '../../lib/productConstants';
+import { completenessColors, formatPrice, formatDate, toFormData } from './product-detail/productDetailHelpers';
+import { REGULATORY_TYPE_LABELS, REGULATORY_TYPE_BADGE, VISIBILITY_STATUS, getVisibilityStatus } from '../../lib/productConstants';
 
 interface ProductDetailDrawerProps {
   returnTo?: string;
@@ -76,7 +76,7 @@ const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
 const INPUT_CLASS =
   'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50';
 
-export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions, returnTo }: ProductDetailDrawerProps) {
+export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions, returnTo }: Readonly<ProductDetailDrawerProps>) {
   const supplierTaskReturnTo = returnTo ?? '/supplier/products';
   const editor = useSupplierProductEditor(product, open, onClose, onSaved);
   const {
@@ -154,13 +154,10 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const regBadge = REGULATORY_TYPE_BADGE[regType] || REGULATORY_TYPE_BADGE.GENERAL;
   const regBadgeCls = `${regBadge.bg} ${regBadge.text}`;
 
-  const distBadge = DISTRIBUTION_TYPE_BADGE[product.distributionType] || DISTRIBUTION_TYPE_BADGE.PUBLIC;
-  const distCfg = { label: distBadge.label, cls: `${distBadge.bg} ${distBadge.text}` };
   const compCfg = COMPLETENESS_BADGE[product.completenessStatus || 'DRAFT'] || COMPLETENESS_BADGE.DRAFT;
 
   const score = product.completenessScore || 0;
-  const scoreColor = score >= 80 ? 'text-green-600' : score >= 40 ? 'text-amber-600' : 'text-red-500';
-  const scoreBgColor = score >= 80 ? 'bg-green-500' : score >= 40 ? 'bg-amber-500' : 'bg-red-500';
+  const { text: scoreColor, background: scoreBgColor } = completenessColors(score);
 
   return (
     <>
@@ -199,7 +196,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       <SupplierServicePricesModal product={product} controller={servicePrices} />
 
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
+        aria-label="상품 상세창 닫기"
         className="fixed inset-0 bg-black/30 z-40 transition-opacity"
         onClick={handleClose}
       />
@@ -249,19 +248,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          {!isEditing && returnTo && !approvalActions && (
-            <div className="mb-4 flex flex-wrap gap-2 rounded-lg bg-slate-50 p-3 text-sm">
-              <button type="button" onClick={() => navigate(supplierEditLink('/supplier/store-descriptions', { masterId: product.masterId, language: 'ko' }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 설명서 만들기</button>
-              <button type="button" onClick={() => navigate(supplierEditLink('/supplier/signage', { product: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 사이니지 만들기</button>
-              {product.approvalStatus === 'APPROVED' && !getAllowedOfferActions(product).restricted && (
-                <>
-                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/supply-proposals', { offer: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">공급 제안 만들기</button>
-                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-events', { offer: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 이벤트 만들기</button>
-                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-recruitments', { masterId: product.masterId }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 모집 만들기</button>
-                </>
-              )}
-            </div>
-          )}
+          {!isEditing && returnTo && !approvalActions && <SupplierProductTaskLinks product={product} returnTo={supplierTaskReturnTo} />}
 
           {/* ── 반려 안내 배너 (WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1) ──
                반려 = 끝이 아니라 보완 후 재요청 가능함을 상단에 명확히 안내(상태 체계 불변). */}
@@ -484,38 +471,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
-          {/* ── 상태 ── */}
-          <Section title="상태">
-            {!isEditing && (
-              <InfoRow label="활성">
-                <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
-                  {product.isActive ? '활성' : '비활성'}
-                </Badge>
-              </InfoRow>
-            )}
-            <InfoRow label="유통 방식">
-              <Badge className={distCfg.cls}>{distCfg.label}</Badge>
-            </InfoRow>
-            <InfoRow label="승인">
-              <Badge className={
-                product.approvalStatus === 'APPROVED' ? 'bg-green-50 text-green-700'
-                  : product.approvalStatus === 'PENDING' ? 'bg-amber-50 text-amber-700'
-                  : product.approvalStatus === 'REJECTED' ? 'bg-red-50 text-red-700'
-                  : 'bg-slate-100 text-slate-600'
-              }>
-                {product.approvalStatus === 'APPROVED' ? '승인' : product.approvalStatus === 'PENDING' ? '대기' : product.approvalStatus === 'REJECTED' ? '거부' : (typeof product.approvalStatus === 'string' ? product.approvalStatus : '') || '-'}
-              </Badge>
-            </InfoRow>
-            <InfoRow label="완성도">
-              <div className="flex items-center gap-2">
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div className={`h-full ${scoreBgColor} rounded-full`} style={{ width: `${score}%` }} />
-                </div>
-                <span className={`text-xs font-medium ${scoreColor}`}>{score}%</span>
-                <Badge className={compCfg.cls}>{compCfg.label}</Badge>
-              </div>
-            </InfoRow>
-          </Section>
+          <SupplierProductStatusSection product={product} isEditing={isEditing} completeness={{ score, scoreColor, scoreBgColor, compCfg }} Badge={Badge} />
 
           {/* ── 서비스 ── */}
           {/* WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링 */}

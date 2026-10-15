@@ -66,7 +66,65 @@ function fmtDay(v: string | null | undefined): string {
   return new Date(v).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved, initialLanguage = DEFAULT_LANG, initialDescriptionId }: Props) {
+function languageStatusDot(row: SupplierStoreDescriptionDraft | undefined): string | null {
+  if (!row) return null;
+  if (row.status === 'canonical') return 'bg-emerald-500';
+  if (row.status === 'needs_review' || row.status === 'revision_requested') return 'bg-amber-500';
+  return 'bg-slate-400';
+}
+
+function DescriptionLanguageTabs({ language, rows, busy, onSelect }: Readonly<{
+  language: SupportedLang;
+  rows: SupplierStoreDescriptionDraft[];
+  busy: boolean;
+  onSelect: (language: SupportedLang) => void;
+}>) {
+  return (
+    <div className="mb-3">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {SUPPORTED_LANGS.map((l) => {
+          const row = rows.find((r) => normLang(r.language) === l);
+          const active = l === language;
+          const dot = languageStatusDot(row);
+          return (
+            <button
+              key={l}
+              type="button"
+              onClick={() => onSelect(l)}
+              disabled={busy}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 ${
+                active ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {LANG_LABELS[l]}
+              {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} title="작성된 설명서 있음" />}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[11px] text-slate-400 mt-1.5">
+        언어별로 <b>독립된 설명서</b>입니다. 한 언어를 저장해도 다른 언어에는 영향이 없으며, 언어마다 따로 검수받습니다. (● = 작성됨)
+      </p>
+    </div>
+  );
+}
+
+function ReadOnlyDescriptionNotice({ published, hasWorkingDraft, onEdit }: Readonly<{
+  published: boolean;
+  hasWorkingDraft: boolean;
+  onEdit: () => void;
+}>) {
+  return (
+    <div className="mb-3 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
+      <p>{published ? '매장에 노출 중인 설명서' : '보관된 설명서'}는 읽기 전용입니다. 수정은 작업본에서 진행합니다.</p>
+      <button type="button" className="mt-2 font-medium text-emerald-700 underline" onClick={onEdit}>
+        {hasWorkingDraft ? '현재 작업본 열기' : '새 작업본 작성'}
+      </button>
+    </div>
+  );
+}
+
+export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved, initialLanguage = DEFAULT_LANG, initialDescriptionId }: Readonly<Props>) {
   const { user } = useAuth();
   const tpl = useContentTemplates();
   const canCreatePublicTemplate =
@@ -240,7 +298,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-40" onClick={requestClose} />
+      <button type="button" aria-label="설명서 편집창 닫기" className="fixed inset-0 bg-black/30 z-40" onClick={requestClose} disabled={saving || withdrawing} />
       <div className="fixed top-0 right-0 h-full w-full max-w-[720px] bg-white shadow-2xl z-50 flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-slate-200">
@@ -286,48 +344,13 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
           ) : (
             <>
               {/* WO-...-LANGUAGE-EDITOR-V1: 언어 탭 — 언어별 독립 작업행(자동 복사 없음). */}
-              <div className="mb-3">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {SUPPORTED_LANGS.map((l) => {
-                    const row = rows.find((r) => normLang(r.language) === l);
-                    const active = l === language;
-                    const dot = !row ? null
-                      : row.status === 'canonical' ? 'bg-emerald-500'
-                      : (row.status === 'needs_review' || row.status === 'revision_requested') ? 'bg-amber-500'
-                      : 'bg-slate-400';
-                    return (
-                      <button
-                        key={l}
-                        type="button"
-                        onClick={() => selectLanguage(l)}
-                        disabled={saving || withdrawing}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 ${
-                          active ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {LANG_LABELS[l]}
-                        {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} title="작성된 설명서 있음" />}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-[11px] text-slate-400 mt-1.5">
-                  언어별로 <b>독립된 설명서</b>입니다. 한 언어를 저장해도 다른 언어에는 영향이 없으며, 언어마다 따로 검수받습니다. (● = 작성됨)
-                </p>
-              </div>
-              {readOnly && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                  <p>{isCanonical ? '매장에 노출 중인 설명서' : '보관된 설명서'}는 읽기 전용입니다. 수정은 작업본에서 진행합니다.</p>
-                  <button type="button" className="mt-2 font-medium text-emerald-700 underline" onClick={() => {
-                    setExisting(workingRow ?? null);
-                    // An existing draft always wins. Only an explicit new draft may start from published content.
-                    setContent(workingRow?.content ?? (isCanonical ? content : ''));
-                    setDirty(false);
-                  }}>
-                    {workingRow ? '현재 작업본 열기' : '새 작업본 작성'}
-                  </button>
-                </div>
-              )}
+              <DescriptionLanguageTabs language={language} rows={rows} busy={saving || withdrawing} onSelect={selectLanguage} />
+              {readOnly && <ReadOnlyDescriptionNotice published={isCanonical} hasWorkingDraft={!!workingRow} onEdit={() => {
+                setExisting(workingRow ?? null);
+                // An existing draft wins; only an explicit new draft starts from published content.
+                setContent(workingRow?.content ?? (isCanonical ? content : ''));
+                setDirty(false);
+              }} />}
               {isRevision && (
                 <div className="mb-3 px-3 py-2 rounded-lg bg-orange-50 border border-orange-200 text-xs text-orange-800">
                   <div className="font-semibold">운영자가 수정을 요청했습니다 · {fmtDay(existing?.revisionDueAt)}까지 재요청</div>
