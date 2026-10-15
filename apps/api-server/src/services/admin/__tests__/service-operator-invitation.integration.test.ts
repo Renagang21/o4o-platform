@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { DataSource, type EntityManager } from 'typeorm';
 
 jest.mock('../../../database/connection.js', () => ({ AppDataSource: {} }));
@@ -134,6 +134,8 @@ integration(
       service = new ServiceOperatorInvitationService(
         adapted as any,
         async (to, url) => {
+          const rawToken = new URLSearchParams(new URL(url).hash.slice(1)).get('token')!;
+          expect(await query('SELECT id FROM service_operator_invitations WHERE token_hash=$1', [createHash('sha256').update(rawToken).digest('hex')])).toHaveLength(1);
           mails.push({
             to,
             token: new URLSearchParams(new URL(url).hash.slice(1)).get(
@@ -295,12 +297,12 @@ integration(
         ).toEqual({ status, role: 'customer' });
       },
     );
-    it('mail failure rolls back the invitation and leaves no privilege', async () => {
+    it('mail failure keeps a durable pending invitation without granting privilege', async () => {
       sendOK = false;
       await expect(create()).rejects.toMatchObject({
         code: 'INVITATION_MAIL_FAILED',
       });
-      expect(await service.list()).toHaveLength(0);
+      expect(await service.list()).toEqual([expect.objectContaining({ status: 'pending' })]);
       expect(assignRole).not.toHaveBeenCalled();
     });
     it('resending rotates the hash and expiry, invalidating the previous link', async () => {
@@ -315,7 +317,7 @@ integration(
         role: 'lecture:operator',
       });
     });
-    it('failed resend keeps the previous link valid', async () => {
+    it('failed resend keeps durable state and permits an explicit later retry', async () => {
       const invite = await create();
       const old = token();
       now = new Date(now.getTime() + 61_000);
@@ -323,9 +325,12 @@ integration(
       await expect(
         service.manage(invite.id, admin, 'resend'),
       ).rejects.toMatchObject({ code: 'INVITATION_MAIL_FAILED' });
-      await expect(service.accept(old, target)).resolves.toMatchObject({
-        role: 'lecture:operator',
-      });
+      await expect(service.accept(old, target)).rejects.toMatchObject({ code: 'INVALID_OR_EXPIRED_INVITATION' });
+      expect(assignRole).not.toHaveBeenCalled();
+      sendOK = true;
+      now = new Date(now.getTime() + 61_000);
+      await service.manage(invite.id, admin, 'resend');
+      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:operator' });
     });
     it('an authorized new admin can re-endorse an invitation after the original inviter loses authority', async () => {
       const invite = await create();
@@ -362,6 +367,17 @@ integration(
       await expect(
         service.manage(invite.id, admin, 'resend'),
       ).rejects.toMatchObject({ code: 'INVITATION_RESEND_TOO_SOON' });
+    });
+    it('replaces an expired pending invitation without needing its list position', async () => {
+      const old = await create();
+      const oldToken = token();
+      now = new Date(now.getTime() + 8 * 86400_000);
+      const next = await create();
+      expect(next.id).not.toBe(old.id);
+      expect((await query('SELECT status FROM service_operator_invitations WHERE id=$1', [old.id]))[0].status).toBe('cancelled');
+      await expect(service.accept(oldToken, target)).rejects.toMatchObject({ code: 'INVALID_OR_EXPIRED_INVITATION' });
+      expect(assignRole).not.toHaveBeenCalled();
+      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:operator' });
     });
     it('rechecks inviter authority and target active status when accepting', async () => {
       await create();

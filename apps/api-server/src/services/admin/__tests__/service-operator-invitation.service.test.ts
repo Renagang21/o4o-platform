@@ -99,3 +99,15 @@ describe('operator invitation fail-closed boundaries', () => {
     expect(h.query.mock.calls[0][0]).not.toContain('UPDATE');
   });
 });
+
+
+it('never sends mail when the transaction callback finishes but commit fails', async () => {
+  const mail = jest.fn(async () => true);
+  const query = jest.fn(async (sql: string) => sql.includes('INSERT INTO service_operator_invitations')
+    ? [{ id: OTHER, invited_email: 'fixture@example.test', role: 'lecture:operator', purpose: 'assignment' }] : []);
+  const db = { query, transaction: async (callback: any) => { await callback({ query }); throw new Error('Synthetic commit failure'); } };
+  const service = new ServiceOperatorInvitationService(db as any, mail, () => NOW);
+  jest.spyOn(service as any, 'actor').mockResolvedValue(undefined);
+  await expect(service.create({ actorId: USER, email: 'fixture@example.test', serviceKey: 'lecture', role: 'lecture:operator' })).rejects.toThrow('Synthetic commit failure');
+  expect(mail).not.toHaveBeenCalled();
+});

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth, useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
-const KEY = 'o4o_operator_invite';
+import { OPERATOR_INVITATION_KEY as KEY } from '../lib/operatorInvitationReturn';
 /** Fragment tokens stay out of request URLs, access logs and login return URLs. GET never accepts. */
 export default function OperatorInvitePage() {
   const { user, isAuthenticated, isLoading, refreshAuth } = useAuth();

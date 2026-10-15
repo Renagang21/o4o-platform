@@ -39,11 +39,13 @@ function mount(path: string, entry: string, element: JSX.Element) {
 let hashAtCall: string[] = [];
 
 beforeEach(() => {
+  sessionStorage.clear();
   hashAtCall = [];
   api.verifyEmail.mockReset();
   api.resetPassword.mockReset();
 });
 afterEach(() => {
+  sessionStorage.clear();
   cleanup();
   window.history.replaceState(null, '', '/');
 });
@@ -132,4 +134,16 @@ describe('/reset-password', () => {
     expect(screen.queryByTestId('reset-password-form')).toBeNull();
     expect(api.resetPassword).not.toHaveBeenCalled();
   });
+});
+
+
+it('returns from email verification to login with a token-free operator invitation destination', async () => {
+  const invitation = 'a'.repeat(64);
+  sessionStorage.setItem('o4o_operator_invite', invitation);
+  api.verifyEmail.mockResolvedValue({ message: '확인 완료' });
+  mount('/verify-email', `/verify-email#token=${TOKEN}`, <VerifyEmailPage />);
+  const login = await screen.findByRole('link', { name: '로그인하러 가기' });
+  expect(login.getAttribute('href')).toBe('/login?returnTo=%2Foperator-invite');
+  expect(login.getAttribute('href')).not.toContain(invitation);
+  expect(sessionStorage.getItem('o4o_operator_invite')).toBe(invitation);
 });

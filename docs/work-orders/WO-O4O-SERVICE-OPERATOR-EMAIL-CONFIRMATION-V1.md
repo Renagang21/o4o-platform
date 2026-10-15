@@ -88,3 +88,14 @@ OPERATOR_INVITE_TEST_PORT=55432 pnpm --filter @o4o/api-server exec jest --runInB
 - 격리 PostgreSQL15에 canonical bootstrap과 전체 incremental manifest를 적용해 prefix schema fingerprint 일치를 확인했다. 실제 DB 통합 23 PASS: 이미 active인 membership 포함 상태 보존, 비활성 사용자 수락 거절/무쓰기. 컨테이너·fixture DB 제거 완료. 운영 DB 접속·DDL·메일 발송 없음.
 - API 타입 검사·production build PASS. 관리자 초대/role UI 12 PASS, Neture 수락 UI 5 PASS.
 - 전체 CI·Sonar·Codex는 새 통합 PR head로 판정한다. 신규 migration의 운영 적용 및 실제 계정 초대 발송은 미실행이다.
+
+
+### 통합 리뷰 후속 — 가입 복귀·메일 커밋 순서·만료 초대
+
+#641 P2 세 건을 보완했다. 초대 토큰은 tab-local sessionStorage에만 두고, 이메일 가입·확인 화면의 로그인 링크와 가입 완료 복귀는 저장된 유효 초대가 있을 때 고정 `/operator-invite`로 연결한다. 토큰은 signup/login URL에 싣지 않고 수락은 여전히 사용자의 명시적 클릭·서버 본인 확인 뒤에만 실행한다. 일반 가입, 잘못된 token, 브라우저 storage 차단 시 기본 홈 복귀를 유지한다.
+
+메일은 token hash·만료의 transaction commit이 끝난 뒤 발송한다. commit 실패 시 메일이 전혀 발송되지 않는 회귀를 추가했다. SMTP 실패 시 이미 커밋한 pending 상태는 유지되며 이전 token은 교체된 상태다. 권한 부여는 없고, 관리자에게 목록 새로고침 후 1분 뒤 재발송·취소하도록 명시한다. 실패한 메일을 성공으로 응답하거나 DB commit을 되돌렸다고 주장하지 않는다. 이 실패 상태·기존 링크 무효·후속 재발송 복구를 실제 DB에서 검증했다.
+
+동일 email/service/role의 새 초대를 만들 때 기존 advisory lock 안에서 만료 pending을 cancelled로 전이해 pending-only unique key를 해제한다. 관리 목록 200건 밖에 있어도 새 초대를 만들 수 있고 옛 token은 거절한다. 새 status나 schema 변경은 없다.
+
+검증: 영향 API13 suite152 PASS(별도 DB24는 opt-in skip), 격리 PG15 실제24 PASS 및 모든 메일 callback에서 별도 DB 연결로 hash 커밋 가시성 확인. commit 실패 무발송 unit8 PASS. Neture 전체1025 PASS, 이후 추가한 복귀 helper4개와 verification9개13 PASS. API tsc/build·최종 Neture build·변경 lint PASS. fixture 컨테이너 제거 완료. 실제 사용자·운영 DB·SMTP·메일 수신·배포는 미실행이다. 최종 CI·리뷰는 새 head 기준으로 확인한다.

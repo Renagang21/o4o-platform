@@ -28,10 +28,9 @@ export class ServiceOperatorInvitationError extends Error {
             '이미 가입된 이메일입니다. 사용자 검색에서 대상 계정을 선택하세요.',
           INVITATION_ALREADY_PENDING:
             '확인 대기 중인 초대가 있습니다. 초대 목록에서 재발송 또는 취소하세요.',
-          INVITATION_MAIL_FAILED:
-            '확인 메일을 보내지 못했습니다. 메일 설정을 확인한 뒤 다시 요청하세요.',
           INVALID_INVITATION_ID: '초대 식별자가 올바르지 않습니다.',
           INVITATION_NOT_FOUND: '초대를 찾을 수 없습니다.',
+          INVITATION_MAIL_FAILED: '초대 상태는 저장되었지만 메일 발송이 확인되지 않았습니다. 목록을 새로고침하고 1분 후 재발송하거나 취소해 주세요.',
           INVITATION_NOT_PENDING: '이미 수락되거나 취소된 초대입니다.',
           INVITATION_RESEND_TOO_SOON: '재발송은 이전 발송 1분 후 가능합니다.',
           INVALID_OR_EXPIRED_INVITATION:
@@ -144,10 +143,10 @@ export class ServiceOperatorInvitationService {
     return rows.length > 0;
   }
 
-  private async deliver(
+  private async prepareDelivery(
     m: EntityManager,
     invite: OperatorInvite,
-  ): Promise<OperatorInvite> {
+  ): Promise<{ invite: OperatorInvite; url: string | null }> {
     const token = randomBytes(32).toString('hex');
     const expires = new Date(this.now().getTime() + 7 * 86400_000);
     await m.query(
@@ -156,6 +155,12 @@ export class ServiceOperatorInvitationService {
     );
     // Fixed catalog origin; request Origin/Host/returnUrl never control a mailed link.
     const url = `${getServiceOrigin('neture')}/operator-invite#token=${token}`;
+    return { invite: { ...invite, expires_at: expires, updated_at: this.now() }, url };
+  }
+
+  private async deliverCommitted(prepared: { invite: OperatorInvite; url: string | null }): Promise<OperatorInvite> {
+    const { invite, url } = prepared;
+    if (!url) return invite;
     let sent = false;
     try {
       sent = await this.sendMail(
@@ -168,7 +173,7 @@ export class ServiceOperatorInvitationService {
       /* Do not log mailer errors: transports may include credentials or message bodies. */
     }
     if (!sent) fail('INVITATION_MAIL_FAILED', 503);
-    return { ...invite, expires_at: expires, updated_at: this.now() };
+    return invite;
   }
 
   async create(input: {
@@ -179,7 +184,7 @@ export class ServiceOperatorInvitationService {
     actorId: string;
   }): Promise<OperatorInvite> {
     const resolved = resolveOperatorRole(input.role, input.serviceKey);
-    return this.db.transaction(async (m) => {
+    const prepared = await this.db.transaction(async (m) => {
       await this.actor(m, input.actorId);
       const user = input.targetUserId
         ? await this.target(m, input.targetUserId)
@@ -200,6 +205,10 @@ export class ServiceOperatorInvitationService {
       await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
         hash(`${email}:${resolved.serviceKey}:${resolved.role}`),
       ]);
+      // Free the pending-only unique key even when the old row is beyond the list window.
+      await m.query(`UPDATE service_operator_invitations SET status='cancelled',updated_at=$4
+        WHERE lower(invited_email)=$1 AND service_key=$2 AND role=$3 AND status='pending' AND expires_at<=$4`,
+        [email, resolved.serviceKey, resolved.role, this.now()]);
       const pending = await m.query(
         `SELECT id FROM service_operator_invitations
         WHERE lower(invited_email)=$1 AND service_key=$2 AND role=$3 AND status='pending' FOR UPDATE`,
@@ -223,8 +232,9 @@ export class ServiceOperatorInvitationService {
           this.now(),
         ],
       );
-      return this.deliver(m, invite);
+      return this.prepareDelivery(m, invite);
     });
+    return this.deliverCommitted(prepared);
   }
 
   async manage(
@@ -233,7 +243,7 @@ export class ServiceOperatorInvitationService {
     action: 'resend' | 'cancel',
   ): Promise<OperatorInvite> {
     if (!UUID.test(id)) fail('INVALID_INVITATION_ID', 400);
-    return this.db.transaction(async (m) => {
+    const prepared = await this.db.transaction(async (m) => {
       await this.actor(m, actorId);
       const [invite]: OperatorInvite[] = await m.query(
         `SELECT ${COLUMNS} FROM service_operator_invitations WHERE id=$1 FOR UPDATE`,
@@ -246,7 +256,7 @@ export class ServiceOperatorInvitationService {
           "UPDATE service_operator_invitations SET status='cancelled',updated_at=now() WHERE id=$1",
           [id],
         );
-        return { ...invite, status: 'cancelled' };
+        return { invite: { ...invite, status: 'cancelled' as const }, url: null };
       }
       resolveOperatorRole(invite.role, invite.service_key);
       if (invite.target_user_id) await this.target(m, invite.target_user_id);
@@ -256,8 +266,9 @@ export class ServiceOperatorInvitationService {
         'UPDATE service_operator_invitations SET invited_by_user_id=$2 WHERE id=$1',
         [invite.id, actorId],
       );
-      return this.deliver(m, { ...invite, invited_by_user_id: actorId });
+      return this.prepareDelivery(m, { ...invite, invited_by_user_id: actorId });
     });
+    return this.deliverCommitted(prepared);
   }
 
   async inspect(
