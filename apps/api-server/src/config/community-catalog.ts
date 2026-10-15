@@ -63,7 +63,7 @@ export const O4O_COMMUNITIES: readonly CommunityDefinition[] = Object.freeze([
     status: 'active',
     participationPolicy: { mode: 'authenticated' },
     capabilities: ['forum', 'content', 'resources'],
-    // KPA 와 Pharmacy-Hub 가 만든 포럼은 하나의 약사 커뮤니티다 (PH 별도 약사 Community = 0).
+    // 약사 커뮤니티 포럼 저장 코드. 'pharmacy-hub' 는 퇴역 서비스(PharmacyHub) 시절 만들어진 포럼 행의 저장 코드다.
     forumStorageCodes: ['kpa-society', 'pharmacy-hub'],
     entries: [
       { serviceKey: 'kpa-society', path: '/forum' },
@@ -106,7 +106,7 @@ export function listActiveCommunities(): CommunityDefinition[] {
 }
 
 /**
- * Legacy service-scoped mount(`/kpa/forum`, `/pharmacy-hub/forum`, …)가 자기 Community 를 찾는 adapter.
+ * Legacy service-scoped mount(`/kpa/forum`, …)가 자기 Community 를 찾는 adapter.
  * 서비스가 Community 를 소유한다는 뜻이 아니라, "이 서비스 web 의 커뮤니티 surface 가 어느 Community 의
  * 진입인가" 를 catalog `entries` 에서 역으로 읽는 것이다. 없으면 undefined (Community 아님).
  */

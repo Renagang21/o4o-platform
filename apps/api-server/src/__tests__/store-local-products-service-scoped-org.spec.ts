@@ -122,7 +122,8 @@ function makeDataSource() {
       }
 
       // 2-a) 약국 매장(kpa) 후보 — 내 매장(약국) 신청 원장 active 조직
-      if (sql.includes('neture_pharmacy_memberships')) {
+      //      (back-compat 후보 SQL 도 퇴역 서비스 전용 조직 판정에 이 테이블을 쓰므로 is_primary 로 구분한다)
+      if (sql.includes('neture_pharmacy_memberships') && !sql.includes('is_primary')) {
         const roles = params[1] as string[];
         return memberships
           .filter((m) => roles.includes(m.role) && m.pharmacyLedger === 'active')
@@ -130,7 +131,7 @@ function makeDataSource() {
       }
 
       // 2) service-scoped 후보 (serviceKey 지정 경로)
-      if (sql.includes('organization_service_enrollments')) {
+      if (sql.includes('organization_service_enrollments') && !sql.includes('is_primary')) {
         const roles = params[1] as string[];
         const enrollmentCodes = params[2] as string[];
         const slugKeys = params[3] as string[];

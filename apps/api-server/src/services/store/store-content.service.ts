@@ -8,11 +8,11 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * `kpa_store_contents` 는 **legacy physical table name** 이고 논리 개념은 service-neutral
  * Store Production Material 이다 (CLAUDE.md §5 / O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1).
- * 따라서 KPA 전용 테이블이 아니며, Pharmacy-Hub 도 같은 원장을 organization_id 로 격리해 쓴다.
+ * 따라서 KPA 전용 테이블이 아니며, 서비스와 무관하게 같은 원장을 organization_id 로 격리해 쓴다.
  *
  * 왜 추출하는가
  *   공통 controller 는 조직을 isStoreOwner(dataSource, userId, 'kpa') + KpaMember fallback 으로
- *   구한다 — KPA 하드와이어라 Pharmacy-Hub 가 그대로 마운트할 수 없다.
+ *   구한다 — KPA 하드와이어다.
  *   조직 결정만 서비스 경계별로 하고, 검증·SQL 계약은 공유한다.
  *
  * 계약

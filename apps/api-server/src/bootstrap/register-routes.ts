@@ -102,7 +102,6 @@ import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.rout
 // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
 //   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
-// WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
 import { createKpaBranchRoutes } from '../routes/kpa-branch/kpa-branch.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
@@ -182,7 +181,6 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
   // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F:
   //   결제됐으나 공급자에게 전달되지 않은(paid-but-unbridged) 주문 탐지·복구 — 전 producer 공통.
-  //   기존 Pharmacy-Hub 전용 recovery 는 그대로 유지한다(무회귀).
   app.use('/api/v1/admin/fulfillment', createAdminFulfillmentRecoveryRoutes());
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/pending-tasks', adminPendingTasksRoutes);
@@ -918,7 +916,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
       // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
       //   KpaPaymentEventHandler 제거 — serviceKey='kpa' producer 0건.
-      //   (KPA B2B 발주는 O4O 결제 경로를 쓰지 않는다. 결제 축은 pharmacy-hub /
+      //   (KPA B2B 발주는 O4O 결제 경로를 쓰지 않는다. 결제 축은
       //    neture-b2b / store-service-subscription 만 살아 있다.)
 
       // 31-b. Register KPA Join Inquiry public routes (WO-KPA-JOIN-CONVERSION-V1)

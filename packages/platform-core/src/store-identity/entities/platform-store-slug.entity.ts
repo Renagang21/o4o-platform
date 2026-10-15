@@ -23,10 +23,7 @@ import {
 /**
  * Service keys for slug ownership
  */
-// WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 'pharmacy-hub' 추가 (additive union 확장).
-//   DB 컬럼은 varchar(50) 이라 스키마 변경·migration 이 없다. 기존 4 키의 의미·동작 불변이며
-//   소비처(store-hub.controller / foreign-visitor-partner-qr-code.routes)는 전부 pass-through
-//   cast 라 exhaustive switch 회귀가 없다.
+// DB 컬럼은 varchar(50) 이다. 퇴역 서비스 키(PharmacyHub 등)는 union 에 두지 않는다.
 export type StoreSlugServiceKey =
   | 'cosmetics'
   | 'kpa'
@@ -59,7 +56,7 @@ export class PlatformStoreSlug {
 
   /**
    * The canonical store axis is **organizations.id** (all services reserve with the
-   * organization id — kpa / cosmetics / pharmacy-hub).
+   * organization id — kpa / cosmetics).
    *
    * WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §6 에서 축을 고정했다.
    * 서비스 전용 매장 테이블 PK(예: cosmetics_stores.id)를 넣으면 공개 조회가 영구 404 이고

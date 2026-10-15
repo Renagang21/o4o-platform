@@ -34,9 +34,7 @@ import { ForeignVisitorPartnerQrCodeService } from './foreign-visitor-partner-qr
 import { ForeignVisitorPartnerQrScanEventService, hashWithSalt } from './foreign-visitor-partner-qr-scan-event.service.js';
 import { FOREIGN_VISITOR_QR_STATUSES, type ForeignVisitorQrStatus } from './foreign-visitor-partner-qr-code.entity.js';
 
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-//   serviceKey allowlist 확장만으로 PharmacyHub 를 수용한다 (분기·복제 없음).
-//   원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 — 기존 3서비스 동작 불변.
+// 원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 (서비스별 분기·복제 없음).
 const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics'];
 const GATE_PLAN_CODE = 'FOREIGN_VISITOR_SALES_SUPPORT' as const;
 

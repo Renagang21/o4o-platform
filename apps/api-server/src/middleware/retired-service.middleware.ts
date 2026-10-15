@@ -1,13 +1,16 @@
 import type { RequestHandler, Response } from 'express';
 
-const retiredKeys = new Set(['pharmacy-hub', 'pharmacy-hub-event-offer']);
+/** 퇴역 서비스 키 SSOT — SQL 판정(utils/retired-organization.ts)도 이 값을 쓴다. */
+export const RETIRED_SERVICE_KEYS = ['pharmacy-hub', 'pharmacy-hub-event-offer'] as const;
+export const RETIRED_SERVICE_KEY_PREFIX = 'pharmacy-hub:';
+const retiredKeys = new Set<string>(RETIRED_SERVICE_KEYS);
 const scopeFields = ['serviceId', 'serviceKey', 'service_key', 'serviceCode', 'service_code', 'sourceService',
   'membershipServiceKey', 'membershipRole', 'targetServiceKey', 'sourceServiceKey', 'serviceKeys', 'service_keys', 'role', 'roles'] as const;
 export function isRetiredServiceValue(value: unknown): boolean {
   if (Array.isArray(value)) return value.some(isRetiredServiceValue);
   if (typeof value !== 'string') return false;
   const key = value.trim();
-  return retiredKeys.has(key) || key.startsWith('pharmacy-hub:');
+  return retiredKeys.has(key) || key.startsWith(RETIRED_SERVICE_KEY_PREFIX);
 }
 
 /** Role provisioning/catalog boundary; legacy cosmetics service APIs are outside this scope. */

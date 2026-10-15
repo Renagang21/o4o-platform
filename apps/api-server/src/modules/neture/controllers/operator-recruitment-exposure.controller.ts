@@ -23,6 +23,7 @@ import { requireNetureScope } from '../../../middleware/neture-scope.middleware.
 import { NetureService } from '../neture.service.js';
 import { ExposureStatus, RecruitmentStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { sendRetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };
@@ -93,6 +94,7 @@ export function createOperatorRecruitmentExposureController(_dataSource: DataSou
       }
       res.json({ success: true, data: result.data });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[OperatorRecruitmentExposure] Error deciding:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }

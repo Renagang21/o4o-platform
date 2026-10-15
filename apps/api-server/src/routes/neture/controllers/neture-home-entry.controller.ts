@@ -39,7 +39,7 @@ import { resolveNetureServiceStates } from '../../../modules/neture/services/net
 const STORE_CAPABLE_SERVICES = listStoreCapableServices();
 
 export interface HomeEntryStore {
-  /** canonical service_key (kpa-society · k-cosmetics · pharmacy-hub) */
+  /** canonical service_key (kpa-society · k-cosmetics) */
   serviceKey: string;
   organizationId: string;
   /** organizations.name (없으면 null — 화면은 "이름 없는 매장" 으로 표시) */

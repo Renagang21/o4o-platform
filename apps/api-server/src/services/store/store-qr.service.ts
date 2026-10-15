@@ -26,6 +26,8 @@
 
 import type { DataSource } from 'typeorm';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { RETIRED_SERVICE_KEYS } from '../../middleware/retired-service.middleware.js';
+import { retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -181,6 +183,15 @@ export async function resolvePublicQrLanding(
     return NOT_FOUND;
   }
 
+  // 퇴역 서비스(PharmacyHub 등) 전용 매장의 QR 은 착지시키지 않고 스캔도 기록하지 않는다.
+  const [retiredOrg]: Array<{ retired: boolean }> = await dataSource.query(
+    `SELECT ${retiredServiceOnlyOrganizationSql('$1::uuid')} AS retired`,
+    [qrData.organizationId],
+  );
+  if (retiredOrg?.retired) {
+    return failure(410, 'SERVICE_RETIRED', '운영이 종료된 서비스의 QR 입니다.');
+  }
+
   // 5초 중복 방지: 같은 ipHash + qrCodeId
   //
   // WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1:
@@ -223,14 +234,14 @@ export async function resolvePublicQrLanding(
   // 매장(조직)은 서비스마다 slug 를 가질 수 있다(1 Store : N Services). storeSlug 는 종전대로 최신 slug.
   const storeRows: Array<{ slug: string; service_key: string }> = await dataSource.query(
     `SELECT slug, service_key FROM platform_store_slugs
-     WHERE store_id = $1 AND is_active = true
+     WHERE store_id = $1 AND is_active = true AND NOT (service_key = ANY($2::text[]))
      ORDER BY created_at DESC`,
-    [qrData.organizationId],
+    [qrData.organizationId, [...RETIRED_SERVICE_KEYS]],
   );
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
   //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·
   //   중첩 QR 주소)은 서비스 축을 쓰므로, 매장이 **호출 호스트 서비스의 slug 를 하나도 갖지 않을 때만** 매장의
-  //   최신 slug 서비스 축을 쓴다(예: 옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr 에서 연다).
+  //   최신 slug 서비스 축을 쓴다. 퇴역 서비스 slug 는 위 조회에서 제외되므로 축이 될 수 없다.
   //   호출 서비스 slug 가 있으면(여러 서비스에 걸친 매장 포함) 종전과 같다.
   const callerServiceKey = serviceKey || 'kpa';
   const callerCanonical = resolveCanonicalServiceKey(callerServiceKey);

@@ -64,7 +64,6 @@ const TRANSLATION_LOCALES: TranslationLocale[] = ['en', 'zh', 'ja', 'vi', 'th', 
 // WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1:
 //   목록 + direct CRUD + productRef 링크 로직을 services/store/store-content.service.ts 로 추출.
 //   이 컨트롤러는 KPA 조직 결정(isStoreOwner('kpa') + KpaMember fallback) + 응답 envelope 만 담당한다.
-//   Pharmacy-Hub 는 같은 서비스 함수를 enrollment 기준 조직 해석기와 함께 호출한다 (로직 복제 0).
 //   요청/응답 계약은 추출 전과 동일하다.
 export { normalizeTags };
 

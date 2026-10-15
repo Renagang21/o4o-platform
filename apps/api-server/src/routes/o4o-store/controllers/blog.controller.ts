@@ -35,7 +35,6 @@ import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1:
 //   staff \uC800\uC791 \uB85C\uC9C1\uC744 services/store/store-blog.service.ts \uB85C \uCD94\uCD9C.
 //   \uC774 \uCEE8\uD2B8\uB864\uB7EC\uB294 slug\u2192\uB9E4\uC7A5 \uD574\uC11D + \uC18C\uC720 \uD655\uC778 + \uC751\uB2F5 envelope \uB9CC \uB2F4\uB2F9\uD55C\uB2E4.
-//   Pharmacy-Hub \uB294 \uAC19\uC740 \uC11C\uBE44\uC2A4 \uD568\uC218\uB97C enrollment \uAE30\uC900 \uC870\uC9C1 \uD574\uC11D\uAE30\uC640 \uD568\uAED8 \uD638\uCD9C\uD55C\uB2E4.
 import {
   listStoreBlogPosts,
   createStoreBlogPost,

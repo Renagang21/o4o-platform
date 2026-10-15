@@ -3,7 +3,7 @@ import { cleanup, render, waitFor, fireEvent, screen } from '@testing-library/re
 import UserDetailPage from '../UserDetailPage';
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 describe('member detail service boundary', () => {
-  it.each(['neture', 'kpa-society', 'pharmacy-hub'])('sends selected service %s and refreshes when selection changes', async (serviceKey) => {
+  it.each(['neture', 'kpa-society', 'kpa-branch'])('sends selected service %s and refreshes when selection changes', async (serviceKey) => {
     const get = vi.fn(async (path: string) => { void path; return ({ user: { id: 'u', name: '회원', email: 'fixture@example.invalid', status: 'active', isActive: true, createdAt: '2026-01-01' }, roles: [], memberships: [] }); });
     const api = { get, put: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() };
     const config: any = { theme: 'blue', serviceKey };

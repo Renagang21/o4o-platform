@@ -7,8 +7,6 @@
  *   검증·SQL 계약을 services/store/store-local-products.service.ts 로 추출하고
  *   이 라우트는 **인증·조직 결정 + 상태코드 매핑**만 담당한다.
  *   기존 `resolveStoreAccess` 판정 후 명시 선택 조직 일치를 상품 어댑터에서 확인한다.
- *   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다
- *   (routes/pharmacy-hub — 라우트 복사 금지).
  *
  * StoreLocalProduct는 Commerce Object가 아니다.
  * Checkout/EcommerceOrder와 완전 분리된 Display Domain.

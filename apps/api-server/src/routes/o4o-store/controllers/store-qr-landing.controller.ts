@@ -34,7 +34,6 @@ import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspac
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1:
 //   QR CRUD·집계 계약을 services/store/store-qr.service.ts 로 추출했다. 이 controller 는
 //   인증·조직 결정(공통 createRequireStoreWorkspaceAccess — 무변경)과 응답 매핑·파일 스트리밍만 담당한다.
-//   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다.
 import {
   resolvePublicQrLanding,
   listStoreQrCodes,
@@ -49,7 +48,7 @@ import {
   type QrFailure,
 } from '../../../services/store/store-qr.service.js';
 // WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §7:
-//   placement lifecycle 은 KPA/PH 공통 service 하나가 SSOT 다. 서비스별 복제본을 만들지 않는다.
+//   placement lifecycle 은 공통 service 하나가 SSOT 다. 서비스별 복제본을 만들지 않는다.
 import {
   listQrPlacements,
   startQrPlacement,
@@ -81,9 +80,6 @@ type AuthMiddleware = RequestHandler;
 const QR_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   cosmetics: 'k-cosmetics',
-  // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1: role prefix 와 catalog key 동일
-  // (service-catalog.ts `pharmacy-hub` → pharmacyhub.co.kr). 본 controller 는 서비스별
-  // 명시 serviceKey 로만 mount 되며 pharmacy-hub mount 는 아직 없다.
   // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1: role prefix 와 catalog key 동일.
   // 본 controller 는 cafe24-b2b 로 mount 되지 않는다 (Pilot 범위 밖 — §14).
   'cafe24-b2b': 'cafe24-b2b',

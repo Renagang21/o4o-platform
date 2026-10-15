@@ -76,7 +76,8 @@ export function makeStoreTabletDataSource(opts: StoreTabletStubOptions) {
         const allowed = params[1] as string[];
         return opts.currentRoles().some((r) => allowed.includes(r)) ? [{ ok: 1 }] : [];
       }
-      if (sql.includes('organization_service_enrollments')) {
+      // back-compat 후보 SQL(is_primary)도 퇴역 서비스 전용 조직 판정에 enrollment 를 쓰므로 구분한다
+      if (sql.includes('organization_service_enrollments') && !sql.includes('is_primary')) {
         const roles = params[1] as string[];
         const enrollmentCodes = params[2] as string[];
         const slugKeys = params[3] as string[];

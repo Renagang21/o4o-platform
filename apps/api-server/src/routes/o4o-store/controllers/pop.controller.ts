@@ -22,7 +22,6 @@
  * WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1:
  *   저장·검증 계약을 services/store/store-pop.service.ts 로 추출했다. 이 controller 는
  *   **slug → 매장 해석 + 소유 확인 + 응답 매핑**만 담당한다 (조직 해석 방식 무변경).
- *   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다.
  *
  * Drift Guard (service 안에서 강제):
  *   - import endpoint 는 author_role='operator' AND status='published' 원본만 통과

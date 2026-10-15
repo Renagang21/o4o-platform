@@ -50,7 +50,7 @@ export class CertificateController extends BaseController {
       const issuedBy = (req as any).user?.id;
       const service = CertificateService.getInstance();
 
-      // PR #225 merge-gate: 발급 대상 course 는 lecture scope 만 (legacy KPA/PH courseId 는 non-disclosure 404).
+      // PR #225 merge-gate: 발급 대상 course 는 lecture scope 만 (legacy KPA 등 courseId 는 non-disclosure 404).
       if (!(await guardCourseScope(req, res, data?.courseId))) return;
 
       const certificate = await service.issueCertificate(data, issuedBy);
@@ -189,7 +189,7 @@ export class CertificateController extends BaseController {
 
   /**
    * PR #225 merge-gate 재검토 P1-9: update/revoke/renew 대상 certificate 는 lecture course 의 것만.
-   * legacy(KPA/PH) certificate 는 non-disclosure 404 · write 0. `null` 이면 이미 응답된 상태다.
+   * legacy(KPA 등) certificate 는 non-disclosure 404 · write 0. `null` 이면 이미 응답된 상태다.
    */
   private static async loadLectureCertificateOr404(req: Request, res: Response, id: string | undefined) {
     if (!id) {

@@ -34,8 +34,8 @@ const NETURE_B2B_ORDER_SOURCE = 'neture_b2b_checkout';
  *   bridge 대상 checkout_order 의 `metadata.source` 별 기술자(registry).
  *
  * Neture 는 기존 값과 **완전히 동일**하다(무회귀 — 등록만 옮겼을 뿐 값·동작 불변).
- * Pharmacy-Hub 는 자기 항목을 추가해 같은 bridge 를 탄다. 공급자 workspace 는
- * `neture_orders.service_key` 로 스코프하므로 두 서비스 주문은 섞이지 않는다.
+ * 다른 producer 도 자기 항목을 추가해 같은 bridge 를 탄다. 공급자 workspace 는
+ * `neture_orders.service_key` 로 스코프하므로 서비스 간 주문은 섞이지 않는다.
  */
 interface BridgeSourceDescriptor {
   /** payment sourceService 라벨 (metadata.sourceService 로 기록) */

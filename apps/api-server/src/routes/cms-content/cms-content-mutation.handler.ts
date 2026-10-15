@@ -21,6 +21,7 @@ import { requireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import { CmsContentService, StatusValidationError, StatusTransitionError } from './cms-content.service.js';
 import type { ContentAuthorRole, ContentVisibilityScope } from './cms-content-utils.js';
 import {
@@ -287,6 +288,12 @@ export function createCmsContentMutationRoutes(deps: {
         return;
       }
 
+      // 퇴역 서비스 콘텐츠는 platform admin 이라도 수정하지 않는다.
+      if (isRetiredServiceValue(content.serviceKey)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+
       // Service-scoped authorization against the existing content's serviceKey.
       // Non-platform-admin callers cannot move content across services.
       const putAuth = await authorizeCmsMutation(req.user, content.serviceKey);
@@ -401,6 +408,10 @@ export function createCmsContentMutationRoutes(deps: {
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },
         });
+        return;
+      }
+      if (isRetiredServiceValue(existing.serviceKey)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }
       const patchAuth = await authorizeCmsMutation(req.user, existing.serviceKey);

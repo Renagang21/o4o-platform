@@ -133,7 +133,7 @@ describe('buildHomeEntryModel — 매장 카드 = Store Workspace Home', () => {
     serviceStates: { supplier: { status: 'none', source: 'none' } },
   });
 
-  it('1 Store : N Services — 버튼 = 매장 이름 · returnPath = <basePath>/workspace (KPA /store, PH /store-owner) · 서비스 이름은 보조 정보 · 운영 종료된 K-Cos 는 진입 없음', () => {
+  it('1 Store : N Services — 버튼 = 매장 이름 · returnPath = <basePath>/workspace (KPA /store) · 서비스 이름은 보조 정보 · 퇴역한 K-Cos·PharmacyHub 는 진입 없음', () => {
     const m = buildHomeEntryModel(user(['user']), storeData());
     const store = m.groups.find((g) => g.id === 'store')!;
     expect(store.title).toBe('매장');
@@ -158,9 +158,9 @@ describe('buildHomeEntryModel — 매장 카드 = Store Workspace Home', () => {
     expect(buildHomeEntryModel(user(['user']), d).groups.find((g) => g.id === 'store')!.items[0].label).toBe('이름 없는 매장');
   });
 
-  it('active 가 아닌 서비스의 매장은 진입을 만들지 않는다', () => {
+  it('약국 매장(KPA)은 개인 가입 상태와 무관하고, 퇴역 서비스 매장은 active 여도 진입이 없다', () => {
     const d = storeData();
-    d.services = d.services.map((s) => (s.key === 'pharmacy-hub' ? { ...s, membership: { status: 'suspended' } } : s)) as HomeEntryData['services'];
+    d.services = d.services.map((s) => (s.key === 'kpa-society' ? { ...s, membership: { status: 'suspended' } } : s)) as HomeEntryData['services'];
     const m = buildHomeEntryModel(user(['user']), d);
     expect(m.groups.find((g) => g.id === 'store')!.items.map((i) => i.action)).toEqual([
       { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' },

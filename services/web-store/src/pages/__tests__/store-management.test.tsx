@@ -52,8 +52,8 @@ describe('내 매장 경영지원', () => {
     mount(<StoreLibraryNavigation section="mine" />);
     expect(screen.getByRole('link', { name: '자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents');
   });
-  it('PharmacyHub 문맥에서는 약국 전용 자료 입구를 숨기고 내 자료함 기능을 보존한다', () => {
-    mocks.serviceKey = 'pharmacy-hub';
+  it('약국이 아닌 서비스 문맥에서는 약국 전용 자료 입구를 숨기고 내 자료함 기능을 보존한다', () => {
+    mocks.serviceKey = 'neture';
     mount(<StoreLibraryNavigation section="mine" />);
     expect(screen.queryByRole('link', { name: '자료 가져오기' })).toBeNull();
     expect(screen.getByRole('link', { name: '파일 · 참고 자료' })).toBeTruthy();

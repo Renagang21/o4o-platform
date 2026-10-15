@@ -71,7 +71,6 @@ export interface O4OService {
   name: string;
   /**
    * 한글 표시 이름 (optional — 미지정 시 name 사용).
-   * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1 에서 추가. 기존 서비스는 미지정으로 동작 불변.
    */
   nameKo?: string;
   /**

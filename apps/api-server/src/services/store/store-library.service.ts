@@ -8,7 +8,6 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 왜 추출하는가 — store-local-products.service.ts 와 동일한 이유다.
  *   공통 controller 는 createRequireStoreOwner(=resolveStoreAccess) 로 조직을 주입받는다.
- *   Pharmacy-Hub 는 enrollment 기준 resolvePharmacyHubStoreOrganization() 으로 조직을 정한다.
  *   조직 결정만 서비스 경계별로 하고(공통 가드 무변경), 검증·SQL 계약은 공유한다.
  *
  * 계약
@@ -16,8 +15,8 @@
  *   - 소유 경계는 organization_id 단일 축이다 (Boundary Policy §7 Store Ops).
  *   - 삭제는 **비활성화(soft delete)** 다. 물리 삭제 경로를 새로 만들지 않는다.
  *   - 검증 실패는 예외가 아니라 결과 객체로 돌려준다 (라우트가 상태코드를 그대로 매핑).
- *   - 응답 envelope 은 만들지 않는다 — 공통 라우트는 nested({error:{code,message}}),
- *     Pharmacy-Hub 는 flat({error,code}) 로 서로 다르기 때문이다.
+ *   - 응답 envelope 은 만들지 않는다 — 라우트마다 형태(예: nested({error:{code,message}}))가
+ *     다를 수 있기 때문이다.
  */
 
 import type { DataSource } from 'typeorm';

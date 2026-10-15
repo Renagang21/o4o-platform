@@ -32,9 +32,7 @@ import {
 } from './store-service-subscription-plan-catalog.js';
 
 /** Store feature 이용권의 serviceKey 축 = store_owner role-prefix (kpa|cosmetics). */
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-//   serviceKey allowlist 확장만으로 PharmacyHub 를 수용한다 (분기·복제 없음).
-//   원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 — 기존 3서비스 동작 불변.
+// 원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 (서비스별 분기·복제 없음).
 const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics'];
 
 // ── WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (가격/기간/표시명은 plan catalog SSOT) ──

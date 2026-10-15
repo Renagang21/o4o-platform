@@ -285,7 +285,7 @@ export class CourseController extends BaseController {
    * 직접 publish 는 Lecture 운영자(`lecture:operator` ⊂ `lecture:admin`) override 경로.
    * 일반 강사는 submit-review 를 사용해야 함 → 403.
    * PR #225 merge-gate(Codex P1): 호출자 role 만이 아니라 대상 강의도 검사한다 —
-   * `course.serviceKey !== 'lecture'`(legacy KPA/PH/null) 는 approve/reject/archive 와 같이 404.
+   * `course.serviceKey !== 'lecture'`(legacy KPA/null) 는 approve/reject/archive 와 같이 404.
    */
   static async publishCourse(req: Request, res: Response): Promise<any> {
     try {
@@ -425,7 +425,7 @@ export class CourseController extends BaseController {
    * 계약
    * - guard: requireAuth + requireLectureOperator (active lecture membership + `lecture:operator` ⊂ `lecture:admin`,
    *   `platform:super_admin` break-glass 유지). role 만으로는 통과하지 못한다.
-   * - scope: `course.serviceKey === 'lecture'` 만. legacy(KPA/PH/NULL) 는 non-disclosure 404.
+   * - scope: `course.serviceKey === 'lecture'` 만. legacy(KPA/NULL) 는 non-disclosure 404.
    *   scope 판정은 소유권·admin override 보다 먼저다.
    * - 노출: 강의 정보 · 커리큘럼(lesson) · lesson 내용 · 평가(quiz/assignment) 존재 여부.
    * - 금지: enrollment 생성 · 모든 write · 정답 노출 · 타 서비스 강의 접근. write 0.

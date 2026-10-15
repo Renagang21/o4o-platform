@@ -236,8 +236,6 @@ const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBul
 // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C (2026-09-23):
 //   SupplierSupplyOffersPage(안내 허브) 은퇴 — 유통 정책·서비스 대상은 상품 목록/Drawer 에서 직접 본다.
 //   허브가 가리키던 서비스 제공 설정·판매자 모집·펀딩·이벤트 오퍼는 사이드바에 직접 항목이 있다.
-// WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
-//   공급자 직접 opt-in 서비스(Pharmacy-Hub) 제공 설정 — Pharmacy-Hub 에는 공급자 shell 이 없다.
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
 const SupplierRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierRecruitmentsPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1

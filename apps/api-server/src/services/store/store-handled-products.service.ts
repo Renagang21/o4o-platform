@@ -6,7 +6,7 @@
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 왜 추출하는가
- *   Pharmacy-Hub 는 공통 `/api/v1/store/*` 라우트를 그대로 쓸 수 없다. 그 라우트는
+ *   공통 `/api/v1/store/*` 라우트는
  *   `resolveStoreAccess(ds, userId, roles)` 를 serviceKey 없이 호출하고, 그 안의
  *   `organization_members … LIMIT 1` 은 service enrollment 를 보지 않아 **다중 조직
  *   계정에서 타 서비스 조직을 반환**할 수 있다. 공통 resolveStoreAccess 변경은 W7
@@ -14,8 +14,7 @@
  *
  * 계약
  *   - 이 모듈은 **인증·조직 결정을 하지 않는다.** organizationId 는 호출자가
- *     이미 서비스 경계에 맞게 해석한 값이어야 한다 (KPA/KCos = resolveStoreAccess,
- *     Pharmacy-Hub = resolvePharmacyHubStoreOrganization).
+ *     이미 서비스 경계에 맞게 해석한 값이어야 한다 (KPA/KCos = resolveStoreAccess).
  *   - SSOT 무변경: organization_product_listings(listing) + store_local_products(local)
  *     을 물리 통합하지 않고 sourceType 으로 구분해 조회 통합한다.
  *   - Boundary Policy: organization_id 필터 필수 · Raw SQL parameter binding 필수.

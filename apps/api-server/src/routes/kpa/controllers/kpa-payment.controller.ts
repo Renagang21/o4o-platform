@@ -15,8 +15,7 @@
  *   prepare/confirm 이 없는 이상 결제창을 띄울 대상이 없고,
  *   프론트엔드 호출자는 repo 전수 조사 결과 **0건**이다.
  *
- *   보호 대상(미변경): Pharmacy-Hub B2B 결제(`/pharmacy-hub/store-owner/payments/*`),
- *   Neture B2B 결제(`/neture/b2b/payments/*`) — 매장이 **구매자**인 B2B 축.
+ *   보호 대상(미변경): Neture B2B 결제(`/neture/b2b/payments/*`) — 매장이 **구매자**인 B2B 축.
  *
  *   경로 자체는 404 가 아닌 **410 (Gone)** 으로 남겨 은퇴 사실을 명시한다.
  */

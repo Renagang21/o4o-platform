@@ -6,7 +6,7 @@
  *    serviceKey 별 도메인(kpa-society / k-cosmetics / pharmacy-hub) 분기 + KPA default fallback.
  *  - WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §17:
  *    수료증 화면은 독립 강의 서비스(`lecture` · study.neture.co.kr) 단일 소유다.
- *    KPA / K-Cosmetics / PharmacyHub 의 `/certificate/verify/:id` 는 Lecture 로 외부 이동만 하므로
+ *    KPA 등 legacy 서비스의 `/certificate/verify/:id` 는 Lecture 로 외부 이동만 하므로
  *    검증 링크는 serviceKey 와 무관하게 Lecture 도메인으로 인쇄한다. **KPA fallback 은 없다.**
  *    (legacy serviceKey row 가 남아 있어도 동일 — Lecture 가 id 기반 공개 검증을 제공한다. §21 이후 실제 잔존 row 는 0건.)
  *

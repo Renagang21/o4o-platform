@@ -281,7 +281,6 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
   // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
   //   승인축 서비스(kpa-society / k-cosmetics)는 `offer_service_approvals`
   //   승인이 필요한 wrapper 로, neture 는 자기 공급 정책 wrapper 로 간다.
-  //   Pharmacy-Hub 는 자체 controller/route 를 유지한다(§21 · §24 — URL 통일 금지).
   router.post(
     '/cart/:serviceKey/checkout-confirm-b2b',
     async (req: Request, res: Response): Promise<void> => {

@@ -54,13 +54,6 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
  * - kpa        : `kpa:store_owner` (약국 사업자 서비스 `kpa-society` = pharmacy.neture.co.kr 의 매장 경영자.
  *                `kpa` 는 legacy/internal role prefix 일 뿐 — KPA 분회(kpa.neture.co.kr · `kpa-branch`)와 무관)
  * - cosmetics  : `cosmetics:store_owner` (화장품 · 일반 소매 사업자 서비스 `k-cosmetics` = retail.neture.co.kr)
- * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
- *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
- *                W1(프로비저닝)이 organizations / organization_members(owner) /
- *                organization_service_enrollments / platform_store_slugs 를 생성해도
- *                이 registry 에 없으면 isStoreOwner() 가 role 게이트에서 종료되어
- *                organizationId 를 반환하지 못했다 (CHECK-PHARMACY-HUB-STORE-SUBJECT-
- *                PROVISIONING-V1 §8-5). 등록으로 공통 매장 API 진입을 복구한다.
  */
 const STORE_OWNER_ROLES_BY_SERVICE = {
   // `neture:store_owner` = 내 매장(약국) 신청 승인 약국(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
@@ -73,7 +66,7 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
  * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
  *   StoreOwnerServiceKey(role prefix) → service_memberships.service_key 매핑은
  *   @o4o/security-core 의 resolveCanonicalServiceKey() 가 SSOT 다
- *   (kpa→kpa-society, cosmetics→k-cosmetics, pharmacy-hub self-map).
+ *   (kpa→kpa-society, cosmetics→k-cosmetics).
  *   membership-guard.middleware / utils/serviceScope 와 같은 함수를 쓴다 — 로컬 맵 금지.
  */
 /**
@@ -92,7 +85,7 @@ const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
  *   순회할지" 만 정한다 (storeWorkspaceEnabled = UI metadata, WO §9).
  */
 export interface StoreCapableService {
-  /** canonical service_key (kpa-society · k-cosmetics · pharmacy-hub) */
+  /** canonical service_key (kpa-society · k-cosmetics) */
   serviceKey: string;
   rolePrefix: StoreOwnerServiceKey;
   storeOwnerRole: string;
@@ -150,7 +143,7 @@ export async function isStoreOwner(
   //   createRequireStoreOwner 와 같은 정책(active membership 최소 1개, fail-closed)을 쓴다.
   //
   //   2026-08-24 프로덕션 실측: 활성 store_owner role 보유자 18명 전원이 같은 서비스의
-  //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · pharmacy-hub 6/6),
+  //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · 퇴역 서비스 6/6),
   //   suspended/withdrawn membership 0건 → 현행 사용자 동작 변화 0.
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
   //   약국 매장(`kpa`)은 kpa-society membership · `kpa:store_owner` 가 아니라 **내 매장(약국) 신청 원장 active ∧
@@ -309,7 +302,7 @@ export function createRequireStoreOwner(
     );
     // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
     //   같은 서비스 후보가 2개 이상이면 하나를 골라 통과시키지 않는다.
-    //   Pharmacy-Hub 전용 seam 과 같은 코드·같은 상태코드(409)로 응답한다.
+    //   코드 AMBIGUOUS_STORE_CONNECTION · 상태코드 409 로 응답한다.
     if (resolution.status === 'ambiguous') {
       res.status(409).json({
         success: false,

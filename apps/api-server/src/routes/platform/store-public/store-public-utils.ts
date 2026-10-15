@@ -69,6 +69,10 @@ export async function resolvePublicStore(
 
   if (!record || !record.isActive) {
     const redirect = await slugService.findOldSlugRedirect(slug);
+    if (redirect && isRetiredServiceValue(redirect.serviceKey)) {
+      res.status(410).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Service has been retired' } });
+      return null;
+    }
     if (redirect) {
       const newPath = req.originalUrl.replace(
         `/${encodeURIComponent(slug)}`,

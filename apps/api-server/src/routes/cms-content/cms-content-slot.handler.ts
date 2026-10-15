@@ -23,11 +23,13 @@ import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
 import { optionalAuth, requireAuth } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import {
   resolveCmsReadScope,
   resolveCmsServiceKeys,
   canonicalizeCmsServiceKey,
   isSameCmsService,
+  findCmsSlotContentConflict,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
 
@@ -465,6 +467,18 @@ export function createCmsContentSlotRoutes(deps: {
         });
         return;
       }
+      const slotConflict = findCmsSlotContentConflict(content.serviceKey, serviceKey);
+      if (slotConflict === 'retired') {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+      if (slotConflict === 'mismatch') {
+        res.status(400).json({
+          success: false,
+          error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
+        });
+        return;
+      }
 
       const slotRepo = dataSource.getRepository(CmsContentSlot);
 
@@ -551,6 +565,11 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
+      if (isRetiredServiceValue(slot.serviceKey)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+
       // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
       const isModifyingLockFields = isLocked !== undefined || lockedBy !== undefined ||
                                      lockedReason !== undefined || lockedUntil !== undefined;
@@ -599,6 +618,18 @@ export function createCmsContentSlotRoutes(deps: {
           res.status(400).json({
             success: false,
             error: { code: 'VALIDATION_ERROR', message: 'Content not found' },
+          });
+          return;
+        }
+        const slotConflict = findCmsSlotContentConflict(content.serviceKey, serviceKey !== undefined ? serviceKey : slot.serviceKey);
+        if (slotConflict === 'retired') {
+          res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+          return;
+        }
+        if (slotConflict === 'mismatch') {
+          res.status(400).json({
+            success: false,
+            error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
           });
           return;
         }
@@ -766,6 +797,20 @@ export function createCmsContentSlotRoutes(deps: {
             error: { code: 'VALIDATION_ERROR', message: 'One or more contents not found' },
           });
           return;
+        }
+        for (const existingContent of existingContents) {
+          const slotConflict = findCmsSlotContentConflict(existingContent.serviceKey, serviceKey);
+          if (slotConflict === 'retired') {
+            res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+            return;
+          }
+          if (slotConflict === 'mismatch') {
+            res.status(400).json({
+              success: false,
+              error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
+            });
+            return;
+          }
         }
       }
 

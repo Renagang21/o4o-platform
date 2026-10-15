@@ -26,8 +26,6 @@ const ADMIN_ROLES = [
   'kpa:store_owner',
   'neture:admin',
   'neture:operator',
-  'pharmacy-hub:admin',
-  'pharmacy-hub:operator',
   'platform:super_admin',
 ];
 
