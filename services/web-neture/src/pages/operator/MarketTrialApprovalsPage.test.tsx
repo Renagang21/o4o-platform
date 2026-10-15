@@ -102,3 +102,14 @@ it('failed resolution preserves the note for retry and an unmounted tab cannot r
   await act(async () => complete({}));
   expect(mocks.failures).toHaveBeenCalledTimes(1);
 });
+
+it('focuses the resolve note and returns to its action on Escape without resolving', async () => {
+  mocks.failures.mockResolvedValue(list([failure()])); showFailures();
+  const trigger = await screen.findByRole('button', { name: '해결 처리', exact: true });
+  trigger.focus(); fireEvent.click(trigger);
+  const dialog = screen.getByRole('dialog', { name: '해결 처리' });
+  expect(document.activeElement).toBe(within(dialog).getByRole('textbox', { name: '운영 메모' }));
+  fireEvent(dialog, new Event('cancel', { cancelable: true }));
+  await waitFor(() => expect(document.activeElement).toBe(trigger));
+  expect(mocks.resolve).not.toHaveBeenCalled();
+});
