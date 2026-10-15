@@ -60,8 +60,9 @@ export default function BrandManagementPage() {
   const [pendingMergeTarget, setPendingMergeTarget] = useState<BrandItem | null>(null);
   const dialogId = useId();
   const searchRef = useRef<HTMLInputElement>(null);
+  const mergeSearchRef = useRef<HTMLInputElement>(null);
   const mergeDialogRef = useTaxonomyDialog(showMergeModal && !!mergeSource, searchRef);
-  const confirmDialogRef = useTaxonomyDialog(!!pendingMergeTarget, searchRef);
+  const confirmDialogRef = useTaxonomyDialog(!!pendingMergeTarget, mergeSearchRef);
 
   const loadBrands = useCallback(async (q?: string) => {
     setLoading(true);
@@ -310,6 +311,7 @@ export default function BrandManagementPage() {
                   onChange={e => setMergeSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   data-dialog-initial-focus
+                  ref={mergeSearchRef}
                 />
               </div>
             </div>

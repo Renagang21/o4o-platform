@@ -175,6 +175,24 @@ describe('taxonomy dialog keyboard lifecycle', () => {
     expect(within(confirm).getByRole('alert').textContent).toBe('MERGE_FAILED');
   });
 
+  it('returns cancellation focus inside the parent when a search removes the target', async () => {
+    let finish!: (value: typeof brands) => void;
+    mocks.brands.mockResolvedValueOnce(brands).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    render(<BrandManagementPage />);
+    const trigger = (await screen.findAllByRole('button', { name: '병합' }))[0];
+    fireEvent.change(screen.getByLabelText('브랜드 검색'), { target: { value: '브랜드 A' } });
+    click(trigger);
+    const parent = screen.getByRole('dialog', { name: '브랜드 병합' });
+    click(within(parent).getByRole('button', { name: /브랜드 B/ }));
+    const confirm = screen.getByRole('dialog', { name: '브랜드 병합 확인' });
+    await waitFor(() => expect(mocks.brands).toHaveBeenCalledTimes(2));
+    await act(async () => finish([brands[0]]));
+    expect(within(parent).queryByRole('button', { name: /브랜드 B/ })).toBeNull();
+    escape(confirm);
+    await waitFor(() => expect(document.activeElement).toBe(within(parent).getByRole('textbox')));
+    expect(screen.getByRole('dialog', { name: '브랜드 병합' })).toBe(parent);
+  });
+
   it('dismisses only the confirmation on an idle backdrop release and restores the target', async () => {
     const { parent, target, confirm } = await selectBrand();
     vi.spyOn(confirm, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 100, 300, 200));
