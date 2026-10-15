@@ -74,6 +74,17 @@ CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운�
   만료 역할 검색과 미시작 역할 검색도 각각 1행이 잘못 반환됨을 확인했다. 운영 DB 조회/수정은 실행하지 않았다.
 - 최초 새 작업공간에서 의존성 준비 전 Vitest 실행은 runner 미설치로 미실행이었다. 의존성을 준비한 뒤
   실제 13개 실패를 재현했다. 최초 타입/빌드는 새 CarePharm HostProfile 누락을 잡았고 보완 후 통과했다.
+- push 준비 시 main `761fb49e3e`의 펀딩 운영 화면 변경을 확인해 아직 push하지 않은 자기 branch만
+  rebase했다. 현재 메뉴/역할/host 정본의 main 추가 변경은 없었다. 변경된 소비처 때문에 Neture 전체
+  검증을 다시 실행했으며 최종 946/946 PASS, tsc 포함 production build PASS다.
+
+## Core 조회 최소 수정 제안 — 적용 승인 대기
+
+`AdminUserController.getUsers`에서 이미 쓰는 두 조회의 `is_active=true` 조건 다음에
+`valid_from <= CURRENT_TIMESTAMP`와 `(valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)`를
+추가해 현재 RoleAssignment의 유효기간 계약과 맞춘다. role 부여/회수/쓰기·반환 필드·권한 계층을 바꾸지 않는다.
+Core 표시 파일을 실제 변경하기 전에 이 두 조회 범위를 확인한다. 진단에 쓴 PostgreSQL은 자기 세션의
+Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 테이블, 조회 이후 ROLLBACK이다.
 
 ## 후속 실행 TODO
 
