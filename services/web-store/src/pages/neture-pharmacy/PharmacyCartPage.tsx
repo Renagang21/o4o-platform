@@ -7,7 +7,7 @@
  *   POST   /api/v1/neture/pharmacy/cart/checkout      주문 확정 → 결제 그룹(수취 주체별) · 실패 항목
  * 단가 · 이용 가능 여부는 주문 확정 시 서버가 다시 판정한다. 화면의 금액은 표시용이다.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   neturePharmacyApi,
@@ -35,7 +35,7 @@ export default function PharmacyCartPage() {
     return { items, total: items.length };
   }, []);
   const { items, loading, error, setError, load } = useLatestList<PharmacyCartItem>(fetchList, listErrorMessage);
-  useEffect(() => { setQty(Object.fromEntries(items.map((item) => [item.id, String(item.quantity)]))); }, [items]);
+  useLayoutEffect(() => { setQty(Object.fromEntries(items.map((item) => [item.id, String(item.quantity)]))); }, [items]);
   const unappliedQuantity = items.some(item => qty[item.id] !== undefined && Number(qty[item.id]) !== item.quantity);
 
   const updateQty = async (item: PharmacyCartItem) => {
@@ -180,7 +180,10 @@ export default function PharmacyCartPage() {
                           min={1}
                           aria-label={`${i.productName} 수량`}
                           value={qty[i.id] ?? String(i.quantity)}
-                          onChange={(e) => setQty((prev) => ({ ...prev, [i.id]: e.target.value }))}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setQty((prev) => ({ ...prev, [i.id]: value }));
+                          }}
                           disabled={!i.available || mutationBusy}
                           className="w-16 rounded border border-gray-300 px-2 py-1 text-right"
                         />
