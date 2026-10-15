@@ -40,6 +40,7 @@ vi.mock("../../../../lib/apiClient", () => ({
 }));
 vi.mock("../../../../lib/storeOrganizationHeader", () => ({
   getActiveStoreOrganizationId: () => api.active,
+  captureStoreOrganizationHeaders: (headers: HeadersInit) => new Headers(headers),
 }));
 vi.mock("../../../../api/pharmacyInfo", () => ({ getStoreSlug: api.slug }));
 vi.mock("../../../../api/tablet", () => ({

@@ -25,7 +25,7 @@ import { useStoreResource } from './hooks/useStoreResource';
 import { TabletCommonIdlePicker, TabletOperationNotice, type TabletOperationToast } from './tablet/TabletOperationPanels';
 import { StoreTabletPreview } from './StoreTabletPreview';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
-import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
+import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -113,6 +113,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
   const navigate = useNavigate();
   const location = useLocation();
+  const base = storeWorkspaceBase(location.pathname);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 두 업무를 탭으로 분리.
   //   'corners'  = 코너별 운영(코너 선택 → 현재 콘텐츠 · 교체 · 화면 열기)
@@ -709,7 +710,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
           {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
               뒤로가기가 '매장 자체 상품' 관리 화면으로 가던 잔재 정정 → 매장 홈으로 복귀. */}
           <button
-            onClick={() => navigate('/store')}
+            onClick={() => navigate(base)}
             className="p-2 rounded-lg hover:bg-slate-100"
           >
             <ArrowLeft className="w-5 h-5 text-slate-500" />
@@ -1342,7 +1343,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                     <h3 className="text-sm font-bold text-slate-700">태블릿에 보여줄 상품 선택</h3>
                     <button
                       type="button"
-                      onClick={() => navigate('/store/my-products')}
+                      onClick={() => navigate(`${base}/my-products`)}
                       className="text-xs font-medium text-teal-700 hover:underline whitespace-nowrap"
                     >
                       취급 중인 O4O 제품 관리 →
@@ -1386,7 +1387,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                           <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
                           <button
                             type="button"
-                            onClick={() => navigate('/store/my-products')}
+                            onClick={() => navigate(`${base}/my-products`)}
                             className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
                           >
                             <Plus className="w-3.5 h-3.5" /> 취급 중인 O4O 제품 등록
@@ -1401,7 +1402,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                           <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
                           <button
                             type="button"
-                            onClick={() => navigate('/store/commerce/local-products')}
+                            onClick={() => navigate(`${base}/commerce/local-products`)}
                             className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
                           >
                             <Plus className="w-3.5 h-3.5" /> 매장 자체 상품 등록

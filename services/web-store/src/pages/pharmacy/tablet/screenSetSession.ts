@@ -7,6 +7,7 @@ export function createScreenSetSession(
 ): ScreenSetBuilderApi {
   let created: Awaited<ReturnType<ScreenSetBuilderApi["create"]>> | null = null;
   let writing = false;
+  let pendingBlocksId: string | null = null;
   const assertCurrent = () => {
     if (!current())
       throw new Error("화면 편집 대상이 변경되었습니다. 다시 열어 주세요.");
@@ -17,25 +18,36 @@ export function createScreenSetSession(
     assertCurrent();
     return result;
   };
-  const write = async <T>(operation: () => Promise<T>) => {
+  const writeHeader = async (operation: () => ReturnType<ScreenSetBuilderApi['create']>) => {
     assertCurrent();
+    if (writing || pendingBlocksId) throw new Error("화면 저장이 진행 중입니다.");
+    writing = true;
+    try {
+      const result = await operation();
+      pendingBlocksId = result.id;
+      return result;
+    } finally { writing = false; }
+  };
+  const saveBlocks: ScreenSetBuilderApi['saveBlocks'] = async (id, blocks) => {
+    // The captured writer finishes only the sequence that was already started.
+    if (pendingBlocksId !== id) assertCurrent();
     if (writing) throw new Error("화면 저장이 진행 중입니다.");
     writing = true;
     try {
-      return await read(operation);
+      return await base.saveBlocks(id, blocks);
     } finally {
-      writing = false;
+      writing = false; pendingBlocksId = null;
     }
   };
   return {
     create: (input) =>
-      write(async () => {
+      writeHeader(async () => {
         if (created) return base.update(created.id, input);
         created = await base.create(input);
         return created;
       }),
-    update: (id, input) => write(() => base.update(id, input)),
-    saveBlocks: (id, blocks) => write(() => base.saveBlocks(id, blocks)),
+    update: (id, input) => writeHeader(() => base.update(id, input)),
+    saveBlocks,
     preview: (input) => read(() => base.preview(input)),
     searchO4oDescriptions: (input) =>
       read(() => base.searchO4oDescriptions(input)),

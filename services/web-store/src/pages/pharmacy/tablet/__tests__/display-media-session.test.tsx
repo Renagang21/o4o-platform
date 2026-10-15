@@ -236,23 +236,30 @@ it("a failed header creation stays retryable", async () => {
   await api.create({ name: "Draft" });
   expect(base.create).toHaveBeenCalledTimes(2);
 });
-it("a closed builder cannot send subsequent blocks or reads in a new store", async () => {
+it.each(['create', 'update'] as const)('an initiated %s finishes its captured block write after closing, then rejects new work', async (method) => {
   let current = true;
   const pending = deferred<{ id: string }>();
   const base = baseApi();
-  base.create.mockReturnValue(pending.promise);
-  const api = createScreenSetSession(
-    base as unknown as ScreenSetBuilderApi,
-    () => current,
-  );
-  const writing = api.create({ name: "Draft" });
+  base[method].mockReturnValue(pending.promise);
+  const api = createScreenSetSession(base as unknown as ScreenSetBuilderApi, () => current);
+  const writing = method === 'create' ? api.create({ name: 'Draft' }) : api.update('created', { name: 'Draft' });
   current = false;
-  pending.resolve({ id: "created" });
-  await expect(writing).rejects.toThrow("변경");
-  await expect(api.saveBlocks("created", [])).rejects.toThrow("변경");
-  await expect(api.searchStoreContents("q")).rejects.toThrow("변경");
-  expect(base.saveBlocks).not.toHaveBeenCalled();
+  pending.resolve({ id: 'created' });
+  await expect(writing).resolves.toEqual({ id: 'created' });
+  await api.saveBlocks('created', []);
+  expect(base.saveBlocks).toHaveBeenCalledOnce();
+  await expect(api.saveBlocks('other', [])).rejects.toThrow('변경');
+  await expect(api.create({ name: 'Other' })).rejects.toThrow('변경');
+  await expect(api.searchStoreContents('q')).rejects.toThrow('변경');
   expect(base.searchStoreContents).not.toHaveBeenCalled();
+});
+it('another header cannot interleave between the header and its blocks', async () => {
+  const base = baseApi();
+  const api = createScreenSetSession(base as unknown as ScreenSetBuilderApi, () => true);
+  await api.create({ name: 'Draft' });
+  await expect(api.update('other', { name: 'Other' })).rejects.toThrow('진행');
+  await api.saveBlocks('created', []);
+  expect(base.update).not.toHaveBeenCalled();
 });
 it("duplicate header submissions are rejected synchronously", async () => {
   const pending = deferred<{ id: string }>(),

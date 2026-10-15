@@ -13,8 +13,8 @@ import { createScreenSetSession } from './tablet/screenSetSession';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Layers } from 'lucide-react';
 import {
-  fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
-  archiveScreenSet, saveScreenSetBlocks,
+  fetchScreenSets, fetchScreenSet, updateScreenSet,
+  archiveScreenSet, captureScreenSetWrites,
   // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1
   searchTabletStoreContents, searchTabletO4oDescriptions,
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft → sections resolve(read-only)
@@ -39,16 +39,13 @@ import type { QrScreenSet } from '../../api/storeQr';
 // 공유 편집기 + 라벨/상수/계약을 패키지에서 소비.
 import {
   TabletContentStepBuilder, templateLabel, LEGACY_ONLY_TEMPLATE_KEYS,
-  type ScreenSetBuilderApi, type Toast,
+  type Toast,
 } from '@o4o/tablet-screen-set-editor';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 
 // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 제작 셸에 주입할 **매장(store) API 인스턴스**.
 //   공유 편집기는 api 를 필수 주입받는다(앱 런타임 함수 의존 없음). 매장 제작기는 이 인스턴스를 주입.
-const defaultStoreBuilderApi: ScreenSetBuilderApi = {
-  create: (input) => createScreenSet({ ...input, tabletId: null }),
-  update: (id, input) => updateScreenSet(id, input),
-  saveBlocks: saveScreenSetBlocks,
+const defaultStoreBuilderReads = {
   preview: previewScreenSet,
   searchO4oDescriptions: searchTabletO4oDescriptions,
   searchStoreContents: searchTabletStoreContents,
@@ -158,7 +155,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
     pool: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreProductPool(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
     qr: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreQrOptions(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
   }), [builder]);
-  const builderApi = useMemo(() => createScreenSetSession(defaultStoreBuilderApi, builder?.current ?? (() => false)), [builder]);
+  const builderApi = useMemo(() => createScreenSetSession({ ...defaultStoreBuilderReads, ...captureScreenSetWrites() }, builder?.current ?? (() => false)), [builder]);
   const closeBuilder = () => { sessions.cancel(); setBuilder(null); setMediaPickerTarget(null); };
 
   // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
@@ -248,7 +245,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
         <TabletContentStepBuilder
           initialDetail={builder.detail}
           onCancel={closeBuilder}
-          onSaved={() => { if (builder.current()) { closeBuilder(); void reload(); } }}
+          onSaved={() => { if (isCurrent()) { if (builder.current()) closeBuilder(); void reload(); } }}
           onToast={(notice) => { if (builder.current()) onToast(notice); }}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}

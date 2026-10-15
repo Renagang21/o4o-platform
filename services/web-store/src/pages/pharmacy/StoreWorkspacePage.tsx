@@ -56,6 +56,7 @@ export function StoreWorkspacePage({
                 자료에서 시작
               </Link>
             )}
+            {groups.some(group => group.primary.some(item => item.key === 'library-contents')) && <Link className={linkStyle} to="/store/library/content">제공 자료 찾기</Link>}
           </nav>
         </section>
       )}

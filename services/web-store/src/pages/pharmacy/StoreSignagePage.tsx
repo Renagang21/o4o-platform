@@ -135,6 +135,7 @@ export function StoreSignagePage() {
 function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const location = useLocation();
+  const base = storeWorkspaceBase(location.pathname);
   // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1:
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
@@ -154,7 +155,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       assets: '/store/marketing/signage/videos',
       schedules: '/store/marketing/signage/schedules',
     };
-    const base = storeWorkspaceBase(location.pathname);
     const target = map[tab].replace('/store', base);
     navigate(withWorkspaceMode(target, tab === 'schedules' ? 'use' : 'studio'), { replace: true });
   };
@@ -491,7 +491,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
-            <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
+            <Link to={base} className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">디지털사이니지 운영</h1>
           <p className="text-sm text-slate-500 mt-1">매장 화면에 송출할 콘텐츠를 등록하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
@@ -609,7 +609,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
             {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 모달 → 표준 /new 등록 페이지 */}
             <button
-              onClick={() => navigate('/store/marketing/signage/playlist/new')}
+              onClick={() => navigate(`${base}/marketing/signage/playlist/new`)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               <Plus className="w-4 h-4" />

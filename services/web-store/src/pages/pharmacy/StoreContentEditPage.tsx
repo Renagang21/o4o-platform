@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreContentEditPage — 매장 콘텐츠 독립 편집
  *
@@ -52,6 +53,7 @@ const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[
 
 export default function StoreContentEditPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
+  const { libraryPath } = useStoreLibraryRoute();
 
   const { organizationId } = useStoreOrganizationId();
   const session = useContentAuthoringSession({
@@ -116,7 +118,7 @@ export default function StoreContentEditPage() {
       <div className="mb-6">
         {/* WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: 진입점(내 자료함 콘텐츠)으로 복귀 — canonical 정렬 */}
         <Link
-          to="/store/library/contents"
+          to={libraryPath}
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
