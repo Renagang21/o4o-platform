@@ -17,6 +17,7 @@ import { OrganizationStore } from '../../../modules/store-core/entities/organiza
 import type { StoreBlockType, StoreBlock, TemplateProfile } from '../../../modules/store/types/store-template.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 
 // ── Valid Block Types ───────────────────────────────────────────────────────
 
@@ -159,7 +160,7 @@ export function createLayoutController(
 
   async function findOrgBySlug(slug: string, activeOnly = false): Promise<OrganizationStore | null> {
     const record = await slugService.findBySlug(slug);
-    if (!record || !record.isActive) return null;
+    if (!record || !record.isActive || isRetiredServiceValue(record.serviceKey)) return null;
     const where: any = { id: record.storeId };
     if (activeOnly) where.isActive = true;
     return orgRepo.findOne({ where });

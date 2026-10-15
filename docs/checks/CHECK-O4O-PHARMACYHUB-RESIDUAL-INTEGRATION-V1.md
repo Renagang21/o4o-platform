@@ -29,6 +29,8 @@ API 타입 검사도 통과했다. 전체 Jest의 최종 판정은 이 통합 he
 
 ## 실제 삭제와 분리
 
+KPA 공용 settings/channels/template/layout의 slug 직접 조회도 퇴역 키이면 조직을 읽기 전에 기존 STORE_NOT_FOUND(404)로 닫았다. 같은 findBySlug 소비처를 전체 검색했으며 나머지 공개 경로는 기존 서비스 귀속 일치 또는 퇴역 판정으로 차단됨을 대조했다. PH key3종×조회/쓰기8경로의 HTTP 회귀와 정상 KPA 조회를 포함한 API2 suites/15 tests PASS, 타입 검사 PASS, lint0errors/기존 catch warning4개. 초기 layout 테스트는 비어 있는 blocks를 보내 입력 검증400이 먼저 발생했으므로 유효한 HERO 블록 요청으로 수정해 퇴역 경계를 검증했다.
+
 공개 QR의 별도 slug 선택 쿼리도 접두사 판정 helper로 통일했고 관련 QR·PH API2 suites/44 tests 및 타입 검사 PASS. 퇴역 키 상수를 직접 소비하는 SQL 경로를 전체 검색해 남은 exact-only slug 필터가 없는 것을 확인했다.
 
 head `d90ed83fb`의 CI38696961700 웹 검증 단계에서 기존 장바구니 회귀2건이 실패했다. 해당 Store 파일은 이번 변경에서 수정하지 않았다. 같은 파일의 단독8건과 Store 전체34 files/436 tests가 로컬에서 통과했다. 이 결과로 실패한 CI를 PASS로 대체하지 않으며 최신 head의 CI 결과를 다시 확인한다.

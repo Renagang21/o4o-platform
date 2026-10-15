@@ -29,6 +29,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 import {
   StoreTheme,
   StoreBlock,
@@ -101,7 +102,7 @@ export function createStoreSettingsController(
 
   async function resolveOrg(slug: string): Promise<{ id: string; name: string; storefront_config: any; storefront_blocks: any; template_profile: string | null } | null> {
     const record = await slugService.findBySlug(slug);
-    if (!record || !record.isActive) return null;
+    if (!record || !record.isActive || isRetiredServiceValue(record.serviceKey)) return null;
     const rows: any[] = await dataSource.query(
       `SELECT id, name, storefront_config, storefront_blocks, template_profile
        FROM organizations WHERE id = $1 AND "isActive" = true LIMIT 1`,
