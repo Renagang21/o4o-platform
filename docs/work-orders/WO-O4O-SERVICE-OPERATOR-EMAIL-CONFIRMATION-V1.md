@@ -1,6 +1,6 @@
 # 서비스 운영자 이메일 초대와 기존 지정 확인
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED (사용자 승인한 구현·검증·push·PR 범위)
 > **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-15
 > **근거**: 사용자 승인 — 미가입자 초대, 기존 지정자 이메일 확인, 개발용 운영자 테스트 계정. 종료 범위는 push와 PR이며 병합·배포·운영 DB 변경·실제 메일 발송은 제외.
 
@@ -12,7 +12,7 @@
 - [x] 기존 지정 계정의 확인 메일, 대기/완료 표시, 재발송·취소.
 - [x] 미가입자 가입 후 수락, 잘못된 계정·만료·재사용·동시 수락 방어.
 - [x] 관리자와 수락 화면, focused 검증, 문서 정리.
-- [ ] commit · push · PR (병합/배포 제외).
+- [x] commit · push · PR (병합/배포 제외).
 
 ## 확정한 구현 경계
 
@@ -70,3 +70,11 @@ OPERATOR_INVITE_TEST_PORT=55432 pnpm --filter @o4o/api-server exec jest --runInB
 - 기존 권한 부여자 삭제가 `role_assignments` 이력 검토를 요구하는 기존 정책은 변경하지 않았다. 새 초대의 대상/발송자 처리만 분리 검증했다.
 - 문서 정합: User Domain 정본에 사용자 확정 정책을 추가했다. 기존 역사 WO·정본 색인·무관한 App.tsx 주석은 변경하지 않았다.
 - 클라우드의 격리된 기존 checkout에서 전용 branch를 사용했으며 별도 worktree는 생성하지 않았다.
+
+## 전달 결과
+
+- PR: https://github.com/Renagang21/o4o-platform/pull/617
+- branch: `wo/service-operator-invitations`, 구현 commit: `e92c564712`.
+- 최신 main `c9b72ee2ae` 반영 후 Neture build와 수락 화면 5 tests를 다시 통과했다.
+- CI 진행 상태는 PR Checks가 기준이다. main 병합·배포·운영 메일 발송은 미실행이다.
+- WORKTREE_DISPOSITION: 기존 cloud checkout / 전용 branch / main integration 없음 / 보존 판정 KEEP (미병합 PR 검토용).
