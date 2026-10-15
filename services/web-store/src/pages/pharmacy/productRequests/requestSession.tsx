@@ -22,7 +22,7 @@ export function ProductRequestDialog({ children, onClose, label, style, focusKey
   const dialog = useNativeStoreDialog();
   useLayoutEffect(() => {
     dialog.current?.querySelector<HTMLElement>('[data-request-autofocus]')?.focus();
-  }, [focusKey]);
+  }, [dialog, focusKey]);
   return <dialog ref={dialog} aria-label={label}
     style={{ ...style, margin: 0, border: 0, width: '100%', height: '100%', maxWidth: 'none', maxHeight: 'none', boxSizing: 'border-box' }}
     onCancel={event => { event.preventDefault(); onClose(); }}

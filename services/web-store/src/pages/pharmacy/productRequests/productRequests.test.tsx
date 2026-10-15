@@ -248,6 +248,6 @@ it('native request dialog closes from its backdrop or Escape but preserves an ac
   onClose.mockClear(); rerender(content(true));
   fireEvent.pointerDown(dialog);
   expect(onClose).not.toHaveBeenCalled();
-  fireEvent.cancel(dialog);
+  fireEvent(dialog, new Event('cancel', { bubbles: true, cancelable: true }));
   expect(onClose).toHaveBeenCalledOnce();
 });
