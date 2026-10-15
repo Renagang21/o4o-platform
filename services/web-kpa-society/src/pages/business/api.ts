@@ -28,8 +28,8 @@ export interface BusinessContent {
 
 /** Existing authenticated transport and server-owned approval/storage contracts. */
 export const businessApi = {
-  async get<T>(path: string, params?: Record<string, unknown>): Promise<T> {
-    const response = await authClient.api.get(path, { params });
+  async get<T>(path: string, params?: Record<string, unknown>, organizationId?: string): Promise<T> {
+    const response = await authClient.api.get(path, { params, ...(organizationId ? { headers: { 'X-Store-Organization-Id': organizationId } } : {}) });
     return response.data.data as T;
   },
   async post<T>(path: string, body: unknown): Promise<T> {

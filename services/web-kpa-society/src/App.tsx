@@ -724,7 +724,7 @@ function App() {
           </Route>
           <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
           <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
-            <Route index element={<Navigate to="participation" replace />} />
+            <Route index element={<PharmacyMemberHomePage />} />
             <Route path="participation" element={<BusinessParticipationPage />} />
             <Route path="materials" element={<BusinessMaterialsPage />} />
             <Route path="tools" element={<BusinessToolsPage />} />
