@@ -32,6 +32,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  initialLanguage?: SupportedLang;
+  initialDescriptionId?: string;
 }
 
 // 지원 언어 = 백엔드 계약(ALLOWED_LANG)과 동일. 확대 시 백엔드 계약 변경 필요(본 WO 범위 밖).
@@ -64,7 +66,7 @@ function fmtDay(v: string | null | undefined): string {
   return new Date(v).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved }: Props) {
+export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved, initialLanguage = DEFAULT_LANG, initialDescriptionId }: Props) {
   const { user } = useAuth();
   const tpl = useContentTemplates();
   const canCreatePublicTemplate =
@@ -85,8 +87,8 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   const [withdrawing, setWithdrawing] = useState(false);
 
   // 특정 언어의 작업행을 캐시에서 찾아 편집기에 로드(없으면 빈 편집기 — 자동 복사 금지).
-  const loadLanguageFrom = useCallback((all: SupplierStoreDescriptionDraft[], lang: SupportedLang) => {
-    const row = all.find((r) => normLang(r.language) === lang) ?? null;
+  const loadLanguageFrom = useCallback((all: SupplierStoreDescriptionDraft[], lang: SupportedLang, descriptionId?: string) => {
+    const row = all.find((r) => normLang(r.language) === lang && (!descriptionId || r.id === descriptionId)) ?? null;
     setExisting(row);
     setContent(row?.content || '');
     setDirty(false);
@@ -101,14 +103,15 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     setContent('');
     setExisting(null);
     setRows([]);
-    setLanguage(DEFAULT_LANG);
+    setLanguage(initialLanguage);
     setDirty(false);
     supplierStoreDescriptionApi
       .listMine(product.masterId)
       .then((all) => {
         if (!mounted) return;
         setRows(all);
-        loadLanguageFrom(all, DEFAULT_LANG);
+        if (initialDescriptionId && !all.some((row) => row.id === initialDescriptionId && normLang(row.language) === initialLanguage)) { setLoadError(true); return; }
+        loadLanguageFrom(all, initialLanguage, initialDescriptionId);
       })
       .catch(() => {
         // 조회 실패를 '신규(빈 편집기)'로 오인시키지 않는다. 편집기 대신 오류+재시도 표시.
@@ -120,7 +123,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     return () => {
       mounted = false;
     };
-  }, [open, product?.masterId, loadLanguageFrom, reloadKey]);
+  }, [open, product?.masterId, loadLanguageFrom, reloadKey, initialLanguage, initialDescriptionId]);
 
   // 언어 전환: 미저장 변경 보호 → 해당 언어 초안 로드(캐시).
   const selectLanguage = useCallback((lang: SupportedLang) => {
@@ -309,6 +312,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
                   <div className="mt-1 text-orange-700">수정 후 <strong>다시 검수 요청</strong>하세요. 기한이 지나면 이 설명서는 자동 삭제됩니다.</div>
                 </div>
               )}
+              {initialDescriptionId && <p className="mb-2 text-xs text-slate-500">선택한 자료를 불러왔습니다. 저장·검수 요청은 이 상품·언어의 작업본에 적용됩니다.</p>}
               <RichTextEditor
                 value={content}
                 onChange={(c) => { setContent(c.html); setDirty(true); }}

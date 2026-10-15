@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSupplierOrders } from '../orders/useSupplierOrders';
@@ -120,7 +121,7 @@ describe('supplier query response ordering', () => {
     const oldCounts = deferred<ReturnType<typeof counts>>();
     api.products.mockReturnValueOnce(oldRows.promise).mockResolvedValueOnce(products(7));
     api.counts.mockReturnValueOnce(oldCounts.promise).mockResolvedValueOnce(counts(7));
-    const { result } = renderHook(useSupplierProducts);
+    const { result } = renderHook(useSupplierProducts, { wrapper: MemoryRouter });
     act(() => result.current.setKeyword('new query'));
     await waitFor(() => expect(result.current.pagination.total).toBe(7));
     await waitFor(() => expect(result.current.tabCounts?.total).toBe(7));
@@ -137,11 +138,25 @@ describe('supplier query response ordering', () => {
     expect(api.counts.mock.lastCall?.[0].keyword).toBe('new query');
   });
 
+  it('restores a product list URL and resets page and all filters together', async () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => <MemoryRouter initialEntries={['/supplier/products?q=old&page=2&hasImage=false&completeness=INCOMPLETE&approval=pending']}>{children}</MemoryRouter>;
+    const { result } = renderHook(useSupplierProducts, { wrapper });
+    await waitFor(() => expect(api.products.mock.lastCall?.[0]).toMatchObject({ page: 2, keyword: 'old', hasImage: 'false', completenessStatus: 'INCOMPLETE' }));
+    expect(result.current.activeTab).toBe('pending');
+    act(() => result.current.setKeyword('new'));
+    await waitFor(() => expect(api.products.mock.lastCall?.[0]).toMatchObject({ page: 1, keyword: 'new' }));
+    act(() => result.current.resetAllFilters());
+    await waitFor(() => expect(result.current.hasAnyFilter).toBe(false));
+    expect(result.current.activeTab).toBe('all');
+    expect(result.current.keyword).toBe('');
+    expect(api.products.mock.lastCall?.[0].hasImage).toBeUndefined();
+  });
+
   it('keeps product loading and selection while older results arrive', async () => {
     const old = deferred<ReturnType<typeof products>>();
     const latest = deferred<ReturnType<typeof products>>();
     api.products.mockReturnValueOnce(old.promise).mockReturnValueOnce(latest.promise);
-    const { result } = renderHook(useSupplierProducts);
+    const { result } = renderHook(useSupplierProducts, { wrapper: MemoryRouter });
     act(() => { result.current.setKeyword('new query'); result.current.toggleSelect('new-offer'); });
     await act(async () => old.resolve(products(99)));
     expect(result.current.loading).toBe(true);

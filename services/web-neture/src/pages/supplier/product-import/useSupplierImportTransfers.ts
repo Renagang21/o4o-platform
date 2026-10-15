@@ -11,6 +11,7 @@ import type {
 import { escapeHtmlAttr } from './importHelpers';
 type TransferContext = {
   navigate: NavigateFunction;
+  onApplyDraft?: (draft: ImportDraft) => void;
   sourceUrl: string;
   parsed: ParsedProductData | null;
   adminProduct: FirstmallAdminProduct | null;
@@ -40,6 +41,7 @@ type TransferContext = {
 export function useSupplierImportTransfers(context: TransferContext) {
   const {
     navigate,
+    onApplyDraft,
     sourceUrl,
     parsed,
     adminProduct,
@@ -151,6 +153,11 @@ export function useSupplierImportTransfers(context: TransferContext) {
           : undefined) ?? (o4oRegulatoryType !== 'GENERAL' ? o4oRegulatoryType : undefined),
     };
 
+    if (onApplyDraft) {
+      setNavStatus('idle');
+      onApplyDraft(draft);
+      return;
+    }
     saveDraft(draft);
     setNavStatus('idle');
     // 상위 분기(+보존된 정밀 유형)를 정식 wizard 로 전달. 세부 미지정 의약품은 regulatoryType=DRUG 만.
@@ -160,6 +167,7 @@ export function useSupplierImportTransfers(context: TransferContext) {
     const qs = params.toString();
     navigate(qs ? `/supplier/products/new?${qs}` : '/supplier/products/new');
   }, [
+    onApplyDraft,
     parsed,
     navStatus,
     name,

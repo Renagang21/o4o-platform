@@ -12,6 +12,8 @@
  */
 
 import { useState } from 'react';
+import { getAllowedOfferActions } from '../../lib/supplierProductTypes';
+import { supplierEditLink } from '../../lib/supplierNavigation';
 import { useNavigate } from 'react-router-dom';
 import { X, Pencil } from 'lucide-react';
 import type { SupplierProduct } from '../../lib/api';
@@ -36,6 +38,7 @@ import { formatPrice, formatDate, toFormData } from './product-detail/productDet
 import { DISTRIBUTION_TYPE_BADGE, REGULATORY_TYPE_LABELS, REGULATORY_TYPE_BADGE, VISIBILITY_STATUS, getVisibilityStatus } from '../../lib/productConstants';
 
 interface ProductDetailDrawerProps {
+  returnTo?: string;
   product: SupplierProduct | null;
   open: boolean;
   onClose: () => void;
@@ -73,7 +76,8 @@ const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
 const INPUT_CLASS =
   'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50';
 
-export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions }: ProductDetailDrawerProps) {
+export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions, returnTo }: ProductDetailDrawerProps) {
+  const supplierTaskReturnTo = returnTo ?? '/supplier/products';
   const editor = useSupplierProductEditor(product, open, onClose, onSaved);
   const {
     editMode,
@@ -245,6 +249,19 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
+          {!isEditing && returnTo && !approvalActions && (
+            <div className="mb-4 flex flex-wrap gap-2 rounded-lg bg-slate-50 p-3 text-sm">
+              <button type="button" onClick={() => navigate(supplierEditLink('/supplier/store-descriptions', { masterId: product.masterId, language: 'ko' }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 설명서 만들기</button>
+              <button type="button" onClick={() => navigate(supplierEditLink('/supplier/signage', { product: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 사이니지 만들기</button>
+              {product.approvalStatus === 'APPROVED' && !getAllowedOfferActions(product).restricted && (
+                <>
+                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/supply-proposals', { offer: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">공급 제안 만들기</button>
+                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-events', { offer: product.id }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 이벤트 만들기</button>
+                  <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-recruitments', { masterId: product.masterId }, supplierTaskReturnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 모집 만들기</button>
+                </>
+              )}
+            </div>
+          )}
 
           {/* ── 반려 안내 배너 (WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1) ──
                반려 = 끝이 아니라 보완 후 재요청 가능함을 상단에 명확히 안내(상태 체계 불변). */}

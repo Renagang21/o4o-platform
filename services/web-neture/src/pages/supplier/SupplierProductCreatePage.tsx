@@ -25,6 +25,7 @@
  */
 
 import { useMemo } from 'react';
+import SupplierProductImportPage from './SupplierProductImportPage';
 import { toast } from '@o4o/error-handling';
 import { ProductForm } from '../../components/product';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
@@ -70,6 +71,17 @@ export default function SupplierProductCreatePage() {
     setMediaPickerTarget,
     handleThumbnailFromLibrary,
   } = media;
+  if (formState.sourceImportOpen) {
+    return <SupplierProductImportPage
+      onCancel={() => formState.setSourceImportOpen(false)}
+      onApplyDraft={(draft) => {
+        formState.applySourceImport(draft);
+        if (!media.thumbnailSource && draft.thumbnailUrl) media.setThumbnailSource({ kind: 'library', url: draft.thumbnailUrl });
+        media.setContentItems((prev) => [...prev, ...[...new Set([...draft.detailImageUrls, ...draft.contentImageUrls])].filter((url) => !prev.some((item) => item.kind === 'library' && item.url === url)).map((url) => ({ kind: 'library' as const, url }))]);
+        toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하세요.');
+      }}
+    />;
+  }
   // 검토 요청 완료 — Candidate 상태임을 분명히 한다 (Master/Offer 아직 없음 · HUB 미노출)
   if (registered) {
     return (

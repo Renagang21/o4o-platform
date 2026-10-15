@@ -23,7 +23,9 @@
  *   (기존 공급자 표면의 A 패턴 — throw + 4상태 + 재시도).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import SupplierContentNavigation from '../../components/supplier/SupplierContentNavigation';
+import { supplierEditLink } from '../../lib/supplierNavigation';
 import {
   supplierApi,
   supplierStoreDescriptionApi,
@@ -98,6 +100,7 @@ interface StatusRow {
   /** 운영자 수정 요청 사유 등 조치 안내(있을 때만). */
   note: string | null;
   updatedAt: string;
+  editPath: string;
 }
 
 function formatDate(iso: string | null | undefined): string {
@@ -120,6 +123,10 @@ interface SourceState<T> {
 const EMPTY = { rows: [], failed: false };
 
 export default function SupplierStoreMaterialsStatusPage() {
+  const location = useLocation();
+  const [params, setParams] = useSearchParams();
+  const stateFilter = params.get('state') ?? '';
+  const returnTo = location.pathname + location.search;
   const [loading, setLoading] = useState(true);
   const [descriptions, setDescriptions] = useState<SourceState<SupplierStoreDescriptionDraft>>(EMPTY);
   const [screenSets, setScreenSets] = useState<SourceState<SupplierScreenSet>>(EMPTY);
@@ -184,6 +191,7 @@ export default function SupplierStoreMaterialsStatusPage() {
               : '운영자가 수정을 요청했습니다.'
             : null,
         updatedAt: d.updatedAt,
+        editPath: supplierEditLink('/supplier/store-descriptions', { masterId: d.masterId, language: d.language || 'ko', descriptionId: d.id }, returnTo),
       });
     }
 
@@ -199,6 +207,7 @@ export default function SupplierStoreMaterialsStatusPage() {
         target: s.hubTargetStoreType ? HUB_TARGET_LABEL[s.hubTargetStoreType] ?? s.hubTargetStoreType : null,
         note: null,
         updatedAt: s.updatedAt,
+        editPath: supplierEditLink('/supplier/tablet-screen-sets', { edit: s.id }, returnTo),
       });
     }
 
@@ -213,11 +222,14 @@ export default function SupplierStoreMaterialsStatusPage() {
         target: null, // 사이니지는 매장 유형 대상 축이 없다(확정 정책).
         note: null,
         updatedAt: m.updatedAt,
+        editPath: supplierEditLink('/supplier/signage', { edit: m.id }, returnTo),
       });
     }
 
     return out.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0));
-  }, [descriptions.rows, screenSets.rows, signage.rows, productNameByMaster]);
+  }, [descriptions.rows, screenSets.rows, signage.rows, productNameByMaster, returnTo]);
+
+  const filteredRows = rows.filter((r) => !['action', 'waiting', 'live', 'working', 'closed'].includes(stateFilter) || r.tone === stateFilter);
 
   const summary = useMemo(() => {
     const count = (tone: Tone) => rows.filter((r) => r.tone === tone).length;
@@ -244,7 +256,7 @@ export default function SupplierStoreMaterialsStatusPage() {
     <div className="mx-auto max-w-5xl px-4 py-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">검수·게시 현황</h1>
+          <h1 className="text-xl font-semibold text-slate-900">자료 현황</h1>
           <p className="mt-1 text-sm text-slate-500">
             매장에 제공하는 자료의 검수·게시 상태를 한곳에서 확인합니다. 수정과 게시는 각 자료 화면에서
             진행합니다.
@@ -259,6 +271,7 @@ export default function SupplierStoreMaterialsStatusPage() {
         </button>
       </div>
 
+      <SupplierContentNavigation />
       <StoreMaterialUsageNote
         className="mb-4"
         channels="QR · 태블릿 · 매장 자료함 · 매장 사이니지 화면"
@@ -281,22 +294,23 @@ export default function SupplierStoreMaterialsStatusPage() {
       {/* 요약 — 조치 필요 우선 */}
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
         {[
-          { label: '수정 요청', value: summary.action, cls: 'text-orange-700' },
-          { label: '검수 대기', value: summary.waiting, cls: 'text-amber-700' },
-          { label: '매장 노출·게시 중', value: summary.live, cls: 'text-emerald-700' },
+          { state: 'action', label: '수정 요청', value: summary.action, cls: 'text-orange-700' },
+          { state: 'waiting', label: '검수 대기', value: summary.waiting, cls: 'text-amber-700' },
+          { state: 'live', label: '매장 노출·게시 중', value: summary.live, cls: 'text-emerald-700' },
           // WO-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1:
           //   'live' 는 이미 '매장 노출·게시 중' 으로 두 어휘를 병기하는데 'working' 만 '작성 중' 이라
           //   설명서 행의 '임시저장' 배지와 어긋났다(같은 집계에 들어가는데 라벨이 다름). 동일 패턴으로 병기한다.
-          { label: '작성 중·임시저장', value: summary.working, cls: 'text-slate-600' },
-          { label: '숨김·보관·만료', value: summary.closed, cls: 'text-slate-400' },
+          { state: 'working', label: '작성 중·임시저장', value: summary.working, cls: 'text-slate-600' },
+          { state: 'closed', label: '숨김·보관·만료', value: summary.closed, cls: 'text-slate-400' },
         ].map((c) => (
-          <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-3">
+          <button type="button" key={c.label} aria-pressed={stateFilter === c.state} onClick={() => setParams((prev) => { const next = new URLSearchParams(prev); if (stateFilter === c.state) next.delete('state'); else next.set('state', c.state); return next; })} className={`rounded-xl border bg-white p-3 text-left ${stateFilter === c.state ? 'border-blue-500 ring-1 ring-blue-300' : 'border-slate-200'}`}>
             <div className="text-xs text-slate-500">{c.label}</div>
             <div className={`mt-1 text-2xl font-semibold ${c.cls}`}>{loading ? '–' : c.value}</div>
-          </div>
+          </button>
         ))}
       </div>
 
+      {stateFilter && <button type="button" onClick={() => setParams({})} className="mb-3 text-sm text-blue-700 underline">전체 자료 보기</button>}
       {/* 현황 목록 */}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         {loading ? (
@@ -312,9 +326,9 @@ export default function SupplierStoreMaterialsStatusPage() {
               다시 시도
             </button>
           </div>
-        ) : rows.length === 0 ? (
+        ) : filteredRows.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400">
-            아직 매장에 제공한 자료가 없습니다. 왼쪽 메뉴의 자료 화면에서 시작하세요.
+            {rows.length ? '선택한 상태의 자료가 없습니다.' : '아직 매장에 제공한 자료가 없습니다. 위에서 자료 만들기를 선택하세요.'}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -330,7 +344,7 @@ export default function SupplierStoreMaterialsStatusPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {rows.map((r) => {
+                {filteredRows.map((r) => {
                   const kind = KIND_META[r.kind];
                   return (
                     <tr key={r.key} className="align-top">
@@ -350,7 +364,7 @@ export default function SupplierStoreMaterialsStatusPage() {
                       <td className="whitespace-nowrap px-4 py-3 text-slate-500">{r.target ?? '—'}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-slate-500">{formatDate(r.updatedAt)}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-right">
-                        <Link to={kind.path} className="text-sm font-medium text-emerald-700 hover:underline">
+                        <Link to={r.editPath} className="text-sm font-medium text-emerald-700 hover:underline">
                           관리
                         </Link>
                       </td>

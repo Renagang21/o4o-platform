@@ -33,6 +33,7 @@ import SupplierStoreDescriptionEditorDrawer, {
   normLang,
   type SupportedLang,
 } from './SupplierStoreDescriptionEditorDrawer';
+import SupplierContentNavigation from '../../components/supplier/SupplierContentNavigation';
 import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 
 const PROFILE_PATH = '/mypage/business-profile';
@@ -61,15 +62,16 @@ export default function SupplierStoreDescriptionsPage() {
   // authoring state (ACTIVE 전용)
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [drafts, setDrafts] = useState<SupplierStoreDescriptionDraft[]>([]);
-  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(true);
   // 상품·설명서 목록 조회 실패를 '상품 0건 / 설명서 없음'으로 오인하지 않도록 분리한다.
   const [productsError, setProductsError] = useState(false);
   const [activeReloadKey, setActiveReloadKey] = useState(0);
   const [keyword, setKeyword] = useState('');
   const [selected, setSelected] = useState<SupplierProduct | null>(null);
-  // WO-...-SMOKE-BATCH-V1: 상품 화면에서 넘어온 masterId 를 1회 소비해 해당 상품 편집기를 연다.
+  // 상품·자료 현황에서 넘어온 대상과 언어를 유지해 같은 편집기로 이어 간다.
   const [searchParams, setSearchParams] = useSearchParams();
-  const [deepLinkConsumed, setDeepLinkConsumed] = useState(false);
+  const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
+  const [initialLanguage, setInitialLanguage] = useState<SupportedLang>('ko');
 
   useEffect(() => {
     let mounted = true;
@@ -129,19 +131,27 @@ export default function SupplierStoreDescriptionsPage() {
     };
   }, [active, activeReloadKey]);
 
-  // masterId deep link: 상품 목록 로드 후 1회만 소비한다(못 찾으면 목록만 보여주고 조용히 무시).
+  // URL에 대상을 유지한다. 뒤로가기·새로고침도 같은 상품·언어를 연다.
+  const masterId = searchParams.get('masterId');
+  const requestedLanguage = searchParams.get('language');
+  const descriptionId = searchParams.get('descriptionId');
   useEffect(() => {
-    if (deepLinkConsumed || productsLoading || products.length === 0) return;
-    const masterId = searchParams.get('masterId');
-    if (!masterId) return;
-    setDeepLinkConsumed(true);
+    if (!masterId || productsLoading || productsError || !active) return;
     const target = products.find((p) => p.masterId === masterId);
-    if (target) setSelected(target);
-    // query 를 지워 새로고침·뒤로가기 시 편집기가 다시 열리지 않게 한다.
-    const next = new URLSearchParams(searchParams);
-    next.delete('masterId');
-    setSearchParams(next, { replace: true });
-  }, [deepLinkConsumed, productsLoading, products, searchParams, setSearchParams]);
+    if (!target || (requestedLanguage && !SUPPORTED_LANGS.includes(requestedLanguage as SupportedLang)) || (descriptionId && !drafts.some((d) => d.id === descriptionId && d.masterId === masterId && normLang(d.language) === normLang(requestedLanguage)))) {
+      setDeepLinkError('요청한 상품 또는 언어를 열 수 없습니다. 목록에서 대상을 확인해 주세요.');
+      setSelected(null);
+      return;
+    }
+    setDeepLinkError(null);
+    setInitialLanguage(normLang(requestedLanguage));
+    setSelected(target);
+  }, [masterId, requestedLanguage, descriptionId, productsLoading, productsError, products, drafts, active]);
+
+  const closeEditor = () => {
+    setSelected(null);
+    setSearchParams((prev) => { const next = new URLSearchParams(prev); next.delete('masterId'); next.delete('language'); next.delete('descriptionId'); return next; }, { replace: true });
+  };
 
   // 우선순위: revision_requested(조치 필요) > canonical > needs_review > draft > 기타
   const rank = (s: string) =>
@@ -182,6 +192,8 @@ export default function SupplierStoreDescriptionsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      <SupplierContentNavigation />
+      {deepLinkError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">{deepLinkError}</p>}
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">매장용 상품 설명서</h1>
@@ -312,7 +324,7 @@ export default function SupplierStoreDescriptionsPage() {
                     )}
                     <button
                       type="button"
-                      onClick={() => setSelected(p)}
+                      onClick={() => { setInitialLanguage('ko'); setSelected(p); }}
                       className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
                     >
                       {hasAny ? '설명서 편집' : '설명서 작성'}
@@ -330,7 +342,9 @@ export default function SupplierStoreDescriptionsPage() {
             <SupplierStoreDescriptionEditorDrawer
               product={selected}
               open={!!selected}
-              onClose={() => setSelected(null)}
+              initialLanguage={initialLanguage}
+              initialDescriptionId={descriptionId ?? undefined}
+              onClose={closeEditor}
               onSaved={loadDrafts}
             />
           )}

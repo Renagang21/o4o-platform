@@ -11,15 +11,16 @@
  */
 
 import { useId } from 'react';
+import type { ImportDraft } from '../../lib/product-import/types';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import { useSupplierProductImport } from './product-import/useSupplierProductImport';
 import SupplierImportResult from './product-import/SupplierImportResult';
 import SupplierImportSettings from './product-import/SupplierImportSettings';
 
-export default function SupplierProductImportPage() {
+export default function SupplierProductImportPage({ onApplyDraft, onCancel }: { onApplyDraft?: (draft: ImportDraft) => void; onCancel?: () => void }) {
   const fieldId = useId();
-  const controller = useSupplierProductImport();
+  const controller = useSupplierProductImport(onApplyDraft);
   const {
     sourceUrl,
     setSourceUrl,
@@ -40,6 +41,8 @@ export default function SupplierProductImportPage() {
   return (
     <SupplierActivationGate mode="gate">
       <div className="mx-auto max-w-4xl px-4 py-6">
+        {onCancel && <button type="button" disabled={controller.navStatus === 'copying'} onClick={onCancel} className="mb-4 rounded-lg border px-4 py-2 text-sm text-blue-700 disabled:opacity-50">입력 내용 유지하고 돌아가기</button>}
+        {onApplyDraft && <p className="mb-3 text-sm text-slate-600">현재 작성 중인 상품의 빈 입력란을 보완합니다. 기존 입력·규제 구분과 이미지는 유지되며, 적용만으로 저장·제출되지 않습니다.</p>}
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-slate-900">내 쇼핑몰 관리자 상품 가져오기</h1>
@@ -77,6 +80,7 @@ export default function SupplierProductImportPage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-2">
             <button
+              disabled={!!onApplyDraft && !!passedType}
               onClick={() => selectTop('non_drug')}
               className={`text-left rounded-lg border p-3 transition-colors ${topChoice === 'non_drug' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
             >
@@ -87,6 +91,7 @@ export default function SupplierProductImportPage() {
               </p>
             </button>
             <button
+              disabled={!!onApplyDraft && !!passedType}
               onClick={() => selectTop('drug')}
               className={`text-left rounded-lg border p-3 transition-colors ${topChoice === 'drug' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
             >

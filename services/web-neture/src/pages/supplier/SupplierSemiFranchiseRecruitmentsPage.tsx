@@ -7,7 +7,7 @@
  *   화면(/supplier/recruitments/:id)에서 한다 — 승인된 약국은 모집 공급가로 바로 주문할 수 있다.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   neturePharmacySupplierApi as api,
   formatDateTime,
@@ -15,6 +15,7 @@ import {
   type SemiFranchiseRecruitment,
 } from '../../lib/api/neturePharmacy';
 import { EmptyRow, INPUT, Message, PageHeader, StatusBadge, TD, TH } from '../../components/neture-pharmacy/PharmacyCommerceUi';
+import { supplierReturnPath } from '../../lib/supplierNavigation';
 import { productLabel, useSupplierPharmacyOptions } from '../../components/neture-pharmacy/useSupplierPharmacyOptions';
 
 type Msg = { type: 'success' | 'error'; text: string } | null;
@@ -23,11 +24,20 @@ const digits = (v: string) => v.replace(/[^0-9]/g, '');
 
 export default function SupplierSemiFranchiseRecruitmentsPage() {
   const options = useSupplierPharmacyOptions();
+  const [params] = useSearchParams();
+  const requestedProduct = params.get('masterId');
   const [rows, setRows] = useState<SemiFranchiseRecruitment[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
   const [form, setForm] = useState(EMPTY);
+  const [selectionError, setSelectionError] = useState(false);
+  useEffect(() => {
+    if (!requestedProduct || options.loading || options.error) return;
+    const target = options.products.find((p) => p.masterId === requestedProduct);
+    setSelectionError(!target);
+    if (target) setForm((prev) => ({ ...prev, masterId: target.masterId }));
+  }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -71,6 +81,8 @@ export default function SupplierSemiFranchiseRecruitmentsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {params.has('returnTo') && <Link to={supplierReturnPath(params.get('returnTo'), '/supplier/products')} className="inline-block text-sm text-blue-700 underline">상품 업무로 돌아가기</Link>}
+      {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주세요.</p>}
       <PageHeader
         title="세미프랜차이즈 모집"
         description="세미프랜차이즈 약국을 대상으로 취급매장을 모집합니다. 참여 승인된 약국은 모집 공급가로 바로 주문합니다."

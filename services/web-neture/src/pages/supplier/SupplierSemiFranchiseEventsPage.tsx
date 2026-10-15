@@ -6,6 +6,7 @@
  *   이벤트 가격은 수정할 수 없다 — 취소 후 다시 신청한다. 승인은 담당 운영자가 한다.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   neturePharmacySupplierApi as api,
   formatDateTime,
@@ -13,6 +14,7 @@ import {
   type SemiFranchiseEvent,
 } from '../../lib/api/neturePharmacy';
 import { EmptyRow, INPUT, Message, PageHeader, StatusBadge, TD, TH } from '../../components/neture-pharmacy/PharmacyCommerceUi';
+import { supplierReturnPath } from '../../lib/supplierNavigation';
 import { productLabel, useSupplierPharmacyOptions } from '../../components/neture-pharmacy/useSupplierPharmacyOptions';
 
 type Msg = { type: 'success' | 'error'; text: string } | null;
@@ -32,11 +34,20 @@ const optionalInt = (v: string) => (v.trim() === '' ? undefined : Number(v));
 
 export default function SupplierSemiFranchiseEventsPage() {
   const options = useSupplierPharmacyOptions();
+  const [params] = useSearchParams();
+  const requestedProduct = params.get('offer');
   const [rows, setRows] = useState<SemiFranchiseEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
   const [form, setForm] = useState(EMPTY);
+  const [selectionError, setSelectionError] = useState(false);
+  useEffect(() => {
+    if (!requestedProduct || options.loading || options.error) return;
+    const target = options.products.find((p) => p.id === requestedProduct);
+    setSelectionError(!target);
+    if (target) setForm((prev) => ({ ...prev, offerId: target.id }));
+  }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -100,6 +111,8 @@ export default function SupplierSemiFranchiseEventsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {params.has('returnTo') && <Link to={supplierReturnPath(params.get('returnTo'), '/supplier/products')} className="inline-block text-sm text-blue-700 underline">상품 업무로 돌아가기</Link>}
+      {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주세요.</p>}
       <PageHeader title="세미프랜차이즈 이벤트" description="등록 승인된 제품으로 세미프랜차이즈 약국 대상 이벤트를 신청합니다." />
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">

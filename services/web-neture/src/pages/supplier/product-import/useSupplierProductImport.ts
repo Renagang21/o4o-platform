@@ -5,7 +5,7 @@ import {
   parseFirstmallAdmin,
   looksLikeFirstmallAdmin,
 } from '../../../lib/product-import/firstmall-admin-parser';
-import type { ParsedProductData, FirstmallAdminProduct } from '../../../lib/product-import/types';
+import type { ImportDraft, ParsedProductData, FirstmallAdminProduct } from '../../../lib/product-import/types';
 import {
   getSupplierProductType,
   type SupplierProductTypeDef,
@@ -15,7 +15,7 @@ import { mediaApi } from '../../../lib/api/media';
 import { NON_DRUG, mapImportProduct, flattenCats, type TopChoice } from './importHelpers';
 import { useSupplierImportTransfers } from './useSupplierImportTransfers';
 
-export function useSupplierProductImport() {
+export function useSupplierProductImport(onApplyDraft?: (draft: ImportDraft) => void) {
   const navigate = useNavigate();
 
   // Input state — sourceUrl 은 "내 쇼핑몰 주소"(상대 이미지 URL 절대화 기준)
@@ -76,9 +76,10 @@ export function useSupplierProductImport() {
     productApi.getCategories().then(setCategories);
   }, []);
 
+  const embedded = Boolean(onApplyDraft);
   // 앞 단계 전달 유형 → 상위 분기 미리 선택(정밀 유형 보존). 미전달/직접 진입은 사용자가 상위만 선택.
   useEffect(() => {
-    const incoming = getSupplierProductType(searchParams.get('productType'));
+    const incoming = getSupplierProductType(searchParams.get('productType') ?? (embedded ? 'non_drug' : null));
     if (!incoming) return;
     if (incoming.key === 'otc_drug' || incoming.key === 'rx_drug') {
       setTopChoice('drug');
@@ -88,7 +89,7 @@ export function useSupplierProductImport() {
       setPassedType(incoming); // 의약외품은 비의약품 하위 — 정밀 유형 보존(임의 강등 금지)
     }
     // unclassified/미전달은 사용자가 직접 선택
-  }, [searchParams]);
+  }, [searchParams, embedded]);
 
   const selectTop = (choice: TopChoice) => {
     setTopChoice(choice);
@@ -131,6 +132,7 @@ export function useSupplierProductImport() {
 
   const detailCandidates = useMemo(() => parsed?.detailImageCandidates ?? [], [parsed]);
   const transfer = useSupplierImportTransfers({
+    onApplyDraft,
     navigate,
     sourceUrl,
     parsed,

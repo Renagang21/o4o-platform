@@ -16,7 +16,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import type { SupplierSpaceOutletContext } from '../../components/layouts/SupplierSpaceLayout';
-import { Search, Plus, X, Send, Info, FileText } from 'lucide-react';
+import { Plus, X, Send, Info, FileText } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import { EditableDataTable, SearchBar, Pagination } from '@o4o/operator-ux-core';
 import type { SupplierProduct } from '../../lib/api';
@@ -146,6 +146,8 @@ export default function SupplierProductsPage() {
     countsError,
     drawerProduct,
     setDrawerProduct,
+    closeDrawer,
+    setPage,
     autoNext,
     setAutoNext,
     highlightRowId,
@@ -277,25 +279,8 @@ export default function SupplierProductsPage() {
           <div className="mt-2"><GuideBackLink to="/guide/features/product-registration" label="상품 등록 이용 안내" /></div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => navigate('/supplier/products/library')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
-          >
-            <Search size={16} />
-            라이브러리 검색
-          </button>
-          <button
-            onClick={() => navigate('/supplier/products/new')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700"
-          >
-            <Plus size={16} />
-            신규 제품 검토 요청
-          </button>
-          <button
-            onClick={() => navigate('/supplier/products/import-assistant')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
-          >
-            ⚡ 상품 정보 가져오기 (HTML)
+          <button type="button" onClick={() => navigate('/supplier/products/register')} className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            <Plus size={16} /> 상품 추가
           </button>
         </div>
       </div>
@@ -478,7 +463,7 @@ export default function SupplierProductsPage() {
         page={pagination.page}
         totalPages={pagination.totalPages}
         total={pagination.total}
-        onPageChange={(p) => fetchProducts(p)}
+        onPageChange={setPage}
       />
 
       {/* Select All hint */}
@@ -583,8 +568,9 @@ export default function SupplierProductsPage() {
       {/* Product Detail Drawer (WO-O4O-NETURE-SUPPLIER-DRAWER-V1 / EDITABLE-V1) */}
       <ProductDetailDrawer
         product={drawerProduct}
+        returnTo={`/supplier/products?${new URLSearchParams({ q: keyword, page: String(pagination.page), approval: activeTab, hasImage: filterHasImage, hasDescription: filterHasDescription, barcodeSource: filterBarcodeSource, completeness: filterCompleteness, visibility: filterVisibility, ...(drawerProduct ? { offer: drawerProduct.id } : {}) })}`}
         open={!!drawerProduct}
-        onClose={() => setDrawerProduct(null)}
+        onClose={closeDrawer}
         onSaved={() => fetchProducts(pagination.page)}
       />
 
