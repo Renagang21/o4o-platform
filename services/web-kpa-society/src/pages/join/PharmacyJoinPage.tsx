@@ -4,7 +4,7 @@
  * WO-KPA-HOME-SERVICE-SECTION-V1
  *
  * 대상: 개별 약국
- * 내용: 기본 서비스, 선택 프로그램(혈당관리)
+ * 내용: 기본 서비스, 참여 방법
  */
 
 import React from 'react';
@@ -39,34 +39,6 @@ export function PharmacyJoinPage() {
         </ul>
       </div>
 
-      {/* 혈당관리 프로그램 섹션 */}
-      <div style={styles.programSection}>
-        <div style={styles.programHeader} className="flex-wrap">
-          <span style={styles.programIcon}>🩸</span>
-          <h3 style={styles.programTitle}>혈당관리 프로그램</h3>
-          <span style={styles.programBadge}>선택 참여</span>
-        </div>
-        <p style={styles.programDescription}>
-          혈당관리 프로그램은 약국 서비스 내에서 선택적으로 참여하는 특화 프로그램입니다.
-        </p>
-        <h4 style={styles.subTitle}>프로그램 참여 조건</h4>
-        <ul style={styles.list}>
-          <li>약사회 회원 약국</li>
-          <li>혈당관리 교육 이수</li>
-          <li>프로그램 참여 동의</li>
-        </ul>
-        <h4 style={styles.subTitle}>참여 시 제공 기능</h4>
-        <ul style={styles.list}>
-          <li>고객 혈당 데이터 관리</li>
-          <li>혈당 측정 기록 분석</li>
-          <li>프로그램 전용 콘텐츠 이용</li>
-          <li>전문 교육 및 인증</li>
-        </ul>
-        <a href="/info/glucose-program" style={styles.programLink}>
-          프로그램 상세 안내 →
-        </a>
-      </div>
-
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>참여 방법</h2>
         <ol style={styles.orderedList}>
@@ -81,10 +53,6 @@ export function PharmacyJoinPage() {
           <li>
             <strong>서비스 이용</strong>
             <p style={styles.stepDesc}>기본 서비스를 바로 이용할 수 있습니다.</p>
-          </li>
-          <li>
-            <strong>프로그램 참여 (선택)</strong>
-            <p style={styles.stepDesc}>혈당관리 등 선택 프로그램은 별도 신청 후 이용 가능합니다.</p>
           </li>
         </ol>
       </div>
@@ -120,12 +88,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#0f172a',
     margin: '0 0 12px 0',
   },
-  subTitle: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: '#334155',
-    margin: '16px 0 8px 0',
-  },
   paragraph: {
     fontSize: '1rem',
     color: '#475569',
@@ -150,50 +112,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.9375rem',
     color: '#64748b',
     margin: '4px 0 16px 0',
-  },
-  programSection: {
-    backgroundColor: '#f0f9ff',
-    border: '1px solid #bae6fd',
-    borderRadius: '12px',
-    padding: '24px',
-    marginBottom: '32px',
-  },
-  programHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '12px',
-  },
-  programIcon: {
-    fontSize: '1.5rem',
-  },
-  programTitle: {
-    fontSize: '1.125rem',
-    fontWeight: 600,
-    color: '#0f172a',
-    margin: 0,
-  },
-  programBadge: {
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    backgroundColor: '#e0f2fe',
-    color: '#0369a1',
-    padding: '4px 8px',
-    borderRadius: '12px',
-  },
-  programDescription: {
-    fontSize: '0.9375rem',
-    color: '#475569',
-    lineHeight: 1.6,
-    margin: '0 0 16px 0',
-  },
-  programLink: {
-    display: 'inline-block',
-    marginTop: '16px',
-    fontSize: '0.9375rem',
-    fontWeight: 500,
-    color: '#2563eb',
-    textDecoration: 'none',
   },
   contactBox: {
     backgroundColor: '#f8fafc',

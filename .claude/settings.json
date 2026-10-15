@@ -499,8 +499,6 @@
       "WebFetch(domain:neture.co.kr)",
       "WebFetch(domain:api.neture.co.kr)",
       "WebFetch(domain:kpa-society.co.kr)",
-      "WebFetch(domain:k-cosmetics.site)",
-      "WebFetch(domain:glycopharm.co.kr)",
       "WebFetch(domain:ai.google.dev)",
       "PowerShell(Get-ChildItem *)",
       "PowerShell(Get-Content *)",
