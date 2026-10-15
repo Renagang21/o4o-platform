@@ -1,8 +1,8 @@
 # TODO-O4O-AUTH-IDENTITY-AUDIT-FOLLOWUP-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-15 (KST)
-> **근거**: 서비스 운영자 지정 조사 인계 및 Google 선택 계정·O4O 표시 계정 비교 후속 요청
+> **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-15
+> **근거 WO/IR**: [서비스 운영자 지정 조사 TODO](TODO-O4O-SERVICE-OPERATOR-ASSIGNMENT-AUDIT-V1.md), Google 선택 계정·O4O 표시 계정 비교 후속 요청
 
 ## 기준과 경계
 
