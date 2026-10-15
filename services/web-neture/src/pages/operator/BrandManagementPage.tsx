@@ -7,12 +7,13 @@
  * 브랜드 생성 UI 없음 (자동 생성 유지)
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { Search, GitMerge, X, Package } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { EditableTextCell, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
+import { EditableTextCell, RowActionMenu } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { useTaxonomyDialog } from './hooks/useTaxonomyDialog';
 import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
 // WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: Neture 최초 도입 — 페이지 상단 안내 inline 편집
 import { GuideEditableSection } from '../../components/guide';
@@ -55,7 +56,13 @@ export default function BrandManagementPage() {
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeSearch, setMergeSearch] = useState('');
   const [merging, setMerging] = useState(false);
+  const [mergeError, setMergeError] = useState<string | null>(null);
   const [pendingMergeTarget, setPendingMergeTarget] = useState<BrandItem | null>(null);
+  const dialogId = useId();
+  const searchRef = useRef<HTMLInputElement>(null);
+  const mergeSearchRef = useRef<HTMLInputElement>(null);
+  const mergeDialogRef = useTaxonomyDialog(showMergeModal && !!mergeSource, searchRef);
+  const confirmDialogRef = useTaxonomyDialog(!!pendingMergeTarget, mergeSearchRef);
 
   const loadBrands = useCallback(async (q?: string) => {
     setLoading(true);
@@ -81,12 +88,14 @@ export default function BrandManagementPage() {
   };
 
   const handleMergeSelect = (target: BrandItem) => {
+    setMergeError(null);
     setPendingMergeTarget(target);
   };
 
   const executeMerge = async () => {
     if (!mergeSource || !pendingMergeTarget) return;
 
+    setMergeError(null);
     setMerging(true);
     const res = await operatorBrandApi.mergeBrands(mergeSource.id, pendingMergeTarget.id);
     setMerging(false);
@@ -98,6 +107,7 @@ export default function BrandManagementPage() {
       setPendingMergeTarget(null);
       loadBrands(search);
     } else {
+      setMergeError(res.error || '병합 실패');
       toast.error(res.error || '병합 실패');
     }
   };
@@ -208,6 +218,7 @@ export default function BrandManagementPage() {
         <Search className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
         <input
           type="text"
+          ref={searchRef}
           aria-label="브랜드 검색"
           placeholder="브랜드 검색..."
           value={search}
@@ -231,28 +242,50 @@ export default function BrandManagementPage() {
         tableId="neture-brand-management"
       />
 
-      {/* Merge Confirm Dialog */}
-      <ConfirmActionDialog
-        open={!!pendingMergeTarget}
-        onClose={() => setPendingMergeTarget(null)}
-        onConfirm={executeMerge}
-        title="브랜드 병합 확인"
-        message={mergeSource && pendingMergeTarget
-          ? `"${mergeSource.name}"의 상품 ${mergeSource.productCount}개를 "${pendingMergeTarget.name}"으로 이관하고\n"${mergeSource.name}" 브랜드를 삭제합니다.`
-          : ''}
-        confirmText="병합"
-        variant="warning"
-        loading={merging}
-      />
+      {/* Confirmation is a second native modal, so only its controls receive focus. */}
+      {pendingMergeTarget && mergeSource && (
+        <dialog ref={confirmDialogRef} aria-labelledby={`${dialogId}-confirm-title`}
+          onCancel={(event) => { event.preventDefault(); if (!merging) setPendingMergeTarget(null); }}
+          onPointerUp={(event) => {
+            if (merging || event.target !== event.currentTarget) return;
+            const bounds = event.currentTarget.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                event.clientY < bounds.top || event.clientY > bounds.bottom) {
+              setPendingMergeTarget(null);
+            }
+          }}
+          className="!m-auto w-[calc(100%-2rem)] max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto border-0 p-0 bg-white rounded-xl shadow-xl text-inherit backdrop:bg-black/50">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h2 id={`${dialogId}-confirm-title`} className="text-lg font-semibold text-gray-900">브랜드 병합 확인</h2>
+            <button type="button" aria-label="브랜드 병합 확인 창 닫기" disabled={merging}
+              onClick={() => setPendingMergeTarget(null)}
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:opacity-50">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="px-6 py-4">
+            {mergeError && <p role="alert" className="mb-2 text-sm text-red-700">{mergeError}</p>}
+            <p className="text-gray-600 text-sm whitespace-pre-line">{`"${mergeSource.name}"의 상품 ${mergeSource.productCount}개를 "${pendingMergeTarget.name}"으로 이관하고\n"${mergeSource.name}" 브랜드를 삭제합니다.`}</p>
+          </div>
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <button type="button" data-dialog-initial-focus disabled={merging}
+              onClick={() => setPendingMergeTarget(null)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:opacity-50">취소</button>
+            <button type="button" disabled={merging} onClick={executeMerge}
+              className="px-4 py-2 text-sm font-medium rounded-md bg-amber-600 hover:bg-amber-700 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-600 disabled:opacity-50">{merging ? '처리 중...' : '병합'}</button>
+          </div>
+        </dialog>
+      )}
 
       {/* Merge Modal */}
       {showMergeModal && mergeSource && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+        <dialog ref={mergeDialogRef} aria-labelledby={`${dialogId}-merge-title`}
+          onCancel={(event) => { event.preventDefault(); setShowMergeModal(false); }}
+          className="!m-auto w-[calc(100%-2rem)] max-w-lg max-h-[80vh] flex flex-col border-0 p-0 bg-white rounded-xl shadow-xl text-inherit backdrop:bg-black/50">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">브랜드 병합</h2>
+                <h2 id={`${dialogId}-merge-title`} className="text-lg font-semibold text-slate-800">브랜드 병합</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
                   "<span className="font-medium text-orange-600">{mergeSource.name}</span>"을(를) 병합할 대상 브랜드를 선택하세요
                 </p>
@@ -277,7 +310,8 @@ export default function BrandManagementPage() {
                   value={mergeSearch}
                   onChange={e => setMergeSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  autoFocus
+                  data-dialog-initial-focus
+                  ref={mergeSearchRef}
                 />
               </div>
             </div>
@@ -314,8 +348,7 @@ export default function BrandManagementPage() {
                 병합 시 "{mergeSource.name}"의 상품 {mergeSource.productCount}개가 선택한 브랜드로 이관되고, "{mergeSource.name}"은 삭제됩니다.
               </p>
             </div>
-          </div>
-        </div>
+        </dialog>
       )}
     </div>
   );

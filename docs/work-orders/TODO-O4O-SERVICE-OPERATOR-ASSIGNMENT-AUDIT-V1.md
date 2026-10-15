@@ -22,13 +22,13 @@
 
 - [x] 현재 정본·main·작업공간·전체 관리자 지정 API 확인.
 - [x] 지정 원장 → 로그인 세션 → 서비스 API/라우트 → 프로필 메뉴의 경로 조사.
-- [ ] 운영 지정 원장에서 대상 계정의 서비스별 admin/operator 및 가입 상태를 읽기 전용으로 확인.
+- [x] 운영 지정 원장에서 대상 계정의 서비스별 admin/operator 및 가입 상태를 읽기 전용으로 확인(아래 실제 조회 결과).
 - [ ] 실제 Google 연결·사용자 ID와 지정 계정이 일치하는지 확인(실제 OAuth는 사용자 담당).
 - [x] 확인된 UI 오류를 합성 계정으로 재현하고 수정 범위를 보완.
 - [x] 첫 UI 수정의 지정 역할·미지정·타 서비스·회수·가입 상태·전체 관리자 경계 회귀.
 - [x] 첫 UI 수정의 PC·모바일 메뉴와 기존 직접 URL guard 판정 일치 검증.
 - [x] TODO 보완·검증 기록·이번 경로만 commit/push. [첫 UI 수정 PR #600](https://github.com/Renagang21/o4o-platform/pull/600).
-- [ ] PR 최신 HEAD의 CI/review gate 확인(현재 결과는 PR checks 기준).
+- [x] PR #600 최신 HEAD `5fca45f8a9`의 CI/review gate 확인, main `d83b291cd6` 통합.
 
 ## 조사 후 보완
 
@@ -39,20 +39,20 @@
 | 원장 | 서비스 운영자 지정 catalog는 neture/kpa-society/lecture/kpa-branch/community/supplier/funding. store·약국 협력사업은 기존 계약/운영 화면을 별도로 추적 | 같은 운영 화면을 공유한다는 이유로 다른 서비스 역할을 인정하지 않음 |
 | API·라우트 | supplier/funding/community의 보호 경로는 서비스 역할과 해당 membership을 검사 | 전체 관리자 bypass 등 기존 기술 계약은 이번 UI 수정으로 변경하지 않음 |
 | UI 결함 | NetureUserMenuItems는 모든 host에서 neture:admin/operator 기준과 /admin, /operator를 사용 | supplier/funding/community의 지정 역할을 누락하고 타 서비스 메뉴를 보여줄 수 있음. PC·모바일 공통 소비처 모두 대상 |
-| 현재 운영 계정 | 직접 DB/GCP identity·전체 관리자 브라우저 session이 현재 cloud에 없음 | 확인 안 된 상태를 PASS로 쓰지 않음. 기존 운영 WIF 조사 경로를 재사용할 수 있는 구체적 옵션을 아래에 준비 |
-| 목록 유효기간 결함 | AdminUserController.getUsers의 역할 필터와 역할 batch는 is_active만 검사. RoleAssignment.isValidNow는 시작·종료 시각도 검사 | 격리 PostgreSQL에서 만료·미시작 역할이 목록과 검색에 포함되는 오류 재현. Core 파일의 두 조회 조건 최소 정합 수정은 별도 범위 확인 대기 |
+| 현재 운영 계정 | 직접 DB/GCP identity·전체 관리자 브라우저 session 없이 기존 WIF read-only census 실행 | 대상 계정의 실제 집계를 확보했다. 실제 OAuth와 표시 계정 비교는 별도 확인 |
+| 목록 유효기간 결함 | AdminUserController.getUsers의 역할 필터와 역할 batch는 is_active만 검사. RoleAssignment.isValidNow는 시작·종료 시각도 검사 | 격리 PostgreSQL에서 만료·미시작 역할이 목록과 검색에 포함되는 오류 재현. 사용자가 Core 파일의 두 조회 조건 최소 정합 수정을 승인했고 실제 PostgreSQL 회귀 후 main 반영 |
 
-## 서비스별 추적표 — 현재 운영 데이터 결과는 미확인
+## 서비스별 추적표 — 2026-10-15 운영 read-only census 결과
 
 | 지정 역할 prefix | 실제 서비스 key | 조사한 업무 진입 | 대상 운영자 원장 확인 |
 |---|---|---|---|
-| neture | neture | 대표 /admin, /operator; store의 약국 가입 심사도 기존 Neture 운영 역할 경계 | 미확인 |
-| kpa | kpa-society | 약국 협력사업 운영 화면. membership/조직별 역할을 서비스 운영자 역할과 구분 | 미확인 |
-| lecture | lecture | study 호스트 /operator; lecture 역할과 active membership | 미확인 |
-| kpa-branch | kpa-branch | 분회 서비스 /service-admin; 개별 분회 운영자는 별도 개체 지정 | 미확인 |
-| supplier | supplier | /admin/supplier-governance, /operator/suppliers | 미확인 |
-| funding | funding | /operator/market-trial | 미확인 |
-| community | community | /admin/communities, /operator/communities; 개별 커뮤니티 운영자와 구분 | 미확인 |
+| neture | neture | 대표 /admin, /operator; store의 약국 가입 심사도 기존 Neture 운영 역할 경계 | admin/operator 현재 · 가입 active |
+| kpa | kpa-society | 약국 협력사업 운영 화면. membership/조직별 역할을 서비스 운영자 역할과 구분 | admin/operator 현재 · 가입 active |
+| lecture | lecture | study 호스트 /operator; lecture 역할과 active membership | admin/operator 현재 · 가입 active |
+| kpa-branch | kpa-branch | 분회 서비스 /service-admin; 개별 분회 운영자는 별도 개체 지정 | 현재 지정 역할 없음 · 가입 active |
+| supplier | supplier | /admin/supplier-governance, /operator/suppliers | admin 현재 · 가입 active |
+| funding | funding | /operator/market-trial | admin 현재 · 가입 active |
+| community | community | /admin/communities, /operator/communities; 개별 커뮤니티 운영자와 구분 | admin/operator 현재 · 가입 active |
 
 CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운영자 지정 role가 catalog에 없다.
 이번 최소 수정은 기존 대표 업무 진입을 유지한다. 도메인을 독립 지정 서비스로 확정하거나
@@ -99,12 +99,13 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 
 - [x] 기존 WIF read-only census 옵션 추가·실행 범위 확인(2026-10-15 사용자 승인).
 - [x] 기존 WIF 경로의 standalone read-only 옵션과 masked census 구현.
-- [ ] 운영 원장의 대상 계정별 서비스 지정·유효기간·가입 상태 확인.
+- [x] 운영 원장의 대상 계정별 서비스 지정·유효기간·가입 상태 확인(조회 run #38665214095).
 - [ ] 확인한 원장의 userId와 실제 로그인·Google 연결 결과 비교.
 - [x] Core 목록 유효기간 조건 두 곳의 최소 수정 범위 확인·실제 PostgreSQL 회귀.
-- [ ] 후속 변경의 API/안전 회귀·CI/review·push·main 통합.
+- [x] 후속 변경의 API/안전 회귀·CI/review·push·main 통합(PR #600).
 - [ ] 운영 데이터 불일치가 확인되면 before/after 계획을 별도로 검토하고 전체 관리자 지정 경로로 수정.
-- [ ] 필요한 main 통합·배포 후 실제 운영 화면 검증. 현재 첫 UI 수정은 로컬 검증이며 배포 완료가 아니다.
+- [x] main 통합·자동 API verified rollout과 4개 웹 origin의 수정 메뉴 map 제공 확인.
+- [ ] 본인 운영자 Google 로그인 후 실제 운영 메뉴/업무 접근 확인(사용자 담당).
 
 ## 운영 조회 경로 — 2026-10-15 사용자 승인·구현
 
@@ -139,3 +140,75 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
   collector/gate 포함 11/11 PASS다. NOT NULL migration이나 기존 역할 데이터 변경은 수행하지 않는다.
 
 문서 정합: 과거 운영자 연결 기록은 당시 기록으로 유지한다. 현재 지정 결과는 새 실제 조회 근거로 판정한다.
+
+## main 통합·실제 운영 원장 결과 — 2026-10-15
+
+- [PR #600](https://github.com/Renagang21/o4o-platform/pull/600)의 최종 HEAD `5fca45f8a928247c9153c1cc939ef477a505ce91`에서
+  required CI Gate·API Jest·Code Quality·Sonar·CodeQL과 최신 Codex review 완료, 미해결 스레드 0을 확인했다.
+  실제 main ruleset의 PR/CI 경계를 준수해 `d83b291cd61f479d36b68b36e8b4ad3daab80540`에 통합했다.
+  첫 UI 수정은 앞선 PR #601을 통해 main에 포함됐고 #600이 승인된 Core/read-only 후속을 통합했다.
+- [대상 계정 census #38665214095](https://github.com/Renagang21/o4o-platform/actions/runs/38665214095)는
+  exact main SHA `d83b291cd6`에서 실제 operator-census step SUCCESS다. 전체 로그 ZIP의 redirect가
+  네트워크에서 거절돼 공식 개별 job logs API로 집계 JSON을 확보했다. 프록시/TLS 검증은 유지했다.
+- 대상 계정은 유일한 활성 계정 1개, Google 연결 1개, 현재 `platform:super_admin` 지정 0개다.
+  위 추적표의 6서비스에 현재 관리 역할이 있고 분회는 active 가입만 있다. 각 조회된 역할의
+  미시작/만료/비활성 지정은 0개이고, 다른 계정의 현재 동일 역할 지정도 각 역할에서 0개다.
+  supplier/funding은 admin이 지정돼 있으며 operator는 없다. 기존 서비스 guard가 admin도 인정하므로
+  중복 operator 역할을 추가할 필요는 없다. catalog의 `kpa-branch:admin`은 조회 역할 행 자체가 없다.
+  서비스별 admin/operator 행을 더해 서로 다른 사람 수로 해석하지 않는다.
+- Google 연결 존재와 역할은 같은 target userId로 JOIN한 집계다. 실제 Google 계정의 이메일/sub는
+  수집하지 않았으므로 사용자의 실제 OAuth 소유 검증을 완료했다고 주장하지 않는다.
+  프로필은 O4O 기본 이메일을 표시하며 Google 계정 이메일과 다를 수 있다는 기존 명시 연결 계약은 유지한다.
+- [화면 표시 계정 census #38665862802](https://github.com/Renagang21/o4o-platform/actions/runs/38665862802)도
+  같은 main SHA에서 SUCCESS지만 개별 job 결과 다운로드가 proxy 403으로 거절돼 집계는 미확인이다.
+  성공 exit code를 해당 계정의 지정 결과나 실제 OAuth 연결 일치로 해석하지 않는다.
+- 필요한 GitHub 로그 목적지 `productionresultssa6.blob.core.windows.net`과
+  `results-receiver.actions.githubusercontent.com`을 환경 설정 초안에 추가 저장했다. 기존 도메인·preset·
+  script·credential 바인딩은 유지했다. 초안 저장은 게시/현재 runtime 적용이 아니며 게시 후 해당 기존
+  job의 결과를 읽는다. 로그를 얻기 위해 같은 조회를 반복 dispatch하거나 네트워크 제한을 우회하지 않는다.
+- 이번 census의 운영 role/계정/Google 연결/DB/schema/IAM/배포 변경은 0이다. 수동 배포 dispatch는
+  실행하지 않았다. post-merge CI Gate·API Jest 3 shard·Code Quality·CodeQL은 SUCCESS다.
+  기존 workflow_run 자동 [Delivery #38666079640](https://github.com/Renagang21/o4o-platform/actions/runs/38666079640)가
+  API 배포를 진행 중이며 웹 job은 SKIP이다. 완료 전 운영 반영을 주장하지 않는다.
+
+### 다음 단계와 구체적인 변경 판단
+
+1. 허용 도메인 반영 후 화면 표시 계정의 기존 job 결과를 확보해 전체 관리자와 서비스 운영자를 대조한다.
+   과거 문서의 계정 명칭을 현재 운영자 지정 사실로 사용하지 않는다.
+2. 분회도 동일 대상 계정이 담당해야 한다면 **전체 관리자 직접 지정 경로**에서 그 계정의 userId를
+   선택하고 `serviceKey=kpa-branch`, `role=kpa-branch:admin`만 지정하는 계획이다.
+   before: 현재 역할 없음 / active 가입, after: 현재 역할 1개 / 기존 active 가입 보존.
+   기존 `OperatorAssignmentService.assign` transaction을 쓰며 다른 role·계정 이메일·Google 연결·
+   전체 관리자 권한은 변경하지 않는다. `kpa-branch:operator`나 플랫폼 권한을 새로 부여하지 않는다.
+   현재 승인은 조회와 Core 두 조회 조건 수정이므로 이 실제 권한 부여는 AGENTS.md §5 확인 전 실행하지 않는다.
+   전체 관리자 인증이 필요한 운영 변경이며 계정/권한 수정용 새 우회 경로를 만들지 않는다.
+3. API·웹 배포 단계에서는 현재 Delivery/Promote gate와 migration 포함 여부를 확인하고 승인된 범위로
+   진행한다. 실제 운영자 Google 로그인은 사용자 담당이며 본 단계의 합성 PC/모바일 회귀를 실제 OAuth
+   PASS로 바꾸지 않는다.
+
+WORKTREE_DISPOSITION: KEEP — 같은 미완료 WO의 실제 결과 기록을 이어 진행한다. 원래 checkout의
+shared object 참조와 후속 원장 비교·배포 검증이 남아 있어 삭제하지 않는다. 새 독립 작업으로 재사용하지 않는다.
+DEPLOYMENT: AUTOMATIC — 기존 Delivery의 API verified rollout SUCCESS. 웹 수정 map 제공 확인,
+실제 운영자 OAuth/업무 접근은 사용자 확인 대기. 이 결과 기록만의 배포는 NOT_APPLICABLE.
+문서 정합: 현재 원장 결과와 과거 명시 연결 기록을 구분하고 서비스 추적표·후속 TODO를 실제 결과로 갱신했다.
+
+### 실제 웹 제공 코드 확인 — 2026-10-15
+
+공식 대표·supplier·community·funding 4 origin의 HTML과 각 HTML이 참조하는 JS를
+기존 프록시·검증된 TLS로 직접 GET했다. 모두 HTML/JS HTTP 200이며 공통 entry
+`/assets/index-YTr_TncS.js`(SHA256 `f0d1afb6ecc92fbbbd3fcb123a0138c134eac4e6b4c7bc13479e7a6f2dc7eaaa`)에
+이번 main/supplier/funding/community/carepharm별 운영 메뉴 경로 map이 포함돼 있다.
+따라서 수정 map의 실제 웹 제공은 확인됐다. 문구/링크 존재만의 OAuth 회귀나 사용자의
+기존 브라우저 cache 갱신 완료를 뜻하지 않는다. 본인 운영자 로그인·최종 메뉴 접근은 별도 확인한다.
+API `/health/ready`도 HTTP 200 / ready다. 조회 시 자동 Delivery는 migration step SUCCESS,
+verified traffic switch 단계 진행 중이었다. standalone census는 쓰기 0이며 자동 배포 workflow의
+migration 실행과 분리해 기록한다.
+
+### 자동 API 배포 검증
+
+기존 [Delivery #38666079640](https://github.com/Renagang21/o4o-platform/actions/runs/38666079640)의
+`API / build-and-deploy` job SUCCESS를 확인했다. 대상은 main `d83b291cd6`이며 신규 revision
+readiness smoke·verified traffic switch·전환 후 readiness 검증 모두 SUCCESS다. 이것은 기존
+workflow_run 배포의 결과 확인이며 새 promote/deploy dispatch나 IAM/권한/Google 연결 수정이 아니다.
+현재 목록의 유효기간 조건은 해당 배포 소스에 포함된다. 인증이 필요한 전체 관리자 목록과 실제
+운영자 OAuth를 직접 검증했다고 주장하지 않는다.
