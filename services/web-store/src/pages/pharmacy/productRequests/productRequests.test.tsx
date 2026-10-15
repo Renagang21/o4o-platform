@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import { useProductRequestForm } from './useProductRequestForm';
+import { ProductRequestDialog } from './requestSession';
 import { useProductRequestList, validateRequestList } from './useProductRequestList';
 import { StoreNewProductRequestModal } from '../StoreNewProductRequestModal';
 import { StoreProductRequestsListModal } from '../StoreProductRequestsListModal';
@@ -233,4 +234,20 @@ it('does not fetch or render when a store is unavailable', () => {
   api.store = '';
   render(<><StoreNewProductRequestModal open onClose={closed} onSubmitted={submitted} /><StoreProductRequestsListModal open onClose={closed} onEdit={vi.fn()} /></>);
   expect(screen.queryByRole('dialog')).toBeNull(); expect(api.list).not.toHaveBeenCalled(); expect(api.search).not.toHaveBeenCalled();
+});
+
+it('native request dialog closes from its backdrop or Escape but preserves an active retry session', () => {
+  const onClose = vi.fn();
+  const content = (preventBackdropClose: boolean) => <ProductRequestDialog label="Fixture request dialog" style={{}} onClose={onClose} preventBackdropClose={preventBackdropClose}><button>Inside action</button></ProductRequestDialog>;
+  const { rerender } = render(content(false));
+  const dialog = screen.getByRole('dialog', { name: 'Fixture request dialog' });
+  fireEvent.pointerDown(screen.getByRole('button', { name: 'Inside action' }));
+  expect(onClose).not.toHaveBeenCalled();
+  fireEvent.pointerDown(dialog);
+  expect(onClose).toHaveBeenCalledOnce();
+  onClose.mockClear(); rerender(content(true));
+  fireEvent.pointerDown(dialog);
+  expect(onClose).not.toHaveBeenCalled();
+  fireEvent.cancel(dialog);
+  expect(onClose).toHaveBeenCalledOnce();
 });
