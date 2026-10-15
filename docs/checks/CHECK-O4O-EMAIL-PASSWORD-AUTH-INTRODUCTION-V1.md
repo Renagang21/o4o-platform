@@ -234,3 +234,5 @@ Google 계정 선택 버튼 + "Google 로 처음이신가요? 같은 Google 버�
 
 운영 로그인 smoke(위 미확인 항목) → canonical Demo 계정 2개 생성 및 기존 테스트 데이터 연결
 → 전 과정 실계정 검증 → DONE. **Demo 계정 생성은 운영 데이터 write 이므로 별도 승인 단계다.**
+
+> **회수 시 정정(2026-10-15)**: 위 "canonical Demo 계정 2개 생성" 단계는 **2026-10-01 시점의 역사 기록**이며 현행이 아니다. Demo 계정의 정본은 [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이고, 2026-10-12 확정으로 매장 경영자 · 공급자 · 직원 **3개 계정**을 정의한다.

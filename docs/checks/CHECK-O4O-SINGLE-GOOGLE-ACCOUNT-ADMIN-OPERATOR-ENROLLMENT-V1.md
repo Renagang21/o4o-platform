@@ -1,6 +1,8 @@
 # CHECK-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1
 
 > 시작: 2026-09-26 · 상태: **`BLOCKED — 실행 전 사용자 결정 1건 + 사용자 조작 필요`**
+> **상태**: SUPERSEDED · **대체 문서**: [`apps/api-server/src/config/operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · **표기일**: 2026-10-15
+> **회수 시 주(2026-10-15)**: §1-1 · §9 의 "운영자 역할 11개 부여" 할 일은 **종료(obsolete)** 다. 그 목록의 `pharmacy-hub:*` · `cosmetics:*` 는 서비스 은퇴로 현행 운영자 역할 카탈로그에 없고, `kpa-branch:operator` 는 Admin 이 부여하지 않는다(분회 서비스 관리자가 분회 화면에서 지정). 현행 부여 대상은 위 카탈로그가 정본이다. 이 문서는 2026-09-26 시점 기록으로만 남긴다.
 > 대상 계정: `[REDACTED_EMAIL_B]` (**이미 등록된 Google 사용자 1명**)
 
 ---
@@ -303,6 +305,8 @@ register-routes · setup-middlewares 등). API 를 배포하면 함께 나간다
 |---|---|---|
 | ① | **Console**: 승인된 JavaScript 원본에 위 7개 등록 | 통합 배포의 게이트 |
 | ② | **Admin 화면**: 운영자 역할 11개 부여 (후보 검색 → Google 연결된 후보 선택) | **무관 — 지금 가능**. B2 의 선행 조건 |
+
+> **회수 시 정정(2026-10-15)**: ② 는 **종료(obsolete)** — 11개 목록은 은퇴한 `pharmacy-hub:*` · `cosmetics:*` 와 Admin 부여 대상이 아닌 `kpa-branch:operator` 를 포함한다. 현행 대상은 [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) 를 따른다.
 
 ②에서 후보가 **유일하게 식별되지 않으면**(0건 · 동명이인 · Google 미연결) **부여를 중지하고 알린다.**
 

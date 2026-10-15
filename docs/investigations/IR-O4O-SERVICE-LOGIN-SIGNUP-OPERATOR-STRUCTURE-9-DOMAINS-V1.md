@@ -1,5 +1,8 @@
 # IR-O4O-SERVICE-LOGIN-SIGNUP-OPERATOR-STRUCTURE-9-DOMAINS-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`apps/api-server/src/config/service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`apps/api-server/src/config/operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · **표기일**: 2026-10-15
+> **회수 시 주(2026-10-15)**: 조사 자체는 COMPLETED 다. 이 IR 이 "키가 없다"(§2 #2~#4 · §4 G1~G4 · §6)로 적은 `community` · `supplier` · `funding` 은 이후 서비스 카탈로그에 독립 서비스 키로, 운영자 역할 카탈로그에 `community:*` · `supplier:*` · `funding:*` 로 등재됐다. 아래 본문은 2026-09-27 시점 기록이며 현행 구조 판단에는 위 카탈로그 파일을 쓴다.
+
 > 작성일: 2026-09-27 · 확장: 2026-09-27(커뮤니티 · 분회 · 권한 범위) · **조사 전용 — 코드 · DB · 권한 · OAuth 설정 변경 0 · 배포 0**
 > 선행: [`IR-O4O-OPERATOR-ASSIGNMENT-TARGET-DOMAINS-9-V1`](IR-O4O-OPERATOR-ASSIGNMENT-TARGET-DOMAINS-9-V1.md)
 
