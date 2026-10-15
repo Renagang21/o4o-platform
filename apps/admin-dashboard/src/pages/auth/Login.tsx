@@ -12,9 +12,11 @@
  *
  * GIS 버튼은 하나만 둔다 — 같은 페이지에서 두 번 initialize 하면 마지막 callback 만 살아남는다.
  */
+import { LoginCard, LoginLayout } from '@o4o/auth-react';
+
 import { FC, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Lock, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import { renderGoogleButton } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -82,7 +84,7 @@ const Login: FC = () => {
       return (
         <div className="min-h-screen bg-o4o-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
-            <div className="text-center">
+            <div className="o4o-login-footnote text-center">
               <div className="mx-auto h-16 w-16 bg-red-500 rounded-full flex items-center justify-center">
                 <AlertTriangle className="h-8 w-8 text-white" />
               </div>
@@ -135,33 +137,14 @@ const Login: FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md mx-auto space-y-6 relative">
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
-        </div>
-        {/* 헤더 */}
-        <div className="relative text-center">
-          <div className="inline-flex h-16 w-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl items-center justify-center shadow-lg mb-4">
-            <Lock className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="text-3xl font-bold text-white">
-            O4O Admin
-          </h2>
-          <p className="mt-2 text-sm text-blue-200">
-            관리자 계정으로 로그인하세요
-          </p>
-        </div>
-
+    <LoginLayout brand="O4O Admin" tone="slate" headline={<>운영의 시작,<br />명확하고 간결하게.</>} description="O4O 서비스 운영을 위한 관리자 공간입니다.">
+      <LoginCard brand="O4O Admin" tone="slate" heading="h1" title="관리자 로그인" description="승인된 관리자 Google 계정으로 로그인하세요.">
         {/* 세션 사용자 교체 안내 — 명시적 재로그인 전까지 기존 화면 · 서버 세션을 쓰지 않는다 */}
         {sessionConflict && (
           <div
             role="alert"
             data-testid="session-conflict-notice"
-            className="bg-amber-500/15 border border-amber-400/40 rounded-lg p-4 text-sm text-amber-100"
+            className="mb-5 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900"
           >
             다른 계정의 로그인으로 이 브라우저의 관리자 세션이 바뀌었습니다. 보안을 위해 이전 화면을 닫았습니다.
             계속하려면 관리자 계정으로 다시 로그인하세요.
@@ -169,14 +152,14 @@ const Login: FC = () => {
         )}
 
         {/* 로그인 폼 */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">
+        <div className="o4o-login-provider-panel">
           {/* Google 로 계속하기 — 기본 진입 */}
-          <div className="mb-6">
+          <div className="mb-2">
             {googleStage === 'loading' && (
-              <p className="text-center text-sm text-blue-200">Google 로그인을 준비하고 있습니다…</p>
+              <p className="text-center text-sm text-slate-600">Google 로그인을 준비하고 있습니다…</p>
             )}
             {googleStage === 'disabled' && (
-              <p className="text-center text-sm text-blue-200" data-testid="google-continue-disabled">Google 로그인은 준비 중입니다.</p>
+              <p className="text-center text-sm text-slate-600" data-testid="google-continue-disabled">Google 로그인은 준비 중입니다.</p>
             )}
             {googleStage === 'ready' && (
               <div ref={googleContainerRef} className="flex justify-center min-h-[44px]" data-testid="google-continue-button" />
@@ -186,8 +169,8 @@ const Login: FC = () => {
 
         {/* 에러 메시지 */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-red-200">
+          <div role="alert" className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+            <div className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-4 w-4" />
               <span className="text-sm">{error}</span>
             </div>
@@ -195,16 +178,16 @@ const Login: FC = () => {
         )}
 
         {/* 하단 링크 */}
-        <div className="text-center">
+        <div className="o4o-login-footnote text-center">
           <a
             href={MAIN_SITE_URL}
-            className="text-sm text-blue-300 hover:text-white transition-colors"
+            className="text-sm underline underline-offset-4"
           >
             메인 사이트로 돌아가기
           </a>
         </div>
-      </div>
-    </div>
+      </LoginCard>
+    </LoginLayout>
   );
 };
 
