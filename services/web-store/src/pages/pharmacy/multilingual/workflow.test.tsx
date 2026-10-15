@@ -68,11 +68,17 @@ it('serializes imports and prevents Escape, backdrop and kind edits during a wri
   const pending = deferred<StoreMlcGroupDetail>(); api.imported.mockReturnValue(pending.promise); await openImport(); input('연결할 제품', 'local-a');
   const submit = screen.getByRole('button', { name: '가져오기 실행' }); fireEvent.click(submit); fireEvent.click(submit);
   expect(api.imported).toHaveBeenCalledTimes(1); fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' }); expect(screen.getByRole('dialog')).toBeTruthy();
+  fireEvent.click(screen.getByTestId('mlc-import-backdrop')); expect(screen.getByRole('dialog')).toBeTruthy();
   expect(screen.getByLabelText('제품 종류').matches(':disabled')).toBe(true);
   await act(async () => pending.resolve(group()));
 });
 it('closes the import dialog with Escape before submission and restores focus', async () => {
   await openImport(); fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' }); expect(screen.queryByRole('dialog')).toBeNull();
+  expect(api.imported).not.toHaveBeenCalled();
+});
+it('closes the import dialog from the backdrop but not from clicks inside the dialog', async () => {
+  await openImport(); fireEvent.click(screen.getByRole('dialog')); expect(screen.getByRole('dialog')).toBeTruthy();
+  fireEvent.click(screen.getByTestId('mlc-import-backdrop')); expect(screen.queryByRole('dialog')).toBeNull();
   expect(api.imported).not.toHaveBeenCalled();
 });
 it('drops old-store import success before the store rerenders', async () => {
@@ -97,6 +103,7 @@ it('keeps a missing published language distinct from a network failure', async (
   api.resolve.mockRejectedValueOnce(Object.assign(new Error('private'), { code: 'PUBLISHED_PAGE_NOT_FOUND' }));
   render(wrap(<StoreMultilingualContentsMyPage />)); fireEvent.click(await screen.findByRole('button', { name: '발행 내용 보기' }));
   await screen.findByText(/발행된 대체 언어가 없습니다/); fireEvent.click(screen.getByRole('button', { name: '언어별 보기 다시 시도' })); await screen.findByRole('heading', { name: 'Fallback EN' });
+  expect(screen.queryByText(/발행된 대체 언어가 없습니다/)).toBeNull(); expect(api.resolve).toHaveBeenCalledTimes(2);
 });
 it('ignores a language preview after the selected language changes', async () => {
   const old = deferred<unknown>(); api.resolve.mockReturnValue(old.promise); render(wrap(<StoreMultilingualContentsMyPage />));

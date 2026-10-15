@@ -27,13 +27,15 @@ function withTabletMode(url: string): string {
   return url + (url.includes('?') ? '&' : '?') + 'mode=tablet';
 }
 
-export function MultilingualPublicActions(props: Props) {
+export function MultilingualPublicActions(props: Readonly<Props>) {
   const scope = useStoreOperationScope();
   return <PublicActionsSession key={`${scope.key}:${props.groupId}`} {...props} isCurrent={scope.isCurrent} />;
 }
 
-function PublicActionsSession({ groupId, disabled = false, onPublished, isCurrent }: Props & { isCurrent: () => boolean }) {
-  const [busy, setBusy] = useState<null | 'open' | 'tablet' | 'copy' | 'qr'>(null);
+type PublicAction = 'open' | 'tablet' | 'copy' | 'qr';
+
+function PublicActionsSession({ groupId, disabled = false, onPublished, isCurrent }: Readonly<Props & { isCurrent: () => boolean }>) {
+  const [busy, setBusy] = useState<null | PublicAction>(null);
   const lock = useRef(false);
   const [copied, setCopied] = useState(false);
   const [qr, setQr] = useState<{ svg: string; url: string } | null>(null);
@@ -41,17 +43,41 @@ function PublicActionsSession({ groupId, disabled = false, onPublished, isCurren
   const requests = useLatestStoreRequest();
   const openTab = useRef<Window | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); openTab.current?.close(); }, []);
-  const run = async (action: 'open' | 'tablet' | 'copy' | 'qr') => {
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+    openTab.current?.close();
+  }, []);
+  const deliver = async (action: PublicAction, url: string, popup: Window | null, owned: () => boolean) => {
+    if (action === 'qr') {
+      const result = await getMlcQr(groupId);
+      if (owned()) setQr({ svg: result.svg, url: result.url });
+      return;
+    }
+    if (action === 'copy') {
+      await navigator.clipboard.writeText(url);
+      if (!owned()) return;
+      setCopied(true);
+      timer.current = setTimeout(() => { if (owned()) setCopied(false); }, 2000);
+      return;
+    }
+    popup?.location.replace(action === 'tablet' ? withTabletMode(url) : url);
+    openTab.current = null;
+  };
+  /** Open synchronously in the user gesture; returns false when the popup was blocked. */
+  const openPopup = (action: PublicAction): { ok: boolean; popup: Window | null } => {
+    if (action !== 'open' && action !== 'tablet') return { ok: true, popup: null };
+    const popup = window.open('about:blank', '_blank');
+    if (!popup) { setError('새 창이 차단되었습니다. 팝업을 허용하거나 URL 복사를 사용해 주세요.'); return { ok: false, popup: null }; }
+    popup.opener = null;
+    openTab.current = popup;
+    return { ok: true, popup };
+  };
+  const run = async (action: PublicAction) => {
     if (lock.current || disabled || !isCurrent()) return;
     if (action === 'qr' && qr) { setQr(null); return; }
-    // Open synchronously in the user gesture; never leave a stale store's tab open.
-    const popup = action === 'open' || action === 'tablet' ? window.open('about:blank', '_blank') : null;
-    if (action === 'open' || action === 'tablet') {
-      if (!popup) { setError('새 창이 차단되었습니다. 팝업을 허용하거나 URL 복사를 사용해 주세요.'); return; }
-      popup.opener = null;
-      openTab.current = popup;
-    }
+    // Never leave a stale store's tab open.
+    const { ok, popup } = openPopup(action);
+    if (!ok) return;
     const current = requests.begin();
     const owned = () => current() && isCurrent();
     lock.current = true; setBusy(action); setError(null); setCopied(false);
@@ -63,18 +89,7 @@ function PublicActionsSession({ groupId, disabled = false, onPublished, isCurren
       if (!['http:', 'https:'].includes(link.protocol)) throw new Error('Invalid link');
       if (onPublished) await onPublished();
       if (!owned()) { popup?.close(); return; }
-      if (action === 'qr') {
-        const result = await getMlcQr(groupId);
-        if (owned()) setQr({ svg: result.svg, url: result.url });
-      } else if (action === 'copy') {
-        await navigator.clipboard.writeText(url);
-        if (!owned()) return;
-        setCopied(true);
-        timer.current = setTimeout(() => { if (owned()) setCopied(false); }, 2000);
-      } else {
-        popup?.location.replace(action === 'tablet' ? withTabletMode(url) : url);
-        openTab.current = null;
-      }
+      await deliver(action, url, popup, owned);
     } catch {
       popup?.close();
       if (owned()) {

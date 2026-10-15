@@ -12,7 +12,7 @@ export function StoreMultilingualContentsMyPage() {
   return <MyContentsSession key={scope.key} isCurrent={scope.isCurrent} />;
 }
 
-function MyContentsSession({ isCurrent }: { isCurrent: () => boolean }) {
+function MyContentsSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);
   const [params] = useSearchParams();
@@ -49,7 +49,7 @@ function MyContentsSession({ isCurrent }: { isCurrent: () => boolean }) {
       </>}
   </div>;
 }
-function ContentCard({ group: initialGroup, base, selected, isCurrent }: { group: StoreMlcGroup; base: string; selected: boolean; isCurrent: () => boolean }) {
+function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonly<{ group: StoreMlcGroup; base: string; selected: boolean; isCurrent: () => boolean }>) {
   const [group, setGroup] = useState(initialGroup);
   const publication = useLatestStoreRequest();
   const [locale, setLocale] = useState<StoreMlcLocale>(group.defaultLocale);

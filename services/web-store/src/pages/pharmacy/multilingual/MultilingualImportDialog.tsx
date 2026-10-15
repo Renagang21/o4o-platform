@@ -12,7 +12,7 @@ interface Props {
 }
 const LIMIT = 20;
 
-export function MultilingualImportDialog({ item, isCurrent, onClose, onImported }: Props) {
+export function MultilingualImportDialog({ item, isCurrent, onClose, onImported }: Readonly<Props>) {
   const [kind, setKind] = useState<StoreMlcTargetKind>('local');
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -69,10 +69,26 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
       if (current() && isCurrent()) setSaving(false);
     }
   };
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3" onClick={close}>
+  let productBody;
+  if (error) {
+    productBody = <div role="alert" className="text-sm text-red-700">{error}<button type="button" onClick={() => void load()} className="block min-h-11 underline">제품 다시 시도</button></div>;
+  } else if (loading) {
+    productBody = <p role="status">제품 불러오는 중…</p>;
+  } else if (products.length === 0) {
+    productBody = <p>조건에 맞는 연결 가능한 제품이 없습니다.</p>;
+  } else {
+    productBody = <label className="block text-sm">연결할 제품<select aria-label="연결할 제품" value={products.some(p => p.sourceId === selected?.sourceId) ? selected?.sourceId || '' : ''}
+      className="block border rounded p-2 w-full min-h-11" onChange={e => setSelected(products.find(p => p.sourceId === e.target.value) ?? null)}>
+      <option value="">제품을 선택하세요</option>{products.map(p => <option key={p.sourceId} value={p.sourceId}>{p.name}</option>)}
+    </select></label>;
+  }
+  return <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
+    {/* Backdrop is a real button (not a clickable div) so pointer close stays keyboard/a11y-safe; Escape is handled on the dialog. */}
+    <button type="button" aria-hidden="true" tabIndex={-1} data-testid="mlc-import-backdrop" onClick={close}
+      className="absolute inset-0 w-full h-full bg-black/40 cursor-default" />
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="mlc-import-heading" tabIndex={-1}
-      className="w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-white rounded-xl p-4 sm:p-6 space-y-4"
-      onClick={e => e.stopPropagation()} onKeyDown={e => {
+      className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-white rounded-xl p-4 sm:p-6 space-y-4"
+      onKeyDown={e => {
         if (e.key === 'Escape') { e.stopPropagation(); close(); }
         if (e.key === 'Tab') {
           const nodes = dialogRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex="0"]');
@@ -94,15 +110,9 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
         }}><option value="local">매장 경영활용 제품</option><option value="listing">O4O 주문 가능 상품</option></select></label>
         <form className="flex gap-2" onSubmit={e => { e.preventDefault(); if (!writing.current) { setQuery(search.trim()); setPage(1); } }}>
           <input aria-label="연결할 제품 검색" value={search} onChange={e => setSearch(e.target.value)} className="min-w-0 flex-1 border rounded p-2" />
-          <button className="min-h-11 px-3 border rounded">검색</button>
+          <button type="submit" className="min-h-11 px-3 border rounded">검색</button>
         </form>
-        {error ? <div role="alert" className="text-sm text-red-700">{error}<button type="button" onClick={() => void load()} className="block min-h-11 underline">제품 다시 시도</button></div>
-          : loading ? <p role="status">제품 불러오는 중…</p>
-          : products.length === 0 ? <p>조건에 맞는 연결 가능한 제품이 없습니다.</p>
-          : <label className="block text-sm">연결할 제품<select aria-label="연결할 제품" value={products.some(p => p.sourceId === selected?.sourceId) ? selected?.sourceId || '' : ''}
-              className="block border rounded p-2 w-full min-h-11" onChange={e => setSelected(products.find(p => p.sourceId === e.target.value) ?? null)}>
-              <option value="">제품을 선택하세요</option>{products.map(p => <option key={p.sourceId} value={p.sourceId}>{p.name}</option>)}
-            </select></label>}
+        {productBody}
         {!loading && !error && total > LIMIT && <Pagination page={page} totalPages={Math.ceil(total / LIMIT)} total={total} onPageChange={setPage} />}
       </fieldset>
       {selected && <p className="text-sm break-words">선택한 제품: <b>{selected.name}</b></p>}

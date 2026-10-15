@@ -39,7 +39,7 @@ export function HubMultilingualContentLibraryPage() {
   return <HubLibrarySession key={scope.key} isCurrent={scope.isCurrent} />;
 }
 
-function HubLibrarySession({ isCurrent }: { isCurrent: () => boolean }) {
+function HubLibrarySession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);

@@ -65,7 +65,7 @@ export default function StoreProductMultilingualContentPage() {
   return <AuthoringSession key={`${scope.key}:${targetKind}:${targetId}:${params.get('groupId') || ''}`} isCurrent={scope.isCurrent} />;
 }
 
-function AuthoringSession({ isCurrent }: { isCurrent: () => boolean }) {
+function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);
