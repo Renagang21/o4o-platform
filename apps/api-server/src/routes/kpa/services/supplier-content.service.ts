@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * Supplier Content Service
  *
@@ -118,7 +119,7 @@ export class SupplierContentService {
         const existing = await qr.query(
           `SELECT id, title, status
              FROM cms_contents
-            WHERE "serviceKey" = $1
+            WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" = $1
               AND metadata->'sourceRef'->>'kind' = $2
               AND metadata->'sourceRef'->>'id'   = $3
               AND status <> $4
@@ -269,7 +270,7 @@ export class SupplierContentService {
       `SELECT ar.*, c.body, c.summary, c."imageUrl", c."linkUrl"
        FROM kpa_approval_requests ar
        LEFT JOIN cms_contents c ON c.id = (ar.payload->>'contentId')::uuid
-       WHERE ar.id = $1
+       WHERE c.${ORDINARY_CMS_CONTENT_SQL} AND ar.id = $1
          AND ar.entity_type = 'hub_content_submission'
          AND ar.requester_id = $2
        LIMIT 1`,

@@ -1,8 +1,11 @@
+import type { RefObject } from 'react';
+import { OperatorDialog } from './OperatorDialog';
 import type { ServiceApprovalItem } from '../../lib/api/serviceApproval';
 import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { STATUS_BADGE, getRegulatoryBadge, getCompletenessBadge, formatPrice } from './productServiceApprovalPresentation';
 
 interface Props {
+  fallbackFocus: RefObject<HTMLElement | null>;
   item: ServiceApprovalItem;
   canManage: boolean;
   decisionBusy: boolean;
@@ -11,21 +14,19 @@ interface Props {
   onReject: (id: string) => void;
 }
 
-export function ProductServiceApprovalDrawer({ item, canManage, decisionBusy, onClose, onApprove, onReject }: Readonly<Props>) {
+export function ProductServiceApprovalDrawer({ fallbackFocus, item, canManage, decisionBusy, onClose, onApprove, onReject }: Readonly<Props>) {
   const badge = STATUS_BADGE[item.approvalStatus] || { label: item.approvalStatus, bg: 'bg-slate-50', text: 'text-slate-600' };
   const regulatoryBadge = getRegulatoryBadge(item);
   const completenessBadge = getCompletenessBadge(item);
   return (
-    <>
-      <button type="button" aria-label="상품 상세 배경 닫기" className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
-      <dialog open aria-modal="true" aria-label="상품 상세" className="m-0 p-0 border-0 left-auto fixed right-0 top-0 bottom-0 h-full w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
+    <OperatorDialog dismissOnBackdrop label="상품 상세" fallbackFocus={fallbackFocus} onCancel={onClose} className="!ml-auto !mr-0 !mt-0 !mb-0 !w-full max-w-md !max-h-dvh h-dvh p-0 bg-white shadow-xl">
         <div className="p-6">
           {/* Drawer header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-slate-900">상품 상세</h2>
             <button
               onClick={onClose}
-              aria-label="상품 상세 닫기"
+              data-dialog-initial-focus aria-label="상품 상세 닫기"
               className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -167,8 +168,7 @@ export function ProductServiceApprovalDrawer({ item, canManage, decisionBusy, on
             </div>
           )}
         </div>
-      </dialog>
-    </>
+      </OperatorDialog>
 
   );
 }

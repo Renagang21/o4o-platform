@@ -38,7 +38,7 @@ function MyContentsSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>
   return <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
     <header><h1 className="text-xl font-bold">내 매장 다국어 상품 콘텐츠</h1>
       <p className="text-sm text-slate-600 mt-2">제품에 연결한 안내 자료를 확인하고 언어별 내용을 작성하거나 고객용 링크·QR로 활용합니다.</p>
-      <Link to={`${base}/library/multilingual-product-contents`} className="inline-flex items-center min-h-11 text-blue-700 underline">제공 자료에서 가져오기</Link>
+      <Link to="/store/library/multilingual-product-contents" className="inline-flex items-center min-h-11 text-blue-700 underline">제공 자료에서 가져오기</Link>
     </header>
     {error ? <div role="alert"><p>{error}</p><button onClick={() => void load()} className="min-h-11 underline">다시 시도</button></div>
       : loading ? <p role="status">콘텐츠 불러오는 중…</p>
@@ -73,7 +73,7 @@ function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonl
   const html = result?.page.content?.html;
   return <section aria-label={group.title} className={`bg-white rounded-xl border p-4 sm:p-5 space-y-3 ${selected ? 'border-blue-500' : 'border-slate-200'}`}>
     <h2 className="font-semibold break-words">{group.title}{selected && <span className="ml-2 text-xs text-blue-700">선택한 콘텐츠</span>}</h2>
-    <p className="text-sm text-slate-600">연결 제품: {group.targetKind === 'local' ? '매장 경영활용 제품' : 'O4O 주문 가능 상품'} · 기본 언어 {STORE_MLC_LOCALE_LABELS[group.defaultLocale]}</p>
+    <p className="text-sm text-slate-600">연결 제품: {group.targetKind === 'local' ? '매장 경영활용 제품' : 'O4O DB 기반 제품'} · 기본 언어 {STORE_MLC_LOCALE_LABELS[group.defaultLocale]}</p>
     <p className="text-xs text-slate-500">{group.sourceType === 'operator_hub' ? '제공 자료의 독립 사본' : '매장 직접 작성'} · 작성 언어: {group.pages.map(p => `${STORE_MLC_LOCALE_LABELS[p.locale]} (${p.status === 'published' ? '발행' : p.status === 'archived' ? '보관' : '초안'})`).join(', ') || '없음'}</p>
     <Link className="inline-flex items-center min-h-11 text-blue-700 underline text-sm" to={`${base}/products/multilingual/${group.targetKind}/${encodeURIComponent(group.targetId)}?groupId=${encodeURIComponent(group.id)}`}>연결 제품의 언어별 내용 확인·편집</Link>
     <div className="flex flex-wrap items-center gap-2">

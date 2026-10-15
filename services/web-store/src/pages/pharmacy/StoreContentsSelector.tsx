@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreContentsSelector — 콘텐츠 선택 canonical 셀렉터 (공유)
  *
@@ -239,6 +240,7 @@ function DocumentsSection({
   enablePdfExport?: boolean;
 }) {
   const [params, setParams] = useSearchParams();
+  const { base, returnState } = useStoreLibraryRoute();
   const initialSearch = mode === 'page' ? params.get('librarySearch') ?? '' : '';
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
@@ -414,7 +416,7 @@ function DocumentsSection({
   const handleCreatePop = useCallback(() => {
     if (!isCurrent() || !singleSelectedRow) return;
     const r = singleSelectedRow;
-    navigate(CANONICAL_STORE_POP_V2_ROUTE, {
+    navigate(base + CANONICAL_STORE_POP_V2_ROUTE.slice('/store'.length), {
       state: buildPopV2HandoffState(
         popV2HandoffFromProductionItem({
           id: r.id,
@@ -423,7 +425,7 @@ function DocumentsSection({
         }),
       ),
     });
-  }, [singleSelectedRow, navigate, isCurrent]);
+  }, [singleSelectedRow, navigate, isCurrent, base]);
 
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1:
   //   "원본 갱신됨" 사본에서 현재 canonical 원본을 **새 사본으로 다시 가져오기**(덮어쓰기 아님).
@@ -469,11 +471,11 @@ function DocumentsSection({
               // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
               // 모달 안에서 router Link 사용 시 host 페이지가 unmount → 작업 흐름 끊김.
               // 새 탭으로 열어 작업 컨텍스트 유지.
-              <a href={row.href} target="_blank" rel="noreferrer" style={styles.titleLink} title={row.title}>
+              <a href={base + row.href.slice('/store'.length)} target="_blank" rel="noreferrer" style={styles.titleLink} title={row.title}>
                 {row.title}
               </a>
             ) : (
-              <Link to={row.href} style={styles.titleLink} title={row.title}>
+              <Link to={base + row.href.slice('/store'.length)} state={returnState} style={styles.titleLink} title={row.title}>
                 {row.title}
               </Link>
             )}
@@ -581,20 +583,20 @@ function DocumentsSection({
                 {reimportingId === row.id ? '가져오는 중…' : '다시 가져오기'}
               </button>
             )}
-            <a
-              href={row.href}
+            <Link
+              to={base + row.href.slice('/store'.length)} state={returnState}
               target={mode === 'modal' ? '_blank' : undefined}
               rel={mode === 'modal' ? 'noreferrer' : undefined}
               style={styles.viewBtn}
               aria-label="콘텐츠 편집"
             >
               편집
-            </a>
+            </Link>
           </div>
         ),
       },
     ],
-    [mode, applyTag, handleReimport, reimportingId, removing, usageById],
+    [mode, base, returnState, applyTag, handleReimport, reimportingId, removing, usageById],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;

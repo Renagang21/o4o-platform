@@ -8,6 +8,7 @@
  */
 
 import { storeJsonFetch } from './storeJsonFetch';
+import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
 import type { LocalProduct } from './localProducts';
 
 /**
@@ -245,19 +246,35 @@ export async function fetchScreenSet(id: string): Promise<ScreenSetDetail> {
   return res.data;
 }
 
-export async function createScreenSet(input: { name: string; description?: string | null; tabletId?: string | null; status?: 'draft' | 'active'; templateKey?: string | null }): Promise<ScreenSet> {
-  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE()}/screen-sets`, {
+interface ScreenSetWriteContext { base: string; headers: Headers }
+
+/** Pin both writes of an initiated save to the original service and store. */
+export function captureScreenSetWrites() {
+  const context: ScreenSetWriteContext = { base: BASE(), headers: captureStoreOrganizationHeaders({}) };
+  return {
+    create: (input: Parameters<typeof createScreenSet>[0]) => createScreenSet({ ...input, tabletId: null }, context),
+    update: (id: string, input: Parameters<typeof updateScreenSet>[1]) => updateScreenSet(id, input, context),
+    saveBlocks: (id: string, blocks: ScreenBlock[]) => saveScreenSetBlocks(id, blocks, context),
+  };
+}
+
+export async function createScreenSet(input: { name: string; description?: string | null; tabletId?: string | null; status?: 'draft' | 'active'; templateKey?: string | null }, context?: ScreenSetWriteContext): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${context?.base ?? BASE()}/screen-sets`, {
+    headers: context?.headers,
     method: 'POST',
     body: JSON.stringify(input),
   });
+  if (!res.success || !res.data?.id) throw new Error('화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.');
   return res.data;
 }
 
-export async function updateScreenSet(id: string, input: { name?: string; description?: string | null; status?: ScreenSetStatus; tabletId?: string | null; templateKey?: string | null }): Promise<ScreenSet> {
-  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE()}/screen-sets/${id}`, {
+export async function updateScreenSet(id: string, input: { name?: string; description?: string | null; status?: ScreenSetStatus; tabletId?: string | null; templateKey?: string | null }, context?: ScreenSetWriteContext): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${context?.base ?? BASE()}/screen-sets/${id}`, {
+    headers: context?.headers,
     method: 'PATCH',
     body: JSON.stringify(input),
   });
+  if (!res.success || res.data?.id !== id) throw new Error('화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.');
   return res.data;
 }
 
@@ -278,13 +295,15 @@ export async function archiveScreenSet(id: string): Promise<void> {
   await request(`${BASE()}/screen-sets/${id}`, { method: 'DELETE' });
 }
 
-export async function saveScreenSetBlocks(id: string, blocks: ScreenBlock[]): Promise<ScreenBlock[]> {
-  const res = await request<{ success: boolean; data: ScreenBlock[] }>(`${BASE()}/screen-sets/${id}/blocks`, {
+export async function saveScreenSetBlocks(id: string, blocks: ScreenBlock[], context?: ScreenSetWriteContext): Promise<ScreenBlock[]> {
+  const res = await request<{ success: boolean; data: ScreenBlock[] }>(`${context?.base ?? BASE()}/screen-sets/${id}/blocks`, {
+    headers: context?.headers,
     method: 'PUT',
     body: JSON.stringify({
       blocks: blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
     }),
   });
+  if (!res.success || !Array.isArray(res.data)) throw new Error('화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.');
   return res.data;
 }
 

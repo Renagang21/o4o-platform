@@ -1,3 +1,5 @@
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { api } from '../../lib/apiClient';
 /** Funding entry: login first, then participation and trial lists. Existing participant APIs and permissions are preserved. */
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
@@ -88,6 +90,7 @@ export function MarketTrialHubPage() {
     <>
     <div style={s.container}>
       <h1 className="mb-3 text-2xl font-semibold">유통참여형 펀딩</h1>
+      <ServiceHomeHero surface="funding" client={api} heading="h2" />
       <Link to="/market-trial/manage" className="mb-6 inline-flex min-h-11 items-center rounded border px-4 text-blue-700">내 펀딩·개설 신청</Link>
       {participationError && !isLoading && (
         <LoadError
@@ -185,6 +188,7 @@ export function MarketTrialHubPage() {
         </div>
       </footer>
     </div>
+    <ServiceHomePromotion surface="funding" client={api} />
     </>
   );
 }

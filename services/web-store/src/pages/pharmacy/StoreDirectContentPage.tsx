@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreDirectContentPage — direct 콘텐츠 상세 / 수정 / 삭제
  *
@@ -43,6 +44,7 @@ import { TagInput } from '../../components/store/TagInput';
 export default function StoreDirectContentPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { libraryPath } = useStoreLibraryRoute();
   const [searchParams] = useSearchParams();
 
   const { organizationId } = useStoreOrganizationId();
@@ -55,7 +57,7 @@ export default function StoreDirectContentPage() {
     toDraft: textDraftFromRecord,
     persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
     onSaved: (_record, unchanged) => { if (unchanged) setEditing(false); },
-    onRemoved: () => navigate('/store/library/contents', { replace: true }),
+    onRemoved: () => navigate(libraryPath, { replace: true }),
   });
   const { record: content, loading, error, saving, deleting, reload: fetchContent, save: handleSave, remove: handleDelete } = session;
   const editTitle = session.draft.title, editTags = session.draft.tags;
@@ -125,7 +127,7 @@ export default function StoreDirectContentPage() {
       )}
 
       {/* Back nav — WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: canonical 허브로 복귀 */}
-      <Link to="/store/library/contents" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
+      <Link to={libraryPath} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
         <ArrowLeft className="w-4 h-4" />
         내 자료함 콘텐츠로 돌아가기
       </Link>

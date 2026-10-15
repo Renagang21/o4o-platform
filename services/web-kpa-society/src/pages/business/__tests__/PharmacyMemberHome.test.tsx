@@ -1,3 +1,5 @@
+import { useLayoutEffect } from 'react';
+import BusinessStoreShortcut from '../BusinessStoreShortcut';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
@@ -164,4 +166,18 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
   expect(await screen.findByText('사업 A 자료')).toBeTruthy();
   expect(screen.queryByText('다른 사업 자료')).toBeNull();
   expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a&store=store-a');
+});
+
+
+it('preserves a handoff failure when the user starts navigation immediately after commit', async () => {
+  mocks.handoff.mockRejectedValue(new Error('No organization'));
+  function ClickAtCommit() {
+    useLayoutEffect(() => {
+      screen.getByRole('button', { name: '내 매장으로' }).click();
+    }, []);
+    return <BusinessStoreShortcut />;
+  }
+  render(<ClickAtCommit />);
+  expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
+  expect(mocks.handoff).toHaveBeenCalledTimes(1);
 });

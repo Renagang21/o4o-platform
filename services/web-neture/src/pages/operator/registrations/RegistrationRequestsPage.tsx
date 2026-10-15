@@ -10,7 +10,7 @@
  * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -75,23 +75,38 @@ export default function RegistrationRequestsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkProcessing, setBulkProcessing] = useState(false);
 
+  const gate = useRef({ mounted: true, writing: false, read: 0 });
+  useEffect(() => {
+    const scope = { mounted: true, writing: false, read: 0 };
+    gate.current = scope;
+    return () => { scope.mounted = false; scope.read++; };
+  }, []);
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const busy = processing || savingNotes || bulkProcessing;
+
   const fetchRequests = useCallback(async () => {
+    const scope = gate.current;
+    const sequence = ++scope.read;
+    const current = () => scope.mounted && sequence === scope.read;
     try {
       setLoading(true);
       setFetchError(null);
       const data = await operatorRegistrationApi.getRegistrations();
       const mapped = (data || []).map(r => mapRegistrationRequest(r));
-      setRequests(mapped);
+      if (!current()) return false;
+      setRequests(mapped); setRefreshFailed(false);
+      return true;
     } catch (error) {
-      console.error('Failed to fetch registration requests:', error);
+      if (!current()) return false;
       const errMsg = error instanceof Error ? error.message : 'UNKNOWN';
       if (errMsg.includes('403')) {
         setFetchError('가입 신청 데이터에 접근할 권한이 없습니다. 관리자에게 문의하세요.');
       } else {
         setFetchError('가입 신청 데이터를 불러오지 못했습니다.');
       }
+      return false;
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
   }, []);
 
@@ -99,71 +114,65 @@ export default function RegistrationRequestsPage() {
     fetchRequests();
   }, [fetchRequests]);
 
-  const handleApprove = async (request: RegistrationRequest) => {
+  // One synchronous lock covers writes and their refresh; stale callbacks cannot write again.
+  const runWrite = async (action: () => Promise<void>, setPending: (value: boolean) => void, failure: string) => {
+    const scope = gate.current;
+    if (!scope.mounted || scope.writing || loading || fetchError) return false;
+    scope.writing = true;
+    setPending(true); setMessage(null);
     try {
-      setProcessing(true);
-      setMessage(null);
-
-      const result = await operatorRegistrationApi.approve(request.id);
-      if (!result.success) {
-        setMessage({ type: 'error', text: '승인 처리에 실패했습니다.' });
-        return;
-      }
-
-      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다.` });
-      setSelectedRequest(null);
-      await fetchRequests();
+      await action();
+      return true;
     } catch {
-      setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
+      if (scope.mounted) setMessage({ type: 'error', text: failure });
+      return false;
     } finally {
-      setProcessing(false);
+      scope.writing = false;
+      if (scope.mounted) setPending(false);
     }
   };
 
-  const handleReject = async (request: RegistrationRequest, reason?: string) => {
-    if (!reason?.trim()) {
-      setMessage({ type: 'error', text: '거부 사유를 입력해주세요.' });
-      return;
-    }
+  const refreshAfterWrite = async () => {
+    const ok = await fetchRequests();
+    if (gate.current.mounted) setRefreshFailed(!ok);
+  };
 
-    try {
-      setProcessing(true);
-      setMessage(null);
+  const handleApprove = (request: RegistrationRequest) => runWrite(async () => {
+    if (request.status !== 'PENDING') throw new Error('Not pending');
+    const result = await operatorRegistrationApi.approve(request.id);
+    if (!result.success) throw new Error('Approve failed');
+    if (!gate.current.mounted) return;
+    setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다.` });
+    setSelectedRequest(null);
+    await refreshAfterWrite();
+  }, setProcessing, '승인 처리에 실패했습니다.');
 
+  const handleReject = (request: RegistrationRequest, reason?: string) => {
+    if (!reason?.trim()) return Promise.resolve(false);
+    return runWrite(async () => {
+      if (request.status !== 'PENDING') throw new Error('Not pending');
       const result = await operatorRegistrationApi.reject(request.id, reason);
-      if (!result.success) {
-        setMessage({ type: 'error', text: '거부 처리에 실패했습니다.' });
-        return;
-      }
-
+      if (!result.success) throw new Error('Reject failed');
+      if (!gate.current.mounted) return;
       setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다. 거부 사유가 신청자에게 전달됩니다.` });
-      setSelectedRequest(null);
-      setShowRejectModal(false);
-      await fetchRequests();
-    } catch {
-      setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
-    } finally {
-      setProcessing(false);
-    }
+      setSelectedRequest(null); setShowRejectModal(false);
+      await refreshAfterWrite();
+    }, setProcessing, '거부 처리에 실패했습니다.');
   };
 
-  const handleSaveNotes = async () => {
-    if (!selectedRequest) return;
-    try {
-      setSavingNotes(true);
-      await operatorRegistrationApi.updateNotes(selectedRequest.id, notesValue);
+  const handleSaveNotes = () => {
+    const target = selectedRequest;
+    const notes = notesValue;
+    if (!target) return;
+    return runWrite(async () => {
+      const result = await operatorRegistrationApi.updateNotes(target.id, notes);
+      if (!result.success) throw new Error('Notes failed');
+      if (!gate.current.mounted) return;
       setEditingNotes(false);
-      // Update local state
-      setRequests((prev) =>
-        prev.map((r) => (r.id === selectedRequest.id ? { ...r, operatorNotes: notesValue } : r)),
-      );
-      setSelectedRequest((prev) => (prev ? { ...prev, operatorNotes: notesValue } : null));
+      setSelectedRequest(prev => prev?.id === target.id ? { ...prev, operatorNotes: notes } : prev);
       setMessage({ type: 'success', text: '메모가 저장되었습니다.' });
-    } catch {
-      setMessage({ type: 'error', text: '메모 저장에 실패했습니다.' });
-    } finally {
-      setSavingNotes(false);
-    }
+      await refreshAfterWrite();
+    }, setSavingNotes, '메모 저장에 실패했습니다.');
   };
 
   const selectedPendingIds = useMemo(
@@ -171,39 +180,24 @@ export default function RegistrationRequestsPage() {
     [requests, selectedIds],
   );
 
-  const handleBulkApprove = async () => {
+  const handleBulk = (action: 'approve' | 'reject') => {
     const ids = selectedPendingIds;
     if (ids.length === 0) return;
-    setBulkProcessing(true);
-    setMessage(null);
-    try {
-      await operatorRegistrationApi.batchProcess(ids, 'approve');
-      setMessage({ type: 'success', text: `${ids.length}건 일괄 승인 완료` });
-      setSelectedIds(new Set());
-      await fetchRequests();
-    } catch {
-      setMessage({ type: 'error', text: '일괄 승인 처리 중 오류가 발생했습니다.' });
-    } finally {
-      setBulkProcessing(false);
-    }
+    return runWrite(async () => {
+      const result = action === 'approve'
+        ? await operatorRegistrationApi.batchProcess(ids, action)
+        : await operatorRegistrationApi.batchProcess(ids, action, '운영자 일괄 거부');
+      if (!result?.success || !Array.isArray(result.data?.succeeded) || !Array.isArray(result.data?.failed)) throw new Error('Invalid batch result');
+      if (!gate.current.mounted) return;
+      const failed = result.data.failed.map((r: { id: string }) => r.id);
+      const succeeded = result.data.succeeded.length;
+      setSelectedIds(new Set(failed));
+      setMessage({ type: failed.length ? 'error' : 'success', text: `${succeeded}건 ${action === 'approve' ? '승인' : '거부'} 완료${failed.length ? ` · ${failed.length}건 실패 — 실패 대상만 선택되어 있습니다.` : ''}` });
+      if (succeeded > 0) await refreshAfterWrite();
+    }, setBulkProcessing, `일괄 ${action === 'approve' ? '승인' : '거부'} 처리 중 오류가 발생했습니다.`);
   };
-
-  const handleBulkReject = async () => {
-    const ids = selectedPendingIds;
-    if (ids.length === 0) return;
-    setBulkProcessing(true);
-    setMessage(null);
-    try {
-      await operatorRegistrationApi.batchProcess(ids, 'reject', '운영자 일괄 거부');
-      setMessage({ type: 'success', text: `${ids.length}건 일괄 거부 완료` });
-      setSelectedIds(new Set());
-      await fetchRequests();
-    } catch {
-      setMessage({ type: 'error', text: '일괄 거부 처리 중 오류가 발생했습니다.' });
-    } finally {
-      setBulkProcessing(false);
-    }
-  };
+  const handleBulkApprove = () => handleBulk('approve');
+  const handleBulkReject = () => handleBulk('reject');
 
   const filteredRequests = filterRegistrationRequests(requests, { searchQuery, statusFilter, roleFilter });
 
@@ -312,7 +306,7 @@ export default function RegistrationRequestsPage() {
           <>
             <button
               onClick={() => handleApprove(request)}
-              disabled={processing}
+              disabled={busy || loading || !!fetchError}
               className="text-xs text-green-600 hover:text-green-800 font-medium disabled:opacity-50"
             >
               승인
@@ -322,7 +316,7 @@ export default function RegistrationRequestsPage() {
                 setSelectedRequest(request);
                 setShowRejectModal(true);
               }}
-              disabled={processing}
+              disabled={busy || loading || !!fetchError}
               className="text-xs text-red-600 hover:text-red-800 font-medium disabled:opacity-50"
             >
               거부
@@ -336,7 +330,7 @@ export default function RegistrationRequestsPage() {
     ),
   }));
 
-  if (loading) {
+  if (loading && requests.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-500">가입 신청 목록을 불러오는 중...</div>
@@ -405,6 +399,7 @@ export default function RegistrationRequestsPage() {
           </div>
         )}
 
+        {refreshFailed && <p role="alert" className="mb-4 text-amber-800">처리는 완료됐지만 목록 갱신에 실패했습니다. 다시 시도는 목록만 조회합니다.</p>}
         {/* Message Alert */}
         {message && (
           <div
@@ -426,6 +421,8 @@ export default function RegistrationRequestsPage() {
           </div>
         )}
 
+        {loading && <p role="status">가입 신청 목록을 갱신하는 중...</p>}
+        <fieldset disabled={busy || loading || !!fetchError} className="min-w-0 border-0 p-0 m-0">
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -480,7 +477,7 @@ export default function RegistrationRequestsPage() {
               {
                 key: 'approve',
                 label: `일괄 승인 (${selectedPendingCount})`,
-                onClick: handleBulkApprove,
+                onClick: async () => { await handleBulkApprove(); },
                 variant: 'primary' as const,
                 icon: <UserCheck size={14} />,
                 loading: bulkProcessing,
@@ -490,7 +487,7 @@ export default function RegistrationRequestsPage() {
               {
                 key: 'reject',
                 label: `일괄 거부 (${selectedPendingCount})`,
-                onClick: handleBulkReject,
+                onClick: async () => { await handleBulkReject(); },
                 variant: 'danger' as const,
                 icon: <UserX size={14} />,
                 loading: bulkProcessing,
@@ -530,6 +527,7 @@ export default function RegistrationRequestsPage() {
           />
         </div>
 
+        </fieldset>
         {/* Detail Modal */}
         {selectedRequest && !showRejectModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -537,13 +535,15 @@ export default function RegistrationRequestsPage() {
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900">가입 신청 상세</h3>
                 <button
-                  onClick={() => setSelectedRequest(null)}
+                  onClick={() => { if (!gate.current.writing) setSelectedRequest(null); }}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="p-6 space-y-4">
+                {message?.type === 'error' && <p role="alert" className="text-red-700">{message.text}</p>}
+                <fieldset disabled={busy || loading || !!fetchError} className="min-w-0 border-0 p-0 m-0 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-gray-500">이름</div>
@@ -736,6 +736,7 @@ export default function RegistrationRequestsPage() {
                     <div className="text-sm text-gray-400">메모 없음</div>
                   )}
                 </div>
+                </fieldset>
               </div>
 
               {selectedRequest.status === 'PENDING' && (
@@ -750,14 +751,14 @@ export default function RegistrationRequestsPage() {
                       onClick={() => {
                         setShowRejectModal(true);
                       }}
-                      disabled={processing}
+                      disabled={busy || loading || !!fetchError}
                       className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
                     >
                       거부
                     </button>
                     <button
                       onClick={() => handleApprove(selectedRequest)}
-                      disabled={processing}
+                      disabled={busy || loading || !!fetchError}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
                       승인
@@ -775,10 +776,11 @@ export default function RegistrationRequestsPage() {
             open
             actionType={OperatorActionType.REJECT}
             onClose={() => {
-              setShowRejectModal(false);
+              if (!gate.current.writing) setShowRejectModal(false);
             }}
             onConfirm={(reason) => handleReject(selectedRequest, reason)}
-            loading={processing}
+            loading={busy}
+            error={message?.type === 'error' ? message.text : undefined}
             title="가입 신청 거부"
             message={`${selectedRequest.name}님의 가입 신청을 거부합니다.\n\n거부 사유를 입력해주세요. 입력한 사유는 신청자에게 전달됩니다.`}
             confirmText="거부 확인"

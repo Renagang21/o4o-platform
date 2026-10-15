@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata } from './cms-reserved-presentation.js';
 /**
  * CMS Content Service
  *
@@ -58,7 +59,7 @@ export class CmsContentService {
 
     // 2. Find content
     const content = await this.contentRepo.findOne({ where: { id } });
-    if (!content) return null;
+    if (!content || isHomePresentationMetadata(content.metadata)) return null;
 
     // 3. Validate transition
     const currentStatus = content.status;

@@ -16,8 +16,7 @@ import { claimLoginNavigation, cancelLoginNavigation } from '../lib/loginNavigat
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginForm } from '@o4o/auth-react';
+import { LoginCard, O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginForm } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
@@ -170,35 +169,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}
     >
-      {/* 반투명 배경 - 뒤의 콘텐츠가 보임 */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
+      <LoginCard brand={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm' : 'Neture'} tone="green" heading="h2" title={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
 
-      {/* 모달 카드 */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🌿</span>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">{CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}</h2>
-              <p className="text-xs text-gray-500">{LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]}</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            aria-label="로그인 창 닫기"
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="p-6">
               {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
               <EmailLoginForm<User>
                 onLogin={loginWithEmail}
@@ -264,7 +239,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
               )}
 
               {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 체험하기 — 로그인 수단보다 앞세우지 않는다 */}
-              <section aria-labelledby="demo-entry-title" className="mt-6">
+              <section aria-labelledby="demo-entry-title" className="o4o-login-demo mt-6">
                 <div className="mb-3 flex items-center gap-3 text-xs text-gray-400">
                   <span className="h-px flex-1 bg-gray-200" aria-hidden />
                   <h3 id="demo-entry-title" className="m-0 text-xs font-normal text-gray-400">체험하기</h3>
@@ -291,8 +266,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                 )}
               </section>
           <div className="mt-5 border-t pt-4"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></div>
-        </div>
-      </div>
+      </LoginCard>
     </div>
   );
 }

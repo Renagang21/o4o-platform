@@ -23,7 +23,7 @@
  *   또는 render slot 의 **존재 여부**로도 개별 판단하므로 기존 서비스는 무변경이다.
  */
 
-import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useLayoutEffect, useRef, type ReactNode } from 'react';
 // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync(opt-in)
 import { useSearchParams } from 'react-router-dom';
 import { useMembersConsoleQuery } from './useMembersConsoleQuery';
@@ -53,7 +53,6 @@ import {
   useBatchAction,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab, BuiltAction } from '@o4o/operator-ux-core';
-import { toast } from '@o4o/error-handling';
 
 /**
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
@@ -196,10 +195,24 @@ export function OperatorMembersConsolePage({
   const [rejectReasonText, setRejectReasonText] = useState('');
   const batch = useBatchAction();
 
-  const { users, pagination, loading, error, stats, fetchUsers, fetchStats } =
+  const [writing, setWriting] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const state = useRef({ mounted: false, writing: false, view: 0 });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, writing: false, view: 0 }; state.current = scope;
+    setWriting(false); setActionLoading(null); setSelectedUser(null); setEditUser(null); setDeleteTarget(null); setSelectedIds(new Set());
+    setNotice(''); setActionError(''); setRefreshFailed(false);
+    return () => { scope.mounted = false; scope.view++; };
+  }, [client, serviceKey]);
+  useLayoutEffect(() => { state.current.view++; }, [activeTab, searchQuery, page, sortBy, sortOrder]);
+  const renderedScope = state.current;
+  const renderedView = renderedScope.view;
+  const { users, pagination, loading, error, stats, statsError, fetchUsers, fetchStats } =
     useMembersConsoleQuery({
       client, roleTabs, statusTabs, activeTab, page, searchQuery,
-      serverSort, sortBy, sortOrder, getPrimaryRole,
+      serverSort, sortBy, sortOrder, getPrimaryRole, scopeKey: serviceKey, onPageChange: setPage,
     });
 
   // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync (opt-in)
@@ -236,34 +249,43 @@ export function OperatorMembersConsolePage({
   }, [selectedUser?.id]);
 
   // 서버 정렬 변경 — page=1 reset
-  const handleSort = useCallback((key: string, order: 'asc' | 'desc') => {
+  const handleSort = (key: string, order: 'asc' | 'desc') => changeView(() => {
     setSortBy(key);
     setSortOrder(order);
     setPage(1);
-  }, []);
+  });
 
   // ─── Status Handlers ─────────────────────────────
 
-  const handleStatusChange = async (
-    userId: string,
-    status: string,
-    currentStatus?: string,
-    user?: UserData,
-    options?: { reason?: string },
-  ) => {
+  const refreshAfterWrite = async () => {
+    const scope = state.current;
+    const results = await Promise.all([fetchUsers(), fetchStats()]);
+    if (scope.mounted) setRefreshFailed(!results.every(Boolean));
+  };
+  const runWrite = async (operation: () => Promise<void>) => {
+    const scope = state.current;
+    if (!scope.mounted || scope !== renderedScope || scope.writing) return;
+    if (renderedView !== scope.view || loading || error) { setActionError('목록을 다시 확인한 뒤 처리해 주세요.'); return; }
+    scope.writing = true; setWriting(true); setActionError(''); setNotice('');
+    try { await operation(); }
+    catch (e: any) { if (scope.mounted) setActionError(e?.response?.data?.error || e?.message || '처리에 실패했습니다.'); }
+    finally { scope.writing = false; if (scope.mounted) setWriting(false); }
+  };
+  const changeView = (change: () => void) => {
+    if (state.current.writing || editUser || deleteTarget) return;
+    setNotice(''); setActionError(''); setRefreshFailed(false); change();
+  };
+  const handleStatusChange = (userId: string, status: string, currentStatus?: string, user?: UserData, options?: { reason?: string }) => runWrite(async () => {
+    const scope = state.current;
     setActionLoading(userId);
     try {
       await client.updateStatus(userId, status, currentStatus, user, options);
-      setSelectedUser(null);
-      setRejectReasonText('');
-      fetchUsers();
-      fetchStats();
-    } catch (err: any) {
-      toast.error(err?.message || '오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
+      if (!scope.mounted) return;
+      setNotice(`${user ? getUserName(user) : '회원'} 처리 완료`);
+      setSelectedUser(null); setRejectReasonText('');
+      await refreshAfterWrite();
+    } finally { if (scope.mounted) setActionLoading(null); }
+  });
 
   // ─── Batch Actions ──────────────────────────────────────────
 
@@ -286,31 +308,18 @@ export function OperatorMembersConsolePage({
     [users, selectedIds],
   );
 
-  const handleBulkApprove = async () => {
-    if (selectedApprovableIds.length === 0 || !client.batchUpdateStatus) return;
-    const result = await batch.executeBatch(
-      (batchIds: string[]) => client.batchUpdateStatus!(batchIds, 'approved'),
-      selectedApprovableIds,
-    );
+  const runBatch = (op: (ids: string[]) => Promise<any>, ids: string[]) => runWrite(async () => {
+    if (!ids.length) return;
+    const scope = state.current;
+    const result = await batch.executeBatch(op, ids);
+    if (!scope.mounted) return;
     if (result.successCount > 0) {
-      setSelectedIds(new Set());
-      fetchUsers();
-      fetchStats();
+      setNotice(`${result.successCount}건 처리 완료${result.failedCount ? ` · ${result.failedCount}건 실패` : ''}`);
+      setSelectedIds(new Set()); await refreshAfterWrite();
     }
-  };
-
-  const handleBulkReject = async () => {
-    if (selectedPendingIds.length === 0 || !client.batchUpdateStatus) return;
-    const result = await batch.executeBatch(
-      (batchIds: string[]) => client.batchUpdateStatus!(batchIds, 'rejected'),
-      selectedPendingIds,
-    );
-    if (result.successCount > 0) {
-      setSelectedIds(new Set());
-      fetchUsers();
-      fetchStats();
-    }
-  };
+  });
+  const handleBulkApprove = () => client.batchUpdateStatus && runBatch(ids => client.batchUpdateStatus!(ids, 'approved'), selectedApprovableIds);
+  const handleBulkReject = () => client.batchUpdateStatus && runBatch(ids => client.batchUpdateStatus!(ids, 'rejected'), selectedPendingIds);
 
   // ─── Role tab filtering (client-side) ───────────────────────
 
@@ -353,21 +362,13 @@ export function OperatorMembersConsolePage({
     return {
       key: action.key,
       label,
-      onClick: async () => {
-        if (count === 0) return;
-        const result = await batch.executeBatch(action.executeBatch, targetIds);
-        if (result.successCount > 0) {
-          setSelectedIds(new Set());
-          fetchUsers();
-          fetchStats();
-        }
-      },
+      onClick: () => runBatch(action.executeBatch, targetIds),
       variant: (action.variant ?? 'default') as 'primary' | 'danger' | 'default',
       icon: action.icon,
-      loading: batch.loading,
+      loading: writing,
       group: 'actions' as const,
       visible: (!action.visible || action.visible(selectedUsers)) && count > 0,
-      disabled: count === 0 || batch.loading,
+      disabled: count === 0 || writing || loading || !!error,
       confirm: action.confirm,
     };
   });
@@ -379,7 +380,8 @@ export function OperatorMembersConsolePage({
       onClick: handleBulkApprove,
       variant: 'primary' as const,
       icon: <UserCheck size={14} />,
-      loading: batch.loading,
+      loading: writing,
+      disabled: writing || loading || !!error,
       group: 'actions',
       tooltip: '선택된 신청자를 일괄 승인합니다 (pending/rejected)',
       visible: selectedApprovableIds.length > 0,
@@ -390,7 +392,8 @@ export function OperatorMembersConsolePage({
       onClick: handleBulkReject,
       variant: 'danger' as const,
       icon: <UserX size={14} />,
-      loading: batch.loading,
+      loading: writing,
+      disabled: writing || loading || !!error,
       group: 'actions',
       tooltip: '선택된 대기 신청자를 일괄 거부합니다',
       visible: selectedPendingIds.length > 0,
@@ -489,8 +492,8 @@ export function OperatorMembersConsolePage({
         userActionPolicy,
         user,
         {
-          edit: () => setEditUser(user),
-          delete: () => setDeleteTarget(user),
+          edit: () => { if (!state.current.writing && !loading && !error) setEditUser(user); },
+          delete: () => { if (!state.current.writing && !loading && !error) setDeleteTarget(user); },
         },
         { icons: USER_ACTION_ICONS },
       );
@@ -506,14 +509,15 @@ export function OperatorMembersConsolePage({
           disabled: false,
           loading: false,
           confirm: a.confirm,
-          onClick: async () => {
+          onClick: () => runWrite(async () => {
+            const scope = state.current;
             await a.onClick(user);
-            fetchUsers();
-            fetchStats();
-          },
+            if (scope.mounted) await refreshAfterWrite();
+          }),
         }));
       return (
         <RowActionMenu
+          disabled={writing || loading || !!error || !!editUser || !!deleteTarget}
           actions={[...coreActions, ...additionalActions]}
           inlineMax={userActionPolicy.inlineMax}
         />
@@ -530,10 +534,10 @@ export function OperatorMembersConsolePage({
 
   // ─── Drawer: status-aware footer actions ────────────────────
 
-  const drawerActions = useMemo(() => {
+  const drawerActions = (() => {
     if (!selectedUser) return [];
     const u = selectedUser;
-    const isLoading = actionLoading === u.id;
+    const isLoading = writing || actionLoading === u.id;
     const actions: Array<{
       label: string;
       onClick: () => void;
@@ -583,7 +587,7 @@ export function OperatorMembersConsolePage({
         onClick: () => handleStatusChange(u.id, 'rejected', u.status, u, reasonOptions),
         variant: 'danger',
         loading: isLoading,
-        disabled: isLoading,
+        disabled: isLoading || reasonBlocked,
       });
     }
     if (canManageLifecycle && (u.status === 'active' || u.status === 'approved')) {
@@ -605,13 +609,20 @@ export function OperatorMembersConsolePage({
       });
     }
     return actions;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUser, actionLoading, isApprovalOnly, canManageLifecycle, rejectReason, rejectReasonText]);
+  })();
 
+  useEffect(() => { if (error && notice) setRefreshFailed(true); }, [error, notice]);
+  const feedback = <>
+    {notice && <p role="status" className="mb-3 text-emerald-700">{notice}</p>}
+    {actionError && <p role="alert" className="mb-3 text-red-700">{actionError}</p>}
+    {refreshFailed && <p role="alert" className="mb-3 text-amber-700">처리는 완료했지만 최신 목록·통계를 확인하지 못했습니다. <button disabled={writing} onClick={() => void refreshAfterWrite()}>최신 정보 다시 조회</button></p>}
+  </>;
   // ─── Render ─────────────────────────────────────────────────
 
   return (
     <div className="p-6">
+      {!selectedUser && feedback}
+      {statsError && <p role="alert" className="mb-3 text-amber-700">{statsError} <button disabled={writing} onClick={async () => { if (await fetchStats() && !error) setRefreshFailed(false); }}>통계 다시 조회</button></p>}
       {/* Stats — client.stats() 를 제공하는 서비스에서만 표시 */}
       {showStats && (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -639,27 +650,27 @@ export function OperatorMembersConsolePage({
       )}
 
       {/* Member List Layout: Search + Tabs + Table */}
+      <fieldset disabled={writing || !!editUser || !!deleteTarget} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <MemberListLayout
         title={title}
         description={description}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={(key) => {
-          setActiveTab(key);
-          setPage(1);
+          changeView(() => { setActiveTab(key); setPage(1); });
         }}
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={value => { if (!state.current.writing) setSearch(value); }}
         onSearch={(q) => {
-          setSearchQuery(q);
-          setPage(1);
+          changeView(() => { setSearchQuery(q); setPage(1); });
         }}
         {...(searchPlaceholder !== undefined && { searchPlaceholder })}
         headerActions={
           <button
-            onClick={() => {
-              fetchUsers();
-              fetchStats();
+            disabled={writing || loading}
+            onClick={async () => {
+              const results = await Promise.all([fetchUsers(), fetchStats()]);
+              if (results.every(Boolean) && state.current.mounted) setRefreshFailed(false);
             }}
             className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
           >
@@ -669,7 +680,7 @@ export function OperatorMembersConsolePage({
       >
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+          <div role="alert" className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
             <AlertCircle className="w-4 h-4 shrink-0" />
             {error}
           </div>
@@ -691,14 +702,14 @@ export function OperatorMembersConsolePage({
         <BulkResultModal
           open={batch.showResult}
           onClose={() => {
-            batch.clearResult();
-            fetchUsers();
-            fetchStats();
+            if (!state.current.writing) batch.clearResult();
           }}
           result={batch.result}
-          onRetry={() => {
-            batch.retryFailed();
-          }}
+          onRetry={() => runWrite(async () => {
+            const scope = state.current;
+            const result = await batch.retryFailed();
+            if (scope.mounted && result?.successCount) { setNotice(`${result.successCount}건 재시도 완료`); await refreshAfterWrite(); }
+          })}
         />
         )}
 
@@ -709,16 +720,16 @@ export function OperatorMembersConsolePage({
           rowKey="id"
           loading={loading}
           emptyMessage={
-            activeTab === 'pending'
+            error ? '목록을 다시 불러와 주세요.' : activeTab === 'pending'
               ? '가입 신청이 없습니다.'
               : isApprovalOnly
                 ? '해당 상태의 가입 신청이 없습니다.'
                 : '등록된 사용자가 없습니다.'
           }
-          onRowClick={(user) => setSelectedUser(user)}
+          onRowClick={(user) => { if (!state.current.writing && !editUser && !deleteTarget && !loading && !error) { setActionError(''); setSelectedUser(user); } }}
           tableId={tableId ?? `${serviceKey}-operator-members`}
           {...(canBulk
-            ? { selectable: true, selectedKeys: selectedIds, onSelectionChange: setSelectedIds }
+            ? { selectable: true, selectedKeys: selectedIds, onSelectionChange: (ids: Set<string>) => { if (!state.current.writing && !loading && !error) setSelectedIds(ids); } }
             : {})}
           {...(serverSort
             ? { manualSort: true, sortBy, sortOrder, onSort: handleSort }
@@ -734,8 +745,8 @@ export function OperatorMembersConsolePage({
           pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-4">
             <button
-              onClick={() => setPage(Math.max(1, page - 1))}
-              disabled={page <= 1}
+              onClick={() => changeView(() => setPage(Math.max(1, page - 1)))}
+              disabled={writing || loading || page <= 1}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -745,8 +756,8 @@ export function OperatorMembersConsolePage({
               {page} / {pagination.totalPages}
             </span>
             <button
-              onClick={() => setPage(Math.min(pagination.totalPages, page + 1))}
-              disabled={page >= pagination.totalPages}
+              onClick={() => changeView(() => setPage(Math.min(pagination.totalPages, page + 1)))}
+              disabled={writing || loading || page >= pagination.totalPages}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
               다음
@@ -755,17 +766,19 @@ export function OperatorMembersConsolePage({
           </div>
         )}
       </MemberListLayout>
+      </fieldset>
 
       {/* ─── BaseDetailDrawer ─────────────────────────────────── */}
       <BaseDetailDrawer
         open={!!selectedUser}
-        onClose={() => setSelectedUser(null)}
+        onClose={() => { if (!state.current.writing) setSelectedUser(null); }}
         title={selectedUser ? getUserName(selectedUser) : ''}
         width={520}
         actions={drawerActions}
       >
         {selectedUser && (
           <div style={{ fontSize: 14, color: '#374151' }}>
+            {feedback}
             {/* 기본 정보 */}
             <div
               style={{
@@ -891,6 +904,8 @@ export function OperatorMembersConsolePage({
                   value={rejectReasonText}
                   onChange={(e) => setRejectReasonText(e.target.value)}
                   rows={3}
+                  disabled={writing}
+                  aria-label={rejectReason.label ?? '반려 사유'}
                   placeholder={rejectReason.placeholder ?? '반려 시 신청자에게 전달됩니다.'}
                   style={{
                     width: '100%',
@@ -931,9 +946,9 @@ export function OperatorMembersConsolePage({
         renderEditModal({
           user: editUser,
           onClose: () => setEditUser(null),
-          onSuccess: () => {
-            fetchUsers();
-          },
+          onSuccess: () => { void runWrite(async () => {
+            setNotice('회원 정보를 저장했습니다.'); setEditUser(null); await refreshAfterWrite();
+          }); },
         })}
 
       {/* Delete Flow — service-provided slot */}
@@ -942,11 +957,9 @@ export function OperatorMembersConsolePage({
         renderDeleteFlow({
           user: deleteTarget,
           onClose: () => setDeleteTarget(null),
-          onDeleted: () => {
-            fetchUsers();
-            fetchStats();
-            setDeleteTarget(null);
-          },
+          onDeleted: () => { void runWrite(async () => {
+            setNotice('서비스 회원 처리를 완료했습니다.'); setDeleteTarget(null); await refreshAfterWrite();
+          }); },
         })}
     </div>
   );

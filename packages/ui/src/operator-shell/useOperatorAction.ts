@@ -32,7 +32,7 @@ export interface UseOperatorActionReturn {
   executeAction: (
     apiFn: (reason?: string) => Promise<void>,
     reason?: string,
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 }
 
 export function useOperatorAction(
@@ -40,7 +40,9 @@ export function useOperatorAction(
 ): UseOperatorActionReturn {
   const { onSuccess, onError } = options;
 
-  const [pendingAction, setPendingAction] = useState<OperatorActionType | null>(null);
+  const [pendingAction, setPendingAction] = useState<OperatorActionType | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,10 +64,13 @@ export function useOperatorAction(
         await apiFn(reason);
         setPendingAction(null);
         onSuccess?.();
+        return true;
       } catch (err) {
-        const message = err instanceof Error ? err.message : '처리 중 오류가 발생했습니다.';
+        const message =
+          err instanceof Error ? err.message : '처리 중 오류가 발생했습니다.';
         setError(message);
         onError?.(err instanceof Error ? err : new Error(message));
+        return false;
       } finally {
         setLoading(false);
       }

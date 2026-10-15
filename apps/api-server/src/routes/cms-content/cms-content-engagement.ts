@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from './cms-reserved-presentation.js';
 /**
  * CMS Content Engagement — 추천(recommend) / 조회수(view)
  *
@@ -80,7 +81,7 @@ export async function loadCmsEngagement(
              FROM cms_content_recommendations
             WHERE user_id = $2
          ) mine ON mine.content_id = c.id
-        WHERE c.id = ANY($1::uuid[])`,
+        WHERE c.id = ANY($1::uuid[]) AND c.${ORDINARY_CMS_CONTENT_SQL}`,
       [ids, userId],
     );
     const map = new Map<string, CmsEngagementCounts>();
@@ -105,7 +106,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
   /** 상세와 같은 가시성 경계. 보이지 않으면 null (호출부는 404). */
   const loadVisible = async (id: string, userId: string | null) => {
     const rows: any[] = await dataSource.query(
-      `SELECT id, status, "authorRole", "createdBy" FROM cms_contents WHERE id = $1 LIMIT 1`,
+      `SELECT id, status, "authorRole", "createdBy" FROM cms_contents WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL} LIMIT 1`,
       [id],
     );
     const row = rows[0];
@@ -133,7 +134,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
         return;
       }
       const updated: any[] = await dataSource.query(
-        `UPDATE cms_contents SET "viewCount" = COALESCE("viewCount", 0) + 1 WHERE id = $1 RETURNING "viewCount"`,
+        `UPDATE cms_contents SET "viewCount" = COALESCE("viewCount", 0) + 1 WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL} RETURNING "viewCount"`,
         [id],
       );
       res.json({ success: true, data: { viewCount: Number(updated?.[0]?.viewCount ?? 0) } });

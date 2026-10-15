@@ -9,6 +9,7 @@
  * Store 소유 signage_media CRUD (URL 기반 동영상 등록)
  */
 
+import { storeScopedFetch } from './storeScopedFetch';
 import { getAccessToken } from '../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -63,28 +64,36 @@ function headers(organizationId: string): Record<string, string> {
   };
 }
 
+function mediaResult(json: { success?: boolean; data?: SignageMediaItem } & Partial<SignageMediaItem>): SignageMediaItem {
+  const value = json.data ?? json;
+  if (json.success === false || typeof value.id !== 'string' || !value.id || typeof value.name !== 'string')
+    throw new Error('동영상 저장 결과를 확인하지 못했습니다. 목록을 확인해 주세요.');
+  return value as SignageMediaItem;
+}
+
 /* ─── API Functions ─────────────────────────── */
 
 export async function fetchSignageMedia(
   organizationId: string,
 ): Promise<SignageMediaItem[]> {
-  const res = await fetch(`${BASE}?limit=200`, {
+  const res = await storeScopedFetch(`${BASE}?limit=200`, {
 
     headers: headers(organizationId),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
+  if (json.success === false) throw new Error('동영상 목록을 불러오지 못했습니다.');
   const data = json.data ?? json;
-  return Array.isArray(data)
-    ? data
-    : data.items ?? [];
+  const items = Array.isArray(data) ? data : data.items;
+  if (!Array.isArray(items)) throw new Error('동영상 목록을 확인하지 못했습니다.');
+  return items;
 }
 
 export async function createSignageMedia(
   organizationId: string,
   payload: CreateSignageMediaPayload,
 ): Promise<SignageMediaItem> {
-  const res = await fetch(BASE, {
+  const res = await storeScopedFetch(BASE, {
     method: 'POST',
 
     headers: headers(organizationId),
@@ -95,7 +104,7 @@ export async function createSignageMedia(
     throw new Error(err.message || `HTTP ${res.status}`);
   }
   const json = await res.json();
-  return json.data ?? json;
+  return mediaResult(json);
 }
 
 export async function updateSignageMedia(
@@ -103,7 +112,7 @@ export async function updateSignageMedia(
   id: string,
   payload: UpdateSignageMediaPayload,
 ): Promise<SignageMediaItem> {
-  const res = await fetch(`${BASE}/${id}`, {
+  const res = await storeScopedFetch(`${BASE}/${id}`, {
     method: 'PATCH',
     headers: headers(organizationId),
     body: JSON.stringify(payload),
@@ -113,14 +122,14 @@ export async function updateSignageMedia(
     throw new Error(err.message || `HTTP ${res.status}`);
   }
   const json = await res.json();
-  return json.data ?? json;
+  return mediaResult(json);
 }
 
 export async function deleteSignageMedia(
   organizationId: string,
   id: string,
 ): Promise<void> {
-  const res = await fetch(`${BASE}/${id}`, {
+  const res = await storeScopedFetch(`${BASE}/${id}`, {
     method: 'DELETE',
 
     headers: headers(organizationId),

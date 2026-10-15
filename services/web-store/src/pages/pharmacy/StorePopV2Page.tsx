@@ -1,3 +1,5 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { createStorePopSession } from './operations/storePopSession';
 /**
  * StorePopV2Page (KPA adapter) — WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
  *
@@ -9,7 +11,7 @@
  * 과거 산출물 이력(store_execution_assets usage_type='pop')도 건드리지 않는다.
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   StorePopV2EditorView,
@@ -37,6 +39,11 @@ const notify = {
 type View = { mode: 'list' } | { mode: 'edit'; documentId?: string };
 
 export function StorePopV2Page() {
+  const scope = useStoreOperationScope();
+  return <PopSession key={scope.key} isCurrent={scope.isCurrent} />;
+}
+function PopSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
+  const api = useMemo(() => createStorePopSession(popV2Api, isCurrent), [isCurrent]);
   // HUB / 자료함 / 상품 화면에서 "POP 만들기" 로 들어오면 곧바로 편집기로 진입한다.
   //   WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1
   const handoff = usePopV2Handoff();
@@ -45,7 +52,7 @@ export function StorePopV2Page() {
   if (view.mode === 'edit') {
     return (
       <StorePopV2EditorView
-        api={popV2Api}
+        api={api}
         notify={notify}
         accent={ACCENT}
         templates={TEMPLATES}
@@ -59,7 +66,7 @@ export function StorePopV2Page() {
 
   return (
     <StorePopV2ListView
-      api={popV2Api}
+      api={api}
       notify={notify}
       accent={ACCENT}
       onCreate={() => setView({ mode: 'edit' })}

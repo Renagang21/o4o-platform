@@ -1,3 +1,4 @@
+import { ordinaryCmsMetadata } from '../cms-content/cms-reserved-presentation.js';
 /**
  * Admin Ops Metrics Routes
  *
@@ -86,7 +87,7 @@ export function createAdminOpsMetricsRoutes(dataSource: DataSource): Router {
 
       // Find empty critical slots (critical slot keys without active content)
       const allSlots = await slotRepo.find({
-        where: { isActive: true },
+        where: { isActive: true, content: { metadata: ordinaryCmsMetadata() } },
         relations: ['content'],
       });
 
@@ -107,7 +108,7 @@ export function createAdminOpsMetricsRoutes(dataSource: DataSource): Router {
       // Count expired content (status = published but expiresAt < now)
       const now = new Date();
       const allContents = await contentRepo.find({
-        where: { status: 'published' },
+        where: { status: 'published', metadata: ordinaryCmsMetadata() },
       });
 
       let expiredContentsCount = 0;

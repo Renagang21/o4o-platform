@@ -16,6 +16,7 @@ import logger from '../../utils/logger.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
+import { cmsMutationRows, isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from '../../routes/cms-content/cms-reserved-presentation.js';
 
 // Controllers
 import { createSupplierManagementController } from './controllers/supplier-management.controller.js';
@@ -615,7 +616,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         const rows = await dataSource.query(
           `SELECT id, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", metadata
            FROM cms_contents
-           WHERE type = $1 AND "serviceKey" = 'neture' AND status = 'published'
+           WHERE ${ORDINARY_CMS_CONTENT_SQL} AND type = $1 AND "serviceKey" = 'neture' AND status = 'published'
              AND ("expiresAt" IS NULL OR "expiresAt" > NOW())${metadataFilter}
            ORDER BY "sortOrder" ASC, "createdAt" DESC`,
           params,
@@ -650,7 +651,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
       const rows = await dataSource.query(
         `SELECT id, type, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", status, metadata, "createdAt", "updatedAt"
          FROM cms_contents
-         WHERE type = $1 AND "serviceKey" = 'neture'${metadataFilter}
+         WHERE type = $1 AND "serviceKey" = 'neture' AND ${ORDINARY_CMS_CONTENT_SQL}${metadataFilter}
          ORDER BY "sortOrder" ASC, "createdAt" DESC`,
         params,
       );
@@ -676,6 +677,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         res.status(400).json({ success: false, error: 'TITLE_REQUIRED' });
         return;
       }
+      if (isHomePresentationMetadata(extraMeta)) {
+        res.status(400).json({ success: false, error: 'RESERVED_CONTENT' });
+        return;
+      }
       const contentMetadata = { ...(extraMeta || {}), ...(cfg.metadataSection ? { section: cfg.metadataSection } : {}) };
       const authReq = req as AuthenticatedRequest;
       const rows = await dataSource.query(
@@ -698,7 +703,11 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     try {
       const { id } = req.params;
       const { title, summary, imageUrl, linkUrl, linkText, sortOrder, metadata: extraMeta } = req.body;
-      const rows = await dataSource.query(
+      if (isHomePresentationMetadata(extraMeta)) {
+        res.status(400).json({ success: false, error: 'RESERVED_CONTENT' });
+        return;
+      }
+      const rows = cmsMutationRows<any>(await dataSource.query(
         `UPDATE cms_contents SET
            title = COALESCE($2, title),
            summary = $3,
@@ -708,10 +717,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
            "sortOrder" = COALESCE($7, "sortOrder"),
            metadata = COALESCE($8, metadata),
            "updatedAt" = NOW()
-         WHERE id = $1 AND "serviceKey" = 'neture'
+         WHERE id = $1 AND "serviceKey" = 'neture' AND ${ORDINARY_CMS_CONTENT_SQL}
          RETURNING *`,
         [id, title, summary || null, imageUrl || null, linkUrl || null, linkText || null, sortOrder, extraMeta ? JSON.stringify(extraMeta) : null],
-      );
+      ));
       if (!rows.length) {
         res.status(404).json({ success: false, error: 'NOT_FOUND' });
         return;
@@ -729,10 +738,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.delete('/admin/homepage-contents/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const result = await dataSource.query(
-        `DELETE FROM cms_contents WHERE id = $1 AND "serviceKey" = 'neture' RETURNING id`,
+      const result = cmsMutationRows<any>(await dataSource.query(
+        `DELETE FROM cms_contents WHERE id = $1 AND "serviceKey" = 'neture' AND ${ORDINARY_CMS_CONTENT_SQL} RETURNING id`,
         [id],
-      );
+      ));
       if (!result.length) {
         res.status(404).json({ success: false, error: 'NOT_FOUND' });
         return;
@@ -756,12 +765,12 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         return;
       }
       const publishClause = status === 'published' ? ', "publishedAt" = NOW()' : '';
-      const rows = await dataSource.query(
+      const rows = cmsMutationRows<any>(await dataSource.query(
         `UPDATE cms_contents SET status = $2${publishClause}, "updatedAt" = NOW()
-         WHERE id = $1 AND "serviceKey" = 'neture'
+         WHERE id = $1 AND "serviceKey" = 'neture' AND ${ORDINARY_CMS_CONTENT_SQL}
          RETURNING *`,
         [id, status],
-      );
+      ));
       if (!rows.length) {
         res.status(404).json({ success: false, error: 'NOT_FOUND' });
         return;
