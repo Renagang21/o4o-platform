@@ -7,6 +7,8 @@
 ## 문서·코드 census
 
 기준 main `e6202355af0fc0f39a778d5a2bb51b76bab70896`을 자기 branch에 정상 merge했다.
+통합 대기 중 main이 `85779c2079681516da50997a761d241c82003977`로 이동해 다시 정상 merge했다.
+추가 main 변경은 PharmacyHub 정리 CLI·테스트·CI·문서 11파일이며 공급자/Web Neture 소스 차이 0이다. 기존 앱 검증 결과를 보존하고 최신 merge HEAD의 원격 CI를 확인한다.
 기존 PR의 연속 Phase로 같은 전용 branch/worktree를 유지한다. 공유 기준 checkout과 다른 세션 파일은 변경하지 않는다.
 Supplier Domain·역할별 업무공간·B2B 계약·소비자 commerce 경계·공통 모듈 변경 절차·현행 Delivery를 대조했다.
 
