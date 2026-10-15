@@ -1,6 +1,6 @@
 # WO-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1
 
-> 상태: IN_PROGRESS · 작성일: 2026-10-15
+> 상태: COMPLETED · 작성일: 2026-10-15
 > 승인: 사용자 지시 — AI를 제외한 잔여를 TODO·문서·코드로 점검한 후 구현·push·배포까지 수행.
 > 담당: 이 세션이 개발·순차 통합·배포 결과 검증을 수행한다.
 > 기준: `origin/main` `e6202355af0fc0f39a778d5a2bb51b76bab70896`, 기존 PR #629 HEAD `4e9f38aabceae8d99e6ab01073044d87c38cebde`.
@@ -48,13 +48,16 @@ AI 기능·내부 LLM·새 프레임워크·새 상태머신·DB/migration·권�
 
 ## 4. TODO — push·통합·배포
 
-- [ ] 명시적 파일 scope 점검 후 commit·push, PR 본문을 최종 범위와 검증에 정렬.
-- [ ] 실제 main ruleset·정확한 HEAD의 CI·Codex findings·미해결 스레드·main 이동을 확인.
-- [ ] 정상 PR merge 및 post-merge CI 확인.
-- [ ] 진행 중 공유 배포와 충돌 없이 Delivery의 서비스별 분류·freeze·배포 결과 확인.
-- [ ] 필요한 정식 배포 후 Neture serving SHA와 production status 확인.
-- [ ] 운영 테스트 계정으로 desktop/mobile 읽기 전용 smoke, 권한/오류·toast/API 확인.
-- [ ] CHECK·TODO를 실제 결과로 마감하고 문서 push·PR·통합, 자기 worktree 종료 조건 확인.
+- [x] 명시적 파일 scope 점검 후 commit·push, PR 본문을 최종 범위와 검증에 정렬.
+- [x] 실제 main ruleset·정확한 HEAD의 CI·Codex findings·미해결 스레드·main 이동을 확인. 최종 PR HEAD `e72949faf`, CI Gate·Sonar PASS, Sonar 지적 0·미해결 review thread 0.
+- [x] [PR #629](https://github.com/Renagang21/o4o-platform/pull/629) 정상 merge: `20a04ee2a3337687eae86c4029b01d83b2479a1a`. PR HEAD와 병합 tree 차이 0.
+- [x] [post-merge CI 38741504453](https://github.com/Renagang21/o4o-platform/actions/runs/38741504453) SUCCESS.
+- [x] 진행 중 공유 작업의 대상 확인: PH-only media/GCS 정리 Job과 Neture 웹 배포는 다른 자원이다. 정식 Delivery의 CI·freeze 판정 통과, Neture만 선택·API/Admin skip 확인. rollout 결과는 아래 단계에서 확인한다.
+- [x] [Delivery 38742977260](https://github.com/Renagang21/o4o-platform/actions/runs/38742977260) SUCCESS. verified rollout·report 완료, Neture serving SHA `20a04ee2a3337687eae86c4029b01d83b2479a1a`, `production = success / DEPLOYED · deploy: neture`.
+- [x] 운영 테스트 계정으로 desktop/mobile 읽기 전용 smoke: 공급자 19경로 × 2, 매장 경영자/직원 접근 차단 4건, 로그인 6건 PASS. PC/mobile에서 19개 메뉴 대상과 메뉴 클릭도 확인. API·page error·전체 가로 넘침·업무 write 0.
+- [x] CHECK·TODO를 실제 결과로 마감하고 문서 전용 PR로 인계한다. 문서 PR의 최종 병합 상태와 자기 worktree 종료 정리 결과는 GitHub와 세션 완료 보고에서 확인한다.
+
+완료 근거: [CHECK](../checks/CHECK-O4O-SUPPLIER-NON-AI-WORKSPACE-CLOSURE-V1.md). 소스 PR #629·병합 후 CI·Delivery 성공, 배포 SHA `20a04ee2a`, 운영 읽기 전용 검증 완료. AI·운영자 실제 승인·새 DB/migration은 추가하지 않았다. 종료 기록은 문서 전용으로 `DEPLOYMENT = NOT_APPLICABLE`이다.
 
 ## 5. 데이터·배포 경계
 
