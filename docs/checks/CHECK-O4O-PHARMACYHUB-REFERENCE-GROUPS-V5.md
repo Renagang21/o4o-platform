@@ -7,7 +7,7 @@
 
 ## 실패 근거
 
-V4 개발 plan run38738916090 / job `ph-dev-38738916090-1`은 Cloud Logging에서 13:10:47Z에 전체 작업600초 제한 종료가 확인됐다. 개별 query57014나 IAM 실패로 판정하지 않는다. 성공 census는 없다. 미디어 plan run38740677821 / job `ph-media-38740677821-1`도 Cloud Logging에서 13:23:33Z 전체600초 종료를 확인했다. 두 plan 모두 전체 참조 검사 누적 시간 문제다. 이 수정 전 DB·GCS write, WIF 변경, apply는 실행하지 않았다.
+V4 개발 plan run38738916090 / job `ph-dev-38738916090-1`은 Cloud Logging에서 13:10:47Z에 전체 작업600초 제한 종료가 확인됐다. 개별 query57014나 IAM 실패로 판정하지 않는다. 성공 census는 없다. 미디어 plan run38740677821 / job `ph-media-38740677821-1`도 Cloud Logging에서 13:23:33Z 전체600초 종료를 확인했다. 두 plan 모두 전체 작업 제한은 확인됐지만 종료 당시 실행 중이던 쿼리는 로그로 특정할 수 없다. 이 수정 전 DB·GCS write, WIF 변경, apply는 실행하지 않았다.
 
 ## 수정
 
@@ -17,9 +17,11 @@ V4는 문자열·JSON·배열의 열마다 같은 테이블을 UUID 기본키로
 
 UUID 열의 동등 검사와 legacy fallback, 상속/partition 부모 및 비키 테이블의 전체 검사, 모든 원래 테이블·열의 검사 범위를 유지한다. timeout15초/600초, 고정 census, ownership, FK, Core fence, GCS generation, 트랜잭션·rollback은 변경하지 않는다. 새 dependency·migration·운영 인덱스는 없다. 기존 standalone worker의 공통 모듈 data URL bundling을 그대로 사용한다.
 
+SIGTERM 수신 시 현재 단계·query SHA256만 기록하고 즉시 실패 종료하는 worker 진단을 추가했다. SQL 원문·parameter·행 데이터는 출력하지 않으며 제한 시간을 늘리거나 종료를 지연시키지 않는다.
+
 ## 검증
 
-- focused Node52 PASS: 기존49건과 그룹 구성·대상1회 읽기·cached bind·발견 열·잘못된 응답 회귀.
+- focused Node53 PASS: 기존49건과 SIGTERM 해시 진단·그룹 구성·대상1회 읽기·cached bind·발견 열·잘못된 응답 회귀.
 - 실제 생성 worker의 전체 격리 PostgreSQL fixture PASS(26.4초): plan/apply·공유 보존·FK·Core fence·rollback·상속 자손·각5000행×128KiB JSON 포함.
 - 생성 worker의200만 행·세 열 그룹 fixture PASS(총281.8초): 개발43169ms/미디어48968ms, 각각1954개 구간·scanned합계200만 행. 동일 테이블 세 열을 한 번 순회하고 PK 범위 인덱스, 마지막 최대 UUID 참조, NULL, 원래 literal/배열 의미를 확인했다.
 - 추가100,000행 비PH 대상 원본 +3200행 source fixture PASS(1.1초): 대상 집합1회 조회, 열 사이에 나뉜 token의 오탐 없음, 뒤쪽 열·배열 참조 발견, Unicode·빈 token·NULL 의미. 공통 identifier quoting 추출 후 생성 worker로 재검증했다.

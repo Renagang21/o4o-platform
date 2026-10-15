@@ -63,6 +63,11 @@ const {Client}=createRequire('/app/package.json')('pg');
 ${purge==='media'?"const {Storage}=createRequire('/app/package.json')('@google-cloud/storage');":''}
 const client=new Client({host:process.env.DB_HOST,port:5432,user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME});
 let stage='connect',queryHash='none';
+function interrupted() {
+  console.error('PH_PURGE_INTERRUPTED stage='+stage+' signal=SIGTERM query_sha256='+queryHash);
+  process.exit(1);
+}
+process.once('SIGTERM',interrupted);
 async function query(sql,args) {
   queryHash=diagnosticHash('sha256').update(sql).digest('hex');
   return client.query(sql,args);
@@ -81,7 +86,7 @@ try {
   const message=typeof error.message==='string'&&/^PH_(?:PURGE|DEV|MEDIA)_[A-Z_]+(?::[a-zA-Z0-9_.]+)?$/.test(error.message)?error.message:'PH_PURGE_FAILED';
   const code=typeof error.code==='string'&&/^[0-9A-Z]{5}$/.test(error.code)?error.code:'unknown';
   console.error(message+' stage='+stage+' code='+code+' query_sha256='+queryHash);process.exitCode=1;
-} finally {try{await client.end()}catch{process.exitCode=1}}
+} finally {try{await client.end()}catch{process.exitCode=1}process.removeListener('SIGTERM',interrupted)}
 `;
   const payload=Buffer.from(source+entry).toString('base64');
   const boot=`await import('data:text/javascript;base64,${payload}')`;
