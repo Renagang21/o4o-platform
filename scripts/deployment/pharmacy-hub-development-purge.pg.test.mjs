@@ -2,8 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-import {PharmacyHubDevelopmentPurge} from './pharmacy-hub-development-purge.mjs';
-import {PharmacyHubMediaPurge} from './pharmacy-hub-media-purge.mjs';
+import {loadPurgeSource} from './pharmacy-hub-administrative-purge-job.mjs';
+const {PharmacyHubDevelopmentPurge}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('development')).toString('base64')}`);
+const {PharmacyHubMediaPurge}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('media')).toString('base64')}`);
 import {collectRetirementReferences} from './pharmacy-hub-retirement-references.mjs';
 const uuid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const ph='pharmacy-hub';
@@ -76,7 +77,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       if(stress)await client.query("UPDATE product_identifiers SET metadata=metadata||jsonb_build_object('padding',repeat('z',131072))");
       const referencePlans=[];
       const inspected={...q,query:async(sql,args)=>{
-        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('~ targets.pattern'))
+        if(/FROM (?:ONLY )?"public"\."product_identifiers" s/.test(sql)&&sql.includes('~ targets.pattern'))
           referencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
@@ -85,7 +86,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('ROLLBACK');
       if(stress)await client.query("UPDATE product_identifiers SET metadata=metadata-'padding'");
       const walk=node=>[node,...(node.Plans??[]).flatMap(walk)];
-      assert.equal(referencePlans.length,2);
+      assert.equal(referencePlans.length,6);
       for(const execution of referencePlans) {
         const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE target_patterns');
         assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
@@ -108,6 +109,13 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await begin();
       await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/PH_DEV_SHARED_VALUE:public.literal_refs.value/);
       await client.query('ROLLBACK');await client.query('DELETE FROM literal_refs');
+      // A parent PK is not globally unique across inherited/foreign descendants.
+      // It must retain the full inherited scan rather than paginate ONLY parent rows.
+      await client.query('CREATE TABLE inherited_refs(id uuid PRIMARY KEY,value text); CREATE TABLE inherited_child() INHERITS(inherited_refs)');
+      await client.query('INSERT INTO inherited_child VALUES($1,$2)',[uuid(9999),uuid(101)]);
+      await begin();
+      await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/PH_DEV_SHARED_VALUE:public.inherited_(refs|child).value/);
+      await client.query('ROLLBACK');await client.query('DROP TABLE inherited_child; DROP TABLE inherited_refs');
       const erasure=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await erasure.connect();
       try {
         const pid=(await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
@@ -179,13 +187,13 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       if(stress)await client.query("UPDATE product_candidates SET raw_payload=raw_payload||jsonb_build_object('padding',repeat('z',131072))");
       const mediaReferencePlans=[];
       const inspectedMedia={...q,query:async(sql,args)=>{
-        if(sql.includes('FROM "public"."product_candidates" s')&&sql.includes('~ targets.pattern'))
+        if(/FROM (?:ONLY )?"public"\."product_candidates" s/.test(sql)&&sql.includes('~ targets.pattern'))
           mediaReferencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
       await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       assert.equal((await new PharmacyHubMediaPurge({storage}).up(inspectedMedia,true)).assets,4);await client.query('ROLLBACK');
-      assert.equal(mediaReferencePlans.length,2);
+      assert.equal(mediaReferencePlans.length,6);
       for(const execution of mediaReferencePlans) {
         const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE target_patterns');
         assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
