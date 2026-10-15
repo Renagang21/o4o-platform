@@ -129,3 +129,12 @@ describe('operator mail acceptance', () => {
     expect(sessionStorage.getItem('o4o_operator_invite')).toBe(TOKEN);
   });
 });
+
+
+it.each([['INVALID_OR_EXPIRED_INVITATION', false], ['INVITATION_ACCOUNT_MISMATCH', true], ['TEMPORARY_FAILURE', true]])('clears only terminal inspection failures: %s', async (code, retained) => {
+  h.post.mockRejectedValue({ response: { data: { code } } });
+  render(<OperatorInvitePage />);
+  await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '지정된 계정과 다릅니다. 지정된 계정으로 다시 로그인하세요.' : '유효한 초대를 확인하지 못했습니다. 이미 처리되었거나 만료·취소된 링크인지 확인하세요.');
+  expect(sessionStorage.getItem('o4o_operator_invite')).toBe(retained ? TOKEN : null);
+  expect(h.post.mock.calls.every(([path]) => path.endsWith('/inspect'))).toBe(true);
+});

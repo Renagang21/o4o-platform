@@ -1,3 +1,4 @@
+import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
 import OperatorInvitePage from './pages/OperatorInvitePage';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
@@ -607,6 +608,7 @@ function PostLoginRedirect() {
 
 // 인증 모달 렌더링 컴포넌트 (로그인 + 회원가입)
 function ModalRenderer() {
+  useEffect(() => serveOperatorInvitationContinuation(), []);
   const { activeModal, closeModal, loginReturnUrl } = useLoginModal();
   return (
     <>

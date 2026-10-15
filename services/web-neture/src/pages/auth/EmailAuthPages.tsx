@@ -16,7 +16,7 @@
  * 메일 링크의 1회용 토큰은 URL fragment(`#token=`)로 받고, 읽은 즉시 주소창에서 지운다
  * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
  */
-import { useLayoutEffect, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
@@ -31,7 +31,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
-import { operatorInvitationReturnPath } from '../../lib/operatorInvitationReturn';
+import { operatorInvitationReturnPath, recoverOperatorInvitationContinuation } from '../../lib/operatorInvitationReturn';
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -129,11 +129,19 @@ export function SignupPage() {
 }
 
 export function VerifyEmailPage() {
+  const [, refreshContinuation] = useState(0);
+  const verificationApi = useMemo(() => ({
+    verifyEmail: async (token: string) => {
+      const result = await authClient.verifyEmail(token);
+      if (await recoverOperatorInvitationContinuation()) refreshContinuation(value => value + 1);
+      return result;
+    },
+  }), []);
   const token = useOneTimeToken();
   const links = useAuthLinks();
   return (
     <AuthCard title="이메일 확인">
-      <VerifyEmailView api={authClient} token={token} links={links} />
+      <VerifyEmailView api={verificationApi} token={token} links={links} />
     </AuthCard>
   );
 }

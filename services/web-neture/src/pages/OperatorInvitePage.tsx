@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth, useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
-import { OPERATOR_INVITATION_KEY as KEY } from '../lib/operatorInvitationReturn';
+import { OPERATOR_INVITATION_KEY as KEY, clearOperatorInvitation } from '../lib/operatorInvitationReturn';
 /** Fragment tokens stay out of request URLs, access logs and login return URLs. GET never accepts. */
 export default function OperatorInvitePage() {
   const { user, isAuthenticated, isLoading, refreshAuth } = useAuth();
@@ -47,13 +47,12 @@ export default function OperatorInvitePage() {
         },
       )
       .catch((e: unknown) => {
-        if (current)
-          setMessage(
-            (e as { response?: { data?: { code?: string } } })?.response?.data
-              ?.code === 'INVITATION_ACCOUNT_MISMATCH'
-              ? '지정된 계정과 다릅니다. 지정된 계정으로 다시 로그인하세요.'
-              : '유효한 초대를 확인하지 못했습니다. 이미 처리되었거나 만료·취소된 링크인지 확인하세요.',
-          );
+        if (!current) return;
+        const code = (e as { response?: { data?: { code?: string } } })?.response?.data?.code;
+        if (code === 'INVALID_OR_EXPIRED_INVITATION') clearOperatorInvitation(token);
+        setMessage(code === 'INVITATION_ACCOUNT_MISMATCH'
+          ? '지정된 계정과 다릅니다. 지정된 계정으로 다시 로그인하세요.'
+          : '유효한 초대를 확인하지 못했습니다. 이미 처리되었거나 만료·취소된 링크인지 확인하세요.');
       });
     return () => {
       current = false;
@@ -67,7 +66,7 @@ export default function OperatorInvitePage() {
         token,
       });
       const result = response.data.data;
-      sessionStorage.removeItem(KEY);
+      clearOperatorInvitation(token);
       setDone(true);
       const statuses = Object.values(result.membershipStatuses ?? {});
       setMessage(

@@ -99,3 +99,12 @@ OPERATOR_INVITE_TEST_PORT=55432 pnpm --filter @o4o/api-server exec jest --runInB
 동일 email/service/role의 새 초대를 만들 때 기존 advisory lock 안에서 만료 pending을 cancelled로 전이해 pending-only unique key를 해제한다. 관리 목록 200건 밖에 있어도 새 초대를 만들 수 있고 옛 token은 거절한다. 새 status나 schema 변경은 없다.
 
 검증: 영향 API13 suite152 PASS(별도 DB24는 opt-in skip), 격리 PG15 실제24 PASS 및 모든 메일 callback에서 별도 DB 연결로 hash 커밋 가시성 확인. commit 실패 무발송 unit8 PASS. Neture 전체1025 PASS, 이후 추가한 복귀 helper4개와 verification9개13 PASS. API tsc/build·최종 Neture build·변경 lint PASS. fixture 컨테이너 제거 완료. 실제 사용자·운영 DB·SMTP·메일 수신·배포는 미실행이다. 최종 CI·리뷰는 새 head 기준으로 확인한다.
+
+
+### 같은 통합 PR의 추가 리뷰 — 이메일 확인 새 탭과 종료 token
+
+앞 절의 tab-local 복귀만으로는 이메일 확인 링크를 새 탭에서 열 때 원래 초대를 찾지 못했다. 정상 UI의 이메일 확인 API가 성공한 뒤, 동일 origin BroadcastChannel의 임의 nonce 요청/응답으로 원래 열린 탭의 초대를 단기 복구한다. token은 계속 sessionStorage/메모리에만 있고 localStorage·cookie·signup/login URL·로그에 쓰지 않는다. 여러 서로 다른 초대가 응답하면 추측하지 않는다. 원래 탭이 닫혔거나 channel을 사용할 수 없으면 확인 성공을 실패로 바꾸지 않으며 원래 초대 메일로 돌아갈 수 있다. 실제 로그인·inspect·명시 수락은 서버의 계정 ID·메일·만료·권한 검사를 그대로 거친다. 이메일 확인 자체가 운영자 권한을 부여하지 않는다.
+
+inspect의 INVALID_OR_EXPIRED_INVITATION과 수락 완료 시 해당 token만 정리하며, 동일 token을 가진 원래 탭에도 종료를 알린다. 계정 불일치·일시 오류는 보존한다. 늦은 종료 응답이 다른 새 token을 지우지 않는다.
+
+검증: 신규 terminal3개 포함 focused21 PASS, Neture 전체1032 PASS, production build·변경 lint PASS. 실제 Chromium의 독립 sessionStorage를 가진 새 탭에서8개 시나리오 PASS: 확인 뒤 복귀, 양쪽 종료 정리, 늦은 응답/새 token 보존, 복수 초대 거절, 잘못된 nonce 무시, 이메일 확인 실패 시 미복구, channel 차단/미지원에도 확인 성공 유지. 실제 인증·메일 서버는 합성 구현이며 pageerror0·network write0, fixture 서버/symlink 정리 완료. API152·격리 PG24는 앞 절 결과이며 이 frontend 후속에서 API/schema 변경은 없다. 새 head의 CI·Codex는 다시 판정한다.
