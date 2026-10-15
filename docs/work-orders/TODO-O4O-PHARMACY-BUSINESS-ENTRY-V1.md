@@ -1,6 +1,6 @@
 # TODO-O4O-PHARMACY-BUSINESS-ENTRY-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-15 (KST)
 > **근거**: 약국 협력사업 조사 후 TODO·코드/문서 점검·구현·push·배포 요청
 
@@ -44,8 +44,8 @@ My Home에는 선택 약국의 가입 사업이 보이고 사업 공간으로 �
 - [x] 사업 자료에서 내 매장 자료 가져오기 연결 및 선택 자료 펼치기.
 - [x] 집중 회귀·영향 앱 타입/빌드·lint·PC/모바일 합성 browser 검증.
 - [x] 민감정보·diff·staged scope 확인 후 commit·push·PR.
-- [ ] 실제 ruleset·CI·리뷰 확인 후 순차 병합 및 현재 Delivery 배포.
-- [ ] 운영 서빙 코드·readiness 확인과 결과 기록.
+- [x] 실제 ruleset·CI·리뷰 확인 후 순차 병합 및 현재 Delivery 배포.
+- [x] 운영 서빙 코드·readiness 확인과 결과 기록.
 
 ## 범위와 검증 경계
 
@@ -58,7 +58,7 @@ My Home·Store·사업 홈·자료와 PC/모바일 소비처를 함께 검증한
 
 문서 정합: 이번 결과를 이 TODO에 갱신하며 기존 정본의 가입·복사·사업별 업무 경계를 유지한다.
 DEPLOYMENT: AUTOMATIC — 이번 diff의 classifier는 LEVEL_2, neture·kpa-society·store 대상. 실제 누적 배포 판정은 Delivery 결과로 확인한다.
-WORKTREE_DISPOSITION: KEEP — 구현·통합·배포 진행 중.
+WORKTREE_DISPOSITION: KEEP — 동일 WO 배포 결과 기록 PR의 통합·종료 정리 전까지 보존.
 
 ## 로컬 검증 — 2026-10-15
 
@@ -155,3 +155,46 @@ Store 전체 491건 PASS이며 기존 Neture 983건·약국 협력사업 144건�
 - 최종 Chromium PC/390px 각 9흐름 = 18 PASS / pageerror 0.
   Store에 약국 B가 저장된 상태→명시적 선택→약국 A에 복사, 현재 사업 미가입 약국 제외,
   이용 불가한 선택 링크와 정상 목록 동시 유지까지 확인했다. 모든 인증·업무 API는 합성 fixture다.
+
+## main 통합과 배포 검증
+
+[PR #622](https://github.com/Renagang21/o4o-platform/pull/622)의 최종 HEAD
+`700319b2031bcedd0da2345c0d933cf3eb75ee33`에서 Codex 리뷰 완료·미해결 0,
+CI Gate·웹 build·API Jest 3 shard·CodeQL·SonarCloud 통과를 확인했다.
+실제 main ruleset의 PR/CI 경계를 준수해 main `ca9da671831b35298cc757a89413bd2e58d8f5fb`에 병합했다.
+병합 결과의 세 앱 소스는 검증한 branch와 동일하다.
+
+PR CI [38701003043](https://github.com/Renagang21/o4o-platform/actions/runs/38701003043)의
+첫 Code Quality는 미변경 auth-react의 socialAuth 테스트에서 `resolve is not a function`으로 실패했다.
+공식 check annotations로 약관 promise resolver 준비 전 호출하는 테스트 타이밍 문제를 확인했고,
+동일 소스 로컬 auth-react 19 files / 229 tests가 통과했다. 해당 job만 재실행해 같은 검사와
+CI Gate가 모두 PASS했다. 공통 auth 코드/테스트나 assertions/CI 설정은 변경하지 않았다.
+원본 job log redirect의 새 저장소 도메인은 제한돼 있었으나 annotations API로 실패 근거를 확보했다.
+로그 주소·인증값·계정 원문은 기록하지 않는다.
+
+main의 post-merge CI와 실제 Delivery·서빙 검증 결과를 아래에 이어 기록한다.
+
+main CI [38703494897](https://github.com/Renagang21/o4o-platform/actions/runs/38703494897)의
+첫 Web production build job은 미변경 Store의 `store-purchase-flow.test.tsx`에서
+수량 갱신·재조회 중 checkout 잠금 검사 1건이 실패했다. 공식 annotations로 위치를 확인했다.
+해당 suite의 로컬 단독 8건, 동일 앱 전체 492건 및 병합 전 같은 소스의 PR 웹 job은 PASS했다.
+main API 3 shard·Code Quality 등 나머지 검사가 끝난 뒤 실패한 웹 job만 새 runner에서 재실행했다.
+장바구니 코드·테스트·CI 조건은 이번 작업에서 수정하지 않았다.
+실패 CI에 연결된 첫 Delivery는 웹 배포를 모두 skip했으므로 배포 성공 근거로 사용하지 않는다.
+
+main CI 동일 SHA의 웹 job 재실행과 CI Gate는 최종 PASS했다. 실패 후 코드를 바꾸거나
+검사를 생략하지 않았다. 후속 자동 Delivery는
+[38705078597](https://github.com/Renagang21/o4o-platform/actions/runs/38705078597)이다.
+이 검증 기록은 동일 WO의 통합·배포 closure를 위해 기존 전용 branch에서 연속 작성한다.
+
+세 웹 deploy job의 `Smoke new revision and switch traffic (verified rollout)`과
+`Verify deployment`는 모두 PASS했다. API는 배포 대상이 아니며 기존 revision을 유지했다.
+배포 후 공식 도메인의 HTML·entry JavaScript를 직접 읽어 모두 HTTP 200과 신규 기능 코드를 확인했다.
+Neture `index-JtBA43Hp.js`, Store `index-DumMjwTq.js`, 약국 협력사업 `index-hBQUkljV.js`이다.
+API `/health/ready`도 HTTP 200 / ready를 확인했다. 실제 OAuth·운영 계정 업무 접근 검증과는 구분한다.
+운영 업무 데이터 생성·수정·삭제는 없었다. 브라우저 복사 검증은 격리된 합성 API fixture만 사용했다.
+
+Delivery 최종 결과는 SUCCESS이고 main `ca9da671831b35298cc757a89413bd2e58d8f5fb`의
+`production` commit status는 `success / DEPLOYED · deploy: neture,kpa-society,store`다.
+이번 구현·배포 단계는 완료했다. 위 남은 범위는 별도 후속 구현이며 완료 범위로 간주하지 않는다.
+이후 결과 기록만 담은 문서 PR은 `DEPLOYMENT: NOT_APPLICABLE`이며 운영 재배포 대상이 아니다.
