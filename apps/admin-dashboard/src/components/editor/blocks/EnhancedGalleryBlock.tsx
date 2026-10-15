@@ -3,7 +3,7 @@
  * WordPress Gutenberg와 85% 유사도를 목표로 하는 고급 갤러리 블록
  */
 
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Images,
   Upload,
@@ -82,12 +82,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [isDraggedOver, setIsDraggedOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Refs
-  const dropZoneRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get current layout config
   const layoutConfig = LAYOUT_CONFIGS[layout];
@@ -193,32 +188,6 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
     }
   }, [images, updateAttributes]);
 
-  // Handle drag and drop reordering
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    e.dataTransfer.effectAllowed = 'move';
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setIsDraggedOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback(() => {
-    setIsDraggedOver(false);
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggedOver(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      // Handle file upload
-      // Files dropped - TODO: Implement file upload
-    }
-  }, []);
-
   // Get ordered images (with random order if enabled)
   const orderedImages = useMemo(() => {
     if (randomOrder && !isSelected) {
@@ -311,16 +280,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
   // Render empty state
   const renderEmptyState = () => (
     <div
-      ref={dropZoneRef}
-      className={cn(
-        'border-2 border-dashed rounded-lg p-12 text-center transition-colors',
-        isDraggedOver
-          ? 'border-blue-500 bg-blue-50'
-          : 'border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100'
-      )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      className="border-2 border-dashed rounded-lg p-12 text-center border-gray-300 bg-gray-50"
     >
       <div className="space-y-4">
         <div className="w-16 h-16 mx-auto bg-gray-200 rounded-lg flex items-center justify-center">
@@ -329,7 +289,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Create your gallery</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Upload images or drag and drop to get started
+            Select images from the media library to get started
           </p>
           <div className="flex justify-center gap-2">
             <Button
@@ -337,15 +297,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
               className="flex items-center gap-2"
             >
               <Upload className="w-4 h-4" />
-              Upload Images
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Browse Files
+              Select Images
             </Button>
           </div>
         </div>
@@ -502,21 +454,6 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
       >
         {images.length === 0 ? renderEmptyState() : renderGalleryContent()}
       </div>
-
-      {/* Hidden file input for browse files */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        onChange={(e) => {
-          const files = Array.from(e.target.files || []);
-          if (files.length > 0) {
-            // Files selected - TODO: Handle file upload
-          }
-        }}
-        className="hidden"
-      />
 
       {/* Media Selector Modal */}
       <MediaSelector
