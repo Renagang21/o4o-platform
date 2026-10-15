@@ -366,7 +366,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const handleSaveEdit = async () => {
     const target = editingTarget, draft = editDraft, store = organizationId;
     if (!target || !draft.name.trim() || editBusy.current || mediaMutation.current || !isCurrent()) return;
-    if (!videoPreviewUrl(draft.sourceUrl)) { setEditError('올바른 YouTube 또는 Vimeo 영상 URL을 입력해 주세요.'); return; }
     mediaReads.cancel(); setMediaLoading(false);
     mediaMutation.current = true; editBusy.current = true; setEditSaving(true); setEditError('');
     try {

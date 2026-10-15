@@ -25,6 +25,7 @@ const api = vi.hoisted(() => ({
   updateMedia: vi.fn(),
   removeMedia: vi.fn(),
   asset: vi.fn(),
+  patchAsset: vi.fn(),
 }));
 vi.mock("../../../../contexts/StoreContext", () => ({
   useUnifiedStore: () => ({ organizationId: api.store, status: "ready" }),
@@ -86,7 +87,7 @@ vi.mock("../../../../api/tabletDisplays", async (original) => ({
 vi.mock("../../../../api/assetSnapshot", () => ({
   handledProductContentApi: { byProduct: api.candidates },
   storeAssetControlApi: { list: api.asset },
-  assetSnapshotApi: { list: api.asset },
+  assetSnapshotApi: { list: api.asset, patch: api.patchAsset },
 }));
 vi.mock("../../../../api/storePlaylist", () => ({
   fetchStorePlaylists: async () => [],
@@ -324,3 +325,57 @@ it("media save keeps a failed draft, serializes submissions and closes only afte
   fireEvent.click(screen.getByRole("button", { name: "저장" }));
   await waitFor(() => expect(screen.queryByLabelText(/제목/)).toBeNull());
 });
+
+it.each([
+  { type: "video", sourceUrl: "https://fixtures.example.test/clip.mp4" },
+  { type: "image", sourceUrl: "https://fixtures.example.test/poster.png" },
+  { type: "html", sourceUrl: "", html: "<p>Fixture information</p>" },
+])(
+  "saves metadata for a $type snapshot without requiring an iframe provider",
+  async (content) => {
+    const snapshot = {
+      id: "snapshot",
+      title: "Copied fixture",
+      assetType: "signage",
+      publishStatus: "draft",
+      channelMap: {},
+      isForced: false,
+      isLocked: false,
+      createdAt: "2026-10-15",
+      contentJson: content,
+    };
+    api.media.mockResolvedValue([]);
+    api.asset.mockResolvedValue({ success: true, data: { items: [snapshot] } });
+    api.patchAsset
+      .mockReset()
+      .mockResolvedValue({
+        success: true,
+        data: { ...snapshot, title: "Edited copy" },
+      });
+    render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
+    fireEvent.click(await screen.findByRole("button", { name: "편집" }));
+    expect(screen.queryByTitle("입력한 동영상 미리보기")).toBeNull();
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "입력한 영상 미리보기",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    fireEvent.change(screen.getByLabelText(/제목/), {
+      target: { value: "Edited copy" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "저장" }));
+    await waitFor(() =>
+      expect(api.patchAsset).toHaveBeenCalledWith(
+        "snapshot",
+        expect.objectContaining({
+          title: "Edited copy",
+          sourceUrl: content.sourceUrl || undefined,
+        }),
+      ),
+    );
+    await waitFor(() => expect(screen.queryByLabelText(/제목/)).toBeNull());
+    expect(api.updateMedia).not.toHaveBeenCalled();
+  },
+);
