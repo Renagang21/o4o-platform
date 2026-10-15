@@ -116,3 +116,8 @@ BusinessStoreShortcut의 scope 초기화를 layout effect로 옮겨 클릭 전 �
 ### 같은 통합 PR의 CI 후속 — 장바구니 첫 입력 보존
 
 Store 소비처 CI에서 수량 편집 직후 결제가 잠기지 않는 회귀가 발생했다. commit 직후 입력을 합성한 신규 회귀는 수정 전 첫 수량이 1로 돌아가는 실패를 재현했다. 초기 수량 동기화를 layout effect로 완료하고 이벤트 값을 state updater 밖에서 즉시 복사하여 첫 편집을 보존했다. 저장 중 다른 행·결제 잠금과 실패 복구 assertion은 유지했다. 신규/구매 흐름 9개, Store 전체 493개, Store production build 및 변경 파일 lint PASS. 실제 주문·결제·운영 API는 실행하지 않았다. 기존 1433개와 별도로 Store 493개를 검증했다.
+
+
+### 같은 통합 PR의 CI 후속 — 자료 편집 첫 입력 보존
+
+새 CI에서 자료 편집 후 실패 시 제목이 원래 값으로 돌아가는 문제가 재현됐다. 초기값 동기화가 passive effect로 실행되어 commit 직후 편집을 덮는 신규 회귀를 수정 전 실패로 확인했다. 폼 초기화를 layout effect로 옮기고 제목·요약·링크 입력 값을 state updater 밖에서 복사했다. 실패 후 입력 유지와 같은 값 재시도를 검증했다. 공통 운영자 전체 **152 PASS**, 타입 검사·lint, Neture·약국·강의 production build PASS. 기존 실패 assertion·timeout은 완화하지 않았다. 이번 통합의 기존 1433개 중 운영자151개가152개로 늘어 합계1434이며 Store493개는 별도다.

@@ -8,7 +8,7 @@
  * 서비스 분기 없음 — serviceKey 를 참조하지 않는다.
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useLayoutEffect, useState, useRef } from 'react';
 import type React from 'react';
 import { Loader2, X } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -46,7 +46,7 @@ export function ResourcesFormModal({
   const submitting = useRef(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
     setSubmitError(null);
     setValue(initial ? { ...EMPTY, ...initial } : EMPTY);
@@ -101,7 +101,7 @@ export function ResourcesFormModal({
             <input
               type="text"
               value={value.title}
-              onChange={(e) => setValue((v) => ({ ...v, title: e.target.value }))}
+              onChange={(e) => { const next = e.target.value; setValue((v) => ({ ...v, title: next })); }}
               placeholder={`${nouns.entity} 제목`}
               style={inputStyle}
             />
@@ -111,7 +111,7 @@ export function ResourcesFormModal({
                 <label style={labelStyle}>요약</label>
                 <textarea
                   value={value.summary ?? ''}
-                  onChange={(e) => setValue((v) => ({ ...v, summary: e.target.value }))}
+                  onChange={(e) => { const next = e.target.value; setValue((v) => ({ ...v, summary: next })); }}
                   placeholder="목록에 표시할 한 줄 요약"
                   rows={2}
                   style={{ ...inputStyle, resize: 'vertical' as const }}
@@ -140,7 +140,7 @@ export function ResourcesFormModal({
                 <input
                   type="url"
                   value={value.linkUrl ?? ''}
-                  onChange={(e) => setValue((v) => ({ ...v, linkUrl: e.target.value }))}
+                  onChange={(e) => { const next = e.target.value; setValue((v) => ({ ...v, linkUrl: next })); }}
                   placeholder="https://"
                   style={inputStyle}
                 />
@@ -148,7 +148,7 @@ export function ResourcesFormModal({
                 <input
                   type="text"
                   value={value.linkText ?? ''}
-                  onChange={(e) => setValue((v) => ({ ...v, linkText: e.target.value }))}
+                  onChange={(e) => { const next = e.target.value; setValue((v) => ({ ...v, linkText: next })); }}
                   placeholder="예) 원문 보기"
                   style={inputStyle}
                 />
