@@ -14,6 +14,9 @@ export function useTaxonomyDialog(open: boolean, fallback: RefObject<HTMLElement
     }
     const dialog = dialogRef.current;
     const active = document.activeElement;
+    // A pending parent search/reload must not steal a nested modal's active control.
+    const activeDialog = active instanceof Element ? active.closest('dialog[open]') : null;
+    if (activeDialog && activeDialog !== dialog) return;
     if (open && dialog?.open && active instanceof HTMLElement &&
       (!dialog.contains(active) || active.matches(':disabled'))) {
       // Disabling the focused confirmation button must not leave focus on body.

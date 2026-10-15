@@ -145,6 +145,23 @@ describe('taxonomy dialog keyboard lifecycle', () => {
     expect(mocks.merge).not.toHaveBeenCalled();
   });
 
+  it('preserves the focused nested control while a queued parent search reloads', async () => {
+    let finish!: (value: typeof brands) => void;
+    mocks.brands.mockResolvedValueOnce(brands).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    render(<BrandManagementPage />);
+    const trigger = (await screen.findAllByRole('button', { name: '병합' }))[0];
+    fireEvent.change(screen.getByLabelText('브랜드 검색'), { target: { value: '브랜드' } });
+    click(trigger);
+    click(within(screen.getByRole('dialog', { name: '브랜드 병합' })).getByRole('button', { name: /브랜드 B/ }));
+    const confirm = screen.getByRole('dialog', { name: '브랜드 병합 확인' });
+    const activeControl = within(confirm).getByRole('button', { name: '병합' });
+    activeControl.focus();
+    await waitFor(() => expect(mocks.brands).toHaveBeenCalledTimes(2));
+    expect(document.activeElement).toBe(activeControl);
+    await act(async () => finish(brands));
+    expect(document.activeElement).toBe(activeControl);
+  });
+
   it('does not dismiss a pending merge and keeps its failure inside confirmation', async () => {
     let finish!: (value: { success: boolean; error: string }) => void;
     mocks.merge.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
