@@ -33,7 +33,9 @@ export function createCompletionEvidenceSession() {
 
   const noteSeen = (text: string | null | undefined): void => {
     const t = normalizeEvidenceText(String(text ?? ''));
-    if (!t || seenTexts.includes(t)) return;
+    if (!t) return;
+    const previous = seenTexts.indexOf(t);
+    if (previous >= 0) seenTexts.splice(previous, 1);
     seenTexts.push(t);
     if (seenTexts.length > SEEN_TEXT_MAX) seenTexts.shift();
   };

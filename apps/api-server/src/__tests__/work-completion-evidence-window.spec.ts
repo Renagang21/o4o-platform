@@ -29,3 +29,16 @@ test('unique screen text remains capped and eventually evicts the oldest referen
   for (let index = 0; index < SEEN_TEXT_MAX; index++) session.noteSeen(`Unique synthetic label ${index}`);
   expect(grounded(session)).toBe(false);
 });
+
+test('a completion reference observed on every screen remains current as other elements change', () => {
+  const session = createCompletionEvidenceSession();
+  for (let screen = 0; screen < 5; screen++) {
+    session.noteElements([
+      { elementRef: 'completion', role: 'text', name: quote } as WorkElement,
+      ...Array.from({ length: 149 }, (_, index) => ({
+        elementRef: `e_${screen}_${index}`, role: 'text', name: `Screen ${screen} synthetic label ${index}`,
+      } as WorkElement)),
+    ]);
+  }
+  expect(grounded(session)).toBe(true);
+});
