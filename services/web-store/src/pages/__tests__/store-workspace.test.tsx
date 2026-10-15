@@ -10,9 +10,11 @@ import {
 import {
   currentWorkspaceArea,
   workspaceItems,
+  workspaceGroups,
   workspaceSupportItems,
   withWorkspaceMode,
 } from "../../config/storeWorkspace";
+import { StoreWorkspacePage } from "../pharmacy/StoreWorkspacePage";
 import { StoreWorkspaceShell } from "../../components/layouts/StoreWorkspaceShell";
 import {
   StoreWorkflowNavigation,
@@ -28,6 +30,7 @@ vi.mock("../../contexts/StoreContext", () => ({
     effectiveServiceKey: "kpa-society",
     scopedServiceKey: "kpa-society",
     services: [],
+    workServiceKeys: [],
   }),
 }));
 
@@ -147,9 +150,10 @@ it("서비스 지정 메뉴와 직접 진입에서 동일한 상단 4개 메뉴�
   expect(main.querySelectorAll("a")).toHaveLength(4);
   expect(
     screen
-      .getByRole("link", { name: "매장에서 활용" })
+      .getByRole("link", { name: "매장 운영" })
       .getAttribute("aria-current"),
   ).toBe("page");
+  fireEvent.click(screen.getByText("다른 업무 열기"));
   expect(
     screen.getByRole("link", { name: "QR 배치·출력" }).getAttribute("href"),
   ).toBe(`${base}/marketing/qr?workspace=use`);
@@ -174,7 +178,7 @@ it("제작·활용 이동에서 전달 자료·query·hash를 보존한다", () 
       <Location />
     </MemoryRouter>,
   );
-  fireEvent.click(screen.getByRole("link", { name: "매장에서 활용" }));
+  fireEvent.click(screen.getByRole("link", { name: "매장 운영" }));
   const location = JSON.parse(screen.getByTestId("location").textContent!);
   expect(location.pathname).toBe("/work/kpa-society/store/marketing/qr");
   expect(location.search).toBe("?target=sample&workspace=use");
@@ -223,4 +227,44 @@ it("공통 URL에서 서비스 지정 URL로 전환할 때 제작 자료 전달�
   } finally {
     post.mockRestore();
   }
+});
+
+it('업무 그룹은 필터된 기존 기능을 빠짐없이 한 번씩 배치한다', () => {
+  for (const area of ['commerce', 'studio', 'use'] as const) {
+    const grouped = workspaceGroups(config, area).flatMap(group => [...group.primary, ...group.secondary]);
+    expect(grouped.map(item => item.key).sort()).toEqual(workspaceItems(config, area).map(item => item.key).sort());
+    expect(new Set(grouped.map(item => item.key)).size).toBe(grouped.length);
+  }
+  const filtered = { ...config, menuSections: [] };
+  expect(workspaceGroups(filtered, 'studio')).toEqual([]);
+  expect(workspaceGroups(filtered, 'use')).toEqual([]);
+});
+it('목적지 첫 화면에는 중복 하위 메뉴를 펼치지 않고 매장 선택은 해당 홈으로 복귀한다', () => {
+  const base = '/work/kpa-society/store';
+  render(<MemoryRouter initialEntries={[base + '/workspace/studio']}><StoreWorkspaceShell config={{ ...config, basePath: base }}><h1>준비</h1></StoreWorkspaceShell></MemoryRouter>);
+  expect(screen.queryByRole('navigation', { name: '현재 업무 메뉴' })).toBeNull();
+  expect(screen.getByRole('link', { name: '매장 선택' }).getAttribute('href')).toBe('/select-store?returnTo=%2Fwork%2Fkpa-society%2Fstore');
+});
+
+it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고를 내리고 기존 편집기는 세부 진입으로 유지한다: %s', base => {
+  render(<MemoryRouter initialEntries={[base + '/workspace/studio']}><Routes>
+    <Route path={base} element={<StoreWorkspaceShell config={{ ...config, basePath: base }} />}>
+      <Route path="workspace/studio" element={<StoreWorkspacePage area="studio" />} />
+      <Route path="workspace/use" element={<StoreWorkspacePage area="use" />} />
+    </Route>
+  </Routes></MemoryRouter>);
+  expect(screen.getByRole('link', { name: '상품에서 시작' }).getAttribute('href')).toBe(base + '/my-products');
+  expect(screen.getByRole('link', { name: '블로그' }).closest('details')?.open).toBe(false);
+  fireEvent.click(screen.getByText('편집기·제작 도구'));
+  expect(screen.getByRole('link', { name: '블로그' }).getAttribute('href')).toBe(base + '/content/blog');
+  fireEvent.click(screen.getByRole('link', { name: '매장 운영' }));
+  expect(screen.queryByText('준비 중')).toBeNull();
+  expect(screen.getByRole('link', { name: 'QR 배치·출력' }).getAttribute('href')).toBe(base + '/marketing/qr?workspace=use');
+});
+it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다시 노출하지 않는다', () => {
+  const filtered = { ...config, menuSections: [] };
+  render(<MemoryRouter initialEntries={['/store/workspace/studio']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={filtered} />}><Route path="workspace/studio" element={<StoreWorkspacePage area="studio" />} /></Route></Routes></MemoryRouter>);
+  expect(screen.queryByRole('link', { name: '상품에서 시작' })).toBeNull();
+  expect(screen.queryByRole('link', { name: '자료에서 시작' })).toBeNull();
+  expect(screen.getByRole('status').textContent).toContain('현재 이용할 수 있는 업무가 없습니다');
 });

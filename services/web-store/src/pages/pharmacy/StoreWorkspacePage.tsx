@@ -2,22 +2,23 @@ import { Link, useOutletContext } from "react-router-dom";
 import type { StoreWorkspaceOutlet } from "../../components/layouts/StoreWorkspaceShell";
 import {
   STORE_WORKSPACE_AREAS,
-  workspaceItems,
+  workspaceGroups,
   type StoreWorkspaceArea,
 } from "../../config/storeWorkspace";
 import { useUnifiedStore } from "../../contexts/StoreContext";
 import { SERVICE_WORK_CONFIGS } from "../../config/storeMenu";
 import { isUnifiedServiceKey } from "../../lib/serviceContext";
 
+const linkStyle =
+  "inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 hover:border-teal-600 hover:bg-teal-50";
+
 export function StoreWorkspacePage({
   area,
-}: {
-  area: Exclude<StoreWorkspaceArea, "home">;
-}) {
+}: Readonly<{ area: Exclude<StoreWorkspaceArea, "home"> }>) {
   const { config } = useOutletContext<StoreWorkspaceOutlet>();
   const { workServiceKeys } = useUnifiedStore();
   const meta = STORE_WORKSPACE_AREAS.find((item) => item.key === area)!;
-  const items = workspaceItems(config, area);
+  const groups = workspaceGroups(config, area);
   return (
     <div className="space-y-6">
       <header>
@@ -25,67 +26,134 @@ export function StoreWorkspacePage({
         <p className="mt-2 text-sm text-slate-600">{meta.description}</p>
       </header>
       {area === "studio" && (
-        <p className="rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm text-teal-900">
-          자료 선택 → 제작·미리보기 → 저장 → 매장에서 활용. 가져온 자료는 내
-          매장의 독립 사본이며 원본 변경이 자동 반영되지 않습니다.
-        </p>
-      )}
-      {area === "use" && (
-        <p className="rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm text-teal-900">
-          저장된 자료를 골라 사용 위치에 적용하세요. 제작·게시 상태와 실제
-          배치·기기 재생 상태는 다릅니다. 게시 상태를 확인한 뒤 QR 출력이나 기기 적용 결과를 각각 확인하세요.
-        </p>
-      )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (
-          <Link
-            key={item.key}
-            to={`${config.basePath}${item.subPath}`}
-            className="rounded-xl border border-slate-200 bg-white p-5 hover:border-teal-600 hover:bg-teal-50"
+        <section
+          className="rounded-xl border border-teal-200 bg-teal-50 p-5"
+          aria-label="새 안내 준비"
+        >
+          <h2 className="font-semibold text-teal-950">새 안내 준비</h2>
+          <p className="mt-2 text-sm text-teal-900">
+            사용할 상품이나 자료를 먼저 고르세요. 필요한 안내를 하나씩 준비하고
+            저장한 뒤 매장에 적용합니다.
+          </p>
+          <nav
+            className="mt-4 flex flex-wrap gap-3"
+            aria-label="안내 준비 시작"
           >
-            <h2 className="font-semibold text-slate-800">{item.label}</h2>
-            <span className="mt-3 block text-sm text-teal-700">열기 →</span>
-          </Link>
+            {config.menuSections?.some((section) =>
+              section.items.some((item) => item.key === "my-products"),
+            ) && (
+              <Link className={linkStyle} to={`${config.basePath}/my-products`}>
+                상품에서 시작
+              </Link>
+            )}
+            {groups.some((group) =>
+              group.primary.some((item) => item.key === "library-contents"),
+            ) && (
+              <Link
+                className={linkStyle}
+                to={`${config.basePath}/library/contents`}
+              >
+                자료에서 시작
+              </Link>
+            )}
+          </nav>
+        </section>
+      )}
+      <div className="grid gap-4 md:grid-cols-2">
+        {groups.map((group) => (
+          <section
+            key={group.key}
+            id={group.key}
+            aria-label={group.title}
+            className="min-w-0 rounded-xl border border-slate-200 bg-white p-5"
+          >
+            <h2 className="font-semibold text-slate-900">{group.title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              {group.description}
+            </p>
+            {group.primary.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {group.primary.map((item) => (
+                  <Link
+                    key={item.key}
+                    className={linkStyle}
+                    to={`${config.basePath}${item.subPath}`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+            {group.secondary.length > 0 && (
+              <details className="mt-4 rounded-lg border border-slate-100 bg-slate-50 p-3">
+                <summary className="min-h-11 cursor-pointer content-center text-sm font-medium text-slate-700">
+                  {group.key === "editors" ? "편집기·제작 도구" : "세부 업무"}
+                </summary>
+                <nav
+                  className="mt-3 flex flex-wrap gap-2"
+                  aria-label={`${group.title} 세부 업무`}
+                >
+                  {group.secondary.map((item) => (
+                    <Link
+                      key={item.key}
+                      className={linkStyle}
+                      to={`${config.basePath}${item.subPath}`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </details>
+            )}
+          </section>
         ))}
       </div>
+      {groups.length === 0 && (
+        <p
+          role="status"
+          className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-600"
+        >
+          현재 이용할 수 있는 업무가 없습니다.
+        </p>
+      )}
       {area === "commerce" &&
         workServiceKeys.filter(isUnifiedServiceKey).map((key) => (
-          <section
+          <details
             key={key}
             className="rounded-xl border border-slate-200 bg-white p-5"
           >
-            <h2 className="mb-3 font-semibold">사업별 거래·외부 판매채널</h2>
-            <div className="flex flex-wrap gap-3">
+            <summary className="min-h-11 cursor-pointer content-center font-semibold">
+              {SERVICE_WORK_CONFIGS[key].serviceName} 거래·외부 판매채널
+            </summary>
+            <nav
+              className="mt-4 flex flex-wrap gap-3"
+              aria-label={`${SERVICE_WORK_CONFIGS[key].serviceName} 거래 업무`}
+            >
               {SERVICE_WORK_CONFIGS[key].menuSections
                 ?.flatMap((section) => section.items)
                 .filter((item) => item.key !== "online-sales-orders")
                 .map((item) => (
                   <Link
                     key={item.key}
-                    className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm hover:border-teal-600"
+                    className={linkStyle}
                     to={`${SERVICE_WORK_CONFIGS[key].basePath}${item.subPath}`}
                   >
                     {item.label}
                   </Link>
                 ))}
-            </div>
-          </section>
+            </nav>
+          </details>
         ))}
-      {area === "use" && (
-        <section className="rounded-xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold">한국어·다국어 상담</h2>
-          <p className="mt-2 text-sm text-slate-500">
-            직원 보조 상담과 소비자 직접 상담은 이후 도입할 기능입니다. 현재
-            상담 요청은 위 메뉴에서 확인할 수 있습니다.
-          </p>
-          <span className="mt-3 inline-block rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-500">
-            준비 중
-          </span>
-        </section>
-      )}
       {area === "studio" && (
         <p className="text-sm text-slate-500">
-          제작 화면에서 직접 작성하거나 초안을 붙여넣고 검토한 뒤 저장하세요. 저장만으로 게시·배치가 완료되지는 않습니다.
+          저장은 고객 공개·기기 적용과 다릅니다. 가져온 사본은 원본이 바뀌어도
+          자동으로 업데이트되지 않습니다.
+        </p>
+      )}
+      {area === "use" && (
+        <p className="text-sm text-slate-500">
+          게시됨은 기기 연결·재생 완료를 뜻하지 않습니다. 내용을 바꾸려면 해당
+          안내의 편집 화면에서 수정하세요.
         </p>
       )}
     </div>
