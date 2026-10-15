@@ -9,7 +9,7 @@
  * 게시글 삭제 기능은 포함하지 않음(카테고리 삭제와 구분).
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import {
   Search,
@@ -25,8 +25,8 @@ import {
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { RowActionMenu, ActionBar, BulkResultModal, BaseDetailDrawer } from '@o4o/ui';
-import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { BatchResult, BatchResultItem, ListColumnDef } from '@o4o/operator-ux-core';
 import type {
   ForumCategoryData as CategoryData,
   ForumCategoryDeleteCheck as DeleteCheckData,
@@ -84,7 +84,14 @@ export function OperatorForumCategoriesPage({
 
   const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
 
-  const batch = useBatchAction();
+  const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
+  const [showBatchResult, setShowBatchResult] = useState(false);
+  const [writing, setWriting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const retryBatch = useRef<null | (() => Promise<BatchResult>)>(null);
+  const checkSequence = useRef(0);
 
   const [selectedCategory, setSelectedCategory] = useState<CategoryData | null>(null);
 
@@ -99,102 +106,139 @@ export function OperatorForumCategoriesPage({
   const [tagEditInput, setTagEditInput] = useState('');
   const [isTagSaving, setIsTagSaving] = useState(false);
 
-  useEffect(() => {
-    loadCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadCategories = async () => {
-    setIsCatsLoading(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const read = useRef({ mounted: false, sequence: 0, writing: false, ready: false });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, sequence: 0, writing: false, ready: false };
+    read.current = scope;
+    checkSequence.current++; retryBatch.current = null;
+    setWriting(false); setIsDeactivating(false); setIsHardDeleting(false); setIsTagSaving(false); setIsCheckLoading(false);
+    setBatchResult(null); setShowBatchResult(false); setActionError(null); setNotice(null); setRefreshFailed(false);
+    setCategories([]); setSelectedCatIds(new Set()); setSelectedCategory(null);
+    setDeactivateTarget(null); setHardDeleteTarget(null); setTagEditTarget(null);
+    return () => { scope.mounted = false; scope.sequence++; };
+  }, [client, tableId]);
+  const loadCategories = useCallback(async () => {
+    const scope = read.current;
+    const sequence = ++scope.sequence;
+    const current = () => scope.mounted && sequence === scope.sequence;
+    scope.ready = false; setIsCatsLoading(true); setLoadError(null);
     try {
       const result = await client.getCategories();
-      setCategories(result.data || []);
-    } catch {
-      setCategories([]);
+      if (result?.success === false || !Array.isArray(result?.data)) throw new Error(result?.error || '포럼 목록 응답이 올바르지 않습니다.');
+      if (!current()) return false;
+      scope.ready = true; setCategories(result.data); setSelectedCatIds(new Set()); setRefreshFailed(false);
+      return true;
+    } catch (e) {
+      const err = e as { response?: { data?: { error?: string } }; message?: string };
+      if (current()) setLoadError(err?.response?.data?.error || err?.message || '포럼 목록을 불러오지 못했습니다.');
+      return false;
+    } finally { if (current()) setIsCatsLoading(false); }
+  }, [client]);
+  useEffect(() => { void loadCategories(); }, [loadCategories, tableId]);
+
+  const runWrite = async (work: () => Promise<void>, refresh = true) => {
+    const scope = read.current;
+    if (!scope.mounted || !scope.ready || scope.writing || isCatsLoading || loadError) return false;
+    scope.writing = true; setWriting(true); setActionError(null); setNotice(null);
+    try {
+      await work();
+      if (scope.mounted && refresh) {
+        const ok = await loadCategories();
+        if (scope.mounted) setRefreshFailed(!ok);
+      }
+      return true;
+    } catch (err: any) {
+      const reasons = err?.response?.data?.data?.blockedReasons;
+      if (scope.mounted) setActionError(reasons ? `삭제 불가: ${reasons.join(', ')}` : err?.response?.data?.error || err?.message || '처리에 실패했습니다.');
+      return false;
     } finally {
-      setIsCatsLoading(false);
+      scope.writing = false;
+      if (scope.mounted) { setWriting(false); setIsDeactivating(false); setIsHardDeleting(false); setIsTagSaving(false); }
     }
+  };
+  const executeBatch = async (apiFn: (ids: string[]) => Promise<{ data: { results: BatchResultItem[] } }>, ids: string[]): Promise<BatchResult> => {
+    const scope = read.current;
+    const empty: BatchResult = { results: [], successCount: 0, failedCount: 0, skippedCount: 0 };
+    let result = empty;
+    await runWrite(async () => {
+      let items: BatchResultItem[];
+      try { items = (await apiFn(ids)).data.results; }
+      catch (err: any) { items = ids.map(id => ({ id, status: 'failed', error: err?.message || '처리 실패' })); }
+      if (!scope.mounted) return;
+      result = { results: items, successCount: items.filter(r => r.status === 'success').length, failedCount: items.filter(r => r.status === 'failed').length, skippedCount: items.filter(r => r.status === 'skipped').length };
+      setBatchResult(result); setShowBatchResult(true);
+      const failedIds = items.filter(r => r.status === 'failed').map(r => r.id);
+      retryBatch.current = failedIds.length ? async () => scope.mounted && read.current === scope ? executeBatch(apiFn, failedIds) : empty : null;
+      setNotice(`${result.successCount}건 완료 · ${result.failedCount}건 실패 · ${result.skippedCount}건 제외`);
+      if (result.successCount > 0) {
+        const ok = await loadCategories();
+        if (scope.mounted) setRefreshFailed(!ok);
+      }
+    }, false);
+    return result;
+  };
+  const batch = {
+    loading: writing, result: batchResult, showResult: showBatchResult, executeBatch,
+    clearResult: () => { if (!read.current.writing) { setShowBatchResult(false); setBatchResult(null); retryBatch.current = null; } },
+    retryFailed: async () => { if (!read.current.writing) await retryBatch.current?.(); },
   };
 
   const handleDirectDeactivate = async () => {
     if (!deactivateTarget || !deactivateReason.trim() || !nameConfirmOk) return;
-    setIsDeactivating(true);
-    try {
-      const result = await client.directDeactivate(deactivateTarget.id, {
-        reason: deactivateReason.trim(),
-      });
-      if (result.success) {
-        toast.success(`'${deactivateTarget.name}' 포럼이 비활성화되었습니다`);
-        setDeactivateTarget(null);
-        setDeactivateReason('');
-        setDeactivateNameConfirm('');
-        loadCategories();
-      } else {
-        toast.error(result.error || '비활성화 실패');
-      }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || '오류가 발생했습니다');
-    } finally {
-      setIsDeactivating(false);
-    }
+    const scope = read.current; const target = deactivateTarget; const reason = deactivateReason.trim();
+    await runWrite(async () => {
+      setIsDeactivating(true);
+      const result = await client.directDeactivate(target.id, { reason });
+      if (!result.success) throw new Error(result.error || '비활성화 실패');
+      if (!scope.mounted) return;
+      setNotice(`'${target.name}' 포럼이 비활성화되었습니다`);
+      setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); setSelectedCategory(null);
+    });
   };
-
   const handleActivate = async (cat: CategoryData) => {
+    if (read.current.writing || isCatsLoading || loadError) return;
     if (!confirm(`'${cat.name}' 포럼을 활성화하시겠습니까?\n활성화하면 사용자에게 다시 노출됩니다.`)) return;
-    try {
+    const scope = read.current;
+    await runWrite(async () => {
       const result = await client.activate(cat.id);
-      if (result.success) {
-        toast.success(`'${cat.name}' 포럼이 활성화되었습니다`);
-        loadCategories();
-      } else {
-        toast.error(result.error || '활성화 실패');
-      }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || '오류가 발생했습니다');
-    }
+      if (!result.success) throw new Error(result.error || '활성화 실패');
+      if (scope.mounted) { setNotice(`'${cat.name}' 포럼이 활성화되었습니다`); setSelectedCategory(null); }
+    });
   };
-
+  const closeHardDelete = () => {
+    if (read.current.writing) return;
+    checkSequence.current++; setHardDeleteTarget(null); setHardDeleteCheck(null); setHardDeleteReason(''); setIsCheckLoading(false);
+  };
   const openHardDeleteModal = async (cat: CategoryData) => {
-    setHardDeleteTarget(cat);
-    setHardDeleteCheck(null);
-    setHardDeleteReason('');
-    setIsCheckLoading(true);
+    if (disableHardDelete || read.current.writing || isCatsLoading || loadError) return;
+    const scope = read.current; const sequence = ++checkSequence.current;
+    const current = () => scope.mounted && sequence === checkSequence.current;
+    setHardDeleteTarget(cat); setHardDeleteCheck(null); setHardDeleteReason(''); setActionError(null); setIsCheckLoading(true);
     try {
       const result = await client.getDeleteCheck(cat.id);
-      setHardDeleteCheck(result.data);
+      if (!result?.data || result.success === false) throw new Error('삭제 가능 여부를 확인할 수 없습니다');
+      if (current()) setHardDeleteCheck(result.data);
     } catch {
-      toast.error('삭제 가능 여부를 확인할 수 없습니다');
-      setHardDeleteTarget(null);
-    } finally {
-      setIsCheckLoading(false);
-    }
+      if (current()) setActionError('삭제 가능 여부를 확인할 수 없습니다. 닫은 뒤 다시 시도하세요.');
+    } finally { if (current()) setIsCheckLoading(false); }
   };
-
   const handleHardDelete = async () => {
-    if (!hardDeleteTarget || !hardDeleteReason.trim()) return;
-    setIsHardDeleting(true);
-    try {
-      const result = await client.hardDelete(hardDeleteTarget.id, { reason: hardDeleteReason.trim() });
-      if (result.success) {
-        toast.success(`'${hardDeleteTarget.name}' 포럼이 영구 삭제되었습니다`);
-        setHardDeleteTarget(null);
-        setHardDeleteCheck(null);
-        setHardDeleteReason('');
-        loadCategories();
-      } else {
-        toast.error(result.error || '영구 삭제 실패');
-      }
-    } catch (err: any) {
-      const msg = err?.response?.data?.error || '오류가 발생했습니다';
-      const reasons = err?.response?.data?.data?.blockedReasons;
-      toast.error(reasons ? `삭제 불가: ${reasons.join(', ')}` : msg);
-    } finally {
-      setIsHardDeleting(false);
-    }
+    if (disableHardDelete || !hardDeleteTarget || !hardDeleteReason.trim() || isCheckLoading || !hardDeleteCheck?.hardDeleteAllowed) return;
+    const scope = read.current; const target = hardDeleteTarget; const reason = hardDeleteReason.trim();
+    await runWrite(async () => {
+      setIsHardDeleting(true);
+      const result = await client.hardDelete(target.id, { reason });
+      if (!result.success) throw new Error(result.error || '영구 삭제 실패');
+      if (!scope.mounted) return;
+      setNotice(`'${target.name}' 포럼이 영구 삭제되었습니다`);
+      setHardDeleteTarget(null); setHardDeleteCheck(null); setHardDeleteReason(''); setSelectedCategory(null);
+    });
   };
 
   const openTagEditModal = (cat: CategoryData) => {
-    setTagEditTarget(cat);
+    if (read.current.writing || isCatsLoading || loadError) return;
+    setActionError(null); setTagEditTarget(cat);
     setTagEditTags([...(cat.tags || [])]);
     setTagEditInput('');
   };
@@ -212,21 +256,13 @@ export function OperatorForumCategoriesPage({
 
   const handleTagEditSave = async () => {
     if (!tagEditTarget) return;
-    setIsTagSaving(true);
-    try {
-      const result = await client.updateCategory(tagEditTarget.id, { tags: tagEditTags });
-      if (result.success) {
-        toast.success(`'${tagEditTarget.name}' 태그가 수정되었습니다`);
-        setTagEditTarget(null);
-        loadCategories();
-      } else {
-        toast.error(result.error || '태그 수정 실패');
-      }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || '태그 수정 중 오류가 발생했습니다');
-    } finally {
-      setIsTagSaving(false);
-    }
+    const scope = read.current; const target = tagEditTarget; const tags = [...tagEditTags];
+    await runWrite(async () => {
+      setIsTagSaving(true);
+      const result = await client.updateCategory(target.id, { tags });
+      if (!result.success) throw new Error(result.error || '태그 수정 실패');
+      if (scope.mounted) { setNotice(`'${target.name}' 태그가 수정되었습니다`); setTagEditTarget(null); setSelectedCategory(null); }
+    });
   };
 
   const filteredCategories = useMemo(() => categories.filter((c) => {
@@ -251,7 +287,7 @@ export function OperatorForumCategoriesPage({
     const reasonText = reason.trim();
     const targetIds = targets.map((t) => t.id);
 
-    const result = await batch.executeBatch(async (ids) => {
+    await batch.executeBatch(async (ids) => {
       const settled = await Promise.allSettled(
         ids.map((id) => client.directDeactivate(id, { reason: reasonText })),
       );
@@ -271,8 +307,6 @@ export function OperatorForumCategoriesPage({
         },
       };
     }, targetIds);
-
-    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
   const handleBulkActivate = async () => {
@@ -283,7 +317,7 @@ export function OperatorForumCategoriesPage({
     }
     const targetIds = targets.map((t) => t.id);
 
-    const result = await batch.executeBatch(async (ids) => {
+    await batch.executeBatch(async (ids) => {
       const settled = await Promise.allSettled(
         ids.map((id) => client.activate(id)),
       );
@@ -303,11 +337,11 @@ export function OperatorForumCategoriesPage({
         },
       };
     }, targetIds);
-
-    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
   const handleBulkHardDelete = async () => {
+    if (disableHardDelete) return;
+    const batchScope = read.current;
     const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive);
     if (targets.length === 0) {
       toast.error('완전 삭제할 수 있는 비활성 포럼이 없습니다');
@@ -319,11 +353,13 @@ export function OperatorForumCategoriesPage({
     const reasonText = reason.trim();
     const targetIds = targets.map((t) => t.id);
 
-    const result = await batch.executeBatch(async (ids) => {
+    await batch.executeBatch(async (ids) => {
       const results: Array<{ id: string; status: 'success' | 'failed' | 'skipped'; error?: string }> = [];
       for (const id of ids) {
+        if (!batchScope.mounted) { results.push({ id, status: 'skipped', error: '대상 범위 변경' }); continue; }
         try {
           const check = await client.getDeleteCheck(id);
+          if (!batchScope.mounted) { results.push({ id, status: 'skipped', error: '대상 범위 변경' }); continue; }
           if (!check.data?.hardDeleteAllowed) {
             results.push({
               id,
@@ -344,8 +380,6 @@ export function OperatorForumCategoriesPage({
       }
       return { data: { results } };
     }, targetIds);
-
-    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
   const selectedActiveCount = useMemo(() =>
@@ -418,10 +452,11 @@ export function OperatorForumCategoriesPage({
       onCellClick: () => {},
       render: (_v, row) => (
         <RowActionMenu
+          disabled={writing || isCatsLoading || !!loadError}
           actions={buildRowActions(forumCategoryPolicy, row, {
             editTags: () => openTagEditModal(row),
             activate: () => handleActivate(row),
-            deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); setDeactivateNameConfirm(''); },
+            deactivate: () => { if (read.current.writing || isCatsLoading || loadError) return; setActionError(null); setDeactivateTarget(row); setDeactivateReason(''); setDeactivateNameConfirm(''); },
             hardDelete: () => openHardDeleteModal(row),
           }, {
             icons: CATEGORY_ACTION_ICONS,
@@ -437,12 +472,14 @@ export function OperatorForumCategoriesPage({
         open={batch.showResult}
         onClose={() => {
           batch.clearResult();
-          loadCategories();
         }}
         result={batch.result}
-        onRetry={() => batch.retryFailed()}
+        onRetry={refreshFailed ? undefined : () => batch.retryFailed()}
       />
 
+      {notice && <p role="status" className="rounded bg-green-50 p-3 text-sm text-green-800">{notice}</p>}
+      {refreshFailed && <p className="text-amber-800">처리는 완료됐지만 목록 갱신에 실패했습니다. 목록만 다시 조회해 주세요.</p>}
+      {actionError && <p role="alert" className="text-red-700">{actionError}</p>}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -456,6 +493,7 @@ export function OperatorForumCategoriesPage({
         </div>
       </div>
 
+      <fieldset disabled={writing || isCatsLoading || !!loadError} className="min-w-0 border-0 p-0 m-0 space-y-6">
       {/* 검색 + 상태 필터 */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -482,8 +520,15 @@ export function OperatorForumCategoriesPage({
         </div>
       </div>
 
+      </fieldset>
+      {loadError && <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p>포럼 목록을 불러오지 못했습니다. {loadError}</p>
+        <p>표가 남아 있으면 마지막 조회 결과입니다. 다시 조회한 뒤 처리해 주세요.</p>
+        <button type="button" disabled={writing || isCatsLoading} onClick={() => { if (!read.current.writing) void loadCategories(); }} className="mt-2 min-h-11 rounded border px-3">포럼 목록 다시 조회</button>
+      </div>}
+      <fieldset disabled={writing || isCatsLoading || !!loadError} className="min-w-0 border-0 p-0 m-0 space-y-6">
       {/* canonical ActionBar */}
-      <ActionBar
+      {!loadError && !isCatsLoading && <ActionBar
         selectedCount={selectedCatIds.size}
         onClearSelection={() => setSelectedCatIds(new Set())}
         actions={[
@@ -516,10 +561,10 @@ export function OperatorForumCategoriesPage({
             group: 'danger',
           },
         ]}
-      />
+      />}
 
       {/* DataTable (selectable) */}
-      <DataTable<CategoryData>
+      {(!loadError || categories.length > 0) && <DataTable<CategoryData>
         columns={categoryColumns}
         data={filteredCategories}
         rowKey="id"
@@ -528,23 +573,24 @@ export function OperatorForumCategoriesPage({
         tableId={tableId}
         selectable
         selectedKeys={selectedCatIds}
-        onSelectionChange={setSelectedCatIds}
-        onRowClick={(row) => setSelectedCategory(row)}
-      />
+        onSelectionChange={(keys) => { if (!read.current.writing && !loadError && !isCatsLoading) setSelectedCatIds(keys); }}
+        onRowClick={(row) => { if (!read.current.writing && !loadError && !isCatsLoading) setSelectedCategory(row); }}
+      />}
 
       {/* 목록 하단 요약 */}
-      <div className="flex items-center justify-between text-sm text-slate-500">
+      {!loadError && <div className="flex items-center justify-between text-sm text-slate-500">
         <span>총 {filteredCategories.length}개 포럼</span>
         <span>
           활성 {categories.filter((c) => c.isActive).length} /
           비활성 {categories.filter((c) => !c.isActive).length}
         </span>
-      </div>
+      </div>}
 
+      </fieldset>
       {/* 포럼 카테고리 상세 Drawer */}
       <BaseDetailDrawer
         open={!!selectedCategory}
-        onClose={() => setSelectedCategory(null)}
+        onClose={() => { if (!read.current.writing) setSelectedCategory(null); }}
         title={selectedCategory?.name ?? ''}
         width={480}
       >
@@ -595,7 +641,7 @@ export function OperatorForumCategoriesPage({
       {/* ── 비활성화 확인 모달 ── */}
       {deactivateTarget && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); }} />
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); } }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
@@ -604,6 +650,8 @@ export function OperatorForumCategoriesPage({
               <h2 className="text-lg font-semibold text-slate-800">포럼 비활성화</h2>
             </div>
             <div className="p-6 space-y-4">
+              {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
+              <fieldset disabled={writing} className="min-w-0 border-0 p-0 m-0 space-y-4">
               <div className="p-3 bg-slate-50 rounded-lg">
                 <p className="font-medium text-slate-800">{deactivateTarget.name}</p>
                 {deactivateTarget.creatorName && (
@@ -650,17 +698,18 @@ export function OperatorForumCategoriesPage({
                   />
                 </div>
               )}
+              </fieldset>
             </div>
             <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
               <button
-                onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); }}
+                onClick={() => { if (!read.current.writing) { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); } }}
                 className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={handleDirectDeactivate}
-                disabled={!deactivateReason.trim() || !nameConfirmOk || isDeactivating}
+                disabled={!deactivateReason.trim() || !nameConfirmOk || writing || isCatsLoading || !!loadError}
                 className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
               >
                 {isDeactivating ? (
@@ -677,13 +726,15 @@ export function OperatorForumCategoriesPage({
       {/* ── 태그 수정 모달 ── */}
       {tagEditTarget && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setTagEditTarget(null)} />
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) setTagEditTarget(null); }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200">
               <h2 className="text-lg font-semibold text-slate-800">태그 수정</h2>
               <p className="text-sm text-slate-500 mt-0.5">{tagEditTarget.name}</p>
             </div>
             <div className="p-6 space-y-4">
+              {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
+              <fieldset disabled={writing} className="min-w-0 border-0 p-0 m-0 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">태그</label>
                 <div className="flex flex-wrap gap-2 items-center px-3 py-2 rounded-lg border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent bg-white min-h-[44px]">
@@ -719,17 +770,18 @@ export function OperatorForumCategoriesPage({
                 </div>
                 <p className="text-xs text-slate-400 mt-1.5">Enter 또는 쉼표로 태그를 추가합니다. 30자 이내.</p>
               </div>
+              </fieldset>
             </div>
             <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
               <button
-                onClick={() => setTagEditTarget(null)}
+                onClick={() => { if (!read.current.writing) setTagEditTarget(null); }}
                 className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={handleTagEditSave}
-                disabled={isTagSaving}
+                disabled={writing || isCatsLoading || !!loadError}
                 className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
               >
                 {isTagSaving ? (
@@ -747,7 +799,7 @@ export function OperatorForumCategoriesPage({
       {/* ── Hard Delete 모달 (안전 가드 보존) ── */}
       {hardDeleteTarget && (
         <>
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => { setHardDeleteTarget(null); setHardDeleteCheck(null); }} />
+          <div className="fixed inset-0 bg-black/60 z-40" onClick={closeHardDelete} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-rose-200 bg-rose-50 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
@@ -760,6 +812,8 @@ export function OperatorForumCategoriesPage({
             </div>
 
             <div className="p-6 space-y-4">
+              {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
+              <fieldset disabled={writing} className="min-w-0 border-0 p-0 m-0 space-y-4">
               <div className="p-3 bg-slate-50 rounded-lg">
                 <p className="font-medium text-slate-800">{hardDeleteTarget.name}</p>
                 {hardDeleteTarget.creatorName && (
@@ -834,11 +888,12 @@ export function OperatorForumCategoriesPage({
                   )}
                 </>
               )}
+              </fieldset>
             </div>
 
             <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
               <button
-                onClick={() => { setHardDeleteTarget(null); setHardDeleteCheck(null); setHardDeleteReason(''); }}
+                onClick={closeHardDelete}
                 className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 취소
@@ -846,7 +901,7 @@ export function OperatorForumCategoriesPage({
               {hardDeleteCheck?.hardDeleteAllowed && (
                 <button
                   onClick={handleHardDelete}
-                  disabled={!hardDeleteReason.trim() || isHardDeleting}
+                  disabled={!hardDeleteReason.trim() || writing || isCheckLoading || isCatsLoading || !!loadError}
                   className="px-6 py-2 text-white bg-rose-600 rounded-lg hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   {isHardDeleting ? (
