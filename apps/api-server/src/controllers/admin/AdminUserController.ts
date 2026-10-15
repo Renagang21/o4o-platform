@@ -200,7 +200,7 @@ export class AdminUserController {
       // WO-OPERATOR-FIX-V1: role filter via role_assignments
       if (role && role !== 'all') {
         queryBuilder.andWhere(
-          `EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.valid_from <= CURRENT_TIMESTAMP AND (ra.valid_until IS NULL OR ra.valid_until >= CURRENT_TIMESTAMP) AND ra.role = :filterRole)`,
+          `EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND (ra.valid_from IS NULL OR ra.valid_from <= CURRENT_TIMESTAMP) AND (ra.valid_until IS NULL OR ra.valid_until >= CURRENT_TIMESTAMP) AND ra.role = :filterRole)`,
           { filterRole: role }
         );
       }
@@ -230,7 +230,7 @@ export class AdminUserController {
           `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles
            FROM role_assignments
            WHERE user_id = ANY($1) AND is_active = true
-             AND valid_from <= CURRENT_TIMESTAMP
+             AND (valid_from IS NULL OR valid_from <= CURRENT_TIMESTAMP)
              AND (valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)
            GROUP BY user_id`,
           [userIds]

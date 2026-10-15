@@ -88,7 +88,7 @@ CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운�
 ## Core 조회 최소 수정 — 2026-10-15 사용자 승인·구현
 
 `AdminUserController.getUsers`에서 이미 쓰는 두 조회의 `is_active=true` 조건 다음에
-`valid_from <= CURRENT_TIMESTAMP`와 `(valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)`를
+`(valid_from IS NULL OR valid_from <= CURRENT_TIMESTAMP)`와 `(valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)`를
 추가해 현재 RoleAssignment의 유효기간 계약과 맞춘다. role 부여/회수/쓰기·반환 필드·권한 계층을 바꾸지 않는다.
 두 조회의 최소 정합 수정을 사용자가 승인해 적용했다. 진단에 쓴 PostgreSQL은 자기 세션의
 Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 테이블, 조회 이후 ROLLBACK이다.
@@ -133,5 +133,9 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
   compiled database 코드 2352파일은 bundling 전후 보존했다(운영 DB backup/migration이 아님).
   새 CLI·collector·테스트 lint 오류/경고 0이며 Controller는 기존 UserStatus 미사용 warning 1개를
   그대로 유지한다. 승인된 두 조회 범위를 넓혀 import를 정리하지 않았다.
+- 최신 리뷰 P2의 NULL 시작 시각 경계를 수용했다. `isValidNow()`가 nullable 시작을 현재 권한으로
+  인정하므로 두 Controller 조회와 census의 현재 역할/전체 관리자 집계도 NULL을 허용하도록 맞췄다.
+  실제 PostgreSQL fixture에 NULL 시작 서비스 운영자·전체 관리자와 필터/목록 비교를 추가해 2/2 PASS,
+  collector/gate 포함 11/11 PASS다. NOT NULL migration이나 기존 역할 데이터 변경은 수행하지 않는다.
 
 문서 정합: 과거 운영자 연결 기록은 당시 기록으로 유지한다. 현재 지정 결과는 새 실제 조회 근거로 판정한다.

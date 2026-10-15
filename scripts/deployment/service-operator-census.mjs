@@ -14,7 +14,7 @@ export async function collectOperatorCensus(client, identityFingerprint, catalog
     SELECT id,status,"isActive" FROM users
     WHERE encode(sha256(convert_to(lower(btrim(email)), 'UTF8')), 'hex')=$1
   )`;
-  const current = `(ra.is_active AND ra.valid_from<=CURRENT_TIMESTAMP AND
+  const current = `(ra.is_active AND (ra.valid_from IS NULL OR ra.valid_from<=CURRENT_TIMESTAMP) AND
     (ra.valid_until IS NULL OR ra.valid_until>=CURRENT_TIMESTAMP))`;
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   let census, failure;

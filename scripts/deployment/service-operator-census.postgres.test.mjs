@@ -30,6 +30,8 @@ async function fixture(run) {
       ($1,'community:operator',true,NOW()+interval '1 day',null),
       ($1,'neture:admin',false,NOW()-interval '1 day',null),
       ($1,'lecture:operator',true,NOW()-interval '1 day',NOW()+interval '1 day'),
+      ($1,'neture:operator',true,NULL,NULL),
+      ($2,'platform:super_admin',true,NULL,NULL),
       ($2,'supplier:operator',true,NOW()-interval '1 day',null)`,[target,other]);
     await db.query(`INSERT INTO linked_accounts VALUES ($1,'google','synthetic-provider-id')`,[target]);
     await db.query(`INSERT INTO service_memberships VALUES ($1,'supplier','active'),($1,'funding','suspended')`,[target]);
@@ -40,12 +42,13 @@ async function fixture(run) {
 test('actual PostgreSQL census separates the target, other current operators, expiry, future, revoked and membership state',options,async()=>{
   await fixture(async db=>{
     const digest=createHash('sha256').update('operator@example.test').digest('hex');
-    const report=await collectOperatorCensus(db,digest,['supplier:operator','funding:operator','community:operator','neture:admin','lecture:operator'],['supplier','funding']);
+    const report=await collectOperatorCensus(db,digest,['supplier:operator','funding:operator','community:operator','neture:admin','neture:operator','lecture:operator'],['supplier','funding']);
     assert.deepEqual(report.account,{matched_accounts:1,active_accounts:1,google_links:1,platform_admin_assignments:0});
     const byRole=Object.fromEntries(report.roles.map(row=>[row.role,row]));
     assert.equal(byRole['supplier:operator'].target_current,1);
     assert.equal(byRole['supplier:operator'].other_current_accounts,1);
     assert.equal(byRole['lecture:operator'].target_current,1);
+    assert.equal(byRole['neture:operator'].target_current,1);
     assert.equal(byRole['funding:operator'].target_current,0);
     assert.equal(byRole['funding:operator'].target_expired,1);
     assert.equal(byRole['community:operator'].target_current,0);
@@ -57,6 +60,9 @@ test('actual PostgreSQL census separates the target, other current operators, ex
     await collectOperatorCensus(db,digest,['supplier:operator'],['supplier']);
     const after=await db.query('SELECT * FROM role_assignments ORDER BY user_id,role');
     assert.deepEqual(after.rows,before.rows);
+    const otherDigest=createHash('sha256').update('other@example.test').digest('hex');
+    const other=await collectOperatorCensus(db,otherDigest,['supplier:operator'],['supplier']);
+    assert.equal(other.account.platform_admin_assignments,1);
   });
 });
 
@@ -66,11 +72,12 @@ test('actual Controller role batch and role filter reject expired/future assignm
   const filter=source.match(/`(EXISTS \(SELECT 1 FROM role_assignments ra[^`]+filterRole\))`/)[1].replace(':filterRole','$1').replace('user.id','"user".id');
   await fixture(async(db,target)=>{
     await db.query('BEGIN READ ONLY');
-    assert.deepEqual((await db.query(batch,[[target]])).rows[0].roles,['lecture:operator','supplier:operator']);
+    assert.deepEqual((await db.query(batch,[[target]])).rows[0].roles,['lecture:operator','neture:operator','supplier:operator']);
     for(const role of ['funding:operator','community:operator','neture:admin']) {
       assert.equal((await db.query(`SELECT "user".id FROM users "user" WHERE ${filter}`,[role])).rows.length,0);
     }
     assert.equal((await db.query(`SELECT "user".id FROM users "user" WHERE ${filter}`,['supplier:operator'])).rows.length,2);
+    assert.equal((await db.query(`SELECT "user".id FROM users "user" WHERE ${filter}`,['neture:operator'])).rows.length,1);
     await db.query('ROLLBACK');
     await db.query('BEGIN');
     await db.query(`INSERT INTO role_assignments VALUES ($1,'kpa:admin',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`,[target]);
