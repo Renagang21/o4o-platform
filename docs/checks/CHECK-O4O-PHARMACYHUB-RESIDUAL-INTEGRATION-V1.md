@@ -17,6 +17,14 @@ CMS slot 수정은 contentId가 바뀔 때뿐 아니라 serviceKey 단독 변경
 - 변경4개 TS파일 ESLint 오류0, 기존 slot handler 미사용 변수 warning1 유지. diff whitespace PASS.
 - API 타입/build와 기타 소비처 검증 및 최신 통합CI/리뷰는 진행 중이다. main 통합·배포 완료를 주장하지 않는다.
 
+## 2026-10-15 통합 재검증
+
+원본 #609의 전체 커밋이 #610 head `b29b3111a`에 포함됨을 비교 API의 behind 0으로 확인했다. 원본 PR을 별도로 중복 병합하지 않는다. 이후 main `ac0ef5de9`를 merge 방식으로 반영했고 충돌은 없었다.
+
+후속 리뷰의 초대 직접 수락, 공급자/신청자 모집 이력, 공개 태블릿 토큰, 공개 CMS 콘텐츠와 slot 삭제, 모집 반려·해지·마감, 옛 slug history, 빈 slot 일괄 교체를 코드와 회귀로 대조했다. 통합 후 residual guard·CMS slot scope·store membership 3 suites/60 tests PASS. 소스 구조 검사와 실제 호출 회귀가 함께 포함된 수치이며 실제 운영 DB 검증을 뜻하지 않는다. 최신 CI·Codex 재리뷰와 main 병합·배포는 아직 미완료다.
+
+API 타입 검사도 통과했다. 전체 Jest의 최종 판정은 이 통합 head의 CI에서 확인한다.
+
 ## 실제 삭제와 분리
 
 사용자는 PH 데이터가 테스트용이며 PH/전용 인프라를 재사용하지 않는다고 확인했다. 실제 삭제 전 development plan38673377851은 실패했고 apply는 실행하지 않았다. worker 진단은 로컬 관리자 로그 조회로 확인 중이다. GitHub job 로그 redirect는 현재 환경의 네트워크 정책으로 거절돼 우회하지 않았다.
