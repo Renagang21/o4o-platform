@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { MyHomeStoreBusinesses } from "./MyHomePanels";
 
 const { get, post } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
-vi.mock("../../lib/apiClient", () => ({ api: { get, post } }));
+vi.mock("../../lib/apiClient", () => ({ api: { get: (path: string, ...args: unknown[]) => path.includes("/forum/posts") ? Promise.resolve({ data: { success: true, data: [] } }) : get(path, ...args), post } }));
 vi.mock("../../lib/api/communityOperator", () => ({ listOperatedCommunities: vi.fn() }));
 afterEach(cleanup);
 beforeEach(() => { get.mockReset(); post.mockReset(); });

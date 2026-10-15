@@ -3,7 +3,7 @@ import { requestServiceHandoff } from '@o4o/auth-react';
 import { api } from '../../lib/apiClient';
 
 /** Membership is read for the selected store; destination APIs recheck the current store. */
-export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity }: { businessKey: string; organizationId: string; hasCommunity: boolean }) {
+export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity, postSlug }: { businessKey: string; organizationId: string; hasCommunity: boolean; postSlug?: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const generation = useRef(0);
@@ -22,8 +22,10 @@ export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity 
     setBusy(true); setError(false);
     const key = encodeURIComponent(businessKey);
     const storePath = destination === 'supply' ? `/store/pharmacy/supply?source=${encodeURIComponent(`sf:${businessKey}`)}` : `/store/pharmacy/contents?business=${key}`;
+    const businessRoot = businessKey === 'pharmacy' ? '' : `/businesses/${key}`;
+    const communityPath = postSlug ? `${businessRoot || ''}/${businessKey === 'pharmacy' ? 'community' : 'forum'}/post/${encodeURIComponent(postSlug)}` : businessRoot || '/';
     const target = destination === 'community'
-      ? { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${businessKey === 'pharmacy' ? '/' : `/businesses/${key}`}?store=${encodeURIComponent(organizationId)}` }
+      ? { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${communityPath}?store=${encodeURIComponent(organizationId)}` }
       : { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(storePath)}` };
     try {
       const href = await requestServiceHandoff(api, target);
@@ -36,8 +38,8 @@ export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity 
   return <div className="mt-2">
     <div className="flex flex-wrap gap-2">
       {([
-        ...(hasCommunity ? [['community', '가입자 공간']] : []),
-        ['supply', '공급 상품'], ['contents', '자료 가져오기'],
+        ...(hasCommunity ? [['community', postSlug ? '게시글 보기' : '가입자 공간']] : []),
+        ...(!postSlug ? [['supply', '공급 상품'], ['contents', '자료 가져오기']] : []),
       ] as ['community' | 'supply' | 'contents', string][]).map(([destination, label]) =>
         <button key={destination} type="button" disabled={busy} onClick={() => void open(destination)} className="min-h-11 rounded-lg border px-3 py-2 text-sm text-blue-700 disabled:opacity-50">{label}</button>)}
     </div>
