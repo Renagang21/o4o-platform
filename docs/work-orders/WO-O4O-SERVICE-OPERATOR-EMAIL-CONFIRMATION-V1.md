@@ -108,3 +108,10 @@ OPERATOR_INVITE_TEST_PORT=55432 pnpm --filter @o4o/api-server exec jest --runInB
 inspect의 INVALID_OR_EXPIRED_INVITATION과 수락 완료 시 해당 token만 정리하며, 동일 token을 가진 원래 탭에도 종료를 알린다. 계정 불일치·일시 오류는 보존한다. 늦은 종료 응답이 다른 새 token을 지우지 않는다.
 
 검증: 신규 terminal3개 포함 focused21 PASS, Neture 전체1032 PASS, production build·변경 lint PASS. 실제 Chromium의 독립 sessionStorage를 가진 새 탭에서8개 시나리오 PASS: 확인 뒤 복귀, 양쪽 종료 정리, 늦은 응답/새 token 보존, 복수 초대 거절, 잘못된 nonce 무시, 이메일 확인 실패 시 미복구, channel 차단/미지원에도 확인 성공 유지. 실제 인증·메일 서버는 합성 구현이며 pageerror0·network write0, fixture 서버/symlink 정리 완료. API152·격리 PG24는 앞 절 결과이며 이 frontend 후속에서 API/schema 변경은 없다. 새 head의 CI·Codex는 다시 판정한다.
+
+
+### 추가 리뷰 — 수락 시 만료와 storage 차단
+
+inspect 이후 실제 수락에서 INVALID_OR_EXPIRED_INVITATION이 반환되는 경우에도 해당 token을 종료 처리한다. 다른 계정·일시 오류는 보존한다. incoming fragment는 storage 접근 전에 즉시 제거하며, sessionStorage가 SecurityError를 내는 환경에서는 tab의 메모리로만 명시 수락과 SPA 가입 복귀를 이어간다. StrictMode 재초기화도 원래 token을 유지한다. reload나 탭 종료 후 복구를 약속하지 않으며 token을 URL·localStorage·cookie에 쓰지 않는다.
+
+수락 만료/다른 계정/일시 오류와 storage get/set/remove 차단 StrictMode를 포함한 focused25 PASS, Neture 전체1036 PASS, production build PASS, 변경 lint 오류0/기존 경고1. API·schema 변경 없고 운영 DB·SMTP·메일 발송·DDL은 미실행이다. 최종 CI·Codex는 새 head로 다시 확인한다.

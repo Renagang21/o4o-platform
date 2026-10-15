@@ -2,26 +2,27 @@ import { useEffect, useState } from 'react';
 import { useAuth, useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
-import { OPERATOR_INVITATION_KEY as KEY, clearOperatorInvitation } from '../lib/operatorInvitationReturn';
+import { clearOperatorInvitation, clearOperatorInvitationEntry, readOperatorInvitation, rememberOperatorInvitation } from '../lib/operatorInvitationReturn';
 /** Fragment tokens stay out of request URLs, access logs and login return URLs. GET never accepts. */
 export default function OperatorInvitePage() {
   const { user, isAuthenticated, isLoading, refreshAuth } = useAuth();
   const { openLoginModal } = useLoginModal();
   const [token] = useState(() => {
+    const hadFragment = !!window.location.hash;
     const incoming = new URLSearchParams(window.location.hash.slice(1)).get(
       'token',
     );
+    // Scrub the fragment before optional browser storage; StrictMode may initialize twice.
+    if (hadFragment) window.history.replaceState(null, '', window.location.pathname);
     if (incoming && /^[a-f0-9]{64}$/.test(incoming)) {
-      sessionStorage.setItem(KEY, incoming);
-      window.history.replaceState(null, '', window.location.pathname);
+      rememberOperatorInvitation(incoming);
       return incoming;
     }
-    if (window.location.hash) {
-      sessionStorage.removeItem(KEY);
-      window.history.replaceState(null, '', window.location.pathname);
+    if (hadFragment) {
+      clearOperatorInvitationEntry();
       return '';
     }
-    return sessionStorage.getItem(KEY) ?? '';
+    return readOperatorInvitation();
   });
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -78,6 +79,7 @@ export default function OperatorInvitePage() {
     } catch (e) {
       const code = (e as { response?: { data?: { code?: string } } }).response
         ?.data?.code;
+      if (code === 'INVALID_OR_EXPIRED_INVITATION') clearOperatorInvitation(token);
       setMessage(
         code === 'INVITATION_ACCOUNT_MISMATCH'
           ? '초대에 지정된 계정과 다릅니다. 지정된 계정으로 로그인하세요.'

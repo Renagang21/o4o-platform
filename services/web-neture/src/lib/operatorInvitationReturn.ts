@@ -1,16 +1,27 @@
 /** Tokens remain tab-local and never enter login/signup URLs. */
 export const OPERATOR_INVITATION_KEY = 'o4o_operator_invite';
-export function operatorInvitationReturnPath(): '/' | '/operator-invite' {
+let volatileToken = '';
+const validToken = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+export function readOperatorInvitation(): string {
   try {
-    return /^[a-f0-9]{64}$/.test(sessionStorage.getItem(OPERATOR_INVITATION_KEY) ?? '')
-      ? '/operator-invite' : '/';
-  } catch {
-    return '/';
-  }
+    const stored = sessionStorage.getItem(OPERATOR_INVITATION_KEY);
+    return validToken(stored) ? stored : '';
+  } catch { return volatileToken; }
+}
+export function rememberOperatorInvitation(token: string): void {
+  if (!validToken(token)) return;
+  volatileToken = token;
+  try { sessionStorage.setItem(OPERATOR_INVITATION_KEY, token); } catch { /* In-memory continuation only. */ }
+}
+export function clearOperatorInvitationEntry(): void {
+  volatileToken = '';
+  try { sessionStorage.removeItem(OPERATOR_INVITATION_KEY); } catch { /* In-memory state is already clear. */ }
+}
+export function operatorInvitationReturnPath(): '/' | '/operator-invite' {
+  return validToken(readOperatorInvitation()) ? '/operator-invite' : '/';
 }
 
 const CHANNEL = 'o4o:operator-invitation-continuation:v1';
-const validToken = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 /** Same-origin ephemeral transport; no token in URLs, cookies or persistent storage. */
 export function serveOperatorInvitationContinuation(): () => void {
   if (typeof BroadcastChannel === 'undefined') return () => {};
@@ -18,9 +29,9 @@ export function serveOperatorInvitationContinuation(): () => void {
   try { channel = new BroadcastChannel(CHANNEL); } catch { return () => {}; }
   channel.onmessage = ({ data }) => {
     try {
-      const token = sessionStorage.getItem(OPERATOR_INVITATION_KEY);
+      const token = readOperatorInvitation();
       if (data?.kind === 'terminal' && validToken(data.token) && token === data.token) {
-        sessionStorage.removeItem(OPERATOR_INVITATION_KEY);
+        clearOperatorInvitationEntry();
         return;
       }
       if (data?.kind !== 'request' || typeof data.requestId !== 'string' || !/^[a-f0-9-]{36}$/.test(data.requestId)) return;
@@ -45,17 +56,15 @@ export async function recoverOperatorInvitationContinuation(): Promise<boolean> 
     const timer = setTimeout(() => {
       channel.close();
       if (tokens.size !== 1) { resolve(false); return; }
-      try { sessionStorage.setItem(OPERATOR_INVITATION_KEY, [...tokens][0]); resolve(true); }
-      catch { resolve(false); }
+      rememberOperatorInvitation([...tokens][0]); resolve(true);
     }, 350);
     try { channel.postMessage({ kind: 'request', requestId }); }
     catch { clearTimeout(timer); channel.close(); resolve(false); }
   });
 }
 export function clearOperatorInvitation(token: string): void {
-  try {
-    if (sessionStorage.getItem(OPERATOR_INVITATION_KEY) === token) sessionStorage.removeItem(OPERATOR_INVITATION_KEY);
-  } catch { /* Storage unavailable. */ }
+  if (readOperatorInvitation() === token) clearOperatorInvitationEntry();
+  else if (volatileToken === token) volatileToken = '';
   if (typeof BroadcastChannel === 'undefined') return;
   try {
     const channel = new BroadcastChannel(CHANNEL);
