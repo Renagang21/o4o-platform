@@ -165,8 +165,10 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
   `results-receiver.actions.githubusercontent.com`을 환경 설정 초안에 추가 저장했다. 기존 도메인·preset·
   script·credential 바인딩은 유지했다. 초안 저장은 게시/현재 runtime 적용이 아니며 게시 후 해당 기존
   job의 결과를 읽는다. 로그를 얻기 위해 같은 조회를 반복 dispatch하거나 네트워크 제한을 우회하지 않는다.
-- 운영 role/계정/Google 연결/DB/schema/IAM/배포 변경은 0이다. API·웹 배포는 아직 미실행이며
-  main 반영과 운영 반영을 구분한다. post-merge CI는 조회 당시 일부 진행 중이었다.
+- 이번 census의 운영 role/계정/Google 연결/DB/schema/IAM/배포 변경은 0이다. 수동 배포 dispatch는
+  실행하지 않았다. post-merge CI Gate·API Jest 3 shard·Code Quality·CodeQL은 SUCCESS다.
+  기존 workflow_run 자동 [Delivery #38666079640](https://github.com/Renagang21/o4o-platform/actions/runs/38666079640)가
+  API 배포를 진행 중이며 웹 job은 SKIP이다. 완료 전 운영 반영을 주장하지 않는다.
 
 ### 다음 단계와 구체적인 변경 판단
 
