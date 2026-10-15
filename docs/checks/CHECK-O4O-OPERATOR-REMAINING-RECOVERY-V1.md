@@ -104,3 +104,10 @@ checkout/branch는 미병합 PR 후속 수정용 KEEP, 다른 작업트리는 �
 - 임시 fixture 서버는 종료했고 임시 node_modules symlink를 해제했다. 실제 계정·운영 API·DB write·상태 전이·migration·배포는 실행하지 않았다.
 
 CI·Sonar·Codex 및 최종 main 통합·배포는 후속 확인이다. 원본 PR별 미해결 스레드는 해당 변경을 포함한 최종 통합 결과로 대조하며 근거 없이 완료 처리하지 않는다.
+
+
+### 같은 통합 PR의 CI 후속 — 회원 홈 handoff 초기화 경쟁
+
+#639 첫 CI의 약국 회원 홈 테스트가 이동 실패 alert를 찾지 못했다. 파일 변경 유무만으로 flaky로 처리하지 않았다. 자식 화면이 commit 직후 사용자 입력을 받았지만 passive effect가 뒤늦게 요청 세대를 초기화하여 실패 처리를 폐기하는 상황을, 부모 layout effect의 즉시 클릭 회귀로 재현했다. 수정 전 신규 회귀1개 실패/기존17개 미선택, 수정 후 해당 파일18개 전부 통과했다.
+
+BusinessStoreShortcut의 scope 초기화를 layout effect로 옮겨 클릭 전 완료하고, 기존 returnPath 변경·unmount·bfcache 무효화와 중복 방지를 유지했다. 약국 전체를 다시 실행해 **164 PASS**, production build와 변경 파일 lint를 확인했다. 나머지 소비처 코드는 이전 통합 검증과 같아 현재 합계는 **1433 PASS**다. timeout이나 실패 assertion을 완화하지 않았다. 새 head의 CI·리뷰는 다시 확인한다.
