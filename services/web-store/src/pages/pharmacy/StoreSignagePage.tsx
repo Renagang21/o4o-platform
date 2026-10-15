@@ -1,3 +1,6 @@
+import { videoPreviewUrl } from './signage/videoPreview';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, type SignageEditTarget, type SignageMediaDraft } from './signage/signageMediaDraft';
 import { buildSignageVideoList, filterSignageVideos, summarizePlaylistDuration, type UnifiedVideoItem, type SignageStatusFilter as StatusFilter, type SignageSortKey as SortKey } from './signage/signageVideoList';
 import { useSignagePlaylists } from './hooks/useSignagePlaylists';
@@ -125,6 +128,11 @@ async function loadSignageAssets(): Promise<StoreAssetItem[]> {
 }
 
 export function StoreSignagePage() {
+  const scope = useStoreOperationScope();
+  return <SignageSession key={scope.key} isCurrent={scope.isCurrent} />;
+}
+
+function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const location = useLocation();
   // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1:
@@ -194,6 +202,7 @@ export function StoreSignagePage() {
 
   const [error, setError] = useState<string | null>(null);
   const fetchItems = useCallback(async () => { setError(null); await reloadItems(); }, [reloadItems]);
+  const statusBusy = useRef(new Set<string>());
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -237,6 +246,10 @@ export function StoreSignagePage() {
   } = useSignagePlaylists(organizationId);
 
   // ── Direct video registration (signage_media) ──
+  const mediaReads = useLatestStoreRequest();
+  const [mediaLoading, setMediaLoading] = useState(true);
+  const [mediaLoadError, setMediaLoadError] = useState<string | null>(null);
+  const mediaMutation = useRef(false);
   const [signageMediaItems, setSignageMediaItems] = useState<SignageMediaItem[]>([]);
   const [showVideoRegForm, setShowVideoRegForm] = useState(false);
   const [regVideoTitle, setRegVideoTitle] = useState('');
@@ -261,14 +274,15 @@ export function StoreSignagePage() {
   const registrationDraftRef = useRef(registrationDraft); registrationDraftRef.current = registrationDraft;
 
   const loadSignageMedia = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || !isCurrent()) return;
+    const current = mediaReads.begin(); setMediaLoading(true); setMediaLoadError(null);
     try {
       const data = await fetchSignageMedia(organizationId);
-      if (organizationRef.current === organizationId) setSignageMediaItems(data);
-    } catch {
-      if (organizationRef.current === organizationId) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    }
-  }, [organizationId]);
+      if (!Array.isArray(data)) throw new Error('Invalid media');
+      if (current() && isCurrent()) setSignageMediaItems(data);
+    } catch { if (current() && isCurrent()) setMediaLoadError('내 동영상을 불러오지 못했습니다. 다시 시도해 주세요.'); }
+    finally { if (current() && isCurrent()) setMediaLoading(false); }
+  }, [organizationId, mediaReads, isCurrent]);
 
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
@@ -278,15 +292,16 @@ export function StoreSignagePage() {
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
     setRegVideoError('');
-    if (registrationBusy.current || !regVideoTitle.trim() || !regVideoUrl.trim()) return;
+    if (registrationBusy.current || mediaMutation.current || !isCurrent() || !regVideoTitle.trim() || !regVideoUrl.trim()) return;
     const sourceType = detectVideoSource(regVideoUrl.trim());
-    if (!sourceType) {
+    if (!sourceType || !videoPreviewUrl(regVideoUrl)) {
       setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.');
       return;
     }
     const tags = regVideoTags.split(',').map(t => t.trim()).filter(Boolean);
     const submitted = registrationDraft, store = organizationId;
-    registrationBusy.current = true;
+    mediaReads.cancel(); setMediaLoading(false);
+    mediaMutation.current = true; registrationBusy.current = true;
     setRegVideoSaving(true);
     try {
       await createSignageMedia(organizationId, {
@@ -298,7 +313,7 @@ export function StoreSignagePage() {
         tags: tags.length > 0 ? tags : undefined,
         status: regVideoStatus,
       });
-      if (organizationRef.current !== store) return;
+      if (organizationRef.current !== store || !isCurrent()) return;
       void loadSignageMedia();
       if (registrationDraftRef.current !== submitted) return;
       setRegVideoTitle('');
@@ -309,22 +324,26 @@ export function StoreSignagePage() {
       setRegVideoError('');
       setShowVideoRegForm(false);
     } catch (err: unknown) {
-      if (organizationRef.current === store) setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+      if (organizationRef.current === store && isCurrent()) setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
     } finally {
-      registrationBusy.current = false;
+      mediaMutation.current = false; registrationBusy.current = false;
       setRegVideoSaving(false);
     }
   };
 
   const handleDeleteMedia = async (mediaId: string) => {
-    if (!confirm('이 동영상을 삭제하시겠습니까?')) return;
+    if (mediaMutation.current || !isCurrent() || !confirm('이 동영상을 삭제하시겠습니까?')) return;
+    mediaReads.cancel(); setMediaLoading(false);
+    mediaMutation.current = true;
     try {
       await deleteSignageMedia(organizationId, mediaId);
-      loadSignageMedia();
-    } catch { setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
+      if (isCurrent()) await loadSignageMedia();
+    } catch { if (isCurrent()) setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
+    finally { mediaMutation.current = false; }
   };
 
   const handleOpenEdit = (video: UnifiedVideoItem) => {
+    if (editBusy.current || mediaMutation.current || !isCurrent()) return;
     const target: SignageEditTarget | null = video.source === 'direct' && video._media
       ? { kind: 'direct', media: video._media }
       : video._snapshot ? { kind: 'snapshot', snapshot: video._snapshot } : null;
@@ -334,50 +353,55 @@ export function StoreSignagePage() {
     setEditingTarget(target); setEditDraft(draft); setEditError('');
   };
   const handleEditChange = (field: keyof SignageMediaDraft, value: string) => {
+    if (editBusy.current || !isCurrent()) return;
     setEditDraft(previous => {
       const next = { ...previous, [field]: value }; editDraftRef.current = next; return next;
     });
   };
   const handleCloseEditDrawer = () => {
+    if (editBusy.current) return;
     editTargetRef.current = null;
     setEditingTarget(null); setEditError('');
   };
   const handleSaveEdit = async () => {
     const target = editingTarget, draft = editDraft, store = organizationId;
-    if (!target || !draft.name.trim() || editBusy.current) return;
-    editBusy.current = true; setEditSaving(true); setEditError('');
+    if (!target || !draft.name.trim() || editBusy.current || mediaMutation.current || !isCurrent()) return;
+    mediaReads.cancel(); setMediaLoading(false);
+    mediaMutation.current = true; editBusy.current = true; setEditSaving(true); setEditError('');
     try {
       const metadata = signageMediaMetadata(draft);
       if (target.kind === 'direct') {
         const updated = await updateSignageMedia(store, target.media.id, { name: draft.name.trim(), ...metadata });
-        if (organizationRef.current !== store) return;
+        if (organizationRef.current !== store || !isCurrent()) return;
         setSignageMediaItems(previous => previous.map(media => media.id === updated.id ? updated : media));
       } else {
         const response = await assetSnapshotApi.patch(target.snapshot.id, { title: draft.name.trim(), ...metadata });
-        if (organizationRef.current !== store) return;
+        if (organizationRef.current !== store || !isCurrent()) return;
         setItems(previous => previous.map(item => item.id === target.snapshot.id
           ? { ...item, title: response.data.title, contentJson: response.data.contentJson } : item));
       }
-      if (editTargetRef.current === target && editDraftRef.current === draft) handleCloseEditDrawer();
+      if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
+      if (editTargetRef.current === target && editDraftRef.current === draft) { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }
     } catch (error) {
-      if (organizationRef.current === store && editTargetRef.current === target) setEditError(error instanceof Error ? error.message : '저장에 실패했습니다.');
-    } finally { editBusy.current = false; setEditSaving(false); }
+      if (isCurrent() && organizationRef.current === store && editTargetRef.current === target) setEditError(error instanceof Error ? error.message : '저장에 실패했습니다.');
+    } finally { mediaMutation.current = false; editBusy.current = false; if (isCurrent()) setEditSaving(false); }
   };
   const handleDeleteFromDrawer = async () => {
     const target = editingTarget, store = organizationId;
-    if (!target || editBusy.current) return;
+    if (!target || editBusy.current || mediaMutation.current || !isCurrent()) return;
     const name = target.kind === 'direct' ? target.media.name : target.snapshot.title;
     if (!confirm(`"${name}" 동영상을 삭제하시겠습니까?`)) return;
-    editBusy.current = true; setEditSaving(true); setEditError('');
+    mediaReads.cancel(); setMediaLoading(false);
+    mediaMutation.current = true; editBusy.current = true; setEditSaving(true); setEditError('');
     try {
       if (target.kind === 'direct') await deleteSignageMedia(store, target.media.id);
       else await assetSnapshotApi.remove(target.snapshot.id);
-      if (organizationRef.current !== store) return;
-      if (editTargetRef.current === target) handleCloseEditDrawer();
+      if (organizationRef.current !== store || !isCurrent()) return;
+      if (editTargetRef.current === target) { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }
       if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
     } catch {
-      if (organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주세요.');
-    } finally { editBusy.current = false; setEditSaving(false); }
+      if (isCurrent() && organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주세요.');
+    } finally { mediaMutation.current = false; editBusy.current = false; if (isCurrent()) setEditSaving(false); }
   };
   useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
 
@@ -402,6 +426,8 @@ export function StoreSignagePage() {
 
   useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
 
+  useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
+
   // Total duration + missing-duration count for selected playlist items
   const totalDurationInfo = useMemo(() => summarizePlaylistDuration(playlistItems), [playlistItems]);
 
@@ -420,18 +446,20 @@ export function StoreSignagePage() {
 
   // Handlers
   const handleToggleStatus = async (item: StoreAssetItem) => {
-    if (item.isForced) return;
+    if (item.isForced || statusBusy.current.has(item.id) || !isCurrent()) return;
+    statusBusy.current.add(item.id);
     const cycle: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
     const currentIdx = cycle.indexOf(item.publishStatus);
     const nextStatus = cycle[(currentIdx + 1) % cycle.length];
     setUpdatingId(item.id);
     try {
       const res = await storeAssetControlApi.updatePublishStatus(item.id, nextStatus);
+      if (!isCurrent()) return;
       setItems(prev => prev.map(it =>
         it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
       ));
-    } catch { setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.'); } finally {
-      setUpdatingId(null);
+    } catch { if (isCurrent()) setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.'); } finally {
+      statusBusy.current.delete(item.id); if (isCurrent()) setUpdatingId(null);
     }
   };
 
@@ -458,6 +486,7 @@ export function StoreSignagePage() {
         </div>
       )}
       {playlistActionError && !showAddVideoModal && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{playlistActionError}</div>}
+      {mediaLoadError && <div role="alert" className="p-3 text-sm text-red-700">{mediaLoadError}<button type="button" onClick={() => void loadSignageMedia()} className="min-h-11 underline ml-2">동영상 다시 시도</button></div>}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
@@ -471,7 +500,7 @@ export function StoreSignagePage() {
         <div className="flex gap-2">
           <button
             onClick={() => {
-              fetchItems(); loadPlaylists();
+              fetchItems(); loadSignageMedia(); loadPlaylists();
               if (activeTab === 'schedules') { loadSchedules(); loadSignagePlaylists(); }
             }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
@@ -1174,7 +1203,7 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── [A] Signage KPI ─────────────────────── */}
-      {!loading && !error && !listError && (
+      {!loading && !mediaLoading && !mediaLoadError && !error && !listError && (
         <div className="grid grid-cols-5 gap-4 mb-6">
           <KpiCard label="게시 중" count={kpi.published} color="green" />
           <KpiCard label="초안" count={kpi.draft} color="slate" />
@@ -1187,7 +1216,7 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
-      {!loading && !error && !listError && unifiedVideos.length > 0 && (
+      {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -1199,7 +1228,7 @@ export function StoreSignagePage() {
           />
         </div>
       )}
-      {!loading && !error && !listError && unifiedVideos.length > 0 && (
+      {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div className="flex flex-wrap items-center gap-1 min-w-0">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -1249,16 +1278,16 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── [C] 사이니지 리스트 ───────────────────── */}
-      {loading ? (
+      {loading || mediaLoading ? (
         <div className="flex items-center justify-center py-20 text-slate-400">
           <Loader2 className="w-5 h-5 animate-spin mr-2" />
           사이니지 목록을 불러오는 중...
         </div>
-      ) : (error || listError) ? (
+      ) : (error || listError || mediaLoadError) ? (
         <div className="flex flex-col items-center justify-center py-20 text-red-500">
           <AlertCircle className="w-6 h-6 mb-2" />
-          <p className="text-sm">{listError || error}</p>
-          <button onClick={fetchItems} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+          <p className="text-sm">{listError || error || mediaLoadError}</p>
+          <button onClick={() => { void fetchItems(); void loadSignageMedia(); }} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
         </div>
       ) : filteredUnified.length === 0 ? (
         <div className="text-center py-20 text-slate-400">
@@ -1612,7 +1641,7 @@ export function StoreSignagePage() {
       />
 
       {/* ─── Media / Snapshot Edit Drawer ─────────── */}
-      <StoreSignageMediaEditor
+      <StoreSignageMediaEditor key={editingTarget?.kind === 'direct' ? `media:${editingTarget.media.id}` : `snapshot:${editingTarget?.snapshot.id}`}
         target={editingTarget} draft={editDraft} onChange={handleEditChange}
         editSaving={editSaving} editError={editError}
         handleCloseEditDrawer={handleCloseEditDrawer}
