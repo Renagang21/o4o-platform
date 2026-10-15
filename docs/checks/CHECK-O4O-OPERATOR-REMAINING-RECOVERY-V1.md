@@ -111,3 +111,8 @@ CI·Sonar·Codex 및 최종 main 통합·배포는 후속 확인이다. 원본 P
 #639 첫 CI의 약국 회원 홈 테스트가 이동 실패 alert를 찾지 못했다. 파일 변경 유무만으로 flaky로 처리하지 않았다. 자식 화면이 commit 직후 사용자 입력을 받았지만 passive effect가 뒤늦게 요청 세대를 초기화하여 실패 처리를 폐기하는 상황을, 부모 layout effect의 즉시 클릭 회귀로 재현했다. 수정 전 신규 회귀1개 실패/기존17개 미선택, 수정 후 해당 파일18개 전부 통과했다.
 
 BusinessStoreShortcut의 scope 초기화를 layout effect로 옮겨 클릭 전 완료하고, 기존 returnPath 변경·unmount·bfcache 무효화와 중복 방지를 유지했다. 약국 전체를 다시 실행해 **164 PASS**, production build와 변경 파일 lint를 확인했다. 나머지 소비처 코드는 이전 통합 검증과 같아 현재 합계는 **1433 PASS**다. timeout이나 실패 assertion을 완화하지 않았다. 새 head의 CI·리뷰는 다시 확인한다.
+
+
+### 같은 통합 PR의 CI 후속 — 장바구니 첫 입력 보존
+
+Store 소비처 CI에서 수량 편집 직후 결제가 잠기지 않는 회귀가 발생했다. commit 직후 입력을 합성한 신규 회귀는 수정 전 첫 수량이 1로 돌아가는 실패를 재현했다. 초기 수량 동기화를 layout effect로 완료하고 이벤트 값을 state updater 밖에서 즉시 복사하여 첫 편집을 보존했다. 저장 중 다른 행·결제 잠금과 실패 복구 assertion은 유지했다. 신규/구매 흐름 9개, Store 전체 493개, Store production build 및 변경 파일 lint PASS. 실제 주문·결제·운영 API는 실행하지 않았다. 기존 1433개와 별도로 Store 493개를 검증했다.
