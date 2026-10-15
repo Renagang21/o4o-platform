@@ -21,7 +21,8 @@ interface Props {
   /** At least one saved, non-archived page exists (see hasPublishableMlcPage); otherwise the landing 404s. */
   publishable: boolean;
   disabled?: boolean;
-  onPublished?: () => Promise<void>;
+  /** Refresh after publication. Resolving `false` means the refresh was skipped/superseded: delivery is cancelled. */
+  onPublished?: () => Promise<void | boolean>;
 }
 
 /** url 에 mode=tablet 쿼리 부여 (기존 쿼리 유무 안전 처리). */
@@ -90,7 +91,11 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
       if (!owned()) { popup?.close(); return; }
       const link = new URL(url, window.location.origin);
       if (!['http:', 'https:'].includes(link.protocol)) throw new Error('Invalid link');
-      if (onPublished) await onPublished();
+      if (onPublished && (await onPublished()) === false) {
+        popup?.close(); openTab.current = null;
+        if (owned()) setError('편집 내용이 저장되는 중이라 고객용 링크·QR 전달을 중단했습니다. 발행 상태를 확인한 뒤 다시 시도해 주세요.');
+        return;
+      }
       if (!owned()) { popup?.close(); return; }
       await deliver(action, url, popup, owned);
     } catch {

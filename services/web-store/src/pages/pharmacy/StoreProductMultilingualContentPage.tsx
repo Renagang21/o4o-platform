@@ -215,17 +215,19 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
     finally { lock.current = false; if (current() && isCurrent()) setIsSavingPage(false); }
   };
 
-  const refreshPublication = async () => {
+  /** Returns false when skipped or superseded by an editor write, so the caller must not deliver the link. */
+  const refreshPublication = async (): Promise<boolean> => {
     // Serialize with editor writes: a save/unpublish that starts during this GET supersedes it, and the
     // late response must not overwrite the newer result. Skip while a write is already in flight.
-    if (!group || lock.current || !isCurrent()) return;
+    if (!group || lock.current || !isCurrent()) return false;
     const current = writes.begin();
     const saved = verifyGroup(await getStoreMlcGroup(group.id));
-    if (!current() || !isCurrent()) return;
+    if (!current() || !isCurrent()) return false;
     setGroup(saved);
     setDrafts(prev => Object.fromEntries(STORE_MLC_LOCALES.map(loc => [loc, {
       ...(prev[loc] ?? draftFromPage()), status: saved.pages.find(p => p.locale === loc)?.status ?? 'draft',
     }])));
+    return true;
   };
 
   if (isLoading) {

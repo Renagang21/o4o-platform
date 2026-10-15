@@ -187,6 +187,15 @@ it('drops a late publication refresh when an editor write finished during it', a
   fireEvent.click(screen.getByRole('button', { name: '초안으로 내리기' })); await waitFor(() => expect(api.status).toHaveBeenCalledWith('group', 'ko', 'draft'));
   await waitFor(() => expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull());
   await act(async () => refresh.resolve(published)); expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull();
+  await screen.findByText(/고객용 링크·QR 전달을 중단했습니다/); expect(api.qr).not.toHaveBeenCalled(); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
+});
+it('cancels link delivery and closes the popup when the publication refresh was not applied', async () => {
+  const popup = { opener: {}, close: vi.fn(), location: { replace: vi.fn() } };
+  vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window);
+  render(wrap(<MultilingualPublicActions groupId="group" publishable onPublished={async () => false} />));
+  fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
+  await screen.findByText(/고객용 링크·QR 전달을 중단했습니다/);
+  expect(popup.close).toHaveBeenCalled(); expect(popup.location.replace).not.toHaveBeenCalled(); expect(api.error).not.toHaveBeenCalled();
 });
 it('opens a tab synchronously and closes a stale pending popup on unmount', async () => {
   const pending = deferred<{ url: string }>(); api.key.mockReturnValue(pending.promise); const popup = { opener: {}, close: vi.fn(), location: { replace: vi.fn() } };
