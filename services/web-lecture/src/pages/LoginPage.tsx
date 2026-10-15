@@ -5,7 +5,7 @@
  *   예전에는 Neture 홈으로만 보내 돌아올 길이 없었다.
  */
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
-import { DemoLoginButtons } from '@o4o/auth-react';
+import { LoginCard, LoginLayout, DemoLoginButtons } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const ACCOUNT_CENTER_ENTRY = 'https://neture.co.kr/service-entry/lecture';
@@ -22,10 +22,9 @@ export default function LoginPage() {
 
   if (!isLoading && isAuthenticated) return <Navigate to={returnPath} replace />;
   const entryUrl = `${ACCOUNT_CENTER_ENTRY}?returnPath=${encodeURIComponent(returnPath)}`;
-  return <main className="center-card"><section className="card">
-    <h1>O4O 강의 로그인</h1>
-    <p>O4O 계정은 Neture 에서 통합 관리합니다. Neture 에서 로그인하면 이 화면으로 돌아옵니다.</p>
-    <a className="button-link" href={entryUrl} data-testid="lecture-login-entry">Neture 에서 로그인하고 계속하기</a>
+  return <LoginLayout brand="O4O 강의" tone="indigo" headline={<>새로운 배움이<br />시작되는 곳.</>} description="관심 있는 강의를 만나고, 나만의 배움을 이어가세요.">
+    <LoginCard brand="O4O 강의" tone="indigo" heading="h1" title="O4O 강의 로그인" description="Neture에서 로그인한 뒤 강의로 돌아옵니다.">
+    <a className="o4o-login-primary-link" href={entryUrl} data-testid="lecture-login-entry">Neture 에서 로그인하고 계속하기</a>
     <DemoLoginButtons loginWithEmail={loginWithEmail} onSuccess={() => window.location.assign(returnPath)} />
-  </section></main>;
+  </LoginCard></LoginLayout>;
 }

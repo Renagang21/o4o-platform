@@ -7,7 +7,7 @@
  *   로그인 후 온 곳(state.from · `?returnTo`)으로 돌아가고, 없으면 /me.
  */
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { LoginMethods } from '@o4o/auth-react';
+import { LoginCard, LoginLayout, LoginMethods } from '@o4o/auth-react';
 import { useAuth, type BranchUser } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { BRAND } from '../config/service';
@@ -31,10 +31,8 @@ export default function LoginPage() {
   if (!isLoading && isAuthenticated) return <Navigate to={returnPath} replace />;
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="text-xl font-bold text-gray-900">{BRAND.nameKo} 로그인</h1>
-
-      <div className="mt-6">
+    <LoginLayout brand={BRAND.nameKo} tone="blue" headline={<>가까운 연결,<br />함께하는 분회.</>} description="분회 소식과 회원 서비스를 한곳에서 만나세요.">
+      <LoginCard brand={BRAND.nameKo} tone="blue" heading="h1" title={`${BRAND.nameKo} 로그인`} description="O4O 계정으로 분회 서비스를 이용하세요.">
         <LoginMethods<BranchUser>
           loginWithEmail={loginWithEmail}
           api={authClient}
@@ -49,14 +47,13 @@ export default function LoginPage() {
             privacyHref: PLATFORM_PRIVACY_URL,
           }}
         />
-      </div>
-
-      <p className="mt-6 text-sm text-gray-500">
+      <p className="o4o-login-footnote">
         분회 서비스 이용은 승인이 필요합니다.{' '}
         <Link to="/join" className="font-medium text-primary-600 underline">
           가입 신청
         </Link>
       </p>
-    </div>
+      </LoginCard>
+    </LoginLayout>
   );
 }
