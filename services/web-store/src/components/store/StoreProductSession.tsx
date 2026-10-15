@@ -1,0 +1,37 @@
+import { useCallback, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { getActiveStoreOrganizationId } from '../../lib/storeOrganizationHeader';
+
+export function useStoreProductScope() {
+  const { status, organizationId, effectiveServiceKey } = useUnifiedStore();
+  return { organizationId, key: `${organizationId ?? ''}:${effectiveServiceKey ?? ''}`,
+    ready: status === 'ready' && !!organizationId && !!effectiveServiceKey };
+}
+
+export function useStoreProductSession(organizationId: string) {
+  const mounted = useRef(true);
+  useLayoutEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  return useCallback(() => mounted.current && getActiveStoreOrganizationId() === organizationId, [organizationId]);
+}
+
+/** Native top layer supplies focus containment, Escape and focus restoration. */
+export function StoreProductDialog({ children, onClose, label, style, focusKey, preventBackdropClose }: {
+  children: ReactNode; onClose: () => void; label: string; style: CSSProperties; focusKey?: string; preventBackdropClose?: boolean;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useLayoutEffect(() => {
+    const element = dialog.current!;
+    const previous = document.activeElement as HTMLElement | null;
+    element.showModal();
+    return () => { element.close(); if (previous?.isConnected) previous.focus(); };
+  }, []);
+  useLayoutEffect(() => {
+    dialog.current?.querySelector<HTMLElement>('[data-request-autofocus]')?.focus();
+  }, [focusKey]);
+  return <dialog ref={dialog} aria-label={label}
+    style={{ ...style, margin: 0, border: 0, width: '100%', height: '100%', maxWidth: 'none', maxHeight: 'none', boxSizing: 'border-box' }}
+    onCancel={event => { event.preventDefault(); event.stopPropagation(); onClose(); }}
+    onClick={event => { if (!preventBackdropClose && event.target === event.currentTarget) onClose(); }}>
+    {children}
+  </dialog>;
+}

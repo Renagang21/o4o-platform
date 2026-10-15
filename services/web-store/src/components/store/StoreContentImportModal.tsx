@@ -14,12 +14,9 @@
  *  - 제목은 가져오지 않는다(상품명 자동 변경 금지) — 본문 HTML 만 전달.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X, FileText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { storeLibraryApi } from '../../api/assetSnapshot';
-import type { LibraryContentItem } from '../../api/assetSnapshot';
-
-const PAGE_SIZE = 12;
+import { useContentImport } from './useContentImport';
+import { StoreProductDialog, useStoreProductScope } from './StoreProductSession';
 
 // /store-library/contents 피드 contentJson 본문 HTML 추출.
 // 우선순위: html(direct/execution + 일부 snapshot) → blocks[] → body/content → imageUrl.
@@ -36,11 +33,12 @@ function contentJsonToHtml(json: Record<string, unknown> | undefined): string {
   if (blocks && blocks.length > 0) {
     return blocks
       .map((b) => {
-        const type = (b.type as string) || 'text';
-        const value = (b.value as string) || '';
+        const type = typeof b.type === 'string' ? b.type : 'text';
+        const value = typeof b.value === 'string' ? b.value : '';
+        if (!value) return '';
         if (type === 'image' && value) return `<p><img src="${escAttr(value)}" alt="" /></p>`;
         if (type === 'link' && value) {
-          const label = (b.label as string) || value;
+          const label = typeof b.label === 'string' ? b.label : value;
           return `<p>${escHtml(label)}: ${escHtml(value)}</p>`;
         }
         return `<p>${escHtml(String(value))}</p>`;
@@ -63,84 +61,20 @@ interface StoreContentImportModalProps {
   onImport: (html: string, title: string) => void;
 }
 
-export default function StoreContentImportModal({ open, onClose, onImport }: StoreContentImportModalProps) {
-  const [items, setItems] = useState<LibraryContentItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-
-  const load = useCallback(async (p: number, q: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await storeLibraryApi.listContents({
-        page: p,
-        limit: PAGE_SIZE,
-        search: q.trim() || undefined,
-        source: 'mine',
-      });
-      if (res.success && res.data) {
-        setItems(res.data.items);
-        setTotal(res.data.total);
-      } else {
-        setItems([]);
-        setTotal(0);
-      }
-    } catch {
-      setItems([]);
-      setTotal(0);
-      setError('콘텐츠 목록을 불러오지 못했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // 모달 열릴 때 초기화 + 첫 로드
-  useEffect(() => {
-    if (!open) return;
-    setSearch('');
-    setSelectedId(null);
-    setPage(1);
-    setTotal(0);
-    load(1, '');
-  }, [open, load]);
-
-  // 페이지 변경
-  useEffect(() => {
-    if (!open) return;
-    load(page, search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
-  // 검색 디바운스
-  useEffect(() => {
-    if (!open) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setSelectedId(null);
-      setPage(1);
-      load(1, search);
-    }, 300);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
-
-  if (!open) return null;
-
-  const selected = items.find((i) => i.id === selectedId) ?? null;
+export default function StoreContentImportModal(props: StoreContentImportModalProps) {
+  const scope = useStoreProductScope();
+  if (!props.open || !scope.ready) return null;
+  return <ContentImport key={scope.key} {...props} organizationId={scope.organizationId!} />;
+}
+function ContentImport({ onClose, onImport, organizationId }: StoreContentImportModalProps & { organizationId: string }) {
+  const state = useContentImport(organizationId);
+  const { items, loading, search, setSearch, selectedId, setSelectedId, page, setPage,
+    totalPages, error, setError, selected } = state;
 
   const handleConfirm = () => {
-    if (!selected) return;
+    if (!selected || !state.current()) return;
     const html = contentJsonToHtml(selected.contentJson);
-    if (!html.trim()) {
+    if (!html.replace(/<[^>]*>/g, '').trim() && !/<(img|video|audio)\b/i.test(html)) {
       setError('이 콘텐츠에는 가져올 본문이 없습니다. 다른 콘텐츠를 선택해 주세요.');
       return;
     }
@@ -148,7 +82,7 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[1100] flex items-center justify-center p-4" onClick={onClose}>
+    <StoreProductDialog label="콘텐츠에서 가져오기" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }} onClose={onClose}>
       <div
         className="bg-white rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -156,7 +90,7 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <h3 className="text-base font-bold text-slate-900">콘텐츠에서 가져오기</h3>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
+          <button aria-label="콘텐츠 가져오기 닫기" onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5 text-slate-400" />
           </button>
         </div>
@@ -166,6 +100,8 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
           <div className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg bg-slate-50">
             <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
             <input
+              aria-label="내 매장 콘텐츠 검색"
+              data-request-autofocus
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -184,6 +120,8 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
             <div className="flex items-center justify-center py-16 text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
+          ) : error ? (
+            <div role="alert" className="p-3 text-sm text-red-700">{error} <button onClick={state.reload}>다시 시도</button></div>
           ) : items.length === 0 ? (
             <div className="text-center py-16">
               <FileText className="w-10 h-10 text-slate-200 mx-auto mb-2" />
@@ -215,7 +153,7 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 px-5 py-2">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page <= 1}
               className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30"
             >
@@ -225,7 +163,7 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
               {page} / {totalPages}
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}
               className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30"
             >
@@ -234,7 +172,7 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
           </div>
         )}
 
-        {error && (
+        {error && items.length > 0 && (
           <div className="px-5">
             <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
           </div>
@@ -250,13 +188,13 @@ export default function StoreContentImportModal({ open, onClose, onImport }: Sto
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedId}
+            disabled={!selected || loading || !!error}
             className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             본문 가져오기
           </button>
         </div>
       </div>
-    </div>
+    </StoreProductDialog>
   );
 }
