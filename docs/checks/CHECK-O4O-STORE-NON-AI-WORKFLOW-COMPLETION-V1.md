@@ -126,3 +126,8 @@ Artifacts는 checkout 밖 `/workspace/.o4o-non-ai-browser`에 보존했다.
 - 실계정·운영 API/DB·QR 스캔·실기기 재생·배포 smoke는 미실행이다. PH plan·삭제 운영 창 뒤 CI·Sonar·Codex를 확인해 순차 통합/배포한다.
 
 새 회차 CHECK를 만들지 않고 기존 기록에 이어 쓴다. 정본·정책·canonical index 변경은 없다.
+
+
+### 통합 CI 후속 — 장바구니 첫 입력 회귀
+
+다른 소비처 CI에서 드러난 공통 baseline 장바구니 입력 경쟁을 같은 통합 공간에서 수정한 commit 2ef246c99를 이 branch에 cherry-pick했다. 초기 동기화를 layout effect로 완료하고 이벤트 값을 updater 밖에서 복사한다. 신규 회귀는 수정 전 첫 입력 유실을 재현했다. 이 후속은 앞 절의 원본 runtime tree 동일성 확인 이후 추가한 변경이다. 현재 Store 전체 **570 PASS**, production build PASS. 기존 API 계약 142 PASS는 이전 절 기록과 같으며 실제 주문·결제를 실행하지 않았다.
