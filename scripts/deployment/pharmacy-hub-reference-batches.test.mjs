@@ -42,3 +42,30 @@ test('production non-UUID timeout hashes identify metadata/source_label',()=>{
   [mediaReferenceQuery,'product_identifiers','source_label','d69849326571a56da9279a0532339eadb52e5c8323abb7b5277dcda920f91ca4'],
  ])assert.equal(createHash('sha256').update(build({schema:'public',table,column})).digest('hex'),hash);
 });
+
+test('groups every non-UUID leaf column and reads the complete literal target snapshot once',async()=>{
+ const {prepareReferenceGroups}=await import('./pharmacy-hub-reference-batches.mjs');
+ const base={schema:'public',table:'notes',scan_key:'id'};
+ const columns=[{...base,column:'a',type:'text'},{...base,column:'id',type:'uuid'},
+  {...base,column:'b',type:'jsonb'},{...base,table:'other',column:'c',type:'_text'},
+  {...base,scan_key:null,column:'unkeyed',type:'text'}];
+ let calls=0;
+ const groups=await prepareReferenceGroups({async query(sql,args){calls++;assert.equal(sql,'targets');assert.deepEqual(args,[['ph']]);return [{id:'literal_[x]'},{id:''},{id:null},{id:'literal_[x]'}];}},columns,'targets',['ph'],'invalid');
+ assert.equal(calls,1);assert.deepEqual(groups.map(c=>c.columns??c.column),[['a','b'],'id',['c'],'unkeyed']);
+ assert.deepEqual(groups[0].target_tokens,['literal_[x]','']);assert.equal(groups[0].target_tokens,groups[2].target_tokens);
+ await assert.rejects(prepareReferenceGroups({query:async()=>[{id:12}]},columns,'targets',[],'invalid'),/invalid/);
+});
+for(const [kind,count,build] of [['dev',countDevelopmentReferences,developmentReferenceQuery],['media',countMediaReferences,mediaReferenceQuery]]) {
+ test(`${kind}: grouped batches bind cached targets, identify the matching field, and reject malformed field indices`,async()=>{
+  const group={schema:'public',table:'notes',column:'a',type:'text',scan_key:'id',columns:['a','b'],target_tokens:['literal_[x]']};
+  let calls=0;
+  assert.equal(await count({async query(sql,args){assert.deepEqual(args[2],group.target_tokens);return [++calls===1?
+   {count:'0',scanned:'1024',last_id:uuid(1024),column_index:null}:
+   {count:'1',scanned:'1',last_id:uuid(1025),column_index:'2'}];}},group),1);
+  assert.equal(group.matched_column,'b');
+  for(const column_index of [null,'0','3','bad'])await assert.rejects(count({query:async()=>[
+   {count:'1',scanned:'1',last_id:uuid(1),column_index}]},group),/REFERENCE_BATCH/);
+  const sql=build(group);assert.match(sql,/ARRAY\[s\."a"::text,s\."b"::text\]/);assert.match(sql,/unnest\(\$3::text\[\]\)/);
+  assert.doesNotMatch(sql,/FROM public\./);assert.match(sql,/CASE\s+WHEN octet_length/);
+ });
+}

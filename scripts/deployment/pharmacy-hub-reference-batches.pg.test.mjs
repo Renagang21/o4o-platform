@@ -3,10 +3,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {loadPurgeSource} from './pharmacy-hub-administrative-purge-job.mjs';
-const {countDevelopmentReferences,developmentReferenceQuery}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('development')).toString('base64')}`);
-const {countMediaReferences,mediaReferenceQuery}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('media')).toString('base64')}`);
+const {countDevelopmentReferences,developmentReferenceQuery,developmentReferenceTargets}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('development')).toString('base64')}`);
+const {countMediaReferences,mediaReferenceQuery,mediaReferenceTargets}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('media')).toString('base64')}`);
 const uuid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-event-offer'];
+import {prepareReferenceGroups} from './pharmacy-hub-reference-batches.mjs';
 const walk=n=>[n,...(n.Plans??[]).flatMap(walk)];
 test('PostgreSQL keyset covers every row, uses PK range index, and detects final/NULL/array/literal references',
  {skip:!process.env.PH_BATCH_FIXTURE_URL,timeout:300000},async()=>{
@@ -41,18 +42,25 @@ test('PostgreSQL keyset covers every row, uses PK range index, and detects final
     INSERT INTO source_refs SELECT md5(n::text)::uuid,'legacy-import-source-'||n,
       jsonb_build_object('productMasterId',md5(n::text)::uuid,'source','legacy-import'),ARRAY['unrelated']
       FROM generate_series(1,${rows}) n; ANALYZE source_refs`);
+   // The old worker rediscovered roots on every page; unrelated roots must not
+   // multiply that work by the source page count.
+   await c.query(`INSERT INTO cms_contents SELECT md5(('unrelated-root-'||n)::text)::uuid,'neture'
+     FROM generate_series(1,100000) n; ANALYZE cms_contents`);
    await c.query("SET statement_timeout='15s'");
-   for(const [kind,count,build,column,target] of [
-    ['development',countDevelopmentReferences,developmentReferenceQuery,'metadata',uuid(1)],
-    ['media',countMediaReferences,mediaReferenceQuery,'source_label',uuid(50)],
+   for(const [kind,count,build,column,target,targets] of [
+    ['development',countDevelopmentReferences,developmentReferenceQuery,'metadata',uuid(1),developmentReferenceTargets],
+    ['media',countMediaReferences,mediaReferenceQuery,'source_label',uuid(50),mediaReferenceTargets],
    ]) {
-    const descriptor={schema:'public',table:'source_refs',column,type:column==='metadata'?'jsonb':'text',scan_key:'id'};
+    const descriptors=['source_label','metadata','paths'].map(name=>({schema:'public',table:'source_refs',column:name,type:'text',scan_key:'id'}));
+    let targetReads=0;
+    const [descriptor]=await prepareReferenceGroups({async query(sql,args){targetReads++;return (await c.query(sql,args)).rows;}},descriptors,targets(),keys,'invalid');
+    assert.equal(targetReads,1);assert.equal(descriptor.columns.length,3);
     let scanned=0,calls=0;
     const q={async query(sql,args){const result=await c.query(sql,args);scanned+=Number(result.rows[0].scanned);calls++;return result.rows;}};
     const start=Date.now();assert.equal(await count(q,descriptor),0);
     assert.equal(scanned,rows);assert.equal(calls,Math.floor(rows/1024)+1);
     console.log(JSON.stringify({kind,rows,batchMs:Date.now()-start,calls,scanned}));
-    const plan=(await c.query('EXPLAIN (ANALYZE,FORMAT JSON) '+build(descriptor),[keys,uuid(0)])).rows[0]['QUERY PLAN'][0].Plan;
+    const plan=(await c.query('EXPLAIN (ANALYZE,FORMAT JSON) '+build(descriptor),[keys,uuid(0),descriptor.target_tokens])).rows[0]['QUERY PLAN'][0].Plan;
     assert.ok(walk(plan).some(n=>/Index/.test(n['Node Type'])&&n['Index Cond']?.includes('id >')&&n['Actual Loops']>0));
     // No maximum UUID or late-page row can be skipped. Include NULL payloads too.
     const last='ffffffff-ffff-ffff-ffff-ffffffffffff';
@@ -62,6 +70,19 @@ test('PostgreSQL keyset covers every row, uses PK range index, and detects final
     assert.equal(await count({query:async(s,a)=>(await c.query(s,a)).rows},descriptor),1);
     await c.query('DELETE FROM source_refs WHERE id=$1',[last]);
    }
+   await c.query('CREATE TABLE split_refs(id uuid PRIMARY KEY,a text,b text,paths text[])');
+   const token=uuid(1),last='ffffffff-ffff-ffff-ffff-ffffffffffff';
+   await c.query('INSERT INTO split_refs VALUES($1,$2,$3,NULL)',[last,token.slice(0,18),token.slice(18)]);
+   const split={schema:'public',table:'split_refs',column:'a',type:'text',scan_key:'id',columns:['a','b','paths'],target_tokens:[token]};
+   const direct={query:async(s,a)=>(await c.query(s,a)).rows};
+   assert.equal(await countDevelopmentReferences(direct,split),0);
+   await c.query('UPDATE split_refs SET b=$1',[token]);assert.equal(await countDevelopmentReferences(direct,split),1);assert.equal(split.matched_column,'b');
+   await c.query('UPDATE split_refs SET a=NULL,b=NULL,paths=$1',[['prefix '+token+' suffix']]);
+   assert.equal(await countDevelopmentReferences(direct,split),1);assert.equal(split.matched_column,'paths');
+   split.target_tokens=['한글_[]'];await c.query('UPDATE split_refs SET a=$1,b=NULL',['앞 한글_[] 뒤']);
+   assert.equal(await countDevelopmentReferences(direct,split),1);
+   split.target_tokens=[''];await c.query('UPDATE split_refs SET a=NULL,b=NULL,paths=NULL');assert.equal(await countDevelopmentReferences(direct,split),0);
+   await c.query("UPDATE split_refs SET b=''");assert.equal(await countDevelopmentReferences(direct,split),1);
    // Literal metacharacters and arrays retain the exact PostgreSQL ::text semantics.
    await c.query('ALTER TABLE source_refs RENAME COLUMN id TO reference_key');
    const literal='legacy_[x].+(y){z}^$|?*%\\token';

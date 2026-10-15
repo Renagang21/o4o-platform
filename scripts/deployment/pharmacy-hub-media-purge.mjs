@@ -1,4 +1,4 @@
-import {countReferenceBatches,referenceBatchQuery} from './pharmacy-hub-reference-batches.mjs';
+import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery} from './pharmacy-hub-reference-batches.mjs';
 /** PH-only media retirement. GCS deletes cannot roll back with PostgreSQL.
  * Missing objects may resume a failed attempt, but replacements are generation-protected.
  * No asset identifiers, URLs, object names or credentials leave the worker.
@@ -71,10 +71,10 @@ async function references(q,locked) {
     JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_type t ON t.oid=a.atttypid
     WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
     AND n.nspname NOT LIKE 'pg_%' AND (t.typcategory IN ('S','A') OR t.typname IN ('uuid','json','jsonb'))`);
-  for(const c of columns) {
+  for(const c of await prepareReferenceGroups(q,columns,mediaReferenceTargets(),keys,'PH_MEDIA_REFERENCE_TARGETS')) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_MEDIA_SCHEMA_CHANGED');
     if(await countMediaReferences(q,c))
-      throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
+      throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.matched_column??c.column}`);
   }
 }
 // Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
@@ -82,11 +82,15 @@ async function references(q,locked) {
 export async function countMediaReferences(q,c) {
   const sql=mediaReferenceQuery(c);
   if(!c.scan_key||c.type==='uuid')return count(q,sql);
-  return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH');
+  return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH',c.columns?c:undefined);
 }
+export function mediaReferenceTargets() {return `SELECT v AS id FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
+            UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')}) a
+          CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL`;}
 export function mediaReferenceQuery(c) {
     const owned=c.schema==='public'&&c.table==='media_assets'?assetScope('s'):
       c.schema==='public'&&c.table==='media_entity_links'?linkScope('s'):'FALSE';
+    if(c.columns)return groupedReferenceQuery(c,owned);
     if(c.type==='uuid') {
       const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
       // Partition live/deleted landings to use the partial index without omitting references.

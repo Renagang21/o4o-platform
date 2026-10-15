@@ -459,3 +459,7 @@ PR #561은 CI·SonarCloud PASS 및 Codex 무지적 후 main 35f1dd39f35e287ec7ce
 V3 #627 병합 후 최신 main e6202355a에서 개발 plan38730535162와 미디어 plan38730893771을 재실행했으나 둘 다57014였다. 새 해시는 각각 product_landings.metadata / product_identifiers.source_label의 기존 전체 검사 SQL에 정확히 일치한다. 성공 census·WIF 변경·apply는 아직 없다.
 
 [구간 검사 V4 CHECK](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 진단·분할 검사와 보존 조건·검증을 기록한다. 유효한 leaf UUID PK가 확인된 테이블만1024행씩 끝까지 검사하며, 그 외와 상속·partition 부모는 기존 전체 검사를 유지한다. timeout·검사 범위·보호 fence를 낮추지 않는다. 통합 후 최신 main에서 두 plan을 재검증하고 성공 census 확인 전 apply는 하지 않는다.
+
+### 2026-10-15 후속 V5 — 전체600초 제한
+
+V4 개발 plan run38738916090은 Cloud Logging에서 task 전체600초 종료를 확인했다. 성공 census가 없어 WIF/apply는 계속 보류한다. V5에서 leaf UUID PK 테이블의 비UUID 열을 한 번에 순회하고 PH 대상 집합을 한 번 읽어 재사용한다. 검사 범위·timeout·보호 조건은 유지한다. 검증과 운영 재실행은 [참조 검사 CHECK의 후속 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 구분해 기록한다. #610·#615는 PH 운영 창 뒤 통합한다.

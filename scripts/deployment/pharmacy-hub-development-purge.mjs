@@ -1,4 +1,4 @@
-import {countReferenceBatches,referenceBatchQuery} from './pharmacy-hub-reference-batches.mjs';
+import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery} from './pharmacy-hub-reference-batches.mjs';
 /** Fixed, owner-approved PH development rows. Media/GCS and shared identities stay intact.
  * Caller owns the transaction. Any ownership, dependency or census drift aborts before writes.
  */
@@ -138,10 +138,10 @@ async function references(q,fks,tables) {
     AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
     AND (t.typcategory IN ('S','A') OR t.typname IN ('uuid','json','jsonb'))`);
   const locked=new Set(tables.map(t=>`${t.schema}.${t.table}`));
-  for(const c of columns) {
+  for(const c of await prepareReferenceGroups(q,columns,developmentReferenceTargets(),keys,'PH_DEV_REFERENCE_TARGETS')) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
     if(await countDevelopmentReferences(q,c))
-      throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
+      throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.matched_column??c.column}`);
   }
 }
 // Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
@@ -149,11 +149,13 @@ async function references(q,fks,tables) {
 export async function countDevelopmentReferences(q,c) {
   const sql=developmentReferenceQuery(c);
   if(!c.scan_key||c.type==='uuid')return count(q,sql);
-  return countReferenceBatches(q,sql,keys,'PH_DEV_REFERENCE_BATCH');
+  return countReferenceBatches(q,sql,keys,'PH_DEV_REFERENCE_BATCH',c.columns?c:undefined);
 }
+export function developmentReferenceTargets() {return roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');}
 export function developmentReferenceQuery(c) {
     const owned=c.schema==='public'?deletedScope(c.table,'s'):undefined;
-    const targetIds=roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
+    if(c.columns)return groupedReferenceQuery(c,owned??'FALSE');
+    const targetIds=developmentReferenceTargets();
     if(c.type==='uuid') {
       const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
       // Partition live/deleted landings to use the partial index without omitting references.
