@@ -27,7 +27,8 @@
 - [x] 확인된 UI 오류를 합성 계정으로 재현하고 수정 범위를 보완.
 - [x] 첫 UI 수정의 지정 역할·미지정·타 서비스·회수·가입 상태·전체 관리자 경계 회귀.
 - [x] 첫 UI 수정의 PC·모바일 메뉴와 기존 직접 URL guard 판정 일치 검증.
-- [ ] TODO 보완·검증 기록·이번 경로만 commit/push·PR gate 확인.
+- [x] TODO 보완·검증 기록·이번 경로만 commit/push. [첫 UI 수정 PR #600](https://github.com/Renagang21/o4o-platform/pull/600).
+- [ ] PR 최신 HEAD의 CI/review gate 확인(현재 결과는 PR checks 기준).
 
 ## 조사 후 보완
 
@@ -76,7 +77,13 @@ CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운�
   실제 13개 실패를 재현했다. 최초 타입/빌드는 새 CarePharm HostProfile 누락을 잡았고 보완 후 통과했다.
 - push 준비 시 main `761fb49e3e`의 펀딩 운영 화면 변경을 확인해 아직 push하지 않은 자기 branch만
   rebase했다. 현재 메뉴/역할/host 정본의 main 추가 변경은 없었다. 변경된 소비처 때문에 Neture 전체
-  검증을 다시 실행했으며 최종 946/946 PASS, tsc 포함 production build PASS다.
+  검증을 다시 실행했으며 최종 102 suites 946/946 PASS, tsc 포함 production build PASS다.
+  최종 bundle에서도 PC·모바일 36/36을 다시 확인했다. 계정 원문과 권한을 변경한 smoke가 아니다.
+
+첫 수정 3경로만 `wo/service-operator-assignment-audit`에 push하고 PR #600을 생성했다.
+이 단계의 main 통합·운영 배포는 실행하지 않았다. 다음 실제 원장/Google 연결 확인과 Core 최소 수정은
+아래 범위 확인에 이어 진행한다. WORKTREE_DISPOSITION: KEEP — 이번 조사·후속 수정이 미완료이며
+기존 인증 checkout/다른 세션 작업공간은 변경하지 않았다. 자기 격리 PostgreSQL process는 검증 후 종료했다.
 
 ## Core 조회 최소 수정 제안 — 적용 승인 대기
 
