@@ -8,17 +8,16 @@
  * 등록=POST /store/products/list(master 기반, idempotent). 백엔드 변경 없음.
  */
 
-import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { X, Search, Loader2, Package, Plus, Check } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import {
-  searchO4oStandardProducts,
-  registerStandardProductToStore,
   buildProductVariantLabel,
-  type O4oStandardProduct,
 } from '../../api/o4oStandardProducts';
 import { colors } from '../../styles/theme';
+
+import { useStandardProductSelection } from './productRegistration/useStandardProductSelection';
+import { StoreProductDialog, useStoreProductScope } from '../../components/store/StoreProductSession';
 
 interface Props {
   open: boolean;
@@ -26,9 +25,6 @@ interface Props {
   /** 등록 성공 후 호출 — 매장 경영활용 제품 목록 갱신 */
   onRegistered: () => void;
 }
-
-const PAGE_LIMIT = 20;
-const SEARCH_DEBOUNCE_MS = 300;
 
 /** 분류 필터 chip (code '' = 전체) — 백엔드 classificationToFilter 버킷과 정합 */
 const CLASSIFICATION_CHIPS: { code: string; label: string }[] = [
@@ -55,88 +51,19 @@ const CLASSIFICATION_COLORS: Record<string, { bg: string; fg: string }> = {
   unknown: { bg: '#F1F5F9', fg: '#94A3B8' },
 };
 
-export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Props) {
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [classification, setClassification] = useState('');
-  const [page, setPage] = useState(1);
-  const [items, setItems] = useState<O4oStandardProduct[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [registeringId, setRegisteringId] = useState<string | null>(null);
-  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-
-  // 모달 열릴 때 초기화
-  useEffect(() => {
-    if (open) {
-      setSearchInput('');
-      setSearchQuery('');
-      setClassification('');
-      setPage(1);
-      setRegisteredIds(new Set());
-    }
-  }, [open]);
-
-  // 검색어 디바운스
-  useEffect(() => {
-    const h = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
-      setPage(1);
-    }, SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(h);
-  }, [searchInput]);
-
-  // 검색 조회
-  useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    searchO4oStandardProducts({ q: searchQuery || undefined, classification: classification || undefined, page, limit: PAGE_LIMIT })
-      .then((r) => {
-        if (cancelled) return;
-        setItems(r.items);
-        setTotal(r.meta.total);
-      })
-      .catch((e: any) => {
-        if (!cancelled) setError(e?.message || 'O4O 표준 상품을 불러오지 못했습니다');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, [open, searchQuery, classification, page]);
-
-  const handleRegister = useCallback(async (p: O4oStandardProduct) => {
-    setRegisteringId(p.id);
-    try {
-      const res = await registerStandardProductToStore(p.id);
-      setRegisteredIds((prev) => new Set(prev).add(p.id));
-      if (res.message === 'ALREADY_LISTED') {
-        toast.info(`이미 매장 경영활용 제품에 등록된 상품입니다: ${p.name}`);
-      } else {
-        toast.success(`매장 경영활용 제품으로 등록되었습니다: ${p.name}`);
-      }
-      onRegistered();
-    } catch (e: any) {
-      if (e?.code === 'NO_ACTIVE_MEMBERSHIP') {
-        toast.error('활성화된 매장 멤버십이 없어 등록할 수 없습니다.');
-      } else {
-        toast.error(e?.message || '등록에 실패했습니다');
-      }
-    } finally {
-      setRegisteringId(null);
-    }
-  }, [onRegistered]);
-
-  if (!open) return null;
+export function AddO4oStandardProductModal(props: Props) {
+  const scope = useStoreProductScope();
+  if (!props.open || !scope.ready) return null;
+  return <StandardProductSelection key={scope.key} {...props} organizationId={scope.organizationId!} />;
+}
+function StandardProductSelection({ onClose, onRegistered, organizationId }: Props & { organizationId: string }) {
+  const state = useStandardProductSelection(organizationId, onRegistered);
+  const { searchInput, setSearchInput, classification, setClassification, page, setPage,
+    items, total, loading, error, registeringId, registeredIds, handleRegister, totalPages } = state;
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <StoreProductDialog style={styles.overlay} label="O4O 표준 상품에서 추가" preventBackdropClose={registeringId !== null} onClose={onClose}>
+      <div style={styles.modal}>
         <div style={styles.header}>
           <div>
             <h2 style={styles.title}>O4O 표준 상품에서 추가</h2>
@@ -147,15 +74,18 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
           <button onClick={onClose} style={styles.closeBtn} aria-label="닫기"><X size={18} /></button>
         </div>
 
+        {state.actionError && <p role="alert" className="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{state.actionError}</p>}
+        <fieldset disabled={registeringId !== null} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
         <div style={styles.searchWrap}>
           <Search size={15} style={styles.searchIcon} />
           <input
+            aria-label="표준 상품 검색"
+            data-request-autofocus
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="제품명 / 제조사 / 바코드 검색"
             style={styles.searchInput}
-            autoFocus
           />
         </div>
 
@@ -179,7 +109,8 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
           <span style={styles.countBadge}>{total.toLocaleString()}건</span>
         </div>
 
-        <div style={styles.tableWrap}>
+        <p className="mb-2 text-xs text-slate-500 md:hidden">표를 좌우로 이동하면 추가 버튼을 확인할 수 있습니다.</p>
+        <div style={styles.tableWrap} role="region" aria-label="표준 상품 목록, 좌우로 이동 가능" tabIndex={0}>
           <table style={styles.table}>
             <thead>
               <tr>
@@ -194,9 +125,9 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
               {loading ? (
                 <tr><td colSpan={5} style={styles.empty}><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> 불러오는 중…</td></tr>
               ) : error ? (
-                <tr><td colSpan={5} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td></tr>
+                <tr><td role="alert" colSpan={5} style={{ ...styles.empty, color: '#DC2626' }}>{error} <button type="button" onClick={state.retry}>다시 시도</button></td></tr>
               ) : items.length === 0 ? (
-                <tr><td colSpan={5} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : '표시할 O4O 표준 상품이 없습니다'}</td></tr>
+                <tr><td colSpan={5} style={styles.empty}>{searchInput.trim() ? '검색 결과가 없습니다' : '표시할 O4O 표준 상품이 없습니다'}</td></tr>
               ) : (
                 items.map((p) => {
                   const done = registeredIds.has(p.id);
@@ -266,20 +197,21 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
           </table>
         </div>
 
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+        <div className="[&>div]:flex-wrap"><Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} /></div>
 
         <p style={styles.footnote}>
           ※ 등록한 상품은 <b>매장 경영활용 제품</b>(O4O 기반 제품)으로 추가되어 이 화면 목록에 표시됩니다.
           가격·진열·콘텐츠 등 세부 설정은 등록 후 각 관리 화면에서 진행합니다.
         </p>
+        </fieldset>
       </div>
-    </div>
+    </StoreProductDialog>
   );
 }
 
 const styles: Record<string, CSSProperties> = {
   overlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '40px 16px', overflowY: 'auto' },
-  modal: { background: colors.white, borderRadius: '12px', width: '100%', maxWidth: '820px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', padding: '20px 22px' },
+  modal: { minWidth: 0, background: colors.white, borderRadius: '12px', width: '100%', maxWidth: '820px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', padding: '20px 22px' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '14px' },
   title: { fontSize: '17px', fontWeight: 600, color: colors.neutral800, margin: 0 },
   subtitle: { fontSize: '13px', color: colors.neutral500, margin: '4px 0 0' },

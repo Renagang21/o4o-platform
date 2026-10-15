@@ -12,6 +12,11 @@ export function useNativeStoreDialog() {
     return () => {
       if (typeof dialog.close === 'function') dialog.close();
       if (trigger?.isConnected) trigger.focus();
+      // Backdrop pointerdown can remove the dialog before the browser's default focus action.
+      // Repair only an otherwise unfocused document, never a newly opened dialog or another control.
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => {
+        if (trigger?.isConnected && document.activeElement === document.body && !document.querySelector('dialog[open]')) trigger.focus();
+      });
     };
   }, []);
   return ref;

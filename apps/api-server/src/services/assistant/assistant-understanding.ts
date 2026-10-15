@@ -266,7 +266,12 @@ function extractJsonObject(text: string): unknown {
 // ─── 재개용 메모리 캐시(§17 — DB 비저장) ───────────────────────────────────
 // 키 = logical run id. 한 Task 가 여러 run 을 가질 수 있으므로 Task 로 묶으면 다른 run 의 이해로 재개 판정이 섞인다.
 
-const CACHE_TTL_MS = WORK_RUN_TTL_MS;
+/**
+ * 이해 글(요청 파생 — 업무 값을 담을 수 있다)은 run 이 살아 있는 동안만 둔다. run 만료(WORK_RUN_TTL_MS · 상태 전이마다 연장)와
+ * 같은 수명이라, 질문에 답하지 않아 만료된 run · 종결 처리 중 정리를 놓친 run 의 이해도 그 뒤로 남지 않는다.
+ */
+export const UNDERSTANDING_CACHE_TTL_MS = WORK_RUN_TTL_MS;
+const CACHE_TTL_MS = UNDERSTANDING_CACHE_TTL_MS;
 const CACHE_MAX = 1000;
 const understandingCache = new Map<string, { u: TaskUnderstanding; at: number; timer: ReturnType<typeof setTimeout> }>();
 
