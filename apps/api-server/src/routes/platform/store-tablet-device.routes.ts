@@ -38,7 +38,7 @@ import type { DataSource } from 'typeorm';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { getTrustedClientIp } from '../../utils/trusted-client-ip.js';
-import { retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
+import { retiredServiceKeySql, retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 import {
   applyScreenSetProductList,
@@ -484,6 +484,7 @@ async function findPendingByCode(dataSource: DataSource, code: string) {
        LEFT JOIN LATERAL (
          SELECT slug, service_key FROM platform_store_slugs
           WHERE store_id = d.organization_id AND is_active = TRUE
+            AND NOT ${retiredServiceKeySql('service_key')}
           ORDER BY updated_at DESC NULLS LAST LIMIT 1
        ) ps ON TRUE
       WHERE d.pairing_code = $1 AND d.device_token_hash IS NULL AND d.pairing_expires_at > NOW()
@@ -573,7 +574,8 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
       const upd = await dataSource.query(
         `UPDATE store_tablet_devices d SET last_seen_at = NOW()
           WHERE d.device_token_hash = $1 AND d.is_active = TRUE
-            AND EXISTS (SELECT 1 FROM platform_store_slugs ps WHERE ps.store_id = d.organization_id AND ps.slug = $2 AND ps.is_active = TRUE)
+            AND EXISTS (SELECT 1 FROM platform_store_slugs ps WHERE ps.store_id = d.organization_id AND ps.slug = $2 AND ps.is_active = TRUE
+              AND NOT ${retiredServiceKeySql('ps.service_key')})
             AND NOT ${retiredServiceOnlyOrganizationSql('d.organization_id')}
           RETURNING ${deviceCols('d.')}`,
         [hashDeviceToken(rawToken), req.params.slug],

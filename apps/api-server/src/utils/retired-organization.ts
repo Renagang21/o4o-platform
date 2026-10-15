@@ -15,6 +15,11 @@ import { RETIRED_SERVICE_KEYS, RETIRED_SERVICE_KEY_PREFIX } from '../middleware/
 const keyList = RETIRED_SERVICE_KEYS.map((k) => `'${k}'`).join(', ');
 const prefixLike = `'${RETIRED_SERVICE_KEY_PREFIX}%'`;
 
+/** 신뢰된 column 식에만 사용한다. NULL은 서비스 중립 값으로 유지한다. */
+export function retiredServiceKeySql(column: string): string {
+  return `COALESCE((btrim(${column}) IN (${keyList}) OR btrim(${column}) LIKE ${prefixLike}), FALSE)`;
+}
+
 /** `orgIdExpr` 조직이 퇴역 서비스 전용이면 TRUE 인 SQL boolean 식. */
 export function retiredServiceOnlyOrganizationSql(orgIdExpr: string): string {
   return `(

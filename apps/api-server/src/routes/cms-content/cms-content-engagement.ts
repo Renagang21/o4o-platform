@@ -33,6 +33,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
+import { isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -104,11 +105,12 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
   /** 상세와 같은 가시성 경계. 보이지 않으면 null (호출부는 404). */
   const loadVisible = async (id: string, userId: string | null) => {
     const rows: any[] = await dataSource.query(
-      `SELECT id, status, "authorRole", "createdBy" FROM cms_contents WHERE id = $1 LIMIT 1`,
+      `SELECT id, status, "authorRole", "createdBy", "serviceKey" FROM cms_contents WHERE id = $1 LIMIT 1`,
       [id],
     );
     const row = rows[0];
     if (!row) return null;
+    if (isRetiredServiceValue(row.serviceKey)) throw new RetiredServiceError();
     if (row.status === 'published') return row;
     if (userId && row.createdBy === userId) return row;
     return null;
@@ -137,6 +139,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
       );
       res.json({ success: true, data: { viewCount: Number(updated?.[0]?.viewCount ?? 0) } });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[CMS] Failed to increment view count:', error);
       res.status(500).json({
         success: false,
@@ -203,6 +206,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
         data: { recommendCount: Number(counted?.[0]?.count ?? 0), isRecommendedByMe },
       });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[CMS] Failed to toggle recommendation:', error);
       res.status(500).json({
         success: false,

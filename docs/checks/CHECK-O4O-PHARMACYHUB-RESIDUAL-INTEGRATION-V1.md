@@ -25,6 +25,8 @@ CMS slot 수정은 contentId가 바뀔 때뿐 아니라 serviceKey 단독 변경
 
 API 타입 검사도 통과했다. 전체 Jest의 최종 판정은 이 통합 head의 CI에서 확인한다.
 
+추가 재리뷰에서 발견한 CMS 조회수/추천 변경은 저장된 serviceKey를 읽어 퇴역 콘텐츠를410으로 거절하도록 보완했다. 공유 매장의 pairing slug 선택과 heartbeat slug 조건에도 퇴역 키 판정을 적용했다. PH key·event-offer·prefix/앞뒤 공백은 차단하고 NULL·Neture·KPA는 보존한다. 관련 API5 suites/77 tests, API 타입 검사, 변경 파일 ESLint PASS. 격리 PostgreSQL15의 키 판정8경우도 PASS이며 운영 DB에는 연결하지 않았다.
+
 ## 실제 삭제와 분리
 
 사용자는 PH 데이터가 테스트용이며 PH/전용 인프라를 재사용하지 않는다고 확인했다. 실제 삭제 전 development plan38673377851은 실패했고 apply는 실행하지 않았다. worker 진단은 로컬 관리자 로그 조회로 확인 중이다. GitHub job 로그 redirect는 현재 환경의 네트워크 정책으로 거절돼 우회하지 않았다.

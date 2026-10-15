@@ -185,6 +185,7 @@ describe('store slug · 조직 경로', () => {
     const device = src('routes/platform/store-tablet-device.routes.ts');
     expect(device.match(/retiredServiceOnlyOrganizationSql\(/g)?.length).toBe(3);
     expect(device).toMatch(/pairing_expires_at > NOW\(\)\s+AND NOT \$\{retiredServiceOnlyOrganizationSql\('d\.organization_id'\)\}/);
-    expect(device).toMatch(/ps\.is_active = TRUE\)\s+AND NOT \$\{retiredServiceOnlyOrganizationSql\('d\.organization_id'\)\}/);
+    expect(device).toContain("retiredServiceKeySql('service_key')");
+    expect(device).toMatch(/ps\.is_active = TRUE\s+AND NOT \$\{retiredServiceKeySql\('ps\.service_key'\)\}\)\s+AND NOT \$\{retiredServiceOnlyOrganizationSql\('d\.organization_id'\)\}/);
   });
 });
