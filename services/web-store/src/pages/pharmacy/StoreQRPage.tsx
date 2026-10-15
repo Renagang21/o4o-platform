@@ -1,3 +1,4 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { printQrSelection } from './qr/printQrSelection';
 import { useQrCreation } from './qr/useQrCreation';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -20,7 +21,7 @@ import { captureStoreOrganizationHeaders } from '../../lib/storeOrganizationHead
 import { StoreQrPrintToolbar, StoreQrOutputGuide } from './qr/StoreQrOutput';
 import { StoreQrCreateForms } from './qr/StoreQrCreateForms';
 import { styles } from './qr/qrStyles';
-import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
+import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { useState, useEffect, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
@@ -88,8 +89,13 @@ async function loadQrCodes(): Promise<StoreQrCode[]> {
 }
 
 export function StoreQRPage() {
+  const scope = useStoreOperationScope();
+  return <QrSession key={scope.key} isCurrent={scope.isCurrent} />;
+}
+function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const { organizationId } = useStoreOrganizationId();
   const location = useLocation();
+  const base = storeWorkspaceBase(location.pathname);
   const navigate = useNavigate();
   const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
   const [createdTitle, setCreatedTitle] = useState<string | null>(null);
@@ -221,26 +227,32 @@ export function StoreQRPage() {
    * QR 내리기 — 물리 삭제가 아니라 is_active=false 다(서버도 soft delete 만 한다).
    * 목록에서 지우지 않고 '내림' 으로 남긴다 — 그래야 다시 올릴 수 있다.
    */
-  const handleDeactivate = async (id: string) => {
-    if (!confirm('이 QR을 내리시겠습니까?\n주소(/qr/…)는 그대로 남아 언제든 다시 올릴 수 있습니다.')) return;
+  const statusLock = useRef(false);
+  const [statusBusy, setStatusBusy] = useState(false);
+  const [statusError, setStatusError] = useState<{ id: string; active: boolean } | null>(null);
+  const [statusNotice, setStatusNotice] = useState('');
+  const changeQrStatus = async (id: string, active: boolean) => {
+    if (statusLock.current || !isCurrent()) return;
+    statusLock.current = true; setStatusBusy(true); setStatusError(null); setStatusNotice('');
     try {
-      await deleteStoreQrCode(id);
-      setItems((prev) => prev.map((q) => (q.id === id ? { ...q, isActive: false, landable: false } : q)));
+      const response = active ? await reactivateStoreQrCode(id) : await deleteStoreQrCode(id);
+      if (!response.success) throw new Error('Unconfirmed QR status');
+      if (!isCurrent()) return;
+      setItems(previous => previous.map(qr => qr.id === id ? { ...qr, isActive: active, ...(!active ? { landable: false } : {}) } : qr));
+      if (active) await fetchItems();
+      if (isCurrent()) setStatusNotice(active ? 'QR을 다시 올렸습니다. 고객용 링크를 확인해 주세요.' : 'QR을 내렸습니다. 기존 주소는 유지됩니다.');
     } catch {
-      toast.error('QR을 내리지 못했습니다.');
+      if (isCurrent()) setStatusError({ id, active });
+    } finally {
+      statusLock.current = false;
+      if (isCurrent()) setStatusBusy(false);
     }
   };
-
-  const handleReactivate = async (id: string) => {
-    try {
-      await reactivateStoreQrCode(id);
-      setItems((prev) => prev.map((q) => (q.id === id ? { ...q, isActive: true } : q)));
-      // landable 은 화면 세트 상태 등 다른 축에도 달려 있어 서버 판정을 다시 받는다.
-      fetchItems();
-    } catch {
-      toast.error('QR을 다시 올리지 못했습니다.');
-    }
+  const handleDeactivate = (id: string) => {
+    if (statusLock.current || !isCurrent()) return;
+    if (confirm('이 QR을 내리시겠습니까?\n주소(/qr/…)는 그대로 남아 언제든 다시 올릴 수 있습니다.')) void changeQrStatus(id, false);
   };
+  const handleReactivate = (id: string) => void changeQrStatus(id, true);
 
   const handleCopyUrl = (slug: string, id: string) => {
     // 공개 QR 경로는 서비스 앱이 서빙한다(store 호스트에는 /qr 없음) — URL-FIRST-CENSUS §7-6
@@ -393,7 +405,7 @@ export function StoreQRPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
                 breadcrumb 상위·현재 항목을 실제 사이드바(콘텐츠·활용 > QR-code)와 일치시킨다. */}
-            <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
+            <Link to={base} style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
               콘텐츠·활용
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
@@ -430,7 +442,7 @@ export function StoreQRPage() {
             QR 만들기
           </button>
           {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명 만들기 진입 */}
-          <Link to="/store/marketing/qr/ai-description" style={styles.aiDescBtn}>
+          <Link to={`${base}/marketing/qr/ai-description`} style={styles.aiDescBtn}>
             <Sparkles size={14} />
             AI 설명 QR 만들기
           </Link>
@@ -442,6 +454,9 @@ export function StoreQRPage() {
       </div>
 
       {/* Batch Print Toolbar */}
+      {statusBusy && <p role="status" className="mb-3 text-sm text-slate-600">QR 상태 변경 중…</p>}
+      {statusNotice && <p role="status" className="mb-3 text-sm text-teal-800">{statusNotice}</p>}
+      {statusError && <div role="alert" className="mb-3 text-sm text-red-700">QR 상태 변경 결과를 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void changeQrStatus(statusError.id, statusError.active)}>QR 상태 변경 다시 시도</button></div>}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
       {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
       {items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
@@ -556,6 +571,7 @@ export function StoreQRPage() {
                 목록·대상/원천 배지·행 액션·출력 메뉴·내리기/다시 올리기는 공통 Core 가 그린다.
                 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)만 renderRowActionsBefore 로 주입한다.
                 자체 selectedIds(Set) ↔ Core 의 string[] 변환만 남는다(일괄 출력 보존). */}
+            <fieldset disabled={statusBusy} className="min-w-0">
             <StoreQrOperationBoard<StoreQrCode>
               items={filteredItems}
               loading={loading}
@@ -633,7 +649,7 @@ export function StoreQRPage() {
                   {item.aiDescriptionMode && item.landingTargetId && (
                     <>
                       <Link
-                        to={`/store/content/direct/${item.landingTargetId}?edit=1`}
+                        to={`${base}/content/direct/${item.landingTargetId}?edit=1`}
                         onClick={(e) => e.stopPropagation()}
                         style={styles.iconBtn}
                         title="내용 수정 (본문 편집)"
@@ -641,7 +657,7 @@ export function StoreQRPage() {
                         <Pencil size={16} />
                       </Link>
                       <Link
-                        to={`/store/marketing/qr/ai-description?content=${item.landingTargetId}&qr=${encodeURIComponent(item.slug)}`}
+                        to={`${base}/marketing/qr/ai-description?content=${item.landingTargetId}&qr=${encodeURIComponent(item.slug)}`}
                         onClick={(e) => e.stopPropagation()}
                         style={styles.iconBtn}
                         title="AI 입력·다시 만들기"
@@ -655,7 +671,7 @@ export function StoreQRPage() {
                       태블릿 콘텐츠 목록(보관 해제 지점)으로 보낸다 — dead action 을 만들지 않는다. */}
                   {item.landingType === 'screen_set' && item.landingTargetId && (
                     <Link
-                      to="/store/commerce/tablet-displays?workspace=studio"
+                      to={`${base}/commerce/tablet-displays?workspace=studio`}
                       state={
                         isArchivedCornerQr(item)
                           ? { tab: 'contents', highlightScreenSetId: item.landingTargetId }
@@ -675,6 +691,7 @@ export function StoreQRPage() {
                 </>
               )}
             />
+            </fieldset>
 
             {/* Analytics Panel — DataTable 행 아래 펼침이 직접 지원 안 되므로 표 하단에 표시 */}
             {analyticsId && (

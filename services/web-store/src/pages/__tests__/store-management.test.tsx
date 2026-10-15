@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   organizationId: 'store-a', serviceKey: 'kpa-society', products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
   businesses: vi.fn(), supply: vi.fn(), contents: vi.fn(), orders: vi.fn(), copy: vi.fn(),
 }));
+vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => mocks.organizationId }));
+vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => mocks.serviceKey }));
 vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));

@@ -1,3 +1,5 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreProductDescriptionsPage — 약국 경영지원 / 상품 설명 (결과물 관리 전용)
  *
@@ -53,9 +55,15 @@ const handleImageUpload = async (file: File): Promise<string> => {
 };
 
 export default function StoreProductDescriptionsPage() {
+  const { key } = useStoreOperationScope();
+  return <DescriptionsSession key={key} />;
+}
+function DescriptionsSession() {
+  const { base, libraryPath } = useStoreLibraryRoute();
   return (
     <StoreProductDescriptionsView
       api={descriptionsApi}
+      links={{ localProducts: `${base}/my-products?source=local`, library: libraryPath }}
       findTemplate={(id) => findTemplate(id) ?? null}
       /* KPA palette (styles/theme) — slate 계열 + primary #2563EB */
       theme={{

@@ -1,3 +1,6 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useLocation } from 'react-router-dom';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 /**
  * 이용 가능 콘텐츠 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  *
@@ -8,7 +11,7 @@
  */
 import { useLatestList } from '../../hooks/useLatestList';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -45,6 +48,10 @@ export default function PharmacyContentSourcesPage() {
 }
 
 function PharmacyContentSources() {
+  const { isCurrent } = useStoreOperationScope();
+  const { pathname } = useLocation();
+  const libraryPath = `${storeWorkspaceBase(pathname)}/library/contents`;
+  const copying = useRef(false);
   const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
   const { begin: beginSelection } = useLatestRequest();
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
@@ -71,7 +78,7 @@ function PharmacyContentSources() {
     const isCurrent = beginSelection();
     invalidateCopy();
     setSelectionError(null);
-    setCopyError(null); setCopied(null); setBusyId(null);
+    setCopyError(null); setCopied(null);
     const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
     if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
     // A linked material may not be on this page. The existing detail API rechecks store membership.
@@ -98,16 +105,19 @@ function PharmacyContentSources() {
   };
 
   const copy = async (c: SemiFranchiseContent) => {
-    const isCurrent = beginCopy();
+    if (copying.current || !isCurrent()) return;
+    copying.current = true;
+    const isLatest = beginCopy();
     setBusyId(c.id);
     setCopyError(null);
     setCopied(null);
     try {
       await neturePharmacyApi.copyContent(c.id);
-      if (isCurrent()) setCopied(c.title);
+      if (isLatest() && isCurrent()) setCopied(c.title);
     } catch (e) {
-      if (isCurrent()) setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
+      if (isLatest() && isCurrent()) setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
     } finally {
+      copying.current = false;
       if (isCurrent()) setBusyId(null);
     }
   };
@@ -124,7 +134,7 @@ function PharmacyContentSources() {
       <BusinessTabs businesses={franchises} value={sf} onChange={key => { setSf(key); setPage(1); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
-          <Link key={s.key} to={s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
+          <Link key={s.key} to={s.key === 'store-library' ? libraryPath : s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
             <p className="text-sm font-medium text-gray-900">{s.title}</p>
             <p className="mt-1 text-xs text-gray-500">{s.description}</p>
           </Link>
@@ -137,7 +147,7 @@ function PharmacyContentSources() {
 
       {copied && (
         <Notice>
-          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={STORE_LIBRARY_PATH} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
+          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={libraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
       {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
@@ -176,7 +186,7 @@ function PharmacyContentSources() {
                     <button className={btn.secondary} onClick={() => setExpandedId(expanded ? null : c.id)}>
                       {expanded ? '내용 닫기' : '내용 보기'}
                     </button>
-                    <button className={btn.primary} disabled={busyId === c.id} onClick={() => copy(c)}>
+                    <button className={btn.primary} disabled={busyId !== null} onClick={() => copy(c)}>
                       {busyId === c.id ? '만드는 중...' : '내 매장 사본 만들기'}
                     </button>
                   </div>

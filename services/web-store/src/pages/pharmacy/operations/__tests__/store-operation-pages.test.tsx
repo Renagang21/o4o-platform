@@ -29,28 +29,40 @@ beforeEach(() => {
   api.update.mockImplementation(async (id: string, status: string) => ({ success: true, data: { snapshotId: id, publishStatus: status } }));
 });
 afterEach(cleanup);
-it('a selected store without a public slug still shows confirmed home metrics and true empty activity', async () => {
+it('home starts work before overview finishes and loads recent activity only when opened', async () => {
+  let resolve!: (value: unknown) => void;
+  api.analytics.mockReturnValueOnce(new Promise(r => { resolve = r; }));
   render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
-  await screen.findByRole('heading', { name: '내 매장 홈' });
-  expect(screen.queryByText(/매장이 아직 연결/)).toBeNull();
-  expect(screen.getByText('최근 활동 기록이 없습니다')).toBeTruthy();
-  expect(screen.getByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '안내 준비 →' })).toBeTruthy();
+  expect(api.scans).not.toHaveBeenCalled();
+  expect(screen.getByText(/매장 현황을 불러오는 중/)).toBeTruthy();
+  await act(async () => resolve({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } }));
+  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
+  fireEvent.click(screen.getByText('최근 QR 활동 보기'));
+  await screen.findByText('최근 활동 기록이 없습니다');
+  expect(api.scans).toHaveBeenCalledTimes(1);
 });
-it('home failures remain distinct from genuine empty analytics and activity', async () => {
+it('home overview and optional activity failures have separate retries and never become zero results', async () => {
   api.analytics.mockRejectedValue(Error('synthetic')); api.scans.mockRejectedValue(Error('synthetic'));
   render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
   await screen.findByRole('alert');
   expect(screen.queryByText('최근 활동 기록이 없습니다')).toBeNull();
-  expect(screen.queryByText('아직 홍보 성과 데이터가 없습니다')).toBeNull();
-  api.analytics.mockResolvedValue({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } }); api.scans.mockResolvedValue({ success: true, data: [] });
+  fireEvent.click(screen.getByText('최근 QR 활동 보기'));
+  await screen.findByText(/최근 활동을 확인하지 못했습니다/);
+  api.analytics.mockResolvedValue({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } });
   fireEvent.click(screen.getByRole('button', { name: '현황 다시 시도' }));
+  await waitFor(() => expect(screen.queryByText(/확인하지 못한 현황/)).toBeNull());
+  expect(screen.getByText(/최근 활동을 확인하지 못했습니다/)).toBeTruthy();
+  api.scans.mockResolvedValue({ success: true, data: [] });
+  fireEvent.click(screen.getByRole('button', { name: '최근 활동 다시 시도' }));
   await screen.findByText('최근 활동 기록이 없습니다'); expect(screen.queryByRole('alert')).toBeNull();
 });
-it('home shortcuts preserve service-scoped store paths and use mode', async () => {
+it('home shortcuts preserve the selected service path without displaying all tools', async () => {
   render(<MemoryRouter initialEntries={['/work/kpa-society/store']}><StoreHomePage /></MemoryRouter>);
-  await screen.findByRole('heading', { name: '내 매장 홈' });
-  expect(screen.getByRole('link', { name: '게시 상태 확인' }).getAttribute('href')).toBe('/work/kpa-society/store/content');
-  expect(screen.getByRole('link', { name: 'QR 배치·출력' }).getAttribute('href')).toBe('/work/kpa-society/store/marketing/qr?workspace=use');
+  expect(screen.getByRole('link', { name: '안내 준비 →' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
+  expect(screen.getByRole('link', { name: '매장 안내 변경 →' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/use');
+  expect(screen.queryByRole('link', { name: 'QR 배치·출력' })).toBeNull();
+  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
 });
 it('publishing page reports load failure and recovers through the existing panel retry', async () => {
   api.list.mockRejectedValueOnce(Error('synthetic'));
@@ -101,7 +113,8 @@ it('store switch closes the old QR target and missing direct identity exposes no
 it('use landing retains the configured targets and distinguishes publishing from actual playback', () => {
   const config = { basePath: '/work/kpa-society/store', menuSections: [{ items: [{ key: 'library-contents', label: '자료함', subPath: '/library/contents' }, { key: 'qr', label: 'QR', subPath: '/marketing/qr' }] }] };
   render(<MemoryRouter initialEntries={['/use']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
+  fireEvent.click(screen.getByText('세부 업무'));
   expect(screen.getByRole('link', { name: /게시·활용 상태/ }).getAttribute('href')).toBe('/work/kpa-society/store/content');
   expect(screen.getByRole('link', { name: /QR 배치·출력/ }).getAttribute('href')).toContain('workspace=use');
-  expect(screen.getByText(/기기 재생 상태는 다릅니다/)).toBeTruthy();
+  expect(screen.getByText(/게시됨은 기기 연결·재생 완료/)).toBeTruthy();
 });

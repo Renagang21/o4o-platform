@@ -1,4 +1,4 @@
-import { getMarketingAnalytics, getRecentScans, type MarketingAnalyticsData, type RecentScanItem } from '../../../api/storeAnalytics';
+import { getMarketingAnalytics, type MarketingAnalyticsData } from '../../../api/storeAnalytics';
 import { getStoreExecutionAssets } from '../../../api/storeExecutionAssets';
 import { getListings } from '../../../api/pharmacyProducts';
 import { apiClient } from '../../../api/client';
@@ -6,13 +6,12 @@ import type { LiveSignals } from '../../../api/storeHub';
 
 export interface HomeOverview {
   analytics: MarketingAnalyticsData | null;
-  scans: RecentScanItem[] | null;
   libraryCount: number | null;
   productCount: number | null;
   signals: LiveSignals | null;
   unavailable: string[];
 }
-export const emptyOverview: HomeOverview = { analytics: null, scans: null, libraryCount: null, productCount: null, signals: null, unavailable: [] };
+export const emptyOverview: HomeOverview = { analytics: null, libraryCount: null, productCount: null, signals: null, unavailable: [] };
 function confirmed<T>(result: { success: boolean; data: T }): T {
   if (result.success !== true || result.data == null) throw new Error('Unconfirmed overview');
   return result.data;
@@ -25,11 +24,6 @@ export async function loadHomeOverview(organizationId: string): Promise<HomeOver
     getMarketingAnalytics().then(result => {
       const data = confirmed(result);
       if (!count(data.activeQrCount) || !count(data.weeklyScans) || !Array.isArray(data.topQrCodes)) throw new Error('Invalid analytics');
-      return data;
-    }),
-    getRecentScans().then(result => {
-      const data = confirmed(result);
-      if (!Array.isArray(data)) throw new Error('Invalid activity');
       return data;
     }),
     getStoreExecutionAssets({ page: 1, limit: 1 }).then(result => {
@@ -49,13 +43,12 @@ export async function loadHomeOverview(organizationId: string): Promise<HomeOver
       return data;
     }),
   ] as const);
-  const labels = ['홍보 성과', '최근 활동', '보관 자료', '진열 상품', '처리할 업무'];
+  const labels = ['홍보 성과', '보관 자료', '진열 상품', '처리할 업무'];
   return {
     analytics: results[0].status === 'fulfilled' ? results[0].value : null,
-    scans: results[1].status === 'fulfilled' ? results[1].value : null,
-    libraryCount: results[2].status === 'fulfilled' ? results[2].value : null,
-    productCount: results[3].status === 'fulfilled' ? results[3].value : null,
-    signals: results[4].status === 'fulfilled' ? results[4].value : null,
+    libraryCount: results[1].status === 'fulfilled' ? results[1].value : null,
+    productCount: results[2].status === 'fulfilled' ? results[2].value : null,
+    signals: results[3].status === 'fulfilled' ? results[3].value : null,
     unavailable: results.flatMap((result, index) => result.status === 'rejected' ? [labels[index]] : []),
   };
 }

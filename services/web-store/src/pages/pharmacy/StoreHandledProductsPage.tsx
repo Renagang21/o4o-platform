@@ -4,7 +4,7 @@
 
 import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
 import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
@@ -26,6 +26,8 @@ import { ProductFormModal } from './StoreLocalProductsPage';
 import { createLocalProduct, getLocalProduct, updateLocalProduct, type LocalProduct, type LocalProductInput } from '../../api/localProducts';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { colors } from '../../styles/theme';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
@@ -60,6 +62,12 @@ function parsePage(v: string | null): number {
 }
 
 export default function StoreHandledProductsPage() {
+  const { key } = useStoreOperationScope();
+  return <HandledProductsSession key={key} />;
+}
+function HandledProductsSession() {
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -333,7 +341,10 @@ export default function StoreHandledProductsPage() {
           <button onClick={openLocalCreate} disabled={localSaving} style={styles.primaryBtn}>
             <PlusCircle size={14} /> 직접 등록하기
           </button>
-          <button onClick={() => navigate('/store/product-settings')} style={styles.refreshBtn}>제품 진열 설정</button>
+          <details className="relative rounded-lg border border-slate-200 bg-white p-2 text-sm">
+            <summary className="min-h-7 cursor-pointer content-center">등록·진열 관리</summary>
+            <div className="mt-2 flex flex-wrap gap-2">
+          <button onClick={() => navigate(`${base}/product-settings`)} style={styles.refreshBtn}>제품 진열 설정</button>
           <button onClick={openNewRequest} style={styles.requestBtn}>
             <PlusCircle size={14} />
             O4O DB 등록 요청
@@ -347,6 +358,8 @@ export default function StoreHandledProductsPage() {
             <RefreshCw size={14} />
             새로고침
           </button>
+            </div>
+          </details>
           </>
         }
       />
@@ -402,15 +415,15 @@ export default function StoreHandledProductsPage() {
                 매장용 상세설명서 보기
               </button>}
               {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => editLocal(singleSelected.sourceId)}>직접 등록 제품 수정</button>}
-              <button type="button" style={styles.importBtn} onClick={() => navigate(`/store/library/contents?create=1&pType=${singleSelected.sourceType}&pId=${encodeURIComponent(singleSelected.sourceId)}&pName=${encodeURIComponent(singleSelected.name)}`)}>콘텐츠 만들기</button>
-              <button type="button" style={styles.importBtn} onClick={() => navigate('/store/commerce/tablet-displays')}>태블릿에 활용</button>
+              <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/library/contents?create=1&pType=${singleSelected.sourceType}&pId=${encodeURIComponent(singleSelected.sourceId)}&pName=${encodeURIComponent(singleSelected.name)}&pStore=${encodeURIComponent(organizationId ?? '')}`)}>콘텐츠 만들기</button>
+              <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/commerce/tablet-displays?workspace=use`)}>태블릿에 활용</button>
               {/* WO-O4O-KPA-STORE-MULTILINGUAL-PRODUCT-CONTENT-ENTRY-LINK-V1: 기존 다국어 상품콘텐츠 저작 화면 진입점 연결.
                   handledProducts sourceType('local'|'listing')·sourceId 를 route param(targetKind·targetId)에 그대로 전달. */}
               <button
                 type="button"
                 onClick={() =>
                   navigate(
-                    `/store/products/multilingual/${singleSelected.sourceType}/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`,
+                    `${base}/products/multilingual/${singleSelected.sourceType}/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`,
                   )
                 }
                 style={styles.langBtn}
@@ -419,7 +432,7 @@ export default function StoreHandledProductsPage() {
                 다국어 콘텐츠
               </button>
               {/* O4O 제품은 제품 QR, 직접 등록 제품은 매장 콘텐츠를 통한 QR 제작. */}
-              <button type="button" onClick={() => singleSelected.sourceType === 'listing' ? openProductQr(singleSelected) : navigate(`/store/products/multilingual/local/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`)} style={styles.mlcBtn}>
+              <button type="button" onClick={() => singleSelected.sourceType === 'listing' ? openProductQr(singleSelected) : navigate(`${base}/products/multilingual/local/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`)} style={styles.mlcBtn}>
                 <QrCode size={13} />
                 {singleSelected.sourceType === 'listing' ? '상품 QR 출력' : '콘텐츠 QR 만들기'}
               </button>
