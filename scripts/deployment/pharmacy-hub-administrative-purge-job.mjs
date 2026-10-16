@@ -122,11 +122,11 @@ function closePhase() {
   const now=performance.now();
   phaseTotals.set(phaseLabel,(phaseTotals.get(phaseLabel)??0)+now-phaseStarted);phaseStarted=now;
 }
-function markPhase(label) {
+function recordWorkerPhase(label) {
   closePhase();
   phaseLabel=typeof label==='string'&&/^[a-z_]+(?::[A-Za-z0-9_.]{1,200})?$/.test(label)?label:'unlabeled';
 }
-function enterStage(next) {stage=next;markPhase('stage:'+next);}
+function enterStage(next) {stage=next;recordWorkerPhase('stage:'+next);}
 function timingSummary() {
   closePhase();
   const entries=[...phaseTotals].map(([label,ms])=>[label,Math.round(ms)]),byKind={};
@@ -149,7 +149,7 @@ try {
   enterStage('begin');
   await query(${JSON.stringify(mode==='plan'?'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY':'BEGIN ISOLATION LEVEL SERIALIZABLE')});
   enterStage('purge');
-  const result=await new ${selected.className}(${purge==='media'?'{storage:new Storage({retryOptions:{autoRetry:false,maxRetries:0}})}':''}).up({isTransactionActive:true,phase:markPhase,query:async(sql,args)=>(await query(sql,args)).rows},${mode==='plan'});
+  const result=await new ${selected.className}(${purge==='media'?'{storage:new Storage({retryOptions:{autoRetry:false,maxRetries:0}})}':''}).up({isTransactionActive:true,phase:recordWorkerPhase,query:async(sql,args)=>(await query(sql,args)).rows},${mode==='plan'});
   enterStage('finish');
   await query(${JSON.stringify(mode==='plan'?'ROLLBACK':'COMMIT')});
   console.log(JSON.stringify(result??{applied:true,administrativeScopeOnly:true}));

@@ -133,6 +133,14 @@ for(const [purge,exportName] of [['development','countDevelopmentReferences'],['
     const {args}=jobArguments({...input,purge,source});
     const executable=Buffer.from(args.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
     assert.ok(executable.startsWith(source));
+    // Parse the complete production payload, including helper imports and worker bindings.
+    // --check does not execute imports, connect to PostgreSQL, or access GCS.
+    for(const mode of ['plan','apply']) {
+      const {args:modeArgs}=jobArguments({...input,purge,source,mode});
+      const payload=Buffer.from(modeArgs.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
+      const checked=spawnSync(process.execPath,['--input-type=module','--check'],{input:payload,encoding:'utf8'});
+      assert.equal(checked.status,0,`${purge} ${mode}: ${checked.stderr}`);
+    }
   });
 
 
