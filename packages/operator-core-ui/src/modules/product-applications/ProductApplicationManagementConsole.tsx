@@ -9,7 +9,7 @@
  * approve 는 백엔드 ProductApprovalV2Service(activateListing:true)로 위임 — per-store 단건 OPL active.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { CheckCircle, XCircle, Sparkles, Trash2, HelpCircle } from 'lucide-react';
 import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import type { RowActionItem } from '@o4o/ui';
@@ -40,6 +40,11 @@ function getPriceLabel(app: ProductApplication): string | null {
   if (app.priceGold != null) return '서비스가';
   if (app.priceGeneral != null) return '일반가';
   return null;
+}
+
+function actionFailure(e: unknown, fallback: string): string {
+  const error = e as { response?: { data?: { error?: string; message?: string } }; message?: string };
+  return error?.response?.data?.error || error?.response?.data?.message || error?.message || fallback;
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -79,7 +84,14 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionTargetId, setActionTargetId] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
+  const { pendingAction, loading: actionHookLoading, error: actionError, requestAction, cancelAction, executeAction } = useOperatorAction();
+
+  const [writing, setWriting] = useState(false);
+  const writeLock = useRef(false);
+  const writeSequence = useRef(0);
+  const reads = useRef({ mounted: false, list: 0, stats: 0 });
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const [refreshWarning, setRefreshWarning] = useState<string | null>(null);
 
   // Selection & batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -100,83 +112,126 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
     source: 'ai' | 'rule-based';
   } | null>(null);
 
+  useLayoutEffect(() => {
+    const scope = { mounted: true, list: 0, stats: 0 };
+    reads.current = scope;
+    writeSequence.current++;
+    writeLock.current = false;
+    setWriting(false);
+    setApplications([]);
+    setStats({ pending: 0, approved: 0, rejected: 0 });
+    setTotal(0);
+    setTotalPages(1);
+    setError(null);
+    setStatsError(null);
+    setActionTargetId(null);
+    setSelectedApp(null);
+    setSelectedIds(new Set());
+    setAiSummary(null);
+    setToastMsg(null);
+    setRefreshWarning(null);
+    cancelAction();
+    return () => { scope.mounted = false; scope.list++; scope.stats++; };
+  }, [api, tableId, cancelAction]);
+
+  useLayoutEffect(() => { reads.current.list++; }, [api, page, statusFilter]);
+
   const loadStats = useCallback(async () => {
+    const scope = reads.current;
+    const request = ++scope.stats;
+    const current = () => scope.mounted && request === scope.stats;
     try {
-      setStats(await api.stats());
+      const result = await api.stats();
+      if (!current()) return false;
+      setStats(result); setStatsError(null);
+      return true;
     } catch {
-      // silent
+      if (current()) setStatsError('통계를 불러오지 못했습니다. 마지막 조회 값일 수 있습니다.');
+      return false;
     }
   }, [api]);
 
   const loadApplications = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    const scope = reads.current;
+    const request = ++scope.list;
+    const current = () => scope.mounted && request === scope.list;
+    setLoading(true); setError(null);
     try {
-      const res = await api.list({
-        page,
-        limit: 20,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-      });
-      setApplications(res.data);
-      setTotal(res.pagination.total);
-      setTotalPages(res.pagination.totalPages);
-    } catch (e: any) {
-      setError(e?.message || '신청 목록을 불러올 수 없습니다.');
-    } finally {
-      setLoading(false);
-    }
+      const res = await api.list({ page, limit: 20, status: statusFilter !== 'all' ? statusFilter : undefined });
+      if (!current()) return false;
+      setApplications(res.data); setTotal(res.pagination.total); setTotalPages(res.pagination.totalPages);
+      setPage(res.pagination.page);
+      return true;
+    } catch (e) {
+      if (current()) setError(actionFailure(e, '신청 목록을 불러올 수 없습니다.'));
+      return false;
+    } finally { if (current()) setLoading(false); }
   }, [api, page, statusFilter]);
 
-  useEffect(() => { loadStats(); }, [loadStats]);
-  useEffect(() => { loadApplications(); }, [loadApplications]);
+  useEffect(() => { void loadStats(); }, [loadStats]);
+  useEffect(() => { void loadApplications(); }, [loadApplications]);
+  useEffect(() => { setSelectedIds(new Set()); setAiSummary(null); }, [statusFilter, page]);
 
-  // Reset selection on filter change
-  useEffect(() => {
-    setSelectedIds(new Set());
-    setAiSummary(null);
-  }, [statusFilter]);
+  const refreshAfterWrite = async () => {
+    const scope = reads.current;
+    const refreshed = await Promise.all([loadApplications(), loadStats()]);
+    if (scope.mounted) setRefreshWarning(refreshed.every(Boolean) ? null : '처리는 완료했지만 최신 목록·통계를 확인하지 못했습니다. 다시 조회해 주세요.');
+  };
+  const startWrite = () => {
+    if (writeLock.current) return null;
+    writeLock.current = true; setWriting(true);
+    return ++writeSequence.current;
+  };
+  const endWrite = (token: number) => {
+    if (token !== writeSequence.current) return;
+    writeLock.current = false;
+    if (reads.current.mounted) setWriting(false);
+  };
 
   // ─── Individual Actions (OperatorConfirmModal) ───
 
   const openApproveModal = (appId: string) => {
-    setActionTargetId(appId);
-    requestAction(OperatorActionType.APPROVE);
+    if (writeLock.current || loading || error || actionTargetId) return;
+    setActionTargetId(appId); requestAction(OperatorActionType.APPROVE);
   };
-
   const openRejectModal = (appId: string) => {
-    setActionTargetId(appId);
-    requestAction(OperatorActionType.REJECT);
+    if (writeLock.current || loading || error || actionTargetId) return;
+    setActionTargetId(appId); requestAction(OperatorActionType.REJECT);
   };
 
-  const handleConfirmAction = async (reason?: string) => {
-    if (!actionTargetId) return;
+  const handleConfirmAction = async (reason?: string): Promise<boolean> => {
+    if (!actionTargetId) return false;
     const app = applications.find(a => a.id === actionTargetId);
-    if (!app) return;
-
-    setActionLoading(actionTargetId);
-    await executeAction(async () => {
-      if (pendingAction === OperatorActionType.APPROVE) {
-        // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
-        //   승인 커밋과 매장 진열 활성은 분리 트랜잭션(SAVEPOINT)이라 부분 실패가 가능하다.
-        //   listingActivated 로 실제 결과를 분기해 "진열 생성"을 조건 없이 단언하지 않는다.
-        const result = await api.approve(actionTargetId);
-        const listingActivated = result && typeof result === 'object' ? (result as { listingActivated?: boolean }).listingActivated : undefined;
-        if (listingActivated === false) {
-          setToastMsg({ type: 'error', message: `"${app.product_name}" 승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해주세요.` });
-        } else {
-          setToastMsg({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
-        }
-      } else {
-        await api.reject(actionTargetId, reason || undefined);
-        setToastMsg({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
-      }
-      loadApplications();
-      loadStats();
-    });
-    setActionLoading(null);
-    setActionTargetId(null);
-    setSelectedApp(null);
-    setTimeout(() => setToastMsg(null), 4000);
+    if (!app) return false;
+    const token = startWrite();
+    if (token === null) return false;
+    const scope = reads.current;
+    setActionLoading(actionTargetId); setRefreshWarning(null);
+    try {
+      const success = await executeAction(async () => {
+        try {
+          if (pendingAction === OperatorActionType.APPROVE) {
+            const result = await api.approve(actionTargetId);
+            if (!scope.mounted) return;
+            const listingActivated = result && typeof result === 'object' ? result.listingActivated : undefined;
+            setToastMsg(listingActivated === false
+              ? { type: 'error', message: `"${app.product_name}" 승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해주세요.` }
+              : { type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
+          } else {
+            await api.reject(actionTargetId, reason || undefined);
+            if (!scope.mounted) return;
+            setToastMsg({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
+          }
+        } catch (e) { throw new Error(actionFailure(e, '상품 신청 처리에 실패했습니다.')); }
+        await refreshAfterWrite();
+      });
+      if (!scope.mounted || !success) return false;
+      setActionTargetId(null); setSelectedApp(null);
+      return true;
+    } finally {
+      if (scope.mounted) setActionLoading(null);
+      endWrite(token);
+    }
   };
 
   // ─── Batch Actions ───
@@ -186,16 +241,20 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
       const app = applications.find((a) => a.id === id);
       return app?.status === 'pending';
     });
-    if (pendingIds.length === 0) return;
+    if (pendingIds.length === 0 || actionTargetId || loading || error) return;
+    const token = startWrite();
+    if (token === null) return;
+    try {
+    const scope = reads.current;
     const result = await batch.executeBatch(
       (batchIds) => api.batchApprove(batchIds),
       pendingIds,
     );
-    if (result.successCount > 0) {
+    if (scope.mounted && result.successCount > 0) {
       setSelectedIds(new Set());
-      loadApplications();
-      loadStats();
+      await refreshAfterWrite();
     }
+    } finally { endWrite(token); }
   };
 
   const handleBulkReject = async () => {
@@ -203,48 +262,50 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
       const app = applications.find((a) => a.id === id);
       return app?.status === 'pending';
     });
-    if (pendingIds.length === 0) return;
+    if (pendingIds.length === 0 || actionTargetId || loading || error) return;
+    const token = startWrite();
+    if (token === null) return;
+    try {
+    const scope = reads.current;
     const result = await batch.executeBatch(
       (batchIds) => api.batchReject(batchIds, '일괄 거절'),
       pendingIds,
     );
-    if (result.successCount > 0) {
+    if (scope.mounted && result.successCount > 0) {
       setSelectedIds(new Set());
-      loadApplications();
-      loadStats();
+      await refreshAfterWrite();
     }
+    } finally { endWrite(token); }
   };
 
   // ─── Delete Handlers ───
 
-  const handleDeleteItem = useCallback(async (id: string) => {
+  const handleDeleteItem = async (id: string) => {
+    if (actionTargetId || loading || error) return;
+    const token = startWrite(); if (token === null) return;
+    const scope = reads.current;
     setDeleteLoading(true);
     try {
       await api.remove(id);
+      if (!scope.mounted) return;
       setToastMsg({ type: 'success', message: '신청 이력이 삭제되었습니다.' });
-      loadApplications();
-      loadStats();
-    } catch {
-      setToastMsg({ type: 'error', message: '삭제에 실패했습니다.' });
+      await refreshAfterWrite();
+    } catch (e) {
+      if (scope.mounted) setToastMsg({ type: 'error', message: actionFailure(e, '삭제에 실패했습니다.') });
     } finally {
-      setDeleteLoading(false);
-      setTimeout(() => setToastMsg(null), 4000);
+      if (scope.mounted) { setDeleteLoading(false); }
+      endWrite(token);
     }
-  }, [api, loadApplications, loadStats]);
-
-  const handleBulkDelete = useCallback(async () => {
-    if (selectedIds.size === 0) return;
-    const ids = [...selectedIds];
-    const result = await batch.executeBatch(
-      (batchIds) => api.batchDelete(batchIds),
-      ids,
-    );
-    if (result.successCount > 0) {
-      setSelectedIds(new Set());
-      loadApplications();
-      loadStats();
-    }
-  }, [api, selectedIds, batch, loadApplications, loadStats]);
+  };
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0 || actionTargetId || loading || error) return;
+    const token = startWrite(); if (token === null) return;
+    const scope = reads.current;
+    try {
+      const result = await batch.executeBatch(ids => api.batchDelete(ids), [...selectedIds]);
+      if (scope.mounted && result.successCount > 0) { setSelectedIds(new Set()); await refreshAfterWrite(); }
+    } finally { endWrite(token); }
+  };
 
   // ─── AI Summary ───
 
@@ -263,7 +324,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
         category: a.product_metadata?.category,
       }));
       const summary = await api.aiSummarize(items, '공급 상품 신청 승인/거절 관리');
-      setAiSummary(summary);
+      if (reads.current.mounted) setAiSummary(summary);
     } catch {
       setToastMsg({ type: 'error', message: 'AI 요약에 실패했습니다.' });
       setTimeout(() => setToastMsg(null), 4000);
@@ -273,6 +334,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
   };
 
   const handleFilterChange = (filter: ProductApplicationStatusFilter) => {
+    if (writeLock.current || actionTargetId) return;
     setStatusFilter(filter);
     setPage(1);
   };
@@ -366,6 +428,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
               label: '승인',
               variant: 'primary' as const,
               loading: isTarget,
+              disabled: writing || !!error || loading || actionTargetId !== null,
               onClick: () => openApproveModal(row.id),
             },
             {
@@ -373,6 +436,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
               label: '거절',
               variant: 'danger' as const,
               loading: isTarget,
+              disabled: writing || !!error || loading || actionTargetId !== null,
               onClick: () => openRejectModal(row.id),
             },
           ] : []),
@@ -381,6 +445,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             label: '삭제',
             variant: 'danger' as const,
             loading: deleteLoading,
+            disabled: writing || !!error || loading || actionTargetId !== null,
             divider: row.status === 'pending',
             onClick: () => handleDeleteItem(row.id),
             confirm: {
@@ -431,6 +496,8 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
         </div>
       )}
 
+      {statsError && <p role="alert" className="mb-3 text-amber-700">{statsError} <button type="button" disabled={writing} onClick={() => void loadStats()}>통계 다시 조회</button></p>}
+      {refreshWarning && <p role="alert" className="mb-3 text-amber-700">{refreshWarning} <button type="button" disabled={writing} onClick={() => void refreshAfterWrite()}>최신 정보 다시 조회</button></p>}
       {/* Stats / Filter */}
       <div className="flex gap-3 mb-6 flex-wrap">
         {([
@@ -441,6 +508,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
         ]).map(item => (
           <button
             key={item.key}
+            disabled={writing || actionTargetId !== null}
             onClick={() => handleFilterChange(item.key)}
             className={`px-4 py-2 rounded-lg border text-[13px] font-medium ${
               statusFilter === item.key
@@ -455,11 +523,12 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
 
       {/* Error */}
       {error && (
-        <div className="text-center py-10 text-red-600">
+        <div role="alert" className="text-center py-10 text-red-600">
           {error}
           <div className="mt-3">
             <button
-              onClick={loadApplications}
+              disabled={writing}
+              onClick={() => void loadApplications()}
               className="px-4 py-1.5 text-[13px] border border-red-600 text-red-600 rounded-md hover:bg-red-50"
             >
               다시 시도
@@ -479,7 +548,8 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             onClick: handleBulkApprove,
             variant: 'primary' as const,
             icon: <CheckCircle size={14} />,
-            loading: batch.loading,
+            loading: writing,
+            disabled: writing || loading || !!error || actionTargetId !== null,
             group: 'actions',
             tooltip: '선택된 상품 신청을 일괄 승인합니다',
             visible: selectedPendingCount > 0,
@@ -490,7 +560,8 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             onClick: handleBulkReject,
             variant: 'danger' as const,
             icon: <XCircle size={14} />,
-            loading: batch.loading,
+            loading: writing,
+            disabled: writing || loading || !!error || actionTargetId !== null,
             group: 'actions',
             tooltip: '선택된 상품 신청을 일괄 거절합니다',
             visible: selectedPendingCount > 0,
@@ -512,7 +583,8 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             onClick: handleBulkDelete,
             variant: 'danger' as const,
             icon: <Trash2 size={14} />,
-            loading: batch.loading,
+            loading: writing,
+            disabled: writing || loading || !!error || actionTargetId !== null,
             group: 'danger',
             tooltip: '선택된 신청 이력을 삭제합니다. 승인된 매장 진열 상품은 유지됩니다.',
             visible: selectedIds.size > 0,
@@ -555,9 +627,12 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
 
       <BulkResultModal
         open={batch.showResult}
-        onClose={() => { batch.clearResult(); loadApplications(); loadStats(); }}
+        onClose={() => { if (!writeLock.current) { batch.clearResult(); void refreshAfterWrite(); } }}
         result={batch.result}
-        onRetry={() => { batch.retryFailed(); }}
+        onRetry={async () => {
+          const token = startWrite(); if (token === null) return;
+          try { const result = await batch.retryFailed(); if (result?.successCount) await refreshAfterWrite(); } finally { endWrite(token); }
+        }}
       />
 
       {/* DataTable */}
@@ -571,7 +646,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
           tableId={tableId}
           selectable
           selectedKeys={selectedIds}
-          onSelectionChange={setSelectedIds}
+          onSelectionChange={ids => { if (!writing && !actionTargetId && !loading && !error) setSelectedIds(ids); }}
           onRowClick={(row) => setSelectedApp(row)}
         />
       )}
@@ -581,7 +656,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
         <Pagination
           page={page}
           totalPages={totalPages}
-          onPageChange={setPage}
+          onPageChange={next => { if (!writeLock.current && !actionTargetId) setPage(next); }}
           total={total}
         />
       )}
@@ -591,9 +666,10 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
         <OperatorConfirmModal
           open
           actionType={pendingAction}
-          onClose={() => { cancelAction(); setActionTargetId(null); }}
+          onClose={() => { if (!writeLock.current) { cancelAction(); setActionTargetId(null); } }}
           onConfirm={handleConfirmAction}
-          loading={actionHookLoading}
+          loading={actionHookLoading || writing}
+          error={actionError}
           requireReason={pendingAction === OperatorActionType.REJECT ? false : undefined}
           message={
             pendingAction === OperatorActionType.APPROVE

@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../cms-content/cms-reserved-presentation.js';
 /**
  * KPA Society — Action Queue Definitions
  *
@@ -22,7 +23,7 @@ export const kpaActionConfig: ServiceActionConfig = {
       description: '검토가 필요한 콘텐츠가 있습니다.',
       query: `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
               FROM cms_contents
-              WHERE "serviceKey" IN ('kpa-society', 'kpa')
+              WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa')
                 AND status = 'pending'`,
       actionUrl: '/operator/content?status=pending',
       actionLabel: '콘텐츠 검토',
@@ -35,7 +36,7 @@ export const kpaActionConfig: ServiceActionConfig = {
       description: '임시저장 상태의 콘텐츠가 있습니다.',
       query: `SELECT COUNT(*)::int AS cnt
               FROM cms_contents
-              WHERE "serviceKey" IN ('kpa-society', 'kpa')
+              WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa')
                 AND status = 'draft'`,
       actionUrl: '/operator/content?status=draft',
       actionLabel: '콘텐츠 관리',

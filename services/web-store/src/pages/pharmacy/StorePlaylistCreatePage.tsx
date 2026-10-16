@@ -1,3 +1,4 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 /**
  * StorePlaylistCreatePage — 내 매장 플레이리스트 등록 (매장 디지털 사이니지)
  *
@@ -16,7 +17,7 @@
  *   항목 reconciliation 전 전환 시 목록 불일치/항목 손실. 근거: IR-...-CANONICAL-DATA-MODEL-V1.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { StorePlaylistCreateView } from '@o4o/shared-space-ui';
 import type { SignagePlaylistCreateValues } from '@o4o/shared-space-ui';
@@ -26,19 +27,28 @@ import { createStorePlaylist } from '../../api/storePlaylist';
 
 
 export function StorePlaylistCreatePage() {
+  const scope = useStoreOperationScope();
+  return <PlaylistCreateSession key={scope.key} isCurrent={scope.isCurrent} />;
+}
+function PlaylistCreateSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
+  const lock = useRef(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const listPath = withWorkspaceMode(`${storeWorkspaceBase(pathname)}/marketing/signage/playlist`, 'studio');
 
   const handleSubmit = useCallback(async (values: SignagePlaylistCreateValues) => {
+    if (lock.current || !isCurrent()) return;
+    lock.current = true;
+    try {
     await createStorePlaylist({
       name: values.name,
       playlistType: 'LIST',
       description: values.description || undefined,
       tags: values.tags.length > 0 ? values.tags : undefined,
     });
-    navigate(listPath);
-  }, [navigate, listPath]);
+    if (isCurrent()) navigate(listPath);
+    } finally { lock.current = false; }
+  }, [navigate, listPath, isCurrent]);
 
   return (
     <StorePlaylistCreateView

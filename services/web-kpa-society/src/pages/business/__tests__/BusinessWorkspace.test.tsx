@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), user: { id: 'owner' } as { id: string } | null }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: mocks.get, post: mocks.post } } }));
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } }) : path === '/neture/pharmacy/semi-franchises' && (config as { headers?: unknown })?.headers ? Promise.resolve({ data: { data: ['pharmacy','other'].map(key => ({ key, membershipStatus: 'active' })) } }) : mocks.get(path, config), post: mocks.post } } }));
 import BusinessWorkspace from '../BusinessWorkspace';
 import BusinessParticipationPage from '../BusinessParticipationPage';
 import BusinessMaterialsPage from '../BusinessMaterialsPage';
@@ -42,7 +42,7 @@ describe('사업 서비스의 참가자 공간', () => {
     expect(await screen.findByText('등록된 자료가 없습니다.')).toBeTruthy();
     expect(screen.getByRole('heading', { name: '다른 사업' })).toBeTruthy();
     expect(screen.getByRole('link', { name: '참여자 게시판' }).getAttribute('href')).toBe('/businesses/other/forum');
-    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'other', page: 1, limit: 20 } });
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'other', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
   });
   it('미로그인은 신청도 로그인 진입으로 보내고 자원 조회를 하지 않는다', async () => {
     mocks.user = null; mount('/businesses/pharmacy/participation');
@@ -103,7 +103,7 @@ describe('게시판 미개설 사업의 권한', () => {
     });
     mount('/businesses/pharmacy/materials');
     expect(await screen.findByText('등록된 자료가 없습니다.')).toBeTruthy();
-    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 } });
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
     expect(screen.queryByText('사업 참여 승인 후 자료를 이용할 수 있습니다.')).toBeNull();
   });
   it('미승인 참가자의 자료 접근은 게시판 미개설 상태에서도 차단한다', async () => {

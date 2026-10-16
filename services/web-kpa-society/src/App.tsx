@@ -1,3 +1,4 @@
+import BusinessHomePresentationPage from './pages/business/BusinessHomePresentationPage';
 import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
 import PharmacyLegacyRedirect, { LegacyAwareBusinessWorkspace } from './pages/business/PharmacyLegacyRedirect';
 import BusinessWorkspace from './pages/business/BusinessWorkspace';
@@ -708,6 +709,7 @@ function App() {
           <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout /></Layout>}>
             <Route path="/" element={<PharmacyMemberHomePage />} />
             <Route path="/my/participation" element={<BusinessParticipationPage />} />
+            <Route path="/home-presentation" element={<BusinessHomePresentationPage />} />
             <Route path="/materials" element={<BusinessMaterialsPage />} />
             <Route path="/tools" element={<BusinessToolsPage />} />
             <Route path="/community" element={<BusinessForumBoundary />}>
@@ -724,7 +726,8 @@ function App() {
           </Route>
           <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
           <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
-            <Route index element={<Navigate to="participation" replace />} />
+            <Route index element={<PharmacyMemberHomePage />} />
+            <Route path="home-presentation" element={<BusinessHomePresentationPage />} />
             <Route path="participation" element={<BusinessParticipationPage />} />
             <Route path="materials" element={<BusinessMaterialsPage />} />
             <Route path="tools" element={<BusinessToolsPage />} />

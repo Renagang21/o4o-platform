@@ -1,3 +1,4 @@
+import { cmsMutationRows, ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * Content Approval Service
  *
@@ -321,10 +322,11 @@ export class ContentApprovalService {
    */
   private async publishContent(qr: QueryRunner, domain: string, contentId: string): Promise<void> {
     if (domain === 'cms') {
-      await qr.query(
-        `UPDATE cms_contents SET status = 'published', updated_at = NOW() WHERE id = $1`,
+      const updated = cmsMutationRows(await qr.query(
+        `UPDATE cms_contents SET status = 'published', "updatedAt" = NOW() WHERE ${ORDINARY_CMS_CONTENT_SQL} AND id = $1 RETURNING id`,
         [contentId],
-      );
+      ));
+      if (!updated.length) throw new Error('Content not found');
     } else if (domain === 'signage-media') {
       await qr.query(
         `UPDATE signage_media SET status = 'active', updated_at = NOW() WHERE id = $1`,

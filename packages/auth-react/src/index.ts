@@ -69,3 +69,5 @@ export { SocialAccountConnections } from './SocialAccountConnections';
 export { MyHomeButton, useMyHomeReturn, MY_HOME_SOURCES, getMyHomePath } from './MyHomeButton';
 
 export { useHandoffExchange, type HandoffExchangeState } from './useHandoffExchange';
+
+export { LoginCard, LoginLayout } from './LoginPresentation';

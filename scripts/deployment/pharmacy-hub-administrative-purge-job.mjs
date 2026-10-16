@@ -59,10 +59,16 @@ export function jobArguments({image,source,mode,runId,attempt,username,database,
   const entry=`
 import {createRequire} from 'node:module';
 import {createHash as diagnosticHash} from 'node:crypto';
+import {writeSync as diagnosticWrite} from 'node:fs';
 const {Client}=createRequire('/app/package.json')('pg');
 ${purge==='media'?"const {Storage}=createRequire('/app/package.json')('@google-cloud/storage');":''}
 const client=new Client({host:process.env.DB_HOST,port:5432,user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME});
 let stage='connect',queryHash='none';
+function interrupted() {
+  diagnosticWrite(2,'PH_PURGE_INTERRUPTED stage='+stage+' signal=SIGTERM query_sha256='+queryHash+'\\n');
+  process.exit(1);
+}
+process.once('SIGTERM',interrupted);
 async function query(sql,args) {
   queryHash=diagnosticHash('sha256').update(sql).digest('hex');
   return client.query(sql,args);
@@ -81,7 +87,7 @@ try {
   const message=typeof error.message==='string'&&/^PH_(?:PURGE|DEV|MEDIA)_[A-Z_]+(?::[a-zA-Z0-9_.]+)?$/.test(error.message)?error.message:'PH_PURGE_FAILED';
   const code=typeof error.code==='string'&&/^[0-9A-Z]{5}$/.test(error.code)?error.code:'unknown';
   console.error(message+' stage='+stage+' code='+code+' query_sha256='+queryHash);process.exitCode=1;
-} finally {try{await client.end()}catch{process.exitCode=1}}
+} finally {try{await client.end()}catch{process.exitCode=1}process.removeListener('SIGTERM',interrupted)}
 `;
   const payload=Buffer.from(source+entry).toString('base64');
   const boot=`await import('data:text/javascript;base64,${payload}')`;
@@ -93,6 +99,18 @@ try {
     `--set-env-vars=^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${username}::DB_NAME=${database}`,
     '--command=node',`--args=^|^--input-type=module|-e|${boot}`]};
 }
+export async function loadPurgeSource(purge) {
+  const files={administrative:'pharmacy-hub-administrative-purge.mjs',development:'pharmacy-hub-development-purge.mjs',media:'pharmacy-hub-media-purge.mjs'};
+  if(!Object.hasOwn(files,purge))throw new Error('PH_JOB_SCOPE');
+  const source=await readFile(new URL(files[purge],import.meta.url),'utf8');
+  if(purge==='administrative')return source;
+  // A data-URL worker cannot resolve repository-relative imports. Embed the
+  // shared pure scanner as a data module; never depend on the serving image's files.
+  const relative="from './pharmacy-hub-reference-batches.mjs'";
+  if(source.split(relative).length!==2)throw new Error('PH_JOB_SOURCE');
+  const helper=await readFile(new URL('./pharmacy-hub-reference-batches.mjs',import.meta.url),'utf8');
+  return source.replace(relative,`from 'data:text/javascript;base64,${Buffer.from(helper).toString('base64')}'`);
+}
 export async function runJob({development=false,media=false}={}) {
   if(development&&media)throw new Error('PH_JOB_SCOPE');
   await gate();
@@ -102,10 +120,8 @@ export async function runJob({development=false,media=false}={}) {
   const revision=traffic[0].revisionName;
   if(!/^o4o-core-api-[a-z0-9-]+$/.test(revision))throw new Error('PH_JOB_REVISION');
   const image=run(['run','revisions','describe',revision,...base,'--format=value(status.imageDigest)']);
-  let file='./pharmacy-hub-administrative-purge.mjs',purge='administrative';
-  if(development){file='./pharmacy-hub-development-purge.mjs';purge='development';}
-  if(media){file='./pharmacy-hub-media-purge.mjs';purge='media';}
-  const source=await readFile(new URL(file,import.meta.url),'utf8');
+  const purge=development?'development':media?'media':'administrative';
+  const source=await loadPurgeSource(purge);
   const {name,args}=jobArguments({image,source,mode:process.env.CUTOVER_MODE,runId:process.env.GITHUB_RUN_ID,
     attempt:process.env.GITHUB_RUN_ATTEMPT,username:process.env.DB_USERNAME,database:process.env.DB_NAME,purge});
   await gate();

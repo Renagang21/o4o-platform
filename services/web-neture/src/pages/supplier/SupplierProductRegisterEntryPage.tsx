@@ -60,13 +60,19 @@ export default function SupplierProductRegisterEntryPage() {
     <SupplierActivationGate mode="gate">
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">제품 등록</h1>
+        <h1 className="text-2xl font-bold text-slate-900">상품 추가</h1>
         <p className="text-sm text-slate-500 mt-1">
           등록할 제품이 <strong>의약품</strong>인지 <strong>비의약품</strong>인지 먼저 선택하세요.
           선택에 따라 입력 항목과 검토 절차가 달라집니다.
         </p>
       </div>
 
+      <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <h2 className="font-semibold text-slate-800">이미 등록된 제품인가요?</h2>
+        <p className="my-2 text-sm text-slate-600">표준 제품을 찾으면 정보를 다시 입력하지 않고 공급가와 공급 방식을 설정할 수 있습니다.</p>
+        <button type="button" onClick={() => navigate('/supplier/products/library')} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white">기존 제품 검색·공급 연결</button>
+      </div>
+      <h2 className="mb-3 font-semibold text-slate-800">새 제품 정보 검토 요청</h2>
       {/* Step 1: 의약품 / 비의약품 */}
       <div className="mb-6">
         <div className="text-xs font-semibold text-slate-500 mb-2">1. 제품 구분 선택</div>
@@ -182,6 +188,8 @@ export default function SupplierProductRegisterEntryPage() {
               <ArrowRight className="w-4 h-4 text-slate-400" />
             </button>
           </div>
+
+          <button type="button" onClick={() => navigate(`/supplier/products/import-assistant?${new URLSearchParams({ productType: selected.key })}`)} className="mt-3 rounded-lg border border-blue-200 px-4 py-3 text-sm text-blue-700">쇼핑몰 소스에서 입력하기 (HTML)</button>
 
           {topChoice === 'non_drug' && (
             <p className="mt-3 text-xs text-slate-400">

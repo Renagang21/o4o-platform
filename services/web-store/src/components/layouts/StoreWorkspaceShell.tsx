@@ -6,9 +6,12 @@ import {
   currentWorkspaceArea,
   workspaceItems,
   workspaceSupportItems,
+  workspaceGroups,
 } from "../../config/storeWorkspace";
 import { MyHomeButton } from "@o4o/auth-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { withReturnTo } from "../../lib/returnTo";
+import { WORKSPACE_PATHS } from "../../config/workspace";
 import { authClient } from "../../lib/apiClient";
 
 export interface StoreWorkspaceOutlet {
@@ -36,14 +39,21 @@ export function StoreWorkspaceShell({
   );
   const items = active ? workspaceItems(config, active) : [];
   const support = workspaceSupportItems(config);
+  const landing = STORE_WORKSPACE_AREAS.find((area) => area.key === active);
+  const isLanding =
+    !!landing && location.pathname === `${config.basePath}${landing.subPath}`;
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-slate-700">
-            {organizationName ?? "내 매장"}
-          </p>
-          <details className="relative">
+          <Link
+            to={withReturnTo(WORKSPACE_PATHS.select, config.basePath)}
+            className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
+            aria-label="매장 선택"
+          >
+            {organizationName ?? "내 매장"} · 매장 선택
+          </Link>
+          <details key={location.pathname} className="relative">
             <summary className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
               매장 설정·My Home
             </summary>
@@ -67,9 +77,6 @@ export function StoreWorkspaceShell({
                 authLoading={authLoading}
                 className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
               />
-              <span className="px-3 text-xs text-slate-500">
-                직원 초대·승인은 My Home에서
-              </span>
               <Link
                 className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
                 to="/services"
@@ -94,51 +101,70 @@ export function StoreWorkspaceShell({
             </Link>
           ))}
         </nav>
-        {items.length > 0 && (
+        {items.length > 0 && !isLanding && landing && (
           <nav
             aria-label="현재 업무 메뉴"
-            className="mt-3 flex flex-wrap gap-2"
+            className="mt-3 flex flex-wrap items-start gap-3"
           >
-            {items.map((item) => {
-              const [relative, search = ""] = item.subPath.split("?");
-              const path = `${config.basePath}${relative}`;
-              const matches =
-                (location.pathname === path ||
-                  location.pathname.startsWith(`${path}/`)) &&
-                (!search ||
-                  new URLSearchParams(location.search).get("workspace") ===
-                    new URLSearchParams(search).get("workspace"));
-              return (
-                <Link
-                  key={item.key}
-                  to={`${config.basePath}${item.subPath}`}
-                  aria-current={matches ? "page" : undefined}
-                  className={`rounded-lg border px-3 py-2.5 text-sm ${matches ? "border-teal-700 bg-teal-50 font-semibold text-teal-800" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+            <Link
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
+              to={`${config.basePath}${landing.subPath}`}
+            >
+              {landing.label} 전체
+            </Link>
+            <details
+              key={location.pathname + location.search}
+              className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white p-3"
+            >
+              <summary className="cursor-pointer text-sm font-medium text-slate-700">
+                다른 업무 열기
+              </summary>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                {workspaceGroups(config, active!).map((group) => (
+                  <section key={group.key}>
+                    <h2 className="text-sm font-semibold text-slate-800">
+                      {group.title}
+                    </h2>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {[...group.primary, ...group.secondary].map((item) => (
+                        <Link
+                          key={item.key}
+                          to={`${config.basePath}${item.subPath}`}
+                          className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-600 hover:bg-teal-50"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </details>
           </nav>
         )}
-        {active === "commerce" && serviceWorkConfig && (
-          <nav
-            aria-label="사업별 거래 업무"
-            className="mt-3 flex flex-wrap gap-2"
-          >
-            {serviceWorkConfig.menuSections
-              ?.flatMap((section) => section.items)
-              .filter((item) => item.key !== "online-sales-orders")
-              .map((item) => (
-                <Link
-                  key={item.key}
-                  to={`${serviceWorkConfig.basePath}${item.subPath}`}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
-                >
-                  {item.label}
-                </Link>
-              ))}
-          </nav>
+        {active === "commerce" && !isLanding && serviceWorkConfig && (
+          <details className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+            <summary className="cursor-pointer text-sm">
+              사업별 거래 업무
+            </summary>
+            <nav
+              aria-label="사업별 거래 업무"
+              className="mt-3 flex flex-wrap gap-2"
+            >
+              {serviceWorkConfig.menuSections
+                ?.flatMap((section) => section.items)
+                .filter((item) => item.key !== "online-sales-orders")
+                .map((item) => (
+                  <Link
+                    key={item.key}
+                    to={`${serviceWorkConfig.basePath}${item.subPath}`}
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+            </nav>
+          </details>
         )}
         <main className="min-w-0 py-6">
           {children ?? (

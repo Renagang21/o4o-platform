@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../../routes/cms-content/cms-reserved-presentation.js';
 /**
  * AppreciationService — 기여 감사 포인트
  * WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
@@ -218,7 +219,7 @@ export class AppreciationService {
         case 'content': {
           // cms_contents (createdBy) 우선, kpa_contents (created_by) fallback
           const cms = await AppDataSource.query(
-            `SELECT "createdBy" FROM cms_contents WHERE id = $1 LIMIT 1`,
+            `SELECT "createdBy" FROM cms_contents WHERE ${ORDINARY_CMS_CONTENT_SQL} AND id = $1 LIMIT 1`,
             [targetId],
           );
           if (cms[0]?.createdBy) return cms[0].createdBy;

@@ -19,15 +19,15 @@ export const STORE_WORKSPACE_AREAS = [
   },
   {
     key: "studio",
-    label: "콘텐츠 작업실",
+    label: "안내 만들기",
     subPath: "/workspace/studio",
-    description: "자료를 보관하고 매장에서 쓸 콘텐츠를 준비합니다.",
+    description: "상품과 자료를 골라 매장에서 사용할 안내를 준비합니다.",
   },
   {
     key: "use",
-    label: "매장에서 활용",
+    label: "매장 운영",
     subPath: "/workspace/use",
-    description: "완성된 자료를 배치·출력하고 현장 활용을 확인합니다.",
+    description: "저장된 안내를 적용·출력하고 사용 상태를 확인합니다.",
   },
 ] as const;
 
@@ -183,4 +183,115 @@ export function currentWorkspaceArea(
   )
     return "commerce";
   return null;
+}
+
+/** Presentation only: group the already permission-filtered menu without adding routes or capabilities. */
+export interface StoreWorkspaceGroup {
+  key: string;
+  title: string;
+  description: string;
+  primary: StoreMenuSectionItem[];
+  secondary: StoreMenuSectionItem[];
+}
+export function workspaceGroups(
+  config: StoreDashboardConfig,
+  area: StoreWorkspaceArea,
+): StoreWorkspaceGroup[] {
+  const items = workspaceItems(config, area);
+  const group = (
+    key: string,
+    title: string,
+    description: string,
+    primary: string[],
+    secondary: string[] = [],
+  ): StoreWorkspaceGroup => ({
+    key,
+    title,
+    description,
+    primary: primary.flatMap((key) => items.filter((item) => item.key === key)),
+    secondary: secondary.flatMap((key) =>
+      items.filter((item) => item.key === key),
+    ),
+  });
+  const groups =
+    area === "commerce"
+      ? [
+          group(
+            "products",
+            "내 상품",
+            "매장에서 안내할 상품을 찾고 상품별 정보와 자료를 확인합니다.",
+            ["my-products"],
+          ),
+          group(
+            "orders",
+            "공급·주문",
+            "공급 상품과 조건을 확인하고 기존 거래 업무를 이어갑니다.",
+            ["pharmacy-supply", "pharmacy-cart", "pharmacy-orders"],
+            ["pharmacy-recruitments"],
+          ),
+        ]
+      : area === "studio"
+        ? [
+            group(
+              "contents",
+              "내 안내",
+              "저장한 콘텐츠를 찾아 수정하거나 자료를 골라 새 안내를 준비합니다.",
+              ["library-contents"],
+              ["library-resources"],
+            ),
+            group(
+              "sources",
+              "자료 찾기",
+              "이용 가능한 제공 자료를 찾아 내 매장에서 사용할 사본을 가져옵니다.",
+              ["pharmacy-contents"],
+            ),
+            group(
+              "editors",
+              "직접 만들기",
+              "필요한 편집기를 열어 안내를 작성하고 미리보기·저장을 진행합니다.",
+              [],
+              [
+                "product-descriptions",
+                "tablet-displays",
+                "qr",
+                "signage-playlist",
+                "signage-videos",
+                "pop",
+                "content-blog",
+              ],
+            ),
+          ]
+        : area === "use"
+          ? [
+              group(
+                "status",
+                "사용 중인 안내 확인",
+                "위치별 현황과 자료의 게시 설정을 확인합니다. 실제 기기 동작은 별도로 확인하세요.",
+                ["store-execution"],
+                ["asset-status"],
+              ),
+              group(
+                "apply",
+                "적용·출력",
+                "저장한 안내를 태블릿·QR·사이니지에서 사용합니다.",
+                ["tablet-displays", "qr", "signage-playlist"],
+                ["signage-schedules", "signage-player", "pop"],
+              ),
+              group(
+                "requests",
+                "상담 요청",
+                "고객이 남긴 상담 요청을 확인하고 처리합니다.",
+                ["tablet-requests"],
+              ),
+              group(
+                "analytics",
+                "이용 현황",
+                "실제로 집계된 QR 방문과 홍보 이용 기록을 확인합니다.",
+                ["analytics-marketing"],
+              ),
+            ]
+          : [];
+  return groups.filter(
+    (group) => group.primary.length || group.secondary.length,
+  );
 }

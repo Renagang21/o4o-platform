@@ -14,7 +14,9 @@
  *
  * 차단(WO): 매장·코너 직접 적용 / 공개 URL·QR 생성 / 특정 매장 태블릿 선택·배치 / 매장 제작 콘텐츠 조회.
  */
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import SupplierContentNavigation from '../../components/supplier/SupplierContentNavigation';
 import {
   Loader2, Plus, Layers, Pencil, Trash2, Copy, Send, Archive, ArchiveRestore, RotateCcw, X,
 } from 'lucide-react';
@@ -67,6 +69,11 @@ function targetLabel(t: SupplierHubTargetStoreType | null | undefined): string {
 }
 
 export default function SupplierTabletScreenSetsPage() {
+  const [params, setParams] = useSearchParams();
+  const editId = params.get('edit');
+  const openedId = useRef<string | null>(null);
+  const [targetError, setTargetError] = useState(false);
+  const closeBuilder = () => { setBuilder(null); setParams((prev) => { const next = new URLSearchParams(prev); next.delete('edit'); return next; }, { replace: true }); };
   // WO-O4O-NETURE-SUPPLIER-TABLET-LIST-PERSISTENT-ERROR-STATE-V1:
   //   null = 아직 못 불러옴(로딩/실패). 정상 0건([]) 과 타입 수준에서 구분한다.
   const [sets, setSets] = useState<SupplierScreenSet[] | null>(null);
@@ -124,6 +131,19 @@ export default function SupplierTabletScreenSetsPage() {
       setToast({ type: 'error', message: e?.message || '원본 상세를 불러오지 못했습니다.' });
     }
   }, []);
+
+  useEffect(() => {
+    if (!editId) { openedId.current = null; return; }
+    if (openedId.current === editId) return;
+    openedId.current = editId;
+    let cancelled = false;
+    setBuilder(null);
+    setTargetError(false);
+    fetchSupplierScreenSet(editId).then((detail) => {
+      if (!cancelled) setBuilder({ detail });
+    }).catch(() => { if (!cancelled) setTargetError(true); });
+    return () => { cancelled = true; openedId.current = null; };
+  }, [editId]);
 
   const guard = async (fn: () => Promise<void>) => {
     if (busy) return;
@@ -221,8 +241,8 @@ export default function SupplierTabletScreenSetsPage() {
       <div className="p-4 lg:p-6">
         <TabletContentStepBuilder
           initialDetail={builder.detail}
-          onCancel={() => setBuilder(null)}
-          onSaved={() => { setBuilder(null); reload(); }}
+          onCancel={closeBuilder}
+          onSaved={() => { closeBuilder(); reload(); }}
           onToast={setToast}
           previewApi={previewApi}
           storeSlug={SUPPLIER_PREVIEW_SLUG}
@@ -248,6 +268,9 @@ export default function SupplierTabletScreenSetsPage() {
 
   return (
     <div className="p-4 lg:p-6 space-y-4">
+      <SupplierContentNavigation />
+      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 태블릿 화면을 열 수 없습니다. 대상을 확인하거나 다시 시도해 주세요.</p>}
+
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
           <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">

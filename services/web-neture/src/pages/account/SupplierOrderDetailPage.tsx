@@ -1,3 +1,4 @@
+import { supplierReturnPath } from '../../lib/supplierNavigation';
 /**
  * SupplierOrderDetailPage - 공급자 주문 상세
  *
@@ -113,7 +114,7 @@ function SectionCard({ title, icon, children }: { title: string; icon: React.Rea
 export default function SupplierOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
-  const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/orders' : '/account/supplier/orders';
+  const backPath = supplierReturnPath(new URLSearchParams(location.search).get('returnTo'), '/supplier/orders/manage');
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);

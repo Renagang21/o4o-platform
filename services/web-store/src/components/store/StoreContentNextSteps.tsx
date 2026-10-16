@@ -1,3 +1,4 @@
+import { useStoreLibraryRoute } from '../../pages/pharmacy/library/useStoreLibraryRoute';
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { StoreQrCreateModal, type InlineQrTarget } from "./StoreQrCreateModal";
@@ -14,6 +15,7 @@ function ContentNextStepsSession({ contentId, title }: NextStepsProps) {
   const { isCurrent } = useStoreOperationScope();
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);
+  const { libraryPath } = useStoreLibraryRoute();
   const [qrOpen, setQrOpen] = useState(false);
   const target = useMemo<InlineQrTarget | null>(
     () =>
@@ -39,7 +41,7 @@ function ContentNextStepsSession({ contentId, title }: NextStepsProps) {
         )}
         <Link
           className="rounded-lg border border-teal-300 bg-white px-3 py-2.5 text-sm text-teal-900"
-          to={`${base}/library/contents`}
+          to={libraryPath}
         >
           자료 선택·제작
         </Link>

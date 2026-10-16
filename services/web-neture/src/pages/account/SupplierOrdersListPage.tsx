@@ -12,8 +12,8 @@
  * 실제 API 연동: supplierApi.getOrders() / supplierApi.updateOrderStatus()
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi } from '../../lib/api';
@@ -133,17 +133,36 @@ export default function SupplierOrdersListPage() {
   const [orders, setOrders] = useState<SupplierOrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
-  const [page, setPage] = useState(1);
+  const [params, setParams] = useSearchParams();
+  const location = useLocation();
+  const pageValue = Number(params.get('page'));
+  const page = Number.isSafeInteger(pageValue) && pageValue > 0 ? pageValue : 1;
+  const statusFilter = Object.prototype.hasOwnProperty.call(STATUS_MAP, params.get('status') ?? '') ? params.get('status')! : '';
+  const search = params.get('q') ?? '';
+  const setPage = (next: number | ((prev: number) => number)) => setParams((prev) => { const p = new URLSearchParams(prev); p.set('page', String(typeof next === 'function' ? next(page) : next)); return p; });
+  const setStatusFilter = (value: string) => setParams((prev) => {
+    const p = new URLSearchParams(prev);
+    if (value) { p.set('status', value); } else { p.delete('status'); }
+    p.delete('page');
+    return p;
+  });
+  const setSearch = (value: string) => setParams((prev) => {
+    const p = new URLSearchParams(prev);
+    if (value) { p.set('q', value); } else { p.delete('q'); }
+    return p;
+  }, { replace: true });
+  const detailLink = (id: string) => `/supplier/orders/${id}?${new URLSearchParams({ returnTo: location.pathname + location.search })}`;
+  const requestRef = useRef(0);
+  useEffect(() => () => { requestRef.current += 1; }, []);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
   //   getOrders() 가 throw 하도록 바뀌었다. 기존 catch 는 빈 목록만 세팅해 "주문 0건" 과 구분되지 않았다.
   const fetchOrders = useCallback(async () => {
+    const request = ++requestRef.current;
     setLoading(true);
     setLoadError(false);
     try {
@@ -152,16 +171,18 @@ export default function SupplierOrdersListPage() {
         limit: 20,
         status: statusFilter || undefined,
       });
+      if (request !== requestRef.current) return;
       setOrders(result.data);
       setTotalPages(result.meta.totalPages);
       setTotal(result.meta.total);
     } catch {
+      if (request !== requestRef.current) return;
       setOrders([]);
       setTotalPages(0);
       setTotal(0);
       setLoadError(true);
     } finally {
-      setLoading(false);
+      if (request === requestRef.current) setLoading(false);
     }
   }, [page, statusFilter]);
 
@@ -169,10 +190,6 @@ export default function SupplierOrdersListPage() {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Reset page when filter changes
-  useEffect(() => {
-    setPage(1);
-  }, [statusFilter]);
 
   // Client-side search filter on orderer_name
   const filteredOrders = useMemo(() => {
@@ -209,7 +226,7 @@ export default function SupplierOrdersListPage() {
       key: 'order_number',
       header: '주문번호',
       render: (_v, order) => (
-        <Link to={`/supplier/orders/${order.id}`} style={styles.orderNoLink}>
+        <Link to={detailLink(order.id)} style={styles.orderNoLink}>
           {order.order_number}
         </Link>
       ),
@@ -285,8 +302,9 @@ export default function SupplierOrdersListPage() {
     <div>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>Orders</h1>
-        <p style={styles.subtitle}>매장 주문을 확인하고 처리합니다.</p>
+        <h1 style={styles.title}>주문 처리·배송</h1>
+        <p style={styles.subtitle}>결제된 주문을 확인하고 배송을 처리합니다.</p>
+        <Link to="/supplier/orders" className="mt-2 inline-block text-sm text-blue-700 underline">통합 주문·서비스별 현황 보기</Link>
       </div>
 
       {/* Message Banner */}
@@ -309,11 +327,13 @@ export default function SupplierOrdersListPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="주문 매장명 검색"
               placeholder="매장명 검색..."
               style={styles.searchInput}
             />
           </div>
           <select
+            aria-label="주문 상태"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             style={styles.filterSelect}
@@ -388,7 +408,7 @@ export default function SupplierOrdersListPage() {
                 <div key={order.id} style={styles.mobileCard}>
                   <div style={styles.mobileCardTop}>
                     <div>
-                      <Link to={`/supplier/orders/${order.id}`} style={styles.mobileOrderNo}>
+                      <Link to={detailLink(order.id)} style={styles.mobileOrderNo}>
                         {order.order_number}
                       </Link>
                       <span style={styles.mobileStoreName}>

@@ -1,6 +1,6 @@
 # PharmacyHub 잔여 guard 통합 검증
 
-> **상태**: ACTIVE · **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-15
+> **상태**: ACTIVE · **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-16
 > **연결 작업**: [퇴역 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md), PR #609
 
 ## 통합 범위
@@ -46,3 +46,16 @@ head `d90ed83fb`의 CI38696961700 웹 검증 단계에서 기존 장바구니 �
 purge 도구·Demo/운영자 공유 workflow·잔여 데이터 경로와 signage fail-closed 목록은 원본 의도대로 보존한다. 데이터·GCS·전용 자원 삭제와 잔여0 확인 뒤 전용 도구를 제거하고, 공유 단계는 중립 경로로 분리한다. 다른 서비스 공유 자원·계정·상품/조직을 PH 이름만으로 삭제하지 않는다. WIF 제한/복구와 임시 권한 정리는 검증된 실행 창에서 수행할 별도 운영 단계다.
 
 문서 정합: 원본 역사 기록과 현행 퇴역 정본을 보존하며, 이번 통합 검증과 실제 삭제를 구분한다.
+
+
+## 2026-10-16 최신 일반 통합 main과의 사전 정합
+
+Cloud 통합 담당의 기존 전용 branch에서 main `04ff6b829cc087c676c663ef688153497895889c`를 merge 방식으로 반영했다. CMS engagement는 serviceKey 기반 퇴역 판정과 예약 홈 구성 제외 조건을 함께 유지했다. mutation은 저장된 퇴역 콘텐츠 410과 예약 metadata 주입 차단을 둘 다 유지했다. slot은 퇴역/다른 서비스 쌍 필터와 홈 초안 제외를 결합하고, serviceKey만 변경해도 nextContentId의 실제 콘텐츠를 검증한다. 공급자 메뉴는 최신 판매활동 section을 유지하면서 폐기된 PH 주석을 되살리지 않았다. Frozen Core·schema·권한 부여 정책은 변경하지 않았다.
+
+- frozen install 및 build:packages PASS. API tsc·production build PASS.
+- PH 퇴역·slug·engagement·CMS scope·실제 KPA/shared 뉴스 홈 초안 차단·홈 route API 8 suites/130 tests PASS.
+- Neture 108 files/1046 tests, Store 47 files/573 tests PASS. 두 앱 production build PASS.
+- 충돌 해소 4개 파일 lint 오류0/기존 경고2, diff whitespace PASS.
+- 이번 단계의 실제 PG·브라우저 검증은 미실행이며 앞선 단계의 PG 증거와 구분한다. 운영 DB/GCS 삭제·WIF 변경·PH plan 재실행 없음. 최신 CI·Sonar·Codex는 push 이후 새 head 기준으로 판정한다.
+
+이는 코드 사전 정합이며 PH 정리 완료나 배포 완료가 아니다. PH apply 창 종료 후에만 #610을 main에 병합한다. #609/#603은 #610 포함 관계를 재확인해 중복 병합하지 않는다. 일반 #646의 배포 성공은 이 PH branch의 배포 증거로 사용하지 않는다.

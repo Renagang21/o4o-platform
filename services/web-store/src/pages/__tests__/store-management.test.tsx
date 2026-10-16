@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   organizationId: 'store-a', serviceKey: 'kpa-society', products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
   businesses: vi.fn(), supply: vi.fn(), contents: vi.fn(), orders: vi.fn(), copy: vi.fn(),
 }));
+vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => mocks.organizationId }));
+vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => mocks.serviceKey }));
 vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));
@@ -80,7 +82,7 @@ describe('내 매장 경영지원', () => {
   });
   it('실제 사업 상태와 조건·업무 진입을 표시하며 대기 사업에는 공급 진입을 주지 않는다', async () => {
     mount(<MyServicesPage />, '/services');
-    await screen.findByText('혈당관리 사업');
+    await screen.findByRole('heading', { name: '혈당관리 사업' });
     expect(screen.getByRole('heading', { name: '이용 사업 · 가입 관리' })).toBeTruthy();
     expect(screen.getAllByRole('link', { name: '공급 상품' }).map(x => x.getAttribute('href'))).toEqual([
       '/store/pharmacy/supply?source=sf%3Apharmacy', '/store/pharmacy/supply?source=sf%3Adiabetes',

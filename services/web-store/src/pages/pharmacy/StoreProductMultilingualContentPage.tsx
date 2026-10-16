@@ -14,7 +14,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, ArrowLeft, Send, Globe } from 'lucide-react';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
@@ -288,6 +288,10 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
         </button>
       </div>
 
+      <nav className="flex flex-wrap gap-3 text-sm" aria-label="다국어 안내 다음 작업">
+        <Link to="/store/library/multilingual-product-contents/my" className="min-h-11 content-center text-blue-700 underline">내 다국어 안내 목록</Link>
+        <Link to={`${base}/workspace/use`} className="min-h-11 content-center text-blue-700 underline">매장 적용·출력</Link>
+      </nav>
       {/* Group meta */}
       <div className="space-y-4 bg-white rounded-xl border border-slate-100 p-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

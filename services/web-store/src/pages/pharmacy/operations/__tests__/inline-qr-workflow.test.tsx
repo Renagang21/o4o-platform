@@ -1,0 +1,37 @@
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import { StoreQrCreateModal } from '../../../../components/store/StoreQrCreateModal';
+const api = vi.hoisted(() => ({ store: 'A', create: vi.fn() }));
+vi.mock('../../../../hooks/useStoreOrganizationId', () => ({ useStoreOrganizationId: () => ({ organizationId: api.store }) }));
+vi.mock('../../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
+vi.mock('../../../../lib/serviceContext', () => ({ getActiveServiceKey: () => 'kpa-society', getActiveServicePublicOrigin: () => 'https://fixture.example.test' }));
+vi.mock('../../../../api/storeQr', () => ({ createStoreQrCode: api.create }));
+afterEach(cleanup);
+beforeEach(() => { vi.resetAllMocks(); api.store = 'A'; });
+const target = { id: 'content', title: 'Saved guide', origin: 'direct' as const };
+it('inline creation locks duplicate submissions and closing, preserving inputs after failure for retry', async () => {
+  let reject!: (error: Error) => void;
+  api.create.mockReturnValueOnce(new Promise((_resolve, fail) => { reject = fail; })).mockResolvedValue({ success: true, data: { slug: 'saved-guide' } });
+  const close = vi.fn();
+  render(<MemoryRouter><StoreQrCreateModal open target={target} onClose={close} /></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: 'Edited guide' } });
+  const save = screen.getByRole('button', { name: 'QR-code 생성' }); fireEvent.click(save); fireEvent.click(save);
+  expect(api.create).toHaveBeenCalledOnce();
+  expect(screen.getByLabelText('제목').matches(':disabled')).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: '취소' })); expect(close).not.toHaveBeenCalled();
+  await act(async () => reject(Error('synthetic'))); await screen.findByRole('alert');
+  expect((screen.getByLabelText('제목') as HTMLInputElement).value).toBe('Edited guide');
+  fireEvent.click(screen.getByRole('button', { name: 'QR-code 생성' }));
+  await screen.findByRole('link', { name: '/qr/saved-guide' });
+  expect(api.create.mock.calls[1][0]).toMatchObject({ landingTargetId: 'content', landingType: 'page', title: 'Edited guide' });
+});
+it('old creation completion cannot publish a success in a different store', async () => {
+  let resolve!: (value: unknown) => void;
+  api.create.mockReturnValue(new Promise(done => { resolve = done; })); const created = vi.fn();
+  const tree = () => <MemoryRouter><StoreQrCreateModal open target={target} onClose={vi.fn()} onCreated={created} /></MemoryRouter>;
+  const { rerender } = render(tree()); fireEvent.click(screen.getByRole('button', { name: 'QR-code 생성' }));
+  api.store = 'B'; rerender(tree());
+  await act(async () => resolve({ success: true, data: { slug: 'old-store' } }));
+  expect(screen.queryByRole('link', { name: '/qr/old-store' })).toBeNull(); expect(created).not.toHaveBeenCalled();
+});

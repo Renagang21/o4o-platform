@@ -6,6 +6,7 @@ import { homeEntryManagedStores, type HomeEntryData, type HomeEntryStoreRef } fr
 import { PolicyAcceptanceGate, type PendingPolicyAcceptanceLike } from "@o4o/shared-space-ui";
 import { loadPolicy } from "../../pages/legal/PolicyDocumentPage";
 import { useAuth } from "../../contexts/AuthContext";
+import { MyHomeBusinessEntry } from "./MyHomeBusinessEntry";
 
 type ResourceError = boolean | PendingPolicyAcceptanceLike[];
 function policyError(error: unknown): ResourceError {
@@ -521,13 +522,13 @@ type Analytics = {
 const BUSINESS_STATUS: Record<string, string> = {
   pending: "승인 대기", active: "이용 중", rejected: "반려", suspended: "이용 정지", terminated: "탈퇴",
 };
-type StoreBusiness = { key: string; name: string; status: string };
-export function MyHomeStoreBusinesses({ accountId, organizationId, compact = false }: {
-  accountId: string; organizationId: string; compact?: boolean;
+type StoreBusiness = { key: string; name: string; status: string; active: boolean; hasCommunity: boolean; communityKey: string | null };
+export function MyHomeStoreBusinesses({ accountId, organizationId, canEnterCommunity = false, compact = false }: {
+  accountId: string; organizationId: string; canEnterCommunity?: boolean; compact?: boolean;
 }) {
-  return <StoreBusinessRecords key={`${accountId}:${organizationId}:${compact}`} accountId={accountId} organizationId={organizationId} compact={compact} />;
+  return <StoreBusinessRecords key={`${accountId}:${organizationId}:${compact}:${canEnterCommunity}`} accountId={accountId} organizationId={organizationId} canEnterCommunity={canEnterCommunity} compact={compact} />;
 }
-function StoreBusinessRecords({ accountId, organizationId, compact }: { accountId: string; organizationId: string; compact: boolean }) {
+function StoreBusinessRecords({ accountId, organizationId, compact, canEnterCommunity }: { accountId: string; organizationId: string; compact: boolean; canEnterCommunity: boolean }) {
   const [page, setPage] = useState(1);
   const result = useMyHomeResource<StoreBusiness[] | { denied: true }>(`${accountId}:${organizationId}`, async () => {
     try {
@@ -540,6 +541,8 @@ function StoreBusinessRecords({ accountId, organizationId, compact }: { accountI
       // The API includes an available catalogue. Only explicit store memberships belong in My Home.
       return rows.filter(row => row.membershipStatus !== null).map(row => ({
         key: row.key, name: row.name,
+        communityKey: typeof row.communityKey === "string" && row.communityKey.trim() ? row.communityKey : null,
+        active: row.membershipStatus === "active", hasCommunity: typeof row.communityKey === "string" && !!row.communityKey.trim(),
         status: Object.prototype.hasOwnProperty.call(BUSINESS_STATUS, row.membershipStatus) ? BUSINESS_STATUS[row.membershipStatus] : "상태 확인 필요",
       }));
     } catch (error) {
@@ -551,11 +554,11 @@ function StoreBusinessRecords({ accountId, organizationId, compact }: { accountI
   const visible = items?.slice(compact ? 0 : (page - 1) * 10, compact ? 3 : page * 10);
   return <section className={BOX} aria-label="내 매장 협력사업 참여 현황">
     <h2 className="text-lg font-semibold">약국 협력사업 참여 현황</h2>
-    <p className="mt-2 text-sm text-slate-600">운영 중인 약국 협력사업 중 선택한 매장의 가입 기록입니다. 신청·승인·사업 업무는 내 매장에서 이어갑니다.</p>
+    <p className="mt-2 text-sm text-slate-600">선택한 약국이 참여한 협력사업입니다. 가입자 공간에서 소식을 확인하고 상품·자료는 내 매장에서 이용합니다. 매장이 여러 곳이면 이동 후 매장을 다시 선택해 주세요.</p>
     {!result.data ? <ResourceNotice error={result.error} reload={result.reload} /> : !items ?
       <p className="mt-3 text-sm text-amber-800">선택한 매장의 사업 참여 정보를 조회할 수 없습니다. 내 매장에서 이용 권한을 확인해 주세요.</p> :
       items.length === 0 ? <p className="mt-3 text-sm text-slate-500">운영 중인 약국 협력사업에 표시할 참여 기록이 없습니다.</p> : <>
-        <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></li>)}</ul>
+        <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="py-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></div>{item.active && <MyHomeBusinessEntry key={`${item.key}:${item.hasCommunity}`} businessKey={item.key} organizationId={organizationId} hasCommunity={item.hasCommunity && canEnterCommunity} />}{item.active && item.communityKey && canEnterCommunity && <BusinessNews key={`${accountId}:${organizationId}:${item.key}:${item.communityKey}`} accountId={accountId} organizationId={organizationId} businessKey={item.key} communityKey={item.communityKey} />}</li>)}</ul>
         {compact ? <p className="mt-2 text-xs text-slate-500">참여 기록 {items.length}건 중 최대 3건을 표시합니다.</p> : <RecordPages page={page} total={items.length} limit={10} label="협력사업 참여" onChange={setPage} />}
       </>}
     {compact && <Link to="/mypage/services" className="mt-3 inline-block text-sm text-blue-700 underline">협력사업 참여 현황 더 보기 →</Link>}
@@ -813,7 +816,7 @@ function StoreManagement({
           ))}
         </select>
       </label>
-      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} compact={!participationOnly} />
+      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} canEnterCommunity={['owner', 'admin', 'manager'].includes((data.workspaceStores ?? data.stores).find(s => s.organizationId === store.organizationId)?.memberRole ?? '')} compact={!participationOnly} />
       {!participationOnly && <StoreMetrics accountId={accountId} store={store} compact={compact} />}
       {!compact && renderStoreWorkspace?.(store)}
       {!participationOnly && <Link
@@ -824,4 +827,37 @@ function StoreManagement({
       </Link>}
     </div>
   );
+}
+
+
+type BusinessNewsPost = { id: string; slug: string; title: string; createdAt: string; isPinned: boolean };
+/** Only mounted for a visible active membership with a community-capable store role. */
+function BusinessNews({ accountId, organizationId, businessKey, communityKey }: {
+  accountId: string; organizationId: string; businessKey: string; communityKey: string;
+}) {
+  const result = useMyHomeResource(`${accountId}:${organizationId}:${businessKey}:${communityKey}`, async () => {
+    const load = async (pinned: boolean) => {
+      const response = await api.get(`/communities/${encodeURIComponent(communityKey)}/forum/posts`, {
+        params: { page: 1, limit: 2, sortBy: "latest", isPinned: String(pinned) },
+      });
+      const rows = response.data?.data;
+      if (response.data?.success !== true || !Array.isArray(rows) || rows.length > 2 || !rows.every(post =>
+        post && typeof post.id === "string" && !!post.id && typeof post.slug === "string" && !!post.slug &&
+        typeof post.title === "string" && isDate(post.createdAt) && post.isPinned === pinned)) throw new Error("Invalid business news");
+      return rows as BusinessNewsPost[];
+    };
+    const [pinned, recent] = await Promise.all([load(true), load(false)]);
+    return { pinned, recent };
+  });
+  return <section className="mt-4 rounded-lg bg-slate-50 p-3" aria-label="사업 소식 요약">
+    <h3 className="font-medium">사업 소식</h3>
+    <p className="mt-1 text-xs text-slate-500">고정 공지·최근 글을 각각 최대 2건 표시합니다.</p>
+    {!result.data ? <ResourceNotice error={result.error} reload={result.reload} /> :
+      !result.data.pinned.length && !result.data.recent.length ? <p className="mt-2 text-sm text-slate-500">등록된 사업 소식이 없습니다.</p> :
+      <ul className="divide-y">{[...result.data.pinned, ...result.data.recent].map(post => <li key={post.id} className="py-3">
+        <p className="break-words">{post.isPinned && <span className="mr-2 text-xs text-blue-700">고정 공지</span>}{post.title}</p>
+        <time className="text-xs text-slate-500" dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString("ko-KR")}</time>
+        <MyHomeBusinessEntry businessKey={businessKey} organizationId={organizationId} hasCommunity postSlug={post.slug} />
+      </li>)}</ul>}
+  </section>;
 }

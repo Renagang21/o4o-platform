@@ -1,3 +1,5 @@
+import { useLayoutEffect } from 'react';
+import BusinessStoreShortcut from '../BusinessStoreShortcut';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
@@ -18,6 +20,7 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
   <Route element={<BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout />}><Route path="/" element={<PharmacyMemberHomePage />} /></Route>
   <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
   <Route path="/businesses/:businessKey" element={<LegacyAwareBusinessWorkspace />}>
+    <Route index element={<PharmacyMemberHomePage />} />
     <Route path="forum/post/:slug" element={<p>전환되지 않은 이전 게시글 화면</p>} />
   </Route>
   <Route path="*" element={<Destination />} />
@@ -25,9 +28,12 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
 beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
   mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
+    if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
+    if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
     if (path.endsWith('/access')) return { data: { data: access } };
     if (path.endsWith('/forum/posts')) return { data: { data: config?.params?.isPinned === 'true' ? [post('notice', true)] : config?.params?.isPinned === 'false' ? [] : [post('notice', true), post('conversation')] } };
+    if (path.endsWith('/store/supply-options')) return { data: { data: { items: [] } } };
     if (path.endsWith('/store/contents')) return { data: { data: { items: [
       { id: 'guide', title: '게시된 실제 자료', summary: '사업 자료 요약', semiFranchiseKey: 'pharmacy' },
       { id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'other' },
@@ -63,9 +69,9 @@ describe('약국 회원 초기화면', () => {
     expect(screen.queryByText('다른 사업 자료')).toBeNull();
     expect(screen.queryByText('참여 신청 · 이용 상태')).toBeNull();
     expect(screen.getByRole('link', { name: '회원의 실제 이야기' }).getAttribute('href')).toBe('/community/post/conversation');
-    expect(screen.getByRole('link', { name: '게시된 실제 자료' }).getAttribute('href')).toBe('/materials?content=guide');
+    expect(screen.getByRole('link', { name: '게시된 실제 자료' }).getAttribute('href')).toBe('/materials?content=guide&store=store-a');
     expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 20, sortBy: 'latest' } });
-    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 3 } });
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 3 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
   });
   it('미로그인은 원래 루트로 복귀하는 로그인으로 보내고 회원 데이터를 조회하지 않는다', async () => {
     mocks.user = null; render(tree('/'));
@@ -142,4 +148,36 @@ describe('약국 회원 초기화면', () => {
     ['/businesses/pharmacy/materials', '/materials'], ['/businesses/pharmacy/tools', '/tools'],
     ['/businesses/pharmacy/forum/owned/board/members', '/community/owned/board/members'],
   ])('이전 주소 %s를 %s로 전환한다', (old, next) => expect(pharmacyLegacyPath(old)).toBe(next));
+});
+
+it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표시한다', async () => {
+  mocks.get.mockImplementation(async (path: string) => {
+    if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
+    if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
+    if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
+    if (path.endsWith('/access')) return { data: { data: { ...access, businessKey: 'network-a' } } };
+    if (path.endsWith('/forum/posts')) return { data: { data: [] } };
+    if (path.endsWith('/store/supply-options')) return { data: { data: { items: [] } } };
+    if (path.endsWith('/store/contents')) return { data: { data: { items: [{ id: 'a', title: '사업 A 자료', semiFranchiseKey: 'network-a' }, { id: 'b', title: '다른 사업 자료', semiFranchiseKey: 'network-b' }] } } };
+    throw new Error(path);
+  });
+  render(tree('/businesses/network-a'));
+  expect(await screen.findByText('네트워크 A · 회원 커뮤니티')).toBeTruthy();
+  expect(await screen.findByText('사업 A 자료')).toBeTruthy();
+  expect(screen.queryByText('다른 사업 자료')).toBeNull();
+  expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a&store=store-a');
+});
+
+
+it('preserves a handoff failure when the user starts navigation immediately after commit', async () => {
+  mocks.handoff.mockRejectedValue(new Error('No organization'));
+  function ClickAtCommit() {
+    useLayoutEffect(() => {
+      screen.getByRole('button', { name: '내 매장으로' }).click();
+    }, []);
+    return <BusinessStoreShortcut />;
+  }
+  render(<ClickAtCommit />);
+  expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
+  expect(mocks.handoff).toHaveBeenCalledTimes(1);
 });

@@ -7,7 +7,7 @@
  * Calls staff-only blog endpoints with auth token.
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
+import { storeJsonFetch } from './storeJsonFetch';
 import { getActiveServicePrefix } from '../lib/serviceContext';
 
 function getApiBase(service: string = getActiveServicePrefix()): string {
@@ -28,16 +28,8 @@ export interface StaffBlogPost {
 }
 
 async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
-  const token = getAccessToken();
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-  const json = await res.json();
+  const json = await storeJsonFetch<any>(url, options, (body, status) =>
+    Object.assign(new Error(body.error?.message || body.message || 'Request failed'), { status }));
   if (!json.success) throw new Error(json.error?.message || 'Request failed');
   return json;
 }

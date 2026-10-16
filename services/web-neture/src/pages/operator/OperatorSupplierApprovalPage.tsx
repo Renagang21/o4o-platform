@@ -19,7 +19,8 @@
  * 프론트는 필드를 재계산하지 않고 그대로 사용한다(구버전 payload 대비 fallback 만 유지).
  */
 
-import { useState } from 'react';
+import { OperatorDialog } from './OperatorDialog';
+import { useState, useRef } from 'react';
 import { SupplierDetailBody } from './OperatorSupplierApprovalDetail';
 import { useSupplierApprovalWorkflow } from './useSupplierApprovalWorkflow';
 import { statusFilters, statusColors, statusLabels, isProfileComplete, profileMissingLabels } from './operatorSupplierApprovalModel';
@@ -37,6 +38,7 @@ import { operatorSupplierApi, type AdminSupplier } from '../../lib/api';
 import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
 
 export default function OperatorSupplierApprovalPage() {
+  const dialogFallback = useRef<HTMLHeadingElement>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // ─── 표준 리스트 상태 (server-driven, URL sync) ───
   const {
@@ -195,7 +197,7 @@ export default function OperatorSupplierApprovalPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">공급자 승인</h1>
+        <h1 ref={dialogFallback} tabIndex={-1} className="text-2xl font-bold text-slate-800">공급자 승인</h1>
         <p className="text-slate-500 mt-1">
           가입 승인 완료된 공급자의 기본 정보를 확인하고 운영자가 승인합니다 (PENDING → ACTIVE/REJECTED).
         </p>
@@ -356,15 +358,14 @@ export default function OperatorSupplierApprovalPage() {
 
       {/* 거절 사유 모달 (단일 + 일괄 공용) */}
       {rejectModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1010]">
-          <div role="dialog" aria-label="공급자 거절" className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl mx-4">
+        <OperatorDialog label="공급자 거절" fallbackFocus={dialogFallback} busy={busy} onCancel={closeReject} className="bg-white rounded-xl p-6 max-w-md shadow-xl">
             <h3 className="text-lg font-bold text-slate-800 mb-2">
               {rejectModal.bulk ? `공급자 일괄 거절 (${rejectModal.ids.length}건)` : '공급자 거절'}
             </h3>
             {!rejectModal.bulk && rejectModal.name && (
               <p className="text-sm text-slate-500 mb-2">{rejectModal.name}</p>
             )}
-            <textarea
+            <textarea data-dialog-initial-focus
               aria-label="거절 사유"
               disabled={busy}
               value={rejectReason}
@@ -390,8 +391,7 @@ export default function OperatorSupplierApprovalPage() {
                 거절
               </button>
             </div>
-          </div>
-        </div>
+        </OperatorDialog>
       )}
 
       {/* 일괄 처리 결과 */}

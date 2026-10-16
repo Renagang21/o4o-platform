@@ -449,3 +449,17 @@ PR #561은 CI·SonarCloud PASS 및 Codex 무지적 후 main 35f1dd39f35e287ec7ce
 이 검사에서 7개 삭제 대상 테이블의 ID 조회가 source 행마다 반복 평가될 수 있어, 동일 대상 ID 조회를 MATERIALIZED CTE로 한 번 실행하도록 변경한다. 타 서비스 전체 컬럼·JSON/배열/UUID 참조 검사는 유지하고 timeout을 늘리거나 특정 테이블을 제외하지 않는다. 격리 PostgreSQL의 상품 메타데이터 5,000행에서 실제 EXPLAIN ANALYZE로 CTE producer Actual Loops=1을 확인했으며, 중첩 주문 로그 UUID 참조는 삭제를 차단하고 기존 fence·동시 잠금·rollback 검사는 통과했다. 미디어 plan 38500950060도 실패했지만 worker 진단은 아직 확인 중이다. 운영 DB/GCS 삭제는 미실행이며 두 실패 Job은 조사용으로 보존한다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
 
 보완: materialized 대상 문자열을 literal LIKE 패턴 배열로 한 번 구성해 source JSON/text cast도 행당 한 번 평가한다. %, _, 역슬래시는 escape하고 C collation으로 기존 case-sensitive substring 판정을 유지한다. 격리 fixture의 legacy text ID에서도 유사한 문자열은 허용하고 실제 literal 참조는 차단함을 확인한다. 운영 schema/type 변경은 없다.
+
+## UUID 참조 검사 후속 단계 — 2026-10-15
+
+개발 plan38700687056과 미디어 plan38700997020은 모두 UUID 참조 검사에서57014로 실패했다. 실제 삭제·WIF 변경은 미실행이다. `product_landings.product_master_id` 및 `product_identifiers.product_master_id`의 정확한 SQL 해시를 대조했고, V3에서 UUID 인덱스 경로와 레거시 부분 문자열 fallback을 검증했다. 단위36건·실제 PostgreSQL의100만 행 UUID query fixture 및 기존 대용량 JSON/plan/apply/rollback fixture가 통과했다. [V3 CHECK](../checks/CHECK-O4O-PHARMACYHUB-PURGE-UUID-REFERENCE-SCAN-V3.md)에 범위·검증·한계를 기록한다. PR CI·리뷰·main 통합과 정확한 최신 SHA에서의 두 plan 재실행이 남아 있다. 이 후속 기록은 아래의 과거 실행 결과를 대체하거나 데이터 삭제 완료를 뜻하지 않는다.
+
+## 2026-10-15 V4 후속 — 대량 문자열·JSON 구간 검사
+
+V3 #627 병합 후 최신 main e6202355a에서 개발 plan38730535162와 미디어 plan38730893771을 재실행했으나 둘 다57014였다. 새 해시는 각각 product_landings.metadata / product_identifiers.source_label의 기존 전체 검사 SQL에 정확히 일치한다. 성공 census·WIF 변경·apply는 아직 없다.
+
+[구간 검사 V4 CHECK](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 진단·분할 검사와 보존 조건·검증을 기록한다. 유효한 leaf UUID PK가 확인된 테이블만1024행씩 끝까지 검사하며, 그 외와 상속·partition 부모는 기존 전체 검사를 유지한다. timeout·검사 범위·보호 fence를 낮추지 않는다. 통합 후 최신 main에서 두 plan을 재검증하고 성공 census 확인 전 apply는 하지 않는다.
+
+### 2026-10-15 후속 V5 — 전체600초 제한
+
+V4 개발 plan run38738916090은 Cloud Logging에서 task 전체600초 종료를 확인했다. 성공 census가 없어 WIF/apply는 계속 보류한다. V5에서 leaf UUID PK 테이블의 비UUID 열을 한 번에 순회하고 PH 대상 집합을 한 번 읽어 재사용한다. 검사 범위·timeout·보호 조건은 유지한다. 검증과 운영 재실행은 [참조 검사 CHECK의 후속 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 구분해 기록한다. #610·#615는 PH 운영 창 뒤 통합한다.

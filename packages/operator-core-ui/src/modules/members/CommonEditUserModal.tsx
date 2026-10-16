@@ -19,7 +19,7 @@
  *   config  — 서비스별 주입 설정 (EditUserModalConfig 참조)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   Loader2,
   AlertCircle,
@@ -153,6 +153,14 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
     profileClassification,
   } = config;
 
+  const state = useRef({ mounted: false, saving: false });
+  const [ready, setReady] = useState(false);
+  useLayoutEffect(() => {
+    const scope = { mounted: true, saving: false }; state.current = scope;
+    setLoading(true); setSaving(false); setReady(false); setActionError('');
+    return () => { scope.mounted = false; };
+  }, [userId, serviceKey]);
+  const close = () => { if (!state.current.saving) onClose(); };
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState('');
@@ -184,6 +192,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
   });
 
   useEffect(() => {
+    const scope = state.current;
     // 잘못된 userId 로 fetch 시도 시 `/operator/members/undefined` → 백엔드 500.
     // fetch 자체를 차단하고 안내 메시지 표시.
     if (!userId || !USER_ID_UUID_REGEX.test(userId)) {
@@ -197,6 +206,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
     (async () => {
       try {
         const data = await makeRequest('GET', `/operator/members/${userId}?serviceKey=${encodeURIComponent(serviceKey)}`) as any;
+        if (!scope.mounted) return;
         const u = data.user;
 
         // membership role
@@ -257,6 +267,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         if (profileClassification) {
           try {
             const pData = await makeRequest('GET', profileClassification.fetchPath(userId)) as any;
+            if (!scope.mounted) return;
             const val = pData?.data?.[profileClassification.responseField] ?? '';
             setProfileValue(val);
             setOriginalProfileValue(val);
@@ -264,16 +275,18 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
             // profile not set yet — leave empty
           }
         }
+        if (scope.mounted) setReady(true);
       } catch (err: any) {
-        setActionError(err.message || '데이터를 불러올 수 없습니다.');
+        if (scope.mounted) setActionError(err?.response?.data?.error || err.message || '데이터를 불러올 수 없습니다.');
       } finally {
-        setLoading(false);
+        if (scope.mounted) setLoading(false);
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, serviceKey]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (state.current.saving || !ready) return;
     const { name, value } = e.target;
     const numericFields = ['phone', 'businessNumber'];
     setForm(prev => ({
@@ -284,7 +297,10 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const scope = state.current;
+    if (!scope.mounted || scope.saving || loading || !ready) return;
     if (!form.nickname.trim()) { setActionError('닉네임은 필수입니다.'); return; }
+    scope.saving = true;
     setSaving(true);
     setActionError('');
     try {
@@ -310,6 +326,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         payload.address2 = form.address2;
       }
       await makeRequest('PUT', `/operator/members/${userId}`, payload);
+      if (!scope.mounted) return;
 
       // WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1:
       //   운영 권한(role_assignments) 변경 로직 제거. 부여·회수는 platform admin 전용.
@@ -322,23 +339,25 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         });
       }
 
+      if (!scope.mounted) return;
       onSuccess();
       onClose();
     } catch (err: any) {
-      setActionError(err.message || '수정에 실패했습니다.');
+      if (scope.mounted) setActionError(err?.response?.data?.error || err.message || '수정에 실패했습니다.');
     } finally {
-      setSaving(false);
+      scope.saving = false;
+      if (scope.mounted) setSaving(false);
     }
   };
 
   const inputCls = 'w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div role="dialog" aria-modal="true" aria-label="회원정보 수정" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-slate-800">회원정보 수정</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
+          <button aria-label="닫기" disabled={saving} onClick={close} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
         </div>
 
         {loading ? (
@@ -349,11 +368,12 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {actionError && (
-              <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+              <div role="alert" className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
                 <AlertCircle className="w-4 h-4 shrink-0" />{actionError}
               </div>
             )}
 
+            <fieldset disabled={saving || !ready} className="space-y-4" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
             {/* 기본 정보 */}
             <div>
               <h4 className="text-sm font-semibold text-slate-700 mb-3">기본 정보</h4>
@@ -370,7 +390,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">닉네임 <span className="text-red-500">*</span></label>
-                  <input type="text" name="nickname" value={form.nickname} onChange={handleChange} required className={inputCls} />
+                  <input aria-label="닉네임" type="text" name="nickname" value={form.nickname} onChange={handleChange} required className={inputCls} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">휴대전화</label>
@@ -488,10 +508,11 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
               </div>
             )}
 
+            </fieldset>
             <div className="flex gap-2 pt-2">
-              <button type="button" onClick={onClose}
+              <button type="button" disabled={saving} onClick={close}
                 className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-              <button type="submit" disabled={saving}
+              <button type="submit" disabled={saving || !ready}
                 className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
                 {saving ? '저장 중...' : '저장'}
               </button>

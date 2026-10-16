@@ -1,3 +1,6 @@
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { useLocation } from 'react-router-dom';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 /**
  * 이용 가능 콘텐츠 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  *
@@ -7,7 +10,8 @@
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
  */
 import { useLatestList } from '../../hooks/useLatestList';
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -15,6 +19,7 @@ import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, typ
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { BusinessTabs } from '../../components/BusinessTabs';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
+import { useUnifiedStore } from '../../contexts/StoreContext';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
 
 const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '콘텐츠 목록을 불러오지 못했습니다.');
@@ -38,15 +43,29 @@ function ContentBody({ body }: { body: string | null }) {
 }
 
 export default function PharmacyContentSourcesPage() {
+  const { organizationId } = useUnifiedStore();
+  return <PharmacyContentSources key={organizationId} />;
+}
+
+function PharmacyContentSources() {
+  const { isCurrent } = useStoreOperationScope();
+  const { pathname } = useLocation();
+  const libraryPath = `${storeWorkspaceBase(pathname)}/library/contents`;
+  const copying = useRef(false);
+  const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
+  const { begin: beginSelection } = useLatestRequest();
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
-  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); return p; }); };
+  const selectedContentId = params.get('content') || '';
+  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); p.delete('content'); return p; }); };
   const [qInput, setQInput] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,27 +74,51 @@ export default function PharmacyContentSourcesPage() {
       .catch(() => setFranchises([]));
   }, []);
 
-  const fetchList = useCallback(() => neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE }), [sf, q, page]);
-  const { items, total, loading, error, setError, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
+  const fetchList = useCallback(async () => {
+    const isCurrent = beginSelection();
+    invalidateCopy();
+    setSelectionError(null);
+    setCopyError(null); setCopied(null);
+    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
+    if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
+    // A linked material may not be on this page. The existing detail API rechecks store membership.
+    try {
+      const selected = await neturePharmacyApi.getContent(selectedContentId);
+      if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
+      return { ...result, items: [selected, ...result.items] };
+    } catch {
+      if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주세요.');
+      return result;
+    }
+  }, [sf, q, page, selectedContentId, invalidateCopy, beginSelection]);
+  const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
+  useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
-
+  const clearSelectedContent = () => {
+    setParams(previous => { const next = new URLSearchParams(previous); next.delete('content'); return next; });
+  };
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
+    clearSelectedContent();
     setPage(1);
     setQ(qInput.trim());
   };
 
   const copy = async (c: SemiFranchiseContent) => {
+    if (copying.current || !isCurrent()) return;
+    copying.current = true;
+    const isLatest = beginCopy();
     setBusyId(c.id);
-    setError(null);
+    setCopyError(null);
     setCopied(null);
     try {
       await neturePharmacyApi.copyContent(c.id);
-      setCopied(c.title);
+      if (isLatest() && isCurrent()) setCopied(c.title);
     } catch (e) {
-      setError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
+      if (isLatest() && isCurrent()) setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
     } finally {
-      setBusyId(null);
+      copying.current = false;
+      if (isCurrent()) setBusyId(null);
     }
   };
 
@@ -91,7 +134,7 @@ export default function PharmacyContentSourcesPage() {
       <BusinessTabs businesses={franchises} value={sf} onChange={key => { setSf(key); setPage(1); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
-          <Link key={s.key} to={s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
+          <Link key={s.key} to={s.key === 'store-library' ? libraryPath : s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
             <p className="text-sm font-medium text-gray-900">{s.title}</p>
             <p className="mt-1 text-xs text-gray-500">{s.description}</p>
           </Link>
@@ -104,10 +147,10 @@ export default function PharmacyContentSourcesPage() {
 
       {copied && (
         <Notice>
-          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={STORE_LIBRARY_PATH} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
+          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={libraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
-      {error && <Notice tone="error">{error}</Notice>}
+      {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
 
       <form className="mb-4 flex flex-wrap gap-2" onSubmit={onSearch}>
         <input
@@ -121,7 +164,7 @@ export default function PharmacyContentSourcesPage() {
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : items.length === 0 ? (
+      ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
           <p>이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.</p>
           <p className="mt-1">세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.</p>
@@ -143,7 +186,7 @@ export default function PharmacyContentSourcesPage() {
                     <button className={btn.secondary} onClick={() => setExpandedId(expanded ? null : c.id)}>
                       {expanded ? '내용 닫기' : '내용 보기'}
                     </button>
-                    <button className={btn.primary} disabled={busyId === c.id} onClick={() => copy(c)}>
+                    <button className={btn.primary} disabled={busyId !== null} onClick={() => copy(c)}>
                       {busyId === c.id ? '만드는 중...' : '내 매장 사본 만들기'}
                     </button>
                   </div>
@@ -161,9 +204,9 @@ export default function PharmacyContentSourcesPage() {
 
       {!loading && total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button className={btn.secondary} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>이전</button>
+          <button className={btn.secondary} disabled={page <= 1} onClick={() => { clearSelectedContent(); setPage((p) => p - 1); }}>이전</button>
           <span className="text-gray-600">{page} / {totalPages}</span>
-          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>다음</button>
+          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => { clearSelectedContent(); setPage((p) => p + 1); }}>다음</button>
         </div>
       )}
     </PharmacyPage>

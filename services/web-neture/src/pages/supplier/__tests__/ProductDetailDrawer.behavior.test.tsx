@@ -167,6 +167,13 @@ afterEach(() => {
 });
 
 describe('ProductDetailDrawer existing workflow', () => {
+  it('shows supplier task links only when the caller provides a supplier return path', async () => {
+    const view = render(element());
+    expect(screen.queryByRole('button', { name: '이 상품 설명서 만들기' })).toBeNull();
+    view.rerender(element(product, { returnTo: '/supplier/products?page=2' }));
+    expect(screen.getByRole('button', { name: '이 상품 설명서 만들기' })).toBeTruthy();
+  });
+
   it('keeps a forbidden spot-policy result distinct from an empty policy list', async () => {
     mocks.supplier.listSpotPolicies.mockRejectedValue(
       new Error('SUPPLIER_SPOT_POLICIES_FORBIDDEN'),

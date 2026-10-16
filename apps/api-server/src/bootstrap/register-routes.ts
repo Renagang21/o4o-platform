@@ -1,3 +1,4 @@
+import { createHomePresentationRoutes } from '../routes/home-presentation/home-presentation.routes.js';
 /**
  * Route registration extracted from main.ts
  * WO-O4O-MAIN-TS-BOOTSTRAP-SPLIT-V1
@@ -1027,6 +1028,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (guideContentsError) {
       logger.error('Failed to register Guide Contents routes:', guideContentsError);
     }
+
+    app.use('/api/v1/home-presentation', createHomePresentationRoutes(dataSource));
 
     // 32. Register CMS Content routes (WO-P2-IMPLEMENT-CONTENT)
     try {

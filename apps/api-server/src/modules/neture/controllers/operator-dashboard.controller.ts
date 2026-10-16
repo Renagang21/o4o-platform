@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../../routes/cms-content/cms-reserved-presentation.js';
 /**
  * Neture Operator Dashboard Controller
  *
@@ -106,7 +107,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         dataSource.query(`
           SELECT
             COUNT(*)::int AS total,
-            COUNT(*) FILTER (WHERE status = 'published')::int AS published
+            COUNT(*) FILTER (WHERE ${ORDINARY_CMS_CONTENT_SQL} AND status = 'published')::int AS published
           FROM cms_contents
           WHERE "serviceKey" = 'neture'
         `).catch(() => [{ total: 0, published: 0 }]) as Promise<Array<{ total: number; published: number }>>,

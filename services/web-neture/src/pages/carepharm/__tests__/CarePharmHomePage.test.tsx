@@ -7,7 +7,7 @@ vi.mock('../../../contexts', () => ({
   useAuth: () => ({ user: state.authenticated ? { id: 'member' } : null, isAuthenticated: state.authenticated }),
   useLoginModal: () => ({ openLoginModal: state.login }),
 }));
-vi.mock('../../../lib/apiClient', () => ({ api: { get: state.get } }));
+vi.mock('../../../lib/apiClient', () => ({ api: { get: (url: string) => url.startsWith('/home-presentation/') ? Promise.resolve({ data: { success: true, data: null } }) : state.get(url) } }));
 import CarePharmHomePage from '../CarePharmHomePage';
 
 const group = { communityKey: 'carepharm', kind: 'independent', allowed: false, membershipStatus: null };

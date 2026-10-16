@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata, ordinaryCmsMetadata, ORDINARY_CMS_CONTENT_SQL } from '../../routes/cms-content/cms-reserved-presentation.js';
 /**
  * ContentQueryService — APP-CONTENT 공용 쿼리 서비스
  *
@@ -47,6 +48,7 @@ export class ContentQueryService {
 
     const where: any = {
       serviceKey: In(this.config.serviceKeys),
+      metadata: ordinaryCmsMetadata(),
       status: 'published',
     };
 
@@ -143,9 +145,9 @@ export class ContentQueryService {
    */
   async getById(id: string) {
     const content = await this.repo.findOne({
-      where: { id, serviceKey: In(this.config.serviceKeys) },
+      where: { id, serviceKey: In(this.config.serviceKeys), metadata: ordinaryCmsMetadata() },
     });
-    if (!content) return null;
+    if (!content || isHomePresentationMetadata((content as any).metadata)) return null;
     return this.toDetail(content as any);
   }
 
@@ -154,7 +156,7 @@ export class ContentQueryService {
    */
   async getByIdWithRecommendations(id: string, userId?: string) {
     const content = await this.getById(id);
-    if (!content) return null;
+    if (!content || isHomePresentationMetadata((content as any).metadata)) return null;
 
     const recCountResult = await this.safeRecQuery<{ count: string }>(
       `SELECT COUNT(*) as count FROM cms_content_recommendations WHERE content_id = $1`,
@@ -179,7 +181,7 @@ export class ContentQueryService {
    */
   async incrementViewCount(id: string): Promise<void> {
     await this.dataSource.query(
-      `UPDATE cms_contents SET "viewCount" = "viewCount" + 1 WHERE id = $1`,
+      `UPDATE cms_contents SET "viewCount" = "viewCount" + 1 WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL}`,
       [id],
     );
   }
@@ -189,6 +191,7 @@ export class ContentQueryService {
    * 이미 추천했으면 취소, 아니면 추천
    */
   async toggleRecommendation(contentId: string, userId: string) {
+    if (!await this.getById(contentId)) return { recommendCount: 0, isRecommendedByMe: false };
     // 테이블 존재 여부 graceful check
     const tableCheck = await this.dataSource.query(
       `SELECT EXISTS (SELECT FROM information_schema.tables
@@ -213,7 +216,7 @@ export class ContentQueryService {
       );
       // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 비정규화 카운터 동기화
       await this.dataSource.query(
-        `UPDATE cms_contents SET "likeCount" = GREATEST(0, "likeCount" - 1) WHERE id = $1`,
+        `UPDATE cms_contents SET "likeCount" = GREATEST(0, "likeCount" - 1) WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL}`,
         [contentId],
       ).catch(() => {}); // likeCount 컬럼 미존재 시 graceful
       isRecommendedByMe = false;
@@ -225,7 +228,7 @@ export class ContentQueryService {
       );
       // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 비정규화 카운터 동기화
       await this.dataSource.query(
-        `UPDATE cms_contents SET "likeCount" = "likeCount" + 1 WHERE id = $1`,
+        `UPDATE cms_contents SET "likeCount" = "likeCount" + 1 WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL}`,
         [contentId],
       ).catch(() => {}); // likeCount 컬럼 미존재 시 graceful
       isRecommendedByMe = true;
@@ -248,6 +251,7 @@ export class ContentQueryService {
     const data = await this.repo.find({
       where: {
         serviceKey: In(this.config.serviceKeys),
+      metadata: ordinaryCmsMetadata(),
         type: In(types) as any,
         status: 'published' as any,
       },
@@ -264,6 +268,7 @@ export class ContentQueryService {
     const data = await this.repo.find({
       where: {
         serviceKey: In(this.config.serviceKeys),
+      metadata: ordinaryCmsMetadata(),
         type: In(types) as any,
         status: 'published' as any,
       },

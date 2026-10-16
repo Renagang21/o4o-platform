@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata, ordinaryCmsMetadata } from './cms-reserved-presentation.js';
 /**
  * CMS Content Slot Handler — Slot management endpoints
  *
@@ -235,7 +236,7 @@ export function createCmsContentSlotRoutes(deps: {
       }
 
       // Build where clause
-      const where: any = { slotKey };
+      const where: any = { slotKey, content: { metadata: ordinaryCmsMetadata() } };
       if (scope.serviceKeys) {
         where.serviceKey = In(scope.serviceKeys);
       }
@@ -267,10 +268,11 @@ export function createCmsContentSlotRoutes(deps: {
             return startsOk && endsOk && contentPublished;
           })
         : placeableSlots;
+      const ordinarySlots = filteredSlots.filter(slot => !isHomePresentationMetadata(slot.content?.metadata));
 
       res.json({
         success: true,
-        data: filteredSlots.map(slot => ({
+        data: ordinarySlots.map(slot => ({
           id: slot.id,
           slotKey: slot.slotKey,
           sortOrder: slot.sortOrder,
@@ -299,7 +301,7 @@ export function createCmsContentSlotRoutes(deps: {
           serviceKeys: scope.serviceKeys,
           crossService: scope.crossService,
           organizationId: organizationId || null,
-          total: filteredSlots.length,
+          total: ordinarySlots.length,
         },
       });
     } catch (error: any) {
@@ -330,7 +332,7 @@ export function createCmsContentSlotRoutes(deps: {
       const slotRepo = dataSource.getRepository(CmsContentSlot);
       const access = req.slotAccess!;
 
-      const where: any = {};
+      const where: any = { content: { metadata: ordinaryCmsMetadata() } };
 
       // Operator: force serviceKey filter to their allowed keys
       if (!access.isAdmin) {
@@ -367,11 +369,11 @@ export function createCmsContentSlotRoutes(deps: {
         where.isActive = isActive === 'true';
       }
 
-      const slots = await slotRepo.find({
+      const slots = (await slotRepo.find({
         where,
         relations: ['content'],
         order: { slotKey: 'ASC', sortOrder: 'ASC' },
-      });
+      })).filter(slot => !isHomePresentationMetadata(slot.content?.metadata));
 
       // Group slots by slotKey for better organization
       const slotGroups: Record<string, typeof slots> = {};
@@ -474,7 +476,7 @@ export function createCmsContentSlotRoutes(deps: {
       // Verify content exists
       const contentRepo = dataSource.getRepository(CmsContent);
       const content = await contentRepo.findOne({ where: { id: contentId } });
-      if (!content) {
+      if (!content || isHomePresentationMetadata(content.metadata)) {
         res.status(400).json({
           success: false,
           error: { code: 'VALIDATION_ERROR', message: 'Content not found' },
@@ -561,8 +563,8 @@ export function createCmsContentSlotRoutes(deps: {
 
       const slotRepo = dataSource.getRepository(CmsContentSlot);
 
-      const slot = await slotRepo.findOne({ where: { id } });
-      if (!slot) {
+      const slot = await slotRepo.findOne({ where: { id }, relations: ['content'] });
+      if (!slot || isHomePresentationMetadata(slot.content?.metadata)) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Slot not found' },
@@ -629,7 +631,7 @@ export function createCmsContentSlotRoutes(deps: {
       if (nextContentId && (contentId !== undefined || serviceKey !== undefined)) {
         const contentRepo = dataSource.getRepository(CmsContent);
         const content = await contentRepo.findOne({ where: { id: nextContentId } });
-        if (!content) {
+        if (!content || isHomePresentationMetadata(content.metadata)) {
           res.status(400).json({
             success: false,
             error: { code: 'VALIDATION_ERROR', message: 'Content not found' },
@@ -702,8 +704,8 @@ export function createCmsContentSlotRoutes(deps: {
       const access = req.slotAccess!;
       const slotRepo = dataSource.getRepository(CmsContentSlot);
 
-      const slot = await slotRepo.findOne({ where: { id } });
-      if (!slot) {
+      const slot = await slotRepo.findOne({ where: { id }, relations: ['content'] });
+      if (!slot || isHomePresentationMetadata(slot.content?.metadata)) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Slot not found' },
@@ -809,9 +811,9 @@ export function createCmsContentSlotRoutes(deps: {
       const contentIds = contents.map((c: any) => c.contentId);
       if (contentIds.length > 0) {
         const existingContents = await contentRepo.find({
-          where: { id: In(contentIds) },
+          where: { id: In(contentIds), metadata: ordinaryCmsMetadata() },
         });
-        if (existingContents.length !== contentIds.length) {
+        if (existingContents.length !== contentIds.length || existingContents.some(content => isHomePresentationMetadata(content.metadata))) {
           res.status(400).json({
             success: false,
             error: { code: 'VALIDATION_ERROR', message: 'One or more contents not found' },

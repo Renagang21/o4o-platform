@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata, ordinaryCmsMetadata } from '../../../routes/cms-content/cms-reserved-presentation.js';
 /**
  * KPA Asset Resolver
  *
@@ -89,9 +90,9 @@ export class KpaAssetResolver implements ContentResolver {
     //   global(null) 은 두 목록 어디에도 노출되지 않으므로 복사 대상에서 제외한다
     //   (목록에 없는 자산이 복사되는 우회를 다시 만들지 않기 위함).
     const content = await repo.findOne({
-      where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) },
+      where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']), metadata: ordinaryCmsMetadata() },
     });
-    if (!content) return null;
+    if (!content || isHomePresentationMetadata(content.metadata)) return null;
 
     return {
       title: content.title,

@@ -14,10 +14,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import { RefreshCw } from 'lucide-react';
 import { PLATFORM_ORIGIN } from '../../config/workspace';
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate } from './shared';
 
 export default function SemiFranchisesPage() {
+  const { organizationId, stores } = useUnifiedStore();
+  const canEnterCommunity = ['owner', 'admin', 'manager'].includes(stores?.find(s => s.organizationId === organizationId)?.memberRole ?? '');
+  return <SemiFranchiseRecords key={organizationId} organizationId={organizationId} canEnterCommunity={canEnterCommunity} />;
+}
+
+function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizationId: string | null; canEnterCommunity: boolean }) {
+  const { begin: beginMove } = useLatestRequest();
   const [rows, setRows] = useState<SemiFranchiseRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +36,7 @@ export default function SemiFranchisesPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setRows([]);
     setError(null);
     try {
       setRows(await neturePharmacyApi.listSemiFranchises());
@@ -67,12 +77,13 @@ export default function SemiFranchisesPage() {
   };
 
   const enterCommunity = async (row: SemiFranchiseRow) => {
-    if (!row.communityKey) return;
+    if (!row.communityKey || !canEnterCommunity || !organizationId) return;
+    const isCurrent = beginMove();
     setBusyKey(row.key); setError(null);
     try {
-      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `/businesses/${encodeURIComponent(row.key)}/forum` });
-      window.location.assign(href);
-    } catch { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); }
+      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${row.key === 'pharmacy' ? '/' : `/businesses/${encodeURIComponent(row.key)}`}?store=${encodeURIComponent(organizationId)}` });
+      if (isCurrent()) window.location.assign(href);
+    } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); } }
   };
 
   return (
@@ -88,6 +99,22 @@ export default function SemiFranchisesPage() {
           <a className="underline" href={PLATFORM_ORIGIN}>Neture 가입 상태 확인 · 신청</a>
         </p>
       )}
+      {!loading && rows.some(r => r.membershipStatus === 'active') && <section aria-label="가입한 약국 협력사업" className="mb-8">
+        <h2 className="mb-3 text-lg font-semibold">가입한 약국 협력사업</h2>
+        <p className="mb-4 text-sm text-slate-600">가입자 공간에서 사업 소식과 회원들의 이야기를 확인하고, 상품과 자료는 이 매장에서 이용하세요.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {rows.filter(r => r.membershipStatus === 'active').map(r => <article key={r.key} className="min-w-0 rounded-xl border bg-white p-5">
+            <h3 className="break-words font-semibold">{r.name}</h3>
+            <div className="mt-3 flex flex-wrap gap-2 text-sm text-blue-700">
+              {r.communityKey && canEnterCommunity && <button type="button" className="min-h-11 rounded-lg border px-3 py-2" disabled={busyKey !== null} onClick={() => void enterCommunity(r)}>가입자 공간</button>}
+              <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/supply?source=${encodeURIComponent(`sf:${r.key}`)}`}>공급 상품</Link>
+              <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/contents?business=${encodeURIComponent(r.key)}`}>자료 가져오기</Link>
+              <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/orders?business=${encodeURIComponent(r.key)}`}>주문 내역</Link>
+            </div>
+          </article>)}
+        </div>
+      </section>}
+      <h2 className="mb-3 text-lg font-semibold">사업 가입 · 신청 관리</h2>
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : rows.length === 0 ? (
@@ -107,16 +134,12 @@ export default function SemiFranchisesPage() {
             <tbody>
               {rows.map((r) => {
                 const st = r.membershipStatus;
-                const participantStatus = r.communityKey ? '가입 승인 후 이용' : '-';
+                const participantStatus = !canEnterCommunity ? '약국 경영자 이용' : r.communityKey ? '가입 승인 후 이용' : '-';
                 const canApply = !st || st === 'rejected' || st === 'terminated';
                 const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
                   <tr key={r.key} className="border-b border-gray-100 last:border-0" data-testid={`semi-franchise-${r.key}`}>
-                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}{st === 'active' && <div className="mt-2 flex flex-wrap gap-3 text-xs font-normal text-emerald-700">
-                      <Link to={`/store/pharmacy/supply?source=${encodeURIComponent(`sf:${r.key}`)}`}>공급 상품</Link>
-                      <Link to={`/store/pharmacy/contents?business=${encodeURIComponent(r.key)}`}>자료 가져오기</Link>
-                      <Link to={`/store/pharmacy/orders?business=${encodeURIComponent(r.key)}`}>주문 내역</Link>
-                    </div>}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
                     <td className="px-4 py-3">
                       {st ? <StatusBadge status={st} /> : <span className="text-gray-400">미가입</span>}
                       {r.reason && <p className="mt-1 text-xs text-gray-500">사유: {r.reason}</p>}
@@ -126,7 +149,7 @@ export default function SemiFranchisesPage() {
                       {r.decidedAt ? ` · 처리 ${formatDate(r.decidedAt)}` : ''}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      {r.communityKey && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
+                      {r.communityKey && canEnterCommunity && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {canApply && (

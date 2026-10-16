@@ -54,7 +54,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
       label: '처리 대기 주문',
       value: orderKpi?.pending_processing ?? 0,
       unit: '건',
-      to: '/supplier/orders',
+      to: '/supplier/orders/manage',
       tone: 'red',
     },
     {
@@ -62,7 +62,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
       label: '배송 준비 주문',
       value: orderKpi?.pending_shipping ?? 0,
       unit: '건',
-      to: '/supplier/orders',
+      to: '/supplier/orders/manage?status=preparing',
       tone: 'amber',
     },
     {
@@ -86,7 +86,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
       label: '설명서 수정 요청',
       value: descRevisionRequested,
       unit: '건',
-      to: '/supplier/store-descriptions',
+      to: '/supplier/store-materials-status?state=action',
       tone: 'red',
     },
     {
@@ -102,7 +102,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
       label: '상품 승인 대기',
       value: approval?.pending ?? 0,
       unit: '개',
-      to: '/supplier/products',
+      to: '/supplier/products?approval=pending',
       tone: 'amber',
     },
     {
@@ -115,7 +115,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
     },
   ];
   // 실패 영역의 카드는 값이 없으므로 아예 후보에서 제외한다 (0 으로 표시하지 않는다).
-  const actionItems = actionCandidates.filter((a) => {
+  const visibleItems = actionCandidates.filter((a) => {
     if (a.value <= 0) return false;
     if (opsFailed.orders && a.key.startsWith('orders-')) return false;
     if (opsFailed.inventory && a.key.startsWith('inv-')) return false;
@@ -132,6 +132,8 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
   // 콘텐츠·유통 실패는 처리 필요 판단을 불완전하게 만든다 → 정상 문구를 단정하지 않는다.
   const cdActionAffected = cdFailed.storeDescriptions || cdFailed.recruitments;
   const showProfileAction = !loading && profile != null && !profileComplete;
+  const waitingItems = visibleItems.filter((a) => ['product-approval', 'settlement'].includes(a.key));
+  const actionItems = visibleItems.filter((a) => !['product-approval', 'settlement'].includes(a.key));
   const hasAnyAction = actionItems.length > 0 || showProfileAction;
 
   const supplierStatusRaw = String(profile?.status ?? '').toUpperCase();
@@ -150,6 +152,7 @@ export function dashboardView(data: ReturnType<typeof useSupplierDashboard>) {
     profileComplete,
     missingProfileLabels,
     actionItems,
+    waitingItems,
     failedAreas,
     cdActionAffected,
     showProfileAction,

@@ -1,3 +1,5 @@
+import { HomePresentationEditor } from '@o4o/shared-space-ui';
+import { authClient } from '../../lib/apiClient';
 /**
  * SiteSettingsPage — 분회 홈페이지 설정 (운영자)
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1 §5
@@ -110,6 +112,7 @@ export default function SiteSettingsPage({ slug }: { slug: string }) {
         {message && <p className="text-green-700">{message}</p>}
         {error && <p className="text-red-600">{error}</p>}
       </div>
+      <HomePresentationEditor surface="branch" branchSlug={slug} client={authClient.api} heading="h2" />
     </div>
   );
 }

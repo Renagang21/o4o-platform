@@ -1,3 +1,4 @@
+import { ordinaryCmsMetadata } from '../../routes/cms-content/cms-reserved-presentation.js';
 /**
  * HubContentQueryService — HUB 통합 콘텐츠 조회 서비스
  *
@@ -346,6 +347,7 @@ export class HubContentQueryService {
 
       const where: any = {
         serviceKey,
+        metadata: ordinaryCmsMetadata(),
         status: 'published',
         visibilityScope: In(['platform', 'service']),
       };

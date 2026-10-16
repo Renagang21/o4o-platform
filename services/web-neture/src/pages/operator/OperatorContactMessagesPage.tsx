@@ -18,7 +18,7 @@
  *  - ipAddress / userAgent / adminNotes 조회 — backend 가 응답에서 제외
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -65,6 +65,9 @@ export default function OperatorContactMessagesPage() {
   const [contactTypeFilter, setContactTypeFilter] = useState<ContactTypeFilter>('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [markingRead, setMarkingRead] = useState(false);
+  const markLock = useRef(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const beginLoad = useLatestRequest(`operator-contact:${contactTypeFilter}:${statusFilter}`);
   const beginMark = useLatestRequest(`operator-contact-mark:${contactTypeFilter}:${statusFilter}`);
 
@@ -79,15 +82,17 @@ export default function OperatorContactMessagesPage() {
         page,
         limit: 20,
       });
-      if (!current()) return;
-      if (result) {
+      if (!current()) return false;
+      if (result && Array.isArray(result.items) && result.pagination) {
         setMessages(result.items);
         setPagination(result.pagination);
+        return true;
       } else {
         throw new Error('목록을 불러오지 못했습니다. 다시 시도해 주세요.');
       }
     } catch (e: any) {
-      if (current()) setError(e?.message || '목록을 불러오지 못했습니다.');
+      if (current()) setError(e?.response?.data?.error || e?.message || '목록을 불러오지 못했습니다.');
+      return false;
     } finally {
       if (current()) setLoading(false);
     }
@@ -98,21 +103,19 @@ export default function OperatorContactMessagesPage() {
   }, [load]);
 
   const handleBulkMarkRead = async () => {
-    if (markingRead || loading || error) return;
+    if (markLock.current || loading || error) return;
+    markLock.current = true;
     const current = beginMark();
-    setMarkingRead(true);
+    setMarkingRead(true); setActionError(null); setNotice(null);
     try {
       const result = await operatorContactApi.bulkMarkRead();
       if (!current()) return;
-      if (result) {
-        // 새로고침 — supplier/partner 의 'new' 문의가 in_progress 로 전환됨
-        await load(pagination.page);
-      } else throw new Error('일괄 확인에 실패했습니다. 다시 시도해 주세요.');
+      if (!result) throw new Error('일괄 확인에 실패했습니다. 다시 시도해 주세요.');
+      setNotice('공급자 신규 문의 일괄 확인이 완료되었습니다.');
+      await load(pagination.page);
     } catch (err: any) {
-      if (current()) setError(err?.message || '일괄 확인에 실패했습니다. 다시 시도해 주세요.');
-    } finally {
-      if (current()) setMarkingRead(false);
-    }
+      if (current()) setActionError(err?.response?.data?.error || err?.message || '일괄 확인에 실패했습니다. 다시 시도해 주세요.');
+    } finally { markLock.current = false; if (current()) setMarkingRead(false); }
   };
 
   const formatDate = (iso: string) =>
@@ -219,7 +222,7 @@ export default function OperatorContactMessagesPage() {
             aria-label="문의 유형"
             disabled={markingRead}
             value={contactTypeFilter}
-            onChange={(e) => setContactTypeFilter(e.target.value as ContactTypeFilter)}
+            onChange={(e) => { if (!markLock.current) { setNotice(null); setActionError(null); setContactTypeFilter(e.target.value as ContactTypeFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {contactTypeOptions.map((o) => (
@@ -230,7 +233,7 @@ export default function OperatorContactMessagesPage() {
             aria-label="문의 상태"
             disabled={markingRead}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+            onChange={(e) => { if (!markLock.current) { setNotice(null); setActionError(null); setStatusFilter(e.target.value as StatusFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {statusOptions.map((o) => (
@@ -253,6 +256,9 @@ export default function OperatorContactMessagesPage() {
         </p>
       </div>
 
+      {notice && <p role="status" className="text-emerald-700">{notice}</p>}
+      {actionError && <p role="alert" className="text-red-600">{actionError}<button className="ml-3 underline" disabled={loading || markingRead} onClick={() => { setActionError(null); void load(pagination.page); }}>다시 시도</button></p>}
+      {notice && error && <p role="alert" className="text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 조회만 다시 시도해 주세요.</p>}
       {/* List */}
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center py-16">
@@ -275,16 +281,16 @@ export default function OperatorContactMessagesPage() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3">
           <button
-            onClick={() => load(Math.max(1, pagination.page - 1))}
-            disabled={pagination.page <= 1 || loading}
+            onClick={() => { if (!markLock.current) { setNotice(null); setActionError(null); void load(Math.max(1, pagination.page - 1)); } }}
+            disabled={pagination.page <= 1 || loading || markingRead}
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50"
           >
             이전
           </button>
           <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
           <button
-            onClick={() => load(Math.min(pagination.totalPages, pagination.page + 1))}
-            disabled={pagination.page >= pagination.totalPages || loading}
+            onClick={() => { if (!markLock.current) { setNotice(null); setActionError(null); void load(Math.min(pagination.totalPages, pagination.page + 1)); } }}
+            disabled={pagination.page >= pagination.totalPages || loading || markingRead}
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50"
           >
             다음

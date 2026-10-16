@@ -58,7 +58,7 @@ export default function SupplierDashboardPage() {
     );
   }
 
-  const { recruitmentPending, profileComplete, missingProfileLabels, actionItems, failedAreas, cdActionAffected, showProfileAction, hasAnyAction, supplierStatusLabel, descCounts, trialCounts, recruitmentOpen } = dashboardView(data);
+  const { recruitmentPending, profileComplete, missingProfileLabels, actionItems, waitingItems, failedAreas, cdActionAffected, showProfileAction, hasAnyAction, supplierStatusLabel, descCounts, trialCounts, recruitmentOpen } = dashboardView(data);
   const supplierLabel = profile?.name || user?.name || null;
 
   return (
@@ -88,7 +88,7 @@ export default function SupplierDashboardPage() {
 
       {/* ── 1. 처리 필요 ── */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-base font-semibold text-slate-800 mb-4">처리 필요</h2>
+        <h2 className="text-base font-semibold text-slate-800 mb-4">지금 할 일</h2>
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((i) => <div key={i} className="h-16 bg-slate-100 rounded-lg animate-pulse" />)}
@@ -144,7 +144,7 @@ export default function SupplierDashboardPage() {
         ) : (
           <div className="flex items-center gap-2 py-2">
             <CheckCircle2 size={18} className="text-emerald-500" />
-            <p className="text-sm text-slate-600">현재 바로 처리해야 할 주요 업무가 없습니다.</p>
+            <p className="text-sm text-slate-600">현재 직접 처리할 주요 업무가 없습니다.</p>
           </div>
         )}
         {failedAreas.length > 0 && (
@@ -156,6 +156,16 @@ export default function SupplierDashboardPage() {
           </div>
         )}
       </section>
+
+      {!loading && waitingItems.length > 0 && (
+        <section className="rounded-xl border border-slate-200 bg-white p-6">
+          <h2 className="mb-2 text-base font-semibold text-slate-800">기다리는 일</h2>
+          <p className="mb-4 text-sm text-slate-500">검토·정산 처리를 기다리는 현황입니다. 공급자가 직접 승인하거나 지급하는 작업은 아닙니다.</p>
+          <div className="flex flex-wrap gap-3">
+            {waitingItems.map((item) => <Link key={item.key} to={item.to} className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{item.label} <strong>{item.value.toLocaleString()}{item.unit}</strong></Link>)}
+          </div>
+        </section>
+      )}
 
       {/* ── 2. 핵심 운영 KPI ── */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
@@ -172,13 +182,13 @@ export default function SupplierDashboardPage() {
             <KpiLink
               label="처리 대기 주문"
               value={opsFailed.orders ? UNAVAILABLE : (orderKpi?.pending_processing ?? 0).toLocaleString()}
-              to="/supplier/orders"
+              to="/supplier/orders/manage"
               accent
             />
             <KpiLink
               label="배송 준비 주문"
               value={opsFailed.orders ? UNAVAILABLE : (orderKpi?.pending_shipping ?? 0).toLocaleString()}
-              to="/supplier/orders"
+              to="/supplier/orders/manage?status=preparing"
             />
             <KpiLink
               label="재고 주의"
@@ -259,7 +269,7 @@ export default function SupplierDashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-slate-800">콘텐츠</h2>
             <Link to="/supplier/library" className="text-xs font-medium text-blue-600 hover:text-blue-700">
-              콘텐츠 라이브러리 →
+              자료 보관함 →
             </Link>
           </div>
           {cdFailed.storeDescriptions ? (

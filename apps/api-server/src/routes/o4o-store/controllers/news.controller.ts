@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * News/Content Controller — shared for all services using cms_contents
  *
@@ -83,7 +84,8 @@ export function createNewsController(
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
     const qb = contentRepo.createQueryBuilder('c')
-      .where('c.serviceKey = :sk', { sk: serviceKey });
+      .where('c.serviceKey = :sk', { sk: serviceKey })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`);
 
     if (type && ALLOWED_TYPES.includes(type)) {
       qb.andWhere('c.type = :type', { type });
@@ -144,8 +146,9 @@ export function createNewsController(
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -173,8 +176,9 @@ export function createNewsController(
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -191,8 +195,9 @@ export function createNewsController(
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -220,8 +225,9 @@ export function createNewsController(
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if ((item as any).status !== 'draft') { results.push({ id, status: 'skipped', error: 'Not in draft status' }); continue; }
         (item as any).status = 'published';
         (item as any).publishedAt = new Date();
@@ -251,8 +257,9 @@ export function createNewsController(
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if ((item as any).status === 'archived') { results.push({ id, status: 'skipped', error: 'Already archived' }); continue; }
         (item as any).status = 'archived';
         await contentRepo.save(item);
@@ -281,8 +288,9 @@ export function createNewsController(
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey = :sk', { sk: serviceKey })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if ((item as any).status !== 'archived') { results.push({ id, status: 'skipped', error: 'Only archived items can be hard deleted' }); continue; }
         await contentRepo.delete({ id });
         results.push({ id, status: 'success' });

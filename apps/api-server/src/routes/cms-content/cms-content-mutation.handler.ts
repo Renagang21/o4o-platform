@@ -15,6 +15,7 @@
  */
 
 import { Router, Response } from 'express';
+import { isHomePresentationMetadata } from './cms-reserved-presentation.js';
 import type { DataSource } from 'typeorm';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
 import { requireAuth } from '../../middleware/auth.middleware.js';
@@ -132,6 +133,11 @@ export function createCmsContentMutationRoutes(deps: {
         // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 원장 하위 축 (KPA `sub_type` 대응). 회원 경로에서만 의미를 갖는다.
         subType: reqSubType,
       } = req.body;
+
+      if (isHomePresentationMetadata(metadata)) {
+        res.status(400).json({ success: false, error: { code: 'RESERVED_CONTENT' } });
+        return;
+      }
 
       // Authorize against target serviceKey (platform admin, or the service's operator|admin role)
       const { allowed, isPlatformAdmin } = await authorizeCmsMutation(user, serviceKey);
@@ -280,7 +286,7 @@ export function createCmsContentMutationRoutes(deps: {
         where: { id },
       });
 
-      if (!content) {
+      if (!content || isHomePresentationMetadata(content.metadata)) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },
@@ -291,6 +297,10 @@ export function createCmsContentMutationRoutes(deps: {
       // 퇴역 서비스 콘텐츠는 platform admin 이라도 수정하지 않는다.
       if (isRetiredServiceValue(content.serviceKey)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+      if (isHomePresentationMetadata(metadata)) {
+        res.status(400).json({ success: false, error: { code: 'RESERVED_CONTENT' } });
         return;
       }
 
@@ -403,7 +413,7 @@ export function createCmsContentMutationRoutes(deps: {
       // Load existing content to authorize against its serviceKey before transitioning.
       const contentRepo = dataSource.getRepository(CmsContent);
       const existing = await contentRepo.findOne({ where: { id } });
-      if (!existing) {
+      if (!existing || isHomePresentationMetadata(existing.metadata)) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },

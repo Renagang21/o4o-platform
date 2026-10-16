@@ -73,3 +73,29 @@ describe('member console read contracts', () => {
     expect(result.current.error).toBe('');
   });
 });
+
+it('discards a late response for the old filter', async () => {
+  const options=fixture();let finish!:(v:unknown)=>void;
+  options.client.list=vi.fn().mockImplementationOnce(()=>new Promise(r=>{finish=r;})).mockResolvedValue({users,pagination});
+  const {result,rerender}=renderHook(p=>useMembersConsoleQuery(p),{initialProps:options});
+  rerender({...options,searchQuery:'new'});await waitFor(()=>expect(result.current.loading).toBe(false));
+  await act(async()=>finish({users:[],pagination}));expect(result.current.users).toEqual(users);
+});
+it('does not apply a previous client result after scope changes', async () => {
+  const options=fixture();let finish!:(v:unknown)=>void;
+  options.client.list=vi.fn().mockImplementationOnce(()=>new Promise(r=>{finish=r;}));
+  const {result,rerender}=renderHook(p=>useMembersConsoleQuery(p),{initialProps:options});
+  const next=fixture();rerender(next);await waitFor(()=>expect(result.current.users).toEqual(users));
+  await act(async()=>finish({users:[],pagination}));expect(result.current.users).toEqual(users);
+});
+it('keeps the latest statistics when a previous refresh finishes last', async () => {
+ const options=fixture();let finish!:(v:unknown)=>void;
+ options.client.stats=vi.fn().mockImplementationOnce(()=>new Promise(r=>{finish=r;})).mockResolvedValue({statistics:{total:3,byStatus:[]}});
+ const {result}=renderHook(()=>useMembersConsoleQuery(options));await waitFor(()=>expect(options.client.stats).toHaveBeenCalledTimes(1));
+ await act(async()=>{await result.current.fetchStats();});await act(async()=>finish({statistics:{total:99,byStatus:[]}}));expect(result.current.stats.total).toBe(3);
+});
+it('exposes a separate statistics failure and clears it on retry', async () => {
+ const options=fixture();options.client.stats=vi.fn().mockRejectedValueOnce(new Error('統計')).mockResolvedValue({statistics:{total:1,byStatus:[]}});
+ const {result}=renderHook(()=>useMembersConsoleQuery(options));await waitFor(()=>expect(result.current.statsError).not.toBe(''));expect(result.current.error).toBe('');
+ await act(async()=>{expect(await result.current.fetchStats()).toBe(true);});expect(result.current.statsError).toBe('');
+});

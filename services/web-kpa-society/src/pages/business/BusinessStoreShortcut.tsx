@@ -1,27 +1,46 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import { authClient } from '../../contexts/AuthContext';
 
 /** Existing Store handoff verifies organization access and carries the current login. */
-export default function BusinessStoreShortcut() {
+export default function BusinessStoreShortcut({ businessKey, contentId, supply = false }: { businessKey?: string; contentId?: string; supply?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const generation = useRef(0);
+  const pending = useRef(false);
+  const materialPath = businessKey
+    ? supply ? `/store/pharmacy/supply?${new URLSearchParams({ source: `sf:${businessKey}` })}` : `/store/pharmacy/contents?${new URLSearchParams({ business: businessKey, ...(contentId ? { content: contentId } : {}) })}`
+    : '/store';
+  const returnPath = businessKey ? `/select-store?returnTo=${encodeURIComponent(materialPath)}` : materialPath;
+  // Reset the scope before committed UI can accept a navigation click.
+  useLayoutEffect(() => {
+    const reset = () => { generation.current++; pending.current = false; setBusy(false); setError(''); };
+    reset();
+    const restore = (event: PageTransitionEvent) => { if (event.persisted) reset(); };
+    window.addEventListener('pageshow', restore);
+    const invalidate = () => { generation.current++; };
+    return () => { invalidate(); window.removeEventListener('pageshow', restore); };
+  }, [returnPath]);
   const enterStore = async () => {
-    if (busy) return;
+    if (pending.current) return;
+    pending.current = true;
+    const request = ++generation.current;
     setBusy(true); setError('');
     try {
-      window.location.assign(await requestServiceHandoff(authClient.api, {
-        workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: '/store',
-      }));
+      const href = await requestServiceHandoff(authClient.api, {
+        workspace: 'store', origin: 'https://store.neture.co.kr', returnPath,
+      });
+      if (request === generation.current) window.location.assign(href);
     } catch {
+      if (request !== generation.current) return;
       setError('내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
-      setBusy(false);
+      pending.current = false; setBusy(false);
     }
   };
   return <div>
     <button type="button" disabled={busy} onClick={() => void enterStore()}
       className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60">
-      {busy ? '내 매장으로 이동 중…' : '내 매장으로'} <span aria-hidden="true">↗</span>
+      {busy ? '내 매장으로 이동 중…' : businessKey ? supply ? '내 매장에서 공급 상품 보기' : '내 매장으로 자료 가져오기' : '내 매장으로'} <span aria-hidden="true">↗</span>
     </button>
     {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
   </div>;

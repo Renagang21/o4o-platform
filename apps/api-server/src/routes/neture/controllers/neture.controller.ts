@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * Neture Controller - P2 Implementation
  *
@@ -253,7 +254,7 @@ export function createNetureController(dataSource: DataSource): Router {
         forumPostCount,
       ] = await Promise.all([
         dataSource.query(`SELECT COUNT(*) as count FROM neture_suppliers WHERE status = 'ACTIVE'`),
-        dataSource.query(`SELECT COUNT(*) as count FROM cms_contents WHERE "serviceKey" = 'neture' AND status = 'published'`),
+        dataSource.query(`SELECT COUNT(*) as count FROM cms_contents WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" = 'neture' AND status = 'published'`),
         contentService.listForHome(['notice', 'news', 'hero'], 5),
         signageService.listForHome(3, 3),
         workspace?.allowed ? forumService.listRecentPosts(5) : [],

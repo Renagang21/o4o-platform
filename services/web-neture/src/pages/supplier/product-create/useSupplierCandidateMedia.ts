@@ -97,6 +97,14 @@ export function useSupplierCandidateMedia(importDraft: ImportDraft | null) {
     setItems((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const applyImportImages = (draft: ImportDraft) => {
+    if (!thumbnailSource && draft.thumbnailUrl) setThumbnailSource({ kind: 'library', url: draft.thumbnailUrl });
+    const urls = [...new Set([...draft.detailImageUrls, ...draft.contentImageUrls])];
+    setContentItems((prev) => [...prev, ...urls
+      .filter((url) => !prev.some((item) => item.kind === 'library' && item.url === url))
+      .map((url) => ({ kind: 'library' as const, url }))]);
+  };
+
   // 에디터 인라인 이미지: masterId 없으므로 미디어 라이브러리에 업로드
   const editorImageUpload = useCallback(async (file: File): Promise<string> => {
     const res = await mediaApi.upload(file, true, undefined, 'description');
@@ -121,5 +129,6 @@ export function useSupplierCandidateMedia(importDraft: ImportDraft | null) {
     handleMultiImageSelect,
     removeImageItem,
     editorImageUpload,
+    applyImportImages,
   };
 }

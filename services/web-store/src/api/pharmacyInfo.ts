@@ -63,6 +63,7 @@ export async function getPharmacyInfo(): Promise<PharmacyInfoData | null> {
   const response = await apiClient.get<{ success: boolean; data: PharmacyInfoData | null }>(
     '/pharmacy/info'
   );
+  if (response.success !== true) throw new Error('매장 정보를 불러오지 못했습니다.');
   return response.data;
 }
 
