@@ -1,7 +1,10 @@
 # WO-O4O-AUTO-LISTING-PARAM-TYPE-FIX-V1 — 신규 조직 자동 목록화 SQL 파라미터 타입 오류 수정
 
-> **상태**: ACTIVE (구현·로컬 검증 완료, 통합·배포 대기) · **등록일**: 2026-10-16 · **우선순위**: 높음 (실제 PostgreSQL 재현 확인)
-> **발견 경로**: [`CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1`](../checks/CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md) §7-3 (PR #659)
+> **상태**: ACTIVE
+> **작성일**: 2026-10-16 · **최종 갱신**: 2026-10-17
+> **근거 WO/IR**: [`CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1`](../checks/CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md) §7-3 (PR #659)
+
+우선순위: 높음 (실제 PostgreSQL 재현 확인). 진행: 구현·로컬 검증 완료, 통합·API 배포 대기 — §8.
 
 ## 1. INITIAL_PURPOSE
 
