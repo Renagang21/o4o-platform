@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/apiClient';
 
 type Envelope<T> = { success: boolean; data: T };
@@ -12,7 +12,14 @@ const failure = (e: unknown) => {
 };
 
 /** Individual My Home manages invitations; store authority is rechecked by the server. */
-export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string; onChanged?: () => void }) {
+type Props = { accountId: string; onChanged?: () => void; compact?: boolean };
+export function MyHomeStoreMembers(props: Props) {
+  return <StoreMembers key={props.accountId} {...props} />;
+}
+function StoreMembers({ accountId, onChanged, compact = false }: Props) {
+  const [expanded, setExpanded] = useState(!compact);
+  const alive = useRef(true);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const [stores, setStores] = useState<Store[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [selected, setSelected] = useState('');
@@ -41,7 +48,7 @@ export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string
   useEffect(() => {
     let cancelled = false;
     setMembers(null); setOwner(false);
-    if (!selected) return;
+    if (!selected || !expanded) return;
     const config = { headers: { 'X-Store-Organization-Id': selected }, params: { serviceKey: 'kpa' } };
     api.get('/store/membership', config).then(async (response: { data: Envelope<{ level: string; organizationId: string }> }) => {
       if (cancelled || response.data.data?.organizationId !== selected) return;
@@ -51,7 +58,7 @@ export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string
       if (!cancelled && result.data.data?.organizationId === selected) setMembers(result.data.data.members);
     }).catch((e: unknown) => { if (!cancelled) { setOwner(false); setMembers(null); setError(failure(e)); } });
     return () => { cancelled = true; };
-  }, [accountId, selected, tick]);
+  }, [accountId, selected, tick, expanded]);
 
   const mutate = async (path: string, body: unknown = {}, remove = false) => {
     if (busy) return;
@@ -61,14 +68,16 @@ export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string
     try {
       if (remove) await api.delete(path, config);
       else await api.post(path, body, config);
+      if (!alive.current) return;
       setNotice('처리했습니다. 최종 승인된 직원만 내 매장 업무를 이용할 수 있습니다.');
       setEmail(''); setTick(t => t + 1); onChanged?.();
-    } catch (e) { setError(failure(e)); }
-    finally { setBusy(false); }
+    } catch (e) { if (alive.current) setError(failure(e)); }
+    finally { if (alive.current) setBusy(false); }
   };
   return <section aria-labelledby="store-members-title" className="rounded-2xl border border-slate-200 bg-white p-5">
     <h2 id="store-members-title" className="font-semibold text-slate-900">매장 직원 및 초대</h2>
-    <p className="mt-1 text-sm text-slate-600">경영자 초대 → 직원 수락 → 경영자 최종 승인 후 내 매장 업무 전체를 이용합니다.</p>
+    <p className="mt-1 text-sm text-slate-600">받은 초대를 확인하고, 경영자는 매장별 직원을 관리할 수 있습니다.</p>
+    {compact && !loading && !error && <p className="mt-3 text-sm text-slate-600">받은 초대 {invitations.length}건 · 접근 가능한 매장 {stores.length}곳</p>}
     {error && <p role="alert" className="mt-3 text-red-700">{error} <button type="button" onClick={() => setTick(t => t + 1)} disabled={busy}>다시 시도</button></p>}
     {notice && <p role="status" className="mt-3 text-blue-700">{notice}</p>}
     {loading ? <p className="mt-3">매장과 초대를 확인하는 중…</p> : <>
@@ -80,8 +89,11 @@ export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string
         <button type="button" disabled={busy} className="text-slate-600 underline" onClick={() => void mutate(`/store/invitations/${encodeURIComponent(i.organizationId)}/decline`)}>{i.status === 'accepted' ? '수락 취소' : '거절'}</button>
       </li>)}</ul>
       {!!stores.length && <div className="mt-5">
+        {compact && <button type="button" aria-expanded={expanded} aria-controls="my-home-store-member-details" disabled={busy} className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600" onClick={() => { setExpanded(v => !v); setOwner(false); setMembers(null); setEmail(''); }}>{expanded ? '직원 관리 접기' : '매장 직원 관리 펼치기'}</button>}
+        {expanded && <div id="my-home-store-member-details" className="mt-3">
+        <p className="mb-3 text-xs text-slate-500">이 영역에서 선택한 매장의 직원만 관리합니다. 개인 서비스·활동에는 영향을 주지 않습니다.</p>
         <label className="flex flex-wrap items-center gap-2">내 매장
-          <select value={selected} disabled={busy} onChange={e => { setSelected(e.target.value); setError(null); setNotice(null); }} className="max-w-full rounded border border-slate-300 p-2">
+          <select value={selected} disabled={busy} onChange={e => { setSelected(e.target.value); setOwner(false); setMembers(null); setEmail(''); setError(null); setNotice(null); }} className="max-w-full rounded border border-slate-300 p-2">
             {stores.map(s => <option key={s.organizationId} value={s.organizationId}>{s.organizationName || '이름 없는 매장'}</option>)}
           </select>
         </label>
@@ -98,6 +110,7 @@ export function MyHomeStoreMembers({ accountId, onChanged }: { accountId: string
             {['invited', 'accepted', 'staff'].includes(m.role) && <button type="button" disabled={busy} className="text-red-700 underline" onClick={() => void mutate(`/store/members/${encodeURIComponent(m.userId)}`, {}, true)}>{m.status === 'active' ? '접근 해제' : '초대 취소'}</button>}
           </li>)}</ul>}
         </>}
+      </div>}
       </div>}
     </>}
   </section>;
