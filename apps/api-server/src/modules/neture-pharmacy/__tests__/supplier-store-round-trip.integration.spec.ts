@@ -33,6 +33,7 @@ import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { PharmacyCartService } from '../services/pharmacy-cart.service.js';
 import { PharmacyPaymentService } from '../services/pharmacy-payment.service.js';
 import { EventOfferService } from '../../../routes/kpa/services/event-offer.service.js';
+import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 
 let ds: DataSource;
 // Redirect the existing singleton to the dedicated fixture DB, preserving real repositories and transactions.
@@ -348,5 +349,36 @@ integration('supplier → store → payment → shipment → settlement (real Po
     expect(await settlements.approveSettlement(settlementId)).toMatchObject({ success: true });
     expect(await settlements.paySettlement(settlementId)).toMatchObject({ success: true });
     expect(await settlements.paySettlement(settlementId)).toBeNull();
+  });
+
+  it('new-org auto-listing runs on real PostgreSQL for PUBLIC and OSA-approved SERVICE offers', async () => {
+    const offerFor = async (label: string, distribution: 'PUBLIC' | 'SERVICE') => {
+      const [master] = await ds.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status)
+        VALUES ($1,$1,'Synthetic','GENERAL','ACTIVE') RETURNING id`, [`${label}-${tag}`]);
+      const created = await new SupplierOfferRegistrationService().createSupplierOfferFromExistingMaster(supplierId, { masterId: master.id });
+      const id = created.data!.id;
+      await ds.query(`UPDATE supplier_product_offers SET approval_status='APPROVED', is_active=true,
+        is_public=$2, service_keys=$3, distribution_type=$4 WHERE id=$1`,
+      [id, distribution === 'PUBLIC', distribution === 'PUBLIC' ? [] : ['kpa-society'], distribution]);
+      return id as string;
+    };
+    const listed = async (offer: string) => ds.query(
+      'SELECT service_key, is_active FROM organization_product_listings WHERE organization_id=$1 AND offer_id=$2', [organizationId, offer]);
+    const publicOffer = await offerFor('Auto public', 'PUBLIC');
+    const serviceOffer = await offerFor('Auto service', 'SERVICE');
+
+    expect(await autoListPublicProductsForOrg(ds, organizationId, 'kpa-society')).toBeGreaterThanOrEqual(1);
+    expect(await listed(publicOffer)).toEqual([{ service_key: 'kpa-society', is_active: false }]);
+    // SERVICE offers need the service operator's approval before listing.
+    await autoListServiceProductsForOrg(ds, organizationId, 'kpa-society');
+    expect(await listed(serviceOffer)).toEqual([]);
+    await ds.query(`INSERT INTO offer_service_approvals(offer_id,service_key,approval_status) VALUES ($1,'kpa-society','approved')`, [serviceOffer]);
+    expect(await autoListServiceProductsForOrg(ds, organizationId, 'kpa-society')).toBeGreaterThanOrEqual(1);
+    expect(await listed(serviceOffer)).toEqual([{ service_key: 'kpa-society', is_active: false }]);
+    // Idempotent on repeat: the returned count reports only newly inserted listings.
+    expect(await autoListPublicProductsForOrg(ds, organizationId, 'kpa-society')).toBe(0);
+    expect(await autoListServiceProductsForOrg(ds, organizationId, 'kpa-society')).toBe(0);
+    expect(await listed(publicOffer)).toHaveLength(1);
+    expect(await listed(serviceOffer)).toHaveLength(1);
   });
 });
