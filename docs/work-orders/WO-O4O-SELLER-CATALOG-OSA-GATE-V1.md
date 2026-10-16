@@ -1,7 +1,10 @@
 # WO-O4O-SELLER-CATALOG-OSA-GATE-V1 — 판매자 공급 catalog 의 OSA 승인 미적용 조사·정합
 
-> **상태**: DRAFT · **등록일**: 2026-10-16 · **우선순위**: 중간 (계약 불일치 · 운영 노출 범위 조사 필요)
-> **발견 경로**: PR #659 Codex P2 · [`CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1`](../checks/CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md) §7-1
+> **상태**: DRAFT
+> **작성일**: 2026-10-16 · **최종 갱신**: 2026-10-17
+> **근거 WO/IR**: PR #659 Codex P2 · [`CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1`](../checks/CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md) §7-1
+
+우선순위: 중간 (계약 불일치 · 운영 노출 범위 조사 필요). 진행: 사업 의도 결정 대기 — §7.
 
 ## 1. INITIAL_PURPOSE
 
