@@ -494,7 +494,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <Link to={base} className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">디지털사이니지 운영</h1>
-          <p className="text-sm text-slate-500 mt-1">매장 화면에 송출할 콘텐츠를 등록하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
+          <p className="text-sm text-slate-500 mt-1">안내 자료를 재생목록으로 묶고 보여줄 시간을 정합니다. 아래 현황은 저장된 일정 기준이며 실제 기기 재생 확인은 별도입니다.</p>
           <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="디지털사이니지 운영 방법" /></div>
         </div>
         <div className="flex gap-2">
@@ -558,7 +558,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${currentSchedule ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
-            <span className="text-xs font-medium text-slate-500">현재 재생</span>
+            <span className="text-xs font-medium text-slate-500">현재 시간의 재생 일정</span>
           </div>
           {currentSchedule ? (
             <div>
