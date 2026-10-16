@@ -42,6 +42,7 @@ export function useSignageSchedules(organizationId: string) {
   const [schedulePlaylistError, setSchedulePlaylistError] = useState<
     string | null
   >(null);
+  const [schedulePlaylistLoading, setSchedulePlaylistLoading] = useState(false);
   const [signagePlaylists, setSignagePlaylists] = useState<
     SignagePlaylistOption[]
   >([]);
@@ -61,6 +62,7 @@ export function useSignageSchedules(organizationId: string) {
   const [schIsActive, setSchIsActive] = useState(true);
   const [schSaving, setSchSaving] = useState(false);
   const [schSaveError, setSchSaveError] = useState<string | null>(null);
+  const [savedSchedule, setSavedSchedule] = useState<SignageScheduleItem | null>(null);
 
   // ── Schedule loaders ──
   const loadSchedules = useCallback(async () => {
@@ -89,6 +91,7 @@ export function useSignageSchedules(organizationId: string) {
   const loadSignagePlaylists = useCallback(async () => {
     if (!organizationId || currentStore.current !== organizationId) return;
     const isCurrent = playlistRequest.begin();
+    setSchedulePlaylistLoading(true);
     setSchedulePlaylistError(null);
     try {
       const data = await fetchSignagePlaylists(organizationId);
@@ -98,6 +101,8 @@ export function useSignageSchedules(organizationId: string) {
         setSchedulePlaylistError(
           "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
         );
+    } finally {
+      if (isCurrent()) setSchedulePlaylistLoading(false);
     }
   }, [organizationId, playlistRequest]);
 
@@ -153,11 +158,13 @@ export function useSignageSchedules(organizationId: string) {
     saving.current.add(organizationId);
     setSchSaving(true);
     setSchSaveError(null);
+    setSavedSchedule(null);
     try {
+      let saved: SignageScheduleItem;
       if (editingSchedule) {
-        await updateSchedule(organizationId, editingSchedule.id, {
+        saved = await updateSchedule(organizationId, editingSchedule.id, {
           name: schName.trim(),
-          storePlaylistId: schPlaylistId,
+          ...(editingSchedule.storePlaylistId ? { storePlaylistId: schPlaylistId } : { playlistId: schPlaylistId }),
           daysOfWeek: schDays,
           startTime: schStartTime,
           endTime: schEndTime,
@@ -178,9 +185,10 @@ export function useSignageSchedules(organizationId: string) {
         };
         if (schValidFrom) payload.validFrom = schValidFrom;
         if (schValidUntil) payload.validUntil = schValidUntil;
-        await createSchedule(organizationId, payload);
+        saved = await createSchedule(organizationId, payload);
       }
       if (!isCurrent()) return;
+      setSavedSchedule(saved);
       if (submittedRevision === draftRevision.current) resetScheduleForm();
       await loadSchedules();
     } catch {
@@ -225,6 +233,7 @@ export function useSignageSchedules(organizationId: string) {
     setSignagePlaylists([]);
     setScheduleError(null);
     setSchedulePlaylistError(null);
+    setSavedSchedule(null);
     setSchSaving(saving.current.has(organizationId));
     setDeletingScheduleIds(new Set(deleting.current.get(organizationId)));
     resetScheduleForm();
@@ -255,6 +264,7 @@ export function useSignageSchedules(organizationId: string) {
     deletingScheduleIds,
     scheduleError,
     schedulePlaylistError,
+    schedulePlaylistLoading,
     signagePlaylists,
     showScheduleForm,
     editingSchedule,
@@ -269,6 +279,7 @@ export function useSignageSchedules(organizationId: string) {
     schIsActive,
     schSaving,
     schSaveError,
+    savedSchedule,
     setShowScheduleForm: changeDraft(setShowScheduleForm),
     setSchName: changeDraft(setSchName),
     setSchPlaylistId: changeDraft(setSchPlaylistId),

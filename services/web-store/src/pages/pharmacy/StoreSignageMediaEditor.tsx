@@ -137,8 +137,9 @@ export function StoreSignageMediaEditor({
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
                 <p className="mt-1 text-[11px] text-slate-400">
-                  URL을 변경하면 이 항목이 재생하는 동영상이 변경됩니다. 기존
-                  플레이리스트에는 변경된 URL이 적용됩니다.
+                  {target.kind === 'direct'
+                    ? '등록 영상을 수정합니다. 재생목록에 가져온 매장 사본은 자동 갱신되지 않으므로, 사용 중인 안내의 사본을 확인해 수정하세요.'
+                    : '이 매장 사본을 수정합니다. 이 사본을 사용하는 재생목록에도 반영되며 실제 기기에서는 화면을 다시 열어 확인하세요.'}
                 </p>
               </div>
 
