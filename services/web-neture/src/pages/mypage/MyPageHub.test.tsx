@@ -40,6 +40,7 @@ vi.mock("../../lib/home-entry", async (importOriginal) => ({
 vi.mock("../../components/home/HomeEntryPanel", () => ({
   default: ({ workspaceOnly }: { workspaceOnly?: boolean }) => <p>{workspaceOnly ? "내 업무 바로가기" : "참여 서비스 목록"}</p>,
 }));
+vi.mock("../../components/mypage/MyHomeWorkspaces", () => ({ MyHomeWorkspaces: () => <p>내 업무 바로가기</p> }));
 vi.mock("../../components/mypage/MyHomeStoreMembers", () => ({ MyHomeStoreMembers: () => <p>본인 매장 초대 관리</p> }));
 vi.mock("../../components/mypage/MyHomeParticipation", () => ({
   MyHomeParticipation: () => <p>본인 학습과 펀딩 참여 현황</p>,
@@ -91,12 +92,12 @@ it("offers a personal home without requiring a store role or a service membershi
   expect(screen.queryByRole("region", { name: "내 매장 경영 요약" })).toBeNull();
   expect(screen.getByText("내 업무 바로가기")).toBeTruthy();
 });
-it("puts notifications and available work before detailed-view links without mounting histories", () => {
+it("puts available work before notifications and detailed-view links without mounting histories", () => {
   render(app());
   const notices = screen.getByText("본인 알림");
   const work = screen.getByText("내 업무 바로가기");
   const details = screen.getByRole("navigation", { name: "내 현황 자세히 보기" });
-  expect(notices.compareDocumentPosition(work) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(work.compareDocumentPosition(notices) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(work.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(screen.queryByText("본인 커뮤니티 활동")).toBeNull();
   expect(screen.queryByText("본인 학습과 펀딩 참여 현황")).toBeNull();
