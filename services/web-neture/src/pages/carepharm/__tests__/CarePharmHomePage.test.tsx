@@ -7,6 +7,7 @@ vi.mock('../../../contexts', () => ({
   useLoginModal: () => ({ openLoginModal: state.login }),
 }));
 vi.mock('../../../lib/apiClient', () => ({ api: { get: state.get, post: state.post } }));
+vi.mock('@o4o/shared-space-ui', async original => ({ ...await original<typeof import('@o4o/shared-space-ui')>(), ServiceHomeHero: () => <h1>만성질환관리</h1>, ServiceHomePromotion: () => null }));
 import CarePharmHomePage from '../CarePharmHomePage';
 const business = { key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };
 let access: { kind: string; businessKey: string; allowed: boolean; canManage: boolean };
@@ -19,6 +20,7 @@ beforeEach(() => {
   state.get.mockImplementation(async (path: string) => {
     if (path.endsWith('/businesses/carepharm')) return response(business);
     if (path === '/communities/business%3Acarepharm/access') return response(access);
+    if (path === '/work-scope/accessible-stores') return response({ stores: [{ organizationId: 'owned-store', organizationName: '선택 약국', memberRole: 'owner' }] });
     if (path.endsWith('/semi-franchises')) return response([{ key: 'pharmacy', membershipStatus: 'active' }, { key: 'carepharm', membershipStatus: membership }]);
     if (path.endsWith('/store/contents')) return response({ items: [{ id: 'material', title: '혈당 관리 자료', body: '<p>자료 본문</p>', semiFranchiseKey: 'carepharm' }], total: 1 });
     throw new Error(`Unexpected path: ${path}`);
@@ -50,7 +52,7 @@ describe('CarePharm cooperation service', () => {
     fireEvent.click(screen.getByRole('checkbox')); fireEvent.change(screen.getByRole('textbox'), { target: { value: '참여 신청' } });
     fireEvent.click(screen.getByRole('button', { name: '가입 신청' }));
     await screen.findByText('승인 대기');
-    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청' });
+    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청' }, { headers: { 'X-Store-Organization-Id': 'owned-store' } });
   });
   it('requires fresh condition acceptance after server rejects stale conditions', async () => {
     state.post.mockRejectedValue({ response: { data: { code: 'CONDITIONS_CHANGED' } } });
@@ -66,11 +68,11 @@ describe('CarePharm cooperation service', () => {
   });
   it('only loads this model materials after approval', async () => {
     access.allowed = true; mount('materials'); await screen.findByText('혈당 관리 자료');
-    expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'carepharm', page: 1, limit: 20 } });
+    expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'carepharm', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'owned-store' } });
     expect(screen.queryByRole('button', { name: /복사/ })).toBeNull();
   });
   it('does not display another model materials returned in an invalid response', async () => {
-    access.allowed = true; state.get.mockImplementation(async (path: string) => response(path.endsWith('/businesses/carepharm') ? business : path.includes('/access') ? access : { items: [{ id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'pharmacy' }], total: 1 }));
+    access.allowed = true; state.get.mockImplementation(async (path: string) => response(path.endsWith('/businesses/carepharm') ? business : path.includes('/access') ? access : path === '/work-scope/accessible-stores' ? { stores: [{ organizationId: 'owned-store', organizationName: '선택 약국', memberRole: 'owner' }] } : { items: [{ id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'pharmacy' }], total: 1 }));
     mount('materials'); await screen.findByRole('alert'); expect(screen.queryByText('다른 사업 자료')).toBeNull();
   });
   it('gives the assigned operator the existing scoped management entry without loading store-owner resources', async () => {
@@ -87,4 +89,23 @@ describe('CarePharm cooperation service', () => {
     fireEvent.click(screen.getByRole('button', { name: '다시 시도' })); await waitFor(() => expect(state.get).toHaveBeenCalledTimes(2));
     expect(state.post).not.toHaveBeenCalled();
   });
+});
+
+it('does not pick an arbitrary pharmacy when the owner has multiple stores', async () => {
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve(response({ stores: [
+    { organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' },
+    { organizationId: 'store-b', organizationName: '약국 B', memberRole: 'owner' },
+  ] })) : previous(path, config));
+  mount('participation'); await screen.findByText('가입 상태를 확인할 약국을 선택해 주세요.');
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/semi-franchises'))).toBe(false);
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-b' } });
+  await screen.findByText('미가입');
+  expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises', { headers: { 'X-Store-Organization-Id': 'store-b' } });
+});
+it('never replaces an invalid explicit pharmacy with the first accessible one', async () => {
+  access.allowed = true;
+  render(<MemoryRouter initialEntries={['/materials?store=foreign']}><CarePharmHomePage view="materials" /></MemoryRouter>);
+  await screen.findByText('자료를 이용할 약국을 선택해 주세요.');
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
 });

@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import type { CooperationModel } from './models';
 
 export interface CooperationClient {
-  get(path: string, config?: { params?: Record<string, unknown> }): Promise<{ data: { data: any } }>;
-  post(path: string, body?: unknown): Promise<unknown>;
+  get(path: string, config?: { params?: Record<string, unknown>; headers?: Record<string, string> }): Promise<{ data: { data: any } }>;
+  post(path: string, body?: unknown, config?: { headers?: Record<string, string> }): Promise<unknown>;
 }
 interface Business { key: string; name: string; communityKey: string | null; registrationConditions: string | null }
 interface Access { kind: string; businessKey?: string; allowed: boolean; canManage: boolean }
@@ -18,15 +18,25 @@ export type CooperationView = 'home' | 'participation' | 'materials' | 'tools';
 /** A model-specific service uses the same organization approval and content contracts as Pharmacy. */
 export function CooperationMemberSpace(props: {
   model: CooperationModel; client: CooperationClient; accountId?: string;
-  view?: CooperationView; onLogin: () => void; onEnterStore: () => Promise<void>;
+  view?: CooperationView; onLogin: () => void; onEnterStore: () => Promise<string>; presentation?: ReactNode; promotion?: ReactNode;
 }) {
   const { model, accountId, view = 'home' } = props;
   const scope = `${accountId ?? ''}:${model.key}`;
   // Remounting on scope changes prevents another account/model's data from flashing.
   return <MemberSpace key={scope} {...props} view={view} />;
 }
-function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore }: Parameters<typeof CooperationMemberSpace>[0]) {
-  const [state, setState] = useState<{ business: Business; access: Access } | null>(null);
+function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, presentation, promotion }: Parameters<typeof CooperationMemberSpace>[0]) {
+  const [state, setState] = useState<{ business: Business; access: Access; stores: { organizationId: string; organizationName: string }[] } | null>(null);
+  const [params, setParams] = useSearchParams();
+  const requestedStore = params.get('store');
+  const organizationId = requestedStore ? state?.stores.find(store => store.organizationId === requestedStore)?.organizationId : state?.stores.length === 1 ? state.stores[0].organizationId : undefined;
+  const scopedClient = useMemo<CooperationClient>(() => ({
+    get: (path, config) => client.get(path, { ...config, headers: { ...config?.headers, 'X-Store-Organization-Id': organizationId ?? '' } }),
+    post: (path, body) => client.post(path, body, { headers: { 'X-Store-Organization-Id': organizationId ?? '' } }),
+  }), [client, organizationId]);
+  const mounted = useRef(true);
+  const moving = useRef(false);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [error, setError] = useState('');
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -40,27 +50,40 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore }: 
       // Always use the immutable business namespace, never an unrelated independent community.
       const access: Access = (await client.get(`/communities/${encodeURIComponent(`business:${model.key}`)}/access`)).data.data;
       if (access.kind !== 'semi-franchise' || access.businessKey !== model.key) throw new Error('Business scope mismatch');
-      if (alive) setState({ business, access });
+      const stores = access.canManage ? [] : (await client.get('/work-scope/accessible-stores')).data.data.stores;
+      if (!Array.isArray(stores) || stores.some(store => typeof store.organizationId !== 'string' || typeof store.organizationName !== 'string')) throw new Error('Invalid stores');
+      if (alive) setState({ business, access, stores: stores.filter(store => ['owner', 'admin', 'manager'].includes(store.memberRole)) });
     })().catch(() => { if (alive) setError('서비스 정보를 불러오지 못했습니다. 운영 준비 상태를 확인하거나 다시 시도해 주세요.'); });
     return () => { alive = false; };
   }, [model.key, accountId, client, version]);
-  const enterStore = async () => { setBusy(true); setError(''); try { await onEnterStore(); } catch { setError('내 약국으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인해 주세요.'); } finally { setBusy(false); } };
-  if (!accountId) return <section className="mx-auto max-w-6xl p-6"><h1 className="text-3xl font-semibold">{model.name}</h1><p className="my-5">로그인 후 서비스 참여 신청과 이용 상태를 확인하세요.</p><button className="rounded-lg bg-teal-800 px-5 py-3 text-white" onClick={onLogin}>로그인하기</button></section>;
+  const enterStore = async () => {
+    if (moving.current) return;
+    moving.current = true; setBusy(true); setError('');
+    try { const href = await onEnterStore(); if (mounted.current) window.location.assign(href); }
+    catch { if (mounted.current) setError('내 약국으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인해 주세요.'); }
+    finally { if (mounted.current) { moving.current = false; setBusy(false); } }
+  };
+  const heading = view === 'home' && presentation ? presentation : <h1 className="text-3xl font-semibold">{model.name}</h1>;
+  const storeSearch = organizationId ? `?store=${encodeURIComponent(organizationId)}` : '';
+  const participationPath = model.participationPath + storeSearch;
+  if (!accountId) return <section className="mx-auto max-w-6xl p-6">{heading}<p className="my-5">로그인 후 서비스 참여 신청과 이용 상태를 확인하세요.</p><button className="rounded-lg bg-teal-800 px-5 py-3 text-white" onClick={onLogin}>로그인하기</button>{view === 'home' && promotion}</section>;
   return <section className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
-    <h1 className="text-3xl font-semibold">{model.name}</h1>
+    {heading}
     <nav aria-label="협력사업 서비스" className="flex flex-wrap gap-4 text-teal-800">
-      <Link to="/">회원 공간</Link><Link to={model.participationPath}>참여 신청 · 상태</Link><Link to={model.communityPath}>회원 게시글</Link><Link to="/materials">사업 자료</Link><Link to="/tools">업무 도구</Link><Link to="/contact">Contact Us</Link>
+      <Link to={"/" + storeSearch}>회원 공간</Link><Link to={participationPath}>참여 신청 · 상태</Link><Link to={model.communityPath + storeSearch}>회원 게시글</Link><Link to={"/materials" + storeSearch}>사업 자료</Link><Link to={"/tools" + storeSearch}>업무 도구</Link><Link to="/contact">Contact Us</Link>
     </nav>
     {error && <div><p role="alert">{error}</p><button className="mt-3 underline" onClick={() => setVersion(n => n + 1)}>다시 시도</button></div>}
     {!state && !error && <p role="status">서비스 이용 상태를 확인하고 있습니다…</p>}
     {state && <>
-      {view === 'participation' ? <Participation key={`${model.key}:${version}`} model={model} business={state.business} access={state.access} client={client} onChanged={() => setVersion(n => n + 1)} /> : !state.access.allowed ? <div className="rounded-xl border p-6"><p>이 서비스의 가입 승인 후 회원 게시글·사업 자료·업무 도구를 이용할 수 있습니다.</p><Link className="mt-4 inline-block text-teal-800 underline" to={model.participationPath}>참여 신청 · 상태 확인</Link></div> : <>
-        {view === 'home' && <div className="rounded-xl bg-teal-950 p-6 text-white"><h2 className="text-2xl font-semibold">함께하는 {model.name}</h2><p className="my-4">회원 게시판에서 경험을 나누고 사업 자료를 내 약국에서 활용하세요.</p><Link className="mr-6 underline" to={model.communityPath}>회원 게시글 보기</Link><Link className="underline" to="/materials">사업 자료 보기</Link></div>}
-        {(view === 'materials' || view === 'home') && (state.access.canManage ? <Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link> : <Materials key={`${model.key}:${version}:${view}`} model={model} client={client} />)}
+      {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주세요</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
+      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : !state.access.allowed ? <div className="rounded-xl border p-6"><p>이 서비스의 가입 승인 후 회원 게시글·사업 자료·업무 도구를 이용할 수 있습니다.</p><Link className="mt-4 inline-block text-teal-800 underline" to={participationPath}>참여 신청 · 상태 확인</Link></div> : <>
+        {view === 'home' && <div className="rounded-xl bg-teal-950 p-6 text-white"><h2 className="text-2xl font-semibold">함께하는 {model.name}</h2><p className="my-4">회원 게시판에서 경험을 나누고 사업 자료를 내 약국에서 활용하세요.</p><Link className="mr-6 underline" to={model.communityPath + storeSearch}>회원 게시글 보기</Link><Link className="underline" to={"/materials" + storeSearch}>사업 자료 보기</Link></div>}
+        {(view === 'materials' || view === 'home') && (state.access.canManage ? <Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link> : organizationId ? <Materials key={`${model.key}:${organizationId}:${version}:${view}`} model={model} client={scopedClient} /> : <p>자료를 이용할 약국을 선택해 주세요.</p>)}
         {(view === 'tools' || view === 'home') && <div className="rounded-xl border p-6"><h2 className="text-xl font-semibold">내 약국 업무</h2><p className="my-4">승인된 공급 상품·콘텐츠와 이 사업이 제공하는 약국 업무는 내 약국에서 이용합니다.</p><button disabled={busy} onClick={() => void enterStore()} className="rounded-lg bg-teal-800 px-5 py-3 text-white disabled:opacity-50">{busy ? '이동 중…' : '내 약국으로'}</button></div>}
       </>}
       {state.access.canManage && <Link to="/operator/semi-franchises" className="block underline">참여 약국 · 공급 승인 · 콘텐츠 운영</Link>}
     </>}
+    {view === 'home' && promotion}
   </section>;
 }
 function Participation({ model, business, access, client, onChanged }: { model: CooperationModel; business: Business; access: Access; client: CooperationClient; onChanged: () => void }) {

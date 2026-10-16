@@ -44,8 +44,8 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
 
   useEffect(() => { void load(); }, [load]);
 
-  const enterCommunity = async (row: SemiFranchiseRow, section: 'community' | 'participation' = 'community') => {
-    if (!canEnterCommunity || !organizationId || (section === 'community' && !row.communityKey)) return;
+  const enterCommunity = async (row: SemiFranchiseRow, section: 'home' | 'participation' = 'home') => {
+    if (!canEnterCommunity || !organizationId || (section === 'home' && !row.communityKey)) return;
     const isCurrent = beginMove();
     setBusyKey(row.key); setError(null);
     try {

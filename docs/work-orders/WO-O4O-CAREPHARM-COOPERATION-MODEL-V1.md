@@ -13,13 +13,15 @@
 - 회원 게시판은 `business:carepharm` 사업 이름공간을 사용한다. 별도 독립 커뮤니티 가입이나 기존 pharmacy 가입으로 CarePharm 승인을 대체하지 않는다.
 - 담당 운영자의 기존 회원·공급 제안 승인·콘텐츠 화면은 `businessKey=carepharm`으로 제한한다. 승인·제품 제공·자료 복사는 기존 서버의 사업·조직별 자격 판정을 그대로 사용한다.
 - 인증 전달의 `sessionServiceKey=neture`는 현재 CarePharm의 플랫폼 계정 세션 경로다. CarePharm 사업 가입은 별도 `semi_franchise_memberships`로 판정하며 Neture/pharmacy 가입을 CarePharm 승인으로 취급하지 않는다.
+- 최신 main의 Hero·광고 표시와 약국 경영자/직원 구분, 오래된 handoff 취소 처리를 보존한다. 서비스에 전달된 `store`는 접근 가능한 약국 목록으로 검증하고 가입·자료 API에 `X-Store-Organization-Id`로 전달한다. 여러 약국 중 임의의 약국을 선택하거나 잘못된 명시 선택을 다른 약국으로 대체하지 않는다.
 - 계정·사업·선택 약국이 바뀌면 이전 자격과 콘텐츠를 제거하고 새 자격을 조회한다. 재동의가 필요한 세션은 회원 첫 화면에서도 기존 약관 게이트를 통과해야 한다.
 
 ## 검증
 
-- 전체 회귀: Neture 101 파일·936 테스트, 내 매장 33 파일·372 테스트 통과.
-- 마지막 변경 후 관련 재검증: Neture 10 파일·100 테스트, 내 매장 2 파일·7 테스트 통과. 전체 회귀와 중복되므로 합산하지 않는다.
-- 두 앱의 TypeScript 검사와 production build, 변경 코드 ESLint, 문서 민감정보·diff 검사 수행.
+- 최신 main 통합 전 전체 회귀: Neture 101 파일·936 테스트, 내 매장 33 파일·372 테스트 통과.
+- 최신 main 통합 전 관련 재검증: Neture 10 파일·100 테스트, 내 매장 2 파일·7 테스트 통과. 전체 회귀와 중복되므로 합산하지 않는다.
+- 최신 main 통합 후: Neture 관련 10 파일·102 테스트, 운영자·CarePharm 3 파일·29 테스트, 내 매장 3 파일·18 테스트, 공통 Hero·광고 1 파일·25 테스트 통과. 묶음 사이의 중복은 합산하지 않는다.
+- 최신 공통 types·UI를 재빌드한 후 두 앱의 TypeScript 검사와 production build, 변경 코드 ESLint, 문서 민감정보·diff 검사를 통과했다.
 - 로컬 production bundle을 CarePharm 호스트로 매핑한 합성 브라우저에서 PC(1440)·모바일(390) 비로그인 진입, PC 참여 관리 이동, 페이지 JavaScript 오류·가로 넘침 없음을 확인했다. 실계정 운영 로그인이나 운영 배포 검증을 뜻하지 않는다.
 
 ## 운영 등록과 남은 범위
