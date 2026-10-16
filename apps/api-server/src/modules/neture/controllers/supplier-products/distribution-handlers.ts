@@ -20,13 +20,13 @@ export function createSupplierDistributionHandlers(
         const userId = req.user?.id;
         if (!userId) return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
         const { id } = req.params;
-        const { isPublic, serviceKeys } = req.body || {};
+        const { isPublic, serviceKeys, defaultSupplyEnabled, priceGeneral, servicePrices } = req.body || {};
         if (serviceKeys !== undefined && !Array.isArray(serviceKeys)) {
           return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS' });
         }
         const result = await netureService.updateDistribution(id, supplierId, userId, {
           isPublic,
-          serviceKeys,
+          serviceKeys, defaultSupplyEnabled, priceGeneral, servicePrices,
         });
         if (!result.success) {
           const statusCode =

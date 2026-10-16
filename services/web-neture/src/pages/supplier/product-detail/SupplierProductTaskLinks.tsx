@@ -12,6 +12,7 @@ export default function SupplierProductTaskLinks({ product, returnTo }: Readonly
     <div className="mb-4 flex flex-wrap gap-2 rounded-lg bg-slate-50 p-3 text-sm">
       <button type="button" onClick={() => navigate(supplierEditLink('/supplier/store-descriptions', { masterId: product.masterId, language: 'ko' }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 설명서 만들기</button>
       <button type="button" onClick={() => navigate(supplierEditLink('/supplier/signage', { product: product.id }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">이 상품 사이니지 만들기</button>
+      {product.approvalStatus === 'APPROVED' && <button type="button" onClick={() => navigate(supplierEditLink('/supplier/products/publication', { offer: product.id }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">서비스 게시</button>}
       {product.approvalStatus === 'APPROVED' && !getAllowedOfferActions(product).restricted && (
         <>
           <button type="button" onClick={() => navigate(supplierEditLink('/supplier/supply-proposals', { offer: product.id }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">공급 제안 만들기</button>

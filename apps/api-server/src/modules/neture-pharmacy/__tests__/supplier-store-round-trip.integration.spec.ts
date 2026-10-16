@@ -1,3 +1,6 @@
+import { OrganizationStore } from '../../store-core/entities/organization-store.entity.js';
+import { ServiceProduct } from '../../../routes/kpa/entities/service-product.entity.js';
+import { OrganizationProductListing } from '../../store-core/entities/organization-product-listing.entity.js';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { ProductMaster, ProductCategory, Brand, RepresentativeProduct, ProductImage,
@@ -12,6 +15,11 @@ import { NetureOrder } from '../../../routes/neture/entities/neture-order.entity
 import { NetureOrderItem } from '../../../routes/neture/entities/neture-order-item.entity.js';
 import { NetureProduct } from '../../../routes/neture/entities/neture-product.entity.js';
 import { SupplierOfferRegistrationService } from '../../neture/services/supplier-offer-registration.service.js';
+import { SeparateSupplierRegistrationPublication1792110685889 } from '../../../database/migrations/1792110685889-SeparateSupplierRegistrationPublication.js';
+import { OfferServiceApprovalService } from '../../neture/services/offer-service-approval.service.js';
+import { SupplierOfferDistributionService } from '../../neture/services/supplier-offer-distribution.service.js';
+import { SemiFranchiseEventService } from '../services/semi-franchise-event.service.js';
+import { getSupplyOption } from '../services/supply-access.js';
 import { SupplierOfferWriteService } from '../../neture/services/supplier-offer-write.service.js';
 import { OfferLifecycleService } from '../../neture/services/offer-lifecycle.service.js';
 import { SupplierOrderService } from '../../neture/services/supplier-order.service.js';
@@ -60,6 +68,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 integration('supplier → store → payment → shipment → settlement (real PostgreSQL)', () => {
   jest.setTimeout(60000);
   let supplierId: string;
+  let supplierUserId: string;
   let ownerId: string;
   let operatorId: string;
   let offerId: string;
@@ -67,7 +76,7 @@ integration('supplier → store → payment → shipment → settlement (real Po
 
   beforeAll(async () => {
     ds = new DataSource({ type: 'postgres', url: databaseUrl,
-      entities: [ProductMaster, ProductCategory, Brand, RepresentativeProduct, ProductImage,
+      entities: [OrganizationStore, ServiceProduct, OrganizationProductListing, ProductMaster, ProductCategory, Brand, RepresentativeProduct, ProductImage,
         ProductIdentifier, ProductDrugExtension, NetureSupplier, SupplierProductOffer,
         ServiceAudiencePolicy, OfferServiceApproval, OfferServicePrice, NetureSupplierRegulatedCategory,
         CheckoutOrder, CheckoutPayment, OrderLog, NetureOrder, NetureOrderItem, NetureProduct],
@@ -81,6 +90,7 @@ integration('supplier → store → payment → shipment → settlement (real Po
     ownerId = await makeUser('owner');
     operatorId = await makeUser('operator');
     const supplierUser = await makeUser('supplier');
+    supplierUserId = supplierUser;
     await ds.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES ($1,'neture:operator',true)", [operatorId]);
     const [supplier] = await ds.query(`INSERT INTO neture_suppliers(slug,status,user_id,base_shipping_fee,free_shipping_threshold)
       VALUES ($1,'ACTIVE',$2,3000,50000) RETURNING id`, [`supplier-${tag}`, supplierUser]);
@@ -90,13 +100,13 @@ integration('supplier → store → payment → shipment → settlement (real Po
 
     const registration = new SupplierOfferRegistrationService();
     const created = await registration.createSupplierOfferFromExistingMaster(supplierId, {
-      masterId: master.id, isPublic: true, consumerShortDescription: 'Synthetic integration product',
+      masterId: master.id, consumerShortDescription: 'Synthetic integration product',
       priceGeneral: 10000, stockQuantity: 10,
     });
     expect(created).toMatchObject({ success: true, data: { approvalStatus: 'PENDING', isActive: false } });
     offerId = created.data!.id;
     expect(await registration.createSupplierOfferFromExistingMaster(supplierId, {
-      masterId: master.id, isPublic: true, consumerShortDescription: 'Synthetic duplicate', priceGeneral: 1,
+      masterId: master.id, consumerShortDescription: 'Synthetic duplicate', priceGeneral: 1,
     })).toMatchObject({ success: false, error: 'OFFER_ALREADY_EXISTS' });
     expect(await new SupplierOfferWriteService().updateSupplierOffer(offerId, supplierId, { priceGeneral: 12000 }))
       .toMatchObject({ success: true });
@@ -133,6 +143,125 @@ integration('supplier → store → payment → shipment → settlement (real Po
 
   afterAll(async () => {
     if (ds?.isInitialized) await ds.destroy();
+  });
+
+  it('migration preserves existing approved default publications without publishing pending or designated products', async () => {
+    const q = ds.createQueryRunner();
+    await q.startTransaction();
+    try {
+      const migration = new SeparateSupplierRegistrationPublication1792110685889();
+      await migration.down(q);
+      const ids: string[] = [];
+      for (const [status, keys] of [['APPROVED', []], ['PENDING', []], ['APPROVED', ['kpa-society']], ['REJECTED', []]] as const) {
+        const [master] = await q.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status)
+          VALUES ('Legacy synthetic','Legacy synthetic','Synthetic','GENERAL','ACTIVE') RETURNING id`);
+        const [offer] = await q.query(`INSERT INTO supplier_product_offers(master_id,supplier_id,slug,approval_status,is_active,service_keys,price_general)
+          VALUES ($1,$2,$3,$4,true,$5,4321) RETURNING id`,[master.id,supplierId,randomUUID(),status,keys]);
+        ids.push(offer.id);
+      }
+      await q.query(`INSERT INTO offer_service_approvals(offer_id,service_key,approval_status,reason,decided_at)
+        VALUES ($1,'kpa-society','rejected','Synthetic prior registration reason',NOW())`,[ids[3]]);
+      await migration.up(q);
+      const rows = await q.query(`SELECT id,default_supply_enabled,approval_status,service_keys,price_general FROM supplier_product_offers WHERE id=ANY($1::uuid[])`,[ids]);
+      expect(ids.map(id => rows.find((r: any) => r.id===id).default_supply_enabled)).toEqual([true,false,false,false]);
+      expect((await q.query('SELECT registration_rejection_reason FROM supplier_product_offers WHERE id=$1',[ids[3]]))[0])
+        .toEqual({registration_rejection_reason:'Synthetic prior registration reason'});
+      expect(rows.every((r: any) => r.price_general===4321)).toBe(true);
+      expect(rows.find((r: any) => r.id===ids[1]).approval_status).toBe('PENDING');
+      expect(rows.find((r: any) => r.id===ids[2]).service_keys).toEqual(['kpa-society']);
+    } finally { await q.rollbackTransaction(); await q.release(); }
+  });
+
+  it.each([
+    [[], 'PRIVATE'],
+    [['kpa-society'], 'SERVICE'],
+  ])('registration approval removes legacy PUBLIC catalog eligibility with targets %j', async (serviceKeys, distributionType) => {
+    const [master] = await ds.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status)
+      VALUES ('Legacy public synthetic','Legacy public synthetic','Synthetic','GENERAL','ACTIVE') RETURNING id`);
+    const registered = await new SupplierOfferRegistrationService().createSupplierOfferFromExistingMaster(supplierId, { masterId: master.id });
+    expect(registered.success).toBe(true);
+    const id = registered.data!.id;
+    await ds.query(`UPDATE supplier_product_offers SET is_public=true, distribution_type='PUBLIC', service_keys=$2 WHERE id=$1`, [id, serviceKeys]);
+    expect(await new OfferLifecycleService().approveProduct(id, operatorId)).toMatchObject({ success: true });
+    expect((await ds.query(`SELECT approval_status, is_public, default_supply_enabled, distribution_type FROM supplier_product_offers WHERE id=$1`, [id]))[0])
+      .toEqual({ approval_status: 'APPROVED', is_public: false, default_supply_enabled: false, distribution_type: distributionType });
+    expect(await ds.query(`SELECT id FROM supplier_product_offers WHERE id=$1 AND is_active=true AND distribution_type='PUBLIC'`, [id])).toEqual([]);
+    expect(await ds.query('SELECT id FROM organization_product_listings WHERE offer_id=$1', [id])).toEqual([]);
+  });
+
+  it('keeps approval, explicit publication and scheduled event-only sales independent', async () => {
+    expect(await getSupplyOption(ds, organizationId, 'default', offerId)).toBeNull();
+    const publication = new SupplierOfferDistributionService();
+    expect(await publication.updateDistribution(offerId, supplierId, operatorId, { defaultSupplyEnabled: true, priceGeneral: 12000 }))
+      .toMatchObject({ success: true });
+    expect(await getSupplyOption(ds, organizationId, 'default', offerId)).toMatchObject({ unitPrice: 12000 });
+
+    const events = new SemiFranchiseEventService(ds);
+    const event = await events.supplierCreate(supplierId, supplierUserId, {
+      offerId, semiFranchiseKey: 'pharmacy', eventPrice: 10000,
+      startAt: new Date(Date.now() - 60000).toISOString(), endAt: new Date(Date.now() + 3600000).toISOString(),
+    });
+    // Approval uses the assigned operator; no product registration reapproval.
+    const franchises = new SemiFranchiseService(ds);
+    const franchise = (await franchises.getByKey('pharmacy'))!;
+    await events.operatorDecide(franchise, operatorId, event.id, 'approve');
+    expect(await getSupplyOption(ds, organizationId, 'event', event.id)).toMatchObject({ unitPrice: 10000 });
+    expect(await publication.updateDistribution(offerId, supplierId, operatorId, { defaultSupplyEnabled: false }))
+      .toMatchObject({ success: true });
+    expect(await getSupplyOption(ds, organizationId, 'default', offerId)).toBeNull();
+    expect(await getSupplyOption(ds, organizationId, 'event', event.id)).toMatchObject({ unitPrice: 10000 });
+    expect((await ds.query('SELECT approval_status,price_general FROM supplier_product_offers WHERE id=$1',[offerId]))[0])
+      .toEqual({ approval_status: 'APPROVED', price_general: 12000 });
+    await publication.updateDistribution(offerId, supplierId, operatorId, { defaultSupplyEnabled: true });
+    await publication.updateDistribution(offerId, supplierId, supplierUserId, { serviceKeys: ['kpa-society'] });
+    const [request] = await ds.query('SELECT id FROM offer_service_approvals WHERE offer_id=$1 AND service_key=$2',[offerId,'kpa-society']);
+    expect(await new OfferServiceApprovalService(ds).reject(request.id,operatorId,'Synthetic service rejection')).toMatchObject({success:true});
+    expect((await ds.query('SELECT approval_status FROM supplier_product_offers WHERE id=$1',[offerId]))[0].approval_status).toBe('APPROVED');
+    expect(await getSupplyOption(ds,organizationId,'default',offerId)).not.toBeNull();
+    expect(await getSupplyOption(ds,organizationId,'event',event.id)).not.toBeNull();
+    await publication.updateDistribution(offerId, supplierId, supplierUserId, { serviceKeys: ['kpa-society'], servicePrices: [{serviceKey:'kpa-society',unitPrice:11000}] });
+    await ds.query(`INSERT INTO organizations(id,name,code,type) VALUES ('a0000000-0a00-4000-a000-000000000001','Synthetic service review',$1,'pharmacy') ON CONFLICT(id) DO NOTHING`,[randomUUID()]);
+    const serviceApprovals = new OfferServiceApprovalService(ds);
+    expect(await serviceApprovals.approve(request.id,operatorId)).toMatchObject({success:true});
+    expect((await ds.query('SELECT approval_status FROM supplier_product_offers WHERE id=$1',[offerId]))[0].approval_status).toBe('APPROVED');
+    expect(await getSupplyOption(ds,organizationId,'event',event.id)).not.toBeNull();
+    await publication.updateDistribution(offerId,supplierId,supplierUserId,{ serviceKeys: [] });
+    expect(await serviceApprovals.approve(request.id,operatorId)).toMatchObject({success:false,error:'NOT_PENDING'});
+    expect((await ds.query('SELECT unit_price FROM offer_service_prices WHERE offer_id=$1 AND service_key=$2',[offerId,'kpa-society']))[0].unit_price).toBe(11000);
+    await events.supplierCancel(supplierId, event.id);
+    expect(await getSupplyOption(ds, organizationId, 'event', event.id)).toBeNull();
+    expect(await getSupplyOption(ds, organizationId, 'default', offerId)).toMatchObject({ unitPrice: 12000 });
+
+    const [master] = await ds.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status)
+      VALUES ('Event-only synthetic','Event-only synthetic','Synthetic','GENERAL','ACTIVE') RETURNING id`);
+    const registered = await new SupplierOfferRegistrationService().createSupplierOfferFromExistingMaster(supplierId, { masterId: master.id });
+    const id = registered.data!.id;
+    expect(await publication.updateDistribution(id,supplierId,supplierUserId,{defaultSupplyEnabled:true,priceGeneral:3000})).toMatchObject({success:false,error:'PRODUCT_NOT_APPROVED'});
+
+    const genericEvents = new EventOfferService(ds);
+    const genericInput = { offerId:id, organizationId, serviceKey:'kpa-groupbuy', roleType:'operator' as const, operatorUserId:operatorId,
+      eventConditions:{eventPrice:2000,startAt:new Date(Date.now()-60000),endAt:new Date(Date.now()+3600000)} };
+    await expect(genericEvents.createListing(genericInput)).rejects.toMatchObject({code:'PRODUCT_NOT_APPROVED'});
+    const lifecycle = new OfferLifecycleService();
+    await lifecycle.rejectProduct(id,operatorId,'Synthetic registration correction');
+    expect((await ds.query('SELECT registration_rejection_reason FROM supplier_product_offers WHERE id=$1',[id]))[0])
+      .toEqual({registration_rejection_reason:'Synthetic registration correction'});
+    expect(await lifecycle.submitForApproval(supplierId,[id])).toMatchObject({submitted:1});
+    await lifecycle.approveProduct(id, operatorId);
+    expect((await ds.query('SELECT registration_rejection_reason FROM supplier_product_offers WHERE id=$1',[id]))[0])
+      .toEqual({registration_rejection_reason:null});
+    await ds.query(`INSERT INTO offer_service_prices(offer_id,service_key,unit_price) VALUES ($1,'kpa-society',1500)`,[id]);
+    await expect(genericEvents.createListing(genericInput)).rejects.toThrow('이하여야 합니다');
+    expect(await genericEvents.createListing({...genericInput,eventConditions:{...genericInput.eventConditions,eventPrice:1000}})).toMatchObject({eventPrice:1000});
+    const onlyEvent = await events.supplierCreate(supplierId, supplierUserId, { offerId: id, semiFranchiseKey: 'pharmacy', eventPrice: 2000,
+      startAt: new Date(Date.now() - 60000).toISOString(), endAt: new Date(Date.now() + 3600000).toISOString() });
+    await events.operatorDecide(franchise, operatorId, onlyEvent.id, 'approve');
+    expect(await getSupplyOption(ds, organizationId, 'event', onlyEvent.id)).toMatchObject({ unitPrice: 2000 });
+    expect(await getSupplyOption(ds, organizationId, 'default', id)).toBeNull();
+    await ds.query(`UPDATE organization_product_listings SET end_at=NOW()-interval '1 second' WHERE id=$1`,[onlyEvent.id]);
+    expect(await getSupplyOption(ds, organizationId, 'event', onlyEvent.id)).toBeNull();
+    expect((await ds.query('SELECT approval_status,price_general,default_supply_enabled FROM supplier_product_offers WHERE id=$1',[id]))[0])
+      .toEqual({ approval_status: 'APPROVED', price_general: 0, default_supply_enabled: false });
   });
 
   it('completes the pharmacy purchase with the real checkout and bridge, and preserves settlement scope', async () => {

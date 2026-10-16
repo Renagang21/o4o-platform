@@ -36,11 +36,13 @@ beforeEach(() => {
 
 it('supplier unpaged list keeps ownership, enrichment and derived purpose', async () => {
   query.mockImplementation(async (sql: string) => sql.includes('is_primary') ? [{ master_id: fixture.masterId, image_url: 'fixture-image' }]
+    : sql.includes('json_agg') ? [{ offer_id: fixture.id, approvals: [{ serviceKey: 'kpa-society', status: 'rejected', reason: 'Fixture service reason' }] }]
     : sql.includes("approval_status = 'pending'") ? [{ offer_id: fixture.id, cnt: 2 }]
     : [{ offer_id: fixture.id, cnt: 3 }]);
   expect(await service.getSupplierProducts(fixture.supplierId)).toEqual([expect.objectContaining({
     id: fixture.id, name: 'Fixture product', pendingRequestCount: 2, activeServiceCount: 3,
     purpose: 'ACTIVE_SALES', primaryImageUrl: 'fixture-image', categoryName: 'Fixture category', brandName: 'Fixture brand',
+    serviceApprovals: [{ serviceKey: 'kpa-society', status: 'rejected', reason: 'Fixture service reason' }],
   })]);
   expect(find).toHaveBeenCalledWith(expect.objectContaining({ where: { supplierId: fixture.supplierId } }));
   for (const [sql, params] of query.mock.calls) if (!sql.includes('product_images')) {
@@ -72,19 +74,17 @@ it('supplier filters remain bound and unknown sorting cannot become SQL', async 
   expect(bindings).toEqual(['supplier-fixture', '%fixture%', 'PRIVATE', false, 'manual']);
   expect(countSql).toContain('spo.deleted_at IS NULL');
   expect(countSql).toContain('NOT EXISTS (SELECT 1 FROM product_images');
-  expect(countSql).toContain("osa.approval_status != 'approved'");
+  expect(countSql).toContain("spo.approval_status = 'APPROVED'");
   expect(countSql).toContain("jsonb_typeof(pm.tags) = 'array'");
   const [rowSql, rowBindings] = query.mock.calls[1];
   expect(rowSql).toContain('ORDER BY pm.id, spo.created_at DESC');
   expect(rowSql).not.toContain('DROP TABLE');
   expect(rowBindings).toEqual([...bindings, 100, 0]);
 });
-it.each(['unrequested', 'pending', 'approved', 'rejected'])('supplier approval tab %s keeps service-approval SSOT', async (status) => {
+it.each(['unrequested', 'pending', 'approved', 'rejected'])('supplier approval tab %s uses product registration approval', async (status) => {
   await service.getSupplierProductsPaginated('supplier-fixture', { serviceApprovalStatus: status });
   const sql = query.mock.calls[0][0];
-  expect(sql).toContain('offer_service_approvals');
-  if (status === 'unrequested') expect(sql).toContain('NOT EXISTS');
-  else expect(sql).toContain(`'${status}'`);
+  expect(sql).toContain(`spo.approval_status = '${status === 'unrequested' ? 'PENDING' : status.toUpperCase()}'`);
 });
 it('approval counts use same auxiliary filters and empty fallback', async () => {
   expect(await service.getSupplierProductApprovalCounts('supplier-fixture', { keyword: 'needle', isActive: 'false' })).toEqual({ total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 });

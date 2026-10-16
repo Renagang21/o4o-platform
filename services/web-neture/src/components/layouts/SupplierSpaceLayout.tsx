@@ -78,8 +78,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: '상품',
     icon: Package,
     items: [
-      { label: '상품 목록', path: '/supplier/products' },
-      { label: '상품 추가', path: '/supplier/products/register' },
+      { label: '내 제품', path: '/supplier/products' },
+      { label: '제품 등록', path: '/supplier/products/register' },
+      { label: '서비스 게시', path: '/supplier/products/publication' },
       // 대량 등록·소스 입력은 상품 추가 화면 안에서 선택한다. 기존 URL은 유지한다.
       // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C·§D (2026-09-23):
       //   '거래 상품 정보'(B2B 설명 편집) 와 '공급 오퍼'(안내 허브) 는 상품 목록으로 접힌다.
@@ -88,10 +89,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       //   Pharmacy-Hub 는 운영자 공급 승인이 없는 직접 opt-in 축 — 제공 설정은 Neture 에만 있다.
       { label: '판매자 모집', path: '/supplier/recruitments', section: '판매활동' },
       { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
-      { label: '이벤트 오퍼', path: '/supplier/event-offers' },
+      { label: '이벤트·특가', path: '/supplier/event-offers' },
       // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 공급 경로
-      { label: '공급 제안', path: '/supplier/supply-proposals', section: '세미프랜차이즈' },
-      { label: '세미프랜차이즈 이벤트', path: '/supplier/semi-franchise-events' },
+      { label: '공급 제안', path: '/supplier/supply-proposals', section: '약국 협력사업' },
       { label: '세미프랜차이즈 모집', path: '/supplier/semi-franchise-recruitments' },
     ],
   },
@@ -144,6 +144,7 @@ export default function SupplierSpaceLayout() {
     if (path === '/supplier/products') {
       return pathname === '/supplier/products' || pathname === '/supplier/products/library' || pathname === '/supplier/products/from-master';
     }
+    if (path === '/supplier/event-offers') return pathname === path || pathname === '/supplier/semi-franchise-events';
     if (path === '/supplier/products/register') {
       return ['/supplier/products/register', '/supplier/products/new', '/supplier/products/bulk', '/supplier/products/import-assistant'].includes(pathname);
     }

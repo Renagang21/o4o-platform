@@ -1,6 +1,6 @@
 # 창고형약국 공통 구조·직원 지원 연결
 
-> 상태: 구현 완료·최종 검증/인계 중
+> 상태: 구현·검증 완료 · push 인계
 > 작성일: 2026-10-16
 > 범위: 앞선 기능 판정의 연속 단계. 같은 branch에서 전체 구현·검증·push하며 통합은 담당 공간에서 수행한다.
 
@@ -51,3 +51,10 @@
 API·내 매장·약국 공유 앱·전체 관리자·Neture build PASS. 신규 소스 ESLint, diff check, 문서 민감정보 검사 PASS. 최종 SQL 6건, 사업/직원 HTTP 5건, 약국 화면 64건, 내 매장 31건 PASS. SQL fixture 잔존 0 확인 후 전용 DB 삭제·PostgreSQL 정지.
 
 push 전 main `13f89df0e`에 공급자 migration `1792110685889`가 추가된 것을 확인했다. 이전 회원 원장 migration `1792137600000`보다 먼저 실행되어야 하므로, 개발 branch에 최신 main을 반영하여 manifest 순서와 최종 fingerprint를 다시 검증한다. main 병합·배포를 수행하는 것이 아니며 통합 담당에게 호환된 개발 branch를 넘기는 과정이다.
+
+
+최신 main 동기화 결과: manifest는 공급자 분리 → 회원 유료 원장 순서다. 충돌은 두 incremental 등록 파일뿐이며 양쪽 migration을 보존했다. baseline + 29 incrementals의 최종 스키마는 `8bff6266b19ec25febfb59bfdcc36e8d8dcada715f3b8ec5883a8c01f765ec1b`(6664줄)이다. 격리 PostgreSQL에서 회원 migration down 시 최신 main `d5f95281...`(6654줄), up 시 최종 상태를 정확히 재현했다. 새 빈 DB 전체 bootstrap과 재실행 모두 MIGRATION_JOB SUCCESS, migration contract 21/21 PASS. 이전 초기 단계의 fingerprint는 당시 미병합 기준 검증 기록이며 운영에 적용한 값이 아니다.
+
+동기화 후 API 판정/설정/SQL/태블릿 runtime 4 files / 37 tests PASS, 내 매장/직원 지원/최신 안내 편집 회귀 3 files / 50 tests PASS. API·내 매장·약국 앱·Neture build를 다시 실행해 PASS했다. 공통 tablet 두 package는 source export이며 별도 build script가 없어 앱 build가 최신 소스를 함께 검증한다. 전체 관리자 build는 새 관리 패널 반영 후 PASS했다. 기존 번들 크기/Browserslist 경고는 그대로다.
+
+WORKTREE_DISPOSITION: 기존 `wo/pharmacy-service-entitlements` / 연속 단계 / 최신 개발 기준 `13f89df0e` / main 통합·CI·배포 미실행 / 로컬 SQL·HTTP·화면 smoke PASS / other session usage 없음 / KEEP(통합 담당에게 인계할 미병합 branch 보존).

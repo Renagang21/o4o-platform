@@ -62,6 +62,9 @@ export interface EventOfferApiError {
 
 export interface CreateEventOfferProductDto {
   offerId: string;
+  eventPrice: number;
+  startAt: string;
+  endAt: string;
   // organizationId는 서버에서 kpa_members로 자동 주입
 }
 
@@ -134,7 +137,7 @@ export const eventOfferAdminApi = {
     apiClient.get<{ data: EventOfferAdminProduct[] }>('/groupbuy-admin/products'),
 
   /**
-   * 이벤트 상품 추가 (offerId만 전달, organizationId는 서버 자동 주입)
+   * 이벤트 상품 추가 (제품·가격·기간 전달, organizationId는 서버 자동 주입)
    */
   addProduct: (data: CreateEventOfferProductDto) =>
     apiClient.post<{ data: EventOfferAdminProduct }>('/groupbuy-admin/products', data),

@@ -121,10 +121,6 @@ async function createStep3(query = '') {
     target: { value: 'cat-a' },
   });
   fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
-  fireEvent.change(screen.getByLabelText('검증 공급가'), {
-    target: { value: '2000' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
   return view;
 }
 function parseImport() {
@@ -227,7 +223,7 @@ describe('Candidate creation existing workflow', () => {
     await screen.findByRole('option', { name: '일반 카테고리' });
     expect(mocks.product.getCategories).toHaveBeenCalledTimes(2);
   });
-  it('sends a Candidate-only payload after the three steps', async () => {
+  it('sends a Candidate-only payload without price or publication fields', async () => {
     await createStep3();
     fireEvent.change(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하세요...'), {
       target: { value: '검증 설명' },
@@ -243,7 +239,6 @@ describe('Candidate creation existing workflow', () => {
         imageUrl: null,
         contentImageUrls: [],
         offerDraft: expect.objectContaining({
-          priceGeneral: 2000,
           consumerShortDescription: '검증 설명',
         }),
       }),
@@ -326,7 +321,8 @@ describe('Candidate creation existing workflow', () => {
     ).toBe('초안 상품');
     expect(sessionStorage.getItem('neture-import-draft')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
-    expect((screen.getByLabelText('검증 공급가') as HTMLInputElement).value).toBe('3000');
+    expect(screen.queryByLabelText('검증 공급가')).toBeNull();
+    expect(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하세요...')).toBeTruthy();
   });
 });
 
@@ -344,7 +340,7 @@ describe('Import existing workflow', () => {
     fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
     await screen.findByText('제품 정보 검토 요청 완료');
     expect(mocks.media.upload.mock.calls.some(([selected]) => selected === file)).toBe(true);
-    expect(mocks.supplier.submitProductCandidate.mock.lastCall?.[0]).toMatchObject({ name: '검증 상품', offerDraft: { priceGeneral: 2000 } });
+    expect(mocks.supplier.submitProductCandidate.mock.lastCall?.[0]).toMatchObject({ name: '검증 상품', offerDraft: { consumerShortDescription: null } });
   });
 
   it('applies imported data into the same draft without replacing prior input or submitting', async () => {
@@ -442,12 +438,12 @@ describe('Supplier authoring accessible controls', () => {
     for (const label of [/포장 상품명/, /^상품명/, /카테고리/, /규제 구분/, /^브랜드$/, /브랜드명 직접 입력/, /제조사/, /바코드/]) expect(screen.getByLabelText(label)).toBeTruthy();
     expect(document.activeElement).not.toBe(screen.getByLabelText(/포장 상품명/));
   });
-  it('associates imported registration settings while keeping distribution as a heading', async () => {
+  it('keeps source import focused on accessible product information', async () => {
     parseImport();
     await screen.findByText('3. O4O 등록 설정');
     expect(screen.getByLabelText('카테고리')).toBeTruthy();
-    expect(screen.getByLabelText(/공급가 \(원\)/)).toBeTruthy();
-    expect(screen.getByLabelText(/공개\(PUBLIC\)/)).toBeTruthy();
-    expect(screen.getByText('유통 설정').tagName).toBe('P');
+    expect(screen.queryByLabelText(/공급가 \(원\)/)).toBeNull();
+    expect(screen.queryByLabelText(/공개\(PUBLIC\)/)).toBeNull();
+    expect(screen.queryByText('유통 설정')).toBeNull();
   });
 });

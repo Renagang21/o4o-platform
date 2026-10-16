@@ -26,7 +26,7 @@ const CONTROLLER = 'apps/api-server/src/modules/neture/controllers/supplier-prod
 const ERROR_CODES = 'apps/api-server/src/modules/neture/constants/offer-error-code.ts';
 const NETURE_SERVICE = 'apps/api-server/src/modules/neture/neture.service.ts';
 
-// Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
+// Inspect all write responsibilities, including the separate publication gate.
 const offerSrc = [
   OFFER_SERVICE,
   OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
@@ -125,11 +125,17 @@ describe('② persistence primitive 공유 — 복사 0', () => {
     }
   });
 
-  it('DRUG gate · 약국 전용 서비스 검사 · service approval 은 primitive 안에 있다 (완화 0)', () => {
-    expect(primitiveBody).toContain('assertDrugOfferAllowed(');
-    expect(primitiveBody).toContain("action: 'OFFER_CREATE'");
-    expect(primitiveBody).toContain('assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, filteredServiceKeys)');
-    expect(primitiveBody).toContain('createPendingApprovals(');
+  it('등록은 미게시·심사 대기로 저장하고 DRUG 게시·서비스 승인 gate는 별도 경로에서 유지한다', () => {
+    for (const state of ['isPublic: false', 'isActive: false', 'defaultSupplyEnabled: false', 'serviceKeys: []', 'approvalStatus: OfferApprovalStatus.PENDING']) {
+      expect(primitiveBody).toContain(state);
+    }
+    expect(fromMasterBody).toContain('assertRegulatedPermit(');
+    expect(primitiveBody).not.toContain('createPendingApprovals(');
+    const publication = stripComments(read(OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-distribution.service.ts')));
+    expect(publication).toContain('assertDrugOfferAllowed(');
+    expect(publication).toContain('assertPharmacyOnlyServiceKeys(');
+    expect(publication).toContain('PRODUCT_NOT_APPROVED');
+    expect(publication).toContain('createPendingApprovals(');
   });
 
 });
