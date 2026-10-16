@@ -42,6 +42,12 @@ function Location() {
 }
 
 describe("업무 배치와 기존 경로", () => {
+  it("직원 지원은 약국 메뉴와 업무 그룹에만 노출된다", () => {
+    expect(UNIFIED_STORE_CONFIG.menuSections?.flatMap(s => s.items).some(i => i.key === "staff-support")).toBe(false);
+    expect(workspaceItems(UNIFIED_STORE_CONFIG, "use").some(i => i.key === "staff-support")).toBe(false);
+    expect(workspaceItems(config, "use").some(i => i.key === "staff-support")).toBe(true);
+  });
+
   it("기존 기능이 업무 또는 보조 메뉴에 남고 입력 설정은 변하지 않는다", () => {
     const before = JSON.stringify(config);
     const keys = new Set([

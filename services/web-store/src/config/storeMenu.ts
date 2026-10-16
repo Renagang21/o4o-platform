@@ -32,7 +32,6 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'pop',                  label: 'POP',             subPath: '/marketing/pop-v2' },
       { key: 'qr',                   label: 'QR-code',         subPath: '/marketing/qr' },
       { key: 'tablet-displays',      label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
-      { key: 'staff-support', label: '직원 현장 지원', subPath: '/staff-support' },
       { key: 'tablet-requests',      label: '상담 요청',        subPath: '/requests' },
     ]},
     { label: '매장 실행', items: [
@@ -77,6 +76,9 @@ export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['men
   ]},
   { label: '자료 가져오기', items: [
     { key: 'pharmacy-contents', label: '자료 가져오기', subPath: '/pharmacy/contents' },
+  ]},
+  { label: '직원 지원', items: [
+      { key: 'staff-support', label: '직원 현장 지원', subPath: '/staff-support' },
   ]},
   { label: '가입', items: [
     { key: 'pharmacy-semi-franchises', label: '이용 사업 · 가입 관리', subPath: '/businesses' },
