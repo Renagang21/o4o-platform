@@ -4,7 +4,8 @@ MINEROCK600 EP01 — CUT1 TTS A/B 테스트 (WO-O4O-AUTOMATION-TTS-NARROW-ENDPOI
 O4O 서버의 narrow TTS endpoint(POST /api/v1/platform/automation/tts) 를 호출한다.
 - provider 키는 서버에 있는 것을 그대로 사용한다. 이 PC 로 API key 를 가져오지 않고, 출력·기록하지 않는다.
 - 로그인 자격은 docs/local/TEST-ACCOUNTS.local.md(git 미추적) 에서만 읽고, 토큰·비밀번호를 출력하지 않는다.
-  (또는 O4O_ACCESS_TOKEN 환경변수로 이미 발급된 Bearer token 을 넘길 수 있다.)
+  '용도 | 아이디 | 비밀번호' 표에서 용도가 super_admin 인 행 하나만 쓴다. 관리자가 Google 전용이라 그런 행이 없으면
+  O4O_ACCESS_TOKEN 환경변수로 이미 발급된 Bearer token 을 넘긴다(이 값이 있으면 파일을 읽지 않는다).
 - narration-ko.txt 의 [CUT1] 블록만 생성. 음성 속도 변경·후처리 없음. Gemini 는 서버가 WAV 로 돌려주며
   청취 편의용 mp3 사본만 ffmpeg 로 만든다(원본 wav 보존).
 - 출력: C:\tmp\minerock600-pilot\ep01\narration-test\cut1-openai.mp3 / cut1-gemini.wav (+ cut1-gemini.mp3)
@@ -42,16 +43,72 @@ def post(url, headers, body, timeout=180):
         return e.code, e.read(), dict(e.headers)
 
 
+class AccountsError(Exception):
+    """메시지에는 위치·개수만 담는다. 계정·비밀번호 값은 넣지 않는다."""
+
+
+def _cells(line: str) -> list:
+    return [c.strip() for c in line.strip().strip("|").split("|")]
+
+
+def _unquote(value: str) -> str:
+    return value[1:-1].strip() if len(value) >= 2 and value[0] == value[-1] == "`" else value
+
+
+SUPER_ADMIN = re.compile(r"(?<![A-Za-z0-9_])super_admin(?![A-Za-z0-9_])")
+
+
+def super_admin_credentials(text: str):
+    """TEST-ACCOUNTS.local.md 의 '용도 | 아이디 | 비밀번호 | …' 표에서 용도가 super_admin 인 행 하나만 고른다.
+
+    비밀번호 열이 없는 표(Google 전용 계정)는 대상이 아니다. 해당 행이 없거나 여러 개면 실패하며,
+    임의의 첫 계정이나 다른 파일로 대체하지 않는다.
+    """
+    lines = text.splitlines()
+    tables = 0
+    matches = []
+    for i, line in enumerate(lines):
+        if not line.lstrip().startswith("|") or i + 1 >= len(lines):
+            continue
+        header = _cells(line)
+        if not re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?", lines[i + 1].strip()):
+            continue
+        if not {"용도", "아이디", "비밀번호"} <= set(header):
+            continue
+        tables += 1
+        col = {name: header.index(name) for name in ("용도", "아이디", "비밀번호")}
+        for n, row in enumerate(lines[i + 2:], start=i + 3):
+            if not row.lstrip().startswith("|"):
+                break
+            cells = _cells(row)
+            if len(cells) != len(header):
+                raise AccountsError(f"계정 표 {n}행의 열 수가 머리글과 다름")
+            if SUPER_ADMIN.search(cells[col["용도"]]):
+                matches.append((n, _unquote(cells[col["아이디"]]), _unquote(cells[col["비밀번호"]])))
+    if not tables:
+        raise AccountsError("'용도 | 아이디 | 비밀번호' 계정 표 없음")
+    if not matches:
+        raise AccountsError("비밀번호 로그인 super_admin 행 없음 (관리자가 Google 전용이면 O4O_ACCESS_TOKEN 사용)")
+    if len(matches) > 1:
+        raise AccountsError(f"super_admin 행이 {len(matches)}개 — 하나만 남길 것")
+    n, email, password = matches[0]
+    if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
+        raise AccountsError(f"{n}행 super_admin 아이디가 비었거나 이메일 형식이 아님")
+    if not password or password in {"-", "—"} or re.search(r"\s", password):
+        raise AccountsError(f"{n}행 super_admin 비밀번호가 비었거나 공백을 포함함")
+    return email, password
+
+
 def login(api: str) -> str:
     tok = os.environ.get("O4O_ACCESS_TOKEN", "")
     if tok:
         return tok
-    acct = ACCOUNTS.read_text(encoding="utf-8")
-    m = re.search(r"admin\.neture\.co\.kr 관리자 \(super_admin\)\s*\n아이디\s*:\s*(\S+)\s*\n페스워드\s*:\s*(\S+)", acct)
-    if not m:
-        sys.exit("TEST-ACCOUNTS.local.md 에서 super_admin 항목을 찾지 못함")
+    try:
+        email, password = super_admin_credentials(ACCOUNTS.read_text(encoding="utf-8"))
+    except (AccountsError, OSError) as e:
+        sys.exit(f"{ACCOUNTS.name}: {e if isinstance(e, AccountsError) else '파일을 읽지 못함'}")
     st, data, _ = post(f"{api}/auth/login",
-                       {}, {"email": m.group(1), "password": m.group(2), "serviceKey": "neture", "includeLegacyTokens": True})
+                       {}, {"email": email, "password": password, "serviceKey": "neture", "includeLegacyTokens": True})
     if st != 200:
         sys.exit(f"login HTTP {st}")
     d = json.loads(data).get("data", {})
