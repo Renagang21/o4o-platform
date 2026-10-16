@@ -133,8 +133,12 @@ Codex P2 2건과 CI blocker 는 6-1·6-2 의 수정으로 해소됐고, 병합 h
 - legacy PUBLIC/PENDING 등록 승인 회귀(`supplier-store-round-trip.integration.spec.ts`)에 실제 판매자 공급 catalog
   reader(`SellerService.getAvailableSupplyProducts`)를 추가로 실행한다.
   - 서비스 대상 없음 → 승인 후 `PRIVATE`, 판매자 catalog 비노출.
-  - 기존 명시 서비스 대상(`kpa-society`) 보유 → 승인 후 `SERVICE` 로만 노출되고 `PUBLIC` 으로는 노출되지 않는다.
-    자동 목록화는 `offer_service_approvals` 승인 없이는 생성되지 않는다. 명시 서비스 대상은 기존 게시 보존 원칙상 유지된다.
+  - 기존 명시 서비스 대상(`kpa-society`) 보유 → 승인 후 `distribution_type=SERVICE`, 판매자 catalog 에 `PUBLIC` 으로 노출되지 않는다.
+    명시 서비스 대상은 기존 게시 보존 원칙상 유지된다.
+  - (Codex P2 반영, 2026-10-16) 최초 보강은 OSA 승인 행이 없는 SERVICE offer 의 판매자 catalog 노출을 기대값으로 고정했다.
+    [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §4 는 공급 가능을 공급자 범위 + 서비스 운영자 OSA 승인으로 정하므로,
+    현재 `SellerService.getAvailableSupplyProducts` 가 OSA 를 조회하지 않는 동작을 테스트로 고정하지 않도록 그 기대를 제거했다.
+    runtime 은 이 PR 에서 바꾸지 않으며, catalog 의 OSA 미적용은 별도 WO(`WO-O4O-SELLER-CATALOG-OSA-GATE-V1`)로 다룬다.
 - 음성 대조: 등록 승인 UPDATE 의 `distribution_type` 재계산을 일시 제거하면 두 케이스 모두 `distribution_type: "PUBLIC"` 잔류로 FAIL, 복원 시 PASS.
   (일시 제거는 검증 전용 사본에서만 수행하고 즉시 원복했다.)
 
