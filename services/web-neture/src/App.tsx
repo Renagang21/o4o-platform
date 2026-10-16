@@ -718,7 +718,12 @@ function App() {
               {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierServiceEntry />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
-              {CURRENT_HOST_PROFILE === 'carepharm' && <Route path="/" element={<CarePharmHomePage />} />}
+              {CURRENT_HOST_PROFILE === 'carepharm' && <>
+                <Route path="/" element={<CarePharmHomePage />} />
+                <Route path="/my/participation" element={<CarePharmHomePage view="participation" />} />
+                <Route path="/materials" element={<CarePharmHomePage view="materials" />} />
+                <Route path="/tools" element={<CarePharmHomePage view="tools" />} />
+              </>}
               <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />
               <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />
@@ -1231,9 +1236,9 @@ function App() {
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
               {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 심사 · 담당 세미프랜차이즈 (neture:operator) */}
               <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
-              <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
-              <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage />} />
-              <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage />} />
+              <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} forumHref={business => business.key === 'carepharm' ? '/communities/business%3Acarepharm/forum' : `/communities/${encodeURIComponent(business.community_key ?? `business:${business.key}`)}/forum`} />} />
+              <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} />} />
+              <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} />} />
             </Route>
 
             {/* ================================================================

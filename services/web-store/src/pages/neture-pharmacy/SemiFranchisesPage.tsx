@@ -1,22 +1,19 @@
+import { COOPERATION_MODELS, cooperationDestination } from '@o4o/shared-space-ui';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import { Link } from 'react-router-dom';
 /**
  * 약국 협력사업 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-2 · §7
  *
  *   GET  /api/v1/neture/pharmacy/semi-franchises              목록 + 내 약국의 가입 상태
- *   POST /api/v1/neture/pharmacy/semi-franchises/:key/apply   가입 신청(pending) — `pharmacy` 도 같은 절차
- *   POST /api/v1/neture/pharmacy/semi-franchises/:key/withdraw 탈퇴(terminated)
+ * 가입·취소·탈퇴는 각 모델 서비스에서 처리하고 내 매장에서는 해당 서비스로 이동한다.
  * 승인 · 반려 · 정지는 그 약국 협력사업 담당 운영자가 한다. 커뮤니티는 가입 active 일 때만 열린다(서버 판정).
- * 신청 · 승인 시 서버는 Neture 가입 승인(active)을 직접 확인한다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E2) —
- * 승인 전이면 `NETURE_MEMBERSHIP_REQUIRED` 로 거절되고 이 화면은 Neture 가입 안내 링크를 붙인다.
  */
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import { RefreshCw } from 'lucide-react';
-import { PLATFORM_ORIGIN } from '../../config/workspace';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
-import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
+import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate } from './shared';
 
 export default function SemiFranchisesPage() {
@@ -30,9 +27,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
   const [rows, setRows] = useState<SemiFranchiseRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
-  const [netureRequired, setNetureRequired] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,39 +44,13 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
 
   useEffect(() => { void load(); }, [load]);
 
-  const act = async (row: SemiFranchiseRow, action: 'apply' | 'withdraw') => {
-    const confirmText = row.membershipStatus === 'pending'
-      ? `${row.name} 가입 신청을 취소하시겠습니까?`
-      : `${row.name} 에서 탈퇴하시겠습니까? 탈퇴하면 이 약국 협력사업의 공급 상품을 주문할 수 없습니다.`;
-    if (action === 'withdraw' && !window.confirm(confirmText)) return;
-    setBusyKey(row.key);
-    setError(null);
-    setNetureRequired(false);
-    setMessage(null);
-    try {
-      if (action === 'apply') {
-        if (row.registrationConditions && !window.confirm(`${row.name} 가입 조건\n\n${row.registrationConditions}\n\n조건을 확인하고 가입을 신청하시겠습니까?`)) return;
-        const note = window.prompt('추가 신청 내용 (선택, 2000자 이내)', '');
-        if (note === null) return;
-        await neturePharmacyApi.applySemiFranchise(row.key, { acceptedConditions: true, conditions: row.registrationConditions || undefined, note });
-      }
-      else await neturePharmacyApi.withdrawSemiFranchise(row.key);
-      setMessage(action === 'apply' ? `${row.name} 가입을 신청했습니다. 담당 운영자 승인 후 이용할 수 있습니다.` : `${row.name} 가입을 ${row.membershipStatus === 'pending' ? '취소' : '탈퇴'}했습니다.`);
-      await load();
-    } catch (e) {
-      setError(pharmacyErrorMessage(e));
-      setNetureRequired(pharmacyErrorCode(e) === 'NETURE_MEMBERSHIP_REQUIRED');
-    } finally {
-      setBusyKey(null);
-    }
-  };
-
-  const enterCommunity = async (row: SemiFranchiseRow) => {
-    if (!row.communityKey || !canEnterCommunity || !organizationId) return;
+  const enterCommunity = async (row: SemiFranchiseRow, section: 'community' | 'participation' = 'community') => {
+    if (!canEnterCommunity || !organizationId || (section === 'community' && !row.communityKey)) return;
     const isCurrent = beginMove();
     setBusyKey(row.key); setError(null);
     try {
-      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${row.key === 'pharmacy' ? '/' : `/businesses/${encodeURIComponent(row.key)}`}?store=${encodeURIComponent(organizationId)}` });
+      const destination = cooperationDestination(row.key, section);
+      const href = await requestServiceHandoff(api, { ...destination, returnPath: `${destination.returnPath}?store=${encodeURIComponent(organizationId)}` });
       if (isCurrent()) window.location.assign(href);
     } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); } }
   };
@@ -89,16 +58,10 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
   return (
     <PharmacyPage
       title="이용 사업 · 가입 관리"
-      description="각 약국 협력사업의 가입 상태·조건을 확인하고 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
+      description="각 약국 협력사업의 가입 상태를 확인하고 해당 서비스에서 가입을 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
-      {message && <Notice>{message}</Notice>}
       {error && <Notice tone="error">{error}</Notice>}
-      {error && netureRequired && (
-        <p className="mb-4 text-sm" data-testid="semi-franchise-neture-required">
-          <a className="underline" href={PLATFORM_ORIGIN}>Neture 가입 상태 확인 · 신청</a>
-        </p>
-      )}
       {!loading && rows.some(r => r.membershipStatus === 'active') && <section aria-label="가입한 약국 협력사업" className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">가입한 약국 협력사업</h2>
         <p className="mb-4 text-sm text-slate-600">가입자 공간에서 사업 소식과 회원들의 이야기를 확인하고, 상품과 자료는 이 매장에서 이용하세요.</p>
@@ -110,6 +73,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/supply?source=${encodeURIComponent(`sf:${r.key}`)}`}>공급 상품</Link>
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/contents?business=${encodeURIComponent(r.key)}`}>자료 가져오기</Link>
               <Link className="min-h-11 rounded-lg border px-3 py-2" to={`/store/pharmacy/orders?business=${encodeURIComponent(r.key)}`}>주문 내역</Link>
+              {r.key === 'carepharm' && <Link className="min-h-11 rounded-lg border px-3 py-2" to={COOPERATION_MODELS.carepharm.storePath}>만성질환관리 업무</Link>}
             </div>
           </article>)}
         </div>
@@ -135,8 +99,6 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
               {rows.map((r) => {
                 const st = r.membershipStatus;
                 const participantStatus = !canEnterCommunity ? '약국 경영자 이용' : r.communityKey ? '가입 승인 후 이용' : '-';
-                const canApply = !st || st === 'rejected' || st === 'terminated';
-                const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
                   <tr key={r.key} className="border-b border-gray-100 last:border-0" data-testid={`semi-franchise-${r.key}`}>
                     <td className="px-4 py-3 font-medium text-gray-900">{r.name}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
@@ -152,16 +114,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
                       {r.communityKey && canEnterCommunity && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {canApply && (
-                        <button className={btn.primary} disabled={busyKey === r.key} onClick={() => act(r, 'apply')}>
-                          {st ? '다시 가입 신청' : '가입 신청'}
-                        </button>
-                      )}
-                      {canWithdraw && (
-                        <button className={btn.danger} disabled={busyKey === r.key} onClick={() => act(r, 'withdraw')}>
-                          {st === 'pending' ? '신청 취소' : '탈퇴'}
-                        </button>
-                      )}
+                      {canEnterCommunity ? <button className={btn.primary} disabled={busyKey !== null} onClick={() => void enterCommunity(r, 'participation')}>서비스에서 가입 · 상태 관리</button> : <span className="text-gray-500">약국 경영자 이용</span>}
                     </td>
                   </tr>
                 );
