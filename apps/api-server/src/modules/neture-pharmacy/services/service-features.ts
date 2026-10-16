@@ -40,7 +40,7 @@ export function resolveServiceFeatureGrants(grants: readonly ServiceFeatureGrant
 
 type Executor = { query: (sql: string, params?: unknown[]) => Promise<unknown[]> };
 /** Server adapter only; never accept paid status/features from HTTP input or a store subscription. */
-export type MemberFeatureResolver = (userId: string) => Promise<ServiceFeatureGrant | null>;
+export type MemberFeatureResolver = (ownerUserId: string) => Promise<ServiceFeatureGrant | null>;
 
 export class PharmacyServiceFeatureService {
   constructor(private readonly db: Executor, private readonly memberFeatures?: MemberFeatureResolver) {}
@@ -48,6 +48,7 @@ export class PharmacyServiceFeatureService {
   /** Call only AFTER the existing store workspace guard resolves the authorized organization. */
   async resolve(userId: string, organizationId: string) {
     try {
+      if (!userId || !organizationId) throw new Error('Authorized store context required');
       const rows = await this.db.query(
         `SELECT sf.key, sf.name, owner.metadata->'serviceFeatures' AS features
            FROM semi_franchises sf
@@ -62,7 +63,14 @@ export class PharmacyServiceFeatureService {
         type: 'semi-franchise', key: row.key, name: row.name, features: readServiceFeatures(row.features),
       }));
       if (this.memberFeatures) {
-        const member = await this.memberFeatures(userId);
+        // Payment belongs to the current owner member, never the requesting employee or store.
+        const owners = await this.db.query(
+          `SELECT user_id AS "ownerUserId" FROM organization_members
+            WHERE organization_id = $1 AND role = 'owner' AND left_at IS NULL`,
+          [organizationId],
+        ) as Array<{ ownerUserId: string }>;
+        if (owners.length !== 1 || !owners[0].ownerUserId) throw new Error('Current pharmacy owner unresolved');
+        const member = await this.memberFeatures(owners[0].ownerUserId);
         if (member) grants.push({ ...member, type: 'member', features: readServiceFeatures(member.features) });
       }
       return {

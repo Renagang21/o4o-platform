@@ -36,6 +36,7 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
       if (i === 0) user = u.id;
       const [o] = await db.query(`INSERT INTO organizations (name, code, type, "isActive", metadata) VALUES ('Synthetic pharmacy', $1, 'pharmacy', true, '{"keep":"value"}') RETURNING id`, [`feature-store-${tag}-${i}`]);
       orgs.push(o.id);
+      await db.query(`INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at) VALUES ($1,$2,'owner',true,NOW(),NOW(),NOW())`, [o.id, u.id]);
       await db.query(`INSERT INTO neture_pharmacy_memberships (organization_id, applicant_user_id, status, business_number, pharmacy_name, pharmacist_license_number) VALUES ($1,$2,'active',$3,'Synthetic pharmacy','SYNTHETIC')`, [o.id, u.id, `${tag}${i}`]);
     }
     [store, other] = orgs;
@@ -54,6 +55,7 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     await db.query(`DELETE FROM semi_franchise_memberships WHERE semi_franchise_id IN (SELECT id FROM semi_franchises WHERE key = ANY($1::text[]))`, [keys]);
     await db.query(`DELETE FROM semi_franchises WHERE key = ANY($1::text[])`, [keys]);
     await db.query(`DELETE FROM neture_pharmacy_memberships WHERE applicant_user_id = ANY($1::uuid[])`, [users]);
+    await db.query(`DELETE FROM organization_members WHERE organization_id = ANY($1::uuid[])`, [orgs]);
     await db.query(`DELETE FROM organizations WHERE id = ANY($1::uuid[])`, [orgs]);
     await db.query(`DELETE FROM users WHERE id = ANY($1::uuid[])`, [users]);
     await db.destroy();
@@ -93,4 +95,15 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     await settings.update(keys[0], { serviceFeatures: [] });
     expect((await access.resolve(user, store)).features[0].allowed).toBe(false);
   });
+  it('uses the current store owner member rather than the requesting staff member', async () => {
+    const paid = jest.fn(async (id: string) => id === users[0]
+      ? { type: 'member' as const, key: 'paid', name: '회원 이용권', features: ['tablet' as const] } : null);
+    const service = new PharmacyServiceFeatureService(db, paid);
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
+    expect((await service.resolve(users[0], other)).features[0].allowed).toBe(false);
+    expect(paid.mock.calls).toEqual([[users[0]], [users[1]]]);
+    await db.query(`UPDATE organization_members SET left_at=NOW() WHERE organization_id=$1`, [store]);
+    await expect(service.resolve('free-invited-staff', store)).rejects.toMatchObject({ code: 'FEATURE_ACCESS_UNAVAILABLE' });
+  });
+
 });
