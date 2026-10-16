@@ -172,3 +172,11 @@ PR CI·Sonar·Codex 리뷰와 최신 main CI/Delivery를 확인하고, main 및 
 - 보완 후 focused63 PASS/0 FAIL/0 SKIP, Linux deployment228건 중222 PASS/0 FAIL/6 opt-in SKIP, 변경 파일 ESLint PASS. 본문 재시도 보완은 SQL scanner를 바꾸지 않아 위 PostgreSQL 검증과 같은 SQL을 유지한다.
 
 최신 HEAD의 CI·Sonar·Codex를 다시 확인한 뒤 main 통합과 read-only development/media plan을 순차 실행한다. 이 단계에서 운영 plan·DB/GCS 삭제·WIF/IAM 변경은 실행하지 않았다. apply는 두 plan의 census와 timing 확인 후 별도 window이며 #610/#615 후속 순서를 유지한다.
+
+## V7 통합 후 생성 worker 문법 오류 수정 (2026-10-16)
+
+- #650 병합 후 개발 read-only plan run `38862711401`은 DB 연결 전에 `SyntaxError: Identifier 'markPhase' has already been declared`로 종료됐다. scanner import와 worker timing 함수 이름이 같은 모듈에서 충돌한 것이며, SQL 성능이나 권한 실패로 판정하지 않는다.
+- worker timing 콜백을 `recordWorkerPhase`로 바꿨다. SQL·검사 범위·timeout·Core fence·WIF 조건은 변경하지 않는다.
+- 실제 `loadPurgeSource`와 `jobArguments`로 생성한 development/media 각각의 plan/apply 전체 payload를 `node --input-type=module --check`로 검사한다. 이 검사는 import·DB·GCS 접속을 실행하지 않는다.
+- 기존 코드에서 새 검사가 실패함을 확인하고 수정본에서 focused 16 PASS, Linux deployment 전체 222 PASS / 0 FAIL / 6 opt-in SKIP, 변경 파일 ESLint PASS를 확인했다.
+- 운영 plan 재검증과 worker census·timing 확인은 미완료다. 이 수정 검증에서 운영 데이터·GCS·WIF·IAM 변경과 apply는 실행하지 않았다.
