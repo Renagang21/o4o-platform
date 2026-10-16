@@ -41,11 +41,20 @@ export function referenceBatchQuery(c,patterns,owned) {
       FROM reference_source source CROSS JOIN target_patterns targets`;
 }
 
+/** Optional worker timing hook; labels carry catalog identifiers only. */
+export function markPhase(q,label) {if(typeof q?.phase==='function')q.phase(label);}
+export function referencePhase(c) {
+  if(c.columns)return `reference_group:${c.schema}.${c.table}`;
+  return `${c.type==='uuid'?'reference_uuid':c.scan_key?'reference_batch':'reference_full'}:${c.schema}.${c.table}.${c.column}`;
+}
 /** One target snapshot per reference phase; never serialize tokens into SQL/logs. */
 export async function prepareReferenceGroups(q,columns,targetSql,keys,errorCode) {
   const result=[],groups=new Map();
   for(const c of columns) {
-    if(!c.scan_key||c.type==='uuid') {result.push(c);continue;}
+    // A UUID column without its own full index would otherwise be a separate
+    // whole-table scan. Fold it into the table's single keyset pass: its
+    // ::text regex match is the same equality/legacy-fallback decision.
+    if(!c.scan_key||(c.type==='uuid'&&c.indexed!==false)) {result.push(c);continue;}
     const key=JSON.stringify([c.schema,c.table,c.scan_key]);
     let group=groups.get(key);
     if(!group) {

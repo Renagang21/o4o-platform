@@ -69,3 +69,16 @@ for(const [kind,count,build] of [['dev',countDevelopmentReferences,developmentRe
   assert.doesNotMatch(sql,/FROM public\./);assert.match(sql,/CASE\s+WHEN octet_length/);
  });
 }
+
+test('only catalog-confirmed unindexed UUID columns join the single keyset pass; indexed/unknown UUID and unkeyed stay separate',async()=>{
+ const {prepareReferenceGroups,referencePhase}=await import('./pharmacy-hub-reference-batches.mjs');
+ const base={schema:'public',table:'notes',scan_key:'id'};
+ const columns=[{...base,column:'id',type:'uuid',indexed:true},{...base,column:'payload',type:'jsonb',indexed:false},
+  {...base,column:'reviewed_by',type:'uuid',indexed:false},{...base,column:'owner_id',type:'uuid'},
+  {...base,scan_key:null,table:'legacy',column:'ref_id',type:'uuid',indexed:false}];
+ const groups=await prepareReferenceGroups({query:async()=>[{id:uuid(1)}]},columns,'targets',['ph'],'invalid');
+ assert.deepEqual(groups.map(c=>c.columns??c.column),['id',['payload','reviewed_by'],'owner_id','ref_id']);
+ assert.deepEqual(groups.map(referencePhase),['reference_uuid:public.notes.id','reference_group:public.notes',
+  'reference_uuid:public.notes.owner_id','reference_uuid:public.legacy.ref_id']);
+ assert.match(developmentReferenceQuery(groups[1]),/ARRAY\[s\."payload"::text,s\."reviewed_by"::text\]/);
+});
