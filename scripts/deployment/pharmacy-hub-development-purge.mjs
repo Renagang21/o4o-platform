@@ -1,4 +1,4 @@
-import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery} from './pharmacy-hub-reference-batches.mjs';
+import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery,markPhase,referencePhase} from './pharmacy-hub-reference-batches.mjs';
 /** Fixed, owner-approved PH development rows. Media/GCS and shared identities stay intact.
  * Caller owns the transaction. Any ownership, dependency or census drift aborts before writes.
  */
@@ -117,6 +117,7 @@ async function ownership(q) {
     throw new Error('PH_DEV_SHARED_PAYMENT');
 }
 async function references(q,fks,tables) {
+  markPhase(q,'references_fk');
   for(const fk of fks) {
     if(fk.target==='supplier_product_offers')continue; // Shared supplier-owned records are retained.
     if(!Array.isArray(fk.source_columns)||!fk.source_columns.length||!Array.isArray(fk.target_columns)||fk.source_columns.length!==fk.target_columns.length)
@@ -129,10 +130,13 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
+  markPhase(q,'references_catalog');
   const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type,
       (SELECT ka.attname FROM pg_index ki JOIN pg_attribute ka ON ka.attrelid=ki.indrelid AND ka.attnum=ki.indkey[0]
         JOIN pg_type kt ON kt.oid=ka.atttypid WHERE ki.indrelid=c.oid AND ki.indisprimary AND ki.indisvalid AND ki.indisready AND ki.indnkeyatts=1 AND kt.typname='uuid'
-        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key
+        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key,
+      EXISTS (SELECT 1 FROM pg_index xi WHERE xi.indrelid=c.oid AND xi.indkey[0]=a.attnum
+        AND xi.indpred IS NULL AND xi.indisvalid AND xi.indisready) AS indexed
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')
     AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
@@ -140,6 +144,7 @@ async function references(q,fks,tables) {
   const locked=new Set(tables.map(t=>`${t.schema}.${t.table}`));
   for(const c of await prepareReferenceGroups(q,columns,developmentReferenceTargets(),keys,'PH_DEV_REFERENCE_TARGETS')) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
+    markPhase(q,referencePhase(c));
     if(await countDevelopmentReferences(q,c))
       throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.matched_column??c.column}`);
   }
@@ -148,7 +153,7 @@ async function references(q,fks,tables) {
 // partition parents retain the complete scan (including foreign descendants).
 export async function countDevelopmentReferences(q,c) {
   const sql=developmentReferenceQuery(c);
-  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  if(!c.columns&&(!c.scan_key||c.type==='uuid'))return count(q,sql);
   return countReferenceBatches(q,sql,keys,'PH_DEV_REFERENCE_BATCH',c.columns?c:undefined);
 }
 export function developmentReferenceTargets() {return roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');}
@@ -194,10 +199,15 @@ ${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.tabl
 export class PharmacyHubDevelopmentPurge {
   async up(q,plan=false) {
     if(!q.isTransactionActive)throw new Error('PH_DEV_TRANSACTION_REQUIRED');
+    markPhase(q,'dependencies');
     const {fks,tables}=await dependencies(q,plan);
-    await census(q);await ownership(q);await references(q,fks,tables);
+    markPhase(q,'census');await census(q);
+    markPhase(q,'ownership');await ownership(q);
+    await references(q,fks,tables);
+    markPhase(q,'exclusive_offers');
     const exclusiveOffers=await count(q,`SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE ${exclusiveOffer('x')}`);
     if(!plan) {
+      markPhase(q,'apply');
       for(const r of roots) {
         if(r.table==='supplier_product_offers') {
           const changed=await count(q,`WITH changed AS (UPDATE public.supplier_product_offers x
