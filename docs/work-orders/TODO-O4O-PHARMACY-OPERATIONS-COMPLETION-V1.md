@@ -1,6 +1,6 @@
 # TODO-O4O-PHARMACY-OPERATIONS-COMPLETION-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-16 · **최종 갱신**: 2026-10-16 (KST)
 > **근거**: 약국 협력사업 잔여 전체를 단일 TODO로 묶어 조사·보완·구현·검증·push·통합·배포까지 진행 요청
 
@@ -36,10 +36,10 @@ PR #603의 미통합 기록과 분회 보류 결정을 확인했으며 다른 �
 - [x] 이전 화면 표시 계정 census의 기존 결과 확보·집계 판정, OAuth 확인 경계 기록.
 - [x] 발견 결함을 코드·문서에서 보완하고 회귀로 검증.
 - [x] 영향 소비처 테스트·타입·빌드·lint·PC/모바일 browser 검증.
-- [ ] 민감정보·diff·staged scope 점검 후 commit·push.
-- [ ] 실제 ruleset·CI·Codex·최신 main 대조 후 PR 정상 통합.
-- [ ] Delivery 실제 판정·verified rollout·운영 코드/readiness 확인.
-- [ ] 전체 TODO 최종 판정·실제 로그인 사용자 확인 항목과 완료 근거 기록·종료 정리.
+- [x] 민감정보·diff·staged scope 점검 후 commit·push.
+- [x] 실제 ruleset·CI·Codex·최신 main 대조 후 PR 정상 통합.
+- [x] Delivery 실제 판정·verified rollout·운영 코드/readiness 확인.
+- [x] 전체 TODO 최종 판정·실제 로그인 사용자 확인 항목과 완료 근거 기록.
 
 ## 기존 구현 대조표
 
@@ -57,8 +57,8 @@ PR #603의 미통합 기록과 분회 보류 결정을 확인했으며 다른 �
 새 전시 원장/순위 정책을 임의로 추가하지 않고 기존 전시 계약을 먼저 사용한다.
 실제 OAuth는 USER_VERIFICATION_PENDING으로 분리하며 이를 대신했다고 보고하지 않는다.
 
-DEPLOYMENT: AUTOMATIC — 실제 최종 diff·누적 serving 비교와 Delivery 판정으로 확정.
-WORKTREE_DISPOSITION: KEEP — 조사·구현·통합·배포 진행 중.
+DEPLOYMENT: AUTOMATIC — Delivery #38858740803 verified rollout 및 production DEPLOYED 확인.
+WORKTREE_DISPOSITION: KEEP — 완료 기록 main 포함·clean·검사 종료 확인 후 이번 worktree/branch만 정리한다. 기존 작업공간은 보존한다.
 
 ## 조사 결과와 구현 범위 확정
 
@@ -79,52 +79,16 @@ WORKTREE_DISPOSITION: KEEP — 조사·구현·통합·배포 진행 중.
 기존 canonical baseline·incremental fingerprint와 기존 테스트를 실행한다. DB ownership marker를
 확인한 finally 삭제를 사용하며, 종료 후 이번 컨테이너·데이터도 정리한다. 운영 DB를 사용하지 않는다.
 
-## 현재 검증 근거
+## 완료 및 검증 기록
 
-- Node 22.18.0·pnpm 10.25.0 frozen/integrity install과 공통 빌드 PASS, manifest/lockfile 변경 없음.
-- PostgreSQL 15 전용 loopback DB에서 canonical baseline·incremental 매 prefix fingerprint를
-  확인한 뒤 기존 약국 commerce 24건과 supplier/store 4건 = 28 PASS / 0 SKIP.
-  공급 제안 승인·복수 사업·비담당 거절·콘텐츠 게시/보관·가입 약국 원본·독립 사본·정지 차단을 포함한다.
-  wrapper의 ownership marker 확인 후 DB count 0, 이번 전용 컨테이너/볼륨 삭제와 잔존 0을 확인했다.
-- 신규 계정 전환 회귀는 Neture 2건·약국 웹 2건 PASS다.
-- 약국 웹 전체 23 files / 166 tests, 공통 운영 UI 전체 18 files / 152 tests PASS다.
-  KPA App의 기존 hook warning 2개는 그대로 유지했다.
+전체 표준 운영 작업은 source PR #654의 main 통합과 Delivery #38858740803의
+verified rollout·production DEPLOYED까지 확인했다. 로컬/브라우저/운영 검증과
+여러 커밋의 최종 판정은 [이 트랙 CHECK](../checks/CHECK-O4O-PHARMACY-OPERATIONS-COMPLETION-V1.md)에 모았다.
+현재 특별 서비스는 NOT_APPLICABLE, 실제 OAuth·현재 운영자 업무 접근은
+USER_VERIFICATION_PENDING이다. Sonar gate 통과와 잔여 정적 분석 5개를 구분한다.
 
-브라우저 점검에서 공개 Neture의 `/operator/semi-franchises/*`는 최신 hostProfile 계약에 따라
-약국 웹으로 handoff되는 호환 경로임을 확인했다. 공개 Neture에서 직접 운영 화면을 열어 보려던
-첫 harness는 정상 handoff 뒤 목록을 기다려 timeout했다. 도메인/guard를 우회하지 않고
-Neture 호환 handoff와 실제 약국 웹 운영 흐름으로 관측을 정정했다. 사용되지 않는 Neture 전용
-홈/전시 버튼은 제거했고 Neture legacy wrapper의 계정 수명 분리만 유지한다.
+완료 기록 PR #655는 동일 WO의 source PR 통합 후 증거 보충이며 기능 수정용 중복 PR이 아니다.
+WORKTREE_DISPOSITION은 문서 main 포함·post-merge CI·clean 확인 전까지 KEEP이다.
+조건 충족 후 SAFE_TO_REMOVE를 판정해 이번 worktree/branch만 정리하며 기존 공간을 보존한다.
 
-## 최종 로컬 검증
-
-- 최종 Neture 전체 110 files / 1,068 tests, 약국 웹 23 files / 166 tests,
-  공통 운영 UI 18 files / 152 tests = 1,386 PASS. SQL 28건은 별도이며 중복 합산하지 않는다.
-- 최종 두 앱 TypeScript 포함 production build PASS. 변경 파일 lint 0 errors / 0 warnings,
-  KPA App의 기존 hook warning 2개만 유지한다. 민감정보·diff check PASS.
-- Chromium PC1440/mobile390 각 7흐름 = 14 PASS, pageerror 0·가로 넘침 없음.
-  공개 Neture의 canonical operator handoff → 약국 담당 사업 목록 → 기존 Hero/광고 편집 →
-  공급 제안 확인/승인 → 콘텐츠 초안 저장/게시 → 가입자 공급/자료 표시 → 명시적 Store 선택
-  handoff를 검증했다. 전부 합성 인증/API이며 운영 역할·콘텐츠·주문 데이터는 생성하지 않았다.
-  첫 harness의 호환 도메인/모호한 선택자 문제를 바로잡았고 앱 guard·도메인 정책은 유지했다.
-- 실제 계정의 현재 사업 담당/로그인·세션·업무 접근은 USER_VERIFICATION_PENDING이다.
-  코드와 fixture 검증 및 과거 census 집계를 실제 OAuth·운영 계정 업무 확인으로 바꾸지 않는다.
-  현재 표준 운영 범위의 특별 서비스는 NOT_APPLICABLE이다.
-
-최종 재실행: Neture는 사용되지 않는 전용 이동 컴포넌트를 제거한 뒤 전체 110 files / 1,068 PASS,
-공통 운영 UI 152·약국 웹 166과 합해 1,386 PASS다. 두 앱 최종 build도 PASS다.
-실제 공개 운영 소비처는 약국 웹이며 Neture legacy wrapper는 호환/개발 소비처로 유지한다.
-
-## PR 검사 보완
-
-PR #654의 첫 SonarCloud는 신규 중복률 62.2%와 운영 화면 함수 복잡도 18(허용 15)을 지적했다.
-계정 전환 시나리오를 복제한 소비처별 테스트는 두 실제 wrapper를 실행하는 매개변수 테스트로
-통합해 동일한 4개 소비처/시나리오 검증을 보존했다. 운영 navigation을 별도 표시 함수로 분리했다.
-Sonar 제외/threshold·assertion·CI 설정은 변경하지 않았다.
-최신 main #648의 테스트 계정 SSOT·운영 스크립트 정비를 merge했으며 웹 기능 충돌은 없다.
-현재 테스트 계정 문서는 `docs/local/TEST-ACCOUNTS.local.md`다. 이 작업은 실제 자격증명을 사용하지 않는다.
-
-Sonar 보완 후 재검증: 매개변수 테스트의 두 소비처 4건, 공통 운영 UI 전체 152건,
-Neture 전체 1,070건·약국 웹 전체 164건 = 동일한 총 1,386건 PASS다.
-두 앱 TypeScript 포함 build·변경 lint·PC/mobile Chromium 14흐름도 다시 PASS했다.
-검사 제외나 기준 완화 없이 중복 테스트 코드를 제거하고 navigation 표시 책임만 분리했다.
+문서 정합: My Home 기준·인증 후속 TODO·단일 TODO와 CHECK가 현재 범위와 확인 경계를 공유한다.
