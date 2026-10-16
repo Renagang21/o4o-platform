@@ -65,7 +65,7 @@ for(const [kind,count,build] of [['dev',countDevelopmentReferences,developmentRe
   assert.equal(group.matched_column,'b');
   for(const column_index of [null,'0','3','bad'])await assert.rejects(count({query:async()=>[
    {count:'1',scanned:'1',last_id:uuid(1),column_index}]},group),/REFERENCE_BATCH/);
-  const sql=build(group);assert.match(sql,/ARRAY\[s\."a"::text,s\."b"::text\]/);assert.match(sql,/unnest\(\$3::text\[\]\)/);
+  const sql=build(group);assert.match(sql,/s\."a"::text AS v1,s\."b"::text AS v2/);assert.match(sql,/unnest\(\$3::text\[\]\)/);
   assert.doesNotMatch(sql,/FROM public\./);assert.match(sql,/CASE\s+WHEN octet_length/);
  });
 }
@@ -99,5 +99,14 @@ test('only catalog-confirmed unindexed UUID columns join the single keyset pass;
  assert.deepEqual(groups.map(c=>c.columns??c.column),['id',['payload','reviewed_by'],'owner_id','ref_id']);
  assert.deepEqual(groups.map(referencePhase),['reference_uuid:public.notes.id','reference_group:public.notes',
   'reference_uuid:public.notes.owner_id','reference_uuid:public.legacy.ref_id']);
- assert.match(developmentReferenceQuery(groups[1]),/ARRAY\[s\."payload"::text,s\."reviewed_by"::text\]/);
+ assert.deepEqual(groups[1].types,['jsonb','uuid']);
+ // The folded UUID keeps native equality; only short legacy tokens use the text regex.
+ for(const sql of [developmentReferenceQuery(groups[1]),mediaReferenceQuery(groups[1])]) {
+  assert.match(sql,/s\."payload"::text AS v1,s\."reviewed_by" AS v2,/);
+  assert.match(sql,/\(source\.v2 = ANY\(targets\.uuids\) OR \(targets\.legacy_pattern IS NOT NULL AND \(source\.v2::text COLLATE "C"\) ~ targets\.legacy_pattern\)\)/);
+  assert.match(sql,/CASE WHEN octet_length\(source\.v1\)>=targets\.min_bytes THEN \(source\.v1 COLLATE "C"\) ~ targets\.pattern ELSE FALSE END/);
+  assert.doesNotMatch(sql,/"reviewed_by"::text/);
+  assert.match(sql,/found AS MATERIALIZED \(/);
+ }
+ assert.throws(()=>developmentReferenceQuery({...groups[1],types:['jsonb']}),/PH_PURGE_REFERENCE_GROUP/);
 });

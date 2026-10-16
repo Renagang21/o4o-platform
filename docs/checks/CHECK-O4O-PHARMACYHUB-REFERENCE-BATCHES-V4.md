@@ -113,3 +113,49 @@ PR CI·Sonar·Codex 리뷰와 최신 main CI/Delivery를 확인하고, main 및 
 - 별도 합성 비교: UUID PK + 비색인 UUID 8열 + 약1KB JSON, 10만행, 삭제 root token 41개, 동일 DB에서 V5/V6 연속 실행. V5는 9묶음·107 query·2,370ms, V6는 1묶음·99 query·21,422ms였다. 두 경로 모두 참조 0건을 반환했다. query 수 감소가 속도 개선으로 이어지지 않았으며 이 workload에서는 약9배 느렸다. 실 운영 데이터의 소요 시간을 의미하지 않는다.
 
 **판정: #650 Draft 유지.** UUID 묶음 최적화는 효과가 검증되지 않아 병합·운영 plan 재실행·apply를 보류한다. 단계 진단 수정과 성능 변경을 분리하거나, native UUID 판정을 보존하는 개선안을 별도 비교 검증한 뒤 같은 branch에 추가 push한다. 운영 WIF·IAM·DB·GCS 및 기존 Cloud Run job은 변경하지 않았다.
+
+## 2026-10-16 V6 후속 (V7) — UUID 묶음 퇴행 원인과 수정
+
+위 V6 통합 검증의 판정(병합 보류)과 200만행 stress 미완료·V6 퇴행 기록은 그대로 둔다. 이 절은 같은 branch에 추가한 수정과 그 검증만 다룬다.
+
+### 원인
+
+- 같은 형태의 합성 workload를 loopback PostgreSQL 16.15에서 재현했다. 구성: UUID PK, 비색인 UUID 8열, 약1KB JSON metadata(평균995바이트), 10만행(134MB), 삭제 root token 41개. 참조는 0건이다. V5 9묶음·107 query 약2.8초, V6 1묶음·99 query 약15초로 같은 방향의 퇴행이 나타났다(통합 측정 2,370ms/21,422ms와 장비가 달라 절대값은 다르다).
+- 성분별로 측정했다. V6 형태에서 metadata 한 열만 묶은 group도 같은 열의 V5 group보다 느렸다(4.5초 대 2.6초). 원인은 두 가지였다.
+  1. V6는 UUID 열을 `::text`로 바꾼 뒤 41개 token 정규식 전체를 매 행 적용했다. V5의 UUID 경로는 native `= ANY(uuid[])` 일치와 짧은 legacy token 정규식만 쓴다.
+  2. 새 query의 `found` CTE가 inline되어, `count(found.ordinal)`과 `min(found.ordinal)`에 같은 판정식이 각각 들어갔다. 따라서 모든 정규식이 행마다 두 번 평가됐다. V5 group은 LATERAL 부질의라 해당하지 않았다.
+
+### 수정
+
+- `groupedReferenceQuery`가 group의 열별 type(`types`)을 받는다. UUID 열은 text로 바꾸지 않고 `source.vN = ANY(targets.uuids) OR (targets.legacy_pattern IS NOT NULL AND (source.vN::text COLLATE "C") ~ targets.legacy_pattern)`로 판정한다. 기존 단일 UUID 경로와 같은 의미다. 정규형 UUID token은 정확 일치만 쓴다. `^[0-9a-f-]{1,36}$`인 비정규 token은 legacy 부분 일치로 검사한다. 그 밖의 문자를 가진 token은 UUID 열에서 일치하지 않는다. text·JSON·array 열은 기존 정규식 판정을 그대로 쓴다.
+- `found`를 `MATERIALIZED`로 고정해 판정식을 행마다 한 번만 평가한다.
+- 통합 보완 9cc454f8c5(group 우선 batch 경로)는 유지했다. timeout·검사 테이블/열·Core fence·FK·ownership·census·GCS 조건은 바꾸지 않았다. 단계 진단·GitHub 재시도 코드는 바꾸지 않았다.
+
+### 성능 비교 (합성, 운영 시간 아님)
+
+동일 DB에서 fixture 생성(약3.4초)을 끝낸 뒤 측정했다. 측정 시간에는 대상 token 1회 조회와 모든 group 검사만 들어간다. 실행 순서는 V5→V6→V7→V7→V6→V5다. V5는 ef2a9164e8, V6는 697b5fa28, V7은 이번 수정본의 prepare·count 함수를 썼다.
+
+| 행 수 | 버전 | 묶음 | query | wall time |
+| --- | --- | --- | --- | --- |
+| 10만 | V5 | 9 | 107 | 2,762 / 2,781ms |
+| 10만 | V6 | 1 | 99 | 14,914 / 15,118ms |
+| 10만 | V7 | 1 | 99 | 2,804 / 2,764ms |
+| 50만(670MB) | V5 | 9 | 498 | 15,532 / 15,008ms |
+| 50만 | V7 | 1 | 490 | 14,751 / 14,649ms |
+| 50만 | V6 | 1 | 490 | 75,329ms(양성 대조 1회) |
+
+50만행의 실행 순서는 V5→V7→V7→V5다. 이어서 마지막 page의 UUID 열에 참조 1건을 넣은 양성 대조를 V5·V6·V7 순서로 실행했고, 세 버전 모두 1건을 찾았다. 비교 결과 V7은 V6 퇴행을 해소했다. V5 대비 개선은 확인되지 않았고 동등 수준이다(10만행 ±1%, 50만행 약4% 빠름, 반복 편차 범위). query 수 감소를 속도 개선 근거로 쓰지 않는다. 이 측정은 운영 apply의 600초 여유를 입증하지 않는다.
+
+### 검증
+
+- focused 4파일(Node test): 60 PASS / 0 FAIL / 0 SKIP. group UUID 열의 native 일치, `::text` 미변환, legacy fallback, `types` 불일치 시 PH_PURGE_REFERENCE_GROUP, `found AS MATERIALIZED`를 단위 시험으로 확인한다.
+- scripts/deployment 전체(Windows): 225건 중 218 PASS / 1 FAIL / 6 SKIP. FAIL은 기존 `C:\C:` 경로 문제가 있는 pharmacy-hub-resource-retirement 테스트이며 이번 변경과 무관하다(파일 미변경). SKIP 6건은 opt-in PostgreSQL fixture다.
+- loopback PostgreSQL 16.15 fixture(127.0.0.1 전용 컨테이너, 검증 후 제거)에서 다음이 PASS다. development plan/apply·공유 보존·cross-schema FK·JSON 참조·그룹 결제·rollback. batch 전체 범위·NULL·array·literal(3,200행). UUID query/planner(5,000행). 새로 추가한 UUID 선두 group fixture(2,101행)도 PASS다. development·media 각각 canonical UUID 일치, JSON 중첩, NULL을 포함한 array, text 열을 마지막 page에서 탐지한다. UUID 한 글자가 다른 값은 일치하지 않는다. 짧은 legacy token은 UUID 열에서 탐지하고, 비hex token은 탐지하지 않는다.
+- 200만행 batch stress: development 첫 전체 순회 52,283ms/1,954 query, media 첫 전체 순회 51,172ms/1,954 query를 마쳤다. 이후 EXPLAIN ANALYZE와 마지막 page 재검사 단계에서 300초 test timeout에 도달했다. **전체 PASS가 아니다.** 통합 측정(79,660ms)과 장비가 달라 직접 비교하지 않는다. timeout은 올리지 않았다.
+- 변경 파일 ESLint PASS. 운영 DB·GCS·Cloud Run 접속, plan 재실행, apply, WIF 변경은 없다.
+
+### 남은 위험
+
+- 실제 운영 테이블 분포에서의 소요 시간은 측정하지 않았다. 운영 plan 재실행 결과(PH_PURGE_TIMING)로 판단해야 한다.
+- 200만행 stress 시험은 여전히 300초 안에 끝나지 않는다.
+- 단계 진단·GitHub 재시도만 먼저 통합하려면 `prepareReferenceGroups`의 UUID 합류 조건(`c.type==='uuid'&&c.indexed!==false`)을 V5의 `c.type==='uuid'`로 되돌리면 된다. 이 경우 group에는 UUID 열이 들어가지 않는다.
