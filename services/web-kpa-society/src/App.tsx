@@ -1,3 +1,4 @@
+import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
 import BusinessHomePresentationPage from './pages/business/BusinessHomePresentationPage';
 import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
 import PharmacyLegacyRedirect, { LegacyAwareBusinessWorkspace } from './pages/business/PharmacyLegacyRedirect';
@@ -10,7 +11,7 @@ import BusinessForumManagementPage from './pages/business/BusinessForumManagemen
 import { MyHomeButton, O4OHomeButton } from '@o4o/auth-react';
 import { RoleGuard } from './components/auth/RoleGuard';
 import { authClient as pharmacyManagementAuthClient } from './contexts/AuthContext';
-import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
 import { useEffect, useMemo, useState, lazy, Suspense, type ReactNode } from 'react';
@@ -849,9 +850,9 @@ function App() {
           <Route path="/resources/new" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           <Route path="/resources/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
-          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><OperatorSemiFranchisePage businessKey="pharmacy" forumHref={business => business.key === 'pharmacy' ? '/community' : `/businesses/${encodeURIComponent(business.key)}/forum`} /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><SemiFranchiseContentFormPage businessKey="pharmacy" /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><SemiFranchiseContentFormPage businessKey="pharmacy" /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
           <Route path="/operator/*" element={<OperatorRoutes />} />
 
           {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}

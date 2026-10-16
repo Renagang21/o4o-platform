@@ -1,7 +1,7 @@
 # TODO-O4O-AUTH-IDENTITY-AUDIT-FOLLOWUP-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-15
+> **작성일**: 2026-10-15 · **최종 갱신**: 2026-10-16
 > **근거 WO/IR**: [서비스 운영자 지정 조사 TODO](TODO-O4O-SERVICE-OPERATOR-ASSIGNMENT-AUDIT-V1.md), Google 선택 계정·O4O 표시 계정 비교 후속 요청
 
 ## 기준과 경계
@@ -27,8 +27,8 @@ HEAD `b3b71b46021858c841ae203ea93509e3ef1f29d8` 변경도 확인했다. 이 문�
 - [x] 현재 코드에서 Google identity 조회·O4O 계정 해석 경로 확인.
 - [x] 화면 표시 계정의 기존 job 로그 다운로드 재시도 및 접근 차단 확인.
 - [x] 기존 네트워크 목록을 보존하며 필요한 두 도메인을 환경 초안에 저장.
-- [ ] 환경 설정 저장·게시 후 현재 runtime 허용 목록을 재확인하고 기존 job 결과 읽기.
-- [ ] 확보된 집계를 대상 운영자 집계와 비교하고 결과의 확인 가능 범위를 기록.
+- [x] 환경 설정 저장·게시 후 현재 runtime 허용 목록을 재확인하고 기존 job 결과 읽기.
+- [x] 확보된 집계를 대상 운영자 집계와 비교하고 결과의 확인 가능 범위를 기록.
 - [ ] 사용자가 실제 로그인 결과를 확인한 뒤 원장·세션 계정의 일치 여부를 최종 판정.
 - [ ] 실제 결함이 확인되면 별도 수정 범위·회귀 검증을 구체화하고 구현.
 
@@ -79,3 +79,17 @@ DEPLOYMENT: NOT_APPLICABLE — 이번 후속 문서 변경. 기존 소스의 자
 기존 기록이나 canonical index는 이 후속 문서에서 다시 쓰지 않는다.
 
 WORKTREE_DISPOSITION: KEEP — 후속 로그 확인과 사용자 실제 로그인 검증이 남았으며 PR 통합 전이다.
+
+## 기존 결과 확보 — 2026-10-16
+
+현재 환경의 네트워크 enforced와 기존 GitHub 결과 저장소 도메인 허용을 확인했다.
+기존 run `38665862802`의 job `116197563425` 로그를 공식 개별 job logs API로 읽었다.
+새 workflow dispatch·운영 조회·DB/권한/Google 연결 수정은 없었다.
+기존 collector 출력은 `readOnly=true`, `result=TARGET_NOT_FOUND`이며 matched_accounts·
+active_accounts·google_links·platform_admin_assignments가 모두 0이다.
+이는 당시 입력한 화면 표시 이메일 fingerprint에 일치하는 계정이 없었다는 결과다.
+기존 운영자 census의 유일한 활성 계정/연결 집계와는 다른 결과이며, 실제 Google sub나
+브라우저 세션 계정을 비교한 조회가 아니므로 OAuth 연결 오류·다른 계정 연결·동일 계정임을
+판정하지 않는다. 표시 이메일 차이만으로 병합·기본 이메일/연결 변경을 수행하지 않는다.
+집계 결과 확보 항목은 종료하고 실제 로그인 계정 확인은 사용자 담당으로 남긴다.
+후속 표준 운영 완료는 [통합 TODO](TODO-O4O-PHARMACY-OPERATIONS-COMPLETION-V1.md)에서 관리한다.
