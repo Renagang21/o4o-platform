@@ -75,3 +75,49 @@ API는 synthetic fixture로 intercept하여 실제 업무 데이터를 쓰지 �
 - PR·원격 CI Gate·원격 Sonar·main 통합·운영 배포는 실행하지 않았다. 현재 CI Pipeline은 main/develop push 또는 main 대상 PR에서 실행되므로 이 작업 branch push만으로 CI PASS를 주장하지 않는다.
 
 문서 정합: Supplier Domain·Distribution Freeze·Event Offer·Neture 약국 commerce의 현행 규칙을 수정했고 과거 WO/CHECK는 보존했다.
+
+## 6. 통합 재개 — 2026-10-16
+
+사용자 후속 지시로 최신 main·기존 PR·배포 상태 확인과 통합·배포·업무 흐름 검증을 재개했다.
+실제 운영자 승인은 사용자 담당이다. 위 개발 종료 시점의 결과와 아래 후속 결과를 구분한다.
+
+- 원격 인계 HEAD `a6ce6742918aa491843ef6b06fd03e61ff70d2be`를 확인했다.
+- 최신 main `3613c235ec4838b854a8e07970e757a16cd1dacf`를 같은 작업 branch에 병합했다. 충돌 없이 local merge `fbca87d4eb6b551d668b05b2d74da2f8b2c833ac`를 만들었다. main 직접 변경·push는 없다.
+- GitHub 공개 페이지에서 기존 [PR #652](https://github.com/Renagang21/o4o-platform/pull/652)의 Draft·Integration HOLD 기록을 확인했다. 같은 변경의 새 PR을 만들지 않는다.
+- 최신 main의 [Delivery #401](https://github.com/Renagang21/o4o-platform/actions/runs/38868442627)은 공개 workflow 목록·run 화면에서 Success를 확인했다. 실제 serving SHA·서비스별 반영 상태는 인증 로그/API 및 운영 HTTP 접근이 없어 미확인이다. 이 결과에 공급자 분리 branch가 포함된 것으로 해석하지 않는다.
+- 이전 CI run `38845950897`은 API Jest 1/3·3/3 및 CI Gate 실패다. 공개 화면에서는 세부 로그에 로그인을 요구하며, 현재 환경의 GitHub API 접속은 네트워크 정책으로 차단돼 있다. 로컬 검증으로 원격 CI PASS를 대체하지 않는다.
+
+### 6-1. Codex 지적 수정
+
+| 지적 | 후속 수정·검증 |
+|---|---|
+| `PRRT_kwDOOXrFm86tDmeN` — legacy PUBLIC 제품의 등록 승인 후 파생 유통 값 잔류 | 등록 승인 UPDATE에서 `deriveDistributionType(false, serviceKeys)` 값을 함께 저장한다. 기존 승인 제품의 멱등 분기는 유지한다. 빈 대상·KPA 대상 각각의 legacy PUBLIC 회귀와 실제 PostgreSQL catalog eligibility를 검증한다. |
+| `PRRT_kwDOOXrFm86tDmeQ` — KPA 이벤트 기간 DTO 누락 | 공급자 POST 응답과 GET 목록 모두 `startAt`·`endAt`를 반환한다. 생성 직후·재조회·과거 기간 없는 행의 HTTP 응답 테스트를 추가했다. |
+
+### 6-2. 후속 로컬 검증
+
+- frozen lockfile 설치·공통 packages·API·Neture·KPA build PASS. 수정 후 API build도 재검증했다.
+- 변경 소스는 루트 `eslint.config.js` 기준 focused ESLint 0 errors/0 warnings다. 레거시 `.eslintrc.cjs`는 현재 표준 검증 설정이 아니다.
+- 병합본 API 관련 회귀: 68 suites/1,279 tests PASS, 별도 DB 조건부 8 suites/83 tests SKIP.
+- Neture 웹 전체 111 files/1,077 tests PASS, KPA 웹 전체 23 files/166 tests PASS.
+- Codex 수정 focused HTTP/write 회귀 2 suites/43 tests PASS.
+- 이전 결합 구조를 기대하던 `supplier-product-registration-cutover-contract`·`supplier-existing-master-direct-offer-link-contract`의 3 FAIL을 로컬에서 재현했다. 등록의 미게시/심사 대기·Master write 금지·중복 계약을 유지하고, 약국 대상·DRUG·서비스 승인 gate가 게시 경로에 남는지 검사하도록 정렬했다. 두 파일과 service-key 잔여 계약 3 suites/53 tests PASS. 원격 실패 로그 자체는 API 정책 차단·공개 로그 로그인 요구로 열람하지 못했으므로 원격 실패 전체가 이 3건뿐이라고 단정하지 않는다.
+- 수정 후 실제 PostgreSQL 전용 fixture 6/6 PASS. 기존 게시 보존·등록 승인/게시/이벤트 분리·checkout/payment/배송/정산 및 legacy PUBLIC 회귀를 포함한다. fixture DB 소유 표식 확인 후 삭제·잔존 DB 0을 확인했다. 운영 데이터는 생성하지 않았다.
+- migration 계약 21 PASS/0 FAIL. 문서 민감정보 검사·diff 검사를 수행했다.
+- API 전체 CI 대응 검증: 수집한 538개 파일의 실행 결과 집합이 정확히 일치하는지 대조했다. 먼저 완료한 24 suites 결과를 보존하고 나머지 514개를 3개 직렬 묶음(`--runInBand --runTestsByPath`)으로 완료했다. 최종 515 suites PASS/23 suites 전체 SKIP/미실행 파일 0. PASS 파일 안의 개별 조건부 SKIP도 PASS test로 합산하지 않는다.
+- 전체 검증 중 `supplier-offer-update-private-gate`의 승인 상태 없는 과거 fixture 때문에 기존 활성화/공개 허용 기대 2 FAIL을 추가 재현했다. 신규 fixture에 PENDING 상태를 명시하고, 허용 예시는 APPROVED로 정렬했다. PENDING/REJECTED가 판매자 지정·활성화·공개로 등록 승인을 우회하지 못하는 부정 검증을 추가했으며 재실행 9/9 PASS다. 해당 파일만 재검증 결과로 교체해 최종 실패 파일 0을 확인했다. 최초 실패 및 원래 분할 실행의 non-zero 결과를 숨기지 않고 최종 결과와 구분한다.
+- coverage 대조 산출물은 현재 세션의 `/tmp/supplier-api-final-coverage.json`이다. 원격 CI Gate·review thread 해결은 별개이며 아직 확정하지 않았다.
+
+### 6-3. 운영 적용 경계·현재 차단 사항
+
+Git 읽기와 작업 branch push에 사용하는 플랫폼 인증은 존재하며 GitHub token 재발급을 요구하지 않는다.
+GitHub API 정책 차단으로 최신 checks·review thread 상태·ruleset·배포 상태를 확정할 수 없다.
+환경 설정 초안에 GitHub API 및 API/Neture/KPA 공개 검증 도메인을 추가했다. 초안 저장은 runtime 적용·게시나 제품 배포를 뜻하지 않는다.
+
+`DEPLOYMENT = REQUIRED`이며 운영 적용 완료는 미확인이다. main PR 병합·운영 migration·Promote를 실행하지 않았다.
+재개 시 기존 PR의 최신 HEAD·CI Gate·Codex blocker·미해결 thread·main 위치를 확인한 뒤 진행한다.
+운영 migration `SeparateSupplierRegistrationPublication1792110685889`는 두 컬럼 추가와 기존 기본 공급/반려 사유 보존을 수행하므로 해당 운영 DB 실행 승인 범위를 확인해야 한다.
+API와 Neture/KPA 웹을 함께 적용하고 사용자 담당 운영자 승인을 포함한 실제 업무 검증을 별도로 완료해야 한다.
+`docs/local/TEST-ACCOUNTS.local.md`는 이 클라우드에 없으며 과거/Demo 계정으로 대체하지 않는다.
+
+문서 정합: 기존 개발 기록을 보존하고 이 절에 후속 통합·검증·차단 상태만 추가했다. 업무 정본의 추가 정책 변경은 없다.

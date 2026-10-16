@@ -172,6 +172,23 @@ integration('supplier → store → payment → shipment → settlement (real Po
     } finally { await q.rollbackTransaction(); await q.release(); }
   });
 
+  it.each([
+    [[], 'PRIVATE'],
+    [['kpa-society'], 'SERVICE'],
+  ])('registration approval removes legacy PUBLIC catalog eligibility with targets %j', async (serviceKeys, distributionType) => {
+    const [master] = await ds.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status)
+      VALUES ('Legacy public synthetic','Legacy public synthetic','Synthetic','GENERAL','ACTIVE') RETURNING id`);
+    const registered = await new SupplierOfferRegistrationService().createSupplierOfferFromExistingMaster(supplierId, { masterId: master.id });
+    expect(registered.success).toBe(true);
+    const id = registered.data!.id;
+    await ds.query(`UPDATE supplier_product_offers SET is_public=true, distribution_type='PUBLIC', service_keys=$2 WHERE id=$1`, [id, serviceKeys]);
+    expect(await new OfferLifecycleService().approveProduct(id, operatorId)).toMatchObject({ success: true });
+    expect((await ds.query(`SELECT approval_status, is_public, default_supply_enabled, distribution_type FROM supplier_product_offers WHERE id=$1`, [id]))[0])
+      .toEqual({ approval_status: 'APPROVED', is_public: false, default_supply_enabled: false, distribution_type: distributionType });
+    expect(await ds.query(`SELECT id FROM supplier_product_offers WHERE id=$1 AND is_active=true AND distribution_type='PUBLIC'`, [id])).toEqual([]);
+    expect(await ds.query('SELECT id FROM organization_product_listings WHERE offer_id=$1', [id])).toEqual([]);
+  });
+
   it('keeps approval, explicit publication and scheduled event-only sales independent', async () => {
     expect(await getSupplyOption(ds, organizationId, 'default', offerId)).toBeNull();
     const publication = new SupplierOfferDistributionService();

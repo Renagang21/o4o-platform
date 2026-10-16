@@ -217,6 +217,8 @@ export function createSupplierOffersController(
           title: r.title,
           supplierName: r.supplierName,
           price: r.price,
+          startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+          endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
           isActive: r.isActive,
           status: r.status,   // DB 값 직접 노출 (pending | approved | rejected | canceled)
           proposedAt: r.proposedAt instanceof Date
@@ -300,6 +302,8 @@ export function createSupplierOffersController(
             status: result.status,
             isActive: result.isActive,
             proposedAt: result.createdAt,
+            startAt: result.startAt,
+            endAt: result.endAt,
           },
         });
       } catch (error: any) {

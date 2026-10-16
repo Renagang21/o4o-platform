@@ -124,6 +124,17 @@ describe('registration approval is independent from service publication', () => 
     expect(mockSync).not.toHaveBeenCalled(); expect(mockPending).not.toHaveBeenCalled(); expect(expand).not.toHaveBeenCalled();
     expect(tx.query).not.toHaveBeenCalled();
   });
+  it.each([
+    [[], 'PRIVATE'],
+    [['kpa-society'], 'SERVICE'],
+  ])('clears legacy PUBLIC distribution on registration approval with targets %j', async (serviceKeys, expected) => {
+    repo.findOne.mockResolvedValue(fixture({ isPublic: true, distributionType: 'PUBLIC', serviceKeys }));
+    await runDecision('approveProduct');
+    const write = query.mock.calls.find(([sql]) => sql.includes('UPDATE supplier_product_offers'));
+    expect(write?.[0]).toContain('distribution_type = $2');
+    expect(write?.[1]).toEqual(['offer-fixture', expected]);
+    expect(expand).not.toHaveBeenCalled();
+  });
   it('registration rejection atomically disables the product and existing publication grants', async () => {
     await service.rejectProduct('offer-fixture', 'actor-fixture', 'Fixture reason');
     expect(tx.query.mock.calls.some(([sql]) => sql.includes("approval_status = 'REJECTED'"))).toBe(true);

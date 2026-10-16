@@ -3,7 +3,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { SupplierProductOffer, OfferApprovalStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 import { SupplierRegulatedCategoryService, resolveRegulatedCategoryFromProduct } from './supplier-regulated-category.service.js';
-import { assertRegulatedPermit } from './offer-write-policy.js';
+import { assertRegulatedPermit, deriveDistributionType } from './offer-write-policy.js';
 
 /** Existing OfferLifecycleService workflows; public callers use NetureOfferService. */
 export class OfferLifecycleService {
@@ -65,9 +65,9 @@ export class OfferLifecycleService {
       await AppDataSource.query(
         `UPDATE supplier_product_offers
             SET approval_status = 'APPROVED', is_active = true, registration_rejection_reason = NULL,
-                default_supply_enabled = false, is_public = false, updated_at = NOW()
+                default_supply_enabled = false, is_public = false, distribution_type = $2, updated_at = NOW()
           WHERE id = $1 AND deleted_at IS NULL`,
-        [offerId],
+        [offerId, deriveDistributionType(false, offer.serviceKeys ?? [])],
       );
       logger.info(`[NetureOfferService] Product registration approved: ${offerId} by ${adminUserId}; publication unchanged to off`);
       return {
