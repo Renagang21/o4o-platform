@@ -104,7 +104,7 @@ My Home은 사람 기준으로 여러 서비스와 업무 공간을 찾고 이�
 - [x] 확정 범위를 한 개발 묶음으로 구현. 내부는 작은 변경과 검증을 반복.
 - [x] Neture 전체 테스트·타입 포함 production build·변경 lint·문서 검사.
 - [x] PC와 390/375/320px 모바일 Chromium 시나리오 검증. 조작 가능성·포커스·가로 넘침·pageerror·출처 매장 표시 확인.
-- [ ] 정본·TODO 결과 정합, 자신의 변경만 commit·push·PR, CI/리뷰 결과 인계.
+- [x] 정본·TODO 결과 정합, 자신의 변경만 commit·push·PR, CI/리뷰 진행 상태 인계.
 
 필수 시나리오:
 - 첫 방문·목적지 없음·다중 역할·긴 공간명·복수 매장에서 올바른 업무를 찾는다.
@@ -141,3 +141,8 @@ My Home은 사람 기준으로 여러 서비스와 업무 공간을 찾고 이�
 타입 포함 build, 변경 ESLint 오류/경고 0, Chromium 19관측 PASS다.
 브라우저는 합성 인증/API로 검사했으며 실계정·운영 배포 검증은 미실행이다.
 기존 공통 헤더·탭·URL과 서버 판정·Store 재선택을 유지했고 현행 정본을 함께 갱신했다.
+
+구현 commit `56801ea96`을 push하고 [PR #649](https://github.com/Renagang21/o4o-platform/pull/649)를 생성했다.
+최초 조회에서 scope·static analysis·문서 guard CI가 진행 중이며 리뷰는 아직 없다.
+이 기록을 추가하는 문서 commit의 CI는 PR 최신 HEAD 기준으로 확인한다.
+개발 공간에서는 병합·배포를 실행하지 않았고 worktree는 후속 수정용으로 KEEP이다.

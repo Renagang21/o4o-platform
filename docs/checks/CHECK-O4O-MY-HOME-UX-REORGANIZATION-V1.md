@@ -70,3 +70,10 @@ My Home 정본에 첫 화면의 현재 구성·저장 범위·직원 관리 펼�
 
 DEPLOYMENT = AUTOMATIC (병합 이후 기존 Neture Delivery 대상).
 WORKTREE_DISPOSITION = KEEP (구현 PR 검토·후속 수정용).
+
+## PR 인계
+
+구현 commit `56801ea96`, [PR #649](https://github.com/Renagang21/o4o-platform/pull/649).
+최초 PR 조회의 scope·static analysis·문서 guard는 진행 중이고 리뷰는 미등록이다.
+최종 HEAD의 CI 결과는 PR에서 확인하며 CI PASS·병합·운영 배포를 선행 보고하지 않는다.
+마지막 직원 관리 파일의 포맷 차이를 줄인 뒤 해당 8 tests와 ESLint도 다시 PASS했다.
