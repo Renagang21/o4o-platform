@@ -15,6 +15,7 @@
  * - 신규: 자기 SPO 중에서 KPA 이벤트로 제안 (POST /kpa/supplier/event-offers)
  */
 
+import SupplierEventNavigation from '../../components/supplier/SupplierEventNavigation';
 import { useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, AlertTriangle } from 'lucide-react';
@@ -30,6 +31,7 @@ export default function SupplierEventOfferPage() {
   const { guideTitle, guideDesc, guideSteps, activeTab, setActiveTab, items, total, page, totalPages, loading, itemsError, myProposals, proposalsLoading, proposalsError, loadMyProposals, fetchItems, handleOpenPropose } = controller;
   return (
     <div className="max-w-5xl mx-auto p-6">
+      <SupplierEventNavigation />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

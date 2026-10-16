@@ -49,7 +49,7 @@ const ACCESS_CTE = `
      WHERE sfm.organization_id = $1 AND sfm.status = 'active'
   ),
   base AS (
-    SELECT spo.id AS offer_id, spo.master_id, spo.supplier_id, spo.price_general, spo.service_keys,
+    SELECT spo.id AS offer_id, spo.master_id, spo.supplier_id, spo.price_general, spo.service_keys, spo.default_supply_enabled,
            spo.track_inventory, spo.stock_quantity, spo.reserved_quantity,
            pm.name AS product_name, COALESCE(so.name, ns.slug) AS supplier_name,
            ns.base_shipping_fee, ns.free_shipping_threshold, ns.user_id AS supplier_user_id
@@ -66,7 +66,7 @@ const ACCESS_CTE = `
            NULL::text AS note, NULL::timestamp AS start_at, NULL::timestamp AS end_at,
            NULL::int AS total_quantity, NULL::int AS per_store_limit, NULL::int AS per_order_limit
       FROM base b JOIN my_sf sf ON sf.key = '${DEFAULT_SEMI_FRANCHISE_KEY}'
-     WHERE cardinality(COALESCE(b.service_keys, '{}'::text[])) = 0
+     WHERE b.default_supply_enabled = true AND b.price_general > 0
     UNION ALL
     -- (2) 명시적 공급 제안 — 대상 세미프랜차이즈 운영자 승인 ∧ 그 세미프랜차이즈 가입 ∧ (대상 약국이면 이 약국)
     SELECT 'proposal', sp.id, b.*, sf.key, sf.name, sf.payment_receiver_key, sp.unit_price,

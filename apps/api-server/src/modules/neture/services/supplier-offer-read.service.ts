@@ -59,6 +59,13 @@ export class SupplierOfferReadService {
         }
       }
 
+      const approvals: Array<{ offer_id: string; approvals: Array<{ serviceKey: string; status: string; reason: string | null }> }> = await AppDataSource.query(
+        `SELECT osa.offer_id, json_agg(json_build_object('serviceKey',osa.service_key,'status',osa.approval_status,'reason',osa.reason)) AS approvals
+           FROM offer_service_approvals osa JOIN supplier_product_offers spo ON spo.id=osa.offer_id
+          WHERE spo.supplier_id = $1 AND spo.deleted_at IS NULL GROUP BY osa.offer_id`, [supplierId],
+      );
+      const approvalMap = new Map(approvals.map(row => [row.offer_id, row.approvals]));
+
       return offers.map((o) => {
         const activeServiceCount = serviceMap.get(o.id) || 0;
         const pendingRequestCount = pendingMap.get(o.id) || 0;
@@ -71,12 +78,18 @@ export class SupplierOfferReadService {
           masterId: o.masterId,
           name: productName,
           masterName: productName,
+          regulatoryType: o.master?.regulatoryType,
           category: o.master?.category?.name || '',
           isActive: o.isActive,
+          defaultSupplyEnabled: o.defaultSupplyEnabled,
+          serviceApprovals: approvalMap.get(o.id) ?? [],
+          isPublic: o.isPublic,
+          serviceKeys: o.serviceKeys,
           purpose,
           distributionType: o.distributionType,
           allowedSellerIds: o.allowedSellerIds,
           approvalStatus: o.approvalStatus,
+          registrationRejectionReason: o.registrationRejectionReason,
           priceGeneral: o.priceGeneral,
           priceGold: o.priceGold,
           pricePlatinum: o.pricePlatinum,
@@ -140,10 +153,12 @@ export class SupplierOfferReadService {
         `SELECT
            spo.id, spo.master_id AS "masterId", spo.is_active AS "isActive",
            spo.is_public AS "isPublic",
+           spo.default_supply_enabled AS "defaultSupplyEnabled",
            spo.is_featured AS "isFeatured",
            spo.distribution_type AS "distributionType",
            spo.allowed_seller_ids AS "allowedSellerIds",
            spo.approval_status AS "approvalStatus",
+           spo.registration_rejection_reason AS "registrationRejectionReason",
            spo.price_general AS "priceGeneral",
            spo.price_gold AS "priceGold",
            spo.price_platinum AS "pricePlatinum",
@@ -253,21 +268,10 @@ export class SupplierOfferReadService {
     const rows: Array<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
       `SELECT
          COUNT(*)::int AS total,
-         COUNT(*) FILTER (WHERE NOT EXISTS (
-           SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
-         ))::int AS unrequested,
-         COUNT(*) FILTER (WHERE EXISTS (
-           SELECT 1 FROM offer_service_approvals osa
-           WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
-         ))::int AS pending,
-         COUNT(*) FILTER (WHERE
-           NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')
-           AND EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
-         )::int AS approved,
-         COUNT(*) FILTER (WHERE EXISTS (
-           SELECT 1 FROM offer_service_approvals osa
-           WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
-         ))::int AS rejected
+         0::int AS unrequested,
+         COUNT(*) FILTER (WHERE spo.approval_status = 'PENDING')::int AS pending,
+         COUNT(*) FILTER (WHERE spo.approval_status = 'APPROVED')::int AS approved,
+         COUNT(*) FILTER (WHERE spo.approval_status = 'REJECTED')::int AS rejected
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        WHERE ${q.where}`,
@@ -312,7 +316,7 @@ export class SupplierOfferReadService {
     approvalStatus: string,
     completenessScore: number,
   ): 'APPROVED' | 'READY' | 'INCOMPLETE' | 'DRAFT' {
-    if (approvalStatus === 'approved') return 'APPROVED';
+    if (approvalStatus.toUpperCase() === 'APPROVED') return 'APPROVED';
     if (completenessScore >= 70) return 'READY';
     if (completenessScore > 0) return 'INCOMPLETE';
     return 'DRAFT';
@@ -412,21 +416,12 @@ export class SupplierOfferReadService {
     };
   }
 
+  /** 기존 query 이름은 호환 유지. 내 제품 탭은 제품 등록 승인 기준이다. */
   private serviceApprovalConditions(status: string | undefined): string[] {
-    const conditions: string[] = [];
-    if (status === 'unrequested') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
-    } else if (status === 'pending') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
-    } else if (status === 'approved') {
-      conditions.push(
-        `NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`,
-        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`,
-      );
-    } else if (status === 'rejected') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')`);
-    }
-    return conditions;
+    if (status === 'pending' || status === 'unrequested') return ["spo.approval_status = 'PENDING'"];
+    if (status === 'approved') return ["spo.approval_status = 'APPROVED'"];
+    if (status === 'rejected') return ["spo.approval_status = 'REJECTED'"];
+    return [];
   }
 
 }

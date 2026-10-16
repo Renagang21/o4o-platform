@@ -38,6 +38,8 @@ const ERROR_CODES = {
   ALREADY_PROPOSED: { code: 'ALREADY_PROPOSED', message: '이미 제안된 이벤트 상품입니다.' },
   ORG_UNAVAILABLE: { code: 'ORG_UNAVAILABLE', message: 'KPA 조직 정보를 확인할 수 없습니다. 관리자에게 문의하세요.' },
   INVALID_PARAMS: { code: 'INVALID_PARAMS', message: '필수 파라미터가 없습니다.' },
+  PRODUCT_NOT_APPROVED: { code: 'PRODUCT_NOT_APPROVED', message: '제품 등록 승인 후 이벤트를 제안할 수 있습니다.' },
+  INVALID_EVENT_CONDITIONS: { code: 'INVALID_EVENT_CONDITIONS', message: '이벤트 가격과 시작·종료 일시를 확인해 주세요.' },
 } as const;
 
 function err(res: Response, status: number, code: keyof typeof ERROR_CODES): void {
@@ -197,7 +199,8 @@ export function createSupplierOffersController(
             opl.rejected_reason AS "rejectedReason",
             COALESCE(pm.name, '(상품명 없음)')  AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
-            spo.price_general::numeric          AS price
+            COALESCE(opl.event_price,spo.price_general)::numeric AS price,
+            opl.start_at AS "startAt", opl.end_at AS "endAt"
           FROM organization_product_listings opl
           JOIN supplier_product_offers spo ON spo.id = opl.offer_id
           JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
@@ -214,6 +217,8 @@ export function createSupplierOffersController(
           title: r.title,
           supplierName: r.supplierName,
           price: r.price,
+          startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+          endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
           isActive: r.isActive,
           status: r.status,   // DB 값 직접 노출 (pending | approved | rejected | canceled)
           proposedAt: r.proposedAt instanceof Date
@@ -280,6 +285,11 @@ export function createSupplierOffersController(
           organizationId,
           roleType: 'supplier',
           ownerUserId: userId,
+          eventConditions: {
+            eventPrice: Number(req.body.eventPrice),
+            startAt: new Date(req.body.startAt ?? ''),
+            endAt: new Date(req.body.endAt ?? ''),
+          },
         });
 
         res.status(201).json({
@@ -292,6 +302,8 @@ export function createSupplierOffersController(
             status: result.status,
             isActive: result.isActive,
             proposedAt: result.createdAt,
+            startAt: result.startAt,
+            endAt: result.endAt,
           },
         });
       } catch (error: any) {
@@ -302,6 +314,8 @@ export function createSupplierOffersController(
             OFFER_NOT_OWNED: 'OFFER_NOT_OWNED',
             ALREADY_LISTED: 'ALREADY_PROPOSED',
             INTERNAL_ERROR: 'INTERNAL_ERROR',
+            PRODUCT_NOT_APPROVED: 'PRODUCT_NOT_APPROVED',
+            INVALID_EVENT_CONDITIONS: 'INVALID_EVENT_CONDITIONS',
           };
           const mapped = map[error.code] ?? 'INTERNAL_ERROR';
           err(res, error.statusCode, mapped);

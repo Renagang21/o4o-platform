@@ -192,7 +192,7 @@ describe('Master 서버 재검증', () => {
   it('PUBLIC 인데 짧은 설명 없음 → PUBLIC_REQUIRES_DESCRIPTION (기존 등록 계약 동일)', async () => {
     const { svc } = build();
     const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, isPublic: true });
-    expect(r).toMatchObject({ success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' });
+    expect(r).toMatchObject({ success: false, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION' });
   });
 });
 
@@ -200,7 +200,7 @@ describe('정상 생성 — masterId 보존 · Master 재추론 0 · Master/Cand
   it('선택 masterId 가 그대로 offer.masterId 가 되고 resolveOrCreateMaster 는 호출되지 않는다', async () => {
     const { svc, catalogService } = build();
     const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, {
-      masterId: MASTER_ID, priceGeneral: 1000, stockQuantity: '7', serviceKeys: ['kpa-society'], isFeatured: true,
+      masterId: MASTER_ID, priceGeneral: 1000, stockQuantity: '7', isFeatured: true,
     });
     expect(r.success).toBe(true);
     expect((r as { data: { masterId: string } }).data.masterId).toBe(MASTER_ID);
@@ -208,7 +208,7 @@ describe('정상 생성 — masterId 보존 · Master 재추론 0 · Master/Cand
     const saved = state.saved[0] as Record<string, unknown>;
     expect(saved).toMatchObject({
       supplierId: SUPPLIER_ID, masterId: MASTER_ID, approvalStatus: 'PENDING', isActive: false,
-      priceGeneral: 1000, stockQuantity: 7, isFeatured: true, serviceKeys: ['kpa-society'], distributionType: 'SERVICE',
+      priceGeneral: 1000, stockQuantity: 7, isFeatured: true, serviceKeys: [], distributionType: 'PRIVATE',
     });
     expect(String(saved.slug)).toMatch(/^8801234567890-22222222-/);
     expect(catalogService.resolveOrCreateMaster).not.toHaveBeenCalled();
@@ -225,11 +225,11 @@ describe('정상 생성 — masterId 보존 · Master 재추론 0 · Master/Cand
     expect(String((state.saved[0] as Record<string, unknown>).slug)).toMatch(new RegExp(`^${MASTER_ID}-`));
   });
 
-  it('service approval 은 승인 대상 키에 대해 기존 서비스로 생성한다', async () => {
+  it('등록은 서비스 승인 원장을 생성하지 않고 게시 선택을 거절한다', async () => {
     const { svc } = build();
-    await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] });
-    expect(state.approvalCalls).toHaveLength(1);
-    expect(state.approvalCalls[0]).toEqual(['offer-new', ['kpa-society']]);
+    expect(await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID })).toMatchObject({ success: true });
+    expect(state.approvalCalls).toHaveLength(0);
+    expect(await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] })).toMatchObject({ success: false, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION' });
   });
 });
 
@@ -263,42 +263,17 @@ describe('Offer 유일성 계약 — 변경 0 · 재사용', () => {
   });
 });
 
-describe('DRUG gate — assertDrugOfferAllowed 계약 불변 (완화 없음)', () => {
-  beforeEach(() => { state.master = activeMaster({ regulatoryType: 'DRUG' }); });
-
-  it('DRUG + isPublic=true → DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', async () => {
+describe('DRUG 등록과 게시의 분리', () => {
+  it('승인된 의약품 Master는 가격·게시 대상 없이 미게시 제품으로 등록한다', async () => {
+    state.master = activeMaster({ regulatoryType: 'DRUG' });
     const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, {
-      masterId: MASTER_ID, isPublic: true, consumerShortDescription: 'd', serviceKeys: ['kpa-society'],
-    });
-    expect(r).toMatchObject({ success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN' });
+    expect(await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID })).toMatchObject({ success: true });
+    expect(state.saved[0]).toMatchObject({ isPublic: false, defaultSupplyEnabled: false, serviceKeys: [], approvalStatus: 'PENDING', isActive: false, priceGeneral: 0 });
+  });
+  it.each([{ isPublic: true }, { serviceKeys: ['kpa-society'] }, { serviceKeys: ['k-cosmetics'] }])('등록 경로로 의약품 게시를 요청할 수 없다: %p', async (input) => {
+    state.master = activeMaster({ regulatoryType: 'DRUG' });
+    expect(await build().svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, ...input })).toMatchObject({ success: false, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION' });
     expect(state.saved).toHaveLength(0);
-  });
-
-  it('DRUG + serviceKeys=[] (PRIVATE draft) → DRUG_SERVICE_CONTEXT_REQUIRED — 완화하지 않는다', async () => {
-    const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, isPublic: false, serviceKeys: [] });
-    expect(r).toMatchObject({ success: false, error: 'DRUG_SERVICE_CONTEXT_REQUIRED' });
-  });
-
-  it('DRUG + 비약국 serviceKey 포함 → DRUG_NON_PHARMACY_SERVICE', async () => {
-    const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society', 'k-cosmetics'] });
-    expect(r).toMatchObject({ success: false, error: 'DRUG_NON_PHARMACY_SERVICE' });
-  });
-
-  it('DRUG + pharmacy-target serviceKeys 만 → 허용', async () => {
-    const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] });
-    expect(r.success).toBe(true);
-    expect((state.saved[0] as Record<string, unknown>).isPublic).toBe(false);
-  });
-
-  it('한글 "의약품" Master 도 DRUG 로 판정된다', async () => {
-    state.master = activeMaster({ regulatoryType: '의약품' });
-    const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: [] });
-    expect(r).toMatchObject({ success: false, error: 'DRUG_SERVICE_CONTEXT_REQUIRED' });
   });
 });
 
@@ -309,7 +284,7 @@ describe('규제 permit — Master 값만 사용', () => {
     state.master = activeMaster({ regulatoryType: 'HEALTH_FUNCTIONAL', categoryId: CAT });
     state.category = { isRegulated: true };
     const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] });
+    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID });
     expect(r).toMatchObject({ success: false, error: 'PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED' });
   });
 
@@ -317,7 +292,7 @@ describe('규제 permit — Master 값만 사용', () => {
     state.master = activeMaster({ regulatoryType: 'HEALTH_FUNCTIONAL', categoryId: CAT, isMfdsVerified: true });
     state.category = { isRegulated: true };
     const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] });
+    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID });
     expect(r.success).toBe(true);
   });
 
@@ -325,7 +300,7 @@ describe('규제 permit — Master 값만 사용', () => {
     state.master = activeMaster({ regulatoryType: 'HEALTH_FUNCTIONAL', categoryId: CAT, mfdsPermitNumber: 'P-1' });
     state.category = { isRegulated: true };
     const { svc } = build();
-    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['kpa-society'] });
+    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID });
     expect(r.success).toBe(true);
   });
 
@@ -334,7 +309,7 @@ describe('규제 permit — Master 값만 사용', () => {
     state.category = { isRegulated: true };
     const { svc } = build();
     const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys: ['k-cosmetics'] });
-    expect(r).toMatchObject({ success: false, error: 'REGULATED_PRODUCT_NON_PHARMACY_SERVICE' });
+    expect(r).toMatchObject({ success: false, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION' });
   });
 });
 

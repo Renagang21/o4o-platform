@@ -12,6 +12,7 @@
  *   - 모든 액션에 toast + 로딩 처리
  */
 
+import { EventOfferTermsFields, EMPTY_EVENT_TERMS, eventOfferConditions } from '../../../components/event-offer/EventOfferTermsFields';
 import { useState, useEffect } from 'react';
 import { toast } from '@o4o/error-handling';
 import { ConfirmActionDialog } from '@o4o/ui';
@@ -108,6 +109,7 @@ export function EventOfferManagePage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [availableOffers, setAvailableOffers] = useState<AvailableOffer[]>([]);
   const [selectedOfferId, setSelectedOfferId] = useState('');
+  const [eventTerms, setEventTerms] = useState(EMPTY_EVENT_TERMS);
   const [offersLoading, setOffersLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -174,6 +176,7 @@ export function EventOfferManagePage() {
     setShowAddForm(true);
     setCreateError(null);
     setSelectedOfferId('');
+    setEventTerms(EMPTY_EVENT_TERMS);
     if (availableOffers.length > 0) return; // 이미 로드됨
     setOffersLoading(true);
     try {
@@ -189,6 +192,7 @@ export function EventOfferManagePage() {
   const closeAddForm = () => {
     setShowAddForm(false);
     setSelectedOfferId('');
+    setEventTerms(EMPTY_EVENT_TERMS);
     setCreateError(null);
   };
 
@@ -198,10 +202,12 @@ export function EventOfferManagePage() {
       setCreateError('등록할 이벤트를 선택하세요.');
       return;
     }
+    const conditions = eventOfferConditions(eventTerms);
+    if (!conditions) { setCreateError('양수 이벤트 가격과 올바른 시작·종료 일시를 입력하세요.'); return; }
     setCreating(true);
     setCreateError(null);
     try {
-      const res = await eventOfferAdminApi.addProduct({ offerId: selectedOfferId });
+      const res = await eventOfferAdminApi.addProduct({ offerId: selectedOfferId, ...conditions });
       if (res?.data) {
         setProducts(prev => [...prev, res.data]);
         // 등록된 offer는 available에서 제거
@@ -428,6 +434,7 @@ export function EventOfferManagePage() {
                 ) : (
                   <div style={styles.selectRow}>
                     <select
+                      aria-label="이벤트 제품 선택"
                       style={styles.offerSelect}
                       value={selectedOfferId}
                       onChange={e => setSelectedOfferId(e.target.value)}
@@ -441,16 +448,17 @@ export function EventOfferManagePage() {
                         </option>
                       ))}
                     </select>
-                    <button
-                      type="submit"
-                      style={{ ...styles.addButton, opacity: creating || !selectedOfferId ? 0.6 : 1 }}
-                      disabled={creating || !selectedOfferId}
-                    >
-                      {creating ? PAGE_TEXT.submittingLabel : PAGE_TEXT.submitLabel}
-                    </button>
                   </div>
                 )}
+                {availableOffers.length > 0 && <EventOfferTermsFields value={eventTerms} onChange={setEventTerms} disabled={creating} />}
                 {createError && <div style={styles.formError}>{createError}</div>}
+                {availableOffers.length > 0 && <button
+                  type="submit"
+                  style={{ ...styles.addButton, alignSelf: 'flex-start', opacity: creating || !selectedOfferId ? 0.6 : 1 }}
+                  disabled={creating || !selectedOfferId}
+                >
+                  {creating ? PAGE_TEXT.submittingLabel : PAGE_TEXT.submitLabel}
+                </button>}
               </form>
             </div>
           )}
@@ -767,7 +775,7 @@ const styles: Record<string, React.CSSProperties> = {
   container: { padding: '24px', maxWidth: '1100px' },
 
   // Header
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' },
+  header: { display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' },
   title: { fontSize: '22px', fontWeight: 700, color: colors.neutral900, margin: 0 },
   subtitle: { fontSize: '13px', color: colors.neutral500, marginTop: '4px' },
   headerActions: { display: 'flex', gap: '10px', alignItems: 'center' },
@@ -838,6 +846,7 @@ const styles: Record<string, React.CSSProperties> = {
   selectRow: { display: 'flex', gap: '10px', alignItems: 'center' },
   offerSelect: {
     flex: 1,
+    minWidth: 0,
     padding: '10px 12px',
     border: `1px solid ${colors.neutral300}`,
     borderRadius: '8px',

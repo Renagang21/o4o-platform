@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { O4O_SERVICES, REGULATORY_TYPE_OPTIONS } from './importHelpers';
+import { REGULATORY_TYPE_OPTIONS } from './importHelpers';
 import type { useSupplierProductImport } from './useSupplierProductImport';
 
 export default function SupplierImportSettings({
@@ -14,12 +14,6 @@ export default function SupplierImportSettings({
     navigate,
     o4oCategoryId,
     setO4oCategoryId,
-    o4oPriceGeneral,
-    setO4oPriceGeneral,
-    o4oIsPublic,
-    setO4oIsPublic,
-    o4oServiceKeys,
-    setO4oServiceKeys,
     o4oRegulatoryType,
     setO4oRegulatoryType,
     flatCats,
@@ -55,22 +49,6 @@ export default function SupplierImportSettings({
           </select>
         </div>
 
-        {/* 공급가 */}
-        <div>
-          <label htmlFor={`${formId}-field2`} className="mb-1 block text-sm font-medium text-slate-700">
-            공급가 (원) <span className="text-red-500">*</span>
-          </label>
-          <input id={`${formId}-field2`}
-            type="number"
-            value={o4oPriceGeneral}
-            onChange={(e) => setO4oPriceGeneral(e.target.value)}
-            placeholder="0"
-            min="0"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-          <p className="mt-0.5 text-xs text-slate-400">공급자가 결정하는 B2B 공급가</p>
-        </div>
-
         {/* 규제 유형 (조건부) */}
         {selectedCatIsRegulated && (
           <div>
@@ -92,53 +70,7 @@ export default function SupplierImportSettings({
         )}
       </div>
 
-      {/* 유통 설정 */}
-      <div className="mt-5">
-        <p className="mb-2 block text-sm font-medium text-slate-700">유통 설정</p>
-        <label className="mb-3 flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={o4oIsPublic}
-            onChange={(e) => setO4oIsPublic(e.target.checked)}
-            className="h-4 w-4 accent-blue-600"
-          />
-          <span className="text-sm text-slate-700">공개(PUBLIC) — 모든 판매처에 노출</span>
-        </label>
-
-        <p className="mb-2 text-xs text-slate-500">서비스별 공급 (복수 선택 가능)</p>
-        <div className="flex flex-wrap gap-4">
-          {O4O_SERVICES.map((svc) => (
-            <label key={svc.key} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={o4oServiceKeys.includes(svc.key)}
-                onChange={(e) => {
-                  setO4oServiceKeys((prev) =>
-                    e.target.checked ? [...prev, svc.key] : prev.filter((k) => k !== svc.key),
-                  );
-                }}
-                className="h-4 w-4 accent-blue-600"
-              />
-              <span className="text-sm text-slate-700">{svc.name}</span>
-            </label>
-          ))}
-        </div>
-        {!o4oIsPublic && o4oServiceKeys.length === 0 && (
-          <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            서비스별 공급이 설정되지 않아 승인요청 대상이 아닙니다. 저장 후 상품 편집에서 추가할 수
-            있습니다.
-          </p>
-        )}
-      </div>
-
-      {/* 설정 요약 */}
-      <div className="mt-4 rounded-lg bg-white border border-slate-200 px-4 py-3 text-xs text-slate-500">
-        <span className="font-medium text-slate-700">설정 요약: </span>
-        {o4oCategoryId ? flatCats.find((c) => c.id === o4oCategoryId)?.name : '카테고리 미선택'} /
-        공급가 {o4oPriceGeneral ? `${Number(o4oPriceGeneral).toLocaleString()}원` : '미입력'} /
-        {o4oIsPublic ? ' PUBLIC' : ''}
-        {o4oServiceKeys.length > 0 ? ` ${o4oServiceKeys.join(', ')}` : ' PRIVATE'}
-      </div>
+      <p className="mt-4 text-sm text-slate-600">제품 정보만 검토 요청으로 제출합니다. 공급가·서비스 게시·이벤트 기간은 등록 승인 후 각 업무에서 설정합니다.</p>
 
       {/* Actions */}
       <div className="mt-5 flex gap-3">

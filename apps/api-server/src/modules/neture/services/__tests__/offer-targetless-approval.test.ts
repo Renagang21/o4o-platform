@@ -1,8 +1,8 @@
 /**
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3) — 공급처 미지정(serviceKeys 빈) 제품의 운영자 승인 · 반려
  *
- * OSA 행이 없으면 파생 sync 는 PENDING 을 돌려준다. 승인 · 반려 모두 제품 등록 상태를 직접 기록해야 하며
- * (승인만 처리되면 반려가 "성공" 응답 뒤에도 PENDING 으로 남는다 — Codex review), 반려는 파생 REJECTED 와 같은 cascade 를 한다.
+ * OSA 유무와 무관하게 제품 등록 상태를 직접 기록한다. 등록 반려는 기존 노출을 모두 차단하고,
+ * 서비스 반려는 별도 경로에서 해당 서비스만 변경한다.
  * DB 없이 AppDataSource 를 fake 로 대체하고 실행된 SQL 을 기록한다.
  */
 jest.mock('@o4o/ai-prompts/store', () => ({ PRODUCT_CONTENT_PROMPTS: {} }), { virtual: true });
@@ -87,10 +87,10 @@ describe('공급처 미지정 제품 — 운영자 승인 · 반려', () => {
     expect(state.syncCalls).toBe(0);
   });
 
-  it('공급처가 지정된 제품은 기존 OSA 파생 경로 그대로', async () => {
+  it('공급처가 지정된 제품도 등록 반려는 OSA 생성/파생 없이 처리', async () => {
     reset(['kpa-society']);
     await service.rejectProduct(OFFER_ID, ADMIN_ID);
-    expect(state.qrQueries.some((q) => /INSERT INTO offer_service_approvals/.test(q))).toBe(true);
-    expect(state.syncCalls).toBe(1);
+    expect(state.qrQueries.some((q) => /INSERT INTO offer_service_approvals/.test(q))).toBe(false);
+    expect(state.syncCalls).toBe(0);
   });
 });

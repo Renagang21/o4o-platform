@@ -5,12 +5,12 @@
  * offer_service_approvals 테이블 전용 (기존 product_approvals와 독립).
  *
  * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
- * offer_service_approvals = SSOT. supplier_product_offers.approval_status는 파생 필드.
- * syncOfferFromServiceApprovals()가 모든 승인 상태 변경의 단일 경로.
+ * offer_service_approvals = 서비스 게시 승인 SSOT. 제품 등록 승인은 독립이다.
+ * 서비스 상태의 변경은 제품 등록 승인/다른 서비스/이벤트와 독립이다.
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
-import { autoExpandPublicProduct, autoExpandServiceProduct } from '../../../utils/auto-listing.utils.js';
+import { autoExpandServiceProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
 import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
 
@@ -21,11 +21,11 @@ export class OfferServiceApprovalService {
   constructor(private readonly dataSource: DataSource) {}
 
   /**
-   * 상품 생성 시 pending 승인 자동 생성 (idempotent)
+   * 명시적 서비스 게시 요청의 pending 승인 생성 (idempotent)
    *
    * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
    * 실제 INSERT된 service_key 목록을 반환 (ON CONFLICT로 skip된 것 제외).
-   * submitForApproval이 이 값으로 "정말 새로 요청된 행"과 "이미 존재해서 skip된 행"을 구분한다.
+   * 게시 요청 경로가 이 값으로 새 요청과 기존 행을 구분한다.
    *
    * WO-O4O-NETURE-PRODUCT-APPROVAL-RESUBMIT-AFTER-REJECT-FIX-V1:
    * 기존 (offer_id, service_key) UNIQUE 제약 + ON CONFLICT DO NOTHING 구조에서는
@@ -385,131 +385,31 @@ export class OfferServiceApprovalService {
 
   // ==================== WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1 ====================
 
-  /**
-   * 파생 상태 동기화 — offer_service_approvals 기준으로 offer 상태 결정
-   *
-   * 파생 규칙 (WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1):
-   *   ANY approved → APPROVED (하나라도 승인되면 제품 활성화)
-   *   ALL rejected → REJECTED
-   *   some pending, none approved → PENDING
-   *
-   * 상태 전이 부작용:
-   *   → APPROVED: is_active=true + PUBLIC이면 autoExpandPublicProduct()
-   *   → REJECTED: product_approvals revoke + listings 비활성화
-   */
+  /** 서비스 게시 승인만 동기화한다. 제품 등록 승인과 다른 서비스/이벤트를 변경하지 않는다. */
   async syncOfferFromServiceApprovals(
     offerId: string,
     decidedBy: string,
     executor: QueryExecutor,
   ): Promise<{ previousStatus: string; derivedStatus: string; changed: boolean; autoListedCount: number }> {
-    // 1. 현재 service approval 상태 조회
-    const approvals: Array<{ approval_status: string; service_key: string }> = await executor.query(
-      `SELECT approval_status, service_key FROM offer_service_approvals WHERE offer_id = $1`,
-      [offerId],
+    const [offer] = await executor.query(
+      `SELECT approval_status, is_active, master_id, service_keys FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL`, [offerId],
     );
-
-    if (!approvals.length) {
-      return { previousStatus: 'PENDING', derivedStatus: 'PENDING', changed: false, autoListedCount: 0 };
+    const status = offer?.approval_status ?? 'PENDING';
+    const result = { previousStatus: status, derivedStatus: status, changed: false, autoListedCount: 0 };
+    if (status !== 'APPROVED' || !offer.is_active) return result;
+    const approvals: Array<{ approval_status: string; service_key: string }> = await executor.query(
+      `SELECT approval_status, service_key FROM offer_service_approvals WHERE offer_id = $1`, [offerId],
+    );
+    const approvedKeys = approvals.filter(a => a.approval_status === 'approved' && offer.service_keys?.includes(a.service_key)).map(a => a.service_key);
+    if (approvedKeys.length) result.autoListedCount = await autoExpandServiceProduct(executor, offerId, offer.master_id, approvedKeys);
+    if (approvedKeys.includes('kpa-society')) {
+      await executor.query(
+        `INSERT INTO product_approvals (offer_id, organization_id, service_key, approval_type, approval_status, requested_by, metadata)
+         VALUES ($1, 'a0000000-0a00-4000-a000-000000000001', 'kpa-society', 'service', 'pending', $2, '{"source":"neture_bridge"}'::jsonb)
+         ON CONFLICT (offer_id, organization_id, approval_type) DO NOTHING`, [offerId, decidedBy],
+      );
     }
-
-    // 2. 파생 규칙 적용 (WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1)
-    //   ANY approved → APPROVED (하나라도 승인되면 제품 활성화)
-    //   ALL rejected → REJECTED
-    //   some pending, none approved → PENDING
-    // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
-    //   'cancelled'(공급자 철회) 행은 파생에서 제외. 모든 행이 cancelled 면 상태를 변경하지 않는다
-    //   (REJECTED 오판 + 전체 listing 비활성 cascade 방지). 노출은 catalog 게이트(approved만)에서 자연 제외.
-    const active = approvals.filter(a => a.approval_status !== 'cancelled');
-    const anyApproved = active.some(a => a.approval_status === 'approved');
-    const hasPending = active.some(a => a.approval_status === 'pending');
-
-    // 3. 현재 offer 상태 조회
-    const [offer]: Array<{ approval_status: string; is_active: boolean; distribution_type: string; master_id: string }> =
-      await executor.query(
-        `SELECT approval_status, is_active, distribution_type, master_id FROM supplier_product_offers WHERE id = $1`,
-        [offerId],
-      );
-    if (!offer) {
-      return { previousStatus: 'PENDING', derivedStatus: 'PENDING', changed: false, autoListedCount: 0 };
-    }
-
-    let derivedStatus: string;
-    if (anyApproved) derivedStatus = 'APPROVED';
-    else if (hasPending) derivedStatus = 'PENDING';
-    else if (active.length === 0) derivedStatus = offer.approval_status; // 전부 cancelled → 변경 없음
-    else derivedStatus = 'REJECTED';
-
-    const previousStatus = offer.approval_status;
-    const changed = previousStatus !== derivedStatus;
-    let autoListedCount = 0;
-
-    if (!changed) {
-      return { previousStatus, derivedStatus, changed: false, autoListedCount: 0 };
-    }
-
-    // 4. offer 파생 상태 업데이트
-    if (derivedStatus === 'APPROVED') {
-      // → APPROVED: is_active=true + auto-expand
-      await executor.query(
-        `UPDATE supplier_product_offers SET approval_status = 'APPROVED', is_active = true, updated_at = NOW() WHERE id = $1`,
-        [offerId],
-      );
-
-      if (offer.distribution_type === 'PUBLIC') {
-        autoListedCount = await autoExpandPublicProduct(executor, offerId, offer.master_id);
-      } else if (offer.distribution_type === 'SERVICE') {
-        // WO-NETURE-SERVICE-DISTRIBUTION-AUTO-EXPAND-V1
-        const approvedKeys = approvals
-          .filter(a => a.approval_status === 'approved')
-          .map(a => a.service_key);
-        autoListedCount = await autoExpandServiceProduct(executor, offerId, offer.master_id, approvedKeys);
-      }
-
-      // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
-      // kpa-society가 승인된 경우 → product_approvals PENDING row 생성 (KPA 2차 심사 큐)
-      const kpaApproved = approvals.some(a => a.service_key === 'kpa-society' && a.approval_status === 'approved');
-      if (kpaApproved) {
-        await executor.query(
-          `INSERT INTO product_approvals (offer_id, organization_id, service_key, approval_type, approval_status, requested_by, metadata)
-           VALUES ($1, 'a0000000-0a00-4000-a000-000000000001', 'kpa-society', 'service', 'pending', $2, '{"source":"neture_bridge"}'::jsonb)
-           ON CONFLICT (offer_id, organization_id, approval_type) DO NOTHING`,
-          [offerId, decidedBy],
-        );
-        logger.info(`[ServiceApproval] Offer ${offerId} → KPA 2차 심사 큐 생성 (bridge)`);
-      }
-
-      logger.info(`[ServiceApproval] Offer ${offerId} → APPROVED (derived) by ${decidedBy}, autoListed=${autoListedCount}`);
-    } else if (derivedStatus === 'REJECTED') {
-      // → REJECTED: offer 상태 + cascade (product_approvals revoke + listings 비활성화)
-      await executor.query(
-        `UPDATE supplier_product_offers SET approval_status = 'REJECTED', updated_at = NOW() WHERE id = $1`,
-        [offerId],
-      );
-
-      await executor.query(
-        `UPDATE product_approvals
-         SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
-             reason = 'Offer rejected (derived)', updated_at = NOW()
-         WHERE offer_id = $1 AND approval_status = 'approved'`,
-        [offerId, decidedBy],
-      );
-
-      await executor.query(
-        `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
-        [offerId],
-      );
-
-      logger.info(`[ServiceApproval] Offer ${offerId} → REJECTED (derived) by ${decidedBy}, cascade applied`);
-    } else {
-      // → PENDING
-      await executor.query(
-        `UPDATE supplier_product_offers SET approval_status = 'PENDING', updated_at = NOW() WHERE id = $1`,
-        [offerId],
-      );
-      logger.info(`[ServiceApproval] Offer ${offerId} → PENDING (derived) by ${decidedBy}`);
-    }
-
-    return { previousStatus, derivedStatus, changed, autoListedCount };
+    return result;
   }
 
   /**
@@ -518,7 +418,7 @@ export class OfferServiceApprovalService {
    */
   async approve(approvalId: string, decidedBy: string, reason?: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
     const rows = await this.dataSource.query(
-      `SELECT id, offer_id, approval_status FROM offer_service_approvals WHERE id = $1`,
+      `SELECT id, offer_id, service_key, approval_status FROM offer_service_approvals WHERE id = $1`,
       [approvalId],
     );
     if (!rows.length) return { success: false, error: 'APPROVAL_NOT_FOUND' };
@@ -528,12 +428,28 @@ export class OfferServiceApprovalService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.query(
+      const [offer] = await queryRunner.query(
+        `SELECT approval_status, service_keys FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`, [offerId],
+      );
+      if (offer?.approval_status !== 'APPROVED') {
+        await queryRunner.rollbackTransaction();
+        return { success: false, error: 'PRODUCT_NOT_APPROVED' };
+      }
+      if (!offer.service_keys?.includes(rows[0].service_key)) {
+        await queryRunner.rollbackTransaction();
+        return { success: false, error: 'SERVICE_NOT_REQUESTED' };
+      }
+      const updated = await queryRunner.query(
         `UPDATE offer_service_approvals
          SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), reason = $3, updated_at = NOW()
-         WHERE id = $1`,
+         WHERE id = $1 AND approval_status = 'pending' RETURNING id`,
         [approvalId, decidedBy, reason || null],
       );
+
+      if (!updated.length) {
+        await queryRunner.rollbackTransaction();
+        return { success: false, error: 'NOT_PENDING' };
+      }
 
       const syncResult = await this.syncOfferFromServiceApprovals(offerId, decidedBy, queryRunner);
       await queryRunner.commitTransaction();
@@ -558,7 +474,7 @@ export class OfferServiceApprovalService {
    */
   async reject(approvalId: string, decidedBy: string, reason?: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
     const rows = await this.dataSource.query(
-      `SELECT id, offer_id, approval_status FROM offer_service_approvals WHERE id = $1`,
+      `SELECT id, offer_id, service_key, approval_status FROM offer_service_approvals WHERE id = $1`,
       [approvalId],
     );
     if (!rows.length) return { success: false, error: 'APPROVAL_NOT_FOUND' };
@@ -568,13 +484,27 @@ export class OfferServiceApprovalService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.query(
+      await queryRunner.query(`SELECT id FROM supplier_product_offers WHERE id = $1 FOR UPDATE`, [offerId]);
+      const updated = await queryRunner.query(
         `UPDATE offer_service_approvals
          SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(), reason = $3, updated_at = NOW()
-         WHERE id = $1`,
+         WHERE id = $1 AND approval_status = 'pending' RETURNING id`,
         [approvalId, decidedBy, reason || null],
       );
 
+      if (!updated.length) {
+        await queryRunner.rollbackTransaction();
+        return { success: false, error: 'NOT_PENDING' };
+      }
+
+      await queryRunner.query(
+        `UPDATE organization_product_listings SET is_active = false, updated_at = NOW()
+          WHERE offer_id = $1 AND service_key = (SELECT service_key FROM offer_service_approvals WHERE id = $2)`, [offerId, approvalId],
+      );
+      await queryRunner.query(
+        `UPDATE product_approvals SET approval_status = 'revoked', updated_at = NOW()
+          WHERE offer_id = $1 AND service_key = (SELECT service_key FROM offer_service_approvals WHERE id = $2) AND approval_status = 'approved'`, [offerId, approvalId],
+      );
       const syncResult = await this.syncOfferFromServiceApprovals(offerId, decidedBy, queryRunner);
       await queryRunner.commitTransaction();
 
@@ -615,20 +545,20 @@ export class OfferServiceApprovalService {
 
       // WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1:
       // 반려는 "끝"이 아니라 보완 후 재요청 가능함을 알림 문구에 명시한다(상태 체계 불변).
-      const title = isApproved ? '상품 승인 완료' : '상품 승인 반려';
+      const title = isApproved ? '서비스 게시 승인 완료' : '서비스 게시 승인 반려';
       let message: string;
       if (isApproved) {
         message = reason
-          ? `[${productName}] 승인되었습니다. 사유: ${reason}`
-          : `[${productName}] 승인되었습니다.`;
+          ? `[${productName}] 서비스 게시가 승인되었습니다. 사유: ${reason}`
+          : `[${productName}] 서비스 게시가 승인되었습니다.`;
       } else {
         message = reason
-          ? `[${productName}] 승인 요청이 반려되었습니다. 사유: ${reason} 제품 정보를 수정한 뒤 다시 승인 요청할 수 있습니다.`
-          : `[${productName}] 승인 요청이 반려되었습니다. 사유를 확인하고 제품 정보를 보완한 뒤 다시 승인 요청할 수 있습니다.`;
+          ? `[${productName}] 서비스 게시 요청이 반려되었습니다. 사유: ${reason} 서비스 게시에서 대상과 조건을 확인한 뒤 다시 저장해 재신청할 수 있습니다.`
+          : `[${productName}] 서비스 게시 요청이 반려되었습니다. 서비스 게시에서 사유와 조건을 확인한 뒤 다시 저장해 재신청할 수 있습니다.`;
       }
 
-      // targetUrl: schema 변경 없이 metadata에 포함(공급자 제품 목록). 라우트 설계 영향 없음.
-      const targetUrl = '/supplier/products';
+      // 등록 재검토와 혼동하지 않도록 해당 제품의 서비스 게시로 연결한다.
+      const targetUrl = `/supplier/products/publication?offer=${encodeURIComponent(offerId)}`;
 
       // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1:
       // serviceKey 누락 defect 수정 — serviceKey=NULL 이면 serviceKey 필터 소비처에서
