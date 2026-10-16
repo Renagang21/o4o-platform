@@ -52,3 +52,22 @@ describe.each([['Neture compatibility', NeturePage, NetureEditor], ['Pharmacy', 
   });
 
 });
+
+describe('CarePharm operator adapter model scope', () => {
+  beforeEach(() => {
+    mocks.user = { id: 'carepharm-operator' }; mocks.get.mockReset(); mocks.post.mockReset(); mocks.patch.mockReset();
+    configurePharmacyManagementClient({ ...mocks, put: vi.fn(), delete: vi.fn() });
+  });
+  afterEach(cleanup);
+  it('forwards the requested model instead of showing every assigned business', async () => {
+    mocks.get.mockImplementation(async (path: string) => envelope(path.endsWith('/semi-franchises') ? [sf, { ...sf, key: 'carepharm', name: '만성질환관리' }] : []));
+    render(<MemoryRouter><NeturePage businessKey="carepharm" /></MemoryRouter>);
+    await waitFor(() => expect(mocks.get.mock.calls.some(([path]) => path.includes('/carepharm/memberships'))).toBe(true));
+    expect(mocks.get.mock.calls.some(([path]) => path.includes('/pharmacy/memberships'))).toBe(false);
+  });
+  it('does not load a different model content editor through a direct URL', () => {
+    render(<MemoryRouter initialEntries={['/operator/semi-franchises/pharmacy/contents/content-a/edit']}><Routes><Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<NetureEditor businessKey="carepharm" />} /></Routes></MemoryRouter>);
+    expect(screen.getByText('이 사업의 콘텐츠가 아닙니다.')).toBeTruthy();
+    expect(mocks.get).not.toHaveBeenCalled();
+  });
+});

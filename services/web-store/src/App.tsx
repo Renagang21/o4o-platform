@@ -1,3 +1,4 @@
+import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
 /**
  * Unified Store Workspace 라우트 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥ · §8-3
  *
@@ -221,6 +222,7 @@ function storeChildRoutes() {
         <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
         <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
         <Route path={rel(PP.contents)} element={pharmacyOnly(<PharmacyContentSourcesPage />)} />
+        <Route path="pharmacy/carepharm" element={pharmacyOnly(<CarePharmToolsPage />)} />
         <Route path={rel(PP.recruitments)} element={pharmacyOnly(<PharmacyRecruitmentsPage />)} />
         <Route path={rel(PP.cart)} element={pharmacyOnly(<PharmacyCartPage />)} />
         <Route path={rel(PP.orders)} element={pharmacyOnly(<PharmacyOrdersPage />)} />
