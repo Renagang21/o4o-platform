@@ -393,7 +393,7 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 
 현재 남은 조건: 분회 수정안의 최신 review/CI → main 통합 → canonical 배포 및 실제 serving SHA,
 2026-11-13 시행일의 새 정책 게시·기존 회원 재동의, 사용자 본인의 실제 Google·카카오 인증,
-로컬 `docs/local/TEST-ACCOUNT.txt` 확보 후 일반 계정 상태별 운영 검증이다. 해당 SSOT는 이 checkout과
+로컬 `docs/local/TEST-ACCOUNTS.local.md` 확보 후 일반 계정 상태별 운영 검증이다. 해당 SSOT는 이 checkout과
 기준 workspace에 없어 Demo를 미가입·대기·반려·정지·탈퇴 일반 계정의 증명으로 대체하지 않는다.
 GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 현재 프록시403으로
 조회가 차단돼 실제 serving SHA 확인은 OPEN이다. 환경 초안에 도메인을 추가했으며 저장·게시 후 재확인한다.
