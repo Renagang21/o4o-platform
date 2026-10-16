@@ -12,7 +12,7 @@ export class MemberPaidFeatureService {
       WHERE p.user_id=$1 AND p.active=true AND (p.ends_at IS NULL OR p.ends_at>NOW())
         AND u.status='active' AND u."isActive"=true`, [ownerUserId]);
     return rows.length ? { type: 'member', key: 'paid-member', name: '경영자 유료회원',
-      features: PHARMACY_SERVICE_FEATURES.map(f => f.key) } : null;
+      features: PHARMACY_SERVICE_FEATURES.filter(f => f.key === 'tablet' || f.key === 'multilingual-content').map(f => f.key) } : null;
   }
 
   async find(email: unknown) {

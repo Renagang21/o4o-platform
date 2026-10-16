@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from './config/businessSite';
 import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
 import BusinessHomePresentationPage from './pages/business/BusinessHomePresentationPage';
 import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
@@ -325,7 +326,7 @@ const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/publ
  * 지부·분회 기능은 별도 분회 서비스(services/web-kpa-branch) 소관이다.
  */
 
-const SERVICE_NAME = 'O4O 약국';
+const SERVICE_NAME = BUSINESS_SITE.name;
 
 // ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
 // Service User 인증 제거, Platform User 단일 인증으로 통합
@@ -707,7 +708,7 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout /></Layout>}>
+          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey={BUSINESS_SITE.key} memberLayout /></Layout>}>
             <Route path="/" element={<PharmacyMemberHomePage />} />
             <Route path="/my/participation" element={<BusinessParticipationPage />} />
             <Route path="/home-presentation" element={<BusinessHomePresentationPage />} />
@@ -725,7 +726,7 @@ function App() {
               <Route path="manage" element={<BusinessForumManagementPage view="manage" />} />
             </Route>
           </Route>
-          <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
+          {BUSINESS_SITE.key === 'pharmacy' && <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />}
           <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
             <Route index element={<PharmacyMemberHomePage />} />
             <Route path="home-presentation" element={<BusinessHomePresentationPage />} />

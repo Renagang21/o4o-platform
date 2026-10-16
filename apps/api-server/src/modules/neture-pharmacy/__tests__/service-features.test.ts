@@ -21,7 +21,7 @@ describe('service feature grants', () => {
   it('does not interpret an unconnected paid source as a non-member', async () => {
     const service = new PharmacyServiceFeatureService({ query: jest.fn().mockResolvedValue([]) });
     expect(await service.resolve('free-staff', 'approved-store')).toMatchObject({
-      memberEntitlement: 'not-connected', features: [{ allowed: null }, { allowed: null }],
+      memberEntitlement: 'not-connected', features: [{ allowed: null }, { allowed: null }, { allowed: null }],
     });
     await expect(service.require('free-staff', 'approved-store', 'tablet')).rejects.toMatchObject({ httpStatus: 503, code: 'MEMBER_ENTITLEMENT_NOT_CONNECTED' });
   });

@@ -1,3 +1,4 @@
+import { StaffDemandSummary } from './StaffDemandSummary';
 import { MemberPaidFeaturesPanel } from './MemberPaidFeaturesPanel';
 /**
  * AdminSemiFranchisePage — 약국 협력사업 관리 (/admin/semi-franchises)
@@ -134,6 +135,7 @@ export default function AdminSemiFranchisePage() {
 
       <Message message={message} />
       <MemberPaidFeaturesPanel />
+      <StaffDemandSummary />
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">
         <h2 className="mb-3 text-base font-semibold text-gray-900">새 약국 협력사업</h2>

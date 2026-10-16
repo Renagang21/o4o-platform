@@ -1,3 +1,4 @@
+import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
 /**
  * Unified Store Workspace 라우트 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥ · §8-3
  *
@@ -187,6 +188,7 @@ function storeChildRoutes() {
         <Route path="marketing/pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
+        <Route path="staff-support" element={<StoreStaffSupportPage />} />
         <Route path="requests" element={<TabletRequestsPage />} />
         {/* 매장 자료함 · 콘텐츠 */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />

@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../../config/businessSite';
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -40,7 +41,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const operatorNavigation = state.access?.canManage ? <nav aria-label="담당 사업 운영" className="mb-5 flex flex-wrap gap-3 text-sm text-blue-700">
       <NavLink to={businessKey === 'pharmacy' ? '/home-presentation' : `${base}/home-presentation`}>Hero · 광고 관리</NavLink>
       <NavLink to={`${businessPath(businessKey, 'forum')}/manage`}>게시판 운영</NavLink>
-      {businessKey === 'pharmacy' && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}
+      {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}
     </nav> : null;
   if (memberLayout) return <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{operatorNavigation}<Outlet context={state} /></div>;
   return <div className="mx-auto max-w-6xl px-4 py-6">

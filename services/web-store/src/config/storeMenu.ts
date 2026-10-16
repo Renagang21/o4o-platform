@@ -32,6 +32,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'pop',                  label: 'POP',             subPath: '/marketing/pop-v2' },
       { key: 'qr',                   label: 'QR-code',         subPath: '/marketing/qr' },
       { key: 'tablet-displays',      label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
+      { key: 'staff-support', label: '직원 현장 지원', subPath: '/staff-support' },
       { key: 'tablet-requests',      label: '상담 요청',        subPath: '/requests' },
     ]},
     { label: '매장 실행', items: [

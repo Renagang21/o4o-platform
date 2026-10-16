@@ -1,3 +1,4 @@
+import { StoreStaffSupportService } from '../services/store-staff-support.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from '../services/member-paid-features.js';
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -102,6 +103,7 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     await members.set(users[0], users[1], { active: true, endsAt: null });
     expect((await members.find(`feature-${tag}-0@example.test`)).active).toBe(true);
     expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
+    expect((await service.resolve('free-invited-staff', store)).features.find(f=>f.key==='store-staff-support')?.allowed).toBe(false);
     expect((await service.resolve(users[0], other)).features[0].allowed).toBe(false);
     await members.set(users[0], users[1], { active: true, endsAt: '2000-01-01T00:00:00.000Z' });
     expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
@@ -115,6 +117,26 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
     await db.query(`UPDATE organization_members SET user_id=$2 WHERE organization_id=$1`, [store, users[0]]);
     await members.set(users[0], users[1], { active: false, endsAt: null });
+  });
+
+  it('isolates staff support locations, private guides and concurrent anonymous demand counts', async () => {
+    const support = new StoreStaffSupportService(db);
+    const [product] = await db.query(`INSERT INTO store_local_products (organization_id,name) VALUES ($1,'Synthetic support product') RETURNING id`,[store]);
+    await support.location(store,{kind:'local',id:product.id,location:'A-3'});
+    expect((await support.products(store,'Synthetic support'))[0].location).toBe('A-3');
+    expect(await support.products(other,'Synthetic support')).toEqual([]);
+    await expect(support.location(other,{kind:'local',id:product.id,location:'wrong'})).rejects.toMatchObject({code:'PRODUCT_NOT_FOUND'});
+    await db.query(`INSERT INTO semi_franchise_contents(semi_franchise_id,title,summary,tags,status) VALUES ($1,'Short guide','Synthetic instruction','["staff-quick-guide"]','published')`,[a]);
+    expect(await support.guides(store)).toHaveLength(1);
+    expect(await support.guides(other)).toHaveLength(0);
+    await Promise.all(Array.from({length:12},()=>support.demand(store,'not-found')));
+    const [{ month }] = await db.query(`SELECT to_char(NOW() AT TIME ZONE 'Asia/Seoul','YYYY-MM') AS month`);
+    expect((await support.summary(month)).find((r:any)=>r.id===store).counts['not-found']).toBe(12);
+    const [{ metadata }] = await db.query(`SELECT metadata FROM organizations WHERE id=$1`,[store]);
+    expect(metadata.keep).toBe('value');
+    expect(metadata.staffSupport.locations[`local:${product.id}`]).toBe('A-3');
+    await db.query(`DELETE FROM semi_franchise_contents WHERE semi_franchise_id=$1`,[a]);
+    await db.query(`DELETE FROM store_local_products WHERE id=$1`,[product.id]);
   });
 
   it('uses the current store owner member rather than the requesting staff member', async () => {

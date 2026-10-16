@@ -56,7 +56,7 @@ it('uses only the guard-resolved store and never accepts paid status or a differ
   const result = await request(app()).get('/api/v1/neture/pharmacy/service-features?organizationId=foreign&isPaid=true')
     .set('x-test-actor', 'invited-free-staff');
   expect(result.status).toBe(200);
-  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'connected', features: [{ allowed: true }, { allowed: false }] });
+  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'connected', features: [{ allowed: true }, { allowed: false }, { allowed: false }] });
   expect(query.mock.calls[0][1]).toEqual(['authorized-store']);
   query.mockClear();
   expect((await request(app()).get('/api/v1/neture/pharmacy/service-features').set('x-test-actor', 'uninvited')).status).toBe(403);
@@ -84,4 +84,26 @@ it('restricts member paid eligibility management to platform administrators and 
   query.mockResolvedValueOnce([{ active: true }]);
   expect((await request(server).put(`${base}/10000000-0000-4000-8000-000000000001`).set('x-test-actor', 'platform-admin').send({ active: true, endsAt: null })).status).toBe(200);
   expect(query.mock.calls[1][1]).toEqual(['10000000-0000-4000-8000-000000000001', true, null, 'platform-admin']);
+});
+
+it('requires the configured staff-support feature and preserves owner-only location writes', async () => {
+  let enabled = false;
+  query.mockImplementation(async (sql: string) => {
+    if (sql.includes('FROM semi_franchises sf')) return enabled ? [{key:'megapharm',name:'메가팜',features:['store-staff-support']}] : [];
+    if (sql.includes('AS "ownerUserId"')) return [{ownerUserId:'store-owner'}];
+    if (sql.includes('WITH products')) return [{id:'product',kind:'local',name:'합성 상품',location:'A-3'}];
+    return [];
+  });
+  const server=app();
+  const base='/api/v1/neture/pharmacy/staff-support';
+  expect((await request(server).get(`${base}/products?q=상품`).set('x-test-actor','invited-free-staff')).status).toBe(403);
+  enabled=true;
+  expect((await request(server).get(`${base}/products?q=상품`).set('x-test-actor','invited-free-staff')).body.data[0].location).toBe('A-3');
+  expect((await request(server).put(`${base}/location`).set('x-test-actor','invited-free-staff').send({})).status).toBe(403);
+  expect((await request(server).post(`${base}/demands`).set('x-test-actor','invited-free-staff').send({reason:'free-text',customer:'ignored'})).status).toBe(400);
+  expect((await request(server).post(`${base}/demands`).set('x-test-actor','invited-free-staff').send({reason:'not-found',customer:'ignored'})).status).toBe(200);
+  const writes=query.mock.calls.filter(([sql])=>sql.startsWith('UPDATE organizations'));
+  expect(writes).toHaveLength(1);
+  expect(writes[0][1]).toEqual(['authorized-store','not-found']);
+  expect((await request(server).get('/api/v1/neture/admin/staff-support/demands?month=2030-01').set('x-test-actor','business-operator')).status).toBe(403);
 });

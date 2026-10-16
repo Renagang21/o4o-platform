@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../config/businessSite';
 import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * Auth Context
@@ -220,7 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useMemo(
       () => ({
         // canonical service key — role prefix('kpa')가 아니라 service_memberships.service_key.
-        serviceKey: 'kpa-society',
+        serviceKey: BUSINESS_SITE.authServiceKey,
         authClient,
         getAccessToken,
         toUser: (apiUser: Record<string, unknown>) => createUserFromApiResponse(apiUser as unknown as ApiUser),

@@ -1,3 +1,4 @@
+import { StoreStaffSupportService } from './services/store-staff-support.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
@@ -302,6 +303,19 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
       actionParam<'publish' | 'archive'>(req, ['publish', 'archive']))));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
+  router.use('/pharmacy/staff-support', (_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
+  const staffSupport = new StoreStaffSupportService(dataSource);
+  const support = async (req: Req) => serviceFeatures.require(req.user!.id, org(req), 'store-staff-support');
+  router.get('/pharmacy/staff-support/products', ...store, handle(async req => { await support(req); return staffSupport.products(org(req), req.query.q); }));
+  router.get('/pharmacy/staff-support/guides', ...store, handle(async req => { await support(req); return staffSupport.guides(org(req)); }));
+  router.put('/pharmacy/staff-support/location', ...store, handle(async req => {
+    await support(req);
+    const owners = await dataSource.query(`SELECT 1 FROM organization_members WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL`, [org(req),req.user!.id]);
+    if (!owners.length) throw new NeturePharmacyError(403,'STORE_OWNER_REQUIRED','진열 위치 수정은 경영자가 할 수 있습니다.');
+    return staffSupport.location(org(req),req.body ?? {});
+  }));
+  router.post('/pharmacy/staff-support/demands', ...store, handle(async req => { await support(req); return staffSupport.demand(org(req),req.body?.reason); }));
+  router.get('/admin/staff-support/demands', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return staffSupport.summary(req.query.month); }));
   router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
   router.get('/admin/service-features', ...admin, handle(async () => PHARMACY_SERVICE_FEATURES));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);

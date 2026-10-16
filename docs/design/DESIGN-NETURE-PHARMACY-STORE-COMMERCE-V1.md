@@ -508,6 +508,19 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 구현·검증·인계: [CHECK-PHARMACY-FEATURE-APPLICATION-V1](../checks/CHECK-PHARMACY-FEATURE-APPLICATION-V1.md).
 
 
+### 15-6. megapharm 공통 사업 구조와 직원 현장 지원 (2026-10-16)
+
+- `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
+- 기본 pharmacy 호스트의 인증 서비스 문맥은 종전대로 kpa-society다. 독립 사업 호스트는 공통 Neture 계정을 사용하고 사업별 가입 권한을 별도 검증한다. megapharm은 Neture session domain으로 등록하여 pharmacy 협력사업 가입을 추가 전제로 요구하지 않는다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
+- `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. 협력사업 설정으로 제공하며 회원 유료 자격의 tablet/multilingual-content에 자동 합산하지 않는다. 특정 사업 전용 제공을 다른 약국에 노출하지 않는 기존 계약을 유지한다.
+- `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
+- 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
+- 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. O4O 전체 관리자는 월별 요청 건수를 조회하고, 협력사업 운영자에게 다른 사업/매장 집계를 공유하는 권한은 추가하지 않는다.
+- 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 megapharm 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
+
+검증·운영 설정 인계: [CHECK-MEGAPHARM-STAFF-SUPPORT-V1](../checks/CHECK-MEGAPHARM-STAFF-SUPPORT-V1.md).
+
+
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.

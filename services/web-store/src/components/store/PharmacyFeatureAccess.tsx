@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import type { StoreDashboardConfig } from '@o4o/store-ui-core';
 import { coreApiClient } from '../../api/client';
 
-export type PharmacyFeature = 'tablet' | 'multilingual-content';
+export type PharmacyFeature = 'tablet' | 'multilingual-content' | 'store-staff-support';
 export type FeatureAccess = { organizationId: string; features: Array<{ key: PharmacyFeature; allowed: boolean | null }> };
 export function pharmacyFeatureForPath(path: string): PharmacyFeature | null {
+  if (/\/staff-support(?:\/|$)/.test(path)) return 'store-staff-support';
   if (/\/(commerce\/tablet-displays|requests|channels\/tablet)(\/|$)/.test(path)) return 'tablet';
   if (/\/products\/multilingual\//.test(path) || /\/library\/multilingual-product-contents\/?$/.test(path)) return 'multilingual-content';
   return null;

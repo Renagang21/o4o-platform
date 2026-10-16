@@ -4,6 +4,7 @@ import { NeturePharmacyError } from '../constants.js';
 export const PHARMACY_SERVICE_FEATURES = [
   { key: 'tablet', label: '태블릿' },
   { key: 'multilingual-content', label: '다국어 상품 콘텐츠' },
+  { key: 'store-staff-support', label: '매장 직원 지원' },
 ] as const;
 export type PharmacyServiceFeature = typeof PHARMACY_SERVICE_FEATURES[number]['key'];
 

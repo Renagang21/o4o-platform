@@ -3,12 +3,12 @@ import { requestServiceHandoff } from '@o4o/auth-react';
 import { authClient } from '../../contexts/AuthContext';
 
 /** Existing Store handoff verifies organization access and carries the current login. */
-export default function BusinessStoreShortcut({ businessKey, contentId, supply = false }: { businessKey?: string; contentId?: string; supply?: boolean }) {
+export default function BusinessStoreShortcut({ businessKey, contentId, supply = false, staffSupport = false }: { staffSupport?: boolean; businessKey?: string; contentId?: string; supply?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const generation = useRef(0);
   const pending = useRef(false);
-  const materialPath = businessKey
+  const materialPath = staffSupport ? '/store/staff-support' : businessKey
     ? supply ? `/store/pharmacy/supply?${new URLSearchParams({ source: `sf:${businessKey}` })}` : `/store/pharmacy/contents?${new URLSearchParams({ business: businessKey, ...(contentId ? { content: contentId } : {}) })}`
     : '/store';
   const returnPath = businessKey ? `/select-store?returnTo=${encodeURIComponent(materialPath)}` : materialPath;
@@ -40,7 +40,7 @@ export default function BusinessStoreShortcut({ businessKey, contentId, supply =
   return <div>
     <button type="button" disabled={busy} onClick={() => void enterStore()}
       className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60">
-      {busy ? '내 매장으로 이동 중…' : businessKey ? supply ? '내 매장에서 공급 상품 보기' : '내 매장으로 자료 가져오기' : '내 매장으로'} <span aria-hidden="true">↗</span>
+      {busy ? '내 매장으로 이동 중…' : staffSupport ? '내 매장에서 직원 현장 지원' : businessKey ? supply ? '내 매장에서 공급 상품 보기' : '내 매장으로 자료 가져오기' : '내 매장으로'} <span aria-hidden="true">↗</span>
     </button>
     {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
   </div>;
