@@ -22,6 +22,7 @@ import { SemiFranchiseEventService } from '../services/semi-franchise-event.serv
 import { getSupplyOption } from '../services/supply-access.js';
 import { SupplierOfferWriteService } from '../../neture/services/supplier-offer-write.service.js';
 import { OfferLifecycleService } from '../../neture/services/offer-lifecycle.service.js';
+import { SellerService } from '../../neture/services/seller.service.js';
 import { SupplierOrderService } from '../../neture/services/supplier-order.service.js';
 import { ShipmentService } from '../../neture/services/shipment.service.js';
 import { SettlementCommandService } from '../../neture/services/settlement-command.service.js';
@@ -187,6 +188,10 @@ integration('supplier → store → payment → shipment → settlement (real Po
       .toEqual({ approval_status: 'APPROVED', is_public: false, default_supply_enabled: false, distribution_type: distributionType });
     expect(await ds.query(`SELECT id FROM supplier_product_offers WHERE id=$1 AND is_active=true AND distribution_type='PUBLIC'`, [id])).toEqual([]);
     expect(await ds.query('SELECT id FROM organization_product_listings WHERE offer_id=$1', [id])).toEqual([]);
+    // Real seller supply catalog reader of distribution_type.
+    const catalog = (await new SellerService(ds).getAvailableSupplyProducts(organizationId)).filter((p) => p.id === id);
+    // Only a retained explicit service target stays visible, as SERVICE; never as PUBLIC.
+    expect(catalog.map((p) => p.distributionType)).toEqual(serviceKeys.length ? ['SERVICE'] : []);
   });
 
   it('keeps approval, explicit publication and scheduled event-only sales independent', async () => {

@@ -121,3 +121,44 @@ API와 Neture/KPA 웹을 함께 적용하고 사용자 담당 운영자 승인�
 `docs/local/TEST-ACCOUNTS.local.md`는 이 클라우드에 없으며 과거/Demo 계정으로 대체하지 않는다.
 
 문서 정합: 기존 개발 기록을 보존하고 이 절에 후속 통합·검증·차단 상태만 추가했다. 업무 정본의 추가 정책 변경은 없다.
+
+## 7. 병합 후 독립 재검증·회귀 보강 — 2026-10-16
+
+PR #652 는 `a53a92b04c8059a5cfa41bfc131a69890b09becd` 로 main `13f89df0e48477509cc21128ea73cb42eb364b78` 에 병합됐다(2026-10-16 11:10Z).
+Codex P2 2건과 CI blocker 는 6-1·6-2 의 수정으로 해소됐고, 병합 head 의 CI Gate·API Jest 1~3/3·SonarCloud 는 SUCCESS 다.
+이 절은 별도 PC에서 같은 head 를 독립 재검증하고 회귀를 한 단계 보강한 결과다. 운영 DB·운영 HTTP·배포는 사용하지 않았다.
+
+### 7-1. 회귀 보강
+
+- legacy PUBLIC/PENDING 등록 승인 회귀(`supplier-store-round-trip.integration.spec.ts`)에 실제 판매자 공급 catalog
+  reader(`SellerService.getAvailableSupplyProducts`)를 추가로 실행한다.
+  - 서비스 대상 없음 → 승인 후 `PRIVATE`, 판매자 catalog 비노출.
+  - 기존 명시 서비스 대상(`kpa-society`) 보유 → 승인 후 `SERVICE` 로만 노출되고 `PUBLIC` 으로는 노출되지 않는다.
+    자동 목록화는 `offer_service_approvals` 승인 없이는 생성되지 않는다. 명시 서비스 대상은 기존 게시 보존 원칙상 유지된다.
+- 음성 대조: 등록 승인 UPDATE 의 `distribution_type` 재계산을 일시 제거하면 두 케이스 모두 `distribution_type: "PUBLIC"` 잔류로 FAIL, 복원 시 PASS.
+  (일시 제거는 검증 전용 사본에서만 수행하고 즉시 원복했다.)
+
+### 7-2. 검증 결과
+
+| 항목 | 결과 |
+|---|---|
+| PostgreSQL 전용 fixture (`scripts/dev/run-supplier-store-fixture.ts`, 일회용 loopback 클러스터) | baseline·전체 incremental prefix fingerprint 일치, 6/6 PASS, `Fixture cleanup PASS: database count 0` |
+| 음성 대조 fixture | 2 FAIL(의도) / 4 PASS, cleanup database count 0 |
+| 관련 API Jest (supplier·offer·seller·distribution·listing·registration·event-offer·neture-pharmacy 및 branch 변경 테스트 72 파일) | 64 suites/1,187 tests PASS, 8 suites/85 tests DB 조건부 SKIP, FAIL 0 |
+| API `tsc --noEmit` | PASS |
+| 변경 spec ESLint(루트 설정) | 0 errors/0 warnings |
+| KPA synthetic browser (`/supplier/event-offers`, 1440px·390px, API 전부 intercept) | 수정 응답 형태: 제안 직후·재조회 모두 이벤트 기간 표시, 기간 없는 과거 제안은 미표시, page error 0. 수정 전 응답 형태(음성 대조): 제안 직후 기간 미표시 재현 |
+
+- KPA POST 응답의 기간 값은 실제 `EventOfferService.createdListingResult` 가 저장값을 ISO 문자열로 반환함을 코드로 확인하고 같은 직렬화를 intercept 에 사용했다. 실제 로그인·권한 경로의 운영 smoke 는 아니다.
+- 일회용 클러스터·fixture DB·dev server 는 종료 후 정리했다. 운영 데이터는 생성하지 않았다.
+- 첫 관련 Jest 실행은 로컬 메모리 부족(V8 heap OOM, exit 134)으로 중단됐다. 테스트 실패가 아니며 worker 재활용 설정으로 재실행해 위 결과를 얻었다.
+
+### 7-3. 범위 밖 발견 (수정하지 않음 · 별도 WO 제안)
+
+`apps/api-server/src/utils/auto-listing.utils.ts` 의 `autoListPublicProductsForOrg`·`autoListServiceProductsForOrg` 는
+`INSERT ... SELECT $2` 의 select list(text 추론)와 `sap.service_key = $2`(varchar 추론)에 같은 파라미터를 써서
+실제 PostgreSQL 에서 항상 `inconsistent types deduced for parameter $2 (text versus character varying)` 로 실패한다.
+canonical baseline fixture 와 최소 재현 SQL 모두에서 확인했다. 이 함수는 이번 branch 에서 변경되지 않은 main 기존 코드다.
+신규 조직의 PUBLIC/SERVICE 자동 목록화 경로가 운영에서 실패하고 있을 가능성이 있으므로 호출 경로·운영 로그 확인과 `$2::varchar` 명시 등 수정은 별도 WO 로 다룬다.
+
+문서 정합: 기존 기록을 보존하고 병합 후 재검증·보강·범위 밖 발견만 추가했다. 업무 정본 변경 없음.
