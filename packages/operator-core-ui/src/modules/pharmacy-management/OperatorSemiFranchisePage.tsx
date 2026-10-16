@@ -98,11 +98,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
         </select>
       </PageHeader>
 
-      {currentBusiness?.status === 'active' && <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
-        {renderBusinessHome?.(currentBusiness)}
-        <Link to={forumHref?.(currentBusiness) ?? `/communities/${encodeURIComponent(currentBusiness.community_key || `business:${sfKey}`)}/forum`}>참여자 게시판</Link>
-        <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
-      </nav>}
+      <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.map((t) => (
           <button
@@ -440,4 +436,19 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
       </div>}
     </div>
   );
+}
+
+
+function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
+  business: SemiFranchise | undefined;
+  forumHref?: BusinessPageProps['forumHref'];
+  renderBusinessHome?: BusinessPageProps['renderBusinessHome'];
+}) {
+  if (business?.status !== 'active') return null;
+  const forum = forumHref?.(business) ?? `/communities/${encodeURIComponent(business.community_key || `business:${business.key}`)}/forum`;
+  return <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
+    {renderBusinessHome?.(business)}
+    <Link to={forum}>참여자 게시판</Link>
+    <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
+  </nav>;
 }

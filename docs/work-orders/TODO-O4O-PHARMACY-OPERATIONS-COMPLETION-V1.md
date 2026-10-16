@@ -114,3 +114,17 @@ Neture 호환 handoff와 실제 약국 웹 운영 흐름으로 관측을 정정�
 최종 재실행: Neture는 사용되지 않는 전용 이동 컴포넌트를 제거한 뒤 전체 110 files / 1,068 PASS,
 공통 운영 UI 152·약국 웹 166과 합해 1,386 PASS다. 두 앱 최종 build도 PASS다.
 실제 공개 운영 소비처는 약국 웹이며 Neture legacy wrapper는 호환/개발 소비처로 유지한다.
+
+## PR 검사 보완
+
+PR #654의 첫 SonarCloud는 신규 중복률 62.2%와 운영 화면 함수 복잡도 18(허용 15)을 지적했다.
+계정 전환 시나리오를 복제한 소비처별 테스트는 두 실제 wrapper를 실행하는 매개변수 테스트로
+통합해 동일한 4개 소비처/시나리오 검증을 보존했다. 운영 navigation을 별도 표시 함수로 분리했다.
+Sonar 제외/threshold·assertion·CI 설정은 변경하지 않았다.
+최신 main #648의 테스트 계정 SSOT·운영 스크립트 정비를 merge했으며 웹 기능 충돌은 없다.
+현재 테스트 계정 문서는 `docs/local/TEST-ACCOUNTS.local.md`다. 이 작업은 실제 자격증명을 사용하지 않는다.
+
+Sonar 보완 후 재검증: 매개변수 테스트의 두 소비처 4건, 공통 운영 UI 전체 152건,
+Neture 전체 1,070건·약국 웹 전체 164건 = 동일한 총 1,386건 PASS다.
+두 앱 TypeScript 포함 build·변경 lint·PC/mobile Chromium 14흐름도 다시 PASS했다.
+검사 제외나 기준 완화 없이 중복 테스트 코드를 제거하고 navigation 표시 책임만 분리했다.
