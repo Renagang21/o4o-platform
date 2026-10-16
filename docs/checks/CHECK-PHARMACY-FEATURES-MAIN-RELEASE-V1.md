@@ -21,3 +21,13 @@
 ## 검증·실행 기록
 
 검증 및 실제 PR/배포 결과를 아래에 기록한다.
+
+
+- PR: https://github.com/Renagang21/o4o-platform/pull/663
+- 최신 main 기준 API·전체 관리자·내 매장·약국 공통 앱·Neture production build PASS.
+- 실제 격리 PostgreSQL에서 baseline + 29 incremental 정상 적용 및 최종 fingerprint 검증 PASS. 운영 DB 조회/쓰기는 아직 하지 않았다.
+- 판정·관리자/직원 HTTP·실행 차단·SQL·태블릿 runtime: 5 suites / 39 tests PASS.
+- 공통 관리 UI 전체: 21 files / 159 tests PASS.
+- 내 매장 hook/직원 지원/업무 그룹/CarePharm 회귀: 5 files / 39 tests PASS.
+- migration contract 및 문서 민감정보 검사 PASS. 원장 생성은 빈 신규 테이블뿐이며 활성 회원 seed는 없다.
+- 병합은 PR required CI Gate와 리뷰 blocker 확인 후 진행한다. 운영 migration 승인이 필요하면 해당 SHA와 적용 범위를 제시한다. 이 기록은 사전 검증 시점이며 병합/배포 완료를 뜻하지 않는다.
