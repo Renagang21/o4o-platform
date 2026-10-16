@@ -77,7 +77,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       if(stress)await client.query("UPDATE product_identifiers SET metadata=metadata||jsonb_build_object('padding',repeat('z',131072))");
       const referencePlans=[];
       const inspected={...q,query:async(sql,args)=>{
-        if(/FROM (?:ONLY )?"public"\."product_identifiers" s/.test(sql)&&sql.includes('~ targets.pattern'))
+        if(/FROM (?:ONLY )?"public"\."product_identifiers" s/.test(sql)&&(sql.includes('~ targets.pattern')||sql.includes('strpos(')))
           referencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
@@ -187,7 +187,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       if(stress)await client.query("UPDATE product_candidates SET raw_payload=raw_payload||jsonb_build_object('padding',repeat('z',131072))");
       const mediaReferencePlans=[];
       const inspectedMedia={...q,query:async(sql,args)=>{
-        if(/FROM (?:ONLY )?"public"\."product_candidates" s/.test(sql)&&sql.includes('~ targets.pattern'))
+        if(/FROM (?:ONLY )?"public"\."product_candidates" s/.test(sql)&&(sql.includes('~ targets.pattern')||sql.includes('strpos(')))
           mediaReferencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
