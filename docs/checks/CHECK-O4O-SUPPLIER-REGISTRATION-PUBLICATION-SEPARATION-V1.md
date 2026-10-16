@@ -1,6 +1,6 @@
 # CHECK-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-16 · 최종 갱신: 2026-10-16
+> 상태: COMPLETED (로컬 검증·push 인계) · 작성일: 2026-10-16 · 최종 갱신: 2026-10-16
 > 작업: [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)
 > 기준: `04ff6b829cc087c676c663ef688153497895889c` · branch: `wo/supplier-registration-publication-separation`
 > 범위: 개발·로컬 검증·commit·push. 사용자 지시에 따라 PR·병합·운영 적용은 제외.

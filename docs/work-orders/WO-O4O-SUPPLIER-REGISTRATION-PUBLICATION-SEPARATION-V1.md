@@ -1,6 +1,6 @@
 # WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-16 · 최종 갱신: 2026-10-16
+> 상태: COMPLETED (개발·검증·push 범위) · 작성일: 2026-10-16 · 최종 갱신: 2026-10-16
 > 승인: 사용자 확정안 — 제품 등록·승인 / 서비스 게시·일반 공급 / 기간 한정 이벤트를 분리한다. TODO를 문서·코드와 대조해 보정한 뒤 개발·검증·commit·push까지 수행한다. PR은 만들지 않는다.
 > 기준: `origin/main` `04ff6b829cc087c676c663ef688153497895889c`
 > 작업 branch: `wo/supplier-registration-publication-separation`
@@ -29,7 +29,7 @@
 - [x] 공급자·운영자·매장 소비처와 공유 모듈의 영향 범위를 대조하고 관련 회귀 보완.
 - [x] 변경한 현행 기준 문서를 정합. 과거 WO/CHECK의 당시 결과는 다시 쓰지 않음.
 - [x] API·웹 테스트, lint·타입·빌드, desktop/mobile 브라우저 행동 검증과 미실행 범위 기록.
-- [ ] 명시적 파일 scope 확인 후 commit·작업 branch push. PR 생성 없음.
+- [x] 명시적 파일 scope 확인 후 commit·작업 branch push. PR 생성 없음.
 
 ## 3. 문서·코드 점검 결과와 보정
 
@@ -61,3 +61,10 @@ API·Neture·KPA 빌드, 회귀 테스트, 실제 격리 PostgreSQL 업무 흐�
 새 API의 KPA 이벤트 생성은 가격·기간을 요구하므로 구형 웹과 장기간 혼용하지 않는다. 운영 rollback은 암묵적 기본 공급 정책으로 돌아가므로 별도 판단한다.
 개발 중 이동한 `origin/main`은 `daad0563c`이며 변경은 개발 담당 push 종료에 대한 지침 문서뿐이다. 구현 경로와 충돌하지 않아 자동 통합하지 않았다.
 push는 운영 배포 완료를 뜻하지 않는다. PR은 생성하지 않는다.
+
+## 5. 개발 종료
+
+- 구현 commit: `cac451b4e8a5e89bd36590abc10dc6099cca8572`.
+- `origin/wo/supplier-registration-publication-separation` push와 원격 SHA 일치를 확인했다.
+- PR 생성·main 통합·운영 migration/배포 없음. CI Pipeline은 이 branch push의 실행 대상이 아니며 로컬 검증 결과를 인계한다.
+- branch/worktree는 후속 통합 검토를 위해 `KEEP`한다. 이번 작업의 개발 범위는 완료했다.
