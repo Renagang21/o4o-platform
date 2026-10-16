@@ -122,6 +122,7 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
   it('isolates staff support locations, private guides and concurrent anonymous demand counts', async () => {
     const support = new StoreStaffSupportService(db);
     const [product] = await db.query(`INSERT INTO store_local_products (organization_id,name) VALUES ($1,'Synthetic support product') RETURNING id`,[store]);
+    await expect(support.location(store,{kind:{toString:()=> 'local'},id:product.id,location:'wrong'})).rejects.toMatchObject({code:'INVALID_LOCATION'});
     await support.location(store,{kind:'local',id:product.id,location:'A-3'});
     expect((await support.products(store,'Synthetic support'))[0].location).toBe('A-3');
     expect(await support.products(other,'Synthetic support')).toEqual([]);

@@ -320,7 +320,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.post('/pharmacy/staff-support/demands', ...store, handle(async req => { await support(req); return staffSupport.demand(org(req),req.body?.reason); }));
   router.get('/admin/staff-support/demands', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return staffSupport.summary(req.query.month); }));
   router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
-  router.get('/admin/service-features', ...admin, handle(async () => PHARMACY_SERVICE_FEATURES));
+  router.get('/admin/service-features', ...admin, handle(() => Promise.resolve(PHARMACY_SERVICE_FEATURES)));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
   router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>

@@ -243,7 +243,7 @@ export class SemiFranchiseService {
     const name = typeof input.name === 'string' ? input.name.trim() : '';
     if (!KEY_RE.test(key)) throw new NeturePharmacyError(400, 'INVALID_KEY', 'key 는 영문 소문자 · 숫자 · - 2~63자입니다.');
     if (!name || name.length > 255) throw new NeturePharmacyError(400, 'INVALID_NAME', '이름을 입력해 주세요.');
-    return this.dataSource.transaction(async (m) => {
+    return await this.dataSource.transaction(async (m) => {
       const [dup] = await m.query(`SELECT 1 FROM semi_franchises WHERE key = $1`, [key]);
       if (dup) throw new NeturePharmacyError(409, 'KEY_IN_USE', '이미 있는 key 입니다.');
       const communityKey = input.communityKey?.trim() || null;

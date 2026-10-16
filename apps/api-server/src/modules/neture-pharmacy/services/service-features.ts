@@ -74,13 +74,14 @@ export class PharmacyServiceFeatureService {
         const member = await this.memberFeatures(owners[0].ownerUserId);
         if (member) grants.push({ ...member, type: 'member', features: readServiceFeatures(member.features) });
       }
+      const missingAllowed = this.memberFeatures ? false : null;
       return {
         organizationId,
         memberEntitlement: this.memberFeatures ? 'connected' as const : 'not-connected' as const,
         features: resolveServiceFeatureGrants(grants).map(feature => ({
           ...feature,
           // A missing personal paid adapter is unknown, never a negative membership decision.
-          allowed: feature.allowed ? true : this.memberFeatures ? false : null,
+          allowed: feature.allowed ? true : missingAllowed,
         })),
       };
     } catch {

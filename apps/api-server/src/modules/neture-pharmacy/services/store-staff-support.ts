@@ -11,7 +11,7 @@ export class StoreStaffSupportService {
   async products(org: string, search: unknown) {
     const q = typeof search === "string" ? search.trim().slice(0, 80) : "";
     if (!q) return [];
-    return this.db.query(
+    return await this.db.query(
       `WITH products AS (
       SELECT id,'local'::text AS kind,name FROM store_local_products WHERE organization_id=$1 AND is_active=true
       UNION ALL SELECT l.id,'listing'::text AS kind,m.name AS name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id WHERE l.organization_id=$1 AND l.is_active=true
@@ -29,8 +29,9 @@ export class StoreStaffSupportService {
     org: string,
     input: { kind?: unknown; id?: unknown; location?: unknown },
   ) {
+    const kind = input.kind;
     if (
-      !["local", "listing"].includes(String(input.kind)) ||
+      (kind !== "local" && kind !== "listing") ||
       typeof input.id !== "string" ||
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         input.id,
@@ -45,7 +46,7 @@ export class StoreStaffSupportService {
       );
     }
     const table =
-      input.kind === "local"
+      kind === "local"
         ? "store_local_products"
         : "organization_product_listings";
     const found = await this.db.query(
@@ -62,12 +63,12 @@ export class StoreStaffSupportService {
       `UPDATE organizations SET metadata=COALESCE(metadata,'{}'::jsonb)||jsonb_build_object('staffSupport',
       COALESCE(metadata->'staffSupport','{}'::jsonb)||jsonb_build_object('locations',
       COALESCE(metadata#>'{staffSupport,locations}','{}'::jsonb)||jsonb_build_object($2::text,$3::text))) WHERE id=$1`,
-      [org, `${input.kind}:${input.id}`, input.location.trim()],
+      [org, `${kind}:${input.id}`, input.location.trim()],
     );
     return { saved: true };
   }
   async guides(org: string) {
-    return this.db.query(
+    return await this.db.query(
       `SELECT c.id,c.title,c.summary,c.body,sf.name AS "businessName" FROM semi_franchise_contents c
       JOIN semi_franchises sf ON sf.id=c.semi_franchise_id
       JOIN semi_franchise_memberships m ON m.semi_franchise_id=sf.id AND m.organization_id=$1 AND m.status='active'
@@ -101,7 +102,7 @@ export class StoreStaffSupportService {
         "INVALID_MONTH",
         "조회 월을 확인해 주세요.",
       );
-    return this.db.query(
+    return await this.db.query(
       `SELECT o.id,o.name, o.metadata#>ARRAY['staffSupport','demandCounts',$1] AS counts
       FROM organizations o JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
       WHERE o.metadata#>ARRAY['staffSupport','demandCounts',$1] IS NOT NULL ORDER BY o.name,o.id LIMIT 500`,

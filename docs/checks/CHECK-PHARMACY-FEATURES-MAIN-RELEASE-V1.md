@@ -31,3 +31,7 @@
 - 내 매장 hook/직원 지원/업무 그룹/CarePharm 회귀: 5 files / 39 tests PASS.
 - migration contract 및 문서 민감정보 검사 PASS. 원장 생성은 빈 신규 테이블뿐이며 활성 회원 seed는 없다.
 - 병합은 PR required CI Gate와 리뷰 blocker 확인 후 진행한다. 운영 migration 승인이 필요하면 해당 SHA와 적용 범위를 제시한다. 이 기록은 사전 검증 시점이며 병합/배포 완료를 뜻하지 않는다.
+
+- PR 정적 분석 보완: 상태 메시지·버튼 접근성, 입력 kind 엄격 검사, 중첩 UI/분기 단순화. 권한 정책 변경 없음.
+- CI shard 2 실패는 기존 태블릿 조직 테스트 stub의 새 이용권 SQL 오인 응답으로 재현. 조회별 고정 응답으로 구분 후 13 tests PASS; 실서비스 권한 guard 유지.
+- 보완 후 API 판정·HTTP·격리 SQL 27 tests, SQL 입력 회귀 6 tests, 협력사업 화면 55 tests, 관련 관리/매장 화면 26 tests PASS. CI 재검증 후 병합·배포 예정.

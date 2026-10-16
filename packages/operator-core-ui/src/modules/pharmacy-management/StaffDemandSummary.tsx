@@ -29,7 +29,8 @@ export function StaffDemandSummary() {
               "/neture/admin/staff-support/demands",
               { params: { month } },
             );
-            if (!r.data.success) throw new Error();
+            if (!r.data.success)
+              throw new Error("Demand summary lookup failed");
             setRows(r.data.data);
             setMessage(r.data.data.length ? "" : "기록된 요청이 없습니다.");
           } catch {
@@ -51,11 +52,15 @@ export function StaffDemandSummary() {
           }}
           className="rounded border p-2"
         />
-        <button disabled={busy || !month} className="rounded border p-2">
+        <button
+          type="submit"
+          disabled={busy || !month}
+          className="rounded border p-2"
+        >
           집계 조회
         </button>
       </form>
-      <p role="status">{message}</p>
+      <output>{message}</output>
       <ul>
         {rows.map((r) => (
           <li key={r.id} className="mt-3 rounded border p-3">
