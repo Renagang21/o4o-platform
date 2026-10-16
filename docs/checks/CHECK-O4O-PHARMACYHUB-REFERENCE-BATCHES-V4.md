@@ -101,3 +101,15 @@ PR CI·Sonar·Codex 리뷰와 최신 main CI/Delivery를 확인하고, main 및 
 - 남은 Cloud Run job 13개(ph-dev 38381041967·38469425232·38496164336·38500564796·38673377851·38700687056·38730535162·38738916090·38767007199, ph-media 38500950060·38700997020·38730893771·38740677821)는 통합 담당의 정리 단계에서 처리한다. 이번 작업에서는 실행·삭제하지 않았다.
 
 문서 정합: V5 운영 결과(worker 성공·runner 실패)의 진단과 V6 수정을 구분해 기록했다. 기존 기록의 판정은 바꾸지 않았다.
+
+## 2026-10-16 V6 통합 검증 — 병합 보류
+
+통합 담당이 main `daad0563c` 기준 결합본에서 검증했다. 인계 source는 `c753b19157`, 검토 PR은 #650(Draft)이다.
+
+- 실 PostgreSQL development fixture에서 UUID 열이 group의 첫 열이면 `bind message supplies 1 parameters, but prepared statement requires 3`(08P01)가 재현됐다. group descriptor가 첫 UUID 열의 type을 유지해 scalar count 경로로 들어간 것이 원인이다. development/media 모두 group을 우선하여 batch 경로를 사용하도록 보완했고 UUID 선두 묶음·마지막 page 탐지 회귀 2건을 추가했다.
+- 보완 후 focused 60 PASS/0 FAIL/0 SKIP. Linux deployment 전체 225건: 219 PASS/0 FAIL/6 SKIP(일반 실행에서 opt-in PostgreSQL fixture 미지정). 변경 script ESLint PASS.
+- 별도 loopback PostgreSQL에서 development plan/apply·공유 보존·cross-schema FK·JSON 참조·그룹 결제·rollback fixture PASS. batch 전체 범위·NULL·array·literal fixture PASS(3,200행). UUID query/planner fixture PASS(100만행). GCS는 합성 storage adapter만 사용했으며 실제 운영 API/DB/GCS 접속은 없다.
+- 최초 development fixture 이름 오지정은 설정을 고쳐 재실행했다. 200만행 batch stress는 development 첫 전체 순회 79,660ms/1,954 query를 관측했으나 전체 시험이 300초 test timeout에 도달하여 중단했다. 이 stress 전체를 PASS로 보고하지 않으며 production timeout이나 테스트 제한은 상향하지 않았다.
+- 별도 합성 비교: UUID PK + 비색인 UUID 8열 + 약1KB JSON, 10만행, 삭제 root token 41개, 동일 DB에서 V5/V6 연속 실행. V5는 9묶음·107 query·2,370ms, V6는 1묶음·99 query·21,422ms였다. 두 경로 모두 참조 0건을 반환했다. query 수 감소가 속도 개선으로 이어지지 않았으며 이 workload에서는 약9배 느렸다. 실 운영 데이터의 소요 시간을 의미하지 않는다.
+
+**판정: #650 Draft 유지.** UUID 묶음 최적화는 효과가 검증되지 않아 병합·운영 plan 재실행·apply를 보류한다. 단계 진단 수정과 성능 변경을 분리하거나, native UUID 판정을 보존하는 개선안을 별도 비교 검증한 뒤 같은 branch에 추가 push한다. 운영 WIF·IAM·DB·GCS 및 기존 Cloud Run job은 변경하지 않았다.

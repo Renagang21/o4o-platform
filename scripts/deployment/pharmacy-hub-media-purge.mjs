@@ -86,7 +86,7 @@ async function references(q,locked) {
 // partition parents retain the complete scan (including foreign descendants).
 export async function countMediaReferences(q,c) {
   const sql=mediaReferenceQuery(c);
-  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  if(!c.columns&&(!c.scan_key||c.type==='uuid'))return count(q,sql);
   return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH',c.columns?c:undefined);
 }
 export function mediaReferenceTargets() {return `SELECT v AS id FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}

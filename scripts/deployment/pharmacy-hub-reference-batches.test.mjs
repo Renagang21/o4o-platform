@@ -70,6 +70,25 @@ for(const [kind,count,build] of [['dev',countDevelopmentReferences,developmentRe
  });
 }
 
+for(const [kind,count] of [['dev',countDevelopmentReferences],['media',countMediaReferences]]) {
+ test(`${kind}: a catalog group starting with an unindexed UUID still binds targets and walks late pages`,async()=>{
+  const {prepareReferenceGroups}=await import('./pharmacy-hub-reference-batches.mjs');
+  const base={schema:'public',table:'notes',scan_key:'id'};
+  const [group]=await prepareReferenceGroups({query:async()=>[{id:uuid(7)}]},[
+   {...base,column:'reviewed_by',type:'uuid',indexed:false},
+   {...base,column:'payload',type:'jsonb',indexed:false},
+  ],'targets',['ph'],'invalid');
+  let calls=0;
+  assert.equal(await count({async query(sql,args){
+   assert.equal(args.length,3);assert.deepEqual(args[2],[uuid(7)]);
+   assert.equal(args[1],calls===0?null:uuid(1024));
+   return [++calls===1?{count:'0',scanned:'1024',last_id:uuid(1024),column_index:null}:
+    {count:'1',scanned:'1',last_id:uuid(1025),column_index:'1'}];
+  }},group),1);
+  assert.equal(calls,2);assert.equal(group.matched_column,'reviewed_by');
+ });
+}
+
 test('only catalog-confirmed unindexed UUID columns join the single keyset pass; indexed/unknown UUID and unkeyed stay separate',async()=>{
  const {prepareReferenceGroups,referencePhase}=await import('./pharmacy-hub-reference-batches.mjs');
  const base={schema:'public',table:'notes',scan_key:'id'};

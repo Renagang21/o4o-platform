@@ -153,7 +153,7 @@ async function references(q,fks,tables) {
 // partition parents retain the complete scan (including foreign descendants).
 export async function countDevelopmentReferences(q,c) {
   const sql=developmentReferenceQuery(c);
-  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  if(!c.columns&&(!c.scan_key||c.type==='uuid'))return count(q,sql);
   return countReferenceBatches(q,sql,keys,'PH_DEV_REFERENCE_BATCH',c.columns?c:undefined);
 }
 export function developmentReferenceTargets() {return roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');}
