@@ -7,14 +7,16 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import TabletScreenSetManager from "../../TabletScreenSetManager";
 import TabletPage from "../../StoreTabletDisplaysPage";
 import { StoreSignagePage } from "../../StoreSignagePage";
 const api = vi.hoisted(() => ({
   store: "A",
   active: "A",
+  tablets: [] as Array<Record<string, unknown>>,
   sets: vi.fn(),
   detail: vi.fn(),
   candidates: vi.fn(),
@@ -55,9 +57,7 @@ vi.mock("../../../../api/tablet", () => ({
 }));
 vi.mock("../../../../api/tabletDisplays", async (original) => ({
   ...(await original<object>()),
-  fetchTablets: async () => [
-    { id: "corner", name: "Tablet A", location: "Corner A", is_active: true },
-  ],
+  fetchTablets: async () => api.tablets,
   fetchScreenSets: api.sets,
   fetchScreenSet: api.detail,
   fetchTabletDisplaySettings: async () => ({
@@ -169,6 +169,9 @@ const media = {
 beforeEach(() => {
   vi.clearAllMocks();
   api.store = api.active = "A";
+  api.tablets = [
+    { id: "corner", name: "Tablet A", location: "Corner A", is_active: true },
+  ];
   api.sets
     .mockReset()
     .mockResolvedValue([
@@ -265,6 +268,100 @@ it("switching stores closes a builder and ignores the old pending detail", async
   await act(async () => old.resolve({ id: "one", name: "Old" }));
   expect(screen.queryByRole("heading", { name: "Builder Old" })).toBeNull();
   expect(notify).not.toHaveBeenCalled();
+});
+it("auto-edit requests with a new key reopen the same set and the consumed request is acknowledged", async () => {
+  const handled = vi.fn();
+  const h = render(<TabletScreenSetManager onToast={vi.fn()} autoEditId="one" autoEditKey={1} onAutoEditHandled={handled} />);
+  await screen.findByRole("heading", { name: "Builder One" });
+  await waitFor(() => expect(handled).toHaveBeenCalledWith(1));
+  fireEvent.click(screen.getByText("Close builder"));
+  h.rerender(<TabletScreenSetManager onToast={vi.fn()} autoEditId={null} onAutoEditHandled={handled} />);
+  expect(screen.queryByRole("heading", { name: "Builder One" })).toBeNull();
+  h.rerender(<TabletScreenSetManager onToast={vi.fn()} autoEditId="one" autoEditKey={2} onAutoEditHandled={handled} />);
+  await screen.findByRole("heading", { name: "Builder One" });
+  await waitFor(() => expect(handled).toHaveBeenCalledWith(2));
+  expect(api.detail).toHaveBeenCalledTimes(2);
+});
+it("a late auto-edit detail after a store switch neither opens nor acknowledges", async () => {
+  const old = deferred<{ id: string; name: string }>();
+  api.detail.mockReturnValue(old.promise);
+  const handled = vi.fn(), notify = vi.fn();
+  const h = render(<TabletScreenSetManager onToast={notify} autoEditId="one" autoEditKey={1} onAutoEditHandled={handled} />);
+  await waitFor(() => expect(api.detail).toHaveBeenCalled());
+  api.store = api.active = "B";
+  h.rerender(<TabletScreenSetManager onToast={notify} autoEditId={null} onAutoEditHandled={handled} />);
+  await act(async () => old.resolve({ id: "one", name: "Old" }));
+  expect(screen.queryByRole("heading", { name: "Builder Old" })).toBeNull();
+  expect(handled).not.toHaveBeenCalled();
+  expect(notify).not.toHaveBeenCalled();
+});
+describe("현재 안내 수정 반복", () => {
+  beforeEach(() => {
+    api.tablets = [
+      { id: "corner-a", name: "Tablet A", location: "Corner A", is_active: true, currentScreenSetId: "one" },
+      { id: "corner-b", name: "Tablet B", location: "Corner B", is_active: true, currentScreenSetId: "two" },
+      { id: "corner-c", name: "Tablet C", location: "Corner C", is_active: true, currentScreenSetId: "one" },
+    ];
+    api.sets.mockResolvedValue([
+      { id: "one", name: "One", templateKey: "corner_information_basic_v1", status: "active", updatedAt: "2026-10-15" },
+      { id: "two", name: "Two", templateKey: "corner_information_basic_v1", status: "active", updatedAt: "2026-10-15" },
+    ]);
+    api.detail.mockImplementation(async (id: string) => ({ id, name: id === "two" ? "Two" : "One", blocks: [], templateKey: "corner_information_basic_v1" }));
+  });
+  async function editFromCorner(location: string) {
+    const card = (await screen.findByText(location)).closest("li, div[role='button'], div")!;
+    let node: HTMLElement | null = card as HTMLElement;
+    while (node && !within(node).queryByText("현재 안내 수정")) node = node.parentElement;
+    fireEvent.click(within(node!).getByText("현재 안내 수정"));
+  }
+  async function backToCorners() {
+    fireEvent.click(screen.getByText("Close builder"));
+    fireEvent.click(screen.getByText("위치별 운영"));
+    await screen.findByText("Corner A");
+  }
+  it("닫고 위치 화면으로 돌아와 같은 안내를 다시 수정할 수 있다", async () => {
+    render(wrap(<TabletPage />));
+    await editFromCorner("Corner A");
+    await screen.findByRole("heading", { name: "Builder One" });
+    await backToCorners();
+    await editFromCorner("Corner A");
+    await screen.findByRole("heading", { name: "Builder One" });
+    expect(api.detail).toHaveBeenCalledTimes(2);
+  });
+  it("다른 위치의 다른 안내, 같은 안내를 쓰는 다른 위치도 매번 연다", async () => {
+    render(wrap(<TabletPage />));
+    await editFromCorner("Corner A");
+    await screen.findByRole("heading", { name: "Builder One" });
+    await backToCorners();
+    await editFromCorner("Corner B");
+    await screen.findByRole("heading", { name: "Builder Two" });
+    await backToCorners();
+    await editFromCorner("Corner C");
+    await screen.findByRole("heading", { name: "Builder One" });
+    expect(api.detail.mock.calls.map(([id]) => id)).toEqual(["one", "two", "one"]);
+  });
+  it("소비한 요청은 콘텐츠 탭에 다시 들어와도 편집기를 다시 열지 않는다", async () => {
+    render(wrap(<TabletPage />));
+    await editFromCorner("Corner A");
+    await screen.findByRole("heading", { name: "Builder One" });
+    await backToCorners();
+    fireEvent.click(screen.getByText("태블릿 콘텐츠"));
+    await screen.findByText("Edit One");
+    expect(screen.queryByRole("heading", { name: /Builder/ })).toBeNull();
+    expect(api.detail).toHaveBeenCalledTimes(1);
+  });
+  it("불러오기 실패 뒤 다시 누르면 재시도해 연다", async () => {
+    api.detail.mockRejectedValueOnce(new Error("일시 오류"));
+    render(wrap(<TabletPage />));
+    await editFromCorner("Corner A");
+    await waitFor(() => expect(api.detail).toHaveBeenCalledTimes(1));
+    await screen.findByText("Edit One");
+    expect(screen.queryByRole("heading", { name: /Builder/ })).toBeNull();
+    fireEvent.click(screen.getByText("위치별 운영"));
+    await editFromCorner("Corner A");
+    await screen.findByRole("heading", { name: "Builder One" });
+    expect(api.detail).toHaveBeenCalledTimes(2);
+  });
 });
 async function openAdvanced() {
   render(wrap(<TabletPage />));

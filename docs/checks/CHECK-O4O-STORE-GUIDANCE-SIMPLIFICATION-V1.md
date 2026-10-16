@@ -109,3 +109,35 @@ Auth/선택 매장 문맥과 HTTP API만 합성 fixture다. 문맥 A/B는 실제
 - source head의 CI Gate는 PASS였으나 Sonar Reliability B로 실패했다. guardedCancel의 한 줄 다중 조건문을 동작 변경 없이 중괄호·여러 줄로 명확히 구분했다. 보완 후 관련 17 tests와 변경 대상 ESLint PASS. source export package에는 독립 build script가 없어 이를 package build PASS로 집계하지 않는다.
 
 최신 HEAD의 원격 CI·Sonar·Codex 결과는 다시 확인한다. 이 기록은 main 병합·운영 배포 성공을 선행 보고하지 않는다.
+
+## 2026-10-16 개발 담당 Codex P2 보완
+
+통합 담당 보완 HEAD `ea6369546d`(원격 동일 확인) 위에서 같은 branch로 수정했다. API·권한·route 계약, 의존성, lockfile, Sonar 설정은 바꾸지 않았다.
+
+### 수정
+
+- **제작 화면 미리보기의 상세/QR(PRRT_kwDOOXrFm86tDlmk)**: `GuidanceDialog`에 `contained` 모드를 두었다. `TabletKioskPage embedded`의 상세·코너 QR·제품 QR 확대는 `showModal()` 대신 미리보기 상자 안의 non-modal dialog로 열려 바깥 입력·버튼을 가리거나 막지 않는다. Escape·닫기·배경 클릭으로 닫고, 열 때 상세 안으로 포커스를 옮기며, 닫으면 여는 버튼으로 포커스를 돌려준다. Escape는 바깥 편집기로 전파하지 않는다. 독립 태블릿·공개 QR은 기존 native modal을 유지한다.
+- **화면 전환 정리**: 매장 slug·Screen Set id가 바뀌면 열린 상세/QR을 닫는다. draft 미리보기는 입력마다 객체가 새로 오므로 객체가 아닌 식별자로 판단하며, 같은 화면의 내용 수정에는 상세가 유지된다.
+- **'현재 안내 수정' 재요청(PRRT_kwDOOXrFm86tDsS5)**: 요청마다 증가하는 key를 붙이고, `TabletScreenSetManager`가 처리한 key를 `onAutoEditHandled`로 알려 부모가 그 요청만 비운다. 같은 Screen Set의 반복 요청, 다른 위치·같은 안내, 실패 뒤 재시도가 각각 새 요청으로 열린다. 매장 전환 뒤 이전 매장의 늦은 응답은 기존 세션 분리·`edits.cancel()`로 열지도 확인하지도 않는다. 새 UI route·전역 상태는 없다.
+- **탭과 URL 모드 일치**: 수정 요청 시 탭만 바꾸지 않고 탭 버튼과 같은 `workspace=studio` URL로 맞춘다. 이전에는 URL이 `use`로 남아 편집 뒤 '위치별 운영'을 눌러도 돌아가지 않았다.
+- **Sonar 실제 blocker**: 원격 gate 실패 조건은 new Reliability B 하나였다. 원인은 modal dialog의 배경 `onClick`에 키보드 대응이 없다는 S1082(BUG)였다. 배경 클릭의 키보드 대응으로 두 모드 공통 Escape `onKeyDown`을 붙였고, 같은 파일의 S6759(props read-only)도 정리했다. 기준 완화·skip은 하지 않았다.
+- 유지보수성 경고로 남긴 것(gate 조건 OK, 이번 수정 범위 밖): `role="status"`→`<output>` 권고 2건(TabletKioskPage, TabletContentLibraryList), 중첩 template literal 1건(tablet-screen-set-editor), dialog 이벤트 핸들러 S6847 1건. 최신 push 뒤 원격 Sonar 재분석 결과로 다시 확인해야 한다.
+
+### 검증
+
+- 관련 tests: guidance-experience 22(기존 17 + 신규 5), display-media-pages 19(기존 13 + 신규 6) PASS. 수정 전 소스로 돌린 negative control에서 신규 7개가 실패해 회귀를 잡는 것을 확인했다. 같은 안내 재편집(위치 복귀 후)과 실패 뒤 재시도 2개는 탭 전환 시 manager가 다시 mount되어 수정 전에도 통과하며, 회귀 방지용으로 유지한다.
+- Store 전체 48 files / 601 tests PASS. web-store `tsc -b`, tablet-kiosk-core `tsc --noEmit`, 변경 6파일 ESLint PASS. Store·KPA·Neture production build PASS(기존 chunk 크기 경고만).
+- 합성 browser(Chromium 1440/390px, 실제 `StoreTabletDisplaysPage`·공용 제작기·`TabletKioskPage`, Store/Auth context만 stub, API는 매장별 route fixture): 38/38 PASS.
+  - 제작 화면 작은 미리보기: 상세가 non-modal이며 미리보기 상자 안에 열리고, 포커스가 상세 안으로 간다. 상세를 연 채 바깥 '코너 제목' 입력을 편집할 수 있고, 미리보기가 갱신돼도 상세가 유지된다. Escape를 누르면 상세만 닫히고 편집기는 유지되며 포커스가 돌아온다. 닫기·배경 클릭으로 닫힌다. 바깥 버튼이 가려지지 않는다. QR 확대도 상자 안에 열리고 포커스가 복귀한다. 문서 가로 넘침이 없다. 변경이 있을 때 목록으로 가면 확인 질문이 나오고, 편집기를 닫으면 상세가 정리된다.
+  - 반복 수정: 닫기 후 위치로 돌아가 같은 안내를 재편집, 다른 위치·다른 안내, 같은 안내·다른 위치, 콘텐츠 탭 재진입 시 다시 열리지 않음, 실패 뒤 재시도, 위치 상세 패널 버튼, 매장 전환 뒤 늦은 응답 무시와 새 매장 편집.
+  - pageerror·외부 요청·네트워크 쓰기(미리보기 POST 제외) 각 0.
+  - 처음 실행에서 실패한 3건은 모두 harness 문제였고 제품 코드는 바꾸지 않았다. 매장 정보 fixture 필드명(`storeSlug`), 모바일 미리보기 안 버튼의 스크롤, 변경 후 목록 이동 확인 질문 처리를 harness에서 바로잡아 재실행했다.
+  - 이 browser 실행은 마지막 Sonar 보완(modal dialog의 Escape `onKeyDown` 추가) 전이다. 보완 뒤에는 Store 전체 tests·builds로 확인했다.
+- 임시 harness는 commit 전에 삭제했다.
+
+### 미실행
+
+- 원래 42개 synthetic browser 시나리오: 그 harness가 이 PC에 없어 재실행하지 못했다.
+- '태블릿 크게 보기' 전체 화면 overlay 안의 상세는 별도로 browser 확인하지 않았다.
+- 실계정 로그인, 실제 tablet 기기, QR 인쇄·스캔, 운영 데이터 생성은 요청 범위 밖이다.
+- 원격 CI·Sonar·Codex 재리뷰와 thread 처리는 통합 담당이 이어서 맡는다.
