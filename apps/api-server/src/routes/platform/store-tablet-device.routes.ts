@@ -1,3 +1,4 @@
+import { checkPharmacyFeature } from '../../modules/neture-pharmacy/service-feature-access.js';
 import { resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
 /**
  * 실제 태블릿 기기(store_tablet_devices) · 연결(pairing) · 현장 runtime 관리 라우트
@@ -380,6 +381,7 @@ export function registerStoreTabletDeviceRoutes(
         } catch { allowed = false; }
       }
       if (!allowed) { res.status(403).json({ success: false, error: '이 매장의 직원 권한이 없습니다.', code: 'STORE_STAFF_FORBIDDEN' }); return; }
+      if (!await checkPharmacyFeature(dataSource, res, device.organizationId, 'tablet')) return;
       await handler(req, res, { userId, device });
     };
   }
@@ -505,6 +507,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
       if (!code) { res.status(400).json({ success: false, error: '6자리 연결 코드를 입력해 주세요.', code: 'VALIDATION_ERROR' }); return; }
       const pending = await findPendingByCode(dataSource, code);
       if (!pending) { res.status(404).json({ success: false, error: '유효하지 않거나 만료된 코드입니다.', code: 'PAIRING_CODE_INVALID' }); return; }
+      if (!await checkPharmacyFeature(dataSource, res, pending.organizationId, 'tablet')) return;
       if (!pending.storeSlug) { res.status(409).json({ success: false, error: '이 매장은 공개 태블릿 주소(slug)가 없어 연결할 수 없습니다.', code: 'STORE_SLUG_MISSING' }); return; }
       const locations = await listLocations(dataSource, pending.organizationId);
       res.json({
@@ -532,6 +535,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
       const requestedLocation = typeof req.body?.locationId === 'string' && UUID_RE.test(req.body.locationId) ? req.body.locationId : null;
       const pending = await findPendingByCode(dataSource, code);
       if (!pending) { res.status(404).json({ success: false, error: '유효하지 않거나 만료된 코드입니다.', code: 'PAIRING_CODE_INVALID' }); return; }
+      if (!await checkPharmacyFeature(dataSource, res, pending.organizationId, 'tablet')) return;
       if (!pending.storeSlug) { res.status(409).json({ success: false, error: '이 매장은 공개 태블릿 주소(slug)가 없어 연결할 수 없습니다.', code: 'STORE_SLUG_MISSING' }); return; }
       let locationId: string | null = pending.currentLocationId ?? null;
       if (requestedLocation) {
@@ -575,6 +579,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
       const rows: DeviceRow[] = Array.isArray(upd?.[0]) ? upd[0] : upd;
       const device = rows?.[0];
       if (!device) { res.status(401).json({ success: false, error: 'Tablet device not connected', code: 'DEVICE_NOT_CONNECTED' }); return; }
+      if (!await checkPharmacyFeature(dataSource, res, device.organizationId, 'tablet')) return;
       let location: any = null;
       if (device.currentLocationId) {
         const l = await dataSource.query(`SELECT id, name, location FROM store_tablets WHERE id = $1 AND organization_id = $2 AND is_active = TRUE LIMIT 1`, [device.currentLocationId, device.organizationId]);

@@ -1,3 +1,4 @@
+import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
@@ -43,7 +44,7 @@ import { getBusinessInfo } from './services/business-info.js';
 import { PharmacyMembershipService } from './services/pharmacy-membership.service.js';
 import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provisioner.js';
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
-import { PHARMACY_SERVICE_FEATURES, PharmacyServiceFeatureService } from './services/service-features.js';
+import { PHARMACY_SERVICE_FEATURES } from './services/service-features.js';
 import { getSupplyOption, listActiveSemiFranchiseKeys, listSupplyOptions } from './services/supply-access.js';
 import { SupplyProposalService, type ProposalAction } from './services/supply-proposal.service.js';
 import { SemiFranchiseEventService, type EventAction } from './services/semi-franchise-event.service.js';
@@ -105,7 +106,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
-  const serviceFeatures = new PharmacyServiceFeatureService(dataSource);
+  const serviceFeatures = createPharmacyFeatureService(dataSource);
   const proposals = new SupplyProposalService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
   const recruitments = new SemiFranchiseRecruitmentService(dataSource);
@@ -301,8 +302,12 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
       actionParam<'publish' | 'archive'>(req, ['publish', 'archive']))));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
-  router.get('/pharmacy/service-features', ...store, handle(async req => serviceFeatures.resolve(req.user!.id, org(req))));
+  router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
   router.get('/admin/service-features', ...admin, handle(async () => PHARMACY_SERVICE_FEATURES));
+  const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
+  router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
+  router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>
+    memberPaidFeatures.set(uuidParam(req, 'userId'), req.user!.id, req.body ?? {})));
   router.get('/admin/semi-franchises', ...admin, handle(async () => semiFranchises.listAll()));
   router.post('/admin/semi-franchises', ...admin, handle(async (req, res) => {
     res.status(201);

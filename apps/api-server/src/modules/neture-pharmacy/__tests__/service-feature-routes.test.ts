@@ -51,11 +51,12 @@ it('requires authentication and the platform administrator role for catalog and 
 });
 
 it('uses only the guard-resolved store and never accepts paid status or a different store from the caller', async () => {
-  query.mockResolvedValue([{ key: 'a', name: 'A', features: ['tablet'] }]);
+  query.mockResolvedValueOnce([{ key: 'a', name: 'A', features: ['tablet'] }])
+    .mockResolvedValueOnce([{ ownerUserId: 'verified-owner' }]).mockResolvedValueOnce([]);
   const result = await request(app()).get('/api/v1/neture/pharmacy/service-features?organizationId=foreign&isPaid=true')
     .set('x-test-actor', 'invited-free-staff');
   expect(result.status).toBe(200);
-  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'not-connected', features: [{ allowed: true }, { allowed: null }] });
+  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'connected', features: [{ allowed: true }, { allowed: false }] });
   expect(query.mock.calls[0][1]).toEqual(['authorized-store']);
   query.mockClear();
   expect((await request(app()).get('/api/v1/neture/pharmacy/service-features').set('x-test-actor', 'uninvited')).status).toBe(403);
@@ -68,4 +69,19 @@ it('returns a retryable error instead of an empty entitlement list on lookup fai
   expect(result.status).toBe(503);
   expect(result.body).toMatchObject({ success: false, code: 'FEATURE_ACCESS_UNAVAILABLE' });
   expect(JSON.stringify(result.body)).not.toContain('private details');
+});
+
+it('restricts member paid eligibility management to platform administrators and validates writes', async () => {
+  const server = app();
+  const base = '/api/v1/neture/admin/member-paid-entitlements';
+  expect((await request(server).get(`${base}?email=fixture@example.test`)).status).toBe(401);
+  expect((await request(server).get(`${base}?email=fixture@example.test`).set('x-test-actor', 'invited-free-staff')).status).toBe(403);
+  expect(query).not.toHaveBeenCalled();
+  query.mockResolvedValueOnce([{ id: '10000000-0000-4000-8000-000000000001', email: 'fixture@example.test', active: false }]);
+  expect((await request(server).get(`${base}?email=fixture@example.test`).set('x-test-actor', 'platform-admin')).status).toBe(200);
+  expect((await request(server).put(`${base}/10000000-0000-4000-8000-000000000001`).set('x-test-actor', 'invited-free-staff').send({ active: true })).status).toBe(403);
+  expect((await request(server).put(`${base}/10000000-0000-4000-8000-000000000001`).set('x-test-actor', 'platform-admin').send({ active: 'true' })).status).toBe(400);
+  query.mockResolvedValueOnce([{ active: true }]);
+  expect((await request(server).put(`${base}/10000000-0000-4000-8000-000000000001`).set('x-test-actor', 'platform-admin').send({ active: true, endsAt: null })).status).toBe(200);
+  expect(query.mock.calls[1][1]).toEqual(['10000000-0000-4000-8000-000000000001', true, null, 'platform-admin']);
 });

@@ -493,6 +493,21 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 실제 경영자 회원 유료 원장 연결은 미완료이며, 매장 단위 이용권으로 대신하지 않는다. `MemberFeatureResolver(ownerUserId)` 연결 시 위 기준으로 조회한다. 미연결은 무료 판정이 아닌 확인 미완료 상태를 유지한다.
 
+### 15-5. 관리자 설정의 내 매장 적용·경영자 회원 원장 (2026-10-16)
+
+§15-4의 초기 단계(미연결 adapter·내 매장 미적용)를 이어 구현한다. 협력사업별 별도 코드 분기 없이 기존 `/admin/semi-franchises`를 `약국 협력사업` 독립 메뉴로 제공한다. 동일 관리 화면은 전체 관리자 앱 및 Neture 호환 wrapper가 공유한다.
+
+- **회원 유료 원장**: `member_paid_service_entitlements`는 회원당 1행으로 `active`, 선택 만료일 `ends_at`, 최종 수정 관리자·시각만 관리한다. Core User·서비스 가입/역할·기존 매장 구독 원장을 바꾸지 않는다. 전체 관리자가 정확한 이메일로 회원 조회 후 활성·해제한다. 실제 결제 수납·자동 유료 전환은 포함하지 않는다. 만료는 `ends_at > NOW()`일 때만 유효하며 NULL은 기한 없음이다.
+- **회원 관리 API**: `GET /api/v1/neture/admin/member-paid-entitlements?email=...`, `PUT /api/v1/neture/admin/member-paid-entitlements/:userId`(`active:boolean`, `endsAt:ISO timestamp|null`). 기존 platform super admin guard를 적용한다. 클라이언트는 기존 API base(`/api/v1`)를 재사용한다.
+- **공통 판정**: 접근 guard가 확정한 약국의 현재 경영자 관계를 읽고 그 회원의 유료 원장을 조회한다. 정상 활성 회원의 활성 유료 자격은 현재 카탈로그 두 기능을 제공한다. 협력사업 제공 기능과 합산한다. 직원 개인 유료 자격은 사용하지 않는다. 원장 조회 오류/경영자 관계 미확정은 503이며, 정상 조회에서 행 없음·해제·만료만 미제공으로 본다.
+- **태블릿**: 공통 및 KPA 관리 API, 기기 직원 runtime, pairing, 공개 태블릿 정보·콘텐츠 실행 경로에 같은 약국 기능 판정을 적용한다. 기존 매장/기기 접근 guard를 먼저 유지한다. 비약국 조직의 기존 규칙은 변경하지 않는다.
+- **다국어 상품 콘텐츠**: 신규 제작·가져오기·편집 및 제공 원본 HUB는 기능 자격을 확인한다. 이미 보유한 독립 사본 읽기·이미 발행한 공개 QR 열람은 유지한다. 자료를 삭제하거나 탈퇴 시 자동 회수하지 않는다.
+- **내 매장 UI**: 공통/서비스 지정 layout에서 태블릿 메뉴 및 대상 URL 진입에 서버 판정을 적용한다. 다국어 HUB/상품별 편집 진입도 확인하며 보유 사본 목록은 유지한다. 매장 변경·경로 이동·창 복귀 시 재조회하고, 이전 조직/요청 결과를 재사용하지 않는다. 오류는 확인 실패·재시도로 안내한다. 서버 API는 매 실행마다 재검증하므로 열린 화면도 기능 권한을 우회하지 않는다.
+- 운영 적용은 별도 통합 담당이 신규 incremental migration(1792137600000)을 정상 migration job으로 먼저 적용한 뒤 API·관리자·내 매장 웹을 반영한다. 이번 작업의 종료점은 코드·문서·검증·push이며 운영 DB 변경/배포를 실행하지 않는다.
+
+구현·검증·인계: [CHECK-PHARMACY-FEATURE-APPLICATION-V1](../checks/CHECK-PHARMACY-FEATURE-APPLICATION-V1.md).
+
+
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.

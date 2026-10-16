@@ -1,3 +1,4 @@
+import { requirePharmacyFeature } from '../../../modules/neture-pharmacy/service-feature-access.js';
 /**
  * Multilingual Product Content Controller
  *
@@ -179,7 +180,14 @@ export function createMultilingualProductContentController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
+  const storeAccess = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
+  const featureAccess = requirePharmacyFeature(dataSource, 'multilingual-content');
+  const requireStoreOwner: RequestHandler = (req, res, next) => storeAccess(req, res, error => {
+    if (error) return next(error);
+    // Existing copies and published QR remain readable after membership ends.
+    if (req.method === 'GET' && !req.path.endsWith('/hub')) return next();
+    return featureAccess(req, res, next);
+  });
 
   // ─── PUBLIC: GET /public/multilingual-product-contents/:publicKey?locale=en ───
   // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1

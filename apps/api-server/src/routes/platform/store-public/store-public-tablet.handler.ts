@@ -1,3 +1,4 @@
+import { checkPharmacyFeature } from '../../../modules/neture-pharmacy/service-feature-access.js';
 /**
  * Store Public Tablet Handler — Tablet products + interest requests
  *
@@ -54,6 +55,7 @@ export function createStorePublicTabletRoutes(deps: {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
       //   공개 상품 집합의 권위 = first active tablet 의 visible display rows(configured).
@@ -170,6 +172,7 @@ export function createStorePublicTabletRoutes(deps: {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       const {
         masterId,
@@ -340,6 +343,7 @@ export function createStorePublicTabletRoutes(deps: {
 
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       const interestRepo = dataSource.getRepository(TabletInterestRequest);
       const request = await interestRepo.findOne({
@@ -391,6 +395,7 @@ export function createStorePublicTabletRoutes(deps: {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
       //   optional tabletId query(코너별 태블릿). 유효한 이 매장 active tablet 이면 그 태블릿,
@@ -453,6 +458,7 @@ export function createStorePublicTabletRoutes(deps: {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       const rows = await dataSource.query(
         `SELECT show_price, show_qr, show_consultation_button, auto_slide_seconds, idle_slide_seconds
@@ -498,6 +504,7 @@ export function createStorePublicTabletRoutes(deps: {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
+      if (!await checkPharmacyFeature(dataSource, res, resolved.storeId, 'tablet')) return;
 
       const requestedTabletId = typeof req.query.tabletId === 'string' ? req.query.tabletId : null;
       // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 이용자 선택 표시 언어(O4O 1차 7개 언어).

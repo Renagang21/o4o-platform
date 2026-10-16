@@ -1,3 +1,4 @@
+import { MemberPaidFeatureService, createPharmacyFeatureService } from '../services/member-paid-features.js';
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { SemiFranchiseService } from '../services/semi-franchise.service.js';
@@ -95,6 +96,27 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     await settings.update(keys[0], { serviceFeatures: [] });
     expect((await access.resolve(user, store)).features[0].allowed).toBe(false);
   });
+  it('round-trips member eligibility and rechecks expiration, cancellation, ownership and business fallback', async () => {
+    const members = new MemberPaidFeatureService(db);
+    const service = createPharmacyFeatureService(db);
+    await members.set(users[0], users[1], { active: true, endsAt: null });
+    expect((await members.find(`feature-${tag}-0@example.test`)).active).toBe(true);
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
+    expect((await service.resolve(users[0], other)).features[0].allowed).toBe(false);
+    await members.set(users[0], users[1], { active: true, endsAt: '2000-01-01T00:00:00.000Z' });
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    await members.set(users[0], users[1], { active: false, endsAt: null });
+    await settings.update(keys[0], { serviceFeatures: ['tablet'] });
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
+    await settings.update(keys[0], { serviceFeatures: [] });
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    await members.set(users[0], users[1], { active: true, endsAt: null });
+    await db.query(`UPDATE organization_members SET user_id=$2 WHERE organization_id=$1`, [store, users[1]]);
+    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    await db.query(`UPDATE organization_members SET user_id=$2 WHERE organization_id=$1`, [store, users[0]]);
+    await members.set(users[0], users[1], { active: false, endsAt: null });
+  });
+
   it('uses the current store owner member rather than the requesting staff member', async () => {
     const paid = jest.fn(async (id: string) => id === users[0]
       ? { type: 'member' as const, key: 'paid', name: '회원 이용권', features: ['tablet' as const] } : null);
