@@ -17,7 +17,7 @@ it('moves application management to the independent model and never applies from
   render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
   fireEvent.click(await screen.findByRole('button', { name: '서비스에서 가입 · 상태 관리' }));
   await screen.findByRole('alert');
-  expect(state.handoff).toHaveBeenCalledWith(expect.anything(), { serviceKey: 'neture', origin: 'https://carepharm.neture.co.kr', returnPath: '/my/participation?store=store-a' });
+  expect(state.handoff).toHaveBeenCalledWith(expect.anything(), { serviceKey: 'carepharm', origin: 'https://carepharm.neture.co.kr', returnPath: '/my/participation?store=store-a' });
   expect(state.post).not.toHaveBeenCalled();
   expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
 });

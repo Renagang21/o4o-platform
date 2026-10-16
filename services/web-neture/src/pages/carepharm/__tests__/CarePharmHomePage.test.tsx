@@ -13,11 +13,12 @@ const business = { key: 'carepharm', name: '만성질환관리', communityKey: '
 let access: { kind: string; businessKey: string; allowed: boolean; canManage: boolean };
 let membership: string | null;
 const response = (data: unknown) => ({ data: { data } });
-const mount = (view: 'home' | 'participation' | 'materials' = 'home') => render(<MemoryRouter><CarePharmHomePage view={view} /></MemoryRouter>);
+const mount = (view: 'home' | 'participation' | 'materials' | 'tools' = 'home') => render(<MemoryRouter><CarePharmHomePage view={view} /></MemoryRouter>);
 beforeEach(() => {
   state.get.mockReset(); state.post.mockReset(); state.login.mockReset(); state.authenticated = true; state.account = 'owner'; membership = null;
   access = { kind: 'semi-franchise', businessKey: 'carepharm', allowed: false, canManage: false };
   state.get.mockImplementation(async (path: string) => {
+    if (path.endsWith('/businesses/carepharm/store-access')) return response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: access.allowed, membershipStatus: access.allowed ? 'active' : membership });
     if (path.endsWith('/businesses/carepharm')) return response(business);
     if (path === '/communities/business%3Acarepharm/access') return response(access);
     if (path === '/work-scope/accessible-stores') return response({ stores: [{ organizationId: 'owned-store', organizationName: '선택 약국', memberRole: 'owner' }] });
@@ -72,7 +73,8 @@ describe('CarePharm cooperation service', () => {
     expect(screen.queryByRole('button', { name: /복사/ })).toBeNull();
   });
   it('does not display another model materials returned in an invalid response', async () => {
-    access.allowed = true; state.get.mockImplementation(async (path: string) => response(path.endsWith('/businesses/carepharm') ? business : path.includes('/access') ? access : path === '/work-scope/accessible-stores' ? { stores: [{ organizationId: 'owned-store', organizationName: '선택 약국', memberRole: 'owner' }] } : { items: [{ id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'pharmacy' }], total: 1 }));
+    access.allowed = true; const previous = state.get.getMockImplementation()!;
+    state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store/contents') ? Promise.resolve(response({ items: [{ id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'pharmacy' }], total: 1 })) : previous(path, config));
     mount('materials'); await screen.findByRole('alert'); expect(screen.queryByText('다른 사업 자료')).toBeNull();
   });
   it('gives the assigned operator the existing scoped management entry without loading store-owner resources', async () => {
@@ -106,6 +108,59 @@ it('does not pick an arbitrary pharmacy when the owner has multiple stores', asy
 it('never replaces an invalid explicit pharmacy with the first accessible one', async () => {
   access.allowed = true;
   render(<MemoryRouter initialEntries={['/materials?store=foreign']}><CarePharmHomePage view="materials" /></MemoryRouter>);
-  await screen.findByText('자료를 이용할 약국을 선택해 주세요.');
+  await screen.findByText('회원 업무를 이용할 약국을 선택해 주세요.');
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+
+it.each([null, 'pending', 'rejected', 'suspended', 'terminated'])('does not use another pharmacy approval for selected membership %s', async status => {
+  access.allowed = true;
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access') ? Promise.resolve(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: false, membershipStatus: status })) : previous(path, config));
+  mount('tools'); await screen.findByText(/이 서비스의 가입 승인 후/);
+  expect(screen.queryByRole('button', { name: '내 약국으로' })).toBeNull();
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+it('keeps resources hidden while the selected pharmacy check is pending and rejects a mismatched reply', async () => {
+  access.allowed = true;
+  let finish!: (value: unknown) => void;
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access') ? new Promise(resolve => { finish = resolve; }) : previous(path, config));
+  mount('materials'); await waitFor(() => expect(finish).toBeTypeOf('function'));
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+  finish(response({ businessKey: 'carepharm', organizationId: 'other-store', allowed: true }));
+  await screen.findByRole('alert');
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+it('ignores a late approved response after changing to an unapproved pharmacy', async () => {
+  access.allowed = true;
+  let finish!: (value: unknown) => void;
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: any) => {
+    if (path === '/work-scope/accessible-stores') return Promise.resolve(response({ stores: ['a', 'b'].map(id => ({ organizationId: id, organizationName: id, memberRole: 'owner' })) }));
+    if (path.endsWith('/store-access')) return config.headers['X-Store-Organization-Id'] === 'a' ? new Promise(resolve => { finish = resolve; }) : Promise.resolve(response({ businessKey: 'carepharm', organizationId: 'b', allowed: false, membershipStatus: 'pending' }));
+    return previous(path, config);
+  });
+  mount('materials'); await screen.findByRole('combobox');
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'a' } });
+  await waitFor(() => expect(finish).toBeTypeOf('function'));
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'b' } });
+  await screen.findByText(/이 서비스의 가입 승인 후/);
+  finish(response({ businessKey: 'carepharm', organizationId: 'a', allowed: true, membershipStatus: 'active' }));
+  await waitFor(() => expect(screen.queryByText('혈당 관리 자료')).toBeNull());
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+it('drops an old account gate response when another account signs in', async () => {
+  access.allowed = true;
+  let finish!: (value: unknown) => void;
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => {
+    if (path.endsWith('/store-access')) return state.account === 'owner' ? new Promise(resolve => { finish = resolve; }) : Promise.resolve(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: false, membershipStatus: null }));
+    return previous(path, config);
+  });
+  const ui = mount('materials'); await waitFor(() => expect(finish).toBeTypeOf('function'));
+  state.account = 'other-account'; ui.rerender(<MemoryRouter><CarePharmHomePage view="materials" /></MemoryRouter>);
+  await screen.findByText(/이 서비스의 가입 승인 후/);
+  finish(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: true, membershipStatus: 'active' }));
+  await waitFor(() => expect(screen.queryByText('혈당 관리 자료')).toBeNull());
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
 });
