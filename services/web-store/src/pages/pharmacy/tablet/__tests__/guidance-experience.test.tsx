@@ -27,8 +27,8 @@ const sections = [
 function phone(overrides: Partial<QrScreenSet> = {}): QrScreenSet {
   return { landingType: 'screen_set', slug: 'corner-a', name: '내부 관리 이름', templateKey: 'corner_information_basic_v1', sections, ...overrides };
 }
-function tablet(templateKey = 'corner_information_basic_v1'): TabletScreenResponse {
-  return { mode: 'screen_set', templateKey, screenSet: { id: 'screen-a', name: '내부 관리 이름' }, qrUrl: '/qr/corner-a', sections };
+function tablet(templateKey = 'corner_information_basic_v1', id = 'screen-a'): TabletScreenResponse {
+  return { mode: 'screen_set', templateKey, screenSet: { id, name: '내부 관리 이름' }, qrUrl: '/qr/corner-a', sections };
 }
 const kioskApi: TabletKioskApi = {
   fetchProducts: async () => ({ data: [], meta: { page: 1, limit: 50, total: 0, totalPages: 1 } }),
@@ -117,6 +117,76 @@ describe('고객용 안내', () => {
     act(() => vi.advanceTimersByTime(61_000));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByText(/화면을 터치/)).toBeTruthy();
+  });
+});
+
+describe('제작 화면의 작은 미리보기', () => {
+  function Authoring({ screenId = 'screen-a' }: { screenId?: string }) {
+    return (
+      <div>
+        <label>바깥 입력<input aria-label="바깥 입력" defaultValue="" /></label>
+        <button type="button">바깥 저장</button>
+        <div data-testid="preview" style={{ position: 'relative', width: 320, height: 200 }}>
+          <TabletKioskPage slug="fixture" api={kioskApi} previewScreen={tablet('corner_information_basic_v1', screenId)} embedded />
+        </div>
+      </div>
+    );
+  }
+  it('상세는 미리보기 상자 안에서 열리고 바깥 입력·버튼을 막지 않는다', async () => {
+    render(<Authoring />);
+    await act(async () => undefined);
+    const opener = screen.getByRole('button', { name: /사용 순서/ }); opener.focus(); fireEvent.click(opener);
+    const dialog = screen.getByRole('dialog', { name: '사용 순서' });
+    expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
+    expect(dialog.hasAttribute('open')).toBe(true);
+    expect(screen.getByTestId('preview').contains(dialog)).toBe(true);
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    const outside = screen.getByLabelText('바깥 입력') as HTMLInputElement;
+    outside.focus(); fireEvent.change(outside, { target: { value: '계속 편집' } });
+    expect(document.activeElement).toBe(outside); expect(outside.value).toBe('계속 편집');
+    expect(screen.getByRole('dialog', { name: '사용 순서' })).toBeTruthy();
+  });
+  it('미리보기 상세는 Escape·닫기·바깥 배경으로 닫히고 포커스를 돌려준다', async () => {
+    render(<Authoring />);
+    await act(async () => undefined);
+    const opener = screen.getByRole('button', { name: /사용 순서/ });
+    opener.focus(); fireEvent.click(opener);
+    fireEvent.keyDown(screen.getByRole('dialog', { name: '사용 순서' }), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull(); expect(document.activeElement).toBe(opener);
+    opener.focus(); fireEvent.click(opener);
+    fireEvent.click(within(screen.getByRole('dialog', { name: '사용 순서' })).getByRole('button', { name: '닫기' }));
+    expect(screen.queryByRole('dialog')).toBeNull(); expect(document.activeElement).toBe(opener);
+    fireEvent.click(opener);
+    fireEvent.click(screen.getByRole('dialog', { name: '사용 순서' }).parentElement!);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+  it('미리보기 QR 확대도 상자 안에 머물고 닫기 버튼으로 정리된다', async () => {
+    render(<Authoring />);
+    await act(async () => undefined);
+    const qr = screen.getByRole('button', { name: '휴대전화로 보기 — QR 크게 보기' });
+    qr.focus(); fireEvent.click(qr);
+    const dialog = screen.getByRole('dialog', { name: '휴대전화로 보기' });
+    expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
+    expect(screen.getByTestId('preview').contains(dialog)).toBe(true);
+    fireEvent.click(within(dialog).getByRole('button', { name: '닫기' }));
+    expect(screen.queryByRole('dialog')).toBeNull(); expect(document.activeElement).toBe(qr);
+  });
+  it('다른 안내로 미리보기를 바꾸면 이전 상세를 닫고, 입력 중 갱신은 상세를 유지한다', async () => {
+    const view = render(<Authoring />);
+    await act(async () => undefined);
+    fireEvent.click(screen.getByRole('button', { name: /사용 순서/ }));
+    view.rerender(<Authoring />);
+    expect(screen.getByRole('dialog', { name: '사용 순서' })).toBeTruthy();
+    view.rerender(<Authoring screenId="screen-b" />);
+    await act(async () => undefined);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+  it('독립 태블릿은 기존처럼 native modal 로 연다', async () => {
+    render(<TabletKioskPage slug="fixture" api={kioskApi} previewScreen={tablet()} />);
+    await act(async () => undefined);
+    fireEvent.click(screen.getByRole('button', { name: /사용 순서/ }));
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalledOnce();
+    expect(document.querySelector('[data-guidance-contained]')).toBeNull();
   });
 });
 

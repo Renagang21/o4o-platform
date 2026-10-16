@@ -80,28 +80,28 @@ export const VISIBILITY_STATUS: Record<VisibilityStatusKey, {
     description: '비활성 상태라 운영자 화면에 노출되지 않습니다.',
   },
   PRIVATE: {
-    label: '비공개',
+    label: '일반 공급 미게시',
     bg: 'bg-slate-100',
     text: 'text-slate-500',
-    description: '유통 타입이 비공개라 운영자 화면에 노출되지 않습니다.',
+    description: '일반 공급 게시 대상이 없습니다. 이벤트·특가는 별도 상태로 관리합니다.',
   },
   REJECTED: {
     label: '반려됨',
     bg: 'bg-red-50',
     text: 'text-red-600',
-    description: '서비스 승인이 반려되었습니다. 수정 후 재요청해 주세요.',
+    description: '선택한 공급의 검토 상태를 확인해 주세요. 제품 등록 승인과 서비스 승인은 별도입니다.',
   },
   PENDING: {
     label: '승인 대기',
     bg: 'bg-amber-50',
     text: 'text-amber-700',
-    description: '서비스 승인 대기 중입니다. 승인되면 운영자 화면에 노출됩니다.',
+    description: '등록 또는 대상 서비스의 승인 검토 중입니다. 등록 승인만으로 게시되지는 않습니다.',
   },
   VISIBLE: {
     label: '노출 가능',
     bg: 'bg-emerald-50',
     text: 'text-emerald-700',
-    description: '공개·활성 상태이므로 운영자 화면에 노출됩니다.',
+    description: '명시적으로 선택한 일반 공급 대상에 게시할 수 있습니다.',
   },
 };
 
@@ -159,9 +159,15 @@ export function getServiceDisplay(serviceKeys: string[] | null | undefined): str
 export function getVisibilityStatus(product: {
   isActive: boolean;
   distributionType: string;
+  defaultSupplyEnabled?: boolean;
+  isPublic?: boolean;
+  approvalStatus?: string;
   serviceApprovals?: Array<{ serviceKey: string; status: string }> | null;
 }): VisibilityStatusKey {
+  if (product.approvalStatus === 'PENDING') return 'PENDING';
+  if (product.approvalStatus === 'REJECTED') return 'REJECTED';
   if (!product.isActive) return 'INACTIVE';
+  if (product.defaultSupplyEnabled || product.isPublic) return 'VISIBLE';
   if (product.distributionType === 'PRIVATE') return 'PRIVATE';
 
   const approvals = (product.serviceApprovals || []).filter(a => a.serviceKey !== 'neture');

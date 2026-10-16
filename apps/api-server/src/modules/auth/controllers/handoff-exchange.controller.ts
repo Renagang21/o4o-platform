@@ -1,3 +1,4 @@
+import { getHandoffServiceAlias } from '../../../config/handoff-service-aliases.js';
 import { getNetureMainMembershipStatus } from '../../neture/services/neture-main-membership.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
@@ -191,6 +192,18 @@ export class HandoffExchangeController extends BaseController {
             targetWorkspace: payload.targetWorkspace,
           },
           payload.sourceAuthMethod,
+        );
+      }
+
+      // Alias tokens are consumed only by their exact receiver, then issue the existing account session.
+      // Canonical Neture tokens still go through the representative-only origin/path contract below.
+      const alias = getHandoffServiceAlias(payload.targetServiceKey);
+      if (alias) {
+        if (req.get('origin') !== alias.origin) {
+          return BaseController.error(res, 'Handoff token is invalid or expired', 401, 'HANDOFF_TOKEN_INVALID');
+        }
+        return HandoffExchangeController.issueHandoffSession(
+          req, res, user, roles, memberships, { targetServiceKey: alias.sessionServiceKey }, payload.sourceAuthMethod,
         );
       }
 

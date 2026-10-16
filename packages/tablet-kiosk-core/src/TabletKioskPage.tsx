@@ -521,6 +521,12 @@ export function TabletKioskPage({
   }, [slug, api, previewScreen, viewerLang, screenRefreshKey]);
   // 주입 우선(previewScreen) → 없으면 fetch 결과. mode='screen_set' 인 것만 유효.
   const screen = (previewScreen && previewScreen.mode === 'screen_set') ? previewScreen : fetchedScreen;
+  // 다른 화면(매장 slug·Screen Set)으로 바뀌면 이전 화면의 상세/QR 을 닫는다.
+  //   draft 미리보기는 입력마다 previewScreen 객체가 새로 오므로 객체가 아닌 식별자로만 판단한다.
+  const screenIdentity = `${slug ?? ''}\u0000${screen?.screenSet?.id ?? ''}`;
+  useEffect(() => {
+    setOpenContentCard(null); setQrModalOpen(false); setProductQrZoom(null);
+  }, [screenIdentity]);
 
   // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
   //   product_list 에 **명시 선택**이 저장되면 서버가 selectionMode='selected' + 선택 순서의 products 를 내려준다.
@@ -1170,7 +1176,7 @@ export function TabletKioskPage({
       </main>
 
       {qrModalOpen && cornerQrUrl && (
-        <GuidanceDialog label={'휴대전화로 보기'} onClose={() => setQrModalOpen(false)} style={styles.qrModal}>
+        <GuidanceDialog label={'휴대전화로 보기'} onClose={() => setQrModalOpen(false)} style={styles.qrModal} contained={embedded}>
             <div style={styles.qrModalTitle}>휴대전화로 이어서 보기</div>
             <div style={styles.qrModalDesc}>QR을 스캔하면 이 코너 안내를 휴대전화에서 확인할 수 있습니다.</div>
             <div style={{ margin: '18px 0' }}><QrImage url={cornerQrUrl} size={200} /></div>
@@ -1181,7 +1187,7 @@ export function TabletKioskPage({
       {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기 — 위 코너 QR 모달과 동일 스타일 재사용.
           어떤 용도의 QR 인지는 매장이 정한다(O4O 가 규정하지 않음) → 안내 문구를 용도 중립으로 둔다. */}
       {productQrZoom && (
-        <GuidanceDialog label={productQrZoom.name} onClose={() => setProductQrZoom(null)} style={styles.qrModal}>
+        <GuidanceDialog label={productQrZoom.name} onClose={() => setProductQrZoom(null)} style={styles.qrModal} contained={embedded}>
             <div style={styles.qrModalTitle}>{productQrZoom.name}</div>
             <div style={styles.qrModalDesc}>QR을 스캔하면 휴대전화에서 이어서 확인할 수 있습니다.</div>
             <div style={{ margin: '18px 0' }}><QrImage url={productQrZoom.url} size={200} /></div>
@@ -1190,7 +1196,7 @@ export function TabletKioskPage({
       )}
 
       {openContentCard && (
-        <GuidanceDialog label={openContentCard.title || '안내 상세'} onClose={() => setOpenContentCard(null)} style={styles.contentModal}>
+        <GuidanceDialog label={openContentCard.title || '안내 상세'} onClose={() => setOpenContentCard(null)} style={styles.contentModal} contained={embedded}>
             <div style={styles.contentModalHeader}>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px', minWidth: 0 }}>
                 {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 상세 모달 출처 배지 공개 미노출. */}

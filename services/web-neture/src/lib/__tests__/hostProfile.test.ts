@@ -11,7 +11,7 @@ describe('CarePharm host boundary', () => {
     expect(getHostProfile('CAREPHARM.neture.co.kr')).toBe('carepharm');
     expect(getHostProfile('carepharm.neture.co.kr.example.com')).toBe('main');
   });
-  it.each(['/', '/login', '/terms', '/mypage', '/communities/carepharm/forum', '/communities/carepharm/public/post/example'])('keeps its own route %s', path => {
+  it.each(['/', '/login', '/terms', '/mypage', '/my/participation', '/materials', '/tools', '/communities/business%3Acarepharm/forum', '/operator/semi-franchises'])('keeps its own route %s', path => {
     expect(decideHost('carepharm', loc(path))).toEqual({ kind: 'stay' });
   });
   it.each(['/communities/pharmacy/forum', '/communities/carepharm-other/forum', '/operator/service-members/community'])('does not claim another community or service role at %s', path => {
@@ -177,4 +177,9 @@ it.each(['supplier', 'funding', 'community'] as const)('%s member list/detail re
 it.each(['main', 'supplier', 'funding', 'community'] as const)('%s preserves old creator URLs and routes directly to funding', profile => {
   expect(decideHost(profile, loc('/supplier/market-trial/new', '?from=nav', '#form'))).toEqual({ kind: 'external', href: 'https://funding.neture.co.kr/market-trial/manage/new?from=nav#form' });
   if (profile === 'funding') for (const path of ['/market-trial/manage/new', '/market-trial/manage/project/edit', '/market-trial/project/forum/write']) expect(decideHost(profile, loc(path))).toEqual({ kind: 'stay' });
+});
+
+it('keeps only CarePharm operator routes on its own host', () => {
+  expect(decideHost('carepharm', loc('/operator/semi-franchises/carepharm/contents/new'))).toEqual({ kind: 'stay' });
+  expect(decideHost('main', loc('/operator/semi-franchises'))).toEqual({ kind: 'external', href: 'https://pharmacy.neture.co.kr/operator/semi-franchises' });
 });

@@ -203,7 +203,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '승인 요청' }));
+    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
     expect(api.submitForApproval).not.toHaveBeenCalled();
     expect(screen.getByText('1개 선택')).toBeTruthy();
   });
@@ -222,7 +222,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /승인요청 전/ }).textContent).toContain('—'),
+      expect(screen.getByRole('button', { name: /등록 검토 중/ }).textContent).toContain('—'),
     );
     expect(screen.queryByText('상품 목록을 불러오지 못했습니다.')).toBeNull();
   });
@@ -232,7 +232,7 @@ describe('SupplierProductsPage existing workflow', () => {
     await loaded();
     fireEvent.change(screen.getByLabelText('상품 검색'), { target: { value: '바코드' } });
     fireEvent.click(screen.getByRole('button', { name: '검색 실행' }));
-    fireEvent.click(screen.getByRole('button', { name: /승인 요청 중/ }));
+    fireEvent.click(screen.getByRole('button', { name: /등록 검토 중/ }));
     await waitFor(() =>
       expect(api.getProductsPaginated).toHaveBeenLastCalledWith(
         expect.objectContaining({ keyword: '바코드', serviceApprovalStatus: 'pending', page: 1 }),
@@ -250,7 +250,7 @@ describe('SupplierProductsPage existing workflow', () => {
     fireEvent.click(screen.getByRole('button', { name: '2페이지' }));
     await screen.findByText('현재 페이지 2');
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '승인 요청' }));
+    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
     await screen.findByText('1건 승인 요청 완료');
     await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(3));
     expect(api.getProductsPaginated.mock.lastCall?.[0].page).toBe(2);
@@ -267,7 +267,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '승인 요청' }));
+    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
     await screen.findByText('승인 요청 결과');
     expect(screen.getByText('승인 요청 제외: 1건')).toBeTruthy();
     expect(screen.getAllByText('검증 상품 1').length).toBeGreaterThan(1);

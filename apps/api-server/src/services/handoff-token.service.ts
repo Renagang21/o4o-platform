@@ -1,3 +1,4 @@
+import { getHandoffServiceAlias } from '../config/handoff-service-aliases.js';
 /**
  * Handoff Token Service
  *
@@ -101,7 +102,7 @@ class HandoffTokenService {
     let targetWorkspace: HandoffWorkspace | null = null;
     if (resolved.kind === 'service') {
       // Validate target service exists in catalog
-      const targetService = getService(resolved.targetServiceKey);
+      const targetService = getService(getHandoffServiceAlias(resolved.targetServiceKey)?.sessionServiceKey ?? resolved.targetServiceKey);
       if (!targetService) {
         throw new Error(`Unknown target service: ${resolved.targetServiceKey}`);
       }

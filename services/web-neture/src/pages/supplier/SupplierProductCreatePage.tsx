@@ -1,11 +1,10 @@
 /**
- * SupplierProductCreatePage - 공급자 신규 제품 검토 요청 (3-Step Wizard · Candidate 제출)
+ * SupplierProductCreatePage - 공급자 신규 제품 검토 요청 (2-Step Wizard · Candidate 제출)
  *
  * WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
  *
  * Step 1: 기본 정보 (상품명, 카테고리, 브랜드, 제조사, 바코드 optional, 규제)
- * Step 2: 기본 공급가 초안 (offerDraft — 승격 후 Offer 생성 시 참고)
- * Step 3: 이미지/설명/검토 요청
+ * Step 2: 이미지/설명/검토 요청
  *
  * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1:
  *   이 화면은 더 이상 ProductMaster/Offer 를 만들지 않는다. 제출 = POST /supplier/product-candidates (Candidate).
@@ -28,7 +27,6 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SupplierProductImportPage from './SupplierProductImportPage';
 import { toast } from '@o4o/error-handling';
-import { ProductForm } from '../../components/product';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { loadAndClearDraft } from '../../lib/product-import/storage';
@@ -58,7 +56,7 @@ function CandidateRequestComplete({ registered, productType }: Readonly<{
         <p className="text-xs text-blue-700/80 mt-2">
           아직 <strong>공급 상품(Offer)으로 등록된 것은 아닙니다.</strong> 운영자가 제품 정보를
           검토해 표준 제품(ProductMaster)으로 확정하면, 제품 라이브러리에서 해당 제품을 선택해
-          공급가·공급 방식을 설정하고 공급을 시작할 수 있습니다.
+          내 제품 등록을 요청할 수 있습니다. 등록 승인 후 서비스 게시와 이벤트를 각각 진행하세요.
           {productType?.rx && ' 처방의약품은 승격 후에도 약국 대상 서비스 공급으로만 연결됩니다.'}
         </p>
         {(registered.candidateId || registered.identifierValue) && (
@@ -105,7 +103,7 @@ export default function SupplierProductCreatePage() {
   const formState = useSupplierCandidateForm(importDraft);
   const media = useSupplierCandidateMedia(importDraft);
   const { registered, submitting, handleSubmit } = useSupplierCandidateSubmission(formState, media);
-  const { guideTitle, guideDesc, guideSteps } = useSupplierCandidateGuide();
+  const { guideTitle } = useSupplierCandidateGuide();
   const {
     navigate,
     productType,
@@ -114,8 +112,6 @@ export default function SupplierProductCreatePage() {
     form,
     submitError,
     handleApplyDraft,
-    productFormInitialData,
-    handleProductFormChange,
     goNext,
     goBack,
     goToSourceImport,
@@ -169,14 +165,12 @@ export default function SupplierProductCreatePage() {
           variant="info"
           title={guideTitle ?? '제품 정보를 검토 요청으로 제출합니다.'}
           description={
-            guideDesc ??
-            '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 선택해 공급가·공급 방식을 설정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요. 사진·PDF·URL 이 있으면 [ChatGPT로 작업]으로 제품정보를 정리해 입력란에 채운 뒤 확인·수정할 수 있습니다.'
+            '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 내 제품으로 등록합니다. 가격·게시 대상·이벤트 기간은 각 후속 업무에서 정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요. 사진·PDF·URL 이 있으면 [ChatGPT로 작업]으로 제품정보를 정리해 입력란에 채운 뒤 확인·수정할 수 있습니다.'
           }
           steps={
-            guideSteps ?? [
+            [
               'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다 (직접 입력 · 상세페이지 소스 · ChatGPT 결과 적용 중 편한 방법으로. 바코드가 있으면 조회해 기존 제품 여부를 확인)',
-              'Step 2: 기본 공급가 초안을 입력합니다 (승격 후 Offer 연결 시 참고값)',
-              'Step 3: 대표 이미지와 상세 설명을 첨부하고 검토 요청을 제출합니다',
+                            'Step 2: 대표 이미지와 상세 설명을 첨부하고 검토 요청을 제출합니다',
             ]
           }
           compact
@@ -293,26 +287,7 @@ export default function SupplierProductCreatePage() {
 
         {currentStep === 1 && <SupplierCandidateBasicFields controller={formState} />}
 
-        {/* ==================== Step 2: 기본 공급가 (WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1) ====================
-           정보-우선: 등록 단계에서는 기본 공급가만 입력하고, 공급 방식(전체 공개/서비스 공급)은 등록 후 별도 설정한다. */}
-        {currentStep === 2 && (
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">기본 공급가 (초안)</h3>
-            <p className="text-xs text-slate-500 mb-5">
-              검토 요청에 함께 보관되는 <strong>참고 초안</strong>입니다. 실제 공급가·공급
-              방식·재고는 운영자 승격 후 제품 라이브러리에서 공급 연결할 때 확정합니다.
-            </p>
-            <ProductForm
-              mode="create"
-              initialData={productFormInitialData}
-              onChange={handleProductFormChange}
-              hideDistribution
-              hideStock
-            />
-          </div>
-        )}
-
-        {currentStep === 3 && <SupplierCandidateMediaFields formState={formState} media={media} />}
+        {currentStep === 2 && <SupplierCandidateMediaFields formState={formState} media={media} />}
 
         {/* ==================== Error / Navigation ==================== */}
         {submitError && (
@@ -338,7 +313,7 @@ export default function SupplierProductCreatePage() {
             </button>
           )}
 
-          {currentStep < 3 ? (
+          {currentStep < 2 ? (
             <button
               onClick={goNext}
               className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium"

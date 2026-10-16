@@ -114,10 +114,6 @@ const MEMBERSHIP_BACKED_SIGNAGE_SERVICE_KEYS = new Set([
   'kpa-society',
   'k-cosmetics',
   'neture',
-  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8:
-  //   pharmacy-hub 도 service_memberships 축을 가진 canonical service 다. 빠져 있으면
-  //   공통 signage 라우트에서만 membership 검사가 면제돼 다른 4서비스와 계약이 어긋난다.
-  'pharmacy-hub',
 ]);
 
 /**

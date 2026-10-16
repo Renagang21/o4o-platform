@@ -27,8 +27,11 @@ export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 
 export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[] {
   if (profile === 'carepharm') return [
-    { label: '모임 소개', href: '/' },
-    { label: '내 정보', href: '/mypage' },
+    { label: '회원 공간', href: '/' },
+    { label: '참여 신청 · 상태', href: '/my/participation' },
+    { label: '회원 게시글', href: '/communities/business%3Acarepharm/forum' },
+    { label: '사업 자료', href: '/materials' },
+    { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'community') return [
     { label: '커뮤니티 · 단체활동', href: '/' },

@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from './businessSite';
 /**
  * pharmacy.neture.co.kr 표시 브랜드 — WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
  *
@@ -10,8 +11,8 @@
  * 기존 KPA-Society asset(public/favicon.png · public/icons/*)은 교체 전까지 그대로 쓴다.
  */
 
-export const PHARMACY_DISPLAY_NAME = 'O4O 약국';
-export const PHARMACY_ORIGIN = 'https://pharmacy.neture.co.kr';
+export const PHARMACY_DISPLAY_NAME = BUSINESS_SITE.name;
+export const PHARMACY_ORIGIN = BUSINESS_SITE.key === 'megapharm' ? 'https://megapharm.neture.co.kr' : 'https://pharmacy.neture.co.kr';
 export const PHARMACY_ACCENT = '#2563eb';
 
 /** 공용 헤더 브랜드 (GlobalHeader `brand`) */

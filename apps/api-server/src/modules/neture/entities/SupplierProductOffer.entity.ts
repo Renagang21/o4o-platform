@@ -82,6 +82,13 @@ export class SupplierProductOffer {
   })
   approvalStatus: OfferApprovalStatus;
 
+  @Column({ name: 'registration_rejection_reason', type: 'text', nullable: true })
+  registrationRejectionReason: string | null;
+
+  /** Neture 약국 기본 공급 게시 선택. 제품 승인·이벤트 사용 가능 여부와 독립. */
+  @Column({ name: 'default_supply_enabled', type: 'boolean', default: false })
+  defaultSupplyEnabled: boolean;
+
   @Column({ name: 'is_active', type: 'boolean', default: false })
   isActive: boolean;
 

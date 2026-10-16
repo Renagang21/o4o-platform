@@ -422,7 +422,13 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           )}
 
           {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Offer 배포 설정 분리 */}
-          {!isEditing && (
+          {!isEditing && returnTo && !approvalActions && (
+            <Section title="서비스 게시">
+              <p className="text-sm text-slate-600">등록 승인과 게시 상태는 별도입니다. 기본 공급·대상 서비스·가격은 서비스 게시에서 설정하고, 기간 한정 판매는 이벤트·특가에서 진행하세요.</p>
+              <button type="button" className="mt-3 rounded-lg border px-3 py-2 text-sm text-blue-700" onClick={() => navigate(`/supplier/products/publication?offer=${product.id}&returnTo=${encodeURIComponent(supplierTaskReturnTo)}`)}>서비스 게시 관리</button>
+            </Section>
+          )}
+          {!isEditing && (!returnTo || approvalActions) && (
             <OfferDistributionSection
               product={product}
               navigate={navigate}

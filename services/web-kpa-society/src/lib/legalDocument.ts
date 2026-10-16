@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../config/businessSite';
 /**
  * KPA Society 공개 정책 문서 loader
  * WO-O4O-KPA-LEGAL-POLICY-ROUTES-ALIGNMENT-V1
@@ -42,7 +43,7 @@ export async function loadPublishedLegalDocument(documentType: string): Promise<
 // ─── Canonical 정책문서 (service_policy_documents) + legacy fallback ───────────
 // WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1
 
-const POLICY_SERVICE_KEY = 'kpa-society';
+const POLICY_SERVICE_KEY = BUSINESS_SITE.authServiceKey;
 
 export interface PublicPolicyDocument {
   title: string;
@@ -89,6 +90,8 @@ export async function loadPublishedPolicyDocument(documentType: string): Promise
   } catch {
     // 네트워크 오류 → legacy fallback (표준 조회 실패가 공개를 막지 않도록)
   }
+
+  if (BUSINESS_SITE.key !== 'pharmacy') return { status: 'empty' };
 
   // 2) legacy kpa_legal_documents (전환 안전망)
   const legacy = await loadPublishedLegalDocument(documentType);

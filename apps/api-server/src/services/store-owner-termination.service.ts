@@ -37,7 +37,7 @@ const SERVICE_CONFIG: Record<StoreOwnerContractServiceKey, ServiceConfig> = {
 };
 
 /** 공유 Store 데이터 보호 시 현재 store-capable enrollment 로 취급할 축. */
-const SHARED_STORE_SERVICE_CODES = ['kpa-society', 'k-cosmetics', 'pharmacy-hub', 'cafe24-b2b'] as const;
+const SHARED_STORE_SERVICE_CODES = ['kpa-society', 'k-cosmetics', 'cafe24-b2b'] as const;
 
 export interface StoreOwnerTerminationCase {
   id: string;

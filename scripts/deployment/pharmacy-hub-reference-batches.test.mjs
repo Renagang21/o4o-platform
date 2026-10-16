@@ -65,7 +65,50 @@ for(const [kind,count,build] of [['dev',countDevelopmentReferences,developmentRe
   assert.equal(group.matched_column,'b');
   for(const column_index of [null,'0','3','bad'])await assert.rejects(count({query:async()=>[
    {count:'1',scanned:'1',last_id:uuid(1),column_index}]},group),/REFERENCE_BATCH/);
-  const sql=build(group);assert.match(sql,/ARRAY\[s\."a"::text,s\."b"::text\]/);assert.match(sql,/unnest\(\$3::text\[\]\)/);
+  const sql=build(group);assert.match(sql,/s\."a"::text AS v1,s\."b"::text AS v2/);assert.match(sql,/unnest\(\$3::text\[\]\)/);
   assert.doesNotMatch(sql,/FROM public\./);assert.match(sql,/CASE\s+WHEN octet_length/);
  });
 }
+
+for(const [kind,count] of [['dev',countDevelopmentReferences],['media',countMediaReferences]]) {
+ test(`${kind}: a catalog group starting with an unindexed UUID still binds targets and walks late pages`,async()=>{
+  const {prepareReferenceGroups}=await import('./pharmacy-hub-reference-batches.mjs');
+  const base={schema:'public',table:'notes',scan_key:'id'};
+  const [group]=await prepareReferenceGroups({query:async()=>[{id:uuid(7)}]},[
+   {...base,column:'reviewed_by',type:'uuid',indexed:false},
+   {...base,column:'payload',type:'jsonb',indexed:false},
+  ],'targets',['ph'],'invalid');
+  let calls=0;
+  assert.equal(await count({async query(sql,args){
+   assert.equal(args.length,3);assert.deepEqual(args[2],[uuid(7)]);
+   assert.equal(args[1],calls===0?null:uuid(1024));
+   return [++calls===1?{count:'0',scanned:'1024',last_id:uuid(1024),column_index:null}:
+    {count:'1',scanned:'1',last_id:uuid(1025),column_index:'1'}];
+  }},group),1);
+  assert.equal(calls,2);assert.equal(group.matched_column,'reviewed_by');
+ });
+}
+
+test('only catalog-confirmed unindexed UUID columns join the single keyset pass; indexed/unknown UUID and unkeyed stay separate',async()=>{
+ const {prepareReferenceGroups,referencePhase}=await import('./pharmacy-hub-reference-batches.mjs');
+ const base={schema:'public',table:'notes',scan_key:'id'};
+ const columns=[{...base,column:'id',type:'uuid',indexed:true},{...base,column:'payload',type:'jsonb',indexed:false},
+  {...base,column:'reviewed_by',type:'uuid',indexed:false},{...base,column:'owner_id',type:'uuid'},
+  {...base,scan_key:null,table:'legacy',column:'ref_id',type:'uuid',indexed:false}];
+ const groups=await prepareReferenceGroups({query:async()=>[{id:uuid(1)}]},columns,'targets',['ph'],'invalid');
+ assert.deepEqual(groups.map(c=>c.columns??c.column),['id',['payload','reviewed_by'],'owner_id','ref_id']);
+ assert.deepEqual(groups.map(referencePhase),['reference_uuid:public.notes.id','reference_group:public.notes',
+  'reference_uuid:public.notes.owner_id','reference_uuid:public.legacy.ref_id']);
+ assert.deepEqual(groups[1].types,['jsonb','uuid']);
+ // The folded UUID keeps native equality; only short legacy tokens use the text regex.
+ for(const sql of [developmentReferenceQuery(groups[1]),mediaReferenceQuery(groups[1])]) {
+  assert.match(sql,/s\."payload"::text AS v1,s\."reviewed_by" AS v2,/);
+  assert.match(sql,/\(source\.v2 = ANY\(targets\.uuids\) OR \(targets\.legacy_pattern IS NOT NULL AND \(source\.v2::text COLLATE "C"\) ~ targets\.legacy_pattern\)\)/);
+  assert.match(sql,/CASE WHEN octet_length\(source\.v1\)>=targets\.min_bytes THEN EXISTS \(SELECT 1 FROM unnest\(targets\.tokens\) target\s+WHERE strpos\(source\.v1 COLLATE "C",target\)>0\) ELSE FALSE END/);
+  assert.match(sql,/SELECT array_agg\(token\) AS tokens,/);
+  assert.doesNotMatch(sql,/targets\.pattern/);
+  assert.doesNotMatch(sql,/"reviewed_by"::text/);
+  assert.match(sql,/found AS MATERIALIZED \(/);
+ }
+ assert.throws(()=>developmentReferenceQuery({...groups[1],types:['jsonb']}),/PH_PURGE_REFERENCE_GROUP/);
+});

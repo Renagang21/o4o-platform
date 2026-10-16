@@ -9,8 +9,8 @@ export const O4O_BRAND_DESCRIPTION = '소규모 사업자를 위한 O4O(Online f
 /** 하위 host 대표 화면(`/`) 메타 — Hero 확정 문구와 같은 값 */
 export const SUBHOST_HOME_SEO: Readonly<Record<SubHost, PageSeoConfig>> = Object.freeze({
   carepharm: {
-    title: 'CarePharm — 만성질환 관리 약국 협업 모임',
-    description: '만성질환 관리에 함께하는 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.',
+    title: 'CarePharm — 만성질환관리',
+    description: '만성질환관리 참여 약국의 회원 활동과 사업 자료, 약국 업무를 지원합니다.',
     ogType: 'website',
   },
   supplier: {

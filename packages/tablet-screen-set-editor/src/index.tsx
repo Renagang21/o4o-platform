@@ -1136,7 +1136,14 @@ export function TabletContentStepBuilder({
     window.addEventListener('beforeunload', h);
     return () => window.removeEventListener('beforeunload', h);
   }, [isDirty]);
-  const guardedCancel = () => { if (saveLock.current) return; if (!isDirty || window.confirm(DISCARD_MSG)) onCancel(); };
+  const guardedCancel = () => {
+    if (saveLock.current) {
+      return;
+    }
+    if (!isDirty || window.confirm(DISCARD_MSG)) {
+      onCancel();
+    }
+  };
 
   // ── 업무 항목 ↔ 내부 블록 접근자 (WO-...-BUSINESS-FIELDS-V1) ──
   //   사용자는 블록을 추가/삭제/정렬하지 않는다. 각 업무 단계가 자기 블록의 config 만 수정한다.

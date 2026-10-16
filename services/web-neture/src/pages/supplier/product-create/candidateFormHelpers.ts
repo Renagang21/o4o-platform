@@ -1,7 +1,7 @@
 import type { CategoryTreeItem } from '../../../lib/api';
 
 // WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 공급 방식은 승격 후 Offer 연결 시 설정
-export const STEPS = ['기본 정보', '기본 공급가(초안)', '이미지 / 설명'];
+export const STEPS = ['제품 정보', '이미지 / 설명'];
 
 export interface SupplierCandidateForm {
   barcode: string;

@@ -80,9 +80,7 @@ export function useEventProposal({
     if (!eventPrice || !Number.isFinite(epNum) || epNum <= 0) {
       return '이벤트 가격을 0보다 큰 숫자로 입력하세요.';
     }
-    if (selectedOffer.price != null && epNum > Number(selectedOffer.price)) {
-      return `이벤트 가격은 일반 공급가(₩${Number(selectedOffer.price).toLocaleString()}) 이하여야 합니다.`;
-    }
+    // 대상별 서비스 공급가가 다르므로 가격 상한은 서버가 대상 문맥으로 판정한다.
     if (!startAt) return '시작 일시를 입력하세요.';
     if (!endAt) return '종료 일시를 입력하세요.';
     const startMs = new Date(startAt).getTime();

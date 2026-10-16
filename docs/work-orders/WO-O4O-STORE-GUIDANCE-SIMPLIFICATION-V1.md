@@ -73,3 +73,10 @@
 - 세부 결과·공유 소비처·실계정/기기 미확인 범위는 [CHECK](../checks/CHECK-O4O-STORE-GUIDANCE-SIMPLIFICATION-V1.md)에 기록했다.
 - 최종 main `daad0563c`의 개발 push-only 인계 정책을 확인했다. 이번 구현과 파일 충돌은 없으며 시작 기준 commit은 유지한다.
 - 개발 인계 branch는 `wo/store-guidance-simplification`이다. PR CI·main 병합·배포와 현장 실사용 검증은 완료로 표시하지 않는다.
+
+## 8. 2026-10-16 개발 담당 Codex P2 보완
+
+- 제작 화면 미리보기의 상세/QR이 미리보기 상자 안의 non-modal dialog로 열린다. 독립 태블릿·공개 QR의 modal은 유지했고, 화면이 바뀌면 열린 상세를 정리한다.
+- '현재 안내 수정'에 요청별 key와 처리 확인을 붙여 반복 요청이 다시 열린다. 탭과 `workspace` URL 모드도 일치시켰다.
+- Sonar gate의 실제 blocker인 Reliability B(S1082)를 코드로 해소했다. 기준 완화·skip은 없다.
+- Store 601 tests, KPA·Neture 포함 build, 합성 browser 38개 PASS. 원래 42개 시나리오와 실계정·기기·QR 인쇄는 미실행이다. 세부 결과는 [CHECK](../checks/CHECK-O4O-STORE-GUIDANCE-SIMPLIFICATION-V1.md) 끝 절에 있다.

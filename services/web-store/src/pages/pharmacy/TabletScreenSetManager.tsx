@@ -114,6 +114,10 @@ interface Props {
    *   미지정이면 기존처럼 목록부터 시작한다. 세트를 못 찾으면 목록에 머물고 안내만 띄운다.
    */
   autoEditId?: string | null;
+  /** 같은 id 재요청을 구분하는 요청 식별자(누를 때마다 증가). 미지정이면 id 당 1회. */
+  autoEditKey?: number;
+  /** 자동 편집 요청을 소비(상세 조회 성공·실패 무관)했음을 알린다. 호출부는 요청을 비운다. */
+  onAutoEditHandled?: (key: number) => void;
 }
 
 export default function TabletScreenSetManager(props: Readonly<Props>) {
@@ -125,7 +129,7 @@ async function loadScreenSets() {
   if (!Array.isArray(sets)) throw new Error('Invalid screen sets');
   return sets;
 }
-function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId, isCurrent }: Props & { isCurrent: () => boolean }) {
+function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId, autoEditKey, onAutoEditHandled, isCurrent }: Props & { isCurrent: () => boolean }) {
   const onToast = useCallback((notice: Toast) => { if (isCurrent()) notify(notice); }, [notify, isCurrent]);
   const { data: sets, loading, error: listError, reload } = useStoreResource(loadScreenSets, []);
   const refresh = useCallback(() => { if (isCurrent()) void reload(); }, [isCurrent, reload]);
@@ -203,17 +207,23 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1:
   //   QR 목록에서 넘어온 화면 세트 편집기를 1회만 자동 오픈한다(호출부가 history state 를 즉시 비우므로
   //   재마운트로 반복 열리지 않는다). 보관·삭제된 세트는 상세 조회가 404 → openEdit 이 안내 토스트만 띄운다.
-  const autoEditDone = useRef(false);
+  //   요청마다(autoEditKey) 한 번씩 처리한다 — 편집기를 닫은 뒤 같은 안내를 다시 요청해도 열린다.
+  const handledAutoEdit = useRef<string | null>(null);
   useEffect(() => {
-    if (!autoEditId || autoEditDone.current) return;
+    if (!autoEditId) return;
+    const key = autoEditKey ?? 0;
+    const request = `${key}:${autoEditId}`;
+    if (handledAutoEdit.current === request) return;
     let disposed = false;
     void Promise.resolve().then(async () => {
       if (disposed) return;
       await openEdit(autoEditId);
-      if (!disposed) autoEditDone.current = true;
+      if (disposed) return;
+      handledAutoEdit.current = request;
+      onAutoEditHandled?.(key);
     });
     return () => { disposed = true; edits.cancel(); };
-  }, [autoEditId, openEdit, edits]);
+  }, [autoEditId, autoEditKey, openEdit, edits, onAutoEditHandled]);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1: 사용자 문구 '보관' → '리스트에서 제거'(내부는 archived/soft-delete 그대로).
   const handleArchive = async (set: ScreenSet) => {
