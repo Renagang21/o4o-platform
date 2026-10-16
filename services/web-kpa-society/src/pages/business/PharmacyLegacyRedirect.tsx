@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../../config/businessSite';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
 import { businessPath, type BusinessSection } from './api';
 import BusinessWorkspace from './BusinessWorkspace';
@@ -5,7 +6,7 @@ import BusinessWorkspace from './BusinessWorkspace';
 /** Nested generic routes rank above a wildcard; redirect at their parent too. */
 export function LegacyAwareBusinessWorkspace() {
   const { businessKey } = useParams();
-  return businessKey === 'pharmacy' ? <PharmacyLegacyRedirect /> : <BusinessWorkspace />;
+  return businessKey === 'pharmacy' && BUSINESS_SITE.key === 'pharmacy' ? <PharmacyLegacyRedirect /> : <BusinessWorkspace />;
 }
 
 export function pharmacyLegacyPath(pathname: string): string {

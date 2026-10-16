@@ -45,6 +45,7 @@ export interface PharmacyMembership {
 }
 
 export interface SemiFranchise {
+  service_features?: string[];
   registration_conditions?: string;
   id: string;
   key: string;
@@ -226,12 +227,13 @@ export const neturePharmacyOperatorApi = {
 // ─── Neture 관리자 ──────────────────────────────────────────────────────────
 
 export const neturePharmacyAdminApi = {
+  listServiceFeatures: () => get<Array<{ key: string; label: string }>>('/neture/admin/service-features'),
   listSemiFranchises: () => get<SemiFranchise[]>('/neture/admin/semi-franchises'),
-  createSemiFranchise: (input: { key: string; name: string; communityKey?: string; registrationConditions?: string }) =>
+  createSemiFranchise: (input: { key: string; name: string; communityKey?: string; registrationConditions?: string; serviceFeatures?: string[] }) =>
     send<SemiFranchise>('post', '/neture/admin/semi-franchises', input),
   updateSemiFranchise: (
     key: string,
-    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string },
+    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string; serviceFeatures?: string[] },
   ) => send<SemiFranchise>('patch', `/neture/admin/semi-franchises/${enc(key)}`, patch),
   assignOperator: (key: string, userId: string) =>
     send<{ assigned: boolean }>('post', `/neture/admin/semi-franchises/${enc(key)}/operators/${enc(userId)}`),
