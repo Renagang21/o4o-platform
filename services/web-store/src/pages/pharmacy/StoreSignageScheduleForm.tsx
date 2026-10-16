@@ -68,17 +68,19 @@ export function StoreSignageScheduleForm({
           {saveError}
         </p>
       )}
+      <p className="text-sm text-slate-600">보여줄 재생목록과 요일·시간을 정하세요. 일정 저장 후 실제 화면은 기기에서 확인하세요.</p>
       {/* Row 1: Name */}
       <input
         type="text"
+        aria-label="스케줄명"
         value={schName}
         onChange={(e) => setSchName(e.target.value)}
         placeholder="스케줄명 *"
-        className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
 
       {/* Row 2: Playlist + Priority */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3">
         <div className="min-w-0">
           {playlists.filter((p) => p.publishStatus === "published").length ===
             0 && (
@@ -90,8 +92,13 @@ export function StoreSignageScheduleForm({
           <select
             aria-label="플레이리스트 선택"
             value={schPlaylistId}
-            onChange={(e) => setSchPlaylistId(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            onChange={(e) => {
+              const id = e.target.value;
+              setSchPlaylistId(id);
+              const previousName = playlists.find((item) => item.id === schPlaylistId)?.name;
+              if (id && (!schName.trim() || schName === `${previousName} 재생`)) setSchName(`${playlists.find((item) => item.id === id)?.name || '매장 안내'} 재생`);
+            }}
+            className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="">플레이리스트 선택 *</option>
             {playlists
@@ -103,23 +110,7 @@ export function StoreSignageScheduleForm({
               ))}
           </select>
         </div>
-        <div className="flex items-center gap-1.5">
-          <label
-            htmlFor={`${fieldId}-priority`}
-            className="text-xs text-slate-500 whitespace-nowrap"
-          >
-            우선순위
-          </label>
-          <input
-            id={`${fieldId}-priority`}
-            type="number"
-            aria-label="우선순위"
-            value={schPriority}
-            onChange={(e) => setSchPriority(Number(e.target.value))}
-            min={0}
-            className="w-16 px-2 py-1.5 text-sm border border-slate-300 rounded-md text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
+
       </div>
 
       {/* Row 3: Days of week */}
@@ -164,7 +155,7 @@ export function StoreSignageScheduleForm({
             aria-label="시작 시간"
             value={schStartTime}
             onChange={(e) => setSchStartTime(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
         <div className="min-w-0">
@@ -180,11 +171,31 @@ export function StoreSignageScheduleForm({
             aria-label="종료 시간"
             value={schEndTime}
             onChange={(e) => setSchEndTime(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
       </div>
 
+      <details className="rounded-lg border border-blue-200 bg-white p-3">
+        <summary className="min-h-11 flex items-center cursor-pointer text-sm font-semibold text-slate-700">기간·우선순위 설정{(schValidFrom || schValidUntil || schPriority !== 0) ? ' · 별도 설정 있음' : ' · 선택'}</summary>
+        <div className="space-y-3 pt-3">
+        <div className="flex items-center gap-1.5">
+          <label
+            htmlFor={`${fieldId}-priority`}
+            className="text-xs text-slate-500 whitespace-nowrap"
+          >
+            우선순위
+          </label>
+          <input
+            id={`${fieldId}-priority`}
+            type="number"
+            aria-label="우선순위"
+            value={schPriority}
+            onChange={(e) => setSchPriority(Number(e.target.value))}
+            min={0}
+            className="w-16 px-2 py-1.5 text-sm border border-slate-300 rounded-md text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
       {/* Row 5: Valid from / until */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0">
@@ -200,7 +211,7 @@ export function StoreSignageScheduleForm({
             aria-label="유효 시작일"
             value={schValidFrom}
             onChange={(e) => setSchValidFrom(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
         <div className="min-w-0">
@@ -216,10 +227,13 @@ export function StoreSignageScheduleForm({
             aria-label="유효 종료일"
             value={schValidUntil}
             onChange={(e) => setSchValidUntil(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
       </div>
+
+        </div>
+      </details>
 
       {/* Row 6: Active toggle + actions */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
@@ -241,14 +255,14 @@ export function StoreSignageScheduleForm({
               !schPlaylistId ||
               schDays.length === 0
             }
-            className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 min-h-11 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {schSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {editing ? "수정" : "저장"}
           </button>
           <button
             onClick={resetScheduleForm}
-            className="px-4 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+            className="min-h-11 px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
           >
             취소
           </button>

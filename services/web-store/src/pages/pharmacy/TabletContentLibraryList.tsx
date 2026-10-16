@@ -1,3 +1,4 @@
+import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 /**
  * TabletContentLibraryList — 태블릿 콘텐츠(화면 세트) O4O 표준 리스트
@@ -165,6 +166,7 @@ interface Props {
   onApplyToTablet?: (screenSetId: string, tabletId: string) => Promise<void>;
   /** HUB 가져오기 완료 후 방금 가져온 사본 하이라이트. */
   highlightId?: string | null;
+  savedSet?: ScreenSet | null;
 }
 
 export default function TabletContentLibraryList({
@@ -185,6 +187,7 @@ export default function TabletContentLibraryList({
   tablets,
   onApplyToTablet,
   highlightId,
+  savedSet,
   isCurrent = alwaysCurrent,
 }: Props) {
   const previewRequests = useLatestStoreRequest();
@@ -203,6 +206,7 @@ export default function TabletContentLibraryList({
 
   // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿에 적용' 모달 + 하이라이트/스크롤.
   const [applyFor, setApplyFor] = useState<ScreenSet | null>(null);
+  const [applyError, setApplyError] = useState<string | null>(null);
   const [applyBusyTabletId, setApplyBusyTabletId] = useState<string | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
   const listTopRef = useRef<HTMLDivElement | null>(null);
@@ -285,20 +289,20 @@ export default function TabletContentLibraryList({
       toast.error('먼저 ‘위치별 운영’에서 위치를 추가해 주세요.');
       return;
     }
-    setApplyFor(s);
+    setApplyError(null); setApplyFor(s);
   }, [tablets, onApplyToTablet]);
 
   const handleApplySelect = useCallback(async (tabletId: string) => {
     if (!applyFor || !onApplyToTablet || applyLock.current || !isCurrent()) return;
     applyLock.current = true;
-    setApplyBusyTabletId(tabletId);
+    setApplyBusyTabletId(tabletId); setApplyError(null);
     try {
       await onApplyToTablet(applyFor.id, tabletId);
       if (!isCurrent()) return;
       setApplyFor(null);
       onRefresh();
-    } catch {
-      /* 오류 토스트는 부모(onApplyToTablet)에서 표시 */
+    } catch (error) {
+      if (isCurrent()) setApplyError(error instanceof Error ? error.message : '적용하지 못했습니다. 위치를 다시 눌러 시도하세요.');
     } finally {
       applyLock.current = false; if (isCurrent()) setApplyBusyTabletId(null);
     }
@@ -568,11 +572,23 @@ export default function TabletContentLibraryList({
   const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
   const highlightedSet = activeHighlight ? sets.find((s) => s.id === activeHighlight) : null;
+  const savedRow = savedSet ? sets.find((item) => item.id === savedSet.id) ?? savedSet : null;
 
   return (
     <div className="space-y-3" ref={listTopRef}>
+      {savedRow && (
+        <section aria-label="저장한 안내 다음 작업" className="rounded-xl border border-teal-200 bg-teal-50 p-4 space-y-2">
+          <p role="status" className="text-sm font-semibold text-teal-900">“{savedRow.name}” 내용을 저장했습니다.</p>
+          <p className="text-sm text-teal-800">현재 사용 위치: {(usageBySet[savedRow.id] ?? []).join(', ') || '아직 적용하지 않음'}. 실제 기기 재생은 현장에서 확인하세요.</p>
+          {savedRow.status === 'archived' && <p className="text-sm text-teal-800">보관된 안내입니다. 다시 사용하려면 목록에서 보관을 해제하세요.</p>}
+          <div className="flex flex-wrap gap-2">
+            {onApplyToTablet && savedRow.status === 'active' && <button type="button" onClick={() => openApply(savedRow)} disabled={busy || loading} className="min-h-11 px-4 py-2 rounded-lg bg-teal-600 text-white disabled:opacity-50">사용할 위치 선택</button>}
+            <button type="button" onClick={() => onEdit(savedRow.id)} disabled={busy || loading} className="min-h-11 px-4 py-2 rounded-lg border border-teal-300 bg-white text-teal-800 disabled:opacity-50">저장한 안내 수정</button>
+          </div>
+        </section>
+      )}
       {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 방금 가져온 사본 안내 배너. */}
-      {highlightedSet && (
+      {highlightedSet && highlightedSet.id !== savedSet?.id && (
         <div className="flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-800">
           <Check className="w-4 h-4 shrink-0" />
           <span className="min-w-0">
@@ -734,7 +750,7 @@ export default function TabletContentLibraryList({
                 <h3 className="text-base font-bold text-slate-800">코너 QR</h3>
                 <p className="text-xs text-slate-500 mt-0.5 truncate">“{qrFor.set.name}” 의 휴대전화 보기 QR입니다.</p>
               </div>
-              <button onClick={closeQr} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
+              <button onClick={closeQr} disabled={!!applyBusyTabletId} className="min-h-11 min-w-11 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
                 <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
@@ -799,14 +815,16 @@ export default function TabletContentLibraryList({
       {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿에 적용' — 대상 태블릿 선택 모달.
           기존 current-screen-set API 재사용. 적용 = 그 태블릿의 '지금 나오는 화면' 교체(코너별 운영과 동일 결과). */}
       {applyFor && (
-        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => !applyBusyTabletId && setApplyFor(null)}>
+        <AuthoringDialog labelId="tablet-apply-heading" className="max-w-md" onClose={() => { if (!applyLock.current) setApplyFor(null); }}>
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-slate-800">태블릿에 적용</h3>
+                <h3 id="tablet-apply-heading" className="text-base font-bold text-slate-800">태블릿에 적용</h3>
                 <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 위치에 띄울지 고르세요.</p>
+                <p className="text-xs text-slate-500 mt-1">위치의 설정을 바꿉니다. 연결된 기기의 실제 표시는 별도로 확인하세요.</p>
+                {applyError && <p role="alert" className="text-sm text-red-700 mt-2">{applyError} 위치를 다시 눌러 시도하세요.</p>}
               </div>
-              <button onClick={() => !applyBusyTabletId && setApplyFor(null)} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
+              <button onClick={() => !applyLock.current && setApplyFor(null)} disabled={!!applyBusyTabletId} className="min-h-11 min-w-11 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
                 <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
@@ -848,7 +866,7 @@ export default function TabletContentLibraryList({
               </p>
             </div>
           </div>
-        </div>
+        </AuthoringDialog>
       )}
 
       {/* WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정(product_list 선택 목록만). */}

@@ -180,15 +180,15 @@ const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 화면에 넣을 �
 const TEMPLATE_OPTIONS: TemplateMeta[] = [
   {
     key: 'corner_information_basic_v1',
-    label: '기본 코너 안내형',
-    description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 범용 템플릿입니다.',
+    label: '제품·안내 함께 보기',
+    description: '짧은 코너 안내와 제품, 추가 정보를 함께 살펴봅니다.',
     requiredBlocks: ['corner_description', 'content_list', 'product_list', 'qr_guide'],
   },
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: 상품 집중형.
   {
     key: 'product_focus',
-    label: '상품 집중형',
-    description: '중심 제품과 핵심 설명을 크게 보여주고 관련 콘텐츠·QR을 보조로 배치합니다.',
+    label: '제품 자세히 보기',
+    description: '첫 제품을 크게 보여주고 다른 제품과 추가 안내를 이어서 살펴봅니다.',
     requiredBlocks: ['product_list', 'content_list', 'qr_guide'],
   },
   // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 대기 영상형 / 코너 소개형 / 제품 진열형.
@@ -200,8 +200,8 @@ const TEMPLATE_OPTIONS: TemplateMeta[] = [
   },
   {
     key: 'corner_overview_qr',
-    label: '코너 소개형',
-    description: '영상 없이 코너 설명과 콘텐츠, QR을 중심으로 보여줍니다. 코너 안내가 중요한 화면에 적합합니다.',
+    label: '안내 읽기',
+    description: '사용 방법이나 코너 이용 안내를 먼저 읽고 필요한 정보를 찾아봅니다.',
     requiredBlocks: ['corner_description', 'content_list', 'qr_guide'],
   },
   {
@@ -220,11 +220,12 @@ export const templateLabel = (key: string | null | undefined) => templateMeta(ke
 // WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: '대기 영상형'(idle_touch_video) 을 신규 제작 선택지에서 제거.
 //   이유: 모든 템플릿이 '대기 화면'(대기 영상) 단계를 갖게 되어 전용 템플릿이 중복 선택지가 됨.
 //   ── 신규 선택 가능 목록 / legacy 호환 metadata 분리 ──
-//   · TEMPLATE_OPTIONS(위, 5종) = legacy 포함 metadata → templateMeta/templateLabel/TemplateThumb 가
+//   · TEMPLATE_OPTIONS(위, 5종) = legacy 2종 포함 metadata → templateMeta/templateLabel/TemplateThumb 가
 //     기존 idle_touch_video 콘텐츠의 라벨·썸네일을 계속 해석(기존 콘텐츠 표시/편집 진입 유지).
-//   · SELECTABLE_TEMPLATE_OPTIONS(4종) = 신규 제작 카드 + 필터가 노출하는 목록(idle_touch_video 제외).
-//   기존 idle_touch_video 화면 세트는 자동 변환하지 않으며(template_key 유지), 편집 진입 시 다른 4종으로 변경 가능.
-export const LEGACY_ONLY_TEMPLATE_KEYS: string[] = ['idle_touch_video'];
+//   · SELECTABLE_TEMPLATE_OPTIONS(3종) = 신규 제작 카드 + 필터가 노출하는 목록(idle_touch_video 제외).
+//   기존 idle_touch_video 화면 세트는 자동 변환하지 않으며(template_key 유지), 편집 진입 시 세 기본 배치로 변경 가능.
+// 기존 키·블록은 그대로 저장한다. 새 제작에서는 겹치는 진열형을 제외한 세 기본 배치만 제안한다.
+export const LEGACY_ONLY_TEMPLATE_KEYS: string[] = ['idle_touch_video', 'product_grid_qr'];
 const isLegacyOnlyTemplate = (key: string | null | undefined): boolean =>
   !!key && LEGACY_ONLY_TEMPLATE_KEYS.includes(key);
 const SELECTABLE_TEMPLATE_OPTIONS: TemplateMeta[] = TEMPLATE_OPTIONS.filter(
@@ -243,79 +244,32 @@ const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 �
 //   실제 결과 화면은 오른쪽 고정 미리보기(TabletKioskPage embedded)가 담당한다.
 //   (WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1 의 드롭다운 TemplateSelectField 를 대체)
 function TemplateThumb({ templateKey }: { templateKey: string }) {
-  const frame = 'w-full aspect-[16/10] rounded-md border border-slate-200 bg-white p-1.5 overflow-hidden';
-  const block = 'rounded-[2px] bg-slate-200';
-  const line = 'rounded-full bg-slate-200';
-  const qr = 'rounded-[2px] bg-slate-700';
-
-  switch (templateKey) {
-    // 대기 영상형: 전면 영상 + 중앙 터치 안내 + 우하단 QR
-    case 'idle_touch_video':
-      return (
-        <div className={frame} aria-hidden>
-          <div className="w-full h-full rounded-[3px] bg-slate-600 relative flex items-center justify-center">
-            <div className="h-1 w-1/3 rounded-full bg-white/70" />
-            <div className="absolute bottom-1 right-1 w-3 h-3 rounded-[2px] bg-white" />
-          </div>
+  const focus = templateKey === 'product_focus';
+  const guide = templateKey === 'corner_overview_qr';
+  return (
+    <div className="w-full aspect-[16/10] rounded-md border border-slate-200 bg-slate-50 p-2 flex flex-col gap-1 overflow-hidden" aria-hidden>
+      <div className="flex items-start justify-between gap-2">
+        <div className="h-1.5 w-1/2 rounded bg-slate-500" />
+        <div className="w-3 h-3 rounded-sm bg-slate-700 shrink-0" />
+      </div>
+      {(guide || !focus) && <div className="h-1 w-4/5 rounded bg-slate-300" />}
+      {guide ? (
+        <div className="mt-1 space-y-2 rounded border border-slate-200 bg-white p-2">
+          {[0, 1, 2].map((i) => <div key={i} className="h-1 rounded bg-slate-300" />)}
         </div>
-      );
-    // 상품 집중형: 큰 제품 + 우측 설명/QR
-    case 'product_focus':
-      return (
-        <div className={`${frame} flex gap-1`} aria-hidden>
-          <div className={`${block} flex-[2]`} />
-          <div className="flex-1 flex flex-col gap-1">
-            <div className={`${line} h-1 w-full`} />
-            <div className={`${line} h-1 w-4/5`} />
-            <div className={`${line} h-1 w-3/5`} />
-            <div className={`${qr} mt-auto w-3 h-3`} />
-          </div>
-        </div>
-      );
-    // 코너 소개형: 제목 + 설명 텍스트 중심 + QR
-    case 'corner_overview_qr':
-      return (
-        <div className={`${frame} flex flex-col gap-1`} aria-hidden>
-          <div className={`${line} h-1.5 w-1/2`} />
-          <div className="flex gap-1 flex-1 min-h-0">
-            <div className="flex-1 flex flex-col gap-1">
-              <div className={`${line} h-1 w-full`} />
-              <div className={`${line} h-1 w-5/6`} />
-              <div className={`${block} flex-1 mt-0.5`} />
+      ) : (
+        <div className="grid grid-cols-2 gap-1 min-h-0">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={`rounded border border-slate-200 bg-white p-1.5 space-y-1 ${focus && i === 0 ? 'col-span-2' : ''}`}>
+              <div className="h-1 w-3/4 rounded bg-slate-400" />
+              <div className="h-1 w-1/2 rounded bg-slate-200" />
             </div>
-            <div className={`${qr} w-4 h-4 self-start`} />
-          </div>
+          ))}
         </div>
-      );
-    // 제품 진열형: 제품 그리드 + QR
-    case 'product_grid_qr':
-      return (
-        <div className={`${frame} flex gap-1`} aria-hidden>
-          <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-1">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className={block} />)}
-          </div>
-          <div className={`${qr} w-3 h-3 self-end`} />
-        </div>
-      );
-    // 기본 코너 안내형: 제목 + 목록 + QR
-    case 'corner_information_basic_v1':
-    default:
-      return (
-        <div className={`${frame} flex flex-col gap-1`} aria-hidden>
-          <div className={`${line} h-1.5 w-2/5`} />
-          <div className="flex gap-1 flex-1 min-h-0">
-            <div className="flex-1 flex flex-col gap-1">
-              <div className={`${block} flex-1`} />
-              <div className={`${block} flex-1`} />
-            </div>
-            <div className={`${qr} w-4 h-4 self-end`} />
-          </div>
-        </div>
-      );
-  }
+      )}
+    </div>
+  );
 }
-
-// WO-...-BUSINESS-FIELDS-V1: block_type 별 config 폼(BlockConfigForm) 제거 — 업무 단계 렌더러가 대체.
 
 // ── content_list 편집기 (WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1) ──
 //   raw JSON 없이 O4O 표준 설명서 / 매장 제작 콘텐츠를 골라 카드 목록을 구성.
@@ -989,14 +943,17 @@ function stripIdleForMobilePreview(screen: TabletScreenResponse | null): TabletS
  * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1 §4.1:
  *   편집 영역 하나(제목 + 안내 + 내용). 단계 번호·진행 상태를 표시하지 않으며, 영역 간 잠금도 없다.
  */
-function EditorSection({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
-  return (
+function EditorSection({ title, note, children, optional = false }: { title: string; note?: string; children: ReactNode; optional?: boolean }) {
+  const content = <>{note && <p className="text-sm text-slate-500 leading-relaxed">{note}</p>}{children}</>;
+  return optional ? (
+    <details className="border border-slate-200 rounded-xl p-4 bg-white">
+      <summary className="min-h-11 flex items-center cursor-pointer text-sm font-bold text-slate-700">{title}<span className="ml-auto text-xs font-normal text-slate-500">펼쳐서 변경</span></summary>
+      <div className="space-y-3 pt-3">{content}</div>
+    </details>
+  ) : (
     <section className="border border-slate-200 rounded-xl p-4 bg-white space-y-3">
-      <div>
-        <h4 className="text-sm font-bold text-slate-800">{title}</h4>
-        {note && <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">{note}</p>}
-      </div>
-      {children}
+      <h4 className="text-sm font-bold text-slate-800">{title}</h4>
+      {content}
     </section>
   );
 }
@@ -1061,6 +1018,9 @@ export function TabletContentStepBuilder({
   // WO-...-BUSINESS-FIELDS-V1: 진입 즉시 업무 항목이 쓰는 내부 블록을 자동 확보(추가만).
   const [blocks, setBlocks] = useState<ScreenBlock[]>(() => ensureAutoBlocks(seedInitialBlocks(initialDetail)));
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const saveLock = useRef(false);
+  const createdHeader = useRef<ScreenSet | null>(null);
   // 템플릿을 바꾸면 그 템플릿이 쓰는 블록을 자동 준비한다(사용자는 블록을 의식하지 않는다).
   const selectTemplate = (key: string) => {
     setTemplateKey(key);
@@ -1176,7 +1136,7 @@ export function TabletContentStepBuilder({
     window.addEventListener('beforeunload', h);
     return () => window.removeEventListener('beforeunload', h);
   }, [isDirty]);
-  const guardedCancel = () => { if (!isDirty || window.confirm(DISCARD_MSG)) onCancel(); };
+  const guardedCancel = () => { if (saveLock.current) return; if (!isDirty || window.confirm(DISCARD_MSG)) onCancel(); };
 
   // ── 업무 항목 ↔ 내부 블록 접근자 (WO-...-BUSINESS-FIELDS-V1) ──
   //   사용자는 블록을 추가/삭제/정렬하지 않는다. 각 업무 단계가 자기 블록의 config 만 수정한다.
@@ -1206,35 +1166,41 @@ export function TabletContentStepBuilder({
   const productSummary = selectedProducts.length > 0 ? `${selectedProducts.length}개 직접 선택` : '코너 진열 상품 사용';
 
   const handleSave = async () => {
+    if (saveLock.current) return;
     if (!nameValid) { onToast({ type: 'error', message: '코너 제목 또는 콘텐츠 관리 이름을 입력해 주세요.' }); return; }
+    saveLock.current = true;
+    setSaveError(null);
     setSaving(true);
     try {
-      let id = initialDetail?.id;
-      if (isEdit && id) {
+      let id = initialDetail?.id ?? createdHeader.current?.id;
+      if (id) {
         // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 상태는 사용자가 선택하지 않는다.
         //   '저장 = 사용할 수 있는 화면 세트'. 코너 적용 게이트(POST current-screen-set)가 active 를 요구하므로
         //   draft 는 active 로 승격(선택 UI 제거 후 draft 를 적용 가능하게 만들 다른 경로가 없음).
         //   active/archived/operator_template 등은 그대로 유지(보관·특수 상태는 별도 흐름에서 관리).
-        const nextStatus: ScreenSetStatus = initialDetail!.status === 'draft' ? 'active' : initialDetail!.status;
+        const previousStatus = initialDetail?.status ?? createdHeader.current!.status;
+        const nextStatus: ScreenSetStatus = previousStatus === 'draft' ? 'active' : previousStatus;
         await api.update(id, { name: name.trim(), status: nextStatus, templateKey });
       } else {
         // library 재사용 세트(tabletId=null). 신규 저장은 기본 active(코너별 운영에서 바로 적용 가능). draft 는 UI 에서 만들지 않는다.
         //   운영자 API 는 status/tabletId 를 무시하고 operator_template 로 강제한다(계약 고정).
         const created = await api.create({ name: name.trim(), status: 'active', templateKey });
+        createdHeader.current = created;
         id = created.id;
       }
       await api.saveBlocks(id!, blocks);
-      // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 여기까지 왔으면 QR 까지 준비된 것이다
-      //   (QR 확보 실패는 저장 트랜잭션과 함께 롤백되어 위에서 예외로 떨어진다).
+      // 블록·QR 저장까지 성공한 뒤 완료한다. 헤더 생성과 블록 저장은 별도 요청이므로
+      // 블록 실패 후에는 생성 ID를 재사용한다(모든 역할 공통, 새 재개 저장소 없음).
       onToast({ type: 'success', message: isEdit ? '태블릿 콘텐츠가 저장되었습니다.' : `태블릿 콘텐츠 "${name.trim()}" 생성됨` });
       onSaved();
     } catch (e: any) {
       // QR 준비 실패 = 저장 실패(부분 성공 아님). 사용자에게 재시도를 명확히 안내한다.
       const message = e?.code === 'SCREEN_SET_QR_FAILED'
-        ? 'QR 준비에 실패해 저장이 취소되었습니다. 잠시 후 다시 저장해 주세요.'
+        ? 'QR을 준비하지 못했습니다. 입력한 내용은 유지됩니다. 잠시 후 다시 저장해 주세요.'
         : (e?.message || '저장에 실패했습니다.');
+      setSaveError(message);
       onToast({ type: 'error', message });
-    } finally { setSaving(false); }
+    } finally { saveLock.current = false; setSaving(false); }
   };
 
   // ── 업무 단계 렌더러 (WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1) ──
@@ -1285,8 +1251,7 @@ export function TabletContentStepBuilder({
     );
   };
 
-  // 2) 코너 설명 — 제목 + 짧은 소개(평문).
-  //   공개 뷰어가 본문을 평문으로 렌더(<p>{body}</p>)하므로 HTML 편집기/HTML 입력창을 두지 않는다.
+  // 2) 코너 제목 + 짧은 안내. 본문은 기존 표준 HTML 편집기와 공개 ContentRenderer를 재사용한다.
   const renderCornerStep = () => {
     const c = configOf('corner_description');
     return (
@@ -1294,6 +1259,7 @@ export function TabletContentStepBuilder({
         <div>
           <label className="text-xs font-semibold text-slate-600">코너 제목</label>
           <input
+            aria-label="코너 제목"
             value={c.title ?? ''}
             onChange={(e) => {
               const v = e.target.value;
@@ -1333,17 +1299,14 @@ export function TabletContentStepBuilder({
               value={normalizeCornerBody(c.body)}
               onChange={({ html }) => patchConfigOf('corner_description', { body: html })}
               placeholder="이 코너에서 손님에게 보여줄 내용을 자유롭게 작성하세요. 글·이미지·표를 원하는 구성으로 넣을 수 있습니다."
-              minHeight="320px"
+              minHeight="180px"
+              editable={!saving}
               onImageUpload={onImageUpload}
               onMediaLibraryPick={onMediaLibraryPick}
               showInternalAi={showInternalAi}
             />
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            글·이미지·표·목록을 자유롭게 구성할 수 있습니다. 하나의 긴 내용으로 만들지, 여러 콘텐츠로 나눌지는 직접 정하시면 됩니다.
-            LLM으로 만든 HTML은 위 <b>LLM으로 작업하기</b> 또는 편집기의 HTML 탭에 붙여 넣으세요.
-            오른쪽 미리보기에서 실제 태블릿에 보이는 모습을 확인할 수 있습니다.
-          </p>
+          <p className="text-xs text-slate-500 mt-1">첫 화면의 설명은 짧게 작성하세요. 긴 사용법은 추가 정보로 연결하고, 고객 화면 미리보기에서 읽기 편한지 확인하세요.</p>
         </div>
       </div>
     );
@@ -1386,19 +1349,20 @@ export function TabletContentStepBuilder({
             title={nameValid ? undefined : '코너 제목 또는 콘텐츠 관리 이름을 입력하면 저장할 수 있습니다.'}>
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 저장
           </button>
-          <button onClick={guardedCancel} className="text-xs text-slate-500 hover:text-slate-700 inline-flex items-center gap-1">
+          <button onClick={guardedCancel} disabled={saving} className="min-h-11 text-sm text-slate-500 hover:text-slate-700 inline-flex items-center gap-1">
             <X className="w-3.5 h-3.5" /> 목록으로
           </button>
         </div>
       </div>
+      {saveError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{saveError} 입력한 내용은 유지됩니다. 저장을 다시 눌러 시도하세요.</p>}
       <p className="text-[11px] text-slate-500 leading-relaxed">
-        아래 항목은 <b>순서 없이</b> 원하는 대로 작성하시면 됩니다. 비워 둔 항목이 있어도 저장할 수 있고, 저장 후 언제든 다시 열어 추가·수정할 수 있습니다.
+        제목과 필요한 내용만 준비하면 저장할 수 있습니다. 추가 자료·대기 영상·화면 배치는 필요할 때 펼쳐서 변경하세요.
       </p>
 
       {/* ── WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 2단 — 왼쪽 편집(≈58%) / 오른쪽 실제 결과 화면(≈42%).
              PC 웹 기준. lg 미만에서는 미리보기가 아래로 내려간다. ── */}
       <div className="lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-4 lg:items-start">
-      <div className="space-y-3 min-w-0">
+      <fieldset disabled={saving} className="space-y-3 min-w-0">
 
       {/* 코너 내용 */}
       <EditorSection title="코너 내용" note="이 코너가 어떤 곳인지, 손님에게 무엇을 보여줄지 자유롭게 작성합니다. 제목만 먼저 정해 두고 내용은 나중에 채워도 됩니다.">
@@ -1413,18 +1377,18 @@ export function TabletContentStepBuilder({
       )}
 
       {/* 추가 정보 */}
-      <EditorSection title="추가 정보" note="손님에게 함께 보여줄 설명서·안내 콘텐츠를 골라 목록으로 구성합니다.">
+      <EditorSection optional title={`추가 정보${extraCount ? ` · ${extraCount}개` : ' · 선택'}`} note="손님에게 함께 보여줄 설명서·안내 콘텐츠를 골라 목록으로 구성합니다.">
         {renderExtraStep()}
       </EditorSection>
 
       {/* 대기 화면 */}
-      <EditorSection title="대기 화면" note="손님이 화면을 만지지 않을 때 자동으로 재생할 영상입니다(YouTube·Vimeo URL). “화면을 터치하세요” 안내는 자동으로 표시됩니다.">
+      <EditorSection optional title={`대기 화면 · ${idleUrl ? '영상 설정됨' : '선택'}`} note="손님이 화면을 만지지 않을 때 자동으로 재생할 영상입니다(YouTube·Vimeo URL). “화면을 터치하세요” 안내는 자동으로 표시됩니다.">
         {renderIdleStep()}
       </EditorSection>
 
       {/* 화면 배치 — WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 카드 선택. 클릭 즉시 오른쪽 미리보기 반영.
-          WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 신규 선택 카드는 SELECTABLE_TEMPLATE_OPTIONS(4종). */}
-      <EditorSection title="화면 배치" note="같은 내용을 어떤 배치로 보여줄지 정합니다. 카드를 누르면 오른쪽 미리보기에 바로 반영됩니다.">
+          WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 신규 선택 카드는 SELECTABLE_TEMPLATE_OPTIONS(3종). */}
+      <EditorSection optional title={`화면 배치 · ${templateLabel(templateKey)}`} note="같은 내용을 어떤 배치로 보여줄지 정합니다. 카드를 누르면 오른쪽 미리보기에 바로 반영됩니다.">
         {/* 기존 idle_touch_video 콘텐츠 편집 진입 시 안내만 표시. 자동 변환하지 않는다. */}
         {isLegacyOnlyTemplate(templateKey) && (
           <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
@@ -1432,6 +1396,7 @@ export function TabletContentStepBuilder({
             그대로 저장하면 유지되며, 아래에서 다른 배치를 고르면 변경됩니다.
           </div>
         )}
+        {isLegacyOnlyTemplate(initialDetail?.templateKey) && <button type="button" onClick={() => selectTemplate(initialDetail!.templateKey)} aria-pressed={templateKey === initialDetail?.templateKey} className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700">기존 배치 유지 · {templateLabel(initialDetail?.templateKey)}</button>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {SELECTABLE_TEMPLATE_OPTIONS.map((t) => {
             const selected = t.key === templateKey;
@@ -1462,17 +1427,18 @@ export function TabletContentStepBuilder({
       {/* 저장 */}
       <EditorSection title="저장">
         {/* WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 관리 이름 기본값 = 코너 제목 자동 파생. */}
-        <div>
+        <details>
+          <summary className="min-h-11 flex items-center cursor-pointer text-sm font-semibold text-slate-600">관리 이름 변경</summary>
           <label className="text-xs font-semibold text-slate-600">콘텐츠 관리 이름</label>
-          <input value={name}
+          <input aria-label="콘텐츠 관리 이름" value={name}
             onChange={(e) => { setName(e.target.value); setNameEdited(true); }}
             placeholder="예: 구강관리 코너 - 겨울철 안내형"
             className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           <p className="text-[11px] text-slate-400 mt-1">콘텐츠 목록에서 구분하기 위한 이름입니다. 고객 화면에는 코너 제목이 표시됩니다.</p>
-          {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다. 코너 제목을 입력하면 자동으로 채워집니다.</p>}
-        </div>
+        </details>
+        {!nameValid && <p className="text-sm text-amber-700">저장하려면 코너 제목을 입력해 주세요. 관리 이름은 제목에서 자동으로 채워집니다.</p>}
         <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-          저장한 콘텐츠는 코너에 자동 적용되지 않습니다. 실제 태블릿 화면은 ‘코너별 운영’에서 선택합니다.
+          새 안내는 저장 후 사용할 위치를 선택합니다. 사용 중인 안내를 수정하면 같은 안내가 연결된 위치와 기존 QR에도 반영됩니다.
         </p>
         <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
           <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
@@ -1506,7 +1472,7 @@ export function TabletContentStepBuilder({
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
         </button>
       </EditorSection>
-      </div>{/* /왼쪽: 편집 영역 */}
+      </fieldset>{/* /왼쪽: 편집 영역 */}
 
       {/* ── 오른쪽: 실제 결과 화면(모든 단계에서 유지) ── */}
       {/* sticky 오프셋 = 전역 헤더(sticky top-0 · 실측 높이 65px) 아래로 내려 가리지 않게 한다. */}
