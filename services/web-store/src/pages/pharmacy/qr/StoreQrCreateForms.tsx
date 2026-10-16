@@ -150,7 +150,8 @@ export function StoreQrCreateForms({
             />
           </div>
 
-          <div style={styles.formRow}>
+          <details style={styles.formRow}>
+            <summary style={{ minHeight: 44, cursor: "pointer", fontWeight: 600 }}>QR 주소 변경 · 선택</summary>
             <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>
               QR 주소 (URL 경로)
             </label>
@@ -167,7 +168,7 @@ export function StoreQrCreateForms({
                 placeholder="my-video-qr"
               />
             </div>
-          </div>
+          </details>
 
           {formError && <p style={styles.formError}>{formError}</p>}
 
@@ -299,7 +300,8 @@ export function StoreQrCreateForms({
             )}
           </div>
 
-          <div style={styles.formRow}>
+          <details style={styles.formRow}>
+            <summary style={{ minHeight: 44, cursor: "pointer", fontWeight: 600 }}>QR 주소 변경 · 선택</summary>
             <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>
               QR 주소 (URL 경로)
             </label>
@@ -316,7 +318,7 @@ export function StoreQrCreateForms({
                 placeholder="my-qr-code"
               />
             </div>
-          </div>
+          </details>
 
           {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
               운영자 콘텐츠(참조형)는 연결 유형/대상이 'page'+content.id 로 고정 — 잠금 안내로 대체. */}

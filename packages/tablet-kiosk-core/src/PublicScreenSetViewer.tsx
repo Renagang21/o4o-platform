@@ -22,10 +22,10 @@
  * - 무인증 접근. 콘텐츠 원본을 복사/재작성하지 않는다.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { GuidanceDialog } from './GuidanceDialog';
 import { ContentRenderer } from '@o4o/content-editor';
 // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 태블릿과 동일한 QR 렌더를 재사용(qrcode.react 재도입 없음).
-import { QrImage } from './TabletKioskPage';
 import type { QrScreenSet, QrScreenSetSection } from './types';
 
 /**
@@ -128,7 +128,7 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
   // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1: 상품 상세(이미지 없음) 진입.
   const [openProduct, setOpenProduct] = useState<ProductCard | null>(null);
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기(태블릿과 같은 동작).
-  const [openQr, setOpenQr] = useState<{ url: string; name: string } | null>(null);
+  useEffect(() => { setOpenCard(null); setOpenProduct(null); }, [screenSet.slug]);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR 모바일은 '태블릿 대기화면'을 첫 콘텐츠로 보여주지 않는다.
   //   대기화면은 무조작 태블릿 전용 개념 — 휴대전화로 열면 코너 안내·상품·추가 콘텐츠를 바로 본다.
@@ -138,20 +138,22 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
     .filter((s) => s.blockType !== 'qr_guide' && s.blockType !== 'idle_media' && s.blockType !== 'corner_description')
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const cornerBody = (() => {
-    const s = screenSet.sections.find((x) => x.blockType === 'corner_description');
-    const d = (s?.data ?? {}) as { title?: string; body?: string };
-    return d.body && d.body.trim() ? d.body : null;
+  const corner = (() => {
+    const section = screenSet.sections.find((item) => item.blockType === 'corner_description');
+    return (section?.data ?? {}) as { title?: string; body?: string };
   })();
+  const productFirst = screenSet.templateKey === 'product_focus' || screenSet.templateKey === 'product_grid_qr';
+  if (productFirst) bodySections.sort((a, b) => Number(b.blockType === 'product_list') - Number(a.blockType === 'product_list'));
+
 
   return (
     <div style={styles.page}>
       <div style={styles.wrap}>
         <header style={styles.header}>
-          <h1 style={styles.cornerTitle}>{screenSet.name || '코너 안내'}</h1>
+          <h1 style={styles.cornerTitle}>{corner.title?.trim() || '코너 안내'}</h1>
           {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명 = 표준 편집기 산출 HTML.
               태블릿과 동일하게 ContentRenderer(DOMPurify)로 렌더 → 두 화면의 렌더 계약 일치. */}
-          {cornerBody && <ContentRenderer html={cornerBody} variant="guide" style={styles.cornerBody} />}
+          {corner.body && <ContentRenderer html={corner.body} variant="guide" style={styles.cornerBody} />}
         </header>
 
         {bodySections.map((section, idx) => (
@@ -160,7 +162,7 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
             section={section}
             onOpenCard={setOpenCard}
             onOpenProduct={setOpenProduct}
-            onOpenQr={setOpenQr}
+            focus={screenSet.templateKey === 'product_focus'}
           />
         ))}
 
@@ -172,8 +174,7 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
 
       {/* 콘텐츠 상세 — content_list 카드 탭 시 모달(ContentRenderer, DOMPurify) */}
       {openCard && openCard.detail?.html && (
-        <div style={styles.modalOverlay} onClick={() => setOpenCard(null)} role="presentation">
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <GuidanceDialog label={openCard.title || '안내 상세'} onClose={() => setOpenCard(null)} style={styles.modal}>
             <div style={styles.modalHeader}>
               <div style={{ minWidth: 0 }}>
                 {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지 공개 미노출(sourceBadge 데이터는 보존). */}
@@ -184,15 +185,13 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
             <div style={styles.modalBody}>
               <ContentRenderer html={openCard.detail.html} variant="guide" />
             </div>
-          </div>
-        </div>
+        </GuidanceDialog>
       )}
 
       {/* WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
           상품 상세 — 상품 이미지 없음. 상품명 / 규격 / 가격 / 설명(전체 너비) / 안내. */}
       {openProduct && (
-        <div style={styles.modalOverlay} onClick={() => setOpenProduct(null)} role="presentation">
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <GuidanceDialog label={openProduct.name || '제품 상세'} onClose={() => setOpenProduct(null)} style={styles.modal}>
             <div style={styles.modalHeader}>
               <div style={{ minWidth: 0 }}>
                 <h2 style={styles.modalTitle}>{openProduct.name || '상품'}</h2>
@@ -210,37 +209,32 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
                 <p style={{ margin: 0, color: colors.neutral500 }}>자세한 내용은 이 화면을 매장 직원에게 보여주세요.</p>
               )}
             </div>
-          </div>
-        </div>
+        </GuidanceDialog>
       )}
 
-      {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기.
-          어떤 용도의 QR 인지는 매장이 정한다(O4O 가 규정하지 않음) → 안내 문구는 용도 중립. */}
-      {openQr && (
-        <div style={styles.modalOverlay} onClick={() => setOpenQr(null)} role="presentation">
-          <div style={{ ...styles.modal, textAlign: 'center', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ ...styles.modalTitle, marginBottom: '6px' }}>{openQr.name}</h2>
-            <p style={{ margin: '0 0 16px', fontSize: '13px', color: colors.neutral500 }}>QR을 스캔하면 이어서 확인할 수 있습니다.</p>
-            <div style={{ display: 'flex', justifyContent: 'center' }}><QrImage url={openQr.url} size={200} /></div>
-            <button onClick={() => setOpenQr(null)} style={styles.qrModalClose}>닫기</button>
-          </div>
-        </div>
-      )}
+
     </div>
   );
+}
+
+function directGuideUrl(value?: string | null): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value, 'https://o4o.invalid');
+    return ['http:', 'https:'].includes(url.protocol) ? value : null;
+  } catch { return null; }
 }
 
 function SectionBlock({
   section,
   onOpenCard,
   onOpenProduct,
-  onOpenQr,
+  focus,
 }: {
   section: QrScreenSetSection;
   onOpenCard: (c: ContentCard) => void;
   onOpenProduct: (p: ProductCard) => void;
-  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
-  onOpenQr: (q: { url: string; name: string }) => void;
+  focus: boolean;
 }) {
   // corner_description 은 header 에서 이미 렌더 → 본문 반복 안 함.
   if (section.blockType === 'corner_description') return null;
@@ -254,29 +248,31 @@ function SectionBlock({
     if (items.length === 0) return null;
     return (
       <section style={styles.section}>
-        <h2 style={styles.sectionLabel}>코너 콘텐츠</h2>
+        <h2 style={styles.sectionLabel}>더 알아보기</h2>
         <div style={styles.cardList}>
           {items.map((c) => {
             const clickable = !!c.hasDetail && !!c.detail?.html;
             return (
-              <div
+              <button
                 key={c.itemId}
-                onClick={clickable ? () => onOpenCard(c) : undefined}
-                style={{ ...styles.card, cursor: clickable ? 'pointer' : 'default' }}
+                type="button"
+                disabled={!clickable}
+                onClick={() => onOpenCard(c)}
+                style={{ ...styles.cardButton, ...styles.card, cursor: clickable ? 'pointer' : 'default' }}
               >
                 {c.thumbnailUrl && (
-                  <div style={styles.cardThumb}>
+                  <span style={styles.cardThumb}>
                     <img src={c.thumbnailUrl} alt="" style={styles.cardThumbImg} />
-                  </div>
+                  </span>
                 )}
-                <div style={styles.cardBody}>
+                <span style={styles.cardBody}>
                   {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지 공개 미노출(sourceBadge 데이터는 보존). */}
                   {c.title && <span style={styles.cardTitle}>{c.title}</span>}
                   {c.summary && <span style={styles.cardSummary}>{c.summary}</span>}
                   {c.relatedProductName && <span style={styles.cardRelated}>{c.relatedProductName}</span>}
                   {clickable && <span style={styles.cardMore}>자세히 보기 ›</span>}
-                </div>
-              </div>
+                </span>
+              </button>
             );
           })}
         </div>
@@ -293,35 +289,23 @@ function SectionBlock({
         {/* WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
             상품 이미지/📦 제거 → 상품명 + 규격(specification) + 가격 텍스트 버튼. 카드 전체가 상세 진입 버튼. */}
         <div style={styles.productGrid}>
-          {products.map((p) => {
+          {products.map((p, index) => {
             const price = formatPrice(p);
+            const link = directGuideUrl(p.qrUrl);
             return (
               <div
                 key={`${p.type}-${p.id}`}
-                onClick={() => onOpenProduct(p)}
-                style={{ ...styles.productCard, cursor: 'pointer' }}
+                style={{ ...styles.productCard, ...(focus && index === 0 ? { gridColumn: '1 / -1' } : {}) }}
               >
-                <div style={styles.productInfo}>
+                <button type="button" onClick={() => onOpenProduct(p)} style={{ ...styles.cardButton, ...styles.productInfo, width: '100%' }}>
                   <span style={styles.productName}>{p.name || '상품'}</span>
                   {p.specification && <span style={styles.productSpec}>{p.specification}</span>}
-                  <div style={styles.productFooter}>
+                  <span style={styles.productFooter}>
                     {price ? <span style={styles.productPrice}>{price}</span> : <span aria-hidden />}
                     <span style={styles.productMore}>자세히 보기 ›</span>
-                  </div>
-                </div>
-                {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 고른 QR(있을 때만).
-                    터치하면 확대 보기 — 상품 상세 진입과 분리. */}
-                {p.qrUrl && (
-                  <div
-                    style={styles.productQrBox}
-                    onClick={(e) => { e.stopPropagation(); onOpenQr({ url: p.qrUrl!, name: p.name || '상품' }); }}
-                    role="button"
-                    aria-label={`${p.name || '상품'} QR 크게 보기`}
-                  >
-                    <QrImage url={p.qrUrl} size={64} />
-                    <span style={styles.productQrHint}>QR 크게 보기</span>
-                  </div>
-                )}
+                  </span>
+                </button>
+                {link && <a href={link} style={styles.productQrBox}>연결된 안내 열기 ›</a>}
               </div>
             );
           })}
@@ -399,7 +383,7 @@ const styles: Record<string, React.CSSProperties> = {
     wordBreak: 'keep-all',
   },
   cornerBody: {
-    fontSize: '15px',
+    fontSize: '16px',
     color: colors.neutral600,
     lineHeight: 1.6,
     margin: '12px 0 0',
@@ -412,9 +396,9 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
   },
   sectionLabel: {
-    fontSize: '13px',
+    fontSize: '18px',
     fontWeight: 700,
-    color: colors.neutral500,
+    color: colors.neutral700,
     margin: '0 0 12px',
     letterSpacing: '0.02em',
   },
@@ -449,13 +433,14 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
   },
   // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지(badge) 공개 미노출로 스타일 제거.
-  cardTitle: { fontSize: '15px', fontWeight: 600, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
-  cardSummary: { fontSize: '13px', color: colors.neutral500, lineHeight: 1.5 },
+  cardButton: { appearance: 'none', font: 'inherit', textAlign: 'left', color: 'inherit', background: 'transparent', border: 0, padding: 0, cursor: 'pointer', minHeight: '48px' },
+  cardTitle: { fontSize: '18px', fontWeight: 600, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
+  cardSummary: { fontSize: '16px', color: colors.neutral500, lineHeight: 1.5 },
   cardRelated: { fontSize: '12px', color: colors.neutral400 },
   cardMore: { fontSize: '13px', fontWeight: 600, color: colors.primary, marginTop: '2px' },
   productGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
     gap: '10px',
   },
   // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
@@ -467,8 +452,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#fff',
   },
   productInfo: { padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px', minHeight: '78px', justifyContent: 'center' },
-  productName: { fontSize: '15px', fontWeight: 700, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
-  productSpec: { fontSize: '12px', color: colors.neutral500, lineHeight: 1.4 },
+  productName: { fontSize: '18px', fontWeight: 700, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
+  productSpec: { fontSize: '15px', color: colors.neutral500, lineHeight: 1.4 },
   productFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginTop: '2px' },
   productPrice: { fontSize: '14px', fontWeight: 700, color: colors.primary },
   productMore: { fontSize: '12px', fontWeight: 600, color: colors.primary, whiteSpace: 'nowrap' },
@@ -482,19 +467,11 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '4px',
     padding: '8px 10px 10px',
     borderTop: `1px solid ${colors.neutral200}`,
-    cursor: 'pointer',
-  },
-  productQrHint: { fontSize: '11px', fontWeight: 600, color: colors.neutral500, whiteSpace: 'nowrap' },
-  qrModalClose: {
-    marginTop: '18px',
-    minHeight: '44px',
-    padding: '10px 20px',
-    borderRadius: '10px',
-    border: 'none',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 700,
+    minHeight: '48px',
+    justifyContent: 'center',
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.primary,
     cursor: 'pointer',
   },
   footer: {
@@ -505,26 +482,18 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '8px 0 16px',
   },
   footerText: { fontSize: '12px', color: colors.neutral400 },
-  modalOverlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(15,23,42,0.55)',
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
   modal: {
     width: '100%',
     maxWidth: '480px',
     maxHeight: '88vh',
     backgroundColor: '#fff',
-    borderRadius: '16px 16px 0 0',
+    borderRadius: '16px',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
   },
   modalHeader: {
+    flexShrink: 0,
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
@@ -535,8 +504,8 @@ const styles: Record<string, React.CSSProperties> = {
   modalTitle: { fontSize: '17px', fontWeight: 700, color: colors.neutral800, margin: '6px 0 0', lineHeight: 1.35, wordBreak: 'keep-all' },
   modalClose: {
     flexShrink: 0,
-    width: '36px',
-    height: '36px',
+    width: '48px',
+    height: '48px',
     borderRadius: '10px',
     border: 'none',
     backgroundColor: colors.neutral100,
@@ -545,6 +514,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
   modalBody: {
+    minHeight: 0,
     padding: '16px 18px 24px',
     overflowY: 'auto',
     fontSize: '15px',

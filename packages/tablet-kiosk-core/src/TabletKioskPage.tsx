@@ -50,6 +50,7 @@
  * 외부 export 정책: 본 컴포넌트와 props 만. RuntimeState/Action 은 내부 전용.
  */
 
+import { GuidanceDialog } from './GuidanceDialog';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
@@ -614,7 +615,6 @@ export function TabletKioskPage({
   const cornerQrLabel = qrGuide?.label || '휴대전화로 보기';
   // QR 생성 실패를 성공으로 숨기지 않는다 — screen_set 인데 URL 이 없으면 화면에 그대로 표시.
   const cornerQrUnavailable = screen?.mode === 'screen_set' && !cornerQrUrl;
-  const hideHeaderBand = !!cornerQrUrl;
   const showFloatingQr = !!cornerQrUrl && !isIdleTouch && displaySettings?.showQr !== false;
   // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 언어 선택은 실제 태블릿 런타임(비-미리보기)에서
   //   적용된 Screen Set(콘텐츠 존재)일 때만 노출. legacy/미리보기/임베드는 미노출.
@@ -697,8 +697,9 @@ export function TabletKioskPage({
       if (timer) clearTimeout(timer);
       if (isIdleEnterable) {
         timer = setTimeout(() => {
+          setOpenContentCard(null); setQrModalOpen(false); setProductQrZoom(null);
           dispatch({ type: 'IDLE_ENTER' });
-        }, idleTimeoutMs);
+        }, screen?.mode === 'screen_set' && (mode === 'detail' || openContentCard || qrModalOpen || productQrZoom) ? Math.max(idleTimeoutMs, 120_000) : idleTimeoutMs);
       }
     };
 
@@ -716,13 +717,15 @@ export function TabletKioskPage({
     armTimer();
     window.addEventListener('pointerdown', handleInteraction);
     window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('wheel', handleInteraction, { passive: true });
 
     return () => {
       if (timer) clearTimeout(timer);
       window.removeEventListener('pointerdown', handleInteraction);
       window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('wheel', handleInteraction);
     };
-  }, [idleTimeoutMs, mode]);
+  }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom]);
 
   const statusLabels: Record<string, { label: string; color: string; message: string }> = {
     REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주세요.' },
@@ -976,79 +979,46 @@ export function TabletKioskPage({
         />
       )}
 
-      {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy).
-          product_focus / product_grid_qr(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩.
-          WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.1·§5.6):
-            제목/설명을 좌우 1행(space-between)에서 세로 스택으로 변경 → 제목이 좁은 폭에 눌려
-            글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
-            설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
-      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 코너명 전용 헤더 밴드는 legacy(KCos)에서만.
-          KPA(screen-set)는 코너 설명 섹션이 제목을 담고, QR 은 우상단 작은 버튼 → 모달. */}
-      {!hideHeaderBand && (
-      <div style={isProductLayout ? styles.headerCompact : styles.header}>
-        <div style={styles.headerMain}>
+      {!isIdleTouch && (
+        <header style={{ ...styles.header, ...styles.guidanceHeader }}>
           <div style={styles.headerTexts}>
-            <div style={styles.headerTitleRow}>
-              {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
-                  아직 코너 제목이 확정되지 않았으므로 '매장 상품 안내'(실제 코너처럼 보이는 문구) 대신 중립 placeholder. */}
-              <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || (previewLayoutOnly ? '코너 제목' : '매장 상품 안내')}</h1>
-            </div>
-            {!isProductLayout && !cornerInfo?.body && !previewLayoutOnly && (
-              <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
+            {showLangSelector && (
+              <div style={styles.langSelector}>
+                <span style={styles.langSelectorIcon} aria-hidden>🌐</span>
+                <select value={viewerLang} onChange={(event) => selectViewerLang(event.target.value)} style={styles.langSelectorSelect} aria-label="표시 언어 선택">
+                  {SUPPORTED_VIEWER_LOCALES.map((code) => <option key={code} value={code}>{localeLabel(code)}</option>)}
+                </select>
+              </div>
             )}
+            <h1 style={styles.cornerTitle}>{cornerInfo?.title || (previewLayoutOnly ? '코너 제목' : '매장 상품 안내')}</h1>
+            <p style={styles.cornerHint}>{isCornerOverview ? '안내를 읽고 필요한 정보를 확인하세요' : '궁금한 제품을 눌러 자세히 살펴보세요'}</p>
+            {showQrBadge && displaySettings?.showQr !== false && <span style={styles.qrBadge}>QR 코드로 접속</span>}
           </div>
-          {showQrBadge && displaySettings?.showQr !== false && (
-            <span style={styles.qrBadge}>QR 코드로 접속</span>
+          {showFloatingQr && cornerQrUrl && (
+            <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrCard} aria-label="휴대전화로 보기 — QR 크게 보기">
+              <QrImage url={cornerQrUrl} size={92} />
+              <span style={styles.floatingQrCardText}>{cornerQrLabel}</span>
+            </button>
           )}
-        </div>
-      </div>
+          {cornerQrUnavailable && displaySettings?.showQr !== false && (
+            <p role="status" style={styles.floatingQrFailed}>QR을 준비하지 못했습니다<br />매장 관리자에게 문의해 주세요</p>
+          )}
+        </header>
       )}
 
-      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 우상단 작은 '휴대전화로 보기' 버튼(QR 상시 노출 대신).
-          클릭 시 QR 모달. url 은 서버가 Screen Set public_qr_slug 로 도출(공개 /qr/{slug} — 비로그인 접근). */}
-      {/* WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 버튼(모달 필요) → **QR 자체를 상시 노출**.
-          손님이 모달을 열지 않고 바로 스캔할 수 있어야 한다. 카드를 누르면 크게 보기(기존 모달 재사용). */}
-      {showFloatingQr && cornerQrUrl && (
-        <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrCard} aria-label="휴대전화로 보기 — QR 크게 보기">
-          <QrImage url={cornerQrUrl} size={92} />
-          <span style={styles.floatingQrCardText}>{cornerQrLabel}</span>
-        </button>
-      )}
-      {/* QR 보장 실패는 숨기지 않는다(성공처럼 보이게 하지 않음). */}
-      {cornerQrUnavailable && displaySettings?.showQr !== false && !isIdleTouch && (
-        <div style={styles.floatingQrFailed}>QR을 준비하지 못했습니다<br />매장 관리자에게 문의해 주세요</div>
-      )}
-
-      {/* WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 우상단 QR 버튼과 대칭인 좌상단 표시 언어 선택.
-          7개 언어(LOCALE_LABELS 재사용) · 선택값 브라우저 로컬 유지 · 변경 시 STORE 설명서 재조회(선택→ko→없음). */}
-      {showLangSelector && (
-        <div style={styles.langSelector}>
-          <span style={styles.langSelectorIcon} aria-hidden>🌐</span>
-          <select
-            value={viewerLang}
-            onChange={(e) => selectViewerLang(e.target.value)}
-            style={styles.langSelectorSelect}
-            aria-label="표시 언어 선택"
-          >
-            {SUPPORTED_VIEWER_LOCALES.map((code) => (
-              <option key={code} value={code}>{localeLabel(code)}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
+      <main style={styles.guidanceBody} aria-label="코너 안내와 제품">
       {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
           실제 코너 설명(screen_set corner_description)이 있을 때만 렌더. 긴 문단은 자체 스크롤로
           화면 상단을 독점하지 않게 제한(§5.6). product 레이아웃(축약 헤더)은 설명 섹션 생략. */}
-      {!isProductLayout && cornerInfo?.body && (
-        <div style={styles.cornerDescSection}>
-          <span style={styles.cornerDescLabel}>코너 안내</span>
+      {cornerInfo?.body && (
+        <details open={!isProductLayout} style={styles.cornerDescSection}>
+          <summary style={styles.cornerDescLabel}>코너 안내</summary>
           {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명은 표준 편집기(RichTextEditor) 산출 HTML.
               평문 <p>{body}</p> 는 React 이스케이프로 태그가 글자로 보였다 → 기존 ContentRenderer 로 렌더.
               sanitize 는 ContentRenderer(DOMPurify sanitizeRichHtml)가 담당 — raw innerHTML 신규 사용 없음.
               (상품 상세가 이미 쓰는 계약과 동일: types.ts "ContentRenderer 로만 렌더") */}
           <ContentRenderer html={cornerInfo.body} variant="guide" style={styles.cornerBody} />
-        </div>
+        </details>
       )}
 
       {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내(screen_set 전용, 있을 때만).
@@ -1066,30 +1036,32 @@ export function TabletKioskPage({
         // WO-O4O-KPA-TABLET-TEMPLATE-DESIGN-REFINE-V1: 제품 집중/진열형은 제품을 먼저 보이게 flex order 로 재정렬.
         //   (상품 집중형·제품 진열형인데 제품이 콘텐츠 카드 아래로 밀려 이름과 어긋났다.)
         <div style={{ ...styles.contentListSection, order: isProductLayout ? 6 : 4 }}>
-          <span style={styles.contentListLabel}>코너 콘텐츠</span>
+          <h2 style={styles.contentListLabel}>더 알아보기</h2>
           <div style={styles.contentGrid}>
             {contentCards.map((c) => {
               const clickable = c.hasDetail && !!c.detail?.html;
               return (
-                <div
+                <button
                   key={c.itemId}
-                  onClick={clickable ? () => setOpenContentCard(c) : undefined}
-                  style={clickable ? styles.contentCard : { ...styles.contentCard, cursor: 'default' }}
+                  type="button"
+                  disabled={!clickable}
+                  onClick={() => setOpenContentCard(c)}
+                  style={{ ...styles.cardButton, ...styles.contentCard, cursor: clickable ? 'pointer' : 'default' }}
                 >
                   {c.thumbnailUrl && (
-                    <div style={styles.contentThumbArea}>
+                    <span style={styles.contentThumbArea}>
                       <img src={c.thumbnailUrl} alt="" style={styles.productImg} />
-                    </div>
+                    </span>
                   )}
-                  <div style={styles.contentCardBody}>
+                  <span style={styles.contentCardBody}>
                     {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지(O4O 표준/매장 제작) 공개 미노출.
                         내부 sourceType/sourceBadge 데이터는 보존(관리/판별용). */}
                     <span style={styles.contentCardTitle}>{c.title}</span>
                     {c.summary && <span style={styles.contentCardSummary}>{c.summary}</span>}
                     {c.relatedProductName && <span style={styles.contentCardRelated}>{c.relatedProductName}</span>}
                     {clickable && <span style={styles.contentCardMore}>자세히 보기 ›</span>}
-                  </div>
-                </div>
+                  </span>
+                </button>
               );
             })}
           </div>
@@ -1147,35 +1119,34 @@ export function TabletKioskPage({
               <div
                 key={`${p.type}-${p.id}`}
                 ref={(el) => { cardRefs.current[idx] = el; }}
-                onClick={() => { setBrowseIndex(idx); dispatch({ type: 'SELECT_PRODUCT', product: p }); }}
-                style={highlighted ? { ...styles.productCard, outline: '3px solid #14b8a6', outlineOffset: '2px', transform: 'scale(1.02)' } : styles.productCard}
+                style={{ ...styles.productCard, ...(isProductFocus && idx === 0 ? styles.featuredProduct : {}), ...(highlighted ? { outline: '3px solid #14b8a6', outlineOffset: '2px' } : {}) }}
               >
                 {/* WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 이미지/📦 fallback 제거 —
                     상품명 + 규격(specification) + (가격) 텍스트 버튼. 카드 전체가 선택 버튼. */}
-                <div style={styles.productInfo}>
-                  <span style={styles.productName}>{p.name}</span>
+                <button type="button" onClick={() => { setBrowseIndex(idx); dispatch({ type: 'SELECT_PRODUCT', product: p }); }} style={{ ...styles.cardButton, ...styles.productInfo, flex: 1, minWidth: 0, ...(isProductFocus && idx === 0 ? { minHeight: '140px' } : {}) }}>
+                  <span style={{ ...styles.productName, ...(isProductFocus && idx === 0 ? styles.featuredProductName : {}) }}>{p.name}</span>
                   {p.specification && (
                     <span style={styles.productSpec}>{p.specification}</span>
                   )}
-                  <div style={styles.productCardFooter}>
+                  <span style={styles.productCardFooter}>
                     {displaySettings?.showPrice !== false ? (
                       <span style={styles.productPrice}>{productPriceText(p)}</span>
                     ) : <span aria-hidden />}
                     <span style={styles.productMore}>자세히 보기 ›</span>
-                  </div>
-                </div>
+                  </span>
+                </button>
                 {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 QR(있을 때만).
                     터치하면 코너 QR 과 동일한 확대 보기 모달을 재사용한다(카드 선택과 분리). */}
                 {p.qrUrl && (
-                  <div
-                    style={styles.productQrBox}
-                    onClick={(e) => { e.stopPropagation(); setProductQrZoom({ url: p.qrUrl!, name: p.name }); }}
-                    role="button"
+                  <button
+                    type="button"
+                    style={{ ...styles.cardButton, ...styles.productQrBox }}
+                    onClick={() => setProductQrZoom({ url: p.qrUrl!, name: p.name })}
                     aria-label={`${p.name} QR 크게 보기`}
                   >
                     <QrImage url={p.qrUrl} size={64} />
                     <span style={styles.productQrHint}>QR 크게 보기</span>
-                  </div>
+                  </button>
                 )}
                 {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: '자체'(local) 출처 배지 공개 미노출. p.type 데이터는 보존. */}
               </div>
@@ -1196,33 +1167,30 @@ export function TabletKioskPage({
           detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
       {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: QR 모달 — QR 이미지는 여기서만 표시.
           url = 서버 도출 공개 /qr/{slug}(비로그인 소비자 화면). */}
+      </main>
+
       {qrModalOpen && cornerQrUrl && (
-        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setQrModalOpen(false)} role="presentation">
-          <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+        <GuidanceDialog label={'휴대전화로 보기'} onClose={() => setQrModalOpen(false)} style={styles.qrModal}>
             <div style={styles.qrModalTitle}>휴대전화로 이어서 보기</div>
             <div style={styles.qrModalDesc}>QR을 스캔하면 이 코너 안내를 휴대전화에서 확인할 수 있습니다.</div>
             <div style={{ margin: '18px 0' }}><QrImage url={cornerQrUrl} size={200} /></div>
             <button type="button" onClick={() => setQrModalOpen(false)} style={styles.qrModalClose}>닫기</button>
-          </div>
-        </div>
+        </GuidanceDialog>
       )}
 
       {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기 — 위 코너 QR 모달과 동일 스타일 재사용.
           어떤 용도의 QR 인지는 매장이 정한다(O4O 가 규정하지 않음) → 안내 문구를 용도 중립으로 둔다. */}
       {productQrZoom && (
-        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setProductQrZoom(null)} role="presentation">
-          <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+        <GuidanceDialog label={productQrZoom.name} onClose={() => setProductQrZoom(null)} style={styles.qrModal}>
             <div style={styles.qrModalTitle}>{productQrZoom.name}</div>
             <div style={styles.qrModalDesc}>QR을 스캔하면 휴대전화에서 이어서 확인할 수 있습니다.</div>
             <div style={{ margin: '18px 0' }}><QrImage url={productQrZoom.url} size={200} /></div>
             <button type="button" onClick={() => setProductQrZoom(null)} style={styles.qrModalClose}>닫기</button>
-          </div>
-        </div>
+        </GuidanceDialog>
       )}
 
       {openContentCard && (
-        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setOpenContentCard(null)} role="presentation">
-          <div style={styles.contentModal} onClick={(e) => e.stopPropagation()}>
+        <GuidanceDialog label={openContentCard.title || '안내 상세'} onClose={() => setOpenContentCard(null)} style={styles.contentModal}>
             <div style={styles.contentModalHeader}>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px', minWidth: 0 }}>
                 {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 상세 모달 출처 배지 공개 미노출. */}
@@ -1246,8 +1214,7 @@ export function TabletKioskPage({
                 />
               )}
             </div>
-          </div>
-        </div>
+        </GuidanceDialog>
       )}
     </div>
   );
@@ -1472,6 +1439,12 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLab
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  guidanceHeader: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '16px' },
+  guidanceBody: { flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' },
+  cardButton: { appearance: 'none', font: 'inherit', textAlign: 'left', color: 'inherit', background: 'transparent', border: 0, padding: 0, cursor: 'pointer', minHeight: '48px' },
+  featuredProduct: { gridColumn: '1 / -1' },
+  featuredProductName: { fontSize: 'clamp(22px, 2.5vw, 30px)' },
+
   fullscreen: {
     position: 'fixed',
     inset: 0,
@@ -1493,29 +1466,11 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 축약 헤더(코너 설명 최소화, 상품 영역 우선).
-  headerCompact: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    padding: 'clamp(8px, 1.4vw, 12px) clamp(16px, 3vw, 28px)',
-    backgroundColor: '#fff',
-    borderBottom: '1px solid #e2e8f0',
-    flexShrink: 0,
-  },
+
   // 제목 + QR 배지 행(가로, 좁으면 wrap). 제목이 전체 폭을 확보해 세로 깨짐 없음.
-  headerTitleRow: {
-    display: 'flex',
-    alignItems: 'baseline',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
+
   // WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1: 헤더 = 제목(좌) + QR(우상단 고정)
-  headerMain: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: '16px',
-  },
+
   headerTexts: { minWidth: 0, flex: 1 },
   headerQr: {
     display: 'flex',
@@ -1539,16 +1494,9 @@ const styles: Record<string, React.CSSProperties> = {
     wordBreak: 'keep-all',
     overflowWrap: 'break-word',
   },
-  cornerTitleCompact: {
-    fontSize: 'clamp(16px, 1.8vw, 19px)',
-    fontWeight: 700,
-    lineHeight: 1.25,
-    margin: 0,
-    wordBreak: 'keep-all',
-    overflowWrap: 'break-word',
-  },
+
   cornerBody: {
-    fontSize: 'clamp(13px, 1.5vw, 15px)',
+    fontSize: 'clamp(16px, 1.5vw, 18px)',
     color: '#475569',
     lineHeight: 1.65,
     margin: 0,
@@ -1558,8 +1506,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   // legacy(코너 설명 미주입) 헤더 안내 힌트 — 코너 설명 섹션과 구분되는 짧은 보조문구.
   cornerHint: {
-    fontSize: 'clamp(13px, 1.5vw, 14px)',
-    color: '#94a3b8',
+    fontSize: 'clamp(15px, 1.5vw, 16px)',
+    color: '#475569',
     lineHeight: 1.5,
     margin: 0,
   },
@@ -1573,14 +1521,14 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#f8fafc',
     borderBottom: '1px solid #e2e8f0',
     flexShrink: 0,
-    maxHeight: '30vh',
-    overflowY: 'auto',
   },
   cornerDescLabel: {
-    fontSize: '11px',
+    minHeight: '44px',
+    cursor: 'pointer',
+    fontSize: '16px',
     fontWeight: 700,
     letterSpacing: '0.04em',
-    color: '#94a3b8',
+    color: '#475569',
   },
   qrBadge: {
     fontSize: '11px',
@@ -1596,10 +1544,8 @@ const styles: Record<string, React.CSSProperties> = {
   // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 우상단 상시 QR 카드(기존 '휴대전화로 보기' 버튼 대체).
   //   버튼→모달 단계를 없애 손님이 바로 스캔할 수 있게 한다. 누르면 기존 QR 모달(크게 보기)로 연결.
   floatingQrCard: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    zIndex: 30,
+    flexShrink: 0,
+    alignSelf: 'flex-start',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -1621,10 +1567,8 @@ const styles: Record<string, React.CSSProperties> = {
     wordBreak: 'keep-all',
   },
   floatingQrFailed: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    zIndex: 30,
+    flexShrink: 0,
+    margin: 0,
     padding: '10px 12px',
     maxWidth: '160px',
     fontSize: '12px',
@@ -1639,10 +1583,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 좌상단 표시 언어 선택(터치 44px).
   langSelector: {
-    position: 'absolute',
-    top: '12px',
-    left: '12px',
-    zIndex: 30,
+    marginBottom: '8px',
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
@@ -1677,6 +1618,7 @@ const styles: Record<string, React.CSSProperties> = {
   qrModalTitle: { fontSize: '18px', fontWeight: 800, color: '#0f172a' },
   qrModalDesc: { fontSize: '13px', color: '#64748b', marginTop: '6px', lineHeight: 1.5 },
   qrModalClose: {
+    minHeight: '48px',
     marginTop: '4px',
     padding: '10px 24px',
     fontSize: '14px',
@@ -1688,8 +1630,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
   body: {
-    flex: 1,
-    overflowY: 'auto',
+    flexShrink: 0,
     padding: '16px',
   },
   // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.2): minmax(min(px,100%),1fr) 로 아주 좁은 폭에서도
@@ -1706,6 +1647,8 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '16px',
   },
   productCard: {
+    display: 'flex',
+    alignItems: 'stretch',
     position: 'relative',
     backgroundColor: '#fff',
     borderRadius: '12px',
@@ -1730,14 +1673,14 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
   },
   productName: {
-    fontSize: '16px',
+    fontSize: '18px',
     fontWeight: 700,
     color: '#0f172a',
     lineHeight: 1.35,
     wordBreak: 'keep-all' as const,
   },
   productSpec: {
-    fontSize: '13px',
+    fontSize: '15px',
     color: '#64748b',
     lineHeight: 1.4,
   },
@@ -1761,12 +1704,15 @@ const styles: Record<string, React.CSSProperties> = {
   },
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 카드 하단 QR(매장이 고른 QR 이 있을 때만).
   productQrBox: {
+    flex: '0 0 104px',
+    width: '104px',
+    justifyContent: 'center',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     gap: '4px',
     padding: '8px 10px 10px',
-    borderTop: '1px solid #f1f5f9',
+    borderLeft: '1px solid #f1f5f9',
     cursor: 'pointer',
   },
   productQrHint: {
@@ -1931,6 +1877,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   backBtn: {
+    minHeight: '48px',
     padding: '14px 24px',
     borderRadius: '12px',
     border: '2px solid #e2e8f0',
@@ -2051,7 +1998,7 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
   },
   qrCardTitle: {
-    fontSize: 'clamp(14px, 1.6vw, 16px)',
+    fontSize: 'clamp(18px, 1.6vw, 20px)',
     fontWeight: 700,
     color: '#1e3a8a',
   },
@@ -2234,14 +2181,13 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#fff',
     borderBottom: '1px solid #e2e8f0',
     flexShrink: 0,
-    maxHeight: '48vh',
-    overflowY: 'auto',
   },
   contentListLabel: {
-    fontSize: '11px',
+    margin: 0,
+    fontSize: '18px',
     fontWeight: 700,
     letterSpacing: '0.04em',
-    color: '#94a3b8',
+    color: '#475569',
   },
   contentGrid: {
     display: 'grid',
@@ -2272,7 +2218,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: contentBadge(출처) 공개 미노출로 스타일 제거.
   contentCardTitle: {
-    fontSize: 'clamp(14px, 1.6vw, 16px)',
+    fontSize: 'clamp(18px, 1.6vw, 20px)',
     fontWeight: 700,
     color: '#0f172a',
     wordBreak: 'keep-all',
@@ -2295,16 +2241,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#2563eb',
     marginTop: '2px',
   },
-  contentModalOverlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(15,23,42,0.55)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px',
-    zIndex: 900,
-  },
+
   contentModal: {
     display: 'flex',
     flexDirection: 'column',
@@ -2333,9 +2270,10 @@ const styles: Record<string, React.CSSProperties> = {
     overflowWrap: 'break-word',
   },
   contentModalClose: {
+    minHeight: '48px',
     flexShrink: 0,
-    width: '40px',
-    height: '40px',
+    width: '48px',
+    height: '48px',
     borderRadius: '10px',
     border: '1px solid #e2e8f0',
     backgroundColor: '#fff',
@@ -2344,6 +2282,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
   contentModalBody: {
+    minHeight: 0,
     padding: '20px',
     overflowY: 'auto',
   },

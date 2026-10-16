@@ -136,7 +136,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
     if (mode === 'use') setActiveTab('corners');
   }, [location.search]);
   const [highlightScreenSetId] = useState<string | null>(navState?.highlightScreenSetId ?? null);
-  const [autoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
+  const [autoEditScreenSetId, setAutoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
   // 소비 후 history state 제거(새로고침·뒤로가기 시 재트리거 방지).
   useEffect(() => {
     if (navState?.tab || navState?.highlightScreenSetId || navState?.editScreenSetId) {
@@ -189,7 +189,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
       })
       .catch(() => { /* 코너 카드 부가정보 실패는 무시(카드 자체는 표시) */ });
     return () => { cancelled = true; };
-  }, [tablets.length]);
+  }, [tablets.length, activeTab]);
   useEffect(() => {
     if (!showGuide) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowGuide(false); };
@@ -926,6 +926,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                     {pairingBusyId === t.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Link2 className="w-3 h-3" />} 태블릿 연결
                   </button>
                 </div>
+                {t.currentScreenSetId && <button type="button" onClick={(event) => { event.stopPropagation(); setAutoEditScreenSetId(t.currentScreenSetId!); setActiveTab('contents'); }} className="mt-2 min-h-11 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm font-semibold text-teal-800">현재 안내 수정</button>}
                 {list.length > 0 && (
                   <ul className="mt-1.5 space-y-0.5">
                     {list.map((d) => (
@@ -1117,6 +1118,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
               {/* WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너 = 연결(store_tablet_corner_contents) 기반.
                   연결 목록 · 현재 사용 중 · 빠른 교체 · 순서 · 연결 추가/해제. 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭. */}
+              {selectedTablet?.currentScreenSetId && <button type="button" onClick={() => { setAutoEditScreenSetId(selectedTablet.currentScreenSetId!); setActiveTab('contents'); }} className="min-h-11 w-full rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white">현재 안내 수정</button>}
               {selectedTabletId && (
                 <TabletCornerContentsPanel
                   tabletId={selectedTabletId}
@@ -1598,7 +1600,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
       {activeTab === 'contents' && (
         <div className="space-y-3">
           <p className="text-sm text-slate-500">
-            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 연결·교체는 <b>코너별 운영</b> 탭에서 합니다.
+            고객에게 보여줄 안내를 준비합니다. 저장한 뒤 바로 사용할 위치를 선택할 수 있습니다.
           </p>
           <TabletScreenSetManager
             onToast={setToast}
