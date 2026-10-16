@@ -191,8 +191,9 @@ integration('supplier → store → payment → shipment → settlement (real Po
     // Real seller supply catalog reader of distribution_type: registration approval never exposes PUBLIC.
     const catalog = (await new SellerService(ds).getAvailableSupplyProducts(organizationId)).filter((p) => p.id === id);
     expect(catalog.filter((p) => p.distributionType === 'PUBLIC')).toEqual([]);
-    // SERVICE visibility without an approved offer_service_approvals row is deliberately not asserted:
-    // the catalog query does not consult OSA yet (WO-O4O-SELLER-CATALOG-OSA-GATE-V1).
+    // This Neture seller catalog follows the Neture exposure axis (approval_status / distribution_type /
+    // allowed_seller_ids, no offer_service_approvals junction — B2B contract §13-2, OfferExposureStrategy 'neture'),
+    // so SERVICE visibility here is not an OSA question and is left unasserted.
     if (!serviceKeys.length) expect(catalog).toEqual([]);
   });
 
