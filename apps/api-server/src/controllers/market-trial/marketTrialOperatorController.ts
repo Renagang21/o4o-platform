@@ -39,6 +39,8 @@ import { hasFundingOperator } from '../../services/funding/funding-access.js';
 import { FundingWorkspaceService, FundingError } from '../../services/funding/funding-workspace.service.js';
 import { fundingReview, fundingForumSlug, fundingForumCode, FUNDING_PROGRESS_TRANSITIONS } from '../../services/funding/funding-review.js';
 import { participantFilters, participantCsvCell } from '../../services/funding/funding-participant-export.js';
+import { FundingOperatorExceptionsService } from '../../services/funding/funding-operator-exceptions.service.js';
+import { FundingRewardRecordService } from '../../services/funding/funding-reward-record.service.js';
 import { FundingPaymentRecordService } from '../../services/funding/funding-payment-record.service.js';
 import { forumFailureFilters, isForumFailureId } from '../../services/funding/funding-forum-failure-filters.js';
 
@@ -124,6 +126,30 @@ export class MarketTrialOperatorController {
    * GET /api/v1/neture/operator/market-trial
    * 전체 Trial 목록 (관리용)
    */
+  static async listExceptions(req: AuthRequest, res: Response) {
+    try {
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) throw new Error('DataSource unavailable');
+      const data = await new FundingOperatorExceptionsService(ds).list(req.query);
+      return res.json({ success: true, data });
+    } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      return res.status(500).json({ success: false, message: '예외 현황을 조회하지 못했습니다.' });
+    }
+  }
+  static async participantHistory(req: AuthRequest, res: Response) {
+    try {
+      if (![req.params.id, req.params.participantId].every(id => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id))) throw new FundingError(400, 'INVALID_PARTICIPANT_ID', '대상 정보를 확인해 주세요.');
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) throw new Error('DataSource unavailable');
+      const data = await new FundingOperatorExceptionsService(ds).history(req.params.id, req.params.participantId);
+      return res.json({ success: true, data });
+    } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      return res.status(500).json({ success: false, message: '처리 이력을 조회하지 못했습니다.' });
+    }
+  }
+
   static async listAll(req: AuthRequest, res: Response) {
     try {
       const { status } = req.query;
@@ -572,18 +598,10 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
-      // Update participant rewardStatus
-      const result = await ds.query(
-        `WITH updated AS (UPDATE market_trial_participants
-         SET "rewardStatus" = $1, "updatedAt" = now()
-         WHERE id = $2 AND "marketTrialId" = $3
-         RETURNING id, "rewardType", "rewardStatus", "createdAt") SELECT * FROM updated`,
-        [rewardStatus, participantId, id],
-      );
-
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
+      const actorId = req.user?.id;
+      if (!actorId) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+      const updated = await new FundingRewardRecordService(ds).update(id, participantId, actorId, rewardStatus);
+      const result = [updated];
 
       res.json({
         success: true,
@@ -595,6 +613,7 @@ export class MarketTrialOperatorController {
         message: `이행 상태가 "${rewardStatus === 'fulfilled' ? '이행 완료' : '대기'}"로 변경되었습니다.`,
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Update participant reward status error:', error);
       res.status(500).json({ success: false, message: 'Failed to update participant status' });
     }

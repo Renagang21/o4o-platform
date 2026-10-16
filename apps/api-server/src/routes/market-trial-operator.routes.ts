@@ -34,6 +34,7 @@ export function createNetureOperatorTrialRoutes(): Router {
 
   router.get('/', MarketTrialOperatorController.listAll);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: aggregate KPI (literal path — must precede /:id)
+  router.get('/exceptions', MarketTrialOperatorController.listExceptions);
   router.get('/kpi', MarketTrialOperatorController.getKpi);
   // WO-MONITOR-1: 포럼 연계 실패 조회/resolve (리터럴 경로 — /:id 보다 앞에 위치)
   router.get('/forum-sync-failures', MarketTrialOperatorController.listForumSyncFailures);
@@ -44,6 +45,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   // WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1
   router.get('/:id/funnel', MarketTrialOperatorController.getFunnel);
   router.get('/:id/participants', MarketTrialOperatorController.listParticipants);
+  router.get('/:id/participants/:participantId/history', MarketTrialOperatorController.participantHistory);
   router.get('/:id/participants/export', MarketTrialOperatorController.exportParticipantsCSV);
   // WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1
   router.patch('/:id/participants/:participantId/reward-status', MarketTrialOperatorController.updateParticipantRewardStatus);

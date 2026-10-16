@@ -14,6 +14,7 @@
  * WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
  */
 
+import SupplierReviewRequestsPanel from '../../components/supplier/SupplierReviewRequestsPanel';
 import { Save, Loader2, CheckCircle, Info, BadgeCheck } from 'lucide-react';
 import { SUPPLIER_STATUS_CONFIG } from './profile/profilePresentation';
 import { useSupplierProfile } from './profile/useSupplierProfile';
@@ -87,6 +88,8 @@ export default function SupplierProfilePage() {
           </p>
         </div>
       )}
+
+      <SupplierReviewRequestsPanel key={profile.id} supplierId={profile.id} disabled={profile.status?.toUpperCase() === 'INACTIVE'} />
 
       <SupplierBusinessInfo controller={business} />
 

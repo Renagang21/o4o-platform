@@ -89,6 +89,8 @@ import { CreateAiUsageReservations1791870434349 } from '../migrations/1791870434
 // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 (assistant_run_frames.understanding)
 import { AddAssistantRunFrameUnderstanding1791970408318 } from '../migrations/1791970408318-AddAssistantRunFrameUnderstanding.js';
 
+import { CreateSupplierReviewRequests1792116000000 } from '../migrations/1792116000000-CreateSupplierReviewRequests.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -117,6 +119,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AllowStoreStaffDemoAccounts1791810417566,
   CreateAiUsageReservations1791870434349,
   AddAssistantRunFrameUnderstanding1791970408318,
+  CreateSupplierReviewRequests1792116000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

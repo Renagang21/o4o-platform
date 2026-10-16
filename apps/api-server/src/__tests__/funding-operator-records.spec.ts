@@ -5,7 +5,8 @@ import { participantCsvCell } from '../services/funding/funding-participant-expo
 
 const project = { id: 'project', title: '=fixture title, "quoted"', status: 'recruiting' };
 const repo = { findOne: jest.fn() };
-const ds: any = { getRepository: (entity: any) => entity === MarketTrial ? repo : {}, query: jest.fn() };
+const auditInsert = jest.fn().mockResolvedValue({});
+const ds: any = { transaction: jest.fn((work: any) => work({ query: ds.query, getRepository: () => ({ insert: auditInsert }) })), getRepository: (entity: any) => entity === MarketTrial ? repo : {}, query: jest.fn() };
 const response = () => { const res: any = { status: jest.fn(), json: jest.fn(), send: jest.fn(), setHeader: jest.fn() }; res.status.mockReturnValue(res); return res; };
 beforeEach(() => { jest.clearAllMocks(); repo.findOne.mockResolvedValue(project); Controller.setDataSource(ds); });
 
@@ -27,9 +28,11 @@ it('disabled settlement remains 409 with no writes', async () => {
   expect(res.status).toHaveBeenCalledWith(409); expect(ds.query).not.toHaveBeenCalled();
 });
 it('reward updates read the actual PostgreSQL SELECT projection and remain trial scoped', async () => {
-  ds.query.mockResolvedValue([{ id: 'participant', rewardStatus: 'fulfilled', rewardType: 'product' }]);
-  const res = response(); await Controller.updateParticipantRewardStatus({ params: { id: 'project', participantId: 'participant' }, body: { rewardStatus: 'fulfilled' } } as any, res);
-  expect(ds.query.mock.calls[0][0]).toContain('SELECT * FROM updated'); expect(ds.query.mock.calls[0][1]).toEqual(['fulfilled', 'participant', 'project']);
+  ds.query.mockResolvedValueOnce([{ id: 'participant', rewardStatus: 'pending' }]).mockResolvedValueOnce([{ id: 'participant', rewardStatus: 'fulfilled', rewardType: 'product' }]);
+  const res = response(); await Controller.updateParticipantRewardStatus({ user: { id: 'operator' }, params: { id: 'project', participantId: 'participant' }, body: { rewardStatus: 'fulfilled' } } as any, res);
+  expect(ds.query.mock.calls[0][0]).toContain('FOR UPDATE'); expect(ds.query.mock.calls[0][1]).toEqual(['participant', 'project']);
+  expect(ds.query.mock.calls[1][0]).toContain('SELECT * FROM updated'); expect(ds.query.mock.calls[1][1]).toEqual(['fulfilled', 'participant', 'project']);
+  expect(auditInsert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'operator', meta: { trialId: 'project', participantId: 'participant', beforeStatus: 'pending', afterStatus: 'fulfilled' } }));
   expect(res.json.mock.calls[0][0].data.rewardStatus).toBe('fulfilled');
 });
 it.each(['=SUM(1,2)', ' \t@fixture', '\rvalue', '-1', '+fixture'])('neutralizes spreadsheet formulas: %s', value => {
