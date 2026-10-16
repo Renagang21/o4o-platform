@@ -5,6 +5,7 @@ import type { User } from "../../contexts/AuthContext";
 import {
   buildHomeEntryModel,
   resolveHomeEntryUrl,
+  ServiceEntryError,
   type EntryItem,
   type HomeEntryData,
 } from "../../lib/home-entry";
@@ -157,12 +158,14 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
       if (request !== generation.current) return;
       record(item.id);
       window.location.assign(href);
-    } catch {
+    } catch (error) {
       if (request !== generation.current) return;
       pending.current = false;
       setBusyId(null);
       setMoveError(
-        "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.",
+        error instanceof ServiceEntryError
+          ? error.message
+          : "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.",
       );
     }
   };

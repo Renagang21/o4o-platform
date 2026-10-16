@@ -77,3 +77,15 @@ WORKTREE_DISPOSITION = KEEP (구현 PR 검토·후속 수정용).
 최초 PR 조회의 scope·static analysis·문서 guard는 진행 중이고 리뷰는 미등록이다.
 최종 HEAD의 CI 결과는 PR에서 확인하며 CI PASS·병합·운영 배포를 선행 보고하지 않는다.
 마지막 직원 관리 파일의 포맷 차이를 줄인 뒤 해당 8 tests와 ESLint도 다시 PASS했다.
+
+## 2026-10-16 통합 검증과 리뷰 보완
+
+통합 담당은 인계된 기존 PR #649를 재사용한다. main `daad0563c`와 결합한 전용 검증 worktree에서 충돌 없이 검사했으며 별도 중복 PR을 만들지 않는다.
+
+- 결합본 Neture 전체 109 files / 1,064 tests PASS, TypeScript 포함 production build PASS, 변경 7개 TS/TSX ESLint 오류·경고 0.
+- 최신 리뷰의 `ServiceEntryError` 메시지 유실을 보완했다. 로그인 필요·미승인/정지 안내는 resolver의 기존 메시지를 유지하고 예상하지 못한 오류만 일반 안내로 처리한다. 실패 시 최근 이동 미기록·재시도 가능 상태는 유지한다.
+- 보완 후 Neture 전체 109 files / 1,066 tests PASS. 해당 component 17 tests PASS(도메인 오류 2건 추가), 변경 2파일 ESLint PASS, TypeScript 포함 production build PASS.
+- 실제 component와 production CSS를 사용하는 Chromium 합성 harness에서 1440/390/320px, 키보드 즐겨찾기·재로딩, 검색 없음·해제, 일반 오류·로그인 안내, 재시도·이동·뒤로가기·최근 기록 삭제의 10개 관측 PASS. pageerror 0, 네트워크 쓰기 0. 운영 인증·실계정·서버 권한 검증은 실행하지 않았다.
+- 최초 테스트 명령의 config 확장자/실행 위치를 바로잡아 실제 테스트가 실행된 결과만 위에 기록했다. Chromium은 샌드박스 소켓 제한을 확인한 뒤 합성 검증 범위에서 다시 실행했다.
+
+이 절은 로컬 통합 검증 기록이다. 최신 PR CI·리뷰·병합·운영 배포 결과를 선행하여 PASS로 주장하지 않는다.

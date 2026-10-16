@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import type { User } from "../../contexts/AuthContext";
-import type { HomeEntryData } from "../../lib/home-entry";
+import { ServiceEntryError, type HomeEntryData } from "../../lib/home-entry";
 import { myHomePreferencesKey } from "../../lib/my-home-preferences";
 const { resolve } = vi.hoisted(() => ({ resolve: vi.fn() }));
 vi.mock("../../lib/home-entry", async (original) => ({
@@ -275,7 +275,9 @@ it("does not record failed handoff attempts and permits retry", async () => {
   resolve.mockRejectedValue(new Error("denied"));
   render(app());
   fireEvent.click(screen.getByRole("button", { name: /합성 매장 B 매장/ }));
-  await screen.findByRole("alert");
+  expect((await screen.findByRole("alert")).textContent).toContain(
+    "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.",
+  );
   expect(resolve).toHaveBeenCalledWith({
     kind: "workspace",
     returnPath: "/select-store",
@@ -288,6 +290,18 @@ it("does not record failed handoff attempts and permits retry", async () => {
       }) as HTMLButtonElement
     ).disabled,
   ).toBe(false);
+});
+
+it.each([
+  ["AUTH_REQUIRED", "로그인이 필요합니다."],
+  ["HANDOFF_TARGET_NOT_ACTIVE", "이 서비스 이용이 아직 승인되지 않았거나 정지 상태입니다."],
+])("preserves the actionable handoff message for %s", async (code, message) => {
+  resolve.mockRejectedValue(new ServiceEntryError(message, code));
+  render(app());
+  fireEvent.click(screen.getByRole("button", { name: /합성 매장 B 매장/ }));
+  expect((await screen.findByRole("alert")).textContent).toContain(message);
+  expect(localStorage.getItem(myHomePreferencesKey("account-a"))).toBeNull();
+  expect((screen.getByRole("button", { name: /합성 매장 B 매장/ }) as HTMLButtonElement).disabled).toBe(false);
 });
 
 it("discards a late handoff after the source account or access data changes", async () => {
