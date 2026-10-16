@@ -104,7 +104,9 @@ test('only catalog-confirmed unindexed UUID columns join the single keyset pass;
  for(const sql of [developmentReferenceQuery(groups[1]),mediaReferenceQuery(groups[1])]) {
   assert.match(sql,/s\."payload"::text AS v1,s\."reviewed_by" AS v2,/);
   assert.match(sql,/\(source\.v2 = ANY\(targets\.uuids\) OR \(targets\.legacy_pattern IS NOT NULL AND \(source\.v2::text COLLATE "C"\) ~ targets\.legacy_pattern\)\)/);
-  assert.match(sql,/CASE WHEN octet_length\(source\.v1\)>=targets\.min_bytes THEN \(source\.v1 COLLATE "C"\) ~ targets\.pattern ELSE FALSE END/);
+  assert.match(sql,/CASE WHEN octet_length\(source\.v1\)>=targets\.min_bytes THEN EXISTS \(SELECT 1 FROM unnest\(targets\.tokens\) target\s+WHERE strpos\(source\.v1 COLLATE "C",target\)>0\) ELSE FALSE END/);
+  assert.match(sql,/SELECT array_agg\(token\) AS tokens,/);
+  assert.doesNotMatch(sql,/targets\.pattern/);
   assert.doesNotMatch(sql,/"reviewed_by"::text/);
   assert.match(sql,/found AS MATERIALIZED \(/);
  }
