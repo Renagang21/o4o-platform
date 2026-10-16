@@ -201,7 +201,7 @@ export async function autoListPublicProductsForOrg(
        SELECT
          gen_random_uuid(),
          $1,
-         $2,
+         $2::varchar, -- explicit: an untyped select-list param infers text and conflicts with the varchar comparisons
          spo.master_id,
          spo.id,
          false,
@@ -213,7 +213,8 @@ export async function autoListPublicProductsForOrg(
          AND spo.distribution_type = 'PUBLIC'
          AND s.status = 'ACTIVE'
          AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
-       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING
+       RETURNING 1`,
       [organizationId, serviceKey],
     );
 
@@ -248,7 +249,7 @@ export async function autoListServiceProductsForOrg(
        SELECT
          gen_random_uuid(),
          $1,
-         $2,
+         $2::varchar, -- explicit: an untyped select-list param infers text and conflicts with the varchar comparisons
          spo.master_id,
          spo.id,
          false,
@@ -263,7 +264,8 @@ export async function autoListServiceProductsForOrg(
          AND spo.distribution_type = 'SERVICE'
          AND s.status = 'ACTIVE'
          AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
-       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING
+       RETURNING 1`,
       [organizationId, serviceKey],
     );
 
