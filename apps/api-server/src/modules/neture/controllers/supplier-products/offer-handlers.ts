@@ -27,7 +27,7 @@ export function createSupplierOfferHandlers(
           supplierId,
           req.body ?? {},
         );
-        if (!result.success) {
+        if (result.success === false) {
           const statusCode =
             result.error === OfferErrorCode.SUPPLIER_NOT_ACTIVE
               ? 403
@@ -173,7 +173,7 @@ export function createSupplierOfferHandlers(
           businessShortDescription,
           businessDetailDescription,
         });
-        if (!result.success) {
+        if (result.success === false) {
           const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
           return res.status(statusCode).json(result);
         }
@@ -234,7 +234,7 @@ export function createSupplierOfferHandlers(
           tags,
           isFeatured,
         });
-        if (!result.success) {
+        if (result.success === false) {
           const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
           return res.status(statusCode).json(result);
         }

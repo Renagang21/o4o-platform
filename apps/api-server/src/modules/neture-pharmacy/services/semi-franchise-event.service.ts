@@ -58,7 +58,7 @@ export function validateEventInput(input: SemiFranchiseEventInput, priceGeneral:
   if (!Number.isFinite(eventPrice) || eventPrice <= 0) {
     throw new NeturePharmacyError(400, 'INVALID_EVENT_PRICE', '이벤트 가격은 0보다 커야 합니다.');
   }
-  if (eventPrice > priceGeneral) {
+  if (priceGeneral > 0 && eventPrice > priceGeneral) {
     throw new NeturePharmacyError(400, 'INVALID_EVENT_PRICE', `이벤트 가격(${eventPrice})은 공급가(${priceGeneral}) 이하여야 합니다.`);
   }
   const startAt = new Date(input.startAt ?? '');

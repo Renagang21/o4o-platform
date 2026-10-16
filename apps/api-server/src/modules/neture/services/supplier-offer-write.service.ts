@@ -6,7 +6,7 @@ import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
 import { resolveMasterWriteFields } from './master-link-policy.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
-import { assertDrugOfferAllowed } from '../guards/drug-access.guard.js';
+import { assertDrugOfferAllowed, type DrugGateResult } from '../guards/drug-access.guard.js';
 import { deriveDistributionType } from './offer-write-policy.js';
 
 /** Existing SupplierOfferWriteService workflows; public callers use NetureOfferService. */
@@ -93,12 +93,7 @@ export class SupplierOfferWriteService {
       // 본 경로는 기존에 의약품 게이트가 전혀 없었고, isPublic=true 전환 시 아래에서
       // autoExpandPublicProduct 로 전 서비스 확산까지 유발했다 (선행 감사 P0).
       // 저장 직전에 최종 상태(isPublic + serviceKeys)를 기준으로 판정한다.
-      const drugUpdateGate = await assertDrugOfferAllowed(AppDataSource, {
-        action: offer.isPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE',
-        masterId: offer.masterId,
-        serviceKeys: offer.serviceKeys || [],
-        isPublic: offer.isPublic,
-      });
+      const drugUpdateGate = await checkOfferPublicationAccess(offer);
       if (!drugUpdateGate.allowed) {
         logger.warn(
           `[NetureOfferService] DRUG offer update denied: offer=${offerId}, supplier=${supplierId}, master=${offer.masterId}, isPublic=${offer.isPublic}, code=${drugUpdateGate.code}`,
@@ -172,12 +167,14 @@ export class SupplierOfferWriteService {
         return { success: false, error: 'PRIVATE_REQUIRES_SELLER_IDS' };
       }
 
+      const publicationError = validateOfferPublicationChange(offer, updates);
+      if (publicationError) return { success: false, error: publicationError };
       const savedOffer = await this.offerRepo.save(offer);
 
       // WO-O4O-PRODUCT-AUTO-LISTING-STABILIZATION-V1: PUBLIC 전환 시 기존 매장에 자동 Listing 확산
       if (savedOffer.distributionType === OfferDistributionType.PUBLIC
           && savedOffer.approvalStatus === OfferApprovalStatus.APPROVED
-          && savedOffer.isActive) {
+          && savedOffer.isActive && !prevIsPublic) {
         autoExpandPublicProduct(AppDataSource, savedOffer.id, savedOffer.masterId)
           .then((count) => logger.info(`[NetureOfferService] Auto-expanded ${count} listings for offer ${savedOffer.id} master ${savedOffer.masterId} (PUBLIC transition)`))
           .catch((err) => logger.warn(`[NetureOfferService] Auto-expand failed for offer ${savedOffer.id} master ${savedOffer.masterId}:`, err));
@@ -369,4 +366,24 @@ export class SupplierOfferWriteService {
     logger.info(`[OfferService] bulkDeleteOffers(soft): supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
     return { deleted, failed };
   }
+}
+
+function validateOfferPublicationChange(
+  offer: SupplierProductOffer,
+  updates: { isPublic?: boolean; distributionType?: OfferDistributionType; isActive?: boolean },
+): string | null {
+  const enabling = updates.isPublic === true || updates.distributionType === OfferDistributionType.PUBLIC || updates.isActive === true;
+  if (enabling && offer.approvalStatus !== OfferApprovalStatus.APPROVED) return 'PRODUCT_NOT_APPROVED';
+  const hasTargets = offer.isPublic || offer.defaultSupplyEnabled || (offer.serviceKeys?.length ?? 0) > 0;
+  if (hasTargets && (!Number.isInteger(offer.priceGeneral) || offer.priceGeneral <= 0)) return 'PRICE_REQUIRED';
+  return null;
+}
+
+async function checkOfferPublicationAccess(offer: SupplierProductOffer): Promise<DrugGateResult> {
+  if (!offer.isPublic && !offer.serviceKeys?.length && !offer.defaultSupplyEnabled) return { allowed: true, isDrug: false };
+  return assertDrugOfferAllowed(AppDataSource, {
+    action: offer.isPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE', masterId: offer.masterId,
+    serviceKeys: offer.defaultSupplyEnabled ? [...(offer.serviceKeys || []), 'neture'] : offer.serviceKeys || [],
+    isPublic: offer.isPublic,
+  });
 }

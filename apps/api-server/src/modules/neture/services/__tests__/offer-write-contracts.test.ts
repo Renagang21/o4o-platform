@@ -100,235 +100,108 @@ beforeEach(() => {
   mockAudienceResolver.mockResolvedValue((key: string) => key === 'kpa-society');
 });
 
-describe('operator decisions: idempotency, permit and atomic service approvals', () => {
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s missing offer does not start a transaction', async (method) => {
+describe('registration approval is independent from service publication', () => {
+  it.each(['approveProduct', 'rejectProduct'] as const)('%s enforces product existence', async method => {
     repo.findOne.mockResolvedValue(null);
     expect(await runDecision(method)).toEqual({ success: false, error: 'PRODUCT_NOT_FOUND' });
-    expect(AppDataSource.createQueryRunner).not.toHaveBeenCalled();
+    expect(query).not.toHaveBeenCalled();
   });
-  it.each([['approveProduct', 'APPROVED'], ['rejectProduct', 'REJECTED']] as const)(
-    '%s is idempotent for %s', async (method, status) => {
-      repo.findOne.mockResolvedValue(fixture({ approvalStatus: status, isActive: method === 'approveProduct' }));
-      expect(await runDecision(method)).toEqual({ success: true, data: {
-        id: 'offer-fixture', masterId: 'master-fixture', isActive: method === 'approveProduct', approvalStatus: status,
-        ...(method === 'approveProduct' ? { autoListedCount: 0 } : {}),
-      } });
-      expect(query).not.toHaveBeenCalled();
-      expect(AppDataSource.createQueryRunner).not.toHaveBeenCalled();
-    });
-  it('approval requires the regulated permit before starting a transaction', async () => {
+  it.each([['approveProduct', 'APPROVED'], ['rejectProduct', 'REJECTED']] as const)('%s is idempotent', async (method, status) => {
+    repo.findOne.mockResolvedValue(fixture({ approvalStatus: status }));
+    expect(await runDecision(method)).toMatchObject({ success: true, data: { approvalStatus: status } });
+    expect(query).not.toHaveBeenCalled(); expect(tx.query).not.toHaveBeenCalled();
+  });
+  it('cannot approve a regulated product without its permit', async () => {
     query.mockResolvedValue([{ is_regulated: true, mfds_permit_number: null }]);
     expect(await runDecision('approveProduct')).toEqual({ success: false, error: 'PERMIT_REQUIRED_FOR_APPROVAL' });
-    expect(query.mock.calls[0][1]).toEqual(['master-fixture']);
-    expect(tx.startTransaction).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(1);
   });
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s creates unique missing service approvals in the same transaction', async (method) => {
-    repo.findOne.mockResolvedValue(fixture({ serviceKeys: ['kpa-society', 'kpa-society', 'k-cosmetics'] }));
-    await runDecision(method);
-    const insert = tx.query.mock.calls.find(([sql]) => sql.includes('INSERT INTO offer_service_approvals'));
-    expect(insert?.[1]).toEqual(['offer-fixture', 'kpa-society', 'k-cosmetics']);
-    expect(insert?.[0]).toContain("VALUES ($1, $2, 'pending', NOW(), NOW()), ($1, $3, 'pending', NOW(), NOW())");
-    expect([...new Set(insert?.[0].match(/\$\d+/g))]).toEqual(['$1', '$2', '$3']);
-    expect(insert?.[0]).toContain('ON CONFLICT (offer_id, service_key) DO NOTHING');
-    expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
-    expect(events).toEqual(['startTransaction', 'select', 'write', 'write', 'sync', 'commitTransaction', 'release']);
-    expect(tx.rollbackTransaction).not.toHaveBeenCalled();
+  it('approves registration without approving services or publishing a listing', async () => {
+    expect(await runDecision('approveProduct')).toMatchObject({ success: true, data: { approvalStatus: 'APPROVED', autoListedCount: 0 } });
+    const write = query.mock.calls.find(([sql]) => sql.includes('UPDATE supplier_product_offers'));
+    expect(write?.[0]).toContain('default_supply_enabled = false, is_public = false');
+    expect(write?.[0]).toContain('registration_rejection_reason = NULL');
+    expect(mockSync).not.toHaveBeenCalled(); expect(mockPending).not.toHaveBeenCalled(); expect(expand).not.toHaveBeenCalled();
+    expect(tx.query).not.toHaveBeenCalled();
   });
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s existing service approvals skip creation', async (method) => {
-    tx.query.mockResolvedValue([{ id: 'approval-fixture' }]);
-    await runDecision(method);
-    expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO'))).toBe(false);
-    expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
-    expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
-  });
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s existing approvals with empty targets still use derived sync', async (method) => {
-    repo.findOne.mockResolvedValue(fixture({ serviceKeys: [] }));
-    tx.query.mockResolvedValue([{ id: 'approval-fixture' }]);
-    await runDecision(method);
-    expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
-    expect(tx.query.mock.calls.some(([sql]) => sql.includes('UPDATE supplier_product_offers'))).toBe(false);
-    expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO'))).toBe(false);
-    expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
-  });
-  it.each([
-    ['approveProduct', 'select'], ['approveProduct', 'insert'],
-    ['rejectProduct', 'select'], ['rejectProduct', 'insert'],
-  ] as const)('%s preparation %s failure rolls back before decision', async (method, stage) => {
-    const failure = new Error('Fixture preparation failure');
-    if (stage === 'insert') tx.query.mockResolvedValueOnce([]);
-    tx.query.mockRejectedValueOnce(failure);
-    await expect(runDecision(method)).rejects.toBe(failure);
-    expect(mockSync).not.toHaveBeenCalled();
-    expect(tx.query.mock.calls.some(([sql]) => sql.includes('UPDATE'))).toBe(false);
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
-    expect(tx.release).toHaveBeenCalledTimes(1);
-  });
-  it('rejection preserves actor and explicit reason bindings', async () => {
+  it('registration rejection atomically disables the product and existing publication grants', async () => {
     await service.rejectProduct('offer-fixture', 'actor-fixture', 'Fixture reason');
-    const decision = tx.query.mock.calls.find(([sql]) => sql.includes("SET approval_status = 'rejected'"));
-    expect(decision?.[1]).toEqual(['offer-fixture', 'actor-fixture', 'Fixture reason']);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes("approval_status = 'REJECTED'"))).toBe(true);
+    const rejection = tx.query.mock.calls.find(([sql]) => sql.includes('UPDATE supplier_product_offers'));
+    expect(rejection?.[0]).toContain('registration_rejection_reason = $2');
+    expect(rejection?.[1]).toEqual(['offer-fixture', 'Fixture reason']);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('UPDATE organization_product_listings'))).toBe(true);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO'))).toBe(false);
+    expect(tx.query.mock.calls.find(([sql]) => sql.includes('UPDATE product_approvals'))?.[1]).toEqual(['offer-fixture', 'actor-fixture', 'Fixture reason']);
+    expect(mockSync).not.toHaveBeenCalled(); expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
   });
-  it('targetless rejection cascades before commit using fallback reason and actor UUID cast', async () => {
-    repo.findOne.mockResolvedValue(fixture({ serviceKeys: [] }));
-    expect(await runDecision('rejectProduct')).toEqual({ success: true, data: {
-      id: 'offer-fixture', masterId: 'master-fixture', isActive: false, approvalStatus: 'REJECTED',
-    } });
-    const revoke = tx.query.mock.calls.find(([sql]) => sql.includes('UPDATE product_approvals'));
-    expect(revoke?.[0]).toContain('$2::uuid');
-    expect(revoke?.[1]).toEqual(['offer-fixture', 'actor-fixture', 'Offer rejected by admin']);
-    expect(events).toEqual(['startTransaction', 'select', 'write', 'write', 'write', 'commitTransaction', 'release']);
-    expect(mockSync).not.toHaveBeenCalled();
-  });
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s sync failure rolls back and releases, rethrowing original error', async (method) => {
-    const failure = new Error('fixture sync failure');
-    mockSync.mockRejectedValue(failure);
-    await expect(runDecision(method)).rejects.toBe(failure);
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(events.slice(-2)).toEqual(['rollbackTransaction', 'release']);
-  });
-  it.each(['approveProduct', 'rejectProduct'] as const)('%s decision SQL failure rolls back without sync', async (method) => {
-    const failure = new Error('fixture write failure');
-    tx.query.mockResolvedValueOnce([]).mockResolvedValueOnce([]).mockRejectedValueOnce(failure);
-    await expect(runDecision(method)).rejects.toBe(failure);
-    expect(mockSync).not.toHaveBeenCalled();
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
-    expect(tx.release).toHaveBeenCalledTimes(1);
-  });
-  it('targetless rejection cascade failure rolls back every write', async () => {
-    repo.findOne.mockResolvedValue(fixture({ serviceKeys: [] }));
-    const failure = new Error('fixture cascade failure');
-    tx.query.mockResolvedValueOnce([]).mockResolvedValueOnce([]).mockRejectedValueOnce(failure);
-    await expect(runDecision('rejectProduct')).rejects.toBe(failure);
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
-    expect(tx.release).toHaveBeenCalledTimes(1);
-  });
-  it('commit failure also rolls back and releases', async () => {
-    const failure = new Error('fixture commit failure');
-    tx.commitTransaction.mockRejectedValue(failure);
-    await expect(runDecision('approveProduct')).rejects.toBe(failure);
-    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
-    expect(tx.release).toHaveBeenCalledTimes(1);
+  it.each(['query', 'commit'] as const)('rejection %s failure rolls back every write', async stage => {
+    const error = new Error('Fixture rejection failure');
+    if (stage === 'query') tx.query.mockRejectedValueOnce(error); else tx.commitTransaction.mockRejectedValueOnce(error);
+    await expect(runDecision('rejectProduct')).rejects.toBe(error);
+    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1); expect(tx.release).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('supplier approval requests preserve saved policy and truthful batch outcome', () => {
-  const owned = (id: string, over: Record<string, unknown> = {}) => ({ id, service_keys: ['kpa-society'], ...over });
-  it('ownership, missing eligible keys and inserts are counted separately', async () => {
-    query.mockResolvedValue([owned('owned'), owned('no-target', { service_keys: ['neture'] })]);
-    expect(await service.submitForApproval('supplier-fixture', ['foreign', 'owned', 'no-target'])).toEqual({
-      submitted: 1, errors: [{ id: 'foreign', error: 'NOT_OWNED' }],
-      skipped: [{ id: 'no-target', reason: 'NO_ELIGIBLE_SERVICE_KEYS' }],
-    });
-    expect(query.mock.calls[0][0]).toContain('o.deleted_at IS NULL');
-    expect(query.mock.calls[0][1]).toEqual([['foreign', 'owned', 'no-target'], 'supplier-fixture']);
-    expect(mockPending).toHaveBeenCalledWith('owned', ['kpa-society']);
-    expect(mockSync).not.toHaveBeenCalled();
+describe('registration resubmission preserves ownership, category gate and batch outcomes', () => {
+  const owned = (id: string, approval_status = 'REJECTED') => ({ id, approval_status, service_keys: [] });
+  it('resubmits only rejected owned products and does not create service requests', async () => {
+    query.mockResolvedValueOnce([owned('a'), owned('b', 'APPROVED'), owned('c', 'PENDING')]).mockResolvedValueOnce([{ id: 'a' }]);
+    expect(await service.submitForApproval('supplier-fixture', ['a', 'b', 'c', 'foreign'])).toEqual({ submitted: 1,
+      errors: [{ id: 'foreign', error: 'NOT_OWNED' }], skipped: ['b','c'].map(id => ({ id, reason: 'ALREADY_REQUESTED_OR_DECIDED' })) });
+    expect(query.mock.calls[1][0]).toContain("approval_status = 'REJECTED'");
+    expect(mockPending).not.toHaveBeenCalled(); expect(mockSync).not.toHaveBeenCalled();
   });
-  it('rejected/cancelled resubmission syncs pending state and counts exactly once', async () => {
-    query.mockResolvedValue([owned('owned')]);
-    mockPending.mockResolvedValue({ insertedServiceKeys: [], resubmittedServiceKeys: ['kpa-society'] });
-    expect(await service.submitForApproval('supplier-fixture', ['owned'])).toEqual({ submitted: 1, skipped: [], errors: [] });
-    expect(mockSync).toHaveBeenCalledWith('owned', 'supplier-fixture', AppDataSource);
+  it('category denial does not change the registration', async () => {
+    query.mockResolvedValueOnce([owned('a')]); mockCategoryGate.mockReturnValue({ allowed: false, reasonCode: 'SUPPLIER_CATEGORY_PENDING' });
+    expect(await service.submitForApproval('supplier-fixture', ['a'])).toMatchObject({ submitted: 0, skipped: [{ id: 'a', reason: 'SUPPLIER_CATEGORY_PENDING' }] });
+    expect(query).toHaveBeenCalledTimes(1);
   });
-  it('already pending/approved requests are skipped with no sync', async () => {
-    query.mockResolvedValue([owned('owned')]);
-    mockPending.mockResolvedValue({ insertedServiceKeys: [], resubmittedServiceKeys: [] });
-    expect(await service.submitForApproval('supplier-fixture', ['owned'])).toEqual({
-      submitted: 0, skipped: [{ id: 'owned', reason: 'ALREADY_REQUESTED_OR_DECIDED' }], errors: [],
-    });
-    expect(mockSync).not.toHaveBeenCalled();
-  });
-  it.each(['SUPPLIER_CATEGORY_PENDING', undefined])('category denial keeps reason/fallback %s and writes nothing', async (reasonCode) => {
-    query.mockResolvedValue([owned('owned')]);
-    mockCategoryGate.mockReturnValue({ allowed: false, reasonCode });
-    expect(await service.submitForApproval('supplier-fixture', ['owned'])).toEqual({
-      submitted: 0, skipped: [{ id: 'owned', reason: reasonCode || 'SUPPLIER_CATEGORY_NOT_APPROVED' }], errors: [],
-    });
-    expect(mockPending).not.toHaveBeenCalled();
-  });
-  it('regulated non-pharmacy service is skipped', async () => {
-    query.mockResolvedValue([owned('owned', { is_regulated: true, service_keys: ['k-cosmetics'] })]);
-    expect(await service.submitForApproval('supplier-fixture', ['owned'])).toEqual({
-      submitted: 0, skipped: [{ id: 'owned', reason: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' }], errors: [],
-    });
-    expect(mockPending).not.toHaveBeenCalled();
-  });
-  it('per-offer DB failure is masked and later offers still execute', async () => {
-    query.mockResolvedValue([owned('first'), owned('second')]);
-    mockPending.mockRejectedValueOnce(new Error('internal fixture detail'));
-    expect(await service.submitForApproval('supplier-fixture', ['first', 'second'])).toEqual({
-      submitted: 1, skipped: [], errors: [{ id: 'first', error: 'INTERNAL_ERROR' }],
-    });
-    expect(mockPending.mock.calls.map(([id]) => id)).toEqual(['first', 'second']);
-  });
-  it('resubmission sync failure is counted as an error rather than submitted', async () => {
-    query.mockResolvedValue([owned('owned')]);
-    mockPending.mockResolvedValue({ insertedServiceKeys: [], resubmittedServiceKeys: ['kpa-society'] });
-    mockSync.mockRejectedValue(new Error('fixture sync failure'));
-    expect(await service.submitForApproval('supplier-fixture', ['owned'])).toEqual({
-      submitted: 0, skipped: [], errors: [{ id: 'owned', error: 'INTERNAL_ERROR' }],
-    });
+  it('records an individual DB failure and continues the batch', async () => {
+    query.mockResolvedValueOnce([owned('a'),owned('b')]).mockRejectedValueOnce(new Error('private')).mockResolvedValueOnce([{ id: 'b' }]);
+    expect(await service.submitForApproval('supplier-fixture', ['a','b'])).toEqual({ submitted: 1, skipped: [], errors: [{ id: 'a', error: 'INTERNAL_ERROR' }] });
   });
 });
 
-describe('distribution writes preserve scope, diff and transaction order', () => {
-  it.each([[[], 'OFFER_NOT_FOUND'], [[rawFixture({ supplier_id: 'foreign' })], 'NOT_OWNED']] as const)(
-    'denies invalid ownership with %s / %s before writes', async (rows, error) => {
-      query.mockResolvedValue(rows);
-      expect(await service.updateDistribution('offer-fixture', 'supplier-fixture', 'actor-fixture', {})).toEqual({ success: false, error });
-      expect(tx.startTransaction).not.toHaveBeenCalled();
-    });
-  it('preserves non-approval keys, deduplicates input and cancels/adds/syncs in one transaction', async () => {
-    query.mockResolvedValue([rawFixture({ service_keys: ['kpa-society', 'fixture-other'] })]);
-    const result = await service.updateDistribution('offer-fixture', 'supplier-fixture', 'actor-fixture', {
-      isPublic: true, serviceKeys: ['k-cosmetics', 'k-cosmetics', 'neture'],
-    });
-    expect(tx.query.mock.calls[0][1]).toEqual(['offer-fixture', ['k-cosmetics', 'fixture-other'], true, 'PUBLIC']);
-    expect(mockCancel).toHaveBeenCalledWith('offer-fixture', ['kpa-society'], tx);
-    expect(mockPending).toHaveBeenCalledWith('offer-fixture', ['k-cosmetics'], tx);
-    expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
-    expect(events).toEqual(['connect', 'startTransaction', 'write', 'cancel', 'pending', 'sync', 'commitTransaction', 'release']);
-    expect(result).toMatchObject({ success: true, data: {
-      added: ['k-cosmetics'], removed: ['kpa-society'], serviceKeys: ['k-cosmetics', 'fixture-other'], distributionType: 'PUBLIC',
-    } });
+describe('service publication is atomic and cannot mutate registration approval', () => {
+  beforeEach(() => tx.query.mockImplementation(async (sql: string) => sql.includes('SELECT id, supplier_id') ? [rawFixture({ approval_status: 'APPROVED', is_active: true, price_general: 100, default_supply_enabled: false })] : []));
+  it.each([['missing', 'OFFER_NOT_FOUND'], ['foreign', 'NOT_OWNED']] as const)('refuses %s products under the lock', async (kind, error) => {
+    tx.query.mockResolvedValueOnce(kind === 'missing' ? [] : [rawFixture({ supplier_id: 'foreign' })]);
+    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{})).toEqual({ success: false, error });
+    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1); expect(mockPending).not.toHaveBeenCalled();
   });
-  it('unchanged targets do not create/cancel approvals but still sync', async () => {
-    query.mockResolvedValue([rawFixture()]);
-    await service.updateDistribution('offer-fixture', 'supplier-fixture', 'actor-fixture', {});
-    expect(mockPending).not.toHaveBeenCalled();
-    expect(mockCancel).not.toHaveBeenCalled();
-    expect(mockSync).toHaveBeenCalledTimes(1);
-    expect(tx.query.mock.calls[0][1]).toEqual(['offer-fixture', ['kpa-society'], false, 'SERVICE']);
+  it.each([['PENDING',100,'PRODUCT_NOT_APPROVED'],['APPROVED',0,'PRICE_REQUIRED']] as const)('refuses publication for %s / price %s', async (approval_status, price_general, error) => {
+    tx.query.mockResolvedValueOnce([rawFixture({ approval_status, price_general, is_active: true })]);
+    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ defaultSupplyEnabled: true })).toEqual({ success: false, error });
+    expect(tx.commitTransaction).not.toHaveBeenCalled();
   });
-  it('drug gate denies the proposed final scope without opening a transaction', async () => {
-    query.mockResolvedValue([rawFixture()]);
+  it('saves price, explicit Neture publication and selected services together', async () => {
+    const r = await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{
+      defaultSupplyEnabled: true, priceGeneral: 500, serviceKeys: ['kpa-society'], servicePrices: [{ serviceKey: 'kpa-society', unitPrice: 450 }],
+    });
+    expect(r).toMatchObject({ success: true, data: { defaultSupplyEnabled: true, priceGeneral: 500 } });
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO offer_service_prices'))).toBe(true);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('SET approval_status'))).toBe(false);
+    expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
+  });
+  it('withdrawing a service keeps default publication, product approval and service prices', async () => {
+    await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ serviceKeys: [] });
+    expect(mockCancel).toHaveBeenCalledWith('offer-fixture',['kpa-society'],tx);
+    expect(tx.query.mock.calls.some(([sql]) => /DELETE|SET approval_status|UPDATE organization_product_listings/.test(sql))).toBe(false);
+  });
+  it('drug denial rolls back before any publication write', async () => {
     drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN' });
-    expect(await service.updateDistribution('offer-fixture', 'supplier-fixture', 'actor-fixture', { isPublic: true })).toEqual({
-      success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN',
-    });
-    expect(drugGate).toHaveBeenCalledWith(AppDataSource, {
-      action: 'OFFER_PUBLISH', masterId: 'master-fixture', serviceKeys: ['kpa-society'], isPublic: true,
-    });
-    expect(tx.startTransaction).not.toHaveBeenCalled();
+    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ isPublic: true })).toEqual({ success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN' });
+    expect(tx.commitTransaction).not.toHaveBeenCalled(); expect(expand).not.toHaveBeenCalled();
   });
-  it.each(['write', 'cancel', 'pending', 'sync'] as const)('%s failure rolls back and releases the same query runner', async (stage) => {
-    query.mockResolvedValue([rawFixture()]);
-    const failure = new Error(`fixture ${stage} failure`);
-    if (stage === 'write') tx.query.mockRejectedValue(failure);
-    if (stage === 'cancel') mockCancel.mockRejectedValue(failure);
-    if (stage === 'pending') mockPending.mockRejectedValue(failure);
-    if (stage === 'sync') mockSync.mockRejectedValue(failure);
-    await expect(service.updateDistribution('offer-fixture', 'supplier-fixture', 'actor-fixture', { serviceKeys: ['k-cosmetics'] })).rejects.toBe(failure);
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(events.slice(-2)).toEqual(['rollbackTransaction', 'release']);
-  });
-  it('removed direct service delivery cannot issue price or scope writes', () => {
-    expect('setServiceDelivery' in service).toBe(false);
-    expect(query).not.toHaveBeenCalled();
-    expect(tx.startTransaction).not.toHaveBeenCalled();
+  it.each(['write','cancel','pending','sync'] as const)('%s failure rolls back the publication', async stage => {
+    const error = new Error('Fixture publication failure');
+    if (stage === 'write') tx.query.mockResolvedValueOnce([rawFixture({ approval_status:'APPROVED',is_active:true,price_general:100 })]).mockResolvedValueOnce([]).mockRejectedValueOnce(error);
+    if (stage === 'cancel') mockCancel.mockRejectedValueOnce(error);
+    if (stage === 'pending') mockPending.mockRejectedValueOnce(error);
+    if (stage === 'sync') mockSync.mockRejectedValueOnce(error);
+    await expect(service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ serviceKeys: ['k-cosmetics'] })).rejects.toBe(error);
+    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1); expect(tx.release).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -340,6 +213,7 @@ describe('supplier editing and partial batches preserve ownership and failure ou
     expect(repo.save).not.toHaveBeenCalled();
   });
   it('update drug denial prevents save and public expansion', async () => {
+    repo.findOne.mockResolvedValue(fixture({ approvalStatus: 'APPROVED' }));
     drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', message: 'Fixture denial' });
     expect(await service.updateSupplierOffer('offer-fixture', 'supplier-fixture', { isPublic: true })).toEqual({
       success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', message: 'Fixture denial',

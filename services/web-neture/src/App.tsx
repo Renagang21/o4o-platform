@@ -249,6 +249,7 @@ const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierPr
 
 // Supplier Product Library (WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1)
 const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
+const SupplierProductPublicationPage = lazy(() => import('./pages/supplier/SupplierProductPublicationPage'));
 const SupplierProductFromMasterPage = lazy(() => import('./pages/supplier/SupplierProductFromMasterPage'));
 
 // Supplier Account
@@ -857,6 +858,7 @@ function App() {
             }>
               <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/supplier/products/publication" element={<SupplierProductPublicationPage />} />
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
               <Route path="/supplier/products/from-master" element={<SupplierProductFromMasterPage />} />
               <Route path="/supplier/products/import-assistant" element={<SupplierProductImportPage />} />

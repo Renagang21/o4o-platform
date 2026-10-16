@@ -8,6 +8,7 @@
 > **Status:** Frozen (Beta-Operational)
 > **Freeze Date:** 2026-02-27
 > **Version:** v1.0
+> **최종 갱신:** 2026-10-16 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md), 제품 등록 승인과 서비스 게시 승인 분리
 
 ---
 
@@ -32,7 +33,7 @@ Neture Distribution Engine v1은 다음 범위를 포함하는 구조로 확정�
 
 ### Tier 1 — PUBLIC
 
-* 자동 확산 (상품 승인 시 모든 활성 조직에 listing 생성)
+* 공급자의 명시적 전체 공급 게시 시 활성 조직에 listing 생성 (제품 등록 승인만으로 생성하지 않음)
 * listing 기본값 `is_active = false`
 * 운영자가 가격/채널 설정 후 수동 활성화
 * Checkout: 채널 가드만 적용
@@ -77,7 +78,7 @@ Supplier INACTIVE / Product REJECTED
 
 * Listing은 전달 객체
 * 노출은 5중 가시성 게이트 통과 시만 가능
-* 승인과 listing 생성은 원자적 (SERVICE/PRIVATE)
+* 서비스 게시 승인과 listing 생성은 원자적 (SERVICE/PRIVATE). 제품 등록 승인은 별도이며 OSA·listing 생성 없음
 * PUBLIC은 자동 확산 시 bulk insert
 * 재승인 시 listing 자동 활성화 금지
 * Supplier INACTIVE 시 모든 Tier listing 비활성화
@@ -170,4 +171,4 @@ Freeze Date: 2026-02-27
 
 ---
 
-*Updated: 2026-02-27*
+*Updated: 2026-10-16*

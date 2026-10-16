@@ -142,8 +142,6 @@ export default function OperatorProductApprovalPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
-  const [guideDesc, setGuideDesc] = useState<string | null>(null);
-  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,8 +153,6 @@ export default function OperatorProductApprovalPage() {
         try {
           const parsed = JSON.parse(raw);
           if (parsed.title) setGuideTitle(parsed.title);
-          if (parsed.description) setGuideDesc(parsed.description);
-          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
         } catch { /* use fallback */ }
       })
       .catch(() => { /* use fallback */ });
@@ -412,11 +408,11 @@ export default function OperatorProductApprovalPage() {
       <GuideBlock
         variant="info"
         title={guideTitle ?? '공급자 상품 승인 절차를 안내합니다.'}
-        description={guideDesc ?? '공급자가 등록한 상품을 검토하고 플랫폼 노출 여부를 결정합니다.'}
-        steps={guideSteps ?? [
+        description="공급자의 제품 등록 정보를 검토합니다. 서비스 게시와 이벤트 조건 승인은 별도 업무입니다."
+        steps={[
           '승인대기 탭에서 검토할 상품 목록을 확인합니다',
           '상품명 클릭으로 이미지·설명·가격 등 상세 정보를 검토합니다',
-          '승인 시 서비스 노출 정책에 따라 즉시 배포됩니다',
+          '등록 승인만 기록하며 게시하지 않습니다. 공급자가 이후 서비스 게시 또는 이벤트를 진행합니다',
           '반려 시 사유를 입력하면 공급자에게 전달됩니다',
         ]}
         compact

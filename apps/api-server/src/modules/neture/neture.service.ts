@@ -310,7 +310,7 @@ export class NetureService {
     offerId: string,
     supplierId: string,
     userId: string,
-    input: { isPublic?: boolean; serviceKeys?: string[] },
+    input: import('./services/supplier-offer-distribution.service.js').SupplierPublicationInput,
   ) {
     return this.offerService.updateDistribution(offerId, supplierId, userId, input);
   }

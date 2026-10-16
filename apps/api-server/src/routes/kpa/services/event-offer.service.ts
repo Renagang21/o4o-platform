@@ -32,6 +32,34 @@ import {
   isSupportedTargetServiceKey,
 } from '../../../constants/event-offer-service-mapping.js';
 
+export interface EventOfferCreateInput {
+  offerId: string;
+  serviceKey: string;
+  organizationId: string;
+  roleType: 'supplier' | 'operator';
+  /** roleType='supplier'일 때 offer 소유권 검증용 (해당 offer의 supplier가 이 user에 매핑되는지) */
+  ownerUserId?: string;
+  /**
+   * WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+   * roleType='operator'일 때 결정자 user_id (decided_by에 기록).
+   * roleType='supplier'일 땐 무시.
+   */
+  operatorUserId?: string;
+  /**
+   * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+   * 이벤트 조건. supplier 가 일반 공급가/소비자가와 별도로 지정한다.
+   * 일반 공급가는 절대 변경하지 않는다.
+   */
+  eventConditions?: {
+    eventPrice: number;
+    startAt: Date;
+    endAt: Date;
+    totalQuantity?: number | null;
+    perOrderLimit?: number | null;
+    perStoreLimit?: number | null;
+  };
+}
+
 // ─── WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1 ───────────────────────────────
 // Event Offer service_key → Store(매장 진열) service_key 매핑.
 // 매핑된 항목만 참여 후 매장 진열 등록 후처리를 실행한다.
@@ -990,33 +1018,7 @@ export class EventOfferService {
   //
   // 중복 방지: (organization_id, service_key, offer_id)
 
-  async createListing(input: {
-    offerId: string;
-    serviceKey: string;
-    organizationId: string;
-    roleType: 'supplier' | 'operator';
-    /** roleType='supplier'일 때 offer 소유권 검증용 (해당 offer의 supplier가 이 user에 매핑되는지) */
-    ownerUserId?: string;
-    /**
-     * WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
-     * roleType='operator'일 때 결정자 user_id (decided_by에 기록).
-     * roleType='supplier'일 땐 무시.
-     */
-    operatorUserId?: string;
-    /**
-     * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
-     * 이벤트 조건. supplier 가 일반 공급가/소비자가와 별도로 지정한다.
-     * 일반 공급가는 절대 변경하지 않는다.
-     */
-    eventConditions?: {
-      eventPrice: number;
-      startAt: Date;
-      endAt: Date;
-      totalQuantity?: number | null;
-      perOrderLimit?: number | null;
-      perStoreLimit?: number | null;
-    };
-  }): Promise<{
+  async createListing(input: EventOfferCreateInput): Promise<{
     id: string;
     offerId: string;
     masterId: string;
@@ -1034,40 +1036,7 @@ export class EventOfferService {
     perStoreLimit: number | null;
     createdAt: string;
   }> {
-    // 1. Offer 조회 (master_id, supplier_id, price, name, supplier org_name)
-    const offerRows = await this.dataSource.query(
-      `SELECT spo.id, spo.master_id, spo.supplier_id, spo.price_general,
-              pm.name AS product_name,
-              org.name AS org_name
-       FROM supplier_product_offers spo
-       LEFT JOIN product_masters pm ON pm.id = spo.master_id
-       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-       LEFT JOIN organizations org   ON org.id = ns.organization_id
-       WHERE spo.id = $1
-       LIMIT 1`,
-      [input.offerId],
-    );
-    if (!offerRows.length) {
-      throw new EventOfferCreateError(404, 'Offer not found', 'OFFER_NOT_FOUND');
-    }
-    const offer = offerRows[0];
-
-    // 2. roleType='supplier'이면 소유권 검증
-    if (input.roleType === 'supplier') {
-      if (!input.ownerUserId) {
-        throw new EventOfferCreateError(
-          403,
-          'ownerUserId required for supplier role',
-          'OFFER_NOT_OWNED',
-        );
-      }
-      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
-      //   소유권 = canonical 공급자 관계(organization_members owner). legacy user_id 는 resolver 내부 fallback.
-      const ownedSupplierIds = await listOwnedSupplierIds(this.dataSource, input.ownerUserId);
-      if (!ownedSupplierIds.includes(String(offer.supplier_id))) {
-        throw new EventOfferCreateError(403, 'Offer not owned', 'OFFER_NOT_OWNED');
-      }
-    }
+    const offer = await this.loadApprovedListingOffer(input);
 
     // 3. 중복 체크 (organization_id, service_key, offer_id)
     const dup = await this.dataSource.query(
@@ -1093,45 +1062,8 @@ export class EventOfferService {
     const decidedAt = input.roleType === 'operator' ? new Date() : null;
 
     // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
-    // 이벤트 조건 입력 검증 — 정책: eventPrice <= price_general, startAt < endAt
-    const ec = input.eventConditions;
-    if (ec) {
-      if (!Number.isFinite(ec.eventPrice) || ec.eventPrice <= 0) {
-        throw new EventOfferCreateError(400, 'eventPrice 는 0 보다 큰 숫자여야 합니다.', 'INTERNAL_ERROR');
-      }
-      // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1:
-      //   검증 기준 = 대상 서비스의 서비스별 공급가(있으면) ?? 기본 공급가(price_general).
-      const generalPrice = offer.price_general != null ? Number(offer.price_general) : null;
-      const [svcPriceRow] = await this.dataSource.query(
-        `SELECT unit_price FROM offer_service_prices WHERE offer_id = $1 AND service_key = $2`,
-        [input.offerId, input.serviceKey],
-      );
-      const basePrice = svcPriceRow?.unit_price != null ? Number(svcPriceRow.unit_price) : generalPrice;
-      if (basePrice != null && ec.eventPrice > basePrice) {
-        throw new EventOfferCreateError(
-          400,
-          `이벤트 가격(${ec.eventPrice})은 공급가(${basePrice}) 이하여야 합니다.`,
-          'INTERNAL_ERROR',
-        );
-      }
-      const startMs = ec.startAt.getTime();
-      const endMs = ec.endAt.getTime();
-      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) {
-        throw new EventOfferCreateError(400, '시작/종료 일시 형식이 올바르지 않습니다.', 'INTERNAL_ERROR');
-      }
-      if (startMs >= endMs) {
-        throw new EventOfferCreateError(400, '시작 일시는 종료 일시보다 이전이어야 합니다.', 'INTERNAL_ERROR');
-      }
-      if (ec.totalQuantity != null && (!Number.isFinite(ec.totalQuantity) || ec.totalQuantity < 0)) {
-        throw new EventOfferCreateError(400, 'totalQuantity 는 0 이상이어야 합니다.', 'INTERNAL_ERROR');
-      }
-      if (ec.perOrderLimit != null && (!Number.isFinite(ec.perOrderLimit) || ec.perOrderLimit < 1)) {
-        throw new EventOfferCreateError(400, 'perOrderLimit 은 1 이상이어야 합니다.', 'INTERNAL_ERROR');
-      }
-      if (ec.perStoreLimit != null && (!Number.isFinite(ec.perStoreLimit) || ec.perStoreLimit < 1)) {
-        throw new EventOfferCreateError(400, 'perStoreLimit 은 1 이상이어야 합니다.', 'INTERNAL_ERROR');
-      }
-    }
+    // 양수 이벤트 가격·기간 필수. 대상의 양수 일반 공급가가 있으면 그 가격 이하.
+    const ec = await this.validateListingConditions(input, offer.price_general);
 
     // 5. INSERT
     const listingRepo = this.dataSource.getRepository(OrganizationProductListing);
@@ -1145,9 +1077,9 @@ export class EventOfferService {
       // 일반 공급가 스냅샷 (기존 로직 유지)
       price: offer.price_general != null ? Number(offer.price_general) : null,
       // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 전용 가격/기간/수량
-      event_price: ec ? ec.eventPrice : null,
-      start_at: ec ? ec.startAt : null,
-      end_at: ec ? ec.endAt : null,
+      event_price: ec.eventPrice,
+      start_at: ec.startAt,
+      end_at: ec.endAt,
       total_quantity: ec?.totalQuantity ?? null,
       per_order_limit: ec?.perOrderLimit ?? null,
       per_store_limit: ec?.perStoreLimit ?? null,
@@ -1160,6 +1092,91 @@ export class EventOfferService {
     } as Partial<OrganizationProductListing>);
 
     const saved = await listingRepo.save(listing);
+    return this.createdListingResult(input, offer, saved, status, isActive);
+  }
+
+  private async loadApprovedListingOffer(input: EventOfferCreateInput) {
+    // 1. Offer 조회 (master_id, supplier_id, price, name, supplier org_name)
+    const offerRows = await this.dataSource.query(
+      `SELECT spo.id, spo.master_id, spo.supplier_id, spo.price_general, spo.approval_status, spo.is_active, spo.deleted_at,
+              pm.name AS product_name,
+              org.name AS org_name
+       FROM supplier_product_offers spo
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       LEFT JOIN organizations org   ON org.id = ns.organization_id
+       WHERE spo.id = $1
+       LIMIT 1`,
+      [input.offerId],
+    );
+    if (!offerRows.length) {
+      throw new EventOfferCreateError(404, 'Offer not found', 'OFFER_NOT_FOUND');
+    }
+    const offer = offerRows[0];
+    if (offer.deleted_at || offer.approval_status !== 'APPROVED' || !offer.is_active) {
+      throw new EventOfferCreateError(409, '제품 등록 승인 및 활성화 후 이벤트를 신청할 수 있습니다.', 'PRODUCT_NOT_APPROVED');
+    }
+
+
+    // 2. roleType='supplier'이면 소유권 검증
+    if (input.roleType === 'supplier') {
+      if (!input.ownerUserId) {
+        throw new EventOfferCreateError(
+          403,
+          'ownerUserId required for supplier role',
+          'OFFER_NOT_OWNED',
+        );
+      }
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+      //   소유권 = canonical 공급자 관계(organization_members owner). legacy user_id 는 resolver 내부 fallback.
+      const ownedSupplierIds = await listOwnedSupplierIds(this.dataSource, input.ownerUserId);
+      if (!ownedSupplierIds.includes(String(offer.supplier_id))) {
+        throw new EventOfferCreateError(403, 'Offer not owned', 'OFFER_NOT_OWNED');
+      }
+    }
+
+    return offer;
+  }
+
+  private async validateListingConditions(input: EventOfferCreateInput, ordinaryPrice: number | string | null) {
+    const ec = input.eventConditions;
+    if (!ec) throw new EventOfferCreateError(400, '이벤트 가격과 시작·종료 일시가 필요합니다.', 'INVALID_EVENT_CONDITIONS');
+    if (ec) {
+      if (!Number.isFinite(ec.eventPrice) || ec.eventPrice <= 0) {
+        throw new EventOfferCreateError(400, 'eventPrice 는 0 보다 큰 숫자여야 합니다.', 'INVALID_EVENT_CONDITIONS');
+      }
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1:
+      //   검증 기준 = 대상 서비스의 서비스별 공급가(있으면) ?? 기본 공급가(price_general).
+      const generalPrice = ordinaryPrice != null ? Number(ordinaryPrice) : null;
+      const [svcPriceRow] = await this.dataSource.query(
+        `SELECT unit_price FROM offer_service_prices WHERE offer_id = $1 AND service_key = $2`,
+        [input.offerId, STORE_SERVICE_KEY_MAP[input.serviceKey] ?? input.serviceKey],
+      );
+      const basePrice = svcPriceRow?.unit_price != null ? Number(svcPriceRow.unit_price) : generalPrice;
+      if (basePrice != null && basePrice > 0 && ec.eventPrice > basePrice) {
+        throw new EventOfferCreateError(
+          400,
+          `이벤트 가격(${ec.eventPrice})은 공급가(${basePrice}) 이하여야 합니다.`,
+          'INVALID_EVENT_CONDITIONS',
+        );
+      }
+      const startMs = ec.startAt.getTime();
+      const endMs = ec.endAt.getTime();
+      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) {
+        throw new EventOfferCreateError(400, '시작/종료 일시 형식이 올바르지 않습니다.', 'INVALID_EVENT_CONDITIONS');
+      }
+      if (startMs >= endMs) {
+        throw new EventOfferCreateError(400, '시작 일시는 종료 일시보다 이전이어야 합니다.', 'INVALID_EVENT_CONDITIONS');
+      }
+      validateListingLimit(ec.totalQuantity, 0, 'totalQuantity');
+      validateListingLimit(ec.perOrderLimit, 1, 'perOrderLimit');
+      validateListingLimit(ec.perStoreLimit, 1, 'perStoreLimit');
+    }
+
+    return ec!;
+  }
+
+  private createdListingResult(input: EventOfferCreateInput, offer: { master_id: string; product_name: string; org_name: string; price_general: number | string | null }, saved: OrganizationProductListing, status: 'pending' | 'approved', isActive: boolean) {
     const createdAt = (saved.created_at instanceof Date
       ? saved.created_at
       : new Date(saved.created_at)
@@ -1580,6 +1597,8 @@ export class EventOfferError extends Error {
  * Typed error for createListing() — controller가 statusCode + code를 응답에 매핑.
  */
 export type EventOfferCreateErrorCode =
+  | 'PRODUCT_NOT_APPROVED'
+  | 'INVALID_EVENT_CONDITIONS'
   | 'OFFER_NOT_FOUND'
   | 'OFFER_NOT_OWNED'
   | 'ALREADY_LISTED'
@@ -1597,5 +1616,11 @@ export class EventOfferCreateError extends Error {
   ) {
     super(message);
     this.name = 'EventOfferCreateError';
+  }
+}
+
+function validateListingLimit(value: number | null | undefined, minimum: number, label: string): void {
+  if (value != null && (!Number.isFinite(value) || value < minimum)) {
+    throw new EventOfferCreateError(400, `${label} 는 ${minimum} 이상이어야 합니다.`, 'INVALID_EVENT_CONDITIONS');
   }
 }

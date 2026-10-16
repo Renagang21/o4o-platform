@@ -302,10 +302,10 @@ export default function SupplierProductsPage() {
           </p>
           <ul className="space-y-1.5">
             <li>
-              <strong>승인요청</strong> — 상품을 선택하고 위 <span className="font-medium">[승인 요청]</span> 버튼으로 운영자 검토를 요청합니다.
+              <strong>승인요청</strong> — 신규 등록은 자동으로 검토 대기 상태가 됩니다. 반려된 제품만 [등록 재검토 요청]으로 다시 제출합니다.
             </li>
             <li>
-              <strong>서비스 등록 신청</strong> — 상품 편집에서 공급할 서비스를 선택한 뒤 승인 요청합니다.
+              <strong>서비스 등록 신청</strong> — 등록 승인 후 [서비스 게시]에서 대상 서비스와 가격을 정합니다. 이벤트·특가는 별도 업무입니다.
               <span className="text-amber-600"> 의약품은 약국 대상 서비스에만 연결할 수 있습니다.</span>
             </li>
             <li>
@@ -337,9 +337,8 @@ export default function SupplierProductsPage() {
       <div className="flex border-b border-slate-200 mb-3">
         {([
           { key: 'all' as ApprovalTab, label: '전체', count: tabCounts?.total },
-          { key: 'unrequested' as ApprovalTab, label: '승인요청 전', count: tabCounts?.unrequested },
-          { key: 'pending' as ApprovalTab, label: '승인 요청 중', count: tabCounts?.pending },
-          { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts?.approved },
+          { key: 'pending' as ApprovalTab, label: '등록 검토 중', count: tabCounts?.pending },
+          { key: 'approved' as ApprovalTab, label: '등록 승인', count: tabCounts?.approved },
           { key: 'rejected' as ApprovalTab, label: '거절', count: tabCounts?.rejected },
         ]).map((tab) => (
           <button
@@ -406,7 +405,7 @@ export default function SupplierProductsPage() {
             className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded"
           >
             <Send size={13} />
-            승인 요청
+            등록 재검토 요청
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}

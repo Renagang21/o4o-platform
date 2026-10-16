@@ -20,6 +20,7 @@ export interface SupplierProduct {
   description: string;
   purpose: SupplierProductPurpose;
   isActive: boolean;
+  defaultSupplyEnabled?: boolean;
   acceptsApplications: boolean;
   isPublic: boolean;
   // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
@@ -38,6 +39,7 @@ export interface SupplierProduct {
   specification: string | null;
   primaryImageUrl: string | null;
   approvalStatus: string;
+  registrationRejectionReason?: string | null;
   priceGeneral: number;
   priceGold: number | null;
   /** @deprecated WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 별도 정책으로 이동 */
