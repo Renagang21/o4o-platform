@@ -40,7 +40,7 @@ Node `22.18.0`, pnpm `10.25.0`, `/workspace/.o4o-cloud/activate.sh` 사용.
 | 계약 검사 | PASS — API Jest 8 suites / 194 tests. 선행 5 계약 + signage forced-content surface read + service AI query HTTP + service AI extensions |
 | Store/KPA/Neture build | PASS — `pnpm --filter store-web build`, `pnpm --filter @o4o/web-kpa-society build`, `pnpm --filter @o4o/web-neture build` |
 | 집중 ESLint | PASS — 변경 TS/TSX 19개, 오류·경고 0. 최종 fixture/guard 변경 파일도 재검사 PASS |
-| 문서·diff | PASS — `node scripts/check-doc-sensitive.mjs` 4026개, 상대 링크 23개, `git diff --check` |
+| 문서·diff | PASS — `node scripts/check-doc-sensitive.mjs` 4028개, 상대 링크 24개, `git diff --check` |
 
 신규 검사는 공통 AI의 명시 요청·화면 문맥·대화/입력 보존·중복 요청·한도·scope 격리·빈 응답·유료 호출 timeout,
 사이니지 같은 ID/확인된 성공 자료 재사용·불명확한 결과 재전송 차단·저장 잠금·snapshot 미리보기,
