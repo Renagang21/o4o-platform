@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { neturePharmacyAdminApi as api, formatDateTime, type SemiFranchise } from './api';
 import { INPUT, Message, PageHeader, StatusBadge } from './PharmacyCommerceUi';
+import { ServiceFeatureSelector } from './ServiceFeatureSelector';
 
 type Msg = { type: 'success' | 'error'; text: string } | null;
 
@@ -18,22 +19,29 @@ interface EditForm {
   communityKey: string;
   paymentReceiverKey: string;
   registrationConditions: string;
+  serviceFeatures: string[];
 }
 
 export default function AdminSemiFranchisePage() {
   const [items, setItems] = useState<SemiFranchise[]>([]);
+  const [features, setFeatures] = useState<Array<{ key: string; label: string }>>([]);
+  const [settingsReady, setSettingsReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<Msg>(null);
   const [busy, setBusy] = useState(false);
-  const [createForm, setCreateForm] = useState({ key: '', name: '', communityKey: '', registrationConditions: '' });
+  const [createForm, setCreateForm] = useState({ key: '', name: '', communityKey: '', registrationConditions: '', serviceFeatures: [] as string[] });
   const [editKey, setEditKey] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ name: '', status: 'active', communityKey: '', paymentReceiverKey: '', registrationConditions: '' });
+  const [editForm, setEditForm] = useState<EditForm>({ name: '', status: 'active', communityKey: '', paymentReceiverKey: '', registrationConditions: '', serviceFeatures: [] });
   const [operatorInput, setOperatorInput] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
+    setSettingsReady(false);
     try {
-      setItems((await api.listSemiFranchises()) ?? []);
+      const [businesses, catalog] = await Promise.all([api.listSemiFranchises(), api.listServiceFeatures()]);
+      setItems(businesses);
+      setFeatures(catalog);
+      setSettingsReady(true);
     } catch (err) {
       setMessage({ type: 'error', text: (err as Error).message });
     } finally {
@@ -69,10 +77,11 @@ export default function AdminSemiFranchisePage() {
           name: createForm.name.trim(),
           communityKey: createForm.communityKey.trim() || undefined,
           registrationConditions: createForm.registrationConditions.trim(),
+          serviceFeatures: createForm.serviceFeatures,
         }),
       '약국 협력사업을 만들었습니다.',
     );
-    if (ok) setCreateForm({ key: '', name: '', communityKey: '', registrationConditions: '' });
+    if (ok) setCreateForm({ key: '', name: '', communityKey: '', registrationConditions: '', serviceFeatures: [] });
   };
 
   const startEdit = (sf: SemiFranchise) => {
@@ -83,6 +92,7 @@ export default function AdminSemiFranchisePage() {
       communityKey: sf.community_key ?? '',
       paymentReceiverKey: sf.payment_receiver_key ?? '',
       registrationConditions: sf.registration_conditions ?? '',
+      serviceFeatures: sf.service_features ?? [],
     });
   };
 
@@ -92,6 +102,7 @@ export default function AdminSemiFranchisePage() {
       status: editForm.status,
       communityKey: editForm.communityKey.trim() || null,
       registrationConditions: editForm.registrationConditions.trim(),
+      serviceFeatures: editForm.serviceFeatures,
     };
     // 수취 주체 키는 바뀐 경우에만 보낸다(빈 값 = 미정으로 되돌림).
     if ((sf.payment_receiver_key ?? '') !== editForm.paymentReceiverKey.trim()) {
@@ -146,14 +157,17 @@ export default function AdminSemiFranchisePage() {
           <textarea aria-label="서비스 가입 조건" className={INPUT} maxLength={4000} placeholder="운영자와 협의한 가입 조건" value={createForm.registrationConditions} onChange={(e) => setCreateForm({ ...createForm, registrationConditions: e.target.value })} />
           <button
             type="button"
-            disabled={busy || !createForm.key.trim() || !createForm.name.trim()}
+            disabled={busy || !settingsReady || !createForm.key.trim() || !createForm.name.trim()}
             onClick={create}
             className="rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
             만들기
           </button>
         </div>
+        <ServiceFeatureSelector features={features} selected={createForm.serviceFeatures} disabled={busy || !settingsReady}
+          onChange={serviceFeatures => setCreateForm(previous => ({ ...previous, serviceFeatures }))} />
       </section>
+      {!settingsReady && !loading && <button type="button" onClick={load} className="rounded border px-4 py-2 text-sm">설정 다시 불러오기</button>}
 
       <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         결제 수취 주체(실제 수취인 · PG 연동)는 아직 정해지지 않았습니다. 수취 주체 키는 사업 결정이 내려진 뒤에만 입력하세요.
@@ -205,16 +219,18 @@ export default function AdminSemiFranchisePage() {
                     </label>
                   </div>
                   <textarea aria-label="서비스 가입 조건 수정" className={INPUT} maxLength={4000} value={editForm.registrationConditions} onChange={(e) => setEditForm({ ...editForm, registrationConditions: e.target.value })} />
+                  <ServiceFeatureSelector features={features} selected={editForm.serviceFeatures} disabled={busy || !settingsReady}
+                    onChange={serviceFeatures => setEditForm(previous => ({ ...previous, serviceFeatures }))} />
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      disabled={busy || !editForm.name.trim()}
+                      disabled={busy || !settingsReady || !editForm.name.trim()}
                       onClick={() => saveEdit(sf)}
                       className="rounded-md bg-primary-600 px-4 py-2 text-sm text-white disabled:opacity-50"
                     >
                       저장
                     </button>
-                    <button type="button" onClick={() => setEditKey(null)} className="rounded-md border px-4 py-2 text-sm">
+                    <button type="button" disabled={busy} onClick={() => setEditKey(null)} className="rounded-md border px-4 py-2 text-sm">
                       취소
                     </button>
                   </div>
@@ -232,7 +248,7 @@ export default function AdminSemiFranchisePage() {
                       {sf.payment_receiver_key || '미정'}
                     </div>
                   </div>
-                  <button type="button" onClick={() => startEdit(sf)} className="rounded-md border px-3 py-1.5 text-sm">
+                  <button type="button" disabled={busy || !settingsReady} onClick={() => startEdit(sf)} className="rounded-md border px-3 py-1.5 text-sm">
                     수정
                   </button>
                 </div>

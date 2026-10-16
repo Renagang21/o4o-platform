@@ -19,6 +19,7 @@ import {
   rowsOf,
 } from '../constants.js';
 import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
+import { validateServiceFeatures, type PharmacyServiceFeature } from './service-features.js';
 
 export interface SemiFranchiseRow {
   id: string;
@@ -29,9 +30,10 @@ export interface SemiFranchiseRow {
   payment_receiver_key: string | null;
   community_key: string | null;
   registration_conditions?: string | null;
+  service_features?: PharmacyServiceFeature[];
 }
 
-const SF_COLUMNS = `sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, (SELECT metadata->>'registrationConditions' FROM organizations WHERE id = sf.organization_id) AS registration_conditions`;
+const SF_COLUMNS = `sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, (SELECT metadata->>'registrationConditions' FROM organizations WHERE id = sf.organization_id) AS registration_conditions, (SELECT COALESCE(metadata->'serviceFeatures', '[]'::jsonb) FROM organizations WHERE id = sf.organization_id) AS service_features`;
 const KEY_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
 export class SemiFranchiseService {
@@ -234,7 +236,8 @@ export class SemiFranchiseService {
     );
   }
 
-  async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string }): Promise<SemiFranchiseRow> {
+  async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown }): Promise<SemiFranchiseRow> {
+    const serviceFeatures = validateServiceFeatures(input.serviceFeatures === undefined ? [] : input.serviceFeatures);
     const key = typeof input.key === 'string' ? input.key.trim().toLowerCase() : '';
     if (input.registrationConditions !== undefined && (typeof input.registrationConditions !== 'string' || input.registrationConditions.length > 4000)) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
     const name = typeof input.name === 'string' ? input.name.trim() : '';
@@ -250,7 +253,7 @@ export class SemiFranchiseService {
       // 운영 조직 — 이 세미프랜차이즈 이벤트 원장(OPL)의 소유 조직.
       const [org] = await m.query(
         `INSERT INTO organizations (name, code, type, "isActive", metadata) VALUES ($1, $2, 'semi_franchise', true, $3::jsonb) RETURNING id`,
-        [`${name} 세미프랜차이즈 운영`, `semi-franchise-${key}`, JSON.stringify({ registrationConditions: input.registrationConditions?.trim() || null })],
+        [`${name} 세미프랜차이즈 운영`, `semi-franchise-${key}`, JSON.stringify({ registrationConditions: input.registrationConditions?.trim() || null, serviceFeatures })],
       );
       const [row] = await m.query(
         `INSERT INTO semi_franchises (key, name, organization_id, community_key)
@@ -258,7 +261,7 @@ export class SemiFranchiseService {
          RETURNING id, key, name, organization_id, status, payment_receiver_key, community_key`,
         [key, name, org.id, communityKey],
       );
-      return row;
+      return { ...row, service_features: serviceFeatures };
     });
   }
 
@@ -268,8 +271,9 @@ export class SemiFranchiseService {
    */
   async update(
     key: string,
-    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string },
+    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown },
   ): Promise<SemiFranchiseRow> {
+    const serviceFeatures = patch.serviceFeatures === undefined ? undefined : validateServiceFeatures(patch.serviceFeatures);
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
     if (patch.status && patch.status !== 'active' && patch.status !== 'closed') {
@@ -283,6 +287,9 @@ export class SemiFranchiseService {
       if (patch.registrationConditions !== undefined) {
         if (typeof patch.registrationConditions !== 'string' || patch.registrationConditions.length > 4000) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
         await m.query(`UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('registrationConditions', $2::text) WHERE id = $1`, [sf.organization_id, patch.registrationConditions.trim()]);
+      }
+      if (serviceFeatures !== undefined) {
+        await m.query(`UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('serviceFeatures', $2::jsonb) WHERE id = $1`, [sf.organization_id, JSON.stringify(serviceFeatures)]);
       }
       const has = (k: string) => Object.prototype.hasOwnProperty.call(patch, k);
       const [row] = rowsOf(await m.query(
@@ -304,7 +311,7 @@ export class SemiFranchiseService {
           patch.paymentReceiverKey?.trim() || null,
         ],
       ));
-      return { ...row, registration_conditions: patch.registrationConditions?.trim() ?? sf.registration_conditions };
+      return { ...row, registration_conditions: patch.registrationConditions?.trim() ?? sf.registration_conditions, service_features: serviceFeatures ?? sf.service_features ?? [] };
     });
   }
 

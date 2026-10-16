@@ -43,6 +43,7 @@ import { getBusinessInfo } from './services/business-info.js';
 import { PharmacyMembershipService } from './services/pharmacy-membership.service.js';
 import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provisioner.js';
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
+import { PHARMACY_SERVICE_FEATURES, PharmacyServiceFeatureService } from './services/service-features.js';
 import { getSupplyOption, listActiveSemiFranchiseKeys, listSupplyOptions } from './services/supply-access.js';
 import { SupplyProposalService, type ProposalAction } from './services/supply-proposal.service.js';
 import { SemiFranchiseEventService, type EventAction } from './services/semi-franchise-event.service.js';
@@ -104,6 +105,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
+  const serviceFeatures = new PharmacyServiceFeatureService(dataSource);
   const proposals = new SupplyProposalService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
   const recruitments = new SemiFranchiseRecruitmentService(dataSource);
@@ -299,6 +301,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
       actionParam<'publish' | 'archive'>(req, ['publish', 'archive']))));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
+  router.get('/pharmacy/service-features', ...store, handle(async req => serviceFeatures.resolve(req.user!.id, org(req))));
+  router.get('/admin/service-features', ...admin, handle(async () => PHARMACY_SERVICE_FEATURES));
   router.get('/admin/semi-franchises', ...admin, handle(async () => semiFranchises.listAll()));
   router.post('/admin/semi-franchises', ...admin, handle(async (req, res) => {
     res.status(201);

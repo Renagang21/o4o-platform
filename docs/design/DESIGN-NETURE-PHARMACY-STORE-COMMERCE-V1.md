@@ -474,6 +474,19 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ---
 
+### 15-4. 공통 제공 기능 판정·최소 관리자 설정 (2026-10-16)
+
+- 협업체의 추가 제공 기능은 운영 조직 `organizations.metadata.serviceFeatures`에 저장한다. 새 테이블·migration·원장은 만들지 않는다. 미설정은 추가 제공 없음이며, 기존 가입·공급·원본/독립 사본 계약은 그대로다.
+- 전체 관리자 기존 사업 생성·수정 화면에 고정 기능 체크를 추가한다. 현재 목록은 `tablet`(태블릿), `multilingual-content`(다국어 상품 콘텐츠)뿐이다. 실시간 통역·전문인 상담·상품 진열 위치 업무가 구현됐다는 뜻이 아니다. 새 사업의 기존 기능 선택은 데이터 변경이며 새 업무 기능은 개발 대상이다.
+- `GET /api/v1/neture/admin/service-features`는 기존 `platform:super_admin` guard로 카탈로그를 제공한다. 기존 생성/수정 API의 `serviceFeatures`는 배열만 허용하고 미지원 키는 400, 중복은 정규화한다. 수정에서 필드 생략은 유지, `[]`는 명시적 해제다. 다른 조직 metadata는 보존한다.
+- `GET /api/v1/neture/pharmacy/service-features`는 기존 로그인·매장 접근 guard가 확정한 조직으로만 판정한다. 무료 초대 직원의 접근은 그대로이며, 유료회원·관리자·협업체 가입이 매장 접근이나 약사 업무 권한을 새로 부여하지 않는다.
+- 공통 판정기는 해당 약국의 기본 승인 active ∧ 해당 협업체 가입 active ∧ 사업 active인 제공 목록을 합친다. 기능은 중복하지 않고 제공 출처는 보존한다. 한 출처가 종료돼도 다른 유효 출처가 있으면 이용 가능하다. 별도 캐시 없이 요청마다 현행 원장·설정을 읽는다.
+- 개인회원 유료 원장은 확인되지 않았다. 기존 `store_paid_feature_entitlements`는 조직 단위이므로 개인회원 자격으로 재해석하지 않는다. 서버의 `MemberFeatureResolver(userId)` 연결점만 제공하며 HTTP의 유료 상태·기능 목록은 받지 않는다. 기본 응답 `memberEntitlement='not-connected'`이고, 협업체 제공이 없는 기능의 `allowed=null`은 **확인 미완료**다. 연결된 회원 원장이 없다고 미가입/무료로 판정하지 않는다. 협업체 제공이 확인되면 `allowed=true`는 확정할 수 있다.
+- 조회/설정 해석 실패는 503 `FEATURE_ACCESS_UNAVAILABLE`이며 빈 목록·미가입으로 바꾸지 않는다. 공통 `require()`는 모든 출처를 확인한 뒤에만 403을 반환하며 개인회원 미연결 시 필요한 기능을 확인할 수 없으면 503을 반환한다.
+- 이번 범위는 판정 API·관리자 설정이다. 내 매장 메뉴·기존 실행 endpoint의 전면 gating은 별도 담당이 연결한다. 기존 정상 기능을 새 설정 부재로 차단하지 않는다. 소비처는 판정 API의 `allowed === true`만 허용으로 사용하고 `null`을 이용 불가 안내가 아닌 연결/확인 미완료로 처리해야 한다. 전문인 자격·직원 작업 범위·자료 접근 guard는 독립적으로 유지한다.
+
+구현·검증·인계: [CHECK-O4O-PHARMACY-SERVICE-FEATURES-V1](../checks/CHECK-O4O-PHARMACY-SERVICE-FEATURES-V1.md).
+
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
