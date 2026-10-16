@@ -30,7 +30,7 @@ const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.free
   supplier: ['/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
   funding: ['/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
   community: ['/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
-  carepharm: ['/communities/carepharm/forum', '/communities/carepharm/public'],
+  carepharm: ['/my/participation', '/materials', '/tools', '/communities/business%3Acarepharm/forum', '/communities/business:carepharm/forum', '/operator/semi-franchises'],
 });
 
 /**
@@ -136,7 +136,10 @@ export function decideHost(
     '/admin/settings/service-audience': 'https://admin.neture.co.kr',
   };
   for (const [prefix, origin] of Object.entries(managementOrigins)) {
-    if (matchesPrefix(pathname, prefix)) return { kind: 'external', href: `${origin}${suffix}` };
+    if (matchesPrefix(pathname, prefix)) {
+      if (profile === 'carepharm' && prefix === '/operator/semi-franchises') return { kind: 'stay' };
+      return { kind: 'external', href: `${origin}${suffix}` };
+    }
   }
 
   if (profile === 'main') {

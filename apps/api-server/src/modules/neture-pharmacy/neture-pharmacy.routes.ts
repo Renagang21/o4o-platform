@@ -1,5 +1,6 @@
 import { StoreStaffSupportService } from './services/store-staff-support.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
+import { resolveBusinessStoreAccess } from './services/business-store-access.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
@@ -180,6 +181,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
 
   // Application surface: authentication only; membership still gates every business resource.
   router.get('/pharmacy/businesses/:key', requireAuth, handle(async (req) => getBusinessInfo(dataSource, req.params.key)));
+  router.get('/pharmacy/businesses/:key/store-access', ...store, handle(async (req) =>
+    resolveBusinessStoreAccess(dataSource, req.user!.id, org(req), req.params.key)));
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
     semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));

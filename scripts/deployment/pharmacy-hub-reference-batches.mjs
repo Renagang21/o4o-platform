@@ -73,10 +73,12 @@ export async function prepareReferenceGroups(q,columns,targetSql,keys,errorCode)
 const canonicalUuid='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
 const escapedToken=`regexp_replace(token,'([[:punct:]])',repeat(chr(92),3)||'1','g')`;
 /**
- * One keyset page over every grouped column. Text/JSON/array values use the
- * literal-substring regex. UUID values stay native: equality against canonical
- * targets, and the regex only for short legacy tokens (same decision as the
- * separate UUID path, without casting every UUID to text for the full pattern).
+ * One keyset page over every grouped column. Text/JSON/array values use a
+ * literal byte substring test per target (strpos, "C" collation): the same
+ * matches as the fully-escaped regex alternation, whose cost grows with every
+ * alternative and dominated the production scans. UUID values stay native:
+ * equality against canonical targets, and the regex only for short legacy
+ * tokens (same decision as the separate UUID path, without casting every UUID).
  */
 export function groupedReferenceQuery(c,owned) {
   const types=c.types??c.columns?.map(()=>'text');
@@ -86,9 +88,10 @@ export function groupedReferenceQuery(c,owned) {
   const values=c.columns.map((column,i)=>types[i]==='uuid'?`s.${quote(column)} AS v${i+1}`:`s.${quote(column)}::text AS v${i+1}`);
   const hits=c.columns.map((_,i)=>types[i]==='uuid'
     ?`(source.v${i+1} = ANY(targets.uuids) OR (targets.legacy_pattern IS NOT NULL AND (source.v${i+1}::text COLLATE "C") ~ targets.legacy_pattern))`
-    :`CASE WHEN octet_length(source.v${i+1})>=targets.min_bytes THEN (source.v${i+1} COLLATE "C") ~ targets.pattern ELSE FALSE END`);
+    :`CASE WHEN octet_length(source.v${i+1})>=targets.min_bytes THEN EXISTS (SELECT 1 FROM unnest(targets.tokens) target
+              WHERE strpos(source.v${i+1} COLLATE "C",target)>0) ELSE FALSE END`);
   return `WITH target_patterns AS MATERIALIZED (
-        SELECT string_agg(${escapedToken},'|') AS pattern,
+        SELECT array_agg(token) AS tokens,
           min(octet_length(token)) AS min_bytes,
           array_agg(CASE WHEN token ~ '${canonicalUuid}' THEN token::uuid END) FILTER(WHERE token ~ '${canonicalUuid}') AS uuids,
           string_agg(${escapedToken},'|') FILTER(WHERE token ~ '^[0-9a-f-]{1,36}$' AND token !~ '${canonicalUuid}') AS legacy_pattern
@@ -99,7 +102,7 @@ export function groupedReferenceQuery(c,owned) {
         WHERE ($2::uuid IS NULL OR s.${quote(c.scan_key)}>$2::uuid)
         ORDER BY s.${quote(c.scan_key)} LIMIT ${referenceBatchSize}),
       -- Materialized so count() and min() share one evaluation; an inlined CTE
-      -- repeats every regex per aggregate.
+      -- repeats every substring test per aggregate.
       found AS MATERIALIZED (
         SELECT CASE WHEN COALESCE(source.owned,FALSE) THEN NULL
           ELSE array_position(ARRAY[${hits.join(',\n            ')}]::boolean[],TRUE) END AS ordinal
