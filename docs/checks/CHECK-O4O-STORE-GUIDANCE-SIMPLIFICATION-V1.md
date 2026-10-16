@@ -96,3 +96,16 @@ Auth/선택 매장 문맥과 HTTP API만 합성 fixture다. 문맥 A/B는 실제
 
 초기 TODO → 점검 후 TODO → 구현·검증 결과를 WO에 남기고 [현재 화면/업무 설계](../platform/store/DESIGN-O4O-STORE-WORKSPACE-WEB-V1.md)의 2026-10-16 절을 갱신한다.
 과거 WO/CHECK와 canonical index의 판정·상태를 다시 쓰지 않는다.
+
+## 2026-10-16 통합 담당 검증
+
+인계 head `e81a71cc01`을 main `a4063be499`와 결합한 전용 통합 worktree에서 충돌 없이 검증했다. 기존 PR #651을 재사용한다.
+
+- frozen lockfile·integrity 설치와 workspace packages build PASS.
+- Store 전체 48 files / 590 tests PASS. 기존 API 계약 5 suites / 111 tests PASS(로컬 scoped-mount 서버가 필요해 sandbox 소켓 제한 확인 후 재실행).
+- Store·KPA·Neture TypeScript 포함 production build PASS. 기존 Browserslist·chunk 크기 경고는 비차단이다.
+- 실제 공통 PublicScreenSetViewer·TabletKioskPage와 production CSS를 Chromium 1440/390px에서 실행했다. 고객 제목·관리 이름 미노출·가로 넘침 없음, 키보드 상세 열기·Escape·포커스 복귀, 제품 설명·복귀, 모바일 기존 QR 직접 링크의 14개 관측 PASS. pageerror/외부 요청/네트워크 쓰기 각각0. 합성 데이터이며 운영 계정·실제 기기 재생 검증은 아니다.
+- 최초 browser harness가 태블릿 제품 상세도 dialog로 가정했다. 기존 전체 상세 화면→뒤로 계약에 맞춰 기대를 바로잡아 재검증했다. 제품 코드를 이 기대에 맞춰 바꾸지 않았다.
+- source head의 CI Gate는 PASS였으나 Sonar Reliability B로 실패했다. guardedCancel의 한 줄 다중 조건문을 동작 변경 없이 중괄호·여러 줄로 명확히 구분했다. 보완 후 관련 17 tests와 변경 대상 ESLint PASS. source export package에는 독립 build script가 없어 이를 package build PASS로 집계하지 않는다.
+
+최신 HEAD의 원격 CI·Sonar·Codex 결과는 다시 확인한다. 이 기록은 main 병합·운영 배포 성공을 선행 보고하지 않는다.
