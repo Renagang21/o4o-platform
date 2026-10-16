@@ -238,7 +238,6 @@ export class MediaLibraryService {
 
     const qb = this.repo.createQueryBuilder('m')
       .where('m.is_library_public = true')
-      .andWhere("(m.service_key IS NULL OR (BTRIM(m.service_key) NOT IN (:...retiredKeys) AND BTRIM(m.service_key) NOT LIKE :retiredNamespace))", { retiredKeys: ['pharmacy-hub', 'pharmacy-hub-event-offer'], retiredNamespace: 'pharmacy-hub:%' })
       .orderBy('m.created_at', 'DESC').addOrderBy('m.id', 'DESC');
 
     // Type(asset_type) — 파일 종류 필터
