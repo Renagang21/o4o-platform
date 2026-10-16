@@ -70,3 +70,9 @@ it("propagates reward audit failure from the same transaction", async () => {
     }),
   );
 });
+it("keeps fulfillment obligations after fulfilled → closed but not for failed auto-closes", () => {
+  const sql = FUNDING_EXCEPTION_SQL.fulfillment_pending;
+  expect(sql).toContain("t.status IN ('outcome_confirming','fulfilled')");
+  expect(sql).toContain(`'[{"from":"fulfilled","to":"closed"}]'::jsonb`);
+  expect(sql).not.toMatch(/IN \([^)]*'closed'/);
+});

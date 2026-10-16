@@ -1,6 +1,6 @@
 # 공급자 보완 요청·이력 / 펀딩 입금·이행 예외 검증
 
-작성: 2026-10-16 · 상태: 개발 검증 완료 / branch push 인계
+작성: 2026-10-16 · 상태: PR #653 blocker 3건 수정·재검증 완료 / branch push 인계 (하단 "PR #653 후속 수정" 참조)
 Repository: Renagang21/o4o-platform
 Branch: `wo/supplier-funding-operator-exceptions` · base: `daad0563c`
 작업서: [TODO](../work-orders/WO-O4O-SUPPLIER-FUNDING-OPERATOR-EXCEPTIONS-TODO-V1.md)
@@ -69,3 +69,41 @@ PR·CI 운영·병합·배포는 수행하지 않는다. 개발 branch는 통합
 
 문서 정합: TODO 완료 항목과 조사 근거를 갱신하고 서비스별 roadmap에 이번 범위를 연결했다.
 정본 정책과 완료된 과거 WO/CHECK는 재작성하지 않았다.
+
+## PR #653 후속 수정 (2026-10-16)
+
+검토 head `782394b3d` 에서 통합 담당이 전달한 blocker 3건을 같은 branch 에서 수정했다.
+
+### 실패 원인과 수정
+
+| blocker | 원인 | 수정 |
+|---|---|---|
+| Codex P1 · 종료 후 이행 의무 소실 | `fulfillment_pending` 이 trial `outcome_confirming`/`fulfilled` 만 보았다. `fulfilled→closed` 는 미이행 참여자가 있어도 허용되므로 종료 순간 입금 확인·이행 미확인 의무가 목록에서 사라졌다 | 판정 범위에 `closed` 중 `statusHistory` 에 `fulfilled→closed` 전환이 기록된 trial 을 추가했다. 모집 실패 자동 종료(`recruiting→closed`, `closeReason=auto_target_missed`)와 심사 단계 종료는 그 전환 기록이 없어 포함되지 않는다. 새 상태·기한은 만들지 않았다 |
+| Codex P2 · 제출 전 검토 완료 | `resolve` 가 `resolved` 만 거부해 `requested` 에서도 통과, `submitted_at` 없는 완료가 생겼다. UI 도 요청 상태에서 검토 완료 입력을 보였다 | 공급자 행·요청 행 잠금 뒤 최신 상태가 `submitted` 일 때만 완료하고, `requested` 는 409 `REVIEW_REQUEST_NOT_SUBMITTED` 로 거부한다. UPDATE 에도 기대 상태·version 조건을 넣어 0행이면 409 로 끝낸다. UI 는 운영자에게 `requested` 요청을 "공급자 제출 대기" 안내로만 보여 주고 입력·저장 버튼을 숨긴다 |
+| Sonar Reliability C | 신뢰성 BUG 는 `OperatorSupplierApprovalPage.tsx:337` 미처리 Promise(S9383) 1건. 그 밖에 신뢰성 영향 LOW 인 S7503(async 내 await 없음) 3건(`create`·`transition`·`update`) | drawer action 은 `runWrite` 가 모든 오류를 잡아 화면에 표시하므로 Promise 를 `void` 로 명시했다. 서비스 3개는 `return await` 로 바꿔 입력 검증 실패도 기존처럼 reject 로 전달된다(동기 throw 로 바뀌지 않음). 규칙 비활성화·기준 완화는 하지 않았다 |
+
+유지보수성 경고(props readonly · nested ternary · `role="status"` · Cognitive Complexity)는 신뢰성 결함이 아니며 gate 의 maintainability 조건은 A 였다.
+수정한 패널의 입력 라벨 중첩 삼항은 변수로 정리했고, 나머지 유지보수성 경고는 이번 blocker 범위 밖이라 두었다.
+
+### 재검증
+
+| 검증 | 결과 |
+|---|---|
+| frozen install / 공통 패키지 build | 통과 |
+| API·Neture TypeScript / production build | 통과 |
+| Neture 전체 Vitest | 112개 파일, 1,062개 통과 (패널 신규 2개: 제출 전 완료 차단 · 제출 건 version 포함 완료) |
+| 관련 API 단위·경로 (예외·보완 요청·handler·펀딩 기록) | 4 suites, 39개 통과 (신규: requested→resolve 거부, submitted→resolve 허용·상태/version 조건, UPDATE 0행 409, 종료 판정 SQL) |
+| 전용 PostgreSQL 통합 (`O4O_SUPPLIER_FUNDING_TEST_PORT=55449`) | 8개 통과. 이번 PC 는 PostgreSQL 17 임시 클러스터(127.0.0.1 전용·trust·세션 scratch 디렉터리)로 실행했다 |
+| 통합 신규 2건 | requested→resolve 거부 후 행 불변(state·version·submitted_at·resolved_at), 제출 후 동시 resolve 2건 중 1건만 성공·나머지 `REVIEW_REQUEST_CHANGED`, 감사 2건만 추가 / `fulfilled→closed` trial 은 이행 미확인 유지·이행 기록 후 해소, 모집 실패 자동 종료 trial 은 어떤 예외로도 미포함 |
+| migration `1792116000000` | 같은 통합 실행에서 bootstrap+incremental 적용, 등록 fingerprint 일치, down→이전 fingerprint, up→복구, 재실행 no-op, writer fence 활성 확인. 임시 DB 는 afterAll 에서 DROP 했고 잔존 0 을 조회로 확인했다 |
+| migration 계약 | 21 pass / 0 fail |
+| 변경 파일 ESLint | 오류·경고 0 |
+| PC 1440 / mobile 390 브라우저 | production build 를 실제 호스트명으로 띄우고 모든 API 를 합성 응답으로 가로챘다. 요청 상태 공급자는 완료 입력·버튼 0, 제출 상태 공급자는 저장 실패 시 입력 유지→재시도 성공→목록 조회 실패 안내→조회만 재시도. resolve 쓰기 2회(실패1·성공1), 조회 재시도 추가 쓰기 0, page error 0, 가로 넘침 0 |
+
+브라우저 범위: 이번 수정이 바꾼 운영자 보완 요청 흐름만 다시 확인했다. 펀딩 예외 화면·공급자 본인 제출 화면은 UI 코드가 바뀌지 않았거나 Vitest 로 덮이므로 브라우저 재실행을 생략했다.
+fixture 계정·식별자는 모두 합성 값이며 운영 DB·운영 API·실제 입금·주문·결제는 사용하지 않았다.
+
+### 통합 담당 인계
+
+- origin/main 에 #652 의 `SeparateSupplierRegistrationPublication1792110685889` 가 이미 manifest·expected-schema-states 끝에 들어가 있다. 이 branch 는 main 을 병합하지 않았으므로 manifest 순서와 최종 fingerprint 는 통합 시 전용 DB 에서 다시 산출해야 한다. 위 fingerprint 검증은 이 branch 단독 기준이다.
+- 운영 migration·배포·PR 운영은 수행하지 않았다.

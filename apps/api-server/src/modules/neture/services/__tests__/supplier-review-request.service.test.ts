@@ -78,3 +78,49 @@ it("does not convert audit insertion failure into successful request creation", 
     }),
   ).rejects.toThrow("audit unavailable");
 });
+it("refuses to resolve a request the supplier has not submitted", async () => {
+  manager.query
+    .mockResolvedValueOnce([{ status: "PENDING" }])
+    .mockResolvedValueOnce([{ id: request, version: 1, state: "requested" }]);
+  await expect(
+    new SupplierReviewRequestService(ds).transition(
+      supplier,
+      request,
+      actor,
+      "resolve",
+      { version: 1, note: "fixture" },
+    ),
+  ).rejects.toMatchObject({ code: "REVIEW_REQUEST_NOT_SUBMITTED" });
+  expect(manager.query).toHaveBeenCalledTimes(2);
+  expect(insert).not.toHaveBeenCalled();
+});
+it("resolves submitted requests only when the locked state and version still match", async () => {
+  manager.query
+    .mockResolvedValueOnce([{ status: "PENDING" }])
+    .mockResolvedValueOnce([{ id: request, version: 2, state: "submitted" }])
+    .mockResolvedValueOnce([{ id: request, version: 3, state: "resolved" }]);
+  const row = await new SupplierReviewRequestService(ds).transition(
+    supplier,
+    request,
+    actor,
+    "resolve",
+    { version: 2, note: "fixture" },
+  );
+  expect(row.state).toBe("resolved");
+  expect(manager.query.mock.calls[2][0]).toContain("AND state = $5 AND version = $6");
+  expect(manager.query.mock.calls[2][1].slice(2)).toEqual([request, supplier, "submitted", 2]);
+  manager.query
+    .mockResolvedValueOnce([{ status: "PENDING" }])
+    .mockResolvedValueOnce([{ id: request, version: 2, state: "submitted" }])
+    .mockResolvedValueOnce([]);
+  await expect(
+    new SupplierReviewRequestService(ds).transition(
+      supplier,
+      request,
+      actor,
+      "resolve",
+      { version: 2, note: "fixture" },
+    ),
+  ).rejects.toMatchObject({ code: "REVIEW_REQUEST_CHANGED" });
+  expect(insert).toHaveBeenCalledTimes(1);
+});

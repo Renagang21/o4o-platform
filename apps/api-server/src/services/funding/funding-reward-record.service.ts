@@ -16,7 +16,7 @@ export class FundingRewardRecordService {
         "INVALID_REWARD_STATUS",
         "이행 상태를 확인해 주세요.",
       );
-    return this.ds.transaction(async (manager) => {
+    return await this.ds.transaction(async (manager) => {
       const [before] = await manager.query(
         'SELECT id, "rewardStatus" FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2 FOR UPDATE',
         [participantId, trialId],

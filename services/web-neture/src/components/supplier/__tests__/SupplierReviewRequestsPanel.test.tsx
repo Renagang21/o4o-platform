@@ -34,7 +34,14 @@ const request = {
   submitted_at: null,
   resolved_at: null,
 };
-const data = (current: unknown = null, supplierId = "supplier-a") => ({
+const submitted = {
+  ...request,
+  state: "submitted",
+  version: 2,
+  response_note: "서류 수정 완료",
+  submitted_at: "2026-10-16",
+};
+const data =(current: unknown = null, supplierId = "supplier-a") => ({
   supplierId,
   current,
   requests: current ? [current] : [],
@@ -97,9 +104,34 @@ it("allows the supplier to submit only its own current request version", async (
   expect(api.create).not.toHaveBeenCalled();
   expect(api.resolve).not.toHaveBeenCalled();
 });
+it("does not let the operator resolve a request before the supplier submits", async () => {
+  api.list.mockResolvedValue(data(request));
+  render(<Panel supplierId="supplier-a" operator />);
+  await screen.findByText(/보완 제출을 기다리고 있습니다/);
+  expect(screen.queryByRole("textbox")).toBeNull();
+  expect(screen.queryByRole("button", { name: "검토 완료 저장" })).toBeNull();
+  expect(api.resolve).not.toHaveBeenCalled();
+});
+it("resolves a submitted request with its current version", async () => {
+  api.list.mockResolvedValue(data(submitted));
+  render(<Panel supplierId="supplier-a" operator />);
+  fireEvent.change(
+    await screen.findByRole("textbox", { name: "검토 완료 사유" }),
+    { target: { value: "확인 완료" } },
+  );
+  fireEvent.click(screen.getByRole("button", { name: "검토 완료 저장" }));
+  await waitFor(() =>
+    expect(api.resolve).toHaveBeenCalledWith(
+      "supplier-a",
+      "request-a",
+      "확인 완료",
+      2,
+    ),
+  );
+});
 it("locks duplicate submissions and ignores completion after switching suppliers", async () => {
   let release!: (v: unknown) => void;
-  api.list.mockResolvedValue(data(request));
+  api.list.mockResolvedValue(data(submitted));
   api.resolve.mockReturnValueOnce(
     new Promise((r) => {
       release = r;
@@ -123,8 +155,8 @@ it("locks duplicate submissions and ignores completion after switching suppliers
 });
 it("discards the previous target draft when a refreshed request changed", async () => {
   api.list
-    .mockResolvedValueOnce(data(request))
-    .mockResolvedValueOnce(data({ ...request, id: "request-b", version: 2 }));
+    .mockResolvedValueOnce(data(submitted))
+    .mockResolvedValueOnce(data({ ...submitted, id: "request-b", version: 3 }));
   render(<Panel supplierId="supplier-a" operator />);
   await screen.findByRole("textbox");
   fireEvent.change(screen.getByRole("textbox"), {

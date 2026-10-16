@@ -1,13 +1,17 @@
 import type { DataSource } from "typeorm";
 import { FundingError } from "./funding-workspace.service.js";
 
+// A trial reaches fulfillment obligations only after outcome confirmation. CLOSED alone is ambiguous
+// (auto target-missed closes from recruiting), so closed trials qualify only via a recorded fulfilled→closed step.
+const FULFILLMENT_STAGE_SQL = `(t.status IN ('outcome_confirming','fulfilled') OR (t.status = 'closed' AND COALESCE(t."statusHistory", '[]'::jsonb) @> '[{"from":"fulfilled","to":"closed"}]'::jsonb))`;
+
 // These are review hints derived from the ledger, not new payment or trial states/deadlines.
 export const FUNDING_EXCEPTION_SQL = {
   payment_pending: `COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending')`,
   payment_failed: `p."paymentStatus" = 'failed'`,
   amount_missing: `p."paymentStatus" = 'paid' AND p."paidAmount" IS NULL`,
   amount_mismatch: `p."paymentStatus" = 'paid' AND p."paidAmount" IS NOT NULL AND p."paidAmount" <> p."contributionAmount"`,
-  fulfillment_pending: `p."paymentStatus" = 'paid' AND COALESCE(p."rewardStatus", 'pending') <> 'fulfilled' AND t.status IN ('outcome_confirming','fulfilled')`,
+  fulfillment_pending: `p."paymentStatus" = 'paid' AND COALESCE(p."rewardStatus", 'pending') <> 'fulfilled' AND ${FULFILLMENT_STAGE_SQL}`,
   fulfilled_without_payment: `p."rewardStatus" = 'fulfilled' AND COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending','failed')`,
 } as const;
 export function fundingExceptionFilter(value: unknown) {

@@ -293,4 +293,101 @@ fixture("isolated supplier review and funding operations", () => {
       await db.query("DROP FUNCTION sf_fail_audit()");
     }
   });
+  it("resolves only submitted requests and lets exactly one concurrent resolution win", async () => {
+    const service = new SupplierReviewRequestService(db);
+    const [open] = await db.query(
+      "SELECT id, version, state FROM neture_supplier_review_requests WHERE supplier_id=$1 AND resolved_at IS NULL",
+      [ids.supplier],
+    );
+    expect(open.state).toBe("requested");
+    await expect(
+      service.transition(ids.supplier, open.id, ids.actor, "resolve", {
+        version: open.version,
+        note: "제출 전 완료 시도",
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_REQUEST_NOT_SUBMITTED" });
+    const [unchanged] = await db.query(
+      "SELECT state, version, resolved_at, submitted_at FROM neture_supplier_review_requests WHERE id=$1",
+      [open.id],
+    );
+    expect(unchanged).toMatchObject({ state: "requested", version: open.version, resolved_at: null, submitted_at: null });
+    const audits = async () =>
+      (
+        await db.query(
+          "SELECT count(*)::int AS n FROM action_logs WHERE action_key LIKE 'neture.supplier.review_%' AND meta->>'requestId' = $1",
+          [open.id],
+        )
+      )[0].n;
+    const auditsBefore = await audits();
+    const submitted = await service.transition(ids.supplier, open.id, ids.other, "submit", {
+      version: open.version,
+      note: "보완 제출",
+    });
+    const results = await Promise.allSettled(
+      [1, 2].map(() =>
+        service.transition(ids.supplier, open.id, ids.actor, "resolve", {
+          version: submitted.version,
+          note: "동시 검토 완료",
+        }),
+      ),
+    );
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    expect(results.find((r) => r.status === "rejected")).toMatchObject({
+      reason: expect.objectContaining({ code: "REVIEW_REQUEST_CHANGED" }),
+    });
+    const [final] = await db.query(
+      "SELECT state, version, submitted_at, resolved_at FROM neture_supplier_review_requests WHERE id=$1",
+      [open.id],
+    );
+    expect(final.state).toBe("resolved");
+    expect(final.version).toBe(submitted.version + 1);
+    expect(final.submitted_at).not.toBeNull();
+    expect(final.resolved_at).not.toBeNull();
+    expect(await audits()).toBe(auditsBefore + 2);
+  });
+  it("keeps paid unfulfilled obligations after fulfilled → closed but not after a failed auto-close", async () => {
+    const closedAfterFulfilled = "30000000-0000-4000-8000-000000000002";
+    const autoClosed = "30000000-0000-4000-8000-000000000003";
+    const fulfilledHistory = JSON.stringify([
+      { from: "outcome_confirming", to: "fulfilled", at: "2026-10-01T00:00:00Z", reason: "operator_progress", auto: false },
+      { from: "fulfilled", to: "closed", at: "2026-10-02T00:00:00Z", reason: "operator_progress", auto: false },
+    ]);
+    const autoHistory = JSON.stringify([
+      { from: "recruiting", to: "closed", at: "2026-10-02T00:00:00Z", reason: "auto_target_missed", auto: true },
+    ]);
+    await db.query(
+      `INSERT INTO market_trials(id,title,status,"fundingStartAt","fundingEndAt","currentParticipants","supplierId","targetAmount","trialPeriodDays","trialUnitPrice","statusHistory","closeReason")
+       VALUES ($1,'이행 후 종료','closed',now(),now(),1,$3,100,30,100,$4::jsonb,NULL),
+              ($2,'모집 실패 종료','closed',now(),now(),1,$3,100,30,100,$5::jsonb,'auto_target_missed')`,
+      [closedAfterFulfilled, autoClosed, ids.supplier, fulfilledHistory, autoHistory],
+    );
+    await db.query(
+      `INSERT INTO market_trial_participants(id,"marketTrialId","participantId","participantType","contributionAmount","paymentStatus","paidAmount","rewardStatus")
+       VALUES ($1,$2,$4,'store_owner',100,'paid',100,'pending'),($3,$5,$4,'store_owner',100,'paid',100,'pending')`,
+      [
+        "40000000-0000-4000-8000-000000000002",
+        closedAfterFulfilled,
+        "40000000-0000-4000-8000-000000000003",
+        ids.other,
+        autoClosed,
+      ],
+    );
+    const service = new FundingOperatorExceptionsService(db);
+    const pending = await service.list({ type: "fulfillment_pending" });
+    expect(pending.items.map((i: { trialId: string }) => i.trialId)).toContain(closedAfterFulfilled);
+    expect(pending.items.map((i: { trialId: string }) => i.trialId)).not.toContain(autoClosed);
+    const all = await service.list({});
+    const byTrial = (id: string) => all.items.find((i: { trialId: string }) => i.trialId === id);
+    expect(byTrial(closedAfterFulfilled)?.types).toEqual(["fulfillment_pending"]);
+    expect(byTrial(autoClosed)).toBeUndefined();
+    await new FundingRewardRecordService(db).update(
+      closedAfterFulfilled,
+      "40000000-0000-4000-8000-000000000002",
+      ids.actor,
+      "fulfilled",
+    );
+    expect(
+      (await service.list({ type: "fulfillment_pending" })).items.map((i: { trialId: string }) => i.trialId),
+    ).not.toContain(closedAfterFulfilled);
+  });
 });

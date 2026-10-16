@@ -128,7 +128,7 @@ export default function SupplierReviewRequestsPanel({
               ? "보완 요청을 저장하고 알림을 생성했습니다."
               : "보완 요청은 저장됐지만 알림 생성은 확인하지 못했습니다.",
           );
-      } else if (target && operator) {
+      } else if (operator && target?.state === "submitted") {
         await supplierReviewApi.resolve(
           supplierId,
           target.id,
@@ -139,7 +139,7 @@ export default function SupplierReviewRequestsPanel({
           setNotice(
             "보완 요청의 검토 완료를 저장했습니다. 공급자 승인 상태는 별도로 처리합니다.",
           );
-      } else if (target?.state === "requested") {
+      } else if (!operator && target?.state === "requested") {
         await supplierReviewApi.submit(target.id, note, target.version);
         if (scope.mounted)
           setNotice("보완 제출을 저장했습니다. 운영자의 검토를 기다려 주세요.");
@@ -176,7 +176,19 @@ export default function SupplierReviewRequestsPanel({
     }
   };
   const current = data?.current;
-  const canWrite = !!data && (operator || current?.state === "requested");
+  // Operators resolve only after the supplier submits; a requested item waits for the supplier.
+  const awaitingSupplier = operator && current?.state === "requested";
+  const canWrite =
+    !!data &&
+    (operator
+      ? !current || current.state === "submitted"
+      : current?.state === "requested");
+  let formLabel = "보완 제출 내용";
+  let submitLabel = "보완 제출";
+  if (operator) {
+    formLabel = current ? "검토 완료 사유" : "보완 요청 내용";
+    submitLabel = current ? "검토 완료 저장" : "보완 요청 저장";
+  }
   return (
     <section
       className="my-5 space-y-3 rounded-lg border border-slate-200 p-4"
@@ -242,6 +254,12 @@ export default function SupplierReviewRequestsPanel({
       {!loading && !readError && data && !current && (
         <p className="text-sm">진행 중인 보완 요청이 없습니다.</p>
       )}
+      {awaitingSupplier && (
+        <p className="text-sm text-slate-600">
+          공급자의 보완 제출을 기다리고 있습니다. 제출된 뒤 검토 완료할 수
+          있습니다.
+        </p>
+      )}
       {canWrite && (
         <fieldset
           disabled={pending || loading || !!readError || disabled}
@@ -268,19 +286,9 @@ export default function SupplierReviewRequestsPanel({
             </div>
           )}
           <label className="block text-sm">
-            {operator
-              ? current
-                ? "검토 완료 사유"
-                : "보완 요청 내용"
-              : "보완 제출 내용"}
+            {formLabel}
             <textarea
-              aria-label={
-                operator
-                  ? current
-                    ? "검토 완료 사유"
-                    : "보완 요청 내용"
-                  : "보완 제출 내용"
-              }
+              aria-label={formLabel}
               value={note}
               maxLength={2000}
               onChange={(e) => setNote(e.target.value)}
@@ -293,13 +301,7 @@ export default function SupplierReviewRequestsPanel({
             disabled={!note.trim() || (operator && !current && !items.length)}
             onClick={() => void write()}
           >
-            {pending
-              ? "저장 중..."
-              : operator
-                ? current
-                  ? "검토 완료 저장"
-                  : "보완 요청 저장"
-                : "보완 제출"}
+            {pending ? "저장 중..." : submitLabel}
           </button>
         </fieldset>
       )}

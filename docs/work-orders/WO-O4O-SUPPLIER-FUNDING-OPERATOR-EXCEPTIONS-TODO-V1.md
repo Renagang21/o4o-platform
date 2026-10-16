@@ -60,3 +60,11 @@ Market Trial content-only 경계·오프라인 입금/감사 정책·초기 운�
 API/웹 타입·빌드, migration 계약 21개·소스 계약 36개, PC/mobile 8개 흐름 통과.
 상세 근거와 배포 전 migration 유의사항은 [CHECK](../checks/CHECK-O4O-SUPPLIER-FUNDING-OPERATOR-EXCEPTIONS-V1.md)를 따른다.
 종료점은 branch push이며 PR·CI 운영·병합·배포·운영 DB 적용은 통합 담당 몫이다.
+
+## PR #653 blocker 후속 (2026-10-16)
+
+- [x] Codex P1: `fulfilled→closed` 이후에도 입금 확인·이행 미확인 의무 유지, 모집 실패 자동 종료 제외 (`statusHistory` 전환 기록 기준).
+- [x] Codex P2: 보완 요청 검토 완료는 잠금 후 최신 상태 `submitted` 에서만 허용, UI 는 제출 전 완료 동작 차단.
+- [x] Sonar Reliability: 미처리 Promise 1건(BUG)·async 반환 계약 3건 수정. 규칙·기준 완화 없음.
+- [x] 단위·통합(PostgreSQL 격리)·타입·빌드·lint·PC/mobile 브라우저 재검증. 상세는 CHECK "PR #653 후속 수정".
+- [ ] (통합 담당) #652 통합 순서에 맞춘 manifest·expected-schema fingerprint 재산출, 운영 migration 승인.

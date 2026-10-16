@@ -123,7 +123,7 @@ export class SupplierReviewRequestService {
   ) {
     const items = reviewItems(input.items);
     const note = reviewText(input.note);
-    return this.ds.transaction(async (manager) => {
+    return await this.ds.transaction(async (manager) => {
       await this.lockSupplier(manager, supplierId);
       const open = await manager.query(
         "SELECT id FROM neture_supplier_review_requests WHERE supplier_id = $1 AND resolved_at IS NULL",
@@ -175,7 +175,7 @@ export class SupplierReviewRequestService {
         "보완 요청을 다시 조회해 주세요.",
       );
     const note = reviewText(input.note);
-    return this.ds.transaction(async (manager) => {
+    return await this.ds.transaction(async (manager) => {
       await this.lockSupplier(manager, supplierId);
       const [before] = await manager.query(
         "SELECT * FROM neture_supplier_review_requests WHERE id = $1 AND supplier_id = $2 FOR UPDATE",
@@ -187,25 +187,41 @@ export class SupplierReviewRequestService {
           "REVIEW_REQUEST_NOT_FOUND",
           "이 공급자의 보완 요청을 찾을 수 없습니다.",
         );
-      if (
-        before.version !== input.version ||
-        before.state === "resolved" ||
-        (action === "submit" && before.state !== "requested")
-      )
+      // Only requested → submitted → resolved; resolution requires the supplier's submission.
+      const fromState = action === "submit" ? "requested" : "submitted";
+      if (before.version !== input.version || before.state === "resolved")
         return fail(
           409,
           "REVIEW_REQUEST_CHANGED",
           "이미 처리되었거나 변경된 요청입니다. 다시 조회해 주세요.",
         );
+      if (before.state !== fromState)
+        return action === "resolve"
+          ? fail(
+              409,
+              "REVIEW_REQUEST_NOT_SUBMITTED",
+              "공급자가 보완 내용을 제출한 뒤 검토 완료할 수 있습니다.",
+            )
+          : fail(
+              409,
+              "REVIEW_REQUEST_CHANGED",
+              "이미 처리되었거나 변경된 요청입니다. 다시 조회해 주세요.",
+            );
       const columns =
         action === "submit"
           ? "state = 'submitted', response_note = $1, submitted_by = $2, submitted_at = now()"
           : "state = 'resolved', resolution_note = $1, resolved_by = $2, resolved_at = now()";
       const [row] = await manager.query(
         `WITH updated AS (UPDATE neture_supplier_review_requests SET ${columns}, version = version + 1, updated_at = now()
-        WHERE id = $3 AND supplier_id = $4 RETURNING *) SELECT * FROM updated`,
-        [privateText(note), actorId, requestId, supplierId],
+        WHERE id = $3 AND supplier_id = $4 AND state = $5 AND version = $6 RETURNING *) SELECT * FROM updated`,
+        [privateText(note), actorId, requestId, supplierId, fromState, before.version],
       );
+      if (!row)
+        return fail(
+          409,
+          "REVIEW_REQUEST_CHANGED",
+          "이미 처리되었거나 변경된 요청입니다. 다시 조회해 주세요.",
+        );
       await this.audit(
         manager,
         actorId,

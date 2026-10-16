@@ -334,7 +334,7 @@ export default function OperatorSupplierApprovalPage() {
         onClose={() => { if (!reviewLock.current) closeDrawer(); }}
         title={drawer?.name ?? '공급자 상세'}
         width={560}
-        actions={(drawerActions ?? []).map(action => ({ ...action, disabled: action.disabled || reviewBusy, onClick: () => { if (!reviewLock.current) action.onClick(); } }))}
+        actions={(drawerActions ?? []).map(action => ({ ...action, disabled: action.disabled || reviewBusy, onClick: () => { if (!reviewLock.current) void action.onClick(); } }))}
       >
         {actionMessage?.type === 'error' && <p role="alert" className="mb-3 text-red-700">{actionMessage.text}</p>}
         {drawer && (
