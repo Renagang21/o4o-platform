@@ -159,3 +159,16 @@ PR CI·Sonar·Codex 리뷰와 최신 main CI/Delivery를 확인하고, main 및 
 - 실제 운영 테이블 분포에서의 소요 시간은 측정하지 않았다. 운영 plan 재실행 결과(PH_PURGE_TIMING)로 판단해야 한다.
 - 200만행 stress 시험은 여전히 300초 안에 끝나지 않는다.
 - 단계 진단·GitHub 재시도만 먼저 통합하려면 `prepareReferenceGroups`의 UUID 합류 조건(`c.type==='uuid'&&c.indexed!==false`)을 V5의 `c.type==='uuid'`로 되돌리면 된다. 이 경우 group에는 UUID 열이 들어가지 않는다.
+
+## 2026-10-16 V7 통합 검증과 GitHub 본문 전송 재시도 보완
+
+통합 담당이 source `573c4862f7`을 main `9a86fcf0fb`와 충돌 없이 결합해 검증했다. 기존 PR #650을 재사용한다.
+
+- Linux focused60 PASS, deployment225건 중219 PASS/0 FAIL/6 opt-in SKIP, 변경 script ESLint PASS.
+- 일회성 loopback PostgreSQL15에서 fixture3개 PASS/0 SKIP. development 합성 plan/apply·공유 보존·FK·rollback, batch3200행의 전체 범위/NULL/array/literal, UUID query/planner5000행과 새 UUID 선두 group의 canonical·legacy·비hex·마지막 page를 확인했다. 실제 GCS는 사용하지 않았다.
+- 별도10만행 비교: UUID PK·비색인UUID8열·약1KB JSON·root41개, fixture setup 제외, V5→V7→V7→V5 순서. V5 1602/1551ms(107query), V7 1471/1539ms(99query). 마지막 page 양성 대조는 양쪽 모두1건이었다. V6의 큰 합성 퇴행은 재현되지 않았지만 운영 소요/600초 apply 여유를 입증한 결과는 아니다. 기존200만행 stress 미완료 기록은 유지하며 다시 PASS로 집계하지 않았다.
+- 초기 임시DB의 Unix socket 준비 신호가 initialization 서버를 가리켜 접속이 끊겼다. 최종 TCP 서버 준비를 기다리도록 외부 harness를 고쳐 재검증했고, 컨테이너·데이터 볼륨은 모두 제거했다.
+- Codex 추가 P2: GitHub 헤더 수신 후 본문 stream 전송 오류가 재시도되지 않았다. TypeError/AbortError/TimeoutError는 기존 최대3회·1초/2초 대기 경로에 포함하고, malformed JSON 등은 즉시 PH_JOB_GITHUB_RESPONSE로 실패시킨다. 성공적으로 해석한 main/CI/production gate 차단은 재시도하지 않는다. 실제 Response stream 오류·상한·malformed JSON 회귀3건을 추가했다.
+- 보완 후 focused63 PASS/0 FAIL/0 SKIP, Linux deployment228건 중222 PASS/0 FAIL/6 opt-in SKIP, 변경 파일 ESLint PASS. 본문 재시도 보완은 SQL scanner를 바꾸지 않아 위 PostgreSQL 검증과 같은 SQL을 유지한다.
+
+최신 HEAD의 CI·Sonar·Codex를 다시 확인한 뒤 main 통합과 read-only development/media plan을 순차 실행한다. 이 단계에서 운영 plan·DB/GCS 삭제·WIF/IAM 변경은 실행하지 않았다. apply는 두 plan의 census와 timing 확인 후 별도 window이며 #610/#615 후속 순서를 유지한다.

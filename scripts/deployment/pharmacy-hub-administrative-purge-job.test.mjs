@@ -193,6 +193,34 @@ test('GitHub reads retry only transport failures and transient statuses, within 
   });
   await withEnv({PRODUCTION_GATE_TOKEN:''},()=>assert.rejects(github('x',{fetchImpl:async()=>assert.fail()}),e=>e.message==='PH_JOB_GITHUB_AUTH'));
 });
+test('GitHub retries interrupted body streams after successful headers',async()=>{
+ await withEnv({PRODUCTION_GATE_TOKEN:'fixture-token'},async()=>{
+  for(const error of [new TypeError('private stream detail'),new DOMException('private abort','AbortError'),new DOMException('private timeout','TimeoutError')]) {
+   let calls=0;const pauses=[];
+   const actual=await github('fixture',{fetchImpl:async()=>++calls===1
+    ?new Response(new ReadableStream({start(controller){controller.error(error);}}),{status:200})
+    :new Response('{"ok":true}',{status:200}),pause:async ms=>pauses.push(ms)});
+   assert.deepEqual(actual,{ok:true});assert.equal(calls,2);assert.deepEqual(pauses,[1000]);
+  }
+ });
+});
+test('GitHub body transport failures share the same three-attempt bound',async()=>{
+ await withEnv({PRODUCTION_GATE_TOKEN:'fixture-token'},async()=>{
+  let calls=0;const pauses=[];
+  await assert.rejects(github('fixture',{fetchImpl:async()=>{calls++;return new Response(new ReadableStream({
+   start(controller){controller.error(new TypeError('private stream detail'));},
+  }),{status:200});},pause:async ms=>pauses.push(ms)}),e=>e.message==='PH_JOB_GITHUB_UNAVAILABLE');
+  assert.equal(calls,3);assert.deepEqual(pauses,[1000,2000]);
+ });
+});
+test('GitHub malformed JSON bodies fail once without transport retries',async()=>{
+ await withEnv({PRODUCTION_GATE_TOKEN:'fixture-token'},async()=>{
+  let calls=0;
+  await assert.rejects(github('fixture',{fetchImpl:async()=>{calls++;return new Response('{invalid',{status:200});},
+   pause:async()=>assert.fail('malformed JSON must not retry')}),e=>e.message==='PH_JOB_GITHUB_RESPONSE');
+  assert.equal(calls,1);
+ });
+});
 const gateEnv={GITHUB_REF:'refs/heads/main',WORKFLOW_ACTOR:'owner',REPOSITORY_OWNER:'owner',CUTOVER_MODE:'plan',GITHUB_RUN_ID:'77',GITHUB_SHA:'a'.repeat(40)};
 const ciGate={check_runs:[{name:'CI Gate',app:{id:15368},head_sha:'a'.repeat(40),conclusion:'success'}]};
 function gateAnswers(overrides={}) {

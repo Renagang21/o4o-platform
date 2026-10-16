@@ -15,7 +15,7 @@ export function assertRestrictedWif(condition,sha) {
   if(String(condition).trim().replace(/\s+/g,' ')!==restrictedWifCondition(sha))throw new Error('PH_JOB_WIF_RESTRICTION_REQUIRED');
 }
 // Only transport failures and GitHub-side transient statuses are retried. A
-// successful response is always evaluated once: moved main, missing CI and busy
+// successfully decoded response is evaluated once: moved main, missing CI and busy
 // production remain immediate blocks.
 const transientStatus=new Set([429,500,502,503,504]);
 export async function github(path,{fetchImpl=fetch,pause=ms=>new Promise(resolve=>setTimeout(resolve,ms)),attempts=3}={}) {
@@ -32,7 +32,12 @@ export async function github(path,{fetchImpl=fetch,pause=ms=>new Promise(resolve
     }
     if(response&&!transientStatus.has(response.status)) {
       if(!response.ok)throw new Error('PH_JOB_GITHUB_GATE');
-      try {return await response.json();} catch {throw new Error('PH_JOB_GITHUB_RESPONSE');}
+      try {return await response.json();} catch(error) {
+        // Body reads can fail after headers arrive; malformed JSON and other
+        // response errors remain immediate failures without exposing details.
+        if(!(error instanceof TypeError||['AbortError','TimeoutError'].includes(error?.name)))
+          throw new Error('PH_JOB_GITHUB_RESPONSE');
+      }
     }
     if(attempt>=attempts)throw new Error('PH_JOB_GITHUB_UNAVAILABLE');
     await pause(1000*attempt);
