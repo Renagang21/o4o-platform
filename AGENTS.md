@@ -42,8 +42,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 구현 요청이면 승인된 안전 범위 안에서 불필요한 중간 승인 없이 완료까지 진행한다.
 - 이미 명시적으로 승인된 변경 범위를 같은 이유로 기계적으로 다시 승인받지 않는다.
   승인된 범위 안의 조사 · 수정 · 검증 · review finding 처리 · 스레드 정리 · 상태 조회는 스스로 판단해 진행한다.
-  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 개발 담당의 기본 종료점은 검증 · commit · push · PR 생성이다.
-  **PR 병합과 운영 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다**(§4-1(e)·(f)).
+  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 개발 담당의 기본 종료점은 검증 · commit · push 후 통합 담당에게 인계하는 것이다.
+  **PR 생성부터 CI·리뷰 운영 · 병합 · 배포 · 운영 변경까지는 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다**(§4-1(e)·(f)).
 - 새롭게 발견된 범위 확대나 미승인 위험 변경은 해당 변경 전에 중지하고 보고한다.
 - 범위 밖 문제는 임의 수정하지 않고 보고한다. 무관한 build/test 실패도 임의로 고치지 않는다.
 - 기존 코드 패턴을 우선하고 과도한 추상화·리팩터링을 피한다. 코딩 컨벤션은 [README.md](README.md)를 따른다.
@@ -124,8 +124,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 **(e) main 통합 — PR merge · 기술 gate 충족 후**
 
 ```text
-개발 담당: 작업 → 검증 → commit / push → PR 생성 → 검증 결과 · 미해결 사항 인계 → 종료
-통합 담당: PR 검토 → required CI PASS → Codex blocker 없음 = integration-ready
+개발 담당: 작업 → 로컬 검증 → commit / push → branch · commit SHA · 검증 결과 · 미해결 사항 인계 → 종료
+통합 담당: 인계 branch / HEAD 확인 → 기존 PR 재사용 또는 PR 생성 → required CI PASS → Codex blocker 없음 = integration-ready
 → 순차 PR merge → post-merge 확인 → 현재 Delivery 정책에 따른 배포 · 검증 → 결과 보고
 ```
 
@@ -134,8 +134,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   삭제 · non-fast-forward 금지 · **필수 human approval 0** · admin bypass 가능. 합의 규칙: [README — 기여](README.md#기여).
 - **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.**
   owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
-- **개발 담당은 integration-ready 여부와 관계없이 push · PR 생성까지 수행하고 통합 담당에게 인계한다.** PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경을 자동으로 진행하지 않는다. 통합 담당의 수정 요청을 받은 경우에도 수정 · 검증 · commit · push까지 수행하고 다시 인계한다.
-- **사용자가 해당 공간을 통합 담당으로 명시적으로 지정한 경우에만** PR 검토 · CI 확인 · 순차 병합 · post-merge 확인 · 배포 결과 검증을 진행한다. 지정은 세션 문맥에서 확인하며 계정·branch 이름이나 CI 성공만으로 추정하지 않는다. HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 확인하고 §5의 미승인 위험 변경 경계를 유지한다.
+- **개발 담당은 로컬 검증 · commit · push까지만 수행하고 통합 담당에게 인계한다.** PR 생성 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 수행하지 않는다. 통합 담당의 수정 요청을 받은 경우에도 같은 작업 branch에서 수정 · 검증 · commit · push 후 새 HEAD를 재인계한다. 추가 수정용 PR을 별도로 만들지 않는다.
+- **사용자가 해당 공간을 통합 담당으로 명시적으로 지정한 경우에만** PR 생성 · 검토 · CI 및 Codex 리뷰 운영 · 순차 병합 · post-merge 확인 · 배포 결과 검증을 진행한다. 작업별 기존 PR이 있으면 재사용하고 동일 변경의 중복 PR을 만들지 않는다. 지정은 세션 문맥에서 확인하며 계정·branch 이름이나 CI 성공만으로 추정하지 않는다. HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 확인하고 §5의 미승인 위험 변경 경계를 유지한다.
 - 통합 담당이 해결하지 못하는 코드 문제는 원인 · 실패 근거 · 수정 범위를 해당 개발 담당에게 전달한다. 개발 담당의 수정 push 후 통합 담당이 재검증한다.
 - **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
   보안 · 권한 · DB · 공통 Core 변경, 또는 사용자가 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
@@ -179,8 +179,8 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 **(i) 생명주기 · 종료 정리**
 
 ```text
-개발 담당: 최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → PR → 인계
-통합 담당: CI · Codex → main 통합(PR merge) → post-merge CI → (필요 시) deploy / smoke
+개발 담당: 최신 origin/main → 전용 worktree + branch → 작업 → 로컬 검증 → commit / push → 인계
+통합 담당: 기존 PR 재사용 또는 PR 생성 → CI · Codex → main 통합(PR merge) → post-merge CI → (필요 시) deploy / smoke
 → 개발 담당에게 결과 전달 → 종료 정리(아래) → 트랙 종료
 ```
 
@@ -237,8 +237,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - 커밋 후 `git show --stat --oneline HEAD`로 실제 포함 경로를 확인한다.
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
   공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
-- 개발 담당의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 작업 branch 에 push됨 + PR 생성 + 검증 결과 · CI 상태 · 미해결 사항 인계**다. CI가 진행 중이면 그 상태를 명시하고, 실패 원인이 자기 변경이면 수정 · 검증 · push한 뒤 다시 인계한다. 미해결 실패를 integration-ready로 보고하지 않는다.
-  **기본 종료점은 push · PR 생성이며 병합 · 배포까지 자동으로 확대하지 않는다.** 통합 담당으로 명시적으로 지정된 공간만 §4-1(e)·(f)에 따라 병합 · post-merge 확인 · 필요한 배포 검증까지 진행한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+- 개발 담당의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 작업 branch 에 push됨 + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계**다. PR 생성은 개발 담당의 완료 조건이 아니다. PR 미생성으로 PR CI가 실행되지 않았다면 미실행으로 명시한다. 이미 확인한 CI 실패나 미해결 사항을 숨기지 않으며, 통합 담당의 수정 요청에는 같은 branch에 추가 push 후 재인계한다. 미해결 실패를 integration-ready로 보고하지 않는다.
+  **개발 담당의 기본 종료점은 push 후 인계이며, PR 생성부터는 통합 담당의 책임이다.** 통합 담당으로 명시적으로 지정된 공간만 §4-1(e)·(f)에 따라 PR 생성 · CI·리뷰 운영 · 병합 · post-merge 확인 · 필요한 배포 검증까지 진행한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 - 병합 전 branch/worktree는 후속 수정에 필요하므로 보존한다. 통합 담당의 병합 결과를 받은 뒤 §4-1(i)의 조건을 확인해 자기 작업공간만 정리한다.
 
 ## 5. 위험 변경 / 사용자 확인
@@ -300,7 +300,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   콘솔 오류뿐 아니라 **toast·API 응답과 실제 동작**을 확인한다.
 - route / menu / layout 변경은 desktop·mobile을 각각 확인한다.
   신규 route는 메뉴 진입·직접 URL과 기존 route 회귀를 확인한다.
-- 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNT.txt`다(로컬 전용).
+- 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`다(로컬 전용 · 2026-10-16 변경, 이전 `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다).
   파일 위치·새 clone/클라우드에서 누락되는 이유·확보 절차는 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
   현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed/Demo 계정으로 대체하지 않는다.
   운영 계정 사용과 자격증명의 코드·문서·커밋 복사를 금지한다.

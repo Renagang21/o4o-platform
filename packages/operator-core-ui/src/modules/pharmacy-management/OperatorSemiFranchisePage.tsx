@@ -9,6 +9,7 @@
  *   가입 신청 목록은 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장 신청 상태를 함께 보여준다.
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
@@ -39,13 +40,14 @@ import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 type BusinessPageProps = Readonly<{
   businessKey?: string;
   forumHref?: (business: SemiFranchise) => string;
+  renderBusinessHome?: (business: SemiFranchise) => ReactNode;
 }>;
 
 export default function OperatorSemiFranchisePage(props: BusinessPageProps = {}) {
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
 }
 
-function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
+function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: BusinessPageProps) {
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
     interactionLocked, decision, reason, setReason, decisionError, run, confirmDecision, cancelDecision,
@@ -68,7 +70,7 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
         <PageHeader title="담당 약국 협력사업" />
         <Message message={message} />
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          담당으로 지정된 약국 협력사업이 없습니다. Neture 관리자에게 담당 지정을 요청하세요.
+          담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하세요.
         </div>
       </div>
     );
@@ -96,10 +98,7 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
         </select>
       </PageHeader>
 
-      {currentBusiness?.status === 'active' && <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
-        <Link to={forumHref?.(currentBusiness) ?? `/communities/${encodeURIComponent(currentBusiness.community_key || `business:${sfKey}`)}/forum`}>참여자 게시판</Link>
-        <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
-      </nav>}
+      <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.map((t) => (
           <button
@@ -437,4 +436,19 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
       </div>}
     </div>
   );
+}
+
+
+function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
+  business: SemiFranchise | undefined;
+  forumHref?: BusinessPageProps['forumHref'];
+  renderBusinessHome?: BusinessPageProps['renderBusinessHome'];
+}) {
+  if (business?.status !== 'active') return null;
+  const forum = forumHref?.(business) ?? `/communities/${encodeURIComponent(business.community_key || `business:${business.key}`)}/forum`;
+  return <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
+    {renderBusinessHome?.(business)}
+    <Link to={forum}>참여자 게시판</Link>
+    <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
+  </nav>;
 }

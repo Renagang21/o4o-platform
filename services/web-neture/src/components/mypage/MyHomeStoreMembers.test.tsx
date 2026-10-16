@@ -22,6 +22,41 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe('My Home 직원 초대·최종 승인', () => {
+  it('모아보기에서는 초대를 유지하고 구성원 조회는 직원 관리를 펼칠 때만 실행한다', async () => {
+    render(<MyHomeStoreMembers accountId="owner" compact />);
+    const toggle = await screen.findByRole('button', { name: '매장 직원 관리 펼치기' });
+    expect(screen.queryByRole('textbox', { name: '직원 이메일' })).toBeNull();
+    expect(api.get.mock.calls.some(([path]) => path === '/store/members' || path === '/store/membership')).toBe(false);
+    fireEvent.click(toggle);
+    expect(await screen.findByRole('button', { name: '최종 승인' })).toBeTruthy();
+    expect(api.get.mock.calls.filter(([path]) => path === '/store/members')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: '직원 관리 접기' }));
+    expect(screen.queryByRole('button', { name: '최종 승인' })).toBeNull();
+  });
+  it('매장이 없는 직원도 초대를 바로 수락할 수 있다', async () => {
+    invitations = [{ organizationId: 'invite-only', organizationName: '합성 초대 매장', status: 'invited' }];
+    api.get.mockImplementation(async (path: string) => path === '/work-scope/accessible-stores' ? envelope({ stores: [] }) : envelope(invitations));
+    render(<MyHomeStoreMembers accountId="invite-only" compact />);
+    fireEvent.click(await screen.findByRole('button', { name: '초대 수락' }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/store/invitations/invite-only/accept', {}, expect.anything()));
+    expect(screen.queryByRole('button', { name: '매장 직원 관리 펼치기' })).toBeNull();
+  });
+  it('매장 전환 시 이전 구성원 조회의 늦은 응답을 버린다', async () => {
+    let finish!: (value: unknown) => void;
+    const original = api.get.getMockImplementation()!;
+    api.get.mockImplementation((path: string, config?: { headers: Record<string, string> }) => {
+      if (path === '/work-scope/accessible-stores') return Promise.resolve(envelope({ stores: [store, { ...store, organizationId: 'store-b', organizationName: '합성 매장 B' }] }));
+      if (path === '/store/members' && config?.headers['X-Store-Organization-Id'] === 'store-a') return new Promise(r => { finish = r; });
+      if (path === '/store/members') return Promise.resolve(envelope({ organizationId: 'store-b', members: [] }));
+      return original(path, config);
+    });
+    render(<MyHomeStoreMembers accountId="owner" />);
+    await waitFor(() => expect(finish).toBeTypeOf('function'));
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-b' } });
+    finish(envelope({ organizationId: 'store-a', members }));
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith('/store/members', expect.objectContaining({ headers: { 'X-Store-Organization-Id': 'store-b' } })));
+    expect(screen.queryByRole('button', { name: '최종 승인' })).toBeNull();
+  });
   it('경영자는 승인 대기 직원을 선택 매장에서 최종 승인한다', async () => {
     const changed = vi.fn(); render(<MyHomeStoreMembers accountId="owner" onChanged={changed} />);
     fireEvent.click(await screen.findByRole('button', { name: '최종 승인' }));

@@ -168,10 +168,10 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
   소유자 bypass 가능하나 정상 경로로 쓰지 않음). main 통합 절차는 [AGENTS.md §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). `deploy/*` tag 생성 · 변경은
   소유자만. `production` Environment 는 `main` · `deploy/*` 에서만. 수동 배포 게이트는 소유자만.
 
-1. `main` 이 저장소 정본입니다. 개발 담당은 전용 branch/worktree에서 구현·검증·commit·push·PR 생성 및 인계까지 수행합니다. 수정 요청에도 기존 PR branch에 추가 push하고 재인계합니다. 사용자가 명시적으로 지정한 통합 담당 공간만 리뷰·CI 확인·순차 PR 병합·배포 결과 검증을 수행합니다.
+1. `main` 이 저장소 정본입니다. 개발 담당은 전용 branch/worktree에서 구현·로컬 검증·commit·push 후 저장소·branch·commit SHA·변경 요약·검증 결과·미해결 사항을 인계합니다. 수정 요청에도 같은 작업 branch에 추가 push하고 재인계합니다. 사용자가 명시적으로 지정한 통합 담당 공간이 기존 PR 재사용 또는 PR 생성부터 CI·리뷰 운영·순차 PR 병합·배포 결과 검증까지 수행합니다. 동일 변경의 중복 PR은 만들지 않습니다.
 2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
    PR 의 workflow 변경도 merge 전에 사용자가 검토합니다.
-3. 개발 담당은 PR merge·auto-merge 설정·배포 dispatch·운영 DB·IAM/WIF 변경을 자동으로 진행하지 않습니다. 기존 GitHub Actions 자동 배포는 유지하고 통합 담당이 병합 후 결과를 확인합니다. 새 위험 변경으로 사용자 확인이 필요한 것은:
+3. 개발 담당은 PR 생성·PR merge·auto-merge 설정·배포 dispatch·운영 DB·IAM/WIF 변경을 자동으로 진행하지 않습니다. 기존 GitHub Actions 자동 배포는 유지하고 통합 담당이 병합 후 결과를 확인합니다. 새 위험 변경으로 사용자 확인이 필요한 것은:
    - production 배포 설정 변경 · `DEPLOY_FREEZE` 해제(`false` 로 변경) — 비상 시 `true` 설정은 누구나 즉시 해도 된다
    - production migration 실행 (`migrate_only` 포함) · `deploy/*` 태그 생성 · push
    - production DB write
