@@ -25,6 +25,7 @@ fixture("isolated supplier review and funding operations", () => {
     trial: "30000000-0000-4000-8000-000000000001",
     participant: "40000000-0000-4000-8000-000000000001",
   };
+  const prefixFingerprints: { hash: string; lineCount: number }[] = [];
   beforeAll(async () => {
     const config = {
       type: "postgres" as const,
@@ -59,6 +60,27 @@ fixture("isolated supplier review and funding operations", () => {
     } finally {
       await runner.release();
     }
+    // Apply incrementals one prefix at a time so every registered state k (= baseline + first k) is observed.
+    for (let k = 0; k <= INCREMENTAL_MIGRATIONS.length; k++) {
+      const step = new DataSource({
+        ...config,
+        database: name,
+        migrations: INCREMENTAL_MIGRATIONS.slice(0, k),
+        migrationsTableName: "typeorm_migrations",
+      });
+      await step.initialize();
+      try {
+        await step.runMigrations({ transaction: "each" });
+        const stepRunner = step.createQueryRunner();
+        await stepRunner.startTransaction();
+        const { hash, lineCount } = await computeSchemaFingerprint(stepRunner);
+        await stepRunner.rollbackTransaction();
+        await stepRunner.release();
+        prefixFingerprints.push({ hash, lineCount });
+      } finally {
+        await step.destroy();
+      }
+    }
     await db.runMigrations({ transaction: "each" });
   });
   afterAll(async () => {
@@ -67,6 +89,14 @@ fixture("isolated supplier review and funding operations", () => {
       await admin.query(`DROP DATABASE ${name}`);
       await admin.destroy();
     }
+  });
+  it("matches every registered prefix fingerprint from the baseline through the final migration", () => {
+    expect(prefixFingerprints).toEqual(
+      EXPECTED_SCHEMA_STATES.map((s) => ({
+        hash: s.fingerprint,
+        lineCount: s.fingerprintLineCount,
+      })),
+    );
   });
   it("matches the registered schema fingerprint and reruns migrations without changes", async () => {
     const runner = db.createQueryRunner();

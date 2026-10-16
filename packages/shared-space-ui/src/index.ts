@@ -330,3 +330,5 @@ export type {
 export { ServiceHomeHero, ServiceHomePromotion, HomeHeroView, HomePromotionView, homePresentationPath, homePresentationManagePath } from "./home-presentation/HomePresentation";
 export type { HomePresentationClient } from "./home-presentation/HomePresentation";
 export { HomePresentationEditor } from "./home-presentation/HomePresentationEditor";
+export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } from './cooperation/models';
+export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';

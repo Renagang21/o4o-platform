@@ -1,4 +1,4 @@
-import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery} from './pharmacy-hub-reference-batches.mjs';
+import {countReferenceBatches,referenceBatchQuery,prepareReferenceGroups,groupedReferenceQuery,markPhase,referencePhase} from './pharmacy-hub-reference-batches.mjs';
 /** PH-only media retirement. GCS deletes cannot roll back with PostgreSQL.
  * Missing objects may resume a failed attempt, but replacements are generation-protected.
  * No asset identifiers, URLs, object names or credentials leave the worker.
@@ -42,6 +42,7 @@ async function census(q) {
     throw new Error('PH_MEDIA_LINK_CENSUS_CHANGED');
 }
 async function references(q,locked) {
+  markPhase(q,'references_fk');
   const fks=await q.query(`SELECT sn.nspname AS schema,s.relname AS "table",t.relname AS target,
     array_agg(sa.attname::text ORDER BY k.ordinality) AS source_columns,
     array_agg(ta.attname::text ORDER BY k.ordinality) AS target_columns
@@ -64,15 +65,19 @@ async function references(q,locked) {
       throw new Error(`PH_MEDIA_SHARED_FK:${f.schema}.${f.table}`);
   }
   // IDs, full public URLs and object paths are all checked across application data.
+  markPhase(q,'references_catalog');
   const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type,
       (SELECT ka.attname FROM pg_index ki JOIN pg_attribute ka ON ka.attrelid=ki.indrelid AND ka.attnum=ki.indkey[0]
         JOIN pg_type kt ON kt.oid=ka.atttypid WHERE ki.indrelid=c.oid AND ki.indisprimary AND ki.indisvalid AND ki.indisready AND ki.indnkeyatts=1 AND kt.typname='uuid'
-        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key FROM pg_attribute a
+        AND NOT EXISTS (SELECT 1 FROM pg_inherits hi WHERE hi.inhparent=c.oid)) AS scan_key,
+      EXISTS (SELECT 1 FROM pg_index xi WHERE xi.indrelid=c.oid AND xi.indkey[0]=a.attnum
+        AND xi.indpred IS NULL AND xi.indisvalid AND xi.indisready) AS indexed FROM pg_attribute a
     JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_type t ON t.oid=a.atttypid
     WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
     AND n.nspname NOT LIKE 'pg_%' AND (t.typcategory IN ('S','A') OR t.typname IN ('uuid','json','jsonb'))`);
   for(const c of await prepareReferenceGroups(q,columns,mediaReferenceTargets(),keys,'PH_MEDIA_REFERENCE_TARGETS')) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_MEDIA_SCHEMA_CHANGED');
+    markPhase(q,referencePhase(c));
     if(await countMediaReferences(q,c))
       throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.matched_column??c.column}`);
   }
@@ -81,7 +86,7 @@ async function references(q,locked) {
 // partition parents retain the complete scan (including foreign descendants).
 export async function countMediaReferences(q,c) {
   const sql=mediaReferenceQuery(c);
-  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  if(!c.columns&&(!c.scan_key||c.type==='uuid'))return count(q,sql);
   return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH',c.columns?c:undefined);
 }
 export function mediaReferenceTargets() {return `SELECT v AS id FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
@@ -173,10 +178,13 @@ export class PharmacyHubMediaPurge {
   constructor({storage}) {this.storage=storage;}
   async up(q,plan=false) {
     if(!q.isTransactionActive)throw new Error('PH_MEDIA_TRANSACTION_REQUIRED');
-    const locked=await stableTables(q,plan);await census(q);await references(q,locked);
-    const files=await objects(q,this.storage);
+    markPhase(q,'dependencies');const locked=await stableTables(q,plan);
+    markPhase(q,'census');await census(q);
+    await references(q,locked);
+    markPhase(q,'objects');const files=await objects(q,this.storage);
     const missingObjects=files.filter(f=>f.missing).length;
     if(plan)return {applied:false,assets:4,links:1,objects:4,missingObjects};
+    markPhase(q,'apply');
     await removeObjects(files);
     if(await count(q,`WITH removed AS (DELETE FROM public.media_entity_links l WHERE ${linkScope('l')} RETURNING 1)
       SELECT count(*)::text AS count FROM removed`)!==1)throw new Error('PH_MEDIA_LINK_DELETE_COUNT');

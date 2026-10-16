@@ -22,6 +22,8 @@ export interface SupplierOffersData {
 }
 
 export interface SupplierProposal {
+  startAt?: string | null;
+  endAt?: string | null;
   id: string;
   offerId: string;
   title: string;
@@ -48,6 +50,6 @@ export const supplierEventOfferApi = {
   /**
    * SPO를 KPA 이벤트로 제안
    */
-  propose: (offerId: string) =>
-    apiClient.post<{ data: SupplierProposal }>('/supplier/event-offers', { offerId }),
+  propose: (offerId: string, conditions: { eventPrice: number; startAt: string; endAt: string }) =>
+    apiClient.post<{ data: SupplierProposal }>('/supplier/event-offers', { offerId, ...conditions }),
 };

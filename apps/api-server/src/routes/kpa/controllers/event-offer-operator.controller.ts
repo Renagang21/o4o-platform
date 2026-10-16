@@ -73,6 +73,8 @@ const ERROR_CODES = {
   INTERNAL_ERROR: { code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' },
   NOT_FOUND: { code: 'NOT_FOUND', message: '상품을 찾을 수 없습니다.' },
   INVALID_PARAMS: { code: 'INVALID_PARAMS', message: '필수 파라미터가 없습니다.' },
+  PRODUCT_NOT_APPROVED: { code: 'PRODUCT_NOT_APPROVED', message: '제품 등록 승인 후 이벤트를 등록할 수 있습니다.' },
+  INVALID_EVENT_CONDITIONS: { code: 'INVALID_EVENT_CONDITIONS', message: '이벤트 가격과 시작·종료 일시를 확인해 주세요.' },
   OFFER_NOT_FOUND: { code: 'OFFER_NOT_FOUND', message: '공급자 상품을 찾을 수 없습니다.' },
   ALREADY_REGISTERED: { code: 'ALREADY_REGISTERED', message: '이미 등록된 이벤트 상품입니다.' },
   ORG_NOT_FOUND: { code: 'ORG_NOT_FOUND', message: '운영자 조직 정보를 찾을 수 없습니다.' },
@@ -342,6 +344,11 @@ export function createEventOfferOperatorController(
           roleType: 'operator',
           // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: operator 즉시 승인 → decided_by 기록
           operatorUserId: userId,
+          eventConditions: {
+            eventPrice: Number(req.body.eventPrice),
+            startAt: new Date(req.body.startAt ?? ''),
+            endAt: new Date(req.body.endAt ?? ''),
+          },
         });
 
         res.json({
@@ -351,17 +358,17 @@ export function createEventOfferOperatorController(
             offerId: result.offerId,
             title: result.title,
             supplierName: result.supplierName,
-            conditionSummary: `단가: ${result.price ?? '미정'}원`,
+            conditionSummary: `이벤트 단가: ${result.eventPrice ?? result.price ?? '미정'}원`,
             orderCount: 0,
             participantCount: 0,
             isVisible: result.isActive,
             order: 0,
-            startDate: result.createdAt,
-            endDate: result.createdAt,
+            startDate: result.startAt ?? result.createdAt,
+            endDate: result.endAt ?? result.createdAt,
             status: result.status,
-            startAt: null,
-            endAt: null,
-            totalQuantity: null,
+            startAt: result.startAt,
+            endAt: result.endAt,
+            totalQuantity: result.totalQuantity,
           } as EventOfferProduct,
         });
       } catch (error: any) {
@@ -372,6 +379,8 @@ export function createEventOfferOperatorController(
             ALREADY_LISTED: 'ALREADY_REGISTERED',
             OFFER_NOT_OWNED: 'INTERNAL_ERROR', // operator 분기에서는 발생 불가
             INTERNAL_ERROR: 'INTERNAL_ERROR',
+            PRODUCT_NOT_APPROVED: 'PRODUCT_NOT_APPROVED',
+            INVALID_EVENT_CONDITIONS: 'INVALID_EVENT_CONDITIONS',
             // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
             NOT_FOUND: 'NOT_FOUND',
             INVALID_STATE: 'INVALID_STATE',

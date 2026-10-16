@@ -8,6 +8,7 @@
  *   Tab 2: 내 이벤트 제안 — 이미 제안한 이벤트 목록 + 상태
  */
 
+import { EventOfferTermsFields, EMPTY_EVENT_TERMS, eventOfferConditions } from '../../components/event-offer/EventOfferTermsFields';
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
@@ -50,6 +51,8 @@ export function SupplierEventOfferPage() {
   const [notSupplier, setNotSupplier] = useState(false);
   const [proposing, setProposing] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [proposalTarget, setProposalTarget] = useState<string | null>(null);
+  const [eventTerms, setEventTerms] = useState(EMPTY_EVENT_TERMS);
 
   useEffect(() => {
     loadAll();
@@ -78,15 +81,19 @@ export function SupplierEventOfferPage() {
   };
 
   const handlePropose = async (offer: SupplierOffer) => {
+    const conditions = eventOfferConditions(eventTerms);
+    if (!conditions) { toast.error('양수 이벤트 가격과 올바른 시작·종료 일시를 입력하세요.'); return; }
     if (proposing) return;
     setProposing(offer.id);
     try {
-      const res = await supplierEventOfferApi.propose(offer.id);
+      const res = await supplierEventOfferApi.propose(offer.id, conditions);
       if (res?.data) {
         setOffers(prev => prev.filter(o => o.id !== offer.id));
         setProposals(prev => [res.data, ...prev]);
         toast.success(`"${offer.title}" 이(가) 제안되었습니다. 운영자 검토 후 노출됩니다.`);
         setActiveTab('my-proposals');
+        setProposalTarget(null);
+        setEventTerms(EMPTY_EVENT_TERMS);
       }
     } catch (err: any) {
       const apiErr = err?.response?.data?.error as ApiError | undefined;
@@ -207,17 +214,11 @@ export function SupplierEventOfferPage() {
                   <div style={styles.offerTitle}>{offer.title}</div>
                   <div style={styles.offerSupplier}>{offer.supplierName}</div>
                   <div style={styles.offerPrice}>{formatPrice(offer.price)}</div>
-                  <button
-                    style={{
-                      ...styles.proposeBtn,
-                      opacity: proposing === offer.id ? 0.6 : 1,
-                      cursor: proposing === offer.id ? 'not-allowed' : 'pointer',
-                    }}
-                    disabled={!!proposing}
-                    onClick={() => handlePropose(offer)}
-                  >
-                    {proposing === offer.id ? TEXT.proposingBtn : TEXT.proposeBtn}
-                  </button>
+                  {proposalTarget === offer.id ? <div>
+                    <EventOfferTermsFields value={eventTerms} onChange={setEventTerms} disabled={!!proposing} />
+                    <button style={styles.proposeBtn} disabled={!!proposing} onClick={() => handlePropose(offer)}>{proposing ? TEXT.proposingBtn : '가격·기간으로 제안 제출'}</button>
+                    <button disabled={!!proposing} onClick={() => { setProposalTarget(null); setEventTerms(EMPTY_EVENT_TERMS); }}>취소</button>
+                  </div> : <button style={styles.proposeBtn} disabled={!!proposing || !!proposalTarget} onClick={() => { setProposalTarget(offer.id); setEventTerms(EMPTY_EVENT_TERMS); }}>{TEXT.proposeBtn}</button>}
                 </div>
               ))}
             </div>
@@ -266,6 +267,7 @@ export function SupplierEventOfferPage() {
                   </span>
                   <span style={{ width: 70, textAlign: 'right' as const, fontSize: 12, color: colors.neutral500 }}>
                     {formatDate(p.proposedAt)}
+                    {p.startAt && p.endAt && <div>이벤트 기간: {formatDate(p.startAt)} ~ {formatDate(p.endAt)}</div>}
                   </span>
                 </div>
               ))}

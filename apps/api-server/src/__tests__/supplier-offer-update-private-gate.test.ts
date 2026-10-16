@@ -11,6 +11,7 @@
  *   노출·거래 차단은 소비 경로의 `distribution_type <> 'PRIVATE' OR $x = ANY(allowed_seller_ids)`
  *   필터가 이미 보장하므로, 순수 정보 수정을 막을 이유가 없다.
  *
+ * 등록·게시 분리 이후 활성화·전체 공개는 등록 승인 제품에만 허용한다.
  * DB 없이 service 메서드의 분기만 검증한다.
  */
 import 'reflect-metadata';
@@ -35,6 +36,7 @@ type OfferRow = {
   serviceKeys: string[];
   allowedSellerIds: string[];
   distributionType: string;
+  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
   priceGeneral: number;
   consumerShortDescription: string | null;
 };
@@ -51,6 +53,7 @@ function newlyRegisteredOffer(over: Partial<OfferRow> = {}): OfferRow {
     serviceKeys: [],
     allowedSellerIds: [],
     distributionType: 'PRIVATE',
+    approvalStatus: 'PENDING',
     priceGeneral: 1000,
     consumerShortDescription: null,
     ...over,
@@ -111,20 +114,29 @@ describe('updateSupplierOffer — PRIVATE + 판매자 미지정 게이트 적용
     expect(saved).toHaveLength(1);
   });
 
-  it('전체 공개로 전환하면 PRIVATE 이 아니므로 게이트에 걸리지 않는다', async () => {
-    const { svc, saved } = withOffer(newlyRegisteredOffer());
+  it('등록 승인 제품을 전체 공개로 전환하면 PRIVATE 게이트에 걸리지 않는다', async () => {
+    const { svc, saved } = withOffer(newlyRegisteredOffer({ approvalStatus: 'APPROVED' }));
     const r = await svc.updateSupplierOffer('offer-1', 'sup-1', { isPublic: true });
     expect(r.success).toBe(true);
     expect(saved[0].distributionType).toBe('PUBLIC');
   });
 
-  it('판매자를 지정하면 활성화도 통과한다', async () => {
-    const { svc, saved } = withOffer(newlyRegisteredOffer());
+  it('등록 승인 제품은 판매자를 지정하면 활성화도 통과한다', async () => {
+    const { svc, saved } = withOffer(newlyRegisteredOffer({ approvalStatus: 'APPROVED' }));
     const r = await svc.updateSupplierOffer('offer-1', 'sup-1', {
       allowedSellerIds: ['seller-1'],
       isActive: true,
     });
     expect(r.success).toBe(true);
     expect(saved[0].isActive).toBe(true);
+  });
+
+  it.each(['PENDING', 'REJECTED'] as const)('%s 제품은 판매자를 지정해도 활성화나 전체 공개로 등록 승인을 우회하지 못한다', async approvalStatus => {
+    for (const updates of [{ isPublic: true }, { allowedSellerIds: ['seller-1'], isActive: true }]) {
+      const { svc, saved } = withOffer(newlyRegisteredOffer({ approvalStatus }));
+      expect(await svc.updateSupplierOffer('offer-1', 'sup-1', updates))
+        .toMatchObject({ success: false, error: 'PRODUCT_NOT_APPROVED' });
+      expect(saved).toHaveLength(0);
+    }
   });
 });

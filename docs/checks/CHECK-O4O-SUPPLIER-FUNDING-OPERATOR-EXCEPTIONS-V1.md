@@ -107,3 +107,22 @@ fixture 계정·식별자는 모두 합성 값이며 운영 DB·운영 API·실�
 
 - origin/main 에 #652 의 `SeparateSupplierRegistrationPublication1792110685889` 가 이미 manifest·expected-schema-states 끝에 들어가 있다. 이 branch 는 main 을 병합하지 않았으므로 manifest 순서와 최종 fingerprint 는 통합 시 전용 DB 에서 다시 산출해야 한다. 위 fingerprint 검증은 이 branch 단독 기준이다.
 - 운영 migration·배포·PR 운영은 수행하지 않았다.
+
+## origin/main 동기화와 fingerprint 재산출 (2026-10-17)
+
+사용자 승인(작업 branch 동기화까지)에 따라 `origin/main` `a9063fc0b` 를 일반 merge commit 으로 병합했다. rebase · force push 는 없다.
+
+- 충돌은 `manifest.ts` · `expected-schema-states.ts` 2개뿐이었다. #652 의 `SeparateSupplierRegistrationPublication1792110685889` 를 앞에, 이 branch 의 `CreateSupplierReviewRequests1792116000000` 을 뒤에 두었다.
+- 최종 상태 fingerprint 를 격리 PostgreSQL 17 에서 다시 산출했다: `18c01a7f97f311d41c04cfe9bc2dd56706741360ee6d103dc3845f2a4893b465` / 6,684 lines. #652 상태(6,654)에 이번 테이블의 30줄이 더해진 값이다. 이전 단독 값(`eaaa23ef…` / 6,682)은 폐기했다.
+- 통합 spec 에 전 prefix 검증을 추가했다. baseline 부터 migration 을 하나씩 적용하며 각 단계의 fingerprint · line 수가 `EXPECTED_SCHEMA_STATES[k]` 와 같은지 본다. baseline + 29개 prefix 가 모두 일치했다.
+- lockfile 변경이 없어 재설치하지 않았고 공통 패키지만 다시 build 했다.
+
+| 검증 (병합 후) | 결과 |
+|---|---|
+| 격리 PostgreSQL 통합 | 9개 통과 (전 prefix fingerprint · 최종 down/up 복구 · 재실행 no-op · writer fence · 기존 회귀 7). 임시 DB 잔존 0 |
+| migration 계약 / deploy-risk source 계약 | 21 pass / 36 pass |
+| API tsc · 관련 jest (예외 · 보완 요청 · handler · 펀딩 기록 · DB 상태 분류기) | 통과 · 5 suites 71 통과, 4 skip(분류기 spec 의 격리 DB env-gated 항목) |
+| Neture tsc · 전체 Vitest | 통과 · 117개 파일 1,123개 통과 |
+| API · Neture production build / 변경 파일 ESLint | 통과 / 0 |
+
+운영 migration · main PR 병합 · 배포는 이 승인 범위가 아니며 수행하지 않았다.

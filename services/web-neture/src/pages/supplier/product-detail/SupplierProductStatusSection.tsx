@@ -32,16 +32,17 @@ export default function SupplierProductStatusSection({ product, isEditing, compl
   return (
     <Section title="상태">
       {!isEditing && (
-        <InfoRow label="활성">
+        <InfoRow label="제품 이용">
           <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
             {product.isActive ? '활성' : '비활성'}
           </Badge>
         </InfoRow>
       )}
-      <InfoRow label="유통 방식">
-        <Badge className={`${distribution.bg} ${distribution.text}`}>{distribution.label}</Badge>
+      <InfoRow label="일반 공급 범위">
+        <Badge className={`${distribution.bg} ${distribution.text}`}>{product.defaultSupplyEnabled ? 'Neture 기본 공급' : distribution.label}</Badge>
       </InfoRow>
-      <InfoRow label="승인"><Badge className={approval.cls}>{approval.label}</Badge></InfoRow>
+      <InfoRow label="제품 등록 승인"><Badge className={approval.cls}>{approval.label}</Badge></InfoRow>
+      {product.registrationRejectionReason && <InfoRow label="등록 검토 사유">{product.registrationRejectionReason}</InfoRow>}
       <InfoRow label="완성도">
         <div className="flex items-center gap-2">
           <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">

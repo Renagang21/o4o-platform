@@ -83,6 +83,39 @@ test('PostgreSQL keyset covers every row, uses PK range index, and detects final
    assert.equal(await countDevelopmentReferences(direct,split),1);
    split.target_tokens=[''];await c.query('UPDATE split_refs SET a=NULL,b=NULL,paths=NULL');assert.equal(await countDevelopmentReferences(direct,split),0);
    await c.query("UPDATE split_refs SET b=''");assert.equal(await countDevelopmentReferences(direct,split),1);
+   // A UUID column first in a folded group keeps native equality plus the short
+   // legacy-token fallback; the last page, NULL, array and JSON stay covered.
+   await c.query(`CREATE TABLE uuid_group_refs(id uuid PRIMARY KEY,owner_id uuid,metadata jsonb,paths text[],label text);
+    INSERT INTO uuid_group_refs SELECT md5(('uuid-group-'||n)::text)::uuid,md5(('owner-'||n)::text)::uuid,
+      jsonb_build_object('source','legacy-import'),ARRAY['unrelated'],NULL FROM generate_series(1,2100) n;
+    INSERT INTO uuid_group_refs VALUES('ffffffff-ffff-ffff-ffff-ffffffffffff',NULL,NULL,NULL,NULL)`);
+   const uuidFirst=['owner_id','metadata','paths','label'].map((name,i)=>({schema:'public',table:'uuid_group_refs',column:name,
+    type:['uuid','jsonb','_text','text'][i],scan_key:'id',...(i===0?{indexed:false}:{})}));
+   const lastRow='ffffffff-ffff-ffff-ffff-ffffffffffff';
+   for(const [count,targets,target] of [[countDevelopmentReferences,developmentReferenceTargets,uuid(1)],[countMediaReferences,mediaReferenceTargets,uuid(50)]]) {
+    const [group]=await prepareReferenceGroups(direct,uuidFirst,targets(),keys,'invalid');
+    assert.deepEqual(group.columns,['owner_id','metadata','paths','label']);assert.equal(group.types[0],'uuid');
+    assert.equal(await count(direct,group),0);
+    for(const [set,column] of [[`owner_id='${target}'`,'owner_id'],[`metadata=jsonb_build_object('nested',jsonb_build_array('${target}'))`,'metadata'],
+      [`paths=ARRAY[NULL,'prefix ${target} suffix']`,'paths'],[`label='x${target}y'`,'label']]) {
+     await c.query(`UPDATE uuid_group_refs SET ${set} WHERE id=$1`,[lastRow]);
+     assert.equal(await count(direct,group),1);assert.equal(group.matched_column,column);
+     await c.query('UPDATE uuid_group_refs SET owner_id=NULL,metadata=NULL,paths=NULL,label=NULL WHERE id=$1',[lastRow]);
+    }
+    // A canonical UUID never matches by substring of a different UUID.
+    await c.query(`UPDATE uuid_group_refs SET owner_id=$1 WHERE id=$2`,['a'+target.slice(1),lastRow]);
+    assert.equal(await count(direct,group),0);
+   }
+   // Short legacy token inside a UUID column (development text-PK target).
+   await c.query('UPDATE offer_service_prices SET id=$1',['4000-80']);
+   await c.query('UPDATE uuid_group_refs SET owner_id=$1 WHERE id=$2',['12345678-1234-4000-8000-123456789abc',lastRow]);
+   const [legacy]=await prepareReferenceGroups(direct,uuidFirst,developmentReferenceTargets(),keys,'invalid');
+   assert.equal(await countDevelopmentReferences(direct,legacy),1);assert.equal(legacy.matched_column,'owner_id');
+   await c.query('UPDATE offer_service_prices SET id=$1',['legacy-not-hex']);
+   const [nonHex]=await prepareReferenceGroups(direct,uuidFirst,developmentReferenceTargets(),keys,'invalid');
+   assert.equal(await countDevelopmentReferences(direct,nonHex),0);
+   await c.query('UPDATE offer_service_prices SET id=$1',[uuid(37)]);
+   await c.query('DROP TABLE uuid_group_refs');
    // Literal metacharacters and arrays retain the exact PostgreSQL ::text semantics.
    await c.query('ALTER TABLE source_refs RENAME COLUMN id TO reference_key');
    const literal='legacy_[x].+(y){z}^$|?*%\\token';

@@ -2,13 +2,9 @@ import type { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierProductOffer, OfferDistributionType, OfferApprovalStatus, SupplierStatus, ProductCategory, ProductMaster } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
-import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
-import { filterApprovalEligibleServiceKeys } from '../constants/approval-service-keys.js';
-import { ServiceAudienceService } from './service-audience.service.js';
-import { assertDrugOfferAllowed } from '../guards/drug-access.guard.js';
 import { canonicalizeRegulatoryType } from '../promotion/adapters/supplier/supplier-regulatory-type.js';
-import { deriveDistributionType, assertRegulatedPermit, assertPharmacyOnlyServiceKeys } from './offer-write-policy.js';
+import { deriveDistributionType, assertRegulatedPermit } from './offer-write-policy.js';
 
 
 /**
@@ -137,9 +133,9 @@ export class SupplierOfferRegistrationService {
    * 공급자 Offer 생성의 유일한 persistence 원형이다 — 호출자는 createSupplierOfferFromExistingMaster 뿐
    * (레거시 createSupplierOffer 는 WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 로 은퇴).
    *
-   * 맡는 것(순서·코드·로그 불변):
-   *   slug/serviceKeys 정제 → 규제 상품 약국 전용 검사 → DRUG gate → Offer 구성 →
-   *   (supplier, master) 중복 사전검사 → save + 23505 fallback → service approval 생성 → 응답.
+   * 맡는 것: slug 생성 → 미게시·등록 심사 대기 Offer 구성 →
+   *   (supplier, master) 중복 사전검사 → save + 23505 fallback → 응답.
+   *   서비스 대상·약국 전용 공급·DRUG 게시 gate는 별도 게시 경로가 담당한다.
    *
    * 맡지 않는 것: Master resolve/create · 입력 검증 · permit 판정 · ProductMaster write.
    * ProductMaster / ProductIdentifier / ProductCandidate 에는 어떤 write 도 하지 않는다.
@@ -154,7 +150,7 @@ export class SupplierOfferRegistrationService {
       masterBarcode: string;
       /** 카테고리 기반 규제 상품 여부(기존 is_regulated 축) */
       isRegulated: boolean;
-      /** 알고 있으면 전달 — DRUG gate 가 master 를 재조회하지 않는다. 없으면 gate 가 masterId 로 조회(기존 동작) */
+      /** 호출자 입력의 호환 필드. 등록은 게시 gate를 실행하지 않는다. */
       regulatoryType?: string | null;
       stockQuantity: number;
       isPublic?: boolean;
@@ -169,60 +165,22 @@ export class SupplierOfferRegistrationService {
       isFeatured?: boolean;
     },
   ) {
-    const { masterId, masterBarcode, isRegulated } = input;
+    const { masterId, masterBarcode } = input;
 
     // slug + offer entity
     const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
-
-    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
-    //
-    // serviceKeys 는 등록 서비스 목록(allowlist)으로 검증되지 않으므로, 유통 축을 뒤집는
-    // 값은 여기서 입력 단계에 걸러낸다. 'neture' 는 PUBLIC 축이고 'glucoseview' 는 폐지된
-    // 서비스 키다 — 둘 중 하나라도 통과하면 deriveDistributionType 이 offer 를
-    // SERVICE 유통으로 잘못 판정한다.
-    const filteredServiceKeys = (input.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
-
-    // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
-    // 규제 상품은 약국 대상 서비스(service_audience_policies)에만 연결 가능
-    const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-    const pharmacyServiceError = assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, filteredServiceKeys);
-    if (pharmacyServiceError) {
-      return {
-        success: false,
-        error: pharmacyServiceError,
-        message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
-      };
-    }
-    const resolvedIsPublic = input.isPublic ?? (input.distributionType === OfferDistributionType.PUBLIC);
-
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-    // 의약품 판정 SSOT = product_masters.regulatory_type='DRUG'.
-    // 위 is_regulated 축은 실측상 DRUG 를 전혀 커버하지 못하므로(카테고리 미연결 100%)
-    // DRUG 축 게이트를 별도로 적용한다. 빈 serviceKeys·PUBLIC 전환도 여기서 거부된다.
-    const drugCreateGate = await assertDrugOfferAllowed(AppDataSource, {
-      action: 'OFFER_CREATE',
-      masterId,
-      regulatoryType: input.regulatoryType,
-      serviceKeys: filteredServiceKeys,
-      isPublic: resolvedIsPublic,
-    });
-    if (!drugCreateGate.allowed) {
-      logger.warn(
-        `[NetureOfferService] DRUG OFFER_CREATE denied: supplier=${supplierId}, master=${masterId}, keys=[${filteredServiceKeys.join(',')}], isPublic=${resolvedIsPublic}, code=${drugCreateGate.code}`,
-      );
-      return { success: false, error: drugCreateGate.code!, message: drugCreateGate.message };
-    }
 
     const offer = this.offerRepo.create({
       supplierId,
       masterId,
       slug,
-      isPublic: resolvedIsPublic,
-      distributionType: deriveDistributionType(resolvedIsPublic, filteredServiceKeys),
+      isPublic: false,
+      distributionType: deriveDistributionType(false, []),
       isActive: false,
+      defaultSupplyEnabled: false,
       approvalStatus: OfferApprovalStatus.PENDING,
       allowedSellerIds: [],
-      serviceKeys: filteredServiceKeys,
+      serviceKeys: [],
       priceGeneral: input.priceGeneral ?? 0,
       priceGold: input.priceGold ?? null,
       pricePlatinum: input.pricePlatinum ?? null,
@@ -265,18 +223,8 @@ export class SupplierOfferRegistrationService {
     }
     logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
 
-    // WO-NETURE-REMOVE-NETURE-FROM-SERVICE-SELECTION-AND-APPROVAL-V1:
-    // Neture는 기본 운영 공간이므로 service approval 대상 아님
-    // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
-    // 승인 대상 서비스 키 정책은 filterApprovalEligibleServiceKeys(SSOT) 통해서만 결정
-    const approvalService = new OfferServiceApprovalService(AppDataSource);
-    const approvalKeys = filterApprovalEligibleServiceKeys(input.serviceKeys);
-    if (approvalKeys.length > 0) {
-      await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
-    }
-
     return {
-      success: true,
+      success: true as const,
       data: {
         id: savedOffer.id,
         masterId: savedOffer.masterId,
@@ -330,6 +278,10 @@ export class SupplierOfferRegistrationService {
         return { success: false as const, error: OfferErrorCode.UNSUPPORTED_FIELD, message: `허용되지 않는 필드: ${unknownFields.join(', ')}` };
       }
       const input = body as unknown as CreateOfferFromExistingMasterInput;
+      if (input.isPublic || input.distributionType === OfferDistributionType.PUBLIC || input.serviceKeys?.length) {
+        return { success: false as const, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION', message: '등록 후 승인된 제품의 서비스 게시에서 공급 조건을 설정해 주세요.' };
+      }
+
 
       // 2. masterId 형식
       if (typeof input.masterId !== 'string' || !UUID_RE.test(input.masterId.trim())) {
@@ -337,11 +289,7 @@ export class SupplierOfferRegistrationService {
       }
       const masterId = input.masterId.trim();
 
-      // 3. 공개 유통 설명 요건 · 공급자 상태 (기존 등록 경로와 동일 계약)
-      const isPublic = input.isPublic ?? (input.distributionType === OfferDistributionType.PUBLIC);
-      if (isPublic && !input.consumerShortDescription?.trim()) {
-        return { success: false as const, error: OfferErrorCode.PUBLIC_REQUIRES_DESCRIPTION };
-      }
+      // 공급자 상태를 서버에서 재확인한다.
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId }, select: ['id', 'status'] });
       if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
         return { success: false as const, error: OfferErrorCode.SUPPLIER_NOT_ACTIVE };

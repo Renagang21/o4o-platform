@@ -77,7 +77,7 @@ export function useSupplierProducts() {
   const setFilterVisibility = (value: React.SetStateAction<string>) => setQueryValue('visibility', value);
 
   // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: 승인요청 전 탭 추가
-  const requestedTab = searchParams.get('approval');
+  const requestedTab = searchParams.get('approval') === 'unrequested' ? 'pending' : searchParams.get('approval');
   const activeTab: ApprovalTab = ['all', 'unrequested', 'pending', 'approved', 'rejected'].includes(requestedTab ?? '') ? requestedTab as ApprovalTab : 'all';
   const setActiveTab = (tab: ApprovalTab) => setQueryValue('approval', tab === 'all' ? '' : tab);
   // WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1:
@@ -345,7 +345,7 @@ export function useSupplierProducts() {
   const handleSubmitApproval = async () => {
     if (
       !confirm(
-        `선택한 ${selectedIds.size}개 상품의 저장된 공급 정책을 기준으로 승인 요청을 보냅니다.\n진행하시겠습니까?`,
+        `선택한 ${selectedIds.size}개 상품 중 반려된 제품의 등록 재검토를 요청합니다.\n진행하시겠습니까?`,
       )
     )
       return;
