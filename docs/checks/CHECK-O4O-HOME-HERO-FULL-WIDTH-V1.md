@@ -37,3 +37,9 @@
 문서 정합: 이번 WO·CHECK만 추가. 대표 홈 정본의 기존 AI 우선 설명과 사용자 최신 Hero 위치 결정의 차이를 기록했으며 정본 본문·색인은 변경하지 않았다.
 
 통합·배포 결과는 후속 확인 후 별도 기록한다. 이번 작업 외 다른 세션의 worktree·변경은 수정하지 않는다.
+
+## main 정렬 후속
+
+최초 HEAD `591c3827a4`의 required CI Gate·전체 API Jest 3 shard·Code Quality·웹/관리자 build·CodeQL·SonarCloud PASS, 미해결 리뷰 스레드0을 확인했다. 검사 중 main에 #672(`7323fce6a9`)가 반영되어 같은 작업 branch에 정상 merge했다. 충돌0, main 대비 변경은 이번 6개 경로뿐이다. main 이력은 다시 쓰지 않았다.
+
+통합 후 대표 홈 순서·커뮤니티 독립 진입·운영자 메뉴 focused 4 files/59 tests PASS, Neture·약국 production build 재실행 PASS. 최초 1124개 전체 결과는 이전 HEAD의 기록이며 후속 HEAD에서 다시 전체 실행했다고 보고하지 않는다. 공통 Hero 소스는 main merge로 바뀌지 않았다. 새 HEAD의 CI·리뷰·통합은 다시 확인한다.
