@@ -10,6 +10,7 @@
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
 import type { ReactNode } from 'react';
+import type { Tab } from './assignedBusinessModel';
 import { Link } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
@@ -39,6 +40,8 @@ import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 
 type BusinessPageProps = Readonly<{
   businessKey?: string;
+  contentEditHref?: (businessKey: string, contentId?: string) => string;
+  tabs?: readonly Tab[];
   forumHref?: (business: SemiFranchise) => string;
   renderBusinessHome?: (business: SemiFranchise) => ReactNode;
 }>;
@@ -47,12 +50,13 @@ export default function OperatorSemiFranchisePage(props: BusinessPageProps = {})
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
 }
 
-function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: BusinessPageProps) {
+function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, contentEditHref, tabs }: BusinessPageProps) {
+  const workspace = useAssignedBusinessWorkspace(businessKey, tabs);
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
     interactionLocked, decision, reason, setReason, decisionError, run, confirmDecision, cancelDecision,
     load, retryAssignments, selectBusiness, selectTab, selectStatus,
-  } = useAssignedBusinessWorkspace(businessKey);
+  } = workspace;
 
   const positive = (a: string) => a === 'approve' || a === 'reactivate';
 
@@ -100,7 +104,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
 
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
-        {TABS.map((t) => (
+        {TABS.filter(t => !tabs || tabs.includes(t.key)).map((t) => (
           <button
             key={t.key}
             type="button"
@@ -124,7 +128,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
           </ul>
           <Link
-            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/new`}
+            to={contentEditHref?.(sfKey) ?? `/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/new`}
             className="shrink-0 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
           >
             콘텐츠 작성
@@ -377,65 +381,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
           </table>
         )}
 
-        {tab === 'contents' && (
-          <table className="w-full min-w-[640px] divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className={TH}>제목</th>
-                <th className={TH}>태그</th>
-                <th className={TH}>게시일</th>
-                <th className={TH}>수정일</th>
-                <th className={TH}>상태</th>
-                <th className={TH}>처리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <EmptyRow colSpan={6} text="불러오는 중..." />
-              ) : rows.length === 0 ? (
-                <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />
-              ) : (
-                (rows as SemiFranchiseContent[]).map((c) => (
-                  <tr key={c.id}>
-                    <td className={TD}>
-                      <div className="font-medium text-gray-900">{c.title}</div>
-                      {c.sourceItemId && <div className="text-xs text-blue-700">공급자 등재 요청</div>}
-                      {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
-                    </td>
-                    <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
-                    <td className={TD}>{formatDateTime(c.publishedAt)}</td>
-                    <td className={TD}>{formatDateTime(c.updatedAt)}</td>
-                    <td className={TD}>
-                      <StatusBadge status={c.status} />
-                      {c.reviewReason && <p className="text-xs text-gray-500">{c.reviewReason}</p>}
-                    </td>
-                    <td className={TD}>
-                      <div className="flex flex-wrap gap-1">
-                        {!['archived', 'rejected'].includes(c.status) && (
-                          <Link
-                            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
-                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            수정
-                          </Link>
-                        )}
-                        {(c.sourceItemId && c.status === 'archived' ? [] : CONTENT_ACTIONS[c.status] ?? []).map((a) => (
-                          <ActionButton
-                            key={a.action}
-                            label={a.label}
-                            action={a.action}
-                            disabled={interactionLocked || loading}
-                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
-                          />
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+        {tab === 'contents' && <OperatorContentsTable workspace={workspace} contentEditHref={contentEditHref} />}
       </div>}
     </div>
   );
@@ -454,4 +400,64 @@ function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
     <Link to={forum}>참여자 게시판</Link>
     <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
   </nav>;
+}
+
+
+function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ workspace: ReturnType<typeof useAssignedBusinessWorkspace>; contentEditHref?: BusinessPageProps["contentEditHref"] }>) {
+  const { rows, loading, interactionLocked, sfKey, run } = workspace;
+  let contentRows: ReactNode;
+  if (loading) contentRows = <EmptyRow colSpan={6} text="불러오는 중..." />;
+  else if (!rows.length) contentRows = <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />;
+  else contentRows = (rows as SemiFranchiseContent[]).map((c) => (
+                  <tr key={c.id}>
+                    <td className={TD}>
+                      <div className="font-medium text-gray-900">{c.title}</div>
+                      {c.sourceItemId && <div className="text-xs text-blue-700">공급자 등재 요청</div>}
+                      {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
+                    </td>
+                    <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
+                    <td className={TD}>{formatDateTime(c.publishedAt)}</td>
+                    <td className={TD}>{formatDateTime(c.updatedAt)}</td>
+                    <td className={TD}>
+                      <StatusBadge status={c.status} />
+                      {c.reviewReason && <p className="text-xs text-gray-500">{c.reviewReason}</p>}
+                    </td>
+                    <td className={TD}>
+                      <div className="flex flex-wrap gap-1">
+                        {!['archived', 'rejected'].includes(c.status) && (
+                          <Link
+                            to={contentEditHref?.(sfKey, c.id) ?? `/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
+                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            수정
+                          </Link>
+                        )}
+                        {(c.sourceItemId && c.status === 'archived' ? [] : CONTENT_ACTIONS[c.status] ?? []).map((a) => (
+                          <ActionButton
+                            key={a.action}
+                            label={a.label}
+                            action={a.action}
+                            disabled={interactionLocked || loading}
+                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ));
+  return (<table className="w-full min-w-[640px] divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className={TH}>제목</th>
+                <th className={TH}>태그</th>
+                <th className={TH}>게시일</th>
+                <th className={TH}>수정일</th>
+                <th className={TH}>상태</th>
+                <th className={TH}>처리</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {contentRows}
+            </tbody>
+          </table>);
 }

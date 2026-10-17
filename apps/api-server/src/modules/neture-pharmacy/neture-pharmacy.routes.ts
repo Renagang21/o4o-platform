@@ -1,4 +1,5 @@
 import { StoreStaffSupportService } from './services/store-staff-support.js';
+import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
@@ -109,6 +110,15 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
+  const cooperatives = new CooperativeService(dataSource);
+  router.get('/cooperatives', handle(async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    return cooperatives.directory();
+  }));
+  router.get('/cooperatives/me', requireAuth, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    return cooperatives.session(req.user!.id);
+  }));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
   const proposals = new SupplyProposalService(dataSource);
   const supplierContents = new SupplierBusinessContentService(dataSource);

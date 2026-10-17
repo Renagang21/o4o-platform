@@ -1,0 +1,95 @@
+name: Deploy cooperative test service
+run-name: Cooperative test ${{ inputs.sha }} (apply=${{ inputs.apply }})
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "검증된 main HEAD SHA (API migration·배포가 먼저 완료되어야 함)"
+        required: true
+      operator_email:
+        description: "사용자가 지정한 기존 운영자 계정"
+        required: true
+      member_email:
+        description: "사용자가 지정한 기존 개인 조합원 계정"
+        required: true
+      apply:
+        description: "false = 계정·연결 사전 점검만 / true = 테스트 조합 등록·앱 배포"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: cooperative-production
+  cancel-in-progress: false
+env:
+  PROJECT_ID: netureyoutube
+  REGION: asia-northeast3
+  RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
+jobs:
+  deploy:
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.18.0"
+      - name: Pin reviewed main HEAD and green CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          test "$TARGET_SHA" = "$GITHUB_SHA"
+          test "$TARGET_SHA" = "$(gh api repos/$GITHUB_REPOSITORY/commits/main --jq .sha)"
+          node scripts/ci/ci-gate.mjs --target "$TARGET_SHA" --wait-seconds 1800 --enforce
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+      - name: Require same-SHA serving API and pin its immutable image
+        run: |
+          set -euo pipefail
+          REVISION=$(gcloud run services describe o4o-core-api --region="$REGION" --project="$PROJECT_ID" --format=json | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{const t=JSON.parse(s).status.traffic.filter(x=>x.percent>0);if(t.length!==1||t[0].percent!==100)process.exit(1);process.stdout.write(t[0].revisionName)})')
+          gcloud run revisions describe "$REVISION" --region="$REGION" --project="$PROJECT_ID" --format=json > "$RUNNER_TEMP/coop-api-revision.json"
+          node --input-type=module -e 'import fs from "node:fs";const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/coop-api-revision.json"));if(r.metadata.labels["o4o-commit-sha"]!==process.env.GITHUB_SHA||!r.status.imageDigest)process.exit(1);fs.appendFileSync(process.env.GITHUB_ENV,"API_IMAGE="+r.status.imageDigest+"\n")'
+      - name: Provision only the approved cooperative test fixture
+        env:
+          APPLY: ${{ inputs.apply }}
+          DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
+          DB_NAME: ${{ secrets.GCP_DB_NAME }}
+          COOP_TEST_OPERATOR_EMAIL: ${{ inputs.operator_email }}
+          COOP_TEST_MEMBER_EMAIL: ${{ inputs.member_email }}
+        run: |
+          set -euo pipefail
+          ARGS='dist/provision-test-cooperative.js'
+          if [ "$APPLY" = 'true' ]; then ARGS="$ARGS,--apply"; fi
+          node --input-type=module -e 'import fs from "node:fs";const e=process.env;fs.writeFileSync(e.RUNNER_TEMP+"/coop-job-env.json",JSON.stringify({NODE_ENV:"production",DB_HOST:"/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db",DB_PORT:"5432",DB_USERNAME:e.DB_USERNAME,DB_NAME:e.DB_NAME,COOP_TEST_OPERATOR_EMAIL:e.COOP_TEST_OPERATOR_EMAIL,COOP_TEST_MEMBER_EMAIL:e.COOP_TEST_MEMBER_EMAIL}),{mode:0o600})'
+          gcloud run jobs deploy o4o-coop-test-provision --image="$API_IMAGE" --region="$REGION" --project="$PROJECT_ID" \
+            --service-account="$RUNTIME_SA" --task-timeout=300 --max-retries=0 \
+            --env-vars-file="$RUNNER_TEMP/coop-job-env.json" \
+            --set-secrets='DB_PASSWORD=o4o-db-password:latest' --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
+            --command=node --args="$ARGS"
+          gcloud run jobs execute o4o-coop-test-provision --region="$REGION" --project="$PROJECT_ID" --wait
+      - name: Build and deploy cooperative frontend
+        if: inputs.apply
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker gcr.io --quiet
+          docker build -f services/web-pharmacy-coop/Dockerfile -t "gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA" .
+          docker push "gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA"
+          gcloud run deploy cooperative-web --image="gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA" --region="$REGION" --project="$PROJECT_ID" \
+            --service-account="$RUNTIME_SA" --port=8080 --memory=256Mi --cpu=1 --min-instances=0 --max-instances=5 \
+            --no-traffic --tag="sha-${GITHUB_SHA:0:12}" --update-labels="o4o-commit-sha=$GITHUB_SHA"
+      - name: Verify new frontend before switching traffic
+        if: inputs.apply
+        run: |
+          set -euo pipefail
+          node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --paths '/,/test,/login' --attempts 3
+          gcloud run services update-traffic cooperative-web --region="$REGION" --project="$PROJECT_ID" --to-tags="sha-${GITHUB_SHA:0:12}=100"
+      # Public invoker IAM, DNS, HTTPS certificate and load-balancer host routing are owner-managed.
+      # This workflow never grants IAM or claims the public domain is ready merely because Cloud Run deployed.

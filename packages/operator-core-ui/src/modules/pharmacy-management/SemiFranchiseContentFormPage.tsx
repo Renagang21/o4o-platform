@@ -13,9 +13,9 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { useSemiFranchiseContentEditor } from './useSemiFranchiseContentEditor';
 import { INPUT, Message, PageHeader, StatusBadge } from './PharmacyCommerceUi';
 
-export default function SemiFranchiseContentFormPage({ businessKey }: { businessKey?: string } = {}) {
+export default function SemiFranchiseContentFormPage({ businessKey, returnPath }: { businessKey?: string; returnPath?: string } = {}) {
   const { key, listPath, isEdit, form, current, loading, saving, message, loadError, loadedScope, scope,
-    archived, set, submit, reloadContent } = useSemiFranchiseContentEditor(businessKey);
+    archived, set, submit, reloadContent } = useSemiFranchiseContentEditor(businessKey, returnPath);
 
   if (businessKey && businessKey !== key) return <p>이 사업의 콘텐츠가 아닙니다.</p>;
   if (loadError) return <div role="alert" className="p-6"><Message message={message} /><button onClick={reloadContent} className="mt-3 rounded border px-4 py-2">다시 불러오기</button></div>;

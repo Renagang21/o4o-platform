@@ -1,4 +1,15 @@
-import { createContext, useContext, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  lazy,
+  Suspense,
+} from "react";
+import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
+const CooperativeBusinessOperator = lazy(
+  () => import("./CooperativeBusinessOperator"),
+);
 import {
   Link,
   NavLink,
@@ -20,6 +31,7 @@ import {
 } from "./domain";
 
 interface AppContext {
+  businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
   session: SessionSnapshot;
   preview: boolean;
@@ -48,16 +60,22 @@ function SiteLink({
 }
 
 export function App({
+  businessClient,
   cooperatives,
   session = anonymousSession,
   preview = false,
 }: {
+  businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
   session?: SessionSnapshot;
   preview?: boolean;
 }) {
+  const context = useMemo(
+    () => ({ cooperatives, session, preview, businessClient }),
+    [cooperatives, session, preview, businessClient],
+  );
   return (
-    <Context.Provider value={{ cooperatives, session, preview }}>
+    <Context.Provider value={context}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
@@ -77,6 +95,14 @@ export function App({
             />
             <Route path="services" element={<Services />} />
             <Route path="operator" element={<CooperativeManagement />} />
+            <Route
+              path="operator/contents/new"
+              element={<CooperativeManagement editor />}
+            />
+            <Route
+              path="operator/contents/:id/edit"
+              element={<CooperativeManagement editor />}
+            />
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="*" element={<NotFound />} />
@@ -120,7 +146,9 @@ function Layout() {
               <SiteLink to="/operator">연합회 운영</SiteLink>
             )}
           </nav>
-          <span className="account-status">계정 연동 준비 중</span>
+          <span className="account-status">
+            {session.userId ? "로그인됨" : "로그인 후 조합 이용"}
+          </span>
         </div>
       </header>
       {preview && (
@@ -409,6 +437,7 @@ function Membership() {
     suspended: "이용 정지",
     withdrawn: "탈퇴",
   };
+  const emptyTitle = session.userId ? "미가입" : "로그인 후 가입 상태 확인";
   return (
     <section className="section narrow">
       <h2>가입 자격과 내 참여 상태</h2>
@@ -418,7 +447,7 @@ function Membership() {
         <p>개인 자격으로 가입하며, 다른 조합 가입 여부와 별도로 심사합니다.</p>
       </div>
       <Empty
-        title={status ? statusLabels[status] : "가입·계정 연동 준비 중"}
+        title={status ? statusLabels[status] : emptyTitle}
         text="조합 가입과 약국 내 매장 자격은 별개입니다. 가입 신청의 실제 저장과 심사는 아직 연결되지 않았습니다."
       />
     </section>
@@ -510,10 +539,24 @@ function FederationManagement() {
   );
 }
 
-function CooperativeManagement() {
+function CooperativeManagement({
+  editor = false,
+}: Readonly<{ editor?: boolean }>) {
   const cooperative = useOutletContext<Cooperative>();
-  const { session } = useContext(Context);
+  const { session, businessClient } = useContext(Context);
   const { canManage } = cooperativeAccess(session, cooperative.id);
+  if (canManage && cooperative.businessKey && businessClient)
+    return (
+      <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
+        <CooperativeBusinessOperator
+          key={cooperative.id}
+          businessKey={cooperative.businessKey}
+          slug={cooperative.slug}
+          client={businessClient}
+          editor={editor}
+        />
+      </Suspense>
+    );
   return (
     <section className="section">
       <h2>조합 운영</h2>

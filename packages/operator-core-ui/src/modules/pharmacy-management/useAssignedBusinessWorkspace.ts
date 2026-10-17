@@ -24,10 +24,10 @@ function loadBusinessRows(key: string, tab: Tab, status: string) {
 }
 
 /** 기존 담당 사업의 조회·심사 수명. 사업 scope와 요청 세대를 함께 소유한다. */
-export function useAssignedBusinessWorkspace(businessKey?: string) {
+export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?: readonly Tab[]) {
   const [searchParams] = useSearchParams();
   const queryTab = searchParams.get('tab');
-  const initialTab: Tab = isTab(queryTab) ? queryTab : 'memberships';
+  const initialTab: Tab = isTab(queryTab) && (!allowedTabs || allowedTabs.includes(queryTab)) ? queryTab : allowedTabs?.[0] ?? 'memberships';
   const initialKey = useRef(searchParams.get('key'));
   const [franchises, setFranchises] = useState<SemiFranchise[] | null>(null);
   const [sfKey, setSfKey] = useState('');
@@ -122,7 +122,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string) {
     clearRows(); setSfKey(key);
   };
   const selectTab = (next: Tab) => {
-    if (locked() || next === tab) return;
+    if (locked() || next === tab || (allowedTabs && !allowedTabs.includes(next))) return;
     clearRows(); setTab(next); setStatus(DEFAULT_STATUS[next]);
   };
   const selectStatus = (next: string) => {

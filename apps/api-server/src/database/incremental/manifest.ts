@@ -96,6 +96,8 @@ import { AddFundingOfflineState1792212000000 } from '../migrations/1792212000000
 
 import { AddSupplierBusinessContentRequests1792215000000 } from '../migrations/1792215000000-AddSupplierBusinessContentRequests.js';
 
+import { CreateCooperativeMemberships1792216000000 } from '../migrations/1792216000000-CreateCooperativeMemberships.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -129,6 +131,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateSupplierReviewRequests1792193756961,
   AddFundingOfflineState1792212000000,
   AddSupplierBusinessContentRequests1792215000000,
+  CreateCooperativeMemberships1792216000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

@@ -7,6 +7,8 @@ export type MembershipStatus =
   | "withdrawn";
 
 export interface Cooperative {
+  /** Explicit backend business binding, never inferred from the display slug or personal membership. */
+  businessKey?: string;
   id: string;
   slug: string;
   name: string;

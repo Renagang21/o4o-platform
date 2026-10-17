@@ -113,3 +113,14 @@ it('reviews supplier content within its business and requires a rejection reason
   fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '내용 보완 필요' } }); confirm();
   await waitFor(() => expect(api.setContentStatus).toHaveBeenCalledWith('pharmacy', 'request-a', 'reject', '내용 보완 필요'));
 });
+
+it('restricts cooperative tabs even on a direct membership URL and keeps its own-content editor local', async () => {
+  api.listProposals.mockResolvedValue([]);
+  render(<MemoryRouter initialEntries={['/test/operator?tab=memberships']}><Page businessKey="pharmacy" tabs={['proposals','contents']} contentEditHref={() => '/test/operator/contents/new'} /></MemoryRouter>);
+  await waitFor(() => expect(api.listProposals).toHaveBeenCalledWith('pharmacy', 'pending'));
+  expect(api.listSfMemberships).not.toHaveBeenCalled();
+  expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠' }));
+  await waitFor(() => expect(api.listContents).toHaveBeenCalledWith('pharmacy', 'all'));
+  expect(screen.getByRole('link', { name: '콘텐츠 작성' }).getAttribute('href')).toBe('/test/operator/contents/new');
+});

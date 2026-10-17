@@ -2812,6 +2812,15 @@ importers:
 
   services/web-pharmacy-coop:
     dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
+      "@o4o/operator-core-ui":
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -2837,6 +2846,15 @@ importers:
       vite:
         specifier: ~5.4.19
         version: 5.4.19(@types/node@24.10.1)(lightningcss@1.30.2)(terser@5.44.1)
+      tailwindcss:
+        specifier: 3.4.17
+        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.4.5))
+      autoprefixer:
+        specifier: ~10.4.16
+        version: 10.4.22(postcss@8.4.49)
+      postcss:
+        specifier: ~8.4.31
+        version: 8.4.49
 
 packages:
 
