@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Page from './OperatorSemiFranchisePage';
 const api = vi.hoisted(() => ({ listAssignedSemiFranchises: vi.fn(), listSfMemberships: vi.fn(), listProposals: vi.fn(),
   listEvents: vi.fn(), listRecruitments: vi.fn(), listContents: vi.fn(), decideEvent: vi.fn(), decideRecruitment: vi.fn(),
-  decideSfMembership: vi.fn(), decideProposal: vi.fn(), setContentStatus: vi.fn() }));
+  decideSfMembership: vi.fn(), decideProposal: vi.fn(), setContentStatus: vi.fn(), listContentSubmissions: vi.fn(), decideContentSubmission: vi.fn() }));
 vi.mock('./api', () => ({ neturePharmacyOperatorApi: api, STATUS_CLASS: {}, STATUS_LABEL: {},
   MEMBERSHIP_ACTIONS_BY_STATUS: { pending: [{ action: 'approve', label: '승인' }] }, formatDateTime: () => '-', formatWon: String }));
 const businesses = [{ key: 'pharmacy', name: '가상 약국 사업', status: 'active' }, { key: 'other', name: '가상 다른 사업', status: 'active' }];
@@ -14,6 +14,7 @@ beforeEach(() => {
   vi.resetAllMocks(); api.listAssignedSemiFranchises.mockResolvedValue(businesses);
   api.listSfMemberships.mockResolvedValue([]); api.listEvents.mockResolvedValue([event]);
   api.listRecruitments.mockResolvedValue([recruitment]); api.listContents.mockResolvedValue([]);
+  api.listContentSubmissions.mockResolvedValue([]);
 });
 afterEach(cleanup);
 function show(pharmacy = false) { return render(<MemoryRouter><Page businessKey={pharmacy ? 'pharmacy' : undefined} /></MemoryRouter>); }
@@ -25,6 +26,22 @@ async function events() {
 }
 const rowAction = (name: string, action: string) => within(screen.getByText(name).closest('tr')!).getByRole('button', { name: action });
 const confirm = () => fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+it.each(['approve', 'reject'] as const)('reviews supplier submissions in the selected business (%s) without removing own content creation', async action => {
+  api.listContentSubmissions.mockResolvedValue([{ id: 'submitted-a', status: 'pending', supplierName: 'Synthetic supplier', content: { title: 'Submitted material', body: '<p>Submitted body</p>', summary: '', attachments: [] } }]);
+  api.decideContentSubmission.mockResolvedValue({}); show();
+  await screen.findByRole('heading', { name: '담당 약국 협력사업' });
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠', exact: true }));
+  expect(await screen.findByRole('link', { name: '콘텐츠 작성' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '공급자 콘텐츠 심사' }));
+  await screen.findByText('Submitted material');
+  fireEvent.click(rowAction('Submitted material', action === 'approve' ? '승인·게시' : '반려'));
+  if (action === 'reject') fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: 'Review note' } });
+  expect(api.decideContentSubmission).not.toHaveBeenCalled(); confirm();
+  await waitFor(() => {
+    if (action === 'reject') expect(api.decideContentSubmission).toHaveBeenCalledWith('pharmacy', 'submitted-a', action, 'Review note');
+    else expect(api.decideContentSubmission).toHaveBeenCalledWith('pharmacy', 'submitted-a', action);
+  });
+});
 it.each([false, true])('failed event decision preserves reason/target and retries within the selected business (%s)', async pharmacy => {
   api.decideEvent.mockRejectedValueOnce(new Error('가상 처리 실패')).mockResolvedValueOnce({});
   show(pharmacy); await events(); fireEvent.click(rowAction(event.productName, '반려'));

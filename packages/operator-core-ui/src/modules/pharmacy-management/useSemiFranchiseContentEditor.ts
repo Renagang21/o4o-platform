@@ -5,11 +5,12 @@ import { EMPTY_CONTENT_DRAFT, contentToDraft, buildContentInput, type ContentDra
 import type { Msg } from './assignedBusinessModel';
 
 /** 콘텐츠 초안·읽기/쓰기 수명. 보관·사업 범위·이전 요청의 이동 방어를 보존한다. */
-export function useSemiFranchiseContentEditor(businessKey?: string) {
-  const { key = '', id } = useParams<{ key: string; id?: string }>();
+export function useSemiFranchiseContentEditor(businessKey?: string, returnPath?: string) {
+  const { key: routeKey, id } = useParams<{ key: string; id?: string }>();
+  const key = routeKey || businessKey || '';
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const listPath = `/operator/semi-franchises?key=${encodeURIComponent(key)}&tab=contents`;
+  const listPath = returnPath ?? `/operator/semi-franchises?key=${encodeURIComponent(key)}&tab=contents`;
 
   const [form, setForm] = useState<ContentDraft>(EMPTY_CONTENT_DRAFT);
   const [current, setCurrent] = useState<SemiFranchiseContent | null>(null);

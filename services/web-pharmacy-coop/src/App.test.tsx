@@ -17,6 +17,15 @@ function open(path: string, session: SessionSnapshot = anonymousSession) {
 }
 
 describe("federation and cooperative route boundaries", () => {
+  it('does not mount the authenticated backend for another cooperative operator, including direct editor URLs', () => {
+    const client = { get: vi.fn(), post: vi.fn(), patch: vi.fn(), put: vi.fn(), delete: vi.fn() };
+    render(<MemoryRouter initialEntries={['/sample-coop-b/operator/contents/new']}><App
+      cooperatives={previewCooperatives.map(row => ({ ...row, businessKey: `business-${row.id}` }))}
+      session={{ ...anonymousSession, userId: 'person', cooperativeOperators: [{ userId: 'person', cooperativeId: 'preview-a' }] }} businessClient={client}
+    /></MemoryRouter>);
+    expect(screen.getByText('이 조합의 운영 권한이 필요합니다.')).toBeTruthy();
+    expect(client.get).not.toHaveBeenCalled(); expect(client.post).not.toHaveBeenCalled();
+  });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(

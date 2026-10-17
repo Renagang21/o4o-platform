@@ -21,18 +21,20 @@ pnpm exec vitest run --config services/web-pharmacy-coop/vitest.config.mjs
 
 ## 화면 구조
 
-| 경로                           | 범위                                    |
-| ------------------------------ | --------------------------------------- |
-| `/`                            | 연합회 홈                               |
-| `/cooperatives`                | 소속 조합 목록                          |
-| `/about`                       | 연합회 소개·업무 경계                   |
-| `/operator`                    | 연합회 조합 가입·소속 관리 연결 위치    |
-| `/:cooperativeSlug`            | 개별 조합 홈·공지·회원 이야기·자료 진입 |
-| `/:cooperativeSlug/membership` | 조합별 가입 조건·개인 참여 상태         |
-| `/:cooperativeSlug/community`  | 해당 조합 회원 게시판 연결 위치         |
-| `/:cooperativeSlug/materials`  | 해당 조합 자료 연결 위치                |
-| `/:cooperativeSlug/services`   | 조합 서비스·기존 내 매장 연결           |
-| `/:cooperativeSlug/operator`   | 해당 조합의 회원·서비스 관리 연결 위치  |
+| 경로                                           | 범위                                    |
+| ---------------------------------------------- | --------------------------------------- |
+| `/`                                            | 연합회 홈                               |
+| `/cooperatives`                                | 소속 조합 목록                          |
+| `/about`                                       | 연합회 소개·업무 경계                   |
+| `/operator`                                    | 연합회 조합 가입·소속 관리 연결 위치    |
+| `/:cooperativeSlug`                            | 개별 조합 홈·공지·회원 이야기·자료 진입 |
+| `/:cooperativeSlug/membership`                 | 조합별 가입 조건·개인 참여 상태         |
+| `/:cooperativeSlug/community`                  | 해당 조합 회원 게시판 연결 위치         |
+| `/:cooperativeSlug/materials`                  | 해당 조합 자료 연결 위치                |
+| `/:cooperativeSlug/services`                   | 조합 서비스·기존 내 매장 연결           |
+| `/:cooperativeSlug/operator`                   | 조합별 공급 조건·콘텐츠 운영 연결 위치  |
+| `/:cooperativeSlug/operator/contents/new`      | 조합 자체 콘텐츠 작성                   |
+| `/:cooperativeSlug/operator/contents/:id/edit` | 게시 자료 편집                          |
 
 현재 프로덕션 조합 목록은 비어 있다. 서버 디렉토리 연결 전까지 실제 조합을 등록한 것으로 표시하지 않는다.
 알 수 없는 조합 주소는 다른 조합으로 대신 연결하지 않고 찾을 수 없음 화면으로 처리한다.
@@ -55,9 +57,30 @@ pnpm exec vitest run --config services/web-pharmacy-coop/vitest.config.mjs
 
 다음 구현에서는 기존 공통 인증을 연결하고 서버에서 모든 조합별 조회/변경 요청의 범위를 재검증해야 한다.
 기존 `semi_franchise_memberships`는 약국 조직 기준이므로 개인 조합원 원장으로 재사용하지 않는다.
-조합 디렉토리·가입/심사·게시판/자료 저장·운영 API와 DB migration은 이 변경에 포함하지 않는다.
+조합 디렉토리·개인 가입/심사·게시판의 실제 연결은 후속 범위다. 공급·콘텐츠 공통 운영 API 연결은 아래 갱신을 따른다.
 연합회 가입 심사 기준·세부 업무, 회비/출자/의결, 직원 위임, 도메인·배포는 추가 업무 분석 대상이다.
-기존 인증·권한·카탈로그·약국 서비스·DB·배포 설정은 변경하지 않는다.
+개인 조합원 가입을 약국 조직 가입으로 대신하지 않는다. 기존 인증·권한·카탈로그·배포 설정은 변경하지 않는다.
+
+## 2026-10-17 공급 조건·콘텐츠 운영 연결
+
+`Cooperative.businessKey`에 실제 `semi_franchises.key`를 명시하고 `App.businessClient`에 기존 인증된
+`PharmacyManagementClient`를 전달하면 해당 조합 운영 공간에서 공통 운영 UI를 사용한다.
+사업 코드는 조합 주소에서 추정하지 않는다. 본 조합의 운영 자격·businessKey·인증된 전송 계층이
+모두 있어야 연결하며, 실제 API는 `neture:operator/admin` 역할과 `semi_franchise_operators` 담당 관계를
+다시 검사한다. 초기 앱은 여전히 anonymous이며 실제 조합 디렉토리/인증 설정을 만들지 않는다.
+
+- 공급 조건: 기존 공급자 공급 제안 등록 → 해당 사업 운영자 승인 API/화면 재사용.
+- 자체 콘텐츠: 기존 조합 운영자의 작성·초안 저장·수정·게시·보관 흐름 재사용.
+- 공급자 콘텐츠: 공급자 자료실의 ‘협업체에 제출’ → 특정 사업의 승인 대기함 → 담당 운영자 ‘승인·게시’.
+- 승인하면 제출 당시 버전을 `semi_franchise_contents`에 게시하므로 기존 사업 자료 조회·매장 사본 API를 그대로 쓴다.
+- 파일 자료는 HTTP(S) 첨부 링크/메타데이터를 보존한다. 원격 파일 자체를 내려받아 별도 보관하는 기능은 아니다.
+- 조합의 개인 조합원 관리와 약국 조직 가입은 구분한다. 조합 운영 UI에는 공급·콘텐츠 세 탭만 연결한다.
+- 교육은 기존 강의 서비스에서 회원 대상 강의를 운영한다. 협업체 코드에 강의 기능을 추가하지 않는다.
+- 제휴 경영지원은 당분간 미구현, 공동 상품 기획은 오프라인 업무다.
+
+추가 저장 구조는 `CreateBusinessContentSubmissions1792200000000` migration이다. 운영 적용은 별도
+검토된 migration/배포 절차가 필요하며 현재 작업에서는 격리 DB만 변경했다. Neture 및 기존 약국 앱
+(pharmacy/megapharm)의 공통 운영 모듈에도 같은 콘텐츠 심사 탭이 제공된다.
 
 ## 검증
 

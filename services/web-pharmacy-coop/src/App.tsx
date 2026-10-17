@@ -1,4 +1,8 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, lazy, Suspense } from "react";
+import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
+const CooperativeBusinessOperator = lazy(
+  () => import("./CooperativeBusinessOperator"),
+);
 import {
   Link,
   NavLink,
@@ -20,6 +24,7 @@ import {
 } from "./domain";
 
 interface AppContext {
+  businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
   session: SessionSnapshot;
   preview: boolean;
@@ -48,16 +53,20 @@ function SiteLink({
 }
 
 export function App({
+  businessClient,
   cooperatives,
   session = anonymousSession,
   preview = false,
 }: {
+  businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
   session?: SessionSnapshot;
   preview?: boolean;
 }) {
   return (
-    <Context.Provider value={{ cooperatives, session, preview }}>
+    <Context.Provider
+      value={{ cooperatives, session, preview, businessClient }}
+    >
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
@@ -77,6 +86,14 @@ export function App({
             />
             <Route path="services" element={<Services />} />
             <Route path="operator" element={<CooperativeManagement />} />
+            <Route
+              path="operator/contents/new"
+              element={<CooperativeManagement editor />}
+            />
+            <Route
+              path="operator/contents/:id/edit"
+              element={<CooperativeManagement editor />}
+            />
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="*" element={<NotFound />} />
@@ -510,10 +527,22 @@ function FederationManagement() {
   );
 }
 
-function CooperativeManagement() {
+function CooperativeManagement({ editor = false }: { editor?: boolean }) {
   const cooperative = useOutletContext<Cooperative>();
-  const { session } = useContext(Context);
+  const { session, businessClient } = useContext(Context);
   const { canManage } = cooperativeAccess(session, cooperative.id);
+  if (canManage && cooperative.businessKey && businessClient)
+    return (
+      <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
+        <CooperativeBusinessOperator
+          key={cooperative.id}
+          businessKey={cooperative.businessKey}
+          slug={cooperative.slug}
+          client={businessClient}
+          editor={editor}
+        />
+      </Suspense>
+    );
   return (
     <section className="section">
       <h2>조합 운영</h2>

@@ -16,6 +16,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { BusinessContentSubmitDialog } from './BusinessContentSubmitDialog';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderOpen, AlertCircle, Send } from 'lucide-react';
 import { supplierApi, type SupplierLibraryItem, type SupplierLibraryHandoffTarget } from '../../lib/api';
@@ -66,6 +67,7 @@ export default function SupplierLibraryPage() {
   const [handoffSubmitting, setHandoffSubmitting] = useState(false);
   const [handoffError, setHandoffError] = useState<string | null>(null);
   const [handoffNotice, setHandoffNotice] = useState<string | null>(null);
+  const [businessItem, setBusinessItem] = useState<SupplierLibraryItem | null>(null);
   useEffect(() => {
     let cancelled = false;
     supplierApi.getLibraryHandoffTargets().then((targets) => {
@@ -237,6 +239,7 @@ export default function SupplierLibraryPage() {
     createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
     actions: (
       <div style={{ display: 'flex', gap: '8px' }}>
+        <button type="button" onClick={() => setBusinessItem(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0f766e', fontSize: '13px' }}>협업체에 제출</button>
         {handoffTargets.length > 0 && (
           <button
             onClick={() => openHandoff(item)}
@@ -272,7 +275,7 @@ export default function SupplierLibraryPage() {
             콘텐츠 라이브러리
           </h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-            공급자 콘텐츠의 원천입니다. 공개 자료는 매장 HUB 에, 제공한 자료는 서비스 운영자에게 전달됩니다.
+            공개 자료는 매장 자료함에서 조회합니다. 특정 협업체의 회원에게만 제공할 자료는 ‘협업체에 제출’을 이용하세요.
           </p>
         </div>
         <button
@@ -415,6 +418,7 @@ export default function SupplierLibraryPage() {
       )}
 
       {/* Handoff Modal — Supplier → Service Operator (WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1) */}
+      {businessItem && <BusinessContentSubmitDialog key={businessItem.id} item={businessItem} onClose={() => setBusinessItem(null)} onSuccess={message => { setHandoffNotice(message); setBusinessItem(null); }} />}
       {handoffItem && (
         <div
           style={{
@@ -434,6 +438,7 @@ export default function SupplierLibraryPage() {
             <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', lineHeight: 1.6 }}>
               <b>{handoffItem.title}</b> 을(를) 선택한 서비스의 운영자에게 제공합니다.
               제공 후 검토·수정·게시는 해당 서비스 운영자가 진행하며, 공급자 작업은 여기서 끝납니다.
+              협업체 회원 전용 자료는 이 공용 서비스 전달 대신 ‘협업체에 제출’을 이용해 주세요.
             </p>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#334155', marginBottom: '6px' }}>
               제공할 서비스

@@ -155,6 +155,19 @@ export interface SemiFranchiseContentInput {
   tags?: string[];
 }
 
+export interface BusinessContentSubmission {
+  id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reason: string | null;
+  content: { title: string; summary: string | null; body: string | null; attachments: Array<{ name: string; url: string }> };
+  semiFranchiseKey: string;
+  semiFranchiseName: string;
+  supplierName: string;
+  createdAt: string;
+  reviewedAt: string | null;
+  publishedContentId: string | null;
+}
+
 function errorOf(err: unknown): Error {
   const e = err as { response?: { data?: { error?: string; message?: string } }; message?: string };
   return new Error(e?.response?.data?.error || e?.response?.data?.message || e?.message || '요청을 처리하지 못했습니다.');
@@ -214,6 +227,10 @@ export const neturePharmacyOperatorApi = {
 
   listContents: (key: string, status?: string) =>
     get<SemiFranchiseContent[]>(`/neture/operator/semi-franchises/${enc(key)}/contents`, { status: status || 'all' }),
+  listContentSubmissions: (key: string, status?: string) =>
+    get<BusinessContentSubmission[]>(`/neture/operator/semi-franchises/${enc(key)}/content-submissions`, { status }),
+  decideContentSubmission: (key: string, id: string, action: 'approve' | 'reject', reason?: string) =>
+    send('post', `/neture/operator/semi-franchises/${enc(key)}/content-submissions/${enc(id)}/${action}`, { reason }),
   getContent: (key: string, id: string) =>
     get<SemiFranchiseContent>(`/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`),
   createContent: (key: string, input: SemiFranchiseContentInput) =>
@@ -244,6 +261,9 @@ export const neturePharmacyAdminApi = {
 // ─── 공급자 ─────────────────────────────────────────────────────────────────
 
 export const neturePharmacySupplierApi = {
+  listContentSubmissions: () => get<BusinessContentSubmission[]>('/neture/supplier/content-submissions'),
+  submitContent: (libraryItemId: string, semiFranchiseKey: string) =>
+    send<{ id: string; status: string; reused: boolean }>('post', '/neture/supplier/content-submissions', { libraryItemId, semiFranchiseKey }),
   listSemiFranchises: () => get<Array<{ key: string; name: string }>>('/neture/supplier/semi-franchises'),
 
   listProposals: () => get<SupplyProposal[]>('/neture/supplier/supply-proposals'),

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
+import { BusinessContentAttachments } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { useBusiness } from './BusinessWorkspace';
 import { businessApi, businessError, pharmacyApiBase, type BusinessContent } from './api';
 import BusinessStoreShortcut from './BusinessStoreShortcut';
@@ -44,6 +45,7 @@ function BusinessMaterialRecords({ materialStore }: { materialStore: ReturnType<
       <summary className="min-h-11 cursor-pointer break-words py-3 font-semibold leading-7 text-slate-900">{item.title}</summary>
       {item.summary && <p className="my-3 break-words text-sm leading-7 text-slate-600">{item.summary}</p>}
       {item.body && <div className="min-w-0 break-words border-t border-slate-100 pt-4 leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"><ContentRenderer html={item.body} /></div>}
+      <BusinessContentAttachments attachments={item.attachments} />
       <div className="mt-4 border-t pt-4"><p className="mb-3 text-sm text-slate-500">내 매장에 복사해 편집할 수 있습니다. 매장이 여러 곳이면 이동 후 사용할 매장을 선택해 주세요.</p><BusinessStoreShortcut businessKey={business.key} contentId={item.id} /></div>
     </details>)}
     {total > 20 && <nav aria-label="자료 목록 페이지" className="mt-6 flex flex-wrap items-center justify-center gap-3 border-t border-slate-100 pt-5 text-sm text-slate-600"><button className="min-h-11 rounded-lg border bg-white px-4 py-2 font-medium disabled:opacity-40" type="button" disabled={page <= 1 || loading} onClick={() => setPage(n => n - 1)}>이전</button><span>{page} / {Math.ceil(total / 20)}</span><button className="min-h-11 rounded-lg border bg-white px-4 py-2 font-medium disabled:opacity-40" type="button" disabled={page * 20 >= total || loading} onClick={() => setPage(n => n + 1)}>다음</button></nav>}
