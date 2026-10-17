@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useId,
   useRef,
   useState,
@@ -256,6 +257,32 @@ export function ServiceHomeHero(
       eyebrow?: ReactNode;
     },
 ) {
+  const frame = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    const measure = () => {
+      const width = document.documentElement.clientWidth;
+      if (!width) return;
+      element.style.setProperty("--home-page-width", `${width}px`);
+      element.style.setProperty(
+        "--home-page-left",
+        `${element.getBoundingClientRect().left}px`,
+      );
+    };
+    measure();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(measure);
+    observer?.observe(document.documentElement);
+    observer?.observe(element);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
   const { config: initial, hasPublished } = useHomePresentation(props);
   // Keep the service's established first headline and primary entry actions until an operator publishes.
   const config =
@@ -278,11 +305,14 @@ export function ServiceHomeHero(
         }
       : initial;
   return (
-    <HomeHeroView
-      {...props}
-      config={config}
-      fallbackTitle={props.title?.join("\n")}
-    />
+    <div ref={frame} className="home-hero-frame">
+      <HomeHeroView
+        {...props}
+        className={`home-hero-full ${props.className ?? ""}`}
+        config={config}
+        fallbackTitle={props.title?.join("\n")}
+      />
+    </div>
   );
 }
 export function HomePromotionView({
