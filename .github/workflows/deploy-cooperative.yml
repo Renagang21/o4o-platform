@@ -30,6 +30,9 @@ env:
 jobs:
   deploy:
     if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false'
+    # Production credentials and ref restrictions match the existing deployment jobs.
+    # GCP owner must also allow this workflow in the WIF provider condition.
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
