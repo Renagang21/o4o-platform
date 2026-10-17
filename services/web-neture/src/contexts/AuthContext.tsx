@@ -16,6 +16,7 @@ import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { useServiceAuth, useRoleSelection, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
+import { CURRENT_HOST_PROFILE } from '../lib/hostProfile';
 import { readDemoMetadata, type DemoMetadata } from '../lib/demoAccounts';
 
 // Re-export for consumers that import getAccessToken from AuthContext
@@ -82,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useMemo(
       () => ({
         // canonical service key (service_memberships.service_key). role prefix 가 아니다.
-        serviceKey: 'neture',
+        serviceKey: CURRENT_HOST_PROFILE === 'community' ? 'community' : 'neture',
         authClient,
         getAccessToken,
         toUser: (apiUser) => ({ ...(buildPlatformUser(apiUser as never) as User), demo: readDemoMetadata(apiUser) }),

@@ -183,3 +183,11 @@ it('keeps only CarePharm operator routes on its own host', () => {
   expect(decideHost('carepharm', loc('/operator/semi-franchises/carepharm/contents/new'))).toEqual({ kind: 'stay' });
   expect(decideHost('main', loc('/operator/semi-franchises'))).toEqual({ kind: 'external', href: 'https://pharmacy.neture.co.kr/operator/semi-franchises' });
 });
+
+// Settings menu links must retain the community origin and its own session.
+it.each(['/operator/legal/community', '/operator/home-presentation/community'])('community settings %s stay local and main hands them off', path => {
+  const location = { pathname: path, search: '?tab=review', hash: '#settings' };
+  expect(decideHost('community', location)).toEqual({ kind: 'stay' });
+  expect(decideHost('main', location)).toEqual({ kind: 'external', href: `https://community.neture.co.kr${path}?tab=review#settings` });
+  expect(decideHost('funding', location)).toEqual({ kind: 'external', href: `https://neture.co.kr${path}?tab=review#settings` });
+});

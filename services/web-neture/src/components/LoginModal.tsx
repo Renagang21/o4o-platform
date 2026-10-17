@@ -37,6 +37,10 @@ const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freez
   carepharm: '만성질환 관리 약국 협업 모임',
 });
 
+const LOGIN_BRAND: Readonly<Record<HostProfile, string>> = {
+  main: 'Neture', supplier: 'Neture', funding: 'Neture', community: '커뮤니티', carepharm: 'CarePharm',
+};
+
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -169,10 +173,10 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}
+    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
-      <LoginCard brand={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm' : 'Neture'} tone="green" heading="h2" title={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
+      <LoginCard brand={LOGIN_BRAND[CURRENT_HOST_PROFILE]} tone="green" heading="h2" title={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
 
               {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
               <EmailLoginForm<User>
