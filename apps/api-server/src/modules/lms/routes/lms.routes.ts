@@ -224,6 +224,8 @@ router.get('/certificates/:id/pdf', ipBurstLimiter, requireAuth, apiLimiter, req
 router.get('/certificates/:id/verify', apiLimiter, asyncHandler(CertificateController.verifyPublic));
 
 // GET /api/v1/lms/certificates/:id - Get Certificate by ID
+router.get('/certificates/:id/history', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.certificateHistory));
+
 router.get('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getCertificate));
 
 // PATCH /api/v1/lms/certificates/:id - Update Certificate

@@ -170,3 +170,12 @@ T01은 기존 오프라인 입금·이행 기록으로 도출하는 확인 대�
 T01/T03 전체를 완료한 것은 아니다. 중앙 관리자·약사회 분회는 이번 범위에서 제외했다.
 이번 개발 종료점은 검증·push이며 PR·통합·운영 migration 적용은 별도 통합 담당에게 인계한다.
 검증 근거: [CHECK](../checks/CHECK-O4O-SUPPLIER-FUNDING-OPERATOR-EXCEPTIONS-V1.md).
+
+
+## 2026-10-17 — 강의 수료증 사유·감사 후속
+
+[수료증 TODO](WO-LECTURE-CERTIFICATE-AUDIT-TODO-V1.md)를 먼저 작성하고 정책·코드·소비처를 대조한 후 구현했다.
+앞선 강의 흐름 정비에서 남긴 폐기 사유 서버 보관을 기존 action_logs·보유기간 집행으로 보완하고,
+발급/갱신/폐기/일반 수정의 원자적 감사·운영자 이력·학습자 유효 상태 표시를 정비했다.
+[검증 기록](../checks/CHECK-LECTURE-CERTIFICATE-AUDIT-V1.md)에 실 SQL·경계·웹·PC/mobile 근거를 남겼다.
+이번 종료점은 개발 branch push이며 T05 전체 완료를 의미하지 않는다. 중앙 관리자·약사회 분회는 제외한다.

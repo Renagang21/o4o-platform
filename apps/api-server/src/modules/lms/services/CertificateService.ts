@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { CertificateAuditService } from './certificate-audit.service.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Certificate } from '@o4o/lms-core';
@@ -153,11 +154,14 @@ export class CertificateService extends BaseService<Certificate> {
       }
     });
 
+    if (course.serviceKey === 'lecture') {
+      return new CertificateAuditService(AppDataSource, Certificate).issued(certificate, enrollment.id, issuedBy);
+    }
     const saved = await this.certificateRepository.save(certificate);
 
     // Update enrollment with certificate ID
     await this.enrollmentService.updateEnrollment(enrollment.id, {
-      // @ts-ignore
+      // @ts-expect-error Legacy enrollment link is supported by the existing persistence method.
       certificateId: saved.id
     });
 
@@ -265,50 +269,16 @@ export class CertificateService extends BaseService<Certificate> {
     return { certificates, total };
   }
 
-  async updateCertificate(id: string, input: UpdateCertificateRequest): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    // PR #225 merge-gate 11차 P1: allowlist 밖 키(courseId · userId · id)는 여기서 제거한다.
+  async updateCertificate(id: string, input: UpdateCertificateRequest, actor?: string, operationId?: string): Promise<Certificate> {
     const data = pickUpdatableCertificateFields(input);
-
-    // Update fields
-    Object.assign(certificate, data);
-
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate updated`, { id: updated.id });
-
-    return updated;
+    return new CertificateAuditService(AppDataSource, Certificate).change(id, 'updated', data as Record<string, unknown>, actor, operationId);
   }
 
-  async revokeCertificate(id: string): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.revoke();
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate revoked`, { id: updated.id });
-
-    return updated;
+  async revokeCertificate(id: string, reason?: unknown, actor?: string, operationId?: string): Promise<Certificate> {
+    return new CertificateAuditService(AppDataSource, Certificate).change(id, 'revoked', {reason}, actor, operationId);
   }
 
-  async renewCertificate(id: string, months: number = 12): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.renew(months);
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate renewed`, { id: updated.id, months });
-
-    return updated;
+  async renewCertificate(id: string, months: number = 12, actor?: string, operationId?: string): Promise<Certificate> {
+    return new CertificateAuditService(AppDataSource, Certificate).change(id, 'renewed', {months}, actor, operationId);
   }
 }

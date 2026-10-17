@@ -20,7 +20,7 @@ it('connects the issued certificate to renewal and public verification', async (
   expect((screen.getByRole('button', { name: '갱신' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.change(screen.getByLabelText('갱신 기간(개월)'), { target: { value: '6' } });
   fireEvent.click(screen.getByRole('button', { name: '갱신' }));
-  await waitFor(() => expect(api.renewCertificate).toHaveBeenCalledWith('cert', 6));
+  await waitFor(() => expect(api.renewCertificate).toHaveBeenCalledWith('cert', 6, expect.any(String)));
 });
 it('retains the target and shows persistent errors after a failed renewal', async () => {
   api.renewCertificate.mockRejectedValue(new Error('fixture'));
@@ -43,7 +43,8 @@ it('retains a failed revocation reason and retries the captured target', async (
   expect((dialog().getByRole('textbox') as HTMLTextAreaElement).value).toBe('잘못 발급된 수료증');
   fireEvent.click(dialog().getByRole('button', { name: '처리 확인' }));
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-  expect(api.revokeCertificate).toHaveBeenNthCalledWith(2, 'cert-a', '잘못 발급된 수료증');
+  expect(api.revokeCertificate).toHaveBeenNthCalledWith(2, 'cert-a', '잘못 발급된 수료증', expect.any(String));
+  expect(api.revokeCertificate.mock.calls[0][2]).toBe(api.revokeCertificate.mock.calls[1][2]);
   expect(screen.getByRole('status').textContent).toContain('cert-a');
 });
 it('blocks other certificate commands during issue and ignores a late unmounted response', async () => {

@@ -9,6 +9,8 @@ type CertificateAction = { kind: 'issue'; userId: string; courseId: string }
 /** Certificate commands retain their submitted target; operator-wide read access is unchanged. */
 export function useOperatorCertificates() {
   const toast = useToast();
+  const retryRequest = useRef<{intent: string; id: string} | null>(null);
+  const [historyRevision, setHistoryRevision] = useState(0);
   const lifecycle = useRef({ mounted: false, pending: false });
   const [issue, setIssue] = useState({ userId: '', courseId: '' });
   const [issued, setIssued] = useState<{ certificate: LectureCertificate; userId: string; courseId: string } | null>(null);
@@ -29,6 +31,9 @@ export function useOperatorCertificates() {
     if (action.kind === 'issue' && (!action.userId || !action.courseId)) return false;
     if (action.kind !== 'issue' && !action.id) return false;
     if (action.kind === 'renew' && (!Number.isInteger(action.months) || action.months < 1)) return false;
+    const intent=JSON.stringify(action);
+    if (retryRequest.current?.intent !== intent) retryRequest.current={intent,id:crypto.randomUUID()};
+    const requestId=retryRequest.current.id;
     state.pending = true; setBusy(true); setMessage(null);
     const label = action.kind === 'issue' ? '발급' : action.kind === 'renew' ? '갱신' : '폐기';
     const target = action.kind === 'issue' ? `학습자 ${action.userId} · 강의 ${action.courseId}` : `수료증 ${action.id}${action.kind === 'renew' ? ` · ${action.months}개월` : ''}`;
@@ -39,9 +44,10 @@ export function useOperatorCertificates() {
         const certificate = response.data.certificate;
         setIssued({ certificate, userId: action.userId, courseId: action.courseId });
         setTargetId(certificate.id); setVerifyCode(certificate.verificationCode ?? '');
-      } else if (action.kind === 'renew') await operatorApi.renewCertificate(action.id, action.months);
-      else await operatorApi.revokeCertificate(action.id, action.reason);
+      } else if (action.kind === 'renew') await operatorApi.renewCertificate(action.id, action.months, requestId);
+      else await operatorApi.revokeCertificate(action.id, action.reason, requestId);
       if (!state.mounted) return false;
+      retryRequest.current=null; setHistoryRevision(value=>value+1);
       setMessage({ error: false, text: `${label} 완료 · ${target}` }); toast.success(`${label} 완료`);
       return true;
     } catch (err) {
@@ -50,5 +56,5 @@ export function useOperatorCertificates() {
     } finally { if (state.mounted) { state.pending = false; setBusy(false); } }
   }
   return { issue, setIssue, issued, targetId, setTargetId, months, setMonths, validMonths,
-    verifyCode, setVerifyCode, busy, message, execute, clearMessage: () => setMessage(null) };
+    verifyCode, setVerifyCode, busy, message, execute, historyRevision, clearMessage: () => setMessage(null) };
 }

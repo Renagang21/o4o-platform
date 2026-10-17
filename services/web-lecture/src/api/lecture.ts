@@ -85,7 +85,17 @@ export interface LectureEnrollment {
   createdAt?: string;
 }
 
+export interface CertificateAuditEntry {
+  id: string; actorId: string | null; source: string; at: string; action: string;
+  certificateId: string; courseId: string; subjectId: string;
+  before: {isValid: boolean; expiresAt: string | null} | null;
+  after: {isValid: boolean; expiresAt: string | null};
+  reason: string | null; months: number | null; changedFields?: string[] | null;
+}
+export interface CertificateAuditHistory {items: CertificateAuditEntry[]; hasMore: boolean; page: number}
+
 export interface LectureCertificate {
+  isValid?: boolean;
   id: string;
   certificateNumber: string;
   courseId: string;
@@ -309,10 +319,12 @@ export const operatorApi = {
 
   issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
     lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
-  revokeCertificate: (id: string, reason?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason }),
-  renewCertificate: (id: string, months?: number) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, months ? { months } : {}),
+  certificateHistory: (id: string, page = 1) =>
+    lmsHttp.get<LmsApiResponse<CertificateAuditHistory>>(`/lms/certificates/${encodeURIComponent(id)}/history?page=${page}`),
+  revokeCertificate: (id: string, reason?: string, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${encodeURIComponent(id)}/revoke`, { reason, ...(operationId ? {operationId} : {}) }),
+  renewCertificate: (id: string, months?: number, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${encodeURIComponent(id)}/renew`, {...(months !== undefined ? { months } : {}), ...(operationId ? {operationId} : {})}),
 };
 
 /** 백엔드 오류 메시지 추출 (axios envelope `{ success:false, error, code }`). */

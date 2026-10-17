@@ -1,3 +1,4 @@
+import { CertificateAuditService } from '../modules/lms/services/certificate-audit.service.js';
 /**
  * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 — PR #225 merge-gate 계약 (Codex P1 5건)
  *
@@ -731,6 +732,24 @@ describe('3차 P1-9 certificate update/revoke/renew 는 lecture 강의 수료증
       expect(res.statusCode).toBe(404);
     }
     expect(certMutations).toEqual([]);
+  });
+  it('history rejects foreign/missing certificates before reading private audit', async () => {
+    const history=jest.spyOn(CertificateAuditService.prototype,'history').mockResolvedValue({items:[],hasMore:false,page:1});
+    try {
+      for (const id of ['c-kpa','c-null','ghost']) {
+        const res=makeRes();await CertificateController.certificateHistory(op({params:{id}}),res);
+        expect(res.statusCode).toBe(404);
+      }
+      expect(history).not.toHaveBeenCalled();
+      const res=makeRes();await CertificateController.certificateHistory(op({params:{id:'c-lec'},query:{page:'2'}}),res);
+      expect(res.statusCode).toBe(200);expect(history).toHaveBeenCalledWith('c-lec',2);
+    } finally {history.mockRestore();}
+  });
+  it('passes optional reason/request ID and the authenticated actor to the mutation', async () => {
+    const res=makeRes();
+    await CertificateController.revokeCertificate(op({params:{id:'c-lec'},body:{reason:'오발급',operationId:'request-key',actor:'forged'}}),res);
+    expect(res.statusCode).toBe(200);
+    expect(CertificateService.getInstance().revokeCertificate).toHaveBeenCalledWith('c-lec','오발급','op','request-key');
   });
   it('lecture certificate → update/revoke/renew 200', async () => {
     let res = makeRes();

@@ -1,3 +1,5 @@
+import { CertificateAuditService, CertificateOperationError } from '../services/certificate-audit.service.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
@@ -57,7 +59,8 @@ export class CertificateController extends BaseController {
 
       return BaseController.created(res, { certificate });
     } catch (error: any) {
-      logger.error('[CertificateController.issueCertificate] Error', { error: error.message });
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      logger.error('[CertificateController.issueCertificate] Error', { error: error.name });
 
       if (error.message && error.message.includes('already issued')) {
         return BaseController.error(res, error.message, 409);
@@ -68,6 +71,18 @@ export class CertificateController extends BaseController {
       }
 
       return BaseController.error(res, error);
+    }
+  }
+
+  static async certificateHistory(req: Request, res: Response): Promise<any> {
+    try {
+      if (!(await CertificateController.loadLectureCertificateOr404(req,res,req.params.id))) return;
+      const history=await new CertificateAuditService(AppDataSource).history(req.params.id,Number(req.query.page??1));
+      return BaseController.ok(res,history);
+    } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res,error.message,error.status);
+      logger.error('[CertificateHistory] Query failed',{error:error.name});
+      return BaseController.error(res,'처리 이력을 조회하지 못했습니다.');
     }
   }
 
@@ -213,11 +228,12 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.updateCertificate(id, data);
+      const certificate = await service.updateCertificate(id, data, (req as any).user?.id, req.body?.operationId);
 
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
-      logger.error('[CertificateController.updateCertificate] Error', { error: error.message });
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      logger.error('[CertificateController.updateCertificate] Error', { error: error.name });
 
       if (error.message && error.message.includes('not found')) {
         return BaseController.notFound(res, error.message);
@@ -234,11 +250,12 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.revokeCertificate(id);
+      const certificate = await service.revokeCertificate(id, req.body?.reason, (req as any).user?.id, req.body?.operationId);
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
     } catch (error: any) {
-      logger.error('[CertificateController.revokeCertificate] Error', { error: error.message });
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      logger.error('[CertificateController.revokeCertificate] Error', { error: error.name });
 
       if (error.message && error.message.includes('not found')) {
         return BaseController.notFound(res, error.message);
@@ -256,11 +273,12 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.renewCertificate(id, months);
+      const certificate = await service.renewCertificate(id, months, (req as any).user?.id, req.body?.operationId);
 
       return BaseController.ok(res, { certificate, message: 'Certificate renewed successfully' });
     } catch (error: any) {
-      logger.error('[CertificateController.renewCertificate] Error', { error: error.message });
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      logger.error('[CertificateController.renewCertificate] Error', { error: error.name });
 
       if (error.message && error.message.includes('not found')) {
         return BaseController.notFound(res, error.message);

@@ -1,15 +1,16 @@
 /**
  * 운영자 — 수료증 운영: 발급 / 폐기 / 갱신 (WO Phase 2 §11 Operator)
- * 수료증 read 는 백엔드 소유권 경계상 본인 것만 열린다 — 운영 화면은 write 액션과 공개 진위 확인 링크만 제공한다.
+ * 수료증 본문 read 는 본인 경계를 유지하며 운영 이력은 별도 강의 운영자 API로 조회한다.
  */
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useOperatorCertificates } from './useOperatorCertificates';
 import OperatorReasonDialog from './OperatorReasonDialog';
+import CertificateHistoryPanel from './CertificateHistoryPanel';
 
 export default function OperatorCertificatesPage() {
   const navigate = useNavigate();
-  const { issue, setIssue, issued: result, targetId, setTargetId, months, setMonths, validMonths, verifyCode, setVerifyCode, busy, message, execute, clearMessage } = useOperatorCertificates();
+  const { issue, setIssue, issued: result, targetId, setTargetId, months, setMonths, validMonths, verifyCode, setVerifyCode, busy, message, execute, clearMessage, historyRevision } = useOperatorCertificates();
   const issued = result?.certificate;
   const [revoking, setRevoking] = useState<string | null>(null);
 
@@ -30,6 +31,7 @@ export default function OperatorCertificatesPage() {
 
     <section className="panel">
       <h2>폐기 · 갱신</h2>
+      <p className="muted">폐기 사유는 운영 이력에 저장됩니다. 개인 연락처·계좌번호 등은 입력하지 마세요.</p>
       <label className="field"><span>수료증 id</span><input disabled={busy} value={targetId} onChange={(e) => setTargetId(e.target.value.trim())} /></label>
       <div className="field-row">
         <label className="field"><span>갱신 기간(개월)</span><input disabled={busy} type="number" min={1} step={1} value={months} onChange={(e) => setMonths(Number(e.target.value))} /></label>
@@ -41,6 +43,7 @@ export default function OperatorCertificatesPage() {
       </div>
     </section>
 
+    {targetId && <CertificateHistoryPanel key={`history:${targetId}:${historyRevision}`} id={targetId} revision={historyRevision} busy={busy} />}
     <section className="panel">
       <h2>진위 확인</h2>
       <form className="field-row" onSubmit={(e) => { e.preventDefault(); if (verifyCode) navigate(`/certificates/verify/${encodeURIComponent(verifyCode)}`); }}>

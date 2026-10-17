@@ -46,7 +46,7 @@ export default function MyCertificatesPage() {
       {items.map((c) => <li key={c.id} className="list-item">
         <div className="list-main">
           <span className="list-title">{c.course?.title ?? '강의'}</span>
-          {c.status && c.status !== 'active' && <span className={`badge badge-${c.status}`}>{c.status}</span>}
+          <span className="badge">{c.isValid === false ? '폐기' : c.expiresAt && new Date(c.expiresAt).getTime() < Date.now() ? '만료' : c.isValid === true ? '유효' : c.status ?? '상태 확인 필요'}</span>
         </div>
         <div className="list-meta muted">번호 {c.certificateNumber} · 발급 {c.issuedAt?.slice(0, 10)}{c.expiresAt ? ` · 만료 ${c.expiresAt.slice(0, 10)}` : ''}</div>
         <div className="list-actions">
