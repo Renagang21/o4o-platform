@@ -6,6 +6,7 @@
 
 - 대표 홈: full-width Hero 아래 비로그인 공개 서비스 탐색, 로그인 가입 서비스·내 매장·가입 상태, 다른 서비스 소개, AI, 소식 순서. 본문 My Home 요약 제거, 상단 `/mypage` 직접 링크 유지·버튼 영역 명확화.
 - 회원 분류: 기존 `/auth/services`, `/neture/home/entry`, accessible-stores와 기존 buildHomeEntryModel 사용. 서비스 active만 이용 진입, pending·suspended·rejected·withdrawn 별도 상태. 공급자 개인 이용 상태와 매장 조직은 기존 출처 유지. 조회 실패·로딩은 미가입으로 단정하지 않음.
+- 자동 리뷰 P2 반영: 기본 대표 계정 svc:neture는 servicesOnly 표시에서만 제외한다. /mypage 본문 진입 중복 방지. 다른 My Home 모델·화면은 유지하며 기본 계정만 있는 빈 상태·실제 가입 서비스가 있는 상태를 재검증한다.
 - 공개 서비스 배너 모두 한 문장 설명. 준비 중·Partner·독립 hospital 문서 이동 유지. 공개 탐색에 새 인증 제한 없음.
 - 헤더 조사: NetureGlobalHeader(대표 내부·공급자·펀딩·커뮤니티), KpaGlobalHeader(약국), BranchLayout·DirectoryShell(분회), RootShell(매장), AdminHeader(관리자)는 기존 상단 계정 영역 MyHomeButton 직접 진입 확인. StoreWorkspaceShell은 RootShell 아래 부가 메뉴로 공통 상단 진입이 유지됨. 공동체/독립 사업의 권한·기본 접근은 변경하지 않음.
 - 병원 파일 도구는 개인 로그인·계정이 없는 공용 로컬 파일 앱으로 확인했다. 개인 세션을 임의로 추가하지 않고 기존 O4O 대표 복귀를 유지한다.

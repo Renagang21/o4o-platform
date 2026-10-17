@@ -188,13 +188,15 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
     !hasWorkspaceEntry && !model.platformAdmin && model.myServices.length === 0 && model.statusItems.length === 0 && model.joinable.length === 0;
 
   if (servicesOnly) {
+    // 대표 계정의 /mypage 진입은 상단 My Home에만 둔다. 전체 My Home 모델은 보존한다.
+    const joinedServices = model.myServices.filter(item => item.id !== 'svc:neture');
     const stores = model.groups.find(group => group.id === 'store')?.items.filter(item => item.id.startsWith('workspace-store:') || item.id.startsWith('store:') && item.id !== 'store:management') ?? [];
     return <section aria-labelledby="joined-services-title" className="mt-10 w-full max-w-3xl text-left">
       <h2 id="joined-services-title" className="text-xl font-semibold text-slate-900">가입한 서비스</h2>
       <p className="mt-2 text-sm text-slate-500">이용 중인 서비스로 바로 이동하세요. 개인 활동과 계정은 상단 My Home에서 확인할 수 있습니다.</p>
       {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
-      {model.myServices.length > 0 ? <ul className="mt-5 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
-        {model.myServices.map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      {joinedServices.length > 0 ? <ul className="mt-5 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+        {joinedServices.map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <EntryButton item={item} busyId={busyId} onHandoff={handleHandoff} />
           <p className="mb-0 mt-3 text-sm text-slate-600">{data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim() || (item.id.startsWith('business:') ? '가입한 약국 협력사업의 참여자 공간을 이용합니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : item.id === 'svc:neture' ? '필요한 서비스와 개인 활동을 한곳에서 확인합니다.' : '가입한 서비스에서 활동을 이어갑니다.')}</p>
         </li>)}
