@@ -13,7 +13,7 @@ describe('준비 중 서비스 안내', () => {
   for (const name of ['만성질환관리', '약국/약사협동조합', '창고형 약국']) {
     it(`${name}: 안내만 열고 닫은 뒤 카드로 초점을 복원한다`, () => {
       render(<MemoryRouter><ServiceDiscovery /></MemoryRouter>);
-      const trigger = screen.getByRole('button', { name: `${name} 준비 중 · 안내 보기` });
+      const trigger = screen.getByRole('button', { name: new RegExp(`^${name} `) });
       trigger.focus(); fireEvent.click(trigger);
       const dialog = screen.getByRole('dialog', { name });
       expect(dialog.textContent).toContain('준비 중입니다.');
@@ -45,4 +45,19 @@ it('병원 별도 앱은 SPA catch-all 대신 문서 탐색 링크로 연다', (
   fireEvent.click(hospital);
   expect(screen.queryByRole('heading', { name: '잘못된 SPA 경로' })).toBeNull();
   expect(screen.getByRole('heading', { name: '전체 서비스' })).toBeTruthy();
+});
+
+it('회원이 가입·신청한 항목은 다른 서비스 소개에서 중복하지 않는다', () => {
+  const data = {services: [{key:'lecture', membership:{status:'active'}}, {key:'kpa-branch', membership:{status:'pending'}}], stores:[], workspaceStores:[], branches:[], serviceStates:{supplier:{status:'suspended',source:'fixture'}}} as import('../../lib/home-entry').HomeEntryData;
+  render(<MemoryRouter><ServiceDiscovery personalized data={data}/></MemoryRouter>);
+  expect(screen.getByRole('heading', {name:'다른 서비스 알아보기'})).toBeTruthy();
+  expect(screen.queryByRole('link', {name:/^O4O 강의/})).toBeNull();
+  expect(screen.queryByRole('link', {name:/^약사회 분회/})).toBeNull();
+  expect(screen.queryByRole('link', {name:/^공급자 /})).toBeNull();
+  expect(screen.getByRole('link', {name:/^커뮤니티 /}).textContent).toContain('공개 글을 둘러보고');
+});
+it('가입 정보가 없으면 미가입으로 단정하지 않고 공개 전체 목록을 유지한다', () => {
+  render(<MemoryRouter><ServiceDiscovery personalized data={null}/></MemoryRouter>);
+  expect(screen.getByRole('heading', {name:'전체 서비스'})).toBeTruthy();
+  expect(screen.getByRole('link', {name:/^O4O 강의/})).toBeTruthy();
 });

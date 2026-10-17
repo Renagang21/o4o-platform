@@ -21,3 +21,12 @@ it('자격을 갖춘 강사·운영자 링크만 별도 업무 메뉴에 묶는�
  const tasks=screen.getByRole('navigation',{name:'강의 업무 메뉴',hidden:true});
  expect(within(tasks).getAllByRole('link',{hidden:true}).map(a=>a.getAttribute('href'))).toEqual(['/instructor','/operator','/operator/home-presentation','/operator/contact','/operator/members']);
 });
+
+it('로그인과 My Home은 탐색 메뉴와 분리된 같은 계정 위치에 있다',()=>{
+ const view=render(<MemoryRouter><SiteShell /></MemoryRouter>);
+ expect(screen.getByRole('link',{name:'로그인'}).closest('.header-actions')).toBeTruthy();
+ view.unmount();auth.isAuthenticated=true;auth.user={roles:[],memberships:[]};
+ render(<MemoryRouter><SiteShell /></MemoryRouter>);
+ expect(screen.getByRole('button',{name:'My Home'}).closest('.header-actions')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'My Home'}).closest('nav')).toBeNull();
+});
