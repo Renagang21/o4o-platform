@@ -34,3 +34,20 @@
 ## 인계
 
 개발 담당은 commit/push 후 인계한다(AGENTS.md §4-2). PR 생성·CI 운영·병합·배포는 통합 담당 범위다. 이 worktree는 병합 전 후속 수정을 위해 KEEP한다.
+
+## 후속 삭제·통합 준비 — 2026-10-17
+
+사용자가 기존 커뮤니티 테스트 데이터 삭제 후 main 병합·배포를 명시적으로 지시했다.
+위의 최초 개발 범위 기록에 이어 운영 삭제 도구를 추가했다. 기본 실행은 읽기 전용이며,
+검토한 fingerprint와 일치하는 경우에만 transaction으로 삭제한다. 범위·보존 대상·실행 방법은
+[scripts/maintenance/README](../../scripts/maintenance/README.md)를 따른다.
+
+- 전용 로컬 PostgreSQL에서 삭제/보존·계획 변경·범위 밖 FK·조직 콘텐츠·첨부 참조 차단·재실행 등 7 tests PASS.
+- PR #672의 기존 코드 HEAD에서 필수 `CI Gate` 및 API Jest 3 shards, affected web/admin build, CodeQL PASS.
+  후속 도구 commit의 CI는 별도 확인이 필요하다.
+- 등록된 STAFF/STOREOWNER/SUPPLIER 세 계정의 운영 이메일 로그인 HTTP 200 확인.
+  실제 역할은 각각 `kpa:store_member`, `neture:store_owner`, `neture:supplier`다.
+  STAFF의 포럼 관리자 조회는 `403 ADMIN_REQUIRED`로 거부됐다.
+- API/커뮤니티 도메인 허용과 테스트 계정 주입은 정상이다. 현재 runtime에 GCP outbound identity와 운영 DB binding은 없다.
+  기존 production 작업 workflow는 main 전용이며 커뮤니티 삭제 도구 실행 경로를 제공하지 않는다.
+- 운영 데이터 삭제는 아직 실행하지 않았다. 사용자 지정 순서(삭제 → main 병합 → 배포)를 유지하며 PR은 draft로 둔다.
