@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { api } from "../../lib/apiClient";
 export default function SupplierActiveFundings({
   supplierId,
+  onCheckState,
 }: {
   supplierId: string;
+  onCheckState?: (supplierId: string, ready: boolean) => void;
 }) {
   const [rows, setRows] = useState<
       { id: string; title: string; status: string }[] | null
@@ -13,6 +15,7 @@ export default function SupplierActiveFundings({
     [more, setMore] = useState(false);
   useEffect(() => {
     let alive = true;
+    onCheckState?.(supplierId, false);
     setRows(null);
     setError("");
     void api
@@ -23,6 +26,7 @@ export default function SupplierActiveFundings({
         if (alive) {
           setRows(r.data.data.items);
           setMore(r.data.data.hasMore);
+          onCheckState?.(supplierId, true);
         }
       })
       .catch(() => {
@@ -31,7 +35,7 @@ export default function SupplierActiveFundings({
     return () => {
       alive = false;
     };
-  }, [supplierId, retry]);
+  }, [supplierId, retry, onCheckState]);
   return (
     <section className="my-3 rounded border p-3">
       <h3 className="font-semibold">공급자 진행 펀딩 확인</h3>

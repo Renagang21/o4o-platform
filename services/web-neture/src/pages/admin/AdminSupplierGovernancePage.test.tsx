@@ -1,11 +1,11 @@
-vi.mock('../../components/supplier/SupplierActiveFundings',()=>({default:()=>null}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-const mocks = vi.hoisted(() => ({ list: vi.fn(), deactivate: vi.fn(), reactivate: vi.fn() }));
+import { act, cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
+const mocks = vi.hoisted(() => ({ get: vi.fn(), list: vi.fn(), deactivate: vi.fn(), reactivate: vi.fn() }));
 vi.mock('../../lib/api', () => ({ adminSupplierApi: { getGovernanceSuppliers: mocks.list, deactivateSupplier: mocks.deactivate, reactivateSupplier: mocks.reactivate } }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: mocks.get } }));
 import AdminSupplierGovernancePage from './AdminSupplierGovernancePage';
 const supplier = { id: 'fixture-supplier', name: '검증 공급자', status: 'ACTIVE', hasActiveOrders: false, hasUnsettled: false, activeOrderCount: 0, unsettledCount: 0, lastStatusChangedAt: null, lastChangedBy: null, lastChangeReason: null };
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => { vi.resetAllMocks(); mocks.get.mockResolvedValue({ data: { success: true, data: { items: [], hasMore: false } } }); });
 afterEach(cleanup);
 it('failed governance reads never show empty counts and can recover in the same screen', async () => {
   mocks.list.mockRejectedValueOnce(new Error('공급자 조회 실패')).mockResolvedValueOnce([supplier]);
@@ -26,6 +26,8 @@ it('failed mutations retain the reason and retry once without dismissing a pendi
   fireEvent.click(screen.getByRole('button', { name: '더보기' }));
   fireEvent.click(screen.getByRole('button', { name: '비활성화', exact: true }));
   const dialog = screen.getByRole('dialog', { name: '공급자 상태 변경' });
+  await waitFor(() => expect((within(dialog).getByRole('button', { name: '비활성화', exact: true }) as HTMLButtonElement).disabled).toBe(true));
+  await within(dialog).findByText('조회된 진행 펀딩이 없습니다.');
   fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: '보존할 사유' } });
   fireEvent.click(within(dialog).getByRole('button', { name: '비활성화', exact: true }));
   await within(dialog).findByRole('alert');
@@ -39,4 +41,32 @@ it('failed mutations retain the reason and retry once without dismissing a pendi
   await act(async () => done({ success: true }));
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(mocks.deactivate).toHaveBeenLastCalledWith('fixture-supplier', '보존할 사유');
+});
+
+it('blocks deactivation until the current funding read succeeds, preserving the reason through failed reads', async () => {
+  let fail!: (reason: unknown) => void;
+  mocks.list.mockResolvedValue([supplier]);
+  mocks.get.mockReturnValueOnce(new Promise((_resolve, reject) => { fail = reject; }));
+  render(<AdminSupplierGovernancePage />);
+  await screen.findByText('검증 공급자');
+  fireEvent.click(screen.getByRole('button', { name: '더보기' }));
+  fireEvent.click(screen.getByRole('button', { name: '비활성화', exact: true }));
+  const dialog = screen.getByRole('dialog');
+  fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: '오프라인 후속 처리' } });
+  const confirm = within(dialog).getByRole('button', { name: '비활성화', exact: true }) as HTMLButtonElement;
+  expect(confirm.disabled).toBe(true);
+  fireEvent.click(confirm);
+  expect(mocks.deactivate).not.toHaveBeenCalled();
+  await act(async () => fail(Error('read failed')));
+  await within(dialog).findByRole('alert');
+  expect(confirm.disabled).toBe(true);
+  fireEvent.click(confirm);
+  expect(mocks.deactivate).not.toHaveBeenCalled();
+  fireEvent.click(within(dialog).getByRole('button', { name: '다시 확인' }));
+  await within(dialog).findByText('조회된 진행 펀딩이 없습니다.');
+  expect(confirm.disabled).toBe(false);
+  expect((within(dialog).getByRole('textbox') as HTMLTextAreaElement).value).toBe('오프라인 후속 처리');
+  mocks.deactivate.mockResolvedValue({ success: true });
+  fireEvent.click(confirm);
+  await waitFor(() => expect(mocks.deactivate).toHaveBeenCalledWith('fixture-supplier', '오프라인 후속 처리'));
 });

@@ -83,3 +83,5 @@ API 집중 회귀·격리 SQL 7 suites / 99 tests PASS(일반 API 84 + SQL 15), 
 Codex 리뷰 P1/P2(과거 `auto_target_missed`의 미환급 입금 누락, 철회자의 진행 알림 수신)를 반영했다. 과거 모집 실패 건은 환급 확인 대상에만 포함하고 입금 독촉·약정·이행 예외에서는 계속 제외한다. 상세의 환급 확인 금액도 같은 기준을 사용한다. 모집 결과·단계 알림은 현재 참여자만 수신하며 공급자 본인 알림과 보존 원장은 유지한다.
 
 최신 API/격리 SQL 8 suites / 110 tests PASS(일반 API 84, 펀딩 SQL 17, 기존 공급자·펀딩 SQL 9), TypeScript·변경 API lint PASS다. 기존 SQL harness도 현재 마지막 migration을 대상으로 up/down하도록 정합하고 baseline~31개 incremental의 모든 prefix fingerprint를 재검증했다. 실제 SQL로 수신자를 조회한 뒤 notification 저장 호출만 spy로 대체해 철회 이력은 참여자 알림 대상에 포함되지 않는 것을 확인했다. 운영 알림/업무 데이터 write는 없으며 두 격리 DB의 잔존 0을 확인하고 전용 PostgreSQL 프로세스를 종료했다.
+
+Codex 리뷰 P2(공급자 진행 펀딩 조회 실패/대기 중 비활성화 허용)를 반영했다. 조회 상태를 상태 변경 dialog에 전달하고 현재 대상의 조회가 성공해야 비활성화 버튼과 실행 handler를 모두 허용한다. 재활성화는 기존 정책을 유지한다. 실패→읽기 재시도 중 사유 보존·write 0·성공 후 해제의 회귀를 추가했다. 관련 UI 5 tests, 웹 전체 116 files / 1,061 tests, TypeScript·production build PASS다. PC·모바일 fixture browser에서도 조회 실패 시 차단과 재조회 성공 시 해제를 확인했다.
