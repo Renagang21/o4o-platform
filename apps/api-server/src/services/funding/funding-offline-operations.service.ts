@@ -132,6 +132,15 @@ export class FundingOfflineOperationsService {
           );
         } else if (input.action === "refund") {
           if (
+            Number(input.amount) > 0 &&
+            !["paid", "refunded"].includes(p.paymentStatus)
+          ) {
+            return fail(
+              409,
+              "입금 확인 상태와 실제 입금액을 먼저 확인·정정해 주세요.",
+            );
+          }
+          if (
             !money(input.amount) ||
             Number(input.amount) > Number(p.paidAmount ?? 0)
           )

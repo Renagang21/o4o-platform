@@ -111,6 +111,20 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       reason: "약정 확인",
     });
     expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(0);
+    // A historical amount on a canceled/unpaid record is not a confirmed deposit.
+    await db.query(
+      'UPDATE market_trial_participants SET "paidAmount"=100 WHERE id=$1',
+      [participant],
+    );
+    await expect(
+      service.update(trial, participant, actor, {
+        action: "refund",
+        amount: 10,
+        version: 1,
+        processedAt: "2026-10-17T01:00:00Z",
+        reason: "미확인 입금 환급 차단",
+      }),
+    ).rejects.toMatchObject({ status: 409 });
     await new FundingPaymentRecordService(db).update(
       trial,
       participant,
