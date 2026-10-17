@@ -17,6 +17,11 @@ describe('signup policy boundary', () => {
     expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
     expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
   });
+  it('MegaPharm reuses the pharmacy app with the existing account signup and social session scope', () => {
+    const origin = 'https://megapharm.neture.co.kr';
+    expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
+    expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
+  });
   it.each(['https://carepharm.neture.co.kr.attacker.invalid', 'https://carepharm.neture.co.kr/path'])('CarePharm lookalike or path origin remains rejected: %s', origin => {
       expect(() => signupPolicyKeyFromOrigin(origin)).toThrow(expect.objectContaining({ code: 'SIGNUP_ORIGIN_NOT_ALLOWED' }));
       expect(() => socialOrigin({ get: () => origin } as never)).toThrow(expect.objectContaining({ code: 'SOCIAL_ORIGIN_NOT_ALLOWED' }));
