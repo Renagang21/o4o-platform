@@ -63,3 +63,8 @@ apply의 remaining 및 별도 후속 plan의 대상 전체가 0임을 확인했�
 이는 사용자 전달 실행 결과에 근거한 확인이며 클라우드에서 직접 DB를 실행한 것은 아니다.
 이제 main 통합·배포를 진행한다. 최신 main의 약국 로그인 제목 변경을 충돌 없이 통합했다.
 SonarCloud가 지적한 문자열 정렬 comparator와 화면 함수 복잡도를 수정하고 재검증한다.
+
+통합 리뷰의 P1/P2 두 건도 반영했다. 약국 서비스의 구 포럼 진입은
+`/communities/community/forum`으로 handoff하고, 공통 navigation 소비처를 확인한 뒤
+community 전용 public header에서 폐기된 개설·운영 항목을 제거했다.
+독립 홈·사업 공간·host profile 회귀 3 files / 53 tests PASS.
