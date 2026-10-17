@@ -108,7 +108,7 @@ await service.deleteCategoriesForOrganization('org-seoul');
 
 ## 라이선스
 
-MIT
+O4O 자체 코드의 현재 버전에는 별도 이용허락을 부여하지 않습니다. [저작권 고지](../../LICENSE.md)를 따릅니다.
 
 ---
 
