@@ -25,6 +25,13 @@ export async function requireActiveOperatorScope(req: Request, res: Response, ne
   }
 }
 
+function selectManagementService(req: Request, roleMutation: boolean, roleService?: string): unknown {
+  if (roleMutation && roleService) return roleService;
+  const membershipRoleEdit = req.method === 'PUT' && typeof req.body?.membershipRole === 'string' && req.body.membershipRole.trim();
+  if (membershipRoleEdit) return req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
+  return req.body?.serviceKey ?? req.query.serviceKey;
+}
+
 /** Service member lifecycle authority is independent of ordinary profile editing. */
 export function memberManagementPolicy(req: Request, res: Response, next: NextFunction): void {
   const scope: ServiceScope = (req as any).serviceScope;
@@ -38,8 +45,8 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
   const roleMutation = req.path.endsWith('/roles') || req.path.includes('/roles/');
   // Role ownership determines authority; an unrelated body serviceKey cannot override it.
   // Bare roles are checked again against the resolved catalogue service in the controller.
-  const selected = roleMutation && roleService ? roleService : req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
-  const keys = typeof selected === 'string' ? [selected] : scope.serviceKeys;
+  const selected = selectManagementService(req, roleMutation, roleService);
+  const keys = typeof selected === 'string' ? [selected.trim()] : scope.serviceKeys;
   const admin = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => adminKeys.includes(key)));
   const ownsSelection = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => scope.serviceKeys.includes(key)));
   if (!ownsSelection) {
@@ -54,6 +61,10 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
       && !['approved', 'active', 'rejected', 'suspended'].includes(status);
   if (adminAction && !admin) {
     res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '해당 서비스 관리자 권한이 필요합니다.' });
+    return;
+  }
+  if (req.method === 'DELETE' && !roleMutation && keys.includes('community')) {
+    res.status(409).json({ success: false, code: 'COMMUNITY_DELETION_ROUTE_REQUIRED', error: '커뮤니티 관리자 화면에서 활동 데이터와 연결 범위를 확인한 뒤 삭제해 주세요.' });
     return;
   }
   next();
