@@ -85,6 +85,13 @@ export interface LectureEnrollment {
   createdAt?: string;
 }
 
+export interface CertificateOperationRecord {
+  id: string; createdAt: string; actorId: string | null;
+  action: 'issue' | 'renew' | 'revoke' | 'update'; reason: string | null;
+  before: { isValid: boolean; expiresAt: string | null } | null;
+  after: { isValid: boolean; expiresAt: string | null };
+}
+
 export interface LectureCertificate {
   id: string;
   certificateNumber: string;
@@ -307,6 +314,8 @@ export const operatorApi = {
   rejectApplication: (id: string, reason?: string) =>
     lmsHttp.post<LmsApiResponse<unknown>>(`/lms/instructor/applications/${id}/reject`, { reason }),
 
+  certificateOperations: (id: string, page = 1) =>
+    lmsHttp.get<LmsApiResponse<{ items: CertificateOperationRecord[]; hasMore: boolean; page: number }>>(`/lms/certificates/${encodeURIComponent(id)}/operations`, { page }),
   issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
     lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
   revokeCertificate: (id: string, reason?: string) =>

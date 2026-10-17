@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
+import { CertificateOperationError } from '../services/certificate-operation-log.js';
 import { CertificateService } from '../services/CertificateService.js';
 import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
@@ -57,6 +58,9 @@ export class CertificateController extends BaseController {
 
       return BaseController.created(res, { certificate });
     } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      if (error.code === '23505' || error.driverError?.code === '23505')
+        return BaseController.error(res, '이미 발급된 수료증입니다. 처리 이력을 확인해 주세요.', 409);
       logger.error('[CertificateController.issueCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('already issued')) {
@@ -213,10 +217,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.updateCertificate(id, data);
+      const certificate = await service.updateCertificate(id, data, (req as any).user?.id);
 
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
       logger.error('[CertificateController.updateCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {
@@ -234,10 +239,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.revokeCertificate(id);
+      const certificate = await service.revokeCertificate(id, req.body?.reason, (req as any).user?.id);
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
     } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
       logger.error('[CertificateController.revokeCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {
@@ -245,6 +251,20 @@ export class CertificateController extends BaseController {
       }
 
       return BaseController.error(res, error);
+    }
+  }
+
+  static async certificateOperationHistory(req: Request, res: Response): Promise<any> {
+    try {
+      const certificate = await CertificateController.loadLectureCertificateOr404(req, res, req.params.id);
+      if (!certificate) return;
+      const page = req.query.page === undefined ? 1 : Number(req.query.page);
+      const history = await CertificateService.getInstance().getOperationHistory(certificate.id, page);
+      return BaseController.ok(res, history);
+    } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
+      logger.error('[CertificateController.certificateOperationHistory] failed');
+      return BaseController.error(res, '수료증 처리 이력을 불러오지 못했습니다.', 500);
     }
   }
 
@@ -256,10 +276,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.renewCertificate(id, months);
+      const certificate = await service.renewCertificate(id, months, (req as any).user?.id);
 
       return BaseController.ok(res, { certificate, message: 'Certificate renewed successfully' });
     } catch (error: any) {
+      if (error instanceof CertificateOperationError) return BaseController.error(res, error.message, error.status);
       logger.error('[CertificateController.renewCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {

@@ -124,3 +124,22 @@ it('restricts cooperative tabs even on a direct membership URL and keeps its own
   await waitFor(() => expect(api.listContents).toHaveBeenCalledWith('pharmacy', 'all'));
   expect(screen.getByRole('link', { name: '콘텐츠 작성' }).getAttribute('href')).toBe('/test/operator/contents/new');
 });
+
+it.each([false, true])('preserves a content rejection draft and separates saved review from failed follow-up reads (%s)', async pharmacy => {
+  api.listContents.mockResolvedValueOnce([{ id: 'request-b', title: '격리 자료 요청', sourceItemId: 'source-b', status: 'pending' }])
+    .mockRejectedValueOnce(Error('격리 조회 실패')).mockResolvedValueOnce([]);
+  api.setContentStatus.mockRejectedValueOnce(Error('격리 저장 실패')).mockResolvedValueOnce({});
+  show(pharmacy); await screen.findByRole('heading', { name: '담당 약국 협력사업' });
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠' })); await screen.findByText('격리 자료 요청');
+  fireEvent.click(rowAction('격리 자료 요청', '반려'));
+  fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '구체적인 보완 사유' } }); confirm();
+  await screen.findByText('격리 저장 실패'); expect((screen.getByLabelText('처리 사유') as HTMLTextAreaElement).value).toBe('구체적인 보완 사유');
+  confirm(); await screen.findByText('격리 조회 실패');
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(screen.getByText(/반려 처리는 완료되었습니다/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '목록 다시 조회' }));
+  await waitFor(() => expect(screen.queryByText('격리 조회 실패')).toBeNull());
+  expect(api.setContentStatus.mock.calls).toEqual([
+    ['pharmacy', 'request-b', 'reject', '구체적인 보완 사유'], ['pharmacy', 'request-b', 'reject', '구체적인 보완 사유'],
+  ]);
+});

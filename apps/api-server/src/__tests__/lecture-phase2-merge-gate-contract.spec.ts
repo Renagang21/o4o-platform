@@ -1389,3 +1389,45 @@ describe('정적 계약', () => {
     expect(mw).toContain('WHERE a.id = $1');
   });
 });
+
+// Operator history adds no general private-certificate read permission.
+describe('certificate operation history keeps the lecture resource boundary', () => {
+  beforeEach(() => {
+    certificates['c-lec'] = { userId: 'u', courseId: 'lec-pub' };
+    certificates['c-kpa'] = { userId: 'u', courseId: 'kpa-old' };
+  });
+  it('never reads history for legacy or missing certificates', async () => {
+    const service = CertificateService.getInstance();
+    service.getOperationHistory = jest.fn();
+    for (const id of ['c-kpa', 'missing']) {
+      const res = makeRes();
+      await CertificateController.certificateOperationHistory(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { id } }), res);
+      expect(res.statusCode).toBe(404);
+    }
+    expect(service.getOperationHistory).not.toHaveBeenCalled();
+  });
+  it('reads a scoped target and never returns the private certificate entity', async () => {
+    const service = CertificateService.getInstance();
+    service.getOperationHistory = jest.fn().mockResolvedValue({ items: [], hasMore: false, page: 2 });
+    const res = makeRes();
+    const req = makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { id: 'c-lec' } });
+    req.query = { page: '2' };
+    await CertificateController.certificateOperationHistory(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(service.getOperationHistory).toHaveBeenCalledWith('c-lec', 2);
+    expect(res.body.data).toEqual({ items: [], hasMore: false, page: 2 });
+  });
+  it('passes only the authenticated actor to the revocation service', async () => {
+    const service = CertificateService.getInstance();
+    const original = service.revokeCertificate;
+    service.revokeCertificate = jest.fn().mockResolvedValue({ id: 'c-lec' });
+    try {
+      await CertificateController.revokeCertificate(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { id: 'c-lec' }, body: { reason: '검토 사유', actorId: 'forged' } }), makeRes());
+      expect(service.revokeCertificate).toHaveBeenCalledWith('c-lec', '검토 사유', 'op');
+    } finally { service.revokeCertificate = original; }
+  });
+  it('wires the new read behind the existing live lecture operator guard', () => {
+    const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(routes).toContain("router.get('/certificates/:id/operations', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.certificateOperationHistory))");
+  });
+});

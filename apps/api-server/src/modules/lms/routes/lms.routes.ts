@@ -229,6 +229,9 @@ router.get('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, require
 // PATCH /api/v1/lms/certificates/:id - Update Certificate
 router.patch('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.updateCertificate));
 
+// Operator-only minimal action history; private learner reads stay owner-scoped.
+router.get('/certificates/:id/operations', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.certificateOperationHistory));
+
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
 router.post('/certificates/:id/revoke', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.revokeCertificate));
 

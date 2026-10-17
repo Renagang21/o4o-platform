@@ -179,3 +179,10 @@ T01/T03 전체를 완료한 것은 아니다. 중앙 관리자·약사회 분회
 모집 결과 자동 판정·GET 변경을 제거했다. 실제 계좌 조회·송금/환급 실행·자동 중지·개설자 승계·통합 운영 대시보드는 만들지 않는다.
 개발 branch `wo/funding-offline-operations`는 검증·push까지만 진행한다. 운영 migration 적용·PR·main 통합·배포·실계정 검증은 이 인계에서 완료로 표시하지 않는다.
 검증·제한·통합 순서는 [CHECK](../checks/CHECK-FUNDING-OFFLINE-OPERATIONS-V1.md)에 기록했다. 이전 완료 기록은 당시 근거로 보존하며 상위 WO는 ACTIVE다.
+
+
+## 2026-10-17 — 강의 수료증 처리 이력·약국 협력사업 재점검
+
+사용자의 후속 진행 지시에 따라 [TODO](WO-LECTURE-CERTIFICATE-BUSINESS-OPERATIONS-TODO-V1.md)를 먼저 작성하고 코드·현행 정책을 대조했다. 수료증의 선택 폐기 사유·인증 처리자·전후 상태를 기존 감사 원장과 같은 transaction에 저장하고 강의 운영자만 조회하는 최소 이력을 연결했다. 기존 개인 조회/공개 진위 확인/자동 발급은 유지하며 Core entity·schema/migration은 변경하지 않는다. 약국 협력사업은 최근 콘텐츠 심사 및 두 소비처를 확인하고 실패 복구 회귀를 보강했으며 공급자의 참여 승인 업무를 운영자에게 옮기지 않았다.
+
+[CHECK](../checks/CHECK-LECTURE-CERTIFICATE-BUSINESS-OPERATIONS-V1.md)에 개발 검증과 미실행을 구분했다. 이번 종료점은 검증·commit·push 후 인계이며 PR·운영 반영은 포함하지 않는다. 상위 전체 서비스 정비는 계속 ACTIVE다.

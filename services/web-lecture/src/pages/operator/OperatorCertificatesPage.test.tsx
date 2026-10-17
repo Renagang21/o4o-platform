@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Page from './OperatorCertificatesPage';
-const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn() }));
+const api = vi.hoisted(() => ({ certificateOperations: vi.fn(), issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn() }));
 vi.mock('../../api/lecture', () => ({ operatorApi: api, errorMessage: () => '처리 실패' }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: vi.fn(), error: vi.fn() }) }));
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => { vi.resetAllMocks(); api.certificateOperations.mockResolvedValue({ data: { items: [], hasMore: false, page: 1 } }); });
 afterEach(cleanup);
 it('connects the issued certificate to renewal and public verification', async () => {
   api.issueCertificate.mockResolvedValue({ data: { certificate: { id: 'cert', certificateNumber: 'SAMPLE', verificationCode: 'verify-code' } } });
@@ -61,4 +61,15 @@ it('blocks other certificate commands during issue and ignores a late unmounted 
   render(<MemoryRouter><Page /></MemoryRouter>);
   expect((screen.getByLabelText('수료증 id') as HTMLInputElement).value).toBe('');
   expect(screen.queryByText(/OLD/)).toBeNull();
+});
+
+it('preserves command success when history refresh fails and retries without another mutation', async () => {
+  api.revokeCertificate.mockResolvedValue({}); api.certificateOperations.mockRejectedValueOnce(Error('read failed')).mockResolvedValueOnce({ data: { items: [], hasMore: false, page: 1 } });
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText('수료증 id'), { target: { value: 'cert' } });
+  fireEvent.click(screen.getByRole('button', { name: '폐기' }));
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: '처리 확인' }));
+  await screen.findByRole('alert'); expect(screen.getByRole('status').textContent).toContain('폐기 완료');
+  fireEvent.click(screen.getByRole('button', { name: '이력 다시 조회' }));
+  await screen.findByText('기록된 처리 이력이 없습니다.'); expect(api.revokeCertificate).toHaveBeenCalledTimes(1);
 });

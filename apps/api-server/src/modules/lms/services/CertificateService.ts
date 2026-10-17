@@ -1,7 +1,8 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Certificate } from '@o4o/lms-core';
+import { Certificate, Enrollment, Course } from '@o4o/lms-core';
+import { CertificateOperationError, certificateReason, certificateState, recordCertificateOperation, type CertificateOperation } from './certificate-operation-log.js';
 import { CourseService } from './CourseService.js';
 import { EnrollmentService } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
@@ -153,13 +154,22 @@ export class CertificateService extends BaseService<Certificate> {
       }
     });
 
-    const saved = await this.certificateRepository.save(certificate);
-
-    // Update enrollment with certificate ID
-    await this.enrollmentService.updateEnrollment(enrollment.id, {
-      // @ts-ignore
-      certificateId: saved.id
-    });
+    const saved = issuedBy && course.serviceKey === 'lecture'
+      ? await AppDataSource.transaction(async manager => {
+        const result = await manager.getRepository(Certificate).save(certificate);
+        const linked = await manager.getRepository(Enrollment).update(enrollment.id, { certificateId: result.id });
+        if (linked.affected !== 1) throw new CertificateOperationError(409, '수강 기록이 변경됐습니다. 다시 확인해 주세요.');
+        await recordCertificateOperation(manager, issuedBy, result.id, 'issue', null, certificateState(result));
+        return result;
+      })
+      : await this.certificateRepository.save(certificate);
+    if (!issuedBy || course.serviceKey !== 'lecture') {
+      await this.enrollmentService.updateEnrollment(enrollment.id, {
+        // Legacy enrollment service accepts this persisted linkage at runtime.
+        // @ts-expect-error certificateId is an entity field omitted by its existing request type.
+        certificateId: saved.id
+      });
+    }
 
     logger.info(`[LMS] Certificate issued`, {
       certificateId: saved.id,
@@ -265,7 +275,8 @@ export class CertificateService extends BaseService<Certificate> {
     return { certificates, total };
   }
 
-  async updateCertificate(id: string, input: UpdateCertificateRequest): Promise<Certificate> {
+  async updateCertificate(id: string, input: UpdateCertificateRequest, actorId?: string): Promise<Certificate> {
+    if (actorId) return this.changeWithHistory(id, actorId, 'update', certificate => { Object.assign(certificate, pickUpdatableCertificateFields(input)); });
     const certificate = await this.getCertificate(id);
     if (!certificate) {
       throw new Error(`Certificate not found: ${id}`);
@@ -284,31 +295,43 @@ export class CertificateService extends BaseService<Certificate> {
     return updated;
   }
 
-  async revokeCertificate(id: string): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.revoke();
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate revoked`, { id: updated.id });
-
-    return updated;
+  private async changeWithHistory(id: string, actorId: string | undefined, action: CertificateOperation,
+    change: (certificate: Certificate) => void, reason: string | null = null): Promise<Certificate> {
+    return AppDataSource.transaction(async manager => {
+      const repository = manager.getRepository(Certificate);
+      const certificate = await repository.findOne({ where: { id }, lock: { mode: 'pessimistic_write' } });
+      if (!certificate) throw new CertificateOperationError(404, 'Certificate not found');
+      if (actorId) {
+        const course = await manager.getRepository(Course).findOne({ where: { id: certificate.courseId, serviceKey: 'lecture' } });
+        if (!course) throw new CertificateOperationError(404, 'Certificate not found');
+      }
+      const before = certificateState(certificate);
+      change(certificate);
+      const updated = await repository.save(certificate);
+      if (actorId) await recordCertificateOperation(manager, actorId, id, action, before, certificateState(updated), reason);
+      return updated;
+    });
   }
 
-  async renewCertificate(id: string, months: number = 12): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
+  async revokeCertificate(id: string, reason?: unknown, actorId?: string): Promise<Certificate> {
+    const note = certificateReason(reason);
+    return this.changeWithHistory(id, actorId, 'revoke', certificate => certificate.revoke(), note);
+  }
 
-    certificate.renew(months);
-    const updated = await this.certificateRepository.save(certificate);
+  async renewCertificate(id: string, months: number = 12, actorId?: string): Promise<Certificate> {
+    if (!Number.isSafeInteger(months) || months < 1) throw new CertificateOperationError(400, '갱신 기간은 1개월 이상의 정수로 입력해 주세요.');
+    const expires = new Date(); expires.setMonth(expires.getMonth() + months);
+    if (!Number.isFinite(expires.getTime())) throw new CertificateOperationError(400, '갱신 기간을 확인해 주세요.');
+    return this.changeWithHistory(id, actorId, 'renew', certificate => certificate.renew(months));
+  }
 
-    logger.info(`[LMS] Certificate renewed`, { id: updated.id, months });
-
-    return updated;
+  async getOperationHistory(id: string, page = 1) {
+    if (!Number.isSafeInteger(page) || page < 1 || page > 10000)
+      throw new CertificateOperationError(400, '이력 페이지를 확인해 주세요.');
+    const rows = await AppDataSource.query(`SELECT id,created_at AS "createdAt",user_id AS "actorId",
+      meta->>'action' AS action,meta->>'reason' AS reason,meta->'before' AS before,meta->'after' AS after
+      FROM action_logs WHERE service_key='lecture' AND action_key='lecture.certificate_operation'
+      AND status='success' AND meta->>'certificateId'=$1 ORDER BY created_at DESC,id DESC LIMIT 21 OFFSET $2`, [id, (page - 1) * 20]);
+    return { items: rows.slice(0, 20), hasMore: rows.length > 20, page };
   }
 }

@@ -1,7 +1,8 @@
 /**
  * 운영자 — 수료증 운영: 발급 / 폐기 / 갱신 (WO Phase 2 §11 Operator)
- * 수료증 read 는 백엔드 소유권 경계상 본인 것만 열린다 — 운영 화면은 write 액션과 공개 진위 확인 링크만 제공한다.
+ * 개인 수료증 읽기는 본인 범위다. 운영자는 대상별 최소 처리 이력과 공개 진위 확인을 이용한다.
  */
+import CertificateOperationHistory from './CertificateOperationHistory';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useOperatorCertificates } from './useOperatorCertificates';
@@ -9,7 +10,7 @@ import OperatorReasonDialog from './OperatorReasonDialog';
 
 export default function OperatorCertificatesPage() {
   const navigate = useNavigate();
-  const { issue, setIssue, issued: result, targetId, setTargetId, months, setMonths, validMonths, verifyCode, setVerifyCode, busy, message, execute, clearMessage } = useOperatorCertificates();
+  const { issue, setIssue, issued: result, targetId, setTargetId, months, setMonths, validMonths, verifyCode, setVerifyCode, busy, message, execute, clearMessage, historyRevision } = useOperatorCertificates();
   const issued = result?.certificate;
   const [revoking, setRevoking] = useState<string | null>(null);
 
@@ -40,6 +41,8 @@ export default function OperatorCertificatesPage() {
         <button type="button" className="btn btn-ghost danger" disabled={busy || !targetId} onClick={() => { clearMessage(); setRevoking(targetId); }}>폐기</button>
       </div>
     </section>
+
+    <CertificateOperationHistory key={targetId} id={targetId} disabled={busy} revision={historyRevision.id === targetId ? historyRevision.version : 0} />
 
     <section className="panel">
       <h2>진위 확인</h2>
