@@ -36,6 +36,7 @@ import {
 } from './PharmacyCommerceUi';
 import { TABS, FILTERS, PROPOSAL_ACTIONS, EVENT_ACTIONS, CONTENT_ACTIONS, RECRUITMENT_ACTIONS } from './assignedBusinessModel';
 import { useAssignedBusinessWorkspace } from './useAssignedBusinessWorkspace';
+import { SupplyProposalDetails } from './SupplyProposalDetails';
 import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 
 type BusinessPageProps = Readonly<{
@@ -226,19 +227,20 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{p.productName}</div>
                       <div className="text-xs text-gray-500">{formatDateTime(p.createdAt)}</div>
+                      <SupplyProposalDetails proposal={p} />
                     </td>
-                    <td className={TD}>{p.supplierName || '-'}</td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[6rem]`}>{p.supplierName || '-'}</td>
+                    <td className={`${TD} min-w-[7rem]`}>
                       {formatWon(p.unitPrice)}
                       {p.priceGeneral !== null && <div className="text-xs text-gray-500">공급가 {formatWon(p.priceGeneral)}</div>}
                     </td>
-                    <td className={TD}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
-                    <td className={TD}>{p.note || '-'}</td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[8rem]`}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
+                    <td className={`${TD} min-w-[6rem]`}>{p.note || '-'}</td>
+                    <td className={`${TD} min-w-[4rem]`}>
                       <StatusBadge status={p.status} />
                       {p.reason && <div className="mt-1 text-xs text-gray-500">{p.reason}</div>}
                     </td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[8rem]`}>
                       <div className="flex flex-wrap gap-1">
                         {(PROPOSAL_ACTIONS[p.status] ?? []).map((a) => (
                           <ActionButton
