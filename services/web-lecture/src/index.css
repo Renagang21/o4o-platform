@@ -38,3 +38,8 @@
   .option-row{flex-wrap:wrap}
   .option-row input[type=text]{flex-basis:100%}
 }
+
+/* Account entry keeps the login position across public and signed-in pages. */
+.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-shrink:0;font-size:14px}
+.header-actions .o4o-home-link{white-space:nowrap}
+@media(max-width:900px){.header{flex-wrap:wrap;gap:14px;padding:16px 20px}.header>.brand{flex:1;min-width:0}.header>.nav{order:3;flex-basis:100%;justify-content:flex-start;flex-wrap:wrap}.header-actions>span{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.header-actions{gap:10px;font-size:13px}}
