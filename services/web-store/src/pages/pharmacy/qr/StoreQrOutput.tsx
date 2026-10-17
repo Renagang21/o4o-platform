@@ -119,6 +119,7 @@ export function StoreQrOutputGuide({
           </button>
         </div>
         <div style={styles.guideBody}>
+          <p style={{ fontSize: 14, lineHeight: 1.7, margin: '0 0 12px' }}>이미 출력한 QR은 연결 주소를 유지하면 계속 사용할 수 있습니다. 연결된 자료를 수정한 뒤 휴대전화로 다시 열어 확인하세요. 다른 자료로 새 QR을 만들면 기존 인쇄물의 연결도 확인해야 합니다.</p>
           {QR_EXPORT_GUIDE.map((g) => (
             <div key={g.situation} style={styles.guideCard}>
               <div style={{ flex: 1, minWidth: 0 }}>

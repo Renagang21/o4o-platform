@@ -13,6 +13,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { withReturnTo } from "../../lib/returnTo";
 import { WORKSPACE_PATHS } from "../../config/workspace";
 import { authClient } from "../../lib/apiClient";
+import { StoreAiAssistant } from '../store/StoreAiAssistant';
 
 export interface StoreWorkspaceOutlet {
   config: StoreDashboardConfig;
@@ -166,6 +167,7 @@ export function StoreWorkspaceShell({
             </nav>
           </details>
         )}
+        <StoreAiAssistant area={active} basePath={config.basePath} items={items} />
         <main className="min-w-0 py-6">
           {children ?? (
             <Outlet context={{ config } satisfies StoreWorkspaceOutlet} />

@@ -75,6 +75,20 @@ vi.mock("../../../../api/tabletDisplays", () => ({
   clearCurrentScreenSet: m.clear,
 }));
 const notify = vi.fn();
+it.each([
+  { storePlaylistId: null, playlistId: 'broadcast-guide', expected: { playlistId: 'broadcast-guide' }, excluded: 'storePlaylistId' },
+  { storePlaylistId: 'store-guide', playlistId: null, expected: { storePlaylistId: 'store-guide' }, excluded: 'playlistId' },
+])('preserves the schedule reader model when editing $expected', async ({ storePlaylistId, playlistId, expected, excluded }) => {
+  const schedule = { id: 'schedule', name: '고객 안내 일정', storePlaylistId, playlistId, daysOfWeek: [1], startTime: '09:00:00', endTime: '18:00:00', priority: 0, isActive: true, validFrom: null, validUntil: null };
+  m.updateSchedule.mockResolvedValue(schedule);
+  const { result } = renderHook(() => useSignageSchedules('store-A'));
+  await waitFor(() => expect(result.current.scheduleLoading).toBe(false));
+  act(() => result.current.openEditSchedule(schedule as Parameters<typeof result.current.openEditSchedule>[0]));
+  await act(() => result.current.handleSaveSchedule());
+  const payload = m.updateSchedule.mock.calls[0][2];
+  expect(payload).toMatchObject(expected); expect(payload).not.toHaveProperty(excluded);
+  expect(result.current.savedSchedule).toEqual(schedule);
+});
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (reason: Error) => void;
   const promise = new Promise<T>((yes, no) => {
