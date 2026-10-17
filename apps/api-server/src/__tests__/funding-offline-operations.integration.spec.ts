@@ -1,3 +1,4 @@
+import { readFundingParticipantActivity } from "../services/funding/funding-participant-activity.service.js";
 import { computeKpiSnapshot } from "../controllers/market-trial/marketTrialOperatorController.js";
 import { listSupplierActiveFundings } from "../modules/neture/services/supplier-active-fundings.service.js";
 import { DataSource } from "typeorm";
@@ -412,5 +413,51 @@ fixture("offline funding on disposable local PostgreSQL", () => {
         ),
       ).toBe(!expected);
     }
+  });
+  it("separates active capacity from preserved participant history", async () => {
+    const replacement = "60000000-0000-4000-8000-000000000001";
+    await db.query(
+      `INSERT INTO users(id,email,name) VALUES ($1,'replacement@example.invalid','격리 대체 참여자')`,
+      [replacement],
+    );
+    await db.query(
+      `UPDATE market_trials SET "currentParticipants"=1,"maxParticipants"=1 WHERE id=$1`,
+      [trial],
+    );
+    await db.query(
+      `UPDATE market_trial_participants SET "offlineState"=jsonb_set("offlineState",'{withdrawn}','true') WHERE id=$1`,
+      [participant],
+    );
+    await db.query(
+      `INSERT INTO market_trial_participants("marketTrialId","participantId","participantType","contributionAmount","rewardType","rewardStatus") VALUES ($1,$2,'store_owner',0,'product','pending')`,
+      [trial, replacement],
+    );
+    const rows = await readFundingParticipantActivity(db, trial);
+    expect(rows).toHaveLength(2);
+    expect(rows.filter((r) => !r.withdrawn)).toHaveLength(1);
+    expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(70);
+  });
+  it("rejects whole-trial stop after fulfillment while allowing participant corrections", async () => {
+    await db.query(
+      `UPDATE market_trials SET status='fulfilled',"closeReason"=NULL WHERE id=$1`,
+      [trial],
+    );
+    const before = await service.snapshot(trial);
+    await expect(
+      service.update(trial, null, actor, {
+        action: "stop",
+        version: before.trial.offlineState.version,
+        reason: "완료 후 중지 차단",
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    expect((await service.snapshot(trial)).trial.status).toBe("fulfilled");
+    const target = before.participants.find((p) => p.id === participant);
+    await service.update(trial, participant, actor, {
+      action: "pledge",
+      version: target.offlineState.version,
+      amount: 100,
+      reason: "완료 후 과거 약정 정정",
+    });
+    expect((await service.snapshot(trial)).trial.status).toBe("fulfilled");
   });
 });

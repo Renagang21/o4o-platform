@@ -45,3 +45,13 @@ it('uses recorded net deposits for supplier list and detail even when the legacy
   expect(detail.json).toHaveBeenCalledWith(expect.objectContaining({data:expect.objectContaining({trial:expect.objectContaining({currentAmount:40,amountRate:40})})}));
   expect(ds.query.mock.calls.every(([sql]:[string])=>!/^\s*(INSERT|UPDATE|DELETE)/i.test(sql))).toBe(true);
 });
+
+it('keeps supplier recruitment totals at one seat after a replacement joins', async () => {
+  record={...record,status:TrialStatus.DEVELOPMENT,maxParticipants:1,currentParticipants:1,createdAt:new Date()};creator.mockResolvedValue(true);
+  ds.query.mockImplementation(async(sql:string)=>sql.includes('AS withdrawn')?[
+    {withdrawn:true,rewardType:'product',rewardStatus:'pending'},
+    {withdrawn:false,rewardType:'product',rewardStatus:'pending'},
+  ]:[]);
+  const res=response();await MarketTrialController.getSupplierTrialResults({params:{id:'project'},user:{id:'owner'}} as any,res);
+  expect(res.json.mock.calls[0][0].data.summary).toMatchObject({totalCount:1,recruitRate:100,recordCount:2,withdrawnCount:1,productCount:1});
+});

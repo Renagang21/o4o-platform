@@ -1,3 +1,4 @@
+import { readFundingParticipantActivity } from '../../services/funding/funding-participant-activity.service.js';
 /**
  * Market Trial Operator Controller
  *
@@ -362,7 +363,7 @@ export class MarketTrialOperatorController {
            COUNT(p.id)::int                                            AS "participantCount",
            COUNT(p.id) FILTER (WHERE p."rewardType" = 'product')::int AS "productRewardCount"
          FROM market_trial_participants p
-         WHERE p."marketTrialId" = $1`,
+         WHERE p."marketTrialId" = $1 AND NOT COALESCE((p."offlineState"->>'withdrawn')::boolean,false)`,
         [id],
       );
 
@@ -419,6 +420,7 @@ export class MarketTrialOperatorController {
       const rows: Array<{
         id: string;
         participantName: string;
+        withdrawn: boolean;
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
@@ -446,6 +448,7 @@ export class MarketTrialOperatorController {
         `SELECT
            p.id,
            COALESCE(u.name, u.email, '알 수 없음') AS "participantName",
+           COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
            p."participantType",
            p."rewardType",
            p."rewardStatus",
@@ -478,13 +481,8 @@ export class MarketTrialOperatorController {
         params,
       );
 
-      // Full count (without filters) for summary — fetch settlement status counts too
-      const allRows: Array<{ rewardType: string | null; rewardStatus: string; settlementStatus: string }> = await ds.query(
-        `SELECT p."rewardType", p."rewardStatus", COALESCE(p."settlementStatus", 'pending') AS "settlementStatus"
-         FROM market_trial_participants p
-         WHERE p."marketTrialId" = $1`,
-        [id],
-      );
+      const historyRows = await readFundingParticipantActivity(ds, id);
+      const allRows = historyRows.filter(row => !row.withdrawn);
 
       const totalCount = allRows.length;
       const productCount = allRows.filter((r) => r.rewardType === 'product').length;
@@ -507,6 +505,8 @@ export class MarketTrialOperatorController {
         success: true,
         data: {
           summary: {
+            recordCount: historyRows.length,
+            withdrawnCount: historyRows.length - allRows.length,
             totalCount,
             productCount,
             cashCount,
@@ -532,6 +532,7 @@ export class MarketTrialOperatorController {
             return {
               id: r.id,
               name: r.participantName,
+              withdrawn: !!r.withdrawn,
               type: r.participantType,
               rewardType: r.rewardType,
               rewardStatus: r.rewardStatus,
@@ -721,6 +722,7 @@ export class MarketTrialOperatorController {
       const conditions = ['p."marketTrialId" = $1', ...participantFilters(req.query, params)];
       const rows: Array<{
         participantName: string;
+        withdrawn: boolean;
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
@@ -736,6 +738,7 @@ export class MarketTrialOperatorController {
       }> = await ds.query(
         `SELECT
            COALESCE(u.name, u.email, '알 수 없음') AS "participantName",
+           COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
            p."participantType",
            p."rewardType",
            p."rewardStatus",
@@ -794,7 +797,7 @@ export class MarketTrialOperatorController {
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태', '참여 상태'];
       const trialTitle = trial.title || '';
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
@@ -808,7 +811,7 @@ export class MarketTrialOperatorController {
         rewardStatusLabel(r.rewardStatus), won(r.contributionAmount), paymentStatusLabel(r.paymentStatus),
         won(r.paidAmount), r.paidAt ? fmtDate(r.paidAt) : '-', r.confirmedAt ? fmtDate(r.confirmedAt) : '-',
         r.paymentReference, settlementChoiceLabel(r.settlementChoice), settlementStatusLabel(r.settlementStatus),
-        fmtDate(r.createdAt), trialTitle, trialStatusText,
+        fmtDate(r.createdAt), trialTitle, trialStatusText, r.withdrawn ? '철회' : '참여 유지',
       ].map(participantCsvCell).join(','));
 
       // BOM for Excel UTF-8 compatibility

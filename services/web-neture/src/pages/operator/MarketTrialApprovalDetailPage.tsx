@@ -393,10 +393,10 @@ function ParticipationReport({
     <div className="mb-5 bg-white border border-gray-200 rounded-lg p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <p className="text-xs font-medium text-gray-500">참여 리포트</p>
-        <span className="text-xs text-gray-400">오프라인 입금 확인 기준 · 온라인 결제 아님</span>
+        <span className="text-xs text-gray-400">오프라인 입금 확인 이력 기준 · 철회 기록 포함</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-        <MetricCell value={kpi.participantCount} label="총 참여자" />
+        <MetricCell value={kpi.participantCount} label="참여 기록" />
         <MetricCell value={kpi.paidParticipantCount} label="입금 확인" highlight={kpi.paidParticipantCount > 0} />
         <MetricCell value={kpi.unpaidParticipantCount} label="입금 미확인" />
         <MetricCell value={won(kpi.totalPaidAmount)} label="입금 확인 금액 합계" highlight={kpi.totalPaidAmount > 0} />

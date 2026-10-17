@@ -136,3 +136,9 @@ it("coordinates parent busy state and preserves input on a rejected success enve
     (screen.getByLabelText("오프라인 처리 사유") as HTMLTextAreaElement).value,
   ).toBe("오프라인 확인 사유");
 });
+
+it('does not offer a whole-trial stop after fulfillment',async()=>{
+ const value=snapshot();value.data.data.trial.status='fulfilled';get.mockResolvedValue(value);await ready();
+ expect(screen.queryByRole('option',{name:'펀딩 중지'})).toBeNull();
+ expect(screen.getByRole('option',{name:'누적 환급 기록·정정'})).toBeTruthy();
+});

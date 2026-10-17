@@ -15,11 +15,11 @@ it.each(['listParticipants', 'exportParticipantsCSV'] as const)('%s rejects inva
   expect(res.status).toHaveBeenCalledWith(400); expect(ds.query).not.toHaveBeenCalled();
 });
 it('exports the displayed payment/reward conditions and distinguishes first and last confirmation', async () => {
-  ds.query.mockResolvedValue([{ participantName: '@fixture', participantType: 'store_owner', rewardType: 'product', rewardStatus: 'pending', paymentStatus: 'paid', paidAmount: '12000', paidAt: new Date('2026-10-01T00:00:00Z'), confirmedAt: new Date('2026-10-11T00:00:00Z'), paymentReference: 'fixture, "value"', createdAt: new Date('2026-10-01T00:00:00Z') }]);
+  ds.query.mockResolvedValue([{ participantName: '@fixture', participantType: 'store_owner', rewardType: 'product', rewardStatus: 'pending', paymentStatus: 'paid', paidAmount: '12000', paidAt: new Date('2026-10-01T00:00:00Z'), confirmedAt: new Date('2026-10-11T00:00:00Z'), paymentReference: 'fixture, "value"', withdrawn:true, createdAt: new Date('2026-10-01T00:00:00Z') }]);
   const res = response(); await Controller.exportParticipantsCSV({ params: { id: 'project' }, query: { paymentStatus: 'paid', rewardType: 'product' } } as any, res);
   const [sql, values] = ds.query.mock.calls[0];
   expect(sql).toContain('COALESCE(p."paymentStatus", \'unpaid\')'); expect(values).toEqual(['project', 'product', 'paid']);
-  const csv = res.send.mock.calls[0][0]; expect(csv).toContain('최초 입금 확인일,마지막 확인일');
+  const csv = res.send.mock.calls[0][0]; expect(csv).toContain('참여 상태'); expect(csv).toContain('철회'); expect(csv).toContain('최초 입금 확인일,마지막 확인일');
   expect(csv).toContain("\"'@fixture\""); expect(csv).toContain('"fixture, ""value"""'); expect(csv).toContain("'=fixture title");
   expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', expect.stringContaining("filename*=UTF-8''"));
 });
@@ -37,4 +37,19 @@ it('reward updates read the actual PostgreSQL SELECT projection and remain trial
 });
 it.each(['=SUM(1,2)', ' \t@fixture', '\rvalue', '-1', '+fixture'])('neutralizes spreadsheet formulas: %s', value => {
   expect(participantCsvCell(value)).toBe(`"'${value}"`);
+});
+
+it('reports one current participant after withdrawal/replacement while preserving both history rows', async () => {
+  const date=new Date('2026-10-17T00:00:00Z');
+  ds.query.mockReset().mockResolvedValueOnce([
+    {id:'old',participantName:'철회 기록',withdrawn:true,rewardType:'product',rewardStatus:'pending',createdAt:date,updatedAt:date},
+    {id:'replacement',participantName:'현재 참여',withdrawn:false,rewardType:'product',rewardStatus:'pending',createdAt:date,updatedAt:date},
+  ]).mockResolvedValueOnce([
+    {withdrawn:true,rewardType:'product',rewardStatus:'pending',settlementStatus:'pending'},
+    {withdrawn:false,rewardType:'product',rewardStatus:'pending',settlementStatus:'pending'},
+  ]);
+  const res=response();await Controller.listParticipants({params:{id:'project'},query:{}} as any,res);
+  const data=res.json.mock.calls[0][0].data;
+  expect(data.summary).toMatchObject({totalCount:1,recordCount:2,withdrawnCount:1,productCount:1,pendingCount:1});
+  expect(data.participants.map((p:any)=>p.withdrawn)).toEqual([true,false]);
 });

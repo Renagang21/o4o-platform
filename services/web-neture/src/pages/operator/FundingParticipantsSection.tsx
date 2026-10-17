@@ -53,7 +53,7 @@ export default function FundingParticipantsSection(props: Props) {
           {props.exportLoading ? '내보내는 중...' : '현재 조건 CSV 내보내기'}
         </button>
       </div>
-      <p className="text-xs text-gray-500 mb-4">펀딩 참여 명단입니다. 서비스 회원 자격과 포럼 회원 가입은 별도로 관리합니다. 입금 확인이 포럼 가입을 자동 승인하지 않습니다.</p>
+      <p className="text-xs text-gray-500 mb-4">상단 인원은 현재 참여 인원이며 철회 기록도 이력 확인을 위해 함께 표시합니다. 서비스 회원 자격과 포럼 회원 가입은 별도로 관리합니다. 입금 확인이 포럼 가입을 자동 승인하지 않습니다.</p>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {filters.map(f => <button key={f.value} onClick={() => props.onFilterChange(f.value)} disabled={busy}
           aria-pressed={props.filter === f.value} className={`${button} ${props.filter === f.value ? 'bg-blue-50 text-blue-700' : ''}`}>{f.label}</button>)}
@@ -76,7 +76,7 @@ export default function FundingParticipantsSection(props: Props) {
             <table className="w-full min-w-[580px] text-sm">
               <thead><tr className="text-left text-xs text-gray-500"><th className="p-2">이름</th><th>유형</th><th>보상</th><th>참여일</th><th>이행 상태</th><th>처리</th></tr></thead>
               <tbody>{props.participants.map(p => <tr key={p.id} className="border-t border-gray-100">
-                <td className="p-2">{p.name}</td><td>{['seller', 'store_owner'].includes(p.type) ? '매장 경영자' : p.type}</td>
+                <td className="p-2">{p.name}{p.withdrawn && <span className="ml-2 text-xs text-amber-700">참여 철회</span>}</td><td>{['seller', 'store_owner'].includes(p.type) ? '매장 경영자' : p.type}</td>
                 <td>{p.rewardType === 'product' ? '제품' : p.rewardType === 'cash' ? '현금' : '-'}</td>
                 <td>{new Date(p.joinedAt).toLocaleDateString('ko-KR')}</td><td>{p.rewardStatus === 'fulfilled' ? '완료' : '대기'}</td>
                 <td><button className={button} disabled={props.updatingId !== null || busy} onClick={() => props.onToggleRewardStatus(p)}>
@@ -92,7 +92,7 @@ export default function FundingParticipantsSection(props: Props) {
                 const status = p.paymentStatus ?? 'unpaid';
                 const selected = form?.id === p.id ? form : null;
                 return <article key={p.id} className="border border-gray-200 rounded-lg p-3">
-                  <div className="flex flex-wrap items-center gap-2 mb-2"><strong className="text-sm min-w-0 break-all">{p.name}</strong>
+                  <div className="flex flex-wrap items-center gap-2 mb-2"><strong className="text-sm min-w-0 break-all">{p.name}</strong>{p.withdrawn && <span className="text-xs text-amber-700">참여 철회</span>}
                     <span className="text-xs text-gray-600">{PAYMENT_STATUS_LABELS[status]}</span>
                     <span className="text-sm">{p.paidAmount == null ? '금액 미기록' : `${p.paidAmount.toLocaleString()}원`}</span>
                   </div>

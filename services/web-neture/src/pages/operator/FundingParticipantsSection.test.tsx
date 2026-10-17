@@ -85,3 +85,9 @@ it('directs refunds to the separate offline record flow', () => {
  expect(screen.queryByRole('button', {name:'환불 완료 기록'})).toBeNull();
  expect(screen.getByText('환급은 오프라인 사후 처리에서 기록')).toBeTruthy();
 });
+
+it('marks withdrawn history while the heading counts only current participants',()=>{
+ render(<FundingParticipantsSection {...props()} totalCount={0} participants={[{...participant,withdrawn:true}]}/>);
+ expect(screen.getByText('펀딩 참여자 (0명)')).toBeTruthy();expect(screen.getAllByText('참여 철회').length).toBeGreaterThan(0);
+ expect(screen.queryByText('아직 참여자가 없습니다.')).toBeNull();
+});

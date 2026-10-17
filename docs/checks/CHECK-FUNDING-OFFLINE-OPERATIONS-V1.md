@@ -75,3 +75,7 @@ Codex 리뷰 P2(철회·중지 대상을 약정금 미등록 목록에도 안내
 Codex 리뷰 P2(기존 작업 저장 후 현황 조회 실패 시 오프라인 입력만 재활성화될 수 있음)를 반영했다. 오프라인 form도 `actionLoading`(저장·조회·복구 필요)을 공유한다. 조회 복구 전 잠금/읽기 재시도 후 해제를 기존 workspace 회귀에 추가해 UI 17 tests·TypeScript·production build PASS했다. PC 1440px·모바일 390px 실제 bundle의 fixture browser에서도 사유 입력 disabled, 읽기만 재시도 후 해제, 추가 write 0·수평 넘침 0·pageerror 0을 확인했다.
 
 Codex 리뷰 P2(운영자 결과 확인 전 모집 기한이 지나도 공개 상세에 참여창이 남을 수 있음)를 반영했다. 시작 전/마감 후에는 접수창을 노출하지 않고, 열린 화면도 서버와 같은 `[시작, 종료)` 경계에서 접수를 닫는다. 클릭 시에도 기간·정원을 재확인하며 clock timer는 refetch나 결과/단계 변경을 하지 않는다. 기간 경계 UI 4 tests, 최신 웹 전체 121 files / 1,134 tests, TypeScript·production build PASS다. PC·모바일에서 시작 전/마감 후/열린 화면의 기한 경과 6개 fixture를 확인했으며 각 상세 GET 1회·write 0·수평 넘침 0·pageerror 0이다.
+
+Codex 리뷰 P2 2건(철회·대체 참여 후 활성 인원 집계 불일치, 이행 완료 후 중지의 부적절한 환급 확인 대상 생성)을 반영했다. 공급자·운영자 참여/이행 요약과 모집률·funnel은 현재 참여만 집계하고 `recordCount`/`withdrawnCount`로 보존 이력을 구분한다. 명단·공급자 현황·CSV에 철회를 표시하며 입금 원장/금융 KPI는 이력을 포함하는 기록 집계임을 명시한다. 이행 완료는 기존 정상 종료를 사용하고 whole-trial stop은 모집/준비/결과 확인 단계로 제한한다. 완료 후 참여자 금액 정정은 유지한다.
+
+API 집중 회귀·격리 SQL 7 suites / 99 tests PASS(일반 API 84 + SQL 15), UI 집중 38 tests·API/웹 TypeScript·production build PASS다. 실제 bundle의 PC·모바일 모금→중지→철회→부분 환급/조회 복구, 공급자 조회 재시도도 회귀 PASS했다. 최신 main #672의 커뮤니티 독립 서비스 변경을 충돌 없이 반영했으며 migration manifest/expected schema는 동일하다. 이 기준 main의 웹 전체 1,058 tests와 타입·빌드·브라우저를 먼저 확인했고 이번 활성 인원/종료 보완의 최종 전체 회귀는 PR #674에서 추적한다.

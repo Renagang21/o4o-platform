@@ -81,7 +81,10 @@ export default function FundingOfflineOperations({
           setAction((v) =>
             v === "result" && r.data.data.trial.status !== "recruiting"
               ? "withdraw"
-              : v === "stop" && r.data.data.trial.status === "closed"
+              : v === "stop" &&
+                  !["recruiting", "development", "outcome_confirming"].includes(
+                    r.data.data.trial.status,
+                  )
                 ? "withdraw"
                 : v,
           );
@@ -285,14 +288,9 @@ export default function FundingOfflineOperations({
                 {data.trial.status === "recruiting" && (
                   <option value="result">{labels.result}</option>
                 )}
-                {[
-                  "recruiting",
-                  "development",
-                  "outcome_confirming",
-                  "fulfilled",
-                ].includes(data.trial.status) && (
-                  <option value="stop">{labels.stop}</option>
-                )}
+                {["recruiting", "development", "outcome_confirming"].includes(
+                  data.trial.status,
+                ) && <option value="stop">{labels.stop}</option>}
                 {["withdraw", "refund", "pledge"].map((v) => (
                   <option value={v} key={v}>
                     {labels[v]}

@@ -1,3 +1,4 @@
+import { readFundingParticipantActivity } from '../../services/funding/funding-participant-activity.service.js';
 import { readFundingAmounts } from '../../services/funding/funding-offline-operations.service.js';
 import { PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 /**
@@ -125,7 +126,7 @@ export class MarketTrialController {
     try {
       const trial = await MarketTrialController.trialRepo.findOne({ where: { id: req.params.id } });
       if (!trial || !await isFundingCreator(MarketTrialController.dataSource!, trial, req.user!.id)) return res.status(403).json({ success: false, message: '자기 펀딩만 조회할 수 있습니다.' });
-      const rows = await MarketTrialController.dataSource!.query(`SELECT p.id, COALESCE(u.name, '회원') AS name, p."paymentStatus" AS "paymentStatus"
+      const rows = await MarketTrialController.dataSource!.query(`SELECT p.id, COALESCE(u.name, '회원') AS name, p."paymentStatus" AS "paymentStatus", COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn
         FROM market_trial_participants p LEFT JOIN users u ON u.id = p."participantId" WHERE p."marketTrialId" = $1 ORDER BY p."createdAt", p.id`, [trial.id]);
       res.json({ success: true, data: rows });
     } catch (error) { logger.error('[Funding] creator participants failed', error); res.status(500).json({ success: false, message: '참여 현황 조회에 실패했습니다.' }); }
@@ -514,10 +515,8 @@ export class MarketTrialController {
       // Aggregate participant stats (no individual info exposed)
       // WO-O4O-MARKET-TRIAL-CONVERSION-READ-WIRING-CLEANUP-V1:
       // content-only — 전환 분포(conversionDistribution)·매장 진열(listingCount) 집계 제거.
-      const rows = await MarketTrialController.participantRepo.find({
-        where: { marketTrialId: id },
-        select: ['rewardType', 'rewardStatus'] as any,
-      });
+      const activity = await readFundingParticipantActivity(MarketTrialController.dataSource, id);
+      const rows = activity.filter(row => !row.withdrawn);
 
       const totalCount = rows.length;
       const productCount = rows.filter((r) => r.rewardType === 'product').length;
@@ -544,6 +543,8 @@ export class MarketTrialController {
           forum: workspaceForum ?? null,
           trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? ''), recordedAmounts.get(trial.id) ?? 0), ...fundingReview(trial) },
           summary: {
+            recordCount: activity.length,
+            withdrawnCount: activity.length - rows.length,
             totalCount,
             productCount,
             cashCount,
@@ -704,7 +705,6 @@ export class MarketTrialController {
 
       const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
       const settlementCalc = trial ? calcSettlementForParticipant(participation, trial) : null;
-      const recordedAmounts = trial ? await readFundingAmounts(MarketTrialController.dataSource, [id]) : new Map<string,number>();
 
       // 선택 저장 + 상태 → choice_completed
       await MarketTrialController.participantRepo.update(participation.id, {

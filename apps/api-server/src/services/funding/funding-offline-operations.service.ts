@@ -209,6 +209,17 @@ export class FundingOfflineOperationsService {
         if (!decision && input.action !== "stop")
           return fail(400, "처리 종류를 확인해 주세요.");
         if (
+          !decision &&
+          !["recruiting", "development", "outcome_confirming"].includes(
+            trial.status,
+          )
+        ) {
+          return fail(
+            409,
+            "이행 완료된 펀딩은 중지가 아닌 정상 종료로 처리해 주세요.",
+          );
+        }
+        if (
           decision &&
           (trial.status !== "recruiting" ||
             !["met", "not_met"].includes(String(input.decision)))

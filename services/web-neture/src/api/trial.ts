@@ -123,6 +123,7 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
 
 export interface TrialParticipant {
   id: string;
+  withdrawn?: boolean;
   name: string;
   type: string;
   rewardType: string | null;
@@ -155,6 +156,8 @@ export interface TrialParticipant {
 }
 
 export interface ParticipantSummary {
+  recordCount?: number;
+  withdrawnCount?: number;
   totalCount: number;
   productCount: number;
   cashCount: number;
@@ -743,7 +746,7 @@ export async function changeFundingCreatorStatus(id: string, status: TrialStatus
   const { data } = await api.patch(`${API_BASE_URL}/api/market-trial/${id}/creator-status`, { status });
   return data.data;
 }
-export async function getFundingCreatorParticipants(id: string): Promise<{ id: string; name: string; paymentStatus: string }[]> {
+export async function getFundingCreatorParticipants(id: string): Promise<{ id: string; name: string; paymentStatus: string; withdrawn?: boolean }[]> {
   const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/creator-participants`);
   return data.data;
 }
