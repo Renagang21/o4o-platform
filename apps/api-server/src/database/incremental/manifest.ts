@@ -92,8 +92,10 @@ import { AddAssistantRunFrameUnderstanding1791970408318 } from '../migrations/17
 import { SeparateSupplierRegistrationPublication1792110685889 } from '../migrations/1792110685889-SeparateSupplierRegistrationPublication.js';
 import { CreateMemberPaidServiceEntitlements1792137600000 } from '../migrations/1792137600000-CreateMemberPaidServiceEntitlements.js';
 import { CreateSupplierReviewRequests1792193756961 } from '../migrations/1792193756961-CreateSupplierReviewRequests.js';
-import { CreateBusinessContentSubmissions1792200000000 } from '../migrations/1792200000000-CreateBusinessContentSubmissions.js';
-import { CreateCooperativeMemberships1792201000000 } from '../migrations/1792201000000-CreateCooperativeMemberships.js';
+import { AddFundingOfflineState1792212000000 } from '../migrations/1792212000000-AddFundingOfflineState.js';
+
+import { CreateBusinessContentSubmissions1792213000000 } from '../migrations/1792213000000-CreateBusinessContentSubmissions.js';
+import { CreateCooperativeMemberships1792214000000 } from '../migrations/1792214000000-CreateCooperativeMemberships.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -126,8 +128,9 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   SeparateSupplierRegistrationPublication1792110685889,
   CreateMemberPaidServiceEntitlements1792137600000,
   CreateSupplierReviewRequests1792193756961,
-  CreateBusinessContentSubmissions1792200000000,
-  CreateCooperativeMemberships1792201000000,
+  AddFundingOfflineState1792212000000,
+  CreateBusinessContentSubmissions1792213000000,
+  CreateCooperativeMemberships1792214000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

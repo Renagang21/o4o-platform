@@ -79,7 +79,7 @@ UI의 접근 판정은 서버 인가를 대신하지 않는다. 연합회 운영
 - 교육은 기존 강의 서비스에서 회원 대상 강의를 운영한다. 협업체 코드에 강의 기능을 추가하지 않는다.
 - 제휴 경영지원은 당분간 미구현, 공동 상품 기획은 오프라인 업무다.
 
-추가 저장 구조는 `CreateBusinessContentSubmissions1792200000000` migration이다. 운영 적용은 별도
+추가 저장 구조는 `CreateBusinessContentSubmissions1792213000000` migration이다. 운영 적용은 별도
 검토된 migration/배포 절차가 필요하며 현재 작업에서는 격리 DB만 변경했다. Neture 및 기존 약국 앱
 (pharmacy/megapharm)의 공통 운영 모듈에도 같은 콘텐츠 심사 탭이 제공된다.
 
@@ -98,7 +98,7 @@ ESLint, 도메인/화면 테스트 29개 통과. Chromium에서 두 조합 전�
 
 ## 테스트 조합 운영 연결 절차
 
-`CreateCooperativeMemberships1792201000000`은 조합 디렉토리와 개인 조합원 원장을 추가한다.
+`CreateCooperativeMemberships1792214000000`은 조합 디렉토리와 개인 조합원 원장을 추가한다.
 스키마 migration은 기존 API 배포의 전용 migration Job에서만 실행한다. 데이터 등록은 별도이며
 migration 자체가 계정·권한·예시 조합을 생성하지 않는다.
 

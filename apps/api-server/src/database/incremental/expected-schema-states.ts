@@ -292,16 +292,23 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '086af046804b172646d4bec9acd190b3dcb076ff10650c2a1b1833df2592d375',
     fingerprintLineCount: 6694,
   },
-  // Isolated PostgreSQL 15 canonical bootstrap + all incremental migrations; no production fingerprint adopted.
+  // Isolated PostgreSQL 15 canonical bootstrap + ordered incrementals, 2026-10-17.
   {
-    appliedThrough: 'CreateBusinessContentSubmissions1792200000000',
-    fingerprint: '2cc1fe67bd4d672ffbe5cb35e2f12d0f4964e18e43d35ae1a65b3daa21297629',
-    fingerprintLineCount: 6721,
+    appliedThrough: 'AddFundingOfflineState1792212000000',
+    fingerprint: '76c1307f0ee0a073e7ce53f9ae00e58c8695b6084842d42f6475bac35df58c04',
+    fingerprintLineCount: 6698,
+  },
+  // Unapplied cooperative migrations follow the funding migration already integrated on main.
+  // Isolated PostgreSQL 15 canonical bootstrap + every existing prefix verified, 2026-10-17.
+  {
+    appliedThrough: 'CreateBusinessContentSubmissions1792213000000',
+    fingerprint: '8d935b8c346fff658ead1aefc456704469332afc7b7a66f0f0705657bf87d49c',
+    fingerprintLineCount: 6725,
   },
   {
-    appliedThrough: 'CreateCooperativeMemberships1792201000000',
-    fingerprint: 'cc72071620a7c15c8cdd42fc63ea0ff5e4d8ff793abaa078d7c666f86a39393e',
-    fingerprintLineCount: 6754,
+    appliedThrough: 'CreateCooperativeMemberships1792214000000',
+    fingerprint: 'beeeaa21eac87f87cf64e53bf7234949151be15b412c7cfc376c6a26617c0971',
+    fingerprintLineCount: 6758,
   },
 ] as const;
 

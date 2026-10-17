@@ -115,7 +115,7 @@ export default function ForumHubPage({
   const { isAuthenticated } = useAuth();
 
   const config: ForumHubConfig = useMemo(() => ({
-    serviceKey: 'neture',
+    serviceKey: basePath === '/communities/community/forum' ? 'community' : 'neture',
     heroTitle: title,
     heroDesc: description,
     categoryPath: (id) => `${basePath}/posts?category=${id}`,

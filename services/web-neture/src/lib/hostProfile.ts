@@ -108,7 +108,7 @@ export function decideHost(
   }
 
   // Preserve old forum addresses while the community owns the actual workspace.
-  const generalBase = '/communities/o4o-general/forum';
+  const generalBase = '/communities/community/forum';
   let forumPath: string | null = null;
   if (matchesPrefix(pathname, '/forum')) forumPath = generalBase + pathname.slice('/forum'.length);
   else if (pathname === '/community') forumPath = generalBase;

@@ -205,6 +205,8 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {([
                   ['참여금', fmt(detail.contributionAmount)],
+                  ['참여 철회', detail.withdrawn?'철회 기록됨':'참여 유지'],
+                  ['누적 환급 기록',fmt(detail.refundedAmount??0)],
                   ['리워드', detail.rewardRate != null ? `+${detail.rewardRate}%` : '–'],
                   ['총 보상 기준 금액', fmt(detail.totalSettlementAmount)],
                   ['제품 단가', fmt(detail.trialUnitPrice)],

@@ -22,7 +22,9 @@ import { api } from '../lib/apiClient';
  * 권한 계약을 이미 갖고 있어 공통 경로를 그대로 유지한다.
  */
 function communityPathKey(): string | undefined {
-  return typeof window === 'undefined' ? undefined : /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
+  if (typeof window === 'undefined') return undefined;
+  const key = /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
+  return key ?? (window.location.hostname === 'community.neture.co.kr' ? 'community' : undefined);
 }
 function fundingPathKey(): string | undefined {
   return typeof window === 'undefined' ? undefined : /^\/market-trial\/([a-f0-9-]+)\/forum(?:\/|$)/i.exec(window.location.pathname)?.[1];

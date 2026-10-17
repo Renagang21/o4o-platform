@@ -40,7 +40,7 @@ describe('supplier 호스트', () => {
   });
   it('공급자 경로 · 레거시 deep-link 는 그대로', () => {
     expect(decideHost('supplier', loc('/supplier/dashboard')).kind).toBe('stay');
-    expect(decideHost('supplier', loc('/supplier/forum/posts'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/posts' });
+    expect(decideHost('supplier', loc('/supplier/forum/posts'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum/posts' });
     expect(decideHost('supplier', loc('/account/supplier/products')).kind).toBe('stay');
     expect(decideHost('supplier', loc('/workspace/hub')).kind).toBe('stay');
   });
@@ -91,7 +91,7 @@ describe('community 호스트', () => {
     expect(decideHost('community', loc('/retail/abc'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/retail/abc' });
   });
   it('그 밖의 경로는 대표 호스트로 · 로그인은 그 호스트', () => {
-    expect(decideHost('community', loc('/forum'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum' });
+    expect(decideHost('community', loc('/forum'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum' });
     expect(decideHost('community', loc('/login')).kind).toBe('stay');
   });
 });
@@ -153,14 +153,14 @@ describe('이전 커뮤니티 주소', () => {
       ['/supplier/forum/request-category', '/request'], ['/workspace/forum/write', '/write'],
     ]) {
       expect(decideHost('supplier', loc(source, '?edit=one', '#form'))).toEqual({
-        kind: 'external', href: `https://community.neture.co.kr/communities/o4o-general/forum${target}?edit=one#form`,
+        kind: 'external', href: `https://community.neture.co.kr/communities/community/forum${target}?edit=one#form`,
       });
     }
   });
   it('게시판별 공지와 글 작성 링크를 실제 포럼 경로로 변환한다', () => {
-    expect(decideHost('main', loc('/forum/service-update', '?page=2'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/posts?page=2&board=service-update' });
-    expect(decideHost('main', loc('/forum/service-update/new'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/write?forum=service-update' });
-    expect(decideHost('main', loc('/forum/service-update/notice'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/post/notice' });
+    expect(decideHost('main', loc('/forum/service-update', '?page=2'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum/posts?page=2&board=service-update' });
+    expect(decideHost('main', loc('/forum/service-update/new'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum/write?forum=service-update' });
+    expect(decideHost('main', loc('/forum/service-update/notice'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum/post/notice' });
   });
 });
 
