@@ -973,7 +973,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       )}
 
       {quickStart && <SignageQuickStart videos={unifiedVideos} organizationId={organizationId} isCurrent={isCurrent}
-        onSaved={playlist => { acceptCreatedPlaylist(playlist); setSavedGuide(playlist.name); setQuickStart(false); void fetchItems(); }}
+        onSaved={playlist => { acceptCreatedPlaylist(playlist); setSavedGuide(playlist.name); setQuickStart(false); void fetchItems(); void loadPlaylists(); }}
         onClose={draft => { setQuickStart(false); if (draft) acceptCreatedPlaylist(draft); void loadPlaylists(); }} />}
       {playlistPreview && selectedPlaylist && <SignagePlaylistPreview key={selectedPlaylist.id} name={selectedPlaylist.name} items={playlistItems} onClose={() => setPlaylistPreview(false)} />}
 
