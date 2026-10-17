@@ -42,7 +42,7 @@ Node `22.18.0`, pnpm `10.25.0`, `/workspace/.o4o-cloud/activate.sh` 사용.
 | Store 전체 테스트 | PASS — 57 files / 649 tests. `pnpm exec vitest run --config services/web-store/vitest.config.mjs --maxWorkers=2` |
 | Store 빌드 | PASS — `pnpm --filter store-web build` |
 | 집중 ESLint | PASS — 변경 TS/TSX 29개, `--max-warnings=0`. 최종 표시 문구/중복 fragment 정비 3개 파일도 재검사 PASS |
-| 문서·diff | PASS — docs 민감정보 패턴 0건(4047 files), 상대 링크 26개, `git diff --check`. staged 32개 scope 검사 PASS |
+| 문서·diff | PASS — docs 민감정보 패턴 0건(4049 files), 상대 링크 26개, `git diff --check`. staged 32개 scope 검사 PASS |
 
 기존 권한/상태/라우트 회귀 외에 실제 목적지 목록 구성, capability 없는 페이지 비노출, 위치별/빈 실행 현황 링크의 capability 유지,
 동일 AI의 모달 이동·미전송 입력/진행 중 요청/추가 입력 보존·추가 유료 요청 방지, Enter/Shift+Enter/IME,
