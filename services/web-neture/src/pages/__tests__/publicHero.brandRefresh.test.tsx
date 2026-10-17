@@ -62,10 +62,11 @@ describe('supplier `/`', () => {
 });
 
 describe('community `/`', () => {
-  it('서비스 소개 없이 독립 커뮤니티 목록으로 시작하고 사업 게시판을 섞지 않는다', async () => {
+  it('독립서비스 소개와 공개 글 진입을 제공하고 과거 업종별 목록은 표시하지 않는다', async () => {
     renderAt(<CommunityHostHomePage />);
-    expect(h1Text()).toBe('커뮤니티 · 단체활동');
-    expect((await screen.findByRole('link', { name: /약사 커뮤니티/ })).getAttribute('href')).toBe('/communities/pharmacy/forum');
+    expect(screen.getByText('정보와 경험을 나누는 커뮤니티 서비스입니다.')).toBeTruthy();
+    expect(screen.getAllByRole('link', { name: /공개 게시글 보기/ })[0].getAttribute('href')).toBe('/communities/community/public');
+    expect(screen.queryByText('약사 커뮤니티')).toBeNull();
     expect(screen.queryByText('사업 회원 게시판')).toBeNull();
   });
 });

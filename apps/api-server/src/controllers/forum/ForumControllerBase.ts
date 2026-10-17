@@ -368,10 +368,8 @@ export class ForumControllerBase {
       if (typeof rows[0]?.key !== 'string' || !rows[0].key) return false;
       const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
       const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
-      if (workspace?.allowed && workspace.canManage) return true;
-      // New UUID spaces have no service-role fallback. Historical service
-      // governance remains behind the mount's current community approval gate.
-      if (!legacyCommunityKey) return false;
+      // Service suspension/revocation is authoritative; stale service roles never bypass it.
+      return !!workspace?.allowed && workspace.canManage;
     }
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(forum.service_code);
     return rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false;

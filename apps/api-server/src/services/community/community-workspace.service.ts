@@ -1,8 +1,8 @@
+import { readCommunityServiceMembership } from './community-service-membership.js';
 import { hasCommunityServiceOperator } from './community-service-operator-access.js';
 import { randomUUID } from 'node:crypto';
 import type { EntityManager } from 'typeorm';
-import { getCommunityDefinition, listActiveCommunities } from '../../config/community-catalog.js';
-import { resolveCommunityAccess, type CommunityAccessUser } from '../../utils/community-access.resolver.js';
+import { type CommunityAccessUser } from '../../utils/community-access.resolver.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { resolveSemiFranchiseBusinessAccess, resolveSemiFranchiseCommunityAccess } from '../../modules/neture-pharmacy/services/semi-franchise-community-access.js';
 
@@ -27,6 +27,18 @@ export interface CommunityWorkspace {
 /** Existing pharmacist forums retain their ledger. New spaces use immutable UUIDs (varchar(50)). */
 export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAccessUser | null, key: string): Promise<CommunityWorkspace | null> {
   if (typeof key !== 'string' || !key) return null;
+  if (key === 'community') {
+    const member = user?.id ? await readCommunityServiceMembership(exec, user.id) : null;
+    const allowed = member?.eligible === true && member.status === 'active';
+    return { communityKey: 'community', name: '커뮤니티', kind: 'independent', allowed,
+      canManage: allowed && await hasCommunityServiceOperator(exec, user!.id!),
+      canJoin: member?.eligible === true && (!member.status || member.status === 'rejected'),
+      membershipStatus: member?.status ?? null, communityStatus: 'active',
+      reason: allowed ? null : !user?.id ? 'AUTH_REQUIRED' : !member?.eligible ? 'ACCOUNT_NOT_ACTIVE' : 'COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED',
+      forumStorageCodes: ['community'] };
+  }
+  // Retired entities must not reappear through catalog fallback or existing DB rows.
+  if (['pharmacy', 'cosmetics', 'o4o-general'].includes(key)) return null;
   const byBusinessKey = key.startsWith('business:');
   const [sf] = await exec.query(byBusinessKey
     ? 'SELECT id, key, name, status FROM semi_franchises WHERE key = $1'
@@ -47,35 +59,11 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
       forumStorageCodes: [`sf:${sf.id}`] };
   }
-  const [community] = await exec.query('SELECT id, name, status FROM communities WHERE slug = $1', [key]);
-  const definition = getCommunityDefinition(key);
-  if (!community && !definition) return null;
-  const [membership] = community && user?.id ? await exec.query(
-    'SELECT status, role FROM community_memberships WHERE community_id = $1 AND user_id = $2', [community.id, user.id],
-  ) : [];
-  const policyAllowed = !definition || resolveCommunityAccess(user, key).allowed;
-  const serviceOperator = eligible && community?.status === 'active' && await hasCommunityServiceOperator(exec, user!.id);
-  const allowed = serviceOperator || eligible && community?.status === 'active' && membership?.status === 'active' && policyAllowed;
-  const [service] = allowed && ['admin', 'operator'].includes(membership?.role) ? await exec.query(
-    "SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = 'community' AND status = 'active'", [user!.id],
-  ) : [];
-  return { communityKey: key, name: community?.name ?? definition!.name, kind: 'independent', allowed: !!allowed,
-    canManage: !!serviceOperator || !!service, canJoin: !serviceOperator && eligible && community?.status === 'active' && policyAllowed && !['pending','active','suspended'].includes(membership?.status),
-    membershipStatus: membership?.status ?? null,
-    communityStatus: community?.status ?? null,
-    reason: allowed ? null : !user?.id ? 'AUTH_REQUIRED' : !eligible ? 'NETURE_MEMBERSHIP_REQUIRED' : 'COMMUNITY_MEMBERSHIP_REQUIRED',
-    forumStorageCodes: definition ? [...definition.forumStorageCodes] : community ? [`community:${community.id}`] : [] };
+  return null;
 }
 
 export async function listCommunityWorkspaces(exec: Exec, user: CommunityAccessUser | null): Promise<CommunityWorkspace[]> {
-  const rows = await exec.query("SELECT slug AS key FROM communities WHERE status = 'active' UNION SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE status = 'active'");
-  const keys = new Set([...listActiveCommunities().map(c => c.key), ...rows.map(r => r.key)]);
-  const result: CommunityWorkspace[] = [];
-  for (const key of keys) {
-    const workspace = await resolveCommunityWorkspace(exec, user, key);
-    if (workspace && (workspace.kind === 'independent' || workspace.allowed)) result.push(workspace);
-  }
-  return result;
+  return [(await resolveCommunityWorkspace(exec, user, 'community'))!];
 }
 
 /** Board creation is an explicit action by this space's operator; it never grants membership. */

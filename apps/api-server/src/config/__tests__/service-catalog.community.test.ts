@@ -1,24 +1,4 @@
-/**
- * 독립 서비스 3개의 카탈로그 계약 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3 · §4
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * 이 테스트가 막는 것
- *
- *   ① `joinEnabled: true` 로 되돌리는 것.
- *      그러면 범용 `POST /auth/services/{key}/join` 이 **어느 커뮤니티에도 승인받지 않은**
- *      사람에게 `service_memberships` 를 만들어 준다. 그 행은 진입 자격이므로 개별 커뮤니티
- *      승인(가입 승인형 하나)을 서비스 단위로 우회하는 길이 된다. 커뮤니티의 서비스 가입은
- *      **개별 승인의 결과로만** 생긴다(community-lifecycle.service ensureServiceMembership).
- *
- *   ② 독립 주소를 대표 호스트의 하위 경로로 되돌리는 것.
- *      `community` · `supplier` · `funding` 은 각자 `*.neture.co.kr` **독립 서비스**다.
- *      같은 `neture-web` 을 서빙하지만(Cloud Run 서비스를 서브도메인 수만큼 만들지 않는다)
- *      주소와 권한 경계는 독립이다. 호스트 라우팅은 `web-neture/src/lib/hostProfile.ts` 가 갖는다.
- *
- *      착수 중 `community` 를 `neture.co.kr` + `basePath: '/community'` 로 등록했다가
- *      **확정 요구사항과 달라 정정했다.** 같은 앱을 서빙한다는 사실이 주소·권한 경계를
- *      대표 호스트에 붙여도 된다는 뜻이 아니다.
- */
+/** Independent community service catalog and unchanged neighboring service boundaries. */
 import { O4O_SERVICES, getService, getServiceOrigins } from '../service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 
@@ -29,9 +9,8 @@ describe('community 서비스 카탈로그', () => {
     expect(community).toBeDefined();
   });
 
-  it('서비스 단위 자가 가입 경로를 열지 않는다 — joinEnabled=false', () => {
-    // true 로 바꾸면 개별 커뮤니티 승인이 우회된다. 위 주석 ① 참조.
-    expect(community?.joinEnabled).toBe(false);
+  it('독립서비스 가입 신청을 허용한다', () => {
+    expect(community?.joinEnabled).toBe(true);
   });
 
   it('독립 주소다 — `community.neture.co.kr` 호스트 루트가 진입(basePath 없음)', () => {
@@ -65,7 +44,7 @@ describe('자가 가입 경로가 승인 축을 우회하지 않는다', () => {
    * `lecture` 도 같은 이유(가입 UX·약관 미게시)로 닫혀 있다.
    * `supplier` 는 조직 기반 심사이고 `funding` 은 운영자 범위 축이므로 둘 다 자가 가입이 없다.
    */
-  it.each(['community', 'supplier', 'funding', 'kpa-branch', 'lecture', 'cafe24-b2b'])(
+  it.each(['supplier', 'funding', 'kpa-branch', 'lecture', 'cafe24-b2b'])(
     '%s 는 joinEnabled=false',
     (key) => {
       expect(getService(key)?.joinEnabled).toBe(false);
@@ -105,7 +84,7 @@ describe('supplier · funding 독립 서비스', () => {
   });
 
   it('세 서비스 모두 운영자 업무 공간을 갖는다 (매장 축은 없다)', () => {
-    for (const key of ['community', 'supplier', 'funding']) {
+    for (const key of ['supplier', 'funding']) {
       expect(getService(key)?.workspace).toMatchObject({
         storeWorkspaceEnabled: false,
         operatorWorkspaceEnabled: true,

@@ -1,9 +1,10 @@
-import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
+import { readCommunityServiceMembership } from './community-service-membership.js';
 import type { EntityManager } from 'typeorm';
 
 /** Central assignment is effective only with current active service membership and role. */
 export async function hasCommunityServiceOperator(exec: Pick<EntityManager, 'query'>, userId: string, adminOnly = false): Promise<boolean> {
-  if (await getNetureMainMembershipStatus(exec, userId) !== 'active') return false;
+  const member = await readCommunityServiceMembership(exec, userId);
+  if (!member.eligible || member.status !== 'active') return false;
   const rows = await exec.query(
     `SELECT 1 FROM role_assignments ra
       JOIN service_memberships sm ON sm.user_id = ra.user_id

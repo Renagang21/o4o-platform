@@ -522,7 +522,7 @@ function PharmacistCommunityRedirect() {
     if (isLoading) return;
     let active = true;
     setFailed(false);
-    const base = '/communities/pharmacy/forum';
+    const base = '/communities/community/forum';
     const suffix = location.pathname.startsWith('/mypage/my-forums')
       ? '/owned' + location.pathname.slice('/mypage/my-forums'.length)
       : location.pathname.slice('/forum'.length);
