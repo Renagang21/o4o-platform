@@ -410,6 +410,22 @@ fixture("isolated supplier review and funding operations", () => {
     const byTrial = (id: string) => all.items.find((i: { trialId: string }) => i.trialId === id);
     expect(byTrial(closedAfterFulfilled)?.types).toEqual(["fulfillment_pending"]);
     expect(byTrial(autoClosed)).toBeUndefined();
+    // A failed recruiting trial is not collection/fulfillment work in any filter.
+    for (const [payment, amount, reward] of [
+      ["unpaid", null, "pending"], ["pending", null, "pending"],
+      ["failed", null, "pending"], ["paid", null, "pending"],
+      ["paid", 50, "pending"], ["unpaid", null, "fulfilled"],
+    ]) {
+      await db.query(`UPDATE market_trial_participants SET "paymentStatus"=$1,
+        "paidAmount"=$2,"rewardStatus"=$3 WHERE "marketTrialId"=$4`,
+        [payment, amount, reward, autoClosed]);
+      for (const type of [undefined, "payment_pending", "payment_failed", "amount_missing",
+        "amount_mismatch", "fulfillment_pending", "fulfilled_without_payment"]) {
+        expect((await service.list({type})).items.some(
+          (row: {trialId: string}) => row.trialId === autoClosed)).toBe(false);
+      }
+    }
+
     await new FundingRewardRecordService(db).update(
       closedAfterFulfilled,
       "40000000-0000-4000-8000-000000000002",

@@ -142,3 +142,11 @@ fixture 계정·식별자는 모두 합성 값이며 운영 DB·운영 API·실�
 | API tsc · 관련 jest | 통과 · 5 suites 71 통과, 4 skip(분류기 spec env-gated) |
 | Neture tsc · 전체 Vitest | 통과 · 117개 파일 1,123개 통과. 첫 실행에서 빌드와 병렬로 돌린 `demoAccounts.test.ts` 가 5초 timeout(6.9초)으로 1건 실패했고, 단독 재실행 1.8초 통과 · 전체 단독 재실행 전부 통과를 확인했다 |
 | API · Neture production build / 변경 파일 ESLint | 통과 / 0 |
+
+## 통합 재개·자동 모집 실패 제외 (2026-10-17)
+
+사용자가 이 공간에서 main 병합·배포를 지시하여 기존 PR #653을 재사용한다.
+리뷰 지적에 따라 `closeReason=auto_target_missed`는 모든 입금·이행 예외 조회에서 제외했다.
+NULL closeReason인 정상 펀딩은 유지한다. 격리 SQL에서 unpaid/pending/failed/금액 누락/불일치/미입금 이행의 6개 원장 조합을 전체 및 6종 필터에 대조했다.
+관련 단위·격리 PostgreSQL 테스트 18개가 통과했고, 전 prefix fingerprint·migration down/up·writer fence 검증도 포함했다.
+최종 migration 이름은 위 2차 동기화 기록의 `CreateSupplierReviewRequests1792193756961`이다.

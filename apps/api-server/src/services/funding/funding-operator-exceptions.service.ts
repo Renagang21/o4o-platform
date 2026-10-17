@@ -47,7 +47,8 @@ export class FundingOperatorExceptionsService {
       COALESCE(u.name, '참여자') AS "participantName", p."paymentStatus", p."rewardStatus", p."contributionAmount", p."paidAmount", p."updatedAt",
       array_remove(ARRAY[${flags}], NULL) AS types
       FROM market_trial_participants p JOIN market_trials t ON t.id = p."marketTrialId" LEFT JOIN users u ON u.id = p."participantId"
-      WHERE t.status NOT IN ('draft','submitted') AND (${conditions})
+      WHERE t.status NOT IN ('draft','submitted')
+      AND t."closeReason" IS DISTINCT FROM 'auto_target_missed' AND (${conditions})
       ORDER BY p."updatedAt" ASC, p.id ASC LIMIT 31 OFFSET $1`,
       [(page - 1) * 30],
     );
