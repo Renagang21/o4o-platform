@@ -28,6 +28,7 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 - 전용 API는 `/communities/community/management/*`다. 서비스 키·저장 코드는 서버에서 `community`로 고정한다.
 - 매 요청 현재 DB의 정상 공통 계정·활성 커뮤니티 가입·유효한 `community:admin/operator`를 확인한다.
   다른 서비스 admin이나 단독 platform 역할로 커뮤니티 권한을 합성하지 않는다.
+- 운영 중지한 게시판은 목록뿐 아니라 직접 글·댓글·쓰기 target에서도 차단한다. 재개 시 기존 데이터로 다시 이용한다.
 - 상태 변경은 Operator 이상, 삭제 계획 조회와 실행은 Admin만 가능하다.
 - 삭제 계획은 대상·선택된 행의 내용·차단 사유를 fingerprint로 묶는다. 실행 트랜잭션에서 재검사하고
   변경되었으면 409로 거부한다. 화면에서는 영향 건수와 되돌릴 수 없음을 표시하고 확인 문구를 입력받는다.
@@ -55,7 +56,7 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 ## 검증·통합 상태
 
 - 격리 PostgreSQL 기능 검증: 11 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
-- API focused: 6 suites / 105 tests PASS (위 PostgreSQL 11개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
+- API focused: 6 suites / 106 tests PASS (위 PostgreSQL 11개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
 - 웹 focused: 4 files / 106 tests PASS.
 - 공유 회원 UI 전체: 21 files / 166 tests PASS (직접 소비처뿐 아니라 공통 모듈 회귀 포함).
 - Neture 웹 전체: 122 files / 1100 tests PASS.

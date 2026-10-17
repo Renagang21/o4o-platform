@@ -105,9 +105,9 @@ function fakeQuery(sql: string, params?: any[]): any[] {
   // isForumInServiceScope
   if (s.includes('SELECT 1 FROM forum_category_requests')) {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 경계는 코드 집합(ANY($2::text[]))
-    const [forumId, codes] = params || [];
+    const [forumId, codes, activeCommunityOnly] = params || [];
     const set: string[] = Array.isArray(codes) ? codes : [codes];
-    return state.forums.some((f) => f.id === forumId && set.includes(f.service_code)) ? [1] : [];
+    return state.forums.some((f) => f.id === forumId && set.includes(f.service_code) && (!activeCommunityOnly || (f.status === 'completed' && !f.organization_id))) ? [1] : [];
   }
   // checkClosedForumAccess / hasForumModerationOverride / pin ownership
   if (s.includes('FROM forum_category_requests')) {
@@ -732,4 +732,15 @@ describe('independent community daily moderation authority', () => {
   await new ScopedPost().pinPost(makeReq({user:{id:'platform-admin',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community'},params:{id:'community-post'},body:{pin:true}}),res);
   expect(out.status).toBe(403);expect(state.savedPosts).toHaveLength(0);
  });
+});
+
+
+it('community board suspension blocks direct scoped targets until reopened',async()=>{
+ class Access extends ForumPostController { canAccess(id:string,ctx:ForumContext){return this.isForumInServiceScope(id,ctx);} }
+ const forum={...KPA_FORUM,id:'community-board',service_code:'community',status:'archived'};
+ state.forums.push(forum);
+ const ctx:ForumContext={scope:'community',communityKey:'community',forumStorageCodes:['community']};
+ expect(await new Access().canAccess(forum.id,ctx)).toBe(false);
+ forum.status='completed';
+ expect(await new Access().canAccess(forum.id,ctx)).toBe(true);
 });

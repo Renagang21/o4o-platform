@@ -127,6 +127,10 @@ export class ForumControllerBase {
     // service key, so the conversion SSOT (@o4o/security-core) is used here.
     // No forum-local mapping table is introduced.
     this.applyServiceScope(qb, alias, ctx);
+    if (ctx.communityKey === 'community') {
+      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _liveCommunityBoard WHERE _liveCommunityBoard.id = ${alias}.forum_id
+        AND _liveCommunityBoard.service_code = 'community' AND _liveCommunityBoard.organization_id IS NULL AND _liveCommunityBoard.status = 'completed')`);
+    }
     if (ctx.excludeScopedCommunities && !ctx.serviceCode && !ctx.communityKey) return;
 
     // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
@@ -243,8 +247,9 @@ export class ForumControllerBase {
     if (!forumId || codes.length === 0) return false;
 
     const rows = await AppDataSource.query(
-      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = ANY($2::text[]) LIMIT 1`,
-      [forumId, codes],
+      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = ANY($2::text[])
+        AND ($3::boolean = false OR (status = 'completed' AND organization_id IS NULL)) LIMIT 1`,
+      [forumId, codes, ctx?.communityKey === 'community'],
     );
     return rows.length > 0;
   }
