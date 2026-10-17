@@ -65,3 +65,5 @@ Node 22.18.0 / pnpm 10.25.0, frozen install 및 공유 패키지 build 후 검�
 최신 main `900f8043af`의 무관한 약국 로그인 문구 변경을 같은 작업 branch에 merge하고 PR #674를 생성했다. 필수 CI Gate와 Codex 리뷰 확인 후 병합하며, 운영 적용은 main의 CI 성공 SHA에 대해 기존 LEVEL 3 promote → migration Job → API → 웹 절차를 사용한다.
 
 통합 점검 중 과거 입금액만 남은 미입금/취소 행에 양수 환급을 등록하면 순모금과 환급 상태가 모순될 수 있어, 실제 입금 확인·정정을 먼저 요구하도록 보완했다. 격리 SQL 기존 12건에 해당 회귀 검증을 추가해 PASS했다. 이 변경은 실제 송금/환급을 실행하지 않는다. 병합·운영 적용·배포의 실행 결과는 PR #674에 기록한다.
+
+Codex 리뷰 P1(기존 입금 API의 `refunded` 요청이 환급 상세 없이 순모금을 제외할 수 있음)을 반영했다. 누적 환급 기록이 없는 행의 직접 `refunded` 변경은 409 `OFFLINE_REFUND_RECORD_REQUIRED`로 차단한다. 오프라인 환급 이력이 있는 금액 정정은 잔액에 맞는 상태를 유지한다. 기존 API 호출의 거절/transaction rollback/순모금 보존을 검증했으며 관련 API·격리 SQL 3 suites / 52 tests PASS, TypeScript PASS다.

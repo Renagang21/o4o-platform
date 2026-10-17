@@ -65,6 +65,9 @@ export class FundingPaymentRecordService {
       if (!before) throw new FundingError(404, 'PARTICIPANT_NOT_FOUND', '이 펀딩의 참여자를 찾을 수 없습니다.');
 
       const refund=Number((before as PaymentRow & {offlineState?:{refundAmount?:number}}).offlineState?.refundAmount??0);
+      if (status === 'refunded' && refund === 0) {
+        throw new FundingError(409,'OFFLINE_REFUND_RECORD_REQUIRED','환급 완료는 오프라인 사후 처리에서 누적 환급액·처리일·사유와 함께 기록해 주세요.');
+      }
       if(input.paidAmount!==undefined&&Number(input.paidAmount??0)<refund)throw new FundingError(400,'REFUND_EXCEEDS_PAYMENT','입금액은 기록된 환급액 이상이어야 합니다.');
       if (refund > 0 && !['paid','refunded'].includes(status)) {
         throw new FundingError(409,'REFUND_RECORD_EXISTS','환급 기록이 있는 입금은 미입금·취소로 바꿀 수 없습니다. 입금·누적 환급 금액을 정정해 주세요.');

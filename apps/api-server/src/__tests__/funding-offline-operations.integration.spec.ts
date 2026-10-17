@@ -135,6 +135,15 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     expect(Number(state.totals.netAmount)).toBe(100);
     expect(Number(state.trial.currentAmount)).toBe(100);
     expect(state.trial.status).toBe("recruiting");
+    await expect(
+      new FundingPaymentRecordService(db).update(trial, participant, actor, {
+        paymentStatus: "refunded",
+      }),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: "OFFLINE_REFUND_RECORD_REQUIRED",
+    });
+    expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(100);
   });
   it("records an explicit result, rejects replay and stops without automatically refunding", async () => {
     await service.update(trial, null, actor, {
