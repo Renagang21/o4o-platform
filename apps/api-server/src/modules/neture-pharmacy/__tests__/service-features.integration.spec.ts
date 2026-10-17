@@ -66,6 +66,8 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
   it('round-trips creation, rejects invalid edits, preserves unrelated metadata and supports clearing', async () => {
     const key = keys[0];
     expect((await settings.getByKey(key))?.service_features).toEqual(['tablet']);
+    await expect(settings.create({ key, name: 'Duplicate synthetic business', serviceFeatures: ['store-staff-support'] })).rejects.toMatchObject({ code: 'KEY_IN_USE' });
+    expect((await settings.getByKey(key))?.service_features).toEqual(['tablet']);
     await expect(settings.update(key, { serviceFeatures: ['unsupported'] })).rejects.toMatchObject({ code: 'INVALID_SERVICE_FEATURES' });
     expect((await settings.getByKey(key))?.service_features).toEqual(['tablet']);
     await settings.update(key, { registrationConditions: 'Synthetic conditions' });
@@ -75,6 +77,26 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     await settings.update(key, { serviceFeatures: [] });
     expect((await settings.getByKey(key))?.service_features).toEqual([]);
     await settings.update(key, { serviceFeatures: ['tablet'] });
+  });
+
+  it('applies saved business settings without leaking staff support through paid membership or another pharmacy', async () => {
+    const service = createPharmacyFeatureService(db);
+    const members = new MemberPaidFeatureService(db);
+    try {
+      await members.set(users[0], users[1], { active: true, endsAt: null });
+      await settings.update(keys[0], { serviceFeatures: ['store-staff-support'] });
+      const features = (await service.resolve('free-invited-staff', store)).features;
+      expect(features.find(f => f.key === 'tablet')?.allowed).toBe(true);
+      expect(features.find(f => f.key === 'store-staff-support')).toMatchObject({ allowed: true, sources: [{ key: keys[0], type: 'semi-franchise' }] });
+      expect((await service.resolve('free-invited-staff', other)).features.find(f => f.key === 'store-staff-support')?.allowed).toBe(false);
+      await settings.update(keys[0], { status: 'closed' });
+      const after = (await service.resolve('free-invited-staff', store)).features;
+      expect(after.find(f => f.key === 'store-staff-support')?.allowed).toBe(false);
+      expect(after.find(f => f.key === 'tablet')?.allowed).toBe(true);
+    } finally {
+      await settings.update(keys[0], { status: 'active', serviceFeatures: ['tablet'] });
+      await members.set(users[0], users[1], { active: false, endsAt: null });
+    }
   });
 
   it('keeps a second valid grant after suspension and isolates another pharmacy', async () => {

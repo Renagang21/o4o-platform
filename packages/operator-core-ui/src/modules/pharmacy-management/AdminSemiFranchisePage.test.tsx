@@ -1,63 +1,234 @@
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import Page from './AdminSemiFranchisePage';
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import Page from "./AdminSemiFranchisePage";
 
-const api = vi.hoisted(() => ({ listSemiFranchises: vi.fn(), listServiceFeatures: vi.fn(), createSemiFranchise: vi.fn(), updateSemiFranchise: vi.fn() }));
-vi.mock('./api', () => ({ neturePharmacyAdminApi: api, formatDateTime: () => '', STATUS_CLASS: {}, STATUS_LABEL: {} }));
-const business = { id: 'a', key: 'a', name: '합성 사업', status: 'active', service_features: ['tablet'], operators: [] };
+const api = vi.hoisted(() => ({
+  listSemiFranchises: vi.fn(),
+  listServiceFeatures: vi.fn(),
+  createSemiFranchise: vi.fn(),
+  updateSemiFranchise: vi.fn(),
+  assignOperator: vi.fn(),
+  revokeOperator: vi.fn(),
+}));
+vi.mock("./api", () => ({
+  neturePharmacyAdminApi: api,
+  formatDateTime: () => "",
+  STATUS_CLASS: {},
+  STATUS_LABEL: {},
+}));
+const business = {
+  id: "a",
+  key: "a",
+  name: "합성 사업",
+  status: "active",
+  service_features: ["tablet"],
+  operators: [],
+};
 beforeEach(() => {
   vi.resetAllMocks();
   api.listSemiFranchises.mockResolvedValue([business]);
-  api.listServiceFeatures.mockResolvedValue([{ key: 'tablet', label: '태블릿' }, { key: 'multilingual-content', label: '다국어 상품 콘텐츠' }]);
+  api.listServiceFeatures.mockResolvedValue([
+    { key: "tablet", label: "태블릿" },
+    { key: "multilingual-content", label: "다국어 상품 콘텐츠" },
+  ]);
   api.updateSemiFranchise.mockResolvedValue({});
   api.createSemiFranchise.mockResolvedValue({});
 });
 afterEach(cleanup);
 
-it('sends selected features on creation without inventing a paid or professional entitlement', async () => {
+it("sends selected features on creation without inventing a paid or professional entitlement", async () => {
   render(<Page />);
-  await screen.findByRole('button', { name: '수정' });
-  fireEvent.change(screen.getByPlaceholderText('key (영문 소문자 · 숫자 · -)'), { target: { value: 'new-business' } });
-  fireEvent.change(screen.getByPlaceholderText('이름'), { target: { value: '새 합성 사업' } });
-  fireEvent.click(screen.getByLabelText('태블릿'));
-  fireEvent.click(screen.getByRole('button', { name: '만들기' }));
-  await waitFor(() => expect(api.createSemiFranchise).toHaveBeenCalledWith(expect.objectContaining({ key: 'new-business', serviceFeatures: ['tablet'] })));
+  await screen.findByRole("button", { name: "수정" });
+  fireEvent.change(
+    screen.getByPlaceholderText("key (영문 소문자 · 숫자 · -)"),
+    { target: { value: "new-business" } },
+  );
+  fireEvent.change(screen.getByPlaceholderText("이름"), {
+    target: { value: "새 합성 사업" },
+  });
+  fireEvent.click(screen.getByLabelText("태블릿"));
+  fireEvent.click(screen.getByRole("button", { name: "만들기" }));
+  await waitFor(() =>
+    expect(api.createSemiFranchise).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: "new-business",
+        serviceFeatures: ["tablet"],
+      }),
+    ),
+  );
 });
 
-it('loads persisted selections, preserves a failed edit, and permits explicit clearing on retry', async () => {
-  api.updateSemiFranchise.mockRejectedValueOnce(new Error('저장 실패'));
+it("loads persisted selections, preserves a failed edit, and permits explicit clearing on retry", async () => {
+  api.updateSemiFranchise.mockRejectedValueOnce(new Error("저장 실패"));
   render(<Page />);
-  fireEvent.click(await screen.findByRole('button', { name: '수정' }));
-  const fieldset = screen.getAllByRole('group', { name: '제공 기능' })[1];
-  const tablet = within(fieldset).getByLabelText('태블릿') as HTMLInputElement;
+  fireEvent.click(await screen.findByRole("button", { name: "수정" }));
+  const fieldset = screen.getAllByRole("group", { name: "제공 기능" })[1];
+  const tablet = within(fieldset).getByLabelText("태블릿") as HTMLInputElement;
   expect(tablet.checked).toBe(true);
   fireEvent.click(tablet);
-  fireEvent.click(screen.getByRole('button', { name: '저장' }));
-  await screen.findByText('저장 실패');
+  fireEvent.click(screen.getByRole("button", { name: "저장" }));
+  await screen.findByText("저장 실패");
   expect(tablet.checked).toBe(false);
-  fireEvent.click(screen.getByRole('button', { name: '저장' }));
-  await waitFor(() => expect(api.updateSemiFranchise).toHaveBeenLastCalledWith('a', expect.objectContaining({ serviceFeatures: [] })));
-  await screen.findByRole('button', { name: '수정' });
+  fireEvent.click(screen.getByRole("button", { name: "저장" }));
+  await waitFor(() =>
+    expect(api.updateSemiFranchise).toHaveBeenLastCalledWith(
+      "a",
+      expect.objectContaining({ serviceFeatures: [] }),
+    ),
+  );
+  await screen.findByRole("button", { name: "수정" });
 });
 
-it('does not replace unknown configuration with empty grants after a failed load; supports retry', async () => {
-  api.listServiceFeatures.mockRejectedValueOnce(new Error('조회 실패'));
+it("does not replace unknown configuration with empty grants after a failed load; supports retry", async () => {
+  api.listServiceFeatures.mockRejectedValueOnce(new Error("조회 실패"));
   render(<Page />);
-  await screen.findByText('조회 실패');
-  expect((screen.getByRole('button', { name: '만들기' }) as HTMLButtonElement).disabled).toBe(true);
-  expect(screen.queryByRole('button', { name: '수정' })).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: '설정 다시 불러오기' }));
-  await screen.findByRole('button', { name: '수정' });
+  await screen.findByText("조회 실패");
+  expect(
+    (screen.getByRole("button", { name: "만들기" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(screen.queryByRole("button", { name: "수정" })).toBeNull();
+  expect(screen.queryByText("약국 협력사업이 없습니다.")).toBeNull();
+  expect(screen.getByText(/미등록 상태를 의미하지 않습니다/)).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "설정 다시 불러오기" }));
+  await screen.findByRole("button", { name: "수정" });
 });
 
-it('locks feature edits, cancellation and other business selection during a save', async () => {
+it("locks feature edits, cancellation and other business selection during a save", async () => {
   let finish!: () => void;
-  api.updateSemiFranchise.mockImplementation(() => new Promise<void>(resolve => { finish = resolve; }));
+  api.updateSemiFranchise.mockImplementation(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
   render(<Page />);
-  fireEvent.click(await screen.findByRole('button', { name: '수정' }));
-  fireEvent.click(screen.getByRole('button', { name: '저장' }));
-  expect((screen.getByRole('button', { name: '취소' }) as HTMLButtonElement).disabled).toBe(true);
-  expect((screen.getAllByRole('group', { name: '제공 기능' })[1] as HTMLFieldSetElement).disabled).toBe(true);
+  fireEvent.click(await screen.findByRole("button", { name: "수정" }));
+  fireEvent.click(screen.getByRole("button", { name: "저장" }));
+  expect(
+    (screen.getByRole("button", { name: "취소" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(
+    (
+      screen.getAllByRole("group", {
+        name: "제공 기능",
+      })[1] as HTMLFieldSetElement
+    ).disabled,
+  ).toBe(true);
   finish();
-  await screen.findByRole('button', { name: '수정' });
+  await screen.findByRole("button", { name: "수정" });
+});
+
+it("shows saved feature labels, closed-state effect and operator readiness independently per business", async () => {
+  api.listSemiFranchises.mockResolvedValue([
+    business,
+    {
+      ...business,
+      key: "closed-business",
+      name: "마감 합성 사업",
+      status: "closed",
+      service_features: ["multilingual-content"],
+    },
+    {
+      ...business,
+      key: "empty-business",
+      name: "미선택 합성 사업",
+      service_features: [],
+    },
+  ]);
+  render(<Page />);
+  const active = await screen.findByRole("region", { name: "합성 사업 설정" });
+  expect(
+    within(active).getByRole("list", { name: "설정된 제공 기능" }).textContent,
+  ).toBe("태블릿");
+  const closed = screen.getByRole("region", { name: "마감 합성 사업 설정" });
+  expect(within(closed).getByText("다국어 상품 콘텐츠")).toBeTruthy();
+  expect(within(closed).getByText(/마감된 사업의 기능은/)).toBeTruthy();
+  expect(within(active).getByText(/가입 승인·자료 운영을 맡을/)).toBeTruthy();
+  expect(
+    within(
+      screen.getByRole("region", { name: "미선택 합성 사업 설정" }),
+    ).getByText(/추가 제공하는 기능이 없습니다/),
+  ).toBeTruthy();
+});
+
+it("does not show an empty register or discard successful save feedback if the refresh fails", async () => {
+  api.listSemiFranchises
+    .mockResolvedValueOnce([business])
+    .mockRejectedValueOnce(new Error("최신 현황 조회 실패"))
+    .mockResolvedValue([business]);
+  render(<Page />);
+  fireEvent.click(await screen.findByRole("button", { name: "수정" }));
+  fireEvent.click(screen.getByRole("button", { name: "저장" }));
+  await screen.findByText("최신 현황 조회 실패");
+  expect(screen.getByText("저장했습니다.")).toBeTruthy();
+  expect(screen.queryByText("약국 협력사업이 없습니다.")).toBeNull();
+  expect(screen.queryByRole("button", { name: "수정" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "설정 다시 불러오기" }));
+  await screen.findByRole("button", { name: "수정" });
+  expect(api.updateSemiFranchise).toHaveBeenCalledTimes(1);
+});
+
+it("preserves a duplicate registration draft and never updates an existing business automatically", async () => {
+  api.createSemiFranchise.mockRejectedValueOnce(
+    new Error("이미 있는 key 입니다."),
+  );
+  render(<Page />);
+  await screen.findByRole("button", { name: "수정" });
+  fireEvent.change(screen.getByLabelText("사업 key"), {
+    target: { value: "existing-key" },
+  });
+  fireEvent.change(screen.getByLabelText("새 사업 이름"), {
+    target: { value: "새 합성 사업" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "만들기" }));
+  await screen.findByText("이미 있는 key 입니다.");
+  expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe(
+    "existing-key",
+  );
+  expect(api.updateSemiFranchise).not.toHaveBeenCalled();
+});
+
+it("locks registration fields and operator input while creating without preselecting any grants", async () => {
+  let finish!: () => void;
+  api.createSemiFranchise.mockImplementation(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  render(<Page />);
+  await screen.findByRole("button", { name: "수정" });
+  fireEvent.change(screen.getByLabelText("사업 key"), {
+    target: { value: "new-key" },
+  });
+  fireEvent.change(screen.getByLabelText("새 사업 이름"), {
+    target: { value: "새 합성 사업" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "만들기" }));
+  expect(api.createSemiFranchise).toHaveBeenCalledWith(
+    expect.objectContaining({ serviceFeatures: [] }),
+  );
+  expect(
+    (screen.getByRole("group", { name: "새 사업 등록" }) as HTMLFieldSetElement)
+      .disabled,
+  ).toBe(true);
+  expect(
+    (screen.getByLabelText("합성 사업 담당 운영자 ID") as HTMLInputElement)
+      .disabled,
+  ).toBe(true);
+  finish();
+  await waitFor(() =>
+    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe(
+      "",
+    ),
+  );
 });
