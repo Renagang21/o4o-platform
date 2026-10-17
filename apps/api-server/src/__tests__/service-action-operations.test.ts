@@ -122,7 +122,7 @@ it('preserves the server value when a stale contact draft is submitted', async (
 it('deletes only an archived lecture and records audit in its owning transaction', async () => {
   query.mockImplementation(async sql => sql.includes('FOR UPDATE') ? [{ id: 'course', title: 'Fixture', status: 'archived' }] : []);
   expect(await hardDeleteLectureCourse(db, 'course', 'admin', 'cleanup')).toMatchObject({ deleted: true, title: 'Fixture' });
-  expect(query.mock.calls[0][0]).toContain(`"serviceKey"='lecture'`);
+  expect(query.mock.calls[0][0]).toContain(`service_key='lecture'`);
   expect(query.mock.calls.at(-1)![1].slice(0, 3)).toEqual(['lecture', 'admin', 'lecture.course.hard_delete']);
 });
 it.each([[[]], [[{ status: 'published' }]]])('blocks a missing, foreign or active course before deleting learning data (%p)', async rows => {

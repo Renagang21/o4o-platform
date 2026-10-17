@@ -5,7 +5,7 @@ import { OperationError, operationReason, recordOperation } from '../../../servi
 export async function hardDeleteLectureCourse(db: DataSource, id: string, actorId: string, inputReason: unknown) {
   const reason = operationReason(inputReason);
   return db.transaction(async manager => {
-    const [course] = await manager.query(`SELECT id,title,status FROM lms_courses WHERE id=$1 AND "serviceKey"='lecture' FOR UPDATE`, [id]);
+    const [course] = await manager.query(`SELECT id,title,status FROM lms_courses WHERE id=$1 AND service_key='lecture' FOR UPDATE`, [id]);
     if (!course) throw new OperationError(404, 'COURSE_NOT_FOUND', '강의를 찾을 수 없습니다.');
     if (course.status !== 'archived') throw new OperationError(409, 'ARCHIVE_REQUIRED', '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.');
     await manager.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId"=$1)`, [id]);

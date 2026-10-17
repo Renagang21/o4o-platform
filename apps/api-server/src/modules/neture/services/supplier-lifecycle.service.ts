@@ -7,6 +7,7 @@ import { NetureSupplier, SupplierStatus } from '../entities/index.js';
 import { NetureSupplierBusinessService } from './supplier-business.service.js';
 import logger from '../../../utils/logger.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import { invalidateRoles } from '../../auth/utils/role-cache.js';
 import { getNetureMainMembershipStatus } from './neture-main-membership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
@@ -313,6 +314,8 @@ export class NetureSupplierLifecycleService {
         };
       }).then(async (result) => {
         if (result.success) {
+          // A concurrent /auth/me may refill the cache before this transaction commits.
+          if (result.data?.userId) invalidateRoles(result.data.userId as string);
           logger.info(
             `[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${result.data?.revokedApprovalCount} approvals)`,
           );
@@ -402,6 +405,8 @@ export class NetureSupplierLifecycleService {
         };
       }).then(async (result) => {
         if (result.success) {
+          // Invalidate again after commit, before notifying the restored account.
+          if (result.data?.userId) invalidateRoles(result.data.userId as string);
           logger.info(`[NetureSupplierService] Supplier reactivated: ${supplierId} by ${adminUserId}`);
           // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
           // 재활성화 알림 — 커밋 성공 + role 복구 후 fire-and-forget. role 이 복구되어 /supplier/dashboard guard 통과.

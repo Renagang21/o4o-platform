@@ -68,3 +68,7 @@ TODO를 먼저 작성하고, 활성 서비스 catalog·정본·실제 route/guar
 기준 main `663e2c7d703ab67f19baf7e4482f85ad58c713aa`를 작업 branch에 merge했다. PR #685의 커뮤니티 전용 회원·활동/포럼 삭제 계획과 실행 API, PR #686의 협동조합 운영 workspace를 보존했다. 따라서 위 조사 시점의 활동 전체 삭제 미구현 판정은 커뮤니티 전용 경로에 일괄 적용하지 않는다. 커뮤니티는 전용 삭제 계획·참조 차단·원자 실행이 구현됐으며, 공통 가입 정리와 다른 서비스의 활동 삭제 후속은 별개다.
 
 통합 후 권한·삭제 경계 API 5 suites/92 tests와 Neture production build가 통과했다. Neture의 CarePharm 라우트와 신규 operator 상품 정리 라우트를 함께 확인했다. 이번 변경에는 신규 schema/migration이 없다. PR required CI·리뷰와 배포 결과는 GitHub PR/Actions의 실제 결과로 판정한다.
+
+### PR #687 리뷰 보완
+
+Codex의 LMS 물리 컬럼명(P1)과 공급자 role cache 커밋 경계(P2) 지적을 수정했다. 강의 잠금 조회는 migration의 `service_key`를 사용한다. 공급자 비활성화·재활성화는 같은 transaction의 역할 쓰기를 유지하면서 커밋 완료 후 role cache를 다시 무효화한다. 커밋 전 동시 조회로 이전 역할이 캐시에 재유입되는 회귀를 양 전이에 추가했으며 관련 2 suites/67 tests가 통과했다. 이 검증은 대역 transaction/실제 프로세스 캐시 검증이며 실제 PostgreSQL 동시 실행 검증을 대신하지 않는다.

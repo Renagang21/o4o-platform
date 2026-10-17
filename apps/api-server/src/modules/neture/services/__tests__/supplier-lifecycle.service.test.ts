@@ -5,6 +5,7 @@ import { NetureSupplierBusinessService } from '../supplier-business.service.js';
 import { SupplierStatus } from '../../entities/index.js';
 import { demoAccountService, DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../../services/auth/demo-account.service.js';
 import { roleAssignmentService } from '../../../auth/services/role-assignment.service.js';
+import { getCachedRoles, setCachedRoles } from '../../../auth/utils/role-cache.js';
 import { notificationService } from '../../../../services/NotificationService.js';
 import { getNetureMainMembershipStatus } from '../neture-main-membership.js';
 import { organizationOpsService } from '../../../organization/services/organization-ops.service.js';
@@ -221,6 +222,24 @@ describe('supplier lifecycle contracts', () => {
     await expect(service[method](supplier.id, 'fixture-admin', 'Fixture reason')).rejects.toThrow('audit unavailable');
     expect(events).toContain('rollback'); expect(events).not.toContain('commit');
     expect(notificationService.createNotification).not.toHaveBeenCalled();
+  });
+
+  it.each(['deactivateSupplier', 'reactivateSupplier'] as const)('%s clears roles repopulated by a concurrent pre-commit read', async method => {
+    locked.status = method === 'deactivateSupplier' ? 'ACTIVE' : 'INACTIVE';
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async callback => {
+      const result = await callback(manager);
+      // Another /auth/me reads the old committed roles after the role writer's invalidation.
+      setCachedRoles('fixture-user', method === 'deactivateSupplier' ? ['neture:supplier'] : []);
+      events.push('commit');
+      return result;
+    });
+    (notificationService.createNotification as jest.Mock).mockImplementation(async () => {
+      expect(getCachedRoles('fixture-user')).toBeNull();
+      events.push('notify');
+    });
+    expect(await service[method](supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: true });
+    expect(getCachedRoles('fixture-user')).toBeNull();
+    expect(events.indexOf('commit')).toBeLessThan(events.indexOf('notify'));
   });
 
   it('notification failure preserves a successful state transition', async () => {
