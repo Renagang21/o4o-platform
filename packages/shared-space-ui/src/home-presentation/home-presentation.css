@@ -486,3 +486,27 @@
     transition: none !important;
   }
 }
+
+/* Public Heroes span the usable viewport, including inside constrained service layouts.
+   Measure clientWidth rather than 100vw so desktop scrollbars never add horizontal overflow.
+   The operator's inline preview continues to use the contained HomeHeroView. */
+.home-hero-frame {
+  width: 100%;
+  min-width: 0;
+}
+.home-hero.home-hero-full {
+  width: var(--home-page-width, 100%);
+  max-width: none;
+  margin-inline-start: calc(-1 * var(--home-page-left, 0px));
+  margin-inline-end: 0;
+  border-radius: 0;
+  border-inline: 0;
+  padding-inline: clamp(24px, 4vw, 64px);
+}
+.home-hero-full > .home-hero-main,
+.home-hero-full > .home-hero-actions,
+.home-hero-full > .home-hero-controls,
+.home-hero-full > .home-hero-context {
+  max-width: 1180px;
+  margin-inline: auto;
+}

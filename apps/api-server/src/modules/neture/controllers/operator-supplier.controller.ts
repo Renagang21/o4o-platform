@@ -1,3 +1,4 @@
+import { listSupplierActiveFundings } from '../services/supplier-active-fundings.service.js';
 /**
  * Neture Operator Supplier Controller
  *
@@ -75,6 +76,16 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
 
   const review = createSupplierReviewHandlers(dataSource);
   router.get('/suppliers/review-requests', review.operatorQueue);
+  router.get('/suppliers/:id/active-fundings', async (req, res) => {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(req.params.id)) {
+      return res.status(400).json({success:false,error:'공급자 대상을 확인해 주세요.'});
+    }
+    try {
+      res.json({success:true,data:await listSupplierActiveFundings(dataSource, req.params.id)});
+    } catch {
+      res.status(500).json({success:false,error:'진행 펀딩 조회 실패'});
+    }
+  });
   router.get('/suppliers/:id/review-requests', review.operatorList);
   router.post('/suppliers/:id/review-requests', review.create);
   router.post('/suppliers/:id/review-requests/:requestId/resolve', review.resolve);

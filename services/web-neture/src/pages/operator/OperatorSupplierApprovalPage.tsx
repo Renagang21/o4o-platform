@@ -1,3 +1,4 @@
+import SupplierActiveFundings from '../../components/supplier/SupplierActiveFundings';
 /**
  * OperatorSupplierApprovalPage — 공급자 승인 (Operator scope)
  *
@@ -338,7 +339,8 @@ export default function OperatorSupplierApprovalPage() {
       >
         {actionMessage?.type === 'error' && <p role="alert" className="mb-3 text-red-700">{actionMessage.text}</p>}
         {drawer && (
-          <><SupplierReviewRequestsPanel key={drawer.id} supplierId={drawer.id} operator disabled={busy || editing || drawer.status === 'INACTIVE'} onBusyChange={onReviewBusy} />
+          <><SupplierActiveFundings supplierId={drawer.id} />
+          <SupplierReviewRequestsPanel key={drawer.id} supplierId={drawer.id} operator disabled={busy || editing || drawer.status === 'INACTIVE'} onBusyChange={onReviewBusy} />
           <SupplierDetailBody
             supplier={drawer}
             onOpenCategories={() => { if (!reviewLock.current) openCategories(drawer); }}

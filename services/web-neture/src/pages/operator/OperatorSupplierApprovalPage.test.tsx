@@ -1,3 +1,4 @@
+vi.mock('../../components/supplier/SupplierActiveFundings',()=>({default:()=>null}));
 import { supplierReviewApi } from '../../lib/api/supplierReview';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';

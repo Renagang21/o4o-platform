@@ -51,7 +51,7 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
   recruiting: {
     title: '참여자 모집 중입니다',
-    desc: '모집 기간이 끝나거나 정원이 채워지면 체험 진행 단계로 전환됩니다.',
+    desc: '모집 기한 만료·정원 충족 후 운영자가 오프라인 모금 결과를 확인합니다.',
   },
   development: {
     title: '체험이 진행 중입니다',
@@ -63,7 +63,7 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
   fulfilled: {
     title: '이행이 완료되었습니다',
-    desc: '모든 보상 지급이 완료되었습니다. 최종 결과를 확인하고 다음 유통참여형 펀딩을 준비하세요.',
+    desc: '진행 단계가 이행 완료로 등록되었습니다. 개별 입금·환급·이행 기록은 별도로 확인하세요.',
   },
   closed: {
     title: '유통참여형 펀딩이 종료되었습니다',

@@ -5,14 +5,18 @@ import { FundingError } from "./funding-workspace.service.js";
 // (auto target-missed closes from recruiting), so closed trials qualify only via a recorded fulfilled→closed step.
 const FULFILLMENT_STAGE_SQL = `(t.status IN ('outcome_confirming','fulfilled') OR (t.status = 'closed' AND COALESCE(t."statusHistory", '[]'::jsonb) @> '[{"from":"fulfilled","to":"closed"}]'::jsonb))`;
 
+const COLLECTIBLE = `NOT COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AND COALESCE(t."closeReason",'') NOT IN ('operator_stopped','operator_target_missed','auto_target_missed')`;
+const NOT_LEGACY_MISS = `t."closeReason" IS DISTINCT FROM 'auto_target_missed'`;
 // These are review hints derived from the ledger, not new payment or trial states/deadlines.
 export const FUNDING_EXCEPTION_SQL = {
-  payment_pending: `COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending')`,
-  payment_failed: `p."paymentStatus" = 'failed'`,
-  amount_missing: `p."paymentStatus" = 'paid' AND p."paidAmount" IS NULL`,
-  amount_mismatch: `p."paymentStatus" = 'paid' AND p."paidAmount" IS NOT NULL AND p."paidAmount" <> p."contributionAmount"`,
-  fulfillment_pending: `p."paymentStatus" = 'paid' AND COALESCE(p."rewardStatus", 'pending') <> 'fulfilled' AND ${FULFILLMENT_STAGE_SQL}`,
-  fulfilled_without_payment: `p."rewardStatus" = 'fulfilled' AND COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending','failed')`,
+  payment_pending: `${COLLECTIBLE} AND COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending')`,
+  payment_failed: `${COLLECTIBLE} AND p."paymentStatus" = 'failed'`,
+  amount_missing: `${NOT_LEGACY_MISS} AND p."paymentStatus" = 'paid' AND p."paidAmount" IS NULL`,
+  amount_mismatch: `${NOT_LEGACY_MISS} AND (p."contributionAmount" > 0 OR p."offlineState" ? 'pledgedAt') AND p."paymentStatus" = 'paid' AND p."paidAmount" IS NOT NULL AND p."paidAmount" <> p."contributionAmount"`,
+  fulfillment_pending: `${COLLECTIBLE} AND p."paymentStatus" = 'paid' AND COALESCE(p."rewardStatus", 'pending') <> 'fulfilled' AND ${FULFILLMENT_STAGE_SQL}`,
+  refund_pending: `p."paymentStatus"='paid' AND (COALESCE((p."offlineState"->>'withdrawn')::boolean,false) OR t."closeReason" IN ('operator_stopped','operator_target_missed','auto_target_missed')) AND COALESCE(p."paidAmount",0)>COALESCE((p."offlineState"->>'refundAmount')::numeric,0)`,
+  pledge_missing: `${COLLECTIBLE} AND p."paymentStatus"='paid' AND p."contributionAmount"=0 AND NOT (p."offlineState" ? 'pledgedAt')`,
+  fulfilled_without_payment: `${NOT_LEGACY_MISS} AND p."rewardStatus" = 'fulfilled' AND COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending','failed')`,
 } as const;
 export function fundingExceptionFilter(value: unknown) {
   if (value === undefined || value === "" || value === "all") return null;
@@ -48,7 +52,7 @@ export class FundingOperatorExceptionsService {
       array_remove(ARRAY[${flags}], NULL) AS types
       FROM market_trial_participants p JOIN market_trials t ON t.id = p."marketTrialId" LEFT JOIN users u ON u.id = p."participantId"
       WHERE t.status NOT IN ('draft','submitted')
-      AND t."closeReason" IS DISTINCT FROM 'auto_target_missed' AND (${conditions})
+      AND (${conditions})
       ORDER BY p."updatedAt" ASC, p.id ASC LIMIT 31 OFFSET $1`,
       [(page - 1) * 30],
     );
