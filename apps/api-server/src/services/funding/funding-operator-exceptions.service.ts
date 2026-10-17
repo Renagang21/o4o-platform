@@ -14,7 +14,7 @@ export const FUNDING_EXCEPTION_SQL = {
   amount_mismatch: `(p."contributionAmount" > 0 OR p."offlineState" ? 'pledgedAt') AND p."paymentStatus" = 'paid' AND p."paidAmount" IS NOT NULL AND p."paidAmount" <> p."contributionAmount"`,
   fulfillment_pending: `${COLLECTIBLE} AND p."paymentStatus" = 'paid' AND COALESCE(p."rewardStatus", 'pending') <> 'fulfilled' AND ${FULFILLMENT_STAGE_SQL}`,
   refund_pending: `p."paymentStatus"='paid' AND (COALESCE((p."offlineState"->>'withdrawn')::boolean,false) OR t."closeReason" IN ('operator_stopped','operator_target_missed')) AND COALESCE(p."paidAmount",0)>COALESCE((p."offlineState"->>'refundAmount')::numeric,0)`,
-  pledge_missing: `p."paymentStatus"='paid' AND p."contributionAmount"=0 AND NOT (p."offlineState" ? 'pledgedAt')`,
+  pledge_missing: `${COLLECTIBLE} AND p."paymentStatus"='paid' AND p."contributionAmount"=0 AND NOT (p."offlineState" ? 'pledgedAt')`,
   fulfilled_without_payment: `p."rewardStatus" = 'fulfilled' AND COALESCE(p."paymentStatus", 'unpaid') IN ('unpaid','pending','failed')`,
 } as const;
 export function fundingExceptionFilter(value: unknown) {

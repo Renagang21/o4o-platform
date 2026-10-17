@@ -385,4 +385,32 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     expect(kpi.successfulTrials).toBe(1);
     expect(kpi.totalRecruitingAmount).toBe(70);
   });
+  it("keeps withdrawn/stopped participants out of pledge reminders while retaining refund follow-up", async () => {
+    for (const [status, closeReason, withdrawn, expected] of [
+      ["development", null, false, true],
+      ["development", null, true, false],
+      ["closed", "operator_stopped", false, false],
+      ["closed", "operator_target_missed", false, false],
+    ] as const) {
+      await db.query(
+        'UPDATE market_trials SET status=$1,"closeReason"=$2 WHERE id=$3',
+        [status, closeReason, trial],
+      );
+      await db.query(
+        `UPDATE market_trial_participants SET "contributionAmount"=0,"offlineState"=jsonb_set("offlineState"-'pledgedAt','{withdrawn}',to_jsonb($1::boolean)) WHERE id=$2`,
+        [withdrawn, participant],
+      );
+      const service = new FundingOperatorExceptionsService(db);
+      expect(
+        (await service.list({ type: "pledge_missing" })).items.some(
+          (r: any) => r.participantId === participant,
+        ),
+      ).toBe(expected);
+      expect(
+        (await service.list({ type: "refund_pending" })).items.some(
+          (r: any) => r.participantId === participant,
+        ),
+      ).toBe(!expected);
+    }
+  });
 });

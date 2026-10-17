@@ -69,3 +69,5 @@ Node 22.18.0 / pnpm 10.25.0, frozen install 및 공유 패키지 build 후 검�
 Codex 리뷰 P1(기존 입금 API의 `refunded` 요청이 환급 상세 없이 순모금을 제외할 수 있음)을 반영했다. 누적 환급 기록이 없는 행의 직접 `refunded` 변경은 409 `OFFLINE_REFUND_RECORD_REQUIRED`로 차단한다. 오프라인 환급 이력이 있는 금액 정정은 잔액에 맞는 상태를 유지한다. 기존 API 호출의 거절/transaction rollback/순모금 보존을 검증했으며 관련 API·격리 SQL 3 suites / 52 tests PASS, TypeScript PASS다.
 
 Codex 리뷰 P2(기존 펀딩의 공급자 목록·상세가 이전 약정 합계 캐시를 표시할 수 있음)를 반영했다. 공급자 목록·결과 상세와 참여 상세도 공개 목록/상세와 동일한 read-only 원장 집계를 사용한다. API 응답의 실제 입금·환급 반영과 과거 캐시 불변을 검증했다. 관련 controller·격리 SQL 2 suites / 25 tests PASS, TypeScript PASS다.
+
+Codex 리뷰 P2(철회·중지 대상을 약정금 미등록 목록에도 안내할 수 있음)를 반영했다. `pledge_missing`에도 기존 collection 제외 조건을 적용했다. 진행 중/철회/운영자 중지/목표 미달 종료를 격리 SQL에서 비교해 약정 안내와 환급 확인 대상이 겹치지 않는 것을 확인했다. 조회 시 UUID 대소문자가 달라도 DB의 canonical ID를 기준으로 원장 금액을 찾도록 보완했다. controller·예외·격리 SQL 3 suites / 35 tests PASS(격리 SQL은 현재 13건), TypeScript PASS다.

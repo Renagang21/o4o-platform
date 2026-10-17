@@ -36,12 +36,12 @@ it('creation qualification delegates to the canonical supplier middleware, not J
 });
 
 it('uses recorded net deposits for supplier list and detail even when the legacy counter differs', async () => {
-  record={...record,status:TrialStatus.DEVELOPMENT,currentAmount:999,targetAmount:100,trialUnitPrice:100,createdAt:new Date(),updatedAt:new Date()};
+  record={...record,id:'a0000000-0000-4000-8000-000000000001',status:TrialStatus.DEVELOPMENT,currentAmount:999,targetAmount:100,trialUnitPrice:100,createdAt:new Date(),updatedAt:new Date()};
   repo.find.mockResolvedValue([record]);creator.mockResolvedValue(true);
-  ds.query.mockImplementation(async(sql:string)=>sql.includes('GROUP BY "marketTrialId"')?[{id:'project',amount:'40'}]:[]);
+  ds.query.mockImplementation(async(sql:string)=>sql.includes('GROUP BY "marketTrialId"')?[{id:record.id,amount:'40'}]:[]);
   const list=response();await MarketTrialController.getMyTrials({user:{id:'owner'}} as any,list);
   expect(list.json).toHaveBeenCalledWith(expect.objectContaining({data:[expect.objectContaining({currentAmount:40,amountRate:40})]}));
-  const detail=response();await MarketTrialController.getSupplierTrialResults({params:{id:'project'},user:{id:'owner'}} as any,detail);
+  const detail=response();await MarketTrialController.getSupplierTrialResults({params:{id:record.id.toUpperCase()},user:{id:'owner'}} as any,detail);
   expect(detail.json).toHaveBeenCalledWith(expect.objectContaining({data:expect.objectContaining({trial:expect.objectContaining({currentAmount:40,amountRate:40})})}));
   expect(ds.query.mock.calls.every(([sql]:[string])=>!/^\s*(INSERT|UPDATE|DELETE)/i.test(sql))).toBe(true);
 });

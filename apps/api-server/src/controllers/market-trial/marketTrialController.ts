@@ -437,7 +437,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? ''), recordedAmounts.get(id) ?? 0),
+        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? ''), recordedAmounts.get(evaluated.id) ?? 0),
       });
     } catch (error) {
       console.error('Get trial error:', error);
@@ -542,7 +542,7 @@ export class MarketTrialController {
         success: true,
         data: {
           forum: workspaceForum ?? null,
-          trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? ''), recordedAmounts.get(id) ?? 0), ...fundingReview(trial) },
+          trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? ''), recordedAmounts.get(trial.id) ?? 0), ...fundingReview(trial) },
           summary: {
             totalCount,
             productCount,
@@ -641,7 +641,7 @@ export class MarketTrialController {
           ...toParticipationDTO(participation),
           ...await MarketTrialController.ownOffline(participation.id,userId),
           ...settlementCalc,
-          trial: trial ? toTrialDTO(trial, forumMapping?.forumId, undefined, recordedAmounts.get(id) ?? 0) : undefined,
+          trial: trial ? toTrialDTO(trial, forumMapping?.forumId, undefined, recordedAmounts.get(trial.id) ?? 0) : undefined,
         },
       });
     } catch (error) {
