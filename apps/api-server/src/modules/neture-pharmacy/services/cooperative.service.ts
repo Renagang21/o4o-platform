@@ -1,4 +1,5 @@
 import type { DataSource } from "typeorm";
+import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
 
 /** No pharmacy membership, store ownership or federation authority is inferred here. */
 export class CooperativeService {
@@ -17,15 +18,19 @@ export class CooperativeService {
       WHERE m.user_id = $1 AND c.status = 'active' AND sf.status = 'active'`,
       [userId],
     );
-    const cooperativeOperators = await this.db.query(
-      `SELECT c.id AS "cooperativeId", op.user_id AS "userId"
+    const cooperativeOperators = (await hasCooperativeOperatorAccess(
+      this.db,
+      userId,
+    ))
+      ? await this.db.query(
+          `SELECT c.id AS "cooperativeId", op.user_id AS "userId"
       FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id
       JOIN semi_franchise_operators op ON op.semi_franchise_id = sf.id AND op.revoked_at IS NULL
       WHERE op.user_id = $1 AND c.status = 'active' AND sf.status = 'active'
-      AND EXISTS (SELECT 1 FROM role_assignments r WHERE r.user_id = op.user_id
-        AND r.role IN ('neture:operator','neture:admin') AND r.is_active = true)`,
-      [userId],
-    );
+      `,
+          [userId],
+        )
+      : [];
     return {
       userId,
       memberships,

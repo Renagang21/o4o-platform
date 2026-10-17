@@ -1,4 +1,5 @@
 import type { DataSource } from "typeorm";
+import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
 
 /** Explicitly authorized test fixture only. No password changes or platform role grants. */
 export async function provisionTestCooperative(
@@ -22,7 +23,7 @@ export async function provisionTestCooperative(
     );
     const users = await m.query(
       `SELECT id, lower(email) AS email FROM users
-      WHERE lower(email) IN ($1,$2) AND status = 'active' AND "isActive" = true FOR SHARE`,
+      WHERE lower(email) IN ($1,$2) AND status IN ('active','approved') AND "isActive" = true AND "isEmailVerified" = true FOR SHARE`,
       [operatorEmail, memberEmail],
     );
     const operator = users.find(
@@ -33,12 +34,8 @@ export async function provisionTestCooperative(
     );
     if (!operator || !member)
       throw new Error("COOP_TEST_ACTIVE_ACCOUNTS_REQUIRED");
-    const [role] = await m.query(
-      `SELECT 1 FROM role_assignments WHERE user_id = $1
-      AND role IN ('neture:admin','neture:operator') AND is_active = true`,
-      [operator.id],
-    );
-    if (!role) throw new Error("COOP_TEST_EXISTING_OPERATOR_ROLE_REQUIRED");
+    if (!(await hasCooperativeOperatorAccess(m, operator.id)))
+      throw new Error("COOP_TEST_EXISTING_OPERATOR_ROLE_REQUIRED");
     let [business] = await m.query(
       `SELECT id, key, name, organization_id, status FROM semi_franchises WHERE key = 'coop-test' FOR UPDATE`,
     );

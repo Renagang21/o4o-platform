@@ -10,7 +10,8 @@ The production entry now uses the common AuthClient/useServiceAuth email login, 
 Public directory and authenticated self-context are served by `/api/v1/neture/cooperatives` and `/cooperatives/me`.
 The directory binds an explicit cooperative slug to a semi-franchise business row. Personal membership uses
 `cooperative_memberships`, not pharmacy organization memberships. Multiple personal enrollments remain independent.
-Operator context requires both an active assigned business relationship and an existing active Neture operator/admin role.
+Operator context requires an active assigned business relationship, a currently valid Neture operator/admin role and
+canonical Neture main access. The same shared predicate is used by provisioning preflight.
 No federation grants, account creation, password changes, pharmacy membership or store ownership are introduced.
 The cooperative origin is added exactly to CORS and has its own session revocation scope (`coop`).
 Personal enrollment rows are included in the existing account-erasure owned-row registry and write fence.
@@ -41,7 +42,7 @@ The final down restores the previous expected schema fingerprint inside a rolled
 
 ## Validation
 
-- 69 backend tests: actual isolated PostgreSQL cooperative/supplier content tests, auth origin boundaries,
+- 73 backend tests: actual isolated PostgreSQL cooperative/supplier content tests, auth origin boundaries,
   existing login eligibility and account-erasure storage regressions.
 - 37 cooperative frontend tests, including failed-load handling, another user's snapshot rejection and clearing
   old assignments when authentication changes.
@@ -63,3 +64,10 @@ New Cloud Run public-invoker IAM, DNS, HTTPS certificate and LB host routing req
 The current cloud workspace has no configured GCP identity; GitHub Actions WIF is the supported deployment path.
 The environment network draft adds the target hostname, but that draft requires environment review/save/publication to activate.
 Personal membership application/review, federation enrollment operations and member community implementation remain separate work.
+
+## Review correction
+
+The first automatic review found that role validity dates and current Neture access were not reflected in the
+operator projection/provisioning check. Both paths now share role-period checks and the existing
+`getNetureMainMembershipStatus` policy. Regressions cover future/expired/inactive roles and explicit Neture suspension;
+verified normal accounts without a legacy membership row still follow the canonical main-access policy.

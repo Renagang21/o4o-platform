@@ -40,7 +40,7 @@ integration("individual cooperative identity on isolated PostgreSQL", () => {
       [outsider, `${outsider}@example.invalid`],
     ]) {
       await db.query(
-        `INSERT INTO users(id,email,status,"isActive") VALUES ($1,$2,'active',true)`,
+        `INSERT INTO users(id,email,status,"isActive","isEmailVerified") VALUES ($1,$2,'active',true,true)`,
         [id, email],
       );
     }
@@ -152,6 +152,51 @@ integration("individual cooperative identity on isolated PostgreSQL", () => {
     expect(
       (await new CooperativeService(db).session(member)).cooperativeOperators,
     ).toEqual([]);
+  });
+  it.each(["future", "expired", "inactive"])(
+    "rejects a %s operator role in session projection and provisioning",
+    async (state) => {
+      await db.query(
+        `UPDATE role_assignments SET valid_from=CASE WHEN $2='future' THEN now()+interval '1 day' ELSE now()-interval '1 day' END,
+      valid_until=CASE WHEN $2='expired' THEN now()-interval '1 hour' ELSE NULL END,
+      is_active=($2 <> 'inactive') WHERE user_id=$1`,
+        [operator, state],
+      );
+      try {
+        expect(
+          (await new CooperativeService(db).session(operator))
+            .cooperativeOperators,
+        ).toEqual([]);
+        await expect(
+          provisionTestCooperative(db, accounts, true),
+        ).rejects.toThrow("EXISTING_OPERATOR_ROLE_REQUIRED");
+      } finally {
+        await db.query(
+          `UPDATE role_assignments SET valid_from=now()-interval '1 day',valid_until=NULL,is_active=true WHERE user_id=$1`,
+          [operator],
+        );
+      }
+    },
+  );
+  it("rejects a suspended Neture account without issuing an apparent cooperative operator grant", async () => {
+    await db.query(
+      `INSERT INTO service_memberships(user_id,service_key,status) VALUES ($1,'neture','suspended')`,
+      [operator],
+    );
+    try {
+      expect(
+        (await new CooperativeService(db).session(operator))
+          .cooperativeOperators,
+      ).toEqual([]);
+      await expect(
+        provisionTestCooperative(db, accounts, true),
+      ).rejects.toThrow("EXISTING_OPERATOR_ROLE_REQUIRED");
+    } finally {
+      await db.query(
+        `DELETE FROM service_memberships WHERE user_id=$1 AND service_key='neture'`,
+        [operator],
+      );
+    }
   });
   it("hides suspended cooperatives and refuses to silently reactivate a suspended personal member", async () => {
     await db.query(
