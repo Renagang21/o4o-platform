@@ -127,9 +127,13 @@ function fakeQuery(sql: string, params?: any[]): any[] {
   return [];
 }
 
-function makeRepo(kind: 'post' | 'comment' | 'like' | 'other') {
+function makeRepo(kind: 'post' | 'comment' | 'like' | 'forum' | 'other') {
   return {
     findOne: jest.fn(async ({ where }: any) => {
+      if (kind === 'forum') {
+        const f=state.forums.find(f=>where.id?f.id===where.id:f.slug===where.slug);
+        return f?{...f,serviceCode:f.service_code,forumType:f.forum_type}:null;
+      }
       if (kind === 'post') return state.posts.find((p) => p.id === where.id) || null;
       if (kind === 'comment') return state.comments.find((c) => c.id === where.id) || null;
       if (kind === 'like') {
@@ -139,6 +143,17 @@ function makeRepo(kind: 'post' | 'comment' | 'like' | 'other') {
       }
       return null;
     }),
+    createQueryBuilder: kind === 'forum' ? () => {
+      const filters:any={};
+      const qb:any={
+        where:(_sql:string,params:any)=>{Object.assign(filters,params);return qb;},
+        andWhere:(_sql:string,params:any)=>{Object.assign(filters,params);return qb;},
+        orderBy:()=>qb,
+        getMany:async()=>state.forums.filter(f=>(!filters.status||f.status===filters.status)
+          && (!filters.statuses||filters.statuses.includes(f.status)) && (!filters.ctxForumCodes||filters.ctxForumCodes.includes(f.service_code))),
+      };
+      return qb;
+    } : undefined,
     create: jest.fn((v: any) => ({ id: 'new-entity', ...v })),
     save: jest.fn(async (v: any) => {
       if (kind === 'post') state.savedPosts.push({ ...v });
@@ -157,6 +172,7 @@ jest.mock('../database/connection.js', () => ({
       if (name === 'ForumPost') return makeRepo('post');
       if (name === 'ForumComment') return makeRepo('comment');
       if (name === 'ForumPostLike') return makeRepo('like');
+      if (name === 'ForumCategoryRequest') return makeRepo('forum');
       return makeRepo('other');
     },
     query: jest.fn(async (sql: string, params?: any[]) => fakeQuery(sql, params)),
@@ -164,6 +180,7 @@ jest.mock('../database/connection.js', () => ({
 }));
 
 import { ForumCommentController } from '../controllers/forum/ForumCommentController.js';
+import { ForumDirectoryController } from '../controllers/forum/ForumDirectoryController.js';
 import { ForumPostController } from '../controllers/forum/ForumPostController.js';
 import type { ForumContext } from '../middleware/forum-context.middleware.js';
 
@@ -743,4 +760,26 @@ it('community board suspension blocks direct scoped targets until reopened',asyn
  expect(await new Access().canAccess(forum.id,ctx)).toBe(false);
  forum.status='completed';
  expect(await new Access().canAccess(forum.id,ctx)).toBe(true);
+});
+
+
+describe('community suspended boards stay out of member-facing directories',()=>{
+ const id='11111111-1111-4111-8111-111111111111';
+ const ctx:ForumContext={scope:'community',communityKey:'community',forumStorageCodes:['community']};
+ beforeEach(()=>{state.forums.push({...KPA_FORUM,id,slug:'paused',service_code:'community',status:'archived'});});
+ it.each([id,'paused'])('direct directory lookup by %s is hidden',async key=>{
+  const {res,out}=makeRes();await new ForumDirectoryController().getForum(makeReq({user:USER,ctx,params:{id:key}}),res);
+  expect(out.status).toBe(404);
+ });
+ it('ignores includeInactive in the community member directory and shows the board again on reopen',async()=>{
+  const req=makeReq({user:USER,ctx});req.query={includeInactive:'true'};
+  const closed=makeRes();await new ForumDirectoryController().listForums(req,closed.res);expect(closed.out.body.data).toEqual([]);
+  state.forums.find(f=>f.id===id).status='completed';
+  const open=makeRes();await new ForumDirectoryController().listForums(req,open.res);expect(open.out.body.data).toHaveLength(1);
+ });
+ it('preserves another service directory includeInactive behavior',async()=>{
+  state.forums.find(f=>f.id===OTHER_FORUM.id).status='archived';
+  const req=makeReq({user:USER,ctx:{scope:'community',serviceCode:'neture'}});req.query={includeInactive:'true'};
+  const {res,out}=makeRes();await new ForumDirectoryController().listForums(req,res);expect(out.body.data).toHaveLength(1);
+ });
 });

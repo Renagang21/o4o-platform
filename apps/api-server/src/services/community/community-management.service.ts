@@ -56,8 +56,11 @@ async function memberDeletionTarget(db: Exec, actor: string, id: string): Promis
 
   if (!['suspended','withdrawn','rejected'].includes(member.status)) blockers.push('회원 이용을 먼저 정지하거나 탈퇴 처리해 주세요.');
   if (actor === id) blockers.push('자신의 서비스 데이터를 삭제할 수 없습니다.');
-  const roles = await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND is_active=true AND role IN ('community:admin','community:operator')`, [id]);
-  if (roles.length) blockers.push('중앙 관리에서 커뮤니티 운영 역할을 먼저 회수해 주세요.');
+  // Expired grants cannot confer authority again; preserve their history without blocking data deletion.
+  // Non-expired future grants remain protected: only central management may cancel a reserved operational role.
+  const roles = await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND is_active=true
+    AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP) AND role IN ('community:admin','community:operator')`, [id]);
+  if (roles.length) blockers.push('중앙 관리에서 현재 또는 예약된 커뮤니티 운영 역할을 먼저 회수해 주세요.');
   const owned = await db.query(`SELECT f.id FROM forum_category_requests f WHERE f.id IN (${boards}) AND status IN ('completed','archived')
     AND (requester_id=$1 OR EXISTS (SELECT 1 FROM forum_category_members m WHERE m.forum_category_id=f.id AND m.user_id=$1 AND m.role='owner'))`, [id]);
   if (owned.length) blockers.push('소유 게시판을 먼저 정리하거나 소유권을 이전해 주세요.');
@@ -187,7 +190,8 @@ interface CommunityCounters { affected: {id:string}[]; parents: {id:string}[]; c
 async function captureCommunityCounters(db: Exec, id: string, selection: Selection): Promise<CommunityCounters> {
   const affected = await db.query(`SELECT DISTINCT "postId" AS id FROM forum_comment WHERE id=ANY($1::uuid[])
     UNION SELECT post_id AS id FROM forum_post_like WHERE id=ANY($2::uuid[])
-    UNION SELECT id FROM forum_post WHERE id IN (${servicePosts}) AND last_comment_by=$3`, [selection.forum_comment, selection.forum_post_like, id]);
+    UNION SELECT "targetId" AS id FROM forum_like WHERE id=ANY($3::uuid[]) AND "targetType"='post'
+    UNION SELECT id FROM forum_post WHERE id IN (${servicePosts}) AND last_comment_by=$4`, [selection.forum_comment, selection.forum_post_like, selection.forum_like, id]);
   const parents = await db.query(`SELECT DISTINCT "parentId" AS id FROM forum_comment
     WHERE id=ANY($1::uuid[]) AND "parentId" IS NOT NULL`, [selection.forum_comment]);
   const commentLikes = await db.query(`SELECT "targetId" AS id,count(*)::int AS n FROM forum_like
@@ -203,7 +207,10 @@ async function deleteSelectedTable(db: Exec, table: Table, ids: string[]) {
 async function refreshCommunityCounters(db: Exec, counters: CommunityCounters) {
   const {affected,parents,commentLikes} = counters;
   if (affected.length) await db.query(`UPDATE forum_post p SET "commentCount"=(SELECT count(*) FROM forum_comment c WHERE c."postId"=p.id AND c.status='publish'),
-    "likeCount"=(SELECT count(*) FROM forum_post_like l WHERE l.post_id=p.id),
+    "likeCount"=(SELECT count(*) FROM (
+      SELECT l.user_id FROM forum_post_like l WHERE l.post_id=p.id
+      UNION SELECT l."userId" FROM forum_like l WHERE l."targetType"='post' AND l."targetId"=p.id
+    ) post_likers),
     (last_comment_at,last_comment_by)=(SELECT c.created_at,c.author_id FROM forum_comment c WHERE c."postId"=p.id AND c.status='publish' ORDER BY c.created_at DESC,c.id DESC LIMIT 1)
     WHERE p.id=ANY($1::uuid[])`, [affected.map((p: {id: string}) => p.id)]);
   if (parents.length) await db.query(`UPDATE forum_comment c SET "replyCount"=(SELECT count(*) FROM forum_comment r WHERE r."parentId"=c.id AND r.status='publish')

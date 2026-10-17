@@ -55,11 +55,11 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 
 ## 검증·통합 상태
 
-- 격리 PostgreSQL 기능 검증: 22 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
-- API focused: 6 suites / 124 tests PASS (위 PostgreSQL 22개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
+- 격리 PostgreSQL 기능 검증: 26 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
+- API focused: 6 suites / 132 tests PASS (위 PostgreSQL 26개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
 - 웹 focused: 4 files / 106 tests PASS.
-- 공유 회원 UI 전체: 21 files / 166 tests PASS (직접 소비처뿐 아니라 공통 모듈 회귀 포함).
-- Neture 웹 전체: 122 files / 1100 tests PASS.
+- 공유 회원 UI 전체: 22 files / 171 tests PASS (직접 소비처뿐 아니라 공통 모듈 회귀 포함).
+- Neture 웹 전체: 124 files / 1112 tests PASS.
 - 데스크톱 1440px / 모바일 390px × admin/operator: 메뉴·직접 URL·이전 포럼 URL·이용 상태 API 응답, 가로 넘침 0·런타임 오류 0 PASS (로컬 fixture).
 - API/Neture production build, ESLint, 문서 민감정보 검사·TypeORM entity guard·diff check PASS.
 - CI/통합·배포 결과는 확정 뒤 갱신한다.
@@ -86,6 +86,15 @@ SonarCloud가 지적한 함수 복잡도·문자열 정렬·unknown 상태 값 �
 삭제는 종속 테이블 → 원장 순서의 Promise chain으로 직렬 실행한다. 집계 갱신도 같은 트랜잭션에 남긴다.
 SonarJS 로컬 cognitive-complexity 기준15 검사에서 변경 파일4개 모두 지적0건이다.
 API124개, 관련 웹61개, 공유 Forum 경계34개를 재검증했고 공식 품질 분석은 최신 커밋에서 확인한다.
+
+## 후속 리뷰 보정
+
+- 중지 게시판의 UUID/slug 상세와 includeInactive 회원 목록도 차단하고, 전용 운영 목록은 중지 게시판을 유지한다.
+- 만료된 운영 역할은 삭제 차단에서 제외한다. 비활성·만료 역할의 중앙 이력은 유지한다.
+  미래 예약 역할은 현재 행위 권한과 별개의 중앙 지정 보호 대상이므로 취소 전까지 삭제를 차단한다.
+  미래 지정을 서비스 관리자의 데이터 삭제로 자동 취소하거나, 남겨 둔 예약 권한이 재가입 뒤 살아나는 상황을 피한다.
+- 기존 forum_like의 게시글 반응도 집계 갱신 대상에 넣고, 두 좋아요 원장을 사용자 기준으로 합쳐 중복을 제외한다.
+- 전용 DB26개와 API 관련132개가 통과했다. 다른 서비스의 includeInactive 동작을 유지하는 회귀도 확인했다.
 
 ## 문서 정합
 

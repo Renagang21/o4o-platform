@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'node:crypto';
-import { setCommunityBoardStatus, planCommunityDeletion, applyCommunityDeletion } from '../community-management.service.js';
+import { listManagedCommunityBoards, setCommunityBoardStatus, planCommunityDeletion, applyCommunityDeletion } from '../community-management.service.js';
 const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
 (fixture ? describe : describe.skip)('community operations and admin deletion (PostgreSQL)',()=>{
  const schema=`community_management_${randomUUID().replaceAll('-','')}`;
@@ -39,7 +39,10 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
  const apply=(actor:string,kind:'boards'|'members',id:string,digest:string)=>db.transaction('SERIALIZABLE',m=>applyCommunityDeletion(m,actor,kind,id,digest));
  async function post(forum=board,author=member){const id=randomUUID();await db.query('INSERT INTO forum_post(id,forum_id,author_id) VALUES($1,$2,$3)',[id,forum,author]);return id;}
  it('operator suspends and reopens a board while retaining its posts',async()=>{
-  const id=await post();for(const status of ['archived','completed'])await db.transaction(m=>setCommunityBoardStatus(m,operator,board,status));
+  const id=await post();for(const status of ['archived','completed']) {
+   await db.transaction(m=>setCommunityBoardStatus(m,operator,board,status));
+   if(status==='archived') expect(await listManagedCommunityBoards(db,operator)).toEqual([expect.objectContaining({id:board,status:'archived'})]);
+  }
   expect(await db.query('SELECT id FROM forum_post')).toEqual([{id}]);
  });
  it.each(['community:operator','neture:admin','platform:super_admin'])('denies permanent deletion to %s',async role=>{
@@ -147,6 +150,25 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   await db.query('UPDATE forum_post SET last_comment_by=$1,last_comment_at=NOW() WHERE id=$2',[member,surviving]);
   const p=await plan(admin,'members',member);await apply(admin,'members',member,p.digest);
   expect(await db.query('SELECT last_comment_by,last_comment_at,"commentCount" FROM forum_post WHERE id=$1',[surviving])).toEqual([{last_comment_by:null,last_comment_at:null,commentCount:0}]);
+ });
+
+
+ it.each([false,true])('expired roles allow deletion; unrevoked future reservations require central cancellation (future=%s)',async future=>{
+  await db.query(`INSERT INTO role_assignments(user_id,role,is_active,valid_from,valid_until)
+    VALUES($1,'community:operator',true,CASE WHEN $2 THEN NOW()+INTERVAL '1 day' ELSE NOW()-INTERVAL '2 days' END,
+    CASE WHEN $2 THEN NULL ELSE NOW()-INTERVAL '1 day' END)`,[member,future]);
+  const p=await plan(admin,'members',member);
+  if(future){expect(p.blockers.some(message=>message.includes('예약된 커뮤니티 운영 역할'))).toBe(true);}
+  else{expect(p.blockers).toEqual([]);await apply(admin,'members',member,p.digest);expect(await db.query("SELECT id FROM service_memberships WHERE user_id=$1 AND service_key='community'",[member])).toHaveLength(0);}
+ });
+ it.each([false,true])('refreshes legacy-only post reactions and deduplicates mixed like ledgers (mixed=%s)',async mixed=>{
+  const surviving=await post(board,other);
+  await db.query(`INSERT INTO forum_like("targetType","targetId","userId") VALUES('post',$1,$2),('post',$1,$3)`,[surviving,member,other]);
+  if(mixed)await db.query('INSERT INTO forum_post_like(post_id,user_id) VALUES($1,$2),($1,$3)',[surviving,other,admin]);
+  await db.query('UPDATE forum_post SET "likeCount"=$2 WHERE id=$1',[surviving,mixed?3:2]);
+  const p=await plan(admin,'members',member);await apply(admin,'members',member,p.digest);
+  expect(await db.query('SELECT "likeCount" FROM forum_post WHERE id=$1',[surviving])).toEqual([{likeCount:mixed?2:1}]);
+  expect(await db.query('SELECT "userId" FROM forum_like WHERE "targetId"=$1',[surviving])).toEqual([{userId:other}]);
  });
 
 });
