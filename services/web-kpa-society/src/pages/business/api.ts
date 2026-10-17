@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../../config/businessSite';
 import { authClient } from '../../contexts/AuthContext';
 
 export interface Business {
@@ -40,7 +41,7 @@ export const businessApi = {
 export const businessBase = (key: string) => `/businesses/${encodeURIComponent(key)}`;
 export type BusinessSection = 'participation' | 'materials' | 'forum' | 'tools';
 /** Public pharmacy URLs differ from the server-owned business/community identifiers. */
-export const businessPath = (key: string, section: BusinessSection): string => key === 'pharmacy'
+export const businessPath = (key: string, section: BusinessSection): string => key === BUSINESS_SITE.key
   ? { participation: '/my/participation', materials: '/materials', forum: '/community', tools: '/tools' }[section]
   : `${businessBase(key)}/${section}`;
 export const communityApiBase = (key: string) => `/communities/${encodeURIComponent(key)}`;

@@ -1,10 +1,10 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 /** Additive supplier Business workflow; no supplier approval/membership state changes. */
-export class CreateSupplierReviewRequests1792116000000
+export class CreateSupplierReviewRequests1792193756961
   implements MigrationInterface
 {
-  name = "CreateSupplierReviewRequests1792116000000";
+  name = "CreateSupplierReviewRequests1792193756961";
   async up(runner: QueryRunner): Promise<void> {
     await runner.query(`CREATE TABLE public.neture_supplier_review_requests (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

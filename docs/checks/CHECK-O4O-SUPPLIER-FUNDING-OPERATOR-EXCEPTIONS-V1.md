@@ -126,3 +126,19 @@ fixture 계정·식별자는 모두 합성 값이며 운영 DB·운영 API·실�
 | API · Neture production build / 변경 파일 ESLint | 통과 / 0 |
 
 운영 migration · main PR 병합 · 배포는 이 승인 범위가 아니며 수행하지 않았다.
+
+## 2차 origin/main 동기화 · migration epoch 갱신 (2026-10-17)
+
+#663 의 `CreateMemberPaidServiceEntitlements1792137600000` 이 main 에 들어와, 같은 승인 범위(작업 branch 동기화)로 `origin/main` `f95890981` 을 다시 일반 merge commit 으로 병합했다.
+
+- migration 계약 C09 는 incremental epoch 가 manifest 순서대로 **엄격히 증가**해야 한다. 이 branch 의 `1792116000000` 은 main 의 `1792137600000` 보다 작아 뒤에 둘 수 없으므로, 신규 migration 을 `CreateSupplierReviewRequests1792193756961` 로 다시 번호를 매겼다(파일명 · class · name 동시 변경, 본문 SQL 불변). 이 migration 은 운영에 적용된 적이 없어 이력 충돌은 없다. 앞 절들에 남은 `1792116000000` 표기는 당시 기록이다.
+- manifest · expected-schema-states 는 main 의 항목을 그대로 두고 그 뒤에 이 migration 을 붙였다.
+- 최종 fingerprint 재산출(격리 PostgreSQL 17): `086af046804b172646d4bec9acd190b3dcb076ff10650c2a1b1833df2592d375` / 6,694 lines (#663 상태 6,664 + 이번 테이블 30). 이전 값 `18c01a7f…` / 6,684 는 폐기했다.
+
+| 검증 (2차 병합 후) | 결과 |
+|---|---|
+| 격리 PostgreSQL 통합 | 9개 통과 (baseline + 30개 전 prefix fingerprint 일치 · 최종 down/up · 재실행 no-op · writer fence · 기존 회귀 7). 임시 DB 잔존 0 |
+| migration 계약 / deploy-risk source 계약 | 21 pass (C05 30개 순서 · C22 30개 상태 포함) / 36 pass |
+| API tsc · 관련 jest | 통과 · 5 suites 71 통과, 4 skip(분류기 spec env-gated) |
+| Neture tsc · 전체 Vitest | 통과 · 117개 파일 1,123개 통과. 첫 실행에서 빌드와 병렬로 돌린 `demoAccounts.test.ts` 가 5초 timeout(6.9초)으로 1건 실패했고, 단독 재실행 1.8초 통과 · 전체 단독 재실행 전부 통과를 확인했다 |
+| API · Neture production build / 변경 파일 ESLint | 통과 / 0 |

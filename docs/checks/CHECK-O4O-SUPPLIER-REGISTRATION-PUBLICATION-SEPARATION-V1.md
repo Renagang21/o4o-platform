@@ -139,6 +139,13 @@ Codex P2 2건과 CI blocker 는 6-1·6-2 의 수정으로 해소됐고, 병합 h
     [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §4 는 공급 가능을 공급자 범위 + 서비스 운영자 OSA 승인으로 정하므로,
     현재 `SellerService.getAvailableSupplyProducts` 가 OSA 를 조회하지 않는 동작을 테스트로 고정하지 않도록 그 기대를 제거했다.
     runtime 은 이 PR 에서 바꾸지 않으며, catalog 의 OSA 미적용은 별도 WO(`WO-O4O-SELLER-CATALOG-OSA-GATE-V1`)로 다룬다.
+  - **정정 (2026-10-17, PR #662 Codex P2)**: 위 "OSA 미적용" 판단은 틀렸다. 이 catalog 는 Neture 판매자(`/api/v1/neture/seller`) 축이고,
+    [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) §13-2 와
+    `apps/api-server/src/services/cart/offer-exposure-strategy.ts` 의 `neture` strategy 는 `approval_status`·`distribution_type`·`allowed_seller_ids` 만으로
+    노출을 판정하고 `offer_service_approvals` 를 쓰지 않는다. OSA 는 `approval` 축(kpa-society·k-cosmetics) 전용이다.
+    `allowed_seller_ids` 도 strategy 가 `buyerId`(사용자 id)와 비교하므로 catalog 의 `sellerId = req.user.id` 와 같은 축이다.
+    따라서 catalog 동작은 현행 계약과 일치하며 결함이 아니다. `WO-O4O-SELLER-CATALOG-OSA-GATE-V1` 은 등록하지 않고 철회했다.
+    테스트가 SERVICE 노출을 단언하지 않는 결정은 유지하고, 그 근거 주석만 Neture 축 기준으로 고쳤다.
 - 음성 대조: 등록 승인 UPDATE 의 `distribution_type` 재계산을 일시 제거하면 두 케이스 모두 `distribution_type: "PUBLIC"` 잔류로 FAIL, 복원 시 PASS.
   (일시 제거는 검증 전용 사본에서만 수행하고 즉시 원복했다.)
 

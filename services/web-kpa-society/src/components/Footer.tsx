@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../config/businessSite';
 /**
  * Footer — KPA Society 공개 푸터
  *
@@ -23,13 +24,13 @@ export function Footer() {
     <CommunitySiteFooter
       brand={{
         icon: '💊',
-        name: 'O4O 약국',
+        name: BUSINESS_SITE.name,
         tagline: 'AI · 운영자 자료 · 매장 도구를 연결해 작은 약국도 경쟁력을 만듭니다',
         accentColor: '#2563eb',
       }}
       sections={KPA_FOOTER_SECTIONS}
-      copyright="© 2026 Neture · O4O 약국"
-      legalSlot={<PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} />}
+      copyright={`© 2026 Neture · ${BUSINESS_SITE.name}`}
+      legalSlot={BUSINESS_SITE.key === 'pharmacy' ? <PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} /> : undefined}
     />
   );
 }

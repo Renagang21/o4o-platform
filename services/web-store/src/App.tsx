@@ -1,3 +1,4 @@
+import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
 import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
 /**
  * Unified Store Workspace 라우트 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥ · §8-3
@@ -94,8 +95,6 @@ const ForeignVisitorSalesSupportPaymentFailPage = named(() => import('./pages/ph
 const ForeignVisitorPartnersPage = named(() => import('./pages/pharmacy/ForeignVisitorPartnersPage'), 'ForeignVisitorPartnersPage');
 const ForeignVisitorPartnerQrCodesPage = named(() => import('./pages/pharmacy/ForeignVisitorPartnerQrCodesPage'), 'ForeignVisitorPartnerQrCodesPage');
 
-// ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
-
 // ── 매장 HUB ─────────────────────────────────────────────────────────────────
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
 const HubContentLibraryPage = named(() => import('./pages/pharmacy/HubContentLibraryPage'), 'HubContentLibraryPage');
@@ -188,6 +187,7 @@ function storeChildRoutes() {
         <Route path="marketing/pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
+        <Route path="staff-support" element={<StoreStaffSupportPage />} />
         <Route path="requests" element={<TabletRequestsPage />} />
         {/* 매장 자료함 · 콘텐츠 */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />

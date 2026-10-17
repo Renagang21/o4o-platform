@@ -90,7 +90,8 @@ import { CreateAiUsageReservations1791870434349 } from '../migrations/1791870434
 import { AddAssistantRunFrameUnderstanding1791970408318 } from '../migrations/1791970408318-AddAssistantRunFrameUnderstanding.js';
 
 import { SeparateSupplierRegistrationPublication1792110685889 } from '../migrations/1792110685889-SeparateSupplierRegistrationPublication.js';
-import { CreateSupplierReviewRequests1792116000000 } from '../migrations/1792116000000-CreateSupplierReviewRequests.js';
+import { CreateMemberPaidServiceEntitlements1792137600000 } from '../migrations/1792137600000-CreateMemberPaidServiceEntitlements.js';
+import { CreateSupplierReviewRequests1792193756961 } from '../migrations/1792193756961-CreateSupplierReviewRequests.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -121,7 +122,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateAiUsageReservations1791870434349,
   AddAssistantRunFrameUnderstanding1791970408318,
   SeparateSupplierRegistrationPublication1792110685889,
-  CreateSupplierReviewRequests1792116000000,
+  CreateMemberPaidServiceEntitlements1792137600000,
+  CreateSupplierReviewRequests1792193756961,
 ];
 
 export function incrementalMigrationNames(): string[] {

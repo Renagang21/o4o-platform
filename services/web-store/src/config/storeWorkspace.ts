@@ -52,6 +52,7 @@ const studioKeys = new Set([
 const useKeys = new Set([
   "store-execution",
   "tablet-requests",
+  "staff-support",
   "signage-schedules",
   "signage-player",
   "analytics-marketing",
@@ -283,6 +284,7 @@ export function workspaceGroups(
                 "고객이 남긴 상담 요청을 확인하고 처리합니다.",
                 ["tablet-requests"],
               ),
+              group("staff-support", "직원 현장 지원", "상품 위치와 짧은 안내를 확인하고 고객 요구를 간단히 기록합니다.", ["staff-support"]),
               group(
                 "analytics",
                 "이용 현황",

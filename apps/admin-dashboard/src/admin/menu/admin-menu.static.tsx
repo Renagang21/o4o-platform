@@ -122,7 +122,7 @@ export const adminMenuStatic: MenuItem[] = [
   //   product_approvals) 를 한 화면에 모은다. 백엔드 guard = platform:super_admin.
   // ============================================
   { id: 'platform-account-governance', label: '계정 · 역할 · 서비스 정책', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
-  { id: 'semi-franchise-registry', label: '세미프랜차이즈 · 담당 운영자', icon: <Layers className="w-5 h-5" />, path: '/admin/semi-franchises' },
+  { id: 'semi-franchise-registry', label: '약국 협력사업', icon: <Layers className="w-5 h-5" />, path: '/admin/semi-franchises' },
   {
     id: 'platform-hub',
     label: '플랫폼 HUB',

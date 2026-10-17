@@ -142,7 +142,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'Neture',
     domain: 'neture.co.kr',
     // CarePharm은 기존 계정 센터의 세션을 사용하며 독립 serviceKey를 만들지 않는다.
-    sessionDomains: ['carepharm.neture.co.kr'],
+    sessionDomains: ['carepharm.neture.co.kr', 'megapharm.neture.co.kr'],
     description: 'O4O 공급자 및 유통 플랫폼',
     joinEnabled: true,
     // SPECIAL — O4O 대표 진입(REPRESENTATIVE_ENTRY_SERVICE_KEY) · 공급자 축. 매장 identity 축이 없다

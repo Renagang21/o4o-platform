@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { CreateSupplierReviewRequests1792116000000 } from "../database/migrations/1792116000000-CreateSupplierReviewRequests.js";
+import { CreateSupplierReviewRequests1792193756961 } from "../database/migrations/1792193756961-CreateSupplierReviewRequests.js";
 import { ActionLog } from "@o4o/action-log-core";
 import { runCanonicalBootstrap } from "../database/bootstrap/bootstrap-runner.js";
 import { INCREMENTAL_MIGRATIONS } from "../database/incremental/manifest.js";
@@ -113,10 +113,10 @@ fixture("isolated supplier review and funding operations", () => {
     expect(triggers).toEqual([{ tgenabled: "O" }]);
     expect(await db.runMigrations({ transaction: "each" })).toEqual([]);
     await runner.startTransaction();
-    await new CreateSupplierReviewRequests1792116000000().down(runner);
+    await new CreateSupplierReviewRequests1792193756961().down(runner);
     const previous = await computeSchemaFingerprint(runner);
     expect(previous.hash).toBe(EXPECTED_SCHEMA_STATES.at(-2)!.fingerprint);
-    await new CreateSupplierReviewRequests1792116000000().up(runner);
+    await new CreateSupplierReviewRequests1792193756961().up(runner);
     expect((await computeSchemaFingerprint(runner)).hash).toBe(fp.hash);
     await runner.rollbackTransaction();
     await runner.release();
