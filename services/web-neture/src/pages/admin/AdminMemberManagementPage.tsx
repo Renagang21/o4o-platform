@@ -1,12 +1,12 @@
 /**
- * AdminMemberManagementPage — Neture admin 전용 회원 완전삭제 관리
+ * AdminMemberManagementPage — Neture admin 전용 회원 가입 관계 정리 관리
  *
  * WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1
  *
  * - 잘못 가입된 회원, 테스트 계정, 탈퇴 후 재가입 필요 회원 정리
- * - 완전삭제(hard delete): service_memberships + role_assignments 제거, users 비활성화
+ * - 가입 관계 정리(hard delete): 대상 서비스 가입·일반 역할 관계 정리, 공통 계정 유지
  * - 승인/반려/정지/비활성화(soft delete)는 /operator/members 에서 수행 (legacy: /operator/users)
- * - 단일 선택 시만 완전삭제 가능 (대량 삭제 제외)
+ * - 단일 선택 시만 가입 관계 정리 가능 (대량 삭제 제외)
  *
  * 진입: AdminRoute (neture:admin 또는 platform:super_admin)
  */
@@ -231,9 +231,9 @@ export default function AdminMemberManagementPage() {
       <div className="flex items-start gap-3 mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
         <ShieldAlert className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
         <div className="text-sm text-red-700 space-y-1">
-          <p className="font-semibold">admin 전용 회원관리 — 완전삭제 워크플로우</p>
+          <p className="font-semibold">admin 전용 회원관리 — 가입 관계 정리 워크플로우</p>
           <p>
-            잘못 가입된 회원, 테스트 계정 등을 완전삭제합니다.
+            해당 서비스의 가입·일반 역할 관계를 정리합니다. 공통 계정과 활동 기록은 유지됩니다.
             승인·반려·정지·비활성화(soft delete)는{' '}
             <a href="/operator/members" className="underline">운영자 회원관리</a>에서 수행하세요.
           </p>
@@ -306,7 +306,7 @@ export default function AdminMemberManagementPage() {
         </button>
       </div>
 
-      {/* ActionBar — 완전삭제 (단일 선택 시만 활성) */}
+      {/* ActionBar — 가입 관계 정리 (단일 선택 시만 활성) */}
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 mb-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg">
           <span className="text-sm text-slate-600">{selectedIds.size}명 선택됨</span>
@@ -321,10 +321,10 @@ export default function AdminMemberManagementPage() {
               onClick={handleHardDelete}
               disabled={selectedIds.size !== 1}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
-              title={selectedIds.size !== 1 ? '완전삭제는 1명 선택 시만 가능합니다' : '선택한 회원을 완전삭제합니다'}
+              title={selectedIds.size !== 1 ? '가입 관계 정리는 1명 선택 시만 가능합니다' : '선택한 회원을 가입 관계 정리합니다'}
             >
               <Trash2 className="w-4 h-4" />
-              {selectedIds.size === 1 ? '완전삭제' : '완전삭제 (1명만)'}
+              {selectedIds.size === 1 ? '가입 관계 정리' : '가입 관계 정리 (1명만)'}
             </button>
           )}
           <button

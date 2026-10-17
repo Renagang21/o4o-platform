@@ -30,18 +30,20 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
+import { forumOperationAccess } from '../../middleware/forum-operation-access.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { forumRequestService } from '../../services/forum/ForumRequestService.js';
-import { isServiceOperator } from '../../utils/role.utils.js';
+import { isServiceAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, ForumCategoryMember, PostStatus } from '@o4o/forum-core/entities';
+import { ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
 import logger from '../../utils/logger.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { mergeForumMetadataPatch } from '../../services/community/community-public-read-metadata.js';
-import { purgeForumAndDependents } from '../../services/forum/forumHardDelete.js';
+import { changeForumAvailability, hardDeleteForum } from '../../services/forum/forum-operation.service.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
 
 /**
  * WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
@@ -106,6 +108,7 @@ function requireServiceOperator(req: Request, res: Response, next: NextFunction)
 }
 
 router.use(requireServiceOperator);
+router.use(forumOperationAccess('operator'));
 
 // ============================================================================
 // REQUEST REVIEW — delegates to ForumRequestService
@@ -676,99 +679,14 @@ router.patch('/categories/:id', async (req: Request, res: Response): Promise<voi
   }
 });
 
-/** POST /categories/:id/deactivate — operator direct soft delete (status → archived) */
-router.post('/categories/:id/deactivate', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-    const userId = (req as AuthRequest).user?.id;
-    const { reason } = req.body;
-
-    if (!reason?.trim()) {
-      res.status(400).json({ success: false, error: '삭제 사유를 입력해주세요', code: 'REASON_REQUIRED' });
-      return;
-    }
-
-    const forum = await requestRepo().findOne({
-      where: { id: req.params.id, serviceCode },
-    });
-    if (!forum || !['completed', 'archived'].includes(forum.status)) {
-      res.status(404).json({ success: false, error: 'Forum not found for this service' });
-      return;
-    }
-
-    if (forum.status !== 'completed') {
-      res.status(400).json({ success: false, error: '이미 비활성화된 포럼입니다', code: 'ALREADY_INACTIVE' });
-      return;
-    }
-
-    forum.status = 'archived';
-    const metadataPatch = {
-      directDeactivatedAt: new Date().toISOString(),
-      directDeactivatedBy: userId,
-      directDeactivateReason: reason.trim(),
-      archivedAt: new Date().toISOString(),
-    };
-
-    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'archived');
-
-    // Fix B: cascade — archive all publish posts so they no longer appear in recent lists
-    const updateResult = await postRepo().update(
-      { forumId: req.params.id, status: PostStatus.PUBLISHED },
-      { status: PostStatus.ARCHIVED },
-    );
-    logger.info(`Forum ${forum.id} deactivated by operator ${userId} (reason: ${reason.trim()}, posts archived: ${updateResult.affected ?? 0})`);
-    await safeAudit(serviceCode, userId ?? null, 'forum.operator.soft_delete', {
-      forumId: forum.id,
-      forumName: forum.name,
-      serviceCode,
-      action: 'operator_soft_delete',
-      reason: reason.trim(),
-      actorUserId: userId ?? null,
-      actorRoles: (req as AuthRequest).user?.roles ?? [],
-      requestedBy: null,
-      beforeStatus: 'completed',
-      afterStatus: 'archived',
-      affectedCounts: { postsArchived: updateResult.affected ?? 0 },
-    });
-    res.json({ success: true, data: { id: forum.id, isActive: false } });
-  } catch (error: any) {
-    logger.error('Error deactivating forum:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
+/** Daily availability changes include tracked posts and required audit in one transaction. */
+router.post('/categories/:id/deactivate', async (req, res) => {
+  try { res.json({ success: true, data: await changeForumAvailability(AppDataSource, req.params.id, (req as any)._serviceCode, (req as AuthRequest).user!.id, false, req.body?.reason) }); }
+  catch (error) { const status = error instanceof OperationError ? error.status : 500; res.status(status).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 사용 중지 실패' }); }
 });
-
-/** POST /categories/:id/activate — reactivate archived forum (status → completed) */
-router.post('/categories/:id/activate', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-    const userId = (req as AuthRequest).user?.id;
-
-    const forum = await requestRepo().findOne({
-      where: { id: req.params.id, serviceCode },
-    });
-    if (!forum || !['completed', 'archived'].includes(forum.status)) {
-      res.status(404).json({ success: false, error: 'Forum not found for this service' });
-      return;
-    }
-
-    if (forum.status !== 'archived') {
-      res.status(400).json({ success: false, error: '이미 활성 상태인 포럼입니다', code: 'ALREADY_ACTIVE' });
-      return;
-    }
-
-    forum.status = 'completed';
-    const metadataPatch = {
-      reactivatedAt: new Date().toISOString(),
-      reactivatedBy: userId,
-    };
-
-    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'completed');
-    logger.info(`Forum ${forum.id} reactivated by operator ${userId}`);
-    res.json({ success: true, data: { id: forum.id, isActive: true } });
-  } catch (error: any) {
-    logger.error('Error reactivating forum:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
+router.post('/categories/:id/activate', async (req, res) => {
+  try { res.json({ success: true, data: await changeForumAvailability(AppDataSource, req.params.id, (req as any)._serviceCode, (req as AuthRequest).user!.id, true) }); }
+  catch (error) { const status = error instanceof OperationError ? error.status : 500; res.status(status).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 재개 실패' }); }
 });
 
 /** GET /categories/:id/delete-check — hard delete pre-flight check */
@@ -806,11 +724,12 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
     }
     const normalPostCount = postCount - orphanPostCount;
 
-    // 운영자 hard delete: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용
     const blockedReasons: string[] = [];
-    if (normalPostCount > 0) blockedReasons.push(`정상 게시글 ${normalPostCount}건이 남아 있어 삭제할 수 없습니다`);
+    if (!isServiceAdmin((req as AuthRequest).user?.roles || [], SERVICE_CODE_TO_RBAC_KEY[serviceCode])) blockedReasons.push('완전 삭제는 해당 서비스 admin 권한이 필요합니다');
+    if (forum.status !== 'archived') blockedReasons.push('먼저 포럼 사용을 중지해 주세요');
 
     const warnings: string[] = [];
+    if (normalPostCount > 0) warnings.push(`게시글 ${normalPostCount}건과 연결 댓글·좋아요·알림도 삭제됩니다`);
     if (orphanPostCount > 0) warnings.push(`고아 게시글 ${orphanPostCount}건이 자동 정리됩니다 (작성자 계정 없음)`);
     if (generalMemberCount > 0) warnings.push(`일반 멤버 ${generalMemberCount}명의 멤버십이 함께 삭제됩니다`);
     if (ownerCount > 0) warnings.push(`개설자 멤버십이 함께 삭제됩니다`);
@@ -835,219 +754,10 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
   }
 });
 
-/** DELETE /categories/:id/hard — operator permanent hard delete */
-router.delete('/categories/:id/hard', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-    const userId = (req as AuthRequest).user?.id;
-    const { reason } = req.body;
-
-    if (!reason?.trim()) {
-      res.status(400).json({ success: false, error: '삭제 사유를 입력해주세요', code: 'REASON_REQUIRED' });
-      return;
-    }
-
-    const forum = await requestRepo().findOne({
-      where: { id: req.params.id, serviceCode },
-    });
-    if (!forum || !['completed', 'archived'].includes(forum.status)) {
-      res.status(404).json({ success: false, error: 'Forum not found for this service' });
-      return;
-    }
-
-    // Re-check: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용
-    const postCount = await postRepo().count({ where: { forumId: req.params.id } });
-
-    if (postCount > 0) {
-      const orphanRows = await AppDataSource.query(
-        `SELECT COUNT(*)::int AS count
-         FROM forum_post fp
-         LEFT JOIN users u ON u.id = fp.author_id
-         WHERE fp.forum_id = $1 AND u.id IS NULL`,
-        [req.params.id],
-      );
-      const orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
-      const normalPostCount = postCount - orphanPostCount;
-
-      if (normalPostCount > 0) {
-        res.status(409).json({
-          success: false,
-          error: '정상 게시글이 남아 있어 영구 삭제를 할 수 없습니다',
-          code: 'HARD_DELETE_BLOCKED',
-          data: { blockedReasons: [`정상 게시글 ${normalPostCount}건이 남아 있습니다`], normalPostCount, orphanPostCount },
-        });
-        return;
-      }
-      // 고아 게시글만 남은 경우 → purge 에서 좋아요/알림/댓글/게시글까지 자동 정리
-    }
-
-    // WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1:
-    // 공유 purge 함수로 종속 데이터(게시글/댓글/좋아요/알림/멤버십)까지 트랜잭션 정리 후 포럼 제거.
-    const forumName = forum.name;
-    const beforeStatus = forum.status;
-    const counts = await AppDataSource.transaction((manager) => purgeForumAndDependents(manager, forum));
-    logger.info(`Forum ${req.params.id} (${forumName}) hard deleted by operator ${userId} (reason: ${reason.trim()}, counts: ${JSON.stringify(counts)})`);
-    await safeAudit(serviceCode, userId ?? null, 'forum.operator.hard_delete', {
-      forumId: req.params.id,
-      forumName,
-      serviceCode,
-      action: 'operator_hard_delete',
-      reason: reason.trim(),
-      actorUserId: userId ?? null,
-      actorRoles: (req as AuthRequest).user?.roles ?? [],
-      requestedBy: null,
-      beforeStatus,
-      afterStatus: 'deleted',
-      affectedCounts: counts,
-    });
-
-    res.json({ success: true, data: { id: req.params.id, name: forumName, hardDeleted: true, affectedCounts: counts } });
-  } catch (error: any) {
-    logger.error('Error hard deleting forum:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// ============================================================================
-// ANALYTICS — read-only aggregation queries
-// WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
-// ============================================================================
-
-/** GET /analytics/summary — KPI summary for the service */
-router.get('/analytics/summary', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-
-    // Forum stats from forum_category_requests
-    const forumStats = await requestRepo()
-      .createQueryBuilder('forum')
-      .select('COUNT(*) FILTER (WHERE forum.status IN (\'completed\', \'archived\'))::int', 'total')
-      .addSelect('COUNT(*) FILTER (WHERE forum.status = \'completed\')::int', 'active')
-      .where('forum.serviceCode = :serviceCode', { serviceCode })
-      .getRawOne();
-
-    const totalForums = forumStats?.total || 0;
-    const activeForums = forumStats?.active || 0;
-
-    // Post count — count posts by forum_id scoped to service forums
-    const forumIds = await getForumIdsForService(serviceCode);
-    let totalPosts = 0;
-    if (forumIds.length > 0) {
-      const postStats = await postRepo()
-        .createQueryBuilder('post')
-        .select('COUNT(*)::int', 'total')
-        .where('post.forumId IN (:...forumIds)', { forumIds })
-        .andWhere('post.status = :status', { status: PostStatus.PUBLISHED })
-        .getRawOne();
-      totalPosts = postStats?.total || 0;
-    }
-
-    // Request stats (all statuses, scoped by serviceCode)
-    const reqStats = await requestRepo()
-      .createQueryBuilder('r')
-      .select('r.status', 'status')
-      .addSelect('COUNT(*)::int', 'cnt')
-      .where('r.serviceCode = :serviceCode', { serviceCode })
-      .groupBy('r.status')
-      .getRawMany();
-
-    const statusCounts: Record<string, number> = {};
-    for (const row of reqStats) {
-      statusCounts[row.status] = row.cnt;
-    }
-
-    // Delete request stats — forums with pending delete request
-    let deleteRequestsPending = 0;
-    if (forumIds.length > 0) {
-      deleteRequestsPending = await requestRepo()
-        .createQueryBuilder('forum')
-        .where(`forum.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
-        .andWhere('forum.id IN (:...forumIds)', { forumIds })
-        .getCount();
-    }
-
-    res.json({
-      success: true,
-      data: {
-        totalForums,
-        activeForums,
-        totalPosts,
-        pendingRequests: statusCounts['pending'] || 0,
-        revisionRequests: statusCounts['revision_requested'] || 0,
-        approvedRequests: statusCounts['approved'] || 0,
-        rejectedRequests: statusCounts['rejected'] || 0,
-        deleteRequestsPending,
-      },
-    });
-  } catch (error: any) {
-    logger.error('Error getting forum analytics summary:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-/** GET /analytics/trend — daily request/approval trend (last 30 days) */
-router.get('/analytics/trend', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-    const days = Math.min(parseInt(req.query.days as string) || 30, 90);
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - days);
-
-    // Daily request counts
-    const daily = await requestRepo()
-      .createQueryBuilder('r')
-      .select(`TO_CHAR(r.created_at, 'YYYY-MM-DD')`, 'date')
-      .addSelect('COUNT(*)::int', 'requests')
-      .addSelect(`COUNT(*) FILTER (WHERE r.status = 'approved')::int`, 'approved')
-      .addSelect(`COUNT(*) FILTER (WHERE r.status = 'rejected')::int`, 'rejected')
-      .where('r.serviceCode = :serviceCode', { serviceCode })
-      .andWhere(`r.createdAt >= :fromDate`, { fromDate })
-      .groupBy(`TO_CHAR(r.created_at, 'YYYY-MM-DD')`)
-      .orderBy('date', 'ASC')
-      .getRawMany();
-
-    res.json({ success: true, data: { daily, days } });
-  } catch (error: any) {
-    logger.error('Error getting forum analytics trend:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-/** GET /analytics/activity — recent review activity */
-router.get('/analytics/activity', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const serviceCode = (req as any)._serviceCode;
-    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
-
-    // Recent reviewed requests
-    const reviewed = await requestRepo()
-      .createQueryBuilder('r')
-      .select([
-        'r.id', 'r.name', 'r.status', 'r.reviewerName',
-        'r.reviewComment', 'r.reviewedAt', 'r.requesterName',
-      ])
-      .where('r.serviceCode = :serviceCode', { serviceCode })
-      .andWhere('r.reviewedAt IS NOT NULL')
-      .orderBy('r.reviewedAt', 'DESC')
-      .limit(limit)
-      .getMany();
-
-    const activity = reviewed.map((r) => ({
-      id: r.id,
-      type: 'review' as const,
-      name: r.name,
-      status: r.status,
-      reviewerName: r.reviewerName,
-      reviewComment: r.reviewComment,
-      requesterName: r.requesterName,
-      timestamp: r.reviewedAt,
-    }));
-
-    res.json({ success: true, data: activity });
-  } catch (error: any) {
-    logger.error('Error getting forum analytics activity:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
+/** DELETE /categories/:id/hard — service admin permanent hard delete */
+router.delete('/categories/:id/hard', forumOperationAccess('admin'), async (req, res) => {
+  try { res.json({ success: true, data: await hardDeleteForum(AppDataSource, req.params.id, (req as any)._serviceCode, (req as AuthRequest).user!.id, req.body?.reason) }); }
+  catch (error) { const status = error instanceof OperationError ? error.status : 500; res.status(status).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 완전 삭제 실패' }); }
 });
 
 export default router;

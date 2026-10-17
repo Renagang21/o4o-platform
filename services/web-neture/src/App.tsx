@@ -1246,6 +1246,7 @@ function App() {
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
               {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 심사 · 담당 세미프랜차이즈 (neture:operator) */}
               <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
+              <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
               <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} forumHref={business => business.key === 'carepharm' ? '/communities/business%3Acarepharm/forum' : `/communities/${encodeURIComponent(business.community_key ?? `business:${business.key}`)}/forum`} />} />
               <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} />} />
               <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage businessKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : undefined} />} />

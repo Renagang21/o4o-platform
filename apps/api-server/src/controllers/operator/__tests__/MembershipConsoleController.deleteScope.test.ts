@@ -182,3 +182,9 @@ describe('deleteMember — 대상 범위는 명시한 serviceKey 1개', () => {
     expect(res.status).toHaveBeenCalledWith(404);
   });
 });
+
+it('hard relationship cleanup requires admin in the selected service, independent of another admin assignment', async () => {
+  const res = makeRes();
+  await controller.deleteMember(makeReq({ mode: 'hard', serviceKey: 'neture', isPlatformAdmin: false, serviceKeys: ['neture', 'kpa-society'], roles: ['neture:operator', 'kpa:admin'] }), res);
+  expect(res.status).toHaveBeenCalledWith(403); expect(mockDeleteMember).not.toHaveBeenCalled();
+});

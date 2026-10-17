@@ -6,7 +6,7 @@
  * 완전 삭제(hard delete)를 Operator 라우터와 분리한 admin-scoped API.
  * - 서버 측 권한 검사: isServiceAdmin(serviceCode) → {service}:admin 또는 platform:super_admin
  *   (일반 operator 는 URL/API 직접 호출로도 완전 삭제 불가)
- * - 기존 공통 DELETE /forum/operator/categories/:id/hard 는 변경하지 않는다(타 서비스 호환).
+ * - 기존 공통 DELETE /forum/operator/categories/:id/hard 역시 서비스 admin 권한을 검사한다.
  * - Neture Admin 화면은 본 admin 전용 API 만 호출한다.
  *
  * Mount: /api/v1/forum/admin
@@ -19,12 +19,14 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
+import { forumOperationAccess } from '../../middleware/forum-operation-access.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { isServiceAdmin } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, ForumCategoryMember, ForumCategoryRequest } from '@o4o/forum-core/entities';
-import { ActionLog, ActionLogService } from '@o4o/action-log-core';
-import { purgeForumAndDependents } from '../../services/forum/forumHardDelete.js';
+import { ActionLog } from '@o4o/action-log-core';
+import { changeForumAvailability, hardDeleteForum } from '../../services/forum/forum-operation.service.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
 import logger from '../../utils/logger.js';
@@ -44,6 +46,8 @@ const VALID_SERVICE_CODES = Object.keys(SERVICE_CODE_TO_RBAC_KEY);
 const FORUM_AUDIT_ACTION_KEYS = [
   'forum.delete_request.approve',
   'forum.operator.soft_delete',
+  'forum.operator.pause',
+  'forum.operator.resume',
   'forum.operator.hard_delete',
   'forum.admin.restore',
   'forum.admin.hard_delete',
@@ -70,28 +74,11 @@ function requireServiceAdmin(req: Request, res: Response, next: NextFunction): v
   next();
 }
 router.use(requireServiceAdmin);
+router.use(forumOperationAccess('admin'));
 
 const requestRepo = () => AppDataSource.getRepository(ForumCategoryRequest);
 const postRepo = () => AppDataSource.getRepository(ForumPost);
 const memberRepo = () => AppDataSource.getRepository(ForumCategoryMember);
-
-let _actionLog: ActionLogService | null = null;
-function actionLog(): ActionLogService {
-  if (!_actionLog) _actionLog = new ActionLogService(AppDataSource);
-  return _actionLog;
-}
-async function safeAudit(
-  serviceCode: string,
-  userId: string | null,
-  actionKey: string,
-  meta: Record<string, any>,
-): Promise<void> {
-  try {
-    await actionLog().logSuccess(serviceCode, userId, actionKey, { meta });
-  } catch (err: any) {
-    logger.warn(`[forum-admin-audit] failed to record ${actionKey}: ${err?.message || err}`);
-  }
-}
 
 /** 삭제 유형/사유/처리자/삭제일 을 metadata 로부터 도출 */
 function deriveDeleteInfo(meta: Record<string, any> | null | undefined): {
@@ -218,7 +205,7 @@ router.get('/forums/deleted', async (req: Request, res: Response): Promise<void>
     res.json({ success: true, data, count: data.length });
   } catch (error: any) {
     logger.error('Error listing deleted forums:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(error instanceof OperationError ? error.status : 500).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 처리에 실패했습니다.' });
   }
 });
 
@@ -253,9 +240,10 @@ router.get('/forums/:id/hard-delete-check', async (req: Request, res: Response):
     const normalPostCount = postCount - orphanPostCount;
 
     const blockedReasons: string[] = [];
-    if (normalPostCount > 0) blockedReasons.push(`정상 게시글 ${normalPostCount}건이 남아 있어 완전 삭제할 수 없습니다`);
+
 
     const warnings: string[] = [];
+    if (normalPostCount > 0) warnings.push(`게시글 ${normalPostCount}건과 연결 댓글·좋아요·알림도 삭제됩니다`);
     if (orphanPostCount > 0) warnings.push(`고아 게시글 ${orphanPostCount}건이 함께 삭제됩니다 (작성자 계정 없음)`);
     if (generalMemberCount > 0) warnings.push(`일반 멤버 ${generalMemberCount}명의 멤버십이 함께 삭제됩니다`);
     if (ownerCount > 0) warnings.push(`개설자 멤버십이 함께 삭제됩니다`);
@@ -276,7 +264,7 @@ router.get('/forums/:id/hard-delete-check', async (req: Request, res: Response):
     });
   } catch (error: any) {
     logger.error('Error checking admin hard delete eligibility:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(error instanceof OperationError ? error.status : 500).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 처리에 실패했습니다.' });
   }
 });
 
@@ -331,35 +319,11 @@ router.post('/forums/:id/restore', async (req: Request, res: Response): Promise<
       return;
     }
 
-    const meta = forum.metadata || {};
-    const beforeStatus = forum.status;
-    forum.status = 'completed';
-    forum.metadata = {
-      ...meta,
-      // 삭제 요청 상태 정리 (다시 삭제 요청 목록/삭제된 포럼 목록에 남지 않도록)
-      deleteRequestStatus: meta.deleteRequestStatus === 'approved' ? 'restored' : meta.deleteRequestStatus,
-      restoredAt: new Date().toISOString(),
-      restoredBy: userId,
-    };
-    const updated = await requestRepo().save(forum);
-
-    await safeAudit(serviceCode, userId ?? null, 'forum.admin.restore', {
-      forumId: forum.id,
-      forumName: forum.name,
-      serviceCode,
-      action: 'admin_restore',
-      reason: null,
-      actorUserId: userId ?? null,
-      actorRoles: (req as AuthRequest).user?.roles ?? [],
-      beforeStatus,
-      afterStatus: 'completed',
-      warnings,
-    });
-
-    res.json({ success: true, data: { id: updated.id, isActive: true, warnings } });
+    const result = await changeForumAvailability(AppDataSource, forum.id, serviceCode, userId!, true);
+    res.json({ success: true, data: { ...result, warnings: [...warnings, ...(result.warning ? [result.warning] : [])] } });
   } catch (error: any) {
     logger.error('Error restoring forum:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(error instanceof OperationError ? error.status : 500).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 처리에 실패했습니다.' });
   }
 });
 
@@ -390,55 +354,12 @@ router.delete('/forums/:id/hard', async (req: Request, res: Response): Promise<v
       return;
     }
 
-    // 정상 게시글 잔존 시 차단 (고아 게시글은 자동 정리)
-    const postCount = await postRepo().count({ where: { forumId: req.params.id } });
-    if (postCount > 0) {
-      const orphanRows = await AppDataSource.query(
-        `SELECT COUNT(*)::int AS count
-         FROM forum_post fp
-         LEFT JOIN users u ON u.id = fp.author_id
-         WHERE fp.forum_id = $1 AND u.id IS NULL`,
-        [req.params.id],
-      );
-      const orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
-      const normalPostCount = postCount - orphanPostCount;
-      if (normalPostCount > 0) {
-        res.status(409).json({
-          success: false,
-          error: '정상 게시글이 남아 있어 완전 삭제를 할 수 없습니다',
-          code: 'HARD_DELETE_BLOCKED',
-          data: { blockedReasons: [`정상 게시글 ${normalPostCount}건이 남아 있습니다`], normalPostCount, orphanPostCount },
-        });
-        return;
-      }
-    }
-
-    // 삭제 전 스냅샷 (row 제거 후에도 로그에 남기기 위함)
-    const forumName = forum.name;
-    const beforeStatus = forum.status;
-    const requestedBy = forum.metadata?.deleteRequestedBy || null;
-
-    const counts = await AppDataSource.transaction((manager) => purgeForumAndDependents(manager, forum));
-    logger.info(`Forum ${req.params.id} (${forumName}) HARD DELETED by admin ${userId} (reason: ${reason.trim()}, counts: ${JSON.stringify(counts)})`);
-
-    await safeAudit(serviceCode, userId ?? null, 'forum.admin.hard_delete', {
-      forumId: req.params.id,
-      forumName,
-      serviceCode,
-      action: 'admin_hard_delete',
-      reason: reason.trim(),
-      actorUserId: userId ?? null,
-      actorRoles: (req as AuthRequest).user?.roles ?? [],
-      requestedBy,
-      beforeStatus,
-      afterStatus: 'deleted',
-      affectedCounts: counts,
-    });
-
-    res.json({ success: true, data: { id: req.params.id, name: forumName, hardDeleted: true, affectedCounts: counts } });
+    const deleted = await hardDeleteForum(AppDataSource, forum.id, serviceCode, userId!, reason);
+    logger.info('Forum hard deleted by service admin', { forumId: forum.id, userId, counts: deleted.affectedCounts });
+    res.json({ success: true, data: deleted });
   } catch (error: any) {
     logger.error('Error admin hard deleting forum:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(error instanceof OperationError ? error.status : 500).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 처리에 실패했습니다.' });
   }
 });
 
@@ -467,7 +388,7 @@ router.get('/audit-logs', async (req: Request, res: Response): Promise<void> => 
     res.json({ success: true, data, count: data.length });
   } catch (error: any) {
     logger.error('Error listing forum audit logs:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(error instanceof OperationError ? error.status : 500).json({ success: false, error: error instanceof OperationError ? error.message : '포럼 처리에 실패했습니다.' });
   }
 });
 

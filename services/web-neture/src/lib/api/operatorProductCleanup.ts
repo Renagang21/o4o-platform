@@ -26,29 +26,26 @@ const BASE = '/neture/operator/product-cleanup';
 
 export const productCleanupApi = {
   async getDuplicateMasters(): Promise<DuplicateMaster[]> {
-    try {
-      const res = await api.get(`${BASE}/duplicate-masters`);
-      return res.data?.data || [];
-    } catch { return []; }
+    const res = await api.get(`${BASE}/duplicate-masters`);
+    if (!res.data?.success || !Array.isArray(res.data.data)) throw new Error('목록을 불러오지 못했습니다.');
+    return res.data.data;
   },
 
   async getMissingCategory(): Promise<MissingFieldItem[]> {
-    try {
-      const res = await api.get(`${BASE}/missing-category`);
-      return res.data?.data || [];
-    } catch { return []; }
+    const res = await api.get(`${BASE}/missing-category`);
+    if (!res.data?.success || !Array.isArray(res.data.data)) throw new Error('목록을 불러오지 못했습니다.');
+    return res.data.data;
   },
 
   async getMissingBrand(): Promise<MissingFieldItem[]> {
-    try {
-      const res = await api.get(`${BASE}/missing-brand`);
-      return res.data?.data || [];
-    } catch { return []; }
+    const res = await api.get(`${BASE}/missing-brand`);
+    if (!res.data?.success || !Array.isArray(res.data.data)) throw new Error('목록을 불러오지 못했습니다.');
+    return res.data.data;
   },
 
-  async mergeMasters(sourceMasterId: string, targetMasterId: string): Promise<{ success: boolean; data?: { offersMigrated: number; imagesMigrated: number }; error?: string }> {
+  async mergeMasters(sourceMasterId: string, targetMasterId: string, reason: string): Promise<{ success: boolean; data?: { offersMigrated: number; imagesMigrated: number }; error?: string }> {
     try {
-      const res = await api.post(`${BASE}/merge-masters`, { sourceMasterId, targetMasterId });
+      const res = await api.post(`${BASE}/merge-masters`, { sourceMasterId, targetMasterId, reason });
       return res.data;
     } catch (error: any) {
       return { success: false, error: error?.response?.data?.error || 'MERGE_FAILED' };
@@ -85,12 +82,9 @@ export const productCleanupApi = {
   },
 
   async getRecycleBin(page = 1, limit = 50): Promise<{ success: boolean; data?: RecycleBinItem[]; pagination?: { page: number; limit: number; total: number; totalPages: number } }> {
-    try {
-      const res = await api.get(`${BASE}/recycle-bin`, { params: { page, limit } });
-      return res.data;
-    } catch (error: any) {
-      return { success: false };
-    }
+    const res = await api.get(`${BASE}/recycle-bin`, { params: { page, limit } });
+    if (!res.data?.success || !Array.isArray(res.data.data) || !res.data.pagination) throw new Error('휴지통을 불러오지 못했습니다.');
+    return res.data;
   },
 
   async restore(offerId: string): Promise<{ success: boolean; error?: string }> {
@@ -102,9 +96,9 @@ export const productCleanupApi = {
     }
   },
 
-  async hardDelete(offerId: string): Promise<{ success: boolean; error?: string; blockReasons?: string[] }> {
+  async hardDelete(offerId: string, reason: string): Promise<{ success: boolean; error?: string; blockReasons?: string[] }> {
     try {
-      const res = await api.delete(`${BASE}/hard-delete/${offerId}`);
+      const res = await api.delete(`${BASE}/hard-delete/${offerId}`, { data: { reason } });
       return res.data;
     } catch (error: any) {
       const data = error?.response?.data;

@@ -47,7 +47,7 @@ export function AdminLayout() {
           isMobileOpen={mobileSidebarOpen}
           onMobileClose={() => setMobileSidebarOpen(false)}
         />
-        <main className="flex-1 lg:ml-[260px] min-h-screen">
+        <main className="flex-1 min-w-0 lg:ml-[260px] min-h-screen">
           <Outlet />
         </main>
       </div>

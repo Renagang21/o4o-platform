@@ -1,3 +1,5 @@
+import { hardDeleteLectureCourse } from '../services/lecture-course-cleanup.service.js';
+import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Router, Request, Response } from 'express';
 import { CourseController } from '../controllers/CourseController.js';
 import { LessonController } from '../controllers/LessonController.js';
@@ -16,14 +18,13 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture 접근 계약 (KPA guard · 서비스 allowlist 제거)
-import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';
+import { requireLectureLearner, requireLectureOperator, requireLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';
 import { lmsContextMiddleware } from '../utils/lms-service-scope.js';
 import { apiLimiter, ipBurstLimiter } from '../../../middleware/rateLimiter.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
 import { CourseService } from '../services/CourseService.js';
 import { AppDataSource } from '../../../database/connection.js';
-import logger from '../../../utils/logger.js';
 
 const router: Router = Router();
 
@@ -378,30 +379,15 @@ router.post('/operator/courses/:id/archive', ipBurstLimiter, requireAuth, apiLim
   return res.json({ success: true, data: { course: updated } });
 }));
 
-// DELETE /api/v1/lms/operator/courses/:id/hard — ARCHIVED only, cascaded hard delete
-router.delete('/operator/courses/:id/hard', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
-  const service = CourseService.getInstance();
-  const course = await service.getCourse(req.params.id);
-  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
-  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
-  const userRoles: string[] = (req as any).user?.roles || [];
-  if (course.status !== 'archived') {
-    return res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
+// DELETE /api/v1/lms/operator/courses/:id/hard — service admin only, ARCHIVED, transactional hard delete
+router.delete('/operator/courses/:id/hard', ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin, asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const data = await hardDeleteLectureCourse(AppDataSource, req.params.id, (req as any).user.id, req.body?.reason);
+    return res.json({ success: true, data });
+  } catch (error) {
+    if (error instanceof OperationError) return res.status(error.status).json({ success: false, code: error.code, error: error.message });
+    throw error;
   }
-  const courseId = course.id;
-  const title = course.title;
-  const db = AppDataSource;
-  await db.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId" = $1)`, [courseId]);
-  await db.query(`DELETE FROM lms_progress WHERE "lessonId" IN (SELECT id FROM lms_lessons WHERE "courseId" = $1)`, [courseId]);
-  await db.query(`DELETE FROM lms_quiz_attempts WHERE "quizId" IN (SELECT id FROM lms_quizzes WHERE "courseId" = $1)`, [courseId]);
-  await db.query(`DELETE FROM lms_quizzes WHERE "courseId" = $1`, [courseId]);
-  await db.query(`DELETE FROM lms_certificates WHERE "courseId" = $1`, [courseId]);
-  await db.query(`DELETE FROM lms_enrollments WHERE "courseId" = $1`, [courseId]);
-  await db.query(`DELETE FROM lms_events WHERE "courseId" = $1`, [courseId]);
-  await db.query(`DELETE FROM lms_lessons WHERE "courseId" = $1`, [courseId]);
-  await db.query(`DELETE FROM lms_courses WHERE id = $1`, [courseId]);
-  logger.info('[LmsOperator] COURSE_HARD_DELETED', { operatorId: (req as any).user?.id, courseId, title });
-  return res.json({ success: true, data: { deleted: true, id: courseId, title } });
 }));
 
 export default router;
