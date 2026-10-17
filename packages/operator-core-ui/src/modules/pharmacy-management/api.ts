@@ -74,6 +74,13 @@ export interface SemiFranchiseMembership {
 }
 
 export interface SupplyProposal {
+  productSpecification?: string | null;
+  productManufacturer?: string | null;
+  productBarcode?: string | null;
+  productSummary?: string | null;
+  productDescription?: string | null;
+  baseShippingFee?: number | null;
+  freeShippingThreshold?: number | null;
   id: string;
   status: string;
   unitPrice: number;

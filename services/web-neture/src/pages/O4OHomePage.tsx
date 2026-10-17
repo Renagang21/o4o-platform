@@ -2,7 +2,7 @@ import { api as homePresentationApi } from '../lib/apiClient';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 /**
  * O4O representative home. Canonical policy: O4O-HOME-SERVICE-DISCOVERY-V1.
- * 2026-10-17 user-directed presentation: full-width Hero → AI → personal workspace → service discovery → news.
+ * 2026-10-17 user-directed presentation: full-width Hero → joined services / public discovery → AI → news.
  * The existing AI request, attachment, session and membership checks remain the execution boundary.
  * Public discovery is independent of authentication and service membership.
  */
@@ -551,7 +551,7 @@ export default function O4OHomePage() {
           모바일도 같은 메뉴(작은 계정 메뉴). */}
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
         <Link to="/" aria-label="O4O 대표 홈" className="mr-auto text-2xl font-semibold tracking-tight text-slate-900 no-underline">O4O</Link>
-        {isAuthenticated && user && <Link to="/mypage" className="font-medium text-slate-800 no-underline">My Home</Link>}
+        {isAuthenticated && user && <Link to="/mypage" className="rounded-full border border-slate-200 px-4 py-2 font-medium text-slate-800 no-underline hover:bg-slate-50">My Home</Link>}
         {isAuthenticated && user ? (
           <div className="relative" ref={accountMenuRef}>
             <button
@@ -618,8 +618,10 @@ export default function O4OHomePage() {
       <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
 
       {canUseHomeWorkspace ? (
-        /* Hero 다음 실제 업무 순서는 AI → My Home → 서비스 탐색을 유지한다. */
+        /* 가입 서비스 우선, 개인 공간은 상단 계정 영역에서 진입한다. */
         <main className="flex flex-1 flex-col items-center px-4 pb-24">
+          <HomeEntryPanel servicesOnly user={user} data={entry.data} loading={entry.loading} error={entry.error} onReload={entry.reload} />
+          <ServiceDiscovery personalized data={entry.error || entry.loading ? null : entry.data} />
           <h2 className="mt-6 mb-0 text-lg font-semibold">O4O AI</h2>
           <p className="mt-2 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
@@ -632,21 +634,11 @@ export default function O4OHomePage() {
             </>
           )}
 
-          {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
-          <HomeEntryPanel
-            summary
-            user={user}
-            data={entry.data}
-            loading={entry.loading}
-            error={entry.error}
-            onReload={entry.reload}
-          />
-
-          <ServiceDiscovery />
           <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-3xl" />
         </main>
       ) : (
         <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-6 [word-break:keep-all] sm:pt-14">
+          <ServiceDiscovery />
           <section aria-label="서비스 시작" className="flex w-full max-w-2xl flex-col items-center text-center">
             {!authLoading && !hasPendingTerms && (
               <button
@@ -667,8 +659,6 @@ export default function O4OHomePage() {
             <p className="mt-2 mb-0 text-sm text-slate-500">질문하거나 필요한 업무를 요청할 수 있습니다.</p>
             {hasPendingTerms ? null : composerArea}
           </section>
-          <ServiceDiscovery />
-
           {/* 공개 소식 — 실제 글이 있을 때만(0건이면 빈 섹션을 두지 않는다). 로딩 · 오류는 그대로 보인다. */}
           <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-2xl text-left" />
         </main>

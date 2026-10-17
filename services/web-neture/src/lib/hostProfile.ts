@@ -128,6 +128,9 @@ export function decideHost(
     return { kind: 'external', href: `https://community.neture.co.kr${forumPath}${query.size ? `?${query}` : ''}${hash}` };
   }
 
+  // The business operator entry stays on CarePharm; its existing role guard and assigned-business API still apply.
+  if (profile === 'carepharm' && pathname === '/operator') return { kind: 'stay' };
+
   const managementOrigins: Record<string, string> = {
     '/operator/pharmacy-memberships': 'https://store.neture.co.kr',
     '/operator/semi-franchises': 'https://pharmacy.neture.co.kr',

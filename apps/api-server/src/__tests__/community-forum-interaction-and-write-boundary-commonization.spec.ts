@@ -105,9 +105,9 @@ function fakeQuery(sql: string, params?: any[]): any[] {
   // isForumInServiceScope
   if (s.includes('SELECT 1 FROM forum_category_requests')) {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 경계는 코드 집합(ANY($2::text[]))
-    const [forumId, codes] = params || [];
+    const [forumId, codes, activeCommunityOnly] = params || [];
     const set: string[] = Array.isArray(codes) ? codes : [codes];
-    return state.forums.some((f) => f.id === forumId && set.includes(f.service_code)) ? [1] : [];
+    return state.forums.some((f) => f.id === forumId && set.includes(f.service_code) && (!activeCommunityOnly || (f.status === 'completed' && !f.organization_id))) ? [1] : [];
   }
   // checkClosedForumAccess / hasForumModerationOverride / pin ownership
   if (s.includes('FROM forum_category_requests')) {
@@ -127,9 +127,13 @@ function fakeQuery(sql: string, params?: any[]): any[] {
   return [];
 }
 
-function makeRepo(kind: 'post' | 'comment' | 'like' | 'other') {
+function makeRepo(kind: 'post' | 'comment' | 'like' | 'forum' | 'other') {
   return {
     findOne: jest.fn(async ({ where }: any) => {
+      if (kind === 'forum') {
+        const f=state.forums.find(f=>where.id?f.id===where.id:f.slug===where.slug);
+        return f?{...f,serviceCode:f.service_code,forumType:f.forum_type}:null;
+      }
       if (kind === 'post') return state.posts.find((p) => p.id === where.id) || null;
       if (kind === 'comment') return state.comments.find((c) => c.id === where.id) || null;
       if (kind === 'like') {
@@ -139,6 +143,17 @@ function makeRepo(kind: 'post' | 'comment' | 'like' | 'other') {
       }
       return null;
     }),
+    createQueryBuilder: kind === 'forum' ? () => {
+      const filters:any={};
+      const qb:any={
+        where:(_sql:string,params:any)=>{Object.assign(filters,params);return qb;},
+        andWhere:(_sql:string,params:any)=>{Object.assign(filters,params);return qb;},
+        orderBy:()=>qb,
+        getMany:async()=>state.forums.filter(f=>(!filters.status||f.status===filters.status)
+          && (!filters.statuses||filters.statuses.includes(f.status)) && (!filters.ctxForumCodes||filters.ctxForumCodes.includes(f.service_code))),
+      };
+      return qb;
+    } : undefined,
     create: jest.fn((v: any) => ({ id: 'new-entity', ...v })),
     save: jest.fn(async (v: any) => {
       if (kind === 'post') state.savedPosts.push({ ...v });
@@ -157,6 +172,7 @@ jest.mock('../database/connection.js', () => ({
       if (name === 'ForumPost') return makeRepo('post');
       if (name === 'ForumComment') return makeRepo('comment');
       if (name === 'ForumPostLike') return makeRepo('like');
+      if (name === 'ForumCategoryRequest') return makeRepo('forum');
       return makeRepo('other');
     },
     query: jest.fn(async (sql: string, params?: any[]) => fakeQuery(sql, params)),
@@ -164,6 +180,7 @@ jest.mock('../database/connection.js', () => ({
 }));
 
 import { ForumCommentController } from '../controllers/forum/ForumCommentController.js';
+import { ForumDirectoryController } from '../controllers/forum/ForumDirectoryController.js';
 import { ForumPostController } from '../controllers/forum/ForumPostController.js';
 import type { ForumContext } from '../middleware/forum-context.middleware.js';
 
@@ -703,4 +720,66 @@ describe('Static regression guards', () => {
     const serviceForum = read('routes/forum/service-forum.routes.ts');
     expect(serviceForum).toContain('createServiceForumRouter');
   });
+});
+
+// Independent community moderation must come from its freshly resolved own service role.
+describe('independent community daily moderation authority', () => {
+ class ScopedPost extends ForumPostController {
+  protected async resolveForumPostInServiceScope(): Promise<any> { return state.posts[0] ?? null; }
+ }
+ class ScopedComment extends ForumCommentController {
+  protected async resolveForumCommentInServiceScope(): Promise<any> { return {comment:state.comments[0],post:state.posts[0]}; }
+ }
+ it.each([false,true])('post hiding requires community moderation authority, even for platform admin (%s)',async allowed=>{
+  state.posts=[post('community-post','community-board')];
+  const {res,out}=makeRes();
+  await new ScopedPost().deletePost(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'community-post'}}),res);
+  expect(out.status).toBe(allowed?200:403);expect(state.savedPosts).toHaveLength(allowed?1:0);
+  if(allowed)expect(state.savedPosts[0].status).toBe('archived');
+ });
+ it.each([false,true])('comment hiding follows the same community authority (%s)',async allowed=>{
+  state.posts=[post('community-post','community-board')];state.comments=[{id:'comment',postId:'community-post',authorId:'author',status:'published'}];
+  const {res,out}=makeRes();
+  await new ScopedComment().deleteComment(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'comment'}}),res);
+  expect(out.status).toBe(allowed?200:403);expect(state.savedComments).toHaveLength(allowed?1:0);
+ });
+ it('platform privilege alone cannot pin in the independent community',async()=>{
+  state.forums.push({...KPA_FORUM,id:'community-board',service_code:'community'});state.posts=[post('community-post','community-board')];
+  const {res,out}=makeRes();
+  await new ScopedPost().pinPost(makeReq({user:{id:'platform-admin',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community'},params:{id:'community-post'},body:{pin:true}}),res);
+  expect(out.status).toBe(403);expect(state.savedPosts).toHaveLength(0);
+ });
+});
+
+
+it('community board suspension blocks direct scoped targets until reopened',async()=>{
+ class Access extends ForumPostController { canAccess(id:string,ctx:ForumContext){return this.isForumInServiceScope(id,ctx);} }
+ const forum={...KPA_FORUM,id:'community-board',service_code:'community',status:'archived'};
+ state.forums.push(forum);
+ const ctx:ForumContext={scope:'community',communityKey:'community',forumStorageCodes:['community']};
+ expect(await new Access().canAccess(forum.id,ctx)).toBe(false);
+ forum.status='completed';
+ expect(await new Access().canAccess(forum.id,ctx)).toBe(true);
+});
+
+
+describe('community suspended boards stay out of member-facing directories',()=>{
+ const id='11111111-1111-4111-8111-111111111111';
+ const ctx:ForumContext={scope:'community',communityKey:'community',forumStorageCodes:['community']};
+ beforeEach(()=>{state.forums.push({...KPA_FORUM,id,slug:'paused',service_code:'community',status:'archived'});});
+ it.each([id,'paused'])('direct directory lookup by %s is hidden',async key=>{
+  const {res,out}=makeRes();await new ForumDirectoryController().getForum(makeReq({user:USER,ctx,params:{id:key}}),res);
+  expect(out.status).toBe(404);
+ });
+ it('ignores includeInactive in the community member directory and shows the board again on reopen',async()=>{
+  const req=makeReq({user:USER,ctx});req.query={includeInactive:'true'};
+  const closed=makeRes();await new ForumDirectoryController().listForums(req,closed.res);expect(closed.out.body.data).toEqual([]);
+  state.forums.find(f=>f.id===id).status='completed';
+  const open=makeRes();await new ForumDirectoryController().listForums(req,open.res);expect(open.out.body.data).toHaveLength(1);
+ });
+ it('preserves another service directory includeInactive behavior',async()=>{
+  state.forums.find(f=>f.id===OTHER_FORUM.id).status='archived';
+  const req=makeReq({user:USER,ctx:{scope:'community',serviceCode:'neture'}});req.query={includeInactive:'true'};
+  const {res,out}=makeRes();await new ForumDirectoryController().listForums(req,res);expect(out.body.data).toHaveLength(1);
+ });
 });

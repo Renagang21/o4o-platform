@@ -31,8 +31,8 @@ export class ForumDirectoryController extends ForumControllerBase {
    */
   async listForums(req: Request, res: Response): Promise<void> {
     try {
-      const includeInactive = req.query.includeInactive === 'true';
       const ctx = this.getForumContext(req);
+      const includeInactive = req.query.includeInactive === 'true' && ctx?.communityKey !== 'community';
 
       const qb = this.forumRequestRepo.createQueryBuilder('forum');
 
@@ -84,6 +84,9 @@ export class ForumDirectoryController extends ForumControllerBase {
         forum = null;
       }
       if (forum && this.getForumContext(req)?.excludeScopedCommunities && (/^(sf|community|funding):/.test(forum.serviceCode) || CATALOG_FORUM_STORAGE_CODES.includes(forum.serviceCode))) forum = null;
+
+      if (forum && this.getForumContext(req)?.communityKey === 'community'
+        && !await this.isForumInServiceScope(forum.id,this.getForumContext(req))) forum = null;
 
       if (!forum) {
         res.status(404).json({

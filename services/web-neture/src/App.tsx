@@ -3,6 +3,7 @@ import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
 import ServiceMembersPage from './pages/operator/ServiceMembersPage';
+import CommunityServiceManagementPage from './pages/community/CommunityManagementPage';
 /**
  * Neture - o4o 플랫폼 기반 서비스
  *
@@ -1057,9 +1058,9 @@ function App() {
               {/* WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1: 가입 승인은 operator 업무 → /operator/applications */}
               <Route path="/admin/applications" element={<Navigate to="/operator/applications" replace />} />
               <Route path="/admin/community" element={<ForumManagementPage />} />
-              <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+              {CURRENT_HOST_PROFILE !== 'community' && <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />}
               {/* WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: 삭제된 포럼(복구/완전삭제/삭제이력) — admin 전용 */}
-              <Route path="/admin/forum-deleted" element={<ForumDeletedManagementPage />} />
+              {CURRENT_HOST_PROFILE !== 'community' && <Route path="/admin/forum-deleted" element={<ForumDeletedManagementPage />} />}
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /admin/supply 제거 */}
               <Route path="/admin/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
@@ -1167,6 +1168,12 @@ function App() {
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
               <Route path="/operator/communities" element={<CommunityWorkspacePage />} />
+              <Route path="/operator/communities/boards" element={<CommunityServiceManagementPage kind="boards" />} />
+              {CURRENT_HOST_PROFILE === 'community' && <>
+                <Route path="/operator/forum-delete" element={<Navigate to="/operator/communities/boards" replace />} />
+                <Route path="/operator/forum-delete-requests" element={<Navigate to="/operator/communities/boards" replace />} />
+                <Route path="/admin/forum-delete-requests" element={<Navigate to="/operator/communities/boards" replace />} />
+              </>}
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="community" level="admin">
@@ -1174,7 +1181,10 @@ function App() {
               </SubdomainOperatorRoute>
             }>
               <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
-              <Route path="/admin/communities" element={<Navigate to="/operator/communities" replace />} />
+              <Route path="/admin/communities" element={<Navigate to="/admin/communities/members" replace />} />
+              <Route path="/admin/communities/members" element={<CommunityServiceManagementPage kind="members" permanent />} />
+              <Route path="/admin/communities/boards" element={<CommunityServiceManagementPage kind="boards" permanent />} />
+              {CURRENT_HOST_PROFILE === 'community' && <Route path="/admin/forum-deleted" element={<Navigate to="/admin/communities/boards" replace />} />}
             </Route>
 
             {/* ================================================================
@@ -1202,9 +1212,9 @@ function App() {
               <Route path="/operator/applications" element={<RegistrationRequestsPage />} />
               <Route path="/operator/community" element={<ForumManagementPage />} />
               {/* WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: '포럼 삭제' 2-탭 (삭제 요청 + 직접 삭제) */}
-              <Route path="/operator/forum-delete" element={<ForumDeletePage />} />
+              {CURRENT_HOST_PROFILE !== 'community' && <Route path="/operator/forum-delete" element={<ForumDeletePage />} />}
               {/* legacy alias — 기존 링크 보존 */}
-              <Route path="/operator/forum-delete-requests" element={<ForumDeletePage />} />
+              {CURRENT_HOST_PROFILE !== 'community' && <Route path="/operator/forum-delete-requests" element={<ForumDeletePage />} />}
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: 제거된 메뉴 redirect */}
               <Route path="/operator/supply" element={<Navigate to="/operator/all-registered-products" replace />} />

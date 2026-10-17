@@ -10,5 +10,5 @@ export default function ServiceMembersPage({ serviceKey }: Readonly<{ serviceKey
   const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
-  return <ServiceMembersWorkspace serviceKey={serviceKey} basePath={`/operator/service-members/${serviceKey}`} api={adapter} roles={user?.roles ?? []} userId={id} navigate={navigate} />;
+  return <ServiceMembersWorkspace serviceKey={serviceKey} allowDestructiveActions={serviceKey !== 'community'} basePath={`/operator/service-members/${serviceKey}`} api={adapter} roles={user?.roles ?? []} userId={id} navigate={navigate} />;
 }

@@ -212,13 +212,13 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
   it('community:operator → 개설 심사만 노출', () => {
     signIn(['community:operator'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/community', '/operator/communities', '/operator/home-presentation/community']);
+    expect(menuPaths()).toEqual(['/operator/service-members/community', '/operator/communities/boards', '/operator/communities', '/operator/home-presentation/community']);
   });
 
   it('community:admin → 커뮤니티 서비스 관리 항목', () => {
     signIn(['community:admin'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/community', '/operator/legal/community', '/operator/communities', '/operator/home-presentation/community']);
+    expect(menuPaths()).toEqual(['/admin/communities/members', '/admin/communities/boards', '/operator/legal/community', '/operator/communities']);
   });
 
   it('community:admin 이어도 community membership 이 active 가 아니면 항목이 없다', () => {
