@@ -33,9 +33,8 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
   funding: { approvals: [{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
   community: { approvals: [
     { label: '서비스 회원 관리', path: '/operator/service-members/community' },
-    { label: '커뮤니티 서비스 관리', path: '/admin/communities' },
     { label: '서비스 약관 관리', path: '/operator/legal/community' },
-    { label: '커뮤니티 개설 심사', path: '/operator/communities' },
+    { label: '게시판 · 공개 설정 관리', path: '/operator/communities' },
     { label: 'Hero · 광고 관리', path: '/operator/home-presentation/community' },
   ] },
 };

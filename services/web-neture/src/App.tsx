@@ -123,7 +123,6 @@ import MySettingsPage from './pages/mypage/MySettingsPage';
 // WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1
 import MyBusinessProfilePage from './pages/mypage/MyBusinessProfilePage';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개별 커뮤니티 운영자의 가입 심사 (/mypage 는 community 호스트 공용 prefix)
-import MyCommunityOperatorPage from './pages/mypage/MyCommunityOperatorPage';
 
 
 // Forum Pages
@@ -475,7 +474,6 @@ const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
 // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
 const OperatorSupplierApprovalPage = lazy(() => import('./pages/operator/OperatorSupplierApprovalPage'));
-const CommunityServiceAdminPage = lazy(() => import('./pages/admin/CommunityServiceAdminPage'));
 // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
 const OperatorContactMessagesPage = lazy(() => import('./pages/operator/OperatorContactMessagesPage'));
 
@@ -725,7 +723,7 @@ function App() {
                 <Route path="/materials" element={<CarePharmHomePage view="materials" />} />
                 <Route path="/tools" element={<CarePharmHomePage view="tools" />} />
               </>}
-              <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />
+              <Route path="/pharmacist" element={<Navigate to="/" replace />} />
               <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage />} />
@@ -746,7 +744,7 @@ function App() {
               <Route path="/mypage/settings" element={<MySettingsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1: 사업자 정보 */}
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
-              <Route path="/mypage/communities" element={<MyCommunityOperatorPage />} />
+              <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
@@ -1168,7 +1166,7 @@ function App() {
               <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
-              <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
+              <Route path="/operator/communities" element={<CommunityWorkspacePage />} />
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="community" level="admin">
@@ -1176,7 +1174,7 @@ function App() {
               </SubdomainOperatorRoute>
             }>
               <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
-              <Route path="/admin/communities" element={<CommunityServiceAdminPage />} />
+              <Route path="/admin/communities" element={<Navigate to="/operator/communities" replace />} />
             </Route>
 
             {/* ================================================================

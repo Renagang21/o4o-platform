@@ -254,24 +254,16 @@ export const O4O_SERVICES: O4OService[] = [
    * (Cloud Run 서비스를 서브도메인 수만큼 만들지 않는다) 주소와 권한 경계는 독립이다.
    * 호스트 라우팅은 이미 `services/web-neture/src/lib/hostProfile.ts` 가 갖고 있고
    * `community` 프로필의 `/` 가 진입이므로 `basePath` 를 두지 않는다.
-   * 개별 커뮤니티는 그 아래 개체(`communities.slug`)다.
-   *
-   * joinEnabled=false — **서비스 단위 자가 가입 경로를 열지 않는다.** 가입은 개별 커뮤니티
-   * 단위(승인형 하나)이고, `service_memberships('community')` 는 그 승인의 **결과로** 생긴다
-   * (community-lifecycle.service ensureServiceMembership). 여기를 true 로 두면 범용
-   * `POST /auth/services/community/join` 이 어느 커뮤니티에도 승인받지 않은 사람에게
-   * 서비스 진입 자격을 주어 개별 승인을 우회한다.
-   *
-   * platform_services row 는 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
-   * 같은 상태다. 데이터 전용 migration 은 스키마 지문이 직전 상태와 같아져 C22 에 걸린다.
+   * One service membership, requested directly and approved by community operators.
+   * Legacy entity/catalog approvals do not grant service membership.
    */
   {
     key: 'community',
     name: 'O4O Community',
     nameKo: '커뮤니티',
     domain: 'community.neture.co.kr',
-    description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
-    joinEnabled: false,
+    description: '자체 회원과 운영자가 정보와 경험을 나누는 독립 커뮤니티 서비스',
+    joinEnabled: true,
     // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
     workspace: OPERATOR_ONLY_WORKSPACE,
   },

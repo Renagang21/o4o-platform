@@ -143,8 +143,6 @@ describe('Demo 계정 보호 계약', () => {
     ['services/kpa-branch/branch-operator-designation.service.ts', /rejectDemoAccount\(userId\)/, /roleAssignmentService\.assignRole\(/],
     // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
     ['routes/kpa/controllers/member.controller.ts', /assertNotDemoMember\(/, /INSERT INTO/],
-    ['services/community/community-lifecycle.service.ts', /isDemoAccount\(request\.requesterUserId/, /reqRepo\.save\(/, 'async approveCreation('],
-    ['services/community/community-operator-designation.service.ts', /isDemoAccount\(target\.user_id/, /UPDATE community_memberships/],
     // role · membership · ownership 해제/변경
     ['services/approval/MembershipApprovalService.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
     ['services/store-owner-termination.service.ts', /assertNotDemoStoreOwner\(this\.dataSource, input\.userId\)/, /INSERT INTO store_owner_termination_cases/],

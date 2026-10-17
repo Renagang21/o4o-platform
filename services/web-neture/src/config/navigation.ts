@@ -34,8 +34,7 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
     { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'community') return [
-    { label: '커뮤니티 · 단체활동', href: '/' },
-    { label: '개설 신청 · 운영', href: '/mypage/communities' },
+    { label: '커뮤니티', href: '/' },
   ];
   if (profile === 'funding') return [
     { label: '유통참여형 펀딩', href: '/market-trial' },
