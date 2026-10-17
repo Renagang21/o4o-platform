@@ -94,9 +94,9 @@ describe('로그인 전 — 공개 서비스 우선', () => {
     }
   });
 
-  it('Google 시작 CTA 하나 · 우상단 로그인 하나 — 회원가입 버튼 없음 (같은 Google 흐름)', () => {
+  it('로그인은 모달을 열고 회원가입은 가입 화면으로 직접 연결한다', () => {
     mount();
-    expect(screen.queryByRole('button', { name: '회원가입' })).toBeNull();
+    expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('/signup');
     fireEvent.click(screen.getByTestId('home-google-start'));
     fireEvent.click(screen.getByTestId('home-login-button'));
     expect(openLoginModal).toHaveBeenCalledTimes(2);

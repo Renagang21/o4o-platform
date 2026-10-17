@@ -29,7 +29,7 @@ export default function SiteShell() {
       <div className="header-actions" aria-label="계정">
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
         <span className="inline-flex flex-wrap items-center gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
-        {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link>}
+        {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <><Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link><a href="https://neture.co.kr/signup">회원가입</a></>}
       </div>
     </header>
     <div className="content"><Outlet /></div>
