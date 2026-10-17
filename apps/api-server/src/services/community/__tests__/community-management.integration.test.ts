@@ -15,7 +15,7 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
    'role_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid,role text,is_active boolean DEFAULT true,valid_from timestamptz DEFAULT NOW(),valid_until timestamptz)',
    "forum_category_requests(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_code text,organization_id uuid,requester_id uuid,name text,status text,metadata jsonb DEFAULT '{}',updated_at timestamptz DEFAULT NOW())",
    `forum_post(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),forum_id uuid REFERENCES forum_category_requests(id),author_id uuid,organization_id uuid,is_organization_exclusive boolean DEFAULT false,content jsonb DEFAULT '[]',metadata jsonb DEFAULT '{}',"commentCount" int DEFAULT 0,"likeCount" int DEFAULT 0)`,
-   `forum_comment(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid REFERENCES forum_post(id) ON DELETE CASCADE,author_id uuid,"parentId" uuid REFERENCES forum_comment(id) ON DELETE CASCADE,status text DEFAULT 'publish')`,
+   `forum_comment(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid REFERENCES forum_post(id) ON DELETE CASCADE,author_id uuid,"parentId" uuid REFERENCES forum_comment(id) ON DELETE CASCADE,status text DEFAULT 'publish',"likeCount" int DEFAULT 0,"replyCount" int DEFAULT 0)`,
    'forum_notifications(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid,"commentId" uuid,"userId" uuid,"actorId" uuid)',
    'forum_like(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"targetType" text,"targetId" uuid,"userId" uuid)',
    'forum_bookmark(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid,"userId" uuid)',
@@ -89,7 +89,10 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   await db.query('INSERT INTO forum_comment(id,"postId",author_id) VALUES($1,$2,$3)',[comment,surviving,member]);
   await db.query('INSERT INTO forum_comment("postId",author_id,"parentId") VALUES($1,$2,$3)',[surviving,other,comment]);
   await db.query('INSERT INTO forum_post_like(post_id,user_id) VALUES($1,$2)',[surviving,member]);
-  await db.query('INSERT INTO forum_comment("postId",author_id) VALUES($1,$2)',[surviving,other]);
+  const parent=randomUUID();
+  await db.query('INSERT INTO forum_comment(id,"postId",author_id,"likeCount","replyCount") VALUES($1,$2,$3,2,1)',[parent,surviving,other]);
+  await db.query('UPDATE forum_comment SET "parentId"=$1 WHERE id=$2',[parent,comment]);
+  await db.query(`INSERT INTO forum_like("targetType","targetId","userId") VALUES('comment',$1,$2),('comment',$1,$3)`,[parent,member,other]);
   await db.query(`INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','active')`,[member]);
   await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'community:operator',false)",[member]);
   const p=await plan(admin,'members',member);expect(p.blockers).toEqual([]);expect(p.counts.forum_comment).toBe(2);await apply(admin,'members',member,p.digest);
@@ -98,6 +101,7 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   expect(await db.query('SELECT service_key FROM service_memberships WHERE user_id=$1',[member])).toEqual([{service_key:'neture'}]);
   expect(await db.query('SELECT id FROM forum_post WHERE id=$1',[own])).toHaveLength(0);
   expect(await db.query('SELECT "commentCount","likeCount" FROM forum_post WHERE id=$1',[surviving])).toEqual([{commentCount:1,likeCount:0}]);
+  expect(await db.query('SELECT "replyCount","likeCount" FROM forum_comment WHERE id=$1',[parent])).toEqual([{replyCount:0,likeCount:1}]);
  });
  it('blocks owned boards and operational accounts from member deletion',async()=>{
   await db.query('UPDATE forum_category_requests SET requester_id=$1 WHERE id=$2',[member,board]);

@@ -138,6 +138,10 @@ export async function applyCommunityDeletion(db: Exec, actor: string, kind: Comm
   // Refresh surviving post counters after member comments/reactions are removed.
   const affected = kind === 'members' ? await db.query(`SELECT DISTINCT "postId" AS id FROM forum_comment WHERE id=ANY($1::uuid[])
     UNION SELECT post_id AS id FROM forum_post_like WHERE id=ANY($2::uuid[])`, [selection.forum_comment, selection.forum_post_like]) : [];
+  const parents = kind === 'members' ? await db.query(`SELECT DISTINCT "parentId" AS id FROM forum_comment
+    WHERE id=ANY($1::uuid[]) AND "parentId" IS NOT NULL`, [selection.forum_comment]) : [];
+  const commentLikes = kind === 'members' ? await db.query(`SELECT "targetId" AS id,count(*)::int AS n FROM forum_like
+    WHERE id=ANY($1::uuid[]) AND "targetType"='comment' GROUP BY "targetId"`, [selection.forum_like]) : [];
   for (const table of tables) {
     if (selection[table].length) {
       const removed = await db.query(`DELETE FROM ${table} WHERE id=ANY($1::uuid[]) RETURNING id`, [selection[table]]);
@@ -147,6 +151,9 @@ export async function applyCommunityDeletion(db: Exec, actor: string, kind: Comm
   }
   if (affected.length) await db.query(`UPDATE forum_post p SET "commentCount"=(SELECT count(*) FROM forum_comment c WHERE c."postId"=p.id AND c.status='publish'),
     "likeCount"=(SELECT count(*) FROM forum_post_like l WHERE l.post_id=p.id) WHERE p.id=ANY($1::uuid[])`, [affected.map((p: {id: string}) => p.id)]);
+  if (parents.length) await db.query(`UPDATE forum_comment c SET "replyCount"=(SELECT count(*) FROM forum_comment r WHERE r."parentId"=c.id AND r.status='publish')
+    WHERE c.id=ANY($1::uuid[]) AND c."postId" IN (${servicePosts})`, [parents.map((c: {id: string}) => c.id)]);
+  for (const like of commentLikes) await db.query(`UPDATE forum_comment SET "likeCount"=GREATEST(0,"likeCount"-$2) WHERE id=$1`, [like.id, like.n]);
   await audit(db, actor, 'community:permanent_delete', { kind, targetId: id, counts: plan.counts, digest: plan.digest });
   return { ...plan, applied: true };
 }
