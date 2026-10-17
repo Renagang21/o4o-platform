@@ -1,3 +1,4 @@
+import { parse } from 'node-html-parser';
 import type { DataSource } from 'typeorm';
 import { NeturePharmacyError } from '../constants.js';
 
@@ -34,19 +35,28 @@ export class SupplierBusinessContentService {
         (semi_franchise_id, source_supplier_id, source_item_id, title, summary, body, thumbnail_url,
          attachments, status, created_by, updated_by)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,'pending',$9,$9) RETURNING id, status`,
-      [sf.id, supplierId, itemId, source.title, source.description, libraryBlocksText(source.blocks),
+      [sf.id, supplierId, itemId, source.title, source.description, libraryReviewBody(source.blocks),
         source.mime_type?.startsWith('image/') ? source.file_url : null, JSON.stringify(attachments), userId]);
       return { ...created, reused: false };
     });
   }
 }
 
-/** Preserve readable document text without introducing HTML into the plain-text business editor. */
+/** Preserve readable document text; parsing is inert and never fetches external resources. */
 export function libraryBlocksText(value: unknown): string {
-  if (typeof value === 'string') return value.replace(/<[^>]*>/g, '');
+  if (typeof value === 'string') {
+    const document = parse(value);
+    document.querySelectorAll('script,style,template').forEach(node => node.remove());
+    return document.structuredText;
+  }
   if (Array.isArray(value)) return value.map(libraryBlocksText).filter(Boolean).join('\n');
   if (!value || typeof value !== 'object') return '';
   const block = value as Record<string, unknown>;
   if (typeof block.text === 'string') return block.text;
   return libraryBlocksText(block.content ?? block.children ?? block.data);
+}
+
+/** The receiver renders HTML: encode decoded text before rebuilding paragraph boundaries. */
+export function libraryReviewBody(value: unknown): string {
+  return libraryBlocksText(value).split('\n').map(line => '<p>' + line.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!)) + '</p>').join('');
 }

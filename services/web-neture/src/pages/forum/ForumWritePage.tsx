@@ -27,6 +27,7 @@ import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
 import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { libraryDocumentText } from '../supplier/libraryDocumentText';
 import { supplierApi } from '../../lib/api';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
@@ -146,7 +147,7 @@ export function ForumWritePage({
       if (!live) return;
       const escape = (value: string) => value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
       // A separate editable copy; links/files are not silently exposed to community readers.
-      const text = (item.blocks ?? []).map(block => typeof block.content === 'string' ? block.content.replace(/<[^>]*>/g, '') : '').filter(Boolean).join('\n\n');
+      const text = libraryDocumentText(item.blocks);
       setTitle(item.title); setEditorHtml(`<p>${escape(text || item.description || '').replace(/\n/g, '</p><p>')}</p>`);
       setLibraryReady(true);
     }).catch(() => { if (live) setError('원본 자료를 불러오지 못했습니다. 자료함에서 다시 시작하세요.'); })

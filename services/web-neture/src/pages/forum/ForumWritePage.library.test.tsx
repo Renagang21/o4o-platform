@@ -48,3 +48,9 @@ it('blocks posting if the source cannot be read', async () => {
   fireEvent.click(screen.getByRole('button', { name: '게시 제출' }));
   expect(m.create).not.toHaveBeenCalled();
 });
+
+it('keeps paragraph/list separators and decoded entities in the editable copy', async () => {
+  m.get.mockResolvedValue({ title: '자료 제목', blocks: [{ content: '<p>First &amp; A</p><p>Second &#x1F600;</p><ul><li>One</li><li>Two</li></ul>' }] });
+  mount(); await screen.findByTestId('copy-body');
+  expect(screen.getByTestId('copy-body').textContent).toBe('<p>First &amp; A</p><p>Second 😀</p><p>One</p><p>Two</p>');
+});

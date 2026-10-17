@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { createCarePharmReviewDb } from '../../../__tests__/support/carepharm-review-db.js';
 import { AddSupplierBusinessContentRequests1792215000000 } from '../../../database/migrations/1792215000000-AddSupplierBusinessContentRequests.js';
-import { SupplierBusinessContentService, libraryBlocksText } from '../services/supplier-business-content.service.js';
+import { SupplierBusinessContentService, libraryBlocksText, libraryReviewBody } from '../services/supplier-business-content.service.js';
 import { SemiFranchiseContentService } from '../services/semi-franchise-content.service.js';
 import type { SemiFranchiseRow } from '../services/semi-franchise.service.js';
 
@@ -55,7 +55,7 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
     expect(await requests.list(supplier)).toMatchObject([{ sourceItemId: item, status: 'pending', businessKey: sf.key }]);
     expect((await fixture.ds.query(`SELECT is_public FROM neture_supplier_library_items WHERE id=$1`, [item]))[0].is_public).toBe(false);
     await expect(contents.pharmacyGet(member, requestId)).rejects.toMatchObject({ httpStatus: 404 });
-    expect((await contents.operatorGet(sf, requestId)).body).toBe('Member manual');
+    expect((await contents.operatorGet(sf, requestId)).body).toBe('<p>Member manual</p>');
   });
   it('does not allow another business to review this request', async () => {
     await expect(contents.operatorGet(foreign, requestId)).rejects.toMatchObject({ httpStatus: 404 });
@@ -86,6 +86,14 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
     expect((await requests.request(supplier, user, item, sf.key)).reused).toBe(false);
     await expect(contents.operatorSetStatus(sf, user, requestId, 'publish')).rejects.toMatchObject({ httpStatus: 409 });
   });
+  it('can use the supplier-leading index for the private request history query', async () => {
+    const runner = fixture.ds.createQueryRunner(); await runner.startTransaction();
+    try {
+      await runner.query('SET LOCAL enable_seqscan = off');
+      const plan = await runner.query('EXPLAIN SELECT id FROM semi_franchise_contents WHERE source_supplier_id=$1 ORDER BY created_at DESC, id', [supplier]);
+      expect(JSON.stringify(plan)).toContain('idx_sf_content_supplier_history');
+    } finally { await runner.rollbackTransaction(); await runner.release(); }
+  });
   it('refuses rollback with request copies and reverses schema after isolated cleanup', async () => {
     const runner = fixture.ds.createQueryRunner();
     const migration = new AddSupplierBusinessContentRequests1792215000000();
@@ -98,4 +106,14 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
 
 it('extracts nested document text without executing HTML', () => {
   expect(libraryBlocksText([{ content: [{ text: 'A' }, { text: 'B' }] }, { data: { text: 'C' } }])).toBe('A\nB\nC');
+});
+
+it('preserves HTML block boundaries and decodes named/numeric entities in review copies', () => {
+  expect(libraryBlocksText([{ content: '<h2>A &amp; B</h2><p>First&nbsp;text<br>Second</p><ul><li>One</li><li>Two &#x1F600;</li></ul><script>hidden()</script>' }]))
+    .toBe('A & B\nFirst\u00a0text\nSecond\nOne\nTwo 😀');
+});
+
+it('re-encodes decoded text for the receiving HTML renderer without activating escaped markup', () => {
+  expect(libraryReviewBody([{ content: '<p>&lt;img src=x onerror=alert(1)&gt;</p><p>A &amp; B</p>' }]))
+    .toBe('<p>&lt;img src=x onerror=alert(1)&gt;</p><p>A &amp; B</p>');
 });

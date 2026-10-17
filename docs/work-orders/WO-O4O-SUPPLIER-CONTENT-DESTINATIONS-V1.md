@@ -32,7 +32,7 @@
 - 커뮤니티 작성기는 자료 본문을 편집 사본으로 불러오고 게시판을 명시적으로 선택한다. 공개 범위 확인 전 제출을 막고, 원본 링크·첨부파일은 자동 복사하지 않는다. 서버의 기존 커뮤니티·게시판 권한 판정은 유지한다.
 - pharmacy 기본 미게시·예/아니요 선택·명시적 저장을 유지한다. 협업체별 제품 공급 제안에는 기존 공급가·대상·메모와 공통 배송 정책을 안내한다.
 - 로컬 PostgreSQL 15: 신규 요청·기존 CarePharm 회원 범위 2 suites / 18 tests PASS(조건부 skip 없이 실행). 다른 공급자 원본 거절, 폐쇄 사업 거절, 동시 요청 5건의 단일 수신, 사업 간 격리, 반려 후 새 요청, 원본 변경 비전파, 회원 정지 후 열람·복사 거절, 보관 사본 재게시 거절, 데이터가 있는 rollback 거절 포함.
-- 격리 빈 DB canonical bootstrap + 전체 incremental migration 재실행 PASS. 신규 fingerprint `c67b45fd9cb51d7e56a02165f0af61851628c5d632fa395cdd42b8afa39aad8d` / 6702 lines. 최종 migration down은 직전 `76c1307f…` / 6698 lines를 복구하고 up은 신규 fingerprint를 재현한다. 기존 운영 schema fingerprint를 읽거나 채택하지 않았다.
+- 격리 빈 DB canonical bootstrap + 전체 incremental migration 재실행 PASS. 신규 fingerprint `be4a89ff7ed4ffd22e9ebaf2fdaf954c92f26672e3c4f20256e71ecec8490ce8` / 6703 lines. 최종 migration down은 직전 `76c1307f…` / 6698 lines를 복구하고 up은 신규 fingerprint를 재현한다. 기존 운영 schema fingerprint를 읽거나 채택하지 않았다.
 - API 관련 계약 5 suites / 130 tests PASS. Neture 118 files / 1069 tests PASS. 공통 pharmacy-management 5 files / 26 tests PASS. 매장 56 files / 642 tests PASS. KPA 24 files / 167 tests PASS. 최종 집중 3 files / 14 tests는 Neture 전체와 중복이므로 합산하지 않는다.
 - API TypeScript build, Neture TypeScript + Vite build PASS. 초기 API build의 미빌드 workspace 의존성 오류는 의존 패키지 빌드 후 재실행으로 해소했다. dependency·lockfile·CI 설정 변경은 없다.
 - migration contract 21/21 PASS, 문서 민감정보 검사 PASS, diff whitespace 검사 PASS.
@@ -51,3 +51,10 @@
 ## 5. 작업공간 보존
 
 `WORKTREE_DISPOSITION`: `KEEP` — 개발 branch push까지의 인계이며 PR/병합 전 후속 수정에 필요하다. 기준 checkout과 이전 작업 worktree는 변경·정리하지 않는다. 운영 배포와 smoke가 완료됐다는 의미가 아니다.
+
+## 6. PR #678 통합 리뷰 보완 — 2026-10-17
+
+- 최신 main `951b834b6d`를 전용 branch에 충돌 없이 merge했다. 이후 매장 전체 57 files / 649 tests PASS.
+- Codex P2 두 건을 보완했다. 서버는 기존 dependency `node-html-parser`의 structured text, 브라우저는 inert DOM 변환으로 문단·목록·줄바꿈·entity를 보존한다. 수신 HTML에는 텍스트를 다시 escape해 encoded markup이 활성화되지 않게 한다.
+- 공급자별 이력 조회에 `(source_supplier_id, created_at DESC, id)` partial index를 추가했다. PostgreSQL planner가 해당 인덱스를 사용할 수 있는지 검증했다. fingerprint는 위 6703 lines 값으로 재산출하고 fresh replay 및 down/up 복원을 확인했다.
+- 리뷰 보완 집중 검증: PostgreSQL + 변환 2 suites / 21 tests, 커뮤니티 UI 1 file / 4 tests. 배포 승인을 기존 개발 완료로 추정하지 않았으며 별도 사용자의 운영 migration 적용 승인을 확인했다.

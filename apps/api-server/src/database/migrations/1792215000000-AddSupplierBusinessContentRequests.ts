@@ -14,11 +14,13 @@ export class AddSupplierBusinessContentRequests1792215000000 implements Migratio
     await q.query(`CREATE UNIQUE INDEX uq_sf_content_live_supplier_source
       ON semi_franchise_contents (semi_franchise_id, source_supplier_id, source_item_id)
       WHERE source_item_id IS NOT NULL AND status IN ('pending','draft','published')`);
+    await q.query(`CREATE INDEX idx_sf_content_supplier_history ON semi_franchise_contents (source_supplier_id, created_at DESC, id) WHERE source_supplier_id IS NOT NULL`);
   }
   async down(q: QueryRunner): Promise<void> {
     // Fail instead of silently discarding unprocessed supplier requests.
     const [row] = await q.query(`SELECT count(*)::int AS count FROM semi_franchise_contents WHERE source_item_id IS NOT NULL`);
     if (row.count > 0) throw new Error('Supplier content request copies must be reviewed before rollback');
+    await q.query(`DROP INDEX idx_sf_content_supplier_history`);
     await q.query(`DROP INDEX uq_sf_content_live_supplier_source`);
     await q.query(`ALTER TABLE semi_franchise_contents DROP CONSTRAINT semi_franchise_contents_status_check`);
     await q.query(`ALTER TABLE semi_franchise_contents ADD CONSTRAINT semi_franchise_contents_status_check CHECK (status IN ('draft','published','archived'))`);

@@ -301,8 +301,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   // Isolated PostgreSQL 15 canonical bootstrap + all ordered incrementals; no production reads.
   {
     appliedThrough: 'AddSupplierBusinessContentRequests1792215000000',
-    fingerprint: 'c67b45fd9cb51d7e56a02165f0af61851628c5d632fa395cdd42b8afa39aad8d',
-    fingerprintLineCount: 6702,
+    fingerprint: 'be4a89ff7ed4ffd22e9ebaf2fdaf954c92f26672e3c4f20256e71ecec8490ce8',
+    fingerprintLineCount: 6703,
   },
 ] as const;
 
