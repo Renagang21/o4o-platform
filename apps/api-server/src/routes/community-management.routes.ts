@@ -28,7 +28,7 @@ export function createCommunityManagementRoutes(authenticate: RequestHandler) {
   router.patch('/community/management/boards/:id/status', run(req => AppDataSource.transaction('SERIALIZABLE', m => setCommunityBoardStatus(m, req.user!.id, req.params.id, req.body?.status))));
   for (const kind of ['boards','members'] as const) {
     router.get(`/community/management/${kind}/:id/deletion-plan`, run(req => AppDataSource.transaction('REPEATABLE READ', m => planCommunityDeletion(m, req.user!.id, kind, req.params.id))));
-    router.delete(`/community/management/${kind}/:id`, run(async req => {
+    router.delete(`/community/management/${kind}/:id`, run(req => {
       return AppDataSource.transaction('SERIALIZABLE', async m => {
         await requireCommunityManager(m, req.user!.id, true);
         if (kind === 'members') await demoAccountService.assertNotDemoAccount(req.params.id, m);

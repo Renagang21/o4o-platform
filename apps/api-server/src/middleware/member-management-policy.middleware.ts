@@ -25,6 +25,13 @@ export async function requireActiveOperatorScope(req: Request, res: Response, ne
   }
 }
 
+function selectManagementService(req: Request, roleMutation: boolean, roleService?: string): unknown {
+  if (roleMutation && roleService) return roleService;
+  const membershipRoleEdit = req.method === 'PUT' && typeof req.body?.membershipRole === 'string' && req.body.membershipRole.trim();
+  if (membershipRoleEdit) return req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
+  return req.body?.serviceKey ?? req.query.serviceKey;
+}
+
 /** Service member lifecycle authority is independent of ordinary profile editing. */
 export function memberManagementPolicy(req: Request, res: Response, next: NextFunction): void {
   const scope: ServiceScope = (req as any).serviceScope;
@@ -38,12 +45,7 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
   const roleMutation = req.path.endsWith('/roles') || req.path.includes('/roles/');
   // Role ownership determines authority; an unrelated body serviceKey cannot override it.
   // Bare roles are checked again against the resolved catalogue service in the controller.
-  // Match the controller's target selection. membershipServiceKey belongs only to PUT membership-role edits;
-  // DELETE/status use body.serviceKey before query.serviceKey. Normalize before any privilege or retirement check.
-  const membershipRoleEdit = req.method === 'PUT' && typeof req.body?.membershipRole === 'string' && req.body.membershipRole.trim();
-  const selected = roleMutation && roleService ? roleService
-    : membershipRoleEdit ? req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey
-      : req.body?.serviceKey ?? req.query.serviceKey;
+  const selected = selectManagementService(req, roleMutation, roleService);
   const keys = typeof selected === 'string' ? [selected.trim()] : scope.serviceKeys;
   const admin = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => adminKeys.includes(key)));
   const ownsSelection = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => scope.serviceKeys.includes(key)));

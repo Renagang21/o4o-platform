@@ -9,7 +9,7 @@ const countLabels: Record<string,string> = {forum_notifications:'연결 알림',
 const base = '/communities/community/management';
 const errorText = (e: unknown) => (e as {response?:{data?:{error?:string}}}).response?.data?.error ?? '처리하지 못했습니다. 다시 시도해 주세요.';
 const statuses: Record<string,string> = { completed:'운영 중',archived:'운영 중지',active:'활성',suspended:'이용 정지',withdrawn:'탈퇴',rejected:'반려',pending:'승인 대기' };
-export default function CommunityManagementPage({ kind, permanent = false }: { kind: Kind; permanent?: boolean }) {
+export default function CommunityManagementPage({ kind, permanent = false }: Readonly<{ kind: Kind; permanent?: boolean }>) {
   const [rows,setRows] = useState<Row[]>([]);
   const [page,setPage] = useState(1);
   const [totalPages,setTotalPages] = useState(1);
@@ -47,14 +47,15 @@ export default function CommunityManagementPage({ kind, permanent = false }: { k
     try{await api.delete(`${base}/${kind}/${plan.id}`,{data:{expectedDigest:plan.digest}});setPlan(null);setConfirmation('');setMessage('선택한 커뮤니티 데이터를 완전 삭제했습니다.');setVersion(v=>v+1);}
     catch(e){setPlan(null);setConfirmation('');setError(errorText(e));}finally{setBusy(false);}
   }
-  const title=permanent ? kind==='members'?'회원 데이터 완전 삭제':'게시판 완전 삭제':'게시판 운영';
+  const deletionTitles: Record<Kind,string> = {members:'회원 데이터 완전 삭제',boards:'게시판 완전 삭제'};
+  const title=permanent ? deletionTitles[kind] : '게시판 운영';
   return <section className="mx-auto w-full min-w-0 max-w-5xl px-4 py-6">
     <h1 className="text-2xl font-bold">{title}</h1>
     <p className="my-3 text-sm text-slate-600">{permanent?'삭제 전 대상과 연결 데이터를 확인합니다. 공통 계정, 다른 서비스 데이터와 법정·감사 기록은 유지됩니다.':'게시판을 운영 중지하거나 재개합니다. 이용 중지는 데이터 삭제를 수행하지 않습니다.'}</p>
     {permanent && <Link className="text-blue-700" to={kind==='members'?'/operator/service-members/community':'/operator/communities/boards'}>회원·게시판 이용 상태는 일상 운영에서 관리 →</Link>}
     {error && <div role="alert" className="my-4 text-red-700">{error}<button type="button" className="ml-3 min-h-11 underline" onClick={()=>setVersion(v=>v+1)}>다시 불러오기</button></div>}
-    {message && <p role="status" className="my-4 text-green-700">{message}</p>}
-    {loading?<p role="status">불러오는 중…</p>:<ul className="my-4 space-y-3">{rows.map(row=>{
+    {message && <output className="my-4 block text-green-700">{message}</output>}
+    {loading?<output>불러오는 중…</output>:<ul className="my-4 space-y-3">{rows.map(row=>{
       const state=kind==='members'?row.memberships?.find(m=>m.serviceKey==='community')?.status ?? row.status:row.status;
       return <li key={row.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded border bg-white p-4">
         <span className="min-w-0 break-all">{row.name || '회원'} · {statuses[state] ?? state}</span>
