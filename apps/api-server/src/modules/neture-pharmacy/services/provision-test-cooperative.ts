@@ -10,14 +10,11 @@ export async function provisionTestCooperative(
   const operatorEmail = accounts.operatorEmail.trim().toLowerCase();
   const memberEmail = accounts.memberEmail.trim().toLowerCase();
   if (
-    ![operatorEmail, memberEmail].every(
-      (email) =>
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 255,
-    ) ||
+    ![operatorEmail, memberEmail].every((email) => validAccountEmail(email)) ||
     operatorEmail === memberEmail
   )
     throw new Error("COOP_TEST_DISTINCT_ACCOUNTS_REQUIRED");
-  return db.transaction(async (m) => {
+  return await db.transaction(async (m) => {
     await m.query(
       `SELECT pg_advisory_xact_lock(hashtextextended('o4o:provision:coop-test', 0))`,
     );
@@ -104,4 +101,12 @@ export async function provisionTestCooperative(
       slug: "test",
     };
   });
+}
+
+function validAccountEmail(email: string): boolean {
+  if (!email || email.length > 255 || /\s/.test(email)) return false;
+  const parts = email.split("@");
+  if (parts.length !== 2 || !parts[0]) return false;
+  const dot = parts[1].lastIndexOf(".");
+  return dot > 0 && dot < parts[1].length - 1;
 }

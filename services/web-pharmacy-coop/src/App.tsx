@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, lazy, Suspense } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  lazy,
+  Suspense,
+} from "react";
 import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
 const CooperativeBusinessOperator = lazy(
   () => import("./CooperativeBusinessOperator"),
@@ -63,10 +70,12 @@ export function App({
   session?: SessionSnapshot;
   preview?: boolean;
 }) {
+  const context = useMemo(
+    () => ({ cooperatives, session, preview, businessClient }),
+    [cooperatives, session, preview, businessClient],
+  );
   return (
-    <Context.Provider
-      value={{ cooperatives, session, preview, businessClient }}
-    >
+    <Context.Provider value={context}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
@@ -137,7 +146,9 @@ function Layout() {
               <SiteLink to="/operator">연합회 운영</SiteLink>
             )}
           </nav>
-          <span className="account-status">{session.userId ? '로그인됨' : '로그인 후 조합 이용'}</span>
+          <span className="account-status">
+            {session.userId ? "로그인됨" : "로그인 후 조합 이용"}
+          </span>
         </div>
       </header>
       {preview && (
@@ -426,6 +437,7 @@ function Membership() {
     suspended: "이용 정지",
     withdrawn: "탈퇴",
   };
+  const emptyTitle = session.userId ? "미가입" : "로그인 후 가입 상태 확인";
   return (
     <section className="section narrow">
       <h2>가입 자격과 내 참여 상태</h2>
@@ -435,7 +447,7 @@ function Membership() {
         <p>개인 자격으로 가입하며, 다른 조합 가입 여부와 별도로 심사합니다.</p>
       </div>
       <Empty
-        title={status ? statusLabels[status] : session.userId ? "미가입" : "로그인 후 가입 상태 확인"}
+        title={status ? statusLabels[status] : emptyTitle}
         text="조합 가입과 약국 내 매장 자격은 별개입니다. 가입 신청의 실제 저장과 심사는 아직 연결되지 않았습니다."
       />
     </section>
@@ -527,7 +539,9 @@ function FederationManagement() {
   );
 }
 
-function CooperativeManagement({ editor = false }: { editor?: boolean }) {
+function CooperativeManagement({
+  editor = false,
+}: Readonly<{ editor?: boolean }>) {
   const cooperative = useOutletContext<Cooperative>();
   const { session, businessClient } = useContext(Context);
   const { canManage } = cooperativeAccess(session, cooperative.id);

@@ -8,7 +8,8 @@ COPY packages ./packages
 COPY services/web-pharmacy-coop ./services/web-pharmacy-coop
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter @o4o/web-pharmacy-coop... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+    pnpm install --filter @o4o/web-pharmacy-coop... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm --filter @o4o/web-pharmacy-coop... --if-present -r build

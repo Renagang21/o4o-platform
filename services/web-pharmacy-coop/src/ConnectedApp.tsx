@@ -60,7 +60,7 @@ export function ConnectedApp() {
   if (auth.isLoading || loading)
     return (
       <main className="container">
-        <p role="status">계정과 조합 정보를 확인하고 있습니다…</p>
+        <output>계정과 조합 정보를 확인하고 있습니다…</output>
       </main>
     );
   if (error)

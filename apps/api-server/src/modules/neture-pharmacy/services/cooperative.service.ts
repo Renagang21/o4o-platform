@@ -4,7 +4,7 @@ import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
 /** No pharmacy membership, store ownership or federation authority is inferred here. */
 export class CooperativeService {
   constructor(private readonly db: DataSource) {}
-  async directory() {
+  directory() {
     return this.db.query(`SELECT c.id, c.slug, c.name, c.introduction,
       c.eligibility_description AS "eligibilityDescription", sf.key AS "businessKey"
       FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id

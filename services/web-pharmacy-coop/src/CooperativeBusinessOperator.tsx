@@ -12,12 +12,12 @@ export default function CooperativeBusinessOperator({
   slug,
   client,
   editor = false,
-}: {
+}: Readonly<{
   businessKey: string;
   slug: string;
   client: PharmacyManagementClient;
   editor?: boolean;
-}) {
+}>) {
   const [configured, setConfigured] = useState<PharmacyManagementClient | null>(
     null,
   );

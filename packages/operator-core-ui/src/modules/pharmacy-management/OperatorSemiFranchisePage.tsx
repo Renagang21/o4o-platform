@@ -53,11 +53,12 @@ export default function OperatorSemiFranchisePage(props: BusinessPageProps = {})
 }
 
 function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, contentEditHref, tabs }: BusinessPageProps) {
+  const workspace = useAssignedBusinessWorkspace(businessKey, tabs);
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
     interactionLocked, decision, reason, setReason, decisionError, run, confirmDecision, cancelDecision,
     load, retryAssignments, selectBusiness, selectTab, selectStatus,
-  } = useAssignedBusinessWorkspace(businessKey, tabs);
+  } = workspace;
 
   const positive = (a: string) => a === 'approve' || a === 'reactivate';
 
@@ -146,19 +147,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       </div>}
 
       {!loadError && <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        {tab === 'content-submissions' && <table className={`w-full ${rows.length ? 'min-w-[640px]' : ''} divide-y divide-gray-200`}>
-          <thead className="bg-gray-50"><tr>{['제출 자료 · 내용 확인', '공급자', '제출일', '상태', '처리'].map(label => <th key={label} className={TH}>{label}</th>)}</tr></thead>
-          <tbody className="divide-y divide-gray-100">{loading ? <EmptyRow colSpan={5} text="불러오는 중..." /> : rows.length === 0 ? <EmptyRow colSpan={5} text="제출된 공급자 콘텐츠가 없습니다." /> : (rows as BusinessContentSubmission[]).map(row => <tr key={row.id}>
-            <td className={TD}><details><summary className="cursor-pointer font-medium">{row.content.title}</summary>
-              {row.content.summary && <p className="my-2">{row.content.summary}</p>}<BusinessContentPreview content={row.content} />
-            </details>{row.reason && <p className="mt-2 text-xs">심사 사유: {row.reason}</p>}</td>
-            <td className={TD}>{row.supplierName}</td><td className={TD}>{formatDateTime(row.createdAt)}</td><td className={TD}><StatusBadge status={row.status} /></td>
-            <td className={TD}>{row.status === 'pending' && <div className="flex gap-2">
-              <ActionButton label="승인·게시" action="approve" disabled={interactionLocked || loading} onClick={() => run(row.id, '승인·게시', false, () => api.decideContentSubmission(sfKey, row.id, 'approve'), row.content.title)} />
-              <ActionButton label="반려" action="reject" disabled={interactionLocked || loading} onClick={() => run(row.id, '반려', true, reason => api.decideContentSubmission(sfKey, row.id, 'reject', reason), row.content.title)} />
-            </div>}</td>
-          </tr>)}</tbody>
-        </table>}
+        {tab === 'content-submissions' && <SupplierSubmissionTable workspace={workspace} />}
         {tab === 'memberships' && (
           <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -395,25 +384,56 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
           </table>
         )}
 
-        {tab === 'contents' && (
-          <table className="w-full min-w-[640px] divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className={TH}>제목</th>
-                <th className={TH}>태그</th>
-                <th className={TH}>게시일</th>
-                <th className={TH}>수정일</th>
-                <th className={TH}>상태</th>
-                <th className={TH}>처리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <EmptyRow colSpan={6} text="불러오는 중..." />
-              ) : rows.length === 0 ? (
-                <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />
-              ) : (
-                (rows as SemiFranchiseContent[]).map((c) => (
+        {tab === 'contents' && <OperatorContentsTable workspace={workspace} contentEditHref={contentEditHref} />}
+      </div>}
+    </div>
+  );
+}
+
+
+function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
+  business: SemiFranchise | undefined;
+  forumHref?: BusinessPageProps['forumHref'];
+  renderBusinessHome?: BusinessPageProps['renderBusinessHome'];
+}) {
+  if (business?.status !== 'active') return null;
+  const forum = forumHref?.(business) ?? `/communities/${encodeURIComponent(business.community_key || `business:${business.key}`)}/forum`;
+  return <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
+    {renderBusinessHome?.(business)}
+    <Link to={forum}>참여자 게시판</Link>
+    <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
+  </nav>;
+}
+
+
+function SupplierSubmissionTable({ workspace }: Readonly<{ workspace: ReturnType<typeof useAssignedBusinessWorkspace> }>) {
+  const { rows, loading, interactionLocked, sfKey, run } = workspace;
+  let body: ReactNode;
+  if (loading) body = <EmptyRow colSpan={5} text="불러오는 중..." />;
+  else if (rows.length === 0) body = <EmptyRow colSpan={5} text="제출된 공급자 콘텐츠가 없습니다." />;
+  else body = (rows as BusinessContentSubmission[]).map(row => <tr key={row.id}>
+    <td className={TD}><details><summary className="cursor-pointer font-medium">{row.content.title}</summary>
+      {row.content.summary && <p className="my-2">{row.content.summary}</p>}<BusinessContentPreview content={row.content} />
+    </details>{row.reason && <p className="mt-2 text-xs">심사 사유: {row.reason}</p>}</td>
+    <td className={TD}>{row.supplierName}</td><td className={TD}>{formatDateTime(row.createdAt)}</td><td className={TD}><StatusBadge status={row.status} /></td>
+    <td className={TD}>{row.status === 'pending' && <div className="flex gap-2">
+      <ActionButton label="승인·게시" action="approve" disabled={interactionLocked || loading} onClick={() => run(row.id, '승인·게시', false, () => api.decideContentSubmission(sfKey, row.id, 'approve'), row.content.title)} />
+      <ActionButton label="반려" action="reject" disabled={interactionLocked || loading} onClick={() => run(row.id, '반려', true, reason => api.decideContentSubmission(sfKey, row.id, 'reject', reason), row.content.title)} />
+    </div>}</td>
+  </tr>);
+  return <table className={`w-full ${rows.length ? 'min-w-[640px]' : ''} divide-y divide-gray-200`}>
+    <thead className="bg-gray-50"><tr>{['제출 자료 · 내용 확인', '공급자', '제출일', '상태', '처리'].map(label => <th key={label} className={TH}>{label}</th>)}</tr></thead>
+    <tbody className="divide-y divide-gray-100">{body}</tbody>
+  </table>;
+}
+
+
+function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ workspace: ReturnType<typeof useAssignedBusinessWorkspace>; contentEditHref?: BusinessPageProps["contentEditHref"] }>) {
+  const { rows, loading, interactionLocked, sfKey, run } = workspace;
+  let contentRows: ReactNode;
+  if (loading) contentRows = <EmptyRow colSpan={6} text="불러오는 중..." />;
+  else if (!rows.length) contentRows = <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />;
+  else contentRows = (rows as SemiFranchiseContent[]).map((c) => (
                   <tr key={c.id}>
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{c.title}</div>
@@ -447,27 +467,20 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ));
+  return (<table className="w-full min-w-[640px] divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className={TH}>제목</th>
+                <th className={TH}>태그</th>
+                <th className={TH}>게시일</th>
+                <th className={TH}>수정일</th>
+                <th className={TH}>상태</th>
+                <th className={TH}>처리</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {contentRows}
             </tbody>
-          </table>
-        )}
-      </div>}
-    </div>
-  );
-}
-
-
-function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
-  business: SemiFranchise | undefined;
-  forumHref?: BusinessPageProps['forumHref'];
-  renderBusinessHome?: BusinessPageProps['renderBusinessHome'];
-}) {
-  if (business?.status !== 'active') return null;
-  const forum = forumHref?.(business) ?? `/communities/${encodeURIComponent(business.community_key || `business:${business.key}`)}/forum`;
-  return <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
-    {renderBusinessHome?.(business)}
-    <Link to={forum}>참여자 게시판</Link>
-    <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
-  </nav>;
+          </table>);
 }

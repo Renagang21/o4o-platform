@@ -6,11 +6,11 @@ export function BusinessContentSubmitDialog({
   item,
   onClose,
   onSuccess,
-}: {
+}: Readonly<{
   item: { id: string; title: string };
   onClose: () => void;
   onSuccess: (message: string) => void;
-}) {
+}>) {
   const [businesses, setBusinesses] = useState<Array<{
     key: string;
     name: string;
@@ -85,7 +85,7 @@ export function BusinessContentSubmitDialog({
           수정해도 제출 내용은 바뀌지 않습니다.
         </p>
         <label className="block text-sm">
-          제공할 약국 협력사업
+          <span>제공할 약국 협력사업</span>
           <select
             aria-label="제공할 약국 협력사업"
             data-dialog-initial-focus

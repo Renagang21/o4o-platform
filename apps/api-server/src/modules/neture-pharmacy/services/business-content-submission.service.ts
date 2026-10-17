@@ -28,9 +28,7 @@ export function librarySnapshot(item: {
   if (item.content_type === "document") {
     const blocks = Array.isArray(item.blocks) ? item.blocks : [];
     if (
-      !blocks.every(
-        (b) => b && b.type === "html" && typeof b.content === "string",
-      )
+      !blocks.every((b) => b?.type === "html" && typeof b.content === "string")
     ) {
       throw new NeturePharmacyError(
         400,
@@ -85,7 +83,7 @@ const VIEW = `SELECT sub.id, sub.status, sub.reason, sub.content_snapshot AS con
 export class BusinessContentSubmissionService {
   constructor(private readonly ds: DataSource) {}
 
-  async submit(
+  submit(
     supplierId: string,
     userId: string,
     sourceId: string,
@@ -133,14 +131,14 @@ export class BusinessContentSubmissionService {
     });
   }
 
-  async supplierList(supplierId: string) {
+  supplierList(supplierId: string) {
     return this.ds.query(
       `${VIEW} WHERE sub.supplier_id = $1 ORDER BY sub.created_at DESC`,
       [supplierId],
     );
   }
 
-  async operatorList(sf: SemiFranchiseRow, status?: string) {
+  operatorList(sf: SemiFranchiseRow, status?: string) {
     if (status && !["all", "pending", "approved", "rejected"].includes(status))
       throw new NeturePharmacyError(
         400,
@@ -174,7 +172,7 @@ export class BusinessContentSubmissionService {
         "INVALID_REASON",
         "심사 사유는 문자열이어야 합니다.",
       );
-    return this.ds.transaction(async (m) => {
+    return await this.ds.transaction(async (m) => {
       const [row] = await m.query(
         `SELECT * FROM semi_franchise_content_submissions
         WHERE id = $1::uuid AND semi_franchise_id = $2 FOR UPDATE`,

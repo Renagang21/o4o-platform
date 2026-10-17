@@ -41,9 +41,11 @@ async function main() {
     if (db.isInitialized) await db.destroy();
   }
 }
-main().catch(() => {
+try {
+  await main();
+} catch {
   console.error(
     "COOP_TEST_PROVISION_FAILED: verify active accounts, existing operator role, migration and target conflicts. No credentials logged.",
   );
   process.exitCode = 1;
-});
+}

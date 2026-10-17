@@ -109,6 +109,24 @@ integration("individual cooperative identity on isolated PostgreSQL", () => {
       (await new CooperativeService(db).session(outsider)).memberships,
     ).toEqual([]);
   });
+  it.each([
+    ["missing domain", "invalid"],
+    ["multiple separators", "member@@example.invalid"],
+    ["oversized", "m".repeat(1000) + "@example.invalid"],
+  ])("rejects malformed account selector: %s", async (_label, memberEmail) => {
+    await expect(
+      provisionTestCooperative(db, { ...accounts, memberEmail }, true),
+    ).rejects.toThrow("DISTINCT_ACCOUNTS_REQUIRED");
+  });
+  it("requires distinct operator and personal member selectors", async () => {
+    await expect(
+      provisionTestCooperative(
+        db,
+        { ...accounts, memberEmail: accounts.operatorEmail },
+        true,
+      ),
+    ).rejects.toThrow("DISTINCT_ACCOUNTS_REQUIRED");
+  });
   it("requires both the business assignment and an existing active operator role", async () => {
     expect(
       (await new CooperativeService(db).session(operator)).cooperativeOperators,

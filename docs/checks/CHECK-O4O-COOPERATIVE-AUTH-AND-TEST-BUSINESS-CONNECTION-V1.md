@@ -42,7 +42,7 @@ The final down restores the previous expected schema fingerprint inside a rolled
 
 ## Validation
 
-- 73 backend tests: actual isolated PostgreSQL cooperative/supplier content tests, auth origin boundaries,
+- 77 backend tests: actual isolated PostgreSQL cooperative/supplier content tests, auth origin boundaries,
   existing login eligibility and account-erasure storage regressions.
 - 37 cooperative frontend tests, including failed-load handling, another user's snapshot rejection and clearing
   old assignments when authentication changes.
@@ -71,3 +71,11 @@ The first automatic review found that role validity dates and current Neture acc
 operator projection/provisioning check. Both paths now share role-period checks and the existing
 `getNetureMainMembershipStatus` policy. Regressions cover future/expired/inactive roles and explicit Neture suspension;
 verified normal accounts without a legacy membership row still follow the canonical main-access policy.
+
+## Static-analysis correction
+
+SonarCloud reported mutable third-party Action tags and a backtracking email expression. The new workflow now
+pins official Google Actions to verified commit SHAs, and bounded account validation uses separator/domain checks.
+Other new-code findings were addressed by isolating content tables, stable attachment keys, readonly props,
+accessible loading output, a memoized provider value and explicit asynchronous flow. Existing content approval
+and own-authoring tests remain unchanged and pass after the rendering extraction.

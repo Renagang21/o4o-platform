@@ -15,17 +15,17 @@ export function safeAttachmentUrl(value: string): string | null {
 
 export function BusinessContentAttachments({
   attachments,
-}: {
+}: Readonly<{
   attachments?: unknown;
-}) {
+}>) {
   if (!Array.isArray(attachments)) return null;
   return (
     <ul className="my-3 space-y-2">
-      {attachments.map((a, i) => {
+      {attachments.map((a) => {
         const url =
           a && typeof a.url === "string" ? safeAttachmentUrl(a.url) : null;
         return url ? (
-          <li key={i}>
+          <li key={url}>
             <a
               href={url}
               target="_blank"
@@ -43,9 +43,9 @@ export function BusinessContentAttachments({
 
 export function BusinessContentPreview({
   content,
-}: {
+}: Readonly<{
   content: { body?: string | null; attachments?: unknown };
-}) {
+}>) {
   return (
     <div className="max-w-2xl break-words whitespace-normal [&_img]:max-w-full [&_pre]:overflow-x-auto">
       {content.body && <ContentRenderer html={content.body} />}
