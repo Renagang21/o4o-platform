@@ -55,9 +55,11 @@ export class FundingOfflineOperationsService {
    FROM market_trial_participants p LEFT JOIN users u ON u.id=p."participantId" WHERE p."marketTrialId"=$1 ORDER BY p."createdAt",p.id LIMIT 31 OFFSET $3`,
       [
         id,
-        ["operator_stopped", "operator_target_missed"].includes(
-          trial.closeReason,
-        ),
+        [
+          "operator_stopped",
+          "operator_target_missed",
+          "auto_target_missed",
+        ].includes(trial.closeReason),
         (page - 1) * 30,
       ],
     );

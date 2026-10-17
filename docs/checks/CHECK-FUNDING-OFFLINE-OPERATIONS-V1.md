@@ -79,3 +79,7 @@ Codex 리뷰 P2(운영자 결과 확인 전 모집 기한이 지나도 공개 �
 Codex 리뷰 P2 2건(철회·대체 참여 후 활성 인원 집계 불일치, 이행 완료 후 중지의 부적절한 환급 확인 대상 생성)을 반영했다. 공급자·운영자 참여/이행 요약과 모집률·funnel은 현재 참여만 집계하고 `recordCount`/`withdrawnCount`로 보존 이력을 구분한다. 명단·공급자 현황·CSV에 철회를 표시하며 입금 원장/금융 KPI는 이력을 포함하는 기록 집계임을 명시한다. 이행 완료는 기존 정상 종료를 사용하고 whole-trial stop은 모집/준비/결과 확인 단계로 제한한다. 완료 후 참여자 금액 정정은 유지한다.
 
 API 집중 회귀·격리 SQL 7 suites / 99 tests PASS(일반 API 84 + SQL 15), UI 집중 38 tests·API/웹 TypeScript·production build PASS다. 실제 bundle의 PC·모바일 모금→중지→철회→부분 환급/조회 복구, 공급자 조회 재시도도 회귀 PASS했다. 최신 main #672의 커뮤니티 독립 서비스 변경을 충돌 없이 반영했으며 migration manifest/expected schema는 동일하다. 이 기준 main의 웹 전체 1,058 tests와 타입·빌드·브라우저를 먼저 확인했고 이번 활성 인원/종료 보완의 최종 전체 회귀는 PR #674에서 추적한다.
+
+Codex 리뷰 P1/P2(과거 `auto_target_missed`의 미환급 입금 누락, 철회자의 진행 알림 수신)를 반영했다. 과거 모집 실패 건은 환급 확인 대상에만 포함하고 입금 독촉·약정·이행 예외에서는 계속 제외한다. 상세의 환급 확인 금액도 같은 기준을 사용한다. 모집 결과·단계 알림은 현재 참여자만 수신하며 공급자 본인 알림과 보존 원장은 유지한다.
+
+최신 API/격리 SQL 8 suites / 110 tests PASS(일반 API 84, 펀딩 SQL 17, 기존 공급자·펀딩 SQL 9), TypeScript·변경 API lint PASS다. 기존 SQL harness도 현재 마지막 migration을 대상으로 up/down하도록 정합하고 baseline~31개 incremental의 모든 prefix fingerprint를 재검증했다. 실제 SQL로 수신자를 조회한 뒤 notification 저장 호출만 spy로 대체해 철회 이력은 참여자 알림 대상에 포함되지 않는 것을 확인했다. 운영 알림/업무 데이터 write는 없으며 두 격리 DB의 잔존 0을 확인하고 전용 PostgreSQL 프로세스를 종료했다.

@@ -1,5 +1,4 @@
 import { DataSource } from "typeorm";
-import { CreateSupplierReviewRequests1792193756961 } from "../database/migrations/1792193756961-CreateSupplierReviewRequests.js";
 import { ActionLog } from "@o4o/action-log-core";
 import { runCanonicalBootstrap } from "../database/bootstrap/bootstrap-runner.js";
 import { INCREMENTAL_MIGRATIONS } from "../database/incremental/manifest.js";
@@ -113,10 +112,11 @@ fixture("isolated supplier review and funding operations", () => {
     expect(triggers).toEqual([{ tgenabled: "O" }]);
     expect(await db.runMigrations({ transaction: "each" })).toEqual([]);
     await runner.startTransaction();
-    await new CreateSupplierReviewRequests1792193756961().down(runner);
+    const LastMigration = INCREMENTAL_MIGRATIONS.at(-1)!;
+    await new LastMigration().down(runner);
     const previous = await computeSchemaFingerprint(runner);
     expect(previous.hash).toBe(EXPECTED_SCHEMA_STATES.at(-2)!.fingerprint);
-    await new CreateSupplierReviewRequests1792193756961().up(runner);
+    await new LastMigration().up(runner);
     expect((await computeSchemaFingerprint(runner)).hash).toBe(fp.hash);
     await runner.rollbackTransaction();
     await runner.release();
@@ -409,8 +409,8 @@ fixture("isolated supplier review and funding operations", () => {
     const all = await service.list({});
     const byTrial = (id: string) => all.items.find((i: { trialId: string }) => i.trialId === id);
     expect(byTrial(closedAfterFulfilled)?.types).toEqual(["fulfillment_pending"]);
-    expect(byTrial(autoClosed)).toBeUndefined();
-    // A failed recruiting trial is not collection/fulfillment work in any filter.
+    expect(byTrial(autoClosed)?.types).toEqual(["refund_pending"]);
+    // Failed recruitment is not collection/fulfillment work; known unrefunded deposits still need refund review.
     for (const [payment, amount, reward] of [
       ["unpaid", null, "pending"], ["pending", null, "pending"],
       ["failed", null, "pending"], ["paid", null, "pending"],
@@ -419,11 +419,13 @@ fixture("isolated supplier review and funding operations", () => {
       await db.query(`UPDATE market_trial_participants SET "paymentStatus"=$1,
         "paidAmount"=$2,"rewardStatus"=$3 WHERE "marketTrialId"=$4`,
         [payment, amount, reward, autoClosed]);
-      for (const type of [undefined, "payment_pending", "payment_failed", "amount_missing",
+      for (const type of ["payment_pending", "payment_failed", "amount_missing",
         "amount_mismatch", "fulfillment_pending", "fulfilled_without_payment"]) {
         expect((await service.list({type})).items.some(
           (row: {trialId: string}) => row.trialId === autoClosed)).toBe(false);
       }
+      const expectedRefund=payment==='paid'&&Number(amount)>0;
+      for(const type of [undefined,'refund_pending'])expect((await service.list({type})).items.some((row:{trialId:string})=>row.trialId===autoClosed)).toBe(expectedRefund);
     }
 
     await new FundingRewardRecordService(db).update(

@@ -1,4 +1,11 @@
-import { readFundingParticipantActivity } from "../services/funding/funding-participant-activity.service.js";
+import { AppDataSource } from "../database/connection.js";
+import { MarketTrial } from "@o4o/market-trial";
+import { marketTrialNotification } from "../services/marketTrial.notification.js";
+import { notificationService } from "../services/NotificationService.js";
+import {
+  readFundingParticipantActivity,
+  readCurrentFundingParticipantIds,
+} from "../services/funding/funding-participant-activity.service.js";
 import { computeKpiSnapshot } from "../controllers/market-trial/marketTrialOperatorController.js";
 import { listSupplierActiveFundings } from "../modules/neture/services/supplier-active-fundings.service.js";
 import { DataSource } from "typeorm";
@@ -459,5 +466,95 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       reason: "완료 후 과거 약정 정정",
     });
     expect((await service.snapshot(trial)).trial.status).toBe("fulfilled");
+  });
+  it("surfaces legacy failed recruitment deposits for refund review and removes only the signal after refund", async () => {
+    const id = "70000000-0000-4000-8000-000000000001",
+      p = "80000000-0000-4000-8000-000000000001";
+    await db.query(
+      `INSERT INTO market_trials(id,title,status,"fundingStartAt","fundingEndAt","currentParticipants","supplierId","targetAmount","trialPeriodDays","trialUnitPrice","closeReason") VALUES ($1,'과거 실패 모집','closed',now(),now(),1,$2,200,30,100,'auto_target_missed')`,
+      [id, actor],
+    );
+    await db.query(
+      `INSERT INTO market_trial_participants(id,"marketTrialId","participantId","participantType","contributionAmount","paymentStatus","paidAmount","rewardStatus") VALUES ($1,$2,$3,'store_owner',200,'paid',100,'pending')`,
+      [p, id, actor],
+    );
+    const exceptions = new FundingOperatorExceptionsService(db);
+    expect(
+      (await exceptions.list({})).items.find((r: any) => r.trialId === id)
+        ?.types,
+    ).toEqual(["refund_pending"]);
+    expect(
+      Number((await service.snapshot(id)).participants[0].refundPending),
+    ).toBe(100);
+    for (const type of [
+      "payment_pending",
+      "payment_failed",
+      "amount_missing",
+      "amount_mismatch",
+      "fulfillment_pending",
+      "pledge_missing",
+      "fulfilled_without_payment",
+    ]) {
+      expect(
+        (await exceptions.list({ type })).items.some(
+          (r: any) => r.trialId === id,
+        ),
+      ).toBe(false);
+    }
+    await service.update(id, p, actor, {
+      action: "refund",
+      version: 0,
+      amount: 100,
+      processedAt: "2026-10-17T01:00:00Z",
+      reason: "과거 건 오프라인 환급 확인",
+    });
+    expect(
+      (await exceptions.list({ type: "refund_pending" })).items.some(
+        (r: any) => r.trialId === id,
+      ),
+    ).toBe(false);
+    expect((await service.snapshot(id)).participants[0].id).toBe(p);
+  });
+  it("notifies the current participant and creator without treating withdrawn history as a participant recipient", async () => {
+    const recipients = await readCurrentFundingParticipantIds(db, trial);
+    expect(recipients.map((r) => r.participantId)).toEqual([
+      "60000000-0000-4000-8000-000000000001",
+    ]);
+    const repository = jest
+      .spyOn(AppDataSource, "getRepository")
+      .mockImplementation(((target: unknown) => {
+        if (target !== MarketTrial)
+          throw Error("Unexpected fixture repository");
+        return {
+          findOne: async () =>
+            (
+              await db.query("SELECT * FROM market_trials WHERE id=$1", [trial])
+            )[0],
+        };
+      }) as any);
+    const query = jest
+      .spyOn(AppDataSource, "query")
+      .mockImplementation(((sql: string, params: unknown[]) =>
+        db.query(sql, params)) as any);
+    const notify = jest
+      .spyOn(notificationService, "createNotification")
+      .mockResolvedValue({ id: "synthetic-notification" } as any);
+    try {
+      await marketTrialNotification.onRecruitingResult(trial, true, actor);
+      expect(
+        notify.mock.calls
+          .filter(([input]) => !!input.metadata?.participantId)
+          .map(([input]) => input.userId),
+      ).toEqual(recipients.map((r) => r.participantId));
+      expect(
+        notify.mock.calls.some(
+          ([input]) => input.userId === actor && !input.metadata?.participantId,
+        ),
+      ).toBe(true);
+    } finally {
+      notify.mockRestore();
+      query.mockRestore();
+      repository.mockRestore();
+    }
   });
 });

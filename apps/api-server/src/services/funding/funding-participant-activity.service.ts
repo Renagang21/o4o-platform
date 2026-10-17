@@ -19,3 +19,15 @@ export function readFundingParticipantActivity(
     [trialId],
   );
 }
+
+/** Stage/result notifications target current participants, with no change to retained membership records. */
+export function readCurrentFundingParticipantIds(
+  db: DataSource,
+  trialId: string,
+): Promise<Array<{ participantId: string }>> {
+  return db.query(
+    `SELECT "participantId" FROM market_trial_participants WHERE "marketTrialId"=$1
+    AND NOT COALESCE(("offlineState"->>'withdrawn')::boolean,false)`,
+    [trialId],
+  );
+}
