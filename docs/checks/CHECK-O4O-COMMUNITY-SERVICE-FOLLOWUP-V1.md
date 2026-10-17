@@ -11,7 +11,7 @@
 | 운영 메뉴 | 약관·Hero 관리 경로의 community 호스트 소유권 누락으로 대표 호스트 이동 | 두 설정 경로를 community 소유로 지정, query/hash와 원래 세션 유지 |
 | 구글 로그인 | AuthProvider가 Neture 멤버십 조회 대상을 고정 전달 | community 호스트의 조회 키만 community로 정렬 |
 | 알림 조회 | 헤더·모바일 알림의 serviceKey가 Neture로 고정 | community 호스트의 미읽음·목록 조회 키를 community로 지정 |
-| 화면 이름 | 로그인 및 약관 재동의 화면의 Neture 이름 | community 호스트에서 커뮤니티 이름 표시 |
+| 화면 이름 | 로그인 화면의 Neture 이름 | community 호스트에서 커뮤니티 이름 표시. 공통 계정 약관의 Neture 주체 표시는 유지 |
 | 미사용 모델 | 개별 Community/Membership/CreationRequest entity가 registry에 잔류 | 전체 소스 참조가 registry뿐임을 확인하고 3개 클래스·등록 제거 |
 
 구글 로그인 본문의 serviceKey는 응답의 멤버십 조회 대상이다. 서버의 로그인 자격 판정은 Origin으로
@@ -75,3 +75,5 @@
 
 옛 Neture 포럼 삭제·분석 화면은 community 전용 메뉴로 승격하지 않는다.
 community 자체 게시판/공개 설정과 공통 Forum 중재 API의 지원 범위를 별도로 정리해야 한다.
+
+자동 리뷰의 공통 계정 약관 주체 표시 지적을 반영해 해당 이름 변경을 철회하고 community 호스트 회귀 검사를 추가했다.

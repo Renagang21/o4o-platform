@@ -26,7 +26,7 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       onLogout={logout}
       // The representative home renders public content only while terms are pending.
       allowPaths={CURRENT_HOST_PROFILE === 'main' ? [...ALLOW_PATHS, '/'] : ALLOW_PATHS}
-      serviceName={({ community: '커뮤니티', carepharm: 'CarePharm' } as Record<string, string>)[CURRENT_HOST_PROFILE] ?? 'Neture'}
+      serviceName={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm' : 'Neture'}
       termsPath="/terms"
       termsServiceKey="neture"
     >
