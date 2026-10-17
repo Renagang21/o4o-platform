@@ -372,6 +372,7 @@ async function openAdvanced() {
 it("a failed description lookup preserves the saved content link until a successful retry", async () => {
   api.candidates.mockRejectedValueOnce(new Error("private"));
   await openAdvanced();
+  fireEvent.click(screen.getByRole("button", {name:"상품 진열"}));
   await screen.findByText(/기존 연결은 유지합니다/);
   fireEvent.click(screen.getByRole("button", { name: "설명 다시 시도" }));
   await screen.findByRole("option", { name: /Linked description/ });

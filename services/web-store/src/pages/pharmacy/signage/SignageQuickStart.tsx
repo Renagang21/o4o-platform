@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../../components/store/StoreAiPlacement';
 import { useId, useRef, useState } from 'react';
 import { AuthoringDialog } from '../authoring/AuthoringDialog';
 import { createStorePlaylist, addPlaylistItem, addPlaylistItemFromSignage, type StorePlaylist } from '../../../api/storePlaylist';
@@ -56,6 +57,7 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
     <div className="flex max-h-[90vh] flex-col">
     <div className="space-y-4 overflow-y-auto p-5">
       <h2 id={id} className="text-lg font-semibold">새 사이니지 안내</h2>
+      <StoreAiSlot priority={2} label="사이니지 안내 작성" />
       <p className="text-sm text-slate-600">보여줄 자료를 고르세요. 선택한 순서로 초안을 저장한 뒤 재생 시간과 게시를 정합니다.</p>
       {error && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
       <fieldset disabled={saving || uncertain || !!header.current} className="space-y-3 disabled:opacity-70">

@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreDirectContentPage — direct 콘텐츠 상세 / 수정 / 삭제
@@ -216,6 +217,7 @@ export default function StoreDirectContentPage() {
         </div>
       </div>
 
+      <StoreAiSlot label="안내 편집" />
       {/* Content area */}
       {editing ? (
         // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:

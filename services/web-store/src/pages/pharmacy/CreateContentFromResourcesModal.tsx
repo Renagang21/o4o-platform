@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * CreateContentFromResourcesModal — 빈 편집기 직접 작성 → direct 콘텐츠 제작
@@ -95,6 +96,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
         </header>
 
         <div style={styles.body}>
+          <StoreAiSlot priority={2} label="안내 작성" />
           {session.error && <p role="alert" className="mb-3 text-sm text-red-700">{session.error}<button type="button" onClick={() => void session.reload()} className="ml-2 underline">다시 시도</button></p>}
           {session.notice && <output role={session.notice.ok ? 'status' : 'alert'} className={session.notice.ok ? 'mb-3 text-sm text-green-700' : 'mb-3 text-sm text-red-700'}>{session.notice.message}</output>}
           {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품에서 진입한 경우 연결 대상 표시 */}
