@@ -1,14 +1,15 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-const state = vi.hoisted(() => ({ account: 'a', authenticated: true, login: vi.fn(), post: vi.fn() }));
-vi.mock('../../../contexts', () => ({ useAuth: () => ({ user: { id: state.account }, isAuthenticated: state.authenticated }), useLoginModal: () => ({ openLoginModal: state.login }) }));
+const state = vi.hoisted(() => ({ account: 'a', authenticated: true, post: vi.fn() }));
+vi.mock('../../../contexts', () => ({ useAuth: () => ({ user: { id: state.account }, isAuthenticated: state.authenticated }) }));
 vi.mock('../../../lib/apiClient', () => ({ api: { post: state.post } }));
 import StudyEntry from '../CarePharmStudyEntry';
-beforeEach(() => { state.account = 'a'; state.authenticated = true; state.login.mockReset(); state.post.mockReset(); });
-afterEach(cleanup);
-it('asks a guest to log in without issuing a handoff', () => {
+const assign = vi.fn();
+beforeEach(() => { assign.mockReset(); vi.stubGlobal('location', { ...window.location, assign }); state.account = 'a'; state.authenticated = true; state.post.mockReset(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+it('sends a guest through the existing Study login-and-resume entry without issuing a handoff', () => {
   state.authenticated = false; render(<StudyEntry />); fireEvent.click(screen.getByRole('button'));
-  expect(state.login).toHaveBeenCalledWith('/'); expect(state.post).not.toHaveBeenCalled();
+  expect(assign).toHaveBeenCalledWith('https://neture.co.kr/service-entry/lecture?returnPath=%2F'); expect(state.post).not.toHaveBeenCalled();
 });
 it('uses the real handoff helper and existing Study identity, rejects a wrong host, and permits retry', async () => {
   state.post.mockResolvedValue({ data: { data: { targetUrl: 'https://evil.test/handoff' } } }); render(<StudyEntry />);

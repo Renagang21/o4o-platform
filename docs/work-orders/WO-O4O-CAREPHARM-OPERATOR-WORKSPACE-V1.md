@@ -62,3 +62,10 @@ CarePharm의 담당 사업 화면은 이미 존재하지만 `/operator`는 대�
 - 공통 운영 UI 6 files / 32 tests PASS: 배송비 미설정·명시적 0원과 무료배송 기준 null·0·양수를 구분한다.
 - 기존 실제 배송비 계산 함수 Jest 3 tests PASS: 기준 null/0/50000에서 양수 주문의 배송비가 각각 3000/0/3000임을 확인한다. UI와 서버 검증은 각 계층에서 실행하며 frontend production 코드가 API 구현을 import하지 않는다.
 - Neture TypeScript 포함 production build PASS. 변경 코드 lint·문서·diff 검사를 통과한 뒤 같은 branch에 추가 push하고 새 HEAD로 CI·Codex 재리뷰를 확인한다.
+
+## PR #686 Study 로그인 복귀 보완
+
+`PRRT_kwDOOXrFm86tgzG8`: 비로그인 Study CTA가 로그인 후 CarePharm 홈에만 돌아오던 문제를 보완했다. 비로그인은 기존 대표 호스트 `/service-entry/lecture?returnPath=%2F`로 이동해 해당 호스트에서 로그인하고 Study handoff를 자동 재개한다. 세션이 없는 다른 호스트로 로그인 직후 다시 이동해 재로그인을 유발하지 않도록 처음부터 기존 서비스 진입점에서 인증한다. 로그인 사용자의 기존 handoff·origin 검사·계정 전환 보호는 유지한다.
+
+- CarePharm CTA와 기존 ServiceEntryPage 집중 2 files / 22 tests PASS. 비로그인 목적지 보존, 로그인 전 발급 없음, 로그인 복귀 후 추가 클릭 없이 Study로 이동을 확인했다.
+- 변경 파일 ESLint PASS. Neture TypeScript 포함 production build PASS. Study 가입이나 수강 권한을 생성하지 않는다.

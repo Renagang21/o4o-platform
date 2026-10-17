@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { requestServiceHandoff } from '@o4o/auth-react';
-import { useAuth, useLoginModal } from '../../contexts';
+import { useAuth } from '../../contexts';
 import { api } from '../../lib/apiClient';
+import { MAIN_ORIGIN } from '../../lib/hostIdentity';
 
 /** Study owns course publishing, enrollment and access; this entry only preserves the account session. */
 export default function CarePharmStudyEntry() {
@@ -9,14 +10,17 @@ export default function CarePharmStudyEntry() {
   return <StudyEntry key={user?.id ?? 'guest'} authenticated={isAuthenticated} />;
 }
 function StudyEntry({ authenticated }: { authenticated: boolean }) {
-  const { openLoginModal } = useLoginModal();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const active = useRef(true);
   const moving = useRef(false);
   useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
   const enter = async () => {
-    if (!authenticated) { openLoginModal('/'); return; }
+    if (!authenticated) {
+      // Service entry owns login and resumes the Study handoff on its own host.
+      window.location.assign(`${MAIN_ORIGIN}/service-entry/lecture?returnPath=%2F`);
+      return;
+    }
     if (moving.current) return;
     moving.current = true; setBusy(true); setError('');
     try {
