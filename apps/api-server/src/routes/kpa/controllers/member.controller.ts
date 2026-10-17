@@ -1,3 +1,5 @@
+import { assertOrdinaryServiceMember } from '../../../services/operations/service-relationship-protection.js';
+import { OperationError, recordOperation } from '../../../services/operations/operation-audit.js';
 /**
  * KPA Member Controller
  * 약사회 회원 API 엔드포인트
@@ -1499,7 +1501,7 @@ export function createMemberController(
         }
 
         // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-        if (await demoAccountService.isDemoAccount(member.user_id)) {
+        if (await demoAccountService.isDemoAccount(member.user_id, dataSource)) {
           res.status(403).json({ error: { code: DEMO_ACCOUNT_FORBIDDEN_CODE, message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE } });
           return;
         }
@@ -1584,80 +1586,27 @@ export function createMemberController(
         //   기존 forum_post/forum_comment 카운트 기반 409 차단을 제거.
         //   사용자 측 강한 경고(DeleteRiskModal) + 명시적 confirm 으로 보호.
         //
-        // 영향 데이터 — 감사 로그 (삭제 전 / 후 분석 가능)
-        const [forumPosts, forumComments] = await Promise.all([
-          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
-          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
-        ]);
-        const forumPostCnt = forumPosts[0]?.cnt || 0;
-        const forumCommentCnt = forumComments[0]?.cnt || 0;
-
-        // Audit log 먼저 기록 (삭제 전)
-        try {
-          await auditRepo.save(auditRepo.create({
-            operator_id: (req as any).user?.id,
-            operator_role: 'kpa:admin',
-            action_type: 'MEMBER_STATUS_CHANGED' as any,
-            target_type: 'member',
-            target_id: member.id,
-            metadata: {
-              action: 'hard_delete',
-              userId: member.user_id,
-              membershipType: member.membership_type,
-              licenseNumberCleared: !!member.license_number,
-              forumPosts: forumPostCnt,
-              forumComments: forumCommentCnt,
-            },
-          }));
-        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
-
-        // WO-O4O-HARD-DELETE-SERVICE-SCOPED-V1:
-        // users는 공통 Identity — 절대 삭제 금지.
-        // KPA 범위 데이터만 정리한다. 다른 서비스 membership/role은 유지.
-        const queryRunner = dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-        try {
-          // KPA-specific 프로필 삭제 (KPA 전용 테이블)
-          await queryRunner.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]);
-          await queryRunner.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]);
-
-          // service_memberships: KPA 서비스만 삭제
-          await queryRunner.query(
-            `DELETE FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society'`,
-            [member.user_id]
-          );
-
-          // role_assignments: kpa: prefix 역할만 삭제
-          await queryRunner.query(
-            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE 'kpa:%'
-               AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`,
-            [member.user_id]
-          );
-
-          // kpa_members 삭제 (CASCADE: kpa_member_services 자동 삭제)
-          await memberRepo.remove(member);
-
-          // users: 절대 삭제 금지이며 **비활성화도 하지 않는다**
-          //
-          // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
-          //   이전에는 남은 service_memberships 가 0 이면 users 를 `status='deleted'` ·
-          //   `isActive=false` 로 내렸다. `requireAuth` 가 `isActive` 를 보므로 계정이 죽고
-          //   Google 로그인까지 막혔다. KPA 회원 삭제는 **KPA 관계 종료**이지 O4O 계정 탈퇴가 아니다.
-          //   계정 정지/탈퇴는 명시적인 플랫폼 경로(관리자 계정 관리)에서만 한다.
-
-          await queryRunner.commitTransaction();
-        } catch (txError: any) {
-          await queryRunner.rollbackTransaction();
-          console.error('Hard delete transaction failed:', txError);
-          res.status(500).json({ error: { code: 'DELETE_FAILED', message: txError.message } });
-          return;
-        } finally {
-          await queryRunner.release();
-        }
+        // The target profile, membership cleanup and audit share one transaction manager.
+        await dataSource.transaction(async manager => {
+          const current = await manager.getRepository(KpaMember).findOne({ where: { id: member.id }, lock: { mode: 'pessimistic_write' } });
+          if (!current) throw new OperationError(409, 'MEMBER_CHANGED', '회원 상태가 변경됐습니다. 다시 조회해 주세요.');
+          await assertOrdinaryServiceMember(manager, current.user_id, ['kpa-society']);
+          await manager.query('DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1', [current.user_id]);
+          await manager.query('DELETE FROM kpa_student_profiles WHERE user_id = $1', [current.user_id]);
+          await manager.query(`DELETE FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society'`, [current.user_id]);
+          await manager.query(`DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE 'kpa:%'
+            AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`, [current.user_id]);
+          const removedMemberId = current.id;
+          await manager.getRepository(KpaMember).remove(current);
+          await recordOperation(manager, 'kpa-society', (req as any).user.id, 'member.admin.relationship_cleanup', {
+            memberId: removedMemberId, userId: current.user_id, licenseNumberCleared: !!current.license_number,
+            commonIdentityDeleted: false, authoredActivityDeleted: false,
+          });
+        });
 
         res.json({ success: true, data: { mode: 'hard', deleted: true } });
       } catch (error: any) {
+        if (error instanceof OperationError) { res.status(error.status).json({ error: { code: error.code, message: error.message } }); return; }
         console.error('Failed to delete member:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
       }

@@ -1,3 +1,4 @@
+import { recordOperation } from '../../../services/operations/operation-audit.js';
 import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import { Repository, type EntityManager } from 'typeorm';
@@ -290,8 +291,12 @@ export class NetureSupplierLifecycleService {
           );
         }
 
-        // RBAC SSOT (F9): role 쓰기는 roleAssignmentService 를 통해서만. 커밋 성공 후 role 회수.
-        // (트랜잭션 롤백 시 role 은 손대지 않아 부분 성공을 남기지 않는다.)
+        // RBAC SSOT supports the same transaction manager: no committed state/role split.
+        if (locked.user_id) {
+          await roleAssignmentService.removeRole(locked.user_id, 'supplier', manager);
+          await roleAssignmentService.removeRole(locked.user_id, 'neture:supplier', manager);
+        }
+        await recordOperation(manager, 'supplier', adminUserId, 'supplier.admin.deactivate', { supplierId, reason: trimmedReason, revokedApprovalCount: revokedCount });
         const org = await this.businessService.getOrgData(locked.organization_id);
         return {
           success: true,
@@ -307,10 +312,6 @@ export class NetureSupplierLifecycleService {
           },
         };
       }).then(async (result) => {
-        if (result.success && result.data?.userId) {
-          await roleAssignmentService.removeRole(result.data.userId as string, 'supplier');
-          await roleAssignmentService.removeRole(result.data.userId as string, 'neture:supplier');
-        }
         if (result.success) {
           logger.info(
             `[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${result.data?.revokedApprovalCount} approvals)`,
@@ -383,6 +384,10 @@ export class NetureSupplierLifecycleService {
           );
         }
 
+        if (locked.user_id) {
+          await roleAssignmentService.assignRole({ userId: locked.user_id, role: 'neture:supplier', assignedBy: adminUserId }, manager);
+        }
+        await recordOperation(manager, 'supplier', adminUserId, 'supplier.admin.reactivate', { supplierId, reason: trimmedReason });
         const org = await this.businessService.getOrgData(locked.organization_id);
         return {
           success: true,
@@ -396,14 +401,6 @@ export class NetureSupplierLifecycleService {
           },
         };
       }).then(async (result) => {
-        if (result.success && result.data?.userId) {
-          // RBAC SSOT (F9): 커밋 성공 후 supplier role 복구 (assignRole 은 기존 비활성 배정을 재활성화).
-          await roleAssignmentService.assignRole({
-            userId: result.data.userId as string,
-            role: 'neture:supplier',
-            assignedBy: adminUserId,
-          });
-        }
         if (result.success) {
           logger.info(`[NetureSupplierService] Supplier reactivated: ${supplierId} by ${adminUserId}`);
           // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:

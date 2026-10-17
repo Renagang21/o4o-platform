@@ -172,10 +172,10 @@ describe('supplier lifecycle contracts', () => {
     expect(notificationService.createNotification).not.toHaveBeenCalled();
   });
 
-  it('deactivation commits all cascades before role removal and notification', async () => {
+  it('deactivation writes state and roles in one transaction before notification', async () => {
     expect(await service.deactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: true, data: { status: 'INACTIVE', revokedApprovalCount: 2, guard: { activeOrderCount: 0, unsettledCount: 0, settlementInProgressCount: 0 } } });
     expect(updates().map(([sql]) => sql.match(/UPDATE\s+(\w+)/)[1])).toEqual(['neture_suppliers', 'product_approvals', 'organization_product_listings', 'organizations']);
-    expect(events).toEqual(['commit', 'remove-role', 'remove-role', 'notify']);
+    expect(events).toEqual(['remove-role', 'remove-role', 'commit', 'notify']);
     expect(query.mock.calls[0][0]).toContain('FOR UPDATE');
   });
 
@@ -189,12 +189,12 @@ describe('supplier lifecycle contracts', () => {
     expect(notificationService.createNotification).not.toHaveBeenCalled();
   });
 
-  it('reactivation restores access after commit without restoring approvals or listings', async () => {
+  it('reactivation restores access atomically without restoring approvals or listings', async () => {
     locked.status = 'INACTIVE';
     expect(await service.reactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: true, data: { status: 'ACTIVE', previousStatus: 'INACTIVE' } });
     expect(updates().map(([sql]) => sql.match(/UPDATE\s+(\w+)/)[1])).toEqual(['neture_suppliers', 'organizations']);
     expect(getNetureMainMembershipStatus).toHaveBeenCalledWith(manager, 'fixture-user');
-    expect(events).toEqual(['commit', 'assign-role', 'notify']);
+    expect(events).toEqual(['assign-role', 'commit', 'notify']);
   });
 
   it.each(['membership', 'proof'])('reactivation rejects invalid %s without any state or role write', async (gate) => {
@@ -204,6 +204,23 @@ describe('supplier lifecycle contracts', () => {
     expect(await service.reactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: false, error: gate === 'membership' ? 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' : 'BUSINESS_REGISTRATION_REQUIRED' });
     expect(updates()).toHaveLength(0);
     expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
+  });
+
+  it.each(['deactivateSupplier', 'reactivateSupplier'] as const)('%s rolls back when the role write fails and sends no notification', async method => {
+    locked.status = method === 'deactivateSupplier' ? 'ACTIVE' : 'INACTIVE';
+    const error = new Error('fixture role failure');
+    (method === 'deactivateSupplier' ? roleAssignmentService.removeRole : roleAssignmentService.assignRole as jest.Mock).mockRejectedValueOnce(error);
+    await expect(service[method](supplier.id, 'fixture-admin', 'Fixture reason')).rejects.toBe(error);
+    expect(events).toEqual(['rollback']);
+    expect(notificationService.createNotification).not.toHaveBeenCalled();
+  });
+  it.each(['deactivateSupplier', 'reactivateSupplier'] as const)('%s rolls back on mandatory audit failure', async method => {
+    locked.status = method === 'deactivateSupplier' ? 'ACTIVE' : 'INACTIVE';
+    const answer = query.getMockImplementation()!;
+    query.mockImplementation(async (sql: string) => { if (sql.includes('INSERT INTO action_logs')) throw new Error('audit unavailable'); return answer(sql); });
+    await expect(service[method](supplier.id, 'fixture-admin', 'Fixture reason')).rejects.toThrow('audit unavailable');
+    expect(events).toContain('rollback'); expect(events).not.toContain('commit');
+    expect(notificationService.createNotification).not.toHaveBeenCalled();
   });
 
   it('notification failure preserves a successful state transition', async () => {

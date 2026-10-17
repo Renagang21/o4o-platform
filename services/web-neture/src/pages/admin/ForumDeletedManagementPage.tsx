@@ -77,6 +77,8 @@ function formatDate(iso: string | null | undefined): string {
 
 const ACTION_LABEL: Record<string, string> = {
   'forum.delete_request.approve': '삭제 요청 승인',
+  'forum.operator.pause': '운영자 사용 중지',
+  'forum.operator.resume': '운영자 재개',
   'forum.operator.soft_delete': 'Operator 직접 삭제',
   'forum.operator.hard_delete': 'Operator 완전 삭제',
   'forum.admin.restore': 'Admin 복구',

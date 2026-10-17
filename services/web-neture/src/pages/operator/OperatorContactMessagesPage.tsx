@@ -1,24 +1,6 @@
-/**
- * OperatorContactMessagesPage — 문의 메시지 (Operator scope, read-only + 일괄 mark-read)
- *
- * WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
- *
- * 선행 IR : IR-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-SCOPE-AUDIT-V1 (16d4a5def) — B 안 (혼합형) 채택
- * 선행 WO : WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1 (operator scope 분리 패턴)
- *
- * 운영자가 할 수 있는 일:
- *  - 문의 목록 조회 (default = 전체 유형 — WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1)
- *  - contactType / status 필터
- *  - supplier/partner 문의 일괄 mark-read 처리 (service/other 는 admin 개별 처리)
- *
- * 운영자가 할 수 없는 일 (admin 으로 escalate):
- *  - 개별 status 변경
- *  - adminNotes 작성
- *  - service / other 문의의 일괄 처리
- *  - ipAddress / userAgent / adminNotes 조회 — backend 가 응답에서 제외
- */
-
+/** Daily inquiry management; admin and operator share the same service workflow. */
 import { useState, useEffect, useCallback, useRef } from 'react';
+import OperatorContactDetail from './OperatorContactDetail';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -58,6 +40,8 @@ type ContactTypeFilter = '' | 'supplier' | 'partner' | 'service' | 'other';
 type StatusFilter = '' | 'new' | 'in_progress' | 'resolved';
 
 export default function OperatorContactMessagesPage() {
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [detailBusy, setDetailBusy] = useState(false);
   const [messages, setMessages] = useState<OperatorContactMessage[]>([]);
   const [pagination, setPagination] = useState<OperatorContactPagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
@@ -103,7 +87,7 @@ export default function OperatorContactMessagesPage() {
   }, [load]);
 
   const handleBulkMarkRead = async () => {
-    if (markLock.current || loading || error) return;
+    if (markLock.current || detailBusy || loading || error) return;
     markLock.current = true;
     const current = beginMark();
     setMarkingRead(true); setActionError(null); setNotice(null);
@@ -201,8 +185,9 @@ export default function OperatorContactMessagesPage() {
         <span className="whitespace-pre-wrap">{m.messagePreview || '-'}</span>
       </div>
       <p className="text-xs text-slate-400">
-        ※ 개별 상세 / 상태 변경 / 메모 작성은 관리자 화면(/admin/contact-messages)에서 처리합니다.
+        상태 변경과 내부 메모는 문의 상세에서 처리합니다.
       </p>
+      <button type="button" disabled={detailBusy || markingRead} onClick={() => setDetailId(m.id)} className="underline text-emerald-700">문의 상세 처리</button>
     </div>
   );
 
@@ -211,7 +196,7 @@ export default function OperatorContactMessagesPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">문의 메시지 (운영자)</h1>
         <p className="text-slate-500 mt-1">
-          Contact us 로 접수된 모든 문의(공급자 · 서비스 · 기타 — 과거 접수된 파트너 문의 포함)를 확인합니다. 개별 상세 처리·메모는 관리자 화면에서 진행하세요.
+          Contact us 로 접수된 모든 문의(공급자 · 서비스 · 기타 — 과거 접수된 파트너 문의 포함)를 확인합니다. 상세 확인·상태 변경·내부 메모를 이 화면에서 처리합니다.
         </p>
       </div>
 
@@ -220,9 +205,9 @@ export default function OperatorContactMessagesPage() {
         <div className="flex flex-wrap gap-3 items-center">
           <select
             aria-label="문의 유형"
-            disabled={markingRead}
+            disabled={markingRead || detailBusy}
             value={contactTypeFilter}
-            onChange={(e) => { if (!markLock.current) { setNotice(null); setActionError(null); setContactTypeFilter(e.target.value as ContactTypeFilter); } }}
+            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setContactTypeFilter(e.target.value as ContactTypeFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {contactTypeOptions.map((o) => (
@@ -231,9 +216,9 @@ export default function OperatorContactMessagesPage() {
           </select>
           <select
             aria-label="문의 상태"
-            disabled={markingRead}
+            disabled={markingRead || detailBusy}
             value={statusFilter}
-            onChange={(e) => { if (!markLock.current) { setNotice(null); setActionError(null); setStatusFilter(e.target.value as StatusFilter); } }}
+            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setStatusFilter(e.target.value as StatusFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {statusOptions.map((o) => (
@@ -244,7 +229,7 @@ export default function OperatorContactMessagesPage() {
           <button
             type="button"
             onClick={handleBulkMarkRead}
-            disabled={markingRead || loading || !!error}
+            disabled={markingRead || detailBusy || loading || !!error}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-medium"
             title="공급자 문의(과거 파트너 문의 포함) 중 status='new' 항목을 한 번에 처리중으로 전환합니다."
           >
@@ -252,13 +237,15 @@ export default function OperatorContactMessagesPage() {
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-3">
-          ※ 일괄 확인은 공급자 contactType(과거 접수된 파트너 문의 포함)의 신규(`new`) 문의만 대상입니다. 서비스/기타 문의는 관리자 화면에서 처리합니다.
+          ※ 일괄 확인은 공급자 contactType(과거 접수된 파트너 문의 포함)의 신규(`new`) 문의만 대상입니다. 서비스/기타 문의는 개별 상세에서 처리합니다.
         </p>
       </div>
 
       {notice && <p role="status" className="text-emerald-700">{notice}</p>}
       {actionError && <p role="alert" className="text-red-600">{actionError}<button className="ml-3 underline" disabled={loading || markingRead} onClick={() => { setActionError(null); void load(pagination.page); }}>다시 시도</button></p>}
       {notice && error && <p role="alert" className="text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 조회만 다시 시도해 주세요.</p>}
+      {detailId && <OperatorContactDetail key={detailId} id={detailId} onClose={() => setDetailId(null)} onBusy={setDetailBusy}
+        onSaved={async () => { setNotice('문의 처리는 완료했습니다.'); await load(pagination.page); }} />}
       {/* List */}
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center py-16">
@@ -281,7 +268,7 @@ export default function OperatorContactMessagesPage() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3">
           <button
-            onClick={() => { if (!markLock.current) { setNotice(null); setActionError(null); void load(Math.max(1, pagination.page - 1)); } }}
+            onClick={() => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); void load(Math.max(1, pagination.page - 1)); } }}
             disabled={pagination.page <= 1 || loading || markingRead}
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50"
           >
@@ -289,7 +276,7 @@ export default function OperatorContactMessagesPage() {
           </button>
           <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
           <button
-            onClick={() => { if (!markLock.current) { setNotice(null); setActionError(null); void load(Math.min(pagination.totalPages, pagination.page + 1)); } }}
+            onClick={() => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); void load(Math.min(pagination.totalPages, pagination.page + 1)); } }}
             disabled={pagination.page >= pagination.totalPages || loading || markingRead}
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50"
           >
