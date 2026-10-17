@@ -324,6 +324,11 @@ jobs:
     - name: Run tests (web-kpa-society Vitest)
       run: npx vitest run --config services/web-kpa-society/vitest.config.mjs
 
+    - name: Run tests and build (web-pharmacy-coop)
+      run: |
+        pnpm exec vitest run --config services/web-pharmacy-coop/vitest.config.mjs
+        pnpm --filter @o4o/web-pharmacy-coop build
+
     # WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §5 (선행 작업)
     # services/web-neture 의 Local Work Agent 연결 카드 회귀 테스트는
     # vitest.config.mjs 만 있고 workflow step 이 없어 로컬 전용이었다.

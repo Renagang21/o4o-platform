@@ -48,6 +48,8 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
     return null;
   }
   if (host === STORE_WORKSPACE_HOST.toLowerCase()) return STORE_WORKSPACE_KEY;
+  // Federation/cooperative surface uses individual cooperative_memberships, not service memberships.
+  if (host === 'coop.neture.co.kr') return 'coop';
   if (ADMIN_HOSTS.includes(host)) return ADMIN_SURFACE_KEY;
   // Supported www service aliases share the catalog's session scope; arbitrary hosts remain unknown.
   // Keep admin/workspace special hosts exact, before this catalog-only normalization.

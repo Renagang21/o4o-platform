@@ -43,6 +43,7 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   assistant_run_frames: ['user_id'], assistant_procedural_patterns: ['user_id'], assistant_tasks: ['requested_by_user_id'],
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
+  cooperative_memberships: ['user_id'],
 };
 
 export function calendarExpiry(created: Date, years: 1 | 2): Date {

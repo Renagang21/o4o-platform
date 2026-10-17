@@ -298,6 +298,11 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '2cc1fe67bd4d672ffbe5cb35e2f12d0f4964e18e43d35ae1a65b3daa21297629',
     fingerprintLineCount: 6721,
   },
+  {
+    appliedThrough: 'CreateCooperativeMemberships1792201000000',
+    fingerprint: 'cc72071620a7c15c8cdd42fc63ea0ff5e4d8ff793abaa078d7c666f86a39393e',
+    fingerprintLineCount: 6754,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

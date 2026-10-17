@@ -64,6 +64,7 @@ COPY --chown=o4oapi:nodejs dist/main.js ./dist/main.js
 COPY --chown=o4oapi:nodejs dist/main.js.map ./dist/main.js.map
 COPY --chown=o4oapi:nodejs dist/migrate.js ./dist/migrate.js
 COPY --chown=o4oapi:nodejs dist/migrate.js.map ./dist/migrate.js.map
+COPY --chown=o4oapi:nodejs dist/scripts/provision-test-cooperative.js ./dist/provision-test-cooperative.js
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)

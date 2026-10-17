@@ -10,6 +10,8 @@
     "preview": "vite preview --port 4210"
   },
   "dependencies": {
+    "@o4o/auth-client": "workspace:*",
+    "@o4o/auth-react": "workspace:*",
     "@o4o/operator-core-ui": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -2812,6 +2812,12 @@ importers:
 
   services/web-pharmacy-coop:
     dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       "@o4o/operator-core-ui":
         specifier: workspace:*
         version: link:../../packages/operator-core-ui
