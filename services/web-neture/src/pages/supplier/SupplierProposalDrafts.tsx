@@ -3,7 +3,7 @@ import { neturePharmacySupplierApi as api, type SupplyProposal } from '../../lib
 import { INPUT } from '../../components/neture-pharmacy/PharmacyCommerceUi';
 import { productLabel, type SupplierPharmacyOptions } from '../../components/neture-pharmacy/useSupplierPharmacyOptions';
 
-interface Terms { offerId: string; unitPrice: string; note: string }
+interface Terms { offerId: string; unitPrice: string; note: string; baseShippingFee: string; freeShippingThreshold: string; minOrderAmount: string }
 interface Draft extends Terms {
   key: string;
   name: string;
@@ -11,7 +11,19 @@ interface Draft extends Terms {
   status: 'draft' | 'sending' | 'submitted' | 'error';
   error?: string;
 }
-const EMPTY: Terms = { offerId: '', unitPrice: '', note: '' };
+const EMPTY: Terms = { offerId: '', unitPrice: '', note: '', baseShippingFee: '', freeShippingThreshold: '', minOrderAmount: '0' };
+const validMoney = (value: string) => value !== '' && Number.isInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 2147483647;
+const validTerms = (terms: Terms) => validMoney(terms.baseShippingFee) && validMoney(terms.minOrderAmount) &&
+  (terms.freeShippingThreshold === '' || (validMoney(terms.freeShippingThreshold) && Number(terms.freeShippingThreshold) > 0));
+
+function ShippingFields({ terms, onChange, prefix = '' }: { terms: Terms; onChange: (patch: Partial<Terms>) => void; prefix?: string }) {
+  return <div className="grid gap-3 md:grid-cols-3">
+    {(['baseShippingFee', 'freeShippingThreshold', 'minOrderAmount'] as const).map((key, index) => <label key={key} className="min-w-0 text-sm">
+      {prefix}{['기본 배송비 (원)', '무료배송 기준 (원, 선택)', '최소 주문금액 (원)'][index]}
+      <input className={INPUT} inputMode="numeric" value={terms[key]} placeholder={key === 'freeShippingThreshold' ? '비우면 무료배송 기준 없음' : '0 이상 정수'} onChange={(e) => onChange({ [key]: e.target.value.replace(/[^0-9]/g, '') })} />
+    </label>)}
+  </div>;
+}
 
 /** 화면 안에서만 유지하는 초안. 제출은 기존 단일 협업체 API로 각각 처리한다. */
 export default function SupplierProposalDrafts({ options, requestedProduct, proposals, onSubmitted }: {
@@ -34,8 +46,8 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
   }, [requestedProduct, options.products, options.loading, options.error]);
 
   const addDrafts = () => {
-    if (!offerId || !selected.length || !Number.isSafeInteger(Number(terms.unitPrice)) || Number(terms.unitPrice) <= 0) {
-      setMessage('제품 · 협업체 · 공급 가격(원, 양의 정수)을 선택해 주세요.');
+    if (!validTerms(terms) || !offerId || !selected.length || !Number.isSafeInteger(Number(terms.unitPrice)) || Number(terms.unitPrice) <= 0) {
+      setMessage('제품 · 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주세요.');
       return;
     }
     const additions = options.semiFranchises.filter((sf) => selected.includes(sf.key) && !drafts.some((d) => d.key === sf.key));
@@ -54,8 +66,8 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
     if (sending.current) return;
     const pending = drafts.filter((d) => keys.includes(d.key) && d.status !== 'submitted');
     if (!pending.length) return;
-    if (pending.some((d) => !options.products.some((p) => p.id === d.offerId) || !options.semiFranchises.some((sf) => sf.key === d.key) || !Number.isSafeInteger(Number(d.unitPrice)) || Number(d.unitPrice) <= 0)) {
-      setMessage('각 초안의 제품 · 활성 협업체 · 공급 가격(원, 양의 정수)을 확인해 주세요.');
+    if (pending.some((d) => !validTerms(d) || !options.products.some((p) => p.id === d.offerId) || !options.semiFranchises.some((sf) => sf.key === d.key) || !Number.isSafeInteger(Number(d.unitPrice)) || Number(d.unitPrice) <= 0)) {
+      setMessage('각 초안의 제품 · 활성 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주세요.');
       return;
     }
     sending.current = true;
@@ -66,7 +78,8 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
         setDrafts((prev) => prev.map((d) => d.key === draft.key ? { ...d, status: 'sending', error: undefined } : d));
         try {
           await api.createProposal({ offerId: draft.offerId, semiFranchiseKey: draft.key, unitPrice: Number(draft.unitPrice),
-            targetOrganizationId: draft.targetOrganizationId.trim() || undefined, note: draft.note.trim() || undefined });
+            targetOrganizationId: draft.targetOrganizationId.trim() || undefined, note: draft.note.trim() || undefined,
+            terms: { baseShippingFee: Number(draft.baseShippingFee), freeShippingThreshold: draft.freeShippingThreshold === '' ? null : Number(draft.freeShippingThreshold), minOrderAmount: Number(draft.minOrderAmount) } });
           succeeded++;
           setDrafts((prev) => prev.map((d) => d.key === draft.key ? { ...d, status: 'submitted' } : d));
         } catch (error) {
@@ -84,19 +97,20 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
   return <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-4" aria-label="협업체별 공급 요청 초안">
     <h2 className="text-base font-semibold text-gray-900">같은 조건으로 여러 협업체에 요청</h2>
     <p className="text-sm text-gray-600">공통 입력으로 협업체별 초안을 만든 뒤 각각 확인·수정하세요. 요청·승인·변경·종료는 협업체별로 독립 처리되며, 다른 협업체로 자동 반영되지 않습니다.</p>
-    <p className="text-xs text-gray-500">제안 가격 변경은 기존 제안 종료 후 새 요청으로 진행합니다. 현재 배송비는 공급자 공통 정책을 사용합니다. 초안은 이 화면을 벗어나면 사라집니다.</p>
+    <p className="text-xs text-gray-500">가격·배송조건 변경은 기존 제안 종료 후 새 승인 요청으로 진행합니다. 제출한 조건은 고정되며 공급자 공통 설정을 바꿔도 전파되지 않습니다. pharmacy 특별가격도 같은 승인을 거칩니다. 초안은 이 화면을 벗어나면 사라집니다.</p>
     {options.error && <p role="alert" className="text-sm text-red-600">{options.error}</p>}
     <fieldset disabled={busy || options.loading || !!options.error} className="space-y-3 disabled:opacity-70">
       <div className="grid gap-3 md:grid-cols-2">
         <label className="text-sm">제품<select className={INPUT} value={offerId} onChange={(e) => setTerms({ ...terms, offerId: e.target.value })}><option value="">제품 선택 (등록 승인된 제품)</option>{options.products.map((p) => <option key={p.id} value={p.id}>{productLabel(p)}</option>)}</select></label>
         <label className="text-sm">공통 공급 가격 (원)<input className={INPUT} inputMode="numeric" value={terms.unitPrice} onChange={(e) => setTerms({ ...terms, unitPrice: e.target.value.replace(/[^0-9]/g, '') })} /></label>
       </div>
+      <ShippingFields terms={terms} prefix="공통 " onChange={(patch) => setTerms({ ...terms, ...patch })} />
       <label className="block text-sm">공통 메모 (선택)<textarea className={INPUT} maxLength={1000} value={terms.note} onChange={(e) => setTerms({ ...terms, note: e.target.value })} /></label>
       <label className="block text-sm">기존 제안에서 조건 가져오기
         <select className={INPUT} value={source} onChange={(e) => {
           setSource(e.target.value);
           const p = proposals.find((row) => row.id === e.target.value);
-          if (p) { setTerms({ offerId: p.offerId, unitPrice: String(p.unitPrice), note: p.note || '' }); setMessage('제품 · 단가 · 메모를 가져왔습니다. 대상 약국은 복사하지 않습니다. 기존 초안은 변경하지 않습니다.'); }
+          if (p) { setTerms({ offerId: p.offerId, unitPrice: String(p.unitPrice), note: p.note || '', baseShippingFee: p.termsSnapshot ? String(p.termsSnapshot.baseShippingFee) : '', freeShippingThreshold: p.termsSnapshot?.freeShippingThreshold == null ? '' : String(p.termsSnapshot.freeShippingThreshold), minOrderAmount: String(p.termsSnapshot?.minOrderAmount ?? 0) }); setMessage('제품 · 단가 · 고정 배송조건 · 메모를 가져왔습니다. 기존 방식의 제안은 배송비를 새로 입력하세요. 대상 약국은 복사하지 않습니다. 기존 초안은 변경하지 않습니다.'); }
         }}><option value="">기존 제안 선택 (선택 사항)</option>{proposals.map((p) => <option key={p.id} value={p.id}>{p.productName} · {p.semiFranchiseName} · {p.unitPrice.toLocaleString('ko-KR')}원 · {p.id.slice(0, 8)}</option>)}</select>
       </label>
       <fieldset className="rounded border border-gray-200 p-3"><legend className="px-1 text-sm">초안을 만들 협업체 선택</legend>
@@ -116,6 +130,7 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
           <label className="text-sm md:col-span-2">대상 약국 조직 ID (선택)<input className={INPUT} value={d.targetOrganizationId} onChange={(e) => update(d.key, { targetOrganizationId: e.target.value })} /></label>
           <label className="text-sm md:col-span-2">메모 (선택)<textarea className={INPUT} maxLength={1000} value={d.note} onChange={(e) => update(d.key, { note: e.target.value })} /></label>
         </div>
+        <ShippingFields terms={d} onChange={(patch) => update(d.key, patch)} />
         {d.error && <p role="alert" className="text-sm text-red-600">{d.error} 목록에서 접수 여부를 확인한 후 다시 요청하세요. 통신 오류라도 접수됐을 수 있습니다.</p>}
         {d.status !== 'submitted' && <div className="flex flex-wrap gap-3"><button type="button" onClick={() => submit([d.key])} className="rounded bg-primary-600 px-3 py-2 text-sm text-white">{d.name} 승인 요청</button><button type="button" onClick={() => setDrafts((prev) => prev.filter((row) => row.key !== d.key))} className="text-sm text-gray-600">초안 삭제</button></div>}
       </fieldset>)}

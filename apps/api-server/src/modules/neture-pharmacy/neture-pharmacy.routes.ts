@@ -373,7 +373,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return proposals.supplierCreate(req.supplierId!, req.user!.id, req.body);
   }));
   router.post('/supplier/supply-proposals/:id/end', ...supplier, handle(async (req) =>
-    proposals.supplierEnd(req.supplierId!, uuidParam(req, 'id'))));
+    proposals.supplierEnd(req.supplierId!, uuidParam(req, 'id'), req.user!.id)));
 
   router.get('/supplier/semi-franchise-events', ...supplier, handle(async (req) => events.supplierList(req.supplierId!)));
   router.post('/supplier/semi-franchise-events', ...supplier, handle(async (req, res) => {
