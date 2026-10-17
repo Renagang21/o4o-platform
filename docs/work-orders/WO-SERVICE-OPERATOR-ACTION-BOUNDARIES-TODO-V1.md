@@ -94,3 +94,9 @@
 | 실제 PostgreSQL 동시성·삭제 및 운영 검증 | 이번 검증은 합성 API/transaction 대역·브라우저 fixture 중심 | 명시 승인된 격리 DB에서 FK/CASCADE·감사 실패 rollback·동시 승인/삭제·동시 병합·역할 지정/정리 경쟁 검증, 통합 담당의 PR/CI/운영 확인 |
 
 상품 hard delete는 확인된 주문 스냅샷/장바구니 참조가 있으면 차단한다. FK 없는 JSON 참조에 새 주문이 동시에 생기는 경쟁까지 이 변경으로 해결됐다고 보고하지 않는다. 포럼 재개는 감사에 기록한 게시글 ID와 보관 당시 수정 시각이 모두 일치할 때만 복구한다. 중지 후 수정된 글과 감사 보존기간이 지난 추적 없는 글은 그대로 둔다.
+
+## 최신 main 통합 재검증 (2026-10-18 KST)
+
+기준 main `663e2c7d703ab67f19baf7e4482f85ad58c713aa`를 작업 branch에 merge했다. PR #685의 커뮤니티 전용 회원·활동/포럼 삭제 계획과 실행 API, PR #686의 협동조합 운영 workspace를 보존했다. 따라서 위 조사 시점의 활동 전체 삭제 미구현 판정은 커뮤니티 전용 경로에 일괄 적용하지 않는다. 커뮤니티는 전용 삭제 계획·참조 차단·원자 실행이 구현됐으며, 공통 가입 정리와 다른 서비스의 활동 삭제 후속은 별개다.
+
+통합 후 권한·삭제 경계 API 5 suites/92 tests와 Neture production build가 통과했다. Neture의 CarePharm 라우트와 신규 operator 상품 정리 라우트를 함께 확인했다. 이번 변경에는 신규 schema/migration이 없다. PR required CI·리뷰와 배포 결과는 GitHub PR/Actions의 실제 결과로 판정한다.

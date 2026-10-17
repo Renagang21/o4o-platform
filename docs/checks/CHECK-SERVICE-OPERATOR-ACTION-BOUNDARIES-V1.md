@@ -62,3 +62,9 @@ TODO를 먼저 작성하고, 활성 서비스 catalog·정본·실제 route/guar
 통합 담당은 이 branch HEAD와 기준 main 차이를 확인한 뒤 PR/required CI·리뷰·병합·배포를 진행한다. 신규 schema/migration은 없다. 기존 API의 파괴 조치는 해당 서비스 admin과 사유가 필요하며, 구 operator URL로 권한을 우회할 수 없다.
 
 문서 정합: 회원관리 기준의 조치별 운영/가입 정리 범위를 갱신하고 상위 정비 TODO에 최신 전체 범위를 연결했다. 이전 WO의 분회 제외와 과거 완료 기록은 소급 덮어쓰지 않았다.
+
+## 최신 main 통합 재검증 (2026-10-18 KST)
+
+기준 main `663e2c7d703ab67f19baf7e4482f85ad58c713aa`를 작업 branch에 merge했다. PR #685의 커뮤니티 전용 회원·활동/포럼 삭제 계획과 실행 API, PR #686의 협동조합 운영 workspace를 보존했다. 따라서 위 조사 시점의 활동 전체 삭제 미구현 판정은 커뮤니티 전용 경로에 일괄 적용하지 않는다. 커뮤니티는 전용 삭제 계획·참조 차단·원자 실행이 구현됐으며, 공통 가입 정리와 다른 서비스의 활동 삭제 후속은 별개다.
+
+통합 후 권한·삭제 경계 API 5 suites/92 tests와 Neture production build가 통과했다. Neture의 CarePharm 라우트와 신규 operator 상품 정리 라우트를 함께 확인했다. 이번 변경에는 신규 schema/migration이 없다. PR required CI·리뷰와 배포 결과는 GitHub PR/Actions의 실제 결과로 판정한다.
