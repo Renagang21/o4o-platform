@@ -106,6 +106,10 @@ it('reviews supplier content within its business and requires a rejection reason
   await screen.findByText('가상 등재 자료');
   expect(screen.getByText('공급자 등재 요청')).toBeTruthy();
   fireEvent.click(rowAction('가상 등재 자료', '반려'));
+  expect((screen.getByRole('button', { name: '처리 확인' }) as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.getByText('처리 사유 (필수)')).toBeTruthy();
+  fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '   ' } }); confirm();
+  expect(api.setContentStatus).not.toHaveBeenCalled();
   fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '내용 보완 필요' } }); confirm();
   await waitFor(() => expect(api.setContentStatus).toHaveBeenCalledWith('pharmacy', 'request-a', 'reject', '내용 보완 필요'));
 });

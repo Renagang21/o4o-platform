@@ -25,14 +25,14 @@ export function BusinessDecisionDialog({ decision, businessName, reason, onReaso
       <h2 className="text-lg font-semibold">{decision.label} 확인</h2>
       <p className="text-sm text-gray-700">{businessName} · {decision.target}</p>
       <p className="text-sm">이 대상을 {decision.label} 처리할까요?</p>
-      {decision.needsReason && <label className="block text-sm">처리 사유 (선택)
-        <textarea aria-label="처리 사유" value={reason} disabled={saving} onChange={e => onReasonChange(e.target.value)}
+      {decision.needsReason && <label className="block text-sm">처리 사유 ({decision.reasonRequired ? '필수' : '선택'})
+        <textarea aria-label="처리 사유" required={decision.reasonRequired} aria-required={decision.reasonRequired} value={reason} disabled={saving} onChange={e => onReasonChange(e.target.value)}
           className="mt-2 w-full rounded border p-2" rows={3} />
       </label>}
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       <div className="flex justify-end gap-2">
         <button type="button" disabled={saving} onClick={onCancel} className="rounded border px-4 py-2 disabled:opacity-50">닫기</button>
-        <button type="button" disabled={saving} onClick={onConfirm} className="rounded bg-primary-600 px-4 py-2 text-white disabled:opacity-50">{saving ? '처리 중...' : '처리 확인'}</button>
+        <button type="button" disabled={saving || (decision.reasonRequired && !reason.trim())} onClick={onConfirm} className="rounded bg-primary-600 px-4 py-2 text-white disabled:opacity-50">{saving ? '처리 중...' : '처리 확인'}</button>
       </div>
     </section>
   </div>;

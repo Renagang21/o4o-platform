@@ -58,3 +58,9 @@
 - Codex P2 두 건을 보완했다. 서버는 기존 dependency `node-html-parser`의 structured text, 브라우저는 inert DOM 변환으로 문단·목록·줄바꿈·entity를 보존한다. 수신 HTML에는 텍스트를 다시 escape해 encoded markup이 활성화되지 않게 한다.
 - 공급자별 이력 조회에 `(source_supplier_id, created_at DESC, id)` partial index를 추가했다. PostgreSQL planner가 해당 인덱스를 사용할 수 있는지 검증했다. fingerprint는 위 6703 lines 값으로 재산출하고 fresh replay 및 down/up 복원을 확인했다.
 - 리뷰 보완 집중 검증: PostgreSQL + 변환 2 suites / 21 tests, 커뮤니티 UI 1 file / 4 tests. 배포 승인을 기존 개발 완료로 추정하지 않았으며 별도 사용자의 운영 migration 적용 승인을 확인했다.
+
+## 7. 문서 트랙 분리·반려 사유 검증
+
+- 정본 변경은 별도 문서 작업 WO-O4O-SUPPLIER-CONTENT-POLICY-ALIGNMENT-V1 / PR #679로 분리했다. 기능 PR #678에서 기존 정본의 인라인 변경을 제거하고 문서 트랙 main 통합 후 그 기준을 따른다.
+- 콘텐츠 반려에만 `reasonRequired`를 전달해 필수 표기·빈 값/공백 확인 버튼 비활성화·호출 전 검증을 적용했다. 다른 사업 심사의 기존 선택 사유 계약은 유지한다.
+- 공통 pharmacy-management 5 files / 26 tests PASS. 콘텐츠 반려의 빈 값·공백 API 호출 0과 사유 입력 후 정상 호출을 검증했다.
