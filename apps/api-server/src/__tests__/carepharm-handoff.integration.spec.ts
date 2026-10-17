@@ -97,6 +97,14 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
     expect((await exchange(href.searchParams.get('token')!, href.origin)).statusCode).toBe(200);
     await expect(requestServiceHandoff(api, { ...cooperationDestination('carepharm', 'home'), origin: 'https://evil.test' })).rejects.toThrow('Invalid service handoff');
   });
+  it('connects the CarePharm Study entry through the existing lecture issuer and exchange contract', async () => {
+    const href = new URL(await requestServiceHandoff(api, { serviceKey: 'lecture', origin: 'https://study.neture.co.kr', returnPath: '/' }));
+    expect(href.origin).toBe('https://study.neture.co.kr');
+    const result = await exchange(href.searchParams.get('token')!, href.origin);
+    expect(result.statusCode).toBe(200);
+    expect(result.body.data.targetServiceKey).toBe('lecture');
+    expect(await query('SELECT * FROM service_memberships')).toHaveLength(0);
+  });
   it('rechecks real source-session revocation between issuance and exchange', async () => {
     const result = await issue({ targetServiceKey: 'carepharm', returnPath: '/' });
     await query(`INSERT INTO browser_session_revocations VALUES ($1,'store',$2,now()+interval '1 hour')`, [actor, session]);

@@ -130,6 +130,20 @@ describe('ServiceEntryPage — 회귀', () => {
     expect(screen.queryByTestId('service-entry-not-member')).toBeNull();
   });
 
+  it('CarePharm Study 진입은 로그인 후 추가 클릭 없이 handoff를 재개한다', async () => {
+    h.auth.isAuthenticated = false;
+    const entry = '/service-entry/lecture?returnPath=%2F';
+    const ui = mount(entry);
+    await waitFor(() => expect(h.openLoginModal).toHaveBeenCalledWith(entry));
+    expect(h.resolveServiceEntryUrl).not.toHaveBeenCalled();
+    ui.unmount();
+    h.auth.isAuthenticated = true;
+    h.resolveServiceEntryUrl.mockResolvedValue('https://study.neture.co.kr/handoff?token=fixture');
+    mount(entry);
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://study.neture.co.kr/handoff?token=fixture'));
+    expect(h.resolveServiceEntryUrl).toHaveBeenCalledWith('lecture', '/');
+  });
+
   it('로그인 전에는 handoff 를 부르지 않고 로그인 모달을 연다', async () => {
     h.auth.isAuthenticated = false;
     mount('/service-entry/lecture?returnPath=%2Fcourses');
