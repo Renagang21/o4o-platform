@@ -11,7 +11,7 @@ export function SupplyProposalDetails({ proposal: p }: { proposal: SupplyProposa
       <dt>제조사</dt><dd>{p.productManufacturer || '미등록'}</dd>
       <dt>바코드</dt><dd>{p.productBarcode || '미등록'}</dd>
       <dt>기본 배송비</dt><dd>{p.baseShippingFee == null ? '미설정' : formatWon(Number(p.baseShippingFee))}</dd>
-      <dt>무료배송 기준</dt><dd>{p.freeShippingThreshold != null && Number(p.freeShippingThreshold) > 0 ? `${formatWon(Number(p.freeShippingThreshold))} 이상` : '기준 없음'}</dd>
+      <dt>무료배송 기준</dt><dd>{p.freeShippingThreshold == null ? '기준 없음' : Number(p.freeShippingThreshold) === 0 ? '0원 이상 (항상 무료)' : `${formatWon(Number(p.freeShippingThreshold))} 이상`}</dd>
     </dl>
     <p className="mt-3 text-xs text-gray-600">배송비는 현재 공급자 공통 정책입니다. 이 제안에 고정된 개별 배송조건이 아닙니다.</p>
     {p.productSummary && <p className="mt-3 whitespace-pre-wrap">{p.productSummary}</p>}

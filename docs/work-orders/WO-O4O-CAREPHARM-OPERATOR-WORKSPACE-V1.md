@@ -54,3 +54,11 @@ CarePharm의 담당 사업 화면은 이미 존재하지만 `/operator`는 대�
 사용자가 이 작업의 main 머지·배포를 명시적으로 지시했다. 통합 담당으로 기존 branch를 유지하고 main `f2b18165f3998e48dfb186ecf668be41e1e090f7`을 충돌 없이 merge했다. 홈·헤더 변경 반영 후 Neture 전체 123 files / 1107 tests와 TypeScript 포함 production build를 재검증했다. 앞선 DB 검증 대상 서버와 공통 심사 코드에는 이 main merge로 인한 변경이 없다.
 
 이 단계의 기록은 아직 PR CI·Codex 판정·main 머지·운영 배포 완료를 뜻하지 않는다. 정확한 PR HEAD의 기술 gate를 확인한 뒤 저장소 Delivery/Promote 절차로 진행한다. CarePharm 직접 HTTPS 조회는 현재 cloud egress 허용 목록에 없어 proxy CONNECT 403으로 차단되었으며, 도메인 장애로 판정하지 않는다.
+
+## PR #686 Codex P2 보완
+
+`PRRT_kwDOOXrFm86tgwLQ`: 무료배송 기준 `0`을 `null`과 같은 ‘기준 없음’으로 표시하던 오류를 수정했다. 기존 `calculateSupplierShippingFee()`는 양수 주문 합계에서 기준 `0`이면 무료배송이므로 심사 화면도 ‘0원 이상 (항상 무료)’로 표시한다. `null`은 기준 없음으로 유지한다. 배송비 계산·승인·주문 정책 자체는 변경하지 않는다.
+
+- 공통 운영 UI 6 files / 32 tests PASS: 배송비 미설정·명시적 0원과 무료배송 기준 null·0·양수를 구분한다.
+- 기존 실제 배송비 계산 함수 Jest 3 tests PASS: 기준 null/0/50000에서 양수 주문의 배송비가 각각 3000/0/3000임을 확인한다. UI와 서버 검증은 각 계층에서 실행하며 frontend production 코드가 API 구현을 import하지 않는다.
+- Neture TypeScript 포함 production build PASS. 변경 코드 lint·문서·diff 검사를 통과한 뒤 같은 branch에 추가 push하고 새 HEAD로 CI·Codex 재리뷰를 확인한다.
