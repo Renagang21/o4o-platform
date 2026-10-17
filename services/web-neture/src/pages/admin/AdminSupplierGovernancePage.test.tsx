@@ -1,3 +1,4 @@
+vi.mock('../../components/supplier/SupplierActiveFundings',()=>({default:()=>null}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 const mocks = vi.hoisted(() => ({ list: vi.fn(), deactivate: vi.fn(), reactivate: vi.fn() }));

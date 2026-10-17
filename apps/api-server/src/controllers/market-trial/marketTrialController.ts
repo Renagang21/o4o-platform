@@ -1,3 +1,4 @@
+import { readFundingAmounts } from '../../services/funding/funding-offline-operations.service.js';
 import { PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 /**
  * Market Trial Controller
@@ -368,15 +369,13 @@ export class MarketTrialController {
 
       const trials = (await qb.getMany()).filter(isFundingPublic);
 
-      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1:
-      // Evaluate RECRUITING trials that may have expired (fundingEndAt passed)
-      const evaluated = await Promise.all(
-        trials.map((t) => MarketTrialController.trialService.evaluateStatusIfNeeded(t)),
-      );
+      // Read-only: recruitment results are recorded explicitly by the funding operator.
+      const evaluated = trials;
 
       // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
       // Bulk-fetch forum post IDs for all trials
       const trialIds = evaluated.map((t) => t.id);
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, trialIds);
       const forumMap = await buildForumPostMap(MarketTrialController.forumRepo, trialIds);
 
       // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 batch 조회
@@ -387,7 +386,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''))),
+        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''), recordedAmounts.get(t.id) ?? 0)),
       });
     } catch (error) {
       // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1 §E:
@@ -423,8 +422,9 @@ export class MarketTrialController {
         });
       }
 
-      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1: evaluate expired status
-      const evaluated = await MarketTrialController.trialService.evaluateStatusIfNeeded(trial);
+      // Read-only: an expired deadline does not determine the offline collection result.
+      const evaluated = trial;
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, [id]);
 
       // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forum deep link
       const forumMapping = await MarketTrialController.forumRepo.findOne({
@@ -436,7 +436,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? '')),
+        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? ''), recordedAmounts.get(id) ?? 0),
       });
     } catch (error) {
       console.error('Get trial error:', error);
@@ -451,6 +451,12 @@ export class MarketTrialController {
    * GET /api/market-trial/:id/participation
    * 현재 사용자의 참여 정보 조회
    */
+  private static async ownOffline(id:string,userId:string){
+    const rows=await MarketTrialController.dataSource!.query(`SELECT COALESCE(("offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
+      COALESCE(("offlineState"->>'refundAmount')::numeric,0) AS "refundedAmount","offlineState"->>'refundedAt' AS "refundedAt"
+      FROM market_trial_participants WHERE id=$1 AND "participantId"=$2`,[id,userId]);
+    return rows?.[0]??{withdrawn:false,refundedAmount:0,refundedAt:null};
+  }
   static async getParticipation(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -472,7 +478,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: participation ? toParticipationDTO(participation) : null,
+        data: participation ? {...toParticipationDTO(participation),...await MarketTrialController.ownOffline(participation.id,userId)} : null,
       });
     } catch (error) {
       console.error('Get participation error:', error);
@@ -630,6 +636,7 @@ export class MarketTrialController {
         success: true,
         data: {
           ...toParticipationDTO(participation),
+          ...await MarketTrialController.ownOffline(participation.id,userId),
           ...settlementCalc,
           trial: trial ? toTrialDTO(trial, forumMapping?.forumId) : undefined,
         },
@@ -732,9 +739,10 @@ function toTrialDTO(
   trial: MarketTrial,
   forumPostId?: string | null,
   productRef?: TrialProductRef | null,
+  recordedAmount?: number,
 ): any {
   const targetAmount = Number(trial.targetAmount) || 0;
-  const currentAmount = Number(trial.currentAmount) || 0;
+  const currentAmount = recordedAmount ?? (Number(trial.currentAmount) || 0);
   const trialUnitPrice = Number(trial.trialUnitPrice) || 0;
   const rewardRate = Number(trial.rewardRate) || 0;
   const maxParticipants = trial.maxParticipants || null;

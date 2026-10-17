@@ -3,6 +3,8 @@ export const FUNDING_EXCEPTION_LABELS: Record<string, string> = {
   payment_pending: "입금 확인 대기",
   payment_failed: "입금 확인 실패",
   amount_missing: "확인 금액 누락",
+  refund_pending: "철회·중지 후 환급 확인 대기",
+  pledge_missing: "약정 참여금 미등록",
   amount_mismatch: "참여금·확인 금액 불일치",
   fulfillment_pending: "결과 확정 후 이행 미확인",
   fulfilled_without_payment: "이행 완료·입금 미확인",

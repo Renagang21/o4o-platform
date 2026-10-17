@@ -13,7 +13,8 @@ import { api } from '../../lib/apiClient';
  * - 허브(/market-trial)로 복귀
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {useLatestRequest} from '../../hooks/useLatestRequest';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   getTrial,
@@ -45,6 +46,11 @@ export function MarketTrialDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const scope=`${user?.id??'anonymous'}:${id}`;
+  const beginJoin=useLatestRequest(scope);
+  const joining=useRef(false);
+  const [reload,setReload]=useState(0);
+  const [loadedScope,setLoadedScope]=useState('');
   const agreement = useServiceEnrollmentPolicies('funding', async () => (await api.get('/public/services/funding/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${id}`);
 
   const [trial, setTrial] = useState<Trial | null>(null);
@@ -60,6 +66,7 @@ export function MarketTrialDetailPage() {
   useEffect(() => {
     if (!id) return;
     let active = true;
+    setIsLoading(true);setError(null);setTrial(null);setParticipation(null);setSelectedReward(null);setJoinError(null);setJoinSuccess(false);setJoinLoading(false);joining.current=false;
     const fetchData = async () => {
       try {
         const trialData = await getTrial(id);
@@ -70,32 +77,34 @@ export function MarketTrialDetailPage() {
         }
 
         if (isAuthenticated) {
-          const partData = await getParticipation(id).catch(() => null);
+          const partData = await getParticipation(id);
           if (active && partData) setParticipation(partData);
         }
       } catch {
-        if (active) setError('유통참여형 펀딩을 찾을 수 없습니다.');
+        if (active) setError('펀딩 또는 참여 현황을 불러오지 못했습니다. 다시 조회해 주세요.');
       } finally {
-        if (active) setIsLoading(false);
+        if (active) {setIsLoading(false);setLoadedScope(scope);}
       }
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, user?.id, scope, reload]);
 
   const handleJoin = async () => {
-    if (!id || !selectedReward || joinLoading) return;
+    if (!id || !selectedReward || joinLoading || joining.current) return;
     if (!isAuthenticated) {
       navigate(`/login?returnUrl=/market-trial/${id}`);
       return;
     }
+    const current=beginJoin();joining.current=true;
     setJoinLoading(true);
     setJoinError(null);
     try {
       if (!agreement.ready) { setJoinError('서비스 약관을 먼저 확인해 주세요.'); return; }
       const res = await joinTrial(id, selectedReward, agreement.references);
+      if(!current())return;
       if (res?.id) {
         setParticipation({
           id: res.id,
@@ -114,6 +123,7 @@ export function MarketTrialDetailPage() {
         setJoinError('참여 신청에 실패했습니다.');
       }
     } catch (err: unknown) {
+      if(!current())return;
       const e = err as { response?: { data?: { message?: string }; status?: number } };
       const msg = e?.response?.data?.message || '';
       const status = e?.response?.status;
@@ -136,11 +146,11 @@ export function MarketTrialDetailPage() {
         setJoinError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       }
     } finally {
-      setJoinLoading(false);
+      if(current()){joining.current=false;setJoinLoading(false);}
     }
   };
 
-  if (isLoading) {
+  if (isLoading || loadedScope!==scope) {
     return (
       <div style={s.centered}>
         <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>불러오는 중...</p>
@@ -153,6 +163,7 @@ export function MarketTrialDetailPage() {
       <div style={s.centered}>
         <p style={{ color: '#6B7280', fontSize: '1rem', marginBottom: '16px' }}>
           {error || '유통참여형 펀딩을 찾을 수 없습니다.'}
+          <button onClick={()=>setReload(v=>v+1)}>다시 조회</button>
         </p>
         <Link to="/market-trial" style={{ color: '#10B981', fontSize: '0.875rem', textDecoration: 'none' }}>
           ← 유통참여형 펀딩 허브로 돌아가기
@@ -379,7 +390,7 @@ export function MarketTrialDetailPage() {
               <span style={{ fontSize: '1.125rem', color: '#166534' }}>✓</span>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#166534', margin: 0 }}>
-                  참여 신청 완료
+                  {participation?.withdrawn ? '참여 철회 기록됨' : '참여 신청 완료'}
                 </p>
                 <p style={{ fontSize: '0.8125rem', color: '#15803D', margin: '2px 0 0 0' }}>
                   보상 방식: {REWARD_LABELS[participation?.rewardType || selectedReward || ''] || '선택됨'}

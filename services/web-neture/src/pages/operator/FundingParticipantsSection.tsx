@@ -106,7 +106,7 @@ export default function FundingParticipantsSection(props: Props) {
                     <button className={button} disabled={busy} onClick={() => open(p, 'confirm')}>{status === 'paid' ? '재확인·정정' : '수기 송금 확인'}</button>
                     {status === 'paid' && <>
                       <button className={button} disabled={busy} onClick={() => open(p, 'reset')}>입금 확인 취소</button>
-                      <button className={button} disabled={busy} onClick={() => open(p, 'refund')}>환불 완료 기록</button>
+                      <span className="text-xs text-gray-500">환급은 오프라인 사후 처리에서 기록</span>
                     </>}
                   </div>
                   {selected && <form className="mt-3 border-t pt-3" onSubmit={e => { e.preventDefault(); void save(p); }}>

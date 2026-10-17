@@ -3,7 +3,6 @@ import { AppDataSource } from '../database/connection.js';
 // settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
-import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
 import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
@@ -199,10 +198,9 @@ export class StartupService {
       // Settlement Scheduler removed (Phase 8-3 - legacy commerce)
       logger.info('✅ Settlement Scheduler skipped (legacy commerce removed)');
 
-      // WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1
-      // Auto-advance RECRUITING trials whose fundingEndAt has elapsed.
-      marketTrialLifecycleJob.start();
-      logger.info('✅ Market Trial Lifecycle Job started');
+      // Offline funding collection: no automatic date/target-based result transition.
+      // Funding result decisions are recorded by the operator.
+      logger.info('✅ Funding automatic result transitions disabled');
 
       // WO-O4O-SPD-REVISION-REQUEST-EXPIRY-SCHEDULER-V1
       // 공급자 STORE 설명서 수정 요청(revision_requested) 만료(due<now) 자동 hard delete — 매일(부팅+24h).
@@ -303,7 +301,7 @@ export class StartupService {
     try {
       // settlementScheduler removed (Phase 8-3 - legacy commerce)
       // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
-      marketTrialLifecycleJob.stop();
+      // No automatic funding lifecycle worker.
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();

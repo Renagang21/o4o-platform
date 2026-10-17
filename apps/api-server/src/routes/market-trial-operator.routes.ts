@@ -1,3 +1,8 @@
+import logger from '../utils/logger.js';
+import {FundingOfflineOperationsService} from '../services/funding/funding-offline-operations.service.js';
+import {AppDataSource} from '../database/connection.js';
+import {FundingError} from '../services/funding/funding-workspace.service.js';
+import {marketTrialNotification} from '../services/marketTrial.notification.js';
 /**
  * Market Trial Operator Routes
  *
@@ -39,6 +44,30 @@ export function createNetureOperatorTrialRoutes(): Router {
   // WO-MONITOR-1: 포럼 연계 실패 조회/resolve (리터럴 경로 — /:id 보다 앞에 위치)
   router.get('/forum-sync-failures', MarketTrialOperatorController.listForumSyncFailures);
   router.patch('/forum-sync-failures/:failureId/resolve', MarketTrialOperatorController.resolveForumSyncFailure);
+  router.get('/:id/offline-operations', async (req, res) => {
+    try {
+      const data = await new FundingOfflineOperationsService(AppDataSource).snapshot(req.params.id, Number(req.query.page ?? 1));
+      res.json({ success: true, data });
+    } catch (error) {
+      res.status(error instanceof FundingError ? error.status : 500).json({ success: false, message: error instanceof FundingError ? error.message : '운영 기록 조회 실패' });
+    }
+  });
+  router.post('/:id/offline-operations', async (req, res) => {
+    try {
+      if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+        throw new FundingError(400, 'INVALID_OFFLINE_INPUT', '처리 내용을 확인해 주세요.');
+      }
+      const actor = (req as any).user.id;
+      const data = await new FundingOfflineOperationsService(AppDataSource).update(req.params.id, req.body.participantId ?? null, actor, req.body);
+      if (req.body.action === 'result') {
+        void marketTrialNotification.onRecruitingResult(req.params.id, req.body.decision === 'met', actor)
+          .catch(() => logger.warn('[Funding] Result notification failed', { trialId: req.params.id }));
+      }
+      res.json({ success: true, data });
+    } catch (error) {
+      res.status(error instanceof FundingError ? error.status : 500).json({ success: false, message: error instanceof FundingError ? error.message : '운영 기록 저장 실패' });
+    }
+  });
   router.get('/:id', MarketTrialOperatorController.getDetail);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: per-trial KPI
   router.get('/:id/kpi', MarketTrialOperatorController.getTrialKpi);

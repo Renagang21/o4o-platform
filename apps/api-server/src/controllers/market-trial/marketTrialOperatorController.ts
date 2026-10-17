@@ -1124,17 +1124,22 @@ async function computeKpiSnapshot(
        COUNT(*) FILTER (
          WHERE status IN ('development', 'outcome_confirming', 'fulfilled')
             OR "closeReason" = 'auto_target_reached'
+            OR "offlineState"->>'decision' = 'met'
        )::int AS successful,
-       COUNT(*) FILTER (WHERE "closeReason" = 'auto_target_missed')::int AS failed,
+       COUNT(*) FILTER (WHERE "closeReason" IN ('auto_target_missed','operator_target_missed'))::int AS failed,
        COALESCE(SUM("currentParticipants"), 0)::int AS total_participants,
-       COALESCE(SUM("currentAmount"), 0)::numeric AS total_recruiting_amount,
+       COALESCE(SUM(COALESCE(ledger.net_amount,0)), 0)::numeric AS total_recruiting_amount,
        AVG(
          CASE WHEN "targetAmount" > 0
-              THEN ("currentAmount" / "targetAmount") * 100
+              THEN (COALESCE(ledger.net_amount,0) / "targetAmount") * 100
               ELSE NULL
          END
        )::numeric AS avg_achievement_rate
      FROM market_trials
+     LEFT JOIN (
+       SELECT "marketTrialId", SUM(GREATEST(COALESCE("paidAmount",0)-COALESCE(("offlineState"->>'refundAmount')::numeric,0),0)) AS net_amount
+       FROM market_trial_participants WHERE "paymentStatus"='paid' GROUP BY "marketTrialId"
+     ) ledger ON ledger."marketTrialId"=market_trials.id
      ${where}`,
     params,
   );
@@ -1235,6 +1240,7 @@ async function computeTrialKpi(
     failed: number;
     refunded: number;
     paid_amount: string;
+    net_amount: string;
   }> = await ds.query(
     `SELECT
        COUNT(*)::int AS total,
@@ -1242,17 +1248,18 @@ async function computeTrialKpi(
        COUNT(*) FILTER (WHERE "paymentStatus" = 'unpaid')::int AS unpaid,
        COUNT(*) FILTER (WHERE "paymentStatus" = 'failed')::int AS failed,
        COUNT(*) FILTER (WHERE "paymentStatus" = 'refunded')::int AS refunded,
-       COALESCE(SUM("paidAmount"), 0)::numeric AS paid_amount
+       COALESCE(SUM("paidAmount"), 0)::numeric AS paid_amount,
+       COALESCE(SUM(CASE WHEN "paymentStatus"='paid' THEN GREATEST(COALESCE("paidAmount",0)-COALESCE(("offlineState"->>'refundAmount')::numeric,0),0) ELSE 0 END),0)::numeric AS net_amount
      FROM market_trial_participants
      WHERE "marketTrialId" = $1`,
     [trial.id],
   );
-  const r = rows[0] ?? { total: 0, paid: 0, unpaid: 0, failed: 0, refunded: 0, paid_amount: '0' };
+  const r = rows[0] ?? { total: 0, paid: 0, unpaid: 0, failed: 0, refunded: 0, paid_amount: '0', net_amount: '0' };
 
   return {
     trialId: trial.id,
     status: trial.status,
-    achievementRate: calculateAchievementRate(trial.currentAmount, trial.targetAmount),
+    achievementRate: calculateAchievementRate(Number(r.net_amount ?? 0), trial.targetAmount),
     participationRate: calculateParticipationRate(trial.currentParticipants, trial.maxParticipants ?? null),
     participantCount: Number(r.total),
     paidParticipantCount: Number(r.paid),

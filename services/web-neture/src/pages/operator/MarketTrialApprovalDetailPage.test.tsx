@@ -1,3 +1,4 @@
+vi.mock('./FundingOfflineOperations',()=>({default:()=>null}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
@@ -11,7 +12,7 @@ function Switch() { const go = useNavigate(); return <button onClick={() => go('
 const renderPage = () => render(<MemoryRouter initialEntries={['/operator/market-trial/project-a']}><Switch /><Routes><Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} /></Routes></MemoryRouter>);
 beforeEach(() => {
   vi.resetAllMocks(); mocks.kpi.mockResolvedValue(null); mocks.payment.mockResolvedValue({}); mocks.csv.mockResolvedValue(undefined);
-  mocks.detail.mockImplementation(async id => ({ id, title: `테스트 ${id}`, status: 'recruiting', currentParticipants: 1, maxParticipants: 10 }));
+  mocks.detail.mockImplementation(async id => ({ id, title: `테스트 ${id}`, status: 'development', currentParticipants: 1, maxParticipants: 10 }));
   mocks.participants.mockResolvedValue(data);
 });
 afterEach(cleanup);
@@ -63,13 +64,13 @@ it('an initial slow KPI response cannot overwrite the refreshed payment report',
 
 it('refreshes stage, participants and KPI after a manual transition', async () => {
   mocks.status.mockResolvedValue({});
-  mocks.detail.mockResolvedValueOnce({ id: 'project-a', title: '테스트 project-a', status: 'recruiting', currentParticipants: 1 })
-    .mockResolvedValue({ id: 'project-a', title: '테스트 project-a', status: 'development', currentParticipants: 2 });
+  mocks.detail.mockResolvedValueOnce({ id: 'project-a', title: '테스트 project-a', status: 'development', currentParticipants: 1 })
+    .mockResolvedValue({ id: 'project-a', title: '테스트 project-a', status: 'outcome_confirming', currentParticipants: 2 });
   renderPage(); await screen.findByText('참여 이행 관리');
-  fireEvent.click(screen.getByRole('button', { name: '준비 중으로 전환' }));
+  fireEvent.click(screen.getByRole('button', { name: '결과 확정으로 전환' }));
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
-  await waitFor(() => expect(mocks.status).toHaveBeenCalledWith('project-a', 'development'));
-  await screen.findByRole('button', { name: '결과 확정으로 전환' });
+  await waitFor(() => expect(mocks.status).toHaveBeenCalledWith('project-a', 'outcome_confirming'));
+  await screen.findByRole('button', { name: '이행 완료 처리' });
   expect(mocks.participants).toHaveBeenCalledTimes(2);
   expect(mocks.kpi).toHaveBeenCalledTimes(2);
 });
@@ -78,13 +79,13 @@ it('an old transition failure cannot close another trial dialog or set its error
   let fail!: (error: Error) => void;
   mocks.status.mockImplementationOnce(() => new Promise((_resolve, reject) => { fail = reject; }));
   renderPage(); await screen.findByText('참여 이행 관리');
-  fireEvent.click(screen.getByRole('button', { name: '준비 중으로 전환' }));
+  fireEvent.click(screen.getByRole('button', { name: '결과 확정으로 전환' }));
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
   await waitFor(() => expect(mocks.status).toHaveBeenCalledTimes(1));
   fireEvent.click(screen.getByRole('button', { name: '다른 펀딩' }));
   await screen.findByRole('heading', { name: '테스트 project-b' });
   expect(screen.queryByRole('button', { name: '확인' })).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: '준비 중으로 전환' }));
+  fireEvent.click(screen.getByRole('button', { name: '결과 확정으로 전환' }));
   await act(async () => fail(new Error('이전 펀딩 실패')));
   expect(screen.queryByText('이전 펀딩 실패')).toBeNull();
   expect(screen.getByRole('button', { name: '확인' })).toBeTruthy();
@@ -99,21 +100,21 @@ it('keeps a successful payment distinct from a failed refresh and retries reads 
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
   await screen.findByText(/처리는 완료됐지만/);
   expect(screen.queryByRole('button', { name: '기록 저장' })).toBeNull();
-  expect((screen.getByRole('button', { name: '준비 중으로 전환' }) as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByRole('button', { name: '결과 확정으로 전환' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
   await screen.findByText('참여 이행 관리');
   await waitFor(() => expect(screen.queryByText(/처리는 완료됐지만/)).toBeNull());
   expect(mocks.payment).toHaveBeenCalledTimes(1);
-  expect((screen.getByRole('button', { name: '준비 중으로 전환' }) as HTMLButtonElement).disabled).toBe(false);
+  expect((screen.getByRole('button', { name: '결과 확정으로 전환' }) as HTMLButtonElement).disabled).toBe(false);
 });
 
 it('a saved transition closes its dialog even if detail refresh fails, then recovers without repeating it', async () => {
   mocks.status.mockResolvedValue({});
-  mocks.detail.mockResolvedValueOnce({ id: 'project-a', title: '테스트 project-a', status: 'recruiting', currentParticipants: 1 })
+  mocks.detail.mockResolvedValueOnce({ id: 'project-a', title: '테스트 project-a', status: 'development', currentParticipants: 1 })
     .mockRejectedValueOnce(new Error('상세 갱신 실패'))
-    .mockResolvedValue({ id: 'project-a', title: '테스트 project-a', status: 'development', currentParticipants: 1 });
+    .mockResolvedValue({ id: 'project-a', title: '테스트 project-a', status: 'outcome_confirming', currentParticipants: 1 });
   renderPage(); await screen.findByText('참여 이행 관리');
-  fireEvent.click(screen.getByRole('button', { name: '준비 중으로 전환' }));
+  fireEvent.click(screen.getByRole('button', { name: '결과 확정으로 전환' }));
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
   await screen.findByText(/처리는 완료됐지만/);
   await waitFor(() => expect(screen.queryByRole('button', { name: '확인' })).toBeNull());
@@ -126,7 +127,7 @@ it('blocks participant writes and filters during a stage mutation', async () => 
   let done!: (value: unknown) => void;
   mocks.status.mockImplementationOnce(() => new Promise(resolve => { done = resolve; }));
   renderPage(); await screen.findByText('참여 이행 관리');
-  fireEvent.click(screen.getByRole('button', { name: '준비 중으로 전환' }));
+  fireEvent.click(screen.getByRole('button', { name: '결과 확정으로 전환' }));
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
   expect((screen.getByRole('button', { name: '재확인·정정' }) as HTMLButtonElement).disabled).toBe(true);
   expect((screen.getByLabelText('입금 상태') as HTMLSelectElement).disabled).toBe(true);
@@ -182,9 +183,9 @@ it('refreshes the full workspace after approval, forum recovery and fulfillment'
   fireEvent.click(screen.getByRole('button', { name: '승인' }));
   await screen.findByRole('button', { name: '포럼 개설 재처리' });
   await waitFor(() => expect(mocks.participants).toHaveBeenCalledTimes(2));
-  state = { ...state, status: 'recruiting', forumPending: false, forumReady: true };
+  state = { ...state, status: 'development', forumPending: false, forumReady: true };
   fireEvent.click(screen.getByRole('button', { name: '포럼 개설 재처리' }));
-  await screen.findByRole('button', { name: '준비 중으로 전환' });
+  await screen.findByRole('button', { name: '결과 확정으로 전환' });
   await waitFor(() => expect(mocks.participants).toHaveBeenCalledTimes(3));
   fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: '이행 완료' }));
   await waitFor(() => expect(mocks.reward).toHaveBeenCalledWith('project-a', p.id, 'fulfilled'));

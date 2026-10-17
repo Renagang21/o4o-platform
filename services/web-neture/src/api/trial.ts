@@ -238,6 +238,7 @@ export interface Participation {
 export type CreditProcessStatus = 'not_applicable' | 'pending' | 'planned' | 'completed';
 
 export interface ParticipationInfo {
+  withdrawn?:boolean; refundedAmount?:number;refundedAt?:string|null;
   id: string;
   trialId: string;
   participantId: string;

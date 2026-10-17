@@ -1,3 +1,4 @@
+import SupplierActiveFundings from '../../components/supplier/SupplierActiveFundings';
 /**
  * AdminSupplierGovernancePage — 공급자 상태 관리 (Admin Governance)
  *
@@ -338,6 +339,7 @@ export default function AdminSupplierGovernancePage() {
         className="mx-4 w-full max-w-md max-h-[90vh] overflow-y-auto p-6"
         onKeyDown={event => { if (event.key === 'Escape') closeDialog(); }}>
         <h2 className="text-lg font-semibold">공급자 {targetAction}</h2>
+        {dialog && <SupplierActiveFundings key={dialog.supplier.id} supplierId={dialog.supplier.id} />}
         <p className="mt-3 whitespace-pre-line text-sm text-slate-600">{dialog?.kind === 'deactivate' ? deactivateMessage : reactivateMessage}</p>
         <label className="mt-3 block text-sm"><span>변경 사유 (필수)</span>
           <textarea autoFocus value={reason} disabled={actionLoading} onChange={event => setReason(event.target.value)} rows={3}

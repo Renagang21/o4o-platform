@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { changeFundingCreatorStatus, getFundingCreatorParticipants, submitTrial, PAYMENT_STATUS_LABELS, type PaymentStatus, type Trial } from '../../api/trial';
 import { fundingStageTasks } from './fundingStageTasks';
 const NEXT: Record<string, { status: Trial['status']; label: string }> = {
-  recruiting: { status: 'development', label: '준비 단계로 전환' }, development: { status: 'outcome_confirming', label: '결과 확정 단계로 전환' },
+development: { status: 'outcome_confirming', label: '결과 확정 단계로 전환' },
   outcome_confirming: { status: 'fulfilled', label: '이행 완료로 전환' }, fulfilled: { status: 'closed', label: '펀딩 종료' },
 };
 export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Trial; forum?: { id: string; slug: string } | null; onChange: () => void }) {
