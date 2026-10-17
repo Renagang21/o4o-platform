@@ -15,6 +15,7 @@
  * - 로그인 성공 후 역할 기반 진입 화면 또는 콜백(현재 화면 유지)
  */
 
+import { BUSINESS_SITE } from '../config/businessSite';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginCard, O4OHomeButton, LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
@@ -22,6 +23,8 @@ import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
 import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
+
+const loginTitle = BUSINESS_SITE.key === 'megapharm' ? '창고형약국 로그인' : 'O4O 약국 로그인';
 
 export default function LoginModal() {
   const navigate = useNavigate();
@@ -96,10 +99,10 @@ export default function LoginModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label="O4O 약국 로그인"
+    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={loginTitle}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={closeModal} />
-      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title="O4O 약국 로그인" description="약국의 일상과 비즈니스를 연결하세요." onClose={closeModal}>
+      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title={loginTitle} description="약국의 일상과 비즈니스를 연결하세요." onClose={closeModal}>
 
           {error && !isNotMember && (
             <div className="mb-4 p-3 rounded-lg border bg-red-50 border-red-200">
