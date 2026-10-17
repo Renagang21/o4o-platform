@@ -1,10 +1,12 @@
 # PharmacyHub 완전 제거 — 새 작업공간 인계
 
-> **상태**: ACTIVE
+> **상태**: HISTORICAL_HANDOFF — 2026-10-14 당시 인계 기록
 > **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거 WO/IR**: [WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)
 > **인계 사유**: 사용자가 기존 Cloud 작업공간을 종료하고 새 작업공간에서 계속하기로 결정했다.
 > **운영 상태 조회 기준**: 2026-10-14 02:59 UTC / 11:59 KST. 이후 상태는 새 세션에서 재조회한다.
+
+> **2026-10-17 기록 회수**: 이 문서는 원본 branch에 남았던 당시 인계 기록이다. 이후 상태와 실행 승인은 최신 정본·후속 작업 및 [PR #610](https://github.com/Renagang21/o4o-platform/pull/610)의 재개 조건을 다시 확인한다. 이번 문서 회수는 추가 DB/GCS/운영 삭제 승인이나 실행이 아니다.
 
 ## 1. 목표와 이미 승인된 범위
 
