@@ -1,15 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { HomeEntryData } from '../../lib/home-entry';
 import { HOST_ORIGIN } from '../../lib/hostProfile';
 
-type Service = { key: string; description: string } & ({ label: string; href: string; documentNavigation?: boolean; preparing?: never } | { label: string; preparing: true; href?: never });
+type Service = { key: string; description: string; label: string; href: string; documentNavigation?: boolean };
 const groups: { title: string; services: Service[] }[] = [
   { title: '약국 협력사업 참여', services: [
     { key: 'kpa-society', description: 'O4O를 이용하는 약국의 일상 업무를 지원합니다.', label: 'O4O 약국 경영지원', href: 'https://pharmacy.neture.co.kr/' },
-    { key: 'chronic-care', description: '만성질환관리 협력사업을 준비하고 있습니다.', label: '만성질환관리', preparing: true },
-    { key: 'cooperative', description: '약국·약사의 협동조합 협력사업을 준비하고 있습니다.', label: '약국/약사협동조합', preparing: true },
-    { key: 'warehouse', description: '창고형 약국 협력사업을 준비하고 있습니다.', label: '창고형 약국', preparing: true },
+    { key: 'carepharm', description: 'CarePharm에서 만성질환관리 협력사업과 참여 정보를 확인합니다.', label: '만성질환관리', href: `${HOST_ORIGIN.carepharm}/` },
+    { key: 'cooperative', description: '약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.', label: '약국/약사협동조합', href: 'https://coop.neture.co.kr/' },
+    { key: 'megapharm', description: '메가팜의 창고형 약국 협력사업과 참여 정보를 확인합니다.', label: '창고형 약국', href: 'https://megapharm.neture.co.kr/' },
   ] },
   { title: '약국 경영·공급 활동', services: [
     { key: 'store', description: '내 매장의 제품·콘텐츠와 운영 업무를 관리합니다.', label: '내 매장', href: 'https://store.neture.co.kr/' },
@@ -29,21 +28,16 @@ const groups: { title: string; services: Service[] }[] = [
   ] },
 ];
 
-/** 공개 탐색은 개인 업무·가입·이용 권한과 별개다. 준비 중 항목은 안내만 제공한다. */
+/** 공개 탐색은 개인 업무·가입·이용 권한과 별개이며 각 서비스의 실제 진입 주소로 연결한다. */
 export function discoveryServiceHasMembership(service: Service, data: HomeEntryData): boolean {
   if (service.key === 'supplier' && data.serviceStates?.supplier?.status && data.serviceStates.supplier.status !== 'none') return true;
+  if ((service.key === 'carepharm' || service.key === 'megapharm') && data.communities?.some(item => item.kind === 'semi-franchise' && item.businessKey === service.key && item.canParticipate)) return true;
   if (service.key === 'store') return (data.workspaceStores ?? data.stores).length > 0;
   return !!data.services.find(item => item.key === service.key)?.membership;
 }
 
 export default function ServiceDiscovery({ data, personalized = false }: { data?: HomeEntryData | null; personalized?: boolean }) {
   const visibleGroups = groups.map(group => ({ ...group, services: group.services.filter(service => !personalized || !data || !discoveryServiceHasMembership(service, data)) })).filter(group => group.services.length > 0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const trigger = useRef<HTMLButtonElement | null>(null);
-  useEffect(() => {
-    if (selected && !dialog.current?.open) dialog.current?.showModal();
-  }, [selected]);
   const card = 'flex h-full w-full flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-800 no-underline transition-colors hover:border-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700';
   return <section aria-labelledby="all-services-title" className="mt-12 w-full max-w-3xl">
     <h2 id="all-services-title" className="text-xl font-semibold text-slate-900">{personalized && data ? '다른 서비스 알아보기' : '전체 서비스'}</h2>
@@ -52,9 +46,7 @@ export default function ServiceDiscovery({ data, personalized = false }: { data?
       <h3 className="mb-3 text-base font-semibold text-slate-800">{group.title}</h3>
       <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
         {group.services.map(service => <li key={service.label}>
-          {service.preparing ? <button type="button" className={card} aria-haspopup="dialog" onClick={event => { trigger.current = event.currentTarget; setSelected(service.label); }}>
-            <span className="font-medium">{service.label}</span><span className="text-sm leading-relaxed text-slate-600">{service.description}</span><span className="text-sm text-slate-500">준비 중 · 안내 보기</span>
-          </button> : service.href.startsWith('/') && !service.documentNavigation ? <Link className={card} to={service.href}>
+          {service.href.startsWith('/') && !service.documentNavigation ? <Link className={card} to={service.href}>
             <span className="font-medium">{service.label}</span><span className="text-sm leading-relaxed text-slate-600">{service.description}</span><span className="text-sm text-slate-500">{service.label === 'O4O Partner' ? '준비 중 · 서비스 알아보기' : '도구 열기 →'}</span>
           </Link> : <a className={card} href={service.href} target="_blank" rel="noopener noreferrer">
             <span className="font-medium">{service.label}</span><span className="text-sm leading-relaxed text-slate-600">{service.description}</span><span className="text-sm text-slate-500">서비스로 이동 ↗</span>
@@ -62,10 +54,5 @@ export default function ServiceDiscovery({ data, personalized = false }: { data?
         </li>)}
       </ul>
     </nav>)}
-    <dialog ref={dialog} aria-labelledby="preparing-title" aria-describedby="preparing-description" className="w-[calc(100%_-_2rem)] max-w-sm rounded-2xl border-0 p-6 shadow-xl backdrop:bg-slate-900/40" onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); dialog.current?.querySelector('button')?.focus(); } }} onClose={() => { setSelected(null); trigger.current?.focus(); }}>
-      <h2 id="preparing-title" className="text-lg font-semibold">{selected}</h2>
-      <p id="preparing-description" className="my-4 text-slate-600">준비 중입니다.</p>
-      <button type="button" autoFocus onClick={() => dialog.current?.close()} className="rounded-lg bg-slate-900 px-4 py-2 text-white">닫기</button>
-    </dialog>
   </section>;
 }
