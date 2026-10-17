@@ -38,8 +38,13 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
   const roleMutation = req.path.endsWith('/roles') || req.path.includes('/roles/');
   // Role ownership determines authority; an unrelated body serviceKey cannot override it.
   // Bare roles are checked again against the resolved catalogue service in the controller.
-  const selected = roleMutation && roleService ? roleService : req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
-  const keys = typeof selected === 'string' ? [selected] : scope.serviceKeys;
+  // Match the controller's target selection. membershipServiceKey belongs only to PUT membership-role edits;
+  // DELETE/status use body.serviceKey before query.serviceKey. Normalize before any privilege or retirement check.
+  const membershipRoleEdit = req.method === 'PUT' && typeof req.body?.membershipRole === 'string' && req.body.membershipRole.trim();
+  const selected = roleMutation && roleService ? roleService
+    : membershipRoleEdit ? req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey
+      : req.body?.serviceKey ?? req.query.serviceKey;
+  const keys = typeof selected === 'string' ? [selected.trim()] : scope.serviceKeys;
   const admin = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => adminKeys.includes(key)));
   const ownsSelection = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => scope.serviceKeys.includes(key)));
   if (!ownsSelection) {

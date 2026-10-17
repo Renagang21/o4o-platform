@@ -56,7 +56,7 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 ## 검증·통합 상태
 
 - 격리 PostgreSQL 기능 검증: 22 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
-- API focused: 6 suites / 117 tests PASS (위 PostgreSQL 22개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
+- API focused: 6 suites / 124 tests PASS (위 PostgreSQL 22개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
 - 웹 focused: 4 files / 106 tests PASS.
 - 공유 회원 UI 전체: 21 files / 166 tests PASS (직접 소비처뿐 아니라 공통 모듈 회귀 포함).
 - Neture 웹 전체: 122 files / 1100 tests PASS.
@@ -73,6 +73,11 @@ PR #685의 P1/P2 지적을 재현하고 수정했다. 조직 전용 글의 작�
 이 데이터는 일반 커뮤니티 삭제에 포함하지 않고 검토가 끝날 때까지 회원 삭제 자체를 차단한다.
 살아남은 글의 최근 댓글 시각·작성자도 최신 공개 댓글로 재계산하며 공개 댓글이 없으면 둘 다 NULL로 지운다.
 PostgreSQL에서 관련 11개 사례를 추가해 총22개, API 관련 전체117개가 통과했다.
+
+후속 P1 우회도 수정했다. 권한 검사와 community 전용 삭제 검사 전에 서비스 키를 trim하고,
+DELETE/status의 실제 대상(body.serviceKey → query.serviceKey)과 PUT 회원 역할 수정의
+membershipServiceKey를 구분한다. 공백을 URL 인코딩한 직접 HTTP 요청과 다른 본문 키로
+검사를 속이는 요청을 포함한7개 회귀를 추가했다. API 관련 전체124개가 통과했다.
 
 ## 문서 정합
 

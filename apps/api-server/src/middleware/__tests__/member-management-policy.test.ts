@@ -1,9 +1,11 @@
+import express from 'express';
+import request from 'supertest';
 const query = jest.fn();
 jest.mock('../../database/connection.js', () => ({ AppDataSource: { query: (...args: any[]) => query(...args) } }));
 import { memberManagementPolicy, requireActiveOperatorScope } from '../member-management-policy.middleware.js';
 
-function check(method: string, path: string, body: any, roles = ['neture:operator'], keys = ['neture']) {
-  const req: any = { method, path, body, query: {}, user: { roles }, serviceScope: { serviceKeys: keys, rolePrefixes: keys, isPlatformAdmin: roles.includes('platform:super_admin') } };
+function check(method: string, path: string, body: any, roles = ['neture:operator'], keys = ['neture'], queryParams = {}) {
+  const req: any = { method, path, body, query: queryParams, user: { roles }, serviceScope: { serviceKeys: keys, rolePrefixes: keys, isPlatformAdmin: roles.includes('platform:super_admin') } };
   const res: any = { status: jest.fn(), json: jest.fn() }; res.status.mockReturnValue(res);
   const next = jest.fn(); memberManagementPolicy(req, res, next);
   return { req, res, next };
@@ -62,4 +64,29 @@ it('community operator keeps daily suspension and cannot delete; admin uses the 
  expect(admin.res.json).toHaveBeenCalledWith(expect.objectContaining({code:'COMMUNITY_DELETION_ROUTE_REQUIRED'}));
  expect(admin.next).not.toHaveBeenCalled();
  expect(check('DELETE','/u',{serviceKey:'neture'},['neture:admin'],['neture']).next).toHaveBeenCalledTimes(1);
+});
+
+
+it.each([' community ','\tcommunity\n','community'])('normalizes community deletion query scope before the platform bypass (%j)',serviceKey=>{
+ const result=check('DELETE','/u',{},['platform:super_admin'],[],{serviceKey,mode:'hard'});
+ expect(result.res.status).toHaveBeenCalledWith(409);expect(result.next).not.toHaveBeenCalled();
+});
+it('uses actual DELETE target instead of an unrelated membershipServiceKey',()=>{
+ const mixed=['neture:admin','community:operator'];
+ const denied=check('DELETE','/u',{membershipServiceKey:'neture',serviceKey:' community '},mixed,['neture','community']);
+ expect(denied.res.status).toHaveBeenCalledWith(403);expect(denied.next).not.toHaveBeenCalled();
+ const platform=check('DELETE','/u',{membershipServiceKey:'neture',serviceKey:' community '},['platform:super_admin'],[]);
+ expect(platform.res.status).toHaveBeenCalledWith(409);expect(platform.next).not.toHaveBeenCalled();
+ expect(check('DELETE','/u',{membershipServiceKey:'community',serviceKey:'neture'},mixed,['neture','community']).next).toHaveBeenCalledTimes(1);
+});
+it('PUT ordinary membership role edits still authorize the membershipServiceKey',()=>{
+ expect(check('PUT','/u',{membershipRole:'member',membershipServiceKey:'community',serviceKey:'neture'},['community:operator'],['community']).next).toHaveBeenCalledTimes(1);
+});
+it.each([false,true])('HTTP encoded padded community key never reaches the legacy delete handler (body=%s)',async inBody=>{
+ const handler=jest.fn((_req,res)=>res.json({deleted:true}));const a=express();a.use(express.json());
+ a.use((req,_res,next)=>{(req as any).user={roles:['platform:super_admin']};(req as any).serviceScope={isPlatformAdmin:true,serviceKeys:[],rolePrefixes:[]};next();});
+ a.delete('/members/:id',memberManagementPolicy,handler);
+ const call=request(a).delete('/members/fixture').query(inBody?{mode:'hard',serviceKey:'neture'}:{mode:'hard',serviceKey:' community '});
+ if(inBody)call.send({membershipServiceKey:'neture',serviceKey:' community '});
+ const response=await call;expect(response.status).toBe(409);expect(response.body.code).toBe('COMMUNITY_DELETION_ROUTE_REQUIRED');expect(handler).not.toHaveBeenCalled();
 });
