@@ -73,6 +73,6 @@ it('blocks empty title and archived content without a write', async () => {
   fireEvent.click(screen.getByRole('button', { name: '수정 저장' })); await screen.findByText('제목을 입력해 주세요.');
   expect(api.updateContent).not.toHaveBeenCalled(); view.unmount();
   api.getContent.mockResolvedValueOnce({ ...content('보관'), status: 'archived' });
-  show(); await screen.findByText(/보관된 콘텐츠는 수정할 수 없습니다/);
+  show(); await screen.findByText(/보관되거나 반려된 콘텐츠는 수정할 수 없습니다/);
   expect(screen.queryByRole('button', { name: '수정 저장' })).toBeNull(); expect(api.updateContent).not.toHaveBeenCalled();
 });

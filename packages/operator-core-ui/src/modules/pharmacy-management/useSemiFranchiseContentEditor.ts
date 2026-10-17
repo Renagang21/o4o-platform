@@ -48,7 +48,7 @@ export function useSemiFranchiseContentEditor(businessKey?: string) {
     return () => { active = false; };
   }, [key, id, businessKey, scope, reload]);
 
-  const archived = current?.status === 'archived';
+  const archived = current?.status === 'archived' || current?.status === 'rejected';
   const set = (field: keyof ContentDraft, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const submit = async (e: FormEvent) => {

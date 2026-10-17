@@ -81,7 +81,7 @@ Supplier → Service Operator   (서비스 운영자에게 제공)
 
 ```text
 Supplier → 특정 Store 직접 온라인 전달   ✕
-Supplier → Community 직접 게시           ✕
+Supplier 역할로 Community 자동 게시     ✕
 ```
 
 - 특정 매장에 직접 자료를 줄 필요가 있으면 **O4O 밖에서** 전달하고, Store 가 필요 시 **직접 등록**한다 (§5 Store Direct Authoring).
@@ -90,6 +90,8 @@ Supplier → Community 직접 게시           ✕
 - **구현 계약 상세화 (2026-09-16, `WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`)** — 공급자 콘텐츠의 canonical 원장은 `neture_supplier_library_items` 하나다(새 원장 없음).
   · 당시 `Supplier → Store Hub` = Hub source adapter `sourceDomain=supplier-library` (`is_public=true` 행 노출 · 사본 없음 · 특정 매장 대상 없음). 현재는 이 열람 계약을 유지하며 내 매장으로 화면을 재배치한다. adapter 이름이 남았다는 이유로 중간 HUB 화면을 유지하지 않는다.
   · `Supplier → Service Operator` = `POST /neture/library/:id/handoff {serviceKey}` — 대상은 canonical catalog(`operatorWorkspaceEnabled=true` + `workspaceMode=standard`)에서만 파생, 수신은 기존 `cms_contents(authorRole=supplier, status=pending)` 계약 재사용. 제공 후 검토·수정·발행은 운영자 업무이며 **공급자 책임은 제공에서 끝난다** (상태 기계 · 전송 엔진 · lineage 없음).
+
+- **2026-10-17 사용자 지시 · [콘텐츠 목적지 분리 WO](../work-orders/WO-O4O-SUPPLIER-CONTENT-DESTINATIONS-V1.md)**: 공급자 자료함은 원본 보관 장소다. 저장, 커뮤니티 게시, 서비스 등재 요청을 분리한다. 커뮤니티는 일반 회원의 기존 가입·게시판 권한으로 별도 작성기에서 내용을 확인해 게시하며 공급자 역할로 자동 게시하지 않는다. 약국 협력사업의 콘텐츠 등재 요청은 활성 사업 행을 대상으로 기존 회원 전용 `semi_franchise_contents`에 검토 사본을 접수한다. 담당 운영자의 승인·게시/반려와 공급자의 자기 요청 현황 조회를 지원한다. 기존 catalog 기반 CMS 제공 계약은 유지한다. 커뮤니티 가입으로 사업 승인이나 사업 자료 열람을 대신하지 않는다.
 
 ---
 

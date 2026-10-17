@@ -97,3 +97,15 @@ it('does not open an old row decision in the same turn as a business switch', as
   });
   expect(screen.queryByRole('dialog')).toBeNull(); expect(api.decideSfMembership).not.toHaveBeenCalled();
 });
+
+it('reviews supplier content within its business and requires a rejection reason', async () => {
+  api.listContents.mockResolvedValue([{ id: 'request-a', title: '가상 등재 자료', sourceItemId: 'source-a', status: 'pending' }]);
+  api.setContentStatus.mockResolvedValue({}); show();
+  await screen.findByRole('heading', { name: '담당 약국 협력사업' });
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠' }));
+  await screen.findByText('가상 등재 자료');
+  expect(screen.getByText('공급자 등재 요청')).toBeTruthy();
+  fireEvent.click(rowAction('가상 등재 자료', '반려'));
+  fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '내용 보완 필요' } }); confirm();
+  await waitFor(() => expect(api.setContentStatus).toHaveBeenCalledWith('pharmacy', 'request-a', 'reject', '내용 보완 필요'));
+});

@@ -118,6 +118,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
+            <li>공급자가 요청한 자료는 검토 대기 상태입니다. 내용을 확인한 후 승인·게시하거나 사유를 적어 반려하세요. 커뮤니티에는 게시되지 않습니다.</li>
             <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
@@ -398,6 +399,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
                   <tr key={c.id}>
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{c.title}</div>
+                      {c.sourceItemId && <div className="text-xs text-blue-700">공급자 등재 요청</div>}
                       {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
                     </td>
                     <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
@@ -405,10 +407,11 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
                     <td className={TD}>{formatDateTime(c.updatedAt)}</td>
                     <td className={TD}>
                       <StatusBadge status={c.status} />
+                      {c.reviewReason && <p className="text-xs text-gray-500">{c.reviewReason}</p>}
                     </td>
                     <td className={TD}>
                       <div className="flex flex-wrap gap-1">
-                        {c.status !== 'archived' && (
+                        {!['archived', 'rejected'].includes(c.status) && (
                           <Link
                             to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
                             className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
@@ -416,13 +419,13 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome }: B
                             수정
                           </Link>
                         )}
-                        {(CONTENT_ACTIONS[c.status] ?? []).map((a) => (
+                        {(c.sourceItemId && c.status === 'archived' ? [] : CONTENT_ACTIONS[c.status] ?? []).map((a) => (
                           <ActionButton
                             key={a.action}
                             label={a.label}
                             action={a.action}
                             disabled={interactionLocked || loading}
-                            onClick={() => run(c.id, a.label, false, () => api.setContentStatus(sfKey, c.id, a.action), c.title)}
+                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title)}
                           />
                         ))}
                       </div>

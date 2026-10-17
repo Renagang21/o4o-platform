@@ -51,9 +51,19 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
         </div>
       )}
 
+      {current?.attachments?.length ? <section aria-label="검토할 첨부자료" className="space-y-2 rounded border p-4 text-sm">
+        <h2 className="font-semibold">첨부자료</h2>
+        {current.attachments.map((value, index) => {
+          if (!value || typeof value !== 'object') return null;
+          const attachment = value as { url?: unknown; name?: unknown };
+          if (typeof attachment.url !== 'string' || !/^https?:\/\//i.test(attachment.url)) return null;
+          return <a key={index} href={attachment.url} target="_blank" rel="noopener noreferrer" className="block text-blue-700 underline">{typeof attachment.name === 'string' ? attachment.name : '첨부자료 열기'}</a>;
+        })}
+      </section> : null}
+
       {archived ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          보관된 콘텐츠는 수정할 수 없습니다. 목록에서 다시 게시한 뒤 수정하세요.
+          보관되거나 반려된 콘텐츠는 수정할 수 없습니다. 공급자 요청 자료는 원본을 보완한 뒤 새로 요청하고, 운영자 작성 자료는 목록에서 다시 게시한 뒤 수정하세요.
         </div>
       ) : (
         <form onSubmit={submit} aria-busy={saving} className="rounded-lg border border-gray-200 bg-white p-5">

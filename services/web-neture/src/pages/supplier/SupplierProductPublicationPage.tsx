@@ -39,10 +39,12 @@ export default function SupplierProductPublicationPage() {
               <label className="block text-sm">기본 B2B 공급가 (원)
                 <input type="number" min="1" step="1" className={INPUT} value={form.priceGeneral} onChange={e => setForm(f => ({ ...f, priceGeneral: e.target.value }))} />
               </label>
-              <label className="flex items-start gap-3 rounded border p-3 text-sm">
-                <input type="checkbox" className="mt-1" checked={form.defaultSupplyEnabled} onChange={e => setForm(f => ({ ...f, defaultSupplyEnabled: e.target.checked }))} />
-                <span><strong>Neture 약국 기본 공급</strong><span className="mt-1 block text-slate-500">pharmacy 협력사업에 가입한 약국의 공급 목록에 게시합니다.</span></span>
-              </label>
+              <div className="space-y-2 rounded border p-3 text-sm" role="group" aria-label="pharmacy 등재 선택">
+                <strong>이 제품을 pharmacy 협력사업에 공급하시겠습니까?</strong>
+                <label className="flex gap-2"><input type="radio" name="pharmacy-publication" checked={form.defaultSupplyEnabled} onChange={() => setForm(f => ({ ...f, defaultSupplyEnabled: true }))} />예 — Neture 약국 기본 공급에 등재</label>
+                <label className="flex gap-2"><input type="radio" name="pharmacy-publication" checked={!form.defaultSupplyEnabled} onChange={() => setForm(f => ({ ...f, defaultSupplyEnabled: false }))} />아니요 — pharmacy 기본 공급에 등재하지 않음</label>
+                <p className="text-slate-500">예를 선택하고 게시 설정을 저장하면 일반 공급가로 게시됩니다. 다른 협력사업의 공급 제안·이벤트는 별도로 유지됩니다.</p>
+              </div>
               <div className="rounded border p-3 text-sm">
                 <label className="flex items-center gap-3"><input type="checkbox" checked={form.serviceKeys.includes('kpa-society')} onChange={() => toggleService('kpa-society')} /><strong>KPA Society</strong></label>
                 <p className="mt-2">서비스 게시 승인: {serviceStatus[serviceApproval?.status ?? ''] ?? '미신청'}{serviceApproval?.reason && <span className="block text-amber-800">{serviceApproval.reason}</span>}</p>
@@ -58,7 +60,7 @@ export default function SupplierProductPublicationPage() {
               <button type="button" onClick={c.save} className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white">{c.saving ? '저장 중...' : '게시 설정 저장'}</button>
             </fieldset>
             <div className="flex flex-wrap gap-3 text-sm">
-              <Link className="rounded border px-3 py-2 text-blue-700" to={supplierEditLink('/supplier/supply-proposals', { offer: product.id }, returnTo)}>협력사업별 공급 제안</Link>
+              <Link className="rounded border px-3 py-2 text-blue-700" to={supplierEditLink('/supplier/supply-proposals', { offer: product.id }, returnTo)}>협력사업별 거래 조건 설정·등재 요청</Link>
               <Link className="rounded border px-3 py-2 text-purple-700" to={supplierEditLink('/supplier/semi-franchise-events', { offer: product.id }, returnTo)}>이 제품으로 이벤트·특가</Link>
             </div>
           </>}

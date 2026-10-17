@@ -26,8 +26,8 @@ export type MembershipAction = 'approve' | 'reject' | 'suspend' | 'reactivate' |
 export type ProposalAction = 'approve' | 'reject' | 'end';
 export type EventAction = 'approve' | 'reject' | 'cancel';
 export type RecruitmentAction = 'approve' | 'reject';
-export type SemiFranchiseContentAction = 'publish' | 'archive';
-export type SemiFranchiseContentStatus = 'draft' | 'published' | 'archived';
+export type SemiFranchiseContentAction = 'publish' | 'archive' | 'reject';
+export type SemiFranchiseContentStatus = 'draft' | 'pending' | 'rejected' | 'published' | 'archived';
 
 export interface PharmacyMembership {
   id: string;
@@ -139,6 +139,8 @@ export interface SemiFranchiseContent {
   thumbnailUrl: string | null;
   attachments: unknown[] | null;
   tags: string[] | null;
+  sourceItemId?: string | null;
+  reviewReason?: string | null;
   status: SemiFranchiseContentStatus;
   publishedAt: string | null;
   createdAt: string;
@@ -220,8 +222,8 @@ export const neturePharmacyOperatorApi = {
     send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents`, input),
   updateContent: (key: string, id: string, input: SemiFranchiseContentInput) =>
     send<{ id: string; status: string }>('patch', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`, input),
-  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction) =>
-    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`),
+  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction, reason?: string) =>
+    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`, { reason }),
 };
 
 // ─── Neture 관리자 ──────────────────────────────────────────────────────────
