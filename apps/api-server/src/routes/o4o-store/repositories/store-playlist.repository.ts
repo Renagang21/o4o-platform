@@ -124,7 +124,8 @@ export class StorePlaylistRepository {
            i.display_order AS "displayOrder",
            i.is_forced AS "isForced",
            s.title,
-           s.content_json AS "contentJson"
+           s.content_json AS "contentJson",
+           NULL::uuid AS "forcedMediaId"
          FROM store_playlist_items i
          JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
          WHERE i.playlist_id = $1

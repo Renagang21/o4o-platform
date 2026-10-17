@@ -6,6 +6,11 @@ import type { StorePlaylist } from "../../api/storePlaylist";
 interface StoreSignageScheduleFormProps {
   editing: boolean;
   playlists: StorePlaylist[];
+  broadcastPlaylists?: { id: string; name: string }[];
+  broadcast?: boolean;
+  playlistsLoading?: boolean;
+  playlistsError?: string | null;
+  onRetryPlaylists?: () => void;
   schName: string;
   schPlaylistId: string;
   schPriority: number;
@@ -33,6 +38,11 @@ interface StoreSignageScheduleFormProps {
 export function StoreSignageScheduleForm({
   editing,
   playlists,
+  broadcastPlaylists = [],
+  broadcast = false,
+  playlistsLoading = false,
+  playlistsError = null,
+  onRetryPlaylists,
   schName,
   schPlaylistId,
   schPriority,
@@ -57,8 +67,9 @@ export function StoreSignageScheduleForm({
   resetScheduleForm,
 }: Readonly<StoreSignageScheduleFormProps>) {
   const fieldId = useId();
+  const options = broadcast ? broadcastPlaylists : playlists.filter(item => item.publishStatus === 'published');
   return (
-    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+    <fieldset disabled={schSaving} className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
       <div className="text-sm font-medium text-slate-700">
         {editing ? "스케줄 수정" : "새 스케줄"}
       </div>
@@ -69,6 +80,9 @@ export function StoreSignageScheduleForm({
         </p>
       )}
       <p className="text-sm text-slate-600">보여줄 재생목록과 요일·시간을 정하세요. 일정 저장 후 실제 화면은 기기에서 확인하세요.</p>
+      {broadcast && <p className="text-sm text-amber-800">기존 방송 자료의 일정을 수정합니다. 매장 안내 목록과 별도로 유지됩니다.</p>}
+      {playlistsLoading && <p role="status" className="text-sm text-slate-600">재생목록 확인 중…</p>}
+      {playlistsError && <p role="alert" className="text-sm text-red-700">재생목록을 확인하지 못했습니다. 입력은 유지됩니다. <button type="button" onClick={onRetryPlaylists} className="min-h-11 underline">재생목록 다시 시도</button></p>}
       {/* Row 1: Name */}
       <input
         type="text"
@@ -82,27 +96,27 @@ export function StoreSignageScheduleForm({
       {/* Row 2: Playlist + Priority */}
       <div className="grid gap-3">
         <div className="min-w-0">
-          {playlists.filter((p) => p.publishStatus === "published").length ===
-            0 && (
+          {!playlistsLoading && !playlistsError && options.length === 0 && (
             <p className="text-xs text-amber-600 mb-1">
               게시된 플레이리스트가 없습니다. &lsquo;내 플레이리스트&rsquo;
               탭에서 플레이리스트를 게시해주세요.
             </p>
           )}
           <select
+            disabled={playlistsLoading || !!playlistsError}
             aria-label="플레이리스트 선택"
             value={schPlaylistId}
             onChange={(e) => {
               const id = e.target.value;
               setSchPlaylistId(id);
-              const previousName = playlists.find((item) => item.id === schPlaylistId)?.name;
-              if (id && (!schName.trim() || schName === `${previousName} 재생`)) setSchName(`${playlists.find((item) => item.id === id)?.name || '매장 안내'} 재생`);
+              const previousName = options.find((item) => item.id === schPlaylistId)?.name;
+              if (id && (!schName.trim() || schName === `${previousName} 재생`)) setSchName(`${options.find((item) => item.id === id)?.name || '매장 안내'} 재생`);
             }}
             className="w-full min-h-11 px-3 py-2 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="">플레이리스트 선택 *</option>
-            {playlists
-              .filter((p) => p.publishStatus === "published")
+            {schPlaylistId && !options.some(item => item.id === schPlaylistId) && <option value={schPlaylistId} disabled>현재 선택 · 게시 상태 확인 필요</option>}
+            {options
               .map((pl) => (
                 <option key={pl.id} value={pl.id}>
                   {pl.name}
@@ -251,6 +265,7 @@ export function StoreSignageScheduleForm({
             onClick={handleSaveSchedule}
             disabled={
               schSaving ||
+              playlistsLoading || !!playlistsError || !options.some(item => item.id === schPlaylistId) ||
               !schName.trim() ||
               !schPlaylistId ||
               schDays.length === 0
@@ -268,6 +283,6 @@ export function StoreSignageScheduleForm({
           </button>
         </div>
       </div>
-    </div>
+    </fieldset>
   );
 }
