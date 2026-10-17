@@ -1,0 +1,192 @@
+import express from 'express';
+import request from 'supertest';
+import { randomUUID } from 'crypto';
+import { DataSource } from 'typeorm';
+import { createNeturePharmacyRoutes } from '../neture-pharmacy.routes.js';
+import { createStoreTabletRoutes } from '../../../routes/platform/store-tablet.routes.js';
+import { createMultilingualProductContentController } from '../../../routes/o4o-store/controllers/multilingual-product-content.controller.js';
+import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import { SemiFranchiseService } from '../services/semi-franchise.service.js';
+
+// Only session authentication is synthetic. Store relationship/role queries,
+// business/member grants, execution guards and SQL use the disposable database.
+jest.mock('../../../middleware/auth.middleware.js', () => ({
+  ...jest.requireActual('../../../common/middleware/auth/authorization.middleware.js'),
+  requireAuth: (req: any, res: any, next: any) => req.user ? next() : res.status(401).json({ code: 'UNAUTHORIZED' }),
+}));
+// Unrelated checkout/provisioning integrations are not executed by this suite.
+jest.mock('../../../services/checkout.service.js', () => ({ checkoutService: {} }));
+jest.mock('../../../routes/kpa/services/event-offer.service.js', () => ({ EventOfferService: class {} }));
+jest.mock('../services/pharmacy-store-provisioner.js', () => ({ createPharmacyStoreProvisioner: () => ({}) }));
+jest.mock('../services/business-registration-document.service.js', () => ({ BusinessRegistrationDocumentService: class {} }));
+jest.mock('@o4o/asset-copy-core', () => ({ AssetCopyService: class {} }), { virtual: true });
+
+const url = process.env.NETURE_PHARMACY_IT_DATABASE_URL;
+if (url) {
+  const target = new URL(url);
+  if (target.protocol !== 'postgresql:' || target.hostname !== '127.0.0.1' || target.port !== '55432' ||
+      target.pathname !== '/o4o_feature_test' || target.search || target.hash) {
+    throw new Error('Collaboration integration requires its dedicated loopback fixture database');
+  }
+}
+const suite = url ? describe : describe.skip;
+suite('business registration through approved staff execution (PostgreSQL + HTTP)', () => {
+  let db: DataSource;
+  let app: express.Express;
+  let settings: SemiFranchiseService;
+  const users: string[] = [];
+  const orgs: string[] = [];
+  const businesses: string[] = [];
+  const tag = randomUUID().slice(0, 8);
+  let admin: string;
+  let owner: string;
+  let staff: string;
+  let store: string;
+  let other: string;
+  const base = '/api/v1/neture';
+  const tablet = '/tablet/tablets';
+  const multilingual = '/mlc/pharmacy/multilingual-product-contents/hub';
+  const get = (path: string, organizationId = store) => request(app).get(path)
+    .set('x-fixture-user', staff).set('x-store-organization-id', organizationId);
+  const postAdmin = (path: string, body: unknown) => request(app).post(base + path)
+    .set('x-fixture-user', admin).send(body);
+
+  beforeAll(async () => {
+    db = await new DataSource({ type: 'postgres', url, entities: [] }).initialize();
+    settings = new SemiFranchiseService(db);
+    for (let i = 0; i < 4; i++) {
+      const [row] = await db.query(`INSERT INTO users (email,status,"isActive","isEmailVerified")
+        VALUES ($1,'active',true,true) RETURNING id`, [`application-${tag}-${i}@example.test`]);
+      users.push(row.id);
+    }
+    [admin, owner, staff] = users;
+    for (let i = 0; i < 2; i++) {
+      const [row] = await db.query(`INSERT INTO organizations(name,code,type,"isActive")
+        VALUES ('Synthetic pharmacy',$1,'pharmacy',true) RETURNING id`, [`application-${tag}-${i}`]);
+      orgs.push(row.id);
+      const ownerId = i === 0 ? owner : users[3];
+      await db.query(`INSERT INTO organization_members(organization_id,user_id,role,is_primary,joined_at,created_at,updated_at)
+        VALUES ($1,$2,'owner',true,NOW(),NOW(),NOW())`, [row.id, ownerId]);
+      await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,business_number,pharmacy_name,pharmacist_license_number)
+        VALUES ($1,$2,'active',$3,'Synthetic pharmacy','SYNTHETIC')`, [row.id, ownerId, `${tag}-${i}`]);
+    }
+    [store, other] = orgs;
+    await db.query(`INSERT INTO organization_members(organization_id,user_id,role,is_primary,joined_at,created_at,updated_at)
+      VALUES ($1,$2,'staff',true,NOW(),NOW(),NOW())`, [store, staff]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES ($1,'platform:super_admin'),($2,'kpa:store_member')`, [admin, staff]);
+
+    // Point the existing platform role guard at the same local DB, rather than
+    // its process-global production DataSource. Authorization is still row-based.
+    jest.spyOn(roleAssignmentService, 'hasAnyRole').mockImplementation(async (id, roles) => {
+      const rows = await db.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role=ANY($2::text[])
+        AND is_active=true AND valid_from<=NOW() AND (valid_until IS NULL OR valid_until>=NOW())`, [id, roles]);
+      return rows.length > 0;
+    });
+    jest.spyOn(roleAssignmentService, 'getActiveRoles').mockImplementation(async id => db.query(
+      `SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true`, [id]));
+    app = express();
+    app.use(express.json());
+    app.use((req: any, _res, next) => {
+      const id = req.header('x-fixture-user');
+      if (users.includes(id)) req.user = { id, roles: [], memberships: [] };
+      next();
+    });
+    app.use(base, createNeturePharmacyRoutes(db));
+    app.use('/tablet', createStoreTabletRoutes(db, { storeOwnerServiceKey: 'kpa' }));
+    app.use('/mlc', createMultilingualProductContentController(db, (_req, _res, next) => next(), 'kpa'));
+  });
+
+  afterAll(async () => {
+    jest.restoreAllMocks();
+    if (!db?.isInitialized) return;
+    await db.query(`DELETE FROM semi_franchise_memberships WHERE semi_franchise_id=ANY($1::uuid[])`, [businesses]);
+    await db.query(`DELETE FROM semi_franchises WHERE id=ANY($1::uuid[])`, [businesses]);
+    await db.query(`DELETE FROM neture_pharmacy_memberships WHERE applicant_user_id=ANY($1::uuid[])`, [users]);
+    await db.query(`DELETE FROM organization_members WHERE organization_id=ANY($1::uuid[])`, [orgs]);
+    await db.query(`DELETE FROM role_assignments WHERE user_id=ANY($1::uuid[])`, [users]);
+    await db.query(`DELETE FROM organizations WHERE id=ANY($1::uuid[])`, [orgs]);
+    await db.query(`DELETE FROM users WHERE id=ANY($1::uuid[])`, [users]);
+    await db.destroy();
+  });
+
+  it('registers, approves and combines business grants for a real free staff relationship, then rechecks withdrawal and paid ownership', async () => {
+    expect((await request(app).get(base + '/pharmacy/service-features')).status).toBe(401);
+    expect((await get(tablet)).status).toBe(403);
+    expect((await get(multilingual)).status).toBe(403);
+    const keys = [`application-${tag}-a`, `application-${tag}-b`];
+    for (const key of keys) {
+      const result = await postAdmin('/admin/semi-franchises', {
+        key, name: 'Synthetic business', serviceFeatures: ['tablet', 'multilingual-content'],
+      });
+      expect(result.status).toBe(201);
+      businesses.push(result.body.data.id);
+      orgs.push(result.body.data.organization_id);
+    }
+    // Registration alone never enrolls a pharmacy.
+    expect((await get(tablet)).status).toBe(403);
+    for (const key of keys) {
+      await settings.apply(store, owner, key);
+      expect((await get(tablet)).status).toBe(key === keys[0] ? 403 : 200);
+      const [membership] = await db.query(`SELECT id FROM semi_franchise_memberships WHERE organization_id=$1
+        AND semi_franchise_id=(SELECT id FROM semi_franchises WHERE key=$2)`, [store, key]);
+      const sf = await settings.getByKey(key);
+      expect(sf).not.toBeNull();
+      await settings.decideMembership(sf!, admin, membership.id, 'approve');
+      // The first approved business already supplies the feature. Avoid asserting
+      // pending => denied after that independent grant exists.
+      expect((await get(tablet)).status).toBe(200);
+    }
+    const resolved = await get(base + '/pharmacy/service-features');
+    expect(resolved.status).toBe(200);
+    expect(resolved.body.data.features.find((f: any) => f.key === 'tablet').sources).toHaveLength(2);
+    expect((await get(multilingual)).status).toBe(200);
+    expect((await get(tablet, other)).status).toBe(403);
+    expect((await get(base + '/admin/semi-franchises')).status).toBe(403);
+
+    const edit = (key: string, serviceFeatures: string[]) => request(app)
+      .patch(base + '/admin/semi-franchises/' + key).set('x-fixture-user', admin).send({ serviceFeatures });
+    expect((await edit(keys[1], [])).status).toBe(200);
+    expect((await get(tablet)).status).toBe(200);
+    expect((await edit(keys[1], ['tablet', 'multilingual-content'])).status).toBe(200);
+    await settings.withdraw(store, keys[0]);
+    expect((await get(tablet)).status).toBe(200);
+    const closed = await request(app).patch(base + '/admin/semi-franchises/' + keys[1])
+      .set('x-fixture-user', admin).send({ status: 'closed' });
+    expect(closed.status).toBe(200);
+    expect((await get(tablet)).status).toBe(403);
+    expect((await get(multilingual)).status).toBe(403);
+
+    const pay = (id: string) => request(app).put(base + '/admin/member-paid-entitlements/' + id)
+      .set('x-fixture-user', admin).send({ active: true, endsAt: null });
+    expect((await pay(staff)).status).toBe(200);
+    expect((await get(tablet)).status).toBe(403); // Employee payment never pays for this store.
+    expect((await pay(owner)).status).toBe(200);
+    expect((await get(tablet, other)).status).toBe(403);
+    expect((await get(tablet)).status).toBe(200);
+    expect((await get(multilingual)).status).toBe(200);
+    expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(403);
+
+    await db.query(`UPDATE organization_members SET role='accepted' WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
+    expect((await get(tablet)).status).toBe(403);
+    await db.query(`UPDATE organization_members SET role='staff',left_at=NOW() WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
+    expect((await get(tablet)).status).toBe(403);
+    await db.query(`UPDATE organization_members SET left_at=NULL WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
+    expect((await get(tablet)).status).toBe(200);
+
+    await db.query(`UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='kpa:store_member'`, [staff]);
+    expect((await get(tablet)).status).toBe(403);
+    await db.query(`UPDATE role_assignments SET is_active=true WHERE user_id=$1 AND role='kpa:store_member'`, [staff]);
+    expect((await get(tablet)).status).toBe(200);
+
+    const original = db.query.bind(db);
+    const unavailable = jest.spyOn(db, 'query').mockImplementation(async (sql, params) => {
+      if (sql.includes('FROM semi_franchises sf')) throw new Error('Synthetic settings read failure');
+      return original(sql, params);
+    });
+    try {
+      const result = await get(base + '/pharmacy/service-features');
+      expect(result.status).toBe(503);
+      expect(result.body.code).toBe('FEATURE_ACCESS_UNAVAILABLE');
+    } finally { unavailable.mockRestore(); }
+  });
+});
