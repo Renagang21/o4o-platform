@@ -24,3 +24,8 @@ it('another store cannot inherit the previous library query', () => {
   render(<MemoryRouter initialEntries={[{ pathname: '/store/content/direct/one', state: { libraryReturn: '/store/library/contents?librarySearch=Old', libraryScope: 'other:kpa-society' } }]}><Probe /></MemoryRouter>);
   expect(screen.getByTestId('return').textContent).toBe('/store/library/contents');
 });
+it.each(['/store', '/work/kpa-society/store'])('the new studio list retains its own search and return route: %s', base => {
+ render(<MemoryRouter initialEntries={[`${base}/workspace/studio?librarySearch=Guide&librarySource=mine&libraryPage=2`]}><Routes><Route path="*" element={<Probe />} /></Routes></MemoryRouter>);
+ fireEvent.click(screen.getByRole('link',{name:'편집'}));
+ expect(screen.getByTestId('return').textContent).toBe(`${base}/workspace/studio?librarySearch=Guide&librarySource=mine&libraryPage=2`);
+});

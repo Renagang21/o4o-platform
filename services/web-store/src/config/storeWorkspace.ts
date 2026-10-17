@@ -7,7 +7,7 @@ export type StoreWorkspaceArea = "home" | "commerce" | "studio" | "use";
 export const STORE_WORKSPACE_AREAS = [
   {
     key: "home",
-    label: "내 매장 홈",
+    label: "대시보드",
     subPath: "",
     description: "오늘 할 일과 매장 현황을 확인합니다.",
   },

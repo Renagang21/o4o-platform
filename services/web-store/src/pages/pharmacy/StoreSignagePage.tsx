@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { videoPreviewUrl } from './signage/videoPreview';
 import { SignageQuickStart } from './signage/SignageQuickStart';
 import { SignagePlaylistPreview } from './signage/SignagePlaylistPreview';
@@ -139,6 +140,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const location = useLocation();
   const base = storeWorkspaceBase(location.pathname);
+  const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
   // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1:
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
@@ -550,6 +552,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       </div>
 
+      <StoreAiSlot label="사이니지 안내" />
       {/* ─── Tab Bar ─────────────────────────────── */}
       <div className="flex flex-wrap gap-1 mb-1 border-b border-slate-200">
         <button
@@ -588,7 +591,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       </div>
 
       {/* ─── 현재 재생 상태 요약 패널 ─────────────── */}
-      <div className={`flex flex-wrap items-start gap-4 mb-6 px-4 py-3 rounded-xl border ${
+      {(workspaceMode === 'use' || activeTab === 'schedules') && <div className={`flex flex-wrap items-start gap-4 mb-6 px-4 py-3 rounded-xl border ${
         currentSchedule
           ? 'bg-green-50 border-green-200'
           : 'bg-slate-50 border-slate-200'
@@ -639,7 +642,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         >
           스케줄 관리
         </button>
-      </div>
+      </div>}
 
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { Link, useLocation } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { StoreExecutionHomeView, type StoreExecutionGroup, type StoreExecutionQrInput } from '@o4o/store-ui-core';
@@ -27,12 +29,14 @@ async function loadQrs() {
   }));
   return { items, total: response.data.total };
 }
-export default function StoreExecutionPage() {
+interface ExecutionProps { workspace?: boolean; navigation?: ReactNode; availableKeys?: string[] }
+export default function StoreExecutionPage(props: ExecutionProps) {
   const scope = useStoreOperationScope();
-  return <ExecutionSession key={scope.key} />;
+  return <ExecutionSession key={scope.key} {...props} />;
 }
-function ExecutionSession() {
+function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionProps) {
   const { pathname } = useLocation();
+  const allows = (key: string) => !availableKeys || availableKeys.includes(key);
   const base = storeWorkspaceBase(pathname);
   const tablets = useStoreResource(loadTablets, []);
   const qrs = useStoreResource(loadQrs, { items: [] as StoreExecutionQrInput[], total: 0 });
@@ -43,19 +47,21 @@ function ExecutionSession() {
     { label: 'QR', error: qrs.error, loading: qrs.loading, reload: qrs.reload },
   ];
   const groupLinks = (group: StoreExecutionGroup) => <nav className="flex flex-wrap gap-3 text-sm text-blue-700">
-    {group.tablets.length > 0 && <Link className="min-h-11 content-center" to={`${base}/commerce/tablet-displays?workspace=use`}>이 위치의 화면 변경</Link>}
-    {group.qrs.length > 0 && <Link className="min-h-11 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>}
+    {allows('tablet-displays') && group.tablets.length > 0 && <Link className="min-h-11 content-center" to={`${base}/commerce/tablet-displays?workspace=use`}>이 위치의 화면 변경</Link>}
+    {allows('qr') && group.qrs.length > 0 && <Link className="min-h-11 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>}
   </nav>;
   return <div className="max-w-5xl mx-auto px-4 py-6 space-y-5">
     <header className="flex flex-wrap items-start justify-between gap-3">
-      <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />실행 현황</h1>
+      <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />{workspace ? '매장 운영' : '실행 현황'}</h1>
         <p className="mt-2 text-sm text-slate-600">위치별 저장된 태블릿 화면과 QR 설정을 확인합니다. 실제 기기 연결·재생과 QR 스캔 결과는 현장에서 확인해 주세요.</p></div>
       <button type="button" disabled={loading} onClick={() => { void tablets.reload(); void qrs.reload(); }} className="min-h-11 rounded-lg border px-4 text-sm disabled:opacity-50">새로고침</button>
     </header>
+    <StoreAiSlot />
+    {navigation}
     <nav aria-label="매장 적용·출력" className="flex flex-wrap gap-2 text-sm">
-      <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 변경</Link>
-      <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>
-      <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/signage/playlist?workspace=use`}>사이니지 운영</Link>
+      {allows('tablet-displays') && <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 변경</Link>}
+      {allows('qr') && <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>}
+      {allows('signage-playlist') && <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/signage/playlist?workspace=use`}>사이니지 운영</Link>}
     </nav>
     {resources.map(resource => resource.error && <div key={resource.label} role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
       {resource.label} 현황을 확인하지 못했습니다. <button type="button" className="min-h-11 underline" disabled={resource.loading} onClick={() => void resource.reload()}>{resource.label} 현황 다시 시도</button>
@@ -65,7 +71,7 @@ function ExecutionSession() {
     {(loading || !failed || (!tablets.error && tablets.data.length > 0) || (!qrs.error && qrs.data.items.length > 0)) && <StoreExecutionHomeView
       tablets={tablets.error ? [] : tablets.data} qrs={qrs.error ? [] : qrs.data.items} loading={loading}
       palette={{ primary: colors.primary }} renderGroupLinks={groupLinks}
-      emptyAction={<Link to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 적용으로 가기</Link>}
+      emptyAction={allows('tablet-displays') ? <Link to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 적용으로 가기</Link> : undefined}
     />}
   </div>;
 }

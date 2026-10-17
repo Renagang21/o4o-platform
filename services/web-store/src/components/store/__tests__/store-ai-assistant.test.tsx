@@ -77,8 +77,7 @@ it('shows returned text safely and exposes only permission-filtered existing lin
   render(app()); open(); send('문구'); await screen.findByText(/<script>/);
   expect(document.querySelector('script')).toBeNull();
   expect(document.querySelector('a[href^="https://untrusted"]')).toBeNull();
-  fireEvent.click(screen.getByText('안내 만들기에서 작업 이어가기'));
-  expect(screen.getByRole('link', { name: '허용된 태블릿' }).getAttribute('href')).toBe('/store/commerce/tablet-displays');
+  expect(screen.queryByRole('navigation', { name: 'AI 다음 작업' })).toBeNull();
   expect(screen.queryByRole('link', { name: '직원 관리' })).toBeNull();
 });
 
@@ -95,4 +94,14 @@ it('uses the explicit service workspace before the common store service context'
   render(<MemoryRouter><StoreAiAssistant area="commerce" basePath="/work/kpa-society/store" items={[]} /></MemoryRouter>);
   open(); send('거래 조건 설명'); await screen.findByText('어떤 제품을 안내할까요?');
   expect(m.ask.mock.calls[0][0].serviceId).toBe('kpa-society');
+});
+it('uses Enter to send while preserving Korean composition and Shift+Enter', async () => {
+ render(app());
+ fireEvent.change(input(), {target:{value:'상품 설명'}});
+ fireEvent.keyDown(input(), {key:'Enter',isComposing:true});
+ fireEvent.keyDown(input(), {key:'Enter',shiftKey:true});
+ expect(m.ask).not.toHaveBeenCalled();
+ fireEvent.keyDown(input(), {key:'Enter'});
+ await screen.findByText('어떤 제품을 안내할까요?');
+ expect(m.ask).toHaveBeenCalledTimes(1);
 });

@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { printQrSelection } from './qr/printQrSelection';
 import { useQrCreation } from './qr/useQrCreation';
@@ -25,7 +26,7 @@ import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/st
 import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { useState, useEffect, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
-import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
+import { QrCode, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
 //   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
@@ -390,15 +391,6 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     <div style={styles.container}>
       <StoreWorkflowNavigation subject="QR" />
       {createdTitle && <div role="status" className="mb-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">{createdTitle} QR을 저장했습니다. <Link className="font-semibold underline" to={withWorkspaceMode(`${location.pathname}${location.search}`, 'use')}>배치·출력으로 이어가기</Link></div>}
-      {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
-      <div style={{ marginBottom: '16px' }}>
-        <GuideBlock
-          variant="warning"
-          title="QR 코드는 '연결 대상'을 저장합니다"
-          description="QR 코드는 내용을 직접 저장하지 않고, 고객이 스캔했을 때 이동할 연결 대상을 저장합니다. 운영자가 제공한 QR 템플릿을 가져오거나, 내 자료/외부 URL을 연결해 새 QR을 만들 수 있습니다."
-        />
-      </div>
-
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -453,13 +445,24 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       </div>
 
+      <StoreAiSlot label="QR 관리" />
+      <details className="mb-3 text-sm text-slate-600"><summary className="min-h-11 cursor-pointer content-center">QR 연결·파일 안내</summary>      {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
+      <div style={{ marginBottom: '16px' }}>
+        <GuideBlock
+          variant="warning"
+          title="QR 코드는 '연결 대상'을 저장합니다"
+          description="QR 코드는 내용을 직접 저장하지 않고, 고객이 스캔했을 때 이동할 연결 대상을 저장합니다. 운영자가 제공한 QR 템플릿을 가져오거나, 내 자료/외부 URL을 연결해 새 QR을 만들 수 있습니다."
+        />
+      </div>
+
+</details>
       {/* Batch Print Toolbar */}
       {statusBusy && <p role="status" className="mb-3 text-sm text-slate-600">QR 상태 변경 중…</p>}
       {statusNotice && <p role="status" className="mb-3 text-sm text-teal-800">{statusNotice}</p>}
       {statusError && <div role="alert" className="mb-3 text-sm text-red-700">QR 상태 변경 결과를 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void changeQrStatus(statusError.id, statusError.active)}>QR 상태 변경 다시 시도</button></div>}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
       {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
-      {items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
+      {workspaceMode === 'use' && items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
 
       {workspaceMode === 'studio' && <StoreQrCreateForms
         creating={creating}
@@ -482,7 +485,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           카드형 → @o4o/ui DataTable. 자체 selectedIds (Set<string>) + handleBulkPrint
           (외부 toolbar) 는 그대로 보존 — DataTable rowSelection 은 Set ↔ Array 변환만.
           analytics 토글은 행 아래 펼침이 직접 지원 안 되므로 표 하단에 별도 패널로 표시. */}
-      <div style={styles.body}>
+      <div style={styles.body} hidden={workspaceMode === 'studio' && creating}>
         {!loading && !listError && items.length === 0 && (!creating || workspaceMode === 'use') ? (
           <div style={styles.emptyState}>
             {/* WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
@@ -511,15 +514,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 <FolderOpen size={14} />
                 콘텐츠·자료·내 매장 제작자료에서 QR 만들기
               </button>
-              <button
-                type="button"
-                disabled
-                style={styles.emptyCtaDisabled}
-                title="준비 중 — 외부 URL은 내 자료함에 자료로 등록한 뒤 QR로 만들 수 있습니다."
-              >
-                <ExternalLink size={14} />
-                외부 URL QR 만들기 (준비 중)
-              </button>
+
             </div>
           </div>
         ) : (

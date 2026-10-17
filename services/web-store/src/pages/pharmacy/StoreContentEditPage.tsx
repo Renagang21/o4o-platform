@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreContentEditPage — 매장 콘텐츠 독립 편집
@@ -154,6 +155,7 @@ export default function StoreContentEditPage() {
         </div>
       </div>
 
+      <StoreAiSlot label="안내 편집" />
       {/* Title */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-slate-700 mb-1">제목</label>
