@@ -9,7 +9,7 @@
 > **근거 WO**: [`WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1`](../work-orders/WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1.md)
 > **소스 계약**: `apps/api-server/src/__tests__/supplier-domain-boundary.spec.ts`
 > **상위 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — 역할 경계가 충돌하면 그 문서가 우선
-> **작성**: 2026-09-26 · **최종 갱신**: 2026-10-16 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)
+> **작성**: 2026-09-26 · **최종 갱신**: 2026-10-17 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)
 
 이 문서는 Supplier 영역을 **더 확장하기 위한 설계서가 아니다.** 여러 WO 를 거쳐 커진 구현을 초기 역할 정의로 수렴시킨 뒤 **경계를 동결한 기록**이다. 새 Supplier 기능 제안은 이 문서의 5축 안에 들어오는지를 먼저 통과해야 한다.
 
@@ -131,12 +131,16 @@ Supplier Library item → 대상 서비스 선택 → 제공 → Supplier 책임
 이후 검토 · 수정 · 복사 · 발행은 해당 서비스 운영자의 업무
 ```
 
-- 대상은 canonical catalog(`supplier-content-handoff-targets`) 만 허용한다.
-- 수신은 기존 계약 재사용: `cms_contents` (`authorRole='supplier'` · `status='pending'`), KPA 만 `kpa_approval_requests` 추가. **새 원장 · 상태 기계 · 전송 엔진 · lineage 없음.**
+- 기존 CMS 제공 대상은 canonical catalog(`supplier-content-handoff-targets`)만 허용한다.
+- **2026-10-17 · [콘텐츠 목적지 분리 WO](../work-orders/WO-O4O-SUPPLIER-CONTENT-POLICY-ALIGNMENT-V1.md)**: 자료함 저장, 커뮤니티 게시, 서비스 등재 요청은 독립 업무다. 원본은 기본 비공개이며 저장·제품 등록이 게시를 유발하지 않는다.
+- 약국 협력사업 대상은 활성 `semi_franchises` 행에서 선택한다. 기존 `semi_franchise_contents`에 원본 출처(`source_item_id`, `source_supplier_id`)가 있는 `pending` 검토 사본을 만들며, 담당 운영자만 승인·게시 또는 사유를 남겨 반려한다. 공급자는 자기 요청 상태·반려 사유만 조회한다. 공개 CMS 원장을 회원 전용 자료의 중간 저장소로 사용하지 않는다.
+- 같은 원본·사업의 살아 있는 수신(`pending`/`draft`/`published`)은 1개다. 동시 요청은 transaction advisory lock과 partial UNIQUE로 보호한다. 반려·보관 후에는 새 요청을 만들며, 보관된 공급자 수신본을 다시 게시하지 않는다. 원본 수정·삭제는 수신 사본과 기존 약국 사본에 전파되지 않는다.
+- 커뮤니티 게시 버튼은 기존 커뮤니티 가입·게시판 권한을 통과하는 별도 작성기로 이동한다. 사용자가 게시판과 공개 범위를 확인한 뒤 게시하며, 원본 링크·첨부는 자동 복사하지 않는다. 커뮤니티 가입은 서비스 콘텐츠 등재 요청의 전제가 아니다. 공급자 역할만으로 커뮤니티 권한을 부여하지 않는다.
+- 기존 CMS 경로의 수신은 기존 계약 재사용: `cms_contents` (`authorRole='supplier'` · `status='pending'`), KPA 만 `kpa_approval_requests` 추가. **새 원장 · 상태 기계 · 전송 엔진 · lineage 없음.**
 - **멱등성**: 같은 자료 + 같은 대상 서비스의 **살아 있는 수신은 1개를 넘지 않는다.** 출처는 `cms_contents.metadata.sourceRef` 에 태그하고(새 컬럼 0 · migration 0), 동시 요청은 `pg_advisory_xact_lock` 으로 직렬화한다. 재제공 시 HTTP 200 + `reused: true` 로 응답하며 새 행을 만들지 않는다.
 - `archived` 수신은 멱등 판정에서 제외한다 — 운영자가 내린 자료는 공급자가 다시 제공할 수 있어야 한다.
 
-**금지**: `Supplier → 특정 Store 직접 온라인 전송` · `Supplier → Community 직접 발행` · 새 Supplier CMS.
+**금지**: `Supplier → 특정 Store 직접 온라인 전송` · 공급자 역할을 근거로 Community 자동·직접 발행 · 새 Supplier CMS. 일반 커뮤니티 회원으로 별도 작성기에서 확인·게시하는 위 경로는 허용한다.
 
 ---
 
@@ -235,4 +239,4 @@ Identity gate 가 열리기 전 금지: owner 이메일 요구 · `users` 생성
 
 ---
 
-*Version 1.0 · Status: Active (FROZEN) · Updated 2026-10-16*
+*Version 1.0 · Status: Active (FROZEN) · Updated 2026-10-17*
