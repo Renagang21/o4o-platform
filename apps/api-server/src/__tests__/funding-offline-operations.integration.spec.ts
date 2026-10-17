@@ -7,7 +7,10 @@ import { INCREMENTAL_MIGRATIONS } from "../database/incremental/manifest.js";
 import { EXPECTED_SCHEMA_STATES } from "../database/incremental/expected-schema-states.js";
 import { computeSchemaFingerprint } from "../database/bootstrap/schema-fingerprint.js";
 import { AddFundingOfflineState1792212000000 } from "../database/migrations/1792212000000-AddFundingOfflineState.js";
-import { FundingOfflineOperationsService } from "../services/funding/funding-offline-operations.service.js";
+import {
+  FundingOfflineOperationsService,
+  readFundingAmounts,
+} from "../services/funding/funding-offline-operations.service.js";
 import { FundingPaymentRecordService } from "../services/funding/funding-payment-record.service.js";
 import { FundingOperatorExceptionsService } from "../services/funding/funding-operator-exceptions.service.js";
 
@@ -363,6 +366,20 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     });
   });
   it("reports manually confirmed results and live net amounts in the existing KPI", async () => {
+    await db.query('UPDATE market_trials SET "currentAmount"=999 WHERE id=$1', [
+      trial,
+    ]);
+    expect((await readFundingAmounts(db, [trial])).get(trial)).toBe(70);
+    expect(
+      Number(
+        (
+          await db.query(
+            'SELECT "currentAmount" FROM market_trials WHERE id=$1',
+            [trial],
+          )
+        )[0].currentAmount,
+      ),
+    ).toBe(999);
     const kpi = await computeKpiSnapshot(db, { supplierId: null });
     expect(kpi.failedTrials).toBe(1);
     expect(kpi.successfulTrials).toBe(1);
