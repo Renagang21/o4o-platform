@@ -29,7 +29,7 @@ env:
   RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
 jobs:
   deploy:
-    if: github.actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false'
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
