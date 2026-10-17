@@ -347,12 +347,17 @@ export class ForumControllerBase {
     userId?: string,
   ): Promise<boolean> {
     if (!forumId) return false;
-    if (isPlatformAdmin(userRoles)) return true;
     const [forum] = await AppDataSource.query(
       `SELECT service_code FROM forum_category_requests WHERE id = $1 LIMIT 1`,
       [forumId],
     );
     if (!forum || !forum.service_code) return false;
+    if (forum.service_code === 'community') {
+      if (!userId) return false;
+      const { hasCommunityServiceOperator } = await import('../../services/community/community-service-operator-access.js');
+      return hasCommunityServiceOperator(AppDataSource, userId);
+    }
+    if (isPlatformAdmin(userRoles)) return true;
     if (forum.service_code.startsWith('funding:')) {
       if (!userId) return false;
       const { resolveFundingAccess } = await import('../../services/funding/funding-access.js');

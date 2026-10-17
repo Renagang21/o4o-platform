@@ -31,29 +31,40 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
     ],
   },
   funding: { approvals: [{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
-  community: { approvals: [
+  community: { users: [
     { label: '서비스 회원 관리', path: '/operator/service-members/community' },
-    { label: '서비스 약관 관리', path: '/operator/legal/community' },
+  ], forum: [
+    { label: '게시판 운영', path: '/operator/communities/boards' },
     { label: '게시판 · 공개 설정 관리', path: '/operator/communities' },
+  ], content: [
     { label: 'Hero · 광고 관리', path: '/operator/home-presentation/community' },
   ] },
 };
 
 const COMMUNITY_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
   labels: { community_operation: { label: '커뮤니티 운영', emoji: '💬' } },
-  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, approvals: 'community_operation' },
-  groupOrder: { community_operation: ['approvals'] },
+  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, users: 'community_operation', forum: 'community_operation', content: 'community_operation', system: 'community_operation' },
+  groupOrder: { community_operation: ['users', 'forum', 'content', 'system'] },
   displayOrder: ['community_operation'],
   topPinnedGroups: [],
 };
 
 export default function SubdomainOperatorLayoutWrapper({
   serviceKey,
+  area,
 }: {
   serviceKey: SubdomainOperatorKey;
   area: Area;
 }) {
   const { user } = useAuth();
+  const menu = serviceKey === 'community' && area === 'admin' ? { system: [
+    { label: '회원 데이터 완전 삭제', path: '/admin/communities/members' },
+    { label: '게시판 완전 삭제', path: '/admin/communities/boards' },
+    { label: '서비스 약관 관리', path: '/operator/legal/community' },
+    { label: '일상 운영으로', path: '/operator/communities' },
+  ] } : SCOPED_MENU[serviceKey];
+
+  const communityIA = area === 'admin' ? { ...COMMUNITY_OPERATOR_DOMAIN_IA, labels: { community_operation: { label: '커뮤니티 관리', emoji: '⚙️' } } } : COMMUNITY_OPERATOR_DOMAIN_IA;
 
   return (
     <>
@@ -61,9 +72,10 @@ export default function SubdomainOperatorLayoutWrapper({
         header={<NetureGlobalHeader />}
         // 같은 서브도메인 안에서도 단계가 다르다 — `supplier:operator` 에게 admin 전용
         // `/admin/supplier-governance` 항목을 보여주지 않는다.
-        menuItems={withoutUnreachableSubdomainOperatorItems(SCOPED_MENU[serviceKey], user)}
+        menuItems={withoutUnreachableSubdomainOperatorItems(menu, user)}
+        menuLabel={serviceKey === 'community' && area === 'admin' ? '커뮤니티 관리자 메뉴' : undefined}
         capabilities={ENABLED_CAPABILITIES}
-        domainIAConfig={serviceKey === 'community' ? COMMUNITY_OPERATOR_DOMAIN_IA : NETURE_OPERATOR_DOMAIN_IA}
+        domainIAConfig={serviceKey === 'community' ? communityIA : NETURE_OPERATOR_DOMAIN_IA}
       />
       <NetureBottomNav />
     </>

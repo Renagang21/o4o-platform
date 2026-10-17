@@ -36,3 +36,13 @@ describe('service member workspace role policy', () => {
     }
   });
 });
+
+it('community daily workspace suppresses destructive actions even for its admin', async () => {
+ const api=fixture('community','active');
+ render(<MemoryRouter><ServiceMembersWorkspace serviceKey="community" basePath="/members" api={api} roles={['community:admin']} navigate={vi.fn()} allowDestructiveActions={false} /></MemoryRouter>);
+ await waitFor(()=>expect(screen.getByText('테스트회원')).toBeTruthy());
+ fireEvent.click(screen.getByText('테스트회원'));
+ await waitFor(()=>expect(screen.getByRole('button',{name:'비활성화'})).toBeTruthy());
+ expect(screen.queryByRole('button',{name:'삭제'})).toBeNull();
+ expect(api.delete).not.toHaveBeenCalled();
+});

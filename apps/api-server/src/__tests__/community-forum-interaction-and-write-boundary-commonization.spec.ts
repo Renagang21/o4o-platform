@@ -704,3 +704,32 @@ describe('Static regression guards', () => {
     expect(serviceForum).toContain('createServiceForumRouter');
   });
 });
+
+// Independent community moderation must come from its freshly resolved own service role.
+describe('independent community daily moderation authority', () => {
+ class ScopedPost extends ForumPostController {
+  protected async resolveForumPostInServiceScope(): Promise<any> { return state.posts[0] ?? null; }
+ }
+ class ScopedComment extends ForumCommentController {
+  protected async resolveForumCommentInServiceScope(): Promise<any> { return {comment:state.comments[0],post:state.posts[0]}; }
+ }
+ it.each([false,true])('post hiding requires community moderation authority, even for platform admin (%s)',async allowed=>{
+  state.posts=[post('community-post','community-board')];
+  const {res,out}=makeRes();
+  await new ScopedPost().deletePost(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'community-post'}}),res);
+  expect(out.status).toBe(allowed?200:403);expect(state.savedPosts).toHaveLength(allowed?1:0);
+  if(allowed)expect(state.savedPosts[0].status).toBe('archived');
+ });
+ it.each([false,true])('comment hiding follows the same community authority (%s)',async allowed=>{
+  state.posts=[post('community-post','community-board')];state.comments=[{id:'comment',postId:'community-post',authorId:'author',status:'published'}];
+  const {res,out}=makeRes();
+  await new ScopedComment().deleteComment(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'comment'}}),res);
+  expect(out.status).toBe(allowed?200:403);expect(state.savedComments).toHaveLength(allowed?1:0);
+ });
+ it('platform privilege alone cannot pin in the independent community',async()=>{
+  state.forums.push({...KPA_FORUM,id:'community-board',service_code:'community'});state.posts=[post('community-post','community-board')];
+  const {res,out}=makeRes();
+  await new ScopedPost().pinPost(makeReq({user:{id:'platform-admin',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community'},params:{id:'community-post'},body:{pin:true}}),res);
+  expect(out.status).toBe(403);expect(state.savedPosts).toHaveLength(0);
+ });
+});

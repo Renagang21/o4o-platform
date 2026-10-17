@@ -56,5 +56,9 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
     res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '해당 서비스 관리자 권한이 필요합니다.' });
     return;
   }
+  if (req.method === 'DELETE' && !roleMutation && keys.includes('community')) {
+    res.status(409).json({ success: false, code: 'COMMUNITY_DELETION_ROUTE_REQUIRED', error: '커뮤니티 관리자 화면에서 활동 데이터와 연결 범위를 확인한 뒤 삭제해 주세요.' });
+    return;
+  }
   next();
 }

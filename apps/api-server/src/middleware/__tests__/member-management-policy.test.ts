@@ -53,3 +53,13 @@ it.each(['pharmacy-hub:member'])('a forged serviceKey cannot authorize role assi
   expect(res.status).toHaveBeenCalledWith(403);
   expect(next).not.toHaveBeenCalled();
 });
+
+it('community operator keeps daily suspension and cannot delete; admin uses the scoped activity deletion route', () => {
+ expect(check('PATCH','/u/status',{status:'suspended',serviceKey:'community'},['community:operator'],['community']).next).toHaveBeenCalledTimes(1);
+ expect(check('DELETE','/u',{serviceKey:'community'},['community:operator'],['community']).res.status).toHaveBeenCalledWith(403);
+ const admin=check('DELETE','/u',{serviceKey:'community'},['community:admin'],['community']);
+ expect(admin.res.status).toHaveBeenCalledWith(409);
+ expect(admin.res.json).toHaveBeenCalledWith(expect.objectContaining({code:'COMMUNITY_DELETION_ROUTE_REQUIRED'}));
+ expect(admin.next).not.toHaveBeenCalled();
+ expect(check('DELETE','/u',{serviceKey:'neture'},['neture:admin'],['neture']).next).toHaveBeenCalledTimes(1);
+});
