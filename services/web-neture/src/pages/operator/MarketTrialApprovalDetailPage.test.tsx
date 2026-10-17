@@ -1,4 +1,4 @@
-vi.mock('./FundingOfflineOperations',()=>({default:()=>null}));
+vi.mock('./FundingOfflineOperations',()=>({default:({disabled}:{disabled?:boolean})=><button disabled={disabled}>오프라인 기록 검증</button>}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
@@ -99,11 +99,13 @@ it('keeps a successful payment distinct from a failed refresh and retries reads 
   fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
   await screen.findByText(/처리는 완료됐지만/);
+  expect((screen.getByRole('button',{name:'오프라인 기록 검증'}) as HTMLButtonElement).disabled).toBe(true);
   expect(screen.queryByRole('button', { name: '기록 저장' })).toBeNull();
   expect((screen.getByRole('button', { name: '결과 확정으로 전환' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
   await screen.findByText('참여 이행 관리');
   await waitFor(() => expect(screen.queryByText(/처리는 완료됐지만/)).toBeNull());
+  expect((screen.getByRole('button',{name:'오프라인 기록 검증'}) as HTMLButtonElement).disabled).toBe(false);
   expect(mocks.payment).toHaveBeenCalledTimes(1);
   expect((screen.getByRole('button', { name: '결과 확정으로 전환' }) as HTMLButtonElement).disabled).toBe(false);
 });

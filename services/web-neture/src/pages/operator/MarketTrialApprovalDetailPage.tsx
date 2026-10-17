@@ -97,7 +97,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
         <button onClick={() => void refresh()} disabled={offlineBusy || pending || refreshing || participantsLoading} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
       </section>
 
-      <FundingOfflineOperations key={id} id={id} disabled={pending} onBusyChange={setOfflineBusy} onSaved={()=>{void refresh();}} />
+      <FundingOfflineOperations key={id} id={id} disabled={actionLoading} onBusyChange={setOfflineBusy} onSaved={()=>{void refresh();}} />
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
 
       {/* WO-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1: content-only 참여 리포트 (오프라인 입금 기준) */}
