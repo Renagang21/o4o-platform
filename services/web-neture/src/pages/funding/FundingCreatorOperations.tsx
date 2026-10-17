@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { changeFundingCreatorStatus, getFundingCreatorParticipants, submitTrial, PAYMENT_STATUS_LABELS, type PaymentStatus, type Trial } from '../../api/trial';
 import { fundingStageTasks } from './fundingStageTasks';
 const NEXT: Record<string, { status: Trial['status']; label: string }> = {
-  recruiting: { status: 'development', label: '준비 단계로 전환' }, development: { status: 'outcome_confirming', label: '결과 확정 단계로 전환' },
+development: { status: 'outcome_confirming', label: '결과 확정 단계로 전환' },
   outcome_confirming: { status: 'fulfilled', label: '이행 완료로 전환' }, fulfilled: { status: 'closed', label: '펀딩 종료' },
 };
 export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Trial; forum?: { id: string; slug: string } | null; onChange: () => void }) {
@@ -14,7 +14,7 @@ export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Tr
   const [participantsLoading, setParticipantsLoading] = useState(true);
   const [participantsError, setParticipantsError] = useState('');
   const [loadedId, setLoadedId] = useState('');
-  const [rows, setRows] = useState<{ id: string; name: string; paymentStatus: string }[]>([]);
+  const [rows, setRows] = useState<{ id: string; name: string; paymentStatus: string; withdrawn?: boolean }[]>([]);
   const loadParticipants = useCallback(async () => {
     const current = beginParticipants();
     setParticipantsLoading(true); setParticipantsError('');
@@ -54,7 +54,7 @@ export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Tr
     </div>
     <p className="mt-1 text-sm text-gray-600">입금 확인은 펀딩 서비스 운영자가 담당합니다. 포럼 회원 승인은 별도로 관리합니다.</p>
     {participantsError && <p role="alert" className="mt-3 text-red-700">{participantsError}</p>}
-    {!participantsLoading && !participantsError && loadedId === trial.id && <ul className="mt-2 divide-y">{rows.map(row => <li key={row.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{row.name || '회원'}</span><span>{PAYMENT_STATUS_LABELS[row.paymentStatus as PaymentStatus] || '상태 확인 필요'}</span></li>)}</ul>}
+    {!participantsLoading && !participantsError && loadedId === trial.id && <ul className="mt-2 divide-y">{rows.map(row => <li key={row.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{row.name || '회원'}{row.withdrawn ? ' · 참여 철회' : ''}</span><span>{PAYMENT_STATUS_LABELS[row.paymentStatus as PaymentStatus] || '상태 확인 필요'}</span></li>)}</ul>}
     {(participantsLoading || loadedId !== trial.id && !participantsError) && <output>참여 현황 확인 중…</output>}
     {!participantsLoading && !participantsError && loadedId === trial.id && !rows.length && <p className="mt-2 text-gray-500">참여자가 없습니다.</p>}
   </section>;

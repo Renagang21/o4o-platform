@@ -22,7 +22,7 @@ export const STATUS_LABELS: Record<string, string> = {
 
 // Operator-allowed status transitions
 export const NEXT_STATUS: Partial<Record<string, { status: TrialStatus; label: string }>> = {
-  recruiting: { status: 'development', label: '준비 중으로 전환' },
+
   development: { status: 'outcome_confirming', label: '결과 확정으로 전환' },
   outcome_confirming: { status: 'fulfilled', label: '이행 완료 처리' },
   fulfilled: { status: 'closed', label: '종료 처리' },

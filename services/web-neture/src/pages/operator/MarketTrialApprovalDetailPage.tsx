@@ -1,3 +1,4 @@
+import FundingOfflineOperations from './FundingOfflineOperations';
 /**
  * Market Trial Approval Detail Page (Neture Operator)
  *
@@ -24,6 +25,7 @@ export default function MarketTrialApprovalDetailPage() {
 
 function FundingOperatorWorkspace({ id }: { id: string }) {
   const navigate = useNavigate();
+  const [offlineBusy,setOfflineBusy]=useState(false);
   const [query, setQuery] = useSearchParams();
   const focusId = query.get('participantId');
   const {
@@ -83,7 +85,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
         {savedBeforeRefresh ? '처리는 완료됐지만 최신 운영 현황을 확인하지 못했습니다. 다시 저장하지 말고 운영 현황을 새로고침해 주세요.' : '최신 운영 현황을 확인하지 못했습니다. 추가 처리 전에 운영 현황을 새로고침해 주세요.'}
       </div>}
       {kpiError && <div role="alert" className="mb-4 rounded border border-amber-300 p-4 text-sm">
-        운영 지표: {kpiError} <button disabled={pending || refreshing} onClick={() => void refresh()} className="underline">운영 지표 다시 조회</button>
+        운영 지표: {kpiError} <button disabled={offlineBusy || pending || refreshing} onClick={() => void refresh()} className="underline">운영 지표 다시 조회</button>
       </div>}
 
       {/* Summary Metrics Card */}
@@ -92,9 +94,10 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
         <p className="mt-2 text-sm text-blue-900">{fundingStageTasks[trial.status]?.operator}</p>
         <p className="mt-2 text-xs text-blue-800">개설자: {fundingStageTasks[trial.status]?.creator}</p>
         <p className="mt-2 text-xs text-gray-600">단계 변경·입금 확인·참여자별 이행 기록·포럼 회원 승인은 별도 업무이며 자동으로 함께 처리되지 않습니다.</p>
-        <button onClick={() => void refresh()} disabled={pending || refreshing || participantsLoading} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
+        <button onClick={() => void refresh()} disabled={offlineBusy || pending || refreshing || participantsLoading} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
       </section>
 
+      <FundingOfflineOperations key={id} id={id} disabled={actionLoading} onBusyChange={setOfflineBusy} onSaved={()=>{void refresh();}} />
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
 
       {/* WO-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1: content-only 참여 리포트 (오프라인 입금 기준) */}
@@ -150,7 +153,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
       {(trial.forumPending || !trial.forumReady && ['recruiting', 'development', 'outcome_confirming', 'fulfilled'].includes(trial.status)) && (
         <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-4">
           <p>승인된 펀딩의 전용 포럼을 개설합니다. 준비 완료 후 모집을 시작합니다.</p>
-          <button disabled={actionLoading} className="mt-2 min-h-11 rounded border px-4 disabled:opacity-50" onClick={() => void retryForum()}>포럼 개설 재처리</button>
+          <button disabled={offlineBusy || actionLoading} className="mt-2 min-h-11 rounded border px-4 disabled:opacity-50" onClick={() => void retryForum()}>포럼 개설 재처리</button>
         </div>
       )}
       {/* Forum Link */}
@@ -175,7 +178,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
       {focusId && <FundingParticipantHistory key={`${id}:${focusId}`} trialId={id} participantId={focusId} refreshKey={participants.find(p => p.id === focusId)?.updatedAt} />}
       {/* Participant List Section */}
       <FundingParticipantsSection
-        disabled={actionLoading}
+        disabled={offlineBusy || actionLoading}
         participants={focusId ? participants.filter(p => p.id === focusId) : participants}
         totalCount={summary?.totalCount ?? trial.currentParticipants}
         filter={filter}
@@ -201,7 +204,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setShowStatusModal(true)}
-              disabled={actionLoading}
+              disabled={offlineBusy || actionLoading}
               className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
             >
               {nextTransition.label}
@@ -237,14 +240,14 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
           <div className="flex flex-col sm:flex-row gap-3 mt-4">
             <button
               onClick={() => void approve()}
-              disabled={actionLoading}
+              disabled={offlineBusy || actionLoading}
               className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               {pending ? '처리 중...' : '승인'}
             </button>
             <button
               onClick={() => setShowRejectModal(true)}
-              disabled={actionLoading}
+              disabled={offlineBusy || actionLoading}
               className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50"
             >
               반려
@@ -260,7 +263,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">유통참여형 펀딩 반려</h3>
             <textarea
               value={rejectReason}
-              disabled={pending}
+              disabled={offlineBusy || pending}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="반려 사유를 입력해주세요."
               rows={3}
@@ -271,14 +274,14 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowRejectModal(false)}
-                disabled={pending}
+                disabled={offlineBusy || pending}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 취소
               </button>
               <button
                 onClick={handleReject}
-                disabled={actionLoading}
+                disabled={offlineBusy || actionLoading}
                 className="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {pending ? '처리 중...' : '반려하기'}
@@ -301,14 +304,14 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowStatusModal(false)}
-                disabled={pending}
+                disabled={offlineBusy || pending}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 취소
               </button>
               <button
                 onClick={() => handleTrialStatusChange(nextTransition.status)}
-                disabled={actionLoading}
+                disabled={offlineBusy || actionLoading}
                 className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
                 {pending ? '처리 중...' : '확인'}
@@ -390,10 +393,10 @@ function ParticipationReport({
     <div className="mb-5 bg-white border border-gray-200 rounded-lg p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <p className="text-xs font-medium text-gray-500">참여 리포트</p>
-        <span className="text-xs text-gray-400">오프라인 입금 확인 기준 · 온라인 결제 아님</span>
+        <span className="text-xs text-gray-400">오프라인 입금 확인 이력 기준 · 철회 기록 포함</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-        <MetricCell value={kpi.participantCount} label="총 참여자" />
+        <MetricCell value={kpi.participantCount} label="참여 기록" />
         <MetricCell value={kpi.paidParticipantCount} label="입금 확인" highlight={kpi.paidParticipantCount > 0} />
         <MetricCell value={kpi.unpaidParticipantCount} label="입금 미확인" />
         <MetricCell value={won(kpi.totalPaidAmount)} label="입금 확인 금액 합계" highlight={kpi.totalPaidAmount > 0} />

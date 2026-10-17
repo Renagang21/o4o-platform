@@ -1,3 +1,4 @@
+import {refreshFundingAmount} from './funding-offline-operations.service.js';
 import type { DataSource } from 'typeorm';
 import { isPaymentStatus, PaymentStatus } from '@o4o/market-trial';
 import { ActionLog } from '@o4o/action-log-core';
@@ -54,15 +55,26 @@ export class FundingPaymentRecordService {
   async update(trialId: string, participantId: string, actorId: string, input: Record<string, unknown>) {
     const status = validatePaymentRecord(input);
     return this.ds.transaction(async manager => {
+      await manager.query('SELECT id FROM market_trials WHERE id=$1 FOR UPDATE',[trialId]);
       const [before]: PaymentRow[] = await manager.query(
         `SELECT id, COALESCE("paymentStatus", 'unpaid') AS "paymentStatus",
-                "paidAmount", "paymentReference", "paymentNote", "paidAt", "confirmedAt"
+                "paidAmount", "paymentReference", "paymentNote", "paidAt", "confirmedAt", "offlineState"
          FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2 FOR UPDATE`,
         [participantId, trialId],
       );
       if (!before) throw new FundingError(404, 'PARTICIPANT_NOT_FOUND', '이 펀딩의 참여자를 찾을 수 없습니다.');
 
-      const values: unknown[] = [status];
+      const refund=Number((before as PaymentRow & {offlineState?:{refundAmount?:number}}).offlineState?.refundAmount??0);
+      if (status === 'refunded' && refund === 0) {
+        throw new FundingError(409,'OFFLINE_REFUND_RECORD_REQUIRED','환급 완료는 오프라인 사후 처리에서 누적 환급액·처리일·사유와 함께 기록해 주세요.');
+      }
+      if(input.paidAmount!==undefined&&Number(input.paidAmount??0)<refund)throw new FundingError(400,'REFUND_EXCEEDS_PAYMENT','입금액은 기록된 환급액 이상이어야 합니다.');
+      if (refund > 0 && !['paid','refunded'].includes(status)) {
+        throw new FundingError(409,'REFUND_RECORD_EXISTS','환급 기록이 있는 입금은 미입금·취소로 바꿀 수 없습니다. 입금·누적 환급 금액을 정정해 주세요.');
+      }
+      const nextAmount = input.paidAmount === undefined ? Number(before.paidAmount ?? 0) : Number(input.paidAmount ?? 0);
+      const recordedStatus = refund > 0 ? (refund === nextAmount ? 'refunded' : 'paid') : status;
+      const values: unknown[] = [recordedStatus];
       const sets = ['"paymentStatus" = $1'];
       for (const field of optionalFields) {
         const value = input[field];
@@ -100,6 +112,7 @@ export class FundingPaymentRecordService {
         service_key: 'neture', user_id: actorId, organization_id: null,
         action_key: 'neture.operator.market_trial_payment_change', source: 'manual', status: 'success', meta,
       });
+      await refreshFundingAmount(manager,trialId);
       return {
         ...after, paidAmount: amount(after.paidAmount), paidAt: date(after.paidAt),
         confirmedAt: date(after.confirmedAt), updatedAt: date(after.updatedAt),

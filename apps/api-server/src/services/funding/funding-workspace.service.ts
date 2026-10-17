@@ -59,6 +59,7 @@ export class FundingWorkspaceService {
     return this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (creator && trial.supplierId !== actor) throw new FundingError(403, 'FUNDING_NOT_OWNER', '자기 펀딩만 관리할 수 있습니다.');
+      if(trial.status===TrialStatus.RECRUITING)throw new FundingError(409,'OPERATOR_RESULT_REQUIRED','모금 결과는 펀딩 운영자가 오프라인 운영에서 등록합니다.');
       if (!FUNDING_PROGRESS_TRANSITIONS[trial.status]?.includes(next)) throw new FundingError(409, 'FUNDING_STATUS_CONFLICT', '허용되지 않는 상태 변경입니다.');
       trial.statusHistory = [...fundingHistory(trial), this.event(trial, creator ? 'creator_progress' : 'operator_progress', actor, next)];
       trial.status = next;

@@ -1,3 +1,4 @@
+import { readCurrentFundingParticipantIds } from './funding/funding-participant-activity.service.js';
 /**
  * Market Trial Notification Wrapper
  *
@@ -17,7 +18,6 @@
 import { AppDataSource } from '../database/connection.js';
 import {
   MarketTrial,
-  MarketTrialParticipant,
 } from '@o4o/market-trial';
 import { Notification, NotificationType } from '../entities/Notification.js';
 import { notificationService } from './NotificationService.js';
@@ -85,11 +85,6 @@ async function fetchTrial(trialId: string): Promise<MarketTrial | null> {
   return AppDataSource.getRepository(MarketTrial).findOne({ where: { id: trialId } });
 }
 
-async function fetchParticipants(trialId: string): Promise<MarketTrialParticipant[]> {
-  return AppDataSource.getRepository(MarketTrialParticipant).find({
-    where: { marketTrialId: trialId },
-  });
-}
 
 async function notifyAllParticipants(
   trial: MarketTrial,
@@ -98,7 +93,7 @@ async function notifyAllParticipants(
   message: string,
   actorId?: string,
 ): Promise<void> {
-  const participants = await fetchParticipants(trial.id);
+  const participants = await readCurrentFundingParticipantIds(AppDataSource, trial.id);
   if (participants.length === 0) return;
 
   await Promise.allSettled(

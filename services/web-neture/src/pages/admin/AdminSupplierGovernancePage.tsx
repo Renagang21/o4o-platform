@@ -1,3 +1,4 @@
+import SupplierActiveFundings from '../../components/supplier/SupplierActiveFundings';
 /**
  * AdminSupplierGovernancePage — 공급자 상태 관리 (Admin Governance)
  *
@@ -47,10 +48,15 @@ export default function AdminSupplierGovernancePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialog, setDialog] = useState<DialogState>(null);
   const [reason, setReason] = useState('');
+  const [checkedSupplierId, setCheckedSupplierId] = useState<string | null>(null);
+  const onFundingCheckState = useCallback((supplierId: string, ready: boolean) => {
+    setCheckedSupplierId(ready ? supplierId : null);
+  }, []);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const openDialog = (next: NonNullable<DialogState>) => {
     if (submitting.current) return;
+    setCheckedSupplierId(null);
     setReason(''); setActionMessage(null); setDialog(next);
   };
   const closeDialog = () => { if (!submitting.current) setDialog(null); };
@@ -78,6 +84,7 @@ export default function AdminSupplierGovernancePage() {
   const handleConfirm = useCallback(
     async (reason?: string) => {
       if (!dialog || submitting.current || loading || loadError) return;
+      if (dialog.kind === 'deactivate' && checkedSupplierId !== dialog.supplier.id) return;
       const trimmed = (reason ?? '').trim();
       if (!trimmed) return; // 버튼 비활성화와 별개로 핸들러에서도 사유를 확인한다.
       const { kind, supplier } = dialog;
@@ -134,7 +141,7 @@ export default function AdminSupplierGovernancePage() {
         if (current()) setActionLoading(false);
       }
     },
-    [dialog, loadSuppliers, beginAction, loading, loadError],
+    [dialog, loadSuppliers, beginAction, loading, loadError, checkedSupplierId],
   );
 
   const statuses: Array<'all' | 'ACTIVE' | 'INACTIVE'> = ['all', 'ACTIVE', 'INACTIVE'];
@@ -338,6 +345,7 @@ export default function AdminSupplierGovernancePage() {
         className="mx-4 w-full max-w-md max-h-[90vh] overflow-y-auto p-6"
         onKeyDown={event => { if (event.key === 'Escape') closeDialog(); }}>
         <h2 className="text-lg font-semibold">공급자 {targetAction}</h2>
+        {dialog && <SupplierActiveFundings key={dialog.supplier.id} supplierId={dialog.supplier.id} onCheckState={onFundingCheckState} />}
         <p className="mt-3 whitespace-pre-line text-sm text-slate-600">{dialog?.kind === 'deactivate' ? deactivateMessage : reactivateMessage}</p>
         <label className="mt-3 block text-sm"><span>변경 사유 (필수)</span>
           <textarea autoFocus value={reason} disabled={actionLoading} onChange={event => setReason(event.target.value)} rows={3}
@@ -346,7 +354,7 @@ export default function AdminSupplierGovernancePage() {
         {actionMessage?.type === 'error' && <p role="alert" className="mt-3 text-sm text-red-700">{actionMessage.text}</p>}
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" disabled={actionLoading} className="rounded border px-4 py-2" onClick={closeDialog}>취소</button>
-          <button type="button" disabled={actionLoading || !reason.trim()} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+          <button type="button" disabled={actionLoading || !reason.trim() || (dialog?.kind === 'deactivate' && checkedSupplierId !== dialog.supplier.id)} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
             onClick={() => void handleConfirm(reason)}>{confirmLabel}</button>
         </div>
       </Dialog>

@@ -21,7 +21,7 @@ it('retains correction inputs on failure, then closes only after a successful sa
   expect(save.mock.calls[0][1]).not.toHaveProperty('paidAt');
 });
 
-it.each(['입금 확인 취소', '환불 완료 기록'])('%s preserves amount/reference/date and records only status and reason', async action => {
+it.each(['입금 확인 취소'])('%s preserves amount/reference/date and records only status and reason', async action => {
   render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: action }));
   fireEvent.change(screen.getByLabelText('처리 사유 (선택)'), { target: { value: '테스트 사유' } });
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
@@ -29,7 +29,7 @@ it.each(['입금 확인 취소', '환불 완료 기록'])('%s preserves amount/r
   expect(save.mock.calls[0][1]).toEqual({ paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: '테스트 사유' });
 });
 
-it.each(['입금 확인 취소', '환불 완료 기록'])('%s with no reason clears the obsolete confirmation note', async action => {
+it.each(['입금 확인 취소'])('%s with no reason clears the obsolete confirmation note', async action => {
   render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: action }));
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
   await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
@@ -78,4 +78,16 @@ it('locks filters and export during a reward mutation so its response cannot rel
   for (const name of ['제품 보상', '현재 조건 CSV 내보내기', '재확인·정정']) {
     expect((screen.getByRole('button', { name, exact: true }) as HTMLButtonElement).disabled).toBe(true);
   }
+});
+
+it('directs refunds to the separate offline record flow', () => {
+ render(<FundingParticipantsSection {...props()} />);
+ expect(screen.queryByRole('button', {name:'환불 완료 기록'})).toBeNull();
+ expect(screen.getByText('환급은 오프라인 사후 처리에서 기록')).toBeTruthy();
+});
+
+it('marks withdrawn history while the heading counts only current participants',()=>{
+ render(<FundingParticipantsSection {...props()} totalCount={0} participants={[{...participant,withdrawn:true}]}/>);
+ expect(screen.getByText('펀딩 참여자 (0명)')).toBeTruthy();expect(screen.getAllByText('참여 철회').length).toBeGreaterThan(0);
+ expect(screen.queryByText('아직 참여자가 없습니다.')).toBeNull();
 });

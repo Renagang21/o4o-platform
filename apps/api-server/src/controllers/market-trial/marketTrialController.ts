@@ -1,3 +1,5 @@
+import { readFundingParticipantActivity } from '../../services/funding/funding-participant-activity.service.js';
+import { readFundingAmounts } from '../../services/funding/funding-offline-operations.service.js';
 import { PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 /**
  * Market Trial Controller
@@ -124,7 +126,7 @@ export class MarketTrialController {
     try {
       const trial = await MarketTrialController.trialRepo.findOne({ where: { id: req.params.id } });
       if (!trial || !await isFundingCreator(MarketTrialController.dataSource!, trial, req.user!.id)) return res.status(403).json({ success: false, message: '자기 펀딩만 조회할 수 있습니다.' });
-      const rows = await MarketTrialController.dataSource!.query(`SELECT p.id, COALESCE(u.name, '회원') AS name, p."paymentStatus" AS "paymentStatus"
+      const rows = await MarketTrialController.dataSource!.query(`SELECT p.id, COALESCE(u.name, '회원') AS name, p."paymentStatus" AS "paymentStatus", COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn
         FROM market_trial_participants p LEFT JOIN users u ON u.id = p."participantId" WHERE p."marketTrialId" = $1 ORDER BY p."createdAt", p.id`, [trial.id]);
       res.json({ success: true, data: rows });
     } catch (error) { logger.error('[Funding] creator participants failed', error); res.status(500).json({ success: false, message: '참여 현황 조회에 실패했습니다.' }); }
@@ -278,9 +280,10 @@ export class MarketTrialController {
         trials.map((t) => t.productId),
       );
 
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, trials.map(t => t.id));
       res.json({
         success: true,
-        data: trials.filter(t => !fundingOwnerContext(t)?.supplierAccountId || fundingOwnerContext(t)?.supplierAccountId === (req as any).supplierId).map((t) => ({ ...toTrialDTO(t, undefined, productMap.get(t.productId ?? '')), ...fundingReview(t) })),
+        data: trials.filter(t => !fundingOwnerContext(t)?.supplierAccountId || fundingOwnerContext(t)?.supplierAccountId === (req as any).supplierId).map((t) => ({ ...toTrialDTO(t, undefined, productMap.get(t.productId ?? ''), recordedAmounts.get(t.id) ?? 0), ...fundingReview(t) })),
       });
     } catch (error) {
       console.error('Get my trials error:', error);
@@ -368,15 +371,13 @@ export class MarketTrialController {
 
       const trials = (await qb.getMany()).filter(isFundingPublic);
 
-      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1:
-      // Evaluate RECRUITING trials that may have expired (fundingEndAt passed)
-      const evaluated = await Promise.all(
-        trials.map((t) => MarketTrialController.trialService.evaluateStatusIfNeeded(t)),
-      );
+      // Read-only: recruitment results are recorded explicitly by the funding operator.
+      const evaluated = trials;
 
       // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
       // Bulk-fetch forum post IDs for all trials
       const trialIds = evaluated.map((t) => t.id);
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, trialIds);
       const forumMap = await buildForumPostMap(MarketTrialController.forumRepo, trialIds);
 
       // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 batch 조회
@@ -387,7 +388,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''))),
+        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''), recordedAmounts.get(t.id) ?? 0)),
       });
     } catch (error) {
       // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1 §E:
@@ -423,8 +424,9 @@ export class MarketTrialController {
         });
       }
 
-      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1: evaluate expired status
-      const evaluated = await MarketTrialController.trialService.evaluateStatusIfNeeded(trial);
+      // Read-only: an expired deadline does not determine the offline collection result.
+      const evaluated = trial;
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, [id]);
 
       // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forum deep link
       const forumMapping = await MarketTrialController.forumRepo.findOne({
@@ -436,7 +438,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? '')),
+        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? ''), recordedAmounts.get(evaluated.id) ?? 0),
       });
     } catch (error) {
       console.error('Get trial error:', error);
@@ -451,6 +453,12 @@ export class MarketTrialController {
    * GET /api/market-trial/:id/participation
    * 현재 사용자의 참여 정보 조회
    */
+  private static async ownOffline(id:string,userId:string){
+    const rows=await MarketTrialController.dataSource!.query(`SELECT COALESCE(("offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
+      COALESCE(("offlineState"->>'refundAmount')::numeric,0) AS "refundedAmount","offlineState"->>'refundedAt' AS "refundedAt"
+      FROM market_trial_participants WHERE id=$1 AND "participantId"=$2`,[id,userId]);
+    return rows?.[0]??{withdrawn:false,refundedAmount:0,refundedAt:null};
+  }
   static async getParticipation(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -472,7 +480,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: participation ? toParticipationDTO(participation) : null,
+        data: participation ? {...toParticipationDTO(participation),...await MarketTrialController.ownOffline(participation.id,userId)} : null,
       });
     } catch (error) {
       console.error('Get participation error:', error);
@@ -507,10 +515,8 @@ export class MarketTrialController {
       // Aggregate participant stats (no individual info exposed)
       // WO-O4O-MARKET-TRIAL-CONVERSION-READ-WIRING-CLEANUP-V1:
       // content-only — 전환 분포(conversionDistribution)·매장 진열(listingCount) 집계 제거.
-      const rows = await MarketTrialController.participantRepo.find({
-        where: { marketTrialId: id },
-        select: ['rewardType', 'rewardStatus'] as any,
-      });
+      const activity = await readFundingParticipantActivity(MarketTrialController.dataSource, id);
+      const rows = activity.filter(row => !row.withdrawn);
 
       const totalCount = rows.length;
       const productCount = rows.filter((r) => r.rewardType === 'product').length;
@@ -529,13 +535,16 @@ export class MarketTrialController {
       // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
       const productMap = await buildProductRefMap(MarketTrialController.dataSource, [trial.productId]);
 
+      const recordedAmounts = await readFundingAmounts(MarketTrialController.dataSource, [id]);
       const [workspaceForum] = await MarketTrialController.dataSource!.query('SELECT id, slug FROM forum_category_requests WHERE slug = $1 AND service_code = $2 AND status = \'completed\' LIMIT 1', [fundingForumSlug(id), fundingForumCode(id)]);
       res.json({
         success: true,
         data: {
           forum: workspaceForum ?? null,
-          trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? '')), ...fundingReview(trial) },
+          trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? ''), recordedAmounts.get(trial.id) ?? 0), ...fundingReview(trial) },
           summary: {
+            recordCount: activity.length,
+            withdrawnCount: activity.length - rows.length,
             totalCount,
             productCount,
             cashCount,
@@ -621,6 +630,7 @@ export class MarketTrialController {
 
       const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
       const settlementCalc = trial ? calcSettlementForParticipant(participation, trial) : null;
+      const recordedAmounts = trial ? await readFundingAmounts(MarketTrialController.dataSource, [id]) : new Map<string,number>();
 
       const forumMapping = await MarketTrialController.forumRepo.findOne({
         where: { marketTrialId: id },
@@ -630,8 +640,9 @@ export class MarketTrialController {
         success: true,
         data: {
           ...toParticipationDTO(participation),
+          ...await MarketTrialController.ownOffline(participation.id,userId),
           ...settlementCalc,
-          trial: trial ? toTrialDTO(trial, forumMapping?.forumId) : undefined,
+          trial: trial ? toTrialDTO(trial, forumMapping?.forumId, undefined, recordedAmounts.get(trial.id) ?? 0) : undefined,
         },
       });
     } catch (error) {
@@ -732,9 +743,10 @@ function toTrialDTO(
   trial: MarketTrial,
   forumPostId?: string | null,
   productRef?: TrialProductRef | null,
+  recordedAmount?: number,
 ): any {
   const targetAmount = Number(trial.targetAmount) || 0;
-  const currentAmount = Number(trial.currentAmount) || 0;
+  const currentAmount = recordedAmount ?? (Number(trial.currentAmount) || 0);
   const trialUnitPrice = Number(trial.trialUnitPrice) || 0;
   const rewardRate = Number(trial.rewardRate) || 0;
   const maxParticipants = trial.maxParticipants || null;
