@@ -30,6 +30,15 @@ export interface CommunityWorkspace {
   reason: string | null;
 }
 
+function membershipMessage(status: string | null): string {
+  const messages: Record<string, string> = {
+    pending: '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.',
+    suspended: '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.',
+    withdrawn: '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.',
+  };
+  return messages[status ?? ''] ?? '커뮤니티 서비스에 가입 신청하고 운영자 승인 후 참여할 수 있습니다.';
+}
+
 type WorkspaceView = 'hub' | 'posts' | 'write' | 'post' | 'mine' | 'request' | 'owned' | 'members';
 export default function CommunityWorkspacePage({ view = 'hub' }: { view?: WorkspaceView }) {
   const { communityKey = 'community' } = useParams();
@@ -105,7 +114,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {workspace && (!nativeBusiness || nativeAccess) && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
       {!nativeBusiness && <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>}
-      <p className="my-4">{workspace.membershipStatus === 'pending' ? '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.' : workspace.membershipStatus === 'suspended' ? '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.' : workspace.membershipStatus === 'withdrawn' ? '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.' : '커뮤니티 서비스에 가입 신청하고 운영자 승인 후 참여할 수 있습니다.'}</p>
+      <p className="my-4">{membershipMessage(workspace.membershipStatus)}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
       {!nativeBusiness && workspace.canJoin && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
       {!nativeBusiness && workspace.canJoin && <button type="button" disabled={busy || !agreement.ready} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}

@@ -51,3 +51,15 @@
 - API/커뮤니티 도메인 허용과 테스트 계정 주입은 정상이다. 현재 runtime에 GCP outbound identity와 운영 DB binding은 없다.
   기존 production 작업 workflow는 main 전용이며 커뮤니티 삭제 도구 실행 경로를 제공하지 않는다.
 - 운영 데이터 삭제는 아직 실행하지 않았다. 사용자 지정 순서(삭제 → main 병합 → 배포)를 유지하며 PR은 draft로 둔다.
+
+## 운영 삭제 확인 — 2026-10-17
+
+사용자가 로컬 운영 PC의 Cloud SQL Proxy(5442)를 통해 도구를 실행하고 결과를 전달했다.
+검토한 plan fingerprint와 동일한 apply가 `applied: true`로 완료됐다.
+삭제 건수는 communities 3, community_memberships 4, service_memberships 1,
+forum_category_requests 6, forum_post 7, forum_comment 6, forum_post_like 2,
+forum_category_members 2이며 나머지 대상은 0이다. blockers는 없었다.
+apply의 remaining 및 별도 후속 plan의 대상 전체가 0임을 확인했다.
+이는 사용자 전달 실행 결과에 근거한 확인이며 클라우드에서 직접 DB를 실행한 것은 아니다.
+이제 main 통합·배포를 진행한다. 최신 main의 약국 로그인 제목 변경을 충돌 없이 통합했다.
+SonarCloud가 지적한 문자열 정렬 comparator와 화면 함수 복잡도를 수정하고 재검증한다.

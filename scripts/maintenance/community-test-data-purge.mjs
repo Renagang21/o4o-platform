@@ -76,7 +76,7 @@ export async function runPurge(client,{apply=false,expectedDigest}={}){
   await client.query("SET LOCAL lock_timeout='5s'");await client.query("SET LOCAL statement_timeout='30s'");
   if(apply){
    const fks=await references(client);
-   const tables=[...new Set([...scope.map(([t])=>`public.${quoted(t)}`),...fks.map(f=>`${quoted(f.schema)}.${quoted(f.child)}`)])].sort();
+   const tables=[...new Set([...scope.map(([t])=>`public.${quoted(t)}`),...fks.map(f=>`${quoted(f.schema)}.${quoted(f.child)}`)])].sort((a,b)=>a.localeCompare(b));
    await client.query(`LOCK TABLE ${tables.join(',')} IN SHARE ROW EXCLUSIVE MODE`);
   }
   const before=await plan(client);
