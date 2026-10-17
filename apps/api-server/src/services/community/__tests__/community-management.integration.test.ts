@@ -14,8 +14,8 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
    'service_memberships(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid,service_key text,status text)',
    'role_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid,role text,is_active boolean DEFAULT true,valid_from timestamptz DEFAULT NOW(),valid_until timestamptz)',
    "forum_category_requests(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_code text,organization_id uuid,requester_id uuid,name text,status text,metadata jsonb DEFAULT '{}',updated_at timestamptz DEFAULT NOW())",
-   `forum_post(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),forum_id uuid REFERENCES forum_category_requests(id),author_id uuid,organization_id uuid,is_organization_exclusive boolean DEFAULT false,content jsonb DEFAULT '[]',metadata jsonb DEFAULT '{}',"commentCount" int DEFAULT 0,"likeCount" int DEFAULT 0)`,
-   `forum_comment(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid REFERENCES forum_post(id) ON DELETE CASCADE,author_id uuid,"parentId" uuid REFERENCES forum_comment(id) ON DELETE CASCADE,status text DEFAULT 'publish',"likeCount" int DEFAULT 0,"replyCount" int DEFAULT 0)`,
+   `forum_post(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),forum_id uuid REFERENCES forum_category_requests(id),author_id uuid,organization_id uuid,is_organization_exclusive boolean DEFAULT false,content jsonb DEFAULT '[]',metadata jsonb DEFAULT '{}',"commentCount" int DEFAULT 0,"likeCount" int DEFAULT 0,last_comment_at timestamp,last_comment_by uuid)`,
+   `forum_comment(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid REFERENCES forum_post(id) ON DELETE CASCADE,author_id uuid,"parentId" uuid REFERENCES forum_comment(id) ON DELETE CASCADE,status text DEFAULT 'publish',"likeCount" int DEFAULT 0,"replyCount" int DEFAULT 0,created_at timestamp DEFAULT NOW())`,
    'forum_notifications(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid,"commentId" uuid,"userId" uuid,"actorId" uuid)',
    'forum_like(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"targetType" text,"targetId" uuid,"userId" uuid)',
    'forum_bookmark(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"postId" uuid,"userId" uuid)',
@@ -91,7 +91,9 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   await db.query('INSERT INTO forum_post_like(post_id,user_id) VALUES($1,$2)',[surviving,member]);
   const parent=randomUUID();
   await db.query('INSERT INTO forum_comment(id,"postId",author_id,"likeCount","replyCount") VALUES($1,$2,$3,2,1)',[parent,surviving,other]);
-  await db.query('UPDATE forum_comment SET "parentId"=$1 WHERE id=$2',[parent,comment]);
+  await db.query(`UPDATE forum_comment SET "parentId"=$1,created_at='2026-01-02' WHERE id=$2`,[parent,comment]);
+  await db.query("UPDATE forum_comment SET created_at='2026-01-01' WHERE id=$1",[parent]);
+  await db.query("UPDATE forum_post SET last_comment_by=$1,last_comment_at='2026-01-02' WHERE id=$2",[member,surviving]);
   await db.query(`INSERT INTO forum_like("targetType","targetId","userId") VALUES('comment',$1,$2),('comment',$1,$3)`,[parent,member,other]);
   await db.query(`INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','active')`,[member]);
   await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'community:operator',false)",[member]);
@@ -102,6 +104,7 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   expect(await db.query('SELECT id FROM forum_post WHERE id=$1',[own])).toHaveLength(0);
   expect(await db.query('SELECT "commentCount","likeCount" FROM forum_post WHERE id=$1',[surviving])).toEqual([{commentCount:1,likeCount:0}]);
   expect(await db.query('SELECT "replyCount","likeCount" FROM forum_comment WHERE id=$1',[parent])).toEqual([{replyCount:0,likeCount:1}]);
+  expect(await db.query('SELECT last_comment_by,last_comment_at::date::text AS day FROM forum_post WHERE id=$1',[surviving])).toEqual([{last_comment_by:other,day:'2026-01-01'}]);
  });
  it('blocks owned boards and operational accounts from member deletion',async()=>{
   await db.query('UPDATE forum_category_requests SET requester_id=$1 WHERE id=$2',[member,board]);
@@ -117,4 +120,33 @@ const fixture=process.env.COMMUNITY_TEST_PG_SOCKET;
   try{await expect(apply(admin,'boards',board,p.digest)).rejects.toThrow();}finally{await db.query('ALTER TABLE action_logs DROP CONSTRAINT reject_delete');}
   expect(await db.query('SELECT id FROM forum_post')).toEqual([{id}]);
  });
+
+ it.each(['comment','post-like','post-reaction','comment-reaction','bookmark','recipient','actor'])('blocks excluded organization activity: %s',async activity=>{
+  const target=await post(board,other),comment=randomUUID();
+  await db.query('UPDATE forum_post SET organization_id=$1 WHERE id=$2',[randomUUID(),target]);
+  await db.query('INSERT INTO forum_comment(id,"postId",author_id) VALUES($1,$2,$3)',[comment,target,activity==='comment'?member:other]);
+  if(activity==='post-like')await db.query('INSERT INTO forum_post_like(post_id,user_id) VALUES($1,$2)',[target,member]);
+  if(activity.endsWith('reaction'))await db.query(`INSERT INTO forum_like("targetType","targetId","userId") VALUES($1,$2,$3)`,[activity==='post-reaction'?'post':'comment',activity==='post-reaction'?target:comment,member]);
+  if(activity==='bookmark')await db.query('INSERT INTO forum_bookmark("postId","userId") VALUES($1,$2)',[target,member]);
+  if(activity==='recipient'||activity==='actor')await db.query('INSERT INTO forum_notifications("postId","userId","actorId") VALUES($1,$2,$3)',[target,activity==='recipient'?member:other,activity==='actor'?member:other]);
+  const p=await plan(admin,'members',member);expect(p.blockers).toContain('조직 귀속 활동의 별도 검토가 필요합니다.');
+  await expect(apply(admin,'members',member,p.digest)).rejects.toMatchObject({code:'DELETION_BLOCKED'});
+  expect(await db.query("SELECT id FROM service_memberships WHERE user_id=$1 AND service_key='community'",[member])).toHaveLength(1);
+ });
+ it.each(['participation','request','ownership'])('blocks activity on an organization-owned community board: %s',async activity=>{
+  await db.query('UPDATE forum_category_requests SET organization_id=$1 WHERE id=$2',[randomUUID(),board]);
+  if(activity==='participation')await db.query('INSERT INTO forum_category_members(forum_category_id,user_id) VALUES($1,$2)',[board,member]);
+  if(activity==='request')await db.query('INSERT INTO forum_join_requests(forum_category_id,user_id) VALUES($1,$2)',[board,member]);
+  if(activity==='ownership')await db.query('UPDATE forum_category_requests SET requester_id=$1 WHERE id=$2',[member,board]);
+  expect((await plan(admin,'members',member)).blockers).toContain('조직 귀속 활동의 별도 검토가 필요합니다.');
+ });
+ it('clears latest-comment attribution when no published comments remain',async()=>{
+  const surviving=await post(board,other);
+  await db.query('INSERT INTO forum_comment("postId",author_id) VALUES($1,$2)',[surviving,member]);
+  await db.query(`INSERT INTO forum_comment("postId",author_id,status) VALUES($1,$2,'pending')`,[surviving,other]);
+  await db.query('UPDATE forum_post SET last_comment_by=$1,last_comment_at=NOW() WHERE id=$2',[member,surviving]);
+  const p=await plan(admin,'members',member);await apply(admin,'members',member,p.digest);
+  expect(await db.query('SELECT last_comment_by,last_comment_at,"commentCount" FROM forum_post WHERE id=$1',[surviving])).toEqual([{last_comment_by:null,last_comment_at:null,commentCount:0}]);
+ });
+
 });

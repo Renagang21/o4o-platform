@@ -55,8 +55,8 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 
 ## 검증·통합 상태
 
-- 격리 PostgreSQL 기능 검증: 11 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
-- API focused: 6 suites / 106 tests PASS (위 PostgreSQL 11개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
+- 격리 PostgreSQL 기능 검증: 22 tests PASS (권한, 중지/재개, 범위 밖 보존, 삭제 계획 변경, 첨부/외부 FK 차단, rollback).
+- API focused: 6 suites / 117 tests PASS (위 PostgreSQL 22개 포함, HTTP·회원 정책·콘텐츠 중재 경계).
 - 웹 focused: 4 files / 106 tests PASS.
 - 공유 회원 UI 전체: 21 files / 166 tests PASS (직접 소비처뿐 아니라 공통 모듈 회귀 포함).
 - Neture 웹 전체: 122 files / 1100 tests PASS.
@@ -65,6 +65,14 @@ Admin 메뉴는 완전 삭제·약관과 일상 운영으로 이동하는 링크
 - CI/통합·배포 결과는 확정 뒤 갱신한다.
 - 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md`는 현재·기준 checkout 모두 없다.
   따라서 과거 운영 계정을 재사용하지 않고 로컬 fixture 세션으로 화면을 검증한다. 실제 Google 운영자 세션 검증은 포함하지 않는다.
+
+## 리뷰 후 보정
+
+PR #685의 P1/P2 지적을 재현하고 수정했다. 조직 전용 글의 작성자만 확인하던 차단 조건을
+댓글·두 좋아요 원장·북마크·알림 수신/행위자 및 조직 소유 게시판의 참여·신청·소유까지 확장했다.
+이 데이터는 일반 커뮤니티 삭제에 포함하지 않고 검토가 끝날 때까지 회원 삭제 자체를 차단한다.
+살아남은 글의 최근 댓글 시각·작성자도 최신 공개 댓글로 재계산하며 공개 댓글이 없으면 둘 다 NULL로 지운다.
+PostgreSQL에서 관련 11개 사례를 추가해 총22개, API 관련 전체117개가 통과했다.
 
 ## 문서 정합
 

@@ -100,9 +100,27 @@ async function deletionSnapshot(db: Exec, actor: string, kind: CommunityDeletion
   // Organization-owned or media-bearing data needs separate review; never erase shared objects by URL.
   const excluded = await db.query(`SELECT id FROM forum_post WHERE id IN (${posts}) AND (organization_id IS NOT NULL OR is_organization_exclusive=true)`, [id]);
   if (kind === 'members') {
-    const organizationPosts = await db.query(`SELECT id FROM forum_post WHERE forum_id IN (${boards}) AND author_id=$1
-      AND (organization_id IS NOT NULL OR is_organization_exclusive=true)`, [id]);
-    if (organizationPosts.length) blockers.push('조직 귀속 활동의 별도 검토가 필요합니다.');
+    const organizationActivity = await db.query(`WITH scoped_boards AS (
+      SELECT id,organization_id,requester_id FROM forum_category_requests WHERE service_code='community'
+    ), organization_posts AS (
+      SELECT p.id,p.author_id FROM forum_post p JOIN scoped_boards b ON b.id=p.forum_id
+      WHERE b.organization_id IS NOT NULL OR p.organization_id IS NOT NULL OR p.is_organization_exclusive=true
+    ), organization_comments AS (
+      SELECT c.id,c.author_id FROM forum_comment c WHERE c."postId" IN (SELECT id FROM organization_posts)
+    ), activity AS (
+      SELECT requester_id AS user_id FROM scoped_boards WHERE organization_id IS NOT NULL
+      UNION ALL SELECT author_id FROM organization_posts
+      UNION ALL SELECT author_id FROM organization_comments
+      UNION ALL SELECT user_id FROM forum_post_like WHERE post_id IN (SELECT id FROM organization_posts)
+      UNION ALL SELECT "userId" FROM forum_like WHERE ("targetType"='post' AND "targetId" IN (SELECT id FROM organization_posts))
+        OR ("targetType"='comment' AND "targetId" IN (SELECT id FROM organization_comments))
+      UNION ALL SELECT "userId" FROM forum_bookmark WHERE "postId" IN (SELECT id FROM organization_posts)
+      UNION ALL SELECT "userId" FROM forum_notifications WHERE "postId" IN (SELECT id FROM organization_posts) OR "commentId" IN (SELECT id FROM organization_comments)
+      UNION ALL SELECT "actorId" FROM forum_notifications WHERE "postId" IN (SELECT id FROM organization_posts) OR "commentId" IN (SELECT id FROM organization_comments)
+      UNION ALL SELECT user_id FROM forum_category_members WHERE forum_category_id IN (SELECT id FROM scoped_boards WHERE organization_id IS NOT NULL)
+      UNION ALL SELECT user_id FROM forum_join_requests WHERE forum_category_id IN (SELECT id FROM scoped_boards WHERE organization_id IS NOT NULL)
+    ) SELECT 1 FROM activity WHERE user_id=$1 LIMIT 1`, [id]);
+    if (organizationActivity.length) blockers.push('조직 귀속 활동의 별도 검토가 필요합니다.');
   }
   if (excluded.length) blockers.push('조직 귀속 콘텐츠의 소유·보존 범위를 먼저 검토해 주세요.');
   // Any FK reference outside the exact deletion selection blocks even ON DELETE CASCADE.
@@ -137,7 +155,8 @@ export async function applyCommunityDeletion(db: Exec, actor: string, kind: Comm
   if (plan.blockers.length) fail(409, 'DELETION_BLOCKED', plan.blockers.join(' '));
   // Refresh surviving post counters after member comments/reactions are removed.
   const affected = kind === 'members' ? await db.query(`SELECT DISTINCT "postId" AS id FROM forum_comment WHERE id=ANY($1::uuid[])
-    UNION SELECT post_id AS id FROM forum_post_like WHERE id=ANY($2::uuid[])`, [selection.forum_comment, selection.forum_post_like]) : [];
+    UNION SELECT post_id AS id FROM forum_post_like WHERE id=ANY($2::uuid[])
+    UNION SELECT id FROM forum_post WHERE id IN (${servicePosts}) AND last_comment_by=$3`, [selection.forum_comment, selection.forum_post_like, id]) : [];
   const parents = kind === 'members' ? await db.query(`SELECT DISTINCT "parentId" AS id FROM forum_comment
     WHERE id=ANY($1::uuid[]) AND "parentId" IS NOT NULL`, [selection.forum_comment]) : [];
   const commentLikes = kind === 'members' ? await db.query(`SELECT "targetId" AS id,count(*)::int AS n FROM forum_like
@@ -150,7 +169,9 @@ export async function applyCommunityDeletion(db: Exec, actor: string, kind: Comm
     }
   }
   if (affected.length) await db.query(`UPDATE forum_post p SET "commentCount"=(SELECT count(*) FROM forum_comment c WHERE c."postId"=p.id AND c.status='publish'),
-    "likeCount"=(SELECT count(*) FROM forum_post_like l WHERE l.post_id=p.id) WHERE p.id=ANY($1::uuid[])`, [affected.map((p: {id: string}) => p.id)]);
+    "likeCount"=(SELECT count(*) FROM forum_post_like l WHERE l.post_id=p.id),
+    (last_comment_at,last_comment_by)=(SELECT c.created_at,c.author_id FROM forum_comment c WHERE c."postId"=p.id AND c.status='publish' ORDER BY c.created_at DESC,c.id DESC LIMIT 1)
+    WHERE p.id=ANY($1::uuid[])`, [affected.map((p: {id: string}) => p.id)]);
   if (parents.length) await db.query(`UPDATE forum_comment c SET "replyCount"=(SELECT count(*) FROM forum_comment r WHERE r."parentId"=c.id AND r.status='publish')
     WHERE c.id=ANY($1::uuid[]) AND c."postId" IN (${servicePosts})`, [parents.map((c: {id: string}) => c.id)]);
   for (const like of commentLikes) await db.query(`UPDATE forum_comment SET "likeCount"=GREATEST(0,"likeCount"-$2) WHERE id=$1`, [like.id, like.n]);
