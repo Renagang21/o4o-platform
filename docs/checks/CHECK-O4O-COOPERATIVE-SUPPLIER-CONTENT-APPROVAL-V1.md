@@ -64,3 +64,10 @@
 - 임시 브라우저 entry 파일은 삭제했으며, DB 테스트 제출물 0건 확인 후 검증용 컨테이너·tmpfs 데이터를 제거했다.
 
 운영 배포에는 신규 migration 검토·적용이 선행되어야 한다. PR/CI·병합·배포는 통합 담당에게 인계하며 이 작업에서는 실행하지 않는다.
+
+## Subsequent integration note (2026-10-17)
+
+Before first production application, the content-submission migration was renamed to
+`CreateBusinessContentSubmissions1792213000000` to follow the funding migration newly integrated on main.
+The old migration was used on disposable databases only. Current ordering and fingerprints are documented in
+[cooperative authentication and test connection](CHECK-O4O-COOPERATIVE-AUTH-AND-TEST-BUSINESS-CONNECTION-V1.md).
