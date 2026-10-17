@@ -164,7 +164,7 @@ Home
 - **Service Workspace** — "그 서비스가 My Services 항목(매장 화면) · 운영자 화면으로 노출되는가". Identity 와 **별도 metadata** 로 catalog 에 붙인다: `workspace.workspaceMode`(`standard | special | none | undecided`) · `storeWorkspaceEnabled` · `operatorWorkspaceEnabled`. `PlatformService.service_type`(`community | tool | extension`)은 **다른 축**이며 Workspace 판정에 쓰지 않는다.
 - **모든 platform service 가 My Services 항목이 되는 것은 아니다.** 노출 조건은 `Store 의 enrollment 가 active` **AND** `해당 서비스의 storeWorkspaceEnabled` 이다. 근거 없는 서비스는 `undecided` 로 두고 노출하지 않는다 — 코드가 사업 결정을 대신 내리지 않는다.
 - 세 관계는 물리적으로 분리 유지한다 (합치지 않는다): Store ↔ Service = `organization_service_enrollments` · Operator ↔ Service = `role_assignments` + `service_memberships`(membership guard 와 동일 정책) · 사용자 ↔ 조직 = `organization_members`. 읽기 계약은 `/api/v1/work-scope/store-services` · `/operator-services` (`utils/service-tenant.resolver.ts`) 하나로 두며 UI 노출 ≠ 권한이다 — Workspace metadata 는 권한 SSOT 가 아니다.
-- **Community Identity 도 Service Identity 와 별도 축이다** (§5). Industry(업종) 모델은 만들지 않는다 — Community + participation policy 로 충분하다.
+- **Community는 독립 Service Identity다** (2026-10-17 사용자 확정 · §5). 과거 업종별 Community Identity와 participation policy는 폐기하며, 사업 회원 공간은 소유 사업의 별도 원장으로 유지한다.
 
 ### 4-2. Service Operator Workspace 구현 상태 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 · 2026-09-16)
 
@@ -181,6 +181,9 @@ Home
 ---
 
 ## 5. Community Workspace
+
+> **2026-10-17 사용자 확정 — 독립 커뮤니티 서비스 전환:** `community.neture.co.kr`는 자체 서비스 회원(`service_memberships.service_key=community`)과 `community:admin/operator`가 운영하는 하나의 독립서비스다. 아래의 초기 3개 업종별 카탈로그·개별 커뮤니티 개설 신청·개별 가입/운영자 지정 모델은 현행 방향에서 폐기한다. 공통 계정 인증은 재사용하되 Neture나 다른 서비스의 가입/정지/탈퇴를 커뮤니티의 이용 자격으로 합성하지 않는다. 커뮤니티 서비스에 직접 가입 신청하고 서비스 운영자가 승인·회원 상태를 관리한다. 게시판·글의 신규 저장 범위는 `community`이며 과거 서비스 원장의 자동 이전·공개·삭제는 하지 않는다. 기존 사업 회원 공간은 소유 사업의 별도 권한 경계를 유지한다. 이 블록이 아래 과거 개체 모델 기록보다 우선한다. 구현·검증 상태는 [독립서비스 전환 기록](../checks/CHECK-O4O-COMMUNITY-INDEPENDENT-SERVICE-V1.md)을 따른다.
+
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
 

@@ -140,7 +140,7 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
-  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 전용 지정 업무는 이 화면에서 수행한다.
+  // Community service operation uses its own service roles; legacy admin URL redirects to the service workspace.
   { path: '/admin/communities', key: 'community', level: 'admin' },
   { path: '/operator/communities', key: 'community', level: 'operator' },
   { path: '/operator/service-members/supplier', key: 'supplier', level: 'operator' },

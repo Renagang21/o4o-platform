@@ -1,3 +1,5 @@
+import { requestCommunityServiceMembership } from '../../../services/community/community-service-membership.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 import {
   getNetureMainMembershipStatus,
   NETURE_MAIN_MEMBERSHIP_MESSAGES,
@@ -48,6 +50,10 @@ export class HandoffCatalogController extends BaseController {
     }
 
     try {
+      if (serviceKey === 'community') {
+        const result = await AppDataSource.transaction(m => requestCommunityServiceMembership(m, user.id, req.body?.policyReferences));
+        return BaseController.ok(res, { serviceKey, ...result, pendingApproval: result.status === 'pending' });
+      }
       const mainStatus = await getNetureMainMembershipStatus(
         AppDataSource,
         user.id,
@@ -161,6 +167,7 @@ export class HandoffCatalogController extends BaseController {
         message: '가입 신청이 접수되었습니다. 운영자 승인 후 이용 가능합니다.',
       });
     } catch (err: any) {
+      if (err instanceof PolicyAcceptanceError) return BaseController.error(res, err.message, err.httpStatus, err.code);
       logger.error('[Handoff] Service join failed', err);
       return BaseController.error(
         res,
