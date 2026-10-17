@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * ProductionMaterialEditorPage — 매장 제작 자료 편집기(외부 LLM 결과 검토/수정)
@@ -162,6 +163,7 @@ export default function ProductionMaterialEditorPage() {
         </button>
       </div>
 
+      <StoreAiSlot label="제작 자료 편집" />
       {/* Meta inputs */}
       <div style={styles.metaRow}>
         {/* 제목 */}

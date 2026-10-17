@@ -21,6 +21,10 @@ import {
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
 
+vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
+vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
+vi.mock('../pharmacy/StoreExecutionPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>실행 현황</h1>{navigation}</> }));
+
 vi.mock("../../contexts/AuthContext", () => ({
   useAuth: () => ({ user: { id: "fixture-owner" }, isAuthenticated: true, isLoading: false }),
 }));
@@ -252,25 +256,37 @@ it('목적지 첫 화면에는 중복 하위 메뉴를 펼치지 않고 매장 �
   expect(screen.getByRole('link', { name: '매장 선택' }).getAttribute('href')).toBe('/select-store?returnTo=%2Fwork%2Fkpa-society%2Fstore');
 });
 
-it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고를 내리고 기존 편집기는 세부 진입으로 유지한다: %s', base => {
+it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고를 내리고 기존 편집기는 세부 진입으로 유지한다: %s', async base => {
   render(<MemoryRouter initialEntries={[base + '/workspace/studio']}><Routes>
     <Route path={base} element={<StoreWorkspaceShell config={{ ...config, basePath: base }} />}>
       <Route path="workspace/studio" element={<StoreWorkspacePage area="studio" />} />
       <Route path="workspace/use" element={<StoreWorkspacePage area="use" />} />
     </Route>
   </Routes></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '상품에서 시작' }).getAttribute('href')).toBe(base + '/my-products');
-  expect(screen.getByRole('link', { name: '블로그' }).closest('details')?.open).toBe(false);
-  fireEvent.click(screen.getByText('편집기·제작 도구'));
+  await screen.findByRole('heading', {name:'저장한 안내 목록'});
+  expect(screen.getByRole('link', { name: '상품에서 만들기' }).getAttribute('href')).toBe(base + '/my-products');
+  expect(screen.getByRole('link', {name:'블로그'}).closest('details')?.open).toBe(false);
+  expect(screen.getByRole('heading', {name:'저장한 안내 목록'})).toBeTruthy();
+  fireEvent.click(screen.getByText('전체 업무'));
   expect(screen.getByRole('link', { name: '블로그' }).getAttribute('href')).toBe(base + '/content/blog');
   fireEvent.click(screen.getByRole('link', { name: '매장 운영' }));
   expect(screen.queryByText('준비 중')).toBeNull();
+  expect(await screen.findByRole('heading', {name:'실행 현황'})).toBeTruthy();
+  fireEvent.click(screen.getByText('전체 업무'));
   expect(screen.getByRole('link', { name: 'QR 배치·출력' }).getAttribute('href')).toBe(base + '/marketing/qr?workspace=use');
 });
-it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다시 노출하지 않는다', () => {
+it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다시 노출하지 않는다', async () => {
   const filtered = { ...config, menuSections: [] };
   render(<MemoryRouter initialEntries={['/store/workspace/studio']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={filtered} />}><Route path="workspace/studio" element={<StoreWorkspacePage area="studio" />} /></Route></Routes></MemoryRouter>);
-  expect(screen.queryByRole('link', { name: '상품에서 시작' })).toBeNull();
+  expect(screen.queryByRole('link', { name: '상품에서 만들기' })).toBeNull();
   expect(screen.queryByRole('link', { name: '자료에서 시작' })).toBeNull();
-  expect(screen.getByRole('status').textContent).toContain('현재 이용할 수 있는 업무가 없습니다');
+  expect((await screen.findByText('현재 이용할 수 있는 업무가 없습니다.')).textContent).toContain('현재 이용할 수 있는 업무가 없습니다');
+});
+
+it('상품 목적지는 메뉴 카드를 거치지 않고 실제 상품 목록을 표시한다', async () => {
+ render(<MemoryRouter initialEntries={['/store/workspace/commerce']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={config} />}><Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce" />} /></Route></Routes></MemoryRouter>);
+ expect(await screen.findByRole('heading', {name:'상품 목록'})).toBeTruthy();
+ expect(screen.getByRole('link', {name:'공급 상품'}).closest('details')?.open).toBe(false);
+ fireEvent.click(screen.getByText('전체 업무'));
+ expect(screen.getByRole('link', {name:'공급 상품'}).getAttribute('href')).toBe('/store/pharmacy/supply');
 });

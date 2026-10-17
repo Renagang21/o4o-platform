@@ -2,8 +2,9 @@
  * 상품 원장과 매장 소유권은 기존 API 계약을 유지한다. 공급 상품 주문과는 별개다.
  */
 
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
-import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -61,11 +62,12 @@ function parsePage(v: string | null): number {
   return Number.isInteger(n) && n >= 1 ? n : 1;
 }
 
-export default function StoreHandledProductsPage() {
+interface ProductPageProps { workspace?: boolean; navigation?: ReactNode }
+export default function StoreHandledProductsPage(props: ProductPageProps) {
   const { key } = useStoreOperationScope();
-  return <HandledProductsSession key={key} />;
+  return <HandledProductsSession key={key} {...props} />;
 }
-function HandledProductsSession() {
+function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -321,15 +323,12 @@ function HandledProductsSession() {
           </>
         }
         icon={<Boxes size={20} style={{ color: colors.primary }} />}
-        title={STORE_PRODUCT_NAME}
-        description={
-          <>
-            O4O DB 기반 제품과 직접 등록 제품을 한곳에서 관리합니다. O4O 구매 이력 없이 등록·활용할 수 있습니다.
-            실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다.
-          </>
-        }
-        actions={
-          <>
+        title={workspace ? '상품·거래' : STORE_PRODUCT_NAME}
+        description="상품을 찾고 선택해 상세정보·안내 작업을 시작하세요."
+      />
+
+      <StoreAiSlot />
+      <nav aria-label="상품 빠른 작업" className="mb-3 flex flex-wrap items-center gap-2">
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
@@ -360,10 +359,8 @@ function HandledProductsSession() {
           </button>
             </div>
           </details>
-          </>
-        }
-      />
-
+      </nav>
+      {navigation}
       <nav aria-label="제품 등록 방식" className="flex flex-wrap gap-2 mb-4">
         {([['all', '전체'], ['listing', 'O4O DB 기반'], ['local', '직접 등록']] as const).map(([key, label]) =>
           <button key={key} type="button" aria-pressed={source === key} onClick={() => { setPage(1); patchParams({ source: key === 'all' ? null : key, page: null }); }} className={`rounded-lg border px-3 py-2 text-sm ${source === key ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-200'}`}>{label}</button>
@@ -416,6 +413,8 @@ function HandledProductsSession() {
               </button>}
               {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => editLocal(singleSelected.sourceId)}>직접 등록 제품 수정</button>}
               <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/library/contents?create=1&pType=${singleSelected.sourceType}&pId=${encodeURIComponent(singleSelected.sourceId)}&pName=${encodeURIComponent(singleSelected.name)}&pStore=${encodeURIComponent(organizationId ?? '')}`)}>콘텐츠 만들기</button>
+
+              <details className="relative"><summary className="min-h-11 cursor-pointer content-center px-3 text-sm">더보기</summary><div className="absolute right-0 z-20 mt-1 flex w-60 flex-col gap-2 rounded-xl border bg-white p-3 shadow-lg">
               <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/commerce/tablet-displays?workspace=use`)}>태블릿에 활용</button>
               {/* WO-O4O-KPA-STORE-MULTILINGUAL-PRODUCT-CONTENT-ENTRY-LINK-V1: 기존 다국어 상품콘텐츠 저작 화면 진입점 연결.
                   handledProducts sourceType('local'|'listing')·sourceId 를 route param(targetKind·targetId)에 그대로 전달. */}
@@ -436,6 +435,7 @@ function HandledProductsSession() {
                 <QrCode size={13} />
                 {singleSelected.sourceType === 'listing' ? '상품 QR 출력' : '콘텐츠 QR 만들기'}
               </button>
+              </div></details>
             </>
           )}
           {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 내 매장 제품에서 제거(연결 해제, 원본 무접촉). 1건/다건 공통. */}

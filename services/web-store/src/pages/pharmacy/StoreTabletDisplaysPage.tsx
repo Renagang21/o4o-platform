@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -166,6 +167,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   //   legacy 값은 세트가 적용되지 않은 코너(current_screen_set_id 없음)의 fallback 경로에서만 화면을 결정하므로
   //   제거하지 않고 보존한다.
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [advancedPanel, setAdvancedPanel] = useState<'common' | 'idle' | 'settings' | 'products'>('idle');
 
   // Tablet state
   const {
@@ -755,6 +757,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
         </div>
       </div>
 
+      <StoreAiSlot label="태블릿 안내" />
       {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 상단 탭 — 코너별 운영 / 태블릿 콘텐츠 */}
       <div className="flex gap-1 border-b border-slate-200">
         {([
@@ -1166,6 +1169,11 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
               {showAdvanced && (
               <>
+              <nav aria-label="태블릿 상세 설정 항목" className="flex flex-wrap gap-2">
+                {([['idle', '대기 화면'], ['settings', '화면 설정'], ['products', '상품 진열'], ['common', '공통 영상']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={advancedPanel === key} onClick={() => setAdvancedPanel(key)} className={`min-h-11 rounded-lg border px-3 text-sm ${advancedPanel === key ? 'border-teal-700 bg-teal-50 text-teal-800' : 'bg-white'}`}>{label}</button>)}
+              </nav>
+              <div hidden={advancedPanel !== 'common'}>
+
           {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
           {selectedTabletId && (
             <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
@@ -1211,6 +1219,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              </div>
           {/* Loading pool */}
           {loadingPool && (
             <div className="flex items-center justify-center py-12">
@@ -1219,6 +1228,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              <div hidden={advancedPanel !== 'idle'}>
           {/* Idle Playlist Editor (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) */}
           {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -1269,6 +1279,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              </div><div hidden={advancedPanel !== 'settings'}>
           {/* 전시 설정 (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통 */}
           {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -1349,6 +1360,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
           )}
 
           {settingsLoadError && <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{settingsLoadError}<button type="button" className="ml-3 underline" onClick={() => setSettingsRetry(value => value + 1)}>다시 시도</button></div>}
+              </div><div hidden={advancedPanel !== 'products'}>
           {/* Editor */}
           {!loadingPool && pool && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1603,7 +1615,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
               </div>
             </div>
           )}
-              </>
+              </div></>
               )}{/* /고급 설정 (WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1) */}
             </div>{/* /우측: 선택 코너 현재 구성 */}
           </div>{/* /위치·코너 2단 그리드 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}

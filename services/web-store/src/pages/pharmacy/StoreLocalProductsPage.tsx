@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 /**
  * Store Local Products Management Page (KPA)
  *
@@ -240,6 +241,7 @@ function ProductFormModal({
           </button>
         </div>
 
+        <div className="px-6 pt-3"><StoreAiSlot priority={2} label="직접 등록 제품 편집" /></div>
         {/* Form */}
         <form id="direct-product-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           <fieldset disabled={saving} className="min-w-0 space-y-4 border-0 p-0 m-0">
