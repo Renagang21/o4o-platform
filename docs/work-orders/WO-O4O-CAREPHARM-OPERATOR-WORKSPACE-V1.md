@@ -48,3 +48,9 @@ CarePharm의 담당 사업 화면은 이미 존재하지만 `/operator`는 대�
 - main integration / CI / deployment: 미수행
 - smoke: 로컬 production bundle + 합성 API desktop/mobile
 - verdict: KEEP — push 후 통합 담당의 CI·리뷰·통합과 후속 수정에 필요
+
+## main 통합·배포 준비 — 2026-10-17
+
+사용자가 이 작업의 main 머지·배포를 명시적으로 지시했다. 통합 담당으로 기존 branch를 유지하고 main `f2b18165f3998e48dfb186ecf668be41e1e090f7`을 충돌 없이 merge했다. 홈·헤더 변경 반영 후 Neture 전체 123 files / 1107 tests와 TypeScript 포함 production build를 재검증했다. 앞선 DB 검증 대상 서버와 공통 심사 코드에는 이 main merge로 인한 변경이 없다.
+
+이 단계의 기록은 아직 PR CI·Codex 판정·main 머지·운영 배포 완료를 뜻하지 않는다. 정확한 PR HEAD의 기술 gate를 확인한 뒤 저장소 Delivery/Promote 절차로 진행한다. CarePharm 직접 HTTPS 조회는 현재 cloud egress 허용 목록에 없어 proxy CONNECT 403으로 차단되었으며, 도메인 장애로 판정하지 않는다.
