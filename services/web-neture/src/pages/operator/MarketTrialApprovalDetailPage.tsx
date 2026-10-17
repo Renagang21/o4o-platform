@@ -8,8 +8,9 @@
  * 운영자 상세 — Trial 정보 확인 + 승인/반려 + 참여자 이행 상태 관리
  */
 
+import FundingParticipantHistory from './FundingParticipantHistory';
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import type { OperatorTrial, ParticipantListResponse, TrialStatus, MarketTrialDetailKpi } from '../../api/trial';
 import FundingParticipantsSection from './FundingParticipantsSection';
 import { fundingStageTasks } from '../funding/fundingStageTasks';
@@ -23,6 +24,8 @@ export default function MarketTrialApprovalDetailPage() {
 
 function FundingOperatorWorkspace({ id }: { id: string }) {
   const navigate = useNavigate();
+  const [query, setQuery] = useSearchParams();
+  const focusId = query.get('participantId');
   const {
     trial, participantData, trialKpi, loading, error, setError,
     actionLoading, pending, refreshing, refreshRequired, savedBeforeRefresh, kpiError,
@@ -168,10 +171,12 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
         </div>
       )}
 
+      {focusId && <div className="my-4 rounded bg-sky-50 p-3 text-sm"><p>예외 목록에서 선택한 참여자의 기록을 표시합니다.</p><button className="min-h-11 underline" onClick={() => { const next = new URLSearchParams(query); next.delete('participantId'); setQuery(next); }}>전체 참여자 보기</button></div>}
+      {focusId && <FundingParticipantHistory key={`${id}:${focusId}`} trialId={id} participantId={focusId} refreshKey={participants.find(p => p.id === focusId)?.updatedAt} />}
       {/* Participant List Section */}
       <FundingParticipantsSection
         disabled={actionLoading}
-        participants={participants}
+        participants={focusId ? participants.filter(p => p.id === focusId) : participants}
         totalCount={summary?.totalCount ?? trial.currentParticipants}
         filter={filter}
         onFilterChange={setFilter}

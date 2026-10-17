@@ -1,3 +1,4 @@
+import { supplierReviewApi } from '../../../lib/api/supplierReview';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import SupplierProfilePage from '../SupplierProfilePage';
@@ -325,4 +326,17 @@ describe('SupplierProfilePage existing section ownership', () => {
     await screen.findByText('증빙 문서를 열 수 없습니다.');
     expect(api.categories.remove).not.toHaveBeenCalled();
   });
+});
+
+vi.mock('../../../lib/api/supplierReview', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../../../lib/api/supplierReview')>();
+  return { ...original, supplierReviewApi: { ...original.supplierReviewApi,
+    queue: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+    list: vi.fn(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 })),
+  } };
+});
+
+beforeEach(() => {
+  vi.mocked(supplierReviewApi.queue).mockResolvedValue({ items: [], hasMore: false });
+  vi.mocked(supplierReviewApi.list).mockImplementation(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 }));
 });

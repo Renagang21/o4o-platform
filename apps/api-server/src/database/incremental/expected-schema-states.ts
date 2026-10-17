@@ -286,6 +286,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '8bff6266b19ec25febfb59bfdcc36e8d8dcada715f3b8ec5883a8c01f765ec1b',
     fingerprintLineCount: 6664,
   },
+  // Isolated canonical bootstrap + every incremental prefix verified (after #663); final up/down restores previous fingerprint.
+  {
+    appliedThrough: 'CreateSupplierReviewRequests1792193756961',
+    fingerprint: '086af046804b172646d4bec9acd190b3dcb076ff10650c2a1b1833df2592d375',
+    fingerprintLineCount: 6694,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

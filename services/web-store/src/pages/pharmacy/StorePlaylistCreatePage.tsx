@@ -40,13 +40,13 @@ function PlaylistCreateSession({ isCurrent }: Readonly<{ isCurrent: () => boolea
     if (lock.current || !isCurrent()) return;
     lock.current = true;
     try {
-    await createStorePlaylist({
+    const playlist = await createStorePlaylist({
       name: values.name,
       playlistType: 'LIST',
       description: values.description || undefined,
       tags: values.tags.length > 0 ? values.tags : undefined,
     });
-    if (isCurrent()) navigate(listPath);
+    if (isCurrent()) navigate(listPath, { state: { signagePlaylistId: playlist.id, addSignageMaterials: true } });
     } finally { lock.current = false; }
   }, [navigate, listPath, isCurrent]);
 
