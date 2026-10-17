@@ -39,3 +39,16 @@ it('truncated QR overview explicitly reports its loaded scope', async () => {
   api.qrs.mockResolvedValue({ success: true, data: { items: [], total: 250 } });
   render(view); await screen.findByText(/QR 전체 250건 중 0건 기준/);
 });
+
+it('filtered workspace capabilities also apply to location actions and the empty overview', async () => {
+  const { rerender } = render(<MemoryRouter><Execution workspace availableKeys={['store-execution']} /></MemoryRouter>);
+  await screen.findByText('Tablet A');
+  expect(screen.queryByRole('link', { name: '이 위치의 화면 변경' })).toBeNull();
+  expect(screen.queryByRole('link', { name: '태블릿 화면 변경' })).toBeNull();
+  api.tablets.mockResolvedValue([]);
+  fireEvent.click(screen.getByRole('button', { name: '새로고침' }));
+  await waitFor(() => expect(screen.queryByText('Tablet A')).toBeNull());
+  expect(screen.queryByRole('link', { name: '태블릿 화면 적용으로 가기' })).toBeNull();
+  rerender(<MemoryRouter><Execution workspace availableKeys={['store-execution', 'tablet-displays']} /></MemoryRouter>);
+  expect(screen.getByRole('link', { name: '태블릿 화면 적용으로 가기' })).toBeTruthy();
+});

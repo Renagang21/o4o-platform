@@ -30,7 +30,7 @@ import { LibraryDialog } from './library/LibraryDialog';
 import { useLibraryScope } from './library/useLibraryScope';
 import { useLibraryResources } from './library/useLibraryResources';
 import type { UnifiedResourceRow } from './library/libraryResources';
-import { StorePageShell } from '@o4o/store-ui-core';
+import { StoreTaskPageShell as StorePageShell } from '../../components/store/StoreTaskPageShell';
 import { colors } from '../../styles/theme';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
