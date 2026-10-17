@@ -23,6 +23,8 @@ Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국
 
 ---
 
+> **2026-10-17 콘텐츠 등재 요청 보완**: [콘텐츠 목적지 분리 WO](../work-orders/WO-O4O-SUPPLIER-CONTENT-POLICY-ALIGNMENT-V1.md). 공급자 자료함 원본을 활성 협력사업에 요청하면 `semi_franchise_contents`에 `pending` 사본을 접수한다. 담당 운영자는 내용을 검토해 `published`로 승인·게시하거나 사유와 함께 `rejected`로 반려한다. 회원 약국 열람·복사는 기존 `published ∧ 사업 active ∧ 해당 약국 membership active`를 유지한다. 커뮤니티 게시와 원본 공개 여부는 변경하지 않는다. 기존 운영자 `draft → published → archived`는 유지한다. 운영 적용은 별도 migration·배포가 필요하다.
+
 ## 1. 8개 관계
 
 | # | 관계 | 저장 | 카디널리티 · 제약 |
