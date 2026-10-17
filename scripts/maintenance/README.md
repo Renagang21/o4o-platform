@@ -46,3 +46,40 @@ COMMUNITY_PURGE_TEST_SOCKET=/tmp/community-independent-pg node --test scripts/ma
 
 Without the socket binding tests explicitly skip. They must execute, rather than
 skip, before claiming DB verification. Never point this fixture test at production.
+
+## Local operator PC (Windows PowerShell)
+
+Use a dedicated checkout of branch `wo/community-independent-service`; do not switch
+another active development checkout. The web application's Google login is separate
+from GCP authentication. Use the existing authorized GCP account locally; do not
+share its login/session.
+
+1. Follow `SETUP.md` to install dependencies and the Cloud SQL Auth Proxy.
+2. Run `gcloud auth application-default login` if ADC is not already configured.
+3. In a separate terminal run `.\start-cloud-sql-proxy.cmd` and keep it open.
+   Its configured destination is `netureyoutube:asia-northeast3:o4o-platform-db`, local port `5442`.
+4. Configure the ignored `apps/api-server/.env` with the existing production DB
+   credentials (not the local development defaults). Required selectors are
+   `DB_HOST=127.0.0.1`, `DB_PORT=5442`, `DB_NAME=o4o_platform`, and the approved
+   login role `DB_USERNAME=o4o_api_v2`. Enter the DB password only locally.
+   GCP/Cloud SQL Client permission does not replace the PostgreSQL login password.
+5. From the repository root, using Node 22:
+
+```powershell
+$env:COMMUNITY_PURGE_ENVIRONMENT = 'production'
+node --env-file=apps/api-server/.env scripts/maintenance/community-test-data-purge.mjs --plan
+```
+
+Check the selected instance and DB before continuing. Share only the counts,
+blockers and digest if remote review is needed; never share the `.env` file.
+Once that exact plan is reviewed and blockers are empty:
+
+```powershell
+node --env-file=apps/api-server/.env scripts/maintenance/community-test-data-purge.mjs --apply --expected-digest=<reviewed-plan-digest>
+node --env-file=apps/api-server/.env scripts/maintenance/community-test-data-purge.mjs --plan
+```
+
+Existing process environment variables override `--env-file`; use a clean terminal
+or ensure stale `DB_*` bindings do not select a different database. Never place a
+password in the command line. Stop the proxy after the operation. Require all
+remaining counts zero before proceeding with the requested main merge/deployment.
