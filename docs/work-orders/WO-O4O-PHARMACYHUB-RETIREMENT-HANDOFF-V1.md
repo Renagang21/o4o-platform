@@ -1,7 +1,8 @@
 # PharmacyHub 완전 제거 — 새 작업공간 인계
 
-> **상태**: HISTORICAL_HANDOFF — 2026-10-14 당시 인계 기록
-> **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
+> **상태**: COMPLETED
+> **완료 범위**: 당시 인계 문서 작성·전달의 완료다. PH 삭제 전체 완료가 아니며, 후속 실행은 [퇴역 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에서 계속한다.
+> **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-17 (과거 인계 기록 회수)
 > **근거 WO/IR**: [WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)
 > **인계 사유**: 사용자가 기존 Cloud 작업공간을 종료하고 새 작업공간에서 계속하기로 결정했다.
 > **운영 상태 조회 기준**: 2026-10-14 02:59 UTC / 11:59 KST. 이후 상태는 새 세션에서 재조회한다.

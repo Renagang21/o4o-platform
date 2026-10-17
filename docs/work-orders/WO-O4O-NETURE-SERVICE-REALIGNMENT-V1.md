@@ -248,7 +248,7 @@ T01~T13은 전체 작업 내부의 순서·의존성이다. 임의로 일부만 
 - 문서 정합: 역할·주소·commerce 설계와 canonical index의 HUB/복수 약국/커뮤니티 후속 미구현 설명을 현재 branch에 맞추어 수정했다. 과거 CHECK의 당시 결과를 현재 PASS로 다시 쓰지 않았다.
 - 남은 연속 단계: 최신 HEAD CI·리뷰 → main 통합 승인 → 배포 → 실제 신규 계정 가입·증빙·사업/공급자 승인·테스트 주문·QR 업무 → 운영 조건이 충족된 인덱스/퇴역 적용. 외부 선행조건은 전체 완료까지 열린 항목으로 유지한다.
 
-## 7. main 통합·통제 배포 실행 기록 — 2026-10-09
+## 8. main 통합·통제 배포 실행 기록 — 2026-10-09
 
 - 사용자 승인으로 [PR #364](https://github.com/Renagang21/o4o-platform/pull/364)를 main `7202a56b73c1ea0327e987fe5f654730c4816b1b`에 통합했다. 최종 PR HEAD의 CI·SonarCloud·Codex는 PASS/주요 문제 없음, 미해결 스레드 0건이다. 병합 후 CI Pipeline·CodeQL 및 같은 SHA의 Scheduled API Full Jest는 PASS다.
 - main SonarCloud는 실패로 완료했다. 직전 main과 같은 76 Security Hotspots·Security/Reliability E이며 중복률은 15.0%→14.6%다. PR 최종 HEAD의 신규 hotspot 0/PASS와 동일 파일 트리의 증거를 함께 검토했다. 집계가 같다고 개별 이슈가 전부 같다고 판정하지 않으며, 상세 issue API는 환경 호스트 정책으로 미확인이다. main Quality Gate를 PASS로 기록하거나 기준을 변경하지 않았다.
@@ -256,4 +256,4 @@ T01~T13은 전체 작업 내부의 순서·의존성이다. 임의로 일부만 
 - 배포 후 9개 운영 호스트의 root 또는 API `/health/ready`, 8개 웹 호스트의 JS 자산은 모두 HTTP 200이다. 내 매장·담당 심사·사업 등록·공급자·Study 기존 문의·약사 포럼의 보호 API 6개는 익명 요청을 401/403으로 차단했다. 실제 로그인·가입·주문·기기 업무의 PASS는 아니다.
 - 배포 중 다른 AUTH 트랙의 [PR #365](https://github.com/Renagang21/o4o-platform/pull/365)가 main `3e7f44c38cee7aa2eacf069d5eedcdf07c7bbaad`에 추가됐다. 이번 승인은 `7202a56b73` 배포이며 후속 main의 통합·배포 결과를 이번 결과에 합치지 않는다. 다음 운영 검증 착수 시 실제 serving/main 상태를 다시 확인한다.
 - 실제 신규 약국·공급자 가입 대상, 담당 운영자, pharmacy 외 두 번째 승인 사업과 안전한 로그인·증빙 방법은 준비 확인을 요청했다. 계정·사업 원장을 직접 주입하거나 로컬 fixture를 운영 증거로 사용하지 않았다. T10/T13의 실제 업무, T11 이벤트 2단계, T12 QR/데이터/서버 퇴역은 계속 열린 항목이다.
-- 문서 정합: §6의 당시 로컬 실행 기록을 보존하고 현재 통합·배포 결과를 이 절과 [CHECK §5](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md#5-main-통합통제-배포와-읽기-전용-운영-smoke--2026-10-09)에 추가했다. 전체 WO와 작업공간은 KEEP/OPEN이며 다른 세션의 `SETUP.md` 수정은 보존한다.
+- 문서 정합: §7의 당시 로컬 실행 기록을 보존하고 현재 통합·배포 결과를 이 절과 [CHECK §5](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md#5-main-통합통제-배포와-읽기-전용-운영-smoke--2026-10-09)에 추가했다. 전체 WO와 작업공간은 KEEP/OPEN이며 다른 세션의 `SETUP.md` 수정은 보존한다.
