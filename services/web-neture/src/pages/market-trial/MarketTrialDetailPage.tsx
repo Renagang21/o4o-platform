@@ -42,6 +42,13 @@ const REWARD_LABELS: Record<string, string> = {
   cash: '현금 보상',
 };
 
+function recruitmentWindow(trial: Trial, now = Date.now()) {
+  const start = Date.parse(trial.startDate ?? '');
+  const end = Date.parse(trial.endDate ?? '');
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 'unknown';
+  return now < start ? 'before' : now >= end ? 'ended' : 'open';
+}
+
 export function MarketTrialDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -51,6 +58,7 @@ export function MarketTrialDetailPage() {
   const joining=useRef(false);
   const [reload,setReload]=useState(0);
   const [loadedScope,setLoadedScope]=useState('');
+  const [clock,setClock]=useState(0);
   const agreement = useServiceEnrollmentPolicies('funding', async () => (await api.get('/public/services/funding/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${id}`);
 
   const [trial, setTrial] = useState<Trial | null>(null);
@@ -92,8 +100,20 @@ export function MarketTrialDetailPage() {
     };
   }, [id, isAuthenticated, user?.id, scope, reload]);
 
+  useEffect(() => {
+    if (!trial || trial.status !== 'recruiting') return;
+    const now=Date.now();
+    const next=[Date.parse(trial.startDate ?? ''),Date.parse(trial.endDate ?? '')].filter(time=>Number.isFinite(time)&&time>now);
+    if (!next.length) return;
+    const timer=setTimeout(()=>setClock(value=>value+1),Math.min(Math.min(...next)-now,2147483647));
+    return ()=>clearTimeout(timer);
+  },[trial,clock]);
+
   const handleJoin = async () => {
     if (!id || !selectedReward || joinLoading || joining.current) return;
+    if (!trial || trial.status !== 'recruiting' || recruitmentWindow(trial) !== 'open' || (trial.maxParticipants != null && trial.currentParticipants >= trial.maxParticipants)) {
+      setClock(value=>value+1);setJoinError('현재는 참여 접수를 받고 있지 않습니다.');return;
+    }
     if (!isAuthenticated) {
       navigate(`/login?returnUrl=/market-trial/${id}`);
       return;
@@ -177,6 +197,7 @@ export function MarketTrialDetailPage() {
   const rewardLabels = rewardOptions.map((r) => REWARD_LABELS[r] || r).filter(Boolean);
 
   const isRecruiting = trial.status === 'recruiting';
+  const windowState = recruitmentWindow(trial);
   const isFull = trial.maxParticipants != null && trial.currentParticipants >= trial.maxParticipants;
   const hasJoined = participation != null || joinSuccess;
 
@@ -408,7 +429,7 @@ export function MarketTrialDetailPage() {
           </div>
         )}
 
-        {!hasJoined && isRecruiting && !isFull && (
+        {!hasJoined && isRecruiting && !isFull && windowState === 'open' && (
           <div>
             <p style={{ fontSize: '0.8125rem', color: '#6B7280', lineHeight: 1.5, marginBottom: '14px' }}>
               {isAuthenticated
@@ -475,6 +496,14 @@ export function MarketTrialDetailPage() {
                 ? '유통참여형 펀딩 참여 신청'
                 : '보상 방식을 선택해 주세요'}
             </button>
+          </div>
+        )}
+
+        {!hasJoined && isRecruiting && !isFull && windowState !== 'open' && (
+          <div style={s.infoBox}>
+            <p style={{fontSize:'0.875rem',color:'#6B7280',margin:0}}>
+              {windowState === 'before' ? '모집 시작 전입니다.' : windowState === 'ended' ? '모집이 마감되어 운영자의 모금 확인을 기다리고 있습니다.' : '모집 기간을 확인할 수 없어 참여를 접수할 수 없습니다.'}
+            </p>
           </div>
         )}
 

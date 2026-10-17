@@ -73,3 +73,5 @@ Codex 리뷰 P2(기존 펀딩의 공급자 목록·상세가 이전 약정 합�
 Codex 리뷰 P2(철회·중지 대상을 약정금 미등록 목록에도 안내할 수 있음)를 반영했다. `pledge_missing`에도 기존 collection 제외 조건을 적용했다. 진행 중/철회/운영자 중지/목표 미달 종료를 격리 SQL에서 비교해 약정 안내와 환급 확인 대상이 겹치지 않는 것을 확인했다. 조회 시 UUID 대소문자가 달라도 DB의 canonical ID를 기준으로 원장 금액을 찾도록 보완했다. controller·예외·격리 SQL 3 suites / 35 tests PASS(격리 SQL은 현재 13건), TypeScript PASS다.
 
 Codex 리뷰 P2(기존 작업 저장 후 현황 조회 실패 시 오프라인 입력만 재활성화될 수 있음)를 반영했다. 오프라인 form도 `actionLoading`(저장·조회·복구 필요)을 공유한다. 조회 복구 전 잠금/읽기 재시도 후 해제를 기존 workspace 회귀에 추가해 UI 17 tests·TypeScript·production build PASS했다. PC 1440px·모바일 390px 실제 bundle의 fixture browser에서도 사유 입력 disabled, 읽기만 재시도 후 해제, 추가 write 0·수평 넘침 0·pageerror 0을 확인했다.
+
+Codex 리뷰 P2(운영자 결과 확인 전 모집 기한이 지나도 공개 상세에 참여창이 남을 수 있음)를 반영했다. 시작 전/마감 후에는 접수창을 노출하지 않고, 열린 화면도 서버와 같은 `[시작, 종료)` 경계에서 접수를 닫는다. 클릭 시에도 기간·정원을 재확인하며 clock timer는 refetch나 결과/단계 변경을 하지 않는다. 기간 경계 UI 4 tests, 최신 웹 전체 121 files / 1,134 tests, TypeScript·production build PASS다. PC·모바일에서 시작 전/마감 후/열린 화면의 기한 경과 6개 fixture를 확인했으며 각 상세 GET 1회·write 0·수평 넘침 0·pageerror 0이다.
