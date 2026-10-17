@@ -328,7 +328,7 @@ All warnings are logged to console with `[SlideApp]` prefix and are deduplicated
 
 ## License
 
-MIT - O4O Platform Team
+O4O 자체 코드의 현재 버전에는 별도 이용허락을 부여하지 않습니다. [저작권 고지](../../LICENSE.md)를 따릅니다.
 
 ## Version
 
