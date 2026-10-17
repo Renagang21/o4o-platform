@@ -16,6 +16,10 @@
 !dist/migrate.js
 !dist/migrate.js.map
 
+# Cooperative test provisioning Job entry (bundled by tsup)
+!dist/scripts
+!dist/scripts/provision-test-cooperative.js
+
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database
 !dist/database/migrations
