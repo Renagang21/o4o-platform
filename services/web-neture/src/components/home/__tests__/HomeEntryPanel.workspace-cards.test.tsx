@@ -182,3 +182,25 @@ describe('My Home available workspace entries', () => {
     expect(screen.getByText(/매장이 여러 곳이면/)).toBeTruthy();
   });
 });
+
+
+describe('대표 홈 가입 서비스 표시', () => {
+  const mountServices = (d: HomeEntryData | null, error: string | null = null, loading = false) => render(<MemoryRouter><HomeEntryPanel servicesOnly user={user()} data={d} loading={loading} error={error} onReload={() => {}} /></MemoryRouter>);
+  it('가입 서비스와 상태를 구분하고 실제 매장 진입을 보존한다', () => {
+    mountServices(data({services:[{...svc('lecture','강의'),description:'필요한 강의를 학습합니다.'},svc('kpa-branch','분회','pending')], workspaceStores:[{organizationId:'o1',organizationName:'내 약국',memberRole:'owner'}]}));
+    expect(screen.getByRole('heading',{name:'가입한 서비스'})).toBeTruthy();
+    expect(screen.getByRole('button',{name:'강의'})).toBeTruthy();
+    expect(screen.getByText('필요한 강의를 학습합니다.')).toBeTruthy();
+    expect(screen.queryByRole('button',{name:'분회'})).toBeNull();
+    expect(screen.getByText(/분회 ·/)).toBeTruthy();
+    expect(screen.getByRole('button',{name:'내 약국'})).toBeTruthy();
+    expect(screen.queryByRole('heading',{name:'My Home'})).toBeNull();
+  });
+  it('빈 상태와 조회 실패를 구분한다', () => {
+    const view=mountServices(data({services:[],stores:[],workspaceStores:[]}));
+    expect(screen.getByText(/현재 이용 중인 서비스가 없습니다/)).toBeTruthy();
+    view.unmount(); mountServices(null,'조회에 실패했습니다');
+    expect(screen.getByRole('button',{name:'다시 불러오기'})).toBeTruthy();
+    expect(screen.queryByText(/현재 이용 중인 서비스가 없습니다/)).toBeNull();
+  });
+});

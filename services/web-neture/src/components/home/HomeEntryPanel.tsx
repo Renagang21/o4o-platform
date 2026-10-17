@@ -42,6 +42,7 @@ interface HomeEntryPanelProps {
   /** 「O4O 서비스 소식」 섹션 — 내 서비스 아래 · 가입 · 이용 상태 위 */
   newsSlot?: React.ReactNode;
   summary?: boolean;
+  servicesOnly?: boolean;
   /** My Home shows only workspaces the current account can actually enter. */
   workspaceOnly?: boolean;
   /** My Home overview: one entry per populated role, with details in services. */
@@ -105,7 +106,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot, summary, workspaceOnly, compactWorkspace, storeOrganizationId }: HomeEntryPanelProps) {
+export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot, summary, servicesOnly, workspaceOnly, compactWorkspace, storeOrganizationId }: HomeEntryPanelProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
   // 이동 세대(generation). 이동 시작마다 1 증가하고, 뒤로가기(bfcache) 복원 시에도 1 증가한다.
@@ -185,6 +186,32 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
   const hasWorkspaceEntry = model.groups.some((g) => g.items.length > 0);
   const nothingToShow =
     !hasWorkspaceEntry && !model.platformAdmin && model.myServices.length === 0 && model.statusItems.length === 0 && model.joinable.length === 0;
+
+  if (servicesOnly) {
+    const stores = model.groups.find(group => group.id === 'store')?.items.filter(item => item.id.startsWith('workspace-store:') || item.id.startsWith('store:') && item.id !== 'store:management') ?? [];
+    return <section aria-labelledby="joined-services-title" className="mt-10 w-full max-w-3xl text-left">
+      <h2 id="joined-services-title" className="text-xl font-semibold text-slate-900">가입한 서비스</h2>
+      <p className="mt-2 text-sm text-slate-500">이용 중인 서비스로 바로 이동하세요. 개인 활동과 계정은 상단 My Home에서 확인할 수 있습니다.</p>
+      {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
+      {model.myServices.length > 0 ? <ul className="mt-5 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+        {model.myServices.map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <EntryButton item={item} busyId={busyId} onHandoff={handleHandoff} />
+          <p className="mb-0 mt-3 text-sm text-slate-600">{data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim() || (item.id.startsWith('business:') ? '가입한 약국 협력사업의 참여자 공간을 이용합니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : item.id === 'svc:neture' ? '필요한 서비스와 개인 활동을 한곳에서 확인합니다.' : '가입한 서비스에서 활동을 이어갑니다.')}</p>
+        </li>)}
+      </ul> : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보세요.</p>}
+      {stores.length > 0 && <div className="mt-5 rounded-xl border border-slate-200 p-4">
+        <h3 className="text-base font-semibold">내 매장</h3>
+        <p className="my-2 text-sm text-slate-600">내 매장의 제품·콘텐츠와 운영 업무를 관리합니다.</p>
+        <div className="flex flex-wrap gap-2">{stores.map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>
+      </div>}
+      {model.statusItems.length > 0 && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <h3 className="text-sm font-semibold">가입·이용 상태</h3>
+        <ul className="mt-2 list-none space-y-2 p-0 text-sm">{model.statusItems.map(item => <li key={item.id}>
+          {item.serviceName} · {item.statusLabel}{item.guide && <a className="ml-3 text-blue-700 underline" href={item.guide.href}>{item.guide.label}</a>}
+        </li>)}</ul>
+      </div>}
+    </section>;
+  }
 
   if (workspaceOnly) {
     const groups = model.groups.map(group => ({

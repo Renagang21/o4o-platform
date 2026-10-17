@@ -70,10 +70,10 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
-  it('AI 입력 → 전체 서비스 → 소식 순서로 표시한다', () => {
+describe('로그인 전 — 공개 서비스 우선', () => {
+  it('전체 서비스 → AI 입력 → 소식 순서로 표시한다', () => {
     mount();
-    expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
+    expect(before(screen.getByRole('heading', { name: '전체 서비스' }), screen.getByTestId('home-composer'))).toBe(true);
     expect(before(screen.getByRole('heading', { name: '전체 서비스' }), screen.getByTestId('news'))).toBe(true);
   });
 
@@ -125,16 +125,16 @@ describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
   });
 });
 
-describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
+describe('로그인 후 — 가입 서비스 우선', () => {
   beforeEach(() => {
     Object.assign(auth, { user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] }, isAuthenticated: true });
   });
 
-  it('워드마크 → 무엇을 도와드릴까요 → Composer → HomeEntryPanel', () => {
+  it('가입 서비스 → 탐색 → AI 입력', () => {
     mount();
     const prompt = screen.getByText('무엇을 도와드릴까요?', { selector: 'p' });
     expect(before(prompt, screen.getByTestId('home-composer'))).toBe(true);
-    expect(before(screen.getByTestId('home-composer'), screen.getByTestId('entry-panel'))).toBe(true);
+    expect(before(screen.getByTestId('entry-panel'), screen.getByTestId('home-composer'))).toBe(true);
     expect(screen.getAllByTestId('home-composer')).toHaveLength(1);
   });
 
