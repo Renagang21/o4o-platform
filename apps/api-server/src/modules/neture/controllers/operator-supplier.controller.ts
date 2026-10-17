@@ -54,6 +54,7 @@ import {
   type SupplierOnboardingDocumentType,
 } from '../services/supplier-onboarding.service.js';
 import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
+import { createSupplierReviewHandlers } from './supplier-review-handlers.js';
 import logger from '../../../utils/logger.js';
 import { DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 
@@ -71,6 +72,13 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   // Router-level guard: supplier 서브도메인 운영자 (supplier:admin 도 scopeRoleMapping 으로 통과)
   router.use(requireAuth);
   router.use(requireSupplierScope('supplier:operator') as any);
+
+  const review = createSupplierReviewHandlers(dataSource);
+  router.get('/suppliers/review-requests', review.operatorQueue);
+  router.get('/suppliers/:id/review-requests', review.operatorList);
+  router.post('/suppliers/:id/review-requests', review.create);
+  router.post('/suppliers/:id/review-requests/:requestId/resolve', review.resolve);
+
 
   /**
    * GET /operator/suppliers

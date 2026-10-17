@@ -20,7 +20,9 @@
  */
 
 import { OperatorDialog } from './OperatorDialog';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import SupplierReviewQueue from '../../components/supplier/SupplierReviewQueue';
+import SupplierReviewRequestsPanel from '../../components/supplier/SupplierReviewRequestsPanel';
 import { SupplierDetailBody } from './OperatorSupplierApprovalDetail';
 import { useSupplierApprovalWorkflow } from './useSupplierApprovalWorkflow';
 import { statusFilters, statusColors, statusLabels, isProfileComplete, profileMissingLabels } from './operatorSupplierApprovalModel';
@@ -39,6 +41,9 @@ import SupplierRegulatedCategoriesModal from '../../components/supplier/Supplier
 
 export default function OperatorSupplierApprovalPage() {
   const dialogFallback = useRef<HTMLHeadingElement>(null);
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const reviewLock = useRef(false);
+  const onReviewBusy = useCallback((value: boolean) => { reviewLock.current = value; setReviewBusy(value); }, []);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   // ─── 표준 리스트 상태 (server-driven, URL sync) ───
   const {
@@ -196,12 +201,15 @@ export default function OperatorSupplierApprovalPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <fieldset disabled={reviewBusy} className="min-w-0 border-0 p-0 m-0 space-y-6">
       <div>
         <h1 ref={dialogFallback} tabIndex={-1} className="text-2xl font-bold text-slate-800">공급자 승인</h1>
         <p className="text-slate-500 mt-1">
           가입 승인 완료된 공급자의 기본 정보를 확인하고 운영자가 승인합니다 (PENDING → ACTIVE/REJECTED).
         </p>
       </div>
+
+      <SupplierReviewQueue disabled={busy || reviewBusy} onBusyChange={onReviewBusy} />
 
       {actionMessage && (
         <div
@@ -323,26 +331,27 @@ export default function OperatorSupplierApprovalPage() {
       {/* 상세 Drawer */}
       <BaseDetailDrawer
         open={!!drawer}
-        onClose={closeDrawer}
+        onClose={() => { if (!reviewLock.current) closeDrawer(); }}
         title={drawer?.name ?? '공급자 상세'}
         width={560}
-        actions={drawerActions}
+        actions={(drawerActions ?? []).map(action => ({ ...action, disabled: action.disabled || reviewBusy, onClick: () => { if (!reviewLock.current) void action.onClick(); } }))}
       >
         {actionMessage?.type === 'error' && <p role="alert" className="mb-3 text-red-700">{actionMessage.text}</p>}
         {drawer && (
+          <><SupplierReviewRequestsPanel key={drawer.id} supplierId={drawer.id} operator disabled={busy || editing || drawer.status === 'INACTIVE'} onBusyChange={onReviewBusy} />
           <SupplierDetailBody
             supplier={drawer}
-            onOpenCategories={() => openCategories(drawer)}
+            onOpenCategories={() => { if (!reviewLock.current) openCategories(drawer); }}
             onDownload={handleDownloadDocument}
-            editable={drawer.status === 'PENDING' && !busy}
+            editable={drawer.status === 'PENDING' && !busy && !reviewBusy}
             editing={editing}
             editForm={editForm}
             savingEdit={savingEdit}
             onChangeEditForm={(patch) => setEditForm((prev) => ({ ...prev, ...patch }))}
-            onStartEdit={handleStartEdit}
+            onStartEdit={() => { if (!reviewLock.current) handleStartEdit(); }}
             onCancelEdit={handleCancelEdit}
             onSaveEdit={handleSaveEdit}
-          />
+          /></>
         )}
       </BaseDetailDrawer>
 
@@ -401,6 +410,7 @@ export default function OperatorSupplierApprovalPage() {
         result={batch.result}
         onRetry={retryBatch}
       />
+      </fieldset>
     </div>
   );
 }

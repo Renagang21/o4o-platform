@@ -160,3 +160,13 @@ PharmacyHub와 K-Cosmetics는 현재 폐기/퇴역 정책이 우선이므로 운
 ### WIF 복구·배포 결과 정합 — 2026-10-12
 
 사용자의 최신 결과 반영 지시에 따라 같은 ACTIVE WO의 연속 기록 phase로 기존 독립 clone/branch를 유지했다. WIF 임시 제한 해제와 이번 구현의 배포 완료를 [실행 CHECK의 최신 결과](../checks/CHECK-O4O-SERVICE-OPERATOR-WORKFLOWS-V1.md#wif-복구-및-배포-완료--2026-10-12)에 연결한다. 배포 증거는 `20ed384b15` 기준이며 이후 main 변경의 배포 완료까지 의미하지 않는다. 기존 인증 실패·CI 이력은 보존하고 실계정 테스트·미정 정책·후속 기술 정비가 남아 전체 WO는 ACTIVE다. 이 결과 정리 자체는 문서-only이며 앱 배포는 NOT_APPLICABLE이다.
+
+
+## 2026-10-16 — 공급자 보완·펀딩 예외 개발 인계
+
+사용자 지시로 [공급자 보완 요청·처리 이력 / 펀딩 입금·이행 예외 TODO](WO-O4O-SUPPLIER-FUNDING-OPERATOR-EXCEPTIONS-TODO-V1.md)를 먼저 작성하고 코드·정본 대조 후 구현했다.
+T03의 추가 상태 판정은 공급자 승인 상태를 바꾸지 않는 독립 보완 요청 업무 상태로 한정했다.
+T01은 기존 오프라인 입금·이행 기록으로 도출하는 확인 대상과 감사 이력을 보완했다. 새 송금·환불·임의 기한 정책은 없다.
+T01/T03 전체를 완료한 것은 아니다. 중앙 관리자·약사회 분회는 이번 범위에서 제외했다.
+이번 개발 종료점은 검증·push이며 PR·통합·운영 migration 적용은 별도 통합 담당에게 인계한다.
+검증 근거: [CHECK](../checks/CHECK-O4O-SUPPLIER-FUNDING-OPERATOR-EXCEPTIONS-V1.md).
