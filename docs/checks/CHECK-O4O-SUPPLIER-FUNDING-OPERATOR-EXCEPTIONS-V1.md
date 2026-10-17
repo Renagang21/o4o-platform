@@ -152,3 +152,5 @@ NULL closeReason인 정상 펀딩은 유지한다. 격리 SQL에서 unpaid/pendi
 최종 migration 이름은 위 2차 동기화 기록의 `CreateSupplierReviewRequests1792193756961`이다.
 
 최종 리뷰의 공급자 제출 응답 actor UUID 노출도 보완했다. 본인 조회와 제출이 같은 비운영자 projection을 사용하여 requested_by/submitted_by/resolved_by를 제거한다. 실제 handler 응답에 세 필드가 모두 없는 것을 포함한 관련 20개 테스트가 통과했다.
+
+기존 공급자 알림 호환성 리뷰도 반영했다. `listSupplierOwnerUserIds`를 재사용하여 현재 조직 owner 우선·owner 부재 시 기존 user_id fallback이라는 현행 수신자 규칙을 유지한다. 현재 owner와 legacy fallback 성공을 포함한 handler 6개 테스트가 통과했다.

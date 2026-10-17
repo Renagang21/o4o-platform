@@ -8,6 +8,7 @@ import {
 } from "../services/supplier-review-request.service.js";
 import { notificationService } from "../../../services/NotificationService.js";
 import logger from "../../../utils/logger.js";
+import { listSupplierOwnerUserIds } from "../middleware/supplier-context.resolver.js";
 
 type ActorRequest = Request & { user?: { id: string } };
 export function createSupplierReviewHandlers(ds: DataSource) {
@@ -66,18 +67,14 @@ export function createSupplierReviewHandlers(ds: DataSource) {
           req.user.id,
           req.body ?? {},
         );
-        // Only current organization owners receive the notification. A failure never retries the committed request.
+        // Use the canonical owner resolver, including its supported legacy fallback. A failure never retries the committed request.
         let notificationCreated = false;
         try {
-          const owners: { user_id: string }[] = await ds.query(
-            `SELECT DISTINCT om.user_id FROM neture_suppliers s
-          JOIN organization_members om ON om.organization_id = s.organization_id AND om.role = 'owner' AND om.left_at IS NULL WHERE s.id = $1`,
-            [req.params.id],
-          );
+          const owners = await listSupplierOwnerUserIds(ds, req.params.id);
           const results = await Promise.allSettled(
             owners.map((owner) =>
               notificationService.createNotification({
-                userId: owner.user_id,
+                userId: owner,
                 type: "custom",
                 serviceKey: "neture",
                 title: "공급자 정보 보완 요청",

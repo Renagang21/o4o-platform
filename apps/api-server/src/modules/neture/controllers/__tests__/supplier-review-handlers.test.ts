@@ -16,7 +16,12 @@ afterEach(() => jest.restoreAllMocks());
 it("uses the middleware-resolved supplier and session actor, ignoring forged body targets", async () => {
   const submit = jest
     .spyOn(SupplierReviewRequestService.prototype, "transition")
-    .mockResolvedValue({ id: "request", requested_by: "operator-private", submitted_by: "owner-private", resolved_by: null });
+    .mockResolvedValue({
+      id: "request",
+      requested_by: "operator-private",
+      submitted_by: "owner-private",
+      resolved_by: null,
+    });
   const res = response();
   await createSupplierReviewHandlers({} as any).submit(
     {
@@ -111,3 +116,38 @@ it("reports a notification failure separately after a successful committed reque
     }),
   );
 });
+
+it.each([
+  [
+    { user_id: "current-owner", legacy_user_id: "legacy-owner" },
+    "current-owner",
+  ],
+  [{ user_id: null, legacy_user_id: "legacy-owner" }, "legacy-owner"],
+])(
+  "notifies the canonical owner with supported legacy fallback: %p",
+  async (row, recipient) => {
+    jest
+      .spyOn(SupplierReviewRequestService.prototype, "create")
+      .mockResolvedValue({ id: "request" });
+    (notificationService.createNotification as jest.Mock).mockResolvedValue({
+      id: "notice",
+    });
+    const ds: any = { query: jest.fn().mockResolvedValue([row]) };
+    const res = response();
+    await createSupplierReviewHandlers(ds).create(
+      { params: { id: "supplier" }, user: { id: "operator" }, body: {} } as any,
+      res,
+    );
+    expect(notificationService.createNotification).toHaveBeenLastCalledWith(
+      expect.objectContaining({ userId: recipient }),
+    );
+    expect(ds.query).toHaveBeenCalledWith(expect.any(String), [
+      "supplier",
+      ["owner"],
+    ]);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      data: { id: "request", notificationCreated: true },
+    });
+  },
+);
