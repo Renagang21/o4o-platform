@@ -460,10 +460,10 @@ function CommunityOperations({ accountId }: { accountId: string }) {
   if (!result.data?.length) return null;
   return (
     <Link
-      to="/mypage/communities"
+      to="/operator/service-members/community"
       className="inline-block text-sm text-blue-700 underline"
     >
-      운영 중인 커뮤니티 가입 심사 ({result.data.length}개)
+      커뮤니티 서비스 회원 관리
     </Link>
   );
 }

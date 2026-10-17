@@ -1,297 +1,51 @@
-import * as communityServiceAccess from '../../services/community/community-service-operator-access.js';
-/**
- * 커뮤니티 개설·가입 경로 배선 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * 고정하는 것
- *   두 심사 주체가 **다른 축**이며 서로 섞이지 않는다.
- *
- *     개설 심사  아직 어떤 커뮤니티에도 속하지 않은 요청 → 서비스 전체 역할 community:admin
- *     가입 심사  그 커뮤니티 안의 일                    → 개체 운영자 (resolveCommunity + operator)
- *
- *   개설 경로에 개체 가드가 붙으면 첫 커뮤니티를 아무도 만들 수 없고,
- *   가입 승인 경로에 서비스 전체 가드가 붙으면 A 커뮤니티 운영자가 B 를 승인한다.
- */
-import * as fs from 'fs';
-import * as path from 'path';
-import { Router } from 'express';
-
-const calls: string[] = [];
-
-const mark = (name: string) => {
-  const handler: any = (_req: unknown, _res: unknown, next: () => void) => {
-    calls.push(name);
-    next();
-  };
-  handler.__guard = name;
-  return handler;
-};
-
-jest.mock('../../middleware/community-scope.middleware.js', () => ({
-  resolveCommunity: mark('resolveCommunity'),
-  requireCommunityScope: (level: string) => mark(`communityScope:${level}`),
-}));
-
-jest.mock('../../middleware/community-service-scope.middleware.js', () => ({
-  requireCommunityServiceScope: (role: string) => mark(`serviceScope:${role}`),
-}));
-
-jest.mock('../../database/connection.js', () => ({ AppDataSource: {} }));
-jest.mock('../../services/forum/ForumRequestService.js', () => ({ forumRequestService: {} }));
-
-// This suite checks outer community guard wiring. The delegated Forum router
-// has separate boundary tests and requires its real entity graph at runtime.
-jest.mock('../forum/service-forum.routes.js', () => ({
-  createServiceForumRouter: () => Router(),
-}));
-
-jest.mock('../../services/auth/auth-context.helper.js', () => ({
-  freshenUserContext: async () => ({ roles: [], memberships: [] }),
-}));
-
-import express from 'express';
+import express, { Router, type RequestHandler } from 'express';
 import request from 'supertest';
-import { CommunityLifecycleService } from '../../services/community/community-lifecycle.service.js';
-import { CommunityMemberManagementService } from '../../services/community/community-member-management.service.js';
-import { NetureMainMembershipRequiredError } from '../../modules/neture/services/neture-main-membership.js';
+jest.mock('../../database/connection.js', () => ({ AppDataSource: { transaction: jest.fn(async run => run({ query: jest.fn() })) } }));
+jest.mock('../../services/forum/ForumRequestService.js', () => ({ forumRequestService: {} }));
+jest.mock('../forum/service-forum.routes.js', () => ({ createServiceForumRouter: () => Router() }));
+jest.mock('../../services/auth/auth-context.helper.js', () => ({ freshenUserContext: async () => ({ roles: [], memberships: [] }) }));
+jest.mock('../../services/community/community-service-membership.js', () => ({ requestCommunityServiceMembership: jest.fn(async () => ({ status: 'pending', requestSubmitted: true })) }));
+jest.mock('../../services/community/community-workspace.service.js', () => ({
+ listCommunityWorkspaces: jest.fn(async () => [{ communityKey: 'community' }]),
+ resolveCommunityWorkspace: jest.fn(async (_exec, _user, key) => key === 'community' ? { communityKey: key, allowed: false, kind: 'independent', communityStatus: 'active', forumStorageCodes: ['community'] } : null),
+ createCommunityBoard: jest.fn(),
+}));
 import { createCommunitiesRoutes } from '../communities.routes.js';
-
-const optionalAuth = mark('optionalAuth');
-const authenticate = mark('authenticate');
-
-interface Wired {
-  method: string;
-  path: string;
-  guards: string[];
-}
-
-function wiring(): Wired[] {
-  const router: any = createCommunitiesRoutes(optionalAuth, authenticate);
-  return router.stack
-    .filter((layer: any) => layer.route)
-    .map((layer: any) => ({
-      method: Object.keys(layer.route.methods)[0].toUpperCase(),
-      path: layer.route.path,
-      guards: layer.route.stack
-        .map((s: any) => s.handle?.__guard)
-        .filter((g: unknown): g is string => typeof g === 'string'),
-    }));
-}
-
-const find = (method: string, path: string): Wired => {
-  const hit = wiring().find((w) => w.method === method && w.path === path);
-  if (!hit) throw new Error(`route not wired: ${method} ${path}\n${JSON.stringify(wiring(), null, 2)}`);
-  return hit;
+import { requestCommunityServiceMembership } from '../../services/community/community-service-membership.js';
+import { PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
+const optionalAuth: RequestHandler = (_req, _res, next) => next();
+const authenticate: RequestHandler = (req, res, next) => {
+ if (!req.headers['x-test-user']) { res.status(401).json({ code: 'AUTH_REQUIRED' }); return; }
+ (req as any).user = { id: 'session-user' }; next();
 };
-
-describe('개설 — 서비스 전체 역할이 심사한다', () => {
-  it('신청은 인증만 요구한다 (아무 커뮤니티에도 속하지 않은 사람이 신청한다)', () => {
-    expect(find('POST', '/requests').guards).toEqual(['authenticate']);
-  });
-
-  it('내 신청 이력도 인증만 — slug_conflict 재신청 안내의 도달점', () => {
-    expect(find('GET', '/requests/mine').guards).toEqual(['authenticate']);
-  });
-
-  it.each([
-    ['GET', '/requests'],
-    ['POST', '/requests/:requestId/approve'],
-    ['POST', '/requests/:requestId/reject'],
-  ])('%s %s 는 서비스 Operator 이상이 심사한다', (method, path) => {
-    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:operator']);
-  });
-
-  it('개설 심사 경로에는 **개체 가드가 붙지 않는다** (첫 커뮤니티를 만들 수 있어야 한다)', () => {
-    for (const w of wiring().filter((x) => x.path.startsWith('/requests'))) {
-      expect(w.guards.some((g) => g.startsWith('communityScope') || g === 'resolveCommunity')).toBe(false);
-    }
-  });
+function app() {
+ const a = express(); a.use(express.json()); a.use('/communities', createCommunitiesRoutes(optionalAuth, authenticate)); return a;
+}
+beforeEach(() => jest.clearAllMocks());
+it('returns one service rather than the former directory', async () => {
+ const res = await request(app()).get('/communities');
+ expect(res.status).toBe(200); expect(res.body.data.communities).toEqual([{ communityKey: 'community' }]);
 });
-
-describe('가입 — 그 커뮤니티 운영자가 심사한다', () => {
-  it('가입 신청은 인증 + 개체 확인까지만 (아직 회원이 아니다)', () => {
-    expect(find('POST', '/:communitySlug/join').guards).toEqual(['authenticate', 'resolveCommunity']);
-  });
-
-  it.each([
-    ['GET', '/:communitySlug/memberships'],
-    ['POST', '/:communitySlug/memberships/:membershipId/approve'],
-    ['POST', '/:communitySlug/memberships/:membershipId/reject'],
-  ])('%s %s 는 개체 운영자만', (method, path) => {
-    expect(find(method, path).guards).toEqual(['authenticate', 'resolveCommunity', 'communityScope:operator']);
-  });
-
-  it('가입 심사 경로에는 **서비스 전체 가드가 붙지 않는다** (A 운영자가 B 를 승인하면 안 된다)', () => {
-    for (const w of wiring().filter((x) => x.path.includes('/memberships'))) {
-      expect(w.guards.some((g) => g.startsWith('serviceScope'))).toBe(false);
-    }
-  });
-
-  it('개체 경로는 resolveCommunity 가 scope 검사보다 **먼저** 온다 (slug 를 행으로 확인한 뒤 판정)', () => {
-    const { guards } = find('POST', '/:communitySlug/memberships/:membershipId/approve');
-    expect(guards.indexOf('resolveCommunity')).toBeLessThan(guards.indexOf('communityScope:operator'));
-  });
+it.each(['/requests', '/requests/mine', '/operating', '/admin/communities', '/pharmacy/memberships', '/pharmacy/join', '/pharmacy/leave'])('returns gone for retired entity route %s', async path => {
+ const res = await request(app()).post('/communities' + path).send({ userId: 'forged' });
+ expect(res.status).toBe(410); expect(res.body.code).toBe('COMMUNITY_ENTITY_RETIRED');
+ expect(requestCommunityServiceMembership).not.toHaveBeenCalled();
 });
-
-describe('내가 운영하는 커뮤니티 — 가입 심사 화면 진입 목록', () => {
-  it('GET /operating 은 인증만 (대상이 세션 사용자 자신의 운영 행뿐이다)', () => {
-    expect(find('GET', '/operating').guards).toEqual(['authenticate']);
-  });
-
-  it('`/:communitySlug/...` 파라미터 경로보다 먼저 등록된다', () => {
-    const order = wiring().map((w) => `${w.method} ${w.path}`);
-    const operating = order.indexOf('GET /operating');
-    const slug = order.findIndex((k) => k.includes('/:communitySlug'));
-    expect(operating).toBeGreaterThan(-1);
-    expect(operating).toBeLessThan(slug);
-  });
+it('requires authentication before service enrollment', async () => {
+ expect((await request(app()).post('/communities/join')).status).toBe(401);
+ expect(requestCommunityServiceMembership).not.toHaveBeenCalled();
 });
-
-describe('카탈로그 조회 경로는 종전대로 write 0 · optionalAuth', () => {
-  it.each([
-    ['GET', '/'],
-    ['GET', '/:communityKey/access'],
-  ])('%s %s', (method, path) => {
-    expect(find(method, path).guards).toEqual(['optionalAuth']);
-  });
-
-  it('`/requests` 가 `/:communityKey/access` 보다 먼저 등록된다 (param 경로에 먹히지 않는다)', () => {
-    const paths = wiring().map((w) => w.path);
-    expect(paths.indexOf('/requests')).toBeLessThan(paths.indexOf('/:communityKey/access'));
-  });
+it('uses session identity and transactional enrollment', async () => {
+ const res = await request(app()).post('/communities/join').set('x-test-user', 'yes').send({ userId: 'forged', policyReferences: [] });
+ expect(res.status).toBe(200); expect(res.body.data.status).toBe('pending');
+ expect(requestCommunityServiceMembership).toHaveBeenCalledWith(expect.anything(), 'session-user', []);
 });
-
-/**
- * rate limit 은 위 배선 검사에 잡히지 않는다 — 그 검사는 mock 으로 표시한 가드만 모으고
- * `apiLimiter` 는 실제 미들웨어다. 그래서 소스로 따로 고정한다.
- *
- * 신청 경로는 인증만 요구하므로 **로그인한 누구나** 호출할 수 있고, 1건마다 slug 조회 +
- * INSERT 가 나간다. CodeQL(js/missing-rate-limiting)이 같은 종류를 분회 신청 경로에서
- * high 로 잡았다.
- */
-describe('rate limit (소스 고정)', () => {
-  const src = fs.readFileSync(path.resolve(__dirname, '..', 'communities.routes.ts'), 'utf-8');
-  const code = src
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .split('\n')
-    .filter((l) => !l.trim().startsWith('//'))
-    .join('\n');
-
-  it('CodeQL 이 인식하는 limiter 를 쓴다', () => {
-    expect(code).toMatch(/import \{ apiLimiter \} from '\.\.\/middleware\/rateLimiter\.js'/);
-  });
-
-  it.each([
-    ['개설 신청', /router\.post\(\s*'\/requests',\s*apiLimiter,/],
-    ['가입 신청', /router\.post\(\s*'\/:communitySlug\/join',\s*apiLimiter,/],
-    ['운영 커뮤니티 목록', /router\.get\(\s*'\/operating',\s*apiLimiter,/],
-    ['개체 운영자 경계', /const operatorOnly: RequestHandler\[\] = \[apiLimiter,/],
-    ['서비스 심사 경계', /const serviceAdminOnly: RequestHandler\[\] = \[apiLimiter,/],
-  ])('%s 에 limiter 가 붙어 있다', (_label, re) => {
-    expect(code).toMatch(re);
-  });
+it('preserves policy errors', async () => {
+ (requestCommunityServiceMembership as jest.Mock).mockRejectedValueOnce(new PolicyAcceptanceError('ENROLLMENT_POLICY_REQUIRED', 'policy required', 409));
+ const res = await request(app()).post('/communities/join').set('x-test-user', 'yes');
+ expect(res.status).toBe(409); expect(res.body.code).toBe('ENROLLMENT_POLICY_REQUIRED');
 });
-
-describe('개별 커뮤니티 운영자 지정·해제 — 커뮤니티 서비스 운영자(community:admin)', () => {
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
-  //   Admin 은 서비스 운영자만 지정한다. 개별 커뮤니티 운영자는 서비스 운영자가 여기서 지정·해제한다.
-  it.each([
-    ['GET', '/admin/communities'],
-    ['GET', '/admin/communities/:communityId/members'],
-    ['POST', '/admin/communities/:communityId/members/:membershipId/role'],
-  ])('%s %s 는 서비스 전체 가드만 쓴다 (개체 가드 없음)', (method, p) => {
-    expect(find(method, p).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
-  });
-
-  it('파라미터 라우트(/:communitySlug/...)보다 먼저 등록된다', () => {
-    const order = wiring().map((w) => `${w.method} ${w.path}`);
-    const first = order.indexOf('GET /admin/communities/:communityId/members');
-    const slug = order.findIndex((k) => k.includes('/:communitySlug'));
-    expect(first).toBeGreaterThan(-1);
-    expect(first).toBeLessThan(slug);
-  });
-});
-
-
-describe('메인 자격 오류 HTTP 응답', () => {
-  afterEach(() => jest.restoreAllMocks());
-
-  it.each([
-    ['requestCreation', '/requests', 403],
-    ['requestJoin', '/example/join', 403],
-    ['approveCreation', '/requests/request-id/approve', 409],
-    ['approveJoin', '/example/memberships/member-id/approve', 409],
-  ] as const)('%s는 자격 오류를 %s에서 %s로 전달한다', async (method, url, status) => {
-    jest.spyOn(CommunityLifecycleService.prototype, method).mockRejectedValue(
-      new NetureMainMembershipRequiredError('suspended', '신청자의 이용 자격을 확인해 주세요.', status),
-    );
-    const app = express();
-    app.use(express.json());
-    app.use((req, _res, next) => {
-      Object.assign(req, { user: { id: 'reviewer-id' }, community: { id: 'community-id' } });
-      next();
-    });
-    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
-    const response = await request(app).post(url).send({ desiredSlug: 'example', name: 'Example' });
-    expect(response.status).toBe(status);
-    expect(response.body).toEqual({ success: false, error: '신청자의 이용 자격을 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
-  });
-});
-
-
-it.each(['suspend','restore','withdraw'])('%s는 admin guard와 인증을 요구한다', action => {
-  expect(find('POST', `/:communitySlug/memberships/:membershipId/${action}`).guards)
-    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
-});
-it('회원 이력도 admin guard로 한정한다', () => {
-  expect(find('GET','/:communitySlug/memberships/:membershipId/history').guards)
-    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
-});
-
-describe('본인 탈퇴 route', () => {
-  afterEach(() => jest.restoreAllMocks());
-  it('인증과 커뮤니티 확인을 요구하고 관리자 권한은 요구하지 않는다', () => {
-    expect(find('POST', '/:communitySlug/leave').guards).toEqual(['authenticate', 'resolveCommunity']);
-  });
-  it('클라이언트 대상 ID·역할을 무시하고 세션 사용자만 전달한다', async () => {
-    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf').mockResolvedValue({ changed: true, status: 'withdrawn' });
-    const app = express(); app.use(express.json());
-    app.use((req, _res, next) => { Object.assign(req, { user: { id: 'self' }, community: { id: 'a' } }); next(); });
-    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
-    const response = await request(app).post('/fixture/leave').send({ userId: 'other', membershipId: 'other', role: 'admin' });
-    expect(response.status).toBe(200);
-    expect(leave).toHaveBeenCalledWith({ communityId: 'a', actorUserId: 'self' });
-  });
-  it('세션 사용자가 없으면 401이고 변경하지 않는다', async () => {
-    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf');
-    const app = express(); app.use(createCommunitiesRoutes(optionalAuth, authenticate));
-    expect((await request(app).post('/fixture/leave')).status).toBe(401);
-    expect(leave).not.toHaveBeenCalled();
-  });
-});
-
-describe('회원 검색 및 페이지 HTTP 계약', () => {
-  afterEach(() => jest.restoreAllMocks());
-  const app = () => {
-    const instance = express();
-    instance.use((req, _res, next) => { Object.assign(req, { user: { id: 'service-admin' }, community: { id: 'scoped-community' } }); next(); });
-    instance.use(createCommunitiesRoutes(optionalAuth, authenticate));
-    return instance;
-  };
-  it.each(['/example/memberships', '/admin/communities/example/members'])('%s validates query before database list access', async url => {
-    jest.spyOn(communityServiceAccess, 'hasCommunityServiceAdmin').mockResolvedValue(true);
-    const { CommunityOperatorDesignationService } = await import('../../services/community/community-operator-designation.service.js');
-    const review = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview');
-    const designation = jest.spyOn(CommunityOperatorDesignationService.prototype, 'listMembers');
-    const response = await request(app()).get(url).query({ pageSize: 101 });
-    expect(response.status).toBe(400); expect(response.body.code).toBe('INVALID_QUERY');
-    expect(review).not.toHaveBeenCalled(); expect(designation).not.toHaveBeenCalled();
-  });
-  it('review uses the resolved community identity and returns page metadata', async () => {
-    const pagination = { page: 2, pageSize: 20, total: 21, totalPages: 2 };
-    const list = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview').mockResolvedValue({ memberships: [], pagination });
-    const response = await request(app()).get('/example/memberships').query({ status: 'active', q: ' 회원 ', page: 2 });
-    expect(response.status).toBe(200); expect(response.body.data.pagination).toEqual(pagination);
-    expect(list).toHaveBeenCalledWith({ communityId: 'scoped-community', query: { q: '회원', status: 'active', page: 2, pageSize: 20, paginate: true } });
-  });
+it.each(['pharmacy', 'cosmetics', 'o4o-general'])('does not serve retired %s access or public content', async key => {
+ expect((await request(app()).get(`/communities/${key}/access`)).status).toBe(404);
+ expect((await request(app()).get(`/communities/${key}/public/posts`)).status).toBe(404);
 });

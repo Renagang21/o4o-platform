@@ -4,7 +4,6 @@ import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
 import CommunityPublicReadManager from './CommunityPublicReadManager';
-import CommunitySelfWithdrawal from './CommunitySelfWithdrawal';
 import MyPostsPage from '../forum/MyPostsPage';
 import ForumRequestPage from '../forum/ForumRequestPage';
 import MyForumDashboardPage from '../supplier/MyForumDashboardPage';
@@ -33,12 +32,12 @@ export interface CommunityWorkspace {
 
 type WorkspaceView = 'hub' | 'posts' | 'write' | 'post' | 'mine' | 'request' | 'owned' | 'members';
 export default function CommunityWorkspacePage({ view = 'hub' }: { view?: WorkspaceView }) {
-  const { communityKey = '' } = useParams();
+  const { communityKey = 'community' } = useParams();
   const { user } = useAuth();
   return <Workspace key={`${user?.id ?? 'anonymous'}:${communityKey}`} view={view} />;
 }
 function Workspace({ view }: { view: WorkspaceView }) {
-  const { communityKey = '' } = useParams();
+  const { communityKey = 'community' } = useParams();
   const nativeBusiness = CURRENT_HOST_PROFILE === 'carepharm' && communityKey === 'business:carepharm';
   const { user, isAuthenticated } = useAuth();
   const agreement = useServiceEnrollmentPolicies('community', async () => nativeBusiness ? [] : (await api.get('/public/services/community/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${communityKey}`);
@@ -50,10 +49,8 @@ function Workspace({ view }: { view: WorkspaceView }) {
   const [boardName, setBoardName] = useState('');
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
-  const [notice, setNotice] = useState('');
   const basePath = `/communities/${encodeURIComponent(communityKey)}/forum`;
   const nativeAccess = nativeBusiness && workspace?.kind === 'semi-franchise' && workspace.businessKey === 'carepharm';
-  useEffect(() => { setNotice(''); }, [communityKey, user?.id]);
   useEffect(() => {
     let active = true;
     setWorkspace(null); setError('');
@@ -85,10 +82,10 @@ function Workspace({ view }: { view: WorkspaceView }) {
   </section>;
 
   const join = async () => {
-    if (nativeBusiness || workspace?.kind !== 'independent') return;
+    if (nativeBusiness || communityKey !== 'community' || workspace?.kind !== 'independent') return;
     if (!agreement.ready || busy) return;
     setBusy(true); setError('');
-    try { await api.post(`/communities/${encodeURIComponent(communityKey)}/join`, { policyReferences: agreement.references }); setVersion(v => v + 1); }
+    try { await api.post('/communities/join', { policyReferences: agreement.references }); setVersion(v => v + 1); }
     catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code)) agreement.reload(); setError(e.response?.data?.error || '가입 신청에 실패했습니다. 내 프로필의 닉네임과 이용 상태를 확인해 주세요.'); }
     finally { setBusy(false); }
   };
@@ -101,19 +98,18 @@ function Workspace({ view }: { view: WorkspaceView }) {
     finally { setBusy(false); }
   };
   return <div className="max-w-6xl mx-auto px-4 py-8">
-    <Link to="/" className="text-sm text-blue-700">커뮤니티 목록</Link>
-    {notice && <p role="status" className="my-4 text-green-700">{notice}</p>}
+    <Link to="/" className="text-sm text-blue-700">커뮤니티 홈</Link>
     {error && <p role="alert" className="my-4 text-red-700">{error}</p>}
     {!workspace && !error && <p className="my-4">불러오는 중입니다…</p>}
     {nativeBusiness && workspace && !nativeAccess && <p role="alert">이 서비스의 사업 회원 공간을 확인하지 못했습니다.</p>}
     {workspace && (!nativeBusiness || nativeAccess) && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
       {!nativeBusiness && <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>}
-      <p className="my-4">{workspace.membershipStatus === 'pending' ? '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.' : '이 커뮤니티는 가입 승인 후 참여할 수 있습니다.'}</p>
+      <p className="my-4">{workspace.membershipStatus === 'pending' ? '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.' : workspace.membershipStatus === 'suspended' ? '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.' : workspace.membershipStatus === 'withdrawn' ? '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.' : '커뮤니티 서비스에 가입 신청하고 운영자 승인 후 참여할 수 있습니다.'}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
       {!nativeBusiness && workspace.canJoin && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
       {!nativeBusiness && workspace.canJoin && <button type="button" disabled={busy || !agreement.ready} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}
-      {workspace.reason === 'NETURE_MEMBERSHIP_REQUIRED' && <Link to="/mypage">내 계정 확인</Link>}
+      {workspace.reason === 'ACCOUNT_NOT_ACTIVE' && <Link to="/mypage">내 계정 확인</Link>}
     </section>}
     {nativeBusiness && nativeAccess && !workspace?.allowed && <Link to="/my/participation">서비스 참여 신청 · 상태 확인</Link>}
     {workspace?.allowed && (!nativeBusiness || nativeAccess) && <>
@@ -121,7 +117,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
       {workspace.canManage && <section className="my-4 flex flex-wrap items-center gap-3 rounded border bg-white p-4">
         <label>게시판 이름 <input value={boardName} maxLength={100} onChange={e => setBoardName(e.target.value)} className="ml-2 rounded border px-3 py-2" /></label>
         <button type="button" disabled={busy || !boardName.trim()} onClick={createBoard} className="rounded bg-blue-700 px-4 py-2 text-white">게시판 만들기</button>
-        {workspace.kind === 'independent' && <Link to="/mypage/communities">회원 가입 심사</Link>}
+        {workspace.kind === 'independent' && <Link to="/operator/service-members/community">서비스 회원 관리</Link>}
       </section>}
       {workspace.canManage && <CommunityBoardReview communityKey={communityKey} />}
       {workspace.canManage && workspace.kind === 'independent' && <CommunityPublicReadManager key={communityKey} communityKey={communityKey} />}
@@ -134,10 +130,6 @@ function Workspace({ view }: { view: WorkspaceView }) {
       {view === 'owned' && <MyForumDashboardPage basePath={basePath} />}
       {view === 'members' && <CommunityForumMembersPage basePath={basePath} />}
     </>}
-    {!nativeBusiness && isAuthenticated && workspace?.kind === 'independent' && workspace.communityStatus === 'active' && workspace.membershipStatus === 'active' &&
-      <CommunitySelfWithdrawal key={communityKey} communityKey={communityKey} name={workspace.name} onWithdrawn={() => {
-        setNotice('이 커뮤니티의 개별 가입을 탈퇴했습니다.');
-        setWorkspace(null); setVersion(v => v + 1);
-      }} />}
+
   </div>;
 }
