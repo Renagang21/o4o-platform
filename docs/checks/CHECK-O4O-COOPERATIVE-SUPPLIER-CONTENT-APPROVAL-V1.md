@@ -1,8 +1,13 @@
 # 협동조합·약국 협업체 공급 조건 및 콘텐츠 승인
 
-> 상태: COMPLETED
+> 상태: SUPERSEDED — 정본 공통 콘텐츠 구현(PR #678)으로 대체
 > 작성일: 2026-10-17
 > 범위: 코드 조사·보완·로컬 검증. 운영 적용 완료를 의미하지 않는다.
+
+
+이 문서는 최초 로컬 구현의 과거 검증 기록이다. 별도 접수 원장과 해당 migration은 운영 미적용 상태에서 제거했다.
+현재 구현은 main의 기존 `semi_franchise_contents` 접수 흐름을 재사용한다.
+현행 연결·검증은 [협동조합 인증 및 테스트 연결](CHECK-O4O-COOPERATIVE-AUTH-AND-TEST-BUSINESS-CONNECTION-V1.md)을 따른다.
 
 ## 조사와 변경
 

@@ -97,3 +97,30 @@ it('does not open an old row decision in the same turn as a business switch', as
   });
   expect(screen.queryByRole('dialog')).toBeNull(); expect(api.decideSfMembership).not.toHaveBeenCalled();
 });
+
+it('reviews supplier content within its business and requires a rejection reason', async () => {
+  api.listContents.mockResolvedValue([{ id: 'request-a', title: '가상 등재 자료', sourceItemId: 'source-a', status: 'pending' }]);
+  api.setContentStatus.mockResolvedValue({}); show();
+  await screen.findByRole('heading', { name: '담당 약국 협력사업' });
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠' }));
+  await screen.findByText('가상 등재 자료');
+  expect(screen.getByText('공급자 등재 요청')).toBeTruthy();
+  fireEvent.click(rowAction('가상 등재 자료', '반려'));
+  expect((screen.getByRole('button', { name: '처리 확인' }) as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.getByText('처리 사유 (필수)')).toBeTruthy();
+  fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '   ' } }); confirm();
+  expect(api.setContentStatus).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText('처리 사유'), { target: { value: '내용 보완 필요' } }); confirm();
+  await waitFor(() => expect(api.setContentStatus).toHaveBeenCalledWith('pharmacy', 'request-a', 'reject', '내용 보완 필요'));
+});
+
+it('restricts cooperative tabs even on a direct membership URL and keeps its own-content editor local', async () => {
+  api.listProposals.mockResolvedValue([]);
+  render(<MemoryRouter initialEntries={['/test/operator?tab=memberships']}><Page businessKey="pharmacy" tabs={['proposals','contents']} contentEditHref={() => '/test/operator/contents/new'} /></MemoryRouter>);
+  await waitFor(() => expect(api.listProposals).toHaveBeenCalledWith('pharmacy', 'pending'));
+  expect(api.listSfMemberships).not.toHaveBeenCalled();
+  expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠' }));
+  await waitFor(() => expect(api.listContents).toHaveBeenCalledWith('pharmacy', 'all'));
+  expect(screen.getByRole('link', { name: '콘텐츠 작성' }).getAttribute('href')).toBe('/test/operator/contents/new');
+});

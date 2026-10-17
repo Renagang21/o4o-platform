@@ -7,6 +7,7 @@ export interface BusinessDecision {
   id: string;
   label: string;
   needsReason: boolean;
+  reasonRequired?: boolean;
   target: string;
   call: (reason?: string) => Promise<unknown>;
 }
@@ -84,9 +85,9 @@ export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?:
   }, [sfKey, tab, status]);
   useEffect(() => { void load(); }, [load]);
 
-  const run = (id: string, label: string, needsReason: boolean, call: BusinessDecision['call'], target = id) => {
+  const run = (id: string, label: string, needsReason: boolean, call: BusinessDecision['call'], target = id, reasonRequired = false) => {
     if (changingScope.current || submitting.current || decisionRef.current || loading || loadError) return;
-    const next = { id, label, needsReason, call, target };
+    const next = { id, label, needsReason, call, target, reasonRequired };
     decisionRef.current = next; setDecision(next); setReason(''); setDecisionError(''); setMessage(null);
   };
   const cancelDecision = () => {
@@ -96,6 +97,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?:
   const confirmDecision = async () => {
     const selected = decisionRef.current;
     if (changingScope.current || !selected || submitting.current || loading || loadError) return;
+    if (selected.reasonRequired && !reason.trim()) { setDecisionError('반려 사유를 입력해 주세요.'); return; }
     const state = lifecycle.current;
     const current = () => state.mounted && lifecycle.current === state;
     submitting.current = true; setBusyId(selected.id); setDecisionError('');

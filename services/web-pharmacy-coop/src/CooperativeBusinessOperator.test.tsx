@@ -30,6 +30,17 @@ const client = {
   put: vi.fn(),
   delete: vi.fn(),
 };
+it("keeps a callable Axios transport as state instead of invoking it as a React updater", () => {
+  const callableClient = Object.assign(vi.fn(), client);
+  render(
+    <MemoryRouter>
+      <Page businessKey="business-a" slug="coop-a" client={callableClient} />
+    </MemoryRouter>,
+  );
+  expect(screen.getByText("Shared operator")).toBeTruthy();
+  expect(callableClient).not.toHaveBeenCalled();
+  expect(shared.configure).toHaveBeenCalledWith(callableClient);
+});
 it("reuses the scoped supply, own-content and supplier-approval operator workflows for each cooperative", () => {
   render(
     <MemoryRouter>
@@ -40,10 +51,12 @@ it("reuses the scoped supply, own-content and supplier-approval operator workflo
   expect(shared.configure).toHaveBeenCalledWith(client);
   const props = shared.operator.mock.calls.at(-1)![0] as {
     businessKey: string;
+    forumHref: () => string;
     tabs: string[];
     contentEditHref: (key: string, id?: string) => string;
   };
   expect(props.businessKey).toBe("business-a");
+  expect(props.forumHref()).toBe("/coop-a/community");
   expect(props.tabs).toEqual(["proposals", "contents"]);
   expect(props.contentEditHref("business-a")).toBe(
     "/coop-a/operator/contents/new",

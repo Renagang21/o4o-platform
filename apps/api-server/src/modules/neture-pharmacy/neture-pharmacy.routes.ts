@@ -49,6 +49,7 @@ import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provis
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
 import { PHARMACY_SERVICE_FEATURES } from './services/service-features.js';
 import { getSupplyOption, listActiveSemiFranchiseKeys, listSupplyOptions } from './services/supply-access.js';
+import { SupplierBusinessContentService } from './services/supplier-business-content.service.js';
 import { SupplyProposalService, type ProposalAction } from './services/supply-proposal.service.js';
 import { SemiFranchiseEventService, type EventAction } from './services/semi-franchise-event.service.js';
 import { SemiFranchiseRecruitmentService } from './services/semi-franchise-recruitment.service.js';
@@ -120,6 +121,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   }));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
   const proposals = new SupplyProposalService(dataSource);
+  const supplierContents = new SupplierBusinessContentService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
   const recruitments = new SemiFranchiseRecruitmentService(dataSource);
   const cart = new PharmacyCartService(dataSource, new EventOfferService(dataSource), (dto) => checkoutService.createOrder(dto));
@@ -313,7 +315,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     contents.operatorUpdate(await sfOf(req), req.user!.id, uuidParam(req, 'id'), req.body ?? {})));
   router.post('/operator/semi-franchises/:key/contents/:id/:action', ...operator, handle(async (req) =>
     contents.operatorSetStatus(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
-      actionParam<'publish' | 'archive'>(req, ['publish', 'archive']))));
+      actionParam<'publish' | 'archive' | 'reject'>(req, ['publish', 'archive', 'reject']), req.body?.reason)));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
   router.use('/pharmacy/staff-support', (_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
@@ -347,6 +349,17 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     semiFranchises.revokeOperator(req.params.key, uuidParam(req, 'userId'))));
 
   // ─── 공급자 ───────────────────────────────────────────────────────────────
+  router.get('/supplier/content-targets', ...supplier, handle(async () => supplierContents.targets()));
+  router.get('/supplier/content-requests', ...supplier, handle(async (req) => supplierContents.list(req.supplierId!)));
+  router.post('/supplier/content-requests', ...supplier, handle(async (req, res) => {
+    if (!isUuid(req.body?.itemId) || typeof req.body?.businessKey !== 'string' || !req.body.businessKey.trim()) {
+      throw new NeturePharmacyError(400, 'INVALID_REQUEST', '자료와 대상 협력사업을 선택하세요.');
+    }
+    const result = await supplierContents.request(req.supplierId!, req.user!.id, req.body.itemId, req.body.businessKey.trim());
+    res.status(result.reused ? 200 : 201);
+    return result;
+  }));
+
   router.get('/supplier/semi-franchises', ...supplier, handle(async () => dataSource.query(
     `SELECT key, name FROM semi_franchises WHERE status = 'active' ORDER BY (key = 'pharmacy') DESC, name`,
   )));

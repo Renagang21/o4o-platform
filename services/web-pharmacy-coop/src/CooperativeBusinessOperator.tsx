@@ -23,7 +23,7 @@ export default function CooperativeBusinessOperator({
   );
   useLayoutEffect(() => {
     configurePharmacyManagementClient(client);
-    setConfigured(client);
+    setConfigured(() => client);
   }, [client]);
   if (configured !== client) return <p>업무 연결을 확인하고 있습니다…</p>;
   const base = `/${encodeURIComponent(slug)}/operator`;
@@ -35,6 +35,7 @@ export default function CooperativeBusinessOperator({
   ) : (
     <OperatorSemiFranchisePage
       businessKey={businessKey}
+      forumHref={() => `/${encodeURIComponent(slug)}/community`}
       tabs={["proposals", "contents"]}
       contentEditHref={(_key, id) =>
         id

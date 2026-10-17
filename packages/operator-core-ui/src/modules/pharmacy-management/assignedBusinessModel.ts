@@ -50,6 +50,8 @@ export const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
   ],
   contents: [
     { value: 'all', label: '전체' },
+    { value: 'pending', label: '등재 요청' },
+    { value: 'rejected', label: '반려' },
     { value: 'draft', label: '초안' },
     { value: 'published', label: '게시' },
     { value: 'archived', label: '보관' },
@@ -74,7 +76,8 @@ export const EVENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject' 
   approved: [{ action: 'cancel', label: '취소' }],
 };
 
-export const CONTENT_ACTIONS: Record<string, Array<{ action: 'publish' | 'archive'; label: string }>> = {
+export const CONTENT_ACTIONS: Record<string, Array<{ action: 'publish' | 'archive' | 'reject'; label: string }>> = {
+  pending: [{ action: 'publish', label: '승인·게시' }, { action: 'reject', label: '반려' }],
   draft: [
     { action: 'publish', label: '게시' },
     { action: 'archive', label: '보관' },

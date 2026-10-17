@@ -58,6 +58,9 @@ const VIEW = `
     FROM semi_franchise_contents c
     JOIN semi_franchises sf ON sf.id = c.semi_franchise_id`;
 
+/** Review provenance is for the receiving operator, not member-library DTOs. */
+const OPERATOR_VIEW = VIEW.replace('SELECT c.id,', 'SELECT c.source_item_id AS "sourceItemId", c.review_reason AS "reviewReason", c.id,');
+
 /** 약국 조직이 지금 볼 수 있는 콘텐츠 조건 ($1 = organizationId) */
 const PHARMACY_SCOPE = `
   c.status = 'published' AND sf.status = 'active'
@@ -75,13 +78,13 @@ export class SemiFranchiseContentService {
   async operatorList(sf: SemiFranchiseRow, status?: string) {
     const s = status && status !== 'all' ? status : null;
     return this.dataSource.query(
-      `${VIEW} WHERE c.semi_franchise_id = $1 AND ($2::text IS NULL OR c.status = $2) ORDER BY c.updated_at DESC`,
+      `${OPERATOR_VIEW} WHERE c.semi_franchise_id = $1 AND ($2::text IS NULL OR c.status = $2) ORDER BY c.updated_at DESC`,
       [sf.id, s],
     );
   }
 
   async operatorGet(sf: SemiFranchiseRow, id: string) {
-    const [row] = await this.dataSource.query(`${VIEW} WHERE c.id = $1::uuid AND c.semi_franchise_id = $2`, [id, sf.id]);
+    const [row] = await this.dataSource.query(`${OPERATOR_VIEW} WHERE c.id = $1::uuid AND c.semi_franchise_id = $2`, [id, sf.id]);
     if (!row) throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '콘텐츠를 찾을 수 없습니다.');
     return row;
   }
@@ -113,7 +116,7 @@ export class SemiFranchiseContentService {
           attachments = COALESCE($10::jsonb, attachments),
           tags = COALESCE($11::jsonb, tags),
           updated_by = $12, updated_at = NOW()
-        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status <> 'archived'
+        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status IN ('draft','pending','published')
       RETURNING id, status`,
       [
         id, sf.id, c.title ?? null,
@@ -130,16 +133,20 @@ export class SemiFranchiseContentService {
   }
 
   /** 게시 · 보관(게시 중단). 보관된 콘텐츠는 약국에 보이지 않지만 이미 만든 매장 사본은 매장 소유로 남는다. */
-  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive') {
-    const to = action === 'publish' ? 'published' : 'archived';
-    const from = action === 'publish' ? ['draft', 'archived'] : ['draft', 'published'];
+  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive' | 'reject', reason?: string) {
+    const to = action === 'publish' ? 'published' : action === 'reject' ? 'rejected' : 'archived';
+    const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
+    if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
+      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
     const rows = rowsOf(await this.dataSource.query(
       `UPDATE semi_franchise_contents
           SET status = $3::text, updated_by = $4, updated_at = NOW(),
+              review_reason = $6,
               published_at = CASE WHEN $3::text = 'published' THEN NOW() ELSE published_at END
         WHERE id = $1::uuid AND semi_franchise_id = $2 AND status = ANY($5::text[])
+          AND NOT ($3 = 'published' AND status = 'archived' AND source_item_id IS NOT NULL)
       RETURNING id, status`,
-      [id, sf.id, to, userId, from],
+      [id, sf.id, to, userId, from, action === 'reject' ? reason!.trim().slice(0, 1000) : null],
     ));
     if (!rows[0]) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
     return rows[0];

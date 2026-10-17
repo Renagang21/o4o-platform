@@ -298,6 +298,18 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '76c1307f0ee0a073e7ce53f9ae00e58c8695b6084842d42f6475bac35df58c04',
     fingerprintLineCount: 6698,
   },
+  // Isolated PostgreSQL 15 canonical bootstrap + all ordered incrementals; no production reads.
+  {
+    appliedThrough: 'AddSupplierBusinessContentRequests1792215000000',
+    fingerprint: 'be4a89ff7ed4ffd22e9ebaf2fdaf954c92f26672e3c4f20256e71ecec8490ce8',
+    fingerprintLineCount: 6703,
+  },
+  // Isolated PostgreSQL 15: every main prefix preserved, then independent personal cooperative enrollment.
+  {
+    appliedThrough: 'CreateCooperativeMemberships1792216000000',
+    fingerprint: '15996765a666dfc6dbea61e98f47a50a1aa580166d80fc08e3bb2a1206e667b4',
+    fingerprintLineCount: 6736,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

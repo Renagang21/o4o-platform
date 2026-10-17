@@ -27,6 +27,8 @@ import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
 import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { libraryDocumentText } from '../supplier/libraryDocumentText';
+import { supplierApi } from '../../lib/api';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
@@ -77,6 +79,10 @@ export function ForumWritePage({
   const isEditMode = !!editPostId;
   const forumSlugParam = searchParams.get('forum') || '';
   const tagParam = searchParams.get('tag') || '';
+  const libraryId = !isEditMode && communityLabel ? searchParams.get('library') : null;
+  const [libraryReady, setLibraryReady] = useState(false);
+  const [publicationConfirmed, setPublicationConfirmed] = useState(false);
+  const [availableForums, setAvailableForums] = useState<Array<{ id: string; slug: string; name: string; tags: string[] }>>([]);
 
   // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
   //   categorySlug 만 보내면 실제 forum 이 확정되지 않아 글이 forum_id NULL 로 저장되고
@@ -94,6 +100,9 @@ export function ForumWritePage({
         if (!alive) return;
         const items: any[] = Array.isArray(res?.data) ? res.data : [];
         // `?forum=<slug>` 가 있으면 그 포럼을 우선 확정한다 (홈 소식 섹션 · 포럼 목록 필터에서 진입).
+        if (libraryId) {
+          setAvailableForums(items); setForumId(''); setTargetForum(null); return;
+        }
         const matched =
           (forumSlugParam ? items.find((item) => item?.slug === forumSlugParam) : undefined)
           || items.find((item) => item?.slug === categorySlug)
@@ -108,14 +117,14 @@ export function ForumWritePage({
       })
       .catch(() => { /* forum 확정 실패 시 제출 단계에서 안내 */ });
     return () => { alive = false; };
-  }, [isEditMode, categorySlug, forumSlugParam]);
+  }, [isEditMode, categorySlug, forumSlugParam, libraryId]);
 
   const postTypeOptions: ForumWriteFormPostTypeOption[] | undefined = allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined;
   const heading = forumWriteHeading(isEditMode, communityLabel);
   const forumTags = targetForum?.tags ?? [];
   const selectedClassification = forumTags.includes(classification) ? classification : '';
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { openLoginModal } = useLoginModal();
 
   const [title, setTitle] = useState('');
@@ -127,6 +136,24 @@ export function ForumWritePage({
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
   const [showContactOnPost, setShowContactOnPost] = useState(false);
+
+  // The URL contains an opaque source id only. Load through the supplier-owned endpoint.
+  useEffect(() => {
+    let live = true;
+    setLibraryReady(false); setPublicationConfirmed(false);
+    if (!libraryId || !isAuthenticated) return;
+    setIsLoadingPost(true); setError(null); setTitle(''); setEditorHtml('');
+    supplierApi.getLibraryItem(libraryId).then(item => {
+      if (!live) return;
+      const escape = (value: string) => value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+      // A separate editable copy; links/files are not silently exposed to community readers.
+      const text = libraryDocumentText(item.blocks);
+      setTitle(item.title); setEditorHtml(`<p>${escape(text || item.description || '').replace(/\n/g, '</p><p>')}</p>`);
+      setLibraryReady(true);
+    }).catch(() => { if (live) setError('원본 자료를 불러오지 못했습니다. 자료함에서 다시 시작하세요.'); })
+      .finally(() => { if (live) setIsLoadingPost(false); });
+    return () => { live = false; };
+  }, [libraryId, isAuthenticated, user?.id]);
 
   // Load existing post data for edit mode
   useEffect(() => {
@@ -231,6 +258,9 @@ export function ForumWritePage({
   // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: ForumWriteForm create 제출 핸들러.
   // 기존 create 흐름(htmlToBlocks → createForumPost → basePath redirect, contact payload)을 그대로 보존한다.
   async function handleCreateSubmit(payload: ForumWriteFormPayload) {
+    if (libraryId && (!libraryReady || !publicationConfirmed)) {
+      setError('원본을 확인하고 커뮤니티 공개 범위 확인에 동의해 주세요.'); return;
+    }
     const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
     if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
       setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)');
@@ -316,6 +346,17 @@ export function ForumWritePage({
           구조에 대한 질문·의견·제안을 환영합니다.
         </p>
       </div>}
+
+      {libraryId && <section className="mb-4 space-y-3 rounded border p-4 text-sm" aria-label="커뮤니티 게시 확인">
+        <p>자료함 원본과 별도 게시물입니다. 서비스 등재 상태는 변경하지 않습니다. 첨부파일·원본 링크는 자동 복사하지 않습니다.</p>
+        <label className="block">게시할 게시판
+          <select value={forumId} className="ml-2 max-w-full rounded border p-2" onChange={e => {
+            const forum = availableForums.find(f => String(f.id) === e.target.value);
+            setForumId(forum ? String(forum.id) : ''); setTargetForum(forum ?? null);
+          }}><option value="">게시판을 선택하세요</option>{availableForums.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select>
+        </label>
+        <label className="flex gap-2"><input type="checkbox" checked={publicationConfirmed} onChange={e => setPublicationConfirmed(e.target.checked)} />선택한 커뮤니티의 공개 범위를 확인했으며, 거래 조건·비공개 자료를 제외했습니다.</label>
+      </section>}
 
       {/* Error Message */}
       {error && (

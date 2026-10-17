@@ -10,8 +10,8 @@
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
 import type { Tab } from './assignedBusinessModel';
+import { Link } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
   MEMBERSHIP_ACTIONS_BY_STATUS,
@@ -40,10 +40,10 @@ import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 
 type BusinessPageProps = Readonly<{
   businessKey?: string;
-  forumHref?: (business: SemiFranchise) => string;
-  renderBusinessHome?: (business: SemiFranchise) => ReactNode;
   contentEditHref?: (businessKey: string, contentId?: string) => string;
   tabs?: readonly Tab[];
+  forumHref?: (business: SemiFranchise) => string;
+  renderBusinessHome?: (business: SemiFranchise) => ReactNode;
 }>;
 
 export default function OperatorSemiFranchisePage(props: BusinessPageProps = {}) {
@@ -86,7 +86,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       {decision && <BusinessDecisionDialog decision={decision} businessName={currentBusiness?.name || sfKey}
         reason={reason} onReasonChange={setReason} error={decisionError} saving={busyId !== null}
         onConfirm={() => void confirmDecision()} onCancel={cancelDecision} />}
-      <PageHeader title="담당 약국 협력사업" description={tabs ? '담당 협업체의 공급 조건, 자체 콘텐츠, 공급자 제출 자료를 관리합니다.' : '담당으로 지정된 약국 협력사업의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.'}>
+      <PageHeader title="담당 약국 협력사업" description="담당으로 지정된 약국 협력사업의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.">
         <select
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           value={sfKey}
@@ -122,7 +122,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
-            <li>협업체가 직접 만든 콘텐츠를 작성·등록하고 게시할 수 있습니다. 공급자가 제공한 자료의 검토도 콘텐츠 탭에서 진행합니다.</li>
+            <li>공급자가 요청한 자료는 검토 대기 상태입니다. 내용을 확인한 후 승인·게시하거나 사유를 적어 반려하세요. 커뮤니티에는 게시되지 않습니다.</li>
             <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
@@ -412,6 +412,7 @@ function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ worksp
                   <tr key={c.id}>
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{c.title}</div>
+                      {c.sourceItemId && <div className="text-xs text-blue-700">공급자 등재 요청</div>}
                       {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
                     </td>
                     <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
@@ -419,10 +420,11 @@ function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ worksp
                     <td className={TD}>{formatDateTime(c.updatedAt)}</td>
                     <td className={TD}>
                       <StatusBadge status={c.status} />
+                      {c.reviewReason && <p className="text-xs text-gray-500">{c.reviewReason}</p>}
                     </td>
                     <td className={TD}>
                       <div className="flex flex-wrap gap-1">
-                        {c.status !== 'archived' && (
+                        {!['archived', 'rejected'].includes(c.status) && (
                           <Link
                             to={contentEditHref?.(sfKey, c.id) ?? `/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
                             className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
@@ -430,13 +432,13 @@ function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ worksp
                             수정
                           </Link>
                         )}
-                        {(CONTENT_ACTIONS[c.status] ?? []).map((a) => (
+                        {(c.sourceItemId && c.status === 'archived' ? [] : CONTENT_ACTIONS[c.status] ?? []).map((a) => (
                           <ActionButton
                             key={a.action}
                             label={a.label}
                             action={a.action}
                             disabled={interactionLocked || loading}
-                            onClick={() => run(c.id, a.label, false, () => api.setContentStatus(sfKey, c.id, a.action), c.title)}
+                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
                           />
                         ))}
                       </div>
