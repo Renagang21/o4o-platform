@@ -442,6 +442,7 @@ export default function SupplierLibraryFormPage() {
           />
         </div>
 
+        <p className="mb-3 rounded border p-3 text-sm">저장은 자료함의 원본만 변경합니다. 커뮤니티 게시와 서비스 등재 요청은 자료함에서 별도로 진행하세요.</p>
         {/* 공개 여부 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input

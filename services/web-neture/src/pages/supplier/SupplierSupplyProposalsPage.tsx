@@ -100,13 +100,13 @@ export default function SupplierSupplyProposalsPage() {
       {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주세요.</p>}
       <PageHeader
         title="공급 제안"
-        description="등록 승인된 제품을 세미프랜차이즈 약국에 공급 가격으로 제안합니다. 같은 제품에 여러 제안을 낼 수 있습니다."
+        description="등록 승인된 제품의 협력사업별 공급가와 대상을 정하고 등재 승인을 요청합니다. 담당 운영자 승인 후 해당 사업 회원 약국에 노출됩니다."
       />
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">
         <h2 className="mb-1 text-base font-semibold text-gray-900">새 공급 제안</h2>
         <p className="mb-3 text-xs text-gray-500">
-          제안 가격은 수정할 수 없습니다. 가격을 바꾸려면 기존 제안을 종료하고 새 제안을 내세요.
+          제안 가격은 수정할 수 없습니다. 가격을 바꾸려면 기존 제안을 종료하고 새 제안을 내세요. 배송비는 공급자 공통 정책을 사용하며, 추가 협의 사항은 메모에 적습니다.
         </p>
         {options.error && <div className="mb-3 text-sm text-red-600">{options.error}</div>}
         <div className="grid gap-3 md:grid-cols-2">

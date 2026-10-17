@@ -94,6 +94,8 @@ import { CreateMemberPaidServiceEntitlements1792137600000 } from '../migrations/
 import { CreateSupplierReviewRequests1792193756961 } from '../migrations/1792193756961-CreateSupplierReviewRequests.js';
 import { AddFundingOfflineState1792212000000 } from '../migrations/1792212000000-AddFundingOfflineState.js';
 
+import { AddSupplierBusinessContentRequests1792215000000 } from '../migrations/1792215000000-AddSupplierBusinessContentRequests.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -126,6 +128,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateMemberPaidServiceEntitlements1792137600000,
   CreateSupplierReviewRequests1792193756961,
   AddFundingOfflineState1792212000000,
+  AddSupplierBusinessContentRequests1792215000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
