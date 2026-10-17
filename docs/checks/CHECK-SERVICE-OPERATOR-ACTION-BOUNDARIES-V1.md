@@ -72,3 +72,7 @@ TODO를 먼저 작성하고, 활성 서비스 catalog·정본·실제 route/guar
 ### PR #687 리뷰 보완
 
 Codex의 LMS 물리 컬럼명(P1)과 공급자 role cache 커밋 경계(P2) 지적을 수정했다. 강의 잠금 조회는 migration의 `service_key`를 사용한다. 공급자 비활성화·재활성화는 같은 transaction의 역할 쓰기를 유지하면서 커밋 완료 후 role cache를 다시 무효화한다. 커밋 전 동시 조회로 이전 역할이 캐시에 재유입되는 회귀를 양 전이에 추가했으며 관련 2 suites/67 tests가 통과했다. 이 검증은 대역 transaction/실제 프로세스 캐시 검증이며 실제 PostgreSQL 동시 실행 검증을 대신하지 않는다.
+
+### CI의 LMS 구 계약 정합
+
+첫 수정본 CI에서 API Jest 3/3이 실패했다. 로컬에서 `lms-operator-multi-service-scope.spec.ts`의 두 실패를 재현했다. 이전 계약은 완전 삭제도 operator guard이고 inline entity 검사가 5개라고 요구했으나, 이번 기준은 일상 mutation 4개/operator와 영구 삭제/admin·transaction service scope이다. 해당 계약 테스트를 새 권한 분담과 물리 컬럼 범위로 보완했다. 집중 2 suites/37 tests가 통과했으며, operator 삭제 허용으로 구현을 되돌리지 않았다. 다른 CI shard·코드 품질·웹 빌드는 이 시점에 통과했다.
