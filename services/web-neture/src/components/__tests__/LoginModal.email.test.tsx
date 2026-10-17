@@ -28,6 +28,8 @@ vi.mock('@o4o/auth-client', async (importOriginal) => ({
 }));
 vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn(), getKakaoAuthConfig: vi.fn(async () => ({ enabled: false })) } }));
 
+const host = vi.hoisted(() => ({ profile: 'main' }));
+vi.mock('../../lib/hostProfile', () => ({ get CURRENT_HOST_PROFILE() { return host.profile; } }));
 import LoginModal from '../LoginModal';
 
 function mount(onClose = vi.fn()) {
@@ -44,7 +46,7 @@ function mount(onClose = vi.fn()) {
   return onClose;
 }
 
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); host.profile = 'main'; });
 
 describe('LoginModal — 이메일 로그인', () => {
   it('이메일 · 비밀번호 · 로그인 + 계정 도움말 링크 + 대표 호스트 부제', () => {
@@ -87,4 +89,10 @@ describe('LoginModal — 이메일 로그인', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(loginWithEmail).toHaveBeenCalledWith('a@b.co', 'abcd123!');
   });
+});
+
+it('community login exposes its own service name', () => {
+  host.profile = 'community'; mount();
+  expect(screen.getByRole('dialog', { name: '커뮤니티 로그인' })).toBeTruthy();
+  expect(screen.queryByText('Neture 로그인')).toBeNull();
 });

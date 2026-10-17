@@ -18,13 +18,16 @@ const core = {
   setUser: vi.fn(),
 };
 vi.mock('@o4o/auth-react', () => ({
-  useServiceAuth: () => core,
+  useServiceAuth: vi.fn(() => core),
   useRoleSelection: () => ({ switchRole: vi.fn(), updateUser: vi.fn(), hasMultipleRoles: false }),
 }));
 vi.mock('@o4o/auth-client', () => ({ getAccessToken: vi.fn(() => null) }));
 vi.mock('@o4o/auth-utils', async (importOriginal) => ({ ...await importOriginal<typeof import('@o4o/auth-utils')>(), buildPlatformUser: (u: unknown) => u }));
 vi.mock('../../lib/apiClient', () => ({ authClient: { api: { get: vi.fn(), post: vi.fn() } } }));
 
+const host = vi.hoisted(() => ({ profile: 'main' }));
+vi.mock('../../lib/hostProfile', () => ({ get CURRENT_HOST_PROFILE() { return host.profile; } }));
+import { useServiceAuth } from '@o4o/auth-react';
 import { AuthProvider } from '../AuthContext';
 
 const storageEvent = (key: string | null, newValue: string | null) =>
@@ -70,4 +73,11 @@ describe('AuthContext cross-tab · bfcache', () => {
     act(() => { window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false })); });
     expect(core.refresh).toHaveBeenCalledTimes(1);
   });
+});
+
+it.each([['community','community'],['main','neture'],['carepharm','neture'],['supplier','neture'],['funding','neture']])('host %s supplies service membership scope %s', (profile, serviceKey) => {
+  host.profile = profile;
+  render(<AuthProvider><div /></AuthProvider>);
+  expect(vi.mocked(useServiceAuth).mock.calls.at(-1)?.[0].serviceKey).toBe(serviceKey);
+  host.profile = 'main';
 });

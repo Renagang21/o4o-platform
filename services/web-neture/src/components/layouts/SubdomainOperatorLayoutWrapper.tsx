@@ -6,7 +6,7 @@
  *   표시하며, Neture 역할을 함께 가진 사용자에게도 다른 사업의 메뉴를 섞지 않는다.
  *   레이아웃 선택은 권한을 부여하지 않는다.
  */
-import { OperatorAreaShell } from '@o4o/operator-ux-core';
+import { OperatorAreaShell, type OperatorDomainIAConfig } from '@o4o/operator-ux-core';
 import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { NETURE_OPERATOR_DOMAIN_IA } from '../../config/operatorMenuGroups';
@@ -39,6 +39,14 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
   ] },
 };
 
+const COMMUNITY_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
+  labels: { community_operation: { label: '커뮤니티 운영', emoji: '💬' } },
+  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, approvals: 'community_operation' },
+  groupOrder: { community_operation: ['approvals'] },
+  displayOrder: ['community_operation'],
+  topPinnedGroups: [],
+};
+
 export default function SubdomainOperatorLayoutWrapper({
   serviceKey,
 }: {
@@ -55,7 +63,7 @@ export default function SubdomainOperatorLayoutWrapper({
         // `/admin/supplier-governance` 항목을 보여주지 않는다.
         menuItems={withoutUnreachableSubdomainOperatorItems(SCOPED_MENU[serviceKey], user)}
         capabilities={ENABLED_CAPABILITIES}
-        domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
+        domainIAConfig={serviceKey === 'community' ? COMMUNITY_OPERATOR_DOMAIN_IA : NETURE_OPERATOR_DOMAIN_IA}
       />
       <NetureBottomNav />
     </>

@@ -17,12 +17,13 @@ import type {
   NotificationListResult,
 } from '@o4o/account-ui';
 import { api } from '../apiClient';
+import { CURRENT_HOST_PROFILE } from '../hostProfile';
 
 function isUnauthorized(err: any): boolean {
   return err?.response?.status === 401;
 }
 
-const SERVICE_KEY = 'neture';
+const SERVICE_KEY = CURRENT_HOST_PROFILE === 'community' ? 'community' : 'neture';
 
 export const notificationsApi: NotificationApiClient = {
   async getUnreadCount(params) {

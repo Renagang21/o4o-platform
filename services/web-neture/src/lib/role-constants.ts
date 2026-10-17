@@ -7,7 +7,7 @@
  * 기능 동작 변경 없음.
  */
 
-import { isServiceAccessAllowed, type UserLike } from './membershipGate';
+import { getServiceMembershipStatus, isServiceAccessAllowed, type UserLike } from './membershipGate';
 
 // ─── Role Strings ──────────────────────────────────────────────────────────
 
@@ -118,6 +118,7 @@ export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
 export type SubdomainOperatorLevel = 'admin' | 'operator';
 
 export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: SubdomainOperatorLevel): string[] {
+  if (key === 'community') return level === 'operator' ? ['community:operator', 'community:admin'] : ['community:admin'];
   if (level === 'operator') {
     return [`${key}:operator`, `${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
   }
@@ -163,7 +164,7 @@ export type SubdomainOperatorViewer = UserLike | null | undefined;
 /**
  * 메뉴 항목 경로가 서브도메인 운영자 화면이면 **`SubdomainOperatorRoute` 와 같은 조건**일 때만 true:
  *   범위 역할(`{key}:{level}`, admin ⊃ operator) **그리고** 그 서비스 membership active.
- *   `platform:super_admin` 은 membership 없이 통과(MembershipGate · 백엔드 platformBypass 와 같음).
+ *   supplier/funding의 platform bypass는 유지한다. community는 자체 역할과 active membership을 모두 요구한다.
  * 역할만 남고 membership 이 없거나 pending · suspended 인 계정은 route 에서 막히므로 링크도 숨긴다.
  * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
  */
@@ -171,7 +172,10 @@ export function canSeeSubdomainOperatorPath(viewer: SubdomainOperatorViewer, pat
   if (path === '/admin/semi-franchises' || path.startsWith('/admin/semi-franchises/')) return !!viewer?.roles?.includes('platform:super_admin');
   const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
   if (!screen) return true;
-  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && isServiceAccessAllowed(viewer, screen.key);
+  const memberAllowed = screen.key === 'community'
+    ? getServiceMembershipStatus(viewer, 'community') === 'active'
+    : isServiceAccessAllowed(viewer, screen.key);
+  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && memberAllowed;
 }
 
 /**

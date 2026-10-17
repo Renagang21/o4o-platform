@@ -23,7 +23,7 @@ const { authState, getSuppliers, consoleProps, shellProps } = vi.hoisted(() => (
   authState: { roles: [] as string[], memberships: [] as Array<{ serviceKey: string; status: string }> },
   getSuppliers: vi.fn(),
   consoleProps: {} as { extraColumns?: Array<{ key: string }> },
-  shellProps: {} as { menuItems?: Record<string, Array<{ label: string; path: string }>> },
+  shellProps: {} as { menuItems?: Record<string, Array<{ label: string; path: string }>>; domainIAConfig?: { labels: Record<string, {label: string}> } },
 }));
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -54,8 +54,9 @@ vi.mock('@o4o/operator-core-ui/modules/members', () => ({
 }));
 
 vi.mock('@o4o/operator-ux-core', () => ({
-  OperatorAreaShell: (props: { menuItems: Record<string, Array<{ label: string; path: string }>> }) => {
+  OperatorAreaShell: (props: { menuItems: Record<string, Array<{ label: string; path: string }>>; domainIAConfig: { labels: Record<string, {label: string}> } }) => {
     shellProps.menuItems = props.menuItems;
+    shellProps.domainIAConfig = props.domainIAConfig;
     return <div data-testid="scoped-shell" />;
   },
 }));
@@ -319,4 +320,11 @@ describe('membership 상태 — 역할만 남은 계정 (route guard 와 같은 
     ]);
     expect(links(withReachableAdminLinks(adminConfig(), viewer).structureActions)).toContain('/admin/supplier-governance');
   });
+});
+
+it('community shell uses its own domain heading and does not expose platform-only operation', () => {
+  authState.roles = ['platform:super_admin']; authState.memberships = [];
+  render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />);
+  expect(Object.values(shellProps.menuItems ?? {}).flat()).toEqual([]);
+  expect(shellProps.domainIAConfig?.labels.community_operation.label).toBe('커뮤니티 운영');
 });

@@ -25,6 +25,7 @@ import {
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ROLES,
   subdomainOperatorRoles,
+  canSeeSubdomainOperatorPath,
   type SubdomainOperatorKey,
   type SubdomainOperatorLevel,
 } from '../../lib/role-constants';
@@ -90,6 +91,7 @@ function CommunityOperatorRoute({ children, level, fallback }: {
     return <p role="status" className="p-8">커뮤니티 운영 권한을 확인하고 있습니다…</p>;
   }
   return <CommunityGuard allowedRoles={subdomainOperatorRoles('community', level)}
+    isAllowed={() => canSeeSubdomainOperatorPath(user, level === 'admin' ? '/admin/communities' : '/operator/communities')}
     enforceMembership membershipServiceKey="community" fallback={fallback}>
     {children}
   </CommunityGuard>;
