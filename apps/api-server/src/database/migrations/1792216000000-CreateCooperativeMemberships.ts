@@ -1,10 +1,10 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 /** Individual cooperative enrollment is deliberately separate from pharmacy organizations. */
-export class CreateCooperativeMemberships1792214000000
+export class CreateCooperativeMemberships1792216000000
   implements MigrationInterface
 {
-  name = "CreateCooperativeMemberships1792214000000";
+  name = "CreateCooperativeMemberships1792216000000";
   async up(q: QueryRunner): Promise<void> {
     await q.query(`CREATE TABLE public.cooperatives (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

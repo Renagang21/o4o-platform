@@ -14,7 +14,6 @@ const errorText = (error: unknown, fallback: string) => error instanceof Error &
 
 function loadBusinessRows(key: string, tab: Tab, status: string) {
   switch (tab) {
-    case 'content-submissions': return api.listContentSubmissions(key, status);
     case 'memberships': return api.listSfMemberships(key, status);
     case 'proposals': return api.listProposals(key, status);
     case 'events': return api.listEvents(key, status);

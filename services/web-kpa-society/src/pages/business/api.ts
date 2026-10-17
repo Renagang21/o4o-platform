@@ -20,7 +20,6 @@ export interface BusinessMembership {
   reason: string | null;
 }
 export interface BusinessContent {
-  attachments?: unknown;
   id: string;
   title: string;
   summary: string | null;

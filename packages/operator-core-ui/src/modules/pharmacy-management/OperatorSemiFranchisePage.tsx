@@ -11,7 +11,6 @@
  */
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { BusinessContentPreview } from './BusinessContentPreview';
 import type { Tab } from './assignedBusinessModel';
 import {
   neturePharmacyOperatorApi as api,
@@ -20,7 +19,6 @@ import {
   formatWon,
   type SemiFranchise,
   type SemiFranchiseContent,
-  type BusinessContentSubmission,
   type SemiFranchiseEvent,
   type SemiFranchiseMembership,
   type SemiFranchiseRecruitment,
@@ -88,7 +86,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       {decision && <BusinessDecisionDialog decision={decision} businessName={currentBusiness?.name || sfKey}
         reason={reason} onReasonChange={setReason} error={decisionError} saving={busyId !== null}
         onConfirm={() => void confirmDecision()} onCancel={cancelDecision} />}
-      <PageHeader title="담당 약국 협력사업" description={tabs ? '담당 협업체의 공급 조건, 자체 콘텐츠, 공급자 제출 자료를 관리합니다.' : '담당으로 지정된 약국 협력사업의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 자체 콘텐츠 · 공급자 콘텐츠 심사를 처리합니다.'}>
+      <PageHeader title="담당 약국 협력사업" description={tabs ? '담당 협업체의 공급 조건, 자체 콘텐츠, 공급자 제출 자료를 관리합니다.' : '담당으로 지정된 약국 협력사업의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.'}>
         <select
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           value={sfKey}
@@ -124,7 +122,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
-            <li>협업체가 직접 만든 콘텐츠를 작성·등록하고 게시할 수 있습니다. 공급자 제출 자료는 공급자 콘텐츠 심사 탭에서 검토합니다.</li>
+            <li>협업체가 직접 만든 콘텐츠를 작성·등록하고 게시할 수 있습니다. 공급자가 제공한 자료의 검토도 콘텐츠 탭에서 진행합니다.</li>
             <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
@@ -147,7 +145,6 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
       </div>}
 
       {!loadError && <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        {tab === 'content-submissions' && <SupplierSubmissionTable workspace={workspace} />}
         {tab === 'memberships' && (
           <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -403,28 +400,6 @@ function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
     <Link to={forum}>참여자 게시판</Link>
     <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
   </nav>;
-}
-
-
-function SupplierSubmissionTable({ workspace }: Readonly<{ workspace: ReturnType<typeof useAssignedBusinessWorkspace> }>) {
-  const { rows, loading, interactionLocked, sfKey, run } = workspace;
-  let body: ReactNode;
-  if (loading) body = <EmptyRow colSpan={5} text="불러오는 중..." />;
-  else if (rows.length === 0) body = <EmptyRow colSpan={5} text="제출된 공급자 콘텐츠가 없습니다." />;
-  else body = (rows as BusinessContentSubmission[]).map(row => <tr key={row.id}>
-    <td className={TD}><details><summary className="cursor-pointer font-medium">{row.content.title}</summary>
-      {row.content.summary && <p className="my-2">{row.content.summary}</p>}<BusinessContentPreview content={row.content} />
-    </details>{row.reason && <p className="mt-2 text-xs">심사 사유: {row.reason}</p>}</td>
-    <td className={TD}>{row.supplierName}</td><td className={TD}>{formatDateTime(row.createdAt)}</td><td className={TD}><StatusBadge status={row.status} /></td>
-    <td className={TD}>{row.status === 'pending' && <div className="flex gap-2">
-      <ActionButton label="승인·게시" action="approve" disabled={interactionLocked || loading} onClick={() => run(row.id, '승인·게시', false, () => api.decideContentSubmission(sfKey, row.id, 'approve'), row.content.title)} />
-      <ActionButton label="반려" action="reject" disabled={interactionLocked || loading} onClick={() => run(row.id, '반려', true, reason => api.decideContentSubmission(sfKey, row.id, 'reject', reason), row.content.title)} />
-    </div>}</td>
-  </tr>);
-  return <table className={`w-full ${rows.length ? 'min-w-[640px]' : ''} divide-y divide-gray-200`}>
-    <thead className="bg-gray-50"><tr>{['제출 자료 · 내용 확인', '공급자', '제출일', '상태', '처리'].map(label => <th key={label} className={TH}>{label}</th>)}</tr></thead>
-    <tbody className="divide-y divide-gray-100">{body}</tbody>
-  </table>;
 }
 
 

@@ -35,7 +35,7 @@ export default function CooperativeBusinessOperator({
   ) : (
     <OperatorSemiFranchisePage
       businessKey={businessKey}
-      tabs={["proposals", "contents", "content-submissions"]}
+      tabs={["proposals", "contents"]}
       contentEditHref={(_key, id) =>
         id
           ? `${base}/contents/${encodeURIComponent(id)}/edit`

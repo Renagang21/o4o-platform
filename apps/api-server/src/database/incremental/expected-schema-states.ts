@@ -298,18 +298,6 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '76c1307f0ee0a073e7ce53f9ae00e58c8695b6084842d42f6475bac35df58c04',
     fingerprintLineCount: 6698,
   },
-  // Unapplied cooperative migrations follow the funding migration already integrated on main.
-  // Isolated PostgreSQL 15 canonical bootstrap + every existing prefix verified, 2026-10-17.
-  {
-    appliedThrough: 'CreateBusinessContentSubmissions1792213000000',
-    fingerprint: '8d935b8c346fff658ead1aefc456704469332afc7b7a66f0f0705657bf87d49c',
-    fingerprintLineCount: 6725,
-  },
-  {
-    appliedThrough: 'CreateCooperativeMemberships1792214000000',
-    fingerprint: 'beeeaa21eac87f87cf64e53bf7234949151be15b412c7cfc376c6a26617c0971',
-    fingerprintLineCount: 6758,
-  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

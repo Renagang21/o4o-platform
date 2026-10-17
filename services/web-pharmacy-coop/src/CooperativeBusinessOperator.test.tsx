@@ -44,7 +44,7 @@ it("reuses the scoped supply, own-content and supplier-approval operator workflo
     contentEditHref: (key: string, id?: string) => string;
   };
   expect(props.businessKey).toBe("business-a");
-  expect(props.tabs).toEqual(["proposals", "contents", "content-submissions"]);
+  expect(props.tabs).toEqual(["proposals", "contents"]);
   expect(props.contentEditHref("business-a")).toBe(
     "/coop-a/operator/contents/new",
   );
