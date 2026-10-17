@@ -8,7 +8,7 @@
  *   - funding:admin + funding membership 만 가진 계정 → 펀딩 O · 공급자 상태 관리 X · Neture 운영자 화면 X
  *   - Neture 관리자/운영자 역할만 가진 계정 → 두 화면 X (백엔드가 403 을 주는 화면에 들어오지 않는다)
  *   - 역할은 있으나 그 서비스 membership 이 없으면 → membership 안내(화면 X)
- *   - platform:super_admin → 통과 (백엔드 platformBypass 와 같음)
+ *   - supplier/funding의 platform bypass 유지. community는 자체 역할과 active 회원 상태 필수.
  * 운영 DB · 네트워크 0.
  */
 import * as fs from 'fs';
@@ -118,7 +118,7 @@ describe('서브도메인 운영자 화면 guard', () => {
 
   it('platform:super_admin 은 서브도메인 화면 세 곳을 통과한다 (백엔드 platformBypass 와 같음)', async () => {
     authState.user = user(['platform:super_admin'], []);
-    for (const k of ['governance', 'approvals', 'funding', 'community'] as const) expect(await sees(...SCREENS[k])).toBe(true);
+    for (const k of ['governance', 'approvals', 'funding'] as const) expect(await sees(...SCREENS[k])).toBe(true);
   });
 
   it('비로그인 → 로그인 화면', async () => {
@@ -131,7 +131,7 @@ describe('역할 표 — 백엔드 scopeRoleMapping 과 같은 의미', () => {
   it('admin ⊃ operator · community 도 Admin/Operator 분리 · neture 역할 미포함', () => {
     expect(subdomainOperatorRoles('supplier', 'admin')).toEqual(['supplier:admin', 'platform:super_admin']);
     expect(subdomainOperatorRoles('funding', 'operator')).toEqual(['funding:operator', 'funding:admin', 'platform:super_admin']);
-    expect(subdomainOperatorRoles('community', 'operator')).toEqual(['community:operator', 'community:admin', 'platform:super_admin']);
+    expect(subdomainOperatorRoles('community', 'operator')).toEqual(['community:operator', 'community:admin']);
     for (const r of [...subdomainOperatorRoles('supplier', 'admin'), ...subdomainOperatorRoles('funding', 'operator')]) {
       expect(r.startsWith('neture:')).toBe(false);
     }
@@ -233,5 +233,18 @@ describe('App.tsx 배선 (정적)', () => {
     const block = blockOf('<SubdomainOperatorRoute serviceKey="community" level="admin">');
     expect(block).toContain('path="/admin/communities"');
     expect(app.split('path="/admin/communities"').length - 1).toBe(1);
+  });
+});
+
+describe('community operation never inherits platform bypass', () => {
+  it.each([[], [['community','active']]])('platform role alone cannot enter with memberships %j', async memberships => {
+    authState.user = user(['platform:super_admin'], memberships as [string,string][]);
+    expect(await sees('/admin/communities', 'community-admin')).toBe(false);
+  });
+  it('platform plus community role still requires own active membership', async () => {
+    authState.user = user(['platform:super_admin','community:admin'], []);
+    expect(await sees('/admin/communities', 'community-admin')).toBe(false);
+    authState.user = user(['platform:super_admin','community:admin'], [['community','active']]);
+    expect(await sees('/admin/communities', 'community-admin')).toBe(true);
   });
 });

@@ -77,3 +77,28 @@
 community 자체 게시판/공개 설정과 공통 Forum 중재 API의 지원 범위를 별도로 정리해야 한다.
 
 자동 리뷰의 공통 계정 약관 주체 표시 지적을 반영해 해당 이름 변경을 철회하고 community 호스트 회귀 검사를 추가했다.
+
+## 사용자 운영 화면 확인과 후속 보정
+
+사용자가 실제 진입 주소는 `/operator/communities`라고 확인했고, 해당 화면은 열리지만
+게시판 만들기·본문의 서비스 회원 관리가 보이지 않는다고 답했다.
+제공된 화면에는 운영 sidebar와 일반 회원용 가입 신청 본문이 동시에 표시됐다.
+이는 운영자 기능 검증 성공이 아니라 권한 판정 불일치 사례로 기록한다.
+
+코드 재현에서 frontend의 community guard/menu는 platform 역할만으로 또는
+platform + community 역할이 있지만 자기 membership 없이도 열릴 수 있었다.
+반면 서버의 `hasCommunityServiceOperator`는 community 자체 역할과 active membership을 요구한다.
+community의 frontend route/menu도 같은 조건으로 수정했다. supplier/funding의 기존 예외는 유지한다.
+또한 community 운영 shell이 Neture의 '공급·유통 운영' 도메인 제목을 재사용하므로
+해당 shell에만 '커뮤니티 운영' domain IA를 주입했다.
+
+제공된 화면만으로 사용자의 정확한 role/membership 값을 단정하지 않는다.
+중앙 관리자 `/operators`에서 대상 서비스를 community로 지정한 현재 역할과 가입 상태를
+확인해야 한다. 중앙의 기존 운영자 지정 절차는 membership 부재 시 active를 생성하지만,
+이미 있는 pending/suspended/rejected/withdrawn 상태는 덮어쓰지 않는다.
+사용자에게 일반 가입 신청으로 운영 권한을 얻도록 안내하지 않는다.
+커뮤니티 운영 권한을 실제 부여하거나 운영 DB를 직접 수정하지 않았다.
+
+운영 화면 보정 후 재검증: 웹 production build PASS, 전체 119 files / 1086 tests PASS.
+프로필 메뉴의 서비스별 정상 접근·타 서비스 거부 2건을 유지한 최종 targeted 파일 검사도 PASS.
+최종 코드 변경 파일 ESLint 및 문서·unsafe route·diff guard PASS.
