@@ -16,7 +16,7 @@ afterEach(() => jest.restoreAllMocks());
 it("uses the middleware-resolved supplier and session actor, ignoring forged body targets", async () => {
   const submit = jest
     .spyOn(SupplierReviewRequestService.prototype, "transition")
-    .mockResolvedValue({ id: "request" });
+    .mockResolvedValue({ id: "request", requested_by: "operator-private", submitted_by: "owner-private", resolved_by: null });
   const res = response();
   await createSupplierReviewHandlers({} as any).submit(
     {

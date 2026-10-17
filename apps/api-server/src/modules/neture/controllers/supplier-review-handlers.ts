@@ -4,6 +4,7 @@ import type { SupplierRequest } from "../middleware/neture-identity.middleware.j
 import {
   SupplierReviewRequestService,
   SupplierReviewError,
+  supplierReviewPublicRow,
 } from "../services/supplier-review-request.service.js";
 import { notificationService } from "../../../services/NotificationService.js";
 import logger from "../../../utils/logger.js";
@@ -16,24 +17,20 @@ export function createSupplierReviewHandlers(ds: DataSource) {
       res.json({ success: true, data: await work() });
     } catch (e) {
       if (e instanceof SupplierReviewError)
-        return res
-          .status(e.status)
-          .json({
-            success: false,
-            error: { code: e.code, message: e.message },
-          });
+        return res.status(e.status).json({
+          success: false,
+          error: { code: e.code, message: e.message },
+        });
       logger.error("[SupplierReview] Request failed", {
         error: e instanceof Error ? e.name : "UnknownError",
       });
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: {
-            code: "REVIEW_REQUEST_FAILED",
-            message: "보완 요청을 처리하지 못했습니다.",
-          },
-        });
+      res.status(500).json({
+        success: false,
+        error: {
+          code: "REVIEW_REQUEST_FAILED",
+          message: "보완 요청을 처리하지 못했습니다.",
+        },
+      });
     }
   };
   return {
@@ -103,20 +100,21 @@ export function createSupplierReviewHandlers(ds: DataSource) {
         return { ...request, notificationCreated };
       }),
     submit: (req: ActorRequest, res: Response) =>
-      run(res, () => {
+      run(res, async () => {
         if (!req.user?.id)
           throw new SupplierReviewError(
             401,
             "UNAUTHORIZED",
             "로그인이 필요합니다.",
           );
-        return service.transition(
+        const row = await service.transition(
           (req as SupplierRequest).supplierId,
           req.params.requestId,
           req.user.id,
           "submit",
           req.body ?? {},
         );
+        return supplierReviewPublicRow(row);
       }),
     resolve: (req: ActorRequest, res: Response) =>
       run(res, () => {

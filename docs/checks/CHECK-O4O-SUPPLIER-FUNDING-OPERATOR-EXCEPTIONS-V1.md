@@ -150,3 +150,5 @@ fixture 계정·식별자는 모두 합성 값이며 운영 DB·운영 API·실�
 NULL closeReason인 정상 펀딩은 유지한다. 격리 SQL에서 unpaid/pending/failed/금액 누락/불일치/미입금 이행의 6개 원장 조합을 전체 및 6종 필터에 대조했다.
 관련 단위·격리 PostgreSQL 테스트 18개가 통과했고, 전 prefix fingerprint·migration down/up·writer fence 검증도 포함했다.
 최종 migration 이름은 위 2차 동기화 기록의 `CreateSupplierReviewRequests1792193756961`이다.
+
+최종 리뷰의 공급자 제출 응답 actor UUID 노출도 보완했다. 본인 조회와 제출이 같은 비운영자 projection을 사용하여 requested_by/submitted_by/resolved_by를 제거한다. 실제 handler 응답에 세 필드가 모두 없는 것을 포함한 관련 20개 테스트가 통과했다.

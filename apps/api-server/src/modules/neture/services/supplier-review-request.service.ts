@@ -59,6 +59,14 @@ const uuid = (value: string) =>
     value,
   );
 
+/** Supplier-facing projection shared by read and submit responses. */
+export const supplierReviewPublicRow = (row: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(row).filter(
+      ([key]) => !["requested_by", "submitted_by", "resolved_by"].includes(key),
+    ),
+  );
+
 /** Operational requests have their own row; audit logs are not the workflow state store. */
 export class SupplierReviewRequestService {
   constructor(private readonly ds: DataSource) {}
@@ -104,17 +112,15 @@ export class SupplierReviewRequestService {
       requestId,
       version,
     };
-    await manager
-      .getRepository(ActionLog)
-      .insert({
-        service_key: "neture",
-        user_id: actorId,
-        organization_id: null,
-        action_key: `neture.supplier.review_${action}`,
-        source: "manual",
-        status: "success",
-        meta,
-      });
+    await manager.getRepository(ActionLog).insert({
+      service_key: "neture",
+      user_id: actorId,
+      organization_id: null,
+      action_key: `neture.supplier.review_${action}`,
+      source: "manual",
+      status: "success",
+      meta,
+    });
   }
   async create(
     supplierId: string,
@@ -214,7 +220,14 @@ export class SupplierReviewRequestService {
       const [row] = await manager.query(
         `WITH updated AS (UPDATE neture_supplier_review_requests SET ${columns}, version = version + 1, updated_at = now()
         WHERE id = $3 AND supplier_id = $4 AND state = $5 AND version = $6 RETURNING *) SELECT * FROM updated`,
-        [privateText(note), actorId, requestId, supplierId, fromState, before.version],
+        [
+          privateText(note),
+          actorId,
+          requestId,
+          supplierId,
+          fromState,
+          before.version,
+        ],
       );
       if (!row)
         return fail(
@@ -274,14 +287,7 @@ export class SupplierReviewRequestService {
       [supplierId],
     );
     const safe = (r: Record<string, unknown>) =>
-      operator
-        ? r
-        : Object.fromEntries(
-            Object.entries(r).filter(
-              ([key]) =>
-                !["requested_by", "submitted_by", "resolved_by"].includes(key),
-            ),
-          );
+      operator ? r : supplierReviewPublicRow(r);
     // The supplier sees only its request messages, never arbitrary internal audit metadata.
     const actions = operator
       ? await this.ds.query(
