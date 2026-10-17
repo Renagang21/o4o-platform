@@ -47,7 +47,7 @@ export default function SupplierProposalDrafts({ options, requestedProduct, prop
   };
 
   const update = (key: string, patch: Partial<Terms & { targetOrganizationId: string }>) => {
-    setDrafts((prev) => prev.map((d) => d.key === key ? { ...d, ...patch, status: 'draft', error: undefined } : d));
+    setDrafts((prev) => prev.map((d) => d.key === key ? { ...d, ...patch } : d));
   };
 
   const submit = async (keys: string[]) => {

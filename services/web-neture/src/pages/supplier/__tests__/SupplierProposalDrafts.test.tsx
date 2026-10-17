@@ -52,6 +52,9 @@ describe('independent business proposal drafts', () => {
     await waitFor(() => expect(refreshed).toHaveBeenCalled());
     expect(a().getByRole('alert').textContent).toContain('접수됐을 수 있습니다');
     expect((a().getByLabelText('공급 가격 (원)') as HTMLInputElement).value).toBe('1000');
+    fireEvent.change(a().getByLabelText('공급 가격 (원)'), { target: { value:'950' } });
+    fireEvent.change(a().getByLabelText('메모 (선택)'), { target: { value:'수정 조건' } });
+    expect(a().getByRole('alert').textContent).toContain('접수됐을 수 있습니다');
     expect((screen.getByRole('button', { name:'미제출 초안 승인 요청' }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(a().getByRole('button', { name:'협업체 A 승인 요청' }));
     await waitFor(() => expect(refreshed).toHaveBeenCalledTimes(2));

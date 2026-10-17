@@ -6,7 +6,7 @@
  *   같은 제품 · 같은 세미프랜차이즈에 여러 제안을 낼 수 있다. 제안 가격은 수정할 수 없다 —
  *   가격을 바꾸려면 기존 제안을 종료하고 새 제안을 낸다. 승인은 담당 운영자가 한다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   neturePharmacySupplierApi as api,
@@ -28,6 +28,7 @@ export default function SupplierSupplyProposalsPage() {
   const requestedProduct = params.get('offer');
   const [rows, setRows] = useState<SupplyProposal[]>([]);
   const [loading, setLoading] = useState(true);
+  const loadVersion = useRef(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
   const [selectionError, setSelectionError] = useState(false);
@@ -38,13 +39,15 @@ export default function SupplierSupplyProposalsPage() {
   }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {
+    const version = ++loadVersion.current;
     setLoading(true);
     try {
-      setRows((await api.listProposals()) ?? []);
+      const next = (await api.listProposals()) ?? [];
+      if (version === loadVersion.current) setRows(next);
     } catch (err) {
-      setMessage({ type: 'error', text: (err as Error).message });
+      if (version === loadVersion.current) setMessage({ type: 'error', text: (err as Error).message });
     } finally {
-      setLoading(false);
+      if (version === loadVersion.current) setLoading(false);
     }
   }, []);
 
