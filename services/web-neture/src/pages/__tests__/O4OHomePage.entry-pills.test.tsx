@@ -165,9 +165,12 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
 });
 
 
-it('keeps the anonymous AI composer before the added service Hero', () => {
+it.each([false, true])('places a single full-width Hero before the AI and personal workspace (authenticated=%s)', (signedIn) => {
+  if (signedIn) Object.assign(auth, {user:{id:'synthetic',name:'샘플',roles:[]}, isAuthenticated:true});
   mount();
-  const hero = document.querySelector('main .home-presentation');
+  const hero = document.querySelector('.home-hero-frame');
+  expect(document.querySelectorAll('.home-hero-frame')).toHaveLength(1);
   expect(hero).toBeTruthy();
-  expect(before(screen.getByTestId('home-composer'), hero!)).toBe(true);
+  expect(before(hero!, screen.getByTestId('home-composer'))).toBe(true);
+  if (signedIn) expect(before(hero!, screen.getByTestId('entry-panel'))).toBe(true);
 });
