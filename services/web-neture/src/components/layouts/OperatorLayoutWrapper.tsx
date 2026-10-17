@@ -10,6 +10,8 @@
  *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/K-Cosmetics operator 정합).
  */
 
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
+import CarePharmOperatorLayout from './CarePharmOperatorLayout';
 import { filterMenuByRole } from '@o4o/ui';
 import { OperatorAreaShell, OperatorServiceSwitcher, createOperatorServicesApi } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
@@ -31,6 +33,10 @@ const netureOperatorServicesApi = createOperatorServicesApi({
 });
 
 export default function OperatorLayoutWrapper() {
+  return CURRENT_HOST_PROFILE === 'carepharm' ? <CarePharmOperatorLayout /> : <NetureOperatorLayout />;
+}
+
+function NetureOperatorLayout() {
   // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 「유통참여형 펀딩」 은 funding:operator 화면 — 그 역할과
   //   funding membership active 가 있을 때만 노출(route guard 와 같은 조건).
