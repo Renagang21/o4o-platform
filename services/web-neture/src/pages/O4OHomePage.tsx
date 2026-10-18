@@ -2,7 +2,7 @@ import { api as homePresentationApi } from '../lib/apiClient';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 /**
  * O4O representative home. Canonical policy: O4O-HOME-SERVICE-DISCOVERY-V1.
- * 2026-10-18 user-directed presentation: AI → full-width Hero → joined services / public discovery → news.
+ * 2026-10-18 user-directed presentation: full-width Hero → AI → joined services / public discovery → news.
  * The existing AI request, attachment, session and membership checks remain the execution boundary.
  * Public discovery is independent of authentication and service membership.
  */
@@ -297,7 +297,7 @@ export default function O4OHomePage() {
   const isSuperAdmin = !!user?.roles?.some((r) => String(r) === 'platform:super_admin');
   const netureGateStatus = netureMainStatus && netureMainStatus !== 'active' && !isSuperAdmin ? netureMainStatus : null;
 
-  // AI Composer는 로그인 전후 모두 본문 최상단의 단일 영역에서 표시한다.
+  // AI Composer는 로그인 전후 모두 Hero 바로 아래 단일 영역에서 표시한다.
   const composerArea = (
     <>
       {/*
@@ -617,9 +617,10 @@ export default function O4OHomePage() {
 
       <nav aria-label="대표 홈 메뉴" className="flex justify-center gap-6 px-4 py-3 text-sm"><a href="#all-services-title">전체 서비스</a><Link to="/contact">Contact Us</Link></nav>
 
-      <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-6 [word-break:keep-all] sm:pt-10">
-        <section aria-labelledby="home-ai-title" className="mb-10 flex w-full flex-col items-center text-center">
-          <h1 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h1>
+      <main className="flex flex-1 flex-col items-center px-4 pb-16 [word-break:keep-all]">
+        <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
+        <section aria-labelledby="home-ai-title" className="mt-6 flex w-full flex-col items-center text-center">
+          <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
           <p className="mt-2 mb-0 text-sm text-slate-500">{canUseHomeWorkspace ? '무엇을 도와드릴까요?' : '질문하거나 필요한 업무를 요청할 수 있습니다.'}</p>
           {canUseHomeWorkspace && netureGateStatus ? (
             <NetureMembershipNotice status={netureGateStatus} />
@@ -631,8 +632,6 @@ export default function O4OHomePage() {
           )}
           {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
         </section>
-
-        <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h2" />
 
         {canUseHomeWorkspace ? (
           <>
