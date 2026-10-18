@@ -35,3 +35,7 @@ Chromium으로 실제 production build를 열고 API를 합성 fixture로 대체
 이 변경은 wo/service-header-account-display에서 개발·검증 후 push한다. 이 CHECK는 새 헤더 변경의 PR CI·main 병합·운영 배포 성공을 주장하지 않는다.
 
 앞선 운영자 조치 경계 PR #687은 별도 변경이다. main 48f84fb776d4c9123408f67cebb7d51c583f15e6의 CI와 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39081352123)가 성공했으며 production 상태는 DEPLOYED(api,admin,neture,kpa-society,lecture,store)다. API readiness와 대표/Study/Funding/약국/Store 공개 URL HTTP 200을 재확인했다. 새 헤더 변경이 그 배포에 포함됐다고 보고하지 않는다.
+
+## 통합 준비 (2026-10-18)
+
+최신 main ee263cfd93a996ced1e9e009a463cd74ef6d32b1을 작업 branch에 merge했다. 강의 SiteShell의 충돌은 로그인 후 이름 계정 메뉴와 로그인 전 신규 회원가입 링크를 함께 보존하는 것으로 해결했다. 공통 헤더의 현재 메뉴 재선택 닫기와 CarePharm 홈 정비, 분회 가입 링크도 보존했다. 강의·분회 헤더 집중 회귀 5 tests가 통과했다. 배포 여부는 이 준비 기록이 아닌 대상 main SHA의 CI/Delivery/Promote 실제 결과로 판정한다.
