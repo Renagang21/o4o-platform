@@ -287,6 +287,7 @@ const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/Pharmac
 const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
 const SemiFranchiseContentFormPage = lazy(() => import('./pages/operator/SemiFranchiseContentFormPage'));
 const AdminSemiFranchisePage = lazy(() => import('./pages/admin/AdminSemiFranchisePage'));
+const AdminPharmacyServiceSettingsPage = lazy(() => import('./pages/admin/AdminPharmacyServiceSettingsPage'));
 const SupplierSupplyProposalsPage = lazy(() => import('./pages/supplier/SupplierSupplyProposalsPage'));
 const SupplierSemiFranchiseEventsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseEventsPage'));
 const SupplierSemiFranchiseRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseRecruitmentsPage'));
@@ -1108,6 +1109,7 @@ function App() {
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
               {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 관리 (neture:admin) */}
               <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
+              <Route path="/admin/pharmacy-service-settings" element={<AdminPharmacyServiceSettingsPage />} />
             </Route>
 
             {/* ================================================================

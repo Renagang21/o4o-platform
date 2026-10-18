@@ -23,7 +23,7 @@ export function readServiceFeatures(value: unknown): PharmacyServiceFeature[] {
 }
 
 export interface ServiceFeatureGrant {
-  type: 'semi-franchise' | 'member';
+  type: 'semi-franchise' | 'member' | 'default';
   key: string;
   name: string;
   features: PharmacyServiceFeature[];
@@ -44,12 +44,32 @@ type Executor = { query: (sql: string, params?: unknown[]) => Promise<unknown[]>
 export type MemberFeatureResolver = (ownerUserId: string) => Promise<ServiceFeatureGrant | null>;
 
 export class PharmacyServiceFeatureService {
-  constructor(private readonly db: Executor, private readonly memberFeatures?: MemberFeatureResolver) {}
+  constructor(private readonly db: Executor, private readonly memberFeatures?: MemberFeatureResolver,
+    private readonly policy?: {
+      defaultFeatures: () => Promise<PharmacyServiceFeature[]>;
+      staffFeatures: (userId: string, organizationId: string) => Promise<PharmacyServiceFeature[] | null>;
+    }) {}
 
   /** Call only AFTER the existing store workspace guard resolves the authorized organization. */
   async resolve(userId: string, organizationId: string) {
     try {
-      if (!userId || !organizationId) throw new Error('Authorized store context required');
+      if (!userId) throw new Error('Authorized user required');
+      const result = await this.resolveStore(organizationId);
+      const staff = this.policy ? await this.policy.staffFeatures(userId, organizationId) : null;
+      return { ...result, features: result.features.map(feature => ({ ...feature,
+        storeAllowed: feature.allowed,
+        allowed: feature.allowed === null ? null : feature.allowed && (staff === null || staff.includes(feature.key)),
+      })) };
+    } catch (error) {
+      if (error instanceof NeturePharmacyError) throw error;
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+    }
+  }
+
+  /** Public/device consumers have store eligibility, not an employee identity. */
+  async resolveStore(organizationId: string) {
+    try {
+      if (!organizationId) throw new Error('Authorized store context required');
       const rows = await this.db.query(
         `SELECT sf.key, sf.name, owner.metadata->'serviceFeatures' AS features
            FROM semi_franchises sf
@@ -63,6 +83,7 @@ export class PharmacyServiceFeatureService {
       const grants: ServiceFeatureGrant[] = rows.map(row => ({
         type: 'semi-franchise', key: row.key, name: row.name, features: readServiceFeatures(row.features),
       }));
+      if (this.policy) grants.push({ type: 'default', key: 'default', name: '기본 제공', features: await this.policy.defaultFeatures() });
       if (this.memberFeatures) {
         // Payment belongs to the current owner member, never the requesting employee or store.
         const owners = await this.db.query(
@@ -92,6 +113,14 @@ export class PharmacyServiceFeatureService {
   /** Feature consumers retain their existing store, staff and material guards. */
   async require(userId: string, organizationId: string, feature: PharmacyServiceFeature) {
     const result = await this.resolve(userId, organizationId);
+    return this.assertFeature(result, feature);
+  }
+
+  async requireStore(organizationId: string, feature: PharmacyServiceFeature) {
+    return this.assertFeature(await this.resolveStore(organizationId), feature);
+  }
+
+  private assertFeature<T extends Awaited<ReturnType<PharmacyServiceFeatureService['resolveStore']>>>(result: T, feature: PharmacyServiceFeature): T {
     if (!result.features.some(item => item.key === feature && item.allowed)) {
       if (result.memberEntitlement === 'not-connected') {
         throw new NeturePharmacyError(503, 'MEMBER_ENTITLEMENT_NOT_CONNECTED', '회원 이용 자격 연결을 확인해 주세요.');

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/apiClient';
+import { StaffFeatureEditor, type StaffFeature } from './StaffFeatureEditor';
 
 type Envelope<T> = { success: boolean; data: T };
 type Store = { organizationId: string; organizationName: string; memberRole: string };
 type Invitation = { organizationId: string; organizationName: string; status: 'invited' | 'accepted' };
-type Member = { userId: string; email: string; name: string | null; role: string; status: 'invited' | 'accepted' | 'active' };
+type Member = { userId: string; email: string; name: string | null; role: string; status: 'invited' | 'accepted' | 'active'; serviceFeatures?: string[] | null };
 const statusLabel = { invited: '수락 대기', accepted: '경영자 승인 대기', active: '이용 중' };
 const failure = (e: unknown) => {
   const value = e as { response?: { data?: { error?: unknown } } };
@@ -24,6 +25,8 @@ function StoreMembers({ accountId, onChanged, compact = false }: Props) {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [selected, setSelected] = useState('');
   const [members, setMembers] = useState<Member[] | null>(null);
+  const [features, setFeatures] = useState<StaffFeature[] | null>(null);
+  const [featureError, setFeatureError] = useState(false);
   const [owner, setOwner] = useState(false);
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
@@ -47,7 +50,7 @@ function StoreMembers({ accountId, onChanged, compact = false }: Props) {
   }, [accountId, tick]);
   useEffect(() => {
     let cancelled = false;
-    setMembers(null); setOwner(false);
+    setMembers(null); setOwner(false); setFeatures(null); setFeatureError(false);
     if (!selected || !expanded) return;
     const config = { headers: { 'X-Store-Organization-Id': selected }, params: { serviceKey: 'kpa' } };
     api.get('/store/membership', config).then(async (response: { data: Envelope<{ level: string; organizationId: string }> }) => {
@@ -55,18 +58,30 @@ function StoreMembers({ accountId, onChanged, compact = false }: Props) {
       if (response.data.data.level !== 'owner') return;
       setOwner(true);
       const result = await api.get('/store/members', config);
-      if (!cancelled && result.data.data?.organizationId === selected) setMembers(result.data.data.members);
+      if (cancelled) return;
+      if (result.data.data?.organizationId !== selected) throw new Error('Invalid store response');
+      setMembers(result.data.data.members);
+      try {
+        const featureResult = await api.get('/neture/pharmacy/service-features', config);
+        if (cancelled) return;
+        const access = featureResult.data.data;
+        if (!featureResult.data.success || access?.organizationId !== selected || !Array.isArray(access.features) ||
+          !['tablet', 'multilingual-content', 'store-staff-support'].every(key => access.features.some((feature: StaffFeature) => feature.key === key)) ||
+          access.features.some((feature: StaffFeature) => typeof feature.allowed !== 'boolean')) throw new Error('Invalid feature response');
+        setFeatures(access.features);
+      } catch { if (!cancelled) setFeatureError(true); }
     }).catch((e: unknown) => { if (!cancelled) { setOwner(false); setMembers(null); setError(failure(e)); } });
     return () => { cancelled = true; };
   }, [accountId, selected, tick, expanded]);
 
-  const mutate = async (path: string, body: unknown = {}, remove = false) => {
+  const mutate = async (path: string, body: unknown = {}, remove = false, put = false) => {
     if (busy) return;
     setBusy(true); setError(null); setNotice(null);
     // Capture the selected store for this entire operation. Changing selection cannot redirect it.
     const config = { headers: { 'X-Store-Organization-Id': selected }, params: { serviceKey: 'kpa' } };
     try {
       if (remove) await api.delete(path, config);
+      else if (put) await api.put(path, body, config);
       else await api.post(path, body, config);
       if (!alive.current) return;
       setNotice('처리했습니다. 최종 승인된 직원만 내 매장 업무를 이용할 수 있습니다.');
@@ -104,9 +119,15 @@ function StoreMembers({ accountId, onChanged, compact = false }: Props) {
             <button type="submit" disabled={busy} className="rounded bg-blue-700 px-3 py-2 text-white">직원 초대</button>
           </form>
           <p className="mt-2 text-sm text-slate-500">가입된 사용자를 초대할 수 있습니다. 퇴사·업무 변경 시 접근을 해제하면 작성 자료는 매장에 유지됩니다.</p>
+          {featureError && <p role="alert" className="mt-3 text-red-700">약국의 제공 기능을 확인하지 못했습니다. <button type="button" disabled={busy} className="underline" onClick={() => setTick(value => value + 1)}>기능 다시 확인</button></p>}
           {members === null ? <p className="mt-3">구성원을 확인하는 중…</p> : <ul className="mt-3 space-y-3">{members.map(m => <li key={m.userId} className="flex flex-wrap items-center gap-3">
             <span className="break-all">{m.name || m.email} · {statusLabel[m.status]}</span>
-            {m.role === 'accepted' && <button type="button" disabled={busy} className="text-blue-700 underline" onClick={() => void mutate(`/store/members/${encodeURIComponent(m.userId)}/approve`)}>최종 승인</button>}
+            {['accepted', 'staff'].includes(m.role) && (features ? <StaffFeatureEditor key={`${selected}:${tick}:${m.userId}`}
+              name={m.name || m.email} pending={m.role === 'accepted'} features={features} selected={m.serviceFeatures ?? null} busy={busy}
+              onSave={serviceFeatures => void (m.role === 'accepted'
+                ? mutate(`/store/members/${encodeURIComponent(m.userId)}/approve`, { serviceFeatures })
+                : mutate(`/neture/pharmacy/staff-feature-permissions/${encodeURIComponent(m.userId)}`, { serviceFeatures }, false, true))} />
+              : !featureError && <p className="text-sm text-slate-500">이용 기능을 확인하는 중…</p>)}
             {['invited', 'accepted', 'staff'].includes(m.role) && <button type="button" disabled={busy} className="text-red-700 underline" onClick={() => void mutate(`/store/members/${encodeURIComponent(m.userId)}`, {}, true)}>{m.status === 'active' ? '접근 해제' : '초대 취소'}</button>}
           </li>)}</ul>}
         </>}

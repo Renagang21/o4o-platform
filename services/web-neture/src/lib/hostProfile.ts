@@ -135,6 +135,7 @@ export function decideHost(
     '/operator/pharmacy-memberships': 'https://store.neture.co.kr',
     '/operator/semi-franchises': 'https://pharmacy.neture.co.kr',
     '/admin/semi-franchises': 'https://admin.neture.co.kr',
+    '/admin/pharmacy-service-settings': 'https://admin.neture.co.kr',
     '/admin/platform': 'https://admin.neture.co.kr',
     '/admin/settings/service-audience': 'https://admin.neture.co.kr',
   };

@@ -37,3 +37,14 @@ it('does not call pharmacy APIs for another store domain and refuses a mismatche
   await waitFor(() => expect(hook.result.current.error).toBe(true));
   expect(hook.result.current.data).toBeNull();
 });
+it('discards the previous account permission even when the selected store and path are unchanged', async () => {
+  api.get.mockResolvedValueOnce(allowed('a'));
+  const hook = renderHook(({ account }) => usePharmacyFeatureAccess('a', true, '/store/requests', account), { initialProps: { account: 'owner' } });
+  await waitFor(() => expect(hook.result.current.data?.features[0].allowed).toBe(true));
+  let finish!: (value: unknown) => void;
+  api.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  hook.rerender({ account: 'staff' });
+  expect(hook.result.current.data).toBeNull();
+  await act(async () => finish({ success: true, data: { organizationId: 'a', features: [{ key: 'tablet', allowed: false }, { key: 'multilingual-content', allowed: false }] } }));
+  await waitFor(() => expect(hook.result.current.data?.features[0].allowed).toBe(false));
+});

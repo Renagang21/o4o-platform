@@ -1,6 +1,8 @@
 import type { DataSource } from 'typeorm';
 import { NeturePharmacyError } from '../constants.js';
-import { PHARMACY_SERVICE_FEATURES, PharmacyServiceFeatureService, type ServiceFeatureGrant } from './service-features.js';
+import { PharmacyServiceFeatureService, type ServiceFeatureGrant } from './service-features.js';
+import { PharmacyServicePolicyService } from './service-feature-policy.js';
+import { resolveStaffFeatures } from './staff-feature-permissions.js';
 
 type Executor = Pick<DataSource, 'query'>;
 export class MemberPaidFeatureService {
@@ -12,7 +14,7 @@ export class MemberPaidFeatureService {
       WHERE p.user_id=$1 AND p.active=true AND (p.ends_at IS NULL OR p.ends_at>NOW())
         AND u.status='active' AND u."isActive"=true`, [ownerUserId]);
     return rows.length ? { type: 'member', key: 'paid-member', name: '경영자 유료회원',
-      features: PHARMACY_SERVICE_FEATURES.filter(f => f.key === 'tablet' || f.key === 'multilingual-content').map(f => f.key) } : null;
+      features: await new PharmacyServicePolicyService(this.db).read('paid') } : null;
   }
 
   async find(email: unknown) {
@@ -44,5 +46,8 @@ export class MemberPaidFeatureService {
 
 export function createPharmacyFeatureService(db: Executor) {
   const members = new MemberPaidFeatureService(db);
-  return new PharmacyServiceFeatureService(db, id => members.resolve(id));
+  const policy = new PharmacyServicePolicyService(db);
+  return new PharmacyServiceFeatureService(db, id => members.resolve(id), {
+    defaultFeatures: () => policy.read('default'), staffFeatures: (userId, organizationId) => resolveStaffFeatures(db, userId, organizationId),
+  });
 }

@@ -123,6 +123,7 @@ export const adminMenuStatic: MenuItem[] = [
   // ============================================
   { id: 'platform-account-governance', label: '계정 · 역할 · 서비스 정책', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
   { id: 'semi-franchise-registry', label: '약국 협력사업', icon: <Layers className="w-5 h-5" />, path: '/admin/semi-franchises' },
+  { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
   {
     id: 'platform-hub',
     label: '플랫폼 HUB',

@@ -71,8 +71,8 @@ export function MemberPaidFeaturesPanel() {
     >
       <h2 className="mb-2 font-semibold">회원 유료 자격</h2>
       <p className="mb-3 text-sm text-gray-600">
-        경영자가 유료회원이면 해당 내 매장의 태블릿·다국어 상품 콘텐츠를 초대
-        직원도 이용합니다.
+        경영자가 유료회원이면 약국 서비스 설정에서 지정한 기능을 해당 약국에 제공합니다.
+        초대 직원의 이용 범위는 경영자가 My Home에서 허용합니다.
       </p>
       <div className="flex flex-wrap gap-2">
         <input

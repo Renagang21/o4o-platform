@@ -72,7 +72,7 @@ export function StoreWorkDashboard({ config, withCapabilities = false, workspace
   const { organizationName, stores, organizationId, services } = useUnifiedStore();
   const location = useLocation();
   const pharmacy = services.some(service => service.serviceKey === 'kpa-society');
-  const featureAccess = usePharmacyFeatureAccess(organizationId, pharmacy, location.pathname);
+  const featureAccess = usePharmacyFeatureAccess(organizationId, pharmacy, location.pathname, user?.id);
   const requestedFeature = pharmacy ? pharmacyFeatureForPath(location.pathname) : null;
   const featureDecision = featureAccess.data?.features.find(f => f.key === requestedFeature);
   const featureAllowed = requestedFeature && featureDecision?.allowed === true;
