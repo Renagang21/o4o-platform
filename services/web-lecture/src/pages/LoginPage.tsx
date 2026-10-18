@@ -25,6 +25,7 @@ export default function LoginPage() {
   return <LoginLayout brand="O4O 강의" tone="indigo" headline={<>새로운 배움이<br />시작되는 곳.</>} description="관심 있는 강의를 만나고, 나만의 배움을 이어가세요.">
     <LoginCard brand="O4O 강의" tone="indigo" heading="h1" title="O4O 강의 로그인" description="Neture에서 로그인한 뒤 강의로 돌아옵니다.">
     <a className="o4o-login-primary-link" href={entryUrl} data-testid="lecture-login-entry">Neture 에서 로그인하고 계속하기</a>
+    <p className="o4o-login-footnote">O4O 계정이 없으신가요? <a href="https://neture.co.kr/signup">회원가입</a></p>
     <DemoLoginButtons loginWithEmail={loginWithEmail} onSuccess={() => window.location.assign(returnPath)} />
   </LoginCard></LoginLayout>;
 }

@@ -16,7 +16,7 @@
  *
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
- *   - `GET /neture/home/entry`       분회(slug) · 공급자/메인 상태 (기존 서비스별 매장 목록은 신규 흐름에서 미사용)
+ *   - `GET /neture/home/entry`       분회(slug) · 공급자/메인 상태 · 협력사업 참여 판정 · 개인 협동조합 가입 (기존 서비스별 매장 목록은 신규 흐름에서 미사용)
  *   - `GET /work-scope/accessible-stores` Store와 같은 조직 기반 매장 목록
  *   - `user.roles` (from /auth/me)   platform:super_admin · 관리자 판정 (Neture RoleGuard 와 같은 상수)
  *   - `GET /communities`             Community Catalog + 참여 가능 여부 — **커뮤니티 진입의 유일한 출처**
@@ -136,6 +136,9 @@ export interface HomeEntryData {
   operatorServices?: EntryOperatorService[];
   /** Community Catalog + 참여 판정 (서버 확정). 없으면 빈 배열로 취급한다 */
   communities?: EntryCommunity[];
+  /** Business access is read from the business ledger, independently of the community directory. */
+  businesses?: { key: string; name: string; canParticipate: boolean; membershipStatus?: string | null }[];
+  cooperatives?: { id: string; slug: string; name: string; status: string }[];
 }
 
 // ─── 진입 액션 ────────────────────────────────────────────────────────────────
@@ -328,6 +331,8 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     serviceStates: normalizeServiceStates(entry.serviceStates),
     operatorServices,
     communities,
+    businesses: Array.isArray(entry.businesses) ? entry.businesses : undefined,
+    cooperatives: Array.isArray(entry.cooperatives) ? entry.cooperatives : [],
   };
 }
 
@@ -343,6 +348,26 @@ export function useHomeEntry(enabled: boolean, accountId?: string): UseHomeEntry
   const [tick, setTick] = useState(0);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refresh = () => {
+      if (document.visibilityState === 'hidden') return;
+      clearTimeout(timer);
+      timer = setTimeout(reload, 100);
+    };
+    const restored = (event: PageTransitionEvent) => { if (event.persisted) refresh(); };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    window.addEventListener('pageshow', restored);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      window.removeEventListener('pageshow', restored);
+    };
+  }, [enabled, reload]);
 
   useEffect(() => {
     setLoadedAccount(accountId);
@@ -650,14 +675,21 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
-  for (const business of data.communities ?? []) {
-    if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
+  const businesses = data.businesses ?? (data.communities ?? [])
+    .filter(item => item.kind === 'semi-franchise' && item.businessKey)
+    .map(item => ({ key: item.businessKey!, name: item.name, canParticipate: item.canParticipate }));
+  for (const business of businesses) {
+    if (!business.canParticipate) continue;
     // 독립 사업은 pharmacy 개인 가입을 요구하는 service handoff로 우회하지 않는다.
     // CarePharm은 기존 alias, 메가팜은 공개 호스트(현재 별도 handoff alias 없음)를 사용한다.
-    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` };
-    if (business.businessKey === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
-    else if (business.businessKey === 'megapharm') action = { kind: 'public', href: 'https://megapharm.neture.co.kr/' };
-    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`, action });
+    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.key)}/forum` };
+    if (business.key === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
+    else if (business.key === 'megapharm') action = { kind: 'public', href: 'https://megapharm.neture.co.kr/' };
+    myServices.push({ id: `business:${business.key}`, label: `${business.name} · 참여자 공간`, action });
+  }
+  for (const cooperative of data.cooperatives ?? []) {
+    if (cooperative.status !== 'active') continue;
+    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://coop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
   }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
@@ -691,6 +723,16 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 가입 · 이용 상태 (active 가 아닌 membership 만) ──
   const statusItems: StatusItem[] = [];
+  for (const business of data.businesses ?? []) {
+    if (business.canParticipate || !business.membershipStatus) continue;
+    const status = business.membershipStatus;
+    statusItems.push({ id: `status:business:${business.key}`, serviceName: business.name, status,
+      statusLabel: status === 'active' ? '이용 자격 확인 필요' : STATUS_LABELS[status] ?? (status === 'terminated' ? '이용 종료' : status) });
+  }
+  for (const cooperative of data.cooperatives ?? []) {
+    if (cooperative.status === 'active') continue;
+    statusItems.push({ id: `status:cooperative:${cooperative.id}`, serviceName: `약국/약사협동조합 · ${cooperative.name}`, status: cooperative.status, statusLabel: STATUS_LABELS[cooperative.status] ?? cooperative.status });
+  }
   for (const svcKey of ['supplier'] as const) {
     const status = states[svcKey].status;
     if (status === 'none' || status === 'active') continue;

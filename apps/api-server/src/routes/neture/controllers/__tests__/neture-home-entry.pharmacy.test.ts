@@ -28,7 +28,7 @@ async function entry(options: { legacyRole?: boolean } = {}) {
   const router = createNetureHomeEntryController({ query } as any, (_req, _res, next) => next());
   const route = (router as any).stack.find((layer: any) => layer.route?.path === '/entry').route;
   const handler = route.stack[route.stack.length - 1].handle;
-  const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+  const res: any = { setHeader: jest.fn(), status: jest.fn().mockReturnThis(), json: jest.fn() };
   const next = jest.fn();
   handler({ user: { id: 'synthetic-demo', roles: ['neture:store_owner'] } }, res, next);
   await new Promise(resolve => setImmediate(resolve));

@@ -308,7 +308,7 @@ export default function HospitalDrugPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      {/* 헤더 — 계정/네비게이션 없음. 화면 정체성 + 두 연결(원내 자료 · PC 자동화)만. */}
+      {/* 원내 조회는 무로그인으로 유지하고 O4O 계정 가입은 별도 화면으로 연결한다. */}
       <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -323,6 +323,7 @@ export default function HospitalDrugPage() {
               onDisconnect={disconnectLocal}
             />
             <AgentBadge agent={agent} onRetry={refreshAgent} />
+            <a href="/signup" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-700 hover:underline">O4O 회원가입</a>
           </div>
         </div>
         {localError && (
