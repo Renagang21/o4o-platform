@@ -373,11 +373,10 @@ function LoginRoute() {
  *   /register 는 기존 진입 URL 을 유지하며 공통 계정 가입 화면으로 연결한다.
  */
 function RegisterRoute() {
-  const { openRegisterModal } = useAuthModal();
-
   useEffect(() => {
-    openRegisterModal();
-  }, [openRegisterModal]);
+    // Automatic legacy redirect must not trap Back navigation on /register.
+    window.location.replace('https://neture.co.kr/signup');
+  }, []);
 
   return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">O4O 회원가입 화면으로 이동합니다.</p></Layout>;
 }
