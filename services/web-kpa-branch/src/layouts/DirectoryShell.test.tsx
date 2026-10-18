@@ -50,6 +50,6 @@ describe('DirectoryShell', () => {
     const account = screen.getByRole('button', { name: '계정 메뉴' });
     expect(account.textContent).toContain('검증용 분회 회원');
     fireEvent.click(account);
-    expect(screen.getByRole('menuitem', { name: 'O4O 로그아웃' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'O4O 로그아웃' })).toBeTruthy();
   });
 });

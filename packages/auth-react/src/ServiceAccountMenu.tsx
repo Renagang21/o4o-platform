@@ -33,12 +33,12 @@ export function ServiceAccountMenu({ displayName, email, roleLabel, badge, child
     };
   }, [open]);
   return <div className="o4o-service-account" ref={root}>
-    <button ref={button} type="button" className="o4o-service-account__trigger" aria-label="계정 메뉴" aria-expanded={open} aria-haspopup="menu" aria-controls={open ? id : undefined} title={displayName} onClick={() => setOpen(value => !value)}>
+    <button ref={button} type="button" className="o4o-service-account__trigger" aria-label="계정 메뉴" aria-expanded={open} aria-controls={open ? id : undefined} title={displayName} onClick={() => setOpen(value => !value)}>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="9" r="3" /><path d="M6 19v-1a6 6 0 0 1 12 0v1" /></svg>
       <span className="o4o-service-account__name">{displayName}</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
     </button>
-    {open && <div id={id} className="o4o-service-account__panel" role="menu" aria-label="계정 메뉴">
+    {open && <div id={id} className="o4o-service-account__panel" role="region" aria-label="계정 메뉴">
       <div className="o4o-service-account__identity">
         <p className="o4o-service-account__display-name">{displayName}</p>
         {email && <p>{email}</p>}
@@ -46,7 +46,7 @@ export function ServiceAccountMenu({ displayName, email, roleLabel, badge, child
         {badge}
       </div>
       {children && <div className="o4o-service-account__items" onClick={event => { if ((event.target as HTMLElement).closest('a,button')) setOpen(false); }}>{children}</div>}
-      <button type="button" role="menuitem" className="o4o-service-account__logout" onClick={() => { setOpen(false); void onLogout(); }}>{logoutLabel}</button>
+      <button type="button" className="o4o-service-account__logout" onClick={() => { setOpen(false); void onLogout(); }}>{logoutLabel}</button>
     </div>}
   </div>;
 }

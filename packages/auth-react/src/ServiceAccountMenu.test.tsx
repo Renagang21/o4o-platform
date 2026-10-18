@@ -15,10 +15,11 @@ it('shows one named account trigger and keeps identity details and Demo notice i
   mount();
   const trigger = screen.getByRole('button', { name: '계정 메뉴' });
   expect(within(trigger).getByText(displayName)).toBeTruthy();
+  expect(trigger.hasAttribute('aria-haspopup')).toBe(false);
   expect(screen.queryByText('member@example.invalid')).toBeNull();
   expect(screen.queryByText('Demo 계정')).toBeNull();
   fireEvent.click(trigger);
-  const menu = screen.getByRole('menu');
+  const menu = screen.getByRole('region', { name: '계정 메뉴' });
   expect(within(menu).getByText('Demo 계정')).toBeTruthy();
   expect(within(menu).getByRole('link', { name: '운영 대시보드' }).getAttribute('href')).toBe('/operator');
   expect(screen.getAllByRole('button', { name: '계정 메뉴' })).toHaveLength(1);
@@ -29,11 +30,11 @@ it('closes on Escape with focus restored and on an outside click', () => {
   const trigger = screen.getByRole('button', { name: '계정 메뉴' });
   fireEvent.click(trigger);
   fireEvent.keyDown(document, { key: 'Escape' });
-  expect(screen.queryByRole('menu')).toBeNull();
+  expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
   expect(document.activeElement).toBe(trigger);
   fireEvent.click(trigger);
   fireEvent.mouseDown(screen.getByRole('button', { name: '바깥' }));
-  expect(screen.queryByRole('menu')).toBeNull();
+  expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
 });
 
 it('closes after service navigation and invokes the existing logout only once', () => {
@@ -42,10 +43,10 @@ it('closes after service navigation and invokes the existing logout only once', 
   const trigger = screen.getByRole('button', { name: '계정 메뉴' });
   fireEvent.click(trigger);
   fireEvent.click(screen.getByRole('link', { name: '운영 대시보드' }));
-  expect(screen.queryByRole('menu')).toBeNull();
+  expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
   expect(logout).not.toHaveBeenCalled();
   fireEvent.click(trigger);
-  fireEvent.click(screen.getByRole('menuitem', { name: 'O4O 로그아웃' }));
+  fireEvent.click(screen.getByRole('button', { name: 'O4O 로그아웃' }));
   expect(logout).toHaveBeenCalledTimes(1);
-  expect(screen.queryByRole('menu')).toBeNull();
+  expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
 });

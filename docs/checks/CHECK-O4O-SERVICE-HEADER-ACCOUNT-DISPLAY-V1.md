@@ -39,3 +39,7 @@ Chromium으로 실제 production build를 열고 API를 합성 fixture로 대체
 ## 통합 준비 (2026-10-18)
 
 최신 main ee263cfd93a996ced1e9e009a463cd74ef6d32b1을 작업 branch에 merge했다. 강의 SiteShell의 충돌은 로그인 후 이름 계정 메뉴와 로그인 전 신규 회원가입 링크를 함께 보존하는 것으로 해결했다. 공통 헤더의 현재 메뉴 재선택 닫기와 CarePharm 홈 정비, 분회 가입 링크도 보존했다. 강의·분회 헤더 집중 회귀 5 tests가 통과했다. 배포 여부는 이 준비 기록이 아닌 대상 main SHA의 CI/Delivery/Promote 실제 결과로 판정한다.
+
+### PR #695 접근성 리뷰 보완
+
+ARIA menu의 화살표 키·menuitem 계약을 선언하는 대신 기본 링크/버튼을 쓰는 일반 펼침 영역으로 수정했다. trigger는 aria-expanded/aria-controls로 연결하고 panel은 이름 있는 region으로 제공한다. Tab은 기본 문서 순서를 사용하며 Escape focus 복구·외부 클릭 닫기는 유지한다. 관련 공통/Neture/분회 10 tests가 통과했다.

@@ -20,7 +20,7 @@ it.each(['main', 'supplier', 'funding', 'community', 'carepharm'])('%s shows one
   expect(screen.queryByRole('button', { name: '사용자 메뉴' })).toBeNull();
   expect(screen.queryByText('Demo 계정')).toBeNull();
   fireEvent.click(trigger);
-  expect(within(screen.getByRole('menu')).getByText('Demo 계정')).toBeTruthy();
+  expect(within(screen.getByRole('region', { name: '계정 메뉴' })).getByText('Demo 계정')).toBeTruthy();
   expect(screen.getAllByRole('button', { name: '계정 메뉴' })).toHaveLength(1);
-  expect(within(screen.getByRole('menu')).getByText('설정')).toBeTruthy();
+  expect(within(screen.getByRole('region', { name: '계정 메뉴' })).getByText('설정')).toBeTruthy();
 });
