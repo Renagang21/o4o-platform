@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { coreApiClient } from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
+import { useConsultationSpeech } from './useConsultationSpeech';
 
 const base = '/neture/pharmacy/multilingual-consultation';
 type Mode = { key: string; label: string; professional: boolean; entitled: boolean; allowed: boolean };
@@ -31,6 +32,11 @@ function Consultation({ organizationId }: Readonly<{ organizationId: string }>) 
   const dialog = useRef<HTMLDialogElement>(null);
   const current = context?.modes.find(item => item.key === mode);
   const fixedResponse = mode === 'floor-staff' && direction === 'to-customer';
+  const speech = useConsultationSpeech(`${organizationId}:${mode}:${language}:${direction}`, words => {
+    version.current++; setBusy(false); setResult(null);
+    setError(text.length + words.length + 1 > 1000 ? '음성 입력은 1,000자까지 반영했습니다. 문장을 확인해 주세요.' : '');
+    setText(previous => [previous.trim(), words].filter(Boolean).join(' ').slice(0, 1000));
+  });
   useEffect(() => {
     alive.current = true;
     const forget = () => { version.current++; setText(''); setResult(null); setBusy(false); dialog.current?.close(); };
@@ -53,10 +59,11 @@ function Consultation({ organizationId }: Readonly<{ organizationId: string }>) 
   }, [organizationId, retry]);
 
   const clear = () => {
-    version.current++; setResult(null); setText(''); setError(''); setBusy(false); dialog.current?.close();
+    speech.reset(); version.current++; setResult(null); setText(''); setError(''); setBusy(false); dialog.current?.close();
   };
   const translate = async () => {
-    if (!current?.allowed || busy || (!fixedResponse && !text.trim())) return;
+    if (!current?.allowed || busy || speech.listening || (!fixedResponse && !text.trim())) return;
+    speech.reset();
     const request = ++version.current;
     const captured = { mode, language, direction };
     setBusy(true); setError(''); setResult(null);
@@ -87,6 +94,7 @@ function Consultation({ organizationId }: Readonly<{ organizationId: string }>) 
       {!context && <button type="button" className="mt-2 underline" onClick={() => { clear(); setRetry(value => value + 1); }}>다시 확인</button>}
       {context && <button type="button" className="mt-2 underline" onClick={() => { clear(); setRetry(value => value + 1); }}>이용 상태 다시 확인</button>}
     </div>}
+    {speech.message && <p role="status" className="rounded border bg-amber-50 p-3 text-sm">{speech.message}</p>}
     {!context && !error && <p role="status">상담 이용 상태를 확인하는 중…</p>}
     {context && <>
       <div className="grid gap-4 rounded-xl border bg-white p-4 sm:grid-cols-2">
@@ -103,20 +111,31 @@ function Consultation({ organizationId }: Readonly<{ organizationId: string }>) 
         {fixedResponse ? <><p className="text-sm text-slate-600">직원은 매장 안내 문구를 선택합니다. 약 선택·복용 문의는 약사에게 연결해 주세요.</p>
           <label className="block space-y-2"><span className="font-medium">안내 문구</span><select className="w-full rounded border p-2" value={phrase} onChange={event => { clear(); setPhrase(event.target.value); }}>{context.phrases.map(item => <option key={item.key} value={item.key}>{item.text}</option>)}</select></label></>
           : <label className="block space-y-2"><span className="font-medium">{direction === 'to-customer' ? '고객에게 전달할 한국어 문장' : '고객이 입력한 문장'}</span>
-            <textarea aria-label={direction === 'to-customer' ? '고객에게 전달할 한국어 문장' : '고객이 입력한 문장'} autoComplete="off" className="min-h-32 w-full rounded border p-3" maxLength={1000} value={text} onChange={event => { version.current++; setBusy(false); setResult(null); setError(''); setText(event.target.value); }} />
+            <textarea aria-label={direction === 'to-customer' ? '고객에게 전달할 한국어 문장' : '고객이 입력한 문장'} autoComplete="off" className="min-h-32 w-full rounded border p-3" maxLength={1000} value={text} onChange={event => { speech.reset(); version.current++; setBusy(false); setResult(null); setError(''); setText(event.target.value); }} />
             <span className="block text-right text-xs text-slate-500">{text.length}/1,000자</span></label>}
-        <p className="text-xs text-slate-500">문장은 번역 서비스로 전달됩니다. 이름·연락처 등 식별 정보는 입력하지 마세요. 상담 내용은 저장하지 않으며 화면을 나가거나 새 상담을 시작하면 지워집니다.</p>
-        <button type="button" className="min-h-11 rounded bg-blue-700 px-5 py-2 text-white disabled:opacity-50" disabled={busy || (!fixedResponse && !text.trim())} onClick={() => void translate()}>{busy ? '번역 중…' : '번역하기'}</button>
+        {!fixedResponse && <div className="space-y-2">
+          <p className="text-xs text-slate-500">마이크를 켜면 브라우저의 음성 인식 서비스로 음성이 전달될 수 있습니다. 입력된 문장을 확인·수정한 뒤 번역해 주세요.</p>
+          {speech.inputSupported ? <button type="button" disabled={busy} aria-pressed={speech.listening} className="min-h-11 rounded border px-4 py-2 disabled:opacity-50"
+            onClick={() => speech.listening ? speech.finishListening() : speech.startListening(direction === 'to-customer' ? 'ko' : language)}>{speech.listening ? '음성 입력 마치기' : '마이크 켜기'}</button>
+            : <p className="text-sm text-slate-600">이 브라우저는 음성 입력을 지원하지 않습니다. 문자를 직접 입력해 주세요.</p>}
+          {speech.listening && <p role="status" className="text-sm text-blue-800">음성을 듣고 있습니다. 말을 마친 뒤 입력된 문장을 확인해 주세요.</p>}
+        </div>}
+        <p className="text-xs text-slate-500">문장은 번역 서비스로 전달됩니다. 음성 입력·읽어주기는 브라우저·기기 서비스에서 처리하며 지원 언어가 다를 수 있습니다. 이름·연락처 등 식별 정보는 입력하지 마세요. O4O는 음성 파일과 상담 내용을 저장하지 않으며 화면을 나가거나 새 상담을 시작하면 문장이 지워집니다.</p>
+        <button type="button" className="min-h-11 rounded bg-blue-700 px-5 py-2 text-white disabled:opacity-50" disabled={busy || speech.listening || (!fixedResponse && !text.trim())} onClick={() => void translate()}>{busy ? '번역 중…' : '번역하기'}</button>
         {busy && <p role="status">문장을 번역하고 있습니다…</p>}
         {result && <div className="space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-4" aria-live="polite">
           <p className="whitespace-pre-wrap break-words text-sm text-slate-600">{result.source}</p>
           <p className="whitespace-pre-wrap break-words text-xl font-medium" lang={direction === 'to-customer' ? language : 'ko'}>{result.translation}</p>
+          {speech.outputSupported ? <button type="button" className="min-h-11 rounded border px-3 py-2" onClick={() => speech.speaking ? speech.stopReading() : speech.read(result.translation, direction === 'to-customer' ? language : 'ko')}>{speech.speaking ? '읽어주기 중지' : '번역문 읽어주기'}</button>
+            : <p className="text-sm text-slate-600">이 브라우저는 읽어주기를 지원하지 않습니다. 문자 화면을 이용해 주세요.</p>}
           {direction === 'to-customer' && <button type="button" className="min-h-11 rounded border border-blue-700 px-3 py-2 text-blue-800" onClick={() => dialog.current?.showModal()}>고객에게 크게 보여주기</button>}
         </div>}
       </section>}
     </>}
-    <dialog ref={dialog} aria-label="고객용 번역 화면" className="max-h-[90vh] w-11/12 max-w-4xl rounded-xl p-5 backdrop:bg-black/50">
+    <dialog ref={dialog} aria-label="고객용 번역 화면" onClose={speech.stopReading} onCancel={speech.stopReading} className="max-h-[90vh] w-11/12 max-w-4xl rounded-xl p-5 backdrop:bg-black/50">
       <p className="whitespace-pre-wrap break-words text-3xl leading-relaxed sm:text-5xl" lang={language}>{result?.translation}</p>
+      {speech.message && <p role="status" className="mt-4 text-sm text-amber-800">{speech.message}</p>}
+      {result && speech.outputSupported && <button type="button" className="mt-4 min-h-11 rounded border px-4 py-2" onClick={() => speech.speaking ? speech.stopReading() : speech.read(result.translation, language)}>{speech.speaking ? '읽어주기 중지' : '고객에게 읽어주기'}</button>}
       <form method="dialog" className="mt-6"><button className="min-h-11 rounded border px-4 py-2">직원 화면으로 돌아가기</button></form>
     </dialog>
   </main>;
