@@ -550,6 +550,11 @@ export default function AdminSemiFranchisePage() {
                               {op.email}
                             </span>
                           )}
+                          {op.membershipStatus !== "active" && (
+                            <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-800">
+                              Neture 이용 자격 없음 — 사업 운영 불가
+                            </span>
+                          )}
                         </li>
                       ))}
                     </ul>

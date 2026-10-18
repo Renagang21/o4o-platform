@@ -131,8 +131,15 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
     const list = await as(admin).get('/admin/semi-franchises');
     const byKey = Object.fromEntries(list.body.data.map((b: any) => [b.key, b]));
     expect(byKey.carepharm.operators).toEqual([]);
-    expect(byKey.carepharm.roleOperators).toEqual([expect.objectContaining({ userId: careOperator, role: 'neture:carepharm_operator' })]);
-    expect(byKey.megapharm.roleOperators).toEqual([expect.objectContaining({ userId: megaAdmin, role: 'neture:megapharm_admin' })]);
+    expect(byKey.carepharm.roleOperators).toEqual([expect.objectContaining({ userId: careOperator, role: 'neture:carepharm_operator', membershipStatus: 'active' })]);
+    expect(byKey.megapharm.roleOperators).toEqual([expect.objectContaining({ userId: megaAdmin, role: 'neture:megapharm_admin', membershipStatus: 'active' })]);
+    expect(byKey.carepharm.roleOperators[0]).not.toHaveProperty('account_status');
+
+    // 역할은 그대로여도 Neture 메인 이용이 정지되면 운영 불가로 표시된다(역할 · 정지 원장은 바꾸지 않는다).
+    await db.query(`INSERT INTO service_memberships (user_id, service_key, status) VALUES ($1, 'neture', 'suspended')`, [megaAdmin]);
+    const suspended = await as(admin).get('/admin/semi-franchises');
+    expect(suspended.body.data.find((b: any) => b.key === 'megapharm').roleOperators[0].membershipStatus).toBe('suspended');
+    await db.query(`DELETE FROM service_memberships WHERE user_id = $1`, [megaAdmin]);
   });
 
   it('isolates each business operator while both applications are pending, then approves each', async () => {

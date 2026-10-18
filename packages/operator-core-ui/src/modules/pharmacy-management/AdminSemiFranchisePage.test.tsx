@@ -273,8 +273,8 @@ it("lists centrally assigned business roles separately from revocable individual
       ...business,
       operators: [{ userId: "individual-user", assignedAt: "" }],
       roleOperators: [
-        { userId: "role-user", role: "neture:a_admin", name: null, email: "role@example.invalid" },
-        { userId: "named-user", role: "neture:a_operator", name: "합성 담당", email: "named@example.invalid" },
+        { userId: "role-user", role: "neture:a_admin", name: null, email: "role@example.invalid", membershipStatus: "active" },
+        { userId: "named-user", role: "neture:a_operator", name: "합성 담당", email: "named@example.invalid", membershipStatus: "active" },
       ],
     },
   ]);
@@ -291,4 +291,19 @@ it("lists centrally assigned business roles separately from revocable individual
   await waitFor(() => expect(api.revokeOperator).toHaveBeenCalledWith("a", "individual-user"));
   expect(api.revokeOperator).toHaveBeenCalledTimes(1);
   expect(screen.queryByText(/가입 승인·자료 운영을 맡을/)).toBeNull();
+});
+
+it("keeps the operator prompt when the only role holder cannot use business routes", async () => {
+  api.listSemiFranchises.mockResolvedValue([
+    {
+      ...business,
+      roleOperators: [
+        { userId: "suspended-user", role: "neture:a_operator", name: "정지 담당", email: null, membershipStatus: "suspended" },
+      ],
+    },
+  ]);
+  render(<Page />);
+  const roles = await screen.findByLabelText("합성 사업 지정 역할 보유자");
+  expect(within(roles).getByText(/Neture 이용 자격 없음/)).toBeTruthy();
+  expect(screen.getByText(/가입 승인·자료 운영을 맡을/)).toBeTruthy();
 });

@@ -32,7 +32,9 @@ export function BusinessFeatureSummary({
         </p>
       )}
       {(business.operators ?? []).length === 0 &&
-        (business.roleOperators ?? []).length === 0 && (
+        !(business.roleOperators ?? []).some(
+          (op) => op.membershipStatus === "active",
+        ) && (
         <p className="text-gray-500">
           가입 승인·자료 운영을 맡을 담당 운영자를 지정해 주세요.
         </p>

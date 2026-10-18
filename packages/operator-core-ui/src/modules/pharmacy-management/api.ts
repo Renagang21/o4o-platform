@@ -57,7 +57,14 @@ export interface SemiFranchise {
   activeMemberCount?: number;
   operators?: Array<{ userId: string; assignedAt: string }>;
   /** 운영자 관리 화면에서 지정한 사업 한정 역할 — 조회 전용(여기서 해제하지 않는다). */
-  roleOperators?: Array<{ userId: string; role: string; name: string | null; email: string | null }>;
+  roleOperators?: Array<{
+    userId: string;
+    role: string;
+    name: string | null;
+    email: string | null;
+    /** Neture 메인 이용 자격 — active 가 아니면 역할이 있어도 사업 운영 경로를 쓸 수 없다. */
+    membershipStatus?: string;
+  }>;
 }
 
 export interface SemiFranchiseMembership {
