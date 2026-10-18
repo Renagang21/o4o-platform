@@ -16,6 +16,7 @@ function mount() {render(<MemoryRouter initialEntries={['/supplier/supply-propos
 async function create() {
   await waitFor(()=>expect((screen.getByLabelText('제품') as HTMLSelectElement).value).toBe('offer-a'));
   fireEvent.change(screen.getByLabelText('공통 공급 가격 (원)'),{target:{value:'1000'}});
+  fireEvent.change(screen.getByLabelText('공통 기본 배송비 (원)'),{target:{value:'3000'}});
   fireEvent.click(screen.getByLabelText('협업체 A'));
   fireEvent.click(screen.getByRole('button',{name:'협업체별 초안 만들기'}));
   fireEvent.click(screen.getByRole('button',{name:'협업체 A 승인 요청'}));

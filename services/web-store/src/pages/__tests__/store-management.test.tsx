@@ -95,6 +95,20 @@ describe('내 매장 경영지원', () => {
     await waitFor(() => expect(mocks.supply).toHaveBeenLastCalledWith(expect.objectContaining({ source: 'sf:diabetes' })));
     expect(screen.queryByRole('button', { name: '승인 대기 사업' })).toBeNull();
   });
+  it('공급 제안의 승인된 배송조건과 최소금액을 약국에 표시한다', async () => {
+    mocks.supply.mockResolvedValue({items:[{kind:'proposal',optionId:'proposal-a',offerId:'offer-a',productName:'조건 제품',supplierName:'가상 공급자',semiFranchiseKey:'diabetes',semiFranchiseName:'혈당관리 사업',unitPrice:1000,
+      termsSnapshot:{version:1,baseShippingFee:2000,freeShippingThreshold:50000,minOrderAmount:10000}}],total:1});
+    mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
+    await screen.findByText('조건 제품');
+    expect(screen.getByText(/배송비 2,000원/)).toBeTruthy();
+    expect(screen.getByText(/50,000원 이상 무료배송/)).toBeTruthy();
+    expect(screen.getByText(/최소 주문 10,000원/)).toBeTruthy();
+  });
+  it('과거 제안에 고정 조건을 만들어 표시하지 않는다', async () => {
+    mocks.supply.mockResolvedValue({items:[{kind:'proposal',optionId:'proposal-a',offerId:'offer-a',productName:'기존 제품',supplierName:'가상 공급자',semiFranchiseKey:'pharmacy',semiFranchiseName:'기본 약국 사업',unitPrice:1000,termsSnapshot:null}],total:1});
+    mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
+    await screen.findByText('기존 제품');expect(screen.getByText(/기존 제안 · 공급자 공통 배송정책 적용/)).toBeTruthy();
+  });
   it('제공 자료는 사업별 조회하고 독립 사본 원칙을 표시한다', async () => {
     mount(<PharmacyContentSourcesPage />, '/store/pharmacy/contents?business=diabetes');
     await waitFor(() => expect(mocks.contents).toHaveBeenCalledWith(expect.objectContaining({ sf: 'diabetes' })));

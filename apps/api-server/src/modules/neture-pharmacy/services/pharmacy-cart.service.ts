@@ -81,7 +81,11 @@ export function groupCheckoutLines(lines: CheckoutLine[]): CheckoutGroup[] {
   const groups = new Map<string, CheckoutGroup>();
   for (const line of lines) {
     const receiverKey = receiverKeyOf(line.option.semiFranchiseKey, line.option.paymentReceiverKey);
-    const k = `${receiverKey}\u0000${line.option.supplierId}`;
+    // New fixed conditions cannot share shipping/minimum amounts across businesses or different terms.
+    const termsKey = line.option.termsSnapshot ? JSON.stringify([
+      line.option.semiFranchiseKey, line.option.baseShippingFee, line.option.freeShippingThreshold, line.option.minOrderAmount ?? 0,
+    ]) : 'legacy';
+    const k = `${receiverKey}\u0000${line.option.supplierId}\u0000${termsKey}`;
     const g = groups.get(k) ?? { receiverKey, supplierId: line.option.supplierId, lines: [] };
     g.lines.push(line);
     groups.set(k, g);
@@ -242,6 +246,12 @@ export class PharmacyCartService {
     const createdOrders: Array<{ orderId: string; orderNumber: string; supplierId: string; receiverKey: string; paymentGroupId: string; totalAmount: number }> = [];
 
     for (const group of groupCheckoutLines(lines)) {
+      const subtotal = group.lines.reduce((sum, line) => sum + line.option.unitPrice * line.quantity, 0);
+      if (subtotal < (group.lines[0].option.minOrderAmount ?? 0)) {
+        for (const line of group.lines) failedItems.push({ itemId: line.cartItemId, productName: line.option.productName,
+          code: 'MIN_ORDER_AMOUNT_NOT_MET', message: `해당 협업체 조건의 최소 주문금액(${group.lines[0].option.minOrderAmount}원)을 충족하지 못했습니다.` });
+        continue;
+      }
       // 2a. 이벤트 수량 원자 차감 (기존 함수 그대로)
       const eventLines = group.lines.filter((l) => l.option.kind === 'event');
       const reservations: Array<{ listingId: string; qty: number }> = [];
@@ -300,6 +310,7 @@ export class PharmacyCartService {
           unitPrice: l.option.unitPrice,
           cartItemId: l.cartItemId,
           conditions: {
+            proposalTerms: l.option.termsSnapshot ?? null,
             startAt: l.option.startAt,
             endAt: l.option.endAt,
             perStoreLimit: l.option.perStoreLimit,
