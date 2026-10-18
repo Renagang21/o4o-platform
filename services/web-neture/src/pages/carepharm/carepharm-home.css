@@ -1,0 +1,9 @@
+.carepharm-home .home-hero { padding-block: 28px; margin-bottom: 0; }
+.carepharm-home .home-hero-main { min-height: 156px; }
+.carepharm-home .home-hero-description { min-height: 0; }
+.carepharm-home { overflow-wrap: anywhere; }
+.carepharm-home h2 { word-break: keep-all; }
+@media (max-width: 640px) {
+  .carepharm-home .home-hero { padding-block: 24px; }
+  .carepharm-home .home-hero-main { min-height: 0; }
+}

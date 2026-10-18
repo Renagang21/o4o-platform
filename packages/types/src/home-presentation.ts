@@ -116,8 +116,8 @@ const COPY: Record<HomeSurface, [string, string, string, string]> = {
   carepharm: [
     "만성질환 관리, 약국이 함께합니다",
     "참여 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.",
-    "꾸준한 상담을 함께 고민합니다",
-    "복약 상담과 지속적인 건강 관리에 도움이 되는 현장 경험을 나눠보세요.",
+    "함께 나누는 약국 경영 자료",
+    "회원 자료와 협업체 소식을 확인하고 내 약국에서 활용하세요.",
   ],
   pharmacy: [
     "약국의 일상에 든든한 연결",
@@ -158,7 +158,7 @@ export function initialHomePresentation(
   });
   return {
     enabled: true,
-    slides: [
+    slides: surface === "carepharm" ? [message("welcome", title, description)] : [
       message("welcome", title, description),
       message("discover", secondTitle, secondDescription),
     ],

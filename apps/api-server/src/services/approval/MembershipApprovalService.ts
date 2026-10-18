@@ -1,3 +1,5 @@
+import { recordOperation } from '../operations/operation-audit.js';
+import { assertOrdinaryServiceMember } from '../operations/service-relationship-protection.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 /**
  * MembershipApprovalService — Core-level approval logic
@@ -1393,6 +1395,7 @@ export class MembershipApprovalService {
       }
 
       if (mode === 'hard') {
+        await assertOrdinaryServiceMember(queryRunner, userId, serviceKeys);
         // WO-O4O-HARD-DELETE-SERVICE-SCOPED-V1:
         // users는 공통 Identity — 절대 삭제 금지.
         // serviceKey 범위의 데이터만 정리한다.
@@ -1468,6 +1471,11 @@ export class MembershipApprovalService {
           [userId]
         );
 
+        for (const serviceKey of serviceKeys) {
+          await recordOperation(queryRunner, serviceKey, deletedBy, 'member.admin.relationship_cleanup', {
+            userId, mode: 'hard', commonIdentityDeleted: false, authoredActivityDeleted: false,
+          });
+        }
         await queryRunner.commitTransaction();
         logger.info('[ApprovalService] HARD_DELETE_SUCCESS', {
           userId, deletedBy, serviceKeys, isPlatformAdmin,

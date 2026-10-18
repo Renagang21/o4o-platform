@@ -652,8 +652,12 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   const myServices: EntryItem[] = [];
   for (const business of data.communities ?? []) {
     if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
-    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`,
-      action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` } });
+    // 독립 사업은 pharmacy 개인 가입을 요구하는 service handoff로 우회하지 않는다.
+    // CarePharm은 기존 alias, 메가팜은 공개 호스트(현재 별도 handoff alias 없음)를 사용한다.
+    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` };
+    if (business.businessKey === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
+    else if (business.businessKey === 'megapharm') action = { kind: 'public', href: 'https://megapharm.neture.co.kr/' };
+    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`, action });
   }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;

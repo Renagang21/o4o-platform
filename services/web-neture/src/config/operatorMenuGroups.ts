@@ -30,13 +30,13 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // 그룹 이동으로 인한 권한 회귀 없음. (라벨: '공급자 활성화' → '공급자 승인')
     { label: '공급자 승인', path: '/operator/suppliers' },
     // WO-O4O-NETURE-OPERATOR-SIDEBAR-DEAD-LINKS-CLEANUP-V1: adminOnly 항목은 /operator/* 라우트가
-    // 없으므로 실제 존재하는 /admin/* 로 정정 (회원 완전삭제 와 동일 패턴). 권한자에게만 노출.
+    // 없으므로 실제 존재하는 /admin/* 로 정정 (서비스 가입 정리 와 동일 패턴). 권한자에게만 노출.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
     // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 이 경로는 더 이상 관리 화면이 아니라
     //   중앙 관리자 `/operators` 안내 화면이다. 진입 동선은 유지하고 라벨만 안내 성격으로 정정.
     { label: '운영자 관리 안내', path: '/admin/operators', adminOnly: true },
     // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
-    { label: '회원 완전삭제', path: '/admin/members', adminOnly: true },
+    { label: '서비스 가입 정리', path: '/admin/members', adminOnly: true },
     // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: dead link 해소 + operator 노출
     { label: '문의 메시지', path: '/operator/contact-messages' },
   ],
@@ -64,7 +64,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
     { label: '카테고리 관리', path: '/admin/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/admin/brands', adminOnly: true },
-    { label: '상품 데이터 정리', path: '/admin/product-cleanup', adminOnly: true },
+    { label: '상품 데이터 정리', path: '/operator/product-cleanup' },
     { label: '마스터 관리', path: '/admin/masters', adminOnly: true },
     { label: '카탈로그 일괄등록', path: '/admin/catalog-import', adminOnly: true },
     // category-mapping-rules 는 /operator 라우트가 실제 존재하므로 유지.
@@ -128,7 +128,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
  *   /admin/* prefix 로 노출했다. 결과적으로 /admin 좌측 메뉴가 operator sidebar 의 superset 으로
  *   보였다 ("operator 처럼 보임" 증상의 핵심).
  *
- *   본 함수는 admin 전용 항목 (UNIFIED_MENU 의 adminOnly: true 항목 + 회원 완전삭제) 만 뽑아 보여준다.
+ *   본 함수는 admin 전용 항목 (UNIFIED_MENU 의 adminOnly: true 항목 + 서비스 가입 정리) 만 뽑아 보여준다.
  *   가입 승인 / 상품 관리 / 주문 관리 / 사이니지 / 포럼 / AI 리포트 같은 operator 업무는
  *   admin sidebar 에서 제외되며, system group 의 "운영자 업무 →" 링크로 /operator 진입 안내.
  *
@@ -152,11 +152,10 @@ export function getAdminMenu(
     ],
     users: [
       // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
-      { label: '회원 완전삭제', path: '/admin/members' },
+      { label: '서비스 가입 정리', path: '/admin/members' },
       // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리(운영자 지정) 성격 — 라벨 표면화.
       // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 중앙 관리자 `/operators` 안내 화면.
       { label: '운영자 관리 안내', path: '/admin/operators' },
-      { label: '문의 메시지', path: '/admin/contact-messages' },
     ],
     approvals: [
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:

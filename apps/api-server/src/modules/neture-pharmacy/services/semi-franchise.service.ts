@@ -1,3 +1,5 @@
+import { recordOperation } from '../../../services/operations/operation-audit.js';
+import { hasCooperativeOperatorAccess } from './cooperative-operator-access.js';
 import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { businessCommunityKeyTaken } from '../../../services/community/community-key-namespace.js';
 /**
@@ -236,7 +238,7 @@ export class SemiFranchiseService {
     );
   }
 
-  async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown }): Promise<SemiFranchiseRow> {
+  async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown }, actorId: string | null = null): Promise<SemiFranchiseRow> {
     const serviceFeatures = validateServiceFeatures(input.serviceFeatures === undefined ? [] : input.serviceFeatures);
     const key = typeof input.key === 'string' ? input.key.trim().toLowerCase() : '';
     if (input.registrationConditions !== undefined && (typeof input.registrationConditions !== 'string' || input.registrationConditions.length > 4000)) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
@@ -261,6 +263,7 @@ export class SemiFranchiseService {
          RETURNING id, key, name, organization_id, status, payment_receiver_key, community_key`,
         [key, name, org.id, communityKey],
       );
+      await recordOperation(m, 'neture', actorId, 'business.admin.create', { businessId: row.id, key });
       return { ...row, service_features: serviceFeatures };
     });
   }
@@ -272,6 +275,7 @@ export class SemiFranchiseService {
   async update(
     key: string,
     patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown },
+    actorId: string | null = null,
   ): Promise<SemiFranchiseRow> {
     const serviceFeatures = patch.serviceFeatures === undefined ? undefined : validateServiceFeatures(patch.serviceFeatures);
     const sf = await this.getByKey(key);
@@ -311,6 +315,7 @@ export class SemiFranchiseService {
           patch.paymentReceiverKey?.trim() || null,
         ],
       ));
+      await recordOperation(m, 'neture', actorId, 'business.admin.update', { businessId: sf.id, fields: Object.keys(patch) });
       return { ...row, registration_conditions: patch.registrationConditions?.trim() ?? sf.registration_conditions, service_features: serviceFeatures ?? sf.service_features ?? [] };
     });
   }
@@ -318,31 +323,26 @@ export class SemiFranchiseService {
   async assignOperator(key: string, userId: string, assignedBy: string) {
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
-    // 담당 지정은 이미 Neture 운영 role 을 가진 사용자에게만 — 담당 관계가 role 을 대신하지 않는다.
-    const [hasRole] = await this.dataSource.query(
-      `SELECT 1 FROM role_assignments
-        WHERE user_id = $1 AND role IN ('neture:operator','neture:admin') AND is_active = true LIMIT 1`,
-      [userId],
-    );
-    if (!hasRole) throw new NeturePharmacyError(409, 'NOT_NETURE_OPERATOR', 'Neture 운영자 role 이 없는 사용자입니다.');
-    const rows = await this.dataSource.query(
-      `INSERT INTO semi_franchise_operators (semi_franchise_id, user_id, assigned_by)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (semi_franchise_id, user_id) WHERE revoked_at IS NULL DO NOTHING
-       RETURNING id`,
-      [sf.id, userId, assignedBy],
-    );
-    return { assigned: rows.length > 0 };
+    return this.dataSource.transaction(async manager => {
+      if (!(await hasCooperativeOperatorAccess(manager, userId))) throw new NeturePharmacyError(409, 'NOT_NETURE_OPERATOR', '현재 Neture 운영 권한과 메인 이용 자격이 필요합니다.');
+      const rows = await manager.query(
+        `INSERT INTO semi_franchise_operators (semi_franchise_id, user_id, assigned_by)
+         VALUES ($1, $2, $3) ON CONFLICT (semi_franchise_id, user_id) WHERE revoked_at IS NULL DO NOTHING RETURNING id`,
+        [sf.id, userId, assignedBy]);
+      if (rows.length) await recordOperation(manager, 'neture', assignedBy, 'business.admin.operator_assign', { businessId: sf.id, userId });
+      return { assigned: rows.length > 0 };
+    });
   }
 
-  async revokeOperator(key: string, userId: string) {
+  async revokeOperator(key: string, userId: string, actorId: string | null = null) {
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
-    const rows = rowsOf(await this.dataSource.query(
-      `UPDATE semi_franchise_operators SET revoked_at = NOW()
-        WHERE semi_franchise_id = $1 AND user_id = $2 AND revoked_at IS NULL RETURNING id`,
-      [sf.id, userId],
-    ));
-    return { revoked: rows.length > 0 };
+    return this.dataSource.transaction(async manager => {
+      const rows = rowsOf(await manager.query(
+        `UPDATE semi_franchise_operators SET revoked_at = NOW()
+          WHERE semi_franchise_id = $1 AND user_id = $2 AND revoked_at IS NULL RETURNING id`, [sf.id, userId]));
+      if (rows.length) await recordOperation(manager, 'neture', actorId, 'business.admin.operator_revoke', { businessId: sf.id, userId });
+      return { revoked: rows.length > 0 };
+    });
   }
 }
