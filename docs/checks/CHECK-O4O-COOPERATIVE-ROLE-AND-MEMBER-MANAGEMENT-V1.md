@@ -1,7 +1,7 @@
 # CHECK-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1
 
 - 작성: 2026-10-18
-- 상태: LOCAL_VERIFIED · PUSH_PENDING · 운영 미적용
+- 상태: LOCAL_VERIFIED · PUSHED · 운영 미적용
 - branch: `wo/cooperative-role-management`
 - base: `6419df05c7103d77f500b775c6ff914f9cb6c5a6`
 - 정책: [설계](../design/DESIGN-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md) · [TODO](../work-orders/TODO-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md)
@@ -48,3 +48,9 @@
 - 회원 게시판/자료 본문 화면은 기존 placeholder 범위를 유지한다. 이번 구현은 회원관리와 기존 공급조건·콘텐츠 운영 권한 정비다.
 - 실제 migration·운영 배포는 별도 통합 담당 공간에서 수행한다. 본 branch를 main에 직접 push하지 않는다.
 - 문서 정합: 권한 설계·TODO·서비스 README·현행 사업 설계·RBAC 카탈로그를 새 정책에 맞췄으며 과거 CHECK/WO 이력은 보존했다.
+
+## Git / 작업공간 인계
+
+- 구현 commit: `ec56052809`, 원격 `wo/cooperative-role-management` push 완료. 마지막 CLI 이력 보완 후 조합 PostgreSQL 19개와 production API bundle을 재검증했다.
+- PR: 사용자 지시로 미생성. PR CI·main 통합·운영 deployment/smoke 미실행.
+- WORKTREE_DISPOSITION: `/workspace/o4o-wt/cooperative-role-management` / `wo/cooperative-role-management` / base `6419df05c7` / verdict `KEEP` (후속 검토·통합용 branch-only commits 보존).

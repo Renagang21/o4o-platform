@@ -1,7 +1,7 @@
 # TODO-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1
 
 - 작성: 2026-10-18
-- 상태: LOCAL_VERIFIED · PUSH_PENDING
+- 상태: PUSHED · 운영 미적용
 - 사용자 승인: 연합회 산하 조합관리와 개별 조합원관리의 admin/operator 분리. 개발·검증·commit·push까지. PR 생성·병합·운영 DB 적용·배포 없음.
 - 기준: origin/main 6419df05c7. 도메인 https://pharmcoop.neture.co.kr.
 
@@ -18,7 +18,7 @@
 - [x] 기존 사업 운영 API와 테스트 조합 provisioning을 조합별 권한에 맞춤
 - [x] forward migration·개인정보 삭제 경계·스키마 fingerprint 검증
 - [x] 권한/API/격리 PostgreSQL·UI 검증, 결과 기록
-- [ ] 문서 정합 점검·commit·push·인계
+- [x] 문서 정합 점검·commit·push·인계
 
 ## 확정 권한
 
@@ -45,3 +45,5 @@
 ## 검증 및 인계
 
 [검증 기록](../checks/CHECK-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md)을 따른다. 신규 migration은 격리 DB에서만 검증했으며 운영 적용·계정 생성·배포는 수행하지 않았다. PR 생성 없이 branch push 후 종료한다.
+
+- 구현 commit `ec56052809`를 전용 branch에 push 완료했다. PR 생성·병합·운영 적용은 수행하지 않았다.
