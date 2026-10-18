@@ -12,23 +12,22 @@ import { roleAssignmentService } from '../../auth/services/role-assignment.servi
  * 기존 관리자 API 로 등록한 뒤에만 노출되고, 각 사업 담당(광역 역할 없음)은 자기 사업 신청만 조회 · 승인한다.
  * 세션 인증만 합성이다. 역할 · 가입 · 접근 판정과 SQL 은 일회용 DB 를 쓴다. 운영 DB 금지.
  */
-jest.mock('../../../middleware/auth.middleware.js', () => ({
-  ...jest.requireActual('../../../common/middleware/auth/authorization.middleware.js'),
-  requireAuth: (req: any, res: any, next: any) => req.user ? next() : res.status(401).json({ code: 'UNAUTHORIZED' }),
-}));
-jest.mock('../../../services/checkout.service.js', () => ({ checkoutService: {} }));
-jest.mock('../../../routes/kpa/services/event-offer.service.js', () => ({ EventOfferService: class {} }));
-jest.mock('../services/pharmacy-store-provisioner.js', () => ({ createPharmacyStoreProvisioner: () => ({}) }));
-jest.mock('../services/business-registration-document.service.js', () => ({ BusinessRegistrationDocumentService: class {} }));
+// 이 suite 가 실행하지 않는 주문 · 매장 생성 · 문서 · 자산 의존성은 빈 구현으로 둔다.
 jest.mock('@o4o/asset-copy-core', () => ({ AssetCopyService: class {} }), { virtual: true });
+jest.mock('../services/business-registration-document.service.js', () => ({ BusinessRegistrationDocumentService: class {} }));
+jest.mock('../services/pharmacy-store-provisioner.js', () => ({ createPharmacyStoreProvisioner: () => ({}) }));
+jest.mock('../../../routes/kpa/services/event-offer.service.js', () => ({ EventOfferService: class {} }));
+jest.mock('../../../services/checkout.service.js', () => ({ checkoutService: {} }));
+jest.mock('../../../middleware/auth.middleware.js', () => {
+  const actual = jest.requireActual('../../../common/middleware/auth/authorization.middleware.js');
+  return { ...actual, requireAuth: (req: any, res: any, next: any) => (req.user ? next() : res.status(401).end()) };
+});
 
+/** 전용 loopback fixture DB 만 허용한다(운영 · 공유 DB 오지정 차단). */
+const FIXTURE_DB = '127.0.0.1:55432/o4o_feature_test';
 const url = process.env.NETURE_PHARMACY_IT_DATABASE_URL;
-if (url) {
-  const target = new URL(url);
-  if (target.protocol !== 'postgresql:' || target.hostname !== '127.0.0.1' || target.port !== '55432' ||
-      target.pathname !== '/o4o_feature_test' || target.search || target.hash) {
-    throw new Error('Care/Mega ledger integration requires its dedicated loopback fixture database');
-  }
+if (url && !new RegExp(`^postgresql://[^@/]*@${FIXTURE_DB.replace(/\./g, '\\.')}$`).test(url)) {
+  throw new Error(`Care/Mega ledger integration requires ${FIXTURE_DB}`);
 }
 const KEYS = ['carepharm', 'megapharm'] as const;
 const suite = url ? describe : describe.skip;
@@ -52,38 +51,39 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
     db = await new DataSource({ type: 'postgres', url, entities: [] }).initialize();
     const existing = await db.query(`SELECT key FROM semi_franchises WHERE key = ANY($1::text[])`, [KEYS]);
     if (existing.length) throw new Error('fixture DB already has carepharm/megapharm rows — use a fresh database');
-    for (let i = 0; i < 4; i++) {
-      const [row] = await db.query(`INSERT INTO users (email,status,"isActive","isEmailVerified")
-        VALUES ($1,'active',true,true) RETURNING id`, [`care-mega-${tag}-${i}@example.test`]);
-      users.push(row.id);
-    }
+    const created = await db.query(
+      `INSERT INTO users (email, status, "isActive", "isEmailVerified")
+       SELECT 'care-mega-' || $1 || '-' || n || '@example.test', 'active', true, true FROM generate_series(0, 3) AS n
+       RETURNING id, email`, [tag]);
+    users.push(...created.sort((a: any, b: any) => a.email.localeCompare(b.email)).map((r: any) => r.id));
     [admin, owner, careOperator, megaAdmin] = users;
-    const [org] = await db.query(`INSERT INTO organizations(name,code,type,"isActive")
-      VALUES ('Synthetic pharmacy',$1,'pharmacy',true) RETURNING id`, [`care-mega-${tag}`]);
+    // 기존 가입 조건을 갖춘 매장: 소유 관계 + 내 매장(약국) 기본 가입 active.
+    const [org] = await db.query(
+      `WITH o AS (INSERT INTO organizations (name, code, type, "isActive") VALUES ('Synthetic pharmacy', 'care-mega-' || $1, 'pharmacy', true) RETURNING id),
+            m AS (INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+                  SELECT id, $2, 'owner', true, NOW(), NOW(), NOW() FROM o)
+       INSERT INTO neture_pharmacy_memberships (organization_id, applicant_user_id, status, business_number, pharmacy_name, pharmacist_license_number)
+       SELECT id, $2, 'active', 'care-mega-' || $1, 'Synthetic pharmacy', 'SYNTHETIC' FROM o RETURNING organization_id AS id`, [tag, owner]);
     store = org.id;
     orgs.push(store);
-    await db.query(`INSERT INTO organization_members(organization_id,user_id,role,is_primary,joined_at,created_at,updated_at)
-      VALUES ($1,$2,'owner',true,NOW(),NOW(),NOW())`, [store, owner]);
-    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,business_number,pharmacy_name,pharmacist_license_number)
-      VALUES ($1,$2,'active',$3,'Synthetic pharmacy','SYNTHETIC')`, [store, owner, `${tag}-0`]);
     // 담당 계정은 사업 한정 역할 하나씩만 — 광역(neture:admin · operator · super_admin) 없음.
     await db.query(`INSERT INTO role_assignments(user_id,role) VALUES
       ($1,'platform:super_admin'),($2,'neture:carepharm_operator'),($3,'neture:megapharm_admin')`, [admin, careOperator, megaAdmin]);
 
-    jest.spyOn(roleAssignmentService, 'hasAnyRole').mockImplementation(async (id, roles) => {
-      const rows = await db.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role=ANY($2::text[])
-        AND is_active=true AND valid_from<=NOW() AND (valid_until IS NULL OR valid_until>=NOW())`, [id, roles]);
-      return rows.length > 0;
-    });
-    jest.spyOn(roleAssignmentService, 'getActiveRoles').mockImplementation(async id => db.query(
-      `SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true`, [id]));
+    // 프로세스 전역 운영 DataSource 대신 같은 fixture DB 의 역할 원장을 읽게 한다.
+    const activeRoles = (id: string) => db.query(
+      `SELECT * FROM role_assignments WHERE user_id = $1 AND is_active = true
+          AND (valid_from IS NULL OR valid_from <= NOW()) AND (valid_until IS NULL OR valid_until >= NOW())`, [id]);
+    jest.spyOn(roleAssignmentService, 'getActiveRoles').mockImplementation(activeRoles as any);
+    jest.spyOn(roleAssignmentService, 'hasAnyRole').mockImplementation(async (id, roles) =>
+      (await activeRoles(id)).some((r: any) => roles.includes(r.role)));
     app = express();
     app.use(express.json());
     app.use(async (req: any, _res, next) => {
       const id = req.header('x-fixture-user');
       if (users.includes(id)) {
-        const roles = await db.query(`SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true`, [id]);
-        req.user = { id, roles: roles.map((r: any) => r.role), memberships: [{ serviceKey: 'neture', status: 'active' }] };
+        const roles = (await activeRoles(id)).map((r: any) => r.role);
+        req.user = { id, roles, memberships: [{ serviceKey: 'neture', status: 'active' }] };
       }
       next();
     });
@@ -93,13 +93,17 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   afterAll(async () => {
     jest.restoreAllMocks();
     if (!db?.isInitialized) return;
-    await db.query(`DELETE FROM semi_franchise_memberships WHERE semi_franchise_id=ANY($1::uuid[])`, [businesses]);
-    await db.query(`DELETE FROM semi_franchises WHERE id=ANY($1::uuid[])`, [businesses]);
-    await db.query(`DELETE FROM neture_pharmacy_memberships WHERE applicant_user_id=ANY($1::uuid[])`, [users]);
-    await db.query(`DELETE FROM organization_members WHERE organization_id=ANY($1::uuid[])`, [orgs]);
-    await db.query(`DELETE FROM role_assignments WHERE user_id=ANY($1::uuid[])`, [users]);
-    await db.query(`DELETE FROM organizations WHERE id=ANY($1::uuid[])`, [orgs]);
-    await db.query(`DELETE FROM users WHERE id=ANY($1::uuid[])`, [users]);
+    // FK 순서대로 이 suite 가 만든 행만 지운다(고정 SQL · id 는 bind).
+    const cleanup: Array<[string, string[]]> = [
+      ['DELETE FROM semi_franchise_memberships WHERE semi_franchise_id = ANY($1::uuid[])', businesses],
+      ['DELETE FROM semi_franchises WHERE id = ANY($1::uuid[])', businesses],
+      ['DELETE FROM neture_pharmacy_memberships WHERE organization_id = ANY($1::uuid[])', orgs],
+      ['DELETE FROM organization_members WHERE user_id = ANY($1::uuid[])', users],
+      ['DELETE FROM role_assignments WHERE user_id = ANY($1::uuid[])', users],
+      ['DELETE FROM organizations WHERE id = ANY($1::uuid[])', orgs],
+      ['DELETE FROM users WHERE id = ANY($1::uuid[])', users],
+    ];
+    for (const [sql, ids] of cleanup) await db.query(sql, [ids]);
     await db.destroy();
   });
 
