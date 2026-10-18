@@ -111,8 +111,14 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$COOP_FIRST_CREATE" = 'true' ]; then
-            # A private first revision cannot be fetched anonymously; require the revision Ready condition instead.
-            node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --mode readiness
+            # The first revision of a new service necessarily serves 100%, which the shared smoke rejects by design
+            # (it guards --no-traffic deploys). Verify directly: the tagged revision is the sole 100% target and Ready.
+            # It is private, so it cannot be fetched anonymously here.
+            gcloud run services describe cooperative-web --region="$REGION" --project="$PROJECT_ID" --format=json > "$RUNNER_TEMP/coop-web-service.json"
+            REVISION=$(TAG="sha-${GITHUB_SHA:0:12}" node --input-type=module -e 'import fs from "node:fs";const s=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/coop-web-service.json"));const live=(s.status.traffic??[]).filter(t=>t.percent>0);const tagged=(s.status.traffic??[]).find(t=>t.tag===process.env.TAG);if(!tagged||live.length!==1||live[0].percent!==100||live[0].revisionName!==tagged.revisionName)process.exit(1);process.stdout.write(tagged.revisionName)')
+            gcloud run revisions describe "$REVISION" --region="$REGION" --project="$PROJECT_ID" --format=json \
+              | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{const c=(JSON.parse(s).status.conditions??[]).find(x=>x.type==="Ready");if(c?.status!=="True")process.exit(1)})'
+            echo "first revision $REVISION serves 100% and is Ready (private until public invoker is granted)"
           else
             node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --paths '/,/test,/login' --attempts 3
           fi

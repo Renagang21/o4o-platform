@@ -90,3 +90,4 @@ Neture 전체 Vitest 127개 파일 1,133개 · tsc · build · ESLint 통과. �
 - `frontend_only=true` 이면 조합 등록 점검 · 등록 job 을 건너뛰고 앱만 배포한다. 조합 데이터 변경은 0이다. main HEAD · green CI · 같은 SHA 를 서빙하는 API 고정 조건은 그대로다.
 - Cloud Run 은 `--no-traffic` 으로 새 서비스를 만들 수 없다. 그래서 최초 생성은 공개 invoker 없이(비공개) 만들고 revision Ready 조건으로 검증한다. 이후 공개 invoker 는 workflow 밖에서 소유자가 부여한다(기존 원칙 유지). 이미 있는 서비스는 기존과 같이 0% 배포 → tag URL HTTP smoke → 전환이다.
 - 운영자 · 조합원 이메일 입력은 `frontend_only` 에서 비워도 되도록 선택 입력으로 바꾸고, 등록 점검 단계에서 비어 있으면 실패하게 했다.
+- Codex P1 반영: 공용 smoke 스크립트는 `--no-traffic` 배포를 지키기 위해 트래픽을 받는 tag 를 readiness 판정 전에 거부한다. 최초 생성 revision 은 반드시 100% 를 받으므로 이 경로에 쓸 수 없다. 공용 스크립트(API 배포도 사용)는 바꾸지 않고, 최초 생성 분기에서 "tag revision 이 유일한 100% 대상이고 Ready=True" 를 직접 검사하도록 바꿨다. 정상 · 분할 트래픽 · 다른 revision 100% · Ready=False 4가지 입력으로 판정을 확인했다.
