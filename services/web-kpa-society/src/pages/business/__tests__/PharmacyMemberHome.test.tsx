@@ -133,7 +133,7 @@ describe('약국 회원 초기화면', () => {
     expect(screen.queryByText('등록된 공지가 없습니다.')).toBeNull();
     mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/forum/posts') ? Promise.resolve({ data: { data: [] } }) : original(path, config));
     fireEvent.click(screen.getAllByRole('button', { name: '다시 시도' })[0]);
-    expect(await screen.findByText('첫 약국 이야기를 나눠 주세요 →')).toBeTruthy();
+    expect(await screen.findByText('회원 게시판에서 이야기를 나눠 주세요 →')).toBeTruthy();
     expect(screen.queryByRole('heading', { name: '회원 약국들의 이야기' })).toBeNull();
     expect(screen.queryByRole('heading', { name: '중요 공지' })).toBeNull();
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
@@ -203,4 +203,21 @@ it('다른 사업 운영자에게 호스트 사업으로 연결되는 관리 링
   expect(screen.queryByRole('link', { name: '사업 자료 관리 →' })).toBeNull();
   expect(screen.getByRole('link', { name: 'Hero · 광고 관리' }).getAttribute('href')).toBe('/businesses/network-a/home-presentation');
   expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
+});
+
+it.each(['business-news', 'business-products'])('미로그인 회원의 %s 위치를 로그인 복귀 주소에 보존한다', async section => {
+  mocks.user = null;
+  render(tree(`/#${section}`));
+  expect(await screen.findByTestId('destination')).toHaveProperty('textContent', `/login?returnTo=${encodeURIComponent('/#' + section)}`);
+  expect(mocks.get).not.toHaveBeenCalled();
+});
+it('최근 혼합 페이지가 공지로만 채워져도 전체 게시판에 첫 글을 쓰라는 주장을 하지 않는다', async () => {
+  const original = mocks.get.getMockImplementation()!;
+  mocks.get.mockImplementation((path: string, config?: { params?: Record<string, unknown> }) => {
+    if (path.endsWith('/forum/posts') && !config?.params?.isPinned) return Promise.resolve({ data: { data: Array.from({ length: 20 }, (_, i) => post(`notice-${i}`, true)) } });
+    return original(path, config);
+  });
+  render(tree('/'));
+  expect((await screen.findByRole('link', { name: '회원 게시판에서 이야기를 나눠 주세요 →' })).getAttribute('href')).toBe('/community/write');
+  expect(screen.queryByText(/첫 약국 이야기/)).toBeNull();
 });

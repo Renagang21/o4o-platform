@@ -88,3 +88,14 @@ main #703의 후속 변경을 merge한 후 약국 웹 177건·공통 운영 UI 1
 기본 정확 일치 조건으로 정정한 후 전체 185건·변경 lint·TypeScript 포함 production build PASS다.
 
 리뷰 보완 후 실제 최종 빌드로 약국/메가팜 PC/mobile 28흐름도 다시 PASS, pageerror·가로 넘침 0이다.
+
+### 추가 복귀·표현 보완
+
+재리뷰의 두 항목도 보완했다. 비로그인 시 `pathname + search + hash`를 로그인 returnTo와
+state.from에 함께 보존한다. 최근 혼합 20건에 공지만 있을 때 전체 게시판이 비었다고 추정하거나
+'첫 이야기'라고 안내하지 않고 기존 회원 게시판 글쓰기로 연결한다. 별도 새 API/집계는 만들지 않는다.
+두 anchor 복귀·혼합 페이지 회귀 3건을 추가해 최종 약국 웹 27 files / 188 tests PASS,
+TypeScript 포함 production build PASS다. BusinessWorkspace의 기존 user hook dependency 경고
+1개는 그대로이며 변경 lint 0 errors다. 실제 OAuth 로그인 완료를 대신하는 검증은 아니다.
+
+추가 보완 후 최종 빌드에서도 PC/mobile 28흐름 PASS, pageerror·가로 넘침 0을 확인했다.
