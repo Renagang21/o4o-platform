@@ -540,3 +540,14 @@ p {
     font-size: 26px;
   }
 }
+
+/* Scoped management forms remain usable on narrow member devices. */
+form label, .section > label, .card > label { display: grid; gap: .4rem; margin: .8rem 0; }
+form input, textarea { width: 100%; min-width: 0; padding: .65rem; border: 1px solid #b7c7c1; border-radius: .4rem; font: inherit; }
+textarea { min-height: 5rem; }
+.card small { overflow-wrap: anywhere; }
+.actions { flex-wrap: wrap; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.coop-management button { padding: .55rem .85rem; border: 1px solid #8faea3; border-radius: .4rem; background: #fff; color: #163c35; margin: .2rem; font: inherit; }
+.coop-management button:not(:disabled):hover { background: #e8f2ed; }
+.coop-management button:focus-visible { outline: 3px solid #238775; outline-offset: 2px; }

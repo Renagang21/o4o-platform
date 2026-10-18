@@ -152,13 +152,14 @@ export class SemiFranchiseService {
     return sf;
   }
 
-  async listAssigned(userId: string) {
+  async listAssigned(userId: string, cooperativeOnly = false) {
     return this.dataSource.query(
       `SELECT ${SF_COLUMNS}
          FROM semi_franchises sf
          WHERE ${BUSINESS_OPERATOR_PREDICATE}
+          AND ($2::boolean=false OR EXISTS(SELECT 1 FROM cooperatives c WHERE c.semi_franchise_id=sf.id))
         ORDER BY sf.name, sf.key`,
-      [userId],
+      [userId,cooperativeOnly],
     );
   }
 
@@ -319,6 +320,7 @@ export class SemiFranchiseService {
   async assignOperator(key: string, userId: string, assignedBy: string) {
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
+    if ((await this.dataSource.query('SELECT 1 FROM cooperatives WHERE semi_franchise_id=$1',[sf.id])).length) throw new NeturePharmacyError(409,'USE_COOPERATIVE_ROLES','조합별 역할 관리에서 지정해 주세요.');
     return this.dataSource.transaction(async manager => {
       if (!(await hasCooperativeOperatorAccess(manager, userId))) throw new NeturePharmacyError(409, 'NOT_NETURE_OPERATOR', '현재 Neture 운영 권한과 메인 이용 자격이 필요합니다.');
       const rows = await manager.query(

@@ -67,3 +67,20 @@ it('business configuration is service admin work, separate from platform setting
   expect((await request(app).get('/business/operator/semi-franchises/fixture/memberships').set('x-role', 'neture:admin')).status).toBe(403);
   expect(query.mock.calls.some(([sql]) => sql.includes('semi_franchise_operators'))).toBe(true);
 });
+
+it('cooperative business API accepts only a live local assignment and never exposes pharmacy memberships', async () => {
+  let local = true;
+  query.mockImplementation(async sql => {
+    if (sql.startsWith('SELECT c.id FROM cooperatives')) return [{ id: 'cooperative' }];
+    if (sql.includes('SELECT r.role FROM cooperative_roles')) return local ? [{ role: 'operator' }] : [];
+    if (sql.startsWith('SELECT sf.id, sf.key')) return [{ id: 'business', key: 'coop-one', status: 'active' }];
+    if (sql.startsWith('SELECT 1 FROM semi_franchises sf WHERE sf.id=$2')) return local ? [{ ok: 1 }] : [];
+    return [];
+  });
+  // Synthetic identity has no Neture or collaborator operator role.
+  const app = server();
+  expect((await request(app).get('/business/operator/semi-franchises/coop-one/contents').set('x-role', 'neture:user')).status).toBe(200);
+  expect((await request(app).get('/business/operator/semi-franchises/coop-one/memberships').set('x-role', 'neture:user')).status).toBe(403);
+  local = false;
+  expect((await request(app).get('/business/operator/semi-franchises/coop-one/contents').set('x-role', 'neture:pharmcoop_admin')).status).toBe(403);
+});

@@ -1,6 +1,5 @@
-import { BUSINESS_OPERATOR_PREDICATE } from './business-operator-access.js';
 import type { DataSource } from "typeorm";
-import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
+import { federationRole } from "./cooperative-management.service.js";
 
 /** No pharmacy membership, store ownership or federation authority is inferred here. */
 export class CooperativeService {
@@ -19,24 +18,18 @@ export class CooperativeService {
       WHERE m.user_id = $1 AND c.status = 'active' AND sf.status = 'active'`,
       [userId],
     );
-    const operatorAccess = await hasCooperativeOperatorAccess(this.db, userId);
-    const cooperativeOperators = operatorAccess
-      ? await this.db.query(
-          `SELECT c.id AS "cooperativeId", $1::uuid AS "userId"
-      FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id
-      WHERE ${BUSINESS_OPERATOR_PREDICATE} AND c.status = 'active' AND sf.status = 'active'
-      `,
-          [userId],
-        )
-      : [];
-    const federationRoles = operatorAccess ? await this.db.query(
-      `SELECT 1 FROM role_assignments WHERE user_id=$1 AND role IN ('neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true AND (valid_from IS NULL OR valid_from<=CURRENT_TIMESTAMP) AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP) LIMIT 1`, [userId],
-    ) : [];
+    const cooperativeOperators = await this.db.query(
+      `SELECT cr.cooperative_id AS "cooperativeId", cr.user_id AS "userId", cr.role
+       FROM cooperative_roles cr JOIN cooperatives c ON c.id=cr.cooperative_id
+       JOIN semi_franchises sf ON sf.id=c.semi_franchise_id JOIN users u ON u.id=cr.user_id
+       WHERE cr.user_id=$1 AND cr.revoked_at IS NULL AND c.status='active' AND sf.status='active'
+       AND u.status IN ('active','approved') AND u."isActive"=true AND u."isEmailVerified"=true`, [userId]);
+    const role = await federationRole(this.db,userId);
     return {
       userId,
       memberships,
       cooperativeOperators,
-      federationOperators: federationRoles.length ? [{ userId }] : [],
+      federationOperators: role ? [{ userId, role }] : [],
     };
   }
 }
