@@ -37,6 +37,20 @@
 ## 사전 점검 (read-only, 2026-10-18)
 
 - GCP: `cooperative-web` Cloud Run 서비스 없음(미배포). LB `o4o-global-lb` 에 coop · pharmcoop host rule 없음. Certificate Manager 에 coop 인증서 · map entry 없음. 옛 도메인으로 만들어진 GCP 리소스는 없어 정리 대상도 없다.
-- DNS(가비아 위임): `pharmcoop.neture.co.kr` A → LB `136.110.132.35` 이미 등록. wildcard 아님. `coop.neture.co.kr` 은 해석되지 않는다.
+- DNS(가비아 위임): `pharmcoop.neture.co.kr` A 레코드가 기존 전역 LB 공인 IP(다른 서비스 host 와 동일)로 이미 등록. wildcard 아님. `coop.neture.co.kr` 은 해석되지 않는다.
 - 운영자 계정(지정 운영자): 운영 DB 에 없음 — 기존 차단 미해결. 계정 생성 · 전역 역할 부여는 하지 않는다.
 - 개인 조합원(지정 계정) 기준선: 활성 역할 `neture:store_owner`(비활성 `kpa:store_owner` 1), 약국 조직 owner 1, service membership `kpa-society` · `lecture` · `neture`, 협동조합 membership 0.
+
+## GCP 도메인 연결 (2026-10-18)
+
+모두 이번 작업 전용 리소스를 새로 만들었다. 공유 인증서 · 다른 서비스 host rule · backend 는 바꾸지 않았다.
+
+| 리소스 | 내용 |
+|---|---|
+| Certificate Manager `cm-cert-pharmcoop-v1` | `pharmcoop.neture.co.kr` 전용 Google 관리 인증서(LB 인증) |
+| cert map entry `cm-entry-pharmcoop` | 기존 `o4o-main-cert-map` 에 host 1개 추가 |
+| serverless NEG `neg-cooperative-web` | asia-northeast3, Cloud Run `cooperative-web` 대상 |
+| backend service `backend-cooperative-web` | EXTERNAL_MANAGED · HTTP · 로그 1.0 (기존 web backend 와 같은 설정) |
+| URL map `o4o-global-lb` | host rule `pharmcoop.neture.co.kr` → path matcher `path-matcher-cooperative` 추가. 변경 전후 export diff 는 이 두 항목 추가뿐 |
+
+HTTP→HTTPS redirect URL map 은 모든 host 를 이미 덮어 변경하지 않았다. 옛 `coop` 도메인으로 만든 GCP 리소스는 처음부터 없었다.
