@@ -1,3 +1,4 @@
+import { pharmacyCollaboratorRoles } from '@o4o/types';
 /**
  * Neture Role Constants — SSOT
  *
@@ -205,4 +206,13 @@ export function withoutUnreachableSubdomainOperatorLinks<
   return (items ?? []).filter((item) =>
     [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(viewer, p)),
   );
+}
+
+/** The main host redirects this entry to pharmacy; CarePharm owns its local entry.
+ * Other collaborators use their own application's operator navigation.
+ */
+export function getBusinessOperatorRolesForHost(profile: string): string[] {
+  if (profile === 'carepharm') return pharmacyCollaboratorRoles('carepharm');
+  if (profile === 'main') return pharmacyCollaboratorRoles('pharmacy');
+  return [];
 }

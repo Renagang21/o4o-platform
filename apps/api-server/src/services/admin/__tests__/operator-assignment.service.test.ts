@@ -191,3 +191,18 @@ describe('searchCandidates — 사람을 고르기 위한 검색', () => {
     expect(h.qb.limit).toHaveBeenCalledWith(50);
   });
 });
+
+
+describe('collaborator assignment preserves the canonical account and membership state', () => {
+  it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => ['admin','operator'].map(level => `neture:${key}_${level}`)))('%s never grants Neture-wide administration or activates suspended membership', async role => {
+    const h = makeHarness({ user: USER, linked: LINKED,
+      existingMembership: { userId: 'user-1', serviceKey: 'neture', status: 'suspended' } });
+    const result = await h.service.assign({ userId: 'user-1', serviceKey: 'neture', role });
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith({ userId: 'user-1', role }, expect.anything());
+    expect(result).toMatchObject({ serviceKey: 'neture', role, membershipPolicy: 'KEEP_EXISTING_STATUS', membershipStatuses: { neture: 'suspended' } });
+    expect(h.writes.memberships).toEqual([]);
+    expect(h.writes.users).toEqual([]);
+    expect(h.writes.linkedAccounts).toEqual([]);
+  });
+});

@@ -342,7 +342,7 @@ export default function OperatorsPage() {
       }
       // role prefix('kpa','cosmetics') ≠ canonical service_key('kpa-society','k-cosmetics').
       // 변환은 @o4o/security-core SSOT 에 위임한다 — 로컬 중복 매핑을 만들지 않는다.
-      const canonicalServiceKey = resolveCanonicalServiceKey(targetServiceKey);
+      const canonicalServiceKey = resolveCanonicalServiceKey(targetRole.split(':')[0]);
       const serviceLabel = SERVICES[targetServiceKey as keyof typeof SERVICES]?.label ?? targetServiceKey;
 
       {
@@ -574,7 +574,7 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: 'All Services', options: getServiceOptions() },
+            { key: 'service', placeholder: 'All Services', options: [...getServiceOptions(), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: 'All Operator Roles', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
@@ -981,7 +981,7 @@ export default function OperatorsPage() {
                         </div>
                         <div className="mt-2 text-xs text-slate-500">
                           요청에 실리는 값 — service key:{' '}
-                          <code>{resolveCanonicalServiceKey(targetServiceKey)}</code>
+                          <code>{resolveCanonicalServiceKey(targetRole.split(':')[0])}</code>
                           {targetRole && (
                             <>
                               {' '}· role: <code>{targetRole}</code>

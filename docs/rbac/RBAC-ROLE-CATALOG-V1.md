@@ -160,3 +160,23 @@ Layer A와 Layer B는 혼합 금지:
 
 *Document Version: 1.0*
 *Last Updated: 2026-02-27*
+
+## 약국 협업체 운영자 지정 — 2026-10-18
+
+사용자 요청에 따라 `admin.neture.co.kr/operators`에서 아래 네 대상을 각각 지정한다.
+공통 계정과 canonical `neture` 가입 원장은 유지하며, 사업 키를 새 service membership으로 만들지 않는다.
+
+| 대상 | Admin | Operator |
+|---|---|---|
+| pharmacy | `neture:pharmacy_admin` | `neture:pharmacy_operator` |
+| carepharm | `neture:carepharm_admin` | `neture:carepharm_operator` |
+| megapharm | `neture:megapharm_admin` | `neture:megapharm_operator` |
+| pharmcoop | `neture:pharmcoop_admin` | `neture:pharmcoop_operator` |
+
+두 역할은 해당 사업의 기존 운영 기능을 이용한다. Neture 전체 관리·플랫폼 관리·다른 사업 운영 권한은 부여하지 않는다.
+`pharmcoop` 범위에는 등록된 개별 협동조합의 사업 공간과 연합 운영자 세션이 포함된다.
+기존 `neture:admin/operator`와 활성 `semi_franchise_operators` 관계를 함께 가진 담당자도 계속 이용한다.
+매 요청 활성·유효기간을 확인하며, 역할만으로 약국 소유·참여 가입을 만들거나 기존 가입 상태를 변경하지 않는다.
+Google 연결 계정만 지정하며, 신규 계정 생성·타인 비밀번호 설정 경로는 추가하지 않는다.
+
+근거: [약국 협업체 운영자 지정 WO](../work-orders/WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1.md).

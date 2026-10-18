@@ -11,7 +11,7 @@ import type { DataSource } from "typeorm";
 import { HOME_SURFACES, type HomeSurface } from "@o4o/types";
 import { KPA_SCOPE_CONFIG } from "@o4o/security-core";
 import { requireAuth } from "../../middleware/auth.middleware.js";
-import { requireNetureScope } from "../../middleware/neture-scope.middleware.js";
+import { requireNetureScope, requireNetureBusinessScope } from "../../middleware/neture-scope.middleware.js";
 import { requireLectureScope } from "../../middleware/lecture-scope.middleware.js";
 import { createMembershipScopeGuard } from "../../common/middleware/membership-guard.middleware.js";
 import { apiLimiter } from "../../middleware/rateLimiter.js";
@@ -167,7 +167,7 @@ export function createHomePresentationRoutes(ds: DataSource) {
   router.get(
     "/pharmacy/business/:key/manage",
     requireAuth as RequestHandler,
-    requireNetureScope("neture:operator"),
+    requireNetureBusinessScope,
     resolveBusiness,
     businessOperator,
     business.manageRead,
@@ -176,7 +176,7 @@ export function createHomePresentationRoutes(ds: DataSource) {
     "/pharmacy/business/:key/manage",
     apiLimiter,
     requireAuth as RequestHandler,
-    requireNetureScope("neture:operator"),
+    requireNetureBusinessScope,
     resolveBusiness,
     businessOperator,
     business.save,

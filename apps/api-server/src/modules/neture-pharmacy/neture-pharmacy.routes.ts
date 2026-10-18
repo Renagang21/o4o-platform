@@ -24,7 +24,7 @@ import type { DataSource } from 'typeorm';
 import { requireNetureMainMembership } from '../../middleware/neture-main-membership.middleware.js';
 import { requireRole } from '../../middleware/auth.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
-import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
+import { requireNetureScope, requireNetureBusinessScope } from '../../middleware/neture-scope.middleware.js';
 import { createPharmacyStoreAccess } from './pharmacy-store-access.js';
 import { createRequireActiveSupplier } from '../neture/middleware/neture-identity.middleware.js';
 import { checkoutService } from '../../services/checkout.service.js';
@@ -134,6 +134,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const mainAccess = requireNetureMainMembership(dataSource);
   const store = [requireAuth, createPharmacyStoreAccess(dataSource)] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
+  const businessOperator = [requireAuth, requireNetureBusinessScope as RequestHandler];
   const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
@@ -276,45 +277,45 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     membership.decide(req.user!.id, uuidParam(req, 'id'), actionParam<MembershipAction>(req, MEMBERSHIP_ACTIONS), req.body?.reason)));
 
   // ─── 담당 세미프랜차이즈 운영자 ───────────────────────────────────────────
-  router.get('/operator/semi-franchises', ...operator, handle(async (req) => semiFranchises.listAssigned(req.user!.id)));
+  router.get('/operator/semi-franchises', ...businessOperator, handle(async (req) => semiFranchises.listAssigned(req.user!.id)));
   const sfOf = (req: Req) => semiFranchises.requireOperatorOf(req.user!.id, req.params.key);
 
-  router.get('/operator/semi-franchises/:key/memberships', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/memberships', ...businessOperator, handle(async (req) =>
     semiFranchises.listMemberships(await sfOf(req), req.query.status as string | undefined)));
-  router.post('/operator/semi-franchises/:key/memberships/:id/:action', ...operator, handle(async (req) =>
+  router.post('/operator/semi-franchises/:key/memberships/:id/:action', ...businessOperator, handle(async (req) =>
     semiFranchises.decideMembership(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<MembershipAction>(req, MEMBERSHIP_ACTIONS), req.body?.reason)));
 
-  router.get('/operator/semi-franchises/:key/supply-proposals', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/supply-proposals', ...businessOperator, handle(async (req) =>
     proposals.operatorList(await sfOf(req), req.query.status as string | undefined)));
-  router.post('/operator/semi-franchises/:key/supply-proposals/:id/:action', ...operator, handle(async (req) =>
+  router.post('/operator/semi-franchises/:key/supply-proposals/:id/:action', ...businessOperator, handle(async (req) =>
     proposals.operatorDecide(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<ProposalAction>(req, ['approve', 'reject', 'end']), req.body?.reason)));
 
-  router.get('/operator/semi-franchises/:key/events', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/events', ...businessOperator, handle(async (req) =>
     events.operatorList(await sfOf(req), req.query.status as string | undefined)));
-  router.post('/operator/semi-franchises/:key/events/:id/:action', ...operator, handle(async (req) =>
+  router.post('/operator/semi-franchises/:key/events/:id/:action', ...businessOperator, handle(async (req) =>
     events.operatorDecide(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<EventAction>(req, ['approve', 'reject', 'cancel']), req.body?.reason)));
 
-  router.get('/operator/semi-franchises/:key/recruitments', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/recruitments', ...businessOperator, handle(async (req) =>
     recruitments.operatorList(await sfOf(req), req.query.status as string | undefined)));
-  router.post('/operator/semi-franchises/:key/recruitments/:id/:action', ...operator, handle(async (req) =>
+  router.post('/operator/semi-franchises/:key/recruitments/:id/:action', ...businessOperator, handle(async (req) =>
     recruitments.operatorDecide(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<'approve' | 'reject'>(req, ['approve', 'reject']), req.body?.note)));
 
-  router.get('/operator/semi-franchises/:key/contents', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/contents', ...businessOperator, handle(async (req) =>
     contents.operatorList(await sfOf(req), req.query.status as string | undefined)));
-  router.get('/operator/semi-franchises/:key/contents/:id', ...operator, handle(async (req) =>
+  router.get('/operator/semi-franchises/:key/contents/:id', ...businessOperator, handle(async (req) =>
     contents.operatorGet(await sfOf(req), uuidParam(req, 'id'))));
-  router.post('/operator/semi-franchises/:key/contents', ...operator, handle(async (req, res) => {
+  router.post('/operator/semi-franchises/:key/contents', ...businessOperator, handle(async (req, res) => {
     const sf = await sfOf(req);
     res.status(201);
     return contents.operatorCreate(sf, req.user!.id, req.body ?? {});
   }));
-  router.patch('/operator/semi-franchises/:key/contents/:id', ...operator, handle(async (req) =>
+  router.patch('/operator/semi-franchises/:key/contents/:id', ...businessOperator, handle(async (req) =>
     contents.operatorUpdate(await sfOf(req), req.user!.id, uuidParam(req, 'id'), req.body ?? {})));
-  router.post('/operator/semi-franchises/:key/contents/:id/:action', ...operator, handle(async (req) =>
+  router.post('/operator/semi-franchises/:key/contents/:id/:action', ...businessOperator, handle(async (req) =>
     contents.operatorSetStatus(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<'publish' | 'archive' | 'reject'>(req, ['publish', 'archive', 'reject']), req.body?.reason)));
 

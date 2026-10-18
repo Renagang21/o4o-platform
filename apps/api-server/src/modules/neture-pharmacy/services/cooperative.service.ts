@@ -1,3 +1,4 @@
+import { BUSINESS_OPERATOR_PREDICATE } from './business-operator-access.js';
 import type { DataSource } from "typeorm";
 import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
 
@@ -18,24 +19,24 @@ export class CooperativeService {
       WHERE m.user_id = $1 AND c.status = 'active' AND sf.status = 'active'`,
       [userId],
     );
-    const cooperativeOperators = (await hasCooperativeOperatorAccess(
-      this.db,
-      userId,
-    ))
+    const operatorAccess = await hasCooperativeOperatorAccess(this.db, userId);
+    const cooperativeOperators = operatorAccess
       ? await this.db.query(
-          `SELECT c.id AS "cooperativeId", op.user_id AS "userId"
+          `SELECT c.id AS "cooperativeId", $1::uuid AS "userId"
       FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id
-      JOIN semi_franchise_operators op ON op.semi_franchise_id = sf.id AND op.revoked_at IS NULL
-      WHERE op.user_id = $1 AND c.status = 'active' AND sf.status = 'active'
+      WHERE ${BUSINESS_OPERATOR_PREDICATE} AND c.status = 'active' AND sf.status = 'active'
       `,
           [userId],
         )
       : [];
+    const federationRoles = operatorAccess ? await this.db.query(
+      `SELECT 1 FROM role_assignments WHERE user_id=$1 AND role IN ('neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true AND (valid_from IS NULL OR valid_from<=CURRENT_TIMESTAMP) AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP) LIMIT 1`, [userId],
+    ) : [];
     return {
       userId,
       memberships,
       cooperativeOperators,
-      federationOperators: [],
+      federationOperators: federationRoles.length ? [{ userId }] : [],
     };
   }
 }
