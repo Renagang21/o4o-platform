@@ -126,7 +126,7 @@ CGM API 규격과 무료혈당기 코드 검증·사용 처리 규격은 별도 
 
 미승인 사용자는 작은 사업 안내와 신청 경로만 보며 회원 게시글·자료·전시를 조회하지 않는다. 담당 운영자에게 매장 소유자용 자료 조회를 요구하지 않는다. 게시판 미개설·계정/사업/선택 약국 전환에서도 기존 권한과 범위를 유지한다. 공통 웹 앱을 사용하는 메가팜 및 다른 사업 키도 이 표시 구조의 영향 대상으로 검증하며 사업별 업무를 통합하지 않는다.
 
-이번 변경의 TODO·코드/문서 대조와 검증은 [회원 메인 재구성 TODO](../work-orders/TODO-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에 기록한다. 정책 갱신이나 push만으로 main 통합·운영 배포 완료를 판정하지 않는다. 이번 구현은 PR #704로 main에 반영됐고 Delivery #39127701475의 약국 웹 verified rollout·production DEPLOYED와 공식 실행 파일을 확인했다. [재구성 CHECK](../checks/CHECK-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에서 합성 검증·운영 코드 확인·실제 OAuth 미검증을 구분한다. 과거 회원 초기화면 구현/배포 기록은 기존 WO와 앞 절의 당시 근거로 보존한다.
+이번 변경의 TODO·코드/문서 대조와 검증은 [회원 메인 재구성 TODO](../work-orders/TODO-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에 기록한다. 정책 갱신이나 push만으로 main 통합·운영 배포 완료를 판정하지 않는다. 이번 구현은 PR #704로 main에 반영됐고 Delivery #39127701475의 약국 웹 verified rollout·production DEPLOYED와 공식 실행 파일을 확인했다. [운영 통합·배포 CHECK](../checks/CHECK-O4O-PHARMACY-MEMBER-HOME-INTEGRATION-DEPLOYMENT-V1.md)에서 합성 검증·운영 코드 확인·실제 OAuth 미검증을 구분한다. 과거 회원 초기화면 구현/배포 기록은 기존 WO와 앞 절의 당시 근거로 보존한다.
 
 ## 6. 구현 현황·회귀 검증 기준
 
