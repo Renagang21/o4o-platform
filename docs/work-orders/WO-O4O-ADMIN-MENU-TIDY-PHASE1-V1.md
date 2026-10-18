@@ -1,6 +1,6 @@
 # WO-O4O-ADMIN-MENU-TIDY-PHASE1-V1
 
-- 상태: ACTIVE
+- 상태: COMPLETED — 1차 정비
 - 작성·최종 갱신: 2026-10-19 (KST)
 - 기준: main `3d460505597dc50adedd3f1bb59639aa59b387e9`
 - 사용자 지시: 전체 관리자 정리정돈을 단계적으로 진행. TODO·코드/문서 조사 → 정비 → 개발·배포.
@@ -25,8 +25,8 @@
 - [x] 메뉴·한영 명칭·Content 준비 안내 정리 및 고아 메뉴 설정 제거
 - [x] 모바일 검증에서 발견한 헤더 제목 세로 꺾임과 중첩 button 정리
 - [x] 회귀·타입·lint·production build 및 desktop/mobile 검증
-- [ ] commit/push·PR·CI·Codex 리뷰·main 병합
-- [ ] 운영 배포·서빙 SHA·배포 자산 확인 및 결과 기록
+- [x] commit/push·PR·CI·Codex 리뷰·main 병합
+- [x] 운영 배포·서빙 SHA·배포 자산 확인 및 결과 기록
 
 ## 연결 조사와 정리 방향
 
@@ -54,7 +54,26 @@
 - 모바일 메뉴에서 포인트 진입, 계정 메뉴 열림/닫힘, 헤더 제목 한 줄 및 중첩 button 부재 확인. 기존 공용 dropdown의 `forwardRef` 개발 경고는 잔여이며 공용 UI 구현 변경은 이번 범위에서 제외한다.
 - `git diff --check`, docs 민감정보 검사 PASS. 배포 영향 사전 판정은 `admin` 단독 `LEVEL_2`.
 - 실제 Google 로그인은 사용자 브라우저에서 수행하며 비밀번호/토큰 전달을 요구하지 않는다. 위 검증은 합성 로컬 데이터다. 운영 검증은 공개 자산·응답 및 Delivery 기록으로 구분한다. 운영 포인트 지급/차감과 DB 변경 없음.
-- commit/PR/main/운영 배포 결과는 완료 후 아래에 기록한다.
+- 운영용 production 빌드를 로컬 preview로 다시 실행한 동일 1440px/390px 동작 검증도 PASS. 실제 Google 사용자 인증이나 서버 권한 검증을 합성 응답 검증으로 대신했다고 보고하지 않는다.
+
+### 통합·배포 기록
+
+- 구현 commit: `4663eab484664864215fe5fc3379cd721f43bf27`.
+- [PR #707](https://github.com/Renagang21/o4o-platform/pull/707): required CI Gate·CodeQL PASS, Codex 현재 HEAD 리뷰 완료·지적 0, 미해결 스레드 0 확인 후 병합.
+- main merge: `c9ece46fedacd02f009adc7214eafc0bf7357e97`, 2026-10-19 08:44 KST.
+- [PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/39177507201) PASS.
+- [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39177768969) PASS.
+- [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39177986093) SUCCESS. `Admin / deploy`와 `Report (serving SHA · commit status)` 모두 SUCCESS, merge SHA의 `production` status가 `DEPLOYED · deploy: admin` / success로 확정됐다. API·다른 web 배포 job은 skip. DB/migration 변경 없음.
+- 운영 admin 공개 응답·자산 검증 PASS: 메인과 기존 SPA 주소 4개 HTTP 200, 진입 번들 `/assets/index-Boz4tDW7.js`의 유지 메뉴·한글 명칭 확인, 제거한 AppStore/영상/사이니지 전용 chunk 참조 부재 확인.
+- 운영 도움말 `/assets/ContentPolicyHelp-DagAa57v.js`, 포인트 이동 `/assets/PointOperationsNav-CGymgSyD.js`, 콘텐츠·게시 위치 chunk의 새 안내/명칭 확인. `/health`도 HTTP 200.
+- 실제 Google 사용자 세션의 운영 브라우저 클릭은 미실시. 합성 로컬 브라우저 검증과 운영 서빙/공개 자산 검증을 구분한다. 운영 업무 데이터 생성·수정·삭제 없음.
+- 배포 완료 기록 반영은 docs-only 후속 PR이며 런타임 재배포 대상이 아니다.
+
+### 문서 정합·잔여
+
+- 현재 소스의 메뉴 수·명칭·제거한 AppStore/정책/제작 진입 안내와 회귀 계약을 정리했다. 과거 WO·IR의 본문/판정 및 canonical index는 변경하지 않았다.
+- 상품 DB의 ‘조회 전용’ 안내/주석과 실제 쓰기 기능의 차이, 구 IR의 현재와 다른 메뉴·권한·API 서술은 후속 작업의 근거로 기록했다. 이력물을 현행 정책으로 재작성하지 않는다.
+- 이번 단계에서 SUPERSEDED 표기나 canonical 문서 판정 변경은 하지 않았다.
 
 ## 전체 메뉴 정리 지도와 초기 화면 방향
 
