@@ -77,3 +77,17 @@ DEPLOYMENT: REQUIRED — 후속 통합 담당이 actual Delivery 판정 후 진�
 WORKTREE_DISPOSITION: KEEP — `wo/pharmacy-member-home`과 이번 전용 공간을 인계·후속 수정용으로 보존한다.
 
 문서 정합: 서비스 탐색 정본의 회원 메인 절을 갱신했고 과거 배포 기록은 당시 근거로 보존한다.
+
+## 후속 통합·배포 단계 — 2026-10-18 추가 승인
+
+사용자가 개발 push 완료 후 이 공간에서 main 병합·배포 진행을 명시적으로 요청했다.
+앞 절의 push 범위 완료는 당시 기록이며 이 절부터 동일 WO의 통합 담당으로 진행한다.
+최신 main `1ba05e353d`의 관리자 사업 원장/등록 화면 후속 변경을 자기 branch에 merge했다.
+이번 메인·메뉴 수정 경로와 충돌은 없고 공통 운영 UI 소비 빌드·회귀와 실제 CI를 재확인한다.
+
+- [ ] 최신 HEAD CI·Codex 리뷰·미해결 스레드·실제 ruleset 확인 후 정상 PR 통합.
+- [ ] main CI·Delivery 판정·신규 revision 검증·트래픽 전환·serving 결과 확인.
+- [ ] 운영 파일·readiness 확인과 CHECK 결과 기록·종료 정리.
+
+DEPLOYMENT: AUTOMATIC — 최종 누적 serving 비교와 actual Delivery 판정으로 확정한다.
+WORKTREE_DISPOSITION: KEEP — 후속 통합·배포·기록 진행 중.
