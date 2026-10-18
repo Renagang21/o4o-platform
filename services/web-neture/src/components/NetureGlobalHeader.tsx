@@ -1,4 +1,3 @@
-import { parsePharmacyCollaboratorRole } from '@o4o/types';
 /**
  * NetureGlobalHeader — Neture 서비스의 GlobalHeader 브릿지
  *
@@ -20,7 +19,7 @@ import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
-import { SUPPLIER_ONLY_ROLES } from '../lib/role-constants';
+import { SUPPLIER_ONLY_ROLES, getBusinessOperatorRolesForHost } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { DEMO_NOTICE } from '../lib/demoAccounts';
@@ -80,7 +79,8 @@ export function NetureGlobalHeader() {
   const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
 
-  const businessOperator = user?.roles?.some(role => { const scope = parsePharmacyCollaboratorRole(role); return scope && (CURRENT_HOST_PROFILE !== 'carepharm' || scope.businessKey === 'carepharm'); });
+  // Main business entry redirects to pharmacy; other collaborators operate on their own host.
+  const businessOperator = user?.roles?.some(role => getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE).includes(role));
   if (businessOperator && !publicNav.some(item => item.href === '/operator/semi-franchises') && !contextualNav.some(item => item.href === '/operator/semi-franchises')) contextualNav.push({ label: '사업 운영', href: '/operator/semi-franchises' });
 
   const headerUser = user

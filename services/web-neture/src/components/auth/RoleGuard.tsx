@@ -1,4 +1,4 @@
-import { PHARMACY_COLLABORATOR_ROLES, pharmacyCollaboratorRoles } from '@o4o/types';
+import { getBusinessOperatorRolesForHost } from '../../lib/role-constants';
 import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 /**
  * RoleGuard / RouteGuard — Neture 역할 기반 접근 제어
@@ -169,7 +169,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
   const { pathname } = useLocation();
   const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && pathname === '/operator');
-  const scopedRoles = !businessPath ? [] : CURRENT_HOST_PROFILE === 'carepharm' ? pharmacyCollaboratorRoles('carepharm') : PHARMACY_COLLABORATOR_ROLES;
+  const scopedRoles = businessPath ? getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE) : [];
   return (
     <RouteGuard
       allowedRoles={[...OPERATOR_OR_ABOVE_ROLES, ...scopedRoles]}

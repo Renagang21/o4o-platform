@@ -53,3 +53,7 @@ Admin은 해당 사업의 Operator 기능을 포함한다. 별도 새 관리자 
 추가 회귀: 사업 홈 편집 route 19개와 service action HTTP 경계 6개 테스트가 통과했다.
 새 business scope export를 route mock에 반영하고 사업 메타데이터 조회와 권한 조회를 구별했다.
 최신 main의 계정 메뉴 변경을 반영한 뒤 Neture·약국 웹을 재빌드하여 통과했다.
+
+리뷰 보완: 대표 Neture의 사업 운영 주소는 Pharmacy 호스트로 이동하므로 pharmacy 역할에만 표시한다.
+CarePharm 호스트는 CarePharm 역할만 로컬 사업 운영으로 진입한다. MegaPharm·Pharmcoop는 각 앱의 운영 진입을 사용한다.
+호스트 이동과 역할의 대응 회귀 2개 파일 52개 테스트가 통과했다.
