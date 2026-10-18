@@ -42,13 +42,22 @@ it('truncated QR overview explicitly reports its loaded scope', async () => {
 
 it('filtered workspace capabilities also apply to location actions and the empty overview', async () => {
   const { rerender } = render(<MemoryRouter><Execution workspace availableKeys={['store-execution']} /></MemoryRouter>);
-  await screen.findByText('Tablet A');
+  await screen.findByText('현재 이용 가능한 태블릿·QR 기능이 없습니다.');
+  expect(api.tablets).not.toHaveBeenCalled(); expect(api.qrs).not.toHaveBeenCalled();
   expect(screen.queryByRole('link', { name: '이 위치의 화면 변경' })).toBeNull();
   expect(screen.queryByRole('link', { name: '태블릿 화면 변경' })).toBeNull();
-  api.tablets.mockResolvedValue([]);
-  fireEvent.click(screen.getByRole('button', { name: '새로고침' }));
-  await waitFor(() => expect(screen.queryByText('Tablet A')).toBeNull());
   expect(screen.queryByRole('link', { name: '태블릿 화면 적용으로 가기' })).toBeNull();
+  api.tablets.mockResolvedValue([]);
   rerender(<MemoryRouter><Execution workspace availableKeys={['store-execution', 'tablet-displays']} /></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '태블릿 화면 적용으로 가기' })).toBeTruthy();
+  await screen.findByRole('link', { name: '태블릿 화면 적용으로 가기' });
+  expect(api.tablets).toHaveBeenCalledOnce(); expect(api.qrs).not.toHaveBeenCalled();
+});
+it('a QR-only store never queries unavailable tablets, including on refresh', async () => {
+  api.tablets.mockRejectedValue(Error('SERVICE_FEATURE_REQUIRED'));
+  render(<MemoryRouter><Execution workspace availableKeys={['store-execution', 'qr']} /></MemoryRouter>);
+  await screen.findByText('조회한 QR이 없습니다');
+  expect(screen.queryByRole('alert')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '새로고침' }));
+  await waitFor(() => expect(api.qrs).toHaveBeenCalledTimes(2));
+  expect(api.tablets).not.toHaveBeenCalled();
 });

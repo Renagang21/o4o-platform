@@ -34,7 +34,7 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 
 import { STORE_CONTENTS_HEADING } from '../../config/storeLibraryLabels';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties, type ReactNode } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
@@ -54,7 +54,8 @@ export default function StoreLibraryContentsPage(props: LibraryPageProps) {
 }
 function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps) {
   const { organizationId } = useLibraryScope();
-  const { base } = useStoreLibraryRoute();
+  const { base, productReturn } = useStoreLibraryRoute();
+  const navigate = useNavigate();
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -85,6 +86,10 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
 
   const closeCreateModal = useCallback(() => {
     setCreateFromResourcesOpen(false);
+    if (productCtx && productReturn) {
+      navigate(productReturn.path, { state: { productReturn }, replace: true });
+      return;
+    }
     // 제품 진입 파라미터 정리 — 닫은 뒤 새로고침해도 재오픈되지 않게.
     if (searchParams.get('create')) {
       setSearchParams(
@@ -96,7 +101,7 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
         { replace: true },
       );
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, productCtx, productReturn, navigate]);
 
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
