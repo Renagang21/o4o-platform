@@ -2,7 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadFooterLegal } from '../lib/footerLegal';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { canAccess } from './AccessGate';
@@ -29,7 +29,7 @@ export default function SiteShell() {
       <div className="header-actions" aria-label="계정">
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
         <span className="inline-flex flex-wrap items-center gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
-        {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link>}
+        {isAuthenticated && user ? <ServiceAccountMenu key={user.id} displayName={user.name || '사용자'} email={user.email} onLogout={logout} /> : <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link>}
       </div>
     </header>
     <div className="content"><Outlet /></div>
