@@ -1,0 +1,18 @@
+.pharmacy-member-home .home-hero {
+  padding-top: 24px;
+  padding-bottom: 20px;
+}
+.pharmacy-member-home .home-hero-main {
+  min-height: 0;
+  gap: 20px;
+}
+.pharmacy-member-home .home-hero-art {
+  display: none;
+}
+.pharmacy-member-home .home-hero-description {
+  min-height: 0;
+  margin-top: 12px !important;
+}
+.pharmacy-member-home .home-hero-image {
+  max-height: 140px;
+}
