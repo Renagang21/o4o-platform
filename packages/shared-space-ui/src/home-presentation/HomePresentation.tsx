@@ -360,9 +360,9 @@ export function HomePromotionView({
     </aside>
   );
 }
-export function ServiceHomePromotion(props: PublicProps) {
-  const { config, ready } = useHomePresentation(props);
-  return ready ? (
+export function ServiceHomePromotion(props: PublicProps & { publishedOnly?: boolean }) {
+  const { config, ready, hasPublished } = useHomePresentation(props);
+  return ready && (!props.publishedOnly || hasPublished) ? (
     <HomePromotionView surface={props.surface} config={config} />
   ) : null;
 }

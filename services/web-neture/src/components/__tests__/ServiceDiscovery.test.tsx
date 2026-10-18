@@ -56,6 +56,17 @@ it('가입 정보가 없으면 미가입으로 단정하지 않고 공개 전체
   expect(screen.getByRole('link', {name:/^O4O 강의/})).toBeTruthy();
 });
 
+it('사업·조합의 별도 원장 정보를 사용하고 정지된 사업은 활성으로 추론하지 않는다', () => {
+  const data = { services: [], stores: [], branches: [], communities: [], serviceStates: { supplier: { status: 'none', source: 'none' } },
+    businesses: [{ key: 'carepharm', name: '합성 사업', canParticipate: true }, { key: 'megapharm', name: '다른 합성 사업', canParticipate: false }],
+    cooperatives: [{ id: 'coop', slug: 'sample', name: '합성 조합', status: 'pending' }],
+  } as import('../../lib/home-entry').HomeEntryData;
+  render(<MemoryRouter><ServiceDiscovery personalized data={data} /></MemoryRouter>);
+  expect(screen.queryByRole('link', { name: /^만성질환관리 / })).toBeNull();
+  expect(screen.queryByRole('link', { name: /^약국\/약사협동조합 / })).toBeNull();
+  expect(screen.getByRole('link', { name: /^창고형 약국 / })).toBeTruthy();
+});
+
 it('로그인 후 미가입 협력사업도 실제 서비스로 공개 진입할 수 있다', () => {
  const data={services:[], stores:[], workspaceStores:[], branches:[], serviceStates:{supplier:{status:'none',source:'none'}}} as import('../../lib/home-entry').HomeEntryData;
  render(<MemoryRouter><ServiceDiscovery personalized data={data}/></MemoryRouter>);

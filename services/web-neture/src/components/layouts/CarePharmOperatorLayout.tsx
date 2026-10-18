@@ -4,7 +4,6 @@ import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
-import CarePharmStudyEntry from '../../pages/carepharm/CarePharmStudyEntry';
 
 /** Display scope only: the existing OperatorRoute and assigned-business API remain authoritative. */
 const MENU: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
@@ -25,7 +24,6 @@ export default function CarePharmOperatorLayout() {
       <div className="mb-4 rounded-xl border bg-white p-4">
         <p className="font-semibold">CarePharm · 만성질환 약국 협업체 운영</p>
         <p className="mt-2 text-sm text-gray-600">참여 약국의 가입, 공급 제안, 회원 전용 콘텐츠를 관리합니다.</p>
-        <CarePharmStudyEntry />
       </div>
       <Outlet />
     </OperatorAreaShell>

@@ -20,7 +20,8 @@ vi.mock("@o4o/auth-client", () => ({
 }));
 vi.mock("@o4o/auth-react", () => ({
   useServiceAuth: () => mocks.auth,
-  EmailLoginForm: () => <p>공통 로그인</p>,
+  O4O_ACCOUNT_LINKS: { signup: "https://neture.co.kr/signup" },
+  EmailLoginForm: ({ links }: { links?: { signup?: string } }) => <><p>공통 로그인</p>{links?.signup && <a href={links.signup}>회원가입</a>}</>,
 }));
 vi.mock("./App", () => ({
   App: ({ session }: { session: { userId: string | null } }) => (
@@ -40,6 +41,11 @@ const open = () =>
     </MemoryRouter>,
   );
 describe("server-backed cooperative session", () => {
+  it("provides common account signup from the cooperative login page", async () => {
+    mocks.get.mockResolvedValue({ data: { data: [] } });
+    render(<MemoryRouter initialEntries={["/login"]}><ConnectedApp /></MemoryRouter>);
+    expect((await screen.findByRole("link", { name: "회원가입" })).getAttribute("href")).toBe("https://neture.co.kr/signup");
+  });
   it("loads a public directory without requesting or inventing personal membership", async () => {
     mocks.get.mockResolvedValue({ data: { data: [] } });
     open();

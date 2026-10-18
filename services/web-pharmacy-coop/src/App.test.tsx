@@ -28,6 +28,7 @@ describe("federation and cooperative route boundaries", () => {
   });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
+    expect(screen.getByRole("link", { name: "회원가입" }).getAttribute("href")).toBe("https://neture.co.kr/signup");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
       "조합의 힘",
     );

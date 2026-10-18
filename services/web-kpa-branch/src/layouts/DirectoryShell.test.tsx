@@ -35,6 +35,7 @@ describe('DirectoryShell', () => {
     expect(header.textContent).toContain('약사회 분회');
     expect(screen.getAllByTestId('o4o-home-button').length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: '로그인' }).getAttribute('href')).toBe('/login');
+    expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('https://neture.co.kr/signup');
     const nav = screen.getByRole('navigation', { name: '분회 서비스' });
     const hrefs = Array.from(nav.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs).toEqual(['/', '/join', '/me']);
