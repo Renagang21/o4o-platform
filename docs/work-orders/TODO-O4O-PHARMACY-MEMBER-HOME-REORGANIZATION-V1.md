@@ -10,7 +10,7 @@
 현재 사업별 특별 서비스는 없다. 교육/행사는 안내 콘텐츠이며 별도 수강·예약 시스템을 만들지 않는다.
 기존 게시·가입·권한·전시·독립 사본 계약을 재사용한다. 범용 core/extension 플랫폼을 새로 만들지 않는다.
 운영 데이터·권한·DB·API 계약·의존성·CI 인프라는 변경하지 않는다.
-사용자 종료 범위는 commit/push이며 PR 생성·main 병합·배포는 이번 작업에 포함하지 않는다.
+최초 개발 요청의 종료 범위는 commit/push였다. 이후 사용자 추가 승인에 따른 main 병합·배포는 아래 후속 단계에서 구분한다.
 
 ## TODO
 
@@ -71,7 +71,7 @@ WORKTREE_DISPOSITION: KEEP — 구현·검증·push 및 후속 통합 인계 전
 
 검증 결과는 [이 트랙 CHECK](../checks/CHECK-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에 기록한다.
 전체 26 files / 177 tests·TypeScript 포함 production build·변경 lint·약국/메가팜 PC/mobile 28흐름 PASS.
-실제 OAuth·실제 업무 데이터 검증은 하지 않았으며 PR CI·통합·배포는 이번 요청 밖으로 미실행이다.
+실제 OAuth·실제 업무 데이터 검증은 하지 않았다. 개발 push 시점에는 PR CI·통합·배포가 미실행이었으며 후속 단계의 결과를 별도로 기록한다.
 
 DEPLOYMENT: REQUIRED — 후속 통합 담당이 actual Delivery 판정 후 진행한다. 이번 완료는 개발·검증·push 범위다.
 WORKTREE_DISPOSITION: KEEP — `wo/pharmacy-member-home`과 이번 전용 공간을 인계·후속 수정용으로 보존한다.
@@ -85,9 +85,20 @@ WORKTREE_DISPOSITION: KEEP — `wo/pharmacy-member-home`과 이번 전용 공간
 최신 main `1ba05e353d`의 관리자 사업 원장/등록 화면 후속 변경을 자기 branch에 merge했다.
 이번 메인·메뉴 수정 경로와 충돌은 없고 공통 운영 UI 소비 빌드·회귀와 실제 CI를 재확인한다.
 
-- [ ] 최신 HEAD CI·Codex 리뷰·미해결 스레드·실제 ruleset 확인 후 정상 PR 통합.
-- [ ] main CI·Delivery 판정·신규 revision 검증·트래픽 전환·serving 결과 확인.
-- [ ] 운영 파일·readiness 확인과 CHECK 결과 기록·종료 정리.
+- [x] 최신 HEAD CI·Codex 리뷰·미해결 스레드·실제 ruleset 확인 후 정상 PR 통합.
+- [x] main CI·Delivery 판정·신규 revision 검증·트래픽 전환·serving 결과 확인.
+- [x] 운영 파일·readiness 확인과 CHECK 결과 기록·종료 정리 조건 확정.
 
 DEPLOYMENT: AUTOMATIC — 최종 누적 serving 비교와 actual Delivery 판정으로 확정한다.
 WORKTREE_DISPOSITION: KEEP — 후속 통합·배포·기록 진행 중.
+
+## 통합·운영 반영 완료
+
+PR #704 main `0b6649bd3615fd5b6dae1889c9a32a03d1a019cc`의 post-merge CI
+#39126999450·Delivery #39127701475 모두 SUCCESS, 약국 웹 verified rollout과
+최종 production DEPLOYED를 확인했다. 공식 약국 HTML/실행 파일 200과 새 메인 코드,
+API readiness 200/ready도 확인했다. 실제 OAuth·실제 업무 데이터 검증과는 구분한다.
+최종 근거와 리뷰 보완·정적 분석 경고는 이 트랙 CHECK에 기록했다.
+
+WORKTREE_DISPOSITION: KEEP — 완료 기록 PR의 main 포함·post-merge CI·clean 확인 후
+SAFE_TO_REMOVE를 판정해 이번 worktree/branch만 정리한다. 이전 작업공간은 보존한다.

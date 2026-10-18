@@ -10,7 +10,7 @@
 현재 사업의 소식·본부 전시·운영 자료·제품 정보·회원 활동 중심으로 재구성한다.
 거래는 내 매장, 복수 사업 모아보기는 My Home, 현재 특별 서비스는 없음으로 유지한다.
 기준은 main `d9576802c1a44d6c957c702835cb2d09394d08d5`, branch는 `wo/pharmacy-member-home`이다.
-이번 요청은 개발·검증·commit/push까지다. PR 생성·통합·배포는 수행하지 않는다.
+최초 개발 요청은 검증·commit/push까지였다. 사용자의 후속 main 병합·배포 승인은 뒤의 통합/운영 결과 절에서 구분한다.
 
 ## 코드·소비처 대조
 
@@ -67,7 +67,7 @@ Chromium에서 실제 production 빌드 파일과 합성 계정/API를 사용한
 - 현재 worktree·기준 checkout에 `docs/local/TEST-ACCOUNTS.local.md`가 없다. 환경 변수 준비 상태를 실제 계정 확인으로 바꾸지 않는다.
 - 실제 Google·카카오 로그인·실제 가입 약국의 운영 데이터·실제 handoff 세션 교환은 미검증이다.
 - 운영 쓰기·테스트 데이터 생성 없음. 합성 데이터는 브라우저 응답/임시 파일에만 있으며 운영에 정리할 업무 데이터가 없다.
-- PR CI·Codex 리뷰·main 병합·운영 배포는 이번 요청에서 미실행이다. push를 운영 적용으로 보고하지 않는다.
+- 최초 개발 push 시점에는 PR CI·Codex 리뷰·main 병합·운영 배포가 미실행이었다. 후속 실행 결과는 뒤 절에 기록하며 push 자체를 운영 적용으로 보고하지 않는다.
 - 후속 통합 담당은 branch HEAD와 main 이동·실제 ruleset·CI·리뷰·Delivery 판정을 다시 확인한다.
 
 WORKTREE_DISPOSITION: KEEP — 후속 통합·수정에 필요한 이번 branch/worktree를 보존한다. 이전 공간은 변경하지 않는다.
@@ -99,3 +99,48 @@ TypeScript 포함 production build PASS다. BusinessWorkspace의 기존 user hoo
 1개는 그대로이며 변경 lint 0 errors다. 실제 OAuth 로그인 완료를 대신하는 검증은 아니다.
 
 추가 보완 후 최종 빌드에서도 PC/mobile 28흐름 PASS, pageerror·가로 넘침 0을 확인했다.
+
+## main 통합 확인
+
+[PR #704](https://github.com/Renagang21/o4o-platform/pull/704)는 source HEAD
+`62084e9577828c0e99889f537fdbb15b90bdd447`에서 required CI Gate와
+[CI #39126128276](https://github.com/Renagang21/o4o-platform/actions/runs/39126128276)를 통과했다.
+최종 코드 리뷰는 `25761e7394`에서 완료됐고 지적 4건의 미해결 스레드는 0이다.
+그 뒤 #705의 다른 트랙 문서 갱신을 최신 main에서 merge한 `62084e9577`은
+리뷰한 코드와 services/packages/apps/.github 차이가 0임을 확인했다.
+실제 main ruleset은 PR·CI Gate 필수·필수 human approval 0이며 bypass 없이 정상 merge했다.
+main merge SHA는 `0b6649bd3615fd5b6dae1889c9a32a03d1a019cc`다.
+병합 결과도 검증한 branch와 코드 차이 0이며 post-merge CI·Delivery를 확인한다.
+SonarCloud app suite는 통합 시 queued로 결과가 없었다. 필수 gate 통과와 미보고 외부 분석을 구분한다.
+
+이 절과 운영 결과 추가는 동일 WO의 source PR 통합 후 완료 근거를 보충하는 연속 단계다.
+기능 수정용 중복 PR을 만들지 않고 같은 branch에서 문서 전용 완료 기록을 진행한다.
+
+SonarCloud는 이후 source HEAD `62084e9577`에서 SUCCESS로 완료됐다. 신규 중복률 0%·
+security hotspots 0이다. CSS !important 2곳과 표시 문구 중첩 ternary 1곳, 총 3개 warning은
+남아 있으며 gate 통과와 구분한다. 공통 Hero의 기존 !important를 서비스 범위에서 덮는 표시 문제이며
+검사 제외·threshold 변경이나 공통 CSS 계약 변경은 하지 않았다.
+
+## 운영 배포·최종 판정
+
+- main `0b6649bd3615fd5b6dae1889c9a32a03d1a019cc`의
+  [CI #39126999450](https://github.com/Renagang21/o4o-platform/actions/runs/39126999450) SUCCESS.
+- [Delivery #39127701475](https://github.com/Renagang21/o4o-platform/actions/runs/39127701475) SUCCESS.
+  실제 누적 판정에 따라 약국 웹(kpa-society)만 자동 배포했으며 API·관리자·다른 웹은 대상이 아니다.
+- 신규 revision smoke·트래픽 전환·Verify deployment·최종 serving SHA 확인 SUCCESS.
+  해당 main SHA의 `production` 상태는 SUCCESS / `DEPLOYED · deploy: kpa-society`다.
+  단순 skip run 성공으로 운영 반영을 대신하지 않았다.
+- 공식 `pharmacy.neture.co.kr` HTML/entry JS는 모두 HTTP 200. entry가
+  `/assets/index-CkV8yavU.js`에서 `/assets/index-BGfGNHOW.js`로 바뀌었고, 새 메인 제목
+  '약국에 필요한 소식과 자료'와 실제 헤더 높이를 반영하는 이동 코드가 포함됐다.
+- API readiness는 HTTP 200 / ready. API 신규 배포·실제 OAuth·실제 운영 업무 검증을 의미하지 않는다.
+- source 코드의 약국 웹 188건·공통 운영 UI 188건, 양 사업 PC/mobile 28흐름 PASS와
+  최종 branch→main 코드 차이 0을 대조했다. 운영 업무 데이터·권한·Google 연결 변경 없음.
+
+**완료**: TODO→코드/문서 조사→화면 보완→로컬 검증→push→리뷰 보완→정상 main 통합→
+실제 verified 운영 배포와 공식 제공 코드 확인. 실제 OAuth·실제 업무 확인은 사용자 검증 항목으로 남긴다.
+Sonar gate는 통과했으며 표시 코드의 warning 3개와 기존 hook 경고 1개는 앞 절에 구분했다.
+
+완료 기록은 문서 전용 후속 PR로 통합하며 별도 runtime 배포는 NOT_APPLICABLE이다.
+WORKTREE_DISPOSITION: KEEP — 완료 기록 main 포함·post-merge CI·clean·진행 중 operation/작업 process 없음
+확인 후 SAFE_TO_REMOVE로 판정해 이번 worktree/branch만 정리한다. 기존 공간은 보존한다.
