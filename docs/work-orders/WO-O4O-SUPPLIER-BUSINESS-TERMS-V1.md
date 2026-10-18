@@ -68,3 +68,5 @@
 사용자의 main 병합·배포 지시로 통합을 시작했다. main `78909a7a87`의 운영자 제품 상세를 보존하고, 고정 조건이 있는 제안은 공통 정책 대신 해당 조건을 표시하도록 충돌을 해결했다. 공유 약국 관리 37개, 실제 격리 PostgreSQL 포함 API 53개(새 main의 운영자 제품 상세 2개 포함) 재검증 통과. 제품 상세 필드가 추가된 main에 맞춰 격리 DB fixture도 갱신했다. 운영 migration 승인은 `AddSupplierProposalTerms1792221000000`에 대해 배포 직전 별도로 확인한다. 기존 개발 단계의 미실행 기록은 당시 범위이며 후속 통합 결과는 PR·배포 증거로 인계한다.
 
 PR #693 Codex P2 보완: 과거 공급자 종료가 보존한 서로 다른 결정·종료 시각은 승인 이력으로 표시한다. 이전 운영자 종료처럼 두 시각이 같은 경우에만 구분 불가로 표시한다. 공유 약국 관리 UI 38개 재검증 통과.
+
+PR CI 후속: API shard 2가 Supplier identity 정본 경계에서 실패했다. 로그 저장소의 프록시 403 때문에 동일 shard를 로컬 재현해, 직접 legacy pointer 조회가 원인임을 확인했다. 예외·경계 테스트 변경 없이 `resolveSupplierForUser`를 재사용하도록 수정했다. canonical 관계가 오래된 legacy pointer보다 우선하는 사례를 추가했고, 실제 PostgreSQL 17개를 포함한 관련 5 suites·95 tests가 통과했다. 기존 공통 resolver의 observable fallback을 유지한다.

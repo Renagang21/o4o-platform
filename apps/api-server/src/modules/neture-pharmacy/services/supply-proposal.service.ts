@@ -11,7 +11,7 @@ import { NeturePharmacyError,
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
 
-import { SUPPLIER_WORK_MEMBER_ROLES } from '../../neture/middleware/supplier-context.resolver.js';
+import { resolveSupplierForUser } from '../../neture/middleware/supplier-context.resolver.js';
 import { proposalTerms } from './proposal-terms.js';
 
 export type ProposalAction = 'approve' | 'reject' | 'end';
@@ -122,20 +122,22 @@ export class SupplyProposalService {
   async operatorDecide(sf: SemiFranchiseRow, operatorId: string, proposalId: string, action: ProposalAction, reason?: string | null) {
     return this.dataSource.transaction(async (m) => {
       const [current] = await m.query(
-        `SELECT sp.id, sp.status,
-                (sp.requested_by = $3::uuid OR ns.user_id = $3::uuid OR EXISTS (
-                  SELECT 1 FROM organization_members om WHERE om.organization_id = ns.organization_id
-                    AND om.user_id = $3::uuid AND om.left_at IS NULL AND om.role = ANY($4::text[])
-                )) AS self_approval
+        `SELECT sp.id, sp.status, sp.requested_by,
+                spo.supplier_id, ns.organization_id AS supplier_organization_id
            FROM supply_proposals sp JOIN supplier_product_offers spo ON spo.id = sp.offer_id
            JOIN neture_suppliers ns ON ns.id = spo.supplier_id
           WHERE sp.id = $1::uuid AND sp.semi_franchise_id = $2 FOR UPDATE OF sp`,
-        [proposalId, sf.id, operatorId, SUPPLIER_WORK_MEMBER_ROLES],
+        [proposalId, sf.id],
       );
       // 다른 세미프랜차이즈의 제안은 처리할 수 없다(존재도 드러내지 않음).
       if (!current) throw new NeturePharmacyError(404, 'PROPOSAL_NOT_FOUND', '제안을 찾을 수 없습니다.');
-      if (action === 'approve' && current.self_approval) {
-        throw new NeturePharmacyError(403, 'SELF_APPROVAL_FORBIDDEN', '자신이 요청했거나 공급 업무를 담당하는 공급자의 제안은 승인할 수 없습니다.');
+      if (action === 'approve') {
+        // Use the canonical resolver, including its observable legacy fallback, rather than a second identity path.
+        const supplier = current.requested_by === operatorId ? null
+          : await resolveSupplierForUser(this.dataSource, operatorId, current.supplier_organization_id);
+        if (current.requested_by === operatorId || (supplier?.kind === 'resolved' && supplier.supplierId === current.supplier_id)) {
+          throw new NeturePharmacyError(403, 'SELF_APPROVAL_FORBIDDEN', '자신이 요청했거나 공급 업무를 담당하는 공급자의 제안은 승인할 수 없습니다.');
+        }
       }
       const next = nextProposalStatus(current.status, action);
       if (!next) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);

@@ -18,8 +18,8 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     fixture=await createCarePharmReviewDb();
     await fixture.ds.query(`
       CREATE TABLE users(id uuid PRIMARY KEY,name text);
-      CREATE TABLE organizations(id uuid PRIMARY KEY,name text,phone text,address text,address_detail jsonb);
-      CREATE TABLE organization_members(organization_id uuid,user_id uuid,role text,left_at timestamptz);
+      CREATE TABLE organizations(id uuid PRIMARY KEY,name text,phone text,address text,address_detail jsonb,type text);
+      CREATE TABLE organization_members(organization_id uuid,user_id uuid,role text,left_at timestamptz,is_primary boolean);
       CREATE TABLE neture_suppliers(id uuid PRIMARY KEY,organization_id uuid,user_id uuid,slug text,status text,base_shipping_fee int,free_shipping_threshold int);
       CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,status text,specification text,manufacturer_name text,barcode text);
       CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY,master_id uuid,supplier_id uuid,approval_status text,deleted_at timestamptz,
@@ -39,8 +39,8 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     `);
     const q=fixture.ds.createQueryRunner();await new AddSupplierProposalTerms1792221000000().up(q);await q.release();
     await fixture.ds.query(`INSERT INTO users VALUES ($1,'Owner'),($2,'Requester'),($3,'Legacy'),($4,'Reviewer'),($5,'Closer')`,[owner,requester,legacy,operator,closer]);
-    await fixture.ds.query(`INSERT INTO organizations(id,name) VALUES ($1,'Supplier fixture'),($2,'Pharmacy fixture')`,[org,buyerOrg]);
-    await fixture.ds.query(`INSERT INTO organization_members VALUES ($1,$2,'owner',NULL)`,[org,owner]);
+    await fixture.ds.query(`INSERT INTO organizations(id,name,type) VALUES ($1,'Supplier fixture','supplier'),($2,'Pharmacy fixture','pharmacy')`,[org,buyerOrg]);
+    await fixture.ds.query(`INSERT INTO organization_members(organization_id,user_id,role,left_at) VALUES ($1,$2,'owner',NULL)`,[org,owner]);
     await fixture.ds.query(`INSERT INTO neture_suppliers VALUES ($1,$2,$3,'fixture','ACTIVE',3000,50000)`,[supplier,org,legacy]);
     await fixture.ds.query(`INSERT INTO product_masters(id,name,status) VALUES ($1,'Fixture product','ACTIVE')`,[master]);
     await fixture.ds.query(`INSERT INTO supplier_product_offers(id,master_id,supplier_id,approval_status,price_general) VALUES ($1,$2,$3,'APPROVED',1200)`,[offer,master,supplier]);
@@ -73,6 +73,20 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
   it.each([['requester',requester],['canonical owner',owner],['legacy owner',legacy]])('blocks self approval by %s',async(_label,actor)=>{
     const p=await create();await expect(service.operatorDecide(sf,actor,p.id,'approve')).rejects.toMatchObject({code:'SELF_APPROVAL_FORBIDDEN'});
     expect((await service.supplierList(supplier))[0].status).toBe('pending');
+  });
+  it('uses canonical authority before a stale legacy supplier pointer',async()=>{
+    const otherOrg=randomUUID(), otherSupplier=randomUUID();
+    await fixture.ds.query("INSERT INTO organizations(id,name,type) VALUES ($1,'Other supplier fixture','supplier')",[otherOrg]);
+    await fixture.ds.query("INSERT INTO neture_suppliers(id,organization_id,slug,status) VALUES ($1,$2,'other-fixture','ACTIVE')",[otherSupplier,otherOrg]);
+    await fixture.ds.query("INSERT INTO organization_members(organization_id,user_id,role) VALUES ($1,$2,'owner')",[otherOrg,legacy]);
+    try {
+      const p=await create();
+      await expect(service.operatorDecide(sf,legacy,p.id,'approve')).resolves.toMatchObject({status:'approved'});
+    } finally {
+      await fixture.ds.query('DELETE FROM organization_members WHERE organization_id=$1',[otherOrg]);
+      await fixture.ds.query('DELETE FROM neture_suppliers WHERE id=$1',[otherSupplier]);
+      await fixture.ds.query('DELETE FROM organizations WHERE id=$1',[otherOrg]);
+    }
   });
   it('does not treat a former owner as current supplier authority and keeps business scope',async()=>{
     const p=await create();await fixture.ds.query('UPDATE organization_members SET left_at=now()');
