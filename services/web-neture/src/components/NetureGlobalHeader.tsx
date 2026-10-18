@@ -1,3 +1,4 @@
+import { parsePharmacyCollaboratorRole } from '@o4o/types';
 /**
  * NetureGlobalHeader — Neture 서비스의 GlobalHeader 브릿지
  *
@@ -78,6 +79,9 @@ export function NetureGlobalHeader() {
   //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
   const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
+
+  const businessOperator = user?.roles?.some(role => { const scope = parsePharmacyCollaboratorRole(role); return scope && (CURRENT_HOST_PROFILE !== 'carepharm' || scope.businessKey === 'carepharm'); });
+  if (businessOperator && !publicNav.some(item => item.href === '/operator/semi-franchises') && !contextualNav.some(item => item.href === '/operator/semi-franchises')) contextualNav.push({ label: '사업 운영', href: '/operator/semi-franchises' });
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }

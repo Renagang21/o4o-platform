@@ -1,3 +1,4 @@
+import { BUSINESS_OPERATOR_PREDICATE, hasBusinessOperatorAccess } from './business-operator-access.js';
 import { recordOperation } from '../../../services/operations/operation-audit.js';
 import { hasCooperativeOperatorAccess } from './cooperative-operator-access.js';
 import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
@@ -8,7 +9,7 @@ import { businessCommunityKeyTaken } from '../../../services/community/community
  * - 약국 조직 단위 가입(신청 · 승인 · 정지 · 종료). 내 매장(약국) 승인이 세미프랜차이즈 가입을 자동 승인하지 않는다.
  * - 신청 · 승인(재활성화 포함) 시점에 **현재** Neture 메인 가입 active 를 직접 확인한다 — 내 매장 승인을 거쳤다는
  *   간접 충족에 기대지 않는다(이후 Neture 가입 상태가 바뀔 수 있다). 정지 연쇄 정책은 별도.
- * - 담당 운영자 판정 = (라우트 guard) neture:operator role ∧ (여기) semi_franchise_operators 활성 행.
+ * - 담당 운영자 판정 = 사업 한정 역할 또는 유효 Neture 운영 역할 + 활성 담당 관계.
  * - 세미프랜차이즈를 추가해도 코드 분기를 늘리지 않는다(행 + 운영 조직 1개).
  */
 import type { DataSource } from 'typeorm';
@@ -138,12 +139,7 @@ export class SemiFranchiseService {
   // ─── 담당 운영자 ────────────────────────────────────────────────────────
 
   async isOperatorOf(userId: string, semiFranchiseId: string): Promise<boolean> {
-    const rows = await this.dataSource.query(
-      `SELECT 1 FROM semi_franchise_operators
-        WHERE semi_franchise_id = $1 AND user_id = $2 AND revoked_at IS NULL LIMIT 1`,
-      [semiFranchiseId, userId],
-    );
-    return rows.length > 0;
+    return hasBusinessOperatorAccess(this.dataSource, userId, semiFranchiseId);
   }
 
   /** 담당이 아니면 403. 반환한 세미프랜차이즈 범위 안의 행만 처리한다. */
@@ -160,7 +156,7 @@ export class SemiFranchiseService {
     return this.dataSource.query(
       `SELECT ${SF_COLUMNS}
          FROM semi_franchises sf
-         JOIN semi_franchise_operators op ON op.semi_franchise_id = sf.id AND op.user_id = $1 AND op.revoked_at IS NULL
+         WHERE ${BUSINESS_OPERATOR_PREDICATE}
         ORDER BY sf.name, sf.key`,
       [userId],
     );

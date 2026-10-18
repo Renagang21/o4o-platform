@@ -1,3 +1,5 @@
+import { PHARMACY_COLLABORATOR_ROLES, pharmacyCollaboratorRoles } from '@o4o/types';
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 /**
  * RoleGuard / RouteGuard — Neture 역할 기반 접근 제어
  *
@@ -165,9 +167,12 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
  *   기존 redirectMap 제거 — admin이 /operator/* 에서 차단되던 구조 해소.
  */
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
+  const { pathname } = useLocation();
+  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && pathname === '/operator');
+  const scopedRoles = !businessPath ? [] : CURRENT_HOST_PROFILE === 'carepharm' ? pharmacyCollaboratorRoles('carepharm') : PHARMACY_COLLABORATOR_ROLES;
   return (
     <RouteGuard
-      allowedRoles={OPERATOR_OR_ABOVE_ROLES}
+      allowedRoles={[...OPERATOR_OR_ABOVE_ROLES, ...scopedRoles]}
       requireMembership="neture"
       fallback={fallback}
     >

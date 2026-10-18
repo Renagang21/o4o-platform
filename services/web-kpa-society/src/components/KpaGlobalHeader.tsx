@@ -1,3 +1,5 @@
+import { pharmacyCollaboratorRoles } from '@o4o/types';
+import { BUSINESS_SITE } from '../config/businessSite';
 /**
  * KpaGlobalHeader — KPA Society 서비스의 GlobalHeader 브릿지
  *
@@ -75,7 +77,7 @@ export function KpaGlobalHeader() {
     base: businessMatch ? [] : KPA_BASE_NAV,
     contextual: [],
     conditions: {},
-    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
+    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
     guestTrailing: [],
     isAuthenticated: !!user,
   });

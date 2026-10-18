@@ -41,6 +41,15 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   'supplier:operator',
   'funding:admin',
   'funding:operator',
+  // Business-scoped roles keep canonical Neture membership; they do not grant Neture-wide administration.
+  'neture:pharmacy_admin',
+  'neture:pharmacy_operator',
+  'neture:carepharm_admin',
+  'neture:carepharm_operator',
+  'neture:megapharm_admin',
+  'neture:megapharm_operator',
+  'neture:pharmcoop_admin',
+  'neture:pharmcoop_operator',
 ]);
 
 export type OperatorRoleRejectCode =
