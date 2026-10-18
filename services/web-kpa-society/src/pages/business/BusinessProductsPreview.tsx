@@ -25,9 +25,9 @@ export default function BusinessProductsPreview({ businessKey, organizationId, c
     return () => { alive = false; };
   }, [scope, organizationId, canManage, businessKey, retry]);
   const current = result?.scope === scope ? result : null;
-  return <section className="rounded-xl border bg-white p-5 sm:p-6" aria-label="사업 공급 상품">
-    <h2 className="text-lg font-semibold text-slate-900">사업 공급 상품</h2>
-    <p className="mt-2 text-sm leading-6 text-slate-600">선택 약국이 현재 이용할 수 있는 사업 공급 조건을 최대 3건 보여줍니다. 상세 조건과 주문은 내 매장에서 확인하세요.</p>
+  return <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6" aria-label="제품 정보">
+    <h2 className="text-lg font-semibold text-slate-900">제품 정보</h2>
+    <p className="mt-2 text-sm leading-6 text-slate-600">이 사업에서 선택 약국에 제공하는 제품을 소개합니다. 공급 조건 확인과 주문은 내 매장에서 이어갑니다.</p>
     {canManage ? <p className="mt-3 text-sm text-slate-500">공급 승인과 상품 관리는 사업 운영 화면에서 진행합니다.</p> : !organizationId ?
       <p className="mt-3 text-sm text-slate-500">이용할 약국을 먼저 선택해 주세요.</p> :
       !current ? <p role="status" className="py-4 text-sm text-slate-500">공급 상품을 불러오고 있습니다…</p> :

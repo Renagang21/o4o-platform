@@ -28,6 +28,7 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
 beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
   mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
+    if (path.startsWith('/home-presentation/')) return { data: { success: true, data: null } };
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
     if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
@@ -55,18 +56,21 @@ describe('약국 회원 초기화면', () => {
     render(tree('/'));
     expect(await screen.findByText('오래된 고정 0')).toBeTruthy();
     expect(screen.getByText('최근 공지 4')).toBeTruthy();
-    expect(screen.getByRole('heading', { name: '고정 공지' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '중요 공지' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: '최근 공지' })).toBeTruthy();
     expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 3, sortBy: 'latest', isPinned: 'true' } });
     expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 5, sortBy: 'latest', isPinned: 'false', type: 'announcement' } });
   });
-  it('루트에 Hero와 실제 공지·게시글·자료를 바로 표시하고 신청 화면을 거치지 않는다', async () => {
+  it('사업 소식·자료·제품·회원 활동 순서로 실제 콘텐츠를 표시하고 소개/매장 안내 상자를 없앤다', async () => {
     render(tree('/'));
     expect(await screen.findByText('회원의 실제 이야기')).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('함께하는 공동공간');
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('약국에 필요한 소식과 자료');
     expect(screen.getByText('게시된 실제 공지')).toBeTruthy();
-    expect(screen.getByRole('heading', {name:'가입 약국 소식'})).toBeTruthy();
-    expect(screen.getByText('회원의 실제 이야기').compareDocumentPosition(screen.getByRole('heading', {name:'나의 약국 업무'})) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('heading', {name:'회원 약국들의 이야기'})).toBeTruthy();
+    const headings = ['사업 소식', '약국 운영 자료', '제품 정보', '회원 약국들의 이야기'].map(name => screen.getByRole('heading', { name }));
+    headings.slice(1).forEach((heading, i) => expect(headings[i].compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy());
+    expect(screen.queryByText('나의 약국 업무')).toBeNull();
+    expect(screen.queryByText('사업자와 가입 약국이')).toBeNull();
     expect(await screen.findByText('사업 자료 요약')).toBeTruthy();
     expect(screen.queryByText('다른 사업 자료')).toBeNull();
     expect(screen.queryByText('참여 신청 · 이용 상태')).toBeNull();
@@ -89,7 +93,7 @@ describe('약국 회원 초기화면', () => {
   it('운영자에게 회원 게시글과 관리 링크를 제공하고 소유자 전용 자료 API를 호출하지 않는다', async () => {
     access.canManage = true; render(tree('/'));
     expect(await screen.findByText('게시된 실제 공지')).toBeTruthy();
-    expect(screen.getByRole('link', { name: '사업 운영 · 회원 관리' }).getAttribute('href')).toBe('/operator/semi-franchises');
+    expect(screen.getByRole('link', { name: '사업 운영 · 회원 관리' }).getAttribute('href')).toBe('/operator/semi-franchises?key=pharmacy');
     expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
   });
   it('자료 실패를 빈 자료로 표시하지 않고 게시글과 독립적으로 재시도한다', async () => {
@@ -129,15 +133,16 @@ describe('약국 회원 초기화면', () => {
     expect(screen.queryByText('등록된 공지가 없습니다.')).toBeNull();
     mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/forum/posts') ? Promise.resolve({ data: { data: [] } }) : original(path, config));
     fireEvent.click(screen.getAllByRole('button', { name: '다시 시도' })[0]);
-    expect(await screen.findByText('등록된 공지가 없습니다.')).toBeTruthy();
-    expect(screen.getByText('최근 가입 약국 소식이 없습니다.')).toBeTruthy();
+    expect(await screen.findByText('첫 약국 이야기를 나눠 주세요 →')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: '회원 약국들의 이야기' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: '중요 공지' })).toBeNull();
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
   it('내 매장 이동 실패를 안내하고 다시 실행할 수 있게 한다', async () => {
-    mocks.handoff.mockRejectedValue(new Error('No organization')); render(tree('/'));
-    fireEvent.click(await screen.findByRole('button', { name: '내 매장으로' }));
+    mocks.handoff.mockRejectedValue(new Error('No organization')); render(<BusinessStoreShortcut compact />);
+    fireEvent.click(screen.getByRole('button', { name: '내 매장' }));
     expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
-    await waitFor(() => expect(screen.getByRole('button', { name: '내 매장으로' })).toHaveProperty('disabled', false));
+    await waitFor(() => expect(screen.getByRole('button', { name: '내 매장' })).toHaveProperty('disabled', false));
     expect(mocks.handoff).toHaveBeenCalledWith({ get: mocks.get }, { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: '/store' });
   });
   it('이전 상세 URL은 query/hash를 보존해 실제 회원 콘텐츠 URL로 연결한다', async () => {
@@ -154,6 +159,7 @@ describe('약국 회원 초기화면', () => {
 
 it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표시한다', async () => {
   mocks.get.mockImplementation(async (path: string) => {
+    if (path.startsWith('/home-presentation/')) return { data: { success: true, data: null } };
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
     if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
@@ -164,7 +170,7 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
     throw new Error(path);
   });
   render(tree('/businesses/network-a'));
-  expect(await screen.findByText('네트워크 A · 공동공간')).toBeTruthy();
+  expect(await screen.findByText('네트워크 A · 협력약국 공간')).toBeTruthy();
   expect(await screen.findByText('사업 A 자료')).toBeTruthy();
   expect(screen.queryByText('다른 사업 자료')).toBeNull();
   expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a&store=store-a');
