@@ -79,3 +79,14 @@ Neture 전체 Vitest 127개 파일 1,133개 · tsc · build · ESLint 통과. �
 - 따라서 새 도메인의 `/` · `/test` · `/login` 직접 접근, 로그인 · 세션 유지 · 로그아웃, 운영자 · 개인 조합원 권한 검증은 frontend 배포 이후로 남는다. 현재 새 도메인은 유효한 HTTPS 위에서 backend 대상 서비스가 없어 404 다.
 - `cooperative-web` 공개 invoker IAM 은 서비스가 생성된 뒤에 설정한다.
 - 개인 조합원 계정의 역할 · 약국 조직 · 매장 연결은 이번 작업에서 바뀌지 않았다(조합 연결 미실행). 연결 후 비교는 등록 실행 시 위 기준선과 대조한다.
+
+## 앱 단독 배포 경로 추가 (2026-10-18)
+
+사용자 지시: 테스트 조합 등록 차단(운영자 계정 부재)은 나중에 해결하고, 지금은 `pharmcoop.neture.co.kr` 이 열려야 한다.
+기존 workflow 는 조합 등록 점검이 실패하면 앱 배포 단계에 도달하지 못해, `cooperative-web` 이 한 번도 생성되지 않았고 LB 가 404 를 냈다.
+
+`deploy-cooperative.yml` 에 `frontend_only` 입력을 추가했다.
+
+- `frontend_only=true` 이면 조합 등록 점검 · 등록 job 을 건너뛰고 앱만 배포한다. 조합 데이터 변경은 0이다. main HEAD · green CI · 같은 SHA 를 서빙하는 API 고정 조건은 그대로다.
+- Cloud Run 은 `--no-traffic` 으로 새 서비스를 만들 수 없다. 그래서 최초 생성은 공개 invoker 없이(비공개) 만들고 revision Ready 조건으로 검증한다. 이후 공개 invoker 는 workflow 밖에서 소유자가 부여한다(기존 원칙 유지). 이미 있는 서비스는 기존과 같이 0% 배포 → tag URL HTTP smoke → 전환이다.
+- 운영자 · 조합원 이메일 입력은 `frontend_only` 에서 비워도 되도록 선택 입력으로 바꾸고, 등록 점검 단계에서 비어 있으면 실패하게 했다.

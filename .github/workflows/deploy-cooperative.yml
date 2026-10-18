@@ -1,5 +1,5 @@
 name: Deploy cooperative test service
-run-name: Cooperative test ${{ inputs.sha }} (apply=${{ inputs.apply }})
+run-name: Cooperative test ${{ inputs.sha }} (apply=${{ inputs.apply }}, frontend_only=${{ inputs.frontend_only }})
 on:
   workflow_dispatch:
     inputs:
@@ -7,13 +7,19 @@ on:
         description: "검증된 main HEAD SHA (API migration·배포가 먼저 완료되어야 함)"
         required: true
       operator_email:
-        description: "사용자가 지정한 기존 운영자 계정"
-        required: true
+        description: "사용자가 지정한 기존 운영자 계정 (frontend_only 이면 비워도 됨)"
+        required: false
+        default: ""
       member_email:
-        description: "사용자가 지정한 기존 개인 조합원 계정"
-        required: true
+        description: "사용자가 지정한 기존 개인 조합원 계정 (frontend_only 이면 비워도 됨)"
+        required: false
+        default: ""
       apply:
         description: "false = 계정·연결 사전 점검만 / true = 테스트 조합 등록·앱 배포"
+        type: boolean
+        default: false
+      frontend_only:
+        description: "true = 조합 등록 점검·등록 없이 앱만 배포 (조합 데이터 변경 0)"
         type: boolean
         default: false
 permissions:
@@ -61,6 +67,8 @@ jobs:
           gcloud run revisions describe "$REVISION" --region="$REGION" --project="$PROJECT_ID" --format=json > "$RUNNER_TEMP/coop-api-revision.json"
           node --input-type=module -e 'import fs from "node:fs";const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/coop-api-revision.json"));if(r.metadata.labels["o4o-commit-sha"]!==process.env.GITHUB_SHA||!r.status.imageDigest)process.exit(1);fs.appendFileSync(process.env.GITHUB_ENV,"API_IMAGE="+r.status.imageDigest+"\n")'
       - name: Provision only the approved cooperative test fixture
+        # frontend_only skips the fixture entirely: no cooperative/membership/operator rows are read or written.
+        if: ${{ !inputs.frontend_only }}
         env:
           APPLY: ${{ inputs.apply }}
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
@@ -69,6 +77,7 @@ jobs:
           COOP_TEST_MEMBER_EMAIL: ${{ inputs.member_email }}
         run: |
           set -euo pipefail
+          test -n "$COOP_TEST_OPERATOR_EMAIL" && test -n "$COOP_TEST_MEMBER_EMAIL"
           ARGS='dist/provision-test-cooperative.js'
           if [ "$APPLY" = 'true' ]; then ARGS="$ARGS,--apply"; fi
           node --input-type=module -e 'import fs from "node:fs";const e=process.env;fs.writeFileSync(e.RUNNER_TEMP+"/coop-job-env.json",JSON.stringify({NODE_ENV:"production",DB_HOST:"/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db",DB_PORT:"5432",DB_USERNAME:e.DB_USERNAME,DB_NAME:e.DB_NAME,COOP_TEST_OPERATOR_EMAIL:e.COOP_TEST_OPERATOR_EMAIL,COOP_TEST_MEMBER_EMAIL:e.COOP_TEST_MEMBER_EMAIL}),{mode:0o600})'
@@ -79,20 +88,34 @@ jobs:
             --command=node --args="$ARGS"
           gcloud run jobs execute o4o-coop-test-provision --region="$REGION" --project="$PROJECT_ID" --wait
       - name: Build and deploy cooperative frontend
-        if: inputs.apply
+        if: inputs.apply || inputs.frontend_only
         run: |
           set -euo pipefail
           gcloud auth configure-docker gcr.io --quiet
           docker build -f services/web-pharmacy-coop/Dockerfile -t "gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA" .
           docker push "gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA"
-          gcloud run deploy cooperative-web --image="gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA" --region="$REGION" --project="$PROJECT_ID" \
-            --service-account="$RUNTIME_SA" --port=8080 --memory=256Mi --cpu=1 --min-instances=0 --max-instances=5 \
-            --no-traffic --tag="sha-${GITHUB_SHA:0:12}" --update-labels="o4o-commit-sha=$GITHUB_SHA"
+          COMMON=(--image="gcr.io/$PROJECT_ID/cooperative-web:$GITHUB_SHA" --region="$REGION" --project="$PROJECT_ID"
+            --service-account="$RUNTIME_SA" --port=8080 --memory=256Mi --cpu=1 --min-instances=0 --max-instances=5
+            --tag="sha-${GITHUB_SHA:0:12}" --update-labels="o4o-commit-sha=$GITHUB_SHA")
+          if gcloud run services describe cooperative-web --region="$REGION" --project="$PROJECT_ID" --format='value(metadata.name)' >/dev/null 2>&1; then
+            gcloud run deploy cooperative-web "${COMMON[@]}" --no-traffic
+            echo "COOP_FIRST_CREATE=false" >> "$GITHUB_ENV"
+          else
+            # Cloud Run cannot create a service with --no-traffic; the first revision serves at once.
+            # It stays private (no public invoker) until the owner grants access, so nothing is exposed early.
+            gcloud run deploy cooperative-web "${COMMON[@]}" --no-allow-unauthenticated
+            echo "COOP_FIRST_CREATE=true" >> "$GITHUB_ENV"
+          fi
       - name: Verify new frontend before switching traffic
-        if: inputs.apply
+        if: inputs.apply || inputs.frontend_only
         run: |
           set -euo pipefail
-          node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --paths '/,/test,/login' --attempts 3
+          if [ "$COOP_FIRST_CREATE" = 'true' ]; then
+            # A private first revision cannot be fetched anonymously; require the revision Ready condition instead.
+            node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --mode readiness
+          else
+            node scripts/ci/cloud-run-rollout.mjs smoke --service cooperative-web --tag "sha-${GITHUB_SHA:0:12}" --paths '/,/test,/login' --attempts 3
+          fi
           gcloud run services update-traffic cooperative-web --region="$REGION" --project="$PROJECT_ID" --to-tags="sha-${GITHUB_SHA:0:12}=100"
       # Public invoker IAM, DNS, HTTPS certificate and load-balancer host routing are owner-managed.
       # This workflow never grants IAM or claims the public domain is ready merely because Cloud Run deployed.

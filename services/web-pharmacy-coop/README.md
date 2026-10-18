@@ -104,6 +104,8 @@ migration 자체가 계정·권한·예시 조합을 생성하지 않는다.
 2. `Deploy cooperative test service` workflow에 해당 main HEAD SHA와 `apply=false`로 사전 검사한다.
 3. 같은 SHA의 `apply=true`는 `test` → `coop-test` → 테스트 협동조합을 등록하고 사용자 지정 운영자·개인 조합원을 연결한다.
 4. 최초 신규 Cloud Run 서비스의 공개 invoker IAM과 DNS·HTTPS 인증서·LB의 `pharmcoop.neture.co.kr` 호스트 연결은 인프라 소유자가 설정한다.
+   - 조합 등록과 무관하게 앱만 먼저 열 때는 `frontend_only=true` 로 실행한다. 조합·조합원·운영자 데이터는 읽지도 쓰지도 않고 앱만 배포한다.
+   - 서비스가 처음 생성되는 실행은 비공개로 만들고 revision Ready 조건만 확인한다. 이후 소유자가 공개 invoker 를 부여한다. 이미 있는 서비스는 기존처럼 0% 배포 → tag URL HTTP 검사 → 전환한다.
 5. 공개 도메인에서 운영자·개인 조합원 로그인과 다른 조합 접근 거절을 확인해야 실사용 완료다.
 
 이 수동 workflow는 저장소 소유자·배포 동결 해제·정확한 main HEAD·동일 SHA의 green CI·동일 SHA를 서빙하는 API를 요구한다.
