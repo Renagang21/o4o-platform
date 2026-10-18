@@ -71,9 +71,9 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('로그인 전 — 공개 서비스 우선', () => {
-  it('전체 서비스 → AI 입력 → 소식 순서로 표시한다', () => {
+  it('AI 입력 → 전체 서비스 → 소식 순서로 표시한다', () => {
     mount();
-    expect(before(screen.getByRole('heading', { name: '전체 서비스' }), screen.getByTestId('home-composer'))).toBe(true);
+    expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
     expect(before(screen.getByRole('heading', { name: '전체 서비스' }), screen.getByTestId('news'))).toBe(true);
   });
 
@@ -107,6 +107,7 @@ describe('로그인 전 — 공개 서비스 우선', () => {
     auth.isLoading = true;
     mount();
     expect(screen.queryByTestId('home-google-start')).toBeNull();
+    expect(before(screen.getByTestId('home-composer'), document.querySelector('.home-hero-frame')!)).toBe(true);
   });
 
   it('비로그인 AI 제출은 실행하지 않고 로그인으로 보낸다 · 첫 사용 안내는 보이지 않는다', () => {
@@ -130,11 +131,11 @@ describe('로그인 후 — 가입 서비스 우선', () => {
     Object.assign(auth, { user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] }, isAuthenticated: true });
   });
 
-  it('가입 서비스 → 탐색 → AI 입력', () => {
+  it('AI 입력 → 가입 서비스 → 탐색', () => {
     mount();
     const prompt = screen.getByText('무엇을 도와드릴까요?', { selector: 'p' });
     expect(before(prompt, screen.getByTestId('home-composer'))).toBe(true);
-    expect(before(screen.getByTestId('entry-panel'), screen.getByTestId('home-composer'))).toBe(true);
+    expect(before(screen.getByTestId('home-composer'), screen.getByTestId('entry-panel'))).toBe(true);
     expect(screen.getAllByTestId('home-composer')).toHaveLength(1);
   });
 
@@ -160,17 +161,20 @@ describe('로그인 후 — 가입 서비스 우선', () => {
   expect(screen.getByRole("heading", { name: "전체 서비스" })).toBeTruthy();
   expect(screen.queryByTestId("entry-panel")).toBeNull();
   expect(screen.queryByTestId("home-composer")).toBeNull();
+  expect(before(screen.getByRole("heading", { name: "O4O AI" }), document.querySelector(".home-hero-frame")!)).toBe(true);
   expect(screen.queryByTestId("home-google-start")).toBeNull();
   expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
 });
 
 
-it.each([false, true])('places a single full-width Hero before the AI and personal workspace (authenticated=%s)', (signedIn) => {
+it.each([false, true])('places AI first, then a single full-width Hero and services (authenticated=%s)', (signedIn) => {
   if (signedIn) Object.assign(auth, {user:{id:'synthetic',name:'샘플',roles:[]}, isAuthenticated:true});
   mount();
   const hero = document.querySelector('.home-hero-frame');
   expect(document.querySelectorAll('.home-hero-frame')).toHaveLength(1);
   expect(hero).toBeTruthy();
-  expect(before(hero!, screen.getByTestId('home-composer'))).toBe(true);
+  expect(before(hero!, screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
+  expect(screen.getByRole('heading', { level: 1, name: 'O4O AI' })).toBeTruthy();
+  expect(before(screen.getByTestId('home-composer'), hero!)).toBe(true);
   if (signedIn) expect(before(hero!, screen.getByTestId('entry-panel'))).toBe(true);
 });
