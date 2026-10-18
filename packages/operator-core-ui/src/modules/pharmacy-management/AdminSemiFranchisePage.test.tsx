@@ -232,3 +232,63 @@ it("locks registration fields and operator input while creating without preselec
     ),
   );
 });
+
+it("prefills the CarePharm registration form from the operators link without saving it", async () => {
+  window.history.replaceState(null, "", "/admin/semi-franchises?register=carepharm");
+  try {
+    render(<Page />);
+    await screen.findByRole("button", { name: "수정" });
+    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe("carepharm");
+    expect((screen.getByLabelText("새 사업 이름") as HTMLInputElement).value).toBe("CarePharm · 만성질환관리");
+    expect(screen.getByText(/"만들기"를 눌러야 등록됩니다/)).toBeTruthy();
+    expect(api.createSemiFranchise).not.toHaveBeenCalled();
+  } finally {
+    window.history.replaceState(null, "", "/");
+  }
+});
+
+it("ignores presets outside CarePharm and MegaPharm and reports an already registered business", async () => {
+  window.history.replaceState(null, "", "/admin/semi-franchises?register=pharmcoop");
+  try {
+    render(<Page />);
+    await screen.findByRole("button", { name: "수정" });
+    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe("");
+  } finally {
+    cleanup();
+  }
+  api.listSemiFranchises.mockResolvedValue([{ ...business, key: "megapharm", name: "MegaPharm · 창고형약국" }]);
+  window.history.replaceState(null, "", "/admin/semi-franchises?register=megapharm");
+  try {
+    render(<Page />);
+    await screen.findByText(/이미 등록되어 있습니다/);
+    expect(api.createSemiFranchise).not.toHaveBeenCalled();
+  } finally {
+    window.history.replaceState(null, "", "/");
+  }
+});
+
+it("lists centrally assigned business roles separately from revocable individual operators", async () => {
+  api.listSemiFranchises.mockResolvedValue([
+    {
+      ...business,
+      operators: [{ userId: "individual-user", assignedAt: "" }],
+      roleOperators: [
+        { userId: "role-user", role: "neture:a_admin", name: null, email: "role@example.invalid" },
+        { userId: "named-user", role: "neture:a_operator", name: "합성 담당", email: "named@example.invalid" },
+      ],
+    },
+  ]);
+  api.revokeOperator.mockResolvedValue({});
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+  render(<Page />);
+  const roles = await screen.findByLabelText("합성 사업 지정 역할 보유자");
+  expect(within(roles).getByText("role@example.invalid")).toBeTruthy();
+  expect(within(roles).getByText("합성 담당")).toBeTruthy();
+  expect(within(roles).queryByRole("button")).toBeNull();
+  const revokeButtons = screen.getAllByRole("button", { name: "해제" });
+  expect(revokeButtons).toHaveLength(1);
+  fireEvent.click(revokeButtons[0]);
+  await waitFor(() => expect(api.revokeOperator).toHaveBeenCalledWith("a", "individual-user"));
+  expect(api.revokeOperator).toHaveBeenCalledTimes(1);
+  expect(screen.queryByText(/가입 승인·자료 운영을 맡을/)).toBeNull();
+});

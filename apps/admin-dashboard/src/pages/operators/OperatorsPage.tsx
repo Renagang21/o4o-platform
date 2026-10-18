@@ -60,6 +60,48 @@ import {
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
+import { Link } from 'react-router-dom';
+import {
+  parseBusinessLedgerResponse,
+  registerPresetPath,
+  resolveBusinessLedgerStatus,
+  type BusinessLedgerState,
+  type BusinessLedgerStatus,
+} from '@/lib/business-ledger';
+
+const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
+  loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
+  error: { label: '조회 실패', className: 'bg-amber-100 text-amber-800' },
+  unregistered: { label: '사업 미등록', className: 'bg-red-100 text-red-700' },
+  active: { label: '사업 운영', className: 'bg-green-100 text-green-800' },
+  closed: { label: '사업 마감', className: 'bg-gray-200 text-gray-700' },
+};
+
+/** 역할 행의 사업 원장 상태. 사업 한정 역할(pharmacy · carepharm · megapharm)이 아니면 '-'. */
+function BusinessLedgerCell({ serviceKey, ledger }: { serviceKey: string; ledger: BusinessLedgerState }) {
+  const status = resolveBusinessLedgerStatus(serviceKey, ledger);
+  if (status === 'not_applicable') return <span className="text-xs text-gray-400">-</span>;
+  const badge = LEDGER_BADGE[status];
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1">
+      <span
+        className={`px-2 py-0.5 rounded text-xs font-medium ${badge.className}`}
+        title={status === 'error' && ledger.status === 'error' ? ledger.message : undefined}
+      >
+        {badge.label}
+      </span>
+      {status === 'unregistered' && (
+        <Link
+          to={registerPresetPath(serviceKey)}
+          onClick={(e) => e.stopPropagation()}
+          className="text-xs text-blue-600 underline"
+        >
+          사업 등록
+        </Link>
+      )}
+    </span>
+  );
+}
 
 
 /**
@@ -121,9 +163,25 @@ export default function OperatorsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
+  // 사업 원장(semi_franchises) — 계정 상태와 별개. 실패는 '미등록'과 구분해 보여준다.
+  const [businessLedger, setBusinessLedger] = useState<BusinessLedgerState>({ status: 'loading' });
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const fetchBusinessLedger = async () => {
+    setBusinessLedger({ status: 'loading' });
+    try {
+      const response = await authClient.api.get('/neture/admin/semi-franchises');
+      setBusinessLedger({ status: 'ok', byKey: parseBusinessLedgerResponse(response.data) });
+    } catch (err: any) {
+      setBusinessLedger({
+        status: 'error',
+        message: err?.response?.data?.error || err?.message || '사업 원장을 조회하지 못했습니다.',
+      });
+    }
+  };
 
   /**
    * 운영자 목록 조회.
@@ -139,6 +197,7 @@ export default function OperatorsPage() {
    *     - HTTP 200 이지만 `success:false` 이거나 배열이 아닌 응답도 **실패로 판정**한다.
    */
   const fetchUsers = async () => {
+    void fetchBusinessLedger();
     try {
       setLoading(true);
       const response = await authClient.api.get('/admin/users', { params: { limit: 1000 } });
@@ -488,8 +547,9 @@ export default function OperatorsPage() {
       ),
     },
     {
+      // 사용자 계정 상태(users.status). 역할 유효성 · 사업 개설과는 별개 — 사업은 다음 열.
       key: 'status',
-      header: 'Status',
+      header: '계정 상태',
       width: '100px',
       align: 'center',
       sortable: true,
@@ -504,6 +564,12 @@ export default function OperatorsPage() {
           {row.userIsActive ? 'Active' : 'Inactive'}
         </span>
       ),
+    },
+    {
+      key: 'businessLedger',
+      header: '사업 원장',
+      width: '150px',
+      render: (_, row) => <BusinessLedgerCell serviceKey={row.parsedRole.serviceKey} ledger={businessLedger} />,
     },
     {
       key: 'createdAt',
@@ -685,7 +751,7 @@ export default function OperatorsPage() {
             <dl className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
               <dt className="text-gray-500">이메일</dt>
               <dd className="col-span-2 text-gray-900">{detailTarget.userEmail}</dd>
-              <dt className="text-gray-500">상태</dt>
+              <dt className="text-gray-500">계정 상태</dt>
               <dd className="col-span-2">
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
@@ -695,6 +761,10 @@ export default function OperatorsPage() {
                   {detailTarget.userIsActive ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                   {detailTarget.userIsActive ? 'Active' : 'Inactive'}
                 </span>
+              </dd>
+              <dt className="text-gray-500">사업 원장</dt>
+              <dd className="col-span-2">
+                <BusinessLedgerCell serviceKey={detailTarget.parsedRole.serviceKey} ledger={businessLedger} />
               </dd>
               <dt className="text-gray-500">가입일</dt>
               <dd className="col-span-2 text-gray-900">{detailTarget.userCreatedAt || '-'}</dd>
