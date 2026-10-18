@@ -33,18 +33,18 @@ integration('home participation reads the same local PostgreSQL ledgers after ap
   it('reflects an approved membership on the next read, excludes other accounts and revokes suspended access', async () => {
     const db = { query: (sql: string, params?: unknown[]) => client.query(sql, params).then(result => result.rows) } as any;
     const before = await readHomeParticipation(db, 'member');
-    expect(before.businesses[0].canParticipate).toBe(false);
+    expect(before.businesses).toEqual([]);
     expect(before.cooperatives[0].status).toBe('pending');
     await client.query("UPDATE semi_franchise_memberships SET status='active'; UPDATE cooperative_memberships SET status='active'");
     const approved = await readHomeParticipation(db, 'member');
     expect(approved.businesses[0].canParticipate).toBe(true);
     expect(approved.cooperatives[0].status).toBe('active');
     const outsider = await readHomeParticipation(db, 'outsider');
-    expect(outsider.businesses[0].canParticipate).toBe(false);
+    expect(outsider.businesses).toEqual([]);
     expect(outsider.cooperatives).toEqual([]);
     await client.query("UPDATE semi_franchise_memberships SET status='suspended'; UPDATE cooperative_memberships SET status='suspended'");
     const suspended = await readHomeParticipation(db, 'member');
-    expect(suspended.businesses[0].canParticipate).toBe(false);
+    expect(suspended.businesses).toEqual([]);
     expect(suspended.cooperatives[0].status).toBe('suspended');
   });
 });

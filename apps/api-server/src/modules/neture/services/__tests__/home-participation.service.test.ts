@@ -15,7 +15,7 @@ it('reads business access without the general community catalog and scopes coope
   access.mockResolvedValue({ semiFranchise: true, allowed: false, semiFranchiseKey: 'carepharm' });
   const db = { query } as any;
   const first = await readHomeParticipation(db, 'member');
-  expect(first.businesses[0].canParticipate).toBe(false);
+  expect(first.businesses).toEqual([]);
   expect(first.cooperatives[0].status).toBe('pending');
   access.mockResolvedValue({ semiFranchise: true, allowed: true, semiFranchiseKey: 'carepharm' });
   expect((await readHomeParticipation(db, 'member')).businesses[0].canParticipate).toBe(true);

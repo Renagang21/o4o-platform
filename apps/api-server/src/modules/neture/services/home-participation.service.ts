@@ -18,5 +18,5 @@ export async function readHomeParticipation(db: Pick<DataSource, 'query'>, userI
         ORDER BY c.name, c.id`, [userId],
     ),
   ]);
-  return { businesses, cooperatives };
+  return { businesses: businesses.filter(business => business.canParticipate), cooperatives };
 }
