@@ -49,3 +49,7 @@ Admin은 해당 사업의 Operator 기능을 포함한다. 별도 새 관리자 
   이 화면 검증은 로컬 mock API이며 운영 로그인·운영 권한 부여 검증을 대신하지 않는다.
 - 현재 checkout의 `docs/local/TEST-ACCOUNTS.local.md`는 없음. 환경의 이전 계정 변수나 폐기 계정으로 대체하지 않았다.
 - 문서 민감정보 검사 0건, 새 migration·의존성/lockfile 변경 0건.
+
+추가 회귀: 사업 홈 편집 route 19개와 service action HTTP 경계 6개 테스트가 통과했다.
+새 business scope export를 route mock에 반영하고 사업 메타데이터 조회와 권한 조회를 구별했다.
+최신 main의 계정 메뉴 변경을 반영한 뒤 Neture·약국 웹을 재빌드하여 통과했다.
