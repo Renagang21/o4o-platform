@@ -164,7 +164,7 @@ export function GlobalHeader({
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
-  }, [location.pathname, location.search, location.hash]);
+  }, [location.pathname, location.search, location.hash, location.key]);
 
   const allNav = [
     ...publicNav,

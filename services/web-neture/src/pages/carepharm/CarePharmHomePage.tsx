@@ -13,7 +13,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
   const location = useLocation();
   useEffect(() => {
     if (view === 'home' && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView?.();
-  }, [view, location.hash]);
+  }, [view, location.hash, location.key]);
   const memberSpace = <CooperationMemberSpace model={COOPERATION_MODELS.carepharm} client={api}
     accountId={isAuthenticated ? user?.id : undefined} view={view}
     onLogin={() => openLoginModal(location.pathname + location.search)}

@@ -86,3 +86,13 @@ Study는 상시 제공하지 않는다. 강의가 있을 때 운영자가 Hero·
 - 통합된 production bundle로 기존 합성 API desktop/mobile 12개 상태를 재실행해 PASS. 실제 사업 등록·권한 부여·메일·업무 write 요청은 하지 않았다.
 - main ruleset 조회: PR 필수, required `CI Gate`, 필수 human approval 0. PR의 정확한 HEAD에서 CI·Codex·미해결 스레드를 확인하고 통합한다. 다른 main 배포와 동시에 공유 runtime을 변경하지 않는다.
 - 아직 이 문단은 PR CI·main 머지·운영 배포 성공을 뜻하지 않는다. 통합 담당이 Delivery/Promote의 실제 serving SHA와 공개 응답을 확인해 최종 결과를 보고한다.
+
+## PR #690 Codex P2 보완
+
+`PRRT_kwDOOXrFm86tlyLA`: 현재 `/#news`에서 메뉴를 열고 같은 항목을 다시 선택하면 pathname/search/hash가 그대로여서 메뉴가 닫히지 않는 경우를 보완했다. 공통 헤더 닫힘과 CarePharm 앵커 스크롤의 effect에 매 navigation마다 달라지는 `location.key`를 포함한다. 같은 앵커로 재진입할 때 스크롤을 다시 내리는 동작도 유지한다.
+
+- 공통 UI 전체 4 files / 39 tests PASS: 최초 이동과 같은 anchor/query/path 재선택을 함께 검증한다.
+- CarePharm·운영자 집중 2 / 32 tests PASS, 변경 파일 lint PASS.
+- UI 패키지 build, Neture TypeScript 포함 production build, Pharmacy production bundle 재생성 PASS. 최신 bundle로 mobile 현재 앵커 재선택까지 검증한 뒤 같은 branch의 새 HEAD를 push한다.
+
+- 최신 production bundle의 desktop/mobile 합성 API 12개 시나리오 PASS. mobile에서 스크롤을 위로 돌린 뒤 현재 `/#news`를 다시 선택해도 메뉴가 닫히고 공지 영역이 다시 보임을 확인했다.
