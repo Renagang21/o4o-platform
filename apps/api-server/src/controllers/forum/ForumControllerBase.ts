@@ -127,6 +127,10 @@ export class ForumControllerBase {
     // service key, so the conversion SSOT (@o4o/security-core) is used here.
     // No forum-local mapping table is introduced.
     this.applyServiceScope(qb, alias, ctx);
+    if (ctx.communityKey === 'community') {
+      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _liveCommunityBoard WHERE _liveCommunityBoard.id = ${alias}.forum_id
+        AND _liveCommunityBoard.service_code = 'community' AND _liveCommunityBoard.organization_id IS NULL AND _liveCommunityBoard.status = 'completed')`);
+    }
     if (ctx.excludeScopedCommunities && !ctx.serviceCode && !ctx.communityKey) return;
 
     // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
@@ -243,8 +247,9 @@ export class ForumControllerBase {
     if (!forumId || codes.length === 0) return false;
 
     const rows = await AppDataSource.query(
-      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = ANY($2::text[]) LIMIT 1`,
-      [forumId, codes],
+      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = ANY($2::text[])
+        AND ($3::boolean = false OR (status = 'completed' AND organization_id IS NULL)) LIMIT 1`,
+      [forumId, codes, ctx?.communityKey === 'community'],
     );
     return rows.length > 0;
   }
@@ -341,18 +346,37 @@ export class ForumControllerBase {
    *   - 해당 forum 의 service_code 에 대응하는 service operator/admin → 같은 서비스만 허용
    * 새로운 권한 개념을 만들지 않는다 (cross-service operator bypass 없음).
    */
+  private async hasScopedCommunityModeration(forumCode: string, userId: string, userRoles: string[], legacyCommunityKey?: string | null): Promise<boolean> {
+  const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
+    `SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
+     UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forumCode],
+  );
+  if (typeof rows[0]?.key !== 'string' || !rows[0].key) return false;
+  const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
+  const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
+  // Service suspension/revocation is authoritative; stale service roles never bypass it.
+  return !!workspace?.allowed && workspace.canManage;
+  }
+
+  private async hasCommunityModerationAccess(userId?: string): Promise<boolean> {
+    if (!userId) return false;
+    const { hasCommunityServiceOperator } = await import('../../services/community/community-service-operator-access.js');
+    return hasCommunityServiceOperator(AppDataSource,userId);
+  }
+
   protected async hasForumModerationOverride(
     forumId: string | null | undefined,
     userRoles: string[],
     userId?: string,
   ): Promise<boolean> {
     if (!forumId) return false;
-    if (isPlatformAdmin(userRoles)) return true;
     const [forum] = await AppDataSource.query(
       `SELECT service_code FROM forum_category_requests WHERE id = $1 LIMIT 1`,
       [forumId],
     );
-    if (!forum || !forum.service_code) return false;
+    if (!forum?.service_code) return false;
+    if (forum.service_code === 'community') return this.hasCommunityModerationAccess(userId);
+    if (isPlatformAdmin(userRoles)) return true;
     if (forum.service_code.startsWith('funding:')) {
       if (!userId) return false;
       const { resolveFundingAccess } = await import('../../services/funding/funding-access.js');
@@ -361,15 +385,7 @@ export class ForumControllerBase {
     }
     const legacyCommunityKey = communityKeyForForumStorageCode(forum.service_code);
     if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
-      const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
-        `SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
-         UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forum.service_code],
-      );
-      if (typeof rows[0]?.key !== 'string' || !rows[0].key) return false;
-      const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
-      const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
-      // Service suspension/revocation is authoritative; stale service roles never bypass it.
-      return !!workspace?.allowed && workspace.canManage;
+      return this.hasScopedCommunityModeration(forum.service_code,userId,userRoles,legacyCommunityKey);
     }
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(forum.service_code);
     return rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false;

@@ -147,7 +147,7 @@ function Layout() {
             )}
           </nav>
           <span className="account-status">
-            {session.userId ? "로그인됨" : "로그인 후 조합 이용"}
+            {session.userId ? "로그인됨" : <><span>로그인 후 조합 이용</span>{" · "}<a href="https://neture.co.kr/signup">회원가입</a></>}
           </span>
         </div>
       </header>

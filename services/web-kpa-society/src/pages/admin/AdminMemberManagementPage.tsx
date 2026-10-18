@@ -5,13 +5,13 @@
  *
  * /operator/members 와 분리된 admin 전용 회원관리 화면.
  *   - 잘못 가입된 회원 / 탈퇴 처리된 회원 / 테스트 회원 정리
- *   - 면허번호(license_number) 중복 해소를 위한 완전삭제 워크플로우
+ *   - 면허번호(license_number) 중복 해소를 위한 가입·프로필 정리 워크플로우
  *   - 승인/반려/정지/복원/탈퇴 처리는 /operator/members 잔존
  *
  * 정책 (WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1 + 본 WO):
  *   - hard delete: kpa:admin 전용 (백엔드 가드)
- *   - 활동 데이터(forum_post / forum_comment) 있어도 완전삭제 가능 — 강한 경고로 보호
- *   - 단일 선택 시만 완전삭제 (DeleteRiskModal 단일 회원 기준)
+ *   - 활동 데이터(forum_post / forum_comment) 있어도 가입·프로필 정리 가능 — 강한 경고로 보호
+ *   - 단일 선택 시만 가입·프로필 정리 (DeleteRiskModal 단일 회원 기준)
  *
  * 진입: AdminAuthGuard (kpa:admin 또는 membershipRole='admin')
  */
@@ -258,9 +258,9 @@ export default function AdminMemberManagementPage() {
       <div className="flex items-start gap-3 mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
         <ShieldAlert className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
         <div className="text-sm text-red-700 space-y-1">
-          <p className="font-semibold">관리자 전용 회원관리 — 완전삭제 워크플로우</p>
+          <p className="font-semibold">관리자 전용 회원관리 — 가입·프로필 정리 워크플로우</p>
           <p>
-            잘못 가입된 회원, 탈퇴 처리된 회원, 테스트 회원 등의 데이터를 완전삭제하여{' '}
+            잘못 가입된 회원의 KPA 가입·프로필을 정리하여{' '}
             <strong>면허번호 중복 / 가입 이력</strong>을 해제합니다.
             승인/반려/정지/복원/탈퇴 처리 는{' '}
             <a href="/operator/members" className="underline">운영자 회원관리</a>{' '}
@@ -309,7 +309,7 @@ export default function AdminMemberManagementPage() {
       {/* MemberListLayout — operator 와 동일 컴포넌트 */}
       <MemberListLayout
         title="회원관리 (관리자)"
-        description="잘못 가입된 회원 정리 / 면허번호 중복 해소 / 완전삭제 워크플로우"
+        description="잘못 가입된 회원 정리 / 면허번호 중복 해소 / 가입·프로필 정리 워크플로우"
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -332,7 +332,7 @@ export default function AdminMemberManagementPage() {
           </div>
         )}
 
-        {/* Admin bulk action — 완전삭제만 (단일 선택 시만 활성) */}
+        {/* Admin bulk action — 가입·프로필 정리만 (단일 선택 시만 활성) */}
         <div className="mb-3">
           <ActionBar
             selectedCount={selectedIds.size}
@@ -340,14 +340,14 @@ export default function AdminMemberManagementPage() {
             actions={[
               {
                 key: 'hard-delete',
-                label: selectedIds.size === 1 ? '완전삭제' : '완전삭제 (1명만)',
+                label: selectedIds.size === 1 ? '가입·프로필 정리' : '가입·프로필 정리 (1명만)',
                 onClick: handleHardDelete,
                 variant: 'danger' as const,
                 icon: <Trash2 size={14} />,
                 group: 'danger' as const,
                 tooltip: selectedIds.size === 1
-                  ? '선택한 회원을 완전삭제합니다 (면허번호/연결 데이터까지 정리)'
-                  : '완전삭제는 1명 선택 시에만 가능합니다',
+                  ? '선택한 회원을 가입·프로필 정리합니다 (면허번호/연결 데이터까지 정리)'
+                  : '가입·프로필 정리는 1명 선택 시에만 가능합니다',
                 visible: selectedIds.size > 0,
                 disabled: selectedIds.size !== 1,
               },

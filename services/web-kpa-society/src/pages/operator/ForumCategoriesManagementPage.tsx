@@ -9,6 +9,7 @@
  * 공통 /api/v1/forum/operator/categories* API 사용 (forumOperatorApi, serviceCode=kpa-society)
  */
 
+import { useAuth } from '../../contexts/AuthContext';
 import { OperatorForumCategoriesPage } from '@o4o/operator-core-ui/modules/forum-categories';
 import type { ForumCategoriesClient } from '@o4o/operator-core-ui/modules/forum-categories';
 import { forumOperatorApi } from '../../api/forum';
@@ -16,5 +17,7 @@ import { forumOperatorApi } from '../../api/forum';
 const client: ForumCategoriesClient = forumOperatorApi;
 
 export default function ForumCategoriesManagementPage() {
-  return <OperatorForumCategoriesPage client={client} tableId="kpa-forum-categories" />;
+  const { user } = useAuth();
+  const canHardDelete = user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
+  return <OperatorForumCategoriesPage client={client} tableId="kpa-forum-categories" disableHardDelete={!canHardDelete} />;
 }

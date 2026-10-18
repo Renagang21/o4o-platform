@@ -191,3 +191,10 @@ it.each(['/operator/legal/community', '/operator/home-presentation/community'])(
   expect(decideHost('main', location)).toEqual({ kind: 'external', href: `https://community.neture.co.kr${path}?tab=review#settings` });
   expect(decideHost('funding', location)).toEqual({ kind: 'external', href: `https://neture.co.kr${path}?tab=review#settings` });
 });
+
+// CarePharm's own operator landing must reach its scoped layout before redirecting to assigned work.
+it('keeps only the CarePharm operator entry native without claiming other Neture management paths', () => {
+  expect(decideHost('carepharm', loc('/operator'))).toEqual({ kind: 'stay' });
+  expect(decideHost('carepharm', loc('/operator/members'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/operator/members' });
+  expect(decideHost('main', loc('/operator'))).toEqual({ kind: 'stay' });
+});

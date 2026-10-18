@@ -4,9 +4,9 @@
  * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
  *
  * 원칙:
- * - 로그인/가입/비밀번호찾기 모두 모달로만 수행
+ * - 로그인은 모달, 계정 가입은 공통 가입 화면으로 연결
  * - 인증 완료 후 현재 화면 유지
- * - URL 변경 없음
+ * - 로그인 모달은 현재 URL 유지
  * - 모달 간 자연스러운 전환
  */
 
@@ -23,7 +23,7 @@ interface AuthModalContextType {
   activeModal: ModalType;
   /** 로그인 모달 열기 */
   openLoginModal: () => void;
-  /** 가입 진입 — 로그인 모달과 같은 화면이다(Google 로 계속하기가 가입을 겸한다). */
+  /** 공통 계정 가입 화면으로 이동한다. 서비스 가입 신청·승인과는 별개다. */
   openRegisterModal: () => void;
   /** 모달 닫기 */
   closeModal: () => void;
@@ -53,8 +53,7 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openRegisterModal = useCallback(() => {
-    setLoginNavigationHandled(false);
-    setActiveModal('login');
+    window.location.assign('https://neture.co.kr/signup');
   }, []);
 
   const closeModal = useCallback(() => {

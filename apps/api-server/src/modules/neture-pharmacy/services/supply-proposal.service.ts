@@ -34,7 +34,11 @@ const PROPOSAL_VIEW = `
          decision_actor.name AS "decidedByName", end_actor.name AS "endedByName",
          sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName",
          spo.id AS "offerId", spo.price_general AS "priceGeneral", pm.name AS "productName",
-         spo.supplier_id AS "supplierId", COALESCE(so.name, ns.slug) AS "supplierName"
+         spo.supplier_id AS "supplierId", COALESCE(so.name, ns.slug) AS "supplierName",
+         pm.specification AS "productSpecification", pm.manufacturer_name AS "productManufacturer",
+         pm.barcode AS "productBarcode", spo.business_short_description AS "productSummary",
+         spo.business_detail_description AS "productDescription",
+         ns.base_shipping_fee AS "baseShippingFee", ns.free_shipping_threshold AS "freeShippingThreshold"
     FROM supply_proposals sp
     JOIN semi_franchises sf ON sf.id = sp.semi_franchise_id
     JOIN supplier_product_offers spo ON spo.id = sp.offer_id

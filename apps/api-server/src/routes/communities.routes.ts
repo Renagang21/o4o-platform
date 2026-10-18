@@ -9,6 +9,7 @@ import { PolicyAcceptanceError } from '../modules/policy-acceptance/policy-accep
 import { requestCommunityServiceMembership } from '../services/community/community-service-membership.js';
 import { forumRequestService } from '../services/forum/ForumRequestService.js';
 import { createServiceForumRouter } from './forum/service-forum.routes.js';
+import { createCommunityManagementRoutes } from './community-management.routes.js';
 import { createCommunityPublicReadRoutes } from './community-public-read.routes.js';
 import { listCommunityWorkspaces, resolveCommunityWorkspace, createCommunityBoard } from '../services/community/community-workspace.service.js';
 
@@ -31,6 +32,7 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
     }
     next();
   });
+  router.use(createCommunityManagementRoutes(authenticate));
   router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));
   router.get('/', optionalAuth, asyncHandler(async (req, res) => {
     res.json({ success: true, data: { communities: await listCommunityWorkspaces(AppDataSource, await currentCommunityUser(req as AuthRequest)) } });

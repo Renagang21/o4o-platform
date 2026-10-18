@@ -12,7 +12,7 @@
  *   - 면허번호(kpa_members.license_number) + 연결 데이터 cascade 정리
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
@@ -58,30 +58,34 @@ const MEMBERSHIP_TYPE_LABEL: Record<string, string> = {
 };
 
 export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
+  const lock = useRef(false);
+  const lifecycle = useRef({ alive: true, version: 0 });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DeleteRiskData | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    apiClient
-      .get<{ data: DeleteRiskData }>(`/members/${memberId}/delete-risk`)
-      .then((r) => setData(r.data))
-      .catch((e) => toast.error(e.message))
-      .finally(() => setLoading(false));
+    const state = lifecycle.current;
+    const version = ++state.version; state.alive = true;
+    setLoading(true); setDeleting(false); setData(null); setError('');
+    apiClient.get<{ data: DeleteRiskData }>(`/members/${memberId}/delete-risk`)
+      .then(r => { if (!r.data) throw new Error('회원 확인 실패'); if (lifecycle.current.alive && lifecycle.current.version === version) setData(r.data); })
+      .catch(e => { if (lifecycle.current.alive && lifecycle.current.version === version) setError(e.message || '회원 확인 실패'); })
+      .finally(() => { if (lifecycle.current.alive && lifecycle.current.version === version) setLoading(false); });
+    return () => { state.alive = false; state.version++; };
   }, [memberId]);
 
   const handleConfirm = async () => {
-    setDeleting(true);
+    if (loading || !data || lock.current) return;
+    lock.current = true; setDeleting(true); setError('');
+    const version = lifecycle.current.version;
     try {
       await apiClient.delete(`/members/${memberId}?mode=hard`);
-      toast.success('완전 삭제 완료');
-      onDeleted();
-      onClose();
-    } catch (e: any) {
-      toast.error(e.message || '삭제 실패');
-    } finally {
-      setDeleting(false);
-    }
+      if (!lifecycle.current.alive || lifecycle.current.version !== version) return;
+      toast.success('KPA 가입·프로필 정리 완료'); onDeleted(); onClose();
+    } catch (e: any) { if (lifecycle.current.alive && lifecycle.current.version === version) setError(e.message || '가입 정리 실패'); }
+    finally { lock.current = false; if (lifecycle.current.alive && lifecycle.current.version === version) setDeleting(false); }
   };
 
   const hasActivity = data
@@ -106,7 +110,7 @@ export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
   ) : data ? (
     <div className="space-y-3">
       <div>
-        <p className="text-sm font-medium text-slate-700 mb-2">삭제 시 영향받는 데이터</p>
+        <p className="text-sm font-medium text-slate-700 mb-2">대상 회원의 참고 데이터 (전체 삭제 범위 아님)</p>
         <div className="grid grid-cols-2 gap-2">
           {[
             { label: '서비스 연결', value: data.risks.memberServices },
@@ -136,7 +140,7 @@ export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
               실제 활동 데이터 (포럼 게시글 {data.risks.forumPosts}건 / 댓글 {data.risks.forumComments}건) 있음
             </p>
             <p>
-              완전삭제 시 게시글/댓글의 작성자 정보가 깨지거나 함께 삭제될 수 있습니다.
+              KPA 가입·프로필을 정리하며 게시글·댓글과 공통 계정은 유지됩니다.
               잘못 가입된 회원 / 면허번호 중복 해소가 아니라 활동 이력이 있는 회원이라면 신중하게 진행하세요.
             </p>
           </div>
@@ -145,7 +149,7 @@ export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
         <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
           <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
           <p className="text-xs text-amber-700">
-            감사 로그 등 부수 데이터가 있습니다. 완전삭제는 가능하지만 진행 전 확인하세요.
+            활동·감사 기록은 보존됩니다. KPA 가입·프로필 정리 범위를 확인하세요.
           </p>
         </div>
       ) : (
@@ -164,6 +168,8 @@ export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
   return (
     <MemberHardDeleteConfirmModal
       open
+      relationshipOnly
+      confirmDisabled={loading || !data}
       member={target}
       serviceLabel="KPA-Society"
       loading={deleting}
@@ -171,6 +177,8 @@ export function MemberDeleteRiskModal({ memberId, onClose, onDeleted }: Props) {
       onConfirm={handleConfirm}
     >
       {riskBlock}
+      <p className="text-sm">KPA 가입·면허 프로필·일반 역할을 정리하며, 공통 계정·다른 서비스·작성 활동·감사 기록은 유지됩니다.</p>
+      {error && <p role="alert" className="text-red-700">{error}</p>}
     </MemberHardDeleteConfirmModal>
   );
 }

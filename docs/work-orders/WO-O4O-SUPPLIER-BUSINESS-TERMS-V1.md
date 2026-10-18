@@ -62,3 +62,7 @@
 검증 산출물은 저장소 밖 `/workspace/artifacts/supplier-business-terms/`에 보관한다. 가상 fixture만 포함하며 실제 계정값·운영 응답은 저장하지 않는다. worktree/branch는 통합 전 후속 수정용으로 KEEP한다.
 
 검증 종료 정리: 이번에 생성한 임시 schema 잔존 0, 격리 DB 4개 삭제 후 잔존 0을 확인했다. 이번 preview 프로세스와 로컬 PostgreSQL을 종료했다. 코드 작업공간은 push 후 KEEP한다.
+
+## 통합 후속 — 2026-10-18
+
+사용자의 main 병합·배포 지시로 통합을 시작했다. main `78909a7a87`의 운영자 제품 상세를 보존하고, 고정 조건이 있는 제안은 공통 정책 대신 해당 조건을 표시하도록 충돌을 해결했다. 공유 약국 관리 37개, 실제 격리 PostgreSQL 포함 API 51개 재검증 통과. 제품 상세 필드가 추가된 main에 맞춰 격리 DB fixture도 갱신했다. 운영 migration 승인은 `AddSupplierProposalTerms1792221000000`에 대해 배포 직전 별도로 확인한다. 기존 개발 단계의 미실행 기록은 당시 범위이며 후속 통합 결과는 PR·배포 증거로 인계한다.

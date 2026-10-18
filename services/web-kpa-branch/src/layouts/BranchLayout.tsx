@@ -183,6 +183,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
             ) : (
               <span className="flex items-center gap-3">
                 <LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink>
+                <a href="https://neture.co.kr/signup" className="font-medium text-primary-600">회원가입</a>
                 <Link to="/join" className="text-gray-600 hover:text-gray-900">가입 신청</Link>
               </span>
             )}

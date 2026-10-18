@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../apiClient', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 
-import { fetchHomeEntryData, buildHomeEntryModel, type EntryCommunity, type HomeEntryData } from '../home-entry';
+import { fetchHomeEntryData, buildHomeEntryModel, resolveHomeEntryUrl, type EntryCommunity, type HomeEntryData } from '../home-entry';
 import type { User } from '../../contexts/AuthContext';
 
 const svc = (key: string, nameKo: string, status = 'active') => ({
@@ -145,4 +145,24 @@ describe('현행 workspace 응답과 조회 실패 처리', () => {
     if (status === 404) expect((await fetchHomeEntryData()).communities).toEqual([]);
     else await expect(fetchHomeEntryData()).rejects.toMatchObject({ response: { status: 503 } });
   });
+});
+
+
+describe('독립 협력사업 참여자는 약국 서비스 가입 없이 실제 호스트로 진입한다', () => {
+ const business = (key: string): EntryCommunity => ({communityKey:`business:${key}`,businessKey:key,kind:'semi-franchise',name:'합성 사업',canParticipate:true,reason:null,entries:[]});
+ it('CarePharm은 기존 인증 alias를 사용하고 pharmacy handoff를 요청하지 않는다', async () => {
+  const model=buildHomeEntryModel(user(),data([business('carepharm')],{}));
+  const action=model.myServices.find(item=>item.id==='business:carepharm')!.action;
+  expect(action).toEqual({kind:'handoff',serviceKey:'carepharm',returnPath:'/'});
+  if(action.kind!=='handoff')throw Error('expected handoff');
+  const {api}=await import('../apiClient');
+  vi.mocked(api.post).mockReset().mockResolvedValue({data:{data:{targetUrl:'https://carepharm.neture.co.kr/handoff?token=synthetic'}}});
+  expect(await resolveHomeEntryUrl(action)).toBe('https://carepharm.neture.co.kr/handoff?token=synthetic');
+  expect(api.post).toHaveBeenCalledWith('/auth/handoff',{targetServiceKey:'carepharm',returnPath:'/'});
+ });
+ it('메가팜은 자기 공개 호스트로 연결하고 미승인 사업은 업무 진입을 만들지 않는다', () => {
+  const model=buildHomeEntryModel(user(),data([business('megapharm'),{...business('carepharm'),canParticipate:false}],{}));
+  expect(model.myServices.find(item=>item.id==='business:megapharm')?.action).toEqual({kind:'public',href:'https://megapharm.neture.co.kr/'});
+  expect(model.myServices.some(item=>item.id==='business:carepharm')).toBe(false);
+ });
 });

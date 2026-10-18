@@ -48,6 +48,8 @@ const SERVICE_OPTIONS = [
 export default function ProductServiceApprovalPage() {
   const dialogFallback = useRef<HTMLHeadingElement>(null);
   const { user } = useAuth();
+  const canHardDelete = user?.roles?.some((r: string) => r === 'neture:admin' || r === 'platform:super_admin') ?? false;
+  const [deleteReason, setDeleteReason] = useState('');
   const canManage = user?.roles?.some(
     (r: string) => r === 'neture:admin' || r === 'neture:operator' || r === 'platform:super_admin',
   ) ?? false;
@@ -188,20 +190,21 @@ export default function ProductServiceApprovalPage() {
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
   const openDelete = (item: ServiceApprovalItem) => {
-    if (!canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    if (!canHardDelete || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    setDeleteReason('');
     setDeleteError(null);
     setDeleteTarget({ offerId: item.offerId, productName: item.productName || '(이름 없음)' });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteTarget || !canManage || deleteWriting.current || decisionWriting.current || trashWriting.current) return;
+    if (!deleteTarget || !canHardDelete || !deleteReason.trim() || deleteWriting.current || decisionWriting.current || trashWriting.current) return;
     const { offerId } = deleteTarget;
     deleteWriting.current = true;
     setDeleteLoading(true);
     setDeleteError(null);
     let deleted = false;
     try {
-      const result = await operatorServiceApprovalApi.deletePendingOffer(offerId);
+      const result = await operatorServiceApprovalApi.deletePendingOffer(offerId, deleteReason.trim());
       if (!deleteMounted.current) return;
       if (!result.success) {
         setDeleteError(`삭제하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
@@ -710,14 +713,14 @@ export default function ProductServiceApprovalPage() {
                       >
                         거절
                       </button>
-                      <button
+                      {canHardDelete && <button
                         onClick={() => openDelete(item)}
                         disabled={!canManage || decisionBusy || deleteLoading}
                         title="이 상품을 완전히 삭제합니다"
                         className="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs font-medium hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         삭제
-                      </button>
+                      </button>}
                     </>
                   ) : item.approvalStatus === 'approved' ? (
                     <button
@@ -838,6 +841,7 @@ export default function ProductServiceApprovalPage() {
             <p className="text-sm text-slate-500 mb-4">
               이 상품을 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다.
             </p>
+            <label className="block text-sm">삭제 사유<textarea aria-label="삭제 사유" maxLength={2000} value={deleteReason} disabled={deleteLoading} onChange={e => setDeleteReason(e.target.value)} className="block w-full border rounded p-2" /></label>
             {deleteError && <p role="alert" className="text-sm text-red-600">{deleteError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
@@ -849,7 +853,7 @@ export default function ProductServiceApprovalPage() {
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                disabled={!canManage || deleteLoading}
+                disabled={!canHardDelete || !deleteReason.trim() || deleteLoading}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 {deleteLoading ? '삭제 중...' : '삭제 확인'}

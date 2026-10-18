@@ -21,9 +21,9 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
       CREATE TABLE organizations(id uuid PRIMARY KEY,name text,phone text,address text,address_detail jsonb);
       CREATE TABLE organization_members(organization_id uuid,user_id uuid,role text,left_at timestamptz);
       CREATE TABLE neture_suppliers(id uuid PRIMARY KEY,organization_id uuid,user_id uuid,slug text,status text,base_shipping_fee int,free_shipping_threshold int);
-      CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,status text);
+      CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,status text,specification text,manufacturer_name text,barcode text);
       CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY,master_id uuid,supplier_id uuid,approval_status text,deleted_at timestamptz,
-        is_active boolean DEFAULT true,price_general int,service_keys text[] DEFAULT '{}',default_supply_enabled boolean DEFAULT true,
+        business_short_description text,business_detail_description text,is_active boolean DEFAULT true,price_general int,service_keys text[] DEFAULT '{}',default_supply_enabled boolean DEFAULT true,
         track_inventory boolean DEFAULT false,stock_quantity int DEFAULT 0,reserved_quantity int DEFAULT 0);
       CREATE TABLE semi_franchises(id uuid PRIMARY KEY,key text,name text,status text,organization_id uuid,payment_receiver_key text);
       CREATE TABLE semi_franchise_memberships(semi_franchise_id uuid,organization_id uuid,status text);
@@ -42,7 +42,7 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     await fixture.ds.query(`INSERT INTO organizations(id,name) VALUES ($1,'Supplier fixture'),($2,'Pharmacy fixture')`,[org,buyerOrg]);
     await fixture.ds.query(`INSERT INTO organization_members VALUES ($1,$2,'owner',NULL)`,[org,owner]);
     await fixture.ds.query(`INSERT INTO neture_suppliers VALUES ($1,$2,$3,'fixture','ACTIVE',3000,50000)`,[supplier,org,legacy]);
-    await fixture.ds.query(`INSERT INTO product_masters VALUES ($1,'Fixture product','ACTIVE')`,[master]);
+    await fixture.ds.query(`INSERT INTO product_masters(id,name,status) VALUES ($1,'Fixture product','ACTIVE')`,[master]);
     await fixture.ds.query(`INSERT INTO supplier_product_offers(id,master_id,supplier_id,approval_status,price_general) VALUES ($1,$2,$3,'APPROVED',1200)`,[offer,master,supplier]);
     await fixture.ds.query(`INSERT INTO semi_franchises VALUES ($1,'pharmacy','Business A','active',$3,'receiver'),($2,'fixture-other','Business B','active',$4,'receiver')`,[sf.id,other.id,randomUUID(),randomUUID()]);
     await fixture.ds.query(`INSERT INTO semi_franchise_memberships VALUES ($1,$3,'active'),($2,$3,'active')`,[sf.id,other.id,buyerOrg]);

@@ -6,7 +6,8 @@ import { OperatorMemberSoftDeleteFlow } from './OperatorMemberSoftDeleteFlow';
 import type { MembersConsoleClient } from './types';
 
 /** Service membership console, independent of business entities and community membership. */
-export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, userId, navigate }: Readonly<{
+export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, userId, navigate, allowDestructiveActions = true }: Readonly<{
+  allowDestructiveActions?: boolean;
   serviceKey: string;
   basePath: string;
   api: UserDetailApiAdapter;
@@ -26,9 +27,9 @@ export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, user
     stats: () => api.get(`/operator/members/stats?serviceKey=${encodeURIComponent(serviceKey)}`),
     updateStatus: async (id, status) => { await api.patch(`/operator/members/${id}/status`, { status, serviceKey }); },
   }), [api, serviceKey]);
-  if (userId) return <UserDetailPage userId={userId} apiAdapter={api} isAdmin={isAdmin} canManageMembers={canManageLifecycle} navigate={navigate}
+  if (userId) return <UserDetailPage userId={userId} apiAdapter={api} isAdmin={isAdmin && allowDestructiveActions} canManageMembers={canManageLifecycle} navigate={navigate}
     config={{ serviceKey, listPath: basePath, theme: 'blue', labels: { businessInfoTitle: '사업자 정보', businessNameLabel: '사업자명' } }} />;
-  return <OperatorMembersConsolePage serviceKey={serviceKey} client={client} canManageLifecycle={canManageLifecycle} canDeleteMembership={isAdmin}
+  return <OperatorMembersConsolePage serviceKey={serviceKey} client={client} canManageLifecycle={canManageLifecycle} canDeleteMembership={isAdmin && allowDestructiveActions}
     title="서비스 회원 관리" description="이 서비스의 가입 신청과 회원 이용 상태를 관리합니다." roleTabs={[]}
     fullDetailHref={user => `${basePath}/${user.id}`}
     statusTabs={[{ key: 'active', label: '활성', status: 'active' }, { key: 'suspended', label: '정지', status: 'suspended' }, { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' }]}

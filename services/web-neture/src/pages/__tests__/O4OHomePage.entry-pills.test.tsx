@@ -82,7 +82,7 @@ describe('로그인 전 — 공개 서비스 우선', () => {
     const groups = ['약국 협력사업 참여', '약국 경영·공급 활동', '커뮤니티·단체활동', '제품·유통 사업 참여', '기타'];
     const links = groups.flatMap(linksOf);
     expect(links.map(l => l.href)).toEqual([
-      'https://pharmacy.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
+      'https://pharmacy.neture.co.kr/', 'https://carepharm.neture.co.kr/', 'https://coop.neture.co.kr/', 'https://megapharm.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
       'https://community.neture.co.kr', 'https://kpa.neture.co.kr/', 'https://study.neture.co.kr/',
       'https://funding.neture.co.kr/', '/services/partner', '/hospital',
     ]);
@@ -94,9 +94,9 @@ describe('로그인 전 — 공개 서비스 우선', () => {
     }
   });
 
-  it('Google 시작 CTA 하나 · 우상단 로그인 하나 — 회원가입 버튼 없음 (같은 Google 흐름)', () => {
+  it('로그인은 모달을 열고 회원가입은 가입 화면으로 직접 연결한다', () => {
     mount();
-    expect(screen.queryByRole('button', { name: '회원가입' })).toBeNull();
+    expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('/signup');
     fireEvent.click(screen.getByTestId('home-google-start'));
     fireEvent.click(screen.getByTestId('home-login-button'));
     expect(openLoginModal).toHaveBeenCalledTimes(2);

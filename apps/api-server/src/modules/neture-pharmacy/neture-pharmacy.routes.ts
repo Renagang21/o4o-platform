@@ -134,6 +134,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const mainAccess = requireNetureMainMembership(dataSource);
   const store = [requireAuth, createPharmacyStoreAccess(dataSource)] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
+  const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
   const org = (req: Req) => req.organizationId as string;
@@ -337,16 +338,16 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
   router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>
     memberPaidFeatures.set(uuidParam(req, 'userId'), req.user!.id, req.body ?? {})));
-  router.get('/admin/semi-franchises', ...admin, handle(async () => semiFranchises.listAll()));
-  router.post('/admin/semi-franchises', ...admin, handle(async (req, res) => {
+  router.get('/admin/semi-franchises', ...businessAdmin, handle(async () => semiFranchises.listAll()));
+  router.post('/admin/semi-franchises', ...businessAdmin, handle(async (req, res) => {
     res.status(201);
-    return semiFranchises.create(req.body ?? {});
+    return semiFranchises.create(req.body ?? {}, req.user!.id);
   }));
-  router.patch('/admin/semi-franchises/:key', ...admin, handle(async (req) => semiFranchises.update(req.params.key, req.body ?? {})));
-  router.post('/admin/semi-franchises/:key/operators/:userId', ...admin, handle(async (req) =>
+  router.patch('/admin/semi-franchises/:key', ...businessAdmin, handle(async (req) => semiFranchises.update(req.params.key, req.body ?? {}, req.user!.id)));
+  router.post('/admin/semi-franchises/:key/operators/:userId', ...businessAdmin, handle(async (req) =>
     semiFranchises.assignOperator(req.params.key, uuidParam(req, 'userId'), req.user!.id)));
-  router.delete('/admin/semi-franchises/:key/operators/:userId', ...admin, handle(async (req) =>
-    semiFranchises.revokeOperator(req.params.key, uuidParam(req, 'userId'))));
+  router.delete('/admin/semi-franchises/:key/operators/:userId', ...businessAdmin, handle(async (req) =>
+    semiFranchises.revokeOperator(req.params.key, uuidParam(req, 'userId'), req.user!.id)));
 
   // ─── 공급자 ───────────────────────────────────────────────────────────────
   router.get('/supplier/content-targets', ...supplier, handle(async () => supplierContents.targets()));

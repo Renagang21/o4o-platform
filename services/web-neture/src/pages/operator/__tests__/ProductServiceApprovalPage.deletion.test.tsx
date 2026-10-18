@@ -4,7 +4,7 @@ import Page from '../ProductServiceApprovalPage';
 import type { ServiceApprovalItem } from '../../../lib/api/serviceApproval';
 const api = vi.hoisted(() => ({ list: vi.fn(), stats: vi.fn(), analytics: vi.fn(), approve: vi.fn(), reject: vi.fn(), deletePendingOffer: vi.fn() }));
 const cleanupApi = vi.hoisted(() => ({ softDelete: vi.fn() }));
-const auth = vi.hoisted(() => ({ id: 'fixture-session', roles: ['neture:operator'] as string[] }));
+const auth = vi.hoisted(() => ({ id: 'fixture-session', roles: ['neture:admin'] as string[] }));
 vi.mock('../../../lib/api/serviceApproval', () => ({ operatorServiceApprovalApi: api }));
 vi.mock('../../../lib/api/operatorProductCleanup', () => ({ productCleanupApi: cleanupApi }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: auth }) }));
@@ -13,7 +13,7 @@ function item(id: string, approvalStatus: string): ServiceApprovalItem {
 }
 
 beforeEach(() => {
-  vi.resetAllMocks(); auth.roles = ['neture:operator']; window.history.replaceState(null, '', '/');
+  vi.resetAllMocks(); auth.roles = ['neture:admin']; window.history.replaceState(null, '', '/');
   api.list.mockResolvedValue({ data: [item('a', 'pending')], pagination: { page: 1, limit: 30, total: 1, totalPages: 1 } });
   api.stats.mockResolvedValue({ total: 1, pending: 1, approved: 0, rejected: 0, todayPending: 0 });
   cleanupApi.softDelete.mockResolvedValue({ success: true });
@@ -28,7 +28,7 @@ async function openDelete() {
   fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true }));
   return view;
 }
-const confirmDelete = () => fireEvent.click(screen.getByRole('button', { name: '삭제 확인' }));
+const confirmDelete = () => (fireEvent.change(screen.getByRole('textbox', { name: '삭제 사유' }), { target: { value: '검증 정리' } }), fireEvent.click(screen.getByRole('button', { name: '삭제 확인' })));
 it('preserves failed target, selection and list; retry uses Offer ID rather than approval ID', async () => {
   api.deletePendingOffer.mockResolvedValueOnce({ success: false, error: 'NOT_PENDING' }).mockResolvedValueOnce({ success: true });
   await openDelete(); confirmDelete();
@@ -37,7 +37,7 @@ it('preserves failed target, selection and list; retry uses Offer ID rather than
   expect(screen.getByText('1건 선택됨')).toBeTruthy(); expect(api.list).toHaveBeenCalledTimes(1);
   confirmDelete();
   await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
-  expect(api.deletePendingOffer.mock.calls).toEqual([['offer-a'], ['offer-a']]);
+  expect(api.deletePendingOffer.mock.calls).toEqual([['offer-a', '검증 정리'], ['offer-a', '검증 정리']]);
   expect(screen.queryByText('상품 삭제')).toBeNull();
 });
 it('recovers unexpected rejection and preserves target for retry', async () => {
@@ -98,7 +98,7 @@ it('keeps the captured target during writing and does not close a different curr
   fireEvent.click(screen.getByText('검증상품-b'));
   finish({success: true}); await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
   expect(screen.getByText('상품명')).toBeTruthy();
-  expect(api.deletePendingOffer).toHaveBeenCalledWith('offer-a');
+  expect(api.deletePendingOffer).toHaveBeenCalledWith('offer-a', '검증 정리');
 });
 
 it('blocks an already-open approval confirmation while deletion is writing', async () => {
@@ -169,4 +169,11 @@ it('does not refresh when an approved Offer finishes moving after unmount', asyn
   cleanupApi.softDelete.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
   const view = await openApproved(); moveToTrash(); view.unmount(); finish({success: true});
   await new Promise(resolve => setTimeout(resolve, 0)); expect(api.list).toHaveBeenCalledTimes(1);
+});
+
+it('keeps daily approval but hides permanent deletion for service operators and unrelated admins', async () => {
+  auth.roles = ['neture:operator', 'kpa:admin'];
+  render(<Page />); await screen.findByText('검증상품-a');
+  expect(screen.queryByRole('button', { name: '삭제', exact: true })).toBeNull();
+  expect((screen.getByRole('button', { name: '승인', exact: true }) as HTMLButtonElement).disabled).toBe(false);
 });
