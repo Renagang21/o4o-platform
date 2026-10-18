@@ -5,7 +5,7 @@ import PlatformServicesPage from '@/pages/platform/account-governance/PlatformSe
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
 import PlatformRolesPage from '@/pages/platform/account-governance/PlatformRolesPage';
 import ServiceAudiencePolicyPage from '@/pages/platform/account-governance/ServiceAudiencePolicyPage';
-import { AdminSemiFranchisePage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import { AdminSemiFranchisePage, AdminPharmacyServiceSettingsPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
 configurePharmacyManagementClient(api);
 import { Route } from 'react-router-dom';
@@ -78,6 +78,7 @@ export function PlatformRoutes() {
     </Route>,
     <Route key="/admin/settings/service-audience" path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />,
     <Route key="/admin/semi-franchises" path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />,
+    <Route key="/admin/pharmacy-service-settings" path="/admin/pharmacy-service-settings" element={<AdminPharmacyServiceSettingsPage />} />,
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역
     //
     //   조사 정본: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md

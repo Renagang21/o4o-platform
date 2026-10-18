@@ -85,12 +85,12 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     try {
       await members.set(users[0], users[1], { active: true, endsAt: null });
       await settings.update(keys[0], { serviceFeatures: ['store-staff-support'] });
-      const features = (await service.resolve('free-invited-staff', store)).features;
+      const features = (await service.resolveStore(store)).features;
       expect(features.find(f => f.key === 'tablet')?.allowed).toBe(true);
       expect(features.find(f => f.key === 'store-staff-support')).toMatchObject({ allowed: true, sources: [{ key: keys[0], type: 'semi-franchise' }] });
-      expect((await service.resolve('free-invited-staff', other)).features.find(f => f.key === 'store-staff-support')?.allowed).toBe(false);
+      expect((await service.resolveStore(other)).features.find(f => f.key === 'store-staff-support')?.allowed).toBe(false);
       await settings.update(keys[0], { status: 'closed' });
-      const after = (await service.resolve('free-invited-staff', store)).features;
+      const after = (await service.resolveStore(store)).features;
       expect(after.find(f => f.key === 'store-staff-support')?.allowed).toBe(false);
       expect(after.find(f => f.key === 'tablet')?.allowed).toBe(true);
     } finally {
@@ -124,19 +124,19 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     const service = createPharmacyFeatureService(db);
     await members.set(users[0], users[1], { active: true, endsAt: null });
     expect((await members.find(`feature-${tag}-0@example.test`)).active).toBe(true);
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
-    expect((await service.resolve('free-invited-staff', store)).features.find(f=>f.key==='store-staff-support')?.allowed).toBe(false);
-    expect((await service.resolve(users[0], other)).features[0].allowed).toBe(false);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(true);
+    expect((await service.resolveStore(store)).features.find(f=>f.key==='store-staff-support')?.allowed).toBe(false);
+    expect((await service.resolveStore(other)).features[0].allowed).toBe(false);
     await members.set(users[0], users[1], { active: true, endsAt: '2000-01-01T00:00:00.000Z' });
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(false);
     await members.set(users[0], users[1], { active: false, endsAt: null });
     await settings.update(keys[0], { serviceFeatures: ['tablet'] });
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(true);
     await settings.update(keys[0], { serviceFeatures: [] });
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(false);
     await members.set(users[0], users[1], { active: true, endsAt: null });
     await db.query(`UPDATE organization_members SET user_id=$2 WHERE organization_id=$1`, [store, users[1]]);
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(false);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(false);
     await db.query(`UPDATE organization_members SET user_id=$2 WHERE organization_id=$1`, [store, users[0]]);
     await members.set(users[0], users[1], { active: false, endsAt: null });
   });
@@ -166,11 +166,11 @@ suite('service feature settings and live membership predicates (PostgreSQL)', ()
     const paid = jest.fn(async (id: string) => id === users[0]
       ? { type: 'member' as const, key: 'paid', name: '회원 이용권', features: ['tablet' as const] } : null);
     const service = new PharmacyServiceFeatureService(db, paid);
-    expect((await service.resolve('free-invited-staff', store)).features[0].allowed).toBe(true);
-    expect((await service.resolve(users[0], other)).features[0].allowed).toBe(false);
+    expect((await service.resolveStore(store)).features[0].allowed).toBe(true);
+    expect((await service.resolveStore(other)).features[0].allowed).toBe(false);
     expect(paid.mock.calls).toEqual([[users[0]], [users[1]]]);
     await db.query(`UPDATE organization_members SET left_at=NOW() WHERE organization_id=$1`, [store]);
-    await expect(service.resolve('free-invited-staff', store)).rejects.toMatchObject({ code: 'FEATURE_ACCESS_UNAVAILABLE' });
+    await expect(service.resolveStore(store)).rejects.toMatchObject({ code: 'FEATURE_ACCESS_UNAVAILABLE' });
   });
 
 });

@@ -381,7 +381,7 @@ export function registerStoreTabletDeviceRoutes(
         } catch { allowed = false; }
       }
       if (!allowed) { res.status(403).json({ success: false, error: '이 매장의 직원 권한이 없습니다.', code: 'STORE_STAFF_FORBIDDEN' }); return; }
-      if (!await checkPharmacyFeature(dataSource, res, device.organizationId, 'tablet')) return;
+      if (!await checkPharmacyFeature(dataSource, res, device.organizationId, 'tablet', userId)) return;
       await handler(req, res, { userId, device });
     };
   }

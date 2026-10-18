@@ -65,6 +65,7 @@ export function usePharmacyFeatureAccess(
   organizationId: string | null,
   enabled: boolean,
   path: string,
+  accountId = '',
 ) {
   const [retry, setRetry] = useState(0);
   const [result, setResult] = useState<{
@@ -72,7 +73,7 @@ export function usePharmacyFeatureAccess(
     data?: FeatureAccess;
     error?: boolean;
   } | null>(null);
-  const scope = `${organizationId}:${path}:${retry}`;
+  const scope = `${accountId}:${organizationId}:${path}:${retry}`;
   useEffect(() => {
     if (!enabled || !organizationId) return;
     let cancelled = false;
@@ -122,8 +123,8 @@ export function PharmacyFeatureNotice({
       <h2 className="font-semibold">{title}</h2>
       {denied && (
         <p className="mt-2">
-          경영자 유료회원 자격 또는 가입한 약국 협력사업의 제공 기능을 확인해
-          주세요.
+          약국의 기본·유료·협력사업 제공 기능과 My Home에서 경영자가 허용한
+          근무자 이용 범위를 확인해 주세요.
         </p>
       )}
       {(error || denied) && (

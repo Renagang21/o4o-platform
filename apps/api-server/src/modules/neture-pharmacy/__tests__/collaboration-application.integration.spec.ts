@@ -74,6 +74,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
     await db.query(`INSERT INTO organization_members(organization_id,user_id,role,is_primary,joined_at,created_at,updated_at)
       VALUES ($1,$2,'staff',true,NOW(),NOW(),NOW())`, [store, staff]);
     await db.query(`INSERT INTO role_assignments(user_id,role) VALUES ($1,'platform:super_admin'),($2,'kpa:store_member')`, [admin, staff]);
+    await db.query(`INSERT INTO service_memberships(user_id,service_key,status) VALUES ($1,'neture','active')`, [owner]);
 
     // Point the existing platform role guard at the same local DB, rather than
     // its process-global production DataSource. Authorization is still row-based.
@@ -86,9 +87,12 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       `SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true`, [id]));
     app = express();
     app.use(express.json());
-    app.use((req: any, _res, next) => {
+    app.use(async (req: any, _res, next) => {
       const id = req.header('x-fixture-user');
-      if (users.includes(id)) req.user = { id, roles: [], memberships: [] };
+      if (users.includes(id)) {
+        const roles = await db.query('SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true', [id]);
+        req.user = { id, roles: roles.map((row: { role: string }) => row.role), memberships: [] };
+      }
       next();
     });
     app.use(base, createNeturePharmacyRoutes(db));
@@ -104,6 +108,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
     await db.query(`DELETE FROM neture_pharmacy_memberships WHERE applicant_user_id=ANY($1::uuid[])`, [users]);
     await db.query(`DELETE FROM organization_members WHERE organization_id=ANY($1::uuid[])`, [orgs]);
     await db.query(`DELETE FROM role_assignments WHERE user_id=ANY($1::uuid[])`, [users]);
+    await db.query(`DELETE FROM service_memberships WHERE user_id=ANY($1::uuid[])`, [users]);
     await db.query(`DELETE FROM organizations WHERE id=ANY($1::uuid[])`, [orgs]);
     await db.query(`DELETE FROM users WHERE id=ANY($1::uuid[])`, [users]);
     await db.destroy();
@@ -188,5 +193,56 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       expect(result.status).toBe(503);
       expect(result.body.code).toBe('FEATURE_ACCESS_UNAVAILABLE');
     } finally { unavailable.mockRestore(); }
+  });
+
+  it('applies administrator policies and My Home employee restrictions to real execution APIs', async () => {
+    const policies = ['pharmacy-service-features:default', 'pharmacy-service-features:paid'];
+    const previous = await db.query('SELECT key,value FROM settings WHERE key=ANY($1::text[])', [policies]);
+    const configure = (target: string, features: string[]) => request(app).put(base + '/admin/service-feature-policies/' + encodeURIComponent(target))
+      .set('x-fixture-user', admin).send({ features });
+    const permit = (actor: string, target: string, serviceFeatures: string[], organizationId = store) => request(app)
+      .put(base + '/pharmacy/staff-feature-permissions/' + target).set('x-fixture-user', actor)
+      .set('x-store-organization-id', organizationId).send({ serviceFeatures });
+    try {
+      expect((await get(base + '/admin/service-feature-policies')).status).toBe(403);
+      expect((await request(app).get(base + '/admin/service-feature-policies')).status).toBe(401);
+      const listed = await request(app).get(base + '/admin/service-feature-policies').set('x-fixture-user', admin);
+      expect(listed.status).toBe(200);
+      expect(listed.headers['cache-control']).toContain('no-store');
+      expect(listed.body.data.targets.filter((target: any) => target.key.startsWith('business:')).length).toBeGreaterThanOrEqual(2);
+      expect((await configure('paid', ['store-staff-support'])).status).toBe(200);
+      expect((await configure('default', ['multilingual-content'])).status).toBe(200);
+      expect((await get(tablet)).status).toBe(403);
+      expect((await get(multilingual)).status).toBe(200);
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(200);
+      // Payment alone supplies staff support even though both business grants have ended.
+      expect((await permit(staff, staff, [])).status).toBe(403);
+      expect((await permit(owner, staff, [], other)).status).toBe(403);
+      expect((await permit(owner, owner, [])).status).toBe(404);
+      expect((await permit(owner, staff, ['tablet'])).status).toBe(400);
+      expect((await permit(owner, staff, ['multilingual-content'])).status).toBe(200);
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(403);
+      expect((await get(multilingual)).status).toBe(200);
+      const permissions = await get(base + '/pharmacy/service-features');
+      expect(permissions.body.data.features.find((feature: any) => feature.key === 'store-staff-support')).toMatchObject({ storeAllowed: true, allowed: false });
+      expect((await permit(owner, staff, [])).status).toBe(200);
+      expect((await get(multilingual)).status).toBe(403);
+      expect((await permit(owner, staff, ['store-staff-support'])).status).toBe(200);
+      expect((await configure('paid', [])).status).toBe(200);
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(403);
+      const businessKey = (await db.query('SELECT key FROM semi_franchises WHERE id=$1', [businesses[1]]))[0].key;
+      expect((await configure(`business:${businessKey}`, ['store-staff-support'])).status).toBe(200);
+      await settings.update(businessKey, { status: 'active' });
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(200);
+      expect((await configure('paid', ['store-staff-support'])).status).toBe(200);
+      await settings.withdraw(store, businessKey);
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(200);
+      await db.query(`UPDATE settings SET value='{"features":["unknown"]}'::jsonb WHERE key=$1`, [policies[0]]);
+      expect((await get(base + '/pharmacy/service-features')).status).toBe(503);
+      expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(503);
+    } finally {
+      await db.query('DELETE FROM settings WHERE key=ANY($1::text[])', [policies]);
+      for (const row of previous) await db.query(`INSERT INTO settings(key,value,type) VALUES ($1,$2::jsonb,'pharmacy-service-features')`, [row.key, JSON.stringify(row.value)]);
+    }
   });
 });
