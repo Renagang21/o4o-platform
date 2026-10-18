@@ -1,4 +1,5 @@
 import './pharmacy-member-home.css';
+import { BUSINESS_SITE } from '../../config/businessSite';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowUpRight, BookOpen, MessageSquare, Megaphone } from 'lucide-react';
@@ -74,6 +75,7 @@ export default function PharmacyMemberHomePage() {
   const pinnedNotices = currentNotices.data.filter(post => post.isPinned).slice(0, 3);
   const recentNotices = currentNotices.data.filter(isRecentNotice).slice(0, 5);
   const conversations = currentPosts.data.filter(post => !isNotice(post)).slice(0, 5);
+  const canManageHere = !!access?.canManage && business.key === BUSINESS_SITE.key;
   const businessName = business.name === 'pharmacy' ? 'O4O 약국 경영지원' : business.name;
   const selectedMaterialsPath = materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '');
   const showConversations = !!business.communityKey && (currentPosts.loading || !!currentPosts.error || conversations.length > 0);
@@ -97,7 +99,7 @@ export default function PharmacyMemberHomePage() {
         <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="약국 운영 자료" to={selectedMaterialsPath} linkLabel="전체 자료" />
         <p className="text-sm leading-6 text-slate-600">본부가 제공하는 콘텐츠를 살펴보고, 사용할 자료는 내 매장에서 사본으로 가져오세요.</p>
         {materialStore.selection}
-        {access.canManage ? <p className="text-sm text-slate-600">자료의 작성·검토·게시는 <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link>에서 진행합니다.</p> :
+        {access.canManage ? <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p> :
           materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="새로운 운영 자료가 등록되면 이곳에서 확인할 수 있습니다.">
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{currentMaterials.data.map(item => <li key={item.id} className="min-w-0 rounded-xl border border-slate-200 bg-white p-5">
               <p className="mb-3 text-xs font-medium text-blue-700">본부 제공 자료</p>
@@ -129,7 +131,7 @@ export default function PharmacyMemberHomePage() {
       <Link to={businessPath(business.key, 'tools')}>업무 바로가기</Link>
       <Link to="/contact">본부 문의</Link>
       {access?.allowed && <Link to={`${forumPath}/owned`}>내 게시판 · 개설 신청</Link>}
-      {access?.canManage && <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}`}>사업 운영 · 회원 관리</Link>}
+      {canManageHere && <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}`}>사업 운영 · 회원 관리</Link>}
     </nav>
   </div>;
 }

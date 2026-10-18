@@ -189,3 +189,18 @@ it('preserves a handoff failure when the user starts navigation immediately afte
   expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
   expect(mocks.handoff).toHaveBeenCalledTimes(1);
 });
+
+it('다른 사업 운영자에게 호스트 사업으로 연결되는 관리 링크를 표시하지 않는다', async () => {
+  const original = mocks.get.getMockImplementation()!;
+  mocks.get.mockImplementation((path: string, config: unknown) => {
+    if (path.endsWith('/businesses/network-a')) return Promise.resolve({ data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } });
+    if (path.endsWith('/access')) return Promise.resolve({ data: { data: { ...access, businessKey: 'network-a', canManage: true } } });
+    return original(path, config);
+  });
+  render(tree('/businesses/network-a'));
+  await screen.findByText('네트워크 A · 협력약국 공간');
+  expect(screen.queryByRole('link', { name: '사업 운영 · 회원 관리' })).toBeNull();
+  expect(screen.queryByRole('link', { name: '사업 자료 관리 →' })).toBeNull();
+  expect(screen.getByRole('link', { name: 'Hero · 광고 관리' }).getAttribute('href')).toBe('/businesses/network-a/home-presentation');
+  expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
+});

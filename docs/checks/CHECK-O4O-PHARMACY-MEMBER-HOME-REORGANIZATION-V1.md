@@ -73,3 +73,18 @@ Chromium에서 실제 production 빌드 파일과 합성 계정/API를 사용한
 WORKTREE_DISPOSITION: KEEP — 후속 통합·수정에 필요한 이번 branch/worktree를 보존한다. 이전 공간은 변경하지 않는다.
 
 문서 정합: 기존 정본의 회원 메인 절을 현재 사용자 지시에 맞게 갱신하고, 단일 TODO와 이 CHECK에서 실행 상태를 구분한다.
+
+## 통합 리뷰 보완 — 2026-10-18
+
+사용자의 추가 main 병합·배포 지시로 PR #704에서 동일 WO 통합 단계를 진행한다.
+main #703의 후속 변경을 merge한 후 약국 웹 177건·공통 운영 UI 188건과 빌드를 재검증했다.
+리뷰는 상단 매장 버튼의 자격과 다른 사업에서 호스트 관리 화면으로 오인 이동할 가능성을 지적했다.
+상단 버튼은 기존 `useKpaUserRoles(...).isStoreOwner`와 동일하게 제한하고, 호스트와 다른 사업에서는
+자료/회원 관리 링크와 헤더의 호스트 운영 메뉴를 제공하지 않는다. 그 사업의 기존 전시/게시판 운영 경로는 유지한다.
+서버 권한을 새로 부여하거나 query key로 호스트 운영 화면의 범위를 바꾸지 않는다.
+
+역할별 헤더/호스트 범위 7건과 다른 사업 운영자 1건을 추가해 약국 웹 전체 27 files / 185 tests PASS다.
+새 테스트의 지원되지 않는 `ByRoleOptions.exact` 옵션으로 TypeScript가 한 번 실패했다. 문자열 name의
+기본 정확 일치 조건으로 정정한 후 전체 185건·변경 lint·TypeScript 포함 production build PASS다.
+
+리뷰 보완 후 실제 최종 빌드로 약국/메가팜 PC/mobile 28흐름도 다시 PASS, pageerror·가로 넘침 0이다.
