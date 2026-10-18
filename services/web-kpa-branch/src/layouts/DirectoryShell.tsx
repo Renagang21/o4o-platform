@@ -37,7 +37,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
             {!isLoading && (isAuthenticated ? (
               <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
             ) : (
-              <LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink>
+              <><LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink><a href="https://neture.co.kr/signup" className="font-medium text-primary-600">회원가입</a></>
             ))}
           </div>
         </div>

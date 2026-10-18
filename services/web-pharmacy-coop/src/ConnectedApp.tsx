@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import { AuthClient, getAccessToken } from "@o4o/auth-client";
-import { EmailLoginForm, useServiceAuth } from "@o4o/auth-react";
+import { EmailLoginForm, O4O_ACCOUNT_LINKS, useServiceAuth } from "@o4o/auth-react";
 import { App } from "./App";
 import {
   anonymousSession,
@@ -99,6 +99,7 @@ export function ConnectedApp() {
                 </>
               ) : (
                 <EmailLoginForm
+                  links={O4O_ACCOUNT_LINKS}
                   onLogin={auth.loginWithEmail}
                   api={authClient}
                   onSuccess={() => navigate("/test", { replace: true })}

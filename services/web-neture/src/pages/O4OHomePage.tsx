@@ -547,7 +547,7 @@ export default function O4OHomePage() {
     <div className="flex min-h-screen flex-col bg-white">
       {/* 대표 브랜드와 기존 계정 메뉴.
           WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4:
-          로그인 전 = 로그인 하나(Google — 가입 겸용) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
+          로그인 전 = 로그인 · 회원가입(/signup) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
           모바일도 같은 메뉴(작은 계정 메뉴). */}
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
         <Link to="/" aria-label="O4O 대표 홈" className="mr-auto text-2xl font-semibold tracking-tight text-slate-900 no-underline">O4O</Link>
@@ -600,16 +600,18 @@ export default function O4OHomePage() {
             )}
           </div>
         ) : (
-          // 로그인은 모달 하나(이메일 · Google). 이메일 가입은 모달의 '회원가입'(/signup).
-          <button
-            type="button"
-            onClick={() => openLoginModal()}
-            data-testid="home-login-button"
-            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
-          >
-            <UserCircle className="h-5 w-5" />
-            <span>로그인</span>
-          </button>
+          <>
+            <Link to="/signup" className="rounded-full bg-slate-900 px-4 py-2 font-medium text-white no-underline hover:bg-slate-700">회원가입</Link>
+            <button
+              type="button"
+              onClick={() => openLoginModal()}
+              data-testid="home-login-button"
+              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
+            >
+              <UserCircle className="h-5 w-5" />
+              <span>로그인</span>
+            </button>
+          </>
         )}
       </div>
 
