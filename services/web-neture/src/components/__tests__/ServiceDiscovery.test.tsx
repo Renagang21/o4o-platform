@@ -8,7 +8,7 @@ afterEach(cleanup);
 describe('공개 서비스 진입', () => {
   it.each([
     ['만성질환관리', 'https://carepharm.neture.co.kr/'],
-    ['약국/약사협동조합', 'https://coop.neture.co.kr/'],
+    ['약국/약사협동조합', 'https://pharmcoop.neture.co.kr/'],
     ['창고형 약국', 'https://megapharm.neture.co.kr/'],
   ])('%s 카드는 준비 중 팝업 대신 해당 서비스로 연결한다', (name, href) => {
     render(<MemoryRouter><ServiceDiscovery /></MemoryRouter>);
@@ -59,7 +59,7 @@ it('가입 정보가 없으면 미가입으로 단정하지 않고 공개 전체
 it('로그인 후 미가입 협력사업도 실제 서비스로 공개 진입할 수 있다', () => {
  const data={services:[], stores:[], workspaceStores:[], branches:[], serviceStates:{supplier:{status:'none',source:'none'}}} as import('../../lib/home-entry').HomeEntryData;
  render(<MemoryRouter><ServiceDiscovery personalized data={data}/></MemoryRouter>);
- expect(screen.getByRole('link',{name:/^약국\/약사협동조합 /}).getAttribute('href')).toBe('https://coop.neture.co.kr/');
+ expect(screen.getByRole('link',{name:/^약국\/약사협동조합 /}).getAttribute('href')).toBe('https://pharmcoop.neture.co.kr/');
  expect(screen.queryByRole('dialog')).toBeNull();
 });
 

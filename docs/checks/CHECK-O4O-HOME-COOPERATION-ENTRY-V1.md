@@ -12,6 +12,8 @@
 | 약국/약사협동조합 | https://coop.neture.co.kr/ |
 | 창고형 약국 | https://megapharm.neture.co.kr/ |
 
+> **도메인 정정 (2026-10-18)**: 위 협동조합 목적지 `coop.neture.co.kr` 은 잘못 안내된 도메인이며 `https://pharmcoop.neture.co.kr/` 로 정정됐다. 당시 기록은 보존한다. 현행: [CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1](CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1.md).
+
 기존 CarePharm host identity, 협동조합 App의 공개 federation 루트·session origin, 약국 앱의 megapharm business site 설정을 확인했다. 특정 조합 `/test`로 고정하지 않았다. 공개 협동조합 directory API GET은 200/빈 목록으로 확인했으며, 조합·회원 데이터를 생성하거나 가입·승인하지 않았다.
 
 세 카드의 준비 중 설명과 전용 dialog를 제거했다. Partner 소개와 병원 도구의 문서 탐색은 그대로다. 게스트/로그인 후 미가입 소개 모두 같은 주소를 사용한다. 참여 가능한 CarePharm·megapharm은 기존 서버 communities의 kind/businessKey/canParticipate 출처로 중복 소개를 제외한다. 역할 문자열이나 도메인만으로 가입·이용 자격을 추정하지 않는다. 협동조합의 개인 가입 상태를 임의로 추가하지 않았다.

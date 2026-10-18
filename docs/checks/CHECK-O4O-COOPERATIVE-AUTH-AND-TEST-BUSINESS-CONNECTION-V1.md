@@ -15,6 +15,8 @@ Operator projection and provisioning share currently valid Neture operator/admin
 Exact cooperative CORS and session-revocation scope are configured. Account erasure recognizes personal membership rows.
 
 Target: `coop.neture.co.kr/test`, name `테스트 협동조합`, business key `coop-test`.
+
+> **도메인 정정 (2026-10-18)**: 위 `coop.neture.co.kr` 은 잘못 안내된 도메인이며 정확한 도메인은 `pharmcoop.neture.co.kr` 이다(테스트 조합 `https://pharmcoop.neture.co.kr/test`). 이 기록의 당시 내용은 보존하고, 현행 설정은 [CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1](CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1.md) 을 따른다. Cloud Run `cooperative-web` · slug `test` · business key `coop-test` · session scope `coop` 은 바뀌지 않는다.
 Execution receives account selectors, not passwords. Existing verified usable accounts and a currently valid
 operator role are required; no account/password/global-role creation or pharmacy/store membership is performed.
 Provisioning is atomic, idempotent and conflict-sensitive, with a dry-run and per-target advisory lock.

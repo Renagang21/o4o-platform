@@ -7,7 +7,7 @@ const groups: { title: string; services: Service[] }[] = [
   { title: '약국 협력사업 참여', services: [
     { key: 'kpa-society', description: 'O4O를 이용하는 약국의 일상 업무를 지원합니다.', label: 'O4O 약국 경영지원', href: 'https://pharmacy.neture.co.kr/' },
     { key: 'carepharm', description: 'CarePharm에서 만성질환관리 협력사업과 참여 정보를 확인합니다.', label: '만성질환관리', href: `${HOST_ORIGIN.carepharm}/` },
-    { key: 'cooperative', description: '약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.', label: '약국/약사협동조합', href: 'https://coop.neture.co.kr/' },
+    { key: 'cooperative', description: '약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.', label: '약국/약사협동조합', href: 'https://pharmcoop.neture.co.kr/' },
     { key: 'megapharm', description: '메가팜의 창고형 약국 협력사업과 참여 정보를 확인합니다.', label: '창고형 약국', href: 'https://megapharm.neture.co.kr/' },
   ] },
   { title: '약국 경영·공급 활동', services: [

@@ -61,7 +61,7 @@ export const getAllowedOrigins = (): string[] => {
     // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1:
     //   store.neture.co.kr = O4O 공통 Store Workspace(서비스가 아님 · serviceKey 없음). 정확한 origin 만, wildcard 금지.
     "https://store.neture.co.kr",
-    "https://coop.neture.co.kr",
+    "https://pharmcoop.neture.co.kr",
     // CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 (서브도메인 이전): 확정된 목표 호스트.
     //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다(pharmacyhub 선례).
     //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
