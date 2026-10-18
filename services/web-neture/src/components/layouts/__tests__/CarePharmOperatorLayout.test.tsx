@@ -9,7 +9,6 @@ vi.mock('../../../config/operatorMenuGroups', () => ({ UNIFIED_MENU: { dashboard
 vi.mock('../../../lib/role-constants', () => ({ withoutUnreachableSubdomainOperatorItems: (items: unknown) => items }));
 vi.mock('../../NetureGlobalHeader', () => ({ NetureGlobalHeader: () => <header>서비스 헤더</header> }));
 vi.mock('../../NetureBottomNav', () => ({ NetureBottomNav: () => null }));
-vi.mock('../../../pages/carepharm/CarePharmStudyEntry', () => ({ default: () => <p>Study 연결</p> }));
 vi.mock('../../../lib/apiClient', () => ({ api: {} }));
 vi.mock('@o4o/operator-ux-core', () => ({
   createOperatorServicesApi: () => ({}),

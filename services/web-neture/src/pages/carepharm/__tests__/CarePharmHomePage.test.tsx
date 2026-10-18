@@ -82,11 +82,11 @@ describe('CarePharm cooperation service', () => {
     expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
   });
   it('drops member resources immediately on account changes', async () => {
-    access.allowed = true; const ui = mount(); await screen.findByText('혈당 관리 자료');
+    access.allowed = true; const ui = mount(); await screen.findByRole('link', { name: '자료실 보기' });
     state.authenticated = false; ui.rerender(<MemoryRouter><CarePharmHomePage /></MemoryRouter>);
     expect(screen.queryByText('혈당 관리 자료')).toBeNull(); expect(screen.getByRole('button', { name: '로그인하기' })).toBeTruthy();
   });
-  it('reports an unavailable model as an error instead of registering or joining anything', async () => {
+  it('retries transport failures without registering or joining anything', async () => {
     state.get.mockRejectedValue(new Error('not registered')); mount(); await screen.findByRole('alert');
     fireEvent.click(screen.getByRole('button', { name: '다시 시도' })); await waitFor(() => expect(state.get).toHaveBeenCalledTimes(2));
     expect(state.post).not.toHaveBeenCalled();
@@ -163,4 +163,44 @@ it('drops an old account gate response when another account signs in', async () 
   finish(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: true, membershipStatus: 'active' }));
   await waitFor(() => expect(screen.queryByText('혈당 관리 자료')).toBeNull());
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+
+
+it('keeps the public homepage when the real server reports no active business, without retrying or creating one', async () => {
+  state.get.mockRejectedValue({ response: { status: 404, data: { code: 'BUSINESS_NOT_FOUND' } } });
+  mount();
+  await screen.findByText(/회원 서비스가 아직 개설되지/);
+  expect(screen.getByRole('heading', { name: '함께 나누고, 내 약국에서 활용합니다' })).toBeTruthy();
+  expect(screen.getByRole('heading', { name: '공지·안내' })).toBeTruthy();
+  expect(screen.queryByRole('alert')).toBeNull();
+  expect(screen.queryByRole('button', { name: '다시 시도' })).toBeNull();
+  expect(screen.queryByText('Study 교육으로 이동')).toBeNull();
+  expect(screen.queryByRole('navigation', { name: '협력사업 서비스' })).toBeNull();
+  expect(state.post).not.toHaveBeenCalled();
+});
+it('distinguishes a missing member space from a network failure', async () => {
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.includes('/communities/')
+    ? Promise.reject({ response: { status: 404, data: { code: 'COMMUNITY_NOT_FOUND' } } }) : previous(path, config));
+  mount(); await screen.findByText(/회원 공간이 아직 개설되지/);
+  expect(screen.queryByRole('button', { name: '다시 시도' })).toBeNull();
+});
+it('offers login again for an expired session while retaining the introduction', async () => {
+  state.get.mockRejectedValue({ response: { status: 401, data: {} } });
+  mount(); fireEvent.click(await screen.findByRole('button', { name: '다시 로그인' }));
+  expect(state.login).toHaveBeenCalledWith('/');
+  expect(screen.getByRole('heading', { name: '함께 나누고, 내 약국에서 활용합니다' })).toBeTruthy();
+});
+it('identifies a forbidden pharmacy-list request and does not load protected materials', async () => {
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path === '/work-scope/accessible-stores'
+    ? Promise.reject({ response: { status: 403, data: {} } }) : previous(path, config));
+  mount(); expect((await screen.findByRole('alert')).textContent).toContain('소속 약국 목록에 접근할 수 없습니다');
+  expect(screen.queryByRole('button', { name: '다시 시도' })).toBeNull();
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+it('keeps home as an overview and loads member material bodies only in the material workspace', async () => {
+  access.allowed = true; mount(); await screen.findByRole('link', { name: '자료실 보기' });
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+  expect(screen.getByRole('link', { name: '내 매장 업무 안내' }).getAttribute('href')).toBe('/tools?store=owned-store');
 });
