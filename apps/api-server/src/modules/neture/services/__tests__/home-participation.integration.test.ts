@@ -33,7 +33,7 @@ integration('home participation reads the same local PostgreSQL ledgers after ap
   it('reflects an approved membership on the next read, excludes other accounts and revokes suspended access', async () => {
     const db = { query: (sql: string, params?: unknown[]) => client.query(sql, params).then(result => result.rows) } as any;
     const before = await readHomeParticipation(db, 'member');
-    expect(before.businesses).toEqual([]);
+    expect(before.businesses[0]).toMatchObject({ canParticipate: false, membershipStatus: 'pending' });
     expect(before.cooperatives[0].status).toBe('pending');
     await client.query("UPDATE semi_franchise_memberships SET status='active'; UPDATE cooperative_memberships SET status='active'");
     const approved = await readHomeParticipation(db, 'member');
@@ -42,9 +42,12 @@ integration('home participation reads the same local PostgreSQL ledgers after ap
     const outsider = await readHomeParticipation(db, 'outsider');
     expect(outsider.businesses).toEqual([]);
     expect(outsider.cooperatives).toEqual([]);
+    await client.query("UPDATE neture_pharmacy_memberships SET status='suspended'");
+    expect((await readHomeParticipation(db, 'member')).businesses[0]).toMatchObject({ canParticipate: false, membershipStatus: 'active' });
+    await client.query("UPDATE neture_pharmacy_memberships SET status='active'");
     await client.query("UPDATE semi_franchise_memberships SET status='suspended'; UPDATE cooperative_memberships SET status='suspended'");
     const suspended = await readHomeParticipation(db, 'member');
-    expect(suspended.businesses).toEqual([]);
+    expect(suspended.businesses[0]).toMatchObject({ canParticipate: false, membershipStatus: 'suspended' });
     expect(suspended.cooperatives[0].status).toBe('suspended');
   });
 });

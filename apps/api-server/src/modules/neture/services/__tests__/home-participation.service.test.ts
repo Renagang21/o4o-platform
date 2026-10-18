@@ -10,12 +10,16 @@ it('reads business access without the general community catalog and scopes coope
       expect(sql).toContain("c.status = 'active' AND sf.status = 'active'");
       return [{ id: 'coop', slug: 'sample', name: '합성 조합', status: 'pending' }];
     }
+    if (sql.includes('FROM semi_franchise_memberships')) {
+      expect(params).toEqual(['member']);
+      return [{ key: 'carepharm', status: 'pending' }];
+    }
     return [{ key: 'carepharm', name: '합성 사업' }];
   });
   access.mockResolvedValue({ semiFranchise: true, allowed: false, semiFranchiseKey: 'carepharm' });
   const db = { query } as any;
   const first = await readHomeParticipation(db, 'member');
-  expect(first.businesses).toEqual([]);
+  expect(first.businesses).toEqual([{ key: 'carepharm', name: '합성 사업', canParticipate: false, membershipStatus: 'pending' }]);
   expect(first.cooperatives[0].status).toBe('pending');
   access.mockResolvedValue({ semiFranchise: true, allowed: true, semiFranchiseKey: 'carepharm' });
   expect((await readHomeParticipation(db, 'member')).businesses[0].canParticipate).toBe(true);

@@ -30,7 +30,7 @@ const groups: { title: string; services: Service[] }[] = [
 
 /** 공개 탐색은 개인 업무·가입·이용 권한과 별개이며 각 서비스의 실제 진입 주소로 연결한다. */
 export function discoveryServiceHasMembership(service: Service, data: HomeEntryData): boolean {
-  if ((service.key === 'carepharm' || service.key === 'megapharm') && data.businesses !== undefined) return data.businesses.some(item => item.key === service.key && item.canParticipate);
+  if ((service.key === 'carepharm' || service.key === 'megapharm') && data.businesses !== undefined) return data.businesses.some(item => item.key === service.key && (item.canParticipate || item.membershipStatus));
   if (service.key === 'cooperative') return (data.cooperatives ?? []).length > 0;
   if (service.key === 'supplier' && data.serviceStates?.supplier?.status && data.serviceStates.supplier.status !== 'none') return true;
   if ((service.key === 'carepharm' || service.key === 'megapharm') && data.communities?.some(item => item.kind === 'semi-franchise' && item.businessKey === service.key && item.canParticipate)) return true;

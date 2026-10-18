@@ -137,7 +137,7 @@ export interface HomeEntryData {
   /** Community Catalog + 참여 판정 (서버 확정). 없으면 빈 배열로 취급한다 */
   communities?: EntryCommunity[];
   /** Business access is read from the business ledger, independently of the community directory. */
-  businesses?: { key: string; name: string; canParticipate: boolean }[];
+  businesses?: { key: string; name: string; canParticipate: boolean; membershipStatus?: string | null }[];
   cooperatives?: { id: string; slug: string; name: string; status: string }[];
 }
 
@@ -723,6 +723,12 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 가입 · 이용 상태 (active 가 아닌 membership 만) ──
   const statusItems: StatusItem[] = [];
+  for (const business of data.businesses ?? []) {
+    if (business.canParticipate || !business.membershipStatus) continue;
+    const status = business.membershipStatus;
+    statusItems.push({ id: `status:business:${business.key}`, serviceName: business.name, status,
+      statusLabel: status === 'active' ? '이용 자격 확인 필요' : STATUS_LABELS[status] ?? (status === 'terminated' ? '이용 종료' : status) });
+  }
   for (const cooperative of data.cooperatives ?? []) {
     if (cooperative.status === 'active') continue;
     statusItems.push({ id: `status:cooperative:${cooperative.id}`, serviceName: `약국/약사협동조합 · ${cooperative.name}`, status: cooperative.status, statusLabel: STATUS_LABELS[cooperative.status] ?? cooperative.status });

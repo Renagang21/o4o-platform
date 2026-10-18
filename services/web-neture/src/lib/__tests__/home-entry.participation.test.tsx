@@ -17,9 +17,11 @@ it('shows approved business and cooperative entries even when /communities has n
   const input = data();
   expect(buildHomeEntryModel(user, input).myServices.map(item => item.id)).toEqual(['business:carepharm', 'cooperative:coop']);
   input.businesses![0].canParticipate = false;
+  input.businesses![0].membershipStatus = 'pending';
   input.cooperatives![0].status = 'suspended';
   const next = buildHomeEntryModel(user, input);
   expect(next.myServices).toEqual([]);
+  expect(next.statusItems).toContainEqual(expect.objectContaining({ id: 'status:business:carepharm', status: 'pending' }));
   expect(next.statusItems).toContainEqual(expect.objectContaining({ id: 'status:cooperative:coop', status: 'suspended' }));
 });
 
