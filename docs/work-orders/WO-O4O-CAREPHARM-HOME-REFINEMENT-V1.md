@@ -76,3 +76,13 @@ Study는 상시 제공하지 않는다. 강의가 있을 때 운영자가 Hero·
 - main integration / deployment: 미수행 — 사용자 지정 종료점은 push
 - CI/Codex: push 뒤 통합 담당 확인 대상. 로컬 성공을 새 HEAD의 CI 성공으로 대신하지 않는다.
 - verdict: KEEP — 아직 main 미반영이며 통합·리뷰 및 후속 운영 개통에 필요
+
+
+## main 통합·배포 지시 후 재검증 — 2026-10-18
+
+사용자가 push 완료 후 이 공간에서 main 머지·배포를 명시적으로 지시했다. 위 push 종료점·미통합 표기는 이전 단계의 기록으로 유지한다. 같은 작업 branch에서 main `48f84fb776d4c9123408f67cebb7d51c583f15e6`을 충돌 없이 merge했다. 새 migration·의존성 변경은 없다.
+
+- main 반영 후 Neture 전체 126 files / 1129 tests PASS, TypeScript 포함 production build PASS.
+- 통합된 production bundle로 기존 합성 API desktop/mobile 12개 상태를 재실행해 PASS. 실제 사업 등록·권한 부여·메일·업무 write 요청은 하지 않았다.
+- main ruleset 조회: PR 필수, required `CI Gate`, 필수 human approval 0. PR의 정확한 HEAD에서 CI·Codex·미해결 스레드를 확인하고 통합한다. 다른 main 배포와 동시에 공유 runtime을 변경하지 않는다.
+- 아직 이 문단은 PR CI·main 머지·운영 배포 성공을 뜻하지 않는다. 통합 담당이 Delivery/Promote의 실제 serving SHA와 공개 응답을 확인해 최종 결과를 보고한다.
