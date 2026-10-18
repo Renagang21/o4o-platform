@@ -121,7 +121,7 @@ export function NetureGlobalHeader() {
          데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
       userMenuItems={<NetureUserMenuItems user={user} isAuthenticated={isAuthenticated} />}
       accountSlot={isAuthenticated && user ? <ServiceAccountMenu key={user.id} displayName={getUserDisplayName(user)} email={user.email} onLogout={handleLogout}
-        badge={user.demo?.isDemo ? <span role="status" title={DEMO_NOTICE} className="mt-1 inline-flex rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-800">Demo 계정<span className="sr-only"> — {DEMO_NOTICE}</span></span> : undefined}>
+        badge={user.demo?.isDemo ? <output title={DEMO_NOTICE} className="mt-1 inline-flex rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-800">Demo 계정<span className="sr-only"> — {DEMO_NOTICE}</span></output> : undefined}>
         <NetureUserMenuItems user={user} isAuthenticated={isAuthenticated} />
       </ServiceAccountMenu> : undefined}
       /* WO-O4O-NETURE-MOBILE-NAV-...-V1: 모바일 햄버거 drawer 는 사이트 nav 만 표시.

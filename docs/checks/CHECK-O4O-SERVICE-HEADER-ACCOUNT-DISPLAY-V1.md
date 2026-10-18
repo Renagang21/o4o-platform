@@ -43,3 +43,7 @@ Chromium으로 실제 production build를 열고 API를 합성 fixture로 대체
 ### PR #695 접근성 리뷰 보완
 
 ARIA menu의 화살표 키·menuitem 계약을 선언하는 대신 기본 링크/버튼을 쓰는 일반 펼침 영역으로 수정했다. trigger는 aria-expanded/aria-controls로 연결하고 panel은 이름 있는 region으로 제공한다. Tab은 기본 문서 순서를 사용하며 Escape focus 복구·외부 클릭 닫기는 유지한다. 관련 공통/Neture/분회 10 tests가 통과했다.
+
+### SonarCloud 지적 보완
+
+일반 컨테이너의 클릭 위임을 제거했다. 경로의 key 변경을 함께 감지하여 같은 목적지 재선택도 닫히도록 하고 해당 회귀를 추가했다. panel은 이름 있는 section, 상태 안내는 output으로 표현했다. props readonly와 중첩 삼항식도 정리했다. 집중 9 tests와 변경 lint가 통과했다. 비필수 검사라도 이번 변경에서 발견한 신뢰성 실패를 숨기지 않고 수정했다.

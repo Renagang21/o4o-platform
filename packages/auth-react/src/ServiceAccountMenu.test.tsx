@@ -50,3 +50,11 @@ it('closes after service navigation and invokes the existing logout only once', 
   expect(logout).toHaveBeenCalledTimes(1);
   expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
 });
+
+
+it('closes when the current destination is selected again', () => {
+  render(<MemoryRouter initialEntries={['/operator']}><ServiceAccountMenu displayName={displayName} onLogout={vi.fn()}><Link to="/operator">현재 운영 화면</Link></ServiceAccountMenu></MemoryRouter>);
+  fireEvent.click(screen.getByRole('button', { name: '계정 메뉴' }));
+  fireEvent.click(screen.getByRole('link', { name: '현재 운영 화면' }));
+  expect(screen.queryByRole('region', { name: '계정 메뉴' })).toBeNull();
+});
