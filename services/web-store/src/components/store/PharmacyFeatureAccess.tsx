@@ -5,7 +5,10 @@ import { coreApiClient } from "../../api/client";
 export type PharmacyFeature =
   | "tablet"
   | "multilingual-content"
-  | "store-staff-support";
+  | "store-staff-support"
+  | "multilingual-consultation"
+  | "multilingual-staff-response"
+  | "multilingual-pharmacist-consultation";
 export type FeatureAccess = {
   organizationId: string;
   features: Array<{ key: PharmacyFeature; allowed: boolean | null }>;
@@ -32,14 +35,20 @@ export function filterPharmacyFeatureMenu(
     menuSections: config.menuSections?.map((section) => ({
       ...section,
       items: section.items.filter((item) => {
-        const feature = pharmacyFeatureForPath(item.subPath);
+        const features = pharmacyFeaturesForPath(item.subPath);
         return (
-          !feature ||
-          access?.features.some((f) => f.key === feature && f.allowed === true)
+          !features.length ||
+          access?.features.some((f) => features.includes(f.key) && f.allowed === true)
         );
       }),
     })),
   };
+}
+
+export function pharmacyFeaturesForPath(path: string): PharmacyFeature[] {
+  if (/\/multilingual-consultation(?:\/|$)/.test(path)) return ['multilingual-consultation', 'multilingual-staff-response', 'multilingual-pharmacist-consultation'];
+  const feature = pharmacyFeatureForPath(path);
+  return feature ? [feature] : [];
 }
 
 function validFeatureResponse(

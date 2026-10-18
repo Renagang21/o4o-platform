@@ -118,4 +118,32 @@ describe('My Home 직원 초대·최종 승인', () => {
     fireEvent.click(screen.getByRole('button', { name: '이용 기능 저장' }));
     await waitFor(() => expect(api.put).toHaveBeenCalledWith('/neture/pharmacy/staff-feature-permissions/staff-a', { serviceFeatures: [] }, expect.objectContaining({ headers: { 'X-Store-Organization-Id': 'store-a' } })));
   });
+  it('약사 상담을 허용하기 전에 경영자가 해당 직원의 약사 사용을 확인한다', async () => {
+    const original = api.get.getMockImplementation()!;
+    api.get.mockImplementation(async (path: string, config?: { headers: Record<string, string> }) => {
+      const response = await original(path, config);
+      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 매대 약사 상담', allowed: true, requiresProfessional: true });
+      return response;
+    });
+    render(<MyHomeStoreMembers accountId="owner" />);
+    const professional = await screen.findByRole('checkbox', { name: '다국어 매대 약사 상담' });
+    expect((professional as HTMLInputElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('checkbox', { name: '경영자로서 이 근무자가 약사임을 확인합니다.' }));
+    fireEvent.click(professional);
+    fireEvent.click(screen.getByRole('button', { name: '최종 승인' }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/store/members/staff-a/approve', { serviceFeatures: ['tablet', 'multilingual-consultation'], pharmacistConfirmed: true }, expect.anything()));
+  });
+  it('경영자는 My Home에서 자기 약사 상담 사용을 확인한다', async () => {
+    members = [{ userId: 'owner', email: 'fixture@example.test', role: 'owner', status: 'active' }];
+    const original = api.get.getMockImplementation()!;
+    api.get.mockImplementation(async (path: string, config?: { headers: Record<string, string> }) => {
+      const response = await original(path, config);
+      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 매대 약사 상담', allowed: true, requiresProfessional: true });
+      return response;
+    });
+    render(<MyHomeStoreMembers accountId="owner" />);
+    fireEvent.click(await screen.findByRole('checkbox', { name: '본인은 약사이며 약사 상담 기능을 사용합니다.' }));
+    fireEvent.click(screen.getByRole('button', { name: '본인 확인 저장' }));
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/neture/pharmacy/pharmacist-confirmation', { confirmed: true }, expect.objectContaining({ headers: { 'X-Store-Organization-Id': 'store-a' } })));
+  });
 });

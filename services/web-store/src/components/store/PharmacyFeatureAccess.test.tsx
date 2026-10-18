@@ -1,6 +1,6 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { filterPharmacyFeatureMenu, pharmacyFeatureForPath, usePharmacyFeatureAccess } from './PharmacyFeatureAccess';
+import { filterPharmacyFeatureMenu, pharmacyFeatureForPath, pharmacyFeaturesForPath, usePharmacyFeatureAccess } from './PharmacyFeatureAccess';
 const api = vi.hoisted(() => ({ get: vi.fn() }));
 vi.mock('../../api/client', () => ({ coreApiClient: api }));
 afterEach(cleanup);
@@ -16,6 +16,15 @@ it('maps scoped/direct feature paths while preserving existing multilingual copi
   ] }] };
   expect(filterPharmacyFeatureMenu(config, null).menuSections?.[0].items.map(i => i.key)).toEqual(['home']);
   expect(filterPharmacyFeatureMenu(config, allowed('a').data as any).menuSections?.[0].items).toHaveLength(2);
+});
+it('shows one consultation menu when any permitted mode is available', () => {
+  const config = { serviceKey: 'store', serviceName: '내 매장', basePath: '/store', enabledMenus: [], menuSections: [{ label: '', items: [{ key: 'consultation', label: '다국어 상담', subPath: '/multilingual-consultation' }] }] };
+  const modes = pharmacyFeaturesForPath('/work/kpa-society/store/multilingual-consultation');
+  expect(modes).toHaveLength(3);
+  for (const key of modes) {
+    expect(filterPharmacyFeatureMenu(config, { organizationId: 'store', features: [{ key, allowed: true }] }).menuSections?.[0].items).toHaveLength(1);
+  }
+  expect(filterPharmacyFeatureMenu(config, { organizationId: 'store', features: modes.map(key => ({ key, allowed: false })) }).menuSections?.[0].items).toHaveLength(0);
 });
 it('discards old store responses and permits retry after an unavailable lookup', async () => {
   let oldResolve: (value: unknown) => void = () => {};

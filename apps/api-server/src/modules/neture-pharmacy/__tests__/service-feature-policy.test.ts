@@ -40,7 +40,8 @@ it('unions base, business and owner payment, then intersects employee permission
   await expect(service.require('staff', 'store', 'tablet')).rejects.toMatchObject({ httpStatus: 403 });
   staff = ['tablet'];
   expect((await service.resolve('staff', 'store')).features[0].allowed).toBe(true);
-  expect((await service.resolveStore('store')).features.every(feature => feature.allowed)).toBe(true);
+  expect((await service.resolveStore('store')).features.filter(feature => feature.allowed).map(feature => feature.key))
+    .toEqual(['tablet', 'multilingual-content', 'store-staff-support']);
 });
 
 it('does not allow an employee setting to grant an unavailable store function or alter another relationship', async () => {

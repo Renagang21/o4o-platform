@@ -3,9 +3,13 @@ import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { PharmacyServicePolicyService } from './services/service-feature-policy.js';
 import { saveStaffFeatures } from './services/staff-feature-permissions.js';
+import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './services/consultation-professional.js';
+import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
+import { createConsultationTranslator } from './services/consultation-translator.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
+import rateLimit from 'express-rate-limit';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
@@ -108,7 +112,7 @@ function actionParam<T extends string>(req: Req, allowed: readonly T[]): T {
   return a;
 }
 
-export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRouter {
+export function createNeturePharmacyRoutes(dataSource: DataSource, consultationDependencies?: ConsultationDependencies): ExpressRouter {
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
@@ -122,6 +126,9 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return cooperatives.session(req.user!.id);
   }));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
+  const consultation = new MultilingualConsultationService(dataSource, consultationDependencies ?? {
+    translate: createConsultationTranslator(dataSource), professional: (userId, organizationId) => consultationProfessionalConfirmed(dataSource, userId, organizationId),
+  });
   const proposals = new SupplyProposalService(dataSource);
   const supplierContents = new SupplierBusinessContentService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
@@ -339,6 +346,17 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.post('/pharmacy/staff-support/demands', ...store, handle(async req => { await support(req); return staffSupport.demand(org(req),req.body?.reason); }));
   router.get('/admin/staff-support/demands', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return staffSupport.summary(req.query.month); }));
   router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
+  router.get('/pharmacy/multilingual-consultation/context', ...store, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return consultation.context(req.user!.id, org(req));
+  }));
+  const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
+    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주세요.' } });
+  router.post('/pharmacy/multilingual-consultation/translate', ...store, consultationLimiter, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return consultation.translate(req.user!.id, org(req), req.body ?? {});
+  }));
+  router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);
+  }));
   router.get('/admin/service-features', ...admin, handle(() => Promise.resolve(PHARMACY_SERVICE_FEATURES)));
   const featurePolicies = new PharmacyServicePolicyService(dataSource);
   router.get('/admin/service-feature-policies', ...admin, handle(async (_req, res) => {
@@ -363,7 +381,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     if (!owners.length) throw new NeturePharmacyError(403, 'STORE_OWNER_REQUIRED', '근무자 기능 설정은 경영자가 할 수 있습니다.');
     const access = await serviceFeatures.resolveStore(org(req));
     return saveStaffFeatures(dataSource, org(req), uuidParam(req, 'userId'), req.body?.serviceFeatures,
-      access.features.filter(feature => feature.allowed === true).map(feature => feature.key));
+      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false, req.body?.pharmacistConfirmed);
   }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));

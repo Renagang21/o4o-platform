@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import { StaffFeatureEditor, type StaffFeature } from './StaffFeatureEditor';
+import { OwnerPharmacistConfirmation } from './OwnerPharmacistConfirmation';
 
 type Envelope<T> = { success: boolean; data: T };
 type Store = { organizationId: string; organizationName: string; memberRole: string };
 type Invitation = { organizationId: string; organizationName: string; status: 'invited' | 'accepted' };
-type Member = { userId: string; email: string; name: string | null; role: string; status: 'invited' | 'accepted' | 'active'; serviceFeatures?: string[] | null };
+type Member = { userId: string; email: string; name: string | null; role: string; status: 'invited' | 'accepted' | 'active'; serviceFeatures?: string[] | null; pharmacistConfirmed?: boolean };
 const statusLabel = { invited: '수락 대기', accepted: '경영자 승인 대기', active: '이용 중' };
 const failure = (e: unknown) => {
   const value = e as { response?: { data?: { error?: unknown } } };
@@ -122,11 +123,16 @@ function StoreMembers({ accountId, onChanged, compact = false }: Props) {
           {featureError && <p role="alert" className="mt-3 text-red-700">약국의 제공 기능을 확인하지 못했습니다. <button type="button" disabled={busy} className="underline" onClick={() => setTick(value => value + 1)}>기능 다시 확인</button></p>}
           {members === null ? <p className="mt-3">구성원을 확인하는 중…</p> : <ul className="mt-3 space-y-3">{members.map(m => <li key={m.userId} className="flex flex-wrap items-center gap-3">
             <span className="break-all">{m.name || m.email} · {statusLabel[m.status]}</span>
+            {m.role === 'owner' && m.userId === accountId && features?.some(feature => feature.requiresProfessional && feature.allowed) && <OwnerPharmacistConfirmation
+              key={`owner:${selected}:${tick}`} confirmed={m.pharmacistConfirmed === true} busy={busy}
+              onSave={confirmed => void mutate('/neture/pharmacy/pharmacist-confirmation', { confirmed }, false, true)} />}
             {['accepted', 'staff'].includes(m.role) && (features ? <StaffFeatureEditor key={`${selected}:${tick}:${m.userId}`}
-              name={m.name || m.email} pending={m.role === 'accepted'} features={features} selected={m.serviceFeatures ?? null} busy={busy}
-              onSave={serviceFeatures => void (m.role === 'accepted'
-                ? mutate(`/store/members/${encodeURIComponent(m.userId)}/approve`, { serviceFeatures })
-                : mutate(`/neture/pharmacy/staff-feature-permissions/${encodeURIComponent(m.userId)}`, { serviceFeatures }, false, true))} />
+              name={m.name || m.email} pending={m.role === 'accepted'} features={features} selected={m.serviceFeatures ?? null} busy={busy} pharmacistConfirmed={m.pharmacistConfirmed}
+              onSave={(serviceFeatures, pharmacistConfirmed) => {
+                const body = { serviceFeatures, ...(pharmacistConfirmed === undefined ? {} : { pharmacistConfirmed }) };
+                void (m.role === 'accepted' ? mutate(`/store/members/${encodeURIComponent(m.userId)}/approve`, body)
+                  : mutate(`/neture/pharmacy/staff-feature-permissions/${encodeURIComponent(m.userId)}`, body, false, true));
+              }} />
               : !featureError && <p className="text-sm text-slate-500">이용 기능을 확인하는 중…</p>)}
             {['invited', 'accepted', 'staff'].includes(m.role) && <button type="button" disabled={busy} className="text-red-700 underline" onClick={() => void mutate(`/store/members/${encodeURIComponent(m.userId)}`, {}, true)}>{m.status === 'active' ? '접근 해제' : '초대 취소'}</button>}
           </li>)}</ul>}

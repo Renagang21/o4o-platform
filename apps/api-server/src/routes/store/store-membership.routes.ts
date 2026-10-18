@@ -172,6 +172,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
       const data = await approveStoreMember(dataSource, {
         ownerUserId: sessionUserId(req), targetUserId: req.params.userId,
         serviceFeatures: req.body?.serviceFeatures,
+        pharmacistConfirmed: req.body?.pharmacistConfirmed,
         serviceKey: readServiceKey(req), preferredOrganizationId: readPreferredStoreOrganizationId(req),
       });
       res.json({ success: true, data });

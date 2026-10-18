@@ -490,6 +490,13 @@ describe('M7 Role ∧ Relationship', () => {
     expect(members[0].metadata.pharmacyServiceFeatures).toEqual([]);
     expect(members[0].role).toBe(STORE_STAFF_ROLE);
   });
+  it('약사 사용 확인을 남기려면 실제 경영자 관계가 있어야 한다', async () => {
+    asOwnerOf(ORG_A);
+    const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_ACCEPTED_ROLE, left_at: null }] });
+    await expectCode(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceFeatures: ['tablet'], pharmacistConfirmed: true }), 'STORE_OWNER_REQUIRED');
+    expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+  });
 
   it('직원 거절은 자기 초대만 취소하며 승인된 관계는 바꾸지 않는다', async () => {
     const { ds, members } = makeDs({ members: [
