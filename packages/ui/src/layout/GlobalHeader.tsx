@@ -160,11 +160,11 @@ export function GlobalHeader({
     return () => document.removeEventListener('mousedown', handler);
   }, [userMenuOpen]);
 
-  // Close mobile menu on route change
+  // Close menus when navigating, including same-page anchors and query routes.
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, location.search, location.hash]);
 
   const allNav = [
     ...publicNav,
