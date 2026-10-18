@@ -689,7 +689,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   }
   for (const cooperative of data.cooperatives ?? []) {
     if (cooperative.status !== 'active') continue;
-    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://coop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
+    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://pharmcoop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
   }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;

@@ -54,3 +54,28 @@
 | URL map `o4o-global-lb` | host rule `pharmcoop.neture.co.kr` → path matcher `path-matcher-cooperative` 추가. 변경 전후 export diff 는 이 두 항목 추가뿐 |
 
 HTTP→HTTPS redirect URL map 은 모든 host 를 이미 덮어 변경하지 않았다. 옛 `coop` 도메인으로 만든 GCP 리소스는 처음부터 없었다.
+
+## 병합 · 배포 결과 (2026-10-18)
+
+| 항목 | 결과 |
+|---|---|
+| PR #692 | CI 전 항목 통과(CI Gate · API Jest 3분할 · Web build · Code Quality · Docs guard), Codex 지적 0, Sonar 통과 → merge `716504eaf2` |
+| Delivery | `HELD_LEVEL_3` (api · neture) → Promote `716504eaf2` 성공 |
+| API | `o4o-core-api` 새 revision 100% traffic, label `o4o-commit-sha=716504eaf2` |
+| Neture web | `neture-web` 새 revision 100%, label `716504eaf2`. 운영 번들에 홈 협동조합 카드 `pharmcoop` 링크 확인 |
+| CORS (운영 API preflight) | `Origin: https://pharmcoop.neture.co.kr` → 204 · `allow-origin` 일치 · credentials true. 옛 origin 은 임의 미등록 origin 과 같은 거부 응답 |
+| 인증서 · HTTPS | `cm-cert-pharmcoop-v1` ACTIVE(AUTHORIZED), `https://pharmcoop.neture.co.kr` TLS 검증 정상 |
+| 협동조합 workflow 사전 점검 (`apply=false`, main HEAD = API SHA = `716504eaf2`) | CI · SHA 고정 · 같은 SHA serving API 확인까지 통과, 조합 등록 사전 점검 job 에서 실패(지정 운영자 계정 부재 — 기존 차단). frontend 배포 단계는 실행되지 않음 |
+
+## 후속 정정 — 홈 "내 서비스" 조합별 링크
+
+#692 작성 기준(`993206f0a4`) 이후 다른 PR 로 들어온 `services/web-neture/src/lib/home-entry.ts` 의 조합별 참여 링크(`https://coop.neture.co.kr/<slug>`)가 운영 번들에 남아 있었다. 운영 DB 에 조합이 0건이라 실제 노출은 없었다.
+`https://pharmcoop.neture.co.kr/<slug>` 로 고치고, 조합 항목의 href 를 고정하는 단위 검증을 추가했다(기존 테스트는 id 만 비교해 도메인을 보지 않았다).
+Neture 전체 Vitest 127개 파일 1,133개 · tsc · build · ESLint 통과. 첫 실행은 다른 작업과 겹쳐 worker heap 부족 · `demoAccounts` timeout 으로 실패했고, worker 2개로 다시 실행해 전부 통과했다.
+
+## 미해결
+
+- 지정 운영자 계정이 운영 DB 에 없어 테스트 조합 등록과 협동조합 frontend 배포(`cooperative-web` 최초 생성)가 막혀 있다. 계정 생성 · 전역 역할 부여는 하지 않았다.
+- 따라서 새 도메인의 `/` · `/test` · `/login` 직접 접근, 로그인 · 세션 유지 · 로그아웃, 운영자 · 개인 조합원 권한 검증은 frontend 배포 이후로 남는다. 현재 새 도메인은 유효한 HTTPS 위에서 backend 대상 서비스가 없어 404 다.
+- `cooperative-web` 공개 invoker IAM 은 서비스가 생성된 뒤에 설정한다.
+- 개인 조합원 계정의 역할 · 약국 조직 · 매장 연결은 이번 작업에서 바뀌지 않았다(조합 연결 미실행). 연결 후 비교는 등록 실행 시 위 기준선과 대조한다.
