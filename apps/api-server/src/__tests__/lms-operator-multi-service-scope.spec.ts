@@ -7,7 +7,7 @@
  * 서비스 allowlist 자체가 사라졌다. 본 spec 은 그 은퇴를 정적으로 고정한다.
  *
  * 계약:
- *   - 운영자 경로 guard = requireLectureOperator (active lecture membership + lecture:operator|admin)
+ *   - 일상 운영 guard = requireLectureOperator; 영구 삭제 = requireLectureAdmin (active lecture membership 필수)
  *   - 운영 대상 = course.serviceKey === 'lecture' 만. 그 외(legacy NULL 포함)는 non-disclosure 404
  *   - kpa:* / cosmetics:* / pharmacy-hub:* / admin / super_admin 문자열 allowlist 0
  */
@@ -16,6 +16,7 @@ import { join } from 'path';
 
 const ROUTES = readFileSync(join(__dirname, '../modules/lms/routes/lms.routes.ts'), 'utf-8');
 // PR #225 merge-gate repair: isLectureCourse 는 lecture-access.ts 로 승격(CourseController 강사 write 경로와 공유)
+const CLEANUP = readFileSync(join(__dirname, '../modules/lms/services/lecture-course-cleanup.service.ts'), 'utf-8');
 const ACCESS = readFileSync(join(__dirname, '../modules/lms/middleware/lecture-access.ts'), 'utf-8');
 
 describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은퇴)', () => {
@@ -30,20 +31,27 @@ describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은�
     expect(ROUTES).not.toContain('SERVICE_SCOPE_VIOLATION');
   });
 
-  it('운영 mutation 5종은 requireLectureOperator 로만 보호된다', () => {
+  it('일상 운영 mutation 4종은 requireLectureOperator 로 보호된다', () => {
     const lines = ROUTES.split('\n');
     for (const p of [
       "router.post('/operator/courses/:id/unpublish'",
       "router.post('/operator/courses/:id/approve'",
       "router.post('/operator/courses/:id/reject'",
       "router.post('/operator/courses/:id/archive'",
-      "router.delete('/operator/courses/:id/hard'",
     ]) {
       const line = lines.find((l) => l.includes(p));
       expect(line).toBeDefined();
       // 11차 P1-30: apiLimiter 가 인증 뒤 · guard 앞에 온다 (키에 userId 가 실린다)
       expect(line).toContain('ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator');
     }
+  });
+
+  it('완전 삭제는 lecture admin만 허용하고 service-scoped transaction으로 위임한다', () => {
+    const route = ROUTES.slice(ROUTES.indexOf("router.delete('/operator/courses/:id/hard'"));
+    expect(route.split('\n')[0]).toContain('ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin');
+    expect(route).toContain('hardDeleteLectureCourse(AppDataSource');
+    expect(CLEANUP).toContain("service_key='lecture' FOR UPDATE");
+    expect(CLEANUP).not.toContain('"serviceKey"');
   });
 
   it('운영 목록(GET /operator/courses)이 존재하며 requireLectureOperator 로 보호된다', () => {
@@ -53,10 +61,11 @@ describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은�
   it('운영 대상은 course.serviceKey === lecture 만이며, 그 외는 404 (403 아님)', () => {
     expect(ACCESS).toContain("export function isLectureCourse(courseServiceKey: string | null | undefined): boolean");
     expect(ACCESS).toContain('return courseServiceKey === SERVICE_KEYS.LECTURE;');
-    expect(ROUTES).toContain("import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';");
+    expect(ROUTES).toContain("import { requireLectureLearner, requireLectureOperator, requireLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';");
     expect(ROUTES).not.toContain('function isLectureCourse(');
     const checks = ROUTES.match(/if \(!isLectureCourse\(course\.serviceKey\)\) \{ return res\.status\(404\)/g) ?? [];
-    expect(checks.length).toBe(5);
+    // Four daily mutations use entity properties; permanent deletion checks the physical service_key under lock.
+    expect(checks.length).toBe(4);
   });
 
   it('generic LMS 라우터는 lecture 컨텍스트를 서버가 고정한다 (client serviceKey 미신뢰)', () => {

@@ -1,37 +1,11 @@
-/**
- * Neture Operator Contact Messages Controller
- *
- * WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
- *
- * 선행 IR: IR-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-SCOPE-AUDIT-V1 (16d4a5def)
- *   → B 안 (혼합형) 채택: operator 가 supplier/partner 문의를 조회·일괄 확인 처리.
- *     상세 처리·개별 status 변경·adminNotes 작성은 admin 유지.
- *
- * Routes (mount: /operator):
- *   GET /operator/contact-messages
- *     · list + pagination + filter (contactType / status)
- *     · WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1:
- *       default contactType = 전체 (supplier/partner/service/other).
- *       Contact us 는 공개 문의 창구이므로 operator 가 모든 유형의 신규 문의를 놓치지 않도록 한다.
- *       (이전: default = supplier+partner. supplier/partner 우선은 selectable 필터로만 유지)
- *     · operator 화면 노출 안전 필드만 SELECT — adminNotes / ipAddress / userAgent 0
- *     · message 본문은 preview (앞 160자) 만 반환 — 상세 처리는 admin
- *
- * 의도적 미노출 (사용자 directive):
- *   - adminNotes : admin 전용
- *   - ipAddress / userAgent : PII 노출 범위 외
- *   - 개별 detail / status PATCH : admin 유지
- *
- * Auth: requireAuth + requireNetureScope('neture:operator')
- *   scopeRoleMapping 에 의해 neture:operator + neture:admin 모두 통과.
- *   기존 admin /admin/contact-messages 화면·엔드포인트는 그대로 유지.
- */
-
+/** Daily inquiry list/detail/status/internal notes: service operator; security telemetry excluded. */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { NetureContactMessage } from '../entities/NetureContactMessage.entity.js';
+import { contactDetail, updateOperatorContact } from '../services/contact-operations.service.js';
+import { OperationError } from '../../../services/operations/operation-audit.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -50,7 +24,7 @@ interface OperatorContactMessageRow {
   email: string;
   phone: string | null;
   subject: string;
-  /** 본문 preview (앞 160자). 상세는 admin 화면 진입. */
+  /** 본문 preview (앞 160자). 상세는 별도 상세 API에서 조회. */
   messagePreview: string;
   status: string;
   createdAt: string;
@@ -119,8 +93,8 @@ export function createOperatorContactController(dataSource: DataSource): Router 
         qb.andWhere('msg.status = :status', { status });
       }
 
-      const pageNum = Math.max(1, Number(page));
-      const limitNum = Math.min(Math.max(1, Number(limit)), 100);
+      const pageNum = Math.max(1, Math.floor(Number(page) || 1));
+      const limitNum = Math.min(Math.max(1, Math.floor(Number(limit) || 20)), 100);
 
       qb.orderBy('msg.createdAt', 'DESC')
         .skip((pageNum - 1) * limitNum)
@@ -163,5 +137,18 @@ export function createOperatorContactController(dataSource: DataSource): Router 
     }
   });
 
+  router.get('/contact-messages/:id', async (req, res) => {
+    try {
+      const message = await repo.findOne({ where: { id: req.params.id } });
+      if (!message) { res.status(404).json({ success: false, error: 'NOT_FOUND' }); return; }
+      res.json({ success: true, data: contactDetail(message) });
+    } catch { res.status(500).json({ success: false, error: '문의 상세를 불러오지 못했습니다.' }); }
+  });
+  router.patch('/contact-messages/:id', async (req, res) => {
+    try { res.json({ success: true, data: await updateOperatorContact(dataSource, req.params.id, (req as any).user.id, req.body) }); }
+    catch (error) { res.status(error instanceof OperationError ? error.status : 500).json({ success: false,
+      code: error instanceof OperationError ? error.code : 'INTERNAL_ERROR',
+      error: error instanceof OperationError ? error.message : '문의 처리를 완료하지 못했습니다.' }); }
+  });
   return router;
 }

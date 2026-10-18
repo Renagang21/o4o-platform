@@ -1,0 +1,31 @@
+import { beforeEach, afterEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import Detail from '../OperatorContactDetail';
+const api = vi.hoisted(() => ({ get: vi.fn(), patch: vi.fn() }));
+vi.mock('../../../lib/apiClient', () => ({ api }));
+const row = { id: 'a', subject: '합성 문의', message: '합성 본문', status: 'new', adminNotes: '', updatedAt: '2026-01-01T00:00:00.000Z' };
+beforeEach(() => { vi.resetAllMocks(); api.get.mockResolvedValue({ data: { success: true, data: row } }); api.patch.mockResolvedValue({ data: { success: true, data: { ...row, status: 'resolved' } } }); });
+afterEach(cleanup);
+it('keeps the draft on failure, blocks duplicate writes and returns the saved record without reissuing the write', async () => {
+  const saved = vi.fn(async () => undefined); const busy = vi.fn();
+  let finish!: (value: unknown) => void; api.patch.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  render(<Detail id="a" onClose={vi.fn()} onSaved={saved} onBusy={busy} />); await screen.findByText('합성 본문');
+  fireEvent.change(screen.getByRole('textbox', { name: '문의 내부 메모' }), { target: { value: '보존할 입력' } });
+  fireEvent.change(screen.getByRole('combobox', { name: '상세 처리 상태' }), { target: { value: 'resolved' } });
+  fireEvent.click(screen.getByRole('button', { name: '문의 저장' })); fireEvent.click(screen.getByRole('button', { name: '저장 중…' }));
+  expect(api.patch).toHaveBeenCalledTimes(1); finish({ data: { success: false } }); await screen.findByRole('alert');
+  expect((screen.getByRole('textbox', { name: '문의 내부 메모' }) as HTMLTextAreaElement).value).toBe('보존할 입력');
+  fireEvent.click(screen.getByRole('button', { name: '문의 저장' })); await screen.findByText('저장했습니다.');
+  expect(api.patch).toHaveBeenLastCalledWith('/neture/operator/contact-messages/a', { status: 'resolved', adminNotes: '보존할 입력', expectedUpdatedAt: row.updatedAt });
+  expect(saved).toHaveBeenCalledTimes(1); await waitFor(() => expect(busy).toHaveBeenLastCalledWith(false));
+});
+it('ignores a previous target response and does not refresh after a pending write is unmounted', async () => {
+  let old!: (value: unknown) => void; api.get.mockImplementationOnce(() => new Promise(resolve => { old = resolve; }));
+  const saved = vi.fn(); const props = { onClose: vi.fn(), onSaved: saved, onBusy: vi.fn() };
+  const view = render(<Detail id="a" {...props} />); view.rerender(<Detail id="b" {...props} />);
+  await screen.findByText('합성 본문'); old({ data: { success: true, data: { ...row, message: '늦은 응답' } } });
+  await new Promise(resolve => setTimeout(resolve, 0)); expect(screen.queryByText('늦은 응답')).toBeNull();
+  let finish!: (value: unknown) => void; api.patch.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  fireEvent.click(screen.getByRole('button', { name: '문의 저장' })); view.unmount(); finish({ data: { success: true, data: row } });
+  await new Promise(resolve => setTimeout(resolve, 0)); expect(saved).not.toHaveBeenCalled();
+});

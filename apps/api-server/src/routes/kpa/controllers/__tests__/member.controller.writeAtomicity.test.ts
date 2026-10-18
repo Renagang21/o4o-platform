@@ -82,7 +82,7 @@ function normalize(sql: string): string {
 }
 
 /** 테스트용 DataSource 더블 — transaction 경계와 SQL 흐름을 기록한다. */
-function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string; currentMembershipStatus?: string; missingMember?: boolean; demo?: boolean } = {}) {
+function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string; currentMembershipStatus?: string; missingMember?: boolean; demo?: boolean; protectedRole?: boolean; failOnRemove?: boolean } = {}) {
   const calls: Call[] = [];
   const saves: Array<{ entity: string; scope: 'tx' | 'global'; value: any }> = [];
   const state: any = {
@@ -116,6 +116,7 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
     if (options.failOn && options.failOn.test(n)) {
       throw new Error('INJECTED_FAILURE');
     }
+    if (/SELECT role FROM role_assignments/i.test(n)) return options.protectedRole ? [{ role: 'kpa:admin' }] : [];
     if (/SELECT 1 FROM demo_accounts/i.test(n)) return options.demo ? [{ exists: 1 }] : [];
     if (/SELECT id, user_id, status, role, created_at FROM service_memberships/i.test(n)) {
       return [{ id: MEMBERSHIP_ID, user_id: USER_ID, status: options.currentMembershipStatus ?? 'pending', role: 'member', created_at: '2026-10-01' }];
@@ -135,6 +136,14 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
   const entityName = (e: any) => (typeof e === 'string' ? e : e?.name ?? String(e));
 
   const makeManager = (scope: 'tx' | 'global') => ({
+    getRepository: (entity: any) => ({
+      findOne: async () => memberExists ? member : null,
+      remove: async (value: any) => {
+        if (options.failOnRemove) throw new Error('INJECTED_FAILURE');
+        saves.push({ entity: entityName(entity), scope, value });
+        return value;
+      },
+    }),
     query: (sql: string, params?: any[]) => runQuery(scope, sql, params ?? []),
     findOne: async (entity: any, _opts: any) => (entityName(entity) === 'KpaMember' && memberExists && (_opts.where?.id === MEMBER_ID || _opts.where?.user_id === USER_ID) ? member : null),
     save: async (entity: any, value: any) => {
@@ -181,7 +190,7 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
   return { dataSource, calls, saves, state, member };
 }
 
-function getHandler(dataSource: any, path: string, method: 'patch') {
+function getHandler(dataSource: any, path: string, method: 'patch' | 'delete') {
   const router: any = createMemberController(
     dataSource,
     ((_req: any, _res: any, next: any) => next()) as any,
@@ -612,5 +621,28 @@ describe('operator transition dispatch follows the locked membership state', () 
     await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
     expect(out.statusCode).toBe(500); expect(h.state.txRolledBack).toBe(1);
     expect(h.saves).toHaveLength(0);
+  });
+});
+
+describe('KPA admin membership/profile cleanup transaction', () => {
+  it('keeps profile removal and mandatory audit on the same transaction manager', async () => {
+    const h = makeDataSource(); const res = makeRes();
+    await getHandler(h.dataSource, '/:id', 'delete')({ ...req({}), query: { mode: 'hard' } }, res);
+    expect(res.statusCode).toBe(200); expect(h.state.txCommitted).toBe(1);
+    expect(h.calls.filter(c => c.scope === 'global' && WRITE_RE.test(c.sql))).toEqual([]);
+    expect(h.saves.filter(s => s.entity === 'KpaMember')).toEqual([expect.objectContaining({ scope: 'tx' })]);
+    expect(h.calls.some(c => c.scope === 'tx' && c.sql.includes('INSERT INTO action_logs'))).toBe(true);
+    expect(h.calls.some(c => /^DELETE FROM users/.test(c.sql))).toBe(false);
+  });
+  it.each([{ failOnRemove: true }, { failOn: /INSERT INTO action_logs/ }])('does not commit if profile removal or audit fails (%p)', async options => {
+    const h = makeDataSource(options); const res = makeRes();
+    await getHandler(h.dataSource, '/:id', 'delete')({ ...req({}), query: { mode: 'hard' } }, res);
+    expect(res.statusCode).toBe(500); expect(h.state.txCommitted).toBe(0); expect(h.state.txRolledBack).toBe(1);
+  });
+  it('blocks an active service operator/admin before removing the membership', async () => {
+    const h = makeDataSource({ protectedRole: true }); const res = makeRes();
+    await getHandler(h.dataSource, '/:id', 'delete')({ ...req({}), query: { mode: 'hard' } }, res);
+    expect(res.statusCode).toBe(409);
+    expect(h.calls.filter(c => WRITE_RE.test(c.sql))).toEqual([]);
   });
 });

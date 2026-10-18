@@ -494,7 +494,7 @@ export function OperatorForumCategoriesPage({
             포럼 목록 관리
           </h1>
           <p className="text-slate-500 mt-1">
-            활성 포럼 관리 (활성화 / 비활성화 / 태그 / 완전 삭제)
+            {disableHardDelete ? '포럼 사용 중지·재개·태그 관리' : '포럼 사용 중지·재개·태그·admin 완전 삭제'}
           </p>
         </div>
       </div>
