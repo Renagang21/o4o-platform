@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
@@ -98,6 +98,11 @@ export function KpaGlobalHeader() {
     navigate('/');
   };
 
+  const accountMenu = user ? <ServiceAccountMenu key={user.id} displayName={getUserDisplayName(user)} email={user.email} roleLabel={getKpaServiceRoleLabel(user)} onLogout={handleLogout}>
+    <KpaUserMenuItems user={user} />
+  </ServiceAccountMenu> : undefined;
+  const accountLoading = isLoading ? <output>계정 확인 중</output> : undefined;
+
   return (
     <GlobalHeader
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 표시 이름 = O4O 약국 (serviceKey 불변) */
@@ -147,6 +152,7 @@ export function KpaGlobalHeader() {
       /* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 규칙은 KpaUserMenuItems(SSOT)로 이동.
          데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
       userMenuItems={<KpaUserMenuItems user={user} />}
+      accountSlot={accountMenu ?? accountLoading}
       /* WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
          모바일 햄버거 drawer 는 사이트 nav 만 표시. 사용자 이름·이메일·역할별 대시보드·계정 메뉴·
          로그아웃은 모바일 하단 '내정보' 프로필 시트(MobileBottomNav)로 분리한다.

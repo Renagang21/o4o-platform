@@ -15,7 +15,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
-import { MyHomeButton, O4OHomeButton } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
@@ -104,17 +104,6 @@ export function NetureGlobalHeader() {
       homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>}
       utilitySlot={
         <>
-          {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(user.demo) 기준 Demo 배지 — modal 없음 */}
-          {isAuthenticated && user?.demo?.isDemo && (
-            <span
-              role="status"
-              title={DEMO_NOTICE}
-              className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800 whitespace-nowrap"
-            >
-              Demo 계정
-              <span className="sr-only"> — {DEMO_NOTICE}</span>
-            </span>
-          )}
           {isAuthenticated && user && (
             <NotificationBell
               unreadCount={notif.unreadCount}
@@ -131,6 +120,10 @@ export function NetureGlobalHeader() {
       /* WO-O4O-NETURE-MOBILE-NAV-...-V1: 역할별 업무 공간 + 계정 메뉴를 NetureUserMenuItems(SSOT)로 이관.
          데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
       userMenuItems={<NetureUserMenuItems user={user} isAuthenticated={isAuthenticated} />}
+      accountSlot={isAuthenticated && user ? <ServiceAccountMenu key={user.id} displayName={getUserDisplayName(user)} email={user.email} onLogout={handleLogout}
+        badge={user.demo?.isDemo ? <output title={DEMO_NOTICE} className="mt-1 inline-flex rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-800">Demo 계정<span className="sr-only"> — {DEMO_NOTICE}</span></output> : undefined}>
+        <NetureUserMenuItems user={user} isAuthenticated={isAuthenticated} />
+      </ServiceAccountMenu> : undefined}
       /* WO-O4O-NETURE-MOBILE-NAV-...-V1: 모바일 햄버거 drawer 는 사이트 nav 만 표시.
          이름·이메일·역할별 업무 공간·계정 메뉴·로그아웃은 모바일 하단 '내정보' 프로필 시트
          (NetureBottomNav)로 분리. 데스크톱 드롭다운(userMenuItems)은 영향 없음. */
