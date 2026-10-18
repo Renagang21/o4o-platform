@@ -10,6 +10,7 @@ import { MemberPaidFeaturesPanel } from "./MemberPaidFeaturesPanel";
  *   결제 수취 주체 키는 사업 결정(D1) 전이라 미정 — 화면이 값을 미리 채우지 않는다.
  */
 import { useCallback, useEffect, useState } from "react";
+import { PHARMACY_COLLABORATORS } from "@o4o/types";
 import {
   neturePharmacyAdminApi as api,
   formatDateTime,
@@ -19,6 +20,28 @@ import { INPUT, Message, PageHeader, StatusBadge } from "./PharmacyCommerceUi";
 import { ServiceFeatureSelector } from "./ServiceFeatureSelector";
 
 type Msg = { type: "success" | "error"; text: string } | null;
+
+/**
+ * 운영자 관리 화면의 "사업 등록" 링크(`?register=<key>`)가 넘기는 등록 양식 프리셋.
+ * 역할 지정만으로는 사업 행이 생기지 않는다 — 양식만 채우고 저장은 관리자가 "만들기"로 한다.
+ * 협동조합(pharmcoop)은 별도 등록 절차라 대상이 아니다.
+ */
+const REGISTER_PRESET_KEYS = ["carepharm", "megapharm"] as const;
+type RegisterPresetKey = (typeof REGISTER_PRESET_KEYS)[number];
+
+function readRegisterPreset(): RegisterPresetKey | null {
+  if (typeof window === "undefined") return null;
+  const key = new URLSearchParams(window.location.search).get("register");
+  return (REGISTER_PRESET_KEYS as readonly string[]).includes(key ?? "")
+    ? (key as RegisterPresetKey)
+    : null;
+}
+
+function roleLevelLabel(role: string): string {
+  if (role.endsWith("_admin")) return "Admin";
+  if (role.endsWith("_operator")) return "Operator";
+  return role;
+}
 
 interface EditForm {
   name: string;
@@ -39,9 +62,10 @@ export default function AdminSemiFranchisePage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [message, setMessage] = useState<Msg>(null);
   const [busy, setBusy] = useState(false);
+  const [registerPreset] = useState(readRegisterPreset);
   const [createForm, setCreateForm] = useState({
-    key: "",
-    name: "",
+    key: registerPreset ?? "",
+    name: registerPreset ? PHARMACY_COLLABORATORS[registerPreset].label : "",
     communityKey: "",
     registrationConditions: "",
     serviceFeatures: [] as string[],
@@ -198,6 +222,18 @@ export default function AdminSemiFranchisePage() {
           연결되지는 않습니다.
         </p>
       </section>
+      {registerPreset && (
+        <div
+          role="status"
+          className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900"
+        >
+          {!settingsReady
+            ? `${PHARMACY_COLLABORATORS[registerPreset].label} 등록 현황을 확인하는 중입니다.`
+            : items.some((sf) => sf.key === registerPreset)
+              ? `${PHARMACY_COLLABORATORS[registerPreset].label} 사업은 이미 등록되어 있습니다. 아래 목록에서 상태를 확인하세요.`
+              : `${PHARMACY_COLLABORATORS[registerPreset].label} 등록 양식을 미리 채웠습니다. 내용을 확인하고 "만들기"를 눌러야 등록됩니다.`}
+        </div>
+      )}
       <MemberPaidFeaturesPanel />
       <StaffDemandSummary />
 
@@ -463,7 +499,7 @@ export default function AdminSemiFranchisePage() {
                 </div>
                 {(sf.operators ?? []).length === 0 ? (
                   <div className="text-xs text-gray-400">
-                    지정된 담당 운영자가 없습니다.
+                    이 화면에서 개별 지정한 담당 운영자가 없습니다.
                   </div>
                 ) : (
                   <ul className="space-y-1">
@@ -489,6 +525,40 @@ export default function AdminSemiFranchisePage() {
                       </li>
                     ))}
                   </ul>
+                )}
+                {(sf.roleOperators ?? []).length > 0 && (
+                  <div
+                    className="mt-3"
+                    aria-label={`${sf.name} 지정 역할 보유자`}
+                  >
+                    <div className="mb-1 text-xs font-medium text-gray-600">
+                      운영자 관리에서 지정한 사업 역할 (조회 전용 — 해제는
+                      운영자 관리 화면에서)
+                    </div>
+                    <ul className="space-y-1">
+                      {(sf.roleOperators ?? []).map((op) => (
+                        <li
+                          key={`${op.userId}::${op.role}`}
+                          className="text-sm text-gray-700"
+                        >
+                          <span className="mr-2 rounded bg-teal-50 px-1.5 py-0.5 text-xs text-teal-700">
+                            {roleLevelLabel(op.role)}
+                          </span>
+                          {op.name || op.email || "이름 미등록"}
+                          {op.name && op.email && (
+                            <span className="ml-1 text-xs text-gray-400">
+                              {op.email}
+                            </span>
+                          )}
+                          {op.membershipStatus !== "active" && (
+                            <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-800">
+                              Neture 이용 자격 없음 — 사업 운영 불가
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
                 <div className="mt-3 flex gap-2">
                   <input
