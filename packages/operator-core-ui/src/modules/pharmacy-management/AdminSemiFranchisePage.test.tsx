@@ -43,13 +43,118 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+it("starts with an explicit service choice and no internal identifier field", async () => {
+  render(<Page />);
+  await screen.findByRole("button", { name: "수정" });
+  expect(
+    (screen.getByRole("combobox", { name: "대상 서비스" }) as HTMLSelectElement)
+      .value,
+  ).toBe("");
+  expect(screen.queryByLabelText("새 사업 식별자")).toBeNull();
+  expect(screen.queryByRole("option", { name: /협동조합/ })).toBeNull();
+  expect(
+    (screen.getByRole("button", { name: "만들기" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(api.createSemiFranchise).not.toHaveBeenCalled();
+});
+
+it.each([
+  ["carepharm", "CarePharm · 만성질환관리"],
+  ["megapharm", "MegaPharm · 창고형약국"],
+])(
+  "registers %s by choosing its name and checking features without typing a key",
+  async (key, name) => {
+    render(<Page />);
+    await screen.findByRole("button", { name: "수정" });
+    fireEvent.change(screen.getByRole("combobox", { name: "대상 서비스" }), {
+      target: { value: key },
+    });
+    expect(
+      (screen.getByLabelText("새 사업 이름") as HTMLInputElement).value,
+    ).toBe(name);
+    expect(screen.queryByLabelText("새 사업 식별자")).toBeNull();
+    expect(api.createSemiFranchise).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByLabelText("태블릿"));
+    fireEvent.click(screen.getByRole("button", { name: "만들기" }));
+    await waitFor(() =>
+      expect(api.createSemiFranchise).toHaveBeenCalledWith({
+        key,
+        name,
+        communityKey: undefined,
+        registrationConditions: "",
+        serviceFeatures: ["tablet"],
+      }),
+    );
+  },
+);
+
+it("disables existing active and closed services and prevents a duplicate preset submission", async () => {
+  api.listSemiFranchises.mockResolvedValue([
+    { ...business, key: "pharmacy" },
+    { ...business, key: "carepharm", status: "closed" },
+  ]);
+  window.history.replaceState(null, "", "/?register=carepharm");
+  try {
+    render(<Page />);
+    await screen.findByText(/사업은 이미 등록되어 있습니다/);
+    const menu = screen.getByRole("combobox", { name: "대상 서비스" });
+    expect(
+      (
+        within(menu).getByRole("option", {
+          name: /약국 협력사업.*이미 등록됨/,
+        }) as HTMLOptionElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (
+        within(menu).getByRole("option", {
+          name: /CarePharm.*마감/,
+        }) as HTMLOptionElement
+      ).disabled,
+    ).toBe(true);
+    const button = screen.getByRole("button", {
+      name: "만들기",
+    }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    fireEvent.click(button);
+    expect(api.createSemiFranchise).not.toHaveBeenCalled();
+  } finally {
+    window.history.replaceState(null, "", "/");
+  }
+});
+
+it("updates the chosen service and keeps custom business registration available explicitly", async () => {
+  render(<Page />);
+  await screen.findByRole("button", { name: "수정" });
+  const menu = screen.getByRole("combobox", { name: "대상 서비스" });
+  fireEvent.change(menu, { target: { value: "carepharm" } });
+  fireEvent.change(menu, { target: { value: "megapharm" } });
+  expect(
+    (screen.getByLabelText("새 사업 이름") as HTMLInputElement).value,
+  ).toBe("MegaPharm · 창고형약국");
+  expect(screen.queryByText(/CarePharm.*등록 양식/)).toBeNull();
+  fireEvent.change(menu, { target: { value: "custom" } });
+  fireEvent.change(screen.getByLabelText("새 사업 식별자"), {
+    target: { value: "synthetic-other" },
+  });
+  fireEvent.change(screen.getByLabelText("새 사업 이름"), {
+    target: { value: "합성 기타 사업" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "만들기" }));
+  await waitFor(() =>
+    expect(api.createSemiFranchise).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "synthetic-other" }),
+    ),
+  );
+});
+
 it("sends selected features on creation without inventing a paid or professional entitlement", async () => {
   render(<Page />);
   await screen.findByRole("button", { name: "수정" });
-  fireEvent.change(
-    screen.getByPlaceholderText("key (영문 소문자 · 숫자 · -)"),
-    { target: { value: "new-business" } },
-  );
+  fireEvent.change(screen.getByRole("combobox", { name: "대상 서비스" }), {
+    target: { value: "carepharm" },
+  });
   fireEvent.change(screen.getByPlaceholderText("이름"), {
     target: { value: "새 합성 사업" },
   });
@@ -58,7 +163,7 @@ it("sends selected features on creation without inventing a paid or professional
   await waitFor(() =>
     expect(api.createSemiFranchise).toHaveBeenCalledWith(
       expect.objectContaining({
-        key: "new-business",
+        key: "carepharm",
         serviceFeatures: ["tablet"],
       }),
     ),
@@ -183,17 +288,18 @@ it("preserves a duplicate registration draft and never updates an existing busin
   );
   render(<Page />);
   await screen.findByRole("button", { name: "수정" });
-  fireEvent.change(screen.getByLabelText("사업 key"), {
-    target: { value: "existing-key" },
+  fireEvent.change(screen.getByRole("combobox", { name: "대상 서비스" }), {
+    target: { value: "carepharm" },
   });
   fireEvent.change(screen.getByLabelText("새 사업 이름"), {
     target: { value: "새 합성 사업" },
   });
   fireEvent.click(screen.getByRole("button", { name: "만들기" }));
   await screen.findByText("이미 있는 key 입니다.");
-  expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe(
-    "existing-key",
-  );
+  expect(
+    (screen.getByRole("combobox", { name: "대상 서비스" }) as HTMLInputElement)
+      .value,
+  ).toBe("carepharm");
   expect(api.updateSemiFranchise).not.toHaveBeenCalled();
 });
 
@@ -207,8 +313,8 @@ it("locks registration fields and operator input while creating without preselec
   );
   render(<Page />);
   await screen.findByRole("button", { name: "수정" });
-  fireEvent.change(screen.getByLabelText("사업 key"), {
-    target: { value: "new-key" },
+  fireEvent.change(screen.getByRole("combobox", { name: "대상 서비스" }), {
+    target: { value: "carepharm" },
   });
   fireEvent.change(screen.getByLabelText("새 사업 이름"), {
     target: { value: "새 합성 사업" },
@@ -227,19 +333,35 @@ it("locks registration fields and operator input while creating without preselec
   ).toBe(true);
   finish();
   await waitFor(() =>
-    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe(
-      "",
-    ),
+    expect(
+      (
+        screen.getByRole("combobox", {
+          name: "대상 서비스",
+        }) as HTMLInputElement
+      ).value,
+    ).toBe(""),
   );
 });
 
 it("prefills the CarePharm registration form from the operators link without saving it", async () => {
-  window.history.replaceState(null, "", "/admin/semi-franchises?register=carepharm");
+  window.history.replaceState(
+    null,
+    "",
+    "/admin/semi-franchises?register=carepharm",
+  );
   try {
     render(<Page />);
     await screen.findByRole("button", { name: "수정" });
-    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe("carepharm");
-    expect((screen.getByLabelText("새 사업 이름") as HTMLInputElement).value).toBe("CarePharm · 만성질환관리");
+    expect(
+      (
+        screen.getByRole("combobox", {
+          name: "대상 서비스",
+        }) as HTMLInputElement
+      ).value,
+    ).toBe("carepharm");
+    expect(
+      (screen.getByLabelText("새 사업 이름") as HTMLInputElement).value,
+    ).toBe("CarePharm · 만성질환관리");
     expect(screen.getByText(/"만들기"를 눌러야 등록됩니다/)).toBeTruthy();
     expect(api.createSemiFranchise).not.toHaveBeenCalled();
   } finally {
@@ -248,16 +370,32 @@ it("prefills the CarePharm registration form from the operators link without sav
 });
 
 it("ignores presets outside CarePharm and MegaPharm and reports an already registered business", async () => {
-  window.history.replaceState(null, "", "/admin/semi-franchises?register=pharmcoop");
+  window.history.replaceState(
+    null,
+    "",
+    "/admin/semi-franchises?register=pharmcoop",
+  );
   try {
     render(<Page />);
     await screen.findByRole("button", { name: "수정" });
-    expect((screen.getByLabelText("사업 key") as HTMLInputElement).value).toBe("");
+    expect(
+      (
+        screen.getByRole("combobox", {
+          name: "대상 서비스",
+        }) as HTMLInputElement
+      ).value,
+    ).toBe("");
   } finally {
     cleanup();
   }
-  api.listSemiFranchises.mockResolvedValue([{ ...business, key: "megapharm", name: "MegaPharm · 창고형약국" }]);
-  window.history.replaceState(null, "", "/admin/semi-franchises?register=megapharm");
+  api.listSemiFranchises.mockResolvedValue([
+    { ...business, key: "megapharm", name: "MegaPharm · 창고형약국" },
+  ]);
+  window.history.replaceState(
+    null,
+    "",
+    "/admin/semi-franchises?register=megapharm",
+  );
   try {
     render(<Page />);
     await screen.findByText(/이미 등록되어 있습니다/);
@@ -273,8 +411,20 @@ it("lists centrally assigned business roles separately from revocable individual
       ...business,
       operators: [{ userId: "individual-user", assignedAt: "" }],
       roleOperators: [
-        { userId: "role-user", role: "neture:a_admin", name: null, email: "role@example.invalid", membershipStatus: "active" },
-        { userId: "named-user", role: "neture:a_operator", name: "합성 담당", email: "named@example.invalid", membershipStatus: "active" },
+        {
+          userId: "role-user",
+          role: "neture:a_admin",
+          name: null,
+          email: "role@example.invalid",
+          membershipStatus: "active",
+        },
+        {
+          userId: "named-user",
+          role: "neture:a_operator",
+          name: "합성 담당",
+          email: "named@example.invalid",
+          membershipStatus: "active",
+        },
       ],
     },
   ]);
@@ -288,7 +438,9 @@ it("lists centrally assigned business roles separately from revocable individual
   const revokeButtons = screen.getAllByRole("button", { name: "해제" });
   expect(revokeButtons).toHaveLength(1);
   fireEvent.click(revokeButtons[0]);
-  await waitFor(() => expect(api.revokeOperator).toHaveBeenCalledWith("a", "individual-user"));
+  await waitFor(() =>
+    expect(api.revokeOperator).toHaveBeenCalledWith("a", "individual-user"),
+  );
   expect(api.revokeOperator).toHaveBeenCalledTimes(1);
   expect(screen.queryByText(/가입 승인·자료 운영을 맡을/)).toBeNull();
 });
@@ -298,7 +450,13 @@ it("keeps the operator prompt when the only role holder cannot use business rout
     {
       ...business,
       roleOperators: [
-        { userId: "suspended-user", role: "neture:a_operator", name: "정지 담당", email: null, membershipStatus: "suspended" },
+        {
+          userId: "suspended-user",
+          role: "neture:a_operator",
+          name: "정지 담당",
+          email: null,
+          membershipStatus: "suspended",
+        },
       ],
     },
   ]);

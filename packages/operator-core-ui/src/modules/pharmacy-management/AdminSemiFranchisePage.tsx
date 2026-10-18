@@ -28,6 +28,9 @@ type Msg = { type: "success" | "error"; text: string } | null;
  */
 const REGISTER_PRESET_KEYS = ["carepharm", "megapharm"] as const;
 type RegisterPresetKey = (typeof REGISTER_PRESET_KEYS)[number];
+const REGISTRATION_SERVICES = ["pharmacy", "carepharm", "megapharm"] as const;
+type RegistrationService = (typeof REGISTRATION_SERVICES)[number];
+type RegistrationTarget = RegistrationService | "custom" | "";
 
 function readRegisterPreset(): RegisterPresetKey | null {
   if (typeof window === "undefined") return null;
@@ -63,8 +66,10 @@ export default function AdminSemiFranchisePage() {
   const [message, setMessage] = useState<Msg>(null);
   const [busy, setBusy] = useState(false);
   const [registerPreset] = useState(readRegisterPreset);
+  const [registrationTarget, setRegistrationTarget] =
+    useState<RegistrationTarget>(registerPreset ?? "");
   const [createForm, setCreateForm] = useState({
-    key: registerPreset ?? "",
+    key: (registerPreset ?? "") as string,
     name: registerPreset ? PHARMACY_COLLABORATORS[registerPreset].label : "",
     communityKey: "",
     registrationConditions: "",
@@ -82,6 +87,23 @@ export default function AdminSemiFranchisePage() {
   const [operatorInput, setOperatorInput] = useState<Record<string, string>>(
     {},
   );
+  const selectedService = REGISTRATION_SERVICES.find(
+    (key) => key === registrationTarget,
+  );
+  const alreadyRegistered = items.some(
+    (sf) => sf.key === createForm.key.trim(),
+  );
+
+  const selectRegistrationTarget = (target: RegistrationTarget) => {
+    setRegistrationTarget(target);
+    const service = REGISTRATION_SERVICES.find((key) => key === target);
+    setCreateForm((previous) => ({
+      ...previous,
+      key: service ?? "",
+      name: service ? PHARMACY_COLLABORATORS[service].label : "",
+      communityKey: "",
+    }));
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -123,6 +145,15 @@ export default function AdminSemiFranchisePage() {
   };
 
   const create = async () => {
+    if (
+      !settingsReady ||
+      busy ||
+      !registrationTarget ||
+      alreadyRegistered ||
+      !createForm.key.trim() ||
+      !createForm.name.trim()
+    )
+      return;
     const ok = await act(
       () =>
         api.createSemiFranchise({
@@ -134,7 +165,8 @@ export default function AdminSemiFranchisePage() {
         }),
       "약국 협력사업을 만들었습니다.",
     );
-    if (ok)
+    if (ok) {
+      setRegistrationTarget("");
       setCreateForm({
         key: "",
         name: "",
@@ -142,6 +174,7 @@ export default function AdminSemiFranchisePage() {
         registrationConditions: "",
         serviceFeatures: [],
       });
+    }
   };
 
   const startEdit = (sf: SemiFranchise) => {
@@ -222,16 +255,18 @@ export default function AdminSemiFranchisePage() {
           연결되지는 않습니다.
         </p>
       </section>
-      {registerPreset && (
+      {selectedService && (
         <div
           role="status"
           className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900"
         >
-          {!settingsReady
-            ? `${PHARMACY_COLLABORATORS[registerPreset].label} 등록 현황을 확인하는 중입니다.`
-            : items.some((sf) => sf.key === registerPreset)
-              ? `${PHARMACY_COLLABORATORS[registerPreset].label} 사업은 이미 등록되어 있습니다. 아래 목록에서 상태를 확인하세요.`
-              : `${PHARMACY_COLLABORATORS[registerPreset].label} 등록 양식을 미리 채웠습니다. 내용을 확인하고 "만들기"를 눌러야 등록됩니다.`}
+          {loadError
+            ? "등록 현황을 확인하지 못했습니다. 설정을 다시 불러온 뒤 등록하세요."
+            : !settingsReady
+              ? `${PHARMACY_COLLABORATORS[selectedService].label} 등록 현황을 확인하는 중입니다.`
+              : alreadyRegistered
+                ? `${PHARMACY_COLLABORATORS[selectedService].label} 사업은 이미 등록되어 있습니다. 아래 목록에서 상태를 확인하세요.`
+                : `${PHARMACY_COLLABORATORS[selectedService].label} 등록 양식을 미리 채웠습니다. 내용을 확인하고 "만들기"를 눌러야 등록됩니다.`}
         </div>
       )}
       <MemberPaidFeaturesPanel />
@@ -246,63 +281,109 @@ export default function AdminSemiFranchisePage() {
           aria-label="새 사업 등록"
           className="space-y-3"
         >
-          <div className="grid gap-3 md:grid-cols-4">
-            <input
-              className={INPUT}
-              aria-label="사업 key"
-              maxLength={63}
-              placeholder="key (영문 소문자 · 숫자 · -)"
-              value={createForm.key}
-              onChange={(e) =>
-                setCreateForm({ ...createForm, key: e.target.value })
-              }
-            />
-            <input
-              className={INPUT}
-              aria-label="새 사업 이름"
-              maxLength={255}
-              placeholder="이름"
-              value={createForm.name}
-              onChange={(e) =>
-                setCreateForm({ ...createForm, name: e.target.value })
-              }
-            />
-            <input
-              className={INPUT}
-              aria-label="새 사업 커뮤니티 key"
-              placeholder="커뮤니티 key (선택)"
-              value={createForm.communityKey}
-              onChange={(e) =>
-                setCreateForm({ ...createForm, communityKey: e.target.value })
-              }
-            />
-            <textarea
-              aria-label="서비스 가입 조건"
-              className={INPUT}
-              maxLength={4000}
-              placeholder="운영자와 협의한 가입 조건"
-              value={createForm.registrationConditions}
-              onChange={(e) =>
-                setCreateForm({
-                  ...createForm,
-                  registrationConditions: e.target.value,
-                })
-              }
-            />
-            <button
-              type="button"
-              disabled={
-                busy ||
-                !settingsReady ||
-                !createForm.key.trim() ||
-                !createForm.name.trim()
-              }
-              onClick={create}
-              className="rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            >
-              만들기
-            </button>
+          <p className="text-sm text-gray-600">
+            등록할 서비스를 선택하세요. 이름은 자동으로 채워지며 변경할 수
+            있습니다.
+          </p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <label className="text-sm">
+              <span className="mb-1 block text-gray-600">대상 서비스</span>
+              <select
+                className={INPUT}
+                style={{ appearance: "auto" }}
+                value={registrationTarget}
+                onChange={(e) =>
+                  selectRegistrationTarget(e.target.value as RegistrationTarget)
+                }
+              >
+                <option value="">서비스를 선택하세요</option>
+                {REGISTRATION_SERVICES.map((key) => {
+                  const existing = items.find((sf) => sf.key === key);
+                  return (
+                    <option key={key} value={key} disabled={!!existing}>
+                      {PHARMACY_COLLABORATORS[key].label}
+                      {existing
+                        ? ` — 이미 등록됨 (${existing.status === "active" ? "운영" : "마감"})`
+                        : ""}
+                    </option>
+                  );
+                })}
+                <option value="custom">기타 협력사업 직접 등록</option>
+              </select>
+            </label>
+            {registrationTarget === "custom" && (
+              <label className="text-sm">
+                <span className="mb-1 block text-gray-600">새 사업 식별자</span>
+                <input
+                  className={INPUT}
+                  maxLength={63}
+                  placeholder="영문 소문자 · 숫자 · -"
+                  value={createForm.key}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, key: e.target.value })
+                  }
+                />
+              </label>
+            )}
+            <label className="text-sm">
+              <span className="mb-1 block text-gray-600">사업 이름</span>
+              <input
+                className={INPUT}
+                aria-label="새 사업 이름"
+                maxLength={255}
+                placeholder="이름"
+                value={createForm.name}
+                onChange={(e) =>
+                  setCreateForm({ ...createForm, name: e.target.value })
+                }
+              />
+            </label>
+            <label className="text-sm md:col-span-2">
+              <span className="mb-1 block text-gray-600">가입 조건 (선택)</span>
+              <textarea
+                aria-label="서비스 가입 조건"
+                className={INPUT}
+                maxLength={4000}
+                placeholder="운영자와 협의한 가입 조건"
+                value={createForm.registrationConditions}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    registrationConditions: e.target.value,
+                  })
+                }
+              />
+            </label>
+            <details className="text-sm md:col-span-2">
+              <summary className="cursor-pointer text-gray-600">
+                커뮤니티 연결 설정 (선택)
+              </summary>
+              <p className="my-2 text-gray-500">
+                별도로 정한 회원 커뮤니티 주소가 있을 때만 입력하세요. 사업
+                등록을 위해 입력할 필요는 없습니다.
+              </p>
+              <label>
+                <span className="mb-1 block text-gray-600">
+                  회원 커뮤니티 주소 식별자
+                </span>
+                <input
+                  className={INPUT}
+                  value={createForm.communityKey}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      communityKey: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </details>
           </div>
+          {alreadyRegistered && (
+            <p role="status" className="text-sm text-amber-800">
+              이미 등록된 사업입니다. 새로 만들지 말고 아래 목록에서 수정하세요.
+            </p>
+          )}
           <ServiceFeatureSelector
             features={features}
             selected={createForm.serviceFeatures}
@@ -311,6 +392,21 @@ export default function AdminSemiFranchisePage() {
               setCreateForm((previous) => ({ ...previous, serviceFeatures }))
             }
           />
+          <button
+            type="button"
+            disabled={
+              busy ||
+              !settingsReady ||
+              !registrationTarget ||
+              alreadyRegistered ||
+              !createForm.key.trim() ||
+              !createForm.name.trim()
+            }
+            onClick={create}
+            className="w-full sm:w-auto rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            만들기
+          </button>
         </fieldset>
       </section>
       {loadError && (
