@@ -1,3 +1,4 @@
+import PointOperationsNav from '@/components/points/PointOperationsNav';
 /**
  * PointBudgetPage — 서비스별 포인트 예산 관리
  *
@@ -186,6 +187,8 @@ export default function PointBudgetPage() {
       />
 
       {/* ── 예산 추가 폼 ── */}
+      <PointOperationsNav />
+
       <section className="mb-10 border-b border-gray-200 pb-8">
         <h2 className="mb-1 text-lg font-semibold text-gray-900">예산 추가</h2>
         <p className="mb-4 text-sm text-gray-500">

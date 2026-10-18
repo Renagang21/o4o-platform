@@ -153,7 +153,8 @@ export const adminAppsApi = {
   /**
    * Get all installed apps
    *
-   * ⚠️ platform 관리자 전용(`requireAdmin`). 앱 관리 화면(AppStorePage 등)에서만 사용한다.
+   * ⚠️ platform 관리자 전용(`requireAdmin`). 모듈 관리 조회 계약이다.
+   *    이전 AppStore UI는 1차 메뉴 정비에서 제거됐다.
    *    메뉴·라우트 게이팅에는 `appAvailabilityApi.getAvailability()` 를 사용할 것.
    */
   getInstalledApps: async (): Promise<AppRegistryEntry[]> => {

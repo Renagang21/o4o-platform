@@ -61,10 +61,10 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
   return (
     <header className="bg-white border-b border-gray-300">
-      <div className="px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="px-4 py-4 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Left side */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             {onMenuClick && (
               <button
                 onClick={onMenuClick}
@@ -76,26 +76,26 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             )}
             
             <div>
-              <h1 className="text-xl font-semibold text-o4o-text-primary">
+              <h1 className="whitespace-nowrap text-lg font-semibold text-o4o-text-primary sm:text-xl">
                 관리자 대시보드
               </h1>
-              <p className="text-sm text-o4o-text-secondary">
+              <p className="hidden text-sm text-o4o-text-secondary sm:block">
                 O4O 플랫폼 통합 관리 시스템
               </p>
             </div>
           </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-4">
+        <div className="flex max-w-full flex-wrap items-center gap-2 sm:gap-4">
           {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지 · 권한 확대 없음) */}
           <MyHomeButton accountId={user?.id === undefined ? undefined : String(user.id)} api={api} isAuthenticated={!!user} className="text-sm font-medium" />
           <O4OHomeButton
             api={api}
             isAuthenticated={!!user}
-            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-200 text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary disabled:opacity-60"
+            className="whitespace-nowrap px-3 py-1.5 text-sm font-medium rounded-md border border-gray-200 text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary disabled:opacity-60"
           />
           {/* Session Status Indicator */}
-          <div className={`flex items-center gap-1 text-xs ${sessionTone}`}>
+          <div className={`flex items-center gap-1 whitespace-nowrap text-xs ${sessionTone}`}>
             <Clock className="w-3 h-3" />
             <span>세션: {sessionLabel}</span>
           </div>
@@ -105,8 +105,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
           {/* User menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button className="flex items-center gap-3 p-2 rounded-md text-o4o-text-primary hover:bg-o4o-bg-tertiary">
+            <DropdownMenuTrigger aria-label="계정 메뉴" className="flex items-center gap-3 p-2 rounded-md text-o4o-text-primary hover:bg-o4o-bg-tertiary">
                 <div className="w-8 h-8 bg-admin-blue text-white rounded-full flex items-center justify-center">
                   <User className="w-4 h-4" />
                 </div>
@@ -117,7 +116,6 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                   </div>
                   <div className="text-xs text-o4o-text-secondary">{user?.email}</div>
                 </div>
-              </button>
             </DropdownMenuTrigger>
             
             <DropdownMenuContent className="w-64" align="end">
