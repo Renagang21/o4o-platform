@@ -55,3 +55,9 @@ it('shows fixed proposal terms instead of the current common policy', () => {
   expect(screen.queryByText(/현재 공급자 공통 정책/)).toBeNull();
   expect(screen.queryByText(/9,999/)).toBeNull();
 });
+
+it('preserves distinguishable legacy approval when supplier ended it later', () => {
+  render(<SupplyProposalHistory proposal={{decidedAt:'2026-10-17T01:00:00Z',decidedByName:'Fixture Reviewer',endedAt:'2026-10-17T02:00:00Z',endedBy:null,termsSnapshot:null} as SupplyProposal} />);
+  expect(screen.getByText(/승인·반려 결정: Fixture Reviewer/)).toBeTruthy();
+  expect(screen.queryByText(/승인·종료 구분 불가/)).toBeNull();
+});

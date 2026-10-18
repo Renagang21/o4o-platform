@@ -13,7 +13,8 @@ export function SupplyProposalTermsSummary({ terms }: { terms?: SupplyProposalTe
 }
 
 export function SupplyProposalHistory({ proposal: p }: { proposal: SupplyProposal }) {
-  const legacyEnd = !!p.endedAt && !p.endedBy && !p.termsSnapshot;
+  const legacyEnd = !!p.endedAt && !!p.decidedAt && !p.endedBy && !p.termsSnapshot
+    && new Date(p.decidedAt).getTime() === new Date(p.endedAt).getTime();
   return <div className="mt-1 space-y-0.5 text-xs text-gray-500">
     {p.decidedAt && <div>{legacyEnd ? '이전 처리 기록 (승인·종료 구분 불가)' : '승인·반려 결정'}: {p.decidedByName || '담당 운영자'} · {formatDateTime(p.decidedAt)}</div>}
     {p.endedAt && <div>종료: {p.endedByName || (p.endedBy ? '담당자' : '기록 없음')} · {formatDateTime(p.endedAt)}</div>}
