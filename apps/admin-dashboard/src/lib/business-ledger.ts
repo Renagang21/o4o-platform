@@ -55,7 +55,7 @@ export function parseBusinessLedgerResponse(body: unknown): Record<string, Ledge
   }
   const byKey: Record<string, LedgerRowStatus> = {};
   for (const row of b.data as Array<{ key?: unknown; status?: unknown } | null>) {
-    if (!row || typeof row.key !== 'string' || !row.key.trim()
+    if (!row || typeof row.key !== 'string' || !/^[a-z0-9][a-z0-9-]{1,62}$/.test(row.key)
       || (row.status !== 'active' && row.status !== 'closed')
       || Object.prototype.hasOwnProperty.call(byKey, row.key)) {
       throw new Error('사업 원장 응답 형식이 올바르지 않습니다.');

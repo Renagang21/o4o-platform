@@ -62,6 +62,11 @@ describe('business ledger status is separate from account status', () => {
     [{ key: 'carepharm', status: 'pending' }],
     [{ key: '', status: 'active' }],
     [{ key: 'megapharm' }],
+    [{ key: 'carepharm ', status: 'active' }],
+    [{ key: 'CarePharm', status: 'active' }],
+    [{ key: 'care.pharm', status: 'active' }],
+    [{ key: 'c', status: 'active' }],
+    [{ key: 'c'.repeat(64), status: 'active' }],
     [{ key: 'carepharm', status: 'active' }, { key: 'carepharm', status: 'closed' }],
   ])('rejects malformed or conflicting rows instead of offering registration: %j', (...rows) => {
     expect(() => parseBusinessLedgerResponse({ success: true, data: rows })).toThrow();
