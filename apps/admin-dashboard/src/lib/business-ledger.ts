@@ -46,7 +46,7 @@ export function registerPresetPath(serviceKey: string): string {
 
 /**
  * `GET /neture/admin/semi-franchises` 응답을 key → status 로 줄인다.
- * `success:false` · 배열이 아닌 data 는 실패로 던진다(빈 원장 = 미등록 으로 위장하지 않는다).
+ * 실패·행 형식 오류·중복 key는 실패로 던진다(빈 원장 = 미등록으로 위장하지 않는다).
  */
 export function parseBusinessLedgerResponse(body: unknown): Record<string, LedgerRowStatus> {
   const b = body as { success?: boolean; data?: unknown; error?: string } | undefined;
@@ -54,10 +54,13 @@ export function parseBusinessLedgerResponse(body: unknown): Record<string, Ledge
     throw new Error(b?.error || '사업 원장 응답 형식이 올바르지 않습니다.');
   }
   const byKey: Record<string, LedgerRowStatus> = {};
-  for (const row of b.data as Array<{ key?: unknown; status?: unknown }>) {
-    if (typeof row?.key === 'string' && (row.status === 'active' || row.status === 'closed')) {
-      byKey[row.key] = row.status;
+  for (const row of b.data as Array<{ key?: unknown; status?: unknown } | null>) {
+    if (!row || typeof row.key !== 'string' || !row.key.trim()
+      || (row.status !== 'active' && row.status !== 'closed')
+      || Object.prototype.hasOwnProperty.call(byKey, row.key)) {
+      throw new Error('사업 원장 응답 형식이 올바르지 않습니다.');
     }
+    Object.defineProperty(byKey, row.key, { value: row.status, enumerable: true });
   }
   return byKey;
 }

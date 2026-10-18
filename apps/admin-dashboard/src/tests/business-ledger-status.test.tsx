@@ -57,6 +57,24 @@ describe('business ledger status is separate from account status', () => {
     expect(resolveBusinessLedgerStatus('pharmcoop', { status: 'ok', byKey: {} })).toBe('not_applicable');
   });
 
+  it.each([
+    [null],
+    [{ key: 'carepharm', status: 'pending' }],
+    [{ key: '', status: 'active' }],
+    [{ key: 'megapharm' }],
+    [{ key: 'carepharm', status: 'active' }, { key: 'carepharm', status: 'closed' }],
+  ])('rejects malformed or conflicting rows instead of offering registration: %j', (...rows) => {
+    expect(() => parseBusinessLedgerResponse({ success: true, data: rows })).toThrow();
+  });
+
+  it('shows lookup failure without a registration action when a business row is malformed', async () => {
+    mockGet(async () => ({ success: true, data: [{ key: 'carepharm', status: 'pending' }] }));
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    await screen.findByText('care@example.invalid');
+    await waitFor(() => expect(rowOf('care@example.invalid').textContent).toContain('조회 실패'));
+    expect(rowOf('care@example.invalid').querySelector('a')).toBeNull();
+  });
+
   it('falls back from name to first/last to nickname, never to Unknown', () => {
     expect(resolveUserName({ name: ' 표시 ' })).toBe('표시');
     expect(resolveUserName({ firstName: '이름', lastName: '성' })).toBe('성 이름');
