@@ -63,8 +63,10 @@ describe('약국 회원 초기화면', () => {
   it('루트에 Hero와 실제 공지·게시글·자료를 바로 표시하고 신청 화면을 거치지 않는다', async () => {
     render(tree('/'));
     expect(await screen.findByText('회원의 실제 이야기')).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('더 나은 약국 경영');
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('함께하는 공동공간');
     expect(screen.getByText('게시된 실제 공지')).toBeTruthy();
+    expect(screen.getByRole('heading', {name:'가입 약국 소식'})).toBeTruthy();
+    expect(screen.getByText('회원의 실제 이야기').compareDocumentPosition(screen.getByRole('heading', {name:'나의 약국 업무'})) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(await screen.findByText('사업 자료 요약')).toBeTruthy();
     expect(screen.queryByText('다른 사업 자료')).toBeNull();
     expect(screen.queryByText('참여 신청 · 이용 상태')).toBeNull();
@@ -128,7 +130,7 @@ describe('약국 회원 초기화면', () => {
     mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/forum/posts') ? Promise.resolve({ data: { data: [] } }) : original(path, config));
     fireEvent.click(screen.getAllByRole('button', { name: '다시 시도' })[0]);
     expect(await screen.findByText('등록된 공지가 없습니다.')).toBeTruthy();
-    expect(screen.getByText('최근 목록에 회원 게시글이 없습니다.')).toBeTruthy();
+    expect(screen.getByText('최근 가입 약국 소식이 없습니다.')).toBeTruthy();
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
   it('내 매장 이동 실패를 안내하고 다시 실행할 수 있게 한다', async () => {
@@ -162,7 +164,7 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
     throw new Error(path);
   });
   render(tree('/businesses/network-a'));
-  expect(await screen.findByText('네트워크 A · 회원 커뮤니티')).toBeTruthy();
+  expect(await screen.findByText('네트워크 A · 공동공간')).toBeTruthy();
   expect(await screen.findByText('사업 A 자료')).toBeTruthy();
   expect(screen.queryByText('다른 사업 자료')).toBeNull();
   expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a&store=store-a');

@@ -114,9 +114,28 @@ describe('사업 참여자 공간은 해당 사업 서비스로 진입한다', (
       name: '약국 협력사업', canParticipate: true, reason: null, entries: [{ serviceKey: 'community', path: '/communities/members/forum' }] };
     const model = buildHomeEntryModel(user(), data([GENERAL, business, { ...business, businessKey: 'blocked', canParticipate: false }], {}));
     expect(model.groups.find(g => g.id === 'community')!.items.map(item => item.id)).toEqual(['community:o4o-general']);
-    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/businesses/pharmacy/forum' });
+    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/' });
     expect(model.myServices.some(item => item.id === 'business:blocked')).toBe(false);
   });
+  it('pharmacy 사업과 서비스에 모두 가입해도 루트 진입은 한 번만 표시한다', () => {
+    const input = data([], { 'kpa-society': 'active' });
+    input.businesses = [{ key: 'pharmacy', name: 'pharmacy', canParticipate: true }];
+    const entries = buildHomeEntryModel(user(), input).myServices;
+    expect(entries.filter(item => item.id === 'business:pharmacy' || item.id === 'svc:kpa-society')).toHaveLength(1);
+    expect(entries.find(item => item.id === 'business:pharmacy')).toMatchObject({label:'O4O 약국 경영지원', action:{kind:'handoff', serviceKey:'kpa-society', returnPath:'/'}});
+  });
+
+  it('pharmacy 루트 이동은 기존 세션 handoff의 루트 복귀 경로를 사용한다', async () => {
+    const { api } = await import('../apiClient');
+    vi.mocked(api.post).mockResolvedValueOnce({data:{data:{targetUrl:'https://pharmacy.neture.co.kr/handoff?code=synthetic'}}});
+    const input = data([], {});
+    input.businesses = [{key:'pharmacy',name:'pharmacy',canParticipate:true}];
+    const action = buildHomeEntryModel(user(), input).myServices[0].action;
+    if(action.kind !== 'handoff') throw new Error('Expected service handoff');
+    expect(await resolveHomeEntryUrl(action)).toContain('https://pharmacy.neture.co.kr/handoff');
+    expect(api.post).toHaveBeenCalledWith('/auth/handoff',{targetServiceKey:'kpa-society',returnPath:'/'});
+  });
+
 });
 
 

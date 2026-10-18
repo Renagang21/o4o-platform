@@ -49,7 +49,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
     <p className="mt-2 text-sm text-slate-600" role="status">{state.access?.canManage ? '담당 운영자' : state.access?.allowed ? '참여 승인 · 이용 가능' : '참여 신청·승인 상태는 참여 신청에서 확인할 수 있습니다.'}</p>
     <nav aria-label="약국 협력사업 업무" className="my-5 flex flex-wrap gap-2 border-b pb-4">
       {[
-        ['', '사업 홈'], ['participation', '참여 신청'], ['materials', '사업 자료'], ['forum', '참여자 게시판'], ['tools', '업무 도구'],
+        ['', '공동공간'], ['participation', '참여 신청'], ['materials', '사업 자료'], ['forum', '참여자 게시판'], ['tools', '업무 도구'],
       ].map(([path, label]) => <NavLink key={path} end={!path} to={(path ? `${base}/${path}` : base) + storeSearch} className={({ isActive }) => `rounded-lg px-4 py-2 text-sm ${isActive ? 'bg-blue-700 text-white' : 'border bg-white text-slate-700'}`}>{label}</NavLink>)}
       <NavLink to="/contact" className="rounded-lg border px-4 py-2 text-sm">Contact Us</NavLink>
     </nav>

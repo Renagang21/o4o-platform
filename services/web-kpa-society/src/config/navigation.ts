@@ -21,8 +21,8 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
-  { label: '커뮤니티', href: '/' },
-  { label: '회원 게시글', href: '/community' },
+  { label: '공동공간', href: '/' },
+  { label: '가입 약국 소식', href: '/community' },
   { label: '사업 자료', href: '/materials' },
   { label: 'Contact Us', href: '/contact' },
 ];

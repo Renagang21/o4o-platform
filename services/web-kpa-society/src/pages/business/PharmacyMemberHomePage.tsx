@@ -1,3 +1,4 @@
+import './pharmacy-member-home.css';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -59,19 +60,13 @@ export default function PharmacyMemberHomePage() {
   const pinnedNotices = currentNotices.data.filter(post => post.isPinned).slice(0, 3);
   const recentNotices = currentNotices.data.filter(isRecentNotice).slice(0, 5);
   const conversations = currentPosts.data.filter(post => !isNotice(post)).slice(0, 5);
-  return <div className="space-y-6">
+  return <div className="pharmacy-member-home space-y-6">
     <ServiceHomeHero surface="pharmacy" businessKey={business.key} client={authClient.api}
-      eyebrow={`${business.name} · 회원 커뮤니티`} title={['함께 나누는 경험,', '더 나은 약국 경영']}
-      titleId="member-home-title" description={['약국 운영의 소식과 경험을 함께 나눕니다. 공지와 회원들의 이야기를 확인하고, 필요한 사업 자료를 찾아보세요.']}>
-        <aside aria-label="나의 업무 바로가기" className="rounded-xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold">{access?.canManage ? '사업 운영' : '나의 약국 업무'}</h2>
-          <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">{access?.canManage ? '참여 약국의 신청과 사업 자료는 운영 화면에서 관리합니다.' : '주문·상품·자료함·사이니지 등 실제 매장 업무는 내 매장에서 이어갑니다.'}</p>
-          {access?.canManage ? <Link to="/operator/semi-franchises" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-900">사업 운영 · 회원 관리 <ArrowUpRight size={16} aria-hidden="true" /></Link> : <BusinessStoreShortcut />}
-        </aside>
-    </ServiceHomeHero>
+      eyebrow={`${business.name === 'pharmacy' ? 'O4O 약국 경영지원' : business.name} · 공동공간`} title={['사업자와 가입 약국이', '함께하는 공동공간']}
+      titleId="member-home-title" description={['사업자의 공지와 가입 약국의 현장 소식을 나누고, 협력사업 자료를 함께 확인하세요.']} />
     {!access?.allowed ? <section className="rounded-xl border bg-white p-6">
       <h2 className="text-lg font-semibold">참여 신청 · 이용 안내</h2>
-      <p className="my-3 text-sm leading-6 text-slate-600">회원 커뮤니티와 사업 자료는 사업 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
+      <p className="my-3 text-sm leading-6 text-slate-600">공동공간의 소식과 사업 자료는 사업 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
       <Link className="font-medium text-blue-700" to={membershipPath}>참여 신청 · 상태 확인 →</Link>
     </section> : <>
       <section aria-labelledby="notices-title" className="rounded-xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6">
@@ -83,20 +78,18 @@ export default function PharmacyMemberHomePage() {
             {!!recentNotices.length && <div className={pinnedNotices.length ? 'mt-4 border-t border-blue-100 pt-4' : ''}><h3 className="text-sm font-semibold text-blue-900">최근 공지</h3><PostRows posts={recentNotices} base={forumPath} notice /></div>}
           </DataState>}
       </section>
-      <ServiceHomePromotion surface="pharmacy" businessKey={business.key} client={authClient.api} />
-      {materialStore.selection}
-      <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
         <section aria-labelledby="conversations-title" className="rounded-xl border bg-white p-5 sm:p-6">
-          <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원들의 이야기" to={forumPath} linkLabel="전체 게시글" />
+          <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="가입 약국 소식" to={forumPath} linkLabel="전체 게시글" />
           {!business.communityKey ? <p className="py-3 text-sm text-slate-500">게시판이 아직 개설되지 않았습니다.</p> :
-            <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={!conversations.length} emptyText="최근 목록에 회원 게시글이 없습니다.">
+            <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={!conversations.length} emptyText="최근 가입 약국 소식이 없습니다.">
               <PostRows posts={conversations} base={forumPath} />
             </DataState>}
           <Link to={`${forumPath}/write`} className="mt-4 inline-flex min-h-11 items-center rounded-lg border px-4 py-2 text-sm font-medium text-blue-700">이야기 나누기</Link>
         </section>
         <section aria-labelledby="materials-title" className="rounded-xl border bg-white p-5 sm:p-6">
           <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="사업 자료" to={materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '')} linkLabel="전체 자료" />
+          {materialStore.selection}
           {access.canManage ? <div className="py-3 text-sm leading-6 text-slate-600"><p>자료 등록과 게시 상태는 사업 운영 화면에서 확인합니다.</p><Link to="/operator/semi-franchises" className="mt-3 inline-block text-blue-700">사업 자료 관리 →</Link></div> :
             materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="등록된 사업 자료가 없습니다.">
               <ul className="divide-y">{currentMaterials.data.map(item => <li key={item.id} className="py-4">
@@ -107,6 +100,14 @@ export default function PharmacyMemberHomePage() {
         </section>
       </div>
     </>}
+        <aside aria-label="나의 업무 바로가기" className="rounded-xl border border-slate-200 bg-white p-5">
+          <h2 className="font-semibold">{access?.canManage ? '사업 운영' : '나의 약국 업무'}</h2>
+          <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">{access?.canManage ? '참여 약국의 신청과 사업 자료는 운영 화면에서 관리합니다.' : '주문·상품·자료함·사이니지 등 실제 매장 업무는 내 매장에서 이어갑니다.'}</p>
+          {access?.canManage ? <Link to="/operator/semi-franchises" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-900">사업 운영 · 회원 관리 <ArrowUpRight size={16} aria-hidden="true" /></Link> : <BusinessStoreShortcut />}
+        </aside>
+
+    {access?.allowed && <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />}
+    <ServiceHomePromotion surface="pharmacy" businessKey={business.key} client={authClient.api} />
     <nav aria-label="회원 지원" className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-5 text-sm text-slate-600">
       <Link to={membershipPath}>내 참여 상태</Link>
       <Link to={businessPath(business.key, 'tools')}>업무 바로가기</Link>

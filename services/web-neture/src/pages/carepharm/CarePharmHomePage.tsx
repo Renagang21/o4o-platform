@@ -27,7 +27,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
       <section id="about" aria-labelledby="carepharm-about" className="scroll-mt-24">
         <p className="text-sm font-semibold text-teal-700">CarePharm 소개</p>
         <h2 id="carepharm-about" className="mt-2 text-2xl font-semibold text-slate-900">함께 나누고, 내 약국에서 활용합니다</h2>
-        <p className="mt-4 max-w-3xl leading-7 text-slate-600">만성질환 약국 협업체의 소식과 회원 자료를 확인하는 공간입니다. 협업체 참여는 이곳에서 신청하고, 승인된 약국의 업무는 내 매장에서 이용합니다.</p>
+        <p className="mt-4 max-w-3xl leading-7 text-slate-600">만성질환관리 사업자와 가입 약국이 소식과 사업 자료를 함께 나누는 공동공간입니다. 협업체 참여는 이곳에서 신청하고, 승인된 약국의 업무는 내 매장에서 이용합니다.</p>
         <Link to="/my/participation" className="mt-5 inline-flex rounded-lg bg-teal-800 px-5 py-3 text-sm font-semibold text-white">참여 안내 보기</Link>
       </section>
       <section id="news" aria-labelledby="carepharm-news" className="scroll-mt-24 border-t border-slate-200 pt-8">
