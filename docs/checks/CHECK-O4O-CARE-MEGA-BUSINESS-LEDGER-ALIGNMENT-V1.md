@@ -43,20 +43,25 @@
 
 추가하지 않은 것: 자동 사업 생성 · 자동 승인 · 권한 우회 · migration · 협동조합 변경.
 
+PR #701 리뷰 반영:
+
+- Codex P2 — 역할은 있지만 Neture 메인 이용 자격이 active 가 아닌 사용자는 사업 운영 경로 가드에서 막힌다. `roleOperators` 에 같은 판정(`resolveNetureMainMembershipStatus`)의 `membershipStatus` 를 함께 내려, 화면은 "Neture 이용 자격 없음 — 사업 운영 불가"로 표시하고 자격 있는 보유자가 없으면 담당 지정 안내를 유지한다(`41a38a2f3c`).
+- SonarCloud 새 코드 중복 6.4%(기준 3%) — 신규 통합 spec 의 fixture 보일러플레이트가 기존 spec 과 같았다. 검증 내용은 그대로 두고 fixture 를 다시 작성(`21559da3ed`). 게이트 완화 없음.
+
 ## 5. 검증
 
 로컬(이 PC, C: 검증 worktree · 같은 변경 파일):
 
 | 항목 | 결과 |
 |---|---|
-| operator-core-ui pharmacy-management vitest | 6 파일 41 PASS(신규 3) |
+| operator-core-ui pharmacy-management vitest | 6 파일 42 PASS(신규 4) |
 | admin-dashboard vitest `src/tests` | 22 파일 392 PASS(신규 4) |
 | tsc `--noEmit` admin-dashboard · api-server | 오류 0 |
 | tsc operator-core-ui | 오류 2 — 이번 변경과 무관한 기존 `members/__tests__/MemberHardDeleteConfirmModal.scope.test.tsx` |
 | API 빌드 `tsc -p tsconfig.build.json` · tsup | 성공 |
 | eslint 변경 파일 | 오류 0 · 경고 1(기존 `useEffect` 의존성) |
 | 일회용 PostgreSQL 17(127.0.0.1:55432) 전체 migration 재생 | SUCCESS · schema assertion PASS · 초기 사업 pharmacy 1행 |
-| 신규 `care-mega-business-ledger.integration.spec.ts` | 2 PASS — 역할만 있을 때 상세 404 · 목록 미노출 → 관리자 API 등록(중복 409) → 노출 · 가입 미생성 → `roleOperators` 분리 → 두 사업 신청 pending → 광역 역할 없는 Care 담당은 Care 신청만 조회 · 승인 · Mega 경로 403 · 자기 경로에 타 사업 ID 404 · 상태 불변 → 각 담당 승인 active → 기본 가입 유지 · 협동조합 연결 0. 테스트 행 정리 확인(0) |
+| 신규 `care-mega-business-ledger.integration.spec.ts` | 2 PASS — 역할만 있을 때 상세 404 · 목록 미노출 → 관리자 API 등록(중복 409) → 노출 · 가입 미생성 → `roleOperators` 분리 · 메인 이용 정지 시 `membershipStatus=suspended` → 두 사업 신청 pending → 광역 역할 없는 Care 담당은 Care 신청만 조회 · 승인 · Mega 경로 403 · 자기 경로에 타 사업 ID 404 · 상태 불변 → 각 담당 승인 active → 기본 가입 유지 · 협동조합 연결 0. 테스트 행 정리 확인(0) |
 | 기존 `neture-pharmacy` suite | 15 PASS · 7 skip · **2 FAIL(7건)**: `collaboration-application`(관리자 생성 403) · `neture-pharmacy-commerce`(6건). 이번 서비스 변경을 되돌려도 동일하게 실패 — 이 로컬 환경의 기존 실패로 판정, 범위 밖 |
 
 인증은 합성 세션이다(실제 Google 로그인 아님). 브라우저 검증(데스크톱 · 모바일)은 이 세션에 브라우저 도구가 없어 **미실행**.
