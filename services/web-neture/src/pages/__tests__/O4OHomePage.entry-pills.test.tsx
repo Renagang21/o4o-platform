@@ -82,7 +82,7 @@ describe('로그인 전 — 공개 서비스 우선', () => {
     const groups = ['약국 협력사업 참여', '약국 경영·공급 활동', '커뮤니티·단체활동', '제품·유통 사업 참여', '기타'];
     const links = groups.flatMap(linksOf);
     expect(links.map(l => l.href)).toEqual([
-      'https://pharmacy.neture.co.kr/', 'https://carepharm.neture.co.kr/', 'https://coop.neture.co.kr/', 'https://megapharm.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
+      'https://pharmacy.neture.co.kr/', 'https://carepharm.neture.co.kr/', 'https://pharmcoop.neture.co.kr/', 'https://megapharm.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
       'https://community.neture.co.kr', 'https://kpa.neture.co.kr/', 'https://study.neture.co.kr/',
       'https://funding.neture.co.kr/', '/services/partner', '/hospital',
     ]);

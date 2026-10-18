@@ -2,7 +2,7 @@
 
 연합회 아래 개별 협동조합이 서브디렉토리로 소속되는 독립 프런트엔드의 시작점이다.
 `pharmacy.neture.co.kr`의 회원 홈·게시판·자료·사업 참여/운영 구성을 **개별 조합**의 모델로 사용한다.
-연합회 업무는 개별 조합 서비스와 구분한다. 목표 도메인은 `coop.neture.co.kr`, 최초 테스트 조합은 `/test`다.
+연합회 업무는 개별 조합 서비스와 구분한다. 목표 도메인은 `pharmcoop.neture.co.kr`, 최초 테스트 조합은 `/test`다.
 
 ## 실행
 
@@ -103,7 +103,7 @@ migration 자체가 계정·권한·예시 조합을 생성하지 않는다.
 1. PR 필수 검사·리뷰·main 통합 후 기존 Delivery/Promote 경로로 API를 배포한다.
 2. `Deploy cooperative test service` workflow에 해당 main HEAD SHA와 `apply=false`로 사전 검사한다.
 3. 같은 SHA의 `apply=true`는 `test` → `coop-test` → 테스트 협동조합을 등록하고 사용자 지정 운영자·개인 조합원을 연결한다.
-4. 최초 신규 Cloud Run 서비스의 공개 invoker IAM과 DNS·HTTPS 인증서·LB의 `coop.neture.co.kr` 호스트 연결은 인프라 소유자가 설정한다.
+4. 최초 신규 Cloud Run 서비스의 공개 invoker IAM과 DNS·HTTPS 인증서·LB의 `pharmcoop.neture.co.kr` 호스트 연결은 인프라 소유자가 설정한다.
 5. 공개 도메인에서 운영자·개인 조합원 로그인과 다른 조합 접근 거절을 확인해야 실사용 완료다.
 
 이 수동 workflow는 저장소 소유자·배포 동결 해제·정확한 main HEAD·동일 SHA의 green CI·동일 SHA를 서빙하는 API를 요구한다.
