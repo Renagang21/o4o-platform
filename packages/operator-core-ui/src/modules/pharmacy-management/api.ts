@@ -73,7 +73,20 @@ export interface SemiFranchiseMembership {
   pharmacistLicenseNumber: string | null;
 }
 
+export interface SupplyProposalTerms {
+  version: 1;
+  baseShippingFee: number;
+  freeShippingThreshold: number | null;
+  minOrderAmount: number;
+}
+
 export interface SupplyProposal {
+  termsSnapshot?: SupplyProposalTerms | null;
+  decidedBy?: string | null;
+  decidedByName?: string | null;
+  endedBy?: string | null;
+  endedByName?: string | null;
+  endReason?: string | null;
   productSpecification?: string | null;
   productManufacturer?: string | null;
   productBarcode?: string | null;
@@ -262,6 +275,7 @@ export const neturePharmacySupplierApi = {
     targetOrganizationId?: string;
     unitPrice: number;
     note?: string;
+    terms?: Omit<SupplyProposalTerms, 'version'>;
   }) => send<{ id: string; status: string }>('post', '/neture/supplier/supply-proposals', input),
   endProposal: (id: string) => send('post', `/neture/supplier/supply-proposals/${enc(id)}/end`),
 

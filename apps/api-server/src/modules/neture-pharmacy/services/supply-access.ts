@@ -13,6 +13,8 @@ import { DEFAULT_SEMI_FRANCHISE_KEY, SEMI_FRANCHISE_EVENT_SERVICE_KEY, type Supp
 import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
 import { recruitmentTargetMatch } from './recruitment-target.js';
 
+import type { ProposalTerms } from './proposal-terms.js';
+
 type Exec = { query: (sql: string, params?: unknown[]) => Promise<any[]> };
 
 export interface SupplyOption {
@@ -39,6 +41,8 @@ export interface SupplyOption {
   availableStock: number | null;
   baseShippingFee: number | null;
   freeShippingThreshold: number | null;
+  minOrderAmount?: number;
+  termsSnapshot?: ProposalTerms | null;
 }
 
 const ACCESS_CTE = `
@@ -64,13 +68,13 @@ const ACCESS_CTE = `
     SELECT 'default'::text AS kind, b.offer_id AS option_id, b.*, sf.key AS sf_key, sf.name AS sf_name,
            sf.payment_receiver_key, b.price_general AS unit_price, NULL::uuid AS target_organization_id,
            NULL::text AS note, NULL::timestamp AS start_at, NULL::timestamp AS end_at,
-           NULL::int AS total_quantity, NULL::int AS per_store_limit, NULL::int AS per_order_limit
+           NULL::int AS total_quantity, NULL::int AS per_store_limit, NULL::int AS per_order_limit, NULL::jsonb AS proposal_terms
       FROM base b JOIN my_sf sf ON sf.key = '${DEFAULT_SEMI_FRANCHISE_KEY}'
      WHERE b.default_supply_enabled = true AND b.price_general > 0
     UNION ALL
     -- (2) 명시적 공급 제안 — 대상 세미프랜차이즈 운영자 승인 ∧ 그 세미프랜차이즈 가입 ∧ (대상 약국이면 이 약국)
     SELECT 'proposal', sp.id, b.*, sf.key, sf.name, sf.payment_receiver_key, sp.unit_price,
-           sp.target_organization_id, sp.note, NULL, NULL, NULL, NULL, NULL
+           sp.target_organization_id, sp.note, NULL, NULL, NULL, NULL, NULL, sp.terms_snapshot
       FROM supply_proposals sp
       JOIN base b ON b.offer_id = sp.offer_id
       JOIN my_sf sf ON sf.id = sp.semi_franchise_id
@@ -78,7 +82,7 @@ const ACCESS_CTE = `
     UNION ALL
     -- (3) 세미프랜차이즈 이벤트 — 운영 조직 = 세미프랜차이즈, 담당 운영자 승인 · 기간 내
     SELECT 'event', opl.id, b.*, sf.key, sf.name, sf.payment_receiver_key, ROUND(opl.event_price)::int,
-           NULL, NULL, opl.start_at, opl.end_at, opl.total_quantity, opl.per_store_limit, opl.per_order_limit
+           NULL, NULL, opl.start_at, opl.end_at, opl.total_quantity, opl.per_store_limit, opl.per_order_limit, NULL::jsonb
       FROM organization_product_listings opl
       JOIN base b ON b.offer_id = opl.offer_id
       JOIN my_sf sf ON sf.organization_id = opl.organization_id
@@ -88,7 +92,7 @@ const ACCESS_CTE = `
     UNION ALL
     -- (4) 취급매장 모집 — 조건 승인 · 모집 중 · 이 약국 조직의 참여 승인
     SELECT 'recruitment', sr.id, b.*, sf.key, sf.name, sf.payment_receiver_key, sr.supply_unit_price,
-           NULL, NULL, NULL, NULL, NULL, NULL, NULL
+           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL::jsonb
       FROM seller_recruitments sr
       JOIN my_sf sf ON ${recruitmentTargetMatch()}
       JOIN base b ON b.master_id::text = sr.product_id AND b.supplier_user_id::text = sr.seller_id
@@ -106,7 +110,10 @@ const SELECT_OPTION = `
          o.per_store_limit AS "perStoreLimit", o.per_order_limit AS "perOrderLimit",
          o.track_inventory AS "trackInventory",
          CASE WHEN o.track_inventory THEN o.stock_quantity - o.reserved_quantity END AS "availableStock",
-         o.base_shipping_fee AS "baseShippingFee", o.free_shipping_threshold AS "freeShippingThreshold"
+         CASE WHEN o.proposal_terms IS NOT NULL THEN (o.proposal_terms->>'baseShippingFee')::int ELSE o.base_shipping_fee END AS "baseShippingFee",
+         CASE WHEN o.proposal_terms IS NOT NULL THEN (o.proposal_terms->>'freeShippingThreshold')::int ELSE o.free_shipping_threshold END AS "freeShippingThreshold",
+         COALESCE((o.proposal_terms->>'minOrderAmount')::int, 0) AS "minOrderAmount",
+         o.proposal_terms AS "termsSnapshot"
     FROM options o`;
 
 function normalize(row: any): SupplyOption {
@@ -120,6 +127,7 @@ function normalize(row: any): SupplyOption {
     availableStock: num(row.availableStock),
     baseShippingFee: num(row.baseShippingFee),
     freeShippingThreshold: num(row.freeShippingThreshold),
+    minOrderAmount: num(row.minOrderAmount) ?? 0,
   };
 }
 

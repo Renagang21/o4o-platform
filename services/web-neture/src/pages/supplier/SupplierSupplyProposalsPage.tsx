@@ -1,3 +1,4 @@
+import { SupplyProposalTermsSummary, SupplyProposalHistory } from '@o4o/operator-core-ui/modules/pharmacy-management';
 /**
  * SupplierSupplyProposalsPage — 공급 제안 (/supplier/supply-proposals)
  *
@@ -110,10 +111,11 @@ export default function SupplierSupplyProposalsPage() {
                   </td>
                   <td className={TD}>{p.semiFranchiseName}</td>
                   <td className={TD}>{p.targetOrganizationName || '해당 협업체 활성 회원 약국 전체'}</td>
-                  <td className={TD}>{formatWon(p.unitPrice)}</td>
+                  <td className={TD}>{formatWon(p.unitPrice)}<SupplyProposalTermsSummary terms={p.termsSnapshot} /></td>
                   <td className={TD}>
                     <StatusBadge status={p.status} />
                     {p.reason && <div className="mt-1 text-xs text-gray-500">{p.reason}</div>}
+                    <SupplyProposalHistory proposal={p} />
                   </td>
                   <td className={TD}>{formatDateTime(p.createdAt)}</td>
                   <td className={TD}>

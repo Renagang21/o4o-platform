@@ -1,3 +1,4 @@
+import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
 /**
  * OperatorSemiFranchisePage — 담당 약국 협력사업 (/operator/semi-franchises)
  *
@@ -232,6 +233,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
                     <td className={`${TD} min-w-[6rem]`}>{p.supplierName || '-'}</td>
                     <td className={`${TD} min-w-[7rem]`}>
                       {formatWon(p.unitPrice)}
+                      <SupplyProposalTermsSummary terms={p.termsSnapshot} />
                       {p.priceGeneral !== null && <div className="text-xs text-gray-500">공급가 {formatWon(p.priceGeneral)}</div>}
                     </td>
                     <td className={`${TD} min-w-[8rem]`}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
@@ -239,6 +241,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
                     <td className={`${TD} min-w-[4rem]`}>
                       <StatusBadge status={p.status} />
                       {p.reason && <div className="mt-1 text-xs text-gray-500">{p.reason}</div>}
+                      <SupplyProposalHistory proposal={p} />
                     </td>
                     <td className={`${TD} min-w-[8rem]`}>
                       <div className="flex flex-wrap gap-1">

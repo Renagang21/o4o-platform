@@ -310,6 +310,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '15996765a666dfc6dbea61e98f47a50a1aa580166d80fc08e3bb2a1206e667b4',
     fingerprintLineCount: 6736,
   },
+  // Isolated PostgreSQL 15 canonical bootstrap + all prior prefixes and empty-state down/up verified.
+  {
+    appliedThrough: 'AddSupplierProposalTerms1792221000000',
+    fingerprint: '2fe675793e6f86734ed83e4317047f7b2548e02c1fea92ae39bba083f8a8f644',
+    fingerprintLineCount: 6741,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

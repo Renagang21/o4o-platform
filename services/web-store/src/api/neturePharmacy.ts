@@ -64,6 +64,7 @@ export interface SemiFranchiseRow {
 export type SupplyKind = 'default' | 'proposal' | 'event' | 'recruitment';
 
 export interface SupplyOption {
+  termsSnapshot?: { version: 1; baseShippingFee: number; freeShippingThreshold: number | null; minOrderAmount: number } | null;
   kind: SupplyKind;
   optionId: string;
   offerId: string;

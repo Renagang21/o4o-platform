@@ -6,10 +6,12 @@ import type { SupplyProposal } from '../../../lib/api/neturePharmacy';
 const mocks = vi.hoisted(() => ({ createProposal: vi.fn() }));
 vi.mock('../../../lib/api/neturePharmacy', () => ({ neturePharmacySupplierApi: mocks }));
 const options = { products: [{ id: 'offer-a', name: '제품 A', approvalStatus: 'APPROVED' }, { id: 'offer-b', name: '제품 B', approvalStatus: 'APPROVED' }], semiFranchises: [{ key: 'a', name: '협업체 A' }, { key: 'b', name: '협업체 B' }], loading: false, error: null } as SupplierPharmacyOptions;
-const original = { id: 'proposal-a', offerId: 'offer-a', productName: '제품 A', semiFranchiseName: '협업체 A', unitPrice: 1200, note: '복사 조건', targetOrganizationId: 'outside-pharmacy' } as SupplyProposal;
+const original = { id: 'proposal-a', offerId: 'offer-a', productName: '제품 A', semiFranchiseName: '협업체 A', unitPrice: 1200, note: '복사 조건', targetOrganizationId: 'outside-pharmacy', termsSnapshot:{version:1,baseShippingFee:4000,freeShippingThreshold:null,minOrderAmount:10000} } as SupplyProposal;
 function mount(proposals: SupplyProposal[] = []) { const onSubmitted = vi.fn().mockResolvedValue(undefined); render(<SupplierProposalDrafts options={options} requestedProduct="offer-a" proposals={proposals} onSubmitted={onSubmitted} />); return onSubmitted; }
 function create() {
   fireEvent.change(screen.getByLabelText('공통 공급 가격 (원)'), { target: { value: '1000' } });
+  fireEvent.change(screen.getByLabelText('공통 기본 배송비 (원)'), { target: { value: '3000' } });
+  fireEvent.change(screen.getByLabelText('공통 무료배송 기준 (원, 선택)'), { target: { value: '50000' } });
   fireEvent.change(screen.getByLabelText('공통 메모 (선택)'), { target: { value: '공통 조건' } });
   fireEvent.click(screen.getByLabelText('협업체 A')); fireEvent.click(screen.getByLabelText('협업체 B'));
   fireEvent.click(screen.getByRole('button', { name: '협업체별 초안 만들기' }));
@@ -39,8 +41,8 @@ describe('independent business proposal drafts', () => {
     fireEvent.click(screen.getByRole('button', { name: '미제출 초안 승인 요청' }));
     await waitFor(() => expect(refreshed).toHaveBeenCalledTimes(2));
     expect(mocks.createProposal.mock.calls.map(([payload]) => payload)).toEqual([
-      { offerId:'offer-a',semiFranchiseKey:'a',unitPrice:900,targetOrganizationId:'pharmacy-a',note:'공통 조건' },
-      { offerId:'offer-a',semiFranchiseKey:'b',unitPrice:1000,targetOrganizationId:undefined,note:'공통 조건' },
+      { offerId:'offer-a',semiFranchiseKey:'a',unitPrice:900,targetOrganizationId:'pharmacy-a',note:'공통 조건',terms:{baseShippingFee:3000,freeShippingThreshold:50000,minOrderAmount:0} },
+      { offerId:'offer-a',semiFranchiseKey:'b',unitPrice:1000,targetOrganizationId:undefined,note:'공통 조건',terms:{baseShippingFee:3000,freeShippingThreshold:50000,minOrderAmount:0} },
     ]);
     expect((screen.getByRole('button', { name:'미제출 초안 승인 요청' }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.queryByRole('button', { name:'협업체 A 승인 요청' })).toBeNull();
@@ -71,6 +73,8 @@ describe('independent business proposal drafts', () => {
     fireEvent.click(screen.getByRole('button', { name:'협업체별 초안 만들기' }));
     expect((b().getByLabelText('공급 가격 (원)') as HTMLInputElement).value).toBe('1200');
     expect((b().getByLabelText('메모 (선택)') as HTMLInputElement).value).toBe('복사 조건');
+    expect((b().getByLabelText('기본 배송비 (원)') as HTMLInputElement).value).toBe('4000');
+    expect((b().getByLabelText('최소 주문금액 (원)') as HTMLInputElement).value).toBe('10000');
     expect((b().getByLabelText('대상 약국 조직 ID (선택)') as HTMLInputElement).value).toBe('');
   });
   it('blocks empty selections and invalid draft prices before any request', () => {
