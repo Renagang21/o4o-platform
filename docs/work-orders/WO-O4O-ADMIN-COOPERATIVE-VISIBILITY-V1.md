@@ -1,6 +1,6 @@
 # WO-O4O-ADMIN-COOPERATIVE-VISIBILITY-V1
 
-- 상태: COMPLETED
+- 상태: ACTIVE
 - 작성·최종 갱신: 2026-10-19 (KST)
 - 기준: main `491be1bb82c5b9788ff97020d0e0430939be11b6`
 - 사용자 지시: `admin.neture.co.kr/admin/semi-franchises`에 빠진 약사·약국 협동조합 정비. 후속 답변으로 **연합회만** 확정.
@@ -14,6 +14,7 @@
 - [x] UI·API 권한·SQL·PC/모바일 검증
 - [x] commit·push·PR #710 CI·리뷰·main 병합
 - [x] 운영 배포·서빙 SHA 확인 및 결과 기록
+- [ ] 사용자 Google 관리자 세션으로 연합회 역할 현황 조회·새로고침 검증 — 확인 후 WO 종료
 
 ## 조사 결과
 
@@ -64,7 +65,13 @@
 ## 다른 작업과의 경계·Git 정리
 
 - 이번 배포 중 다른 공간의 PR #713이 main `40c8f9d6e030de142730a9da1e95b6f07e1e97db`에 별도로 병합됐다. 이번 Delivery는 이미 고정한 `ff59bc43d1`을 배포했으며 PR #713을 배포하거나 promote하지 않았다.
-- 코드 branch `wo/admin-cooperative-visibility`는 main의 조상이지만, 최신 main에서 다른 작업이 두 API 파일을 변경해 작업 경로 diff가 0이 아니다. 정리 판정은 KEEP이며 로컬·원격 branch와 관리형 checkout을 보존한다. 다른 작업을 원복하거나 branch를 강제 삭제하지 않는다.
+- 코드 branch `wo/admin-cooperative-visibility`는 main의 조상이며 `git log origin/main..wo/admin-cooperative-visibility`가 비어 있다. 경로 diff 0은 squash 병합 시의 대체 확인이므로, 이후 main의 동일 파일 변경을 보존 사유로 사용한 이전 판정을 정정했다. 코드 branch를 사용하는 worktree·남은 전용 commit이 없음을 확인하고 로컬·원격 branch를 표준 절차로 삭제했다. Google 세션 검증은 배포된 화면에서 진행하며 이 코드 branch를 필요로 하지 않는다. 관리형 checkout은 보존한다.
 - 검증용 로컬 preview 서버는 종료했다. 격리 SQL 검증 데이터는 메모리 DB 종료로 제거했다.
-- 완료 기록은 문서 전용 후속 PR로 제출한다. 다른 공간의 통합·배포와 겹치지 않게 기록 PR의 병합 시점을 분리한다.
+- 검증·배포 기록은 문서 전용 PR #714로 통합한다. 별도 공간의 PR #713은 Promote `39261558005`에서 API 배포를 마쳤고, 후속 main `51f772caa8`은 Delivery `39263847909`에서 `NO_DEPLOY`로 종료됐다. 이 기록 PR에서 별도 migration이나 재배포를 수행하지 않는다.
 - 문서 정합: 사용자 확정 범위인 연합회만 기록했다. 범위 내 추가 불일치 없음. 과거 작업 문서나 canonical 판정은 변경하지 않았다.
+
+## 남은 운영 인증 검증
+
+- 현재 유일한 관리형 checkout의 `docs/local/TEST-ACCOUNTS.local.md`는 없다. 환경의 비관리자 테스트 계정 연결을 Google 관리자 인증 대신 사용하지 않는다.
+- 사용자가 자신의 Google 관리자 세션으로 연합회 화면 진입 → 실제 역할 현황 표시 → 새로고침 후 유지 여부를 확인해야 한다. 사용자 인증값 전달·임의 권한 부여는 요구하지 않는다.
+- 이 확인이 끝나기 전까지 WO는 `ACTIVE`로 유지한다. 구현·배포 완료와 인증 후 운영 DB 조회 검증을 구분하며, 미실시 검증을 통과로 기록하지 않는다.
