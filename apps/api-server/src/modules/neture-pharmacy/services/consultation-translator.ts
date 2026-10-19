@@ -10,10 +10,21 @@ export type ConsultationTranslator = (input: ConsultationTranslationInput, acces
   actorId: string; organizationId: string; authorize: () => Promise<boolean>;
 }) => Promise<{ translation: string }>;
 
-function numericValues(text: string) { return (text.match(/\d+(?:[.,]\d+)*/g) ?? []).sort(); }
-function numericUnits(text: string) {
-  return (text.match(/\d+(?:[.,]\d+)*\s*(?:mcg|mg|kg|mL|ml|IU|mEq|mmol|μg|µg|ug|g|L|%)(?![a-zA-Z])/g) ?? [])
-    .map(value => value.replace(/\s/g, '').toLowerCase()).sort();
+const quantityUnits = new Set(['mcg', 'mg', 'kg', 'ml', 'iu', 'meq', 'mmol', 'μg', 'µg', 'ug', 'g', 'l', '%']);
+function numericSignatures(text: string) {
+  const values: string[] = [];
+  const units: string[] = [];
+  // Scan numeric runs once; matching units separately avoids overlapping backtracking.
+  for (const match of text.matchAll(/\d[\d.,]*/g)) {
+    let end = match[0].length;
+    while (end > 0 && (match[0][end - 1] === '.' || match[0][end - 1] === ',')) end--;
+    const value = match[0].slice(0, end);
+    values.push(value);
+    const unit = /^\s*([a-zA-Zμµ]+|%)/.exec(text.slice(match.index + end))?.[1]?.toLowerCase();
+    if (unit && quantityUnits.has(unit)) units.push(value + unit);
+  }
+  const compare = (left: string, right: string) => left.localeCompare(right);
+  return JSON.stringify({ values: values.sort(compare), units: units.sort(compare) });
 }
 
 /** Reuses the existing platform-funded translation policy and metadata-only accounting. */
@@ -24,8 +35,7 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
       const result = await runAiExtension({
         extension: { ...consultationTranslationExtension, parse: content => {
           const output = consultationTranslationExtension.parse(content);
-          if (JSON.stringify(numericValues(input.text)) !== JSON.stringify(numericValues(output.translation)) ||
-            JSON.stringify(numericUnits(input.text)) !== JSON.stringify(numericUnits(output.translation))) throw new Error('Invalid numeric translation');
+          if (numericSignatures(input.text) !== numericSignatures(output.translation)) throw new Error('Invalid numeric translation');
           return output;
         } }, input, materials: [], funding: { payer: 'platform' },
         context: { requestId: randomUUID(), serviceId: 'store', featureId: consultationTranslationExtension.id,
@@ -36,7 +46,7 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
             { maxTokens: 2048, temperature: 0, responseMode: 'json', userId: context.actorId });
           return { ...response, provider: response.provider ?? 'unknown' };
         },
-      }, { authorize: () => access.authorize(), record: async event => { logger.info('[AI_EXTENSION]', event); } });
+      }, { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });
       return result.output;
     } catch (error) {
       if (error instanceof AiExtensionError && error.code === 'QUOTA_EXCEEDED') {

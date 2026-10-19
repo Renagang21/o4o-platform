@@ -7,6 +7,12 @@ type Target = { key: string; name: string; features: string[]; status?: string }
 type Policy = { features: Array<{ key: string; label: string }>; targets: Target[] };
 const base = '/neture/admin/service-feature-policies';
 
+function validPolicy(data: Policy) {
+  if (!Array.isArray(data?.features) || !Array.isArray(data?.targets) || !data.targets.length) return false;
+  const keys = new Set(data.features.map(feature => feature.key));
+  return data.targets.every(item => Array.isArray(item.features) && item.features.every(key => keys.has(key)));
+}
+
 export default function AdminPharmacyServiceSettingsPage() {
   const [policy, setPolicy] = useState<Policy | null>(null);
   const [target, setTarget] = useState('default');
@@ -23,9 +29,7 @@ export default function AdminPharmacyServiceSettingsPage() {
     getPharmacyManagementClient().get(base).then(response => {
       if (cancelled) return;
       const data: Policy = response.data.data;
-      if (!response.data.success || !Array.isArray(data?.features) || !Array.isArray(data?.targets) ||
-        !data.targets.length || data.targets.some(item => !Array.isArray(item.features) ||
-          item.features.some(key => !data.features.some(feature => feature.key === key)))) throw new Error('Invalid policy');
+      if (!response.data.success || !validPolicy(data)) throw new Error('Invalid policy');
       setPolicy(data); setTarget(data.targets[0].key); setSelected(data.targets[0].features);
     }).catch(() => { if (!cancelled) setError('제공 설정을 불러오지 못했습니다. 다시 시도해 주세요.'); });
     return () => { cancelled = true; };
@@ -49,8 +53,8 @@ export default function AdminPharmacyServiceSettingsPage() {
     <p className="text-sm text-gray-600">대상을 선택하고 제공할 기능을 지정합니다. 기본·유료·가입 협력사업의 기능은 합산하며 중복 제공은 한 번만 적용합니다.</p>
     <Link className="inline-block text-blue-700 underline" to="/admin/semi-franchises">약국 협력사업 등록·관리</Link>
     {error && <p role="alert" className="text-red-700">{error} {!policy && <button type="button" disabled={busy} className="ml-2 underline" onClick={() => setRetry(value => value + 1)}>다시 시도</button>}</p>}
-    {notice && <p role="status" className="text-blue-700">{notice}</p>}
-    {!policy && !error && <p role="status">제공 설정을 확인하는 중…</p>}
+    {notice && <output className="block text-blue-700">{notice}</output>}
+    {!policy && !error && <output className="block">제공 설정을 확인하는 중…</output>}
     {policy && <form className="space-y-4 rounded-lg border border-gray-200 bg-white p-4" onSubmit={event => { event.preventDefault(); void save(); }}>
       <label className="block space-y-2"><span className="font-medium">설정 대상</span>
         <select className="block w-full rounded border border-gray-300 p-2" value={target} disabled={busy} onChange={event => {

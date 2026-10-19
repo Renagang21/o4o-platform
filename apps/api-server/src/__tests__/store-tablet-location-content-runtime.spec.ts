@@ -381,6 +381,10 @@ it('rechecks paid owner eligibility for staff device runtime and pairing after c
   let paid = false;
   dataSource.query.mockImplementation(async (sql: string, params: unknown[]) => {
     if (sql.includes('SELECT status FROM neture_pharmacy_memberships')) return [{ status: 'active' }];
+    if (sql.includes('FROM settings WHERE key')) return [];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return state.members
+      .filter(member => member.organization_id === params[0] && member.user_id === params[1])
+      .map(member => ({ role: member.role, configured: false }));
     if (sql.includes('FROM semi_franchises sf')) return [];
     if (sql.includes('AS "ownerUserId"')) return [{ ownerUserId: 'owner-member' }];
     if (sql.includes('FROM member_paid_service_entitlements')) {

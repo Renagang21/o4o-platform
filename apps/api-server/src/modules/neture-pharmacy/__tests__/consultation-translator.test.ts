@@ -39,3 +39,14 @@ it('allows numbers to follow target-language word order while keeping their valu
   execute.mockResolvedValueOnce({ content: '{"translation":"2 tablets, 3 times daily"}', provider: 'gemini', model: 'policy-model', requestId: 'provider-id', promptTokens: 10, completionTokens: 5 });
   await expect(createConsultationTranslator({} as any)({ text: '하루 3회 2정', source: 'ko', target: 'en' }, access())).resolves.toEqual({ translation: '2 tablets, 3 times daily' });
 });
+it.each([
+  ['10 mg, 5 mL.', '5 mL; 10 mg.'],
+  ['0.9%, 20 mmol, 7 mEq, 5 mcg', '5 mcg; 7 mEq; 20 mmol; 0.9%'],
+])('preserves quantities across punctuation and word order: %s', async (text, translation) => {
+  execute.mockResolvedValueOnce({ content: JSON.stringify({ translation }), provider: 'gemini', model: 'policy-model', requestId: 'provider-id', promptTokens: 10, completionTokens: 5 });
+  await expect(createConsultationTranslator({} as any)({ text, source: 'ko', target: 'en' }, access())).resolves.toEqual({ translation });
+});
+it('does not treat a unit prefix inside a longer word as an interchangeable quantity unit', async () => {
+  execute.mockResolvedValueOnce({ content: '{"translation":"10 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'provider-id', promptTokens: 10, completionTokens: 5 });
+  await expect(createConsultationTranslator({} as any)({ text: '10 mgX', source: 'ko', target: 'en' }, access())).rejects.toMatchObject({ httpStatus: 503 });
+});

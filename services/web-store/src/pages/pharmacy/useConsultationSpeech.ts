@@ -16,6 +16,17 @@ export const consultationSpeechLocale: Record<string, string> = {
   ko: 'ko-KR', en: 'en-US', zh: 'zh-CN', ja: 'ja-JP', vi: 'vi-VN', th: 'th-TH', id: 'id-ID',
 };
 
+function recognitionErrorMessage(code: string) {
+  switch (code) {
+    case 'not-allowed':
+    case 'service-not-allowed': return '마이크 사용이 허용되지 않았습니다. 브라우저 권한을 확인하거나 문자를 입력해 주세요.';
+    case 'no-speech': return '음성을 듣지 못했습니다. 다시 말하거나 문자를 입력해 주세요.';
+    case 'audio-capture': return '마이크를 찾지 못했습니다. 연결을 확인하거나 문자를 입력해 주세요.';
+    case 'language-not-supported': return '이 기기에서 선택 언어의 음성 입력을 지원하지 않습니다. 문자를 입력해 주세요.';
+    default: return '음성 입력을 완료하지 못했습니다. 네트워크를 확인하거나 문자를 입력해 주세요.';
+  }
+}
+
 /** Browser-only, transient speech. No recording blobs, automatic translation or persistence. */
 export function useConsultationSpeech(scope: string, onTranscript: (text: string) => void) {
   const constructor = (window as SpeechWindow).SpeechRecognition ?? (window as SpeechWindow).webkitSpeechRecognition;
@@ -65,12 +76,7 @@ export function useConsultationSpeech(scope: string, onTranscript: (text: string
       current.onerror = event => {
         if (recognition.current !== current) return;
         recognition.current = null; setListening(false);
-        setMessage(event.error === 'not-allowed' || event.error === 'service-not-allowed'
-          ? '마이크 사용이 허용되지 않았습니다. 브라우저 권한을 확인하거나 문자를 입력해 주세요.'
-          : event.error === 'no-speech' ? '음성을 듣지 못했습니다. 다시 말하거나 문자를 입력해 주세요.'
-            : event.error === 'audio-capture' ? '마이크를 찾지 못했습니다. 연결을 확인하거나 문자를 입력해 주세요.'
-              : event.error === 'language-not-supported' ? '이 기기에서 선택 언어의 음성 입력을 지원하지 않습니다. 문자를 입력해 주세요.'
-                : '음성 입력을 완료하지 못했습니다. 네트워크를 확인하거나 문자를 입력해 주세요.');
+        setMessage(recognitionErrorMessage(event.error));
       };
       current.onend = () => { if (recognition.current === current) { recognition.current = null; setListening(false); } };
       setListening(true); current.start();
