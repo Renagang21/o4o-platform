@@ -63,7 +63,7 @@ it('business configuration is service admin work, separate from platform setting
   expect((await request(app).get('/business/admin/semi-franchises').set('x-role', 'kpa:admin')).status).toBe(403);
   // Existing platform-wide feature settings do not become service-admin APIs.
   expect((await request(app).get('/business/admin/service-features').set('x-role', 'neture:admin')).status).toBe(403);
-  query.mockImplementation(async sql => sql.includes('FROM semi_franchises sf') ? [{ id: 'business', key: 'fixture', status: 'active' }] : []);
+  query.mockImplementation(async sql => sql.startsWith('SELECT sf.id, sf.key') ? [{ id: 'business', key: 'fixture', status: 'active' }] : []);
   expect((await request(app).get('/business/operator/semi-franchises/fixture/memberships').set('x-role', 'neture:admin')).status).toBe(403);
   expect(query.mock.calls.some(([sql]) => sql.includes('semi_franchise_operators'))).toBe(true);
 });

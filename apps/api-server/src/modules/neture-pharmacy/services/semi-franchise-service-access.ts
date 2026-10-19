@@ -1,3 +1,4 @@
+import { BUSINESS_OPERATOR_PREDICATE } from './business-operator-access.js';
 /**
  * 세미프랜차이즈 서비스 이용 자격 — 직접 로그인 · handoff 공용
  *
@@ -27,6 +28,7 @@ export type SemiFranchiseAccessNext =
 export interface SemiFranchiseServiceAccess {
   semiFranchiseKey: string;
   allowed: boolean;
+  operator?: boolean;
   /** 안내 기준 약국 조직(가장 진행된 조직)의 내 매장(약국) 신청 상태. 없으면 null */
   pharmacyMembershipStatus: string | null;
   /** 같은 조직의 세미프랜차이즈 가입 상태. 없으면 null */
@@ -88,6 +90,8 @@ export async function resolveSemiFranchiseServiceAccess(
   userId: string,
   semiFranchiseKey: string,
 ): Promise<SemiFranchiseServiceAccess> {
+  const operator = await exec.query(`SELECT 1 FROM semi_franchises sf WHERE sf.key=$2 AND sf.status='active' AND ${BUSINESS_OPERATOR_PREDICATE} AND EXISTS (SELECT 1 FROM users u WHERE u.id=$1 AND u."isEmailVerified"=true AND u."isActive"=true AND u.status IN ('active','approved')) AND NOT EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id=$1 AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')) LIMIT 1`, [userId, semiFranchiseKey]);
+  if (operator.length) return { semiFranchiseKey, allowed: true, operator: true, pharmacyMembershipStatus: null, semiFranchiseMembershipStatus: null, next: null };
   const rows = await exec.query(
     `SELECT npm.status AS basic, sfm.status AS semi
        FROM organization_members om

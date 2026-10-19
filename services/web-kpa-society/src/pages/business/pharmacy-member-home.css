@@ -1,0 +1,46 @@
+.pharmacy-member-home .home-hero {
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.pharmacy-member-home .home-hero-main {
+  min-height: 0;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.pharmacy-member-home .home-hero-title {
+  font-size: clamp(1.25rem, 3vw, 1.875rem) !important;
+  line-height: 1.4 !important;
+}
+.pharmacy-member-home .home-hero-art {
+  display: none;
+}
+.pharmacy-member-home .home-hero-description {
+  min-height: 0;
+  margin-top: 12px !important;
+}
+.pharmacy-member-home .home-hero-image {
+  max-height: 180px;
+}
+.pharmacy-member-home .home-promotion {
+  border-radius: 12px;
+}
+.pharmacy-member-home :is(h1, h2, h3, a) {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .pharmacy-member-home .home-hero-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The mobile account utilities can make the sticky header taller than one row. */
+.pharmacy-member-home :is(#business-news, #business-products) {
+  scroll-margin-top: 160px;
+}
+@media (min-width: 640px) {
+  .pharmacy-member-home :is(#business-news, #business-products) {
+    scroll-margin-top: 112px;
+  }
+}

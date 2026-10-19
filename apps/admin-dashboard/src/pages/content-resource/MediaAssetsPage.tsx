@@ -12,6 +12,7 @@
  * 이번 WO 범위: media_assets metadata 조회·수정(검색 화면·통합검색은 후속).
  * 파일 속성(url/gcs_path/file_name/original_name)은 편집 불가(읽기 전용 표시).
  */
+import ContentPolicyHelp from '@/components/content/ContentPolicyHelp';
 import { ExternalMediaForm, MediaCatalogPanel } from './MediaCatalogPanel';
 import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
@@ -99,6 +100,8 @@ const MediaAssetsPage: React.FC = () => {
           공용 미디어 라이브러리(media_assets) 자산의 메타데이터를 관리합니다. 파일 URL은 변경되지 않으며,
           제목·설명·태그 등 서술 메타데이터만 수정됩니다. (총 {total}건)
         </p>
+
+      <ContentPolicyHelp context="media" />
 
         <ExternalMediaForm onCreated={()=>void doFetch()}/>
         {/* WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: Metadata 검색/필터 바 (AND) */}

@@ -682,14 +682,15 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     if (!business.canParticipate) continue;
     // 독립 사업은 pharmacy 개인 가입을 요구하는 service handoff로 우회하지 않는다.
     // CarePharm은 기존 alias, 메가팜은 공개 호스트(현재 별도 handoff alias 없음)를 사용한다.
-    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.key)}/forum` };
-    if (business.key === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
+    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.key)}` };
+    if (business.key === 'pharmacy') action = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/' };
+    else if (business.key === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
     else if (business.key === 'megapharm') action = { kind: 'public', href: 'https://megapharm.neture.co.kr/' };
-    myServices.push({ id: `business:${business.key}`, label: `${business.name} · 참여자 공간`, action });
+    myServices.push({ id: `business:${business.key}`, label: business.key === 'pharmacy' ? nameOf('kpa-society') : `${business.name} · 공동공간`, action });
   }
   for (const cooperative of data.cooperatives ?? []) {
     if (cooperative.status !== 'active') continue;
-    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://coop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
+    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://pharmcoop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
   }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
@@ -698,6 +699,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   }
   for (const svc of data.services) {
     if (svc.membership?.status !== 'active') continue;
+    if (svc.key === 'kpa-society' && businesses.some(business => business.key === 'pharmacy' && business.canParticipate)) continue;
     if (svc.key === 'neture') {
       myServices.push({ id: 'svc:neture', label: nameOf('neture'), note: '현재 화면', action: { kind: 'internal', to: '/mypage' } });
       continue;

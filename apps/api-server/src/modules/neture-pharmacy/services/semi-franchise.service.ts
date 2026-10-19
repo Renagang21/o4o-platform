@@ -1,3 +1,4 @@
+import { BUSINESS_OPERATOR_PREDICATE, hasBusinessOperatorAccess } from './business-operator-access.js';
 import { recordOperation } from '../../../services/operations/operation-audit.js';
 import { hasCooperativeOperatorAccess } from './cooperative-operator-access.js';
 import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
@@ -8,7 +9,7 @@ import { businessCommunityKeyTaken } from '../../../services/community/community
  * - 약국 조직 단위 가입(신청 · 승인 · 정지 · 종료). 내 매장(약국) 승인이 세미프랜차이즈 가입을 자동 승인하지 않는다.
  * - 신청 · 승인(재활성화 포함) 시점에 **현재** Neture 메인 가입 active 를 직접 확인한다 — 내 매장 승인을 거쳤다는
  *   간접 충족에 기대지 않는다(이후 Neture 가입 상태가 바뀔 수 있다). 정지 연쇄 정책은 별도.
- * - 담당 운영자 판정 = (라우트 guard) neture:operator role ∧ (여기) semi_franchise_operators 활성 행.
+ * - 담당 운영자 판정 = 사업 한정 역할 또는 유효 Neture 운영 역할 + 활성 담당 관계.
  * - 세미프랜차이즈를 추가해도 코드 분기를 늘리지 않는다(행 + 운영 조직 1개).
  */
 import type { DataSource } from 'typeorm';
@@ -20,7 +21,12 @@ import {
   type MembershipStatus,
   rowsOf,
 } from '../constants.js';
-import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
+import {
+  NETURE_MAIN_SERVICE_KEY,
+  assertNetureMainMembershipActive,
+  resolveNetureMainMembershipStatus,
+  type NetureMainMembershipRow,
+} from '../../neture/services/neture-main-membership.js';
 import { validateServiceFeatures, type PharmacyServiceFeature } from './service-features.js';
 
 export interface SemiFranchiseRow {
@@ -138,12 +144,7 @@ export class SemiFranchiseService {
   // ─── 담당 운영자 ────────────────────────────────────────────────────────
 
   async isOperatorOf(userId: string, semiFranchiseId: string): Promise<boolean> {
-    const rows = await this.dataSource.query(
-      `SELECT 1 FROM semi_franchise_operators
-        WHERE semi_franchise_id = $1 AND user_id = $2 AND revoked_at IS NULL LIMIT 1`,
-      [semiFranchiseId, userId],
-    );
-    return rows.length > 0;
+    return hasBusinessOperatorAccess(this.dataSource, userId, semiFranchiseId);
   }
 
   /** 담당이 아니면 403. 반환한 세미프랜차이즈 범위 안의 행만 처리한다. */
@@ -160,7 +161,7 @@ export class SemiFranchiseService {
     return this.dataSource.query(
       `SELECT ${SF_COLUMNS}
          FROM semi_franchises sf
-         JOIN semi_franchise_operators op ON op.semi_franchise_id = sf.id AND op.user_id = $1 AND op.revoked_at IS NULL
+         WHERE ${BUSINESS_OPERATOR_PREDICATE}
         ORDER BY sf.name, sf.key`,
       [userId],
     );
@@ -228,14 +229,42 @@ export class SemiFranchiseService {
 
   // ─── Neture 관리자 ──────────────────────────────────────────────────────
 
+  /**
+   * operators = 이 화면에서 지정 · 해제하는 개별 담당(semi_franchise_operators).
+   * roleOperators = 운영자 관리 화면이 지정한 사업 한정 역할(neture:{key}_admin · _operator, 조회 전용) —
+   *   BUSINESS_OPERATOR_PREDICATE 의 사업 key 역할 분기와 같은 조건. 개별 담당 해제로 풀리지 않으므로 섞지 않는다.
+   *   협동조합(pharmcoop)은 cooperatives 연결 판정이 따로 있어 여기서 집계하지 않는다.
+   */
   async listAll() {
-    return this.dataSource.query(
+    const rows = await this.dataSource.query<Array<{ roleOperators: Array<NetureMainMembershipRow & Record<string, unknown>> }>>(
       `SELECT ${SF_COLUMNS},
               (SELECT count(*)::int FROM semi_franchise_memberships x WHERE x.semi_franchise_id = sf.id AND x.status = 'active') AS "activeMemberCount",
               COALESCE((SELECT json_agg(json_build_object('userId', op.user_id, 'assignedAt', op.assigned_at) ORDER BY op.assigned_at)
-                          FROM semi_franchise_operators op WHERE op.semi_franchise_id = sf.id AND op.revoked_at IS NULL), '[]'::json) AS operators
+                          FROM semi_franchise_operators op WHERE op.semi_franchise_id = sf.id AND op.revoked_at IS NULL), '[]'::json) AS operators,
+              COALESCE((SELECT json_agg(json_build_object(
+                                 'userId', ra.user_id, 'role', ra.role, 'email', u.email,
+                                 'name', COALESCE(NULLIF(btrim(u.name), ''), NULLIF(btrim(concat_ws(' ', u."lastName", u."firstName")), ''), NULLIF(btrim(u.nickname), '')),
+                                 'account_status', u.status, 'account_active', u."isActive",
+                                 'email_verified', u."isEmailVerified", 'membership_status', sm.status
+                               ) ORDER BY ra.role, ra.user_id)
+                          FROM role_assignments ra JOIN users u ON u.id = ra.user_id
+                          LEFT JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = $1
+                         WHERE sf.key IN ('pharmacy','carepharm','megapharm')
+                           AND ra.role IN ('neture:' || sf.key || '_admin', 'neture:' || sf.key || '_operator')
+                           AND ra.is_active = true
+                           AND (ra.valid_from IS NULL OR ra.valid_from <= CURRENT_TIMESTAMP)
+                           AND (ra.valid_until IS NULL OR ra.valid_until >= CURRENT_TIMESTAMP)), '[]'::json) AS "roleOperators"
          FROM semi_franchises sf ORDER BY (sf.key = 'pharmacy') DESC, sf.name`,
+      [NETURE_MAIN_SERVICE_KEY],
     );
+    // 사업 운영 경로 가드는 역할과 함께 Neture 메인 이용 자격 active 를 요구한다 — 같은 판정으로 자격을 따로 알려 준다.
+    return rows.map(row => ({
+      ...row,
+      roleOperators: (row.roleOperators ?? []).map(({ account_status, account_active, email_verified, membership_status, ...op }) => ({
+        ...op,
+        membershipStatus: resolveNetureMainMembershipStatus({ account_status, account_active, email_verified, membership_status }),
+      })),
+    }));
   }
 
   async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string; serviceFeatures?: unknown }, actorId: string | null = null): Promise<SemiFranchiseRow> {

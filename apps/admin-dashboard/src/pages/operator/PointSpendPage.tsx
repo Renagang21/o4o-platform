@@ -1,3 +1,4 @@
+import PointOperationsNav from '@/components/points/PointOperationsNav';
 /**
  * PointSpendPage (operator point operation page)
  *
@@ -318,11 +319,13 @@ export default function PointSpendPage() {
     <div className="p-6">
       <PageHeader
         title="포인트 운영"
-        subtitle="포인트 적립(grant)·차감(spend)과 사용자 거래 이력 조회를 수행합니다."
+        subtitle="포인트 지급·차감과 거래 조회를 관리합니다. 서비스별 지급 예산도 확인할 수 있습니다."
       />
 
       {/* ── 지급(grant) 섹션 ── */}
-      <section className="mt-2 mb-10 border-b border-gray-200 pb-8">
+      <PointOperationsNav showTasks />
+
+      <section id="point-grant" className="scroll-mt-6 mt-2 mb-10 border-b border-gray-200 pb-8">
         <h2 className="mb-1 text-lg font-semibold text-gray-900">포인트 지급</h2>
         <p className="mb-4 text-sm text-gray-500">
           운영자가 사용자에게 수동으로 포인트를 적립합니다. 차감 실수 보상, 이벤트 보상 등에 사용합니다.
@@ -412,7 +415,7 @@ export default function PointSpendPage() {
       </section>
 
       {/* ── 차감(spend) 섹션 ── */}
-      <section className="mb-10 border-b border-gray-200 pb-8">
+      <section id="point-spend" className="scroll-mt-6 mb-10 border-b border-gray-200 pb-8">
         <h2 className="mb-1 text-lg font-semibold text-gray-900">포인트 차감 (보상 정산)</h2>
         <p className="mb-4 text-sm text-gray-500">
           보상 지급 완료 후 사용자 포인트를 차감합니다. 차감 사유(description)는 필수이며 모든 내역은
@@ -534,7 +537,7 @@ export default function PointSpendPage() {
       </section>
 
       {/* ── 거래 이력 조회 (WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1) ── */}
-      <div className="mt-10 border-t border-gray-200 pt-8">
+      <div id="point-transactions" className="scroll-mt-6 mt-10 border-t border-gray-200 pt-8">
         <h2 className="mb-1 text-lg font-semibold text-gray-900">거래 이력 조회</h2>
         <p className="mb-4 text-sm text-gray-500">
           특정 사용자의 포인트 적립·차감 이력을 최신순으로 조회합니다.

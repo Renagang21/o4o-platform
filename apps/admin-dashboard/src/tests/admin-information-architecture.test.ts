@@ -42,7 +42,7 @@ const ALL_ROUTES = ROUTE_FILES.map((f) => stripAllComments(read(`routes/${f}.rou
 // ---------------------------------------------------------------------------
 
 describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () => {
-  /** 사이드바에 보여야 하는 경로 전체. 프로덕션 브라우저 smoke 로 22건 실측 확인(CHECK §5-1). */
+  /** 1차 정비 후 사이드바 경로 전체. 제거한 4개 독립 진입점의 회귀를 방지한다. */
   const EXPECTED_PATHS = [
     '/admin',
     '/admin/platform/hub',
@@ -67,17 +67,10 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     //   `/content/analytics` 제거. 둘 다 cms_media 하나에 의존했고 운영에 그 테이블이 없다.
     '/content',
     '/content-resource/media-assets',
-    '/content/policies',
     // CMS
     '/admin/cms/contents',
     '/admin/cms/slots',
     '/admin/ops/metrics',
-    // AppStore
-    '/apps/store',
-    // Signage
-    '/admin/digital-signage/content',
-    // 자동화 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
-    '/automation/video-jobs',
   ];
 
   it('메뉴 경로 집합이 canonical 구조와 정확히 일치한다', () => {
@@ -136,6 +129,20 @@ describe('서비스 전용 업무는 플랫폼 관리자 메뉴로 돌아오지 
     // 제거의 반대 방향 가드 — KPA + Neture 를 함께 집계하는 유일한 플랫폼 화면이다.
     expect(menuPaths).toContain('/admin/platform/hub');
     expect(existsSync(join(SRC, 'pages', 'platform', 'PlatformHubPage.tsx'))).toBe(true);
+  });
+});
+
+describe('1차 정비에서 제외한 독립 관리자 업무', () => {
+  it.each([
+    ['/apps/store', 'pages/apps/AppStorePage.tsx'],
+    ['/admin/appstore/installed', 'pages/apps/AppStorePage.tsx'],
+    ['/automation/video-jobs', 'pages/automation/VideoJobsPage.tsx'],
+    ['/automation/video-jobs/:id', 'pages/automation/VideoJobDetailPage.tsx'],
+    ['/admin/digital-signage/*', 'pages/digital-signage/DigitalSignageRouter.tsx'],
+    ['/content/policies', 'pages/content/policies/index.tsx'],
+  ])('%s의 직접 URL로 전용 화면이 되살아나지 않는다', (path, file) => {
+    expect(ALL_ROUTES).not.toContain(`path="${path}"`);
+    expect(existsSync(join(SRC, file))).toBe(false);
   });
 });
 
@@ -228,7 +235,6 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
     'core-points',
     'platform-hub',
     'ops-metrics',
-    'appstore-browse',
   ];
 
   it.each(PLATFORM_ONLY_MENUS)('%s 메뉴가 platform 경계로 게이트된다', (menuId) => {
@@ -245,7 +251,7 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
     // adminRouteAccess.expandRequiredRoles 는 `admin`·`super_admin` 이 있을 때만 확장하고,
     // `matchesRequiredRole` 은 그때 서비스 접두 역할까지 받아준다. 백엔드가 platform 전용인
     // 화면에서는 그 확장이 일어나지 않아야 한다.
-    for (const p of ['/admin/platform/hub', '/admin/ops/metrics', '/operator/points', '/apps/store']) {
+    for (const p of ['/admin/platform/hub', '/admin/ops/metrics', '/operator/points']) {
       const at = ALL_ROUTES.indexOf(`path="${p}"`);
       expect(at, `${p} route 선언을 찾지 못했다`).toBeGreaterThan(-1);
       const block = ALL_ROUTES.slice(at, at + 300);

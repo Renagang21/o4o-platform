@@ -1,3 +1,4 @@
+import { hasBusinessOperatorAccess } from './business-operator-access.js';
 /**
  * 세미프랜차이즈 커뮤니티 접근 — DESIGN §7
  *
@@ -31,6 +32,10 @@ async function resolveAccess(
   if (!sf) return { semiFranchise: false, allowed: false, semiFranchiseKey: null };
   if (sf.status !== 'active') return { semiFranchise: true, allowed: false, semiFranchiseKey: sf.key };
   if (!userId) return { semiFranchise: true, allowed: false, semiFranchiseKey: sf.key };
+  if (await hasBusinessOperatorAccess(exec, userId, sf.id)) {
+    const [main] = await exec.query(`SELECT 1 FROM users u WHERE u.id=$1 AND u."isEmailVerified"=true AND u."isActive"=true AND u.status IN ('active','approved') AND NOT EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))`, [userId]);
+    if (main) return { semiFranchise: true, allowed: true, semiFranchiseKey: sf.key, operator: true };
+  }
   const rows = await exec.query(
     `SELECT 1
       WHERE EXISTS (SELECT 1 FROM users u WHERE u.id = $2 AND u."isEmailVerified" = true AND u."isActive" = true AND u.status IN ('active','approved'))
@@ -43,11 +48,6 @@ async function resolveAccess(
        JOIN neture_pharmacy_memberships npm
          ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
       WHERE sfm.semi_franchise_id = $1 AND sfm.status = 'active'
-        ) OR EXISTS (
-          SELECT 1 FROM semi_franchise_operators sfo
-          JOIN role_assignments ra ON ra.user_id = sfo.user_id AND ra.is_active = true
-            AND ra.role IN ('neture:operator','neture:admin')
-          WHERE sfo.semi_franchise_id = $1 AND sfo.user_id = $2 AND sfo.revoked_at IS NULL
         ))
       LIMIT 1`,
     [sf.id, userId],

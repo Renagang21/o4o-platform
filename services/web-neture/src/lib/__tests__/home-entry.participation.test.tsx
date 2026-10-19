@@ -16,6 +16,8 @@ const data = (): HomeEntryData => ({ services: [], stores: [], branches: [], com
 it('shows approved business and cooperative entries even when /communities has neither', () => {
   const input = data();
   expect(buildHomeEntryModel(user, input).myServices.map(item => item.id)).toEqual(['business:carepharm', 'cooperative:coop']);
+  expect(buildHomeEntryModel(user, input).myServices.find(item => item.id === 'cooperative:coop')?.action)
+    .toEqual({ kind: 'public', href: 'https://pharmcoop.neture.co.kr/sample' });
   input.businesses![0].canParticipate = false;
   input.businesses![0].membershipStatus = 'pending';
   input.cooperatives![0].status = 'suspended';

@@ -19,6 +19,11 @@ jest.mock("../../../middleware/auth.middleware", () => ({
 }));
 jest.mock("../../../middleware/neture-scope.middleware", () => ({
   requireNetureScope: (scope: string) => mockScopeGuard(scope),
+  requireNetureBusinessScope: (req: any, res: any, next: any) => {
+    const role = req.headers["x-test-role"];
+    const allowed = /^neture:(?:(?:pharmacy|carepharm|megapharm|pharmcoop)_)?(?:admin|operator)$/.test(role || "");
+    return allowed && req.headers["x-test-membership"] === "active" ? next() : res.status(403).json({ success: false });
+  },
 }));
 jest.mock("../../../middleware/supplier-service-scope.middleware", () => ({
   requireSupplierScope: (scope: string) => mockScopeGuard(scope),

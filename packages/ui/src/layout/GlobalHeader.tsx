@@ -78,6 +78,8 @@ export interface GlobalHeaderProps {
   logoutLabel?: string;
   /** UserArea 드롭다운 내부 커스텀 메뉴 항목 (대시보드, 마이페이지 등) */
   userMenuItems?: React.ReactNode;
+  /** Service-owned account presentation; role-aware mobile items remain independent. */
+  accountSlot?: React.ReactNode;
   /**
    * 모바일 햄버거 메뉴 전용 사용자 메뉴 항목.
    * WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1:
@@ -124,6 +126,7 @@ export function GlobalHeader({
   onLogout,
   logoutLabel = '로그아웃',
   userMenuItems,
+  accountSlot,
   mobileUserMenuItems,
   showMobileUserMenu = true,
   utilitySlot,
@@ -264,7 +267,7 @@ export function GlobalHeader({
             {isAuthenticated && utilitySlot}
 
             {/* UserArea */}
-            {isAuthenticated && user ? (
+            {isAuthenticated && user ? accountSlot ?? (
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}

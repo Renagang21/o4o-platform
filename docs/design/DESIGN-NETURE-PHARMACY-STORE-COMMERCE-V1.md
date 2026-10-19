@@ -734,3 +734,15 @@ pathRules:
 - kpa-society `service_memberships` 가 active 이면 기존 경로 그대로(약국 협력사업 조회 0). 기존 kpa-society 가입 · `kpa:store_owner` 를 Neture 자격으로 **재해석하지 않는다**. 판정은 membership · role 을 만들지 않는다(읽기만).
 - 미충족은 상태별 `next`(`apply_pharmacy` · `pharmacy_pending` · `pharmacy_suspended` · `apply_semi_franchise` · `semi_franchise_pending` · `semi_franchise_suspended`) + 안내 문구 + 신청 링크(store.neture.co.kr `/start-pharmacy` · `/store/pharmacy/semi-franchises`, 정지는 링크 없음).
 - 포럼은 사업 서비스 가입과 구분한다. 옛 pharmacy `/forum/*`는 community의 독립 약사 커뮤니티로 연결하며, 사업 회원 포럼은 별도 community_key와 해당 사업 가입을 검사한다(§7).
+
+## 2026-10-18 보완 — 네 약국 협업체 운영자 지정
+
+사용자가 전체 관리자 화면에서 pharmacy·carepharm·megapharm·pharmcoop 각각 Admin과 Operator를
+지정하도록 요청했다. 네 대상은 여전히 사업 식별자이며 별도 `service_memberships` 서비스가 아니다.
+`neture:{사업키}_admin/operator` 역할로 해당 사업만 운영한다. 기존 Neture 전체 역할을 복제하지 않는다.
+`pharmcoop` 역할은 등록 협동조합의 사업 공간과 연합 운영자 세션을 포함하며 임의의 다른 사업은 포함하지 않는다.
+이 보완은 위의 기존 `neture:operator/admin` + 활성 담당 관계 방식과 함께 적용한다.
+신규 사업 자동 생성·기존 가입 승인·약국 소유권·참여 가입 동기화는 하지 않는다.
+정상 계정·이메일 확인·Neture 명시 정지/탈퇴 차단과 매 요청 역할 유효기간 확인을 유지한다.
+역할 목록은 [RBAC 카탈로그](../rbac/RBAC-ROLE-CATALOG-V1.md#약국-협업체-운영자-지정--2026-10-18),
+구현·검증은 [WO](../work-orders/WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1.md)를 따른다.

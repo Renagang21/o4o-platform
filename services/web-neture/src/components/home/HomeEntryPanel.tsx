@@ -198,7 +198,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
       {joinedServices.length > 0 ? <ul className="mt-5 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
         {joinedServices.map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <EntryButton item={item} busyId={busyId} onHandoff={handleHandoff} />
-          <p className="mb-0 mt-3 text-sm text-slate-600">{data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim() || (item.id.startsWith('business:') ? '가입한 약국 협력사업의 참여자 공간을 이용합니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : item.id === 'svc:neture' ? '필요한 서비스와 개인 활동을 한곳에서 확인합니다.' : '가입한 서비스에서 활동을 이어갑니다.')}</p>
+          <p className="mb-0 mt-3 text-sm text-slate-600">{data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim() || (item.id.startsWith('business:') ? '사업자와 가입 약국이 공지·소식·사업 자료를 함께 나누는 공동공간입니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : item.id === 'svc:neture' ? '필요한 서비스와 개인 활동을 한곳에서 확인합니다.' : '가입한 서비스에서 활동을 이어갑니다.')}</p>
         </li>)}
       </ul> : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보세요.</p>}
       {stores.length > 0 && <div className="mt-5 rounded-xl border border-slate-200 p-4">

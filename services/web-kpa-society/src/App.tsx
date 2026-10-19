@@ -1,3 +1,4 @@
+import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from './config/businessSite';
 import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
 import BusinessHomePresentationPage from './pages/business/BusinessHomePresentationPage';
@@ -850,9 +851,9 @@ function App() {
           <Route path="/resources/new" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           <Route path="/resources/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
-          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorPage /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
           <Route path="/operator/*" element={<OperatorRoutes />} />
 
           {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
