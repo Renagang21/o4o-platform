@@ -1,6 +1,6 @@
 # WO-O4O-ADMIN-COOPERATIVE-VISIBILITY-V1
 
-- 상태: ACTIVE
+- 상태: COMPLETED
 - 작성·최종 갱신: 2026-10-19 (KST)
 - 기준: main `491be1bb82c5b9788ff97020d0e0430939be11b6`
 - 사용자 지시: `admin.neture.co.kr/admin/semi-franchises`에 빠진 약사·약국 협동조합 정비. 후속 답변으로 **연합회만** 확정.
@@ -11,8 +11,9 @@
 - [x] 일반 사업·연합회·개별 조합의 차이 확인
 - [x] 사용자 답변 반영: 개별 조합 목록·상태·조합원 집계 제외
 - [x] 연합회 진입과 기존 Admin·Operator 지정 화면 연결, 지정 현황 표시
-- [ ] UI·API 권한·SQL·PC/모바일 검증
-- [ ] commit·push·기존 PR #710 리뷰·main·배포 및 결과 기록
+- [x] UI·API 권한·SQL·PC/모바일 검증
+- [x] commit·push·PR #710 CI·리뷰·main 병합
+- [x] 운영 배포·서빙 SHA 확인 및 결과 기록
 
 ## 조사 결과
 
@@ -34,8 +35,36 @@
 
 운영 데이터 생성·변경·삭제, 역할 자동 부여, migration은 없다. 공개 디렉토리·개별 조합 운영·실제 접근 판정과 기존 역할 지정 계약을 변경하지 않는다. 실제 Google 인증은 사용자 브라우저에서 하며 자격증명 전달을 요구하지 않는다.
 
-## 검증
+## 최종 코드 검증
 
-- 연합회 화면 Vitest 5 tests PASS: 기존 사업 유지·탭 전환·직접 URL·지정 현황과 이름 대체·실패/재시도. 개별 조합 관리와 쓰기 요청 없음.
-- API HTTP 회귀 6 tests PASS: 실제 role guard, 비로그인 401/서비스 운영자 403/플랫폼 관리자 200, private/no-store, 원시 계정 필드 제외, 단일 SELECT와 개별 조합·사업·조합원 미조회 확인.
-- 관리자 전체 회귀·type-check·lint, API build, 격리 PostgreSQL SQL 실행, 실제 App PC/모바일 최종 검증 진행 중. 이전의 개별 조합 포함 검증 결과를 최종 검증으로 인용하지 않는다.
+- admin 전체 Vitest: 직렬 25 files / 420 tests PASS.
+- API HTTP 회귀: 6 tests PASS. 실제 role guard, 비로그인 401/서비스 운영자 403/플랫폼 관리자 200, private/no-store, 원시 계정 필드 제외, 단일 SELECT 및 개별 조합·사업·조합원 미조회.
+- admin type-check·운영용 build, API TypeScript build PASS. 변경 파일 lint 오류 0/기존 경고 1. 문서 민감정보 검사 PASS.
+- 별도 메모리 PostgreSQL(PGlite)에서 실제 최종 SQL PASS: 유효 Admin/Operator, 만료·미래·해제·다른 사업 역할 제외, 이름 대체와 계정 자격, 단일 SELECT/개별 조합·사업·조합원 미조회. 운영 PostgreSQL major 차이는 검증 한계이며 검증 dependency는 저장소 밖 임시 경로에만 설치했다. 검증 데이터는 메모리 DB 종료로 제거했다.
+- 실제 production admin App + 합성 API, Chromium 1440px/390px PASS: 탭·직접 URL·새로고침·역할/자격·오류/재시도·지정자 없음·기존 사업 화면 복귀. 개별 조합 관리·쓰기 요청 0, pageerror 0.
+- 운영 Google 관리자 세션 검증은 미실시다. 운영 데이터 변경은 없다.
+
+## main 통합
+
+- PR [#710](https://github.com/Renagang21/o4o-platform/pull/710), merge `ff59bc43d19136db0eca806c8ed17766028a0319`.
+- 범위 축소 commit `87e1dabe113df5517145774d37a2dd2087332ee4`: PR CI `39254640912` PASS, Codex 지적 없음.
+- 다른 작업 PR #709가 먼저 병합되어 최신 main `4212290d8ce9f8e4fca3217350a0441cd354d6fe`를 같은 branch에 merge했다. 이번 8개 파일의 내용은 동일하고 main 대비 Store 파일 변경은 없다.
+- 통합 HEAD `2057b52bcfaa9d4a1ab12a3587cde1f412d510f8`: PR CI `39256223434` PASS, CodeQL·Sonar PASS, 해당 HEAD Codex 지적 및 미해결 스레드 없음.
+- Store Delivery `39257011394`의 `DEPLOYED · deploy: store` 확인 후 이번 PR을 순차 병합했다. 운영 데이터·역할·migration 변경 없음.
+- 병합 commit CI `39257847505` PASS. 운영 배포 결과는 아래와 같다.
+
+## 운영 배포·확인
+
+- Delivery [39259373722](https://github.com/Renagang21/o4o-platform/actions/runs/39259373722) SUCCESS. 최종 production status: `DEPLOYED · deploy: api,admin`.
+- API 먼저 배포·검증한 후 관리자 배포를 수행했다. `Final serving SHA → DEPLOYED / FAILED` 단계에서 API·관리자의 목표 SHA `ff59bc43d19136db0eca806c8ed17766028a0319` 서빙을 확인했다. 다른 web 서비스는 이 배포 대상이 아니다.
+- 운영 `/admin/semi-franchises` 및 `?section=cooperatives` HTTP 200. 실제 배포 JS에서 연합회 탭·운영자 지정 링크·새 API 경로 확인.
+- API `/health` HTTP 200. 비로그인 연합회 API 요청은 HTTP 401로 차단된다. 이 응답만으로 인증 후 DB 조회 성공을 주장하지 않는다.
+- 실제 Google 관리자 세션으로 역할 현황을 조회하는 운영 브라우저 검증은 남아 있다. 사용자 인증값 제공이나 운영 데이터 정비를 요구·수행하지 않았다. 새 migration은 없다.
+
+## 다른 작업과의 경계·Git 정리
+
+- 이번 배포 중 다른 공간의 PR #713이 main `40c8f9d6e030de142730a9da1e95b6f07e1e97db`에 별도로 병합됐다. 이번 Delivery는 이미 고정한 `ff59bc43d1`을 배포했으며 PR #713을 배포하거나 promote하지 않았다.
+- 코드 branch `wo/admin-cooperative-visibility`는 main의 조상이지만, 최신 main에서 다른 작업이 두 API 파일을 변경해 작업 경로 diff가 0이 아니다. 정리 판정은 KEEP이며 로컬·원격 branch와 관리형 checkout을 보존한다. 다른 작업을 원복하거나 branch를 강제 삭제하지 않는다.
+- 검증용 로컬 preview 서버는 종료했다. 격리 SQL 검증 데이터는 메모리 DB 종료로 제거했다.
+- 완료 기록은 문서 전용 후속 PR로 제출한다. 다른 공간의 통합·배포와 겹치지 않게 기록 PR의 병합 시점을 분리한다.
+- 문서 정합: 사용자 확정 범위인 연합회만 기록했다. 범위 내 추가 불일치 없음. 과거 작업 문서나 canonical 판정은 변경하지 않았다.
