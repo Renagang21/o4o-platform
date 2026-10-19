@@ -17,15 +17,16 @@ integration('home participation reads the same local PostgreSQL ledgers after ap
       CREATE TEMP TABLE organization_members(organization_id text, user_id text, role text, left_at timestamp);
       CREATE TEMP TABLE neture_pharmacy_memberships(organization_id text, status text);
       CREATE TEMP TABLE semi_franchise_operators(semi_franchise_id text, user_id text, revoked_at timestamp);
-      CREATE TEMP TABLE role_assignments(user_id text, role text, is_active boolean);
+      CREATE TEMP TABLE role_assignments(user_id text, role text, is_active boolean, valid_from timestamptz, valid_until timestamptz);
+      CREATE TEMP TABLE cooperative_roles(cooperative_id text,user_id text,role text,revoked_at timestamptz);
       CREATE TEMP TABLE cooperatives(id text, slug text, name text, status text, semi_franchise_id text);
       CREATE TEMP TABLE cooperative_memberships(cooperative_id text, user_id text, status text);
       INSERT INTO users VALUES ('member',true,true,'active'),('outsider',true,true,'active');
-      INSERT INTO semi_franchises VALUES ('business','carepharm','합성 사업','active');
+      INSERT INTO semi_franchises VALUES ('business','carepharm','합성 사업','active'),('cooperative-business','coop-test','합성 조합 사업','active');
       INSERT INTO organization_members VALUES ('store','member','owner',NULL);
       INSERT INTO neture_pharmacy_memberships VALUES ('store','active');
       INSERT INTO semi_franchise_memberships VALUES ('business','store','pending');
-      INSERT INTO cooperatives VALUES ('coop','sample','합성 조합','active','business');
+      INSERT INTO cooperatives VALUES ('coop','sample','합성 조합','active','cooperative-business');
       INSERT INTO cooperative_memberships VALUES ('coop','member','pending');
     `);
   });
@@ -44,6 +45,7 @@ integration('home participation reads the same local PostgreSQL ledgers after ap
     expect(outsider.cooperatives).toEqual([]);
     await client.query("UPDATE neture_pharmacy_memberships SET status='suspended'");
     expect((await readHomeParticipation(db, 'member')).businesses[0]).toMatchObject({ canParticipate: false, membershipStatus: 'active' });
+    expect((await readHomeParticipation(db, 'member')).businesses.find((b: {key:string})=>b.key==='coop-test')).toMatchObject({canParticipate:true});
     await client.query("UPDATE neture_pharmacy_memberships SET status='active'");
     await client.query("UPDATE semi_franchise_memberships SET status='suspended'; UPDATE cooperative_memberships SET status='suspended'");
     const suspended = await readHomeParticipation(db, 'member');

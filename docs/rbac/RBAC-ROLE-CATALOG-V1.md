@@ -174,9 +174,18 @@ Layer A와 Layer B는 혼합 금지:
 | pharmcoop | `neture:pharmcoop_admin` | `neture:pharmcoop_operator` |
 
 두 역할은 해당 사업의 기존 운영 기능을 이용한다. Neture 전체 관리·플랫폼 관리·다른 사업 운영 권한은 부여하지 않는다.
-`pharmcoop` 범위에는 등록된 개별 협동조합의 사업 공간과 연합 운영자 세션이 포함된다.
-기존 `neture:admin/operator`와 활성 `semi_franchise_operators` 관계를 함께 가진 담당자도 계속 이용한다.
+`pharmcoop` 범위는 연합회 산하 조합관리이며 개별 조합 운영 권한으로 전파되지 않는다. 연합회 admin은 조합 최종 결정과 조합 admin 지정·해제를, operator는 검토·보완을 담당한다.
+기존 `neture:admin/operator`와 활성 `semi_franchise_operators` 관계를 함께 가진 담당자는 비조합 사업에서만 계속 이용한다.
 매 요청 활성·유효기간을 확인하며, 역할만으로 약국 소유·참여 가입을 만들거나 기존 가입 상태를 변경하지 않는다.
 Google 연결 계정만 지정하며, 신규 계정 생성·타인 비밀번호 설정 경로는 추가하지 않는다.
 
 근거: [약국 협업체 운영자 지정 WO](../work-orders/WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1.md).
+
+### 개별 협동조합 역할 — 2026-10-18
+
+`cooperative_roles`에 조합 ID·사용자별 `admin` 또는 `operator`를 지정한다. 전역 `role_assignments` 역할이나 Neture 전역 운영 자격을 추가하지 않는다.
+연합회 admin이 조합 admin을, 조합 admin이 자기 조합 operator를 지정·해제한다.
+조합 admin은 회원 자격을 최종 결정하며 operator는 검토·보완·처리 요청을 한다.
+한 사람은 조합마다 다른 역할을 가질 수 있다. 자기 역할 해제·마지막 사용 가능한 admin 해제를 막고, 역할/회원 상태 종료는 다른 조합·약국 조직·매장 권한에 영향을 주지 않는다.
+개별 조합 배정 대상은 기존 활성·이메일 인증 계정이다. 위의 공통 관리자 Google 연결 조건은 연합회 전역 역할 지정 경로의 조건이며 local 조합 역할의 필수 조건으로 확대하지 않는다.
+상세: [협동조합 권한 설계](../design/DESIGN-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md).
