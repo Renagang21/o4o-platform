@@ -73,6 +73,22 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       description: '유통참여형 펀딩 운영 업무',
     },
   ],
+  pharmacy: [
+    { value: 'neture:pharmacy_admin', label: 'Admin', description: 'pharmacy 관리자' },
+    { value: 'neture:pharmacy_operator', label: 'Operator', description: 'pharmacy 운영자' },
+  ],
+  carepharm: [
+    { value: 'neture:carepharm_admin', label: 'Admin', description: 'carepharm 관리자' },
+    { value: 'neture:carepharm_operator', label: 'Operator', description: 'carepharm 운영자' },
+  ],
+  megapharm: [
+    { value: 'neture:megapharm_admin', label: 'Admin', description: 'megapharm 관리자' },
+    { value: 'neture:megapharm_operator', label: 'Operator', description: 'megapharm 운영자' },
+  ],
+  pharmcoop: [
+    { value: 'neture:pharmcoop_admin', label: 'Admin', description: 'pharmcoop 관리자' },
+    { value: 'neture:pharmcoop_operator', label: 'Operator', description: 'pharmcoop 운영자' },
+  ],
 };
 
 /** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_OPERATOR_ROLES` 와 같은 순서·같은 집합이어야 한다. */

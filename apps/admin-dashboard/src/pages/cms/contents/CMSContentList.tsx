@@ -11,6 +11,7 @@
  * - Change status (draft -> published -> archived)
  */
 
+import ContentPolicyHelp from '@/components/content/ContentPolicyHelp';
 import { useState, useEffect, useCallback } from 'react';
 import {
   Plus,
@@ -220,10 +221,10 @@ export default function CMSContentList() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <FileText className="w-6 h-6" />
-              CMS Contents
+              콘텐츠 관리
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              Manage Hero and Notice content for all services
+              서비스에 게시할 공용 콘텐츠를 관리합니다.
             </p>
           </div>
           <button
@@ -231,9 +232,11 @@ export default function CMSContentList() {
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Content
+            콘텐츠 만들기
           </button>
         </div>
+
+        <ContentPolicyHelp context="content" />
 
         {/* Filters */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -333,7 +336,7 @@ export default function CMSContentList() {
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Content
+              콘텐츠 만들기
             </button>
           </div>
         </div>

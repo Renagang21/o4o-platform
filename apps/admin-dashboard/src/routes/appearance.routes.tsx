@@ -23,9 +23,6 @@ const LEGACY_MAIL_REDIRECT = '/settings/email';
 // Settings
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 
-// App Store
-const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
-
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -62,27 +59,6 @@ export function AppearanceRoutes() {
     } />,
     // 레거시 메일 관리 → 설정/이메일
     <Route key="/mail/*" path="/mail/*" element={<Navigate to={LEGACY_MAIL_REDIRECT} replace />} />,
-
-    // 앱 장터
-    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬
-    //   AppStore 화면은 `/api/v1/admin/apps*` 를 소비하고 그 경계는 `requireAdmin`
-    //   (= `platform:super_admin` 전용) 이다. `['admin']` 선언은 서비스 접두 역할까지
-    //   통과시켜(adminRouteAccess.matchesRequiredRole) 진입 후 403 을 받게 했다.
-    <Route key="/apps/store" path="/apps/store" element={
-      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <AppStorePage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    // 설치된 앱
-    <Route key="/admin/appstore/installed" path="/admin/appstore/installed" element={
-      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <AppStorePage defaultTab="installed" />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // 설정
     <Route key="/settings/*" path="/settings/*" element={

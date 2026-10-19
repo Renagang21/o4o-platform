@@ -21,8 +21,6 @@ import { Suspense, lazy } from 'react';
  *              /admin/marketing/operator/console
  */
 
-// Digital Signage Management (Phase 6)
-const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalSignageRouter'));
 
 // Store Content Pages (WO-O4O-STORE-CONTENT-UI)
 const StoreContentListPage = lazy(() => import('@/pages/store-content'));
@@ -57,21 +55,13 @@ const PageLoader = () => (
 );
 
 /**
- * digital signage · store content/POP/QR/tablet routes
+ * Store content/POP/QR/tablet routes
  *
  * (파일명은 역사적 이유로 `lms-marketing.routes` 를 유지한다. marketing publisher 콘솔은
  *  WO-O4O-ADMIN-LMS-MARKETING-CONSOLE-RETIREMENT-V1 에서 제거됐다.)
  */
 export function LmsMarketingRoutes() {
   return [
-    // Digital Signage Management (Phase 6)
-    <Route key="/admin/digital-signage/*" path="/admin/digital-signage/*" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <DigitalSignageRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Store Content (WO-O4O-STORE-CONTENT-UI)
     <Route key="/store-content/templates" path="/store-content/templates" element={

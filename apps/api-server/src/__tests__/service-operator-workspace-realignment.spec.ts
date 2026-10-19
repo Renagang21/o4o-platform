@@ -374,7 +374,8 @@ describe('Neture SPECIAL — 자체 도메인 IA 보존 (WO §7)', () => {
       'common',
     ]);
     const wrapper = code('services/web-neture/src/components/layouts/OperatorLayoutWrapper.tsx');
-    expect(wrapper).toContain('domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}');
+    // Neture-wide operators retain the IA; collaborator-only operators receive their narrow menu.
+    expect(wrapper).toContain('domainIAConfig={scopedOnly ? undefined : NETURE_OPERATOR_DOMAIN_IA}');
   });
 
   it('Neture 메뉴는 표준 IA 로 강제되지 않는다 (item domain override 없음 · 자체 config 로 전 항목 배치)', () => {

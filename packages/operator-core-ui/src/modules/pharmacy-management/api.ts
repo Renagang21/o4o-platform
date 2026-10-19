@@ -56,6 +56,15 @@ export interface SemiFranchise {
   community_key: string | null;
   activeMemberCount?: number;
   operators?: Array<{ userId: string; assignedAt: string }>;
+  /** 운영자 관리 화면에서 지정한 사업 한정 역할 — 조회 전용(여기서 해제하지 않는다). */
+  roleOperators?: Array<{
+    userId: string;
+    role: string;
+    name: string | null;
+    email: string | null;
+    /** Neture 메인 이용 자격 — active 가 아니면 역할이 있어도 사업 운영 경로를 쓸 수 없다. */
+    membershipStatus?: string;
+  }>;
 }
 
 export interface SemiFranchiseMembership {
@@ -73,7 +82,20 @@ export interface SemiFranchiseMembership {
   pharmacistLicenseNumber: string | null;
 }
 
+export interface SupplyProposalTerms {
+  version: 1;
+  baseShippingFee: number;
+  freeShippingThreshold: number | null;
+  minOrderAmount: number;
+}
+
 export interface SupplyProposal {
+  termsSnapshot?: SupplyProposalTerms | null;
+  decidedBy?: string | null;
+  decidedByName?: string | null;
+  endedBy?: string | null;
+  endedByName?: string | null;
+  endReason?: string | null;
   productSpecification?: string | null;
   productManufacturer?: string | null;
   productBarcode?: string | null;
@@ -262,6 +284,7 @@ export const neturePharmacySupplierApi = {
     targetOrganizationId?: string;
     unitPrice: number;
     note?: string;
+    terms?: Omit<SupplyProposalTerms, 'version'>;
   }) => send<{ id: string; status: string }>('post', '/neture/supplier/supply-proposals', input),
   endProposal: (id: string) => send('post', `/neture/supplier/supply-proposals/${enc(id)}/end`),
 

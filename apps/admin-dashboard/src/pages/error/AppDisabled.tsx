@@ -46,12 +46,6 @@ export default function AppDisabled() {
               대시보드로 돌아가기
             </Link>
 
-            <Link
-              to="/apps/store"
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              앱 장터에서 활성화하기
-            </Link>
           </div>
 
           {/* Help Text */}

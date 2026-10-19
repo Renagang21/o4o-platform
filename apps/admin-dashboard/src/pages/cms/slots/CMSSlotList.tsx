@@ -12,6 +12,7 @@
  * - Display lock status for contract-bound slots
  */
 
+import ContentPolicyHelp from '@/components/content/ContentPolicyHelp';
 import { useState, useEffect, useCallback } from 'react';
 import {
   Plus,
@@ -207,10 +208,10 @@ export default function CMSSlotList() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Layout className="w-6 h-6" />
-              CMS Slots
+              게시 위치
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              Manage content placement across services
+              콘텐츠가 표시될 위치와 연결을 관리합니다.
             </p>
           </div>
           <button
@@ -218,9 +219,11 @@ export default function CMSSlotList() {
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Slot
+            게시 위치 만들기
           </button>
         </div>
+
+        <ContentPolicyHelp context="placement" />
 
         {/* Filters */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -292,7 +295,7 @@ export default function CMSSlotList() {
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Slot
+              게시 위치 만들기
             </button>
           </div>
         </div>

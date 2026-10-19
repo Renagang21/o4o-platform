@@ -160,7 +160,7 @@ describe('A축 · 메뉴는 "설정 없음 = 허용" 에 기대지 않는다', (
   it('platform 전용 백엔드를 소비하는 메뉴는 명시적으로 역할을 선언한다', () => {
     for (const menuId of [
       'core-users', 'core-operators', 'core-points',
-      'platform-hub', 'ops-metrics', 'appstore-browse',
+      'platform-hub', 'ops-metrics',
     ]) {
       expect(CFG).toContain(`menuId: '${menuId}'`);
     }

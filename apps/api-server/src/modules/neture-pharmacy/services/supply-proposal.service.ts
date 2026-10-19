@@ -11,6 +11,9 @@ import { NeturePharmacyError,
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
 
+import { resolveSupplierForUser } from '../../neture/middleware/supplier-context.resolver.js';
+import { proposalTerms } from './proposal-terms.js';
+
 export type ProposalAction = 'approve' | 'reject' | 'end';
 const PROPOSAL_TRANSITIONS: Record<ProposalAction, { from: string[]; to: string }> = {
   approve: { from: ['pending'], to: 'approved' },
@@ -27,6 +30,8 @@ const PROPOSAL_VIEW = `
   SELECT sp.id, sp.status, sp.unit_price AS "unitPrice", sp.note, sp.reason,
          sp.target_organization_id AS "targetOrganizationId", tgt.name AS "targetOrganizationName",
          sp.created_at AS "createdAt", sp.decided_at AS "decidedAt", sp.ended_at AS "endedAt",
+         sp.decided_by AS "decidedBy", sp.ended_by AS "endedBy", sp.end_reason AS "endReason", sp.terms_snapshot AS "termsSnapshot",
+         decision_actor.name AS "decidedByName", end_actor.name AS "endedByName",
          sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName",
          spo.id AS "offerId", spo.price_general AS "priceGeneral", pm.name AS "productName",
          spo.supplier_id AS "supplierId", COALESCE(so.name, ns.slug) AS "supplierName",
@@ -40,7 +45,9 @@ const PROPOSAL_VIEW = `
     JOIN product_masters pm ON pm.id = spo.master_id
     JOIN neture_suppliers ns ON ns.id = spo.supplier_id
     LEFT JOIN organizations so ON so.id = ns.organization_id
-    LEFT JOIN organizations tgt ON tgt.id = sp.target_organization_id`;
+    LEFT JOIN organizations tgt ON tgt.id = sp.target_organization_id
+    LEFT JOIN users decision_actor ON decision_actor.id = sp.decided_by
+    LEFT JOIN users end_actor ON end_actor.id = sp.ended_by`;
 
 export class SupplyProposalService {
   constructor(private readonly dataSource: DataSource) {}
@@ -48,15 +55,16 @@ export class SupplyProposalService {
   async supplierCreate(
     supplierId: string,
     userId: string,
-    input: { offerId?: string; semiFranchiseKey?: string; targetOrganizationId?: string | null; unitPrice?: number; note?: string | null },
+    input: { offerId?: string; semiFranchiseKey?: string; targetOrganizationId?: string | null; unitPrice?: number; note?: string | null; terms?: unknown },
   ) {
     const unitPrice = Number(input.unitPrice);
-    if (!Number.isInteger(unitPrice) || unitPrice <= 0) {
+    if (!Number.isInteger(unitPrice) || unitPrice <= 0 || unitPrice > 2147483647) {
       throw new NeturePharmacyError(400, 'INVALID_PRICE', '공급 가격은 0보다 큰 정수(원)여야 합니다.');
     }
     const [offer] = await this.dataSource.query(
-      `SELECT id, approval_status FROM supplier_product_offers
-        WHERE id = $1::uuid AND supplier_id = $2::uuid AND deleted_at IS NULL`,
+      `SELECT spo.id, spo.approval_status, ns.base_shipping_fee, ns.free_shipping_threshold
+         FROM supplier_product_offers spo JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+        WHERE spo.id = $1::uuid AND spo.supplier_id = $2::uuid AND spo.deleted_at IS NULL`,
       [input.offerId, supplierId],
     );
     if (!offer) throw new NeturePharmacyError(404, 'OFFER_NOT_FOUND', '공급 제품을 찾을 수 없습니다.');
@@ -77,10 +85,11 @@ export class SupplyProposalService {
       );
       if (!pharmacy) throw new NeturePharmacyError(400, 'INVALID_TARGET', '대상 약국을 찾을 수 없습니다.');
     }
+    const terms = proposalTerms(input.terms, { baseShippingFee: offer.base_shipping_fee, freeShippingThreshold: offer.free_shipping_threshold });
     const [row] = await this.dataSource.query(
-      `INSERT INTO supply_proposals (offer_id, semi_franchise_id, target_organization_id, unit_price, note, status, requested_by)
-       VALUES ($1, $2, $3, $4, $5, 'pending', $6) RETURNING id, status`,
-      [offer.id, sf.id, target, unitPrice, input.note?.trim()?.slice(0, 1000) || null, userId],
+      `INSERT INTO supply_proposals (offer_id, semi_franchise_id, target_organization_id, unit_price, note, status, requested_by, terms_snapshot)
+       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7::jsonb) RETURNING id, status`,
+      [offer.id, sf.id, target, unitPrice, input.note?.trim()?.slice(0, 1000) || null, userId, JSON.stringify(terms)],
     );
     return row;
   }
@@ -89,14 +98,14 @@ export class SupplyProposalService {
     return this.dataSource.query(`${PROPOSAL_VIEW} WHERE spo.supplier_id = $1::uuid ORDER BY sp.created_at DESC`, [supplierId]);
   }
 
-  async supplierEnd(supplierId: string, proposalId: string) {
+  async supplierEnd(supplierId: string, proposalId: string, userId: string) {
     const rows = rowsOf(await this.dataSource.query(
-      `UPDATE supply_proposals sp SET status = 'ended', ended_at = NOW(), updated_at = NOW()
+      `UPDATE supply_proposals sp SET status = 'ended', ended_at = NOW(), ended_by = $3::uuid, updated_at = NOW()
          FROM supplier_product_offers spo
         WHERE sp.id = $1::uuid AND spo.id = sp.offer_id AND spo.supplier_id = $2::uuid
           AND sp.status IN ('pending','approved')
       RETURNING sp.id, sp.status`,
-      [proposalId, supplierId],
+      [proposalId, supplierId, userId],
     ));
     if (!rows[0]) throw new NeturePharmacyError(404, 'PROPOSAL_NOT_FOUND', '종료할 수 있는 제안이 없습니다.');
     return rows[0];
@@ -113,16 +122,33 @@ export class SupplyProposalService {
   async operatorDecide(sf: SemiFranchiseRow, operatorId: string, proposalId: string, action: ProposalAction, reason?: string | null) {
     return this.dataSource.transaction(async (m) => {
       const [current] = await m.query(
-        `SELECT id, status FROM supply_proposals WHERE id = $1::uuid AND semi_franchise_id = $2 FOR UPDATE`,
+        `SELECT sp.id, sp.status, sp.requested_by,
+                spo.supplier_id, ns.organization_id AS supplier_organization_id
+           FROM supply_proposals sp JOIN supplier_product_offers spo ON spo.id = sp.offer_id
+           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          WHERE sp.id = $1::uuid AND sp.semi_franchise_id = $2 FOR UPDATE OF sp`,
         [proposalId, sf.id],
       );
       // 다른 세미프랜차이즈의 제안은 처리할 수 없다(존재도 드러내지 않음).
       if (!current) throw new NeturePharmacyError(404, 'PROPOSAL_NOT_FOUND', '제안을 찾을 수 없습니다.');
+      if (action === 'approve') {
+        // Use the canonical resolver, including its observable legacy fallback, rather than a second identity path.
+        const supplier = current.requested_by === operatorId ? null
+          : await resolveSupplierForUser(this.dataSource, operatorId, current.supplier_organization_id);
+        if (current.requested_by === operatorId || (supplier?.kind === 'resolved' && supplier.supplierId === current.supplier_id)) {
+          throw new NeturePharmacyError(403, 'SELF_APPROVAL_FORBIDDEN', '자신이 요청했거나 공급 업무를 담당하는 공급자의 제안은 승인할 수 없습니다.');
+        }
+      }
       const next = nextProposalStatus(current.status, action);
       if (!next) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);
       const [row] = rowsOf(await m.query(
         `UPDATE supply_proposals
-            SET status = $2::text, decided_by = $3, decided_at = NOW(), reason = $4,
+            SET status = $2::text,
+                decided_by = CASE WHEN $2::text = 'ended' THEN decided_by ELSE $3::uuid END,
+                decided_at = CASE WHEN $2::text = 'ended' THEN decided_at ELSE NOW() END,
+                reason = CASE WHEN $2::text = 'ended' THEN reason ELSE $4 END,
+                ended_by = CASE WHEN $2::text = 'ended' THEN $3::uuid ELSE ended_by END,
+                end_reason = CASE WHEN $2::text = 'ended' THEN $4 ELSE end_reason END,
                 ended_at = CASE WHEN $2::text = 'ended' THEN NOW() ELSE ended_at END, updated_at = NOW()
           WHERE id = $1 RETURNING id, status`,
         [proposalId, next, operatorId, reason?.trim()?.slice(0, 1000) || null],

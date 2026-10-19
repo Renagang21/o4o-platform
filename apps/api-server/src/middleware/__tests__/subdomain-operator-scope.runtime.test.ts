@@ -17,7 +17,7 @@ import type { RequestHandler } from 'express';
 import { requireSupplierScope } from '../supplier-service-scope.middleware.js';
 import { requireFundingScope } from '../funding-service-scope.middleware.js';
 import { requireCommunityServiceScope } from '../community-service-scope.middleware.js';
-import { requireNetureScope } from '../neture-scope.middleware.js';
+import { requireNetureBusinessScope, requireNetureScope } from '../neture-scope.middleware.js';
 
 type Persona = { roles: string[]; memberships: Array<[string, string]> };
 
@@ -191,5 +191,15 @@ describe('커뮤니티 조회 권한의 일반 회원 경계', () => {
     const persona: Persona = { roles, memberships: [['community', 'active']] };
     expect(await passes(requireCommunityServiceScope('community:operator') as RequestHandler, persona)).toBe(false);
     expect(await passes(requireCommunityServiceScope('community:admin') as RequestHandler, persona)).toBe(false);
+  });
+});
+
+
+describe('pharmacy collaborator scopes never become Neture-wide roles', () => {
+  it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => [`neture:${key}_admin`, `neture:${key}_operator`]))('%s only enters the business scope', async role => {
+    const p: Persona = { roles: [role], memberships: [['neture','active']] };
+    expect(await passes(requireNetureBusinessScope as RequestHandler, p)).toBe(true);
+    expect(await matrix(p)).toEqual(NONE);
+    expect(await passes(requireNetureBusinessScope as RequestHandler, { ...p, memberships: [['neture','suspended']] })).toBe(false);
   });
 });

@@ -1,3 +1,4 @@
+import { hasBusinessOperatorAccess } from '../../modules/neture-pharmacy/services/business-operator-access.js';
 import { readCommunityServiceMembership } from './community-service-membership.js';
 import { hasCommunityServiceOperator } from './community-service-operator-access.js';
 import { randomUUID } from 'node:crypto';
@@ -49,13 +50,9 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
     const access = byBusinessKey
       ? await resolveSemiFranchiseBusinessAccess(exec, user?.id, sf.key)
       : await resolveSemiFranchiseCommunityAccess(exec, user?.id, key);
-    const operators = eligible && sf.status === 'active' ? await exec.query(
-      `SELECT 1 FROM semi_franchise_operators sfo
-       JOIN role_assignments ra ON ra.user_id = sfo.user_id AND ra.is_active = true AND ra.role IN ('neture:operator','neture:admin')
-       WHERE sfo.semi_franchise_id = $1 AND sfo.user_id = $2 AND sfo.revoked_at IS NULL`, [sf.id, user!.id],
-    ) : [];
+    const canManage = !!user?.id && sf.status === 'active' && (access.operator === true || (eligible && await hasBusinessOperatorAccess(exec, user.id, sf.id)));
     return { communityKey: key, name: sf.name, kind: 'semi-franchise', businessKey: sf.key, allowed: access.allowed,
-      canManage: operators.length > 0, canJoin: false, membershipStatus: access.allowed ? 'active' : null, communityStatus: null,
+      canManage, canJoin: false, membershipStatus: access.allowed ? 'active' : null, communityStatus: null,
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
       forumStorageCodes: [`sf:${sf.id}`] };
   }

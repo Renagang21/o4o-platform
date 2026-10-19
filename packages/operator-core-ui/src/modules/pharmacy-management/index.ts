@@ -4,3 +4,4 @@ export { default as OperatorSemiFranchisePage } from './OperatorSemiFranchisePag
 export { default as SemiFranchiseContentFormPage } from './SemiFranchiseContentFormPage';
 export { default as AdminSemiFranchisePage } from './AdminSemiFranchisePage';
 export { default as AdminPharmacyServiceSettingsPage } from './AdminPharmacyServiceSettingsPage';
+export { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';

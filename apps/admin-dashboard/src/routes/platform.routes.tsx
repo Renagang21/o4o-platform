@@ -1,3 +1,4 @@
+import AdminCooperationBusinessesPage from '@/pages/platform/AdminCooperationBusinessesPage';
 import PlatformAdminLandingPage from '@/pages/platform/account-governance/PlatformAdminLandingPage';
 import PlatformSectionLayout from '@/pages/platform/account-governance/PlatformSectionLayout';
 import PlatformAccountsPage from '@/pages/platform/account-governance/PlatformAccountsPage';
@@ -5,7 +6,7 @@ import PlatformServicesPage from '@/pages/platform/account-governance/PlatformSe
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
 import PlatformRolesPage from '@/pages/platform/account-governance/PlatformRolesPage';
 import ServiceAudiencePolicyPage from '@/pages/platform/account-governance/ServiceAudiencePolicyPage';
-import { AdminSemiFranchisePage, AdminPharmacyServiceSettingsPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import { AdminPharmacyServiceSettingsPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
 configurePharmacyManagementClient(api);
 import { Route } from 'react-router-dom';
@@ -18,11 +19,6 @@ import { Suspense, lazy } from 'react';
 
 // Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
 const PlatformHubPage = lazy(() => import('@/pages/platform/PlatformHubPage'));
-
-// 자동화 › 동영상 제작 작업공간 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
-//   backend /api/v1/platform/automation-jobs — platform admin 전용(Media V2 관리 API 와 같은 guard).
-const VideoJobsPage = lazy(() => import('@/pages/automation/VideoJobsPage'));
-const VideoJobDetailPage = lazy(() => import('@/pages/automation/VideoJobDetailPage'));
 
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
 //   /admin/dashboard/operations (pages/dashboard/phase2.4) 는 하드코딩 통계·가짜 알림만
@@ -77,7 +73,7 @@ export function PlatformRoutes() {
       <Route path="service-audience" element={<ServiceAudiencePolicyPage />} />
     </Route>,
     <Route key="/admin/settings/service-audience" path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />,
-    <Route key="/admin/semi-franchises" path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />,
+    <Route key="/admin/semi-franchises" path="/admin/semi-franchises" element={<AdminCooperationBusinessesPage />} />,
     <Route key="/admin/pharmacy-service-settings" path="/admin/pharmacy-service-settings" element={<AdminPharmacyServiceSettingsPage />} />,
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역
     //
@@ -122,21 +118,6 @@ export function PlatformRoutes() {
     //   `/api/v1/platform/hub/*` 는 `requireAuth + requirePlatformAdmin`(= `isPlatformAdmin`,
     //   `platform:super_admin` 전용) 이다. `['admin']` 선언은 서비스 접두 역할까지 통과시켜
     //   (adminRouteAccess.matchesRequiredRole) 진입 후 403 을 받게 했다.
-    // 자동화 › 동영상 제작 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
-    <Route key="/automation/video-jobs" path="/automation/video-jobs" element={
-      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <VideoJobsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/automation/video-jobs/:id" path="/automation/video-jobs/:id" element={
-      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <VideoJobDetailPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     <Route key="/admin/platform/hub" path="/admin/platform/hub" element={
       <AdminProtectedRoute requiredRoles={['platform:super_admin']}>

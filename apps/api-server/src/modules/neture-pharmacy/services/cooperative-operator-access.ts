@@ -8,7 +8,7 @@ export async function hasCooperativeOperatorAccess(
 ): Promise<boolean> {
   const [role] = await exec.query(
     `SELECT 1 FROM role_assignments WHERE user_id=$1
-    AND role IN ('neture:operator','neture:admin') AND is_active=true
+    AND role IN ('neture:operator','neture:admin','neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true
     AND (valid_from IS NULL OR valid_from <= CURRENT_TIMESTAMP)
     AND (valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP) LIMIT 1`,
     [userId],

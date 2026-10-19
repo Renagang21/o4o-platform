@@ -39,6 +39,12 @@ function Conditions({ o }: { o: SupplyOption }) {
   if (o.perStoreLimit != null) parts.push(`매장당 ${o.perStoreLimit}개`);
   if (o.perOrderLimit != null) parts.push(`1회 ${o.perOrderLimit}개`);
   if (o.targetOrganizationId) parts.push('내 약국 대상 제안');
+  if (o.termsSnapshot) {
+    const t = o.termsSnapshot;
+    parts.push(`배송비 ${formatWon(t.baseShippingFee)}`);
+    parts.push(t.freeShippingThreshold === null ? '무료배송 기준 없음' : `${formatWon(t.freeShippingThreshold)} 이상 무료배송`);
+    parts.push(`최소 주문 ${formatWon(t.minOrderAmount)} (동일 협업체·조건 합계)`);
+  } else if (o.kind === 'proposal') parts.push('기존 제안 · 공급자 공통 배송정책 적용');
   return (
     <div className="text-xs text-gray-600">
       {o.note && <p className="whitespace-pre-line">{o.note}</p>}
@@ -146,8 +152,9 @@ export default function SupplyOptionsPage() {
         </div>
       ) : (
         <>
+          <p className="text-xs text-gray-500 md:hidden">표를 좌우로 밀어 공급조건과 담기 버튼을 확인하세요.</p>
           <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table className="w-full text-sm">
+            <table className="min-w-[800px] w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-600">
                   <th className="px-4 py-3 font-medium">제품</th>

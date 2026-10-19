@@ -62,6 +62,7 @@ import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791
 import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 import { AlignSellerRecruitmentApplicationIdentity1791477914134 } from '../migrations/1791477914134-AlignSellerRecruitmentApplicationIdentity.js';
 
+
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
   /**
@@ -98,6 +99,9 @@ import { AddSupplierBusinessContentRequests1792215000000 } from '../migrations/1
 
 import { CreateCooperativeMemberships1792216000000 } from '../migrations/1792216000000-CreateCooperativeMemberships.js';
 
+import { AddSupplierProposalTerms1792221000000 } from '../migrations/1792221000000-AddSupplierProposalTerms.js';
+import { CreateCooperativeManagement1792300000000 } from '../migrations/1792300000000-CreateCooperativeManagement.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -132,6 +136,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddFundingOfflineState1792212000000,
   AddSupplierBusinessContentRequests1792215000000,
   CreateCooperativeMemberships1792216000000,
+  AddSupplierProposalTerms1792221000000,
+  CreateCooperativeManagement1792300000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

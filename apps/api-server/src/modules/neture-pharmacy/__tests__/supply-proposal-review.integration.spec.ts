@@ -9,12 +9,13 @@ local('Supply proposal review information — isolated real PostgreSQL', () => {
   const supplier = randomUUID(), otherSupplier = randomUUID(), care = randomUUID(), other = randomUUID(), offer = randomUUID(), master = randomUUID(), proposal = randomUUID();
   beforeAll(async () => {
     fixture = await createCarePharmReviewDb(); service = new SupplyProposalService(fixture.ds);
-    await fixture.ds.query(`CREATE TABLE organizations(id uuid, name text);
+    await fixture.ds.query(`CREATE TABLE users(id uuid, name text);
+      CREATE TABLE organizations(id uuid, name text);
       CREATE TABLE neture_suppliers(id uuid, slug text, organization_id uuid, base_shipping_fee integer, free_shipping_threshold integer);
       CREATE TABLE product_masters(id uuid, name text, specification text, manufacturer_name text, barcode text);
       CREATE TABLE supplier_product_offers(id uuid, master_id uuid, supplier_id uuid, price_general integer, business_short_description text, business_detail_description text);
       CREATE TABLE semi_franchises(id uuid, key text, name text);
-      CREATE TABLE supply_proposals(id uuid, offer_id uuid, semi_franchise_id uuid, target_organization_id uuid, status text, unit_price integer, note text, reason text, created_at timestamp DEFAULT now(), decided_at timestamp, ended_at timestamp);`);
+      CREATE TABLE supply_proposals(id uuid, offer_id uuid, semi_franchise_id uuid, target_organization_id uuid, status text, unit_price integer, note text, reason text, created_at timestamp DEFAULT now(), decided_at timestamp, ended_at timestamp, decided_by uuid, ended_by uuid, end_reason text, terms_snapshot jsonb);`);
     await fixture.ds.query("INSERT INTO neture_suppliers VALUES ($1,'synthetic-supplier',null,3000,50000),($2,'another',null,0,0)", [supplier,otherSupplier]);
     await fixture.ds.query("INSERT INTO product_masters VALUES ($1,'Synthetic product','30 units','Synthetic manufacturer','SYNTHETIC')", [master]);
     await fixture.ds.query("INSERT INTO supplier_product_offers VALUES ($1,$2,$3,12000,'B2B summary','<p>B2B details</p>')", [offer,master,supplier]);
