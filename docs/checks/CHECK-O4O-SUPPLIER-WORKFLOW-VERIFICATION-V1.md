@@ -34,7 +34,7 @@
 ## 3. 이번 실행 결과
 
 - Node 22.18.0/pnpm 10.25.0, frozen/offline install. 의존성·lockfile 변경 없음.
-- PostgreSQL 15, loopback 전용 port 5548, 이번 작업이 만든 별도 DB만 사용. 표준 `src/migrate.ts`가 bootstrap과 incremental 34개를 적용하고 지문 `2fe675793e6f86734ed83e4317047f7b2548e02c1fea92ae39bba083f8a8f644` / 6741 lines post-assertion PASS.
+- PostgreSQL 15, loopback 전용 port 5548, 이번 작업이 만든 별도 DB만 사용. 초기 표준 `src/migrate.ts` 실행은 bootstrap과 incremental 34개를 적용하고 지문 `2fe675793e6f86734ed83e4317047f7b2548e02c1fea92ae39bba083f8a8f644` / 6741 lines post-assertion PASS.
 - 새 DB의 API 관련 7 suites/133 tests PASS, skipped 0. 실제 PostgreSQL은 commerce 26 + 제안 조건 17 + 운영자 제품 상세 2 + 콘텐츠 요청 12 = 57개. Supplier 경계 41 + 규칙 21 + 조건 단위 14 = 76개.
 - PostgreSQL의 주문/결제 테스트는 SQL order creator와 test-mode bridger를 사용하는 서비스 통합 테스트다. 실제 결제 게이트웨이·운영 결제를 실행하지 않았다.
 - 공유 pharmacy-management UI 6 files/47 tests PASS. 최신 main의 공통 운영자 변경까지 포함한 현재 실행 수치다.
@@ -62,3 +62,10 @@
 초안 영구 저장은 이번 미구현 결함으로 판정하지 않았다. 공급자 종료 사유 입력은 2026-10-19 사용자 결정에 따라 불필요하며 후속 정비 항목에서 제외한다. 대상 약국 active 가입 추가 검사·결제 직전 재검증은 사용자 제외 정책을 유지한다.
 
 최종 정리: 임시 schema 잔존 0 확인, 이번 격리 DB 두 개 삭제 후 잔존 0 확인, 로컬 PostgreSQL 종료. 다른 작업공간/DB/프로세스는 변경하지 않았다.
+
+
+## 6. 최신 main 통합 후 재검증
+
+main `40c8f9d6e0`에 협동조합 역할 관리 PR #713이 반영되어, 별도 새 DB에서 bootstrap과 incremental 35개를 다시 실행했다. 새 기대 지문 `63a1eff0d73093a57fc459f064d3e883b7b6a9c4de5b41b8c4768aa154ec6e3f` / 6774 lines의 post-assertion PASS, 공급자 관련 7 suites/133 tests PASS를 확인했다. 폐기된 커뮤니티 주소는 과거 개별 가입 후와 현재 서비스 가입 후 모두 null임을 직접 검증한다.
+
+새 협동조합 migration은 다른 PR의 main 변경이다. 이번 PR 자체는 통합 테스트와 문서만 변경하며 운영 서비스 소스·schema 변경은 없다. 다른 작업의 운영 migration 승인을 이번 검증으로 대신하거나 promote를 실행하지 않는다. 인증된 운영 업무 검증의 기존 BLOCKED는 유지한다.
