@@ -138,6 +138,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
+  router.get('/admin/cooperative-federation', ...admin, handle(async (_req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    return cooperatives.federationForAdmin();
+  }));
   const org = (req: Req) => req.organizationId as string;
 
   const documents = new BusinessRegistrationDocumentService(dataSource);
