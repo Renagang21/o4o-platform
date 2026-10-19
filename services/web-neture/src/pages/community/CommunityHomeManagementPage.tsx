@@ -21,11 +21,46 @@ const blank = (kind: EditorialKind): Partial<HomeItem> => ({
 const errorText = (error: unknown) =>
   (error as { response?: { data?: { error?: string } } }).response?.data
     ?.error || "저장하지 못했습니다. 다시 시도해 주세요.";
+function ManagementPagination({
+  page,
+  hasNext,
+  busy,
+  onPage,
+}: {
+  page: number;
+  hasNext: boolean;
+  busy: boolean;
+  onPage: (page: number) => void;
+}) {
+  return (
+    <nav aria-label="관리 목록 페이지" className="mt-4 flex items-center gap-4">
+      <button
+        type="button"
+        disabled={busy || page === 1}
+        onClick={() => onPage(page - 1)}
+        className="min-h-11 disabled:opacity-40"
+      >
+        이전 항목
+      </button>
+      <span>{page}페이지</span>
+      <button
+        type="button"
+        disabled={busy || !hasNext}
+        onClick={() => onPage(page + 1)}
+        className="min-h-11 disabled:opacity-40"
+      >
+        다음 항목
+      </button>
+    </nav>
+  );
+}
 export default function CommunityHomeManagementPage() {
   const [kind, setKind] = useState<EditorialKind | "forum">("notice"),
     [items, setItems] = useState<HomeItem[]>([]),
     [page, setPage] = useState(1),
     [hasNext, setHasNext] = useState(false),
+    [forumInput, setForumInput] = useState(""),
+    [forumSearch, setForumSearch] = useState(""),
     [forum, setForum] = useState<HomePreview | null>(null),
     [form, setForm] = useState<Partial<HomeItem>>(blank("notice")),
     [id, setId] = useState<string | null>(null),
@@ -44,8 +79,11 @@ export default function CommunityHomeManagementPage() {
     if (kind !== "forum") setForm(blank(kind));
     const request =
       kind === "forum"
-        ? homeApi.forum().then((data) => {
-            if (active) setForum(data);
+        ? homeApi.forum(page, forumSearch).then((data) => {
+            if (active) {
+              setForum(data);
+              setHasNext(data.hasNext);
+            }
           })
         : homeApi.manage(kind, page).then((data) => {
             if (active) {
@@ -63,7 +101,7 @@ export default function CommunityHomeManagementPage() {
     return () => {
       active = false;
     };
-  }, [kind, version, page]);
+  }, [kind, version, page, forumSearch]);
   const save = async () => {
     setBusy(true);
     setError("");
@@ -139,31 +177,23 @@ export default function CommunityHomeManagementPage() {
         <section className="rounded-xl border bg-white p-5">
           <h2 className="font-semibold">포럼 상시 노출 지정</h2>
           <p className="my-3 text-sm">
-            최근 글을 선택하거나 글 ID로 지정합니다. 공개 범위는 기존
-            게시판·공개 설정을 따릅니다.
+            게시글 제목을 검색하거나 목록에서 선택해 상시 노출을 지정합니다.
+            공개 범위는 기존 게시판·공개 설정을 따릅니다.
           </p>
           <form
             className="mb-4 flex flex-wrap gap-3"
-            onSubmit={async (e) => {
+            onSubmit={(e) => {
               e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              setBusy(true);
-              setError("");
-              try {
-                await homeApi.pinForum(String(data.get("postId")), true);
-                setVersion((v) => v + 1);
-              } catch (err) {
-                setError(errorText(err));
-              } finally {
-                setBusy(false);
-              }
+              setPage(1);
+              setForumSearch(forumInput.trim());
             }}
           >
             <label>
-              게시글 ID{" "}
+              게시글 제목 검색{" "}
               <input
-                required
-                name="postId"
+                maxLength={200}
+                value={forumInput}
+                onChange={(e) => setForumInput(e.target.value)}
                 className="max-w-full rounded border p-2"
               />
             </label>
@@ -171,7 +201,7 @@ export default function CommunityHomeManagementPage() {
               disabled={busy}
               className="rounded bg-emerald-700 px-3 py-2 text-white"
             >
-              상시 노출 지정
+              검색
             </button>
           </form>
           {[...(forum?.pinned ?? []), ...(forum?.recent ?? [])].map((item) => (
@@ -179,7 +209,16 @@ export default function CommunityHomeManagementPage() {
               key={item.id}
               className="flex items-center justify-between gap-3 border-t py-3"
             >
-              <span className="break-all">{item.title}</span>
+              {item.slug ? (
+                <Link
+                  to={`/communities/community/forum/post/${encodeURIComponent(item.slug)}`}
+                  className="break-all text-emerald-700"
+                >
+                  {item.title}
+                </Link>
+              ) : (
+                <span className="break-all">{item.title}</span>
+              )}
               <button
                 disabled={busy}
                 onClick={() => pin(item)}
@@ -189,6 +228,12 @@ export default function CommunityHomeManagementPage() {
               </button>
             </div>
           ))}
+          <ManagementPagination
+            page={page}
+            hasNext={hasNext}
+            busy={busy}
+            onPage={setPage}
+          />
         </section>
       )}
       {!loading && kind !== "forum" && (
@@ -222,28 +267,12 @@ export default function CommunityHomeManagementPage() {
                 </span>
               </button>
             ))}
-            <nav
-              aria-label="관리 목록 페이지"
-              className="mt-4 flex items-center gap-4"
-            >
-              <button
-                type="button"
-                disabled={busy || page === 1}
-                onClick={() => setPage((n) => n - 1)}
-                className="min-h-11 disabled:opacity-40"
-              >
-                이전 항목
-              </button>
-              <span>{page}페이지</span>
-              <button
-                type="button"
-                disabled={busy || !hasNext}
-                onClick={() => setPage((n) => n + 1)}
-                className="min-h-11 disabled:opacity-40"
-              >
-                다음 항목
-              </button>
-            </nav>
+            <ManagementPagination
+              page={page}
+              hasNext={hasNext}
+              busy={busy}
+              onPage={setPage}
+            />
           </section>
           <form
             onSubmit={(e) => {

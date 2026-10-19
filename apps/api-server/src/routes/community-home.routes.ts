@@ -121,7 +121,8 @@ export function createCommunityHomeRoutes(
       return managedHomeForum(
         AppDataSource,
         req.user!.id,
-        await resolveUser(req),
+        pageOf(req.query.page),
+        req.query.q ?? "",
       );
     }),
   );

@@ -79,9 +79,12 @@ export const homeApi = {
     id
       ? api.put(`/communities/community/management/home-items/${id}`, item)
       : api.post("/communities/community/management/home-items", item),
-  forum: async () =>
-    (await api.get("/communities/community/management/home-forum")).data
-      .data as HomePreview,
+  forum: async (page = 1, q = "") =>
+    (
+      await api.get("/communities/community/management/home-forum", {
+        params: { page, q },
+      })
+    ).data.data as HomePreview & { hasNext: boolean; page: number },
   pinForum: async (id: string, isPinned: boolean) =>
     api.patch(`/communities/community/management/home-forum/${id}`, {
       isPinned,

@@ -38,8 +38,8 @@
 
 ## 코드·문서 검증 결과
 
-- 커뮤니티 API 4 suites / 56 tests PASS(격리 PostgreSQL 9 tests 포함). CMS·공개 노출·slot·변경 scope·presentation 회귀 5 suites / 108 tests PASS.
-- web-neture 전체 131 files / 1155 tests PASS(뉴스 본문 입력 제외 테스트 포함).
+- 커뮤니티 API 4 suites / 58 tests PASS(격리 PostgreSQL 11 tests 포함). CMS·공개 노출·slot·변경 scope·presentation 회귀 5 suites / 108 tests PASS.
+- web-neture 전체 131 files / 1156 tests PASS(뉴스 본문 입력 제외 테스트 포함).
 - API type-check 및 API tsup build PASS, web-neture TypeScript + Vite production build PASS(기존 chunk 크기 경고).
 - PC 1440px / 모바일 390px: 공지·뉴스 같은 행/모바일 순차, 포럼→콘텐츠→자료실, 가로 넘침 없음. Operator 진입·목록 페이지 왕복·폼 작성·상시 노출·공개 선택·저장 요청·성공 표시 PASS. 브라우저 응답은 격리 fixture이며 실제 운영 계정 검증과 구분한다.
 - 로컬 ESLint 및 SonarJS recommended/cognitive complexity 15 검사 PASS. 억제 주석·기준 완화 없음.
@@ -61,3 +61,7 @@
 공통 CMS 예약 조건식은 기존 `c.`/`cms.` 접두사 소비자와 호환되도록 단일 컬럼 참조 및 `IN (...) IS NOT TRUE`를 사용한다. section 누락/JSON null·일반 항목 포함, 두 예약 종류 제외, metadata 컬럼이 함께 있는 JOIN의 별칭 조회를 PostgreSQL에서 검증한다.
 
 별칭 호환 보완 후 커뮤니티·CMS 통합 9 suites / 164 tests PASS(격리 PostgreSQL 9 tests 포함). API type-check·tsup build·ESLint·SonarJS·docs 검사 PASS.
+
+홈·공개 목록 미리보기에서는 body를 조회하지 않고 상세·관리 편집에서만 조회한다. 실제 PostgreSQL로 body 미반환/상세 유지 검증 PASS. 포럼 지정은 ID 입력을 제거하고 제목 검색·20개 단위 페이지·선택 버튼으로 제공한다. 지정 목록은 현재 게시된 제목을 조회하고 설정 원장에는 일반 설정명만 저장하여 원문 제목을 복제하지 않는다. 비게시/삭제/이동 글은 일반 안내로 표시하고 지정 해제할 수 있다. 25개 글의 두 번째 페이지·검색·제목 갱신·초안 전환과 공개 미노출 검증 PASS.
+
+추가 검증: 커뮤니티·CMS 9 suites / 166 tests PASS(격리 PostgreSQL 11 tests), 웹 131 files / 1156 tests PASS, API·웹 build/type-check, ESLint/SonarJS PASS. PC/모바일 브라우저에서 운영 목록 페이지 왕복·저장·포럼 제목 검색·상시 지정 PASS(page errors/가로 넘침 0).

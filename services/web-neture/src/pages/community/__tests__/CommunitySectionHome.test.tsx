@@ -185,4 +185,31 @@ describe("community section home", () => {
       "이전 공지",
     );
   });
+  it("searches forum titles and pins a selected result without technical IDs", async () => {
+    api.manage.mockResolvedValue({ items: [], hasNext: false, page: 1 });
+    api.forum.mockResolvedValue({
+      pinned: [],
+      recent: [{ ...item("old-post", "지난 포럼 글"), slug: "old-post" }],
+      hasNext: false,
+      page: 1,
+    });
+    api.pinForum.mockResolvedValue({});
+    mount(<Management />);
+    await screen.findByText("등록된 항목이 없습니다.");
+    fireEvent.click(screen.getByRole("button", { name: "포럼", exact: true }));
+    await screen.findByLabelText("게시글 제목 검색");
+    expect(screen.queryByLabelText("게시글 ID")).toBeNull();
+    fireEvent.change(screen.getByLabelText("게시글 제목 검색"), {
+      target: { value: "지난" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "검색", exact: true }));
+    await waitFor(() => expect(api.forum).toHaveBeenLastCalledWith(1, "지난"));
+    await screen.findByText("지난 포럼 글");
+    fireEvent.click(
+      screen.getByRole("button", { name: "상시 노출", exact: true }),
+    );
+    await waitFor(() =>
+      expect(api.pinForum).toHaveBeenCalledWith("old-post", true),
+    );
+  });
 });

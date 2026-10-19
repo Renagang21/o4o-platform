@@ -20,7 +20,7 @@ const TYPES: Record<HomeKind, string> = {
 };
 const UUID = /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 const SCOPE = `"serviceKey"='community' AND "organizationId" IS NULL AND metadata->>'section'='${EDITORIAL_SECTION}'`;
-const COLUMNS = `id,title,summary,body,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience`;
+const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience`;
 const fail = (status: number, code: string, message: string): never => {
   throw new CommunityManagementError(status, code, message);
 };
@@ -139,7 +139,7 @@ export async function getEditorial(
   homeUuid(id);
   const w = await access(db, user);
   const [item] = await db.query(
-    `SELECT ${COLUMNS} FROM cms_contents WHERE ${SCOPE} AND ${eligible} AND ${visibility} AND id=$2`,
+    `SELECT ${COLUMNS},body FROM cms_contents WHERE ${SCOPE} AND ${eligible} AND ${visibility} AND id=$2`,
     [w.allowed, id],
   );
   if (!item)
@@ -204,7 +204,7 @@ export async function managedHomeItems(
 ) {
   await requireCommunityManager(db, actor);
   const rows = await db.query(
-    `SELECT ${COLUMNS} FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
+    `SELECT ${COLUMNS},body FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
       ORDER BY "isPinned" DESC,"sortOrder","createdAt" DESC,id LIMIT 21 OFFSET $2`,
     [kind, (page - 1) * 20],
   );
@@ -289,17 +289,35 @@ export async function saveEditorial(
 export async function managedHomeForum(
   db: Exec,
   actor: string,
-  user: CommunityAccessUser | null,
+  page = 1,
+  search: unknown = "",
 ) {
   await requireCommunityManager(db, actor);
+  if (typeof search !== "string" || search.length > 200)
+    fail(400, "INVALID_HOME_SEARCH", "검색어는 200자 이내로 입력해 주세요.");
   const pinned =
-    await db.query(`SELECT metadata->>'postId' AS id,title,true AS "isPinned","createdAt" FROM cms_contents
-    WHERE ${SCOPE} AND metadata->>'kind'='forum-pin' AND status='published' ORDER BY "createdAt",id`);
-  const preview = await homeForumItems(db, user);
+    await db.query(`SELECT h.metadata->>'postId' AS id,COALESCE(p.title,'표시할 수 없는 게시글') AS title,
+    p.slug,true AS "isPinned",h."createdAt" FROM
+    (SELECT metadata,"createdAt",id FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'='forum-pin' AND status='published') h
+    LEFT JOIN forum_post p ON p.id::text=h.metadata->>'postId' AND p.status='publish' AND p.organization_id IS NULL AND p.is_organization_exclusive=false
+      AND p.forum_id IN(SELECT id FROM forum_category_requests WHERE service_code='community' AND organization_id IS NULL)
+    ORDER BY h."createdAt",h.id`);
+  const rows = await db.query(
+    `SELECT p.id,p.slug,p.title,p.excerpt AS summary,false AS "isPinned",p.created_at AS "createdAt"
+    FROM forum_post p JOIN forum_category_requests b ON b.id=p.forum_id
+    WHERE b.service_code='community' AND b.organization_id IS NULL AND b.status='completed'
+      AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.status='publish' AND p.title ILIKE $1
+    ORDER BY p.created_at DESC,p.id LIMIT 21 OFFSET $2`,
+    ["%" + String(search).trim() + "%", (page - 1) * 20],
+  );
   const ids = new Set(pinned.map((item: { id: string }) => item.id));
   return {
     pinned,
-    recent: preview.recent.filter((item: { id: string }) => !ids.has(item.id)),
+    recent: rows
+      .slice(0, 20)
+      .filter((item: { id: string }) => !ids.has(item.id)),
+    hasNext: rows.length > 20,
+    page,
   };
 }
 export async function pinHomeForum(
@@ -346,14 +364,14 @@ export async function pinHomeForum(
     if (existing.length) {
       await db.query(
         `UPDATE cms_contents SET status='published',title=$2,"updatedAt"=NOW() WHERE ${selection} AND id=$1`,
-        [existing[0].id, post.title],
+        [existing[0].id, "포럼 상시노출 설정"],
       );
     } else {
       await db.query(
         `INSERT INTO cms_contents ("serviceKey",type,title,status,metadata,"createdBy","authorRole","visibilityScope")
         VALUES('community','featured',$1,'published',$2::jsonb,$3,'service_admin','service')`,
         [
-          post.title,
+          "포럼 상시노출 설정",
           JSON.stringify({
             section: EDITORIAL_SECTION,
             kind: "forum-pin",

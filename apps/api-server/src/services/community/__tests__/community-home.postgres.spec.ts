@@ -344,6 +344,53 @@ run("community home PostgreSQL visibility and persistence", () => {
     ).toEqual([a]);
     expect((await communityHome(db, user)).forum.pinned).toHaveLength(2);
   });
+  it("excludes full bodies from previews while preserving detail and editing", async () => {
+    const saved = await save(data({ body: "Detail body", isPinned: true }));
+    expect(
+      (await communityHome(db, null)).content.pinned[0],
+    ).not.toHaveProperty("body");
+    expect(
+      (await listEditorial(db, null, "content")).items[0],
+    ).not.toHaveProperty("body");
+    expect((await getEditorial(db, null, saved.id)).body).toBe("Detail body");
+    expect((await managedHomeItems(db, actor, "content")).items[0].body).toBe(
+      "Detail body",
+    );
+  });
+  it("lets managers search and page older forum posts by title", async () => {
+    const id = await board();
+    for (let i = 0; i < 25; i++) await post(id, `Forum title ${i}`);
+    expect((await managedHomeForum(db, actor, 1)).hasNext).toBe(true);
+    expect((await managedHomeForum(db, actor, 2)).recent).toHaveLength(5);
+    const match = await managedHomeForum(db, actor, 1, "title 24");
+    expect(match.recent).toHaveLength(1);
+    await db.transaction((m) =>
+      pinHomeForum(m, actor, match.recent[0].id, true),
+    );
+    await db.query("UPDATE forum_post SET title=$2 WHERE id=$1", [
+      match.recent[0].id,
+      "Changed title",
+    ]);
+    expect((await managedHomeForum(db, actor)).pinned[0].title).toBe(
+      "Changed title",
+    );
+    await db.query(
+      "UPDATE forum_post SET status='draft',title='Private draft' WHERE id=$1",
+      [match.recent[0].id],
+    );
+    expect((await managedHomeForum(db, actor)).pinned[0].title).toBe(
+      "표시할 수 없는 게시글",
+    );
+    expect((await communityHome(db, user)).forum.pinned).toEqual([]);
+
+    expect(
+      (
+        await db.query(
+          `SELECT title FROM cms_contents WHERE metadata->>'kind'='forum-pin'`,
+        )
+      )[0].title,
+    ).toBe("포럼 상시노출 설정");
+  });
   it("persists forum pins with scope and two-slot restriction", async () => {
     const open = await board();
     const ids = [];
@@ -368,9 +415,9 @@ run("community home PostgreSQL visibility and persistence", () => {
       [open],
     );
     expect((await communityHome(db, user)).forum.pinned).toEqual([]);
-    expect((await managedHomeForum(db, actor, user)).pinned).toHaveLength(2);
+    expect((await managedHomeForum(db, actor)).pinned).toHaveLength(2);
     await db.transaction((m) => pinHomeForum(m, actor, ids[1], false));
-    expect((await managedHomeForum(db, actor, user)).pinned).toHaveLength(1);
+    expect((await managedHomeForum(db, actor)).pinned).toHaveLength(1);
     const foreign = await post(
       await board("open", "completed", "neture"),
       "Foreign",
