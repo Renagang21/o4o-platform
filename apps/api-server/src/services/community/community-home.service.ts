@@ -73,6 +73,12 @@ export function parseEditorial(input: Record<string, unknown>) {
     summary = text("summary", 1000),
     linkUrl = text("linkUrl", 500);
   validateEditorialLink(kind, linkUrl);
+  if (kind === "news" && body)
+    fail(
+      400,
+      "NEWS_LINK_ONLY",
+      "뉴스는 본문 복제 없이 제목·요약·원문 링크로 등록해 주세요.",
+    );
   const status = input.status ?? "draft",
     audience = input.audience ?? "members";
   if (

@@ -241,16 +241,18 @@ export default function CommunityHomeManagementPage() {
                 className="mt-1 w-full rounded border p-2"
               />
             </label>
-            <label className="block">
-              본문
-              <textarea
-                rows={7}
-                maxLength={50000}
-                value={form.body ?? ""}
-                onChange={(e) => update("body", e.target.value)}
-                className="mt-1 w-full rounded border p-2"
-              />
-            </label>
+            {kind !== "news" && (
+              <label className="block">
+                본문
+                <textarea
+                  rows={7}
+                  maxLength={50000}
+                  value={form.body ?? ""}
+                  onChange={(e) => update("body", e.target.value)}
+                  className="mt-1 w-full rounded border p-2"
+                />
+              </label>
+            )}
             <label className="block">
               {kind === "news"
                 ? "약사공론 기사 원문 URL"

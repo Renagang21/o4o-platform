@@ -1,3 +1,5 @@
+import { ServiceHomeHero, ServiceHomePromotion } from "@o4o/shared-space-ui";
+import { api } from "../../lib/apiClient";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts";
@@ -170,6 +172,10 @@ export default function CommunityHostHomePage() {
           <HomeSection section="forum" data={data} />
           <HomeSection section="content" data={data} />
           <HomeSection section="resource" data={data} />
+          <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
+            <ServiceHomeHero surface="community" client={api} heading="h2" />
+            <ServiceHomePromotion surface="community" client={api} />
+          </aside>
           {!data.member && (
             <aside className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
               공개 항목을 둘러볼 수 있습니다. 회원 전용 자료와 글쓰기는{" "}

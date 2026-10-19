@@ -25,6 +25,7 @@ vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: {
   member: false, ...Object.fromEntries(['notice','news','forum','content','resource'].map(key=>[key,{pinned:[],recent:[]}]))
 } } })) } }));
 
+vi.mock('@o4o/shared-space-ui', async()=>({...await vi.importActual('@o4o/shared-space-ui'),ServiceHomeHero:()=>null,ServiceHomePromotion:()=>null}));
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
 import { getTrials } from '../../api/trial';

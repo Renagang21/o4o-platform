@@ -12,6 +12,7 @@
 - [x] 커뮤니티 전용 CMS 귀속·목록·상세·Operator 편집/게시·비공개·상시 노출 및 순서 관리.
 - [x] 포럼은 기존 게시글/공개 지정 경계를 재사용. 게시판 내부 고정과 첫 화면 지정을 분리하고, 예약 CMS forum-pin 행은 현재 Operator만 변경.
 - [x] 뉴스는 약사공론 HTTPS 원문 링크만 등록. 자동 수집/본문 복제 없음.
+- [x] Hero·광고는 주요 섹션 아래 보조 영역에 유지. 뉴스 본문 입력·저장을 차단.
 - [x] 로딩·실패·빈 목록 및 비로그인·승인 회원·운영자 경계 테스트.
 - [x] PC/모바일 브라우저·빌드·focused 테스트·문서 검증.
 - [ ] push·PR CI/리뷰·main 병합·API/웹 배포·공개 smoke 및 종료 기록.
@@ -37,7 +38,7 @@
 ## 코드·문서 검증 결과
 
 - 커뮤니티 API 4 suites / 55 tests PASS(격리 PostgreSQL 8 tests 포함). CMS·공개 노출·slot·변경 scope·presentation 회귀 5 suites / 108 tests PASS.
-- web-neture 전체 131 files / 1153 tests PASS. 이후 조건문 정리 focused 8 files / 41 tests PASS.
+- web-neture 전체 131 files / 1154 tests PASS(뉴스 본문 입력 제외 테스트 포함).
 - API type-check 및 API tsup build PASS, web-neture TypeScript + Vite production build PASS(기존 chunk 크기 경고).
 - PC 1440px / 모바일 390px: 공지·뉴스 같은 행/모바일 순차, 포럼→콘텐츠→자료실, 가로 넘침 없음. Operator 진입·폼 작성·상시 노출·공개 선택·저장 요청·성공 표시 PASS. 브라우저 응답은 격리 fixture이며 실제 운영 계정 검증과 구분한다.
 - 로컬 ESLint 및 SonarJS recommended/cognitive complexity 15 검사 PASS. 억제 주석·기준 완화 없음.
@@ -49,3 +50,7 @@
 ## 배포
 
 - DEPLOYMENT=REQUIRED(API·web-neture). CI 및 검토 후 main PR 병합, 현재 Delivery 정책으로 실행·서빙 결과 확인 예정.
+
+## PR 검토 보완
+
+[PR #711](https://github.com/Renagang21/o4o-platform/pull/711) 초기 자동 검토 3건을 반영했다: 게시판/작성자가 조작할 수 있는 isPinned와 첫 화면 상시 지정을 분리, 뉴스 본문 입력·저장 거부, 기존 Hero·광고의 주요 섹션 아래 공개 소비 유지. PostgreSQL에는 원장 격리·일반 고정 우회 차단·대문자 ID 정규화·비공개 보호·중지 후 해제 회귀를 포함했다. 최종 HEAD의 CI·재검토·배포 결과는 PR 기록에서 확인한다.

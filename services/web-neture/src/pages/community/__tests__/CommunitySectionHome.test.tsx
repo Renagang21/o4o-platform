@@ -20,6 +20,10 @@ vi.mock("../communityHomeApi", async () => ({
   ...(await vi.importActual("../communityHomeApi")),
   homeApi: api,
 }));
+vi.mock("@o4o/shared-space-ui", () => ({
+  ServiceHomeHero: () => <div data-testid="community-hero" />,
+  ServiceHomePromotion: () => <div data-testid="community-promotion" />,
+}));
 import Home from "../CommunityHostHomePage";
 import Management from "../CommunityHomeManagementPage";
 const item = (id: string, title = id) => ({
@@ -74,6 +78,8 @@ describe("community section home", () => {
     expect(screen.getByText("news-pin ↗").getAttribute("target")).toBe(
       "_blank",
     );
+    expect(screen.getByTestId("community-hero")).toBeTruthy();
+    expect(screen.getByTestId("community-promotion")).toBeTruthy();
     expect(screen.queryByText("게시판 만들기")).toBeNull();
     expect(screen.queryByText("가입 신청")).toBeNull();
   });
@@ -144,4 +150,12 @@ describe("community section home", () => {
     );
     expect(screen.queryByText("저장했습니다.")).toBeNull();
   });
+  it('news registration offers source link without article body input',async()=>{
+    api.manage.mockResolvedValue([]);mount(<Management/>);
+    await screen.findByText('등록된 항목이 없습니다.');
+    fireEvent.click(screen.getByRole('button',{name:'약사공론 뉴스'}));
+    await screen.findByLabelText('약사공론 기사 원문 URL');
+    expect(screen.queryByLabelText('본문')).toBeNull();
+  });
+
 });
