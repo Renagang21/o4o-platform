@@ -65,3 +65,5 @@
 홈·공개 목록 미리보기에서는 body를 조회하지 않고 상세·관리 편집에서만 조회한다. 실제 PostgreSQL로 body 미반환/상세 유지 검증 PASS. 포럼 지정은 ID 입력을 제거하고 제목 검색·20개 단위 페이지·선택 버튼으로 제공한다. 지정 목록은 현재 게시된 제목을 조회하고 설정 원장에는 일반 설정명만 저장하여 원문 제목을 복제하지 않는다. 비게시/삭제/이동 글은 일반 안내로 표시하고 지정 해제할 수 있다. 25개 글의 두 번째 페이지·검색·제목 갱신·초안 전환과 공개 미노출 검증 PASS.
 
 추가 검증: 커뮤니티·CMS 9 suites / 166 tests PASS(격리 PostgreSQL 11 tests), 웹 131 files / 1156 tests PASS, API·웹 build/type-check, ESLint/SonarJS PASS. PC/모바일 브라우저에서 운영 목록 페이지 왕복·저장·포럼 제목 검색·상시 지정 PASS(page errors/가로 넘침 0).
+
+SonarCloud 지적 28건에 대해 문자열 원시 타입 검증/never 반환 함수의 제어 흐름, readonly props, 명시적 button type, output 상태 안내, 명확한 label 마크업을 보완했다. 타입 정보를 읽는 SonarJS 검사 0건, ESLint·API type-check/build·웹 build PASS. 웹 131 files / 1156 tests, API/CMS 9 suites / 166 tests, PC/모바일 목록·검색·저장·지정 browser PASS를 다시 확인했다. 억제 주석·기준 완화 없음. 원격 품질 게이트 결과는 최종 HEAD의 PR 기록을 따른다.

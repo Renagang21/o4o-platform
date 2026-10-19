@@ -11,9 +11,9 @@ import {
 import { PreviewItems } from "./CommunityHostHomePage";
 export default function CommunityEditorialPage({
   kind,
-}: {
+}: Readonly<{
   kind: EditorialKind;
-}) {
+}>) {
   const { id } = useParams(),
     { user } = useAuth();
   const [items, setItems] = useState<HomeItem[]>([]),
@@ -34,7 +34,7 @@ export default function CommunityEditorialPage({
     setItems([]);
     const request = id
       ? homeApi.detail(id).then((row) => {
-          if (row.kind !== kind) throw Error();
+          if (row.kind !== kind) throw new Error("EDITORIAL_KIND_MISMATCH");
           if (alive) setItem(row);
         })
       : homeApi.list(kind, page).then((result) => {
@@ -60,11 +60,12 @@ export default function CommunityEditorialPage({
         커뮤니티 첫 화면 →
       </Link>
       <h1 className="my-5 text-2xl font-bold">{SECTION_NAMES[kind]}</h1>
-      {loading && <p role="status">불러오는 중입니다…</p>}
+      {loading && <output className="block">불러오는 중입니다…</output>}
       {!loading && error && (
         <div role="alert">
           항목을 불러올 수 없습니다. 열람 자격과 주소를 확인해 주세요.{" "}
           <button
+            type="button"
             onClick={() => setRetry((n) => n + 1)}
             className="min-h-11 text-emerald-700"
           >
@@ -105,6 +106,7 @@ export default function CommunityEditorialPage({
           </div>
           <nav aria-label="페이지" className="mt-5 flex items-center gap-4">
             <button
+              type="button"
               className="min-h-11 disabled:opacity-40"
               disabled={page === 1}
               onClick={() => setPage((n) => n - 1)}
@@ -113,6 +115,7 @@ export default function CommunityEditorialPage({
             </button>
             <span>{page}페이지</span>
             <button
+              type="button"
               className="min-h-11 disabled:opacity-40"
               disabled={!hasNext}
               onClick={() => setPage((n) => n + 1)}

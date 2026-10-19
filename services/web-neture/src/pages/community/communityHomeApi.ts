@@ -75,7 +75,7 @@ export const homeApi = {
         params: { kind, page },
       })
     ).data.data as { items: HomeItem[]; hasNext: boolean; page: number },
-  save: async (id: string | null, item: Partial<HomeItem>) =>
+  save: (id: string | null, item: Partial<HomeItem>) =>
     id
       ? api.put(`/communities/community/management/home-items/${id}`, item)
       : api.post("/communities/community/management/home-items", item),
@@ -85,7 +85,7 @@ export const homeApi = {
         params: { page, q },
       })
     ).data.data as HomePreview & { hasNext: boolean; page: number },
-  pinForum: async (id: string, isPinned: boolean) =>
+  pinForum: (id: string, isPinned: boolean) =>
     api.patch(`/communities/community/management/home-forum/${id}`, {
       isPinned,
     }),

@@ -5,13 +5,11 @@ export const HOME_PRESENTATION_SECTION = "home-presentation";
 export const ORDINARY_CMS_CONTENT_SQL =
   "metadata->>'section' IN ('home-presentation','community-editorial') IS NOT TRUE";
 export function isHomePresentationMetadata(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const section = (value as Record<string, unknown>).section;
   return (
-    !!value &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    [HOME_PRESENTATION_SECTION, "community-editorial"].includes(
-      String((value as Record<string, unknown>).section),
-    )
+    typeof section === "string" &&
+    [HOME_PRESENTATION_SECTION, "community-editorial"].includes(section)
   );
 }
 

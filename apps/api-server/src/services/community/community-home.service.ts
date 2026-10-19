@@ -21,9 +21,9 @@ const TYPES: Record<HomeKind, string> = {
 const UUID = /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 const SCOPE = `"serviceKey"='community' AND "organizationId" IS NULL AND metadata->>'section'='${EDITORIAL_SECTION}'`;
 const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience`;
-const fail = (status: number, code: string, message: string): never => {
+function fail(status: number, code: string, message: string): never {
   throw new CommunityManagementError(status, code, message);
-};
+}
 export function homeKind(value: unknown): HomeKind {
   if (!HOME_KINDS.includes(value as HomeKind))
     fail(400, "INVALID_HOME_KIND", "분류를 확인해 주세요.");
@@ -65,7 +65,7 @@ export function parseEditorial(input: Record<string, unknown>) {
     const value = input[key] ?? "";
     if (typeof value !== "string" || value.length > max)
       fail(400, "INVALID_HOME_ITEM", "입력 내용의 길이를 확인해 주세요.");
-    return String(value).trim();
+    return value.trim();
   };
   if (!title || title.length > 255)
     fail(400, "INVALID_HOME_ITEM", "제목을 입력해 주세요(255자 이내).");
@@ -111,7 +111,7 @@ export function parseEditorial(input: Record<string, unknown>) {
 }
 async function access(db: Exec, user: CommunityAccessUser | null) {
   const w = await resolveCommunityWorkspace(db, user, "community");
-  if (!w || w.communityStatus !== "active")
+  if (w?.communityStatus !== "active")
     fail(404, "COMMUNITY_NOT_FOUND", "커뮤니티를 찾을 수 없습니다.");
   return w;
 }
@@ -228,7 +228,7 @@ export async function saveEditorial(
       `SELECT id,metadata->>'kind' AS kind FROM cms_contents WHERE ${SCOPE} AND id=$1 FOR UPDATE`,
       [id],
     );
-    if (!existing || existing.kind !== item.kind)
+    if (existing?.kind !== item.kind)
       fail(
         404,
         "HOME_ITEM_NOT_FOUND",
@@ -308,7 +308,7 @@ export async function managedHomeForum(
     WHERE b.service_code='community' AND b.organization_id IS NULL AND b.status='completed'
       AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.status='publish' AND p.title ILIKE $1
     ORDER BY p.created_at DESC,p.id LIMIT 21 OFFSET $2`,
-    ["%" + String(search).trim() + "%", (page - 1) * 20],
+    ["%" + search.trim() + "%", (page - 1) * 20],
   );
   const ids = new Set(pinned.map((item: { id: string }) => item.id));
   return {

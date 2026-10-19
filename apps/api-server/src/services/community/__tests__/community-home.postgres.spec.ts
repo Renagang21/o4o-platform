@@ -81,7 +81,7 @@ run("community home PostgreSQL visibility and persistence", () => {
       const sql = CANONICAL_SCHEMA_BASELINE_STATEMENTS.find((s) =>
         s.startsWith(`CREATE TABLE public.${table} (`),
       );
-      if (!sql) throw Error(table);
+      if (!sql) throw new Error(table);
       await db.query(
         sql
           .replace(`public.${table}`, table)
@@ -122,7 +122,7 @@ run("community home PostgreSQL visibility and persistence", () => {
         [...home.content.pinned, ...home.content.recent].map((x: any) => x.id),
       ).size,
     ).toBe(12);
-    expect((await db.query("SELECT * FROM action_logs")).length).toBe(13);
+    expect(await db.query("SELECT * FROM action_logs")).toHaveLength(13);
   });
   it("blocks third pin, persists edits and allows unpinning then replacement", async () => {
     const a = await save(data({ isPinned: true }));

@@ -26,12 +26,12 @@ function ManagementPagination({
   hasNext,
   busy,
   onPage,
-}: {
+}: Readonly<{
   page: number;
   hasNext: boolean;
   busy: boolean;
   onPage: (page: number) => void;
-}) {
+}>) {
   return (
     <nav aria-label="관리 목록 페이지" className="mt-4 flex items-center gap-4">
       <button
@@ -144,6 +144,7 @@ export default function CommunityHomeManagementPage() {
         {(["notice", "news", "forum", "content", "resource"] as const).map(
           (k) => (
             <button
+              type="button"
               key={k}
               aria-pressed={kind === k}
               disabled={busy}
@@ -163,6 +164,7 @@ export default function CommunityHomeManagementPage() {
         <p role="alert" className="text-red-700">
           {error}{" "}
           <button
+            type="button"
             disabled={busy}
             onClick={() => setVersion((v) => v + 1)}
             className="min-h-11 underline"
@@ -171,8 +173,8 @@ export default function CommunityHomeManagementPage() {
           </button>
         </p>
       )}
-      {message && <p role="status">{message}</p>}
-      {loading && <p role="status">불러오는 중입니다…</p>}
+      {message && <output className="block">{message}</output>}
+      {loading && <output className="block">불러오는 중입니다…</output>}
       {!loading && kind === "forum" && (
         <section className="rounded-xl border bg-white p-5">
           <h2 className="font-semibold">포럼 상시 노출 지정</h2>
@@ -189,7 +191,7 @@ export default function CommunityHomeManagementPage() {
             }}
           >
             <label>
-              게시글 제목 검색{" "}
+              <span className="block">게시글 제목 검색</span>{" "}
               <input
                 maxLength={200}
                 value={forumInput}
@@ -198,6 +200,7 @@ export default function CommunityHomeManagementPage() {
               />
             </label>
             <button
+              type="submit"
               disabled={busy}
               className="rounded bg-emerald-700 px-3 py-2 text-white"
             >
@@ -220,6 +223,7 @@ export default function CommunityHomeManagementPage() {
                 <span className="break-all">{item.title}</span>
               )}
               <button
+                type="button"
                 disabled={busy}
                 onClick={() => pin(item)}
                 className="shrink-0 rounded border px-3 py-2"
@@ -241,6 +245,7 @@ export default function CommunityHomeManagementPage() {
           <section className="rounded-xl border bg-white p-5">
             <h2 className="mb-4 font-semibold">등록 항목</h2>
             <button
+              type="button"
               onClick={() => {
                 setId(null);
                 setForm(blank(kind));
@@ -252,6 +257,7 @@ export default function CommunityHomeManagementPage() {
             {!items.length && <p>등록된 항목이 없습니다.</p>}
             {items.map((item) => (
               <button
+                type="button"
                 key={item.id}
                 onClick={() => {
                   setId(item.id);
@@ -283,7 +289,7 @@ export default function CommunityHomeManagementPage() {
           >
             <h2 className="font-semibold">{id ? "항목 편집" : "새 항목"}</h2>
             <label className="block">
-              제목
+              <span className="block">제목</span>
               <input
                 required
                 maxLength={255}
@@ -293,7 +299,7 @@ export default function CommunityHomeManagementPage() {
               />
             </label>
             <label className="block">
-              요약
+              <span className="block">요약</span>
               <textarea
                 maxLength={1000}
                 value={form.summary ?? ""}
@@ -303,7 +309,7 @@ export default function CommunityHomeManagementPage() {
             </label>
             {kind !== "news" && (
               <label className="block">
-                본문
+                <span className="block">본문</span>
                 <textarea
                   rows={7}
                   maxLength={50000}
@@ -335,7 +341,7 @@ export default function CommunityHomeManagementPage() {
             )}
             <div className="flex flex-wrap gap-4">
               <label>
-                게시 상태
+                <span className="block">게시 상태</span>
                 <select
                   value={form.status}
                   onChange={(e) => update("status", e.target.value)}
@@ -347,7 +353,7 @@ export default function CommunityHomeManagementPage() {
                 </select>
               </label>
               <label>
-                열람 범위
+                <span className="block">열람 범위</span>
                 <select
                   value={form.audience}
                   onChange={(e) => update("audience", e.target.value)}
@@ -365,10 +371,10 @@ export default function CommunityHomeManagementPage() {
                 onChange={(e) => update("isPinned", e.target.checked)}
                 className="mr-2"
               />
-              상시 노출
+              <span className="ml-2">상시 노출</span>
             </label>
             <label className="block">
-              표시 순서 (작은 숫자 먼저)
+              <span className="block">표시 순서 (작은 숫자 먼저)</span>
               <input
                 type="number"
                 min={0}
@@ -379,6 +385,7 @@ export default function CommunityHomeManagementPage() {
               />
             </label>
             <button
+              type="submit"
               disabled={busy}
               className="min-h-11 rounded bg-emerald-700 px-5 py-2 text-white disabled:opacity-40"
             >

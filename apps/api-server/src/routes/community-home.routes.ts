@@ -24,8 +24,13 @@ export function createCommunityHomeRoutes(
 ) {
   const router = Router();
   const pageOf = (value: unknown) => {
-    const page = String(value ?? "1");
-    if (!/^\d+$/.test(page) || +page < 1 || +page > 10000)
+    const page = value ?? "1";
+    if (
+      typeof page !== "string" ||
+      !/^\d+$/.test(page) ||
+      +page < 1 ||
+      +page > 10000
+    )
       throw new CommunityManagementError(
         400,
         "INVALID_PAGE",

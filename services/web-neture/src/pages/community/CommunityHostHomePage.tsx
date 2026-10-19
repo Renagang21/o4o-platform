@@ -18,12 +18,12 @@ export function PreviewItems({
   section,
   member,
   pinned = false,
-}: {
+}: Readonly<{
   items: HomeItem[];
   section: EditorialKind | "forum";
   member: boolean;
   pinned?: boolean;
-}) {
+}>) {
   return (
     <ul className="divide-y divide-slate-100">
       {items.map((item) => (
@@ -63,10 +63,10 @@ export function PreviewItems({
 function HomeSection({
   section,
   data,
-}: {
+}: Readonly<{
   section: EditorialKind | "forum";
   data: CommunityHome;
-}) {
+}>) {
   const preview = data[section];
   return (
     <section
@@ -149,7 +149,7 @@ export default function CommunityHostHomePage() {
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-bold text-slate-900">커뮤니티</h1>
       {!data && !error && (
-        <p role="status">커뮤니티 소식을 불러오고 있습니다…</p>
+        <output className="block">커뮤니티 소식을 불러오고 있습니다…</output>
       )}
       {error && (
         <div role="alert" className="rounded-xl border bg-white p-5">
