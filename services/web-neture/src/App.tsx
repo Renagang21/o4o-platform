@@ -1,4 +1,5 @@
 import HomePresentationPage from './pages/operator/HomePresentationPage';
+import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
@@ -720,6 +721,7 @@ function App() {
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               {CURRENT_HOST_PROFILE === 'carepharm' && <>
                 <Route path="/" element={<CarePharmHomePage />} />
+                <Route path="/news/:noticeId" element={<CarePharmNewsPage />} />
                 <Route path="/my/participation" element={<CarePharmHomePage view="participation" />} />
                 <Route path="/materials" element={<CarePharmHomePage view="materials" />} />
                 <Route path="/tools" element={<CarePharmHomePage view="tools" />} />
@@ -1229,6 +1231,7 @@ function App() {
               {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/operator/home-presentation/neture" element={<HomePresentationPage surface="neture" />} />
+              <Route path="/operator/home-presentation/carepharm" element={<HomePresentationPage surface="carepharm" />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />

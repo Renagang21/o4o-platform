@@ -212,6 +212,19 @@ it("preserves the branch identity and primary entry when an operator hides promo
 });
 
 describe("operator editor", () => {
+  it("labels and previews every CarePharm public notice while retaining the published-only API contract", async () => {
+    const draft = initialHomePresentation("carepharm");
+    draft.promotions.push({ ...draft.promotions[0], id: "second", title: "두 번째 공지" });
+    const client = { get: vi.fn().mockResolvedValue(response({ ...state(), draft })), put: vi.fn() };
+    render(<HomePresentationEditor surface="carepharm" client={client} />);
+    expect(await screen.findByRole("heading", { name: "Hero · 공개 공지 관리" })).toBeTruthy();
+    await screen.findAllByLabelText("제목");
+    expect(client.get).toHaveBeenCalledExactlyOnceWith("/home-presentation/carepharm/manage");
+    const preview = screen.getByRole("region", { name: "홈 화면 미리보기" });
+    expect(within(preview).getByText("두 번째 공지")).toBeTruthy();
+    expect(within(preview).getByText("CarePharm 이용 안내")).toBeTruthy();
+    expect(screen.getByLabelText("Hero·공개 공지 노출 사용")).toBeTruthy();
+  });
   it("distinguishes a failed read from an empty first configuration and blocks saving", async () => {
     const client = {
       get: vi.fn().mockRejectedValue(new Error("fixture")),

@@ -21,6 +21,7 @@ function mount(path: string) {
   return render(<MemoryRouter initialEntries={[path]}><Routes><Route element={<OperatorLayout />}>
     <Route path="/operator" element={<p>대표 대시보드</p>} />
     <Route path="/operator/semi-franchises" element={<Business />} />
+    <Route path="/operator/home-presentation/carepharm" element={<p>CarePharm 홈 편집</p>} />
     <Route path="/operator/members" element={<p>전체 회원 조회</p>} />
   </Route></Routes></MemoryRouter>);
 }
@@ -36,4 +37,10 @@ it('preserves the existing Neture layout and service switcher on the representat
   state.host = 'main'; mount('/operator');
   expect(screen.getByText('대표 대시보드')).toBeTruthy(); expect(screen.getByText('Neture 전체 업무')).toBeTruthy();
   expect(state.switcher).toHaveBeenCalledWith(expect.objectContaining({ currentServiceKey: 'neture' }));
+});
+it('mounts its native home editor and exposes its dedicated menu', () => {
+  mount('/operator/home-presentation/carepharm');
+  expect(screen.getByText('CarePharm 홈 편집')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '홈 · 공개 공지' }).getAttribute('href')).toBe('/operator/home-presentation/carepharm');
+  expect(screen.queryByText('대표 대시보드')).toBeNull();
 });

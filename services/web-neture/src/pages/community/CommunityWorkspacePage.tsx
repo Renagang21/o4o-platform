@@ -4,6 +4,7 @@ import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
 import CommunityPublicReadManager from './CommunityPublicReadManager';
+import CarePharmCommunityGuide from '../carepharm/CarePharmCommunityGuide';
 import MyPostsPage from '../forum/MyPostsPage';
 import ForumRequestPage from '../forum/ForumRequestPage';
 import MyForumDashboardPage from '../supplier/MyForumDashboardPage';
@@ -56,6 +57,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
   const [workspace, setWorkspace] = useState<CommunityWorkspace | null>(null);
   const [error, setError] = useState('');
   const [boardName, setBoardName] = useState('');
+  const [boardDescription, setBoardDescription] = useState('');
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
   const basePath = `/communities/${encodeURIComponent(communityKey)}/forum`;
@@ -101,8 +103,8 @@ function Workspace({ view }: { view: WorkspaceView }) {
   const createBoard = async () => {
     setBusy(true); setError('');
     try {
-      const r = await api.post(`/communities/${encodeURIComponent(communityKey)}/boards`, { name: boardName });
-      setBoardName(''); navigate(`${basePath}/posts?category=${r.data.data.id}`);
+      const r = await api.post(`/communities/${encodeURIComponent(communityKey)}/boards`, { name: boardName, ...(nativeAccess ? { description: boardDescription } : {}) });
+      setBoardName(''); setBoardDescription(''); navigate(`${basePath}/posts?category=${r.data.data.id}`);
     } catch { setError('게시판을 만들지 못했습니다.'); }
     finally { setBusy(false); }
   };
@@ -123,15 +125,17 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {nativeBusiness && nativeAccess && !workspace?.allowed && <Link to="/my/participation">서비스 참여 신청 · 상태 확인</Link>}
     {workspace?.allowed && (!nativeBusiness || nativeAccess) && <>
       <nav className="my-4 flex gap-4 text-sm text-blue-700"><Link to={basePath}>게시판</Link><Link to={`${basePath}/my-posts`}>내 글</Link><Link to={`${basePath}/owned`}>내 게시판 · 신청</Link></nav>
+      {nativeAccess && <CarePharmCommunityGuide onSelect={workspace.canManage ? item => { setBoardName(item.name); setBoardDescription(item.description); } : undefined} />}
       {workspace.canManage && <section className="my-4 flex flex-wrap items-center gap-3 rounded border bg-white p-4">
         <label>게시판 이름 <input value={boardName} maxLength={100} onChange={e => setBoardName(e.target.value)} className="ml-2 rounded border px-3 py-2" /></label>
+        {nativeAccess && <label className="w-full">게시판 설명 <textarea value={boardDescription} maxLength={4000} rows={3} onChange={e => setBoardDescription(e.target.value)} className="mt-2 block w-full rounded border px-3 py-2" /></label>}
         <button type="button" disabled={busy || !boardName.trim()} onClick={createBoard} className="rounded bg-blue-700 px-4 py-2 text-white">게시판 만들기</button>
         {workspace.kind === 'independent' && <Link to="/operator/service-members/community">서비스 회원 관리</Link>}
       </section>}
       {workspace.canManage && <CommunityBoardReview communityKey={communityKey} />}
       {workspace.canManage && workspace.kind === 'independent' && <CommunityPublicReadManager key={communityKey} communityKey={communityKey} />}
       {view === 'hub' && <ForumHubPage title={workspace.name} basePath={basePath} requestAction={<Link to={`${basePath}/request`}>게시판 개설 신청</Link>} description="회원들과 소식과 자료를 나누는 공간입니다." />}
-      {view === 'posts' && <ForumPage title={workspace.name} boardSlug={new URLSearchParams(window.location.search).get('board') || undefined} basePath={basePath} />}
+      {view === 'posts' && <ForumPage title={workspace.name} description={nativeAccess ? '협업체 회원이 약국 운영 경험과 자료 활용 정보를 나누는 공간입니다.' : undefined} boardSlug={new URLSearchParams(window.location.search).get('board') || undefined} basePath={basePath} />}
       {view === 'write' && <ForumWritePage communityLabel={workspace.name} categorySlug="" backPath={basePath} />}
       {view === 'post' && <ForumPostPage basePath={basePath} canModerate={workspace.canManage} />}
       {view === 'mine' && <MyPostsPage basePath={basePath} />}
