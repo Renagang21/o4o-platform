@@ -32,6 +32,15 @@ async function resolveAccess(
   if (!sf) return { semiFranchise: false, allowed: false, semiFranchiseKey: null };
   if (sf.status !== 'active') return { semiFranchise: true, allowed: false, semiFranchiseKey: sf.key };
   if (!userId) return { semiFranchise: true, allowed: false, semiFranchiseKey: sf.key };
+  const [cooperative] = await exec.query('SELECT id,status FROM cooperatives WHERE semi_franchise_id=$1',[sf.id]);
+  if (cooperative) {
+    if (cooperative.status!=='active') return {semiFranchise:true,allowed:false,semiFranchiseKey:sf.key};
+    const operator = await hasBusinessOperatorAccess(exec,userId,sf.id);
+    const members = await exec.query(`SELECT 1 FROM cooperative_memberships cm JOIN users u ON u.id=cm.user_id
+      WHERE cm.cooperative_id=$1 AND cm.user_id=$2 AND cm.status='active'
+      AND u.status IN ('active','approved') AND u."isActive"=true AND u."isEmailVerified"=true`,[cooperative.id,userId]);
+    return {semiFranchise:true,allowed:operator||members.length>0,semiFranchiseKey:sf.key,operator};
+  }
   if (await hasBusinessOperatorAccess(exec, userId, sf.id)) {
     const [main] = await exec.query(`SELECT 1 FROM users u WHERE u.id=$1 AND u."isEmailVerified"=true AND u."isActive"=true AND u.status IN ('active','approved') AND NOT EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))`, [userId]);
     if (main) return { semiFranchise: true, allowed: true, semiFranchiseKey: sf.key, operator: true };

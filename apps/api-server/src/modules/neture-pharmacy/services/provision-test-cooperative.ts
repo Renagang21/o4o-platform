@@ -1,5 +1,4 @@
 import type { DataSource } from "typeorm";
-import { hasCooperativeOperatorAccess } from "./cooperative-operator-access.js";
 
 /** Explicitly authorized test fixture only. No password changes or platform role grants. */
 export async function provisionTestCooperative(
@@ -31,8 +30,14 @@ export async function provisionTestCooperative(
     );
     if (!operator || !member)
       throw new Error("COOP_TEST_ACTIVE_ACCOUNTS_REQUIRED");
-    if (!(await hasCooperativeOperatorAccess(m, operator.id)))
-      throw new Error("COOP_TEST_EXISTING_OPERATOR_ROLE_REQUIRED");
+    // This owner-only CLI bootstraps one explicitly approved local admin; no global role is granted.
+    const [existingRole] = await m.query(
+      `SELECT cr.role FROM cooperative_roles cr JOIN cooperatives c ON c.id=cr.cooperative_id
+      WHERE c.slug='test' AND cr.user_id=$1 AND cr.revoked_at IS NULL`,
+      [operator.id],
+    );
+    if (existingRole && existingRole.role !== "admin")
+      throw new Error("COOP_TEST_ADMIN_ROLE_CONFLICT");
     let [business] = await m.query(
       `SELECT id, key, name, organization_id, status FROM semi_franchises WHERE key = 'coop-test' FOR UPDATE`,
     );
@@ -84,16 +89,28 @@ export async function provisionTestCooperative(
       VALUES ('test','테스트 협동조합',$1,'협동조합 서비스 연결을 확인하는 임시 조합입니다.','테스트 참여를 승인받은 개인') RETURNING id`,
           [business.id],
         );
-    await m.query(
-      `INSERT INTO semi_franchise_operators (semi_franchise_id,user_id,assigned_by)
-      VALUES ($1,$2,$2) ON CONFLICT (semi_franchise_id,user_id) WHERE revoked_at IS NULL DO NOTHING`,
-      [business.id, operator.id],
+    const assigned = await m.query(
+      `INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,'admin')
+       ON CONFLICT(cooperative_id,user_id) WHERE revoked_at IS NULL DO NOTHING RETURNING id`,
+      [cooperative.id, operator.id],
     );
-    await m.query(
+    if (assigned.length)
+      await m.query(
+        `INSERT INTO cooperative_management_events(cooperative_id,actor_id,subject_id,action,reason,next_state)
+      VALUES($1,$2,$2,'role_assign','승인된 테스트 조합 최초 관리자 CLI 연결','admin')`,
+        [cooperative.id, operator.id],
+      );
+    const enrolled = await m.query(
       `INSERT INTO cooperative_memberships (cooperative_id,user_id,status) VALUES ($1,$2,'active')
-      ON CONFLICT (cooperative_id,user_id) DO NOTHING`,
+      ON CONFLICT (cooperative_id,user_id) DO NOTHING RETURNING id`,
       [cooperative.id, member.id],
     );
+    if (enrolled.length)
+      await m.query(
+        `INSERT INTO cooperative_management_events(cooperative_id,actor_id,subject_id,action,reason,next_state)
+      VALUES($1,$2,$3,'member_approve','승인된 테스트 개인 조합원 CLI 연결','active')`,
+        [cooperative.id, operator.id, member.id],
+      );
     return {
       mode: "apply",
       ready: true,

@@ -50,7 +50,7 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
     const access = byBusinessKey
       ? await resolveSemiFranchiseBusinessAccess(exec, user?.id, sf.key)
       : await resolveSemiFranchiseCommunityAccess(exec, user?.id, key);
-    const canManage = eligible && sf.status === 'active' && await hasBusinessOperatorAccess(exec, user!.id!, sf.id);
+    const canManage = !!user?.id && sf.status === 'active' && (access.operator === true || (eligible && await hasBusinessOperatorAccess(exec, user.id, sf.id)));
     return { communityKey: key, name: sf.name, kind: 'semi-franchise', businessKey: sf.key, allowed: access.allowed,
       canManage, canJoin: false, membershipStatus: access.allowed ? 'active' : null, communityStatus: null,
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
