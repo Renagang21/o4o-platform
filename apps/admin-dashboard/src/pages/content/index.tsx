@@ -1,96 +1,21 @@
-/**
- * Content Overview (Shell)
- *
- * WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1
- *
- * ⚠️ SHELL 상태
- * - 이 페이지는 기능을 제공하지 않습니다
- * - Content Core와 연결되지 않았습니다
- * - UI 기준 고정 목적으로만 존재합니다
- *
- * @see docs/platform/content-core/CONTENT-CORE-OVERVIEW.md
- * @see docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md
- */
-
-import { FileText, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function ContentOverviewPage() {
-  const subMenus = [
-    {
-      // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
-      //   `Assets`(/content/assets · cms_media) 타일을 미디어 정본 화면으로 교체했다.
-      id: 'media-library',
-      label: '미디어 라이브러리',
-      description: '이미지 · 동영상 등 제작 자료 관리 (media_assets)',
-      path: '/content-resource/media-assets',
-    },
-    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
-    //   `Collections` 타일 제거 — 화면 주석에 "기능 미구현 · DB 미구현 · Mock 없음" 이
-    //   명시돼 있었고 메뉴·라우트·화면을 함께 제거했다. 여기 남기면 데드링크가 된다.
-    {
-      id: 'policies',
-      label: '정책 안내',
-      // 데이터 화면이 아니라 content-core 의 Owner/Status/Visibility 정책 **안내 문서** 화면이다.
-      description: '콘텐츠 소유·상태·공개 범위 정책 안내',
-      path: '/content/policies',
-    },
-    // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
-    //   `Analytics` 타일 제거 — 화면이 cms_media 집계(`/content/assets/stats`) 하나에만 의존했고
-    //   그 테이블은 운영에 존재한 적이 없어 상시 500 이었다. 여기 남기면 데드링크가 된다.
-  ];
+const TASKS = [
+  { path: '/content-resource/media-assets', label: '미디어 라이브러리', description: '공용 이미지·영상 등 자료를 찾고 정보를 관리합니다.' },
+  { path: '/admin/cms/contents', label: '콘텐츠 관리', description: '플랫폼 콘텐츠의 내용과 공개·게시 상태를 관리합니다.' },
+  { path: '/admin/cms/slots', label: '게시 위치', description: '화면에 보여줄 콘텐츠와 게시 위치를 설정합니다.' },
+];
 
+export default function ContentOverviewPage() {
   return (
     <div className="p-6 max-w-4xl">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <FileText className="w-8 h-8 text-gray-400" />
-          <h1 className="text-2xl font-semibold text-gray-900">Content</h1>
-        </div>
-        <p className="text-gray-500">
-          콘텐츠 단일 진실 원천 (Single Source of Truth)
-        </p>
-      </div>
-
-      {/* Shell Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
-        <div className="flex items-start gap-3">
-          <div className="w-2 h-2 bg-amber-400 rounded-full mt-2" />
-          <div>
-            <p className="text-amber-800 font-medium">준비 중</p>
-            <p className="text-amber-700 text-sm mt-1">
-              이 영역은 Content Core 기준에 따라 확장될 예정입니다.
-              현재는 네비게이션 구조만 정의된 상태입니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Sub Menu Cards */}
-      <div className="space-y-3">
-        {subMenus.map((menu) => (
-          <Link
-            key={menu.id}
-            to={menu.path}
-            className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium text-gray-900">{menu.label}</h3>
-                <p className="text-sm text-gray-500 mt-1">{menu.description}</p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-gray-400" />
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Reference */}
-      <div className="mt-8 pt-6 border-t border-gray-200">
-        <p className="text-xs text-gray-400">
-          참조: docs/platform/content-core/CONTENT-CORE-OVERVIEW.md
-        </p>
+      <h1 className="text-2xl font-semibold text-gray-900">콘텐츠·자료</h1>
+      <p className="mt-2 mb-6 text-sm text-gray-600">자료 관리와 콘텐츠 게시 작업을 선택하세요. 각 작업 화면에서 관리 도움말을 확인할 수 있습니다.</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {TASKS.map(({ path, label, description }) => <Link key={path} to={path} className="rounded-lg border border-gray-200 bg-white p-5 hover:border-blue-400">
+          <h2 className="font-semibold text-gray-900">{label}</h2>
+          <p className="mt-2 text-sm text-gray-600">{description}</p>
+        </Link>)}
       </div>
     </div>
   );

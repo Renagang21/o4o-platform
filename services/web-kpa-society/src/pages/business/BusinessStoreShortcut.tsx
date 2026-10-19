@@ -8,7 +8,9 @@ export default function BusinessStoreShortcut({
   contentId,
   supply = false,
   staffSupport = false,
+  compact = false,
 }: {
+  compact?: boolean;
   staffSupport?: boolean;
   businessKey?: string;
   contentId?: string;
@@ -76,9 +78,9 @@ export default function BusinessStoreShortcut({
         type="button"
         disabled={busy}
         onClick={() => void enterStore()}
-        className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+        className={compact ? 'inline-flex min-h-9 items-center gap-1 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60' : 'inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60'}
       >
-        {busy ? "내 매장으로 이동 중…" : label}{" "}
+        {busy ? '내 매장으로 이동 중…' : compact ? '내 매장' : label}{" "}
         <span aria-hidden="true">↗</span>
       </button>
       {error && (

@@ -45,15 +45,13 @@ const NotInstalledState: FC<NotInstalledStateProps> = ({ appName }) => (
       {appName} 앱이 설치되지 않았습니다
     </h2>
     <p className="text-gray-600 text-center max-w-md mb-6">
-      이 기능을 사용하려면 {appName} 앱을 먼저 설치해야 합니다.
-      앱스토어에서 설치할 수 있습니다.
+      현재 제공되지 않는 기능입니다. 사용 가능한 관리자 메뉴를 확인하세요.
     </p>
-    {/* WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: 앱스토어 route 는 /apps/store (/admin/appstore 는 dead link 였다) */}
     <Link
-      to="/apps/store"
+      to="/admin"
       className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
     >
-      앱스토어로 이동
+      관리자 홈으로 이동
       <ArrowRight className="w-4 h-4" />
     </Link>
   </div>
@@ -67,7 +65,7 @@ interface InactiveStateProps {
   appId: string;
 }
 
-const InactiveState: FC<InactiveStateProps> = ({ appName, appId }) => (
+const InactiveState: FC<InactiveStateProps> = ({ appName }) => (
   <div className="flex flex-col items-center justify-center py-16 px-4">
     <div className="bg-yellow-100 rounded-full p-4 mb-4">
       <AlertCircle className="w-12 h-12 text-yellow-600" />
@@ -76,13 +74,13 @@ const InactiveState: FC<InactiveStateProps> = ({ appName, appId }) => (
       {appName} 앱이 비활성화 상태입니다
     </h2>
     <p className="text-gray-600 text-center max-w-md mb-6">
-      이 기능을 사용하려면 {appName} 앱을 활성화해야 합니다.
+      현재 비활성 상태인 기능입니다. 사용 가능한 관리자 메뉴를 확인하세요.
     </p>
     <Link
-      to={`/apps/store?activate=${appId}`}
+      to="/admin"
       className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
     >
-      앱 활성화하기
+      관리자 홈으로 이동
       <ArrowRight className="w-4 h-4" />
     </Link>
   </div>

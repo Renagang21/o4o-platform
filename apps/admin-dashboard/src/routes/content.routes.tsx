@@ -29,7 +29,6 @@ const LEGACY_CONTENT_REDIRECT = '/admin/cms/contents';
 //   `/content-resource/media-assets`(media_assets · /platform/media-library) 다.
 // Content Core Shell Pages (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)
 const ContentOverviewPage = lazy(() => import('@/pages/content'));
-const ContentPoliciesPage = lazy(() => import('@/pages/content/policies'));
 
 // CMS V2 Pages (Phase C-2.5 & C-3)
 
@@ -135,13 +134,6 @@ export function ContentRoutes() {
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <ContentOverviewPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/content/policies" path="/content/policies" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentPoliciesPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

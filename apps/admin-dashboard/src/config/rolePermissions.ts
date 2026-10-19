@@ -92,7 +92,6 @@ export const menuPermissions: MenuPermission[] = [
   //   | core-points     | `/api/v1/points/admin/*`      | `requireAuth` + `requireAdmin` |
   //   | platform-hub    | `/api/v1/platform/hub/*`      | `requireAuth` + `requirePlatformAdmin` |
   //   | ops-metrics     | `/api/v1/admin/ops/metrics`   | `authenticate` + `requireAdmin` |
-  //   | appstore-browse | `/api/v1/admin/apps`          | `requireAdmin` |
   //
   //   `requireAdmin` 은 WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1 이후 `platform:super_admin` 전용이다
   //   (legacy `admin`·`super_admin` 거부).
@@ -106,10 +105,6 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'ops-metrics',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
-    menuId: 'appstore-browse',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
@@ -146,10 +141,6 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'cms',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
-    menuId: 'appstore',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
@@ -197,29 +188,11 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
-    menuId: 'content-policies',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
     menuId: 'cms-contents',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
     menuId: 'cms-slots',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  // WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1 — 그룹 헤더 + leaf.
-  //   백엔드 /api/v1/platform/automation-jobs 는 platform:super_admin 전용 (`platform:admin` 은 은퇴한 role).
-  {
-    menuId: 'automation',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
-    menuId: 'automation-video-jobs',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
-    menuId: 'digital-signage-content',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 

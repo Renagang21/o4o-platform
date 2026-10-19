@@ -1,11 +1,12 @@
-import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import './pharmacy-member-home.css';
+import { BUSINESS_SITE } from '../../config/businessSite';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowUpRight, BookOpen, MessageSquare, Megaphone } from 'lucide-react';
 import type { ForumPostResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
-import BusinessStoreShortcut from './BusinessStoreShortcut';
+import BusinessHomeFeature from './BusinessHomeFeature';
 import BusinessProductsPreview from './BusinessProductsPreview';
 import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 import { businessApi, businessError, businessPath, communityApiBase, pharmacyApiBase, type BusinessContent } from './api';
@@ -18,6 +19,21 @@ const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
   const { user } = useAuth();
+  const { hash, key: locationKey } = useLocation();
+  useEffect(() => {
+    if (!['#business-news', '#business-products'].includes(hash)) return;
+    // Let the header's navigation effect close the mobile drawer before measuring.
+    let frame = window.requestAnimationFrame(() => {
+      frame = window.requestAnimationFrame(() => {
+        const target = document.getElementById(hash.slice(1));
+        if (!target) return;
+        const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+        target.style.scrollMarginTop = `${Math.max(112, Math.ceil(headerHeight) + 16)}px`;
+        target.scrollIntoView?.({ block: 'start' });
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [hash, locationKey, access?.allowed, business.key]);
   const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage, business.key, '상품·자료를 이용할 약국');
   const scope = `${user?.id}:${materialStore.organizationId}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
@@ -59,62 +75,77 @@ export default function PharmacyMemberHomePage() {
   const pinnedNotices = currentNotices.data.filter(post => post.isPinned).slice(0, 3);
   const recentNotices = currentNotices.data.filter(isRecentNotice).slice(0, 5);
   const conversations = currentPosts.data.filter(post => !isNotice(post)).slice(0, 5);
-  return <div className="space-y-6">
-    <ServiceHomeHero surface="pharmacy" businessKey={business.key} client={authClient.api}
-      eyebrow={`${business.name} · 회원 커뮤니티`} title={['함께 나누는 경험,', '더 나은 약국 경영']}
-      titleId="member-home-title" description={['약국 운영의 소식과 경험을 함께 나눕니다. 공지와 회원들의 이야기를 확인하고, 필요한 사업 자료를 찾아보세요.']}>
-        <aside aria-label="나의 업무 바로가기" className="rounded-xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold">{access?.canManage ? '사업 운영' : '나의 약국 업무'}</h2>
-          <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">{access?.canManage ? '참여 약국의 신청과 사업 자료는 운영 화면에서 관리합니다.' : '주문·상품·자료함·사이니지 등 실제 매장 업무는 내 매장에서 이어갑니다.'}</p>
-          {access?.canManage ? <Link to="/operator/semi-franchises" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-900">사업 운영 · 회원 관리 <ArrowUpRight size={16} aria-hidden="true" /></Link> : <BusinessStoreShortcut />}
-        </aside>
-    </ServiceHomeHero>
+  const canManageHere = !!access?.canManage && business.key === BUSINESS_SITE.key;
+  const businessName = business.name === 'pharmacy' ? 'O4O 약국 경영지원' : business.name;
+  const selectedMaterialsPath = materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '');
+  const showConversations = !!business.communityKey && (currentPosts.loading || !!currentPosts.error || conversations.length > 0);
+  return <div className="pharmacy-member-home space-y-8">
+    <header className="member-home-heading border-b border-slate-200 pb-5">
+      <p className="text-xs font-semibold tracking-wide text-blue-700">{businessName} · 협력약국 공간</p>
+      <h1 id="member-home-title" className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">약국에 필요한 소식과 자료</h1>
+      <p className="mt-2 text-sm leading-6 text-slate-600">본부가 전하는 소식부터 제품 정보, 회원 약국의 이야기까지 확인하세요.</p>
+    </header>
     {!access?.allowed ? <section className="rounded-xl border bg-white p-6">
       <h2 className="text-lg font-semibold">참여 신청 · 이용 안내</h2>
-      <p className="my-3 text-sm leading-6 text-slate-600">회원 커뮤니티와 사업 자료는 사업 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
+      <p className="my-3 text-sm leading-6 text-slate-600">사업 소식과 운영 자료는 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
       <Link className="font-medium text-blue-700" to={membershipPath}>참여 신청 · 상태 확인 →</Link>
     </section> : <>
-      <section aria-labelledby="notices-title" className="rounded-xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6">
-        <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="공지" to={forumPath} linkLabel="게시판 보기" />
-        <p className="mb-3 text-xs text-slate-500">고정 공지 최대 3개와 최근 공지 5개를 확인하세요.</p>
-        {!business.communityKey ? <p className="py-3 text-sm text-slate-500">게시판이 아직 개설되지 않았습니다.</p> :
-          <DataState state={currentNotices} retry={() => setRetryPosts(n => n + 1)} empty={!pinnedNotices.length && !recentNotices.length} emptyText="등록된 공지가 없습니다.">
-            {!!pinnedNotices.length && <div><h3 className="text-sm font-semibold text-blue-900">고정 공지</h3><PostRows posts={pinnedNotices} base={forumPath} notice /></div>}
-            {!!recentNotices.length && <div className={pinnedNotices.length ? 'mt-4 border-t border-blue-100 pt-4' : ''}><h3 className="text-sm font-semibold text-blue-900">최근 공지</h3><PostRows posts={recentNotices} base={forumPath} notice /></div>}
+      <section id="business-news" aria-labelledby="notices-title" className="scroll-mt-28 space-y-4">
+        <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="사업 소식" to={forumPath} linkLabel="게시판에서 보기" />
+        {business.communityKey && <NoticeContent state={currentNotices} pinned={pinnedNotices} recent={recentNotices} forumPath={forumPath} retry={() => setRetryPosts(n => n + 1)} />}
+        <BusinessHomeFeature key={scope} businessKey={business.key} />
+      </section>
+      <section aria-labelledby="materials-title" className="space-y-4">
+        <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="약국 운영 자료" to={selectedMaterialsPath} linkLabel="전체 자료" />
+        <p className="text-sm leading-6 text-slate-600">본부가 제공하는 콘텐츠를 살펴보고, 사용할 자료는 내 매장에서 사본으로 가져오세요.</p>
+        {materialStore.selection}
+        {access.canManage ? <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p> :
+          materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="새로운 운영 자료가 등록되면 이곳에서 확인할 수 있습니다.">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{currentMaterials.data.map(item => <li key={item.id} className="min-w-0 rounded-xl border border-slate-200 bg-white p-5">
+              <p className="mb-3 text-xs font-medium text-blue-700">본부 제공 자료</p>
+              <Link className="block break-words text-lg font-semibold leading-7 text-slate-900 hover:text-blue-700" to={`${materialsPath}?${new URLSearchParams({ content: item.id, store: materialStore.organizationId ?? '' })}`}>{item.title}</Link>
+              {item.summary && <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-500">{item.summary}</p>}
+              <p className="mt-4 text-xs text-slate-500">내용 확인 · 내 매장에서 활용</p>
+            </li>)}</ul>
           </DataState>}
       </section>
-      <ServiceHomePromotion surface="pharmacy" businessKey={business.key} client={authClient.api} />
-      {materialStore.selection}
-      <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />
-      <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <section aria-labelledby="conversations-title" className="rounded-xl border bg-white p-5 sm:p-6">
-          <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원들의 이야기" to={forumPath} linkLabel="전체 게시글" />
-          {!business.communityKey ? <p className="py-3 text-sm text-slate-500">게시판이 아직 개설되지 않았습니다.</p> :
-            <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={!conversations.length} emptyText="최근 목록에 회원 게시글이 없습니다.">
-              <PostRows posts={conversations} base={forumPath} />
-            </DataState>}
-          <Link to={`${forumPath}/write`} className="mt-4 inline-flex min-h-11 items-center rounded-lg border px-4 py-2 text-sm font-medium text-blue-700">이야기 나누기</Link>
-        </section>
-        <section aria-labelledby="materials-title" className="rounded-xl border bg-white p-5 sm:p-6">
-          <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="사업 자료" to={materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '')} linkLabel="전체 자료" />
-          {access.canManage ? <div className="py-3 text-sm leading-6 text-slate-600"><p>자료 등록과 게시 상태는 사업 운영 화면에서 확인합니다.</p><Link to="/operator/semi-franchises" className="mt-3 inline-block text-blue-700">사업 자료 관리 →</Link></div> :
-            materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="등록된 사업 자료가 없습니다.">
-              <ul className="divide-y">{currentMaterials.data.map(item => <li key={item.id} className="py-4">
-                <Link className="font-medium text-slate-900 hover:text-blue-700" to={`${materialsPath}?${new URLSearchParams({ content: item.id, store: materialStore.organizationId ?? '' })}`}>{item.title}</Link>
-                {item.summary && <p className="mt-2 text-sm leading-6 text-slate-500">{item.summary}</p>}
-              </li>)}</ul>
-            </DataState>}
-        </section>
+      <div id="business-products" className="scroll-mt-28">
+        <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />
       </div>
+      {showConversations && <section aria-labelledby="conversations-title" className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+        <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원 약국들의 이야기" to={forumPath} linkLabel="전체 게시글" />
+        <div className="grid gap-6 lg:grid-cols-[1fr_15rem]">
+          <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={false} emptyText="">
+            <PostRows posts={conversations} base={forumPath} />
+          </DataState>
+          <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm leading-6 text-slate-600">궁금한 점을 묻고, 다른 약국에 도움이 될 경험을 나눠 주세요.</p>
+            <Link to={`${forumPath}/write`} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white">이야기 나누기 <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          </div>
+        </div>
+      </section>}
+      {!showConversations && business.communityKey && <Link to={`${forumPath}/write`} className="inline-flex min-h-11 items-center text-sm font-medium text-blue-700">회원 게시판에서 이야기를 나눠 주세요 →</Link>}
     </>}
-    <nav aria-label="회원 지원" className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-5 text-sm text-slate-600">
+    <nav aria-label="회원 지원" className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-200 pt-5 text-sm text-slate-600">
+      <Link to="/service-guide">이용 안내</Link>
       <Link to={membershipPath}>내 참여 상태</Link>
       <Link to={businessPath(business.key, 'tools')}>업무 바로가기</Link>
-      <Link to="/contact">Contact Us · 문의하기</Link>
+      <Link to="/contact">본부 문의</Link>
       {access?.allowed && <Link to={`${forumPath}/owned`}>내 게시판 · 개설 신청</Link>}
-      {access?.canManage && <Link to={`${forumPath}/manage`}>게시판 운영</Link>}
+      {canManageHere && <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}`}>사업 운영 · 회원 관리</Link>}
     </nav>
   </div>;
+}
+
+function NoticeContent({ state, pinned, recent, forumPath, retry }: Readonly<{
+  state: LoadedSection<ForumPostResponse>; pinned: ForumPostResponse[]; recent: ForumPostResponse[]; forumPath: string; retry: () => void;
+}>) {
+  if (!state.loading && !state.error && !pinned.length && !recent.length) return null;
+  return <DataState state={state} retry={retry} empty={false} emptyText="">
+    <div className="grid gap-4 md:grid-cols-2">
+      {!!pinned.length && <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-5"><h3 className="text-sm font-semibold text-blue-900">중요 공지</h3><PostRows posts={pinned} base={forumPath} notice /></div>}
+      {!!recent.length && <div className="rounded-xl border border-slate-200 bg-white p-5"><h3 className="text-sm font-semibold text-slate-900">최근 공지</h3><PostRows posts={recent} base={forumPath} notice /></div>}
+    </div>
+  </DataState>;
 }
 
 function SectionHeading({ id, icon, title, to, linkLabel }: Readonly<{ id: string; icon: ReactNode; title: string; to: string; linkLabel: string }>) {
@@ -135,7 +166,7 @@ function PostRows({ posts, base, notice = false }: Readonly<{ posts: ForumPostRe
       {notice && <span className="mr-2 rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-800">공지</span>}{post.title}
     </Link>
     <p className="mt-1 flex flex-wrap gap-x-3 text-xs leading-6 text-slate-500">
-      {!notice && <span>{post.author?.nickname || post.author?.name || '참여자'}</span>}
+      <span>{post.author?.nickname || post.author?.name || '참여자'}</span>
       <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</time>
       {!notice && <span>댓글 {post.commentCount}</span>}
     </p>

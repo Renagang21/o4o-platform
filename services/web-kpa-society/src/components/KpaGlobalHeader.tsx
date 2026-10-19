@@ -1,5 +1,6 @@
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from '../config/businessSite';
+import BusinessStoreShortcut from '../pages/business/BusinessStoreShortcut';
 /**
  * KpaGlobalHeader — KPA Society 서비스의 GlobalHeader 브릿지
  *
@@ -19,7 +20,7 @@ import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
-import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
+import { getKpaServiceRoleLabel, KpaUserMenuItems, useKpaUserRoles } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
 import { authClient } from '../contexts/AuthContext';
@@ -35,9 +36,11 @@ import { notificationsApi } from '../api/notifications';
 
 export function KpaGlobalHeader() {
   const { user, logout, isLoading } = useAuth();
+  const { isStoreOwner } = useKpaUserRoles(user);
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
   const businessMatch = useMatch('/businesses/:businessKey/*');
+  const isHostWorkspace = !businessMatch || businessMatch.params.businessKey === BUSINESS_SITE.key;
   // The business workspace owns its task navigation; the header retains account/store utilities.
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
@@ -77,7 +80,7 @@ export function KpaGlobalHeader() {
     base: businessMatch ? [] : KPA_BASE_NAV,
     contextual: [],
     conditions: {},
-    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
+    trailing: [...(isHostWorkspace && (user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
     guestTrailing: [],
     isAuthenticated: !!user,
   });
@@ -119,7 +122,7 @@ export function KpaGlobalHeader() {
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /></span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && isStoreOwner && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /></span>}
       utilitySlot={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {user && creditBalance !== null && (
