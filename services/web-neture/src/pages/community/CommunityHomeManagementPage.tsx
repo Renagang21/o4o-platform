@@ -24,6 +24,8 @@ const errorText = (error: unknown) =>
 export default function CommunityHomeManagementPage() {
   const [kind, setKind] = useState<EditorialKind | "forum">("notice"),
     [items, setItems] = useState<HomeItem[]>([]),
+    [page, setPage] = useState(1),
+    [hasNext, setHasNext] = useState(false),
     [forum, setForum] = useState<HomePreview | null>(null),
     [form, setForm] = useState<Partial<HomeItem>>(blank("notice")),
     [id, setId] = useState<string | null>(null),
@@ -45,8 +47,11 @@ export default function CommunityHomeManagementPage() {
         ? homeApi.forum().then((data) => {
             if (active) setForum(data);
           })
-        : homeApi.manage(kind).then((data) => {
-            if (active) setItems(data);
+        : homeApi.manage(kind, page).then((data) => {
+            if (active) {
+              setItems(data.items);
+              setHasNext(data.hasNext);
+            }
           });
     request
       .catch(() => {
@@ -58,7 +63,7 @@ export default function CommunityHomeManagementPage() {
     return () => {
       active = false;
     };
-  }, [kind, version]);
+  }, [kind, version, page]);
   const save = async () => {
     setBusy(true);
     setError("");
@@ -104,7 +109,11 @@ export default function CommunityHomeManagementPage() {
               key={k}
               aria-pressed={kind === k}
               disabled={busy}
-              onClick={() => setKind(k)}
+              onClick={() => {
+                setPage(1);
+                setKind(k);
+                setMessage("");
+              }}
               className={`min-h-11 rounded border px-4 ${kind === k ? "bg-emerald-700 text-white" : "bg-white"}`}
             >
               {SECTION_NAMES[k]}
@@ -213,6 +222,28 @@ export default function CommunityHomeManagementPage() {
                 </span>
               </button>
             ))}
+            <nav
+              aria-label="관리 목록 페이지"
+              className="mt-4 flex items-center gap-4"
+            >
+              <button
+                type="button"
+                disabled={busy || page === 1}
+                onClick={() => setPage((n) => n - 1)}
+                className="min-h-11 disabled:opacity-40"
+              >
+                이전 항목
+              </button>
+              <span>{page}페이지</span>
+              <button
+                type="button"
+                disabled={busy || !hasNext}
+                onClick={() => setPage((n) => n + 1)}
+                className="min-h-11 disabled:opacity-40"
+              >
+                다음 항목
+              </button>
+            </nav>
           </section>
           <form
             onSubmit={(e) => {

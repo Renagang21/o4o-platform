@@ -23,6 +23,16 @@ export function createCommunityHomeRoutes(
   resolveUser: (req: Request) => Promise<CommunityAccessUser | null>,
 ) {
   const router = Router();
+  const pageOf = (value: unknown) => {
+    const page = String(value ?? "1");
+    if (!/^\d+$/.test(page) || +page < 1 || +page > 10000)
+      throw new CommunityManagementError(
+        400,
+        "INVALID_PAGE",
+        "페이지를 확인해 주세요.",
+      );
+    return +page;
+  };
   const handle = (
     run: (req: AuthRequest) => Promise<unknown>,
   ): RequestHandler =>
@@ -54,18 +64,11 @@ export function createCommunityHomeRoutes(
     apiLimiter,
     optionalAuth,
     handle(async (req) => {
-      const page = String(req.query.page ?? "1");
-      if (!/^\d+$/.test(page) || +page < 1 || +page > 10000)
-        throw new CommunityManagementError(
-          400,
-          "INVALID_PAGE",
-          "페이지를 확인해 주세요.",
-        );
       return listEditorial(
         AppDataSource,
         await resolveUser(req),
         homeKind(req.query.kind),
-        +page,
+        pageOf(req.query.page),
       );
     }),
   );
@@ -82,7 +85,12 @@ export function createCommunityHomeRoutes(
     apiLimiter,
     authenticate,
     handle((req) =>
-      managedHomeItems(AppDataSource, req.user!.id, homeKind(req.query.kind)),
+      managedHomeItems(
+        AppDataSource,
+        req.user!.id,
+        homeKind(req.query.kind),
+        pageOf(req.query.page),
+      ),
     ),
   );
   router.post(

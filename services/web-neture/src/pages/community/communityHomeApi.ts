@@ -69,12 +69,12 @@ export const homeApi = {
   detail: async (id: string) =>
     (await api.get(`/communities/community/editorial/${id}`)).data
       .data as HomeItem,
-  manage: async (kind: EditorialKind) =>
+  manage: async (kind: EditorialKind, page = 1) =>
     (
       await api.get("/communities/community/management/home-items", {
-        params: { kind },
+        params: { kind, page },
       })
-    ).data.data as HomeItem[],
+    ).data.data as { items: HomeItem[]; hasNext: boolean; page: number },
   save: async (id: string | null, item: Partial<HomeItem>) =>
     id
       ? api.put(`/communities/community/management/home-items/${id}`, item)

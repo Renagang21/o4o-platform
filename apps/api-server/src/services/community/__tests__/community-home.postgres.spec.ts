@@ -192,6 +192,31 @@ run("community home PostgreSQL visibility and persistence", () => {
     );
     await expect(save(data(), item.id)).rejects.toMatchObject({ status: 404 });
   });
+  it("keeps records beyond the former 200-row limit manageable", async () => {
+    await db.query(`INSERT INTO cms_contents("serviceKey",type,title,status,"sortOrder",metadata)
+      SELECT 'community','featured','Record '||n,'published',n,'{"section":"community-editorial","kind":"content","audience":"members"}'::jsonb FROM generate_series(1,205) n`);
+    expect(await managedHomeItems(db, actor, "content", 1)).toMatchObject({
+      hasNext: true,
+      page: 1,
+    });
+    const tail = await managedHomeItems(db, actor, "content", 11);
+    expect(tail.items).toHaveLength(5);
+    expect(tail.hasNext).toBe(false);
+    const id = tail.items[0].id;
+    await save(
+      data({
+        title: "Edited older record",
+        status: "archived",
+        sortOrder: 201,
+      }),
+      id,
+    );
+    expect(
+      (await managedHomeItems(db, actor, "content", 11)).items.find(
+        (row: any) => row.id === id,
+      ),
+    ).toMatchObject({ title: "Edited older record", status: "archived" });
+  });
   it("enforces valid HTTPS links, source, lengths and default private draft", () => {
     expect(parseEditorial({ kind: "notice", title: "Hello" })).toMatchObject({
       audience: "members",

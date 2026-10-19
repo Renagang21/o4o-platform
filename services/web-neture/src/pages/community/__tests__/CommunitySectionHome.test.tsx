@@ -104,14 +104,18 @@ describe("community section home", () => {
     expect(screen.getByText("약사공론 바로가기 ↗")).toBeTruthy();
   });
   it("operator can edit and save pin/order/publication without destructive controls", async () => {
-    api.manage.mockResolvedValue([
-      {
-        ...item("one", "운영 공지"),
-        kind: "notice",
-        isPinned: true,
-        sortOrder: 1,
-      },
-    ]);
+    api.manage.mockResolvedValue({
+      items: [
+        {
+          ...item("one", "운영 공지"),
+          kind: "notice",
+          isPinned: true,
+          sortOrder: 1,
+        },
+      ],
+      hasNext: false,
+      page: 1,
+    });
     api.save.mockResolvedValue({});
     mount(<Management />);
     fireEvent.click(await screen.findByText("운영 공지"));
@@ -135,7 +139,7 @@ describe("community section home", () => {
     expect(screen.queryByText("완전 삭제")).toBeNull();
   });
   it("shows server pin limit rejection without claiming save success", async () => {
-    api.manage.mockResolvedValue([]);
+    api.manage.mockResolvedValue({ items: [], hasNext: false, page: 1 });
     api.save.mockRejectedValue({
       response: { data: { error: "상시 노출은 분류별 최대 2개입니다." } },
     });
@@ -150,12 +154,35 @@ describe("community section home", () => {
     );
     expect(screen.queryByText("저장했습니다.")).toBeNull();
   });
-  it('news registration offers source link without article body input',async()=>{
-    api.manage.mockResolvedValue([]);mount(<Management/>);
-    await screen.findByText('등록된 항목이 없습니다.');
-    fireEvent.click(screen.getByRole('button',{name:'약사공론 뉴스'}));
-    await screen.findByLabelText('약사공론 기사 원문 URL');
-    expect(screen.queryByLabelText('본문')).toBeNull();
+  it("news registration offers source link without article body input", async () => {
+    api.manage.mockResolvedValue({ items: [], hasNext: false, page: 1 });
+    mount(<Management />);
+    await screen.findByText("등록된 항목이 없습니다.");
+    fireEvent.click(screen.getByRole("button", { name: "약사공론 뉴스" }));
+    await screen.findByLabelText("약사공론 기사 원문 URL");
+    expect(screen.queryByLabelText("본문")).toBeNull();
   });
 
+  it("pages the operator list so older records remain editable", async () => {
+    api.manage
+      .mockResolvedValueOnce({
+        items: [item("new", "최근 공지")],
+        hasNext: true,
+        page: 1,
+      })
+      .mockResolvedValueOnce({
+        items: [item("old", "이전 공지")],
+        hasNext: false,
+        page: 2,
+      });
+    mount(<Management />);
+    await screen.findByText("최근 공지");
+    fireEvent.click(screen.getByRole("button", { name: "다음 항목" }));
+    await screen.findByText("이전 공지");
+    expect(api.manage).toHaveBeenLastCalledWith("notice", 2);
+    fireEvent.click(screen.getByText("이전 공지"));
+    expect((screen.getByLabelText("제목") as HTMLInputElement).value).toBe(
+      "이전 공지",
+    );
+  });
 });

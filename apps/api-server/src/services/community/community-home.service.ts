@@ -200,12 +200,15 @@ export async function managedHomeItems(
   db: Exec,
   actor: string,
   kind: HomeKind,
+  page = 1,
 ) {
   await requireCommunityManager(db, actor);
-  return db.query(
-    `SELECT ${COLUMNS} FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1 ORDER BY "isPinned" DESC,"sortOrder","createdAt" DESC,id LIMIT 200`,
-    [kind],
+  const rows = await db.query(
+    `SELECT ${COLUMNS} FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
+      ORDER BY "isPinned" DESC,"sortOrder","createdAt" DESC,id LIMIT 21 OFFSET $2`,
+    [kind, (page - 1) * 20],
   );
+  return { items: rows.slice(0, 20), hasNext: rows.length > 20, page };
 }
 /** Scope lock serializes the two-slot check and writes without a new schema. */
 export async function saveEditorial(
