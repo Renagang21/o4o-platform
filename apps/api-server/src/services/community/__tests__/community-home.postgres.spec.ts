@@ -41,7 +41,10 @@ jest.mock("../community-workspace.service", () => ({
     name: "커뮤니티",
     kind: "independent",
     communityStatus: "active",
-    allowed: user?.id === "11111111-1111-4111-8111-111111111111",
+    allowed:
+      user?.id === "11111111-1111-4111-8111-111111111111" &&
+      !user?.fixtureSuspended,
+    canManage: user?.fixtureManage === true,
     forumStorageCodes: ["community"],
   }),
 }));
@@ -285,11 +288,12 @@ run("community home PostgreSQL visibility and persistence", () => {
     forumType = "open",
     status = "completed",
     service = "community",
+    requester = actor,
   ) {
     const id = randomUUID();
     await db.query(
       `INSERT INTO forum_category_requests(id,service_code,name,status,forum_type,requester_id,reason,description,requester_name) VALUES($1,$2,'Board',$3,$4,$5,'fixture','Fixture','Fixture')`,
-      [id, service, status, forumType, actor],
+      [id, service, status, forumType, requester],
     );
     return id;
   }
@@ -303,7 +307,12 @@ run("community home PostgreSQL visibility and persistence", () => {
   }
   it("shows only signed public posts anonymously; members see permitted open and joined closed boards", async () => {
     const open = await board(),
-      closed = await board("closed"),
+      closed = await board(
+        "closed",
+        "completed",
+        "community",
+        "22222222-2222-4222-8222-222222222222",
+      ),
       paused = await board("open", "archived"),
       foreign = await board("open", "completed", "neture");
     const a = await post(open, "Public", true),
@@ -343,6 +352,46 @@ run("community home PostgreSQL visibility and persistence", () => {
       (await communityHome(db, null)).forum.pinned.map((item: any) => item.id),
     ).toEqual([a]);
     expect((await communityHome(db, user)).forum.pinned).toHaveLength(2);
+  });
+  it("matches closed-board member, requester and live service moderation access", async () => {
+    const other = "22222222-2222-4222-8222-222222222222";
+    const closed = await board("closed", "completed", "community", other);
+    const postId = await post(closed, "Closed home pin");
+    await db.transaction((m) => pinHomeForum(m, actor, postId, true));
+    expect((await communityHome(db, user)).forum.pinned).toEqual([]);
+    expect(
+      (
+        await communityHome(db, { ...user, fixtureManage: true })
+      ).forum.pinned.map((row: any) => row.id),
+    ).toEqual([postId]);
+    expect(
+      (
+        await communityHome(db, {
+          ...user,
+          fixtureManage: true,
+          fixtureSuspended: true,
+        })
+      ).forum.pinned,
+    ).toEqual([]);
+    expect((await communityHome(db, null)).forum.pinned).toEqual([]);
+    await db.query(
+      "UPDATE forum_category_requests SET requester_id=$2 WHERE id=$1",
+      [closed, actor],
+    );
+    expect(
+      (await communityHome(db, user)).forum.pinned.map((row: any) => row.id),
+    ).toEqual([postId]);
+    await db.query(
+      "UPDATE forum_category_requests SET requester_id=$2 WHERE id=$1",
+      [closed, other],
+    );
+    await db.query(
+      "INSERT INTO forum_category_members(forum_category_id,user_id) VALUES($1,$2)",
+      [closed, actor],
+    );
+    expect(
+      (await communityHome(db, user)).forum.pinned.map((row: any) => row.id),
+    ).toEqual([postId]);
   });
   it("excludes full bodies from previews while preserving detail and editing", async () => {
     const saved = await save(data({ body: "Detail body", isPinned: true }));

@@ -23,8 +23,7 @@ export function createCommunityHomeRoutes(
   resolveUser: (req: Request) => Promise<CommunityAccessUser | null>,
 ) {
   const router = Router();
-  const pageOf = (value: unknown) => {
-    const page = value ?? "1";
+  const pageOf = (page: unknown = "1") => {
     if (
       typeof page !== "string" ||
       !/^\d+$/.test(page) ||

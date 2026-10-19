@@ -38,7 +38,7 @@
 
 ## 코드·문서 검증 결과
 
-- 커뮤니티 API 4 suites / 58 tests PASS(격리 PostgreSQL 11 tests 포함). CMS·공개 노출·slot·변경 scope·presentation 회귀 5 suites / 108 tests PASS.
+- 커뮤니티 API 4 suites / 59 tests PASS(격리 PostgreSQL 12 tests 포함). CMS·공개 노출·slot·변경 scope·presentation 회귀 5 suites / 108 tests PASS.
 - web-neture 전체 131 files / 1156 tests PASS(뉴스 본문 입력 제외 테스트 포함).
 - API type-check 및 API tsup build PASS, web-neture TypeScript + Vite production build PASS(기존 chunk 크기 경고).
 - PC 1440px / 모바일 390px: 공지·뉴스 같은 행/모바일 순차, 포럼→콘텐츠→자료실, 가로 넘침 없음. Operator 진입·목록 페이지 왕복·폼 작성·상시 노출·공개 선택·저장 요청·성공 표시 PASS. 브라우저 응답은 격리 fixture이며 실제 운영 계정 검증과 구분한다.
@@ -67,3 +67,5 @@
 추가 검증: 커뮤니티·CMS 9 suites / 166 tests PASS(격리 PostgreSQL 11 tests), 웹 131 files / 1156 tests PASS, API·웹 build/type-check, ESLint/SonarJS PASS. PC/모바일 브라우저에서 운영 목록 페이지 왕복·저장·포럼 제목 검색·상시 지정 PASS(page errors/가로 넘침 0).
 
 SonarCloud 지적 28건에 대해 문자열 원시 타입 검증/never 반환 함수의 제어 흐름, readonly props, 명시적 button type, output 상태 안내, 명확한 label 마크업을 보완했다. 타입 정보를 읽는 SonarJS 검사 0건, ESLint·API type-check/build·웹 build PASS. 웹 131 files / 1156 tests, API/CMS 9 suites / 166 tests, PC/모바일 목록·검색·저장·지정 browser PASS를 다시 확인했다. 억제 주석·기준 완화 없음. 원격 품질 게이트 결과는 최종 HEAD의 PR 기록을 따른다.
+
+폐쇄 게시판 홈 조회는 `ForumControllerBase.checkClosedForumAccess`의 현재 서비스 중재 권한·requester 소유권·게시판 회원 분기를 SQL에 동일하게 반영한다. 활성 서비스 자격이 없으면 먼저 공개 조회로 제한한다. 일반 회원/비회원·서비스 운영자·기존 소유자·정지 회원·비로그인 벡터를 PostgreSQL에서 검증했다. 9 suites / 167 tests PASS(격리 PostgreSQL 12 tests), API type-check/build·타입 기반 SonarJS PASS. 앞선 SonarCloud 게이트 통과 뒤 남은 기본 매개변수 권고도 보완했다.

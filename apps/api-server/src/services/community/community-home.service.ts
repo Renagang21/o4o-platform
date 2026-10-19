@@ -167,18 +167,21 @@ export async function homeForumItems(
     // The existing signed designation is the only anonymous forum authority.
     return publicCommunityHomePosts(db);
   }
+  // Same closed-board branches as ForumControllerBase.checkClosedForumAccess:
+  // live service moderation, requester ownership, or current board membership.
   const base = `FROM forum_post p JOIN forum_category_requests b ON b.id=p.forum_id
     WHERE b.service_code='community' AND b.organization_id IS NULL AND b.status='completed'
     AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.status='publish'
-    AND (b.forum_type='open' OR EXISTS(SELECT 1 FROM forum_category_members m WHERE m.forum_category_id=b.id AND m.user_id=$1))`;
+    AND (b.forum_type IS DISTINCT FROM 'closed' OR $2::boolean OR b.requester_id=$1
+      OR EXISTS(SELECT 1 FROM forum_category_members m WHERE m.forum_category_id=b.id AND m.user_id=$1))`;
   const fields = `p.id,p.slug,p.title,p.excerpt AS summary,p.created_at AS "createdAt",b.name AS "boardName"`;
   const pinned = await db.query(
     `SELECT ${fields},true AS "isPinned" ${base} AND ${COMMUNITY_HOME_PIN_SQL} ORDER BY p.updated_at DESC,p.id LIMIT 2`,
-    [user!.id],
+    [user!.id, w.canManage === true],
   );
   const recent = await db.query(
-    `SELECT ${fields},false AS "isPinned" ${base} AND NOT(p.id=ANY($2::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`,
-    [user!.id, pinned.map((p: { id: string }) => p.id)],
+    `SELECT ${fields},false AS "isPinned" ${base} AND NOT(p.id=ANY($3::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`,
+    [user!.id, w.canManage === true, pinned.map((p: { id: string }) => p.id)],
   );
   return { pinned, recent };
 }
