@@ -24,7 +24,7 @@
 
 - 관련 API 7 suites/133 tests PASS (실제 PostgreSQL 57, 경계/단위 76), 공유 운영자 UI 47, 공급자 UI 8 PASS.
 - 기존 commerce 실패는 수정 전 20 PASS/6 FAIL → 수정 후 26 PASS/0 FAIL. 독립 새 DB의 표준 migration·지문 후 관련 suite 전체를 재실행했다.
-- 변경은 commerce 테스트 fixture/현행 기대값, 기본 공급 SQL 설명 주석, 이 WO와 CHECK뿐이다. runtime 동작·권한·결제·schema·의존성·lockfile·CI 설정은 변경하지 않는다. UI 변경도 없어 새로운 desktop/mobile 브라우저 회귀를 실행한 것으로 보고하지 않는다.
+- 변경은 commerce 테스트 fixture/현행 기대값, 이 WO와 CHECK뿐이다. runtime 동작·권한·결제·schema·의존성·lockfile·CI 설정은 변경하지 않는다. UI 변경도 없어 새로운 desktop/mobile 브라우저 회귀를 실행한 것으로 보고하지 않는다.
 - 문서 정합: 과거 완료 기록을 고치지 않고 새 CHECK에서 #653/#678/#679/#693의 병합과 과거 배포 증거를 연결한다.
 - 공급자 실계정 로그인은 401 INVALID_CREDENTIALS로 BLOCKED. 운영자 승인·운영 주문/결제는 NOT_RUN. 인증된 운영 읽기 검증이 남으므로 전체 업무 검증 완료로 마감하지 않는다.
 - 문서 민감정보/상대 링크·whitespace 검사와 작업 범위 확인 후 commit/push로 개발 인계한다. 새 PR 생성·병합·배포는 이번 회차에 수행하지 않는다.
