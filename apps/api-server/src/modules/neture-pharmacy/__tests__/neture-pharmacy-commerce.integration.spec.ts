@@ -172,9 +172,11 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
       expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: false, canJoin: true });
       await ds.query("INSERT INTO community_memberships (community_id,user_id,status,role) VALUES ($1,$2,'active','member')", [independent.id, member.owner]);
+      expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
       expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: false });
       await ds.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES ($1,'community','member','active')", [member.owner]);
       expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: true, forumStorageCodes: ['community'] });
+      expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
       expect(await resolveCommunityWorkspace(ds, actor, sfCommunityKey)).toMatchObject({ allowed: false, canJoin: false });
       expect(await listCommunityWorkspaces(ds, actor)).not.toEqual(expect.arrayContaining([expect.objectContaining({ communityKey: sfCommunityKey })]));
       const businessMembershipId = await joinSemiFranchise(member.orgId, member.owner, sfKey, pharmacyOperator);
