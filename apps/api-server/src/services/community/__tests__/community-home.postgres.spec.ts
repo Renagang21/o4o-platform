@@ -13,6 +13,7 @@ import {
 } from "../community-home.service";
 import {
   ORDINARY_CMS_CONTENT_SQL,
+  ordinaryCmsMetadata,
   isHomePresentationMetadata,
 } from "../../../routes/cms-content/cms-reserved-presentation";
 import {
@@ -173,6 +174,34 @@ run("community home PostgreSQL visibility and persistence", () => {
     ).toEqual([]);
     expect(isHomePresentationMetadata({ section: "community-editorial" })).toBe(
       true,
+    );
+    const plain = randomUUID(),
+      nullable = randomUUID(),
+      presentation = randomUUID();
+    await db.query(
+      `INSERT INTO cms_contents(id,"serviceKey",type,title,status,metadata) VALUES
+      ($1,'neture','notice','Ordinary','published','{}'),($2,'neture','notice','Null section','published','{"section":null}'),
+      ($3,'neture','hero','Presentation','published','{"section":"home-presentation"}')`,
+      [plain, nullable, presentation],
+    );
+    // Match KPA/CMS alias-prefixed consumers, including joins that also have metadata.
+    const visible = await db.query(
+      `SELECT c.id FROM cms_contents c LEFT JOIN (SELECT '{}'::jsonb AS metadata) extra ON true WHERE c.${ORDINARY_CMS_CONTENT_SQL} ORDER BY c.id`,
+    );
+    expect(visible.map((row: any) => row.id).sort()).toEqual(
+      [plain, nullable].sort(),
+    );
+    expect(
+      await db.query(
+        `SELECT c.${ORDINARY_CMS_CONTENT_SQL} AS visible FROM (SELECT NULL::jsonb AS metadata) c`,
+      ),
+    ).toEqual([{ visible: true }]);
+    const raw = ordinaryCmsMetadata().getSql!("c.metadata");
+    const rawVisible = await db.query(
+      `SELECT c.id FROM cms_contents c LEFT JOIN (SELECT '{}'::jsonb AS metadata) extra ON true WHERE ${raw} ORDER BY c.id`,
+    );
+    expect(rawVisible.map((row: any) => row.id).sort()).toEqual(
+      [plain, nullable].sort(),
     );
   });
   it("checks manager and item scope, and does not let client change kinds", async () => {

@@ -1,8 +1,9 @@
 import { Raw } from "typeorm";
 /** Reserved rows are owned by dedicated APIs; generic CMS must not bypass their visibility or writes. */
 export const HOME_PRESENTATION_SECTION = "home-presentation";
+// Legacy consumers prepend an SQL table alias (c., cms.); keep one column reference and no leading parenthesis.
 export const ORDINARY_CMS_CONTENT_SQL =
-  "(metadata->>'section' IS NULL OR metadata->>'section' NOT IN ('home-presentation','community-editorial'))";
+  "metadata->>'section' IN ('home-presentation','community-editorial') IS NOT TRUE";
 export function isHomePresentationMetadata(value: unknown): boolean {
   return (
     !!value &&
@@ -28,5 +29,5 @@ export const ordinaryCmsMetadata = () =>
       .split(".")
       .map((part) => '"' + part.replaceAll('"', '""') + '"')
       .join(".");
-    return `(${column}->>'section' IS NULL OR ${column}->>'section' NOT IN ('home-presentation','community-editorial'))`;
+    return `${column}->>'section' IN ('home-presentation','community-editorial') IS NOT TRUE`;
   });

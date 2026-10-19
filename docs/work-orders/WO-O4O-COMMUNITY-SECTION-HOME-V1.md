@@ -57,3 +57,7 @@
 [PR #711](https://github.com/Renagang21/o4o-platform/pull/711) 초기 자동 검토 3건을 반영했다: 게시판/작성자가 조작할 수 있는 isPinned와 첫 화면 상시 지정을 분리, 뉴스 본문 입력·저장 거부, 기존 Hero·광고의 주요 섹션 아래 공개 소비 유지. PostgreSQL에는 원장 격리·일반 고정 우회 차단·대문자 ID 정규화·비공개 보호·중지 후 해제 회귀를 포함했다. 최종 HEAD의 CI·재검토·배포 결과는 PR 기록에서 확인한다.
 
 추가 검토의 운영 목록 200개 절단 문제는 20개 단위 페이지·hasNext·이전/다음 조작으로 해결했다. 205개 fixture의 마지막 페이지 조회·편집·게시 중지와 PC/모바일 목록 왕복·저장을 검증했다.
+
+공통 CMS 예약 조건식은 기존 `c.`/`cms.` 접두사 소비자와 호환되도록 단일 컬럼 참조 및 `IN (...) IS NOT TRUE`를 사용한다. section 누락/JSON null·일반 항목 포함, 두 예약 종류 제외, metadata 컬럼이 함께 있는 JOIN의 별칭 조회를 PostgreSQL에서 검증한다.
+
+별칭 호환 보완 후 커뮤니티·CMS 통합 9 suites / 164 tests PASS(격리 PostgreSQL 9 tests 포함). API type-check·tsup build·ESLint·SonarJS·docs 검사 PASS.
