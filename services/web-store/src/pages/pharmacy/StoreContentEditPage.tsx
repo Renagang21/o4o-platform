@@ -54,7 +54,7 @@ const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[
 
 export default function StoreContentEditPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
-  const { libraryPath } = useStoreLibraryRoute();
+  const { backPath, returnState, productReturn } = useStoreLibraryRoute();
 
   const { organizationId } = useStoreOrganizationId();
   const session = useContentAuthoringSession({
@@ -119,11 +119,17 @@ export default function StoreContentEditPage() {
       <div className="mb-6">
         {/* WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: 진입점(내 자료함 콘텐츠)으로 복귀 — canonical 정렬 */}
         <Link
-          to={libraryPath}
+          to={backPath}
+          state={returnState}
+          onClick={event => {
+            if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            const changed = session.record && JSON.stringify(session.draft) !== JSON.stringify(snapshotDraftFromRecord(session.record));
+            if (saving || (changed && !window.confirm('저장하지 않은 작성 내용을 버리고 돌아가시겠습니까?'))) event.preventDefault();
+          }}
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          내 자료함 콘텐츠로
+          {productReturn ? '상품 목록으로 돌아가기' : '내 자료함 콘텐츠로'}
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
