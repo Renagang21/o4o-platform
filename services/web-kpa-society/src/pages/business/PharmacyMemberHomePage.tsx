@@ -7,9 +7,9 @@ import type { ForumPostResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import BusinessHomeFeature from './BusinessHomeFeature';
-import BusinessProductsPreview from './BusinessProductsPreview';
+import { BusinessHomeShowcase } from '@o4o/shared-space-ui';
 import { useBusinessMaterialStore } from './useBusinessMaterialStore';
-import { businessApi, businessError, businessPath, communityApiBase, pharmacyApiBase, type BusinessContent } from './api';
+import { businessError, businessPath, communityApiBase } from './api';
 
 interface LoadedSection<T> { scope: string; data: T[]; error: string; loading: boolean }
 const pending = <T,>(scope: string): LoadedSection<T> => ({ scope, data: [], error: '', loading: true });
@@ -38,9 +38,7 @@ export default function PharmacyMemberHomePage() {
   const scope = `${user?.id}:${materialStore.organizationId}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [noticesState, setNoticesState] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
-  const [materials, setMaterials] = useState<LoadedSection<BusinessContent>>(() => pending(scope));
   const [retryPosts, setRetryPosts] = useState(0);
-  const [retryMaterials, setRetryMaterials] = useState(0);
   useEffect(() => {
     let alive = true;
     setPosts(pending(scope));
@@ -57,18 +55,8 @@ export default function PharmacyMemberHomePage() {
     }).catch(error => { if (alive) setNoticesState({ scope, data: [], error: businessError(error), loading: false }); });
     return () => { alive = false; };
   }, [scope, access?.allowed, business.communityKey, retryPosts]);
-  useEffect(() => {
-    let alive = true;
-    setMaterials(pending(scope));
-    if (!access?.allowed || access.canManage || !materialStore.organizationId) return;
-    void businessApi.get<{ items: BusinessContent[] }>(`${pharmacyApiBase}/store/contents`, { sf: business.key, page: 1, limit: 3 }, materialStore.organizationId)
-      .then(data => { if (alive) setMaterials({ scope, data: data.items.filter(item => item.semiFranchiseKey === business.key), error: '', loading: false }); })
-      .catch(error => { if (alive) setMaterials({ scope, data: [], error: businessError(error), loading: false }); });
-    return () => { alive = false; };
-  }, [scope, access?.allowed, access?.canManage, business.key, materialStore.organizationId, retryMaterials]);
   const currentPosts = posts.scope === scope ? posts : pending<ForumPostResponse>(scope);
   const currentNotices = noticesState.scope === scope ? noticesState : pending<ForumPostResponse>(scope);
-  const currentMaterials = materials.scope === scope ? materials : pending<BusinessContent>(scope);
   const forumPath = businessPath(business.key, 'forum');
   const materialsPath = businessPath(business.key, 'materials');
   const membershipPath = businessPath(business.key, 'participation');
@@ -99,18 +87,10 @@ export default function PharmacyMemberHomePage() {
         <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="약국 운영 자료" to={selectedMaterialsPath} linkLabel="전체 자료" />
         <p className="text-sm leading-6 text-slate-600">본부가 제공하는 콘텐츠를 살펴보고, 사용할 자료는 내 매장에서 사본으로 가져오세요.</p>
         {materialStore.selection}
-        {access.canManage ? <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p> :
-          materialStore.organizationId && <DataState state={currentMaterials} retry={() => setRetryMaterials(n => n + 1)} empty={!currentMaterials.data.length} emptyText="새로운 운영 자료가 등록되면 이곳에서 확인할 수 있습니다.">
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{currentMaterials.data.map(item => <li key={item.id} className="min-w-0 rounded-xl border border-slate-200 bg-white p-5">
-              <p className="mb-3 text-xs font-medium text-blue-700">본부 제공 자료</p>
-              <Link className="block break-words text-lg font-semibold leading-7 text-slate-900 hover:text-blue-700" to={`${materialsPath}?${new URLSearchParams({ content: item.id, store: materialStore.organizationId ?? '' })}`}>{item.title}</Link>
-              {item.summary && <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-500">{item.summary}</p>}
-              <p className="mt-4 text-xs text-slate-500">내용 확인 · 내 매장에서 활용</p>
-            </li>)}</ul>
-          </DataState>}
+        {access.canManage && <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p>}
       </section>
       <div id="business-products" className="scroll-mt-28">
-        <BusinessProductsPreview key={scope} businessKey={business.key} organizationId={materialStore.organizationId} canManage={!!access.canManage} />
+        <BusinessHomeShowcase key={scope} client={authClient.api} externalSelection businessKey={business.key} organizationId={materialStore.organizationId} accountId={user?.id} operator={!!access.canManage} />
       </div>
       {showConversations && <section aria-labelledby="conversations-title" className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원 약국들의 이야기" to={forumPath} linkLabel="전체 게시글" />
