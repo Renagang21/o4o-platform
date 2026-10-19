@@ -20,7 +20,7 @@ vi.mock('../supplier/MyForumDashboardPage', () => ({ default: () => null }));
 vi.mock('./CommunityBoardReview', () => ({ default: () => null }));
 vi.mock('./CommunityPublicReadManager', () => ({ default: () => null }));
 vi.mock('./CommunityForumMembersPage', () => ({ default: () => null }));
-import Home from './CommunityHostHomePage';
+import Workspace from './CommunityWorkspacePage';
 let membershipStatus: string|null;
 let canManage: boolean;
 beforeEach(() => {
@@ -29,9 +29,9 @@ beforeEach(() => {
  state.post.mockImplementation(async () => { membershipStatus='pending'; return {data:{success:true}}; });
 });
 afterEach(cleanup);
-describe('independent community home', () => {
+describe('independent community participation workspace', () => {
  it('shows one service without the former directory or community creation workflow', async () => {
-  render(<MemoryRouter><Home /></MemoryRouter>);
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
   await screen.findByRole('button',{name:'가입 신청'});
   expect(state.get).toHaveBeenCalledWith('/communities/community/access');
   expect(screen.queryByText('약사 커뮤니티')).toBeNull();
@@ -39,7 +39,7 @@ describe('independent community home', () => {
   expect(screen.queryByText('커뮤니티 개설 신청 · 운영')).toBeNull();
  });
  it('requests only service membership and reloads pending status', async () => {
-  render(<MemoryRouter><Home /></MemoryRouter>);
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
   fireEvent.click(await screen.findByRole('button',{name:'가입 신청'}));
   await screen.findByText('가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.');
   expect(state.post).toHaveBeenCalledWith('/communities/join',{policyReferences:[]});
@@ -47,7 +47,7 @@ describe('independent community home', () => {
  });
  it('allows retry after failed enrollment and refreshes stale policy references', async () => {
   state.post.mockRejectedValueOnce({response:{data:{code:'ENROLLMENT_POLICY_REQUIRED',error:'서비스 약관을 다시 확인하세요'}}});
-  render(<MemoryRouter><Home /></MemoryRouter>);
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
   fireEvent.click(await screen.findByRole('button',{name:'가입 신청'}));
   await screen.findByText('서비스 약관을 다시 확인하세요');
   expect(state.reload).toHaveBeenCalledTimes(1);
@@ -55,13 +55,13 @@ describe('independent community home', () => {
  });
  it.each(['suspended','withdrawn'])('does not offer re-enrollment for %s', async status => {
   membershipStatus=status;
-  render(<MemoryRouter><Home /></MemoryRouter>);
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
   await screen.findByText(status==='suspended'?'커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.':'커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.');
   expect(screen.queryByRole('button',{name:'가입 신청'})).toBeNull();
  });
  it('shows own member management only to the service operator', async () => {
   membershipStatus='active'; canManage=true;
-  render(<MemoryRouter><Home /></MemoryRouter>);
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
   const link=await screen.findByRole('link',{name:'서비스 회원 관리'});
   expect(link.getAttribute('href')).toBe('/operator/service-members/community');
   expect(screen.queryByText('회원 가입 심사')).toBeNull();

@@ -1,3 +1,4 @@
+import { COMMUNITY_HOME_PIN_SQL } from './community-home-pins.js';
 import type { EntityManager } from 'typeorm';
 import { resolveCommunityWorkspace, type CommunityWorkspace } from './community-workspace.service.js';
 import type { CommunityAccessUser } from '../../utils/community-access.resolver.js';
@@ -142,4 +143,25 @@ export async function setCommunityPublicRead(exec: Exec, key: string, user: Comm
     jsonb_set(COALESCE(metadata, '{}'::jsonb), '{${PUBLIC_READ_KEY}}', $2::jsonb, true), updated_at = NOW()
     WHERE id = $1::uuid`, [boardId, JSON.stringify(setting)]);
   return selection;
+}
+
+/** Home preview keeps pinned slots separate from the ten latest readable posts. */
+export async function publicCommunityHomePosts(exec: Exec) {
+  const value = await workspace(exec, "community", null);
+  const boardIds = await verifiedPublicBoards(exec, value);
+  if (!boardIds.length) return { pinned: [], recent: [] };
+  const base = `FROM forum_post p JOIN forum_category_requests b ON b.id=p.forum_id WHERE ${PUBLIC_POST}`;
+  const pinned = await exec.query(
+    `SELECT ${PUBLIC_FIELDS.replace('p."isPinned"', 'true AS "isPinned"')} ${base} AND ${COMMUNITY_HOME_PIN_SQL} ORDER BY p.updated_at DESC,p.id LIMIT 2`,
+    [value.forumStorageCodes, boardIds],
+  );
+  const recent = await exec.query(
+    `SELECT ${PUBLIC_FIELDS.replace('p."isPinned"', 'false AS "isPinned"')} ${base} AND NOT(p.id=ANY($3::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`,
+    [
+      value.forumStorageCodes,
+      boardIds,
+      pinned.map((p: { id: string }) => p.id),
+    ],
+  );
+  return { pinned: pinned.map(publicFields), recent: recent.map(publicFields) };
 }

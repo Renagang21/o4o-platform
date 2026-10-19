@@ -1,3 +1,4 @@
+import { BusinessHomeShowcaseService } from './services/business-home-showcase.service.js';
 import { cooperativeManagementRoutes } from './cooperative-management.routes.js';
 import { cooperativeRole } from './services/cooperative-management.service.js';
 import { StoreStaffSupportService } from './services/store-staff-support.js';
@@ -118,6 +119,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
+  const showcase = new BusinessHomeShowcaseService(dataSource);
   const cooperatives = new CooperativeService(dataSource);
   router.get('/cooperatives', handle(async (_req, res) => {
     res.setHeader('Cache-Control', 'no-store');
@@ -235,6 +237,13 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
 
   // Application surface: authentication only; membership still gates every business resource.
   router.get('/pharmacy/businesses/:key', requireAuth, handle(async (req) => getBusinessInfo(dataSource, req.params.key)));
+  router.get('/pharmacy/businesses/:key/showcase', requireAuth, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    const sf = await semiFranchises.getByKey(req.params.key);
+    if (!sf) throw new NeturePharmacyError(404, 'BUSINESS_NOT_FOUND', '협업체를 찾을 수 없습니다.');
+    const selected = req.get('X-Store-Organization-Id') || null;
+    return showcase.memberList(sf, req.user!.id, selected);
+  }));
   router.get('/pharmacy/businesses/:key/store-access', ...store, handle(async (req) =>
     resolveBusinessStoreAccess(dataSource, req.user!.id, org(req), req.params.key)));
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
@@ -320,6 +329,16 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/operator/semi-franchises', ...businessOperator, handle(async (req,res) => semiFranchises.listAssigned(req.user!.id,res.locals.cooperativeOnly===true)));
   const sfOf = (req: Req) => semiFranchises.requireOperatorOf(req.user!.id, req.params.key);
 
+  router.get('/operator/semi-franchises/:key/showcase', ...businessOperator, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    return showcase.operatorList(await sfOf(req));
+  }));
+  router.put('/operator/semi-franchises/:key/showcase', ...businessOperator, handle(async (req) =>
+    showcase.update(await sfOf(req), req.user!.id, req.body ?? {})));
+  router.get('/operator/semi-franchises/:key/showcase-history', ...businessOperator, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    return showcase.history(await sfOf(req));
+  }));
   router.get('/operator/semi-franchises/:key/memberships', ...businessOperator, handle(async (req) =>
     semiFranchises.listMemberships(await sfOf(req), req.query.status as string | undefined)));
   router.post('/operator/semi-franchises/:key/memberships/:id/:action', ...businessOperator, handle(async (req) =>

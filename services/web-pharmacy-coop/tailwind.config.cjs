@@ -3,6 +3,7 @@ module.exports = {
     "./index.html",
     "./src/**/*.{ts,tsx}",
     "../../packages/operator-core-ui/src/modules/pharmacy-management/**/*.{ts,tsx}",
+    "../../packages/shared-space-ui/src/cooperation/BusinessHomeShowcase.tsx",
   ],
   theme: {
     extend: {

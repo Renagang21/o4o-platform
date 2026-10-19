@@ -13,11 +13,16 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
   const supplier = randomUUID(), other = randomUUID(), user = randomUUID(), item = randomUUID();
   const sf = { id: randomUUID(), key: 'carepharm' } as SemiFranchiseRow;
   const foreign = { id: randomUUID(), key: 'coop' } as SemiFranchiseRow;
+  const reviewer = randomUUID();
   const member = randomUUID(), outsider = randomUUID();
   let requestId: string;
   beforeAll(async () => {
     fixture = await createCarePharmReviewDb();
     await fixture.ds.query(`
+      CREATE TABLE organizations(id uuid,name text,type text);
+      CREATE TABLE organization_members(organization_id uuid,user_id uuid,role text,left_at timestamptz,is_primary boolean);
+      CREATE TABLE neture_suppliers(id uuid,organization_id uuid,user_id uuid,status text);
+      CREATE TABLE action_logs(id uuid DEFAULT gen_random_uuid(),service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamptz DEFAULT now());
       CREATE TABLE semi_franchises (id uuid PRIMARY KEY, key text, name text, status text);
       CREATE TABLE semi_franchise_memberships (semi_franchise_id uuid, organization_id uuid, status text);
       CREATE TABLE neture_supplier_library_items (id uuid PRIMARY KEY, supplier_id uuid, title text,
@@ -73,7 +78,7 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
   });
   it('only exposes published copies to active members of the receiving business', async () => {
     await fixture.ds.query(`INSERT INTO semi_franchise_memberships VALUES ($1,$2,'active'),($3,$4,'active')`, [sf.id, member, foreign.id, outsider]);
-    await contents.operatorSetStatus(sf, user, requestId, 'publish');
+    await contents.operatorSetStatus(sf, reviewer, requestId, 'publish');
     expect((await contents.pharmacyGet(member, requestId)).id).toBe(requestId);
     await expect(contents.pharmacyGet(outsider, requestId)).rejects.toMatchObject({ httpStatus: 404 });
     await fixture.ds.query(`UPDATE semi_franchise_memberships SET status='suspended' WHERE organization_id=$1`, [member]);

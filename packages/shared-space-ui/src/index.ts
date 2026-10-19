@@ -332,3 +332,4 @@ export type { HomePresentationClient } from "./home-presentation/HomePresentatio
 export { HomePresentationEditor } from "./home-presentation/HomePresentationEditor";
 export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } from './cooperation/models';
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
+export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
