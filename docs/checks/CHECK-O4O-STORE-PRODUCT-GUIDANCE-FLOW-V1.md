@@ -89,3 +89,5 @@ store-contents-selector-inline-pop-to-v2.spec.ts
 원격 개발 HEAD와 clean 상태를 확인하고 최신 `origin/main 491be1bb82c5b9788ff97020d0e0430939be11b6`을 동일 전용 branch에 merge했다. 기존 원격 이력을 재작성하지 않았고 충돌은 없었다. main 대비 실제 변경 범위는 기존 Store 화면·로컬 helper·회귀 테스트·WO/CHECK이며 공통 Core/API/DB/의존성/배포 설정을 추가 변경하지 않는다.
 
 실제 main ruleset의 PR 필수·`CI Gate` 필수·human approval 0을 확인했다. 통합된 코드의 재검증과 PR CI·리뷰 확인 후 PR로 병합하고, post-merge CI와 현재 Delivery 정책의 `production` 상태·운영 공개 경로/자산을 확인한다. 실행별 결과는 통합 PR 및 연결된 Actions 기록으로 판정하며, 이 착수 기록 자체로 운영 배포나 실기기 검증 완료를 주장하지 않는다.
+
+[통합 PR #709](https://github.com/Renagang21/o4o-platform/pull/709)의 Codex P2 지적에서 작성 취소가 상품 목록 history entry를 복제하는 문제를 확인했다. 공통·서비스 mount의 회귀 검사 2개가 기존 코드에서 실패하는 것을 재현한 후, 이미 검색·선택을 보존한 원래 entry로 돌아가도록 수정했다. 해당 route suite 16개와 수정 파일 집중 린트를 통과했다. PC/모바일 합성 브라우저에도 취소 후 뒤로 한 번의 이전 화면 이동·앞으로의 선택 복원 검사를 추가했다. 최종 HEAD의 전체 재검증·CI·배포 결과는 PR과 연결된 실행 기록을 따른다.

@@ -87,7 +87,8 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
   const closeCreateModal = useCallback(() => {
     setCreateFromResourcesOpen(false);
     if (productCtx && productReturn) {
-      navigate(productReturn.path, { state: { productReturn }, replace: true });
+      // Product entry already retains its query and selection; do not duplicate it on cancel.
+      navigate(-1);
       return;
     }
     // 제품 진입 파라미터 정리 — 닫은 뒤 새로고침해도 재오픈되지 않게.

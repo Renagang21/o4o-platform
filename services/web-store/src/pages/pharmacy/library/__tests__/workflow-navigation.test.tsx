@@ -1,9 +1,17 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import { MemoryRouter, Route, Routes, useLocation, Link } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useStoreLibraryRoute } from '../useStoreLibraryRoute';
-const context = vi.hoisted(() => ({ scope: 'A:kpa-society' }));
+import StoreLibraryContentsPage from '../../StoreLibraryContentsPage';
+const context = vi.hoisted(() => ({ scope: 'A:kpa-society', organizationId: 'A' }));
 vi.mock('../useLibraryScope', () => ({ useLibraryScope: () => context }));
+vi.mock('../../../../components/store/StoreTaskPageShell', () => ({ StoreTaskPageShell: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
+vi.mock('../../../../components/StoreLibraryNavigation', () => ({ StoreLibraryNavigation: () => null }));
+vi.mock('../../../../api/assetSnapshot', () => ({ storeAssetControlApi: {} }));
+vi.mock('../../StoreContentsSelector', () => ({ StoreContentsSelector: () => null }));
+vi.mock('../../StartProductionModal', () => ({ StartProductionModal: () => null }));
+vi.mock('../../ContentCreationGuideModal', () => ({ ContentCreationGuideModal: () => null }));
+vi.mock('../../CreateContentFromResourcesModal', () => ({ CreateContentFromResourcesModal: ({ open, onClose }: { open: boolean; onClose: () => void }) => open ? <button onClick={onClose}>작성 취소</button> : null }));
 afterEach(() => { cleanup(); context.scope = 'A:kpa-society'; });
 function Probe() {
   const { base, libraryPath, returnState, backPath } = useStoreLibraryRoute();
@@ -34,6 +42,27 @@ it.each(['/store', '/work/kpa-society/store'])('product-origin editing carries t
   render(<MemoryRouter initialEntries={[{ pathname: `${base}/library/contents`, state: { productReturn } }]}><Probe /></MemoryRouter>);
   fireEvent.click(screen.getByRole('link', { name: '편집' }));
   expect(screen.getByTestId('back').textContent).toBe(productReturn.path);
+  expect(JSON.parse(screen.getByTestId('state').textContent!).productReturn).toEqual(productReturn);
+});
+it.each(['/store', '/work/kpa-society/store'])('cancel returns to the existing product entry so one Back leaves the list: %s', async base => {
+  const path = `${base}/workspace/commerce?q=Sample&source=local&page=2&limit=50`;
+  const productReturn = { path, scope: context.scope, selectedKey: 'local:one' };
+  function HistoryButtons() { const navigate = useNavigate(); return <><button onClick={() => navigate(-1)}>뒤로</button><button onClick={() => navigate(1)}>앞으로</button></>; }
+  render(<MemoryRouter initialIndex={2} initialEntries={[
+    `${base}/workspace/studio`,
+    { pathname: `${base}/workspace/commerce`, search: '?q=Sample&source=local&page=2&limit=50', state: { productReturn } },
+    { pathname: `${base}/library/contents`, search: '?create=1&pType=local&pId=one&pStore=A', state: { productReturn } },
+  ]}><HistoryButtons /><Routes>
+    <Route path={`${base}/workspace/studio`} element={<p>이전 화면</p>} />
+    <Route path={`${base}/workspace/commerce`} element={<Probe />} />
+    <Route path={`${base}/library/contents`} element={<StoreLibraryContentsPage />} />
+  </Routes></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '작성 취소' }));
+  expect(screen.getByTestId('back').textContent).toBe(path);
+  expect(JSON.parse(screen.getByTestId('state').textContent!).productReturn).toEqual(productReturn);
+  fireEvent.click(screen.getByRole('button', { name: '뒤로' }));
+  expect(screen.getByText('이전 화면')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '앞으로' }));
   expect(JSON.parse(screen.getByTestId('state').textContent!).productReturn).toEqual(productReturn);
 });
 it.each([
