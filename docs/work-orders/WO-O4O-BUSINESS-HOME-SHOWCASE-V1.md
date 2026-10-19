@@ -42,3 +42,6 @@ WORKTREE_DISPOSITION
 - main integration: 미실행 / PR CI: 미실행 / deployment: 미실행
 - smoke: 합성 API Chromium 16 cases PASS (PC/모바일)
 - verdict: KEEP — push 후 통합 담당의 검토·수정 요청을 위해 보존
+
+## 통합 진행
+사용자의 후속 main 병합·배포 지시로 이 공간에서 통합을 진행한다. 최신 main 40c8f9d6e0의 협동조합 역할·회원관리/관리자 가시성/상품 안내 변경을 보존했다. neture-pharmacy.routes.ts의 import 충돌은 신규 협동조합 관리 route/role과 메인 진열 service를 함께 유지해 해결했다. 개별 조합 cooperative_roles 및 기존 businessOperator/requireOperatorOf 판정은 최신 main 구현을 그대로 사용한다. 우리 변경에는 새 migration이 없으며 선행 main 배포와 겹치지 않게 진행한다. 앞 개발 단계의 PR·배포 미실행 기록은 당시 범위다.
