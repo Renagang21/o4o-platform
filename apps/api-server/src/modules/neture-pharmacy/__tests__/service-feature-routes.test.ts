@@ -108,22 +108,24 @@ it('requires the configured staff-support feature and preserves owner-only locat
   expect((await request(server).get('/api/v1/neture/admin/staff-support/demands?month=2030-01').set('x-test-actor','business-operator')).status).toBe(403);
 });
 
-it('exposes the complete cooperative directory only to authenticated platform administrators', async () => {
+it('exposes federation roles only to authenticated platform administrators without querying individual cooperatives', async () => {
   const server = app();
-  const path = '/api/v1/neture/admin/cooperatives';
+  const path = '/api/v1/neture/admin/cooperative-federation';
   expect((await request(server).get(path)).status).toBe(401);
   for (const actor of ['business-operator', 'neture-admin', 'cooperative-operator', 'invited-free-staff']) {
     expect((await request(server).get(path).set('x-test-actor', actor)).status).toBe(403);
   }
   expect(query).not.toHaveBeenCalled();
-  query.mockResolvedValueOnce([{ id: 'synthetic', cooperativeStatus: 'suspended', businessStatus: 'closed' }]).mockResolvedValueOnce([
+  query.mockResolvedValueOnce([
     { userId: 'synthetic-operator', role: 'neture:pharmcoop_admin', name: null, email: null, account_status: 'suspended', account_active: true, email_verified: true, membership_status: 'active' },
   ]);
   const result = await request(server).get(path).set('x-test-actor', 'platform-admin');
   expect(result.status).toBe(200);
   expect(result.headers['cache-control']).toBe('private, no-store');
-  expect(result.body.data).toEqual({ cooperatives: [{ id: 'synthetic', cooperativeStatus: 'suspended', businessStatus: 'closed' }], roleOperators: [
+  expect(result.body.data).toEqual({ roleOperators: [
     { userId: 'synthetic-operator', role: 'neture:pharmcoop_admin', name: null, email: null, membershipStatus: 'suspended' },
   ] });
-  expect(query.mock.calls.every(([sql]) => sql.trimStart().startsWith('SELECT'))).toBe(true);
+  expect(query).toHaveBeenCalledTimes(1);
+  expect(query.mock.calls[0][0].trimStart()).toMatch(/^SELECT/);
+  expect(query.mock.calls[0][0]).not.toMatch(/cooperatives|cooperative_memberships|semi_franchises/);
 });

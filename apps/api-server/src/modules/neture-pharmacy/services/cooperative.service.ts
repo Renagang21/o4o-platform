@@ -12,14 +12,8 @@ export class CooperativeService {
       FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id
       WHERE c.status = 'active' AND sf.status = 'active' ORDER BY c.name, c.slug`);
   }
-  /** Platform settings projection; includes suspended cooperatives and closed businesses. No state changes. */
-  async directoryForAdmin() {
-    const cooperatives = await this.db.query(`SELECT c.id, c.slug, c.name,
-      c.status AS "cooperativeStatus", sf.key AS "businessKey", sf.status AS "businessStatus",
-      (SELECT count(*)::int FROM cooperative_memberships cm
-        WHERE cm.cooperative_id=c.id AND cm.status='active') AS "activeMemberCount"
-      FROM cooperatives c JOIN semi_franchises sf ON sf.id=c.semi_franchise_id
-      ORDER BY c.name, c.slug`);
+  /** Federation role settings only; individual cooperatives and members are not queried. */
+  async federationForAdmin() {
     const roles = await this.db.query<Array<NetureMainMembershipRow & Record<string, unknown>>>(
       `SELECT ra.user_id AS "userId", ra.role, u.email,
         COALESCE(NULLIF(btrim(u.name), ''), NULLIF(btrim(concat_ws(' ', u."lastName", u."firstName")), ''), NULLIF(btrim(u.nickname), '')) AS name,
@@ -32,7 +26,6 @@ export class CooperativeService {
         AND (ra.valid_until IS NULL OR ra.valid_until>=CURRENT_TIMESTAMP)
       ORDER BY ra.role, ra.user_id`, [NETURE_MAIN_SERVICE_KEY]);
     return {
-      cooperatives,
       roleOperators: roles.map(({ account_status, account_active, email_verified, membership_status, ...role }) => ({
         ...role,
         membershipStatus: resolveNetureMainMembershipStatus({ account_status, account_active, email_verified, membership_status }),

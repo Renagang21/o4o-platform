@@ -17,7 +17,7 @@ export default function AdminCooperationBusinessesPage() {
         {[
           { label: "약국 협력사업", selected: !cooperative, query: {} },
           {
-            label: "약국·약사 협동조합",
+            label: "약국·약사 협동조합 연합회",
             selected: cooperative,
             query: { section: "cooperatives" },
           },
