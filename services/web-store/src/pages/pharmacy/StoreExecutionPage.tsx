@@ -38,8 +38,9 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
   const { pathname } = useLocation();
   const allows = (key: string) => !availableKeys || availableKeys.includes(key);
   const base = storeWorkspaceBase(pathname);
-  const tablets = useStoreResource(loadTablets, []);
-  const qrs = useStoreResource(loadQrs, { items: [] as StoreExecutionQrInput[], total: 0 });
+  const tabletAllowed = allows('tablet-displays'), qrAllowed = allows('qr');
+  const tablets = useStoreResource(loadTablets, [], tabletAllowed);
+  const qrs = useStoreResource(loadQrs, { items: [] as StoreExecutionQrInput[], total: 0 }, qrAllowed);
   const loading = tablets.loading || qrs.loading;
   const failed = !!tablets.error || !!qrs.error;
   const resources = [
@@ -54,7 +55,7 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
     <header className="flex flex-wrap items-start justify-between gap-3">
       <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />{workspace ? '매장 운영' : '실행 현황'}</h1>
         <p className="mt-2 text-sm text-slate-600">위치별 저장된 태블릿 화면과 QR 설정을 확인합니다. 실제 기기 연결·재생과 QR 스캔 결과는 현장에서 확인해 주세요.</p></div>
-      <button type="button" disabled={loading} onClick={() => { void tablets.reload(); void qrs.reload(); }} className="min-h-11 rounded-lg border px-4 text-sm disabled:opacity-50">새로고침</button>
+      <button type="button" disabled={loading || (!tabletAllowed && !qrAllowed)} onClick={() => { void tablets.reload(); void qrs.reload(); }} className="min-h-11 rounded-lg border px-4 text-sm disabled:opacity-50">새로고침</button>
     </header>
     <StoreAiSlot />
     {navigation}
@@ -63,13 +64,17 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
       {allows('qr') && <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>}
       {allows('signage-playlist') && <Link className="min-h-11 border rounded-lg px-4 content-center" to={`${base}/marketing/signage/playlist?workspace=use`}>사이니지 운영</Link>}
     </nav>
+    {(!tabletAllowed || !qrAllowed) && <p className="text-sm text-slate-600">
+      {!(tabletAllowed || qrAllowed) ? '현재 이용 가능한 태블릿·QR 기능이 없습니다.' : `${tabletAllowed ? 'QR' : '태블릿'}은 현재 이용 가능한 기능에 포함되지 않아 조회·집계에서 제외합니다.`}
+    </p>}
     {resources.map(resource => resource.error && <div key={resource.label} role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
       {resource.label} 현황을 확인하지 못했습니다. <button type="button" className="min-h-11 underline" disabled={resource.loading} onClick={() => void resource.reload()}>{resource.label} 현황 다시 시도</button>
     </div>)}
     {!loading && failed && <p role="status" className="text-sm text-slate-600">조회에 성공한 자료만 표시합니다. 확인하지 못한 항목은 사용 없음으로 집계하지 않습니다.</p>}
     {!loading && !qrs.error && qrs.data.total > qrs.data.items.length && <p className="text-sm text-amber-800">QR 전체 {qrs.data.total}건 중 {qrs.data.items.length}건 기준입니다. 전체 목록은 QR 배치·출력에서 확인하세요.</p>}
-    {(loading || !failed || (!tablets.error && tablets.data.length > 0) || (!qrs.error && qrs.data.items.length > 0)) && <StoreExecutionHomeView
+    {(tabletAllowed || qrAllowed) && (loading || !failed || (!tablets.error && tablets.data.length > 0) || (!qrs.error && qrs.data.items.length > 0)) && <StoreExecutionHomeView
       tablets={tablets.error ? [] : tablets.data} qrs={qrs.error ? [] : qrs.data.items} loading={loading}
+      labels={{ summaryTablets: '조회한 태블릿', ...(!tabletAllowed ? { emptyAll: '조회한 QR이 없습니다', emptyHint: 'QR 배치·출력에서 저장한 QR을 확인해 주세요.' } : !qrAllowed ? { emptyAll: '조회한 태블릿이 없습니다', emptyHint: '태블릿 화면 변경에서 저장한 태블릿을 확인해 주세요.' } : {}) }}
       palette={{ primary: colors.primary }} renderGroupLinks={groupLinks}
       emptyAction={allows('tablet-displays') ? <Link to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 적용으로 가기</Link> : undefined}
     />}
