@@ -1,4 +1,4 @@
-# WO-O4O-SUPPLIER-WORKFLOW-CLOSURE-V1
+# WO-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1
 
 > 상태: ACTIVE · 작성일: 2026-10-19
 > 기준 main: `491be1bb82` · 사용자: 공급자 잔여 정비 진행
@@ -10,7 +10,7 @@
 - [x] 격리 PostgreSQL의 표준 schema에서 기존 20 PASS/6 FAIL 재현
 - [x] 현재 기본 공급 opt-in·커뮤니티 정책과 fixture/기대값 대조·정비, 26/26 PASS
 - [x] 새 DB 표준 재생 후 협업체별 조건·콘텐츠 요청 포함 API 133개 및 공유 UI 47개 PASS
-- [x] 기존 작업의 PR/배포 증거와 [별도 CHECK](../checks/CHECK-O4O-SUPPLIER-WORKFLOW-CLOSURE-V1.md) 연결, 검증·미실행 범위 구분
+- [x] 기존 작업의 PR/배포 증거와 [별도 CHECK](../checks/CHECK-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1.md) 연결, 검증·미실행 범위 구분
 - [x] 문서/코드 검증·범위 확인 후 commit·push로 개발 인계 (HEAD·원격 확인은 완료 보고 참조)
 
 사용자 제외 항목인 제안 대상 약국의 active 가입 추가 검사와 결제 직전 제안/가입 재검증은 구현하지 않는다. pharmacy 특별가격은 동일 승인 절차를 유지한다. 운영자 실제 승인·운영 주문/결제·업무 데이터 쓰기는 수행하지 않는다. 초안 영구 저장은 이번 범위 밖이다. 공급자 종료 사유 입력은 2026-10-19 사용자 결정으로 불필요하며 후속 TODO로 남기지 않는다. 새 migration/정책 변경은 이번 범위 밖이다.
