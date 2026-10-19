@@ -1,4 +1,6 @@
 import { BusinessHomeShowcaseService } from './services/business-home-showcase.service.js';
+import { cooperativeManagementRoutes } from './cooperative-management.routes.js';
+import { cooperativeRole } from './services/cooperative-management.service.js';
 import { StoreStaffSupportService } from './services/store-staff-support.js';
 import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
@@ -61,7 +63,7 @@ import { SemiFranchiseContentService } from './services/semi-franchise-content.s
 import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
 import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
 import { AssetCopyService } from '@o4o/asset-copy-core';
-import { NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
+import { getNetureMainMembershipStatus, NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
 type Handler = (req: Req, res: Response) => Promise<unknown>;
@@ -121,6 +123,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     res.setHeader('Cache-Control', 'private, no-store');
     return cooperatives.session(req.user!.id);
   }));
+  router.use('/cooperative-management', cooperativeManagementRoutes(dataSource));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
   const proposals = new SupplyProposalService(dataSource);
   const supplierContents = new SupplierBusinessContentService(dataSource);
@@ -136,10 +139,34 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const mainAccess = requireNetureMainMembership(dataSource);
   const store = [requireAuth, createPharmacyStoreAccess(dataSource)] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
-  const businessOperator = [requireAuth, requireNetureBusinessScope as RequestHandler];
+  const cooperativeBusinessGuard: RequestHandler = async (req,res,next) => {
+    try {
+      if (req.params.key) {
+        const [c] = await dataSource.query('SELECT c.id FROM cooperatives c JOIN semi_franchises sf ON sf.id=c.semi_franchise_id WHERE sf.key=$1',[req.params.key]);
+        if (c) {
+          if (!await cooperativeRole(dataSource,req.user!.id,c.id) || req.path.includes('/memberships')) {
+            res.status(403).json({success:false,code:'COOPERATIVE_FORBIDDEN',error:'해당 조합의 업무 권한이 필요합니다.'}); return;
+          }
+          next(); return;
+        }
+      } else {
+        const [row] = await dataSource.query(`SELECT c.id FROM cooperative_roles cr JOIN cooperatives c ON c.id=cr.cooperative_id
+          JOIN semi_franchises sf ON sf.id=c.semi_franchise_id JOIN users u ON u.id=cr.user_id
+          WHERE cr.user_id=$1 AND cr.revoked_at IS NULL AND c.status='active' AND sf.status='active'
+          AND u.status IN ('active','approved') AND u."isActive"=true AND u."isEmailVerified"=true LIMIT 1`,[req.user!.id]);
+        if (row) {res.locals.cooperativeOnly=await getNetureMainMembershipStatus(dataSource,req.user!.id)!=='active';next();return;}
+      }
+      await (requireNetureBusinessScope as RequestHandler)(req,res,next);
+    } catch(error) {next(error);}
+  };
+  const businessOperator = [requireAuth, cooperativeBusinessGuard];
   const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
+  router.get('/admin/cooperative-federation', ...admin, handle(async (_req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    return cooperatives.federationForAdmin();
+  }));
   const org = (req: Req) => req.organizationId as string;
 
   const documents = new BusinessRegistrationDocumentService(dataSource);
@@ -286,7 +313,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     membership.decide(req.user!.id, uuidParam(req, 'id'), actionParam<MembershipAction>(req, MEMBERSHIP_ACTIONS), req.body?.reason)));
 
   // ─── 담당 세미프랜차이즈 운영자 ───────────────────────────────────────────
-  router.get('/operator/semi-franchises', ...businessOperator, handle(async (req) => semiFranchises.listAssigned(req.user!.id)));
+  router.get('/operator/semi-franchises', ...businessOperator, handle(async (req,res) => semiFranchises.listAssigned(req.user!.id,res.locals.cooperativeOnly===true)));
   const sfOf = (req: Req) => semiFranchises.requireOperatorOf(req.user!.id, req.params.key);
 
   router.get('/operator/semi-franchises/:key/showcase', ...businessOperator, handle(async (req, res) => {

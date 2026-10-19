@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import { AuthClient, getAccessToken } from "@o4o/auth-client";
-import { EmailLoginForm, O4O_ACCOUNT_LINKS, useServiceAuth } from "@o4o/auth-react";
+import {
+  EmailLoginForm,
+  O4O_ACCOUNT_LINKS,
+  useServiceAuth,
+} from "@o4o/auth-react";
 import { App } from "./App";
 import {
   anonymousSession,
@@ -23,6 +27,7 @@ export function ConnectedApp() {
   const [cooperatives, setCooperatives] = useState<Cooperative[]>([]);
   const [snapshot, setSnapshot] = useState<SessionSnapshot>(anonymousSession);
   const [error, setError] = useState(false);
+  const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   useEffect(() => {
@@ -53,7 +58,7 @@ export function ConnectedApp() {
     return () => {
       current = false;
     };
-  }, [auth.user]);
+  }, [auth.user, revision]);
   // Never expose a previous user's assignments while a new session is being loaded.
   const session =
     !loading && snapshot.userId === auth.user?.id ? snapshot : anonymousSession;
@@ -112,6 +117,7 @@ export function ConnectedApp() {
           path="*"
           element={
             <App
+              onSessionChanged={() => setRevision((v) => v + 1)}
               cooperatives={cooperatives}
               session={session}
               businessClient={authClient.api}

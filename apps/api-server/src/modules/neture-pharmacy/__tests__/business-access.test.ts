@@ -7,6 +7,7 @@ function executor(allowed: boolean) {
   return { query: jest.fn(async (sql: string, _params: unknown[]) => {
     if (sql.includes('SELECT sf.key, sf.name')) return [{ key: sf.key, name: '사업', communityKey: null }];
     if (sql.includes('SELECT id, key, status')) return [sf];
+    if (sql.includes('FROM cooperatives WHERE semi_franchise_id=$1')) return [];
     if (sql.includes('FROM semi_franchises sf WHERE sf.id=$2')) return [];
     if (sql.includes('WHERE EXISTS')) return allowed ? [{ ok: 1 }] : [];
     throw new Error('Unexpected query');
@@ -19,8 +20,8 @@ describe('business access independently of forum configuration', () => {
     const byForum = executor(true);
     expect(await resolveSemiFranchiseBusinessAccess(byBusiness, 'owner', 'pharmacy')).toEqual(
       await resolveSemiFranchiseCommunityAccess(byForum, 'owner', 'configured-forum'));
-    expect(byBusiness.query.mock.calls[2]).toEqual(byForum.query.mock.calls[2]);
-    expect(byBusiness.query.mock.calls[2][1]).toEqual([sf.id, 'owner']);
+    expect(byBusiness.query.mock.calls[3]).toEqual(byForum.query.mock.calls[3]);
+    expect(byBusiness.query.mock.calls[3][1]).toEqual([sf.id, 'owner']);
     expect(byBusiness.query.mock.calls[0][0]).toContain('WHERE key = $1');
     expect(byForum.query.mock.calls[0][0]).toContain('WHERE community_key = $1');
   });

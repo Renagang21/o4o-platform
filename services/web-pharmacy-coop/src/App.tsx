@@ -1,9 +1,19 @@
 import { BusinessHomeShowcase } from '@o4o/shared-space-ui';
 import {
+  FederationManagementPanel,
+  MemberManagementPanel,
+  MembershipApplication,
+  AffiliationApplication,
+  PersonalHistory,
+  WithdrawalRequest,
+  MyAffiliations,
+} from "./Management";
+import {
   createContext,
   useContext,
   useEffect,
   useMemo,
+  useState,
   lazy,
   Suspense,
 } from "react";
@@ -36,6 +46,7 @@ interface AppContext {
   cooperatives: readonly Cooperative[];
   session: SessionSnapshot;
   preview: boolean;
+  onSessionChanged?: () => void;
 }
 const Context = createContext<AppContext>({
   cooperatives: [],
@@ -62,18 +73,26 @@ function SiteLink({
 
 export function App({
   businessClient,
+  onSessionChanged,
   cooperatives,
   session = anonymousSession,
   preview = false,
 }: {
+  onSessionChanged?: () => void;
   businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
   session?: SessionSnapshot;
   preview?: boolean;
 }) {
   const context = useMemo(
-    () => ({ cooperatives, session, preview, businessClient }),
-    [cooperatives, session, preview, businessClient],
+    () => ({
+      cooperatives,
+      session,
+      preview,
+      businessClient,
+      onSessionChanged,
+    }),
+    [cooperatives, session, preview, businessClient, onSessionChanged],
   );
   return (
     <Context.Provider value={context}>
@@ -148,7 +167,15 @@ function Layout() {
             )}
           </nav>
           <span className="account-status">
-            {session.userId ? "로그인됨" : <><span>로그인 후 조합 이용</span>{" · "}<a href="https://neture.co.kr/signup">회원가입</a></>}
+            {session.userId ? (
+              "로그인됨"
+            ) : (
+              <>
+                <span>로그인 후 조합 이용</span>
+                {" · "}
+                <a href="https://neture.co.kr/signup">회원가입</a>
+              </>
+            )}
           </span>
         </div>
       </header>
@@ -166,7 +193,7 @@ function Layout() {
             <strong>약국 협동조합 연합회</strong>
             <p>각 조합의 자율적인 운영을 연결합니다.</p>
           </div>
-          <span>서비스 기본 구조 · 가입 접수 준비 중</span>
+          <span>조합의 자율적인 가입·운영을 지원합니다.</span>
         </div>
       </footer>
     </>
@@ -318,6 +345,8 @@ function Directory({ compact = false }: { compact?: boolean }) {
 }
 
 function FederationAbout() {
+  const [applicationsVersion, setApplicationsVersion] = useState(0);
+  const { businessClient, session, preview } = useContext(Context);
   return (
     <section className="section narrow">
       <p className="eyebrow">연합회 소개</p>
@@ -338,10 +367,17 @@ function FederationAbout() {
           조합에 가입할 수 있습니다.
         </p>
       </div>
-      <Empty
-        title="연합회 가입 절차 준비 중"
-        text="조합의 가입 신청·심사 절차와 연합회 세부 업무는 추가 협의 후 연결합니다."
-      />
+      {businessClient && session.userId && !preview ? (
+        <>
+          <AffiliationApplication
+            client={businessClient}
+            onChanged={() => setApplicationsVersion((v) => v + 1)}
+          />
+          <MyAffiliations key={applicationsVersion} client={businessClient} />
+        </>
+      ) : (
+        <p>로그인 후 조합 가입을 신청할 수 있습니다.</p>
+      )}
     </section>
   );
 }
@@ -432,7 +468,8 @@ function CooperativeHome() {
 
 function Membership() {
   const cooperative = useOutletContext<Cooperative>();
-  const { session } = useContext(Context);
+  const { session, businessClient, preview, onSessionChanged } =
+    useContext(Context);
   const { status } = cooperativeAccess(session, cooperative.id);
   const statusLabels = {
     pending: "심사 대기",
@@ -452,8 +489,35 @@ function Membership() {
       </div>
       <Empty
         title={status ? statusLabels[status] : emptyTitle}
-        text="조합 가입과 약국 내 매장 자격은 별개입니다. 가입 신청의 실제 저장과 심사는 아직 연결되지 않았습니다."
+        text="조합 가입과 약국 내 매장 자격은 별개입니다. 조합의 admin이 가입 자격을 최종 심사합니다."
       />
+      {session.userId &&
+        businessClient &&
+        !preview &&
+        (!status ||
+          status === "pending" ||
+          status === "withdrawn" ||
+          status === "rejected") && (
+          <MembershipApplication
+            key={cooperative.id}
+            client={businessClient}
+            coop={cooperative.id}
+            onChanged={onSessionChanged}
+          />
+        )}
+      {session.userId && businessClient && !preview && (
+        <PersonalHistory
+          key={`${cooperative.id}:${status}`}
+          client={businessClient}
+          coop={cooperative.id}
+        />
+      )}
+      {session.userId &&
+        businessClient &&
+        !preview &&
+        (status === "active" || status === "suspended") && (
+          <WithdrawalRequest client={businessClient} coop={cooperative.id} />
+        )}
     </section>
   );
 }
@@ -529,7 +593,18 @@ function Services() {
 }
 
 function FederationManagement() {
-  const { session } = useContext(Context);
+  const { session, businessClient, preview } = useContext(Context);
+  if (businessClient && !preview && canManageFederation(session))
+    return (
+      <FederationManagementPanel
+        key={session.userId}
+        client={businessClient}
+        admin={session.federationOperators.some(
+          (r) => r.userId === session.userId && r.role === "admin",
+        )}
+        userId={session.userId!}
+      />
+    );
   return (
     <section className="section">
       <h1>연합회 운영</h1>
@@ -550,18 +625,29 @@ function CooperativeManagement({
 }: Readonly<{ editor?: boolean }>) {
   const cooperative = useOutletContext<Cooperative>();
   const { session, businessClient } = useContext(Context);
-  const { canManage } = cooperativeAccess(session, cooperative.id);
+  const { canManage, isAdmin } = cooperativeAccess(session, cooperative.id);
   if (canManage && cooperative.businessKey && businessClient)
     return (
-      <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
-        <CooperativeBusinessOperator
-          key={cooperative.id}
-          businessKey={cooperative.businessKey}
-          slug={cooperative.slug}
-          client={businessClient}
-          editor={editor}
-        />
-      </Suspense>
+      <>
+        {!editor && (
+          <MemberManagementPanel
+            key={`${session.userId}:${cooperative.id}`}
+            client={businessClient}
+            cooperative={cooperative}
+            admin={isAdmin}
+            userId={session.userId!}
+          />
+        )}
+        <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
+          <CooperativeBusinessOperator
+            key={cooperative.id}
+            businessKey={cooperative.businessKey}
+            slug={cooperative.slug}
+            client={businessClient}
+            editor={editor}
+          />
+        </Suspense>
+      </>
     );
   return (
     <section className="section">
