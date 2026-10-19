@@ -1,7 +1,10 @@
 # WO-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-19
-> 기준 main: `491be1bb82` · 사용자: 공급자 잔여 정비 진행
+> **상태**: ACTIVE
+> **작성일**: 2026-10-19 · **최종 갱신**: 2026-10-19
+> **근거 WO/IR**: [WO-O4O-SUPPLIER-BUSINESS-TERMS-V1](WO-O4O-SUPPLIER-BUSINESS-TERMS-V1.md) · 사용자 공급자 잔여 정비 진행 지시
+
+기준 main: `491be1bb82`
 
 ## 범위와 TODO
 

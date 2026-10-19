@@ -1,8 +1,10 @@
 # CHECK-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1
 
-> 상태: ACTIVE · 검증일: 2026-10-19 (Asia/Seoul)
-> 기준 main: `491be1bb82c5b9788ff97020d0e0430939be11b6`
-> 작업: [WO](../work-orders/WO-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1.md)
+> **상태**: ACTIVE
+> **작성일**: 2026-10-19 · **최종 갱신**: 2026-10-19
+> **근거 WO/IR**: [WO-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1](../work-orders/WO-O4O-SUPPLIER-WORKFLOW-VERIFICATION-V1.md)
+
+기준 main: `491be1bb82c5b9788ff97020d0e0430939be11b6` · 검증 기준 시간대: Asia/Seoul
 
 ## 1. 결론과 검증 경계
 
