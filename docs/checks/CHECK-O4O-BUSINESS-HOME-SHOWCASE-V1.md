@@ -17,3 +17,7 @@ WO 최초 TODO 작성 → 정본/코드 소비처 재검증 → 구현 전 TODO 
 
 ## 미실행 / 인계
 실제 운영 계정/사업 등록·담당 지정·개별 조합의 가입 상태·DNS/호스트 연결 검증은 미실행이다. 실제 공급 요청/승인·가입·제품·콘텐츠·조직 설정·감사 로그 데이터는 변경하지 않았다. 새 migration 없음. 개발 종료점은 push이며 PR·CI·병합·배포는 통합 담당 범위다. 작업 worktree/branch는 후속 수정용 KEEP.
+
+## main 통합 후 재검증
+최신 협동조합 역할/회원관리 main을 보존해 API import 충돌을 해결했다. 통합 후 API·권한·도메인 경계 76개, 공통 운영자 50개, Pharmcoop 43개 및 API/Pharmcoop production build, 협동조합 PC/모바일 4개 시나리오 PASS. 이어 최신 협동조합 정책과 기존 진열 조회를 대조해 개인 조합원의 Neture 메인 상태 결합을 해소하고 회귀 검증을 추가했다. 앞의 385개 개발 검증 기록은 최초 개발 HEAD의 결과다.
+개인 조합 자격 분리 수정 후 API·권한·경계 5 suites / 77 tests와 API production build, 변경 코드 ESLint 및 문서 민감정보 검사 PASS. 약국은 기존 Neture/조직/사업 자격을 유지하고 개인 조합원만 최신 독립 자격 정책을 따른다.

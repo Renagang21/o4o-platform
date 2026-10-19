@@ -86,6 +86,12 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
     await batch(`UPDATE neture_suppliers SET status='ACTIVE';UPDATE supply_proposals SET status='ended' WHERE id=$1`,[global]);
     expect((await service.memberList(sf,user,store)).items.map(i=>i.id)).not.toContain(`product:${global}`);
   });
+  it('keeps personal cooperative membership independent of Neture main service suspension',async()=>{
+    await batch(`INSERT INTO service_memberships VALUES($1,'neture','suspended')`,[user]);
+    expect((await service.memberList(sf,user,null)).items.some(i=>i.id===`content:${content}`)).toBe(true);
+    await expect(service.memberList(sf,user,store)).rejects.toMatchObject({httpStatus:403});
+    await batch(`DELETE FROM service_memberships WHERE user_id=$1`,[user]);
+  });
   it('rechecks suspended pharmacy and cooperative memberships and closed business on every read',async()=>{
     await batch(`UPDATE semi_franchise_memberships SET status='suspended'`);
     await expect(service.memberList(sf,user,store)).rejects.toMatchObject({httpStatus:403});

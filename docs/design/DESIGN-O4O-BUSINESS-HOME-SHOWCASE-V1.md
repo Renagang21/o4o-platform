@@ -10,7 +10,7 @@
 ## 권한과 DTO
 operator 경로는 기존 businessOperator 미들웨어와 requireOperatorOf를 재사용한다. 담당 판정·역할은 business-operator-access.ts의 기존 정책이 최종 권위다. 전역 화면이나 프런트의 메뉴/URL은 권한이 아니다. 기존 연합회·개별 조합 운영 역할 정책을 새로 변경하지 않는다. Pharmcoop은 서버 directory가 제공한 개별 조합→businessKey 연결과 cooperative session의 해당 조합 canManage를 사용한다.
 
-회원 조회는 requireAuth 이후 선택 약국의 사용자/조직 권한·약국 승인·해당 사업 가입 active를 resolveBusinessStoreAccess로 확인한다. 개인 조합원은 그 business에 연결된 활성 개별 조합의 활성 개인 가입과 계정/Neture 정지 여부를 확인한다. 개인 가입만으로 약국 대상 한정 제안이나 구매 자격을 부여하지 않는다. 이 경로는 전체 대상 제품 소개·승인 콘텐츠만 반환하며 가격·대상 약국·첨부 DTO를 제외한다. 콘텐츠 본문은 기존 ContentRenderer를 사용한다. 콘텐츠/사본 거래 자격은 기존 별도 API가 판정한다. 비회원 공개 없음.
+회원 조회는 requireAuth 이후 선택 약국의 사용자/조직 권한·약국 승인·해당 사업 가입 active를 resolveBusinessStoreAccess로 확인한다. 개인 조합원은 그 business에 연결된 활성 개별 조합의 활성 개인 가입과 계정 상태를 확인한다. 최신 협동조합 정책에 따라 개인 조합 접근은 Neture 메인 가입 상태와 독립이며, 선택 약국의 이용 자격과도 섞지 않는다. 개인 가입만으로 약국 대상 한정 제안이나 구매 자격을 부여하지 않는다. 이 경로는 전체 대상 제품 소개·승인 콘텐츠만 반환하며 가격·대상 약국·첨부 DTO를 제외한다. 콘텐츠 본문은 기존 ContentRenderer를 사용한다. 콘텐츠/사본 거래 자격은 기존 별도 API가 판정한다. 비회원 공개 없음.
 
 ## 원자성과 이력
 진열 쓰기는 운영 조직 행 잠금으로 같은 조직에 속한 다른 사업 설정을 보존하고 클라이언트 version과 비교한다. 충돌은 SHOWCASE_CHANGED 409로 반환한다. 해당 사업의 현재 승인 항목인지 확인하며 사업 마감 시 변경을 거부한다. 같은 트랜잭션에서 action_logs에 business.showcase.update를 기록한다. 감사 로그 실패 시 설정도 rollback한다.

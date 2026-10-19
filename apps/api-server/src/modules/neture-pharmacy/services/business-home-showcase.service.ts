@@ -85,7 +85,7 @@ export class BusinessHomeShowcaseService {
         JOIN cooperatives c ON c.id=cm.cooperative_id AND c.status='active'
         JOIN users u ON u.id=cm.user_id AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved')
         WHERE cm.user_id=$1 AND cm.status='active' AND c.semi_franchise_id=$2
-        AND NOT EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=$1 AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')) LIMIT 1`, [userId, sf.id]);
+        LIMIT 1`, [userId, sf.id]);
       if (!member) throw new NeturePharmacyError(403, 'MEMBERSHIP_REQUIRED', '이 협업체의 가입 승인이 필요합니다.');
     }
     const items = sortShowcase(await this.candidates(sf, organizationId, false), await this.settings(sf)).slice(0, 60);
