@@ -37,6 +37,7 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
     { label: '게시판 운영', path: '/operator/communities/boards' },
     { label: '게시판 · 공개 설정 관리', path: '/operator/communities' },
   ], content: [
+    { label: '첫 화면 · 콘텐츠 · 자료 관리', path: '/operator/communities/home' },
     { label: 'Hero · 광고 관리', path: '/operator/home-presentation/community' },
   ] },
 };
