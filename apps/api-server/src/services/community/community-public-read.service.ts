@@ -143,3 +143,14 @@ export async function setCommunityPublicRead(exec: Exec, key: string, user: Comm
     WHERE id = $1::uuid`, [boardId, JSON.stringify(setting)]);
   return selection;
 }
+
+/** Home preview keeps pinned slots separate from the ten latest readable posts. */
+export async function publicCommunityHomePosts(exec: Exec) {
+  const value = await workspace(exec, 'community', null);
+  const boardIds = await verifiedPublicBoards(exec, value);
+  if (!boardIds.length) return { pinned: [], recent: [] };
+  const base = `FROM forum_post p JOIN forum_category_requests b ON b.id=p.forum_id WHERE ${PUBLIC_POST}`;
+  const pinned = await exec.query(`SELECT ${PUBLIC_FIELDS} ${base} AND p."isPinned"=true ORDER BY p.updated_at DESC,p.id LIMIT 2`, [value.forumStorageCodes,boardIds]);
+  const recent = await exec.query(`SELECT ${PUBLIC_FIELDS} ${base} AND NOT(p.id=ANY($3::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`, [value.forumStorageCodes,boardIds,pinned.map((p:{id:string})=>p.id)]);
+  return { pinned:pinned.map(publicFields), recent:recent.map(publicFields) };
+}

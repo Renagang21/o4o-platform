@@ -73,6 +73,8 @@ import SupplierLandingPage from './pages/SupplierLandingPage';
 import CommunityWorkspacePage from './pages/community/CommunityWorkspacePage';
 import CommunityPublicPostsPage from './pages/community/CommunityPublicPostsPage';
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
+import CommunityEditorialPage from './pages/community/CommunityEditorialPage';
+import CommunityHomeManagementPage from './pages/community/CommunityHomeManagementPage';
 import CarePharmHomePage from './pages/carepharm/CarePharmHomePage';
 
 // ============================================================================
@@ -725,6 +727,13 @@ function App() {
                 <Route path="/tools" element={<CarePharmHomePage view="tools" />} />
               </>}
               <Route path="/pharmacist" element={<Navigate to="/" replace />} />
+              {(['notice','news','content','resource'] as const).map(kind => {
+                const segment = {notice:'notices',news:'news',content:'content',resource:'resources'}[kind];
+                return <Route key={kind} path={`/communities/community/${segment}`}>
+                  <Route index element={<CommunityEditorialPage kind={kind}/>} />
+                  <Route path=":id" element={<CommunityEditorialPage kind={kind}/>} />
+                </Route>;
+              })}
               <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage />} />
@@ -1167,6 +1176,7 @@ function App() {
               <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
+              <Route path="/operator/communities/home" element={<CommunityHomeManagementPage />} />
               <Route path="/operator/communities" element={<CommunityWorkspacePage />} />
               <Route path="/operator/communities/boards" element={<CommunityServiceManagementPage kind="boards" />} />
               {CURRENT_HOST_PROFILE === 'community' && <>
