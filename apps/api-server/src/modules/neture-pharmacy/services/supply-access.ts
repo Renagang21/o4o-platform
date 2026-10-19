@@ -64,7 +64,7 @@ const ACCESS_CTE = `
      WHERE spo.is_active = true AND spo.deleted_at IS NULL AND spo.approval_status = 'APPROVED'
   ),
   options AS (
-    -- (1) 공급처 미지정 승인 제품 = pharmacy 기본 공급만
+    -- (1) 명시적으로 기본 공급 게시를 선택한 승인 제품 = pharmacy 기본 공급만 (service_keys에서 추론하지 않음)
     SELECT 'default'::text AS kind, b.offer_id AS option_id, b.*, sf.key AS sf_key, sf.name AS sf_name,
            sf.payment_receiver_key, b.price_general AS unit_price, NULL::uuid AS target_organization_id,
            NULL::text AS note, NULL::timestamp AS start_at, NULL::timestamp AS end_at,
