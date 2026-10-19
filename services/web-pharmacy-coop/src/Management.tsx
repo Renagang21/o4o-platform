@@ -60,14 +60,30 @@ function eventLabel(action: string): string {
     ? `${labels[clean.slice(8)] || "처리"} 요청`
     : labels[clean] || "처리 기록";
 }
-const actionsFor = (status: string) =>
-  status === "pending"
-    ? ["approve", "reject"]
-    : status === "active"
-      ? ["suspend", "withdraw", "expel"]
-      : status === "suspended"
-        ? ["restore", "withdraw", "expel"]
-        : [];
+function actionsFor(status: string): string[] {
+  if (status === "pending") return ["approve", "reject"];
+  if (status === "active") return ["suspend", "withdraw", "expel"];
+  if (status === "suspended") return ["restore", "withdraw", "expel"];
+  return [];
+}
+function affiliationActions(status: string, admin: boolean): string[] {
+  if (status === "pending")
+    return [
+      "review",
+      "request_changes",
+      ...(admin ? ["approve", "reject"] : []),
+    ];
+  if (!admin) return [];
+  if (status === "active") return ["suspend"];
+  if (status === "suspended") return ["restore"];
+  return [];
+}
+const affiliationMaxLength = {
+  slug: 58,
+  name: 255,
+  introduction: 2000,
+  eligibilityDescription: 2000,
+} as const;
 function errorText(error: unknown) {
   const e = error as {
     response?: { data?: { error?: string } };
@@ -116,11 +132,14 @@ function useWork(client: Client, path: string) {
   };
   return { data, error, busy, message, send, version };
 }
-function Feedback({ error, message }: { error: string; message: string }) {
+function Feedback({
+  error,
+  message,
+}: Readonly<{ error: string; message: string }>) {
   return (
     <>
       {error && <p role="alert">{error}</p>}
-      {message && <p role="status">{message}</p>}
+      {message && <output>{message}</output>}
     </>
   );
 }
@@ -129,12 +148,12 @@ function History({
   coop,
   federation,
   version,
-}: {
+}: Readonly<{
   client: Client;
   coop: string;
   federation: boolean;
   version: number;
-}) {
+}>) {
   const path = `${base}/${federation ? "federation/" : ""}${coop}/history`;
   const [rows, setRows] = useState<Event[]>([]);
   const [error, setError] = useState("");
@@ -181,12 +200,12 @@ export function RoleManagement({
   coop,
   federation,
   userId,
-}: {
+}: Readonly<{
   client: Client;
   coop: string;
   federation: boolean;
   userId: string;
-}) {
+}>) {
   const work = useWork(
     client,
     `${base}/${federation ? "federation/" : ""}${coop}/roles`,
@@ -205,7 +224,7 @@ export function RoleManagement({
         }}
       >
         <label>
-          기존 계정 이메일
+          <span>기존 계정 이메일</span>
           <input
             required
             type="email"
@@ -214,7 +233,7 @@ export function RoleManagement({
           />
         </label>
         <label>
-          지정·해제 사유
+          <span>지정·해제 사유</span>
           <textarea
             required
             maxLength={2000}
@@ -222,13 +241,16 @@ export function RoleManagement({
             onChange={(e) => setReason(e.target.value)}
           />
         </label>
-        <button disabled={work.busy || !reason.trim()}>조합 {role} 지정</button>
+        <button type="submit" disabled={work.busy || !reason.trim()}>
+          조합 {role} 지정
+        </button>
       </form>
       {(work.data as Role[] | null)?.map((r) => (
         <p key={r.id}>
           {r.name || r.email} · {r.role}{" "}
           {r.role === role && (
             <button
+              type="button"
               disabled={work.busy || r.userId === userId || !reason.trim()}
               onClick={() =>
                 void work.send(`${base}/${coop}/roles/${r.id}/revoke`, {
@@ -254,11 +276,11 @@ export function FederationManagementPanel({
   client,
   admin,
   userId,
-}: {
+}: Readonly<{
   client: Client;
   admin: boolean;
   userId: string;
-}) {
+}>) {
   const work = useWork(client, `${base}/federation`);
   const [selected, setSelected] = useState<Affiliation | null>(null),
     [reason, setReason] = useState("");
@@ -283,6 +305,7 @@ export function FederationManagementPanel({
               {labels[c.status]} · /{c.slug}
             </p>
             <button
+              type="button"
               onClick={() => {
                 setSelected(c);
                 setReason("");
@@ -299,7 +322,7 @@ export function FederationManagementPanel({
           <p>{current.introduction}</p>
           <p>가입 자격: {current.eligibilityDescription}</p>
           <label>
-            처리 사유
+            <span>처리 사유</span>
             <textarea
               maxLength={2000}
               value={reason}
@@ -307,21 +330,9 @@ export function FederationManagementPanel({
             />
           </label>
           <div className="actions">
-            {(current.status === "pending"
-              ? [
-                  "review",
-                  "request_changes",
-                  ...(admin ? ["approve", "reject"] : []),
-                ]
-              : admin
-                ? current.status === "active"
-                  ? ["suspend"]
-                  : current.status === "suspended"
-                    ? ["restore"]
-                    : []
-                : []
-            ).map((a) => (
+            {affiliationActions(current.status, admin).map((a) => (
               <button
+                type="button"
                 key={a}
                 disabled={work.busy || !reason.trim()}
                 onClick={() =>
@@ -361,12 +372,12 @@ export function MemberManagementPanel({
   cooperative,
   admin,
   userId,
-}: {
+}: Readonly<{
   client: Client;
   cooperative: Cooperative;
   admin: boolean;
   userId: string;
-}) {
+}>) {
   const work = useWork(client, `${base}/${cooperative.id}/members`);
   const [reason, setReason] = useState("");
   return (
@@ -379,7 +390,7 @@ export function MemberManagementPanel({
       </p>
       <Feedback {...work} />
       <label>
-        검토·처리 사유
+        <span>검토·처리 사유</span>
         <textarea
           maxLength={2000}
           value={reason}
@@ -404,6 +415,7 @@ export function MemberManagementPanel({
                 ),
               ].map((a) => (
                 <button
+                  type="button"
                   key={a}
                   disabled={work.busy || !reason.trim()}
                   onClick={() =>
@@ -443,11 +455,11 @@ export function MembershipApplication({
   client,
   coop,
   onChanged,
-}: {
+}: Readonly<{
   client: Client;
   coop: string;
   onChanged?: () => void;
-}) {
+}>) {
   const [reason, setReason] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -473,7 +485,7 @@ export function MembershipApplication({
     >
       <h3>개인 조합원 가입·보완 신청</h3>
       <label>
-        가입 자격·신청 내용
+        <span>가입 자격·신청 내용</span>
         <textarea
           required
           maxLength={2000}
@@ -481,7 +493,9 @@ export function MembershipApplication({
           onChange={(e) => setReason(e.target.value)}
         />
       </label>
-      <button disabled={busy || done || !reason.trim()}>가입·보완 신청</button>
+      <button type="submit" disabled={busy || done || !reason.trim()}>
+        가입·보완 신청
+      </button>
       <Feedback
         error={error}
         message={done ? "가입 신청을 접수했습니다." : ""}
@@ -492,10 +506,10 @@ export function MembershipApplication({
 export function AffiliationApplication({
   client,
   onChanged,
-}: {
+}: Readonly<{
   client: Client;
   onChanged?: () => void;
-}) {
+}>) {
   const [fields, setFields] = useState({
     slug: "",
     name: "",
@@ -534,16 +548,18 @@ export function AffiliationApplication({
         ] as const
       ).map(([key, label]) => (
         <label key={key}>
-          {label}
+          <span>{label}</span>
           <input
             required
-            maxLength={key === "slug" ? 58 : key === "name" ? 255 : 2000}
+            maxLength={affiliationMaxLength[key]}
             value={fields[key]}
             onChange={(e) => setFields({ ...fields, [key]: e.target.value })}
           />
         </label>
       ))}
-      <button disabled={busy || done}>조합 가입 신청</button>
+      <button type="submit" disabled={busy || done}>
+        조합 가입 신청
+      </button>
       <Feedback
         error={error}
         message={done ? "신청을 접수했습니다. 연합회에서 검토합니다." : ""}
@@ -555,10 +571,10 @@ export function AffiliationApplication({
 export function PersonalHistory({
   client,
   coop,
-}: {
+}: Readonly<{
   client: Client;
   coop: string;
-}) {
+}>) {
   const work = useWork(client, `${base}/${coop}/my-history`);
   return (
     <section className="card spaced coop-management">
@@ -576,10 +592,10 @@ export function PersonalHistory({
 export function WithdrawalRequest({
   client,
   coop,
-}: {
+}: Readonly<{
   client: Client;
   coop: string;
-}) {
+}>) {
   const [reason, setReason] = useState(""),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
@@ -604,7 +620,7 @@ export function WithdrawalRequest({
     >
       <h3>조합 탈퇴 요청</h3>
       <label>
-        탈퇴 사유
+        <span>탈퇴 사유</span>
         <textarea
           required
           maxLength={2000}
@@ -612,12 +628,14 @@ export function WithdrawalRequest({
           onChange={(e) => setReason(e.target.value)}
         />
       </label>
-      <button disabled={busy || !reason.trim() || !!message}>탈퇴 요청</button>
+      <button type="submit" disabled={busy || !reason.trim() || !!message}>
+        탈퇴 요청
+      </button>
       <Feedback error={error} message={message} />
     </form>
   );
 }
-export function MyAffiliations({ client }: { client: Client }) {
+export function MyAffiliations({ client }: Readonly<{ client: Client }>) {
   const work = useWork(client, `${base}/my-affiliations`);
   const [reason, setReason] = useState("");
   return (
@@ -642,7 +660,7 @@ export function MyAffiliations({ client }: { client: Client }) {
               }}
             >
               <label>
-                보완 내용
+                <span>보완 내용</span>
                 <textarea
                   required
                   maxLength={2000}
@@ -650,7 +668,7 @@ export function MyAffiliations({ client }: { client: Client }) {
                   onChange={(e) => setReason(e.target.value)}
                 />
               </label>
-              <button disabled={work.busy || !reason.trim()}>
+              <button type="submit" disabled={work.busy || !reason.trim()}>
                 보완 내용 제출
               </button>
             </form>

@@ -63,3 +63,5 @@ Codex P1: 공통 계정 삭제가 마지막 조합 admin 역할을 개인 원장
 격리 bootstrap의 현행 스키마에는 이번 migration 이전부터 `ai_usage_reservations`, `member_paid_service_entitlements`, `cooperatives`의 writer fence 누락이 있다. 따라서 전체 계정 삭제는 기존 `WRITER_MANIFEST_REQUIRES_REFRESH`로 계속 보류된다. 이 리뷰 수정에서 기존 적용 migration이나 무관 테이블을 바꾸지 않았다. 통합 검증은 이관 전의 역할 보존과 이관 후 조합 이관 코드 해제, 독립된 개인정보 보류 유지까지 확인한다. 전체 계정 삭제 완료로 보고하지 않는다.
 
 리뷰 보완 검증: 조합 PostgreSQL·HTTP·개인정보 storage 3 suites 27개 통과. 활성 행과 이미 해제된 역할 이력을 구분해 보존 여부를 확인했다. API 타입 검사와 추가 helper ESLint 통과. 스키마 변경은 없어 신규 migration fingerprint는 유지된다.
+
+통합 Sonar 보완: 역할 입력을 string으로 명시 검증하고 폼 submit/button 타입, 읽기 전용 props, label/output 접근성, 중첩 조건문, 중복 import/selector와 감사 상태 인자를 정리했다. 아직 미적용인 신규 migration의 트리거 생성은 동일 SQL을 순서대로 명시했으며 up/down 재검증에서 등록 fingerprint가 그대로임을 확인했다. 서버 27개·UI 43개, API 타입·운영 bundle·web build·Chromium 네 역할 재검증 통과.

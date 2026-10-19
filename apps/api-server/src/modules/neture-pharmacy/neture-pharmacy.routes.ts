@@ -1,4 +1,3 @@
-import { getNetureMainMembershipStatus } from '../neture/services/neture-main-membership.js';
 import { cooperativeManagementRoutes } from './cooperative-management.routes.js';
 import { cooperativeRole } from './services/cooperative-management.service.js';
 import { StoreStaffSupportService } from './services/store-staff-support.js';
@@ -63,7 +62,7 @@ import { SemiFranchiseContentService } from './services/semi-franchise-content.s
 import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
 import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
 import { AssetCopyService } from '@o4o/asset-copy-core';
-import { NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
+import { getNetureMainMembershipStatus, NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
 type Handler = (req: Req, res: Response) => Promise<unknown>;

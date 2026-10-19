@@ -117,13 +117,20 @@ export class CooperativeManagementService {
     subject: string | null,
     action: string,
     note: string,
-    previous: string | null = null,
-    next: string | null = null,
+    state: Readonly<{ previous?: string | null; next?: string | null }> = {},
   ) {
     return exec.query(
       `INSERT INTO cooperative_management_events(cooperative_id,actor_id,subject_id,action,reason,previous_state,next_state)
       VALUES($1,$2,$3,$4,$5,$6,$7)`,
-      [coop, actor, subject, action, note, previous, next],
+      [
+        coop,
+        actor,
+        subject,
+        action,
+        note,
+        state.previous ?? null,
+        state.next ?? null,
+      ],
     );
   }
   async federationList(actor: string) {
@@ -156,7 +163,7 @@ export class CooperativeManagementService {
       throw invalid();
     const intro = reason(input.introduction),
       eligibility = reason(input.eligibilityDescription);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       await usable(m, actor);
       await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
         `cooperative:slug:${slug}`,
@@ -194,8 +201,7 @@ export class CooperativeManagementService {
         null,
         "affiliation_apply",
         "연합회 가입 신청",
-        null,
-        "pending",
+        { previous: null, next: "pending" },
       );
       return coop;
     });
@@ -207,7 +213,7 @@ export class CooperativeManagementService {
     note: unknown,
   ) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       const row = await this.lock(m, coop);
       await this.requireFederation(
         m,
@@ -218,7 +224,7 @@ export class CooperativeManagementService {
         if (row.status !== "pending") throw invalid();
       } else {
         const transition = affiliationTransitions[action];
-        if (!transition || !transition[0].includes(row.status)) throw invalid();
+        if (!transition?.[0].includes(row.status)) throw invalid();
         await m.query("UPDATE cooperatives SET status=$2 WHERE id=$1", [
           coop,
           transition[1],
@@ -228,16 +234,10 @@ export class CooperativeManagementService {
           transition[1] === "active" ? "active" : "closed",
         ]);
       }
-      await this.audit(
-        m,
-        coop,
-        actor,
-        null,
-        `affiliation_${action}`,
-        text,
-        row.status,
-        affiliationTransitions[action]?.[1] ?? row.status,
-      );
+      await this.audit(m, coop, actor, null, `affiliation_${action}`, text, {
+        previous: row.status,
+        next: affiliationTransitions[action]?.[1] ?? row.status,
+      });
       return { ok: true };
     });
   }
@@ -260,11 +260,12 @@ export class CooperativeManagementService {
     if (
       typeof email !== "string" ||
       email.length > 255 ||
-      !["admin", "operator"].includes(String(role))
+      typeof role !== "string" ||
+      !["admin", "operator"].includes(role)
     )
       throw invalid();
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       await this.lock(m, coop);
       if (role === "admin") await this.requireFederation(m, actor, true);
       else await this.requireLocal(m, actor, coop, true);
@@ -295,22 +296,16 @@ export class CooperativeManagementService {
         "INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,$3) RETURNING id",
         [coop, target.id, role],
       );
-      await this.audit(
-        m,
-        coop,
-        actor,
-        target.id,
-        "role_assign",
-        text,
-        null,
-        String(role),
-      );
+      await this.audit(m, coop, actor, target.id, "role_assign", text, {
+        previous: null,
+        next: role,
+      });
       return row;
     });
   }
   async revokeRole(actor: string, coop: string, roleId: string, note: unknown) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       await this.lock(m, coop);
       const [row] = await m.query(
         "SELECT * FROM cooperative_roles WHERE id=$1 AND cooperative_id=$2 AND revoked_at IS NULL FOR UPDATE",
@@ -348,22 +343,16 @@ export class CooperativeManagementService {
         "UPDATE cooperative_roles SET revoked_at=now() WHERE id=$1",
         [roleId],
       );
-      await this.audit(
-        m,
-        coop,
-        actor,
-        row.user_id,
-        "role_revoke",
-        text,
-        row.role,
-        null,
-      );
+      await this.audit(m, coop, actor, row.user_id, "role_revoke", text, {
+        previous: row.role,
+        next: null,
+      });
       return { ok: true };
     });
   }
   async applyMembership(actor: string, coop: string, note: unknown) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       const c = await this.lock(m, coop);
       await usable(m, actor);
       const [sf] = await m.query(
@@ -398,8 +387,7 @@ export class CooperativeManagementService {
           ? "member_supplement"
           : "membership_apply",
         text,
-        existing?.status ?? null,
-        "pending",
+        { previous: existing?.status ?? null, next: "pending" },
       );
       return { ok: true };
     });
@@ -425,7 +413,7 @@ export class CooperativeManagementService {
   }
   async supplementAffiliation(actor: string, coop: string, note: unknown) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       const c = await this.lock(m, coop);
       await usable(m, actor);
       const own = await m.query(
@@ -439,7 +427,7 @@ export class CooperativeManagementService {
   }
   async requestWithdrawal(actor: string, coop: string, note: unknown) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       await this.lock(m, coop);
       await usable(m, actor);
       const [member] = await m.query(
@@ -447,16 +435,10 @@ export class CooperativeManagementService {
         [coop, actor],
       );
       if (!member) throw denied();
-      await this.audit(
-        m,
-        coop,
-        actor,
-        actor,
-        "member_request_withdraw",
-        text,
-        member.status,
-        member.status,
-      );
+      await this.audit(m, coop, actor, actor, "member_request_withdraw", text, {
+        previous: member.status,
+        next: member.status,
+      });
       return { ok: true };
     });
   }
@@ -476,7 +458,7 @@ export class CooperativeManagementService {
     note: unknown,
   ) {
     const text = reason(note);
-    return this.db.transaction(async (m) => {
+    return await this.db.transaction(async (m) => {
       await this.lock(m, coop);
       const role = await this.requireLocal(m, actor, coop);
       const [member] = await m.query(
@@ -494,7 +476,7 @@ export class CooperativeManagementService {
       const transition = MEMBER_TRANSITIONS[requestedAction];
       if (
         !["review", "request_changes"].includes(action) &&
-        (!transition || !transition[0].includes(member.status))
+        !transition?.[0].includes(member.status)
       )
         throw invalid();
       if (
@@ -517,8 +499,10 @@ export class CooperativeManagementService {
         member.user_id,
         `member_${action}`,
         text,
-        member.status,
-        final ? transition[1] : member.status,
+        {
+          previous: member.status,
+          next: final ? transition[1] : member.status,
+        },
       );
       return { ok: true };
     });

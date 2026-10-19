@@ -39,10 +39,12 @@ export class CreateCooperativeManagement1792300000000
     await q.query(
       `CREATE INDEX cooperative_management_events_coop ON cooperative_management_events(cooperative_id,created_at DESC)`,
     );
-    for (const table of ["cooperative_roles", "cooperative_management_events"])
-      await q.query(
-        `CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${table} FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`,
-      );
+    await q.query(
+      `CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON cooperative_roles FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`,
+    );
+    await q.query(
+      `CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON cooperative_management_events FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`,
+    );
   }
   async down(q: QueryRunner): Promise<void> {
     // Never silently discard pending/rejected affiliations on rollback.
