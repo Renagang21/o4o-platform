@@ -47,6 +47,7 @@ export const menuPermissions: MenuPermission[] = [
   //   노출 범위는 변하지 않고 선언만 명시화된다.
   { menuId: 'platform-account-governance', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'semi-franchise-registry', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'pharmacy-service-settings', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'dashboard',
     roles: [...PLATFORM_ADMIN_ROLES]

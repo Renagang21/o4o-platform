@@ -11,6 +11,7 @@
 
 - 최신 main의 사업 목록 조회 generic에서 기본 사업 행 필드가 빠져 설정 대상 map의 TypeScript 빌드가 실패했다. `SemiFranchiseRow` 교집합을 명시해 실제 SELECT 필드를 보존했다. SQL/실행 로직 변경은 없다.
 - Codex P2: Neture 관리자에 플랫폼 전용 메뉴 노출. `getAdminMenu(false)`에서 숨기고 Neture 호환 설정 화면도 기존 `PlatformRoute`로 감쌌다. Neture 관리자 직접 URL은 설정 컴포넌트/API를 실행하지 않으며 전체 관리자는 사용 가능하다. 서버 권한은 넓히지 않았다.
+- CI의 Admin Vitest에서 새 정적 메뉴의 권한 등록 누락을 발견했다. `pharmacy-service-settings`를 플랫폼 관리자 전용 등록부에 추가하고 정적 메뉴의 정확한 경로/개수 계약을 보완했다. 플랫폼 허용·서비스 관리자 거절 회귀도 추가했다. 미등록 메뉴의 기본 거절은 유지한다.
 - 새 migration·dependency·배포 설정·운영 정책값 변경은 없다. 음성은 브라우저 Web Speech API이며 Google Cloud 음성 API 연동은 포함하지 않는다.
 
 ## 로컬 재검증
@@ -21,7 +22,8 @@
 | 공통 operator UI 전체 | 24 files / 192 tests PASS |
 | My Home·호스트·플랫폼 설정 진입 | 4 files / 69 tests PASS |
 | Store 상담·음성·기능 판정·직원 지원 | 4 files / 30 tests PASS |
-| 합계 | 409 tests PASS |
+| Admin Dashboard 전체·메뉴/권한 계약 | 25 files / 422 tests PASS |
+| 합계 | 831 tests PASS |
 | 공통 의존 패키지 | `pnpm run build:packages` PASS |
 | API·Admin·Neture·Store | 관련 build PASS, API·Neture·Store 타입 검사 포함 |
 | PC/모바일 Chromium fixture | 1440/390px, 관리자·My Home·상담·고객 dialog·Neture 관리자 역할 경계 64개 확인 PASS |
@@ -29,7 +31,7 @@
 
 브라우저는 실제 React 페이지·guard·메뉴와 합성 인증/API/음성 API를 연결했다. Neture 관리자에게 메뉴/화면을 제공하지 않고 정책 API도 호출하지 않는지, 전체 관리자에게는 노출/호출하는지 PC·모바일 모두 확인했다. 화면 오류·가로 넘침은 0이다. 실제 마이크·발음 품질·외부 AI 호출·실계정 로그인 검증을 의미하지 않는다.
 
-통합 직후 공통 UI 테스트는 갱신 전 types 산출물 때문에 실패했고 공통 패키지 재빌드 후 192개 전체가 통과했다. API 타입 오류와 Codex 지적은 위와 같이 수정했다. DB 검증은 기존 전용 loopback fixture만 사용했고 운영 DB는 쓰지 않았다.
+통합 직후 공통 UI 테스트는 갱신 전 types 산출물 때문에 실패했고 공통 패키지 재빌드 후 192개 전체가 통과했다. API 타입 오류와 Codex 지적은 위와 같이 수정했다. CI의 관리자 테스트 실패는 정확한 앱 작업 디렉터리에서 전체 suite를 재현해 원인을 확인했고 수정 후 422개 전체 및 Admin build가 통과했다. DB 검증은 기존 전용 loopback fixture만 사용했고 운영 DB는 쓰지 않았다.
 
 ## 소비처·배포 경계
 
