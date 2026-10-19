@@ -1,3 +1,5 @@
+import { AccountErasureService } from "../../../services/privacy/account-erasure.service.js";
+import { cooperativeAdminTransferRequired } from "../../../services/privacy/cooperative-erasure-review.js";
 import { DataSource } from "typeorm";
 import { randomUUID } from "node:crypto";
 import { CooperativeService } from "../services/cooperative.service.js";
@@ -17,6 +19,7 @@ integration(
   "cooperative federation and personal management on isolated PostgreSQL",
   () => {
     let db: DataSource, service: CooperativeManagementService;
+    let erasureOperation: string | undefined;
     const fed = randomUUID(),
       fedOp = randomUUID(),
       admin = randomUUID(),
@@ -81,6 +84,10 @@ integration(
     });
     afterAll(async () => {
       if (!db?.isInitialized) return;
+      if (erasureOperation)
+        await db.query("DELETE FROM account_erasure_operations WHERE id=$1", [
+          erasureOperation,
+        ]);
       const rows = await db.query(
         "SELECT organization_id FROM semi_franchises WHERE id=ANY($1::uuid[])",
         [[business, secondBusiness]],
@@ -471,6 +478,65 @@ integration(
         operator,
       ]);
     });
+    it("requires cooperative admin transfer and preserves independent erasure review holds", async () => {
+      expect(await cooperativeAdminTransferRequired(db, operator)).toBe(true);
+      await db.query(
+        "INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",
+        [fed],
+      );
+      await db.query(
+        "INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','suspended')",
+        [operator],
+      );
+      const erasure = new AccountErasureService(db, {
+        enabled: true,
+        inventoryReviewed: true,
+        systemYears: 1,
+        systemBasis: "cooperative-transfer-fixture",
+        personalBuckets: [],
+      });
+      const pending = await erasure.request(operator, fed);
+      erasureOperation = pending.operationId;
+      expect(pending.state).toBe("review_required");
+      expect(pending.reviewCodes).toContain(
+        "COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED",
+      );
+      expect(
+        await db.query(
+          "SELECT 1 FROM cooperative_roles WHERE cooperative_id=$1 AND user_id=$2 AND role='admin' AND revoked_at IS NULL",
+          [coop, operator],
+        ),
+      ).toHaveLength(1);
+      await service.assignRole(
+        fed,
+        coop,
+        emails[admin],
+        "admin",
+        "삭제 전 관리자 이관",
+      );
+      expect(await cooperativeAdminTransferRequired(db, operator)).toBe(false);
+      await db.query('UPDATE users SET "isEmailVerified"=false WHERE id=$1', [
+        admin,
+      ]);
+      expect(await cooperativeAdminTransferRequired(db, operator)).toBe(true);
+      await db.query('UPDATE users SET "isEmailVerified"=true WHERE id=$1', [
+        admin,
+      ]);
+      const resumed = await erasure.resume(pending.operationId, fed);
+      expect(resumed.reviewCodes).not.toContain(
+        "COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED",
+      );
+      // The canonical fixture has pre-existing writer-manifest gaps outside this change.
+      // A cooperative transfer must not bypass that independent privacy review or erase early.
+      expect(resumed.state).toBe("review_required");
+      expect(resumed.reviewCodes).toContain("WRITER_MANIFEST_REQUIRES_REFRESH");
+      expect(
+        await db.query("SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL", [
+          operator,
+        ]),
+      ).toHaveLength(1);
+      expect(await cooperativeRole(db, admin, coop)).toBe("admin");
+    });
     it("fences new cooperative roles and audit references during account erasure", async () => {
       const erased = randomUUID();
       await db.query(
@@ -497,7 +563,7 @@ integration(
           ),
         ).rejects.toThrow();
         expect(
-          await db.query("SELECT 1 FROM cooperative_roles WHERE user_id=$1", [
+          await db.query("SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL", [
             erased,
           ]),
         ).toEqual([]);

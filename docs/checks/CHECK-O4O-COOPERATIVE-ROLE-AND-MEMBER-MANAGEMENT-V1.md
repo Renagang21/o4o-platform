@@ -54,3 +54,12 @@
 - 구현 commit: `ec56052809`, 원격 `wo/cooperative-role-management` push 완료. 마지막 CLI 이력 보완 후 조합 PostgreSQL 19개와 production API bundle을 재검증했다.
 - PR: 사용자 지시로 미생성. PR CI·main 통합·운영 deployment/smoke 미실행.
 - WORKTREE_DISPOSITION: `/workspace/o4o-wt/cooperative-role-management` / `wo/cooperative-role-management` / base `6419df05c7` / verdict `KEEP` (후속 검토·통합용 branch-only commits 보존).
+
+## 2026-10-19 통합 리뷰 보완
+
+사용자가 병합→배포를 승인해 통합 단계로 전환했다. 최신 main을 충돌 없이 반영하고 PR #713을 생성했다.
+Codex P1: 공통 계정 삭제가 마지막 조합 admin 역할을 개인 원장으로 삭제할 수 있어, 계정 삭제의 reviewManifest에 `COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED` 검토 코드를 추가했다. 삭제 준비와 최종 삭제 직전의 기존 reviewManifest 호출 모두에서 검사한다. 다른 사용 가능한 활성·이메일 인증 조합 admin이 있어야 이관 검토가 해제되며, 이관이 다른 개인정보 삭제 보류를 우회하지 않는다.
+
+격리 bootstrap의 현행 스키마에는 이번 migration 이전부터 `ai_usage_reservations`, `member_paid_service_entitlements`, `cooperatives`의 writer fence 누락이 있다. 따라서 전체 계정 삭제는 기존 `WRITER_MANIFEST_REQUIRES_REFRESH`로 계속 보류된다. 이 리뷰 수정에서 기존 적용 migration이나 무관 테이블을 바꾸지 않았다. 통합 검증은 이관 전의 역할 보존과 이관 후 조합 이관 코드 해제, 독립된 개인정보 보류 유지까지 확인한다. 전체 계정 삭제 완료로 보고하지 않는다.
+
+리뷰 보완 검증: 조합 PostgreSQL·HTTP·개인정보 storage 3 suites 27개 통과. 활성 행과 이미 해제된 역할 이력을 구분해 보존 여부를 확인했다. API 타입 검사와 추가 helper ESLint 통과. 스키마 변경은 없어 신규 migration fingerprint는 유지된다.
