@@ -4,9 +4,15 @@ import { cooperativeRole } from './services/cooperative-management.service.js';
 import { StoreStaffSupportService } from './services/store-staff-support.js';
 import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
+import { PharmacyServicePolicyService } from './services/service-feature-policy.js';
+import { saveStaffFeatures } from './services/staff-feature-permissions.js';
+import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './services/consultation-professional.js';
+import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
+import { createConsultationTranslator } from './services/consultation-translator.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
+import rateLimit from 'express-rate-limit';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
@@ -50,7 +56,7 @@ import { getBusinessInfo } from './services/business-info.js';
 import { PharmacyMembershipService } from './services/pharmacy-membership.service.js';
 import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provisioner.js';
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
-import { PHARMACY_SERVICE_FEATURES } from './services/service-features.js';
+import { PHARMACY_SERVICE_FEATURES, readServiceFeatures, validateServiceFeatures } from './services/service-features.js';
 import { getSupplyOption, listActiveSemiFranchiseKeys, listSupplyOptions } from './services/supply-access.js';
 import { SupplierBusinessContentService } from './services/supplier-business-content.service.js';
 import { SupplyProposalService, type ProposalAction } from './services/supply-proposal.service.js';
@@ -109,7 +115,7 @@ function actionParam<T extends string>(req: Req, allowed: readonly T[]): T {
   return a;
 }
 
-export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRouter {
+export function createNeturePharmacyRoutes(dataSource: DataSource, consultationDependencies?: ConsultationDependencies): ExpressRouter {
   const router: ExpressRouter = Router();
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
@@ -125,6 +131,9 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   }));
   router.use('/cooperative-management', cooperativeManagementRoutes(dataSource));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
+  const consultation = new MultilingualConsultationService(dataSource, consultationDependencies ?? {
+    translate: createConsultationTranslator(dataSource), professional: (userId, organizationId) => consultationProfessionalConfirmed(dataSource, userId, organizationId),
+  });
   const proposals = new SupplyProposalService(dataSource);
   const supplierContents = new SupplierBusinessContentService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
@@ -162,6 +171,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const businessOperator = [requireAuth, cooperativeBusinessGuard];
   const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
+  const featurePolicyAdmin: RequestHandler = (req, res, next) => {
+    if (req.body?.serviceFeatures === undefined) return next();
+    return (requireRole(['platform:super_admin']) as RequestHandler)(req, res, next);
+  };
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
   router.get('/admin/cooperative-federation', ...admin, handle(async (_req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
@@ -380,17 +393,53 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.post('/pharmacy/staff-support/demands', ...store, handle(async req => { await support(req); return staffSupport.demand(org(req),req.body?.reason); }));
   router.get('/admin/staff-support/demands', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return staffSupport.summary(req.query.month); }));
   router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
+  router.get('/pharmacy/multilingual-consultation/context', ...store, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return consultation.context(req.user!.id, org(req));
+  }));
+  const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
+    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주세요.' } });
+  router.post('/pharmacy/multilingual-consultation/translate', ...store, consultationLimiter, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return consultation.translate(req.user!.id, org(req), req.body ?? {});
+  }));
+  router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);
+  }));
   router.get('/admin/service-features', ...admin, handle(() => Promise.resolve(PHARMACY_SERVICE_FEATURES)));
+  const featurePolicies = new PharmacyServicePolicyService(dataSource);
+  router.get('/admin/service-feature-policies', ...admin, handle(async (_req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    const [basic, paid, businesses] = await Promise.all([featurePolicies.read('default'), featurePolicies.read('paid'), semiFranchises.listAll()]);
+    return { features: PHARMACY_SERVICE_FEATURES, targets: [
+      { key: 'default', name: '기본 제공 · 전체 약국', features: basic },
+      { key: 'paid', name: '유료회원', features: paid },
+      ...businesses.map((business: { key: string; name: string; service_features?: unknown; status: string }) => ({ key: `business:${business.key}`, name: `협력사업 · ${business.name}`,
+        features: readServiceFeatures(business.service_features), status: business.status })),
+    ] };
+  }));
+  router.put('/admin/service-feature-policies/:target', ...admin, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    const target = req.params.target;
+    if (target.startsWith('business:')) return semiFranchises.update(target.slice('business:'.length), { serviceFeatures: validateServiceFeatures(req.body?.features) }, req.user!.id);
+    return featurePolicies.set(target, req.body?.features, req.user!.id);
+  }));
+  router.put('/pharmacy/staff-feature-permissions/:userId', ...store, handle(async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    const owners = await dataSource.query(`SELECT 1 FROM organization_members WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL`, [org(req), req.user!.id]);
+    if (!owners.length) throw new NeturePharmacyError(403, 'STORE_OWNER_REQUIRED', '근무자 기능 설정은 경영자가 할 수 있습니다.');
+    const access = await serviceFeatures.resolveStore(org(req));
+    return saveStaffFeatures(dataSource, org(req), uuidParam(req, 'userId'), req.body?.serviceFeatures,
+      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false, req.body?.pharmacistConfirmed);
+  }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
   router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>
     memberPaidFeatures.set(uuidParam(req, 'userId'), req.user!.id, req.body ?? {})));
   router.get('/admin/semi-franchises', ...businessAdmin, handle(async () => semiFranchises.listAll()));
-  router.post('/admin/semi-franchises', ...businessAdmin, handle(async (req, res) => {
+  router.post('/admin/semi-franchises', ...businessAdmin, featurePolicyAdmin, handle(async (req, res) => {
     res.status(201);
     return semiFranchises.create(req.body ?? {}, req.user!.id);
   }));
-  router.patch('/admin/semi-franchises/:key', ...businessAdmin, handle(async (req) => semiFranchises.update(req.params.key, req.body ?? {}, req.user!.id)));
+  router.patch('/admin/semi-franchises/:key', ...businessAdmin, featurePolicyAdmin, handle(async (req) => semiFranchises.update(req.params.key, req.body ?? {}, req.user!.id)));
   router.post('/admin/semi-franchises/:key/operators/:userId', ...businessAdmin, handle(async (req) =>
     semiFranchises.assignOperator(req.params.key, uuidParam(req, 'userId'), req.user!.id)));
   router.delete('/admin/semi-franchises/:key/operators/:userId', ...businessAdmin, handle(async (req) =>

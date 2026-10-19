@@ -57,6 +57,8 @@ const makeDataSource = () => {
     if (sql.includes('FROM semi_franchises sf')) {
       return [{ key: 'test-business', name: 'Test business', features: ['tablet'] }];
     }
+    if (sql.includes('FROM settings WHERE key')) return [];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'owner', configured: false }];
     if (sql.includes('SELECT user_id AS "ownerUserId"')) return [{ ownerUserId: 'owner-kpa' }];
     if (sql.includes('FROM member_paid_service_entitlements')) return [];
     if (sql.includes('neture_pharmacy_memberships')) {

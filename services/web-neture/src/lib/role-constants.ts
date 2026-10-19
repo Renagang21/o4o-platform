@@ -170,7 +170,7 @@ export type SubdomainOperatorViewer = UserLike | null | undefined;
  * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
  */
 export function canSeeSubdomainOperatorPath(viewer: SubdomainOperatorViewer, path: string): boolean {
-  if (path === '/admin/semi-franchises' || path.startsWith('/admin/semi-franchises/')) return !!viewer?.roles?.includes('platform:super_admin');
+  if (['/admin/semi-franchises', '/admin/pharmacy-service-settings'].some(prefix => path === prefix || path.startsWith(`${prefix}/`))) return !!viewer?.roles?.includes('platform:super_admin');
   const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
   if (!screen) return true;
   const memberAllowed = screen.key === 'community'

@@ -23,10 +23,14 @@ it('requires the active pharmacy and rejects unavailable reads without running t
 });
 it('allows a paid owner for free staff and denies an unqualified owner', async () => {
   for (const paid of [true, false]) {
-    const query = jest.fn().mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ ownerUserId: 'owner' }]).mockResolvedValueOnce(paid ? [{ user_id: 'owner' }] : []);
+    const query: jest.Mock = jest.fn(async (sql: string) => {
+      if (sql.startsWith('SELECT status')) return [{ status: 'active' }];
+      if (sql.includes('ownerUserId')) return [{ ownerUserId: 'owner' }];
+      if (sql.includes('member_paid_service_entitlements')) return paid ? [{ user_id: 'owner' }] : [];
+      return [];
+    });
     const response = await request(server(query)).post('/execute');
     expect(response.status).toBe(paid ? 200 : 403);
-    expect(query.mock.calls[3][1]).toEqual(['owner']);
+    expect(query.mock.calls.find(call => call[0].includes('member_paid_service_entitlements'))?.[1]).toEqual(['owner']);
   }
 });
