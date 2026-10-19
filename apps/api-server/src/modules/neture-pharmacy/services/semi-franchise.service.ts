@@ -237,7 +237,7 @@ export class SemiFranchiseService {
    *   협동조합(pharmcoop)은 cooperatives 연결 판정이 따로 있어 여기서 집계하지 않는다.
    */
   async listAll() {
-    const rows = await this.dataSource.query<Array<{ roleOperators: Array<NetureMainMembershipRow & Record<string, unknown>> }>>(
+    const rows = await this.dataSource.query<Array<SemiFranchiseRow & { roleOperators: Array<NetureMainMembershipRow & Record<string, unknown>> }>>(
       `SELECT ${SF_COLUMNS},
               (SELECT count(*)::int FROM semi_franchise_memberships x WHERE x.semi_franchise_id = sf.id AND x.status = 'active') AS "activeMemberCount",
               COALESCE((SELECT json_agg(json_build_object('userId', op.user_id, 'assignedAt', op.assigned_at) ORDER BY op.assigned_at)

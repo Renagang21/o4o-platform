@@ -174,7 +174,7 @@ export function getAdminMenu(
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈(데이터 행) 생성 · 수정 · 담당 운영자 지정
     stores: [
       { label: '세미프랜차이즈 관리', path: '/admin/semi-franchises' },
-      { label: '약국 서비스 설정', path: '/admin/pharmacy-service-settings' },
+      ...(isPlatformAdmin ? [{ label: '약국 서비스 설정', path: '/admin/pharmacy-service-settings' }] : []),
     ],
     orders: [
       { label: '정산 관리', path: '/admin/settlements' },
