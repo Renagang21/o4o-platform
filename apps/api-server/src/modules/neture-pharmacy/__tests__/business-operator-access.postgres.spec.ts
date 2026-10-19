@@ -15,7 +15,7 @@ integration('collaborator operator boundaries on isolated PostgreSQL', () => {
   const keys = ['pharmacy', 'carepharm', 'megapharm', 'pharmcoop', 'individual-coop', 'unrelated'];
   const ids = Object.fromEntries(keys.map(key => [key, randomUUID()]));
   beforeAll(async () => {
-    db = new DataSource({ type: 'postgres', host: '127.0.0.1', port: 55439,
+    db = new DataSource({ type: 'postgres', host: '127.0.0.1', port: Number(process.env.O4O_PHARMACY_ROLES_PORT || 55439),
       username: 'postgres', database: 'o4o_pharmacy_roles_test', entities: [], synchronize: false, extra: { max: 1 } });
     await db.initialize();
     // Temporary tables are scoped to this connection. No real application schema is modified.
@@ -25,6 +25,7 @@ integration('collaborator operator boundaries on isolated PostgreSQL', () => {
       CREATE TEMP TABLE semi_franchises(id uuid, key text, status text, community_key text);
       CREATE TEMP TABLE semi_franchise_operators(semi_franchise_id uuid, user_id uuid, revoked_at timestamptz);
       CREATE TEMP TABLE cooperatives(id uuid, semi_franchise_id uuid, status text);
+      CREATE TEMP TABLE cooperative_roles(id uuid,cooperative_id uuid,user_id uuid,role text,revoked_at timestamptz);
       CREATE TEMP TABLE cooperative_memberships(cooperative_id uuid, user_id uuid, status text);
       CREATE TEMP TABLE organization_members(user_id uuid, organization_id uuid, role text, left_at timestamptz);
       CREATE TEMP TABLE neture_pharmacy_memberships(organization_id uuid, status text);
@@ -47,7 +48,7 @@ integration('collaborator operator boundaries on isolated PostgreSQL', () => {
     await grant(role);
     for (const target of keys) {
       expect(await hasBusinessOperatorAccess(db, user, ids[target])).toBe(
-        target === key || (key === 'pharmcoop' && target === 'individual-coop'));
+        target === key);
     }
     const access = await resolveSemiFranchiseServiceAccess(db, user, key);
     expect(access).toMatchObject({ allowed: true, operator: true, pharmacyMembershipStatus: null, semiFranchiseMembershipStatus: null });
@@ -92,7 +93,7 @@ integration('collaborator operator boundaries on isolated PostgreSQL', () => {
     await grant('neture:operator');
     expect((await new CooperativeService(db).session(user)).federationOperators).toEqual([]);
     await grant('neture:pharmcoop_admin');
-    expect(await new CooperativeService(db).session(user)).toMatchObject({ federationOperators: [{ userId: user }], cooperativeOperators: [{ userId: user }] });
+    expect(await new CooperativeService(db).session(user)).toMatchObject({ federationOperators: [{ userId: user }], cooperativeOperators: [] });
     await db.query(`UPDATE role_assignments SET is_active=false WHERE role='neture:pharmcoop_admin'`);
     expect((await new CooperativeService(db).session(user)).cooperativeOperators).toEqual([]);
   });

@@ -30,11 +30,13 @@ export interface FederationAffiliation {
 
 /** Assignments must eventually come from the server; UI state is not authorization. */
 export interface CooperativeOperator {
+  role?: "admin" | "operator";
   cooperativeId: string;
   userId: string;
 }
 
 export interface FederationOperator {
+  role?: "admin" | "operator";
   userId: string;
 }
 
@@ -57,7 +59,7 @@ export function cooperativeAccess(
   cooperativeId: string,
 ) {
   if (!session.userId)
-    return { isMember: false, canManage: false, status: null };
+    return { isMember: false, canManage: false, isAdmin: false, status: null };
   const rows = session.memberships.filter(
     (row) =>
       row.userId === session.userId && row.cooperativeId === cooperativeId,
@@ -68,7 +70,13 @@ export function cooperativeAccess(
     (row) =>
       row.userId === session.userId && row.cooperativeId === cooperativeId,
   );
-  return { isMember: status === "active", canManage, status };
+  const isAdmin = session.cooperativeOperators.some(
+    (row) =>
+      row.userId === session.userId &&
+      row.cooperativeId === cooperativeId &&
+      row.role === "admin",
+  );
+  return { isMember: status === "active", canManage, isAdmin, status };
 }
 
 export function canManageFederation(session: SessionSnapshot) {
