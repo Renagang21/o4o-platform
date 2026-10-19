@@ -75,8 +75,10 @@ export function parseEditorial(input: Record<string, unknown>) {
   const status = input.status ?? "draft",
     audience = input.audience ?? "members";
   if (
-    !["draft", "published", "archived"].includes(String(status)) ||
-    !["public", "members"].includes(String(audience))
+    typeof status !== "string" ||
+    typeof audience !== "string" ||
+    !["draft", "published", "archived"].includes(status) ||
+    !["public", "members"].includes(audience)
   )
     fail(400, "INVALID_HOME_ITEM", "게시·공개 상태를 확인해 주세요.");
   const sortOrder = input.sortOrder ?? 0;

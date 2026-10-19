@@ -213,6 +213,8 @@ run("community home PostgreSQL visibility and persistence", () => {
       ).linkUrl,
     ).toContain("kpanews");
     expect(() => parseEditorial(data({ sortOrder: -1 }))).toThrow();
+    expect(() => parseEditorial(data({ status: ["published"] }))).toThrow();
+    expect(() => parseEditorial(data({ audience: ["public"] }))).toThrow();
     expect(() => parseEditorial(data({ title: "x".repeat(256) }))).toThrow();
   });
   async function board(
