@@ -14,7 +14,7 @@ import {
   managedHomeItems,
   saveEditorial,
   pinHomeForum,
-  homeForumItems,
+  managedHomeForum,
 } from "../services/community/community-home.service.js";
 
 export function createCommunityHomeRoutes(
@@ -110,9 +110,11 @@ export function createCommunityHomeRoutes(
     apiLimiter,
     authenticate,
     handle(async (req) => {
-      // The chooser is manager-only even though the same preview powers member home.
-      await managedHomeItems(AppDataSource, req.user!.id, "notice");
-      return homeForumItems(AppDataSource, await resolveUser(req));
+      return managedHomeForum(
+        AppDataSource,
+        req.user!.id,
+        await resolveUser(req),
+      );
     }),
   );
   router.patch(

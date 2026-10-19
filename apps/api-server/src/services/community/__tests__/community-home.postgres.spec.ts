@@ -8,6 +8,7 @@ import {
   managedHomeItems,
   saveEditorial,
   pinHomeForum,
+  managedHomeForum,
   parseEditorial,
 } from "../community-home.service";
 import {
@@ -242,7 +243,7 @@ run("community home PostgreSQL visibility and persistence", () => {
       closed = await board("closed"),
       paused = await board("open", "archived"),
       foreign = await board("open", "completed", "neture");
-    const a = await post(open, "Public"),
+    const a = await post(open, "Public", true),
       b = await post(open, "Private");
     await post(closed, "Closed");
     await post(paused, "Paused");
@@ -273,6 +274,12 @@ run("community home PostgreSQL visibility and persistence", () => {
       [closed, actor],
     );
     expect((await communityHome(db, user)).forum.recent).toHaveLength(3);
+    await db.transaction((m) => pinHomeForum(m, actor, a.toUpperCase(), true));
+    await db.transaction((m) => pinHomeForum(m, actor, b, true));
+    expect(
+      (await communityHome(db, null)).forum.pinned.map((item: any) => item.id),
+    ).toEqual([a]);
+    expect((await communityHome(db, user)).forum.pinned).toHaveLength(2);
   });
   it("persists forum pins with scope and two-slot restriction", async () => {
     const open = await board();
@@ -286,6 +293,21 @@ run("community home PostgreSQL visibility and persistence", () => {
     await db.transaction((m) => pinHomeForum(m, actor, ids[0], false));
     await db.transaction((m) => pinHomeForum(m, actor, ids[2], true));
     expect((await communityHome(db, user)).forum.pinned).toHaveLength(2);
+    // Board pins and ordinary author edits cannot forge a service-home selection.
+    await db.query('UPDATE forum_post SET "isPinned"=true WHERE id=$1', [
+      ids[0],
+    ]);
+    expect(
+      (await communityHome(db, user)).forum.pinned.map((p: any) => p.id).sort(),
+    ).toEqual([ids[1], ids[2]].sort());
+    await db.query(
+      "UPDATE forum_category_requests SET status='archived' WHERE id=$1",
+      [open],
+    );
+    expect((await communityHome(db, user)).forum.pinned).toEqual([]);
+    expect((await managedHomeForum(db, actor, user)).pinned).toHaveLength(2);
+    await db.transaction((m) => pinHomeForum(m, actor, ids[1], false));
+    expect((await managedHomeForum(db, actor, user)).pinned).toHaveLength(1);
     const foreign = await post(
       await board("open", "completed", "neture"),
       "Foreign",

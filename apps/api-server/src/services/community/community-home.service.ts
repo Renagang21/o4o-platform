@@ -1,3 +1,4 @@
+import { COMMUNITY_HOME_PIN_SQL } from "./community-home-pins.js";
 import type { EntityManager } from "typeorm";
 import type { CommunityAccessUser } from "../../utils/community-access.resolver.js";
 import { resolveCommunityWorkspace } from "./community-workspace.service.js";
@@ -31,7 +32,7 @@ export function homeKind(value: unknown): HomeKind {
 export function homeUuid(value: string): string {
   if (!UUID.test(value))
     fail(400, "INVALID_RESOURCE_ID", "항목을 확인해 주세요.");
-  return value;
+  return value.toLowerCase();
 }
 function validateEditorialLink(kind: HomeKind, linkUrl: string) {
   if (linkUrl) {
@@ -164,13 +165,13 @@ export async function homeForumItems(
     WHERE b.service_code='community' AND b.organization_id IS NULL AND b.status='completed'
     AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.status='publish'
     AND (b.forum_type='open' OR EXISTS(SELECT 1 FROM forum_category_members m WHERE m.forum_category_id=b.id AND m.user_id=$1))`;
-  const fields = `p.id,p.slug,p.title,p.excerpt AS summary,p."isPinned",p.created_at AS "createdAt",b.name AS "boardName"`;
+  const fields = `p.id,p.slug,p.title,p.excerpt AS summary,p.created_at AS "createdAt",b.name AS "boardName"`;
   const pinned = await db.query(
-    `SELECT ${fields} ${base} AND p."isPinned"=true ORDER BY p.updated_at DESC,p.id LIMIT 2`,
+    `SELECT ${fields},true AS "isPinned" ${base} AND ${COMMUNITY_HOME_PIN_SQL} ORDER BY p.updated_at DESC,p.id LIMIT 2`,
     [user!.id],
   );
   const recent = await db.query(
-    `SELECT ${fields} ${base} AND NOT(p.id=ANY($2::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`,
+    `SELECT ${fields},false AS "isPinned" ${base} AND NOT(p.id=ANY($2::uuid[])) ORDER BY p.created_at DESC,p.id LIMIT 10`,
     [user!.id, pinned.map((p: { id: string }) => p.id)],
   );
   return { pinned, recent };
@@ -276,6 +277,22 @@ export async function saveEditorial(
   });
   return saved;
 }
+export async function managedHomeForum(
+  db: Exec,
+  actor: string,
+  user: CommunityAccessUser | null,
+) {
+  await requireCommunityManager(db, actor);
+  const pinned =
+    await db.query(`SELECT metadata->>'postId' AS id,title,true AS "isPinned","createdAt" FROM cms_contents
+    WHERE ${SCOPE} AND metadata->>'kind'='forum-pin' AND status='published' ORDER BY "createdAt",id`);
+  const preview = await homeForumItems(db, user);
+  const ids = new Set(pinned.map((item: { id: string }) => item.id));
+  return {
+    pinned,
+    recent: preview.recent.filter((item: { id: string }) => !ids.has(item.id)),
+  };
+}
 export async function pinHomeForum(
   db: Exec,
   actor: string,
@@ -283,31 +300,61 @@ export async function pinHomeForum(
   pinned: unknown,
 ) {
   await requireCommunityManager(db, actor);
-  homeUuid(id);
+  id = homeUuid(id);
   if (typeof pinned !== "boolean")
     fail(400, "INVALID_HOME_ITEM", "상시 노출 설정을 확인해 주세요.");
   await db.query(
     "SELECT pg_advisory_xact_lock(hashtext('community-forum-home-pins'))",
   );
-  const scope = `forum_id IN(SELECT id FROM forum_category_requests WHERE service_code='community' AND organization_id IS NULL AND status='completed') AND organization_id IS NULL AND is_organization_exclusive=false AND status='publish'`;
-  const [post] = await db.query(
-    `SELECT id FROM forum_post WHERE ${scope} AND id=$1 FOR UPDATE`,
-    [id],
-  );
-  if (!post)
-    fail(404, "HOME_ITEM_NOT_FOUND", "게시된 커뮤니티 글을 선택해 주세요.");
-  if (pinned) {
-    const rows = await db.query(
-      `SELECT id FROM forum_post WHERE ${scope} AND "isPinned"=true AND id<>$1`,
+  const selection = `${SCOPE} AND metadata->>'kind'='forum-pin'`;
+  // Unpin works even if the post/board was stopped or removed after designation.
+  if (!pinned) {
+    await db.query(
+      `UPDATE cms_contents SET status='archived',"updatedAt"=NOW() WHERE ${selection} AND metadata->>'postId'=$1`,
       [id],
     );
-    if (rows.length >= 2)
+  } else {
+    const [post] = await db.query(
+      `SELECT p.id,p.title FROM forum_post p JOIN forum_category_requests b ON b.id=p.forum_id
+      WHERE b.service_code='community' AND b.organization_id IS NULL AND b.status='completed'
+      AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.status='publish' AND p.id=$1 FOR SHARE OF p,b`,
+      [id],
+    );
+    if (!post)
+      fail(404, "HOME_ITEM_NOT_FOUND", "게시된 커뮤니티 글을 선택해 주세요.");
+    const active = await db.query(
+      `SELECT metadata->>'postId' AS id FROM cms_contents WHERE ${selection} AND status='published'`,
+    );
+    if (
+      !active.some((row: { id: string }) => row.id === id) &&
+      active.length >= 2
+    )
       fail(409, "HOME_PIN_LIMIT", "포럼 상시 노출은 최대 2개입니다.");
+    const existing = await db.query(
+      `SELECT id FROM cms_contents WHERE ${selection} AND metadata->>'postId'=$1 LIMIT 1`,
+      [id],
+    );
+    if (existing.length) {
+      await db.query(
+        `UPDATE cms_contents SET status='published',title=$2,"updatedAt"=NOW() WHERE ${selection} AND id=$1`,
+        [existing[0].id, post.title],
+      );
+    } else {
+      await db.query(
+        `INSERT INTO cms_contents ("serviceKey",type,title,status,metadata,"createdBy","authorRole","visibilityScope")
+        VALUES('community','featured',$1,'published',$2::jsonb,$3,'service_admin','service')`,
+        [
+          post.title,
+          JSON.stringify({
+            section: EDITORIAL_SECTION,
+            kind: "forum-pin",
+            postId: id,
+          }),
+          actor,
+        ],
+      );
+    }
   }
-  await db.query(
-    'UPDATE forum_post SET "isPinned"=$2,updated_at=NOW() WHERE id=$1',
-    [id, pinned],
-  );
   await homeAudit(db, actor, "community:home_forum_pin", { id, pinned });
   return { id, isPinned: pinned };
 }
