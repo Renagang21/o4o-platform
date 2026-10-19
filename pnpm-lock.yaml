@@ -2812,6 +2812,9 @@ importers:
 
   services/web-pharmacy-coop:
     dependencies:
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client

@@ -1,3 +1,4 @@
+import { BusinessHomeShowcase } from '@o4o/shared-space-ui';
 import {
   createContext,
   useContext,
@@ -390,6 +391,8 @@ function CooperativeLayout() {
 
 function CooperativeHome() {
   const cooperative = useOutletContext<Cooperative>();
+  const { businessClient, session } = useContext(Context);
+  const access = cooperativeAccess(session, cooperative.id);
   return (
     <section className="section">
       <div className="member-welcome">
@@ -402,6 +405,7 @@ function CooperativeHome() {
           가입 자격 확인 →
         </SiteLink>
       </div>
+      {businessClient && cooperative.businessKey && <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} />}
       <div className="cards two">
         <div className="card">
           <h2>조합 공지</h2>
@@ -456,12 +460,14 @@ function Membership() {
 
 function MemberSection({ kind }: { kind: "community" | "materials" }) {
   const cooperative = useOutletContext<Cooperative>();
-  const { session } = useContext(Context);
+  const { session, businessClient } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
   const allowed = access.isMember || access.canManage;
   return (
     <section className="section">
       <h2>{kind === "community" ? "회원 게시판" : "조합 자료"}</h2>
+      {kind === 'materials' && allowed && businessClient && cooperative.businessKey ?
+        <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} only="content" /> :
       <Empty
         title={
           allowed
@@ -473,7 +479,7 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
             ? "이 조합에 속한 게시글과 자료만 조회하도록 연결합니다."
             : "다른 조합의 가입·운영 자격으로 이 공간을 이용할 수 없습니다."
         }
-      />
+      />}
       <SiteLink className="text-link" to={`/${cooperative.slug}/membership`}>
         가입·내 참여 확인 →
       </SiteLink>
