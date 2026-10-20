@@ -117,7 +117,7 @@ describe('A. 대표 진입 판정 helper', () => {
     expect(isRepresentativeEntryExchangeOrigin('https://study.neture.co.kr', 'production')).toBe(false);
     expect(isRepresentativeEntryExchangeOrigin('https://store.neture.co.kr', 'production')).toBe(false);
     expect(isRepresentativeEntryExchangeOrigin('https://admin.neture.co.kr', 'production')).toBe(false);
-    expect(isRepresentativeEntryExchangeOrigin('https://kpa-society.co.kr', 'production')).toBe(false);
+    expect(isRepresentativeEntryExchangeOrigin('https://pharmacy.neture.co.kr', 'production')).toBe(false);
     expect(isRepresentativeEntryExchangeOrigin('https://neture.co.kr.evil.test', 'production')).toBe(false);
     expect(isRepresentativeEntryExchangeOrigin('http://localhost:4211', 'production')).toBe(false);
     expect(isRepresentativeEntryExchangeOrigin('http://localhost:4211', 'development')).toBe(true);
@@ -130,7 +130,7 @@ describe('A. 대표 진입 판정 helper', () => {
 describe('B. generateHandoff', () => {
   it('비로그인 → 401 AUTH_REQUIRED · 토큰 INSERT 0', async () => {
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', null), res);
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', null), res);
     expect([res.statusCode, res.body.code]).toEqual([401, 'AUTH_REQUIRED']);
     expect(query).not.toHaveBeenCalled();
   });
@@ -145,7 +145,7 @@ describe('B. generateHandoff', () => {
   it('neture membership 없는 활성 사용자도 target=neture 발급 — service_memberships 조회 0 · returnTo "/" 고정', async () => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]); // INSERT · prune
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr'), res);
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetUrl).toBe(`https://neture.co.kr/handoff?token=${uuid}&returnTo=%2F`);
     expect(res.body.data.targetService.key).toBe('neture');
@@ -215,7 +215,7 @@ describe('B. generateHandoff', () => {
     async (target) => {
       const res = mockRes();
       await HandoffController.generateHandoff(
-        mockReq({ targetServiceKey: target }, 'https://kpa-society.co.kr', { ...KPA_ONLY_USER, refreshTokenFamily: null }),
+        mockReq({ targetServiceKey: target }, 'https://pharmacy.neture.co.kr', { ...KPA_ONLY_USER, refreshTokenFamily: null }),
         res,
       );
       expect([res.statusCode, res.body.code]).toEqual([401, 'HANDOFF_SESSION_REVOKED']);
@@ -269,7 +269,7 @@ describe('C. exchangeHandoff', () => {
   });
 
   it.each([
-    ['https://kpa-society.co.kr'],
+    ['https://pharmacy.neture.co.kr'],
     ['https://study.neture.co.kr'],
     ['https://store.neture.co.kr'],
     [undefined],

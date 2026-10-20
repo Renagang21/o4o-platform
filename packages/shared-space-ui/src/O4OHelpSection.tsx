@@ -28,7 +28,7 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
     serviceKey: 'kpa-society',
     title: 'KPA Society',
     description: '약사회 회원을 위한 커뮤니티·학술·서비스 통합 플랫폼입니다',
-    href: 'https://kpa-society.co.kr/',
+    href: 'https://pharmacy.neture.co.kr/',
     external: true,
   },
   // K-Cosmetics(www.k-cosmetics.site)는 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.

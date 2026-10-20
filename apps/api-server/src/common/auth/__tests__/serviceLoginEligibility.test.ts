@@ -29,10 +29,6 @@ describe('resolveLoginMembershipGateKey', () => {
     ['https://k-cosmetics.site', 'k-cosmetics'],
     ['https://www.k-cosmetics.site', 'k-cosmetics'], // www 별칭도 같은 게이트
     ['https://www.pharmacy.neture.co.kr', 'kpa-society'],
-    // WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch 가 kpa.neture.co.kr 로 옮겨
-    //   kpa-society.co.kr 은 kpa-society 의 legacy 호스트로만 남는다(종전: kpa-branch `/kpa` 와 겹쳐 단정 불가).
-    ['https://kpa-society.co.kr', 'kpa-society'],
-    ['https://www.kpa-society.co.kr', 'kpa-society'],
   ])('G1 %s → %s', (origin, key) => {
     expect(resolveLoginMembershipGateKey(origin)).toBeNull();
   });

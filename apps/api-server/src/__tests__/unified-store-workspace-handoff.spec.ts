@@ -237,7 +237,7 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     resolveAccessibleStores.mockResolvedValueOnce([STORE]);
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetWorkspace: 'store', returnPath: '/store' }, 'https://kpa-society.co.kr'), res);
+    await HandoffController.generateHandoff(mockReq({ targetWorkspace: 'store', returnPath: '/store' }, 'https://pharmacy.neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetUrl).toBe(`${STORE_WORKSPACE_ORIGIN}/handoff?token=${uuid}&returnTo=%2Fstore`);
     expect(res.body.data.targetWorkspace).toBe('store');
@@ -379,7 +379,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(isStoreWorkspaceExchangeOrigin('https://store.neture.co.kr', 'production')).toBe(true);
     expect(isStoreWorkspaceExchangeOrigin('https://STORE.neture.co.kr', 'production')).toBe(true);
     expect(isStoreWorkspaceExchangeOrigin('https://neture.co.kr', 'production')).toBe(false);
-    expect(isStoreWorkspaceExchangeOrigin('https://kpa-society.co.kr', 'production')).toBe(false);
+    expect(isStoreWorkspaceExchangeOrigin('https://pharmacy.neture.co.kr', 'production')).toBe(false);
     expect(isStoreWorkspaceExchangeOrigin('https://store.neture.co.kr.evil.test', 'production')).toBe(false);
     expect(isStoreWorkspaceExchangeOrigin('http://localhost:4210', 'production')).toBe(false);
     expect(isStoreWorkspaceExchangeOrigin('http://localhost:4210', 'development')).toBe(true);
@@ -421,7 +421,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
       findOne.mockResolvedValueOnce(USER);
       query.mockResolvedValueOnce(memberships);
       const res = mockRes();
-      await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+      await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
       expect([res.statusCode, res.body.code]).toEqual([401, 'HANDOFF_TOKEN_INVALID']);
       expect(generateTokens).not.toHaveBeenCalled();
       expect(resolveAccessibleStores).not.toHaveBeenCalled();
@@ -447,7 +447,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce(memberships);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetServiceKey).toBe('kpa-society');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
@@ -465,7 +465,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce(memberships);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
     expect(linkedAccountsQuery).not.toHaveBeenCalled();
@@ -476,7 +476,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce(memberships);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
   });
@@ -487,7 +487,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     query.mockResolvedValueOnce(memberships);
     jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['store_owner', 'platform:super_admin']);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect([res.statusCode, res.body.code]).toEqual([403, 'PASSWORD_SESSION_NOT_ALLOWED']);
     expect(generateTokens).not.toHaveBeenCalled();
   });
@@ -498,7 +498,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     query.mockResolvedValueOnce(memberships);
     jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['kpa-society:admin']);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
   });
@@ -509,7 +509,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     query.mockResolvedValueOnce(memberships);
     jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['platform:super_admin']);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'google');
   });
@@ -518,7 +518,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     consumedService('kakao'); findOne.mockResolvedValueOnce(USER); query.mockResolvedValueOnce(memberships);
     jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(platform ? ['platform:super_admin'] : ['kpa-society:admin']);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid, authMethod: 'google' }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid, authMethod: 'google' }, 'https://pharmacy.neture.co.kr', undefined), res);
     if (platform) {
       expect([res.statusCode, res.body.code]).toEqual([403, 'GOOGLE_SESSION_REQUIRED']);
       expect(generateTokens).not.toHaveBeenCalled();
@@ -533,7 +533,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce([{ serviceKey: 'kpa-society', status: 'pending' }]);
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.user.memberships).toEqual([{ serviceKey: 'kpa-society', status: 'pending' }]);
   });

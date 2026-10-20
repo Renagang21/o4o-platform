@@ -49,8 +49,6 @@ export const LOCAL_AGENT_PORT = 47821;
 const ALLOWED_ORIGINS = new Set([
   'https://neture.co.kr',
   'https://www.neture.co.kr',
-  'https://kpa-society.co.kr',
-  'https://www.kpa-society.co.kr',
 ]);
 
 /** /health 의 localData 요약 — 허용 키만, 실패해도 창구는 산다. */

@@ -51,7 +51,7 @@ export const getAllowedOrigins = (): string[] => {
     "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
     "https://shop.neture.co.kr", "https://forum.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
-    "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
+    // 옛 약국 앱 도메인 · www — 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1). 약국 앱 = pharmacy.neture.co.kr.
     // k-cosmetics.site · www — K-Cosmetics 종료로 제거(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     // WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1:
     //   canonical 도메인은 platform_services.entry_url / Dockerfile VITE_SERVICE_URL 과 동일.
@@ -83,12 +83,7 @@ export const getAllowedOrigins = (): string[] => {
     //   209개 분회가 각자 도메인을 붙이면 정적 allowlist 로는 확장되지 않으므로,
     //   custom-domain onboarding 시 branch_domains(status='active') 기반 동적 origin
     //   판정을 별도 WO 로 도입한다.
-    //
-    //   WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-    //     공용 진입이 서브도메인(branch.kpa-society.co.kr, DNS 미연결)에서
-    //     kpa-society.co.kr 의 `/kpa` path 로 바뀌었다. origin 은 host 축이므로
-    //     이미 위에 등록된 "https://kpa-society.co.kr" / "https://www.kpa-society.co.kr"
-    //     가 그대로 분회 앱의 origin 이 된다 — 별도 항목을 추가하지 않는다.
+    //   분회 공용 호스트는 위의 "https://kpa.neture.co.kr" 이다.
     "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
     //   web-hospital-pharmacy(Cloud Run) 는 /api/ai/* (파일 이해·조사) 를 cross-origin 호출한다.

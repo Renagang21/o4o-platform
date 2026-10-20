@@ -19,6 +19,7 @@
 | D3 | **약관 · 정책 문서는 사업별로 따로 둔다.** 내용이 비슷해도 하나를 공유하지 않는다. 각 사업의 약관은 그 사업에 속하며 그 사업 단위로 관리 · 게시 · 동의 기록한다. | 사용자 2026-10-20 |
 | D4 | 기존 `service_key='kpa-society'` 회원 · 약관 동의 · 콘텐츠는 의미 없는 테스트 데이터다. 데이터 이전 단계를 두지 않는다. | 사용자 2026-10-20 |
 | D5 | 사업 식별은 서비스 키가 아니라 사업 데이터 행(`semi_franchises.key`)으로 한다. 이 결정은 유지한다(D1 은 pharmacy 를 이 방식에 맞추는 것). | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) L59 · [RBAC-ROLE-CATALOG-V1](../rbac/RBAC-ROLE-CATALOG-V1.md) L164-182 |
+| D6 | **옛 약국 앱 도메인(kpa-society.co.kr) 관련 내용은 전부 삭제한다.** 혼선을 막기 위해서다. 옛 주소 지원(CORS · 쿠키 · 세션 판정 · 분회 옛 경로 이동)도 남기지 않는다. | 사용자 2026-10-20 |
 
 D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공통 계정 축(`neture`)이다. 사업 독립은 사업 가입 원장 · 사업 범위 데이터 · 사업별 약관으로 구현한다. 이 해석이 사용자 의도와 다르면 단계 1 시작 전에 정정한다.
 
@@ -85,8 +86,20 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 ### 단계 5 — 테스트 데이터 정리
 - 운영 DB read-only 로 `kpa-society` 범위 테스트 데이터 건수를 집계한다. 삭제는 운영 write 라 건별 사용자 승인 후 실행한다.
 
+### 단계 0 — 옛 도메인 삭제 (D6) · 코드 · 문서 완료, 운영 인프라 대기
+- 완료(이 branch):
+  - API: CORS 허용 목록 · 쿠키 도메인 · catalog `legacyDomains` 제거, 관련 주석 · dev 스크립트 안내.
+  - 분회 앱: 옛 경로 이동 모듈(`lib/canonicalHost`) · 공용 호스트 목록의 옛 도메인 제거. `/kpa` asset base 는 유지(현행 LB · Dockerfile 계약).
+  - 약국 앱 Dockerfile 기본 `VITE_SERVICE_URL`, 관리자 QR 안내 · 공용 도움말 링크 · 가이드 문구, Local Agent 허용 origin, e2e · 검증 스크립트, CI fixture.
+  - 테스트: 옛 도메인을 쓰던 origin 예시를 `pharmacy.neture.co.kr` 로 교체. 재등록 방지 guard 3곳만 문자열을 남긴다(세션 판정 null · 분회 공용 호스트 목록 · 대표 홈 가입 안내).
+  - 문서: `KPA-SOCIETY-SERVICE-STRUCTURE` 본문 삭제 · 은퇴 안내로 교체(SUPERSEDED), reference 문서 2건 삭제, `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1` 옛 주소 열 · §4 행, CANONICAL-INDEX 행, `CLAUDE.md` §10, `scripts/README.md`.
+- 의도적으로 남긴 것:
+  - 이미 운영에 적용된 migration `20270305000000-SeedKpaBranchServiceAndRoles`(이력 파일 수정 금지). 운영 DB `platform_services` 의 해당 URL 값은 아래 운영 단계.
+  - 기록물(`docs/checks` · `investigations` · `work-orders` · `ir` · `archive`)과 이미 SUPERSEDED 인 `O4O-IDENTITY-ARCHITECTURE-V1` — 과거 시점 기록이라 수정하지 않는다.
+- 운영 단계(사용자 승인 필요): LB URL map 의 옛 도메인 host rule · path-matcher, 인증서 · certificate map entry, DNS, 운영 DB `platform_services` URL 값.
+
 ### 단계 6 — 명칭 잔재 (후순위)
-- LB `kpa-society.co.kr` 라우팅, `services/web-kpa-society/Dockerfile` 기본값 `https://kpa-society.co.kr`, `service-catalog.ts` `legacyDomains`, Cloud Run 이름 `kpa-society-web` · 앱 디렉터리 이름. 인프라 변경은 사용자 승인 후.
+- Cloud Run 이름 `kpa-society-web` · 앱 디렉터리 `services/web-kpa-society` · 서비스 키 `kpa-society` 이름. 인프라 변경은 사용자 승인 후.
 
 ## 중지 조건 (이 WO 에서 예상되는 것)
 
