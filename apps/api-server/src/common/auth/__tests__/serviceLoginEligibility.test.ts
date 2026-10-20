@@ -26,8 +26,6 @@ describe('resolveLoginMembershipGateKey', () => {
   it.each([
     ['https://pharmacy.neture.co.kr', 'kpa-society'],
     ['https://retail.neture.co.kr', 'k-cosmetics'],
-    ['https://k-cosmetics.site', 'k-cosmetics'],
-    ['https://www.k-cosmetics.site', 'k-cosmetics'], // www 별칭도 같은 게이트
     ['https://www.pharmacy.neture.co.kr', 'kpa-society'],
   ])('G1 %s → %s', (origin, key) => {
     expect(resolveLoginMembershipGateKey(origin)).toBeNull();
@@ -37,7 +35,6 @@ describe('resolveLoginMembershipGateKey', () => {
     'https://neture.co.kr', // 대표 진입 — 신규 사용자 · 약국 가입 신청이 로그인 뒤에 시작된다
     'https://store.neture.co.kr', // Store Workspace — 매장 가입 신청 자리
     'https://admin.neture.co.kr', // 관리자 — Google 전용 · platform 역할 축
-    'https://pharmacyhub.co.kr', // 자기 호스트 /join (requireAuth)
     'https://kpa.neture.co.kr', // kpa-branch — 자기 호스트 /join(분회 운영자 승인) · 게이트 없음
     'https://www.neture.co.kr',
     'https://study.neture.co.kr', // lecture — 이 WO 범위 밖

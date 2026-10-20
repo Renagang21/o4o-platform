@@ -175,7 +175,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'K-Cosmetics',
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'retail.neture.co.kr',
-    legacyDomains: ['k-cosmetics.site'],
+    // 옛 K-Cosmetics 도메인 legacyDomains 는 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
     // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
     // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.

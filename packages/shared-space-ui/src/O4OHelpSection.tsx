@@ -31,7 +31,7 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
     href: 'https://pharmacy.neture.co.kr/',
     external: true,
   },
-  // K-Cosmetics(www.k-cosmetics.site)는 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+  // K-Cosmetics(옛 K-Cosmetics 도메인)는 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1:
   //   유통참여형 펀딩은 독립 서비스가 아니라 Neture 내부 기능이다. cross-service 카탈로그
   //   ("다른 서비스 보기")에서 제거 — KPA/KCos 매장 측 유통참여형 펀딩 연결 흔적 제거.

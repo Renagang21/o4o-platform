@@ -19,7 +19,7 @@
 | D3 | **약관 · 정책 문서는 사업별로 따로 둔다.** 내용이 비슷해도 하나를 공유하지 않는다. 각 사업의 약관은 그 사업에 속하며 그 사업 단위로 관리 · 게시 · 동의 기록한다. | 사용자 2026-10-20 |
 | D4 | 기존 `service_key='kpa-society'` 회원 · 약관 동의 · 콘텐츠는 의미 없는 테스트 데이터다. 데이터 이전 단계를 두지 않는다. | 사용자 2026-10-20 |
 | D5 | 사업 식별은 서비스 키가 아니라 사업 데이터 행(`semi_franchises.key`)으로 한다. 이 결정은 유지한다(D1 은 pharmacy 를 이 방식에 맞추는 것). | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) L59 · [RBAC-ROLE-CATALOG-V1](../rbac/RBAC-ROLE-CATALOG-V1.md) L164-182 |
-| D6 | **옛 약국 앱 도메인(kpa-society.co.kr) 관련 내용은 전부 삭제한다.** 혼선을 막기 위해서다. 옛 주소 지원(CORS · 쿠키 · 세션 판정 · 분회 옛 경로 이동)도 남기지 않는다. | 사용자 2026-10-20 |
+| D6 | **은퇴 도메인 관련 내용은 전부 삭제한다**: `kpa-society.co.kr` · `k-cosmetics.site` · `glycopharm.co.kr` · `pharmacyhub.co.kr` · `siteguide.co.kr` · `glucoseview.co.kr`. 혼선을 막기 위해서다. 옛 주소 지원(CORS · 쿠키 · 세션 판정 · 분회 옛 경로 이동)도 남기지 않는다. 외부 DNS 는 사용자가 정리 완료(2026-10-20). | 사용자 2026-10-20 |
 
 D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공통 계정 축(`neture`)이다. 사업 독립은 사업 가입 원장 · 사업 범위 데이터 · 사업별 약관으로 구현한다. 이 해석이 사용자 의도와 다르면 단계 1 시작 전에 정정한다.
 
@@ -96,7 +96,13 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 - 의도적으로 남긴 것:
   - 이미 운영에 적용된 migration `20270305000000-SeedKpaBranchServiceAndRoles`(이력 파일 수정 금지). 운영 DB `platform_services` 의 해당 URL 값은 아래 운영 단계.
   - 기록물(`docs/checks` · `investigations` · `work-orders` · `ir` · `archive`)과 이미 SUPERSEDED 인 `O4O-IDENTITY-ARCHITECTURE-V1` — 과거 시점 기록이라 수정하지 않는다.
-- 운영 단계(사용자 승인 필요): LB URL map 의 옛 도메인 host rule · path-matcher, 인증서 · certificate map entry, DNS, 운영 DB `platform_services` URL 값.
+- 추가 4개 도메인(D6 확장): K-Cosmetics catalog `legacyDomains` 제거(이제 catalog 에 옛 호스트 0), 코드 주석 · 테스트 fixture · README · 배포 workflow 주석. 재등록 방지 guard 는 `service-catalog.canonical-domain.test.ts` 한 목록에 6개 도메인을 모았다(그 밖에 web-neture 대표 홈 guard 2곳 유지). `O4O-IDENTITY-ARCHITECTURE-V1`(SUPERSEDED) 본문 삭제.
+- 남긴 것: `scripts/deployment/pharmacy-hub-*`(PH 인프라 퇴역 도구 — 대상 호스트 문자열이 동작 조건) · `pharmacyhub-qr-cutover.yml`, `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` 의 미실행 테스트 QR 4행 삭제 SQL, `HANDOFF.md` · `docs/handoffs` 인계 기록.
+- 운영 상태 (2026-10-20):
+  - DNS — 사용자 정리 완료.
+  - LB `o4o-global-lb` — 옛 약국 앱 도메인 host rule 2 · `path-matcher-kpa-society` · `api.kpa-society.co.kr` 제거 **적용 완료**(validate 통과 후 import). 나머지 5개 도메인 host rule 은 이미 없음. 적용 후 응답 확인은 미실행.
+  - 인증서 — 옛 약국 앱 도메인 3개가 공용 인증서 `cm-cert-neture-v4`(neture · www · admin · api 와 공유) SAN 에 있다. DNS 삭제로 자동 갱신(만료 2027-01-04) 검증이 실패할 수 있으므로 **neture 4개 도메인만의 새 인증서로 교체 → entry 4개 재지정 → 옛 도메인 entry 3개 · DNS authorization 3개 · v4 삭제** 가 필요하다. 사용자 승인 대기.
+  - 운영 DB `platform_services` 의 옛 분회 URL 값 — 사용자 승인 대기.
 
 ### 단계 6 — 명칭 잔재 (후순위)
 - Cloud Run 이름 `kpa-society-web` · 앱 디렉터리 `services/web-kpa-society` · 서비스 키 `kpa-society` 이름. 인프라 변경은 사용자 승인 후.

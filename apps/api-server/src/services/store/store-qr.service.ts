@@ -227,7 +227,7 @@ export async function resolvePublicQrLanding(
      ORDER BY created_at DESC`,
     [qrData.organizationId],
   );
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (옛 PH 도메인 QR 착지 이전):
   //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·
   //   중첩 QR 주소)은 서비스 축을 쓰므로, 매장이 **호출 호스트 서비스의 slug 를 하나도 갖지 않을 때만** 매장의
   //   최신 slug 서비스 축을 쓴다(예: 옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr 에서 연다).

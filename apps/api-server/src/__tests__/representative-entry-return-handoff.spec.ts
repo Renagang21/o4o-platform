@@ -342,7 +342,7 @@ describe('C. exchangeHandoff', () => {
   it('previously issued PH handoff cannot create a new session', async () => {
     consumed('pharmacy-hub', 'neture');
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacyhub.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(410);
     expect(generateTokens).not.toHaveBeenCalled();
     expect(findOne).not.toHaveBeenCalled();

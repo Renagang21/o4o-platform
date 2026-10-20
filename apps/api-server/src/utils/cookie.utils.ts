@@ -10,7 +10,7 @@ import { AuthTokens } from '../types/auth.js';
  * Supports multiple service domains:
  * - neture.co.kr (and subdomains)
  * (옛 약국 앱 도메인은 은퇴로 제거 — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1)
- * (k-cosmetics.site 는 K-Cosmetics 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
+ * (옛 K-Cosmetics 도메인은 K-Cosmetics 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  */
 
 /**

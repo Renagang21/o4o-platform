@@ -6,7 +6,7 @@
  * 닫으려는 결함 (production 실측):
  *   `GET /api/v1/lms/instructor/courses` 가 `instructorId` 만으로 좁혀져 있어,
  *   여러 서비스의 강사인 사용자에게 타 서비스 강의가 그대로 노출됐다.
- *   pharmacyhub.co.kr `/instructor/courses` 총 7건 중 6건이 `serviceKey='kpa-society'`
+ *   옛 PH 도메인 `/instructor/courses` 총 7건 중 6건이 `serviceKey='kpa-society'`
  *   (§20 완료 조건 `cross-service leakage = 0` 위반).
  *
  * 검증 2계층 — 공개 목록 스펙(lms-public-course-service-scope.spec.ts)과 같은 방식:

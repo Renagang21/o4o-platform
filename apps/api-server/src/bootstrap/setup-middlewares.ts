@@ -52,7 +52,7 @@ export const getAllowedOrigins = (): string[] => {
     "https://shop.neture.co.kr", "https://forum.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     // 옛 약국 앱 도메인 · www — 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1). 약국 앱 = pharmacy.neture.co.kr.
-    // k-cosmetics.site · www — K-Cosmetics 종료로 제거(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+    // 옛 K-Cosmetics 도메인 · www — K-Cosmetics 종료로 제거(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     // WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1:
     //   canonical 도메인은 platform_services.entry_url / Dockerfile VITE_SERVICE_URL 과 동일.
     //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다.
