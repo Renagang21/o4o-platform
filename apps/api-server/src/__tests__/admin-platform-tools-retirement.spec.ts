@@ -34,3 +34,8 @@ it('other service entry points cannot restore role editing or advertise the remo
     expect(menu).not.toContain('서비스 대상 정책 (플랫폼)');
   }
 });
+
+it('dashboard API actions do not advertise retired role editors', () => {
+  expect(read('modules/neture/controllers/admin-dashboard.controller.ts')).not.toContain("link: '/admin/roles'");
+  expect(read('routes/kpa/services/operator-dashboard.service.ts')).not.toContain("link: '/operator/roles'");
+});
