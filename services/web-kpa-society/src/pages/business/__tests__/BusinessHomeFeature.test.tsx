@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { initialHomePresentation } from '@o4o/types';
+import { initialHomePresentation, type HomePresentation } from '@o4o/types';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), user: { id: 'member-a' } }));
 vi.mock('../../../contexts/AuthContext', () => ({ authClient: { api: { get: mocks.get } }, useAuth: () => ({ user: mocks.user }) }));
 import BusinessHomeFeature from '../BusinessHomeFeature';
-const publication = (title = '본부의 실제 캠페인') => {
+const publication = (title = '본부의 실제 캠페인'): HomePresentation => {
   const base = initialHomePresentation('pharmacy');
   return { ...base, slides: [{ ...base.slides[0], title, linkText: '내용 확인', linkUrl: '/materials' }], promotions: [] };
 };
@@ -61,4 +61,20 @@ it('슬라이드 없이 게시한 광고도 기존 광고·광고주 표기를 �
   expect(await screen.findByRole('heading', { name: '게시된 협력 광고' })).toBeTruthy();
   expect(screen.getByText('광고 · 검증 협력사')).toBeTruthy();
   expect(screen.queryByRole('heading', { name: '본부 소식' })).toBeNull();
+});
+it('게시 Hero는 상단 h1으로, 광고는 별도 하단에서 한 번 표시한다', async () => {
+  const config = publication();
+  config.promotions = [{ ...config.slides[0], id: 'promotion', title: '하단 안내' }];
+  mocks.get.mockResolvedValue(response(config));
+  render(<><BusinessHomeFeature businessKey="megapharm" mode="hero" fallback={<h1>기본 제목</h1>} /><BusinessHomeFeature businessKey="megapharm" mode="promotions" /></>);
+  await screen.findByRole('heading', { level: 1, name: '본부의 실제 캠페인' });
+  await screen.findByRole('heading', { name: '하단 안내' });
+  expect(screen.getAllByText('본부의 실제 캠페인')).toHaveLength(1);
+  expect(screen.queryByText('기본 제목')).toBeNull();
+});
+it('미게시 Hero에서는 간결한 기존 제목을 유지한다', async () => {
+  mocks.get.mockResolvedValue(response(null));
+  render(<BusinessHomeFeature businessKey="pharmacy" mode="hero" fallback={<h1>기본 제목</h1>} />);
+  await waitFor(() => expect(mocks.get).toHaveBeenCalled());
+  expect(screen.getByRole('heading', { name: '기본 제목' })).toBeTruthy();
 });

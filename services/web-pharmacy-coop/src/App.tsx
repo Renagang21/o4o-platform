@@ -1,6 +1,6 @@
 import { MemberForum } from "./MemberForum";
 import { MyCooperatives, MyUpdates } from "./Participation";
-import { BusinessHomeShowcase } from "@o4o/shared-space-ui";
+import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import {
   FederationManagementPanel,
   MemberManagementPanel,
@@ -109,6 +109,7 @@ export function App({
           />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
+          <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
           <Route path=":cooperativeSlug" element={<CooperativeLayout />}>
             <Route index element={<CooperativeHome />} />
             <Route path="membership" element={<Membership />} />
@@ -122,6 +123,7 @@ export function App({
             />
             <Route path="services" element={<Services />} />
             <Route path="operator" element={<CooperativeManagement />} />
+            <Route path="operator/home-presentation" element={<CooperativeHeroManagement />} />
             <Route
               path="operator/contents/new"
               element={<CooperativeManagement editor />}
@@ -233,9 +235,14 @@ function PersonalSpace({ updates = false }: { updates?: boolean }) {
 }
 
 function FederationHome() {
+  const { businessClient, preview } = useContext(Context);
   return (
     <>
-      <section className="hero">
+      {businessClient && !preview ? <ServiceHomeHero surface="pharmcoop" client={businessClient}
+        title={["조합의 힘을 모아, 약국의 내일을 함께."]}
+        description={["각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다."]}
+        eyebrow="함께하는 약국, 연결되는 협동조합"
+        actions={<div className="actions"><SiteLink className="button outline" to="/cooperatives">소속 협동조합 찾기 ↗</SiteLink><SiteLink to="/about">연합회 알아보기 →</SiteLink></div>} /> : <section className="hero">
         <div>
           <p className="eyebrow">함께하는 약국, 연결되는 협동조합</p>
           <h1>
@@ -272,7 +279,7 @@ function FederationHome() {
           </div>
           <p>독립적으로 운영하고, 함께 연결됩니다.</p>
         </div>
-      </section>
+      </section>}
       <section className="section">
         <div className="section-heading">
           <div>
@@ -299,6 +306,7 @@ function FederationHome() {
         </div>
       </section>
       <Directory compact />
+      {businessClient && !preview && <ServiceHomePromotion surface="pharmcoop" client={businessClient} publishedOnly />}
       <section className="store-callout">
         <div>
           <p className="eyebrow">약국 경영자 공통 공간</p>
@@ -416,7 +424,7 @@ function FederationAbout() {
 
 function CooperativeLayout() {
   const { cooperativeSlug = "" } = useParams();
-  const { cooperatives, preview } = useContext(Context);
+  const { cooperatives, preview, businessClient } = useContext(Context);
   const cooperative = validCooperativeSlug(cooperativeSlug)
     ? cooperatives.find((row) => row.slug === cooperativeSlug)
     : undefined;
@@ -429,11 +437,12 @@ function CooperativeLayout() {
         <span aria-hidden="true">/</span>
         <span>{cooperative.name}</span>
       </div>
-      <section className="coop-heading">
+      {businessClient && !preview ? <ServiceHomeHero key={cooperative.id} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient}
+        title={[cooperative.name]} description={[cooperative.introduction]} eyebrow="개별 협동조합 공간" /> : <section className="coop-heading">
         <p className="eyebrow">개별 협동조합 공간</p>
         <h1>{cooperative.name}</h1>
         <p>{cooperative.introduction}</p>
-      </section>
+      </section>}
       <nav className="coop-nav" aria-label="협동조합 메뉴">
         {[
           ["", "조합 홈"],
@@ -459,7 +468,7 @@ function CooperativeLayout() {
 
 function CooperativeHome() {
   const cooperative = useOutletContext<Cooperative>();
-  const { businessClient, session } = useContext(Context);
+  const { businessClient, session, preview } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
   return (
     <section className="section">
@@ -502,6 +511,7 @@ function CooperativeHome() {
           자료 이용 안내 →
         </SiteLink>
       </div>
+      {businessClient && !preview && <ServiceHomePromotion surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} publishedOnly />}
     </section>
   );
 }
@@ -657,14 +667,14 @@ function FederationManagement() {
   const { session, businessClient, preview } = useContext(Context);
   if (businessClient && !preview && canManageFederation(session))
     return (
-      <FederationManagementPanel
+      <><p><SiteLink to="/operator/home-presentation">Hero 관리</SiteLink></p><FederationManagementPanel
         key={session.userId}
         client={businessClient}
         admin={session.federationOperators.some(
           (r) => r.userId === session.userId && r.role === "admin",
         )}
         userId={session.userId!}
-      />
+      /></>
     );
   return (
     <section className="section">
@@ -681,6 +691,18 @@ function FederationManagement() {
   );
 }
 
+function FederationHeroManagement() {
+  const { session, businessClient, preview } = useContext(Context);
+  if (!businessClient || preview || !canManageFederation(session)) return <Empty title="연합회 운영 권한이 필요합니다." text="현재 연합회 운영자만 편집할 수 있습니다." />;
+  return <><SiteLink to="/operator">연합회 운영으로</SiteLink><HomePresentationEditor key={session.userId} surface="pharmcoop" client={businessClient} /></>;
+}
+function CooperativeHeroManagement() {
+  const cooperative = useOutletContext<Cooperative>();
+  const { session, businessClient, preview } = useContext(Context);
+  if (!businessClient || preview || !cooperativeAccess(session, cooperative.id).canManage) return <Empty title="이 조합의 운영 권한이 필요합니다." text="다른 조합 또는 연합회 역할만으로 편집할 수 없습니다." />;
+  return <><SiteLink to={`/${cooperative.slug}/operator`}>조합 운영으로</SiteLink><HomePresentationEditor key={`${session.userId}:${cooperative.id}`} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} heading="h2" /></>;
+}
+
 function CooperativeManagement({
   editor = false,
 }: Readonly<{ editor?: boolean }>) {
@@ -690,6 +712,7 @@ function CooperativeManagement({
   if (canManage && cooperative.businessKey && businessClient)
     return (
       <>
+        {!editor && <p><SiteLink to={`/${cooperative.slug}/operator/home-presentation`}>Hero 관리</SiteLink></p>}
         {!editor && (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
