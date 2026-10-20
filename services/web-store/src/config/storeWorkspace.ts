@@ -12,6 +12,12 @@ export const STORE_WORKSPACE_AREAS = [
     description: "오늘 할 일과 매장 현황을 확인합니다.",
   },
   {
+    key: "use",
+    label: "매장 운영",
+    subPath: "/workspace/use",
+    description: "상담하고 매장의 사이니지·태블릿·QR을 운영합니다.",
+  },
+  {
     key: "commerce",
     label: "상품·거래",
     subPath: "/workspace/commerce",
@@ -22,12 +28,6 @@ export const STORE_WORKSPACE_AREAS = [
     label: "안내 만들기",
     subPath: "/workspace/studio",
     description: "상품과 자료를 골라 매장에서 사용할 안내를 준비합니다.",
-  },
-  {
-    key: "use",
-    label: "매장 운영",
-    subPath: "/workspace/use",
-    description: "상담하고 매장의 사이니지·태블릿·QR을 운영합니다.",
   },
 ] as const;
 
