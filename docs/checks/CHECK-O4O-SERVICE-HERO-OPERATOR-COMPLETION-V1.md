@@ -44,3 +44,17 @@
 - 격리 PostgreSQL 테스트 schema 잔존 0개 확인 후 이번 전용 DB를 DROP하고 이번에 시작한 서버를 중지했다. 운영 DB 요청 없음.
 - unsafe route guard: 1,285개 파일 검사, 위반 0개. 문서 민감정보 검사 0건, git diff --check PASS.
 - push 전 origin/main `6b1a168fbc`의 다른 작업 진행을 확인했다. 이번 변경 파일과 직접 겹침은 없다. 개발 branch를 임의 merge/rebase하지 않았으며 통합 담당이 최신 main CI를 확인한다.
+
+
+## main 통합·배포 착수 — 2026-10-20
+
+사용자가 main 병합·배포를 명시했다. PR·기술 gate·배포 검증을 수행하는 통합 단계다. 확인한 main `5b2f6bd9ee`에는 #730 협동조합 회원 기능과 #732 Hero 시각 구분이 추가돼 편집기·사업 홈·협동조합 App 세 곳에서 충돌했다. main 기능을 보존해 통합했고, 신규 두 surface의 Hero 디자인 정보/장식과 조합 slug 편집 경로를 함께 유지했다. MegaPharm businessKey의 시각 구분도 상단 Hero에 전달한다. 새 schema·migration·의존성 변경 없음.
+
+통합 검증: 공통 UI 142개, 협동조합 전체 62개, API/기존 조합 route 28개, Neture/CarePharm 52개 PASS. 약국 사업 75개 실행에서 두 건이 병렬 빌드 중 findBy 기본 대기 안에 완료되지 않았으며, 해당 파일 단독 재실행 22개가 모두 PASS했다. 나머지 53개는 최초 실행에서 PASS했다. 기존 실패를 숨기거나 timeout/assertion을 완화하지 않았다. 통합 소비처 빌드·브라우저 재검증 결과를 이어 기록한다.
+
+현재 실행 환경 revision 10에는 사용자 지정 네트워크 허용 목록이 비어 있고 GitHub REST/GraphQL 요청이 모두 HTTP 403으로 거부된다. native Git fetch는 성공했다. GitHub API와 운영 확인에 필요한 정확한 도메인을 환경 설정 초안에 저장했다. 초안 저장은 적용/게시를 뜻하지 않는다. 실행 환경에서 GitHub API 접근이 확인되기 전에는 PR 상태·CI·병합·배포 성공을 주장하지 않는다. 토큰 추출·다른 경로를 통한 네트워크 우회·CI 우회는 하지 않는다.
+
+
+통합 코드의 공통 패키지 빌드, API 타입/tsup, Pharmcoop·KPA·Neture 운영 빌드 PASS. KPA 충돌 해소 중 광고 컴포넌트에 불필요한 businessKey prop이 전달된 타입 오류를 수정한 뒤 재빌드를 통과했다. 디자인 값은 Hero에만 전달한다. 대상 ESLint 오류/경고 0, 문서 검사와 diff check PASS. 최종 Chromium 운영 번들 PC 1440·모바일 390에서 연합회/조합 12개와 Pharmacy/MegaPharm 4개, 총 16개를 다시 통과했다. 의도한 첫 PUT 503 후 입력 보존·재시도·공개 소비, 다른 조합과 연합회 우회 차단, 가로 넘침/pageerror 0을 확인했다. 모바일 편집 화면도 시각 확인했다.
+
+GitHub API 차단은 실제 프록시 CONNECT 단계 403으로 확인했다. 이번 통합 단계에서 main 병합·원격 CI/리뷰·운영 배포는 미실행이다. native Git으로 검증된 통합 branch를 추가 push해 보존하고, 허용 설정이 실행 환경에 반영되면 PR·기술 gate 확인부터 재개한다. WORKTREE_DISPOSITION은 KEEP(통합/배포 미완료)이다.

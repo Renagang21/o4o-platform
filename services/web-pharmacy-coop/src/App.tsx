@@ -1,3 +1,5 @@
+import { MemberForum } from "./MemberForum";
+import { MyCooperatives, MyUpdates } from "./Participation";
 import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import {
   FederationManagementPanel,
@@ -100,6 +102,11 @@ export function App({
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
           <Route path="cooperatives" element={<Directory />} />
+          <Route path="cooperatives/mine" element={<PersonalSpace />} />
+          <Route
+            path="cooperatives/updates"
+            element={<PersonalSpace updates />}
+          />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
           <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
@@ -164,6 +171,12 @@ function Layout() {
             <SiteLink to="/">연합회 홈</SiteLink>
             <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
             <SiteLink to="/about">연합회 소개</SiteLink>
+            {session.userId && (
+              <>
+                <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
+                <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
+              </>
+            )}
             {canManageFederation(session) && (
               <SiteLink to="/operator">연합회 운영</SiteLink>
             )}
@@ -199,6 +212,25 @@ function Layout() {
         </div>
       </footer>
     </>
+  );
+}
+
+function PersonalSpace({ updates = false }: { updates?: boolean }) {
+  const { session, businessClient, preview } = useContext(Context);
+  if (!session.userId)
+    return (
+      <section className="section">
+        <h1>{updates ? "내 처리 소식" : "내 협동조합"}</h1>
+        <p>로그인 후 확인할 수 있습니다.</p>
+        <Link to="/login">로그인</Link>
+      </section>
+    );
+  if (!businessClient || preview)
+    return <p>실제 로그인과 서버 연결 후 이용할 수 있습니다.</p>;
+  return updates ? (
+    <MyUpdates key={session.userId} client={businessClient} />
+  ) : (
+    <MyCooperatives key={session.userId} client={businessClient} />
   );
 }
 
@@ -450,7 +482,15 @@ function CooperativeHome() {
           가입 자격 확인 →
         </SiteLink>
       </div>
-      {businessClient && cooperative.businessKey && <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} />}
+      {businessClient && cooperative.businessKey && (
+        <BusinessHomeShowcase
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          accountId={session.userId ?? undefined}
+          cooperative
+          operator={access.canManage}
+        />
+      )}
       <div className="cards two">
         <div className="card">
           <h2>조합 공지</h2>
@@ -537,23 +577,44 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
   const { session, businessClient } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
   const allowed = access.isMember || access.canManage;
+  let content = (
+    <Empty
+      title={
+        allowed
+          ? "데이터 연결 준비 중"
+          : "이 조합의 참여 자격을 확인해야 합니다."
+      }
+      text={
+        allowed
+          ? "이 조합에 속한 게시글과 자료만 조회하도록 연결합니다."
+          : "다른 조합의 가입·운영 자격으로 이 공간을 이용할 수 없습니다."
+      }
+    />
+  );
+  if (allowed && businessClient && cooperative.businessKey) {
+    content =
+      kind === "community" ? (
+        <MemberForum
+          key={`${session.userId}:${cooperative.id}`}
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          canManage={access.canManage}
+        />
+      ) : (
+        <BusinessHomeShowcase
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          accountId={session.userId ?? undefined}
+          cooperative
+          operator={access.canManage}
+          only="content"
+        />
+      );
+  }
   return (
     <section className="section">
       <h2>{kind === "community" ? "회원 게시판" : "조합 자료"}</h2>
-      {kind === 'materials' && allowed && businessClient && cooperative.businessKey ?
-        <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} only="content" /> :
-      <Empty
-        title={
-          allowed
-            ? "데이터 연결 준비 중"
-            : "이 조합의 참여 자격을 확인해야 합니다."
-        }
-        text={
-          allowed
-            ? "이 조합에 속한 게시글과 자료만 조회하도록 연결합니다."
-            : "다른 조합의 가입·운영 자격으로 이 공간을 이용할 수 없습니다."
-        }
-      />}
+      {content}
       <SiteLink className="text-link" to={`/${cooperative.slug}/membership`}>
         가입·내 참여 확인 →
       </SiteLink>
@@ -646,7 +707,7 @@ function CooperativeManagement({
   editor = false,
 }: Readonly<{ editor?: boolean }>) {
   const cooperative = useOutletContext<Cooperative>();
-  const { session, businessClient } = useContext(Context);
+  const { session, businessClient, onSessionChanged } = useContext(Context);
   const { canManage, isAdmin } = cooperativeAccess(session, cooperative.id);
   if (canManage && cooperative.businessKey && businessClient)
     return (
@@ -658,6 +719,7 @@ function CooperativeManagement({
             client={businessClient}
             cooperative={cooperative}
             admin={isAdmin}
+            onChanged={onSessionChanged}
             userId={session.userId!}
           />
         )}

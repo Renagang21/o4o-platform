@@ -38,7 +38,7 @@ export default function BusinessHomeFeature({ businessKey, mode = "all", fallbac
   const visible = visibleHomePresentation(current.document);
   if (!visible.slides.length && !visible.promotions.length) return null;
   return <div className="space-y-4">
-    {mode !== "promotions" && !!visible.slides.length && <HomeHeroView surface="pharmacy" config={current.document} heading={mode === "hero" ? "h1" : "h2"} titleId={mode === "hero" ? "member-home-title" : "business-feature-title"} fallbackTitle="본부 소식" />}
+    {mode !== "promotions" && !!visible.slides.length && <HomeHeroView surface="pharmacy" businessKey={businessKey} config={current.document} heading={mode === "hero" ? "h1" : "h2"} titleId={mode === "hero" ? "member-home-title" : "business-feature-title"} fallbackTitle="본부 소식" />}
     {mode !== "hero" && <HomePromotionView surface="pharmacy" config={current.document} />}
   </div>;
 }

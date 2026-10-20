@@ -151,7 +151,7 @@ describe("home presentation contract and public display", () => {
     await act(async () => finish(response(previous)));
     expect(screen.queryByText("이전 서비스 콘텐츠")).toBeNull();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
-      "제품의 가능성",
+      "새로운 제품",
     );
   });
 });

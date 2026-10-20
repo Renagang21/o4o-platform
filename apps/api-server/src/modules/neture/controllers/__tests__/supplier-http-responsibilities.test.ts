@@ -94,6 +94,7 @@ jest.mock('../../services/product-candidate.service.js', () => ({
 }));
 jest.mock('../../services/supplier.service.js', () => ({
   SupplierProfileNameInvalidError: class extends Error {},
+  SupplierProfileEntityTypeInvalidError: class extends Error {},
   SupplierProfileFieldUnsupportedError: class extends Error {
     constructor(public fields: string[]) {
       super('unsupported');
@@ -132,7 +133,7 @@ jest.mock('../../../../utils/logger.js', () => ({
 import { createSupplierManagementController } from '../supplier-management.controller.js';
 import { createSupplierProductController } from '../supplier-product.controller.js';
 import { SupplierProfileFieldUnsupportedError } from '../../services/supplier.service.js';
-import { SupplierProfileNameInvalidError } from '../../services/supplier.service.js';
+import { SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError } from '../../services/supplier.service.js';
 import { PolicyAcceptanceError } from '../../../policy-acceptance/policy-acceptance.service.js';
 
 const app = express();
@@ -236,6 +237,12 @@ describe('business HTTP ownership and actual supplier identity gates (resolver/s
       taxInvoiceEmail: 'fixture@example.invalid',
     });
     expect(mockMembership).not.toHaveBeenCalled();
+  });
+  it('returns an actionable 400 for a legacy or invalid business classification', async () => {
+    mockBusiness.updateSupplierProfile.mockRejectedValueOnce(new SupplierProfileEntityTypeInvalidError());
+    const result = await send('patch', '/profile').send({ businessEntityType: 'simple_taxpayer' });
+    expect(result.status).toBe(400);
+    expect(result.body).toMatchObject({ success: false, error: 'SUPPLIER_PROFILE_ENTITY_TYPE_INVALID' });
   });
   it('returns an actionable 400 when a business name is invalid', async () => {
     mockBusiness.updateSupplierProfile.mockRejectedValueOnce(new SupplierProfileNameInvalidError());

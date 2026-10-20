@@ -25,5 +25,5 @@ export function isPublicLecturePath(path: string): boolean {
 export const STUDY_HERO = {
   title: ['필요한 지식을', '실무와 연결합니다'],
   description: ['O4O 서비스와 현장 업무에 필요한', '강의와 학습 콘텐츠를 만나보세요.'],
-  accent: '#0d9488',
+  accent: '#5b4acb',
 } as const;

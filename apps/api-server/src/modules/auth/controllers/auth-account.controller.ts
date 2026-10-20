@@ -10,6 +10,7 @@ import { compatPrimaryRole } from '../../../utils/compat-primary-role.js';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
+import { isSelectableBusinessEntityType } from '@o4o/types';
 import logger from '../../../utils/logger.js';
 import { demoAccountService, sendDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
@@ -171,6 +172,12 @@ export class AuthAccountController extends BaseController {
 
     if (!resolvedActivityType) {
       return BaseController.error(res, 'No fields to update', 400);
+    }
+
+    if (businessInfo && typeof businessInfo === 'object' &&
+        businessInfo.businessEntityType !== undefined &&
+        !isSelectableBusinessEntityType(businessInfo.businessEntityType)) {
+      return BaseController.error(res, '세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.', 400);
     }
 
     try {
