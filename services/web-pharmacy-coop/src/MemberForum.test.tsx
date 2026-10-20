@@ -81,11 +81,46 @@ describe("cooperative business forum", () => {
     expect(api.post).toHaveBeenCalledWith(`${root}/forum/posts`, {
       forumId: "board",
       title: "제목",
-      content: "내용",
+      content: [{ id: "paragraph-0", type: "paragraph", content: "내용" }],
       type: "discussion",
     });
     fireEvent.click(screen.getByRole("button", { name: "글 등록" }));
     await screen.findByText("게시글을 등록했습니다.");
+  });
+  it("preserves textarea line breaks and literal markup after submission and detail reload", async () => {
+    const api = client();
+    let savedContent: unknown;
+    const get = api.get.getMockImplementation()!;
+    api.get.mockImplementation(async (path) =>
+      path.endsWith("/posts/post")
+        ? {
+            data: {
+              data: { id: "post", title: "줄바꿈", content: savedContent },
+            },
+          }
+        : get(path),
+    );
+    api.post.mockImplementation(async (_path, body) => {
+      savedContent = body.content;
+      return { data: { success: true } };
+    });
+    const view = open(api);
+    await screen.findByText("회원 글쓰기");
+    fireEvent.change(screen.getByLabelText("게시판"), {
+      target: { value: "board" },
+    });
+    fireEvent.change(screen.getByLabelText("글 제목"), {
+      target: { value: "줄바꿈" },
+    });
+    fireEvent.change(screen.getByLabelText("글 내용"), {
+      target: { value: "첫 줄\n\n둘째 줄 <b>문자 그대로</b> & 안내" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "글 등록" }));
+    await screen.findByText("게시글을 등록했습니다.");
+    fireEvent.click(screen.getByRole("button", { name: "우리 소식" }));
+    await screen.findByText(/둘째 줄 <b>문자 그대로<\/b> & 안내/);
+    expect(view.container.querySelectorAll("article br")).toHaveLength(2);
+    expect(view.container.querySelector("article b")).toBeNull();
   });
   it("allows scoped operators to request a board using the existing endpoint", async () => {
     const api = client();

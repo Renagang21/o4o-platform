@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ForumPostContent } from "@o4o/shared-space-ui";
+import { ForumPostContent, forumContentToHtml } from "@o4o/shared-space-ui";
 import type { PharmacyManagementClient as Client } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import { LoadFeedback, useRows, workError } from "./Participation";
 
@@ -212,7 +212,15 @@ function ForumPostForm({
           const response = await client.post(`${base}/posts`, {
             forumId,
             title: title.trim(),
-            content: body.trim(),
+            content: [
+              {
+                id: "paragraph-0",
+                type: "paragraph",
+                content: forumContentToHtml(body.trim(), {
+                  escapePlainText: true,
+                }),
+              },
+            ],
             type: "discussion",
           });
           if (response.data.success === false) throw new Error();

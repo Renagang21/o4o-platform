@@ -61,3 +61,5 @@ WORKTREE_DISPOSITION: 기존 작업공간 `/workspace/o4o-wt/cooperative-role-ma
 사용자가 제안된 다음 작업(이번 branch 검토·CI·병합·API 및 협동조합 웹 배포, 가능한 운영 검증) 진행을 지시했다. 앞 절의 push 종료/운영 미실행은 개발 단계 당시 기록이며 이번 통합 지시를 제한하지 않는다.
 
 통합 시작 main은 `0b9821122a`다. 이미 push된 branch에 main을 merge해 연합회 Operator 지정 화면과 비공개 revision 인증 smoke 보완을 유지했다. 새 migration은 없다. 운영 배포는 기존 workflow의 gate를 유지하고 API와 Pharmcoop으로 한정한다. 조합 fixture 생성·기존 계정 권한 부여·IAM/DNS 변경은 실행하지 않는다. 공개 호스트 접근은 환경 allowlist에 없으며 GCP 직접 outbound identity도 없다. GitHub Actions WIF 배포와 인증된 private smoke 결과를 확인하고 공개/실계정 업무 검증의 한계를 별도로 보고한다.
+
+PR #730의 Codex P2는 textarea 원문을 단일 paragraph로 정규화할 때 줄바꿈이 접히는 문제였다. 기존 `forumContentToHtml(..., {escapePlainText:true})`로 일반 텍스트를 escape하고 줄바꿈을 보존한 paragraph block을 전송하도록 수정했다. 제출→본문 재조회에서 빈 줄 2개와 HTML처럼 보이는 문자열·앰퍼샌드가 그대로 표시되고 임의 `<b>` 요소가 생성되지 않는 회귀 검증을 추가했다. 최신 main의 연합회 Operator 관리와 함께 UI 54개가 통과했다.
