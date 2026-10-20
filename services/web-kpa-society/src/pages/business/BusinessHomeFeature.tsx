@@ -37,7 +37,7 @@ export default function BusinessHomeFeature({ businessKey }: Readonly<{ business
   const visible = visibleHomePresentation(current.document);
   if (!visible.slides.length && !visible.promotions.length) return null;
   return <div className="space-y-4">
-    {!!visible.slides.length && <HomeHeroView surface="pharmacy" config={current.document} heading="h2" titleId="business-feature-title" fallbackTitle="본부 소식" />}
+    {!!visible.slides.length && <HomeHeroView surface="pharmacy" businessKey={businessKey} config={current.document} heading="h2" titleId="business-feature-title" fallbackTitle="본부 소식" />}
     <HomePromotionView surface="pharmacy" config={current.document} />
   </div>;
 }
