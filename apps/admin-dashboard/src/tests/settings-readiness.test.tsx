@@ -1,9 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EmailSettings from '../pages/settings/EmailSettings';
-import AppServices from '../pages/settings/AppServices';
 import { settingsService } from '../api/settings';
 import { unifiedApi } from '../api/unified-client';
 import toast from 'react-hot-toast';
@@ -15,7 +13,6 @@ const put = vi.mocked(unifiedApi.raw.put);
 const email = { smtpHost: 'smtp.example.invalid', smtpPort: 587,
   smtpUser: 'synthetic-user', smtpPassword: randomUUID(), smtpSecure: false, fromEmail: 'sender@example.invalid', fromName: 'Fixture' };
 const reply = (data: unknown) => ({ data: { success: true, data } });
-const renderAi = () => render(<MemoryRouter><AppServices /></MemoryRouter>);
 
 beforeEach(() => vi.resetAllMocks());
 
@@ -85,29 +82,5 @@ describe('email settings workflow', () => {
     fireEvent.submit(host.closest('form')!);
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('SMTP 설정 저장에 실패했습니다.'));
     expect(toast.success).not.toHaveBeenCalled();
-  });
-});
-
-describe('AI services overview', () => {
-  const models = { current: 'fixture-model', models: [{ id: 'fixture-model', displayName: 'Fixture Model', inputTokenLimit: 4096 }] };
-  it('shows server model information and links to the existing policy editor', async () => {
-    get.mockResolvedValue(reply(models));
-    renderAi();
-    await screen.findByText('Fixture Model');
-    expect(screen.getByRole('link', { name: 'AI Query 설정으로 이동' })).toHaveAttribute('href', '/settings/ai-query');
-    expect(screen.getByText(/사용 통계가 연결되어 있지 않습니다/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '설정 저장' })).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText(/API Key/)).not.toBeInTheDocument();
-    expect(put).not.toHaveBeenCalled();
-  });
-
-  it('shows a retryable error instead of indefinite loading or sample data', async () => {
-    get.mockResolvedValueOnce({ data: { success: true, data: {} } }).mockResolvedValueOnce(reply(models));
-    renderAi();
-    await screen.findByRole('alert');
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '다시 불러오기' }));
-    await screen.findByText('Fixture Model');
-    expect(get).toHaveBeenCalledTimes(2);
   });
 });

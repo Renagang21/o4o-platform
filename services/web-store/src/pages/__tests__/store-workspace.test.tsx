@@ -1,8 +1,8 @@
 import { authClient } from "../../lib/apiClient";
 import UnifiedStoreLayout from "../../components/layouts/UnifiedStoreLayout";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   UNIFIED_STORE_CONFIG,
   withPharmacyStoreMenu,
@@ -104,6 +104,9 @@ describe("업무 배치와 기존 경로", () => {
     ["/store/workspace/studio", "", "studio"],
     ["/store/content/direct/sample", "", "studio"],
     ["/store/content", "", "use"],
+    ["/store/staff-support", "", "use"],
+    ["/store/multilingual-consultation", "", "use"],
+    ["/store/multilingual-consultation-other", "", null],
     ["/store/pharmacy/contents", "", "studio"],
     ["/store/pharmacy/orders", "", "commerce"],
     ["/store/marketing/qr", "?workspace=use", "use"],
@@ -271,8 +274,8 @@ it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고
   expect(screen.getByRole('link', { name: '블로그' }).getAttribute('href')).toBe(base + '/content/blog');
   fireEvent.click(screen.getByRole('link', { name: '매장 운영' }));
   expect(screen.queryByText('준비 중')).toBeNull();
-  expect(await screen.findByRole('heading', {name:'실행 현황'})).toBeTruthy();
-  fireEvent.click(screen.getByText('전체 업무'));
+  expect(await screen.findByRole('heading', {name:'매장 운영'})).toBeTruthy();
+  fireEvent.click(within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'QR'}));
   expect(screen.getByRole('link', { name: 'QR 배치·출력' }).getAttribute('href')).toBe(base + '/marketing/qr?workspace=use');
 });
 it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다시 노출하지 않는다', async () => {
@@ -289,4 +292,68 @@ it('상품 목적지는 메뉴 카드를 거치지 않고 실제 상품 목록�
  expect(screen.getByRole('link', {name:'공급 상품'}).closest('details')?.open).toBe(false);
  fireEvent.click(screen.getByText('전체 업무'));
  expect(screen.getByRole('link', {name:'공급 상품'}).getAttribute('href')).toBe('/store/pharmacy/supply');
+});
+
+
+function OperationsHistory() {
+  const navigate = useNavigate();
+  return <button onClick={() => navigate(-1)}>뒤로</button>;
+}
+
+it.each(['/store', '/work/kpa-society/store'])('상담 첫 화면은 기존 기능을 연결하고 운영 목록을 미리 조회하지 않는다: %s', async base => {
+  const get = vi.spyOn(authClient.api, 'get');
+  try {
+    render(<MemoryRouter initialEntries={[base + '/workspace/use']}><Routes>
+      <Route path={base} element={<StoreWorkspaceShell config={{...config, basePath:base}} />}>
+        <Route path="workspace/use" element={<StoreWorkspacePage area="use" />} />
+      </Route>
+    </Routes></MemoryRouter>);
+    await screen.findByRole('heading', {name:'상담'});
+    expect(screen.getByRole('link', {name:'다국어 상담 시작'}).getAttribute('href')).toBe(base + '/multilingual-consultation');
+    expect(screen.getByRole('link', {name:'상품 위치·기본 안내'}).getAttribute('href')).toBe(base + '/staff-support');
+    expect(screen.getByRole('link', {name:'상담 요청 확인'}).getAttribute('href')).toBe(base + '/requests');
+    expect(screen.queryByRole('link', {name:'재생할 안내·순서 변경'})).toBeNull();
+    expect(screen.queryByRole('heading', {name:'실행 현황'})).toBeNull();
+    expect(screen.getByText('배치·이용 현황 확인').closest('details')?.open).toBe(false);
+    expect(within(screen.getByRole('navigation', {name:'매장 보조 메뉴'})).queryByRole('link', {name:'다국어 상담'})).toBeNull();
+    expect(get).not.toHaveBeenCalled();
+  } finally { get.mockRestore(); }
+});
+
+it('업무 선택은 뒤로가기로 복구하며 query·hash·state를 보존한다', async () => {
+  render(<MemoryRouter initialEntries={[{pathname:'/store/workspace/use',search:'?topic=consultation&view=compact',hash:'#work',state:{selection:'fixture'}}]}><Routes>
+    <Route path="/store" element={<StoreWorkspaceShell config={config} />}>
+      <Route path="workspace/use" element={<><StoreWorkspacePage area="use" /><OperationsHistory /><Location /></>} />
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading', {name:'상담'});
+  fireEvent.click(within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'사이니지'}));
+  expect(screen.getByRole('heading', {name:'사이니지'})).toBeTruthy();
+  expect(screen.queryByRole('link', {name:'다국어 상담 시작'})).toBeNull();
+  const location = JSON.parse(screen.getByTestId('location').textContent!);
+  expect(location.search).toBe('?topic=signage&view=compact');
+  expect(location.hash).toBe('#work');
+  expect(location.state).toEqual({selection:'fixture'});
+  expect(screen.getByRole('link', {name:'재생할 안내·순서 변경'}).getAttribute('href')).toBe('/store/marketing/signage/playlist?workspace=use');
+  fireEvent.click(screen.getByRole('button', {name:'뒤로'}));
+  expect(screen.getByRole('heading', {name:'상담'})).toBeTruthy();
+});
+
+it('권한에서 빠진 업무·참고 자료를 새 첫 화면이 복원하지 않고 허용된 업무로 시작한다', async () => {
+  const filtered = {...config, menuSections:config.menuSections?.map(section => ({...section,items:section.items.filter(item => ['qr','store-execution'].includes(item.key))}))};
+  render(<MemoryRouter initialEntries={['/store/workspace/use?topic=consultation']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={filtered} />}><Route path="workspace/use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
+  await screen.findByRole('heading', {name:'QR'});
+  const topics = screen.getByRole('navigation', {name:'매장 운영 업무'});
+  expect(within(topics).getAllByRole('link')).toHaveLength(1);
+  expect(screen.queryByRole('link', {name:'다국어 상담 시작'})).toBeNull();
+  expect(screen.queryByText('상담에 사용할 상품·안내 자료')).toBeNull();
+  expect(screen.queryByRole('link', {name:'태블릿 위치·화면 관리'})).toBeNull();
+});
+
+it.each(['/store', '/work/kpa-society/store'])('상담 직접 진입도 매장 운영을 활성화하고 해당 업무로 복귀한다: %s', base => {
+  render(<MemoryRouter initialEntries={[base + '/multilingual-consultation']}><StoreWorkspaceShell config={{...config,basePath:base}}><h1>상담 내용</h1></StoreWorkspaceShell></MemoryRouter>);
+  expect(screen.getByRole('link', {name:'매장 운영'}).getAttribute('aria-current')).toBe('page');
+  const consultation = within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'상담'});
+  expect(consultation.getAttribute('aria-current')).toBe('page');
+  expect(consultation.getAttribute('href')).toBe(base + '/workspace/use?topic=consultation');
 });

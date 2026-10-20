@@ -1,6 +1,6 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-14 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-20 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
 > 조사 기준: `3c95dc170103f739a3e3a33b20f85350ae0ecef5`. 코드 존재는 현행 사업 기능이라는 증거가 아니다.
@@ -207,3 +207,16 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 비용 장애 검증은 단계를 구분한다. 예약/admission의 DB 장애는 provider 호출 전 거부(공통 질의 503)다. provider 성공 후 정산/receipt 저장 장애는 생성 결과를 반환하고 경고·미해결 예약을 유지하므로 자동 유료 재호출이나 시간 경과만으로 해제하지 않는다.
 
 [시작 안내](../development/COLLABORATOR-START-HERE.md)와 [SETUP](../../SETUP.md)을 따라 최신 main의 전용 작업공간에서 착수한다. 개별 서비스의 중복을 성급하게 전역 공통화하지 않으며 전체 정비에서 소비처·업무 차이를 함께 판단한다. 새 Core/Memory/정산 기반·퇴역 서비스 기능을 중복 생성하지 않는다. 외부 유료 계약·운영 credential/DB 변경은 개발 착수와 구분한다.
+
+## 12. 관리자 AI 운영 조회 기반 — main·운영 반영 (2026-10-20)
+
+[구현 TODO](../work-orders/WO-O4O-ADMIN-AI-USAGE-MANAGEMENT-V1.md)의 첫 단계로 관리자 설정의 기존 Gemini 전용 개요를 전체 사용처 조회로 교체했다. [PR #724](https://github.com/Renagang21/o4o-platform/pull/724)로 main에 통합했고 `653178d0b884d545f60d472311436ea7a8f3e727`의 API·관리자 배포를 확인했다. 당시 서빙 리비전·공개 URL 검증과 실계정 미검증 범위는 [배포 CHECK](../checks/CHECK-O4O-ADMIN-AI-USAGE-MANAGEMENT-DEPLOYMENT-V1.md)에 있다. 이 기록이 이후의 live serving 상태를 대신하지 않는다.
+
+- `/api/ai/admin/management`와 `/api/ai/admin/management/usage`는 기존 `authenticate` + `requireAdmin` 뒤의 읽기 전용 API다. 후자는 최근 7/30/90일의 Asia/Seoul 기간을 사용한다. 새 인증 체계나 공급자 호출을 만들지 않는다.
+- `services/ai-management/catalog.ts`는 31개 논리적 사용처의 소스 연결·능력·선택 경로·중지/회계 연결을 기록한다. 실행 registry·서비스 identity·권한 정책이 아니며, 등록/운영 활성/실제 사용을 동치로 다루지 않는다. 서비스명은 기존 카탈로그에서 읽고 공통 업무 영역은 별도로 구분한다.
+- 현재 저장 모델/정책 조회와 실행 적용 확인은 다르다. 누락 정책을 GET으로 생성하지 않으며 정책 조회 실패를 활성 기본 모델로 대체해 표시하지 않는다. 범위 정책의 캐시·실행 적용은 미확인으로 표시한다.
+- 공급자 연결은 DB SQL의 키 존재 여부 집계와 서버 환경 연결 유무만 확인한다. 키·prompt·응답·개인 기록을 반환하지 않는다. 모델은 코드 목록이며 공급자 실시간 제공/인증 성공을 검증한 것이 아니다.
+- 사용량은 기존 `ai_usage_logs`의 공급자/모델/scope 기록을 한 번만 집계한다. 서비스·기능별 전체 통계, 실제 유료 시도 수, 공급자 청구로 표시하지 않는다. 비용 누락·토큰 누락(기존 0/0 기록 포함)·기능 미분류·조회 실패를 구분하고 금액을 현재 단가로 다시 계산하지 않는다.
+- 관리자 UI는 사용처·현재 설정 / API·모델 연결 / 사용량·비용을 제공한다. 기존 공통 질의 설정 경로와 수정 기능은 유지하면서 그 활성화가 전체 AI 중지를 뜻하지 않음을 표시한다.
+
+기능별 모델 쓰기·버전·중지 admission, 번역 override 분리, 모든 직접 transport/멀티모달의 비용 이관과 실제 적용 증거는 **후속 TODO**다. 이 조회 기반 구현이 §11의 남은 실행/운영 검증을 완료하지 않는다. DB schema·migration·한도·키·부담 주체·운영 설정은 바꾸지 않았다.
