@@ -31,7 +31,9 @@ function client() {
   return {
     get: vi.fn(async (path: string) => ({
       data: {
-        data: path.endsWith("/members")
+        data: path.startsWith("/service-operator-management/")
+          ? {role:'neture:pharmcoop_operator',operators:[],candidates:[],truncated:false}
+          : path.endsWith("/members")
           ? [member]
           : path.endsWith("/federation")
             ? [{ ...coop, status: "pending" }]
@@ -129,4 +131,12 @@ describe("scoped administration work", () => {
       ),
     );
   });
+});
+
+it("federation admin manages federation Operators independently of local cooperative Admin grants", async () => {
+  const api = client();
+  render(<FederationManagementPanel client={api} admin userId="f" />);
+  await screen.findByText("지정된 Operator가 없습니다.");
+  expect(api.get).toHaveBeenCalledWith("/service-operator-management/pharmcoop");
+  expect(screen.getByRole("heading", {name:"연합회 Operator 지정 · 해제"})).toBeTruthy();
 });

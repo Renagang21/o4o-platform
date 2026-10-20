@@ -1,3 +1,4 @@
+import ServiceOperatorsPage from './pages/operator/ServiceOperatorsPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import OperatorMembersPage from './pages/operator/OperatorMembersPage';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
@@ -63,6 +64,7 @@ export default function App() {
         <Route path="/instructor/lessons/:lessonId/assignment" element={<InstructorAssignmentPage />} />
         <Route path="/instructor/lessons/:lessonId/submissions" element={<InstructorSubmissionsPage />} />
       </Route>
+      <Route element={<AccessGate area="admin" />}><Route path="/operator/operators" element={<ServiceOperatorsPage />} /></Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
         <Route path="/operator/home-presentation" element={<HomePresentationPage />} />
