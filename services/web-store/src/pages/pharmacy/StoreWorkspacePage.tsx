@@ -15,7 +15,7 @@ const StoreHandledProductsPage = lazy(
 const StoreLibraryContentsPage = lazy(
   () => import("./StoreLibraryContentsPage"),
 );
-const StoreExecutionPage = lazy(() => import("./StoreExecutionPage"));
+const StoreOperationsPage = lazy(() => import("./StoreOperationsPage"));
 
 const linkStyle =
   "inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-teal-600";
@@ -131,14 +131,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         }
       />
     );
-  if (area === "use" && has("store-execution"))
-    return (
-      <StoreExecutionPage
-        workspace
-        navigation={navigation}
-        availableKeys={items.map((item) => item.key)}
-      />
-    );
+  if (area === "use") return <StoreOperationsPage config={config} />;
   // A missing capability must never be restored by composing its page directly.
   return (
     <div>
@@ -146,7 +139,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         {area === "commerce"
           ? "상품·거래"
           : area === "studio"
-            ? "안내 만들기"
+            ? "매장 컨텐츠"
             : "매장 운영"}
       </h1>
       {navigation}

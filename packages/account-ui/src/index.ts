@@ -253,3 +253,11 @@ export {
   mobileBottomNavLabelStyle,
   mobileBottomNavBadgeStyle,
 } from './mobile-nav/mobileBottomNavStyles.js';
+
+export { PharmacyBusinessInfo } from './components/PharmacyBusinessInfo.js';
+export type {
+  PharmacyBusinessInfoData,
+  PharmacyBusinessInfoPatch,
+  PharmacyBusinessInfoProps,
+  PharmacyBusinessInfoTheme,
+} from './components/PharmacyBusinessInfo.js';

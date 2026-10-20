@@ -510,3 +510,141 @@
   max-width: 1180px;
   margin-inline: auto;
 }
+
+/* Service identities share interaction and sizing, not a single campaign design. */
+.home-hero[data-home-identity] {
+  --hero-bg: #eef4ff;
+  --hero-ink: #182e52;
+  --hero-muted: #425673;
+  --hero-primary: #245ac1;
+  --hero-on-primary: #fff;
+  --hero-paper: #fff;
+  --hero-soft: #dae6fc;
+  --hero-line: #a6bbdc;
+  --hero-art-ink: #182e52;
+  background: var(--hero-bg);
+  border-color: var(--hero-line);
+  color: var(--hero-ink);
+  padding-block: clamp(28px, 4vw, 52px);
+}
+.home-hero[data-home-identity] .home-hero-main {
+  grid-template-columns: minmax(0, 1.15fr) minmax(240px, .85fr);
+  gap: clamp(24px, 5vw, 72px);
+  min-height: 240px;
+}
+.home-hero[data-home-identity] .home-hero-title {
+  color: var(--hero-ink) !important;
+  font-size: clamp(28px, 3.3vw, 48px) !important;
+  line-height: 1.22 !important;
+}
+.home-hero[data-home-identity] .home-hero-eyebrow { color: var(--hero-ink); opacity: .85; }
+.home-hero[data-home-identity] .home-hero-description { color: var(--hero-muted); max-width: 38rem; min-height: 0; }
+.home-hero[data-home-identity] .home-hero-image {
+  height: clamp(180px, 23vw, 300px);
+  border: 1px solid var(--hero-line);
+  background: var(--hero-paper);
+}
+.home-hero-visual { width: 100%; max-width: 440px; justify-self: center; min-width: 0; }
+.home-hero-visual svg { display: block; width: 100%; height: auto; overflow: visible; font-family: inherit; }
+.hero-art-paper { fill: var(--hero-paper); stroke: var(--hero-line); stroke-width: 1.5; }
+.hero-art-soft { fill: var(--hero-soft); }
+.hero-art-primary { fill: var(--hero-primary); }
+.hero-art-line { stroke: var(--hero-primary); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.hero-art-light-line { stroke: var(--hero-on-primary); stroke-width: 2; stroke-linejoin: round; }
+.hero-art-ink { fill: var(--hero-art-ink); font-size: 16px; font-weight: 650; }
+.hero-art-on-primary { fill: var(--hero-on-primary); font-size: 16px; font-weight: 650; }
+.hero-art-small { font-size: 13px; }
+.hero-art-large { font-size: 23px; font-weight: 750; }
+.hero-art-play { fill: var(--hero-on-primary); }
+.home-hero[data-home-identity] .home-hero-controls,
+.home-hero[data-home-identity] .home-hero-count { color: var(--hero-muted); }
+.home-hero[data-home-identity] .home-hero-controls button {
+  color: var(--hero-ink); background: transparent; border-color: var(--hero-line);
+}
+.home-hero[data-home-identity] .home-hero-dots button { border: 0; }
+.home-hero[data-home-identity] .home-hero-dots button span { background: var(--hero-ink); }
+.home-hero[data-home-identity] .home-hero-dots button[aria-pressed="true"] span { background: var(--hero-ink); }
+.home-hero[data-home-identity] .home-hero-link {
+  background: var(--hero-primary); color: var(--hero-on-primary) !important;
+}
+.home-hero[data-home-identity] .home-hero-context { border-color: var(--hero-line); color: var(--hero-muted); }
+.home-hero[data-home-identity] .home-hero-context p { color: inherit; }
+.home-hero[data-home-identity] :is(a, button):focus-visible { outline: 3px solid var(--hero-ink); outline-offset: 4px; }
+.home-hero[data-home-identity="neture"] {
+  --hero-bg: radial-gradient(ellipse at 85% 20%, #23584f, transparent 60%), #102d35;
+  --hero-ink: #f4fff9; --hero-muted: #c2ddd7; --hero-primary: #a9e4bf; --hero-on-primary: #102d35;
+  --hero-paper: #f4fbf6; --hero-soft: #d3eddf; --hero-line: #5b8c83; --hero-art-ink: #143a37;
+}
+.home-hero[data-home-identity="supplier"] {
+  --hero-bg: linear-gradient(110deg, #142b4a 0%, #183f67 100%);
+  --hero-ink: #f4f8ff; --hero-muted: #c8d9ed; --hero-primary: #1c66b1; --hero-on-primary: #fff;
+  --hero-soft: #d9edff; --hero-line: #78a4cd; --hero-art-ink: #193e65;
+}
+.home-hero[data-home-identity="funding"] {
+  --hero-bg: #faf4e9; --hero-ink: #43233e; --hero-muted: #6d5263; --hero-primary: #793766;
+  --hero-soft: #e9d5e5; --hero-line: #c8a9be; --hero-art-ink: #532746;
+  border-bottom: 5px solid var(--hero-primary);
+}
+.home-hero[data-home-identity="lecture"] {
+  --hero-bg: linear-gradient(125deg, #e9e5ff, #f8f6ff 75%); --hero-ink: #2d2460; --hero-muted: #5e5681;
+  --hero-primary: #5b4acb; --hero-soft: #d6cff5; --hero-line: #b8abdf; --hero-art-ink: #372768;
+}
+.home-hero[data-home-identity="lecture"] .home-hero-copy { order: 2; }
+.home-hero[data-home-identity="lecture"] :is(.home-hero-visual, .home-hero-image) { order: 1; }
+.home-hero[data-home-identity="community"] {
+  --hero-bg: #fff5ed; --hero-ink: #53332a; --hero-muted: #74584d; --hero-primary: #a54836;
+  --hero-soft: #f4d8c5; --hero-line: #d7b4a2; --hero-art-ink: #623c30;
+}
+.home-hero[data-home-identity="community"] .home-hero-title { font-size: clamp(26px, 3vw, 38px) !important; }
+.home-hero[data-home-identity="carepharm"] {
+  --hero-bg: radial-gradient(ellipse at 85% 50%, #c8eee3, transparent 65%), #edf9f5;
+  --hero-ink: #124c45; --hero-muted: #3f6d65; --hero-primary: #1d776b;
+  --hero-soft: #c8eee3; --hero-line: #8dbfb3; --hero-art-ink: #19564c;
+}
+.home-hero[data-home-identity="pharmacy"] {
+  --hero-bg: #f3f7fd; --hero-ink: #213b5e; --hero-muted: #506682; --hero-primary: #285d9b;
+  --hero-soft: #dbe7f8; --hero-line: #b2c7df; --hero-art-ink: #244466;
+}
+.home-hero[data-home-identity="megapharm"] {
+  --hero-bg: #242d47; --hero-ink: #fff9e9; --hero-muted: #d9dfed; --hero-primary: #f2bf63; --hero-on-primary: #282d40;
+  --hero-soft: #f9e9c9; --hero-line: #8a93ac; --hero-art-ink: #323f5c;
+}
+.home-hero[data-home-identity="branch"] {
+  --hero-bg: #fbf2ed; --hero-ink: #542c3b; --hero-muted: #755765; --hero-primary: #853c56;
+  --hero-soft: #efdae0; --hero-line: #cfacb6; --hero-art-ink: #633347;
+}
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-main {
+  min-height: 0; grid-template-columns: minmax(0, 1.4fr) minmax(140px, .6fr); gap: 24px;
+}
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-visual { max-width: 240px; }
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-title { font-size: clamp(22px, 2.5vw, 32px) !important; line-height: 1.35 !important; }
+.home-editor-design-guide { padding: 18px 20px; border: 1px solid #cbd5e1; border-radius: 12px; background: #f8fafc; margin-block: 20px; }
+.home-editor-design-guide h2 { margin: 0 0 8px; font-size: 17px; color: #24374b; }
+.home-editor-design-guide p { margin: 6px 0; color: #475569; line-height: 1.7; }
+@media (max-width: 640px) {
+  .home-hero[data-home-identity] { padding-block: 26px; }
+  .home-hero[data-home-identity] .home-hero-main,
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-main {
+    grid-template-columns: minmax(0, 1fr); gap: 20px; min-height: 0;
+  }
+  .home-hero[data-home-identity] .home-hero-copy { order: 0; }
+  .home-hero[data-home-identity] :is(.home-hero-visual, .home-hero-image) { order: 1; }
+  .home-hero[data-home-identity] .home-hero-visual { max-width: 300px; }
+  .home-hero[data-home-identity] .home-hero-title { font-size: 28px !important; }
+  .home-hero[data-home-identity] .home-hero-description { font-size: 15px; }
+  .home-hero[data-home-identity] .home-hero-controls { margin-top: 16px; }
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-visual { max-width: 210px; }
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-title { font-size: 24px !important; }
+}
+
+/* Cooperative presentation stays distinct from the federation's operating scope. */
+.home-hero[data-home-identity="pharmcoop"] {
+  --hero-bg: #123f38;
+  --hero-ink: #f4fff9; --hero-muted: #c5dfd6; --hero-primary: #dce9cb; --hero-on-primary: #123f38;
+  --hero-paper: #f5f9ef; --hero-soft: #dce9cb; --hero-line: #78a799; --hero-art-ink: #123f38;
+}
+.home-hero[data-home-identity="cooperative"] {
+  --hero-bg: #eef7f1;
+  --hero-ink: #194c40; --hero-muted: #426858; --hero-primary: #226c59; --hero-on-primary: #fff;
+  --hero-paper: #fff; --hero-soft: #d5eadc; --hero-line: #9fc3ae; --hero-art-ink: #194c40;
+}

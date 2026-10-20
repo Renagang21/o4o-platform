@@ -2,7 +2,7 @@
 // PC context (owner) + tablet context (fresh browser, 1280x800). Credentials from env.
 import { chromium } from 'playwright';
 
-const BASE = process.env.KPA_BASE || 'https://kpa-society.co.kr';
+const BASE = process.env.KPA_BASE || 'https://pharmacy.neture.co.kr';
 const EMAIL = process.env.KPA_EMAIL;
 const PASS = process.env.KPA_PASS;
 if (!EMAIL || !PASS) { console.error('KPA_EMAIL/KPA_PASS required'); process.exit(2); }
@@ -99,7 +99,7 @@ try {
 
   // ── 6. 같은 코드 재사용 불가
   const reuse = await tab.evaluate(async ({ base, c }) => {
-    const r = await fetch(`${base.replace('kpa-society.co.kr', 'api.neture.co.kr')}/api/v1/stores/tablet-pairing/lookup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: c }) }).catch(() => null);
+    const r = await fetch(`${base.replace('pharmacy.neture.co.kr', 'api.neture.co.kr')}/api/v1/stores/tablet-pairing/lookup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: c }) }).catch(() => null);
     return r ? r.status : -1;
   }, { base: BASE, c: code });
   log(6, reuse === 404 || reuse === 409, `사용된 연결 코드 재사용 거부 (HTTP ${reuse})`);

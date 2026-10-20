@@ -482,10 +482,9 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     events.supplierCancel(req.supplierId!, uuidParam(req, 'id'))));
 
   router.get('/supplier/semi-franchise-recruitments', ...supplier, handle(async (req) => recruitments.supplierList(req.user!.id)));
-  router.post('/supplier/semi-franchise-recruitments', ...supplier, handle(async (req, res) => {
-    if (!isUuid(req.body?.masterId)) throw new NeturePharmacyError(400, 'INVALID_REQUEST', 'masterId 가 필요합니다.');
-    res.status(201);
-    return recruitments.supplierCreate(req.user!.id, [req.supplierId!], req.body);
+  // 신규 협업체 취급매장 모집 종료. 기존 내역·신청·주문 원장은 보존한다.
+  router.post('/supplier/semi-franchise-recruitments', ...supplier, handle(async () => {
+    throw new NeturePharmacyError(410, 'SEMI_FRANCHISE_RECRUITMENT_RETIRED', '별도 협업체 취급매장 모집 기능은 더 이상 제공하지 않습니다.');
   }));
 
   return router;

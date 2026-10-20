@@ -3905,7 +3905,7 @@ export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
       step: '02',
       title: '접근 도메인',
       description: '아래 도메인에서 서비스에 접속합니다.',
-      items: [{ label: '접속 도메인', detail: 'kpa-society.co.kr' }],
+      items: [{ label: '접속 도메인', detail: 'pharmacy.neture.co.kr' }],
     },
     {
       step: '03',

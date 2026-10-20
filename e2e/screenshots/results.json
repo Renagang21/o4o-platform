@@ -17,7 +17,7 @@
     "approvalSuccess": false,
     "approvalNote": "Approve button not found or user not in pending list",
     "loginSuccess": false,
-    "loginNote": "Login may have failed — still on login page: https://kpa-society.co.kr/",
+    "loginNote": "Login may have failed — still on login page: https://pharmacy.neture.co.kr/",
     "accessSuccess": false,
     "accessNote": "Skipped — login failed"
   },
@@ -28,7 +28,7 @@
     "approvalSuccess": false,
     "approvalNote": "Approve button not found or user not in pending list",
     "loginSuccess": false,
-    "loginNote": "Login may have failed — still on login page: https://k-cosmetics.site/login",
+    "loginNote": "Login may have failed — still on login page: (retired K-Cosmetics host)/login",
     "accessSuccess": false,
     "accessNote": "Skipped — login failed"
   }

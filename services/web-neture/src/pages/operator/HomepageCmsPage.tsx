@@ -2,19 +2,19 @@
  * HomepageCmsPage — 운영자 홈페이지 CMS 관리
  * WO-O4O-NETURE-HOMEPAGE-CMS-V1
  *
- * 탭: Hero Slides | Homepage Ads | 협력사 로고 (metadataSection 'partner-logo' = 홈 협력사 로고 CMS 섹션, Legacy Partner 아님)
+ * Hero는 현행 홈 구성에서 관리. 탭: Homepage Ads | 협력사 로고 (metadataSection 'partner-logo' = 홈 협력사 로고 CMS 섹션, Legacy Partner 아님)
  * 기능: 등록 / 수정 / 삭제 / 발행 / 순서 변경
  */
 
+import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Eye, EyeOff, ArrowUp, ArrowDown, X, Image, AlertTriangle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { homepageCmsApi, type CmsContent } from '../../lib/api/content';
 
-type Section = 'hero' | 'ads' | 'logos';
+type Section = 'ads' | 'logos';
 
 const TABS: { key: Section; label: string }[] = [
-  { key: 'hero', label: 'Hero Slides' },
   { key: 'ads', label: 'Homepage Ads' },
   { key: 'logos', label: '협력사 로고' },
 ];
@@ -32,7 +32,7 @@ interface FormData {
 const emptyForm: FormData = { title: '', summary: '', imageUrl: '', linkUrl: '', linkText: '', sortOrder: 0, logoUrl: '' };
 
 export default function HomepageCmsPage() {
-  const [tab, setTab] = useState<Section>('hero');
+  const [tab, setTab] = useState<Section>('ads');
   const [items, setItems] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -106,7 +106,7 @@ export default function HomepageCmsPage() {
       }
       setShowModal(false);
       await loadItems();
-    } catch (err) {
+    } catch {
       toast.error('저장에 실패했습니다.');
     } finally {
       setSaving(false);
@@ -145,6 +145,7 @@ export default function HomepageCmsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      <p className="mb-4 rounded-lg border border-teal-200 bg-teal-50 p-4 text-sm">대표 홈 Hero는 <Link className="font-medium text-teal-800 underline" to="/operator/home-presentation/neture">Hero · 광고 관리</Link>에서 수정하고 공개합니다.</p>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">홈페이지 콘텐츠 관리</h1>
         <button

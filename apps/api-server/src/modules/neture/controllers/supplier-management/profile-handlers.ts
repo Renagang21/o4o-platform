@@ -3,7 +3,7 @@ import type {
   SupplierRequest,
   AuthenticatedRequest,
 } from '../../middleware/neture-identity.middleware.js';
-import { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError } from '../../services/supplier.service.js';
+import { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError } from '../../services/supplier.service.js';
 import logger from '../../../../utils/logger.js';
 import type { NetureService } from '../../neture.service.js';
 
@@ -108,6 +108,12 @@ export function createSupplierProfileHandlers(
         }
         res.json({ success: true, data: result });
       } catch (error) {
+        if (error instanceof SupplierProfileEntityTypeInvalidError) {
+          return res.status(400).json({
+            success: false, error: 'SUPPLIER_PROFILE_ENTITY_TYPE_INVALID',
+            message: '세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.',
+          });
+        }
         if (error instanceof SupplierProfileNameInvalidError) {
           return res.status(400).json({
             success: false, error: 'SUPPLIER_PROFILE_NAME_INVALID',

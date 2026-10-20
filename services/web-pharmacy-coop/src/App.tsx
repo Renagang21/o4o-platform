@@ -1,4 +1,6 @@
-import { BusinessHomeShowcase } from '@o4o/shared-space-ui';
+import { MemberForum } from "./MemberForum";
+import { MyCooperatives, MyUpdates } from "./Participation";
+import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import {
   FederationManagementPanel,
   MemberManagementPanel,
@@ -100,8 +102,14 @@ export function App({
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
           <Route path="cooperatives" element={<Directory />} />
+          <Route path="cooperatives/mine" element={<PersonalSpace />} />
+          <Route
+            path="cooperatives/updates"
+            element={<PersonalSpace updates />}
+          />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
+          <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
           <Route path=":cooperativeSlug" element={<CooperativeLayout />}>
             <Route index element={<CooperativeHome />} />
             <Route path="membership" element={<Membership />} />
@@ -115,6 +123,7 @@ export function App({
             />
             <Route path="services" element={<Services />} />
             <Route path="operator" element={<CooperativeManagement />} />
+            <Route path="operator/home-presentation" element={<CooperativeHeroManagement />} />
             <Route
               path="operator/contents/new"
               element={<CooperativeManagement editor />}
@@ -162,6 +171,12 @@ function Layout() {
             <SiteLink to="/">연합회 홈</SiteLink>
             <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
             <SiteLink to="/about">연합회 소개</SiteLink>
+            {session.userId && (
+              <>
+                <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
+                <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
+              </>
+            )}
             {canManageFederation(session) && (
               <SiteLink to="/operator">연합회 운영</SiteLink>
             )}
@@ -200,10 +215,34 @@ function Layout() {
   );
 }
 
+function PersonalSpace({ updates = false }: { updates?: boolean }) {
+  const { session, businessClient, preview } = useContext(Context);
+  if (!session.userId)
+    return (
+      <section className="section">
+        <h1>{updates ? "내 처리 소식" : "내 협동조합"}</h1>
+        <p>로그인 후 확인할 수 있습니다.</p>
+        <Link to="/login">로그인</Link>
+      </section>
+    );
+  if (!businessClient || preview)
+    return <p>실제 로그인과 서버 연결 후 이용할 수 있습니다.</p>;
+  return updates ? (
+    <MyUpdates key={session.userId} client={businessClient} />
+  ) : (
+    <MyCooperatives key={session.userId} client={businessClient} />
+  );
+}
+
 function FederationHome() {
+  const { businessClient, preview } = useContext(Context);
   return (
     <>
-      <section className="hero">
+      {businessClient && !preview ? <ServiceHomeHero surface="pharmcoop" client={businessClient}
+        title={["조합의 힘을 모아, 약국의 내일을 함께."]}
+        description={["각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다."]}
+        eyebrow="함께하는 약국, 연결되는 협동조합"
+        actions={<div className="actions"><SiteLink className="button outline" to="/cooperatives">소속 협동조합 찾기 ↗</SiteLink><SiteLink to="/about">연합회 알아보기 →</SiteLink></div>} /> : <section className="hero">
         <div>
           <p className="eyebrow">함께하는 약국, 연결되는 협동조합</p>
           <h1>
@@ -240,7 +279,7 @@ function FederationHome() {
           </div>
           <p>독립적으로 운영하고, 함께 연결됩니다.</p>
         </div>
-      </section>
+      </section>}
       <section className="section">
         <div className="section-heading">
           <div>
@@ -267,6 +306,7 @@ function FederationHome() {
         </div>
       </section>
       <Directory compact />
+      {businessClient && !preview && <ServiceHomePromotion surface="pharmcoop" client={businessClient} publishedOnly />}
       <section className="store-callout">
         <div>
           <p className="eyebrow">약국 경영자 공통 공간</p>
@@ -384,7 +424,7 @@ function FederationAbout() {
 
 function CooperativeLayout() {
   const { cooperativeSlug = "" } = useParams();
-  const { cooperatives, preview } = useContext(Context);
+  const { cooperatives, preview, businessClient } = useContext(Context);
   const cooperative = validCooperativeSlug(cooperativeSlug)
     ? cooperatives.find((row) => row.slug === cooperativeSlug)
     : undefined;
@@ -397,11 +437,12 @@ function CooperativeLayout() {
         <span aria-hidden="true">/</span>
         <span>{cooperative.name}</span>
       </div>
-      <section className="coop-heading">
+      {businessClient && !preview ? <ServiceHomeHero key={cooperative.id} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient}
+        title={[cooperative.name]} description={[cooperative.introduction]} eyebrow="개별 협동조합 공간" /> : <section className="coop-heading">
         <p className="eyebrow">개별 협동조합 공간</p>
         <h1>{cooperative.name}</h1>
         <p>{cooperative.introduction}</p>
-      </section>
+      </section>}
       <nav className="coop-nav" aria-label="협동조합 메뉴">
         {[
           ["", "조합 홈"],
@@ -427,7 +468,7 @@ function CooperativeLayout() {
 
 function CooperativeHome() {
   const cooperative = useOutletContext<Cooperative>();
-  const { businessClient, session } = useContext(Context);
+  const { businessClient, session, preview } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
   return (
     <section className="section">
@@ -441,7 +482,15 @@ function CooperativeHome() {
           가입 자격 확인 →
         </SiteLink>
       </div>
-      {businessClient && cooperative.businessKey && <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} />}
+      {businessClient && cooperative.businessKey && (
+        <BusinessHomeShowcase
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          accountId={session.userId ?? undefined}
+          cooperative
+          operator={access.canManage}
+        />
+      )}
       <div className="cards two">
         <div className="card">
           <h2>조합 공지</h2>
@@ -462,6 +511,7 @@ function CooperativeHome() {
           자료 이용 안내 →
         </SiteLink>
       </div>
+      {businessClient && !preview && <ServiceHomePromotion surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} publishedOnly />}
     </section>
   );
 }
@@ -527,23 +577,44 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
   const { session, businessClient } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
   const allowed = access.isMember || access.canManage;
+  let content = (
+    <Empty
+      title={
+        allowed
+          ? "데이터 연결 준비 중"
+          : "이 조합의 참여 자격을 확인해야 합니다."
+      }
+      text={
+        allowed
+          ? "이 조합에 속한 게시글과 자료만 조회하도록 연결합니다."
+          : "다른 조합의 가입·운영 자격으로 이 공간을 이용할 수 없습니다."
+      }
+    />
+  );
+  if (allowed && businessClient && cooperative.businessKey) {
+    content =
+      kind === "community" ? (
+        <MemberForum
+          key={`${session.userId}:${cooperative.id}`}
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          canManage={access.canManage}
+        />
+      ) : (
+        <BusinessHomeShowcase
+          client={businessClient}
+          businessKey={cooperative.businessKey}
+          accountId={session.userId ?? undefined}
+          cooperative
+          operator={access.canManage}
+          only="content"
+        />
+      );
+  }
   return (
     <section className="section">
       <h2>{kind === "community" ? "회원 게시판" : "조합 자료"}</h2>
-      {kind === 'materials' && allowed && businessClient && cooperative.businessKey ?
-        <BusinessHomeShowcase client={businessClient} businessKey={cooperative.businessKey} accountId={session.userId ?? undefined} cooperative operator={access.canManage} only="content" /> :
-      <Empty
-        title={
-          allowed
-            ? "데이터 연결 준비 중"
-            : "이 조합의 참여 자격을 확인해야 합니다."
-        }
-        text={
-          allowed
-            ? "이 조합에 속한 게시글과 자료만 조회하도록 연결합니다."
-            : "다른 조합의 가입·운영 자격으로 이 공간을 이용할 수 없습니다."
-        }
-      />}
+      {content}
       <SiteLink className="text-link" to={`/${cooperative.slug}/membership`}>
         가입·내 참여 확인 →
       </SiteLink>
@@ -596,14 +667,14 @@ function FederationManagement() {
   const { session, businessClient, preview } = useContext(Context);
   if (businessClient && !preview && canManageFederation(session))
     return (
-      <FederationManagementPanel
+      <><p><SiteLink to="/operator/home-presentation">Hero 관리</SiteLink></p><FederationManagementPanel
         key={session.userId}
         client={businessClient}
         admin={session.federationOperators.some(
           (r) => r.userId === session.userId && r.role === "admin",
         )}
         userId={session.userId!}
-      />
+      /></>
     );
   return (
     <section className="section">
@@ -620,21 +691,35 @@ function FederationManagement() {
   );
 }
 
+function FederationHeroManagement() {
+  const { session, businessClient, preview } = useContext(Context);
+  if (!businessClient || preview || !canManageFederation(session)) return <Empty title="연합회 운영 권한이 필요합니다." text="현재 연합회 운영자만 편집할 수 있습니다." />;
+  return <><SiteLink to="/operator">연합회 운영으로</SiteLink><HomePresentationEditor key={session.userId} surface="pharmcoop" client={businessClient} /></>;
+}
+function CooperativeHeroManagement() {
+  const cooperative = useOutletContext<Cooperative>();
+  const { session, businessClient, preview } = useContext(Context);
+  if (!businessClient || preview || !cooperativeAccess(session, cooperative.id).canManage) return <Empty title="이 조합의 운영 권한이 필요합니다." text="다른 조합 또는 연합회 역할만으로 편집할 수 없습니다." />;
+  return <><SiteLink to={`/${cooperative.slug}/operator`}>조합 운영으로</SiteLink><HomePresentationEditor key={`${session.userId}:${cooperative.id}`} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} heading="h2" /></>;
+}
+
 function CooperativeManagement({
   editor = false,
 }: Readonly<{ editor?: boolean }>) {
   const cooperative = useOutletContext<Cooperative>();
-  const { session, businessClient } = useContext(Context);
+  const { session, businessClient, onSessionChanged } = useContext(Context);
   const { canManage, isAdmin } = cooperativeAccess(session, cooperative.id);
   if (canManage && cooperative.businessKey && businessClient)
     return (
       <>
+        {!editor && <p><SiteLink to={`/${cooperative.slug}/operator/home-presentation`}>Hero 관리</SiteLink></p>}
         {!editor && (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
             client={businessClient}
             cooperative={cooperative}
             admin={isAdmin}
+            onChanged={onSessionChanged}
             userId={session.userId!}
           />
         )}

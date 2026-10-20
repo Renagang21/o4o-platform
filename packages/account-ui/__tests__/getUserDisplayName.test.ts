@@ -91,7 +91,7 @@ describe('getUserDisplayName', () => {
   describe('서비스별 대표 입력 — 공통화 전후 동일 (회귀 고정)', () => {
     it.each([
       ['KPA (name + email)', { id: '1', email: 'sohae2100@gmail.com', name: '서상원' }, '서상원'],
-      ['K-Cosmetics (name === email)', { email: 'ops@k-cosmetics.site', name: 'ops@k-cosmetics.site' }, 'ops'],
+      ['K-Cosmetics (name === email)', { email: 'ops@example.com', name: 'ops@example.com' }, 'ops'],
       ['lastName + firstName', { email: 'ph@example.com', name: 'ph', lastName: '김', firstName: '약사' }, '김약사'],
       ['Neture (displayName)', { email: 'n@neture.co.kr', name: 'n', displayName: '네처운영자' }, '네처운영자'],
     ])('%s → %s', (_label, input, expected) => {

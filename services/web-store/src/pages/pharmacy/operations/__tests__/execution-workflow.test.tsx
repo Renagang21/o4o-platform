@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
 import Execution from '../../StoreExecutionPage';
 const api = vi.hoisted(() => ({ store: 'A', tablets: vi.fn(), qrs: vi.fn() }));
 vi.mock('../../../../hooks/useStoreOrganizationId', () => ({ useStoreOrganizationId: () => ({ organizationId: api.store }) }));
@@ -60,4 +60,14 @@ it('a QR-only store never queries unavailable tablets, including on refresh', as
   fireEvent.click(screen.getByRole('button', { name: '새로고침' }));
   await waitFor(() => expect(api.qrs).toHaveBeenCalledTimes(2));
   expect(api.tablets).not.toHaveBeenCalled();
+});
+
+it('the detail route inherits filtered workspace capabilities without explicit page props', async () => {
+  const config = { basePath: '/store', menuSections: [{ items: [{ key: 'store-execution', subPath: '/execution' }, { key: 'qr', subPath: '/marketing/qr' }] }] };
+  render(<MemoryRouter initialEntries={['/store/execution']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="/store/execution" element={<Execution />} /></Route></Routes></MemoryRouter>);
+  await screen.findByText('조회한 QR이 없습니다');
+  expect(api.tablets).not.toHaveBeenCalled();
+  expect(api.qrs).toHaveBeenCalledOnce();
+  expect(screen.queryByRole('link', { name: '태블릿 화면 변경' })).toBeNull();
+  expect(screen.getByRole('heading', { name: '위치별 저장 설정' })).toBeTruthy();
 });

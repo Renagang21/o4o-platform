@@ -121,7 +121,7 @@ const gated = (el: ReactElement) => <StoreGate>{el}</StoreGate>;
 const Loading = <div className="p-8 text-center text-sm text-slate-500">불러오는 중...</div>;
 const NotFound = <main className="center-card"><section className="card"><h1>페이지를 찾을 수 없습니다</h1></section></main>;
 /**
- * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · k-cosmetics.site)가 종료됐다
+ * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · 옛 K-Cosmetics 도메인)가 종료됐다
  * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). 이 앱의 K-Cosmetics 화면은 종료 안내만 보여 준다.
  * 같은 기능이라는 근거가 없으므로 약국 화면으로 보내지 않는다. 화면 코드는 PHASE1B 에서 삭제했다
  * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
