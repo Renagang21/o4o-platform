@@ -14,7 +14,9 @@ const MENU: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
 };
 
 export default function CarePharmOperatorLayout() {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const pathname = location.pathname.replace(/\/+$/, '');
+  if (pathname !== location.pathname) return <Navigate to={{ pathname, search: location.search, hash: location.hash }} replace />;
   if (pathname === '/operator') return <Navigate to="/operator/semi-franchises?key=carepharm&tab=memberships" replace />;
   // Do not mount a representative-site console or issue its requests on this business host.
   if (pathname !== '/operator/home-presentation/carepharm' && pathname !== '/operator/semi-franchises' && !pathname.startsWith('/operator/semi-franchises/')) {

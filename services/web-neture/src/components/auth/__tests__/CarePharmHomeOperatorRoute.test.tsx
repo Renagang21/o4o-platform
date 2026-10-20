@@ -12,6 +12,9 @@ afterEach(cleanup);
 it.each([
   ['neture:carepharm_operator', '/operator/home-presentation/carepharm', true],
   ['neture:carepharm_admin', '/operator/home-presentation/carepharm', true],
+  ['neture:carepharm_operator', '/operator/home-presentation/carepharm/', true],
+  ['neture:carepharm_admin', '/operator/home-presentation/carepharm/', true],
+  ['neture:pharmacy_operator', '/operator/home-presentation/carepharm/', false],
   ['neture:pharmacy_operator', '/operator/home-presentation/carepharm', false],
   ['neture:carepharm_operator', '/operator/members', false],
 ] as const)('applies %s only to its business-owned editor at %s', (role, path, allowed) => {

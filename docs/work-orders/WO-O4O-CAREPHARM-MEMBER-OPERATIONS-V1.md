@@ -76,3 +76,4 @@
 - 통합 재검증: CarePharm·호스트·포럼 클라이언트 **118 PASS**, 공통 전시/사업 showcase **34 PASS**, 실제 PostgreSQL management route·권한·저장 **29 PASS**, 수정 테스트 ESLint·diff 검사 PASS.
 - 저장소 ruleset의 required `CI Gate`, 최신 HEAD의 보안 검사·리뷰 및 미해결 사항을 확인한 후 PR로 병합한다. 배포는 현재 Delivery/Promote 경로를 사용하며 freeze·권한·SHA gate를 유지한다. 운영 business 등록·회원 승인·무료혈당기 기획은 실행 범위에 추가하지 않는다.
 - 정확한 PR/병합 SHA·post-merge CI·배포 run·운영 확인 결과는 해당 PR의 최종 인계 기록과 최종 사용자 보고에 남긴다. 실제 성공을 확인하기 전에 배포 완료로 판정하지 않는다.
+- PR #717 Codex P2 `PRRT_kwDOOXrFm86uKs1t`: 편집 경로의 trailing slash를 React Router는 허용하지만 가드/레이아웃의 정확 비교가 거부했다. 두 곳에서 동일하게 후행 slash를 제거해 판정하고 레이아웃은 쿼리·해시를 보존한 정규 주소로 이동하도록 보완했다. 사업 역할·다른 사업 거부·편집 화면 진입을 포함한 **60 테스트와 수정 파일 ESLint PASS**. 기존 PR에서 수정 HEAD의 CI·리뷰를 재확인한다.

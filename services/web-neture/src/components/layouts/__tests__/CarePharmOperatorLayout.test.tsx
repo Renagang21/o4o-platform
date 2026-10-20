@@ -17,11 +17,12 @@ vi.mock('@o4o/operator-ux-core', () => ({
 }));
 import OperatorLayout from '../OperatorLayoutWrapper';
 function Business() { const location = useLocation(); return <p>사업 업무{location.search}</p>; }
+function HomeEditor() { const location = useLocation(); return <><p>CarePharm 홈 편집</p><output aria-label="현재 편집 주소">{location.pathname}{location.search}{location.hash}</output></>; }
 function mount(path: string) {
   return render(<MemoryRouter initialEntries={[path]}><Routes><Route element={<OperatorLayout />}>
     <Route path="/operator" element={<p>대표 대시보드</p>} />
     <Route path="/operator/semi-franchises" element={<Business />} />
-    <Route path="/operator/home-presentation/carepharm" element={<p>CarePharm 홈 편집</p>} />
+    <Route path="/operator/home-presentation/carepharm" element={<HomeEditor />} />
     <Route path="/operator/members" element={<p>전체 회원 조회</p>} />
   </Route></Routes></MemoryRouter>);
 }
@@ -43,4 +44,10 @@ it('mounts its native home editor and exposes its dedicated menu', () => {
   expect(screen.getByText('CarePharm 홈 편집')).toBeTruthy();
   expect(screen.getByRole('link', { name: '홈 · 공개 공지' }).getAttribute('href')).toBe('/operator/home-presentation/carepharm');
   expect(screen.queryByText('대표 대시보드')).toBeNull();
+});
+it('canonicalizes the editor trailing slash without losing query or hash', async () => {
+  mount('/operator/home-presentation/carepharm/?draft=1#preview');
+  await screen.findByText('CarePharm 홈 편집');
+  expect(screen.getByLabelText('현재 편집 주소').textContent).toBe('/operator/home-presentation/carepharm?draft=1#preview');
+  expect(screen.queryByText('사업 업무?key=carepharm&tab=memberships')).toBeNull();
 });
