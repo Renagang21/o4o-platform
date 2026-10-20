@@ -198,7 +198,7 @@ const AiQuerySettings: React.FC = () => {
         <div className="flex items-center gap-3">
           <Bot className="w-8 h-8 text-blue-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">AI Query 설정</h1>
+            <h1 className="text-2xl font-bold text-gray-900">공통 질의 설정</h1>
             <p className="text-gray-600 mt-1">
               AI 질의 기능의 정책을 설정합니다. 일 사용량 제한, 모델 선택, 시스템 프롬프트를 관리할 수 있습니다.
             </p>
@@ -226,9 +226,9 @@ const AiQuerySettings: React.FC = () => {
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">AI 기능 활성화</h3>
+              <h3 className="text-lg font-semibold text-gray-900">공통 질문·요약 활성화</h3>
               <p className="text-sm text-gray-500 mt-1">
-                AI 질의 기능을 전체적으로 활성화/비활성화합니다.
+                공통 질문·요약의 사용 여부를 설정합니다. 다른 AI 사용처의 중지 여부는 AI 운영 관리에서 연결 범위를 확인하세요.
               </p>
             </div>
             <button
@@ -301,8 +301,8 @@ const AiQuerySettings: React.FC = () => {
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">AI 모델</h3>
           <p className="text-sm text-gray-500 mb-4">
-            AI 질의·편집 AI 에 사용할 Gemini 모델을 선택합니다. 목록은 현재 API 키로 Google 이 실제 제공하는
-            모델입니다 — 새 모델이 나오면 여기서 고르면 되고, 코드 배포는 필요 없습니다.
+            이 설정을 읽는 질의·편집 경로의 Gemini 모델을 선택합니다. 전체 AI의 공통 모델 설정은 아닙니다.
+            모델 목록의 출처와 조회 시각을 확인하세요.
           </p>
 
           <div className="flex items-center gap-3">
