@@ -23,7 +23,13 @@ const app = () => {
 afterEach(() => jest.restoreAllMocks());
 describe("cooperative management HTTP boundary", () => {
   it("requires authentication on federation, member, role and application paths", async () => {
-    for (const path of ["/federation", `/${id}/members`, `/${id}/roles`])
+    for (const path of [
+      "/my-cooperatives",
+      "/my-updates",
+      "/federation",
+      `/${id}/members`,
+      `/${id}/roles`,
+    ])
       expect((await request(app()).get("/manage" + path)).status).toBe(401);
     expect(
       (await request(app()).post("/manage/affiliations").send({})).status,
@@ -46,6 +52,44 @@ describe("cooperative management HTTP boundary", () => {
     expect(response.status).toBe(403);
     expect(response.headers["cache-control"]).toBe("private, no-store");
     expect(decide).toHaveBeenCalledWith(actor, id, id, "approve", "검토");
+  });
+  it("binds personal feeds and eligibility writes to authenticated identity", async () => {
+    const mine = jest
+      .spyOn(CooperativeManagementService.prototype, "myCooperatives")
+      .mockResolvedValue([]);
+    const updates = jest
+      .spyOn(CooperativeManagementService.prototype, "myUpdates")
+      .mockResolvedValue([]);
+    const save = jest
+      .spyOn(CooperativeManagementService.prototype, "updateEligibility")
+      .mockResolvedValue({ ok: true });
+    for (const path of ["my-cooperatives", "my-updates"]) {
+      const response = await request(app())
+        .get(`/manage/${path}?userId=spoof`)
+        .set("x-test-user", actor);
+      expect(response.status).toBe(200);
+      expect(response.headers["cache-control"]).toBe("private, no-store");
+    }
+    expect(mine).toHaveBeenCalledWith(actor);
+    expect(updates).toHaveBeenCalledWith(actor);
+    expect(
+      (await request(app()).post(`/manage/${id}/eligibility`).send({})).status,
+    ).toBe(401);
+    await request(app())
+      .post(`/manage/${id}/eligibility`)
+      .set("x-test-user", actor)
+      .send({ eligibilityDescription: "개인", reason: "정비" });
+    expect(save).toHaveBeenCalledWith(actor, id, {
+      eligibilityDescription: "개인",
+      reason: "정비",
+    });
+    expect(
+      (
+        await request(app())
+          .get(`/manage/${id}/eligibility`)
+          .set("x-test-user", actor)
+      ).status,
+    ).toBe(404);
   });
   it("rejects malformed IDs before querying and never interprets GET as a mutation", async () => {
     const decide = jest

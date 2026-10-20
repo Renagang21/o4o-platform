@@ -401,6 +401,58 @@ export class CooperativeManagementService {
       [actor],
     );
   }
+  /** Include inactive affiliations for status visibility, without granting resource access. */
+  async myCooperatives(actor: string) {
+    await usable(this.db, actor);
+    return this.db.query(
+      `SELECT c.id,c.slug,c.name,c.status AS "cooperativeStatus",sf.status AS "businessStatus",
+        m.status AS "membershipStatus",r.role
+       FROM cooperatives c JOIN semi_franchises sf ON sf.id=c.semi_franchise_id
+       LEFT JOIN cooperative_memberships m ON m.cooperative_id=c.id AND m.user_id=$1
+       LEFT JOIN cooperative_roles r ON r.cooperative_id=c.id AND r.user_id=$1 AND r.revoked_at IS NULL
+       WHERE m.id IS NOT NULL OR r.id IS NOT NULL ORDER BY c.name,c.id`,
+      [actor],
+    );
+  }
+  /** A personal activity feed, not a second notification ledger or an unread counter. */
+  async myUpdates(actor: string) {
+    await usable(this.db, actor);
+    return this.db.query(
+      `SELECT e.id,c.slug,c.name AS "cooperativeName",e.action,e.reason,
+        e.next_state AS "nextState",e.created_at AS "createdAt",
+        c.status AS "cooperativeStatus",sf.status AS "businessStatus"
+       FROM cooperative_management_events e JOIN cooperatives c ON c.id=e.cooperative_id
+       JOIN semi_franchises sf ON sf.id=c.semi_franchise_id
+       WHERE (e.subject_id=$1 AND e.action IN ('membership_apply','member_supplement',
+         'member_request_changes','member_approve','member_reject','member_suspend','member_restore',
+         'member_withdraw','member_expel','member_request_withdraw','role_assign','role_revoke'))
+       OR (e.action LIKE 'affiliation_%' AND EXISTS (
+         SELECT 1 FROM cooperative_management_events a WHERE a.cooperative_id=c.id
+         AND a.actor_id=$1 AND a.action='affiliation_apply'))
+       ORDER BY e.created_at DESC,e.id DESC LIMIT 100`,
+      [actor],
+    );
+  }
+  async updateEligibility(
+    actor: string,
+    coop: string,
+    input: Record<string, unknown>,
+  ) {
+    const text = reason(input.eligibilityDescription),
+      note = reason(input.reason);
+    return this.db.transaction(async (m) => {
+      const c = await this.lock(m, coop);
+      await this.requireLocal(m, actor, coop, true);
+      if (c.eligibility_description !== text) {
+        await m.query(
+          "UPDATE cooperatives SET eligibility_description=$2 WHERE id=$1",
+          [coop, text],
+        );
+        await this.audit(m, coop, actor, null, "eligibility_update", note);
+      }
+      return { ok: true };
+    });
+  }
   async myHistory(actor: string, coop: string) {
     await usable(this.db, actor);
     return this.db.query(
