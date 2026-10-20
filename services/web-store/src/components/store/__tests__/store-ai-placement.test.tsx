@@ -35,7 +35,7 @@ function Fixture() {
   return (
     <StoreAiPlacementProvider>
       <section aria-label="목록">
-        <h1>안내 만들기</h1>
+        <h1>매장 컨텐츠</h1>
         <StoreAiSlot />
         <button onClick={() => setDialog(true)}>작성</button>
       </section>
