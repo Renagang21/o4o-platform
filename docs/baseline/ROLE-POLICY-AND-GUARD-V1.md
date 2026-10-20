@@ -1,13 +1,13 @@
 # Admin/Operator Role Policy & Guard Baseline v1.0
 
+> **상태**: SUPERSEDED (전체 관리자 역할·역할 종류 편집·폐기 역할의 현재 취급 범위만) · **대체 문서**: [O4O-CURRENT-ADMIN-ROLE-POLICY-V1](O4O-CURRENT-ADMIN-ROLE-POLICY-V1.md) · **표기일**: 2026-10-20
+
 > **Status: Active Policy + Frozen Baseline**
 > **Version: 1.0 | Created: 2026-02-17**
 >
 > (2026-10-06 정정, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) 이 문서의 `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` · `{service}:branch_*` Org Layer 서술(§1 · §5 · §6 · §8)은 **과거 기록**이다 — 이 역할들은 제거됐고 guard 를 복구하지 않는다. 현행 KPA 역할은 [`KPA-ROLE-MATRIX-V1`](KPA-ROLE-MATRIX-V1.md)(KPA Society, scope = `kpa:admin` ⊃ `kpa:operator`), 분회 서비스 역할 · 분회 소속 판정은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md)(`kpa-branch:*` + `branch_memberships`)가 정본이며, 충돌하면 그 두 문서가 우선한다. **GlucoseView 행(§3 · §4 · §7 · §8)도 과거 기록**이다 — 현행 서비스 identity(`apps/api-server/src/config/service-catalog.ts`)와 `packages/security-core` 에 GlucoseView 는 없고 관련 역할 · guard 도 없다. 위 두 범위를 뺀 나머지 원칙(계층 · Admin/Operator 구분 · Platform Bypass · 서비스 격리 · Guard 패턴)은 유효하다.
 
 ---
-
-> **2026-10-20 사용자 결정 반영:** 전체 관리자 역할은 `platform:super_admin` 하나다. 과거 `platform:admin`·`platform:operator`·`platform:manager`·`platform:vendor`·`platform:member`·`platform:contributor` 정의는 현재 발급·권한 판정에서 제외한다. 서비스 운영 권한은 기존 서비스별 admin/operator 지정으로 관리하며 관리자가 역할 종류를 편집하는 메뉴는 제거한다. legacy `lms:instructor` 대신 현행 `lecture:*` 경계를 사용한다. 과거 할당 이력의 물리 삭제나 현재 운영 DB 정리가 완료됐다는 뜻은 아니다. [정비 WO](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)에 구현·검증·배포 단계를 구분한다.
 
 ## 1. 권한 계층 구조
 
