@@ -17,7 +17,6 @@ export default function SupplierProductTaskLinks({ product, returnTo }: Readonly
         <>
           <button type="button" onClick={() => navigate(supplierEditLink('/supplier/supply-proposals', { offer: product.id }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">공급 제안 만들기</button>
           <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-events', { offer: product.id }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 이벤트 만들기</button>
-          <button type="button" onClick={() => navigate(supplierEditLink('/supplier/semi-franchise-recruitments', { masterId: product.masterId }, returnTo))} className="rounded border bg-white px-3 py-2 text-blue-700">세미프랜차이즈 모집 만들기</button>
         </>
       )}
     </div>

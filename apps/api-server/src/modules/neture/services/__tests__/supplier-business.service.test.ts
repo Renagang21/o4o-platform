@@ -111,13 +111,29 @@ describe('supplier business profile behavior', () => {
     expect(AppDataSource.transaction).not.toHaveBeenCalled();
   });
 
+  it.each(['individual', 'corporation'])('accepts an explicit %s classification', async (businessEntityType) => {
+    await service.updateSupplierProfile('fixture-supplier', { businessEntityType });
+    const update = txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'));
+    expect(update).toBeDefined();
+    expect(update![1]).toContainEqual(expect.stringContaining(`"businessEntityType":"${businessEntityType}"`));
+  });
+
+  it.each(['simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other', '', null, 42, {}])(
+    'rejects classification %p before any profile writes', async (businessEntityType) => {
+      await expect(service.updateSupplierProfile('fixture-supplier', { businessEntityType } as any))
+        .rejects.toMatchObject({ name: 'SupplierProfileEntityTypeInvalidError' });
+      expect(AppDataSource.transaction).not.toHaveBeenCalled();
+      expect(save).not.toHaveBeenCalled();
+    },
+  );
+
   it('merges address and business metadata using the same transaction before supplier save', async () => {
-    const result = await service.updateSupplierProfile('fixture-supplier', { businessZipCode: 'changed-postal', businessEntityType: 'changed-type', managerPhone: '010-0000-0000' });
+    const result = await service.updateSupplierProfile('fixture-supplier', { businessZipCode: 'changed-postal', businessEntityType: 'corporation', managerPhone: '010-0000-0000' });
     const update = txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'));
     expect(update).toBeDefined();
     const jsonValues = update![1].filter((value: unknown) => typeof value === 'string' && value.startsWith('{')).map((value: string) => JSON.parse(value));
     expect(jsonValues).toContainEqual({ zipCode: 'changed-postal', baseAddress: 'Fixture address', detailAddress: 'Fixture detail' });
-    expect(jsonValues).toContainEqual({ otherService: { retained: true }, businessProfile: { businessEntityType: 'changed-type', businessStartDate: '2000-01-01', retained: true } });
+    expect(jsonValues).toContainEqual({ otherService: { retained: true }, businessProfile: { businessEntityType: 'corporation', businessStartDate: '2000-01-01', retained: true } });
     expect(save).toHaveBeenCalledWith(expect.objectContaining({ managerPhone: '01000000000' }));
     expect(txQuery.mock.invocationCallOrder.at(-1)).toBeLessThan(save.mock.invocationCallOrder[0]);
     expect(AppDataSource.transaction).toHaveBeenCalledTimes(1);
@@ -149,7 +165,7 @@ describe('supplier business profile behavior', () => {
 
   it('rejects business metadata with no canonical organization before starting a transaction', async () => {
     supplier.organizationId = null;
-    await expect(service.updateSupplierProfile('fixture-supplier', { businessEntityType: 'fixture-type' })).rejects.toMatchObject({ name: 'SupplierProfileFieldUnsupportedError', fields: ['businessEntityType'] });
+    await expect(service.updateSupplierProfile('fixture-supplier', { businessEntityType: 'individual' })).rejects.toMatchObject({ name: 'SupplierProfileFieldUnsupportedError', fields: ['businessEntityType'] });
     expect(AppDataSource.transaction).not.toHaveBeenCalled();
     expect(save).not.toHaveBeenCalled();
     expect(new SupplierProfileFieldUnsupportedError(['businessStartDate'])).toBeInstanceOf(Error);
