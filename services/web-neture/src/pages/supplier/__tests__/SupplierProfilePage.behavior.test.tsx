@@ -198,6 +198,32 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
   });
+  it('edits the registered business name and restores the saved name after reopening', async () => {
+    const page = render(<SupplierProfilePage />);
+    await loaded();
+    const input = screen.getByLabelText('상호명') as HTMLInputElement;
+    expect(input.disabled).toBe(false);
+    expect(input.value).toBe(profile.name);
+    fireEvent.change(input, { target: { value: '  변경 공급자  ' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ name: '변경 공급자' }),
+    ));
+    await screen.findByRole('button', { name: '저장됨' });
+    page.unmount();
+    api.profile.getProfile.mockResolvedValue({ ...profile, name: '변경 공급자' });
+    render(<SupplierProfilePage />);
+    await loaded();
+    expect((screen.getByLabelText('상호명') as HTMLInputElement).value).toBe('변경 공급자');
+  });
+  it('does not submit a blank business name', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.change(screen.getByLabelText('상호명'), { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await screen.findByText('상호명을 1~255자로 입력해 주세요.');
+    expect(api.profile.updateProfile).not.toHaveBeenCalled();
+  });
   it('edits contact and shipping values through their visible field labels', async () => {
     render(<SupplierProfilePage />);
     await loaded();

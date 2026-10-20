@@ -7,6 +7,7 @@ vi.mock('../../../contexts', () => ({
   useLoginModal: () => ({ openLoginModal: state.login }),
 }));
 vi.mock('../../../lib/apiClient', () => ({ api: { get: state.get, post: state.post } }));
+vi.mock('../CarePharmNotices', () => ({ CarePharmNotices: () => null }));
 vi.mock('@o4o/shared-space-ui', async original => ({ ...await original<typeof import('@o4o/shared-space-ui')>(), ServiceHomeHero: () => <h1>만성질환관리</h1>, ServiceHomePromotion: () => null }));
 import CarePharmHomePage from '../CarePharmHomePage';
 const business = { key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };

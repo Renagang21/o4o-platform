@@ -84,6 +84,33 @@ describe('supplier business profile behavior', () => {
     expect(findOne).toHaveBeenCalledWith({ where: { id: 'fixture-supplier', status: SupplierStatus.ACTIVE } });
   });
 
+  it('updates the canonical organization name in the profile transaction', async () => {
+    (AppDataSource.query as jest.Mock).mockResolvedValue([{ ...org, name: 'Renamed fixture' }]);
+    const result = await service.updateSupplierProfile('fixture-supplier', { name: '  Renamed fixture  ' });
+    expect(txQuery).toHaveBeenCalledWith(
+      expect.stringContaining('UPDATE organizations SET name = $1'),
+      ['Renamed fixture', 'fixture-org'],
+    );
+    expect(save).toHaveBeenCalledWith(supplier);
+    expect(supplier).not.toHaveProperty('name');
+    expect(result).toMatchObject({ name: 'Renamed fixture' });
+    expect(await service.getSupplierProfile('fixture-supplier')).toMatchObject({ name: 'Renamed fixture' });
+  });
+
+  it.each(['', '   ', 'x'.repeat(256), null, 42, {}, []])('rejects invalid business name %p before writes', async (name) => {
+    await expect(service.updateSupplierProfile('fixture-supplier', { name } as any))
+      .rejects.toMatchObject({ name: 'SupplierProfileNameInvalidError' });
+    expect(AppDataSource.transaction).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('rejects a name change when there is no canonical organization', async () => {
+    supplier.organizationId = null;
+    await expect(service.updateSupplierProfile('fixture-supplier', { name: 'Renamed fixture' }))
+      .rejects.toMatchObject({ fields: ['name'] });
+    expect(AppDataSource.transaction).not.toHaveBeenCalled();
+  });
+
   it('merges address and business metadata using the same transaction before supplier save', async () => {
     const result = await service.updateSupplierProfile('fixture-supplier', { businessZipCode: 'changed-postal', businessEntityType: 'changed-type', managerPhone: '010-0000-0000' });
     const update = txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'));

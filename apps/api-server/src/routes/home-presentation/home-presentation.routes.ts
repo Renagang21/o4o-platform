@@ -124,10 +124,33 @@ export function createHomePresentationRoutes(ds: DataSource) {
       return kpaScope("kpa:operator")(req, res, next);
     if (req.params.surface === "lecture")
       return requireLectureScope("lecture:operator")(req, res, next);
+    if (req.params.surface === "carepharm")
+      return requireNetureBusinessScope(req, res, next);
     return requireNetureScope("neture:operator")(req, res, next);
   };
   // Business-owned pharmacy homes use their existing assigned operator boundary, not KPA roles.
   const businesses = new SemiFranchiseService(ds);
+  // Keep the existing CarePharm presentation slot; never infer business ownership
+  // from a Neture-wide role, a body parameter or another model's assignment.
+  const carePharmOperator: RequestHandler = async (req, res, next) => {
+    if (req.params.surface !== "carepharm") return next();
+    try {
+      const business = await businesses.requireOperatorOf(
+        (req as Request & { user: { id: string } }).user.id,
+        "carepharm",
+      );
+      if (business.status !== "active") {
+        res.status(404).json({ success: false, message: "운영 중인 사업을 찾을 수 없습니다." });
+        return;
+      }
+      next();
+    } catch (error) {
+      res.status((error as { httpStatus?: number }).httpStatus ?? 500).json({
+        success: false,
+        message: "CarePharm의 현재 운영 권한을 확인해 주세요.",
+      });
+    }
+  };
   const business = presentationHandlers(ds, (req) => ({
     surface: "pharmacy",
     organizationId: (req as Request & { presentationOrg: string })
@@ -187,6 +210,7 @@ export function createHomePresentationRoutes(ds: DataSource) {
     supported,
     requireAuth as RequestHandler,
     authorize,
+    carePharmOperator,
     ordinary.manageRead,
   );
   router.put(
@@ -195,6 +219,7 @@ export function createHomePresentationRoutes(ds: DataSource) {
     supported,
     requireAuth as RequestHandler,
     authorize,
+    carePharmOperator,
     ordinary.save,
   );
   return router;

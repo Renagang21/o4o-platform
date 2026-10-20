@@ -1,4 +1,5 @@
 import HomePresentationPage from './pages/operator/HomePresentationPage';
+import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
@@ -723,6 +724,7 @@ function App() {
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               {CURRENT_HOST_PROFILE === 'carepharm' && <>
                 <Route path="/" element={<CarePharmHomePage />} />
+                <Route path="/news/:noticeId" element={<CarePharmNewsPage />} />
                 <Route path="/my/participation" element={<CarePharmHomePage view="participation" />} />
                 <Route path="/materials" element={<CarePharmHomePage view="materials" />} />
                 <Route path="/tools" element={<CarePharmHomePage view="tools" />} />
@@ -1142,6 +1144,7 @@ function App() {
               <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/operator/legal/supplier" element={<SubdomainOperatorRoute serviceKey="supplier" level="admin"><ServiceLegalSettingsPage serviceKey="supplier" /></SubdomainOperatorRoute>} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+              <Route path="/admin/supplier-governance/operators" element={<OperatorsPage scope="supplier" />} />
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="supplier" level="operator">
@@ -1167,6 +1170,7 @@ function App() {
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/home-presentation/funding" element={<HomePresentationPage surface="funding" />} />
+              <Route path="/operator/market-trial/operators" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><OperatorsPage scope="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1194,6 +1198,7 @@ function App() {
             }>
               <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
               <Route path="/admin/communities" element={<Navigate to="/admin/communities/members" replace />} />
+              <Route path="/admin/communities/operators" element={<OperatorsPage scope="community" />} />
               <Route path="/admin/communities/members" element={<CommunityServiceManagementPage kind="members" permanent />} />
               <Route path="/admin/communities/boards" element={<CommunityServiceManagementPage kind="boards" permanent />} />
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/admin/forum-deleted" element={<Navigate to="/admin/communities/boards" replace />} />}
@@ -1241,6 +1246,7 @@ function App() {
               {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/operator/home-presentation/neture" element={<HomePresentationPage surface="neture" />} />
+              <Route path="/operator/home-presentation/carepharm" element={<HomePresentationPage surface="carepharm" />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />

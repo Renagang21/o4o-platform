@@ -11,7 +11,7 @@ describe('CarePharm host boundary', () => {
     expect(getHostProfile('CAREPHARM.neture.co.kr')).toBe('carepharm');
     expect(getHostProfile('carepharm.neture.co.kr.example.com')).toBe('main');
   });
-  it.each(['/', '/login', '/terms', '/mypage', '/my/participation', '/materials', '/tools', '/communities/business%3Acarepharm/forum', '/operator/semi-franchises'])('keeps its own route %s', path => {
+  it.each(['/', '/login', '/terms', '/mypage', '/my/participation', '/materials', '/tools', '/news/notice-id', '/operator/home-presentation/carepharm', '/communities/business%3Acarepharm/forum', '/operator/semi-franchises'])('keeps its own route %s', path => {
     expect(decideHost('carepharm', loc(path))).toEqual({ kind: 'stay' });
   });
   it.each(['/communities/pharmacy/forum', '/communities/carepharm-other/forum', '/operator/service-members/community'])('does not claim another community or service role at %s', path => {

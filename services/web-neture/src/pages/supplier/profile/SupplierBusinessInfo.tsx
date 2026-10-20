@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { Building2, FileText, MapPin } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
-import { inputClass, disabledInputClass } from './profilePresentation';
+import { inputClass } from './profilePresentation';
 import type { useSupplierBusinessProfile } from './useSupplierBusinessProfile';
 
 export default function SupplierBusinessInfo({
@@ -13,6 +13,8 @@ export default function SupplierBusinessInfo({
   const fieldId = useId();
   const {
     profile,
+    name,
+    setName,
     representativeName,
     setRepresentativeName,
     businessNumber,
@@ -42,7 +44,7 @@ export default function SupplierBusinessInfo({
           사업자 기본정보
         </h2>
         <div className="space-y-5">
-          {/* 상호명 (읽기 전용) */}
+          {/* 상호명 */}
           <div>
             <label
               htmlFor={`${fieldId}-field-0`}
@@ -53,11 +55,13 @@ export default function SupplierBusinessInfo({
             <input
               id={`${fieldId}-field-0`}
               type="text"
-              value={profile.name}
-              disabled
-              className={disabledInputClass}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={255}
+              required
+              className={inputClass}
             />
-            <p className="mt-1 text-xs text-gray-400">상호명은 공급자 등록 시 설정됩니다.</p>
+            <p className="mt-1 text-xs text-gray-400">사업자등록증에 기재된 상호명을 입력해 주세요.</p>
           </div>
 
           {/* 대표자명 */}
