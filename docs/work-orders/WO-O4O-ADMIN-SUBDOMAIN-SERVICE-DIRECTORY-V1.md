@@ -5,6 +5,8 @@
 > **근거 WO/IR**: 사용자 `/admin/platform/services`의 이전 서비스 목록을 현재 서브도메인 구조로 정비 요청
 > **관련 정본**: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) · [서브도메인 의미](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)
 
+후속 통합 범위: 사용자가 개발 push 후 main 병합·운영 배포를 승인했다. 아래의 PR CI 미실행·운영 미반영은 최초 개발 인계 당시의 기록이다. 최신 main의 CarePharm 변경과 파일 충돌 없이 통합했으며, 후속 CI·리뷰·병합·실제 서빙 검증 결과는 이 branch의 병합 PR과 최종 운영 인계 보고에 기록한다. 이 문서의 개발 검증을 운영 완료 증거로 해석하지 않는다.
+
 ## 1. 조사와 범위
 
 기준 main `3f584bcab186dd8676e0a79f2563166b865b71f3`. 클라우드 격리 checkout을 유지하고 최신 main에서 새 전용 branch `wo/admin-subdomain-service-directory`를 생성했다. onboarding skill에 따라 추가 worktree는 만들지 않는다.
