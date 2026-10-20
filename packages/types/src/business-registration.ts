@@ -31,7 +31,8 @@
 // ─── Enums / String Literal Types ────────────────────────────
 
 /**
- * 사업자 유형 (사업자등록증의 "사업자 유형" 분류).
+ * 저장된 사업자 구분 코드. 새 선택지는 individual / corporation 두 가지이며,
+ * 과거 과세 유형 코드는 기존 데이터 조회·API 호환을 위해 남긴다.
  *   - individual: 개인사업자
  *   - corporation: 법인사업자
  *   - simple_taxpayer: 간이과세자
@@ -48,6 +49,11 @@ export type BusinessEntityType =
   | 'tax_exempt'
   | 'non_profit'
   | 'other';
+
+/** 새 입력은 세금계산서용 개인·법인 구분만 허용한다. 과거 값은 읽기 호환을 위해 유지한다. */
+export function isSelectableBusinessEntityType(value: unknown): value is 'individual' | 'corporation' {
+  return value === 'individual' || value === 'corporation';
+}
 
 /**
  * 사업자 정보 검증 상태.

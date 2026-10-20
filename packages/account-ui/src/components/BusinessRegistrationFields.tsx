@@ -16,16 +16,16 @@
  *   - 계좌 정보는 포함하지 않는다 (PG 사 관리, 오프라인 절차).
  *   - 세금계산서 / 사업자등록번호 / 상호 / 대표자 / 주소 / 전화 등은 본 컴포넌트
  *     범위 외 (서비스별 폼 구조에 그대로 둔다).
- *   - 모든 필드 optional (서비스별 required 정책은 부모 폼에서 결정).
+ *   - 개인·법인 구분은 필수. 나머지 필드의 required 정책은 부모 폼에서 결정.
  *   - 스타일을 강제하지 않는다 — inputClassName / labelClassName override 지원.
  *
- * 라벨 SSOT: @o4o/types BUSINESS_ENTITY_TYPE_LABELS.
+ * 새 입력은 개인·법인만 선택. 과거 과세 유형 값은 임의 변환하지 않는다.
  */
 
-import type { ChangeEvent, ReactElement } from 'react';
+import { useId, type ChangeEvent, type ReactElement } from 'react';
 import {
   type BusinessEntityType,
-  BUSINESS_ENTITY_TYPE_LABELS,
+  isSelectableBusinessEntityType,
 } from '@o4o/types';
 
 export interface BusinessRegistrationFieldsValue {
@@ -65,9 +65,10 @@ const DEFAULT_INPUT_CLASS =
 const DEFAULT_LABEL_CLASS = 'block text-sm font-medium text-gray-700 mb-1';
 const DEFAULT_CONTAINER_CLASS = 'space-y-3';
 
-const ENTITY_TYPE_OPTIONS = (
-  Object.entries(BUSINESS_ENTITY_TYPE_LABELS) as Array<[BusinessEntityType, string]>
-).map(([value, label]) => ({ value, label }));
+const ENTITY_TYPE_OPTIONS = [
+  { value: 'individual', label: '개인' },
+  { value: 'corporation', label: '법인' },
+];
 
 const ALL_FIELDS: BusinessRegistrationFieldKey[] = [
   'businessType',
@@ -84,9 +85,11 @@ export function BusinessRegistrationFields({
   className,
   inputClassName,
   labelClassName,
-  entityTypePlaceholder = '선택 (선택사항)',
+  entityTypePlaceholder = '개인 / 법인 선택',
   includeFields,
 }: BusinessRegistrationFieldsProps) {
+  const entityTypeId = useId();
+  const entityTypeSelected = isSelectableBusinessEntityType(value.businessEntityType);
   const inputCls = inputClassName ?? DEFAULT_INPUT_CLASS;
   const labelCls = labelClassName ?? DEFAULT_LABEL_CLASS;
   const containerCls = className ?? DEFAULT_CONTAINER_CLASS;
@@ -137,13 +140,15 @@ export function BusinessRegistrationFields({
     ),
     businessEntityType: (
       <div key="businessEntityType">
-        <label className={labelCls}>사업자 유형{requiredMark}</label>
+        <label htmlFor={entityTypeId} className={labelCls}>사업자 구분<span className="text-red-500"> *</span></label>
         <select
+          id={entityTypeId}
           name="businessEntityType"
-          value={value.businessEntityType ?? ''}
+          aria-describedby={`${entityTypeId}-help`}
+          value={entityTypeSelected ? value.businessEntityType : ''}
           onChange={handle('businessEntityType')}
           disabled={disabled}
-          required={required}
+          required
           className={inputCls}
         >
           <option value="">{entityTypePlaceholder}</option>
@@ -153,6 +158,11 @@ export function BusinessRegistrationFields({
             </option>
           ))}
         </select>
+        <p id={`${entityTypeId}-help`} className="mt-1 text-xs text-gray-500">
+          {value.businessEntityType && !entityTypeSelected
+            ? '기존 입력값으로는 개인·법인을 확인할 수 없습니다. 다시 선택해 주세요.'
+            : '세금계산서 발행에 사용할 개인·법인 구분입니다.'}
+        </p>
       </div>
     ),
     businessStartDate: (
