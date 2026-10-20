@@ -1,6 +1,6 @@
 # WO-O4O-HOME-MEMBERSHIP-DISCOVERY-V1
 
-상태: 화면 수정·로컬 검증 완료 / 계정 식별·운영 조회 완료 / 데이터 보정 승인 대기
+상태: 화면 수정·로컬 검증 완료 / 계정 식별·운영 조회 완료 / 데이터 보정 승인 완료·안전 실행 경로 구현 완료·운영 plan/apply 대기
 기준: origin/main 5b2f6bd9ee · branch wo/home-membership-discovery
 
 ## 문제와 범위
@@ -45,7 +45,7 @@
 
 관찰 출처: 일반 로그인 후 `GET /auth/services`, `GET /neture/home/entry`, `GET /communities`, `GET /neture/pharmacy/semi-franchises`, `GET /neture/cooperatives`. 응답 원문·개인 식별자·인증값은 산출물에 보관하지 않는다. 공개 목록 0건은 DB에 조합이 전혀 없다는 단정이 아니다.
 
-## 검토 가능한 데이터 보정 범위 — 아직 미실행
+## 승인된 데이터 보정 범위 — 운영 실행 대기
 
 1. 대상은 registry의 활성 STORE_OWNER 1계정과 그 계정의 기존 Demo 약국 조직만이다. 같은 코드 정본의 로그인 식별자와 일치하고 owner 관계가 유일할 때만 진행한다.
 2. 누락된 활성 서비스 가입과 CarePharm·메가팜 사업 참여를 보정한다. 기존 정지·반려·탈퇴 행을 무조건 active로 덮어쓰지 않는다. 기존 상태가 있으면 사유 확인 전 정지한다.
@@ -54,4 +54,15 @@
 5. 실제 DB 조회로 정확한 before-image·예상 쓰기 수·관계 경계·복구 자료를 확보하고 digest가 일치하는 단일 transaction에서만 적용한다. 데이터 복구 기능·행 단위 범위·사후 검증이 준비되기 전 쓰지 않는다. 인가 우회는 추가하지 않는다.
 6. 적용 후 새 로그인으로 원장·업무 접근·상단 가입 서비스·하단 제외 여부를 검증한다. 가입 가능한 대상이 없는 협동조합을 임의 가입 처리해 목록을 숨기지 않는다.
 
-`AGENTS.md` §5는 운영 DB write 및 seed·권한 범위 확대에 명시적 승인을 요구한다. 현재 사용자 지시는 문제 수정이며, 위 다중 서비스 데이터·자격 확장 실행 자체는 별도 확인 대상으로 남긴다. 화면 코드의 기존 수정은 보존하되 사용자 계정 데이터가 해결됐다고 보고하거나 이 PR을 전체 해결로 병합·배포하지 않는다.
+`AGENTS.md` §5의 운영 write 확인에 대해 사용자가 “승인”이라고 명시했다(2026-10-20, KST). 이 계획 범위의 재승인을 요구하지 않는다. 검증된 실행 코드를 main에 통합한 뒤 read-only plan → 정확한 digest를 사용한 apply → 사후 조회 순서로 진행한다. main 통합을 데이터 보정 완료로 보고하지 않는다.
+
+
+## 실행 구현과 검증
+
+- 기존 운영 경로와 같은 main·repository owner·production environment·WIF identity·SQL proxy를 쓰는 전용 `demo-owner-participation.yml`을 추가했다. 기존 다목적 workflow는 이미 dispatch 입력 25개이므로 수정하지 않는다. 새 DB 권한·Secret·IAM·schema는 만들지 않는다.
+- 기본은 read-only repeatable-read plan이다. apply는 main CI Gate 성공, DEPLOY_FREEZE=false, 정확한 plan digest가 필요하다. 기존 Demo 운영과 동일 concurrency group으로 직렬화한다.
+- 데이터 변경은 고정된 community/funding service_memberships 및 기존 Demo 약국의 CarePharm/megapharm semi_franchise_memberships 중 없는 active 행만 추가한다. 정지·반려·탈퇴·대기는 중단한다. 자격 확인에 앞서 supplier/kpa-branch 가입 행을 만들지 않는다.
+- registry 활성 STORE_OWNER 단일성·공통 코드 정본과의 일치·확인된 정상 계정·유일한 승인 약국 owner 관계·활성 메인 회원·사업 활성 상태를 확인한다. 다른 Demo 사용자와 credential·role·동의·소유권은 변경하지 않는다.
+- 정확한 before-image와 새 행 ID를 기존 `canonical_demo_repair_snapshots`에 동일 transaction으로 보관한다. 실패 시 전체 rollback, 정상 재실행은 writes=0이다. 복구 자료 원문은 DB 내부에만 남기며 공개 산출물은 digest·집계·작업 종류만 포함한다. 사후 복구는 이 snapshot의 추가 행과 이후 참조를 검토한 보상 transaction으로 수행하고, 종속 데이터가 생겼다면 무조건 삭제하지 않는다.
+- 공급자 조직 소유 관계·분회 active 관계도 같은 계정 범위로 조회하여 plan에 후보 수만 기록한다. 신규 사업·조합·분회·공급자 조직을 임의로 생성하지 않는다.
+- PostgreSQL 15 독립 fixture 11개 테스트와 실제 workflow gate 3개 테스트 통과. API 타입 검사·변경 파일 lint 통과. fixture는 실제 운영 schema 전체 이식이 아닌, 관련 테이블의 SQL·FK·unique 제약을 재현한 전용 DB다. 실제 운영 결과는 이후 CHECK/PR에 기록한다.
