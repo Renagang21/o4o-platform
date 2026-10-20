@@ -226,6 +226,118 @@ integration(
         await resolveSemiFranchiseBusinessAccess(db, member, "coop-test"),
       ).toMatchObject({ allowed: false });
     });
+    it("lets only the scoped admin update free-form eligibility with an audit reason", async () => {
+      const description =
+        "약사와 비약사 경영자 및 일반 개인은 정관에 따른 자격 자료를 제출합니다.";
+      for (const actor of [operator, fed, fedOp, member, other]) {
+        await expect(
+          service.updateEligibility(actor, coop, {
+            eligibilityDescription: description,
+            reason: "기준 정비",
+          }),
+        ).rejects.toMatchObject({ httpStatus: 403 });
+      }
+      await expect(
+        service.updateEligibility(admin, coop, {
+          eligibilityDescription: description,
+          reason: " ",
+        }),
+      ).rejects.toMatchObject({ httpStatus: 400 });
+      await expect(
+        service.updateEligibility(admin, coop, {
+          eligibilityDescription: "x".repeat(2001),
+          reason: "사유",
+        }),
+      ).rejects.toMatchObject({ httpStatus: 400 });
+      const before = await db.query(
+        "SELECT user_id,status FROM cooperative_memberships WHERE cooperative_id=$1 ORDER BY user_id",
+        [coop],
+      );
+      await service.updateEligibility(admin, coop, {
+        eligibilityDescription: description,
+        reason: "기준 정비",
+      });
+      await service.updateEligibility(admin, coop, {
+        eligibilityDescription: description,
+        reason: "중복 저장",
+      });
+      expect(
+        (await new CooperativeService(db).directory()).find(
+          (c: any) => c.id === coop,
+        ).eligibilityDescription,
+      ).toBe(description);
+      expect(
+        await db.query(
+          "SELECT user_id,status FROM cooperative_memberships WHERE cooperative_id=$1 ORDER BY user_id",
+          [coop],
+        ),
+      ).toEqual(before);
+      expect(
+        (await service.history(admin, coop, false)).filter(
+          (e: any) => e.action === "eligibility_update",
+        ),
+      ).toEqual([
+        expect.objectContaining({
+          reason: "기준 정비",
+          actorId: admin,
+          previousState: null,
+          nextState: null,
+        }),
+      ]);
+    });
+    it("lists only the authenticated person's memberships and roles, keeping them separate", async () => {
+      expect(await service.myCooperatives(member)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: coop,
+            membershipStatus: "pending",
+            role: null,
+          }),
+          expect.objectContaining({
+            id: second,
+            membershipStatus: "pending",
+            role: null,
+          }),
+        ]),
+      );
+      expect(await service.myCooperatives(admin)).toEqual([
+        expect.objectContaining({
+          id: coop,
+          membershipStatus: null,
+          role: "admin",
+        }),
+      ]);
+      expect(await service.myCooperatives(fed)).toEqual([]);
+    });
+    it("shows personal results without another member's notes or federation-wide access", async () => {
+      const updates = await service.myUpdates(member);
+      expect(updates).toHaveLength(2);
+      expect(updates.every((e: any) => e.action === "membership_apply")).toBe(
+        true,
+      );
+      expect(await service.myUpdates(fed)).toEqual([]);
+      const adminUpdates = await service.myUpdates(admin);
+      expect(adminUpdates.every((e: any) => e.action === "role_assign")).toBe(
+        true,
+      );
+      expect(adminUpdates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ nextState: "admin" }),
+        ]),
+      );
+      await db.query('UPDATE users SET "isEmailVerified"=false WHERE id=$1', [
+        member,
+      ]);
+      try {
+        await expect(service.myUpdates(member)).rejects.toMatchObject({
+          httpStatus: 403,
+        });
+      } finally {
+        await db.query('UPDATE users SET "isEmailVerified"=true WHERE id=$1', [
+          member,
+        ]);
+      }
+    });
     it("operator reviews and requests approval but direct final decisions are denied", async () => {
       const [m] = await service.members(operator, coop);
       await service.memberAction(operator, coop, m.id, "review", "서류 확인");
@@ -412,6 +524,21 @@ integration(
     it("affiliation suspension blocks local service and personal access until restoration", async () => {
       await service.affiliationAction(fed, second, "suspend", "조합 운영 정지");
       expect(await cooperativeRole(db, other, second)).toBeNull();
+      expect(await service.myCooperatives(member)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: second,
+            cooperativeStatus: "suspended",
+            businessStatus: "closed",
+          }),
+        ]),
+      );
+      await expect(
+        service.updateEligibility(other, second, {
+          eligibilityDescription: "수정",
+          reason: "정지 중",
+        }),
+      ).rejects.toMatchObject({ httpStatus: 403 });
       expect(
         (await new CooperativeService(db).directory()).some(
           (r: { id: string }) => r.id === second,
@@ -531,9 +658,10 @@ integration(
       expect(resumed.state).toBe("review_required");
       expect(resumed.reviewCodes).toContain("WRITER_MANIFEST_REQUIRES_REFRESH");
       expect(
-        await db.query("SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL", [
-          operator,
-        ]),
+        await db.query(
+          "SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL",
+          [operator],
+        ),
       ).toHaveLength(1);
       expect(await cooperativeRole(db, admin, coop)).toBe("admin");
     });
@@ -563,9 +691,10 @@ integration(
           ),
         ).rejects.toThrow();
         expect(
-          await db.query("SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL", [
-            erased,
-          ]),
+          await db.query(
+            "SELECT 1 FROM cooperative_roles WHERE user_id=$1 AND revoked_at IS NULL",
+            [erased],
+          ),
         ).toEqual([]);
       } finally {
         await db.query("DELETE FROM account_erasure_operations WHERE id=$1", [
