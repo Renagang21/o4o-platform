@@ -35,11 +35,12 @@ import { resolveKpaBusinessContact } from '../../shared/businessInfoRead.js';
 const USER_ID = '22222222-3333-4444-8555-666666666666';
 
 /** GET /kpa/members 를 한 회원의 businessInfo 로 실행하고 business_info DTO 를 돌려준다. */
-async function listDtoFor(businessInfo: any): Promise<any> {
+async function listMemberFor(businessInfo: any, roles: string[] = []): Promise<any> {
   const dataSource: any = {
     getRepository: () => ({ findOne: async () => null, find: async () => [], save: async (v: any) => v, create: (v: any) => v }),
     query: async (sql: string) => {
       if (/COUNT\(\*\)/i.test(sql)) return [{ total: 1 }];
+      if (sql.includes('FROM role_assignments')) return roles.map(role => ({ user_id: USER_ID, role }));
       return [{
         sm_id: 'sm-1',
         km_id: 'km-1',
@@ -63,8 +64,19 @@ async function listDtoFor(businessInfo: any): Promise<any> {
   await handler({ query: {}, user: { id: 'op-1' } } as any, res);
 
   const payload = res.json.mock.calls[0][0];
-  return payload.data[0].business_info;
+  return payload.data[0];
 }
+
+async function listDtoFor(businessInfo: any): Promise<any> {
+  return (await listMemberFor(businessInfo)).business_info;
+}
+
+it('excludes historical KPA qualification and organization roles from current capabilities', async () => {
+  const member = await listMemberFor({}, ['kpa:pharmacist', 'kpa:student', 'kpa:branch_admin',
+    'kpa:branch_operator', 'kpa:district_admin', 'kpa:admin', 'kpa:operator', 'platform:super_admin']);
+  expect(member.capabilities).toEqual(['kpa:admin', 'kpa:operator', 'platform:super_admin']);
+  expect(member.status).toBe('active');
+});
 
 /** MypageService.getProfile 을 한 회원의 businessInfo 로 실행한다. */
 async function profileFor(businessInfo: any): Promise<any> {
