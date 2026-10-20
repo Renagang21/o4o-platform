@@ -123,7 +123,7 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
     <StorePageShell
       labels={{
         ...STORE_CONTENTS_HEADING,
-        ...(workspace ? { pageTitle: '안내 만들기' } : {}),
+        ...(workspace ? { pageTitle: '매장 컨텐츠' } : {}),
         subtitle:
           '저장한 안내를 선택해 수정하거나 새 안내를 만드세요.',
       }}

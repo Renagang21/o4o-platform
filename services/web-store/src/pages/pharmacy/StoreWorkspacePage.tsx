@@ -139,7 +139,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         {area === "commerce"
           ? "상품·거래"
           : area === "studio"
-            ? "안내 만들기"
+            ? "매장 컨텐츠"
             : "매장 운영"}
       </h1>
       {navigation}

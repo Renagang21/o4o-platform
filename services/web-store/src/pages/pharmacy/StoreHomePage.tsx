@@ -110,7 +110,7 @@ function StoreHomeSession() {
             <StoreAiSlot />
             <nav aria-label="매장 빠른 작업" className="mb-4 flex flex-wrap gap-2 text-sm">
               {product && <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}${product.subPath}`}>상품 보기</Link>}
-              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>안내 만들기</Link>
+              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>매장 컨텐츠</Link>
               <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/use`}>운영 확인</Link>
             </nav>
           </>
