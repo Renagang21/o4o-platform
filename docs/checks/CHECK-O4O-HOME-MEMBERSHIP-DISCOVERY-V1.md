@@ -19,3 +19,12 @@
 - workflow의 실제 shell gate: 3개 통과. owner/main/exact digest/unfrozen 조건과 잘못된 입력 차단.
 - 공통 packages 빌드, API type-check, 변경 TS lint 통과.
 - 운영 SQL plan/apply, 최종 사용자 계정 사후 검증, 이번 PR main 반영 및 배포는 아직 미실행이다.
+
+
+## 운영 인증 경로 교정 (2026-10-20, KST)
+
+PR #736은 main e8061c8096으로 병합됐고, 첫 read-only plan run 39428287852는 WIF의 attribute condition에서 거부됐다. DB proxy·SQL 조회·쓰기 실행 전 인증 단계 실패다. IAM 신뢰 범위를 넓히지 않는다.
+
+기존 허용 workflow `pharmacyhub-qr-cutover.yml`에 mode 선택지 `demo-participation-plan` / `demo-participation-apply`만 추가하여 기존 인증 경로를 사용한다. `demo_accounts=true`를 함께 지정해야 하며 다른 작업·QR 경로와 조합하면 중단한다. 입력 개수는 기존 25개를 유지한다. apply는 기존 main·owner·unfrozen 조건에 더해 CI Gate 성공과 정확한 digest를 요구한다. 일반 Demo 계정 정렬의 기존 plan/apply 동작은 유지한다. 사용 불가능한 신규 workflow는 제거한다. IAM·Secret·schema·실행 계정·서비스 데이터 범위는 변경하지 않는다.
+
+이 교정은 동일 WO의 운영 실행 단계이며 새 worktree/branch `wo/demo-owner-participation-operation`에서 시작했다. 데이터 보정에 대한 사용자 승인은 계속 유효하다. 운영 plan/apply 결과는 아직 대기 중이다.
