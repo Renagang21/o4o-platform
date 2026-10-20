@@ -471,7 +471,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       color: colors.neutral500,
       margin: 0,
     },
-  
+
     // Card
     card: {
       backgroundColor: colors.white,
@@ -498,7 +498,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       margin: 0,
       flex: 1,
     },
-  
+
     // Info rows (View mode)
     infoRow: {
       display: 'flex',
@@ -528,7 +528,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       padding: '2px 6px',
       borderRadius: '4px',
     },
-  
+
     // Edit button (card header)
     editBtn: {
       padding: '6px 16px',
@@ -540,7 +540,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       fontWeight: 500,
       cursor: 'pointer',
     },
-  
+
     // Form (Edit mode)
     formGroup: {
       marginBottom: '16px',
@@ -600,7 +600,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       fontWeight: 500,
       cursor: 'pointer',
     },
-  
+
     // Feedback
     successBox: {
       padding: '12px 16px',
@@ -623,7 +623,7 @@ function createStyles({ colors, shadows, borderRadius }: PharmacyBusinessInfoThe
       margin: '0 0 4px',
       fontSize: '0.8125rem',
     },
-  
+
     // Loading/Error
     loadingBox: {
       display: 'flex',
