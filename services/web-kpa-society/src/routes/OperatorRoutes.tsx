@@ -24,7 +24,6 @@ import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManag
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import ServiceOperatorsPage from '../pages/operator/ServiceOperatorsPage';
-import RoleManagementPage from '../pages/operator/RoleManagementPage';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
@@ -241,7 +240,7 @@ export function OperatorRoutes() {
 
           {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
           <Route path="operators" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><ServiceOperatorsPage /></RoleGuard>} />
-          <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
+          <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><Navigate to="/operator" replace /></RoleGuard>} />
 
           {/* 레거시 리다이렉트 */}
         </Route>

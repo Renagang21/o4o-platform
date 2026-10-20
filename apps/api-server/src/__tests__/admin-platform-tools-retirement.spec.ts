@@ -18,3 +18,19 @@ it('product supply, seller recruitment and listing flows do not consult the reti
     expect(source).not.toContain('c.is_regulated');
   }
 });
+
+// Other deployed service shells previously exposed the same retired editor.
+it('other service entry points cannot restore role editing or advertise the removed policy page', () => {
+  const readRepo = (path: string) => readFileSync(resolve(process.cwd(), '../..', path), 'utf8');
+  const neture = readRepo('services/web-neture/src/App.tsx');
+  const kpa = readRepo('services/web-kpa-society/src/routes/OperatorRoutes.tsx');
+  expect(neture).not.toContain('<RoleManagementPage');
+  expect(kpa).not.toContain('<RoleManagementPage');
+  expect(neture).toContain('<Route path="/admin/roles" element={<Navigate to="/admin" replace />} />');
+  expect(kpa).toContain('<Navigate to="/operator" replace />');
+  for (const app of ['web-neture', 'web-kpa-society']) {
+    const menu = readRepo(`services/${app}/src/config/operatorMenuGroups.ts`);
+    expect(menu).not.toMatch(/label: '역할 관리/);
+    expect(menu).not.toContain('서비스 대상 정책 (플랫폼)');
+  }
+});
