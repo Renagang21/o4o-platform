@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ComponentType, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useId, type ComponentType, type CSSProperties } from 'react';
 import { Navigate } from 'react-router-dom';
 import { BusinessRegistrationFields } from './BusinessRegistrationFields.js';
 import { getBusinessEntityTypeLabel, isSelectableBusinessEntityType } from '@o4o/types';
@@ -93,7 +93,15 @@ function digitsOnly(value: string): string {
   return value.replace(/\D/g, '');
 }
 
-export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch }: PharmacyBusinessInfoProps) {
+function isBusinessEmail(value: string): boolean {
+  const at = value.indexOf('@');
+  if (at < 1 || /\s/.test(value)) return false;
+  const dot = value.indexOf('.', at + 2);
+  return dot >= 0 && dot < value.length - 1;
+}
+
+export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch }: Readonly<PharmacyBusinessInfoProps>) {
+  const formId = useId();
   const { colors } = theme;
   const styles = createStyles(theme);
   const [data, setData] = useState<PharmacyBusinessInfoData | null>(null);
@@ -143,17 +151,17 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
     if (!form.name.trim() || form.name.trim().length < 2) {
       errs.push('약국명은 2자 이상 입력해 주세요.');
     }
-    if (form.taxInvoiceEmail && !/^\S+@\S+\.\S+$/.test(form.taxInvoiceEmail)) {
+    if (form.taxInvoiceEmail && !isBusinessEmail(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
     }
     // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
-    if (form.businessEmail && !/^\S+@\S+\.\S+$/.test(form.businessEmail)) {
+    if (form.businessEmail && !isBusinessEmail(form.businessEmail)) {
       errs.push('약국 대표 이메일 형식이 올바르지 않습니다.');
     }
-    if (form.contactEmail && !/^\S+@\S+\.\S+$/.test(form.contactEmail)) {
+    if (form.contactEmail && !isBusinessEmail(form.contactEmail)) {
       errs.push('담당자 이메일 형식이 올바르지 않습니다.');
     }
-    if (form.baseAddress && form.baseAddress.trim().length === 0) {
+    if (form.baseAddress.length > 0 && form.baseAddress.trim().length === 0) {
       errs.push('기본주소를 입력해 주세요.');
     }
     return errs;
@@ -239,7 +247,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
       {errors.length > 0 && (
         <div style={styles.errorMsgBox}>
-          {errors.map((e, i) => <p key={i} style={styles.errorMsgText}>{e}</p>)}
+          {errors.map((e) => <p key={e} style={styles.errorMsgText}>{e}</p>)}
         </div>
       )}
 
@@ -256,8 +264,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
           /* ── Edit Mode ── */
           <div>
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>약국명 *</label>
+              <label htmlFor={`${formId}-name`} style={styles.formLabel}>약국명 *</label>
               <input
+                id={`${formId}-name`}
                 style={styles.formInput}
                 value={form.name}
                 onChange={e => updateField('name', e.target.value)}
@@ -266,8 +275,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>약국 전화번호</label>
+              <label htmlFor={`${formId}-phone`} style={styles.formLabel}>약국 전화번호</label>
               <input
+                id={`${formId}-phone`}
                 style={styles.formInput}
                 value={form.phone}
                 onChange={e => updateField('phone', digitsOnly(e.target.value))}
@@ -276,8 +286,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>개설자 연락처</label>
+              <label htmlFor={`${formId}-ownerPhone`} style={styles.formLabel}>개설자 연락처</label>
               <input
+                id={`${formId}-ownerPhone`}
                 style={styles.formInput}
                 value={form.ownerPhone}
                 onChange={e => updateField('ownerPhone', digitsOnly(e.target.value))}
@@ -286,8 +297,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>대표자명</label>
+              <label htmlFor={`${formId}-ceoName`} style={styles.formLabel}>대표자명</label>
               <input
+                id={`${formId}-ceoName`}
                 style={styles.formInput}
                 value={form.ceoName}
                 onChange={e => updateField('ceoName', e.target.value)}
@@ -297,8 +309,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>담당자명</label>
+              <label htmlFor={`${formId}-contactName`} style={styles.formLabel}>담당자명</label>
               <input
+                id={`${formId}-contactName`}
                 style={styles.formInput}
                 value={form.contactName}
                 onChange={e => updateField('contactName', e.target.value)}
@@ -308,8 +321,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>사업자등록번호</label>
+              <label htmlFor={`${formId}-businessNumber`} style={styles.formLabel}>사업자등록번호</label>
               <input
+                id={`${formId}-businessNumber`}
                 style={{ ...styles.formInput, backgroundColor: colors.neutral100, cursor: 'not-allowed' }}
                 value={data.businessNumber || ''}
                 disabled
@@ -318,8 +332,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>세금계산서 이메일</label>
+              <label htmlFor={`${formId}-taxInvoiceEmail`} style={styles.formLabel}>세금계산서 이메일</label>
               <input
+                id={`${formId}-taxInvoiceEmail`}
                 style={styles.formInput}
                 value={form.taxInvoiceEmail}
                 onChange={e => updateField('taxInvoiceEmail', e.target.value)}
@@ -330,8 +345,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
             {/* WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1: 약국 대표 이메일 / 담당자 이메일 */}
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>약국 대표 이메일</label>
+              <label htmlFor={`${formId}-businessEmail`} style={styles.formLabel}>약국 대표 이메일</label>
               <input
+                id={`${formId}-businessEmail`}
                 style={styles.formInput}
                 value={form.businessEmail}
                 onChange={e => updateField('businessEmail', e.target.value)}
@@ -340,8 +356,9 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
               />
             </div>
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>담당자 이메일</label>
+              <label htmlFor={`${formId}-contactEmail`} style={styles.formLabel}>담당자 이메일</label>
               <input
+                id={`${formId}-contactEmail`}
                 style={styles.formInput}
                 value={form.contactEmail}
                 onChange={e => updateField('contactEmail', e.target.value)}
@@ -376,7 +393,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             <div style={styles.formDivider} />
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>약국 주소</label>
+              <div style={styles.formLabel}>약국 주소</div>
               <AddressSearch
                 zipCode={form.zipCode}
                 address={form.baseAddress}
@@ -415,38 +432,50 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
         ) : (
           /* ── View Mode ── */
           <div>
-            {[
-              ['약국명', data.name],
-              ['약국 전화번호', data.phone],
-              ['개설자 연락처', data.ownerPhone],
-              ['대표자명', data.ceoName],
-              ['담당자명', data.contactName],
-              ['사업자등록번호', data.businessNumber],
-              ['세금계산서 이메일', data.taxInvoiceEmail],
-              ['약국 대표 이메일', data.businessEmail],
-              ['담당자 이메일', data.contactEmail],
-              ['업태', data.businessType],
-              ['종목', data.businessItem],
-              ['사업자 유형', data.businessEntityType ? getBusinessEntityTypeLabel(data.businessEntityType) : null],
-              ['개업일', data.businessStartDate],
-              ...(data.addressDetail || data.address ? [
-                ...(data.addressDetail?.zipCode ? [['우편번호', data.addressDetail.zipCode]] : []),
-                ['기본주소', data.addressDetail?.baseAddress || data.address],
-                ...(data.addressDetail?.detailAddress ? [['상세주소', data.addressDetail.detailAddress]] : []),
-              ] : [['주소', null]]),
-            ].map(([label, value]) => (
-              <div key={label} style={styles.infoRow}>
-                <span style={styles.infoLabel}>{label}</span>
-                <span style={styles.infoValue}>
-                  {value || '-'}
-                  {label === '사업자등록번호' && value && <span style={styles.readOnlyBadge}>변경 불가</span>}
-                </span>
-              </div>
-            ))}
+            <PharmacyInfoRows data={data} styles={styles} />
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function PharmacyInfoRows({ data, styles }: Readonly<{
+  data: PharmacyBusinessInfoData;
+  styles: Record<string, CSSProperties>;
+}>) {
+  const rows = [
+    ['약국명', data.name],
+    ['약국 전화번호', data.phone],
+    ['개설자 연락처', data.ownerPhone],
+    ['대표자명', data.ceoName],
+    ['담당자명', data.contactName],
+    ['사업자등록번호', data.businessNumber],
+    ['세금계산서 이메일', data.taxInvoiceEmail],
+    ['약국 대표 이메일', data.businessEmail],
+    ['담당자 이메일', data.contactEmail],
+    ['업태', data.businessType],
+    ['종목', data.businessItem],
+    ['사업자 유형', data.businessEntityType ? getBusinessEntityTypeLabel(data.businessEntityType) : null],
+    ['개업일', data.businessStartDate],
+    ...(data.addressDetail || data.address ? [
+      ...(data.addressDetail?.zipCode ? [['우편번호', data.addressDetail.zipCode]] : []),
+      ['기본주소', data.addressDetail?.baseAddress || data.address],
+      ...(data.addressDetail?.detailAddress ? [['상세주소', data.addressDetail.detailAddress]] : []),
+    ] : [['주소', null]]),
+  ];
+  return (
+    <>
+      {rows.map(([label, value]) => (
+        <div key={label} style={styles.infoRow}>
+          <span style={styles.infoLabel}>{label}</span>
+          <span style={styles.infoValue}>
+            {value || '-'}
+            {label === '사업자등록번호' && value && <span style={styles.readOnlyBadge}>변경 불가</span>}
+          </span>
+        </div>
+      ))}
+    </>
   );
 }
 

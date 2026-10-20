@@ -88,3 +88,30 @@ describe('shared pharmacy information behavior through the Store adapter', () =>
     expect(api.get).toHaveBeenCalledTimes(1);
   });
 });
+
+
+describe('business email validation after commonization', () => {
+  it.each([
+    ['세금계산서 이메일', 'invoice@example.invalid', true],
+    ['약국 대표 이메일', 'business@example.invalid', true],
+    ['담당자 이메일', 'contact@example.invalid', true],
+    ['세금계산서 이메일', 'missing-at.invalid', false],
+    ['약국 대표 이메일', 'business@domain', false],
+    ['담당자 이메일', 'contact@white space.invalid', false],
+    ['세금계산서 이메일', 'contact@.invalid', false],
+    ['약국 대표 이메일', 'contact@domain.', false],
+    ['담당자 이메일', '@domain.invalid', false],
+    ['담당자 이메일', '', true],
+  ])('preserves %s acceptance for %s', async (label, email, valid) => {
+    api.get.mockResolvedValue({ name: '검증 약국', businessEntityType: 'individual' });
+    render(<PharmacyInfoPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '수정' }));
+    fireEvent.change(screen.getByLabelText(label, { exact: true }), { target: { value: email } });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    if (valid) await screen.findByText('약국 정보가 저장되었습니다.');
+    else {
+      await screen.findByText(/이메일 형식이 올바르지 않습니다/);
+      expect(api.update).not.toHaveBeenCalled();
+    }
+  });
+});
