@@ -7,6 +7,8 @@
 
 후속 통합 범위: 사용자가 개발 push 후 main 병합·운영 배포를 승인했다. 아래의 PR CI 미실행·운영 미반영은 최초 개발 인계 당시의 기록이다. 최신 main의 CarePharm 변경과 파일 충돌 없이 통합했으며, 후속 CI·리뷰·병합·실제 서빙 검증 결과는 이 branch의 병합 PR과 최종 운영 인계 보고에 기록한다. 이 문서의 개발 검증을 운영 완료 증거로 해석하지 않는다.
 
+통합 리뷰 보완: PR #731의 약국 서비스 소개 문구 P2를 반영해 서비스 탐색 정본 §1의 확정 소개와 정확히 맞췄다. API 응답·화면·브라우저 fixture에 같은 문구의 검증을 추가하고 API 7·UI 8·Chromium 6 tests 및 변경 파일 lint를 다시 통과했다. 운영 데이터·권한·설정 변경은 추가하지 않았다.
+
 ## 1. 조사와 범위
 
 기준 main `3f584bcab186dd8676e0a79f2563166b865b71f3`. 클라우드 격리 checkout을 유지하고 최신 main에서 새 전용 branch `wo/admin-subdomain-service-directory`를 생성했다. onboarding skill에 따라 추가 worktree는 만들지 않는다.

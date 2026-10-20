@@ -7,7 +7,7 @@ import PlatformServicesPage from '../pages/platform/account-governance/PlatformS
 vi.mock('../api/base', () => ({ api: { get: vi.fn() } }));
 const get = vi.mocked(api.get);
 const entries: PlatformDirectoryEntry[] = [
-  { id: 'pharmacy', name: 'O4O 약국 경영지원', description: '약국 지원', group: 'services', kind: '약국 협력사업', url: 'https://pharmacy.neture.co.kr', state: 'active' },
+  { id: 'pharmacy', name: 'O4O 약국 경영지원', description: 'O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스', group: 'services', kind: '약국 협력사업', url: 'https://pharmacy.neture.co.kr', state: 'active' },
   { id: 'carepharm', name: 'CarePharm · 만성질환관리', description: '사업 지원', group: 'services', kind: '약국 협력사업', url: 'https://carepharm.neture.co.kr', state: 'missing' },
   { id: 'pharmcoop', name: '약국·약사 협동조합', description: '협동조합 연합회', group: 'services', kind: '협동조합 연합회', url: 'https://pharmcoop.neture.co.kr', state: 'federation' },
   { id: 'store', name: '내 매장', description: '매장 업무', group: 'spaces', kind: '업무 공간', url: 'https://store.neture.co.kr', state: 'configured' },
@@ -31,6 +31,7 @@ describe('current service directory', () => {
   it('shows separate groups and current addresses with business-specific states', async () => {
     render(<PlatformServicesPage />);
     await screen.findByRole('heading', { name: 'O4O 약국 경영지원' });
+    expect(screen.getByText('O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /현재 서비스/ })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /대표·공통 업무 공간/ })).toBeInTheDocument();
     const care = screen.getByRole('heading', { name: /CarePharm/ }).closest('li')!;

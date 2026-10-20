@@ -29,7 +29,10 @@ it('uses current canonical domains and separates pharmacy from the pharmacist br
   const rows = res.body.data;
   expect(rows).toHaveLength(15);
   const byId = Object.fromEntries(rows.map((row: any) => [row.id, row]));
-  expect(byId.pharmacy).toMatchObject({ name: 'O4O 약국 경영지원', url: 'https://pharmacy.neture.co.kr', state: 'active' });
+  expect(byId.pharmacy).toMatchObject({
+    name: 'O4O 약국 경영지원', url: 'https://pharmacy.neture.co.kr', state: 'active',
+    description: 'O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스',
+  });
   expect(byId['kpa-branch']).toMatchObject({ name: '약사회 분회', url: 'https://kpa.neture.co.kr', state: 'configured' });
   expect(byId.carepharm).toMatchObject({ url: 'https://carepharm.neture.co.kr', state: 'missing' });
   expect(byId.megapharm.url).toBe('https://megapharm.neture.co.kr');

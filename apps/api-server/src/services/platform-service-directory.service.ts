@@ -37,7 +37,8 @@ export async function readPlatformServiceDirectory(db: Pick<DataSource, 'query'>
   const entries: PlatformDirectoryEntry[] = [
     catalog('kpa-society', {
       id: 'pharmacy', name: 'O4O 약국 경영지원', kind: '약국 협력사업',
-      description: '약국 경영지원 사업과 참여 약국을 위한 서비스',
+      // User-facing introduction fixed by O4O-HOME-SERVICE-DISCOVERY-V1 §1.
+      description: 'O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스',
     }),
     ...(['carepharm', 'megapharm'] as const).map(key => ({
       id: key, name: PHARMACY_COLLABORATORS[key].label,

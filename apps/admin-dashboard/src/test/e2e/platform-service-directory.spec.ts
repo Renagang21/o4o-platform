@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 const entries = [
-  { id: 'pharmacy', name: 'O4O 약국 경영지원', description: '약국 지원', group: 'services', kind: '약국 협력사업', url: 'https://pharmacy.neture.co.kr', state: 'active' },
+  { id: 'pharmacy', name: 'O4O 약국 경영지원', description: 'O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스', group: 'services', kind: '약국 협력사업', url: 'https://pharmacy.neture.co.kr', state: 'active' },
   { id: 'carepharm', name: 'CarePharm · 만성질환관리', description: '만성질환관리 협력사업', group: 'services', kind: '약국 협력사업', url: 'https://carepharm.neture.co.kr', state: 'missing' },
   { id: 'megapharm', name: 'MegaPharm · 창고형약국', description: '창고형 약국 협력사업', group: 'services', kind: '약국 협력사업', url: 'https://megapharm.neture.co.kr', state: 'closed' },
   { id: 'pharmcoop', name: '약국·약사 협동조합', description: '개별 조합은 서비스에서 관리', group: 'services', kind: '협동조합 연합회', url: 'https://pharmcoop.neture.co.kr', state: 'federation' },
@@ -54,6 +54,7 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       await expect(page.getByRole('heading', { name: '내 매장', exact: true })).toBeVisible();
       await page.reload();
       await expect(page.getByRole('heading', { name: 'O4O 약국 경영지원', exact: true })).toBeVisible();
+      await expect(page.getByText('O4O를 이용하는 약국 내에서의 업무를 지원하는 약국 개설자 서비스', { exact: true })).toBeVisible();
       await expect(page.getByRole('link', { name: /neture.co.kr\/services\/partner/ })).toHaveAttribute('href', 'https://neture.co.kr/services/partner');
       const main = page.locator('main');
       expect(await main.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
