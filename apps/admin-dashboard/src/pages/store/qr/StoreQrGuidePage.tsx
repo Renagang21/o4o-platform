@@ -27,7 +27,7 @@ import { QrCode, ExternalLink } from 'lucide-react';
 const STORE_QR_ENTRIES: { service: string; url: string; note: string }[] = [
   {
     service: 'KPA-Society',
-    url: 'https://kpa-society.co.kr/store/marketing/qr',
+    url: 'https://pharmacy.neture.co.kr/store/marketing/qr',
     note: '약국 매장 QR 관리',
   },
 ];

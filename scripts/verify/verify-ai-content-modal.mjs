@@ -18,7 +18,7 @@ import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-const BASE_URL = process.env.KPA_URL || 'https://kpa-society.co.kr';
+const BASE_URL = process.env.KPA_URL || 'https://pharmacy.neture.co.kr';
 const COURSE_EDIT_PATH = '/instructor/courses/77d530a0-1bb3-4e1b-be3f-691811c1c40e';
 const TEST_EMAIL = process.env.TEST_EMAIL;
 const TEST_PASSWORD = process.env.TEST_PASSWORD;

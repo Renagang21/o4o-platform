@@ -53,20 +53,25 @@ describe('옛 호스트 수용 (session-origin)', () => {
   it.each([
     ['https://pharmacy.neture.co.kr', 'kpa-society'],
     ['https://retail.neture.co.kr', 'k-cosmetics'],
-    // 인쇄 QR · 북마크로 들어온 옛 호스트 — 종전 판정 그대로
-    ['https://kpa-society.co.kr', 'kpa-society'],
-    ['https://k-cosmetics.site', 'k-cosmetics'],
   ])('%s → %s', (origin, key) => {
     expect(resolveSessionServiceKey(origin)).toBe(key);
   });
 
-  it('kpa-society.co.kr 은 kpa-branch 로 오판정되지 않는다 (호스트 루트는 KPA Society 앱)', () => {
-    expect(resolveSessionServiceKey('https://kpa-society.co.kr')).not.toBe('kpa-branch');
+  it('옛 호스트는 하나도 등록돼 있지 않다 — 새 호스트를 여기에 늘리지 않는다', () => {
+    const all = O4O_SERVICES.flatMap((s) => (s.legacyDomains ?? []).map((d) => `${s.key}:${d}`));
+    expect(all).toEqual([]);
   });
 
-  it('옛 호스트는 정확히 두 개만 등록돼 있다 — 새 호스트를 여기에 늘리지 않는다', () => {
-    const all = O4O_SERVICES.flatMap((s) => (s.legacyDomains ?? []).map((d) => `${s.key}:${d}`));
-    expect(all.sort()).toEqual(['k-cosmetics:k-cosmetics.site', 'kpa-society:kpa-society.co.kr']);
+  // 재등록 방지 guard — 은퇴 도메인(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1). 이 목록만 은퇴 도메인 문자열을 갖는다.
+  it.each([
+    'kpa-society.co.kr',
+    'k-cosmetics.site',
+    'glycopharm.co.kr',
+    'pharmacyhub.co.kr',
+    'siteguide.co.kr',
+    'glucoseview.co.kr',
+  ].flatMap((d) => [`https://${d}`, `https://www.${d}`]))('은퇴 도메인 %s 는 어떤 서비스 세션도 아니다', (origin) => {
+    expect(resolveSessionServiceKey(origin)).toBeNull();
   });
 });
 
@@ -79,7 +84,6 @@ describe('Pharmacy-Hub 신규 가입 비노출', () => {
   it('retired identity and origins are no longer registered', () => {
     expect(getService('pharmacy-hub')).toBeUndefined();
     expect(getServiceOrigin('pharmacy-hub')).toBeUndefined();
-    expect(resolveSessionServiceKey('https://pharmacyhub.co.kr')).not.toBe('pharmacy-hub');
   });
 
   it('kpa-society 는 여전히 가입 가능하다', () => {
@@ -110,13 +114,11 @@ describe('kpa-branch — canonical kpa.neture.co.kr (WO-O4O-KPA-BRANCH-SERVICE-C
     expect(resolveSessionServiceKey('https://kpa.neture.co.kr')).toBe('kpa-branch');
   });
 
-  it('옛 공용 경로 호스트 kpa-society.co.kr 는 kpa-branch 의 legacyDomains 가 아니다 (호스트 루트 = kpa-society)', () => {
+  it('kpa-branch 는 legacyDomains 가 없다', () => {
     expect(getService('kpa-branch')?.legacyDomains).toBeUndefined();
-    expect(resolveSessionServiceKey('https://kpa-society.co.kr')).toBe('kpa-society');
   });
 
   it('생성 경로에 옛 분회 경로가 나오지 않는다', () => {
-    expect(getServiceOrigin('kpa-branch')).not.toContain('kpa-society.co.kr');
     expect(new URL(getServiceOrigin('kpa-branch')).pathname).toBe('/');
   });
 

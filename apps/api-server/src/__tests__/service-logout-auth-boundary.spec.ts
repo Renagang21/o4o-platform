@@ -191,7 +191,7 @@ describe('1. 로그아웃된 서비스의 access token 으로는 handoff 를 발
 
     const res = mockRes();
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', staleToken),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', staleToken),
       res,
     );
 
@@ -223,7 +223,7 @@ describe('2. 발급 뒤 출발 서비스에서 로그아웃하면 그 handoff �
   it('A 에서 발급 → A 로그아웃 → TTL 안에 교환 → 401 SERVICE_SESSION_REVOKED', async () => {
     const liveToken = accessTokenFor('kpa-society');
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', liveToken),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', liveToken),
       mockRes(),
     );
     expect(handoffRows).toHaveLength(1);
@@ -239,7 +239,7 @@ describe('2. 발급 뒤 출발 서비스에서 로그아웃하면 그 handoff �
   it('출발 서비스가 살아 있으면 교환은 정상이다', async () => {
     const liveToken = accessTokenFor('kpa-society');
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', liveToken),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', liveToken),
       mockRes(),
     );
 
@@ -294,7 +294,7 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
 
     const res = mockRes();
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', legacyAccessToken()),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', legacyAccessToken()),
       res,
     );
 
@@ -305,7 +305,7 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
   it('5-1b 브라우저 ID가 없는 배포 전 토큰은 재로그인이 필요하다', async () => {
     const res = mockRes();
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', legacyAccessToken()),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', legacyAccessToken()),
       res,
     );
 
@@ -385,7 +385,7 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
     bumpDuringHandoffInsert = 'kpa-society';
 
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', aToken),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', aToken),
       mockRes(),
     );
 
@@ -412,7 +412,7 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
     expect(gen.statusCode).toBe(200);
 
     const ex = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://kpa-society.co.kr'), ex);
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://pharmacy.neture.co.kr'), ex);
     expect(ex.statusCode).toBe(200);
   });
 });
@@ -421,7 +421,7 @@ describe('4. handoff 원장이 출발 서비스 세대를 보관한다', () => {
   it('발급 시 source_session_epoch 를 기록한다', async () => {
     const liveToken = accessTokenFor('kpa-society');
     await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', liveToken),
+      mockReq({ targetServiceKey: 'neture' }, 'https://pharmacy.neture.co.kr', liveToken),
       mockRes(),
     );
     expect(handoffRows[0].source_session_epoch).toBe(0);

@@ -354,7 +354,7 @@ async function initKpaSignage() {
     console.log(`   🔗 Playlist Items: ${itemCount}개`);
     console.log('');
     console.log('🔍 확인 방법:');
-    console.log('   1. https://kpa-society.co.kr/signage 접속');
+    console.log('   1. https://pharmacy.neture.co.kr/signage 접속');
     console.log('   2. 플레이리스트 2개, 미디어 6개 노출 확인');
     console.log('   3. 상세 페이지 진입 확인');
     console.log('');

@@ -4,7 +4,7 @@
  * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§15
  *
  * 닫으려는 결함 (production 실측):
- *   pharmacyhub.co.kr `/instructor/courses/new` 의 `강의 생성` 이 항상 실패했다.
+ *   옛 PH 도메인 `/instructor/courses/new` 의 `강의 생성` 이 항상 실패했다.
  *   backend `CourseService.createCourse` 는 O4O Tag Policy V1 로 태그를 필수로 요구하는데,
  *   PH 는 공통 form shell 대신 제목·설명만 있는 자체 form 을 두어 태그를 보낼 수 없었다
  *   (`POST /lms/courses` 500 → 화면에 `태그를 1개 이상 입력해주세요`).
