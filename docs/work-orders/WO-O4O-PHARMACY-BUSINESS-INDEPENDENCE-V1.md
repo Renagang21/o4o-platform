@@ -98,11 +98,13 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
   - 기록물(`docs/checks` · `investigations` · `work-orders` · `ir` · `archive`)과 이미 SUPERSEDED 인 `O4O-IDENTITY-ARCHITECTURE-V1` — 과거 시점 기록이라 수정하지 않는다.
 - 추가 4개 도메인(D6 확장): K-Cosmetics catalog `legacyDomains` 제거(이제 catalog 에 옛 호스트 0), 코드 주석 · 테스트 fixture · README · 배포 workflow 주석. 재등록 방지 guard 는 `service-catalog.canonical-domain.test.ts` 한 목록에 6개 도메인을 모았다(그 밖에 web-neture 대표 홈 guard 2곳 유지). `O4O-IDENTITY-ARCHITECTURE-V1`(SUPERSEDED) 본문 삭제.
 - 남긴 것: `scripts/deployment/pharmacy-hub-*`(PH 인프라 퇴역 도구 — 대상 호스트 문자열이 동작 조건) · `pharmacyhub-qr-cutover.yml`, `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` 의 미실행 테스트 QR 4행 삭제 SQL, `HANDOFF.md` · `docs/handoffs` 인계 기록.
-- 운영 상태 (2026-10-20):
-  - DNS — 사용자 정리 완료.
-  - LB `o4o-global-lb` — 옛 약국 앱 도메인 host rule 2 · `path-matcher-kpa-society` · `api.kpa-society.co.kr` 제거 **적용 완료**(validate 통과 후 import). 나머지 5개 도메인 host rule 은 이미 없음. 적용 후 응답 확인은 미실행.
-  - 인증서 — 옛 약국 앱 도메인 3개가 공용 인증서 `cm-cert-neture-v4`(neture · www · admin · api 와 공유) SAN 에 있다. DNS 삭제로 자동 갱신(만료 2027-01-04) 검증이 실패할 수 있으므로 **neture 4개 도메인만의 새 인증서로 교체 → entry 4개 재지정 → 옛 도메인 entry 3개 · DNS authorization 3개 · v4 삭제** 가 필요하다. 사용자 승인 대기.
-  - 운영 DB `platform_services` 의 옛 분회 URL 값 — 사용자 승인 대기.
+- 운영 상태 (2026-10-20, 완료):
+  - DNS — 사용자 정리 완료(`retail` A 레코드 포함). `account` CNAME(ghs.googlehosted.com)은 용도 미상이라 사용자 판단으로 유지 — 이 GCP 프로젝트(App Engine · Cloud Run 도메인 매핑)와 저장소에는 연결이 없다.
+  - LB `o4o-global-lb` — 옛 약국 앱 도메인 host rule 2 · `path-matcher-kpa-society` · `api.kpa-society.co.kr` 제거(validate 통과 후 import). 나머지 5개 도메인 host rule 은 원래 없었다.
+  - 인증서 — 공용 `cm-cert-neture-v4`(옛 약국 앱 도메인 3개 SAN 포함)를 neture 4개 도메인만의 `cm-cert-neture-v5`(기존 DNS authorization 재사용, 만료 2027-01-18)로 교체 → entry 4개 재지정 · ACTIVE → 옛 도메인 entry 3개 · DNS authorization 3개 · v4 삭제. 남은 DNS authorization 은 neture 4개뿐, 은퇴 도메인 인증서 0.
+  - 검증 — neture · www · admin · api 가 v5 를 서빙(SAN 4개), 9개 호스트(neture · www · admin · api /health · pharmacy · megapharm · kpa · pharmcoop · store) HTTP 200.
+  - 운영 DB `platform_services.entry_url` — `kpa-society` → `https://pharmacy.neture.co.kr`, `kpa-branch` → `https://kpa.neture.co.kr`, `k-cosmetics`(퇴역) → NULL. 현재값 조건부 UPDATE 1건씩 · 단일 트랜잭션 · 사용자 승인 · 은퇴 도메인 잔여 0.
+  - 남은 것 — K-Cosmetics 잔여 정리(catalog `domain: retail.neture.co.kr` · `cosmetics:*` · 가입 데이터)는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 범위로 별도.
 
 ### 단계 6 — 명칭 잔재 (후순위)
 - Cloud Run 이름 `kpa-society-web` · 앱 디렉터리 `services/web-kpa-society` · 서비스 키 `kpa-society` 이름. 인프라 변경은 사용자 승인 후.
