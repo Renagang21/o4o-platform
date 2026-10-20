@@ -68,3 +68,12 @@
 - `WORKTREE_DISPOSITION`: `/workspace/o4o-wt/carepharm-store-workspace`, 다른 세션에 위임/공유하지 않음, 개발·로컬 검증 완료, **KEEP**(push 후 통합 인계·후속 수정 필요). 정확한 HEAD·원격 일치·미커밋/미추적 0은 최종 보고에서 확인한다.
 
 문서 정합: 현행 공간·가입·자료 소유 경계와 충돌 없음. QR의 실제 지원 범위를 조사해 이번 화면/WO 안내를 보완했다. 과거 WO 재작성·정본 색인 변경·SUPERSEDED 표기 없음.
+
+## 2026-10-20 main 통합·배포 단계
+
+- 사용자 **“main으로 병합 → 배포”** 지시에 따라 이 공간에서 통합을 수행한다. 위의 PR 미생성·미병합·미배포와 KEEP 표기는 개발 인계 시점의 기록이다.
+- 최신 main `3f584bcab1`을 같은 branch의 merge commit `563fc190b7`로 반영했다. 충돌 없음. 기존 Store 운영·상담·진열 메뉴 개편을 보존하며 CarePharm 변경은 원래의 7개 파일이다.
+- 통합 재검증: Store 전체 **60 파일 / 723 PASS**, Neture CarePharm 관련 **5 파일 / 58 PASS**, 실제 격리 PostgreSQL 및 issuer→client→exchange 계약 **2 suite / 32 PASS**, Store·Neture production build와 API type-check PASS. 새 migration·의존성·배포 설정 변경 없음.
+- 실제 main ruleset의 PR 필수·required `CI Gate`·필수 human approval 0을 확인했다. 기존 PR이 없으므로 하나의 PR을 생성해 정확한 HEAD의 CI·보안 검사·Codex 리뷰와 미해결 사항을 확인한 뒤 병합한다.
+- 배포는 현행 Delivery/Promote 경로로 수행한다. freeze·CI·정확한 SHA·기존 호스트/가입 권한 gate를 유지한다. 운영 사업 개통·승인·자료 게시·권한 부여를 대신 실행하지 않는다.
+- 최종 PR·HEAD·병합 SHA·post-merge CI·배포 run·실제 운영 확인·정리 결과는 해당 PR의 최종 기록과 사용자 보고에 남긴다. 확인 전 성공을 선언하지 않는다.
