@@ -1,7 +1,15 @@
 import { Repository, type EntityManager } from 'typeorm';
+import { isSelectableBusinessEntityType } from '@o4o/types';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierStatus, ContactVisibility } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+
+export class SupplierProfileEntityTypeInvalidError extends Error {
+  constructor() {
+    super('SUPPLIER_PROFILE_ENTITY_TYPE_INVALID');
+    this.name = 'SupplierProfileEntityTypeInvalidError';
+  }
+}
 
 export class SupplierProfileNameInvalidError extends Error {
   constructor() {
@@ -192,6 +200,10 @@ export class NetureSupplierBusinessService {
         if (!supplier.organizationId) {
           throw new SupplierProfileFieldUnsupportedError(['name']);
         }
+      }
+
+      if (data.businessEntityType !== undefined && !isSelectableBusinessEntityType(data.businessEntityType)) {
+        throw new SupplierProfileEntityTypeInvalidError();
       }
 
       // Existing contact fields

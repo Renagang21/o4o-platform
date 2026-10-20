@@ -87,6 +87,22 @@ const bizWrite = (calls: Call[]) => {
 beforeEach(() => jest.clearAllMocks());
 
 describe('PATCH /auth/me/profile — businessInfo 부분 갱신', () => {
+  it.each(['individual', 'corporation'])('accepts an explicit %s classification', async (businessEntityType) => {
+    const { calls, res } = await runController({ activityType: 'pharmacy_employee', businessInfo: { businessEntityType } });
+    expect(bizWrite(calls)!.payloads).toEqual([{ businessEntityType }]);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other', '', null, 42, {}])(
+    'rejects business classification %p before starting a transaction', async (businessEntityType) => {
+      const { calls, res } = await runController({ activityType: 'pharmacy_employee', businessInfo: { businessEntityType } });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockTransaction).not.toHaveBeenCalled();
+      expect(calls).toEqual([]);
+    },
+  );
+
   it('W-1 회귀: 병합용 사전 SELECT 가 사라지고 부분 갱신 표현식으로 나간다', async () => {
     const { calls } = await runController({
       activityType: 'pharmacy_employee',

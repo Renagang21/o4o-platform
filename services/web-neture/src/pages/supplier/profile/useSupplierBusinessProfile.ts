@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { isSelectableBusinessEntityType } from '@o4o/types';
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../../lib/api';
 
 export function useSupplierBusinessProfile() {
@@ -88,6 +89,11 @@ export function useSupplierBusinessProfile() {
     if (!name.trim() || name.trim().length > 255) {
       setSaved(false);
       setError('상호명을 1~255자로 입력해 주세요.');
+      return;
+    }
+    if (!isSelectableBusinessEntityType(businessEntityType)) {
+      setSaved(false);
+      setError('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
       return;
     }
     setSaving(true);

@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AddressSearch } from '@o4o/ui';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
-import { getBusinessEntityTypeLabel } from '@o4o/types';
+import { getBusinessEntityTypeLabel, isSelectableBusinessEntityType } from '@o4o/types';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import {
   getPharmacyInfo,
@@ -113,6 +113,9 @@ export function PharmacyInfoPage() {
 
   const validate = (): string[] => {
     const errs: string[] = [];
+    if (!isSelectableBusinessEntityType(form.businessEntityType)) {
+      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+    }
     if (!form.name.trim() || form.name.trim().length < 2) {
       errs.push('약국명은 2자 이상 입력해 주세요.');
     }
