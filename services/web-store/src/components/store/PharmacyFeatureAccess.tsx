@@ -5,7 +5,10 @@ import { coreApiClient } from "../../api/client";
 export type PharmacyFeature =
   | "tablet"
   | "multilingual-content"
-  | "store-staff-support";
+  | "store-staff-support"
+  | "multilingual-consultation"
+  | "multilingual-staff-response"
+  | "multilingual-pharmacist-consultation";
 export type FeatureAccess = {
   organizationId: string;
   features: Array<{ key: PharmacyFeature; allowed: boolean | null }>;
@@ -32,14 +35,20 @@ export function filterPharmacyFeatureMenu(
     menuSections: config.menuSections?.map((section) => ({
       ...section,
       items: section.items.filter((item) => {
-        const feature = pharmacyFeatureForPath(item.subPath);
+        const features = pharmacyFeaturesForPath(item.subPath);
         return (
-          !feature ||
-          access?.features.some((f) => f.key === feature && f.allowed === true)
+          !features.length ||
+          access?.features.some((f) => features.includes(f.key) && f.allowed === true)
         );
       }),
     })),
   };
+}
+
+export function pharmacyFeaturesForPath(path: string): PharmacyFeature[] {
+  if (/\/multilingual-consultation(?:\/|$)/.test(path)) return ['multilingual-consultation', 'multilingual-staff-response', 'multilingual-pharmacist-consultation'];
+  const feature = pharmacyFeatureForPath(path);
+  return feature ? [feature] : [];
 }
 
 function validFeatureResponse(
@@ -65,6 +74,7 @@ export function usePharmacyFeatureAccess(
   organizationId: string | null,
   enabled: boolean,
   path: string,
+  accountId = '',
 ) {
   const [retry, setRetry] = useState(0);
   const [result, setResult] = useState<{
@@ -72,7 +82,7 @@ export function usePharmacyFeatureAccess(
     data?: FeatureAccess;
     error?: boolean;
   } | null>(null);
-  const scope = `${organizationId}:${path}:${retry}`;
+  const scope = `${accountId}:${organizationId}:${path}:${retry}`;
   useEffect(() => {
     if (!enabled || !organizationId) return;
     let cancelled = false;
@@ -122,8 +132,8 @@ export function PharmacyFeatureNotice({
       <h2 className="font-semibold">{title}</h2>
       {denied && (
         <p className="mt-2">
-          경영자 유료회원 자격 또는 가입한 약국 협력사업의 제공 기능을 확인해
-          주세요.
+          약국의 기본·유료·협력사업 제공 기능과 My Home에서 경영자가 허용한
+          근무자 이용 범위를 확인해 주세요.
         </p>
       )}
       {(error || denied) && (

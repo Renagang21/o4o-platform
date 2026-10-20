@@ -34,7 +34,10 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
     { label: '참여 안내', href: '/my/participation' },
   ];
   if (profile === 'community') return [
-    { label: '커뮤니티', href: '/' },
+    { label: '포럼', href: '/communities/community/forum' },
+    { label: '콘텐츠', href: '/communities/community/content' },
+    { label: '자료실', href: '/communities/community/resources' },
+    { label: '공지사항', href: '/communities/community/notices' },
   ];
   if (profile === 'funding') return [
     { label: '유통참여형 펀딩', href: '/market-trial' },

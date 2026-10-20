@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /** Keep transport failures distinct from an empty store resource; ignore superseded responses. */
-export function useStoreResource<T>(load: () => Promise<T>, initial: T) {
+export function useStoreResource<T>(load: () => Promise<T>, initial: T, enabled = true) {
+  const empty = useRef(initial);
   const [data, setData] = useState(initial);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const revision = useRef(0);
   const reload = useCallback(async () => {
+    if (!enabled) return;
     const current = ++revision.current;
     setLoading(true); setError(null);
     try {
@@ -17,8 +19,12 @@ export function useStoreResource<T>(load: () => Promise<T>, initial: T) {
     } finally {
       if (current === revision.current) setLoading(false);
     }
-  }, [load]);
+  }, [load, enabled]);
   const cancel = useCallback(() => { revision.current++; }, []);
-  useEffect(() => { void reload(); return cancel; }, [reload, cancel]);
-  return { data, setData, loading, error, reload };
+  useEffect(() => {
+    if (enabled) void reload();
+    else { cancel(); setData(empty.current); setLoading(false); setError(null); }
+    return cancel;
+  }, [enabled, reload, cancel]);
+  return { data: enabled ? data : empty.current, setData, loading: enabled && loading, error: enabled ? error : null, reload };
 }

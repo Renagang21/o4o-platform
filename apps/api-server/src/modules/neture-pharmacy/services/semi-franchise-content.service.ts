@@ -1,3 +1,5 @@
+import { resolveSupplierForUser } from '../../neture/middleware/supplier-context.resolver.js';
+import { recordOperation } from '../../../services/operations/operation-audit.js';
 /**
  * 세미프랜차이즈 콘텐츠 자료함 — DESIGN §6 · §15 (WO TODO 3-3)
  *
@@ -138,7 +140,19 @@ export class SemiFranchiseContentService {
     const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
     if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
       throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
-    const rows = rowsOf(await this.dataSource.query(
+    return this.dataSource.transaction(async manager => {
+      const [current] = await manager.query(`SELECT c.title, c.status, c.created_by, c.source_supplier_id,
+        ns.organization_id FROM semi_franchise_contents c LEFT JOIN neture_suppliers ns ON ns.id=c.source_supplier_id
+        WHERE c.id=$1 AND c.semi_franchise_id=$2 FOR UPDATE OF c`, [id, sf.id]);
+      if (!current) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+      if (!from.includes(current.status) || (action === 'publish' && current.status === 'archived' && current.source_supplier_id))
+        throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+      if (action === 'publish' && current.source_supplier_id) {
+        const supplier = current.created_by === userId ? null : await resolveSupplierForUser(this.dataSource, userId, current.organization_id);
+        if (current.created_by === userId || (supplier?.kind === 'resolved' && supplier.supplierId === current.source_supplier_id))
+          throw new NeturePharmacyError(403, 'SELF_APPROVAL_FORBIDDEN', '본인 또는 공급 업무를 담당하는 공급자의 자료는 승인할 수 없습니다.');
+      }
+      const rows = rowsOf(await manager.query(
       `UPDATE semi_franchise_contents
           SET status = $3::text, updated_by = $4, updated_at = NOW(),
               review_reason = $6,
@@ -149,7 +163,12 @@ export class SemiFranchiseContentService {
       [id, sf.id, to, userId, from, action === 'reject' ? reason!.trim().slice(0, 1000) : null],
     ));
     if (!rows[0]) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+    await recordOperation(manager, 'neture', userId, 'business.content.status', {
+      businessId: sf.id, businessKey: sf.key, itemId: `content:${id}`, title: current.title, before: current.status, after: to,
+      reason: action === 'reject' ? reason!.trim().slice(0, 1000) : null,
+    });
     return rows[0];
+    });
   }
 
   // ─── 약국 ──────────────────────────────────────────────────────────────

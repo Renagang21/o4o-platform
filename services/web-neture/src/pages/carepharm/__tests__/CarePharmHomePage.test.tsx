@@ -19,6 +19,7 @@ beforeEach(() => {
   state.get.mockReset(); state.post.mockReset(); state.login.mockReset(); state.authenticated = true; state.account = 'owner'; membership = null;
   access = { kind: 'semi-franchise', businessKey: 'carepharm', allowed: false, canManage: false };
   state.get.mockImplementation(async (path: string) => {
+    if (path.endsWith('/showcase')) return response({ businessKey:'carepharm',items:[] });
     if (path.endsWith('/businesses/carepharm/store-access')) return response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: access.allowed, membershipStatus: access.allowed ? 'active' : membership });
     if (path.endsWith('/businesses/carepharm')) return response(business);
     if (path === '/communities/business%3Acarepharm/access') return response(access);

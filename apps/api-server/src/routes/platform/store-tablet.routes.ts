@@ -323,7 +323,7 @@ export function createStoreTabletRoutes(
         const injected = await options.resolveOrganizationId(req, res);
         // null = 해석기가 이미 응답을 보냈다(미연결·모호 등). 핸들러를 실행하지 않는다.
         if (!injected || res.headersSent) return;
-        if (!await checkPharmacyFeature(dataSource, res, injected, 'tablet')) return;
+        if (!await checkPharmacyFeature(dataSource, res, injected, 'tablet', req.user?.id)) return;
         await handler(req, res, injected);
         return;
       }
@@ -344,7 +344,7 @@ export function createStoreTabletRoutes(
       if (res.headersSent) return;
 
       const organizationId = req.organizationId!;
-      if (!await checkPharmacyFeature(dataSource, res, organizationId, 'tablet')) return;
+      if (!await checkPharmacyFeature(dataSource, res, organizationId, 'tablet', req.user?.id)) return;
       await handler(req, res, organizationId);
     };
   }

@@ -51,12 +51,18 @@ it('requires authentication and the platform administrator role for catalog and 
 });
 
 it('uses only the guard-resolved store and never accepts paid status or a different store from the caller', async () => {
-  query.mockResolvedValueOnce([{ key: 'a', name: 'A', features: ['tablet'] }])
-    .mockResolvedValueOnce([{ ownerUserId: 'verified-owner' }]).mockResolvedValueOnce([]);
+  query.mockImplementation(async (sql: string) => {
+    if (sql.includes('FROM semi_franchises sf')) return [{ key: 'a', name: 'A', features: ['tablet'] }];
+    if (sql.includes('AS "ownerUserId"')) return [{ ownerUserId: 'verified-owner' }];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'staff', configured: false }];
+    if (sql.includes('FROM settings WHERE key') || sql.includes('FROM member_paid_service_entitlements')) return [];
+    throw new Error('Unexpected feature fixture query');
+  });
   const result = await request(app()).get('/api/v1/neture/pharmacy/service-features?organizationId=foreign&isPaid=true')
     .set('x-test-actor', 'invited-free-staff');
   expect(result.status).toBe(200);
-  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'connected', features: [{ allowed: true }, { allowed: false }, { allowed: false }] });
+  expect(result.body.data).toMatchObject({ organizationId: 'authorized-store', memberEntitlement: 'connected' });
+  expect(result.body.data.features.filter((feature: { allowed: boolean }) => feature.allowed).map((feature: { key: string }) => feature.key)).toEqual(['tablet']);
   expect(query.mock.calls[0][1]).toEqual(['authorized-store']);
   query.mockClear();
   expect((await request(app()).get('/api/v1/neture/pharmacy/service-features').set('x-test-actor', 'uninvited')).status).toBe(403);
@@ -91,6 +97,7 @@ it('requires the configured staff-support feature and preserves owner-only locat
   query.mockImplementation(async (sql: string) => {
     if (sql.includes('FROM semi_franchises sf')) return enabled ? [{key:'megapharm',name:'메가팜',features:['store-staff-support']}] : [];
     if (sql.includes('AS "ownerUserId"')) return [{ownerUserId:'store-owner'}];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'staff', configured: false }];
     if (sql.includes('WITH products')) return [{id:'product',kind:'local',name:'합성 상품',location:'A-3'}];
     return [];
   });
@@ -106,4 +113,26 @@ it('requires the configured staff-support feature and preserves owner-only locat
   expect(writes).toHaveLength(1);
   expect(writes[0][1]).toEqual(['authorized-store','not-found']);
   expect((await request(server).get('/api/v1/neture/admin/staff-support/demands?month=2030-01').set('x-test-actor','business-operator')).status).toBe(403);
+});
+
+it('exposes federation roles only to authenticated platform administrators without querying individual cooperatives', async () => {
+  const server = app();
+  const path = '/api/v1/neture/admin/cooperative-federation';
+  expect((await request(server).get(path)).status).toBe(401);
+  for (const actor of ['business-operator', 'neture-admin', 'cooperative-operator', 'invited-free-staff']) {
+    expect((await request(server).get(path).set('x-test-actor', actor)).status).toBe(403);
+  }
+  expect(query).not.toHaveBeenCalled();
+  query.mockResolvedValueOnce([
+    { userId: 'synthetic-operator', role: 'neture:pharmcoop_admin', name: null, email: null, account_status: 'suspended', account_active: true, email_verified: true, membership_status: 'active' },
+  ]);
+  const result = await request(server).get(path).set('x-test-actor', 'platform-admin');
+  expect(result.status).toBe(200);
+  expect(result.headers['cache-control']).toBe('private, no-store');
+  expect(result.body.data).toEqual({ roleOperators: [
+    { userId: 'synthetic-operator', role: 'neture:pharmcoop_admin', name: null, email: null, membershipStatus: 'suspended' },
+  ] });
+  expect(query).toHaveBeenCalledTimes(1);
+  expect(query.mock.calls[0][0].trimStart()).toMatch(/^SELECT/);
+  expect(query.mock.calls[0][0]).not.toMatch(/cooperatives|cooperative_memberships|semi_franchises/);
 });

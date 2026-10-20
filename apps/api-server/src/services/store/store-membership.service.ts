@@ -1,4 +1,6 @@
 import { findActiveStoreMemberCandidates, resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
+import { createPharmacyFeatureService } from '../../modules/neture-pharmacy/services/member-paid-features.js';
+import { readStaffFeatures, saveStaffFeatures } from '../../modules/neture-pharmacy/services/staff-feature-permissions.js';
 /**
  * Store Membership — 사업자가 허가한 사용자(Store Member)의 **단일 정본**
  *
@@ -120,6 +122,8 @@ export interface StoreMemberRow {
   role: string;
   status: 'invited' | 'accepted' | 'active';
   joinedAt: string;
+  serviceFeatures: unknown;
+  pharmacistConfirmed: boolean;
 }
 
 export class StoreMemberError extends Error {
@@ -236,9 +240,11 @@ export async function listStoreMembers(
   preferredOrganizationId?: string | null,
 ): Promise<{ organizationId: string; members: StoreMemberRow[] }> {
   const organizationId = await requireOwnedOrganization(dataSource, ownerUserId, serviceKey, preferredOrganizationId);
-  const rows: Array<{ user_id: string; email: string; name: string | null; role: string; joined_at: Date }> =
+  const rows: Array<{ user_id: string; email: string; name: string | null; role: string; joined_at: Date; features?: unknown; configured?: boolean; pharmacist_confirmed?: boolean }> =
     await dataSource.query(
-      `SELECT om.user_id, u.email, u.name, om.role, om.joined_at
+      `SELECT om.user_id, u.email, u.name, om.role, om.joined_at, om.metadata->'pharmacyServiceFeatures' AS features,
+              om.metadata ? 'pharmacyServiceFeatures' AS configured,
+              om.metadata->'pharmacyPharmacistConfirmed'='true'::jsonb AS pharmacist_confirmed
          FROM organization_members om
          JOIN users u ON u.id = om.user_id
         WHERE om.organization_id = $1 AND om.left_at IS NULL
@@ -254,6 +260,8 @@ export async function listStoreMembers(
       role: r.role,
       status: r.role === STORE_INVITED_ROLE ? 'invited' : r.role === STORE_ACCEPTED_ROLE ? 'accepted' : 'active',
       joinedAt: new Date(r.joined_at).toISOString(),
+      serviceFeatures: r.role === STORE_STAFF_ROLE || r.configured === true ? readStaffFeatures(r.features, r.configured === true) : null,
+      pharmacistConfirmed: r.pharmacist_confirmed === true,
     })),
   };
 }
@@ -300,7 +308,8 @@ export async function inviteStoreMember(
       `INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
        VALUES ($1, $2, $3, false, now(), now(), now())
        ON CONFLICT (organization_id, user_id) DO UPDATE
-         SET role = EXCLUDED.role, left_at = NULL, joined_at = now(), updated_at = now()`,
+         SET role = EXCLUDED.role, left_at = NULL, joined_at = now(), updated_at = now(),
+             metadata = COALESCE(organization_members.metadata,'{}'::jsonb) - 'pharmacyServiceFeatures' - 'pharmacyPharmacistConfirmed'`,
       [organizationId, user.id, STORE_INVITED_ROLE],
     );
     return { organizationId, userId: user.id, role: STORE_INVITED_ROLE };
@@ -382,7 +391,7 @@ export async function approveStoreMember(dataSource: DataSource, input: Paramete
 
 async function approveStoreMemberUnlocked(
   manager: EntityManager,
-  input: { ownerUserId: string; targetUserId: string; serviceKey?: StoreOwnerServiceKey; preferredOrganizationId?: string | null },
+  input: { ownerUserId: string; targetUserId: string; serviceKey?: StoreOwnerServiceKey; preferredOrganizationId?: string | null; serviceFeatures?: unknown; pharmacistConfirmed?: unknown },
   organizationId: string,
 ): Promise<{ organizationId: string; userId: string; role: string }> {
   if (input.serviceKey && input.serviceKey !== 'kpa') fail('STORE_NOT_RESOLVED', 403);
@@ -394,6 +403,15 @@ async function approveStoreMemberUnlocked(
     [organizationId, input.targetUserId, STORE_ACCEPTED_ROLE],
   );
   if (!pending) fail('INVITATION_NOT_FOUND', 404);
+  if (input.pharmacistConfirmed === true) {
+    const owners = await manager.query(`SELECT 1 FROM organization_members WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $3`,
+      [organizationId, input.ownerUserId, 'owner']);
+    if (!owners.length) fail('STORE_OWNER_REQUIRED', 403);
+  }
+  const access = await createPharmacyFeatureService(manager).resolveStore(organizationId);
+  const available = access.features.filter(feature => feature.allowed === true).map(feature => feature.key);
+  const defaultFeatures = access.features.filter(feature => feature.allowed === true && !('requiresProfessional' in feature && feature.requiresProfessional)).map(feature => feature.key);
+  await saveStaffFeatures(manager, organizationId, input.targetUserId, input.serviceFeatures === undefined ? defaultFeatures : input.serviceFeatures, available, true, input.pharmacistConfirmed);
   const linked = await linkedServiceKeys(manager, organizationId);
   const services: StoreOwnerServiceKey[] = ['kpa', ...linked.filter(key => key === 'cafe24-b2b')];
   for (const key of services) await roleAssignmentService.assignRole({ userId: input.targetUserId, role: STORE_MEMBER_ROLE_BY_SERVICE[key], assignedBy: input.ownerUserId }, manager);

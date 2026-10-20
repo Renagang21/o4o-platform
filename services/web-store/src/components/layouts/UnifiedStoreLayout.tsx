@@ -1,4 +1,4 @@
-import { usePharmacyFeatureAccess, pharmacyFeatureForPath, filterPharmacyFeatureMenu, PharmacyFeatureNotice } from '../store/PharmacyFeatureAccess';
+import { usePharmacyFeatureAccess, pharmacyFeaturesForPath, filterPharmacyFeatureMenu, PharmacyFeatureNotice } from '../store/PharmacyFeatureAccess';
 /**
  * UnifiedStoreLayout — 내 매장(/store) 공통 골격. WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-3
  *
@@ -72,13 +72,13 @@ export function StoreWorkDashboard({ config, withCapabilities = false, workspace
   const { organizationName, stores, organizationId, services } = useUnifiedStore();
   const location = useLocation();
   const pharmacy = services.some(service => service.serviceKey === 'kpa-society');
-  const featureAccess = usePharmacyFeatureAccess(organizationId, pharmacy, location.pathname);
-  const requestedFeature = pharmacy ? pharmacyFeatureForPath(location.pathname) : null;
-  const featureDecision = featureAccess.data?.features.find(f => f.key === requestedFeature);
-  const featureAllowed = requestedFeature && featureDecision?.allowed === true;
-  const featureUnavailable = featureAccess.error || (!!featureAccess.data && featureDecision?.allowed == null);
-  const featurePending = requestedFeature && !featureAllowed;
-  const featureNotice = featurePending ? <PharmacyFeatureNotice error={featureUnavailable} denied={featureDecision?.allowed === false} reload={featureAccess.reload} /> : null;
+  const featureAccess = usePharmacyFeatureAccess(organizationId, pharmacy, location.pathname, user?.id);
+  const requestedFeatures = pharmacy ? pharmacyFeaturesForPath(location.pathname) : [];
+  const featureAllowed = requestedFeatures.some(key => featureAccess.data?.features.some(feature => feature.key === key && feature.allowed === true));
+  const featureDenied = !!featureAccess.data && requestedFeatures.every(key => featureAccess.data?.features.some(feature => feature.key === key && feature.allowed === false));
+  const featureUnavailable = featureAccess.error || (!!featureAccess.data && !featureAllowed && !featureDenied);
+  const featurePending = requestedFeatures.length > 0 && !featureAllowed;
+  const featureNotice = featurePending ? <PharmacyFeatureNotice error={featureUnavailable} denied={featureDenied} reload={featureAccess.reload} /> : null;
   const isStaff = stores.some(store => store.organizationId === organizationId && store.memberRole === 'staff');
   const visibleConfig = isStaff ? { ...config, menuSections: config.menuSections?.map(section => ({ ...section, items: section.items.filter(item => item.key !== 'members') })) } : config;
   const navigate = useNavigate();

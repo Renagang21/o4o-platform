@@ -23,6 +23,7 @@
  */
 import { Router, type Request, type Response, type RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
+import { NeturePharmacyError } from '../../modules/neture-pharmacy/constants.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
@@ -55,6 +56,10 @@ function readServiceKey(req: Request): StoreOwnerServiceKey | undefined {
 const sessionUserId = (req: Request): string => ((req as AuthRequest).user?.id as string) ?? '';
 
 function sendError(res: Response, error: unknown): void {
+  if (error instanceof NeturePharmacyError) {
+    res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
+    return;
+  }
   if (error instanceof StoreMemberError || error instanceof StoreEnrollmentError) {
     res.status(error.status).json({ success: false, error: error.message, code: error.code });
     return;
@@ -64,6 +69,7 @@ function sendError(res: Response, error: unknown): void {
 
 export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth: RequestHandler): Router {
   const router = Router();
+  router.use((_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
   // Reject retired scopes before readServiceKey can fall back to an unscoped request.
   router.use((req, res, next) => {
     if (req.query.serviceKey === 'pharmacy-hub' || req.body?.serviceKey === 'pharmacy-hub') {
@@ -165,6 +171,8 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
     try {
       const data = await approveStoreMember(dataSource, {
         ownerUserId: sessionUserId(req), targetUserId: req.params.userId,
+        serviceFeatures: req.body?.serviceFeatures,
+        pharmacistConfirmed: req.body?.pharmacistConfirmed,
         serviceKey: readServiceKey(req), preferredOrganizationId: readPreferredStoreOrganizationId(req),
       });
       res.json({ success: true, data });

@@ -1,3 +1,4 @@
+import { BusinessHomeShowcaseManager } from './BusinessHomeShowcaseManager';
 import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
 /**
  * OperatorSemiFranchisePage — 담당 약국 협력사업 (/operator/semi-franchises)
@@ -104,6 +105,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
         </select>
       </PageHeader>
 
+      <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.filter(t => !tabs || tabs.includes(t.key)).map((t) => (

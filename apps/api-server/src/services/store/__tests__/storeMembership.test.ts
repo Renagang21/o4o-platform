@@ -33,6 +33,9 @@ const linkedMock = jest.fn();
 const hasAnyRoleMock = jest.fn();
 const assignRoleMock = jest.fn();
 const removeRoleMock = jest.fn();
+jest.mock('../../../modules/neture-pharmacy/services/member-paid-features.js', () => ({
+  createPharmacyFeatureService: () => ({ resolveStore: async () => ({ features: [{ key: 'tablet', allowed: true }] }) }),
+}));
 jest.mock('../../../utils/store-owner.utils.js', () => ({
   isStoreOwner: (...args: unknown[]) => ownerMock(...args),
 }));
@@ -124,6 +127,12 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
       if (hit) Object.assign(hit, { role, left_at: null });
       else members.push({ organization_id, user_id, role, left_at: null });
       return [];
+    }
+    if (s.startsWith('UPDATE organization_members SET metadata')) {
+      const hit = members.find(m => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null && m.role === p[3]);
+      if (!hit) return [[], 0];
+      hit.metadata = { ...hit.metadata, pharmacyServiceFeatures: JSON.parse(p[2]) };
+      return [[{ user_id: p[1] }], 1];
     }
     if (s.startsWith('UPDATE organization_members SET role =')) {
       const [organization_id, user_id, nextRole, fromRole] = p;
@@ -437,6 +446,7 @@ describe('M7 Role ∧ Relationship', () => {
     expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
     await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceKey: 'kpa', preferredOrganizationId: ORG_A });
     expect(members[0].role).toBe(STORE_STAFF_ROLE);
+    expect(members[0].metadata.pharmacyServiceFeatures).toEqual(['tablet']);
     expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member', assignedBy: OWNER }), expect.objectContaining({ query: expect.any(Function) }));
   });
 
@@ -462,8 +472,30 @@ describe('M7 Role ∧ Relationship', () => {
     const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_ACCEPTED_ROLE, left_at: null }] });
     await expect(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF })).rejects.toThrow('temporary failure');
     expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
+    expect(members[0].metadata).toBeUndefined();
     await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF });
     expect(members[0].role).toBe(STORE_STAFF_ROLE);
+  });
+
+  it('최종 승인 시 명시적으로 빈 기능 목록을 저장하고 매장 미제공 기능은 거절한다', async () => {
+    asOwnerOf(ORG_A);
+    const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_ACCEPTED_ROLE, left_at: null }] });
+    await expect(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceFeatures: ['store-staff-support'] }))
+      .rejects.toMatchObject({ code: 'FEATURE_NOT_AVAILABLE' });
+    expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+    await expect(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceFeatures: null }))
+      .rejects.toMatchObject({ code: 'INVALID_SERVICE_FEATURES' });
+    await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceFeatures: [] });
+    expect(members[0].metadata.pharmacyServiceFeatures).toEqual([]);
+    expect(members[0].role).toBe(STORE_STAFF_ROLE);
+  });
+  it('약사 사용 확인을 남기려면 실제 경영자 관계가 있어야 한다', async () => {
+    asOwnerOf(ORG_A);
+    const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_ACCEPTED_ROLE, left_at: null }] });
+    await expectCode(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceFeatures: ['tablet'], pharmacistConfirmed: true }), 'STORE_OWNER_REQUIRED');
+    expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
   });
 
   it('직원 거절은 자기 초대만 취소하며 승인된 관계는 바꾸지 않는다', async () => {

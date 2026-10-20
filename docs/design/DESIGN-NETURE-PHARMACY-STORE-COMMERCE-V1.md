@@ -503,7 +503,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 - **회원 유료 원장**: `member_paid_service_entitlements`는 회원당 1행으로 `active`, 선택 만료일 `ends_at`, 최종 수정 관리자·시각만 관리한다. Core User·서비스 가입/역할·기존 매장 구독 원장을 바꾸지 않는다. 전체 관리자가 정확한 이메일로 회원 조회 후 활성·해제한다. 실제 결제 수납·자동 유료 전환은 포함하지 않는다. 만료는 `ends_at > NOW()`일 때만 유효하며 NULL은 기한 없음이다.
 - **회원 관리 API**: `GET /api/v1/neture/admin/member-paid-entitlements?email=...`, `PUT /api/v1/neture/admin/member-paid-entitlements/:userId`(`active:boolean`, `endsAt:ISO timestamp|null`). 기존 platform super admin guard를 적용한다. 클라이언트는 기존 API base(`/api/v1`)를 재사용한다.
-- **공통 판정**: 접근 guard가 확정한 약국의 현재 경영자 관계를 읽고 그 회원의 유료 원장을 조회한다. 정상 활성 회원의 활성 유료 자격은 현재 카탈로그 두 기능을 제공한다. 협력사업 제공 기능과 합산한다. 직원 개인 유료 자격은 사용하지 않는다. 원장 조회 오류/경영자 관계 미확정은 503이며, 정상 조회에서 행 없음·해제·만료만 미제공으로 본다.
+- **공통 판정**: 접근 guard가 확정한 약국의 현재 경영자 관계를 읽고 그 회원의 유료 원장을 조회한다. 유료 제공 기능은 §15-7의 관리자 설정을 따르며 미설정 시 기존 두 기능을 유지한다. 기본·협력사업 제공 기능과 합산하고 직원에게는 경영자 허용 범위를 함께 적용한다. 직원 개인 유료 자격은 사용하지 않는다. 원장 조회 오류/경영자 관계 미확정은 503이며, 정상 조회에서 행 없음·해제·만료만 미제공으로 본다.
 - **태블릿**: 공통 및 KPA 관리 API, 기기 직원 runtime, pairing, 공개 태블릿 정보·콘텐츠 실행 경로에 같은 약국 기능 판정을 적용한다. 기존 매장/기기 접근 guard를 먼저 유지한다. 비약국 조직의 기존 규칙은 변경하지 않는다.
 - **다국어 상품 콘텐츠**: 신규 제작·가져오기·편집 및 제공 원본 HUB는 기능 자격을 확인한다. 이미 보유한 독립 사본 읽기·이미 발행한 공개 QR 열람은 유지한다. 자료를 삭제하거나 탈퇴 시 자동 회수하지 않는다.
 - **내 매장 UI**: 공통/서비스 지정 layout에서 태블릿 메뉴 및 대상 URL 진입에 서버 판정을 적용한다. 다국어 HUB/상품별 편집 진입도 확인하며 보유 사본 목록은 유지한다. 매장 변경·경로 이동·창 복귀 시 재조회하고, 이전 조직/요청 결과를 재사용하지 않는다. 오류는 확인 실패·재시도로 안내한다. 서버 API는 매 실행마다 재검증하므로 열린 화면도 기능 권한을 우회하지 않는다.
@@ -516,13 +516,53 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 - `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
 - 기본 pharmacy 호스트의 인증 서비스 문맥은 종전대로 kpa-society다. 독립 사업 호스트는 공통 Neture 계정을 사용하고 사업별 가입 권한을 별도 검증한다. megapharm은 Neture session domain으로 등록하여 pharmacy 협력사업 가입을 추가 전제로 요구하지 않는다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
-- `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. 협력사업 설정으로 제공하며 회원 유료 자격의 tablet/multilingual-content에 자동 합산하지 않는다. 특정 사업 전용 제공을 다른 약국에 노출하지 않는 기존 계약을 유지한다.
+- `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
 - `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
 - 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
 - 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. O4O 전체 관리자는 월별 요청 건수를 조회하고, 협력사업 운영자에게 다른 사업/매장 집계를 공유하는 권한은 추가하지 않는다.
 - 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 megapharm 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
 
 검증·운영 설정 인계: [CHECK-MEGAPHARM-STAFF-SUPPORT-V1](../checks/CHECK-MEGAPHARM-STAFF-SUPPORT-V1.md).
+
+### 15-7. 대상별 서비스 설정과 My Home 근무자 허용 (2026-10-18)
+
+전체 관리자 메뉴 `약국 서비스 설정`(`/admin/pharmacy-service-settings`)에서 **대상 → 제공 기능 선택**으로 관리한다. 대상은 기본 제공·유료회원·기존 등록 협력사업이다. 협력사업 등록·운영자 지정은 기존 `약국 협력사업` 메뉴를 사용하며, 사업 추가가 별도 화면이나 코드 분기를 만들지 않는다.
+
+- 기본/유료 정책은 기존 `settings`의 `pharmacy-service-features:default` / `pharmacy-service-features:paid`에 `{features,updatedBy}`로 저장한다. 미저장 기본은 `[]`, 미저장 유료는 기존 `tablet`·`multilingual-content`다. 저장된 `[]`는 명시적 제공 해제다. 잘못된 저장값·조회 실패는 503이며 미설정 기본값으로 덮지 않는다.
+- 사업 제공 기능은 기존 운영 조직의 `metadata.serviceFeatures`를 재사용한다. 관리 API `GET /neture/admin/service-feature-policies`, `PUT /neture/admin/service-feature-policies/:target`은 `platform:super_admin` 전용이다. target은 `default`, `paid`, `business:<등록 key>`이며, 기존 사업 수정 경로의 제공 기능 변경도 같은 전체 관리자 권한을 요구한다.
+- 약국의 기능은 기본 + 활성 협력사업 + 현재 경영자 회원 유료 제공 기능의 합집합이다. 유료/무료만 구분하며 약국 규모·협력사업 미가입 조건·유료 등급은 추가하지 않는다. 자격 하나가 끝나도 다른 제공 자격은 유지한다. 수납·자동 갱신·중복 결제/환불은 이 설정 작업 범위가 아니다.
+- 근무자의 실제 기능은 약국 기능과 경영자 허용의 교집합이다. My Home의 기존 직원 관리에서 최종 승인 시 선택하고 승인 후 수정한다. 기존 `organization_members.metadata.pharmacyServiceFeatures`만 추가 사용한다. Role·관계·매장 범위를 새로 만들거나 넓히지 않는다.
+- 미설정 기존 직원은 이전 세 기능 허용을 보존하며 미래 기능을 자동 허용하지 않는다. 신규 승인 시 허용 목록을 기존 Role 발급과 같은 트랜잭션으로 저장한다. 구 UI의 승인 요청에 목록이 없으면 전문인 확인이 필요한 기능을 제외한 승인 당시 약국 이용 목록을 저장한다. 명시적 `[]`도 유효하며 재초대는 과거 설정을 초기화한다.
+- 직원 수정 `PUT /neture/pharmacy/staff-feature-permissions/:userId`은 현재 매장 경영자만 가능하다. 현재 약국의 이용 범위 밖 기능, 다른 매장 직원, 경영자 관계 자체의 변경을 거절한다. 메뉴·직접 URL·직원 로그인 실행 API는 같은 공통 판정을 사용한다. 계정·매장 변경과 창 복귀 시 이전 결과를 재사용하지 않는다.
+- 공개 태블릿·기기 토큰은 기존 매장 자격을 유지하고 직원 로그인 runtime은 개별 허용도 검사한다. 공용 기기의 직원 식별은 후속 설계다. 보유 독립 사본·발행 공개 QR·사업 비공개 원본의 기존 접근 계약은 유지한다.
+- 설정 기반 도입 시 카탈로그는 실제 구현된 세 기능이었다. 문장 단위 다국어 상담·직원 응대·약사 사용 확인은 §15-8로 확장한다. 기능 이용권이 전문인 자격을 만들지 않는다.
+
+작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-SERVICE-POLICY-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-SERVICE-POLICY-V1.md). 운영 설정·배포는 이번 push 범위에 포함하지 않는다.
+
+### 15-8. 내 매장 다국어 상담 (2026-10-18)
+
+내 매장 `/store/multilingual-consultation`의 `다국어 상담` 메뉴 하나에서 사용 가능한 모드를 고른다. 서비스 지정 Store 경로도 같은 child route·메뉴 판정을 사용한다. 아래 세 기능 중 하나라도 허용되면 메뉴에 진입하며 각 실행은 해당 기능을 다시 확인한다.
+
+| 기능 key | 모드 | 범위 |
+|---|---|---|
+| multilingual-consultation | 매대 약사 상담 | 약사가 입력한 문장과 고객 발화의 양방향 번역 |
+| multilingual-staff-response | 매장 직원 응대 | 고객 발화 번역·고정된 짧은 매장 안내/약사 연결 문구 |
+| multilingual-pharmacist-consultation | 매장 약사 상담 | 매장 현장에서 사용하는 약사 문장 번역, 같은 번역 엔진·PC/모바일 화면 재사용 |
+
+- 세 기능은 기존 관리자 기본/유료/협력사업 선택 목록과 My Home 직원 허용에 등록한다. 약국 규모·도메인·특정 사업 key 조건을 추가하지 않는다. 기존 유료 미설정 두 기능과 기존 직원 호환 세 기능에 새 상담을 자동 추가하지 않는다. 운영에서 제공 대상을 정해 선택해야 한다.
+- 문자 입력·영어/중국어/일본어/베트남어/태국어/인도네시아어와 한국어 양방향 번역이다. 고객에게 크게 보여주기·새 상담/내용 지우기를 제공한다. 사용자 후속 답변에 따라 첫 버전에 브라우저 음성 입력·번역문 읽어주기를 포함한다. 자동 의료 답변·약 선택/복용 판단·상담 이력·QR 자가 상담은 포함하지 않는다.
+- 약사 모드는 `requiresProfessional`로 표시한다. 사용 확인은 사용자 결정에 따라 경영자가 My Home에서 해당 직원이 약사임을 확인하고 기능을 허용하는 방식이다. 경영자 본인은 같은 My Home에서 본인 사용 확인을 저장할 수 있다. 이는 공식 면허 검증 표시가 아니며 기존 `kpa_pharmacist_profiles.license_verified=true` 확인 값도 읽는다. 별도 중앙 면허 심사/직원 등급 체계를 추가하지 않는다. 유료·협력사업 가입 또는 소유 관계만으로 약사 사용을 허용하지 않는다.
+- 약국별 확인은 기존 `organization_members.metadata.pharmacyPharmacistConfirmed` boolean이다. 직원의 허용 기능과 확인은 동일 UPDATE, 최종 승인 때는 기존 Role 발급과 같은 트랜잭션으로 저장한다. 실제 owner만 양성 확인을 남길 수 있고 직원 본인 확인 우회는 거절한다. 재초대는 이전 개별 기능·확인을 초기화한다. 새 자격/role/면허 검증 원장은 만들지 않는다.
+- API: `GET /neture/pharmacy/multilingual-consultation/context`, `POST /neture/pharmacy/multilingual-consultation/translate`, `PUT /neture/pharmacy/pharmacist-confirmation`. 기존 인증·약국·owner/staff 접근과 선택 조직을 사용한다. 번역 body는 mode/language/direction과 text 또는 직원용 phrase key다. client user/organization/약사 주장으로 자격을 만들지 않는다.
+- 비전문 직원의 한국어 응답은 서버가 가진 짧은 안내 문구만 사용한다. 자유 입력 text를 outgoing 직원 응대에 넣으면 거절한다. 약사 연결 안내를 기본 제공하며 증상 판정·의약품 추천을 생성하지 않는다.
+- 음성 입력은 마이크 버튼을 누른 경우에만 시작하며 고객 방향은 선택 언어, 직원 방향은 한국어다. 입력 문장을 확인·수정하고 명시적으로 번역한다. 비전문 직원의 outgoing 고정 문구에는 마이크를 제공하지 않는다. 읽어주기도 번역 결과/고객 화면에서 버튼으로 시작·중지하며 해당 방향의 번역 언어를 사용한다. 새 기능 key·별도 이용권을 추가하지 않는다.
+- 음성은 브라우저 Web Speech API를 사용한다. 브라우저/기기별 언어·API 지원이 다르며 마이크 권한 거절·무음·음성 미설치·재생/네트워크 오류는 안내하고 문자 상담을 유지한다. 음성 인식/읽어주기는 브라우저 서비스로 음성/문장이 전달될 수 있으며 클릭 전에 안내한다. O4O의 음성 파일 업로드/보관이나 새 음성 provider 계약·서버·schema는 추가하지 않는다.
+- 계정·매장·언어·모드·방향 변경, 새 상담·화면 종료·백그라운드 전환은 인식과 재생을 중지하고 늦은 음성 이벤트를 폐기한다. 번역 중에는 마이크 입력을 시작하지 않으며 인식이 끝난 뒤 번역한다. 음성 인식 문장도 1,000자로 제한하고 기존 번역 API와 같은 검증을 따른다.
+- AI는 기존 Core Extension `pharmacy.consultation.translation`과 CONTENT_TRANSLATION 정책·플랫폼 부담·사용량/한도를 재사용한다. JSON plain-text 응답만 사용하고 입력 1,000자·출력 4,000자 이하, 언어·방향·출력 형식을 검증한다. 숫자 값과 통용 단위의 추가/누락/변경을 차단하되 번역의 의학적 정확성을 보증하는 판정으로 사용하지 않는다. 사람이 원문과 결과를 확인한다.
+- 매 실행 전후에 매장 Role/관계·제공 기능·개별 허용·약사 사용 확인을 재검사한다. 호출 중 회수된 권한으로 결과를 반환하지 않는다. 확인/원장 조회 오류는 503, 정상 자격 미충족은 403, AI 한도 초과는 429로 구분한다. 별도 사용자별 분당 요청 제한은 보조 수단이며 기존 quota를 대신하지 않는다.
+- 원문/번역은 번역 요청 처리와 현재 화면 메모리만 사용한다. DB·로그·Local/Session Storage·Task/Memory에 저장하지 않는다. 기존 AI 사용량 이력은 actor/모델/토큰/상태 metadata만 남긴다. 계정/매장/모드/언어 전환·새 상담·pagehide 때 내용을 지우고 늦은 응답을 폐기한다. 개인정보 입력을 피하도록 안내한다.
+
+작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md). 실제 외부 AI·실계정·운영 제공 정책·배포 검증은 실행 결과와 구분한다.
 
 
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
@@ -740,8 +780,10 @@ pathRules:
 사용자가 전체 관리자 화면에서 pharmacy·carepharm·megapharm·pharmcoop 각각 Admin과 Operator를
 지정하도록 요청했다. 네 대상은 여전히 사업 식별자이며 별도 `service_memberships` 서비스가 아니다.
 `neture:{사업키}_admin/operator` 역할로 해당 사업만 운영한다. 기존 Neture 전체 역할을 복제하지 않는다.
-`pharmcoop` 역할은 등록 협동조합의 사업 공간과 연합 운영자 세션을 포함하며 임의의 다른 사업은 포함하지 않는다.
-이 보완은 위의 기존 `neture:operator/admin` + 활성 담당 관계 방식과 함께 적용한다.
+`pharmcoop` 역할은 연합회 산하 조합관리 범위다. 연합회 admin은 조합 최종 결정과 조합 admin 지정·해제를, operator는 조합 신청 검토·보완을 맡는다.
+개별 조합의 사업·회원관리는 `cooperative_roles`의 조합별 admin/operator 배정을 요구하며 연합회 역할을 상속하지 않는다.
+위의 기존 `neture:operator/admin` + 활성 담당 관계 방식은 비조합 사업에만 유지한다.
+상세 회원관리·권한 정책은 [협동조합 권한 설계](DESIGN-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md)를 따른다.
 신규 사업 자동 생성·기존 가입 승인·약국 소유권·참여 가입 동기화는 하지 않는다.
 정상 계정·이메일 확인·Neture 명시 정지/탈퇴 차단과 매 요청 역할 유효기간 확인을 유지한다.
 역할 목록은 [RBAC 카탈로그](../rbac/RBAC-ROLE-CATALOG-V1.md#약국-협업체-운영자-지정--2026-10-18),

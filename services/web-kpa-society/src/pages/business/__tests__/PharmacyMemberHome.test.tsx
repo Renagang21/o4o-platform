@@ -29,6 +29,7 @@ beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
   mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
     if (path.startsWith('/home-presentation/')) return { data: { success: true, data: null } };
+    if (path.endsWith('/showcase')) return {data:{data:{businessKey:path.includes('/network-a/') ? 'network-a':'pharmacy',items:[{id:'content:guide',kind:'content',title:'게시된 실제 자료',summary:'사업 자료 요약',body:null}]}}};
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
     if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
@@ -67,7 +68,7 @@ describe('약국 회원 초기화면', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('약국에 필요한 소식과 자료');
     expect(screen.getByText('게시된 실제 공지')).toBeTruthy();
     expect(screen.getByRole('heading', {name:'회원 약국들의 이야기'})).toBeTruthy();
-    const headings = ['사업 소식', '약국 운영 자료', '제품 정보', '회원 약국들의 이야기'].map(name => screen.getByRole('heading', { name }));
+    const headings = ['사업 소식', '약국 운영 자료', '승인 제품 · 콘텐츠', '회원 약국들의 이야기'].map(name => screen.getByRole('heading', { name }));
     headings.slice(1).forEach((heading, i) => expect(headings[i].compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy());
     expect(screen.queryByText('나의 약국 업무')).toBeNull();
     expect(screen.queryByText('사업자와 가입 약국이')).toBeNull();
@@ -75,9 +76,9 @@ describe('약국 회원 초기화면', () => {
     expect(screen.queryByText('다른 사업 자료')).toBeNull();
     expect(screen.queryByText('참여 신청 · 이용 상태')).toBeNull();
     expect(screen.getByRole('link', { name: '회원의 실제 이야기' }).getAttribute('href')).toBe('/community/post/conversation');
-    expect(screen.getByRole('link', { name: '게시된 실제 자료' }).getAttribute('href')).toBe('/materials?content=guide&store=store-a');
+    expect(screen.getByRole('heading', { name: '게시된 실제 자료' })).toBeTruthy();
     expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 20, sortBy: 'latest' } });
-    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 3 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/businesses/pharmacy/showcase', { headers: { 'X-Store-Organization-Id': 'store-a' } });
   });
   it('미로그인은 원래 루트로 복귀하는 로그인으로 보내고 회원 데이터를 조회하지 않는다', async () => {
     mocks.user = null; render(tree('/'));
@@ -98,14 +99,14 @@ describe('약국 회원 초기화면', () => {
   });
   it('자료 실패를 빈 자료로 표시하지 않고 게시글과 독립적으로 재시도한다', async () => {
     const original = mocks.get.getMockImplementation()!;
-    mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/store/contents') ? Promise.reject(new Error('Offline')) : original(path, config));
+    mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/showcase') ? Promise.reject(new Error('Offline')) : original(path, config));
     render(tree('/'));
     expect(await screen.findByRole('alert')).toBeTruthy();
     expect(screen.getByText('회원의 실제 이야기')).toBeTruthy();
     expect(screen.queryByText('등록된 사업 자료가 없습니다.')).toBeNull();
     const postRequests = mocks.get.mock.calls.filter(([path]) => path.endsWith('/forum/posts')).length;
     mocks.get.mockImplementation(original);
-    fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
+    fireEvent.click(screen.getByRole('button', { name: '진열 다시 조회' }));
     expect(await screen.findByText('게시된 실제 자료')).toBeTruthy();
     expect(mocks.get.mock.calls.filter(([path]) => path.endsWith('/forum/posts')).length).toBe(postRequests);
   });
@@ -163,6 +164,7 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
     if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
+    if (path.endsWith('/showcase')) return {data:{data:{businessKey:'network-a',items:[{id:'content:a',kind:'content',title:'사업 A 자료',summary:null,body:null}]}}};
     if (path.endsWith('/access')) return { data: { data: { ...access, businessKey: 'network-a' } } };
     if (path.endsWith('/forum/posts')) return { data: { data: [] } };
     if (path.endsWith('/store/supply-options')) return { data: { data: { items: [] } } };
@@ -173,7 +175,7 @@ it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표�
   expect(await screen.findByText('네트워크 A · 협력약국 공간')).toBeTruthy();
   expect(await screen.findByText('사업 A 자료')).toBeTruthy();
   expect(screen.queryByText('다른 사업 자료')).toBeNull();
-  expect(screen.getByRole('link', { name: '사업 A 자료' }).getAttribute('href')).toBe('/businesses/network-a/materials?content=a&store=store-a');
+  expect(screen.getByRole('heading', { name: '사업 A 자료' })).toBeTruthy();
 });
 
 

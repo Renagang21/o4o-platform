@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import StoreHandledProductsPage from '../pharmacy/StoreHandledProductsPage';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import MyServicesPage from '../MyServicesPage';
@@ -47,6 +47,32 @@ beforeEach(() => {
   mocks.supply.mockResolvedValue({ items: [], total: 0 });
   mocks.contents.mockResolvedValue({ items: [], total: 0 });
   mocks.orders.mockResolvedValue([]);
+});
+
+it('returning from product guidance restores selection only from the current confirmed product page', async () => {
+  const path = '/store/workspace/commerce?q=Sample&source=local&page=2&limit=50';
+  const row = { sourceType: 'local', sourceId: 'one', name: 'Sample', isActive: true };
+  mocks.products.mockResolvedValue({ items: [row], pagination: { total: 51 } });
+  render(<MemoryRouter initialEntries={[{ pathname: '/store/workspace/commerce', search: '?q=Sample&source=local&page=2&limit=50',
+    state: { productReturn: { path, scope: 'store-a:kpa-society', selectedKey: 'local:one' } },
+  }]}><StoreHandledProductsPage workspace /></MemoryRouter>);
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
+  expect(mocks.products).toHaveBeenCalledWith({ page: 2, limit: 50, search: 'Sample', source: 'local' });
+});
+it('browser back from guidance also restores the originating product selection and query', async () => {
+  mocks.products.mockResolvedValue({ items: [{ sourceType: 'local', sourceId: 'one', name: 'Sample', isActive: true }], pagination: { total: 51 } });
+  function Back() { const navigate = useNavigate(); return <button onClick={() => navigate(-1)}>브라우저 뒤로</button>; }
+  render(<MemoryRouter initialEntries={['/store/workspace/commerce?q=Sample&source=local&page=2&limit=50']}><Routes>
+    <Route path="/store/workspace/commerce" element={<StoreHandledProductsPage workspace />} />
+    <Route path="/store/library/contents" element={<Back />} />
+  </Routes></MemoryRouter>);
+  await screen.findByText('Sample');
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠 만들기' }));
+  fireEvent.click(await screen.findByRole('button', { name: '브라우저 뒤로' }));
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
 });
 
 describe('내 매장 경영지원', () => {

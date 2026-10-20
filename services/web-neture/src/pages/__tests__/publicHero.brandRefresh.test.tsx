@@ -21,11 +21,11 @@ vi.mock('../../components/auth/ServiceApplyPanel', () => ({
 }));
 vi.mock('../../api/trial', () => ({ getTrials: vi.fn(async () => []), getMyParticipations: vi.fn(async () => []) }));
 
-vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: { data: { communities: [
-  { communityKey: 'pharmacy', name: '약사 커뮤니티', kind: 'independent', allowed: false },
-  { communityKey: 'business', name: '사업 회원 게시판', kind: 'semi-franchise', allowed: true },
-] } } })) } }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: { success: true, data: {
+  member: false, ...Object.fromEntries(['notice','news','forum','content','resource'].map(key=>[key,{pinned:[],recent:[]}]))
+} } })) } }));
 
+vi.mock('@o4o/shared-space-ui', async()=>({...await vi.importActual('@o4o/shared-space-ui'),ServiceHomeHero:()=>null,ServiceHomePromotion:()=>null}));
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
 import { getTrials } from '../../api/trial';
@@ -62,10 +62,11 @@ describe('supplier `/`', () => {
 });
 
 describe('community `/`', () => {
-  it('독립서비스 소개와 공개 글 진입을 제공하고 과거 업종별 목록은 표시하지 않는다', async () => {
+  it('콘텐츠 섹션과 바로가기를 제공하고 과거 업종별 목록은 표시하지 않는다', async () => {
     renderAt(<CommunityHostHomePage />);
-    expect(screen.getByText('정보와 경험을 나누는 커뮤니티 서비스입니다.')).toBeTruthy();
-    expect(screen.getAllByRole('link', { name: /공개 게시글 보기/ })[0].getAttribute('href')).toBe('/communities/community/public');
+    expect(await screen.findByRole('heading', {name:'포럼'})).toBeTruthy();
+    expect(h1Text()).toBe('커뮤니티');
+    expect(screen.getByRole('link', {name:'포럼 바로가기 →'}).getAttribute('href')).toBe('/communities/community/public');
     expect(screen.queryByText('약사 커뮤니티')).toBeNull();
     expect(screen.queryByText('사업 회원 게시판')).toBeNull();
   });

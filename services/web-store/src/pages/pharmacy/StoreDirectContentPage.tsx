@@ -45,7 +45,7 @@ import { TagInput } from '../../components/store/TagInput';
 export default function StoreDirectContentPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { libraryPath } = useStoreLibraryRoute();
+  const { backPath, returnState, productReturn } = useStoreLibraryRoute();
   const [searchParams] = useSearchParams();
 
   const { organizationId } = useStoreOrganizationId();
@@ -58,7 +58,7 @@ export default function StoreDirectContentPage() {
     toDraft: textDraftFromRecord,
     persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
     onSaved: (_record, unchanged) => { if (unchanged) setEditing(false); },
-    onRemoved: () => navigate(libraryPath, { replace: true }),
+    onRemoved: () => navigate(backPath, { replace: true, state: returnState }),
   });
   const { record: content, loading, error, saving, deleting, reload: fetchContent, save: handleSave, remove: handleDelete } = session;
   const editTitle = session.draft.title, editTags = session.draft.tags;
@@ -128,9 +128,13 @@ export default function StoreDirectContentPage() {
       )}
 
       {/* Back nav — WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: canonical 허브로 복귀 */}
-      <Link to={libraryPath} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
+      <Link to={backPath} state={returnState} onClick={event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        const changed = content && JSON.stringify(session.draft) !== JSON.stringify(textDraftFromRecord(content));
+        if (session.saving || session.deleting || (editing && changed && !window.confirm('저장하지 않은 작성 내용을 버리고 돌아가시겠습니까?'))) event.preventDefault();
+      }} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
         <ArrowLeft className="w-4 h-4" />
-        내 자료함 콘텐츠로 돌아가기
+        {productReturn ? '상품 목록으로 돌아가기' : '내 자료함 콘텐츠로 돌아가기'}
       </Link>
 
       {/* Header */}
