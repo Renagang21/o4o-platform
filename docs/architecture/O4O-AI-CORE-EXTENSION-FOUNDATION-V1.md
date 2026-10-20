@@ -208,9 +208,9 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 [시작 안내](../development/COLLABORATOR-START-HERE.md)와 [SETUP](../../SETUP.md)을 따라 최신 main의 전용 작업공간에서 착수한다. 개별 서비스의 중복을 성급하게 전역 공통화하지 않으며 전체 정비에서 소비처·업무 차이를 함께 판단한다. 새 Core/Memory/정산 기반·퇴역 서비스 기능을 중복 생성하지 않는다. 외부 유료 계약·운영 credential/DB 변경은 개발 착수와 구분한다.
 
-## 12. 관리자 AI 운영 조회 기반 — 작업 branch 구현 (2026-10-20)
+## 12. 관리자 AI 운영 조회 기반 — main·운영 반영 (2026-10-20)
 
-[구현 TODO](../work-orders/WO-O4O-ADMIN-AI-USAGE-MANAGEMENT-V1.md)의 첫 단계로 관리자 설정의 기존 Gemini 전용 개요를 전체 사용처 조회로 교체했다. 이 절은 작업 branch의 코드 범위이며 main 통합·운영 적용 증거가 아니다.
+[구현 TODO](../work-orders/WO-O4O-ADMIN-AI-USAGE-MANAGEMENT-V1.md)의 첫 단계로 관리자 설정의 기존 Gemini 전용 개요를 전체 사용처 조회로 교체했다. [PR #724](https://github.com/Renagang21/o4o-platform/pull/724)로 main에 통합했고 `653178d0b884d545f60d472311436ea7a8f3e727`의 API·관리자 배포를 확인했다. 당시 서빙 리비전·공개 URL 검증과 실계정 미검증 범위는 [배포 CHECK](../checks/CHECK-O4O-ADMIN-AI-USAGE-MANAGEMENT-DEPLOYMENT-V1.md)에 있다. 이 기록이 이후의 live serving 상태를 대신하지 않는다.
 
 - `/api/ai/admin/management`와 `/api/ai/admin/management/usage`는 기존 `authenticate` + `requireAdmin` 뒤의 읽기 전용 API다. 후자는 최근 7/30/90일의 Asia/Seoul 기간을 사용한다. 새 인증 체계나 공급자 호출을 만들지 않는다.
 - `services/ai-management/catalog.ts`는 31개 논리적 사용처의 소스 연결·능력·선택 경로·중지/회계 연결을 기록한다. 실행 registry·서비스 identity·권한 정책이 아니며, 등록/운영 활성/실제 사용을 동치로 다루지 않는다. 서비스명은 기존 카탈로그에서 읽고 공통 업무 영역은 별도로 구분한다.

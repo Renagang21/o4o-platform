@@ -4,6 +4,8 @@
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 「TODO 작성 → 코드·문서 보완 → 개발 → push까지」 · [설계안][design] · [사용처 조사표][inventory]
 
+현재 결과: 조회 기반 1단계는 [PR #724](https://github.com/Renagang21/o4o-platform/pull/724)로 main에 병합되고 API·관리자 배포까지 완료됐다. §1·§4의 push-only 종료는 최초 개발 인계 당시의 범위이며 이후 사용자 승인과 통합 결과는 §5·§6에 기록한다. 기능별 쓰기·실행 제어는 §3의 후속 TODO다.
+
 ## 1. 이번 차수의 목표와 범위
 
 설계 §9의 첫 단계인 사용처·현재 설정·공급자 연결·기록된 사용량 조회를 실제 관리자 UI/API로 구현한다. 기존 Gemini 화면만으로 전체 AI 상태를 파악할 수 없는 문제를 먼저 해결한다. 기능별 모델/중지 쓰기와 전체 직접 호출 이관은 후속 단계로 구분한다.
@@ -69,3 +71,13 @@
 - 개별 job 로그는 환경의 대상 호스트 제한으로 읽지 못했으나, 공식 전체 run 로그 ZIP으로 원인을 확인했다. 네트워크 정책·credential·workflow를 변경하지 않았다.
 
 수정 후 focused tests 4 suites / 48 tests와 API 타입 검사 PASS. 재실행 CI/리뷰를 확인한 뒤 병합한다. 신규 schema/migration은 없으며 현재 runtime 판정은 API·admin LEVEL 2다.
+
+## 6. 1단계 main 통합·운영 반영 결과 (2026-10-20)
+
+- [PR #724](https://github.com/Renagang21/o4o-platform/pull/724) 병합: `653178d0b884d545f60d472311436ea7a8f3e727`, 2026-10-20 13:42:23 Asia/Seoul. 최신 개발 HEAD의 CI Gate·CodeQL PASS, Codex 재리뷰 findings 없음 및 미해결 스레드 0 확인 후 정상 병합했다.
+- 병합 SHA의 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39370985041)·[CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/39370985103) PASS. [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39371832247)는 API → admin 순서로 성공했으며 다른 웹 서비스는 NO_DEPLOY다.
+- API `o4o-core-api-04098-sit`, 관리자 `o4o-admin-dashboard-01520-mac`: 둘 다 병합 SHA를 단일 리비전 트래픽 100%로 제공한다. 배포 보고서의 production 상태는 DEPLOYED다.
+- 운영 health/readiness 200, 두 조회 API의 비로그인 요청 401, 기존/신규 설정 HTML 및 실제 Settings asset 200을 확인했다. 새 자산의 AI 운영 관리·사용량/비용 표시와 API 연결 경로를 확인했다. 실제 Google 관리자 로그인 후 데이터 조회는 미검증이다.
+- 신규 migration·정책 쓰기·유료 AI 호출은 추가하지 않았다. 기존 배포 migration Job은 성공했으나 DB 직접 조회나 pending migration 적용 건수 확인은 수행하지 않았다. DB 무변경을 별도로 입증한 결과로 해석하지 않는다.
+
+전체 AI 관리 개발 완료가 아니라 **조회 기반 1단계의 배포 완료**다. 세부 증거·검증 한계는 [배포 CHECK](../checks/CHECK-O4O-ADMIN-AI-USAGE-MANAGEMENT-DEPLOYMENT-V1.md)에 기록한다. 같은 WO의 배포 기록 후속으로 기존 전용 branch를 유지하며 runtime 변경 없이 문서만 보완한다.
