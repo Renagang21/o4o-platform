@@ -157,6 +157,9 @@ export type {
   OperatorOrderStatusPageProps,
 } from './modules/product-order-view';
 
+export { ServiceOperatorManagement } from './modules/ServiceOperatorManagement';
+export type { OperatorManagementClient } from './modules/ServiceOperatorManagement';
+
 // Surveys Module (WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1)
 export {
   OperatorSurveyListPage,
