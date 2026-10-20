@@ -37,6 +37,7 @@ export const supplierProfileApi = {
   },
 
   async updateProfile(data: {
+    name?: string;
     contactEmail?: string;
     contactPhone?: string;
     contactWebsite?: string;

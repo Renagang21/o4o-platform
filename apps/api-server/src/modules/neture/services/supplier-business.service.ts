@@ -3,6 +3,13 @@ import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierStatus, ContactVisibility } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
+export class SupplierProfileNameInvalidError extends Error {
+  constructor() {
+    super('SUPPLIER_PROFILE_NAME_INVALID');
+    this.name = 'SupplierProfileNameInvalidError';
+  }
+}
+
 /**
  * WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §9:
  *   canonical 저장 위치가 없는 프로필 필드는 **조용히 버리지 않고** 이 오류로 거부한다.
@@ -130,6 +137,7 @@ export class NetureSupplierBusinessService {
   async updateSupplierProfile(
     supplierId: string,
     data: {
+      name?: string;
       contactEmail?: string;
       contactPhone?: string;
       contactWebsite?: string;
@@ -176,6 +184,15 @@ export class NetureSupplierBusinessService {
     try {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return null;
+
+      if (data.name !== undefined) {
+        if (typeof data.name !== 'string' || !data.name.trim() || data.name.trim().length > 255) {
+          throw new SupplierProfileNameInvalidError();
+        }
+        if (!supplier.organizationId) {
+          throw new SupplierProfileFieldUnsupportedError(['name']);
+        }
+      }
 
       // Existing contact fields
       if (data.contactEmail !== undefined) supplier.contactEmail = data.contactEmail || '';
@@ -251,6 +268,7 @@ export class NetureSupplierBusinessService {
 
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: org-only write (no supplier reverse-sync)
       const orgWriteNeeded =
+        data.name !== undefined ||
         data.businessNumber !== undefined ||
         data.businessAddress !== undefined ||
         data.businessZipCode !== undefined ||
@@ -282,6 +300,7 @@ export class NetureSupplierBusinessService {
           await this.writeOrgBusinessData(
             supplier.organizationId,
             {
+              name: data.name?.trim(),
               business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
               address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
               phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
@@ -316,6 +335,7 @@ export class NetureSupplierBusinessService {
       return {
         id: supplier.id,
         // Business profile — org SSOT
+        name: org?.name ?? '',
         businessNumber: org?.business_number ?? null,
         representativeName: supplier.representativeName || null,
         businessZipCode: org?.address_detail?.zipCode ?? null,
@@ -362,6 +382,7 @@ export class NetureSupplierBusinessService {
   private async writeOrgBusinessData(
     organizationId: string,
     data: {
+      name?: string;
       business_number?: string | null;
       address?: string | null;
       phone?: string | null;
@@ -386,6 +407,10 @@ export class NetureSupplierBusinessService {
       const params: any[] = [];
       let idx = 1;
 
+      if (data.name !== undefined) {
+        setClauses.push(`name = $${idx++}`);
+        params.push(data.name);
+      }
       if (data.business_number !== undefined) {
         setClauses.push(`business_number = $${idx++}`);
         params.push(data.business_number);

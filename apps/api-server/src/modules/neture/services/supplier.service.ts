@@ -7,7 +7,7 @@ import { NetureSupplierBusinessService } from './supplier-business.service.js';
 import { NetureSupplierLifecycleService } from './supplier-lifecycle.service.js';
 import { NetureSupplierDirectoryService } from './supplier-directory.service.js';
 
-export { SupplierProfileFieldUnsupportedError } from './supplier-business.service.js';
+export { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError } from './supplier-business.service.js';
 export type { SupplierObligationGuard } from './supplier-lifecycle.service.js';
 export { applySupplierListQuery } from './supplier-directory.service.js';
 export type { GovernanceSupplierRow, SupplierListQueryParams, SupplierListItemLike } from './supplier-directory.service.js';
