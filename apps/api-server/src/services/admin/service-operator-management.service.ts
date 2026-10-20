@@ -1,6 +1,7 @@
 import type { DataSource, EntityManager } from "typeorm";
 import { resolveNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
 import { resolveCanonicalServiceKey } from "@o4o/security-core";
+import { lockOperatorAssignments } from '../../modules/auth/services/operator-assignment-lock.js';
 import { roleAssignmentService } from "../../modules/auth/services/role-assignment.service.js";
 import { demoAccountService } from "../auth/demo-account.service.js";
 import {
@@ -160,10 +161,8 @@ export class ServiceOperatorManagementService {
           "SELF_OPERATOR_CHANGE_FORBIDDEN",
           "자기 역할은 다른 Admin에게 요청하세요.",
         );
-      // Serialize changes to the same user/scope (including the absent-assignment case).
-      await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
-        `service-operator:${scope.key}:${userId}`,
-      ]);
+      // Same lock as every canonical operator writer; includes preflight and audit ownership.
+      await lockOperatorAssignments(m, userId);
       await demoAccountService.assertNotDemoAccount(userId, m);
       let changed = false;
       if (assign) {

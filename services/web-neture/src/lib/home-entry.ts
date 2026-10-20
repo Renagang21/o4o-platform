@@ -637,7 +637,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   카드를 만들지 않는다(dead link 0).
     //   community 는 Admin(`/admin/communities`)과 Operator(`/operator/communities`)로 구분한다.
     // Policy settings remain secondary links, without replacing a service's primary management workspace.
-    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key && !s.path.startsWith('/operator/legal/'));
+    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key && s.primaryEntry !== false && !s.path.startsWith('/operator/legal/'));
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
       if (!screen) continue;

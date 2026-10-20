@@ -80,7 +80,7 @@ Neture `/admin/operators`는 중앙 관리자 링크만 제공한다. 공통
 | Pharmacy/MegaPharm 사업 화면·권한·공통 IA | 80 PASS |
 | Pharmcoop 전체 | 44 PASS |
 | 분회 웹 전체 | 39 PASS |
-| 합계 | 654 PASS |
+| 합계 | 554 PASS |
 | API TypeScript 및 tsup 운영 빌드 | PASS |
 | Neture·Lecture·Pharmacy/MegaPharm·Pharmcoop 각 TypeScript 포함 운영 빌드 | 4개 PASS |
 | 신규/직접 수정 핵심 코드 ESLint | 오류 0·경고 0 |
@@ -126,11 +126,34 @@ WORKTREE_DISPOSITION: 전용 worktree/branch 유지(KEEP), 통합 전 후속 수
 - 5개 범위 × 가입 원장 없음/pending/rejected/active 허용, 명시적 suspended/withdrawn 차단을
   실제 PostgreSQL로 회귀 검증하며 가입 상태를 변경하지 않는 것도 확인한다.
 - 보완 후 API 100개 PASS(기존 71개에서 29개 증가), TypeScript·API 운영 빌드·ESLint PASS.
-  이전 웹/UI 검증과 합하면 683개이며 이 수정은 웹 코드를 바꾸지 않는다.
+  이전 웹/UI 검증과 합하면 583개이며 이 수정은 웹 코드를 바꾸지 않는다.
 
 - 추가 P2: 기존 Operator의 계정 비활성/이메일 미확인/심사·정지 상태를 이용 불가로 표시하도록 목록 SQL을 보완.
   Neture와 독립 서비스 양쪽에서 표시와 역할 해제 가능성을 회귀 검증한다.
 - CI ESLint의 테스트 코드 `no-unexpected-multiline` 1건을 수정하고 전체 변경 TS/TSX 파일을 다시 검사한다.
 - 최종 보완: API 110개 PASS, API 타입·빌드 PASS, 변경 TS/TSX 전체 lint 오류/경고 0.
   저장소 전체 lint ratchet도 기존 오류 46개 기준선 그대로 PASS(기준선/규칙 수정 없음).
-  웹/UI 기존 검증과 합하면 693개 PASS이며 실제 운영 계정의 권한 변경은 없다.
+  웹/UI 기존 검증과 합하면 593개 PASS이며 실제 운영 계정의 권한 변경은 없다.
+
+
+### 추가 통합 검토 — 공통 저장 경로·진입 동선
+
+- 중앙과 서비스 Admin의 경합을 해결하기 위해 canonical RoleAssignmentService의 **Operator 쓰기만**
+  동일 사용자 advisory lock + transaction으로 직렬화한다. 서비스의 사전 판정도 같은 잠금을 사용한다.
+  manager 없는 호출도 내부 transaction을 사용하고 commit 후 캐시를 다시 무효화한다.
+  F10 §3.2의 버그 수정 범위이며 새 권한/역할/컬럼/API 계약/미들웨어 변경 없음.
+  Admin/플랫폼 역할의 기존 마지막 관리자 보호·잠금 경로는 바꾸지 않는다(F9 write SSOT 유지).
+- 실제 RoleAssignment Entity·실제 ORM 저장 경로를 사용하는 PostgreSQL 경합 테스트를 추가했다.
+  중앙 먼저/서비스 먼저 두 순서에서 잠금 대기를 확인하고, 중앙 지정자·유효기간 보존과
+  서비스의 잘못된 성공 감사 기록 부재, standalone revoke→regrant를 검증한다.
+- KPA platform-only 사용자도 중앙 콘솔 안내 화면에 도달하도록 guard를 맞추고 중복 legacy redirect를 제거.
+  서비스 Admin에게만 실제 지정 API를 보여주는 책임은 기존 화면/서버에서 유지한다.
+- CI 전체 Neture 테스트가 발견한 펀딩 대표 진입 변경도 수정. 지정 화면은 secondary entry로 표시하고
+  기존 `/operator/market-trial` 첫 진입과 Admin 전용 메뉴 차단을 함께 유지한다.
+- 로컬 결과: API/Core 7 suites 127 PASS(별도 기존 분회·조합 17 PASS는 앞 실행), Neture 전체 135 suites
+  1,203 PASS, KPA 사업/IA 80 PASS + 중앙 안내 2 PASS. API·Neture·KPA 운영 빌드 PASS.
+- 초기 검증표 합계 오기 정정: 654→554, 이후 보완 시 683→583 및 693→593.
+  이번 기록은 스위트별 실행 결과로 구분하며 서로 겹치는 실행을 더해 새 합계로 보고하지 않는다.
+- 추가 확인: 전체 lint ratchet 46 오류 기준선 PASS, 최종 KPA 운영 빌드로 platform-only 중앙 안내 PC/모바일
+  2 PASS(서비스 지정 API 조회 0·console error 0). 앞 20개 서비스 Admin 브라우저 결과와 구분한다.
+- 통합 중 main #720 공급자 상호명 수정(`d176026c24`)을 확인했다. migration/권한 변경은 없고 별도 경로다.

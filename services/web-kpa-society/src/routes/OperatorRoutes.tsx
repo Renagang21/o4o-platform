@@ -240,11 +240,10 @@ export function OperatorRoutes() {
           <Route path="analytics" element={<OperatorAnalyticsPage />} />
 
           {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
-          <Route path="operators" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN]}><ServiceOperatorsPage /></RoleGuard>} />
+          <Route path="operators" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><ServiceOperatorsPage /></RoleGuard>} />
           <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
 
           {/* 레거시 리다이렉트 */}
-          <Route path="operators" element={<Navigate to="/operator/members" replace />} />
         </Route>
 
         {/* 404 → operator index */}
