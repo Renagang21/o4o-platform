@@ -1,7 +1,7 @@
 # 관리자 서비스·대상 정책·역할 관리 제거와 과거 역할 정비
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 세 메뉴 제거 및 미사용 역할 정비 지시, 공급사·약국 모두 의약품 취급 가능 정정
 > **관련 정본**: [역할·업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) · [KPA 역할](../baseline/KPA-ROLE-MATRIX-V1.md) · [분회 역할](../baseline/KPA-BRANCH-ROLE-MATRIX-V1.md) · [B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)
 
@@ -54,3 +54,8 @@
 ### 정본 색인 별도 정합 작업
 
 후속 리뷰 근거로 CANONICAL-INDEX에 현재 관리자 역할 정책을 등록하고 Frozen baseline의 부분 대체 관계를 같은 별도 문서 커밋에 명시한다. 앞 절의 색인 미변경은 그 단계의 이력이며 이 절에서 정정한다. KPA 회원 목록의 추가 권한도 중앙 퇴역 판정에 맞췄다. 원본 할당 행이나 서비스별 회원 업무는 변경하지 않는다.
+
+
+### 운영 완료 (2026-10-21 Asia/Seoul)
+
+PR #742를 main `1fa8d7e4cb8edb5da63c43c63956e8911630eab6`로 병합했다. 병합 후 CI·CodeQL 성공, Delivery LEVEL 3 보류 확인 후 Promote `39442854482`를 1회 실행했다. API·관리자·Neture·약국·강의·매장·분회 총 7개 서비스가 같은 SHA의 리비전에서 100% 서빙 중이며 최종 `production=DEPLOYED`다. hospital-pharmacy는 runtime 변경이 없어 NO_DEPLOY다. 관리자 공개 화면 파일·health/readiness 등 12개와 웹 공개 주소 5개 검증이 통과했다. 실제 Google 로그인·운영 업무 쓰기와 역할 원본 행 삭제는 미실행이다. migration Job 성공·서빙 리비전·검증 한계·KEEP 판정은 [CHECK의 최종 운영 완료 절](../checks/CHECK-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)에 기록했다. 이 결과 문서 후속 작업은 같은 WO 연속 단계이며 앱 배포는 NOT_APPLICABLE다.
