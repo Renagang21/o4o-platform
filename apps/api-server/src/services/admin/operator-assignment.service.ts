@@ -14,6 +14,7 @@ import { LinkedAccount } from '../../entities/LinkedAccount.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { ensureServiceMembershipsForRoles, type MembershipPolicy } from './service-membership-ensure.js';
 import { resolveOperatorRole } from '../../config/operator-role-catalog.js';
+import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import { demoAccountService } from '../auth/demo-account.service.js';
 
 export type OperatorAssignmentRejectCode =
@@ -103,7 +104,7 @@ export class OperatorAssignmentService {
   }): Promise<OperatorAssignmentResult> {
     const { serviceKey, role } = resolveOperatorRole(input.role, input.serviceKey ?? null);
 
-    return this.dataSource.transaction(async (manager) => {
+    const result = await this.dataSource.transaction(async (manager) => {
       const user = await manager.getRepository(User).findOne({ where: { id: input.userId } });
       if (!user) throw new OperatorAssignmentError('USER_NOT_FOUND');
       // Demo 계정 보호(정책 §8 role 변경): 지정 **전에** 막는다.
@@ -131,6 +132,8 @@ export class OperatorAssignmentService {
         membershipStatuses: ensured.existingStatuses,
       };
     });
+    invalidateRoles(result.userId);
+    return result;
   }
 }
 

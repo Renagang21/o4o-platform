@@ -157,3 +157,11 @@ WORKTREE_DISPOSITION: 전용 worktree/branch 유지(KEEP), 통합 전 후속 수
 - 추가 확인: 전체 lint ratchet 46 오류 기준선 PASS, 최종 KPA 운영 빌드로 platform-only 중앙 안내 PC/모바일
   2 PASS(서비스 지정 API 조회 0·console error 0). 앞 20개 서비스 Admin 브라우저 결과와 구분한다.
 - 통합 중 main #720 공급자 상호명 수정(`d176026c24`)을 확인했다. migration/권한 변경은 없고 별도 경로다.
+
+### 캐시 시점 보완
+
+- 서비스 지정·해제 및 중앙 직접 지정은 바깥 transaction commit 뒤 역할 캐시를 다시 무효화한다.
+  실제 DB에서 변경 전 committed 역할을 읽어 캐시에 넣는 동시 auth/me를 재현하고, 요청 완료 뒤
+  오래된 캐시가 남지 않는 것을 grant/revoke 두 경우에 확인했다. 중앙 지정도 같은 시점 테스트를 추가했다.
+- UUID 대소문자 표현이 사용자 잠금·캐시 키·자기 역할 변경 차단을 우회하지 않도록 canonical casing을 사용한다.
+- 이 보완의 API/DB·중앙 지정 4 suites 118 PASS, 수정 파일 lint 오류/경고 0. 기존 전체 검증과 별도 실행이다.

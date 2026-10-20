@@ -10,6 +10,6 @@ export async function lockOperatorAssignments(
   userId: string,
 ): Promise<void> {
   await manager.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
-    `operator-assignment:${userId}`,
+    `operator-assignment:${userId.toLowerCase()}`,
   ]);
 }

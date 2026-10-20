@@ -135,7 +135,7 @@ export class RoleAssignmentService {
     if (isOperatorAssignmentRole(role)) {
       if (!manager) {
         const saved = await AppDataSource.transaction(tx => this.assignRole(input, tx));
-        invalidateRoles(userId); // invalidate again after this transaction commits
+        invalidateRoles(userId.toLowerCase()); // invalidate again after this transaction commits
         return saved;
       }
       await lockOperatorAssignments(manager, userId);
@@ -235,7 +235,7 @@ export class RoleAssignmentService {
     if (isOperatorAssignmentRole(role)) {
       if (!manager) {
         const removed = await AppDataSource.transaction(tx => this.removeRole(userId, role, tx));
-        invalidateRoles(userId);
+        invalidateRoles(userId.toLowerCase());
         return removed;
       }
       await lockOperatorAssignments(manager, userId);

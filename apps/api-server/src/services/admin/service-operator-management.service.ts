@@ -1,6 +1,7 @@
 import type { DataSource, EntityManager } from "typeorm";
 import { resolveNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
 import { resolveCanonicalServiceKey } from "@o4o/security-core";
+import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import { lockOperatorAssignments } from '../../modules/auth/services/operator-assignment-lock.js';
 import { roleAssignmentService } from "../../modules/auth/services/role-assignment.service.js";
 import { demoAccountService } from "../auth/demo-account.service.js";
@@ -153,7 +154,8 @@ export class ServiceOperatorManagementService {
         "INVALID_USER_ID",
         "대상 사용자를 선택해 주세요.",
       );
-    return this.db.transaction(async (m) => {
+    userId = userId.toLowerCase();
+    const result = await this.db.transaction(async (m) => {
       await this.authorize(m, actor, scope);
       if (actor === userId)
         throw new OperationError(
@@ -244,5 +246,7 @@ export class ServiceOperatorManagementService {
         changed,
       };
     });
+    invalidateRoles(userId);
+    return result;
   }
 }

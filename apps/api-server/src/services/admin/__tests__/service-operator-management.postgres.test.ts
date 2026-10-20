@@ -357,6 +357,9 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       expect((await s.list(actor, key)).operators).toHaveLength(0);
     },
   );
+  it('self-change protection uses canonical UUID casing',async()=>{
+    await setup();await expect(s.change(actor,'funding',actor.toUpperCase(),true)).rejects.toMatchObject({code:'SELF_OPERATOR_CHANGE_FORBIDDEN'});
+  });
   it("same target parallel assignment produces a single active role and audit", async () => {
     await setup();
     await Promise.all([

@@ -4,6 +4,7 @@ import { DataSource, Entity, PrimaryColumn } from "typeorm";
 jest.mock("../../../../database/connection.js", () => ({
   AppDataSource: { getRepository: jest.fn(), transaction: jest.fn() },
 }));
+import { getCachedRoles, setCachedRoles } from "../../utils/role-cache.js";
 import { AppDataSource } from "../../../../database/connection.js";
 import { RoleAssignment } from "../../entities/RoleAssignment.js";
 import { RoleAssignmentService } from "../role-assignment.service.js";
@@ -114,14 +115,14 @@ suite(
         release = deferred();
       const centralWrite = db.transaction(async (m) => {
         await writer.assignRole(
-          { userId: target, role, assignedBy: central, validUntil: until },
+          { userId: target.toUpperCase(), role, assignedBy: central, validUntil: until },
           m,
         );
         held.resolve();
         await release.promise;
       });
       await held.promise;
-      const local = service.change(admin, "funding", target, true);
+      const local = service.change(admin, "funding", target.toUpperCase(), true);
       try {
         await waitForBlockedOperator();
       } finally {
@@ -152,7 +153,7 @@ suite(
       const local = scoped.change(admin, "funding", target, true);
       await held.promise;
       const centralWrite = writer.assignRole({
-        userId: target,
+        userId: target.toUpperCase(),
         role,
         assignedBy: central,
         validUntil: until,
@@ -173,7 +174,7 @@ suite(
       expect(await db.query("SELECT * FROM action_logs")).toHaveLength(1);
     });
     it("standalone canonical revoke and later grant retain the canonical round trip", async () => {
-      await writer.assignRole({ userId: target, role, assignedBy: central });
+      await writer.assignRole({ userId: target.toUpperCase(), role, assignedBy: central });
       await writer.removeRole(target, role);
       expect(
         await db.query(
@@ -189,5 +190,29 @@ suite(
         ),
       ).toHaveLength(1);
     });
+
+    it.each([true, false])(
+      "outer %s mutation clears a pre-commit auth/me cache snapshot after commit",
+      async (assign) => {
+        if (!assign) await service.change(admin, "funding", target, true);
+        let observed: string[] = [];
+        const scoped = new ServiceOperatorManagementService({
+          transaction: (fn: any) =>
+            db.transaction(async (m) => {
+              const result = await fn(m);
+              const rows = await db.query(
+                "SELECT role FROM role_assignments WHERE user_id=$1 AND is_active",
+                [target],
+              );
+              observed = rows.map((r: any) => r.role);
+              setCachedRoles(target, observed);
+              return result;
+            }),
+        } as any);
+        await scoped.change(admin, "funding", target.toUpperCase(), assign);
+        expect(observed).toEqual(assign ? [] : [role]);
+        expect(getCachedRoles(target)).toBeNull();
+      },
+    );
   },
 );
