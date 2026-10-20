@@ -34,14 +34,14 @@ export default function PlatformSectionLayout() {
           platform admin
         </span>
       </div>
-      <nav className="flex gap-1 border-b border-slate-200 mb-6">
+      <nav aria-label="플랫폼 관리 메뉴" className="flex gap-1 overflow-x-auto border-b border-slate-200 mb-6">
         {NAV.map((n) => (
           <NavLink
             key={n.to}
             to={n.to}
             end={n.end}
             className={({ isActive }) =>
-              `px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors no-underline ${
+              `shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors no-underline ${
                 isActive
                   ? 'text-slate-900 border-slate-800'
                   : 'text-slate-500 border-transparent hover:text-slate-700'

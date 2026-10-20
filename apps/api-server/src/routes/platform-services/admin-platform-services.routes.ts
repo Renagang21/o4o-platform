@@ -2,6 +2,7 @@
  * Platform Services - Admin Routes
  *
  * GET   /api/v1/admin/platform-services              — 전체 목록
+ * GET   /api/v1/admin/platform-services/directory    — 현재 서비스·업무공간 주소
  * PATCH /api/v1/admin/platform-services/:code        — 설정 수정
  *
  * WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1
@@ -14,6 +15,7 @@ import { PlatformServiceCatalogService } from '../../services/platform-service-c
 import { requireAuth, requireAdmin } from '../../common/middleware/auth.middleware.js';
 import type { AuthRequest } from '../../common/middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
+import { readPlatformServiceDirectory } from '../../services/platform-service-directory.service.js';
 
 export function createAdminPlatformServicesRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -22,6 +24,18 @@ export function createAdminPlatformServicesRoutes(dataSource: DataSource): Route
   // All admin routes require auth + admin role
   router.use(requireAuth);
   router.use(requireAdmin);
+
+  /** Current domain/workspace projection; legacy editable DB catalog remains at GET /. */
+  router.get('/directory', async (_req: AuthRequest, res: Response) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    try {
+      const entries = await readPlatformServiceDirectory(dataSource);
+      res.json({ success: true, data: entries });
+    } catch (error) {
+      logger.error('[AdminPlatformServices] Error reading current directory:', error);
+      res.status(503).json({ success: false, code: 'DIRECTORY_UNAVAILABLE', error: '현재 서비스 목록을 불러오지 못했습니다.' });
+    }
+  });
 
   /**
    * GET / — 전체 서비스 목록 (admin)
