@@ -10,6 +10,10 @@ const migration = 'demo-owner-participation-v1';
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const stop = (code: string): never => { throw new Error(code); };
 
+function requireActiveSingle(rows: Row[], code: string) {
+  if (rows.length > 1 || rows.some(row=>row.status!=='active')) stop(code);
+}
+
 async function inventory(client: Client, lock: boolean) {
   const registry = await client.query(`SELECT d.user_id,u.email,u.status,u."isActive",u."isEmailVerified"
     FROM demo_accounts d JOIN users u ON u.id=d.user_id
@@ -35,11 +39,11 @@ async function inventory(client: Client, lock: boolean) {
     [organization.organization_id, targets.map(b=>b.id)]);
   for (const key of services) {
     const current = memberships.filter(m=>m.service_key===key);
-    if (current.length > 1 || current.some(m=>m.status!=='active')) stop('EXISTING_SERVICE_STATE_REQUIRES_REVIEW');
+    requireActiveSingle(current,'EXISTING_SERVICE_STATE_REQUIRES_REVIEW');
   }
   for (const target of targets) {
     const current = participation.filter(m=>m.semi_franchise_id===target.id);
-    if (current.length > 1 || current.some(m=>m.status!=='active')) stop('EXISTING_BUSINESS_STATE_REQUIRES_REVIEW');
+    requireActiveSingle(current,'EXISTING_BUSINESS_STATE_REQUIRES_REVIEW');
   }
   const missingServices = services.filter(key=>!memberships.some(m=>m.service_key===key));
   const missingBusinesses = targets.filter(b=>!participation.some(m=>m.semi_franchise_id===b.id));
@@ -83,19 +87,16 @@ export async function runDemoOwnerParticipation(client: Client, options: {apply?
     const [recovery]=await client.query("SELECT to_regclass('public.canonical_demo_repair_snapshots') IS NOT NULL AS ready");
     if (!recovery?.ready) stop('RECOVERY_TABLE_REQUIRED');
     const snapshotKey=migration+'-'+randomUUID();
-    const added: {table:string;id:string}[]=[];
-    for (const key of plan.missingServices) {
-      const [row]=await client.query(`INSERT INTO service_memberships (user_id,service_key,status,role)
-        VALUES ($1,$2,'active',$3) RETURNING id`,[plan.owner.user_id,key,key==='community'?'member':'customer']);
-      added.push({table:'service_memberships',id:row.id});
-    }
-    for (const business of plan.missingBusinesses) {
-      const [row]=await client.query(`INSERT INTO semi_franchise_memberships
-        (semi_franchise_id,organization_id,status,applied_by,applied_at,decided_at,reason)
-        VALUES ($1,$2,'active',$3,NOW(),NOW(),'Approved synthetic Store Owner Demo participation repair') RETURNING id`,
-        [business.id,plan.organization.organization_id,plan.owner.user_id]);
-      added.push({table:'semi_franchise_memberships',id:row.id});
-    }
+    const serviceRows=await client.query(`INSERT INTO service_memberships (user_id,service_key,status,role)
+      SELECT $1,key,'active',CASE WHEN key='community' THEN 'member' ELSE 'customer' END
+      FROM unnest($2::text[]) AS target(key) RETURNING id`,[plan.owner.user_id,plan.missingServices]);
+    const businessRows=await client.query(`INSERT INTO semi_franchise_memberships
+      (semi_franchise_id,organization_id,status,applied_by,applied_at,decided_at,reason)
+      SELECT id,$2,'active',$3,NOW(),NOW(),'Approved synthetic Store Owner Demo participation repair'
+      FROM unnest($1::uuid[]) AS target(id) RETURNING id`,
+      [plan.missingBusinesses.map(b=>b.id),plan.organization.organization_id,plan.owner.user_id]);
+    const added=[...serviceRows.map(row=>({table:'service_memberships',id:row.id})),
+      ...businessRows.map(row=>({table:'semi_franchise_memberships',id:row.id}))];
     // Snapshot and insert identities commit with the repaired rows. No sensitive fields leave the DB.
     await client.query(`INSERT INTO canonical_demo_repair_snapshots (migration,snapshot) VALUES ($1,$2::jsonb)`,
       [snapshotKey,JSON.stringify({operation:migration,before:plan.before,added,digest:plan.digest})]);
