@@ -58,8 +58,8 @@ export class ServiceOperatorManagementService {
       "SELECT status FROM service_memberships WHERE user_id=$1 AND service_key=$2 FOR SHARE",
       [userId, scope.membershipKey],
     );
-    // Federation already uses automatic verified-main-account eligibility; do not add manual approval here.
-    return scope.key === "pharmcoop"
+    // All Neture-backed scopes use the canonical automatic main-account eligibility.
+    return scope.membershipKey === "neture"
       ? resolveNetureMainMembershipStatus({
           account_status: "active",
           account_active: true,
@@ -119,7 +119,7 @@ export class ServiceOperatorManagementService {
           scope.operatorRole,
           scope.membershipKey,
           pattern,
-          scope.key === "pharmcoop",
+          scope.membershipKey === "neture",
         ],
       );
       const q = query.trim();
@@ -133,7 +133,7 @@ export class ServiceOperatorManagementService {
         WHERE u.status IN ('active','approved') AND u."isActive"=true AND u."isEmailVerified"=true
         AND (sm.status='active' OR ($3 AND (sm.status IS NULL OR sm.status NOT IN ('suspended','withdrawn'))))
         AND (u.name ILIKE $2 OR u.email ILIKE $2) ORDER BY u.email,u.id LIMIT 30`,
-              [scope.membershipKey, pattern, scope.key === "pharmcoop"],
+              [scope.membershipKey, pattern, scope.membershipKey === "neture"],
             );
       return {
         scope: scope.key,

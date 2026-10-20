@@ -259,15 +259,72 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     );
     expect((await s.list(actor, "funding", "%%")).candidates).toHaveLength(0);
   });
-  it("federation admin and candidate retain automatic main eligibility without manual memberships", async () => {
-    await setup("pharmcoop");
-    await db.ds.query("DELETE FROM service_memberships");
-    expect(
-      (await s.list(actor, "pharmcoop", "Candidate")).candidates,
-    ).toHaveLength(1);
-    await s.change(actor, "pharmcoop", target, true);
-    expect((await s.list(actor, "pharmcoop")).operators).toHaveLength(1);
-  });
+  const netureScopes = [
+    "neture",
+    "pharmacy",
+    "carepharm",
+    "megapharm",
+    "pharmcoop",
+  ];
+  it.each(
+    netureScopes.flatMap((key) =>
+      ["none", "pending", "rejected", "active"].map((status) => [key, status]),
+    ),
+  )(
+    "%s keeps canonical main eligibility with %s membership",
+    async (key, status) => {
+      await setup(key);
+      if (status === "none")
+        await db.ds.query("DELETE FROM service_memberships");
+      else
+        await db.ds.query("UPDATE service_memberships SET status=$1", [status]);
+      expect((await s.list(actor, key, "Candidate")).candidates).toHaveLength(
+        1,
+      );
+      await s.change(actor, key, target, true);
+      expect((await s.list(actor, key)).operators).toHaveLength(1);
+      expect((await s.list(actor, key)).operators[0].membershipStatus).toBe(
+        "active",
+      );
+      const memberships = await db.ds.query(
+        "SELECT status FROM service_memberships",
+      );
+      expect(memberships.map((r: any) => r.status)).toEqual(
+        status === "none" ? [] : [status, status],
+      );
+    },
+  );
+  it.each(
+    netureScopes.flatMap((key) =>
+      ["suspended", "withdrawn"].map((status) => [key, status]),
+    ),
+  )(
+    "%s rejects explicit actor and target %s membership",
+    async (key, status) => {
+      await setup(key);
+      await db.ds.query(
+        "UPDATE service_memberships SET status=$1 WHERE user_id=$2",
+        [status, actor],
+      );
+      await expect(s.list(actor, key)).rejects.toMatchObject({
+        code: "SERVICE_ADMIN_REQUIRED",
+      });
+      await db.ds.query(
+        "UPDATE service_memberships SET status=$1 WHERE user_id=$2",
+        ["active", actor],
+      );
+      await db.ds.query(
+        "UPDATE service_memberships SET status=$1 WHERE user_id=$2",
+        [status, target],
+      );
+      expect((await s.list(actor, key, "Candidate")).candidates).toHaveLength(
+        0,
+      );
+      await expect(s.change(actor, key, target, true)).rejects.toMatchObject({
+        code: "ACTIVE_SERVICE_MEMBER_REQUIRED",
+      });
+    },
+  );
   it("same target parallel assignment produces a single active role and audit", async () => {
     await setup();
     await Promise.all([

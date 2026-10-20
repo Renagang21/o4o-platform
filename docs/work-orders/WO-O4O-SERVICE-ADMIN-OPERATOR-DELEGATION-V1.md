@@ -55,8 +55,9 @@ Neture `/admin/operators`는 중앙 관리자 링크만 제공한다. 공통
 - 사용자 입력 role/serviceKey를 허용하지 않고 서버 allowlist에서 scope별 정확한 Operator 하나를 결정.
 - DB의 현재 Admin·활성 계정·소속·역할 유효기간을 트랜잭션 안에서 확인하고 잠근다.
 - 후보는 해당 서비스 이용 자격이 있는 사람만 검색. Google 연결 없는 회원은 연결 필요 표시.
-- 일반 서비스는 active membership 필수. **Pharmcoop 연합회는 기존 federationRole과 같은
-  이메일 확인·정상 계정·명시적 Neture 정지/탈퇴 차단의 자동 메인 자격을 유지**한다.
+- 독립 서비스는 active membership 필수. **Neture 원장을 쓰는 대표·Pharmacy·CarePharm·MegaPharm·Pharmcoop
+  범위는 canonical 메인 resolver와 같은 이메일 확인·정상 계정·명시적 Neture 정지/탈퇴 차단의
+  자동 메인 자격을 유지**한다.
 - 개인 조합과 연결된 사업은 전역 사업 역할 신규 지정으로 우회하지 않는다.
 - 지정은 서비스 가입/정지 상태를 수정하지 않는다. 해제는 해당 Operator 한 역할만 비활성화하며
   다른 서비스 역할·Admin·계정·회원·활동 데이터를 건드리지 않는다.
@@ -115,3 +116,14 @@ manager 전달을 검사한다. 운영 코드의 writer는 기존 roleAssignment
   과거 WO/IR·은퇴 서비스·미판정 서비스 정본은 변경하지 않았다.
 
 WORKTREE_DISPOSITION: 전용 worktree/branch 유지(KEEP), 통합 전 후속 수정에 필요.
+
+
+### PR #719 통합 검토 보완
+
+- 최신 main #717 (`b54074d038`)을 통합하고 CarePharm·호스트/셸 회귀 89개 및 API/Neture 빌드 통과.
+- Codex P1: 메인 자동 이용 자격이 Pharmcoop에만 적용되어 Neture/Pharmacy/CarePharm/MegaPharm의
+  정상 Admin/후보를 차단하는 문제를 수정. 모든 `membershipKey=neture` 범위의 인가·후보·목록 상태를 일치시킴.
+- 5개 범위 × 가입 원장 없음/pending/rejected/active 허용, 명시적 suspended/withdrawn 차단을
+  실제 PostgreSQL로 회귀 검증하며 가입 상태를 변경하지 않는 것도 확인한다.
+- 보완 후 API 100개 PASS(기존 71개에서 29개 증가), TypeScript·API 운영 빌드·ESLint PASS.
+  이전 웹/UI 검증과 합하면 683개이며 이 수정은 웹 코드를 바꾸지 않는다.
