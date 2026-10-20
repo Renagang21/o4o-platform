@@ -1,0 +1,46 @@
+# 관리자 서비스 관리 화면의 현재 서브도메인 정렬
+
+> **상태**: ACTIVE — 개발·검증 완료, main 통합 대기
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
+> **근거 WO/IR**: 사용자 `/admin/platform/services`의 이전 서비스 목록을 현재 서브도메인 구조로 정비 요청
+> **관련 정본**: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) · [서브도메인 의미](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)
+
+## 1. 조사와 범위
+
+기준 main `3f584bcab186dd8676e0a79f2563166b865b71f3`. 클라우드 격리 checkout을 유지하고 최신 main에서 새 전용 branch `wo/admin-subdomain-service-directory`를 생성했다. onboarding skill에 따라 추가 worktree는 만들지 않는다.
+
+- 현재 화면은 `/api/v1/admin/platform-services` → `PlatformServiceCatalogService.listServices()` → `platform_services` DB 행을 표시한다. `entryUrl`은 현재 코드의 공식 URL과 별개이며 과거 상품 모듈·K-Cosmetics가 포함될 수 있다.
+- 실제 서비스 호스트는 API `service-catalog.ts`, 사업별 호스트는 `@o4o/types`의 `PHARMACY_COLLABORATORS`, 내 매장 주소는 `store-workspace.ts`에 있다. `ServiceDiscovery.tsx`와 서비스 탐색 정본에 현재 공개 진입과 Partner 준비 중 정책이 있다.
+- serviceKey·사업 key·운영 권한·업무공간·서브도메인은 다른 축이다. Pharmacy의 legacy `kpa-society`와 분회의 `kpa-branch`를 구분하고, CarePharm/MegaPharm/협동조합의 새 service membership을 만들지 않는다.
+- `platformAdminApi.getServices`/`PlatformService`의 관리자 UI 소비처는 이 페이지 하나다. 기존 DB catalog GET/PATCH와 공개 catalog 소비처는 변경하지 않고, 같은 관리자 guard 아래 별도 읽기 `/directory`를 추가한다.
+- 기존 `requireAuth` + `requireAdmin`은 `platform:super_admin`을 확인한다. 권한·역할·인증·handoff·DNS·배포 설정·DB schema/seed/write는 변경하지 않는다.
+
+## 2. 구현 TODO
+
+- [x] 코드·정본·화면 및 문자열 소비처 대조, 데이터 출처와 퇴역 경계 확인
+- [x] 현재 서비스 / 대표·공통 업무공간 / 연동·준비 중 항목으로 구성하는 서버 읽기 투영
+- [x] 공식 코드 URL 재사용, K-Cosmetics·PharmacyHub·내부 상품 모듈을 현행 서비스로 노출하지 않음
+- [x] Pharmacy·CarePharm·MegaPharm은 해당 사업 원장의 운영/종료/미등록을 구분; 협동조합은 연합회 수준만 표시
+- [x] Store·admin을 별도 가입 서비스와 구분, Partner는 대표 홈의 준비 중 설명으로 연결
+- [x] 기존 실제 경로인 Cafe24·병원 도구는 연동/도구로 구분하고 서브도메인을 임의 생성하지 않음
+- [x] 화면에 서비스명·공식 주소·업무 범위·원장 상태, 이름/주소 검색·구분 선택·오류 재시도 제공
+- [x] 기존 활성 배지는 운영 확인으로 사용하지 않음; DB 읽기 실패를 미등록/0으로 숨기지 않음
+- [x] API guard·읽기 전용·URL/퇴역 회귀, UI 상태·검색·필터, 데스크톱/모바일 브라우저 검증
+- 타입·build·lint·문서 검사 후 path-specific commit/push, 원격 SHA 확인 결과와 운영 미반영 상태를 최종 보고로 인계
+
+## 3. 화면과 데이터 계약
+
+기존 route와 상위 메뉴는 유지한다. 초기 화면은 전체 목록을 세 구분으로 보여 주며 이름·주소로 검색한다. 내부 legacy key·서비스 기술 유형·대표 배지는 일상 화면에서 제거한다. 주소 등록은 실제 DNS/서빙/가입 가능 상태 확인을 뜻하지 않으며, 약국 협력사업 상태만 해당 `semi_franchises`의 현재 행으로 판정한다. 협동조합 연합회는 단일 사업 행이나 개별 조합 상태를 추정하지 않는다.
+
+기존 catalog 편집·가입/승인·계정/역할 관리 기능은 이 화면에 추가하지 않는다. 이번 종료점은 검증·commit·push이며 PR·main 병합·배포는 후속 통합 단계다.
+
+
+## 4. 개발 검증 결과와 통합 인계
+
+- 현재 서비스 9개, 대표·공통 업무 공간 3개, 연동·도구·준비 중 3개의 총 15개 진입을 표시한다. 현재 이름·주소를 우선하고 이전 DB의 `entryUrl`/기술 유형/대표 배지는 읽지 않는다.
+- 관리자 섹션 공통 탭이 모바일에서 세로로 꺾이는 문제를 같은 섹션 내부의 가로 스크롤로 보완했다. 소비처는 `platform.routes.tsx` 아래 플랫폼 홈·계정·서비스·사용자·역할·대상 정책 6화면이다. 메뉴 항목·경로·guard는 유지한다. 브라우저에서 기존 계정 탭 → 서비스 탭 진입과 직접 URL/새로고침을 확인했다.
+- API Jest 7, 관리자 Vitest 8, 데스크톱·모바일 Chromium 6 tests PASS. 양쪽 타입 검사·build PASS, 변경 파일 ESLint 오류/경고 0. 최초 브라우저의 광범위한 alert selector가 기존 개발 버전 배너까지 선택해 실패했으며 실제 오류 영역으로 한정해 전체 6건 재검증을 통과했다.
+- [검증 CHECK](../checks/CHECK-O4O-ADMIN-SUBDOMAIN-SERVICE-DIRECTORY-V1.md)에 표시 대상·출처·제한을 기록한다. 실제 Google 관리자 로그인·운영 DB/원장 상태·DNS/서빙·실제 외부 서비스 클릭 검증은 수행하지 않았다. 테스트는 로컬 fixture로 외부 API를 차단했다.
+- API의 새 GET을 관리자 화면보다 먼저 사용할 수 있어야 한다. 통합 시 API → admin 순서의 기존 배포 경로를 사용한다. 신규 migration/seed/DB write·역할/인증/공통 서비스 카탈로그 변경은 없다. 이번 branch에서는 PR·CI·병합·배포를 수행하지 않는다.
+
+문서 정합: 이전 관리자 표시와 현재 서비스 탐색·서브도메인 정본 간 차이를 구현 WO/CHECK로 기록했다. 과거 catalog CHECK의 DB `entry_url` 정리 잔여는 이 화면에서 공식 코드 주소를 사용하도록 해소하며 DB 값 자체의 삭제·수정은 수행하지 않는다. 정본 정책·CANONICAL-INDEX는 바꾸지 않았다.
