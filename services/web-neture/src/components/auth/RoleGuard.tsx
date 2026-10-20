@@ -167,8 +167,9 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
  *   기존 redirectMap 제거 — admin이 /operator/* 에서 차단되던 구조 해소.
  */
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
-  const { pathname } = useLocation();
-  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && pathname === '/operator');
+  const location = useLocation();
+  const pathname = location.pathname.replace(/\/+$/, '');
+  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && (pathname === '/operator' || pathname === '/operator/home-presentation/carepharm'));
   const scopedRoles = businessPath ? getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE) : [];
   return (
     <RouteGuard

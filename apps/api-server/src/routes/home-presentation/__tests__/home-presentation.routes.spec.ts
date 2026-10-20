@@ -85,7 +85,7 @@ beforeEach(() => {
     organization_id: user,
     status: "active",
   });
-  mockBusinessOperator.mockResolvedValue({ id: "business" });
+  mockBusinessOperator.mockResolvedValue({ id: "business", status: "active" });
   app = express();
   app.use(express.json());
   app.use("/home", createHomePresentationRoutes({} as DataSource));
@@ -222,4 +222,22 @@ it("requires the assigned pharmacy business operator and derives organization fr
     .set("x-test-membership", "active");
   expect(response.status).toBe(403);
   expect(read).not.toHaveBeenCalled();
+});
+it.each(["get", "put"] as const)("checks CarePharm assignment on %s without changing the existing presentation slot", async method => {
+  const send = () => request(app)[method]("/home/carepharm/manage")
+    .set("x-test-user", user).set("x-test-role", "neture:carepharm_operator")
+    .set("x-test-membership", "active")
+    .send({ config: initialHomePresentation("carepharm"), revision: 0, publish: false, key: "pharmacy" });
+  expect((await send()).status).toBe(200);
+  expect(mockBusinessOperator).toHaveBeenCalledWith(user, "carepharm");
+  expect(method === "get" ? read : save).toHaveBeenCalledWith(
+    { surface: "carepharm", organizationId: null }, ...(method === "put" ? [initialHomePresentation("carepharm"), 0, false, user] : []),
+  );
+  read.mockClear(); save.mockClear();
+  mockBusinessOperator.mockRejectedValueOnce({ httpStatus: 403 });
+  expect((await send()).status).toBe(403);
+  expect(read).not.toHaveBeenCalled(); expect(save).not.toHaveBeenCalled();
+  mockBusinessOperator.mockResolvedValueOnce({ status: "closed" });
+  expect((await send()).status).toBe(404);
+  expect(read).not.toHaveBeenCalled(); expect(save).not.toHaveBeenCalled();
 });
