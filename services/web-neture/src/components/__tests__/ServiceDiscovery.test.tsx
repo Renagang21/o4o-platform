@@ -80,3 +80,35 @@ it('이미 참여 가능한 사업은 다른 서비스 소개에서 중복하지
  expect(screen.queryByRole('link',{name:/^만성질환관리 /})).toBeNull();
  expect(screen.getByRole('link',{name:/^창고형 약국 /}).getAttribute('href')).toBe('https://megapharm.neture.co.kr/');
 });
+
+it('모든 서비스 가입 시 미가입 서비스 영역을 숨기고 공개 도구는 별도로 유지한다', () => {
+  const data = {
+    services: ['kpa-society', 'community', 'kpa-branch', 'lecture', 'funding'].map(key => ({ key, membership: { status: 'active' } })),
+    stores: [{ id: 'fixture-store' }], branches: [],
+    serviceStates: { supplier: { status: 'active', source: 'fixture' } },
+    businesses: ['pharmacy', 'carepharm', 'megapharm'].map(key => ({ key, name: key, canParticipate: true, membershipStatus: 'active' })),
+    cooperatives: [{ id: 'fixture-coop', slug: 'fixture', name: '합성 조합', status: 'active' }],
+  } as import('../../lib/home-entry').HomeEntryData;
+  render(<MemoryRouter><ServiceDiscovery personalized data={data} /></MemoryRouter>);
+  expect(screen.queryByRole('heading', { name: '다른 서비스 알아보기' })).toBeNull();
+  expect(screen.queryByRole('link', { name: /^만성질환관리 / })).toBeNull();
+  expect(screen.queryByRole('link', { name: /^약사회 분회 / })).toBeNull();
+  const publicSection = screen.getByRole('region', { name: '공개 도구·준비 중 서비스' });
+  expect(publicSection.textContent).toContain('O4O Partner');
+  expect(publicSection.textContent).toContain('병원·약품 파일 도구');
+});
+
+it('pharmacy 사업 원장에만 가입된 회원도 약국 서비스를 미가입으로 표시하지 않는다', () => {
+  const data = { services: [], stores: [], branches: [], serviceStates: { supplier: { status: 'none', source: 'none' } },
+    businesses: [{ key: 'pharmacy', name: '약국', canParticipate: true, membershipStatus: 'active' }],
+  } as import('../../lib/home-entry').HomeEntryData;
+  render(<MemoryRouter><ServiceDiscovery personalized data={data} /></MemoryRouter>);
+  expect(screen.queryByRole('link', { name: /^O4O 약국 경영지원 / })).toBeNull();
+  expect(screen.getByRole('link', { name: /^만성질환관리 / })).toBeTruthy();
+});
+
+it('데이터 조회 실패 시 공개 도구를 포함한 전체 탐색을 유지한다', () => {
+  render(<MemoryRouter><ServiceDiscovery personalized data={null} /></MemoryRouter>);
+  expect(screen.getByRole('region', { name: '전체 서비스' }).textContent).toContain('O4O Partner');
+  expect(screen.queryByRole('region', { name: '공개 도구·준비 중 서비스' })).toBeNull();
+});

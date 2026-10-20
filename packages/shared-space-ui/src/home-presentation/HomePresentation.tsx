@@ -29,7 +29,12 @@ export function homePresentationPath(
   surface: HomeSurface,
   branchSlug?: string,
   businessKey?: string,
+  cooperativeSlug?: string,
 ) {
+  if (surface === "cooperative") {
+    if (!cooperativeSlug) throw new Error("협동조합을 먼저 선택해 주세요.");
+    return `/home-presentation/cooperative/${encodeURIComponent(cooperativeSlug)}`;
+  }
   if (surface === "branch") {
     if (!branchSlug) throw new Error("분회를 먼저 선택해 주세요.");
     return `/kpa-branch/branches/${encodeURIComponent(branchSlug)}/home-presentation`;
@@ -40,29 +45,37 @@ export function homePresentationManagePath(
   surface: HomeSurface,
   branchSlug?: string,
   businessKey?: string,
+  cooperativeSlug?: string,
 ) {
   return surface === "branch"
     ? `/kpa-branch/branches/${encodeURIComponent(branchSlug ?? "")}/operator/home-presentation`
-    : `${homePresentationPath(surface, branchSlug, businessKey)}/manage`;
+    : `${homePresentationPath(surface, branchSlug, businessKey, cooperativeSlug)}/manage`;
 }
 interface PublicProps {
   surface: HomeSurface;
   client?: Pick<HomePresentationClient, "get">;
   branchSlug?: string;
   businessKey?: string;
+  cooperativeSlug?: string;
 }
 function useHomePresentation({
   surface,
   client,
   branchSlug,
   businessKey,
+  cooperativeSlug,
 }: PublicProps) {
   const [state, setState] = useState<{
     scope: string;
     document: HomePresentation | null;
     ready: boolean;
   }>({ scope: "", document: null, ready: false });
-  const endpoint = homePresentationPath(surface, branchSlug, businessKey);
+  const endpoint = homePresentationPath(
+    surface,
+    branchSlug,
+    businessKey,
+    cooperativeSlug,
+  );
   useEffect(() => {
     let active = true;
     setState({ scope: endpoint, document: null, ready: false });
@@ -362,7 +375,9 @@ export function HomePromotionView({
     </aside>
   );
 }
-export function ServiceHomePromotion(props: PublicProps & { publishedOnly?: boolean }) {
+export function ServiceHomePromotion(
+  props: PublicProps & { publishedOnly?: boolean },
+) {
   const { config, ready, hasPublished } = useHomePresentation(props);
   return ready && (!props.publishedOnly || hasPublished) ? (
     <HomePromotionView surface={props.surface} config={config} />

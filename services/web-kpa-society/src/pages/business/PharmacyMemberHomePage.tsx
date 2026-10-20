@@ -68,11 +68,11 @@ export default function PharmacyMemberHomePage() {
   const selectedMaterialsPath = materialsPath + (materialStore.organizationId ? `?store=${encodeURIComponent(materialStore.organizationId)}` : '');
   const showConversations = !!business.communityKey && (currentPosts.loading || !!currentPosts.error || conversations.length > 0);
   return <div className="pharmacy-member-home space-y-8">
-    <header className="member-home-heading border-b border-slate-200 pb-5">
+    <BusinessHomeFeature key={`${scope}:hero`} businessKey={business.key} mode="hero" fallback={<header className="member-home-heading border-b border-slate-200 pb-5">
       <p className="text-xs font-semibold tracking-wide text-blue-700">{businessName} · 협력약국 공간</p>
       <h1 id="member-home-title" className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">약국에 필요한 소식과 자료</h1>
       <p className="mt-2 text-sm leading-6 text-slate-600">본부가 전하는 소식부터 제품 정보, 회원 약국의 이야기까지 확인하세요.</p>
-    </header>
+    </header>} />
     {!access?.allowed ? <section className="rounded-xl border bg-white p-6">
       <h2 className="text-lg font-semibold">참여 신청 · 이용 안내</h2>
       <p className="my-3 text-sm leading-6 text-slate-600">사업 소식과 운영 자료는 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
@@ -81,7 +81,7 @@ export default function PharmacyMemberHomePage() {
       <section id="business-news" aria-labelledby="notices-title" className="scroll-mt-28 space-y-4">
         <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="사업 소식" to={forumPath} linkLabel="게시판에서 보기" />
         {business.communityKey && <NoticeContent state={currentNotices} pinned={pinnedNotices} recent={recentNotices} forumPath={forumPath} retry={() => setRetryPosts(n => n + 1)} />}
-        <BusinessHomeFeature key={scope} businessKey={business.key} />
+        <BusinessHomeFeature key={scope} businessKey={business.key} mode="promotions" />
       </section>
       <section aria-labelledby="materials-title" className="space-y-4">
         <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="약국 운영 자료" to={selectedMaterialsPath} linkLabel="전체 자료" />
