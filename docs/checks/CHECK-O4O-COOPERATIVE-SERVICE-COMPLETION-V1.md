@@ -55,3 +55,9 @@ DEPLOYMENT = MANUAL/GATED. 통합 담당이 API와 cooperative-web을 함께 반
 WORKTREE_DISPOSITION: 기존 작업공간 `/workspace/o4o-wt/cooperative-role-management` 재사용 / branch `wo/cooperative-service-completion` / base `b54074d038` / main integration·remote CI·deployment 미실행 / verdict `KEEP` — 병합 전 후속 수정 및 통합 인계용.
 
 구현 commit `968c711a1c` 원격 push 완료. 이후 본 인계 문서의 완료 상태를 별도 문서 커밋으로 push한다. push 직전 main `d176026c24`의 공급자 사업자명 변경을 확인했고 변경 파일 충돌 없이 rebase했다. rebase 후 API 타입 검사·협동조합 UI 52개를 다시 통과했다. WORKTREE_DISPOSITION은 KEEP이며 이번 작업의 미커밋·미추적 변경 없이 인계한다.
+
+## 후속 통합 착수 — 2026-10-20
+
+사용자가 제안된 다음 작업(이번 branch 검토·CI·병합·API 및 협동조합 웹 배포, 가능한 운영 검증) 진행을 지시했다. 앞 절의 push 종료/운영 미실행은 개발 단계 당시 기록이며 이번 통합 지시를 제한하지 않는다.
+
+통합 시작 main은 `0b9821122a`다. 이미 push된 branch에 main을 merge해 연합회 Operator 지정 화면과 비공개 revision 인증 smoke 보완을 유지했다. 새 migration은 없다. 운영 배포는 기존 workflow의 gate를 유지하고 API와 Pharmcoop으로 한정한다. 조합 fixture 생성·기존 계정 권한 부여·IAM/DNS 변경은 실행하지 않는다. 공개 호스트 접근은 환경 allowlist에 없으며 GCP 직접 outbound identity도 없다. GitHub Actions WIF 배포와 인증된 private smoke 결과를 확인하고 공개/실계정 업무 검증의 한계를 별도로 보고한다.
