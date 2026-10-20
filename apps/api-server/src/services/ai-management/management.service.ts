@@ -261,16 +261,24 @@ export class AiManagementService {
     const period = usagePeriod(days, now);
     // Historical usage has scope but no reliable per-row service/feature attribution.
     const rows = await this.read<UsageRow[]>(
-      `SELECT provider::text AS provider, model, scope,
+      // Legacy accounting writes omitted provider usage as 0/0, not NULL.
+      // Neither NULL nor a zero-token generation proves that the call was free.
+      `WITH recorded AS (
+      SELECT provider, model, scope, status, "promptTokens", "completionTokens", "costEstimated",
+        ("promptTokens" IS NULL OR "completionTokens" IS NULL
+          OR ("promptTokens" = 0 AND "completionTokens" = 0)) AS usage_unknown
+      FROM ai_usage_logs WHERE "createdAt" >= $1 AND "createdAt" < $2
+      )
+      SELECT provider::text AS provider, model, scope,
       COUNT(*)::text AS records,
       COUNT(*) FILTER (WHERE status = 'success')::text AS successes,
       COUNT(*) FILTER (WHERE status = 'error')::text AS errors,
-      COUNT(*) FILTER (WHERE "costEstimated" IS NULL)::text AS unpriced,
-      COUNT(*) FILTER (WHERE "promptTokens" IS NULL OR "completionTokens" IS NULL)::text AS unmetered,
+      COUNT(*) FILTER (WHERE "costEstimated" IS NULL OR usage_unknown)::text AS unpriced,
+      COUNT(*) FILTER (WHERE usage_unknown)::text AS unmetered,
       COALESCE(SUM("promptTokens"), 0)::text AS input,
       COALESCE(SUM("completionTokens"), 0)::text AS output,
       COALESCE(SUM("costEstimated"), 0)::text AS cost
-      FROM ai_usage_logs WHERE "createdAt" >= $1 AND "createdAt" < $2
+      FROM recorded
       GROUP BY provider, model, scope ORDER BY provider, model, scope`,
       [period.from, period.to],
     );

@@ -41,7 +41,7 @@
 
 | 검증 | 결과·범위 |
 | --- | --- |
-| API Jest | 2 suites / 28 tests PASS. 주입된 DB fixture와 HTTP router로 권한 gate·읽기 전용·민감정보 미반환·불명/오류·기간·정확한 소수 비용 합산 검증 |
+| API Jest | 최초 2 suites / 28 tests PASS. 통합 리뷰 보완 후 결과는 아래 기록 참조. 주입된 DB fixture와 HTTP router로 권한 gate·읽기 전용·민감정보 미반환·불명/오류·기간·정확한 소수 비용 합산 검증 |
 | 관리자 Vitest | 2 files / 17 tests PASS. 이름/영역 선택·상세·공유 정책·오류/재조회·부분 비용·이전 응답 무시·기존 이메일 회귀 포함 |
 | Chromium 브라우저 | 데스크톱 1280×800, 모바일 390×844의 실제 관리자 앱 + 차단된 fixture API로 최종 12 tests PASS. UI 동작·재조회·공통 설정 이동/저장 회귀·서비스 역할 거부·비로그인 이동 검증 |
 | 타입·build | API/관리자 의존 패키지 build, 양쪽 type-check, API build, 관리자 Vite build PASS |
@@ -57,3 +57,15 @@
 
 [design]: https://github.com/Renagang21/o4o-platform/blob/2572abe80a2cfe2927b2e6b7e1a9ae9fa06c8d31/docs/design/DESIGN-O4O-AI-USAGE-CONTROL-V1.md
 [inventory]: https://github.com/Renagang21/o4o-platform/blob/84c03f3abc575d117f179cbabe2d687b1a991b14/docs/investigations/IR-O4O-AI-USAGE-CONTROL-INVENTORY-V1.md
+
+
+## 5. 통합 진행 — 사용자 main 병합·배포 승인 (2026-10-20)
+
+사용자가 개발 종료 후 main 병합과 배포를 지시했다. 최신 main의 추가 변경은 협동조합 배포 증적 문서이며 작업 branch에 병합하고 PR #724를 생성했다. 현재 절은 병합/배포 전 수정 기록이며 운영 완료 증거는 아니다.
+
+- Codex P2: 기존 회계가 provider 사용량 누락을 토큰 0/0·비용 0으로 기록한 경우 NULL 검사만으로는 누락을 감지하지 못했다. 조회 SQL에서 NULL 및 양쪽 0 토큰을 미확인으로 분류하고 비용 미확인에도 반영한다. 원장/한도/실행기의 값은 변경하지 않는다.
+- 실제 집계 SQL의 predicate를 in-memory SQLite에서 실행하는 4건의 회귀 검증을 추가했다. PostgreSQL text cast/bind만 테스트 adapter에서 변환하며, 실제 PostgreSQL 검증을 했다는 뜻은 아니다. 0토큰/누락/일부 누락과 명시적으로 계측된 0원, 기간 경계·공유 정책 중복 방지를 구분한다.
+- 최초 PR CI의 API shard 3에서 기존 권한 소스 검사가 부모 subrouter의 `use` 선언을 핸들러로 세지 않아 실패했다. 경로가 있는 `use`까지 포함하고 각 선언의 guard를 검사하도록 보완했다. 관리자 권한 자체는 완화하지 않았다.
+- 개별 job 로그는 환경의 대상 호스트 제한으로 읽지 못했으나, 공식 전체 run 로그 ZIP으로 원인을 확인했다. 네트워크 정책·credential·workflow를 변경하지 않았다.
+
+수정 후 focused tests 4 suites / 48 tests와 API 타입 검사 PASS. 재실행 CI/리뷰를 확인한 뒤 병합한다. 신규 schema/migration은 없으며 현재 runtime 판정은 API·admin LEVEL 2다.

@@ -261,8 +261,10 @@ describe('§6 권한 계약', () => {
       path.resolve(__dirname, '../routes/ai-admin.routes.ts'),
       'utf8',
     );
-    const handlers = src.match(/router\.(get|post|put|patch|delete)\(/g) || [];
-    const guarded = src.match(/authenticate,\s*requireAdmin/g) || [];
+    // Path-mounted subrouters must be guarded too; count the guard on each
+    // declaration rather than matching unrelated middleware references.
+    const handlers = src.match(/router\.(get|post|put|patch|delete|use)\(\s*['"][^'"]+['"]\s*,/g) || [];
+    const guarded = src.match(/router\.(get|post|put|patch|delete|use)\(\s*['"][^'"]+['"]\s*,\s*authenticate,\s*requireAdmin/g) || [];
     expect(handlers.length).toBeGreaterThan(0);
     expect(guarded.length).toBe(handlers.length);
   });
