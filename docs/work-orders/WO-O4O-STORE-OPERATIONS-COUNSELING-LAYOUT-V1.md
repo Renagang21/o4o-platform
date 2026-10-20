@@ -26,8 +26,14 @@
 - [x] 실제 컴포넌트+합성 API PC/모바일 브라우저 검사, 스크린샷과 한계 기록.
 - [x] CHECK·TODO 정합, 변경 경로만 stage·scope 검사·commit·named branch push.
 
-실계정/운영 데이터 변경·유료 AI·마이크·실기기 검증·PR·main 병합·배포는 이번 작업에 포함하지 않는다.
+초기 개발은 push까지 완료했다. 2026-10-20 사용자의 후속 지시로 같은 WO의 PR·main 병합·배포를 이 공간에서 진행한다. 실계정/운영 데이터 변경·유료 AI·마이크·실기기 검증은 포함하지 않는다.
+
+## 사용자 승인 후 통합
+
+- [x] 현재 ruleset 확인(PR·CI Gate 필수), 최신 main `653178d0b8` 충돌 없이 통합(`95ddb1bc5b26`).
+- [x] 통합 후 의존 패키지·Store build, 전체 709 tests, 집중 ESLint 재검증 PASS.
+- PR의 실제 HEAD·CI·Codex 미해결 사항 확인 후 순차 병합한다. 배포는 Unified Delivery와 실제 serving SHA 기준으로 확인하며 최종 상태는 PR/Actions와 완료 보고가 기준이다.
 
 검증: Store 60 files / 709 tests, 의존 패키지·Store build, 집중 lint, PC/모바일 합성 브라우저 88개 확인 PASS. 상세 결과·한계·인계는 [CHECK](../checks/CHECK-O4O-STORE-OPERATIONS-COUNSELING-LAYOUT-V1.md)를 따른다.
 
-문서 정합: 코드·검증 완료에 맞춰 TODO를 갱신하고 CHECK를 추가했다. 종료 체크는 commit·push 완료 시 확정한다.
+문서 정합: 개발 commit·push 완료와 사용자 승인 후 통합 재검증을 반영했다. 병합·배포의 실제 결과는 PR/Actions에 기록한다.

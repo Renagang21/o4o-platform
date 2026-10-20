@@ -51,7 +51,15 @@ Node 22.18.0 / pnpm 10.25.0. 전용 worktree에서 frozen lockfile·무결성 �
 ## 인계
 
 - 시작 main `d176026c2485`. push 전 확인 main `762bed8cc1dd`; 이번 수정 경로와 겹치는 main 변경은 없다. 자동 merge/rebase는 하지 않았다.
-- 개발 종료점은 commit·named branch push다. PR/CI 운영·main 병합·배포는 통합 담당이 최신 main과 함께 검증한다. 이번 작업은 운영에 아직 반영되지 않았다.
+- 초기 개발은 commit·named branch push까지 완료했다. 이후 사용자가 이 공간에 PR·main 병합·배포를 지시해 같은 WO의 통합 단계로 진행한다. 아래 통합 재검증은 배포 완료 증거와 구분한다.
 - `WORKTREE_DISPOSITION`: owned worktree `/workspace/o4o-wt/store-operations-counseling-layout`, branch 동일 WO, main integration/CI/deployment 미실행, verdict `KEEP`(미병합 변경 검토·통합용). 기존 작업공간은 정리하지 않았다.
+
+### 사용자 승인 후 통합 재검증 (2026-10-20)
+
+최신 main `653178d0b884d545f60d472311436ea7a8f3e727`을 merge commit `95ddb1bc5b26`으로 통합했다. 충돌은 없었으며 원래 화면 수정 경로의 main 변경도 없다. 같은 WO의 연속 통합 단계로 전용 branch를 유지한다. lockfile·의존성 선언은 변하지 않았다.
+
+의존 패키지 build, Store 전체 60 files / 709 tests, TypeScript 포함 Store build, 변경 TS/TSX 9개 ESLint를 재실행해 통과했다. 기존 PC/모바일 합성 브라우저 88개 확인은 개발 HEAD의 증거이며 main 통합 후 실제 운영 검증으로 바꾸어 주장하지 않는다. 통합 로그는 동일 증적 디렉터리의 `integration-*` 파일에 보존한다.
+
+실제 main ruleset은 PR와 `CI Gate`를 요구하며 human approval 0이다. 현재 HEAD의 CI·Codex 미해결 사항·main 이동을 확인한 뒤 병합한다. 자동/통제 배포는 README의 Unified Delivery를 따르며 API·관리자 등 다른 작업의 진행 중 배포를 수동 실행으로 중첩하지 않는다. 최종 PR·merge SHA·Delivery run·production/serving 결과는 해당 PR/Actions와 완료 보고가 기준이다.
 
 문서 정합: 이번 [WO](../work-orders/WO-O4O-STORE-OPERATIONS-COUNSELING-LAYOUT-V1.md)와 이 검증 기록을 추가했다. 과거 CHECK와 canonical 정책은 변경하지 않았다.
