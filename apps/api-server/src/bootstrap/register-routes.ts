@@ -67,7 +67,6 @@ import storeOwnerTerminationRoutes from '../routes/admin/store-owner-termination
 
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
-import { createAdminPlatformServicesRoutes } from '../routes/platform-services/admin-platform-services.routes.js';
 import { createStoreNetworkRoutes } from '../routes/platform/store-network.routes.js';
 import { createPhysicalStoreRoutes } from '../routes/platform/physical-store.routes.js';
 import { createSlugRoutes } from '../routes/platform/slug.routes.js';
@@ -346,7 +345,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     // 8.7. Register Platform Service Catalog routes (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
     app.use('/api/v1/platform-services', createPlatformServicesRoutes(dataSource));
-    app.use('/api/v1/admin/platform-services', createAdminPlatformServicesRoutes(dataSource));
     logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
 
     // 8.8. Register Store Network Dashboard routes (WO-O4O-STORE-NETWORK-DASHBOARD-V1)

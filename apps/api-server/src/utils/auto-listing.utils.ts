@@ -12,59 +12,10 @@
 
 import type { DataSource, QueryRunner } from 'typeorm';
 import logger from './logger.js';
-import { isDrugProductById } from '../modules/neture/guards/drug-access.guard.js';
 import { NON_CANONICAL_ENROLLMENT_CODES } from './listing-service-key.js';
 
 /** DataSource 또는 QueryRunner 양쪽에서 query() 실행 가능 */
 type QueryExecutor = Pick<DataSource, 'query'> | Pick<QueryRunner, 'query'>;
-
-/**
- * WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1
- *
- * 자동확산 대상 조직을 **약국 대상 서비스로 제한**하는 SQL 조건.
- * `:masterParam` 이 의약품이 아니면 조건은 항상 참(기존 동작 불변),
- * 의약품이면 `service_audience_policies.is_pharmacy_target_service = true` 인 서비스만 통과한다.
- * 정책 행이 없으면 EXISTS 가 false → 제외 (fail-closed).
- *
- * @param masterParam 마스터 id 를 담은 파라미터 placeholder (예: '$2')
- * @param serviceExpr 대상 service_key SQL 식 (예: 'ose.service_code')
- */
-function drugAudienceSqlCondition(masterParam: string, serviceExpr: string): string {
-  return `(
-      NOT EXISTS (
-        SELECT 1 FROM product_masters pm_drug
-         WHERE pm_drug.id = ${masterParam}
-           AND upper(btrim(pm_drug.regulatory_type)) IN ('DRUG', '의약품')
-      )
-      OR EXISTS (
-        SELECT 1 FROM service_audience_policies sap
-         WHERE sap.service_key = ${serviceExpr}
-           AND sap.is_pharmacy_target_service = true
-      )
-    )`;
-}
-
-/**
- * 조직 단위 확산(신규 조직 → 기존 PUBLIC/SERVICE offer)에서 사용하는 조건.
- * offer 의 master 가 의약품이면, 그 조직이 진입하는 serviceKey 가 약국 대상일 때만 통과한다.
- *
- * @param masterExpr offer 의 master_id SQL 식 (예: 'spo.master_id')
- * @param serviceParam 대상 serviceKey 파라미터 placeholder (예: '$2')
- */
-function drugAudienceSqlConditionForOrg(masterExpr: string, serviceParam: string): string {
-  return `(
-      NOT EXISTS (
-        SELECT 1 FROM product_masters pm_drug
-         WHERE pm_drug.id = ${masterExpr}
-           AND upper(btrim(pm_drug.regulatory_type)) IN ('DRUG', '의약품')
-      )
-      OR EXISTS (
-        SELECT 1 FROM service_audience_policies sap
-         WHERE sap.service_key = ${serviceParam}
-           AND sap.is_pharmacy_target_service = true
-      )
-    )`;
-}
 
 /**
  * PUBLIC Offer 승인 시: 모든 활성 조직에 listing 자동 생성.
@@ -101,21 +52,12 @@ export async function autoExpandPublicProduct(
          --   role/product-level 별칭('cosmetics' / 'kpa') 잔재 행은 제외한다.
          --   (canonical 행이 같은 조직에 이미 있어 진열 대상이 줄지 않는다)
          AND NOT (ose.service_code = ANY($3::text[]))
-         AND ${drugAudienceSqlCondition('$2', 'ose.service_code')}
        ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [offerId, masterId, NON_CANONICAL_ENROLLMENT_CODES],
     );
 
     const count = Array.isArray(result) ? result.length : (result as { rowCount?: number }).rowCount ?? 0;
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1: 조용한 skip 금지 — 제한 사실을 기록한다.
-    const isDrug = await isDrugProductById(executor, masterId);
-    if (isDrug === true) {
-      logger.warn(
-        `[AutoListing][DRUG] PUBLIC offer ${offerId} (master ${masterId}) 확산을 약국 대상 서비스로 제한했다. 생성된 listing=${count}`,
-      );
-    } else {
-      logger.info(`[AutoListing] Expanded PUBLIC offer ${offerId} to ${count} org listings`);
-    }
+    logger.info(`[AutoListing] Expanded PUBLIC offer ${offerId} to ${count} org listings`);
     return count;
   } catch (error) {
     logger.error(`[AutoListing] Failed to expand PUBLIC offer ${offerId}:`, error);
@@ -158,21 +100,12 @@ export async function autoExpandServiceProduct(
        WHERE o."isActive" = true
          AND ose.status = 'active'
          AND ose.service_code = ANY($3::text[])
-         AND ${drugAudienceSqlCondition('$2', 'ose.service_code')}
        ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [offerId, masterId, approvedServiceKeys],
     );
 
     const count = Array.isArray(result) ? result.length : (result as { rowCount?: number }).rowCount ?? 0;
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1: 조용한 skip 금지.
-    const isDrug = await isDrugProductById(executor, masterId);
-    if (isDrug === true) {
-      logger.warn(
-        `[AutoListing][DRUG] SERVICE offer ${offerId} (master ${masterId}) 확산을 약국 대상 서비스로 제한했다. 요청 services=${approvedServiceKeys.join(', ')}, 생성된 listing=${count}`,
-      );
-    } else {
-      logger.info(`[AutoListing] Expanded SERVICE offer ${offerId} to ${count} org listings for services: ${approvedServiceKeys.join(', ')}`);
-    }
+    logger.info(`[AutoListing] Expanded SERVICE offer ${offerId} to ${count} org listings for services: ${approvedServiceKeys.join(', ')}`);
     return count;
   } catch (error) {
     logger.error(`[AutoListing] Failed to expand SERVICE offer ${offerId}:`, error);
@@ -212,14 +145,13 @@ export async function autoListPublicProductsForOrg(
          AND spo.approval_status = 'APPROVED'
          AND spo.distribution_type = 'PUBLIC'
          AND s.status = 'ACTIVE'
-         AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
        ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING
        RETURNING 1`,
       [organizationId, serviceKey],
     );
 
     const count = Array.isArray(result) ? result.length : (result as { rowCount?: number }).rowCount ?? 0;
-    logger.info(`[AutoListing] Listed ${count} PUBLIC offers for org ${organizationId} (${serviceKey}) — 의약품은 약국 대상 서비스에만 포함`);
+    logger.info(`[AutoListing] Listed ${count} PUBLIC offers for org ${organizationId} (${serviceKey})`);
     return count;
   } catch (error) {
     logger.error(`[AutoListing] Failed to list PUBLIC offers for org ${organizationId}:`, error);
@@ -263,14 +195,13 @@ export async function autoListServiceProductsForOrg(
          AND spo.approval_status = 'APPROVED'
          AND spo.distribution_type = 'SERVICE'
          AND s.status = 'ACTIVE'
-         AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
        ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING
        RETURNING 1`,
       [organizationId, serviceKey],
     );
 
     const count = Array.isArray(result) ? result.length : (result as { rowCount?: number }).rowCount ?? 0;
-    logger.info(`[AutoListing] Listed ${count} SERVICE offers for org ${organizationId} (${serviceKey}) — 의약품은 약국 대상 서비스에만 포함`);
+    logger.info(`[AutoListing] Listed ${count} SERVICE offers for org ${organizationId} (${serviceKey})`);
     return count;
   } catch (error) {
     logger.error(`[AutoListing] Failed to list SERVICE offers for org ${organizationId}:`, error);

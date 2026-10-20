@@ -2,14 +2,11 @@ import AdminCooperationBusinessesPage from '@/pages/platform/AdminCooperationBus
 import PlatformAdminLandingPage from '@/pages/platform/account-governance/PlatformAdminLandingPage';
 import PlatformSectionLayout from '@/pages/platform/account-governance/PlatformSectionLayout';
 import PlatformAccountsPage from '@/pages/platform/account-governance/PlatformAccountsPage';
-import PlatformServicesPage from '@/pages/platform/account-governance/PlatformServicesPage';
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
-import PlatformRolesPage from '@/pages/platform/account-governance/PlatformRolesPage';
-import ServiceAudiencePolicyPage from '@/pages/platform/account-governance/ServiceAudiencePolicyPage';
 import { AdminPharmacyServiceSettingsPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
 configurePharmacyManagementClient(api);
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
@@ -67,12 +64,13 @@ export function PlatformRoutes() {
     <Route key="/admin/platform" path="/admin/platform" element={<PlatformSectionLayout />}>
       <Route index element={<PlatformAdminLandingPage />} />
       <Route path="accounts" element={<PlatformAccountsPage />} />
-      <Route path="services" element={<PlatformServicesPage />} />
       <Route path="users" element={<PlatformUsersPage />} />
-      <Route path="roles" element={<PlatformRolesPage />} />
-      <Route path="service-audience" element={<ServiceAudiencePolicyPage />} />
+      {/* Removed administration tools: old bookmarks return to the platform home. */}
+      {['services', 'roles', 'service-audience'].map(path =>
+        <Route key={path} path={path} element={<Navigate to="/admin/platform" replace />} />
+      )}
     </Route>,
-    <Route key="/admin/settings/service-audience" path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />,
+    <Route key="/admin/settings/service-audience" path="/admin/settings/service-audience" element={<Navigate to="/admin/platform" replace />} />,
     <Route key="/admin/semi-franchises" path="/admin/semi-franchises" element={<AdminCooperationBusinessesPage />} />,
     <Route key="/admin/pharmacy-service-settings" path="/admin/pharmacy-service-settings" element={<AdminPharmacyServiceSettingsPage />} />,
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역

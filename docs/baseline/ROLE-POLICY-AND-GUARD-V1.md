@@ -7,6 +7,8 @@
 
 ---
 
+> **2026-10-20 사용자 결정 반영:** 전체 관리자 역할은 `platform:super_admin` 하나다. 과거 `platform:admin`·`platform:operator`·`platform:manager`·`platform:vendor`·`platform:member`·`platform:contributor` 정의는 현재 발급·권한 판정에서 제외한다. 서비스 운영 권한은 기존 서비스별 admin/operator 지정으로 관리하며 관리자가 역할 종류를 편집하는 메뉴는 제거한다. legacy `lms:instructor` 대신 현행 `lecture:*` 경계를 사용한다. 과거 할당 이력의 물리 삭제나 현재 운영 DB 정리가 완료됐다는 뜻은 아니다. [정비 WO](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)에 구현·검증·배포 단계를 구분한다.
+
 ## 1. 권한 계층 구조
 
 ```

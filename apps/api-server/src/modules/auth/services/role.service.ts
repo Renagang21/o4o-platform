@@ -40,7 +40,9 @@ export class RoleService {
    * Get role by full name (e.g., 'kpa:admin')
    */
   async getRoleByName(name: string): Promise<Role | null> {
-    return this.repository.findOne({ where: { name, isActive: true } });
+    if (isRetiredRoleValue(name)) return null;
+    const role = await this.repository.findOne({ where: { name, isActive: true } });
+    return role && !isRetiredRoleValue(role.serviceKey) ? role : null;
   }
 
   /**

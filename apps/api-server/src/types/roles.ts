@@ -32,12 +32,7 @@ export type ServiceKey =
  *   플랫폼 전역 관리는 `platform:super_admin`, 서비스 관리·운영은 `{service}:admin` / `{service}:operator` 를 쓴다.
  *   근거: WO-O4O-LEGACY-ADMIN-ROLE-AND-SCOPE-USAGE-AUDIT-V1 (CHECK 4f63b2844)
  */
-export type PlatformRole =
-  | 'platform:super_admin'  // Highest privilege, cross-service access
-  | 'platform:manager'      // Platform manager
-  | 'platform:vendor'       // Platform vendor
-  | 'platform:member'       // Platform member
-  | 'platform:contributor'; // Platform contributor
+export type PlatformRole = 'platform:super_admin';
 
 /**
  * KPA-Society service roles
@@ -50,9 +45,7 @@ export type PlatformRole =
 export type KpaRole =
   | 'kpa:admin'            // KPA service admin
   | 'kpa:operator'         // KPA service operator
-  | 'kpa:store_owner'      // KPA pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
-  | 'kpa:pharmacist'       // General pharmacist/member
-  | 'kpa:student';         // Student member
+  | 'kpa:store_owner';     // Pharmacy store workspace
 
 /**
  * Neture service roles
@@ -88,12 +81,6 @@ export type CosmeticsRole =
   | 'cosmetics:supplier'     // K-Cosmetics supplier
   | 'cosmetics:store_owner'; // K-Cosmetics store owner
 
-/**
- * LMS roles
- */
-export type LmsRole =
-  | 'lms:instructor';     // Legacy LMS 강사 — 선언만 유지(runtime 소비 0 · 과거 role_assignment 해석용)
-
 /** O4O Lecture service roles — 일반 학습자는 role이 아니라 service_memberships로 판정 */
 export type LectureRole =
   | 'lecture:admin'
@@ -109,7 +96,6 @@ export type PrefixedRole =
   | NetureRole
   | LegacyBareRole
   | CosmeticsRole
-  | LmsRole
   | LectureRole;
 
 /**
@@ -236,38 +222,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   },
   // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
   //   'platform:admin' / 'platform:operator' entries removed (활성 보유자 0, 독립 권한 0).
-  'platform:manager': {
-    role: 'platform:manager',
-    label: 'Platform Manager',
-    description: 'Platform manager',
-    service: 'platform',
-    category: 'platform',
-    deprecated: false
-  },
-  'platform:vendor': {
-    role: 'platform:vendor',
-    label: 'Platform Vendor',
-    description: 'Platform vendor',
-    service: 'platform',
-    category: 'commerce',
-    deprecated: false
-  },
-  'platform:member': {
-    role: 'platform:member',
-    label: 'Platform Member',
-    description: 'Platform member',
-    service: 'platform',
-    category: 'platform',
-    deprecated: false
-  },
-  'platform:contributor': {
-    role: 'platform:contributor',
-    label: 'Platform Contributor',
-    description: 'Platform contributor',
-    service: 'platform',
-    category: 'platform',
-    deprecated: false
-  },
 
   // KPA roles
   'kpa:admin': {
@@ -295,22 +249,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     service: 'kpa',
     category: 'commerce',
     deprecated: false
-  },
-  'kpa:pharmacist': {
-    role: 'kpa:pharmacist',
-    label: 'Pharmacist',
-    description: 'General pharmacist/member — WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환. 신규 할당 중단.',
-    service: 'kpa',
-    category: 'service',
-    deprecated: true
-  },
-  'kpa:student': {
-    role: 'kpa:student',
-    label: 'Student',
-    description: 'Student member — WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환. 신규 할당 중단.',
-    service: 'kpa',
-    category: 'service',
-    deprecated: true
   },
 
   // Neture roles
@@ -432,16 +370,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   },
 
 
-  // LMS roles
-  'lms:instructor': {
-    role: 'lms:instructor',
-    label: 'LMS Instructor',
-    description: 'LMS 강사',
-    service: 'lms',
-    category: 'service',
-    deprecated: false
-  },
-
   // O4O Lecture roles (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1)
   'lecture:admin': {
     role: 'lecture:admin', label: 'O4O Lecture Admin', description: 'O4O 강의 서비스 관리자',
@@ -479,7 +407,7 @@ export function getRoleMetadata(role: string): RoleMetadata | undefined {
  *
  * @example
  * getRolesByService('kpa')
- * // Returns: ['kpa:admin', 'kpa:operator', 'kpa:store_owner', 'kpa:pharmacist', 'kpa:student']
+ * // Returns: ['kpa:admin', 'kpa:operator', 'kpa:store_owner']
  */
 export function getRolesByService(serviceKey: ServiceKey): PrefixedRole[] {
   return Object.values(ROLE_REGISTRY)

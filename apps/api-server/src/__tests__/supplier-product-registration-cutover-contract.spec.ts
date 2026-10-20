@@ -173,14 +173,14 @@ describe('C. 레거시 POST /supplier/products 라우트 제거', () => {
 });
 
 describe('D. 불변 — DRUG gate · unique · Admin/system resolveOrCreateMaster 소비자', () => {
-  it('drug-access.guard의 세 거부 코드를 유지하고 게시 경로에서 규제·가격·등록 승인을 확인한다', () => {
+  it('상품·조직 정합 검사와 게시 경로의 가격·등록 승인을 유지한다', () => {
     const guard = read(`${NETURE}/guards/drug-access.guard.ts`);
-    for (const c of ['DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', 'DRUG_SERVICE_CONTEXT_REQUIRED', 'DRUG_NON_PHARMACY_SERVICE']) {
+    for (const c of ['DRUG_PRODUCT_UNRESOLVED', 'DRUG_SERVICE_CONTEXT_REQUIRED', 'DRUG_ORG_CONTEXT_MISMATCH']) {
       expect(guard).toContain(c);
     }
     const publication = stripComments(read(`${NETURE}/services/supplier-offer-distribution.service.ts`));
     expect(publication).toMatch(/assertDrugOfferAllowed\([\s\S]{0,400}action: nextPublic \? 'OFFER_PUBLISH' : 'OFFER_UPDATE'/);
-    expect(publication).toContain('assertPharmacyOnlyServiceKeys(');
+    expect(publication).not.toContain('ServiceAudienceService');
     expect(publication).toContain('PRODUCT_NOT_APPROVED');
     expect(publication).toContain('PRICE_REQUIRED');
     expect(publication).toContain('createPendingApprovals(');

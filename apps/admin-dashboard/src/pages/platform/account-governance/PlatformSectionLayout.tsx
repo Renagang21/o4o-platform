@@ -3,7 +3,7 @@
  *
  * WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1
  *
- * platform-admin section 내부 navigation(플랫폼 홈 / 계정 관리 / 서비스 관리)만 제공.
+ * platform-admin section 내부 navigation(플랫폼 홈 / 계정 관리 / 사용자 조회)만 제공.
  * 전체 Neture admin sidebar 와 통합하지 않는다(section 내부 한정).
  * guard 는 상위 PlatformRoute(platform:super_admin)가 담당.
  */
@@ -14,11 +14,7 @@ import { ShieldCheck } from 'lucide-react';
 const NAV = [
   { to: '/admin/platform', label: '플랫폼 홈', end: true },
   { to: '/admin/platform/accounts', label: '계정 관리', end: false },
-  { to: '/admin/platform/services', label: '서비스 관리', end: false },
   { to: '/admin/platform/users', label: '사용자 조회', end: false },
-  { to: '/admin/platform/roles', label: '역할 관리', end: false },
-  // WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1
-  { to: '/admin/platform/service-audience', label: '서비스 대상 정책', end: false },
 ];
 
 export default function PlatformSectionLayout() {
