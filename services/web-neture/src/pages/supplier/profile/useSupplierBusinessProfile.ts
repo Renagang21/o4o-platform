@@ -3,6 +3,7 @@ import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from
 
 export function useSupplierBusinessProfile() {
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
+  const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export function useSupplierBusinessProfile() {
 
   const initializeProfile = useCallback((data: SupplierProfile) => {
     setProfile(data);
+    setName(data.name);
     // Section A
     setRepresentativeName(data.representativeName || '');
     setBusinessNumber(data.businessNumber || '');
@@ -83,12 +85,18 @@ export function useSupplierBusinessProfile() {
   }, []);
 
   const handleSave = async () => {
+    if (!name.trim() || name.trim().length > 255) {
+      setSaved(false);
+      setError('상호명을 1~255자로 입력해 주세요.');
+      return;
+    }
     setSaving(true);
     setError(null);
     setSaved(false);
 
     const result = await supplierProfileApi.updateProfile({
       // Section A
+      name: name.trim(),
       businessNumber,
       representativeName,
       businessZipCode,
@@ -152,6 +160,8 @@ export function useSupplierBusinessProfile() {
   return {
     profile,
     setProfile,
+    name,
+    setName,
     saving,
     setSaving,
     saved,
