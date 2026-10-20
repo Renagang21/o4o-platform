@@ -21,14 +21,16 @@ local('CarePharm selected pharmacy gate — actual PostgreSQL, no authorization 
       CREATE TABLE semi_franchise_memberships (semi_franchise_id uuid, organization_id uuid, status text, PRIMARY KEY(semi_franchise_id, organization_id));
       CREATE TABLE service_memberships (user_id uuid, service_key text, status text);
       CREATE TABLE semi_franchise_operators (semi_franchise_id uuid, user_id uuid, revoked_at timestamp);
-      CREATE TABLE role_assignments (user_id uuid, role text, is_active boolean);
+      CREATE TABLE role_assignments (user_id uuid, role text, is_active boolean, valid_from timestamptz, valid_until timestamptz);
+      CREATE TABLE cooperatives (id uuid, semi_franchise_id uuid, status text);
+      CREATE TABLE cooperative_roles (cooperative_id uuid, user_id uuid, revoked_at timestamptz);
       CREATE TABLE semi_franchise_contents (id uuid PRIMARY KEY, semi_franchise_id uuid, title text, summary text, body text, thumbnail_url text, attachments jsonb, tags jsonb, status text, published_at timestamp, created_at timestamp, updated_at timestamp);
     `);
     contents = new SemiFranchiseContentService(fixture.ds, async input => { copied.push(input); return { snapshotId: randomUUID() }; });
   });
   beforeEach(async () => {
     copied.length = 0;
-    await fixture.ds.query('TRUNCATE users, organization_members, neture_pharmacy_memberships, semi_franchises, semi_franchise_memberships, service_memberships, semi_franchise_operators, role_assignments, semi_franchise_contents');
+    await fixture.ds.query('TRUNCATE users, organization_members, neture_pharmacy_memberships, semi_franchises, semi_franchise_memberships, service_memberships, semi_franchise_operators, role_assignments, cooperatives, cooperative_roles, semi_franchise_contents');
     await fixture.ds.query('INSERT INTO users(id) VALUES ($1),($2)', [actor, other]);
     await fixture.ds.query("INSERT INTO organization_members VALUES ($1,$2,'owner',null),($1,$3,'owner',null),($4,$5,'owner',null)", [actor,a,b,other,foreign]);
     await fixture.ds.query("INSERT INTO neture_pharmacy_memberships VALUES ($1,'active'),($2,'active'),($3,'active')", [a,b,foreign]);
@@ -67,7 +69,7 @@ local('CarePharm selected pharmacy gate — actual PostgreSQL, no authorization 
   });
   it('operator assignment does not replace the selected pharmacy membership', async () => {
     await fixture.ds.query('INSERT INTO semi_franchise_operators VALUES ($1,$2,null)',[care,actor]);
-    await fixture.ds.query("INSERT INTO role_assignments VALUES ($1,'neture:operator',true)",[actor]);
+    await fixture.ds.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES ($1,'neture:operator',true)",[actor]);
     expect((await resolveSemiFranchiseBusinessAccess(fixture.ds,actor,'carepharm')).allowed).toBe(true);
     expect((await resolveBusinessStoreAccess(fixture.ds,actor,b,'carepharm')).allowed).toBe(false);
   });
@@ -77,5 +79,26 @@ local('CarePharm selected pharmacy gate — actual PostgreSQL, no authorization 
     await fixture.ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care]);
     await fixture.ds.query("UPDATE neture_pharmacy_memberships SET status='suspended' WHERE organization_id=$1",[a]);
     expect((await resolveBusinessStoreAccess(fixture.ds,actor,a,'carepharm')).allowed).toBe(false);
+  });
+  it('returns only the latest published CarePharm materials for the pharmacy preview', async () => {
+    for (let day = 1; day <= 5; day++) {
+      await fixture.ds.query(`INSERT INTO semi_franchise_contents(id,semi_franchise_id,title,status,published_at)
+        VALUES($1,$2,$3,'published',$4)`, [randomUUID(), care, `Material ${day}`, `2026-10-0${day}T00:00:00Z`]);
+    }
+    await fixture.ds.query("UPDATE semi_franchise_contents SET published_at='2026-09-01' WHERE id=$1", [material]);
+    await fixture.ds.query(`INSERT INTO semi_franchise_contents(id,semi_franchise_id,title,status,published_at)
+      VALUES($1,$2,'Unpublished','draft',NOW()),($3,$4,'Another model','published',NOW())`, [randomUUID(), care, randomUUID(), pharmacy]);
+    await fixture.ds.query("INSERT INTO semi_franchise_memberships VALUES($1,$2,'active')", [pharmacy, a]);
+    const result = await contents.pharmacyList(a, { sfKey: 'carepharm', page: 1, limit: 3 });
+    expect(result.items.map((item: { title: string }) => item.title)).toEqual(['Material 5', 'Material 4', 'Material 3']);
+    expect(result.total).toBe(6);
+  });
+  it('blocks direct material reads and copies after membership removal without invoking the copier', async () => {
+    expect((await contents.pharmacyGet(a, material)).id).toBe(material);
+    await fixture.ds.query("UPDATE semi_franchise_memberships SET status='suspended' WHERE semi_franchise_id=$1 AND organization_id=$2", [care, a]);
+    expect((await contents.pharmacyList(a, { sfKey: 'carepharm', limit: 3 })).items).toEqual([]);
+    await expect(contents.pharmacyGet(a, material)).rejects.toMatchObject({ httpStatus: 404 });
+    await expect(contents.pharmacyCopy(a, actor, material)).rejects.toMatchObject({ httpStatus: 404 });
+    expect(copied).toEqual([]);
   });
 });
