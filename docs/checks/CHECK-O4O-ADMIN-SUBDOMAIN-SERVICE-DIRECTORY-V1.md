@@ -57,3 +57,25 @@ API 테스트의 auth/DB는 fixture다. API 테스트는 15개 전체 투영을,
 기존 Browserslist/브라우저 메타데이터 및 Tailwind 검색 범위 안내가 build에 남아 있으나 build는 성공했다. 의존성·lockfile·build 설정을 변경하지 않았다. PR CI·main 병합·운영 배포는 이번 개발 단계에서 미실행이다. 통합 시 새 API가 필요한 관리자 화면과 API를 함께 반영하고 API → admin 순서로 검증한다.
 
 문서 정합: 구현 TODO와 검증 결과를 연결했다. 운영 미적용과 로컬 fixture 검증을 구분하며 정본·정책·index는 변경하지 않았다.
+
+## 4. 후속 운영 배포 검증
+
+2026-10-20 16:31 (Asia/Seoul), 사용자 승인에 따른 후속 통합 결과다. 위 §1~§3은 최초 개발 단계의 기록이며 아래 증거와 구분한다.
+
+| 항목 | 실제 확인 결과 |
+| --- | --- |
+| main 병합 | [PR #731](https://github.com/Renagang21/o4o-platform/pull/731), `f37ff2dcab971cdc4def5086eb565b9613410b10` |
+| main CI / CodeQL | [CI 39384764123](https://github.com/Renagang21/o4o-platform/actions/runs/39384764123) / [CodeQL 39384764213](https://github.com/Renagang21/o4o-platform/actions/runs/39384764213), SUCCESS |
+| 자동 배포 | [Delivery 39385916999](https://github.com/Renagang21/o4o-platform/actions/runs/39385916999), SUCCESS; 최종 `production` commit status `DEPLOYED` |
+| API 서빙 | `o4o-core-api-04107-sad`, 트래픽 100%, `o4o-commit-sha` label = 위 병합 SHA |
+| 관리자 서빙 | `o4o-admin-dashboard-01529-dir`, 트래픽 100%, `o4o-commit-sha` label = 위 병합 SHA |
+| 전환 검증 | API 새 revision readiness → 전환 → 공개 `/health/ready` 200; admin 새 revision 직접 smoke → 전환 → 공개 HTTP 검사 통과 |
+| 공개 HTTP 재확인 | API `/health`·`/health/ready` 200, 관리자 `/admin/platform/services`·기존 `/admin/platform/accounts` HTML 200 |
+| 비로그인 조회 | `/api/v1/admin/platform-services/directory` 401. 상위 인증 guard도 같은 응답을 반환하므로 이 결과만으로 새 endpoint의 실제 업무 응답을 입증하지 않는다 |
+| 실제 게시 JS | 운영 HTML에서 실제 entry JS 경로를 추출해 200 확인. 새 directory API 경로·화면 소개·공통 업무 공간·사업 미등록 문구 존재, 이전 catalog 화면 소개 문구 없음 |
+
+운영 HTTP·게시 JS 검증 11항목을 16:30:40 (Asia/Seoul)에 통과했다. 이는 비로그인 공개 응답과 실제 배포 파일 검사다. 실제 Google 관리자 로그인 후 목록 조회·운영 사업 원장 응답·15개 외부 서비스 이동/서빙·가입 가능 여부는 검증하지 않았다. 개발 단계의 API 7·UI 8·Chromium 6 tests는 최신 main 통합 후 재통과했으며 auth/DB는 fixture다. `@o4o/shared-space-ui`는 source export 패키지로 별도 build script가 없고 Vite·브라우저 검증에서 해당 소스를 소비했다.
+
+이번 소스에 신규 migration·seed·DB write는 없다. 기존 배포의 migration Job `o4o-api-migrations-rxgh9`는 성공했으나 실제 적용 건수는 확인하지 않았다. DB 무변경을 단정하지 않으며 별도 운영 DB 접속·변경은 수행하지 않았다. 개별 job 로그 다운로드는 네트워크 제한으로 사용할 수 없어 완료된 workflow의 공식 전체 로그 ZIP에서 전환·최종 서빙 결과를 확인했다. 자격정보·운영 응답 원문은 이 문서에 복사하지 않는다.
+
+문서 정합: 같은 트랙의 기존 CHECK에 운영 결과와 미확인 범위를 추가하고 WO 완료 상태를 연결했다. 정본 정책·CANONICAL-INDEX 변경은 없다. 이 문서 보완은 배포 `NOT_APPLICABLE`이다.

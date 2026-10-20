@@ -1,6 +1,6 @@
 # 관리자 서비스 관리 화면의 현재 서브도메인 정렬
 
-> **상태**: ACTIVE — 개발·검증 완료, main 통합 대기
+> **상태**: COMPLETED
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 `/admin/platform/services`의 이전 서비스 목록을 현재 서브도메인 구조로 정비 요청
 > **관련 정본**: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) · [서브도메인 의미](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)
@@ -48,3 +48,15 @@
 - API의 새 GET을 관리자 화면보다 먼저 사용할 수 있어야 한다. 통합 시 API → admin 순서의 기존 배포 경로를 사용한다. 신규 migration/seed/DB write·역할/인증/공통 서비스 카탈로그 변경은 없다. 이번 branch에서는 PR·CI·병합·배포를 수행하지 않는다.
 
 문서 정합: 이전 관리자 표시와 현재 서비스 탐색·서브도메인 정본 간 차이를 구현 WO/CHECK로 기록했다. 과거 catalog CHECK의 DB `entry_url` 정리 잔여는 이 화면에서 공식 코드 주소를 사용하도록 해소하며 DB 값 자체의 삭제·수정은 수행하지 않는다. 정본 정책·CANONICAL-INDEX는 바꾸지 않았다.
+
+## 5. 후속 main 통합·운영 배포 결과
+
+2026-10-20 16:31 (Asia/Seoul) 확인. 위 개발 인계 기록 이후 사용자가 main 병합·운영 배포를 승인했고, 다른 공간의 배포 종료를 확인한 뒤 순차 진행했다.
+
+- [PR #731](https://github.com/Renagang21/o4o-platform/pull/731) 병합: `f37ff2dcab971cdc4def5086eb565b9613410b10`. 최신 branch의 PR CI·CodeQL·SonarCloud 통과, Codex 미해결 finding 0건을 확인했다. 약국 소개 문구와 응답 검증 오류 메시지에 대한 리뷰 보완을 반영했다.
+- 병합 후 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39384764123)와 CodeQL 통과. [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39385916999)가 LEVEL 2로 API → admin을 자동 배포했고 최종 `production` 상태는 `DEPLOYED`다. 다른 웹 서비스는 이번 배포 대상이 아니다.
+- API `o4o-core-api-04107-sad`, 관리자 `o4o-admin-dashboard-01529-dir` 각각 트래픽 100%, revision label의 SHA가 위 병합 SHA와 일치했다. 운영 HTTP·게시 파일 검증과 한계는 [CHECK §4](../checks/CHECK-O4O-ADMIN-SUBDOMAIN-SERVICE-DIRECTORY-V1.md#4-후속-운영-배포-검증)에 기록했다.
+- 신규 migration·seed·DB write 코드는 없다. 기존 배포 절차의 migration Job `o4o-api-migrations-rxgh9` 성공을 확인했으나 적용 건수·운영 데이터 무변경을 직접 검증한 것은 아니다. 별도 DB 조회·수정이나 운영 로그인은 수행하지 않았다.
+- 배포 결과 기록은 동일 WO의 연속 단계로 기존 전용 branch에서 문서만 갱신한다. 이 문서 변경의 배포는 `NOT_APPLICABLE`이며 서비스 재배포는 하지 않는다. 클라우드가 준비한 단일 기본 checkout은 `KEEP`한다.
+
+문서 정합: WO 완료 상태와 기존 CHECK의 운영 증적을 추가했다. 개발 당시의 미배포 기록은 이력으로 보존하며 정본·정책·index는 변경하지 않았다.
