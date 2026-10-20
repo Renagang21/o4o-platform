@@ -1,7 +1,7 @@
 # 관리자 메뉴 제거·역할 및 대상 정책 정비 개발 검증
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: [구현 TODO](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)
 > **관련 정본**: [B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) · [역할 정책](../baseline/ROLE-POLICY-AND-GUARD-V1.md) · [KPA 역할](../baseline/KPA-ROLE-MATRIX-V1.md)
 
@@ -66,3 +66,35 @@ PR #742에서 Neture·약국 서비스의 옛 역할 편집 진입과 Neture 대
 KPA 회원 목록의 추가 권한에서 폐기 역할을 제외했다. 관리자 목록·회원 콘솔·KPA 회원 목록의 집중 회귀 3 suites / 63 tests PASS. lint 오류 0, 기존 KPA 프로필 처리의 미사용 변수 경고 2건은 유지했다. 역할 원장을 직접 조회하는 runtime 경로를 재검색해 현재 권한 표시와 정확한 현행 역할 allowlist·알림·동의·이력/상태 변경 경로를 구분했다. 이력·법정 동의·회원/매장 원장 쓰기를 이번 정비에 맞춰 바꾸지 않는다.
 
 별도 문서 정합 커밋으로 CANONICAL-INDEX에 현재 관리자 역할 정책 및 Frozen baseline의 부분 대체 관계를 반영했다. 앞선 색인 미변경 기록은 해당 단계의 결과로 보존한다.
+
+
+## main 병합·운영 배포 완료 (2026-10-21 Asia/Seoul)
+
+사용자의 병합·배포 재개 지시에 따라 [PR #742](https://github.com/Renagang21/o4o-platform/pull/742)를 일반 merge했다. main SHA는 `1fa8d7e4cb8edb5da63c43c63956e8911630eab6`다. 최종 소스 `e40ddc8050f9d049624e94d8143e80c3fab2023d`의 CI Gate·보안/품질 검사·Codex 재리뷰가 통과했고 미해결 스레드는 0건이었다. PR API Jest는 539 suites / 8,999 tests PASS, 기존 skip 43 suites / 598 tests다. [병합 후 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39440976079)와 CodeQL도 성공했다.
+
+[Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39442540075)는 CI green·freeze=false·target=main을 확인하고 LEVEL 3으로 보류했다. 서빙 중인 코드와 main 사이의 누적 변경을 계산해 7개 서비스를 대상으로 [Promote 1회](https://github.com/Renagang21/o4o-platform/actions/runs/39442854482)를 실행했다. API 먼저, 성공 후 관리자·웹 순서로 verified rollout이 완료됐다. 최종 read-only serving 조회와 commit status는 모두 `DEPLOYED`다.
+
+| 서비스 | 실제 serving revision | 트래픽 |
+| --- | --- | --- |
+| `o4o-core-api` | `o4o-core-api-04113-zod` | 100% |
+| `o4o-admin-dashboard` | `o4o-admin-dashboard-01535-nuq` | 100% |
+| `neture-web` | `neture-web-01998-nac` | 100% |
+| `kpa-society-web` | `kpa-society-web-02227-xew` | 100% |
+| `lecture-web` | `lecture-web-00208-riv` | 100% |
+| `store-web` | `store-web-00272-hun` | 100% |
+| `kpa-branch-web` | `kpa-branch-web-00310-vam` | 100% |
+
+변경이 없는 hospital-pharmacy는 `NO_DEPLOY`다. 분회와 최종 보고의 checkout이 지연됐지만 최종적으로 모두 성공했고 재시도·추가 promote·취소는 실행하지 않았다. 취소 검토 시점에 체크아웃이 완료돼 안전 사전조건 검사에서 중단된 기록은 실제 workflow 취소가 아니다.
+
+### 운영 검증과 한계
+
+- API `/health`, `/health/ready`, 관리자 홈·계정·사용자 HTML과 실제 entry JS 200. 실제 공개 JS에서 간소화 홈·메뉴명을 확인하고 제거 페이지/client 부재를 확인했다(12 checks PASS).
+- Neture·약국·강의·매장·분회 공개 주소 5개 모두 200(5 checks PASS).
+- 실제 Google 관리자 로그인 후 화면 조작·실제 운영 DB의 역할 보유자 수·의약품 공급 업무 쓰기 검증은 수행하지 않았다. HTML 200을 인증 후 기능 검증으로 해석하지 않는다.
+- 새 migration 파일은 없으며, 서빙 API와 대상 SHA 사이에도 migration 파일 변경이 없다. 표준 API 배포의 Job `o4o-api-migrations-6vfrw` 실행은 성공했다. 개별 적용 건수는 별도 실측하지 않았으며 운영 DB 변경 0건으로 단정하지 않는다. 직접 DB 삭제·원장 정리·seed는 수행하지 않았다.
+
+### 작업 공간
+
+`WORKTREE_DISPOSITION = KEEP`: 클라우드가 관리하는 단일 checkout `/workspace/o4o-platform`과 같은 WO의 branch `wo/admin-platform-menu-role-cleanup`을 유지한다. 별도 worktree는 없다. 개발 초기 base는 `5b2f6bd9eea66709004dd4640419f6867842fcf9`이며 코드 통합은 PR #742로 완료했다. 이 결과 기록은 같은 WO의 docs-only 후속 커밋으로 남긴다(`DEPLOYMENT = NOT_APPLICABLE`, 앱 추가 배포 대상 아님).
+
+문서 정합: Frozen baseline 본문 보존·부분 대체 표기 1건, 현재 관리자 역할 정책 분리와 정본 색인 관계 반영. 기존 WO/CHECK의 개발·보류·미실행 기록은 당시 결과로 보존하며 위 운영 완료 절이 최종 결과다.
