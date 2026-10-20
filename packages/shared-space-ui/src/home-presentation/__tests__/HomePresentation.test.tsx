@@ -39,7 +39,7 @@ describe("home presentation contract and public display", () => {
     (surface) => {
       const defaults = initialHomePresentation(surface);
       expect(parseHomePresentation(defaults)).toEqual(defaults);
-      expect(defaults.slides.length).toBe(surface === "carepharm" ? 1 : 2);
+      expect(defaults.slides.length).toBe(["carepharm", "pharmcoop", "cooperative"].includes(surface) ? 1 : 2);
       expect(defaults.slides.length).toBeLessThanOrEqual(3);
       expect(
         defaults.promotions.every(
