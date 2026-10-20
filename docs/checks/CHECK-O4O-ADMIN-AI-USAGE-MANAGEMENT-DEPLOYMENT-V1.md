@@ -3,7 +3,7 @@
 > **상태**: COMPLETED
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
 > **근거 WO/IR**: [구현 WO](../work-orders/WO-O4O-ADMIN-AI-USAGE-MANAGEMENT-V1.md) · 사용자 main 병합 → 배포 승인
-> **관련 정본**: [AI Core + Extension 공통 기반 §12](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#12-관리자-ai-운영-조회-기반--main운영-반영-2026-10-20)
+> **관련 문서**: [AI Core + Extension 공통 기반 §12](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#12-관리자-ai-운영-조회-기반--main운영-반영-2026-10-20)
 
 ## 1. 판정과 범위
 
@@ -53,4 +53,4 @@ Delivery의 리비전 라벨과 트래픽 검증 결과:
 - 실제 Google 관리자 로그인, 운영 DB에서 반환되는 정책/연결 유무/통계, 공급자 인증, 실제 청구 대조는 미검증이다. 비밀값·사용자별 기록·운영 응답 원문은 이 문서에 기록하지 않는다.
 - 같은 WO의 문서 증적 후속은 runtime 배포 대상이 아니다. 이후 문서-only main SHA와 위 serving 코드 SHA를 혼동하지 않는다.
 
-문서 정합: 구현 WO에 통합·배포 결과를 추가하고 정본 §12의 작업 branch 상태를 main·운영 반영 상태로 갱신했다. 기능별 제어·회계·실계정 검증 TODO는 유지했다.
+문서 정합: 구현 WO에 통합·배포 결과를 추가하고 관련 기반 문서 §12의 작업 branch 상태를 main·운영 반영 상태로 갱신했다. 기반 문서는 CANONICAL-INDEX 미등재이므로 정본으로 승격하거나 index를 변경하지 않았다. 기능별 제어·회계·실계정 검증 TODO는 유지했다.

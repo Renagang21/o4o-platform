@@ -55,7 +55,7 @@
 
 후속은 §3의 쓰기/실제 호출 제어 이관이다. 본 branch는 push에서 인계하고 PR/CI·병합·배포는 통합 담당이 진행한다. PR 미생성으로 PR CI는 미실행이며 현재 운영에는 미적용이다.
 
-문서 정합: 정본 §12에 조회 기반과 미구현 제어의 경계를 반영했다. 기존 로그인 테스트 제목 1건을 현재 UI와 맞췄고 조사표의 소스 주석 차이 3건은 이번 범위에서 수정하지 않았다.
+문서 정합: 관련 기반 문서 §12에 조회 기반과 미구현 제어의 경계를 반영했다. 기존 로그인 테스트 제목 1건을 현재 UI와 맞췄고 조사표의 소스 주석 차이 3건은 이번 범위에서 수정하지 않았다.
 
 [design]: https://github.com/Renagang21/o4o-platform/blob/2572abe80a2cfe2927b2e6b7e1a9ae9fa06c8d31/docs/design/DESIGN-O4O-AI-USAGE-CONTROL-V1.md
 [inventory]: https://github.com/Renagang21/o4o-platform/blob/84c03f3abc575d117f179cbabe2d687b1a991b14/docs/investigations/IR-O4O-AI-USAGE-CONTROL-INVENTORY-V1.md
