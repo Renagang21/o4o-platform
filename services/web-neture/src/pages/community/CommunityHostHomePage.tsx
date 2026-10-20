@@ -146,50 +146,52 @@ export default function CommunityHostHomePage() {
     };
   }, [user?.id, retry]);
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-bold text-slate-900">커뮤니티</h1>
-      {!data && !error && (
-        <output className="block">커뮤니티 소식을 불러오고 있습니다…</output>
-      )}
-      {error && (
-        <div role="alert" className="rounded-xl border bg-white p-5">
-          소식을 불러오지 못했습니다.{" "}
-          <button
-            type="button"
-            onClick={() => setRetry((n) => n + 1)}
-            className="min-h-11 text-emerald-700"
-          >
-            다시 시도
-          </button>
-        </div>
-      )}
-      {data && (
-        <>
-          <div className="grid items-start gap-6 md:grid-cols-2">
-            <HomeSection section="notice" data={data} />
-            <HomeSection section="news" data={data} />
+    <main>
+      <h1 className="sr-only">커뮤니티</h1>
+      <ServiceHomeHero surface="community" client={api} heading="h2" />
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
+        {!data && !error && (
+          <output className="block">커뮤니티 소식을 불러오고 있습니다…</output>
+        )}
+        {error && (
+          <div role="alert" className="rounded-xl border bg-white p-5">
+            소식을 불러오지 못했습니다.{" "}
+            <button
+              type="button"
+              onClick={() => setRetry((n) => n + 1)}
+              className="min-h-11 text-emerald-700"
+            >
+              다시 시도
+            </button>
           </div>
-          <HomeSection section="forum" data={data} />
-          <HomeSection section="content" data={data} />
-          <HomeSection section="resource" data={data} />
-          <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
-            <ServiceHomeHero surface="community" client={api} heading="h2" />
-            <ServiceHomePromotion surface="community" client={api} />
-          </aside>
-          {!data.member && (
-            <aside className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
-              공개 항목을 둘러볼 수 있습니다. 회원 전용 자료와 글쓰기는{" "}
-              <Link
-                to="/communities/community/forum"
-                className="font-medium text-emerald-700 underline"
-              >
-                로그인·가입 및 이용 상태 확인
-              </Link>{" "}
-              후 이용해 주세요.
+        )}
+        {data && (
+          <>
+            <div className="grid items-start gap-6 md:grid-cols-2">
+              <HomeSection section="notice" data={data} />
+              <HomeSection section="news" data={data} />
+            </div>
+            <HomeSection section="forum" data={data} />
+            <HomeSection section="content" data={data} />
+            <HomeSection section="resource" data={data} />
+            <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
+              <ServiceHomePromotion surface="community" client={api} />
             </aside>
-          )}
-        </>
-      )}
+            {!data.member && (
+              <aside className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
+                공개 항목을 둘러볼 수 있습니다. 회원 전용 자료와 글쓰기는{" "}
+                <Link
+                  to="/communities/community/forum"
+                  className="font-medium text-emerald-700 underline"
+                >
+                  로그인·가입 및 이용 상태 확인
+                </Link>{" "}
+                후 이용해 주세요.
+              </aside>
+            )}
+          </>
+        )}
+      </div>
     </main>
   );
 }
