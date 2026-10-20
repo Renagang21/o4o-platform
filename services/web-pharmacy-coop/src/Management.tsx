@@ -1,3 +1,4 @@
+import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
 import { ServiceOperatorManagement } from '@o4o/operator-core-ui';
 import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
@@ -54,6 +55,7 @@ function eventLabel(action: string): string {
     member_supplement: "가입 신청 보완",
     role_assign: "관리 역할 지정",
     role_revoke: "관리 역할 해제",
+    eligibility_update: "가입 기준 변경",
   };
   if (fixed[action]) return fixed[action];
   const clean = action.replace(/^(affiliation|member)_/, "");
@@ -299,6 +301,9 @@ export function FederationManagementPanel({
       </p>
       <Feedback {...work} />
       {!work.data && !work.error && <p>조합 목록을 불러오고 있습니다…</p>}
+      {work.data && (
+        <StatusSummary rows={work.data as Affiliation[]} noun="조합" />
+      )}
       <div className="cards two">
         {(work.data as Affiliation[] | null)?.map((c) => (
           <article className="card" key={c.id}>
@@ -374,7 +379,9 @@ export function MemberManagementPanel({
   cooperative,
   admin,
   userId,
+  onChanged,
 }: Readonly<{
+  onChanged?: () => void;
   client: Client;
   cooperative: Cooperative;
   admin: boolean;
@@ -385,6 +392,17 @@ export function MemberManagementPanel({
   return (
     <section className="section coop-management">
       <h2>조합원 관리 · {admin ? "admin" : "operator"}</h2>
+      {work.data && (
+        <StatusSummary rows={work.data as Member[]} noun="조합원" />
+      )}
+      {admin && (
+        <EligibilitySettings
+          key={cooperative.id}
+          client={client}
+          cooperative={cooperative}
+          onChanged={onChanged}
+        />
+      )}
       <p>
         {admin
           ? "최종 자격 결정은 해당 조합에만 적용됩니다. 제명은 정관에 따른 의결 결과를 기록하세요."
