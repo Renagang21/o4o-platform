@@ -180,7 +180,7 @@ const services: ServiceConfig[] = [
   // 3. KPA-a (약사회 본회)
   {
     name: 'KPA-a',
-    url: 'https://kpa-society.co.kr',
+    url: 'https://pharmacy.neture.co.kr',
     registerPath: '/register',
     loginPath: '/login',
     operatorEmail: OPS.KPA.email,
@@ -228,7 +228,7 @@ const services: ServiceConfig[] = [
       }
     },
     navigateToApproval: async (page: Page) => {
-      await page.goto('https://kpa-society.co.kr/operator/members', { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto('https://pharmacy.neture.co.kr/operator/members', { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(3000);
       // Click "가입 신청" or "대기" tab if exists
       const pendingTab = page.locator('button:has-text("가입 신청"), button:has-text("대기"), button:has-text("pending")').first();

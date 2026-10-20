@@ -32,7 +32,7 @@ describe('Kakao confidential REST and social boundaries',()=>{
   for(const origin of ['https://admin.neture.co.kr','https://neture.co.kr.attacker.invalid','https://neture.co.kr/path','null'])expect(()=>socialOrigin({get:()=>origin} as any)).toThrow();
   expect(socialOrigin({get:()=> 'https://supplier.neture.co.kr'} as any).serviceKey).toBe('supplier');
  });
- it.each([['https://www.neture.co.kr','neture'],['https://kpa-society.co.kr','kpa-society'],['https://www.kpa-society.co.kr','kpa-society']])('maintained alias %s uses the same login/link/logout scope', (origin,key)=>{
+ it.each([['https://www.neture.co.kr','neture']])('maintained alias %s uses the same login/link/logout scope', (origin,key)=>{
   expect(socialOrigin({get:()=>origin} as any)).toEqual({origin,serviceKey:key});
   expect(resolveSessionServiceKey(origin)).toBe(key);
  });

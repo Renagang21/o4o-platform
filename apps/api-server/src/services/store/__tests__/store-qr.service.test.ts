@@ -464,7 +464,7 @@ describe('resolvePublicQrLanding', () => {
   });
 });
 
-// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: pharmacyhub.co.kr QR 착지 이전 — 다른 호스트에서 열어도 매장 서비스 축으로 화면을 구성한다.
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 옛 PH 도메인 QR 착지 이전 — 다른 호스트에서 열어도 매장 서비스 축으로 화면을 구성한다.
 describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (호스트 무관)', () => {
   const { resolveScreenSetSections } = jest.requireMock('../../../routes/platform/store-public/store-public-screen-set-resolve.js') as {
     resolveScreenSetSections: jest.Mock;
