@@ -325,6 +325,38 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       });
     },
   );
+  it.each(
+    ["neture", "funding"].flatMap((key) =>
+      ["inactive", "unverified", "pending", "rejected", "suspended"].map(
+        (state) => [key, state],
+      ),
+    ),
+  )(
+    "%s shows %s account operator unavailable but allows role removal",
+    async (key, state) => {
+      await setup(key);
+      await s.change(actor, key, target, true);
+      if (state === "inactive")
+        await db.ds.query('UPDATE users SET "isActive"=false WHERE id=$1', [
+          target,
+        ]);
+      else if (state === "unverified")
+        await db.ds.query(
+          'UPDATE users SET "isEmailVerified"=false WHERE id=$1',
+          [target],
+        );
+      else
+        await db.ds.query("UPDATE users SET status=$1 WHERE id=$2", [
+          state,
+          target,
+        ]);
+      expect((await s.list(actor, key)).operators[0].membershipStatus).toBe(
+        "unavailable",
+      );
+      await s.change(actor, key, target, false);
+      expect((await s.list(actor, key)).operators).toHaveLength(0);
+    },
+  );
   it("same target parallel assignment produces a single active role and audit", async () => {
     await setup();
     await Promise.all([

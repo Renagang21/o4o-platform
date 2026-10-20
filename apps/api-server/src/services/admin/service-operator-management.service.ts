@@ -108,8 +108,8 @@ export class ServiceOperatorManagementService {
         .replace(/[\\%_]/g, "\\$&")}%`;
       const operators = await m.query(
         `SELECT u.id AS "userId",u.name,u.email,
-        CASE WHEN $4 AND u.status IN ('active','approved') AND u."isActive" AND u."isEmailVerified"
-          AND (sm.status IS NULL OR sm.status NOT IN ('suspended','withdrawn')) THEN 'active'
+        CASE WHEN (u.status IN ('active','approved') AND u."isActive" AND u."isEmailVerified") IS NOT TRUE THEN 'unavailable'
+          WHEN $4 AND (sm.status IS NULL OR sm.status NOT IN ('suspended','withdrawn')) THEN 'active'
           ELSE sm.status END AS "membershipStatus",
         ra.assigned_at AS "assignedAt", (${validRole}) AS "effective"
         FROM role_assignments ra JOIN users u ON u.id=ra.user_id

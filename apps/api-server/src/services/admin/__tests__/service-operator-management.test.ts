@@ -66,9 +66,10 @@ function app() {
 it.each(["post", "delete"] as const)(
   "rejects injected admin/foreign role fields on %s before any DB mutation",
   async (method) => {
-    const res = await request(app())
-      [method]("/manage/funding/operators/00000000-0000-4000-8000-000000000001")
-      .send({ role: "platform:super_admin", serviceKey: "supplier" });
+    const http = request(app());
+    const res = await http[method](
+      "/manage/funding/operators/00000000-0000-4000-8000-000000000001",
+    ).send({ role: "platform:super_admin", serviceKey: "supplier" });
     expect(res.status).toBe(400);
     expect(res.body.code).toBe("UNEXPECTED_OPERATOR_FIELDS");
   },

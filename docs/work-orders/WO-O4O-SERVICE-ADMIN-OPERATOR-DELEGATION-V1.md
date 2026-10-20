@@ -127,3 +127,10 @@ WORKTREE_DISPOSITION: 전용 worktree/branch 유지(KEEP), 통합 전 후속 수
   실제 PostgreSQL로 회귀 검증하며 가입 상태를 변경하지 않는 것도 확인한다.
 - 보완 후 API 100개 PASS(기존 71개에서 29개 증가), TypeScript·API 운영 빌드·ESLint PASS.
   이전 웹/UI 검증과 합하면 683개이며 이 수정은 웹 코드를 바꾸지 않는다.
+
+- 추가 P2: 기존 Operator의 계정 비활성/이메일 미확인/심사·정지 상태를 이용 불가로 표시하도록 목록 SQL을 보완.
+  Neture와 독립 서비스 양쪽에서 표시와 역할 해제 가능성을 회귀 검증한다.
+- CI ESLint의 테스트 코드 `no-unexpected-multiline` 1건을 수정하고 전체 변경 TS/TSX 파일을 다시 검사한다.
+- 최종 보완: API 110개 PASS, API 타입·빌드 PASS, 변경 TS/TSX 전체 lint 오류/경고 0.
+  저장소 전체 lint ratchet도 기존 오류 46개 기준선 그대로 PASS(기준선/규칙 수정 없음).
+  웹/UI 기존 검증과 합하면 693개 PASS이며 실제 운영 계정의 권한 변경은 없다.
