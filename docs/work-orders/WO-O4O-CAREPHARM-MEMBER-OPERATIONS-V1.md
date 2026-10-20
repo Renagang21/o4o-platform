@@ -1,7 +1,7 @@
 # CarePharm 홈·공지 운영과 회원 커뮤니티 구성
 
 > **상태**: COMPLETED · 개발·로컬 검증 완료, main 통합·배포는 통합 담당 후속
-> **작성일**: 2026-10-19 · **최종 갱신**: 2026-10-19
+> **작성일**: 2026-10-19 · **최종 갱신**: 2026-10-20
 > **근거 WO/IR**: 사용자 잔여 작업 진행 지시 · WO-O4O-CAREPHARM-HOME-REFINEMENT-V1 후속
 
 ## 범위와 TODO
@@ -67,3 +67,12 @@
 - `WORKTREE_DISPOSITION`: 전용 worktree `/workspace/o4o-wt/carepharm-member-operations`, 통합/배포 미수행, 합성 browser+실 PG 검증 완료, **KEEP**(통합 담당 인계 대상). 정확한 HEAD·미커밋/미추적 0·원격 일치는 push 후 최종 보고한다.
 
 문서 정합: 현행 정본과 충돌 없음. 사업 회원 게시판 공개 금지·기존 저장 원장 유지. 과거 WO 재작성·SUPERSEDED 표기·정본 색인 변경 없음.
+
+## 2026-10-20 main 통합·배포 단계
+
+- 사용자 지시 **“main으로 병합 → 배포”**에 따라 같은 branch에서 통합 단계를 진행한다. 위의 PR 미생성·미병합·미배포 표기는 2026-10-19 개발 인계 시점의 기록이다.
+- 최신 main `8075aa77caf8869c2815d7242cb65a5c07464c6a`를 merge commit `ff5bab50dcb436fb514eb6b47685b9e6ebdafee1`로 반영했다. App·host profile·CarePharm 테스트는 자동 병합됐으며 기존 main 기능을 유지한다.
+- main에 추가된 협동조합 권한 판정 SQL에 맞춰 **격리 테스트 DB에만** cooperative 역할 테이블/열을 추가했다. 운영 스키마·권한 정책·migration 변경은 없다.
+- 통합 재검증: CarePharm·호스트·포럼 클라이언트 **118 PASS**, 공통 전시/사업 showcase **34 PASS**, 실제 PostgreSQL management route·권한·저장 **29 PASS**, 수정 테스트 ESLint·diff 검사 PASS.
+- 저장소 ruleset의 required `CI Gate`, 최신 HEAD의 보안 검사·리뷰 및 미해결 사항을 확인한 후 PR로 병합한다. 배포는 현재 Delivery/Promote 경로를 사용하며 freeze·권한·SHA gate를 유지한다. 운영 business 등록·회원 승인·무료혈당기 기획은 실행 범위에 추가하지 않는다.
+- 정확한 PR/병합 SHA·post-merge CI·배포 run·운영 확인 결과는 해당 PR의 최종 인계 기록과 최종 사용자 보고에 남긴다. 실제 성공을 확인하기 전에 배포 완료로 판정하지 않는다.

@@ -39,7 +39,8 @@ run('CarePharm operator home and member board contracts, real local PostgreSQL',
       CREATE TABLE semi_franchise_operators(semi_franchise_id uuid, user_id uuid, revoked_at timestamptz);
       CREATE TABLE role_assignments(user_id uuid, role text, is_active boolean, valid_from timestamptz, valid_until timestamptz);
       CREATE TABLE service_memberships(user_id uuid, service_key text, status text);
-      CREATE TABLE cooperatives(semi_franchise_id uuid);
+      CREATE TABLE cooperatives(id uuid, semi_franchise_id uuid, status text);
+      CREATE TABLE cooperative_roles(cooperative_id uuid, user_id uuid, revoked_at timestamptz);
       CREATE TABLE semi_franchise_memberships(semi_franchise_id uuid, organization_id uuid, status text);
       CREATE TABLE organization_members(organization_id uuid, user_id uuid, role text, left_at timestamptz);
       CREATE TABLE neture_pharmacy_memberships(organization_id uuid, status text);
@@ -49,7 +50,7 @@ run('CarePharm operator home and member board contracts, real local PostgreSQL',
     app = express(); app.use(express.json()); app.use('/home', createHomePresentationRoutes(database));
   });
   beforeEach(async () => {
-    await database.query('TRUNCATE users, organizations, semi_franchises, semi_franchise_operators, role_assignments, service_memberships, cooperatives, cms_contents, forum_category_requests, semi_franchise_memberships, organization_members, neture_pharmacy_memberships');
+    await database.query('TRUNCATE users, organizations, semi_franchises, semi_franchise_operators, role_assignments, service_memberships, cooperatives, cooperative_roles, cms_contents, forum_category_requests, semi_franchise_memberships, organization_members, neture_pharmacy_memberships');
     for (const id of [operator, other]) {
       await database.query(`INSERT INTO users VALUES($1,'Fixture','Fixture','active',true,true)`, [id]);
       await database.query(`INSERT INTO service_memberships VALUES($1,'neture','active')`, [id]);
