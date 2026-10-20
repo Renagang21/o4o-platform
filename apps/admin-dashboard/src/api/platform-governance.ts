@@ -102,13 +102,11 @@ export const platformAdminApi = {
     } catch (err) { throw toError(err); }
   },
   async getServiceDirectory(): Promise<PlatformDirectoryEntry[]> {
-    try {
-      const res = await api.get('/admin/platform-services/directory');
-      if (res.data?.success !== true || !Array.isArray(res.data.data)) {
-        throw new Error('현재 서비스 목록 응답을 확인할 수 없습니다.');
-      }
-      return res.data.data;
-    } catch (err) { throw toError(err); }
+    const res = await api.get('/admin/platform-services/directory').catch(err => { throw toError(err); });
+    if (res.data?.success !== true || !Array.isArray(res.data.data)) {
+      throw new Error('현재 서비스 목록 응답을 확인할 수 없습니다.');
+    }
+    return res.data.data;
   },
   // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영)
   async getUsers(params: PlatformUsersParams = {}): Promise<PlatformUsersResult> {

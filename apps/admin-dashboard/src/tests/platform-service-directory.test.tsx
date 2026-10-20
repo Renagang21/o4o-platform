@@ -23,7 +23,7 @@ describe('directory client', () => {
   });
   it.each([reply([], false), reply(undefined), reply({})])('rejects malformed and failed envelopes instead of displaying an empty catalog', async value => {
     get.mockResolvedValue(value);
-    await expect(platformAdminApi.getServiceDirectory()).rejects.toThrow();
+    await expect(platformAdminApi.getServiceDirectory()).rejects.toThrow('현재 서비스 목록 응답을 확인할 수 없습니다.');
   });
 });
 
