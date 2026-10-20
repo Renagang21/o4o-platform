@@ -9,6 +9,8 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
   let failRead = false;
   let failSave = false;
   let failModels = false;
+  let failManagement = false;
+  let failUsage = false;
   let failPolicy = false;
   let failPolicySave = false;
   const policyWrites: Record<string, unknown>[] = [];
@@ -43,6 +45,27 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
       return json({ success: true, data: { current: 'fixture-model', source: 'static', fetchedAt: null, canonical: 'fixture-model',
         models: [{ id: 'fixture-model', displayName: 'Fixture Model', inputTokenLimit: 4096 }] } });
     }
+    if (path === '/api/ai/admin/management') {
+      if (failManagement) return json({ success: false }, 503);
+      return json({ success: true, data: {
+        observedAt: '2026-10-20T02:00:00.000Z', notice: '설정 조회이며 실행 적용은 미확인입니다.',
+        queryPolicyRead: 'read', scopePolicyRead: 'read',
+        groups: [{ id: 'shared', name: '서비스 공통', serviceKey: null }],
+        usages: [{ id: 'service.query', evidenceId: 'A01', name: '공통 질문·요약', group: 'shared', capability: '텍스트',
+          selection: 'query', accounting: 'connected', stop: 'query', note: '공통 질의 경로입니다.', application: 'unverified',
+          configuration: { state: 'stored', model: 'fixture-model', provider: 'gemini', enabled: false, description: '저장된 질의 설정' } }],
+        providers: [{ id: 'gemini', name: 'Google Gemini', support: '텍스트', credential: 'present', databaseRead: 'read', models: ['fixture-model'], modelSource: 'code' }],
+        nonApiItems: [{ name: '유료 음성 인식', status: '도입 예정', note: '별도 연결 필요' }],
+      } });
+    }
+    if (path === '/api/ai/admin/management/usage') {
+      if (failUsage) return json({ success: false }, 503);
+      return json({ success: true, data: {
+        period: { days: Number(new URL(request.url()).searchParams.get('days') || 7), timezone: 'Asia/Seoul', from: '2026-10-13T15:00:00.000Z', to: '2026-10-20T02:00:00.000Z' },
+        coverage: 'partial', notice: '기록된 건만 집계합니다.', groups: [],
+        total: { records: 0, successes: 0, errors: 0, unpriced: 0, unmetered: 0, input: 0, output: 0, cost: '0.00000000' },
+      } });
+    }
     if (path === '/api/ai/policy') {
       if (request.method() === 'PUT') {
         const body = request.postDataJSON();
@@ -58,6 +81,8 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
     return json({ success: false, error: 'Unmocked test API' }, 404);
   });
   return { writes, policyWrites,
+    setManagementFailure: (value: boolean) => { failManagement = value; },
+    setUsageFailure: (value: boolean) => { failUsage = value; },
     setPolicyFailure: (value: boolean) => { failPolicy = value; },
     setPolicySaveFailure: (value: boolean) => { failPolicySave = value; },
     password: email.smtpPassword, setReadFailure: (value: boolean) => { failRead = value; },
@@ -141,19 +166,34 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       expect(api.policyWrites).toHaveLength(2);
     });
 
-    test('AI models recover after retry and the policy editor is reachable', async ({ page }) => {
+    test('AI management filters usages, reports errors, and preserves the policy editor', async ({ page }) => {
       const api = await mockApi(page);
-      api.setModelsFailure(true);
+      api.setManagementFailure(true);
       await page.goto('/settings');
-      await expect(page.getByText('모델 정보를 불러오지 못했습니다.')).toBeVisible();
-      api.setModelsFailure(false);
+      await expect(page.getByText('AI 운영 정보를 불러오지 못했습니다.')).toBeVisible();
+      api.setManagementFailure(false);
       await page.getByRole('button', { name: '다시 불러오기' }).click();
-      await expect(page.getByText('Fixture Model', { exact: true })).toBeVisible();
-      await expect(page.getByText(/사용 통계가 연결되어 있지 않습니다/)).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'AI 운영 관리', exact: true })).toBeVisible();
+      await page.getByLabel('서비스·업무 영역').selectOption('shared');
+      await page.getByLabel('기능·모델 검색').fill('질문');
+      await page.getByRole('button', { name: '공통 질문·요약', exact: true }).click();
+      await expect(page.getByRole('region', { name: '공통 질문·요약 상세' })).toBeVisible();
+      await page.getByRole('tab', { name: 'API·모델 연결', exact: true }).click();
+      await expect(page.getByText('연결 정보 있음', { exact: true })).toBeVisible();
+      api.setUsageFailure(true);
+      await page.getByRole('tab', { name: '사용량·비용', exact: true }).click();
+      await expect(page.getByText(/0건으로 판단할 수 없습니다/)).toBeVisible();
+      api.setUsageFailure(false);
+      await page.getByRole('button', { name: '다시 조회', exact: true }).click();
+      await expect(page.getByText(/전체 서비스에서 AI를 사용하지 않았다는 뜻은 아닙니다/)).toBeVisible();
+      await page.getByLabel('조회 기간').selectOption('30');
+      await expect(page.getByText('기록된 건만 집계합니다.')).toBeVisible();
+      await page.getByRole('tab', { name: '사용처·현재 설정', exact: true }).click();
       await expect(page.getByRole('button', { name: '설정 저장', exact: true })).toHaveCount(0);
       await expect(page.locator('input[type="password"]')).toHaveCount(0);
-      await page.getByRole('link', { name: 'AI Query 설정으로 이동' }).click();
+      await page.getByRole('link', { name: '공통 질의 설정으로 이동' }).click();
       await expect(page).toHaveURL(/\/settings\/ai-query$/);
+      await expect(page.getByRole('heading', { name: '공통 질의 설정', exact: true })).toBeVisible();
       await expect(page.getByRole('button', { name: /저장/ })).toBeVisible();
     });
   });
@@ -170,6 +210,6 @@ test('anonymous users are sent to Google-only login', async ({ page }) => {
   await mockApi(page, null);
   await page.goto('/settings/email');
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByRole('heading', { name: 'O4O Admin' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '관리자 로그인', exact: true })).toBeVisible();
   await expect(page.locator('input[type="password"], input[type="email"]')).toHaveCount(0);
 });
