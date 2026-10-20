@@ -1,5 +1,7 @@
 # Admin/Operator Role Policy & Guard Baseline v1.0
 
+> **상태**: SUPERSEDED (전체 관리자 역할·역할 종류 편집·폐기 역할의 현재 취급 범위만) · **대체 문서**: [O4O-CURRENT-ADMIN-ROLE-POLICY-V1](O4O-CURRENT-ADMIN-ROLE-POLICY-V1.md) · **표기일**: 2026-10-20
+
 > **Status: Active Policy + Frozen Baseline**
 > **Version: 1.0 | Created: 2026-02-17**
 >

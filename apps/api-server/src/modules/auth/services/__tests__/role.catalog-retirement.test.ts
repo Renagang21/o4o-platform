@@ -31,3 +31,11 @@ it.each(['cosmetics','k-cosmetics'])('retired service %s has no assignable roles
  expect(await service.getAssignableRoles(key)).toEqual([]);
  expect(mockRepo.find).not.toHaveBeenCalled();
 });
+
+it('filters obsolete definitions even if their DB catalog rows are still active',async()=>{
+ const current={name:'kpa-branch:admin',serviceKey:'kpa-branch'};
+ mockRepo.find.mockResolvedValue([{name:'platform:manager',serviceKey:'platform'},{name:'kpa:branch_admin',serviceKey:'kpa'},current]);
+ expect(await service.getAllRoles()).toEqual([current]);
+ expect(await service.getRoleByName('kpa:branch_admin')).toBeNull();
+ expect(mockRepo.findOne).not.toHaveBeenCalled();
+});

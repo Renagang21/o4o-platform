@@ -11,7 +11,6 @@ jest.mock('../entities/index.js', () => ({
   ApplicationStatus: { PENDING: 'pending', CANCELLED: 'cancelled' },
   SELLER_RECRUITMENT_TABLE: 'seller_recruitments', SELLER_RECRUITMENT_APPLICATION_TABLE: 'seller_recruitment_applications',
 }));
-jest.mock('../services/service-audience.service.js', () => ({}));
 jest.mock('../../../services/NotificationService.js', () => ({ notificationService: {} }));
 jest.mock('../middleware/supplier-context.resolver.js', () => ({}));
 

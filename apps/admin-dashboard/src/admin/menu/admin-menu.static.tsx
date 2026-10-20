@@ -95,7 +95,7 @@ export interface MenuItem {
  *
  * ```text
  * 관리자 홈                  /admin
- * 계정 · 역할 · 서비스 정책 / 약국 협력사업 / 플랫폼 HUB
+ * 계정 · 운영 권한 / 약국 협력사업 / 플랫폼 HUB
  * 관리 설정                  권한 할당 · 서비스 운영자 · 포인트 운영 · 플랫폼 설정
  * O4O 상품 DB                 기존 7개 업무 유지(상세 재배치는 후속)
  * 콘텐츠·자료                 자료 안내 · 미디어 라이브러리
@@ -118,7 +118,7 @@ export const adminMenuStatic: MenuItem[] = [
   //   KPA(kpa_members / kpa_applications / forum_post) + Neture(neture_suppliers /
   //   product_approvals) 를 한 화면에 모은다. 백엔드 guard = platform:super_admin.
   // ============================================
-  { id: 'platform-account-governance', label: '계정 · 역할 · 서비스 정책', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
+  { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
   { id: 'semi-franchise-registry', label: '약국 협력사업', icon: <Layers className="w-5 h-5" />, path: '/admin/semi-franchises' },
   { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
   {

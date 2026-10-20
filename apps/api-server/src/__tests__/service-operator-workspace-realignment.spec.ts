@@ -149,13 +149,13 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     }
   });
 
-  it('KPA: 상품 · 주문 → 사업 운영 / 분석 · 감사 로그 · 역할 → 운영 관리', () => {
+  it('KPA: 상품 · 주문 → 사업 운영 / 분석 · 감사 로그 → 운영 관리 / 역할 편집 제거', () => {
     expect(kpa.get('/operator/products')).toBe('business_operation');
     expect(kpa.get('/operator/orders')).toBe('business_operation');
     expect(kpa.get('/operator/analytics')).toBe('operations_management');
     expect(kpa.get('/operator/ai-report')).toBe('operations_management');
     expect(kpa.get('/operator/audit-logs')).toBe('operations_management');
-    expect(kpa.get('/operator/roles')).toBe('operations_management');
+    expect(kpa.has('/operator/roles')).toBe(false);
   });
 
   it.each([

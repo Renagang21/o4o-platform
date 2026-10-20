@@ -216,7 +216,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       }
 
       // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-      // 의약품은 약국 대상 서비스에만 진열될 수 있다. 비의약품은 no-op.
+      // 의약품도 별도 대상 설정 없이 취급한다. 상품 실재와 조직의 서비스 소속은 확인한다.
       const drugGate = await assertDrugActionAllowed(dataSource, {
         action: 'OPL_CREATE',
         masterId: resolvedMasterId,
@@ -274,9 +274,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       }
 
       // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-      // offer 를 경유하지 않는 master 직접 등록 경로. 운영 DB 의 비약국 DRUG OPL 5건이
-      // 이 경로로 생성됐다(전부 offer_id IS NULL). offer 축 게이트만으로는 막히지 않으므로
-      // 여기서도 동일한 공통 게이트를 통과시킨다.
+      // Master 직접 등록에도 상품 실재·조직의 서비스 소속 검사를 적용한다.
       const drugGate = await assertDrugActionAllowed(dataSource, {
         action: 'OPL_CREATE',
         masterId,

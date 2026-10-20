@@ -16,13 +16,12 @@ const state: {
   supplier: { id: string; status: string } | null;
   existingOffer: { id: string; deletedAt: Date | null } | null;
   saveImpl: ((o: unknown) => Promise<unknown>) | null;
-  pharmacyRows: Array<{ service_key: string }>;
   queries: Array<{ sql: string; params: unknown[] }>;
   saved: unknown[];
   approvalCalls: unknown[];
 } = {
   master: null, category: null, supplier: null, existingOffer: null, saveImpl: null,
-  pharmacyRows: [{ service_key: 'kpa-society' }], queries: [], saved: [], approvalCalls: [],
+  queries: [], saved: [], approvalCalls: [],
 };
 
 function repoFor(entity: { name?: string } | string) {
@@ -55,17 +54,11 @@ jest.mock('../../../../database/connection.js', () => ({
     getRepository: (e: never) => repoFor(e),
     query: async (sql: string, params: unknown[]) => {
       state.queries.push({ sql, params });
-      if (/service_audience_policies/.test(sql)) return state.pharmacyRows;
       if (/FROM product_masters/.test(sql)) return state.master ? [{ regulatory_type: state.master.regulatoryType }] : [];
       return [];
     },
     manager: {},
   },
-}));
-jest.mock('../service-audience.service.js', () => ({
-  ServiceAudienceService: jest.fn().mockImplementation(() => ({
-    getPharmacyAudienceResolver: async () => (k: string) => state.pharmacyRows.some((r) => r.service_key === k),
-  })),
 }));
 jest.mock('../offer-service-approval.service.js', () => ({
   OfferServiceApprovalService: jest.fn().mockImplementation(() => ({
@@ -104,7 +97,6 @@ beforeEach(() => {
   state.supplier = { id: SUPPLIER_ID, status: 'ACTIVE' };
   state.existingOffer = null;
   state.saveImpl = null;
-  state.pharmacyRows = [{ service_key: 'kpa-society' }];
   state.queries = [];
   state.saved = [];
   state.approvalCalls = [];

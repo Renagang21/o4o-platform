@@ -420,10 +420,6 @@ const StoreManagementPage = lazy(() =>
 const OrdersManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OrdersManagementPage }))
 );
-// WO-O4O-ROLE-MANAGEMENT-UI-V1
-const RoleManagementPage = lazy(() =>
-  import('./pages/operator').then((m) => ({ default: m.RoleManagementPage }))
-);
 // WO-O4O-AUDIT-ANALYTICS-LAYER-V1
 const OperatorAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
@@ -1083,7 +1079,7 @@ function App() {
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
               {/* /admin/supplier-quality · /admin/market-trial alias 는 아래 서브도메인 운영자 블록으로 옮겼다 */}
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
-              <Route path="/admin/roles" element={<RoleManagementPage />} />
+              <Route path="/admin/roles" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />

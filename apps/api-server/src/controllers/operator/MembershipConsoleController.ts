@@ -348,7 +348,7 @@ export class MembershipConsoleController {
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
-        roleMap[row.user_id] = row.roles || [];
+        roleMap[row.user_id] = (row.roles || []).filter((value: string) => !isRetiredRoleValue(value));
       }
 
       // Batch fetch service_memberships (scoped by service)
@@ -522,7 +522,7 @@ export class MembershipConsoleController {
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         },
-        roles: roleRows.map((r: any) => ({
+        roles: roleRows.filter((r: any) => !isRetiredRoleValue(r.role)).map((r: any) => ({
           id: r.id,
           role: r.role,
           isActive: r.is_active,
