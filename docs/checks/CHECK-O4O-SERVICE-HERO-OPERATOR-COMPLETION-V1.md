@@ -1,7 +1,8 @@
 # 서비스·협동조합 Hero 운영 정비 검증
 
 - 작성일: 2026-10-20
-- 상태: main 병합·운영 배포 완료 (PR #738 · main `271638b989`) · 실제 operator 로그인 검증 미실행
+- 상태: ACTIVE
+- 최종 갱신: 2026-10-20 (main 병합·운영 배포 결과와 미검증 항목은 본문 마지막 절)
 - TODO: [TODO-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1](../work-orders/TODO-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)
 - branch: `wo/service-hero-operator-completion`, 시작 main `0b9821122a`
 
