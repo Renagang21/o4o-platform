@@ -15,6 +15,7 @@ import { WORKSPACE_PATHS } from "../../config/workspace";
 import { authClient } from "../../lib/apiClient";
 import { StoreAiAssistant } from '../store/StoreAiAssistant';
 import { StoreAiPlacementProvider, StoreAiSlot } from '../store/StoreAiPlacement';
+import { StoreOperationsNavigation } from '../store/StoreOperationsNavigation';
 
 export interface StoreWorkspaceOutlet {
   config: StoreDashboardConfig;
@@ -97,6 +98,9 @@ export function StoreWorkspaceShell({
             </nav>
           </details>
         </div>
+        {active === "use" && !isLanding && (
+          <div className="mt-3"><StoreOperationsNavigation config={config} /></div>
+        )}
         {items.length > 0 && !isLanding && landing && (
           <nav
             aria-label="현재 업무 메뉴"
@@ -115,7 +119,7 @@ export function StoreWorkspaceShell({
               <summary className="min-h-11 cursor-pointer content-center text-sm font-medium text-slate-700">
                 다른 업무 열기
               </summary>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 grid max-h-[55vh] gap-4 overflow-y-auto pb-3 sm:grid-cols-2">
                 {workspaceGroups(config, active!).map((group) => (
                   <section key={group.key}>
                     <h2 className="text-sm font-semibold text-slate-800">

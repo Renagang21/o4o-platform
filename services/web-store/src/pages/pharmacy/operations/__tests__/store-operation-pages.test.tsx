@@ -110,11 +110,13 @@ it('store switch closes the old QR target and missing direct identity exposes no
   rerender(<MemoryRouter><StoreContentNextSteps /></MemoryRouter>);
   expect(screen.queryByRole('button', { name: '이 콘텐츠로 QR 만들기' })).toBeNull();
 });
-it('use landing keeps only permitted targets when execution capability is absent', () => {
+it('use landing keeps only permitted targets when execution capability is absent', async () => {
   const config = { basePath: '/work/kpa-society/store', menuSections: [{ items: [{ key: 'library-contents', label: '자료함', subPath: '/library/contents' }, { key: 'qr', label: 'QR', subPath: '/marketing/qr' }] }] };
-  render(<MemoryRouter initialEntries={['/use']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
-  fireEvent.click(screen.getByText('전체 업무'));
+  render(<MemoryRouter initialEntries={['/work/kpa-society/store/workspace/use']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="/work/kpa-society/store/workspace/use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
+  await screen.findByRole('heading', { name: 'QR' });
+  fireEvent.click(screen.getByText('배치·이용 현황 확인'));
+  expect(screen.queryByRole('link', { name: '위치별 저장 설정' })).toBeNull();
   expect(screen.getByRole('link', { name: /게시·활용 상태/ }).getAttribute('href')).toBe('/work/kpa-society/store/content');
   expect(screen.getByRole('link', { name: /QR 배치·출력/ }).getAttribute('href')).toContain('workspace=use');
-  expect(screen.getByText(/전체 업무에서 이용할 작업을 선택/)).toBeTruthy();
+  expect(screen.queryByRole('navigation', { name: '상담 참고 자료' })).toBeNull();
 });
