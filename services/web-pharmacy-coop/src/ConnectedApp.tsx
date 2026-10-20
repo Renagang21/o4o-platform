@@ -100,14 +100,16 @@ export function ConnectedApp() {
               {auth.user ? (
                 <>
                   <p>로그인했습니다.</p>
-                  <Link to="/test">테스트 협동조합으로 이동</Link>
+                  <Link to="/cooperatives/mine">내 협동조합으로 이동</Link>
                 </>
               ) : (
                 <EmailLoginForm
                   links={O4O_ACCOUNT_LINKS}
                   onLogin={auth.loginWithEmail}
                   api={authClient}
-                  onSuccess={() => navigate("/test", { replace: true })}
+                  onSuccess={() =>
+                    navigate("/cooperatives/mine", { replace: true })
+                  }
                 />
               )}
             </main>
