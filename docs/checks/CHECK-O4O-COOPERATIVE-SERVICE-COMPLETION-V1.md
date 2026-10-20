@@ -1,6 +1,6 @@
 # CHECK-O4O-COOPERATIVE-SERVICE-COMPLETION-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-20
 > **범위**: 협동조합 개인 참여·가입 기준·회원 게시판 개발 검증
 
@@ -53,3 +53,5 @@
 DEPLOYMENT = MANUAL/GATED. 통합 담당이 API와 cooperative-web을 함께 반영하고 공개 호스트에서 검증한다. 신규 schema 적용은 없다. push 후 branch/commit을 최종 보고한다.
 
 WORKTREE_DISPOSITION: 기존 작업공간 `/workspace/o4o-wt/cooperative-role-management` 재사용 / branch `wo/cooperative-service-completion` / base `b54074d038` / main integration·remote CI·deployment 미실행 / verdict `KEEP` — 병합 전 후속 수정 및 통합 인계용.
+
+구현 commit `968c711a1c` 원격 push 완료. 이후 본 인계 문서의 완료 상태를 별도 문서 커밋으로 push한다. push 직전 main `d176026c24`의 공급자 사업자명 변경을 확인했고 변경 파일 충돌 없이 rebase했다. rebase 후 API 타입 검사·협동조합 UI 52개를 다시 통과했다. WORKTREE_DISPOSITION은 KEEP이며 이번 작업의 미커밋·미추적 변경 없이 인계한다.

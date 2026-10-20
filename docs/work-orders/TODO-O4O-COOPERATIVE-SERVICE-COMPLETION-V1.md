@@ -1,6 +1,6 @@
 # TODO-O4O-COOPERATIVE-SERVICE-COMPLETION-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-20
 > **범위**: 문서·코드 조사 → TODO 보완 → 구현·검증·commit·push
 
@@ -23,7 +23,7 @@
 - [x] 공급·콘텐츠 기존 경로 회귀 확인, 매장 복사는 기존 매장 권한 유지
 - [x] 자동화 검증·타입 검사·빌드·PC/모바일 화면 확인
 - [x] 검증 기록·남은 과제·문서 정합 정리
-- [ ] 범위 확인 후 commit·push·인계
+- [x] 범위 확인 후 commit·push·인계
 
 ## 조사 근거와 구현 결정
 
@@ -50,3 +50,7 @@
 ## 개발 검증
 
 [검증 기록](../checks/CHECK-O4O-COOPERATIVE-SERVICE-COMPLETION-V1.md)을 따른다. 로컬 자동화 141개 및 합성 API 브라우저 4개 시나리오 통과. 운영 적용·실계정 검증은 실행하지 않았다.
+
+## push 인계
+
+구현 commit `968c711a1c`를 `origin/wo/cooperative-service-completion`에 push했다. 최초 조사 기준은 `b54074d038`, push 기준은 `d176026c24`다. 추가된 PR #720은 공급자 사업자명 영역으로 작업 파일과 겹치지 않아 미push branch를 rebase했고 API 타입 검사·협동조합 UI 52개를 재검증했다. PR 생성·CI dispatch·병합·운영 반영은 하지 않았다. 전용 branch/worktree는 후속 통합용으로 보존한다.
