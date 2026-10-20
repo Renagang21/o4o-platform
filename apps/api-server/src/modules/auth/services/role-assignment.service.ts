@@ -20,6 +20,7 @@ import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { isRetiredRoleValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
+import { isOperatorAssignmentRole, lockOperatorAssignments } from './operator-assignment-lock.js';
 import { invalidateRoles } from '../utils/role-cache.js';
 
 export interface AssignRoleInput {
@@ -125,11 +126,20 @@ export class RoleAssignmentService {
    *   선택적 `manager` 를 받는다. 호출자가 트랜잭션 안에서 User·Membership·credential 을
    *   함께 만들 때 role_assignments 만 트랜잭션 밖에 남아 부분 생성이 되는 것을 막기 위함이다.
    *   **write 경로는 그대로 하나다**(F9 RBAC SSOT) — 저장소만 트랜잭션 manager 것으로 바꾼다.
-   *   인자를 생략하면 기존 동작과 완전히 동일하다.
+   *   Operator 쓰기는 manager 생략 시 내부 transaction을 사용하며, 다른 역할은 기존 동작을 유지한다.
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil } = input;
     if (isRetiredRoleValue(role)) throw new RetiredServiceError();
+    // F10 §3.2 bug fix: all operator grant paths share the transaction lock, including callers without a manager.
+    if (isOperatorAssignmentRole(role)) {
+      if (!manager) {
+        const saved = await AppDataSource.transaction(tx => this.assignRole(input, tx));
+        invalidateRoles(userId.toLowerCase()); // invalidate again after this transaction commits
+        return saved;
+      }
+      await lockOperatorAssignments(manager, userId);
+    }
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists
@@ -222,6 +232,14 @@ export class RoleAssignmentService {
    *   행을 지우지 않고 이력을 남긴다.
    */
   async removeRole(userId: string, role: string, manager?: EntityManager): Promise<boolean> {
+    if (isOperatorAssignmentRole(role)) {
+      if (!manager) {
+        const removed = await AppDataSource.transaction(tx => this.removeRole(userId, role, tx));
+        invalidateRoles(userId.toLowerCase());
+        return removed;
+      }
+      await lockOperatorAssignments(manager, userId);
+    }
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
     const assignment = await repository.findOne({
       where: { userId, role, isActive: true },

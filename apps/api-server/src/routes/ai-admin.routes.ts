@@ -21,8 +21,11 @@ import { aiAdminService } from '../services/ai-admin.service.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
+import { createAiManagementRouter } from './ai-management.routes.js';
 
 const router: Router = Router();
+
+router.use('/management', authenticate, requireAdmin, createAiManagementRouter(AppDataSource));
 
 // ============================================================
 // Dashboard

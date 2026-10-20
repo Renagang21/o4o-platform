@@ -1,5 +1,6 @@
 import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
+import { ServiceOperatorManagement } from '@o4o/operator-core-ui';
 import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import type { Cooperative } from "./domain";
 type Client = PharmacyManagementClient;
@@ -292,6 +293,7 @@ export function FederationManagementPanel({
   return (
     <section className="section coop-management">
       <h1>연합회 산하 조합관리</h1>
+      {admin && <ServiceOperatorManagement key={userId} client={client} scope="pharmcoop" title="연합회 Operator 지정 · 해제" />}
       <p>
         {admin
           ? "조합 승인·상태 관리와 조합 admin 지정을 담당합니다."

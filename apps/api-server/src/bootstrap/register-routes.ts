@@ -44,6 +44,9 @@ import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import appAvailabilityRoutes from '../routes/app-availability.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
+import { AppDataSource } from '../database/connection.js';
+import { requireAuth } from '../middleware/auth.middleware.js';
+import { createServiceOperatorManagementRoutes } from '../routes/service-operator-management.routes.js';
 import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments.routes.js';
 // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F: paid-but-unbridged 복구
 import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
@@ -180,6 +183,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
   app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
+  app.use('/api/v1/service-operator-management', createServiceOperatorManagementRoutes(AppDataSource, requireAuth));
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
   // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F:
   //   결제됐으나 공급자에게 전달되지 않은(paid-but-unbridged) 주문 탐지·복구 — 전 producer 공통.

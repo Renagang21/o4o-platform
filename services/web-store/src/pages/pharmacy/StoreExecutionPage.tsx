@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useOutletContext } from 'react-router-dom';
+import type { StoreWorkspaceOutlet } from '../../components/layouts/StoreWorkspaceShell';
+import { workspaceItems } from '../../config/storeWorkspace';
 import { MapPin } from 'lucide-react';
 import { StoreExecutionHomeView, type StoreExecutionGroup, type StoreExecutionQrInput } from '@o4o/store-ui-core';
 import { colors } from '../../styles/theme';
@@ -32,7 +34,9 @@ async function loadQrs() {
 interface ExecutionProps { workspace?: boolean; navigation?: ReactNode; availableKeys?: string[] }
 export default function StoreExecutionPage(props: ExecutionProps) {
   const scope = useStoreOperationScope();
-  return <ExecutionSession key={scope.key} {...props} />;
+  const outlet = useOutletContext<StoreWorkspaceOutlet | undefined>();
+  const availableKeys = props.availableKeys ?? (outlet?.config ? workspaceItems(outlet.config, 'use').map(item => item.key) : undefined);
+  return <ExecutionSession key={scope.key} {...props} availableKeys={availableKeys} />;
 }
 function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionProps) {
   const { pathname } = useLocation();
@@ -53,7 +57,7 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
   </nav>;
   return <div className="max-w-5xl mx-auto px-4 py-6 space-y-5">
     <header className="flex flex-wrap items-start justify-between gap-3">
-      <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />{workspace ? '매장 운영' : '실행 현황'}</h1>
+      <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />{workspace ? '매장 운영' : '위치별 저장 설정'}</h1>
         <p className="mt-2 text-sm text-slate-600">위치별 저장된 태블릿 화면과 QR 설정을 확인합니다. 실제 기기 연결·재생과 QR 스캔 결과는 현장에서 확인해 주세요.</p></div>
       <button type="button" disabled={loading || (!tabletAllowed && !qrAllowed)} onClick={() => { void tablets.reload(); void qrs.reload(); }} className="min-h-11 rounded-lg border px-4 text-sm disabled:opacity-50">새로고침</button>
     </header>
@@ -72,9 +76,10 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
     </div>)}
     {!loading && failed && <p role="status" className="text-sm text-slate-600">조회에 성공한 자료만 표시합니다. 확인하지 못한 항목은 사용 없음으로 집계하지 않습니다.</p>}
     {!loading && !qrs.error && qrs.data.total > qrs.data.items.length && <p className="text-sm text-amber-800">QR 전체 {qrs.data.total}건 중 {qrs.data.items.length}건 기준입니다. 전체 목록은 QR 배치·출력에서 확인하세요.</p>}
+    {qrAllowed && <p className="text-sm text-slate-600">QR 스캔은 조회한 QR의 누적 기록입니다. ‘미배치 QR’은 등록된 배치 위치가 없는 QR이며, 실제 사용 여부를 뜻하지 않습니다.</p>}
     {(tabletAllowed || qrAllowed) && (loading || !failed || (!tablets.error && tablets.data.length > 0) || (!qrs.error && qrs.data.items.length > 0)) && <StoreExecutionHomeView
       tablets={tablets.error ? [] : tablets.data} qrs={qrs.error ? [] : qrs.data.items} loading={loading}
-      labels={{ summaryTablets: '조회한 태블릿', ...(!tabletAllowed ? { emptyAll: '조회한 QR이 없습니다', emptyHint: 'QR 배치·출력에서 저장한 QR을 확인해 주세요.' } : !qrAllowed ? { emptyAll: '조회한 태블릿이 없습니다', emptyHint: '태블릿 화면 변경에서 저장한 태블릿을 확인해 주세요.' } : {}) }}
+      labels={{ summaryTablets: tabletAllowed ? '조회한 태블릿' : '태블릿 조회 제외', summaryQrPlaced: qrAllowed ? '위치 등록 QR' : 'QR 조회 제외', summaryScans: 'QR 누적 스캔', unplacedHint: '배치 위치가 등록되지 않은 QR입니다. QR 배치·출력에서 위치를 지정할 수 있습니다.', ...(!tabletAllowed ? { emptyAll: '조회한 QR이 없습니다', emptyHint: 'QR 배치·출력에서 저장한 QR을 확인해 주세요.' } : !qrAllowed ? { emptyAll: '조회한 태블릿이 없습니다', emptyHint: '태블릿 화면 변경에서 저장한 태블릿을 확인해 주세요.' } : {}) }}
       palette={{ primary: colors.primary }} renderGroupLinks={groupLinks}
       emptyAction={allows('tablet-displays') ? <Link to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 적용으로 가기</Link> : undefined}
     />}

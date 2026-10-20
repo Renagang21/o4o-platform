@@ -22,7 +22,7 @@ export default function SiteShell() {
           <summary>업무 메뉴</summary>
           <nav aria-label="강의 업무 메뉴">
             {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
-            {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/home-presentation">Hero · 광고 관리</Link><Link to="/operator/contact">문의 관리</Link><Link to="/operator/members">회원 관리</Link></>}
+            {canAccess('operator', user) && <><Link to="/operator">운영</Link>{canAccess('admin', user) && <Link to="/operator/operators">Operator 지정 · 해제</Link>}<Link to="/operator/home-presentation">Hero · 광고 관리</Link><Link to="/operator/contact">문의 관리</Link><Link to="/operator/members">회원 관리</Link></>}
           </nav>
         </details>}
       </nav>

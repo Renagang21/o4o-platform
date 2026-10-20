@@ -3,6 +3,7 @@ import './carepharm-home.css';
 import { Link, useLocation } from 'react-router-dom';
 import { COOPERATION_MODELS, CooperationMemberSpace, ServiceHomeHero, type CooperationView } from '@o4o/shared-space-ui';
 import { CarePharmNotices } from './CarePharmNotices';
+import { CarePharmWorkspaces } from './CarePharmWorkspaces';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import { useAuth, useLoginModal } from '../../contexts';
 import { api } from '../../lib/apiClient';
@@ -21,7 +22,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
     onEnterStore={() => requestServiceHandoff(api, {
       workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(COOPERATION_MODELS.carepharm.storePath)}`,
     })} />;
-  if (view !== 'home') return memberSpace;
+  if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
   return <div className="carepharm-home">
     <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm" title={['약국이 함께하는 만성질환 협업']} description={['현장의 경험과 자료를 나누고, 우리 약국의 경영에 활용합니다.']} />
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-8">
@@ -36,6 +37,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
         <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">협업체 운영자가 게시한 소식과 참여 안내를 확인하세요.</p>
         <CarePharmNotices />
       </section>
+      <CarePharmWorkspaces />
       <section aria-label="회원 서비스" className="rounded-2xl border border-slate-200 bg-white">{memberSpace}</section>
     </div>
   </div>;

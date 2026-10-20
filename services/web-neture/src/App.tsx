@@ -1144,6 +1144,7 @@ function App() {
               <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/operator/legal/supplier" element={<SubdomainOperatorRoute serviceKey="supplier" level="admin"><ServiceLegalSettingsPage serviceKey="supplier" /></SubdomainOperatorRoute>} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+              <Route path="/admin/supplier-governance/operators" element={<OperatorsPage scope="supplier" />} />
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="supplier" level="operator">
@@ -1169,6 +1170,7 @@ function App() {
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/home-presentation/funding" element={<HomePresentationPage surface="funding" />} />
+              <Route path="/operator/market-trial/operators" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><OperatorsPage scope="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1196,6 +1198,7 @@ function App() {
             }>
               <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
               <Route path="/admin/communities" element={<Navigate to="/admin/communities/members" replace />} />
+              <Route path="/admin/communities/operators" element={<OperatorsPage scope="community" />} />
               <Route path="/admin/communities/members" element={<CommunityServiceManagementPage kind="members" permanent />} />
               <Route path="/admin/communities/boards" element={<CommunityServiceManagementPage kind="boards" permanent />} />
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/admin/forum-deleted" element={<Navigate to="/admin/communities/boards" replace />} />}

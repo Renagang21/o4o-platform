@@ -30,6 +30,27 @@ beforeEach(() => {
   });
 });
 afterEach(cleanup);
+it('explains cooperation and store responsibilities without adding unplanned services', async () => {
+  state.authenticated = false; mount();
+  expect(screen.getByText('CarePharm 협업체 공간')).toBeTruthy();
+  expect(screen.getByText('가입 승인된 약국의 내 매장')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '내 매장 업무 · 이용 안내' }).getAttribute('href')).toBe('/tools');
+  expect(screen.getByRole('link', { name: '회원 커뮤니티' }).getAttribute('href')).toBe('/communities/business%3Acarepharm/forum');
+  expect(screen.queryByText(/무료혈당기|CGM|Study/)).toBeNull();
+  expect(state.get).not.toHaveBeenCalled();
+});
+it('keeps unapproved pharmacies outside store entry while showing public workflow guidance', async () => {
+  mount('tools'); await screen.findByText(/이 서비스의 가입 승인 후/);
+  expect(screen.getByText('CarePharm 협업체 공간')).toBeTruthy();
+  expect(screen.queryByRole('button', { name: '내 약국으로' })).toBeNull();
+});
+it('preserves the selected pharmacy when navigating between cooperation workspaces', async () => {
+  access.allowed = true;
+  render(<MemoryRouter initialEntries={['/?store=owned-store']}><CarePharmHomePage /></MemoryRouter>);
+  await screen.findByRole('link', { name: '자료실 보기' });
+  expect(screen.getByRole('link', { name: '내 매장 업무 · 이용 안내' }).getAttribute('href')).toBe('/tools?store=owned-store');
+  expect(screen.getByRole('link', { name: '회원 커뮤니티' }).getAttribute('href')).toBe('/communities/business%3Acarepharm/forum?store=owned-store');
+});
 describe('CarePharm cooperation service', () => {
   it('asks signed-out users to log in without reading protected business data', () => {
     state.authenticated = false; mount(); fireEvent.click(screen.getByRole('button', { name: '로그인하기' }));

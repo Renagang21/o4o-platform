@@ -34,7 +34,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
     // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 이 경로는 더 이상 관리 화면이 아니라
     //   중앙 관리자 `/operators` 안내 화면이다. 진입 동선은 유지하고 라벨만 안내 성격으로 정정.
-    { label: '운영자 관리 안내', path: '/admin/operators', adminOnly: true },
+    { label: '운영자 지정 · 해제', path: '/admin/operators', adminOnly: true },
     // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
     { label: '서비스 가입 정리', path: '/admin/members', adminOnly: true },
     // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: dead link 해소 + operator 노출
@@ -155,7 +155,7 @@ export function getAdminMenu(
       { label: '서비스 가입 정리', path: '/admin/members' },
       // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리(운영자 지정) 성격 — 라벨 표면화.
       // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 중앙 관리자 `/operators` 안내 화면.
-      { label: '운영자 관리 안내', path: '/admin/operators' },
+      { label: '운영자 지정 · 해제', path: '/admin/operators' },
     ],
     approvals: [
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
