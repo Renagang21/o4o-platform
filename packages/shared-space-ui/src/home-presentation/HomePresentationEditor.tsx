@@ -14,13 +14,18 @@ import {
   type HomePresentationClient,
 } from "./HomePresentation";
 
-import { HERO_DESIGN, heroIdentity, initialIdentityPresentation } from "./HomeHeroIdentity";
+import {
+  HERO_DESIGN,
+  heroIdentity,
+  initialIdentityPresentation,
+} from "./HomeHeroIdentity";
 
 export interface HomePresentationEditorProps {
   surface: HomeSurface;
   client: HomePresentationClient;
   branchSlug?: string;
   businessKey?: string;
+  cooperativeSlug?: string;
   heading?: "h1" | "h2";
 }
 export function HomePresentationEditor({
@@ -28,12 +33,21 @@ export function HomePresentationEditor({
   client,
   branchSlug,
   businessKey,
+  cooperativeSlug,
   heading = "h1",
 }: HomePresentationEditorProps) {
   const Heading = heading;
   const design = HERO_DESIGN[heroIdentity(surface, businessKey)];
-  const serviceName = surface === "pharmacy" && businessKey === "megapharm" ? "메가팜 · 창고형약국" : HOME_SURFACE_INFO[surface].name;
-  const endpoint = homePresentationManagePath(surface, branchSlug, businessKey);
+  const serviceName =
+    surface === "pharmacy" && businessKey === "megapharm"
+      ? "메가팜 · 창고형약국"
+      : HOME_SURFACE_INFO[surface].name;
+  const endpoint = homePresentationManagePath(
+    surface,
+    branchSlug,
+    businessKey,
+    cooperativeSlug,
+  );
   const [config, setConfig] = useState<HomePresentation>(() =>
     initialIdentityPresentation(surface, businessKey),
   );
@@ -204,21 +218,34 @@ export function HomePresentationEditor({
     >
       <header>
         <p className="home-editor-eyebrow">HOME CONTENT</p>
-        <Heading>{surface === "carepharm" ? "Hero · 공개 공지 관리" : "Hero · 광고 관리"}</Heading>
+        <Heading>
+          {surface === "carepharm"
+            ? "Hero · 공개 공지 관리"
+            : "Hero · 광고 관리"}
+        </Heading>
         <p>
-          {serviceName} ·{" "}
-          {HOME_SURFACE_INFO[surface].purpose}
+          {serviceName} · {HOME_SURFACE_INFO[surface].purpose}
         </p>
       </header>
       <p className="home-editor-help">
         이곳의 안내는 공개 콘텐츠입니다. 회원 전용 자료와 개인정보는 넣지
-        마세요. Hero는 서비스 안내 최대 3개입니다. {surface === "carepharm" ? "공지·안내 목록에는 현재 게시 기간에 해당하는 항목을 모두 표시합니다." : "홍보 영역은 현재 게시 기간에 해당하는 첫 번째 항목을 보여줍니다."} 광고는 광고주를 표시하며, 초기
-        콘텐츠는 자체 서비스 안내입니다.
+        마세요. Hero는 서비스 안내 최대 3개입니다.{" "}
+        {surface === "carepharm"
+          ? "공지·안내 목록에는 현재 게시 기간에 해당하는 항목을 모두 표시합니다."
+          : "홍보 영역은 현재 게시 기간에 해당하는 첫 번째 항목을 보여줍니다."}{" "}
+        광고는 광고주를 표시하며, 초기 콘텐츠는 자체 서비스 안내입니다.
       </p>
-      <aside className="home-editor-design-guide" aria-label="이 서비스의 Hero 제작 안내">
+      <aside
+        className="home-editor-design-guide"
+        aria-label="이 서비스의 Hero 제작 안내"
+      >
         <h2>{design.name} 디자인</h2>
         <p>{design.guidance}</p>
-        <p>권장 이미지: {design.image}. 가로형 이미지를 사용하고, 중요한 내용은 가운데에 배치해 주세요. 이미지가 없으면 서비스 전용 그래픽이 표시됩니다.</p>
+        <p>
+          권장 이미지: {design.image}. 가로형 이미지를 사용하고, 중요한 내용은
+          가운데에 배치해 주세요. 이미지가 없으면 서비스 전용 그래픽이
+          표시됩니다.
+        </p>
       </aside>
       {loading && <p role="status">홈 화면 구성을 불러오고 있습니다…</p>}
       {error && (
@@ -275,7 +302,9 @@ export function HomePresentationEditor({
                   change({ ...config, enabled: event.target.checked })
                 }
               />{" "}
-              {surface === "carepharm" ? "Hero·공개 공지 노출 사용" : "Hero·홍보 노출 사용"}
+              {surface === "carepharm"
+                ? "Hero·공개 공지 노출 사용"
+                : "Hero·홍보 노출 사용"}
             </label>
             <p>
               끄고 공개 반영하면 홍보를 숨깁니다. 서비스의 기본 제목과 업무
@@ -296,7 +325,9 @@ export function HomePresentationEditor({
                 <h2>
                   {section === "slides"
                     ? "Hero 슬라이드"
-                    : surface === "carepharm" ? "공개 공지 · 안내" : "광고 · 서비스 안내"}
+                    : surface === "carepharm"
+                      ? "공개 공지 · 안내"
+                      : "광고 · 서비스 안내"}
                 </h2>
                 <button
                   type="button"
@@ -484,9 +515,17 @@ export function HomePresentationEditor({
                   config={preview}
                   heading="h2"
                 />
-                {surface === "carepharm" ? preview.promotions.map(item => (
-                  <HomePromotionView key={item.id} surface={surface} config={{ ...preview, promotions: [item] }} />
-                )) : <HomePromotionView surface={surface} config={preview} />}
+                {surface === "carepharm" ? (
+                  preview.promotions.map((item) => (
+                    <HomePromotionView
+                      key={item.id}
+                      surface={surface}
+                      config={{ ...preview, promotions: [item] }}
+                    />
+                  ))
+                ) : (
+                  <HomePromotionView surface={surface} config={preview} />
+                )}
               </>
             )}
           </section>

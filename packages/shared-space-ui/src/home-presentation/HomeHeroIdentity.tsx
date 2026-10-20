@@ -42,6 +42,8 @@ export const HERO_DESIGN: Record<HeroIdentity, { name: string; guidance: string;
   carepharm: { name: '관리 자료와 약국 협업', guidance: '사업 소식과 약국이 활용할 관리 자료를 소개해 주세요. 환자 정보나 확인되지 않은 건강 성과는 넣지 마세요.', image: '관리 자료·교육·약국 협업 이미지' },
   pharmacy: { name: '본부와 가입 약국', guidance: '가입 약국에 필요한 본부 소식과 사업 자료를 소개해 주세요. 게시한 내용만 공동공간에 표시됩니다.', image: '본부의 실제 사업 소식·공유 자료 이미지' },
   megapharm: { name: '창고형 약국 협력사업', guidance: '이 사업의 운영 소식과 제품 자료를 소개해 주세요. 실제 운영 정보는 해당 사업의 담당 범위에서 확인하세요.', image: '사업 운영 현장·제품·활용 자료 이미지' },
+  pharmcoop: { name: '협동조합의 연결', guidance: '연합회의 소식과 협동조합 공동 활동을 소개해 주세요. 개별 조합 소식은 각 조합에서 관리합니다.', image: '연합회 공동 활동·협동조합 협력 이미지' },
+  cooperative: { name: '우리 조합의 소식', guidance: '우리 조합의 소식과 참여 안내를 소개해 주세요. 공개 가능한 내용만 게시합니다.', image: '우리 조합의 활동·참여 안내 이미지' },
   branch: { name: '지역 회원의 소식', guidance: '우리 분회의 공지·행사·자료를 소개하고 실제 일정이나 게시글로 연결해 주세요.', image: '지역 회원 활동·행사 안내 이미지' },
 };
 
@@ -53,6 +55,11 @@ export function HeroArtwork({ identity }: { identity: HeroIdentity }) {
         <path d="M94 67L202 140L311 55M202 140L328 218M202 140L72 219" className="hero-art-line" />
         <circle cx="202" cy="140" r="53" className="hero-art-primary" /><text x="202" y="148" textAnchor="middle" className="hero-art-on-primary hero-art-large">O4O</text>
         {[[94,67,'AI'],[311,55,'서비스'],[328,218,'내 매장'],[72,219,'My Home']].map(([x,y,label])=><g key={String(label)}><circle cx={x} cy={y} r="38" className="hero-art-paper"/><text x={x} y={Number(y)+5} textAnchor="middle" className={label==='My Home'?'hero-art-ink hero-art-small':'hero-art-ink'}>{label}</text></g>)}
+      </> : identity === 'pharmcoop' || identity === 'cooperative' ? <>
+        <path d="M90 65L200 145L310 65M200 145L90 225M200 145L310 225" className="hero-art-line" />
+        <circle cx="200" cy="145" r="57" className="hero-art-primary" />
+        <text x="200" y="151" textAnchor="middle" className="hero-art-on-primary">{identity === 'pharmcoop' ? '연합회' : '우리 조합'}</text>
+        {[[90,65],[310,65],[90,225],[310,225]].map(([x,y]) => <g key={`${x}-${y}`}><circle cx={x} cy={y} r="37" className="hero-art-paper" /><text x={x} y={y+5} textAnchor="middle" className="hero-art-ink">{identity === 'pharmcoop' ? '협동조합' : '조합원'}</text></g>)}
       </> : identity === 'supplier' ? <>
         <rect x="27" y="40" width="230" height="194" rx="20" className="hero-art-paper"/>
         <rect x="50" y="64" width="83" height="96" rx="12" className="hero-art-soft"/><path d="M73 90H110V137H73zM82 80H101V91H82z" className="hero-art-primary"/>
