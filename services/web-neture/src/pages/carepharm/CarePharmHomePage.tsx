@@ -24,7 +24,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
     })} />;
   if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
   return <div className="carepharm-home">
-    <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm" title={['약국이 함께하는 만성질환 협업']} description={['현장의 경험과 자료를 나누고, 우리 약국의 경영에 활용합니다.']} />
+    <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm" title={['관리 자료와 현장 경험을,', '약국의 협업으로']} description={['사업자와 참여 약국이 만성질환 관리 자료와 현장 경험을 나누고, 내 약국에서 활용합니다.']} />
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-8">
       <section id="about" aria-labelledby="carepharm-about" className="scroll-mt-24">
         <p className="text-sm font-semibold text-teal-700">CarePharm 소개</p>
