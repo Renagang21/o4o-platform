@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.25.0",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test pilot.test.mjs",
+    "test": "node --test pilot.test.mjs production.test.mjs",
     "verify:browser": "node browser.mjs"
   },
   "devDependencies": {

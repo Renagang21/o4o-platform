@@ -1,6 +1,6 @@
 # Neture 가벼운 배포 난독화 소규모 시험
 
-> **상태**: COMPLETED · 비교 시험 완료, 운영 미적용
+> **상태**: ACTIVE · 1단계 비교 시험 완료 · 2단계 운영 적용 검증
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20
 > **기준**: main `8075aa77caf8869c2815d7242cb65a5c07464c6a`
 > **실행 방법**: [시험 도구 README](../../services/web-neture/tools/obfuscation-pilot/README.md)
@@ -72,3 +72,40 @@ private manifest에는 입력 소스 해시·출력 파일 해시·도구 버전
 운영 채택은 별도 판단이다. 실제 route chunk의 vendor 혼입·해시·캐시, 전체 화면 회귀, 저사양 기기와 비공개 map 보존·복원 절차가 확인되기 전에는 적용하지 않는다. DB·GCS·IAM/WIF·운영 workflow 변경은 없다.
 
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
+
+## 2단계 — 운영 연결 (2026-10-20)
+
+사용자의 "운영에 적용해 보자" 지시에 따라 이 공간에서 해당 변경의 PR·CI·병합·배포까지 진행한다. 1단계 수치는 당시의 작은 비교 번들 결과이며, 아래는 실제 앱 연결의 별도 검증이다. 작업 branch는 동일 트랙을 이어 `wo/neture-obfuscation-pilot`을 유지하고 main `2ec31a4ba5`를 merge로 반영했다.
+
+### 적용과 오류 추적
+
+- 실제 앱에서 allowlist 모듈 3개만 `neture-logic-<hash>.js`로 분리하고, Vite 최종 압축 후 이름만 변환한다. 다른 모듈이 섞이거나 gzip 상한을 넘으면 빌드를 거절한다.
+- 일반 개발·로컬 build는 기본 `off`다. Docker 운영 빌드의 `NETURE_OBFUSCATION=names`에서만 활성화한다. 문자열 변환·디버거 방해·콘솔 억제·속성/권한/URL 변경은 없다.
+- 일반 workspace의 package.json·lockfile은 변경하지 않았다. Docker와 CI만 독립 도구 lockfile로 설치한다.
+- 공개 dist의 map을 모두 제거하고 대상 map·manifest를 보관한다. 로컬 기본 보관은 workspace 밖 임시 폴더이며, Docker builder는 `/app/.private-neture-build`에 둔다.
+- 최종 이미지의 `/opt/o4o-private-debug/`는 nginx root 밖이고 root만 읽을 수 있다. 운영 서버 UID 101은 읽을 수 없다. 배포 SHA의 기존 비공개 이미지와 asset/map 해시로 원본 TS 오류 위치를 복원한다. 공개 Actions artifact에 map을 올리지 않는다.
+- 기존 registry의 익명 token 요청은 실제 `artifactregistry.repositories.downloadArtifacts` 권한 거절(403)이었다. IAM·WIF·bucket·공개 권한은 변경하지 않았다.
+
+### 실제 앱 비교와 로컬 검증
+
+| 항목 | 결과 |
+|---|---|
+| 실제 앱 변환 chunk gzip | 2,120 → 2,238 B (+118 B / +5.57%) |
+| 전체 JS gzip 합계 | 1,231,924 → 1,233,816 B (+1,892 B / 약 0.15%) |
+| 전체 앱 baseline / names 빌드 | 모두 성공, 기존 큰 chunk 경고 유지 |
+| Neture TypeScript | `tsc --noEmit` 통과 |
+| 도구 테스트 | 34 PASS (기존 30 + 실제 Vite/map/범위/비활성 검증 4) |
+| Neture 전체 Vitest | 최초 134 files / 1,199 tests 통과, KPA 의존성 미설치로 1 suite 수집 실패 |
+| 환경 보완 후 해당 suite | KPA 의존성 frozen 설치 후 OperatorSessionScope 6/6 PASS. 소스 수정 없음. PR CI에서 전수 재판정 |
+| 실제 앱 합성 브라우저 | Chromium, 1440·390px × baseline/names, 대표 홈·로그인 총 8개 조합 통과 |
+| 실제 앱 브라우저 오류 | page error 0, 가로 넘침 0, names chunk 응답 모두 200 |
+| 외부 API | 합성 guest 응답으로 intercept, 실제 외부 요청·운영 쓰기 없음 |
+| 운영 runner stage 이미지 | 실제 dist/map과 Dockerfile의 최종 stage로 빌드·실행 성공 |
+| 컨테이너 공개/비공개 | 홈·names JS 200, map·private manifest URL 404, UID 101의 map/manifest 읽기 거절 |
+| ESLint / 문서 민감정보 검사 | 통과 / 0건 |
+
+전체 Docker builder의 로컬 실행은 이 환경의 vfs 레이어 복사 비용 때문에 중단했다. 최종 runner stage를 그대로 추출한 이미지로 HTTP·권한 경계를 검증했다. 전체 Dockerfile 빌드는 운영 workflow 실행 결과로 확인한다. 로컬 runner fixture가 강한 umask로 만든 파일을 복사했을 때 공개 자산을 읽지 못하던 차이를 확인해, 공개 document root의 읽기 권한과 private 폴더의 root 전용 권한을 Dockerfile에 명시했다.
+
+전역 `build:packages`는 Neture만 설치된 환경에서 무관한 utils의 workspace 의존성을 찾지 못해 중단됐고, Neture Dockerfile과 같은 필요 패키지 빌드로 범위를 맞춰 통과했다. 관련 없는 코드·의존성 선언은 수정하지 않았다.
+
+실계정 로그인·저장·모바일 실기기 검증은 하지 않았다. 운영 반영은 PR gate와 verified rollout·serving SHA·공개 자산 확인 후 별도로 기록한다. Neture 한 서비스만 배포하며 DB migration·업무 데이터 write는 이 작업 범위가 아니다.

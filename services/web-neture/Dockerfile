@@ -90,6 +90,13 @@ COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
+# Only the production image build installs this isolated, pinned build toolchain.
+RUN --mount=type=secret,id=proxy_ca \
+    --mount=type=cache,id=o4o-neture-pnpm,target=/pnpm/store \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm --dir services/web-neture/tools/obfuscation-pilot install --ignore-workspace \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true --store-dir=/pnpm/store
+
 # Build workspace dependencies
 # Note: Both organization-core and forum-core have @types/express for compilation
 RUN pnpm --filter @o4o/types build
@@ -118,13 +125,19 @@ ENV VITE_HOST_CUTOVER_FUNDING=$VITE_HOST_CUTOVER_FUNDING
 
 # Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-neture
-RUN npx vite build
+ARG NETURE_OBFUSCATION=names
+RUN mkdir -p /app/.private-neture-build \
+    && NETURE_PRIVATE_DEBUG_DIR=/app/.private-neture-build NETURE_OBFUSCATION=$NETURE_OBFUSCATION npx vite build
 
 # Production stage
 FROM nginx:1.28-alpine AS runner
 
 # Copy built files
 COPY --from=builder /app/services/web-neture/dist /usr/share/nginx/html
+# Private image artifact, outside nginx's document root and unreadable by UID 101.
+COPY --from=builder /app/.private-neture-build /opt/o4o-private-debug
+RUN chmod -R a+rX /usr/share/nginx/html \
+    && chmod -R go-rwx /opt/o4o-private-debug
 COPY --chmod=644 services/web-neture/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --chmod=644 services/web-neture/nginx/nginx.conf /etc/nginx/nginx.conf
 # The entrypoint renders the template as UID 101; all runtime temp files use /tmp.

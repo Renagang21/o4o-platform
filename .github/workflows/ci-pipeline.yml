@@ -338,6 +338,11 @@ jobs:
     - name: Run tests (web-neture Vitest)
       run: npx vitest run --config services/web-neture/vitest.config.mjs
 
+    - name: Verify Neture production names transform and private maps
+      run: |
+        pnpm --dir services/web-neture/tools/obfuscation-pilot install --ignore-workspace --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+        pnpm --dir services/web-neture/tools/obfuscation-pilot test
+
     # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
     # services/web-kpa-branch 에는 테스트 실행 경로가 없었다. 분회 개설 신청의 예약어 주소
     # (backend branch-slug-policy · App.tsx 고정 route 와의 정합) · 심사/신청 API 경로 ·

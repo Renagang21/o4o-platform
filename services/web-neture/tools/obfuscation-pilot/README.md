@@ -4,7 +4,7 @@
 
 ## 실행
 
-저장소의 Node 22.18.0 · pnpm 10.25.0을 사용한다. 시험 의존성은 이 디렉터리의 독립 package/lockfile에만 고정했다. **일반 workspace 설치, 개발 서버, 앱 빌드, Dockerfile, CI/CD에는 연결하지 않는다.**
+저장소의 Node 22.18.0 · pnpm 10.25.0을 사용한다. 의존성은 이 디렉터리의 독립 package/lockfile에만 고정했다. 일반 workspace 설치·개발 서버는 도구를 설치하거나 읽지 않는다. 아래 소규모 비교 명령과 별도로, 2단계 운영 연결은 Docker 이미지 빌드와 CI에서만 이 고정 도구를 설치한다.
 
 저장소 루트에서:
 
@@ -77,4 +77,29 @@ PowerShell에서는 `$env:NETURE_PILOT_PROFILE = 'strings'`를 지정하고, 시
 - 예산이나 동작 검증에 실패해도 강도를 자동으로 낮추거나 운영에 적용하지 않는다. 실패를 보고하고 기본 빌드는 유지한다.
 - 실계정 로그인, 실제 저장, API 호출, 운영 배포, 모바일 실기기 검증은 포함하지 않는다.
 
-다음 단계는 실제 Neture route chunk의 vendor 혼입·해시·캐시·전체 화면·비공개 오류 추적을 검증하는 별도 작업이다. 이 시험 도구를 통과했다고 운영 빌드 전체에 바로 적용하지 않는다.
+## 2단계: 선택 모듈의 운영 연결
+
+사용자의 운영 적용 지시에 따라 `production.mjs`를 추가했다. 대상 모듈 3개는 그대로이며 **이름 변환만** 허용한다. 소규모 시험의 `strings` 후보는 운영에 연결하지 않는다.
+
+- 일반 `vite`/`vite build`는 `NETURE_OBFUSCATION` 기본값 `off`여서 동작이 그대로다. 도구의 동적 로드도 생략한다.
+- production 모드의 `vite build`에서 `NETURE_OBFUSCATION=names`일 때만 적용한다. dev 서버에서는 적용하지 않는다. 다른 설정 값은 거절한다.
+- Neture Dockerfile의 해당 ARG 기본값은 `names`다. 고정 lockfile로 빌드 도구를 설치한다. React·외부 라이브러리는 allowlist 밖이므로 변환하지 않는다.
+- Rollup의 별도 `neture-logic-<hash>.js` chunk에 allowlist만 들어가는지 확인하고, 최종 압축 뒤 변환한다. 반환된 source map은 Rollup이 TS 원본까지 합성한다.
+- gzip 증가율 20%/1KiB 상한, 단일 chunk, hidden map, 공개 경로와 map hash 검사를 실패하면 빌드를 중단한다.
+- 모든 `.map`은 `dist`에서 제거하고, 변환 대상의 map·manifest만 비공개 위치에 보관한다. 로컬 기본값은 workspace 밖 OS 임시 폴더의 `o4o-neture-production-debug/<경로 hash>/`이며, Docker builder는 `NETURE_PRIVATE_DEBUG_DIR=/app/.private-neture-build`로 명시한다. 일반 개발 서버가 로컬 map을 정적으로 제공하지 않도록 workspace 밖을 사용한다.
+- Docker 최종 이미지에는 map·manifest를 nginx document root **밖**인 `/opt/o4o-private-debug/`에 복사한다. root만 읽을 수 있고 서버 UID 101에는 읽기 권한이 없다. 브라우저·공개 Actions artifact에는 map을 업로드하지 않는다.
+- 기존 비공개 registry의 **배포 SHA 이미지**와 manifest의 최종 asset/map 해시가 대응한다. 별도 bucket·IAM·WIF·자격정보는 만들거나 변경하지 않는다.
+
+운영 이미지 접근 권한이 있는 담당자가 해당 SHA 이미지를 받아 복원 정보를 추출한다. 실행 서버나 브라우저에서 map을 가져오는 방식이 아니다.
+
+```sh
+docker pull gcr.io/netureyoutube/neture-web:<배포 SHA>
+docker create --name neture-debug-extract gcr.io/netureyoutube/neture-web:<배포 SHA>
+docker cp neture-debug-extract:/opt/o4o-private-debug ./neture-private-debug
+docker rm neture-debug-extract
+node services/web-neture/tools/obfuscation-pilot/restore.mjs ./neture-private-debug assets/neture-logic-<hash>.js <줄> <열>
+```
+
+이미지에서 추출한 private 폴더는 접근이 제한된 위치에 둔다. 줄·열은 브라우저 stack의 1부터 시작하는 값을 쓴다. manifest의 파일명·map 해시가 다르면 복원을 거절한다. 이 이미지 tag의 보존 정책을 유지해야 해당 버전의 오류를 복원할 수 있다.
+
+운영 문제 시 기존 verified rollout의 자동 원복 경계를 유지한다. 변환을 지속적으로 해제하려면 Docker ARG 기본값을 `off`로 되돌리는 PR을 정상 CI·배포 경로로 반영한다. 규칙이나 배포 gate를 우회하지 않는다.
