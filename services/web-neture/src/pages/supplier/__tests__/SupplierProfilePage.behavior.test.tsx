@@ -25,7 +25,9 @@ vi.mock('../../../lib/api', () => ({
   REGULATED_CATEGORY_ORDER: ['general', 'drug'],
   REGULATED_CATEGORY_LABELS: { general: '일반 상품', drug: '의약품' },
 }));
-vi.mock('@o4o/account-ui', () => ({ BusinessRegistrationFields: () => null }));
+vi.mock('@o4o/account-ui', async () => ({
+  BusinessRegistrationFields: (await import('../../../../../../packages/account-ui/src/components/BusinessRegistrationFields')).BusinessRegistrationFields,
+}));
 vi.mock('@o4o/ui', () => ({
   AddressSearch: ({
     onChange,
@@ -53,6 +55,7 @@ const profile = {
   status: 'active',
   representativeName: '검증 대표',
   businessNumber: 'FIXTURE-BUSINESS',
+  businessEntityType: 'individual',
   managerName: '검증 담당자',
   contactEmailVisibility: 'public',
   _prefilled: true,
@@ -198,6 +201,25 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
   });
+  it.each(['', 'simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'])(
+    'requires an explicit individual/corporation choice for %s without guessing', async (legacy) => {
+      api.profile.getProfile.mockResolvedValue({ ...profile, businessEntityType: legacy });
+      render(<SupplierProfilePage />);
+      await loaded();
+      const select = screen.getByRole('combobox', { name: /사업자 구분/ }) as HTMLSelectElement;
+      expect(select.required).toBe(true);
+      expect(select.value).toBe('');
+      expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
+      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      expect(api.profile.updateProfile).not.toHaveBeenCalled();
+      fireEvent.change(select, { target: { value: 'corporation' } });
+      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ businessEntityType: 'corporation' }),
+      ));
+    },
+  );
   it('edits the registered business name and restores the saved name after reopening', async () => {
     const page = render(<SupplierProfilePage />);
     await loaded();

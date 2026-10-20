@@ -88,11 +88,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
       //   Pharmacy-Hub 는 운영자 공급 승인이 없는 직접 opt-in 축 — 제공 설정은 Neture 에만 있다.
       { label: '판매자 모집', path: '/supplier/recruitments', section: '판매활동' },
-      { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
       { label: '이벤트·특가', path: '/supplier/event-offers' },
       // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 공급 경로
       { label: '공급 제안', path: '/supplier/supply-proposals', section: '약국 협력사업' },
-      { label: '세미프랜차이즈 모집', path: '/supplier/semi-franchise-recruitments' },
     ],
   },
   {
@@ -156,9 +154,6 @@ export default function SupplierSpaceLayout() {
     }
     if (path === '/supplier/recruitments') {
       return pathname === '/supplier/recruitments' || pathname.startsWith('/supplier/recruitments/');
-    }
-    if (path === '/supplier/market-trial') {
-      return pathname === '/supplier/market-trial' || pathname.startsWith('/supplier/market-trial/');
     }
     if (path === '/supplier/library') {
       return pathname === '/supplier/library' || pathname.startsWith('/supplier/library/');
