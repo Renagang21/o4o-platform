@@ -1,8 +1,10 @@
 # CHECK-O4O-PHARMCOOP-PRIVATE-ROLLOUT-V1
 
 - 작성일: 2026-10-20
-- 상태: COMPLETED · 승인된 API/Pharmcoop 운영 배포 완료
+- 최종 갱신: 2026-10-20
+- 상태: COMPLETED
 - 작업: TODO-O4O-PHARMCOOP-PRIVATE-ROLLOUT-V1
+- 검증 시점: 아래 「실행 검증」은 배포 전 로컬 검증 시점의 기록이다. 해당 절의 운영 미실행 표기는 그 시점에만 해당하며, 실제 운영 완료 근거는 「승인·통합·운영 검증」 절에 있다.
 
 ## 원인과 수정
 
