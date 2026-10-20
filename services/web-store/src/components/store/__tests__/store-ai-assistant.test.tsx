@@ -25,7 +25,7 @@ it('opens without a paid call and submits only the entered question and bounded 
   await screen.findByText('어떤 제품을 안내할까요?');
   expect(m.ask).toHaveBeenCalledTimes(1);
   const request = m.ask.mock.calls[0][0];
-  expect(request).toMatchObject({ question: '고객에게 제품을 설명하고 싶어요', serviceId: 'kpa-society', task: 'question', contextData: { pageTitle: '내 매장 · 안내 만들기', serviceInfo: { previousTurns: [] } } });
+  expect(request).toMatchObject({ question: '고객에게 제품을 설명하고 싶어요', serviceId: 'kpa-society', task: 'question', contextData: { pageTitle: '내 매장 · 매장 컨텐츠', serviceInfo: { previousTurns: [] } } });
   expect(request.storeId).toBeUndefined();
   expect(request.contextData.product).toBeUndefined();
 });

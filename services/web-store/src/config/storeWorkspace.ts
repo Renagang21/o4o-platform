@@ -25,7 +25,7 @@ export const STORE_WORKSPACE_AREAS = [
   },
   {
     key: "studio",
-    label: "안내 만들기",
+    label: "매장 컨텐츠",
     subPath: "/workspace/studio",
     description: "상품과 자료를 골라 매장에서 사용할 안내를 준비합니다.",
   },

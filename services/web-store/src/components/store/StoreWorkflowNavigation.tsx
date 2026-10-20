@@ -34,7 +34,7 @@ export function StoreWorkflowNavigation({
         </Link>
         {(
           [
-            ["studio", "안내 만들기"],
+            ["studio", "매장 컨텐츠"],
             ["use", "매장 운영"],
           ] as const
         ).map(([area, label]) => {
