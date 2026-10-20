@@ -114,6 +114,26 @@ const bizWrite = (calls: Call[]) => {
 beforeEach(() => jest.clearAllMocks());
 
 describe('PUT /pharmacy/info — P2/P4 businessInfo write', () => {
+  it.each(['individual', 'corporation'])('accepts explicit %s classification', async (businessEntityType) => {
+    const h = makeHarness();
+    const res = makeRes();
+    await invoke(h.handler, req({ businessEntityType }), res, jest.fn());
+    expect(res.statusCode).toBe(200);
+    expect(bizWrite(h.calls)!.payloads).toEqual([{ businessEntityType }]);
+  });
+  it.each(['simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other', '', null, 42, {}])(
+    'rejects classification %p without changing stored data', async (businessEntityType) => {
+      const h = makeHarness();
+      const res = makeRes();
+      await invoke(h.handler, req({ businessEntityType }), res, jest.fn());
+      expect(res.statusCode).toBe(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.objectContaining({ code: 'VALIDATION_ERROR' }) }));
+      expect(h.orgRepo.save).not.toHaveBeenCalled();
+      expect(h.auditRepo.save).not.toHaveBeenCalled();
+      expect(bizWrite(h.calls)).toBeNull();
+    },
+  );
+
   it('D-1 회귀: json 컬럼에 맞는 명시 캐스트를 쓴다', async () => {
     const h = makeHarness();
     const next = jest.fn();
