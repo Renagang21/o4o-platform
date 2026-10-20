@@ -127,7 +127,7 @@ ENV VITE_HOST_CUTOVER_FUNDING=$VITE_HOST_CUTOVER_FUNDING
 WORKDIR /app/services/web-neture
 ARG NETURE_OBFUSCATION=names
 RUN mkdir -p /app/.private-neture-build \
-    && NETURE_PRIVATE_DEBUG_DIR=/app/.private-neture-build NETURE_OBFUSCATION=$NETURE_OBFUSCATION npx vite build
+    && NETURE_PRIVATE_DEBUG_DIR=/app/.private-neture-build NETURE_OBFUSCATION=$NETURE_OBFUSCATION pnpm exec vite build
 
 # Production stage
 FROM nginx:1.28-alpine AS runner

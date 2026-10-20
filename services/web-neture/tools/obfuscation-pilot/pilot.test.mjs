@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 import JavaScriptObfuscator from 'javascript-obfuscator';
 import { assertOwnModules, buildPilot, lightOptions, outputRoot, profile, restorePosition, serviceRoot, sha256 } from './build.mjs';
 import { loginInputs, parserInputs, validDraft } from './fixtures.mjs';
+import { stripSourceMapComment } from './source-map-comment.mjs';
 
 const artifact = await buildPilot();
 const baseline = await import(pathToFileURL(path.join(outputRoot, 'public/baseline/pilot.js')).href);
@@ -29,11 +30,22 @@ test('public artifacts have no maps, mapping comments or private source content'
 });
 
 test('same input and fixed seed give the same transformed executable', () => {
-  const code = JavaScriptObfuscator.obfuscate(artifact.baseline, lightOptions).getObfuscatedCode()
-    .replace(/\n?\/\/# sourceMappingURL=[^\r\n]*\s*$/, '');
+  const code = stripSourceMapComment(JavaScriptObfuscator.obfuscate(artifact.baseline, lightOptions).getObfuscatedCode());
   assert.equal(code, artifact.obfuscated);
   assert.notEqual(code, artifact.baseline);
   if (profile === 'strings') assert.match(code, /\\x[0-9a-f]{2}|\\u[0-9a-f]{4}/i);
+});
+
+test('map comment removal handles LF/CRLF without touching literals or earlier comments', () => {
+  const code = 'const value = 1;';
+  assert.equal(stripSourceMapComment(code + '\n//# sourceMappingURL=pilot.js.map\n'), code);
+  assert.equal(stripSourceMapComment(code + '\r\n  //# sourceMappingURL=pilot.js.map \r\n\t'), code);
+  assert.equal(stripSourceMapComment('//# sourceMappingURL=pilot.js.map'), '');
+  for (const source of ['', code + '\n', 'const value = "//# sourceMappingURL=literal";', '//# sourceMappingURL=earlier\n' + code]) {
+    assert.equal(stripSourceMapComment(source), source);
+  }
+  const longLine = 'x'.repeat(1000000);
+  assert.equal(stripSourceMapComment(longLine), longLine);
 });
 
 test('exported interface remains the same', () => {

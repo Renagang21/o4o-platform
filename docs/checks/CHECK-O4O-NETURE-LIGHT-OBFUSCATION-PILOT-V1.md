@@ -109,3 +109,5 @@ private manifest에는 입력 소스 해시·출력 파일 해시·도구 버전
 전역 `build:packages`는 Neture만 설치된 환경에서 무관한 utils의 workspace 의존성을 찾지 못해 중단됐고, Neture Dockerfile과 같은 필요 패키지 빌드로 범위를 맞춰 통과했다. 관련 없는 코드·의존성 선언은 수정하지 않았다.
 
 실계정 로그인·저장·모바일 실기기 검증은 하지 않았다. 운영 반영은 PR gate와 verified rollout·serving SHA·공개 자산 확인 후 별도로 기록한다. Neture 한 서비스만 배포하며 DB migration·업무 데이터 write는 이 작업 범위가 아니다.
+
+PR #725 최초 HEAD `54da66d975`에서 CI Gate·모든 CI job과 Codex 지적 0은 확인됐으나, Sonar Security C로 병합하지 않았다. 소스맵 주석 제거의 backtracking 정규식을 선형 문자열 처리로 바꾸고(LF/CRLF·문자열 보존·긴 입력 회귀 추가), Docker의 npx 호출을 이미 설치된 Vite만 실행하는 `pnpm exec vite build`로 바꿨다. 기준 완화·이슈 무시·검사 skip은 하지 않았다. 수정 후 도구 테스트는 35건이며 원격 CI·Sonar·Codex를 새 HEAD에서 다시 판정한다. 순차 브라우저 검증의 await-in-loop 등 비차단 유지보수 경고는 실행 순서를 보존하기 위해 유지했다.

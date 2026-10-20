@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import JavaScriptObfuscator from 'javascript-obfuscator';
+import { stripSourceMapComment } from './source-map-comment.mjs';
 
 export const PRODUCTION_CHUNK = 'neture-logic';
 export const PRODUCTION_MODULES = [
@@ -63,7 +64,7 @@ export function netureProductionObfuscation(root, options = {}) {
           const result = JavaScriptObfuscator.obfuscate(code, {
             ...productionOptions, inputFileName: 'neture-logic.js',
           });
-          const next = result.getObfuscatedCode().replace(/\n?\/\/# sourceMappingURL=[^\r\n]*\s*$/, '');
+          const next = stripSourceMapComment(result.getObfuscatedCode());
           const beforeGzip = gzipSync(code).length;
           const afterGzip = gzipSync(next).length;
           if (afterGzip - beforeGzip > 1024 || afterGzip > beforeGzip * 1.2) {

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import JavaScriptObfuscator from 'javascript-obfuscator';
 import { build } from 'vite';
+import { stripSourceMapComment } from './source-map-comment.mjs';
 
 const require = createRequire(import.meta.url);
 export const serviceRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -102,7 +103,7 @@ export async function buildPilot() {
   const obfuscationStarted = performance.now();
   const transformed = JavaScriptObfuscator.obfuscate(baseline, lightOptions);
   // Keep source maps out of public output, including the discoverable URL comment.
-  const obfuscated = transformed.getObfuscatedCode().replace(/\n?\/\/# sourceMappingURL=[^\r\n]*\s*$/, '');
+  const obfuscated = stripSourceMapComment(transformed.getObfuscatedCode());
   const obfuscatedMap = JSON.parse(transformed.getSourceMap());
   const obfuscationMs = performance.now() - obfuscationStarted;
 
