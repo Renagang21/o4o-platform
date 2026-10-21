@@ -11,6 +11,7 @@
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
+import { isSelectableBusinessEntityType } from '@o4o/types';
 import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
@@ -278,15 +279,14 @@ export function createPharmacyInfoController(
     }
 
     // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1: P2/P4 fields validation (모두 optional)
-    const VALID_ENTITY_TYPES = ['individual', 'corporation', 'simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'];
     if (body.businessType !== undefined && body.businessType !== null && body.businessType !== '') {
       if (typeof body.businessType !== 'string' || body.businessType.length > 100) errors.push('businessType: 업태는 100자 이내');
     }
     if (body.businessItem !== undefined && body.businessItem !== null && body.businessItem !== '') {
       if (typeof body.businessItem !== 'string' || body.businessItem.length > 100) errors.push('businessItem: 종목은 100자 이내');
     }
-    if (body.businessEntityType !== undefined && body.businessEntityType !== null && body.businessEntityType !== '') {
-      if (!VALID_ENTITY_TYPES.includes(body.businessEntityType)) errors.push('businessEntityType: 알 수 없는 사업자 유형');
+    if (body.businessEntityType !== undefined && !isSelectableBusinessEntityType(body.businessEntityType)) {
+      errors.push('businessEntityType: 세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
     }
     if (body.businessStartDate !== undefined && body.businessStartDate !== null && body.businessStartDate !== '') {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(body.businessStartDate)) errors.push('businessStartDate: YYYY-MM-DD 형식이어야 합니다');

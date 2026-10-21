@@ -270,6 +270,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/pharmacy/store/contents', ...store, handle(async (req) => contents.pharmacyList(org(req), {
     sfKey: typeof req.query.sf === 'string' ? req.query.sf : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
+    tag: typeof req.query.tag === 'string' ? req.query.tag : undefined,
     page: Number(req.query.page) || 1,
     limit: Number(req.query.limit) || 30,
   })));
@@ -413,7 +414,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
       { key: 'default', name: '기본 제공 · 전체 약국', features: basic },
       { key: 'paid', name: '유료회원', features: paid },
       ...businesses.map((business: { key: string; name: string; service_features?: unknown; status: string }) => ({ key: `business:${business.key}`, name: `협력사업 · ${business.name}`,
-        features: readServiceFeatures(business.service_features), status: business.status })),
+        features: readServiceFeatures(business.service_features), status: business.status, business })),
     ] };
   }));
   router.put('/admin/service-feature-policies/:target', ...admin, handle(async (req, res) => {
@@ -432,6 +433,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
+  router.get('/admin/member-paid-entitlements/:userId/access', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.describe(uuidParam(req, 'userId')); }));
   router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>
     memberPaidFeatures.set(uuidParam(req, 'userId'), req.user!.id, req.body ?? {})));
   router.get('/admin/semi-franchises', ...businessAdmin, handle(async () => semiFranchises.listAll()));
@@ -482,10 +484,9 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     events.supplierCancel(req.supplierId!, uuidParam(req, 'id'))));
 
   router.get('/supplier/semi-franchise-recruitments', ...supplier, handle(async (req) => recruitments.supplierList(req.user!.id)));
-  router.post('/supplier/semi-franchise-recruitments', ...supplier, handle(async (req, res) => {
-    if (!isUuid(req.body?.masterId)) throw new NeturePharmacyError(400, 'INVALID_REQUEST', 'masterId 가 필요합니다.');
-    res.status(201);
-    return recruitments.supplierCreate(req.user!.id, [req.supplierId!], req.body);
+  // 신규 협업체 취급매장 모집 종료. 기존 내역·신청·주문 원장은 보존한다.
+  router.post('/supplier/semi-franchise-recruitments', ...supplier, handle(async () => {
+    throw new NeturePharmacyError(410, 'SEMI_FRANCHISE_RECRUITMENT_RETIRED', '별도 협업체 취급매장 모집 기능은 더 이상 제공하지 않습니다.');
   }));
 
   return router;

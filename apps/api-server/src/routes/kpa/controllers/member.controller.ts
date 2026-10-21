@@ -12,6 +12,7 @@ import type { EntityManager } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import { isRetiredRoleValue } from '../../../middleware/retired-service.middleware.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 import {
   demoAccountService,
@@ -629,7 +630,7 @@ export function createMemberController(
             [userIds],
           );
           for (const row of raRows as Array<{ user_id: string; role: string }>) {
-            if (!row.user_id || !row.role) continue;
+            if (!row.user_id || !row.role || isRetiredRoleValue(row.role)) continue;
             const list = capabilityMap.get(row.user_id) ?? [];
             list.push(row.role);
             capabilityMap.set(row.user_id, list);

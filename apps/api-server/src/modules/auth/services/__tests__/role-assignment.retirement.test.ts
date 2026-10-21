@@ -36,3 +36,14 @@ it.each(['cosmetics:admin', 'cosmetics:operator'])('retired effective capability
  mockRepository.find.mockResolvedValue([assignment(role)]);
  expect(await service.hasAnyRole('user', [role])).toBe(false);
 });
+
+it.each(['platform:admin', 'platform:operator', 'platform:manager', 'platform:vendor', 'platform:member', 'platform:contributor',
+ 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator', 'kpa:pharmacist', 'kpa:student', 'lms:instructor'])(
+ 'historical role %s cannot grant access or be reissued', async role => {
+  expect(await service.hasRole('user',role)).toBe(false);
+  mockRepository.find.mockResolvedValue([assignment(role), assignment('platform:super_admin'), assignment('kpa-branch:operator')]);
+  expect(await service.getRoleNames('user')).toEqual(['platform:super_admin','kpa-branch:operator']);
+  await expect(service.assignRole({userId:'user',role})).rejects.toMatchObject({httpStatus:410});
+  expect(mockRepository.findOne).not.toHaveBeenCalled();
+  expect(mockRepository.save).not.toHaveBeenCalled();
+ });

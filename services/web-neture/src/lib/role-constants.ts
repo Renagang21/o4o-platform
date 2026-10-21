@@ -137,14 +137,19 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   path: string;
   key: SubdomainOperatorKey;
   level: SubdomainOperatorLevel;
+  primaryEntry?: boolean;
 }> = Object.freeze([
   { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
+  { path: '/operator/market-trial/operators', key: 'funding', level: 'admin', primaryEntry: false },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
   // Community service operation uses its own service roles; legacy admin URL redirects to the service workspace.
   { path: '/admin/communities', key: 'community', level: 'admin' },
   { path: '/operator/communities', key: 'community', level: 'operator' },
+  { path: '/operator/service-contact/supplier', key: 'supplier', level: 'operator' },
+  { path: '/operator/service-contact/funding', key: 'funding', level: 'operator' },
+  { path: '/operator/service-contact/community', key: 'community', level: 'operator' },
   { path: '/operator/service-members/supplier', key: 'supplier', level: 'operator' },
   { path: '/operator/service-members/funding', key: 'funding', level: 'operator' },
   { path: '/operator/service-members/community', key: 'community', level: 'operator' },

@@ -27,10 +27,10 @@ const HOST_BY_NAME: Readonly<Record<string, SubHost>> = Object.freeze({
 const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.freeze({
   // /workspace/* 는 공급자 운영 화면(SupplierOpsLayout)과 공급자 레거시 리다이렉트다.
   // 기존 공급자 포럼 주소는 아래 community adapter 가 먼저 처리한다.
-  supplier: ['/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
-  funding: ['/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
-  community: ['/operator/legal/community', '/operator/home-presentation/community', '/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
-  carepharm: ['/my/participation', '/materials', '/tools', '/news', '/operator/home-presentation/carepharm', '/communities/business%3Acarepharm/forum', '/communities/business:carepharm/forum', '/operator/semi-franchises'],
+  supplier: ['/operator/service-contact/supplier', '/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
+  funding: ['/operator/service-contact/funding', '/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
+  community: ['/operator/service-contact/community', '/operator/legal/community', '/operator/home-presentation/community', '/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
+  carepharm: ['/operator/service-contact/carepharm', '/my/participation', '/materials', '/tools', '/news', '/operator/home-presentation/carepharm', '/communities/business%3Acarepharm/forum', '/communities/business:carepharm/forum', '/operator/semi-franchises'],
 });
 
 /**

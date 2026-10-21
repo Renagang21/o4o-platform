@@ -5,6 +5,7 @@
  * 쓰는 것은 role_assignments (+ 없을 때만 service_memberships) 뿐이다.
  */
 import 'reflect-metadata';
+import { getCachedRoles, setCachedRoles } from '../../../modules/auth/utils/role-cache.js';
 
 const assignRoleMock = jest.fn(async () => ({}));
 
@@ -205,4 +206,13 @@ describe('collaborator assignment preserves the canonical account and membership
     expect(h.writes.users).toEqual([]);
     expect(h.writes.linkedAccounts).toEqual([]);
   });
+});
+
+
+it('central assignment invalidates a cache populated immediately before transaction commit',async()=>{
+  const h=makeHarness({user:USER,linked:LINKED});
+  const original=h.dataSource.transaction.getMockImplementation()!;
+  h.dataSource.transaction.mockImplementation(async(fn:any)=>{const value=await original(fn);setCachedRoles(USER.id,[]);return value;});
+  await h.service.assign({userId:USER.id,serviceKey:'neture',role:'neture:operator'});
+  expect(getCachedRoles(USER.id)).toBeNull();
 });

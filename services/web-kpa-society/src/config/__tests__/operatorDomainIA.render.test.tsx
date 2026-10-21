@@ -48,6 +48,11 @@ function linksByDomain(root: HTMLElement): Record<string, string[]> {
 }
 
 describe('DomainIASidebar — 표준 3도메인 (KPA UNIFIED_MENU)', () => {
+  it('does not advertise the retired role-definition editor', () => {
+    const items = Object.values(UNIFIED_MENU).flatMap(group => group ?? []);
+    expect(items.some(item => item.path === '/operator/roles')).toBe(false);
+  });
+
   it('desktop aside: 서비스 운영 / 사업 운영 / 운영 관리 헤딩만 있고 구 헤딩은 없다', () => {
     renderSidebar();
     const aside = document.querySelector('aside') as HTMLElement;

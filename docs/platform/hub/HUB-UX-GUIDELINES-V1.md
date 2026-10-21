@@ -2,7 +2,8 @@
 
 > **상위 문서**: `CLAUDE.md` (Section 18: APP 표준화 규칙)
 > **적용 범위**: KPA, Neture, Platform Hub
-> **상태**: Active Baseline (2026-02-16)
+> **상태**: ACTIVE
+> **작성일**: 2026-02-16 · **최종 갱신**: 2026-10-21 (Platform 상태·책임 경계 정비)
 
 ---
 
@@ -287,17 +288,17 @@ sections: [
 
 ## 9. 현행 서비스별 적합도
 
-### 9.1 현행 vs 규칙 비교
+### 9.1 기존 서비스 Hub 비교
 
 | 규칙 | KPA | Neture | Platform |
 | ------ | ----- | -------- | ---------- |
 | 카드 ≤ 12 | 12 (상한) | 11 | N/A |
 | Signal ≥ 40%/70% | 25% ❌ | 80% ✅ | N/A |
-| beforeSections | StatusCards ✅ | AI Card ✅ | Risk Overview ✅ |
-| QuickAction 루프 | 없음 ❌ | 완전 ✅ | Proxy ✅ |
+| beforeSections | StatusCards ✅ | AI Card ✅ | §10 상태 점검으로 변경 |
+| QuickAction 루프 | 없음 ❌ | 완전 ✅ | 업무 실행 제거 (§10) |
 | Admin 섹션 분리 | ✅ | ✅ | N/A |
-| allSettled fetch | 단일 | Promise.all ⚠️ | allSettled ✅ |
-| ActionLog | 없음 ❌ | 8/8 ✅ | 1/1 ✅ |
+| allSettled fetch | 단일 | Promise.all ⚠️ | 제한된 동시 점검 (§10) |
+| ActionLog | 없음 ❌ | 8/8 ✅ | 읽기 전용 (§10) |
 
 ### 9.2 개선 필요 항목
 
@@ -309,17 +310,22 @@ sections: [
 
 ---
 
-## 10. Platform Hub 특수 규칙
+## 10. 전체 관리자 서비스 상태 화면
 
-Platform Hub는 hub-core를 사용하지 않고 admin-dashboard 자체 위젯으로 구현된다.
-이는 의도적 차등이며, 다음 규칙을 따른다:
+2026-10-21 사용자 승인에 따라 `/admin/platform/hub`의 목적을 현행 서비스·공통 공간의 기본 기술 상태 확인으로 정비한다. 기존 Risk Overview/Service Health/Action Queue 고정 구성과 cross-service 업무 trigger 의무를 이 화면에 적용하지 않는다. 각 서비스의 Hub·회원/승인/거래 업무는 해당 서비스 책임이다. 이 결정은 다른 서비스 Hub의 업무 동작을 변경하지 않는다.
 
 | 규칙 | 설명 |
-|------|------|
-| 3섹션 고정 | Risk Overview / Service Health / Action Queue |
-| Tailwind + shadcn | admin-dashboard 디자인 시스템 |
-| Cross-service only | 개별 서비스 상세는 각 서비스 Hub에서 |
-| Proxy trigger | 직접 DB 접근 금지, 서비스 API 경유 |
+|---|---|
+| 목록 | 공식 약국 협력사업 4곳, 독립 서비스 5곳, 대표 홈·내 매장·전체 관리자 3곳의 주소 12개. 주소 등록과 사업 개설/활성·가입·권한은 별개 |
+| 웹 점검 | HTTPS 응답, 제한된 HTML 읽기, 동일 origin `/assets/` 앱 JavaScript 응답(분회는 `/kpa/assets/`도 허용). 실제 browser 실행·서비스 identity 일치·로그인/업무 성공으로 해석하지 않음 |
+| 공통 기반 | 기존 서버 시작 READY 상태와 DB SELECT 1. 모든 API·DB schema·업무 원장 일치 보장이 아님 |
+| 표시 | 개별 확인/점검 실패/확인 불가, 실제 점검 시각과 결과 재사용 표시. 수집 실패·빈 작업 목록·0 통계로 전체 정상 판정 금지 |
+| 최신성 | 최근 결과는 60초 재사용. 조회 실패/오래된 결과를 현재 정상처럼 표시하지 않음 |
+| 접근/통신 | 전체 관리자만 조회. 서버가 소유한 공식 HTTPS allowlist만 요청하며 사용자 URL·cookie·token 전달 및 redirect 추적 금지. 시간·응답 크기·동시성 제한 |
+| 업무 경계 | 회원 대기·승인율·콘텐츠 수 및 승인/게시/정산/AI 갱신 trigger를 이 화면에서 제거. 실제 서비스 운영자가 해당 서비스에서 처리 |
+| 저장·검증 | 새 상태 DB나 sites 기반 legacy monitor를 복구하지 않음. 운영 설정/계정 변경과 유료 호출은 개발 테스트와 분리 |
+
+[정비 TODO](../../work-orders/TODO-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)와 [검증 CHECK](../../checks/CHECK-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)에 실제 개발·검증·배포 여부를 기록한다. 2026-10-21 구현은 PR #752로 main에 반영됐고 API·관리자 운영 배포가 확인됐다. 배포 SHA·revision·검증 한계는 CHECK의 후속 통합 결과를 따른다. 문서 갱신 자체를 모든 실제 서비스 업무 정상의 증거로 해석하지 않는다.
 
 ---
 

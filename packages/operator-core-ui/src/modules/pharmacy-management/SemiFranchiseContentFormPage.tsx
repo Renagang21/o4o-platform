@@ -10,6 +10,7 @@
  */
 import { Link } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
+import { CAREPHARM_MATERIAL_OUTLINES, CAREPHARM_MATERIAL_TAGS } from '@o4o/shared-space-ui';
 import { useSemiFranchiseContentEditor } from './useSemiFranchiseContentEditor';
 import { INPUT, Message, PageHeader, StatusBadge } from './PharmacyCommerceUi';
 
@@ -68,6 +69,21 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
       ) : (
         <form onSubmit={submit} aria-busy={saving} className="rounded-lg border border-gray-200 bg-white p-5">
           <fieldset disabled={saving} className="space-y-4">
+            {key === 'carepharm' && <section aria-label="CarePharm 회원자료 작성 도움" className="space-y-3 rounded-lg border border-teal-200 bg-teal-50 p-4 text-sm">
+              <h2 className="font-semibold">회원 약국이 바로 활용할 수 있는 자료</h2>
+              <p>주제·사용 순서·출처·기준일을 함께 안내하세요. 게시한 원본을 회원 약국이 독립 사본으로 가져가 활용합니다.</p>
+              {!isEdit && <div className="flex flex-wrap gap-2">{CAREPHARM_MATERIAL_OUTLINES.map(outline => <button type="button" key={outline.name} className="min-h-11 rounded border bg-white px-3 py-2" onClick={() => {
+                if (form.body.trim() && !window.confirm('작성 중인 본문을 선택한 작성 양식으로 바꾸시겠습니까? 제목과 요약은 유지됩니다.')) return;
+                set('body', outline.html);
+                const tags = form.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+                if (!tags.includes(outline.tag) && tags.length < 20) set('tags', [...tags, outline.tag].join(', '));
+              }}>{outline.name} 양식</button>)}</div>}
+              <p>권장 태그를 선택하거나 아래 태그 입력란에 주제를 직접 입력하세요.</p>
+              <div className="flex flex-wrap gap-2">{CAREPHARM_MATERIAL_TAGS.map(tag => <button type="button" key={tag} className="min-h-11 rounded border bg-white px-3 py-2" onClick={() => {
+                const tags = form.tags.split(',').map(value => value.trim()).filter(Boolean);
+                if (!tags.includes(tag) && tags.length < 20) set('tags', [...tags, tag].join(', '));
+              }}>{tag} 태그 추가</button>)}</div>
+            </section>}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 제목 <span className="text-red-600">*</span>

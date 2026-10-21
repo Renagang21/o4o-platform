@@ -151,6 +151,34 @@ run("home presentation PostgreSQL persistence", () => {
     expect((await ds.query('SELECT "sortOrder" FROM cms_content_slots WHERE id=$1',[ordinarySlot]))[0].sortOrder).toBe(3);
     expect((await service.read(localScope)).revision).toBe(1);
   });
+  it("isolates federation and two cooperative publications including same-organization surface separation", async () => {
+    const alpha: PresentationScope = { surface: "cooperative", organizationId: randomUUID() };
+    const beta: PresentationScope = { surface: "cooperative", organizationId: randomUUID() };
+    const federation: PresentationScope = { surface: "pharmcoop", organizationId: null };
+    for (const [target, title] of [[alpha, "alpha 공개"], [beta, "beta 공개"], [federation, "연합회 공개"]] as const) {
+      const config = initialHomePresentation(target.surface); config.slides[0].title = title;
+      await service.save(target, config, 0, true, actor);
+    }
+    const draft = initialHomePresentation("cooperative"); draft.slides[0].title = "alpha 비공개 초안";
+    await service.save(alpha, draft, 1, false, actor);
+    expect((await service.publicRead(alpha))!.slides[0].title).toBe("alpha 공개");
+    expect((await service.publicRead(beta))!.slides[0].title).toBe("beta 공개");
+    expect((await service.publicRead(federation))!.slides[0].title).toBe("연합회 공개");
+    expect(await service.publicRead({ surface: "pharmacy", organizationId: alpha.organizationId })).toBeNull();
+    await expect(service.save(alpha, draft, 1, true, actor)).rejects.toBeInstanceOf(PresentationConflict);
+  });
+  it("a rejected in-transaction authority check cannot create or overwrite a publication", async () => {
+    const target: PresentationScope = { surface: "cooperative", organizationId: randomUUID() };
+    const document = initialHomePresentation("cooperative");
+    const denied = async () => { throw new Error("revoked role"); };
+    await expect(service.save(target, document, 0, true, actor, denied)).rejects.toThrow("revoked role");
+    expect((await service.read(target)).revision).toBe(0);
+    await service.save(target, document, 0, true, actor);
+    document.slides[0].title = "허용되지 않은 변경";
+    await expect(service.save(target, document, 1, true, actor, denied)).rejects.toThrow("revoked role");
+    expect((await service.read(target)).revision).toBe(1);
+    expect((await service.publicRead(target))!.slides[0].title).not.toBe(document.slides[0].title);
+  });
   it("starts without any persisted or published configuration", async () => {
     expect(await service.read(scope)).toEqual({
       revision: 0,

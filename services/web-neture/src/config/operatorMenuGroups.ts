@@ -34,7 +34,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
     // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 이 경로는 더 이상 관리 화면이 아니라
     //   중앙 관리자 `/operators` 안내 화면이다. 진입 동선은 유지하고 라벨만 안내 성격으로 정정.
-    { label: '운영자 관리 안내', path: '/admin/operators', adminOnly: true },
+    { label: '운영자 지정 · 해제', path: '/admin/operators', adminOnly: true },
     // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
     { label: '서비스 가입 정리', path: '/admin/members', adminOnly: true },
     // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: dead link 해소 + operator 노출
@@ -111,7 +111,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // /operator/settings/notifications 는 플랫폼 관리자 전용 API 계약(operator-notification.routes.ts)
     // 이라 neture:operator 로는 403. route/guard 는 유지하고 운영자 메뉴에서만 제외한다.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
-    { label: '역할 관리 (플랫폼)', path: '/admin/roles', adminOnly: true },
     { label: '이메일 설정', path: '/admin/settings/email', adminOnly: true },
   ],
 };
@@ -155,7 +154,7 @@ export function getAdminMenu(
       { label: '서비스 가입 정리', path: '/admin/members' },
       // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리(운영자 지정) 성격 — 라벨 표면화.
       // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: 중앙 관리자 `/operators` 안내 화면.
-      { label: '운영자 관리 안내', path: '/admin/operators' },
+      { label: '운영자 지정 · 해제', path: '/admin/operators' },
     ],
     approvals: [
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
@@ -173,7 +172,6 @@ export function getAdminMenu(
     ],
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈(데이터 행) 생성 · 수정 · 담당 운영자 지정
     stores: [
-      { label: '세미프랜차이즈 관리', path: '/admin/semi-franchises' },
       ...(isPlatformAdmin ? [{ label: '약국 서비스 설정', path: '/admin/pharmacy-service-settings' }] : []),
     ],
     orders: [
@@ -206,9 +204,7 @@ export function getAdminMenu(
       { label: '문의 설정', path: '/admin/settings/contact' },
       // ── 플랫폼 관리 (여러 서비스/전체 권한에 영향 — WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1) ──
       // 라벨로 표면 분리. 정식 "플랫폼 관리" 그룹/별도 표면은 platform-admin surface 설계 후 분리.
-      { label: '역할 관리 (플랫폼)', path: '/admin/roles' },
       // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1: 약국 대상 서비스 정책 (cross-service)
-      { label: '서비스 대상 정책 (플랫폼)', path: '/admin/settings/service-audience' },
       // admin 계정이 operator 영역으로 진입하는 단일 게이트 (관리자 sidebar 에는 operator 업무를 직접 두지 않는다)
       { label: '운영자 업무 →', path: '/operator' },
     ],

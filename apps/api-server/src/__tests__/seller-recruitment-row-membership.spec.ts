@@ -6,7 +6,6 @@ jest.mock('../modules/neture/entities/index.js', () => ({
   ApplicationStatus: { PENDING: 'pending', APPROVED: 'approved', CANCELLED: 'cancelled' },
   SELLER_RECRUITMENT_TABLE: 'seller_recruitments', SELLER_RECRUITMENT_APPLICATION_TABLE: 'seller_recruitment_applications',
 }));
-jest.mock('../modules/neture/services/service-audience.service.js', () => ({}));
 jest.mock('../services/NotificationService.js', () => ({ notificationService: { createNotification: jest.fn().mockResolvedValue({}) } }));
 jest.mock('../modules/neture/middleware/supplier-context.resolver.js', () => ({ listOwnedSupplierIds: jest.fn().mockResolvedValue(['owned-supplier']) }));
 

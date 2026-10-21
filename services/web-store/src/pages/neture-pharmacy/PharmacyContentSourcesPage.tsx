@@ -18,6 +18,7 @@ import { ContentRenderer } from '@o4o/content-editor';
 import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { BusinessTabs } from '../../components/BusinessTabs';
+import { CAREPHARM_MATERIAL_TAGS } from '@o4o/shared-space-ui';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
@@ -58,10 +59,17 @@ function PharmacyContentSources() {
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
   const selectedContentId = params.get('content') || '';
-  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); p.delete('content'); return p; }); };
-  const [qInput, setQInput] = useState('');
-  const [q, setQ] = useState('');
-  const [page, setPage] = useState(1);
+  const q = params.get('q')?.trim() || '';
+  const tag = params.get('tag')?.trim() || '';
+  const rawPage = Number(params.get('page'));
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const [qInput, setQInput] = useState(q);
+  useEffect(() => { setQInput(q); }, [q]);
+  const updateFilters = (changes: Record<string, string>) => setParams(previous => {
+    const next = new URLSearchParams(previous); next.delete('content'); next.delete('page');
+    for (const [key, value] of Object.entries(changes)) { if (value) next.set(key, value); else next.delete(key); }
+    return next;
+  });
   const [copied, setCopied] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [selectionError, setSelectionError] = useState<string | null>(null);
@@ -79,8 +87,9 @@ function PharmacyContentSources() {
     invalidateCopy();
     setSelectionError(null);
     setCopyError(null); setCopied(null);
-    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
-    if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
+    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, ...(tag ? { tag } : {}), page, limit: PAGE_SIZE });
+    if (sf && result.items.some(item => item.semiFranchiseKey !== sf)) throw new Error('Material business scope mismatch');
+    if (!selectedContentId || page !== 1 || q || tag || result.items.some(item => item.id === selectedContentId)) return result;
     // A linked material may not be on this page. The existing detail API rechecks store membership.
     try {
       const selected = await neturePharmacyApi.getContent(selectedContentId);
@@ -90,18 +99,13 @@ function PharmacyContentSources() {
       if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주세요.');
       return result;
     }
-  }, [sf, q, page, selectedContentId, invalidateCopy, beginSelection]);
+  }, [sf, q, tag, page, selectedContentId, invalidateCopy, beginSelection]);
   const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
   useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
-  const clearSelectedContent = () => {
-    setParams(previous => { const next = new URLSearchParams(previous); next.delete('content'); return next; });
-  };
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
-    clearSelectedContent();
-    setPage(1);
-    setQ(qInput.trim());
+    updateFilters({ q: qInput.trim() });
   };
 
   const copy = async (c: SemiFranchiseContent) => {
@@ -131,7 +135,7 @@ function PharmacyContentSources() {
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       <StoreLibraryNavigation section="sources" />
-      <BusinessTabs businesses={franchises} value={sf} onChange={key => { setSf(key); setPage(1); }} />
+      <BusinessTabs businesses={franchises} value={sf} onChange={key => { setQInput(''); updateFilters({ business: key, q: '', tag: '' }); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
           <Link key={s.key} to={s.key === 'store-library' ? libraryPath : s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
@@ -156,18 +160,24 @@ function PharmacyContentSources() {
         <input
           className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
           placeholder="제목 · 요약 검색"
+          aria-label="자료 제목·요약 검색"
           value={qInput}
           onChange={(e) => setQInput(e.target.value)}
         />
         <button type="submit" className={btn.secondary}>검색</button>
+        {(q || tag) && <button type="button" className={btn.secondary} onClick={() => { setQInput(''); updateFilters({ q: '', tag: '' }); }}>검색 초기화</button>}
       </form>
+      {sf === 'carepharm' && <section aria-label="CarePharm 자료 찾기" className="mb-4 space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
+        <p>주제별 자료 묶음과 운영 실무자료를 사본으로 가져온 뒤 내 자료함에서 편집하세요.</p>
+        <label>자료 태그<select aria-label="자료 태그" value={tag} onChange={event => updateFilters({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...CAREPHARM_MATERIAL_TAGS, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      </section>}
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
-          <p>이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.</p>
-          <p className="mt-1">세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.</p>
+          <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.'}</p>
+          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.'}</p>
           <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">세미프랜차이즈 보기</Link>
         </div>
       ) : (
@@ -181,6 +191,7 @@ function PharmacyContentSources() {
                     <p className="font-medium text-gray-900">{c.title}</p>
                     {c.summary && <p className="mt-1 text-sm text-gray-600">{c.summary}</p>}
                     <p className="mt-1 text-xs text-gray-500">{c.semiFranchiseName} · 게시 {formatDate(c.publishedAt)}</p>
+                    {Array.isArray(c.tags) && <div className="mt-2 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} type="button" className="min-h-11 max-w-full break-words rounded-full border px-3 text-xs" onClick={() => updateFilters({ tag: value })}>{value}</button>)}</div>}
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button className={btn.secondary} onClick={() => setExpandedId(expanded ? null : c.id)}>
@@ -204,9 +215,9 @@ function PharmacyContentSources() {
 
       {!loading && total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button className={btn.secondary} disabled={page <= 1} onClick={() => { clearSelectedContent(); setPage((p) => p - 1); }}>이전</button>
+          <button className={btn.secondary} disabled={page <= 1} onClick={() => updateFilters({ page: String(page - 1) })}>이전</button>
           <span className="text-gray-600">{page} / {totalPages}</span>
-          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => { clearSelectedContent(); setPage((p) => p + 1); }}>다음</button>
+          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => updateFilters({ page: String(page + 1) })}>다음</button>
         </div>
       )}
     </PharmacyPage>

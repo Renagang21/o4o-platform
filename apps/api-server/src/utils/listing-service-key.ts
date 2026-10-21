@@ -16,7 +16,6 @@
  *   - product-approval-v2 가 approval.service_key 를 그대로 OPL 로 전파한다.
  *   - kpa-checkout 은 `opl.service_key = 'kpa-society'` 로 읽는다.
  *   - auto-listing 은 organization_service_enrollments.service_code(=canonical)를 복사한다.
- *   - service_audience_policies 도 canonical key 행만 존재한다.
  *
  * 따라서 enrollment→listing 경계에는 **변환이 필요 없다** (같은 축이다).
  * 변환이 필요한 축은 role-prefix('kpa' / 'cosmetics') 쪽이며, 그것이 필요한 곳은

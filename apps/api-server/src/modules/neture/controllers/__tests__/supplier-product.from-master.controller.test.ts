@@ -118,9 +118,8 @@ describe('오류 코드 → HTTP status 매핑 (WO §2.2)', () => {
     ['MASTER_FIELD_NOT_ALLOWED', 400],
     ['UNSUPPORTED_FIELD', 400],
     ['PUBLIC_REQUIRES_DESCRIPTION', 400],
-    ['DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', 400],
+    ['DRUG_PRODUCT_UNRESOLVED', 400],
     ['DRUG_SERVICE_CONTEXT_REQUIRED', 400],
-    ['DRUG_NON_PHARMACY_SERVICE', 400],
     ['PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED', 400],
   ])('%s → %d', async (code, status) => {
     mockFromMaster.mockResolvedValue({ success: false, error: code, message: 'm' });

@@ -76,3 +76,35 @@ it('blocks empty title and archived content without a write', async () => {
   show(); await screen.findByText(/보관되거나 반려된 콘텐츠는 수정할 수 없습니다/);
   expect(screen.queryByRole('button', { name: '수정 저장' })).toBeNull(); expect(api.updateContent).not.toHaveBeenCalled();
 });
+
+it('offers CarePharm outlines only to new CarePharm drafts and preserves title and summary', async () => {
+  api.createContent.mockResolvedValue({});
+  render(<MemoryRouter initialEntries={['/operator/semi-franchises/carepharm/contents/new']}><Routes><Route path="/operator/semi-franchises/:key/contents/new" element={<Page />} /><Route path="/operator/semi-franchises" element={<p>목록 복귀</p>} /></Routes></MemoryRouter>);
+  await screen.findByRole('button', { name:'초안 저장' });
+  fireEvent.change(screen.getByLabelText('제목'), {target:{value:'우리 약국 활용 자료'}});
+  fireEvent.change(screen.getByLabelText('요약'), {target:{value:'약국별 활용 안내'}});
+  fireEvent.click(screen.getByRole('button',{name:'주제별 자료 묶음 양식'}));
+  fireEvent.click(screen.getByRole('button',{name:'혈당 관리 태그 추가'}));
+  fireEvent.click(screen.getByRole('button',{name:'혈당 관리 태그 추가'}));
+  expect(screen.getByDisplayValue('우리 약국 활용 자료')).toBeTruthy();
+  expect(screen.getByDisplayValue('약국별 활용 안내')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'초안 저장'}));
+  await screen.findByText('목록 복귀');
+  expect(api.createContent.mock.calls[0][0]).toBe('carepharm');
+  expect(api.createContent.mock.calls[0][1]).toMatchObject({ title:'우리 약국 활용 자료', summary:'약국별 활용 안내', tags:['자료 묶음','혈당 관리'] });
+  expect(api.createContent.mock.calls[0][1].body).toContain('내 매장 활용 순서');
+});
+it('does not replace a written CarePharm body when the operator cancels', async () => {
+  const confirm = vi.spyOn(window,'confirm').mockReturnValue(false);
+  render(<MemoryRouter initialEntries={['/operator/semi-franchises/carepharm/contents/new']}><Routes><Route path="/operator/semi-franchises/:key/contents/new" element={<Page />} /></Routes></MemoryRouter>);
+  await screen.findByRole('button',{name:'초안 저장'});
+  fireEvent.change(screen.getAllByRole('textbox')[2], { target:{value:'작성 중인 본문'} });
+  fireEvent.click(screen.getByRole('button',{name:'약국 운영 실무자료 양식'}));
+  expect(screen.getByDisplayValue('작성 중인 본문')).toBeTruthy();
+  expect(api.createContent).not.toHaveBeenCalled(); confirm.mockRestore();
+});
+it('does not offer CarePharm authoring controls in another cooperative', async () => {
+  api.getContent.mockResolvedValue(content('다른 사업 자료')); show();
+  await screen.findByDisplayValue('다른 사업 자료');
+  expect(screen.queryByRole('region',{name:'CarePharm 회원자료 작성 도움'})).toBeNull();
+});

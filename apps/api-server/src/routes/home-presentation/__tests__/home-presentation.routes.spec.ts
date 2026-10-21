@@ -1,3 +1,14 @@
+const mockFederationAuthorization = jest.fn(),
+  mockCooperativeAuthorization = jest.fn();
+jest.mock(
+  "../../../modules/neture-pharmacy/services/cooperative-management.service",
+  () => ({
+    CooperativeManagementService: jest.fn().mockImplementation(() => ({
+      requireFederation: mockFederationAuthorization,
+      requireLocal: mockCooperativeAuthorization,
+    })),
+  }),
+);
 import express from "express";
 import request from "supertest";
 import type { DataSource } from "typeorm";
@@ -21,8 +32,13 @@ jest.mock("../../../middleware/neture-scope.middleware", () => ({
   requireNetureScope: (scope: string) => mockScopeGuard(scope),
   requireNetureBusinessScope: (req: any, res: any, next: any) => {
     const role = req.headers["x-test-role"];
-    const allowed = /^neture:(?:(?:pharmacy|carepharm|megapharm|pharmcoop)_)?(?:admin|operator)$/.test(role || "");
-    return allowed && req.headers["x-test-membership"] === "active" ? next() : res.status(403).json({ success: false });
+    const allowed =
+      /^neture:(?:(?:pharmacy|carepharm|megapharm|pharmcoop)_)?(?:admin|operator)$/.test(
+        role || "",
+      );
+    return allowed && req.headers["x-test-membership"] === "active"
+      ? next()
+      : res.status(403).json({ success: false });
   },
 }));
 jest.mock("../../../middleware/supplier-service-scope.middleware", () => ({
@@ -67,6 +83,8 @@ let read: jest.SpyInstance,
   publicRead: jest.SpyInstance;
 beforeEach(() => {
   jest.clearAllMocks();
+  mockFederationAuthorization.mockResolvedValue("operator");
+  mockCooperativeAuthorization.mockResolvedValue("operator");
   read = jest
     .spyOn(HomePresentationService.prototype, "read")
     .mockResolvedValue({ revision: 0, draft: null, published: null });
@@ -198,6 +216,7 @@ it("derives the service scope from the route and the actor from authenticated st
     0,
     false,
     user,
+    expect.any(Function),
   );
 });
 it("requires the assigned pharmacy business operator and derives organization from its row", async () => {
@@ -223,21 +242,152 @@ it("requires the assigned pharmacy business operator and derives organization fr
   expect(response.status).toBe(403);
   expect(read).not.toHaveBeenCalled();
 });
-it.each(["get", "put"] as const)("checks CarePharm assignment on %s without changing the existing presentation slot", async method => {
-  const send = () => request(app)[method]("/home/carepharm/manage")
-    .set("x-test-user", user).set("x-test-role", "neture:carepharm_operator")
-    .set("x-test-membership", "active")
-    .send({ config: initialHomePresentation("carepharm"), revision: 0, publish: false, key: "pharmacy" });
-  expect((await send()).status).toBe(200);
-  expect(mockBusinessOperator).toHaveBeenCalledWith(user, "carepharm");
-  expect(method === "get" ? read : save).toHaveBeenCalledWith(
-    { surface: "carepharm", organizationId: null }, ...(method === "put" ? [initialHomePresentation("carepharm"), 0, false, user] : []),
+it.each(["get", "put"] as const)(
+  "checks CarePharm assignment on %s without changing the existing presentation slot",
+  async (method) => {
+    const send = () =>
+      request(app)[method]("/home/carepharm/manage")
+        .set("x-test-user", user)
+        .set("x-test-role", "neture:carepharm_operator")
+        .set("x-test-membership", "active")
+        .send({
+          config: initialHomePresentation("carepharm"),
+          revision: 0,
+          publish: false,
+          key: "pharmacy",
+        });
+    expect((await send()).status).toBe(200);
+    expect(mockBusinessOperator).toHaveBeenCalledWith(user, "carepharm");
+    expect(method === "get" ? read : save).toHaveBeenCalledWith(
+      { surface: "carepharm", organizationId: null },
+      ...(method === "put"
+        ? [initialHomePresentation("carepharm"), 0, false, user, expect.any(Function)]
+        : []),
+    );
+    read.mockClear();
+    save.mockClear();
+    mockBusinessOperator.mockRejectedValueOnce({ httpStatus: 403 });
+    expect((await send()).status).toBe(403);
+    expect(read).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
+    mockBusinessOperator.mockResolvedValueOnce({ status: "closed" });
+    expect((await send()).status).toBe(404);
+    expect(read).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
+  },
+);
+
+const coopId = "22222222-2222-4222-8222-222222222222";
+const orgId = "33333333-3333-4333-8333-333333333333";
+it("federation management requires its live role, not the Neture-wide operator role", async () => {
+  expect((await request(app).get("/home/pharmcoop/manage")).status).toBe(401);
+  expect(
+    (await request(app).get("/home/pharmcoop/manage").set("x-test-user", user))
+      .status,
+  ).toBe(200);
+  expect(mockFederationAuthorization).toHaveBeenCalledWith(
+    expect.anything(),
+    user,
   );
-  read.mockClear(); save.mockClear();
-  mockBusinessOperator.mockRejectedValueOnce({ httpStatus: 403 });
-  expect((await send()).status).toBe(403);
-  expect(read).not.toHaveBeenCalled(); expect(save).not.toHaveBeenCalled();
-  mockBusinessOperator.mockResolvedValueOnce({ status: "closed" });
-  expect((await send()).status).toBe(404);
-  expect(read).not.toHaveBeenCalled(); expect(save).not.toHaveBeenCalled();
+  mockFederationAuthorization.mockRejectedValueOnce(new Error("revoked"));
+  expect(
+    (
+      await request(app)
+        .get("/home/pharmcoop/manage")
+        .set("x-test-user", user)
+        .set("x-test-role", "neture:operator")
+    ).status,
+  ).toBe(403);
+});
+it("cooperative public and management resolve the server organization and independent local role", async () => {
+  const db = {
+    query: jest.fn().mockResolvedValue([{ id: coopId, organizationId: orgId }]),
+  } as unknown as DataSource;
+  app = express();
+  app.use(express.json());
+  app.use("/home", createHomePresentationRoutes(db));
+  expect((await request(app).get("/home/cooperative/alpha")).status).toBe(200);
+  expect(publicRead).toHaveBeenLastCalledWith({
+    surface: "cooperative",
+    organizationId: orgId,
+  });
+  expect(
+    (
+      await request(app)
+        .get("/home/cooperative/alpha/manage")
+        .set("x-test-user", user)
+    ).status,
+  ).toBe(200);
+  expect(mockCooperativeAuthorization).toHaveBeenLastCalledWith(
+    db,
+    user,
+    coopId,
+  );
+  expect(read).toHaveBeenLastCalledWith({
+    surface: "cooperative",
+    organizationId: orgId,
+  });
+  expect((await request(app).get("/home/cooperative")).status).toBe(404);
+  expect(
+    (await request(app).get("/home/cooperative/alpha/manage")).status,
+  ).toBe(401);
+  mockCooperativeAuthorization.mockRejectedValueOnce(
+    new Error("another cooperative"),
+  );
+  expect(
+    (
+      await request(app)
+        .put("/home/cooperative/alpha/manage")
+        .set("x-test-user", user)
+        .send({
+          config: initialHomePresentation("cooperative"),
+          revision: 0,
+          publish: true,
+          organizationId: user,
+        })
+    ).status,
+  ).toBe(403);
+  expect(save).not.toHaveBeenCalled();
+});
+it("rejects inactive or missing cooperative and rechecks the current role inside the save transaction", async () => {
+  const db = {
+    query: jest.fn().mockResolvedValue([]),
+  } as unknown as DataSource;
+  app = express();
+  app.use(express.json());
+  app.use("/home", createHomePresentationRoutes(db));
+  expect((await request(app).get("/home/cooperative/missing")).status).toBe(
+    404,
+  );
+  (db.query as jest.Mock).mockResolvedValue([
+    { id: coopId, organizationId: orgId },
+  ]);
+  expect(
+    (
+      await request(app)
+        .put("/home/cooperative/alpha/manage")
+        .set("x-test-user", user)
+        .send({
+          config: initialHomePresentation("cooperative"),
+          revision: 0,
+          publish: true,
+        })
+    ).status,
+  ).toBe(200);
+  const check = save.mock.calls[0][5];
+  const manager = { query: jest.fn().mockResolvedValue([{ id: coopId }]) };
+  await check(manager);
+  expect(manager.query).toHaveBeenCalledWith(
+    expect.stringContaining("FOR UPDATE OF c"),
+    [coopId, orgId],
+  );
+  expect(mockCooperativeAuthorization).toHaveBeenLastCalledWith(
+    manager,
+    user,
+    coopId,
+  );
+  mockCooperativeAuthorization.mockRejectedValueOnce(new Error("role revoked"));
+  await expect(check(manager)).rejects.toThrow("role revoked");
+  manager.query.mockResolvedValue([]);
+  await expect(check(manager)).rejects.toMatchObject({ httpStatus: 404 });
 });

@@ -69,6 +69,7 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
   const [recipients, setRecipients] = useState<string[]>([]);
   const [newEmail, setNewEmail] = useState('');
   const [types, setTypes] = useState<ContactInquiryTypeConfig[]>([]);
+  const [typesDirty, setTypesDirty] = useState(false);
   const [privacyNotice, setPrivacyNotice] = useState('');
   const [completionNotice, setCompletionNotice] = useState('');
   const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
@@ -81,6 +82,7 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
     setEmailEnabled(d.emailNotificationEnabled);
     setRecipients(Array.isArray(d.recipientEmails) ? d.recipientEmails : []);
     setTypes(Array.isArray(d.inquiryTypes) ? d.inquiryTypes : []);
+    setTypesDirty(false);
     setPrivacyNotice(d.privacyNotice || '');
     setCompletionNotice(d.completionNotice || '');
     setAutoReplyEnabled(!!d.autoReplyEnabled);
@@ -114,6 +116,7 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
   }
 
   function toggleType(value: string, enabled: boolean) {
+    setTypesDirty(true);
     setTypes(types.map((t) => (t.value === value ? { ...t, enabled } : t)));
   }
 
@@ -134,7 +137,8 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
         inAppNotificationEnabled: inApp,
         emailNotificationEnabled: emailEnabled,
         recipientEmails: recipients,
-        inquiryTypes: types.length > 0 ? types : null,
+        // Effective defaults are display values, not an explicit type configuration.
+        ...(typesDirty ? { inquiryTypes: types.length > 0 ? types : null } : {}),
         privacyNotice: privacyNotice.trim() || null,
         completionNotice: completionNotice.trim() || null,
         autoReplyEnabled,

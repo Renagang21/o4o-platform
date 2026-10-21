@@ -43,6 +43,20 @@ export function cooperativeManagementRoutes(db: DataSource) {
     };
   const actor = (req: Request) => req.user!.id;
   router.get(
+    "/my-cooperatives",
+    run((req) => service.myCooperatives(actor(req))),
+  );
+  router.get(
+    "/my-updates",
+    run((req) => service.myUpdates(actor(req))),
+  );
+  router.post(
+    "/:coop/eligibility",
+    run((req) =>
+      service.updateEligibility(actor(req), id(req, "coop"), req.body ?? {}),
+    ),
+  );
+  router.get(
     "/my-affiliations",
     run((req) => service.myAffiliations(actor(req))),
   );

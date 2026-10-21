@@ -9,7 +9,14 @@ import { hostStaticSeo } from './tools/hostStaticSeo';
 // production build(`vite build`)는 건드리지 않는다 — 배포 빌드는 Dockerfile ARG 로 명시 주입.
 const LOCAL_DEV_API_BASE_URL = 'http://localhost:3002';
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(async ({ command, mode }) => {
+  const profile = process.env.NETURE_OBFUSCATION ?? 'off';
+  if (!['off', 'names'].includes(profile)) throw new Error('NETURE_OBFUSCATION must be off or names');
+  const enabled = command === 'build' && mode === 'production' && profile === 'names';
+  // A computed URL keeps the optional toolchain out of ordinary dev/build resolution.
+  const obfuscation = enabled
+    ? (await import(new URL('./tools/obfuscation-pilot/production.mjs', import.meta.url).href)).netureProductionObfuscation(__dirname)
+    : undefined;
   if (command === 'serve') {
     const env = loadEnv(mode, __dirname, 'VITE_');
     if (!env.VITE_API_BASE_URL) {
@@ -18,7 +25,7 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    plugins: [react(), hostStaticSeo()],
+    plugins: [react(), hostStaticSeo(), ...(obfuscation ? [obfuscation.plugin] : [])],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
@@ -35,7 +42,7 @@ export default defineConfig(({ command, mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: false,
+      sourcemap: enabled ? 'hidden' : false,
       rollupOptions: {
         external: [
           // Server-only modules that should not be bundled
@@ -47,6 +54,8 @@ export default defineConfig(({ command, mode }) => {
         ],
         output: {
           manualChunks(id) {
+            const ownChunk = obfuscation?.manualChunk(id);
+            if (ownChunk) return ownChunk;
             if (id.includes('node_modules')) {
               // React core
               if (id.includes('react-dom') || id.includes('react-router') || id.includes('/react/')) {

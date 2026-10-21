@@ -188,37 +188,43 @@ describe('② Neture 관리자 대시보드', () => {
 describe('③ 서브도메인 전용 셸 메뉴', () => {
   const menuPaths = () => Object.values(shellProps.menuItems ?? {}).flat().map((i) => i.path);
 
-  it('supplier:operator 만 → 공급자 승인만 보이고 admin 전용 공급자 상태 관리는 숨긴다', () => {
+  it('supplier:operator → 회원·공급자·문의 운영을 제공하고 admin 전용 관리는 숨긴다', () => {
     signIn(['supplier:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="operator" />);
     expect(screen.getByTestId('scoped-shell')).toBeTruthy();
-    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/operator/home-presentation/supplier']);
+    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/operator/service-contact/supplier', '/operator/home-presentation/supplier']);
   });
 
   it('supplier:admin → 두 항목 모두 보인다', () => {
     signIn(['supplier:admin']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/admin/supplier-governance', '/operator/legal/supplier', '/operator/home-presentation/supplier']);
+    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/operator/service-contact/supplier', '/admin/supplier-governance/operators', '/admin/supplier-governance', '/operator/legal/supplier', '/operator/home-presentation/supplier']);
   });
 
   it('funding:operator → 펀딩 항목', () => {
     signIn(['funding:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/funding', '/operator/market-trial', '/operator/home-presentation/funding']);
+    expect(menuPaths()).toEqual(['/operator/service-contact/funding', '/operator/service-members/funding', '/operator/market-trial', '/operator/home-presentation/funding']);
+  });
+
+  it('funding admin sees its Operator designation entry', () => {
+    signIn(['funding:admin']);
+    render(<SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />);
+    expect(menuPaths()).toContain('/operator/market-trial/operators');
   });
 
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리): community:admin 은 자기 서비스 화면
   //   (개설 심사 · 개별 커뮤니티 운영자 지정) 하나를 본다.
-  it('community:operator → 개설 심사만 노출', () => {
+  it('community:operator → 자기 서비스 운영·문의 항목 노출', () => {
     signIn(['community:operator'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/community', '/operator/communities/boards', '/operator/communities', '/operator/communities/home', '/operator/home-presentation/community']);
+    expect(menuPaths()).toEqual(['/operator/service-contact/community', '/operator/service-members/community', '/operator/communities/boards', '/operator/communities', '/operator/communities/home', '/operator/home-presentation/community']);
   });
 
   it('community:admin → 커뮤니티 서비스 관리 항목', () => {
     signIn(['community:admin'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);
-    expect(menuPaths()).toEqual(['/admin/communities/members', '/admin/communities/boards', '/operator/legal/community', '/operator/communities']);
+    expect(menuPaths()).toEqual(['/admin/communities/operators', '/admin/communities/members', '/admin/communities/boards', '/operator/legal/community', '/operator/communities']);
   });
 
   it('community:admin 이어도 community membership 이 active 가 아니면 항목이 없다', () => {

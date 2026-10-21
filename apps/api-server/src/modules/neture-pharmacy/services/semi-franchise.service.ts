@@ -240,8 +240,8 @@ export class SemiFranchiseService {
     const rows = await this.dataSource.query<Array<SemiFranchiseRow & { roleOperators: Array<NetureMainMembershipRow & Record<string, unknown>> }>>(
       `SELECT ${SF_COLUMNS},
               (SELECT count(*)::int FROM semi_franchise_memberships x WHERE x.semi_franchise_id = sf.id AND x.status = 'active') AS "activeMemberCount",
-              COALESCE((SELECT json_agg(json_build_object('userId', op.user_id, 'assignedAt', op.assigned_at) ORDER BY op.assigned_at)
-                          FROM semi_franchise_operators op WHERE op.semi_franchise_id = sf.id AND op.revoked_at IS NULL), '[]'::json) AS operators,
+              COALESCE((SELECT json_agg(json_build_object('userId', op.user_id, 'assignedAt', op.assigned_at, 'name', u.name, 'email', u.email) ORDER BY op.assigned_at)
+                          FROM semi_franchise_operators op LEFT JOIN users u ON u.id=op.user_id WHERE op.semi_franchise_id = sf.id AND op.revoked_at IS NULL), '[]'::json) AS operators,
               COALESCE((SELECT json_agg(json_build_object(
                                  'userId', ra.user_id, 'role', ra.role, 'email', u.email,
                                  'name', COALESCE(NULLIF(btrim(u.name), ''), NULLIF(btrim(concat_ws(' ', u."lastName", u."firstName")), ''), NULLIF(btrim(u.nickname), '')),

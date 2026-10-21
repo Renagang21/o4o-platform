@@ -35,7 +35,7 @@ describe('business ledger status is separate from account status', () => {
     await waitFor(() => expect(rowOf('care@example.invalid').textContent).toContain('사업 미등록'));
     const care = rowOf('care@example.invalid');
     expect(care.textContent).toContain('Active');
-    expect(care.querySelector('a')?.getAttribute('href')).toBe('/admin/semi-franchises?register=carepharm');
+    expect(care.querySelector('a')?.getAttribute('href')).toBe('/admin/pharmacy-service-settings?register=carepharm');
     expect(rowOf('mega@example.invalid').textContent).toContain('사업 마감');
     expect(rowOf('neture@example.invalid').textContent).not.toMatch(/사업 (미등록|운영|마감)/);
     expect(authClient.api.post).not.toHaveBeenCalled();

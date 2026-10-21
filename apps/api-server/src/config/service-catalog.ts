@@ -94,7 +94,7 @@ export interface O4OService {
    *
    * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
    *   **자기 host 를 갖지 않고 다른 서비스 host 의 path 아래에서** 서빙되는 서비스를 표현한다
-   *   (종전 kpa-branch = kpa-society.co.kr/kpa. WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1
+   *   (종전 kpa-branch 가 옛 약국 앱 도메인의 /kpa 아래였으나 WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1
    *   로 kpa.neture.co.kr 로 옮겨 현재 이 값을 쓰는 서비스는 없다 — 응답 계약 `basePath: ''` 는 유지). `domain` 은 언제나 순수 hostname 으로 유지하고
    *   (CORS origin·쿠키 도메인 판정이 hostname 을 전제한다), 경로는 여기에만 둔다.
    *   반드시 '/' 로 시작하고 trailing '/' 는 두지 않는다.
@@ -154,7 +154,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'KPA Society',
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'pharmacy.neture.co.kr',
-    legacyDomains: ['kpa-society.co.kr'],
+    // 옛 약국 앱 도메인 legacyDomains 는 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
     // 사업 의미 = 약국 사업자 대상 세미프랜차이즈 운영 서비스 (docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
     //   role prefix `kpa:*` 는 이 키의 legacy 이름이며 KPA 분회(`kpa-branch` · kpa.neture.co.kr)가 아니다.
     //   WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1: description 을 정본 의미로 맞췄다.
@@ -175,7 +175,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'K-Cosmetics',
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'retail.neture.co.kr',
-    legacyDomains: ['k-cosmetics.site'],
+    // 옛 K-Cosmetics 도메인 legacyDomains 는 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
     // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
     // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.
@@ -208,21 +208,10 @@ export const O4O_SERVICES: O4OService[] = [
    * domain 은 플랫폼 기본 호스트다. 분회 자체 도메인은 branch_domains 로 연결하며
    * 분회별 별도 배포·별도 백엔드는 만들지 않는다.
    *
-   * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-   *   공용 공개 URL 은 별도 서브도메인이 아니라 `https://kpa-society.co.kr/kpa/{branchSlug}` 다
-   *   (LB `o4o-global-lb` / path-matcher-kpa-society 의 `/kpa`·`/kpa/*` pathRule).
-   *   따라서 domain=kpa-society.co.kr + basePath=/kpa 로 표현한다.
-   *   `/kpa` 는 URL prefix 일 뿐 tenant 가 아니다 — 분회는 slug 또는 Host 로만 해석한다.
-   *   WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: kpa-society 가 pharmacy.neture.co.kr 로
-   *   옮길 때 이 항목은 DEFERRED 였다(handoff · 분회 slug 해석을 함께 바꿔야 했다).
-   *
    * WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:
    *   canonical = `https://kpa.neture.co.kr/{branchSlug}` (basePath 없음 · 앱은 root 진입을 이미 판정한다).
    *   handoff · 공개 URL · 세션 귀속(로그인 · 로그아웃 범위)이 모두 이 domain 하나에서 나온다.
-   *   옛 공용 경로 `kpa-society.co.kr/kpa/*` 는 `legacyDomains` 에 넣지 **않는다** — 그 호스트의 루트는
-   *   kpa-society(약국 사업자 서비스) 앱이고 세션 판정은 path 를 보지 않는다. 대신 분회 앱이 그 경로로
-   *   들어온 방문을 canonical 호스트로 옮긴다(web-kpa-branch `lib/canonicalHost`) — 옛 경로에서 로그인하면
-   *   세션이 kpa-society 로 귀속되기 때문이다.
+   *   옛 약국 앱 도메인의 `/kpa/*` 공용 경로는 도메인 은퇴로 지원하지 않는다(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
    * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */

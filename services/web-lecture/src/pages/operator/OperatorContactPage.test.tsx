@@ -9,7 +9,7 @@ let detail: any;
 beforeEach(() => {
   vi.resetAllMocks();
   detail = { id: 'fixture-contact', subject: '합성 강의 문의', name: '합성 문의자', email: 'synthetic@example.invalid', status: 'received', inquiryType: 'partnership', message: '합성 문의 본문', internalNote: null, createdAt: '2026-10-01T00:00:00Z' };
-  client.get.mockImplementation(async path => ({ data: { data: path.includes('legacy-education') ? { items: [], pagination: { totalPages: 1 } } : path === base ? { items: [detail], pagination: { page: 1, totalPages: 1, total: 1, limit: 20 } } : detail } }));
+  client.get.mockImplementation(async path => ({ data: { data: path.endsWith('/replies') ? [] : path.includes('legacy-education') ? { items: [], pagination: { totalPages: 1 } } : path === base ? { items: [detail], pagination: { page: 1, totalPages: 1, total: 1, limit: 20 } } : detail } }));
 });
 afterEach(cleanup);
 it('fixes query, status and note requests to lecture and unwraps the shared page envelope', async () => {

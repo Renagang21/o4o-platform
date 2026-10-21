@@ -148,7 +148,6 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
         { id: 'manage-suppliers', label: '공급사 승인', link: '/admin/supplier-governance', icon: 'store' },
         { id: 'manage-settlements', label: '정산 관리', link: '/admin/settlements', icon: 'dollar-sign' },
         { id: 'manage-commissions', label: '커미션 관리', link: '/admin/commissions', icon: 'percent' },
-        { id: 'manage-roles', label: '역할 관리', link: '/admin/roles', icon: 'key' },
       ];
 
       res.json({

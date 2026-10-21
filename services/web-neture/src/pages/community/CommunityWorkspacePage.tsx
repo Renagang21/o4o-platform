@@ -136,7 +136,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
       {workspace.canManage && workspace.kind === 'independent' && <CommunityPublicReadManager key={communityKey} communityKey={communityKey} />}
       {view === 'hub' && <ForumHubPage title={workspace.name} basePath={basePath} requestAction={<Link to={`${basePath}/request`}>게시판 개설 신청</Link>} description="회원들과 소식과 자료를 나누는 공간입니다." />}
       {view === 'posts' && <ForumPage title={workspace.name} description={nativeAccess ? '협업체 회원이 약국 운영 경험과 자료 활용 정보를 나누는 공간입니다.' : undefined} boardSlug={new URLSearchParams(window.location.search).get('board') || undefined} basePath={basePath} />}
-      {view === 'write' && <ForumWritePage communityLabel={workspace.name} categorySlug="" backPath={basePath} />}
+      {view === 'write' && <ForumWritePage communityLabel={workspace.name} categorySlug="" backPath={basePath} writingContext={nativeAccess ? 'carepharm' : undefined} />}
       {view === 'post' && <ForumPostPage basePath={basePath} canModerate={workspace.canManage} />}
       {view === 'mine' && <MyPostsPage basePath={basePath} />}
       {view === 'request' && <ForumRequestPage basePath={basePath} />}

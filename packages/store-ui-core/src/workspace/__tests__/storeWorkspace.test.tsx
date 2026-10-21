@@ -124,7 +124,7 @@ describe('createStoreServicesApi', () => {
   });
 
   it('handoff 는 https targetUrl 만 받아들인다', async () => {
-    const post = vi.fn(async () => ({ success: true, data: { targetUrl: 'https://k-cosmetics.site/auth/handoff?t=x' } }));
+    const post = vi.fn(async () => ({ success: true, data: { targetUrl: 'https://retail.neture.co.kr/auth/handoff?t=x' } }));
     const api = createStoreServicesApi({ get: vi.fn() as any, post });
     await expect(api.resolveServiceEntryUrl('k-cosmetics', '/store')).resolves.toMatch(/^https:\/\//);
     expect(post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'k-cosmetics', returnPath: '/store' });
@@ -146,7 +146,7 @@ describe('MyServicesView (매장 A · 현재 서비스 = KPA)', () => {
   function renderView(resolution: StoreServiceResolution) {
     const api: StoreServicesApi = {
       fetchStoreServices: vi.fn(async () => resolution),
-      resolveServiceEntryUrl: vi.fn(async () => 'https://k-cosmetics.site/auth/handoff'),
+      resolveServiceEntryUrl: vi.fn(async () => 'https://retail.neture.co.kr/auth/handoff'),
       resolveWorkspaceEntryUrl: vi.fn(async () => 'https://store.neture.co.kr/handoff'),
     };
     render(

@@ -32,8 +32,6 @@ import {
   SELLER_RECRUITMENT_TABLE,
   SELLER_RECRUITMENT_APPLICATION_TABLE,
 } from '../entities/index.js';
-// WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 약국 대상 서비스 정책(의약품 gate 재확인)
-import { ServiceAudienceService } from './service-audience.service.js';
 // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1: 판매자 in-app 알림
 import { notificationService } from '../../../services/NotificationService.js';
 import type { NotificationType } from '../../../entities/Notification.js';
@@ -286,14 +284,13 @@ export class SellerRecruitmentService {
     // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id = $2` → listOwnedSupplierIds.
     const rows: Array<{
       offer_id: string; distribution_type: string; product_name: string;
-      manufacturer: string | null; is_regulated: boolean | null; seller_name: string | null;
+      manufacturer: string | null; seller_name: string | null;
     }> = await AppDataSource.query(
       `SELECT spo.id AS offer_id, spo.distribution_type, pm.name AS product_name,
-              pm.manufacturer_name AS manufacturer, c.is_regulated, org.name AS seller_name
+              pm.manufacturer_name AS manufacturer, org.name AS seller_name
        FROM supplier_product_offers spo
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        JOIN product_masters pm ON pm.id = spo.master_id
-       LEFT JOIN product_categories c ON c.id = pm.category_id
        LEFT JOIN organizations org ON org.id = ns.organization_id
        WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
        ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
@@ -305,14 +302,6 @@ export class SellerRecruitmentService {
 
     // [결정 1·2] 판매자 모집은 PRIVATE 유통 제품만
     if (offer.distribution_type !== 'PRIVATE') return { success: false as const, error: 'OFFER_NOT_PRIVATE' };
-
-    // [결정 3] 의약품/규제 상품 → 약국 대상 서비스에만 (원자적)
-    if (offer.is_regulated) {
-      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-      if (serviceKeys.some((k) => !isPharmacyAudience(k))) {
-        return { success: false as const, error: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' };
-      }
-    }
 
     // UNIQUE(productId, sellerId, serviceId) — 서비스당 1 모집. 하나라도 이미 있으면 전체 실패(원자적).
     const existing = await this.recruitmentRepo.find({
@@ -673,13 +662,12 @@ export class SellerRecruitmentService {
   private async bridgeRecruitmentToOrderable(recruitment: SellerRecruitment, applicantUserId: string): Promise<void> {
     const serviceKey = recruitment.serviceId || 'neture';
 
-    const offerRows: Array<{ id: string; master_id: string; allowed_seller_ids: string[] | null; is_regulated: boolean | null }> =
+    const offerRows: Array<{ id: string; master_id: string; allowed_seller_ids: string[] | null }> =
       await AppDataSource.query(
-        `SELECT spo.id, spo.master_id, spo.allowed_seller_ids, c.is_regulated
+        `SELECT spo.id, spo.master_id, spo.allowed_seller_ids
          FROM supplier_product_offers spo
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN product_categories c ON c.id = pm.category_id
          WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
          ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
          LIMIT 1`,
@@ -690,14 +678,6 @@ export class SellerRecruitmentService {
       return;
     }
     const offer = offerRows[0];
-
-    if (offer.is_regulated) {
-      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-      if (!isPharmacyAudience(serviceKey)) {
-        logger.warn(`[C-Bridge] regulated product → non-pharmacy service(${serviceKey}) — bridge skipped (offer=${offer.id})`);
-        return;
-      }
-    }
 
     const current = offer.allowed_seller_ids || [];
     if (!current.includes(applicantUserId)) {

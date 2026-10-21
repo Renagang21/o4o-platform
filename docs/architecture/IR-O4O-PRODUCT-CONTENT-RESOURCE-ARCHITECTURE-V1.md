@@ -254,7 +254,7 @@ Content Resource 현황
 
 ### 11.2 URL 정책
 - Resource URL = `https://neture.co.kr/r/{resourceId}` 를 **기본 규칙**으로 한다.
-- **서비스별 도메인을 사용하지 않는다** (kpa-society.co.kr/r/... 금지). 소비 서비스와 무관하게 항상 `neture.co.kr`.
+- **서비스별 도메인을 사용하지 않는다** (예: pharmacy.neture.co.kr/r/... 금지). 소비 서비스와 무관하게 항상 `neture.co.kr`.
 - **URL 변경을 허용하지 않는다** (§4.4 Permalink).
 
 ---

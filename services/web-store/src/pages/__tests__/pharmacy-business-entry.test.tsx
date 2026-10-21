@@ -94,7 +94,7 @@ it.each(['page', 'search'])('링크 선택 자료는 %s 변경 뒤 결과에 다
     fireEvent.change(screen.getByPlaceholderText('제목 · 요약 검색'), { target: { value: '새 검색' } });
     fireEvent.click(screen.getByRole('button', { name: '검색' }));
   }
-  await screen.findByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
+  await screen.findByText(mode === 'search' ? '검색 조건에 맞는 자료가 없습니다.' : '이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
   expect(screen.queryByText('선택한 자료')).toBeNull();
   expect(mocks.getContent).toHaveBeenCalledTimes(1);
 });
@@ -126,4 +126,31 @@ it('이용 불가한 자료 딥링크여도 성공한 목록은 유지하고 다
   fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
   await screen.findByRole('link', { name: '내 매장 자료함에서 보기' });
   expect(mocks.copyContent).toHaveBeenCalledWith('available');
+});
+
+it('CarePharm tags are sent to the server, clear linked content, and reset pagination', async () => {
+  mocks.listSemiFranchises.mockResolvedValue([business('carepharm'),business('pharmacy')]);
+  mocks.listContents.mockResolvedValue({items:[],total:25});
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=carepharm&page=2&content=old']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByRole('combobox',{name:'자료 태그'});
+  fireEvent.change(screen.getByRole('combobox',{name:'자료 태그'}),{target:{value:'자료 묶음'}});
+  await waitFor(() => expect(mocks.listContents).toHaveBeenLastCalledWith(expect.objectContaining({sf:'carepharm',tag:'자료 묶음',page:1})));
+  expect(mocks.getContent).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button',{name:'검색 초기화'}));
+  await waitFor(() => expect(mocks.listContents.mock.calls[mocks.listContents.mock.calls.length - 1]?.[0].tag).toBeUndefined());
+});
+it('does not show a late result from an old CarePharm tag query', async () => {
+  let finish!: (value:unknown) => void;
+  mocks.listSemiFranchises.mockResolvedValue([business('carepharm')]);
+  mocks.listContents.mockReturnValueOnce(new Promise(resolve => {finish=resolve;})).mockResolvedValue({items:[{...content,title:'현재 태그 자료',semiFranchiseKey:'carepharm'}],total:1});
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=carepharm']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  fireEvent.change(screen.getByRole('combobox',{name:'자료 태그'}),{target:{value:'약국 운영'}});
+  await screen.findByText('현재 태그 자료');
+  await act(async () => finish({items:[{...content,title:'이전 태그 자료',semiFranchiseKey:'carepharm'}],total:1}));
+  expect(screen.queryByText('이전 태그 자료')).toBeNull();
+});
+it('rejects another business material even when returned by the filtered list', async () => {
+  mocks.listContents.mockResolvedValue({items:[{...content,semiFranchiseKey:'pharmacy'}],total:1});
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=carepharm&tag=자료 묶음']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByRole('alert'); expect(screen.queryByText(content.title)).toBeNull();
 });

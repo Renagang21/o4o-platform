@@ -1,3 +1,5 @@
+import UsersListClean from '../users/UsersListClean';
+import BusinessOperatorAssignments from './BusinessOperatorAssignments';
 /**
  * OperatorsPage — Assignment-Row Canonical (operator-ux-core DataTable)
  *
@@ -133,6 +135,7 @@ interface UserFormState {
 }
 
 export default function OperatorsPage() {
+  const [showLegacy, setShowLegacy] = useState(false);
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
   // WO-O4O-OPERATORS-PAGE-SILENT-NOOP-FIX-V1:
@@ -237,7 +240,7 @@ export default function OperatorsPage() {
 
   // assignment-row flatMap + operator-only preset filter
   const allRows = useMemo<AssignmentRow[]>(
-    () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role)),
+    () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role) && row.parsedRole.serviceKey !== 'platform'),
     [users],
   );
 
@@ -600,17 +603,17 @@ export default function OperatorsPage() {
   ];
 
   // Role facet 옵션 — 운영 권한만 노출 (admin/operator/super_admin/branch_*)
-  const operatorRoleOptions = getRoleOptions().filter((o) => isOperatorRole(o.value));
+  const operatorRoleOptions = getRoleOptions().filter(o => allRows.some(row => row.parsedRole.roleKey === o.value));
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="Operators Management"
-        subtitle="운영 권한(Admin / Operator) 할당 단위 — RBAC SSOT"
+        title="서비스 관리자·운영자"
+        subtitle="서비스별 담당자를 지정하고 운영 권한을 관리합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
-          { id: 'add', label: 'Add Operator', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
+          { id: 'add', label: '서비스 담당자 지정', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
@@ -640,13 +643,17 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: 'All Services', options: [...getServiceOptions(), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
+            { key: 'service', placeholder: 'All Services', options: [...getServiceOptions().filter(option => option.value !== 'platform'), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: 'All Operator Roles', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
           onFilterChange={(k, v) => setFacets((prev) => ({ ...prev, [k]: v } as Facets))}
         />
       </div>
+
+      <p className="mb-4 rounded border bg-white p-4 text-sm">서비스별 Admin·Operator를 지정·해제합니다. 각 서비스 Admin은 자기 서비스에서 Operator를 관리할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+      <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
+      <BusinessOperatorAssignments />
 
       {/* WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1: ActionBar (선택 시 노출) */}
       {selectedIds.size > 0 && (

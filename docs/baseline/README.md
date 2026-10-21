@@ -20,7 +20,7 @@
 | `KPA-ROLE-MATRIX-V1.md` | Active | KPA Society(`kpa:*`) 권한/역할 매트릭스 — 2026-10-06 범위 축소 |
 | `KPA-BRANCH-ROLE-MATRIX-V1.md` | Active | 약사 분회 서비스(`kpa-branch:*`) 역할 · 접근 행렬 |
 | `CHECKOUT-STABLE-DECLARATION-V2.md` | Active | B2B checkout · PaymentCore Stable 범위 (V1 SUPERSEDED) |
-| `KPA-SOCIETY-SERVICE-STRUCTURE.md` | Active | KPA 3-Service 구조 정의 |
+| `KPA-SOCIETY-SERVICE-STRUCTURE.md` | Superseded | 옛 단일 도메인 구조 — 은퇴 안내만 남김 (2026-10-20) |
 | `E-COMMERCE-ORDER-CONTRACT.md` | SUPERSEDED (2026-10-07 → `CHECKOUT-STABLE-DECLARATION-V2.md` §2 · `O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md`) | 구 주문 생성 계약 — `createOrder()` 단일 지점 규칙은 V2 §2 가 유지 · `OrderType` 열거는 stale |
 | `ROLE-POLICY-AND-GUARD-V1.md` | Active | Admin/Operator 권한 정책 + Guard 기준 |
 | `core-boundary.md` | Active | Core/Domain 서비스 경계 |

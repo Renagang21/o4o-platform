@@ -1,3 +1,4 @@
+import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
@@ -420,10 +421,6 @@ const StoreManagementPage = lazy(() =>
 const OrdersManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OrdersManagementPage }))
 );
-// WO-O4O-ROLE-MANAGEMENT-UI-V1
-const RoleManagementPage = lazy(() =>
-  import('./pages/operator').then((m) => ({ default: m.RoleManagementPage }))
-);
 // WO-O4O-AUDIT-ANALYTICS-LAYER-V1
 const OperatorAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
@@ -760,6 +757,8 @@ function App() {
               <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/operator/service-contact/:serviceKey/settings" element={<ServiceContactSettingsPage />} />
+              <Route path="/operator/service-contact/:serviceKey" element={<ServiceContactPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
                   CMS(cms/public/page) 라우터가 프로덕션에 마운트되어 있지 않아 항상 404 →
                   "준비 중" 만 노출되던 경로. 다른 4서비스와 같은 service_policy_documents
@@ -1083,7 +1082,7 @@ function App() {
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
               {/* /admin/supplier-quality · /admin/market-trial alias 는 아래 서브도메인 운영자 블록으로 옮겼다 */}
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
-              <Route path="/admin/roles" element={<RoleManagementPage />} />
+              <Route path="/admin/roles" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />
@@ -1144,6 +1143,7 @@ function App() {
               <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/operator/legal/supplier" element={<SubdomainOperatorRoute serviceKey="supplier" level="admin"><ServiceLegalSettingsPage serviceKey="supplier" /></SubdomainOperatorRoute>} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+              <Route path="/admin/supplier-governance/operators" element={<OperatorsPage scope="supplier" />} />
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="supplier" level="operator">
@@ -1169,6 +1169,7 @@ function App() {
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/home-presentation/funding" element={<HomePresentationPage surface="funding" />} />
+              <Route path="/operator/market-trial/operators" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><OperatorsPage scope="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1196,6 +1197,7 @@ function App() {
             }>
               <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
               <Route path="/admin/communities" element={<Navigate to="/admin/communities/members" replace />} />
+              <Route path="/admin/communities/operators" element={<OperatorsPage scope="community" />} />
               <Route path="/admin/communities/members" element={<CommunityServiceManagementPage kind="members" permanent />} />
               <Route path="/admin/communities/boards" element={<CommunityServiceManagementPage kind="boards" permanent />} />
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/admin/forum-deleted" element={<Navigate to="/admin/communities/boards" replace />} />}

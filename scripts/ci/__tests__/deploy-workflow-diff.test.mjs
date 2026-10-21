@@ -20,7 +20,7 @@ on:
       - main
 env:
   PROJECT_ID: netureyoutube
-  VITE_SERVICE_URL_KPA_SOCIETY: https://kpa-society.co.kr
+  VITE_SERVICE_URL_KPA_SOCIETY: https://old-pharmacy.example.test
   VITE_UNIFIED_STORE_HANDOFF: 'false'
 jobs:
   deploy-hold-notice:
@@ -76,13 +76,13 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
   });
 
   it('W2 BUILD INPUT — build-arg env 값 변경, 서비스가 ARG 를 읽음 → 그 서비스만 build', () => {
-    const a = analyze(mutate([['https://kpa-society.co.kr', 'https://pharmacy.neture.co.kr']]), () => true);
+    const a = analyze(mutate([['https://old-pharmacy.example.test', 'https://pharmacy.neture.co.kr']]), () => true);
     assert.equal(a['kpa-society'].build.length, 1);
     assert.ok(empty(a.neture), 'env 를 참조하지 않는 서비스는 무영향');
   });
 
   it('W3 BUILD INPUT 인데 ARG 를 아무도 읽지 않음(실측: kpa-society/k-cosmetics VITE_SERVICE_URL) → 무영향 + 사유', () => {
-    const a = analyze(mutate([['https://kpa-society.co.kr', 'https://pharmacy.neture.co.kr']]), (arg) => (arg === 'VITE_SERVICE_URL' ? false : true));
+    const a = analyze(mutate([['https://old-pharmacy.example.test', 'https://pharmacy.neture.co.kr']]), (arg) => (arg === 'VITE_SERVICE_URL' ? false : true));
     assert.ok(empty(a['kpa-society']));
     assert.match(a['kpa-society'].notes[0], /VITE_SERVICE_URL 를 읽지 않음/);
   });
@@ -165,12 +165,12 @@ describe('W+. assessRisk 통합 — 원문 주입 시 workflow 변경이 서비�
   });
 
   it('소비되지 않는 build-arg 값 변경 → 배포 없음', () => {
-    const r = run(mutate([['https://kpa-society.co.kr', 'https://pharmacy.neture.co.kr']]), () => false);
+    const r = run(mutate([['https://old-pharmacy.example.test', 'https://pharmacy.neture.co.kr']]), () => false);
     assert.equal(r.deploy_required, false);
   });
 
   it('소비되는 build-arg 변경 → 그 서비스만 LEVEL_2', () => {
-    const r = run(mutate([['https://kpa-society.co.kr', 'https://pharmacy.neture.co.kr']]), () => true);
+    const r = run(mutate([['https://old-pharmacy.example.test', 'https://pharmacy.neture.co.kr']]), () => true);
     assert.deepEqual(r.affected_services, ['kpa-society']);
     assert.equal(r.services['kpa-society'].level, LEVEL_2);
   });
