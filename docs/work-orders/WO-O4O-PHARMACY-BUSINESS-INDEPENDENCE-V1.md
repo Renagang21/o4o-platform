@@ -19,6 +19,8 @@
 | D3 | **약관 · 정책 문서는 사업별로 따로 둔다.** 내용이 비슷해도 하나를 공유하지 않는다. 각 사업의 약관은 그 사업에 속하며 그 사업 단위로 관리 · 게시 · 동의 기록한다. | 사용자 2026-10-20 |
 | D4 | 기존 `service_key='kpa-society'` 회원 · 약관 동의 · 콘텐츠는 의미 없는 테스트 데이터다. 데이터 이전 단계를 두지 않는다. | 사용자 2026-10-20 |
 | D5 | 사업 식별은 서비스 키가 아니라 사업 데이터 행(`semi_franchises.key`)으로 한다. 이 결정은 유지한다(D1 은 pharmacy 를 이 방식에 맞추는 것). | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) L59 · [RBAC-ROLE-CATALOG-V1](../rbac/RBAC-ROLE-CATALOG-V1.md) L164-182 |
+| D7 | **옛 KPA 운영 · 관리 화면은 남기지 않는다.** `kpa:operator` · `kpa:admin` 으로 들어가는 운영 콘솔(`/operator/*` · `/admin/*`)과 그 화면이 쓰는 KPA 전용 화면을 이전하지 않고 삭제한다. pharmacy 에 필요한 운영 화면은 다른 세 사업과 같은 사업 운영 화면(`/operator/semi-franchises`) 기준으로 새로 만든다. | 사용자 2026-10-21 |
+| D8 | **KPA 분회와 같이 쓰던 테이블과의 관계를 끊는다.** pharmacy 는 `kpa_organizations` · `kpa_members` · `kpa_pharmacist_profiles` 를 읽거나 쓰지 않는다. KPA 분회는 새로 만들 예정이며, 그 테이블 설계는 분회를 새로 만들 때 정한다. 이 WO 는 분회 쪽 테이블 · 코드를 바꾸지 않는다. | 사용자 2026-10-21 |
 | D6 | **은퇴 도메인 관련 내용은 전부 삭제한다**: `kpa-society.co.kr` · `k-cosmetics.site` · `glycopharm.co.kr` · `pharmacyhub.co.kr` · `siteguide.co.kr` · `glucoseview.co.kr`. 혼선을 막기 위해서다. 옛 주소 지원(CORS · 쿠키 · 세션 판정 · 분회 옛 경로 이동)도 남기지 않는다. 외부 DNS 는 사용자가 정리 완료(2026-10-20). | 사용자 2026-10-20 |
 
 D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공통 계정 축(`neture`)이다. 사업 독립은 사업 가입 원장 · 사업 범위 데이터 · 사업별 약관으로 구현한다. 이 해석이 사용자 의도와 다르면 단계 1 시작 전에 정정한다.
@@ -82,6 +84,22 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 ### 단계 4 — 프런트
 - `services/web-kpa-society`: `'kpa-society'` 하드코딩을 `BUSINESS_SITE` 기반 사업 범위 키로 교체. megapharm 도메인에서 pharmacy 데이터가 보이지 않음을 실브라우저로 확인.
 - `services/web-neture`(carepharm) · `services/web-pharmacy-coop`(pharmcoop): 사업별 약관 · 가입 흐름을 같은 수준으로 맞춘다.
+
+### 단계 4-a — 프런트 1차: 옛 KPA 화면 삭제 (D7 · D8) · 완료(이 branch)
+- `services/web-kpa-society/src` 파일 329개 삭제 — 옛 운영 · 관리 콘솔(`/operator/*` · `/admin/*` · `routes/OperatorRoutes`), 로컬 매장 화면(`pages/pharmacy` 64개 — 같은 화면의 정본은 `services/web-store/src/pages/pharmacy`), 가이드 · 서비스 소개, KPA 커뮤니티 홈 · 콘텐츠 · 자료실 · 설문 · 참여 · 마이페이지 KPA 화면, 그 화면만 쓰던 `api/*` · 컴포넌트.
+- 매장 진입: `/store/*` · `/hub/*` · `/store-hub/*` 는 조건 없이 `KpaUnifiedStoreHandoff` 로 store.neture.co.kr 에 넘긴다(`PharmacyGuard` · 로컬 layout · `isUnifiedStoreHandoffEnabled` 제거). 공개 · 기기 경로(`/tablet/*` · `/store/:slug/products/:id` · `/store/:slug/blog*` · `/qr/:slug` · 다국어 · 외국인 제휴 · `/public/signage`)는 handoff 밖에 그대로 둔다.
+- 송출(TV) `/store/marketing/signage/play/:playlistId` 는 로컬 재생 화면이 없어졌으므로 `toKpaScopedStorePath` 가 서비스 지정 트리로 바꾸지 않고 web-store 최상위 chrome-free route 로 보낸다(그대로 두면 `/work/kpa-society/store/...` 에 route 가 없어 404).
+- D8: `AuthContext` 의 `/kpa/me-context` 보강(`activityType` · `isStoreOwner` · `kpaMembership`) 제거. 매장 접근 판정은 handoff 목적지가 한다.
+- 계약 테스트 정렬: 삭제 파일을 읽던 api-server spec 18개 · operator-core-ui 2개 · shared-space-ui 4개를 "파일 없음 · route 없음" 단언 또는 web-store 정본 단언으로 바꿨다.
+- 검증: web-kpa-society vitest 16 files / 121 tests PASS · `tsc --noEmit` PASS · `pnpm run build` PASS · KPA 참조 api-server spec 26 suites / 682 tests PASS · operator-core-ui 20 · shared-space-ui 136 PASS. 실브라우저 smoke 미실행(배포 전).
+
+#### 이번 단계에서 발견 · 미해결 (별도 처리)
+1. **공급자 콘텐츠 handoff 대상 막다른 길** — `apps/api-server/src/modules/neture/constants/supplier-content-handoff-targets.ts` 가 `kpa-society` 를 대상으로 두고, 그 승인 큐(`/api/v1/kpa/operator/approvals`)를 보던 프런트 `/operator/approvals` 화면은 삭제됐다. 수신 화면(사업 운영 화면) 결정 후 backend 대상 목록 정비 — 단계 3.
+2. **QR 랜딩 fallback** — `QrLandingPage` 가 대상 미해결 시 `/content/:id` 로 보내는데 이 경로는 이제 404. 공개 랜딩 계약이라 이번에 바꾸지 않았다.
+3. **`VITE_UNIFIED_STORE_HANDOFF` 미사용** — 앱이 더 이상 읽지 않는다. Dockerfile · 배포 workflow 의 인자는 인프라 변경이라 남겼다(정리 WO 필요).
+4. **web-store 잘못된 origin 버그(기존)** — `services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx:347`, `StoreContentEditPage.tsx:78,144`. 이번 범위 밖.
+5. **공유 guide copy 잔재** — `packages/shared-space-ui/src/guide/copy/kpa.ts`(`kpaServiceIntroProps`) 는 소비 화면이 없어졌다. 공용 패키지 export 변경이라 남겼다.
+6. **`/api/v1/kpa/*` backend** — 프런트 소비처가 줄었으므로 route 별 소비처 분석(`me-context` 포함) 후 pharmacy 쪽 경로 정리 — 단계 3.
 
 ### 단계 5 — 테스트 데이터 정리
 - 운영 DB read-only 로 `kpa-society` 범위 테스트 데이터 건수를 집계한다. 삭제는 운영 write 라 건별 사용자 승인 후 실행한다.

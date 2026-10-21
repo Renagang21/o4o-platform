@@ -59,8 +59,7 @@ function isCommunityActive(pathname: string): boolean {
     pathname.startsWith('/community') ||
     pathname.startsWith('/materials') ||
     pathname.startsWith('/my/participation') ||
-    pathname.startsWith('/forum') ||
-    pathname.startsWith('/resources')
+    pathname.startsWith('/tools')
   );
 }
 
@@ -90,7 +89,7 @@ export function MobileBottomNav() {
     if (!n.isRead) void notif.markAsRead(n.id);
     const target = resolveNotificationTarget(n);
     closeSheet();
-    navigate(target ?? '/mypage');
+    if (target) navigate(target);
   }
 
   async function handleLogout() {

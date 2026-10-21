@@ -59,13 +59,13 @@ describe('og:url · canonical', () => {
   const ogUrl = () => document.head.querySelector('meta[property="og:url"]')?.getAttribute('content') ?? null;
 
   it('공개 경로 — pharmacy host 기준 og:url · canonical', () => {
-    expect(applyPharmacyUrlMeta('/forum')).toBe('https://pharmacy.neture.co.kr/forum');
-    expect(ogUrl()).toBe('https://pharmacy.neture.co.kr/forum');
-    expect(canonical()).toBe('https://pharmacy.neture.co.kr/forum');
+    expect(applyPharmacyUrlMeta('/contact')).toBe('https://pharmacy.neture.co.kr/contact');
+    expect(ogUrl()).toBe('https://pharmacy.neture.co.kr/contact');
+    expect(canonical()).toBe('https://pharmacy.neture.co.kr/contact');
   });
 
   it('미등록(업무) 경로 — canonical 제거', () => {
-    applyPharmacyUrlMeta('/forum');
+    applyPharmacyUrlMeta('/contact');
     applyPharmacyUrlMeta('/store/some-internal-page');
     expect(ogUrl()).toBe('https://pharmacy.neture.co.kr/store/some-internal-page');
     expect(canonical()).toBeNull();
@@ -81,8 +81,9 @@ describe('공개 footer · /about 메타 — legacy "약사회" 브랜드 없음
     expect(KPA_FOOTER_SECTIONS.flatMap(s => s.links).some(l => l.href === '/community')).toBe(true);
   });
 
-  it('/about 메타 description 에 대한약사회 없음', () => {
-    expect(kpaSeoRegistry['/about'].description).not.toMatch(/약사회/);
+  it('공개 SEO 메타에 대한약사회 · 삭제된 옛 화면이 없다', () => {
+    expect(Object.values(kpaSeoRegistry).every(c => !/약사회/.test(c.description ?? ''))).toBe(true);
+    expect(['/about', '/forum', '/guide/intro'].some(path => path in kpaSeoRegistry)).toBe(false);
   });
 });
 

@@ -162,18 +162,22 @@ describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 �
   };
 
   it('옛 HUB는 가입 상태를 목적지에서 판정하며 내 매장 기능으로 항상 이전한다', () => {
-    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
+    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff />} />');
     expect(kpa).toContain("'/store/pharmacy/supply'");
     expect(kpa).toContain('`/store/library/${resource}`');
   });
 
-  it('내 매장·업무공간 handoff가 옛 KPA guard보다 먼저 동작한다', () => {
-    expect(kpa).toContain('<Route path="/store" element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
-    expect(kpa).toContain('<Route element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA guard · 로컬 매장 화면은 제거됐다.
+  it('내 매장 handoff 앞에 옛 KPA guard · 로컬 매장 layout 이 없다', () => {
+    expect(kpa).toContain('<Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />');
+    expect(kpa).not.toContain('PharmacyGuard');
+    expect(kpa).not.toContain('KpaStoreLayoutWrapper');
+    expect(kpa).not.toContain('KpaStoreWorkspaceWrapper');
   });
 
   it('공개 · 기기 경로는 /store gate 밖의 최상위 절대 경로로 선언돼 있다', () => {
-    for (const p of ['/store/marketing/signage/play/:playlistId', '/store/:slug/products/:id', '/store/:slug/blog', '/store/:slug/blog/:postSlug',
+    // 송출(/store/marketing/signage/play/:id)은 로컬 route 없이 handoff 가 공통 최상위 route 로 보낸다(unifiedStoreScope).
+    for (const p of ['/store/:slug/products/:id', '/store/:slug/blog', '/store/:slug/blog/:postSlug',
       '/qr/:slug', '/tablet/:slug', '/tablet/setup', '/multilingual-products/:publicKey', '/foreign-visitor/affiliate/:shortCode']) {
       const decl = routeDecl(kpa, `path="${p}"`);
       expect(decl).not.toContain('UnifiedStoreHandoff');
@@ -184,9 +188,10 @@ describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 �
 describe('KPA 앱 — 매장 handoff는 서비스 경로로, pharmacy 배포만 활성화', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
   it('handoff api 는 toKpaScopedStorePath 를 거친다', () => {
-    expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
-    expect(kpa).toContain('toKpaScopedStorePath(returnPath)');
-    expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
+    expect(kpa).toContain('const scopedPath = toKpaScopedStorePath(returnPath);');
+    expect(kpa).toContain('kpaStoreServicesApi.resolveWorkspaceEntryUrl(scopedPath)');
+    // D7: 활성화 flag 는 더 이상 읽지 않는다(배포 인자는 인프라 정리 WO 까지 그대로).
+    expect(kpa).not.toContain('isUnifiedStoreHandoffEnabled');
   });
   it('배포 workflow는 pharmacy 앱만 명시적으로 활성화하고 다른 서비스 기본값은 보존한다', () => {
     const deployment = read('.github/workflows/deploy-web-services.yml');

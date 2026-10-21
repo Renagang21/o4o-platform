@@ -77,9 +77,9 @@ export function ContactPage() {
         {/* ── CTA ── */}
         <section style={s.ctaSection}>
           <div style={s.ctaLinks}>
-            <a href="/about" style={s.ctaLink}>O4O 약국 소개 →</a>
-            <a href="/forum" style={s.ctaLink}>포럼 →</a>
-            <a href="/guide/intro" style={s.ctaLink}>이용 가이드 →</a>
+            <a href="/" style={s.ctaLink}>사업 홈 →</a>
+            <a href="/community" style={s.ctaLink}>회원 게시판 →</a>
+            <a href="/materials" style={s.ctaLink}>운영 자료 →</a>
           </div>
         </section>
 

@@ -25,7 +25,6 @@ import {
   defaultOperatorEntryPath,
   selectOperatorServices,
 } from '../../../../packages/operator-ux-core/src/service-switcher/createOperatorServicesApi';
-import { UNIFIED_MENU as KPA_MENU } from '../../../../services/web-kpa-society/src/config/operatorMenuGroups';
 import {
   UNIFIED_MENU as NETURE_MENU,
   NETURE_OPERATOR_DOMAIN_IA,
@@ -38,7 +37,23 @@ const code = (p: string) =>
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
 
-type Menu = typeof KPA_MENU;
+type Menu = typeof NETURE_MENU;
+
+/**
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 표준 IA 의 마지막 앱 소비처였던 KPA 옛 운영 화면
+ * (operatorMenuGroups · KpaOperatorDashboard · KpaOperatorLayoutWrapper)은 제거됐다.
+ * 항목 단위 도메인 분류 규칙은 서비스와 무관한 고정 fixture 로 검증한다.
+ */
+const IA_FIXTURE_MENU: Menu = {
+  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
+  approvals: [
+    { label: '콘텐츠 승인', path: '/operator/approvals', domain: 'service_operation' },
+    { label: '상품 신청', path: '/operator/product-applications' },
+  ],
+  users: [{ label: '회원', path: '/operator/members' }],
+  products: [{ label: '상품', path: '/operator/products' }],
+  analytics: [{ label: '분석', path: '/operator/analytics' }],
+} as Menu;
 
 /** 항목 path → 도메인 (top-pinned dashboard 제외) */
 function placementOf(menu: Menu): Map<string, string> {
@@ -127,54 +142,30 @@ describe('표준 Service Operator 최상위 IA (WO §8)', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => {
-  const kpa = placementOf(KPA_MENU);
+  const placed = placementOf(IA_FIXTURE_MENU);
 
-  it('KPA approvals 는 item 단위로 나뉜다: 콘텐츠 승인 → 서비스 운영 · 상품 신청/이벤트 오퍼/모집 노출 → 사업 운영', () => {
-    expect(kpa.get('/operator/approvals')).toBe('service_operation');
-    expect(kpa.get('/operator/product-applications')).toBe('business_operation');
-    expect(kpa.get('/operator/event-offers')).toBe('business_operation');
-    expect(kpa.get('/operator/recruitment-exposure')).toBe('business_operation');
+  it('approvals 는 item 단위로 나뉜다: 항목 override(service_operation) 우선 · 미지정 항목은 그룹 기본 도메인', () => {
+    expect(placed.get('/operator/approvals')).toBe('service_operation');
+    expect(placed.get('/operator/product-applications')).toBe('business_operation');
+    expect(placed.get('/operator/members')).toBe('service_operation');
+    expect(placed.get('/operator/products')).toBe('business_operation');
   });
 
-  it('KPA: 회원 · 매장(가맹점) · 매장 지원 콘텐츠 · 공지 · 포럼 · 자료 · 설문 · 협업 문의 · 사이니지 → 서비스 운영 (강의 관리는 Lecture Operator 소유 — Phase 2 §14)', () => {
-    expect(kpa.has('/operator/lms')).toBe(false);
-    for (const p of [
-      '/operator/members', '/operator/stores', '/operator/store-channels', '/operator/blog', '/operator/pop', '/operator/qr',
-      '/operator/video', '/operator/multilingual-product-contents', '/operator/tablet/screen-sets',
-      '/operator/content', '/operator/community', '/operator/docs', '/operator/surveys', '/operator/collaboration-requests',
-      '/operator/resources', '/operator/qualification-requests', '/operator/guide-contents',
-      '/operator/signage/hq-media', '/operator/forum', '/operator/forum-requests',
-    ]) {
-      expect([p, kpa.get(p)]).toEqual([p, 'service_operation']);
-    }
-  });
-
-  it('KPA: 상품 · 주문 → 사업 운영 / 분석 · 감사 로그 → 운영 관리 / 역할 편집 제거', () => {
-    expect(kpa.get('/operator/products')).toBe('business_operation');
-    expect(kpa.get('/operator/orders')).toBe('business_operation');
-    expect(kpa.get('/operator/analytics')).toBe('operations_management');
-    expect(kpa.get('/operator/ai-report')).toBe('operations_management');
-    expect(kpa.get('/operator/audit-logs')).toBe('operations_management');
-    expect(kpa.has('/operator/roles')).toBe(false);
-  });
-
-  it.each([
-    ['web-kpa-society', KPA_MENU],
-  ] as const)('%s: dashboard 를 제외한 모든 항목이 정확히 한 도메인에 배치된다 (누락 0 · 중복 0)', (_svc, menu) => {
-    const paths = allPaths(menu);
-    const placed = resolveDomainGroupItems(menu, DEFAULT_OPERATOR_DOMAIN_IA).flatMap((e) => e.items.map((i) => i.path));
-    expect([...placed].sort()).toEqual([...paths].sort());
+  it('dashboard 를 제외한 모든 항목이 정확히 한 도메인에 배치된다 (누락 0 · 중복 0)', () => {
+    const paths = allPaths(IA_FIXTURE_MENU);
+    const all = resolveDomainGroupItems(IA_FIXTURE_MENU, DEFAULT_OPERATOR_DOMAIN_IA).flatMap((e) => e.items.map((i) => i.path));
+    expect([...all].sort()).toEqual([...paths].sort());
   });
 
   it('한 그룹이 두 도메인에 나뉘어도 각 도메인 안에서는 그룹이 한 번만 나타난다', () => {
-    const placed = resolveDomainGroupItems(KPA_MENU, DEFAULT_OPERATOR_DOMAIN_IA);
+    const entries = resolveDomainGroupItems(IA_FIXTURE_MENU, DEFAULT_OPERATOR_DOMAIN_IA);
     const seen = new Set<string>();
-    for (const e of placed) {
+    for (const e of entries) {
       const id = `${e.domainKey}:${e.groupKey}`;
       expect(seen.has(id)).toBe(false);
       seen.add(id);
     }
-    expect(placed.filter((e) => e.groupKey === 'approvals').map((e) => e.domainKey).sort()).toEqual([
+    expect(entries.filter((e) => e.groupKey === 'approvals').map((e) => e.domainKey).sort()).toEqual([
       'business_operation',
       'service_operation',
     ]);
@@ -193,38 +184,18 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => {
-  it.each([
-    ['web-kpa-society', KPA_MENU],
-  ] as const)('%s UNIFIED_MENU 의 /operator/* 항목은 App.tsx route 가 있다', (svc, menu) => {
-    const segs = operatorRouteSegments(svc);
-    for (const p of allPaths(menu, { includeTopPinned: true })) {
-      if (!p.startsWith('/operator')) continue; // adminOnly /admin/* 항목은 관리자 영역 route
-      assertRouteExists(svc, p, segs);
-    }
-  });
-
-  it.each([
-    ['web-kpa-society', 'services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx', KPA_MENU],
-  ] as const)('%s 대시보드 3도메인 축 · quick action 링크는 route 가 있다', (svc, file, menu) => {
-    const src = read(file);
-    const segs = operatorRouteSegments(svc);
-    const hrefs = [...src.matchAll(/(?:href|link):\s*'(\/operator[^']*)'/g)].map((m) => m[1]);
-    expect(hrefs.length).toBeGreaterThan(0);
-    for (const h of hrefs) assertRouteExists(svc, h, segs);
-    // 구 2축 키가 남아 있지 않다
-    expect(src).not.toMatch(/key:\s*'(community|store-hub)'/);
-    void menu;
-  });
-
-  it('KPA 대시보드 축은 표준 3도메인 키를 쓴다', () => {
-    for (const f of [
+  it('KPA 옛 운영 화면(메뉴 · 대시보드 · layout)은 제거됐고 App.tsx 에 /operator 대시보드 route 가 없다 (D7)', () => {
+    for (const p of [
+      'services/web-kpa-society/src/config/operatorMenuGroups.ts',
       'services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx',
+      'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
+      'services/web-kpa-society/src/routes/OperatorRoutes.tsx',
     ]) {
-      const src = read(f);
-      expect(src).toContain("key: 'service_operation'");
-      expect(src).toContain("key: 'business_operation'");
-      expect(src).toContain("key: 'operations_management'");
+      expect([p, existsSync(resolve(REPO, p))]).toEqual([p, false]);
     }
+    const segs = operatorRouteSegments('web-kpa-society');
+    expect(segs.has('/operator/*')).toBe(false);
+    void assertRouteExists;
   });
 });
 
@@ -310,7 +281,6 @@ describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
     expect(home).not.toContain('ROLE_PREFIX_TO_SERVICE');
     expect(home).not.toContain('OPERATOR_OR_ABOVE_ROLES');
     for (const w of [
-      'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
       'services/web-neture/src/components/layouts/OperatorLayoutWrapper.tsx',
     ]) {
       const c = code(w);
@@ -338,7 +308,8 @@ describe('Supplier → Service Operator 수신함 (WO §12)', () => {
   it('제공 대상 2 서비스 모두 운영자 진입이 있다: KPA=/operator/approvals(자체 승인) · PH=/operator/supplier-contents(공통 inbox) — K-Cos 는 운영 종료로 제외', () => {
     const targets = listSupplierContentHandoffTargets().map((t) => t.key).sort();
     expect(targets).toEqual(['kpa-society']);
-    expect(KPA_MENU.approvals!.some((i) => i.path === '/operator/approvals' && i.domain === 'service_operation')).toBe(true);
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 /operator/approvals 화면은 제거됐다.
+    //   수신 화면은 pharmacy.neture.co.kr 에 새로 만든다(미해결 — backend 대상 목록은 별도 WO).
   });
 
   it('공통 inbox 는 serviceKey 경계 + authorRole=supplier 로만 읽고, 기존 CMS 상태 전이만 호출한다 (새 원장 · workflow 0)', () => {

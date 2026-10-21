@@ -316,7 +316,6 @@ describe('9. dead shortcode 잔재 · 권한 계약 (WO-O4O-DEAD-SHORTCODE-RESID
   describe('보존 계약', () => {
     it('외국인 관광객 파트너 QR `shortCode` 식별자는 그대로다', () => {
       expect(readRoot('apps/api-server/src/modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.entity.ts')).toContain('shortCode');
-      expect(readRoot('services/web-kpa-society/src/api/foreignVisitorPartnerQrCodes.ts')).toContain('shortCode');
     });
 
     it('block-renderer 패키지와 소비처는 그대로다', () => {
