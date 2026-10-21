@@ -107,3 +107,11 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 - 새 회귀: 환경변수 키가 없는 인사이트 및 실제 관리자 CRUD HTTP 포함 3 suites, 26 PASS. 실제 격리 PostgreSQL 모델 설정 4 PASS(정책 먼저 저장→삭제 거절, 삭제 먼저→정책 거절 포함). API type-check PASS. 추가 정책 서비스·기존 runtime 회귀 및 build 결과는 후속 기록한다.
 
 추가 정책 서비스·질의 HTTP·동적 모델·다중 공급자·인사이트 회귀는 5 suites, 63 PASS, API 정식 build PASS다. 처음 실행에서는 신규 잠금 mock 및 기존 질의 HTTP fixture에 transaction/query 계약이 없어 실패했으며 fixture를 보완 후 재실행했다. 공급자 유료 호출을 사용하지 않았다.
+
+### 후속 리뷰: 관리자 블록·기존 엔진 경로
+
+관리자 블록의 OpenAI transport는 기존 Core의 `isReasoningGenerationModel` 판별을 재사용해 GPT-5/6·o-series에는 `max_completion_tokens`를 보내고 `temperature`/`max_tokens`는 생략한다. 구세대는 기존 파라미터를 유지한다. 전체 Core adapter 이관이나 재시도/요금 정책 변경은 하지 않았다.
+
+기존 `AiAdminService.activateEngine`도 정책 writer임을 추가 확인했다. 엔진 활성화와 일반 관리자 정책 저장을 같은 transaction advisory lock에 연결했다. 활성화는 삭제 표식을 검사한 후 엔진 플래그와 정책을 원자 저장하며 삭제된 모델은 409로 거절한다. 일반 정책 저장은 잠금 내부에서 최신 정책을 재조회하므로 오래된 모델 필드를 덮어쓰지 않는다. 앞 절의 "다른 app 쓰기 소비처 미확인"은 당시 조사 결과이며 이 추가 writer 확인으로 보완한다.
+
+실제 `generateContent` 진입점에서 GPT-6/GPT-5/o3/GPT-4.1 모델별 합성 HTTP body, 삭제된 비활성 엔진의 활성화/정책 무변경, 기존 CRUD·질의·정책 회귀: 5 suites, 48 PASS. API type-check PASS. 실제 유료 호출이나 엔진 운영 설정 변경은 하지 않았다.

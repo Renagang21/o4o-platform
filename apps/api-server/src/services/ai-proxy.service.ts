@@ -1,3 +1,4 @@
+import { isReasoningGenerationModel } from '@o4o/ai-core';
 import { ModelControlService } from './ai-management/model-controls.js';
 /**
  * AI Proxy Service
@@ -400,8 +401,9 @@ class AIProxyService {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
-          temperature,
-          max_tokens: maxTokens,
+          ...(isReasoningGenerationModel(model)
+            ? { max_completion_tokens: maxTokens }
+            : { temperature, max_tokens: maxTokens }),
           response_format: { type: 'json_object' },
         }),
         signal: controller.signal,
