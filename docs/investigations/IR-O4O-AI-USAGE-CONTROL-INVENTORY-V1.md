@@ -70,7 +70,7 @@
 | A16 | 이미지 분석 `/api/ai/vision/analyze` | Gemini / Q, route에서 직접 API 호출 | Q 모델 반영 | 공통 중지 미검사 | **미연결** | 텍스트 proxy의 usage 기록도 거치지 않음 [route][proxy-route] |
 | A17 | 관리자 생성 도구·일반 블록 생성 `/api/ai/generate` | 요청 provider/model → whitelist/default; OpenAI/Gemini/Claude transport | 요청값 우선; Q를 공통 기준으로 쓰지 않음 | 공통 중지 미검사 | **부분**, 성공/실패 usage log | 클라이언트 고정값·base URL 차이도 확인 필요 [proxy][proxy] [관리자 client][admin-generator] |
 | A18 | 상품 AI 태그 재생성·제안 `/api/v1/products/:productId/ai-tags/...` | F → `execute` | 모델 변경 미반영 | 공통 중지 미검사 | **미연결**, 상품 태그 결과/모델 저장만 존재 | `PRODUCT_TAGGING` scope 선언만으로 정책 연결이라 판단하면 안 됨 [태그][tagging] |
-| A19 | 전역 상품 설명·POP 등 `ai-contents/generate...`; `/api/v1/catalog-import/jobs/:id/apply`의 적용 상품 자동 생성; `/api/v1/products/:productId/ai-tags/regenerate` 완료 후 연쇄 생성 | P `PRODUCT_CONTENT`; `generateAllContents()`는 상품당 5개 유형을 순차 생성(최대 5회, 태그 호출 별도) | scope DB 정책 반영; 일반 Q와 별개 | P `isEnabled` 검사 | **연결**; 호출 시 사용자 ID 미전달 | 일괄 적용 상품 수 × 최대 5회 및 태그 후 연쇄 호출의 actor·한도 추적 필요 [상품 콘텐츠][product-content] [정책 실행기][policy] [일괄 적용][catalog-import] [공통 트리거][import-common] [태그 재생성][tag-controller] |
+| A19 | 전역 상품 설명·POP 등 `ai-contents/generate...`; `/api/v1/catalog-import/jobs/:id/apply`의 적용 상품 자동 생성; `/api/v1/products/:productId/ai-tags/regenerate` 완료 후 연쇄 생성 | P `PRODUCT_CONTENT`; `generateAllContents()`는 상품당 최대 5개 논리 생성을 순차 실행(각 생성의 retry/fallback·태그 호출 별도) | scope DB 정책 반영; 일반 Q와 별개 | P `isEnabled` 검사 | **연결**; 호출 시 사용자 ID 미전달 | 상품 수 × 최대 5개 논리 생성과 아래 retry/fallback 증폭의 actor·한도 추적 필요 [상품 콘텐츠][product-content] [정책 실행기][policy] [일괄 적용][catalog-import] [공통 트리거][import-common] [태그 재생성][tag-controller] |
 | A20 | 매장 콘텐츠 번역 `store-content` controller의 `/direct/:id/translate` | P `CONTENT_TRANSLATION` | scope 정책 반영 | P `isEnabled` 검사 | **연결**, 사용자 전달 | A21과 scope 공유로 독립 제어 불가 [번역][translation] [controller][store-content-route] |
 | A21 | 약국 다국어 상담 `/api/v1/neture/pharmacy/multilingual-consultation/translate` | P `CONTENT_TRANSLATION` + 상담 Extension | scope 정책 반영 | P `isEnabled` 검사 | **연결**, 사용자 전달 | 상담/콘텐츠 번역별 모델·중지·집계 분리가 필요한지 설계에서 확정 [상담 번역][consultation] |
 | A22 | KPA 선택 목록 요약 `/api/v1/kpa/operator/ai/summarize-selection` | F → `execute` | 모델 변경 미반영 | 공통 중지 미검사 | **미연결** | 운영자 보조 기능으로 식별 [KPA route][kpa] |
@@ -81,8 +81,10 @@
 | A27 | LMS 제출 과제 피드백 `/api/v1/ai/analyze`의 assignment | A26과 동일 | Q/P 모델 선택 미반영 | scope 중지 미검사 | **연결** `LMS_ASSISTANCE` | A26과 실행 공유; 기능별 결과 식별 필요 [LMS][lms] |
 | A28 | Copilot 운영 인사이트 `/api/v1/platform/copilot` 등록 controller | 환경 키 gate 후 R; Extension → 회계 wrapper | Gemini Q, OpenAI 환경값 | Q/P 중지 미검사 | **연결** `OPERATOR_INSIGHT`, 서비스·사용자 전달 | 비용 연결과 정책 제어 연결은 다름 [Copilot][copilot] |
 | A29 | Neture 운영 추천 행동 `/api/v1/neture/operator/actions` | 환경 키 유무로 Gemini 우선/OpenAI; 코드 모델 | Q/P 모델 선택 미반영 | scope 중지 미검사 | **연결** `OPERATOR_ACTIONS`, 사용자 전달 | 사용자/컨텍스트 캐시와 AI 호출을 구분 [운영 행동][actions] |
-| A30 | Neture 공급자 HUB AI 갱신 `/api/v1/neture/hub/trigger/ai-refresh` | 레거시 `runAIInsight`, 기본 Gemini/`gemini-2.5-flash`; 환경 키 | Q/P 모델 선택 미반영 | 공통 중지 미검사 | **미연결**, 반환 토큰·audit hook은 비용 원장과 별개 | API 등록 확인; HUB 페이지의 실제 진입/이용 여부는 미확인 [HUB][hub] [구 오케스트레이터][orchestrator] |
+| A30 | Neture 공급자 HUB AI 갱신 `/api/v1/neture/hub/trigger/ai-refresh` | 레거시 `runAIInsight`, 기본 Gemini/`gemini-2.5-flash`; 환경 키 | Q/P 모델 선택 미반영 | 공통 중지 미검사 | **미연결**, 반환 토큰·audit hook은 비용 원장과 별개 | API·`/workspace/hub` 화면 등록·POST 소비 코드 확인; 실제 운영 이용/현행 사업 적합성은 미확인 [HUB][hub] [구 오케스트레이터][orchestrator] |
 | A31 | 유료 음성 합성 API `/api/v1/platform/automation/tts` | 요청 provider, OpenAI `gpt-4o-mini-tts` / Gemini `gemini-3.1-flash-tts-preview` | 코드 고정 모델; 일반 관리자 선택 미반영 | 공통 중지 미검사; 플랫폼 관리자 guard 별도 | **미연결** | API 등록은 남음. 전용 호출 UI 미확인; 제거한 동영상 제작 메뉴를 복구하지 않음 [TTS][tts] [등록][mounts] |
+
+A19의 **논리 생성과 실제 공급자 시도 수는 다르다**. `generateAllContents()`는 상품당 최대 5개 유형을 생성하며 각 생성은 기존 정책의 `retryMax`(초기 시도 포함, 기본/seed 2)와 설정된 fallback 1회가 적용된다. 기본값과 fallback이 있는 예에서는 wrapper 기준 `5 × (2 + 1) = 15`회 시도까지 가능하다. 또한 [Gemini adapter][gemini-adapter]와 [OpenAI adapter][openai-adapter]는 JSON 파싱 실패 시 각 provider.complete 안에서 1회 추가 요청할 수 있어, 그 오류가 반복되는 JSON 경로는 같은 예에서 실제 HTTP 요청이 `5 × (2 × 2 + 1 × 2) = 30`회까지 늘 수 있다. 이는 전역 고정 상한이나 실제 청구 건수가 아니다. 운영 정책의 retryMax/responseMode, fallback 키·한도·오류에 따라 달라지므로 논리 생성 수나 wrapper attempts만을 물리 호출/비용 합계로 사용하지 않는다. 태그 생성 호출은 별도다.
 
 ## 4. 화면·공통 소비 코드 연결
 
@@ -98,7 +100,7 @@
 | 관리자 [pop.api](../../apps/admin-dashboard/src/api/pop.api.ts) | A19 | 전역 상품 콘텐츠 생성 API 호출 확인 |
 | Store [StoreMultilingualConsultationPage](../../services/web-store/src/pages/pharmacy/StoreMultilingualConsultationPage.tsx) | A21 | 번역은 서버, 음성 입력·읽기는 브라우저 기능 |
 | KPA [OperatorContentDetailPage](../../services/web-kpa-society/src/pages/operator/OperatorContentDetailPage.tsx), [ProductApplicationManagementPage](../../services/web-kpa-society/src/pages/operator/ProductApplicationManagementPage.tsx) | A22~A25 | 선택 목록/본문의 요약·추출·태그 호출 확인 |
-| Neture [HubPage](../../services/web-neture/src/pages/hub/HubPage.tsx) | A30 | `ai-refresh` client 구현 존재. 페이지의 현행 route 진입과 운영 이용은 미확인 |
+| Neture [HubPage](../../services/web-neture/src/pages/hub/HubPage.tsx) | A30 | [App route][neture-app]의 `/workspace/hub` → `HubPage` → `REFRESH_AI`/`ai-refresh` POST 소비 코드 확인. 실제 운영 이용은 미확인 |
 
 ## 5. 외부 호출과 구분해야 하는 코드·계획
 
@@ -198,6 +200,9 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 [guardrail]: ../../packages/types/src/ai-provider-guardrail.ts
 [admin-generator]: ../../apps/admin-dashboard/src/services/ai/SimpleAIGenerator.ts
 [tagging]: ../../apps/api-server/src/modules/store-ai/services/product-ai-tagging.service.ts
+[neture-app]: ../../services/web-neture/src/App.tsx
+[gemini-adapter]: ../../packages/ai-core/src/orchestration/providers/gemini.provider.ts
+[openai-adapter]: ../../packages/ai-core/src/orchestration/providers/openai.provider.ts
 [catalog-import]: ../../apps/api-server/src/modules/catalog-import/services/catalog-import.service.ts
 [import-common]: ../../apps/api-server/src/modules/neture/services/product-import-common.service.ts
 [tag-controller]: ../../apps/api-server/src/modules/store-ai/controllers/product-ai-tag.controller.ts
@@ -227,4 +232,6 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 
 사용자 main 병합·배포 지시에 따라 기존 PR #721을 재사용하고 설계 문서를 함께 검토한다. 원래 조사 기준 SHA와 당시 결과는 유지한다. Codex가 지적한 개발용 Gemini grounding·범용 파일 smoke의 유료 호출 가능 경로를 위 별도 분류에 추가했다. 31개 업무 사용처와 개발 스크립트를 합산하지 않으며, 해당 유료 스크립트는 실행하지 않았다. 이후 구현·운영 적용 여부는 현행 [AI 공통 기반](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)의 완료/후속 구분과 각 구현 기록을 따른다. 문서 통합은 운영 설정·DB write·신규 공급자 호출 승인이 아니다.
 
-추가 리뷰 보완: A31의 production-capable TTS smoke 소비처와 최대 2건 호출을 별도로 연결했다. A19에 상품 일괄 적용 및 태그 재생성 이후의 자동 콘텐츠 생성 진입점과 상품당 최대 5회 호출을 추가했다. 새로운 업무 사용처로 중복 집계하지 않으며, 기존 PRODUCT_CONTENT 공유 정책과 사용자 귀속 미전달을 유지해서 기록한다.
+추가 리뷰 보완: A31의 production-capable TTS smoke 소비처와 최대 2건 호출을 별도로 연결했다. A19에 상품 일괄 적용 및 태그 재생성 이후의 자동 콘텐츠 생성 진입점과 상품당 최대 5개 논리 생성과 wrapper/adapter retry 증폭을 구분해 추가했다. 새로운 업무 사용처로 중복 집계하지 않으며, 기존 PRODUCT_CONTENT 공유 정책과 사용자 귀속 미전달을 유지해서 기록한다.
+
+최신 main 통합 후 추가 대조: A30의 화면 route와 POST 소비 코드는 조사 기준 revision에도 존재함을 확인했다. 이는 운영 이용/사업 활성 판정이 아니며, 보류한 HUB 관리 기능을 새로 활성화하지 않는다. A19의 15회 wrapper 예와 adapter JSON 재시도를 포함한 30회 HTTP 예도 실제 공급자 청구 검증과 구분한다.
