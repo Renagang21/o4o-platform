@@ -165,19 +165,19 @@ export async function listSupplyOptions(
   const q = filter.q?.trim() ? `%${filter.q.trim()}%` : null;
   const limit = Math.min(Math.max(Number(filter.limit) || 50, 1), 200);
   const offset = (Math.max(Number(filter.page) || 1, 1) - 1) * limit;
-  const where = `WHERE ($2::text IS NULL OR o.kind = $2) AND ($3::text IS NULL OR o.sf_key = $3)
+  const where = (publicIndex: number, recruitmentIndex: number) => `WHERE ($2::text IS NULL OR o.kind = $2) AND ($3::text IS NULL OR o.sf_key = $3)
                    AND ($4::text IS NULL OR o.product_name ILIKE $4 OR o.supplier_name ILIKE $4)
-                   AND (NOT $7::boolean OR (o.kind = 'recruitment' AND o.sf_key IS NULL))
-                   AND ($8::text IS NULL OR (o.kind = 'recruitment' AND o.option_id::text = $8))`;
+                   AND (NOT $${publicIndex}::boolean OR (o.kind = 'recruitment' AND o.sf_key IS NULL))
+                   AND ($${recruitmentIndex}::text IS NULL OR (o.kind = 'recruitment' AND o.option_id::text = $${recruitmentIndex}))`;
 
   const rows = await exec.query(
-    `WITH ${ACCESS_CTE} ${SELECT_OPTION} ${where}
+    `WITH ${ACCESS_CTE} ${SELECT_OPTION} ${where(7, 8)}
       ORDER BY o.product_name, o.kind, o.unit_price, o.option_id
       LIMIT $5 OFFSET $6`,
     [organizationId, kind, publicOnly ? null : sfKey, q, limit, offset, publicOnly, recruitment],
   );
   const [{ count }] = await exec.query(
-    `WITH ${ACCESS_CTE} SELECT count(*)::int AS count FROM options o ${where.replaceAll('$7', '$5').replaceAll('$8', '$6')}`,
+    `WITH ${ACCESS_CTE} SELECT count(*)::int AS count FROM options o ${where(5, 6)}`,
     [organizationId, kind, publicOnly ? null : sfKey, q, publicOnly, recruitment],
   );
   return { items: rows.map(normalize), total: count };

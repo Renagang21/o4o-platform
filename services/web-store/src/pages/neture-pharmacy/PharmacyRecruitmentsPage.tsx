@@ -11,7 +11,7 @@ import { RefreshCw } from 'lucide-react';
 import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyRecruitment } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
-import { StoreBusinessTabs } from './StoreBusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
 import { useStoreBusinesses } from './useStoreBusinesses';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -68,18 +68,28 @@ function Recruitments() {
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       <StoreCommerceNavigation />
-      <StoreBusinessTabs businesses={businesses} value={business} publicSource onChange={key => setParams(previous => { const next = new URLSearchParams(previous); if (key) next.set('business', key); else next.delete('business'); return next; })} />
+      <StoreBusinessTabs businesses={businesses} value={business} publicSource onChange={key => setParams(previous => {
+        const next = new URLSearchParams(previous);
+        if (key) {
+          next.set('business', key);
+        } else {
+          next.delete('business');
+        }
+        return next;
+      })} />
       {message && <Notice>{message}</Notice>}
       {actionError && <Notice tone="error">{actionError} 같은 모집에서 다시 신청할 수 있습니다.</Notice>}
       {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>모집 다시 확인</button></Notice>}
-      {loading ? (
+      {loading && (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : error ? null : rows.length === 0 ? (
+      )}
+      {!loading && !error && rows.length === 0 && (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-          <p>{business ? `${businesses.rows.find(row => row.key === business)?.name ?? (business === '__public__' ? '일반 공개 모집' : '선택한 협업체')}의 조회된 모집이 없습니다.` : '지금 참여할 수 있는 모집이 없습니다.'}</p>
+          <p>{business ? `${storeBusinessName(businesses.rows, business)}의 조회된 모집이 없습니다.` : '지금 참여할 수 있는 모집이 없습니다.'}</p>
           <p className="mt-1">일반 공개 모집은 바로 표시되며, 협업체 모집은 가입 조건이 적용됩니다. <Link className="underline" to={pharmacyStorePath('semiFranchises')}>협업체 보기</Link></p>
         </div>
-      ) : (
+      )}
+      {!loading && !error && rows.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>

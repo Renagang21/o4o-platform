@@ -137,7 +137,8 @@ export function createStoreLibraryFeedController(
 
         // outer 필터 (source_group / tags @> 정확 매칭 / ai_mode). 'all' 은 source 절 없음.
         const mkOuterFilter = (sourceIdx: number, tagIdx: number, businessIdx: number) =>
-          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''} ${aiOnly ? `AND ai_mode IS NOT NULL` : ''} ${businessIdx ? `AND source_business_key = $${businessIdx}` : ''}`;
+          [sourceIdx && `AND source_group = $${sourceIdx}`, tagIdx && `AND tags @> $${tagIdx}::jsonb`,
+            aiOnly && 'AND ai_mode IS NOT NULL', businessIdx && `AND source_business_key = $${businessIdx}`].filter(Boolean).join(' ');
         const dataOuterFilter = mkOuterFilter(dSourceIdx, dTagIdx, dBusinessIdx);
         const countOuterFilter = mkOuterFilter(cSourceIdx, cTagIdx, cBusinessIdx);
 

@@ -8,14 +8,16 @@ export function StoreLibraryNavigation({ section }: Readonly<{ section: 'sources
   const { pathname, search } = useLocation();
   const params = new URLSearchParams(search);
   const business = params.get('business') || params.get('libraryBusiness') || '';
+  const sourceQuery = business ? `?business=${encodeURIComponent(business)}` : '';
+  const libraryQuery = business ? `?libraryBusiness=${encodeURIComponent(business)}` : '';
   const base = storeWorkspaceBase(pathname);
   const pharmacy = effectiveServiceKey === 'kpa-society';
   const link = (active: boolean) => `rounded-lg border px-4 py-2 text-sm ${active ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-700'}`;
   return <section className="mb-5 space-y-3" aria-label="매장 자료 관리">
     <nav className="flex flex-wrap gap-2" aria-label="자료함 구분">
-      {pharmacy && <NavLink to={`${base}/pharmacy/contents${business ? `?business=${encodeURIComponent(business)}` : ''}`} className={link(section === 'sources')}>제공 자료</NavLink>}
+      {pharmacy && <NavLink to={`${base}/pharmacy/contents${sourceQuery}`} className={link(section === 'sources')}>제공 자료</NavLink>}
       {!pharmacy && <NavLink to="/store/library/content" className={link(section === 'sources')}>제공 자료 찾기</NavLink>}
-      <NavLink to={`${base}/library/contents${business ? `?libraryBusiness=${encodeURIComponent(business)}` : ''}`} className={link(section === 'mine')}>내 컨텐츠</NavLink>
+      <NavLink to={`${base}/library/contents${libraryQuery}`} className={link(section === 'mine')}>내 컨텐츠</NavLink>
     </nav>
     <NavLink to={`${base}/workspace/use`} className="inline-block rounded-lg border border-teal-200 px-3 py-2 text-sm text-teal-800">저장한 자료 활용하기</NavLink>
     <p className="text-sm text-slate-500">가져온 자료는 내 매장의 독립 사본입니다. 원본이 변경되어도 자동으로 업데이트되지 않습니다.</p>

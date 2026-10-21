@@ -17,7 +17,7 @@ import {
   type SupplyOption,
 } from '../../api/neturePharmacy';
 import { useStoreBusinesses } from './useStoreBusinesses';
-import { StoreBusinessTabs } from './StoreBusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
@@ -57,22 +57,34 @@ function Conditions({ o }: { o: SupplyOption }) {
   );
 }
 
-export default function SupplyOptionsPage(props: { navigation?: ReactNode }) {
+type SupplyPageProps = Readonly<{ navigation?: ReactNode }>;
+
+function readSupplyQuery(params: URLSearchParams) {
+  const source = params.get('source') || 'all';
+  const explicitBusiness = params.get('business') || '';
+  const business = explicitBusiness || (source.startsWith('sf:') ? source.slice(3) : '');
+  const kind = source.startsWith('sf:') ? 'all' : source;
+  const query = params.get('q')?.trim() || '';
+  const rawPage = Number(params.get('page'));
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  return { source, explicitBusiness, business, kind, query, page, recruitment: params.get('recruitment') || '' };
+}
+function supplyEmptyText(query: string, business: string, name: string): string {
+  if (query) return '검색 조건에 맞는 주문 상품이 없습니다.';
+  if (business) return `${name}에서 지금 주문할 수 있는 상품이 없습니다.`;
+  return '지금 주문할 수 있는 공급 상품이 없습니다.';
+}
+
+export default function SupplyOptionsPage(props: SupplyPageProps) {
   const { organizationId } = useUnifiedStore();
   const { user } = useAuth();
   return <SupplyOptionsSession key={`${user?.id}:${organizationId}`} {...props} />;
 }
-function SupplyOptionsSession({ navigation }: { navigation?: ReactNode }) {
+function SupplyOptionsSession({ navigation }: SupplyPageProps) {
   const [params, setParams] = useSearchParams();
-  const source = params.get('source') || 'all';
-  const business = params.get('business') || (source.startsWith('sf:') ? source.slice(3) : '');
-  const kind = source.startsWith('sf:') ? 'all' : source;
-  const query = params.get('q')?.trim() || '';
+  const { source, explicitBusiness, business, kind, query, page, recruitment } = readSupplyQuery(params);
   const [q, setQ] = useState(query);
   useEffect(() => { setQ(query); }, [query]);
-  const rawPage = Number(params.get('page'));
-  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
-  const recruitment = params.get('recruitment') || '';
   const businesses = useStoreBusinesses();
   const change = (values: Record<string, string>) => setParams(previous => {
     const next = new URLSearchParams(previous); next.delete('page');
@@ -85,7 +97,7 @@ function SupplyOptionsSession({ navigation }: { navigation?: ReactNode }) {
   const [addingKey, setAddingKey] = useState<string | null>(null);
   const addBusy = useRef(false);
 
-  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, ...(params.get('business') ? { business } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE }), [source, business, recruitment, query, page, params]);
+  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, ...(explicitBusiness ? { business: explicitBusiness } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE }), [source, explicitBusiness, recruitment, query, page]);
   const { items, total, loading, error, load } = useLatestList<SupplyOption>(fetchList, listErrorMessage);
 
 
@@ -162,16 +174,18 @@ function SupplyOptionsSession({ navigation }: { navigation?: ReactNode }) {
       {recruitment && <p className="mb-3 text-sm text-slate-600">선택한 모집의 주문 가능 상품입니다. 검색 초기화로 다른 상품을 찾을 수 있습니다.</p>}
       {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>상품 다시 확인</button></Notice>}
 
-      {loading ? (
+      {loading && (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : error ? null : items.length === 0 ? (
+      )}
+      {!loading && !error && items.length === 0 && (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-          <p>{query ? '검색 조건에 맞는 주문 상품이 없습니다.' : business ? `${businesses.rows.find(row => row.key === business)?.name ?? (business === '__public__' ? '일반 공개 모집' : '선택한 협업체')}에서 지금 주문할 수 있는 상품이 없습니다.` : '지금 주문할 수 있는 공급 상품이 없습니다.'}</p>
+          <p>{supplyEmptyText(query, business, storeBusinessName(businesses.rows, business))}</p>
           <p className="mt-1">등록·승인된 공급 조건의 상품을 이곳에서 주문합니다. 가입 상태는 이용 사업에서 확인할 수 있습니다.{' '}
             <Link className="underline" to={pharmacyStorePath('semiFranchises')}>협업체 보기</Link>
           </p>
         </div>
-      ) : (
+      )}
+      {!loading && !error && items.length > 0 && (
         <>
           <p className="text-xs text-gray-500 md:hidden">표를 좌우로 밀어 공급조건과 담기 버튼을 확인하세요.</p>
           <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">

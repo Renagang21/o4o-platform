@@ -83,3 +83,5 @@ reason: push 후 통합 검토·수정 재현용. 기준 checkout·다른 작업
 현재 main `1adf577e38`의 새 공개 진입/문의·관리자·AI 관리 변경을 자기 branch에 일반 merge(`aec75fe3af`)했다. 이번 업무 변경과 파일 충돌이 없고 migration·의존성·workflow 변경도 없다. 다른 개발 branch를 포함시키지 않는다. 직전 main의 production 상태는 `DEPLOYED · deploy: api,admin`, Delivery `39601258231` 성공으로 확인했다.
 
 최신 결합 상태의 로컬 검사·PR CI·Codex, 병합 및 배포 결과는 이 절에 이어 기록한다. 실제 계정 업무·공급자 가격 확정·실 PG·QR/기기 검증의 기존 경계는 유지한다.
+
+PR #756 최초 HEAD `2172d17d7b`는 Codex 지적 0·긍정 반응, Store 753건/API 49건과 PC·모바일 재검증을 통과했다. 별도 SonarCloud 검사는 새 코드 신뢰성 C를 보고했다. GitHub check annotation 24건을 확인해 SQL 문자열 치환 대신 명시적 placeholder 번호로 같은 data/count 조건을 생성하고, 중첩된 화면 조건·URL 문자열을 정리했다. 사업명 표시를 로컬 함수로 모으고 props readonly·조건 분기 명확화·상태 output도 반영했다. 가입·공급가·수취 주체·권한 계약은 바꾸지 않았다. SQL 회귀에는 사업+출처+검색+태그를 동시에 적용하는 경우를 보강했다. 수정 후 결과를 별도로 확인한다.

@@ -10,7 +10,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder } from '../../api/neturePharmacy';
-import { StoreBusinessTabs } from './StoreBusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
 import { useStoreBusinesses } from './useStoreBusinesses';
 import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
 import { useUnifiedStore } from '../../contexts/StoreContext';
@@ -116,7 +116,15 @@ function PharmacyOrders() {
       <StoreCommerceNavigation />
       {message && <Notice>{message}</Notice>}
       {actionError && <Notice tone="error">{actionError}</Notice>}
-      <StoreBusinessTabs businesses={businesses} value={business} history publicSource onChange={key => setParams(prev => { const p = new URLSearchParams(prev); if (key) p.set('business', key); else p.delete('business'); return p; })} />
+      <StoreBusinessTabs businesses={businesses} value={business} history publicSource onChange={key => setParams(prev => {
+        const next = new URLSearchParams(prev);
+        if (key) {
+          next.set('business', key);
+        } else {
+          next.delete('business');
+        }
+        return next;
+      })} />
       <p className="mb-3 text-xs text-slate-500">최근 조회한 주문 최대 200건 기준입니다. 협업체 탭은 현재 약국의 가입 상태와 주문 당시 출처를 구분합니다.</p>
       {business && <p className="mb-3 text-sm text-slate-500">선택한 사업의 항목이 포함된 주문입니다. 주문 금액·결제 그룹은 원래 주문 전체 기준입니다.</p>}
       {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>주문 다시 확인</button></Notice>}
@@ -137,7 +145,7 @@ function PharmacyOrders() {
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : visibleOrders.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-          <p>{business ? `${businesses.rows.find(row => row.key === business)?.name ?? '선택한 출처'}의 조회된 주문 내역이 없습니다.` : '주문 내역이 없습니다.'}</p>
+          <p>{business ? `${storeBusinessName(businesses.rows, business)}의 조회된 주문 내역이 없습니다.` : '주문 내역이 없습니다.'}</p>
           <p className="mt-1"><Link className="underline" to={pharmacyStorePath('supply')}>공급 상품 보기</Link></p>
         </div>
       ) : (

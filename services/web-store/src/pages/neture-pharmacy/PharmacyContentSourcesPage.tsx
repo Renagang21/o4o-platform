@@ -17,7 +17,7 @@ import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent } from '../../api/neturePharmacy';
 import { WORKSPACE_PATHS } from '../../config/workspace';
-import { StoreBusinessTabs } from './StoreBusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
 import { useStoreBusinesses } from './useStoreBusinesses';
 import { useAuth } from '../../contexts/AuthContext';
 import { CAREPHARM_MATERIAL_TAGS } from '@o4o/shared-space-ui';
@@ -45,6 +45,12 @@ function ContentBody({ body }: { body: string | null }) {
   return <p className="whitespace-pre-wrap text-sm text-gray-700">{body}</p>;
 }
 
+function contentEmptyText(filtered: boolean, business: string, name: string): string {
+  if (filtered) return '검색 조건에 맞는 자료가 없습니다.';
+  if (business) return `${name}가 제공한 자료가 아직 없습니다.`;
+  return '이용할 수 있는 협업체 콘텐츠가 없습니다.';
+}
+
 export default function PharmacyContentSourcesPage() {
   const { organizationId } = useUnifiedStore();
   const { user } = useAuth();
@@ -61,6 +67,7 @@ function PharmacyContentSources() {
   const businesses = useStoreBusinesses();
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
+  const savedLibraryPath = sf ? `${libraryPath}?libraryBusiness=${encodeURIComponent(sf)}` : libraryPath;
   const selectedContentId = params.get('content') || '';
   const q = params.get('q')?.trim() || '';
   const tag = params.get('tag')?.trim() || '';
@@ -148,7 +155,7 @@ function PharmacyContentSources() {
 
       {copied && (
         <Notice>
-          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={`${libraryPath}${sf ? `?libraryBusiness=${encodeURIComponent(sf)}` : ''}`} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
+          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={savedLibraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
       {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
@@ -173,7 +180,7 @@ function PharmacyContentSources() {
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
-          <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : sf ? `${businesses.rows.find(row => row.key === sf)?.name ?? '선택한 협업체'}가 제공한 자료가 아직 없습니다.` : '이용할 수 있는 협업체 콘텐츠가 없습니다.'}</p>
+          <p>{contentEmptyText(Boolean(q || tag), sf, storeBusinessName(businesses.rows, sf))}</p>
           <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '협업체가 게시한 자료는 이 공간에 표시됩니다. 이미 가져온 사본은 내 컨텐츠에서 확인하세요.'}</p>
           <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">협업체 보기</Link>
         </div>

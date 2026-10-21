@@ -110,14 +110,14 @@ local('Store cooperation — actual local SQL, fixture actor and order creator',
   });
   it('retains snapshot business provenance after edits and membership loss, without leaking other stores', async () => {
     const snapshot = randomUUID();
-    await fixture.ds.query("INSERT INTO o4o_asset_snapshots(id,organization_id,source_service,asset_type,title,content_json) VALUES($1,$2,'semi-franchise','content','Original title',$3)", [snapshot,store,{semiFranchiseKey:'carepharm',semiFranchiseName:'Care fixture',body:'original'}]);
+    await fixture.ds.query("INSERT INTO o4o_asset_snapshots(id,organization_id,source_service,asset_type,title,content_json) VALUES($1,$2,'semi-franchise','content','Original title',$3)", [snapshot,store,{semiFranchiseKey:'carepharm',semiFranchiseName:'Care fixture',body:'original',tags:['Fixture']}]);
     await fixture.ds.query("INSERT INTO kpa_store_contents(id,organization_id,snapshot_id,source_type,title,content_json) VALUES($1,$2,$3,'snapshot_edit','Edited title',$4)",[randomUUID(),store,snapshot,{semiFranchiseKey:'other',body:'edited'}]);
     await fixture.ds.query("INSERT INTO o4o_asset_snapshots(id,organization_id,source_service,asset_type,title,content_json) VALUES($1,$2,'semi-franchise','content','Foreign copy',$3)",[randomUUID(),otherStore,{semiFranchiseKey:'carepharm'}]);
     await fixture.ds.query('DELETE FROM semi_franchise_memberships');
     const router = createStoreLibraryFeedController(fixture.ds, (_req,_res,next)=>next());
     const handler = (router as any).stack.find((entry:any)=>entry.route?.path==='/contents').route.stack.at(-1).handle;
     const response = { json:jest.fn(),status:jest.fn().mockReturnThis() };
-    await handler({query:{business:'carepharm',search:'Original',source:'franchise',tag:'',page:'1',limit:'20'},get:()=>null},response);
+    await handler({query:{business:'carepharm',search:'Original',source:'franchise',tag:'Fixture',page:'1',limit:'20'},get:()=>null},response);
     expect(response.json.mock.calls[0][0]).toMatchObject({success:true,data:{total:1,items:[{title:'Edited title',sourceBusinessKey:'carepharm',sourceName:'Care fixture'}]}});
   });
 });
