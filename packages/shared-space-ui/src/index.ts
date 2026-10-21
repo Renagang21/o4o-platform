@@ -334,3 +334,7 @@ export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } fro
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { CAREPHARM_MATERIAL_TAGS, CAREPHARM_MATERIAL_OUTLINES } from './cooperation/carepharmMaterials';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
+export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, serviceContactUrl } from './service-entry/PublicServiceEntry';
+export type { PublicServiceKey } from './service-entry/PublicServiceEntry';
+export { PublicServiceContact } from './service-entry/PublicServiceContact';
+export { ServiceContactInboxLink, useServiceContactCount } from './service-entry/ServiceContactInboxLink';

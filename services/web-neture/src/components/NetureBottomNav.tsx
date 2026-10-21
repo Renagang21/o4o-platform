@@ -53,6 +53,7 @@ export function NetureBottomNav() {
   const notif = useNotifications(notificationsApi, {
     enabled: isAuthenticated && !!user,
     serviceKey: NOTIFICATION_SERVICE_KEY,
+    pollIntervalMs: 30000,
   });
 
   function handleNotifTab() {

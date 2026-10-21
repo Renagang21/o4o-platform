@@ -171,6 +171,7 @@ function Layout() {
             <SiteLink to="/">연합회 홈</SiteLink>
             <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
             <SiteLink to="/about">연합회 소개</SiteLink>
+            <a href="https://neture.co.kr/contact?service=pharmcoop">Contact Us</a>
             {session.userId && (
               <>
                 <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
@@ -178,7 +179,7 @@ function Layout() {
               </>
             )}
             {canManageFederation(session) && (
-              <SiteLink to="/operator">연합회 운영</SiteLink>
+              <><SiteLink to="/operator">연합회 운영</SiteLink></>
             )}
           </nav>
           <span className="account-status">

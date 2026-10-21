@@ -323,12 +323,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
 
     // 8.2. Public Contact Inquiry (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
-    //   KCos 공개 문의 접수 + 운영자 in-app 알림. Neture/KPA 는 자체 경로 유지(미사용).
+    //   서비스별 공개 문의 접수 + 담당 운영자 알림. 이전 Neture/KPA 경로·이력은 유지.
     const { createPublicContactInquiryController } = await import('../modules/contact-inquiry/public-contact-inquiry.controller.js');
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
 
-    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — KCos 문의 조회·처리
+    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
     app.use('/api/v1/admin/services', createAdminContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry admin route registered at /api/v1/admin/services/:serviceKey/contact-inquiries');

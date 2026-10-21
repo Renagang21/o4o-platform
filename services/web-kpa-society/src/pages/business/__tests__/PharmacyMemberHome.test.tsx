@@ -80,9 +80,10 @@ describe('약국 회원 초기화면', () => {
     expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 20, sortBy: 'latest' } });
     expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/businesses/pharmacy/showcase', { headers: { 'X-Store-Organization-Id': 'store-a' } });
   });
-  it('미로그인은 원래 루트로 복귀하는 로그인으로 보내고 회원 데이터를 조회하지 않는다', async () => {
+  it('미로그인은 공개 소개·문의와 원래 루트로 돌아오는 로그인 링크를 보고 회원 데이터를 조회하지 않는다', async () => {
     mocks.user = null; render(tree('/'));
-    expect(await screen.findByTestId('destination')).toHaveProperty('textContent', '/login?returnTo=%2F');
+    expect(await screen.findByRole('link',{name:'로그인하고 이용하기'})).toHaveProperty('href',expect.stringContaining('/login?returnTo=%2F'));
+    expect(screen.getByRole('link',{name:'Contact Us'}).getAttribute('href')).toBe('/contact');
     expect(mocks.get).not.toHaveBeenCalled();
   });
   it('미승인 사용자에게 Hero·신청 안내만 제공하고 회원 데이터 조회를 하지 않는다', async () => {
@@ -210,7 +211,7 @@ it('다른 사업 운영자에게 호스트 사업으로 연결되는 관리 링
 it.each(['business-news', 'business-products'])('미로그인 회원의 %s 위치를 로그인 복귀 주소에 보존한다', async section => {
   mocks.user = null;
   render(tree(`/#${section}`));
-  expect(await screen.findByTestId('destination')).toHaveProperty('textContent', `/login?returnTo=${encodeURIComponent('/#' + section)}`);
+  expect((await screen.findByRole('link',{name:'로그인하고 이용하기'})).getAttribute('href')).toBe(`/login?returnTo=${encodeURIComponent('/#' + section)}`);
   expect(mocks.get).not.toHaveBeenCalled();
 });
 it('최근 혼합 페이지가 공지로만 채워져도 전체 게시판에 첫 글을 쓰라는 주장을 하지 않는다', async () => {

@@ -46,11 +46,16 @@ function isRateLimited(err: any): boolean {
 
 const SERVICE_KEY = 'kpa';
 
+// MegaPharm previously displayed the shared KPA scope. Keep that history while adding its own inquiries.
+function scopeParams(serviceKey?: string) {
+  return serviceKey === 'megapharm' ? {serviceKeys:'megapharm,kpa-society'} : {serviceKey};
+}
+
 export const notificationsApi: NotificationApiClient = {
   async getUnreadCount(params) {
     try {
       const res = await coreApiClient.get<UnreadCountResponse>('/notifications/unread-count', {
-        serviceKey: params?.serviceKey,
+        ...scopeParams(params?.serviceKey),
         organizationId: params?.organizationId,
       });
       return res?.data?.count ?? 0;
@@ -71,7 +76,7 @@ export const notificationsApi: NotificationApiClient = {
       const res = await coreApiClient.get<ListResponse>('/notifications', {
         page: params.page,
         limit: params.limit,
-        serviceKey: params.serviceKey,
+        ...scopeParams(params.serviceKey),
         organizationId: params.organizationId,
       });
       const data = res?.data ?? {};
