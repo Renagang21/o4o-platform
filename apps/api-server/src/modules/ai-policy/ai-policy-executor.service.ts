@@ -1,3 +1,4 @@
+import { prepareManagedAiRequest } from '../../services/ai-management/runtime-models.js';
 /**
  * AiPolicyExecutorService — WO-O4O-AI-POLICY-SYSTEM-V1
  *
@@ -128,7 +129,7 @@ export class AiPolicyExecutorService {
           }
         : undefined;
     return new AiAccountedExecution(this.dataSource, this.quotaService).invoke(
-      primary,
+      ['PRODUCT_CONTENT', 'CONTENT_TRANSLATION'].includes(scope) ? await prepareManagedAiRequest(this.dataSource, scope === 'PRODUCT_CONTENT' ? 'product.content' : 'store.translation', primary) : primary,
       { scope, userId: overrides?.userId },
       fallback,
     );

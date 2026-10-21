@@ -1,3 +1,4 @@
+import { useServiceContactCount } from '@o4o/shared-space-ui';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from '../config/businessSite';
 import BusinessStoreShortcut from '../pages/business/BusinessStoreShortcut';
@@ -21,7 +22,7 @@ import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/acc
 import type { NotificationItem } from '@o4o/account-ui';
 import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems, useKpaUserRoles } from './KpaUserMenu';
-import { resolveNotificationTarget } from '../lib/notificationRouting';
+import { openNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
 import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -62,15 +63,15 @@ export function KpaGlobalHeader() {
   // (KPA 로컬 SERVICE_KEY='kpa' 는 backend 와 불일치 — literal 'kpa-society' 사용)
   const notif = useNotifications(notificationsApi, {
     enabled: !!user,
-    serviceKey: 'kpa-society',
+    serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key,
+    pollIntervalMs: 30000,
   });
 
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
       // WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
       //   라우팅 규칙을 resolveNotificationTarget(SSOT)로 이관 — MobileBottomNav 알림 시트와 공유.
-      const target = resolveNotificationTarget(n);
-      if (target) navigate(target);
+      openNotificationTarget(n, navigate);
     },
     [navigate],
   );
@@ -81,9 +82,16 @@ export function KpaGlobalHeader() {
     contextual: [],
     conditions: {},
     trailing: [...(isHostWorkspace && (user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
-    guestTrailing: [],
+    guestTrailing: [{ label: 'Contact Us', href: '/contact' }],
     isAuthenticated: !!user,
   });
+
+  // Explicit legacy business assignees have the same server-confirmed contact access.
+  const newContacts = useServiceContactCount({client:authClient.api,serviceKey:BUSINESS_SITE.key === 'pharmacy'?'kpa-society':BUSINESS_SITE.key,accountId:user?.id,enabled:!!user && !isLoading});
+  const contactAllowed = newContacts !== null;
+  if (contactAllowed) computedNav.push({label:newContacts?`문의 관리 · 새 문의 ${newContacts}`:'문의 관리',href:`https://neture.co.kr/operator/service-contact/${BUSINESS_SITE.key==='pharmacy'?'kpa-society':BUSINESS_SITE.key}`});
+
+  if (!computedNav.some(item => item.href === '/contact')) computedNav.push({label:'Contact Us',href:'/contact'});
 
   // User 정보 변환
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.

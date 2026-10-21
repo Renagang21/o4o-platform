@@ -4,7 +4,7 @@ jest.mock('../modules/ai-policy/ai-quota.service.js', () => ({ AiQuotaService: j
 const mockExecute = jest.fn();
 const mockSave = jest.fn(async (value: unknown) => value);
 jest.mock('@o4o/ai-core', () => ({ ...jest.requireActual('@o4o/ai-core'), execute: (...args: unknown[]) => mockExecute(...args) }));
-jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true, getRepository: () => ({ create: (v: unknown) => v, save: mockSave }) } }));
+jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true, query: jest.fn(async () => []), getRepository: () => ({ create: (v: unknown) => v, save: mockSave }) } }));
 jest.mock('../services/ai-operations.service.js', () => ({ aiOperationsService: { recordRequest: jest.fn(), shouldAllowRequest: () => ({ allowed: true }), recordResult: jest.fn() } }));
 jest.mock('../services/ai-card-exposure.service.js', () => ({ aiCardExposureService: { selectCards: () => [] } }));
 import express from 'express';

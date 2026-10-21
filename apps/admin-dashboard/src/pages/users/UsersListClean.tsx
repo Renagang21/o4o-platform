@@ -15,8 +15,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, CheckCircle, Check, X } from 'lucide-react';
+import { RefreshCw, Check, X } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
@@ -27,7 +26,7 @@ import {
   type AdminUserDto,
   type AssignmentRow,
 } from '@/lib/assignment-row';
-import { getRoleOptions, getServiceOptions } from '@/lib/rbac-catalog';
+import { getRoleOptions, getServiceOptions, isOperatorRole } from '@/lib/rbac-catalog';
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -43,7 +42,6 @@ interface Facets {
 const EMPTY_FACETS: Facets = { service: '', role: '', status: '' };
 
 export default function UsersListClean() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
   // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
@@ -117,7 +115,7 @@ export default function UsersListClean() {
   };
 
   // assignment-row flatMap
-  const allRows = useMemo<AssignmentRow[]>(() => flattenUsersToAssignments(users), [users]);
+  const allRows = useMemo<AssignmentRow[]>(() => flattenUsersToAssignments(users.filter(user => Array.isArray(user.roles) && user.roles.length > 0)).filter(row => (!isOperatorRole(row.role) || row.parsedRole.serviceKey === 'platform') && !row.role.startsWith('platform:')), [users]);
 
   const filteredRows = useMemo<AssignmentRow[]>(() => {
     return allRows.filter((row) => {
@@ -227,12 +225,11 @@ export default function UsersListClean() {
             <img src={row.userAvatar} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />
           )}
           <div className="min-w-0">
-            <button
-              onClick={() => navigate(`/users/${row.userId}/edit`)}
+            <span
               className="font-medium text-blue-600 hover:text-blue-800 text-sm truncate block"
             >
               {row.userName}
-            </button>
+            </span>
             <div className="text-xs text-gray-500 truncate">@{row.username}</div>
           </div>
         </div>
@@ -285,13 +282,6 @@ export default function UsersListClean() {
         <RowActionMenu
           actions={[
             {
-              key: 'edit',
-              label: '권한 할당 편집',
-              icon: <CheckCircle size={14} />,
-              variant: 'primary',
-              onClick: () => navigate(`/users/${row.userId}/edit`),
-            },
-            {
               key: 'revoke',
               label: `권한 해제 (${row.roleMeta.label})`,
               variant: 'danger',
@@ -317,14 +307,11 @@ export default function UsersListClean() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="space-y-4 pt-4">
       <PageHeader
-        title="RBAC Role Assignments"
-        subtitle="Platform super-admin 전용 콘솔 — role_assignments SSOT (1 row = 1 user × 1 role)"
-        backUrl="/"
-        backLabel="Dashboard"
+        title="기존·기타 권한 정리"
+        subtitle="운영 역할 외의 기존 권한을 확인·해제합니다. 계정·서비스 가입은 유지됩니다. 회원 관리 업무는 각 서비스에서 처리합니다."
         actions={[
-          { id: 'add', label: 'New Assignment', onClick: () => navigate('/users/new'), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
@@ -370,8 +357,8 @@ export default function UsersListClean() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: 'All Services', options: getServiceOptions() },
-            { key: 'role', placeholder: 'All Roles', options: getRoleOptions() },
+            { key: 'service', placeholder: 'All Services', options: getServiceOptions().filter(option => allRows.some(row => row.parsedRole.serviceKey === option.value)) },
+            { key: 'role', placeholder: 'All Roles', options: getRoleOptions().filter(option => allRows.some(row => row.parsedRole.roleKey === option.value)) },
             { key: 'status', placeholder: 'All Status', options: STATUS_OPTIONS },
           ]}
           filterValues={facets as unknown as Record<string, string>}

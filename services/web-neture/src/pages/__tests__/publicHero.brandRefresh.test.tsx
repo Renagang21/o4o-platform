@@ -28,7 +28,7 @@ vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: {
 vi.mock('@o4o/shared-space-ui', async()=>({...await vi.importActual('@o4o/shared-space-ui'),ServiceHomeHero:()=>null,ServiceHomePromotion:()=>null}));
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
-import { getTrials } from '../../api/trial';
+import { getTrials, getMyParticipations } from '../../api/trial';
 import { MarketTrialHubPage } from '../market-trial/MarketTrialHubPage';
 
 const renderAt = (ui: ReactNode) => render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -73,14 +73,19 @@ describe('community `/`', () => {
 });
 
 describe('funding `/`', () => {
-  it('비로그인은 목록 API 호출 전에 로그인으로 이동한다', async () => {
+  it('비로그인은 공개 소개·문의를 제공하고 실제 이용에 로그인 링크를 제공한다', async () => {
     vi.mocked(getTrials).mockClear();
+    vi.mocked(getMyParticipations).mockClear();
     render(<MemoryRouter initialEntries={['/market-trial?status=recruiting']}><Routes>
       <Route path="/market-trial" element={<MarketTrialHubPage />} />
       <Route path="/login" element={<h1>로그인</h1>} />
     </Routes></MemoryRouter>);
-    expect(await screen.findByRole('heading', { name: '로그인' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: '유통참여형 펀딩' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: '로그인' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Contact Us' }).getAttribute('href')).toBe('/contact');
+    expect(screen.getByRole('link', { name: '로그인하고 이용하기' }).getAttribute('href')).toBe('/login?returnUrl=%2Fmarket-trial%3Fstatus%3Drecruiting');
     expect(getTrials).not.toHaveBeenCalled();
+    expect(getMyParticipations).not.toHaveBeenCalled();
   });
 
   it('로그인 후 소개 배너 없이 모집 목록으로 진입한다', async () => {
