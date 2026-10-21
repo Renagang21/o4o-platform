@@ -110,8 +110,8 @@ A19의 **논리 생성과 실제 공급자 시도 수는 다르다**. `generateA
 | Care 등 scope 명칭 | [scope union][scopes]에 Care/Store 관련 명칭이 남아 있어도 실제 실행 소비처와 연결은 별개 | 선언만으로 운영 사용처·관리자 메뉴 생성 금지 |
 | 건강기능식품 설명 일괄 적용 스크립트 | [bulk-apply](../../apps/api-server/src/scripts/health-functional-food-store-description-bulk-apply.ts)의 `resolveGenerationCapability()`는 현재 `available: false` 반환 | 독립 실행기의 회계/한도 연결 미구성. 실제 유료 생성 사용처로 산정하지 않음; 실행하지 않음 |
 | 이미지 개발 smoke | [astra-image-smoke](../../scripts/ai/astra-image-smoke.mts)는 수동 실행 시 OpenAI 유료 호출 가능 | **개발용 호출**, 공통 비용 기록 미연결. 이번 조사에서는 실행하지 않음 |
-| Gemini grounding 개발 smoke | [gemini-grounding-smoke](../../scripts/ai/gemini-grounding-smoke.mts)는 수동 실행 시 실제 Gemini grounding 생성 호출과 출처 메타데이터를 확인 | **개발용 유료 호출 가능**, 공통 비용 원장·업무 quota 연결 밖. 환경변수의 키·모델을 공통 execute에 직접 주입하며 이번 조사·통합에서는 실행하지 않음 |
-| 범용 파일 구조 추론 개발 smoke | [generic-file-understanding-smoke](../../scripts/ai/generic-file-understanding-smoke.mts)는 합성 CSV와 기존 inference 서비스에 resolver를 주입해 생성 호출(재시도 포함 최대 2회) | **개발용 유료 호출 가능**, 공통 비용 원장 밖. CLI의 모델 resolver override는 관리 설정 적용·운영 usage 수집과 별개. 이번 조사·통합에서는 실행하지 않음 |
+| Gemini grounding 개발 smoke | [gemini-grounding-smoke](../../scripts/ai/gemini-grounding-smoke.mts)는 수동 실행 시 실제 Gemini grounding 생성 호출과 출처 메타데이터를 확인(Core 기본 최대 2시도; text grounding은 JSON 내부 재시도 제외) | **개발용 유료 호출 가능**, 공통 비용 원장·업무 quota 연결 밖. 환경변수의 키·모델을 공통 execute에 직접 주입하며 이번 조사·통합에서는 실행하지 않음 |
+| 범용 파일 구조 추론 개발 smoke | [generic-file-understanding-smoke](../../scripts/ai/generic-file-understanding-smoke.mts)는 합성 CSV와 기존 inference 서비스에 resolver를 주입. 스크립트 최대 2개 논리 추론 시도 × Core 기본 2시도 × Gemini JSON 내부 최대 2요청 = 조건부 최대 8 HTTP 요청 가능 | **개발용 유료 호출 가능**, 공통 비용 원장 밖. CLI의 모델 resolver override는 관리 설정 적용·운영 usage 수집과 별개. 이번 조사·통합에서는 실행하지 않음 |
 | TTS production smoke 소비처 | [tts_ab_cut1.py](../../scripts/media/minerock600-pilot/ep01/tts_ab_cut1.py)는 기본 production API의 A31 TTS endpoint를 호출. `--only` 미지정 시 OpenAI와 Gemini를 순차 요청(최대 2건) | **운영 호출 가능 smoke**, 운영 UI와 구분. A31의 기존 endpoint·미연결 비용 경계를 그대로 따르며 이번 조사·통합에서는 실행하지 않음 |
 | Forum AI 요약·태그 | [ForumAIService](../../apps/api-server/src/services/forum/ForumAIService.ts)의 기본 `RuleBasedProvider`; 실제 외부 provider 주입 소비처 미확인 | 현재 확인 경로는 규칙 처리. 외부 API 사용량으로 산정하지 않음 |
 | 상품 AI 검색·추천 | [검색 서비스](../../apps/api-server/src/modules/store-ai/services/product-ai-search.service.ts), [추천 서비스](../../apps/api-server/src/modules/store-ai/services/product-ai-recommendation.service.ts)는 태그·DB 조회 | 검색 1회마다 새 LLM 호출이 발생하는 구조가 아님 |
@@ -237,3 +237,5 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 최신 main 통합 후 추가 대조: A30의 화면 route와 POST 소비 코드는 조사 기준 revision에도 존재함을 확인했다. 이는 운영 이용/사업 활성 판정이 아니며, 보류한 HUB 관리 기능을 새로 활성화하지 않는다. A19의 15회 wrapper 예와 adapter JSON 재시도를 포함한 30회 HTTP 예도 실제 공급자 청구 검증과 구분한다.
 
 자체 추가 대조: A15는 조사 기준 revision에도 lms-lesson surface를 전달하므로 기존 "surface 미전달" 문구를 정정했다. 해당 surface는 Qwen 허용 대상이 아니며 기존 Gemini 편집 실행 결과/권한은 바꾸지 않는다.
+
+개발 smoke도 동일 기준으로 보완했다. 범용 파일 스크립트의 MAX_ATTEMPTS=2는 외부 HTTP 전체 상한이 아니며 내부 Core·Gemini JSON 재시도를 포함하면 실패 반복 시 최대 8요청 예가 가능하다. grounding smoke는 Core 기본 2시도이고 text 모드라 JSON 내부 재시도는 없다. 둘 다 실제 호출·청구 검증은 수행하지 않았다.
