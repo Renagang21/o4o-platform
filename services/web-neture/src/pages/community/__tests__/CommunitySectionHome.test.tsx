@@ -14,6 +14,8 @@ const api = vi.hoisted(() => ({
   save: vi.fn(),
   forum: vi.fn(),
   pinForum: vi.fn(),
+  review: vi.fn().mockResolvedValue(null),
+  runReview: vi.fn(),
 }));
 vi.mock("../../../contexts", () => ({ useAuth: () => ({ user: null }) }));
 vi.mock("../communityHomeApi", async () => ({
@@ -65,7 +67,7 @@ describe("community section home", () => {
     await screen.findByText("notice-pin");
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((x) => x.textContent),
-    ).toEqual(["공지사항", "약사공론 뉴스", "포럼", "콘텐츠", "자료실"]);
+    ).toEqual(["공지사항", "약업계 주요 소식", "포럼", "콘텐츠", "자료실"]);
     const content = screen.getByRole("region", { name: "콘텐츠" });
     expect(within(content).getAllByRole("listitem")).toHaveLength(11);
     expect(within(content).getByText("상시 노출")).toBeTruthy();
@@ -158,8 +160,8 @@ describe("community section home", () => {
     api.manage.mockResolvedValue({ items: [], hasNext: false, page: 1 });
     mount(<Management />);
     await screen.findByText("등록된 항목이 없습니다.");
-    fireEvent.click(screen.getByRole("button", { name: "약사공론 뉴스" }));
-    await screen.findByLabelText("약사공론 기사 원문 URL");
+    fireEvent.click(screen.getByRole("button", { name: "약업계 주요 소식" }));
+    await screen.findByLabelText("기사 원문 URL (약사공론·데일리팜·메디파나)");
     expect(screen.queryByLabelText("본문")).toBeNull();
   });
 

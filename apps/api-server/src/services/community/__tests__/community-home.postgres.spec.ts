@@ -1,3 +1,4 @@
+import { reviewNews, getNewsReview } from "../community-news-review.service";
 import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from "../../../database/bootstrap/canonical-schema-baseline";
@@ -474,5 +475,93 @@ run("community home PostgreSQL visibility and persistence", () => {
     await expect(
       db.transaction((m) => pinHomeForum(m, actor, foreign, true)),
     ).rejects.toMatchObject({ status: 404 });
+  });
+  it("reserves daily AI work durably across concurrent operators and keeps controls private", async () => {
+    const draft = await save(
+      data({
+        kind: "news",
+        status: "draft",
+        linkUrl: "https://dailypharm.com/user/news/1",
+      }),
+    );
+    let resolve!: (value: any[]) => void;
+    let started!: () => void;
+    const hasStarted = new Promise<void>((r) => {
+      started = r;
+    });
+    const generate = jest.fn(async () => {
+      started();
+      return new Promise<any[]>((r) => {
+        resolve = r;
+      });
+    });
+    const first = reviewNews(db, actor, generate);
+    await hasStarted;
+    expect((await getNewsReview(db, actor))?.state).toBe("pending");
+    expect((await reviewNews(db, actor, generate)).state).toBe("pending");
+    resolve([
+      {
+        id: draft.id,
+        title: "제목",
+        summary: "요약",
+        linkUrl: "https://dailypharm.com/user/news/1",
+        sourceName: "데일리팜",
+        recommended: true,
+        reason: "실무 해설",
+        articleIds: [draft.id],
+      },
+    ]);
+    const done = await first;
+    expect(done.state).toBe("done");
+    expect(generate).toHaveBeenCalledTimes(1);
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    expect(
+      (await managedHomeItems(db, actor, "news")).items.map((i: any) => i.id),
+    ).toEqual([draft.id]);
+    await expect(getEditorial(db, user, done.id)).rejects.toMatchObject({
+      status: 404,
+    });
+    const applied = await save(
+      data({
+        kind: "news",
+        status: "published",
+        linkUrl: "https://dailypharm.com/user/news/1",
+        newsReviewId: done.id,
+      }),
+      draft.id,
+    );
+    expect(
+      (await getEditorial(db, user, applied.id)).newsRecommendation.recommended,
+    ).toBe(true);
+    await expect(
+      save(
+        data({
+          kind: "news",
+          linkUrl: "https://medipana.com/other",
+          newsReviewId: done.id,
+        }),
+        draft.id,
+      ),
+    ).rejects.toMatchObject({ code: "INVALID_NEWS_REVIEW" });
+    const edited = await save(
+      data({ kind: "news", linkUrl: "https://medipana.com/other" }),
+      draft.id,
+    );
+    expect(
+      (await getEditorial(db, user, edited.id)).newsRecommendation,
+    ).toBeNull();
+  });
+  it("persists a failed AI attempt and refuses another charge that day", async () => {
+    await save(
+      data({
+        kind: "news",
+        status: "draft",
+        linkUrl: "https://www.medipana.com/article/1",
+      }),
+    );
+    const generate = jest.fn().mockRejectedValue(Error("provider failure"));
+    expect((await reviewNews(db, actor, generate)).state).toBe("failed");
+    expect((await reviewNews(db, actor, generate)).state).toBe("failed");
+    expect(generate).toHaveBeenCalledTimes(1);
   });
 });

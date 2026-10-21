@@ -1,3 +1,8 @@
+import {
+  getNewsReview,
+  reviewNews,
+} from "../services/community/community-news-review.service.js";
+import { generateNewsSuggestions } from "../services/community/community-news-ai.service.js";
 import { Router, type Request, type RequestHandler } from "express";
 import { AppDataSource } from "../database/connection.js";
 import { asyncHandler } from "../middleware/error-handler.js";
@@ -138,6 +143,20 @@ export function createCommunityHomeRoutes(
       AppDataSource.transaction((m) =>
         pinHomeForum(m, req.user!.id, req.params.id, req.body?.isPinned),
       ),
+    ),
+  );
+  router.get(
+    "/community/management/news-review",
+    apiLimiter,
+    authenticate,
+    handle((req) => getNewsReview(AppDataSource, req.user!.id)),
+  );
+  router.post(
+    "/community/management/news-review",
+    apiLimiter,
+    authenticate,
+    handle((req) =>
+      reviewNews(AppDataSource, req.user!.id, generateNewsSuggestions),
     ),
   );
   return router;

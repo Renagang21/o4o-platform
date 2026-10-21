@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import {
   homeApi,
+  newsSourceName,
   itemHref,
   SECTION_NAMES,
   SECTION_PATHS,
@@ -44,6 +45,12 @@ export function PreviewItems({
               {item.title}
               {section === "news" ? " ↗" : ""}
             </a>
+            {section === "news" &&
+              item.newsRecommendation?.recommended === true && (
+                <span className="shrink-0 rounded bg-sky-50 px-2 py-1 text-xs text-sky-800">
+                  AI 추천
+                </span>
+              )}
           </div>
           {(item.summary || item.excerpt) && (
             <p className="mt-1 line-clamp-2 break-words text-sm text-slate-600">
@@ -51,7 +58,7 @@ export function PreviewItems({
             </p>
           )}
           <p className="mt-1 text-xs text-slate-500">
-            {section === "news" && "약사공론 · "}
+            {section === "news" && `${newsSourceName(item.linkUrl)} · `}
             {section !== "news" && item.boardName && `${item.boardName} · `}
             {new Date(item.createdAt).toLocaleDateString("ko-KR")}
           </p>

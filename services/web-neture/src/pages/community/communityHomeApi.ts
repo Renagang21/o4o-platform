@@ -8,7 +8,7 @@ export const EDITORIAL_KINDS = [
 export type EditorialKind = (typeof EDITORIAL_KINDS)[number];
 export const SECTION_NAMES: Record<EditorialKind | "forum", string> = {
   notice: "공지사항",
-  news: "약사공론 뉴스",
+  news: "약업계 주요 소식",
   forum: "포럼",
   content: "콘텐츠",
   resource: "자료실",
@@ -35,6 +35,11 @@ export interface HomeItem {
   audience?: "public" | "members";
   slug?: string;
   boardName?: string;
+  sourceName?: string;
+  recommended?: boolean;
+  reason?: string;
+  newsReviewId?: string;
+  newsRecommendation?: { recommended: boolean; reason: string };
 }
 export interface HomePreview {
   pinned: HomeItem[];
@@ -43,7 +48,35 @@ export interface HomePreview {
 export type CommunityHome = Record<EditorialKind | "forum", HomePreview> & {
   member: boolean;
 };
+export interface NewsReview {
+  id: string;
+  day: string;
+  state: "pending" | "done" | "failed";
+  items: HomeItem[];
+}
+export function newsSourceName(link?: string): string {
+  try {
+    const host = new URL(link ?? "").hostname.replace(/^www\./, "");
+    return (
+      (
+        {
+          "kpanews.co.kr": "약사공론",
+          "dailypharm.com": "데일리팜",
+          "medipana.com": "메디파나",
+        } as Record<string, string>
+      )[host] ?? "원문"
+    );
+  } catch {
+    return "원문";
+  }
+}
 export const homeApi = {
+  review: async () =>
+    (await api.get("/communities/community/management/news-review")).data
+      .data as NewsReview | null,
+  runReview: async () =>
+    (await api.post("/communities/community/management/news-review")).data
+      .data as NewsReview,
   home: async () => {
     const response = await api.get("/communities/community/home");
     const data = response.data?.data;
@@ -95,7 +128,7 @@ export function itemHref(
   section: EditorialKind | "forum",
   member = false,
 ) {
-  if (section === "news") return item.linkUrl || "https://www.kpanews.co.kr/";
+  if (section === "news") return item.linkUrl || SECTION_PATHS.news;
   if (section === "forum")
     return `/communities/community/${member ? "forum" : "public"}/post/${encodeURIComponent(item.slug ?? item.id)}`;
   return `${SECTION_PATHS[section]}/${item.id}`;
