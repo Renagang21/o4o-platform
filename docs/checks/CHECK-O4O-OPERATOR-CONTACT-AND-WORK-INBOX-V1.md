@@ -80,9 +80,11 @@ Pharmcoop 연합회와 개별 조합에 문의함/미처리 업무 표시를 연
 - 기존 상품·서비스 승인/상품 후보, 사업 이벤트, 펀딩 포럼 실패·모집 기한 경과도 실제 원장에서 조회한다. 자동 결과 판정·송금은 없다.
 - 전용 DB 잔존 0·다른 연결 0을 재확인하고 자기 PostgreSQL 및 preview 서버를 종료했다.
 - 실제 운영자 계정 정본은 작업/기준 checkout 모두 누락됐다. 실계정 검증은 미실행이며 합성 인증으로 대신 완료했다고 보고하지 않는다.
-- 통합 인계 branch: `wo/operator-contact-and-work-inbox`. 시작 main은 `e09db6eb4b`, 최종 fetch main은 `c9d9760aba`(#746 전체 관리자 약국 설정 정비)였다. 개발 중 main을 자동 merge/rebase하지 않았다. 통합 담당이 최신 main·필수 CI/리뷰를 확인한다.
+- 통합 인계 branch: `wo/operator-contact-and-work-inbox`. 시작 main은 `e09db6eb4b`, 기록 작성 중 fetch main은 `c9d9760aba`(#746 전체 관리자 약국 설정 정비)였다. 개발 중 main을 자동 merge/rebase하지 않았다. 통합 담당이 최신 main·필수 CI/리뷰를 확인한다.
 - DEPLOYMENT = MANUAL/GATED. 신규 migration 포함 운영 반영 승인은 별도로 확인해야 한다. 운영 적용·배포·PR은 실행하지 않았다.
 
 WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/operator-contact-and-work-inbox` / KEEP — 개발 push 후 PR·원격 CI·운영 migration·배포·실계정 검증 인계가 남는다.
 
 문서 정합: TODO 초안·코드/문서 재대조·추가 발견·검증 결과를 기록하고 SETUP에 격리 fixture 재현 절차를 추가했다. 과거 기록·canonical index/역할 정책은 변경하지 않았다.
+
+- push 직전 main은 `5c6150a6b0`(#747)로 이동했다. 겹치는 경로는 operatorMenuGroups.ts 1개이며 `git merge-tree --write-tree` 가상 병합은 충돌 0이었다. 실제 main 병합/branch 동기화는 하지 않았으며 통합 후 CI는 별도로 실행해야 한다.
