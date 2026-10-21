@@ -1,3 +1,5 @@
+import { ModelControlService } from '../../../services/ai-management/model-controls.js';
+import { TTS_PROVIDERS } from '../services/tts-narration.service.js';
 /**
  * TTS Narration API — WO-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1
  *
@@ -18,7 +20,7 @@ import { TtsNarrationService, validateTtsRequest } from '../services/tts-narrati
 
 export function createTtsNarrationRouter(ds: DataSource): Router {
   const router = Router();
-  const service = new TtsNarrationService((provider) => resolveAiApiKey(ds, provider));
+  const service = new TtsNarrationService((provider) => resolveAiApiKey(ds, provider), undefined, async provider => (await new ModelControlService(ds).resolve('audio.synthesis.' + provider, { provider, model: TTS_PROVIDERS[provider].model })).model);
   router.post('/automation/tts', [authenticate, requireMediaPlatformAdmin], async (req: Request, res: Response) => {
     try {
       if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) throw new MediaCatalogError('INVALID_BODY');

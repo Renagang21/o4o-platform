@@ -1,0 +1,486 @@
+import type { DataSource } from "typeorm";
+import {
+  MODEL_WHITELIST,
+  GEMINI_CANONICAL_MODEL,
+} from "../../types/ai-proxy.types.js";
+import { AI_USAGE_CATALOG } from "./catalog.js";
+
+export const MODEL_CONTROL_KEY = "ai:model-controls:v1";
+export const MODEL_PROVIDERS = [
+  "gemini",
+  "openai",
+  "claude",
+  "qwen",
+  "deepseek",
+] as const;
+export type ModelProvider = (typeof MODEL_PROVIDERS)[number];
+export type ModelCapability = "text" | "image" | "grounding" | "speech";
+export interface ManagedModel {
+  provider: ModelProvider;
+  id: string;
+  name: string;
+  capabilities: ModelCapability[];
+}
+export interface ModelSelection {
+  provider: ModelProvider;
+  model: string;
+}
+interface Control {
+  revision: number;
+  models: ManagedModel[];
+  deleted: string[];
+  selections: Record<string, ModelSelection>;
+}
+type Database = Pick<DataSource, "query" | "isInitialized">;
+const CAPABILITIES: readonly ModelCapability[] = [
+  "text",
+  "image",
+  "grounding",
+  "speech",
+];
+const keyOf = (provider: string, model: string) => provider + ":" + model;
+const sharedScopes: Record<string, string> = {
+  "product.content": "policy.PRODUCT_CONTENT",
+  "store.translation": "policy.CONTENT_TRANSLATION",
+  "pharmacy.consultation": "policy.CONTENT_TRANSLATION",
+};
+export const modelTargetId = (usage: string) => sharedScopes[usage] ?? usage;
+const multiProvider = new Set([
+  "home.chat",
+  "work.planning",
+  "work.planning.strong",
+  "work.vision",
+  "assistant.understanding",
+  "lms.quiz",
+  "lms.assignment",
+  "operator.insight",
+  "operator.actions",
+  "supplier.hub",
+  "policy.PRODUCT_CONTENT",
+  "policy.CONTENT_TRANSLATION",
+]);
+export const MODEL_TARGETS = [
+  ...new Map(
+    AI_USAGE_CATALOG.filter(
+      (x) => !["audio.synthesis", "supplier.hub"].includes(x.id),
+    ).map((usage) => {
+      const id = modelTargetId(usage.id);
+      return [
+        id,
+        {
+          id,
+          name:
+            id === "policy.CONTENT_TRANSLATION"
+              ? "매장 콘텐츠·약국 상담 번역 (공유)"
+              : usage.name,
+          providers: (usage.id === "admin.blocks"
+            ? ["gemini", "openai", "claude"]
+            : multiProvider.has(id)
+              ? ["gemini", "openai"]
+              : ["gemini"]) as ModelProvider[],
+          capability: ([
+            "home.attachments",
+            "work.vision",
+            "image.analysis",
+          ].includes(usage.id)
+            ? "image"
+            : ["research.authenticated", "hospital.research"].includes(usage.id)
+              ? "grounding"
+              : "text") as ModelCapability,
+        },
+      ];
+    }),
+  ).values(),
+  {
+    id: "work.planning.strong",
+    name: "업무 복구 · 강화 모델 (이미지 지원)",
+    providers: ["gemini", "openai"] as ModelProvider[],
+    capability: "image" as ModelCapability,
+  },
+  ...(["gemini", "openai"] as const).map((provider) => ({
+    id: "audio.synthesis." + provider,
+    name: "음성 합성 · " + provider,
+    providers: [provider] as ModelProvider[],
+    capability: "speech" as ModelCapability,
+  })),
+];
+
+export class ModelControlError extends Error {
+  constructor(
+    public status: number,
+    public code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+const fail = (status: number, code: string, message: string): never => {
+  throw new ModelControlError(status, code, message);
+};
+function defaults(): Control {
+  const models: ManagedModel[] = Object.entries(MODEL_WHITELIST).flatMap(
+    ([provider, ids]) =>
+      ids.map((id) => ({
+        provider: provider as ModelProvider,
+        id,
+        name: id,
+        capabilities: (provider === "gemini" &&
+        [GEMINI_CANONICAL_MODEL, "gemini-2.5-flash", "gemini-2.5-pro"].includes(
+          id,
+        )
+          ? ["text", "image", "grounding"]
+          : ["text", "image"]) as ModelCapability[],
+      })),
+  );
+  models.push(
+    {
+      provider: "openai",
+      id: "gpt-4o-mini",
+      name: "gpt-4o-mini",
+      capabilities: ["text", "image"],
+    },
+    {
+      provider: "openai",
+      id: "gpt-4o-mini-tts",
+      name: "gpt-4o-mini-tts",
+      capabilities: ["speech"],
+    },
+    {
+      provider: "gemini",
+      id: "gemini-3.1-flash-tts-preview",
+      name: "gemini-3.1-flash-tts-preview",
+      capabilities: ["speech"],
+    },
+  );
+  return { revision: 0, models, deleted: [], selections: {} };
+}
+function validateModel(input: unknown): ManagedModel {
+  const value = input as ManagedModel;
+  if (
+    !value ||
+    !MODEL_PROVIDERS.includes(value.provider) ||
+    typeof value.id !== "string" ||
+    !/^[a-z][a-z0-9._-]{0,99}$/.test(value.id) ||
+    typeof value.name !== "string" ||
+    !value.name.trim() ||
+    value.name.length > 100 ||
+    !Array.isArray(value.capabilities) ||
+    !value.capabilities.length ||
+    value.capabilities.some((x) => !CAPABILITIES.includes(x)) ||
+    new Set(value.capabilities).size !== value.capabilities.length ||
+    (value.capabilities.includes("speech") && value.capabilities.length !== 1)
+  )
+    return fail(
+      400,
+      "AI_MODEL_INVALID",
+      "공급자·모델 ID·이름·지원 기능을 확인해 주세요.",
+    );
+  return {
+    provider: value.provider,
+    id: value.id,
+    name: value.name.trim(),
+    capabilities: [...value.capabilities],
+  };
+}
+function parse(input: unknown): Control {
+  const value = input as Control;
+  if (
+    !value ||
+    !Number.isSafeInteger(value.revision) ||
+    value.revision < 0 ||
+    !Array.isArray(value.models) ||
+    value.models.length > 250 ||
+    !Array.isArray(value.deleted) ||
+    value.deleted.some((x) => typeof x !== "string") ||
+    !value.selections ||
+    typeof value.selections !== "object" ||
+    Array.isArray(value.selections)
+  )
+    throw new Error("Invalid model controls");
+  const models = value.models.map(validateModel);
+  if (
+    new Set(models.map((x) => keyOf(x.provider, x.id))).size !== models.length
+  )
+    throw new Error("Duplicate model");
+  const parsed: Control = {
+    revision: value.revision,
+    models,
+    deleted: [...value.deleted],
+    selections: { ...value.selections },
+  };
+  for (const [id, selection] of Object.entries(value.selections)) {
+    checkSelection(parsed, id, selection);
+    parsed.selections[id] = {
+      provider: selection.provider,
+      model: selection.model,
+    };
+  }
+  return parsed;
+}
+function checkSelection(
+  control: Control,
+  id: string,
+  selection: ModelSelection,
+) {
+  const target = MODEL_TARGETS.find((x) => x.id === id);
+  const model = control.models.find(
+    (x) => x.provider === selection?.provider && x.id === selection?.model,
+  );
+  if (
+    !target ||
+    !model ||
+    !target.providers.includes(model.provider) ||
+    !model.capabilities.includes(target.capability)
+  )
+    fail(
+      400,
+      "AI_MODEL_INCOMPATIBLE",
+      "이 사용처에서 지원하는 등록 모델을 선택해 주세요.",
+    );
+}
+
+/** One durable document and optimistic revision: catalog and selections change atomically across instances. */
+export class ModelControlService {
+  constructor(private db: Database) {}
+  async read(): Promise<Control> {
+    try {
+      if (!this.db.isInitialized) return defaults();
+      const rows = await this.db.query(
+        "SELECT value FROM settings WHERE key=$1",
+        [MODEL_CONTROL_KEY],
+      );
+      return rows.length ? parse(rows[0].value) : defaults();
+    } catch {
+      return fail(
+        503,
+        "AI_MODEL_CONTROL_UNAVAILABLE",
+        "모델 설정을 확인하지 못했습니다. 다시 조회해 주세요.",
+      );
+    }
+  }
+  async snapshot() {
+    if (!this.db.isInitialized)
+      return fail(
+        503,
+        "AI_MODEL_CONTROL_UNAVAILABLE",
+        "모델 설정을 조회할 수 없습니다.",
+      );
+    const control = await this.read();
+    return {
+      ...control,
+      protectedModels: [...(await this.references(control))],
+      targets: MODEL_TARGETS,
+      usageTargets: Object.fromEntries(
+        AI_USAGE_CATALOG.map((x) => [x.id, modelTargetId(x.id)]),
+      ),
+    };
+  }
+  private async references(
+    control: Control,
+    includeSelections = true,
+  ): Promise<Set<string>> {
+    // All configured policies count, including disabled ones: re-enabling must not reference a removed model.
+    const rows = await this.db.query(
+      "SELECT 'gemini' AS provider,default_model AS model FROM ai_query_policy UNION ALL SELECT provider,model FROM ai_llm_policies UNION ALL SELECT fallback_provider AS provider,fallback_model AS model FROM ai_llm_policies WHERE fallback_model IS NOT NULL UNION ALL SELECT provider,COALESCE(to_jsonb(s)->>'defaultmodel',to_jsonb(s)->>'defaultModel',to_jsonb(s)->'config'->>'model',to_jsonb(s)->'config'->>'defaultModel') AS model FROM ai_settings s",
+    );
+    const refs = new Set<string>(
+      rows
+        .filter((x: ModelSelection) => x.provider && x.model)
+        .map((x: ModelSelection) => keyOf(x.provider, x.model)),
+    );
+    if (includeSelections)
+      for (const x of Object.values(control.selections))
+        refs.add(keyOf(x.provider, x.model));
+    // Existing runtime fallback and explicitly configured environment models remain available.
+    for (const [provider, ids] of Object.entries({
+      gemini: [
+        GEMINI_CANONICAL_MODEL,
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-3.1-flash-tts-preview",
+        process.env.AI_DEFAULT_MODEL,
+        process.env.AI_STRONG_MODEL,
+      ],
+      openai: [
+        "gpt-6-astra",
+        "gpt-5-mini",
+        "gpt-4o-mini",
+        "gpt-4o-mini-tts",
+        process.env.AI_DEFAULT_MODEL_OPENAI,
+        process.env.AI_STRONG_MODEL_OPENAI,
+      ],
+      claude: ["claude-sonnet-4.5"],
+    }))
+      for (const id of ids) if (id) refs.add(keyOf(provider, id));
+    return refs;
+  }
+  async change(
+    expected: unknown,
+    actorId: string,
+    mutation: {
+      action: "create" | "update" | "delete" | "select";
+      provider?: string;
+      id?: string;
+      model?: unknown;
+      target?: string;
+      selection?: ModelSelection | null;
+    },
+  ) {
+    if (!Number.isSafeInteger(expected) || Number(expected) < 0)
+      return fail(
+        400,
+        "AI_MODEL_REVISION_REQUIRED",
+        "최신 목록을 조회한 뒤 저장해 주세요.",
+      );
+    if (!this.db.isInitialized)
+      return fail(
+        503,
+        "AI_MODEL_CONTROL_UNAVAILABLE",
+        "모델 설정을 저장할 수 없습니다.",
+      );
+    const control = await this.read();
+    if (control.revision !== expected)
+      return fail(
+        409,
+        "AI_MODEL_CONTROL_CONFLICT",
+        "다른 관리자가 변경했습니다. 최신 목록을 다시 조회해 주세요.",
+      );
+    let baseReferences: Set<string>;
+    try {
+      baseReferences = await this.references(control, false);
+    } catch {
+      return fail(
+        503,
+        "AI_MODEL_REFERENCES_UNAVAILABLE",
+        "현재 실행 설정을 확인하지 못해 변경하지 않았습니다.",
+      );
+    }
+    if (mutation.action === "select") {
+      const target = MODEL_TARGETS.find((x) => x.id === mutation.target);
+      if (!target)
+        return fail(400, "AI_MODEL_TARGET_INVALID", "사용처를 확인해 주세요.");
+      if (mutation.selection === null) delete control.selections[target.id];
+      else {
+        checkSelection(control, target.id, mutation.selection!);
+        control.selections[target.id] = {
+          provider: mutation.selection!.provider,
+          model: mutation.selection!.model,
+        };
+      }
+    } else {
+      const oldKey = keyOf(mutation.provider ?? "", mutation.id ?? "");
+      const old = control.models.find(
+        (x) => keyOf(x.provider, x.id) === oldKey,
+      );
+      if (mutation.action !== "create" && !old)
+        return fail(404, "AI_MODEL_NOT_FOUND", "모델이 목록에 없습니다.");
+      const model =
+        mutation.action === "delete" ? null : validateModel(mutation.model);
+      const nextKey = model ? keyOf(model.provider, model.id) : "";
+      if (
+        model &&
+        control.models.some(
+          (x) =>
+            keyOf(x.provider, x.id) === nextKey &&
+            (mutation.action === "create" || x !== old),
+        )
+      )
+        return fail(409, "AI_MODEL_ALREADY_EXISTS", "이미 등록된 모델입니다.");
+      if (
+        old &&
+        (nextKey !== oldKey ||
+          model?.capabilities.join(",") !== old.capabilities.join(","))
+      ) {
+        const refs = new Set([
+          ...baseReferences,
+          ...Object.values(control.selections).map((x) =>
+            keyOf(x.provider, x.model),
+          ),
+        ]);
+        if (refs.has(oldKey))
+          return fail(
+            409,
+            "AI_MODEL_IN_USE",
+            "현재 설정 또는 기본 실행 모델입니다. 다른 모델로 변경한 후 삭제하거나 ID·지원 기능을 변경해 주세요.",
+          );
+      }
+      control.models = control.models.filter(
+        (x) => keyOf(x.provider, x.id) !== oldKey,
+      );
+      if (model) control.models.push(model);
+      if (old && oldKey !== nextKey) control.deleted.push(oldKey);
+      control.deleted = [...new Set(control.deleted)].filter(
+        (x) => x !== nextKey,
+      );
+    }
+    if (control.models.length > 250)
+      return fail(400, "AI_MODEL_LIMIT", "등록 모델 수 제한을 초과했습니다.");
+    control.revision++;
+    const value = JSON.stringify({ ...control, updatedBy: actorId });
+    try {
+      const rows = await this.db.query(
+        "INSERT INTO settings(key,value,type,description) VALUES($1,$2::jsonb,'ai-model-controls','AI 모델 목록·사용 모델 지정') ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value,\"updatedAt\"=NOW() WHERE (settings.value->>'revision')::bigint=$3 RETURNING key",
+        [MODEL_CONTROL_KEY, value, expected],
+      );
+      if (!rows.length)
+        return fail(
+          409,
+          "AI_MODEL_CONTROL_CONFLICT",
+          "다른 관리자가 변경했습니다. 최신 목록을 다시 조회해 주세요.",
+        );
+    } catch (error) {
+      if (error instanceof ModelControlError) throw error;
+      return fail(
+        503,
+        "AI_MODEL_CONTROL_UNAVAILABLE",
+        "모델 설정을 저장하지 못했습니다. 다시 조회해 주세요.",
+      );
+    }
+    return {
+      ...control,
+      protectedModels: [
+        ...new Set([
+          ...baseReferences,
+          ...Object.values(control.selections).map((x) =>
+            keyOf(x.provider, x.model),
+          ),
+        ]),
+      ],
+      targets: MODEL_TARGETS,
+      usageTargets: Object.fromEntries(
+        AI_USAGE_CATALOG.map((x) => [x.id, modelTargetId(x.id)]),
+      ),
+    };
+  }
+  /** Called immediately before the existing adapter. No provider request, key, quota, or parameter policy is replaced. */
+  async resolve(
+    usage: string,
+    fallback: ModelSelection,
+  ): Promise<ModelSelection & { managed?: boolean }> {
+    const control = await this.read();
+    const selection = control.selections[modelTargetId(usage)];
+    if (selection) {
+      checkSelection(control, modelTargetId(usage), selection);
+      return { ...selection, managed: true };
+    }
+    if (control.deleted.includes(keyOf(fallback.provider, fallback.model)))
+      return fail(
+        409,
+        "AI_MODEL_REMOVED",
+        "이 모델은 관리자 목록에서 삭제됐습니다. 사용 모델을 다시 지정해 주세요.",
+      );
+    return fallback;
+  }
+  async allows(provider: string, model: string): Promise<boolean | undefined> {
+    const control = await this.read();
+    if (control.deleted.includes(keyOf(provider, model))) return false;
+    return control.models.some(
+      (x) =>
+        x.provider === provider &&
+        x.id === model &&
+        x.capabilities.includes("text"),
+    )
+      ? true
+      : undefined;
+  }
+}

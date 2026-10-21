@@ -88,7 +88,7 @@ export class CopilotEngineService {
     if (hasAiApiKey()) {
       try {
         const { runAiExtension } = await import('@o4o/ai-core');
-        const target = await resolveAiTarget(AppDataSource);
+        const target = await resolveAiTarget(AppDataSource, undefined, 'operator.insight');
         const extension = createOperatorInsightExtension(profile);
         const run = await runAiExtension({
           extension, input: { metrics },

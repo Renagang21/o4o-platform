@@ -81,7 +81,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "runtime",
     "unconnected",
     "none",
-    "Gemini는 공통 모델값, OpenAI는 서버 기본값을 사용합니다.",
+    "사용 모델을 지정하지 않으면 Gemini는 공통 모델값, OpenAI는 서버 기본값을 사용합니다.",
   ),
   entry(
     "A03",
@@ -224,7 +224,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editing",
     "partial",
     "none",
-    "공통 모델값을 읽지만 공통 중지는 검사하지 않습니다.",
+    "사용 모델을 지정하지 않으면 공통 모델값을 읽습니다. 공통 중지는 검사하지 않습니다.",
   ),
   entry(
     "A16",
@@ -246,7 +246,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "request",
     "partial",
     "none",
-    "요청의 공급자·모델 선택을 사용합니다. 클라이언트별 실제 사용 확인이 필요합니다.",
+    "관리자 사용 모델 지정을 우선하며, 지정하지 않으면 요청의 공급자·모델 선택을 사용합니다. 실제 사용 확인은 별도입니다.",
   ),
   entry(
     "A18",
@@ -257,7 +257,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "fixed",
     "unconnected",
     "none",
-    "서버 코드의 Gemini 모델을 사용하며 관리자 모델 변경과 연결되지 않았습니다.",
+    "사용 모델 지정을 우선하며, 지정하지 않으면 기존 서버 코드의 Gemini 모델을 사용합니다.",
   ),
   entry(
     "A19",
@@ -304,7 +304,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "fixed",
     "unconnected",
     "none",
-    "서버 코드에서 정한 Gemini 모델을 사용합니다.",
+    "사용 모델을 지정하지 않으면 서버 코드에서 정한 Gemini 모델을 사용합니다.",
   ),
   entry(
     "A23",
@@ -348,7 +348,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "environment",
     "connected",
     "none",
-    "서버 인증 연결 유무로 모델을 결정합니다. 비용 연결과 중지 설정 연결은 별개입니다.",
+    "사용 모델을 지정하지 않으면 서버 인증 연결 유무로 모델을 결정합니다. 비용 연결과 중지 설정 연결은 별개입니다.",
     "LMS_ASSISTANCE",
   ),
   entry(

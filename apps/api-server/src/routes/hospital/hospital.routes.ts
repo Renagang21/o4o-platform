@@ -188,7 +188,7 @@ async function runHospitalAiRequest(text: string): Promise<{ kind: 'chat' | 'wor
     {
       exec: denyExec,
       research: async (query) => {
-        const r = await runWebResearch({ query });
+        const r = await runWebResearch({ query, usage: 'hospital.research' });
         return { content: r.content, model: r.model, grounding: r.grounding };
       },
     },
@@ -242,7 +242,7 @@ export function createHospitalRoutes(): Router {
       return res.status(400).json({ success: false, error: '대상 스키마가 올바르지 않습니다.', code: schemaCheck.code ?? 'TARGET_SCHEMA_INVALID' });
     }
     try {
-      const { inference, model } = await inferFileStructure({ profile, targetSchema });
+      const { inference, model } = await inferFileStructure({ profile, targetSchema, usage: 'hospital.structure' });
       logger.info('hospital file-structure', {
         schemaId: targetSchema.id,
         sheets: profile.sheets.length,

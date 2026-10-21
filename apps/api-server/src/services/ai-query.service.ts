@@ -1,3 +1,4 @@
+import { prepareManagedAiRequest } from './ai-management/runtime-models.js';
 import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 /**
  * AI Query Service
@@ -497,12 +498,12 @@ class AiQueryService {
         funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, {
+          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, 'service.query', {
             ...prompt,
             responseMode: 'text',
             config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
             meta: { service: profile.serviceId, callerName: extension.id },
-          }, { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
+          }), { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
           return { ...result, provider: result.provider ?? 'unknown' };
         },
       }, {

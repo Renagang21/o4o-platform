@@ -98,12 +98,13 @@ export class TtsNarrationService {
   constructor(
     private readonly resolveKey: (provider: TtsProvider) => Promise<string>,
     private readonly fetchImpl: FetchLike = (input, init) => fetch(input, init),
+    private readonly resolveModel: (provider: TtsProvider) => Promise<string> = async provider => TTS_PROVIDERS[provider].model,
   ) {}
 
   async synthesize(req: TtsRequest): Promise<TtsResult> {
     const apiKey = await this.resolveKey(req.provider);
     if (!apiKey) throw new MediaCatalogError('TTS_PROVIDER_NOT_CONFIGURED', 503);
-    const spec = TTS_PROVIDERS[req.provider];
+    const spec = { ...TTS_PROVIDERS[req.provider], model: await this.resolveModel(req.provider) };
     const audio = req.provider === 'openai' ? await this.openai(req, spec, apiKey) : await this.gemini(req, spec, apiKey);
     return {
       audio,

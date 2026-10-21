@@ -1,3 +1,5 @@
+import { resolveManagedAiTarget } from '../../../services/ai-management/runtime-models.js';
+import { prepareManagedAiRequest } from '../../../services/ai-management/runtime-models.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
 /**
@@ -40,13 +42,9 @@ export class OperatorAiLlmService {
       // Dynamic import to avoid startup failure if ai-core not built
       const { runAiExtension } = await import('@o4o/ai-core');
 
-      const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        return [];
-      }
-
-      const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
-      const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
+      const previousProvider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
+      const { provider, model, apiKey } = await resolveManagedAiTarget(AppDataSource, 'operator.actions', { provider: previousProvider as 'gemini' | 'openai', model: previousProvider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini', apiKey: process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || '' });
+      if (!apiKey) return [];
 
       const run = await runAiExtension({
         extension: operatorActionsExtension, input: ctx,
@@ -54,11 +52,11 @@ export class OperatorAiLlmService {
         materials: [], funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider, responseMode: 'json',
+          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, 'operator.actions', { ...prompt, provider, responseMode: 'json',
             config: { apiKey, model, maxTokens: 500, temperature: 0.2 },
             timeoutMs: 3000, retry: { maxAttempts: 1, delayMs: 0 },
             meta: { service: 'neture', callerName: 'OperatorAiLlm' },
-          }, { scope: 'OPERATOR_ACTIONS', serviceKey: 'neture', userId: actorId });
+          }), { scope: 'OPERATOR_ACTIONS', serviceKey: 'neture', userId: actorId });
           return { ...result, provider: result.provider ?? provider };
         },
       }, {
