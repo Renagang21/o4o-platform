@@ -131,3 +131,58 @@ it("rejects a retired inactive engine before changing activation flags or policy
     (aiAdminService as any).initialized = false;
   }
 });
+
+it.each(["openai", "claude"] as const)(
+  "adapts the main modal Gemini token default when managed blocks select %s",
+  async (provider) => {
+    const resolve = jest
+      .spyOn(ModelControlService.prototype, "resolve")
+      .mockResolvedValue({
+        provider,
+        model: "synthetic-managed-model",
+        managed: true,
+      });
+    const allows = jest
+      .spyOn(ModelControlService.prototype, "allows")
+      .mockResolvedValue(true);
+    const call = jest
+      .spyOn(aiProxyService as any, "callProviderWithRetry")
+      .mockResolvedValue({
+        success: true,
+        provider,
+        model: "synthetic-managed-model",
+        result: { blocks: [] },
+      });
+    const log = jest
+      .spyOn(aiProxyService as any, "saveUsageLog")
+      .mockResolvedValue(undefined);
+    try {
+      await expect(
+        aiProxyService.generateContent(
+          {
+            provider: "gemini",
+            model: "gemini-3.8-flash",
+            systemPrompt: "synthetic",
+            userPrompt: "synthetic",
+            maxTokens: 16384,
+          },
+          "synthetic-actor",
+          "synthetic-request",
+        ),
+      ).resolves.toMatchObject({ success: true });
+      expect(call).toHaveBeenCalledWith(
+        expect.objectContaining({
+          provider,
+          model: "synthetic-managed-model",
+          maxTokens: 8192,
+        }),
+        "synthetic-request",
+      );
+    } finally {
+      resolve.mockRestore();
+      allows.mockRestore();
+      call.mockRestore();
+      log.mockRestore();
+    }
+  },
+);

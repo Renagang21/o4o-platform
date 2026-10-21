@@ -234,7 +234,13 @@ class AIProxyService {
     const registered = await service.allows(selected.provider, selected.model);
     if (registered === false) throw this.createError('VALIDATION_ERROR', 'AI_MODEL_REMOVED', false);
     const model = registered ? selected.model : this.resolveModel(selected.provider as AIProvider, selected.model);
-    const resolved = { ...request, provider: selected.provider as AIProvider, model };
+    const provider = selected.provider as AIProvider;
+    // The main block generator materializes Gemini's token default before the server selection.
+    // A managed provider switch may lower that budget, never increase the selected provider's cap.
+    const maxTokens = selected.managed && provider !== request.provider && typeof request.maxTokens === 'number'
+      ? Math.min(request.maxTokens, PARAMETER_LIMITS.maxTokens[provider])
+      : request.maxTokens;
+    const resolved = { ...request, provider, model, maxTokens };
     this.validateRequest(resolved, registered === true);
     return resolved;
   }

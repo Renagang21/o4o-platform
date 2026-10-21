@@ -119,3 +119,11 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 ### 품질 검사 보완
 
 SonarCloud의 폼 신뢰성 지적에 따라 모델 저장·사용 모델 저장 버튼을 명시적 submit으로 지정하고 입력 라벨 텍스트를 span으로 구분했다. 모델 관리/조회 단위 13 PASS, desktop/mobile 모델 관리 browser 4 PASS를 재확인했다. 중복 import와 불필요 async 선언도 정리했다. 나머지 스타일·복잡도 권고와 실제 신뢰성 gate를 구분하며 최신 CI/품질 분석 결과는 이후 기록한다.
+
+### 소비처 재검토: 공급자 기본값·로그인 병원 조사
+
+관리자 블록에서 기존 Gemini 요청을 OpenAI/Claude로 지정하면 client의 16,384 토큰 기본값이 남아 8,192 상한에 걸리는 문제를 보완했다. 관리 선택으로 공급자가 달라진 경우에만 토큰 예산을 선택 공급자 상한 이하로 낮춘다. 같은 공급자 요청의 기존 검증과 낮은 예산은 유지한다.
+
+로그인 `surface=hospital-drug`의 research callback도 서버에서 `hospital.research`를 명시한다. 공개 병원 조사와 로그인 병원 조사 모두 같은 별도 모델 target을 사용하며 일반 research target과 구분한다. 실제 로그인된 사용자 세션 대신 합성 인증 HTTP fixture로 해당 소비처를 검증했다.
+
+관리자 생성·로그인 통합 요청 HTTP·grounding HTTP body/선택 전달: 3 suites, 56 PASS. OpenAI/Claude 전환에서 16,384→8,192 및 기존 작은 예산/세대별 파라미터 유지, 로그인 병원 callback의 target과 선택 모델의 Gemini URL을 확인했다. 실제 유료 호출은 수행하지 않았다.

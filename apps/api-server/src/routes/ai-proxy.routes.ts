@@ -1542,7 +1542,7 @@ async function performHospitalDrugRequest(
       {
         exec: (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
         research: async (query) => {
-          const r = await runWebResearch({ query });
+          const r = await runWebResearch({ query, usage: 'hospital.research' });
           return { content: r.content, model: r.model, grounding: r.grounding };
         },
       },
