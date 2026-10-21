@@ -2,7 +2,7 @@
 
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
-> **상태**: ACTIVE · **확정일**: 2026-10-07 · **최종 갱신**: 2026-10-21 (공개 진입·문의 정책; 개발 branch push, 미배포) · 2026-10-11 (My Home 계정 설정 적용 관계 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`)
+> **상태**: ACTIVE · **확정일**: 2026-10-07 · **최종 갱신**: 2026-10-21 (공개 진입·문의 정책; PR #750 main 통합·운영 배포 완료 — 검증 한계는 [구현·검증 WO](../work-orders/WO-O4O-PUBLIC-ENTRY-CONTACT-UNIFICATION-V1.md) 참조) · 2026-10-11 (My Home 계정 설정 적용 관계 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`)
 > **근거**: 사용자 정책 확정 · [WO-NETURE-AUTH-MEMBERSHIP-REFACTOR-V1](../work-orders/WO-NETURE-AUTH-MEMBERSHIP-REFACTOR-V1.md)
 
 > **2026-10-08 추가 확정**: 단계별 구현은 [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md)을 따른다. 카카오 로그인 추가, 사용자용 전체 로그아웃 제거, 비밀번호 변경·재설정 후 전역 세션 무효화, 테스트 데이터 재사용·정리, 전체 관리자 용어를 아래에 반영한다. 정책 확정과 런타임 구현 완료는 구분하며 완료 여부는 WO의 TODO·검증 기록으로 확인한다.

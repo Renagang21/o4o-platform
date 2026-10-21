@@ -3,7 +3,7 @@
 > **상태**: ACTIVE · 대표 홈·참여자 공간 main 반영 / 운영 배포 완료 · 약국 회원 초기화면 PR #414 main 반영 / 운영 배포 완료
 > **확정일**: 2026-10-10 · **근거**: 사용자 대표 홈 설계 논의 및 용어 적용 지시
 > **적용 범위**: 대표 홈의 서비스 발견·분류·안내, 서비스 진입·약국 회원 초기화면. 가입·승인·권한·주문 계약 변경 없음.
-> **최종 갱신**: 2026-10-21 (공개 진입·문의 정책; 개발 branch push, 미배포) · 2026-10-18 (협력약국 콘텐츠 중심 메인 개편 정책) · 2026-10-11 · **정비 근거**: [My Home 문서 정비 WO](../work-orders/WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1.md). 기존 대표 홈·회원 초기화면 배포 기록은 유지하며 My Home 화면은 구현·운영 배포 완료. 실제 로그인 검증 상태는 [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)를 따른다.
+> **최종 갱신**: 2026-10-21 (공개 진입·문의 정책; PR #750 main 통합·운영 배포 완료 — 검증 한계는 [구현·검증 WO](../work-orders/WO-O4O-PUBLIC-ENTRY-CONTACT-UNIFICATION-V1.md) 참조) · 2026-10-18 (협력약국 콘텐츠 중심 메인 개편 정책) · 2026-10-11 · **정비 근거**: [My Home 문서 정비 WO](../work-orders/WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1.md). 기존 대표 홈·회원 초기화면 배포 기록은 유지하며 My Home 화면은 구현·운영 배포 완료. 실제 로그인 검증 상태는 [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)를 따른다.
 
 > **2026-10-16 사용자 정정**: 각 약국 협력모델은 독립 서비스이며 가입·승인은 해당 서비스에서 진행한다. 승인받은 협력모델이 제공하는 기능을 약국 개설약사의 내 약국에서 이용한다. 정비 근거: [WO-O4O-PHARMACY-COOPERATION-SERVICE-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-COOPERATION-SERVICE-INDEPENDENCE-V1.md). 문서 기준 정정이며 코드·DB·배포 변경을 뜻하지 않는다.
 

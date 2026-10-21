@@ -1,7 +1,7 @@
 # 전체 서비스 공개 진입·문의·운영 알림 통합 정비
 
-> **상태**: COMPLETED · 개발 검증·push 인계 완료; main 통합·배포 제외 · **작성일**: 2026-10-21
-> **근거**: 사용자 승인 — TODO 작성 → 코드·문서 검증 → 개발·검증 → commit·push. PR·병합·배포·운영 데이터 변경 제외.
+> **상태**: COMPLETED · 사용자 추가 승인에 따른 main 통합·운영 배포·검증 완료 · **작성일**: 2026-10-21
+> **근거**: 사용자 승인 — TODO 작성 → 코드·문서 검증 → 개발·검증 → commit·push, 후속 `main으로 통합 -> 배포`. 초기 개발 종료 기록은 아래에 보존한다. 신규 migration·backfill·실제 문의/메일 발송 제외.
 > **정본**: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md), [인증·서비스 가입](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 모듈 변경](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)
 
 ## TODO
@@ -93,10 +93,10 @@ API 검사는 격리된 로컬 PostgreSQL socket을 `CONTACT_REVIEW_PG_SOCKET`�
 
 - [x] 원격 branch/HEAD·main ruleset·기존 PR·현재 배포 경로 확인
 - [x] 최신 main `ac38af8df1`을 작업 branch에 병합 (공통 export 자동 병합, 충돌 0)
-- [ ] 통합 후 focused 검증·PR CI·현재 HEAD Codex 리뷰 확인
-- [ ] 기술 gate 충족 후 PR 병합·post-merge CI 확인
-- [ ] Delivery/promote 배포·serving SHA·공개 화면·API 보호 경계 확인
-- [ ] 검증 한계·문서 정합·작업공간 정리 기록 후 종료
+- [x] 통합 후 focused 검증·PR CI·현재 HEAD Codex 리뷰 확인
+- [x] 기술 gate 충족 후 PR 병합·post-merge CI 확인
+- [x] Delivery/promote 배포·serving SHA·공개 화면·API 보호 경계 확인
+- [x] 검증 한계·문서 정합·작업공간 정리 기록 후 종료
 
 
 ### 통합 검토 보완 — 문의 처리 상태의 동시 갱신
@@ -191,3 +191,23 @@ API·강의 빌드, 전체 frontend type-check, ESLint ratchet(46 errors/983 war
 수정 전 유형 저장 UI 2건·설정 링크 8건이 실패했고 수정 후 통과했다. 최종 로컬 검증은 Neture 1,243개·약국/MegaPharm 215개·공통 UI 166개·강의 42개·분회 25개·협동조합 62개·운영 문의/담당 사업 21개·설정 UI 3개·API 47개 = 1,824개다. API의 추가 회귀는 실제 관리자 PUT의 유형 생략→원장 NULL 유지→공개 설정 미구성 유지와 명시 유형 변경을 확인한다. Neture·약국 빌드, 전체 frontend type-check, lint ratchet 기존 기준선 유지가 통과했다.
 
 실제 빌드의 PC/모바일 18개 합성 브라우저에서 플랫폼 관리자(neture/supplier/funding/store/hospital), 기존 CarePharm/MegaPharm 관리자, 강의 관리자, 서버가 거부한 공급자 관리자 역할을 검사했다. 각 소유 서비스 도메인에서 설정 링크→설정 열기→수신자만 저장(유형 필드 미전송), 강의 전용 유형 유지, 거부된 링크 미노출을 확인했다. 외부 통신·실제 설정 저장·메일 발송은 없고 API는 합성했다. JS 오류 0개다. 초기 main→소유 서비스 handoff의 미구현 fixture를 실제 진입 도메인에 맞춰 수정했으며 운영 handoff/Google 인증을 검증했다고 보고하지 않는다. 최신 정확한 HEAD의 CI·재검토 후 병합한다.
+
+
+## main 통합·운영 배포 완료 (2026-10-21 UTC)
+
+- [PR #750](https://github.com/Renagang21/o4o-platform/pull/750): 최종 개발 HEAD `386f184dd81451d2c09697d93727830bd8a0f157`의 CI·Codex 재검토 완료, 미해결 지적 0건을 확인한 뒤 정상 PR merge했다. 통합·배포한 코드 SHA는 `249f0657319a8d45d237641b66503c8b44b95788`다. [post-merge CI](https://github.com/Renagang21/o4o-platform/actions/runs/39563204665)가 성공했다.
+- [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39564751201)는 Delivery의 LEVEL 3 보류 후 사용자 배포 지시에 따른 기존 승격 경로를 사용했다. API 먼저, 의존 웹 순서로 기존 검증 rollout을 실행하고 serving SHA·readiness·traffic 검사를 통과했다. 결과: DEPLOYED · deploy: api,admin,neture,kpa-society,lecture,store,kpa-branch,hospital-pharmacy.
+- 협동조합은 같은 SHA의 API serving 확인 후 기존 [frontend-only workflow](https://github.com/Renagang21/o4o-platform/actions/runs/39565748722)로 배포했다(`frontend_only=true`, `apply=false`). fixture provisioning·계정/조합/조합원 데이터 변경은 실행하지 않았다.
+- 운영 공개 화면 9곳의 PC/모바일 18개 사례: main, supplier, funding, pharmacy, community, lecture, branch, store, hospital. 실제 배포된 응답을 정상 TLS 검증으로 읽어 첫 화면 강제 로그인 없음·문의 폼/필드·가로 넘침/JS 오류 없음을 확인했다. 브라우저는 변경 요청을 차단했고 실제 문의를 제출하지 않았다. 강의 전용 유형도 확인했다.
+- 운영 API 13개 서비스: 공개 설정 200(공개 필드 allowlist만), 잘못된 필수 입력/동의의 접수 요청 400, 비로그인 문의함·관리자 설정 401을 확인했다. 잘못된 요청은 저장/메일 발송 전에 종료했다. API readiness 200. 테스트 계정 검사 결과: 테스트 연결 3개의 로그인 200, supplier/funding 문의함·관리자 설정 접근 각 403, 현재 브라우저 세션 폐기 확인 후 로그아웃 200. 테스트 세션은 로그아웃했으며 접속·인증 보안 기록은 정책에 따라 유지한다.
+- 개발·통합 로컬 검증 최종 1,824개, 공개/문의/알림/권한 메뉴 합성 브라우저 검증은 위 단계별 기록을 따른다. 로컬 PostgreSQL 임시 schema 잔존은 0개다. 운영 문의·이메일·업무 테스트 데이터는 생성하지 않았다. 신규 dependency·lockfile·workflow·migration 변경은 없다.
+
+### 검증 한계
+
+CarePharm·MegaPharm·협동조합의 운영 도메인 HTTP 응답은 네트워크 허용 목록 제약으로 직접 탐색하지 않았다. 로컬 회귀/합성 브라우저·실제 빌드·배포 workflow의 SHA/traffic/readiness 검증 범위는 위 단계별 기록을 따른다. 실제 운영자 Google 로그인·실제 문의 접수/알림 수신·SMTP 수신/답변은 검증하지 않았다. 운영자 계정·역할/가입 배정과 메일 설정은 변경하지 않았다.
+
+### 문서 정합·종료 정리
+
+공개 진입·문의 기준과 두 canonical 문서의 미배포 표기를 실제 배포 결과에 맞췄다. 원래 개발 종료 기록과 각 리뷰/재현 결과는 당시 기록으로 보존했다. 이 문서 정비는 runtime 변경이 없으므로 문서 PR 병합의 배포 판정은 `NOT_APPLICABLE`이다.
+
+작업공간은 이 완료 문서가 main에 반영되고 CI를 확인할 때까지 KEEP이다. 이후 main 포함·clean·진행 중 operation 없음 조건을 확인하여 이 세션의 구현/문서 worktree와 branch만 정리한다. 기준 checkout과 다른 세션의 작업공간은 변경하지 않는다. 실제 정리 결과는 문서 PR/최종 보고에 기록한다.
