@@ -113,6 +113,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
 
       <section aria-labelledby="carepharm-materials-heading" className="rounded-xl border bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="carepharm-materials-heading" className="text-lg font-semibold">최근 회원자료</h2><Link className={actionClass} to={MATERIALS}>전체 회원자료</Link></div>
+        <nav aria-label="CarePharm 자료 종류" className="mt-4 flex flex-wrap gap-3">{['자료 묶음', '약국 운영', '안내물'].map(tag => <Link key={tag} className={actionClass} to={`${MATERIALS}&tag=${encodeURIComponent(tag)}`}>{tag}</Link>)}</nav>
         {materialsError ? <div role="alert" className="mt-4"><p>{materialsError}</p><button className={`${actionClass} mt-3`} onClick={() => setRetry(n => n + 1)}>회원자료 다시 불러오기</button></div> : materials === null ? <p role="status" className="mt-4 text-sm">회원자료를 불러오고 있습니다…</p> : !materials.length ? <p className="mt-4 text-sm text-slate-500">아직 게시된 회원자료가 없습니다.</p> : <ul className="mt-4 divide-y">
           {materials.map(item => <li key={item.id} className="py-4">
             <Link className="block min-h-11 break-words font-medium text-emerald-800 underline" to={`${MATERIALS}&content=${encodeURIComponent(item.id)}`}>{item.title}</Link>

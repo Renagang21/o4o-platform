@@ -209,7 +209,7 @@ export const neturePharmacyApi = {
     return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
   },
 
-  async listContents(params: { sf?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
+  async listContents(params: { sf?: string; q?: string; tag?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
     const res = await coreApiClient.get<Envelope<{ items: SemiFranchiseContent[]; total: number }>>(`${P}/store/contents`, params);
     return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
   },

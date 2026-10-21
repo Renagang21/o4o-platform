@@ -101,4 +101,24 @@ local('CarePharm selected pharmacy gate — actual PostgreSQL, no authorization 
     await expect(contents.pharmacyCopy(a, actor, material)).rejects.toMatchObject({ httpStatus: 404 });
     expect(copied).toEqual([]);
   });
+  it('filters exact tags with search and consistent pagination without crossing memberships or publication status', async () => {
+    const ids = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+    await fixture.ds.query(`INSERT INTO semi_franchise_contents(id,semi_franchise_id,title,summary,tags,status,published_at)
+      VALUES($1,$5,'운영 묶음 1','진열 참고','["자료 묶음","약국 운영"]','published','2026-10-20'),
+            ($2,$5,'운영 묶음 2','진열 참고','["자료 묶음"]','published','2026-10-19'),
+            ($3,$5,'운영 묶음 초안',null,'["자료 묶음"]','draft',NOW()),
+            ($4,$6,'다른 협업체 묶음',null,'["자료 묶음"]','published',NOW())`, [...ids,care,pharmacy]);
+    await fixture.ds.query("INSERT INTO semi_franchise_memberships VALUES($1,$2,'active')", [pharmacy,a]);
+    const first = await contents.pharmacyList(a, { sfKey:'carepharm', tag:'자료 묶음', q:'진열', limit:1 });
+    expect(first.total).toBe(2); expect(first.items.map((row:{id:string}) => row.id)).toEqual([ids[0]]);
+    const second = await contents.pharmacyList(a, { sfKey:'carepharm', tag:'자료 묶음', q:'진열', limit:1, page:2 });
+    expect(second.total).toBe(2); expect(second.items.map((row:{id:string}) => row.id)).toEqual([ids[1]]);
+    expect((await contents.pharmacyList(a, { sfKey:'carepharm', tag:'자료' })).total).toBe(0);
+    expect((await contents.pharmacyList(a, { sfKey:'carepharm', tag:"자료 묶음' OR true --" })).total).toBe(0);
+    expect((await contents.pharmacyList(b, { sfKey:'carepharm', tag:'자료 묶음' })).total).toBe(0);
+    await fixture.ds.query("UPDATE semi_franchise_memberships SET status='suspended' WHERE semi_franchise_id=$1 AND organization_id=$2", [care,a]);
+    expect((await contents.pharmacyList(a, { sfKey:'carepharm', tag:'자료 묶음' })).total).toBe(0);
+    await expect(contents.pharmacyCopy(a,actor,ids[0])).rejects.toMatchObject({ httpStatus:404 });
+    expect(copied).toEqual([]);
+  });
 });

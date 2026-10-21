@@ -270,6 +270,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/pharmacy/store/contents', ...store, handle(async (req) => contents.pharmacyList(org(req), {
     sfKey: typeof req.query.sf === 'string' ? req.query.sf : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
+    tag: typeof req.query.tag === 'string' ? req.query.tag : undefined,
     page: Number(req.query.page) || 1,
     limit: Number(req.query.limit) || 30,
   })));
