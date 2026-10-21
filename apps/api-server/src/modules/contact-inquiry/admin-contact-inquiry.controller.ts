@@ -1,19 +1,24 @@
+import { apiLimiter } from '../../middleware/rateLimiter.js';
+import { ContactReplyService } from './contact-reply.service.js';
+import { deliverContactInquiry } from './contact-delivery.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
+import { contactService, requireContactScope } from './contact-service-scope.js';
 /**
  * Admin Contact Inquiry Controller
  *
  * WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
  *
- * KCos·Study의 각 operator(및 admin)가 해당 서비스 문의를 처리한다. Mount: /api/v1/admin/services
+ * CONTACT_SERVICES의 담당 operator(및 admin)가 해당 서비스 문의를 처리한다. Mount: /api/v1/admin/services
  *   GET   /:serviceKey/contact-inquiries          — 목록(status/page/limit). 본문 미노출(미리보기만).
  *   GET   /:serviceKey/contact-inquiries/:id       — 상세(본문 포함)
  *   PATCH /:serviceKey/contact-inquiries/:id/status — 상태 변경(+handled_at/handled_by)
  *   PATCH /:serviceKey/contact-inquiries/:id/note   — 내부 메모
  *
- * 권한: requireServiceLegalScope('operator') — 문의 '처리'는 operator 업무다 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1).
+ * 권한: requireContactScope('operator') — 문의 '처리'는 operator 업무다 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1).
  *   scopeRoleMapping 상 admin ⊃ operator 이므로 admin 도 그대로 통과한다.
  *   - K-Cosmetics: 'cosmetics:operator' → ['cosmetics:operator','cosmetics:admin'] 통과 (기존 admin-only 403 해소).
  *   문의 '설정'(admin-service-contact-settings.controller)은 그대로 admin 전용 유지.
- *   + 공통 문의 serviceKey = k-cosmetics·lecture (Neture/KPA 는 자체 contact 시스템).
+ *   + 이전 Neture/KPA 문의는 원래 원장과 관리 경로에 보존한다.
  *   + 이전 education 문의는 Study 전용 adapter에서 원래 원장을 유지하며 처리한다.
  *   개인정보(본문/연락처)는 상세에서만.
  */
@@ -22,18 +27,17 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { ContactInquiry } from './entities/ContactInquiry.entity.js';
-import { requireServiceLegalScope } from '../service-legal/service-legal-scope.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
 import { createLegacyEducationRequestController } from './legacy-education-requests.controller.js';
 
 /** 본 contact 관리가 다루는 serviceKey(공통 ContactInquiry 사용 서비스). */
-const CONTACT_ADMIN_SERVICE_KEYS = ['k-cosmetics', 'lecture'] as const;
+
 const VALID_STATUSES = ['received', 'in_review', 'answered', 'closed', 'spam'] as const;
 
 function guardServiceKey(req: Request, res: Response): string | null {
   const serviceKey = req.params.serviceKey;
-  if (!(CONTACT_ADMIN_SERVICE_KEYS as readonly string[]).includes(serviceKey)) {
+  if (!contactService(serviceKey)) {
     res.status(404).json({ success: false, error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' } });
     return null;
   }
@@ -87,7 +91,39 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   const repo = dataSource.getRepository(ContactInquiry);
   // WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1: 문의 처리 = operator 업무.
   //   operator 레벨 가드(admin ⊃ operator)로 KCos operator 의 문의 관리 접근 허용. 설정은 별도 컨트롤러에서 admin 유지.
-  const manageGuard = requireServiceLegalScope('operator');
+  const manageGuard = requireContactScope(dataSource, 'operator');
+  const replies = new ContactReplyService(dataSource);
+  router.get('/:serviceKey/contact-inquiries/summary', authenticate, manageGuard, async (req,res,next) => {
+    try { const newCount=await repo.count({where:{service_key:req.params.serviceKey,status:'received'}});res.json({success:true,data:{newCount}}); }
+    catch(error){next(error);}
+  });
+
+  router.get('/:serviceKey/contact-inquiries/:id/replies', authenticate, manageGuard, apiLimiter, async (req,res,next) => {
+    try {
+      const item = await repo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey } });
+      if (!item) return res.status(404).json({ success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'} });
+      res.json({success:true,data:await replies.history(req.params.serviceKey,req.params.id)});
+    } catch(error) { next(error); }
+  });
+  router.post('/:serviceKey/contact-inquiries/:id/replies', authenticate, manageGuard, apiLimiter, async (req,res,next) => {
+    try {
+      const result = await replies.reply(req.params.serviceKey,req.params.id,req.user!.id,req.body??{});
+      res.json({success:true,data:result});
+    } catch(error) {
+      if (error instanceof OperationError) return res.status(error.status).json({success:false,error:{code:error.code,message:error.message}});
+      next(error);
+    }
+  });
+  router.post('/:serviceKey/contact-inquiries/:id/retry-notifications', authenticate, manageGuard, apiLimiter, async (req,res,next) => {
+    try {
+      const item = await repo.findOne({ where: { id:req.params.id,service_key:req.params.serviceKey } });
+      if (!item) return res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'}});
+      item.notification_status=await deliverContactInquiry(dataSource,item);
+      await repo.save(item);
+      res.json({success:true,data:toDetail(item)});
+    } catch(error) {next(error);}
+  });
+
 
   // ── 목록 ──
   router.get('/:serviceKey/contact-inquiries', authenticate, manageGuard, async (req: Request, res: Response) => {

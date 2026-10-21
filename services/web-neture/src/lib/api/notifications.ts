@@ -23,7 +23,7 @@ function isUnauthorized(err: any): boolean {
   return err?.response?.status === 401;
 }
 
-const SERVICE_KEY = CURRENT_HOST_PROFILE === 'community' ? 'community' : 'neture';
+const SERVICE_KEY = CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE;
 
 export const notificationsApi: NotificationApiClient = {
   async getUnreadCount(params) {

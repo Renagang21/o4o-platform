@@ -333,3 +333,7 @@ export { HomePresentationEditor } from "./home-presentation/HomePresentationEdit
 export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } from './cooperation/models';
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
+export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, serviceContactUrl } from './service-entry/PublicServiceEntry';
+export type { PublicServiceKey } from './service-entry/PublicServiceEntry';
+export { PublicServiceContact } from './service-entry/PublicServiceContact';
+export { ServiceContactInboxLink, useServiceContactCount } from './service-entry/ServiceContactInboxLink';

@@ -1,3 +1,4 @@
+import { useServiceContactCount } from '@o4o/shared-space-ui';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from '../config/businessSite';
 import BusinessStoreShortcut from '../pages/business/BusinessStoreShortcut';
@@ -62,7 +63,7 @@ export function KpaGlobalHeader() {
   // (KPA 로컬 SERVICE_KEY='kpa' 는 backend 와 불일치 — literal 'kpa-society' 사용)
   const notif = useNotifications(notificationsApi, {
     enabled: !!user,
-    serviceKey: 'kpa-society',
+    serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key,
   });
 
   const handleNotificationClick = useCallback(
@@ -81,9 +82,15 @@ export function KpaGlobalHeader() {
     contextual: [],
     conditions: {},
     trailing: [...(isHostWorkspace && (user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
-    guestTrailing: [],
+    guestTrailing: [{ label: 'Contact Us', href: '/contact' }],
     isAuthenticated: !!user,
   });
+
+  const contactAllowed = !!((user?.roles ?? []).some(role => (pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(role) && user?.memberships?.some(m => m.serviceKey === 'neture' && m.status === 'active')) || (BUSINESS_SITE.key === 'pharmacy' && ['kpa:operator','kpa:admin'].includes(role) && user?.memberships?.some(m => m.serviceKey === 'kpa-society' && m.status === 'active'))));
+  const newContacts = useServiceContactCount({client:authClient.api,serviceKey:BUSINESS_SITE.key === 'pharmacy'?'kpa-society':BUSINESS_SITE.key,accountId:user?.id,enabled:contactAllowed});
+  if (contactAllowed) computedNav.push({label:newContacts?`문의 관리 · 새 문의 ${newContacts}`:'문의 관리',href:`https://neture.co.kr/operator/service-contact/${BUSINESS_SITE.key==='pharmacy'?'kpa-society':BUSINESS_SITE.key}`});
+
+  if (!computedNav.some(item => item.href === '/contact')) computedNav.push({label:'Contact Us',href:'/contact'});
 
   // User 정보 변환
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.

@@ -1,3 +1,4 @@
+import { ContactReplyPanel } from './ContactReplyPanel';
 /**
  * ContactInquiryAdminPage — 공통 "문의 관리" 운영 화면
  *
@@ -184,6 +185,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
               <div className="mb-3"><span className={FIELD_LABEL}>경로</span><span className={FIELD_VALUE}>{detail.sourcePath}</span></div>
             )}
 
+            <ContactReplyPanel key={`${serviceKey}:${detail.id}`} api={api} serviceKey={serviceKey} contactId={detail.id} onSent={() => { if (["received","in_review"].includes(detailStatus)) setDetailStatus("answered"); }} />
             <div className="h-px bg-slate-200 my-3.5" />
 
             <div className="mb-3">

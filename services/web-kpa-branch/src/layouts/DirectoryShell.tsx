@@ -1,3 +1,4 @@
+import { ServiceContactInboxLink } from '@o4o/shared-space-ui';
 /**
  * DirectoryShell — 공용 도메인 `/`(분회 찾기)의 헤더 · 푸터
  * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
@@ -52,6 +53,8 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
               {n.label}
             </NavLink>
           ))}
+          <a href="https://neture.co.kr/contact?service=kpa-branch">Contact Us</a>
+          <ServiceContactInboxLink client={authClient.api} serviceKey="kpa-branch" accountId={user?.id} enabled={!!user?.roles?.some((role: string) => ["kpa-branch:admin"].includes(role)) && !!user?.memberships?.some(m => m.serviceKey === "kpa-branch" && m.status === "active")} />
         </nav>
       </header>
 

@@ -33,15 +33,12 @@ function mount(entry = '/login?returnUrl=%2Fworkspace') {
 }
 afterEach(() => { cleanup(); Object.assign(state, { profile: 'supplier', isAuthenticated: false, isLoading: false }); });
 describe('로그인 진입과 보호 홈', () => {
-  it.each(['supplier', 'funding'])('%s 홈에서 로그인으로 이동해 안정적으로 머문다', profile => {
+  it.each(['supplier', 'funding'])('%s 공개 홈은 로그인 창을 자동으로 열지 않는다', profile => {
     state.profile = profile; mount('/');
-    expect(screen.getByTestId('path').textContent).toBe('/login');
-    expect(screen.getByText('모달 닫기')).toBeTruthy();
-    fireEvent.click(screen.getByText('모달 닫기'));
+    expect(screen.getByTestId('path').textContent).toBe('/');
     expect(screen.queryByText('모달 닫기')).toBeNull();
-    fireEvent.click(screen.getByText('로그인하기'));
-    expect(screen.getByText('모달 닫기')).toBeTruthy();
-    expect(screen.getByTestId('return').textContent).toBe('/');
+    expect(screen.getByRole('link',{name:'Contact Us'})).toBeTruthy();
+    expect(screen.getByRole('link',{name:'로그인하고 이용하기'})).toBeTruthy();
   });
   it.each(['main', 'community'])('%s 공개 홈 진입을 유지한다', profile => {
     state.profile = profile; mount(); expect(screen.getByText('공개 홈')).toBeTruthy();
