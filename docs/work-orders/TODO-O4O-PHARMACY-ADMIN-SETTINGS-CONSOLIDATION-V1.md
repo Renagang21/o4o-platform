@@ -1,6 +1,6 @@
 # 약국 서비스 설정 통합 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 승인 — 약국 협력사업 메뉴를 약국 서비스 설정으로 통합, 코드·문서 조사 후 개발·검증·push까지
 > **관련 정본**: [약국 설계](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §15-7 · [역할 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) · [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)
@@ -26,7 +26,7 @@
 - [x] T04 회원 조회에 유효 자격·소유 약국별 가입 및 기능 제공 근거 연결
 - [x] T05 공통 UI의 관리자/Neture 소비처와 권한·상태 전환·저장/해제 회귀 검증
 - [x] T06 desktop/mobile 브라우저 확인, 관련 타입·빌드·lint·문서/민감정보 검사
-- [ ] T07 정본 정합·CHECK 기록·경로별 commit·push·원격 SHA 확인
+- [x] T07 정본 정합·CHECK 기록·경로별 commit·push·원격 SHA 확인
 
 ## 조사 결과와 구현 결정
 
@@ -46,3 +46,8 @@
 ### 검증·인계 결과
 
 구현과 검증 세부 결과는 [CHECK](../checks/CHECK-O4O-PHARMACY-ADMIN-SETTINGS-CONSOLIDATION-V1.md)에 기록한다. 개발 검증은 API 37·공통 UI 51·관리자 431·Neture 관련 55개와 desktop/mobile Chromium 4개다. API/관리자 타입 및 API/관리자/Neture 빌드를 확인한다. 변경 문서 민감정보·링크·scope 검사를 거쳐 이 변경만 경로별 commit/push로 인계한다. 원격 SHA 일치와 clean 상태는 최종 보고에서 확인하며 통합 전이므로 worktree는 KEEP이다. 최신 main 이동과 검증 기준의 차이도 CHECK에 남겼다.
+
+
+### 코드 push 완료
+
+구현 커밋 `af543c0a600c94ad4ccce55bba932ed7a32c069f`를 `origin/wo/pharmacy-admin-settings-consolidation`에 push하고 명시적 fetch로 원격 SHA 일치를 확인했다. 커밋 직전 35개 파일의 staged 범위가 모두 이 작업 안임을 필수 검사기로 확인했다. 이 종료 기록은 같은 작업의 docs-only 후속 커밋으로 push한다. PR 생성·main 병합·배포는 하지 않았다.

@@ -38,7 +38,7 @@ Repository `Renagang21/o4o-platform`, base `622aafc82814aedd4a0878f28101e56ff686
 | 타입 검사 | API / 관리자 PASS |
 | 변경 TS/TSX lint | 오류 0, 기존 경고 2(OperatorsPage fetchUsers 의존성, routes의 _next 미사용) |
 | 최종 빌드 | API TypeScript / 관리자 Vite / Neture Vite PASS |
-| 문서/범위 검사 | 변경 문서 3개 민감정보 0건, 신규 문서 상대 링크·git diff --check PASS. staged 범위는 commit 직전 검사 |
+| 문서/범위 검사 | 변경 문서 3개 민감정보 0건, 신규 문서 상대 링크·git diff --check PASS. staged 35건 모두 작업 범위 PASS |
 
 초기 직접 `build:deps`는 새 worktree에 일부 dist가 없어 실패했다. SETUP.md의 의존 순서 filtered build로 재구성한 뒤 타입·빌드를 검증했다. Neture Vitest는 루트 config 실행이 기준이며 처음 workspace cwd로 실행한 결과는 테스트 0건으로 실패했으므로 PASS에 산입하지 않았다. API HTTP 테스트는 sandbox의 로컬 포트 제한 때문에 지원된 실행 권한으로 로컬 fixture 포트를 사용했다. 브라우저 첫 실행은 수동 Vite와 자체 webServer의 포트가 겹쳐 시작하지 못했으며, 자기 서버만 종료한 뒤 기존 Playwright config로 검증했다.
 
@@ -63,3 +63,9 @@ WORKTREE_DISPOSITION: KEEP. 개발 branch의 검토·main 통합이 남아 있�
 푸시 전 origin/main은 다른 공간의 PR #725로 `19518474f4`로 이동했다. 파일 겹침은 0건이며 변경은 Neture obfuscation build/CI/도구 영역이다. 이번 개발 branch는 승인한 base `622aafc82814aedd4a0878f28101e56ff686219a`를 유지한다. 통합 담당은 최신 main의 Neture 빌드 경로와 함께 CI·브라우저 검증을 확인해야 한다. 다른 작업을 임의 merge/rebase하거나 배포하지 않았다.
 
 문서 검사 기본 실행은 sandbox의 Git 자식 프로세스 제한으로 실패해, 검사기가 지원하는 변경 문서 3개의 명시적 경로 인자로 검증했다. 검사기나 sandbox 경계를 수정하지 않았다.
+
+### Git 인계
+
+구현 커밋 `af543c0a600c94ad4ccce55bba932ed7a32c069f`의 원격 push와 SHA 일치를 확인했다. 필수 staged-scope 검사도 sandbox의 Git 자식 프로세스 EPERM으로 막혔으나, 지원된 실행 권한으로 동일 검사기를 실행해 35개 파일 범위 PASS 후 경로별 commit했다. 검사기·권한 정책을 수정하거나 자동 검토를 우회하지 않았다.
+
+코드 push 시 작업트리는 clean이었다. 이번 완료 기록은 별도 docs-only 커밋으로 같은 branch에 push하며, 최종 SHA는 완료 보고에서 인계한다. PR·병합·배포·운영 원장 쓰기는 미실행이고 worktree는 KEEP이다.
