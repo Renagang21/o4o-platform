@@ -66,7 +66,7 @@
 | A12 | URL→편집 블록 `/api/ai/url-to-blocks` | 편집 wrapper, surface 미전달 → Gemini / Q | Q 모델 반영 | 공통 중지 미검사 | **부분** | URL 파싱과 생성 호출을 구분 [route][proxy-route] [proxy][proxy] |
 | A13 | 콘텐츠의 매장 활용 변환 `/api/ai/content-to-store-use` | Q, 출력 surface에 따른 Gemini/Qwen 조건부 선택 | Q/guardrail 조건부 반영 | 공통 중지 미검사 | Gemini **부분**, Qwen 정보 로그 | A11과 공유 구현, 실제 출력 종류로 분리 [route][proxy-route] [proxy][proxy] |
 | A14 | 강의 구조 생성 `/api/ai/course-structure` | 편집 wrapper, surface 미전달 → Gemini / Q | Q 모델 반영 | 공통 중지 미검사 | **부분** | LMS 퀴즈·과제의 별도 실행 경로와 구분 [route][proxy-route] |
-| A15 | 강의 본문 생성 `/api/ai/lesson-body` | 편집 wrapper, surface 미전달 → Gemini / Q | Q 모델 반영 | 공통 중지 미검사 | **부분** | 공통 LMS 사용처 체계에 연결 검토 [route][proxy-route] |
+| A15 | 강의 본문 생성 `/api/ai/lesson-body` | 편집 wrapper에 `surface=lms-lesson` 전달; 해당 surface의 기존 guardrail로 Gemini / Q | Q 모델 반영 | 공통 중지 미검사 | **부분** | 공통 LMS 사용처 체계에 연결 검토 [route][proxy-route] |
 | A16 | 이미지 분석 `/api/ai/vision/analyze` | Gemini / Q, route에서 직접 API 호출 | Q 모델 반영 | 공통 중지 미검사 | **미연결** | 텍스트 proxy의 usage 기록도 거치지 않음 [route][proxy-route] |
 | A17 | 관리자 생성 도구·일반 블록 생성 `/api/ai/generate` | 요청 provider/model → whitelist/default; OpenAI/Gemini/Claude transport | 요청값 우선; Q를 공통 기준으로 쓰지 않음 | 공통 중지 미검사 | **부분**, 성공/실패 usage log | 클라이언트 고정값·base URL 차이도 확인 필요 [proxy][proxy] [관리자 client][admin-generator] |
 | A18 | 상품 AI 태그 재생성·제안 `/api/v1/products/:productId/ai-tags/...` | F → `execute` | 모델 변경 미반영 | 공통 중지 미검사 | **미연결**, 상품 태그 결과/모델 저장만 존재 | `PRODUCT_TAGGING` scope 선언만으로 정책 연결이라 판단하면 안 됨 [태그][tagging] |
@@ -235,3 +235,5 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 추가 리뷰 보완: A31의 production-capable TTS smoke 소비처와 최대 2건 호출을 별도로 연결했다. A19에 상품 일괄 적용 및 태그 재생성 이후의 자동 콘텐츠 생성 진입점과 상품당 최대 5개 논리 생성과 wrapper/adapter retry 증폭을 구분해 추가했다. 새로운 업무 사용처로 중복 집계하지 않으며, 기존 PRODUCT_CONTENT 공유 정책과 사용자 귀속 미전달을 유지해서 기록한다.
 
 최신 main 통합 후 추가 대조: A30의 화면 route와 POST 소비 코드는 조사 기준 revision에도 존재함을 확인했다. 이는 운영 이용/사업 활성 판정이 아니며, 보류한 HUB 관리 기능을 새로 활성화하지 않는다. A19의 15회 wrapper 예와 adapter JSON 재시도를 포함한 30회 HTTP 예도 실제 공급자 청구 검증과 구분한다.
+
+자체 추가 대조: A15는 조사 기준 revision에도 lms-lesson surface를 전달하므로 기존 "surface 미전달" 문구를 정정했다. 해당 surface는 Qwen 허용 대상이 아니며 기존 Gemini 편집 실행 결과/권한은 바꾸지 않는다.
