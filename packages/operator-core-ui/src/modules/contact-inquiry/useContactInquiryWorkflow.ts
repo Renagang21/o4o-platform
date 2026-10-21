@@ -16,7 +16,8 @@ function message(e: unknown, fallback: string) {
     response?: { data?: { error?: string } };
     message?: string;
   };
-  return error?.response?.data?.error || error?.message || fallback;
+  const detail = error?.response?.data?.error as unknown;
+  return (typeof detail === 'string' ? detail : typeof (detail as {message?:unknown})?.message === 'string' ? (detail as {message:string}).message : null) || error?.message || fallback;
 }
 
 /** 목록 조회, 상세 입력, 순차 저장 결과는 서로 덮어쓰지 않는다. */

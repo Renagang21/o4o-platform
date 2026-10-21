@@ -43,6 +43,7 @@ import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 
 type BusinessPageProps = Readonly<{
   businessKey?: string;
+  contactHref?: (businessKey: string) => string | undefined;
   contentEditHref?: (businessKey: string, contentId?: string) => string;
   tabs?: readonly Tab[];
   forumHref?: (business: SemiFranchise) => string;
@@ -53,7 +54,7 @@ export default function OperatorSemiFranchisePage(props: BusinessPageProps = {})
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
 }
 
-function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, contentEditHref, tabs }: BusinessPageProps) {
+function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusinessHome, contentEditHref, tabs }: BusinessPageProps) {
   const workspace = useAssignedBusinessWorkspace(businessKey, tabs);
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
@@ -84,6 +85,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
   }
 
   const currentBusiness = franchises.find(f => f.key === sfKey);
+  const contactUrl = currentBusiness && contactHref?.(sfKey);
   return (
     <div className="space-y-4 p-6">
       {decision && <BusinessDecisionDialog decision={decision} businessName={currentBusiness?.name || sfKey}
@@ -105,6 +107,7 @@ function AssignedBusinessPanel({ businessKey, forumHref, renderBusinessHome, con
         </select>
       </PageHeader>
 
+      {contactUrl && <a className="text-blue-700 underline" href={contactUrl}>이 사업 문의 관리</a>}
       <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">

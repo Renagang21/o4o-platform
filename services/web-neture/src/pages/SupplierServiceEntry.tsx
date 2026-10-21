@@ -1,14 +1,16 @@
-import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { PublicServiceEntry, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { Link } from 'react-router-dom';
+import { SUPPLIER_ONLY_ROLES } from '../lib/role-constants';
 import { api } from '../lib/apiClient';
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ServiceApplyPanel } from '../components/auth/ServiceApplyPanel';
 
-/** Actual application/status entry; the retired introduction stays out of the service root. */
 export default function SupplierServiceEntry() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
-  if (isLoading) return <output aria-live="polite" className="p-6">로그인 상태를 확인하고 있습니다…</output>;
-  if (!isAuthenticated) return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname + location.search)}`} replace />;
-  return <section className="mx-auto max-w-4xl px-4 py-8"><h1 className="mb-6 text-2xl font-semibold">공급자 신청 · 이용 상태</h1><ServiceHomeHero surface="supplier" client={api} heading="h2" /><ServiceApplyPanel service="supplier" enterWorkspace /><ServiceHomePromotion surface="supplier" client={api} /></section>;
+  const { user, isAuthenticated } = useAuth();
+  const operatorOnly = user?.roles?.some(role => ['supplier:operator','supplier:admin'].includes(role)) &&
+    user?.memberships?.some(m => m.serviceKey === 'supplier' && m.status === 'active') && !user?.roles?.some(role => SUPPLIER_ONLY_ROLES.includes(role));
+  return <><ServiceHomeHero surface="supplier" client={api} />
+    <PublicServiceEntry serviceKey="supplier" contactHref="/contact" loginHref={isAuthenticated ? undefined : '/login?returnUrl=%2F'}>
+      {isAuthenticated && (operatorOnly ? <Link to="/operator/suppliers">공급자 서비스 운영 관리</Link> : <ServiceApplyPanel service="supplier" />)}
+    </PublicServiceEntry><ServiceHomePromotion surface="supplier" client={api} /></>;
 }
