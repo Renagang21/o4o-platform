@@ -29,6 +29,36 @@ export class MemberPaidFeatureService {
     return rows[0];
   }
 
+  /** Administrator read projection. Store eligibility reuses the runtime feature resolver. */
+  async describe(userId: string) {
+    try {
+      const [user] = await this.db.query(`SELECT id, status, "isActive" FROM users WHERE id=$1`, [userId]);
+      if (!user) throw new NeturePharmacyError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
+      const paid = await this.resolve(userId);
+      const stores = await this.db.query(`SELECT o.id, o.name, p.status AS "pharmacyStatus"
+        FROM organization_members om JOIN organizations o ON o.id=om.organization_id
+        LEFT JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
+        WHERE om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL ORDER BY o.id`, [userId]);
+      const memberships = stores.length ? await this.db.query(`SELECT membership.organization_id AS "organizationId",
+          sf.key, sf.name, sf.status AS "businessStatus", membership.status
+        FROM semi_franchise_memberships membership JOIN semi_franchises sf ON sf.id=membership.semi_franchise_id
+        WHERE membership.organization_id=ANY($1::uuid[]) ORDER BY sf.name, sf.key`, [stores.map((store: { id: string }) => store.id)]) : [];
+      const resolver = createPharmacyFeatureService(this.db);
+      const pharmacies = [];
+      for (const store of stores) {
+        const provision = store.pharmacyStatus === 'active' ? await resolver.resolve(userId, store.id) : null;
+        pharmacies.push({ ...store,
+          memberships: memberships.filter((item: { organizationId: string }) => item.organizationId === store.id),
+          features: provision?.features ?? null,
+        });
+      }
+      return { paidEligible: paid !== null, accountStatus: user.status, accountActive: user.isActive, pharmacies };
+    } catch (error) {
+      if (error instanceof NeturePharmacyError) throw error;
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '회원 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+    }
+  }
+
   async set(userId: string, actorId: string, input: { active?: unknown; endsAt?: unknown }) {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId) || typeof input.active !== 'boolean' ||
       (input.endsAt != null && (typeof input.endsAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(input.endsAt) || !Number.isFinite(Date.parse(input.endsAt))))) {

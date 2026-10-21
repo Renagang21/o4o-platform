@@ -1,3 +1,4 @@
+import BusinessOperatorAssignments from './BusinessOperatorAssignments';
 /**
  * OperatorsPage — Assignment-Row Canonical (operator-ux-core DataTable)
  *
@@ -647,6 +648,8 @@ export default function OperatorsPage() {
           onFilterChange={(k, v) => setFacets((prev) => ({ ...prev, [k]: v } as Facets))}
         />
       </div>
+
+      <BusinessOperatorAssignments />
 
       {/* WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1: ActionBar (선택 시 노출) */}
       {selectedIds.size > 0 && (

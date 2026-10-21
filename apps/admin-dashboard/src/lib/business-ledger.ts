@@ -40,12 +40,12 @@ export function resolveBusinessLedgerStatus(serviceKey: string, ledger: Business
 
 export function registerPresetPath(serviceKey: string): string {
   return (REGISTER_PRESET_KEYS as readonly string[]).includes(serviceKey)
-    ? `/admin/semi-franchises?register=${serviceKey}`
-    : '/admin/semi-franchises';
+    ? `/admin/pharmacy-service-settings?register=${serviceKey}`
+    : '/admin/pharmacy-service-settings';
 }
 
 /**
- * `GET /neture/admin/semi-franchises` 응답을 key → status 로 줄인다.
+ * `GET /neture/admin/pharmacy-service-settings` 응답을 key → status 로 줄인다.
  * 실패·행 형식 오류·중복 key는 실패로 던진다(빈 원장 = 미등록으로 위장하지 않는다).
  */
 export function parseBusinessLedgerResponse(body: unknown): Record<string, LedgerRowStatus> {

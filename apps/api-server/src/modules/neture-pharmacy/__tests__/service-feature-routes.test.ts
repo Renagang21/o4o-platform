@@ -136,3 +136,19 @@ it('exposes federation roles only to authenticated platform administrators witho
   expect(query.mock.calls[0][0].trimStart()).toMatch(/^SELECT/);
   expect(query.mock.calls[0][0]).not.toMatch(/cooperatives|cooperative_memberships|semi_franchises/);
 });
+
+it('limits member access summaries to platform administrators and returns controlled failures', async () => {
+  const server = app();
+  const path = '/api/v1/neture/admin/member-paid-entitlements/10000000-0000-4000-8000-000000000001/access';
+  expect((await request(server).get(path)).status).toBe(401);
+  expect((await request(server).get(path).set('x-test-actor', 'business-operator')).status).toBe(403);
+  expect(query).not.toHaveBeenCalled();
+  query.mockResolvedValueOnce([]);
+  expect((await request(server).get(path).set('x-test-actor', 'platform-admin')).status).toBe(404);
+  query.mockRejectedValue(new Error('private database details'));
+  const result = await request(server).get(path).set('x-test-actor', 'platform-admin');
+  expect(result.status).toBe(503);
+  expect(result.headers['cache-control']).toBe('private, no-store');
+  expect(JSON.stringify(result.body)).not.toContain('private database details');
+  expect((await request(server).get(path.replace('10000000-0000-4000-8000-000000000001', 'invalid')).set('x-test-actor', 'platform-admin')).status).toBe(404);
+});

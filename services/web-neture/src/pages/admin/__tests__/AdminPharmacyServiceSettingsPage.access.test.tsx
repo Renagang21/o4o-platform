@@ -16,7 +16,7 @@ afterEach(cleanup);
 
 it('hides the platform-only feature policy menu from a Neture-only administrator', () => {
   expect(Object.values(getAdminMenu(false)).flat().some(item => item.path === '/admin/pharmacy-service-settings')).toBe(false);
-  expect(getAdminMenu(false).stores?.some(item => item.path === '/admin/semi-franchises')).toBe(true);
+  expect(getAdminMenu(false).stores?.some(item => item.path === '/admin/semi-franchises')).toBe(false);
 });
 it('offers the service policy entry to a platform administrator', () => {
   expect(getAdminMenu(true).stores?.some(item => item.path === '/admin/pharmacy-service-settings')).toBe(true);

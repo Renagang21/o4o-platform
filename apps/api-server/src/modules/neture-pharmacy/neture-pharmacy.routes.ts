@@ -413,7 +413,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
       { key: 'default', name: '기본 제공 · 전체 약국', features: basic },
       { key: 'paid', name: '유료회원', features: paid },
       ...businesses.map((business: { key: string; name: string; service_features?: unknown; status: string }) => ({ key: `business:${business.key}`, name: `협력사업 · ${business.name}`,
-        features: readServiceFeatures(business.service_features), status: business.status })),
+        features: readServiceFeatures(business.service_features), status: business.status, business })),
     ] };
   }));
   router.put('/admin/service-feature-policies/:target', ...admin, handle(async (req, res) => {
@@ -432,6 +432,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
+  router.get('/admin/member-paid-entitlements/:userId/access', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.describe(uuidParam(req, 'userId')); }));
   router.put('/admin/member-paid-entitlements/:userId', ...admin, handle(async req =>
     memberPaidFeatures.set(uuidParam(req, 'userId'), req.user!.id, req.body ?? {})));
   router.get('/admin/semi-franchises', ...businessAdmin, handle(async () => semiFranchises.listAll()));
