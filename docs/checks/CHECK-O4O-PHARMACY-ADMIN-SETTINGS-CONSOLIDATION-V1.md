@@ -1,13 +1,13 @@
 # 약국 서비스 설정 통합 개발 검증
 
-> **상태**: IN_PROGRESS
+> **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: [구현 TODO](../work-orders/TODO-O4O-PHARMACY-ADMIN-SETTINGS-CONSOLIDATION-V1.md)
 > **관련 정본**: [약국 설계 §15-7](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) · [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)
 
 ## 범위·기준
 
-Repository `Renagang21/o4o-platform`, base `622aafc82814aedd4a0878f28101e56ff686219a`, branch `wo/pharmacy-admin-settings-consolidation`, 전용 worktree `/workspace/o4o-wt/pharmacy-admin-settings-consolidation`에서 수행했다. 이전 완료 branch와 기준 checkout은 변경하지 않았다. 사용자가 승인한 종료점은 개발·검증·commit·push다. PR 생성·병합·배포는 실행하지 않는다.
+Repository `Renagang21/o4o-platform`, base `622aafc82814aedd4a0878f28101e56ff686219a`, branch `wo/pharmacy-admin-settings-consolidation`, 전용 worktree `/workspace/o4o-wt/pharmacy-admin-settings-consolidation`에서 수행했다. 이전 완료 branch와 기준 checkout은 변경하지 않았다. 개발 단계의 당시 승인 종료점은 개발·검증·commit·push였다. 후속 사용자 승인으로 같은 작업의 PR·병합·배포를 이어가 완료했으며, 통합 결과는 아래 최종 절을 따른다.
 
 ## 최종 변경
 
@@ -48,7 +48,7 @@ Repository `Renagang21/o4o-platform`, base `622aafc82814aedd4a0878f28101e56ff686
 
 인증·계정·HTTP·DB 응답은 합성 fixture다. 실제 Google 관리자 로그인, 운영 DB 쿼리·유료 자격 변경·사업 등록·가입 승인·과금·외부 AI 호출은 수행하지 않았다. 이 결과를 실제 PostgreSQL 원장이나 운영 로그인 검증으로 보고하지 않는다. desktop/mobile 캡처를 확인했으며 개발용 전역 배너가 있는 로컬 화면이다.
 
-공통 UI 소비처는 관리자 앱과 Neture 호환 wrapper다. 다른 사업의 operator 콘텐츠/자료/가입 업무는 유지한다. backend 응답에 사업 정보를 포함하므로 통합·배포 담당은 API와 관리자·Neture 번들을 함께 판정하고 기존 Delivery 정책을 따른다. 이번 작업에서 배포하지 않는다. PR CI는 PR을 생성하지 않아 미실행이다.
+공통 UI 소비처는 관리자 앱과 Neture 호환 wrapper다. 다른 사업의 operator 콘텐츠/자료/가입 업무는 유지한다. backend 응답에 사업 정보를 포함하므로 통합·배포 담당은 API와 관리자·Neture 번들을 함께 판정하고 기존 Delivery 정책을 따른다. 개발 push 종료 당시에는 배포·PR CI가 미실행이었다. 이후 통합 승인에 따른 실제 결과는 아래에 별도 기록했다.
 
 ## 문서 정합·작업공간
 
@@ -78,9 +78,9 @@ WORKTREE_DISPOSITION: KEEP. 개발 branch의 검토·main 통합이 남아 있�
 - [x] 전달 branch/HEAD `8c2fa68d239d3f02b5c0836204e92c8e51935764` 및 clean 상태 확인
 - [x] 최신 main `e09db6eb4b5b48e92bb3ebba2c777910c65f3c73`의 변경 16개 경로 조사: 이번 변경과 겹침 0, Neture 빌드/CI/도구 및 완료 문서
 - [x] 이미 push한 작업 branch에 main을 merge (`273b2eafc52b2d419bbda134537ca0c518fa3c18`), 충돌 0, 다른 checkout 수정 0
-- [ ] 통합 후 관련 검증·PR CI 및 Codex 리뷰
-- [ ] main 병합·post-merge CI·현재 Delivery 정책 판정
-- [ ] 운영 배포·serving revision/traffic·공개 응답 확인 및 한계 기록
+- [x] 통합 후 관련 검증·PR CI 및 Codex 리뷰
+- [x] main 병합·post-merge CI·현재 Delivery 정책 판정
+- [x] 운영 배포·serving revision/traffic·공개 응답 확인 및 한계 기록
 
 새 migration·schema·seed·DB 직접 변경은 추가하지 않는다. 운영 Google 인증과 실제 회원/사업 상태 변경은 이번 검증에서 수행하지 않는다.
 
@@ -100,3 +100,44 @@ PR CI·Codex 재리뷰·운영 배포 결과는 확정 후 아래에 기록한�
 
 
 Codex 후속 P2도 수정했다. 중앙 운영자 화면에서 지정/해제 쓰기 성공과 목록 재조회 실패를 구분하며 성공 안내를 유지한다. 재시도는 GET만 실행하고 성공한 POST/DELETE를 반복하지 않는다. 후보 검색은 별도 목록 재조회를 하지 않는다. UI 3개(성공한 해제 후 GET 실패→조회만 재시도 포함)와 변경 파일 lint를 검증했다. API 타입 검사도 PASS다.
+
+
+## 통합 확정
+
+- [PR #746](https://github.com/Renagang21/o4o-platform/pull/746): 최종 개발 HEAD `37d8a2bb5fab5f5906feecde0449f68ffbaed95c`, PR CI [39527811787](https://github.com/Renagang21/o4o-platform/actions/runs/39527811787) 성공. CI Gate·CodeQL·Guard·SonarCloud PASS.
+- Codex 지적 3건 수정·회귀 검증·스레드 해결 후 최종 HEAD 재리뷰 완료: 추가 지적·미해결 0.
+- 2026-10-21 10:44 KST 정상 merge: `c9d9760abaebe2bbfce53cbe20a1623ad1733860`. 우회·force push·다른 checkout 변경 없음.
+- 병합 커밋의 [main CI 39529022199](https://github.com/Renagang21/o4o-platform/actions/runs/39529022199) 및 CodeQL 39529022119 성공.
+- [Delivery 39529989271](https://github.com/Renagang21/o4o-platform/actions/runs/39529989271)가 API·관리자·Neture·KPA Society·강의·Store 6개를 자동 배포 대상으로 판정했다. 별도 Promote dispatch는 하지 않았다. 최종 서빙 결과는 다음 절에 확정 기록한다.
+
+
+## 운영 배포·공개 검증 완료
+
+2026-10-21 11:05 KST [Delivery 39529989271](https://github.com/Renagang21/o4o-platform/actions/runs/39529989271) 성공, `production=DEPLOYED`를 확인했다. 서비스별 실제 serving SHA 기준 LEVEL_2 자동 verified 배포였으며 DEPLOY_FREEZE=false, main/CI/배포 target 일치, API 성공 후 프런트 배포 순서다. 별도 Promote·직접 서비스 dispatch·설정 우회는 하지 않았다.
+
+| 서비스 | serving revision | SHA | traffic |
+| --- | --- | --- | --- |
+| API | o4o-core-api-04116-hik | c9d9760aba | 100% |
+| 관리자 | o4o-admin-dashboard-01538-kiy | c9d9760aba | 100% |
+| Neture | neture-web-02004-cot | c9d9760aba | 100% |
+| KPA Society | kpa-society-web-02230-toy | c9d9760aba | 100% |
+| 강의 | lecture-web-00211-bem | c9d9760aba | 100% |
+| Store | store-web-00275-han | c9d9760aba | 100% |
+
+트래픽 전환 로그의 각 revision 100%와 최종 serving SHA 재조회 DEPLOYED가 일치한다. KPA Branch·Hospital Pharmacy는 BEHIND_NO_RUNTIME_CHANGE/NO_DEPLOY다. 기존 Neture production names 변경은 이미 운영 반영된 SHA `19518474f4`가 기준이므로 이번 판정에 미배포 Docker 변경으로 다시 포함되지 않았다.
+
+새 migration/schema/seed 파일은 0개다. 표준 API 배포의 `o4o-api-migrations-mhc52` 실행 성공을 확인했다. migration 실제 적용 개수는 별도 DB 조회하지 않았으므로 0건 적용이라고 단정하지 않는다. 운영 원장 직접 쓰기·회원 유료 자격/사업/운영자 상태 변경은 실행하지 않았다.
+
+공개 읽기 검증:
+
+- API `/health`, `/health/ready` 200.
+- 관리자 `/`, `/admin/pharmacy-service-settings`, 구 `/admin/semi-franchises?register=carepharm` 200. 이 HTTP 결과는 SPA shell 제공 확인이며 로그인 후 redirect/저장을 검증한 결과는 아니다.
+- 관리자 공개 번들 `/assets/index-D_N8uw-O.js` 200 및 `기능 설정`, `회원 이용 자격`, `설정 대상` 포함 확인.
+- `/api/v1/neture/admin/service-feature-policies`와 신규 회원 access 요약 API는 비인증 401. 회원 식별자는 합성 UUID이며 실제 계정을 조회하지 않았다.
+- 실제 Google 로그인·운영 DB 기반 유료 자격 변경/사업 등록/가입 승인/운영자 지정·PG/과금·외부 AI 호출은 미실행이다. 실제 관리자 화면 기능 검증은 앞서 기록한 합성 desktop/mobile Chromium 결과를 따른다.
+
+## 종료 기록·작업공간 처리
+
+기능 정비·PR #746 병합·main CI·운영 배포·공개 검증을 완료했다. 이 절의 docs-only 종료 기록은 같은 WO의 후속 PR로 정상 CI/리뷰/병합하고 runtime 변경이 없으면 NO_DEPLOY로 마친다. 이후 origin/main 포함·clean·operation 없음·타 세션 사용 없음 확인 후 자기 worktree/로컬 및 원격 작업 branch만 표준 정리한다. 기준 checkout은 다른 완료 branch 상태를 그대로 보존한다.
+
+문서 정합: 약국 설계 §15-6/§15-7·TODO·CHECK를 사용자 승인안과 실제 배포 결과에 맞췄다. CANONICAL-INDEX 상태·Frozen 본문 수정 0, 미해결 지적 0. 앞선 KEEP/push-only/미배포 서술은 각 단계의 당시 기록이다.
