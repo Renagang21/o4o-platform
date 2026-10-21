@@ -216,8 +216,7 @@ export default function BusinessOperatorAssignments() {
               void act(
                 () =>
                   authClient.api.post(
-                    `/neture/admin/semi-franchises/${encodeURIComponent(target)}/operators`,
-                    { userId: selected },
+                    `/neture/admin/semi-franchises/${encodeURIComponent(target)}/operators/${encodeURIComponent(selected)}`,
                   ),
                 "담당자를 지정했습니다.",
               )

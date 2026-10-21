@@ -83,3 +83,17 @@ WORKTREE_DISPOSITION: KEEP. 개발 branch의 검토·main 통합이 남아 있�
 - [ ] 운영 배포·serving revision/traffic·공개 응답 확인 및 한계 기록
 
 새 migration·schema·seed·DB 직접 변경은 추가하지 않는다. 운영 Google 인증과 실제 회원/사업 상태 변경은 이번 검증에서 수행하지 않는다.
+
+
+### PR #746 통합 검증·리뷰 수정
+
+최신 main 통합 후 관리자 431·공통 UI 51·Neture 관련 55·API 37 및 Chromium desktop/mobile 4개를 다시 통과했다. main의 Neture production names 빌드도 PASS이며 공개 산출물 source map 0개, 비공개 manifest 1개를 확인했다. 고정 도구 lockfile의 캐시 부족분은 정상 registry에서 설치했으며 manifest·dependency·lockfile 변경은 없다.
+
+Codex가 지적한 두 항목을 같은 branch에서 수정한다.
+
+1. P1: 기타 사업의 운영자 지정은 기존 서버 계약인 `/semi-franchises/:key/operators/:userId`를 사용한다. body-only 경로는 404임을 실제 Express router 회귀에서 확인하고 UI가 선택 사용자 경로와 성공 안내를 사용하는지 검증한다.
+2. P2: 회원 소유 조직 조회를 약국 가입 원장 INNER JOIN으로 제한한다. 공급자/기타 조직을 미신청 약국으로 표시하지 않는다. 현재/심사 중 약국은 유지하고 이전 소유 관계는 제외한다. 실제 SELECT를 격리 SQLite 합성 원장에 실행해 공급자 제외·활성/심사 중 약국 유지·탈퇴 owner 제외를 확인했다. 실제 PostgreSQL 검증을 대신하는 결과로 보고하지 않는다.
+
+PR CI·Codex 재리뷰·운영 배포 결과는 확정 후 아래에 기록한다.
+
+수정 후 관리자 운영자 UI 2개, 관련 API 3 suites/17개(요청 계약 1개 추가), 변경 5개 TS/TSX lint 오류·경고 0으로 통과했다. 새 요청 계약 테스트의 초기 403은 합성 인증에 역할 claim이 빠진 fixture 문제여서 합성 전체 관리자 역할만 보완했다. 운영 guard·membership·role 판정 코드는 변경하지 않았다.

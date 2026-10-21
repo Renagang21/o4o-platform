@@ -82,6 +82,9 @@ it("projects approved owned-store eligibility through the runtime resolver and r
   )!;
   expect(storeQuery[0]).toContain("om.role='owner' AND om.left_at IS NULL");
   expect(storeQuery[1]).toEqual([owner]);
+  expect(storeQuery[0]).toContain("JOIN neture_pharmacy_memberships p ON p.organization_id=o.id");
+  expect(storeQuery[0]).not.toMatch(/LEFT\s+JOIN\s+neture_pharmacy_memberships/);
+
 });
 it("does not remove business grants when the paid entitlement is invalid", async () => {
   const { service } = fixture({ paid: false });

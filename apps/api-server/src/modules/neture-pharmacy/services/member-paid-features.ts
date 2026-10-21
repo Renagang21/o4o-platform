@@ -37,7 +37,7 @@ export class MemberPaidFeatureService {
       const paid = await this.resolve(userId);
       const stores = await this.db.query(`SELECT o.id, o.name, p.status AS "pharmacyStatus"
         FROM organization_members om JOIN organizations o ON o.id=om.organization_id
-        LEFT JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
+        JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
         WHERE om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL ORDER BY o.id`, [userId]);
       const memberships = stores.length ? await this.db.query(`SELECT membership.organization_id AS "organizationId",
           sf.key, sf.name, sf.status AS "businessStatus", membership.status

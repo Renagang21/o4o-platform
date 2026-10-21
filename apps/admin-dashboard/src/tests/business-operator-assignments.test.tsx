@@ -66,7 +66,12 @@ it("assigns an existing custom-business operator by search and selection, never 
           ],
     },
   }));
-  api.post.mockResolvedValue({});
+  api.post.mockImplementation(async (path: string) => {
+    // The server accepts the selected user only as the final route parameter.
+    if (path !== "/neture/admin/semi-franchises/custom-business/operators/candidate")
+      throw new Error("Unregistered assignment endpoint");
+    return { data: { success: true, data: { assigned: true } } };
+  });
   render(<Panel />);
   await screen.findByLabelText("기타 사업");
   fireEvent.click(screen.getByText("사업별 개별 담당 지정"));
@@ -89,8 +94,8 @@ it("assigns an existing custom-business operator by search and selection, never 
   fireEvent.click(screen.getByRole("button", { name: "개별 담당 지정" }));
   await waitFor(() =>
     expect(api.post).toHaveBeenCalledWith(
-      "/neture/admin/semi-franchises/custom-business/operators",
-      { userId: "candidate" },
+      "/neture/admin/semi-franchises/custom-business/operators/candidate",
     ),
   );
+  await screen.findByText("담당자를 지정했습니다.");
 });
