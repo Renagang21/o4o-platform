@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ org: 'store', user: 'staff', get: vi.fn(), post: vi.fn() }));
 vi.mock('../../api/client', () => ({ coreApiClient: state }));
@@ -76,5 +76,52 @@ it('clears the customer utterance when leaving the browser page', async () => {
   fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Transient utterance' } });
   fireEvent(window, new Event('pagehide'));
+  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
+});
+it('returns directly from customer display to a focused reply and preserves both directional drafts', async () => {
+  render(<Page />); await screen.findByLabelText('안내 문구');
+  fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+  await screen.findAllByText('Translated words');
+  fireEvent.click(screen.getByRole('button', { name: '고객에게 크게 보여주기' }));
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: '고객이 답하기' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  const reply = screen.getByLabelText('고객이 입력한 문장'); expect(document.activeElement).toBe(reply);
+  expect(state.post).toHaveBeenCalledOnce();
+  fireEvent.change(reply, { target: { value: 'Customer reply' } });
+  fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
+  expect(screen.getAllByText('Translated words').length).toBeGreaterThan(0);
+  expect(screen.queryByRole('textbox')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('Customer reply');
+  fireEvent.click(screen.getByRole('button', { name: '새 상담 · 내용 지우기' }));
+  fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
+  expect(screen.queryByText('Translated words')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
+});
+it('never restores a late translation after leaving its direction, including after switching back', async () => {
+  let finish!: () => void;
+  state.post.mockImplementationOnce((_path, body) => new Promise(resolve => { finish = () => resolve(result(body)); }));
+  render(<Page />); await screen.findByLabelText('안내 문구');
+  fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  await act(async () => finish());
+  fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
+  expect(screen.queryByText('Translated words')).toBeNull();
+  expect(state.post).toHaveBeenCalledOnce();
+});
+it('discards inactive directional content on pagehide and language changes', async () => {
+  const c = context(); c.data.modes = [{ ...modes[0], allowed: true }]; state.get.mockResolvedValue(c);
+  render(<Page />); await screen.findByLabelText('고객에게 전달할 한국어 문장');
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Outgoing draft' } });
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Reply draft' } });
+  fireEvent(window, new Event('pagehide'));
+  fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
+  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Another outgoing draft' } });
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  fireEvent.change(screen.getByLabelText('고객 언어'), { target: { value: 'ja' } });
+  fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
   expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
 });

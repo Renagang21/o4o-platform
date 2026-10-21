@@ -60,6 +60,24 @@ it('usage summary arrives and survives the state change caused by its own reques
   api.list.mockResolvedValue(feed([{ ...row(), hasSourceUpdate: true }])); show();
   await screen.findByText('QR 2 · 태블릿 1에서 사용 중'); expect(api.usage).toHaveBeenCalledOnce();
 });
+it('zero counted references never claim unused content when tablet blocks and video links are uncounted', async () => {
+  api.list.mockResolvedValue(feed([{ ...row(), hasSourceUpdate: true }]));
+  api.usage.mockResolvedValue({ success: true, data: { usage: { qr: 0, tablet_display: 0, product_link: 0, pop_pdf: 0 },
+    coverage: { tablet_content_list_block: 'not_counted', store_videos: 'no_link', pop: 'approximate' } } });
+  show(); await screen.findByText('집계된 사용처 없음');
+  expect(screen.getByText('태블릿 블록 미집계 · 영상 연결 미집계 · POP은 근사 집계')).toBeTruthy();
+  expect(screen.queryByText(/사용 중 아님/)).toBeNull();
+});
+it('usage failure can be retried without losing the selected content or reloading its list', async () => {
+  api.list.mockResolvedValue(feed([{ ...row(), hasSourceUpdate: true }]));
+  api.usage.mockRejectedValueOnce(Error('synthetic'));
+  show(); await select();
+  fireEvent.click(await screen.findByRole('button', { name: '사용처 다시 확인' }));
+  await screen.findByText('QR 2 · 태블릿 1에서 사용 중');
+  expect(api.usage).toHaveBeenCalledTimes(2); expect(api.list).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole('button', { name: '제작 시작' }));
+  expect(start).toHaveBeenCalledWith([{ id: 'one', title: 'Fixture one', origin: 'direct' }]);
+});
 it('modal mode never rewrites its host URL or exposes destructive actions', async () => {
   show('/library?host=retained', true); await select();
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Modal query' } });

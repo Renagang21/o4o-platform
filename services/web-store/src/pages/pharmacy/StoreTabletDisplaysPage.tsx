@@ -1,4 +1,6 @@
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
+import { hasStoreOperationEntry, readStoreOperationEntry, type StoreOperationEntry } from './operations/storeOperationEntry';
+import { StoreOperationReturn } from './operations/StoreExecutionActions';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -115,6 +117,9 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   const navigate = useNavigate();
   const location = useLocation();
   const base = storeWorkspaceBase(location.pathname);
+  const { key: operationScope } = useStoreOperationScope();
+  const operationEntry = readStoreOperationEntry(location.state, operationScope, base, 'tablet');
+  const consumedEntry = useRef<StoreOperationEntry | null>(null);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 두 업무를 탭으로 분리.
   //   'corners'  = 코너별 운영(코너 선택 → 현재 콘텐츠 · 교체 · 화면 열기)
@@ -464,6 +469,14 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
   const [swapCorner, setSwapCorner] = useState<{ tabletId: string; name: string } | null>(null);
+  useEffect(() => {
+    if (!operationEntry || consumedEntry.current === operationEntry || loadingTablets || tabletListError || !isCurrent()) return;
+    const target = tablets.find(tablet => tablet.id === operationEntry.id);
+    if (!target) return;
+    consumedEntry.current = operationEntry;
+    setActiveTab('corners'); setSelectedTabletId(target.id);
+    setSwapCorner({ tabletId: target.id, name: cornerPrimaryLabel(target) });
+  }, [operationEntry, tablets, loadingTablets, tabletListError, isCurrent]);
   // §3: 미리보기 모달 보기 전환(태블릿=넓게 / 휴대전화=390px).
   const [previewView, setPreviewView] = useState<'tablet' | 'mobile'>('tablet');
 
@@ -720,6 +733,9 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   return (
     <div className="space-y-6">
       <StoreWorkflowNavigation subject="태블릿" />
+      <StoreOperationReturn entry={operationEntry} />
+      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.</p>}
+      {operationEntry && !loadingTablets && !tabletListError && !tablets.some(tablet => tablet.id === operationEntry.id) && <p role="alert" className="text-sm text-amber-800">선택한 위치를 현재 목록에서 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void loadTablets()}>위치 다시 확인</button></p>}
       {previewLoading && <p role="status">고객 화면 불러오는 중… <button type="button" onClick={handleClosePreview} className="min-h-11 underline">미리보기 불러오기 취소</button></p>}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
