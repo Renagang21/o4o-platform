@@ -1,7 +1,7 @@
 import { ServiceContactInboxLink } from "@o4o/shared-space-ui";
 import { useNotifications } from "@o4o/account-ui";
 import { notificationsApi } from "../../lib/api/notifications";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ContactInquiryAdminPage,
@@ -65,22 +65,7 @@ function ContactWorkspace({
         (await api.patch(`${base}/${id}/note`, { internalNote })).data.data,
     };
   }, [serviceKey, user?.id]);
-  const prefix =
-    serviceKey === "kpa-society"
-      ? "kpa"
-      : serviceKey === "k-cosmetics"
-        ? "cosmetics"
-        : ["carepharm", "megapharm", "pharmcoop"].includes(serviceKey)
-          ? `neture:${serviceKey}_admin`
-          : serviceKey;
-  const canConfigure =
-    (serviceKey === "kpa-society" &&
-      user.roles?.includes("neture:pharmacy_admin")) ||
-    user?.roles?.includes(
-      prefix.includes(":")
-        ? prefix
-        : `${["store", "hospital"].includes(prefix) ? "neture" : prefix}:admin`,
-    );
+  const canConfigure = useContactSettingsAccess(serviceKey, user.id);
   return (
     <>
       <nav className="flex flex-wrap gap-4 p-4">
@@ -155,4 +140,40 @@ function ContactWorkspace({
       />
     </>
   );
+}
+
+/** Reuse the protected settings GET; only the confirmed capability enters state. */
+function useContactSettingsAccess(serviceKey: string, accountId: string) {
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    let active = true,
+      sequence = 0;
+    setAllowed(false);
+    const read = async () => {
+      const request = ++sequence;
+      try {
+        const response = await api.get(
+          `/admin/services/${encodeURIComponent(serviceKey)}/contact-settings`,
+        );
+        if (active && request === sequence)
+          setAllowed(
+            response.data?.success === true &&
+              response.data?.data?.serviceKey === serviceKey,
+          );
+      } catch {
+        if (active && request === sequence) setAllowed(false);
+      }
+    };
+    void read();
+    const timer = setInterval(() => {
+      if (document.visibilityState !== "hidden") void read();
+    }, 30000);
+    window.addEventListener("focus", read);
+    return () => {
+      active = false;
+      clearInterval(timer);
+      window.removeEventListener("focus", read);
+    };
+  }, [serviceKey, accountId]);
+  return allowed;
 }

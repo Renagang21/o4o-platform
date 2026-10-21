@@ -38,6 +38,7 @@ import { ContactInquiry } from "../entities/ContactInquiry.entity.js";
 import { ServiceContactSettings } from "../entities/ServiceContactSettings.entity.js";
 import { createPublicContactInquiryController } from "../public-contact-inquiry.controller.js";
 import { createAdminContactInquiryController } from "../admin-contact-inquiry.controller.js";
+import { createAdminServiceContactSettingsController } from "../admin-service-contact-settings.controller.js";
 import {
   CONTACT_SERVICES,
   contactRecipients,
@@ -109,6 +110,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     app.use(express.json());
     app.use("/public/services", createPublicContactInquiryController(db));
     app.use("/admin/services", createAdminContactInquiryController(db));
+    app.use("/admin/services", createAdminServiceContactSettingsController(db));
     app.use((error: any, _req: any, res: any, _next: any) =>
       res.status(500).json({ code: error.code || "ERROR" }),
     );
@@ -261,6 +263,28 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
       expect(notificationService.createNotification).not.toHaveBeenCalled();
     } finally {
       read.mockRestore();
+    }
+  });
+  it("preserves inherited lecture inquiry types across unrelated admin settings saves", async () => {
+    const actor=randomUUID();
+    try {
+      await db.query("INSERT INTO users VALUES($1,'active',true,true)",[actor]);
+      await db.query("INSERT INTO role_assignments VALUES($1,'lecture:admin',true,NULL,NULL)",[actor]);
+      await db.query("INSERT INTO service_memberships VALUES($1,'lecture','active')",[actor]);
+      const saved=await request(app).put("/admin/services/lecture/contact-settings").set("x-test-user",actor).send({recipientEmails:["synthetic@example.invalid"],emailNotificationEnabled:true});
+      expect(saved.status).toBe(200);
+      expect((await db.query("SELECT inquiry_types FROM service_contact_settings WHERE service_key='lecture'"))[0].inquiry_types).toBeNull();
+      const publicConfig=await request(app).get("/public/services/lecture/contact-settings");
+      expect(publicConfig.body.data.inquiryTypesConfigured).toBe(false);
+      expect(JSON.stringify(publicConfig.body)).not.toContain("synthetic@example.invalid");
+      const explicit=await request(app).put("/admin/services/lecture/contact-settings").set("x-test-user",actor).send({inquiryTypes:[{value:"partnership",label:"강의 협업",enabled:true}]});
+      expect(explicit.status).toBe(200);
+      expect((await request(app).get("/public/services/lecture/contact-settings")).body.data).toMatchObject({inquiryTypesConfigured:true,inquiryTypes:[{value:"partnership",label:"강의 협업"}]});
+    } finally {
+      await db.query("DELETE FROM service_contact_settings WHERE service_key='lecture'");
+      await db.query("DELETE FROM role_assignments WHERE user_id=$1",[actor]);
+      await db.query("DELETE FROM service_memberships WHERE user_id=$1",[actor]);
+      await db.query("DELETE FROM users WHERE id=$1",[actor]);
     }
   });
   it("selects only live service operators and reports partial notification failure accurately", async () => {
