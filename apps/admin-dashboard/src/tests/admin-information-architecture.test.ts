@@ -47,7 +47,6 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin',
     '/admin/platform/hub',
     '/admin/platform',
-    '/admin/semi-franchises',
     '/admin/pharmacy-service-settings',
     // Core
     '/users',

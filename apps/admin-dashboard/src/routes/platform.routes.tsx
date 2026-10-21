@@ -3,7 +3,8 @@ import PlatformAdminLandingPage from '@/pages/platform/account-governance/Platfo
 import PlatformSectionLayout from '@/pages/platform/account-governance/PlatformSectionLayout';
 import PlatformAccountsPage from '@/pages/platform/account-governance/PlatformAccountsPage';
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
-import { AdminPharmacyServiceSettingsPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import AdminPharmacyServiceSettingsPage from '@/pages/platform/AdminPharmacyServiceSettingsPage';
+import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
 configurePharmacyManagementClient(api);
 import { Navigate, Route } from 'react-router-dom';

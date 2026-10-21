@@ -158,7 +158,7 @@ function deferred<T>() {
   const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
   return { promise, resolve, reject };
 }
-const sourceRow = (title: string) => ({ id: title, title, summary: null, body: null, tags: [], semiFranchiseName: '사업', publishedAt: null });
+const sourceRow = (title: string) => ({ id: title, title, summary: null, body: null, tags: [], semiFranchiseKey: 'diabetes', semiFranchiseName: '사업', publishedAt: null });
 const supplyRow = (productName: string) => ({ productName, kind: 'default', optionId: productName, supplierName: '공급자', unitPrice: 100, semiFranchiseName: '사업', semiFranchiseKey: 'diabetes' });
 
 describe('사업 조회 응답 순서', () => {
