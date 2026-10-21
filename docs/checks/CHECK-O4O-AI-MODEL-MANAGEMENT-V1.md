@@ -1,6 +1,6 @@
 # AI 모델 관리 및 사용 모델 지정 검증
 
-> **상태**: COMPLETED
+> **상태**: ACTIVE — 운영 배포·검증 완료, 정리 전 snapshot; 최종 실행 기록은 아래 링크 참조
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: [모델 관리 TODO](../work-orders/TODO-O4O-AI-MODEL-MANAGEMENT-V1.md)
 > **관련 정본**: [AI 공통 기반 §12](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#12-관리자-ai-운영-조회-기반--main운영-반영-2026-10-20)
@@ -133,3 +133,31 @@ SonarCloud의 폼 신뢰성 지적에 따라 모델 저장·사용 모델 저장
 등록 모델이 존재하나 text 기능이 없으면 `allows()`는 명시적 false를 반환한다. undefined는 관리 목록에 없는 모델의 기존 동적 탐색에만 사용한다. 따라서 정적 whitelist나 Google live 목록이 등록 모델의 비-text 판정을 덮어쓰지 못한다. 기존 공통 질의 모델 선택 목록에서도 해당 모델을 제외한다.
 
 모델 관리·정적/live 모델 목록·정책 서비스 회귀 3 suites, 23 PASS 및 API type-check PASS. 관리 미등록 live text 모델의 기존 탐색은 유지했다. 실제 공급자 조회/생성 대신 합성 ListModels 응답을 사용했다.
+
+## main·운영 배포 확인 (2026-10-21 Asia/Seoul)
+
+- 기능 [PR #754](https://github.com/Renagang21/o4o-platform/pull/754): merge SHA `1adf577e38a7e580f1bbc0499a871c943cecc289`. 최종 개발 HEAD `9b633bb6e003ad25ee9115d8cb012834e8451842`의 CI [39597958990](https://github.com/Renagang21/o4o-platform/actions/runs/39597958990) SUCCESS, Codex 완료·추가 지적 없음·미해결 스레드 0.
+- API CI: 548 suites / 9,060 tests PASS, 46 suites / 646 tests SKIP. 격리 PostgreSQL 검증은 별도 로컬 실행 기록을 따르며 skip을 실제 DB 검증으로 합산하지 않는다. 관리자 30 files / 441 tests PASS. SonarCloud gate SUCCESS이며 스타일·복잡도 개선 권고 17건은 남아 있다(0건으로 보고하지 않음).
+- main post-merge CI [39599667828](https://github.com/Renagang21/o4o-platform/actions/runs/39599667828)와 CodeQL SUCCESS.
+- 자동 [Delivery 39601258231](https://github.com/Renagang21/o4o-platform/actions/runs/39601258231) SUCCESS. LEVEL 2로 API 다음 관리자 순서의 verified rollout, 별도 promote 없음. 최종 production commit status `DEPLOYED` SUCCESS.
+
+| 서비스 | 검증된 serving revision | 트래픽·label SHA |
+| --- | --- | --- |
+| o4o-core-api | o4o-core-api-04128-kuh | 100%; 1adf577e38a7e580f1bbc0499a871c943cecc289 |
+| o4o-admin-dashboard | o4o-admin-dashboard-01550-guy | 100%; 1adf577e38a7e580f1bbc0499a871c943cecc289 |
+
+다른 6개 웹은 runtime 변경이 없어 NO_DEPLOY다. API 새 revision Ready=True 및 전환 후 공개 ready HTTP200, 관리자 새 revision 직접 smoke 후 100% 전환을 확인했다. 최종 Report도 single serving revision label을 같은 SHA로 확인했다. 새 schema/migration·dependency·CI/배포 설정 변경은 없으며 기존 표준 migration job execution은 성공했다.
+
+### 운영 공개·브라우저 확인
+
+공개 API health/ready HTTP200, 관리자 root·hub·operators·admin-accounts·AI settings HTML 및 새 entry JS `/assets/index-DDHVF44X.js` HTTP200을 확인했다. 비로그인 hub 및 새 모델 관리 GET은 HTTP401이다.
+
+Chromium desktop1280×800/mobile390×844에서 settings·AI settings·operators·hub 8개 진입은 /login으로 이동하고 `관리자 로그인` 제목을 표시했다. app pageerror는 0이다. 이는 로그인 성공이나 관리자 설정 저장 검증이 아니다. 실제 Google 인증 세션·운영 모델 저장/재조회·유료 공급자 호출·공급자 청구 대조는 미실행이다. 이 클라우드의 Google SDK tunnel 제한과 비공개 테스트 계정 파일 부재 때문에 실계정 검증으로 대체하지 않았다.
+
+기능의 운영 범위는 기존 31개 논리 사용처 중 30개 모델 선택 연결이다. Qwen/DeepSeek 실제 adapter·유료 STT·통합 중지·전체 비용 이관은 후속이다. 추가 [조사/설계 PR #721](https://github.com/Renagang21/o4o-platform/pull/721)의 X01 Vision OCR 등 전문 API 조사도 현재 모델 관리에 연결됐다는 의미가 아니다.
+
+### 종료 문서·정리 경계
+
+같은 WO의 기존 branch를 main으로 fast-forward한 뒤 이 종료 문서·TODO·정본 현황만 보완한다. 이 절은 문서 병합·실제 worktree 정리 전 snapshot이다. 일회성 테스트 DB/컨테이너 잔존 0은 이미 확인했으나 현재 branch/worktree를 아직 삭제하지 않았다. 문서 CI/Codex·main 통합·post-merge/NO_DEPLOY 확인 후 자기 worktree와 main 포함 branch만 정상 절차로 정리하며, 최종 결과는 [정리 실행 기록](https://github.com/Renagang21/o4o-platform/pull/754#issuecomment-6314873874)에 갱신한다.
+
+문서 정합: 모델 관리의 개발 단계/실제 배포를 구분하고 quota rollback 실패의 후속 해소·리뷰 보완·운영 한계를 기록했다. 새 canonical index 등록이나 범위 밖 정책 변경은 하지 않았다.

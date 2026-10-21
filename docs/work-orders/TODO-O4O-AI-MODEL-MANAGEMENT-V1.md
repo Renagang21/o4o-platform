@@ -39,10 +39,16 @@ AI 운영 관리의 API·모델 연결은 정적 MODEL_WHITELIST 조회이며 �
 - [x] I02 최신 main 통합 및 기존 quota rollback spec의 대상 migration 가정 보완
 - [x] I03 격리 PostgreSQL 모델·schema 7건 및 실행/예약 회귀 139건, 관리자 단위 441건 통과
 - [x] I04 타입·빌드·desktop/mobile browser·문서 검사 완료 및 경로별 commit/push
-- [ ] I05 PR 생성·정확한 HEAD CI·Codex 검토·스레드 해결
-- [ ] I06 최신 main 확인 후 순차 병합·post-merge CI
-- [ ] I07 Delivery 판정에 따른 운영 배포·실제 serving revision/traffic 확인
-- [ ] I08 공개 응답·인증 경계 smoke 및 실제 Google/유료 공급자 미검증 범위 보고
+- [x] I05 PR 생성·정확한 HEAD CI·Codex 검토·스레드 해결
+- [x] I06 최신 main 확인 후 순차 병합·post-merge CI
+- [x] I07 Delivery 판정에 따른 운영 배포·실제 serving revision/traffic 확인
+- [x] I08 공개 응답·인증 경계 smoke 및 실제 Google/유료 공급자 미검증 범위 보고
 - [ ] I09 일회성 PostgreSQL 정리·문서 closure·자기 worktree/branch 안전 정리
 
 I09는 실제 실행 전 완료 표시하지 않는다. 배포 전에는 현재 기능을 운영 적용 완료로 보고하지 않는다.
+
+## 운영 반영·종료 snapshot
+
+기능 PR #754가 main `1adf577e38a7e580f1bbc0499a871c943cecc289`에 병합됐고 운영 배포/공개·인증 경계 검증을 완료했다. 상세 증거는 CHECK의 운영 반영 절을 따른다. 같은 WO의 기존 branch에서 종료 문서만 연속 보완한다.
+
+이 체크는 종료 문서 병합 전 snapshot이다. I09의 일회성 PostgreSQL은 정리했으나 문서 CI·통합과 실제 worktree/branch 정리는 아직 남아 있어 ACTIVE와 미완료 체크를 유지한다. 추가 조사·설계 통합 PR #721도 정리 대상이다. 실제 종료 이후의 최종 상태는 [정리 실행 기록](https://github.com/Renagang21/o4o-platform/pull/754#issuecomment-6314873874)에서 갱신한다. 정리 전에는 완료로 표시하지 않는다.
