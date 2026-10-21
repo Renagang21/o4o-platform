@@ -15,6 +15,7 @@ import {
   resolveInboxScope,
   inboxDestination,
   inboxNotificationTarget,
+  inboxNotificationServiceKey,
   assertInboxWriter,
   scopeGuard,
   inboxRecipients,
@@ -135,9 +136,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
               type: "contact.new",
               title: `${scope.name} 새 문의`,
               message: subject,
-              serviceKey: ["store", "pharmcoop"].includes(scope.serviceKey)
-                ? "neture"
-                : scope.serviceKey,
+              serviceKey: inboxNotificationServiceKey(scope),
               organizationId: scope.organizationId ?? undefined,
               metadata: {
                 contactInquiryId: saved.id,

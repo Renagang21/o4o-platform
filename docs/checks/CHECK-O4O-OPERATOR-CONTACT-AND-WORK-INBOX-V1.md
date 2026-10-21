@@ -107,3 +107,6 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 
 - Codex 재검토 P2 2건: service 범위 ScopedContactForm은 설정을 조회하는 PublicServiceContact에 위임하여 Pharmcoop/Store의 비활성 유형·개인정보/완료 안내를 반영한다. business/cooperative 범위는 조직 전용 endpoint와 권한 경계를 유지하며 응답의 접수번호를 표시한다. 설정·접수번호 집중 회귀 10개 PASS.
 - CarePharm 수정 후 실제 production bundle의 공개 `/contact`를 1440/390에서 합성 응답으로 검증: 정확한 business endpoint POST 각각 1회·동의 true·pageerror 0·문서 가로 넘침 0 PASS. 운영 문의 데이터 생성 0, 자기 preview 종료.
+
+- Codex 추가 P2: Pharmacy/MegaPharm 조직 문의 알림이 Neture 범위·Neture 전용 bridge로 저장되어 해당 앱 알림 목록에서 보이지 않았다. 문의 원장의 조직 경계는 유지하면서 business 알림 serviceKey를 실제 호스트(Pharmacy=`kpa-society`, MegaPharm=`megapharm`, CarePharm=`carepharm`)와 자체 문의함 route에 맞췄다. 실제 PostgreSQL 조직별 접수·수신자·알림 payload 포함 16개 PASS, KPA 알림 조회 범위·클릭 소비처 14개 PASS. 초기 fixture의 baseline 약국 사업 key 중복은 격리 DB 준비만 보완해 재검증했다. 운영 원장은 수정하지 않았다.
+- 최종 설정·접수번호 보완 후 공통 UI 전체 169개와 영향 4개 앱 타입 검사 PASS. API 타입 검사도 재확인한다.

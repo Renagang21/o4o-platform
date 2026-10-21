@@ -275,6 +275,14 @@ export function inboxDestination(scope: InboxScope) {
         : scope.managePath,
   };
 }
+/** Match the notification filters of the app that owns the destination route. */
+export function inboxNotificationServiceKey(scope: InboxScope) {
+  if (scope.kind === "business") {
+    return scope.key === "carepharm" || scope.key === "megapharm" ? scope.key : "kpa-society";
+  }
+  return ["store", "pharmcoop"].includes(scope.serviceKey) ? "neture" : scope.serviceKey;
+}
 export function inboxNotificationTarget(scope: InboxScope) {
+  if (scope.kind === "business") return scope.managePath;
   return `/operator/inbox/open/${scope.kind}/${encodeURIComponent(scope.key)}`;
 }

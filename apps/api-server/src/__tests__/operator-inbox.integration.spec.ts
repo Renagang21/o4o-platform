@@ -81,6 +81,21 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   await request(app).get(`${base}/business/carepharm/manage`).set('x-test-user',fed).expect(403);
   await request(app).post(`${base}/business/cooperative-inbox-a/contact`).send(payload).expect(404);
  });
+ it('delivers each business inquiry into its host bell scope and an owned inbox route',async()=>{
+  for(const [key,serviceKey]of [['carepharm','carepharm'],['pharmacy','kpa-society'],['megapharm','megapharm']]){
+   if(key!=='carepharm'){
+    const organizationId=randomUUID(),businessId=randomUUID();
+    await db.query("INSERT INTO organizations(id,name,code,type) VALUES($1,'Synthetic business',$2,'supplier')",[organizationId,`inbox-${key}`]);
+    await db.query("INSERT INTO semi_franchises(id,key,name,organization_id) VALUES($1,$2,'Synthetic business',$3) ON CONFLICT(key) DO UPDATE SET organization_id=EXCLUDED.organization_id,status='active'",[businessId,key,organizationId]);
+    await db.query('INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,$2,true)',[businessOp,`neture:${key}_operator`]);
+   }
+   (notificationService.createNotification as jest.Mock).mockClear();
+   const response=await request(app).post(`${base}/business/${key}/contact`).send(payload).expect(201);
+   expect(notificationService.createNotification).toHaveBeenCalledWith(expect.objectContaining({userId:businessOp,serviceKey,metadata:expect.objectContaining({targetUrl:`/operator/inbox/business/${key}`})}));
+   const [row]=await db.query('SELECT service_key,organization_id,notification_status FROM contact_inquiries WHERE id=$1',[response.body.data.id]);
+   expect(row.service_key).toBe('neture');expect(row.organization_id).toBeTruthy();expect(row.notification_status).toBe('inapp:sent');
+  }
+ });
  it('service roles and active membership are isolated, including expired roles',async()=>{
   await request(app).get(`${base}/service/supplier/manage`).set('x-test-user',supplier).expect(200);
   await request(app).get(`${base}/service/supplier/manage`).set('x-test-user',funding).expect(403);
