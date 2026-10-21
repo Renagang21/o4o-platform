@@ -317,7 +317,7 @@ sections: [
 | 규칙 | 설명 |
 |---|---|
 | 목록 | 공식 약국 협력사업 4곳, 독립 서비스 5곳, 대표 홈·내 매장·전체 관리자 3곳의 주소 12개. 주소 등록과 사업 개설/활성·가입·권한은 별개 |
-| 웹 점검 | HTTPS 응답, 제한된 HTML 읽기, 동일 origin `/assets/` 앱 JavaScript 응답. 실제 browser 실행·서비스 identity 일치·로그인/업무 성공으로 해석하지 않음 |
+| 웹 점검 | HTTPS 응답, 제한된 HTML 읽기, 동일 origin `/assets/` 앱 JavaScript 응답(분회는 `/kpa/assets/`도 허용). 실제 browser 실행·서비스 identity 일치·로그인/업무 성공으로 해석하지 않음 |
 | 공통 기반 | 기존 서버 시작 READY 상태와 DB SELECT 1. 모든 API·DB schema·업무 원장 일치 보장이 아님 |
 | 표시 | 개별 확인/점검 실패/확인 불가, 실제 점검 시각과 결과 재사용 표시. 수집 실패·빈 작업 목록·0 통계로 전체 정상 판정 금지 |
 | 최신성 | 최근 결과는 60초 재사용. 조회 실패/오래된 결과를 현재 정상처럼 표시하지 않음 |
@@ -325,7 +325,7 @@ sections: [
 | 업무 경계 | 회원 대기·승인율·콘텐츠 수 및 승인/게시/정산/AI 갱신 trigger를 이 화면에서 제거. 실제 서비스 운영자가 해당 서비스에서 처리 |
 | 저장·검증 | 새 상태 DB나 sites 기반 legacy monitor를 복구하지 않음. 운영 설정/계정 변경과 유료 호출은 개발 테스트와 분리 |
 
-[정비 TODO](../../work-orders/TODO-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)와 [검증 CHECK](../../checks/CHECK-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)에 실제 개발·검증·배포 여부를 기록한다. 본 절 갱신은 main 병합·운영 배포 완료를 뜻하지 않는다.
+[정비 TODO](../../work-orders/TODO-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)와 [검증 CHECK](../../checks/CHECK-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)에 실제 개발·검증·배포 여부를 기록한다. 2026-10-21 구현은 PR #752로 main에 반영됐고 API·관리자 운영 배포가 확인됐다. 배포 SHA·revision·검증 한계는 CHECK의 후속 통합 결과를 따른다. 문서 갱신 자체를 모든 실제 서비스 업무 정상의 증거로 해석하지 않는다.
 
 ---
 

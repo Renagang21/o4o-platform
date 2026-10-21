@@ -74,3 +74,31 @@
 추가 SonarCloud PR 분석은 필수 CI Gate와 별개로 신뢰성 C를 보고했다. 이번 범위의 버튼 submit type·라벨/상태 접근성·목록 안정 key·오류 Error 객체·명시적 테스트 assertion을 보완하고, HTTP 상태/앱 파일 검사를 나누어 인지 복잡도를 줄였다. 불필요한 async map을 제거하고 서비스 의존 필드를 readonly로 고정했다. 6개 worker 내부의 순차 await는 동시 요청 상한을 지키기 위한 의도된 구조로 유지했다. 기준 main의 기존 Sonar 실패를 이번 PR의 성공으로 간주하지 않는다. 분회 경로 보완 뒤 API 핵심 회귀는 31 PASS다.
 
 Codex 후속 검토의 관리자 상태 변경 거부 시 목록 소실도 수용했다. 전체 관리자 목록은 조회 실패(`readFailed`)일 때만 감추고, 본인/마지막 관리자 보호 같은 정상적인 쓰기 거부는 오류와 기존 목록·다른 계정 동작을 함께 유지한다. 해당 두 거부 응답의 회귀를 추가하고 기존 관리자 지정 거부 테스트에도 목록 유지 검증을 보완했다.
+
+## 최종 통합·운영 배포 결과 · 2026-10-21
+
+아래가 후속 통합 지시의 최종 결과다. 위의 개발 종료·운영 미검증 기록은 당시 단계의 이력으로 보존한다.
+
+| 항목 | 실제 결과·근거 |
+|---|---|
+| PR 통합 | [#752](https://github.com/Renagang21/o4o-platform/pull/752), 09:29 UTC 병합, merge SHA `0d88c75696dffbd67cfb65819c32ea4b21702e12` |
+| 최종 개발 검증 | API 핵심 HTTP/상태 31 PASS, 관리자 29 files/437 PASS, PC/mobile Chromium 10 PASS, 변경 경로 lint/타입 검사 통과. 추가 테스트는 본인/마지막 관리자 보호 거부 뒤 목록 유지까지 확인 |
+| PR 기술 gate | [CI](https://github.com/Renagang21/o4o-platform/actions/runs/39575512573)·CodeQL·SonarCloud 통과. 최종 개발 HEAD `4e4dde7a819ce951016ed1906c4c065426eb0186` Codex 완료·추가 지적 0·미해결 스레드 0. 구버전 CI는 이번 공간의 수정 전 run만 취소했고 최종 HEAD CI는 성공 |
+| post-merge | [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39577313611)·CodeQL 성공 |
+| API | [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39578732622) LEVEL_2 자동 배포 성공. `o4o-core-api-04125-xod`, 위 main SHA, 단일 revision 100% serving |
+| 관리자 | [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39579810306) 1회. RBAC LEVEL_3 보류를 같은 main SHA로 통제 배포. `o4o-admin-dashboard-01547-xox`, 단일 revision 100% serving. production status DEPLOYED |
+| 다른 서비스 | neture/kpa-society/lecture/store/kpa-branch/hospital-pharmacy는 serving→target runtime 차이 없음, NO_DEPLOY. 추가 재배포 없음 |
+| 전환 검증 | API 새 revision 0%에서 Ready=True 후 100% 전환, 전환 후 `/health/ready` HTTP 200. 관리자 새 revision 0% 직접 URL smoke 뒤 100% 전환. 최종 보고는 실제 revision label과 SHA를 다시 조회 |
+| 운영 공개 HTTP | `/health`, `/health/ready` 200. 관리자 root·`/admin/platform/hub`·`/operators`·`/settings/admin-accounts`·옛 `/users` HTML 200. 앱 JS 200이며 root asset이 배포 전 `index-BHHm7hej.js`에서 `index-DkFYsd8P.js`로 변경 |
+| 운영 미로그인 Chromium | PC 1280×800/mobile 390×844 각각 위 네 보호 경로에서 `/login`의 관리자 로그인 h1 확인, 로그인 경계 8건 PASS, page error 0. 최종 PC/mobile 캡처 시각 검토 |
+| 미인증 API | `/api/v1/platform/hub/summary`, `/api/v1/admin/platform-accounts` 모두 401. 인증 없는 상태 조회/계정 목록 접근 허용 없음 |
+
+브라우저 검증 스크립트의 패키지 설치 경로·옛 로그인 문구 선택자는 현재 설치/실제 h1에 맞춰 바로잡고 재실행했다. 이 수정은 검증 도구에만 적용했고 운영 코드를 바꾸지 않았다.
+
+운영 `/users`의 HTTP 200은 SPA 진입 응답을 뜻한다. 로그인 후 redirect·화면 권한·계정 변경 등은 격리 fixture 브라우저 검증과 구분한다. 운영 캡처의 Google SDK 로딩 오류는 이 클라우드 Chromium의 `accounts.google.com/gsi/client` 요청이 `net::ERR_TUNNEL_CONNECTION_FAILED`로 실패한 것으로 확인했다. 로그인 화면 진입/가드 확인을 Google SDK 버튼 실행 성공으로 보고하지 않는다. 실제 Google 계정으로 로그인하거나 실제 계정/역할을 변경하지 않았다. 운영 인증 후 12개 대상의 상태 snapshot 수집은 미확인이다. 이 작업에 새 schema/migration·seed는 없으며, 표준 API 배포의 기존 migration Job 실행은 성공했다. 직접 운영 DB write·IAM·동결 변수 변경은 하지 않았다.
+
+### 문서 정합·종료 정리
+
+HUB 정본의 동일 origin 앱 파일 규칙에 실제 분회 base `/kpa/assets/`를 보완하고 TODO·역할별 업무공간·HUB 정본의 개발 전/통합 전 표현을 현재 배포 결과와 연결했다. 과거 기록은 본문을 다시 쓰지 않고 후속 결과를 덧붙였다. 이 후속 변경은 문서-only이며 별도 PR·CI·main 반영 뒤 Delivery의 NO_DEPLOY를 확인하고 이번 작업 공간만 표준 절차로 정리한다. 다른 작업 공간과 이전 AI branch는 대상이 아니다. 종료 정리 실행 결과는 해당 후속 PR/최종 보고에서 확인한다.
+
+문서 PR 검토에서 T12의 실제 정리 전 완료 표시를 지적해 수용했다. TODO의 후속 상태를 ACTIVE·T12 미완료로 유지하고, [현재 종료 정리 실행 기록](https://github.com/Renagang21/o4o-platform/pull/753#issuecomment-6313349336)을 별도 활성 추적으로 연결했다. 이 CHECK의 COMPLETED는 검증/배포 결과의 기록 상태이며 작업 공간이 이미 삭제됐다는 뜻이 아니다. 실제 정리 후 실행 기록을 갱신한다.
