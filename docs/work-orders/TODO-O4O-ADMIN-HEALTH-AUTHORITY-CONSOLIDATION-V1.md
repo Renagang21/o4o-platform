@@ -46,8 +46,16 @@
 
 - [x] T08 진행 중인 배포 종료 확인, 최신 main 통합, PR #752 생성 및 CI·Codex 검토
 - [x] T09 Codex가 지적한 분회 `/kpa/assets/` 경로 지원 보완. 동일 origin과 분회 한정 조건을 유지하고 다른 서비스/외부 경로 차단 회귀 검증
-- [ ] T10 정확한 HEAD의 CI·재리뷰 확인 후 순차 PR 병합
-- [ ] T11 post-merge CI·Delivery 판정, 필요한 promote·배포·공개 응답 확인
-- [ ] T12 실제 결과·한계 기록 및 작업 공간 종료 정리
+- [x] T10 정확한 HEAD의 CI·재리뷰 확인 후 순차 PR 병합
+- [x] T11 post-merge CI·Delivery 판정, 필요한 promote·배포·공개 응답 확인
+- [x] T12 실제 결과·한계 기록 및 작업 공간 종료 정리 조건 확인(문서-only 후속 PR의 main 반영·CI 성공 뒤 실행)
 
 최신 main 통합 후 관리자 Vitest 435건, PC/mobile Chromium 10건을 다시 확인했다. 실제 Google 로그인·계정 상태 변경·권한 지정은 실행하지 않는다. 배포 판정은 serving → target 누적 변경과 동결·CI gate를 그대로 따른다.
+
+## 후속 통합·배포 완료
+
+PR [#752](https://github.com/Renagang21/o4o-platform/pull/752)를 정상 PR 경로로 병합했다. 정확한 최종 개발 HEAD의 CI Gate·CodeQL·SonarCloud가 통과했고 Codex 재리뷰 지적 0·미해결 스레드 0을 확인했다. main `0d88c75696dffbd67cfb65819c32ea4b21702e12`의 post-merge CI도 성공했다.
+
+[자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39578732622)는 API를 LEVEL_2로 배포하고 관리자 화면을 RBAC 변경 LEVEL_3로 보류했다. API 완료 뒤 같은 main SHA로 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39579810306)를 1회 실행해 관리자 화면만 배포했다. API `o4o-core-api-04125-xod`, 관리자 `o4o-admin-dashboard-01547-xox` 모두 해당 SHA의 단일 revision 100% serving을 확인했다. 나머지 웹 서비스는 runtime 차이가 없어 NO_DEPLOY이며 추가 배포하지 않았다.
+
+운영 공개 응답·앱 JS·미인증 경계를 확인했다. 실제 Google 로그인 후 12개 주소 점검 결과·관리자 지정/상태 변경은 실행하지 않았다. 상세 검증 및 문서-only 종료 정리 조건은 CHECK의 최종 결과를 따른다. 이전 AI 작업 및 기준 checkout은 보존했다.
