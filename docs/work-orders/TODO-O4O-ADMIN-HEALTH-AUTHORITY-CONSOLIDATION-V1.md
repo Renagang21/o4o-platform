@@ -1,6 +1,6 @@
 # 관리자 서비스 상태·관리 권한 화면 정비 TODO
 
-> **상태**: COMPLETED
+> **상태**: ACTIVE — 후속 T12 종료 정리 대기(이 문서는 병합 전 스냅샷, 현재 실행 상태는 아래 PR 기록 참조)
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거**: 사용자 지시 — 서비스 헬스·권한 할당·서비스 운영자·관리자 계정을 함께 판단하여 정비, TODO → 코드/문서 조사·보완 → 개발·push
 > **관련 정본**: [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) · [서브도메인 의미](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [HUB UX](../platform/hub/HUB-UX-GUIDELINES-V1.md)
@@ -48,7 +48,7 @@
 - [x] T09 Codex가 지적한 분회 `/kpa/assets/` 경로 지원 보완. 동일 origin과 분회 한정 조건을 유지하고 다른 서비스/외부 경로 차단 회귀 검증
 - [x] T10 정확한 HEAD의 CI·재리뷰 확인 후 순차 PR 병합
 - [x] T11 post-merge CI·Delivery 판정, 필요한 promote·배포·공개 응답 확인
-- [x] T12 실제 결과·한계 기록 및 작업 공간 종료 정리 조건 확인(문서-only 후속 PR의 main 반영·CI 성공 뒤 실행)
+- [ ] T12 실제 결과·한계 기록 및 작업 공간 종료 정리 — 문서-only 후속 PR의 main 반영·CI·NO_DEPLOY 확인 뒤 실제 정리 및 최종 보고
 
 최신 main 통합 후 관리자 Vitest 435건, PC/mobile Chromium 10건을 다시 확인했다. 실제 Google 로그인·계정 상태 변경·권한 지정은 실행하지 않는다. 배포 판정은 serving → target 누적 변경과 동결·CI gate를 그대로 따른다.
 
@@ -59,3 +59,7 @@ PR [#752](https://github.com/Renagang21/o4o-platform/pull/752)를 정상 PR 경�
 [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39578732622)는 API를 LEVEL_2로 배포하고 관리자 화면을 RBAC 변경 LEVEL_3로 보류했다. API 완료 뒤 같은 main SHA로 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39579810306)를 1회 실행해 관리자 화면만 배포했다. API `o4o-core-api-04125-xod`, 관리자 `o4o-admin-dashboard-01547-xox` 모두 해당 SHA의 단일 revision 100% serving을 확인했다. 나머지 웹 서비스는 runtime 차이가 없어 NO_DEPLOY이며 추가 배포하지 않았다.
 
 운영 공개 응답·앱 JS·미인증 경계를 확인했다. 실제 Google 로그인 후 12개 주소 점검 결과·관리자 지정/상태 변경은 실행하지 않았다. 상세 검증 및 문서-only 종료 정리 조건은 CHECK의 최종 결과를 따른다. 이전 AI 작업 및 기준 checkout은 보존했다.
+
+### T12 현재 실행 상태
+
+개발·운영 배포 완료와 작업 공간 종료 정리는 구분한다. 위 미완료 표시는 이 문서의 병합 전 스냅샷이며 실제 정리가 끝나기 전 완료로 표시하지 않는다. 문서 PR [#753의 종료 정리 실행 기록](https://github.com/Renagang21/o4o-platform/pull/753#issuecomment-6313349336)을 별도 활성 추적으로 두고, CI·main·NO_DEPLOY 및 실제 worktree/branch 정리 뒤 해당 기록을 최종 결과로 갱신한다. 현재 정리 여부는 그 기록과 실제 Git 상태를 함께 확인한다.
