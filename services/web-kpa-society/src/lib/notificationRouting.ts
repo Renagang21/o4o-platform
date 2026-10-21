@@ -12,17 +12,20 @@
  * 동일한 클릭 라우팅을 재사용한다.
  */
 
-import { resolveNotificationTarget as resolveCommon } from '@o4o/account-ui';
-import type { NotificationItem } from '@o4o/account-ui';
+import { resolveNotificationTarget as resolveCommon } from "@o4o/account-ui";
+import type { NotificationItem } from "@o4o/account-ui";
 
 /** KPA 고유 fallback — metadata.targetUrl 이 없는 store.* 알림의 목적지. */
 function kpaFallback(n: NotificationItem): string | null {
-  const type = String(n.type || '');
-  if (type === 'store.consultation_requested' || type.startsWith('store.tablet')) {
-    return '/store/commerce/tablet-displays';
+  const type = String(n.type || "");
+  if (
+    type === "store.consultation_requested" ||
+    type.startsWith("store.tablet")
+  ) {
+    return "/store/commerce/tablet-displays";
   }
-  if (type.startsWith('store.')) {
-    return '/store';
+  if (type.startsWith("store.")) {
+    return "/store";
   }
   return null;
 }
@@ -34,4 +37,31 @@ function kpaFallback(n: NotificationItem): string | null {
  */
 export function resolveNotificationTarget(n: NotificationItem): string | null {
   return resolveCommon(n, { fallback: kpaFallback });
+}
+
+/** Both KPA hosts use the O4O shared inquiry inbox, rather than a local operator route. */
+export function openNotificationTarget(
+  notification: NotificationItem,
+  navigate: (path: string) => void,
+  assign: (url: string) => void = (url) => window.location.assign(url),
+): boolean {
+  const target = resolveNotificationTarget(notification);
+  if (!target) return false;
+  if (
+    notification.type === "contact.new" &&
+    target.startsWith("/operator/service-contact/")
+  ) {
+    if (
+      ![
+        "/operator/service-contact/kpa-society",
+        "/operator/service-contact/megapharm",
+      ].includes(target)
+    )
+      return false;
+    // The origin is fixed here; notification metadata cannot supply an external destination.
+    assign(`https://neture.co.kr${target}`);
+  } else {
+    navigate(target);
+  }
+  return true;
 }

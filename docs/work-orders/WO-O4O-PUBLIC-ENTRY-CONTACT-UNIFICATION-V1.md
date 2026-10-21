@@ -109,3 +109,16 @@ API 검사는 격리된 로컬 PostgreSQL socket을 `CONTACT_REVIEW_PG_SOCKET`�
 ### CI 소비처 호환성 보완
 
 첫 PR HEAD의 Code Quality Check에서 `void | { id?: string }` 어댑터 반환값의 optional chaining이 일부 프런트엔드 TypeScript 설정에서 실패했다. 기존 `Promise<void>` 어댑터 계약을 유지하면서 명시적인 값 확인으로 접수번호를 읽도록 보완했다. CI와 동일한 `O4O_TYPECHECK_CONCURRENCY=4 pnpm run type-check:frontend`, `pnpm run typecheck:app-store-packages`, API `type-check`를 로컬에서 모두 통과했고, 공통 공개 UI 17개도 재통과했다. 검사 범위·workflow·컴파일 옵션은 변경하지 않았다. 이전 HEAD의 실패를 새 HEAD의 성공으로 대체 확인한 뒤 병합한다.
+
+
+### Codex 리뷰 지적 3건 보완
+
+- P1, 진행 중인 문의 답변 중복: 같은 요청 식별자 재사용뿐 아니라, 문의 행 잠금 안에서 각 답변의 최신 감사 이벤트를 검사한다. 다른 식별자로 진행 중/결과 미확인 답변을 우회하면 `409 REPLY_IN_PROGRESS`로 차단한다. 완료된 과거 `sending` 이벤트는 현재 진행 중으로 오인하지 않아 정상 후속 답변은 허용한다. 운영 화면은 초안을 유지하고 이력 확인 전 재발송을 막는다.
+- P2, 접수 알림 재처리 경합: 최초 발송과 재처리가 같은 문의 단위 claim을 사용한다. 짧은 DB transaction의 행 잠금으로 기존 `notification_status`에 claim과 이전 성공 채널 근거를 저장한 다음 DB 연결을 풀고 외부 발송한다. 종료 시 claim이 일치하는 행의 알림 필드만 갱신한다. 동시에 들어온 재처리는 `409 NOTIFICATION_IN_PROGRESS`이며 성공 채널을 재발송하지 않는다. 외부 발송 중 DB transaction/행 잠금을 유지하지 않는다. 결과 미확인 claim은 자동 만료·재점유하지 않으며 담당자의 발송 결과 확인이 필요하다. 클라이언트에는 claim 식별자 대신 `in_progress`를 제공한다. 부분 실패한 in-app 수신자 개별 중복 제거까지 보장하는 것은 아니다.
+- P2, 약국/MegaPharm 알림 이동: 두 앱의 공통 클릭 adapter에서 허용된 두 문의 경로만 `https://neture.co.kr`의 실제 공통 문의함으로 이동한다. 일반 내부 알림 경로·매장 fallback은 유지하고 외부 URL·알 수 없는 문의 서비스 경로는 거부한다. PC 헤더와 모바일 알림 시트에 같은 adapter를 적용했다.
+
+리뷰 발송 경합 5개 사례는 수정 전 모두 실패했고 수정 후 통과했다. 현재 API 단위 4개·PostgreSQL 통합 18개 = 22개, 공통 문의/담당 사업 UI 21개, 공개 UI 17개, Neture/CarePharm 170개, 약국 37개(알림 경로 8개·헤더 7개 포함), 분회 2개, 협동조합 전체 62개, 강의 2개 = **333개 통과**다. PostgreSQL 임시 schema 잔존은 0개다. 최초 개발 검증 결과와 통합 후 추가 검증을 중복 합산하지 않는다.
+
+API·Neture·약국 최종 빌드와 전체 프런트엔드 type-check를 통과했다. 약국/MegaPharm 2개 호스트의 1440px/390px 합성 브라우저 4개에서 실제 알림 버튼→공통 문의함 이동을 확인했고 JavaScript 오류는 0개다. 이 검사는 로컬 빌드와 합성 계정/API를 사용하며 실제 운영자 Google 세션이나 운영 문의·메일 발송 검증은 아니다. 기존 공개 화면 24개·공급자 문의 처리 2개 검증과 이번 알림 클릭 4개를 구분한다. 새 HEAD에서 CI·Codex 재검토와 지적 스레드 해결을 확인한 뒤 병합한다.
+
+API `type-check`도 재통과했고 ESLint ratchet은 기존 오류 기준선 46건을 유지하여 통과했다(신규 오류 0건). 기존 lint 경고를 0건으로 보고하지 않는다.

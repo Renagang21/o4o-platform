@@ -179,7 +179,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
             </div>
             <div className="flex gap-4">
               <div className="mb-3 flex-1"><span className={FIELD_LABEL}>접수일</span><span className={FIELD_VALUE}>{fmt(detail.createdAt)}</span></div>
-              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>알림 상태</span><span className={FIELD_VALUE}>{detail.notificationStatus || '-'}</span></div>
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>알림 상태</span><span className={FIELD_VALUE}>{detail.notificationStatus === 'in_progress' ? '알림 발송 결과 확인 중' : detail.notificationStatus || '-'}</span></div>
             </div>
             {detail.sourcePath && (
               <div className="mb-3"><span className={FIELD_LABEL}>경로</span><span className={FIELD_VALUE}>{detail.sourcePath}</span></div>

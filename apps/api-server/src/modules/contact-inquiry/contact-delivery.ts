@@ -1,5 +1,7 @@
 import type { DataSource } from "typeorm";
-import type { ContactInquiry } from "./entities/ContactInquiry.entity.js";
+import { ContactInquiry } from "./entities/ContactInquiry.entity.js";
+import { randomUUID } from "crypto";
+import { OperationError } from "../../services/operations/operation-audit.js";
 import { notificationService } from "../../services/NotificationService.js";
 import { loadContactSettings } from "./contact-settings.helper.js";
 import { sendContactEmails } from "./contact-notification.helper.js";
@@ -12,8 +14,59 @@ export function contactTarget(key: string) {
       ? "/operator/contacts"
       : `/operator/service-contact/${key}`;
 }
-/** Persistence precedes delivery. Retry only channels that did not succeed. */
-export async function deliverContactInquiry(
+/**
+ * Claim under a short row lock, then release the connection before external delivery.
+ * An unresolved claim is never reclaimed automatically: a timed-out provider may have sent.
+ */
+export async function dispatchContactInquiry(
+  db: DataSource,
+  serviceKey: string,
+  id: string,
+): Promise<ContactInquiry | null> {
+  const claimed = await db.transaction(async (manager) => {
+    const repo = manager.getRepository(ContactInquiry);
+    const inquiry = await repo.findOne({
+      where: { id, service_key: serviceKey },
+      lock: { mode: "pessimistic_write" },
+    });
+    if (!inquiry) return null;
+    const previous = inquiry.notification_status || "";
+    if (previous.startsWith("sending:"))
+      throw new OperationError(
+        409,
+        "NOTIFICATION_IN_PROGRESS",
+        "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주세요.",
+      );
+    // The bounded existing field retains successful-channel evidence while a claim is unresolved.
+    const completed = ["inapp", "email", "autoreply"]
+      .filter((channel) => previous.includes(`${channel}:sent`))
+      .map((channel) => `${channel}:sent`)
+      .join(";");
+    const claim = `sending:${randomUUID()};${completed}`;
+    await repo.update(
+      { id, service_key: serviceKey },
+      { notification_status: claim },
+    );
+    return { inquiry, claim };
+  });
+  if (!claimed) return null;
+  const notificationStatus = await deliverContactInquiry(db, claimed.inquiry);
+  const repo = db.getRepository(ContactInquiry);
+  const updated = await repo.update(
+    { id, service_key: serviceKey, notification_status: claimed.claim },
+    { notification_status: notificationStatus },
+  );
+  if (updated.affected !== 1)
+    throw new OperationError(
+      409,
+      "NOTIFICATION_STATE_CHANGED",
+      "알림 상태가 변경되었습니다. 문의 상세를 다시 확인해 주세요.",
+    );
+  return repo.findOne({ where: { id, service_key: serviceKey } });
+}
+
+/** Only the claim owner may call delivery. Retry only channels that did not succeed. */
+async function deliverContactInquiry(
   db: DataSource,
   inquiry: ContactInquiry,
 ): Promise<string> {
@@ -35,7 +88,9 @@ export async function deliverContactInquiry(
               type: "contact.new",
               title: "새 문의가 접수되었습니다",
               message: `[${contactService(inquiry.service_key)?.name}] ${inquiry.subject}`,
-              serviceKey: ["store","hospital"].includes(inquiry.service_key) ? "neture" : inquiry.service_key,
+              serviceKey: ["store", "hospital"].includes(inquiry.service_key)
+                ? "neture"
+                : inquiry.service_key,
               metadata: {
                 contactInquiryId: inquiry.id,
                 targetUrl: contactTarget(inquiry.service_key),

@@ -1,5 +1,5 @@
 import { apiLimiter } from '../../middleware/rateLimiter.js';
-import { deliverContactInquiry } from './contact-delivery.js';
+import { dispatchContactInquiry } from './contact-delivery.js';
 import { contactService } from './contact-service-scope.js';
 /**
  * Public Contact Inquiry Controller (no auth)
@@ -147,9 +147,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
 
       // Delivery failure never changes the successful receipt. The result remains retryable.
       try {
-        const notificationStatus = await deliverContactInquiry(dataSource, entity);
-        // Delivery may outlive an operator decision. Update only delivery-owned fields.
-        await repo.update({ id: entity.id, service_key: serviceKey }, { notification_status: notificationStatus });
+        await dispatchContactInquiry(dataSource, serviceKey, entity.id);
       }
       catch { logger.warn('[ContactInquiry] delivery result could not be recorded'); }
 

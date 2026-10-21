@@ -62,6 +62,18 @@ export class ContactReplyService {
         [serviceKey, contactId, replyId],
       );
       if (existing) return { existing: existing.status as string, contact };
+      const [pending] = await manager.query(
+        `SELECT 1 FROM (SELECT DISTINCT ON (meta->>'replyId') meta->>'delivery' AS delivery
+        FROM action_logs WHERE service_key=$1 AND action_key='contact.reply' AND meta->>'contactId'=$2
+        ORDER BY meta->>'replyId',created_at DESC) latest WHERE delivery='sending' LIMIT 1`,
+        [serviceKey, contactId],
+      );
+      if (pending)
+        throw new OperationError(
+          409,
+          "REPLY_IN_PROGRESS",
+          "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주세요.",
+        );
       if (contact.status === "spam" || contact.status === "closed")
         throw new OperationError(
           409,

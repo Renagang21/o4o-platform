@@ -1,6 +1,6 @@
 import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { ContactReplyService } from './contact-reply.service.js';
-import { deliverContactInquiry } from './contact-delivery.js';
+import { dispatchContactInquiry } from './contact-delivery.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 import { contactService, requireContactScope } from './contact-service-scope.js';
 /**
@@ -55,7 +55,7 @@ function toListRow(i: ContactInquiry) {
     organizationName: i.organization_name,
     subject: i.subject,
     status: i.status,
-    notificationStatus: i.notification_status,
+    notificationStatus: i.notification_status?.startsWith("sending:") ? "in_progress" : i.notification_status,
     createdAt: i.created_at,
     handledAt: i.handled_at,
   };
@@ -75,7 +75,7 @@ function toDetail(i: ContactInquiry) {
     message: i.message,
     privacyConsent: i.privacy_consent,
     status: i.status,
-    notificationStatus: i.notification_status,
+    notificationStatus: i.notification_status?.startsWith("sending:") ? "in_progress" : i.notification_status,
     sourcePath: i.source_path,
     createdAt: i.created_at,
     updatedAt: i.updated_at,
@@ -116,14 +116,13 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   });
   router.post('/:serviceKey/contact-inquiries/:id/retry-notifications', authenticate, manageGuard, apiLimiter, async (req,res,next) => {
     try {
-      const item = await repo.findOne({ where: { id:req.params.id,service_key:req.params.serviceKey } });
-      if (!item) return res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'}});
-      const notificationStatus=await deliverContactInquiry(dataSource,item);
-      await repo.update({id:item.id,service_key:item.service_key},{notification_status:notificationStatus});
-      const updated=await repo.findOne({where:{id:item.id,service_key:item.service_key}});
+      const updated=await dispatchContactInquiry(dataSource,req.params.serviceKey,req.params.id);
       if (!updated) return res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'}});
       res.json({success:true,data:toDetail(updated)});
-    } catch(error) {next(error);}
+    } catch(error) {
+      if (error instanceof OperationError) return res.status(error.status).json({success:false,error:{code:error.code,message:error.message}});
+      next(error);
+    }
   });
 
 

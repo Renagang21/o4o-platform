@@ -43,6 +43,7 @@ import {
   contactRecipients,
 } from "../contact-service-scope.js";
 import { ContactReplyService } from "../contact-reply.service.js";
+import * as contactSettings from "../contact-settings.helper.js";
 
 const enabled = process.env.CONTACT_REVIEW_PG_SOCKET;
 const suite = enabled ? describe : describe.skip;
@@ -377,6 +378,186 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
           .set("x-test-user", admin)
       ).status,
     ).toBe(200);
+  });
+  it("rejects a different reply request while another operator send is in flight", async () => {
+    const created = await request(app)
+      .post("/public/services/supplier/contact-inquiries")
+      .send(payload);
+    const id = created.body.data.id;
+    let started!: () => void, release!: () => void;
+    const sending = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const resume = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const send = jest.fn(async () => {
+      started();
+      await resume;
+      return { success: true };
+    });
+    const service = new ContactReplyService(db, send);
+    const first = service.reply("supplier", id, supplier, {
+      requestId: randomUUID(),
+      message: "첫 담당자의 답변",
+    });
+    try {
+      await sending;
+      const other = await request(app)
+        .post(`/admin/services/supplier/contact-inquiries/${id}/replies`)
+        .set("x-test-user", supplier)
+        .send({ requestId: randomUUID(), message: "다른 담당자의 동시 답변" });
+      release();
+      await first;
+      expect(other.status).toBe(409);
+      expect(other.body.error.code).toBe("REPLY_IN_PROGRESS");
+      expect(emailService.sendEmail).not.toHaveBeenCalled();
+      await service.reply("supplier", id, supplier, {
+        requestId: randomUUID(),
+        message: "첫 답변 완료 후 추가 답변",
+      });
+      expect(send).toHaveBeenCalledTimes(2);
+    } finally {
+      release();
+      await first;
+    }
+  });
+  it("keeps an unresolved previous reply from being bypassed with a new request id", async () => {
+    const created = await request(app)
+      .post("/public/services/supplier/contact-inquiries")
+      .send(payload);
+    const id = created.body.data.id;
+    await db.query(
+      "INSERT INTO action_logs(service_key,user_id,action_key,meta) VALUES('supplier',$1,'contact.reply',$2::jsonb)",
+      [
+        supplier,
+        JSON.stringify({
+          contactId: id,
+          replyId: randomUUID(),
+          body: "결과 미확인 답변",
+          delivery: "sending",
+        }),
+      ],
+    );
+    const response = await request(app)
+      .post(`/admin/services/supplier/contact-inquiries/${id}/replies`)
+      .set("x-test-user", supplier)
+      .send({ requestId: randomUUID(), message: "새 요청으로 재발송" });
+    expect(response.status).toBe(409);
+    expect(response.body.error.code).toBe("REPLY_IN_PROGRESS");
+    expect(emailService.sendEmail).not.toHaveBeenCalled();
+  });
+  it.each(["initial", "retry"])(
+    "claims %s delivery before a competing retry can send notifications",
+    async (phase) => {
+      let id: string | undefined;
+      if (phase === "retry") {
+        const created = await request(app)
+          .post("/public/services/supplier/contact-inquiries")
+          .send(payload);
+        id = created.body.data.id;
+        await db.query(
+          "UPDATE contact_inquiries SET notification_status='inapp:fail;email:fail;autoreply:fail' WHERE id=$1",
+          [id],
+        );
+      }
+      jest.clearAllMocks();
+      const settings = jest
+        .spyOn(contactSettings, "loadContactSettings")
+        .mockResolvedValue({
+          ...contactSettings.toEffective("supplier", null),
+          emailNotificationEnabled: true,
+          recipientEmails: ["operator@example.invalid"],
+          autoReplyEnabled: true,
+          autoReplySubject: "접수 확인",
+          autoReplyMessage: "문의 접수 확인입니다.",
+        });
+      let started!: () => void, release!: () => void;
+      const sending = new Promise<void>((resolve) => {
+        started = resolve;
+      });
+      const resume = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      (
+        notificationService.createNotification as jest.Mock
+      ).mockImplementationOnce(async (input) => {
+        id = input.metadata.contactInquiryId;
+        return { id: "notification" };
+      });
+      (emailService.sendEmail as jest.Mock).mockImplementationOnce(async () => {
+        started();
+        await resume;
+        return { success: true };
+      });
+      const first = (
+        phase === "initial"
+          ? request(app)
+              .post("/public/services/supplier/contact-inquiries")
+              .send(payload)
+          : request(app)
+              .post(
+                `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+              )
+              .set("x-test-user", supplier)
+              .send({})
+      ).then((response) => response);
+      try {
+        await sending;
+        const competing = await request(app)
+          .post(
+            `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+          )
+          .set("x-test-user", supplier)
+          .send({});
+        release();
+        const completed = await first;
+        expect(completed.status).toBe(phase === "initial" ? 201 : 200);
+        expect(competing.status).toBe(409);
+        expect(competing.body.error.code).toBe("NOTIFICATION_IN_PROGRESS");
+        expect(notificationService.createNotification).toHaveBeenCalledTimes(1);
+        expect(emailService.sendEmail).toHaveBeenCalledTimes(2);
+        const again = await request(app)
+          .post(
+            `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+          )
+          .set("x-test-user", supplier)
+          .send({});
+        expect(again.status).toBe(200);
+        expect(notificationService.createNotification).toHaveBeenCalledTimes(1);
+        expect(emailService.sendEmail).toHaveBeenCalledTimes(2);
+      } finally {
+        release();
+        await first;
+        settings.mockRestore();
+      }
+    },
+  );
+  it("does not automatically reclaim an unresolved notification dispatch", async () => {
+    const created = await request(app)
+      .post("/public/services/supplier/contact-inquiries")
+      .send(payload);
+    const id = created.body.data.id;
+    await db.query(
+      "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
+      [id, `sending:${randomUUID()};email:sent`],
+    );
+    jest.clearAllMocks();
+    const result = await request(app)
+      .post(
+        `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+      )
+      .set("x-test-user", supplier)
+      .send({});
+    expect(result.status).toBe(409);
+    expect(result.body.error.code).toBe("NOTIFICATION_IN_PROGRESS");
+    const detail = await request(app)
+      .get(`/admin/services/supplier/contact-inquiries/${id}`)
+      .set("x-test-user", supplier);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data.notificationStatus).toBe("in_progress");
+    expect(notificationService.createNotification).not.toHaveBeenCalled();
+    expect(emailService.sendEmail).not.toHaveBeenCalled();
   });
   it("serializes concurrent reply attempts, persists history and keeps failures retryable", async () => {
     const response = await request(app)

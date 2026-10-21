@@ -22,7 +22,7 @@ import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/acc
 import type { NotificationItem } from '@o4o/account-ui';
 import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems, useKpaUserRoles } from './KpaUserMenu';
-import { resolveNotificationTarget } from '../lib/notificationRouting';
+import { openNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
 import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -70,8 +70,7 @@ export function KpaGlobalHeader() {
     (n: NotificationItem) => {
       // WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
       //   라우팅 규칙을 resolveNotificationTarget(SSOT)로 이관 — MobileBottomNav 알림 시트와 공유.
-      const target = resolveNotificationTarget(n);
-      if (target) navigate(target);
+      openNotificationTarget(n, navigate);
     },
     [navigate],
   );

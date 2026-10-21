@@ -40,7 +40,7 @@ import {
   getKpaUserDisplayName,
   KpaUserMenuItems,
 } from './KpaUserMenu';
-import { resolveNotificationTarget } from '../lib/notificationRouting';
+import { openNotificationTarget } from '../lib/notificationRouting';
 
 /** 프로필 시트 메뉴 항목과 같은 모양의 O4O 홈 버튼 */
 const O4O_HOME_SHEET_ITEM_CLASS =
@@ -89,9 +89,8 @@ export function MobileBottomNav() {
 
   function handleNotifItem(n: NotificationItem) {
     if (!n.isRead) void notif.markAsRead(n.id);
-    const target = resolveNotificationTarget(n);
     closeSheet();
-    navigate(target ?? '/mypage');
+    if (!openNotificationTarget(n, navigate)) navigate('/mypage');
   }
 
   async function handleLogout() {

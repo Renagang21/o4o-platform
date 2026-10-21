@@ -74,16 +74,22 @@ export function ContactReplyPanel({
       }
       try {
         const rows = await api.getReplies?.(serviceKey, contactId);
-        if (current === generation.current && Array.isArray(rows)) setHistory(rows);
+        if (current === generation.current && Array.isArray(rows))
+          setHistory(rows);
       } catch {
         if (current === generation.current)
           setError("답변 이력을 갱신하지 못했습니다. 다시 확인해 주세요.");
       }
-    } catch {
+    } catch (failure) {
       if (current === generation.current) {
         setUncertain(true);
+        const code = (
+          failure as { response?: { data?: { error?: { code?: string } } } }
+        )?.response?.data?.error?.code;
         setError(
-          "발송 결과를 확인하지 못했습니다. 답변 이력을 다시 확인해 주세요.",
+          code === "REPLY_IN_PROGRESS"
+            ? "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주세요."
+            : "발송 결과를 확인하지 못했습니다. 답변 이력을 다시 확인해 주세요.",
         );
       }
     } finally {
@@ -153,8 +159,17 @@ export function ContactReplyPanel({
                 setNotice(
                   "알림 재처리 후 문의 상세를 다시 열어 결과를 확인해 주세요.",
                 );
-              } catch {
-                setError("알림을 재처리하지 못했습니다.");
+              } catch (failure) {
+                const code = (
+                  failure as {
+                    response?: { data?: { error?: { code?: string } } };
+                  }
+                )?.response?.data?.error?.code;
+                setError(
+                  code === "NOTIFICATION_IN_PROGRESS"
+                    ? "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주세요."
+                    : "알림을 재처리하지 못했습니다.",
+                );
               } finally {
                 setBusy(false);
               }
