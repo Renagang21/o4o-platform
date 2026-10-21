@@ -43,6 +43,8 @@ import {
   contactRecipients,
 } from "../contact-service-scope.js";
 import { ContactReplyService } from "../contact-reply.service.js";
+import { getServiceMembershipStatusFromDb } from "../../../utils/service-membership.js";
+import { requireNetureScope } from "../../../middleware/neture-scope.middleware.js";
 import * as contactSettings from "../contact-settings.helper.js";
 
 const enabled = process.env.CONTACT_REVIEW_PG_SOCKET;
@@ -81,6 +83,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     );
     await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,status text,"isActive" boolean,"isEmailVerified" boolean);
     CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
+    CREATE TABLE notifications("userId" uuid,type text,channel text,"serviceKey" text,metadata jsonb);
     CREATE TABLE role_assignments(user_id uuid,role text,is_active boolean,valid_from timestamptz,valid_until timestamptz);
     CREATE TABLE semi_franchises(id uuid,key text);
     CREATE TABLE semi_franchise_operators(semi_franchise_id uuid,user_id uuid,revoked_at timestamptz);
@@ -113,6 +116,9 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
   });
   beforeEach(() => {
     jest.clearAllMocks();
+    (notificationService.createNotification as jest.Mock).mockImplementation(
+      async () => ({ id: "notification" }),
+    );
     (AppDataSource.query as jest.Mock).mockImplementation(
       (sql: string, p: any[]) => db.query(sql, p),
     );
@@ -146,6 +152,141 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
       [response.body.data.id],
     );
     expect(row.notification_status).toContain("inapp:fail");
+  });
+  it.each([
+    [null, true, "active", true],
+    ["pending", true, "active", true],
+    ["rejected", true, "active", true],
+    ["active", true, "active", true],
+    ["suspended", true, "active", false],
+    ["withdrawn", true, "active", false],
+    ["active", false, "active", false],
+    ["active", true, "suspended", false],
+  ])(
+    "aligns Neture recipients and the real inbox guard for ledger=%s verified=%s account=%s",
+    async (ledger, verified, account, allowed) => {
+      const userId = randomUUID();
+      try {
+        await db.query("INSERT INTO users VALUES($1,$2,true,$3)", [
+          userId,
+          account,
+          verified,
+        ]);
+        await db.query(
+          "INSERT INTO role_assignments VALUES($1,'neture:operator',true,NULL,NULL)",
+          [userId],
+        );
+        if (ledger)
+          await db.query(
+            "INSERT INTO service_memberships VALUES($1,'neture',$2)",
+            [userId, ledger],
+          );
+        const status = await getServiceMembershipStatusFromDb(
+          db,
+          userId,
+          "neture",
+        );
+        // Production auth projects canonical main eligibility into JWT memberships.
+        const req: any = {
+          user: {
+            id: userId,
+            roles: ["neture:operator"],
+            memberships: [{ serviceKey: "neture", status }],
+          },
+        };
+        const res: any = {
+          status: jest.fn().mockReturnThis(),
+          json: jest.fn().mockReturnThis(),
+        };
+        const next = jest.fn();
+        await requireNetureScope("neture:operator")(req, res, next);
+        expect(next.mock.calls.length > 0).toBe(allowed);
+        for (const key of ["neture", "store", "hospital"]) {
+          expect(
+            (await contactRecipients(db, key)).some(
+              (row) => row.userId === userId,
+            ),
+          ).toBe(allowed);
+        }
+      } finally {
+        await db.query("DELETE FROM role_assignments WHERE user_id=$1", [
+          userId,
+        ]);
+        await db.query("DELETE FROM service_memberships WHERE user_id=$1", [
+          userId,
+        ]);
+        await db.query("DELETE FROM users WHERE id=$1", [userId]);
+      }
+    },
+  );
+  it("retries only failed in-app recipients after partial fan-out success", async () => {
+    const other = randomUUID();
+    try {
+      await db.query("INSERT INTO users VALUES($1,'active',true,true)", [
+        other,
+      ]);
+      await db.query(
+        "INSERT INTO role_assignments VALUES($1,'supplier:operator',true,NULL,NULL)",
+        [other],
+      );
+      await db.query(
+        "INSERT INTO service_memberships VALUES($1,'supplier','active')",
+        [other],
+      );
+      let failed = false;
+      (notificationService.createNotification as jest.Mock).mockImplementation(
+        async (input) => {
+          if (input.userId === other && !failed) {
+            failed = true;
+            throw Error("one recipient unavailable");
+          }
+          await db.query("INSERT INTO notifications VALUES($1,$2,$3,$4,$5)", [
+            input.userId,
+            input.type,
+            "in_app",
+            input.serviceKey,
+            input.metadata,
+          ]);
+          return { id: randomUUID() };
+        },
+      );
+      const created = await request(app)
+        .post("/public/services/supplier/contact-inquiries")
+        .send(payload);
+      const id = created.body.data.id;
+      expect(created.status).toBe(201);
+      expect(notificationService.createNotification).toHaveBeenCalledTimes(2);
+      const retry = await request(app)
+        .post(
+          `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+        )
+        .set("x-test-user", supplier);
+      expect(retry.status).toBe(200);
+      expect(notificationService.createNotification).toHaveBeenCalledTimes(3);
+      const calls = (
+        notificationService.createNotification as jest.Mock
+      ).mock.calls.map(([input]) => input.userId);
+      expect(calls.filter((userId) => userId === supplier)).toHaveLength(1);
+      expect(calls.filter((userId) => userId === other)).toHaveLength(2);
+      const [row] = await db.query(
+        "SELECT notification_status FROM contact_inquiries WHERE id=$1",
+        [id],
+      );
+      expect(row.notification_status).toContain("inapp:sent");
+      const repeated = await request(app)
+        .post(
+          `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+        )
+        .set("x-test-user", supplier);
+      expect(repeated.status).toBe(200);
+      expect(notificationService.createNotification).toHaveBeenCalledTimes(3);
+    } finally {
+      await db.query("DELETE FROM role_assignments WHERE user_id=$1", [other]);
+      await db.query("DELETE FROM service_memberships WHERE user_id=$1", [
+        other,
+      ]);
+      await db.query("DELETE FROM users WHERE id=$1", [other]);
+    }
   });
   it.each(["initial", "retry"])(
     "preserves a concurrent operator decision while saving %s notification delivery",
@@ -462,6 +603,9 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
         );
       }
       jest.clearAllMocks();
+      (notificationService.createNotification as jest.Mock).mockImplementation(
+        async () => ({ id: "notification" }),
+      );
       const settings = jest
         .spyOn(contactSettings, "loadContactSettings")
         .mockResolvedValue({
@@ -543,6 +687,9 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
       [id, `sending:${randomUUID()};email:sent`],
     );
     jest.clearAllMocks();
+    (notificationService.createNotification as jest.Mock).mockImplementation(
+      async () => ({ id: "notification" }),
+    );
     const result = await request(app)
       .post(
         `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,

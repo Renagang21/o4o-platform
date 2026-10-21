@@ -81,22 +81,41 @@ async function deliverContactInquiry(
     try {
       const operators = await contactRecipients(db, inquiry.service_key);
       if (operators.length) {
+        const notificationServiceKey = ["store", "hospital"].includes(
+          inquiry.service_key,
+        )
+          ? "neture"
+          : inquiry.service_key;
+        // The inquiry claim serializes retries. Persisted notifications are per-recipient
+        // delivery receipts, including a save whose caller did not observe success.
+        const delivered: { userId: string }[] = await db.query(
+          `SELECT DISTINCT "userId" FROM notifications
+           WHERE "userId"=ANY($1::uuid[]) AND "serviceKey"=$2
+             AND type='contact.new' AND channel='in_app'
+             AND metadata->>'contactInquiryId'=$3`,
+          [
+            operators.map((op) => op.userId),
+            notificationServiceKey,
+            inquiry.id,
+          ],
+        );
+        const completedRecipients = new Set(delivered.map((row) => row.userId));
         const results = await Promise.allSettled(
-          operators.map((op) =>
-            notificationService.createNotification({
-              userId: op.userId,
-              type: "contact.new",
-              title: "새 문의가 접수되었습니다",
-              message: `[${contactService(inquiry.service_key)?.name}] ${inquiry.subject}`,
-              serviceKey: ["store", "hospital"].includes(inquiry.service_key)
-                ? "neture"
-                : inquiry.service_key,
-              metadata: {
-                contactInquiryId: inquiry.id,
-                targetUrl: contactTarget(inquiry.service_key),
-              },
-            }),
-          ),
+          operators
+            .filter((op) => !completedRecipients.has(op.userId))
+            .map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: "contact.new",
+                title: "새 문의가 접수되었습니다",
+                message: `[${contactService(inquiry.service_key)?.name}] ${inquiry.subject}`,
+                serviceKey: notificationServiceKey,
+                metadata: {
+                  contactInquiryId: inquiry.id,
+                  targetUrl: contactTarget(inquiry.service_key),
+                },
+              }),
+            ),
         );
         inapp = results.every((result) => result.status === "fulfilled")
           ? "sent"

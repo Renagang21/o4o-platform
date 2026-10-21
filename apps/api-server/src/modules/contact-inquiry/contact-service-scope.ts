@@ -90,7 +90,11 @@ export function contactService(key: string) {
     : null;
 }
 
-/** Same live account/membership/role validity used for delivery and custom business inbox access. */
+/** Same live account/membership/role validity used for delivery and custom business inbox access.
+ * Neture main eligibility mirrors getNetureMainMembershipStatus: verified usable
+ * accounts are active without a legacy ledger row or manual pending/rejected approval.
+ * Explicit suspension/withdrawal is still denied. Other services require active membership.
+ */
 export async function contactRecipients(
   db: Pick<DataSource, "query">,
   key: string,

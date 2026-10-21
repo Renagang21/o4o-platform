@@ -140,3 +140,11 @@ API `type-check`도 재통과했고 ESLint ratchet은 기존 오류 기준선 46
 공통 서비스의 목록/건수 소비처는 두 알림 GET route이고, 모든 기존 단일 범위 호출은 동일하게 유지된다. Neture/KPA의 PC·모바일 adapter만 새 필터를 선택한다. 로컬 PostgreSQL의 기능 회귀는 수정 전 7개 실패/기존 계약 4개 통과, 수정 후 11개 모두 통과했다. 사용자 격리·기존 단일 범위·조직 필터·페이지 연결·잘못된 필터 거부·미인증/명시적 빈 범위를 검증했다.
 
 추가 후 API 33개, 약국 전체 211개, Neture 전체 1,230개가 통과했고 앞선 분회 25개·협동조합 62개·강의 41개·공통 공개 UI 17개·공통 문의/담당 사업 21개를 포함한 최종 로컬 검증은 **1,640개**다. API·Neture·약국 빌드, entity registry·unsafe route guard, ESLint 오류 기준선 46건 유지도 통과했다. 기존 1,625개와 중복 합산하지 않는다. PostgreSQL 임시 schema는 종료 후 제거했다. PR의 새 정확한 HEAD에서 CI와 재검토를 확인한 뒤 통합한다.
+
+### 최종 리뷰 — 메인 자격 판정 확인·수신자별 재발송 방지
+
+Neture 원장의 pending/rejected/미등록을 일괄 차단하라는 추가 지적은 현행 메인 가입 정책과 대조했다. 실제 `requireNetureScope`의 DB 검사는 `getServiceMembershipStatusFromDb` → `getNetureMainMembershipStatus`를 호출하고, 로그인 context도 같은 판정으로 메인 membership을 투영한다. 정상 계정·이메일 확인이면 과거 신청 원장의 pending/rejected나 행 부재는 수동 승인 대기가 아니다. 코드상 수신자 SQL은 이 정본과 일치하므로 권한 정책을 변경하지 않았다. 로컬 PostgreSQL에서 원장 미등록/pending/rejected/active, 정지/해지, 이메일 미확인, 계정 정지 8개 사례에 대해 실제 scope guard와 Neture/store/hospital 수신자 결과가 일치함을 확인했다.
+
+여러 수신자 중 일부 알림만 실패하면 기존 구현은 성공한 운영자에게도 재발송했다. 재현 테스트가 수정 전 호출 4회로 실패했고, 수정 후에는 최초 2회·실패 수신자 재시도 1회만 발생한다. 문의 단위 claim 안에서 기존 `notifications`의 문의 식별자·수신자·서비스·채널을 조회해 저장 완료된 수신자를 건너뛴다. 발송 결과 조회 실패 시 재발송하지 않고 실패 상태를 유지한다. 새 원장·schema·migration·공통 NotificationService 계약 변경은 없다. 담당자 미지정 중앙 알림에는 여전히 문의 본문·연락처·문의 식별자를 포함하지 않는다.
+
+API 단위 4개·문의 PostgreSQL 27개·알림 범위 PostgreSQL 11개로 42개 통과했다. 앞서 검증한 다른 소비처를 포함한 로컬 합계는 1,649개이며 이전 합계에 중복 합산하지 않는다. 새 정확한 PR HEAD의 CI와 재검토를 확인한 뒤 병합한다.
