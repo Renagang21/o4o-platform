@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { StoreWorkspacePage } from '../pharmacy/StoreWorkspacePage';
+import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
 import StoreHandledProductsPage from '../pharmacy/StoreHandledProductsPage';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import MyServicesPage from '../MyServicesPage';
@@ -14,7 +16,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => mocks.organizationId }));
 vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => mocks.serviceKey }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey, workServiceKeys: [] }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));
 vi.mock('../../api/localProducts', () => ({ createLocalProduct: mocks.create, updateLocalProduct: mocks.update, getLocalProduct: mocks.single }));
@@ -59,6 +61,24 @@ it('returning from product guidance restores selection only from the current con
   await screen.findByText('1개 선택됨');
   expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
   expect(mocks.products).toHaveBeenCalledWith({ page: 2, limit: 50, search: 'Sample', source: 'local' });
+});
+it.each(['/store','/work/kpa-society/store'])('workspace returns preserve the actual handled-product selection and query: %s', async base => {
+  const search='?q=Sample&source=local&page=2&limit=50',path=base+'/workspace/commerce'+search;
+  mocks.products.mockResolvedValue({items:[{sourceType:'local',sourceId:'one',name:'Sample',isActive:true}],pagination:{total:51}});
+  const config={...withPharmacyStoreMenu(UNIFIED_STORE_CONFIG),basePath:base};
+  render(<MemoryRouter initialEntries={[{pathname:base+'/workspace/commerce',search,state:{productReturn:{path,scope:'store-a:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route element={<Outlet context={{config}}/>}>
+      <Route path={base+'/workspace/commerce'} element={<StoreWorkspacePage area="commerce"/>}/>
+      <Route path={base+'/my-products'} element={<StoreHandledProductsPage/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
+  expect(mocks.products).toHaveBeenCalledWith({page:2,limit:50,search:'Sample',source:'local'});
+  expect(mocks.supply).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'Updated'}});
+  await waitFor(()=>expect(mocks.products).toHaveBeenLastCalledWith({page:1,limit:50,search:'Updated',source:'local'}));
+  expect(mocks.supply).not.toHaveBeenCalled();
 });
 it('browser back from guidance also restores the originating product selection and query', async () => {
   mocks.products.mockResolvedValue({ items: [{ sourceType: 'local', sourceId: 'one', name: 'Sample', isActive: true }], pagination: { total: 51 } });

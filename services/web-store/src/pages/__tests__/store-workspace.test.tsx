@@ -32,6 +32,7 @@ vi.mock("../../contexts/AuthContext", () => ({
 
 vi.mock("../../contexts/StoreContext", () => ({
   useUnifiedStore: () => ({
+    organizationId: 'fixture-store',
     effectiveServiceKey: "kpa-society",
     scopedServiceKey: "kpa-society",
     services: [],
@@ -45,6 +46,43 @@ function Location() {
   const location = useLocation();
   return <output data-testid="location">{JSON.stringify(location)}</output>;
 }
+
+it.each(['/store', '/work/kpa-society/store'])('restores the former product landing only for its current scoped return: %s', async base => {
+  const path = `${base}/workspace/commerce?q=Fixture&source=local&page=2`;
+  render(<MemoryRouter initialEntries={[{pathname:base+'/workspace/commerce',search:'?q=Fixture&source=local&page=2',state:{productReturn:{path,scope:'fixture-store:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route path={base} element={<StoreWorkspaceShell config={{...config,basePath:base}}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+      <Route path="my-products" element={<><h1>상품 목록</h1><Location/></>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 목록'});
+  expect(screen.queryByRole('heading',{name:'상품 주문'})).toBeNull();
+  const location=JSON.parse(screen.getByTestId('location').textContent!);
+  expect(location.pathname).toBe(base+'/my-products');
+  expect(location.state.productReturn).toEqual({path:base+'/my-products'+location.search,scope:'fixture-store:kpa-society',selectedKey:'local:one'});
+});
+it.each([
+  ['another-store:kpa-society','/store/workspace/commerce'],
+  ['fixture-store:another-service','/store/workspace/commerce'],
+  ['fixture-store:kpa-society','/store/my-products'],
+])('ignores a product return for a different scope or exact route: %s %s', async (scope,path) => {
+  render(<MemoryRouter initialEntries={[{pathname:'/store/workspace/commerce',state:{productReturn:{path,scope,selectedKey:'local:one'}}}]}><Routes>
+    <Route path="/store" element={<StoreWorkspaceShell config={config}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 주문'});
+  expect(screen.queryByRole('heading',{name:'상품 목록'})).toBeNull();
+});
+it('a saved product return cannot restore a menu removed by capability filtering', async () => {
+  const filtered={...config,menuSections:config.menuSections?.map(section=>({...section,items:section.items.filter(item=>item.key!=='my-products')}))};
+  render(<MemoryRouter initialEntries={[{pathname:'/store/workspace/commerce',state:{productReturn:{path:'/store/workspace/commerce',scope:'fixture-store:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route path="/store" element={<StoreWorkspaceShell config={filtered}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 주문'});
+});
 
 describe("업무 배치와 기존 경로", () => {
   it("직원 지원은 약국 메뉴와 업무 그룹에만 노출된다", () => {
