@@ -46,8 +46,8 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
 
 const COMMUNITY_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
   labels: { community_operation: { label: '커뮤니티 운영', emoji: '💬' } },
-  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, users: 'community_operation', forum: 'community_operation', content: 'community_operation', system: 'community_operation' },
-  groupOrder: { community_operation: ['users', 'forum', 'content', 'system'] },
+  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, dashboard: 'community_operation', users: 'community_operation', forum: 'community_operation', content: 'community_operation', system: 'community_operation' },
+  groupOrder: { community_operation: ['dashboard', 'users', 'forum', 'content', 'system'] },
   displayOrder: ['community_operation'],
   topPinnedGroups: [],
 };

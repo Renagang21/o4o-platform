@@ -97,3 +97,7 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 - 공통 서비스 접수는 기존 canonical public controller로 POST/body를 보존하는 308 연결을 사용한다. 기존 답변·재발송·설정·서비스 문의 메뉴를 대체하지 않는다. 조직 귀속 문의만 새 범위 전용 접수·처리 경로를 사용한다.
 - 조직 문의를 서비스 공통 관리 경로에서 조회·집계·상태/메모 변경·답변·재발송하지 못하도록 `organization_id IS NULL` 경계를 추가했다. 실제 PostgreSQL 기존 문의 흐름 33개(신규 조직 경계 회귀 포함), 운영 업무함 15개·전체 migration prefix/down/up, Neture 경로/메뉴 75개, Study 42개, 답변 단위 4개 PASS.
 - 운영 실계정 정본 누락 제한은 유지한다. 운영 계정/역할/테스트 문의를 새로 만들지 않는다. PR·CI·배포 결과는 후속 기록한다.
+
+- main 통합 후 shared-space-ui 168개, Pharmcoop 62개, KPA 헤더 권한 11개 PASS. Neture·KPA society·Study·Pharmcoop·Store production build와 API bundle PASS. 커뮤니티 전용 IA에도 dashboard 그룹을 배치하여 업무함 메뉴가 실제 shell에 표시되도록 보완했다.
+- 전체 `pnpm run lint`는 기존 오류 46개 때문에 실패한다. CI 정본의 lint ratchet(기준 46개)을 별도로 실행하며 전체 lint 무오류로 보고하지 않는다. 잘못된 최초 테스트 config/파일·패키지 filter는 실제 경로로 교정 후 재실행했고 무매칭 결과를 PASS로 세지 않았다.
+- 격리 검증용 DB 2개의 잔존을 제거하고 자기 PostgreSQL 서버를 종료했다. 운영 업무 데이터 생성·삭제 없음.
