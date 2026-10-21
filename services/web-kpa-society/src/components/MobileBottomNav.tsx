@@ -78,7 +78,7 @@ export function MobileBottomNav() {
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
 
   // 알림 — KpaGlobalHeader 와 동일 serviceKey('kpa-society') source. 새 API 없음.
-  const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key });
+  const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key, pollIntervalMs: 30000 });
 
   const isCommunity = isCommunityActive(pathname);
   function handleNotifTab() {

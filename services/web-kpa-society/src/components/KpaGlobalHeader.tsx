@@ -64,6 +64,7 @@ export function KpaGlobalHeader() {
   const notif = useNotifications(notificationsApi, {
     enabled: !!user,
     serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key,
+    pollIntervalMs: 30000,
   });
 
   const handleNotificationClick = useCallback(

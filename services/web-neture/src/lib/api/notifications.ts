@@ -25,11 +25,18 @@ function isUnauthorized(err: any): boolean {
 
 const SERVICE_KEY = CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE;
 
+/** Legacy business producers/history remain in Neture. Read their union without copying or resending rows. */
+function scopeParams(serviceKey?: string) {
+  return serviceKey && ['supplier','funding','carepharm'].includes(serviceKey)
+    ? {serviceKeys:`${serviceKey},neture`}
+    : {serviceKey};
+}
+
 export const notificationsApi: NotificationApiClient = {
   async getUnreadCount(params) {
     try {
       const res = await api.get('/notifications/unread-count', {
-        params: { serviceKey: params?.serviceKey, organizationId: params?.organizationId },
+        params: { ...scopeParams(params?.serviceKey), organizationId: params?.organizationId },
       });
       return res?.data?.data?.count ?? 0;
     } catch (err) {
@@ -44,7 +51,7 @@ export const notificationsApi: NotificationApiClient = {
         params: {
           page: params.page,
           limit: params.limit,
-          serviceKey: params.serviceKey,
+          ...scopeParams(params.serviceKey),
           organizationId: params.organizationId,
         },
       });
