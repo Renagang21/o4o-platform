@@ -181,3 +181,5 @@ export type {
 
 export { OperatorInbox, OperatorInboxLink } from './modules/OperatorInbox';
 export type { InboxClient } from './modules/OperatorInbox';
+
+export { OperatorNotificationLink, OperatorNotifications } from "./modules/OperatorNotifications.js";

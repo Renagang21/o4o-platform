@@ -1,3 +1,4 @@
+import NotificationsPage from './pages/NotificationsPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
 import ServiceOperatorsPage from './pages/operator/ServiceOperatorsPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:courseId" element={<CourseDetailPage />} />
       <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonPage />} />

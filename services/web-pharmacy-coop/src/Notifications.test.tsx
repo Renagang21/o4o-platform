@@ -21,7 +21,7 @@ it('loads the Pharmcoop notification scope and marks only the selected notificat
  const api=client();render(<MemoryRouter><CooperativeNotifications client={api}/></MemoryRouter>);
  await screen.findByRole('heading',{name:'조합 문의 · 새 알림'});
  expect(api.get).toHaveBeenCalledWith('/notifications?serviceKey=pharmcoop&page=1&limit=20');
- expect(screen.getByRole('link',{name:'문의 확인'}).getAttribute('href')).toBe('/alpha/operator/inbox');
+ expect(screen.getByRole('link',{name:'업무 확인'}).getAttribute('href')).toBe('/alpha/operator/inbox');
  const button=screen.getByRole('button',{name:'읽음 표시'});fireEvent.click(button);fireEvent.click(button);
  await screen.findByRole('heading',{name:'조합 문의'});
  expect(api.post).toHaveBeenCalledExactlyOnceWith('/notifications/read',{notificationIds:['notice']});

@@ -123,3 +123,7 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 
 - CI 실패 재검증: API shard 1 전체 로컬 실행 179 suites / 3,197 tests PASS, 기존 조건부 252 tests SKIP. cb719556c3의 원격 CI 39674936681도 API 3개 shard·빌드·품질·CI Gate 전체 PASS, Codex 재검토 추가/미해결 지적 0.
 - 별도 SonarCloud는 Reliability C로 실패했다. 알림·사업 문의 wrapper의 같은 줄 guard/후속 문장을 명시적 block과 표준 포맷으로 구분하고, SQL placeholder의 `$1` 리터럴 치환을 반환 함수로 명확히 했다. 동작/권한/SQL 결과는 동일하며 PG17·Pharmcoop 전체68 재검증 PASS, 집중 ESLint 0. 인지 복잡도·스타일 등 비필수 유지보수 제안까지 무관한 리팩터링으로 확대하지 않았다. 새 HEAD의 Sonar·CI를 확인한다.
+
+- Sonar 보완 HEAD d3cd7185a5의 CI 39676651323·SonarCloud 전체 PASS. 재검토 지연으로 20분 후 동일 HEAD를 재요청했고 추가 P2(Study 알림 수신 화면 없음)가 확인됐다.
+- Study 수신 보완: Pharmcoop의 새 알림 UI를 공통 OperatorNotificationLink/OperatorNotifications로 추출해 두 소비처에서 재사용한다. 각 앱이 서비스 키·라우트 해석을 제공한다. Study는 lecture 알림을 수신하고 기존 service-entry/lecture 링크도 실제 로컬 강의 심사/강사 경로로 해석한다. 원래 글로벌 알림 이동 계약을 보존하기 위해 서버 발송 target은 유지했다. backend 심사/등록·권한은 변경하지 않았다. dependency/lockfile 변경 없음.
+- 추출 후 공통 operator UI 전체216, Study 전체45, Pharmcoop 전체68 PASS. 두 앱 production build·집중 ESLint PASS. 실제 번들 1440/390에서 Study 알림→강의 심사 및 Pharmcoop 알림→조합 문의함을 모두 재검증: 각 알림 읽음 POST1, 강의/문의 쓰기0, JS 오류/문서 가로 넘침0 PASS. 계정/응답은 모두 합성으로 운영 쓰기0이다.
