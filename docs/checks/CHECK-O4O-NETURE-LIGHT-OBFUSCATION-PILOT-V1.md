@@ -1,7 +1,7 @@
 # Neture 가벼운 배포 난독화 소규모 시험
 
-> **상태**: ACTIVE · 1단계 비교 시험 완료 · 2단계 운영 적용 검증
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20
+> **상태**: COMPLETED · 1단계 비교 시험 및 2단계 Neture 운영 적용 완료
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-21
 > **기준**: main `8075aa77caf8869c2815d7242cb65a5c07464c6a`
 > **실행 방법**: [시험 도구 README](../../services/web-neture/tools/obfuscation-pilot/README.md)
 
@@ -113,3 +113,13 @@ private manifest에는 입력 소스 해시·출력 파일 해시·도구 버전
 PR #725 최초 HEAD `54da66d975`에서 CI Gate·모든 CI job과 Codex 지적 0은 확인됐으나, Sonar Security C로 병합하지 않았다. 소스맵 주석 제거의 backtracking 정규식을 선형 문자열 처리로 바꾸고(LF/CRLF·문자열 보존·긴 입력 회귀 추가), Docker의 npx 호출을 이미 설치된 Vite만 실행하는 `pnpm exec vite build`로 바꿨다. 기준 완화·이슈 무시·검사 skip은 하지 않았다. 수정 후 도구 테스트는 35건이며 원격 CI·Sonar·Codex를 새 HEAD에서 다시 판정한다. 순차 브라우저 검증의 await-in-loop 등 비차단 유지보수 경고는 실행 순서를 보존하기 위해 유지했다.
 
 2026-10-21 최신 main 반영 후 Codex P2를 받아, CI의 실제 Neture 앱 빌드에도 Docker와 같은 `NETURE_OBFUSCATION=names`를 명시했다. 기존 fixture 테스트와 기본 웹 빌드는 유지한다. 실제 그래프의 allowlist 혼입·gzip 예산·소스맵 생성 실패가 병합 전에 CI Gate를 막으며, 비공개 map과 앱 산출물은 runner 임시 디렉터리에만 쓴다. 같은 최신 main 기준 로컬 도구 테스트 35건과 실제 names 앱 빌드는 통과했다.
+
+### 운영 반영 완료 (2026-10-21)
+
+- [PR #725](https://github.com/Renagang21/o4o-platform/pull/725): 최종 HEAD `91f1f98bf05268488cbfcafd440945bcc5d5c9d3`의 CI Gate·Sonar·CodeQL 통과, Codex 최신 HEAD 지적 0·미해결 thread 0을 확인하고 main `19518474f4dbdd1ee94efeef3ea29882ac37ac71`로 병합했다.
+- [병합 후 CI](https://github.com/Renagang21/o4o-platform/actions/runs/39522487909) 성공. [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39523573020)는 `neture(L3)`만 보류했고, 사용자 승인 범위에서 Neture만 Promote했다.
+- [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39523712750) 성공. 전체 Docker 이미지 build/push, 새 revision smoke·traffic 전환, Verify deployment 및 최종 serving SHA 확인이 성공했다. 해당 SHA의 production 상태는 `DEPLOYED · deploy: neture`다. API·Admin·다른 서비스 배포 job은 skip됐다. DB migration·IAM/WIF 변경은 없다.
+- 운영 HTTPS 직접 조회: 홈 200, `/assets/neture-logic-BFEbF11t.js` 200, SHA-256 `3ab864653f22f5acb5c4f8646a46204f64d74f1e1a4639018ae93b3bc0ccd7ab`로 로컬 검증 산출물과 일치. JS에 `sourceMappingURL`이 없고, 같은 JS의 `.map` 및 `/opt/o4o-private-debug/manifest.json` URL은 404였다.
+- 배포 후 운영 Playwright guest 화면 검증은 이 cloud Chromium의 프록시 CA 신뢰 오류(`ERR_CERT_AUTHORITY_INVALID`)로 navigation 전에 중단됐다. 전용 임시 NSS 저장소에 환경 CA를 등록한 재시도도 같았다. TLS 검증을 끄지 않았다. 실제 브라우저 rendering 성공으로 보고하지 않으며, 실계정 로그인·저장·실기기 smoke도 미실행이다. 기존 로컬 합성 브라우저 결과와 운영 HTTPS 자산 검증, verified rollout 결과를 구분한다.
+
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건. 이 절은 CHECK의 완료 증적이며 사업·보안 기준 문서는 변경하지 않았다.
