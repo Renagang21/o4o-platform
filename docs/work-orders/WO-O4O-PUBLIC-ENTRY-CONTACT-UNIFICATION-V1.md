@@ -1,6 +1,6 @@
 # 전체 서비스 공개 진입·문의·운영 알림 통합 정비
 
-> **상태**: READY_FOR_PUSH · **작성일**: 2026-10-21
+> **상태**: COMPLETED · 개발 검증·push 인계 완료; main 통합·배포 제외 · **작성일**: 2026-10-21
 > **근거**: 사용자 승인 — TODO 작성 → 코드·문서 검증 → 개발·검증 → commit·push. PR·병합·배포·운영 데이터 변경 제외.
 > **정본**: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md), [인증·서비스 가입](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 모듈 변경](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)
 
@@ -14,7 +14,7 @@
 - [x] 접수 확인과 운영자 답변 구분, 발송 실패·재처리·이력 처리
 - [x] 비로그인·미가입·대기·활성·운영자·다른 서비스 권한 회귀 검증
 - [x] 영향받은 앱 빌드·데스크톱/모바일 브라우저 검증
-- [ ] 문서 정합·민감정보·변경 범위 확인, commit·push 후 인계
+- [x] 문서 정합·민감정보·변경 범위 확인, commit·push 후 인계
 
 ## 구현 경계
 
@@ -74,12 +74,13 @@ API 검사는 격리된 로컬 PostgreSQL socket을 `CONTACT_REVIEW_PG_SOCKET`�
 
 종료 범위는 commit·push다. PR·병합·CI 운영·배포·운영 DB 변경·운영 문의 제출·실제 메일 발송은 하지 않는다. 통합 담당은 현재 main과 충돌 여부, 서비스별 담당자와 메일 설정, 실제 Google 운영자 로그인·운영 문의 접수/수신/답변을 별도로 확인한다.
 
-문서 정합: 사용자 승인에 따라 공개 진입·문의 기준을 두 canonical 문서에 추가했다. 기존 가입/승인·조직·역할·무로그인 도구 계약은 유지한다. 운영 배포 완료로 표시하지 않는다.
+문서 정합: 사용자 승인에 따라 공개 진입·문의 기준을 두 canonical 문서에 반영했다. 서비스 탐색 §5의 이전 로그인 필수·소개 화면/문의 금지 표를 새 기준으로 교체하고 회원 초기화면의 소개 Home 금지와 비로그인 공개 안내를 구분했다. 기존 가입/승인·조직·역할·무로그인 도구 계약은 유지한다. 운영 배포 완료로 표시하지 않는다.
 
 
 ## Git·작업공간 상태
 
 - 작업 branch: `wo/public-entry-contact-unification`
+- 구현 commit: `eedb8556b8b3f67829f7e312aeedeedc82449adb`. 작업 branch push 후 `git ls-remote --heads`로 원격 SHA 일치를 확인했다. 이 완료 기록은 같은 branch의 후속 문서 commit으로 인계한다.
 - 작업공간: `/workspace/o4o-wt/public-entry-contact-unification`
 - 시작 main: `e09db6eb4b`; 현재 작업은 독립 worktree 안에서만 수행했다.
 - main 통합·PR CI·배포: 미실행. 개발 범위는 commit·push 후 인계다.
