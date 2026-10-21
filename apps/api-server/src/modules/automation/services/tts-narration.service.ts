@@ -98,7 +98,7 @@ export class TtsNarrationService {
   constructor(
     private readonly resolveKey: (provider: TtsProvider) => Promise<string>,
     private readonly fetchImpl: FetchLike = (input, init) => fetch(input, init),
-    private readonly resolveModel: (provider: TtsProvider) => Promise<string> = async provider => TTS_PROVIDERS[provider].model,
+    private readonly resolveModel: (provider: TtsProvider) => Promise<string> = provider => Promise.resolve(TTS_PROVIDERS[provider].model),
   ) {}
 
   async synthesize(req: TtsRequest): Promise<TtsResult> {

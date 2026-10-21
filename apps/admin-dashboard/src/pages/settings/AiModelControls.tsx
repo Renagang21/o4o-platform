@@ -358,7 +358,7 @@ function ModelDialog({
       >
         <fieldset disabled={busy} className="space-y-3">
           <label className="block">
-            모델 ID
+            <span>모델 ID</span>
             <input
               className={field}
               required
@@ -371,7 +371,7 @@ function ModelDialog({
             />
           </label>
           <label className="block">
-            표시 이름
+            <span>표시 이름</span>
             <input
               className={field}
               maxLength={100}
@@ -422,6 +422,7 @@ function ModelDialog({
               취소
             </button>
             <button
+              type="submit"
               className={button + " bg-blue-600 text-white"}
               disabled={!id.trim() || !selected.length}
             >
@@ -549,7 +550,11 @@ function SelectionForm({
         가격·한도 검사를 통과해야 실행됩니다. 기존 재시도·장애 시 대체 모델
         정책은 유지됩니다.
       </p>
-      <button className={button} disabled={control.busy || control.loading}>
+      <button
+        type="submit"
+        className={button}
+        disabled={control.busy || control.loading}
+      >
         {control.busy ? "저장 중…" : "사용 모델 저장"}
       </button>
     </form>

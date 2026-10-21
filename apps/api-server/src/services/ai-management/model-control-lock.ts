@@ -1,7 +1,7 @@
 import type { DataSource, EntityManager } from "typeorm";
 
 /** Policy model references and catalog retirement must use the same transaction lock. */
-export async function withAiModelControlLock<T>(
+export function withAiModelControlLock<T>(
   db: Pick<DataSource, "transaction">,
   run: (manager: EntityManager) => Promise<T>,
 ): Promise<T> {

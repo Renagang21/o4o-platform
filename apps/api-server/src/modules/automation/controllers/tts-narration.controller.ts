@@ -1,5 +1,4 @@
 import { ModelControlService } from '../../../services/ai-management/model-controls.js';
-import { TTS_PROVIDERS } from '../services/tts-narration.service.js';
 /**
  * TTS Narration API — WO-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1
  *
@@ -16,7 +15,7 @@ import logger from '../../../utils/logger.js';
 import { resolveAiApiKey } from '../../../utils/ai-key.util.js';
 import { requireMediaPlatformAdmin } from '../../media/controllers/media-catalog.controller.js';
 import { MediaCatalogError } from '../../media/services/media-catalog.service.js';
-import { TtsNarrationService, validateTtsRequest } from '../services/tts-narration.service.js';
+import { TtsNarrationService, validateTtsRequest, TTS_PROVIDERS } from '../services/tts-narration.service.js';
 
 export function createTtsNarrationRouter(ds: DataSource): Router {
   const router = Router();

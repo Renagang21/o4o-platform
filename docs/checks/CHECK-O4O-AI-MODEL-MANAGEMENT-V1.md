@@ -115,3 +115,7 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 기존 `AiAdminService.activateEngine`도 정책 writer임을 추가 확인했다. 엔진 활성화와 일반 관리자 정책 저장을 같은 transaction advisory lock에 연결했다. 활성화는 삭제 표식을 검사한 후 엔진 플래그와 정책을 원자 저장하며 삭제된 모델은 409로 거절한다. 일반 정책 저장은 잠금 내부에서 최신 정책을 재조회하므로 오래된 모델 필드를 덮어쓰지 않는다. 앞 절의 "다른 app 쓰기 소비처 미확인"은 당시 조사 결과이며 이 추가 writer 확인으로 보완한다.
 
 실제 `generateContent` 진입점에서 GPT-6/GPT-5/o3/GPT-4.1 모델별 합성 HTTP body, 삭제된 비활성 엔진의 활성화/정책 무변경, 기존 CRUD·질의·정책 회귀: 5 suites, 48 PASS. API type-check PASS. 실제 유료 호출이나 엔진 운영 설정 변경은 하지 않았다.
+
+### 품질 검사 보완
+
+SonarCloud의 폼 신뢰성 지적에 따라 모델 저장·사용 모델 저장 버튼을 명시적 submit으로 지정하고 입력 라벨 텍스트를 span으로 구분했다. 모델 관리/조회 단위 13 PASS, desktop/mobile 모델 관리 browser 4 PASS를 재확인했다. 중복 import와 불필요 async 선언도 정리했다. 나머지 스타일·복잡도 권고와 실제 신뢰성 gate를 구분하며 최신 CI/품질 분석 결과는 이후 기록한다.
