@@ -86,6 +86,16 @@
 
 A19의 **논리 생성과 실제 공급자 시도 수는 다르다**. `generateAllContents()`는 상품당 최대 5개 유형을 생성하며 각 생성은 기존 정책의 `retryMax`(초기 시도 포함, 기본/seed 2)와 설정된 fallback 1회가 적용된다. 기본값과 fallback이 있는 예에서는 wrapper 기준 `5 × (2 + 1) = 15`회 시도까지 가능하다. 또한 [Gemini adapter][gemini-adapter]와 [OpenAI adapter][openai-adapter]는 JSON 파싱 실패 시 각 provider.complete 안에서 1회 추가 요청할 수 있어, 그 오류가 반복되는 JSON 경로는 같은 예에서 실제 HTTP 요청이 `5 × (2 × 2 + 1 × 2) = 30`회까지 늘 수 있다. 이는 전역 고정 상한이나 실제 청구 건수가 아니다. 운영 정책의 retryMax/responseMode, fallback 키·한도·오류에 따라 달라지므로 논리 생성 수나 wrapper attempts만을 물리 호출/비용 합계로 사용하지 않는다. 태그 생성 호출은 별도다.
 
+### 별도 전문 AI API: X01 상품 이미지 OCR
+
+아래는 위 A01~A31 생성·음성 사용처와 별도로 확인한 외부 전문 API다. 31개 행을 전체 외부 AI 비용의 완전한 목록이라고 해석하지 않는다.
+
+| ID·진입점 | 외부 API·인증 | 현재 제어·기록 | 정비 방향 |
+| --- | --- | --- | --- |
+| X01 상품 비썸네일 이미지 업로드: [관리자 handler][ocr-admin] / [공급자 handler][ocr-supplier] → `extractAndSave()` | [ProductOcrService][ocr] → `vision.googleapis.com/v1/images:annotate`, 고정 `TEXT_DETECTION`, imageUri 전달. 토큰은 `GOOGLE_VISION_ACCESS_TOKEN` → Cloud Run ADC metadata → 로컬 gcloud 순서; 확보 불가 시 skip | handler의 `imageType !== thumbnail`에서 fire-and-forget 자동 실행. 현재 extractAndSave당 Vision HTTP 1요청, 자체 재시도 없음. OCR 본문은 기존 product_ocr_texts에 저장하나 공통 AI usage/비용·quota·중지·모델 관리에 미연결 | 생성형 모델 dropdown과 구분해 전문 API 사용 여부·이미지/기능 단위 집계 및 비용 연결을 후속 등록. 실제 API 활성·IAM·유료 사용·가격/청구는 미확인 |
+
+`extractAllForProduct()`는 비대표 이미지별 반복 메서드가 있으나 별도 호출 소비처를 찾지 못했으므로 활성 배치 작업으로 단정하지 않는다. 업로드 1건·OCR 요청·OCR 저장 성공은 별개다. OCR 실패나 저장 실패에도 이미 전달된 외부 요청의 비용이 없었다고 간주하지 않는다. 이번 조사에서 이미지 업로드·토큰 획득·Vision 호출·운영 데이터 변경은 수행하지 않았다. 이 문서 추가로 Vision 실행/설정을 확장하지 않으며 현재 모델 관리의 30/31 연결 범위에도 X01이 포함된 것으로 보고하지 않는다.
+
 ## 4. 화면·공통 소비 코드 연결
 
 화면에 AI 버튼이 존재하는지와 route가 존재하는지를 구분한다. 아래는 소비 코드의 연결 증거이며, 모든 배포 도메인에서 해당 화면이 활성이라는 뜻은 아니다.
@@ -200,6 +210,9 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 [guardrail]: ../../packages/types/src/ai-provider-guardrail.ts
 [admin-generator]: ../../apps/admin-dashboard/src/services/ai/SimpleAIGenerator.ts
 [tagging]: ../../apps/api-server/src/modules/store-ai/services/product-ai-tagging.service.ts
+[ocr]: ../../apps/api-server/src/modules/store-ai/services/product-ocr.service.ts
+[ocr-admin]: ../../apps/api-server/src/modules/neture/controllers/admin.controller.ts
+[ocr-supplier]: ../../apps/api-server/src/modules/neture/controllers/supplier-images/handlers.ts
 [neture-app]: ../../services/web-neture/src/App.tsx
 [gemini-adapter]: ../../packages/ai-core/src/orchestration/providers/gemini.provider.ts
 [openai-adapter]: ../../packages/ai-core/src/orchestration/providers/openai.provider.ts
@@ -239,3 +252,5 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 자체 추가 대조: A15는 조사 기준 revision에도 lms-lesson surface를 전달하므로 기존 "surface 미전달" 문구를 정정했다. 해당 surface는 Qwen 허용 대상이 아니며 기존 Gemini 편집 실행 결과/권한은 바꾸지 않는다.
 
 개발 smoke도 동일 기준으로 보완했다. 범용 파일 스크립트의 MAX_ATTEMPTS=2는 외부 HTTP 전체 상한이 아니며 내부 Core·Gemini JSON 재시도를 포함하면 실패 반복 시 최대 8요청 예가 가능하다. grounding smoke는 Core 기본 2시도이고 text 모드라 JSON 내부 재시도는 없다. 둘 다 실제 호출·청구 검증은 수행하지 않았다.
+
+추가 검토 보완: 업로드 후 자동 Google Vision OCR을 X01 전문 외부 API로 별도 기록했다. 고정 TEXT_DETECTION·ADC 계열 인증·이미지 단위 비용을 생성형 모델/토큰과 구분하며 현재 모델 관리에 연결됐다고 표시하지 않는다.
