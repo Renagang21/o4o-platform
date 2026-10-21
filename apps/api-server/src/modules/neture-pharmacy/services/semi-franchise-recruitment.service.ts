@@ -13,6 +13,7 @@ import { NeturePharmacyError, NETURE_PHARMACY_SERVICE_KEY, DEFAULT_SEMI_FRANCHIS
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
 import { recruitmentTargetMatch, recruitmentAvailable } from './recruitment-target.js';
+import { orderableRecruitmentIds } from './supply-access.js';
 
 const RECRUITMENT_VIEW = `
   SELECT sr.id, sr.product_id AS "masterId", sr.product_name AS "productName", sr.seller_name AS "supplierName",
@@ -108,7 +109,7 @@ export class SemiFranchiseRecruitmentService {
 
   /** 약국 — 일반 공개 및 가입한 세미프랜차이즈의 모집 + 내 약국의 참여 상태 */
   async pharmacyBrowse(organizationId: string) {
-    return this.dataSource.query(
+    const rows = await this.dataSource.query(
       `SELECT sr.id, sr.product_name AS "productName", sr.seller_name AS "supplierName",
               sr.supply_unit_price AS "supplyUnitPrice", sr.consumer_price AS "consumerPrice", sr.created_at AS "createdAt",
               sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName",
@@ -123,6 +124,8 @@ export class SemiFranchiseRecruitmentService {
         ORDER BY sr.created_at DESC`,
       [organizationId],
     );
+    const orderable = await orderableRecruitmentIds(this.dataSource, organizationId, rows.map((row: { id: string }) => row.id));
+    return rows.map((row: { id: string }) => ({ ...row, orderable: orderable.has(row.id) }));
   }
 
   /** 약국 조직 단위 참여 신청 */

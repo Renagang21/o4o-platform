@@ -105,6 +105,7 @@ export function createStoreLibraryFeedController(
         // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT = content_json.aiDescription.mode.
         //   source='ai-description' 는 source_group 이 아니라 ai_mode IS NOT NULL outer 필터(바인드 불필요).
         const aiOnly = rawSource === 'ai-description';
+        const businessFilter = typeof req.query.business === 'string' ? req.query.business.trim() || null : null;
         const rawTag = typeof req.query.tag === 'string' ? req.query.tag.trim().slice(0, 30) : '';
         const tagFilter = rawTag.length > 0 ? rawTag : null;
         const tagJson = tagFilter ? JSON.stringify([tagFilter]) : null;
@@ -116,9 +117,11 @@ export function createStoreLibraryFeedController(
         let dNext = useSearch ? 5 : 4;
         const dSourceIdx = sourceFilter ? dNext++ : 0;
         const dTagIdx = tagFilter ? dNext++ : 0;
+        const dBusinessIdx = businessFilter ? dNext++ : 0;
         let cNext = useSearch ? 3 : 2;
         const cSourceIdx = sourceFilter ? cNext++ : 0;
         const cTagIdx = tagFilter ? cNext++ : 0;
+        const cBusinessIdx = businessFilter ? cNext++ : 0;
 
         // 검색: 제목 + 본문/요약(content_json::text) + tags::text. exec 는 description/html_content/category 추가.
         const mkSnapDirSearch = (alias: string, idx: number) =>
@@ -133,10 +136,10 @@ export function createStoreLibraryFeedController(
         const execSearchClauseCount = useSearch ? mkExecSearch(2) : '';
 
         // outer 필터 (source_group / tags @> 정확 매칭 / ai_mode). 'all' 은 source 절 없음.
-        const mkOuterFilter = (sourceIdx: number, tagIdx: number) =>
-          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''} ${aiOnly ? `AND ai_mode IS NOT NULL` : ''}`;
-        const dataOuterFilter = mkOuterFilter(dSourceIdx, dTagIdx);
-        const countOuterFilter = mkOuterFilter(cSourceIdx, cTagIdx);
+        const mkOuterFilter = (sourceIdx: number, tagIdx: number, businessIdx: number) =>
+          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''} ${aiOnly ? `AND ai_mode IS NOT NULL` : ''} ${businessIdx ? `AND source_business_key = $${businessIdx}` : ''}`;
+        const dataOuterFilter = mkOuterFilter(dSourceIdx, dTagIdx, dBusinessIdx);
+        const countOuterFilter = mkOuterFilter(cSourceIdx, cTagIdx, cBusinessIdx);
 
         const dataQuery = `
           SELECT * FROM (
@@ -148,6 +151,7 @@ export function createStoreLibraryFeedController(
                 CASE WHEN s.source_service = 'semi-franchise' THEN 'franchise' WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END AS source_group,
                 -- WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처 표시는 불변 snapshot 에서 — 매장 편집본(sc)은 보지 않는다.
                 CASE WHEN s.source_service = 'semi-franchise' THEN s.content_json->>'semiFranchiseName' END AS source_name,
+                CASE WHEN s.source_service = 'semi-franchise' THEN s.content_json->>'semiFranchiseKey' END AS source_business_key,
                 -- WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
                 --   snapshot 은 o4o_asset_snapshots(불변 Core) + kpa_store_contents(snapshot_edit override) 구조.
                 --   매장 편집본(override)이 있으면 우선 노출 — 공개 렌더(published-assets)와 동일한 COALESCE 정책.
@@ -179,6 +183,7 @@ export function createStoreLibraryFeedController(
                 NULL::varchar AS asset_type,
                 'mine'::text AS source_group,
                 NULL::text AS source_name,
+                NULL::text AS source_business_key,
                 d.title AS title,
                 d.content_json AS content_json,
                 d.created_at AS sort_at,
@@ -199,6 +204,7 @@ export function createStoreLibraryFeedController(
                 'content'::varchar AS asset_type,
                 'mine'::text AS source_group,
                 NULL::text AS source_name,
+                NULL::text AS source_business_key,
                 e.title AS title,
                 jsonb_build_object('html', e.html_content) AS content_json,
                 e.created_at AS sort_at,
@@ -223,6 +229,7 @@ export function createStoreLibraryFeedController(
             (
               SELECT
                 (CASE WHEN s.source_service = 'semi-franchise' THEN 'franchise' WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END) AS source_group,
+                CASE WHEN s.source_service = 'semi-franchise' THEN s.content_json->>'semiFranchiseKey' END AS source_business_key,
                 COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags,
                 NULL::varchar AS ai_mode
               FROM o4o_asset_snapshots s
@@ -235,7 +242,7 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 'mine'::text AS source_group, COALESCE(d.tags, '[]'::jsonb) AS tags,
+              SELECT 'mine'::text AS source_group, NULL::text AS source_business_key, COALESCE(d.tags, '[]'::jsonb) AS tags,
                 d.content_json->'aiDescription'->>'mode' AS ai_mode
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
@@ -244,7 +251,7 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 'mine'::text AS source_group, COALESCE(e.tags, '[]'::jsonb) AS tags,
+              SELECT 'mine'::text AS source_group, NULL::text AS source_business_key, COALESCE(e.tags, '[]'::jsonb) AS tags,
                 NULL::varchar AS ai_mode
               FROM store_execution_assets e
               WHERE e.organization_id = $1
@@ -260,10 +267,12 @@ export function createStoreLibraryFeedController(
         if (useSearch) dataParams.push(searchPattern);
         if (sourceFilter) dataParams.push(sourceFilter);
         if (tagJson) dataParams.push(tagJson);
+        if (businessFilter) dataParams.push(businessFilter);
         const countParams: any[] = [organizationId];
         if (useSearch) countParams.push(searchPattern);
         if (sourceFilter) countParams.push(sourceFilter);
         if (tagJson) countParams.push(tagJson);
+        if (businessFilter) countParams.push(businessFilter);
 
         const [items, countResult] = await Promise.all([
           dataSource.query(dataQuery, dataParams),
@@ -319,6 +328,7 @@ export function createStoreLibraryFeedController(
           asset_type: string | null;
           source_group: 'franchise' | 'operator' | 'community' | 'mine';
           source_name: string | null;
+          source_business_key: string | null;
           title: string;
           content_json: Record<string, unknown> | null;
           sort_at: string;
@@ -334,6 +344,7 @@ export function createStoreLibraryFeedController(
           // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처 분류(불변 snapshot 기준) — 사본을 편집해도 바뀌지 않는다.
           sourceGroup: row.source_group,
           sourceName: row.source_name ?? null,
+          sourceBusinessKey: row.source_business_key ?? null,
           title: row.title,
           contentJson: row.content_json ?? {},
           createdAt: row.sort_at,

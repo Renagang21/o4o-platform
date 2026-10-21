@@ -22,6 +22,7 @@ import {
 } from "../../components/store/StoreWorkflowNavigation";
 
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
+vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
 vi.mock('../pharmacy/StoreExecutionPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>실행 현황</h1>{navigation}</> }));
 
@@ -286,9 +287,9 @@ it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다�
   expect((await screen.findByText('현재 이용할 수 있는 업무가 없습니다.')).textContent).toContain('현재 이용할 수 있는 업무가 없습니다');
 });
 
-it('상품 목적지는 메뉴 카드를 거치지 않고 실제 상품 목록을 표시한다', async () => {
+it('상품 목적지는 주문 상품 목록을 먼저 표시하고 기존 취급상품 진입을 보존한다', async () => {
  render(<MemoryRouter initialEntries={['/store/workspace/commerce']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={config} />}><Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce" />} /></Route></Routes></MemoryRouter>);
- expect(await screen.findByRole('heading', {name:'상품 목록'})).toBeTruthy();
+ expect(await screen.findByRole('heading', {name:'상품 주문'})).toBeTruthy();
  expect(screen.getByRole('link', {name:'공급 상품'}).closest('details')?.open).toBe(false);
  fireEvent.click(screen.getByText('전체 업무'));
  expect(screen.getByRole('link', {name:'공급 상품'}).getAttribute('href')).toBe('/store/pharmacy/supply');

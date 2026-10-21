@@ -18,6 +18,7 @@ import {
 import { Notice, PharmacyPage, SUPPLY_KIND_LABEL, btn, formatWon, pharmacyStorePath } from './shared';
 import { PaymentGroupPay, usePaymentMode } from './PaymentGroupPay';
 import { useLatestList } from '../../hooks/useLatestList';
+import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
 
 const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '장바구니를 불러오지 못했습니다.');
 
@@ -107,6 +108,7 @@ export default function PharmacyCartPage() {
         <button className={btn.secondary} disabled={loading || mutationBusy} onClick={load}>새로고침</button>
       </>}
     >
+      <StoreCommerceNavigation />
       {error && <Notice tone="error">{error}</Notice>}
 
       {result && (

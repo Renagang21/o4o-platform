@@ -78,7 +78,7 @@ it('browser back from guidance also restores the originating product selection a
 describe('내 매장 경영지원', () => {
   it('약국 문맥에서 자료 가져오기 입구를 제공한다', () => {
     mount(<StoreLibraryNavigation section="mine" />);
-    expect(screen.getByRole('link', { name: '자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents');
+    expect(screen.getByRole('link', { name: '제공 자료' }).getAttribute('href')).toBe('/store/pharmacy/contents');
   });
   it('PharmacyHub 문맥에서는 약국 전용 자료 입구를 숨기고 내 자료함 기능을 보존한다', () => {
     mocks.serviceKey = 'pharmacy-hub';
@@ -118,7 +118,7 @@ describe('내 매장 경영지원', () => {
   it('공급 탭은 승인 사업만 제공하고 선택한 사업 조건을 서버에 전달한다', async () => {
     mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
     fireEvent.click(await screen.findByRole('button', { name: '혈당관리 사업' }));
-    await waitFor(() => expect(mocks.supply).toHaveBeenLastCalledWith(expect.objectContaining({ source: 'sf:diabetes' })));
+    await waitFor(() => expect(mocks.supply).toHaveBeenLastCalledWith(expect.objectContaining({ business: 'diabetes' })));
     expect(screen.queryByRole('button', { name: '승인 대기 사업' })).toBeNull();
   });
   it('공급 제안의 승인된 배송조건과 최소금액을 약국에 표시한다', async () => {

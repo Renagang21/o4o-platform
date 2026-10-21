@@ -9,6 +9,7 @@ import {
 import { useUnifiedStore } from "../../contexts/StoreContext";
 import { SERVICE_WORK_CONFIGS } from "../../config/storeMenu";
 import { isUnifiedServiceKey } from "../../lib/serviceContext";
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 const StoreHandledProductsPage = lazy(
   () => import("./StoreHandledProductsPage"),
 );
@@ -16,6 +17,7 @@ const StoreLibraryContentsPage = lazy(
   () => import("./StoreLibraryContentsPage"),
 );
 const StoreOperationsPage = lazy(() => import("./StoreOperationsPage"));
+const SupplyOptionsPage = lazy(() => import('../neture-pharmacy/SupplyOptionsPage'));
 
 const linkStyle =
   "inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-teal-600";
@@ -103,13 +105,15 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         ))}
     </nav>
   );
+  if (area === 'commerce' && has('pharmacy-supply'))
+    return <SupplyOptionsPage navigation={navigation} />;
   if (area === "commerce" && has("my-products"))
     return <StoreHandledProductsPage workspace navigation={navigation} />;
   if (area === "studio" && has("library-contents"))
     return (
       <StoreLibraryContentsPage
         workspace
-        navigation={navigation}
+        navigation={<><StoreLibraryNavigation section="mine" />{navigation}</>}
         quickLinks={
           <>
             {productAllowed && (

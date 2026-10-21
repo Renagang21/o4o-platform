@@ -6,11 +6,15 @@
  * 결제 전 주문은 결제 그룹 단위로 여기서도 결제할 수 있다(장바구니 화면을 벗어난 경우).
  * 테스트 결제 주문은 "테스트 결제" 로 표시한다 — 실제 결제 · 공급자 지급 근거가 아니다.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
-import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder, type SemiFranchiseRow } from '../../api/neturePharmacy';
-import { BusinessTabs } from '../../components/BusinessTabs';
+import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder } from '../../api/neturePharmacy';
+import { StoreBusinessTabs } from './StoreBusinessTabs';
+import { useStoreBusinesses } from './useStoreBusinesses';
+import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 import { PaymentGroupPay, usePaymentMode } from './PaymentGroupPay';
 import { useLatestList } from '../../hooks/useLatestList';
@@ -47,21 +51,26 @@ function itemSummary(o: PharmacyOrder): string {
 }
 
 export default function PharmacyOrdersPage() {
+  const { organizationId } = useUnifiedStore(); const { user } = useAuth();
+  return <PharmacyOrders key={`${user?.id}:${organizationId}`} />;
+}
+function PharmacyOrders() {
   const mode = usePaymentMode();
   const [params, setParams] = useSearchParams();
   const business = params.get('business') || '';
-  const [businesses, setBusinesses] = useState<SemiFranchiseRow[]>([]);
-  useEffect(() => { let active = true; neturePharmacyApi.listSemiFranchises().then(rows => { if (active) setBusinesses(rows.filter(r => r.membershipStatus !== null)); }).catch(() => {}); return () => { active = false; }; }, []);
+  const businesses = useStoreBusinesses();
   const [message, setMessage] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const cancelBusy = useRef(false);
 
   const fetchList = useCallback(async () => {
     const items = await neturePharmacyApi.listOrders();
     return { items, total: items.length };
   }, []);
-  const { items: orders, loading, error, setError, load } = useLatestList<PharmacyOrder>(fetchList, listErrorMessage);
+  const { items: orders, loading, error, load } = useLatestList<PharmacyOrder>(fetchList, listErrorMessage);
 
-  const visibleOrders = business ? orders.filter(o => o.items?.some(i => i.metadata?.semiFranchiseKey === business)) : orders;
+  const visibleOrders = business ? orders.filter(o => o.items?.some(i => business === '__public__' ? i.metadata?.supplyKind === 'recruitment' && !i.metadata?.semiFranchiseKey : i.metadata?.semiFranchiseKey === business)) : orders;
   /** 결제 전 주문을 결제 그룹별로 묶는다(금액 = 그룹 주문 합계 — 확정 금액은 서버가 다시 계산한다). */
   const unpaidGroups = useMemo(() => {
     const m = new Map<string, { paymentGroupId: string; amount: number; count: number }>();
@@ -76,17 +85,21 @@ export default function PharmacyOrdersPage() {
   }, [orders]);
 
   const cancel = async (o: PharmacyOrder) => {
+    if (cancelBusy.current || !businesses.isCurrent()) return;
     if (!window.confirm(`주문 ${o.orderNumber} 을(를) 취소하시겠습니까?`)) return;
+    cancelBusy.current = true;
     setBusyId(o.id);
-    setError(null);
+    setActionError(null);
     setMessage(null);
     try {
       await neturePharmacyApi.cancelOrder(o.id);
+      if (!businesses.isCurrent()) return;
       setMessage(`주문 ${o.orderNumber} 을(를) 취소했습니다.`);
       await load();
     } catch (e) {
-      setError(pharmacyErrorMessage(e, '주문을 취소하지 못했습니다.'));
+      if (businesses.isCurrent()) setActionError(pharmacyErrorMessage(e, '주문을 취소하지 못했습니다.'));
     } finally {
+      cancelBusy.current = false;
       setBusyId(null);
     }
   };
@@ -100,10 +113,13 @@ export default function PharmacyOrdersPage() {
         <button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>
       </>}
     >
+      <StoreCommerceNavigation />
       {message && <Notice>{message}</Notice>}
-      <BusinessTabs businesses={businesses} value={business} onChange={key => setParams(prev => { const p = new URLSearchParams(prev); if (key) p.set('business', key); else p.delete('business'); return p; })} />
+      {actionError && <Notice tone="error">{actionError}</Notice>}
+      <StoreBusinessTabs businesses={businesses} value={business} history publicSource onChange={key => setParams(prev => { const p = new URLSearchParams(prev); if (key) p.set('business', key); else p.delete('business'); return p; })} />
+      <p className="mb-3 text-xs text-slate-500">최근 조회한 주문 최대 200건 기준입니다. 협업체 탭은 현재 약국의 가입 상태와 주문 당시 출처를 구분합니다.</p>
       {business && <p className="mb-3 text-sm text-slate-500">선택한 사업의 항목이 포함된 주문입니다. 주문 금액·결제 그룹은 원래 주문 전체 기준입니다.</p>}
-      {error && <Notice tone="error">{error}</Notice>}
+      {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>주문 다시 확인</button></Notice>}
 
       {!loading && unpaidGroups.length > 0 && (
         <section className="mb-6 rounded-lg border border-amber-200 bg-white p-4">
@@ -121,7 +137,7 @@ export default function PharmacyOrdersPage() {
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : visibleOrders.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-          <p>주문 내역이 없습니다.</p>
+          <p>{business ? `${businesses.rows.find(row => row.key === business)?.name ?? '선택한 출처'}의 조회된 주문 내역이 없습니다.` : '주문 내역이 없습니다.'}</p>
           <p className="mt-1"><Link className="underline" to={pharmacyStorePath('supply')}>공급 상품 보기</Link></p>
         </div>
       ) : (
@@ -160,7 +176,7 @@ export default function PharmacyOrdersPage() {
                   <td className="px-4 py-3 text-xs text-gray-500">{formatDate(o.createdAt)}</td>
                   <td className="px-4 py-3 text-center">
                     {isUnpaid(o) && (
-                      <button className={btn.danger} disabled={busyId === o.id} onClick={() => cancel(o)}>결제 전 취소</button>
+                      <button className={btn.danger} disabled={busyId !== null} onClick={() => cancel(o)}>결제 전 취소</button>
                     )}
                   </td>
                 </tr>
