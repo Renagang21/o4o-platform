@@ -77,3 +77,17 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 - push 전 확인한 `origin/main=ac38af8df1`의 CarePharm 변경과 이번 작업 경로 중복 없음. 기준 checkout은 건드리지 않음.
 - 종료 범위는 개발·로컬 검증·commit·push. PR CI는 미실행, main 병합·운영 배포는 미실행. `DEPLOYMENT=REQUIRED`이며 통합 담당의 별도 작업으로 남김. 위 기존 rollback 실패도 인계한다.
 - `WORKTREE_DISPOSITION`: branch-only 개발 변경 보존, 통합 전 worktree `KEEP`. 최종 commit SHA·원격 동일 SHA·clean은 Git 및 최종 보고에서 확인한다.
+
+## 2026-10-21 통합 재검증 (진행 중)
+
+사용자가 main 병합·배포를 추가 지시했다. 개발 기록의 미해결 quota rollback 2건은 이번 통합에서 보완했다. 전체 최신 schema 검사는 별도 DB에 유지하고, rollback fixture는 manifest에서 quota migration까지의 prefix를 찾아 적용한다. 따라서 `undoLastMigration()`이 실제 quota를 대상으로 하며 전후 fingerprint도 해당 위치를 사용한다. production migration·manifest·fingerprint 정본은 변경하지 않았다.
+
+최신 main `cec025afb55584d5411f82deaa58d6303a9e02e5`를 충돌 없이 병합한 후 실행 결과:
+
+- API 모델 관리·HTTP 인가: 2 suites, 25 PASS.
+- 실제 격리 PostgreSQL schema/rollback 및 모델 CAS/재조회: 2 suites, 7 PASS. 기존 실패 2건 해소.
+- quota 예약·다중 공급자 runtime·동적 목록·TTS·서비스/LMS Extension·과금 실행: 7 suites, 139 PASS. 예약 14건 포함.
+- 관리자 전체 Vitest: 30 files, 441 PASS.
+- API 및 관리자 type-check PASS, API 정식 build PASS.
+
+테스트는 Node 22.18.0·pnpm 10.25.0, 합성 공급자 응답 및 격리 loopback PostgreSQL 16을 사용했다. 실제 Google 로그인·운영 모델 설정 저장·유료 공급자 호출은 수행하지 않았다. browser·관리자 build·PR/운영 배포·일회성 DB 정리 결과는 이후 실제 실행에 따라 추가한다.

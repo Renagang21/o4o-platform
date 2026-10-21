@@ -1,6 +1,6 @@
 # AI 모델 등록·수정·삭제 및 실행 모델 지정 TODO
 
-> **상태**: COMPLETED
+> **상태**: ACTIVE
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거**: 사용자 요청 — AI 연결의 오래된 모델 삭제, 신규/수정/삭제, 사용하는 모델 지정
 > **관련 정본**: [AI 공통 기반](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md) · [기존 AI 운영 관리](WO-O4O-ADMIN-AI-USAGE-MANAGEMENT-V1.md)
@@ -30,3 +30,19 @@ AI 운영 관리의 API·모델 연결은 정적 MODEL_WHITELIST 조회이며 �
 [검증·제한·데이터 정리·인계 기록](../checks/CHECK-O4O-AI-MODEL-MANAGEMENT-V1.md)에 실제 명령과 결과를 기록했다. 새 모델 관리와 관련 회귀는 통과했으나, 추가한 실제 PostgreSQL 검사에서 기존 quota schema rollback spec 두 건의 마지막 migration 가정 불일치를 발견했다. 별도 수정이 필요하며 전체 검증 무실패로 보고하지 않는다. 운영 Google 로그인·유료 공급자·운영 DB 검증은 미실행이다.
 
 개발 종료는 commit·push 및 원격 SHA/clean 확인이다. PR·병합·배포는 이번 요청의 종료 범위에 포함하지 않는다. 통합 전 worktree/branch를 보존한다.
+
+## 2026-10-21 main 통합·배포 TODO (현재)
+
+사용자 추가 지시 `main 으로 병합 -> 배포`에 따라 이 공간이 통합을 담당한다. 위 T01–T07과 당시 push-only 경계는 개발 종료 기록이며, 아래 체크가 현재 통합 상태다. 운영 설정·유료 호출·새 migration은 추가하지 않는다.
+
+- [x] I01 미배포 branch·기존 PR·최신 main 및 원격 이력 확인
+- [x] I02 최신 main 통합 및 기존 quota rollback spec의 대상 migration 가정 보완
+- [x] I03 격리 PostgreSQL 모델·schema 7건 및 실행/예약 회귀 139건, 관리자 단위 441건 통과
+- [ ] I04 타입·빌드·desktop/mobile browser·문서 검사 완료 및 경로별 commit/push
+- [ ] I05 PR 생성·정확한 HEAD CI·Codex 검토·스레드 해결
+- [ ] I06 최신 main 확인 후 순차 병합·post-merge CI
+- [ ] I07 Delivery 판정에 따른 운영 배포·실제 serving revision/traffic 확인
+- [ ] I08 공개 응답·인증 경계 smoke 및 실제 Google/유료 공급자 미검증 범위 보고
+- [ ] I09 일회성 PostgreSQL 정리·문서 closure·자기 worktree/branch 안전 정리
+
+I09는 실제 실행 전 완료 표시하지 않는다. 배포 전에는 현재 기능을 운영 적용 완료로 보고하지 않는다.
