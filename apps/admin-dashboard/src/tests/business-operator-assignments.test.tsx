@@ -99,3 +99,25 @@ it("assigns an existing custom-business operator by search and selection, never 
   );
   await screen.findByText("담당자를 지정했습니다.");
 });
+
+
+it("preserves a committed revocation when registry refresh fails and retries only the read", async () => {
+  const registry = [{ key: "carepharm", name: "합성 사업", status: "active", operators: [{ userId: "user", name: "합성 담당자" }] }];
+  api.get.mockResolvedValueOnce({ data: { success: true, data: registry } })
+    .mockRejectedValueOnce(new Error("Temporary registry failure"))
+    .mockResolvedValueOnce({ data: { success: true, data: [] } });
+  api.delete.mockResolvedValue({ data: { success: true, data: { revoked: true } } });
+  render(<Panel />);
+  await screen.findByText("합성 담당자");
+  fireEvent.click(screen.getByText("사업별 개별 담당 지정"));
+  fireEvent.click(screen.getByRole("button", { name: "개별 지정 해제" }));
+  await screen.findByText("개별 담당 지정을 해제했습니다.");
+  expect(await screen.findByRole("alert")).toHaveTextContent("변경은 완료됐지만 최신 담당 지정을 확인하지 못했습니다.");
+  expect(screen.queryByText(/처리하지 못했습니다/)).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "담당 지정 다시 조회" }));
+  await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
+  await waitFor(() => expect(screen.queryByText("합성 담당자")).not.toBeInTheDocument());
+  expect(api.delete).toHaveBeenCalledTimes(1);
+  expect(api.get).toHaveBeenCalledTimes(3);
+  expect(screen.getByText("개별 담당 지정을 해제했습니다.")).toBeInTheDocument();
+});

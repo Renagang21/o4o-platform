@@ -47,17 +47,21 @@ export default function BusinessOperatorAssignments() {
     (item) => !canonical.includes(item.key) && item.status === "active",
   );
   const legacy = businesses.filter((item) => item.operators?.length);
-  const act = async (fn: () => Promise<unknown>, success: string) => {
+  const act = async (fn: () => Promise<unknown>, success: string, refresh = true) => {
     setBusy(true);
     setError("");
     setNotice("");
+    let completed = false;
     try {
       await fn();
-      await load();
+      completed = true;
       setNotice(success);
+      if (refresh) await load();
     } catch {
       setError(
-        "처리하지 못했습니다. 현재 Neture 운영 권한과 사업 상태를 확인한 뒤 다시 시도해 주세요.",
+        completed
+          ? "변경은 완료됐지만 최신 담당 지정을 확인하지 못했습니다. 담당 지정만 다시 조회해 주세요."
+          : "처리하지 못했습니다. 현재 Neture 운영 권한과 사업 상태를 확인한 뒤 다시 시도해 주세요.",
       );
     } finally {
       setBusy(false);
@@ -182,7 +186,7 @@ export default function BusinessOperatorAssignments() {
                   )
                     throw new Error("Invalid candidates");
                   setCandidates(response.data.data.candidates);
-                }, "후보 검색을 완료했습니다.")
+                }, "후보 검색을 완료했습니다.", false)
               }
             >
               담당자 검색
