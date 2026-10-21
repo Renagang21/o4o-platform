@@ -64,3 +64,9 @@
 - repo `Renagang21/o4o-platform`, branch `wo/admin-health-authority-consolidation`, base `ac38af8df1941e349924efb00eebb1b5a868f3c8`.
 - 개발 종료는 commit/push 및 원격 SHA/clean 확인. PR·CI·main 통합·운영 배포 미실행. `DEPLOYMENT=REQUIRED`: API·관리자 변경의 별도 통합/배포가 필요하다.
 - `WORKTREE_DISPOSITION`: 작업 branch와 전용 worktree는 통합 전 보존(`KEEP`). 최종 commit·원격 SHA 일치·clean은 최종 보고/Git에서 확인한다. 기준 checkout과 이전 AI 개발 branch는 수정하지 않았다.
+
+## 후속 통합 진행 · 2026-10-21
+
+이전 절은 개발·push 종료 시점 기록이다. 이후 사용자의 병합·배포 지시 및 재개에 따라 이 공간이 통합 담당으로 PR [#752](https://github.com/Renagang21/o4o-platform/pull/752)를 생성했다. 다른 공간의 배포가 완료됐음을 확인했으며 main `3c66a4191594697d3cb42eaa5b4e4db4513d664f`를 merge했다. 이전 운영 serving SHA는 `249f0657319a8d45d237641b66503c8b44b95788`, 그 뒤 문서-only Delivery는 `NO_DEPLOY`였다.
+
+통합 후 API 핵심 HTTP·상태 28건, 관리자 435건, PC/mobile Chromium 10건이 통과했다. Codex의 분회 asset prefix 지적은 `vite.config.ts`의 `/kpa/` base와 Dockerfile의 `/kpa/assets/` 서빙을 대조해 수용했다. 분회에 한해 해당 경로를 지원하며 동일 origin·인증 미전달·redirect 금지 조건을 유지한다. 분회 정상·타 서비스 경로 거부·외부 origin 거부 회귀 3건을 추가했다. main 병합·운영 배포 결과는 완료 후 이 절 아래에 기록한다.

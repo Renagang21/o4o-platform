@@ -39,3 +39,15 @@
 [검증 CHECK](../checks/CHECK-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)에 조사·구현·제한과 인계 범위를 기록했다. API 47개, 관리자 435개, PC/mobile Chromium 10개가 통과했고 타입·운영 빌드·변경 경로 lint(error 0)가 통과했다. 기존 OperatorsPage effect 의존성 lint 경고 1건은 남는다. 실패를 성공으로 감춘 검증은 없으며 최초 준비/테스트 선택자 문제와 브라우저에서 발견한 실제 재등장 버그는 수정·재검증했다.
 
 이번 완료는 전용 작업 branch의 commit·push와 원격 SHA/clean 확인까지다. 실제 Google 계정·운영 상태 점검·계정 변경·배포는 미실행이다. 전체 관리자 권한 회수 API는 기존 계약상 없어서 새로 만들지 않았다. 다른 작업공간 및 이전 AI 모델 관리 branch는 보존했다.
+
+## 후속 통합 지시 · 2026-10-21
+
+위 개발·push 종료 기록 이후 사용자가 이 공간에 PR·main 병합·운영 배포를 지시했고, 다른 공간의 배포가 끝날 때까지 중지한 뒤 재개했다. 이 절이 현재 후속 진행 범위다. 이전 AI 모델 관리 branch는 포함하지 않는다.
+
+- [x] T08 진행 중인 배포 종료 확인, 최신 main 통합, PR #752 생성 및 CI·Codex 검토
+- [x] T09 Codex가 지적한 분회 `/kpa/assets/` 경로 지원 보완. 동일 origin과 분회 한정 조건을 유지하고 다른 서비스/외부 경로 차단 회귀 검증
+- [ ] T10 정확한 HEAD의 CI·재리뷰 확인 후 순차 PR 병합
+- [ ] T11 post-merge CI·Delivery 판정, 필요한 promote·배포·공개 응답 확인
+- [ ] T12 실제 결과·한계 기록 및 작업 공간 종료 정리
+
+최신 main 통합 후 관리자 Vitest 435건, PC/mobile Chromium 10건을 다시 확인했다. 실제 Google 로그인·계정 상태 변경·권한 지정은 실행하지 않는다. 배포 판정은 serving → target 누적 변경과 동결·CI gate를 그대로 따른다.

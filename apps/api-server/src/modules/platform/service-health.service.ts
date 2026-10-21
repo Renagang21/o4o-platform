@@ -93,6 +93,12 @@ export async function checkWebTarget(
   const checks: HealthCheck[] = [];
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT);
+  const isAppAsset = (url: URL) =>
+    url.origin === new URL(target.url).origin &&
+    !url.username &&
+    !url.password &&
+    (url.pathname.startsWith("/assets/") ||
+      (target.id === "kpa-branch" && url.pathname.startsWith("/kpa/assets/")));
   const request = (url: string) =>
     fetcher(url, {
       method: "GET",
@@ -134,19 +140,9 @@ export async function checkWebTarget(
           (value): value is string => !!value && /\.m?js(?:\?|$)/i.test(value),
         )
         .map((value) => new URL(value, target.url))
-        .find(
-          (value) =>
-            value.origin === new URL(target.url).origin &&
-            value.pathname.startsWith("/assets/"),
-        );
+        .find(isAppAsset);
       // No redirects, cross-origin assets, arbitrary URL query input, cookies or authorization forwarding.
-      if (
-        !asset ||
-        asset.origin !== new URL(target.url).origin ||
-        asset.username ||
-        asset.password ||
-        !asset.pathname.startsWith("/assets/")
-      )
+      if (!asset || !isAppAsset(asset))
         checks.push({
           name: "화면·필수 파일",
           state: "unknown",

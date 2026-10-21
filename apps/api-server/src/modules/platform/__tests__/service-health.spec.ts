@@ -82,6 +82,37 @@ it("uses no caller URL or credentials, never follows redirects, and does not fet
   expect(redirected.checks.some((x) => x.state === "unknown")).toBe(true);
 });
 it.each([
+  ["kpa-branch", "/kpa/assets/index-fixture.js", true],
+  ["pharmacy", "/kpa/assets/index-fixture.js", false],
+  ["kpa-branch", "https://outside.invalid/kpa/assets/index-fixture.js", false],
+])(
+  "limits the branch asset prefix to its known origin (%s, %s)",
+  async (id, asset, allowed) => {
+    const target = SERVICE_HEALTH_TARGETS.find((row) => row.id === id)!;
+    const fetcher = jest.fn(
+      async (url: string) =>
+        new Response(
+          url === target.url
+            ? `<html><script type="module" src="${asset}"></script></html>`
+            : "export {};",
+          {
+            headers: {
+              "content-type":
+                url === target.url ? "text/html" : "application/javascript",
+            },
+          },
+        ),
+    );
+    const row = await checkWebTarget(target, fetcher as typeof fetch);
+    expect(
+      row.checks.find((check) => check.name === "화면·필수 파일")?.state,
+    ).toBe(allowed ? "passed" : "unknown");
+    expect(fetcher).toHaveBeenCalledTimes(allowed ? 2 : 1);
+    if (allowed)
+      expect(fetcher.mock.calls[1][0]).toBe(new URL(asset, target.url).href);
+  },
+);
+it.each([
   ["unavailable", 503, "text/html"],
   ["missing", 404, "text/html"],
   ["html-as-js", 200, "text/html"],
