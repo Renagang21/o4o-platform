@@ -1,3 +1,4 @@
+import { OperatorInboxLink } from '@o4o/operator-core-ui';
 /**
  * NetureGlobalHeader — Neture 서비스의 GlobalHeader 브릿지
  *
@@ -19,7 +20,7 @@ import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
-import { SUPPLIER_ONLY_ROLES, getBusinessOperatorRolesForHost } from '../lib/role-constants';
+import { SUPPLIER_ONLY_ROLES, getBusinessOperatorRolesForHost, canSeeSubdomainOperatorPath } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { DEMO_NOTICE } from '../lib/demoAccounts';
@@ -83,6 +84,10 @@ export function NetureGlobalHeader() {
   const businessOperator = user?.roles?.some(role => getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE).includes(role));
   if (businessOperator && !publicNav.some(item => item.href === '/operator/semi-franchises') && !contextualNav.some(item => item.href === '/operator/semi-franchises')) contextualNav.push({ label: '사업 운영', href: '/operator/semi-franchises' });
 
+  const inboxScope = CURRENT_HOST_PROFILE === 'carepharm' ? 'business/carepharm' : `service/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}`;
+  const inboxHref = CURRENT_HOST_PROFILE === 'carepharm' ? '/operator/inbox/business/carepharm' : `/operator/inbox/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}`;
+  const inboxPrefix = CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE;
+  const showInbox = user?.roles?.some(role => CURRENT_HOST_PROFILE === 'carepharm' ? getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE).includes(role) : [`${inboxPrefix}:admin`,`${inboxPrefix}:operator`,'platform:super_admin'].includes(role)) && canSeeSubdomainOperatorPath(user, inboxHref);
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
     : null;
@@ -105,7 +110,7 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
          로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />{isAuthenticated && user && showInbox && <OperatorInboxLink key={`${user.id}:${inboxScope}`} client={api} endpoint={`/operator-inbox/${inboxScope}`} href={inboxHref}/>}</span>}
       utilitySlot={
         <>
           {isAuthenticated && user && (

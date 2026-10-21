@@ -1,3 +1,4 @@
+import { BusinessContactPage, BusinessInboxPage } from './pages/contact/BusinessContactPages';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from './config/businessSite';
 import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
@@ -990,7 +991,9 @@ function App() {
 
           {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
           <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />
-          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          <Route path="/contact/legacy" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          <Route path="/operator/inbox/business/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessInboxPage /></Layout>} />
+          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><BusinessContactPage /></Layout>} />
           {/* WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개) */}
           <Route path="/service-guide" element={<Layout serviceName={SERVICE_NAME}><ServiceGuidePage /></Layout>} />
 

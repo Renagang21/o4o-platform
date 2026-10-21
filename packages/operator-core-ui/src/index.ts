@@ -178,3 +178,6 @@ export type {
   OperatorSurveyListPageProps,
   OperatorSurveyCreatePageProps,
 } from './modules/surveys';
+
+export { OperatorInbox, OperatorInboxLink } from './modules/OperatorInbox';
+export type { InboxClient } from './modules/OperatorInbox';

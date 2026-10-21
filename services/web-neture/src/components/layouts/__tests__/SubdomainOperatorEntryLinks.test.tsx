@@ -192,19 +192,19 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
     signIn(['supplier:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="operator" />);
     expect(screen.getByTestId('scoped-shell')).toBeTruthy();
-    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/operator/home-presentation/supplier']);
+    expect(menuPaths()).toEqual(['/operator/inbox/supplier', '/operator/service-members/supplier', '/operator/suppliers', '/operator/home-presentation/supplier']);
   });
 
   it('supplier:admin → 두 항목 모두 보인다', () => {
     signIn(['supplier:admin']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/admin/supplier-governance/operators', '/admin/supplier-governance', '/operator/legal/supplier', '/operator/home-presentation/supplier']);
+    expect(menuPaths()).toEqual(['/operator/inbox/supplier', '/operator/service-members/supplier', '/operator/suppliers', '/admin/supplier-governance/operators', '/admin/supplier-governance', '/operator/legal/supplier', '/operator/home-presentation/supplier']);
   });
 
   it('funding:operator → 펀딩 항목', () => {
     signIn(['funding:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/funding', '/operator/market-trial', '/operator/home-presentation/funding']);
+    expect(menuPaths()).toEqual(['/operator/inbox/funding', '/operator/service-members/funding', '/operator/market-trial', '/operator/home-presentation/funding']);
   });
 
   it('funding admin sees its Operator designation entry', () => {
@@ -218,7 +218,7 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
   it('community:operator → 개설 심사만 노출', () => {
     signIn(['community:operator'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/community', '/operator/communities/boards', '/operator/communities', '/operator/communities/home', '/operator/home-presentation/community']);
+    expect(menuPaths()).toEqual(['/operator/inbox/community', '/operator/service-members/community', '/operator/communities/boards', '/operator/communities', '/operator/communities/home', '/operator/home-presentation/community']);
   });
 
   it('community:admin → 커뮤니티 서비스 관리 항목', () => {

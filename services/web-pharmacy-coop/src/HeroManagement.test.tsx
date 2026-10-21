@@ -114,7 +114,7 @@ it.each([local, federation, anonymousSession])(
         "/home-presentation/cooperative/beta",
       ),
     );
-    expect(client.get.mock.calls.some(([p]) => p.endsWith("/manage"))).toBe(
+    expect(client.get.mock.calls.some(([p]) => p.startsWith("/home-presentation/") && p.endsWith("/manage"))).toBe(
       false,
     );
     expect(client.put).not.toHaveBeenCalled();

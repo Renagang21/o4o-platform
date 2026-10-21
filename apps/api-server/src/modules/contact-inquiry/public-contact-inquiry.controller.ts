@@ -1,3 +1,5 @@
+import { serviceContactRecipients } from './contact-recipients.js';
+import { deliverOperatorNotifications } from './operator-delivery.js';
 /**
  * Public Contact Inquiry Controller (no auth)
  *
@@ -173,17 +175,9 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
       if (settings.inAppNotificationEnabled) {
         inappStatus = 'none';
         try {
-          const operators: { userId: string }[] = await dataSource.query(
-            `SELECT DISTINCT user_id AS "userId"
-               FROM role_assignments
-              WHERE role IN ($1, $2)
-                AND is_active = true
-              LIMIT 50`,
-            [`${rolePrefix}:operator`, `${rolePrefix}:admin`],
-          );
+          const operators = await serviceContactRecipients(dataSource, rolePrefix, serviceKey);
           if (operators.length > 0) {
-            await Promise.allSettled(
-              operators.map((op) =>
+            inappStatus = await deliverOperatorNotifications(operators, (op) =>
                 notificationService.createNotification({
                   userId: op.userId,
                   type: 'contact.new',
@@ -197,11 +191,9 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
                 //   admin/super_admin) 라 operator 수신자가 열 수 없었다(ROLE_MISMATCH).
                 //   문의 관리 canonical 화면은 operator 로 이관된
                 //   `/operator/contacts`(OperatorRoute = operator+admin+super_admin) 다.
-                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: serviceKey === 'lecture' ? '/operator/contact' : '/operator/contacts' },
+                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: serviceKey === 'lecture' ? '/service-entry/lecture?returnPath=%2Foperator%2Fcontact' : '/operator/contacts' },
                 }),
-              ),
-            );
-            inappStatus = 'sent';
+              );
           }
         } catch (notifyError) {
           inappStatus = 'fail';

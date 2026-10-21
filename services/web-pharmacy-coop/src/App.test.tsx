@@ -46,7 +46,7 @@ describe("federation and cooperative route boundaries", () => {
     );
     const nav = screen.getByRole("navigation", { name: "협동조합 메뉴" });
     const links = [...nav.querySelectorAll("a")];
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(7);
     expect(
       links.every((link) =>
         link.getAttribute("href")?.startsWith("/sample-coop-a"),

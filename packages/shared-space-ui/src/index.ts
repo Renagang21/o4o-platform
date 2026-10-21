@@ -333,3 +333,5 @@ export { HomePresentationEditor } from "./home-presentation/HomePresentationEdit
 export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } from './cooperation/models';
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
+
+export { ScopedContactForm } from "./legal/ScopedContactForm.js";

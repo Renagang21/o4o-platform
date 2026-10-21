@@ -33,6 +33,10 @@ export class ContactInquiry {
   @Column({ type: 'varchar', length: 50 })
   service_key!: string;
 
+  /** Server-derived business/cooperative organization; null means service-wide. */
+  @Column({ type: 'uuid', nullable: true })
+  organization_id!: string | null;
+
   /** service_usage | account_permission | partnership | technical_issue | other */
   @Column({ type: 'varchar', length: 50, default: 'other' })
   inquiry_type!: string;
