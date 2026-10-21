@@ -111,3 +111,5 @@ private manifest에는 입력 소스 해시·출력 파일 해시·도구 버전
 실계정 로그인·저장·모바일 실기기 검증은 하지 않았다. 운영 반영은 PR gate와 verified rollout·serving SHA·공개 자산 확인 후 별도로 기록한다. Neture 한 서비스만 배포하며 DB migration·업무 데이터 write는 이 작업 범위가 아니다.
 
 PR #725 최초 HEAD `54da66d975`에서 CI Gate·모든 CI job과 Codex 지적 0은 확인됐으나, Sonar Security C로 병합하지 않았다. 소스맵 주석 제거의 backtracking 정규식을 선형 문자열 처리로 바꾸고(LF/CRLF·문자열 보존·긴 입력 회귀 추가), Docker의 npx 호출을 이미 설치된 Vite만 실행하는 `pnpm exec vite build`로 바꿨다. 기준 완화·이슈 무시·검사 skip은 하지 않았다. 수정 후 도구 테스트는 35건이며 원격 CI·Sonar·Codex를 새 HEAD에서 다시 판정한다. 순차 브라우저 검증의 await-in-loop 등 비차단 유지보수 경고는 실행 순서를 보존하기 위해 유지했다.
+
+2026-10-21 최신 main 반영 후 Codex P2를 받아, CI의 실제 Neture 앱 빌드에도 Docker와 같은 `NETURE_OBFUSCATION=names`를 명시했다. 기존 fixture 테스트와 기본 웹 빌드는 유지한다. 실제 그래프의 allowlist 혼입·gzip 예산·소스맵 생성 실패가 병합 전에 CI Gate를 막으며, 비공개 map과 앱 산출물은 runner 임시 디렉터리에만 쓴다. 같은 최신 main 기준 로컬 도구 테스트 35건과 실제 names 앱 빌드는 통과했다.

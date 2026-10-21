@@ -342,6 +342,8 @@ jobs:
       run: |
         pnpm --dir services/web-neture/tools/obfuscation-pilot install --ignore-workspace --frozen-lockfile --ignore-scripts --verify-store-integrity=true
         pnpm --dir services/web-neture/tools/obfuscation-pilot test
+        # Match the Docker profile against the real app graph, not only fixtures.
+        NETURE_PRIVATE_DEBUG_DIR="$RUNNER_TEMP/neture-private-debug" NETURE_OBFUSCATION=names pnpm --filter @o4o/web-neture exec vite build --outDir "$RUNNER_TEMP/neture-names-build" --emptyOutDir
 
     # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
     # services/web-kpa-branch 에는 테스트 실행 경로가 없었다. 분회 개설 신청의 예약어 주소
