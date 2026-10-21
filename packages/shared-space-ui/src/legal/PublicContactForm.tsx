@@ -117,7 +117,7 @@ export function PublicContactForm({
         sourcePath: typeof window !== 'undefined' ? window.location.pathname : undefined,
         company_website: form.company_website,
       });
-      setReceiptId(receipt?.id);
+      setReceiptId(receipt ? receipt.id : undefined);
       setSubmitted(true);
     } catch (err: any) {
       setError(err?.message || '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');

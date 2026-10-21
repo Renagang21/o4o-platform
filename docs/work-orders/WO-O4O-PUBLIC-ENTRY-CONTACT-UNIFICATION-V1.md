@@ -103,4 +103,9 @@ API 검사는 격리된 로컬 PostgreSQL socket을 `CONTACT_REVIEW_PG_SOCKET`�
 
 알림 최초 발송·재처리, 내부 메모·상태 변경이 읽어 둔 entity 전체를 저장하면, 그 사이 다른 운영자가 완료한 답변 상태·메모·처리자 정보가 되돌아가는 문제를 로컬 PostgreSQL에서 재현했다. 4개 재현 사례가 수정 전 모두 실패했다. 각 작업이 소유한 필드만 `UPDATE`하고 운영 화면에는 다시 읽은 최신 상세를 반환하도록 수정했다. 공개 접수는 최초 저장 후 알림 결과만 갱신한다.
 
-수정 후 API 단위 4개·PostgreSQL 통합 13개(동시 갱신 4개 포함), 총 17개가 통과했고 임시 schema 잔존은 0개다. 최신 main 통합 재검증은 공통 UI 17개·문의/담당 사업 workflow 20개·Neture/CarePharm 170개·문의 API 17개 = 224개 통과다. 기존 개발 검증 중 API 13개를 17개로 교체하면 227개이며, 기존 빌드/브라우저 결과와 통합 재검증 결과를 구분한다. 협동조합 프런트엔드도 최신 main 통합 상태에서 추가 빌드했다. API 수정의 최종 빌드·새 HEAD CI·Codex 리뷰를 확인한 뒤 병합한다.
+수정 후 API 단위 4개·PostgreSQL 통합 13개(동시 갱신 4개 포함), 총 17개가 통과했고 임시 schema 잔존은 0개다. 최신 main 통합 재검증은 공통 UI 17개·문의/담당 사업 workflow 20개·Neture/CarePharm 170개·문의 API 17개 = 224개 통과다. 기존 개발 검증 중 API 13개를 17개로 교체하면 227개이며, 기존 빌드/브라우저 결과와 통합 재검증 결과를 구분한다. 협동조합 프런트엔드도 최신 main 통합 상태에서 추가 빌드했다. API 수정의 최종 빌드도 통과했다. 새 HEAD CI·Codex 리뷰를 확인한 뒤 병합한다.
+
+
+### CI 소비처 호환성 보완
+
+첫 PR HEAD의 Code Quality Check에서 `void | { id?: string }` 어댑터 반환값의 optional chaining이 일부 프런트엔드 TypeScript 설정에서 실패했다. 기존 `Promise<void>` 어댑터 계약을 유지하면서 명시적인 값 확인으로 접수번호를 읽도록 보완했다. CI와 동일한 `O4O_TYPECHECK_CONCURRENCY=4 pnpm run type-check:frontend`, `pnpm run typecheck:app-store-packages`, API `type-check`를 로컬에서 모두 통과했고, 공통 공개 UI 17개도 재통과했다. 검사 범위·workflow·컴파일 옵션은 변경하지 않았다. 이전 HEAD의 실패를 새 HEAD의 성공으로 대체 확인한 뒤 병합한다.
