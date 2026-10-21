@@ -1,6 +1,7 @@
 import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { dispatchContactInquiry } from './contact-delivery.js';
 import { contactService } from './contact-service-scope.js';
+import { loadPublicContactSettings } from './contact-settings.helper.js';
 /**
  * Public Contact Inquiry Controller (no auth)
  *
@@ -45,6 +46,17 @@ function ipHash(ip: string | undefined): string | null {
 export function createPublicContactInquiryController(dataSource: DataSource): Router {
   const router = Router();
   const repo = dataSource.getRepository(ContactInquiry);
+
+  router.get('/:serviceKey/contact-settings', apiLimiter, async (req: Request, res: Response) => {
+    const serviceKey = req.params.serviceKey;
+    if (!contactService(serviceKey)) return res.status(404).json({ success: false, error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' } });
+    res.setHeader('Cache-Control', 'no-store');
+    try {
+      return res.json({ success: true, data: await loadPublicContactSettings(dataSource, serviceKey) });
+    } catch {
+      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.' } });
+    }
+  });
 
   router.post('/:serviceKey/contact-inquiries', apiLimiter, async (req: Request, res: Response) => {
     const serviceKey = req.params.serviceKey;
@@ -123,7 +135,16 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
         error: { code: 'MESSAGE_TOO_LONG', message: '문의 내용이 너무 깁니다.' },
       });
     }
-    const type = (VALID_INQUIRY_TYPES as readonly string[]).includes(inquiryType) ? inquiryType : 'other';
+    let publicSettings: Awaited<ReturnType<typeof loadPublicContactSettings>>;
+    try { publicSettings = await loadPublicContactSettings(dataSource, serviceKey); }
+    catch {
+      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.' } });
+    }
+    const type = publicSettings.inquiryTypesConfigured ? inquiryType
+      : (VALID_INQUIRY_TYPES as readonly string[]).includes(inquiryType) ? inquiryType : 'other';
+    if (!publicSettings.inquiryTypes.some(option => option.value === type)) {
+      return res.status(400).json({ success: false, error: { code: 'INQUIRY_TYPE_DISABLED', message: '현재 접수할 수 없는 문의 유형입니다. 문의 화면을 새로 열어 확인해 주세요.' } });
+    }
 
     try {
       const entity = repo.create({

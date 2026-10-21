@@ -85,6 +85,11 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,status text,"isActive" boolean,"isEmailVerified" boolean);
     CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
     CREATE TABLE notifications("userId" uuid,type text,channel text,"serviceKey" text,metadata jsonb);
+    CREATE TABLE service_contact_settings(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_key varchar(50) UNIQUE,
+      in_app_notification_enabled boolean DEFAULT true,email_notification_enabled boolean DEFAULT false,recipient_emails jsonb DEFAULT '[]',
+      inquiry_types jsonb,privacy_notice text,completion_notice text,auto_reply_enabled boolean DEFAULT false,auto_reply_subject text,
+      auto_reply_message text,auto_reply_include_original boolean DEFAULT false,is_active boolean DEFAULT true,updated_by uuid,
+      created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now());
     CREATE TABLE role_assignments(user_id uuid,role text,is_active boolean,valid_from timestamptz,valid_until timestamptz);
     CREATE TABLE semi_franchises(id uuid,key text);
     CREATE TABLE semi_franchise_operators(semi_franchise_id uuid,user_id uuid,revoked_at timestamptz);
@@ -136,6 +141,126 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
         [response.body.data.id],
       );
       expect(row.service_key).toBe(key);
+    }
+  });
+  it("publishes only enabled inquiry choices and public notices, and rejects disabled types before saving", async () => {
+    const repo = db.getRepository(ServiceContactSettings);
+    try {
+      await repo.save(
+        repo.create({
+          service_key: "supplier",
+          inquiry_types: [
+            {
+              value: "service_usage",
+              label: "공급 서비스 문의",
+              enabled: true,
+            },
+            { value: "partnership", label: "비활성 제휴", enabled: false },
+          ],
+          privacy_notice: "개인정보 처리 안내",
+          completion_notice: "접수 완료 안내",
+          recipient_emails: ["private-recipient@example.invalid"],
+          auto_reply_subject: "PRIVATE_AUTO_SUBJECT",
+        }),
+      );
+      const response = await request(app).get(
+        "/public/services/supplier/contact-settings",
+      );
+      expect(response.status).toBe(200);
+      expect(response.body.data).toEqual({
+        serviceKey: "supplier",
+        inquiryTypesConfigured: true,
+        inquiryTypes: [{ value: "service_usage", label: "공급 서비스 문의" }],
+        privacyNotice: "개인정보 처리 안내",
+        completionNotice: "접수 완료 안내",
+      });
+      expect(JSON.stringify(response.body)).not.toContain("private-recipient");
+      expect(JSON.stringify(response.body)).not.toContain(
+        "PRIVATE_AUTO_SUBJECT",
+      );
+      const [{ count: before }] = await db.query(
+        "SELECT count(*) FROM contact_inquiries",
+      );
+      const denied = await request(app)
+        .post("/public/services/supplier/contact-inquiries")
+        .send({ ...payload, inquiryType: "partnership" });
+      expect(denied.status).toBe(400);
+      expect(denied.body.error.code).toBe("INQUIRY_TYPE_DISABLED");
+      expect(
+        (await db.query("SELECT count(*) FROM contact_inquiries"))[0].count,
+      ).toBe(before);
+      expect(notificationService.createNotification).not.toHaveBeenCalled();
+      const accepted = await request(app)
+        .post("/public/services/supplier/contact-inquiries")
+        .send({ ...payload, inquiryType: "service_usage" });
+      expect(accepted.status).toBe(201);
+      expect(
+        (
+          await db.query(
+            "SELECT inquiry_type FROM contact_inquiries WHERE id=$1",
+            [accepted.body.data.id],
+          )
+        )[0].inquiry_type,
+      ).toBe("service_usage");
+      const other = await request(app).get(
+        "/public/services/funding/contact-settings",
+      );
+      expect(other.status).toBe(200);
+      expect(other.body.data.inquiryTypesConfigured).toBe(false);
+      expect(other.body.data.privacyNotice).toBeNull();
+    } finally {
+      await repo.delete({ service_key: "supplier" });
+    }
+  });
+  it("does not silently restore the other type when every configured inquiry type is disabled", async () => {
+    const repo = db.getRepository(ServiceContactSettings);
+    try {
+      await repo.save(
+        repo.create({
+          service_key: "funding",
+          inquiry_types: [{ value: "other", label: "기타", enabled: false }],
+        }),
+      );
+      const config = await request(app).get(
+        "/public/services/funding/contact-settings",
+      );
+      expect(config.body.data.inquiryTypes).toEqual([]);
+      expect(
+        (
+          await request(app)
+            .post("/public/services/funding/contact-inquiries")
+            .send(payload)
+        ).status,
+      ).toBe(400);
+    } finally {
+      await repo.delete({ service_key: "funding" });
+    }
+  });
+  it("fails closed for settings read errors without persisting or notifying", async () => {
+    const repo = db.getRepository(ServiceContactSettings),
+      read = jest.spyOn(repo, "findOne");
+    const [{ count: before }] = await db.query(
+      "SELECT count(*) FROM contact_inquiries",
+    );
+    try {
+      read.mockRejectedValue(Error("local settings read failed"));
+      expect(
+        (await request(app).get("/public/services/supplier/contact-settings"))
+          .status,
+      ).toBe(503);
+      expect(
+        (
+          await request(app)
+            .post("/public/services/supplier/contact-inquiries")
+            .send(payload)
+        ).status,
+      ).toBe(503);
+      expect(
+        (await db.query("SELECT count(*) FROM contact_inquiries"))[0].count,
+      ).toBe(before);
+      expect(notificationService.createNotification).not.toHaveBeenCalled();
+    } finally {
+      read.mockRestore();
     }
   });
   it("selects only live service operators and reports partial notification failure accurately", async () => {

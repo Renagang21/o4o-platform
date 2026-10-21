@@ -44,6 +44,8 @@ export interface PublicContactFormProps {
   privacyHref?: string;
   /** 상단 안내 문구(선택). */
   introText?: string;
+  privacyNotice?: string;
+  completionNotice?: string;
   theme?: PublicContactFormTheme;
 }
 
@@ -65,6 +67,8 @@ export function PublicContactForm({
   organizationLabel = '소속/회사명',
   privacyHref,
   introText,
+  privacyNotice,
+  completionNotice,
   theme,
 }: PublicContactFormProps) {
   const formId = useId();
@@ -132,7 +136,7 @@ export function PublicContactForm({
         <div style={{ ...S.successIcon, background: accent }}>✓</div>
         <h2 style={S.successTitle}>문의가 접수되었습니다.</h2>
         {receiptId && <p style={{ overflowWrap: "anywhere" }}>접수번호: {receiptId}</p>}
-        <p style={S.successDesc}>담당자가 확인 후 입력하신 이메일로 회신드립니다.</p>
+        <p style={S.successDesc}>{completionNotice || "담당자가 확인 후 입력하신 이메일로 회신드립니다."}</p>
       </div>
     );
   }
@@ -196,7 +200,7 @@ export function PublicContactForm({
       <label style={S.consent}>
         <input type="checkbox" checked={form.privacyConsent} onChange={(e) => set('privacyConsent', e.target.checked)} />
         <span>
-          문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다.
+          {privacyNotice || "문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다."}
           {privacyHref && (
             <> (<a href={privacyHref} style={{ color: accent, textDecoration: 'underline' }}>개인정보처리방침</a>)</>
           )}
