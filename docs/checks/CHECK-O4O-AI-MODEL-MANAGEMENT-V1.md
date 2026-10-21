@@ -127,3 +127,9 @@ SonarCloud의 폼 신뢰성 지적에 따라 모델 저장·사용 모델 저장
 로그인 `surface=hospital-drug`의 research callback도 서버에서 `hospital.research`를 명시한다. 공개 병원 조사와 로그인 병원 조사 모두 같은 별도 모델 target을 사용하며 일반 research target과 구분한다. 실제 로그인된 사용자 세션 대신 합성 인증 HTTP fixture로 해당 소비처를 검증했다.
 
 관리자 생성·로그인 통합 요청 HTTP·grounding HTTP body/선택 전달: 3 suites, 56 PASS. OpenAI/Claude 전환에서 16,384→8,192 및 기존 작은 예산/세대별 파라미터 유지, 로그인 병원 callback의 target과 선택 모델의 Gemini URL을 확인했다. 실제 유료 호출은 수행하지 않았다.
+
+### 지원 기능 판정 우선순위
+
+등록 모델이 존재하나 text 기능이 없으면 `allows()`는 명시적 false를 반환한다. undefined는 관리 목록에 없는 모델의 기존 동적 탐색에만 사용한다. 따라서 정적 whitelist나 Google live 목록이 등록 모델의 비-text 판정을 덮어쓰지 못한다. 기존 공통 질의 모델 선택 목록에서도 해당 모델을 제외한다.
+
+모델 관리·정적/live 모델 목록·정책 서비스 회귀 3 suites, 23 PASS 및 API type-check PASS. 관리 미등록 live text 모델의 기존 탐색은 유지했다. 실제 공급자 조회/생성 대신 합성 ListModels 응답을 사용했다.

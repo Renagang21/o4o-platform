@@ -161,7 +161,8 @@ export async function listGeminiModels(dataSource: DataSource): Promise<GeminiMo
   const control = await new ModelControlService(dataSource).read();
   const mergeManaged = (models: GeminiModelInfo[]) => {
     const deleted = new Set(control.deleted);
-    const merged = models.filter(model => !deleted.has('gemini:' + model.id));
+    const registered = new Map(control.models.filter(model => model.provider === 'gemini').map(model => [model.id, model]));
+    const merged = models.filter(model => !deleted.has('gemini:' + model.id) && registered.get(model.id)?.capabilities.includes('text') !== false);
     for (const model of control.models.filter(x => x.provider === 'gemini' && x.capabilities.includes('text'))) {
       if (!merged.some(x => x.id === model.id)) merged.push({ id: model.id, displayName: model.name, description: '관리자 등록 · 공급자 제공 여부 미검증', inputTokenLimit: null, outputTokenLimit: null });
     }

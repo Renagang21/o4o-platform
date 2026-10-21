@@ -26,7 +26,10 @@ function fixture() {
       throw new Error("Unexpected test SQL");
     }),
   };
-  Object.assign(db, { transaction: async (run: (manager: typeof db) => Promise<unknown>) => run(db) });
+  Object.assign(db, {
+    transaction: async (run: (manager: typeof db) => Promise<unknown>) =>
+      run(db),
+  });
   return {
     db,
     references,
@@ -357,4 +360,28 @@ it("requires image capability for the strong planner that may receive screen cap
       selection: { provider: "openai", model: model.id },
     }),
   ).rejects.toMatchObject({ status: 400 });
+});
+
+it("explicitly rejects registered non-text models while preserving unknown-model discovery", async () => {
+  const { db } = fixture();
+  const service = new ModelControlService(db);
+  await service.change(0, actor, {
+    action: "update",
+    provider: "gemini",
+    id: "gemini-2.0-flash",
+    model: {
+      provider: "gemini",
+      id: "gemini-2.0-flash",
+      name: "Synthetic image model",
+      capabilities: ["image"],
+    },
+  });
+  expect(await service.allows("gemini", "gemini-2.0-flash")).toBe(false);
+  expect(
+    await service.allows("gemini", "gemini-unlisted-fixture"),
+  ).toBeUndefined();
+  const { isGeminiModelAllowed } = await import(
+    "../../ai-model-registry.service.js"
+  );
+  expect(await isGeminiModelAllowed(db as any, "gemini-2.0-flash")).toBe(false);
 });

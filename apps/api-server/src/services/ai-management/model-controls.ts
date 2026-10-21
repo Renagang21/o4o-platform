@@ -490,13 +490,9 @@ export class ModelControlService {
   async allows(provider: string, model: string): Promise<boolean | undefined> {
     const control = await this.read();
     if (control.deleted.includes(keyOf(provider, model))) return false;
-    return control.models.some(
-      (x) =>
-        x.provider === provider &&
-        x.id === model &&
-        x.capabilities.includes("text"),
-    )
-      ? true
-      : undefined;
+    const registered = control.models.find(
+      (entry) => entry.provider === provider && entry.id === model,
+    );
+    return registered?.capabilities.includes("text");
   }
 }
