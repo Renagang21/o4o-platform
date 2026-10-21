@@ -91,3 +91,11 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 - API 및 관리자 type-check PASS, API 정식 build PASS.
 
 테스트는 Node 22.18.0·pnpm 10.25.0, 합성 공급자 응답 및 격리 loopback PostgreSQL 16을 사용했다. 실제 Google 로그인·운영 모델 설정 저장·유료 공급자 호출은 수행하지 않았다. browser·관리자 build·PR/운영 배포·일회성 DB 정리 결과는 이후 실제 실행에 따라 추가한다.
+
+### 통합 추가 실행 결과
+
+관리자 Vite build 및 desktop/mobile browser 16건 PASS(CRUD·409 입력 유지·모델 지정/해제·새로고침·삭제 보호·Email/AI 설정 회귀·서비스 운영자/익명 접근 제한). API build와 별개 실행했으며 실제 운영 계정은 사용하지 않았다.
+
+이번 통합용 PostgreSQL 컨테이너의 `o4o_ai*` DB 잔존 count 0을 확인한 뒤 해당 일회성 컨테이너/임시 저장소를 제거했다. 이번 작업 label의 컨테이너 잔존도 0이다. 운영 DB·계정·공급자 설정을 변경하지 않았다.
+
+기능 PR은 #754이며 CI·Codex·배포는 아직 진행 중이다. 위 개발 단계 검증과 운영 배포 결과를 구분한다.

@@ -38,7 +38,7 @@ AI 운영 관리의 API·모델 연결은 정적 MODEL_WHITELIST 조회이며 �
 - [x] I01 미배포 branch·기존 PR·최신 main 및 원격 이력 확인
 - [x] I02 최신 main 통합 및 기존 quota rollback spec의 대상 migration 가정 보완
 - [x] I03 격리 PostgreSQL 모델·schema 7건 및 실행/예약 회귀 139건, 관리자 단위 441건 통과
-- [ ] I04 타입·빌드·desktop/mobile browser·문서 검사 완료 및 경로별 commit/push
+- [x] I04 타입·빌드·desktop/mobile browser·문서 검사 완료 및 경로별 commit/push
 - [ ] I05 PR 생성·정확한 HEAD CI·Codex 검토·스레드 해결
 - [ ] I06 최신 main 확인 후 순차 병합·post-merge CI
 - [ ] I07 Delivery 판정에 따른 운영 배포·실제 serving revision/traffic 확인
