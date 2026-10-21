@@ -13,7 +13,7 @@ import { ShieldCheck } from 'lucide-react';
 
 const NAV = [
   { to: '/admin/platform', label: '플랫폼 홈', end: true },
-  { to: '/admin/platform/accounts', label: '계정 관리', end: false },
+  { to: '/settings/admin-accounts', label: '전체 관리자 계정', end: false },
   { to: '/admin/platform/users', label: '사용자 조회', end: false },
 ];
 

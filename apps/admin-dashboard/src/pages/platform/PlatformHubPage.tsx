@@ -1,423 +1,175 @@
-/**
- * Platform Hub Page — Global Aggregation Dashboard
- *
- * WO-PLATFORM-GLOBAL-HUB-V1
- *
- * 플랫폼 통합 허브. 모든 서비스(KPA, Neture) 데이터를
- * 한 화면에서 집계하고, cross-service 트리거를 실행한다.
- *
- * Sections:
- *   1. Global Risk Overview (4 risk cards)
- *   2. Service Health (3 service summaries)
- *   3. Top 5 Action Queue (priority-sorted)
- */
-
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle,
-  Users,
-  ShieldAlert,
-  RefreshCw,
-  Zap,
-  Building2,
-  Package,
-  Loader2,
-} from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
-import PageHeader from '@/components/common/PageHeader';
-
-// ==================== Types ====================
-
-interface ServiceSummary {
-  service: string;
-  label: string;
-  riskLevel: 'healthy' | 'warning' | 'critical' | 'unknown';
-  error?: string;
-  [key: string]: any;
-}
-
-interface TopAction {
-  service: string;
-  actionKey: string;
-  priority: number;
-  label: string;
-}
-
-interface PlatformSummaryData {
-  globalRisk: 'healthy' | 'warning' | 'critical' | 'partial';
-  services: {
-    kpa: ServiceSummary;
-    neture: ServiceSummary;
-  };
-  topActions: TopAction[];
-  timestamp: string;
-}
-
-// ==================== Helpers ====================
-
-const RISK_STYLES: Record<string, { bg: string; border: string; text: string; dot: string }> = {
-  healthy: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', dot: 'bg-green-500' },
-  warning: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', dot: 'bg-amber-500' },
-  critical: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', dot: 'bg-red-500' },
-  partial: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-600', dot: 'bg-gray-400' },
-  unknown: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-500', dot: 'bg-gray-400' },
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getServiceHealth, type ServiceHealth } from "@/api/service-health";
+const stateLabel = {
+  passed: "확인",
+  failed: "점검 실패",
+  unknown: "확인 불가",
 };
-
-const RISK_LABELS: Record<string, string> = {
-  healthy: '정상',
-  warning: '주의',
-  critical: '위험',
-  partial: '부분 장애',
-  unknown: '알 수 없음',
+const stateColor = {
+  passed: "text-emerald-700",
+  failed: "text-red-700",
+  unknown: "text-amber-800",
 };
-
-const SERVICE_ICONS: Record<string, typeof Building2> = {
-  kpa: Users,
-  neture: Package,
-};
-
-function riskStyle(level: string) {
-  return RISK_STYLES[level] || RISK_STYLES.unknown;
-}
-
-// ==================== Component ====================
-
+const time = (value: string) =>
+  new Date(value).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 export default function PlatformHubPage() {
-  const [data, setData] = useState<PlatformSummaryData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [triggerLoading, setTriggerLoading] = useState<string | null>(null);
-  const [triggerResult, setTriggerResult] = useState<{ key: string; message: string; success: boolean } | null>(null);
-
-  const fetchData = useCallback(async () => {
+  const [data, setData] = useState<ServiceHealth | null>(null);
+  const [loading, setLoading] = useState(false),
+    [error, setError] = useState("");
+  const [now, setNow] = useState(Date.now());
+  const version = useRef(0),
+    alive = useRef(false),
+    pending = useRef(false);
+  const load = useCallback(async () => {
+    if (pending.current) return;
+    pending.current = true;
+    const current = ++version.current;
+    setLoading(true);
+    setError("");
     try {
-      setLoading(true);
-      setError(null);
-
-      const res = await authClient.api.get<{ success: boolean; data: PlatformSummaryData }>(
-        // WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1: authClient base = /api/v1 이므로 선행 '/v1' 제거.
-        //   백엔드 mount = /api/v1/platform/hub (register-routes.ts:1138)
-        '/platform/hub/summary',
-      );
-
-      if (res.data.success) {
-        setData(res.data.data);
-      } else {
-        setError('서버에서 데이터를 불러올 수 없습니다.');
+      const value = await getServiceHealth();
+      if (alive.current && current === version.current) {
+        setData(value);
+        setNow(Date.now());
       }
-    } catch (err: any) {
-      console.error('Failed to fetch platform hub summary:', err);
-      setError(err.message || '데이터 로드 실패');
+    } catch {
+      if (alive.current && current === version.current)
+        setError(
+          "서비스 상태를 조회하지 못했습니다. 이전 결과로 현재 정상 여부를 판단할 수 없습니다.",
+        );
     } finally {
-      setLoading(false);
+      pending.current = false;
+      if (alive.current && current === version.current) setLoading(false);
     }
   }, []);
-
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleTrigger = useCallback(async (service: string, actionKey: string) => {
-    try {
-      setTriggerLoading(actionKey);
-      setTriggerResult(null);
-
-      const res = await authClient.api.post<{ success: boolean; message?: string }>(
-        '/platform/hub/trigger',
-        { service, actionKey },
-      );
-
-      setTriggerResult({
-        key: actionKey,
-        message: res.data.message || (res.data.success ? '실행 완료' : '실행 실패'),
-        success: res.data.success,
-      });
-
-      // Refresh data after trigger
-      await fetchData();
-    } catch (err: any) {
-      setTriggerResult({
-        key: actionKey,
-        message: err.message || '트리거 실행 실패',
-        success: false,
-      });
-    } finally {
-      setTriggerLoading(null);
-    }
-  }, [fetchData]);
-
-  // ─── Loading / Error ───
-
-  if (loading && !data) {
-    return (
-      <div className="p-6">
-        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브" />
-        <div className="flex items-center justify-center py-20 text-gray-500">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          데이터를 불러오는 중...
-        </div>
-      </div>
-    );
-  }
-
-  if (error && !data) {
-    return (
-      <div className="p-6">
-        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브" />
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-          <p className="text-red-700">{error}</p>
-          <button
-            onClick={fetchData}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) return null;
-
-  const { globalRisk, services, topActions } = data;
-
-  // ─── Compute Risk Cards ───
-
-  const riskCards = [
-    {
-      label: '승인 위험',
-      icon: ShieldAlert,
-      level: (services.neture.requests?.approvalRate ?? 100) < 50 ? 'critical'
-        : (services.neture.requests?.pending ?? 0) > 5 ? 'warning' : 'healthy',
-      detail: services.neture.error
-        ? '서비스 연결 불가'
-        : `승인율 ${services.neture.requests?.approvalRate ?? 100}% / 대기 ${services.neture.requests?.pending ?? 0}건`,
-    },
-    {
-      label: '커뮤니티',
-      icon: Users,
-      // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
-      //   `applications` 축 제거. `kpa_applications` 테이블은
-      //   WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 에서 은퇴했고
-      //   canonical 승인 대기 축은 `kpa_members.status='pending'`(= `members.pending`) 이다.
-      //   유지하면 항상 "신청 0건" 을 보여 실제 대기 건수를 오해하게 만든다.
-      level: (services.kpa.members?.pending ?? 0) > 10 ? 'warning' : 'healthy',
-      detail: services.kpa.error
-        ? '서비스 연결 불가'
-        : `대기 회원 ${services.kpa.members?.pending ?? 0}명 / 커뮤니티 글 ${services.kpa.forum?.totalPosts ?? 0}건`,
-    },
-  ];
-
+    alive.current = true;
+    void load();
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => {
+      alive.current = false;
+      clearInterval(timer);
+    };
+  }, [load]);
+  const stale =
+    !!data &&
+    now - Date.parse(data.checkedAt) >
+      Math.max(data.cacheSeconds * 1000 + 10000, 90000);
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브 — 모든 서비스를 한눈에" />
+    <div className="space-y-5 p-4 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">서비스 상태</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            현행 서비스와 공통 공간의 기본 접속 상태를 확인합니다.
+          </p>
+        </div>
         <button
-          onClick={fetchData}
+          className="min-h-11 rounded border bg-white px-4 py-2 disabled:opacity-50"
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+          onClick={() => void load()}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          새로고침
+          {loading ? "확인 중…" : "상태 새로고침"}
         </button>
       </div>
-
-      {/* ─── Section 1: Global Risk Overview ─── */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Activity className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Global Risk Overview</h2>
-          <span className={`ml-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${riskStyle(globalRisk).bg} ${riskStyle(globalRisk).text}`}>
-            <span className={`h-2 w-2 rounded-full ${riskStyle(globalRisk).dot}`} />
-            {RISK_LABELS[globalRisk] || globalRisk}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {riskCards.map((card) => {
-            const style = riskStyle(card.level);
-            const Icon = card.icon;
-            return (
-              <div
-                key={card.label}
-                className={`rounded-xl border ${style.border} ${style.bg} p-4 transition-shadow hover:shadow-md`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon className={`h-5 w-5 ${style.text}`} />
-                  <span className="font-medium text-gray-900">{card.label}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${style.dot} ${card.level === 'critical' ? 'animate-pulse' : ''}`} />
-                  <span className={`text-sm font-semibold ${style.text}`}>
-                    {RISK_LABELS[card.level] || card.level}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">{card.detail}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ─── Section 2: Service Health ─── */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Building2 className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Service Health</h2>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* KPA */}
-          <ServiceHealthCard
-            service={services.kpa}
-            metrics={[
-              { label: '총 회원', value: services.kpa.members?.total ?? 0 },
-              { label: '활성 회원', value: services.kpa.members?.active ?? 0 },
-              { label: '가입 대기', value: services.kpa.members?.pending ?? 0, highlight: true },
-              { label: '커뮤니티 글', value: services.kpa.forum?.totalPosts ?? 0 },
-            ]}
-          />
-
-          {/* Neture */}
-          <ServiceHealthCard
-            service={services.neture}
-            metrics={[
-              { label: '공급자', value: `${services.neture.suppliers?.active ?? 0}/${services.neture.suppliers?.total ?? 0}` },
-              { label: '대기 요청', value: services.neture.requests?.pending ?? 0, highlight: true },
-              { label: '승인율', value: `${services.neture.requests?.approvalRate ?? 0}%` },
-              { label: '콘텐츠', value: `${services.neture.content?.published ?? 0}/${services.neture.content?.total ?? 0}` },
-            ]}
-          />
-
-        </div>
-      </section>
-
-      {/* ─── Section 3: Top Action Queue ─── */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Zap className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Top Actions</h2>
-          {topActions.length > 0 && (
-            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-              {topActions.length}
-            </span>
-          )}
-        </div>
-
-        {topActions.length === 0 ? (
-          <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
-            <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <p className="text-green-700 font-medium">모든 서비스 정상</p>
-            <p className="text-green-600 text-sm mt-1">처리 대기 중인 작업이 없습니다.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {topActions.map((action, idx) => {
-              const isLoading = triggerLoading === action.actionKey;
-              const result = triggerResult?.key === action.actionKey ? triggerResult : null;
-              const ServiceIcon = SERVICE_ICONS[action.service] || Building2;
-
-              return (
-                <div
-                  key={action.actionKey + idx}
-                  className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 text-gray-600 text-sm font-bold">
-                    {idx + 1}
-                  </div>
-
-                  <ServiceIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
-
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{action.label}</p>
-                    <p className="text-xs text-gray-500">
-                      {action.service.toUpperCase()} · 우선도 {Math.round(action.priority * 100)}%
-                    </p>
-                  </div>
-
-                  {result ? (
-                    <span className={`text-xs px-2.5 py-1 rounded-full ${result.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {result.message}
+      <p className="rounded border bg-white p-4 text-sm">
+        HTTPS·HTML 화면·앱 JavaScript 응답과 공통 API 실행 준비·DB 연결을
+        점검합니다. 로그인·서비스 식별·권한·가입·승인·결제·AI 실행은 검사하지
+        않습니다. 서비스별 업무는 해당 서비스에서 처리합니다.
+      </p>
+      {error && (
+        <p
+          role="alert"
+          className="rounded border border-red-300 bg-red-50 p-4 text-red-800"
+        >
+          {error}
+        </p>
+      )}
+      {loading && <p role="status">기본 접속 상태를 확인하고 있습니다.</p>}
+      {stale && (
+        <p
+          role="alert"
+          className="rounded border border-amber-300 p-4 text-amber-900"
+        >
+          오래된 점검 결과입니다. 현재 상태는 다시 확인해 주세요.
+        </p>
+      )}
+      {data && (
+        <>
+          <p className="text-sm text-gray-600">
+            마지막 점검: {time(data.checkedAt)} · 결과는 최대{" "}
+            {data.cacheSeconds}초 재사용됩니다.
+            {data.cached ? " 저장된 최근 점검 결과입니다." : ""}
+            {error || stale ? " 아래는 이전 점검 결과입니다." : ""}
+          </p>
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">공통 기반</h2>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {data.infrastructure.map((check) => (
+                <li key={check.name} className="rounded border bg-white p-4">
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <span className="font-medium">{check.name}</span>
+                    <span className={stateColor[check.state]}>
+                      {stateLabel[check.state]}
                     </span>
-                  ) : (
-                    <button
-                      onClick={() => handleTrigger(action.service, action.actionKey)}
-                      disabled={isLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  </div>
+                  <p className="mt-2 text-sm text-gray-600">{check.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">
+              서비스·공통 공간 {data.services.length}곳
+            </h2>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {data.services.map((service) => {
+                const state = service.checks.some((x) => x.state === "failed")
+                  ? "failed"
+                  : service.checks.some((x) => x.state === "unknown")
+                    ? "unknown"
+                    : "passed";
+                return (
+                  <article
+                    key={service.id}
+                    className="min-w-0 space-y-3 rounded border bg-white p-4"
+                  >
+                    <div className="flex flex-wrap justify-between gap-2">
+                      <h3 className="font-semibold">{service.name}</h3>
+                      <span className={stateColor[state]}>
+                        {state === "passed"
+                          ? "기본 접속 확인"
+                          : stateLabel[state]}
+                      </span>
+                    </div>
+                    <a
+                      className="block break-all text-sm text-blue-700 underline"
+                      href={service.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      {isLoading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Zap className="h-3.5 w-3.5" />
-                      )}
-                      실행
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* ─── Footer ─── */}
-      <div className="text-xs text-gray-400 text-right">
-        마지막 갱신: {new Date(data.timestamp).toLocaleString('ko-KR')}
-      </div>
-    </div>
-  );
-}
-
-// ==================== Sub-components ====================
-
-function ServiceHealthCard({
-  service,
-  metrics,
-}: {
-  service: ServiceSummary;
-  metrics: Array<{ label: string; value: string | number; highlight?: boolean }>;
-}) {
-  const style = riskStyle(service.riskLevel);
-  const Icon = SERVICE_ICONS[service.service] || Building2;
-
-  if (service.error) {
-    return (
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Icon className="h-5 w-5 text-gray-400" />
-          <h3 className="font-semibold text-gray-900">{service.label}</h3>
-        </div>
-        <p className="text-sm text-gray-500">서비스 연결 불가</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`rounded-xl border ${style.border} bg-white p-5 transition-shadow hover:shadow-md`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Icon className={`h-5 w-5 ${style.text}`} />
-          <h3 className="font-semibold text-gray-900">{service.label}</h3>
-        </div>
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-          {RISK_LABELS[service.riskLevel] || service.riskLevel}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        {metrics.map((m) => (
-          <div key={m.label}>
-            <p className="text-xs text-gray-500">{m.label}</p>
-            <p className={`text-sm font-semibold ${m.highlight && Number(m.value) > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
-              {m.value}
-            </p>
-          </div>
-        ))}
-      </div>
+                      {new URL(service.url).hostname}
+                    </a>
+                    <ul className="space-y-2 text-sm">
+                      {service.checks.map((check, i) => (
+                        <li key={i}>
+                          <span className={stateColor[check.state]}>
+                            {check.name}: {stateLabel[check.state]}
+                          </span>
+                          <p className="mt-1 text-gray-600">{check.detail}</p>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-xs text-gray-500">
+                      점검 시각: {time(service.checkedAt)}
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

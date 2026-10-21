@@ -1,455 +1,349 @@
-/**
- * AdminAccountsSettings — 관리자 계정 표준 목록 + 안전 유지관리
- *
- * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1 (원본)
- * WO-O4O-ADMIN-ADMIN-ACCOUNTS-STANDARD-TABLE-AND-CRUD-V1:
- *   수동 <table> → O4O 표준 목록(BaseTable + FilterBar + RowActionMenu). 검색·상태·역할 필터,
- *   단건/일괄 활성화·비활성화. (비밀번호 재설정은 WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴)
- *
- *   ⚠️ 중지 조건 #4 발동(부트스트랩 migration 이 특정 계정에 super_admin 재부여:
- *      ActivateAdminUser→sohae2100 / BootstrapCanonicalSeedAccounts→super-admin@o4o.com):
- *      WO 규정에 따라 "표준 목록 전환 + 안전한 기존 액션(list/활성토글/일괄토글)"까지만 구현.
- *      계정 생성(POST /admin/users)·이름·이메일 수정(PUT /admin/users/:id)·역할 할당 CRUD 는
- *      코드 미구현, CHECK 설계 보고로 남긴다.
- *
- * SSOT = role_assignments (RBAC F9). 역할 변경은 좌측 RBAC Role Assignment 화면. 본 탭은 역할 표시만.
- * 서버측 보호(backend enforce): 본인 비활성(SELF_LOCK) / 마지막 super_admin 비활성(LAST_SUPER_ADMIN) /
- *   super_admin 대상 변경은 super_admin 만(SUPER_ADMIN_ONLY). 목록 응답에 비밀번호·해시 없음.
- *
- * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   비밀번호 재설정 액션·모달·결과 패널을 제거했다(서버 `PATCH /admin/platform-accounts/:id/password` 은퇴).
- *   관리자 계정의 로그인 수단은 Google 하나이며, 관리자가 남의 비밀번호를 설정하는 경로 자체가 없다.
- */
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authClient } from '@o4o/auth-client';
-import toast from 'react-hot-toast';
-import { Loader2, ShieldCheck, RefreshCw, Pencil, Users } from 'lucide-react';
-import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
-
-const MAX_ROLE_BADGES = 2;
-
-// WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
-//   역할 필터 canonical 화. backend(admin/platform-accounts.routes.ts)가 목록을 구성하는
-//   기준과 동일한 4개 역할만 필터 옵션으로 노출한다. 계정의 roles 배열에는 legacy 무접두
-//   역할(예: 'super_admin')이 섞여 들어오는데, 이는 role_assignments 잔재일 뿐 본 화면의
-//   포함 기준이 아니므로 필터에서 제외한다(표시·검색·정렬에는 그대로 남는다).
-const CANONICAL_ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-] as const;
-
-interface AdminAccount {
-  id: string;
-  email: string;
-  name: string;
-  roles: string[];
-  isActive: boolean;
-  status: string;
-  createdAt: string;
-  lastLoginAt: string | null;
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { authClient } from "@o4o/auth-client";
+import { z } from "zod";
+const role = "platform:super_admin";
+const accountSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string(),
+  roles: z.array(z.string()),
+  isActive: z.boolean(),
+  lastLoginAt: z.string().nullable(),
+});
+const candidateSchema = z.object({
+  userId: z.string(),
+  email: z.string(),
+  name: z.string().nullable(),
+  hasGoogleLink: z.boolean(),
+});
+type Account = z.infer<typeof accountSchema>;
+type Candidate = z.infer<typeof candidateSchema>;
+const button =
+  "min-h-11 rounded border bg-white px-3 py-2 text-sm disabled:opacity-50";
+const field = "min-h-11 w-full rounded border bg-white p-3";
+function errorMessage(error: unknown) {
+  const message = (error as { response?: { data?: { error?: unknown } } })
+    ?.response?.data?.error;
+  return typeof message === "string"
+    ? message
+    : "처리 결과를 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.";
 }
-
-const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '—');
-const isSuper = (a: AdminAccount) => a.roles.includes('platform:super_admin');
-
-const STATUS_OPTIONS = [
-  { value: 'active', label: '활성' },
-  { value: 'inactive', label: '비활성' },
-];
-
 export default function AdminAccountsSettings() {
-  const navigate = useNavigate();
-  const [accounts, setAccounts] = useState<AdminAccount[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
-
-  // 필터·선택
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
-  const [bulkAction, setBulkAction] = useState('');
-  const [bulkBusy, setBulkBusy] = useState(false);
-
+  const [accounts, setAccounts] = useState<Account[]>([]),
+    [loading, setLoading] = useState(true),
+    [busy, setBusy] = useState(false);
+  const [readFailed, setReadFailed] = useState(false);
+  const [error, setError] = useState(""),
+    [notice, setNotice] = useState(""),
+    [search, setSearch] = useState("");
+  const [query, setQuery] = useState(""),
+    [candidates, setCandidates] = useState<Candidate[]>([]),
+    [selected, setSelected] = useState("");
+  const [candidateError, setCandidateError] = useState(""),
+    [searching, setSearching] = useState(false);
+  const alive = useRef(false),
+    pending = useRef(false),
+    generation = useRef(0);
+  const readVersion = useRef(0);
   const load = useCallback(async () => {
+    const currentRead = ++readVersion.current;
     setLoading(true);
-    setError(null);
+    setError("");
     try {
-      const res = await authClient.api.get('/admin/platform-accounts');
-      if (res.data?.success) setAccounts(res.data.data ?? []);
-      else setError(res.data?.error || '목록을 불러오지 못했습니다.');
-    } catch (e: any) {
-      setError(e?.response?.data?.error || '최고/플랫폼 관리자만 접근할 수 있습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  // 목록에 등장하는 역할 → 필터 옵션
-  // canonical 역할만, 각 옵션에 해당 계정 수를 함께 표기(필터 결과 건수와 일치).
-  const roleOptions = useMemo(
-    () =>
-      CANONICAL_ADMIN_ROLES.map((r) => ({
-        role: r,
-        count: accounts.filter((a) => a.roles.includes(r)).length,
-      }))
-        .filter((o) => o.count > 0)
-        .map((o) => ({ value: o.role, label: `${o.role} (${o.count})` })),
-    [accounts],
-  );
-
-  const filtered = useMemo(() => {
-    const kw = search.trim().toLowerCase();
-    return accounts.filter((a) => {
-      if (kw && !(a.name.toLowerCase().includes(kw) || a.email.toLowerCase().includes(kw) || a.roles.some((r) => r.toLowerCase().includes(kw)))) return false;
-      if (statusFilter === 'active' && !a.isActive) return false;
-      if (statusFilter === 'inactive' && a.isActive) return false;
-      if (roleFilter && !a.roles.includes(roleFilter)) return false;
-      return true;
-    });
-  }, [accounts, search, statusFilter, roleFilter]);
-
-  const setStatus = async (acct: AdminAccount, next: boolean): Promise<boolean> => {
-    const res = await authClient.api.patch(`/admin/platform-accounts/${acct.id}/status`, { isActive: next });
-    if (res.data?.success) return true;
-    toast.error(res.data?.error || `${acct.email}: 상태 변경 실패`);
-    return false;
-  };
-
-  /**
-   * 관리자 권한(platform:super_admin) 부여 — WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1 (B1)
-   *
-   * 정식 경로는 `POST /admin/platform-accounts/:id/super-admin` 하나다.
-   * 범용 역할 API(`POST /operator/members/:id/roles`)로 돌아가지 않는다 —
-   * `operator-assignments` allowlist 가 `platform:*` 을 의도적으로 제외한 경계를 우회하는 것이기 때문이다.
-   *
-   * 서버가 판정하는 것(화면은 그 결과를 그대로 보여준다):
-   *   GOOGLE_LINK_REQUIRED  Google 연결 없음 — 그 계정으로는 로그인 자체가 불가능하다
-   *   TARGET_INACTIVE       비활성 계정
-   *   changed:false         이미 보유(멱등)
-   */
-  const grantSuperAdmin = async (acct: AdminAccount) => {
-    if (
-      !window.confirm(
-        `${acct.email} 에게 최고 관리자 권한(platform:super_admin)을 부여하시겠습니까?\n\n` +
-          '이 계정은 모든 서비스의 거버넌스 권한을 갖게 됩니다.',
-      )
-    ) {
-      return;
-    }
-    setBusyId(acct.id);
-    try {
-      const res = await authClient.api.post(`/admin/platform-accounts/${acct.id}/super-admin`);
-      if (res.data?.success) {
-        toast.success(
-          res.data?.data?.changed === false
-            ? '이미 관리자 권한을 보유하고 있습니다.'
-            : '관리자 권한을 부여했습니다.',
-        );
-        await load();
-      } else {
-        toast.error(res.data?.error || '관리자 권한 부여에 실패했습니다.');
+      const response = await authClient.api.get("/admin/platform-accounts");
+      if (response.data?.success !== true) throw new Error("Invalid response");
+      const rows = z
+        .array(accountSchema)
+        .parse(response.data.data)
+        .filter((x) => x.roles.includes(role))
+        .map((x) => ({ ...x, roles: [role] }));
+      if (alive.current && currentRead === readVersion.current) {
+        setAccounts(rows);
+        setReadFailed(false);
       }
-    } catch (e: any) {
-      const code = e?.response?.data?.code;
-      toast.error(
-        code === 'GOOGLE_LINK_REQUIRED'
-          ? 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 로 로그인한 뒤 부여할 수 있습니다.'
-          : code === 'TARGET_INACTIVE'
-            ? '비활성 계정에는 부여할 수 없습니다.'
-            : e?.response?.data?.error || '관리자 권한 부여에 실패했습니다.',
+    } catch {
+      if (alive.current && currentRead === readVersion.current) {
+        setReadFailed(true);
+        setError("전체 관리자 목록을 조회하지 못했습니다. 다시 불러와 주세요.");
+      }
+    } finally {
+      if (alive.current && currentRead === readVersion.current)
+        setLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    alive.current = true;
+    void load();
+    return () => {
+      alive.current = false;
+    };
+  }, [load]);
+  const mutate = async (
+    task: () => Promise<{ data?: { success?: boolean; error?: string } }>,
+    success: string,
+  ) => {
+    if (pending.current || loading || readFailed) return;
+    pending.current = true;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await task();
+      if (response.data?.success !== true) throw { response };
+      if (alive.current) {
+        setNotice(success);
+        setSelected("");
+        setCandidates([]);
+        setQuery("");
+        await load();
+      }
+    } catch (e) {
+      if (alive.current) setError(errorMessage(e));
+    } finally {
+      pending.current = false;
+      if (alive.current) setBusy(false);
+    }
+  };
+  const find = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const current = ++generation.current;
+    setSearching(true);
+    setCandidateError("");
+    setCandidates([]);
+    setSelected("");
+    try {
+      const response = await authClient.api.get(
+        "/admin/operator-assignments/candidates",
+        { params: { q: query.trim() } },
       );
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const toggleStatus = async (acct: AdminAccount) => {
-    const next = !acct.isActive;
-    if (!window.confirm(`${acct.email} 계정을 ${next ? '활성화' : '비활성화'} 하시겠습니까?`)) return;
-    setBusyId(acct.id);
-    try {
-      if (await setStatus(acct, next)) { toast.success('상태가 변경되었습니다.'); await load(); }
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error || '상태 변경에 실패했습니다.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  // 일괄 활성/비활성 — 기존 status API 반복. 본인/마지막 super_admin 은 backend 가 개별 차단(집계).
-  const handleBulk = async () => {
-    if (!bulkAction || selectedKeys.size === 0) { toast.error('작업과 대상을 선택해 주세요.'); return; }
-    const next = bulkAction === 'activate';
-    const targets = accounts.filter((a) => selectedKeys.has(a.id) && a.isActive !== next);
-    if (targets.length === 0) { toast('변경할 대상이 없습니다.'); return; }
-    if (!window.confirm(`${targets.length}개 계정을 ${next ? '활성화' : '비활성화'} 하시겠습니까?`)) return;
-    setBulkBusy(true);
-    try {
-      const results = await Promise.allSettled(targets.map((a) => setStatus(a, next)));
-      const ok = results.filter((r) => r.status === 'fulfilled' && r.value === true).length;
-      const fail = targets.length - ok;
-      if (fail === 0) toast.success(`${ok}개 계정 상태 변경 완료`);
-      else toast.error(`${fail}개 실패 (성공 ${ok}개) — 본인/마지막 super_admin 등은 보호됩니다.`);
-      setSelectedKeys(new Set());
-      setBulkAction('');
-      await load();
-    } finally {
-      setBulkBusy(false);
-    }
-  };
-
-  // 행 선택 토글 (BaseTable 은 header select-all 만 자동 렌더 — row 체크박스는 _select 컬럼 render 로 제공)
-  const toggleRow = useCallback((id: string) => {
-    setSelectedKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }, []);
-
-  // 행별 '전체 역할 보기' 펼침 상태
-  const toggleRoles = useCallback((id: string) => {
-    setExpandedRoles((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const columns: O4OColumn<AdminAccount>[] = useMemo(() => [
-    {
-      // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
-      //   행 체크박스 — BaseTable selectable 은 header select-all 만 자동. row 는 _select 컬럼 render 필요.
-      key: '_select',
-      header: '',
-      system: true,
-      width: 44,
-      align: 'center',
-      render: (_: unknown, a: AdminAccount) => (
-        <input
-          type="checkbox"
-          checked={selectedKeys.has(a.id)}
-          onChange={() => toggleRow(a.id)}
-          onClick={(e) => e.stopPropagation()}
-          className="w-4 h-4 accent-blue-600 cursor-pointer"
-          aria-label={`${a.email} 선택`}
-        />
-      ),
-    },
-    {
-      key: 'name',
-      header: '이름 / 이메일',
-      sortable: true,
-      sortAccessor: (a: AdminAccount) => a.name,
-      render: (_: unknown, a: AdminAccount) => (
-        <div>
-          <div className="flex items-center gap-1.5 font-medium text-o4o-text-primary">
-            {isSuper(a) && <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />}
-            {a.name}
-          </div>
-          <div className="text-xs text-slate-500">{a.email}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'roles',
-      header: '역할',
-      width: 220,
-      // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
-      //   과밀 방지 — 대표 2개만 배지, 나머지는 +N. title 로 전체 역할 확인.
-      // WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
-      //   '전체 역할 보기' — +N 을 클릭하면 해당 행의 역할을 모두 펼친다(title hover 로만
-      //   확인 가능하던 것을 명시적 토글로 승격). 축약은 표시 계층에만 적용되므로
-      //   필터·정렬·검색은 계속 원본 roles 배열 기준이다.
-      render: (_: unknown, a: AdminAccount) => {
-        const expanded = expandedRoles.has(a.id);
-        const shown = expanded ? a.roles : a.roles.slice(0, MAX_ROLE_BADGES);
-        const rest = a.roles.length - shown.length;
-        return (
-          <div className="flex flex-wrap items-center gap-1">
-            {shown.map((r) => (
-              <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
-            ))}
-            {(rest > 0 || expanded) && (
-              <button
-                type="button"
-                onClick={() => toggleRoles(a.id)}
-                title={expanded ? '역할 접기' : `전체 역할 보기 — ${a.roles.join(', ')}`}
-                className="inline-block px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-600 font-medium hover:bg-slate-300"
-              >
-                {expanded ? '접기' : `+${rest}`}
-              </button>
-            )}
-          </div>
+      if (response.data?.success !== true)
+        throw new Error("Invalid candidates");
+      const rows = z
+        .array(candidateSchema)
+        .parse(response.data.data?.candidates);
+      if (alive.current && current === generation.current) {
+        setCandidates(
+          rows.filter((x) => !accounts.some((a) => a.id === x.userId)),
         );
-      },
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: 90,
-      align: 'center',
-      sortable: true,
-      sortAccessor: (a) => (a.isActive ? 'active' : 'inactive'),
-      render: (_, a) => (
-        <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${a.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-          {a.isActive ? '활성' : '비활성'}
-        </span>
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: '생성일',
-      width: 110,
-      sortable: true,
-      sortAccessor: (a) => a.createdAt,
-      render: (_, a) => <span className="text-slate-500">{fmt(a.createdAt)}</span>,
-    },
-    {
-      key: 'lastLoginAt',
-      header: '마지막 로그인',
-      width: 120,
-      sortable: true,
-      sortAccessor: (a) => a.lastLoginAt || '',
-      render: (_, a) => <span className="text-slate-500">{fmt(a.lastLoginAt)}</span>,
-    },
-    {
-      key: '_actions',
-      header: '',
-      width: 56,
-      system: 'last',
-      align: 'center',
-      render: (_: unknown, a: AdminAccount) => (
-        <RowActionMenu
-          actions={[
-            {
-              // 역할 변경은 RBAC Role Assignment 화면(계정 편집)으로 연결 — 본 탭은 역할 표시만.
-              key: 'edit',
-              label: '수정 (역할 관리)',
-              icon: <Pencil size={14} />,
-              variant: 'primary',
-              onClick: () => navigate(`/users/${a.id}/edit`),
-            },
-            // WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1 (B1): 관리자 권한 부여 — 이미 보유한 계정에는 노출하지 않는다.
-            ...(isSuper(a)
-              ? []
-              : [
-                  {
-                    key: 'grant-super-admin',
-                    label: '관리자 권한 부여',
-                    icon: <ShieldCheck size={14} />,
-                    variant: 'primary' as const,
-                    disabled: busyId === a.id,
-                    onClick: () => grantSuperAdmin(a),
-                  },
-                ]),
-            {
-              key: 'toggle',
-              label: a.isActive ? '비활성화' : '활성화',
-              variant: a.isActive ? 'danger' : 'primary',
-              disabled: busyId === a.id,
-              onClick: () => toggleStatus(a),
-            },
-          ]}
-        />
-      ),
-    },
-  ], [selectedKeys, expandedRoles, busyId, toggleRow, toggleRoles, navigate]);
-
+        if (!rows.length)
+          setCandidateError(
+            "검색 결과가 없습니다. 대상자가 먼저 Google로 가입해야 합니다.",
+          );
+      }
+    } catch {
+      if (alive.current && current === generation.current)
+        setCandidateError(
+          "지정할 사용자를 검색하지 못했습니다. 다시 시도해 주세요.",
+        );
+    } finally {
+      if (alive.current && current === generation.current) setSearching(false);
+    }
+  };
+  const candidate = candidates.find((x) => x.userId === selected);
+  const filtered = accounts.filter((x) =>
+    (x.name + " " + x.email)
+      .toLowerCase()
+      .includes(search.trim().toLowerCase()),
+  );
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <h2 className="text-lg font-bold text-o4o-text-primary">관리자 계정</h2>
-          <p className="mt-1 text-sm text-o4o-text-secondary">
-            최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태를 확인하고 활성 여부를 관리합니다.
-            <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
-          </p>
-        </div>
-        <div className="shrink-0 flex items-center gap-2">
-          {/* WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-              이 화면은 **플랫폼 관리자 계정** 전용이다. 서비스 운영자 계정 등록은
-              `/operators` 가 canonical 이므로 생성 기능을 여기에 복제하지 않고 진입점만 둔다
-              (중복 구현 시 등록 계약이 두 곳으로 갈라진다). */}
-          <button type="button" onClick={() => navigate('/operators')}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-700 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100">
-            <Users className="w-4 h-4" /> 서비스 운영자 관리
-          </button>
-          <button type="button" onClick={load} disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> 새로고침
-          </button>
-        </div>
+    <div className="space-y-5">
+      <div className="flex flex-wrap justify-between gap-3">
+        <h2 className="text-xl font-bold">전체 관리자 계정</h2>
+        <button
+          className={button}
+          disabled={busy || loading}
+          onClick={() => void load()}
+        >
+          새로고침
+        </button>
       </div>
-
-      {/* 두 화면의 역할 경계를 화면에서 분명히 한다 — 어디서 무엇을 만드는지 헷갈리지 않게. */}
-      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        서비스 운영자 계정 등록·역할 지정은 이 화면이 아니라
-        <b>서비스 운영자 관리</b> 화면에서 처리합니다. 로그인 수단은 Google 계정 하나입니다.
-      </div>
-
-      {error ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}</div>
-      ) : loading ? (
-        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
-      ) : (
-        <>
-          <div className="bg-white rounded-lg border border-gray-200 p-3">
-            <FilterBar
-              searchPlaceholder="이름 · 이메일 · 역할 검색"
-              searchValue={search}
-              onSearchChange={setSearch}
-              filters={[
-                { key: 'status', placeholder: '전체 상태', options: STATUS_OPTIONS },
-                { key: 'role', placeholder: '전체 역할', options: roleOptions },
-              ]}
-              filterValues={{ status: statusFilter, role: roleFilter }}
-              onFilterChange={(k, v) => { if (k === 'status') setStatusFilter(v); else if (k === 'role') setRoleFilter(v); }}
-            >
-              <select
-                value={bulkAction}
-                onChange={(e) => setBulkAction(e.target.value)}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white"
-              >
-                <option value="">일괄 작업</option>
-                <option value="activate">활성화</option>
-                <option value="deactivate">비활성화</option>
-              </select>
-              <button
-                type="button"
-                onClick={handleBulk}
-                disabled={selectedKeys.size === 0 || !bulkAction || bulkBusy}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-40"
-              >
-                {bulkBusy ? '처리 중…' : `적용 (${selectedKeys.size})`}
-              </button>
-            </FilterBar>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-            <BaseTable<AdminAccount>
-              columns={columns}
-              data={filtered}
-              rowKey={(a) => a.id}
-              tableId="admin-accounts-list"
-              persistState
-              columnVisibility
-              selectable
-              selectedKeys={selectedKeys}
-              onSelectionChange={setSelectedKeys}
-              emptyMessage="표시할 관리자 계정이 없습니다."
-            />
-          </div>
-        </>
+      <p className="rounded border bg-white p-4 text-sm">
+        O4O 전체 관리자만 지정·관리합니다. 로그인은 Google 계정을 사용합니다.
+        서비스별 담당자는{" "}
+        <Link to="/operators" className="text-blue-700 underline">
+          서비스 관리자·운영자
+        </Link>
+        에서 관리합니다.
+      </p>
+      {error && (
+        <p role="alert" className="text-red-700">
+          {error}
+        </p>
       )}
+      {notice && <output className="block text-blue-700">{notice}</output>}
+      <section className="space-y-3 rounded border bg-white p-4">
+        <h3 className="font-semibold">전체 관리자 추가 지정</h3>
+        <p className="text-sm text-gray-600">
+          이미 가입한 사용자를 검색하고 선택합니다. 지정하면 전체 관리자 권한을
+          갖게 됩니다.
+        </p>
+        <form onSubmit={find} className="flex flex-wrap gap-2">
+          <input
+            aria-label="전체 관리자 지정 대상 검색"
+            className={field + " min-w-0 flex-1"}
+            value={query}
+            onChange={(e) => {
+              generation.current++;
+              setQuery(e.target.value);
+              setCandidates([]);
+              setSelected("");
+              setCandidateError("");
+              setSearching(false);
+            }}
+            placeholder="이름 또는 이메일"
+            disabled={busy}
+          />
+          <button
+            className={button}
+            disabled={
+              busy ||
+              loading ||
+              readFailed ||
+              searching ||
+              query.trim().length < 2
+            }
+          >
+            {searching ? "검색 중…" : "사용자 검색"}
+          </button>
+        </form>
+        {candidateError && (
+          <p role="alert" className="text-red-700">
+            {candidateError}
+          </p>
+        )}
+        {!!candidates.length && (
+          <label className="block text-sm">
+            지정할 사용자
+            <select
+              aria-label="지정할 사용자"
+              className={field + " mt-2"}
+              value={selected}
+              disabled={busy}
+              onChange={(e) => setSelected(e.target.value)}
+            >
+              <option value="">사용자를 선택하세요</option>
+              {candidates.map((x) => (
+                <option
+                  key={x.userId}
+                  value={x.userId}
+                  disabled={!x.hasGoogleLink}
+                >
+                  {x.name || x.email} · {x.email}
+                  {x.hasGoogleLink ? "" : " · Google 연결 필요"}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <button
+          className={button}
+          disabled={!candidate?.hasGoogleLink || busy || loading || readFailed}
+          onClick={() => {
+            if (
+              candidate &&
+              window.confirm(
+                `${candidate.email} 사용자를 전체 관리자로 지정할까요? O4O 전체 관리자 권한을 부여합니다.`,
+              )
+            )
+              void mutate(
+                () =>
+                  authClient.api.post(
+                    `/admin/platform-accounts/${encodeURIComponent(candidate.userId)}/super-admin`,
+                  ),
+                "전체 관리자 권한을 부여했습니다.",
+              );
+          }}
+        >
+          전체 관리자 지정
+        </button>
+      </section>
+      <section className="space-y-3">
+        <h3 className="font-semibold">전체 관리자 목록</h3>
+        <input
+          aria-label="전체 관리자 이름·이메일 검색"
+          placeholder="이름 또는 이메일 검색"
+          className={field}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <p className="text-sm text-gray-600">
+          계정 비활성화는 공통 계정의 이용을 중지합니다. 서비스 담당 권한 해제와
+          다릅니다. 본인·마지막 활성 전체 관리자 보호는 서버에서 확인합니다.
+        </p>
+        {loading ? (
+          <p role="status">전체 관리자 목록을 불러오는 중입니다.</p>
+        ) : (
+          !error && (
+            <div className="overflow-x-auto rounded border bg-white">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <caption className="sr-only">전체 관리자 계정 목록</caption>
+                <thead>
+                  <tr>
+                    {[
+                      "이름 / 이메일",
+                      "역할",
+                      "계정 상태",
+                      "최근 로그인",
+                      "관리",
+                    ].map((x) => (
+                      <th className="p-3" key={x}>
+                        {x}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((x) => (
+                    <tr key={x.id} className="border-t">
+                      <td className="p-3">
+                        <div>{x.name}</div>
+                        <div className="text-xs text-gray-500">{x.email}</div>
+                      </td>
+                      <td className="p-3">전체 관리자</td>
+                      <td className="p-3">{x.isActive ? "활성" : "비활성"}</td>
+                      <td className="p-3">
+                        {x.lastLoginAt
+                          ? new Date(x.lastLoginAt).toLocaleDateString(
+                              "ko-KR",
+                              { timeZone: "Asia/Seoul" },
+                            )
+                          : "—"}
+                      </td>
+                      <td className="p-3">
+                        <button
+                          className={button}
+                          disabled={busy}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `${x.email} 공통 계정을 ${x.isActive ? "비활성화" : "활성화"}할까요? 이 변경은 계정 전체에 적용됩니다.`,
+                              )
+                            )
+                              void mutate(
+                                () =>
+                                  authClient.api.patch(
+                                    `/admin/platform-accounts/${encodeURIComponent(x.id)}/status`,
+                                    { isActive: !x.isActive },
+                                  ),
+                                "공통 계정 상태를 변경했습니다.",
+                              );
+                          }}
+                        >
+                          {x.isActive ? "계정 비활성화" : "계정 활성화"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!filtered.length && (
+                <p className="p-4">표시할 전체 관리자 계정이 없습니다.</p>
+              )}
+            </div>
+          )
+        )}
+      </section>
     </div>
   );
 }
