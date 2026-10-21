@@ -1,8 +1,9 @@
 # 내 매장 협업체별 상품·주문·컨텐츠 연결 검증
 
-> **상태**: ACTIVE (로컬 개발 검증; main 통합·운영 검증 대기)
+> **상태**: ACTIVE (로컬 개발 검증 완료; 추가 승인된 통합·배포 진행)
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (한국시간)
 > **승인 범위**: TODO·문서/코드 대조 → 개발·검증·commit·push. PR·main 병합·배포 제외.
+> **추가 승인**: 2026-10-21 사용자 `main 으로 병합-> 배포`. 아래 최초 개발 검증 기록은 당시 범위를 보존한다.
 > **기준**: `ac38af8df1` · branch `wo/store-cooperation-workflows`
 > **작업 계획**: [TODO](../work-orders/TODO-O4O-STORE-COOPERATION-WORKFLOWS-V1.md) · **현행 계약**: [약국 commerce 설계 §4·6-2](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
 
@@ -74,3 +75,11 @@ reason: push 후 통합 검토·수정 재현용. 기준 checkout·다른 작업
 ```
 
 문서 정합: 약국 commerce 설계 §4·6-2의 공급 필터·공개 모집 조건·업무 배치를 이번 범위에 맞춰 갱신. 과거 WO/CHECK·canonical index는 변경하지 않음.
+
+## 추가 통합 회차 — 2026-10-21
+
+개발 HEAD `7b44671ae2`의 원격 일치와 clean 상태를 확인했다. 해당 branch의 기존 PR은 없었다. 실제 main ruleset은 PR과 `CI Gate` 통과를 요구하며 human approval 수는 0이다. admin bypass는 사용하지 않는다.
+
+현재 main `1adf577e38`의 새 공개 진입/문의·관리자·AI 관리 변경을 자기 branch에 일반 merge(`aec75fe3af`)했다. 이번 업무 변경과 파일 충돌이 없고 migration·의존성·workflow 변경도 없다. 다른 개발 branch를 포함시키지 않는다. 직전 main의 production 상태는 `DEPLOYED · deploy: api,admin`, Delivery `39601258231` 성공으로 확인했다.
+
+최신 결합 상태의 로컬 검사·PR CI·Codex, 병합 및 배포 결과는 이 절에 이어 기록한다. 실제 계정 업무·공급자 가격 확정·실 PG·QR/기기 검증의 기존 경계는 유지한다.

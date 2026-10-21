@@ -1,8 +1,9 @@
 # 내 매장 협업체별 상품·주문·컨텐츠 연결 TODO
 
-> **상태**: COMPLETED (개발·로컬 검증·commit·push 범위; PR·main 통합·배포 별도)
+> **상태**: ACTIVE (개발·push 완료; 추가 승인된 PR·main 통합·배포 진행)
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21
 > **근거**: 사용자 조사안 승인 — 개발·검증·commit·push. PR·병합·배포 제외.
+> **추가 승인**: 2026-10-21 사용자 `main 으로 병합-> 배포`. 이번 공간이 해당 변경의 통합·배포를 진행한다.
 
 ## 기준과 범위
 
@@ -47,3 +48,12 @@
 ## 검증 경계
 
 운영 계정 로그인·DB write·실제 결제·배송·기기 연결은 실행하지 않는다. 로컬 테스트는 독립 loopback PostgreSQL/합성 데이터만 사용하고 생성 자원은 종료 후 정리한다. `WORKTREE_DISPOSITION = KEEP` — push 후 통합 담당의 검토·수정 재현용.
+
+## 추가 승인된 통합·배포 TODO
+
+- [x] 원격 개발 commit `7b44671ae2`와 clean 상태, 기존 PR 부재, 실제 main ruleset 확인.
+- [x] main `1adf577e38`을 자기 branch에 일반 merge(`aec75fe3af`). 변경 경로 충돌·새 migration/의존성/workflow 변경 없음.
+- [ ] 최신 main 결합 상태의 로컬 회귀·build와 PR CI·Codex 검토.
+- [ ] 검증한 HEAD로 고정한 PR merge·post-merge CI 확인.
+- [ ] 실제 serving→target 판정 및 Delivery/필요 시 Promote, production 상태·API/Store 응답 검증.
+- [ ] 결과 기록과 자기 worktree·branch 종료 정리. 다른 세션의 공간은 보존.
