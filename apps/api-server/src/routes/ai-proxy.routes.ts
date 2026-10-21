@@ -1,3 +1,4 @@
+import { ModelControlService } from '../services/ai-management/model-controls.js';
 import { buildHomeChatToolPresentation } from './ai-proxy/home-chat-tool-presentation.js';
 import { fetchUrlText, fetchUrlContent, deriveTitleFromBlocks, detectUsageConditions, UsageWarning } from "./ai-proxy/url-content.js";
 /**
@@ -161,7 +162,7 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 
     // WO-O4O-AI-MODEL-SELECTION-RUNTIME-RESOLVER-V1: 모델을 admin 정책에서 결정(fallback=gemini-2.5-flash).
     // vision 은 gemini-only 인라인 경로 → resolver 가 gemini whitelist 로 검증한 모델만 반환.
-    const model = await resolveEditingModel();
+    const { model } = await new ModelControlService(AppDataSource).resolve('image.analysis', { provider: 'gemini', model: await resolveEditingModel() });
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const controller = new AbortController();
@@ -421,7 +422,7 @@ router.post('/content', authenticate, async (req, res: Response) => {
       },
       userId,
       requestId,
-      { surface: editingSurfaceForOutputType(outputType) },
+      { usage: 'editor.content', surface: editingSurfaceForOutputType(outputType) },
     );
 
     const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
@@ -678,6 +679,7 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
         },
         userId,
         requestId,
+        { usage: 'editor.url' },
       );
     } catch (aiError: any) {
       logger.error('[url-to-blocks] AI 생성 실패', { requestId, error: aiError.message, type: aiError.type });
@@ -933,7 +935,7 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
       },
       userId,
       requestId,
-      { surface: editingSurfaceForOutputType(outputType) },
+      { usage: 'editor.store-use', surface: editingSurfaceForOutputType(outputType) },
     );
 
     const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
@@ -1075,6 +1077,7 @@ router.post('/course-structure', authenticate, async (req, res: Response) => {
       },
       userId,
       requestId,
+      { usage: 'lecture.structure' },
     );
 
     // 3. JSON 배열 파싱 (url-to-blocks 와 동일 패턴)
@@ -1226,7 +1229,7 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
       },
       userId,
       requestId,
-      { surface: 'lms-lesson' },
+      { usage: 'lecture.body', surface: 'lms-lesson' },
     );
 
     let rawText: string = (aiResponse.rawText || '').trim();
@@ -1387,7 +1390,7 @@ async function performHomeChat(
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:
     //   provider 는 (요청 body 명시) → (AI_DEFAULT_PROVIDER env) → (코드 기본값) 순으로 정한다.
     //   Home UI 는 provider 를 보내지 않으므로 실사용에서는 env/기본값이 쓰인다(§11 selector 미노출).
-    const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, reqBody.provider);
+    const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, reqBody.provider, attachments.length ? 'home.attachments' : 'home.chat');
 
     // UNIFIED-REQUEST §6·§7 — 첨부는 여기서 읽고(요청 메모리) 프롬프트 사실 + 자료 블록 + inline part 로만 쓴다.
     const attachmentParts = attachments.length > 0 ? readAttachments(attachments) : [];
@@ -1539,7 +1542,7 @@ async function performHospitalDrugRequest(
       {
         exec: (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
         research: async (query) => {
-          const r = await runWebResearch({ query });
+          const r = await runWebResearch({ query, usage: 'hospital.research' });
           return { content: r.content, model: r.model, grounding: r.grounding };
         },
       },

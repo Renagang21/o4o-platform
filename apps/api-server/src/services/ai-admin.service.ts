@@ -8,6 +8,8 @@
  * - AI 대시보드 데이터
  */
 
+import { ModelControlService, ModelControlError } from './ai-management/model-controls.js';
+import { withAiModelControlLock } from './ai-management/model-control-lock.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { AiEngine } from '../entities/AiEngine.js';
@@ -212,8 +214,10 @@ class AiAdminService {
   async activateEngine(engineId: number): Promise<AiEngineInfo | null> {
     await this.ensureInitialized();
 
-    const engine = await this.engineRepo.findOne({
-      where: { id: engineId },
+    return withAiModelControlLock(AppDataSource, async (manager) => {
+      const engineRepo = manager.getRepository(AiEngine);
+      const engine = await engineRepo.findOne({
+        where: { id: engineId },
     });
 
     if (!engine) {
@@ -224,18 +228,24 @@ class AiAdminService {
       throw new Error('사용할 수 없는 엔진입니다.');
     }
 
+    if (await new ModelControlService({
+      isInitialized: true, query: manager.query.bind(manager),
+    }).allows('gemini', engine.slug) === false) {
+      throw new ModelControlError(409, 'AI_MODEL_REMOVED', '삭제된 모델의 엔진은 활성화할 수 없습니다. 최신 모델 목록을 확인해 주세요.');
+    }
+
     // Deactivate all engines
-    await this.engineRepo.update({}, { isActive: false });
+    await engineRepo.update({}, { isActive: false });
 
     // Activate selected engine
     engine.isActive = true;
-    await this.engineRepo.save(engine);
+    await engineRepo.save(engine);
 
     // Update policy
-    const policy = await this.getOrCreatePolicy();
+    const policy = await this.getOrCreatePolicy(manager.getRepository(AiQueryPolicy));
     policy.activeEngineId = engine.id;
     policy.defaultModel = engine.slug;
-    await this.policyRepo.save(policy);
+    await manager.getRepository(AiQueryPolicy).save(policy);
 
     logger.info(`AI Admin: Engine activated - ${engine.name}`);
 
@@ -248,6 +258,7 @@ class AiAdminService {
       isActive: engine.isActive,
       isAvailable: engine.isAvailable,
     };
+    });
   }
 
   // ============================================================
@@ -257,11 +268,11 @@ class AiAdminService {
   /**
    * Get or create policy
    */
-  private async getOrCreatePolicy(): Promise<AiQueryPolicy> {
-    let policy = await this.policyRepo.findOne({ where: {} });
+  private async getOrCreatePolicy(repo: Repository<AiQueryPolicy> = this.policyRepo): Promise<AiQueryPolicy> {
+    let policy = await repo.findOne({ where: {} });
 
     if (!policy) {
-      policy = this.policyRepo.create({
+      policy = repo.create({
         freeDailyLimit: 10,
         paidDailyLimit: 100,
         globalDailyLimit: 1000,
@@ -269,7 +280,7 @@ class AiAdminService {
         aiEnabled: true,
         defaultModel: GEMINI_CANONICAL_MODEL,
       });
-      await this.policyRepo.save(policy);
+      await repo.save(policy);
     }
 
     return policy;
@@ -298,26 +309,28 @@ class AiAdminService {
    */
   async updatePolicySettings(updates: Partial<AiPolicySettings>): Promise<AiPolicySettings> {
     await this.ensureInitialized();
-    const policy = await this.getOrCreatePolicy();
+    await withAiModelControlLock(AppDataSource, async (manager) => {
+      const policy = await this.getOrCreatePolicy(manager.getRepository(AiQueryPolicy));
 
-    // Apply updates
-    if (updates.freeDailyLimit !== undefined) {
-      policy.freeDailyLimit = updates.freeDailyLimit;
-    }
-    if (updates.paidDailyLimit !== undefined) {
-      policy.paidDailyLimit = updates.paidDailyLimit;
-    }
-    if (updates.globalDailyLimit !== undefined) {
-      policy.globalDailyLimit = updates.globalDailyLimit;
-    }
-    if (updates.warningThreshold !== undefined) {
-      policy.warningThreshold = Math.max(1, Math.min(100, updates.warningThreshold));
-    }
-    if (updates.aiEnabled !== undefined) {
-      policy.aiEnabled = updates.aiEnabled;
-    }
+      // Apply updates
+      if (updates.freeDailyLimit !== undefined) {
+        policy.freeDailyLimit = updates.freeDailyLimit;
+      }
+      if (updates.paidDailyLimit !== undefined) {
+        policy.paidDailyLimit = updates.paidDailyLimit;
+      }
+      if (updates.globalDailyLimit !== undefined) {
+        policy.globalDailyLimit = updates.globalDailyLimit;
+      }
+      if (updates.warningThreshold !== undefined) {
+        policy.warningThreshold = Math.max(1, Math.min(100, updates.warningThreshold));
+      }
+      if (updates.aiEnabled !== undefined) {
+        policy.aiEnabled = updates.aiEnabled;
+      }
 
-    await this.policyRepo.save(policy);
+      await manager.getRepository(AiQueryPolicy).save(policy);
+    });
     logger.info('AI Admin: Policy settings updated');
 
     return this.getPolicySettings();

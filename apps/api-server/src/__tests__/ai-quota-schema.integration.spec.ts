@@ -11,8 +11,16 @@ const fixture =
 fixture(
   "AI quota migration through isolated canonical bootstrap and TypeORM incremental runner",
   () => {
-    let admin: DataSource, db: DataSource;
+    let admin: DataSource, db: DataSource, latestDb: DataSource;
     const name = `o4o_aiquota_migrate_${process.pid}`;
+    const latestName = `${name}_latest`;
+    const quotaName = new CreateAiUsageReservations1791870434349().name;
+    const quotaIndex = INCREMENTAL_MIGRATIONS.findIndex(
+      (Migration) => new Migration().name === quotaName,
+    );
+    if (quotaIndex < 0) throw new Error("Quota migration is not registered");
+    const quotaPrefix = INCREMENTAL_MIGRATIONS.slice(0, quotaIndex + 1);
+    const quotaState = EXPECTED_SCHEMA_STATES[quotaIndex + 1]!;
     beforeAll(async () => {
       const config = {
         type: "postgres" as const,
@@ -24,23 +32,50 @@ fixture(
       admin = new DataSource(config);
       await admin.initialize();
       await admin.query(`CREATE DATABASE ${name}`);
-      db = new DataSource({
+      await admin.query(`CREATE DATABASE ${latestName}`);
+      latestDb = new DataSource({
         ...config,
-        database: name,
+        database: latestName,
         migrations: [...INCREMENTAL_MIGRATIONS],
         migrationsTableName: "typeorm_migrations",
       });
+      await latestDb.initialize();
+      // Isolate quota rollback from later migrations while keeping the full latest-schema test.
+      db = new DataSource({
+        ...config,
+        database: name,
+        migrations: [...quotaPrefix],
+        migrationsTableName: "typeorm_migrations",
+      });
       await db.initialize();
+      const runner = db.createQueryRunner();
+      try {
+        await runner.startTransaction();
+        await runCanonicalBootstrap(runner, {
+          info: () => {},
+          warn: () => {},
+          error: () => {},
+        });
+        await runner.commitTransaction();
+      } catch (error) {
+        if (runner.isTransactionActive) await runner.rollbackTransaction();
+        throw error;
+      } finally {
+        await runner.release();
+      }
+      await db.runMigrations({ transaction: "each" });
     });
     afterAll(async () => {
       if (db?.isInitialized) await db.destroy();
+      if (latestDb?.isInitialized) await latestDb.destroy();
       if (admin?.isInitialized) {
         await admin.query(`DROP DATABASE ${name}`);
+        await admin.query(`DROP DATABASE ${latestName}`);
         await admin.destroy();
       }
     });
     it("converges to the registered schema and reruns without applying migrations twice", async () => {
-      const runner = db.createQueryRunner();
+      const runner = latestDb.createQueryRunner();
       await runner.startTransaction();
       expect((await classifyDatabaseState(runner)).state).toBe("FRESH_EMPTY");
       await runCanonicalBootstrap(runner, {
@@ -49,9 +84,9 @@ fixture(
         error: () => {},
       });
       await runner.commitTransaction();
-      const applied = await db.runMigrations({ transaction: "each" });
+      const applied = await latestDb.runMigrations({ transaction: "each" });
       expect(applied).toHaveLength(INCREMENTAL_MIGRATIONS.length);
-      expect(await db.runMigrations({ transaction: "each" })).toEqual([]);
+      expect(await latestDb.runMigrations({ transaction: "each" })).toEqual([]);
       await runner.startTransaction();
       expect((await classifyDatabaseState(runner)).state).toBe("BOOTSTRAPPED");
       const fp = await computeSchemaFingerprint(runner);
@@ -60,7 +95,7 @@ fixture(
       expect(fp.hash).toBe(expected.fingerprint);
       expect(fp.lineCount).toBe(expected.fingerprintLineCount);
       await runner.release();
-      const precision = await db.query(
+      const precision = await latestDb.query(
         "SELECT numeric_precision,numeric_scale FROM information_schema.columns WHERE table_name='ai_usage_aggregate' AND column_name='current_value'",
       );
       expect(precision[0]).toEqual({ numeric_precision: 20, numeric_scale: 8 });
@@ -135,7 +170,7 @@ fixture(
           )
         )[0].costEstimated,
       ).toBe("0.12345678");
-      const previous = EXPECTED_SCHEMA_STATES.at(-2)!;
+      const previous = EXPECTED_SCHEMA_STATES[quotaIndex]!;
       const runner = db.createQueryRunner();
       await runner.startTransaction();
       expect((await classifyDatabaseState(runner)).state).toBe("BOOTSTRAPPED");
@@ -175,7 +210,7 @@ fixture(
       const latestRunner = db.createQueryRunner();
       await latestRunner.startTransaction();
       expect((await computeSchemaFingerprint(latestRunner)).hash).toBe(
-        EXPECTED_SCHEMA_STATES.at(-1)!.fingerprint,
+        quotaState.fingerprint,
       );
       await latestRunner.commitTransaction();
       await latestRunner.release();
@@ -216,7 +251,7 @@ fixture(
       await runner.startTransaction();
       expect((await classifyDatabaseState(runner)).state).toBe("BOOTSTRAPPED");
       expect((await computeSchemaFingerprint(runner)).hash).toBe(
-        EXPECTED_SCHEMA_STATES.at(-1)!.fingerprint,
+        quotaState.fingerprint,
       );
       await runner.commitTransaction();
       await runner.release();

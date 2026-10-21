@@ -45,6 +45,12 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
       return json({ success: true, data: { current: 'fixture-model', source: 'static', fetchedAt: null, canonical: 'fixture-model',
         models: [{ id: 'fixture-model', displayName: 'Fixture Model', inputTokenLimit: 4096 }] } });
     }
+    if (path === '/api/ai/admin/management/models') return json({ success: true, data: {
+      revision: 0, models: [{ provider: 'gemini', id: 'fixture-model', name: 'Fixture Model', capabilities: ['text'] }],
+      selections: {}, deleted: [], protectedModels: ['gemini:fixture-model'],
+      targets: [{ id: 'service.query', name: '공통 질문·요약', providers: ['gemini'], capability: 'text' }],
+      usageTargets: { 'service.query': 'service.query' },
+    } });
     if (path === '/api/ai/admin/management') {
       if (failManagement) return json({ success: false }, 503);
       return json({ success: true, data: {

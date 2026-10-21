@@ -1,3 +1,4 @@
+import { resolveManagedAiTarget, prepareManagedAiRequest } from '../../../services/ai-management/runtime-models.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
 import { randomUUID } from 'node:crypto';
@@ -61,9 +62,6 @@ export interface AIAnalyzeResult {
 
 const TIMEOUT_MS = 8000; // assignment/quiz analysis can be slower than 3s dashboard insights
 
-function hasApiKey(): boolean {
-  return !!(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
-}
 
 // ─── Service ─────────────────────────────────────────────────────────────────
 
@@ -94,16 +92,12 @@ export class LmsAIService {
   ): Promise<AIAnalyzeResult> {
     const { kind } = input;
     if (!actorId) throw new Error('AUTH_REQUIRED');
-    if (!hasApiKey()) {
-      logger.info(`[LmsAI] No API key configured — returning rule-based fallback for ${kind}`);
-      return fallback();
-    }
 
     try {
       const { runAiExtension } = await import('@o4o/ai-core');
-      const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY!;
-      const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
-      const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
+      const previousProvider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
+      const { provider, model, apiKey } = await resolveManagedAiTarget(AppDataSource, `lms.${kind}`, { provider: previousProvider as 'gemini' | 'openai', model: previousProvider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini', apiKey: process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || '' });
+      if (!apiKey) return fallback();
 
       const run = await runAiExtension({
         extension: lmsAssistanceExtension, input,
@@ -111,11 +105,11 @@ export class LmsAIService {
         materials: [], funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider, responseMode: 'json',
+          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, `lms.${kind}`, { ...prompt, provider, responseMode: 'json',
             config: { apiKey, model, maxTokens: 700, temperature: 0.4 },
             timeoutMs: TIMEOUT_MS, retry: { maxAttempts: 1, delayMs: 0 },
             meta: { service: 'lms', callerName: `LmsAI.${kind}` },
-          }, { scope: 'LMS_ASSISTANCE', serviceKey: 'lecture', userId: actorId });
+          }), { scope: 'LMS_ASSISTANCE', serviceKey: 'lecture', userId: actorId });
           return { ...result, provider: result.provider ?? provider };
         },
       }, {
