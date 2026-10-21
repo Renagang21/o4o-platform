@@ -14,7 +14,7 @@ import MyAccountSettings from './MyAccountSettings'
 const settingsTabs = [
   { id: 'app-services', label: 'AI 운영 관리', icon: <Bot className="w-4 h-4" />, path: '/settings' },
   { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
-  { id: 'admin-accounts', label: '관리자 계정', icon: <Users className="w-4 h-4" />, path: '/settings/admin-accounts' },
+  { id: 'admin-accounts', label: '전체 관리자 계정', icon: <Users className="w-4 h-4" />, path: '/settings/admin-accounts' },
   { id: 'my-account', label: '내 계정', icon: <UserCircle className="w-4 h-4" />, path: '/settings/my-account' }
 ]
 

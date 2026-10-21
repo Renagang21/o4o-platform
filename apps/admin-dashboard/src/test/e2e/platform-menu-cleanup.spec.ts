@@ -30,11 +30,11 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       page.on('pageerror', error => errors.push(error.message));
       await page.goto('/admin/platform');
       const nav = page.getByRole('navigation', { name: '플랫폼 관리 메뉴' });
-      await expect(nav.getByRole('link')).toHaveText(['플랫폼 홈', '계정 관리', '사용자 조회']);
-      await expect(page.getByRole('link', { name: /서비스 운영자.*서비스별 관리자/ })).toHaveAttribute('href', '/operators');
-      await nav.getByRole('link', { name: '계정 관리', exact: true }).click();
-      await expect(page.getByRole('heading', { name: '플랫폼 계정 관리', exact: true })).toBeVisible();
-      await nav.getByRole('link', { name: '사용자 조회', exact: true }).click();
+      await expect(nav.getByRole('link')).toHaveText(['플랫폼 홈', '전체 관리자 계정', '사용자 조회']);
+      await expect(page.getByRole('link', { name: /서비스 관리자·운영자.*서비스별 관리자/ })).toHaveAttribute('href', '/operators');
+      await nav.getByRole('link', { name: '전체 관리자 계정', exact: true }).click();
+      await expect(page.getByRole('heading', { name: '전체 관리자 계정', exact: true })).toBeVisible();
+      await page.goto('/admin/platform/users');
       await expect(page.getByRole('heading', { name: '전체 사용자 조회', exact: true })).toBeVisible();
       for (const old of ['/admin/platform/services', '/admin/platform/roles', '/admin/platform/service-audience', '/admin/settings/service-audience']) {
         await page.goto(old);
