@@ -1,6 +1,6 @@
 import { PublicServiceEntry, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
-/** Funding entry: login first, then participation and trial lists. Existing participant APIs and permissions are preserved. */
+/** Funding entry: public overview first; participant and trial lists require login. Existing participant APIs and permissions are preserved. */
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FlaskConical } from 'lucide-react';

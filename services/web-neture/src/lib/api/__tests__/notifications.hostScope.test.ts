@@ -3,7 +3,7 @@ const state = vi.hoisted(() => ({ profile: 'community', get: vi.fn() }));
 vi.mock('../../hostProfile', () => ({ get CURRENT_HOST_PROFILE() { return state.profile; } }));
 vi.mock('../../apiClient', () => ({ api: { get: state.get } }));
 beforeEach(() => { vi.resetModules(); state.get.mockReset(); });
-it.each([['community', 'community'], ['main', 'neture'], ['supplier', 'neture'], ['funding', 'neture'], ['carepharm', 'neture']])('notification scope for %s is %s', async (profile, serviceKey) => {
+it.each([['community', 'community'], ['main', 'neture'], ['supplier', 'supplier'], ['funding', 'funding'], ['carepharm', 'carepharm']])('notification scope for %s is %s', async (profile, serviceKey) => {
   state.profile = profile;
   state.get.mockResolvedValue({ data: { data: { count: 2, notifications: [], total: 0 } } });
   const { notificationsApi, NOTIFICATION_SERVICE_KEY } = await import('../notifications');
