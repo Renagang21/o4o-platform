@@ -21,6 +21,7 @@ import {
   inboxRecipients,
   type InboxScope,
 } from "./inbox-scope.js";
+import { serviceContactRecipients } from "./contact-recipients.js";
 import { deliverOperatorNotifications } from "./operator-delivery.js";
 import { readInboxTasks } from "./inbox-tasks.js";
 
@@ -127,9 +128,33 @@ export function createOperatorInboxRoutes(ds: DataSource) {
         ],
       );
       let delivery = "fail";
+      let assignmentDelivery: string | undefined;
       try {
-        delivery = await deliverOperatorNotifications(
-          await inboxRecipients(ds, scope),
+        const recipients = await inboxRecipients(ds, scope);
+        if (!recipients.length) {
+          // Assignment alerts disclose only the public space, never an inquiry reference or content.
+          delivery = "none";
+          assignmentDelivery = "fail";
+          assignmentDelivery = await deliverOperatorNotifications(
+            await serviceContactRecipients(ds, "neture", "neture"),
+            (op) => notificationService.createNotification({
+              userId: op.userId,
+              type: "contact.new",
+              title: "문의 담당자 지정이 필요합니다",
+              message: `${scope.name} 문의 담당자를 확인해 주세요.`,
+              serviceKey: "neture",
+              metadata: {
+                assignmentRequired: true,
+                assignmentReceipt: createHash("sha256").update(saved.id).digest("hex"),
+                sourceServiceKey: scope.serviceKey,
+                scopeKind: scope.kind,
+                scopeKey: scope.key,
+                targetUrl: "/operator",
+              },
+            }),
+          );
+        } else delivery = await deliverOperatorNotifications(
+          recipients,
           (op) =>
             notificationService.createNotification({
               userId: op.userId,
@@ -150,7 +175,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
       try {
         await ds.query(
           "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
-          [saved.id, `inapp:${delivery}`],
+          [saved.id, `inapp:${delivery}${assignmentDelivery === undefined ? "" : `;assignment:${assignmentDelivery}`}`],
         );
       } catch {
         /* pending remains visible as incomplete delivery */

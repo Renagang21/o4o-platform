@@ -23,19 +23,19 @@ import { AddContactInquiryOrganization1792540800000 } from '../database/migratio
 
 const integration=process.env.O4O_OPERATOR_INBOX_PG_TEST==='1'?describe:describe.skip;
 integration('operator contact/inbox actual SQL, scope and failure recovery',()=>{
- const local=randomUUID(),other=randomUUID(),fed=randomUUID(),supplier=randomUUID(),funding=randomUUID(),businessOp=randomUUID(),expired=randomUUID();
+ const central=randomUUID(),local=randomUUID(),other=randomUUID(),fed=randomUUID(),supplier=randomUUID(),funding=randomUUID(),businessOp=randomUUID(),expired=randomUUID();
  const org=randomUUID(),otherOrg=randomUUID(),businessOrg=randomUUID(),coop=randomUUID(),otherCoop=randomUUID(),sf=randomUUID(),otherSf=randomUUID(),business=randomUUID();
  let app:express.Express,contactId:string;
  const base='/api/v1/operator-inbox';
  const payload={name:'Synthetic requester',email:'synthetic@example.invalid',subject:'Synthetic scoped request',message:'Synthetic contact body for isolated verification',privacyConsent:true};
  beforeAll(async()=>{
   db=new DataSource({type:'postgres',host:'127.0.0.1',port:55439,username:'operator_inbox_fixture',database:'o4o_operator_inbox_fixture',entities:[ContactInquiry],synchronize:false});await db.initialize();
-  for(const id of [local,other,fed,supplier,funding,businessOp,expired])await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified") VALUES($1,$2,'Synthetic operator','active',true,true)`,[id,`${id}@example.invalid`]);
+  for(const id of [central,local,other,fed,supplier,funding,businessOp,expired])await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified") VALUES($1,$2,'Synthetic operator','active',true,true)`,[id,`${id}@example.invalid`]);
   for(const [id,code]of [[org,'inbox-coop'],[otherOrg,'inbox-other'],[businessOrg,'inbox-business']])await db.query("INSERT INTO organizations(id,name,code,type) VALUES($1,'Synthetic organization',$2,'supplier')",[id,code]);
   for(const [id,key,organizationId]of [[sf,'cooperative-inbox-a',org],[otherSf,'cooperative-inbox-b',otherOrg],[business,'carepharm',businessOrg]])await db.query("INSERT INTO semi_franchises(id,key,name,organization_id) VALUES($1,$2,'Synthetic business',$3)",[id,key,organizationId]);
   for(const [id,slug,businessId]of [[coop,'inbox-a',sf],[otherCoop,'inbox-b',otherSf]])await db.query("INSERT INTO cooperatives(id,slug,name,semi_franchise_id,status) VALUES($1,$2,'Synthetic cooperative',$3,'active')",[id,slug,businessId]);
   for(const [id,cooperativeId]of [[local,coop],[other,otherCoop]])await db.query("INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,'operator')",[cooperativeId,id]);
-  for(const [id,role,key]of [[fed,'neture:pharmcoop_operator','neture'],[supplier,'supplier:operator','supplier'],[funding,'funding:operator','funding'],[businessOp,'neture:carepharm_operator','neture'],[expired,'supplier:operator','supplier']]){
+  for(const [id,role,key]of [[central,'neture:operator','neture'],[fed,'neture:pharmcoop_operator','neture'],[supplier,'supplier:operator','supplier'],[funding,'funding:operator','funding'],[businessOp,'neture:carepharm_operator','neture'],[expired,'supplier:operator','supplier']]){
    await db.query('INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,$2,true)',[id,role]);
    await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,$2,'member','active')",[id,key]);
   }
@@ -132,12 +132,25 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   try{await expect(db.transaction(m=>assertInboxWriter(m,scope,local))).rejects.toThrow('권한');}
   finally{await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[coop,local]);}
  });
- it('recipient absence is recorded and never loses a successfully received inquiry',async()=>{
+ it('alerts central operations without exposing an unassigned inquiry',async()=>{
+  (notificationService.createNotification as jest.Mock).mockClear();
   await request(app).post(`${base}/service/store/contact`).send(payload).expect(308).expect('Location','/api/v1/public/services/store/contact-inquiries');
   await db.query('UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
   const r=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
   await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
-  const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none');
+  const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none;assignment:sent');
+  const alerts=(notificationService.createNotification as jest.Mock).mock.calls.map(args=>args[0]);
+  expect(alerts).toHaveLength(1);expect(alerts[0]).toMatchObject({userId:central,serviceKey:'neture',metadata:{assignmentRequired:true,targetUrl:'/operator',scopeKind:'cooperative',scopeKey:'inbox-b'}});
+  for(const privateValue of [r.body.data.id,payload.subject,payload.message,payload.email])expect(JSON.stringify(alerts[0])).not.toContain(privateValue);
+  await request(app).get(`${base}/cooperative/inbox-b/manage/contacts/${r.body.data.id}`).set('x-test-user',central).expect(403);
+ });
+ it('preserves receipt and exposes central assignment notification failure',async()=>{
+  await db.query('UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
+  (notificationService.createNotification as jest.Mock).mockRejectedValueOnce(Error('synthetic central delivery failure'));
+  const r=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
+  const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none;assignment:fail');
+  await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
+  const s=await request(app).get(`${base}/cooperative/inbox-b/manage`).set('x-test-user',other).expect(200);expect(s.body.data.contact.deliveryAttention).toBeGreaterThan(0);
  });
  it('migration refuses a down that would expose scoped contacts',async()=>{
   const q=db.createQueryRunner();try{await expect(new AddContactInquiryOrganization1792540800000().down(q)).rejects.toThrow('SCOPED_CONTACT_INQUIRIES_EXIST');}finally{await q.release();}

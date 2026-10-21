@@ -112,3 +112,6 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 - 최종 설정·접수번호 보완 후 공통 UI 전체 169개와 영향 4개 앱 타입 검사 PASS. API 타입 검사도 재확인한다.
 
 - Codex P2 추가: CarePharm의 기존 central operator/admin + live business assignment가 신규 헤더의 역할 후보에서 누락됐다. 사업 문의함 링크는 해당 후보와 사업 전용 역할을 대상으로 실제 `/manage` 응답으로 노출을 확정한다. 401/403/404는 숨기고, 권한 확인 후 원장 조회 장애는 확인 필요 상태로 유지한다. KPA business 헤더도 같은 서버 판정을 적용해 배정 없는 central 운영자에게 링크가 남지 않게 했다. 링크 부여·철회 7개, Neture 헤더 10개, KPA 헤더 11개 PASS; 집중 ESLint 오류/경고 0.
+
+- Codex P1 추가: 배정 철회 등으로 사업/조합 담당자가 0명이면 문의 저장·미수신 기록만으로는 누구도 새 문의를 알 수 없다. 현행 공통 문의 정책에 맞춰 Neture 공통 운영자에게 담당자 지정 필요 사실만 알린다. 공개 공간 이름·slug와 역조회 API가 없는 receipt digest만 사용하고, 원시 문의 UUID·제목·본문·연락처·문의 열람 링크를 제공하지 않는다. 범위 권한은 확장하지 않는다.
+- 담당자 미지정/공통 알림 실패·데이터 비노출·권한 차단을 포함한 실제 PostgreSQL 테스트 17개 PASS, fixture DB 잔존 0. 공통 알림 성공/실패는 `assignment` 결과로 구분하며 원래 문의는 미전달 상태로 유지해 새 담당자가 확인할 수 있다. API 타입 검사 재확인.
