@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 type Client = { get(path: string): Promise<unknown> };
-/** A count of received inquiries, scoped to both service and signed-in account. */
+/** Server-confirmed inbox access: null is unconfirmed/denied; zero is allowed.
+ * Scoped to the current account/service, refreshed on focus and every 30 seconds. */
 export function useServiceContactCount({
   client,
   serviceKey,
@@ -17,23 +18,23 @@ export function useServiceContactCount({
     null,
   );
   useEffect(() => {
+    setValue(null);
     if (!enabled || !accountId) return;
     let active = true;
+    let sequence = 0;
     const read = async () => {
+      const request = ++sequence;
       try {
         const response = (await client.get(
           `/admin/services/${encodeURIComponent(serviceKey)}/contact-inquiries/summary`,
         )) as { data?: { data?: { newCount?: number } } };
         const count = response.data?.data?.newCount;
-        if (
-          active &&
-          typeof count === "number" &&
-          Number.isInteger(count) &&
-          count >= 0
-        )
+        if (!active || request !== sequence) return;
+        if (typeof count === "number" && Number.isInteger(count) && count >= 0)
           setValue({ scope, count });
+        else setValue(null);
       } catch {
-        /* The protected inbox retains its own explicit loading/error state. */
+        if (active && request === sequence) setValue(null);
       }
     };
     void read();
@@ -70,7 +71,7 @@ export function ServiceContactInboxLink({
     accountId,
     enabled,
   });
-  if (!enabled) return null;
+  if (count === null) return null;
   return (
     <a
       href={

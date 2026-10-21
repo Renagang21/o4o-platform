@@ -54,7 +54,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
           <a href="https://neture.co.kr/contact?service=kpa-branch">Contact Us</a>
-          <ServiceContactInboxLink client={authClient.api} serviceKey="kpa-branch" accountId={user?.id} enabled={!!user?.roles?.some((role: string) => ["kpa-branch:admin"].includes(role)) && !!user?.memberships?.some(m => m.serviceKey === "kpa-branch" && m.status === "active")} />
+          <ServiceContactInboxLink client={authClient.api} serviceKey="kpa-branch" accountId={user?.id} enabled={isAuthenticated && !isLoading} />
         </nav>
       </header>
 

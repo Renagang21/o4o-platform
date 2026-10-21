@@ -10,7 +10,6 @@ import {
 import { App } from "./App";
 import {
   anonymousSession,
-  canManageFederation,
   type Cooperative,
   type SessionSnapshot,
 } from "./domain";
@@ -88,7 +87,7 @@ export function ConnectedApp() {
   return (
     <>
       <div className="container" aria-label="계정">
-        <ServiceContactInboxLink client={authClient.api} serviceKey="pharmcoop" accountId={auth.user?.id} enabled={Array.isArray(session.federationOperators) && canManageFederation(session)} />
+        <ServiceContactInboxLink client={authClient.api} serviceKey="pharmcoop" accountId={auth.user?.id} enabled={!!auth.user?.id} />
         {auth.user ? (
           <button onClick={() => void auth.logout()}>로그아웃</button>
         ) : (
