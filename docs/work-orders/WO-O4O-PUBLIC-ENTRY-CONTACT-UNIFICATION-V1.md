@@ -85,3 +85,15 @@ API 검사는 격리된 로컬 PostgreSQL socket을 `CONTACT_REVIEW_PG_SOCKET`�
 - 시작 main: `e09db6eb4b`; 현재 작업은 독립 worktree 안에서만 수행했다.
 - main 통합·PR CI·배포: 미실행. 개발 범위는 commit·push 후 인계다.
 - 작업공간 판정: **KEEP** — 아직 main에 병합되지 않은 개발 branch이며 후속 통합·수정에 필요하다. 기준 checkout과 다른 세션 작업공간은 변경·정리하지 않았다.
+
+
+## 사용자 추가 승인 — main 통합·배포 (2026-10-21 KST)
+
+사용자가 이 공간에 `main으로 통합 -> 배포`를 지시했다. 위 개발 종료 기록은 당시 범위로 보존하고, 같은 WO·branch의 후속 통합 단계로 PR·CI·리뷰·병합·현재 Delivery 정책에 따른 배포와 운영 공개 화면 검증을 수행한다. 신규 migration·DB backfill·계정/메일 설정 변경은 포함하지 않는다.
+
+- [x] 원격 branch/HEAD·main ruleset·기존 PR·현재 배포 경로 확인
+- [x] 최신 main `ac38af8df1`을 작업 branch에 병합 (공통 export 자동 병합, 충돌 0)
+- [ ] 통합 후 focused 검증·PR CI·현재 HEAD Codex 리뷰 확인
+- [ ] 기술 gate 충족 후 PR 병합·post-merge CI 확인
+- [ ] Delivery/promote 배포·serving SHA·공개 화면·API 보호 경계 확인
+- [ ] 검증 한계·문서 정합·작업공간 정리 기록 후 종료
