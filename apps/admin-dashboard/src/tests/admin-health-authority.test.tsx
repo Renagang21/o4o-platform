@@ -201,7 +201,27 @@ it("retains grant errors without a success message or changing unrelated roles",
     screen.queryByText("전체 관리자 권한을 부여했습니다."),
   ).not.toBeInTheDocument();
   expect(screen.queryByText(service.email)).not.toBeInTheDocument();
+  expect(screen.getByText(platform.email)).toBeInTheDocument();
 });
+
+it.each(["본인 계정은 비활성화할 수 없습니다.", "마지막 활성 전체 관리자 계정입니다."])(
+  "keeps valid account rows and actions after the server rejects a status mutation: %s",
+  async (message) => {
+    get.mockResolvedValue(reply([platform]) as any);
+    const patch = vi.mocked(authClient.api.patch);
+    patch.mockRejectedValue({ response: { data: { error: message } } });
+    render(<MemoryRouter><Accounts /></MemoryRouter>);
+    await screen.findByText(platform.email);
+    fireEvent.click(screen.getByRole("button", { name: "계정 비활성화" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(message);
+    expect(screen.getByRole("table", { name: "전체 관리자 계정 목록" })).toBeInTheDocument();
+    expect(screen.getByText(platform.email)).toBeInTheDocument();
+    expect(screen.getByText("활성", { exact: true })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "계정 비활성화" })).toBeEnabled());
+    expect(patch).toHaveBeenCalledWith("/admin/platform-accounts/platform-user/status", { isActive: false });
+    expect(get).toHaveBeenCalledTimes(1);
+  },
+);
 
 it('blocks platform grants after a failed account-list read until a successful refresh', async () => {
   get.mockRejectedValueOnce(new Error('read failed')).mockResolvedValue(reply([platform]) as any);

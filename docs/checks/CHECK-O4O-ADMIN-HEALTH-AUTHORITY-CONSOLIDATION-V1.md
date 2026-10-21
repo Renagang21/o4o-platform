@@ -72,3 +72,5 @@
 통합 후 API 핵심 HTTP·상태 28건, 관리자 435건, PC/mobile Chromium 10건이 통과했다. Codex의 분회 asset prefix 지적은 `vite.config.ts`의 `/kpa/` base와 Dockerfile의 `/kpa/assets/` 서빙을 대조해 수용했다. 분회에 한해 해당 경로를 지원하며 동일 origin·인증 미전달·redirect 금지 조건을 유지한다. 분회 정상·타 서비스 경로 거부·외부 origin 거부 회귀 3건을 추가했다. main 병합·운영 배포 결과는 완료 후 이 절 아래에 기록한다.
 
 추가 SonarCloud PR 분석은 필수 CI Gate와 별개로 신뢰성 C를 보고했다. 이번 범위의 버튼 submit type·라벨/상태 접근성·목록 안정 key·오류 Error 객체·명시적 테스트 assertion을 보완하고, HTTP 상태/앱 파일 검사를 나누어 인지 복잡도를 줄였다. 불필요한 async map을 제거하고 서비스 의존 필드를 readonly로 고정했다. 6개 worker 내부의 순차 await는 동시 요청 상한을 지키기 위한 의도된 구조로 유지했다. 기준 main의 기존 Sonar 실패를 이번 PR의 성공으로 간주하지 않는다. 분회 경로 보완 뒤 API 핵심 회귀는 31 PASS다.
+
+Codex 후속 검토의 관리자 상태 변경 거부 시 목록 소실도 수용했다. 전체 관리자 목록은 조회 실패(`readFailed`)일 때만 감추고, 본인/마지막 관리자 보호 같은 정상적인 쓰기 거부는 오류와 기존 목록·다른 계정 동작을 함께 유지한다. 해당 두 거부 응답의 회귀를 추가하고 기존 관리자 지정 거부 테스트에도 목록 유지 검증을 보완했다.

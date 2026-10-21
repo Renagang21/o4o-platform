@@ -278,7 +278,7 @@ export default function AdminAccountsSettings() {
             전체 관리자 목록을 불러오는 중입니다.
           </output>
         ) : (
-          !error && (
+          !readFailed && (
             <div className="overflow-x-auto rounded border bg-white">
               <table className="w-full min-w-[640px] text-left text-sm">
                 <caption className="sr-only">전체 관리자 계정 목록</caption>
