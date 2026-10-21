@@ -35,7 +35,7 @@ export interface PublicContactFormTheme {
 export interface PublicContactFormProps {
   serviceKey: string;
   /** service 측 주입: 접수 API 호출. 실패 시 throw(메시지). */
-  submitInquiry: (payload: ContactInquiryPayload) => Promise<void>;
+  submitInquiry: (payload: ContactInquiryPayload) => Promise<void | { id?: string }>;
   /** 문의 유형 옵션. 기본 공통 5종. */
   inquiryTypes?: { value: string; label: string }[];
   /** 소속명 라벨(예: '약국명' / '매장명'). 기본 '소속/회사명'. */
@@ -44,6 +44,8 @@ export interface PublicContactFormProps {
   privacyHref?: string;
   /** 상단 안내 문구(선택). */
   introText?: string;
+  privacyNotice?: string;
+  completionNotice?: string;
   theme?: PublicContactFormTheme;
 }
 
@@ -65,6 +67,8 @@ export function PublicContactForm({
   organizationLabel = '소속/회사명',
   privacyHref,
   introText,
+  privacyNotice,
+  completionNotice,
   theme,
 }: PublicContactFormProps) {
   const id = useId();
@@ -97,6 +101,8 @@ export function PublicContactForm({
     return null;
   }
 
+  const [receiptId, setReceiptId] = useState<string | undefined>();
+
   async function handleSubmit() {
     if (submittingRef.current) return;
     const v = validate();
@@ -105,7 +111,7 @@ export function PublicContactForm({
     setSubmitting(true);
     setError(null);
     try {
-      await submitInquiry({
+      const receipt = await submitInquiry({
         inquiryType: form.inquiryType,
         name: form.name.trim(),
         email: form.email.trim(),
@@ -117,6 +123,7 @@ export function PublicContactForm({
         sourcePath: typeof window !== 'undefined' ? window.location.pathname : undefined,
         company_website: form.company_website,
       });
+      setReceiptId(receipt ? receipt.id : undefined);
       setSubmitted(true);
     } catch (err: any) {
       setError(err?.message || '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
@@ -131,7 +138,8 @@ export function PublicContactForm({
       <div style={S.card}>
         <div style={{ ...S.successIcon, background: accent }}>✓</div>
         <h2 style={S.successTitle}>문의가 접수되었습니다.</h2>
-        <p style={S.successDesc}>운영자가 확인 후 필요한 경우 회신드립니다.</p>
+        {receiptId && <p style={{ overflowWrap: "anywhere" }}>접수번호: {receiptId}</p>}
+        <p style={S.successDesc}>{completionNotice || "담당자가 확인 후 입력하신 이메일로 회신드립니다."}</p>
       </div>
     );
   }
@@ -195,7 +203,7 @@ export function PublicContactForm({
       <label style={S.consent}>
         <input type="checkbox" checked={form.privacyConsent} onChange={(e) => set('privacyConsent', e.target.checked)} />
         <span>
-          문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다.
+          {privacyNotice || "문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다."}
           {privacyHref && (
             <> (<a href={privacyHref} style={{ color: accent, textDecoration: 'underline' }}>개인정보처리방침</a>)</>
           )}

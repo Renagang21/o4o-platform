@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), login: vi.fn(), authenticated: true, account: 'owner' }));
@@ -94,6 +94,31 @@ describe('CarePharm cooperation service', () => {
     access.allowed = true; mount('materials'); await screen.findByText('혈당 관리 자료');
     expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'carepharm', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'owned-store' } });
     expect(screen.queryByRole('button', { name: /복사/ })).toBeNull();
+  });
+  it('keeps the selected pharmacy while searching and filtering exact material tags', async () => {
+    access.allowed = true;
+    render(<MemoryRouter initialEntries={['/materials?store=owned-store&page=2']}><CarePharmHomePage view="materials" /></MemoryRouter>);
+    await screen.findByRole('combobox',{name:'자료 태그'});
+    fireEvent.change(screen.getByRole('combobox',{name:'자료 태그'}),{target:{value:'자료 묶음'}});
+    await waitFor(() => expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents',{params:{sf:'carepharm',tag:'자료 묶음',page:1,limit:20},headers:{'X-Store-Organization-Id':'owned-store'}}));
+    fireEvent.change(screen.getByRole('textbox',{name:'자료 제목·요약 검색'}),{target:{value:'진열'}});
+    fireEvent.click(screen.getByRole('button',{name:'검색'}));
+    await waitFor(() => expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents',{params:{sf:'carepharm',q:'진열',tag:'자료 묶음',page:1,limit:20},headers:{'X-Store-Organization-Id':'owned-store'}}));
+  });
+  it('discards a late material query after tag selection', async () => {
+    access.allowed = true; const previous = state.get.getMockImplementation()!;
+    let finish!: (value:unknown) => void;
+    let first = true;
+    state.get.mockImplementation((path:string, config?:unknown) => {
+      if (path.endsWith('/store/contents') && first) { first=false; return new Promise(resolve => {finish=resolve;}); }
+      return previous(path,config);
+    });
+    mount('materials'); await screen.findByRole('combobox',{name:'자료 태그'});
+    await waitFor(() => expect(finish).toBeTypeOf('function'));
+    fireEvent.change(screen.getByRole('combobox',{name:'자료 태그'}),{target:{value:'약국 운영'}});
+    await screen.findByText('혈당 관리 자료');
+    await act(async () => finish(response({items:[{id:'old',title:'이전 검색 자료',semiFranchiseKey:'carepharm'}],total:1})));
+    expect(screen.queryByText('이전 검색 자료')).toBeNull();
   });
   it('does not display another model materials returned in an invalid response', async () => {
     access.allowed = true; const previous = state.get.getMockImplementation()!;

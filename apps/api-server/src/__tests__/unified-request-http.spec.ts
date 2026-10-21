@@ -605,3 +605,13 @@ describe('⑭ Neture 가입 승인 guard (CHECK §10 E5)', () => {
     expect(netureStatusMock).toHaveBeenCalledWith(expect.anything(), '00000000-0000-4000-8000-000000000001');
   });
 });
+
+it('authenticated hospital research uses the hospital model target', async () => {
+  runSurfaceMock.mockImplementationOnce(async (dependencies: any) => {
+    await dependencies.research('synthetic research');
+    return { answer: 'synthetic answer', plan: 'research', usedResearch: true, usedLocal: false };
+  });
+  const response = await request(app).post('/api/ai/request').send({ text: '공개 약품 정보를 조사해줘', surface: 'hospital-drug' });
+  expect(response.status).toBe(200);
+  expect(runWebResearchMock).toHaveBeenCalledWith({ query: 'synthetic research', usage: 'hospital.research' });
+});

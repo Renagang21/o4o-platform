@@ -1,4 +1,5 @@
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
+import { useServiceContactCount } from '@o4o/shared-space-ui';
 /**
  * NetureGlobalHeader — Neture 서비스의 GlobalHeader 브릿지
  *
@@ -57,6 +58,7 @@ export function NetureGlobalHeader() {
   const notif = useNotifications(notificationsApi, {
     enabled: isAuthenticated && !!user,
     serviceKey: NOTIFICATION_SERVICE_KEY,
+    pollIntervalMs: 30000,
   });
 
   // WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
@@ -77,7 +79,14 @@ export function NetureGlobalHeader() {
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
   //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
   //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
-  const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
+  const publicNav = [...getServicePublicNav(CURRENT_HOST_PROFILE)];
+  // The protected summary is the authority, including platform bypass and live business assignments.
+  const newContacts = useServiceContactCount({client:api,serviceKey:CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE,accountId:user?.id,enabled:isAuthenticated && !isLoading});
+  const contactAllowed = newContacts !== null;
+  if (contactAllowed) {
+    publicNav.push({ label: newContacts ? `문의 관리 · 새 문의 ${newContacts}` : '문의 관리', href: `/operator/service-contact/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}` });
+  }
+
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
 
   // Main business entry redirects to pharmacy; other collaborators operate on their own host.

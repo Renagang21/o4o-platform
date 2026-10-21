@@ -174,20 +174,22 @@ export class SemiFranchiseContentService {
   // ─── 약국 ──────────────────────────────────────────────────────────────
 
   /** 가입한(active) 세미프랜차이즈의 게시 콘텐츠. sfKey 로 한 세미프랜차이즈만 볼 수 있다. */
-  async pharmacyList(organizationId: string, filter: { sfKey?: string; q?: string; page?: number; limit?: number } = {}) {
+  async pharmacyList(organizationId: string, filter: { sfKey?: string; q?: string; tag?: string; page?: number; limit?: number } = {}) {
     const limit = Math.min(Math.max(Number(filter.limit) || 30, 1), 100);
     const offset = (Math.max(Number(filter.page) || 1, 1) - 1) * limit;
     const sfKey = filter.sfKey?.trim() || null;
     const q = filter.q?.trim() ? `%${filter.q.trim()}%` : null;
+    const tag = filter.tag?.trim() || null;
     const where = `WHERE ${PHARMACY_SCOPE} AND ($2::text IS NULL OR sf.key = $2)
-                     AND ($3::text IS NULL OR c.title ILIKE $3 OR c.summary ILIKE $3)`;
+                     AND ($3::text IS NULL OR c.title ILIKE $3 OR c.summary ILIKE $3)
+                     AND ($4::text IS NULL OR c.tags @> jsonb_build_array($4::text))`;
     const items = await this.dataSource.query(
-      `${VIEW} ${where} ORDER BY c.published_at DESC NULLS LAST, c.id LIMIT $4 OFFSET $5`,
-      [organizationId, sfKey, q, limit, offset],
+      `${VIEW} ${where} ORDER BY c.published_at DESC NULLS LAST, c.id LIMIT $5 OFFSET $6`,
+      [organizationId, sfKey, q, tag, limit, offset],
     );
     const [{ count }] = await this.dataSource.query(
       `SELECT count(*)::int AS count FROM semi_franchise_contents c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id ${where}`,
-      [organizationId, sfKey, q],
+      [organizationId, sfKey, q, tag],
     );
     return { items, total: count };
   }

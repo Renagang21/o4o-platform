@@ -1,3 +1,4 @@
+import { contactService, requireContactScope } from './contact-service-scope.js';
 /**
  * Admin Service Contact Settings Controller
  *
@@ -7,7 +8,7 @@
  *   GET /:serviceKey/contact-settings — effective 설정 조회(없으면 기본값)
  *   PUT /:serviceKey/contact-settings — upsert(이메일 형식 검증)
  *
- * 권한: requireServiceLegalScope('admin') 재사용(serviceKey 별 `{prefix}:admin`).
+ * 권한: requireContactScope('admin') — 서비스별 관리자·membership 범위를 유지한다.
  *   + serviceKey 화이트리스트 = k-cosmetics / neture / kpa-society.
  *     (WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: Neture/KPA 는 기존 저장소를 유지하되
  *      ServiceContactSettings 기반 이메일 알림·자동 회신 설정만 공통 Admin 으로 추가.)
@@ -21,17 +22,16 @@ import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { ServiceContactSettings, type ContactInquiryTypeConfig } from './entities/ServiceContactSettings.entity.js';
 import { toEffective, DEFAULT_INQUIRY_TYPES } from './contact-settings.helper.js';
-import { requireServiceLegalScope } from '../service-legal/service-legal-scope.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
 
-const CONTACT_SETTINGS_SERVICE_KEYS = ['k-cosmetics', 'neture', 'kpa-society'] as const;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_RECIPIENTS = 20;
 
 function guardServiceKey(req: Request, res: Response): string | null {
   const serviceKey = req.params.serviceKey;
-  if (!(CONTACT_SETTINGS_SERVICE_KEYS as readonly string[]).includes(serviceKey)) {
+  if (!contactService(serviceKey)) {
     res.status(404).json({ success: false, error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' } });
     return null;
   }
@@ -144,7 +144,7 @@ function sanitizeInput(
 export function createAdminServiceContactSettingsController(dataSource: DataSource): Router {
   const router = Router();
   const repo = dataSource.getRepository(ServiceContactSettings);
-  const adminGuard = requireServiceLegalScope('admin');
+  const adminGuard = requireContactScope(dataSource, 'admin');
 
   // ── 조회 ──
   router.get('/:serviceKey/contact-settings', authenticate, adminGuard, async (req: Request, res: Response) => {

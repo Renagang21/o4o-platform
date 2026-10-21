@@ -7,8 +7,8 @@ afterEach(cleanup);
 describe('central community role picker', () => {
   it('offers both admin and operator after selecting community', async () => {
     const view = render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Add Operator' })).toBeTruthy());
-    fireEvent.click(screen.getByRole('button', { name: 'Add Operator' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: '서비스 담당자 지정' })).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: '서비스 담당자 지정' }));
     const service = view.container.querySelector('input[name="target-service"][value="community"]')!;
     fireEvent.click(service);
     expect(screen.getByRole('radio', { name: /community:admin/ })).toBeTruthy();

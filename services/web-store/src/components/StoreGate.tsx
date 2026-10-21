@@ -1,3 +1,4 @@
+import { PublicServiceEntry } from '@o4o/shared-space-ui';
 /**
  * StoreGate — Workspace 화면 공통 진입 판정(Unified Store Context 상태 → 화면).
  *   idle      → 로그인 안내
@@ -30,6 +31,7 @@ export function StoreGate({ children }: { children: ReactNode }) {
   if (authLoading) return <Card title="내 매장"><p>로그인 상태를 확인하는 중...</p></Card>;
   switch (status) {
     case 'idle':
+      if (location.pathname === "/") return <PublicServiceEntry serviceKey="store" loginHref="/login?returnTo=%2F" />;
       return <Card title="내 매장"><p>로그인이 필요합니다.</p><Link className="button-link" to={withReturnTo(WORKSPACE_PATHS.login, current)}>로그인</Link></Card>;
     case 'loading':
       return <Card title="내 매장"><p>접근 가능한 매장을 확인하는 중...</p></Card>;

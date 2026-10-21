@@ -47,10 +47,8 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin',
     '/admin/platform/hub',
     '/admin/platform',
-    '/admin/semi-franchises',
     '/admin/pharmacy-service-settings',
     // Core
-    '/users',
     '/operators',
     '/operator/points',
     '/settings',
@@ -231,7 +229,6 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
   // 무게이트로 두면 "설정 없음 = 허용" + App.tsx floor 의 서비스 접두 역할 수용 때문에
   // 서비스 운영자에게도 보이지만, 백엔드(requireAdmin / requirePlatformAdmin)는 403 이다.
   const PLATFORM_ONLY_MENUS = [
-    'core-users',
     'core-operators',
     'core-points',
     'platform-hub',

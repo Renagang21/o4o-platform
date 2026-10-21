@@ -55,7 +55,7 @@ export interface SemiFranchise {
   payment_receiver_key: string | null;
   community_key: string | null;
   activeMemberCount?: number;
-  operators?: Array<{ userId: string; assignedAt: string }>;
+  operators?: Array<{ userId: string; assignedAt: string; name?: string | null; email?: string | null }>;
   /** 운영자 관리 화면에서 지정한 사업 한정 역할 — 조회 전용(여기서 해제하지 않는다). */
   roleOperators?: Array<{
     userId: string;

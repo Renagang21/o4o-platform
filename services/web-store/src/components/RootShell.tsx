@@ -53,6 +53,7 @@ export default function RootShell() {
           </NavLink>
         ))}
         {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <><NavLink to="/operator/pharmacy-memberships">매장 신청 심사</NavLink><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/store" href="/operator/inbox"/></>}
+        <a href="https://neture.co.kr/contact?service=store">Contact Us</a>
       </nav>
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}

@@ -1,6 +1,7 @@
+import ContactPage from './pages/ContactPage';
 import OperatorInboxEntryPage from './pages/operator/OperatorInboxEntryPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
-import ScopedContactPage from './pages/ScopedContactPage';
+import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
@@ -757,7 +758,9 @@ function App() {
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
               <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
-              <Route path="/contact" element={<ScopedContactPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/operator/service-contact/:serviceKey/settings" element={<ServiceContactSettingsPage />} />
+              <Route path="/operator/service-contact/:serviceKey" element={<ServiceContactPage />} />
               <Route path="/operator/inbox/open/:kind/:scopeKey" element={<OperatorInboxEntryPage />} />
               <Route path="/operator/inbox/business/:businessKey" element={<OperatorInboxPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:

@@ -66,7 +66,6 @@ import {
   Database,
   Package,
   Settings,
-  Users,
   FileText,
   BarChart2,
   ClipboardList,
@@ -95,7 +94,7 @@ export interface MenuItem {
  *
  * ```text
  * 관리자 홈                  /admin
- * 계정 · 운영 권한 / 약국 협력사업 / 플랫폼 HUB
+ * 계정 · 운영 권한 / 약국 서비스 설정 / 플랫폼 HUB
  * 관리 설정                  권한 할당 · 서비스 운영자 · 포인트 운영 · 플랫폼 설정
  * O4O 상품 DB                 기존 7개 업무 유지(상세 재배치는 후속)
  * 콘텐츠·자료                 자료 안내 · 미디어 라이브러리
@@ -115,15 +114,13 @@ export const adminMenuStatic: MenuItem[] = [
 
   // ============================================
   // PLATFORM HUB — 유일한 진짜 플랫폼 전역 집계 화면
-  //   KPA(kpa_members / kpa_applications / forum_post) + Neture(neture_suppliers /
-  //   product_approvals) 를 한 화면에 모은다. 백엔드 guard = platform:super_admin.
+  //   현행 12개 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
   // ============================================
   { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
-  { id: 'semi-franchise-registry', label: '약국 협력사업', icon: <Layers className="w-5 h-5" />, path: '/admin/semi-franchises' },
   { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
   {
     id: 'platform-hub',
-    label: '플랫폼 HUB',
+    label: '서비스 상태',
     icon: <Layers className="w-5 h-5" />,
     path: '/admin/platform/hub',
   },
@@ -137,20 +134,10 @@ export const adminMenuStatic: MenuItem[] = [
     label: '관리 설정',
     icon: <Shield className="w-5 h-5" />,
     children: [
-      // WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1 / WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1
-      // 두 entry 는 동일 RBAC SSOT (`role_assignments`) 위의 다른 facet preset:
-      //   /users     — 전체 권한 할당 (assignment-row, 모든 role)
-      //   /operators — 운영 권한(admin/operator/super_admin) preset 적용 + Add/Revoke
-      // 둘 다 `/api/v1/admin/users` 를 소비하므로 같은 경계(platform:super_admin)를 쓴다.
-      {
-        id: 'core-users',
-        label: '권한 할당',
-        icon: <Users className="w-4 h-4" />,
-        path: '/users',
-      },
+      // 서비스 담당 권한은 한 화면에서 관리한다. 과거 /users 북마크도 /operators로 통합한다.
       {
         id: 'core-operators',
-        label: '서비스 운영자',
+        label: '서비스 관리자·운영자',
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },

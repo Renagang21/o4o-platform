@@ -118,7 +118,10 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   finally{await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[coop,local]);}
  });
  it('recipient absence is recorded and never loses a successfully received inquiry',async()=>{
-  const r=await request(app).post(`${base}/service/store/contact`).send(payload).expect(201);
+  await request(app).post(`${base}/service/store/contact`).send(payload).expect(308).expect('Location','/api/v1/public/services/store/contact-inquiries');
+  await db.query('UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
+  const r=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
+  await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
   const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none');
  });
  it('migration refuses a down that would expose scoped contacts',async()=>{

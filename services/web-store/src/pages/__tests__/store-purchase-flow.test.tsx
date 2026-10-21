@@ -16,7 +16,9 @@ vi.mock('../neture-pharmacy/PaymentGroupPay', () => ({
   usePaymentMode: () => 'test',
   PaymentGroupPay: ({ paymentGroupId }: { paymentGroupId: string }) => <button>결제 {paymentGroupId}</button>,
 }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ effectiveServiceKey: 'kpa-society',organizationId:'fixture-store' }) }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({user:{id:'fixture'}}) }));
+vi.mock('../../lib/storeOrganizationHeader', () => ({getActiveStoreOrganizationId:()=> 'fixture-store'}));
 
 function deferred<T>() {
   let resolve!: (value: T) => void;

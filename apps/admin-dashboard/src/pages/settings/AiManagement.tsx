@@ -1,3 +1,4 @@
+import { AiModelCatalog, ModelControlStatus, UsageModelSelection, useAiModelControls } from './AiModelControls';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -14,12 +15,7 @@ const coverage = {
   unconnected: "미연결",
 };
 const stops = { query: "공통 질의 설정", scope: "공유 정책", none: "미연결" };
-const credential = {
-  present: "연결 정보 있음",
-  missing: "연결 정보 없음",
-  unknown: "조회 확인 불가",
-  unsupported: "실제 연결 미확인",
-};
+
 const configuration = {
   stored: "저장 설정",
   missing: "정책 미등록",
@@ -36,6 +32,7 @@ function timestamp(value: string) {
 }
 
 export default function AiManagement() {
+  const modelControl = useAiModelControls();
   const [data, setData] = useState<AiManagementSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -85,7 +82,7 @@ export default function AiManagement() {
   const filtered = data.usages.filter(
     (item) =>
       (!group || item.group === group) &&
-      `${item.name} ${groupName(item.group)} ${item.capability} ${item.configuration.model ?? ""}`
+      `${item.name} ${groupName(item.group)} ${item.capability} ${item.configuration.model ?? ""} ${modelControl.data?.selections[modelControl.data.usageTargets[item.id]]?.model ?? ""}`
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
   );
@@ -102,7 +99,8 @@ export default function AiManagement() {
         </div>
         <button
           className={button}
-          onClick={() => setRetry((value) => value + 1)}
+          disabled={modelControl.busy}
+          onClick={() => { setRetry((value) => value + 1); void modelControl.refresh(); }}
         >
           새로 불러오기
         </button>
@@ -113,10 +111,10 @@ export default function AiManagement() {
       <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm space-y-1">
         <p>{data.notice}</p>
         <p>
-          현재는 조회 기능입니다. 사용처별 모델 변경·중지와 실행 적용 확인은
-          아직 연결되지 않았습니다.
+          모델 목록과 사용 모델을 관리합니다. 사용 중지 설정과 실제 공급자 인증·실행 결과 확인은 별도입니다.
         </p>
       </div>
+      <ModelControlStatus control={modelControl} />
       <div
         role="tablist"
         aria-label="AI 운영 관리 화면"
@@ -136,6 +134,7 @@ export default function AiManagement() {
             aria-controls={`ai-panel-${id}`}
             aria-selected={tab === id}
             className={`${button} ${tab === id ? "bg-blue-50 font-semibold text-blue-800" : ""}`}
+            disabled={modelControl.busy}
             onClick={() => setTab(id)}
           >
             {label}
@@ -193,7 +192,7 @@ export default function AiManagement() {
             </p>
           )}
           <div className="overflow-x-auto rounded border border-gray-200 bg-white">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <caption className="sr-only">
                 AI 사용처와 현재 설정·중지·집계 연결
               </caption>
@@ -232,11 +231,11 @@ export default function AiManagement() {
                       </p>
                     </td>
                     <td className="p-3 break-all">
-                      {item.configuration.model ??
+                      {modelControl.data?.selections[modelControl.data.usageTargets[item.id]]?.model ?? item.configuration.model ??
                         configuration[item.configuration.state]}
                       <p className="mt-1 text-xs text-gray-600">
-                        {item.configuration.provider ?? "기능별 결정"} ·{" "}
-                        {configuration[item.configuration.state]}
+                        {modelControl.data?.selections[modelControl.data.usageTargets[item.id]]?.provider ?? item.configuration.provider ?? "기능별 결정"} ·{" "}
+                        {modelControl.data?.selections[modelControl.data.usageTargets[item.id]] ? '관리자 지정' : configuration[item.configuration.state]}
                       </p>
                     </td>
                     <td className="p-3">
@@ -258,7 +257,7 @@ export default function AiManagement() {
             )}
           </div>
           <div id="ai-usage-detail">
-            {detail && <UsageDetail usage={detail} />}
+            {detail && <><UsageDetail usage={detail} /><UsageModelSelection usageId={detail.id} control={modelControl} /></>}
           </div>
           <div className="rounded border p-4 text-sm space-y-2">
             <h3 className="font-semibold">기존 공통 질의 설정</h3>
@@ -293,46 +292,7 @@ export default function AiManagement() {
           aria-labelledby="ai-tab-providers"
           className="space-y-4"
         >
-          <p className="text-sm text-gray-600">
-            연결 정보 유무만 확인합니다. 인증 성공·실제 호출·모델 제공 여부를
-            검증한 상태는 아닙니다. 키는 비공개 서버 연결에서 관리합니다.
-          </p>
-          {data.providers.map((provider) => (
-            <article
-              key={provider.id}
-              className="rounded border bg-white p-4 space-y-2"
-            >
-              <h3 className="font-semibold">{provider.name}</h3>
-              <p>{credential[provider.credential]}</p>
-              <p className="text-sm text-gray-600">{provider.support}</p>
-              {provider.databaseRead === "unavailable" && (
-                <p className="text-sm text-amber-800">
-                  DB 연결 정보 조회 실패. 서버 환경 연결 유무만 반영할 수
-                  있습니다.
-                </p>
-              )}
-              <details className="text-sm">
-                <summary className="cursor-pointer">
-                  코드에 등록된 모델 ({provider.models.length})
-                </summary>
-                <p className="my-2 text-gray-600">
-                  실시간 공급자 목록이 아닙니다. 사용처별 지원 범위와 제공 여부
-                  확인이 필요합니다.
-                </p>
-                {provider.models.length ? (
-                  <ul className="space-y-1">
-                    {provider.models.map((model) => (
-                      <li key={model} className="break-all">
-                        {model}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>이 목록에서 확인할 수 있는 모델이 없습니다.</p>
-                )}
-              </details>
-            </article>
-          ))}
+          <AiModelCatalog providers={data.providers} control={modelControl} />
         </section>
       )}
       {tab === "statistics" && <RecordedUsage />}
@@ -448,7 +408,7 @@ function RecordedUsage() {
             </p>
           )}
           <div className="overflow-x-auto rounded border bg-white">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <caption className="sr-only">
                 공급자·모델·기록 정책별 사용량
               </caption>

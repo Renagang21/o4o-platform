@@ -88,3 +88,12 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 문서 정합: TODO 초안·코드/문서 재대조·추가 발견·검증 결과를 기록하고 SETUP에 격리 fixture 재현 절차를 추가했다. 과거 기록·canonical index/역할 정책은 변경하지 않았다.
 
 - push 직전 main은 `5c6150a6b0`(#747)로 이동했다. 겹치는 경로는 operatorMenuGroups.ts 1개이며 `git merge-tree --write-tree` 가상 병합은 충돌 0이었다. 실제 main 병합/branch 동기화는 하지 않았으며 통합 후 CI는 별도로 실행해야 한다.
+
+
+## main 통합 진행 — 2026-10-21
+
+- 사용자 `메인 통합 배포` 지시로 이 공간에서 PR·병합·운영 migration 포함 배포를 이어간다.
+- 최신 main `dcd84fa4e2`의 #750 공통 Contact Us·답변·발송 claim·설정, #752 관리자 정비, #754 AI 관리, #756 매장 협업 흐름을 보존하며 기존 push branch에 병합했다.
+- 공통 서비스 접수는 기존 canonical public controller로 POST/body를 보존하는 308 연결을 사용한다. 기존 답변·재발송·설정·서비스 문의 메뉴를 대체하지 않는다. 조직 귀속 문의만 새 범위 전용 접수·처리 경로를 사용한다.
+- 조직 문의를 서비스 공통 관리 경로에서 조회·집계·상태/메모 변경·답변·재발송하지 못하도록 `organization_id IS NULL` 경계를 추가했다. 실제 PostgreSQL 기존 문의 흐름 33개(신규 조직 경계 회귀 포함), 운영 업무함 15개·전체 migration prefix/down/up, Neture 경로/메뉴 75개, Study 42개, 답변 단위 4개 PASS.
+- 운영 실계정 정본 누락 제한은 유지한다. 운영 계정/역할/테스트 문의를 새로 만들지 않는다. PR·CI·배포 결과는 후속 기록한다.

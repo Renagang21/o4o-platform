@@ -78,6 +78,12 @@ export function createOperatorInboxRoutes(ds: DataSource) {
     "/:kind/:key/contact",
     apiLimiter,
     run(async (req, res) => {
+      // Service receipt/settings/delivery stay on the already-deployed canonical controller.
+      // 308 preserves POST + body; organization-owned spaces retain their separate scope below.
+      if (req.inboxScope.kind === "service") {
+        res.redirect(308, `/api/v1/public/services/${req.inboxScope.serviceKey}/contact-inquiries`);
+        return;
+      }
       const body = req.body ?? {};
       if (
         typeof body.company_website === "string" &&
