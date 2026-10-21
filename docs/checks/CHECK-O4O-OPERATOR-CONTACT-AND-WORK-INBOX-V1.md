@@ -104,3 +104,6 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 
 - PR #758 Codex P1: CarePharm `/contact`가 service-wide 접수로 남아 사업별 신규 문의함과 연결되지 않았다. 공개 route를 ScopedContactPage에 연결하고 CarePharm만 business 범위로 접수한다. 다른 Neture 호스트는 기존 ContactPage의 설정·답변·발송 흐름을 유지한다. 기존 서비스 문의 원장/메뉴를 삭제하거나 조직을 추정해 이관하지 않는다. 신규 component 회귀 5개를 추가한다.
 - 통합 후 Neture 전체 140 files / 1,244 tests PASS. lint ratchet 46 / 기준 46 PASS.
+
+- Codex 재검토 P2 2건: service 범위 ScopedContactForm은 설정을 조회하는 PublicServiceContact에 위임하여 Pharmcoop/Store의 비활성 유형·개인정보/완료 안내를 반영한다. business/cooperative 범위는 조직 전용 endpoint와 권한 경계를 유지하며 응답의 접수번호를 표시한다. 설정·접수번호 집중 회귀 10개 PASS.
+- CarePharm 수정 후 실제 production bundle의 공개 `/contact`를 1440/390에서 합성 응답으로 검증: 정확한 business endpoint POST 각각 1회·동의 true·pageerror 0·문서 가로 넘침 0 PASS. 운영 문의 데이터 생성 0, 자기 preview 종료.
