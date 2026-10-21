@@ -85,7 +85,9 @@ export default function PlatformHubPage() {
           {error}
         </p>
       )}
-      {loading && <p role="status">기본 접속 상태를 확인하고 있습니다.</p>}
+      {loading && (
+        <output className="block">기본 접속 상태를 확인하고 있습니다.</output>
+      )}
       {stale && (
         <p
           role="alert"
@@ -124,11 +126,11 @@ export default function PlatformHubPage() {
             </h2>
             <div className="grid gap-4 lg:grid-cols-2">
               {data.services.map((service) => {
-                const state = service.checks.some((x) => x.state === "failed")
-                  ? "failed"
-                  : service.checks.some((x) => x.state === "unknown")
-                    ? "unknown"
-                    : "passed";
+                let state: keyof typeof stateLabel = "passed";
+                if (service.checks.some((x) => x.state === "unknown"))
+                  state = "unknown";
+                if (service.checks.some((x) => x.state === "failed"))
+                  state = "failed";
                 return (
                   <article
                     key={service.id}
@@ -151,8 +153,8 @@ export default function PlatformHubPage() {
                       {new URL(service.url).hostname}
                     </a>
                     <ul className="space-y-2 text-sm">
-                      {service.checks.map((check, i) => (
-                        <li key={i}>
+                      {service.checks.map((check) => (
+                        <li key={check.name}>
                           <span className={stateColor[check.state]}>
                             {check.name}: {stateLabel[check.state]}
                           </span>

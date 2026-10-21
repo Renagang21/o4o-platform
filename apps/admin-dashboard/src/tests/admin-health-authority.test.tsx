@@ -97,7 +97,7 @@ it("marks expired results and handles malformed snapshots as errors", async () =
   render(<Health />);
   await screen.findByText(/오래된 점검 결과/);
   fireEvent.click(screen.getByRole("button", { name: "상태 새로고침" }));
-  await screen.findByText(/서비스 상태를 조회하지 못했습니다/);
+  expect(await screen.findByText(/서비스 상태를 조회하지 못했습니다/)).toBeInTheDocument();
 });
 it("shows only platform administrators and their platform role, filtering a stale mixed response too", async () => {
   get.mockResolvedValue(reply([platform, service]) as any);

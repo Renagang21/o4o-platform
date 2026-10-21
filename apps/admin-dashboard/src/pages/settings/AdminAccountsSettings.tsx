@@ -90,7 +90,8 @@ export default function AdminAccountsSettings() {
     setNotice("");
     try {
       const response = await task();
-      if (response.data?.success !== true) throw { response };
+      if (response.data?.success !== true)
+        throw Object.assign(new Error("Request failed"), { response });
       if (alive.current) {
         setNotice(success);
         setSelected("");
@@ -195,6 +196,7 @@ export default function AdminAccountsSettings() {
             disabled={busy}
           />
           <button
+            type="submit"
             className={button}
             disabled={
               busy ||
@@ -214,7 +216,7 @@ export default function AdminAccountsSettings() {
         )}
         {!!candidates.length && (
           <label className="block text-sm">
-            지정할 사용자
+            <span className="block">지정할 사용자</span>
             <select
               aria-label="지정할 사용자"
               className={field + " mt-2"}
@@ -272,7 +274,9 @@ export default function AdminAccountsSettings() {
           다릅니다. 본인·마지막 활성 전체 관리자 보호는 서버에서 확인합니다.
         </p>
         {loading ? (
-          <p role="status">전체 관리자 목록을 불러오는 중입니다.</p>
+          <output className="block">
+            전체 관리자 목록을 불러오는 중입니다.
+          </output>
         ) : (
           !error && (
             <div className="overflow-x-auto rounded border bg-white">

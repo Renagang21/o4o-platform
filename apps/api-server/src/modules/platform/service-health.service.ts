@@ -21,11 +21,12 @@ export const SERVICE_HEALTH_TARGETS = [
   ...Object.entries(PHARMACY_COLLABORATORS).map(([id, value]) => ({
     id,
     name:
-      id === "pharmcoop"
-        ? "약국·약사 협동조합 연합회"
-        : id === "pharmacy"
-          ? "O4O 약국 경영지원"
-          : value.label,
+      (
+        {
+          pharmcoop: "약국·약사 협동조합 연합회",
+          pharmacy: "O4O 약국 경영지원",
+        } as Record<string, string>
+      )[id] ?? value.label,
     url: `https://${value.domain}/`,
   })),
   ...(
@@ -86,6 +87,72 @@ async function readHtml(response: Response): Promise<string> {
     await reader.cancel().catch(() => {});
   }
 }
+function assetState(status: number, valid: boolean): CheckState {
+  if (valid) return "passed";
+  if (status >= 300 && status < 400) return "unknown";
+  return "failed";
+}
+function httpState(status: number): CheckState {
+  if (status >= 200 && status < 300) return "passed";
+  if (status >= 500 || status === 404) return "failed";
+  return "unknown";
+}
+function isAppAsset(url: URL, target: (typeof SERVICE_HEALTH_TARGETS)[number]) {
+  return (
+    url.origin === new URL(target.url).origin &&
+    !url.username &&
+    !url.password &&
+    (url.pathname.startsWith("/assets/") ||
+      (target.id === "kpa-branch" && url.pathname.startsWith("/kpa/assets/")))
+  );
+}
+async function checkAppFile(
+  response: Response,
+  target: (typeof SERVICE_HEALTH_TARGETS)[number],
+  request: (url: string) => Promise<Response>,
+): Promise<HealthCheck> {
+  const html = await readHtml(response);
+  const tags = html.match(/<script\b[^>]*>/gi) ?? [];
+  const asset = tags
+    .map((tag) => /\bsrc\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1])
+    .filter(
+      (value): value is string => !!value && /\.m?js(?:\?|$)/i.test(value),
+    )
+    .map((value) => new URL(value, target.url))
+    .find((url) => isAppAsset(url, target));
+  // No redirects, cross-origin assets, arbitrary URL query input, cookies or authorization forwarding.
+  if (!asset || !isAppAsset(asset, target))
+    return {
+      name: "화면·필수 파일",
+      state: "unknown",
+      detail: "점검 가능한 동일 주소의 앱 파일이 없습니다.",
+    };
+  else {
+    const js = await request(asset.href);
+    const reader = js.body?.getReader();
+    let prefix = "";
+    try {
+      if (reader) {
+        const chunk = await reader.read();
+        if (chunk.value) prefix = new TextDecoder().decode(chunk.value);
+      }
+    } finally {
+      await reader?.cancel().catch(() => {});
+    }
+    const valid =
+      js.ok &&
+      /(?:javascript|ecmascript)/i.test(js.headers.get("content-type") ?? "") &&
+      !!prefix.trim() &&
+      !/^\s*(?:<!doctype|<html)/i.test(prefix);
+    return {
+      name: "화면·필수 파일",
+      state: assetState(js.status, valid),
+      detail: valid
+        ? "HTML 및 앱 JavaScript 응답 확인"
+        : `앱 파일 응답 확인 실패 (HTTP ${js.status})`,
+    };
+  }
+}
 export async function checkWebTarget(
   target: (typeof SERVICE_HEALTH_TARGETS)[number],
   fetcher: typeof fetch = fetch,
@@ -93,12 +160,6 @@ export async function checkWebTarget(
   const checks: HealthCheck[] = [];
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT);
-  const isAppAsset = (url: URL) =>
-    url.origin === new URL(target.url).origin &&
-    !url.username &&
-    !url.password &&
-    (url.pathname.startsWith("/assets/") ||
-      (target.id === "kpa-branch" && url.pathname.startsWith("/kpa/assets/")));
   const request = (url: string) =>
     fetcher(url, {
       method: "GET",
@@ -110,11 +171,7 @@ export async function checkWebTarget(
     const response = await request(target.url);
     checks.push({
       name: "HTTPS 응답",
-      state: response.ok
-        ? "passed"
-        : response.status >= 500 || response.status === 404
-          ? "failed"
-          : "unknown",
+      state: httpState(response.status),
       detail: `HTTP ${response.status}`,
     });
     if (!response.ok) {
@@ -132,53 +189,7 @@ export async function checkWebTarget(
         detail: "HTML 화면 응답이 아닙니다.",
       });
     } else {
-      const html = await readHtml(response);
-      const tags = html.match(/<script\b[^>]*>/gi) ?? [];
-      const asset = tags
-        .map((tag) => /\bsrc\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1])
-        .filter(
-          (value): value is string => !!value && /\.m?js(?:\?|$)/i.test(value),
-        )
-        .map((value) => new URL(value, target.url))
-        .find(isAppAsset);
-      // No redirects, cross-origin assets, arbitrary URL query input, cookies or authorization forwarding.
-      if (!asset || !isAppAsset(asset))
-        checks.push({
-          name: "화면·필수 파일",
-          state: "unknown",
-          detail: "점검 가능한 동일 주소의 앱 파일이 없습니다.",
-        });
-      else {
-        const js = await request(asset.href);
-        const reader = js.body?.getReader();
-        let prefix = "";
-        try {
-          if (reader) {
-            const chunk = await reader.read();
-            if (chunk.value) prefix = new TextDecoder().decode(chunk.value);
-          }
-        } finally {
-          await reader?.cancel().catch(() => {});
-        }
-        const valid =
-          js.ok &&
-          /(?:javascript|ecmascript)/i.test(
-            js.headers.get("content-type") ?? "",
-          ) &&
-          !!prefix.trim() &&
-          !/^\s*(?:<!doctype|<html)/i.test(prefix);
-        checks.push({
-          name: "화면·필수 파일",
-          state: valid
-            ? "passed"
-            : js.status >= 300 && js.status < 400
-              ? "unknown"
-              : "failed",
-          detail: valid
-            ? "HTML 및 앱 JavaScript 응답 확인"
-            : `앱 파일 응답 확인 실패 (HTTP ${js.status})`,
-        });
-      }
+      checks.push(await checkAppFile(response, target, request));
     }
   } catch {
     checks.push({
@@ -198,9 +209,9 @@ export class ServiceHealthService {
   };
   private pending?: ReturnType<ServiceHealthService["collect"]>;
   constructor(
-    private db: Pick<DataSource, "query" | "isInitialized">,
-    private fetcher: typeof fetch = fetch,
-    private startup: () => string = getStartupState,
+    private readonly db: Pick<DataSource, "query" | "isInitialized">,
+    private readonly fetcher: typeof fetch = fetch,
+    private readonly startup: () => string = getStartupState,
   ) {}
   async snapshot() {
     if (this.cached && Date.now() - this.cached.at < TTL)

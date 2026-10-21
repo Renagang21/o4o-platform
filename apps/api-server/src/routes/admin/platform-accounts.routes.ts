@@ -63,18 +63,16 @@ router.get('/', requireRole(ADMIN_ACCESS_ROLES), async (_req: Request, res: Resp
     }
     const repo = AppDataSource.getRepository(User);
     const users = await repo.find({ where: { id: In(Array.from(idSet)) } });
-    const accounts = await Promise.all(
-      users.map(async (u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email,
-        roles: [SUPER_ADMIN_ROLE],
-        isActive: u.isActive,
-        status: u.status,
-        createdAt: u.createdAt,
-        lastLoginAt: u.lastLoginAt ?? null,
-      })),
-    );
+    const accounts = users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email,
+      roles: [SUPER_ADMIN_ROLE],
+      isActive: u.isActive,
+      status: u.status,
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt ?? null,
+    }));
     // super_admin 우선, 그다음 이름순
     accounts.sort((a, b) => {
       const aSa = a.roles.includes(SUPER_ADMIN_ROLE) ? 0 : 1;
