@@ -18,7 +18,13 @@ export function MemberForum({
   client,
   businessKey,
   canManage,
-}: Readonly<{ client: Client; businessKey: string; canManage: boolean }>) {
+  boardsOnly = false,
+}: Readonly<{
+  client: Client;
+  businessKey: string;
+  canManage: boolean;
+  boardsOnly?: boolean;
+}>) {
   const [communityKey, setCommunityKey] = useState<string | null>(null);
   const [error, setError] = useState(""),
     [version, setVersion] = useState(0);
@@ -49,6 +55,7 @@ export function MemberForum({
       client={client}
       communityKey={communityKey}
       canManage={canManage}
+      boardsOnly={boardsOnly}
     />
   ) : (
     <LoadFeedback
@@ -62,7 +69,13 @@ function ForumWorkspace({
   client,
   communityKey,
   canManage,
-}: Readonly<{ client: Client; communityKey: string; canManage: boolean }>) {
+  boardsOnly,
+}: Readonly<{
+  client: Client;
+  communityKey: string;
+  canManage: boolean;
+  boardsOnly: boolean;
+}>) {
   const root = `/communities/${encodeURIComponent(communityKey)}`;
   const base = `${root}/forum`;
   const [params, setParams] = useSearchParams();
@@ -76,6 +89,7 @@ function ForumWorkspace({
   const [totalPages, setTotalPages] = useState(1);
   const boards = useRows<Board>(client, `${base}/categories`);
   useEffect(() => {
+    if (boardsOnly) return;
     let live = true;
     setPosts(null);
     setDetail(null);
@@ -104,8 +118,23 @@ function ForumWorkspace({
     return () => {
       live = false;
     };
-  }, [client, base, page, postId, version]);
+  }, [client, base, page, postId, version, boardsOnly]);
   const reload = () => setVersion((v) => v + 1);
+  if (boardsOnly)
+    return canManage ? (
+      <div className="coop-management">
+        <h2>조합원 이야기 게시판 관리</h2>
+        <LoadFeedback
+          error={boards.error}
+          loading={boards.rows === null}
+          retry={boards.refresh}
+        />
+        <ul>{boards.rows?.map((b) => <li key={b.id}>{b.name}</li>)}</ul>
+        <BoardForm client={client} root={root} onSaved={boards.refresh} />
+      </div>
+    ) : (
+      <p>이 조합의 운영 권한이 필요합니다.</p>
+    );
   return (
     <div className="coop-management">
       <LoadFeedback error={error} loading={!posts && !detail} retry={reload} />
@@ -172,9 +201,6 @@ function ForumWorkspace({
               onSaved={reload}
             />
           )}
-          {canManage && (
-            <BoardForm client={client} root={root} onSaved={boards.refresh} />
-          )}
         </>
       )}
     </div>
@@ -235,7 +261,7 @@ function ForumPostForm({
         }
       }}
     >
-      <h3>회원 글쓰기</h3>
+      <h3>조합원 글쓰기</h3>
       <label>
         <span>게시판</span>
         <select

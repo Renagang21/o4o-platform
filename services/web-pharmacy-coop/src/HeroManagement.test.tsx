@@ -109,11 +109,7 @@ it.each([local, federation, anonymousSession])(
   async (session) => {
     const { client } = open("/beta/operator/home-presentation", session);
     expect(screen.getByText("이 조합의 운영 권한이 필요합니다.")).toBeTruthy();
-    await waitFor(() =>
-      expect(client.get).toHaveBeenCalledWith(
-        "/home-presentation/cooperative/beta",
-      ),
-    );
+    expect(client.get).not.toHaveBeenCalled();
     expect(client.get.mock.calls.some(([p]) => p.endsWith("/manage"))).toBe(
       false,
     );
@@ -144,7 +140,7 @@ it.each([
   (path, session, target) => {
     open(path, session);
     expect(
-      screen.getByRole("link", { name: "Hero 관리" }).getAttribute("href"),
+      screen.getByRole("link", { name: "홈 화면 편집" }).getAttribute("href"),
     ).toBe(target);
   },
 );

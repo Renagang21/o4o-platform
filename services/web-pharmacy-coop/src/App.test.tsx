@@ -28,7 +28,9 @@ describe("federation and cooperative route boundaries", () => {
   });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
-    expect(screen.getByRole("link", { name: "회원가입" }).getAttribute("href")).toBe("https://neture.co.kr/signup");
+    expect(
+      screen.getByRole("link", { name: "회원가입" }).getAttribute("href"),
+    ).toBe("https://neture.co.kr/signup");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
       "조합의 힘",
     );
@@ -46,7 +48,10 @@ describe("federation and cooperative route boundaries", () => {
     );
     const nav = screen.getByRole("navigation", { name: "협동조합 메뉴" });
     const links = [...nav.querySelectorAll("a")];
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(5);
+    expect(nav.textContent).toContain("조합 소식·자료");
+    expect(nav.textContent).toContain("조합원 이야기");
+    expect(nav.textContent).not.toContain("조합 운영");
     expect(
       links.every((link) =>
         link.getAttribute("href")?.startsWith("/sample-coop-a"),

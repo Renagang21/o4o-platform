@@ -1,6 +1,6 @@
 import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
-import { ServiceOperatorManagement } from '@o4o/operator-core-ui';
+import { ServiceOperatorManagement } from "@o4o/operator-core-ui";
 import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import type { Cooperative } from "./domain";
 type Client = PharmacyManagementClient;
@@ -279,10 +279,12 @@ export function FederationManagementPanel({
   client,
   admin,
   userId,
+  showOperators = true,
 }: Readonly<{
   client: Client;
   admin: boolean;
   userId: string;
+  showOperators?: boolean;
 }>) {
   const work = useWork(client, `${base}/federation`);
   const [selected, setSelected] = useState<Affiliation | null>(null),
@@ -293,7 +295,14 @@ export function FederationManagementPanel({
   return (
     <section className="section coop-management">
       <h1>연합회 산하 조합관리</h1>
-      {admin && <ServiceOperatorManagement key={userId} client={client} scope="pharmcoop" title="연합회 Operator 지정 · 해제" />}
+      {admin && showOperators && (
+        <ServiceOperatorManagement
+          key={userId}
+          client={client}
+          scope="pharmcoop"
+          title="연합회 Operator 지정 · 해제"
+        />
+      )}
       <p>
         {admin
           ? "조합 승인·상태 관리와 조합 admin 지정을 담당합니다."
@@ -380,8 +389,10 @@ export function MemberManagementPanel({
   admin,
   userId,
   onChanged,
+  showSettings = true,
 }: Readonly<{
   onChanged?: () => void;
+  showSettings?: boolean;
   client: Client;
   cooperative: Cooperative;
   admin: boolean;
@@ -395,7 +406,7 @@ export function MemberManagementPanel({
       {work.data && (
         <StatusSummary rows={work.data as Member[]} noun="조합원" />
       )}
-      {admin && (
+      {admin && showSettings && (
         <EligibilitySettings
           key={cooperative.id}
           client={client}
@@ -460,7 +471,7 @@ export function MemberManagementPanel({
         federation={false}
         version={work.version}
       />
-      {admin && (
+      {admin && showSettings && (
         <RoleManagement
           client={client}
           coop={cooperative.id}
@@ -695,6 +706,36 @@ export function MyAffiliations({ client }: Readonly<{ client: Client }>) {
           )}
         </article>
       ))}
+    </section>
+  );
+}
+
+export function CooperativeSettings({
+  client,
+  cooperative,
+  userId,
+  onChanged,
+}: Readonly<{
+  client: Client;
+  cooperative: Cooperative;
+  userId: string;
+  onChanged?: () => void;
+}>) {
+  return (
+    <section className="coop-management">
+      <h2>가입 자격·운영자 설정</h2>
+      <EligibilitySettings
+        key={cooperative.id}
+        client={client}
+        cooperative={cooperative}
+        onChanged={onChanged}
+      />
+      <RoleManagement
+        client={client}
+        coop={cooperative.id}
+        federation={false}
+        userId={userId}
+      />
     </section>
   );
 }

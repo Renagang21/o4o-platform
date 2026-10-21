@@ -12,11 +12,13 @@ export default function CooperativeBusinessOperator({
   slug,
   client,
   editor = false,
+  task = "contents",
 }: Readonly<{
   businessKey: string;
   slug: string;
   client: PharmacyManagementClient;
   editor?: boolean;
+  task?: "contents" | "proposals";
 }>) {
   const [configured, setConfigured] = useState<PharmacyManagementClient | null>(
     null,
@@ -36,7 +38,7 @@ export default function CooperativeBusinessOperator({
     <OperatorSemiFranchisePage
       businessKey={businessKey}
       forumHref={() => `/${encodeURIComponent(slug)}/community`}
-      tabs={["proposals", "contents"]}
+      tabs={[task]}
       contentEditHref={(_key, id) =>
         id
           ? `${base}/contents/${encodeURIComponent(id)}/edit`

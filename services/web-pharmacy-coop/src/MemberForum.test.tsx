@@ -35,10 +35,16 @@ const open = (
   api: ReturnType<typeof client>,
   manage = false,
   path = "/one/community",
+  boardsOnly = false,
 ) =>
   render(
     <MemoryRouter initialEntries={[path]}>
-      <MemberForum client={api} businessKey="coop-one" canManage={manage} />
+      <MemberForum
+        client={api}
+        businessKey="coop-one"
+        canManage={manage}
+        boardsOnly={boardsOnly}
+      />
     </MemoryRouter>,
   );
 describe("cooperative business forum", () => {
@@ -62,7 +68,7 @@ describe("cooperative business forum", () => {
       response: { data: { error: "참여 자격이 변경됐습니다." } },
     });
     open(api);
-    await screen.findByText("회원 글쓰기");
+    await screen.findByText("조합원 글쓰기");
     fireEvent.change(screen.getByLabelText("게시판"), {
       target: { value: "board" },
     });
@@ -105,7 +111,7 @@ describe("cooperative business forum", () => {
       return { data: { success: true } };
     });
     const view = open(api);
-    await screen.findByText("회원 글쓰기");
+    await screen.findByText("조합원 글쓰기");
     fireEvent.change(screen.getByLabelText("게시판"), {
       target: { value: "board" },
     });
@@ -124,8 +130,12 @@ describe("cooperative business forum", () => {
   });
   it("allows scoped operators to request a board using the existing endpoint", async () => {
     const api = client();
-    open(api, true);
+    open(api, true, "/one/operator?work=boards", true);
     await screen.findByText("조합 게시판 개설");
+    expect(screen.queryByText("조합원 글쓰기")).toBeNull();
+    expect(api.get.mock.calls.some(([path]) => path.includes("/posts"))).toBe(
+      false,
+    );
     fireEvent.change(screen.getByLabelText("게시판 이름"), {
       target: { value: "조합 공지" },
     });
@@ -140,7 +150,7 @@ describe("cooperative business forum", () => {
     api.get.mockRejectedValue(new Error("forbidden"));
     open(api);
     await screen.findByRole("alert");
-    expect(screen.queryByText("회원 글쓰기")).toBeNull();
+    expect(screen.queryByText("조합원 글쓰기")).toBeNull();
     expect(api.get).toHaveBeenCalledTimes(1);
   });
   it("supports direct post links and sanitizes unsafe stored markup", async () => {
