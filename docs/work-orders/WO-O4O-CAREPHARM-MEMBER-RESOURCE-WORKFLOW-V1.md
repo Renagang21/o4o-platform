@@ -88,3 +88,12 @@ CarePharm은 독립 협업체다. 다른 사업의 가입·승인·운영자 권
 `WORKTREE_DISPOSITION`: `/workspace/o4o-wt/carepharm-member-resource-workflow`, branch 위와 같음, 개발/로컬 검증 완료, 타 에이전트 위임 없음, main 통합·배포 미실행, **KEEP**(push 후 통합 인계·후속 수정 필요). 정확한 HEAD·원격 일치·미커밋/미추적 0은 최종 인계에서 확인한다.
 
 문서 정합: 기존 독립화 WO의 공통 세션 해석·pharmacy 전용 약관 서술과 현재 사용자 독립 원칙의 대조 필요를 잔여로 기록했다. 과거 기록 재작성·정본 색인 변경·SUPERSEDED 표기 없음.
+
+## 2026-10-21 main 통합·배포 단계
+
+- 사용자 **“main으로 병합 → 배포”** 지시에 따라 이 공간이 통합을 진행한다. 위의 PR 미생성·미병합·미배포·KEEP는 개발 인계 시점의 기록이다.
+- 최신 main `5c6150a6b0`을 기존 branch의 merge commit `23175823f0`으로 반영했다. 충돌 없음. main에서 추가된 것은 다른 작업의 완료 문서 2개이며 개발 검증 이후 runtime 소스는 동일하다.
+- 통합 후 focused 재검증: Neture 회원자료·게시판·community **11 파일 / 96 PASS**, Store CarePharm·자료·사업 전환 **3 파일 / 55 PASS**, 운영자 pharmacy-management **7 파일 / 54 PASS**, API `tsc --noEmit` 성공. 개발 단계 전체 테스트·실제 PostgreSQL·build·화면 결과는 위의 실제 실행 기록을 따른다.
+- 실제 main ruleset의 PR 필수·required `CI Gate`·필수 human approval 0을 확인했다. 기존 PR이 없으므로 하나의 PR을 생성하고 해당 HEAD의 CI·Sonar·CodeQL·Codex 리뷰와 미해결 사항을 확인한 뒤 병합한다. bypass·직접 main push는 사용하지 않는다.
+- 배포는 현재 Delivery/Promote의 판정·API 선행·verified rollout·serving SHA 검증을 따른다. 새 migration은 없으며 운영 사업 등록·약관 게시·회원 승인·권한 부여·업무 데이터 write는 하지 않는다.
+- 최종 PR·HEAD·병합 SHA·CI/배포 run·운영 확인과 정리 결과는 해당 PR의 최종 인계와 사용자 보고에 남긴다. 아직 확인하지 않은 단계를 성공으로 기록하지 않는다.
