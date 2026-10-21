@@ -4,25 +4,28 @@
  * 매장 HUB 단계(취급 신청 → 승인 → 주문 가능) 없이 내 매장에서 바로 주문한다.
  *   GET  /api/v1/neture/pharmacy/store/supply-options?source=all|default|proposal|event|recruitment|sf:<key>&q=&page=
  *   POST /api/v1/neture/pharmacy/cart/items {kind, id, quantity}
- * 목록은 서버가 이 약국이 지금 이용 · 주문할 수 있는 공급 옵션만 돌려준다(미가입 세미프랜차이즈 항목 0).
+ * 목록은 서버가 이 약국이 지금 이용 · 주문할 수 있는 공급 옵션만 돌려준다(미가입 협업체 항목 0).
  * 같은 제품의 여러 공급 경로를 그대로 나열한다 — 가격 비교 · 최저가 강조 · 자동 선택을 하지 않는다.
  */
 import { useLatestList } from '../../hooks/useLatestList';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import {
   neturePharmacyApi,
   pharmacyErrorMessage,
-  type SemiFranchiseRow,
   type SupplyOption,
 } from '../../api/neturePharmacy';
-import { BusinessTabs } from '../../components/BusinessTabs';
+import { useStoreBusinesses } from './useStoreBusinesses';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
 import { Notice, PharmacyPage, SUPPLY_KIND_LABEL, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 
 const TABS: ReadonlyArray<{ source: string; label: string }> = [
   { source: 'all', label: '전체' },
-  { source: 'default', label: 'pharmacy 기본 공급' },
+  { source: 'default', label: '기본 공급' },
   { source: 'proposal', label: '공급 제안' },
   { source: 'event', label: '이벤트' },
   { source: 'recruitment', label: '모집 참여' },
@@ -54,48 +57,71 @@ function Conditions({ o }: { o: SupplyOption }) {
   );
 }
 
-export default function SupplyOptionsPage() {
-  const [params, setParams] = useSearchParams();
+type SupplyPageProps = Readonly<{ navigation?: ReactNode }>;
+
+function readSupplyQuery(params: URLSearchParams) {
   const source = params.get('source') || 'all';
-  const setSource = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); p.set('source', value); return p; }); };
-  const [q, setQ] = useState('');
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
+  const explicitBusiness = params.get('business') || '';
+  const business = explicitBusiness || (source.startsWith('sf:') ? source.slice(3) : '');
+  const kind = source.startsWith('sf:') ? 'all' : source;
+  const query = params.get('q')?.trim() || '';
+  const rawPage = Number(params.get('page'));
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  return { source, explicitBusiness, business, kind, query, page, recruitment: params.get('recruitment') || '' };
+}
+function supplyEmptyText(query: string, business: string, name: string): string {
+  if (query) return '검색 조건에 맞는 주문 상품이 없습니다.';
+  if (business) return `${name}에서 지금 주문할 수 있는 상품이 없습니다.`;
+  return '지금 주문할 수 있는 공급 상품이 없습니다.';
+}
+
+export default function SupplyOptionsPage(props: SupplyPageProps) {
+  const { organizationId } = useUnifiedStore();
+  const { user } = useAuth();
+  return <SupplyOptionsSession key={`${user?.id}:${organizationId}`} {...props} />;
+}
+function SupplyOptionsSession({ navigation }: SupplyPageProps) {
+  const [params, setParams] = useSearchParams();
+  const { source, explicitBusiness, business, kind, query, page, recruitment } = readSupplyQuery(params);
+  const [q, setQ] = useState(query);
+  useEffect(() => { setQ(query); }, [query]);
+  const businesses = useStoreBusinesses();
+  const change = (values: Record<string, string>) => setParams(previous => {
+    const next = new URLSearchParams(previous); next.delete('page');
+    for (const [key, value] of Object.entries(values)) { if (value) next.set(key, value); else next.delete(key); }
+    return next;
+  });
   const [message, setMessage] = useState<string | null>(null);
-  const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [qty, setQty] = useState<Record<string, string>>({});
   const [addingKey, setAddingKey] = useState<string | null>(null);
+  const addBusy = useRef(false);
 
-  useEffect(() => {
-    neturePharmacyApi.listSemiFranchises()
-      .then((rows) => setFranchises(rows.filter((r) => r.membershipStatus === 'active')))
-      .catch(() => setFranchises([]));
-  }, []);
-
-  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, q: query || undefined, page, limit: PAGE_SIZE }), [source, query, page]);
-  const { items, total, loading, error, setError } = useLatestList<SupplyOption>(fetchList, listErrorMessage);
+  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, ...(explicitBusiness ? { business: explicitBusiness } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE }), [source, explicitBusiness, recruitment, query, page]);
+  const { items, total, loading, error, load } = useLatestList<SupplyOption>(fetchList, listErrorMessage);
 
 
-  const choose = (next: string) => { setSource(next); setPage(1); };
+  const choose = (next: string) => change({ source: next, business, recruitment: '' });
   const rowKey = (o: SupplyOption) => `${o.kind}:${o.optionId}`;
 
   const add = async (o: SupplyOption) => {
+    if (addBusy.current || !businesses.isCurrent()) return;
     const key = rowKey(o);
     const n = Number(qty[key] ?? '1');
     if (!Number.isInteger(n) || n < 1) {
-      setError('수량을 1 이상의 정수로 입력해 주세요.');
+      setActionError('수량을 1 이상의 정수로 입력해 주세요.');
       return;
     }
-    setAddingKey(key);
-    setError(null);
+    addBusy.current = true; setAddingKey(key);
+    setActionError(null);
     setMessage(null);
     try {
       await neturePharmacyApi.addCartItem(o.kind, o.optionId, n);
-      setMessage(`${o.productName} ${n}개를 장바구니에 담았습니다.`);
+      if (businesses.isCurrent()) setMessage(`${o.productName} ${n}개를 장바구니에 담았습니다.`);
     } catch (e) {
-      setError(pharmacyErrorMessage(e, '장바구니에 담지 못했습니다.'));
+      if (businesses.isCurrent()) setActionError(pharmacyErrorMessage(e, '장바구니에 담지 못했습니다.'));
     } finally {
-      setAddingKey(null);
+      addBusy.current = false; setAddingKey(null);
     }
   };
 
@@ -103,32 +129,36 @@ export default function SupplyOptionsPage() {
 
   return (
     <PharmacyPage
-      title="공급 상품"
-      description="가입한 세미프랜차이즈에서 지금 주문할 수 있는 공급 상품입니다. 같은 제품도 공급 경로마다 조건과 단가가 다를 수 있으니 확인 후 선택하세요."
+      title="상품 주문"
+      description="가입한 협업체와 참여 승인된 모집에서 주문할 상품을 찾습니다. 공급 경로별 조건과 단가를 확인해 선택하세요."
       actions={<Link className={btn.secondary} to={pharmacyStorePath('cart')}>장바구니 보기</Link>}
     >
-      <BusinessTabs businesses={franchises} value={source.startsWith('sf:') ? source.slice(3) : ''} onChange={key => { setSource(key ? `sf:${key}` : 'all'); setPage(1); }} />
-      <div className="mb-4 flex flex-wrap items-center gap-2" role="tablist" aria-label="공급 경로">
+      <StoreCommerceNavigation />
+      {navigation}
+      <StoreBusinessTabs businesses={businesses} value={business} publicSource onChange={key => change({ business: key, source: kind, recruitment: '' })} />
+      <details className="mb-4"><summary className="min-h-11 cursor-pointer content-center text-sm">공급 종류 선택</summary>
+      <div className="mt-2 flex flex-wrap items-center gap-2" role="tablist" aria-label="공급 경로">
         {TABS.map((t) => (
           <button
             key={t.source}
             type="button"
             role="tab"
-            aria-selected={source === t.source}
+            aria-selected={kind === t.source}
             onClick={() => choose(t.source)}
-            className={`rounded-full border px-3 py-1 text-sm ${source === t.source ? 'border-emerald-600 bg-emerald-50 font-medium text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
+            className={`min-h-11 rounded-full border px-3 py-1 text-sm ${kind === t.source ? 'border-emerald-600 bg-emerald-50 font-medium text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
           >
             {t.label}
           </button>
         ))}
 
-      </div>
+      </div></details>
 
-      <form className="mb-4 flex max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); setQuery(q.trim()); setPage(1); }}>
+      <form className="mb-4 flex max-w-md flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); change({ q: q.trim(), recruitment: '' }); }}>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
+            aria-label="주문 상품 검색"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="제품명, 공급자 검색"
@@ -136,21 +166,26 @@ export default function SupplyOptionsPage() {
           />
         </div>
         <button type="submit" className={btn.secondary}>검색</button>
+        {(query || recruitment) && <button type="button" className={btn.secondary} onClick={() => change({ q: '', recruitment: '' })}>검색 초기화</button>}
       </form>
 
       {message && <Notice>{message} <Link className="underline" to={pharmacyStorePath('cart')}>장바구니로 이동</Link></Notice>}
-      {error && <Notice tone="error">{error}</Notice>}
+      {actionError && <Notice tone="error">{actionError} 수량과 조건을 확인한 뒤 다시 담아 주세요.</Notice>}
+      {recruitment && <p className="mb-3 text-sm text-slate-600">선택한 모집의 주문 가능 상품입니다. 검색 초기화로 다른 상품을 찾을 수 있습니다.</p>}
+      {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>상품 다시 확인</button></Notice>}
 
-      {loading ? (
+      {loading && (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : items.length === 0 ? (
+      )}
+      {!loading && !error && items.length === 0 && (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-          <p>지금 주문할 수 있는 공급 상품이 없습니다.</p>
-          <p className="mt-1">세미프랜차이즈 가입이 승인되면 그 세미프랜차이즈의 공급 상품이 여기에 나타납니다.{' '}
-            <Link className="underline" to={pharmacyStorePath('semiFranchises')}>세미프랜차이즈 보기</Link>
+          <p>{supplyEmptyText(query, business, storeBusinessName(businesses.rows, business))}</p>
+          <p className="mt-1">등록·승인된 공급 조건의 상품을 이곳에서 주문합니다. 가입 상태는 이용 사업에서 확인할 수 있습니다.{' '}
+            <Link className="underline" to={pharmacyStorePath('semiFranchises')}>협업체 보기</Link>
           </p>
         </div>
-      ) : (
+      )}
+      {!loading && !error && items.length > 0 && (
         <>
           <p className="text-xs text-gray-500 md:hidden">표를 좌우로 밀어 공급조건과 담기 버튼을 확인하세요.</p>
           <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -189,7 +224,7 @@ export default function SupplyOptionsPage() {
                             onChange={(e) => setQty((prev) => ({ ...prev, [key]: e.target.value }))}
                             className="w-16 rounded border border-gray-300 px-2 py-1 text-right"
                           />
-                          <button className={btn.primary} disabled={addingKey === key} onClick={() => add(o)}>
+                          <button className={btn.primary} disabled={addingKey !== null} onClick={() => add(o)}>
                             장바구니 담기
                           </button>
                         </div>
@@ -202,9 +237,9 @@ export default function SupplyOptionsPage() {
           </div>
           {lastPage > 1 && (
             <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-              <button className={btn.secondary} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>이전</button>
+              <button className={btn.secondary} disabled={page <= 1} onClick={() => change({ page: String(page - 1) })}>이전</button>
               <span>{page} / {lastPage}</span>
-              <button className={btn.secondary} disabled={page >= lastPage} onClick={() => setPage((p) => p + 1)}>다음</button>
+              <button className={btn.secondary} disabled={page >= lastPage} onClick={() => change({ page: String(page + 1) })}>다음</button>
             </div>
           )}
         </>

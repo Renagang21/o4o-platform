@@ -254,6 +254,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
 
   router.get('/pharmacy/store/supply-options', ...store, handle(async (req) => listSupplyOptions(dataSource, org(req), {
     source: typeof req.query.source === 'string' ? req.query.source : undefined,
+    business: typeof req.query.business === 'string' ? req.query.business : undefined,
+    recruitment: typeof req.query.recruitment === 'string' ? req.query.recruitment : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
     page: Number(req.query.page) || 1,
     limit: Number(req.query.limit) || 50,
