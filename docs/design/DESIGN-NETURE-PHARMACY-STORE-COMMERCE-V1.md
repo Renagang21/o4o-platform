@@ -6,7 +6,7 @@
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-21 (§15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 약국 협력사업 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -499,7 +499,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ### 15-5. 관리자 설정의 내 매장 적용·경영자 회원 원장 (2026-10-16)
 
-§15-4의 초기 단계(미연결 adapter·내 매장 미적용)를 이어 구현한다. 협력사업별 별도 코드 분기 없이 기존 `/admin/semi-franchises`를 `약국 협력사업` 독립 메뉴로 제공한다. 동일 관리 화면은 전체 관리자 앱 및 Neture 호환 wrapper가 공유한다.
+§15-4의 초기 단계(미연결 adapter·내 매장 미적용)를 이어 구현한다. 초기 구현은 협력사업별 별도 코드 분기 없이 `/admin/semi-franchises`를 독립 메뉴로 제공했다. 2026-10-21 현재 관리자 배치는 §15-7의 약국 서비스 설정 통합을 따른다. 동일 관리 화면은 전체 관리자 앱 및 Neture 호환 wrapper가 공유한다.
 
 - **회원 유료 원장**: `member_paid_service_entitlements`는 회원당 1행으로 `active`, 선택 만료일 `ends_at`, 최종 수정 관리자·시각만 관리한다. Core User·서비스 가입/역할·기존 매장 구독 원장을 바꾸지 않는다. 전체 관리자가 정확한 이메일로 회원 조회 후 활성·해제한다. 실제 결제 수납·자동 유료 전환은 포함하지 않는다. 만료는 `ends_at > NOW()`일 때만 유효하며 NULL은 기한 없음이다.
 - **회원 관리 API**: `GET /api/v1/neture/admin/member-paid-entitlements?email=...`, `PUT /api/v1/neture/admin/member-paid-entitlements/:userId`(`active:boolean`, `endsAt:ISO timestamp|null`). 기존 platform super admin guard를 적용한다. 클라이언트는 기존 API base(`/api/v1`)를 재사용한다.
@@ -519,15 +519,17 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 - `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
 - `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
 - 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
-- 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. O4O 전체 관리자는 월별 요청 건수를 조회하고, 협력사업 운영자에게 다른 사업/매장 집계를 공유하는 권한은 추가하지 않는다.
+- 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. 현장 고객 요구의 월별 집계는 전체 관리자 설정 화면에서 노출하지 않는다(2026-10-21 관리자 설정 통합). 기존 수집·저장과 관리자 API의 인증 경계는 보존하며, 서비스 운영자용 조회는 자기 사업/매장 범위를 확인하는 후속 작업이다. 다른 사업/매장 집계를 공유하는 권한을 추가하지 않는다.
 - 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 megapharm 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
 
 검증·운영 설정 인계: [CHECK-MEGAPHARM-STAFF-SUPPORT-V1](../checks/CHECK-MEGAPHARM-STAFF-SUPPORT-V1.md).
 
 ### 15-7. 대상별 서비스 설정과 My Home 근무자 허용 (2026-10-18)
 
-전체 관리자 메뉴 `약국 서비스 설정`(`/admin/pharmacy-service-settings`)에서 **대상 → 제공 기능 선택**으로 관리한다. 대상은 기본 제공·유료회원·기존 등록 협력사업이다. 협력사업 등록·운영자 지정은 기존 `약국 협력사업` 메뉴를 사용하며, 사업 추가가 별도 화면이나 코드 분기를 만들지 않는다.
+전체 관리자 메뉴 `약국 서비스 설정`(`/admin/pharmacy-service-settings`)에서 **대상 → 제공 기능 선택**으로 관리한다. 대상은 기본 제공·유료회원·기존 등록 협력사업이다. 2026-10-21 사용자 승인으로 `약국 협력사업` 독립 메뉴를 제거하고 같은 설정 화면에 통합한다. 사업 추가 버튼으로 등록창을 열고, 협력사업 가입자 대상을 선택하면 사업 정보(이름·상태·가입 조건·추가 연결 설정)를 접어서 표시한다. 기능 편집은 기능 설정 한 곳에서만 한다. 운영자 지정·과거 개별 담당 관리 경로는 기존 `/operators`로 모으며, 사업 추가가 서비스별 새 화면이나 권한 분기를 만들지 않는다.
 
+- 첫 화면은 `기능 설정`, 두 번째 탭은 `회원 이용 자격`이다. 대상은 기본 제공(전체 약국)·유료회원·등록 협력사업의 가입자이며, 사업 등록만으로 기능이 자동 제공되지 않는다. 구 `/admin/semi-franchises` 주소는 query를 보존해 통합 주소로 이동한다. 연합회 기존 조회·운영자 관리 연결은 통합 화면에 유지하며 개별 조합 운영 권한을 새로 부여하지 않는다.
+- 회원 이용 자격은 정확한 이메일로 회원을 조회하고 기존 유료 활성/해제·만료일을 수정한다. 읽기 전용 조회에서 현재 경영자로 연결된 약국, 가입 상태, 공통 runtime 판정의 기능 제공 근거를 표시한다. 미승인 약국·조회 실패는 제공 기능 0건과 구분하며 전문인 확인을 대신하지 않는다. 금액별 유료 등급·결제 자동화는 추후 작업이다.
 - 기본/유료 정책은 기존 `settings`의 `pharmacy-service-features:default` / `pharmacy-service-features:paid`에 `{features,updatedBy}`로 저장한다. 미저장 기본은 `[]`, 미저장 유료는 기존 `tablet`·`multilingual-content`다. 저장된 `[]`는 명시적 제공 해제다. 잘못된 저장값·조회 실패는 503이며 미설정 기본값으로 덮지 않는다.
 - 사업 제공 기능은 기존 운영 조직의 `metadata.serviceFeatures`를 재사용한다. 관리 API `GET /neture/admin/service-feature-policies`, `PUT /neture/admin/service-feature-policies/:target`은 `platform:super_admin` 전용이다. target은 `default`, `paid`, `business:<등록 key>`이며, 기존 사업 수정 경로의 제공 기능 변경도 같은 전체 관리자 권한을 요구한다.
 - 약국의 기능은 기본 + 활성 협력사업 + 현재 경영자 회원 유료 제공 기능의 합집합이다. 유료/무료만 구분하며 약국 규모·협력사업 미가입 조건·유료 등급은 추가하지 않는다. 자격 하나가 끝나도 다른 제공 자격은 유지한다. 수납·자동 갱신·중복 결제/환불은 이 설정 작업 범위가 아니다.

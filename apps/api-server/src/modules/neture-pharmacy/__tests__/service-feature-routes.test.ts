@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { createNeturePharmacyRoutes } from '../neture-pharmacy.routes.js';
+import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 
 // Synthetic authentication only. The production role guard and new routes run unchanged.
 jest.mock('../../../middleware/auth.middleware.js', () => ({
@@ -31,7 +32,7 @@ function app() {
   const instance = express();
   instance.use(express.json());
   instance.use((req: any, _res, next) => {
-    if (req.header('x-test-actor')) req.user = { id: req.header('x-test-actor') };
+    if (req.header('x-test-actor')) req.user = { id: req.header('x-test-actor'), roles: req.header('x-test-actor') === 'platform-admin' ? ['platform:super_admin'] : [] };
     next();
   });
   instance.use('/api/v1/neture', createNeturePharmacyRoutes({ query, getRepository: () => ({}) } as any));
@@ -135,4 +136,38 @@ it('exposes federation roles only to authenticated platform administrators witho
   expect(query).toHaveBeenCalledTimes(1);
   expect(query.mock.calls[0][0].trimStart()).toMatch(/^SELECT/);
   expect(query.mock.calls[0][0]).not.toMatch(/cooperatives|cooperative_memberships|semi_franchises/);
+});
+
+it('limits member access summaries to platform administrators and returns controlled failures', async () => {
+  const server = app();
+  const path = '/api/v1/neture/admin/member-paid-entitlements/10000000-0000-4000-8000-000000000001/access';
+  expect((await request(server).get(path)).status).toBe(401);
+  expect((await request(server).get(path).set('x-test-actor', 'business-operator')).status).toBe(403);
+  expect(query).not.toHaveBeenCalled();
+  query.mockResolvedValueOnce([]);
+  expect((await request(server).get(path).set('x-test-actor', 'platform-admin')).status).toBe(404);
+  query.mockRejectedValue(new Error('private database details'));
+  const result = await request(server).get(path).set('x-test-actor', 'platform-admin');
+  expect(result.status).toBe(503);
+  expect(result.headers['cache-control']).toBe('private, no-store');
+  expect(JSON.stringify(result.body)).not.toContain('private database details');
+  expect((await request(server).get(path.replace('10000000-0000-4000-8000-000000000001', 'invalid')).set('x-test-actor', 'platform-admin')).status).toBe(404);
+});
+
+
+it('accepts a selected operator in the existing route parameter and rejects the body-only path', async () => {
+  const candidate = '10000000-0000-4000-8000-000000000001';
+  const assign = jest.spyOn(SemiFranchiseService.prototype, 'assignOperator').mockResolvedValue({ assigned: true });
+  try {
+    const server = app();
+    const path = '/api/v1/neture/admin/semi-franchises/custom-business/operators';
+    expect((await request(server).post(path).set('x-test-actor', 'platform-admin').send({ userId: candidate })).status).toBe(404);
+    expect(assign).not.toHaveBeenCalled();
+    const result = await request(server).post(`${path}/${candidate}`).set('x-test-actor', 'platform-admin');
+    expect(result.status).toBe(200);
+    expect(result.body).toMatchObject({ success: true, data: { assigned: true } });
+    expect(assign).toHaveBeenCalledWith('custom-business', candidate, 'platform-admin');
+  } finally {
+    assign.mockRestore();
+  }
 });
