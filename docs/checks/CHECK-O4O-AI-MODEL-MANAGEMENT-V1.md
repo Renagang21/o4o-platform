@@ -99,3 +99,11 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 이번 통합용 PostgreSQL 컨테이너의 `o4o_ai*` DB 잔존 count 0을 확인한 뒤 해당 일회성 컨테이너/임시 저장소를 제거했다. 이번 작업 label의 컨테이너 잔존도 0이다. 운영 DB·계정·공급자 설정을 변경하지 않았다.
 
 기능 PR은 #754이며 CI·Codex·배포는 아직 진행 중이다. 위 개발 단계 검증과 운영 배포 결과를 구분한다.
+
+### PR #754 리뷰 보완
+
+- 환경변수 키만 검사하던 운영 인사이트의 사전 gate를 제거하고 기존 DB/env resolver 결과로 실행 여부를 판단한다. DB에만 키가 있는 경우에도 관리 모델을 전달하며 키 미설정·실패 시 기존 규칙 fallback을 유지한다.
+- 모델 변경과 공통 질의 정책 저장이 같은 PostgreSQL transaction advisory lock을 사용한다. 모델 참조 확인·삭제/CAS를 한 transaction에 묶고 정책은 잠금 내부에서 삭제 여부를 다시 검사한 뒤 저장한다. 삭제 직전 검사 후 다른 정책이 저장되는 경쟁을 방지하며 stale 정책 저장에는 409를 반환한다. 현재 scope 정책/credential의 다른 app 쓰기 소비처는 확인되지 않았으며 향후 writer도 같은 잠금 계약이 필요하다. migration/직접 CLI 쓰기를 이 API 보호와 동일하다고 주장하지 않는다.
+- 새 회귀: 환경변수 키가 없는 인사이트 및 실제 관리자 CRUD HTTP 포함 3 suites, 26 PASS. 실제 격리 PostgreSQL 모델 설정 4 PASS(정책 먼저 저장→삭제 거절, 삭제 먼저→정책 거절 포함). API type-check PASS. 추가 정책 서비스·기존 runtime 회귀 및 build 결과는 후속 기록한다.
+
+추가 정책 서비스·질의 HTTP·동적 모델·다중 공급자·인사이트 회귀는 5 suites, 63 PASS, API 정식 build PASS다. 처음 실행에서는 신규 잠금 mock 및 기존 질의 HTTP fixture에 transaction/query 계약이 없어 실패했으며 fixture를 보완 후 재실행했다. 공급자 유료 호출을 사용하지 않았다.

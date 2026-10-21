@@ -28,13 +28,6 @@ import type { AiSummaryItem } from '../types/operator-dashboard.types.js';
 const AI_TIMEOUT_MS = 800;
 
 /**
- * Check if an AI provider API key is configured.
- */
-function hasAiApiKey(): boolean {
-  return !!(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
-}
-
-/**
  * Transform AIInsight (from @o4o/ai-core) into AiSummaryItem[] (for operator-ux-core).
  */
 function transformInsightToSummary(insight: AIInsight): AiSummaryItem[] {
@@ -84,36 +77,35 @@ export class CopilotEngineService {
     const legacyService: AIServiceId | undefined = profile.serviceId === 'kpa-society' ? 'kpa' : profile.serviceId === 'neture' ? 'neture' : undefined;
     const ruleBasedInsights = legacyService ? generateRuleBasedInsights(legacyService, metrics) : [];
 
-    // 2. Try AI-enhanced insights if API key is available
-    if (hasAiApiKey()) {
-      try {
-        const { runAiExtension } = await import('@o4o/ai-core');
-        const target = await resolveAiTarget(AppDataSource, undefined, 'operator.insight');
-        const extension = createOperatorInsightExtension(profile);
-        const run = await runAiExtension({
-          extension, input: { metrics },
-          context: { requestId: randomUUID(), serviceId: profile.serviceId, featureId: 'operator-insight', actorId: user.id, audience: 'staff' },
-          materials: [], funding: { payer: 'platform' },
-        }, {
-          invoke: async prompt => {
-            const result = await executeAccountedAi(AppDataSource, { ...prompt, provider: target.provider,
-              config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
-              timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
-              meta: { service: profile.serviceId, callerName: extension.id },
-            }, { scope: 'OPERATOR_INSIGHT', serviceKey: profile.serviceId, userId: user.id });
-            return { ...result, provider: result.provider ?? target.provider };
-          },
-        }, {
-          // The existing admin guard authorizes caller-submitted aggregates, not domain record access.
-          authorize: async context => context.actorId === user.id,
-          record: async event => { logger.info('[AI_EXTENSION]', event); },
-        });
-        return { insights: transformInsightToSummary(run.output), source: 'ai' };
-      } catch (error) {
-        // AI unavailable or timed out — fall through to rule-based
-        const msg = error instanceof Error ? error.message : String(error);
-        console.warn(`[CopilotEngine] AI call failed for ${service}: ${msg}`);
-      }
+    // 2. Resolve DB/env credentials and managed selection before deciding whether AI is available.
+    try {
+      const { runAiExtension } = await import('@o4o/ai-core');
+      const target = await resolveAiTarget(AppDataSource, undefined, 'operator.insight');
+      if (!target.apiKey) throw new Error('AI_NOT_CONFIGURED');
+      const extension = createOperatorInsightExtension(profile);
+      const run = await runAiExtension({
+        extension, input: { metrics },
+        context: { requestId: randomUUID(), serviceId: profile.serviceId, featureId: 'operator-insight', actorId: user.id, audience: 'staff' },
+        materials: [], funding: { payer: 'platform' },
+      }, {
+        invoke: async prompt => {
+          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider: target.provider,
+            config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
+            timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
+            meta: { service: profile.serviceId, callerName: extension.id },
+          }, { scope: 'OPERATOR_INSIGHT', serviceKey: profile.serviceId, userId: user.id });
+          return { ...result, provider: result.provider ?? target.provider };
+        },
+      }, {
+        // The existing admin guard authorizes caller-submitted aggregates, not domain record access.
+        authorize: async context => context.actorId === user.id,
+        record: async event => { logger.info('[AI_EXTENSION]', event); },
+      });
+      return { insights: transformInsightToSummary(run.output), source: 'ai' };
+    } catch (error) {
+      // AI unavailable or timed out — fall through to rule-based
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`[CopilotEngine] AI call failed for ${service}: ${msg}`);
     }
 
     // 3. Return rule-based insights

@@ -14,6 +14,7 @@ function fixture() {
   const db = {
     isInitialized: true,
     query: jest.fn(async (sql: string, params?: any[]) => {
+      if (sql.startsWith("SELECT pg_advisory_xact_lock")) return [];
       if (sql.startsWith("SELECT value FROM settings"))
         return value ? [{ value: structuredClone(value) }] : [];
       if (sql.startsWith("SELECT 'gemini' AS provider")) return references;
@@ -25,6 +26,7 @@ function fixture() {
       throw new Error("Unexpected test SQL");
     }),
   };
+  Object.assign(db, { transaction: async (run: (manager: typeof db) => Promise<unknown>) => run(db) });
   return {
     db,
     references,

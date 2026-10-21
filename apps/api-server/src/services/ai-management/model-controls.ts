@@ -1,4 +1,5 @@
 import type { DataSource } from "typeorm";
+import { withAiModelControlLock } from "./model-control-lock.js";
 import {
   MODEL_WHITELIST,
   GEMINI_CANONICAL_MODEL,
@@ -24,6 +25,14 @@ export interface ManagedModel {
 export interface ModelSelection {
   provider: ModelProvider;
   model: string;
+}
+interface ModelMutation {
+  action: "create" | "update" | "delete" | "select";
+  provider?: string;
+  id?: string;
+  model?: unknown;
+  target?: string;
+  selection?: ModelSelection | null;
 }
 interface Control {
   revision: number;
@@ -314,17 +323,24 @@ export class ModelControlService {
       for (const id of ids) if (id) refs.add(keyOf(provider, id));
     return refs;
   }
-  async change(
+  async change(expected: unknown, actorId: string, mutation: ModelMutation) {
+    if (!this.db.isInitialized)
+      return fail(
+        503,
+        "AI_MODEL_CONTROL_UNAVAILABLE",
+        "모델 설정을 저장할 수 없습니다.",
+      );
+    return withAiModelControlLock(this.db as DataSource, async (manager) =>
+      new ModelControlService({
+        isInitialized: true,
+        query: manager.query.bind(manager),
+      }).changeLocked(expected, actorId, mutation),
+    );
+  }
+  private async changeLocked(
     expected: unknown,
     actorId: string,
-    mutation: {
-      action: "create" | "update" | "delete" | "select";
-      provider?: string;
-      id?: string;
-      model?: unknown;
-      target?: string;
-      selection?: ModelSelection | null;
-    },
+    mutation: ModelMutation,
   ) {
     if (!Number.isSafeInteger(expected) || Number(expected) < 0)
       return fail(

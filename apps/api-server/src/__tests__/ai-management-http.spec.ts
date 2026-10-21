@@ -21,6 +21,7 @@ const db = AppDataSource as any;
 
 beforeEach(() => {
   db.isInitialized = true;
+  db.transaction = jest.fn(async (run) => run(db));
   db.query.mockReset().mockResolvedValue([]);
 });
 
@@ -90,6 +91,7 @@ it.each([
 it('uses the registered model and current revision through the actual admin HTTP routes', async () => {
   let value: any = null;
   db.query.mockImplementation(async (sql: string, params: any[]) => {
+    if (sql.startsWith('SELECT pg_advisory_xact_lock')) return [];
     if (sql.startsWith('SELECT value FROM settings')) return value ? [{ value }] : [];
     if (sql.startsWith("SELECT 'gemini'")) return [];
     if (sql.startsWith('INSERT INTO settings')) { if (value && value.revision !== params[2]) return []; value = JSON.parse(params[1]); return [{ key: params[0] }]; }

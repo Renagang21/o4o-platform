@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { withAiModelControlLock } from "../model-control-lock.js";
 import { MODEL_CONTROL_KEY, ModelControlService } from "../model-controls.js";
 
 // Never use application connection configuration: only the explicitly isolated loopback fixture.
@@ -150,5 +151,62 @@ fixture("durable model controls on isolated PostgreSQL", () => {
       }),
     ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
     expect(await db.query("SELECT key FROM settings")).toEqual([]);
+  });
+  it("serializes policy validation/write against retirement in both lock orders", async () => {
+    const service = new ModelControlService(db);
+    const gemini = {
+      ...model,
+      provider: "gemini" as const,
+      id: "gemini-race-fixture",
+    };
+    await service.change(0, actor, { action: "create", model: gemini });
+    let entered!: () => void, release!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const write = withAiModelControlLock(db, async (manager) => {
+      expect(
+        await new ModelControlService({
+          isInitialized: true,
+          query: manager.query.bind(manager),
+        }).allows("gemini", gemini.id),
+      ).toBe(true);
+      entered();
+      await hold;
+      await manager.query("INSERT INTO ai_query_policy VALUES ($1)", [
+        gemini.id,
+      ]);
+    });
+    await ready;
+    const retire = service.change(1, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: gemini.id,
+    });
+    release();
+    await write;
+    await expect(retire).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+    await db.query("TRUNCATE ai_query_policy");
+    await service.change(1, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: gemini.id,
+    });
+    await expect(
+      withAiModelControlLock(db, async (manager) => {
+        const allowed = await new ModelControlService({
+          isInitialized: true,
+          query: manager.query.bind(manager),
+        }).allows("gemini", gemini.id);
+        if (allowed === false) throw new Error("AI_MODEL_REMOVED");
+        await manager.query("INSERT INTO ai_query_policy VALUES ($1)", [
+          gemini.id,
+        ]);
+      }),
+    ).rejects.toThrow("AI_MODEL_REMOVED");
+    expect(await db.query("SELECT * FROM ai_query_policy")).toEqual([]);
   });
 });
