@@ -101,3 +101,6 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 - main 통합 후 shared-space-ui 168개, Pharmcoop 62개, KPA 헤더 권한 11개 PASS. Neture·KPA society·Study·Pharmcoop·Store production build와 API bundle PASS. 커뮤니티 전용 IA에도 dashboard 그룹을 배치하여 업무함 메뉴가 실제 shell에 표시되도록 보완했다.
 - 전체 `pnpm run lint`는 기존 오류 46개 때문에 실패한다. CI 정본의 lint ratchet(기준 46개)을 별도로 실행하며 전체 lint 무오류로 보고하지 않는다. 잘못된 최초 테스트 config/파일·패키지 filter는 실제 경로로 교정 후 재실행했고 무매칭 결과를 PASS로 세지 않았다.
 - 격리 검증용 DB 2개의 잔존을 제거하고 자기 PostgreSQL 서버를 종료했다. 운영 업무 데이터 생성·삭제 없음.
+
+- PR #758 Codex P1: CarePharm `/contact`가 service-wide 접수로 남아 사업별 신규 문의함과 연결되지 않았다. 공개 route를 ScopedContactPage에 연결하고 CarePharm만 business 범위로 접수한다. 다른 Neture 호스트는 기존 ContactPage의 설정·답변·발송 흐름을 유지한다. 기존 서비스 문의 원장/메뉴를 삭제하거나 조직을 추정해 이관하지 않는다. 신규 component 회귀 5개를 추가한다.
+- 통합 후 Neture 전체 140 files / 1,244 tests PASS. lint ratchet 46 / 기준 46 PASS.

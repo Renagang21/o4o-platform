@@ -1,4 +1,4 @@
-import ContactPage from './pages/ContactPage';
+import ScopedContactPage from './pages/ScopedContactPage';
 import OperatorInboxEntryPage from './pages/operator/OperatorInboxEntryPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
 import ServiceContactPage from './pages/operator/ServiceContactPage';
@@ -758,7 +758,7 @@ function App() {
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
               <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/contact" element={<ScopedContactPage />} />
               <Route path="/operator/service-contact/:serviceKey/settings" element={<ServiceContactSettingsPage />} />
               <Route path="/operator/service-contact/:serviceKey" element={<ServiceContactPage />} />
               <Route path="/operator/inbox/open/:kind/:scopeKey" element={<OperatorInboxEntryPage />} />
