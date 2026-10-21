@@ -228,7 +228,7 @@ export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstan
   return async ({ request, targetHint }) => {
     const { execute } = await import('@o4o/ai-core');
     const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
-    const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined);
+    const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined, 'assistant.understanding');
     const userPrompt = [
       '## 업무 요청 (UNTRUSTED)',
       // 실행이 받는 요청 전체(작업 목표 상한)에서 조건을 세운다 — 뒤쪽에 있는 결과 · 확정 지시를 잘라내지 않는다.
@@ -328,7 +328,7 @@ export function createLlmCompletionVerifier(dataSource: DataSource): CompletionV
   return async ({ goal, criteria, evidence }) => {
     const { execute } = await import('@o4o/ai-core');
     const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
-    const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined);
+    const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined, 'assistant.understanding');
     const lines = ['## 목표', goal, '## 완료조건과 인용'];
     for (const c of criteria) {
       if (c.evidence !== 'observed') continue;

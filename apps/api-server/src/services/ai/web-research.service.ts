@@ -1,3 +1,4 @@
+import { ModelControlService } from '../ai-management/model-controls.js';
 /**
  * Web Research Service — 범용 Gemini Web Research(grounding) 소비자
  *
@@ -43,6 +44,7 @@ export const WEB_RESEARCH_MAX_ATTEMPTS = 1;
 export interface WebResearchRequest {
   /** 리서치 질의(범용) */
   query: string;
+  usage?: 'research.authenticated' | 'hospital.research';
   /** system prompt override (기본: 범용 리서치 어시스턴트) */
   systemPrompt?: string;
   /** provider 타임아웃(ms) */
@@ -70,7 +72,8 @@ export interface WebResearchResult {
  */
 export async function runWebResearch(request: WebResearchRequest): Promise<WebResearchResult> {
   // 1. admin SSOT → 모델 해석 (하드코딩 금지, resolver 가 항상 유효한 gemini 모델 반환)
-  const model = await resolveEditingModel();
+  const fallbackModel = await resolveEditingModel();
+  const { model } = await new ModelControlService(AppDataSource).resolve(request.usage ?? 'research.authenticated', { provider: 'gemini', model: fallbackModel });
 
   // 2. Gemini 키 해석 (ai_settings → env, 코드/로그에 기록하지 않음)
   const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');

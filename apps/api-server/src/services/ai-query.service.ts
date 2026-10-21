@@ -1,3 +1,6 @@
+import { ModelControlService, ModelControlError } from './ai-management/model-controls.js';
+import { withAiModelControlLock } from './ai-management/model-control-lock.js';
+import { prepareManagedAiRequest } from './ai-management/runtime-models.js';
 import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 /**
  * AI Query Service
@@ -154,9 +157,18 @@ class AiQueryService {
   async updatePolicy(updates: Partial<AiQueryPolicy>): Promise<AiQueryPolicy> {
     await this.ensureInitialized();
 
-    const policy = await this.getPolicy();
-    Object.assign(policy, updates);
-    return await this.policyRepo.save(policy);
+    await this.getPolicy(); // Initialize the protected canonical default before entering the transaction.
+    return withAiModelControlLock(AppDataSource, async (manager) => {
+      if (updates.defaultModel && await new ModelControlService({
+        isInitialized: true, query: manager.query.bind(manager),
+      }).allows('gemini', updates.defaultModel) === false) {
+        throw new ModelControlError(409, 'AI_MODEL_REMOVED', '선택한 모델이 삭제됐습니다. 최신 목록에서 다시 선택해 주세요.');
+      }
+      const repo = manager.getRepository(AiQueryPolicy);
+      const policy = await repo.findOneOrFail({ where: { id: 1 } });
+      Object.assign(policy, updates);
+      return repo.save(policy);
+    });
   }
 
   /**
@@ -497,12 +509,12 @@ class AiQueryService {
         funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, {
+          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, 'service.query', {
             ...prompt,
             responseMode: 'text',
             config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
             meta: { service: profile.serviceId, callerName: extension.id },
-          }, { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
+          }), { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
           return { ...result, provider: result.provider ?? 'unknown' };
         },
       }, {
