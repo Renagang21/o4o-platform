@@ -133,7 +133,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   route/page 는 보존(legacy 안내) — 후속 cleanup WO 에서 제거 판단.
     { label: '감사 로그', path: '/operator/audit-logs', adminOnly: true },
     { label: 'Operator 지정 · 해제', path: '/operator/operators', adminOnly: true },
-    { label: '역할 관리', path: '/operator/roles', adminOnly: true },
   ],
 };
 

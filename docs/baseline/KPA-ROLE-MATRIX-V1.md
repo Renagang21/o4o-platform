@@ -19,6 +19,8 @@
 >   - `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` 는 제거됐다(`WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1`). 조직 단위 역할은 role 이 아니라 `kpa_members.role` 이다.
 > - 유효하게 남는 원칙: `platform:*` 은 서비스 scope 를 대신하지 않음 · serviceKey 격리 · 이력 데이터 Hard delete 금지(2026-10-06 범위 정정 — §7 주석) · 신규 서비스는 serviceKey · scope 문서화 후 구현 · Core 수정 금지. (2026-10-06 정정) "서버 측 org lookup"(분회 organization 범위 확인)은 Society 원칙이 아니다 — 분회 서비스 원칙으로만 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) 에 둔다.
 
+> **2026-10-20 역할 흔적 정비:** 제거된 `kpa:district_admin`·`kpa:branch_admin`·`kpa:branch_operator` 및 자격 역할 `kpa:pharmacist`·`kpa:student`는 DB에 활성 이력 행이 남아 있더라도 현재 역할 조회·발급·인가에서 제외한다. 약사·학생 자격 프로필은 유지하며 현행 `kpa:admin`·`kpa:operator`·`kpa:store_owner`와 분회 `kpa-branch:*`를 대신 제거하지 않는다. 중앙 관리자 역할 종류 편집 메뉴도 제거한다. [정비 WO](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)에 실제 적용 단계를 기록한다.
+
 ---
 
 ## 1. 전제

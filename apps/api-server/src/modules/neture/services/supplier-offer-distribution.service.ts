@@ -3,8 +3,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import { filterApprovalEligibleServiceKeys, isApprovalEligibleServiceKey } from '../constants/approval-service-keys.js';
 import { assertDrugOfferAllowed } from '../guards/drug-access.guard.js';
-import { ServiceAudienceService } from './service-audience.service.js';
-import { deriveDistributionType, assertPharmacyOnlyServiceKeys } from './offer-write-policy.js';
+import { deriveDistributionType } from './offer-write-policy.js';
 import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 
 export interface SupplierPublicationInput {
@@ -85,12 +84,6 @@ export class SupplierOfferDistributionService {
     if (offer.approval_status !== 'APPROVED') return 'PRODUCT_NOT_APPROVED';
     if (!offer.is_active) return 'PRODUCT_INACTIVE';
     if (!Number.isInteger(nextPrice) || nextPrice <= 0) return 'PRICE_REQUIRED';
-    const [master] = await q.query(
-      `SELECT c.is_regulated FROM product_masters m LEFT JOIN product_categories c ON c.id = m.category_id WHERE m.id = $1`, [offer.master_id],
-    );
-    const audience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-    const regulatedError = assertPharmacyOnlyServiceKeys(audience, !!master?.is_regulated, nextKeys);
-    if (regulatedError) return regulatedError;
     const gate = await assertDrugOfferAllowed(q, {
       action: nextPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE', masterId: offer.master_id,
       serviceKeys: nextDefault ? [...nextKeys, 'neture'] : nextKeys, isPublic: nextPublic,

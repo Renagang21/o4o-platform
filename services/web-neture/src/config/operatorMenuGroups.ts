@@ -111,7 +111,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // /operator/settings/notifications 는 플랫폼 관리자 전용 API 계약(operator-notification.routes.ts)
     // 이라 neture:operator 로는 403. route/guard 는 유지하고 운영자 메뉴에서만 제외한다.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
-    { label: '역할 관리 (플랫폼)', path: '/admin/roles', adminOnly: true },
     { label: '이메일 설정', path: '/admin/settings/email', adminOnly: true },
   ],
 };
@@ -206,9 +205,7 @@ export function getAdminMenu(
       { label: '문의 설정', path: '/admin/settings/contact' },
       // ── 플랫폼 관리 (여러 서비스/전체 권한에 영향 — WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1) ──
       // 라벨로 표면 분리. 정식 "플랫폼 관리" 그룹/별도 표면은 platform-admin surface 설계 후 분리.
-      { label: '역할 관리 (플랫폼)', path: '/admin/roles' },
       // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1: 약국 대상 서비스 정책 (cross-service)
-      { label: '서비스 대상 정책 (플랫폼)', path: '/admin/settings/service-audience' },
       // admin 계정이 operator 영역으로 진입하는 단일 게이트 (관리자 sidebar 에는 operator 업무를 직접 두지 않는다)
       { label: '운영자 업무 →', path: '/operator' },
     ],

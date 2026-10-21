@@ -92,6 +92,28 @@ describe.each([
 });
 
 describe('canonical member read scopes', () => {
+  it.each(['getMembers', 'getMemberDetail'] as const)('%s omits retired assignments while preserving current service roles', async method => {
+    const historical = [
+      { id: 'old', role: 'kpa:pharmacist' },
+      { id: 'current', role: 'kpa:operator' },
+    ];
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
+      if (sql.includes('COUNT(*)')) return [{ total: 1 }];
+      if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID }];
+      if (sql.includes('FROM role_assignments')) return method === 'getMembers'
+        ? [{ user_id: ID, roles: historical.map(row => row.role) }]
+        : historical;
+      return [];
+    });
+    const response = await readMembers(method, ['kpa-society'], { serviceKey: 'kpa-society' });
+    const payload = response.json.mock.calls[0][0];
+    expectReadScope(method === 'getMembers' ? [ID] : ID, 'kpa-society', 'kpa');
+    if (method === 'getMembers') expect(payload.users[0].roles).toEqual(['kpa:operator']);
+    else expect(payload.roles).toEqual([expect.objectContaining({ id: 'current', role: 'kpa:operator' })]);
+    expect(historical).toHaveLength(2);
+    expect(mockQuery.mock.calls.every(([sql]) => /^SELECT/.test(sql))).toBe(true);
+  });
   it('central detail needs an explicit scope before personal data access', async () => {
     const out = await readMembers('getMemberDetail', [], {}, true);
     expect(out.status).toHaveBeenCalledWith(400);

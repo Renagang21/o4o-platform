@@ -641,7 +641,6 @@ function buildConfig(
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
     ...(isAdmin
       ? [
-          { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: 'key' },
           { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: 'scroll-text' },
         ]
       : []),

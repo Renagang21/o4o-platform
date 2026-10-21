@@ -31,12 +31,6 @@ jest.mock('../supplier-regulated-category.service.js', () => ({
   })),
   resolveRegulatedCategoryFromProduct: jest.fn(() => 'general'),
 }));
-const mockAudienceResolver = jest.fn();
-jest.mock('../service-audience.service.js', () => ({
-  ServiceAudienceService: jest.fn().mockImplementation(() => ({
-    getPharmacyAudienceResolver: mockAudienceResolver,
-  })),
-}));
 const query = AppDataSource.query as jest.Mock;
 const getRepository = AppDataSource.getRepository as jest.Mock;
 const drugGate = assertDrugOfferAllowed as jest.Mock;
@@ -68,7 +62,7 @@ beforeEach(() => {
   // Keep dependency constructor factories; reset only per-test behavior.
   for (const mock of [...Object.values(repo), ...Object.values(tx), query, getRepository,
     drugGate, expand, mockSync, mockPending, mockCancel, mockCategoryStatuses,
-    mockCategoryGate, mockAudienceResolver]) mock.mockReset();
+    mockCategoryGate]) mock.mockReset();
   events = [];
   service = new NetureOfferService({} as never);
   getRepository.mockReturnValue(repo);
@@ -97,7 +91,6 @@ beforeEach(() => {
   });
   mockCategoryStatuses.mockResolvedValue(new Map());
   mockCategoryGate.mockReturnValue({ allowed: true });
-  mockAudienceResolver.mockResolvedValue((key: string) => key === 'kpa-society');
 });
 
 describe('registration approval is independent from service publication', () => {
@@ -195,14 +188,27 @@ describe('service publication is atomic and cannot mutate registration approval'
     expect(tx.query.mock.calls.some(([sql]) => sql.includes('SET approval_status'))).toBe(false);
     expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
   });
+  it('an approved supplier can publish a drug through regular supply without an audience-policy row', async () => {
+    drugGate.mockImplementation(jest.requireActual('../../guards/drug-access.guard.js').assertDrugOfferAllowed);
+    tx.query.mockImplementation(async (sql: string) => {
+      if (sql.includes('SELECT id, supplier_id')) return [rawFixture({ master_id: '11111111-1111-4111-8111-111111111111', approval_status: 'APPROVED', is_active: true, price_general: 100 })];
+      if (sql.includes('FROM product_masters')) return [{ regulatory_type: 'DRUG' }];
+      if (sql.includes('service_audience_policies')) throw new Error('retired policy must not be read');
+      return [];
+    });
+    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ isPublic: true }))
+      .toMatchObject({ success: true, data: { isPublic: true } });
+    expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
+    expect(expand).toHaveBeenCalled();
+  });
   it('withdrawing a service keeps default publication, product approval and service prices', async () => {
     await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ serviceKeys: [] });
     expect(mockCancel).toHaveBeenCalledWith('offer-fixture',['kpa-society'],tx);
     expect(tx.query.mock.calls.some(([sql]) => /DELETE|SET approval_status|UPDATE organization_product_listings/.test(sql))).toBe(false);
   });
   it('drug denial rolls back before any publication write', async () => {
-    drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN' });
-    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ isPublic: true })).toEqual({ success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN' });
+    drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PRODUCT_UNRESOLVED' });
+    expect(await service.updateDistribution('offer-fixture','supplier-fixture','actor-fixture',{ isPublic: true })).toEqual({ success: false, error: 'DRUG_PRODUCT_UNRESOLVED' });
     expect(tx.commitTransaction).not.toHaveBeenCalled(); expect(expand).not.toHaveBeenCalled();
   });
   it.each(['write','cancel','pending','sync'] as const)('%s failure rolls back the publication', async stage => {
@@ -225,9 +231,9 @@ describe('supplier editing and partial batches preserve ownership and failure ou
   });
   it('update drug denial prevents save and public expansion', async () => {
     repo.findOne.mockResolvedValue(fixture({ approvalStatus: 'APPROVED' }));
-    drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', message: 'Fixture denial' });
+    drugGate.mockResolvedValue({ allowed: false, code: 'DRUG_PRODUCT_UNRESOLVED', message: 'Fixture denial' });
     expect(await service.updateSupplierOffer('offer-fixture', 'supplier-fixture', { isPublic: true })).toEqual({
-      success: false, error: 'DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', message: 'Fixture denial',
+      success: false, error: 'DRUG_PRODUCT_UNRESOLVED', message: 'Fixture denial',
     });
     expect(repo.save).not.toHaveBeenCalled();
     expect(expand).not.toHaveBeenCalled();
