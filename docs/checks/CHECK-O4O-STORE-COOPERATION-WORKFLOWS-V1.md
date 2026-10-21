@@ -1,6 +1,6 @@
 # 내 매장 협업체별 상품·주문·컨텐츠 연결 검증
 
-> **상태**: ACTIVE (로컬 개발 검증 완료; 추가 승인된 통합·배포 진행)
+> **상태**: ACTIVE (main 반영·운영 배포 확인; 실계정 업무 검증은 후속)
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (한국시간)
 > **승인 범위**: TODO·문서/코드 대조 → 개발·검증·commit·push. PR·main 병합·배포 제외.
 > **추가 승인**: 2026-10-21 사용자 `main 으로 병합-> 배포`. 아래 최초 개발 검증 기록은 당시 범위를 보존한다.
@@ -56,7 +56,7 @@ API 파일: `store-cooperation-workflows.integration.spec.ts`, `business-store-a
 
 `pageerror`·외부 요청·미처리 합성 API는 0건이었다. 스크린샷을 직접 확인했다. 검증 artifact는 작업 환경의 `.o4o-cooperation-browser-20261021` / `.o4o-cooperation-20261021`에 두며 실계정·운영 데이터는 포함하지 않는다. 검사 후 전용 Vite 서버와 브라우저 context도 종료했다.
 
-## 남은 경계와 통합 인계
+## 최초 개발 종료 시점의 경계와 통합 인계
 
 - 현재 일반 모집 생성 UI/API에는 공급가 입력이 없다. 가격 없는 모집은 승인만으로 주문 가능해지지 않는다. **공급자 측 공급가 입력·확정 계약은 후속 작업**이다. 소비자가나 기본가로 가격을 추정하지 않았다.
 - 협동조합의 개인 회원 가입을 약국 조직의 사업 가입으로 변환하지 않았다. 해당 정책/연결이 없으면 그 개인 가입을 주문·원본 자료 자격으로 취급하지 않는다.
@@ -82,8 +82,44 @@ reason: push 후 통합 검토·수정 재현용. 기준 checkout·다른 작업
 
 현재 main `1adf577e38`의 새 공개 진입/문의·관리자·AI 관리 변경을 자기 branch에 일반 merge(`aec75fe3af`)했다. 이번 업무 변경과 파일 충돌이 없고 migration·의존성·workflow 변경도 없다. 다른 개발 branch를 포함시키지 않는다. 직전 main의 production 상태는 `DEPLOYED · deploy: api,admin`, Delivery `39601258231` 성공으로 확인했다.
 
-최신 결합 상태의 로컬 검사·PR CI·Codex, 병합 및 배포 결과는 이 절에 이어 기록한다. 실제 계정 업무·공급자 가격 확정·실 PG·QR/기기 검증의 기존 경계는 유지한다.
+최신 결합 상태의 로컬 검사·PR CI·Codex, 병합 및 배포 결과는 아래에 기록했다. 실제 계정 업무·공급자 가격 확정·실 PG·QR/기기 검증의 기존 경계는 유지한다.
 
-PR #756 최초 HEAD `2172d17d7b`는 Codex 지적 0·긍정 반응, Store 753건/API 49건과 PC·모바일 재검증을 통과했다. 별도 SonarCloud 검사는 새 코드 신뢰성 C를 보고했다. GitHub check annotation 24건을 확인해 SQL 문자열 치환 대신 명시적 placeholder 번호로 같은 data/count 조건을 생성하고, 중첩된 화면 조건·URL 문자열을 정리했다. 사업명 표시를 로컬 함수로 모으고 props readonly·조건 분기 명확화·상태 output도 반영했다. 가입·공급가·수취 주체·권한 계약은 바꾸지 않았다. SQL 회귀에는 사업+출처+검색+태그를 동시에 적용하는 경우를 보강했다. 수정 후 결과를 별도로 확인한다.
+PR #756 최초 HEAD `2172d17d7b`는 Codex 지적 0·긍정 반응, Store 753건/API 49건과 PC·모바일 재검증을 통과했다. 별도 SonarCloud 검사는 새 코드 신뢰성 C를 보고했다. GitHub check annotation 24건을 확인해 SQL 문자열 치환 대신 명시적 placeholder 번호로 같은 data/count 조건을 생성하고, 중첩된 화면 조건·URL 문자열을 정리했다. 사업명 표시를 로컬 함수로 모으고 props readonly·조건 분기 명확화·상태 output도 반영했다. 가입·공급가·수취 주체·권한 계약은 바꾸지 않았다. SQL 회귀에는 사업+출처+검색+태그를 동시에 적용하는 경우를 보강했다. 수정 후 검증 결과는 아래 최종 재검증에 기록했다.
 
 후속 Codex 검토는 기존 `/workspace/commerce`의 상품 선택→컨텐츠 작성 복귀가 새 공급 목록에 가려지는 P2 1건을 지적했다. 기존 `readProductGuidanceReturn`의 매장·서비스·허용 경로 검사와 정확한 현재 URL 일치를 재사용해, 그 복귀일 때만 권한 필터에 남은 `/my-products`로 replace 이동하고 query·선택 복귀 state를 함께 옮긴다. 이후 검색도 취급상품 화면에서 계속한다. 새 상품·거래 방문은 주문 목록을 유지한다. 공통/서비스 지정 경로의 실제 취급상품 선택·검색·페이지 복원, 다른 매장/서비스/경로 및 숨겨진 메뉴 거절 회귀를 추가했다.
+
+### 최종 병합과 재검증
+
+- [PR #756](https://github.com/Renagang21/o4o-platform/pull/756)은 최종 HEAD `e4ac76017d50cc7234e6352edccc0cc5444d6d7c`로 고정해 일반 merge했다. main 병합 commit은 `b4bcb8abee64cc3e96c2eb8d9bcd186a54989ee3`다. 실제 main ruleset의 필수 `CI Gate`·approval 수 0을 확인했고 admin bypass·auto-merge 설정은 사용하지 않았다.
+- [최종 PR CI 39612210408](https://github.com/Renagang21/o4o-platform/actions/runs/39612210408)와 CodeQL·SonarCloud gate가 통과했다. Codex의 최종 HEAD 검토는 추가 지적 0·미해결 스레드 0이다. P2 복귀 지적은 회귀와 함께 수정·해결 처리했다.
+- 최종 runtime은 `ff533eacb4`이며 `e4ac76017d`는 권한 필터 거절 테스트에 명시적 assertion 1줄만 추가했다. 로컬 Store 전체 62 files / **761 PASS**, 해당 최종 파일 43 PASS, API 49 PASS(실 PostgreSQL 21건 포함), Store/API build·타입·집중 lint를 통과했다. PC/모바일 합성 API 검사에 공통/서비스 지정의 실제 상품 복귀·선택·검색·페이지 보존도 추가해 확인했다.
+- 직전 CI `39610365461`의 web job은 변경하지 않은 `consultation-speech.test.tsx:47`의 음성 입력 assertion 1건으로 실패했다. 해당 파일의 단독 재검사는 17 PASS였고 음성 상담 코드·테스트를 변경하거나 제외하지 않았다. 최종 CI의 Store 전체 검사는 통과했다. 실패 로그의 외부 blob 다운로드는 이 환경에서 제한돼 GitHub check annotation으로 실패 파일·assertion을 확인했다.
+- 테스트 schema 잔존 0을 재확인하고 전용 PostgreSQL·임시 data directory 및 Vite를 종료·정리했다. 운영 계정·운영 업무 데이터 쓰기는 실행하지 않았다.
+- [병합 후 CI 39614185805](https://github.com/Renagang21/o4o-platform/actions/runs/39614185805)도 success다. [자동 Delivery 39615796483](https://github.com/Renagang21/o4o-platform/actions/runs/39615796483)는 같은 main commit으로 success이며, production commit status는 **`DEPLOYED · deploy: api,store`**다. API/Store 모두 verified rollout 검사와 트래픽 전환, 최종 serving SHA 확인이 성공했다. Promote·설정 변경·새 migration은 없었다.
+
+### 운영 읽기 전용 확인과 종료
+
+2026-10-21 23:37 (한국시간)에 TLS/proxy 설정을 유지한 비로그인 GET으로 다음을 확인했다. 로그인·운영 업무 데이터 쓰기는 실행하지 않았다.
+
+- API `/health/ready`: 200, `status=ready`. 공급 목록·주문·협업체 가입 보호 API는 모두 401.
+- `store.neture.co.kr`의 `/`, `/store/workspace/commerce`, `/store/workspace/studio`, `/store/pharmacy/recruitments`: 모두 200.
+- 실제 응답이 참조하는 `/assets/index-DUrclHbg.js`와 공급·모집·주문·내 컨텐츠·가입 조회 chunk에서 `상품 주문`, `일반 공개 모집`, `협업체 다시 확인`, `libraryBusiness`, `orderable`을 확인했다. 화면 컴포넌트의 운영 로그인 검증을 대신하는 결과는 아니다.
+- HTTP 상태·자산 경로/해시·표식 결과는 저장소 밖 `.o4o-cooperation-delivery-20261021/public-after.json`에 보존했다. 실제 사용자·조직 데이터나 자격정보는 포함하지 않는다.
+
+원래 개발 worktree와 이번 기록용 worktree만 종료 정리 대상으로 확인한다. 모두 이번 세션 소유이며 다른 세션 사용은 없다. 문서-only 결과 기록을 PR로 main에 반영한 뒤 clean·operation 없음·branch-only commit 0을 재확인하고 제거한다. 기준 checkout과 다른 worktree는 보존한다.
+
+```text
+WORKTREE_DISPOSITION
+worktree: /workspace/o4o-wt/store-cooperation-workflows
+branch: wo/store-cooperation-workflows / base: ac38af8df1
+main integration: PR #756 merged (b4bcb8abee) / CI: 39612210408, 39614185805 success
+deployment: AUTOMATIC · Delivery 39615796483 success · DEPLOYED api,store
+smoke: 비로그인 운영 GET/자산 확인 PASS; 실계정 업무·실 PG·기기 검증 미실행
+uncommitted: 0 / untracked: 0 / other session usage: 없음 / branch-only commits: 0
+verdict: SAFE_TO_REMOVE (문서 결과 기록 병합 후 제거)
+record worktree: /workspace/o4o-wt/store-cooperation-delivery-record
+record branch: wo/store-cooperation-delivery-record / base: b4bcb8abee
+record disposition: 결과 문서 PR 병합·CI 확인 전까지 KEEP; 병합 뒤 같은 정리 검사를 적용
+```
+
+문서 정합: TODO의 추가 통합·배포 항목과 이번 CHECK의 상태·실행 결과를 갱신했다. 최초 push-only 기록은 당시 시점으로 구분해 보존하며 canonical index·과거 WO는 변경하지 않았다.
