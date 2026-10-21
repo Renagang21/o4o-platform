@@ -82,6 +82,7 @@ it('a saved product return cannot restore a menu removed by capability filtering
     </Route>
   </Routes></MemoryRouter>);
   await screen.findByRole('heading',{name:'상품 주문'});
+  expect(screen.queryByRole('heading',{name:'상품 목록'})).toBeNull();
 });
 
 describe("업무 배치와 기존 경로", () => {
