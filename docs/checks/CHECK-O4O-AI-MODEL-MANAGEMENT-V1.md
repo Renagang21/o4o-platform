@@ -5,6 +5,8 @@
 > **근거 WO/IR**: [모델 관리 TODO](../work-orders/TODO-O4O-AI-MODEL-MANAGEMENT-V1.md)
 > **관련 정본**: [AI 공통 기반 §12](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#12-관리자-ai-운영-조회-기반--main운영-반영-2026-10-20)
 
+이 문서는 개발·통합·배포 순서의 실행 기록이다. 앞부분의 push-only 종료와 당시 실패는 과거 단계의 증거이며, 현재 반영 상태는 아래 `main·운영 배포 확인` 절과 최종 정리 실행 기록을 따른다.
+
 ## 변경과 적용 범위
 
 관리자 `/settings`의 AI 운영 관리에서 공급자별 모델을 등록·수정·삭제하고, 사용처 상세에서 사용할 모델을 선택·저장한다. `AiModelControls.tsx`와 `api/ai-management.ts`가 관리 API를 사용한다. 기존 조회·공통 질의 정책·사용량 집계는 유지한다.
@@ -64,7 +66,7 @@ Gemini 기존 정책 화면의 동적 모델 조회도 관리자 등록·삭제�
 
 명령은 저장소 루트에서 `pnpm --filter @o4o/api-server exec jest --runInBand <대상 spec>`, `pnpm --filter @o4o/admin-dashboard exec vitest run`, `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm --filter @o4o/admin-dashboard exec playwright test src/test/e2e/ai-model-controls.spec.ts --project chromium --workers 1`를 사용했다. 실제 PostgreSQL 검증은 애플리케이션 DB 설정을 읽지 않는 loopback fixture와 `O4O_AI_QUOTA_TEST_PORT=55447`로 실행했다.
 
-### 미해결: 기존 quota rollback 테스트 2건
+### 개발 당시 미해결: 기존 quota rollback 테스트 2건
 
 `ai-quota-schema.integration.spec.ts`의 rollback archive 생성 및 old precision overflow rollback 검증이 실패했다. 이 spec은 전체 incremental bootstrap 후 `undoLastMigration()`이 `CreateAiUsageReservations1791870434349`를 되돌린다고 가정한다. 현재 manifest의 마지막은 `CreateCooperativeManagement1792300000000`이므로 실제 되돌리는 migration이 다르다. 해당 spec·quota migration·manifest는 작업 기준 `5c6150a6b0`와 diff 0이며 이번 작업에서 수정하지 않았다. PASS로 숨기거나 migration 이력을 바꾸지 않는다. 테스트가 실제 목표 migration을 명시하도록 별도 보완이 필요하다. 독립된 기준 checkout에서 같은 테스트를 재실행한 것은 아니므로 별도 baseline 실행 증거로 표현하지 않는다.
 
