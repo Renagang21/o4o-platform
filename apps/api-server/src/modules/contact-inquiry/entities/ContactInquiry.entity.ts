@@ -4,8 +4,8 @@
  * WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1
  *
  * cross-service 공개 문의(Contact) 접수 저장소. serviceKey 기준.
- * V1 범위: K-Cosmetics (기존 contact 백엔드 없던 서비스).
- * Neture(NetureContactMessage) / KPA(ContactRequest) 는 기존 구조 유지 — 본 테이블 미사용.
+ * 공개 서비스 문의의 공통 원장. CONTACT_SERVICES의 명시적 범위를 사용한다.
+ * 이전 Neture(NetureContactMessage) / KPA(ContactRequest) 이력은 원래 원장에 유지한다.
  *
  * 원칙:
  *   - 공개 submit(인증 없음). 운영자 in-app 알림(notificationService)으로 연결.
@@ -29,9 +29,13 @@ export class ContactInquiry {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** k-cosmetics (V1). service-catalog canonical key. */
+  /** Contact service scope key; never inferred from contact type or source path. */
   @Column({ type: 'varchar', length: 50 })
   service_key!: string;
+
+  /** Server-derived business/cooperative organization; null means service-wide. */
+  @Column({ type: 'uuid', nullable: true })
+  organization_id!: string | null;
 
   /** service_usage | account_permission | partnership | technical_issue | other */
   @Column({ type: 'varchar', length: 50, default: 'other' })

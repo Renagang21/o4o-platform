@@ -96,6 +96,8 @@ export function membershipIdentity(
 const reservedSlugs = new Set([
   "cooperatives",
   "about",
+        "contact",
+        "notifications",
   "operator",
   "preview",
   "login",

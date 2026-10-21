@@ -1,4 +1,5 @@
 import { BUSINESS_SITE } from '../../config/businessSite';
+import { PublicServiceEntry } from '@o4o/shared-space-ui';
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -32,6 +33,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
     return () => { alive = false; };
   }, [businessKey, user?.id, isLoading, retry]);
   if (isLoading) return <output className="p-6" aria-live="polite">로그인 상태를 확인하고 있습니다…</output>;
+  if (!user && location.pathname === '/') return <PublicServiceEntry serviceKey={BUSINESS_SITE.key === 'megapharm' ? 'megapharm' : 'pharmacy'} loginHref={`/login?returnTo=${encodeURIComponent(location.pathname+location.search+location.hash)}`} contactHref="/contact" />;
   if (!user) return <Navigate to={`/login?returnTo=${encodeURIComponent(location.pathname + location.search + location.hash)}`} state={{ from: location.pathname + location.search + location.hash }} replace />;
   if (error) return <section className="p-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)}>다시 시도</button></section>;
   if (state?.loadedFor !== `${user.id}:${businessKey}`) return <output className="p-6" aria-live="polite">사업 정보를 확인하고 있습니다…</output>;
@@ -39,6 +41,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const requestedStore = new URLSearchParams(location.search).get('store');
   const storeSearch = requestedStore ? `?store=${encodeURIComponent(requestedStore)}` : '';
   const operatorNavigation = state.access?.canManage ? <nav aria-label="담당 사업 운영" className="mb-5 flex flex-wrap gap-3 text-sm text-blue-700">
+      <NavLink to={`/operator/inbox/business/${businessKey}`}>운영 알림·문의함</NavLink>
       <NavLink to={businessKey === 'pharmacy' ? '/home-presentation' : `${base}/home-presentation`}>Hero · 광고 관리</NavLink>
       <NavLink to={`${businessPath(businessKey, 'forum')}/manage`}>게시판 운영</NavLink>
       {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}

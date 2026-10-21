@@ -14,6 +14,7 @@ import { AuthRequest } from '../../types/auth.js';
 import { aiQueryService, AiQueryRequest, AiQueryContextType } from '../../services/ai-query.service.js';
 import logger from '../../utils/logger.js';
 import { isGeminiModelAllowed } from '../../services/ai-model-registry.service.js';
+import { ModelControlError } from '../../services/ai-management/model-controls.js';
 import { AppDataSource } from '../../database/connection.js';
 
 export class AiQueryController {
@@ -272,6 +273,9 @@ export class AiQueryController {
       });
 
     } catch (error: any) {
+      if (error instanceof ModelControlError) {
+        return res.status(error.status).json({ success: false, code: error.code, error: error.message });
+      }
       logger.error('AI Policy Update Controller error:', error);
       return res.status(500).json({
         success: false,

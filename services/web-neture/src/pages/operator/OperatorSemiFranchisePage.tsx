@@ -7,5 +7,5 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function OperatorSemiFranchisePage(props: ComponentProps<typeof AssignedBusinessPage> = {}) {
   const { user } = useAuth();
   if (!user) return null;
-  return <>{props.businessKey && user.roles?.includes(`neture:${props.businessKey}_admin`) && <ServiceOperatorManagement key={`${user.id}:${props.businessKey}`} client={authClient.api} scope={props.businessKey} />}<AssignedBusinessPage key={user.id} {...props} /></>;
+  return <>{props.businessKey && user.roles?.includes(`neture:${props.businessKey}_admin`) && <ServiceOperatorManagement key={`${user.id}:${props.businessKey}`} client={authClient.api} scope={props.businessKey} />}<AssignedBusinessPage contactHref={key => ["pharmacy","carepharm","megapharm","pharmcoop"].includes(key) ? `https://neture.co.kr/operator/service-contact/${key === "pharmacy" ? "kpa-society" : key}` : undefined} key={user.id} {...props} /></>;
 }

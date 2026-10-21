@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { PharmacyOperatorPage } from "../PharmacyOperatorPages";
@@ -44,7 +45,7 @@ it.each(["pharmacy", "megapharm"])(
   async (business) => {
     state.business = business;
     state.roles = [`neture:${business}_admin`];
-    render(<PharmacyOperatorPage />);
+    render(<MemoryRouter><PharmacyOperatorPage /></MemoryRouter>);
     await screen.findByText("지정된 Operator가 없습니다.");
     expect(state.get).toHaveBeenCalledWith(
       `/service-operator-management/${business}`,
@@ -56,7 +57,7 @@ it.each(["neture:pharmacy_operator", "neture:megapharm_admin", "neture:admin"])(
   (role) => {
     state.business = "pharmacy";
     state.roles = [role];
-    render(<PharmacyOperatorPage />);
+    render(<MemoryRouter><PharmacyOperatorPage /></MemoryRouter>);
     expect(screen.queryByText("운영자 지정 · 해제")).toBeNull();
     expect(state.get).not.toHaveBeenCalled();
   },

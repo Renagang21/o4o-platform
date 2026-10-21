@@ -223,6 +223,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
                 </div>
               </div>
             ))}
+            <a href="https://neture.co.kr/contact?service=kpa-branch">Contact Us</a>
           </div>
         </nav>
       </header>

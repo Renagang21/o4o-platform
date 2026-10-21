@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, Navigate, useLocation, useOutletContext } from "react-router-dom";
 import type { StoreWorkspaceOutlet } from "../../components/layouts/StoreWorkspaceShell";
 import {
   workspaceGroups,
@@ -9,6 +9,9 @@ import {
 import { useUnifiedStore } from "../../contexts/StoreContext";
 import { SERVICE_WORK_CONFIGS } from "../../config/storeMenu";
 import { isUnifiedServiceKey } from "../../lib/serviceContext";
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { readProductGuidanceReturn } from './productGuidance/productGuidanceRoute';
 const StoreHandledProductsPage = lazy(
   () => import("./StoreHandledProductsPage"),
 );
@@ -16,6 +19,7 @@ const StoreLibraryContentsPage = lazy(
   () => import("./StoreLibraryContentsPage"),
 );
 const StoreOperationsPage = lazy(() => import("./StoreOperationsPage"));
+const SupplyOptionsPage = lazy(() => import('../neture-pharmacy/SupplyOptionsPage'));
 
 const linkStyle =
   "inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-teal-600";
@@ -37,7 +41,11 @@ export function StoreWorkspacePage(props: WorkspaceProps) {
 }
 function WorkspaceContents({ area }: WorkspaceProps) {
   const { config } = useOutletContext<StoreWorkspaceOutlet>();
+  const location = useLocation();
+  const { key: scope } = useStoreOperationScope();
   const { workServiceKeys } = useUnifiedStore();
+  const productReturn = readProductGuidanceReturn(location.state, scope, config.basePath);
+  const returningToProducts = productReturn?.path === location.pathname + location.search;
   const groups = workspaceGroups(config, area);
   const items = workspaceItems(config, area);
   const has = (key: string) => items.some((item) => item.key === key);
@@ -103,13 +111,21 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         ))}
     </nav>
   );
+  // Existing content-authoring history may return to the former handled-products landing.
+  // Move that return to the dedicated route so subsequent searches stay in handled products.
+  if (area === 'commerce' && has('my-products') && productReturn && returningToProducts) {
+    const path = `${config.basePath}/my-products${location.search}`;
+    return <Navigate to={path} replace state={{ ...location.state, productReturn: { ...productReturn, path } }} />;
+  }
+  if (area === 'commerce' && has('pharmacy-supply'))
+    return <SupplyOptionsPage navigation={navigation} />;
   if (area === "commerce" && has("my-products"))
     return <StoreHandledProductsPage workspace navigation={navigation} />;
   if (area === "studio" && has("library-contents"))
     return (
       <StoreLibraryContentsPage
         workspace
-        navigation={navigation}
+        navigation={<><StoreLibraryNavigation section="mine" />{navigation}</>}
         quickLinks={
           <>
             {productAllowed && (

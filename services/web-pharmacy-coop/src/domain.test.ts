@@ -84,6 +84,7 @@ describe("cooperative URL identity", () => {
   );
   it.each([
     "operator",
+    "notifications",
     "api",
     "assets",
     "cooperatives",

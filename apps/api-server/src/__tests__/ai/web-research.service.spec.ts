@@ -28,6 +28,7 @@ jest.mock('../../database/connection.js', () => ({
 }));
 
 import { WEB_RESEARCH_MAX_ATTEMPTS, WEB_RESEARCH_TIMEOUT_MS, runWebResearch } from '../../services/ai/web-research.service.js';
+import { ModelControlService } from '../../services/ai-management/model-controls.js';
 import { GEMINI_CANONICAL_MODEL } from '../../types/ai-proxy.types.js';
 
 const GROUNDED_RESPONSE = {
@@ -161,4 +162,16 @@ describe('runWebResearch — admin 모델 해석 → grounding end-to-end', () =
     expect(r.model).toBe(GEMINI_CANONICAL_MODEL); // 비-gemini → fallback
     expect(captured!.url).toContain(`/models/${GEMINI_CANONICAL_MODEL}:generateContent`);
   });
+  it('uses the separate hospital model for an explicitly identified research request', async () => {
+    const resolve = jest.spyOn(ModelControlService.prototype, 'resolve').mockResolvedValue({ provider: 'gemini', model: 'gemini-hospital-fixture', managed: true });
+    mockFindOne.mockResolvedValue({ id: 1, defaultModel: GEMINI_CANONICAL_MODEL });
+    mockFetch(GROUNDED_RESPONSE);
+    try {
+      const result = await runWebResearch({ query: 'synthetic research', usage: 'hospital.research' });
+      expect(resolve).toHaveBeenCalledWith('hospital.research', expect.anything());
+      expect(captured!.url).toContain('/models/gemini-hospital-fixture:generateContent');
+      expect(result.model).toBe('gemini-hospital-fixture');
+    } finally { resolve.mockRestore(); }
+  });
+
 });

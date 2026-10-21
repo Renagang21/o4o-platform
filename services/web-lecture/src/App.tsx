@@ -1,3 +1,5 @@
+import NotificationsPage from './pages/NotificationsPage';
+import OperatorInboxPage from './pages/operator/OperatorInboxPage';
 import ServiceOperatorsPage from './pages/operator/ServiceOperatorsPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import OperatorMembersPage from './pages/operator/OperatorMembersPage';
@@ -44,6 +46,7 @@ export default function App() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:courseId" element={<CourseDetailPage />} />
       <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonPage />} />
@@ -67,6 +70,7 @@ export default function App() {
       <Route element={<AccessGate area="admin" />}><Route path="/operator/operators" element={<ServiceOperatorsPage />} /></Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
+        <Route path="/operator/inbox" element={<OperatorInboxPage />} />
         <Route path="/operator/home-presentation" element={<HomePresentationPage />} />
         <Route path="/operator/members" element={<OperatorMembersPage />} />
         <Route path="/operator/members/:id" element={<OperatorMembersPage />} />

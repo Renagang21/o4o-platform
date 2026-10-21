@@ -299,7 +299,7 @@ export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'g
 
 
 export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true));
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true), true);
 }
 
 
@@ -349,11 +349,14 @@ export function createLlmPlanner(
   dataSource: DataSource,
   fetchImpl: typeof fetch = fetch,
   resolveTarget: PlannerTargetResolver = defaultTargetResolver,
+  strong = false,
 ): WorkPlanner {
   return {
     kind: 'llm',
     async plan(input) {
-      const { provider, model, apiKey } = await resolveTarget(dataSource);
+      const fallback = await resolveTarget(dataSource);
+      const { resolveManagedAiTarget } = await import('../ai-management/runtime-models.js');
+      const { provider, model, apiKey } = await resolveManagedAiTarget(dataSource, strong ? 'work.planning.strong' : input.image ? 'work.vision' : 'work.planning', fallback);
       const userPrompt = buildPlannerUserPrompt(input);
       if (input.image && provider === 'gemini') {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -423,5 +426,5 @@ export function createStrongLlmPlanner(
   dataSource: DataSource,
   fetchImpl: typeof fetch = fetch,
 ): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver);
+  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver, true);
 }

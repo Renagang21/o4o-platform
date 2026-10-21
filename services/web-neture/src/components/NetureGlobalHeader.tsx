@@ -1,3 +1,5 @@
+import { OperatorInboxLink } from '@o4o/operator-core-ui';
+import { useServiceContactCount } from '@o4o/shared-space-ui';
 /**
  * NetureGlobalHeader — Neture 서비스의 GlobalHeader 브릿지
  *
@@ -19,7 +21,7 @@ import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
-import { SUPPLIER_ONLY_ROLES, getBusinessOperatorRolesForHost } from '../lib/role-constants';
+import { SUPPLIER_ONLY_ROLES, getBusinessOperatorRolesForHost, canSeeSubdomainOperatorPath } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { DEMO_NOTICE } from '../lib/demoAccounts';
@@ -56,6 +58,7 @@ export function NetureGlobalHeader() {
   const notif = useNotifications(notificationsApi, {
     enabled: isAuthenticated && !!user,
     serviceKey: NOTIFICATION_SERVICE_KEY,
+    pollIntervalMs: 30000,
   });
 
   // WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
@@ -76,13 +79,24 @@ export function NetureGlobalHeader() {
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
   //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
   //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
-  const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
+  const publicNav = [...getServicePublicNav(CURRENT_HOST_PROFILE)];
+  // The protected summary is the authority, including platform bypass and live business assignments.
+  const newContacts = useServiceContactCount({client:api,serviceKey:CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE,accountId:user?.id,enabled:isAuthenticated && !isLoading});
+  const contactAllowed = newContacts !== null;
+  if (contactAllowed) {
+    publicNav.push({ label: newContacts ? `문의 관리 · 새 문의 ${newContacts}` : '문의 관리', href: `/operator/service-contact/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}` });
+  }
+
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
 
   // Main business entry redirects to pharmacy; other collaborators operate on their own host.
   const businessOperator = user?.roles?.some(role => getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE).includes(role));
   if (businessOperator && !publicNav.some(item => item.href === '/operator/semi-franchises') && !contextualNav.some(item => item.href === '/operator/semi-franchises')) contextualNav.push({ label: '사업 운영', href: '/operator/semi-franchises' });
 
+  const inboxScope = CURRENT_HOST_PROFILE === 'carepharm' ? 'business/carepharm' : `service/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}`;
+  const inboxHref = CURRENT_HOST_PROFILE === 'carepharm' ? '/operator/inbox/business/carepharm' : `/operator/inbox/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}`;
+  const inboxPrefix = CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE;
+  const showInbox = user?.roles?.some(role => CURRENT_HOST_PROFILE === 'carepharm' ? [...getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE),'neture:operator','neture:admin'].includes(role) : [`${inboxPrefix}:admin`,`${inboxPrefix}:operator`,'platform:super_admin'].includes(role)) && canSeeSubdomainOperatorPath(user, inboxHref);
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
     : null;
@@ -105,7 +119,7 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
          로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />{isAuthenticated && user && showInbox && <OperatorInboxLink requireAccess={CURRENT_HOST_PROFILE === 'carepharm'} key={`${user.id}:${inboxScope}`} client={api} endpoint={`/operator-inbox/${inboxScope}`} href={inboxHref}/>}</span>}
       utilitySlot={
         <>
           {isAuthenticated && user && (

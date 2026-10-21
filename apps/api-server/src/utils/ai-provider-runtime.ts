@@ -171,12 +171,17 @@ export function resolveStrongModelForProvider(provider: RuntimeProvider): string
 export async function resolveStrongAiTarget(
   dataSource: DataSource,
   requestedProvider?: unknown,
+  usage?: string,
 ): Promise<ResolvedAiTarget> {
   const provider = resolveProvider(requestedProvider);
   const [model, apiKey] = await Promise.all([
     Promise.resolve(resolveStrongModelForProvider(provider)),
     resolveKeyForProvider(dataSource, provider),
   ]);
+  if (usage) {
+    const { resolveManagedAiTarget } = await import('../services/ai-management/runtime-models.js');
+    return resolveManagedAiTarget(dataSource, usage, { provider, model, apiKey });
+  }
   return { provider, model, apiKey };
 }
 
@@ -201,12 +206,17 @@ export interface ResolvedAiTarget {
 export async function resolveAiTarget(
   dataSource: DataSource,
   requestedProvider?: unknown,
+  usage?: string,
 ): Promise<ResolvedAiTarget> {
   const provider = resolveProvider(requestedProvider);
   const [model, apiKey] = await Promise.all([
     resolveModelForProvider(provider),
     resolveKeyForProvider(dataSource, provider),
   ]);
+  if (usage) {
+    const { resolveManagedAiTarget } = await import('../services/ai-management/runtime-models.js');
+    return resolveManagedAiTarget(dataSource, usage, { provider, model, apiKey });
+  }
   return { provider, model, apiKey };
 }
 

@@ -1,13 +1,13 @@
 # 약국 서비스 설정 통합 TODO
 
-> **상태**: IN_PROGRESS
+> **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 승인 — 약국 협력사업 메뉴를 약국 서비스 설정으로 통합, 코드·문서 조사 후 개발·검증·push까지
 > **관련 정본**: [약국 설계](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §15-7 · [역할 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) · [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)
 
 ## 범위와 종료점
 
-전용 worktree `/workspace/o4o-wt/pharmacy-admin-settings-consolidation`, branch `wo/pharmacy-admin-settings-consolidation`, base `622aafc82814aedd4a0878f28101e56ff686219a`에서 진행한다. 이전 완료 branch와 기준 checkout을 수정하지 않는다. 이번 종료점은 commit·push다. PR 생성·병합·배포·운영 데이터 변경은 하지 않는다.
+전용 worktree `/workspace/o4o-wt/pharmacy-admin-settings-consolidation`, branch `wo/pharmacy-admin-settings-consolidation`, base `622aafc82814aedd4a0878f28101e56ff686219a`에서 진행한다. 이전 완료 branch와 기준 checkout을 수정하지 않는다. 개발 단계의 당시 종료점은 commit·push였다. 이후 사용자가 같은 작업의 PR·병합·배포를 승인해 아래 후속 통합 절차까지 완료했다. 운영 회원·사업 데이터의 직접 변경은 하지 않았다.
 
 ## 승인한 배치
 
@@ -60,9 +60,9 @@
 - [x] 전달 branch/HEAD `8c2fa68d239d3f02b5c0836204e92c8e51935764` 및 clean 상태 확인
 - [x] 최신 main `e09db6eb4b5b48e92bb3ebba2c777910c65f3c73`의 변경 16개 경로 조사: 이번 변경과 겹침 0, Neture 빌드/CI/도구 및 완료 문서
 - [x] 이미 push한 작업 branch에 main을 merge (`273b2eafc52b2d419bbda134537ca0c518fa3c18`), 충돌 0, 다른 checkout 수정 0
-- [ ] 통합 후 관련 검증·PR CI 및 Codex 리뷰
-- [ ] main 병합·post-merge CI·현재 Delivery 정책 판정
-- [ ] 운영 배포·serving revision/traffic·공개 응답 확인 및 한계 기록
+- [x] 통합 후 관련 검증·PR CI 및 Codex 리뷰
+- [x] main 병합·post-merge CI·현재 Delivery 정책 판정
+- [x] 운영 배포·serving revision/traffic·공개 응답 확인 및 한계 기록
 
 새 migration·schema·seed·DB 직접 변경은 추가하지 않는다. 운영 Google 인증과 실제 회원/사업 상태 변경은 이번 검증에서 수행하지 않는다.
 
@@ -82,3 +82,19 @@ PR CI·Codex 재리뷰·운영 배포 결과는 확정 후 아래에 기록한�
 
 
 Codex 후속 P2도 수정했다. 중앙 운영자 화면에서 지정/해제 쓰기 성공과 목록 재조회 실패를 구분하며 성공 안내를 유지한다. 재시도는 GET만 실행하고 성공한 POST/DELETE를 반복하지 않는다. 후보 검색은 별도 목록 재조회를 하지 않는다. UI 3개(성공한 해제 후 GET 실패→조회만 재시도 포함)와 변경 파일 lint를 검증했다. API 타입 검사도 PASS다.
+
+
+## 통합 확정
+
+- [PR #746](https://github.com/Renagang21/o4o-platform/pull/746): 최종 개발 HEAD `37d8a2bb5fab5f5906feecde0449f68ffbaed95c`, PR CI [39527811787](https://github.com/Renagang21/o4o-platform/actions/runs/39527811787) 성공. CI Gate·CodeQL·Guard·SonarCloud PASS.
+- Codex 지적 3건 수정·회귀 검증·스레드 해결 후 최종 HEAD 재리뷰 완료: 추가 지적·미해결 0.
+- 2026-10-21 10:44 KST 정상 merge: `c9d9760abaebe2bbfce53cbe20a1623ad1733860`. 우회·force push·다른 checkout 변경 없음.
+- 병합 커밋의 [main CI 39529022199](https://github.com/Renagang21/o4o-platform/actions/runs/39529022199) 및 CodeQL 39529022119 성공.
+- [Delivery 39529989271](https://github.com/Renagang21/o4o-platform/actions/runs/39529989271)가 API·관리자·Neture·KPA Society·강의·Store 6개를 자동 배포 대상으로 판정했다. 별도 Promote dispatch는 하지 않았다. 최종 서빙 결과는 다음 절에 확정 기록한다.
+
+
+## 최종 배포 완료
+
+[Delivery 39529989271](https://github.com/Renagang21/o4o-platform/actions/runs/39529989271) 성공, `production=DEPLOYED`. API·관리자·Neture·KPA Society·강의·Store 6개가 `c9d9760abaebe2bbfce53cbe20a1623ad1733860` revision 단일 트래픽 100%임을 배포 결과와 전환 기록에서 확인했다. KPA Branch·Hospital Pharmacy는 runtime 변경이 없어 NO_DEPLOY다. 새 migration 파일 0개이며 표준 배포 migration Job은 성공했다. 직접 DB 변경·실제 계정 상태 변경·과금 검증은 하지 않았다.
+
+API health/ready 200, 관리자 root·통합 주소·구 주소 200, 관리자 정책/신규 조회 API의 비인증 401, 공개 새 번들의 기능 설정/회원 이용 자격/설정 대상 문구를 확인했다. 실제 Google 로그인 이후 화면·실데이터 저장은 미검증이다. 자세한 revision·한계는 CHECK 최종 절을 따른다. 종료 기록은 같은 WO의 docs-only 후속 PR로 정상 CI·리뷰·병합하며 앱을 추가 배포하지 않는다.
