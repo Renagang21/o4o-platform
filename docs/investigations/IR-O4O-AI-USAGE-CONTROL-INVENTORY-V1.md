@@ -110,6 +110,7 @@
 | 이미지 개발 smoke | [astra-image-smoke](../../scripts/ai/astra-image-smoke.mts)는 수동 실행 시 OpenAI 유료 호출 가능 | **개발용 호출**, 공통 비용 기록 미연결. 이번 조사에서는 실행하지 않음 |
 | Gemini grounding 개발 smoke | [gemini-grounding-smoke](../../scripts/ai/gemini-grounding-smoke.mts)는 수동 실행 시 실제 Gemini grounding 생성 호출과 출처 메타데이터를 확인 | **개발용 유료 호출 가능**, 공통 비용 원장·업무 quota 연결 밖. 환경변수의 키·모델을 공통 execute에 직접 주입하며 이번 조사·통합에서는 실행하지 않음 |
 | 범용 파일 구조 추론 개발 smoke | [generic-file-understanding-smoke](../../scripts/ai/generic-file-understanding-smoke.mts)는 합성 CSV와 기존 inference 서비스에 resolver를 주입해 생성 호출(재시도 포함 최대 2회) | **개발용 유료 호출 가능**, 공통 비용 원장 밖. CLI의 모델 resolver override는 관리 설정 적용·운영 usage 수집과 별개. 이번 조사·통합에서는 실행하지 않음 |
+| TTS production smoke 소비처 | [tts_ab_cut1.py](../../scripts/media/minerock600-pilot/ep01/tts_ab_cut1.py)는 기본 production API의 A31 TTS endpoint를 호출. `--only` 미지정 시 OpenAI와 Gemini를 순차 요청(최대 2건) | **운영 호출 가능 smoke**, 운영 UI와 구분. A31의 기존 endpoint·미연결 비용 경계를 그대로 따르며 이번 조사·통합에서는 실행하지 않음 |
 | Forum AI 요약·태그 | [ForumAIService](../../apps/api-server/src/services/forum/ForumAIService.ts)의 기본 `RuleBasedProvider`; 실제 외부 provider 주입 소비처 미확인 | 현재 확인 경로는 규칙 처리. 외부 API 사용량으로 산정하지 않음 |
 | 상품 AI 검색·추천 | [검색 서비스](../../apps/api-server/src/modules/store-ai/services/product-ai-search.service.ts), [추천 서비스](../../apps/api-server/src/modules/store-ai/services/product-ai-recommendation.service.ts)는 태그·DB 조회 | 검색 1회마다 새 LLM 호출이 발생하는 구조가 아님 |
 | 사이니지 AI 생성 | [content.service](../../apps/api-server/src/routes/signage/services/content.service.ts)의 placeholder 생성 | 실 LLM 호출 아님. 제외한 관리자 사이니지 메뉴 복구 근거로 사용하지 않음 |
@@ -226,4 +227,4 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 
 사용자 main 병합·배포 지시에 따라 기존 PR #721을 재사용하고 설계 문서를 함께 검토한다. 원래 조사 기준 SHA와 당시 결과는 유지한다. Codex가 지적한 개발용 Gemini grounding·범용 파일 smoke의 유료 호출 가능 경로를 위 별도 분류에 추가했다. 31개 업무 사용처와 개발 스크립트를 합산하지 않으며, 해당 유료 스크립트는 실행하지 않았다. 이후 구현·운영 적용 여부는 현행 [AI 공통 기반](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)의 완료/후속 구분과 각 구현 기록을 따른다. 문서 통합은 운영 설정·DB write·신규 공급자 호출 승인이 아니다.
 
-추가 리뷰 보완: A19에 상품 일괄 적용 및 태그 재생성 이후의 자동 콘텐츠 생성 진입점과 상품당 최대 5회 호출을 추가했다. 새로운 업무 사용처로 중복 집계하지 않으며, 기존 PRODUCT_CONTENT 공유 정책과 사용자 귀속 미전달을 유지해서 기록한다.
+추가 리뷰 보완: A31의 production-capable TTS smoke 소비처와 최대 2건 호출을 별도로 연결했다. A19에 상품 일괄 적용 및 태그 재생성 이후의 자동 콘텐츠 생성 진입점과 상품당 최대 5회 호출을 추가했다. 새로운 업무 사용처로 중복 집계하지 않으며, 기존 PRODUCT_CONTENT 공유 정책과 사용자 귀속 미전달을 유지해서 기록한다.
