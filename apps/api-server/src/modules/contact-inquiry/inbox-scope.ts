@@ -175,7 +175,7 @@ export async function inboxRecipients(
         .replaceAll("ra.user_id = $1", "ra.user_id = u.id")
         .replaceAll("op.user_id = $1", "op.user_id = u.id")
         .replaceAll("cr.user_id=$1", "cr.user_id=u.id")
-        .replaceAll("$2", "$1"),
+        .replaceAll("$2", () => "$1"),
       [scope.businessId],
     );
   const prefix = scope.key === "store" ? "neture" : scope.key;

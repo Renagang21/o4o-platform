@@ -120,3 +120,6 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 - Codex P2 조합 알림 수신: 개별 조합 알림을 `pharmcoop` 범위와 실제 `/:slug/operator/inbox` 경로로 저장하고, 기존 연합회 알림도 같은 서비스 범위에서 수신하는 알림 목록·미읽음 링크를 Pharmcoop에 추가했다. 원래 연합회 문의 관리 링크는 고정 Neture 관리 화면으로 연결해 답변 기능을 보존한다. 알림 읽음은 선택한 notifications ID만 변경하고 문의는 변경하지 않는다. 의존성/lockfile 변경 없음.
 - Pharmcoop 전체 67개·production build PASS. 1440/390 실제 번들의 합성 알림→담당 조합 문의함 이동 PASS: 알림 읽음 POST 각각 1회, 문의 PATCH 0회, pageerror/문서 가로 넘침 0. 새 notifications slug 충돌은 운영 공개 목록 read-only 조회 200·충돌 없음으로 확인하고 front/backend에 예약했다. PG17개 재검증과 API 타입 PASS, fixture DB 잔존 0.
 - 원격 CI 39670173030: API shard 1의 신규 lecture notification 단위 테스트가 LMS ESM dist 해석 실패로 중단됐다. mock을 virtual로 명시해 테스트 경계를 분리했고 no-cache 집중 3개 PASS. 전역 Jest/CI 설정·assertion은 완화하지 않았다. 동일 shard 전체 로컬 재실행 및 새 HEAD 원격 CI를 확인한다.
+
+- CI 실패 재검증: API shard 1 전체 로컬 실행 179 suites / 3,197 tests PASS, 기존 조건부 252 tests SKIP. cb719556c3의 원격 CI 39674936681도 API 3개 shard·빌드·품질·CI Gate 전체 PASS, Codex 재검토 추가/미해결 지적 0.
+- 별도 SonarCloud는 Reliability C로 실패했다. 알림·사업 문의 wrapper의 같은 줄 guard/후속 문장을 명시적 block과 표준 포맷으로 구분하고, SQL placeholder의 `$1` 리터럴 치환을 반환 함수로 명확히 했다. 동작/권한/SQL 결과는 동일하며 PG17·Pharmcoop 전체68 재검증 PASS, 집중 ESLint 0. 인지 복잡도·스타일 등 비필수 유지보수 제안까지 무관한 리팩터링으로 확대하지 않았다. 새 HEAD의 Sonar·CI를 확인한다.
