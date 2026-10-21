@@ -328,6 +328,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
 
+    const { createOperatorInboxRoutes } = await import('../modules/contact-inquiry/operator-inbox.routes.js');
+    app.use('/api/v1/operator-inbox', createOperatorInboxRoutes(dataSource));
+
     // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
     app.use('/api/v1/admin/services', createAdminContactInquiryController(dataSource));

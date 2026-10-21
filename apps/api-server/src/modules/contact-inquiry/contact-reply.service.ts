@@ -51,7 +51,7 @@ export class ContactReplyService {
       body = input.message.trim();
     const queued = await this.db.transaction(async (manager) => {
       const [contact] = await manager.query(
-        `SELECT id,email,subject,status FROM contact_inquiries WHERE id=$1 AND service_key=$2 FOR UPDATE`,
+        `SELECT id,email,subject,status FROM contact_inquiries WHERE id=$1 AND service_key=$2 AND organization_id IS NULL FOR UPDATE`,
         [contactId, serviceKey],
       );
       if (!contact)
@@ -107,7 +107,7 @@ export class ContactReplyService {
     }
     await this.db.transaction(async (manager) => {
       await manager.query(
-        "SELECT id FROM contact_inquiries WHERE id=$1 AND service_key=$2 FOR UPDATE",
+        "SELECT id FROM contact_inquiries WHERE id=$1 AND service_key=$2 AND organization_id IS NULL FOR UPDATE",
         [contactId, serviceKey],
       );
       await recordOperation(manager, serviceKey, actorId, "contact.reply", {
@@ -119,7 +119,7 @@ export class ContactReplyService {
       if (sent)
         await manager.query(
           `UPDATE contact_inquiries SET status=CASE WHEN status IN ('closed','spam') THEN status ELSE 'answered' END,
-        handled_at=NOW(),handled_by=$3,updated_at=NOW() WHERE id=$1 AND service_key=$2`,
+        handled_at=NOW(),handled_by=$3,updated_at=NOW() WHERE id=$1 AND service_key=$2 AND organization_id IS NULL`,
           [contactId, serviceKey, actorId],
         );
     });

@@ -1,3 +1,4 @@
+import { IsNull } from 'typeorm';
 import type { DataSource } from "typeorm";
 import { ContactInquiry } from "./entities/ContactInquiry.entity.js";
 import { createHash, randomUUID } from "crypto";
@@ -26,7 +27,7 @@ export async function dispatchContactInquiry(
   const claimed = await db.transaction(async (manager) => {
     const repo = manager.getRepository(ContactInquiry);
     const inquiry = await repo.findOne({
-      where: { id, service_key: serviceKey },
+      where: { id, service_key: serviceKey, organization_id: IsNull() },
       lock: { mode: "pessimistic_write" },
     });
     if (!inquiry) return null;
@@ -44,7 +45,7 @@ export async function dispatchContactInquiry(
       .join(";");
     const claim = `sending:${randomUUID()};${completed}`;
     await repo.update(
-      { id, service_key: serviceKey },
+      { id, service_key: serviceKey, organization_id: IsNull() },
       { notification_status: claim },
     );
     return { inquiry, claim };
@@ -53,7 +54,7 @@ export async function dispatchContactInquiry(
   const notificationStatus = await deliverContactInquiry(db, claimed.inquiry);
   const repo = db.getRepository(ContactInquiry);
   const updated = await repo.update(
-    { id, service_key: serviceKey, notification_status: claimed.claim },
+    { id, service_key: serviceKey, organization_id: IsNull(), notification_status: claimed.claim },
     { notification_status: notificationStatus },
   );
   if (updated.affected !== 1)
@@ -62,7 +63,7 @@ export async function dispatchContactInquiry(
       "NOTIFICATION_STATE_CHANGED",
       "알림 상태가 변경되었습니다. 문의 상세를 다시 확인해 주세요.",
     );
-  return repo.findOne({ where: { id, service_key: serviceKey } });
+  return repo.findOne({ where: { id, service_key: serviceKey, organization_id: IsNull() } });
 }
 
 /** Only the claim owner may call delivery. Retry only channels that did not succeed. */

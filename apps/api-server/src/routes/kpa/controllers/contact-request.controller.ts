@@ -1,3 +1,5 @@
+import { serviceContactRecipients } from '../../../modules/contact-inquiry/contact-recipients.js';
+import { deliverOperatorNotifications } from '../../../modules/contact-inquiry/operator-delivery.js';
 /**
  * ContactRequest Controller — KPA-Society 협업·교육 문의
  *
@@ -86,27 +88,18 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
     // (1) in-app: 기존 동작 유지 — kpa:operator + kpa:admin 에게 알림. best-effort.
     let inappStatus = 'none';
     try {
-      const operators: { userId: string }[] = await dataSource.query(
-        `SELECT DISTINCT user_id AS "userId"
-           FROM role_assignments
-          WHERE role IN ('kpa:operator','kpa:admin')
-            AND is_active = true
-          LIMIT 20`,
-      );
+      const operators = await serviceContactRecipients(dataSource, 'kpa', 'kpa-society');
       if (operators.length > 0) {
-        await Promise.allSettled(
-          operators.map((op) =>
+        inappStatus = await deliverOperatorNotifications(operators, (op) =>
             notificationService.createNotification({
               userId: op.userId,
               type: 'contact.new',
               title: `새 문의: ${typeLabel}`,
               message: `${name!.trim()} 님이 문의를 남겼습니다.`,
               serviceKey: 'kpa-society',
-              metadata: { contactRequestId: saved.id, contactType: type },
+              metadata: { contactRequestId: saved.id, contactType: type, targetUrl: '/operator/collaboration-requests' },
             }),
-          ),
-        );
-        inappStatus = 'sent';
+          );
       }
     } catch (err) {
       inappStatus = 'fail';

@@ -41,6 +41,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const requestedStore = new URLSearchParams(location.search).get('store');
   const storeSearch = requestedStore ? `?store=${encodeURIComponent(requestedStore)}` : '';
   const operatorNavigation = state.access?.canManage ? <nav aria-label="담당 사업 운영" className="mb-5 flex flex-wrap gap-3 text-sm text-blue-700">
+      <NavLink to={`/operator/inbox/business/${businessKey}`}>운영 알림·문의함</NavLink>
       <NavLink to={businessKey === 'pharmacy' ? '/home-presentation' : `${base}/home-presentation`}>Hero · 광고 관리</NavLink>
       <NavLink to={`${businessPath(businessKey, 'forum')}/manage`}>게시판 운영</NavLink>
       {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}

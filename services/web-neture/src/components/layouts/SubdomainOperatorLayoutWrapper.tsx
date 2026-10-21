@@ -21,7 +21,7 @@ import {
 type Area = 'admin' | 'operator';
 
 const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>>> = {
-  supplier: {
+  supplier: { dashboard: [{label:'운영 알림·문의함',path:'/operator/inbox/supplier'}],
     approvals: [
       { label: '서비스 회원 관리', path: '/operator/service-members/supplier' },
       { label: '공급자 승인', path: '/operator/suppliers' },
@@ -32,8 +32,8 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
       { label: 'Hero · 광고 관리', path: '/operator/home-presentation/supplier' },
     ],
   },
-  funding: { approvals: [{ label: '문의 관리', path: '/operator/service-contact/funding' },{ label: 'Operator 지정 · 해제', path: '/operator/market-trial/operators' },{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
-  community: { users: [{ label: '문의 관리', path: '/operator/service-contact/community' },
+  funding: { dashboard: [{label:'운영 알림·문의함',path:'/operator/inbox/funding'}], approvals: [{ label: '문의 관리', path: '/operator/service-contact/funding' },{ label: 'Operator 지정 · 해제', path: '/operator/market-trial/operators' },{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
+  community: { dashboard: [{label:'운영 알림·문의함',path:'/operator/inbox/community'}], users: [{ label: '문의 관리', path: '/operator/service-contact/community' },
     { label: '서비스 회원 관리', path: '/operator/service-members/community' },
   ], forum: [
     { label: '게시판 운영', path: '/operator/communities/boards' },
@@ -46,8 +46,8 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
 
 const COMMUNITY_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
   labels: { community_operation: { label: '커뮤니티 운영', emoji: '💬' } },
-  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, users: 'community_operation', forum: 'community_operation', content: 'community_operation', system: 'community_operation' },
-  groupOrder: { community_operation: ['users', 'forum', 'content', 'system'] },
+  groupToDomain: { ...NETURE_OPERATOR_DOMAIN_IA.groupToDomain, dashboard: 'community_operation', users: 'community_operation', forum: 'community_operation', content: 'community_operation', system: 'community_operation' },
+  groupOrder: { community_operation: ['dashboard', 'users', 'forum', 'content', 'system'] },
   displayOrder: ['community_operation'],
   topPinnedGroups: [],
 };

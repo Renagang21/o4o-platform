@@ -1,3 +1,6 @@
+import { CooperativeNotificationLink, CooperativeNotifications } from './Notifications';
+import { OperatorInbox, OperatorInboxLink } from '@o4o/operator-core-ui';
+import { ScopedContactForm } from '@o4o/shared-space-ui';
 import { MemberForum } from "./MemberForum";
 import { MyCooperatives, MyUpdates } from "./Participation";
 import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
@@ -107,11 +110,16 @@ export function App({
             path="cooperatives/updates"
             element={<PersonalSpace updates />}
           />
+          <Route path="contact" element={<CooperativeContactPage />} />
+          <Route path="notifications" element={<CooperativeNotificationPage />} />
+          <Route path="operator/inbox" element={<CooperativeInboxPage />} />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
           <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
           <Route path=":cooperativeSlug" element={<CooperativeLayout />}>
             <Route index element={<CooperativeHome />} />
+            <Route path="contact" element={<CooperativeContactPage local />} />
+            <Route path="operator/inbox" element={<CooperativeInboxPage local />} />
             <Route path="membership" element={<Membership />} />
             <Route
               path="community"
@@ -142,7 +150,7 @@ export function App({
 }
 
 function Layout() {
-  const { preview, session } = useContext(Context);
+  const { preview, session, businessClient } = useContext(Context);
   const location = useLocation();
   useEffect(() => {
     window.scrollTo?.(0, 0);
@@ -170,16 +178,16 @@ function Layout() {
           <nav aria-label="연합회 메뉴">
             <SiteLink to="/">연합회 홈</SiteLink>
             <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
-            <SiteLink to="/about">연합회 소개</SiteLink>
-            <a href="https://neture.co.kr/contact?service=pharmcoop">Contact Us</a>
+            <SiteLink to="/about">연합회 소개</SiteLink><SiteLink to="/contact">문의하기</SiteLink>
             {session.userId && (
               <>
                 <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
                 <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
+                {businessClient&&!preview&&<CooperativeNotificationLink key={session.userId} client={businessClient}/>}
               </>
             )}
             {canManageFederation(session) && (
-              <><SiteLink to="/operator">연합회 운영</SiteLink></>
+              <><SiteLink to="/operator">연합회 운영</SiteLink>{businessClient&&<OperatorInboxLink key={session.userId} client={businessClient} endpoint="/operator-inbox/service/pharmcoop" href="/operator/inbox"/>}</>
             )}
           </nav>
           <span className="account-status">
@@ -425,7 +433,7 @@ function FederationAbout() {
 
 function CooperativeLayout() {
   const { cooperativeSlug = "" } = useParams();
-  const { cooperatives, preview, businessClient } = useContext(Context);
+  const { cooperatives, preview, businessClient, session } = useContext(Context);
   const cooperative = validCooperativeSlug(cooperativeSlug)
     ? cooperatives.find((row) => row.slug === cooperativeSlug)
     : undefined;
@@ -451,6 +459,7 @@ function CooperativeLayout() {
           ["/community", "회원 게시판"],
           ["/materials", "조합 자료"],
           ["/services", "서비스"],
+          ["/contact", "조합 문의"],
           ["/operator", "조합 운영"],
         ].map(([path, label]) => (
           <NavLink
@@ -462,6 +471,7 @@ function CooperativeLayout() {
           </NavLink>
         ))}
       </nav>
+      {businessClient && cooperativeAccess(session,cooperative.id).canManage && <OperatorInboxLink key={`${session.userId}:${cooperative.id}`} client={businessClient} endpoint={`/operator-inbox/cooperative/${cooperative.slug}`} href={`/${cooperative.slug}/operator/inbox`}/>}
       <Outlet context={cooperative} />
     </>
   );
@@ -668,7 +678,7 @@ function FederationManagement() {
   const { session, businessClient, preview } = useContext(Context);
   if (businessClient && !preview && canManageFederation(session))
     return (
-      <><p><SiteLink to="/operator/home-presentation">Hero 관리</SiteLink></p><FederationManagementPanel
+      <><p><SiteLink to="/operator/inbox">운영 알림·문의함</SiteLink> · <SiteLink to="/operator/home-presentation">Hero 관리</SiteLink></p><FederationManagementPanel
         key={session.userId}
         client={businessClient}
         admin={session.federationOperators.some(
@@ -713,7 +723,7 @@ function CooperativeManagement({
   if (canManage && cooperative.businessKey && businessClient)
     return (
       <>
-        {!editor && <p><SiteLink to={`/${cooperative.slug}/operator/home-presentation`}>Hero 관리</SiteLink></p>}
+        {!editor && <p><SiteLink to={`/${cooperative.slug}/operator/inbox`}>운영 알림·문의함</SiteLink> · <SiteLink to={`/${cooperative.slug}/operator/home-presentation`}>Hero 관리</SiteLink></p>}
         {!editor && (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
@@ -783,4 +793,24 @@ function NotFound() {
       </SiteLink>
     </section>
   );
+}
+
+function CooperativeContactPage({local=false}:{local?:boolean}) {
+  const {businessClient}=useContext(Context); const {cooperativeSlug}=useParams();
+  if(!businessClient)return <p>문의 연결을 확인해 주세요.</p>;
+  const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
+  return <ScopedContactForm key={endpoint} client={businessClient} endpoint={endpoint} privacyHref="https://neture.co.kr/privacy"/>;
+}
+function CooperativeInboxPage({local=false}:{local?:boolean}) {
+  const {businessClient,session,cooperatives}=useContext(Context);const {cooperativeSlug}=useParams();
+  if(!businessClient||!session.userId)return <p>로그인 후 담당 운영 권한을 확인해 주세요.</p>;
+  const coop=local?cooperatives.find(c=>c.slug===cooperativeSlug):null;
+  if(local?(!coop||!cooperativeAccess(session,coop.id).canManage):!canManageFederation(session))return <p>해당 공간의 운영 권한이 필요합니다.</p>;
+  const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
+  return <OperatorInbox key={`${session.userId}:${endpoint}`} client={businessClient} endpoint={endpoint}/>;
+}
+
+function CooperativeNotificationPage(){
+ const {session,businessClient,preview}=useContext(Context);
+ return session.userId&&businessClient&&!preview?<CooperativeNotifications key={session.userId} client={businessClient}/>:<p>로그인 후 문의 알림을 확인해 주세요.</p>;
 }

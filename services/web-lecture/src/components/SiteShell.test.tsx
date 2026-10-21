@@ -20,7 +20,7 @@ it('자격을 갖춘 강사·운영자 링크만 별도 업무 메뉴에 묶는�
  render(<MemoryRouter><SiteShell /></MemoryRouter>);
  const tasks=screen.getByRole('navigation',{name:'강의 업무 메뉴',hidden:true});
  await within(tasks).findByRole('link',{name:'문의 관리',hidden:true});
- expect(within(tasks).getAllByRole('link',{hidden:true}).map(a=>a.getAttribute('href'))).toEqual(['/instructor','/operator','/operator/home-presentation','/operator/contact','/operator/members']);
+ expect(within(tasks).getAllByRole('link',{hidden:true}).map(a=>a.getAttribute('href'))).toEqual(['/instructor','/operator','/operator/inbox','/operator/home-presentation','/operator/contact','/operator/members']);
 });
 
 it('로그인과 My Home은 탐색 메뉴와 분리된 같은 계정 위치에 있다',()=>{

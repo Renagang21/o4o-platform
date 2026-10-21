@@ -1,3 +1,4 @@
+import { OperatorInboxLink } from '@o4o/operator-core-ui';
 import { useServiceContactCount } from '@o4o/shared-space-ui';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from '../config/businessSite';
@@ -130,9 +131,9 @@ export function KpaGlobalHeader() {
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && isStoreOwner && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /></span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && isStoreOwner && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" />{user?.roles?.some(role=>['neture:admin','neture:operator',...pharmacyCollaboratorRoles(BUSINESS_SITE.key)].includes(role)) && <OperatorInboxLink requireAccess key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} endpoint={`/operator-inbox/business/${BUSINESS_SITE.key}`} href={`/operator/inbox/business/${BUSINESS_SITE.key}`}/>}</span>}
       utilitySlot={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {user && creditBalance !== null && (
             <Link
               to="/mypage/credits"

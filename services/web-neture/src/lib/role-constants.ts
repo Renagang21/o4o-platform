@@ -147,6 +147,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // Community service operation uses its own service roles; legacy admin URL redirects to the service workspace.
   { path: '/admin/communities', key: 'community', level: 'admin' },
   { path: '/operator/communities', key: 'community', level: 'operator' },
+  { path: '/operator/inbox/supplier', key: 'supplier', level: 'operator', primaryEntry: false },
+  { path: '/operator/inbox/funding', key: 'funding', level: 'operator', primaryEntry: false },
+  { path: '/operator/inbox/community', key: 'community', level: 'operator', primaryEntry: false },
   { path: '/operator/service-contact/supplier', key: 'supplier', level: 'operator' },
   { path: '/operator/service-contact/funding', key: 'funding', level: 'operator' },
   { path: '/operator/service-contact/community', key: 'community', level: 'operator' },
