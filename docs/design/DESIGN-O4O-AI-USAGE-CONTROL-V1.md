@@ -302,3 +302,7 @@ API는 기존 `/api/ai/admin` 아래 등록 목록 조회, capability/연결 목
 [automation]: ../baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md
 [assistant]: ../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md
 [content]: ../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md
+
+## 2026-10-21 문서 통합 검토
+
+위 기준 코드·push 종료 기록은 작성 시점의 설계 이력이다. 후속 사용자 지시로 이 설계와 조사표를 PR #721에서 함께 통합한다. 이 문서는 DRAFT 설계안이며 모델 CRUD/지정 등 개별 구현이 이 전체 설계의 중지·회계·공급자 연결 완료를 뜻하지 않는다. 실제 구현·운영 반영 범위는 [현행 AI 공통 기반](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)의 §12/§12-1 및 구현 기록을 확인한다. 문서-only 통합은 runtime 배포 대상이 아니다.
