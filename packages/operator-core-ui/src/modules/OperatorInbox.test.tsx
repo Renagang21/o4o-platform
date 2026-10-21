@@ -40,3 +40,13 @@ it('work indicator shows pending or query failure and never marks work read',asy
 it('refreshes the indicator after a minute without overlapping pending requests',async()=>{
  vi.useFakeTimers();const api=client();render(<OperatorInboxLink client={api} endpoint="/scope" href="/inbox"/>);await act(async()=>{});expect(api.get).toHaveBeenCalledTimes(1);await act(async()=>vi.advanceTimersByTime(60000));expect(api.get).toHaveBeenCalledTimes(2);
 });
+
+it('discovers assigned business access from the server and hides a denied assignment',async()=>{
+ const api={get:vi.fn().mockRejectedValue({response:{status:403}})};
+ const view=render(<OperatorInboxLink requireAccess client={api} endpoint="/unassigned" href="/inbox"/>);
+ expect(screen.queryByRole('link')).toBeNull();await act(async()=>{});expect(screen.queryByRole('link')).toBeNull();
+ api.get.mockResolvedValue(wrap(summary));view.rerender(<OperatorInboxLink requireAccess client={api} endpoint="/assigned" href="/inbox"/>);
+ expect(await screen.findByRole('link',{name:/미처리 업무 있음/})).toBeTruthy();
+ api.get.mockRejectedValue({response:{status:403}});view.rerender(<OperatorInboxLink requireAccess client={api} endpoint="/revoked" href="/inbox"/>);
+ await act(async()=>{});expect(screen.queryByRole('link')).toBeNull();
+});

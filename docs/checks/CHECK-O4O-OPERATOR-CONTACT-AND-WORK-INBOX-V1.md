@@ -110,3 +110,5 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 
 - Codex 추가 P2: Pharmacy/MegaPharm 조직 문의 알림이 Neture 범위·Neture 전용 bridge로 저장되어 해당 앱 알림 목록에서 보이지 않았다. 문의 원장의 조직 경계는 유지하면서 business 알림 serviceKey를 실제 호스트(Pharmacy=`kpa-society`, MegaPharm=`megapharm`, CarePharm=`carepharm`)와 자체 문의함 route에 맞췄다. 실제 PostgreSQL 조직별 접수·수신자·알림 payload 포함 16개 PASS, KPA 알림 조회 범위·클릭 소비처 14개 PASS. 초기 fixture의 baseline 약국 사업 key 중복은 격리 DB 준비만 보완해 재검증했다. 운영 원장은 수정하지 않았다.
 - 최종 설정·접수번호 보완 후 공통 UI 전체 169개와 영향 4개 앱 타입 검사 PASS. API 타입 검사도 재확인한다.
+
+- Codex P2 추가: CarePharm의 기존 central operator/admin + live business assignment가 신규 헤더의 역할 후보에서 누락됐다. 사업 문의함 링크는 해당 후보와 사업 전용 역할을 대상으로 실제 `/manage` 응답으로 노출을 확정한다. 401/403/404는 숨기고, 권한 확인 후 원장 조회 장애는 확인 필요 상태로 유지한다. KPA business 헤더도 같은 서버 판정을 적용해 배정 없는 central 운영자에게 링크가 남지 않게 했다. 링크 부여·철회 7개, Neture 헤더 10개, KPA 헤더 11개 PASS; 집중 ESLint 오류/경고 0.

@@ -381,12 +381,14 @@ export function OperatorInboxLink({
   client,
   endpoint,
   href,
+  requireAccess = false,
 }: {
   client: Pick<InboxClient, "get">;
   endpoint: string;
   href: string;
+  requireAccess?: boolean;
 }) {
-  const [state, setState] = useState<"loading" | "pending" | "clear" | "error">(
+  const [state, setState] = useState<"loading" | "pending" | "clear" | "error" | "denied">(
     "loading",
   );
   useEffect(() => {
@@ -408,8 +410,9 @@ export function OperatorInboxLink({
                 : "clear",
           );
         }
-      } catch {
-        if (active) setState("error");
+      } catch (error) {
+        const status=(error as {response?:{status?:number}})?.response?.status;
+        if (active) setState(requireAccess && status && [401,403,404].includes(status) ? "denied" : "error");
       } finally {
         running = false;
       }
@@ -420,7 +423,8 @@ export function OperatorInboxLink({
       active = false;
       clearInterval(timer);
     };
-  }, [client, endpoint]);
+  }, [client, endpoint, requireAccess]);
+  if (requireAccess && (state === "loading" || state === "denied")) return null;
   return (
     <a
       href={href}
