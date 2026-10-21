@@ -1,4 +1,7 @@
-import { PublicContactForm } from "../legal/PublicContactForm";
+import {
+  PublicContactForm,
+  type PublicContactFormProps,
+} from "../legal/PublicContactForm";
 import {
   PUBLIC_SERVICE_ENTRIES,
   isPublicServiceKey,
@@ -8,20 +11,25 @@ export function PublicServiceContact({
   serviceKey,
   client,
   privacyHref = "https://neture.co.kr/privacy",
+  inquiryTypes,
+  introText,
 }: {
   serviceKey: string;
   client: { post(path: string, body: unknown): Promise<unknown> };
   privacyHref?: string;
+  inquiryTypes?: PublicContactFormProps["inquiryTypes"];
+  introText?: string;
 }) {
   const name =
     serviceKey === "neture"
       ? "O4O"
-      : serviceKey === "kpa-branch" ? "약사회 분회 서비스 안내"
-      : serviceKey === "kpa-society"
-        ? PUBLIC_SERVICE_ENTRIES.pharmacy.name
-        : isPublicServiceKey(serviceKey)
-          ? PUBLIC_SERVICE_ENTRIES[serviceKey].name
-          : null;
+      : serviceKey === "kpa-branch"
+        ? "약사회 분회 서비스 안내"
+        : serviceKey === "kpa-society"
+          ? PUBLIC_SERVICE_ENTRIES.pharmacy.name
+          : isPublicServiceKey(serviceKey)
+            ? PUBLIC_SERVICE_ENTRIES[serviceKey].name
+            : null;
   if (!name) return <p role="alert">문의할 서비스를 확인해 주세요.</p>;
   return (
     <section style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>
@@ -36,6 +44,8 @@ export function PublicServiceContact({
         key={serviceKey}
         serviceKey={serviceKey}
         privacyHref={privacyHref}
+        inquiryTypes={inquiryTypes}
+        introText={introText}
         submitInquiry={async (payload) => {
           try {
             const response = (await client.post(

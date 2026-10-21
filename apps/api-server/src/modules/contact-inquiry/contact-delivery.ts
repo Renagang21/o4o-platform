@@ -1,6 +1,6 @@
 import type { DataSource } from "typeorm";
 import { ContactInquiry } from "./entities/ContactInquiry.entity.js";
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { OperationError } from "../../services/operations/operation-audit.js";
 import { notificationService } from "../../services/NotificationService.js";
 import { loadContactSettings } from "./contact-settings.helper.js";
@@ -124,21 +124,37 @@ async function deliverContactInquiry(
         inapp = "unassigned";
         // Central operations receives an assignment alert, not another service's private inquiry.
         const central = await contactRecipients(db, "neture");
+        // An opaque digest correlates retries without disclosing the inquiry UUID,
+        // subject, contact details, or a usable inquiry link to central recipients.
+        const assignmentReceipt = createHash("sha256")
+          .update(inquiry.id)
+          .digest("hex");
+        const delivered: { userId: string }[] = await db.query(
+          `SELECT DISTINCT "userId" FROM notifications
+           WHERE "userId"=ANY($1::uuid[]) AND "serviceKey"='neture'
+             AND type='contact.new' AND channel='in_app'
+             AND metadata->>'assignmentReceipt'=$2`,
+          [central.map((op) => op.userId), assignmentReceipt],
+        );
+        const completedRecipients = new Set(delivered.map((row) => row.userId));
         await Promise.allSettled(
-          central.map((op) =>
-            notificationService.createNotification({
-              userId: op.userId,
-              type: "contact.new",
-              title: "문의 담당자 지정이 필요합니다",
-              message: `${contactService(inquiry.service_key)?.name} 문의 담당자를 확인해 주세요.`,
-              serviceKey: "neture",
-              metadata: {
-                assignmentRequired: true,
-                sourceServiceKey: inquiry.service_key,
-                targetUrl: "/operator",
-              },
-            }),
-          ),
+          central
+            .filter((op) => !completedRecipients.has(op.userId))
+            .map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: "contact.new",
+                title: "문의 담당자 지정이 필요합니다",
+                message: `${contactService(inquiry.service_key)?.name} 문의 담당자를 확인해 주세요.`,
+                serviceKey: "neture",
+                metadata: {
+                  assignmentRequired: true,
+                  assignmentReceipt,
+                  sourceServiceKey: inquiry.service_key,
+                  targetUrl: "/operator",
+                },
+              }),
+            ),
         );
       }
     } catch {

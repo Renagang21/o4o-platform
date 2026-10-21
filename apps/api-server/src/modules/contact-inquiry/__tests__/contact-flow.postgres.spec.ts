@@ -43,6 +43,7 @@ import {
   contactRecipients,
 } from "../contact-service-scope.js";
 import { ContactReplyService } from "../contact-reply.service.js";
+import { dispatchContactInquiry } from "../contact-delivery.js";
 import { getServiceMembershipStatusFromDb } from "../../../utils/service-membership.js";
 import { requireNetureScope } from "../../../middleware/neture-scope.middleware.js";
 import * as contactSettings from "../contact-settings.helper.js";
@@ -391,6 +392,55 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     expect(sent[0].userId).toBe(central);
     expect(JSON.stringify(sent)).not.toContain("PRIVATE_SUBJECT");
     expect(sent[0].metadata.assignmentRequired).toBe(true);
+  });
+  it("does not duplicate a private-data-free central assignment alert when retrying email failure", async () => {
+    const defaults = await contactSettings.loadContactSettings(db, "megapharm");
+    const settings = jest
+      .spyOn(contactSettings, "loadContactSettings")
+      .mockResolvedValue({
+        ...defaults,
+        emailNotificationEnabled: true,
+        recipientEmails: ["operator@example.invalid"],
+      });
+    try {
+      (emailService.sendEmail as jest.Mock).mockResolvedValueOnce({
+        success: false,
+      });
+      (notificationService.createNotification as jest.Mock).mockImplementation(
+        async (input) => {
+          await db.query("INSERT INTO notifications VALUES($1,$2,$3,$4,$5)", [
+            input.userId,
+            input.type,
+            "in_app",
+            input.serviceKey,
+            input.metadata,
+          ]);
+          return { id: randomUUID() };
+        },
+      );
+      const created = await request(app)
+        .post("/public/services/megapharm/contact-inquiries")
+        .send({ ...payload, subject: "PRIVATE_ASSIGNMENT_SUBJECT" });
+      expect(created.status).toBe(201);
+      const id = created.body.data.id;
+      const [before] = await db.query(
+        "SELECT notification_status FROM contact_inquiries WHERE id=$1",
+        [id],
+      );
+      expect(before.notification_status).toContain("email:fail");
+      await dispatchContactInquiry(db, "megapharm", id);
+      await dispatchContactInquiry(db, "megapharm", id);
+      expect(notificationService.createNotification).toHaveBeenCalledTimes(1);
+      const sent = (notificationService.createNotification as jest.Mock).mock
+        .calls[0][0];
+      expect(sent.userId).toBe(central);
+      expect(sent.metadata.assignmentRequired).toBe(true);
+      expect(sent.metadata.targetUrl).toBe("/operator");
+      for (const secret of [id, payload.email, "PRIVATE_ASSIGNMENT_SUBJECT"])
+        expect(JSON.stringify(sent)).not.toContain(secret);
+    } finally {
+      settings.mockRestore();
+    }
   });
   it("denies visitors, suspended operators and operators of other services", async () => {
     expect(
