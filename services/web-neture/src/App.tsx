@@ -1,3 +1,4 @@
+import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
@@ -756,6 +757,8 @@ function App() {
               <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/operator/service-contact/:serviceKey/settings" element={<ServiceContactSettingsPage />} />
+              <Route path="/operator/service-contact/:serviceKey" element={<ServiceContactPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
                   CMS(cms/public/page) 라우터가 프로덕션에 마운트되어 있지 않아 항상 404 →
                   "준비 중" 만 노출되던 경로. 다른 4서비스와 같은 service_policy_documents

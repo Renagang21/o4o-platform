@@ -1,3 +1,6 @@
+import { useAuth } from '../../contexts';
+import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 /**
  * Neture Admin — 문의 설정 wrapper
  *
@@ -44,5 +47,9 @@ const contactSettingsApi: ContactSettingsApi = {
 };
 
 export default function ServiceContactSettingsPage() {
-  return <SharedServiceContactSettingsPage serviceKey={SERVICE_KEY} api={contactSettingsApi} />;
+  const { serviceKey = SERVICE_KEY } = useParams();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <p>계정을 확인하는 중입니다…</p>;
+  if (!isAuthenticated) return <Link to={`/login?returnUrl=${encodeURIComponent(`/operator/service-contact/${serviceKey}/settings`)}`}>운영자 로그인</Link>;
+  return <SharedServiceContactSettingsPage key={`${user?.id}:${serviceKey}`} serviceKey={serviceKey} api={contactSettingsApi} />;
 }

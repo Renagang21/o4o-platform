@@ -25,14 +25,15 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
     approvals: [
       { label: '서비스 회원 관리', path: '/operator/service-members/supplier' },
       { label: '공급자 승인', path: '/operator/suppliers' },
+      { label: '문의 관리', path: '/operator/service-contact/supplier' },
       { label: 'Operator 지정 · 해제', path: '/admin/supplier-governance/operators' },
       { label: '공급자 상태 관리', path: '/admin/supplier-governance' },
       { label: '서비스 약관 관리', path: '/operator/legal/supplier' },
       { label: 'Hero · 광고 관리', path: '/operator/home-presentation/supplier' },
     ],
   },
-  funding: { approvals: [{ label: 'Operator 지정 · 해제', path: '/operator/market-trial/operators' },{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
-  community: { users: [
+  funding: { approvals: [{ label: '문의 관리', path: '/operator/service-contact/funding' },{ label: 'Operator 지정 · 해제', path: '/operator/market-trial/operators' },{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }, { label: '서비스 약관 관리', path: '/operator/legal/funding' }, { label: 'Hero · 광고 관리', path: '/operator/home-presentation/funding' }] },
+  community: { users: [{ label: '문의 관리', path: '/operator/service-contact/community' },
     { label: '서비스 회원 관리', path: '/operator/service-members/community' },
   ], forum: [
     { label: '게시판 운영', path: '/operator/communities/boards' },
