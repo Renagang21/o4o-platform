@@ -146,7 +146,11 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
       logger.info(`[ContactInquiry] new: ${entity.id} (${serviceKey}/${type})`);
 
       // Delivery failure never changes the successful receipt. The result remains retryable.
-      try { entity.notification_status = await deliverContactInquiry(dataSource, entity); await repo.save(entity); }
+      try {
+        const notificationStatus = await deliverContactInquiry(dataSource, entity);
+        // Delivery may outlive an operator decision. Update only delivery-owned fields.
+        await repo.update({ id: entity.id, service_key: serviceKey }, { notification_status: notificationStatus });
+      }
       catch { logger.warn('[ContactInquiry] delivery result could not be recorded'); }
 
       return res.status(201).json({ success: true, data: { id: entity.id, status: entity.status } });

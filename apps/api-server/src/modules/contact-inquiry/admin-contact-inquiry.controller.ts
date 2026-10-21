@@ -118,9 +118,11 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     try {
       const item = await repo.findOne({ where: { id:req.params.id,service_key:req.params.serviceKey } });
       if (!item) return res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'}});
-      item.notification_status=await deliverContactInquiry(dataSource,item);
-      await repo.save(item);
-      res.json({success:true,data:toDetail(item)});
+      const notificationStatus=await deliverContactInquiry(dataSource,item);
+      await repo.update({id:item.id,service_key:item.service_key},{notification_status:notificationStatus});
+      const updated=await repo.findOne({where:{id:item.id,service_key:item.service_key}});
+      if (!updated) return res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'}});
+      res.json({success:true,data:toDetail(updated)});
     } catch(error) {next(error);}
   });
 
@@ -175,10 +177,11 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     try {
       const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
       if (!item) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
-      item.status = status;
-      item.handled_at = new Date();
-      item.handled_by = (req as any).user?.id ?? null;
-      const saved = await repo.save(item);
+      await repo.update({ id: item.id, service_key: serviceKey }, {
+        status, handled_at: new Date(), handled_by: req.user!.id,
+      });
+      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey } });
+      if (!saved) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
       res.json({ success: true, data: toDetail(saved) });
     } catch (error) {
       logger.error('[ContactInquiry Admin] status error:', error);
@@ -194,9 +197,12 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     try {
       const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
       if (!item) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
-      item.internal_note = typeof internalNote === 'string' ? internalNote : null;
-      item.handled_by = (req as any).user?.id ?? item.handled_by;
-      const saved = await repo.save(item);
+      await repo.update({ id: item.id, service_key: serviceKey }, {
+        internal_note: typeof internalNote === 'string' ? internalNote : null,
+        handled_by: req.user!.id,
+      });
+      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey } });
+      if (!saved) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
       res.json({ success: true, data: toDetail(saved) });
     } catch (error) {
       logger.error('[ContactInquiry Admin] note error:', error);

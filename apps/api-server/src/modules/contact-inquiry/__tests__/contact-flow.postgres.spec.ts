@@ -146,6 +146,98 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     );
     expect(row.notification_status).toContain("inapp:fail");
   });
+  it.each(["initial", "retry"])(
+    "preserves a concurrent operator decision while saving %s notification delivery",
+    async (phase) => {
+      let id: string | undefined;
+      if (phase === "retry") {
+        const created = await request(app)
+          .post("/public/services/supplier/contact-inquiries")
+          .send(payload);
+        id = created.body.data.id;
+        await db.query(
+          "UPDATE contact_inquiries SET notification_status='inapp:fail' WHERE id=$1",
+          [id],
+        );
+      }
+      (
+        notificationService.createNotification as jest.Mock
+      ).mockImplementationOnce(async (input) => {
+        await db.query(
+          "UPDATE contact_inquiries SET status='answered',internal_note='concurrent operator note',handled_by=$2,handled_at=NOW() WHERE id=$1",
+          [input.metadata.contactInquiryId, supplier],
+        );
+        return { id: "notification" };
+      });
+      const result =
+        phase === "initial"
+          ? await request(app)
+              .post("/public/services/supplier/contact-inquiries")
+              .send(payload)
+          : await request(app)
+              .post(
+                `/admin/services/supplier/contact-inquiries/${id}/retry-notifications`,
+              )
+              .set("x-test-user", supplier)
+              .send({});
+      expect(result.status).toBe(phase === "initial" ? 201 : 200);
+      id ??= result.body.data.id;
+      const [saved] = await db.query(
+        "SELECT status,internal_note,handled_by,notification_status FROM contact_inquiries WHERE id=$1",
+        [id],
+      );
+      expect(saved).toMatchObject({
+        status: "answered",
+        internal_note: "concurrent operator note",
+        handled_by: supplier,
+      });
+      expect(saved.notification_status).toContain("inapp:sent");
+      if (phase === "retry") expect(result.body.data.status).toBe("answered");
+    },
+  );
+  it.each(["note", "status"])(
+    "preserves unrelated concurrent fields when changing an inquiry %s",
+    async (field) => {
+      const created = await request(app)
+        .post("/public/services/supplier/contact-inquiries")
+        .send(payload);
+      const id = created.body.data.id;
+      const repo = db.getRepository(ContactInquiry);
+      const originalFind = repo.findOne.bind(repo);
+      const snapshotRead = jest
+        .spyOn(repo, "findOne")
+        .mockImplementationOnce(async (options) => {
+          const snapshot = await originalFind(options);
+          await db.query(
+            "UPDATE contact_inquiries SET status='answered',internal_note='concurrent note' WHERE id=$1",
+            [id],
+          );
+          return snapshot;
+        });
+      try {
+        const result = await request(app)
+          .patch(`/admin/services/supplier/contact-inquiries/${id}/${field}`)
+          .set("x-test-user", supplier)
+          .send(
+            field === "note"
+              ? { internalNote: "operator note" }
+              : { status: "in_review" },
+          );
+        expect(result.status).toBe(200);
+        const [saved] = await db.query(
+          "SELECT status,internal_note FROM contact_inquiries WHERE id=$1",
+          [id],
+        );
+        expect(saved).toEqual(
+          field === "note"
+            ? { status: "answered", internal_note: "operator note" }
+            : { status: "in_review", internal_note: "concurrent note" },
+        );
+      } finally {
+        snapshotRead.mockRestore();
+      }
+    },
+  );
   it("notifies central operations about missing assignment without exposing the inquiry content", async () => {
     await request(app)
       .post("/public/services/megapharm/contact-inquiries")
@@ -185,10 +277,20 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
       ).status,
     ).toBe(200);
   });
-  it('returns a scoped new-inquiry badge count without disclosing inquiry fields',async()=>{
-    const response=await request(app).get('/admin/services/supplier/contact-inquiries/summary').set('x-test-user',supplier);
-    expect(response.status).toBe(200);expect(Object.keys(response.body.data)).toEqual(['newCount']);expect(response.body.data.newCount).toBeGreaterThan(0);
-    expect((await request(app).get('/admin/services/funding/contact-inquiries/summary').set('x-test-user',supplier)).status).toBe(403);
+  it("returns a scoped new-inquiry badge count without disclosing inquiry fields", async () => {
+    const response = await request(app)
+      .get("/admin/services/supplier/contact-inquiries/summary")
+      .set("x-test-user", supplier);
+    expect(response.status).toBe(200);
+    expect(Object.keys(response.body.data)).toEqual(["newCount"]);
+    expect(response.body.data.newCount).toBeGreaterThan(0);
+    expect(
+      (
+        await request(app)
+          .get("/admin/services/funding/contact-inquiries/summary")
+          .set("x-test-user", supplier)
+      ).status,
+    ).toBe(403);
   });
   it("does not expose or reply to a different service inquiry even when its id is known", async () => {
     const response = await request(app)
@@ -245,14 +347,36 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     );
     expect(await contactRecipients(db, "carepharm")).toEqual([]);
   });
-  it('keeps directory-wide inquiries out of individual branch operators scope',async()=>{
-    const member=randomUUID(),admin=randomUUID();
-    for(const id of [member,admin])await db.query("INSERT INTO users VALUES($1,'active',true,true)",[id]);
-    await db.query("INSERT INTO role_assignments VALUES($1,'kpa-branch:operator',true,NULL,NULL),($2,'kpa-branch:admin',true,NULL,NULL)",[member,admin]);
-    await db.query("INSERT INTO service_memberships VALUES($1,'kpa-branch','active'),($2,'kpa-branch','active')",[member,admin]);
-    expect(await contactRecipients(db,'kpa-branch')).toEqual([{userId:admin}]);
-    expect((await request(app).get('/admin/services/kpa-branch/contact-inquiries/summary').set('x-test-user',member)).status).toBe(403);
-    expect((await request(app).get('/admin/services/kpa-branch/contact-inquiries/summary').set('x-test-user',admin)).status).toBe(200);
+  it("keeps directory-wide inquiries out of individual branch operators scope", async () => {
+    const member = randomUUID(),
+      admin = randomUUID();
+    for (const id of [member, admin])
+      await db.query("INSERT INTO users VALUES($1,'active',true,true)", [id]);
+    await db.query(
+      "INSERT INTO role_assignments VALUES($1,'kpa-branch:operator',true,NULL,NULL),($2,'kpa-branch:admin',true,NULL,NULL)",
+      [member, admin],
+    );
+    await db.query(
+      "INSERT INTO service_memberships VALUES($1,'kpa-branch','active'),($2,'kpa-branch','active')",
+      [member, admin],
+    );
+    expect(await contactRecipients(db, "kpa-branch")).toEqual([
+      { userId: admin },
+    ]);
+    expect(
+      (
+        await request(app)
+          .get("/admin/services/kpa-branch/contact-inquiries/summary")
+          .set("x-test-user", member)
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(app)
+          .get("/admin/services/kpa-branch/contact-inquiries/summary")
+          .set("x-test-user", admin)
+      ).status,
+    ).toBe(200);
   });
   it("serializes concurrent reply attempts, persists history and keeps failures retryable", async () => {
     const response = await request(app)
