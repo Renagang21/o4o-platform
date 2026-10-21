@@ -1,4 +1,4 @@
-jest.mock('@o4o/lms-core',()=>({Course:class{},CourseStatus:{DRAFT:'draft',REJECTED:'rejected',PENDING_REVIEW:'pending_review',PUBLISHED:'published'},ContentKind:{},CourseVisibility:{},CourseReusablePolicy:{}}));
+jest.mock('@o4o/lms-core',()=>({Course:class{},CourseStatus:{DRAFT:'draft',REJECTED:'rejected',PENDING_REVIEW:'pending_review',PUBLISHED:'published'},ContentKind:{},CourseVisibility:{},CourseReusablePolicy:{}}),{virtual:true});
 const courseRepository={save:jest.fn()};
 jest.mock('../database/connection.js',()=>({AppDataSource:{getRepository:()=>courseRepository}}));
 jest.mock('../modules/contact-inquiry/contact-recipients.js',()=>({serviceContactRecipients:jest.fn()}));

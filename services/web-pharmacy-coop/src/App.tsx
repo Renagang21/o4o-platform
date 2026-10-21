@@ -1,3 +1,4 @@
+import { CooperativeNotificationLink, CooperativeNotifications } from './Notifications';
 import { OperatorInbox, OperatorInboxLink } from '@o4o/operator-core-ui';
 import { ScopedContactForm } from '@o4o/shared-space-ui';
 import { MemberForum } from "./MemberForum";
@@ -110,6 +111,7 @@ export function App({
             element={<PersonalSpace updates />}
           />
           <Route path="contact" element={<CooperativeContactPage />} />
+          <Route path="notifications" element={<CooperativeNotificationPage />} />
           <Route path="operator/inbox" element={<CooperativeInboxPage />} />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
@@ -181,6 +183,7 @@ function Layout() {
               <>
                 <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
                 <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
+                {businessClient&&!preview&&<CooperativeNotificationLink key={session.userId} client={businessClient}/>}
               </>
             )}
             {canManageFederation(session) && (
@@ -805,4 +808,9 @@ function CooperativeInboxPage({local=false}:{local?:boolean}) {
   if(local?(!coop||!cooperativeAccess(session,coop.id).canManage):!canManageFederation(session))return <p>해당 공간의 운영 권한이 필요합니다.</p>;
   const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
   return <OperatorInbox key={`${session.userId}:${endpoint}`} client={businessClient} endpoint={endpoint}/>;
+}
+
+function CooperativeNotificationPage(){
+ const {session,businessClient,preview}=useContext(Context);
+ return session.userId&&businessClient&&!preview?<CooperativeNotifications key={session.userId} client={businessClient}/>:<p>로그인 후 문의 알림을 확인해 주세요.</p>;
 }

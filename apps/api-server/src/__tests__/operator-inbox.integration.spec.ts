@@ -60,7 +60,7 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   (notificationService.createNotification as jest.Mock).mockClear();
   const r=await request(app).post(`${base}/cooperative/inbox-a/contact`).send({...payload,organizationId:otherOrg,serviceKey:'funding',sourcePath:'/forged'}).expect(201);contactId=r.body.data.id;
   const [row]=await db.query('SELECT * FROM contact_inquiries WHERE id=$1',[contactId]);expect(row.organization_id).toBe(org);expect(row.service_key).toBe('neture');expect(row.source_path).toBe('/inbox-a/contact');expect(row.notification_status).toBe('inapp:sent');
-  expect(notificationService.createNotification).toHaveBeenCalledTimes(1);expect(notificationService.createNotification).toHaveBeenCalledWith(expect.objectContaining({userId:local,organizationId:org,metadata:expect.objectContaining({targetUrl:'/operator/inbox/open/cooperative/inbox-a'})}));
+  expect(notificationService.createNotification).toHaveBeenCalledTimes(1);expect(notificationService.createNotification).toHaveBeenCalledWith(expect.objectContaining({userId:local,serviceKey:'pharmcoop',organizationId:org,metadata:expect.objectContaining({targetUrl:'/inbox-a/operator/inbox'})}));
  });
  it('federation and another cooperative operator cannot see local contacts',async()=>{
   await request(app).get(`${base}/cooperative/inbox-a/manage/contacts`).set('x-test-user',fed).expect(403);

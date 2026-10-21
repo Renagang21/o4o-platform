@@ -134,7 +134,7 @@ it("연합회 operator는 연합회 Hero 관리에 진입한다", async () => {
 it("조합 operator 역할만으로 연합회 Hero에 접근할 수 없다", () => {
   const { client } = open("/operator/home-presentation", local);
   expect(screen.getByText("연합회 운영 권한이 필요합니다.")).toBeTruthy();
-  expect(client.get).not.toHaveBeenCalled();
+  expect(client.get.mock.calls.every(([path])=>path === "/notifications/unread-count?serviceKey=pharmcoop")).toBe(true);
 });
 it.each([
   ["/operator", federation, "/operator/home-presentation"],

@@ -115,3 +115,8 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 
 - Codex P1 추가: 배정 철회 등으로 사업/조합 담당자가 0명이면 문의 저장·미수신 기록만으로는 누구도 새 문의를 알 수 없다. 현행 공통 문의 정책에 맞춰 Neture 공통 운영자에게 담당자 지정 필요 사실만 알린다. 공개 공간 이름·slug와 역조회 API가 없는 receipt digest만 사용하고, 원시 문의 UUID·제목·본문·연락처·문의 열람 링크를 제공하지 않는다. 범위 권한은 확장하지 않는다.
 - 담당자 미지정/공통 알림 실패·데이터 비노출·권한 차단을 포함한 실제 PostgreSQL 테스트 17개 PASS, fixture DB 잔존 0. 공통 알림 성공/실패는 `assignment` 결과로 구분하며 원래 문의는 미전달 상태로 유지해 새 담당자가 확인할 수 있다. API 타입 검사 재확인.
+
+- Codex P2 커뮤니티 경로 건은 코드 오인으로 확인했다. App의 `/operator/communities`는 `pages/community/CommunityWorkspacePage`를 렌더하고, 해당 화면은 canManage일 때 기존 CommunityBoardReview를 이미 표시한다. `listManagedCommunityBoards`는 별도 게시판 운영 API다. 실제 operator 경로에서 pending 요청 조회→승인→목록 제거 회귀 1개와 기존 심사 11개, 합계 12개 PASS로 근거를 남겼다. 심사 API·권한·화면은 새로 만들지 않았다.
+- Codex P2 조합 알림 수신: 개별 조합 알림을 `pharmcoop` 범위와 실제 `/:slug/operator/inbox` 경로로 저장하고, 기존 연합회 알림도 같은 서비스 범위에서 수신하는 알림 목록·미읽음 링크를 Pharmcoop에 추가했다. 원래 연합회 문의 관리 링크는 고정 Neture 관리 화면으로 연결해 답변 기능을 보존한다. 알림 읽음은 선택한 notifications ID만 변경하고 문의는 변경하지 않는다. 의존성/lockfile 변경 없음.
+- Pharmcoop 전체 67개·production build PASS. 1440/390 실제 번들의 합성 알림→담당 조합 문의함 이동 PASS: 알림 읽음 POST 각각 1회, 문의 PATCH 0회, pageerror/문서 가로 넘침 0. 새 notifications slug 충돌은 운영 공개 목록 read-only 조회 200·충돌 없음으로 확인하고 front/backend에 예약했다. PG17개 재검증과 API 타입 PASS, fixture DB 잔존 0.
+- 원격 CI 39670173030: API shard 1의 신규 lecture notification 단위 테스트가 LMS ESM dist 해석 실패로 중단됐다. mock을 virtual로 명시해 테스트 경계를 분리했고 no-cache 집중 3개 PASS. 전역 Jest/CI 설정·assertion은 완화하지 않았다. 동일 shard 전체 로컬 재실행 및 새 HEAD 원격 CI를 확인한다.

@@ -151,6 +151,7 @@ export class CooperativeManagementService {
         "cooperatives",
         "about",
         "contact",
+        "notifications",
         "operator",
         "preview",
         "login",
