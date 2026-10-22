@@ -59,6 +59,8 @@ import { createPharmacyProductsController } from '../o4o-store/controllers/pharm
 import { createOperatorProductApplicationsController } from './controllers/operator-product-applications.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
+// WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1 — 공개 접수만 유지
+import { createContactRequestHandler } from './controllers/contact-request.controller.js';
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
@@ -155,8 +157,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   //   /members · /qualifications · /instructor · instructor-qualifications · forum-requests · community/*
   //   /operator(summary · actions · approvals · recruitment-exposure · contact-requests · ai · legal · audit-logs · resources)
   //   /supplier/content-submissions · /supplier/signage(campaign-requests · reports) · store/seller-recruitments
-  //   /join-inquiries(admin, 공개 /api/v1/join 유지) · /contact-requests · legal/documents · /me-context · /pharmacy/store
+  //   /join-inquiries(admin, 공개 /api/v1/join 유지) · legal/documents · /me-context · /pharmacy/store
   //   /stores(template · layout · settings) · /forum · /credits · /home · /signage · /mypage
+
+  // 공개 Contact Request — 기존 클라이언트 호환 계약(modules/contact-inquiry/public-contact-inquiry.controller.ts) 유지.
+  // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
+  router.post('/contact-requests', createContactRequestHandler(dataSource));
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));

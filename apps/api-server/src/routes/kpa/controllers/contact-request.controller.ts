@@ -1,0 +1,145 @@
+import { serviceContactRecipients } from '../../../modules/contact-inquiry/contact-recipients.js';
+import { deliverOperatorNotifications } from '../../../modules/contact-inquiry/operator-delivery.js';
+/**
+ * ContactRequest Controller — KPA-Society 협업·교육 문의
+ *
+ * WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
+ *
+ * kpa.routes.ts에서 직접 핸들러로 등록:
+ *   POST /contact-requests           — 공개 (기존 클라이언트 호환 유지)
+ *
+ * operator 목록 · 상태 변경(GET/PATCH /operator/contact-requests)은
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 6항에서 옛 KPA 운영 화면과 함께 제거(소비처 0).
+ */
+
+import { Request, Response, RequestHandler } from 'express';
+import { DataSource } from 'typeorm';
+import { ContactRequest } from '../../../entities/ContactRequest.js';
+import { notificationService } from '../../../services/NotificationService.js';
+import { loadContactSettings } from '../../../modules/contact-inquiry/contact-settings.helper.js';
+import { sendContactEmails } from '../../../modules/contact-inquiry/contact-notification.helper.js';
+import { asyncHandler } from '../../../middleware/error-handler.js';
+import logger from '../../../utils/logger.js';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** POST /api/v1/kpa/contact-requests — 공개 */
+export function createContactRequestHandler(dataSource: DataSource): RequestHandler {
+  const repo = () => dataSource.getRepository(ContactRequest);
+
+  return asyncHandler(async (req: Request, res: Response) => {
+    const {
+      type,
+      organization_name,
+      name,
+      email,
+      phone,
+      subject,
+      message,
+    } = req.body as Record<string, string | undefined>;
+    const privacyConsent = (req.body as any)?.privacyConsent;
+
+    // 개인정보 수집·이용 동의 필수 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+    // 미동의 시 저장·알림 없이 400.
+    if (privacyConsent !== true) {
+      return res.status(400).json({ success: false, error: '개인정보 수집·이용 동의가 필요합니다.', code: 'PRIVACY_CONSENT_REQUIRED' });
+    }
+
+    // ── Validation ──────────────────────────────────────────────────────────
+    const errors: string[] = [];
+    if (!type || type !== 'partner') {
+      errors.push('유효하지 않은 문의 유형입니다. (partner)');
+    }
+    if (!name || name.trim().length < 2) {
+      errors.push('이름은 2자 이상이어야 합니다.');
+    }
+    if (!email || !EMAIL_RE.test(email)) {
+      errors.push('올바른 이메일 주소를 입력해 주세요.');
+    }
+    if (!message || message.trim().length < 10) {
+      errors.push('문의 내용은 10자 이상이어야 합니다.');
+    }
+    if (type === 'partner' && (!organization_name || organization_name.trim().length < 2)) {
+      errors.push('단체/회사명을 입력해 주세요.');
+    }
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, error: errors[0], code: 'VALIDATION_ERROR' });
+    }
+
+    // ── Create record ────────────────────────────────────────────────────────
+    const user = (req as any).user;
+    const entity = repo().create({
+      service_key: 'kpa-society',
+      type: type as 'partner' | 'education',
+      organization_name: organization_name?.trim() || null,
+      name: name!.trim(),
+      email: email!.trim().toLowerCase(),
+      phone: phone?.trim() || null,
+      subject: subject?.trim() || null,
+      message: message!.trim(),
+      status: 'pending',
+      created_by: user?.id ?? null,
+      privacy_consent: true,
+    });
+    const saved = await repo().save(entity);
+
+    const typeLabel = type === 'partner' ? '협력 문의' : '강의 개설 문의';
+
+    // ── 알림: 기존 in-app 유지 + ServiceContactSettings 기반 이메일/자동 회신 추가 ──
+    // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 (기존 저장소/route/UI 불변, 알림만 보강).
+    // (1) in-app: 기존 동작 유지 — kpa:operator + kpa:admin 에게 알림. best-effort.
+    let inappStatus = 'none';
+    try {
+      const operators = await serviceContactRecipients(dataSource, 'kpa', 'kpa-society');
+      if (operators.length > 0) {
+        inappStatus = await deliverOperatorNotifications(operators, (op) =>
+            notificationService.createNotification({
+              userId: op.userId,
+              type: 'contact.new',
+              title: `새 문의: ${typeLabel}`,
+              message: `${name!.trim()} 님이 문의를 남겼습니다.`,
+              serviceKey: 'kpa-society',
+              metadata: { contactRequestId: saved.id, contactType: type, targetUrl: '/operator/inbox/business/pharmacy' },
+            }),
+          );
+      }
+    } catch (err) {
+      inappStatus = 'fail';
+      logger.warn('[ContactRequest] operator notification failed (best-effort)', err);
+    }
+
+    // (2) 이메일 알림 + 문의자 자동 회신: ServiceContactSettings(kpa-society) 기반, best-effort.
+    let emailStatus = 'off';
+    let autoReplyStatus = 'off';
+    try {
+      const settings = await loadContactSettings(dataSource, 'kpa-society');
+      const r = await sendContactEmails(settings, {
+        serviceName: 'KPA Society',
+        typeLabel,
+        subject: saved.subject || typeLabel,
+        name: saved.name,
+        email: saved.email,
+        organizationName: saved.organization_name,
+        phone: saved.phone,
+        message: saved.message,
+        createdAt: saved.createdAt,
+        adminManageUrl: '/operator/inbox/business/pharmacy',
+      });
+      emailStatus = r.emailStatus;
+      autoReplyStatus = r.autoReplyStatus;
+    } catch (notifyErr) {
+      logger.warn('[ContactRequest] email/auto-reply dispatch failed (best-effort)', notifyErr);
+    }
+
+    // (3) 알림 결과 기록 (접수 자체는 이미 성공 — 기록 실패가 성공을 바꾸지 않음).
+    try {
+      saved.notification_status = `inapp:${inappStatus};email:${emailStatus};autoreply:${autoReplyStatus}`;
+      await repo().save(saved);
+    } catch { /* 무시 */ }
+
+    return res.status(201).json({
+      success: true,
+      data: { id: saved.id, status: saved.status },
+    });
+  });
+}
