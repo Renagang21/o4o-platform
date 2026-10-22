@@ -1,6 +1,6 @@
 # 내 매장 일상 업무·대시보드 상태 보완 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (한국시간)
 > **근거**: 미흡점 조사 후 사용자 지시 — TODO 작성·문서/코드 대조·계획 보완·개발·검증·commit·push
 > **종료점**: 전용 branch push 후 인계. PR 생성·main 병합·배포 제외.
@@ -23,7 +23,7 @@
 - [x] 업무 흐름의 상태·표시·선택 전달을 작은 기존 로컬 조각으로 정돈. 범위 밖 전면 리팩터링 제외.
 - [x] 변경 범위 Store/API 회귀·타입/build·집중 lint, 실제 컴포넌트+합성 API의 desktop/mobile 검증.
 - [x] CHECK에 실행 결과·미검증·후속 경계 기록. TODO 상태·문서 링크·민감정보·diff 확인.
-- [ ] path-specific stage/commit, named branch push, 원격 HEAD 일치·작업 범위 미커밋 0 확인 후 인계.
+- [x] path-specific stage/commit, named branch push, 원격 개발 HEAD 일치·작업 범위 미커밋 0 확인. 최종 문서 인계 결과는 CHECK와 완료 보고 참조.
 
 ## 조사 후 보완
 
@@ -38,3 +38,7 @@
 ## 검증 경계
 
 합성 API/인증/매장 검사는 실계정 업무 검증을 뜻하지 않는다. 실제 결제·배송·직원 승인/해제·물리 기기·외부 AI 비용 검증은 실행하지 않는다. 이번 작업 전용 로컬 서버·브라우저와 fixture는 종료 후 정리하고 증적은 저장소 밖에 보존한다.
+
+## 개발 종료
+
+개발 commit `709f10a03d`을 전용 branch에 push하고 원격 HEAD 일치를 확인했다. Store 전체 781/API 관련 35/합성 브라우저 40 PASS, Store/API build·타입·집중 lint 통과다. 결과 기록 보완도 같은 branch에 push하며 PR·main 병합·배포는 통합 담당 범위로 남긴다.

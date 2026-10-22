@@ -46,7 +46,7 @@
 
 push 전 재확인한 main은 `7dc02646da`(#760 KPA 구 화면 철거)다. 변경 371개 경로와 이번 작업의 겹침은 0이며 의존성·workflow 변경도 없다. 시작 기준의 KPA 기존 홈/wrapper가 새 main에서 제거된 것을 확인했다. 이 개발 branch에 자동 merge/rebase하지 않았으며 위 검증은 시작 main `3917a9522d`와의 결합 결과다. 최신 main과의 최종 결합 검증은 통합 담당 범위다.
 
-PR·PR CI·main 병합·배포는 실행하지 않는다. 개발 push 결과와 원격 HEAD 일치는 최종 인계에서 확인한다. 통합 담당은 제출 branch/HEAD와 최신 main의 차이를 확인하고 API/Store 결합 상태·필수 CI/리뷰를 검증한다. 이 CHECK는 배포 또는 실사용 완료 증적이 아니다.
+PR·PR CI·main 병합·배포는 실행하지 않는다. 개발 commit `709f10a03d13bfca57d5a743e7008fabd16a22b0`을 전용 branch에 push하고 최초 원격 HEAD 일치와 clean 상태를 확인했다. 이 결과 기록 보완도 같은 branch에 commit·push하며 최종 제출 HEAD는 완료 보고에서 인계한다. 통합 담당은 제출 branch/HEAD와 최신 main의 차이를 확인하고 API/Store 결합 상태·필수 CI/리뷰를 검증한다. 이 CHECK는 배포 또는 실사용 완료 증적이 아니다.
 
 실제 계정 로그인·직원 초대/최종 승인/해제·정상 매장 간 업무 격리·운영 번역/실제 마이크·QR 출력/스캔·태블릿/사이니지 재생·실 PG·공급자 수신/배송은 미실행이다. 유료 AI·운영 DB·운영 업무 데이터는 사용하지 않았다. 이번 로컬 Vite와 독립 브라우저를 종료했고 전용 포트가 닫힌 것을 확인했다. 테스트 DB·업무 fixture 저장은 만들지 않았다.
 
