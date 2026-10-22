@@ -44,3 +44,7 @@
 PR: https://github.com/Renagang21/o4o-platform/pull/761. 최종 교차 점검에서 CarePharm 호스트의 공통 계정 약관 loader가 사업 문서를 선택할 수 있는 경로를 수정했다. 요청한 serviceKey를 기준으로 계정/사업 문서를 선택하며 3개 회귀를 추가했다.
 
 Codex P1의 기존 Pharmacy handoff도 고정 alias로 보완했다. 최종 교환 세션은 공통 neture 범위이며 다른 호스트 교환은 거절한다. 실제 토큰 원장·client·교환을 포함한 handoff/로그아웃 142개를 통과했다.
+
+## 동일 WO의 배포 전 세션 호환 보완
+
+기능 PR #761은 96f914ede6118b86daa43874bce0caac1d32a106으로 병합됐다. 아직 배포하지 않은 상태에서 기존 로그인 세션의 로그아웃을 추가 확인했다. 전환 전에 발급된 pharmacy/kpa-society 및 pharmcoop/coop 세션은 각자의 정확한 HTTPS Origin에서만 원래 서명 scope·브라우저 ID로 종료하도록 보완한다. 새 세션 발급·다른 사업 가입·로그인 허용에는 적용하지 않는다. 동일 WO의 연속 단계로 기존 전용 worktree/branch에서 이어가며 운영 데이터 변경은 없다.

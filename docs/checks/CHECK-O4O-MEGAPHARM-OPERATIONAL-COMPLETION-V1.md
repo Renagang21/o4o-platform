@@ -1,7 +1,7 @@
 # 메가팜 협업체 운영 완성 검증
 
 - 작성일: 2026-10-22
-- 상태: 로컬 구현·검증 완료, PR #761 CI·리뷰 진행 중
+- 상태: 기능 PR #761 병합, 배포 전 기존 세션 호환 보완 중
 - 작업: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)
 - 정본: [약국 설계 §15-9](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#15-9-사업-운영-도구와-사업별-약관-2026-10-22), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md)
 
@@ -56,3 +56,13 @@ Handoff·세션·로그아웃 관련 9 suite 142 PASS. 이 중 실제 격리 Pos
 계정 인증/카탈로그 소비처 대조: 공통 session scope와 회원가입 약관의 기존 기대값을 새 neture 계정 문맥으로 정렬했다. 서비스별 가입·과거 동의 원장을 바꾸지 않는다. 관련 21 suite 414 PASS(별도 opt-in 73개 제외).
 
 CI 전체 회귀 보완: 첫 전체 실행에서 관리자 guard 인벤토리 2건과 provider 데모 응답의 과거 scope 기대값 5건이 실패했다. 사업별 주입 guard의 명칭을 requireLegalScope로 맞춰 기존 정적 인벤토리 인식을 유지했고 검사 예외는 늘리지 않았다. 데모 응답도 Pharmacy Origin의 neture scope를 검증하도록 정렬하고 일반 사용자 provider 응답에도 Pharmacy Origin을 추가했다. 수정 후 관련 8 suite 107 PASS·API 타입 PASS. 나머지 로컬 전체 shard 1/3·3/3의 실패는 이 두 파일뿐이었다. 최종 CI는 수정 HEAD에서 다시 실행한다.
+
+## 배포 전 기존 세션 종료 호환
+
+배포 이전에 발급된 pharmacy의 kpa-society 세션 및 pharmcoop의 coop 세션도 사용자 로그아웃 시 서버에서 종료돼야 한다. Origin의 새 neture 판정만 적용하면 기존 서명 scope와 달라 서버 종료가 거절되는 경로를 확인했다. 각자의 정확한 기존 호스트에서 로그아웃할 때만 원래 서명 scope와 브라우저 ID로 폐기하도록 보완했다. 일반 Neture·다른 사업·서로 뒤바뀐 legacy scope는 거절한다. 신규 세션 발급은 계속 neture이며 계정/사업 가입이나 권한에는 예외를 주지 않는다.
+
+관련 handoff/세션/로그아웃 128 PASS(이번 실행의 별도 PostgreSQL opt-in 21건은 미실행, 앞선 SQL 21 PASS는 유지), API 타입 PASS. 새 양성 2건·교차 Origin 거절 5건을 추가했다. 동일 WO의 후속 PR에서 최종 CI·병합·배포를 함께 추적한다.
+
+후속 PR #763의 전체 회귀에서 기존 소스 표현을 직접 고정한 service-logout-auth-boundary 1건이 실패했다. Origin을 지역 변수로 추출한 현재 코드에서도 그 값이 req.get(origin)에서 오고 본문이 세션 범위를 정하지 않는다는 두 단언으로 갱신했다. 원래 보안 조건과 런타임 교차 Origin 거절은 유지한다. 관련 경계/로그아웃 38 PASS 후 CI를 다시 실행한다.
+
+공통 UI 소비처 CSS 검증: 협동조합의 기존 Tailwind 스캔 범위에는 새로 소비하는 법정정보·약관 설정 및 테이블/메뉴 스타일이 빠져 있었다. operator-core-ui/operator-ux-core/shared-space-ui/ui 패키지를 스캔하도록 정렬했다. production CSS에서 약관 페이지 폭·본문 편집 높이·테두리·저장 버튼 선택자 생성을 확인했다. 협동조합 build·70개 테스트 PASS, 협동조합 테마의 PC/390px 브라우저 74개 PASS 및 저장 버튼의 실제 표시를 재확인했다.
