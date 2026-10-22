@@ -1,4 +1,5 @@
 import { AppDataSource } from '../../../database/connection.js';
+import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
@@ -256,10 +257,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.revokeCertificate(id);
+      const certificate = await service.revokeCertificate(id, req.user!.id, req.body?.reason ?? '');
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
     } catch (error: any) {
+      if (error instanceof OperationError) return res.status(error.status).json({ success: false, error: error.message, code: error.code });
       logger.error('[CertificateController.revokeCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {
@@ -268,6 +270,14 @@ export class CertificateController extends BaseController {
 
       return BaseController.error(res, error);
     }
+  }
+
+  static async certificateOperations(req: Request, res: Response): Promise<any> {
+    if (!(await CertificateController.loadLectureCertificateOr404(req, res, req.params.id))) return;
+    const operations = await AppDataSource.query(`SELECT user_id AS "actorId", created_at AS at, meta->>'reason' AS reason
+      FROM action_logs WHERE service_key='lecture' AND action_key='lecture.certificate_revoke'
+      AND meta->>'certificateId'=$1 ORDER BY created_at DESC LIMIT 50`, [req.params.id]);
+    return BaseController.ok(res, { operations });
   }
 
   static async renewCertificate(req: Request, res: Response): Promise<any> {

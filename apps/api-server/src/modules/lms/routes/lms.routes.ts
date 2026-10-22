@@ -234,6 +234,8 @@ router.get('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, require
 router.patch('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.updateCertificate));
 
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
+router.get('/certificates/:id/operations', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.certificateOperations));
+
 router.post('/certificates/:id/revoke', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.revokeCertificate));
 
 // POST /api/v1/lms/certificates/:id/renew - Renew Certificate

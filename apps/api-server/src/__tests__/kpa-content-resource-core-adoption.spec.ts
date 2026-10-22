@@ -93,7 +93,8 @@ describe('KPA 6 handler Core 배선', () => {
 
   it('Core 인스턴스를 config 로 생성한다 (tableName 명시 주입 경로)', () => {
     expect(KPA_ROUTES).toContain('const kpaContentCore = createContentResourceCore(');
-    expect(KPA_ROUTES).toContain('createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog })');
+    expect(KPA_ROUTES).toContain('createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog,');
+    expect(KPA_ROUTES).toContain('atomicAudit: async (manager, user, actionType, targetType, targetId');
   });
 
   it('half-wired 참조가 없다 — 선언 1 + 사용 6', () => {

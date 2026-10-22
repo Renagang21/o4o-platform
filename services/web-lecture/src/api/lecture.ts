@@ -321,6 +321,8 @@ export const operatorApi = {
 
   issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
     lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
+  certificateOperations: (id: string) =>
+    lmsHttp.get<LmsApiResponse<{ operations: { actorId: string; at: string; reason: string }[] }>>(`/lms/certificates/${id}/operations`),
   revokeCertificate: (id: string, reason?: string) =>
     lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason }),
   renewCertificate: (id: string, months?: number) =>

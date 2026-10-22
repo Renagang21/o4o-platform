@@ -5,6 +5,7 @@ import { Certificate } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { EnrollmentService } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
+import { revokeLectureCertificate } from './certificate-operation.service.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
@@ -284,18 +285,8 @@ export class CertificateService extends BaseService<Certificate> {
     return updated;
   }
 
-  async revokeCertificate(id: string): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.revoke();
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate revoked`, { id: updated.id });
-
-    return updated;
+  async revokeCertificate(id: string, actorId?: string, reason: unknown = ''): Promise<Certificate> {
+    return Object.assign(new Certificate(), await revokeLectureCertificate(AppDataSource, id, actorId, reason));
   }
 
   async renewCertificate(id: string, months: number = 12): Promise<Certificate> {
