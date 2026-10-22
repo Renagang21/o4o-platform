@@ -220,6 +220,9 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   await db.query("INSERT INTO service_contact_settings(service_key,in_app_notification_enabled) VALUES('supplier',false) ON CONFLICT(service_key) DO UPDATE SET in_app_notification_enabled=false");
   const url=`${base}/service/supplier/manage/contacts/${receipt.id}/retry-notification`;
   expect((await request(app).post(url).set('x-test-user',supplier).expect(200)).body.data.status).toBe('off');
+  expect((await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[receipt.id]))[0].notification_status).toBe('inapp:off;email:sent;autoreply:sent');
+  const disabled=await request(app).get(`${base}/service/supplier/manage/contacts?status=delivery`).set('x-test-user',supplier).expect(200);
+  expect(disabled.body.data.items.some((r:any)=>r.id===receipt.id)).toBe(false);
   await db.query("UPDATE service_contact_settings SET in_app_notification_enabled=true WHERE service_key='supplier'");
   const repaired=await request(app).post(url).set('x-test-user',supplier).expect(200);expect(repaired.body.data.created).toBe(1);
   expect((await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[receipt.id]))[0].notification_status).toBe('inapp:sent;email:sent;autoreply:sent');

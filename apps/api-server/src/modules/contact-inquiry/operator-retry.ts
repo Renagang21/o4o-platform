@@ -39,15 +39,15 @@ export async function retryInboxNotification(
         "NOTIFICATION_IN_PROGRESS",
         "접수 알림의 결과를 확인 중입니다. 기존 발송 상태를 먼저 확인해 주세요.",
       );
+    let enabled = true;
     if (scope.kind === "service") {
       const [settings] = await manager.query(
         "SELECT in_app_notification_enabled FROM service_contact_settings WHERE service_key=$1",
         [scope.serviceKey],
       );
-      if (settings?.in_app_notification_enabled === false)
-        return { status: "off", recipients: 0, created: 0 };
+      enabled = settings?.in_app_notification_enabled !== false;
     }
-    const recipients = await inboxRecipients(manager, scope);
+    const recipients = enabled ? await inboxRecipients(manager, scope) : [];
     let created = 0;
     for (const recipient of recipients) {
       const [existing] = await manager.query(
@@ -79,7 +79,7 @@ export async function retryInboxNotification(
       );
       created++;
     }
-    const status = recipients.length ? "sent" : "none";
+    const status = !enabled ? "off" : recipients.length ? "sent" : "none";
     const otherChannels = (contact.notification_status ?? "")
       .split(";")
       .filter((part: string) => part && !part.startsWith("inapp:"));
