@@ -3,6 +3,7 @@
  */
 
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
+import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
 import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
 import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -344,6 +345,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
       />
 
       <StoreAiSlot />
+      <StoreCommerceNavigation />
       <nav aria-label="상품 빠른 작업" className="relative mb-3 flex flex-wrap items-center gap-2">
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}

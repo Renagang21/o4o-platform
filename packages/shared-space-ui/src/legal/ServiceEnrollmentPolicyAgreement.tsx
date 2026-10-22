@@ -18,6 +18,7 @@ export function useServiceEnrollmentPolicies(serviceKey: string, load: () => Pro
     Promise.resolve().then(() => loader.current()).then(value => {
       if (!alive) return;
       if (!Array.isArray(value) || value.length > 2 || new Set(value.map(doc => doc?.documentType)).size !== value.length
+        || (serviceKey.startsWith('business:') && (value.length !== 2 || value[0]?.version !== value[1]?.version))
         || !value.every(doc => doc && doc.serviceKey === serviceKey && ['terms', 'privacy'].includes(doc.documentType)
           && typeof doc.policyDocumentId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(doc.policyDocumentId)
           && Number.isInteger(doc.version) && doc.version > 0 && typeof doc.title === 'string' && !!doc.title.trim()

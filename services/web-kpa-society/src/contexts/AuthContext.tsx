@@ -10,14 +10,12 @@ import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
  * (/api/v1/auth/service/login · kpa_pharmacy_service_* 토큰) RETIRED — 소비처 0 · 서버 경로 은퇴.
  */
 
-import React, { createContext, useContext, useState, useMemo, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { AuthClient, getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
 //   세션 복구 · 토큰 정리 이벤트 · login/logout 은 공통 Core 로 이동.
-//   KPA 고유분(KPA context 비동기 로딩 · activityType)만 이 파일에 남는다.
 import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
-import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
 export { getAccessToken };
@@ -35,50 +33,16 @@ export const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
   strategy: 'localStorage',
 });
 
-// WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1:
-// store-products-ui 공통 패키지가 KPA의 localStorage-strategy authClient 를 사용하도록 주입.
-// 미주입 시 /store/my-products 가 AUTH_REQUIRED 401 로 회귀하므로 모듈 로드 시점에 1회 호출.
-configureStoreProductsApi(authClient.api);
-
 // ============================================================================
 // Types
 // ============================================================================
 
 /**
- * WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 기반 라벨 매핑
- * kpa_pharmacist_profiles.activity_type → 표시명
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D8:
+ *   pharmacy 는 KPA 분회 테이블(kpa_members · kpa_pharmacist_profiles · kpa_organizations)을
+ *   읽지 않는다. `/kpa/me-context` 보강(activityType · isStoreOwner · kpaMembership)은 제거했다.
+ *   매장 접근 판정은 store.neture.co.kr handoff 목적지가 한다.
  */
-export const ACTIVITY_TYPE_LABELS: Record<string, string> = {
-  pharmacy_owner: '약국 개설자',
-  pharmacy_employee: '약국 근무 약사',
-  hospital: '병원 약사',
-  manufacturer: '제조업',
-  importer: '수입업',
-  wholesaler: '도매업',
-  other_industry: '산업체',
-  government: '공무원',
-  school: '학교',
-  other: '기타',
-  inactive: '비활동',
-};
-
-export type MembershipType = 'pharmacist' | 'student';
-
-/**
- * WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: KPA Membership Context
- * /auth/me 응답의 kpaMembership 필드와 1:1 대응
- */
-export interface KpaMembershipContext {
-  status: string | null;           // kpa_members.status
-  role: string | null;             // kpa_members.role
-  membershipType: string | null;   // kpa_members.membership_type (pharmacist | student)
-  organizationId: string | null;   // kpa_members.organization_id
-  organizationName: string | null;
-  organizationType: string | null;
-  organizationRole: string | null; // organization_members.role
-  serviceAccess: 'full' | 'community-only' | 'pending' | 'blocked' | null;
-}
-
 export interface User {
   id: string;
   email: string;
@@ -87,41 +51,13 @@ export interface User {
   nickname?: string;
   role?: string;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   roles: string[];  // Primary role array
-  membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분
-  // WO-ROLE-NORMALIZATION-PHASE3-C-V1: qualification + business 기반
-  isStoreOwner: boolean;
-  activityType?: string;  // kpa_pharmacist_profiles.activity_type
-
-  // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: 통합 KPA membership context
-  kpaMembership?: KpaMembershipContext;
-
-  // ── 하위 호환 필드 (kpaMembership에서 derive) ──
-  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role (SSOT)
-  membershipRole?: string;  // 'member' | 'operator' | 'admin' | undefined (비소속)
-  membershipOrgId?: string;
-  membershipOrgName?: string;
-  membershipOrgType?: string;   // 'association' | 'branch' | 'group'
-  membershipParentId?: string;
-  membershipStatus?: string;    // 'pending' | 'active' | 'suspended' | 'withdrawn'
   memberships?: { serviceKey: string; status: string }[];
 }
 
-/**
- * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1:
- *   테스트 계정 상수(TEST_ACCOUNTS)와 loginAsTestAccount 는 소비처 0 이라 제거했다.
- *   `TestUser` 는 일부 화면이 표시용 `position` 필드를 읽을 때 쓰고 있어 타입만 남긴다.
- */
-export interface TestUser extends User {
-  position?: string;  // 직책 (표시용)
-}
-
 interface AuthContextType {
-  // Platform User
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  /** WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 로딩 완료 여부 */
-  isKpaContextLoaded: boolean;
   /**
    * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
    *   login(email, password) 는 은퇴했다. 로그인 진입은 Google 하나다.
@@ -136,8 +72,6 @@ interface AuthContextType {
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  /** WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1: activityType + optional businessInfo */
-  setActivityType: (activityType: string, businessInfo?: Record<string, any>) => Promise<void>;
   /** WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17: 미승낙 약관 · 승낙 제출 */
   pendingPolicyAcceptances: PendingPolicyAcceptance[];
   acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
@@ -145,48 +79,17 @@ interface AuthContextType {
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: ApiUser is imported from @o4o/auth-utils
 
-/**
- * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1
- * Role 자동 매핑 제거됨
- *
- * KPA는 더 이상 API role을 해석하지 않음
- * 운영자 여부는 서버 응답(KpaMember 기반)으로만 판단
- */
-
-/**
- * API 응답에서 User 객체 생성
- *
- * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1:
- * - role 매핑 제거 (API role을 그대로 사용)
- * - KPA 프론트는 role 문자열을 해석하지 않음
- *
- * P2-T1 (WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1):
- * - roles 배열 보존 (Phase 4 prefixed roles 지원)
- * - Backward compatibility: role 필드 유지
- */
+/** API 응답 → User. roles 배열은 그대로 보존한다(Phase 4 prefixed roles). */
 function createUserFromApiResponse(apiUser: ApiUser): User {
-  // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
-  // Phase 3: membershipType 매핑 — kpaMembership.membershipType 우선
   const role = apiUser.role || 'pharmacist';
-  const kpaMembership = (apiUser as any).kpaMembership;
-  const membershipType: MembershipType =
-    kpaMembership?.membershipType === 'student' ? 'student'
-    : role === 'student' ? 'student'
-    : 'pharmacist';
   return {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
-    // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
-    //   포럼 공개 표시명 canonical: nickname → name → email local-part.
-    //   서버 /auth/me 응답이 nickname 을 포함하지 않으면 undefined 유지.
+    // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1: 포럼 공개 표시명 canonical: nickname → name → email local-part.
     nickname: (apiUser as any).nickname || undefined,
-    role, // 매핑 없이 그대로 사용 (Backward compatibility)
-    roles: apiUser.roles || [role], // P2-T1: Phase 4 support
-    membershipType,
-    // WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner + activityType
-    isStoreOwner: !!(apiUser as any).isStoreOwner,
-    activityType: (apiUser as any).activityType || undefined,
+    role,
+    roles: apiUser.roles || [role],
     memberships: normalizeMemberships(apiUser),
   };
 }
@@ -204,130 +107,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
-  // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
-  const [isKpaContextLoaded, setIsKpaContextLoaded] = useState(true);
-
   /**
    * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
    *   인증 상태·세션 복구·로그인/로그아웃은 공통 Core 가 담당한다.
-   *   KPA 차이는 아래 주입값이 전부다 — serviceKey / 자체 authClient(localStorage 전략) /
-   *   KPA 필드 확장(createUserFromApiResponse) / 인증 직후 KPA context 후속 로딩.
-   *
-   *   isLoading 초기값(토큰 유무), 토큰 없을 때 /auth/me 생략, AUTH_TOKEN_CLEARED_EVENT 처리는
-   *   Core 가 동일 규칙으로 수행하므로 여기서 중복 구현하지 않는다.
+   *   차이는 serviceKey / 자체 authClient(localStorage 전략) 주입뿐이다.
    */
   const core = useServiceAuth<User>(
     useMemo(
       () => ({
-        // canonical service key — role prefix('kpa')가 아니라 service_memberships.service_key.
+        // canonical service key — role prefix 가 아니라 service_memberships.service_key.
         serviceKey: BUSINESS_SITE.authServiceKey,
         authClient,
         getAccessToken,
         toUser: (apiUser: Record<string, unknown>) => createUserFromApiResponse(apiUser as unknown as ApiUser),
-        // 인증 확정 직후 KPA context 를 비동기로 채운다(화면 진입을 막지 않는다).
-        onAuthenticated: () => {
-          setIsKpaContextLoaded(false);
-          void fetchKpaContextRef.current();
-        },
       }),
       [],
     ),
   );
 
-  const { user, setUser } = core;
-
-  /**
-   * WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context를 별도 API로 비동기 조회
-   *
-   * /auth/login, /auth/me 에서 제거된 KPA enrichment를 대체.
-   * functional setUser로 현재 user 상태에 KPA 필드를 merge.
-   * login()/checkAuth()에서 fire-and-forget으로 호출 → 로그인/화면진입을 차단하지 않음.
-   * AuthGate는 isKpaContextLoaded=false 동안 KPA 게이트를 건너뛴다.
-   */
-  const fetchKpaContext = useCallback(async () => {
-    try {
-      const response = await authClient.api.get('/kpa/me-context') as { data: unknown };
-      const data = response.data as { success: boolean; data: any };
-      if (data.success && data.data) {
-        const ctx = data.data;
-        setUser(prev => {
-          if (!prev) return prev;
-          const updated = { ...prev };
-          updated.activityType = ctx.activityType || undefined;
-          updated.isStoreOwner = !!ctx.isStoreOwner;
-          if (ctx.kpaMembership) {
-            updated.kpaMembership = ctx.kpaMembership;
-            // 하위 호환 필드 populate
-            updated.membershipRole = ctx.kpaMembership.role || undefined;
-            updated.membershipOrgId = ctx.kpaMembership.organizationId || undefined;
-            updated.membershipOrgName = ctx.kpaMembership.organizationName || undefined;
-            updated.membershipOrgType = ctx.kpaMembership.organizationType || undefined;
-            updated.membershipStatus = ctx.kpaMembership.status || undefined;
-            if (ctx.kpaMembership.membershipType === 'student') {
-              updated.membershipType = 'student';
-            }
-          }
-          return updated;
-        });
-      }
-    } catch (error) {
-      console.error('[KPA] me-context fetch failed:', error);
-    } finally {
-      setIsKpaContextLoaded(true);
-    }
-  }, []);
-
-  // onAuthenticated 는 useMemo(deps=[]) 안에서 호출되므로 최신 fetchKpaContext 를 ref 로 참조한다.
-  const fetchKpaContextRef = useRef(fetchKpaContext);
-  fetchKpaContextRef.current = fetchKpaContext;
-
-  /**
-   * WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1 의 "토큰 없으면 /auth/me 생략" 규칙과
-   * 로그인/현재 브라우저 로그아웃은 Core(useServiceAuth)가 수행한다.
-   * checkAuth 는 기존 이름을 유지하되 Core.refresh 로 위임한다(외부 계약 불변).
-   */
-  const checkAuth = core.refresh;
-
-  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: core.login(email+password) 은퇴.
-  //   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다(Google 경로 동일).
-
-  const logout = core.logout;
-
-  /**
-   * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
-   * activityType + optional businessInfo 저장
-   * - API PATCH로 서버 저장 → 서버가 isStoreOwner 재계산
-   * - fetchKpaContext()로 KPA context 갱신 (await — AuthGate 정합성 보장)
-   * - error re-throw: ActivitySetupPage에서 에러 UI 표시 가능
-   */
-  const setActivityType = async (activityType: string, businessInfo?: Record<string, any>) => {
-    if (user) {
-      const payload: Record<string, any> = { activityType };
-      if (businessInfo) payload.businessInfo = businessInfo;
-      await authClient.api.patch('/auth/me/profile', payload);
-      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context만 갱신 (await로 AuthGate 정합성 보장)
-      setIsKpaContextLoaded(false);
-      await fetchKpaContext();
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
-        // Platform User (인증 상태는 공통 Core 산출)
-        user,
+        user: core.user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
-        isKpaContextLoaded,
         loginWithGoogle: core.loginWithGoogle,
         loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
         loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
-        logout,
-        checkAuth,
-        setActivityType,
+        logout: core.logout,
+        checkAuth: core.refresh,
         pendingPolicyAcceptances: core.pendingPolicyAcceptances,
         acceptPendingPolicies: core.acceptPendingPolicies,
       }}

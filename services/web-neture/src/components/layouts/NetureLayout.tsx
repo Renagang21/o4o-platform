@@ -33,14 +33,14 @@ export default function NetureLayout() {
               <p>{CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm · 만성질환관리' : '© 2026 Neture. O4O 통합 업무 공간'}</p>
               {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 하드코딩 법정정보 제거 → API 값 있을 때만 표시 */}
               <div className="text-xs text-gray-400 mt-1">
-                {CURRENT_HOST_PROFILE !== 'carepharm' && <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />}
+                <PublicLegalFooterInfo serviceKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : 'neture'} loadProfile={loadFooterLegal} />
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-400">
               {/* WO-O4O-PUBLIC-FOOTER-LINK-GUARD-V1: dead link /about 제거 (route 없음, About 페이지 부재) */}
-              {CURRENT_HOST_PROFILE !== 'community' && <Link to="/contact" className="hover:text-primary-600 transition-colors">
+              <Link to="/contact" className="hover:text-primary-600 transition-colors">
                 Contact Us
-              </Link>}
+              </Link>
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
                   /terms · /privacy 는 route 가 존재한다(공통 PolicyDocumentViewer). 다른 서비스
                   푸터와 같은 축으로 노출한다 — route 있는 실기능을 숨기지 않는다. */}

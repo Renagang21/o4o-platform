@@ -27,8 +27,10 @@ import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
 import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { blocksToHtml } from '@o4o/forum-core/utils';
 import { libraryDocumentText } from '../supplier/libraryDocumentText';
 import { supplierApi } from '../../lib/api';
+import { CarePharmPostGuide } from '../carepharm/CarePharmPostGuide';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
@@ -36,7 +38,6 @@ import {
   updateForumPost,
   fetchForumPostBySlug,
   fetchUserContactSettings,
-  extractTextContent,
   type UserContactSettings,
 } from '../../services/forumApi';
 
@@ -58,6 +59,8 @@ interface ForumWritePageProps {
   postSegment?: string;
   /** Funding creator/operator can publish notices in their own closed forum. */
   allowAnnouncement?: boolean;
+  /** Set only inside the already-authorized native CarePharm member workspace. */
+  writingContext?: 'carepharm';
 }
 
 function forumWriteHeading(isEditMode: boolean, communityLabel: string | undefined) {
@@ -72,6 +75,7 @@ export function ForumWritePage({
   backPath,
   postSegment = 'post',
   allowAnnouncement = false,
+  writingContext,
 }: ForumWritePageProps = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -79,7 +83,7 @@ export function ForumWritePage({
   const isEditMode = !!editPostId;
   const forumSlugParam = searchParams.get('forum') || '';
   const tagParam = searchParams.get('tag') || '';
-  const libraryId = !isEditMode && communityLabel ? searchParams.get('library') : null;
+  const libraryId = !isEditMode && communityLabel && writingContext !== 'carepharm' ? searchParams.get('library') : null;
   const [libraryReady, setLibraryReady] = useState(false);
   const [publicationConfirmed, setPublicationConfirmed] = useState(false);
   const [availableForums, setAvailableForums] = useState<Array<{ id: string; slug: string; name: string; tags: string[] }>>([]);
@@ -95,6 +99,7 @@ export function ForumWritePage({
   useEffect(() => {
     if (isEditMode) return;
     let alive = true;
+    if (writingContext === 'carepharm') { setForumId(''); setTargetForum(null); setAvailableForums([]); }
     fetchForumCategories()
       .then((res) => {
         if (!alive) return;
@@ -102,6 +107,15 @@ export function ForumWritePage({
         // `?forum=<slug>` 가 있으면 그 포럼을 우선 확정한다 (홈 소식 섹션 · 포럼 목록 필터에서 진입).
         if (libraryId) {
           setAvailableForums(items); setForumId(''); setTargetForum(null); return;
+        }
+        if (writingContext === 'carepharm') {
+          setAvailableForums(items);
+          const selected = items.find(item => item.slug === forumSlugParam);
+          if (selected?.id) {
+            setForumId(String(selected.id));
+            setTargetForum({ ...selected, id: String(selected.id), tags: Array.isArray(selected.tags) ? selected.tags : [] });
+          }
+          return;
         }
         const matched =
           (forumSlugParam ? items.find((item) => item?.slug === forumSlugParam) : undefined)
@@ -117,7 +131,7 @@ export function ForumWritePage({
       })
       .catch(() => { /* forum 확정 실패 시 제출 단계에서 안내 */ });
     return () => { alive = false; };
-  }, [isEditMode, categorySlug, forumSlugParam, libraryId]);
+  }, [isEditMode, categorySlug, forumSlugParam, libraryId, writingContext]);
 
   const postTypeOptions: ForumWriteFormPostTypeOption[] | undefined = allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined;
   const heading = forumWriteHeading(isEditMode, communityLabel);
@@ -132,6 +146,7 @@ export function ForumWritePage({
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState<string | null>(null);
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
@@ -165,10 +180,10 @@ export function ForumWritePage({
         if (response?.data) {
           setTitle(response.data.title);
           setEditSlug(response.data.slug);
-          const text = typeof response.data.content === 'string'
-            ? response.data.content
-            : extractTextContent(response.data.content);
-          setEditorHtml(`<p>${text.split('\n').join('</p><p>')}</p>`);
+          setEditStatus(response.data.status);
+          const html = typeof response.data.content === 'string'
+            ? response.data.content : blocksToHtml(response.data.content);
+          setEditorHtml(html);
           setShowContactOnPost(response.data.showContactOnPost || false);
         } else {
           setError('수정할 게시글을 찾을 수 없습니다.');
@@ -240,6 +255,7 @@ export function ForumWritePage({
       const base = (backPath || '/forum').replace(/\/$/, '');
       const response = await updateForumPost(editPostId, {
         title: payload.title,
+        ...(editStatus === 'draft' ? { status: 'publish' as const } : {}),
         ...(allowAnnouncement && (payload.type === 'discussion' || payload.type === 'announcement') ? { type: payload.type } : {}),
         content: blocks,
         categorySlug: categorySlug,
@@ -358,6 +374,17 @@ export function ForumWritePage({
         <label className="flex gap-2"><input type="checkbox" checked={publicationConfirmed} onChange={e => setPublicationConfirmed(e.target.checked)} />선택한 커뮤니티의 공개 범위를 확인했으며, 거래 조건·비공개 자료를 제외했습니다.</label>
       </section>}
 
+      {writingContext === 'carepharm' && !isEditMode && <section aria-label="회원 게시판 선택" className="mb-4 space-y-3 rounded-lg border p-4 text-sm">
+        <label className="block">게시할 게시판<select aria-label="게시할 게시판" value={forumId} className="mt-2 block min-h-11 w-full rounded border p-2" onChange={event => {
+          const selected = availableForums.find(forum => String(forum.id) === event.target.value);
+          setForumId(selected ? String(selected.id) : '');
+          setTargetForum(selected ? { ...selected, id: String(selected.id), tags: Array.isArray(selected.tags) ? selected.tags : [] } : null);
+          setClassification('');
+        }}><option value="">게시판을 선택하세요</option>{availableForums.map(forum => <option key={forum.id} value={forum.id}>{forum.name}</option>)}</select></label>
+        <p>운영 사례·자료 요청·제품 문의에 맞는 게시판을 선택해 주세요.</p>
+        {!availableForums.length && <p>이용 가능한 게시판이 없거나 목록을 불러오지 못했습니다. <Link className="underline" to={backPath || '/'}>회원 게시판으로 돌아가기</Link></p>}
+      </section>}
+
       {/* Error Message */}
       {error && (
         <div style={styles.errorBanner}>
@@ -365,6 +392,7 @@ export function ForumWritePage({
         </div>
       )}
 
+      {editStatus === 'draft' && <p className="my-4 rounded border p-3">비공개 초안입니다. 내용을 검토한 뒤 게시하면 이 게시판 이용자에게 공개됩니다.</p>}
       {/* Form: create/edit 공통 ForumWriteForm (WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1) */}
         <ForumWriteForm
           showPostType={allowAnnouncement}
@@ -376,8 +404,8 @@ export function ForumWritePage({
           titleMaxLength={200}
           contentLabel={`내용 (최소 ${MIN_CONTENT_LENGTH}자)`}
           contentPlaceholder="의견을 작성해주세요..."
-          submitLabel={isEditMode ? '수정하기' : '등록하기'}
-          submittingLabel={isEditMode ? '수정 중...' : '등록 중...'}
+          submitLabel={isEditMode ? editStatus === 'draft' ? '검토한 초안 게시' : '수정하기' : '등록하기'}
+          submittingLabel={isEditMode ? editStatus === 'draft' ? '게시 중...' : '수정 중...' : '등록 중...'}
           cancelLabel="취소"
           theme="blue"
           onCancel={handleCancel}
@@ -395,6 +423,7 @@ export function ForumWritePage({
           )}
           renderExtra={
             <>
+            {writingContext === 'carepharm' && <CarePharmPostGuide />}
             {!isEditMode && forumTags.length > 0 && (
               <div style={styles.classificationBox}>
                 <label htmlFor="forum-post-classification" style={styles.classificationLabel}>분류</label>

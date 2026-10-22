@@ -32,12 +32,14 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
     { label: '회원 커뮤니티', href: '/communities/business%3Acarepharm/forum' },
     { label: '자료실', href: '/materials' },
     { label: '참여 안내', href: '/my/participation' },
+    { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'community') return [
     { label: '포럼', href: '/communities/community/forum' },
     { label: '콘텐츠', href: '/communities/community/content' },
     { label: '자료실', href: '/communities/community/resources' },
     { label: '공지사항', href: '/communities/community/notices' },
+    { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'funding') return [
     { label: '유통참여형 펀딩', href: '/market-trial' },
@@ -45,8 +47,8 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
     { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'supplier') return [
-    { label: '신청 · 이용 상태', href: '/' },
-    { label: '공급자 업무', href: '/supplier/dashboard' },
+    { label: '서비스 소개 · 이용 안내', href: '/' },
+
     { label: 'Contact Us', href: '/contact' },
   ];
   return NETURE_PUBLIC_NAV;

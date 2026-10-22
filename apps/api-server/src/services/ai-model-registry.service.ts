@@ -1,3 +1,4 @@
+import { ModelControlService } from './ai-management/model-controls.js';
 /**
  * AI Model Registry — Gemini 모델 목록의 **동적 출처** (Google ListModels) + 정적 fallback
  *
@@ -157,13 +158,23 @@ export async function ensureGeminiModelCache(dataSource: DataSource, { force = f
 /** 관리자 화면용 목록. Google 목록이 있으면 그것 + whitelist 에만 있는 항목(레거시)을 뒤에 붙인다. */
 export async function listGeminiModels(dataSource: DataSource): Promise<GeminiModelListing> {
   const state = await ensureGeminiModelCache(dataSource);
-  if (!state) return { models: staticGeminiModels(), source: 'static', fetchedAt: null };
+  const control = await new ModelControlService(dataSource).read();
+  const mergeManaged = (models: GeminiModelInfo[]) => {
+    const deleted = new Set(control.deleted);
+    const registered = new Map(control.models.filter(model => model.provider === 'gemini').map(model => [model.id, model]));
+    const merged = models.filter(model => !deleted.has('gemini:' + model.id) && registered.get(model.id)?.capabilities.includes('text') !== false);
+    for (const model of control.models.filter(x => x.provider === 'gemini' && x.capabilities.includes('text'))) {
+      if (!merged.some(x => x.id === model.id)) merged.push({ id: model.id, displayName: model.name, description: '관리자 등록 · 공급자 제공 여부 미검증', inputTokenLimit: null, outputTokenLimit: null });
+    }
+    return merged;
+  };
+  if (!state) return { models: mergeManaged(staticGeminiModels()), source: 'static', fetchedAt: null };
   const live = state.models;
   const liveIds = new Set(live.map((m) => m.id));
   const legacy = staticGeminiModels().filter((m) => !liveIds.has(m.id));
   const stale = Date.now() - state.fetchedAt >= GEMINI_MODEL_CACHE_TTL_MS;
   return {
-    models: [...live, ...legacy],
+    models: mergeManaged([...live, ...legacy]),
     source: stale ? 'google-stale' : 'google',
     fetchedAt: new Date(state.fetchedAt).toISOString(),
   };
@@ -182,6 +193,8 @@ export function isGeminiModelAllowedSync(id: unknown): id is string {
 /** 비동기 판정 — 캐시를 (필요하면) 채운 뒤 판정한다. 관리자 저장 · 편집 resolver 가 쓴다. */
 export async function isGeminiModelAllowed(dataSource: DataSource, id: unknown): Promise<boolean> {
   if (typeof id !== 'string' || !GEMINI_MODEL_ID_RE.test(id)) return false;
+  const registered = await new ModelControlService(dataSource).allows('gemini', id);
+  if (registered !== undefined) return registered;
   if ((MODEL_WHITELIST.gemini as readonly string[]).includes(id)) return true;
   const state = await ensureGeminiModelCache(dataSource);
   return !!state && state.models.some((m) => m.id === id);

@@ -1,30 +1,7 @@
 /**
- * Admin Platform Accounts — 최고 관리자 계정 안전 유지관리 (additive)
- * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1
- *
- * frozen AdminUserController / users.routes (WO-O4O-CORE-FREEZE-V1) 를 수정하지 않고,
- * admin 계정의 목록 조회 · 활성 토글만 격리 제공한다.
- *
- * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 재설정 경로는 은퇴했다.
- *
- * 재사용(중복 0): User 엔티티, roleAssignmentService(RBAC SSOT).
- * 서버측 보호(frontend 차단에 의존하지 않음):
- *   - 본인 계정 비활성 차단(SELF_LOCK)
- *   - 마지막 활성 super_admin 비활성 차단(LAST_SUPER_ADMIN)
- *   - super_admin 대상 변경은 super_admin 만 가능(SUPER_ADMIN_ONLY)
- *   - 응답에 password 등 민감 필드 미포함
- * V1 범위: 역할 편집 없음(역할 변경은 RBAC Role Assignment 화면에서 관리).
- *
- * WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1:
- *   `platform:super_admin` **부여**의 정식 경로를 여기에 둔다(아래 POST /:id/super-admin).
- *   종전에는 부여 경로가 어디에도 없었고, 유일하게 열려 있던 것은 범용 역할 API
- *   (`POST /operator/members/:id/roles`)가 platform admin 요청자에게 assignability 검사를
- *   건너뛰는 틈이었다. 그 틈으로 주는 것은 `operator-assignments` allowlist 가
- *   `platform:*` 을 **의도적으로 제외한** 경계를 우회하는 것이므로 채택하지 않는다.
- *   플랫폼 계정은 이 화면 소관이라는 기존 선언(`/settings/admin-accounts`)에 맞춰
- *   **관리자 전용 경로를 명시적으로 신설**한다.
- *
- *   회수는 이 WO 범위가 아니다 — 기존 관리자 계정의 역할을 건드리지 않는다.
+ * Whole-platform administrator accounts only: list, existing account status and official grant.
+ * Service Admin/Operator assignment belongs to /admin/operator-assignments.
+ * Keep Google/Demo, self-lock and last-active-platform-admin guards; do not expose other roles.
  */
 import { Router, type Request, type Response } from 'express';
 import { In } from 'typeorm';
@@ -45,10 +22,11 @@ const router: Router = Router();
 // 접근 권한: platform admin 이상
 const ADMIN_ACCESS_ROLES = ['platform:super_admin'];
 // 목록에 표시할 관리자성 역할
-const ADMIN_ACCOUNT_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operator'];
+const ADMIN_ACCOUNT_ROLES = ['platform:super_admin'];
 const SUPER_ADMIN_ROLE = 'platform:super_admin';
 
 router.use(authenticate);
+router.use((_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
 
 /** 현재 활성(isActive) super_admin user id 목록 — role active + user.isActive */
 async function activeSuperAdminIds(): Promise<string[]> {
@@ -85,18 +63,16 @@ router.get('/', requireRole(ADMIN_ACCESS_ROLES), async (_req: Request, res: Resp
     }
     const repo = AppDataSource.getRepository(User);
     const users = await repo.find({ where: { id: In(Array.from(idSet)) } });
-    const accounts = await Promise.all(
-      users.map(async (u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email,
-        roles: await roleAssignmentService.getRoleNames(u.id),
-        isActive: u.isActive,
-        status: u.status,
-        createdAt: u.createdAt,
-        lastLoginAt: u.lastLoginAt ?? null,
-      })),
-    );
+    const accounts = users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email,
+      roles: [SUPER_ADMIN_ROLE],
+      isActive: u.isActive,
+      status: u.status,
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt ?? null,
+    }));
     // super_admin 우선, 그다음 이름순
     accounts.sort((a, b) => {
       const aSa = a.roles.includes(SUPER_ADMIN_ROLE) ? 0 : 1;
@@ -137,6 +113,10 @@ router.patch('/:id/status', requireRole(ADMIN_ACCESS_ROLES), async (req: Request
     const user = await repo.findOne({ where: { id } });
     if (!user) {
       res.status(404).json({ success: false, error: '계정을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+      return;
+    }
+    if (!await roleAssignmentService.hasRole(id, SUPER_ADMIN_ROLE)) {
+      res.status(404).json({ success: false, error: '전체 관리자 계정이 아닙니다.', code: 'NOT_PLATFORM_ACCOUNT' });
       return;
     }
     if (await blockedBySuperAdminGuard(id, actorId, res)) return;

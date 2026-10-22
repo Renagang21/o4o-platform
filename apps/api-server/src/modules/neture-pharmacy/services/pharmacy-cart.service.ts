@@ -80,7 +80,7 @@ export interface CheckoutGroup {
 export function groupCheckoutLines(lines: CheckoutLine[]): CheckoutGroup[] {
   const groups = new Map<string, CheckoutGroup>();
   for (const line of lines) {
-    const receiverKey = receiverKeyOf(line.option.semiFranchiseKey, line.option.paymentReceiverKey);
+    const receiverKey = receiverKeyOf(line.option.semiFranchiseKey ?? `supplier:${line.option.supplierId}`, line.option.paymentReceiverKey);
     // New fixed conditions cannot share shipping/minimum amounts across businesses or different terms.
     const termsKey = line.option.termsSnapshot ? JSON.stringify([
       line.option.semiFranchiseKey, line.option.baseShippingFee, line.option.freeShippingThreshold, line.option.minOrderAmount ?? 0,

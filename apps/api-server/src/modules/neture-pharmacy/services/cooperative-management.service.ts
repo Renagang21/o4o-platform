@@ -1,4 +1,6 @@
 import type { DataSource, EntityManager } from "typeorm";
+import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { businessPolicyScope } from './business-policy-scope.js';
 import { NeturePharmacyError } from "../constants.js";
 import { getNetureMainMembershipStatus } from "../../neture/services/neture-main-membership.js";
 
@@ -136,7 +138,7 @@ export class CooperativeManagementService {
   async federationList(actor: string) {
     await this.requireFederation(this.db, actor);
     return this.db
-      .query(`SELECT c.id,c.slug,c.name,c.status,c.introduction,c.eligibility_description AS "eligibilityDescription",sf.key AS "businessKey"
+      .query(`SELECT c.id,c.slug,c.name,c.status,c.introduction,c.eligibility_description AS "eligibilityDescription",sf.key AS "businessKey", ('business:'||sf.id::text) AS "policyScope"
       FROM cooperatives c JOIN semi_franchises sf ON sf.id=c.semi_franchise_id ORDER BY c.created_at DESC,c.id`);
   }
   async applyAffiliation(actor: string, input: Record<string, unknown>) {
@@ -150,6 +152,8 @@ export class CooperativeManagementService {
       [
         "cooperatives",
         "about",
+        "contact",
+        "notifications",
         "operator",
         "preview",
         "login",
@@ -350,7 +354,7 @@ export class CooperativeManagementService {
       return { ok: true };
     });
   }
-  async applyMembership(actor: string, coop: string, note: unknown) {
+  async applyMembership(actor: string, coop: string, note: unknown, policyReferences?: EnrollmentPolicyReference[]) {
     const text = reason(note);
     return await this.db.transaction(async (m) => {
       const c = await this.lock(m, coop);
@@ -360,6 +364,9 @@ export class CooperativeManagementService {
         [c.semi_franchise_id],
       );
       if (c.status !== "active" || !sf) throw denied();
+      const scope = businessPolicyScope(c.semi_franchise_id);
+      const policies = await recordEnrollmentPolicies(m, actor, scope, policyReferences);
+      await recordEnrollmentApplication(m, actor, scope, { type: 'cooperative_membership_application', id: coop, resourceId: c.semi_franchise_id }, policies);
       const [existing] = await m.query(
         "SELECT status FROM cooperative_memberships WHERE cooperative_id=$1 AND user_id=$2 FOR UPDATE",
         [coop, actor],

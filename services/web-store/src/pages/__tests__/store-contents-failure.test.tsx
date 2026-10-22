@@ -9,6 +9,10 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { StoreContentsSelector } from "../pharmacy/StoreContentsSelector";
 const list = vi.hoisted(() => vi.fn());
+vi.mock("../../contexts/AuthContext", () => ({ useAuth: () => ({ user: { id: "fixture" } }) }));
+vi.mock("../../contexts/StoreContext", () => ({ useUnifiedStore: () => ({ organizationId: "A", effectiveServiceKey: "kpa-society" }) }));
+vi.mock("../../lib/storeOrganizationHeader", async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => "A" }));
+vi.mock("../../api/neturePharmacy", () => ({ neturePharmacyApi: { listSemiFranchises: async () => [] } }));
 vi.mock("../../api/assetSnapshot", () => ({
   storeLibraryApi: { listContents: list },
 }));

@@ -133,15 +133,15 @@ describe('§9-4~6 · 메뉴 권한 정책', () => {
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: core-kpa-branch-service-members **제거** (23 → 22).
   //   분회 가입 승인은 kpa-branch:admin 이 분회 서비스 화면에서 한다 — Admin 은 서비스 운영자만 지정.
   // 약국 서비스 설정 통합: 협력사업 독립 메뉴 제거로 클릭 21 → 20, 그룹 헤더 4 유지.
-  it('클릭 가능한 정적 메뉴는 20개다', () => {
-    expect(CLICKABLE).toHaveLength(20);
+  it('클릭 가능한 정적 메뉴는 19개다', () => {
+    expect(CLICKABLE).toHaveLength(19);
   });
 
-  it('4. 정적 메뉴 전 노드(클릭 20 + 그룹 헤더 4)가 명시적 권한 설정을 갖는다', () => {
+  it('4. 정적 메뉴 전 노드(클릭 19 + 그룹 헤더 4)가 명시적 권한 설정을 갖는다', () => {
     const configured = new Set(menuPermissions.map((m) => m.menuId));
     const missing = ALL_NODES.map((n) => n.id).filter((id) => !!id && !configured.has(id));
     expect(missing).toEqual([]);
-    expect(ALL_NODES).toHaveLength(24); // 클릭 20 + 그룹 헤더 4
+    expect(ALL_NODES).toHaveLength(23); // 클릭 19 + 그룹 헤더 4
   });
 
   it('4-b. 모든 설정 항목이 명시적 역할을 갖는다 (무게이트 항목 0)', () => {

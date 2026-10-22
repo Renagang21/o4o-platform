@@ -33,11 +33,13 @@ const stripComments = (s: string) =>
     .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
     .join('\n');
 
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면은 제거됐다 — 같은 화면의 정본은 store.neture.co.kr(web-store).
 const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
+const STORE = join(REPO, 'services', 'web-store', 'src');
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§1 selector — 인라인 POP 만들기 = POP V2 handoff', () => {
-  const src = stripComments(read(KPA, 'pages', 'pharmacy', 'StoreContentsSelector.tsx'));
+  const src = stripComments(read(STORE, 'pages', 'pharmacy', 'StoreContentsSelector.tsx'));
 
   it('StorePopCreateModal / generateStorePop / api/storePop 을 import 하지 않는다', () => {
     expect(src).not.toMatch(/StorePopCreateModal|InlinePopTarget|generateStorePop|api\/storePop/);
@@ -46,7 +48,8 @@ describe('§1 selector — 인라인 POP 만들기 = POP V2 handoff', () => {
   it('V2 handoff 계약(CANONICAL_STORE_POP_V2_ROUTE · buildPopV2HandoffState · popV2HandoffFromProductionItem) 을 쓴다', () => {
     expect(src).toMatch(/CANONICAL_STORE_POP_V2_ROUTE/);
     expect(src).toMatch(/buildPopV2HandoffState\(\s*popV2HandoffFromProductionItem\(/);
-    expect(src).toMatch(/navigate\(CANONICAL_STORE_POP_V2_ROUTE,/);
+    // 내 매장은 서비스 지정 base(/work/{service}/store 등) 아래로 보낸다.
+    expect(src).toMatch(/navigate\(base \+ CANONICAL_STORE_POP_V2_ROUTE\.slice\('\/store'\.length\),/);
   });
 
   it("execution-asset → 'library' 매핑을 POP handoff 에도 적용한다", () => {
@@ -109,9 +112,10 @@ describe('§3 handoff — 식별자만 싣는 순수 변환', () => {
     }
   });
 
-  it('canonical route 는 KPA StorePopV2Page 가 마운트된 경로다', () => {
+  it('canonical route 는 내 매장 StorePopV2Page 가 마운트된 경로다', () => {
     expect(CANONICAL_STORE_POP_V2_ROUTE).toBe('/store/marketing/pop-v2');
-    expect(read(KPA, 'App.tsx')).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
+    expect(existsSync(join(KPA, 'pages', 'pharmacy', 'StorePopV2Page.tsx'))).toBe(false);
+    expect(read(STORE, 'App.tsx')).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
   });
 });
 
@@ -125,7 +129,7 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
       'App.tsx',
     ];
     for (const f of files) {
-      expect(stripComments(read(KPA, f))).not.toMatch(/components\/store\/StorePopCreateModal/);
+      expect(stripComments(read(STORE, f))).not.toMatch(/components\/store\/StorePopCreateModal/);
     }
   });
 
@@ -133,8 +137,10 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
   //   ③ 당시 @deprecated 로 남겨 둔 dead 파일 2개와 legacy generate route 는 ④ 에서 제거됐다.
   //   최종 상태 단언은 store-pop-legacy-instant-pdf-retirement.spec.ts 가 담당한다.
   it('dead 파일 2개(StorePopCreateModal · api/storePop) 는 더 이상 존재하지 않는다', () => {
-    expect(existsSync(join(KPA, 'components', 'store', 'StorePopCreateModal.tsx'))).toBe(false);
-    expect(existsSync(join(KPA, 'api', 'storePop.ts'))).toBe(false);
+    for (const root of [KPA, STORE]) {
+      expect(existsSync(join(root, 'components', 'store', 'StorePopCreateModal.tsx'))).toBe(false);
+      expect(existsSync(join(root, 'api', 'storePop.ts'))).toBe(false);
+    }
   });
 });
 

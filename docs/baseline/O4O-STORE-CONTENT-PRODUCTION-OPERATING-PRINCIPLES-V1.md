@@ -1,6 +1,7 @@
 # O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1 — 매장 콘텐츠 제작 운영 원칙
 
 > **상태**: ACTIVE (baseline) · **작성일**: 2026-09-14
+> **정책 추가**: 2026-10-22 사용자 승인 — 외부 AI 자료 조회·초안 저장 직접 연결(§3 해당 원칙). 구현·운영 상태는 별도 TODO 참조.
 > **근거 WO**: `WO-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-REALIGNMENT-V1` (AUDIT + BASELINE REALIGNMENT, 기능 개발 없음)
 > **근거 조사**: [IR-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-AUDIT-V1](../investigations/IR-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-AUDIT-V1.md)
 > **관계 문서**: [O4O-AI-USAGE-FLOW-BASELINE-V1](O4O-AI-USAGE-FLOW-BASELINE-V1.md)(AI 진입 흐름) · [O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1](../architecture/O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1.md)(제작 6단계·저장 모델) · [O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1](../architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md)(테이블·경계) · [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)(자동화 진화 원칙)
@@ -39,6 +40,7 @@
 ```
 
 - 기획과 Brief 는 O4O 밖(사용자 AI)에서 만들어져도 된다. O4O 는 **가져오는 지점**(HTML 붙여넣기 · 자료 연결 · Media Library 등록)부터 책임진다.
+- **2026-10-22 사용자 결정 — 외부 AI 직접 연결:** 사용자 동의와 기존 업무 권한 안에서 외부 AI의 자료 조회·초안 저장을 연결할 수 있다. 창작 주체·외부 모델 선택·구독·비용·대화는 사용자 AI에 남는다. 위 표의 O4O Guide 자체가 계정 연동을 맡는 것은 아니며 별도 외부 연결 모듈이 담당한다. [설계](../design/DESIGN-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)·[구현 TODO](../work-orders/TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)를 따르고, 내부 Supplier LLM 금지와 기존 공개·게시·검수 책임은 유지한다. 문서상 허용과 실제 운영 활성화를 구분한다.
 - 재제작은 저장된 콘텐츠·자산에서 다시 시작한다 ([CONTENT-PRODUCTION-FLOW §1](../architecture/O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1.md) 단방향 원칙 유지).
 
 ## 4. 콘텐츠 종류

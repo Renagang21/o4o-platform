@@ -190,3 +190,16 @@ describe('6~7. 저장 검증 · proxy 통과', () => {
     expect(resolver).toContain('EDITING_MODEL_FALLBACK = GEMINI_CANONICAL_MODEL');
   });
 });
+
+it('excludes registered non-text models from both static and live policy choices', async () => {
+  mockFetchOnce(googleListing(['gemini-3.8-flash', 'gemini-9.9-flash', 'gemini-9.8-flash']));
+  const control = { revision: 1, deleted: [], selections: {}, models: ['gemini-2.0-flash', 'gemini-9.9-flash'].map(id => ({ provider: 'gemini', id, name: id, capabilities: ['image'] })) };
+  const managedDb = { isInitialized: true, query: jest.fn(async () => [{ value: control }]) } as any;
+  expect(await isGeminiModelAllowed(managedDb, 'gemini-2.0-flash')).toBe(false);
+  expect(await isGeminiModelAllowed(managedDb, 'gemini-9.9-flash')).toBe(false);
+  const listing = await listGeminiModels(managedDb);
+  expect(listing.models.map(x => x.id)).not.toContain('gemini-2.0-flash');
+  expect(listing.models.map(x => x.id)).not.toContain('gemini-9.9-flash');
+  expect(listing.models.map(x => x.id)).toContain('gemini-9.8-flash');
+  expect(await isGeminiModelAllowed(managedDb, 'gemini-9.8-flash')).toBe(true);
+});

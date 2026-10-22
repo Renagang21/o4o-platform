@@ -1,3 +1,4 @@
+import { AppDataSource } from '../../../database/connection.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
@@ -42,6 +43,27 @@ export class CertificateController extends BaseController {
         : null,
       issuer: certificate.issuerName || 'O4O LMS',
     };
+  }
+
+  /** Operator recovery queue; does not broaden private certificate reads. */
+  static async missingCertificates(req: Request, res: Response): Promise<any> {
+    try {
+      const search = typeof req.query.search === 'string' ? req.query.search.trim().slice(0, 100) : '';
+      const items = await AppDataSource.query(`
+        SELECT e.id AS "enrollmentId", e."userId", e."courseId", u.name AS "userName", c.title AS "courseTitle"
+        FROM lms_enrollments e
+        JOIN lms_courses c ON c.id = e."courseId"
+        JOIN users u ON u.id = e."userId"
+        WHERE c.service_key = 'lecture' AND e.status = 'completed'
+          AND NOT EXISTS (SELECT 1 FROM lms_certificates cert WHERE cert."userId" = e."userId" AND cert."courseId" = e."courseId")
+          AND ($1 = '' OR c.title ILIKE $2 OR u.name ILIKE $2)
+        ORDER BY e."updatedAt" DESC, e.id LIMIT 100
+      `, [search, `%${search}%`]);
+      return BaseController.ok(res, { items });
+    } catch (error: any) {
+      logger.error('[CertificateController.missingCertificates] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
   }
 
   static async issueCertificate(req: Request, res: Response): Promise<any> {

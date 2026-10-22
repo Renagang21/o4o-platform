@@ -27,6 +27,7 @@ import { BusinessRegistrationDocumentService } from './services/business-registr
  *
  * 권한은 API 에서 판정한다 — 화면 메뉴 숨김으로 대신하지 않는다.
  */
+import { businessOperationsRoutes } from './business-operations.routes.js';
 import { Router } from 'express';
 import type { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
@@ -117,6 +118,7 @@ function actionParam<T extends string>(req: Req, allowed: readonly T[]): T {
 
 export function createNeturePharmacyRoutes(dataSource: DataSource, consultationDependencies?: ConsultationDependencies): ExpressRouter {
   const router: ExpressRouter = Router();
+  router.use(businessOperationsRoutes(dataSource));
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
   const showcase = new BusinessHomeShowcaseService(dataSource);
@@ -254,6 +256,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
 
   router.get('/pharmacy/store/supply-options', ...store, handle(async (req) => listSupplyOptions(dataSource, org(req), {
     source: typeof req.query.source === 'string' ? req.query.source : undefined,
+    business: typeof req.query.business === 'string' ? req.query.business : undefined,
+    recruitment: typeof req.query.recruitment === 'string' ? req.query.recruitment : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
     page: Number(req.query.page) || 1,
     limit: Number(req.query.limit) || 50,
@@ -270,6 +274,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/pharmacy/store/contents', ...store, handle(async (req) => contents.pharmacyList(org(req), {
     sfKey: typeof req.query.sf === 'string' ? req.query.sf : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
+    tag: typeof req.query.tag === 'string' ? req.query.tag : undefined,
     page: Number(req.query.page) || 1,
     limit: Number(req.query.limit) || 30,
   })));

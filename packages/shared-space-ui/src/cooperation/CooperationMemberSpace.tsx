@@ -1,18 +1,20 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '../legal/ServiceEnrollmentPolicyAgreement';
 import { BusinessHomeShowcase } from './BusinessHomeShowcase';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import type { CooperationModel } from './models';
+import { CAREPHARM_MATERIAL_TAGS } from './carepharmMaterials';
 
 export interface CooperationClient {
   get(path: string, config?: { params?: Record<string, unknown>; headers?: Record<string, string> }): Promise<{ data: { data: any } }>;
   post(path: string, body?: unknown, config?: { headers?: Record<string, string> }): Promise<unknown>;
 }
-interface Business { key: string; name: string; communityKey: string | null; registrationConditions: string | null }
+interface Business { policyScope: string; key: string; name: string; communityKey: string | null; registrationConditions: string | null }
 interface Access { kind: string; businessKey?: string; allowed: boolean; canManage: boolean }
 interface StoreAccess { businessKey: string; organizationId: string; allowed: boolean; membershipStatus: string | null }
 interface Membership { key: string; membershipStatus: string | null; reason?: string | null }
-interface Material { id: string; title: string; summary: string | null; body: string | null; semiFranchiseKey: string }
+interface Material { id: string; title: string; summary: string | null; body: string | null; semiFranchiseKey: string; tags?: string[] }
 const BASE = '/neture/pharmacy';
 interface LoadIssue { message: string; retryable: boolean; login?: boolean; unavailable?: boolean }
 function loadIssue(error: unknown, stage: string): LoadIssue {
@@ -131,6 +133,7 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
 }
 
 function Participation({ model, business, access, client, onChanged }: { model: CooperationModel; business: Business; access: Access; client: CooperationClient; onChanged: () => void }) {
+  const agreement = useServiceEnrollmentPolicies(business.policyScope, async () => (await client.get(`/neture/businesses/${encodeURIComponent(model.key)}/legal/enrollment-policies`)).data.data, business.key);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -147,11 +150,11 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     return () => { alive = false; };
   }, [client, model.key, access.canManage]);
   const act = async (action: 'apply' | 'withdraw') => {
-    if (busy || (action === 'apply' && (!accepted || staleConditions))) return;
+    if (busy || (action === 'apply' && (!accepted || staleConditions || !agreement.ready))) return;
     if (action === 'withdraw' && !window.confirm('이 서비스의 가입 신청을 취소하거나 탈퇴하시겠습니까?')) return;
     setBusy(true); setError('');
-    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note } : {}); onChanged(); }
-    catch (e: any) { if (e.response?.data?.code === 'CONDITIONS_CHANGED' || e.response?.data?.error?.code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); } setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.'); }
+    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note, policyReferences: agreement.references } : {}); onChanged(); }
+    catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code ?? e.response?.data?.error?.code)) agreement.reload(); if (e.response?.data?.code === 'CONDITIONS_CHANGED' || e.response?.data?.error?.code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); } setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.'); }
     finally { setBusy(false); }
   };
   const status = membership?.membershipStatus;
@@ -163,30 +166,53 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     {!loading && membership && !access.canManage && !['active', 'pending', 'suspended'].includes(status ?? '') && <>
       <label className="block"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> 이 서비스의 참여 조건을 확인했습니다.</label>
       <label className="block">추가 신청 내용<textarea maxLength={2000} value={note} onChange={e => setNote(e.target.value)} className="mt-2 block w-full rounded border p-3" /></label>
-      <button className="rounded bg-teal-800 px-5 py-3 text-white disabled:opacity-50" disabled={!accepted || busy || staleConditions} onClick={() => void act('apply')}>가입 신청</button>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
+      <button className="rounded bg-teal-800 px-5 py-3 text-white disabled:opacity-50" disabled={!accepted || busy || staleConditions || !agreement.ready} onClick={() => void act('apply')}>가입 신청</button>
     </>}
     {staleConditions && <button className="underline" onClick={onChanged}>최신 참여 조건 다시 확인</button>}
     {!loading && membership && !access.canManage && ['active', 'pending', 'suspended'].includes(status ?? '') && <button disabled={busy} onClick={() => void act('withdraw')}>{status === 'pending' ? '신청 취소' : '서비스 탈퇴'}</button>}
   </div>;
 }
 function Materials({ model, client }: { model: CooperationModel; client: CooperationClient }) {
-  const [state, setState] = useState<{ items: Material[]; total: number } | null>(null);
-  const [page, setPage] = useState(1);
+  const [params, setParams] = useSearchParams();
+  const q = params.get('q')?.trim() || '';
+  const tag = params.get('tag')?.trim() || '';
+  const rawPage = Number(params.get('page'));
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const scope = `${model.key}:${q}:${tag}:${page}`;
+  const [qInput, setQInput] = useState(q);
+  const [state, setState] = useState<{ items: Material[]; total: number; scope: string } | null>(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
+  useEffect(() => { setQInput(q); }, [q]);
+  const filter = (changes: Record<string, string>) => setParams(previous => {
+    const next = new URLSearchParams(previous); next.delete('page');
+    for (const [key, value] of Object.entries(changes)) { if (value) next.set(key, value); else next.delete(key); }
+    return next;
+  });
   useEffect(() => {
     let alive = true;
     setState(null); setError('');
-    client.get(`${BASE}/store/contents`, { params: { sf: model.key, page, limit: 20 } }).then(r => {
-      if (r.data.data.items.some((c: Material) => c.semiFranchiseKey !== model.key)) throw new Error('Content scope mismatch');
-      if (alive) setState(r.data.data);
+    client.get(`${BASE}/store/contents`, { params: { sf: model.key, ...(q ? { q } : {}), ...(tag ? { tag } : {}), page, limit: 20 } }).then(r => {
+      if (!Array.isArray(r.data.data.items) || r.data.data.items.some((c: Material) => c.semiFranchiseKey !== model.key)) throw new Error('Content scope mismatch');
+      if (alive) setState({ ...r.data.data, scope });
     }).catch(() => { if (alive) setError('사업 자료를 불러오지 못했습니다.'); });
     return () => { alive = false; };
-  }, [client, model.key, page, retry]);
-  return <div className="space-y-4 rounded-xl border p-6"><h2 className="text-xl font-semibold">사업 자료</h2>{error ? <><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>다시 시도</button></> : !state ? <p role="status">자료를 불러오고 있습니다…</p> : <>
-    {!state.items.length && <p>등록된 자료가 없습니다.</p>}
-    {state.items.map(c => <details key={c.id} className="rounded-lg border p-4"><summary className="cursor-pointer font-semibold">{c.title}</summary>{c.summary && <p className="my-3">{c.summary}</p>}{c.body && <ContentRenderer html={c.body} />}</details>)}
-    {state.total > 20 && <nav aria-label="자료 목록 페이지"><button disabled={page === 1} onClick={() => setPage(p => p - 1)}>이전</button><span className="px-4">{page}</span><button disabled={page * 20 >= state.total} onClick={() => setPage(p => p + 1)}>다음</button></nav>}
+  }, [client, model.key, page, q, tag, scope, retry]);
+  return <div className="space-y-4 rounded-xl border p-4 sm:p-6"><h2 className="text-xl font-semibold">사업 자료</h2>
+    {model.key === 'carepharm' && <p className="text-sm leading-6 text-slate-600">주제별 자료 묶음과 약국 운영 실무자료를 찾아보세요. 내 매장에서 사본을 가져와 우리 약국에 맞게 활용할 수 있습니다.</p>}
+    <form className="flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); filter({ q: qInput.trim() }); }}>
+      <input aria-label="자료 제목·요약 검색" placeholder="제목 · 요약 검색" value={qInput} onChange={event => setQInput(event.target.value)} className="min-h-11 min-w-0 flex-1 rounded border px-3" />
+      <button className="min-h-11 rounded border px-4" type="submit">검색</button>
+      {(q || tag) && <button type="button" className="min-h-11 rounded border px-4" onClick={() => { setQInput(''); filter({ q: '', tag: '' }); }}>검색 초기화</button>}
+    </form>
+    {model.key === 'carepharm' && <label className="block text-sm">자료 태그<select aria-label="자료 태그" value={tag} onChange={event => filter({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...CAREPHARM_MATERIAL_TAGS, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>}
+    {error ? <><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>다시 시도</button></> : !state || state.scope !== scope ? <p role="status">자료를 불러오고 있습니다…</p> : <>
+    <p className="text-sm text-slate-600">{state.total}개 자료{tag && ` · ${tag}`}</p>
+    {!state.items.length && <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.'}</p>}
+    {state.items.map(c => <details key={c.id} className="min-w-0 rounded-lg border p-4"><summary className="cursor-pointer break-words font-semibold">{c.title}</summary>{c.summary && <p className="my-3 break-words">{c.summary}</p>}{Array.isArray(c.tags) && <div className="my-3 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} className="min-h-11 rounded-full border px-3 text-sm" onClick={() => filter({ tag: value })}>{value}</button>)}</div>}{c.body && <ContentRenderer html={c.body} />}</details>)}
+    {state.total > 20 && <nav aria-label="자료 목록 페이지"><button className="min-h-11" disabled={page === 1} onClick={() => filter({ page: String(page - 1) })}>이전</button><span className="px-4">{page}</span><button className="min-h-11" disabled={page * 20 >= state.total} onClick={() => filter({ page: String(page + 1) })}>다음</button></nav>}
     <p>자료를 가져와 편집·활용하려면 내 약국의 사업 자료를 이용하세요.</p>
+    <Link className="inline-flex min-h-11 items-center rounded-lg bg-teal-800 px-4 py-2 text-white" to={`/tools${params.get('store') ? `?store=${encodeURIComponent(params.get('store')!)}` : ''}`}>내 매장 업무 · 이용 안내</Link>
   </>}</div>;
 }

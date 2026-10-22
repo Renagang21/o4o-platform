@@ -32,6 +32,7 @@ interface ListNotificationsOptions {
   type?: NotificationType;
   channel?: NotificationChannel;
   serviceKey?: string;
+  serviceKeys?: string[];
   organizationId?: string;
 }
 
@@ -148,6 +149,7 @@ export class NotificationService {
       type,
       channel,
       serviceKey,
+      serviceKeys,
       organizationId,
     } = options;
 
@@ -171,6 +173,10 @@ export class NotificationService {
 
     if (serviceKey) {
       queryBuilder.andWhere('notification.serviceKey = :serviceKey', { serviceKey });
+    }
+    if (serviceKeys !== undefined) {
+      if (serviceKeys.length === 0) queryBuilder.andWhere('1=0');
+      else queryBuilder.andWhere('notification.serviceKey IN (:...serviceKeys)', { serviceKeys });
     }
 
     if (organizationId) {
@@ -204,7 +210,7 @@ export class NotificationService {
    */
   async getUnreadCount(
     userId: string,
-    options?: { channel?: NotificationChannel; serviceKey?: string; organizationId?: string }
+    options?: { channel?: NotificationChannel; serviceKey?: string; serviceKeys?: string[]; organizationId?: string }
   ): Promise<number> {
     const queryBuilder = this.repository
       .createQueryBuilder('notification')
@@ -217,6 +223,10 @@ export class NotificationService {
 
     if (options?.serviceKey) {
       queryBuilder.andWhere('notification.serviceKey = :serviceKey', { serviceKey: options.serviceKey });
+    }
+    if (options?.serviceKeys !== undefined) {
+      if (options.serviceKeys.length === 0) queryBuilder.andWhere('1=0');
+      else queryBuilder.andWhere('notification.serviceKey IN (:...serviceKeys)', { serviceKeys: options.serviceKeys });
     }
 
     if (options?.organizationId) {

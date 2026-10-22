@@ -71,3 +71,24 @@ export async function loadContactSettings(
     return toEffective(serviceKey, null);
   }
 }
+
+/** Public allowlist only. Unlike notification delivery, policy reads must not
+ * fall back on a database error and re-enable a disabled inquiry type. */
+export async function loadPublicContactSettings(
+  dataSource: DataSource,
+  serviceKey: string,
+) {
+  const row = await dataSource
+    .getRepository(ServiceContactSettings)
+    .findOne({ where: { service_key: serviceKey } });
+  const settings = toEffective(serviceKey, row);
+  return {
+    serviceKey,
+    inquiryTypesConfigured: !!row?.inquiry_types?.length,
+    inquiryTypes: settings.inquiryTypes
+      .filter((type) => type.enabled)
+      .map(({ value, label }) => ({ value, label })),
+    privacyNotice: settings.privacyNotice,
+    completionNotice: settings.completionNotice,
+  };
+}

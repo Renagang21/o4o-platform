@@ -23,31 +23,12 @@ const KPA_HOME = 'services/web-kpa-society/src/pages/CommunityHomePage.tsx';
 const KPA_HEADER = 'services/web-kpa-society/src/components/KpaGlobalHeader.tsx';
 const KPA_FOOTER = 'services/web-kpa-society/src/components/Footer.tsx';
 
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 커뮤니티 홈(CommunityHomePage)은 제거됐다 — pharmacy 홈은 회원 홈이다.
+//   공통 컨테이너 CommunityServiceHome 자체의 계약은 아래 §4 service-neutral 검사가 지킨다.
 describe('community home 공통 컨테이너 채택 (§8)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_HOME],] as const) {
-    it(`${name} 홈이 공통 CommunityServiceHome 을 소비한다`, () => {
-      const src = read(path);
-      expect(src).toContain("from '@o4o/shared-space-ui'");
-      expect(src).toContain('<CommunityServiceHome');
-      // 데이터는 서비스 adapter 로 주입한다
-      expect(src).toContain('loadNotices');
-      expect(src).toContain('loadLatest');
-    });
-
-    it(`${name} 홈에 조회 상태 기계 사본이 되살아나지 않는다`, () => {
-      const src = stripComments(read(path));
-      expect(src).not.toContain('<StandardHomeTemplate');
-      expect(src).not.toContain('<LatestActivitySection');
-      expect(src).not.toContain('setLatestLoading');
-      expect(src).not.toContain('setNoticesError');
-    });
-
-    it(`${name} adapter 는 실패를 빈 목록으로 위장하지 않는다`, () => {
-      const src = stripComments(read(path));
-      // 실패는 throw 로 드러낸다 (4상태 계약: loadError + 재시도)
-      expect(src).not.toContain('catch(() => {})');
-    });
-  }
+  it('옛 KPA 커뮤니티 홈은 존재하지 않는다', () => {
+    expect(existsSync(resolve(ROOT, KPA_HOME))).toBe(false);
+  });
 });
 
 describe('primary nav 공통 조립기 채택 (§9)', () => {
@@ -118,6 +99,8 @@ describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
     'services/web-kpa-society/src/components/platform/PlatformFooter.tsx',
     'services/web-kpa-society/src/components/platform/ServiceCard.tsx',
     'services/web-kpa-society/src/pages/mypage/AnnualReportFormPage.tsx',
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 안내 페이지 layout 도 함께 제거됐다.
+    'services/web-kpa-society/src/components/platform/InfoPageLayout.tsx',
   ];
 
   for (const p of GONE) {
@@ -128,12 +111,5 @@ describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
 
   it('KPA App 에 OrganizationProvider 가 되살아나지 않는다', () => {
     expect(read('services/web-kpa-society/src/App.tsx')).not.toContain('OrganizationProvider');
-  });
-
-  it('안내 페이지는 canonical Layout 하나만 쓴다 (중복 chrome 0)', () => {
-    const src = stripComments(read('services/web-kpa-society/src/components/platform/InfoPageLayout.tsx'));
-    expect(src).not.toContain('PlatformHeader');
-    expect(src).not.toContain('PlatformFooter');
-    expect(src).not.toContain('badgeType');
   });
 });

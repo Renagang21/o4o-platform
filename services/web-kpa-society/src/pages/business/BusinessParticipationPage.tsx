@@ -8,7 +8,7 @@ const STATUS: Record<string, string> = { active: '참여 중', pending: '승인 
 
 export default function BusinessParticipationPage() {
   const { business, access } = useBusiness();
-  const agreement = useServiceEnrollmentPolicies('kpa-society', () => business.key === 'pharmacy' ? businessApi.get('/public/services/kpa-society/enrollment-policies') : Promise.resolve([]), business.key);
+  const agreement = useServiceEnrollmentPolicies(business.policyScope, () => businessApi.get(`/neture/businesses/${encodeURIComponent(business.key)}/legal/enrollment-policies`), business.key);
   const [conditions, setConditions] = useState(business.registrationConditions ?? '');
   const [membership, setMembership] = useState<BusinessMembership | null>(null);
   const [error, setError] = useState('');

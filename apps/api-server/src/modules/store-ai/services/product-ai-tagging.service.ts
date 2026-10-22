@@ -1,5 +1,6 @@
+import { executeManagedAi } from '../../../services/ai-management/runtime-models.js';
 import type { DataSource, Repository } from 'typeorm';
-import { execute } from '@o4o/ai-core';
+
 import { PRODUCT_TAGGING_SYSTEM, PRODUCT_TAGGING_B2B_SYSTEM } from '@o4o/ai-prompts/store';
 import { ProductAiTag } from '../entities/product-ai-tag.entity.js';
 import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
@@ -61,7 +62,7 @@ export class ProductAiTaggingService {
     try {
       const userPrompt = this.buildB2cUserPrompt(product);
 
-      const result = await execute({
+      const result = await executeManagedAi(this.dataSource, 'product.tagging', {
         systemPrompt: PRODUCT_TAGGING_SYSTEM,
         userPrompt,
         config: this.configResolver,
@@ -124,7 +125,7 @@ export class ProductAiTaggingService {
         ? this.buildB2bUserPrompt(product)
         : this.buildB2cUserPrompt(product);
 
-      const result = await execute({
+      const result = await executeManagedAi(this.dataSource, 'product.tagging', {
         systemPrompt,
         userPrompt,
         config: this.configResolver,

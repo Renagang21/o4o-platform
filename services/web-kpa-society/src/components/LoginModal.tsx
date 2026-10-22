@@ -21,7 +21,6 @@ import { useNavigate } from 'react-router-dom';
 import { LoginCard, O4OHomeButton, LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
 import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
-import { getKpaPostLoginRoute } from '../config/dashboard';
 import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 
 const loginTitle = BUSINESS_SITE.key === 'megapharm' ? '창고형약국 로그인' : 'O4O 약국 로그인';
@@ -61,7 +60,7 @@ export default function LoginModal() {
   }, [isOpen]);
 
   /** 로그인 성공 후처리: 모달 닫기 → 콜백 또는 역할 기반 진입 화면. */
-  const finishLogin = (loggedInUser: User) => {
+  const finishLogin = () => {
     try {
       markLoginNavigationHandled();
       closeModal();
@@ -69,12 +68,9 @@ export default function LoginModal() {
         onLoginSuccess();
         return;
       }
-      // WO-O4O-PHARMACY-MEMBER-HOME-V1: 회원 초기화면·운영 역할별 기본 진입
-      // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
-      const redirectTo = getKpaPostLoginRoute(loggedInUser);
-      if (redirectTo) {
-        navigate(redirectTo);
-      }
+      // WO-O4O-PHARMACY-MEMBER-HOME-V1 · WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7:
+      //   기본 진입은 사업 회원 홈 하나다(옛 /admin · /operator 콘솔 삭제).
+      navigate('/');
     } catch (err: unknown) {
       console.error('[Login] Post-login error:', err);
       setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -124,7 +120,7 @@ export default function LoginModal() {
           <LoginMethods<User>
             loginWithEmail={loginWithEmail}
             api={authClient}
-            onSuccess={(loggedInUser) => { setError(null); setIsNotMember(false); setAccessLink(null); finishLogin(loggedInUser); }}
+            onSuccess={() => { setError(null); setIsNotMember(false); setAccessLink(null); finishLogin(); }}
             onEmailFailure={(result: AuthLoginResult<User>) => showNotMember(result)}
             kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: new URLSearchParams(window.location.search).get('returnTo') ?? '/' }}
           google={{
