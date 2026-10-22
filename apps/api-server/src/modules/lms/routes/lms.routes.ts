@@ -197,6 +197,9 @@ router.post('/enrollments/:id/cancel', ipBurstLimiter, requireAuth, apiLimiter, 
 router.get('/enrollments/me/course/:courseId', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
 
 // POST /api/v1/lms/enrollments/:courseId/progress - Update Lesson Progress (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
+router.get('/enrollments/:courseId/playback', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.playback));
+router.post('/enrollments/:courseId/playback', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.playback));
+
 router.post('/enrollments/:courseId/progress', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.updateLessonProgress));
 
 // ========================================
@@ -309,6 +312,8 @@ router.get('/operator/courses', ipBurstLimiter, requireAuth, apiLimiter, require
 // GET /api/v1/lms/operator/courses/:courseId/review — 운영자 검토 전용 read-only surface
 //   11차 P2: 승인·반려 전에 내용을 확인할 수 있어야 한다. learner enrollment 를 약화하지 않고
 //   운영자를 자동 수강 등록하지도 않으며 instructor 권한도 주지 않는다 (write 0).
+router.get('/operator/certificates/missing', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.missingCertificates));
+
 router.get('/operator/courses/:courseId/review', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview));
 
 // POST /api/v1/lms/operator/courses/:id/approve — PENDING_REVIEW → PUBLISHED

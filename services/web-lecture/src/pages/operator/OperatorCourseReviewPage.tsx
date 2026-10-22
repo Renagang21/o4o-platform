@@ -1,3 +1,4 @@
+import { ProfessionalInfoSummary } from '../../components/ProfessionalInfoFields';
 /**
  * 운영자 — 강의 검토 화면 (read-only)
  *
@@ -58,6 +59,8 @@ function CourseReviewWorkspace({ courseId }: { courseId: string }) {
         <li>강사 ID: {course.instructorId}</li>
       </ul>
     </section>
+
+    <ProfessionalInfoSummary value={course.professionalInfo} />
 
     <section className="card">
       <h2>커리큘럼 ({curriculum.length})</h2>

@@ -1,4 +1,6 @@
 import { api } from './apiClient';
+import type { LmsApiResponse } from '@o4o/lms-client';
+import { lmsHttp } from '../api/lecture';
 import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * O4O 강의 (lecture) — `@o4o/lms-ui` 공통 View adapter
@@ -15,7 +17,7 @@ import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createLmsLabels, type LmsLearnerPort, type LmsViewConfig, type LmsViewLabels } from '@o4o/lms-ui';
-import { learnerApi, type LectureEnrollment, type LectureLesson } from '../api/lecture';
+import { learnerApi, type LectureCourse, type LectureEnrollment, type LectureLesson } from '../api/lecture';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
 
@@ -52,7 +54,8 @@ function toLesson(l: LectureLesson) {
     type: l.type,
     order: l.order,
     durationMinutes: l.duration,
-    isPreview: l.isPreview,
+    isPreview: false, // isFree does not bypass the server enrollment/approval boundary.
+    attachments: l.attachments ?? [],
     videoUrl: l.videoUrl ?? null,
     content: l.content ?? null,
   };
@@ -64,9 +67,16 @@ export async function enrollWithPolicy(courseId: string, policyReferences: Enrol
 }
 
 export const lecturePort: LmsLearnerPort = {
+  getPlayback: async (courseId, lessonId) => {
+    const response = await api.get(`/lms/enrollments/${encodeURIComponent(courseId)}/playback`, { params: { lessonId } });
+    return response.data.data.playback;
+  },
+  savePlayback: async (courseId, lessonId, positionSeconds) => {
+    await api.post(`/lms/enrollments/${encodeURIComponent(courseId)}/playback`, { lessonId, positionSeconds });
+  },
   getCourse: async (courseId) => {
-    const res = (await learnerApi.getCourse(courseId)) as any;
-    const c = res?.data?.course ?? res?.data ?? null;
+    const res = await learnerApi.getCourse<LectureCourse>(courseId);
+    const c = res.data.course;
     if (!c) return null;
     return {
       id: c.id,
@@ -83,25 +93,30 @@ export const lecturePort: LmsLearnerPort = {
       requiresApproval: c.requiresApproval,
       isPaid: c.isPaid,
       status: c.status,
+      professionalInfo: c.metadata?.professionalInfo,
     };
   },
 
+  getCurriculum: async (courseId) => {
+    const res = await lmsHttp.get<LmsApiResponse<{ curriculum: LectureLesson[] }>>(`/lms/courses/${encodeURIComponent(courseId)}`, { includeCurriculum: true });
+    return res.data.curriculum.map(toLesson);
+  },
+
   getLessons: async (courseId) => {
-    const res = (await learnerApi.getLessons<LectureLesson>(courseId)) as any;
-    const list = res?.data ?? [];
-    return (Array.isArray(list) ? list : []).map(toLesson);
+    const res = await learnerApi.getLessons<LectureLesson>(courseId);
+    return res.data.map(toLesson);
   },
 
   getLesson: async (_courseId, lessonId) => {
-    const res = (await learnerApi.getLesson(lessonId)) as any;
-    const l = res?.data?.lesson ?? res?.data ?? null;
+    const res = await learnerApi.getLesson(lessonId);
+    const l = res.data.lesson;
     return l ? toLesson(l) : null;
   },
 
   getEnrollment: async (courseId) => {
     try {
-      const res = (await learnerApi.getEnrollmentByCourse<LectureEnrollment>(courseId)) as any;
-      return toEnrollment(res?.data?.enrollment ?? res?.data);
+      const res = await learnerApi.getEnrollmentByCourse<LectureEnrollment>(courseId);
+      return toEnrollment(res.data.enrollment);
     } catch (err) {
       // 미수강(404) 은 정상 상태 — 수강 CTA 노출
       if ((err as any)?.response?.status === 404) return null;
@@ -110,13 +125,13 @@ export const lecturePort: LmsLearnerPort = {
   },
 
   enroll: async (courseId) => {
-    const res = (await learnerApi.enrollCourse<LectureEnrollment>(courseId)) as any;
-    return toEnrollment(res?.data?.enrollment ?? res?.data);
+    const res = await learnerApi.enrollCourse<LectureEnrollment>(courseId);
+    return toEnrollment(res.data.enrollment);
   },
 
   updateProgress: async (courseId, lessonId, completed, metrics) => {
-    const res = (await learnerApi.updateProgress<LectureEnrollment>(courseId, lessonId, completed, metrics)) as any;
-    return toEnrollment(res?.data?.enrollment ?? res?.data);
+    const res = await learnerApi.updateProgress<LectureEnrollment>(courseId, lessonId, completed, metrics);
+    return toEnrollment(res.data.enrollment);
   },
 
   getQuizForLesson: async (lessonId) => {
@@ -190,7 +205,7 @@ export const lecturePort: LmsLearnerPort = {
 /** 공통 View 에 주입할 config — 라우터 · 인증 · toast 를 서비스 쪽에서 묶는다. */
 export function useLectureViewConfig(): LmsViewConfig {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   return useMemo<LmsViewConfig>(() => ({
     accent: LECTURE_ACCENT,
@@ -199,11 +214,12 @@ export function useLectureViewConfig(): LmsViewConfig {
     lessonPath,
     certificatesPath: LECTURE_CERTIFICATES_PATH,
     isAuthenticated,
+    accountId: user?.id,
     // 로그인 후 보던 강의 화면으로 돌아오도록 현재 경로를 넘긴다 (WO-O4O-LECTURE-HANDOFF-NONMEMBER-UX-V1)
     onRequireLogin: () => navigate('/login', { state: { from: `${window.location.pathname}${window.location.search}` } }),
     navigate: (path: string) => navigate(path),
     notify: { success: toast.success, error: toast.error },
     labels: lectureLabels,
     enrollmentEnabled: true,
-  }), [navigate, isAuthenticated, toast]);
+  }), [navigate, isAuthenticated, user?.id, toast]);
 }

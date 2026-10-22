@@ -29,6 +29,7 @@ export interface LmsCourseDetailData {
   requiresApproval?: boolean;
   isPaid?: boolean;
   status?: string;
+  professionalInfo?: { audience?: string; outcomes?: string; prerequisites?: string; instructorBio?: string; expertise?: string; reviewedAt?: string };
 }
 
 export interface LmsLessonData {
@@ -42,6 +43,7 @@ export interface LmsLessonData {
   videoUrl?: string | null;
   /** HTML 문자열. 실제 렌더는 `renderContent` slot 에서 서비스가 수행(sanitize 포함). */
   content?: string | null;
+  attachments?: Array<{ name: string; url: string; type?: string; size?: number }>;
 }
 
 export interface LmsEnrollmentData {
@@ -88,6 +90,7 @@ export interface LmsAssignmentData {
 export interface LmsSubmissionData {
   id?: string;
   content?: string | null;
+  attachments?: Array<{ name: string; url: string; type?: string; size?: number }>;
   submittedAt?: string | null;
   /** 'ungraded' | 'graded' | 'returned' — 채점 미지원 서비스는 undefined. */
   gradingStatus?: string | null;
@@ -118,6 +121,9 @@ export interface LmsCompletionMetrics {
  */
 export interface LmsLearnerPort {
   getCourse(courseId: string): Promise<LmsCourseDetailData | null>;
+  getPlayback?(courseId: string, lessonId?: string): Promise<{ lessonId: string; positionSeconds: number } | null>;
+  savePlayback?(courseId: string, lessonId: string, positionSeconds: number): Promise<void>;
+  getCurriculum?(courseId: string): Promise<LmsLessonData[]>;
   getLessons(courseId: string): Promise<LmsLessonData[]>;
   getLesson?(courseId: string, lessonId: string): Promise<LmsLessonData | null>;
   getEnrollment(courseId: string): Promise<LmsEnrollmentData | null>;
@@ -248,6 +254,8 @@ export interface LmsViewConfig {
   onCertificateUnavailable?: () => void;
   /** 로그인 여부. false 면 enrollment 조회를 시도하지 않는다. */
   isAuthenticated: boolean;
+  /** Changes invalidate account-specific loaded state. */
+  accountId?: string;
   /** 로그인 유도. 미지정 시 `/login` 으로 navigate. */
   onRequireLogin?: () => void;
   /** SPA 네비게이션(react-router `useNavigate` 등). */
