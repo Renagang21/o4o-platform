@@ -19,7 +19,6 @@ import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
 } from './demo-account.service.js';
-import logger from '../../utils/logger.js';
 import {
   EmailAuthError,
   EmailAuthRequestMeta,
@@ -41,16 +40,16 @@ interface EmailRecoveryContext {
   readRoles: (id: string) => Promise<string[]>;
   revokeAllSessions: (id: string, manager?: EntityManager) => Promise<void>;
   findUserByLoginEmail: (email: string) => Promise<User | null>;
-  issueToken: (
+  sendTokenMail: (
     kind: TokenKind,
-    id: string,
+    user: User,
     ttl: number,
-    email?: string,
-  ) => Promise<string>;
+    deliver: (plain: string) => Promise<{ success: boolean }>,
+  ) => Promise<boolean>;
   consumeToken: (
     kind: TokenKind,
     token: string,
-    manager?: Queryable,
+    manager: Queryable,
   ) => Promise<{ user_id: string; email: string } | null>;
   mailer: () => Promise<MailSender>;
 }
@@ -81,26 +80,15 @@ export class EmailAuthRecovery {
     //   다른 조용한 return 과 같은 결과 — 발송 여부로 계정 존재를 추론할 수 없다.
     if (!(await this.context.passwords.hasPassword(user.id))) return;
 
-    const plain = await this.context.issueToken(
-      'reset',
-      user.id,
-      RESET_TOKEN_TTL_MS,
-    );
-    const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password#token=${encodeURIComponent(plain)}`;
-    try {
+    await this.context.sendTokenMail('reset', user, RESET_TOKEN_TTL_MS, async plain => {
+      const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password#token=${encodeURIComponent(plain)}`;
       const mailer = await this.context.mailer();
-      const result = await mailer.sendEmail({
+      return mailer.sendEmail({
         to: user.email,
         subject: '[O4O] 비밀번호 재설정 안내',
         html: renderResetMailHtml(resetUrl, this.context.now().getFullYear()),
       });
-      if (!result.success)
-        logger.warn('[EmailAuth] reset mail not sent', { error: result.error });
-    } catch (error) {
-      logger.warn('[EmailAuth] reset mail failed', {
-        error: (error as Error).message,
-      });
-    }
+    });
   }
 
   async resetPassword(plainToken: string, newPassword: string): Promise<void> {
@@ -117,9 +105,6 @@ export class EmailAuthRecovery {
     await this.context.dataSource().transaction(async (manager) => {
       const row = await this.context.consumeToken('reset', plainToken, manager);
       if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-      await manager.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [
-        row.user_id,
-      ]);
       if (await demoAccountService.isDemoAccount(row.user_id, manager))
         throw new EmailAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
       if (hasPlatformRole(await this.context.readRoles(row.user_id)))
@@ -127,12 +112,7 @@ export class EmailAuthRecovery {
       // Reset can only replace an existing credential, never add the first password.
       if (!(await this.context.passwords.hasPassword(row.user_id, manager)))
         throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-      await this.context.passwords.setPassword(
-        row.user_id,
-        newPassword,
-        manager,
-      );
-      await this.context.revokeAllSessions(row.user_id, manager);
+      await this.storePasswordAndRevoke(row.user_id, newPassword, manager);
       await manager
         .getRepository(User)
         .update({ id: row.user_id }, { isEmailVerified: true });
@@ -179,13 +159,17 @@ export class EmailAuthRecovery {
           throw new EmailAuthError('CURRENT_PASSWORD_MISMATCH');
         }
       }
-      await this.context.passwords.setPassword(
-        userId,
-        input.newPassword,
-        manager,
-      );
-      await this.context.revokeAllSessions(userId, manager);
+      await this.storePasswordAndRevoke(userId, input.newPassword, manager);
     });
+  }
+
+  /** Password, reset links and session generation share one commit or rollback. */
+  private async storePasswordAndRevoke(userId: string, plain: string, manager: EntityManager): Promise<void> {
+    await this.context.passwords.setPassword(userId, plain, manager);
+    await manager.query(
+      `UPDATE password_reset_tokens SET consumed_at = now() WHERE user_id = $1 AND consumed_at IS NULL`, [userId],
+    );
+    await this.context.revokeAllSessions(userId, manager);
   }
 
   async getPasswordStatus(
