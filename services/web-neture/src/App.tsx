@@ -483,6 +483,7 @@ const OperatorContactMessagesPage = lazy(() => import('./pages/operator/Operator
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
+const ExternalAiConsentPage = lazy(() => import('./pages/ExternalAiConsentPage'));
 // Resources (O4O 공통 구조 — /resources)
 const NetureResourcesPage = lazy(() => import('./pages/resources/NetureResourcesPage'));
 
@@ -679,6 +680,7 @@ function App() {
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
+            <Route path="/external-ai/connect" element={<ExternalAiConsentPage />} />
             <Route path="/register" element={<RegisterRedirect />} />
             {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.
                 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 service_credentials 흐름의 부활이 아니다.) */}

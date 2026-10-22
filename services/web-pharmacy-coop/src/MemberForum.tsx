@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ForumPostContent, forumContentToHtml } from "@o4o/shared-space-ui";
+import { ForumPostContent, forumContentToHtml, ForumWriteForm, type ForumWriteFormPayload } from "@o4o/shared-space-ui";
 import type { PharmacyManagementClient as Client } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import { LoadFeedback, useRows, workError } from "./Participation";
 
@@ -11,14 +11,17 @@ type Post = {
   content?: unknown;
   author?: { name?: string };
   createdAt?: string;
+  authorId?: string;
+  status?: string;
 };
 type Board = { id: string; name: string };
 /** Reuses the business member forum. No independent community enrollment or store grant. */
 export function MemberForum({
   client,
   businessKey,
+  currentUserId,
   canManage,
-}: Readonly<{ client: Client; businessKey: string; canManage: boolean }>) {
+}: Readonly<{ client: Client; businessKey: string; currentUserId?: string; canManage: boolean }>) {
   const [communityKey, setCommunityKey] = useState<string | null>(null);
   const [error, setError] = useState(""),
     [version, setVersion] = useState(0);
@@ -48,6 +51,7 @@ export function MemberForum({
       key={communityKey}
       client={client}
       communityKey={communityKey}
+      currentUserId={currentUserId}
       canManage={canManage}
     />
   ) : (
@@ -61,12 +65,14 @@ export function MemberForum({
 function ForumWorkspace({
   client,
   communityKey,
+  currentUserId,
   canManage,
-}: Readonly<{ client: Client; communityKey: string; canManage: boolean }>) {
+}: Readonly<{ client: Client; communityKey: string; currentUserId?: string; canManage: boolean }>) {
   const root = `/communities/${encodeURIComponent(communityKey)}`;
   const base = `${root}/forum`;
   const [params, setParams] = useSearchParams();
-  const postId = params.get("post");
+  const editId = params.get("edit");
+  const postId = editId || params.get("post");
   const rawPage = params.get("page") || "1";
   const page = /^\d{1,6}$/.test(rawPage) ? Math.max(1, Number(rawPage)) : 1;
   const [version, setVersion] = useState(0);
@@ -118,7 +124,10 @@ function ForumWorkspace({
             <article className="card spaced">
               <h3>{detail.title}</h3>
               <p>{detail.author?.name || "조합원"}</p>
-              <ForumPostContent content={detail.content} escapePlainText />
+              {editId && detail.status === 'draft' && detail.authorId === currentUserId ?
+                <DraftReview key={detail.id} post={detail} client={client} base={base} onSaved={() => { setParams({ post: detail.id }); reload(); }} /> :
+                <ForumPostContent content={detail.content} escapePlainText />}
+              {detail.status === 'draft' && detail.authorId === currentUserId && !editId && <button type="button" onClick={() => setParams({ edit: detail.id })}>초안 검토·게시</button>}
             </article>
           )}
         </>
@@ -332,4 +341,20 @@ function BoardForm({
       {message && <output>{message}</output>}
     </form>
   );
+}
+
+/** Explicit user publication in the existing business forum, separate from delegated draft writes. */
+function DraftReview({ post, client, base, onSaved }: Readonly<{ post: Post; client: Client; base: string; onSaved: () => void }>) {
+  const [error, setError] = useState('');
+  const submit = async ({ title, editorHtml }: ForumWriteFormPayload) => {
+    setError('');
+    try {
+      await client.put(`${base}/posts/${encodeURIComponent(post.id)}`, { title, content: editorHtml, status: 'publish' });
+      onSaved();
+    } catch (e) { setError(workError(e)); }
+  };
+  return <section><p>비공개 초안입니다. 검토 후 게시하면 이 조합 게시판 이용자에게 공개됩니다.</p>
+    {error && <p role="alert">{error}</p>}
+    <ForumWriteForm initialTitle={post.title} initialContentHtml={forumContentToHtml(post.content, { escapePlainText: true })} submitLabel="검토한 초안 게시" onSubmit={submit} onCancel={onSaved} />
+  </section>;
 }
