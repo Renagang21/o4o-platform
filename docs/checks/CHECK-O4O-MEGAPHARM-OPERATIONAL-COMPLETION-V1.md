@@ -46,3 +46,9 @@ API 선택 회귀에는 별도 격리 DB로 실행한 새 운영 API 8건과 담
 최종 교차 점검 보완: CarePharm 공개 정책만 business endpoint를 읽도록 loader의 명시적 serviceKey를 따른다. 같은 호스트의 공통 계정 재동의·My Home 약관은 neture 문서를 유지한다. 이 경우와 미게시 fallback 차단 회귀 3개를 추가했고, 관련 계정 gate/패널 테스트 및 Neture production build를 다시 통과했다.
 
 문서 정합: 약국 설계·My Home·OPEN 독립 정비 WO에 현재 연결 범위와 남은 범위를 반영했다. 이전 COMPLETED 실행 기록은 수정하지 않았다.
+
+## PR 교차 검증 보완
+
+Codex P1(기존 Pharmacy handoff 세션 범위)을 반영했다. 기존 kpa-society 이동 대상은 pharmacy.neture.co.kr에서만 교환하는 고정 transport alias이며 최종 세션은 neture다. 기존 My Home·내 매장 링크를 유지하고, 다른 Origin의 교환·대표 Neture 토큰의 타 호스트 교환은 거절한다. CarePharm 전용 경로 제한도 유지한다.
+
+Handoff·세션·로그아웃 관련 9 suite 142 PASS. 이 중 실제 격리 PostgreSQL 토큰 원장·client·교환 흐름 21개를 실행했고, 네 사업 호스트의 공통 계정 로그아웃과 다른 호스트의 Pharmacy 토큰 교환 거절을 확인했다. 이 검증은 앞의 API 선택 회귀와 일부 중복이다. 관련 shared-space-ui 165 PASS·API 타입·Neture build를 재검증했다.

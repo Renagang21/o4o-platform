@@ -527,7 +527,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 ### 15-6. megapharm 공통 사업 구조와 직원 현장 지원 (2026-10-16)
 
 - `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
-- pharmacy·megapharm·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
+- pharmacy·megapharm·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 기존 `kpa-society` handoff 대상은 pharmacy 호스트에서만 교환하는 고정 이동 alias로 수용하며 최종 세션은 neture다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
 - `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
 - `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
 - 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.

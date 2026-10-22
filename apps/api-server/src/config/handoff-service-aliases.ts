@@ -1,5 +1,10 @@
 /** A finite transport alias, not a service identity, membership, or caller-selected origin. */
 export function getHandoffServiceAlias(key: unknown) {
+  // Existing My Home/store clients keep this transport target; the issued account
+  // session must match Pharmacy's current Origin scope, without creating membership.
+  if (key === 'kpa-society') return {
+    key: 'kpa-society', sessionServiceKey: 'neture', origin: 'https://pharmacy.neture.co.kr',
+  } as const;
   return key === 'carepharm' ? {
     key: 'carepharm', sessionServiceKey: 'neture', origin: 'https://carepharm.neture.co.kr',
   } as const : undefined;

@@ -42,3 +42,5 @@
 새 migration 없음. 기존 승인·유료·직원 허용 원장은 유지하고 사업별 정책 범위/운영 패널을 연결했다. 격리 PostgreSQL의 canonical bootstrap과 36개 incremental 적용 뒤 schema fingerprint 일치를 확인했다. 로컬 API·UI·PC/모바일 결과와 한계는 [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)를 따른다. push/PR/CI/병합/운영 배포 상태는 후속 기록으로 보완한다.
 
 PR: https://github.com/Renagang21/o4o-platform/pull/761. 최종 교차 점검에서 CarePharm 호스트의 공통 계정 약관 loader가 사업 문서를 선택할 수 있는 경로를 수정했다. 요청한 serviceKey를 기준으로 계정/사업 문서를 선택하며 3개 회귀를 추가했다.
+
+Codex P1의 기존 Pharmacy handoff도 고정 alias로 보완했다. 최종 교환 세션은 공통 neture 범위이며 다른 호스트 교환은 거절한다. 실제 토큰 원장·client·교환을 포함한 handoff/로그아웃 142개를 통과했다.
