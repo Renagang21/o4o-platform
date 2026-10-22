@@ -21,7 +21,6 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { LoadError } from '@o4o/ui';
 import { LoadingSpinner, EmptyState, Pagination } from '../common';
@@ -376,9 +375,8 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
                   </span>
                 )}
                 <div style={{ ...col, flex: 3 }}>
-                  <Link to={`/event-offers/${item.id}`} style={productLink}>
-                    {item.productName}
-                  </Link>
+                  {/* 이벤트 오퍼 상세 화면이 없다 — 막다른 /event-offers/:id 링크 대신 이름만 표시한다. */}
+                  <span style={productName}>{item.productName}</span>
                   {/* WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 잔여 수량 표시 */}
                   {item.totalQuantity !== null && (
                     <span style={item.totalQuantity <= 10 ? qtyBadgeLow : qtyBadgeNormal}>
@@ -595,11 +593,10 @@ const col: React.CSSProperties = { display: 'flex', flexDirection: 'column', pad
 const colCenter: React.CSSProperties = { textAlign: 'center', flexShrink: 0 };
 const colRight: React.CSSProperties = { textAlign: 'right', flexShrink: 0, paddingRight: '12px' };
 const checkbox: React.CSSProperties = { width: '16px', height: '16px', cursor: 'pointer', accentColor: '#7C3AED' };
-const productLink: React.CSSProperties = {
+const productName: React.CSSProperties = {
   fontSize: '14px',
   fontWeight: 500,
   color: colors.neutral900,
-  textDecoration: 'none',
 };
 const badgeActive: React.CSSProperties = {
   display: 'inline-block',
