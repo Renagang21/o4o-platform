@@ -32,7 +32,11 @@ import {
 } from "./settings/settings.service.js";
 import { AdapterRegistry } from "./adapters/registry.js";
 import { createMcpRouter } from "./mcp/mcp.routes.js";
-import { createBrowserWriteGuard } from "./auth/browser-write.middleware.js";
+import {
+  createBrowserWriteGuard,
+  externalAiAccountOrigins,
+} from "./auth/browser-write.middleware.js";
+import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
 
 type Handler = (req: Request, res: Response) => Promise<unknown>;
 const wrap =
@@ -86,10 +90,7 @@ export function createExternalAiRoutes(
   const browserWrite = createBrowserWriteGuard([
     config?.webOrigin.origin ?? "https://neture.co.kr",
     config?.adminOrigin?.origin ?? "https://admin.neture.co.kr",
-    "https://neture.co.kr",
-    "https://supplier.neture.co.kr",
-    "https://community.neture.co.kr",
-    "https://funding.neture.co.kr",
+    ...externalAiAccountOrigins,
   ]);
   management.use(authenticate, requireAdmin, browserWrite);
   management.get(
@@ -244,7 +245,14 @@ export function createExternalAiRoutes(
       resourceServerUrl: provider.resource,
       scopesSupported: [...scopes],
       resourceName: "O4O 콘텐츠 연결",
-      clientRegistrationOptions: { clientSecretExpirySeconds: 0 },
+      clientRegistrationOptions: {
+        clientSecretExpirySeconds: 0,
+        rateLimit: {
+          windowMs: 60 * 60 * 1000,
+          max: 20,
+          keyGenerator: getTrustedClientIp,
+        },
+      },
     });
     root.use(oauth);
   }

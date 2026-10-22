@@ -21,6 +21,7 @@ import {
 } from "../../apps/api-server/dist/modules/external-ai/settings/settings.service.js";
 import { ForumPostController } from "../../apps/api-server/dist/controllers/forum/ForumPostController.js";
 import { defaultSettings } from "../../apps/api-server/dist/modules/external-ai/contracts.js";
+import { registrationLimits } from "../../apps/api-server/dist/modules/external-ai/auth/oauth-provider.js";
 
 const options = {
   type: "postgres",
@@ -688,6 +689,125 @@ async function tests(db) {
       },
     );
     await expandedTests(db, tools, provider, registerAndAuthorize, base, post);
+    await check(
+      "SDK rejects repeated public registration before more rows are stored",
+      async () => {
+        let limited = false;
+        for (let i = 0; i <= 20; i++) {
+          const before = (
+            await db.query("SELECT count(*)::int AS n FROM external_ai_clients")
+          )[0].n;
+          const response = await fetch(base + "/register", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              redirect_uris: config.redirectUris,
+              token_endpoint_auth_method: "none",
+            }),
+          });
+          if (response.status === 429) {
+            limited = true;
+            assert.ok(response.headers.get("retry-after"));
+            assert.equal(
+              (
+                await db.query(
+                  "SELECT count(*)::int AS n FROM external_ai_clients",
+                )
+              )[0].n,
+              before,
+            );
+            break;
+          }
+          assert.equal(response.status, 201);
+        }
+        assert.ok(limited);
+      },
+    );
+    const registration = {
+      redirect_uris: config.redirectUris,
+      token_endpoint_auth_method: "none",
+    };
+    await check(
+      "global registration capacity is atomic across provider instances",
+      async () => {
+        const prefix = `fixture-capacity-${randomUUID()}-`;
+        const before = (
+          await db.query("SELECT count(*)::int AS n FROM external_ai_clients")
+        )[0].n;
+        await db.query(
+          `INSERT INTO external_ai_clients(id,metadata,created_at)
+        SELECT $1||n,'{}'::jsonb,now()-interval '2 hours' FROM generate_series(1,$2::int) n`,
+          [prefix, registrationLimits.storedClients - before - 1],
+        );
+        const otherProvider = new provider.constructor(
+          db,
+          config,
+          provider.authorizeWorkspaces,
+        );
+        const results = await Promise.allSettled([
+          provider.clientsStore.registerClient(registration),
+          otherProvider.clientsStore.registerClient(registration),
+        ]);
+        try {
+          assert.equal(
+            results.filter((r) => r.status === "fulfilled").length,
+            1,
+          );
+          const rejected = results.find((r) => r.status === "rejected");
+          assert.equal(rejected.reason.errorCode, "too_many_requests");
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM external_ai_clients",
+              )
+            )[0].n,
+            registrationLimits.storedClients,
+          );
+        } finally {
+          await db.query(
+            "DELETE FROM external_ai_clients WHERE id LIKE $1 OR id=ANY($2::text[])",
+            [
+              `${prefix}%`,
+              results
+                .filter((r) => r.status === "fulfilled")
+                .map((r) => r.value.client_id),
+            ],
+          );
+        }
+      },
+    );
+    await check(
+      "global hourly registration quota rejects without a database write",
+      async () => {
+        const prefix = `fixture-hourly-${randomUUID()}-`;
+        await db.query(
+          `INSERT INTO external_ai_clients(id,metadata)
+        SELECT $1||n,'{}'::jsonb FROM generate_series(1,$2::int) n`,
+          [prefix, registrationLimits.newClientsPerHour],
+        );
+        try {
+          const before = (
+            await db.query("SELECT count(*)::int AS n FROM external_ai_clients")
+          )[0].n;
+          await assert.rejects(
+            provider.clientsStore.registerClient(registration),
+            { errorCode: "too_many_requests" },
+          );
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM external_ai_clients",
+              )
+            )[0].n,
+            before,
+          );
+        } finally {
+          await db.query("DELETE FROM external_ai_clients WHERE id LIKE $1", [
+            `${prefix}%`,
+          ]);
+        }
+      },
+    );
     console.log(`External AI integration PASS: ${count} cases`);
   } finally {
     server.close();
@@ -1329,6 +1449,46 @@ async function expandedTests(db, tools, provider, register, base, post) {
         draft(businessCommunityId, "community_post"),
       );
       assert.equal(row.status, "draft");
+      const [originalBusiness] = await db.query(
+        "SELECT key FROM semi_franchises WHERE id=$1",
+        [business],
+      );
+      for (const key of ["pharmacy", "megapharm"]) {
+        const [collision] = await db.query(
+          "SELECT id FROM semi_franchises WHERE key=$1",
+          [key],
+        );
+        if (collision)
+          await db.query("UPDATE semi_franchises SET key=$1 WHERE id=$2", [
+            `fixture-moved-${randomUUID()}`,
+            collision.id,
+          ]);
+        try {
+          await db.query("UPDATE semi_franchises SET key=$1 WHERE id=$2", [
+            key,
+            business,
+          ]);
+          const opened = await exec("get_content_draft", {
+            workspaceId: businessCommunityId,
+            destination: "community_post",
+            contentId: row.id,
+          });
+          assert.equal(
+            opened.openUrl,
+            `https://${key}.neture.co.kr/community/write?edit=${row.id}`,
+          );
+        } finally {
+          await db.query("UPDATE semi_franchises SET key=$1 WHERE id=$2", [
+            originalBusiness.key,
+            business,
+          ]);
+          if (collision)
+            await db.query("UPDATE semi_franchises SET key=$1 WHERE id=$2", [
+              key,
+              collision.id,
+            ]);
+        }
+      }
       await assert.rejects(
         grant(member, [businessCommunityId]),
         /WORKSPACE_FORBIDDEN/,

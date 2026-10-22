@@ -97,3 +97,15 @@ SDK client HTTP round-trip과 격리 PostgreSQL로 PKCE/code 재사용/resource/
 - 커뮤니티 결과 URL은 소속 게시판 서비스의 기존 편집기로 연결한다. 초안 로드만으로 공개하지 않는다.
   사용자가 `검토한 초안 게시`를 제출한 경우에만 기존 게시 API의 `publish` 전이를 요청한다.
 - 계정이 바뀌면 연결 동의의 선택과 내 계정 연결 목록을 새 계정 기준으로 초기화한다.
+
+## 8. 공개 연결 등록의 저장 상한
+
+공식 SDK의 IP당 시간당 20회 제한을 명시하고 기존 trusted-client-IP 판정을 사용한다.
+추가로 PostgreSQL transaction/advisory lock으로 전체 클라이언트 1,000개, 전체 신규 등록 시간당 100개를
+제한한다. 서버 인스턴스가 늘거나 동시에 요청되어도 이 저장 상한을 넘기지 않는다. 기존 연결의 인증·해제는
+등록 상한과 별개다. 한도에 도달하면 신규 등록을 거절하며 기존 연결을 임의로 삭제하지 않는다.
+미사용 client의 기존 30일 정리 및 운영 정리 실행 조건은 유지한다.
+
+공통 계정 설정이 있는 main·www·supplier·funding·community·CarePharm의 정확한 Origin에서 연결 해제를
+허용한다. 임의 하위 도메인이나 Origin 반사는 허용하지 않는다. 약국·MegaPharm의 커뮤니티 초안 검토 URL은
+각 사업의 현재 서브도메인 `/community/write`로 반환한다.

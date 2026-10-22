@@ -23,6 +23,7 @@ import {
   InvalidScopeError,
   InvalidTargetError,
   InvalidTokenError,
+  TooManyRequestsError,
 } from "@modelcontextprotocol/sdk/server/auth/errors.js";
 import { assertEnabled } from "../settings/settings.service.js";
 import {
@@ -35,6 +36,12 @@ import { resolveAccountAccess } from "../../../common/auth/account-access.policy
 export const tokenHash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 const secret = () => randomBytes(32).toString("base64url");
+// The SDK also limits each IP to 20 registrations/hour. These database-wide
+// bounds apply across Cloud Run replicas and direct store callers.
+export const registrationLimits = {
+  storedClients: 1000,
+  newClientsPerHour: 100,
+};
 type Queryable = Pick<DataSource | EntityManager, "query">;
 export interface ConnectionConfig {
   issuer: URL;
@@ -224,14 +231,30 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       const { client_secret, ...metadata } = result;
       if (JSON.stringify(metadata).length > 16000)
         throw new InvalidClientMetadataError("연결 정보가 너무 큽니다.");
-      await this.db.query(
-        "INSERT INTO external_ai_clients(id,metadata,secret_cipher) VALUES($1,$2,$3)",
-        [
-          result.client_id,
-          metadata,
-          client_secret ? this.encrypt(client_secret) : null,
-        ],
-      );
+      await this.db.transaction(async (db) => {
+        await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+          "external-ai-client-registration",
+        ]);
+        await assertEnabled(db);
+        const [counts] = await db.query(`SELECT count(*)::int AS total,
+          count(*) FILTER (WHERE created_at>now()-interval '1 hour')::int AS recent
+          FROM external_ai_clients`);
+        if (
+          counts.total >= registrationLimits.storedClients ||
+          counts.recent >= registrationLimits.newClientsPerHour
+        )
+          throw new TooManyRequestsError(
+            "연결 등록 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
+          );
+        await db.query(
+          "INSERT INTO external_ai_clients(id,metadata,secret_cipher) VALUES($1,$2,$3)",
+          [
+            result.client_id,
+            metadata,
+            client_secret ? this.encrypt(client_secret) : null,
+          ],
+        );
+      });
       return result;
     },
   };

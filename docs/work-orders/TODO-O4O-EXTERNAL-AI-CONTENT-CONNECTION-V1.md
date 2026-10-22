@@ -55,3 +55,14 @@ frontend 전체 타입·API 타입/컴파일·bundle, 변경 5개 웹 build, 정
 
 최초 구현 `9b0067ef7a` 및 상태 기록 `5a1382dfd7` 뒤의 같은 branch에서 전체 범위를 연속 보완했다.
 최종 원격 HEAD는 완료 보고에서 확인한다. 새 migration 추가 없이 최초 연결 원장 6개 테이블과 기존 콘텐츠 원장을 사용한다.
+
+## 통합 단계 추가 지시 (2026-10-22)
+
+사용자가 개발 push 뒤 main 병합·운영 배포를 지시했다. 위 개발 종료 기록과 구분하여 아래를 진행한다.
+
+- [x] 최신 main merge 및 변경된 공통 소비처 재검증
+- [x] PR #766 생성, Codex 지적 2건 보완 및 43개 격리 DB 통합 검증
+- [ ] 최종 HEAD의 필수 CI·재리뷰·미해결 스레드 확인 후 PR merge
+- [ ] post-merge CI·Delivery 판정 및 운영 migration 실행 승인 확인
+- [ ] 표준 API 선행 배포·영향 프런트 배포·협동조합 frontend_only 배포 확인
+- [ ] 서빙 SHA/health 확인 및 종료 보고 (실제 ChatGPT 활성화는 별도 설정·계정 검증 필요)

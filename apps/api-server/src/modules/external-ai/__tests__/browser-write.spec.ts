@@ -1,8 +1,16 @@
-import { createBrowserWriteGuard } from "../auth/browser-write.middleware.js";
+import {
+  createBrowserWriteGuard,
+  externalAiAccountOrigins,
+} from "../auth/browser-write.middleware.js";
 import type { Request, Response } from "express";
 
 const origin = "https://account.example.invalid";
-function request(method: string, providedOrigin?: string, json = false) {
+function request(
+  method: string,
+  providedOrigin?: string,
+  json = false,
+  origins: readonly string[] = [origin],
+) {
   const req = {
     method,
     headers: { origin: providedOrigin },
@@ -10,7 +18,7 @@ function request(method: string, providedOrigin?: string, json = false) {
   };
   const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
   const next = jest.fn();
-  createBrowserWriteGuard([origin])(
+  createBrowserWriteGuard(origins)(
     req as unknown as Request,
     res as unknown as Response,
     next,
@@ -18,6 +26,22 @@ function request(method: string, providedOrigin?: string, json = false) {
   return { res, next };
 }
 describe("delegation browser write boundary", () => {
+  it.each(externalAiAccountOrigins)(
+    "allows account connection revocation from %s",
+    (host) => {
+      expect(
+        request("DELETE", host, false, externalAiAccountOrigins).next,
+      ).toHaveBeenCalled();
+      expect(
+        request(
+          "DELETE",
+          `${host}.attacker.invalid`,
+          false,
+          externalAiAccountOrigins,
+        ).res.status,
+      ).toHaveBeenCalledWith(403);
+    },
+  );
   it("allows a legitimate bodyless DELETE used by Axios", () => {
     expect(request("DELETE", origin).next).toHaveBeenCalled();
   });

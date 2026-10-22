@@ -153,6 +153,9 @@ export class CommunityAdapter {
     } else if (board.businessKey === "carepharm") {
       origin = "https://carepharm.neture.co.kr";
       path = "/communities/business%3Acarepharm/forum/write";
+    } else if (["pharmacy", "megapharm"].includes(board.businessKey)) {
+      origin = `https://${board.businessKey}.neture.co.kr`;
+      path = "/community/write";
     } else if (board.businessKey) {
       origin = "https://pharmacy.neture.co.kr";
       path = `/businesses/${encodeURIComponent(board.businessKey)}/forum/write`;

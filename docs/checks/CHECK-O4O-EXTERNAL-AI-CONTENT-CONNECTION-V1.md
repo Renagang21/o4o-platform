@@ -180,3 +180,22 @@ verdict: KEEP — push 후 통합·운영 확인 및 후속 수정에 필요
 ```
 
 개발 중 read-only fetch에서 main이 최초 `efcf96ec28`, push 직전 `05f63d8865`까지 이동한 것을 확인했다. 개발 branch를 자동 merge/rebase하지 않았으며, 통합 담당은 최신 main 기준으로 소비처 변경을 함께 재검증한다. 다른 worktree는 수정하지 않았다.
+
+## 6. 사용자 통합 지시 후 추가 검증 (2026-10-22)
+
+이후 사용자가 main 병합·배포를 지시하여 이 공간에서 PR #766을 생성했다. 앞 절은 개발 push 당시 기록이다.
+최신 main `05f63d8865`를 merge한 `6b11fc1956`에서 API build, 전체 frontend 타입, 관리자 446건,
+API 164건, Store 6건, 약국 사업 게시판 9건, 조합 16건을 재검증했다. Store·약국/메가팜·조합 웹 build와
+Store desktop/mobile 브라우저 2건도 통과했다. 로컬 PostgreSQL 통합 40건 및 테스트 데이터 삭제를 확인했다.
+
+PR의 Codex 지적 2건을 보완했다.
+
+- 공개 등록: SDK에 이미 IP당 시간당 20회 제한이 있음을 확인했고, 이를 명시하면서 기존 trusted-client-IP를
+  사용했다. DB 전역 1,000개/시간당 신규 100개 저장 상한과 동시 요청 lock을 추가했다.
+- 공통 내 계정: CarePharm·www의 정확한 Origin을 추가하여 해당 호스트에서도 연결 해제가 가능하다.
+- main 통합 영향 확인 중 약국·MegaPharm 초안 URL을 현재 사업 서브도메인의 기존 편집 route로 정렬했다.
+
+보완 후 API compile, 관련 Jest 18건(공통 계정 Origin 6곳의 허용·유사 도메인 거부 포함), 변경 코드 lint가
+통과했다. PostgreSQL/공식 SDK 통합은 기존 40건에 등록 429·동시 전역 상한·시간당 상한을 더해 **43건 PASS**다.
+기존 사업 게시판 사례에서 약국·MegaPharm 실제 결과 URL을 함께 확인했다. fixture DB 0개를 확인했다.
+운영 DB·실제 외부 연결은 아직 변경하지 않았다. 병합/배포의 최종 상태는 PR 및 통합 완료 보고에서 확인한다.
