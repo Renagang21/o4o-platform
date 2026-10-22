@@ -1,3 +1,4 @@
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 const { post, get } = vi.hoisted(() => ({ post: vi.fn(), get: vi.fn() }));
@@ -20,7 +21,7 @@ it("preserves lecture application, collaboration and error inquiry choices and s
       },
     },
   });
-  render(<ContactPage />);
+  render(<MemoryRouter initialEntries={["/contact?courseId=fixture-course&lessonId=fixture-lesson"]}><ContactPage /></MemoryRouter>);
   await screen.findByRole("combobox");
   for (const label of [
     "서비스 이용 신청",
@@ -52,6 +53,7 @@ it("preserves lecture application, collaboration and error inquiry choices and s
     expect.objectContaining({
       inquiryType: "partnership",
       privacyConsent: true,
+      message: expect.stringContaining("[문의 대상] 강의: fixture-course / 레슨: fixture-lesson"),
     }),
   );
 });
