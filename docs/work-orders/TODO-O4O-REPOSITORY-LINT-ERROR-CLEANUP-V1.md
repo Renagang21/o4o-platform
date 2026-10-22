@@ -1,6 +1,6 @@
 # TODO-O4O-REPOSITORY-LINT-ERROR-CLEANUP-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED — 개발·검증·branch push 완료, main 통합·배포 별도
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (KST)
 > **근거**: 사용자가 인증 보완 후 확인한 전체 lint 기존46오류의 해결을 지시
 > **종료 범위**: 문서·코드 조사 → 최소 수정 → 검증 → commit·branch push 후 통합 담당 인계
@@ -28,7 +28,7 @@ CI·lint 규칙/기준은 변경하지 않는다. 유지 대상 security 판정�
 - [x] V01: 변경 테스트·관련 기존 회귀, 제어문자/정규식의 변경 전후 동치 검증.
 - [x] V02: 전체 lint errors0, API 타입·배포 빌드와 해당 frontend 타입·회귀 검증.
 - [x] D01: 최초 실패·수정·최종 결과·남는 경고·미실행 범위 기록.
-- [ ] G01: 자기 변경 경로만 commit·명시 branch push, SHA·검증·미해결 사항 인계.
+- [x] G01: 자기 변경 경로만 commit·명시 branch push, SHA·검증·미해결 사항 인계.
 
 ## 초기 오류 분류
 
@@ -116,6 +116,25 @@ pnpm run type-check:frontend
 남은946경고는 오류46개 해결과 별개다. 실제 media PG fixture·운영 DB·OAuth·브라우저 smoke는 실행하지 않았다.
 이번 UI 변경은 없고 CSV bytes 동치를 검증했다. PR 생성·CI/Codex review 운영·병합·배포는 통합 담당 범위다.
 
+## 개발 종료·push 확인
+
+소스·검증 기록 commit은 `6201d9754c979518fa5422fdd5179dae8fc378e5`이다.
+`git push -u origin wo/repository-lint-error-cleanup-v1` 성공 후 `git ls-remote --heads`로
+원격 branch의 동일 SHA를 확인했다. push 직전 재조회한 `origin/main`은 시작 SHA와 같았다.
+이후 본 문서의 종료 상태만 별도 commit·push한다. 소스 변경 없이 위 최종 검증 결과를 유지한다.
+
+개발 로컬 검증은 완료했다. PR을 생성하지 않아 PR CI·Codex review는 미실행이며,
+integration-ready나 main 통합·배포 완료를 판정하지 않는다. 통합 담당은 위 branch의 최종 HEAD와
+별도 인증 보완 branch를 확인하고 정식 통합 절차를 진행한다. 미해결 오류0, 기존 경고946 및
+전용 PG fixture10 SKIP는 위 기록과 같다.
+
+WORKTREE_DISPOSITION
+- worktree: `/workspace/o4o-wt/repository-lint-error-cleanup-v1`
+- branch: `wo/repository-lint-error-cleanup-v1`; base: `7dc02646dab2808258133139b3ca0714ec3cc14b`
+- main integration / PR CI / deployment / browser smoke: 미실행
+- 소스 commit 후 uncommitted·untracked0 확인. 본 종료 기록 commit 후 동일 상태와 원격 HEAD를 재확인한다.
+- other session usage: 전용 작업공간이며 타 세션 변경 없음. branch-only commits는 통합 전 보존한다.
+- verdict: KEEP — 병합 전 후속 수정·통합 검토를 위해 보존.
+
 DEPLOYMENT: REQUIRED_AFTER_MERGE — runtime source 정비가 포함되며 통합 담당이 현재 Delivery 정책으로 판정한다.
 문서 정합: 이전 인증 TODO의 당시 lint 실패 기록은 보존하며 이번 독립 후속에서 해소 근거를 남긴다.
-WORKTREE_DISPOSITION: KEEP — 검증·push 및 통합 담당 후속 검토 전용이다.
