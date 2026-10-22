@@ -164,6 +164,13 @@ export class CourseController extends BaseController {
         }
       }
 
+      // Opt-in introduction projection. A curriculum outage does not break ordinary course reads.
+      // Existing lesson/content endpoints remain authenticated.
+      if (req.query.includeCurriculum === 'true') {
+        const { lessons } = await LessonService.getInstance().listLessonsByCourse(id, { isPublished: true, limit: 1000 });
+        const curriculum = lessons.map(({ id, title, type, order, duration }) => ({ id, title, type, order, duration }));
+        return BaseController.ok(res, { course, curriculum });
+      }
       return BaseController.ok(res, { course });
     } catch (error: any) {
       logger.error('[CourseController.getCourse] Error', { error: error.message });
@@ -482,6 +489,7 @@ export class CourseController extends BaseController {
           thumbnail: (course as any).thumbnail ?? null,
           createdAt: (course as any).createdAt ?? null,
           updatedAt: (course as any).updatedAt ?? null,
+          professionalInfo: course.metadata?.professionalInfo ?? null,
         },
         curriculum,
         readOnly: true as const,

@@ -7,6 +7,7 @@ vi.mock('../../api/lecture', () => ({
   learnerApi: { getMyEnrollments: mocks.enrollments, getMyCertificates: mocks.certificates },
   errorMessage: (_error: unknown, fallback: string) => fallback,
 }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'synthetic-user' } }) }));
 vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn() } }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ error: vi.fn() }) }));
 import MyEnrollmentsPage from './MyEnrollmentsPage';

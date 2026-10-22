@@ -74,3 +74,7 @@
 - API 및 공통 operator UI 소비 웹 배포 필요. 신규 migration 없음. 실제 이메일 설정·제공자 결과 확인과 실계정 업무 검증은 운영 적용 후 별도 증거로 남긴다.
 - 개발 branch `wo/operator-workflow-completion-todo`. PR 생성·원격 CI·리뷰·main 병합·배포는 이 공간에서 실행하지 않음. HEAD는 개발 인계 메시지/원격 branch로 확인한다.
 - WORKTREE_DISPOSITION: KEEP — 후속 통합 수정·실계정 검증에 필요. 다른 작업공간 정리 없음.
+
+## main 통합 진행 — 2026-10-22
+
+사용자 `메인으로 병합 배포` 지시로 이 공간에서 PR·CI/리뷰·병합·배포를 이어간다. 최신 main `64f314d0ab`를 기존 개발 branch에 정상 merge하며 #767의 미발급 수료증 복구 목록·강의 개선을 보존하고 이번 operator 폐기 이력을 함께 연결했다. 충돌 3개는 controller import와 화면/테스트의 양쪽 기능을 유지해 해소했다. 기존 #766의 외부 AI 및 migration·package 변경은 선행 main 변경이며 이번 작업의 신규 migration은 없다. 통합 검증·배포 결과는 후속 기록한다.

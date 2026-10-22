@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Page from './OperatorCertificatesPage';
-const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn(), certificateOperations: vi.fn() }));
+const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn(), certificateOperations: vi.fn(), missingCertificates: vi.fn() }));
 vi.mock('../../api/lecture', () => ({ operatorApi: api, errorMessage: () => '처리 실패' }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: vi.fn(), error: vi.fn() }) }));
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => { vi.resetAllMocks(); api.missingCertificates.mockResolvedValue({ data: { items: [] } }); });
 afterEach(cleanup);
 it('connects the issued certificate to renewal and public verification', async () => {
   api.issueCertificate.mockResolvedValue({ data: { certificate: { id: 'cert', certificateNumber: 'SAMPLE', verificationCode: 'verify-code' } } });

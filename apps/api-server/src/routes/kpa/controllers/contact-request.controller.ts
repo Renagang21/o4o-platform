@@ -97,7 +97,7 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
               title: `새 문의: ${typeLabel}`,
               message: `${name!.trim()} 님이 문의를 남겼습니다.`,
               serviceKey: 'kpa-society',
-              metadata: { contactRequestId: saved.id, contactType: type, targetUrl: '/operator/collaboration-requests' },
+              metadata: { contactRequestId: saved.id, contactType: type, targetUrl: '/operator/inbox/business/pharmacy' },
             }),
           );
       }
@@ -121,7 +121,7 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
         phone: saved.phone,
         message: saved.message,
         createdAt: saved.createdAt,
-        adminManageUrl: '/operator/collaboration-requests',
+        adminManageUrl: '/operator/inbox/business/pharmacy',
       });
       emailStatus = r.emailStatus;
       autoReplyStatus = r.autoReplyStatus;

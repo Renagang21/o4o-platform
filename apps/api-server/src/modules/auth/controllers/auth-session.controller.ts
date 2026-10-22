@@ -58,8 +58,13 @@ export class AuthSessionController extends BaseController {
     const payload = token ? verifyAccessToken(token) : null;
     const serviceKey = payload?.serviceKey;
     const sessionId = payload?.sessionId;
-    const originService = resolveSessionServiceKey(req.get('origin'));
-    if (!serviceKey || !sessionId || (originService && originService !== serviceKey)) {
+    const origin = req.get('origin');
+    const originService = resolveSessionServiceKey(origin);
+    // Terminate pre-cutover sessions under their signed scope and browser ID.
+    // This compatibility is logout-only: new sessions still use the Neture scope.
+    const retiringScope = origin === 'https://pharmacy.neture.co.kr' ? 'kpa-society'
+      : origin === 'https://pharmcoop.neture.co.kr' ? 'coop' : null;
+    if (!serviceKey || !sessionId || (originService && originService !== serviceKey && retiringScope !== serviceKey)) {
       return BaseController.error(res, '다시 로그인한 뒤 로그아웃해 주세요.', 401, 'SESSION_SCOPE_INVALID');
     }
 

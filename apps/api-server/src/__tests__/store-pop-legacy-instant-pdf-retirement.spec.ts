@@ -103,11 +103,9 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     expect((menu.match(/subPath: '\/marketing\/pop-v2'/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('가이드 copy 의 POP route 는 pop-v2 다 (KPA — KCos copy 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거)', () => {
-    for (const f of ['kpa.ts']) {
-      const src = codeOnly(read(GUIDE, f));
-      expect(src).not.toMatch(/'\/store\/marketing\/pop'/);
-      expect(src).toMatch(/'\/store\/marketing\/pop-v2'/);
+  it('옛 POP route 를 담던 매장 가이드 copy 는 남아 있지 않다 (KCos — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 · KPA — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)', () => {
+    for (const f of ['kpa.ts', 'k-cosmetics.ts']) {
+      expect(existsSync(join(GUIDE, f))).toBe(false);
     }
   });
 });

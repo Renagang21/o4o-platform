@@ -3,6 +3,7 @@
  * 수료증 read 는 백엔드 소유권 경계상 본인 것만 열린다 — 운영 화면은 write 액션·공개 진위 링크와 별도 권한의 폐기 이력만 제공한다.
  */
 import { operatorApi } from '../../api/lecture';
+import { CertificateRecoveryQueue } from './CertificateRecoveryQueue';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useOperatorCertificates } from './useOperatorCertificates';
@@ -30,6 +31,8 @@ export default function OperatorCertificatesPage() {
   return <main className="page page-wide">
     <div className="page-head"><p className="muted"><Link to="/operator">강의 운영</Link> / 수료증 운영</p><h1>수료증 운영</h1></div>
     {message && <p role={message.error ? 'alert' : 'status'} className={`notice${message.error ? ' notice-error' : ''}`}>{message.text}</p>}
+
+    <CertificateRecoveryQueue busy={busy} onIssue={item => execute({ kind: 'issue', userId: item.userId, courseId: item.courseId })} />
 
     <section className="panel">
       <h2>수동 발급</h2>

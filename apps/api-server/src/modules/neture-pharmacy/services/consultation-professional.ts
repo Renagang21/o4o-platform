@@ -8,7 +8,6 @@ export async function consultationProfessionalConfirmed(db: Executor, userId: st
     const rows = await db.query(`SELECT
       EXISTS(SELECT 1 FROM organization_members WHERE user_id=$1 AND organization_id=$2 AND left_at IS NULL
         AND metadata ? 'pharmacyPharmacistConfirmed' AND jsonb_typeof(metadata->'pharmacyPharmacistConfirmed') IS DISTINCT FROM 'boolean') AS invalid,
-      EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id=$1 AND license_verified=true) OR
       EXISTS(SELECT 1 FROM organization_members WHERE user_id=$1 AND organization_id=$2 AND left_at IS NULL
         AND role IN ('owner','staff') AND metadata->'pharmacyPharmacistConfirmed'='true'::jsonb) AS confirmed`, [userId, organizationId]);
     if (rows.length !== 1 || rows[0].invalid === true || typeof rows[0].confirmed !== 'boolean') throw new Error('Invalid confirmation');

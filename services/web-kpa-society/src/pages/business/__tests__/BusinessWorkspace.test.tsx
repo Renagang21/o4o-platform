@@ -8,8 +8,9 @@ import BusinessParticipationPage from '../BusinessParticipationPage';
 import BusinessMaterialsPage from '../BusinessMaterialsPage';
 import { BusinessForumBoundary } from '../BusinessForumPage';
 
-const business = { key: 'pharmacy', name: '약국 협력사업', communityKey: 'business-forum', registrationConditions: '참여 조건' };
+const business = { policyScope: 'business:11111111-1111-4111-8111-111111111111', key: 'pharmacy', name: '약국 협력사업', communityKey: 'business-forum', registrationConditions: '참여 조건' };
 const access = { kind: 'semi-franchise', businessKey: 'pharmacy', allowed: false, canManage: false };
+const policies = ['terms', 'privacy'].map((documentType, i) => ({ serviceKey: business.policyScope, documentType, policyDocumentId: `22222222-2222-4222-8222-22222222222${i}`, version: 1, title: documentType, content: 'Fixture policy' }));
 const response = (data: unknown) => ({ data: { data } });
 const mount = (path: string) => render(<MemoryRouter initialEntries={[path]}><Routes>
   <Route path="/businesses/:businessKey" element={<BusinessWorkspace />}>
@@ -22,7 +23,7 @@ const mount = (path: string) => render(<MemoryRouter initialEntries={[path]}><Ro
 beforeEach(() => {
   mocks.user = { id: 'owner' }; mocks.get.mockReset(); mocks.post.mockReset();
   mocks.get.mockImplementation(async (path: string) => {
-    if (path.endsWith('/enrollment-policies')) return response([]);
+    if (path.endsWith('/enrollment-policies')) return response(policies);
     if (path.endsWith('/businesses/pharmacy')) return response(business);
     if (path.endsWith('/access')) return response(access);
     if (path.endsWith('/semi-franchises')) return response([{ key: 'pharmacy', membershipStatus: null }]);
@@ -74,10 +75,11 @@ describe('사업 서비스의 참가자 공간', () => {
   });
   it('조건 확인 후 기존 신청 API에 해당 사업의 신청만 전달한다', async () => {
     mocks.post.mockResolvedValue(response({ status: 'pending' })); mount('/businesses/pharmacy/participation');
-    const check = await screen.findByRole('checkbox'); fireEvent.click(check);
+    await screen.findByText('privacy · 버전 1');
+    for (const check of screen.getAllByRole('checkbox')) fireEvent.click(check);
     fireEvent.click(screen.getByRole('button', { name: '참여 신청' }));
     await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/pharmacy/apply', {
-      acceptedConditions: true, conditions: '참여 조건', note: '', policyReferences: [],
+      acceptedConditions: true, conditions: '참여 조건', note: '', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })),
     }));
   });
   it('담당 운영자에게 약국 소유자 전용 가입 조회를 요구하지 않는다', async () => {

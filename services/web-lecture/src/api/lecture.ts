@@ -31,7 +31,11 @@ export type CourseVisibility = 'public' | 'members';
 export interface Pagination { total: number; page: number; limit: number; totalPages: number }
 export type Paginated<T> = { success: boolean; data: T[]; pagination?: Pagination };
 
+export interface ProfessionalInfo { audience?: string; outcomes?: string; prerequisites?: string; instructorBio?: string; expertise?: string; reviewedAt?: string }
+export interface LessonAttachment { name: string; url: string; type: string; size: number }
+
 export interface LectureCourse {
+  metadata?: Record<string, unknown> & { professionalInfo?: ProfessionalInfo };
   id: string;
   title: string;
   description: string | null;
@@ -39,6 +43,7 @@ export interface LectureCourse {
   status: CourseStatus;
   visibility: CourseVisibility;
   contentKind?: string;
+  category?: string | null;
   serviceKey?: string | null;
   instructorId: string;
   instructorName?: string | null;
@@ -68,6 +73,8 @@ export interface LectureLesson {
   duration: number;
   isPublished?: boolean;
   isPreview?: boolean;
+  isFree?: boolean;
+  attachments?: LessonAttachment[];
 }
 
 export interface LectureEnrollment {
@@ -161,6 +168,7 @@ export interface InstructorApplication {
 }
 
 export interface CourseInput {
+  metadata?: { professionalInfo?: ProfessionalInfo };
   title: string;
   description: string;
   thumbnail?: string | null;
@@ -169,6 +177,7 @@ export interface CourseInput {
   requiresApproval?: boolean;
 }
 export interface LessonInput {
+  attachments?: LessonAttachment[];
   title: string;
   type: LessonType;
   description?: string | null;
@@ -270,6 +279,7 @@ export interface OperatorCourseReviewLesson {
 }
 export interface OperatorCourseReview {
   course: {
+    professionalInfo?: ProfessionalInfo;
     id: string;
     title: string;
     description: string | null;
@@ -287,7 +297,9 @@ export interface OperatorCourseReview {
   readOnly: true;
 }
 
+export interface MissingCertificate { enrollmentId: string; userId: string; courseId: string; userName?: string; courseTitle: string }
 export const operatorApi = {
+  missingCertificates: (search = '') => lmsHttp.get<LmsApiResponse<{ items: MissingCertificate[] }>>('/lms/operator/certificates/missing', { search }),
   courses: (params?: { status?: string; search?: string; page?: number; limit?: number; contentKind?: string }) =>
     lmsHttp.get<Paginated<LectureCourse>>('/lms/operator/courses', { contentKind: 'all', ...(params ?? {}) }),
   /** 운영자 검토 전용 read-only 조회 (11차 P2) — 수강 등록·write 없음. */
