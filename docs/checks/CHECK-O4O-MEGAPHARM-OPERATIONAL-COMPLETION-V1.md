@@ -1,7 +1,7 @@
 # 메가팜 협업체 운영 완성 검증
 
 - 작성일: 2026-10-22
-- 상태: 로컬 구현·검증 완료, PR·배포 대기
+- 상태: 로컬 구현·검증 완료, PR #761 CI·리뷰 진행 중
 - 작업: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)
 - 정본: [약국 설계 §15-9](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#15-9-사업-운영-도구와-사업별-약관-2026-10-22), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md)
 
@@ -41,6 +41,8 @@ API 선택 회귀에는 별도 격리 DB로 실행한 새 운영 API 8건과 담
 
 ## Git·Delivery
 
-전용 branch wo/megapharm-operational-completion, 기준 main 7dc02646da. 정상 PR·CI·리뷰를 통과한 뒤 병합·Delivery 결과를 기록한다. 새 migration이 없어 이 작업의 운영 DDL은 없다.
+전용 branch wo/megapharm-operational-completion, 기준 main 7dc02646da. 정상 PR·CI·리뷰를 통과한 뒤 병합·Delivery 결과를 기록한다. 새 migration이 없어 이 작업의 운영 DDL은 없다. [PR #761](https://github.com/Renagang21/o4o-platform/pull/761)에서 통합·배포 상태를 추적한다.
+
+최종 교차 점검 보완: CarePharm 공개 정책만 business endpoint를 읽도록 loader의 명시적 serviceKey를 따른다. 같은 호스트의 공통 계정 재동의·My Home 약관은 neture 문서를 유지한다. 이 경우와 미게시 fallback 차단 회귀 3개를 추가했고, 관련 계정 gate/패널 테스트 및 Neture production build를 다시 통과했다.
 
 문서 정합: 약국 설계·My Home·OPEN 독립 정비 WO에 현재 연결 범위와 남은 범위를 반영했다. 이전 COMPLETED 실행 기록은 수정하지 않았다.

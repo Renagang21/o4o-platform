@@ -17,7 +17,7 @@
 - [x] 직원 숙지 자료 체크를 기존 콘텐츠 편집기에 연결한다.
 - [x] 관리자 설정·My Home 허용·무료 초대 직원·약사/비전문인·복수 제공·종료·다른 매장 차단 회귀를 함께 확인한다.
 - [x] 관련 API/SQL·공통 UI·소비 앱·PC/모바일·문서 정합을 검증한다.
-- [ ] 검증한 코드·문서를 commit·push한다.
+- [x] 검증한 코드·문서를 commit·push한다. PR #761.
 - [ ] 정상 PR·CI·리뷰·main 병합·Delivery/promote 배포 및 운영 읽기 점검을 완료한다.
 
 ## 검증 후 확정한 구현
@@ -40,3 +40,5 @@
 ## 로컬 구현·검증 결과 (2026-10-22)
 
 새 migration 없음. 기존 승인·유료·직원 허용 원장은 유지하고 사업별 정책 범위/운영 패널을 연결했다. 격리 PostgreSQL의 canonical bootstrap과 36개 incremental 적용 뒤 schema fingerprint 일치를 확인했다. 로컬 API·UI·PC/모바일 결과와 한계는 [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)를 따른다. push/PR/CI/병합/운영 배포 상태는 후속 기록으로 보완한다.
+
+PR: https://github.com/Renagang21/o4o-platform/pull/761. 최종 교차 점검에서 CarePharm 호스트의 공통 계정 약관 loader가 사업 문서를 선택할 수 있는 경로를 수정했다. 요청한 serviceKey를 기준으로 계정/사업 문서를 선택하며 3개 회귀를 추가했다.
