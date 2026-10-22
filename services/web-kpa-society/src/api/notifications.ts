@@ -46,9 +46,9 @@ function isRateLimited(err: any): boolean {
 
 const SERVICE_KEY = 'kpa';
 
-// MegaPharm previously displayed the shared KPA scope. Keep that history while adding its own inquiries.
+// Each business reads its own notifications; legacy pharmacy history is not a MegaPharm source.
 function scopeParams(serviceKey?: string) {
-  return serviceKey === 'megapharm' ? {serviceKeys:'megapharm,kpa-society'} : {serviceKey};
+  return { serviceKey };
 }
 
 export const notificationsApi: NotificationApiClient = {

@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies } from './fixtures/business-policies.js';
 import { eventIndexState, transitionEventIndex } from '../operations/event-index-transition.js';
 import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoard } from '../../../services/community/community-workspace.service.js';
 /**
@@ -125,7 +126,7 @@ async function approvedPharmacy() {
 
 async function joinSemiFranchise(orgId: string, owner: string, key: string, sfOperator: string) {
   const sf = (await sfs.getByKey(key))!;
-  const app = await sfs.apply(orgId, owner, key);
+  const app = await sfs.apply(orgId, owner, key, { policyReferences: await fixtureBusinessPolicies(ds, key) });
   await sfs.decideMembership(sf, sfOperator, app.id, 'approve');
   return app.id as string;
 }
@@ -229,7 +230,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const sf = await sfs.create({ key, name: 'Synthetic conditions', registrationConditions: 'Original condition' });
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key)).rejects.toMatchObject({ code: 'CONDITIONS_REQUIRED' });
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Stale condition' })).rejects.toMatchObject({ code: 'CONDITIONS_CHANGED' });
-      await sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Original condition', note: 'Synthetic note' });
+      await sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Original condition', note: 'Synthetic note', policyReferences: await fixtureBusinessPolicies(ds, key) });
       expect((await sfs.listMemberships(sf))[0].application).toMatchObject({ conditions: 'Original condition', accepted: true, note: 'Synthetic note' });
       await sfs.update(key, { registrationConditions: 'Updated condition' });
       expect((await sfs.getByKey(key))?.registration_conditions).toBe('Updated condition');
@@ -288,7 +289,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
     it('기본 승인은 세미프랜차이즈 가입을 자동 승인하지 않고, 비담당 운영자는 처리할 수 없다', async () => {
       const p = await approvedPharmacy();
-      const app = await sfs.apply(p.orgId, p.owner, 'pharmacy');
+      const app = await sfs.apply(p.orgId, p.owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
       expect(app.status).toBe('pending');
       const stranger = await user();
       await role(stranger, 'neture:operator');
@@ -330,7 +331,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_semi_franchise', pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: null });
 
       const sf = (await sfs.getByKey('pharmacy'))!;
-      const app = await sfs.apply(row.organization_id, owner, 'pharmacy');
+      const app = await sfs.apply(row.organization_id, owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'semi_franchise_pending', semiFranchiseMembershipStatus: 'pending' });
       await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve');
       expect(await access(owner)).toMatchObject({ allowed: true, next: null, pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'active' });

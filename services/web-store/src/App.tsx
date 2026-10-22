@@ -13,7 +13,7 @@ import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
  * 공통 기능은 KPA canonical 트리(pages/pharmacy)를 서비스 prefix 만 동적으로 바꿔 1회 mount 한다(복사 3벌 금지).
  * 서비스 종속 기능은 /work/<serviceKey> 아래에만 있다. 모든 업무 화면은 StoreGate(매장 선택·서버 재검증) 뒤에 있다.
  */
-import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from 'react';
+import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyMembershipReviewPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
@@ -24,7 +24,6 @@ import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
 import UnifiedStoreLayout, { ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
-import { getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedStoreLibraryLayout from './components/layouts/UnifiedStoreLibraryLayout';
 import HomePage from './pages/HomePage';
@@ -145,18 +144,6 @@ const rel = (p: string) => p.replace(/^\//, '');
 const pharmacyOnly = (el: ReactElement) => <PharmacyContextOnly>{el}</PharmacyContextOnly>;
 
 /**
- * 이용 방법(`/guide/*`)은 서비스 앱이 서빙한다 — 이식 화면의 GuideBackLink 가 store 호스트에서 404 가 되지 않게
- * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15). (K-Cosmetics 는 더 이상 서비스 문맥이 될 수 없다 — PHASE1B)
- */
-function ServiceGuideRedirect() {
-  const { pathname, search } = useLocation();
-  useEffect(() => {
-    window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);
-  }, [pathname, search]);
-  return null;
-}
-
-/**
  * 내 매장 화면(공통 컴포넌트) — `/store/*` 와 서비스 지정 `/work/<serviceKey>/store/*` 두 곳에 같은 트리를 mount 한다.
  * CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13 (서비스별 매장 경영자 화면 위치 이전). 경로 · 컴포넌트 · 권한 동작은 그대로다.
  */
@@ -239,7 +226,6 @@ export default function App() {
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
-    <Route path="/guide/*" element={<ServiceGuideRedirect />} />
 
     <Route element={<RootShell />}>
       <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />

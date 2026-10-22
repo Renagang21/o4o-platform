@@ -30,7 +30,7 @@ export function Footer() {
       }}
       sections={KPA_FOOTER_SECTIONS}
       copyright={`© 2026 Neture · ${BUSINESS_SITE.name}`}
-      legalSlot={BUSINESS_SITE.key === 'pharmacy' ? <PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} /> : undefined}
+      legalSlot={<PublicLegalFooterInfo serviceKey={BUSINESS_SITE.key} loadProfile={loadFooterLegal} />}
     />
   );
 }
