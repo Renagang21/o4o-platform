@@ -106,6 +106,10 @@ SDK client HTTP round-trip과 격리 PostgreSQL로 PKCE/code 재사용/resource/
 등록 상한과 별개다. 한도에 도달하면 신규 등록을 거절하며 기존 연결을 임의로 삭제하지 않는다.
 미사용 client의 기존 30일 정리 및 운영 정리 실행 조건은 유지한다.
 
+인증 전 동의 요청 저장도 SDK의 IP당 15분 100회 제한과 별도로 DB 전역 pending 1,000개/client별 100개로
+제한한다. 동일 전역 lock 안에서 만료된 pending만 회수하고 상한을 확인한 뒤 저장한다. 기존 동의·code·
+access/refresh는 이 회수 대상이 아니다. 여러 서버에서 마지막 슬롯을 동시에 요청해도 한 건만 저장한다.
+
 공통 계정 설정이 있는 main·www·supplier·funding·community·CarePharm의 정확한 Origin에서 연결 해제를
 허용한다. 임의 하위 도메인이나 Origin 반사는 허용하지 않는다. 약국·MegaPharm의 커뮤니티 초안 검토 URL은
 각 사업의 현재 서브도메인 `/community/write`로 반환한다.

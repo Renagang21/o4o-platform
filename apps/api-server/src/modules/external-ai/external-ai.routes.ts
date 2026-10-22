@@ -245,6 +245,13 @@ export function createExternalAiRoutes(
       resourceServerUrl: provider.resource,
       scopesSupported: [...scopes],
       resourceName: "O4O 콘텐츠 연결",
+      authorizationOptions: {
+        rateLimit: {
+          windowMs: 15 * 60 * 1000,
+          max: 100,
+          keyGenerator: getTrustedClientIp,
+        },
+      },
       clientRegistrationOptions: {
         clientSecretExpirySeconds: 0,
         rateLimit: {

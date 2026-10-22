@@ -199,3 +199,8 @@ PR의 Codex 지적 2건을 보완했다.
 통과했다. PostgreSQL/공식 SDK 통합은 기존 40건에 등록 429·동시 전역 상한·시간당 상한을 더해 **43건 PASS**다.
 기존 사업 게시판 사례에서 약국·MegaPharm 실제 결과 URL을 함께 확인했다. fixture DB 0개를 확인했다.
 운영 DB·실제 외부 연결은 아직 변경하지 않았다. 병합/배포의 최종 상태는 PR 및 통합 완료 보고에서 확인한다.
+
+재리뷰의 인증 전 `/authorize` 저장 상한 지적도 보완했다. SDK의 기존 IP당 15분 100회 제한을 명시하고,
+DB 전역 pending 1,000개/client별 100개의 상한과 만료 pending 회수를 같은 lock/transaction에 적용했다.
+compile·변경 lint 및 공식 HTTP 429/추가 저장 없음·client별 상한/만료 회수·두 provider의 마지막 슬롯
+동시 요청을 검증했다. 기존 사례를 포함한 격리 DB/SDK **46건 PASS**, fixture DB 0개를 확인했다.

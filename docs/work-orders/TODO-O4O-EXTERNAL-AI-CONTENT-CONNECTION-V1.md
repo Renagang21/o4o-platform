@@ -62,6 +62,7 @@ frontend 전체 타입·API 타입/컴파일·bundle, 변경 5개 웹 build, 정
 
 - [x] 최신 main merge 및 변경된 공통 소비처 재검증
 - [x] PR #766 생성, Codex 지적 2건 보완 및 43개 격리 DB 통합 검증
+- [x] 재리뷰의 동의 요청 저장 상한 보완 및 HTTP/DB 동시성 포함 46개 통합 검증
 - [ ] 최종 HEAD의 필수 CI·재리뷰·미해결 스레드 확인 후 PR merge
 - [ ] post-merge CI·Delivery 판정 및 운영 migration 실행 승인 확인
 - [ ] 표준 API 선행 배포·영향 프런트 배포·협동조합 frontend_only 배포 확인

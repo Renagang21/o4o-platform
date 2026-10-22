@@ -42,6 +42,10 @@ export const registrationLimits = {
   storedClients: 1000,
   newClientsPerHour: 100,
 };
+export const authorizationLimits = {
+  pendingTotal: 1000,
+  pendingPerClient: 100,
+};
 type Queryable = Pick<DataSource | EntityManager, "query">;
 export interface ConnectionConfig {
   issuer: URL;
@@ -286,19 +290,41 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     )
       throw new InvalidGrantError("연결 요청이 올바르지 않습니다.");
     const request = secret();
-    await this.db.query(
-      `INSERT INTO external_ai_credentials(hash,kind,client_id,data,expires_at)
-      VALUES($1,'pending',$2,$3,now()+interval '10 minutes')`,
-      [
-        tokenHash(request),
-        client.client_id,
-        {
-          ...params,
-          resource: this.resource.href,
-          scopes: this.validateScopes(params.scopes),
-        },
-      ],
-    );
+    await this.db.transaction(async (db) => {
+      await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+        "external-ai-pending-authorization",
+      ]);
+      await assertEnabled(db);
+      // Only expired, unauthenticated pending requests; consent and token rows are retained.
+      await db.query(
+        "DELETE FROM external_ai_credentials WHERE kind='pending' AND expires_at<=now()",
+      );
+      const [counts] = await db.query(
+        `SELECT count(*)::int AS total,
+        count(*) FILTER (WHERE client_id=$1)::int AS client FROM external_ai_credentials WHERE kind='pending'`,
+        [client.client_id],
+      );
+      if (
+        counts.total >= authorizationLimits.pendingTotal ||
+        counts.client >= authorizationLimits.pendingPerClient
+      )
+        throw new TooManyRequestsError(
+          "연결 요청 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
+        );
+      await db.query(
+        `INSERT INTO external_ai_credentials(hash,kind,client_id,data,expires_at)
+        VALUES($1,'pending',$2,$3,now()+interval '10 minutes')`,
+        [
+          tokenHash(request),
+          client.client_id,
+          {
+            ...params,
+            resource: this.resource.href,
+            scopes: this.validateScopes(params.scopes),
+          },
+        ],
+      );
+    });
     res.setHeader("Referrer-Policy", "no-referrer");
     const url = new URL("/external-ai/connect", this.config.webOrigin);
     url.searchParams.set("request", request);

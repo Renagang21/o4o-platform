@@ -21,7 +21,10 @@ import {
 } from "../../apps/api-server/dist/modules/external-ai/settings/settings.service.js";
 import { ForumPostController } from "../../apps/api-server/dist/controllers/forum/ForumPostController.js";
 import { defaultSettings } from "../../apps/api-server/dist/modules/external-ai/contracts.js";
-import { registrationLimits } from "../../apps/api-server/dist/modules/external-ai/auth/oauth-provider.js";
+import {
+  registrationLimits,
+  authorizationLimits,
+} from "../../apps/api-server/dist/modules/external-ai/auth/oauth-provider.js";
 
 const options = {
   type: "postgres",
@@ -806,6 +809,164 @@ async function tests(db) {
             `${prefix}%`,
           ]);
         }
+      },
+    );
+    const authorizationParams = {
+      redirectUri: config.redirectUris[0],
+      codeChallenge: randomBytes(32).toString("base64url"),
+      scopes: ["o4o:read"],
+    };
+    const responseSink = () => ({ setHeader() {}, redirect() {} });
+    await check(
+      "pending authorizations are bounded per client before persistence",
+      async () => {
+        const prefix = `fixture-pending-client-${randomUUID()}-`;
+        const before = (
+          await db.query(
+            "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending' AND client_id=$1",
+            [client.client_id],
+          )
+        )[0].n;
+        await db.query(
+          `INSERT INTO external_ai_credentials(hash,kind,client_id,expires_at)
+        SELECT $1||n,'pending',$2,now()+interval '10 minutes' FROM generate_series(1,$3::int) n`,
+          [
+            prefix,
+            client.client_id,
+            authorizationLimits.pendingPerClient - before,
+          ],
+        );
+        try {
+          await assert.rejects(
+            provider.authorize(client, authorizationParams, responseSink()),
+            { errorCode: "too_many_requests" },
+          );
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending' AND client_id=$1",
+                [client.client_id],
+              )
+            )[0].n,
+            authorizationLimits.pendingPerClient,
+          );
+          await db.query(
+            "UPDATE external_ai_credentials SET expires_at=now()-interval '1 second' WHERE hash LIKE $1",
+            [`${prefix}%`],
+          );
+          await provider.authorize(client, authorizationParams, responseSink());
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM external_ai_credentials WHERE hash LIKE $1",
+                [`${prefix}%`],
+              )
+            )[0].n,
+            0,
+          );
+        } finally {
+          await db.query(
+            "DELETE FROM external_ai_credentials WHERE hash LIKE $1",
+            [`${prefix}%`],
+          );
+        }
+      },
+    );
+    await check(
+      "pending authorization global bound survives concurrent provider requests",
+      async () => {
+        const prefix = `fixture-pending-global-${randomUUID()}-`;
+        const otherClient = (
+          await db.query(
+            "SELECT id FROM external_ai_clients WHERE id<>$1 LIMIT 1",
+            [client.client_id],
+          )
+        )[0].id;
+        const before = (
+          await db.query(
+            "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending'",
+          )
+        )[0].n;
+        await db.query(
+          `INSERT INTO external_ai_credentials(hash,kind,client_id,expires_at)
+        SELECT $1||n,'pending',$2,now()+interval '10 minutes' FROM generate_series(1,$3::int) n`,
+          [prefix, otherClient, authorizationLimits.pendingTotal - before - 1],
+        );
+        try {
+          const otherProvider = new provider.constructor(
+            db,
+            config,
+            provider.authorizeWorkspaces,
+          );
+          const results = await Promise.allSettled([
+            provider.authorize(client, authorizationParams, responseSink()),
+            otherProvider.authorize(
+              client,
+              authorizationParams,
+              responseSink(),
+            ),
+          ]);
+          assert.equal(
+            results.filter((r) => r.status === "fulfilled").length,
+            1,
+          );
+          assert.equal(
+            results.find((r) => r.status === "rejected").reason.errorCode,
+            "too_many_requests",
+          );
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending'",
+              )
+            )[0].n,
+            authorizationLimits.pendingTotal,
+          );
+        } finally {
+          await db.query(
+            "DELETE FROM external_ai_credentials WHERE hash LIKE $1",
+            [`${prefix}%`],
+          );
+        }
+      },
+    );
+    await check(
+      "SDK limits repeated authorization HTTP requests before pending persistence",
+      async () => {
+        const url = new URL("/authorize", base);
+        for (const [key, value] of Object.entries({
+          client_id: client.client_id,
+          redirect_uri: config.redirectUris[0],
+          response_type: "code",
+          code_challenge_method: "S256",
+          code_challenge: authorizationParams.codeChallenge,
+          scope: "o4o:read",
+        }))
+          url.searchParams.set(key, value);
+        let limited = false;
+        for (let i = 0; i <= 100; i++) {
+          const before = (
+            await db.query(
+              "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending'",
+            )
+          )[0].n;
+          const response = await fetch(url, { redirect: "manual" });
+          if (response.status === 429) {
+            limited = true;
+            assert.ok(response.headers.get("retry-after"));
+            assert.equal(
+              (
+                await db.query(
+                  "SELECT count(*)::int AS n FROM external_ai_credentials WHERE kind='pending'",
+                )
+              )[0].n,
+              before,
+            );
+            break;
+          }
+          assert.equal(response.status, 302);
+        }
+        assert.ok(limited);
       },
     );
     console.log(`External AI integration PASS: ${count} cases`);
