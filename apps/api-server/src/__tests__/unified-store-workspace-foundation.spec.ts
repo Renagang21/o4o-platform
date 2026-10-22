@@ -263,7 +263,7 @@ describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 
 
   it('송출 화면(TV)은 내 매장의 chrome-free 최상위 route 로 간다 — 로컬 재생 화면 없음', () => {
     expect(kpa).not.toContain('SignagePlaybackPage');
-    expect(readRepo('services/web-kpa-society/src/lib/unifiedStoreScope.ts')).toContain('signage\/play');
+    expect(readRepo('services/web-kpa-society/src/lib/unifiedStoreScope.ts')).toContain(String.raw`signage\/play`);
     expect(readRepo('services/web-store/src/App.tsx')).toContain('${S}/marketing/signage/play/:playlistId');
   });
 

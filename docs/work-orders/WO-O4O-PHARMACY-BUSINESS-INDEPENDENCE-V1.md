@@ -93,9 +93,11 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 - 계약 테스트 정렬: 삭제 파일을 읽던 api-server spec 18개 · operator-core-ui 2개 · shared-space-ui 4개를 "파일 없음 · route 없음" 단언 또는 web-store 정본 단언으로 바꿨다.
 - 검증: web-kpa-society vitest 16 files / 121 tests PASS · `tsc --noEmit` PASS · `pnpm run build` PASS · KPA 참조 api-server spec 26 suites / 682 tests PASS · operator-core-ui 20 · shared-space-ui 136 PASS. 실브라우저 smoke 미실행(배포 전).
 
+- PR #760 리뷰 대응: 삭제된 화면을 가리키는 외부 진입이 404 가 되지 않게 호환 이동을 두었다. `/operator/*` · `/admin/*` → `/operator/semi-franchises`(Neture My Home 운영 카드), `/operator/collaboration-requests` → `/operator/inbox/business/{key}`(문의 알림 · Neture 문의 화면), `/mypage/*` → `/`(회원 알림), `/guide/*` → `/`(web-store `GuideBackLink`). 원본 링크(`web-neture/lib/home-entry.ts` · `contact-request.controller.ts` · `member.controller.ts` · web-store `GuideBackLink`)의 정리는 단계 3 에서 한다.
+
 #### 이번 단계에서 발견 · 미해결 (별도 처리)
 1. **공급자 콘텐츠 handoff 대상 막다른 길** — `apps/api-server/src/modules/neture/constants/supplier-content-handoff-targets.ts` 가 `kpa-society` 를 대상으로 두고, 그 승인 큐(`/api/v1/kpa/operator/approvals`)를 보던 프런트 `/operator/approvals` 화면은 삭제됐다. 수신 화면(사업 운영 화면) 결정 후 backend 대상 목록 정비 — 단계 3.
-2. **QR 랜딩 fallback** — `QrLandingPage` 가 대상 미해결 시 `/content/:id` 로 보내는데 이 경로는 이제 404. 공개 랜딩 계약이라 이번에 바꾸지 않았다.
+2. ~~**QR 랜딩 fallback**~~ — PR #760 리뷰에서 처리: 인라인 본문이 없는 page QR 은 삭제된 `/content/:id` 로 보내지 않고 미공개 안내를 표시한다.
 3. **`VITE_UNIFIED_STORE_HANDOFF` 미사용** — 앱이 더 이상 읽지 않는다. Dockerfile · 배포 workflow 의 인자는 인프라 변경이라 남겼다(정리 WO 필요).
 4. **web-store 잘못된 origin 버그(기존)** — `services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx:347`, `StoreContentEditPage.tsx:78,144`. 이번 범위 밖.
 5. **공유 guide copy 잔재** — `packages/shared-space-ui/src/guide/copy/kpa.ts`(`kpaServiceIntroProps`) 는 소비 화면이 없어졌다. 공용 패키지 export 변경이라 남겼다.

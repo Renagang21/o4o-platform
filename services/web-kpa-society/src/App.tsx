@@ -330,6 +330,12 @@ function App() {
           <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorPage /></Layout></RoleGuard>} />
           <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
           <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          {/* 삭제된 화면을 가리키는 외부 진입(My Home 운영 카드 · 문의 알림 · 회원 알림 · 이용 방법 링크)의 호환 이동 */}
+          <Route path="/operator/collaboration-requests" element={<Navigate to={`/operator/inbox/business/${BUSINESS_SITE.key}`} replace />} />
+          <Route path="/operator/*" element={<Navigate to="/operator/semi-franchises" replace />} />
+          <Route path="/admin/*" element={<Navigate to="/operator/semi-franchises" replace />} />
+          <Route path="/mypage/*" element={<Navigate to="/" replace />} />
+          <Route path="/guide/*" element={<Navigate to="/" replace />} />
 
           {/* 내 매장 — store.neture.co.kr handoff 전용 (송출 화면 포함, web-store 가 호스팅) */}
           <Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />
