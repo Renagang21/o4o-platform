@@ -3,6 +3,7 @@
 > 상태: ACTIVE — 개발 검증·push 인계, 운영 활성화 전
 > 작성일: 2026-10-22 · 기준 main: `7dc02646dab2808258133139b3ca0714ec3cc14b`
 > Branch: `wo/external-ai-content-connection`
+> 구현 commit: `9b0067ef7a` — 원격 작업 branch push 완료. 상태 기록은 후속 문서 commit으로 인계한다.
 > [설계](../design/DESIGN-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md) · [TODO](../work-orders/TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)
 
 ## 1. 변경과 유지 범위
@@ -44,7 +45,7 @@ Zod 소스 직접 소비처는 `rg -l "from ['\"]zod['\"]" apps packages service
 | admin 전체 Vitest | 31파일, 446 PASS |
 | Neture 동의/해제·기존 MyPageHub Vitest | 3파일, 17 PASS |
 | 격리 PostgreSQL 16 통합 | 24 PASS, 공식 SDK client HTTP 왕복 포함 |
-| migration | baseline+기존 전체 prefix 일치, 새 up/빈 상태 down/up, fixture DB 제거 확인 |
+| migration | baseline+기존 전체 prefix 일치, 새 up/빈 상태 down/up, fixture DB 0개·이번 임시 컨테이너 제거 확인 |
 | 신규 schema fingerprint | `4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3`, 6838 lines |
 | frontend 전체 type-check | PASS |
 | API type-check/tsc build·main/migrate tsup | PASS |

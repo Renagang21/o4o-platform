@@ -1,6 +1,6 @@
 # TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-22
+> 상태: ACTIVE — 개발·검증·push 완료, 통합·운영 활성화 대기 · 작성일: 2026-10-22
 > 사용자 승인: 외부 AI 콘텐츠 제작 설계 전체 개발, 검증·commit·push까지. PR·병합·배포·운영 DB 적용은 이번 범위 밖.
 > 기준: main `7dc02646da`. 전용 branch `wo/external-ai-content-connection`.
 
@@ -22,7 +22,7 @@ O4O는 외부 ChatGPT 모델·구독·비용·토큰·대화 이력을 관리하
 - [x] 사용자 연결 동의·작업공간 선택·연결 해제
 - [x] MCP 실제 SDK client round-trip, 토큰/소유/중지/멱등/충돌 회귀
 - [x] 관리자·사용자 desktop/mobile 브라우저 검증, 관련 type/lint/build
-- [ ] 변경 경로·검증·미실행·운영 적용 조건을 기록하고 commit·push
+- [x] 변경 경로·검증·미실행·운영 적용 조건을 기록하고 commit·push
 
 ## 후속 적용 대상
 
@@ -40,3 +40,5 @@ O4O는 외부 ChatGPT 모델·구독·비용·토큰·대화 이력을 관리하
 현재 로컬 검증: 격리 DB 24건, API 91건, admin 446건, Neture 17건, desktop/mobile 8건 PASS.
 frontend 전체 타입, API/admin 타입·빌드, API bundle, admin/Neture production build, lint ratchet,
 정적 guard와 문서 검사를 완료했다. 실제 ChatGPT·Google 인증, PR·병합·배포·운영 DB 적용은 미실행이다.
+
+구현 commit `9b0067ef7a`를 위 작업 branch에 push했고, 인계 상태 기록을 후속 문서 commit으로 함께 보낸다.
