@@ -104,10 +104,13 @@ describe('Adoption — 서비스 wrapper 가 공통 View 를 쓴다', () => {
 });
 
 describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
-  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 /guide · /service-guide 화면을 두지 않는다(404).
-  it('KPA(pharmacy) App 에 guide · service-guide route 가 없다', () => {
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 /guide · /service-guide 화면을 두지 않는다.
+  //   남은 /guide/* 는 web-store GuideBackLink 가 404 가 되지 않게 홈으로 보내는 호환 이동 하나뿐이다.
+  it('KPA(pharmacy) App 에 guide · service-guide 화면 route 가 없다 (홈 호환 이동만)', () => {
     const src = read('services/web-kpa-society/src/App.tsx');
-    expect(src).not.toMatch(/path="\/?(service-guide|guide)(\/|")/);
+    expect(src).not.toMatch(/path="\/?service-guide(\/|")/);
+    const guideRoutes = src.match(/<Route path="\/?guide[^"]*"[^\n]*/g) ?? [];
+    expect(guideRoutes).toEqual(['<Route path="/guide/*" element={<Navigate to="/" replace />} />']);
   });
 
   it('Neture 의 /guide 는 자체 landing 을 유지한다 (redirect 로 덮지 않는다)', () => {

@@ -102,6 +102,8 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 4. **web-store 잘못된 origin 버그(기존)** — `services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx:347`, `StoreContentEditPage.tsx:78,144`. 이번 범위 밖.
 5. **공유 guide copy 잔재** — `packages/shared-space-ui/src/guide/copy/kpa.ts`(`kpaServiceIntroProps`) 는 소비 화면이 없어졌다. 공용 패키지 export 변경이라 남겼다.
 6. **`/api/v1/kpa/*` backend** — 프런트 소비처가 줄었으므로 route 별 소비처 분석(`me-context` 포함) 후 pharmacy 쪽 경로 정리 — 단계 3.
+7. **web-store 이벤트 오퍼 상품 링크(기존)** — `services/web-store/src/components/event-offer/EventOfferContentPanel.tsx:379` 의 `/event-offers/:id` 는 web-store route 표에 없다. 운영은 이미 handoff(`VITE_UNIFIED_STORE_HANDOFF=true`)로 web-store 를 서빙하고 있었으므로 이번 변경 전부터 있던 web-store 결함 — web-store 상세 목적지 결정 후 별도 WO.
+8. sitemap 은 남은 공개 주소(`/` · `/contact`)만 두도록 이번에 정리했다.
 
 ### 단계 5 — 테스트 데이터 정리
 - 운영 DB read-only 로 `kpa-society` 범위 테스트 데이터 건수를 집계한다. 삭제는 운영 write 라 건별 사용자 승인 후 실행한다.
