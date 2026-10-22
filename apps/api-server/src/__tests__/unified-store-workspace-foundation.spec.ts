@@ -267,16 +267,11 @@ describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 
     expect(readRepo('services/web-store/src/App.tsx')).toContain('${S}/marketing/signage/play/:playlistId');
   });
 
-  it("pharmacy 배포만 handoff를 활성화하고 PH는 기본 false를 보존한다", () => {
-    for (const svc of ['web-kpa-society']) {
-      const df = readRepo(`services/${svc}/Dockerfile`);
-      expect(df).toContain(`ARG VITE_UNIFIED_STORE_HANDOFF=${svc === 'web-kpa-society' ? 'true' : 'false'}`);
-      expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
-    }
-    const wf = readRepo('.github/workflows/deploy-web-services.yml');
-    expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
-    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length ?? 0).toBe(0);
-    expect(wf).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
+  // handoff 가 무조건이 되어 활성화 build 입력은 Dockerfile · 배포 workflow · 타입 선언에서 제거됐다.
+  it('handoff 활성화 build 입력(VITE_UNIFIED_STORE_HANDOFF)이 남아 있지 않다', () => {
+    expect(readRepo('services/web-kpa-society/Dockerfile')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('services/web-kpa-society/src/vite-env.d.ts')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('.github/workflows/deploy-web-services.yml')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
   });
 
   it('handoff 발급은 같은 POST /auth/handoff 의 targetWorkspace=store 분기다 (신규 엔드포인트 0 · 가짜 serviceKey 0)', () => {

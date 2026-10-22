@@ -39,8 +39,10 @@ describe('Supplier → Service Operator handoff targets (WO §10)', () => {
     }
   });
 
-  it('kpa-society 만 대상이다 — 운영 종료된 K-Cosmetics · PharmacyHub 는 제외', () => {
-    expect(keys).toEqual(['kpa-society']);
+  it('수신(승인) 화면이 있는 서비스가 없어 대상이 비어 있다 — kpa-society 는 수신 화면 제거로 제외 (D7)', () => {
+    expect(keys).toEqual([]);
+    expect(keys).not.toContain('kpa-society');
+    expect(getSupplierContentHandoffTarget('kpa-society')).toBeUndefined();
     expect(keys).not.toContain('pharmacy-hub');
     expect(keys).not.toContain('k-cosmetics');
   });
@@ -64,7 +66,6 @@ describe('Supplier → Service Operator handoff targets (WO §10)', () => {
     expect(toCmsServiceKey('kpa-society')).toBe('kpa');
     expect(toCmsServiceKey('k-cosmetics')).toBe('k-cosmetics');
     expect(toCmsServiceKey('pharmacy-hub')).toBe('pharmacy-hub');
-    expect(getSupplierContentHandoffTarget('kpa-society')!.cmsServiceKey).toBe('kpa');
   });
 });
 

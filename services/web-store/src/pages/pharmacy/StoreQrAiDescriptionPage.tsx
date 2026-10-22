@@ -29,6 +29,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 import { Sparkles, ArrowLeft, QrCode, ExternalLink, Trash2, Plus } from 'lucide-react';
 import { RichTextEditor, ContentRenderer, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
@@ -341,10 +342,10 @@ export default function StoreQrAiDescriptionPage() {
     }
   }, [editContentId, editorContent, title, productName, cornerName, aiMeta]);
 
-  // 공개 QR 페이지는 웹 호스트(현재 origin)의 /qr/:slug 라우트(QrLandingPage)에서 렌더된다 — API 호스트 아님.
+  // 공개 QR 페이지는 서비스 앱의 /qr/:slug 라우트(QrLandingPage)에서 렌더된다 — store 호스트 · API 호스트 아님.
   const publicSlug = createdSlug || editQrSlug;
   const publicUrl = useMemo(
-    () => (publicSlug ? `${window.location.origin}/qr/${publicSlug}` : ''),
+    () => (publicSlug ? `${getActiveServicePublicOrigin()}/qr/${publicSlug}` : ''),
     [publicSlug],
   );
 
