@@ -1,6 +1,6 @@
 # CHECK-O4O-SUPPLIER-BUSINESS-CLOSEOUT-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22
 > **근거**: [공급자 업무 마감 WO](../work-orders/WO-O4O-SUPPLIER-BUSINESS-CLOSEOUT-V1.md)
 > **기준**: main `7dc02646da`, branch `wo/supplier-business-closeout`
@@ -59,6 +59,6 @@ API 첫 회 실행에서 전용 URL/port 미지정인 3 suites·41 tests는 skip
 ## 정리·Git 인계
 
 - 격리 review schema 잔존 0. 표준 왕복 DB 삭제 0건 잔존 확인. 이후 이번 전용 PostgreSQL을 정지하고 자체 cluster 디렉터리 전체를 제거해 나머지 합성 업무 자료도 남기지 않았다. 기존 공용 DB/서버는 변경하지 않았다.
-- 브라우저 context 종료. production preview는 최종 검증 후 정지한다. 합성 스크린샷·요약/실행 로그는 저장소 밖 `/workspace/artifacts/supplier-business-closeout` 및 `/tmp/supplier-closeout-*`에 보관한다.
-- commit/push 후 SHA·원격 일치 결과를 기록한다. PR·원격 CI/Sonar·main 통합·배포는 이번 사용자 범위 밖이다.
+- 브라우저 context 종료. production preview도 최종 검증 후 정지했다. 합성 스크린샷·요약/실행 로그는 저장소 밖 `/workspace/artifacts/supplier-business-closeout` 및 `/tmp/supplier-closeout-*`에 보관한다.
+- 구현 `18e2bf82df28e71a36448f0e327d734eca028fd3` push 및 원격 일치를 확인했다. 기준 main과 push 직전 main은 `7dc02646da`로 동일하다. 마감 기록의 최종 SHA는 완료 보고에서 확인한다. PR·원격 CI/Sonar·main 통합·배포는 이번 사용자 범위 밖이다.
 - 작업공간은 KEEP: main 미통합이며 검토·후속 수정 인계에 필요하다.

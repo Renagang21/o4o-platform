@@ -1,6 +1,6 @@
 # WO-O4O-SUPPLIER-BUSINESS-CLOSEOUT-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22
 > **근거**: 사용자 — AI 제외 공급자 업무 마감 정비를 한 단위로 구현·검증하고 push까지
 > **기준**: main `7dc02646da`. PR·병합·배포·운영 DB/업무 쓰기는 제외한다.
@@ -13,7 +13,7 @@
 - [x] 등록·게시·제안·콘텐츠 상태/동선과 주문·배송·재고·정산 계약을 회귀 검증한다.
 - [x] 개인·법인 및 세금계산서 정보 저장·조회 계약을 확인한다. 실제 발행 연동은 별도 결정이다.
 - [x] 현재 메뉴·검증 상태와 문서 차이를 새 실행 기록에서 정리한다. 과거 기록·FROZEN 본문·canonical index는 재작성하지 않는다.
-- [ ] 관련 단위·DB·화면·빌드·격리 브라우저 검증 후 명시적 파일만 commit·push한다.
+- [x] 관련 단위·DB·화면·빌드·격리 브라우저 검증 후 명시적 파일만 commit·push한다.
 
 ## 유지할 경계
 
@@ -30,3 +30,7 @@ AI 변경, 전체 협업체 공통 정책, 대상 약국의 협업체 active 가
 ## 검증·인계
 
 [CHECK](../checks/CHECK-O4O-SUPPLIER-BUSINESS-CLOSEOUT-V1.md) 및 [현행 업무 안내](../guides/SUPPLIER-BUSINESS-WORKFLOW-CURRENT-V1.md)를 참조한다. 운영 업무 쓰기·실제 승인·세금계산서 발행 연동은 이번 완료 범위가 아니다.
+
+## Git 인계 완료
+
+구현 `18e2bf82df28e71a36448f0e327d734eca028fd3`를 원격 `wo/supplier-business-closeout`에 push하고 일치를 확인했다. push 직전 main은 `7dc02646da`로 기준과 동일했다. 이 마감 기록의 최종 commit/원격 SHA는 완료 보고에서 확인한다. PR·CI/Sonar·main 통합·배포는 미실행이다. 작업공간은 후속 인계용 KEEP이다.
