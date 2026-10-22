@@ -114,29 +114,104 @@ export const getAiManagement = () => get("/ai/admin/management", snapshot);
 export const getAiRecordedUsage = (days: 7 | 30 | 90) =>
   get(`/ai/admin/management/usage?days=${days}`, usage);
 
-const modelProvider = z.enum(['gemini', 'openai', 'claude', 'qwen', 'deepseek']);
-const managedModel = z.object({ provider: modelProvider, id: z.string(), name: z.string(), capabilities: z.array(z.enum(['text', 'image', 'grounding', 'speech'])) });
+const modelProvider = z.enum([
+  "gemini",
+  "openai",
+  "claude",
+  "qwen",
+  "deepseek",
+]);
+const managedModel = z.object({
+  provider: modelProvider,
+  id: z.string(),
+  name: z.string(),
+  capabilities: z.array(z.enum(["text", "image", "grounding", "speech"])),
+});
 const selection = z.object({ provider: modelProvider, model: z.string() });
 const modelControls = z.object({
   revision: z.number().int().nonnegative().safe(),
-  models: z.array(managedModel), deleted: z.array(z.string()),
+  models: z.array(managedModel),
+  deleted: z.array(z.string()),
   selections: z.record(selection),
-  targets: z.array(z.object({ id: z.string(), name: z.string(), providers: z.array(modelProvider), capability: z.enum(['text', 'image', 'grounding', 'speech']) })),
+  targets: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      providers: z.array(modelProvider),
+      capability: z.enum(["text", "image", "grounding", "speech"]),
+    }),
+  ),
   usageTargets: z.record(z.string()),
   protectedModels: z.array(z.string()),
+  modelReferences: z
+    .record(
+      z.array(
+        z.object({
+          kind: z.enum(["usage", "policy", "runtime"]),
+          label: z.string(),
+          target: z.string().optional(),
+        }),
+      ),
+    )
+    .default({}),
 });
 export type AiModelControls = z.infer<typeof modelControls>;
 export type ManagedAiModel = z.infer<typeof managedModel>;
 export type AiModelSelection = z.infer<typeof selection>;
-const modelBase = '/ai/admin/management';
-export const getAiModelControls = () => get(modelBase + '/models', modelControls);
-async function writeModelControl(action: () => Promise<{ data: unknown }>): Promise<AiModelControls> {
+const modelBase = "/ai/admin/management";
+export const getAiModelControls = () =>
+  get(modelBase + "/models", modelControls);
+async function writeModelControl(
+  action: () => Promise<{ data: unknown }>,
+): Promise<AiModelControls> {
   const response = await action();
-  const parsed = z.object({ success: z.literal(true), data: modelControls }).safeParse(response.data);
-  if (!parsed.success) throw new Error('저장 응답을 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.');
+  const parsed = z
+    .object({ success: z.literal(true), data: modelControls })
+    .safeParse(response.data);
+  if (!parsed.success)
+    throw new Error(
+      "저장 응답을 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.",
+    );
   return parsed.data.data;
 }
-export const createAiModel = (model: ManagedAiModel, revision: number) => writeModelControl(() => unifiedApi.raw.post(modelBase + '/models', { model, revision }));
-export const updateAiModel = (previous: ManagedAiModel, model: ManagedAiModel, revision: number) => writeModelControl(() => unifiedApi.raw.put(modelBase + '/models/' + encodeURIComponent(previous.provider) + '/' + encodeURIComponent(previous.id), { model, revision }));
-export const deleteAiModel = (model: ManagedAiModel, revision: number) => writeModelControl(() => unifiedApi.raw.delete(modelBase + '/models/' + encodeURIComponent(model.provider) + '/' + encodeURIComponent(model.id), { data: { revision } }));
-export const selectAiModel = (target: string, selection: AiModelSelection | null, revision: number) => writeModelControl(() => unifiedApi.raw.put(modelBase + '/model-selections/' + encodeURIComponent(target), { selection, revision }));
+export const createAiModel = (model: ManagedAiModel, revision: number) =>
+  writeModelControl(() =>
+    unifiedApi.raw.post(modelBase + "/models", { model, revision }),
+  );
+export const updateAiModel = (
+  previous: ManagedAiModel,
+  model: ManagedAiModel,
+  revision: number,
+) =>
+  writeModelControl(() =>
+    unifiedApi.raw.put(
+      modelBase +
+        "/models/" +
+        encodeURIComponent(previous.provider) +
+        "/" +
+        encodeURIComponent(previous.id),
+      { model, revision },
+    ),
+  );
+export const deleteAiModel = (model: ManagedAiModel, revision: number) =>
+  writeModelControl(() =>
+    unifiedApi.raw.delete(
+      modelBase +
+        "/models/" +
+        encodeURIComponent(model.provider) +
+        "/" +
+        encodeURIComponent(model.id),
+      { data: { revision } },
+    ),
+  );
+export const selectAiModel = (
+  target: string,
+  selection: AiModelSelection | null,
+  revision: number,
+) =>
+  writeModelControl(() =>
+    unifiedApi.raw.put(
+      modelBase + "/model-selections/" + encodeURIComponent(target),
+      { selection, revision },
+    ),
+  );
