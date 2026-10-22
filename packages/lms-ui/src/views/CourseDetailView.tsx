@@ -42,6 +42,7 @@ export interface CourseDetailSlotContext {
   lessons: LmsLessonData[];
   enrollment: LmsEnrollmentData | null;
   reload: () => void;
+  enrollmentIneligible?: boolean;
 }
 
 export interface CourseDetailViewProps {
@@ -79,6 +80,7 @@ export function CourseDetailView({
   const requestId = useRef(0);
   const [lessonsError, setLessonsError] = useState<string | null>(null);
   const [enrollmentError, setEnrollmentError] = useState(false);
+  const [enrollmentIneligible, setEnrollmentIneligible] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
 
   const requireLogin = useCallback(() => {
@@ -90,7 +92,7 @@ export function CourseDetailView({
     const current = ++requestId.current;
     setLoading(true); setError(null); setNeedLogin(false);
     setCourse(null); setLessons([]); setEnrollment(null);
-    setLessonsError(null); setEnrollmentError(false);
+    setLessonsError(null); setEnrollmentError(false); setEnrollmentIneligible(false);
     try {
       const courseData = await port.getCourse(courseId);
       const [outline, registration] = await Promise.allSettled([
@@ -107,7 +109,13 @@ export function CourseDetailView({
           : '목차를 불러오지 못했습니다. 다시 시도해 주세요.');
       }
       if (registration.status === 'fulfilled') setEnrollment(registration.value);
-      else setEnrollmentError(true);
+      else {
+        const reason = registration.reason;
+        const code = reason?.response?.data?.code;
+        if (reason?.response?.status === 403 && ['MEMBERSHIP_NOT_FOUND', 'MEMBERSHIP_NOT_ACTIVE'].includes(code)) {
+          setEnrollmentIneligible(true);
+        } else setEnrollmentError(true);
+      }
     } catch (err) {
       if (current !== requestId.current) return;
       if (isMembersOnlyError(err)) setNeedLogin(true);
@@ -183,7 +191,7 @@ export function CourseDetailView({
     );
   }
 
-  const slotCtx: CourseDetailSlotContext = { course, lessons, enrollment, reload: () => void loadData() };
+  const slotCtx: CourseDetailSlotContext = { course, lessons, enrollment, enrollmentIneligible, reload: () => void loadData() };
   const isArchived = course.status === 'archived';
   const completedIds = enrollment?.completedLessonIds ?? [];
   const firstLessonId = lessons[0]?.id ?? '';
@@ -346,6 +354,11 @@ export function CourseDetailView({
                     {enrollment.status === 'completed' && certificateCta}
                   </>
                 )}
+              </div>
+            ) : enrollmentIneligible ? (
+              <div role="status">
+                <p>강의 서비스 이용 자격이 필요합니다. 공개 강의와 목차는 계속 확인할 수 있습니다.</p>
+                {config.enrollmentInquiryPath && <NavLink to={config.enrollmentInquiryPath} navigate={config.navigate} style={primaryButtonStyle(accent)}>이용 문의</NavLink>}
               </div>
             ) : enrollment ? (
               enrollment.status === 'pending' ? (

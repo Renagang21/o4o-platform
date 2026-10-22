@@ -43,7 +43,7 @@
 | 검증 | 결과 | 범위·한계 |
 |---|---|---|
 | frozen install 및 build:packages | 통과 | Node 22.18.0·pnpm 10.25.0; 새 worktree 자체 설치·산출물 |
-| Lecture Vitest | 63/63 통과 (15 files) | 목록·오류 복구·거부·bookmark·계정 전환·자료·전문 정보·수료증·문의·기존 운영 UI |
+| Lecture Vitest | 66/66 통과 (15 files) | 목록·오류 복구·거부·bookmark·계정 전환·자료·전문 정보·수료증·문의·기존 운영 UI |
 | API Jest 선택 10 suite | 296/296 통과 | 새 공개 목차·bookmark 경계, 기존 enrollment/certificate 소유권·교차서비스·수료증 체인·rate-limit·Phase2 검토/승인 계약·목록 공통 UI |
 | lms-ui type-check | 통과 | 공통 패키지 |
 | lecture-web build | 통과 | tsc -b + Vite; 번들 크기·Browserslist 데이터 경고는 남음 |
@@ -85,3 +85,7 @@ Docker와 같은 `npm install --omit=dev --ignore-scripts`를 별도 임시 디�
 ### Codex 후속 리뷰 — pause/ended 저장 큐
 
 PR 리뷰에서 주기적 저장 요청이 진행 중일 때 pause/ended의 강제 저장이 버려질 수 있음을 확인했다. 강제 저장을 한 건 대기시키고 앞 요청 완료 뒤 최신 video 위치를 다시 읽어 저장하도록 수정했다. 여러 강제 이벤트는 마지막 위치로 합치며, 폐기된 계정 인스턴스의 큐는 실행하지 않는다. in-flight·pause·ended 순서와 계정 전환 중 대기 요청 폐기 회귀 2건을 추가했고 Lecture Vitest 총 63건, 공통 타입 검사·프런트 빌드·focused ESLint가 통과했다.
+
+### Codex 후속 리뷰 — 미가입·비활성 회원의 공개 상세
+
+공개 강의는 볼 수 있지만 Lecture membership이 없거나 비활성인 로그인 사용자의 수강 조회는 정상적으로 403을 반환한다. 이 경우 `MEMBERSHIP_NOT_FOUND`·`MEMBERSHIP_NOT_ACTIVE` 코드만 이용 자격 안내·문의 링크로 표시하도록 보완했다. 공개 목차는 유지하고 수강 신청·약관 신청 UI는 노출하지 않는다. 기타 403·네트워크·서버 오류는 기존처럼 재시도 가능한 조회 실패로 유지한다. 서버 guard는 변경하지 않았다. 두 정상 membership 거부 코드와 일반 403 회귀 3건을 추가했고 총 66건이 통과했다.

@@ -256,6 +256,8 @@ export interface LmsViewConfig {
   isAuthenticated: boolean;
   /** Changes invalidate account-specific loaded state. */
   accountId?: string;
+  /** Inquiry destination when the enrollment API reports an inactive/missing service membership. */
+  enrollmentInquiryPath?: string;
   /** 로그인 유도. 미지정 시 `/login` 으로 navigate. */
   onRequireLogin?: () => void;
   /** SPA 네비게이션(react-router `useNavigate` 등). */

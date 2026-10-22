@@ -14,7 +14,7 @@
 
 강의 상세와 목차는 서로 독립적으로 조회된다. `GET /api/v1/lms/courses/:id?includeCurriculum=true`는 **기존 강의 조회의 service·게시 상태·visibility·membership 판정 이후** 발행된 레슨의 `id`, `title`, `type`, `order`, `duration`만 `data.curriculum`에 제공한다(최대 1,000개). 본문·영상 URL·첨부·정답·미리보기 flag는 포함하지 않는다. 회원 전용 강의를 익명에게 공개하는 API가 아니다. 일반 강의 조회는 목차 조회에 의존하지 않는다.
 
-공통 UI의 optional `getCurriculum` port가 없으면 기존 `getLessons` port를 쓴다. 목차 조회 거부·일시적 실패·빈 결과를 구분하며 실패 시 다시 조회한다. 수강 정보 조회 실패를 미수강으로 취급해 새 신청을 유도하지 않는다. 승인 대기·반려 등록은 목차의 학습 링크를 열지 않는다. 레슨·본문 API의 기존 guard는 유지된다.
+공통 UI의 optional `getCurriculum` port가 없으면 기존 `getLessons` port를 쓴다. 목차 조회 거부·일시적 실패·빈 결과를 구분하며 실패 시 다시 조회한다. 수강 정보 조회 실패를 미수강으로 취급해 새 신청을 유도하지 않는다. 서버가 명시한 미가입·비활성 membership의 403은 이용 자격 안내·문의 링크를 표시하며, 다른 403·일시적 장애와 구분한다. 승인 대기·반려 등록은 목차의 학습 링크를 열지 않는다. 레슨·본문 API의 기존 guard는 유지된다.
 
 ## 전문 강의 작성과 검토
 

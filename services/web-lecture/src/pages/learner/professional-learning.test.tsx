@@ -71,3 +71,17 @@ it('does not make pending enrollment curriculum rows navigable', async () => {
  render(<CourseDetailView courseId="course" port={port({ getEnrollment: vi.fn(async () => ({ status: 'pending', progress: 0, completedLessonIds: [] })) })} config={{ ...config, isAuthenticated: true }} />);
  expect(await screen.findByText('승인 대기 중')).toBeTruthy(); expect(screen.queryByRole('link', { name: /공개 목차/ })).toBeNull();
 });
+
+it.each(['MEMBERSHIP_NOT_FOUND', 'MEMBERSHIP_NOT_ACTIVE'])('shows eligibility/inquiry for expected membership denial %s', async code => {
+ const api = port({ getEnrollment: vi.fn().mockRejectedValue({ response: { status: 403, data: { code } } }) });
+ render(<CourseDetailView courseId="course" port={api} config={{ ...config, isAuthenticated: true, enrollmentInquiryPath: '/contact' }} />);
+ expect(await screen.findByText('강의 서비스 이용 자격이 필요합니다. 공개 강의와 목차는 계속 확인할 수 있습니다.')).toBeTruthy();
+ expect(screen.getByText('공개 목차')).toBeTruthy();
+ expect(screen.getByRole('link', { name: '이용 문의' }).getAttribute('href')).toBe('/contact');
+ expect(screen.queryByRole('button', { name: '수강 신청하기' })).toBeNull();
+ expect(screen.queryByRole('button', { name: '다시 시도' })).toBeNull();
+});
+it('keeps unexpected 403 enrollment failures retryable', async () => {
+ render(<CourseDetailView courseId="course" port={port({ getEnrollment: vi.fn().mockRejectedValue({ response: { status: 403, data: { code: 'OTHER_DENIAL' } } }) })} config={{ ...config, isAuthenticated: true }} />);
+ expect(await screen.findByText('수강 정보를 확인하지 못했습니다.')).toBeTruthy(); expect(screen.getByRole('button', { name: '다시 시도' })).toBeTruthy();
+});

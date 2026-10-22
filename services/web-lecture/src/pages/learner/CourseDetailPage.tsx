@@ -28,7 +28,7 @@ export default function CourseDetailPage() {
       courseId={courseId}
       port={port}
       config={config}
-      renderAfterCourseCard={({ enrollment, course }) => <><ProfessionalInfoSummary value={course.professionalInfo} />{config.isAuthenticated && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}</>}
+      renderAfterCourseCard={({ enrollment, course, enrollmentIneligible }) => <><ProfessionalInfoSummary value={course.professionalInfo} />{config.isAuthenticated && !enrollmentIneligible && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}</>}
       renderDescription={(course) => course.description ? <ContentRenderer html={course.description} /> : null}
     />
   </main>;
