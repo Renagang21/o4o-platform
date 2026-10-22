@@ -1,6 +1,6 @@
 # 내 매장 일상 업무·대시보드 상태 보완 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (한국시간)
 > **근거**: 미흡점 조사 후 사용자 지시 — TODO 작성·문서/코드 대조·계획 보완·개발·검증·commit·push
 > **종료점**: 전용 branch push 후 인계. PR 생성·main 병합·배포 제외.
@@ -53,4 +53,4 @@
 - [x] 결합 상태의 frozen 설치·Store 전체 회귀/build·관련 API 회귀/타입/build·집중 lint 실행.
 - [x] 실제 컴포넌트+합성 API의 desktop/mobile 주요 흐름 재검증, 전용 서버/브라우저 종료 확인.
 - [x] 최신 코드와 CHECK의 소비처/검증 기준을 맞추고 결과·미검증 경계 기록.
-- [ ] 문서 정합·민감정보·정확한 stage 범위 점검 후 같은 branch push, 원격 HEAD 일치·clean 확인.
+- [x] 문서 정합·민감정보·정확한 stage 범위 점검 후 같은 branch push, 원격 HEAD 일치·clean 확인 (`0b0fa24eb2`). 완료 상태 기록도 같은 branch에 push하며 최종 HEAD는 완료 보고에서 인계.

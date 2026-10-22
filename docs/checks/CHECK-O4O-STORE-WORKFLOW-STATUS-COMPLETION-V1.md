@@ -82,8 +82,8 @@ KPA 기존 홈/wrapper는 이 최신 main에서 제거됐다. 앞선 역방향 �
 
 브라우저 첫 시도는 개발 서버 첫 진입의 12초 제한 초과로 검사 0건에서 중단됐다. 서버 HTTP 200과 build 종료를 확인한 뒤 동일 검사로 재실행하여 40건을 통과했다. 앱 코드·검사 조건·제한 시간은 바꾸지 않았다. 최초 실패 로그/결과도 별도 보존한다. 최종 검사의 page error·외부/미처리 합성 API·페이지 가로 넘침은 0이며, PC 상담과 모바일 QR 배치 이미지를 다시 직접 확인했다.
 
-후속 로그는 기존 증적 폴더의 `continuation-*`, 브라우저 최종 결과는 기존 `results.json`이다. 이전 결과는 `results-before-main-combination.json`, 최초 제한 시간 초과 결과는 `results-initial-cold-start-timeout.json`으로 보존했다. 검사 브라우저를 종료하고 이번 전용 Vite 프로세스를 종료했다. 전용 포트 종료를 확인한 뒤 push한다.
+후속 로그는 기존 증적 폴더의 `continuation-*`, 브라우저 최종 결과는 기존 `results.json`이다. 이전 결과는 `results-before-main-combination.json`, 최초 제한 시간 초과 결과는 `results-initial-cold-start-timeout.json`으로 보존했다. 검사 브라우저와 이번 전용 Vite 프로세스를 종료하고 전용 포트 종료를 확인했다.
 
-실제 계정·DB·기기·운영 변경 및 AI 이력 계약은 계속 미실행 범위다. PR·PR CI·main 병합·배포도 실행하지 않는다. 후속 결합과 검증 기록을 동일 branch에 push하고 원격 HEAD/clean을 확인하여 최종 제출 HEAD를 인계한다.
+실제 계정·DB·기기·운영 변경 및 AI 이력 계약은 계속 미실행 범위다. PR·PR CI·main 병합·배포도 미실행이다. 후속 결합과 검증 기록 `0b0fa24eb23dc46318a693af529b2a4b3ff1347b`를 동일 branch에 push하고 원격 HEAD 일치·clean을 확인했다. TODO 완료 상태 기록도 같은 branch에 push하며 최종 제출 HEAD는 완료 보고에서 인계한다. worktree는 통합 검토/수정 재현을 위해 KEEP한다.
 
 문서 정합(동일 WO 후속): TODO·CHECK 2개에 최신 main 결합 기준·현행 소비처·재검증 결과를 맞췄다. 기존 설계 계약은 유지하며 별도 정책·정본 색인 변경은 없다.
