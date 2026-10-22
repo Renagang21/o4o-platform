@@ -3,7 +3,7 @@ import { PolicyAcceptanceError } from './policy-acceptance.service.js';
 import { readCurrentPolicyDocument, recordPublishedPolicyEvidence, type CurrentPolicyDocument, type PolicyEvidence, type PolicyReference } from './policy-document-evidence.service.js';
 
 export interface EnrollmentPolicyReference extends PolicyReference { documentType: 'terms' | 'privacy' }
-export const ENROLLMENT_POLICY_SERVICES: ReadonlySet<string> = new Set(['supplier', 'kpa-society', 'community', 'funding', 'lecture']);
+export const ENROLLMENT_POLICY_SERVICES: ReadonlySet<string> = new Set(['supplier', 'kpa-society', 'community', 'funding', 'lecture', 'carepharm']);
 
 export function isEnrollmentPolicySlug(serviceKey: string, documentType: string, slug: unknown): boolean {
   return ENROLLMENT_POLICY_SERVICES.has(serviceKey) && ['terms', 'privacy'].includes(documentType) && slug === `${serviceKey}-service-${documentType}`;
@@ -13,7 +13,7 @@ export async function getEnrollmentPolicies(q: Pick<EntityManager, 'query'>, ser
   if (!ENROLLMENT_POLICY_SERVICES.has(serviceKey)) throw new PolicyAcceptanceError('UNKNOWN_SERVICE', '지원하지 않는 서비스입니다.', 404);
   const docs = await Promise.all(['terms', 'privacy'].map(type => readCurrentPolicyDocument(q, serviceKey, type as 'terms' | 'privacy')));
   const marked = docs.filter((doc): doc is CurrentPolicyDocument => !!doc && isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug));
-  if (marked.length && (marked.length !== 2 || Number(marked[0].version) < 2 || marked[0].version !== marked[1].version)) {
+  if ((serviceKey === 'carepharm' || marked.length > 0) && (marked.length !== 2 || Number(marked[0].version) < 2 || marked[0].version !== marked[1].version)) {
     throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '서비스 약관과 개인정보 안내를 함께 준비하고 있습니다. 잠시 후 다시 확인해 주세요.', 503);
   }
   return marked;

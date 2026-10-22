@@ -11,7 +11,7 @@ function harness(documents = [doc, privacy]) {
     return [];
   }); return { query, writes };
 }
-it.each(['supplier', 'community', 'funding', 'kpa-society', 'lecture'])('%s only records published documents for its explicit application', async service => {
+it.each(['supplier', 'community', 'funding', 'kpa-society', 'lecture', 'carepharm'])('%s only records published documents for its explicit application', async service => {
   const h = harness([doc, privacy].map(d => ({ ...d, service_key: service, slug: `${service}-service-${d.document_type}` })));
   const policies = await recordEnrollmentPolicies(h, 'user', service, refs);
   expect(policies[0].serviceKey).toBe(service); expect(h.writes).toHaveLength(2);
@@ -37,3 +37,5 @@ it.each(['neture', 'store', 'admin', 'arbitrary'])('does not accept a workspace/
 it('does not reinterpret old published integrated terms as a new application policy', async () => { const h = harness([{ ...doc, slug: 'legacy-integrated-terms' }]); expect(await getEnrollmentPolicies(h, 'supplier')).toEqual([]); expect(await recordEnrollmentPolicies(h, 'user', 'supplier', undefined)).toEqual([]); expect(h.writes).toHaveLength(0); });
 
 it.each([{ documents: [doc] }, { documents: [privacy] }, { documents: [doc, { ...privacy, version: 3 }] }])('blocks partial or mismatched policy sets without any evidence: %j', async ({ documents }) => { const h = harness(documents); await expect(recordEnrollmentPolicies(h, 'user', 'supplier', refs)).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE'); expect(h.writes).toHaveLength(0); });
+
+it('CarePharm does not have a legacy no-policy application fallback', async () => { const h=harness([]);await expect(getEnrollmentPolicies(h, 'carepharm')).rejects.toHaveProperty('code','POLICY_UNAVAILABLE');expect(h.writes).toHaveLength(0); });

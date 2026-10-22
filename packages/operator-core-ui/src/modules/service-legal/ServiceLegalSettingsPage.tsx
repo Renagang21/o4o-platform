@@ -123,7 +123,7 @@ function fmtDate(iso: string | null | undefined): string {
   try { return new Date(iso).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
 
-export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }: ServiceLegalSettingsPageProps) {
+export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs, newPolicyVersion = 1 }: ServiceLegalSettingsPageProps) {
   // WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: 일부 서비스는 정책문서 탭을 숨긴다(법정정보만).
   const allowedTabs: TabKey[] = enabledTabs && enabledTabs.length > 0 ? enabledTabs : ALL_TABS;
   const showProfile = allowedTabs.includes('profile');
@@ -144,7 +144,7 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
   const [policies, setPolicies] = useState<ServicePolicyDocumentDto[]>([]);
   const [policiesLoading, setPoliciesLoading] = useState(true);
   const [editing, setEditing] = useState<ServicePolicyDocumentDto | 'new' | null>(null);
-  const [docForm, setDocForm] = useState<ServicePolicyDocumentInput>({ documentType: 'terms', title: '', content: '', version: 1 });
+  const [docForm, setDocForm] = useState<ServicePolicyDocumentInput>({ documentType: 'terms', title: '', content: '', version: newPolicyVersion });
   const [docSaving, setDocSaving] = useState(false);
 
   const loadProfile = useCallback(async () => {
@@ -204,7 +204,7 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
   };
 
   const openNewDoc = () => {
-    setDocForm({ documentType: 'terms', title: '', content: '', version: 1, effectiveDate: null, changeReason: '' });
+    setDocForm({ documentType: 'terms', title: '', content: '', version: newPolicyVersion, effectiveDate: null, changeReason: '' });
     setEditing('new');
   };
   const openEditDoc = (d: ServicePolicyDocumentDto) => {

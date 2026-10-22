@@ -9,7 +9,7 @@ import { NetureBottomNav } from '../NetureBottomNav';
 const MENU: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
   dashboard: [{ label: 'CarePharm 운영 홈', path: '/operator', exact: true }],
   approvals: [{ label: '가입 · 공급 제안 · 콘텐츠', path: '/operator/semi-franchises' }],
-  content: [{ label: '홈 · 공개 공지', path: '/operator/home-presentation/carepharm', exact: true }],
+  content: [{ label: '홈 · 공개 공지', path: '/operator/home-presentation/carepharm', exact: true }, { label: '약관 · 법정정보', path: '/operator/legal/carepharm', exact: true }],
   forum: [{ label: '회원 커뮤니티 운영', path: '/communities/business%3Acarepharm/forum' }],
 };
 
@@ -19,7 +19,7 @@ export default function CarePharmOperatorLayout() {
   if (pathname !== location.pathname) return <Navigate to={{ pathname, search: location.search, hash: location.hash }} replace />;
   if (pathname === '/operator') return <Navigate to="/operator/semi-franchises?key=carepharm&tab=memberships" replace />;
   // Do not mount a representative-site console or issue its requests on this business host.
-  if (pathname !== '/operator/home-presentation/carepharm' && pathname !== '/operator/semi-franchises' && !pathname.startsWith('/operator/semi-franchises/')) {
+  if (pathname !== '/operator/legal/carepharm' && pathname !== '/operator/home-presentation/carepharm' && pathname !== '/operator/semi-franchises' && !pathname.startsWith('/operator/semi-franchises/')) {
     return <Navigate to="/operator" replace />;
   }
   return <>

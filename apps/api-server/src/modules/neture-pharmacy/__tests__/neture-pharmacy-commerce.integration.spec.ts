@@ -1,3 +1,12 @@
+import express from 'express';
+import request from 'supertest';
+import { createAdminServiceLegalController } from '../../service-legal/admin-service-legal.controller.js';
+import { createPublicServiceLegalController } from '../../service-legal/public-service-legal.controller.js';
+import { ServicePolicyDocument } from '../../service-legal/entities/ServicePolicyDocument.entity.js';
+import { ServiceLegalProfile } from '../../service-legal/entities/ServiceLegalProfile.entity.js';
+import { computePolicyContentHash } from '../../policy-acceptance/policy-acceptance.service.js';
+// Authentication is a test boundary; all business/role/policy authorization below uses the real database.
+jest.mock('../../../middleware/auth.middleware.js', () => ({ authenticate: (_req: unknown, _res: unknown, next: () => void) => next() }));
 import { eventIndexState, transitionEventIndex } from '../operations/event-index-transition.js';
 import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoard } from '../../../services/community/community-workspace.service.js';
 /**
@@ -682,41 +691,41 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await ds.query(`UPDATE semi_franchises SET payment_receiver_key = NULL WHERE key IN ('pharmacy', $1)`, [yKey]);
 
       // 결제
-      const prep = await payments.prepare(member.owner, yGroup.paymentGroupId);
+      const prep = await payments.prepare(member.owner, member.orgId, yGroup.paymentGroupId);
       expect(prep.amount).toBe(50000);
-      const again = await payments.prepare(member.owner, yGroup.paymentGroupId);
+      const again = await payments.prepare(member.owner, member.orgId, yGroup.paymentGroupId);
       expect(again).toMatchObject({ paymentId: prep.paymentId, reused: true }); // 중복 준비 재사용
 
       // 다른 묶음의 결제로 이 묶음을 완료할 수 없다
       const otherGroup = result.paymentGroups.find((g) => g !== yGroup)!;
-      const otherPrep = await payments.prepare(member.owner, otherGroup.paymentGroupId);
-      await expect(payments.confirm(member.owner, { paymentId: otherPrep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
+      const otherPrep = await payments.prepare(member.owner, member.orgId, otherGroup.paymentGroupId);
+      await expect(payments.confirm(member.owner, member.orgId, { paymentId: otherPrep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
         .rejects.toMatchObject({ code: 'PAYMENT_NOT_FOUND' });
       // 다른 구매자는 확인할 수 없다
-      await expect(payments.confirm(outsider.owner, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
+      await expect(payments.confirm(outsider.owner, outsider.orgId, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
         .rejects.toMatchObject({ httpStatus: 404 });
       // 준비 후 금액이 바뀌면 거부
       await ds.query(`UPDATE checkout_orders SET "totalAmount" = "totalAmount" + 1 WHERE id = $1`, [yGroup.orderIds[0]]);
-      await expect(payments.confirm(member.owner, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
+      await expect(payments.confirm(member.owner, member.orgId, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId }))
         .rejects.toMatchObject({ code: 'AMOUNT_MISMATCH' });
       await ds.query(`UPDATE checkout_orders SET "totalAmount" = "totalAmount" - 1 WHERE id = $1`, [yGroup.orderIds[0]]);
 
-      const ok = await payments.confirm(member.owner, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId });
+      const ok = await payments.confirm(member.owner, member.orgId, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId });
       expect(ok).toMatchObject({ status: 'PAID', alreadyPaid: false, testPayment: true });
-      const dup = await payments.confirm(member.owner, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId });
+      const dup = await payments.confirm(member.owner, member.orgId, { paymentId: prep.paymentId, paymentGroupId: yGroup.paymentGroupId });
       expect(dup.alreadyPaid).toBe(true);
       expect(bridged.filter((id) => id === yGroup.orderIds[0])).toHaveLength(1); // 공급자 전달 1회
       const [paid] = await ds.query(`SELECT status::text, "paymentStatus"::text AS ps, metadata FROM checkout_orders WHERE id = $1`, [yGroup.orderIds[0]]);
       expect(paid).toMatchObject({ status: 'paid', ps: 'paid' });
       expect(paid.metadata.testPayment).toBe(true);
-      await expect(payments.prepare(member.owner, yGroup.paymentGroupId)).rejects.toMatchObject({ code: 'ALREADY_PAID' });
+      await expect(payments.prepare(member.owner, member.orgId, yGroup.paymentGroupId)).rejects.toMatchObject({ code: 'ALREADY_PAID' });
     });
 
     it('live 모드 · 미설정 production 은 결제를 준비하지 않는다(키 부재를 성공으로 처리하지 않음)', async () => {
       const live = new PharmacyPaymentService(ds, bridger, () => 'live');
-      await expect(live.prepare(randomUUID(), randomUUID())).rejects.toMatchObject({ code: 'PAYMENT_PROVIDER_NOT_SELECTED' });
+      await expect(live.prepare(randomUUID(), randomUUID(), randomUUID())).rejects.toMatchObject({ code: 'PAYMENT_PROVIDER_NOT_SELECTED' });
       const disabled = new PharmacyPaymentService(ds, bridger, () => 'disabled');
-      await expect(disabled.prepare(randomUUID(), randomUUID())).rejects.toMatchObject({ code: 'PAYMENT_NOT_CONFIGURED' });
+      await expect(disabled.prepare(randomUUID(), randomUUID(), randomUUID())).rejects.toMatchObject({ code: 'PAYMENT_NOT_CONFIGURED' });
     });
 
     it('이벤트: 장바구니 주문이 매장 한도 집계에 잡히고(D3), 결제 전 취소가 수량을 복원하며, 재고 부족은 차단된다', async () => {
@@ -791,4 +800,190 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(r.failedItems[0].code).toBe('SUPPLY_OPTION_NOT_AVAILABLE');
     });
   });
+  describe('CarePharm 가입 → 공급 승인 → 선택 약국 결제 경계', () => {
+    let care: Awaited<ReturnType<SemiFranchiseService['getByKey']>>;
+    let careOperator: string;
+    let references: Array<{ policyDocumentId: string; version: number; documentType: 'terms' | 'privacy' }>;
+    beforeAll(async () => {
+      careOperator = await user(); await role(careOperator, 'neture:carepharm_admin');
+      await sfs.create({ key: 'carepharm', name: 'Synthetic Care business' });
+      care = await sfs.getByKey('carepharm');
+      references = [];
+      for (const type of ['terms', 'privacy'] as const) {
+        const [doc] = await ds.query(`INSERT INTO service_policy_documents(service_key,document_type,title,content,slug,version,status,effective_date,published_at)
+          VALUES('carepharm',$1,$2,$3,$4,2,'published',CURRENT_DATE,NOW()) RETURNING id`, [type,`Synthetic ${type}`,`Synthetic exact ${type} body`,`carepharm-service-${type}`]);
+        references.push({ policyDocumentId: doc.id, version: 2, documentType: type });
+      }
+    });
+    async function member() {
+      const store = await approvedPharmacy();
+      const application = await sfs.apply(store.orgId, store.owner, 'carepharm', { acceptedConditions: true, policyReferences: references });
+      await sfs.decideMembership(care!, careOperator, application.id, 'approve');
+      return { ...store, businessMembershipId: application.id };
+    }
+    async function order() {
+      const pharmacy = await member();
+      const product = await supplierWithProduct({ price: 12000, stock: 2, track: true });
+      const proposal = await proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 9000 });
+      await proposals.operatorDecide(care!, careOperator, proposal.id, 'approve');
+      await cart.add(pharmacy.owner, pharmacy.orgId, { kind: 'proposal', id: proposal.id, quantity: 2 });
+      const checked = await cart.checkout(pharmacy.owner, pharmacy.orgId);
+      expect(checked.failedItems).toEqual([]);
+      return { ...pharmacy, ...product, proposal, group: checked.paymentGroups[0], orderId: checked.createdOrders[0].orderId };
+    }
+    it('requires CarePharm documents and never borrows pharmacy/another service consent', async () => {
+      const pharmacy = await approvedPharmacy();
+      await ds.query("UPDATE service_policy_documents SET status='draft' WHERE service_key='carepharm'");
+      try { await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm')).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE'); }
+      finally { await ds.query("UPDATE service_policy_documents SET status='published' WHERE id=ANY($1::uuid[])", [references.map(r => r.policyDocumentId)]); }
+      await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm')).rejects.toHaveProperty('code', 'ENROLLMENT_POLICY_REQUIRED');
+      await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm', { policyReferences: references.map(r => ({ ...r, version: 1 })) })).rejects.toHaveProperty('code', 'POLICY_VERSION_MISMATCH');
+      expect(await ds.query('SELECT 1 FROM semi_franchise_memberships WHERE semi_franchise_id=$1 AND organization_id=$2', [care!.id, pharmacy.orgId])).toEqual([]);
+      expect(await ds.query("SELECT 1 FROM user_policy_acceptances WHERE user_id=$1 AND service_key='carepharm'", [pharmacy.owner])).toEqual([]);
+    });
+    it('stores exact version/hash and application evidence without requiring pharmacy cooperation membership', async () => {
+      const pharmacy = await member();
+      const [stored] = await ds.query("SELECT metadata->'semiFranchiseApplications'->'carepharm' AS application FROM organizations WHERE id=$1", [pharmacy.orgId]);
+      expect(stored.application.applicationPolicies).toEqual(expect.arrayContaining([expect.objectContaining({ serviceKey: 'carepharm', version: 2, contentHash: computePolicyContentHash('Synthetic exact terms body'), acceptanceKind: 'agreement' })]));
+      expect(await ds.query("SELECT 1 FROM semi_franchise_memberships sfm JOIN semi_franchises sf ON sf.id=sfm.semi_franchise_id WHERE sfm.organization_id=$1 AND sf.key='pharmacy'", [pharmacy.orgId])).toEqual([]);
+      expect((await ds.query("SELECT meta FROM action_logs WHERE user_id=$1 AND service_key='carepharm' AND action_key='service:application_policy'", [pharmacy.owner]))).toHaveLength(1);
+    });
+    it.each([null, 'pending', 'rejected', 'suspended', 'terminated'])('rejects a designated pharmacy with CarePharm membership %s', async status => {
+      const pharmacy = await approvedPharmacy(); const product = await supplierWithProduct({ price: 10000 });
+      await joinSemiFranchise(pharmacy.orgId, pharmacy.owner, 'pharmacy', pharmacyOperator);
+      if (status) await ds.query('INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status,applied_by) VALUES($1,$2,$3,$4)', [care!.id, pharmacy.orgId, status, pharmacy.owner]);
+      await expect(proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 8000 })).rejects.toHaveProperty('code', 'TARGET_MEMBERSHIP_REQUIRED');
+      expect(await ds.query('SELECT 1 FROM supply_proposals WHERE offer_id=$1', [product.offerId])).toEqual([]);
+    });
+    it('does not let staff or an unrelated actor apply or withdraw for a pharmacy', async () => {
+      const f=await member();const staff=await user();await role(staff,'kpa:store_member');
+      await ds.query("INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'staff')",[f.orgId,staff]);
+      await expect(sfs.apply(f.orgId,staff,'carepharm',{policyReferences:references})).rejects.toHaveProperty('code','BUSINESS_APPLICANT_REQUIRED');
+      await expect(sfs.withdraw(f.orgId,staff,'carepharm')).rejects.toHaveProperty('code','BUSINESS_APPLICANT_REQUIRED');
+      await expect(sfs.withdraw(f.orgId,await user(),'carepharm')).rejects.toHaveProperty('code','BUSINESS_APPLICANT_REQUIRED');
+      expect((await ds.query('SELECT status FROM semi_franchise_memberships WHERE id=$1',[f.businessMembershipId]))[0].status).toBe('active');
+    });
+    it('rechecks a target that withdrew after the request, preserving the pending proposal', async () => {
+      const pharmacy = await member(); const product = await supplierWithProduct({ price: 10000 });
+      const proposal = await proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 8000 });
+      await sfs.withdraw(pharmacy.orgId, pharmacy.owner, 'carepharm');
+      await expect(proposals.operatorDecide(care!, careOperator, proposal.id, 'approve')).rejects.toHaveProperty('code', 'TARGET_MEMBERSHIP_REQUIRED');
+      expect((await ds.query('SELECT status,decided_by FROM supply_proposals WHERE id=$1', [proposal.id]))[0]).toEqual({ status: 'pending', decided_by: null });
+    });
+    it.each(['suspended', 'terminated'])('blocks payment preparation after business membership becomes %s', async status => {
+      const f = await order();
+      await ds.query('UPDATE semi_franchise_memberships SET status=$2 WHERE id=$1', [f.businessMembershipId,status]);
+      await expect(payments.prepare(f.owner,f.orgId,f.group.paymentGroupId)).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
+      expect(await ds.query('SELECT 1 FROM o4o_payments WHERE "orderId"=$1',[f.group.paymentGroupId])).toEqual([]);
+    });
+    it('blocks confirmation after proposal termination without marking payment/order paid', async () => {
+      const f=await order(); const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      await proposals.operatorDecide(care!,careOperator,f.proposal.id,'end');
+      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
+      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+      expect((await ds.query('SELECT "paymentStatus" FROM checkout_orders WHERE id=$1',[f.orderId]))[0].paymentStatus).toBe('pending');
+      expect(bridged).not.toContain(f.orderId);
+    });
+    it.each(['business','offer','supplier','pharmacy'])('rejects confirmation after %s is disabled', async what => {
+      const f=await order();const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      if(what==='business')await ds.query("UPDATE semi_franchises SET status='closed' WHERE id=$1",[care!.id]);
+      if(what==='offer')await ds.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1',[f.offerId]);
+      if(what==='supplier')await ds.query("UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1",[f.supplierId]);
+      if(what==='pharmacy')await ds.query("UPDATE neture_pharmacy_memberships SET status='suspended' WHERE organization_id=$1",[f.orgId]);
+      try {await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code',what==='pharmacy'?'STORE_ACCESS_REQUIRED':'PAYMENT_SUPPLY_NOT_AVAILABLE');}
+      finally {if(what==='business')await ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care!.id]);}
+      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+    });
+    it('rechecks membership between preparation and confirmation', async () => {
+      const f=await order();const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      await sfs.decideMembership(care!,careOperator,f.businessMembershipId,'suspend');
+      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
+      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+    });
+    it('preserves approved staff payment access and checks current staff role on confirmation', async () => {
+      const f=await order();const staff=await user();await role(staff,'kpa:store_member');
+      await ds.query("INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'staff')",[f.orgId,staff]);
+      await cart.add(staff,f.orgId,{kind:'proposal',id:f.proposal.id,quantity:1});
+      const checked=await cart.checkout(staff,f.orgId);const group=checked.paymentGroups[0];
+      const prepared=await payments.prepare(staff,f.orgId,group.paymentGroupId);
+      await ds.query("UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='kpa:store_member'",[staff]);
+      await expect(payments.confirm(staff,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:group.paymentGroupId})).rejects.toHaveProperty('code','STORE_ACCESS_REQUIRED');
+      await ds.query("UPDATE role_assignments SET is_active=true WHERE user_id=$1 AND role='kpa:store_member'",[staff]);
+      expect(await payments.confirm(staff,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:group.paymentGroupId})).toMatchObject({status:'PAID'});
+    });
+    it('binds a payment group to the selected pharmacy and current actor relationship', async () => {
+      const f=await order(), other=await approvedPharmacy();
+      await ds.query("INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'owner')",[other.orgId,f.owner]);
+      await expect(payments.prepare(f.owner,other.orgId,f.group.paymentGroupId)).rejects.toHaveProperty('code','PAYMENT_GROUP_NOT_FOUND');
+      await expect(payments.prepare(other.owner,f.orgId,f.group.paymentGroupId)).rejects.toHaveProperty('code','PAYMENT_GROUP_NOT_FOUND');
+      await ds.query('UPDATE organization_members SET left_at=NOW() WHERE user_id=$1 AND organization_id=$2',[f.owner,f.orgId]);
+      await expect(payments.prepare(f.owner,f.orgId,f.group.paymentGroupId)).rejects.toHaveProperty('code','STORE_ACCESS_REQUIRED');
+    });
+    it('preserves frozen price/shipping and a paid retry after source withdrawal, without reserving stock twice', async () => {
+      const f=await order();
+      // The lightweight creator does not reserve inventory; reproduce an already-reserved order explicitly.
+      await ds.query('UPDATE supplier_product_offers SET reserved_quantity=stock_quantity WHERE id=$1',[f.offerId]);
+      await ds.query('UPDATE supplier_product_offers SET price_general=99999 WHERE id=$1',[f.offerId]);
+      await ds.query('UPDATE neture_suppliers SET base_shipping_fee=9900 WHERE id=$1',[f.supplierId]);
+      const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      expect(prepared.amount).toBe(21000);
+      const paid=await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId});
+      expect(paid).toMatchObject({status:'PAID',alreadyPaid:false,testPayment:true});
+      await proposals.operatorDecide(care!,careOperator,f.proposal.id,'end');
+      await sfs.withdraw(f.orgId,f.owner,'carepharm');
+      expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).toMatchObject({status:'PAID',alreadyPaid:true});
+      expect(bridged.filter(id=>id===f.orderId)).toHaveLength(1);
+      expect((await ds.query('SELECT reserved_quantity FROM supplier_product_offers WHERE id=$1',[f.offerId]))[0].reserved_quantity).toBe(2);
+    });
+    it('waits for an in-flight proposal termination and refuses a stale confirmation', async () => {
+      const f=await order(); const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      const writer=ds.createQueryRunner();await writer.connect();await writer.startTransaction();
+      let result: Promise<unknown>|undefined;
+      try {
+        await writer.query("UPDATE supply_proposals SET status='ended' WHERE id=$1",[f.proposal.id]);
+        result=payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId}).then(()=>({success:true}),error=>({code:error.code}));
+        let blocked=false;
+        for(let i=0;i<100;i++){blocked=(await writer.query("SELECT 1 FROM pg_locks WHERE NOT granted")).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10));}
+        expect(blocked).toBe(true);await writer.commitTransaction();
+        expect(await result).toEqual({code:'PAYMENT_SUPPLY_NOT_AVAILABLE'});
+        expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+      } finally {if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result;}
+    });
+    it('uses real legal controllers and current business roles for policy publication and stale-form rejection', async () => {
+      const legalDs=new DataSource({type:'postgres',url:DB_URL,entities:[ServicePolicyDocument,ServiceLegalProfile],synchronize:false});await legalDs.initialize();
+      const app=express();app.use(express.json());app.use((req,_res,next)=>{(req as any).user={id:req.get('X-Fixture-Actor'),roles:['neture:carepharm_admin']};next();});
+      app.use('/admin/services',createAdminServiceLegalController(legalDs));app.use('/public/services',createPublicServiceLegalController(legalDs));
+      const endpoint='/admin/services/carepharm/policies';const other=await user();await role(other,'neture:megapharm_admin');
+      const reader=await user();await role(reader,'neture:carepharm_operator');
+      try {
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',reader)).status).toBe(200);
+        expect((await request(app).post(endpoint).set('X-Fixture-Actor',reader).send({documentType:'terms',title:'Unauthorized'})).status).toBe(403);
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',other)).status).toBe(403);
+        const central=await user();await role(central,'neture:admin');
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(403);
+        await sfs.assignOperator('carepharm',central,operatorId);
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(200);
+        await ds.query("UPDATE semi_franchises SET status='closed' WHERE id=$1",[care!.id]);
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(403);
+        await ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care!.id]);
+        const current=references;
+        for(const type of ['privacy','terms'] as const){
+          const created=await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:type,title:`Synthetic revised ${type}`,content:`Revised ${type}`,version:3,effectiveDate:'2026-01-01'});
+          expect(created.status).toBe(201);
+          expect(created.body.data.slug).toBe(`carepharm-service-${type}`);
+          expect((await request(app).patch(`${endpoint}/${created.body.data.id}/publish`).set('X-Fixture-Actor',careOperator).send({action:'publish'})).status).toBe(200);
+        }
+        expect((await request(app).get('/public/services/carepharm/enrollment-policies')).body.data).toHaveLength(2);
+        expect((await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:'terms',title:'Invalid old version',version:1})).status).toBe(400);
+        expect((await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:'terms',title:'Invalid marker',slug:'neture-service-terms',version:4})).status).toBe(400);
+        const pharmacy=await approvedPharmacy();
+        await expect(sfs.apply(pharmacy.orgId,pharmacy.owner,'carepharm',{policyReferences:current})).rejects.toHaveProperty('code','POLICY_VERSION_MISMATCH');
+        const old=current[0];
+        expect((await request(app).put(`${endpoint}/${old.policyDocumentId}`).set('X-Fixture-Actor',careOperator).send({content:'Changed historic agreement'})).status).toBe(409);
+        await ds.query('UPDATE role_assignments SET is_active=false WHERE user_id=$1',[careOperator]);
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',careOperator)).status).toBe(403);
+      } finally {await legalDs.destroy();}
+    });
+  });
+
 });

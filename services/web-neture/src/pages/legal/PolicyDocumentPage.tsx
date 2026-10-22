@@ -32,10 +32,10 @@ export async function loadPolicy(serviceKey: string, documentType: string): Prom
   }
 }
 
-export function TermsPage() {
-  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="terms" heading="이용약관" loadPolicy={loadPolicy} /></>;
+export function TermsPage({ serviceKey = SERVICE_KEY }: { serviceKey?: string }) {
+  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={serviceKey} documentType="terms" heading={serviceKey === 'carepharm' ? 'CarePharm 서비스 이용약관' : '이용약관'} loadPolicy={loadPolicy} /></>;
 }
 
-export function PrivacyPage() {
-  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="privacy" heading="개인정보처리방침" loadPolicy={loadPolicy} /></>;
+export function PrivacyPage({ serviceKey = SERVICE_KEY }: { serviceKey?: string }) {
+  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={serviceKey} documentType="privacy" heading={serviceKey === 'carepharm' ? 'CarePharm 개인정보처리방침' : '개인정보처리방침'} loadPolicy={loadPolicy} /></>;
 }

@@ -23,6 +23,7 @@ function mount(path: string) {
     <Route path="/operator" element={<p>대표 대시보드</p>} />
     <Route path="/operator/semi-franchises" element={<Business />} />
     <Route path="/operator/home-presentation/carepharm" element={<HomeEditor />} />
+    <Route path="/operator/legal/carepharm" element={<p>CarePharm 약관 편집</p>} />
     <Route path="/operator/members" element={<p>전체 회원 조회</p>} />
   </Route></Routes></MemoryRouter>);
 }
@@ -50,4 +51,10 @@ it('canonicalizes the editor trailing slash without losing query or hash', async
   await screen.findByText('CarePharm 홈 편집');
   expect(screen.getByLabelText('현재 편집 주소').textContent).toBe('/operator/home-presentation/carepharm?draft=1#preview');
   expect(screen.queryByText('사업 업무?key=carepharm&tab=memberships')).toBeNull();
+});
+it('mounts its own legal editor without redirecting to the representative console', () => {
+  mount('/operator/legal/carepharm');
+  expect(screen.getByText('CarePharm 약관 편집')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '약관 · 법정정보' }).getAttribute('href')).toBe('/operator/legal/carepharm');
+  expect(screen.queryByText('대표 대시보드')).toBeNull();
 });

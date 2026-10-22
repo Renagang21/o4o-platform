@@ -12,6 +12,8 @@
  */
 
 import type { RequestHandler } from 'express';
+import type { DataSource } from 'typeorm';
+import { requireCarePharmLegalScope } from './carepharm-legal-access.js';
 import {
   NETURE_SCOPE_CONFIG,
   KPA_SCOPE_CONFIG,
@@ -28,8 +30,9 @@ import { COMMUNITY_SCOPE_CONFIG } from '../../middleware/community-service-scope
 import { FUNDING_SCOPE_CONFIG } from '../../middleware/funding-service-scope.middleware.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 
-/** 본 기능이 관리하는 canonical serviceKey (service-catalog 기준). */
+/** Existing service keys plus the CarePharm business legal namespace; authentication catalog is unchanged. */
 export const SUPPORTED_LEGAL_SERVICE_KEYS = [
+  'carepharm',
   'neture',
   'kpa-society',
   'k-cosmetics',
@@ -74,7 +77,8 @@ export function isSupportedPolicyDocumentType(t: string): boolean {
  * role prefix 는 config.serviceKey (kpa / cosmetics / neture) 이며
  * 실제 role 은 `${prefix}:admin` · `${prefix}:operator` 형태다.
  */
-const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = {
+type StandardLegalServiceKey = Exclude<LegalServiceKey, 'carepharm'>;
+const CONFIG_BY_SERVICE_KEY: Record<StandardLegalServiceKey, ServiceScopeGuardConfig> = {
   neture: NETURE_SCOPE_CONFIG,
   'kpa-society': KPA_SCOPE_CONFIG,
   'k-cosmetics': COSMETICS_SCOPE_CONFIG,
@@ -85,14 +89,14 @@ const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = 
 };
 
 const GUARD_BY_SERVICE_KEY: Record<
-  LegalServiceKey,
+  StandardLegalServiceKey,
   { requireScope: (scope: string) => RequestHandler; rolePrefix: string }
 > = Object.fromEntries(
-  (SUPPORTED_LEGAL_SERVICE_KEYS as readonly LegalServiceKey[]).map((sk) => {
+  (Object.keys(CONFIG_BY_SERVICE_KEY) as StandardLegalServiceKey[]).map((sk) => {
     const config = CONFIG_BY_SERVICE_KEY[sk];
     return [sk, { requireScope: createMembershipScopeGuard(config), rolePrefix: config.serviceKey }];
   }),
-) as Record<LegalServiceKey, { requireScope: (scope: string) => RequestHandler; rolePrefix: string }>;
+) as Record<StandardLegalServiceKey, { requireScope: (scope: string) => RequestHandler; rolePrefix: string }>;
 
 /**
  * `:serviceKey` path param 기준으로 `${prefix}:${level}` scope 를 검사하는 미들웨어.
@@ -100,7 +104,7 @@ const GUARD_BY_SERVICE_KEY: Record<
  *
  * @param level 'admin'(write) | 'operator'(read). scopeRoleMapping 에 의해 admin ⊃ operator.
  */
-export function requireServiceLegalScope(level: 'admin' | 'operator'): RequestHandler {
+export function requireServiceLegalScope(level: 'admin' | 'operator', dataSource?: DataSource): RequestHandler {
   return (req, res, next) => {
     const serviceKey = req.params.serviceKey;
     if (!serviceKey || !isSupportedLegalServiceKey(serviceKey)) {
@@ -109,6 +113,10 @@ export function requireServiceLegalScope(level: 'admin' | 'operator'): RequestHa
         error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' },
       });
       return;
+    }
+    if (serviceKey === 'carepharm') {
+      if (!dataSource) return res.status(503).json({ success: false, error: { code: 'SCOPE_UNAVAILABLE', message: '사업 운영 권한을 확인할 수 없습니다.' } });
+      return requireCarePharmLegalScope(dataSource, level)(req, res, next);
     }
     const guard = GUARD_BY_SERVICE_KEY[serviceKey];
     const scope = `${guard.rolePrefix}:${level}`;
