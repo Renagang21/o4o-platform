@@ -64,3 +64,5 @@ CI 전체 회귀 보완: 첫 전체 실행에서 관리자 guard 인벤토리 2�
 관련 handoff/세션/로그아웃 128 PASS(이번 실행의 별도 PostgreSQL opt-in 21건은 미실행, 앞선 SQL 21 PASS는 유지), API 타입 PASS. 새 양성 2건·교차 Origin 거절 5건을 추가했다. 동일 WO의 후속 PR에서 최종 CI·병합·배포를 함께 추적한다.
 
 후속 PR #763의 전체 회귀에서 기존 소스 표현을 직접 고정한 service-logout-auth-boundary 1건이 실패했다. Origin을 지역 변수로 추출한 현재 코드에서도 그 값이 req.get(origin)에서 오고 본문이 세션 범위를 정하지 않는다는 두 단언으로 갱신했다. 원래 보안 조건과 런타임 교차 Origin 거절은 유지한다. 관련 경계/로그아웃 38 PASS 후 CI를 다시 실행한다.
+
+공통 UI 소비처 CSS 검증: 협동조합의 기존 Tailwind 스캔 범위에는 새로 소비하는 법정정보·약관 설정 및 테이블/메뉴 스타일이 빠져 있었다. operator-core-ui/operator-ux-core/shared-space-ui/ui 패키지를 스캔하도록 정렬했다. production CSS에서 약관 페이지 폭·본문 편집 높이·테두리·저장 버튼 선택자 생성을 확인했다. 협동조합 build·70개 테스트 PASS, 협동조합 테마의 PC/390px 브라우저 74개 PASS 및 저장 버튼의 실제 표시를 재확인했다.
