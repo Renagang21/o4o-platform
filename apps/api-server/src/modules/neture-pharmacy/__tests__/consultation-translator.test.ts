@@ -13,7 +13,7 @@ const input = { text: 'Private original utterance', source: 'ko' as const, targe
 const access = () => ({ actorId: 'actor', organizationId: 'store', authorize: jest.fn(async () => true) });
 it('reuses existing policy and actor quota while recording only execution metadata', async () => {
   expect(await createConsultationTranslator({} as any)(input, access())).toEqual({ translation: 'Private translated utterance' });
-  expect(execute).toHaveBeenCalledWith('CONTENT_TRANSLATION', expect.any(String), expect.any(String), expect.objectContaining({ userId: 'actor', temperature: 0 }));
+  expect(execute).toHaveBeenCalledWith('CONTENT_TRANSLATION', expect.any(String), expect.any(String), expect.objectContaining({ userId: 'actor', temperature: 0, usage: 'pharmacy.consultation' }));
   const recorded = JSON.stringify((logger.info as jest.Mock).mock.calls);
   expect(recorded).not.toContain('Private');
   expect(recorded).toContain('provider-completed');

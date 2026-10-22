@@ -43,7 +43,7 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
       }, {
         invoke: async (prompt, context) => {
           const response = await policy.execute('CONTENT_TRANSLATION', prompt.systemPrompt, prompt.userPrompt,
-            { maxTokens: 2048, temperature: 0, responseMode: 'json', userId: context.actorId });
+            { maxTokens: 2048, temperature: 0, responseMode: 'json', userId: context.actorId, usage: 'pharmacy.consultation' });
           return { ...response, provider: response.provider ?? 'unknown' };
         },
       }, { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });

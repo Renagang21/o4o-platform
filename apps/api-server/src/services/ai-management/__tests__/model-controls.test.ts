@@ -385,3 +385,287 @@ it("explicitly rejects registered non-text models while preserving unknown-model
   );
   expect(await isGeminiModelAllowed(db as any, "gemini-2.0-flash")).toBe(false);
 });
+
+it.each<[string, string, string[], string]>([
+  ["gemini", "gemini-2.5-pro", ["work.planning.strong"], "image"],
+  ["openai", "gpt-5-mini", ["admin.blocks"], "text"],
+  [
+    "openai",
+    "gpt-4o-mini",
+    ["lms.quiz", "lms.assignment", "operator.actions"],
+    "text",
+  ],
+  ["openai", "gpt-4o-mini-tts", ["audio.synthesis.openai"], "speech"],
+  [
+    "gemini",
+    "gemini-3.1-flash-tts-preview",
+    ["audio.synthesis.gemini"],
+    "speech",
+  ],
+  ["claude", "claude-sonnet-4.5", ["admin.blocks"], "text"],
+])(
+  "releases %s:%s only after all managed default consumers change, and refuses to restore its deleted fallback",
+  async (provider, id, targets, capability) => {
+    const { db } = fixture();
+    const service = new ModelControlService(db);
+    const replacement = {
+      provider,
+      id: "replacement-fixture",
+      name: "Synthetic replacement",
+      capabilities: [capability],
+    } as any;
+    let state = await service.change(0, actor, {
+      action: "create",
+      model: replacement,
+    });
+    const key = provider + ":" + id;
+    expect(state.modelReferences[key].map((x) => x.target)).toEqual(targets);
+    for (const target of targets as string[]) {
+      await expect(
+        service.change(state.revision, actor, {
+          action: "delete",
+          provider,
+          id,
+        }),
+      ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+      state = await service.change(state.revision, actor, {
+        action: "select",
+        target,
+        selection: { provider: provider as any, model: replacement.id },
+      });
+    }
+    expect(state.protectedModels).not.toContain(key);
+    expect(state.modelReferences[key]).toBeUndefined();
+    state = await service.change(state.revision, actor, {
+      action: "delete",
+      provider,
+      id,
+    });
+    const fresh = new ModelControlService(db);
+    expect(
+      (await fresh.snapshot()).models.some(
+        (x) => x.provider === provider && x.id === id,
+      ),
+    ).toBe(false);
+    for (const target of targets as string[]) {
+      expect(
+        await fresh.resolve(target, { provider: provider as any, model: id }),
+      ).toMatchObject({ model: replacement.id, managed: true });
+      await expect(
+        fresh.change(state.revision, actor, {
+          action: "select",
+          target,
+          selection: null,
+        }),
+      ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
+      expect((await fresh.snapshot()).revision).toBe(state.revision);
+    }
+  },
+);
+
+it("does not treat an old whitelist entry as a runtime default, but retains DB policy protection", async () => {
+  const f = fixture();
+  const service = new ModelControlService(f.db);
+  expect((await service.snapshot()).protectedModels).not.toContain(
+    "gemini:gemini-2.5-flash",
+  );
+  f.references.push({ provider: "gemini", model: "gemini-2.5-flash" });
+  expect(
+    (await service.snapshot()).modelReferences["gemini:gemini-2.5-flash"][0]
+      .kind,
+  ).toBe("policy");
+  await expect(
+    service.change(0, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.5-flash",
+    }),
+  ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+  f.references.length = 0;
+  await service.change(0, actor, {
+    action: "delete",
+    provider: "gemini",
+    id: "gemini-2.5-flash",
+  });
+  expect(await service.allows("gemini", "gemini-2.5-flash")).toBe(false);
+});
+
+it("retains environment and configured fallback references after a managed override", async () => {
+  const previous = process.env.AI_STRONG_MODEL;
+  process.env.AI_STRONG_MODEL = "gemini-2.5-pro";
+  try {
+    const f = fixture();
+    const service = new ModelControlService(f.db);
+    let state = await service.change(0, actor, {
+      action: "select",
+      target: "work.planning.strong",
+      selection: { provider: "gemini", model: "gemini-3.8-flash" },
+    });
+    expect(
+      state.modelReferences["gemini:gemini-2.5-pro"].some(
+        (x) => x.kind === "runtime",
+      ),
+    ).toBe(true);
+    await expect(
+      service.change(state.revision, actor, {
+        action: "delete",
+        provider: "gemini",
+        id: "gemini-2.5-pro",
+      }),
+    ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+    delete process.env.AI_STRONG_MODEL;
+    f.references.push({ provider: "gemini", model: "gemini-2.5-pro" });
+    await expect(
+      service.change(state.revision, actor, {
+        action: "delete",
+        provider: "gemini",
+        id: "gemini-2.5-pro",
+      }),
+    ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+    f.references.length = 0;
+    state = await service.change(state.revision, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.5-pro",
+    });
+    expect(state.deleted).toContain("gemini:gemini-2.5-pro");
+  } finally {
+    if (previous === undefined) delete process.env.AI_STRONG_MODEL;
+    else process.env.AI_STRONG_MODEL = previous;
+  }
+});
+
+it("preserves an existing shared translation selection on read, then lets each usage change independently", async () => {
+  const f = fixture();
+  const service = new ModelControlService(f.db);
+  const initial = await service.read();
+  f.corrupt({
+    ...initial,
+    selections: {
+      "policy.CONTENT_TRANSLATION": {
+        provider: "gemini",
+        model: "gemini-2.5-flash",
+      },
+    },
+  });
+  const state = await service.snapshot();
+  expect(state.selections["store.translation"]).toEqual(
+    state.selections["pharmacy.consultation"],
+  );
+  expect(f.value.selections["policy.CONTENT_TRANSLATION"]).toBeDefined(); // GET did not write.
+  await service.change(state.revision, actor, {
+    action: "select",
+    target: "pharmacy.consultation",
+    selection: { provider: "gemini", model: "gemini-2.0-flash" },
+  });
+  expect(
+    await service.resolve("store.translation", {
+      provider: "gemini",
+      model: "old-code-model",
+    }),
+  ).toMatchObject({ model: "gemini-2.5-flash" });
+  expect(
+    await service.resolve("pharmacy.consultation", {
+      provider: "gemini",
+      model: "old-code-model",
+    }),
+  ).toMatchObject({ model: "gemini-2.0-flash" });
+  expect(f.value.selections["policy.CONTENT_TRANSLATION"]).toBeUndefined();
+});
+
+it("releases a legacy scope primary and fallback only after every consuming usage is overridden", async () => {
+  const f = fixture();
+  f.references.push(
+    {
+      provider: "gemini",
+      model: "gemini-2.0-flash",
+      source: "scope",
+      scope: "CONTENT_TRANSLATION",
+    },
+    {
+      provider: "openai",
+      model: "gpt-4.1",
+      source: "scope",
+      scope: "CONTENT_TRANSLATION",
+    },
+  );
+  const service = new ModelControlService(f.db);
+  let state = await service.change(0, actor, {
+    action: "select",
+    target: "store.translation",
+    selection: { provider: "gemini", model: "gemini-3.8-flash" },
+  });
+  expect(state.protectedModels).toEqual(
+    expect.arrayContaining(["gemini:gemini-2.0-flash", "openai:gpt-4.1"]),
+  );
+  state = await service.change(state.revision, actor, {
+    action: "select",
+    target: "pharmacy.consultation",
+    selection: { provider: "gemini", model: "gemini-3.8-flash" },
+  });
+  expect(state.protectedModels).not.toContain("gemini:gemini-2.0-flash");
+  expect(state.protectedModels).not.toContain("openai:gpt-4.1");
+  state = await service.change(state.revision, actor, {
+    action: "delete",
+    provider: "gemini",
+    id: "gemini-2.0-flash",
+  });
+  state = await service.change(state.revision, actor, {
+    action: "delete",
+    provider: "openai",
+    id: "gpt-4.1",
+  });
+  await expect(
+    service.change(state.revision, actor, {
+      action: "select",
+      target: "store.translation",
+      selection: null,
+    }),
+  ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
+});
+
+it("retains every legacy query-policy consumer until all are explicitly configured", async () => {
+  const f = fixture();
+  f.references.push({
+    provider: "gemini",
+    model: "gemini-2.5-flash",
+    source: "query",
+  });
+  const service = new ModelControlService(f.db);
+  let state = await service.snapshot();
+  const targets = [
+    ...new Set(
+      state.modelReferences["gemini:gemini-2.5-flash"].map((x) => x.target!),
+    ),
+  ];
+  expect(targets).toEqual(
+    expect.arrayContaining([
+      "home.chat",
+      "service.query",
+      "work.planning",
+      "image.analysis",
+      "operator.insight",
+    ]),
+  );
+  for (const target of targets) {
+    expect(state.protectedModels).toContain("gemini:gemini-2.5-flash");
+    state = await service.change(state.revision, actor, {
+      action: "select",
+      target,
+      selection: { provider: "gemini", model: "gemini-3.8-flash" },
+    });
+  }
+  expect(state.protectedModels).not.toContain("gemini:gemini-2.5-flash");
+  state = await service.change(state.revision, actor, {
+    action: "delete",
+    provider: "gemini",
+    id: "gemini-2.5-flash",
+  });
+  await expect(
+    service.change(state.revision, actor, {
+      action: "select",
+      target: "home.chat",
+      selection: null,
+    }),
+  ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
+});
