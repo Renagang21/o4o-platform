@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies, cleanupFixtureBusinessPolicies } from './fixtures/business-policies.js';
 import { AccountErasureService } from "../../../services/privacy/account-erasure.service.js";
 import { cooperativeAdminTransferRequired } from "../../../services/privacy/cooperative-erasure-review.js";
 import { DataSource } from "typeorm";
@@ -84,6 +85,7 @@ integration(
     });
     afterAll(async () => {
       if (!db?.isInitialized) return;
+      await cleanupFixtureBusinessPolicies(db, [business, secondBusiness]);
       if (erasureOperation)
         await db.query("DELETE FROM account_erasure_operations WHERE id=$1", [
           erasureOperation,
@@ -207,8 +209,8 @@ integration(
       ]);
     });
     it("joins independently in multiple cooperatives without pharmacy organization or global roles", async () => {
-      await service.applyMembership(member, coop, "개인 자격");
-      await service.applyMembership(member, second, "다른 조합 자격");
+      await service.applyMembership(member, coop, "개인 자격", await fixtureBusinessPolicies(db, business));
+      await service.applyMembership(member, second, "다른 조합 자격", await fixtureBusinessPolicies(db, secondBusiness));
       expect(
         (await new CooperativeService(db).session(member)).memberships,
       ).toHaveLength(2);
@@ -348,7 +350,7 @@ integration(
         "request_changes",
         "보완 요청",
       );
-      await service.applyMembership(member, coop, "보완 제출");
+      await service.applyMembership(member, coop, "보완 제출", await fixtureBusinessPolicies(db, business));
       await service.memberAction(
         operator,
         coop,
@@ -415,7 +417,7 @@ integration(
           (r: { cooperativeId: string }) => r.cooperativeId === second,
         ).status,
       ).toBe("pending");
-      await service.applyMembership(member, coop, "재가입");
+      await service.applyMembership(member, coop, "재가입", await fixtureBusinessPolicies(db, business));
       await service.memberAction(admin, coop, m.id, "approve", "재심사");
       await service.memberAction(
         admin,
@@ -545,7 +547,7 @@ integration(
         ),
       ).toBe(false);
       await expect(
-        service.applyMembership(member, second, "가입"),
+        service.applyMembership(member, second, "가입", await fixtureBusinessPolicies(db, secondBusiness)),
       ).rejects.toMatchObject({ httpStatus: 403 });
       await service.affiliationAction(fed, second, "restore", "운영 복구");
       expect(await cooperativeRole(db, other, second)).toBe("admin");

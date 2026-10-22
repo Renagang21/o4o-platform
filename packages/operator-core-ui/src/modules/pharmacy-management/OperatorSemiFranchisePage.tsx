@@ -1,3 +1,4 @@
+import { BusinessOperationsPanel } from './BusinessOperationsPanel';
 import { BusinessHomeShowcaseManager } from './BusinessHomeShowcaseManager';
 import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
 /**
@@ -109,6 +110,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
 
       {contactUrl && <a className="text-blue-700 underline" href={contactUrl}>이 사업 문의 관리</a>}
       <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
+      <BusinessOperationsPanel key={`operations:${sfKey}`} businessKey={sfKey} />
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.filter(t => !tabs || tabs.includes(t.key)).map((t) => (
