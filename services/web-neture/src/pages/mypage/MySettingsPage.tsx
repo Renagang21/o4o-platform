@@ -22,6 +22,7 @@ import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
 import LocalAgentCard from '../../components/mypage/LocalAgentCard';
+import ExternalAiConnectionsCard from '../../components/mypage/ExternalAiConnectionsCard';
 import { PasswordSecuritySettings, SocialAccountConnections } from '@o4o/auth-react';
 import { authClient } from '../../lib/apiClient';
 
@@ -78,6 +79,7 @@ export default function MySettingsPage() {
         onLogout={logout}
       />
       <SocialAccountConnections client={authClient} />
+      <ExternalAiConnectionsCard />
       <PasswordSecuritySettings client={authClient} notify={{ success: toast.success }} onSessionEnded={() => openLoginModal('/mypage/settings')} />
     </MyPageLayout>
   );
