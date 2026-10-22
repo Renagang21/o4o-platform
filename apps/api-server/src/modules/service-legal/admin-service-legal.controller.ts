@@ -73,7 +73,7 @@ function normalizeStr(v: unknown): string | null {
   return s.length === 0 ? null : s;
 }
 
-export function createAdminServiceLegalController(dataSource: DataSource, scopeGuard: (level: 'admin' | 'operator') => RequestHandler = requireServiceLegalScope): Router {
+export function createAdminServiceLegalController(dataSource: DataSource, requireLegalScope: (level: 'admin' | 'operator') => RequestHandler = requireServiceLegalScope): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
@@ -98,7 +98,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.get(
     '/:serviceKey/legal-profile',
     authenticate,
-    scopeGuard('operator'),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const profile = await profileRepo.findOne({ where: { service_key: req.params.serviceKey } });
@@ -113,7 +113,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.put(
     '/:serviceKey/legal-profile',
     authenticate,
-    scopeGuard('admin'),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -156,7 +156,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.get(
     '/:serviceKey/policies',
     authenticate,
-    scopeGuard('operator'),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const where: any = { service_key: req.params.serviceKey };
@@ -177,7 +177,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.get(
     '/:serviceKey/policies/:id',
     authenticate,
-    scopeGuard('operator'),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey } });
@@ -195,7 +195,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.post(
     '/:serviceKey/policies',
     authenticate,
-    scopeGuard('admin'),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -246,7 +246,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.put(
     '/:serviceKey/policies/:id',
     authenticate,
-    scopeGuard('admin'),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -325,7 +325,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.patch(
     '/:serviceKey/policies/:id/publish',
     authenticate,
-    scopeGuard('admin'),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -427,7 +427,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, scopeG
   router.patch(
     '/:serviceKey/policies/:id/lifecycle',
     authenticate,
-    scopeGuard('admin'),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;

@@ -54,3 +54,5 @@ Codex P1(기존 Pharmacy handoff 세션 범위)을 반영했다. 기존 kpa-soci
 Handoff·세션·로그아웃 관련 9 suite 142 PASS. 이 중 실제 격리 PostgreSQL 토큰 원장·client·교환 흐름 21개를 실행했고, 네 사업 호스트의 공통 계정 로그아웃과 다른 호스트의 Pharmacy 토큰 교환 거절을 확인했다. 이 검증은 앞의 API 선택 회귀와 일부 중복이다. 관련 shared-space-ui 165 PASS·API 타입·Neture build를 재검증했다.
 
 계정 인증/카탈로그 소비처 대조: 공통 session scope와 회원가입 약관의 기존 기대값을 새 neture 계정 문맥으로 정렬했다. 서비스별 가입·과거 동의 원장을 바꾸지 않는다. 관련 21 suite 414 PASS(별도 opt-in 73개 제외).
+
+CI 전체 회귀 보완: 첫 전체 실행에서 관리자 guard 인벤토리 2건과 provider 데모 응답의 과거 scope 기대값 5건이 실패했다. 사업별 주입 guard의 명칭을 requireLegalScope로 맞춰 기존 정적 인벤토리 인식을 유지했고 검사 예외는 늘리지 않았다. 데모 응답도 Pharmacy Origin의 neture scope를 검증하도록 정렬하고 일반 사용자 provider 응답에도 Pharmacy Origin을 추가했다. 수정 후 관련 8 suite 107 PASS·API 타입 PASS. 나머지 로컬 전체 shard 1/3·3/3의 실패는 이 두 파일뿐이었다. 최종 CI는 수정 HEAD에서 다시 실행한다.
