@@ -43,7 +43,7 @@
 | 검증 | 결과 | 범위·한계 |
 |---|---|---|
 | frozen install 및 build:packages | 통과 | Node 22.18.0·pnpm 10.25.0; 새 worktree 자체 설치·산출물 |
-| Lecture Vitest | 61/61 통과 (15 files) | 목록·오류 복구·거부·bookmark·계정 전환·자료·전문 정보·수료증·문의·기존 운영 UI |
+| Lecture Vitest | 63/63 통과 (15 files) | 목록·오류 복구·거부·bookmark·계정 전환·자료·전문 정보·수료증·문의·기존 운영 UI |
 | API Jest 선택 10 suite | 296/296 통과 | 새 공개 목차·bookmark 경계, 기존 enrollment/certificate 소유권·교차서비스·수료증 체인·rate-limit·Phase2 검토/승인 계약·목록 공통 UI |
 | lms-ui type-check | 통과 | 공통 패키지 |
 | lecture-web build | 통과 | tsc -b + Vite; 번들 크기·Browserslist 데이터 경고는 남음 |
@@ -81,3 +81,7 @@ PR·병합·배포·운영 데이터 변경은 실행하지 않는다. 작업 br
 직전 main의 Promote는 migration 성공 뒤 Cloud Run 배포에서 실패했다. 상세 로그 호스트 접근이 차단되어 그 실패의 직접 원인으로 단정하지 않았다. 별도로 실제 tsup bundle을 생성해 점검한 결과, main에 추가된 MCP SDK의 정적 import 5개가 남지만 Docker용 `package.production.json`에는 해당 패키지가 없었다. API workspace에 이미 선언된 동일 버전 `@modelcontextprotocol/sdk@1.32.1`을 운영 manifest에 연결했다. API 기능·권한·schema 변경은 하지 않았다.
 
 Docker와 같은 `npm install --omit=dev --ignore-scripts`를 별도 임시 디렉터리에서 실행한 후 Node 22.18.0으로 실제 bundle의 정적 external import 59개 resolve와 MCP SDK entry point 5개 동적 load가 모두 통과했다. 임시 설치·bundle은 checkout 밖에 두었다. 운영 manifest 보정 후의 CI·병합·배포 SHA와 결과는 후속 종료 보고에서 확정한다.
+
+### Codex 후속 리뷰 — pause/ended 저장 큐
+
+PR 리뷰에서 주기적 저장 요청이 진행 중일 때 pause/ended의 강제 저장이 버려질 수 있음을 확인했다. 강제 저장을 한 건 대기시키고 앞 요청 완료 뒤 최신 video 위치를 다시 읽어 저장하도록 수정했다. 여러 강제 이벤트는 마지막 위치로 합치며, 폐기된 계정 인스턴스의 큐는 실행하지 않는다. in-flight·pause·ended 순서와 계정 전환 중 대기 요청 폐기 회귀 2건을 추가했고 Lecture Vitest 총 63건, 공통 타입 검사·프런트 빌드·focused ESLint가 통과했다.

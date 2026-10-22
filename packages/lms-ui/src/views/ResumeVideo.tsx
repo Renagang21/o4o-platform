@@ -15,6 +15,7 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
   const changed = useRef(false);
   const lastSaved = useRef(0);
   const saving = useRef(false);
+  const pendingForce = useRef(false);
   useEffect(() => {
     active.current = true;
     setReadFailed(false);
@@ -26,7 +27,11 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
 
   async function save(force = false) {
     const video = videoRef.current;
-    if (!enabled || !port.savePlayback || !video || !changed.current || saving.current) return;
+    if (!enabled || !port.savePlayback || !video || !changed.current) return;
+    if (saving.current) {
+      if (force) pendingForce.current = true;
+      return;
+    }
     if (!force && Date.now() - lastSaved.current < 15000) return;
     const seconds = video.currentTime;
     if (!Number.isFinite(seconds) || seconds < 0) return;
@@ -36,7 +41,13 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
       if (active.current) setMessage('이어보기 위치를 저장했습니다.');
     } catch {
       if (active.current) { setMessage('이어보기 위치 저장에 실패했습니다. 다시 저장해 주세요.'); }
-    } finally { saving.current = false; }
+    } finally {
+      saving.current = false;
+      if (pendingForce.current) {
+        pendingForce.current = false;
+        if (active.current) void save(true);
+      }
+    }
   }
   return <section aria-label="강의 영상">
     {position !== null && position > 0 && <button type="button" onClick={() => {

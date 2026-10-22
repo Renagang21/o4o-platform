@@ -39,3 +39,28 @@ it('ignores a late bookmark from a disposed account instance', async () => {
  await act(async () => done({ lessonId: 'lesson', positionSeconds: 99 }));
  expect(screen.queryByRole('button', { name: /이어보기/ })).toBeNull();
 });
+
+it('flushes the latest forced position after an in-flight periodic save', async () => {
+ let done!: () => void;
+ const api = port(); vi.mocked(api.savePlayback!).mockImplementationOnce(() => new Promise(resolve => { done = resolve; }));
+ const ref = createRef<HTMLVideoElement>();
+ render(<ResumeVideo videoRef={ref} src="https://example.org/video.mp4" courseId="course" lessonId="lesson" enabled port={api} onTimeUpdate={vi.fn()} />);
+ ref.current!.currentTime = 18; fireEvent.timeUpdate(ref.current!);
+ ref.current!.currentTime = 42; fireEvent.pause(ref.current!);
+ ref.current!.currentTime = 47; fireEvent.ended(ref.current!);
+ expect(api.savePlayback).toHaveBeenCalledTimes(1);
+ await act(async () => done());
+ await waitFor(() => expect(api.savePlayback).toHaveBeenCalledTimes(2));
+ expect(api.savePlayback).toHaveBeenLastCalledWith('course', 'lesson', 47);
+});
+it('does not flush a disposed account queue with the next account credentials', async () => {
+ let done!: () => void;
+ const api = port(); vi.mocked(api.savePlayback!).mockImplementationOnce(() => new Promise(resolve => { done = resolve; }));
+ const ref = createRef<HTMLVideoElement>();
+ const view = render(<ResumeVideo key="account-a" videoRef={ref} src="https://example.org/video.mp4" courseId="course" lessonId="lesson" enabled port={api} onTimeUpdate={vi.fn()} />);
+ ref.current!.currentTime = 18; fireEvent.timeUpdate(ref.current!);
+ ref.current!.currentTime = 42; fireEvent.pause(ref.current!);
+ view.rerender(<ResumeVideo key="account-b" videoRef={ref} src="https://example.org/video.mp4" courseId="course" lessonId="lesson" enabled={false} port={api} onTimeUpdate={vi.fn()} />);
+ await act(async () => done());
+ expect(api.savePlayback).toHaveBeenCalledTimes(1);
+});
