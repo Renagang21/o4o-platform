@@ -11,6 +11,12 @@ import { assertEnabled } from "../settings/settings.service.js";
 import { AdapterRegistry } from "../adapters/registry.js";
 import type { DraftInput } from "../adapters/adapter.js";
 
+export const writeLimits = {
+  perConnectionDay: 100,
+  perUserDay: 300,
+  storedErrors: 1000,
+};
+
 export class ExternalAiToolService {
   readonly registry: AdapterRegistry;
   constructor(
@@ -124,6 +130,23 @@ export class ExternalAiToolService {
                 connection.userId,
               );
             }
+            // Serialize all connections of the same user. Existing request metadata
+            // is the rolling 24-hour counter; retries above do not consume quota.
+            await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+              `external-ai-writes:${connection.userId}`,
+            ]);
+            const [counts] = await db.query(
+              `SELECT count(*)::int AS total,
+              count(*) FILTER (WHERE r.connection_id=$1)::int AS connection
+              FROM external_ai_requests r JOIN external_ai_connections c ON c.id=r.connection_id
+              WHERE c.user_id=$2 AND r.expires_at>now()`,
+              [connectionId, connection.userId],
+            );
+            if (
+              counts.connection >= writeLimits.perConnectionDay ||
+              counts.total >= writeLimits.perUserDay
+            )
+              throw new ExternalAiError("WRITE_QUOTA_EXCEEDED", 429);
             const result = await adapter.save(
               db,
               connection.userId,
@@ -146,12 +169,25 @@ export class ExternalAiToolService {
           ? error.code
           : "EXTERNAL_AI_OPERATION_FAILED";
       // Only bounded tool/code metadata; no tokens, document text or client/user names.
-      await this.db
-        .query(
-          "INSERT INTO external_ai_errors(id,tool,code) VALUES($1,$2,$3)",
-          [randomUUID(), name, code],
-        )
-        .catch(() => undefined);
+      if (code !== "WRITE_QUOTA_EXCEEDED")
+        await this.db
+          .transaction(async (db) => {
+            const [lock] = await db.query(
+              "SELECT pg_try_advisory_xact_lock(hashtext($1)) AS acquired",
+              ["external-ai-errors"],
+            );
+            if (!lock.acquired) return;
+            await db.query(
+              `DELETE FROM external_ai_errors WHERE id IN
+                (SELECT id FROM external_ai_errors ORDER BY created_at DESC,id DESC OFFSET $1)`,
+              [writeLimits.storedErrors - 1],
+            );
+            await db.query(
+              "INSERT INTO external_ai_errors(id,tool,code) VALUES($1,$2,$3)",
+              [randomUUID(), name, code],
+            );
+          })
+          .catch(() => undefined);
       throw error instanceof ExternalAiError
         ? error
         : new ExternalAiError(code, 503);

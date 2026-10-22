@@ -125,14 +125,14 @@ export async function loadConnection(
     [id],
   );
   if (!rows[0])
-    throw new InvalidTokenError("O4O 연결이 만료되었거나 해제되었습니다.");
+    throw new InvalidTokenError("O4O connection expired or revoked");
   const row = rows[0];
   const users = await db.query(
     'SELECT status,"isActive" FROM users WHERE id=$1',
     [row.user_id],
   );
   if (!users[0]?.isActive || resolveAccountAccess(users[0].status) !== "normal")
-    throw new InvalidTokenError("O4O 계정을 이용할 수 없습니다.");
+    throw new InvalidTokenError("O4O account unavailable");
   return {
     id: row.id,
     userId: row.user_id,
@@ -552,9 +552,11 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     try {
       row = await this.credential(this.db, value, "access");
     } catch {
-      throw new InvalidTokenError("접근 자격이 만료되었습니다.");
+      // The SDK writes this message into WWW-Authenticate: keep it ASCII.
+      throw new InvalidTokenError("Access credential invalid or expired");
     }
-    if (row.consumed_at) throw new InvalidTokenError("폐기된 접근 자격입니다.");
+    if (row.consumed_at)
+      throw new InvalidTokenError("Access credential revoked");
     const connection = await loadConnection(this.db, row.connection_id);
     return {
       token: value,

@@ -13,6 +13,8 @@ import {
   type ToolName,
 } from "../contracts.js";
 import { assertEnabled } from "../settings/settings.service.js";
+import rateLimit from "express-rate-limit";
+import { getTrustedClientIp } from "../../../utils/trusted-client-ip.js";
 
 const descriptions: Record<ToolName, string> = {
   list_workspaces: "연결을 허용한 내 작업공간과 작성 예제를 확인합니다.",
@@ -48,6 +50,8 @@ const recovery: Record<string, string> = {
     "이 작업공간을 이용할 권한이 없습니다. list_workspaces에서 현재 허용 공간을 확인하세요.",
   REQUEST_ID_REUSED:
     "다른 내용에는 새 requestId를 사용하세요. 저장 재시도에만 같은 requestId를 사용합니다.",
+  WRITE_QUOTA_EXCEEDED:
+    "O4O 연결 저장 한도에 도달했습니다. 자동 재시도를 중지하고 나중에 다시 시도하세요.",
 };
 export function createMcpRouter(
   db: DataSource,
@@ -55,6 +59,16 @@ export function createMcpRouter(
 ) {
   const router = Router(),
     tools = new ExternalAiToolService(db, provider.config.webOrigin);
+  router.use(
+    rateLimit({
+      windowMs: 60_000,
+      max: 120,
+      keyGenerator: getTrustedClientIp,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: "EXTERNAL_AI_IP_RATE_LIMITED" },
+    }),
+  );
   router.use((_req, res, next) => {
     res.setHeader("Cache-Control", "private, no-store");
     next();
@@ -91,6 +105,16 @@ export function createMcpRouter(
         "/.well-known/oauth-protected-resource/api/external-ai/mcp",
         provider.config.issuer,
       ).href,
+    }),
+  );
+  router.use(
+    rateLimit({
+      windowMs: 60_000,
+      max: 60,
+      keyGenerator: (req) => String(req.auth?.extra?.connectionId ?? "missing"),
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: "EXTERNAL_AI_CONNECTION_RATE_LIMITED" },
     }),
   );
   router.post("/", async (req, res, next) => {

@@ -14,7 +14,10 @@ import { EXPECTED_SCHEMA_STATES } from "../../apps/api-server/dist/database/incr
 import { computeSchemaFingerprint } from "../../apps/api-server/dist/database/bootstrap/schema-fingerprint.js";
 import { entities } from "../../apps/api-server/dist/database/entities.js";
 import { createExternalAiRoutes } from "../../apps/api-server/dist/modules/external-ai/external-ai.routes.js";
-import { ExternalAiToolService } from "../../apps/api-server/dist/modules/external-ai/tools/tool.service.js";
+import {
+  ExternalAiToolService,
+  writeLimits,
+} from "../../apps/api-server/dist/modules/external-ai/tools/tool.service.js";
 import {
   changeSettings,
   readSettings,
@@ -1765,6 +1768,192 @@ async function expandedTests(db, tools, provider, register, base, post) {
         exec("list_materials", { workspaceId: orgId }),
         /WORKSPACE_FORBIDDEN/,
       );
+    },
+  );
+  await check(
+    "write quota serializes the last slot and allows an idempotent retry",
+    async () => {
+      const fingerprint = `fixture-write-quota-${randomUUID()}`;
+      const before = (
+        await db.query(
+          "SELECT count(*)::int AS n FROM external_ai_requests WHERE connection_id=$1 AND expires_at>now()",
+          [memberGrant.id],
+        )
+      )[0].n;
+      await db.query(
+        `INSERT INTO external_ai_requests(connection_id,request_id,fingerprint,result,expires_at)
+      SELECT $1,gen_random_uuid(),$2,$3,now()+interval '24 hours' FROM generate_series(1,$4::int)`,
+        [
+          memberGrant.id,
+          fingerprint,
+          { id: communityDraft.id },
+          writeLimits.perConnectionDay - before - 1,
+        ],
+      );
+      try {
+        const inputs = [
+          draft(communityId, "community_post"),
+          draft(communityId, "community_post"),
+        ];
+        const results = await Promise.allSettled(
+          inputs.map((input) => exec("save_content_draft", input, memberGrant)),
+        );
+        assert.equal(results.filter((r) => r.status === "fulfilled").length, 1);
+        assert.equal(
+          results.find((r) => r.status === "rejected").reason.code,
+          "WRITE_QUOTA_EXCEEDED",
+        );
+        const index = results.findIndex((r) => r.status === "fulfilled");
+        assert.equal(
+          (await exec("save_content_draft", inputs[index], memberGrant)).id,
+          results[index].value.id,
+        );
+        await assert.rejects(
+          exec(
+            "save_content_draft",
+            draft(communityId, "community_post"),
+            memberGrant,
+          ),
+          { code: "WRITE_QUOTA_EXCEEDED", status: 429 },
+        );
+        assert.equal(
+          (
+            await db.query(
+              "SELECT count(*)::int AS n FROM external_ai_requests WHERE connection_id=$1 AND expires_at>now()",
+              [memberGrant.id],
+            )
+          )[0].n,
+          writeLimits.perConnectionDay,
+        );
+      } finally {
+        await db.query(
+          "DELETE FROM external_ai_requests WHERE fingerprint=$1",
+          [fingerprint],
+        );
+      }
+    },
+  );
+  await check(
+    "per-user write quota covers separate connections without accepting a fresh draft",
+    async () => {
+      const copies = Array.from({ length: 4 }, () => randomUUID());
+      for (const id of copies)
+        await db.query(
+          `INSERT INTO external_ai_connections(id,user_id,client_id,workspaces,scopes,expires_at)
+      SELECT $1,user_id,client_id,workspaces,scopes,expires_at FROM external_ai_connections WHERE id=$2`,
+          [id, memberGrant.id],
+        );
+      try {
+        for (const id of copies.slice(0, 3))
+          await db.query(
+            `INSERT INTO external_ai_requests(connection_id,request_id,fingerprint,result,expires_at)
+        SELECT $1,gen_random_uuid(),'fixture-user-quota',$2,now()+interval '24 hours' FROM generate_series(1,100)`,
+            [id, { id: communityDraft.id }],
+          );
+        const before = (
+          await db.query("SELECT count(*)::int AS n FROM forum_post")
+        )[0].n;
+        await assert.rejects(
+          tools.execute(
+            "save_content_draft",
+            draft(communityId, "community_post"),
+            copies[3],
+          ),
+          { code: "WRITE_QUOTA_EXCEEDED", status: 429 },
+        );
+        assert.equal(
+          (await db.query("SELECT count(*)::int AS n FROM forum_post"))[0].n,
+          before,
+        );
+      } finally {
+        await db.query(
+          "DELETE FROM external_ai_connections WHERE id=ANY($1::uuid[])",
+          [copies],
+        );
+      }
+    },
+  );
+  await check("error metadata storage is globally bounded", async () => {
+    const before = (
+      await db.query("SELECT count(*)::int AS n FROM external_ai_errors")
+    )[0].n;
+    await db.query(
+      `INSERT INTO external_ai_errors(id,tool,code)
+      SELECT gen_random_uuid(),'list_materials','FIXTURE_ERROR_CAP' FROM generate_series(1,$1::int)`,
+      [writeLimits.storedErrors - before],
+    );
+    try {
+      const priorIds = new Set(
+        (await db.query("SELECT id FROM external_ai_errors")).map(
+          (row) => row.id,
+        ),
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: communityId }),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      assert.equal(
+        (await db.query("SELECT count(*)::int AS n FROM external_ai_errors"))[0]
+          .n,
+        writeLimits.storedErrors,
+      );
+      assert.ok(
+        (await db.query("SELECT id FROM external_ai_errors")).some(
+          (row) => !priorIds.has(row.id),
+        ),
+      );
+    } finally {
+      await db.query(
+        "DELETE FROM external_ai_errors WHERE code='FIXTURE_ERROR_CAP'",
+      );
+    }
+  });
+  await check(
+    "MCP enforces connection and IP execution limits before dispatch",
+    async () => {
+      const ping = (token, id) =>
+        fetch(base + "/api/external-ai/mcp", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json, text/event-stream",
+          },
+          body: JSON.stringify({ jsonrpc: "2.0", id, method: "ping" }),
+        });
+      let connectionLimited = false;
+      for (let i = 0; i <= 60; i++) {
+        const response = await ping(memberGrant.token.access_token, i);
+        if (response.status === 429) {
+          assert.equal(
+            (await response.json()).code,
+            "EXTERNAL_AI_CONNECTION_RATE_LIMITED",
+          );
+          connectionLimited = true;
+          break;
+        }
+        assert.equal(response.status, 200);
+      }
+      assert.ok(connectionLimited);
+      let ipLimited = false;
+      for (let i = 0; i <= 120; i++) {
+        const response = await ping("fixture-invalid-token", i);
+        if (response.status === 429) {
+          assert.equal(
+            (await response.json()).code,
+            "EXTERNAL_AI_IP_RATE_LIMITED",
+          );
+          ipLimited = true;
+          break;
+        }
+        assert.equal(response.status, 401);
+        assert.match(
+          response.headers.get("www-authenticate"),
+          /^[\x20-\x7e]+$/,
+        );
+        assert.equal((await response.json()).error, "invalid_token");
+      }
+      assert.ok(ipLimited);
     },
   );
   await check(
