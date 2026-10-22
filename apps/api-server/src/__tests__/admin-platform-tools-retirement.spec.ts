@@ -37,5 +37,6 @@ it('other service entry points cannot restore role editing or advertise the remo
 
 it('dashboard API actions do not advertise retired role editors', () => {
   expect(read('modules/neture/controllers/admin-dashboard.controller.ts')).not.toContain("link: '/admin/roles'");
-  expect(read('routes/kpa/services/operator-dashboard.service.ts')).not.toContain("link: '/operator/roles'");
+  // KPA operator-dashboard.service 는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 제거됐다.
+  expect(existsSync(resolve(process.cwd(), 'src', 'routes/kpa/services/operator-dashboard.service.ts'))).toBe(false);
 });

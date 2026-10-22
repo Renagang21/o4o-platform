@@ -309,7 +309,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   //   카탈로그 등록 제거 (패키지 삭제).
   // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
   //   forum-yaksa 카탈로그 등록 제거 (HOLD 해제 — 감사 결과 실행 소비처 0건).
-  //   약사 조직의 포럼은 공용 forum-core / /api/v1/kpa/forum 구조로 운영된다.
+  //   약사 조직의 포럼은 공용 forum-core / 커뮤니티(/communities/:key) 구조로 운영된다.
   // ============================================
   {
     appId: 'pharmacy-ai-insight',

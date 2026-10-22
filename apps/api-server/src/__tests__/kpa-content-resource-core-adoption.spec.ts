@@ -82,9 +82,8 @@ describe('KPA 6 handler Core 배선', () => {
     "contentRouter.get('/', optionalAuth as any, asyncHandler(kpaContentCore.list))",
     "contentRouter.delete('/:id', authenticate, asyncHandler(kpaContentCore.remove))",
     "contentRouter.post('/:id/view', optionalAuth as any, asyncHandler(kpaContentCore.incrementView))",
-    'asyncHandler(kpaContentCore.operatorList)',
-    'asyncHandler(kpaContentCore.operatorUpdateStatus)',
-    'asyncHandler(kpaContentCore.operatorRemove)',
+    // operator 3 handler(operatorList · operatorUpdateStatus · operatorRemove)를 쓰던 /operator/resources mount 는
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 소비처 0 으로 제거됐다.
   ];
 
   it.each(WIRED)('배선됨: %s', (snippet) => {
@@ -96,9 +95,9 @@ describe('KPA 6 handler Core 배선', () => {
     expect(KPA_ROUTES).toContain('createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog })');
   });
 
-  it('half-wired 참조가 없다 — 선언 1 + 사용 6', () => {
+  it('half-wired 참조가 없다 — 선언 1 + 사용 3', () => {
     const refs = KPA_ROUTES.match(/kpaContentCore/g) ?? [];
-    expect(refs.length).toBe(7);
+    expect(refs.length).toBe(4);
   });
 
   it('옮긴 handler 의 인라인 SQL 이 남아 있지 않다', () => {

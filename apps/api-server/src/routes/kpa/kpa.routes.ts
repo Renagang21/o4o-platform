@@ -13,34 +13,21 @@ import { isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from '../cms-con
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ ADMIN (kpa:admin scope required)                                    │
  * │  /organizations     - 조직 관리 (CRUD)                                │
- * │  /members           - 회원 관리 (승인/거절)                             │
- * │  /applications      - 신청서 처리                                     │
- * │  /join-inquiries    - 참여 문의 관리                                   │
- * │  /forum/categories  - 포럼 카테고리 생성/수정/삭제 (구조 변경)             │
- * │  /operator/audit-logs - 감사 로그 조회                                 │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ OPERATOR (kpa:operator scope required)                              │
- * │  /operator          - 운영자 요약 대시보드                              │
  * │  /groupbuy-admin    - 공동구매 운영                                    │
  * │  /news (POST/PUT/DELETE) - 콘텐츠 CRUD                               │
  * │  /news/admin/list   - 콘텐츠 전체 목록                                 │
- * │  /forum/moderation  - 포럼 중재                                       │
+ * │  (소비처 0 mount 제거 — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a)   │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ AUTHENTICATED (requireAuth only)                                    │
- * │  /mypage            - 마이페이지                                       │
- * │  /pharmacy/store    - 약국 스토어 설정                                  │
  * │  /pharmacy/products - 약국 상품 관리                                    │
  * │  /store-hub         - 스토어 허브                                      │
  * │  /assets            - 자산 스냅샷 (복사/조회)                           │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ PUBLIC (no auth / optionalAuth)                                     │
- * │  /forum (GET)       - 포럼 조회                                        │
- * │  (demo-forum removed — WO-O4O-KPA-CODE-CLEANUP-V1)                     │
- * │  /home              - 홈 페이지 데이터                                  │
  * │  /news (GET)        - 공지사항/뉴스 조회                                │
- * │  /resources         - 자료실 (placeholder)                             │
  * │  /groupbuy (GET)    - 공동구매 조회 (placeholder)                       │
- * │  /organization      - 조직 공개 정보                                    │
  * │  /health            - 헬스체크                                          │
  * └─────────────────────────────────────────────────────────────────────┘
  */
@@ -50,23 +37,15 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 import { DataSource } from 'typeorm';
 import { ContentQueryService } from '../../modules/content/index.js';
-import { SignageQueryService } from '../../modules/signage/index.js';
-import { ForumQueryService } from '../../modules/forum/index.js';
 import { createOrganizationController } from './controllers/organization.controller.js';
-import { createMemberController } from './controllers/member.controller.js';
 // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: KpaApplication(범용 신청) dead flow 폐기 —
 //   회원 승인 canonical 경로(/members)만 유지. application.controller 삭제(소비처 0, 데이터 0).
-import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
-// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (kpa-society 고정 proxy)
-import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
 // WO-O4O-KPA-CONTENT-BODY-SANITIZE-ON-WRITE-V1: content body 저장 전 backend sanitize (jsdom+DOMPurify).
 // 기존 backend-safe sanitizer 재사용 (위치/명명 공통화는 후속 WO-O4O-BACKEND-SAFE-HTML-SANITIZER-COMMONIZATION-V1).
 import { sanitizeDescriptionHtml } from '../../modules/neture/utils/sanitize-description-html.util.js';
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
-import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
-// WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
-import { createContactRequestHandler, listContactRequestsHandler, updateContactRequestStatusHandler } from './controllers/contact-request.controller.js';
+import { createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
 //   조직 가입 요청(organization-join-requests) dead flow 은퇴 — 프로덕션 0건, 실제 create/검수 UI 부재.
 //   회원 가입/역할 변경은 canonical 회원·조직 관리(PATCH /kpa/members/:id/status)로 일원화.
@@ -75,7 +54,6 @@ import { createContactRequestHandler, listContactRequestsHandler, updateContactR
 //   약국 서비스 별도 신청(pharmacy-requests) 폐지 — 매장 운영 권한은 약국 경영자 회원 승인(Path B, member.controller)에서 자동 부여.
 //   controller/route mount 제거. 이력 보존을 위해 KpaPharmacyRequest 엔티티/마이그레이션은 유지(별도 cleanup WO).
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
-import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
 import { createPharmacyInfoController } from '../o4o-store/controllers/pharmacy-info.controller.js';
 import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
 import { createOperatorProductApplicationsController } from './controllers/operator-product-applications.controller.js';
@@ -95,7 +73,6 @@ import { createMultilingualProductContentController } from '../o4o-store/control
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
 import { createStoreExternalSalesController } from '../o4o-store/controllers/store-external-sales.controller.js'; // WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1
-import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
 import { createKpaCheckoutController } from './controllers/kpa-checkout.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 import { createKpaPaymentController } from './controllers/kpa-payment.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E: 매장→공급자 B2B 결제(소비자 commerce 경로와 별개)
@@ -115,25 +92,9 @@ import { createOperatorQrController } from '../o4o-store/controllers/operator-qr
 import { createOperatorScreenSetController } from '../o4o-store/controllers/operator-screen-set.controller.js';
 import { createSupplierScreenSetController } from '../o4o-store/controllers/supplier-screen-set.controller.js';
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
-import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
-import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
-import { createInstructorController } from './controllers/instructor.controller.js';
-import { createForumRequestController } from './controllers/forum-request.controller.js';
-import { createForumMembershipController } from './controllers/forum-membership.controller.js';
-import { createContentApprovalController } from './controllers/content-approval.controller.js';
-import { createSupplierContentController } from './controllers/supplier-content.controller.js';
-import { createSupplierSignageReportController } from './controllers/supplier-signage-report.controller.js';
-import { createSupplierCampaignRequestController } from './controllers/supplier-campaign-request.controller.js';
 import { createSupplierSignageMediaController } from './controllers/supplier-signage-media.controller.js';
-import { createStoreSellerRecruitmentBrowseController } from '../../modules/neture/controllers/store-seller-recruitment-browse.controller.js';
-import { createCommunityHubController } from './controllers/community-hub.controller.js';
-import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
-import { createMypageController } from './controllers/mypage.controller.js';
-import { createMeContextController } from './controllers/me-context.controller.js'; // WO-KPA-LOGIN-LATENCY-CLEANUP-V1
-import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
-import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
 import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
 import {
   SUMMARIZE_SYSTEM_PROMPT, buildSummarizeUserPrompt,
@@ -155,21 +116,9 @@ import { createContentResourceCore } from '../common/content-resource/content-re
 import { createKpaContentResourceConfig } from './controllers/kpa-content-resource.config.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
-// WO-O4O-OPERATOR-ACTION-LAYER-V1
-import { createActionQueueRouter } from '../../common/action-queue/index.js';
-import { kpaActionConfig } from './action-definitions.js';
-
-// Domain controllers - Forum
-import { ForumController } from '../../controllers/forum/ForumController.js';
-import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
-// WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
-import { requireCommunityAccess } from '../../middleware/community-access.middleware.js';
-import { resolveCommunityWorkspace } from '../../services/community/community-workspace.service.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
 //   KPA 는 더 이상 LMS runtime 을 소유하지 않는다. `/api/v1/kpa/lms/*` remount · LMS controller import ·
 //   course-request → LMS course 생성 경로를 제거했다. 강의는 O4O 강의(lecture) 서비스(study.neture.co.kr) 가 담당한다.
-// WO-O4O-CREDIT-SYSTEM-V1
-import { CreditController } from '../../modules/credit/controllers/CreditController.js';
 import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
 import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 
@@ -196,88 +145,29 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     defaultTypes: ['notice', 'news'],
   });
 
-  // APP-SIGNAGE Phase 1: shared signage query service
-  // WO-O4O-KPA-COMMUNITY-FINAL-STABILIZATION-V1 (마감):
-  //   Home 만 오래된 출처 구성(['hq','store'])을 써서 HUB 공유 계약과 불일치했다.
-  //   그 결과 KPA 사이니지 5건이 전부 source='community' 인데 Home 최신글·미리보기에서
-  //   전건 제외돼 "등록된 글이 없습니다" 로만 보였다(데이터는 존재).
-  //   HUB canonical(HubContentQueryService.querySignageMedia · 공개 목록/상세 API)과 동일하게 정렬한다:
-  //     hq(본사) · supplier(공급자) · community(회원 공개)
-  //   store 는 개별 매장 전용 자산이라 Home·HUB 공유 대상에서 계속 제외한다
-  //   (매장 간 노출·재사용 방지 — resolveSignage 의 source 게이트와 동일 기준).
-  const signageService = new SignageQueryService(dataSource, {
-    serviceKey: 'kpa-society',
-    sources: ['hq', 'supplier', 'community'],
-  });
-
-  // APP-FORUM Phase 1: shared forum query service
-  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: KPA 홈·포럼 허브 = 약사 커뮤니티(pharmacy)
-  const forumService = new ForumQueryService(dataSource, {
-    scope: 'community',
-    communityKey: 'pharmacy',
-  });
-
   // ============================================================================
   // ADMIN ROUTES — requireKpaScope('kpa:admin') enforced in sub-controllers
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Structure/Role/Policy → Admin only
   // ============================================================================
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
-  router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
   // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: '/applications' 마운트 제거(dead flow).
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 단계 4-a 6항: 소비처 0 mount 제거(옛 KPA 운영자·관리자 화면 은퇴 D7).
+  //   /members · /qualifications · /instructor · instructor-qualifications · forum-requests · community/*
+  //   /operator(summary · actions · approvals · recruitment-exposure · contact-requests · ai · legal · audit-logs · resources)
+  //   /supplier/content-submissions · /supplier/signage(campaign-requests · reports) · store/seller-recruitments
+  //   /join-inquiries(admin, 공개 /api/v1/join 유지) · /contact-requests · legal/documents · /me-context · /pharmacy/store
+  //   /stores(template · layout · settings) · /forum · /credits · /home · /signage · /mypage
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1)
-  router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope, 'kpa-society'));
-
-  // Instructor Dashboard (WO-O4O-INSTRUCTOR-DASHBOARD-V1)
-  router.use('/instructor', createInstructorDashboardController(dataSource, coreRequireAuth as any));
-
-  // Instructor Qualifications (WO-O4O-ROUTES-REFACTOR-V1)
-  router.use('/', createInstructorController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Forum Requests (WO-O4O-ROUTES-REFACTOR-V1)
-  // @deprecated WO-O4O-FORUM-REQUEST-API-DEDUP-V1 — legacy /kpa/forum-requests/* (kpa_approval_requests).
-  // Canonical is /api/v1/forum/category-requests/* + /api/v1/forum/operator/* (forum_category_requests).
-  // No frontend caller; retained for back-compat. Route retirement deferred to follow-up WO.
-  router.use('/', createForumRequestController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Community Hub — Ads/Sponsors (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
-  router.use('/', createCommunityHubController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // OPERATOR ROUTES — requireKpaScope('kpa:operator') enforced
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Operations/Content → Operator
   // ============================================================================
 
-  // Operator Summary routes (운영자 실사용 화면 1단계)
-  router.use('/operator', createOperatorSummaryController(dataSource, {
-    contentService,
-    signageService,
-    forumService,
-  }));
-  // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
-  // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
-  // WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1:
-  //   action-queue 는 KPA/Cosmetics 공유 컨트롤러이므로 KPA scope 는
-  //   반드시 이 마운트 지점에서 명시한다(공유 컨트롤러 내부 수정 금지).
-  //   기존에는 GET /actions·POST /actions/dismiss 가 상위 operator-summary 라우터의
-  //   마운트 순서(먼저 mount)에 의존해 requireKpaScope('kpa:operator') 로 보호되었다.
-  //   마운트 순서와 무관하게 보호되도록 kpa:operator scope 를 명시(허용 역할 불변,
-  //   execute 는 그대로 kpa:admin executeGuard 로 더 엄격).
-  router.use('/operator', coreRequireAuth as any, requireKpaScope('kpa:operator'), createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
-
-  // Content Approval — hub_content_submission / signage_campaign_request
-  // (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
-  //  WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: store_share_to_hub 제거)
-  router.use('/operator/approvals', createContentApprovalController(dataSource, coreRequireAuth as any, requireKpaScope));
-
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
-
-  // 판매자 모집 노출 승인 (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1) — serviceKey 'kpa-society' 고정
-  router.use(createServiceRecruitmentExposureProxyController(coreRequireAuth as any, requireKpaScope('kpa:operator'), 'kpa-society'));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createEventOfferOperatorController(dataSource, coreRequireAuth as any));
@@ -285,112 +175,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Supplier Event Offer proposal routes (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1)
   router.use('/supplier', createSupplierOffersController(dataSource, coreRequireAuth as any));
 
-  // Supplier Marketing Content Submission (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1)
-  router.use('/supplier/content-submissions', createSupplierContentController(dataSource, coreRequireAuth as any));
-
-  // Supplier Signage Campaign Requests (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1)
-  // NOTE: 더 구체적인 경로를 먼저 등록 (Express prefix matching)
-  router.use('/supplier/signage/campaign-requests', createSupplierCampaignRequestController(dataSource, coreRequireAuth as any));
-
   // Supplier Signage Media Authoring (WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1)
   // 공급자 직접 제작·게시(source='supplier', serviceKey='kpa-society') — 기존 HUB/asset-snapshot 조회·복사 경로 재사용
   router.use('/supplier/signage/media', createSupplierSignageMediaController(dataSource, coreRequireAuth as any));
-
-  // Store Seller Recruitment Browse (WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1)
-  // 매장 경영자(kpa:store_owner)가 승인·모집중 판매자 모집을 조회. serviceKey/exposure/status backend 고정.
-  router.use(createStoreSellerRecruitmentBrowseController(dataSource, coreRequireAuth as any));
-
-  // Supplier Signage Campaign Report (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REPORT-API-V1)
-  router.use('/supplier/signage', createSupplierSignageReportController(dataSource, coreRequireAuth as any));
-
-  // Join Inquiry Admin routes (WO-KPA-JOIN-CONVERSION-V1)
-  router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Contact Request — WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
-  router.post('/contact-requests', createContactRequestHandler(dataSource));
-  router.get('/operator/contact-requests', coreRequireAuth as any, requireKpaScope('kpa:operator'), listContactRequestsHandler(dataSource));
-  router.patch('/operator/contact-requests/:id/status', coreRequireAuth as any, requireKpaScope('kpa:operator'), updateContactRequestStatusHandler(dataSource));
-
-  // ── AI Selection Summary (WO-O4O-TABLE-STANDARD-V3) ──
-  router.post('/operator/ai/summarize-selection', coreRequireAuth as any, requireKpaScope('kpa:admin') as any, asyncHandler(async (req: Request, res: Response) => {
-    const { items, context } = req.body;
-    if (!Array.isArray(items) || items.length === 0) {
-      res.status(400).json({ success: false, error: 'items 배열이 필요합니다.', code: 'INVALID_INPUT' });
-      return;
-    }
-    if (items.length > 20) {
-      res.status(400).json({ success: false, error: '최대 20개 항목까지 요약 가능합니다.', code: 'TOO_MANY_ITEMS' });
-      return;
-    }
-
-    // Truncate data to ~4000 chars
-    const dataStr = JSON.stringify(items).slice(0, 4000);
-
-    const systemPrompt = `당신은 운영자 대시보드 AI 어시스턴트입니다. 선택된 항목 데이터를 분석하여 패턴, 추천, 주의사항을 한국어로 요약합니다.
-
-응답 형식 (JSON):
-{
-  "summary": "전체 요약 (1-3문장)",
-  "patterns": ["발견된 패턴 1", "패턴 2"],
-  "recommendations": ["추천 액션 1", "추천 액션 2"],
-  "warnings": ["주의사항 (있을 경우)"]
-}`;
-
-    const userPrompt = `다음 ${items.length}개 항목을 분석해 주세요.${context ? `\n맥락: ${context}` : ''}\n\n데이터:\n${dataStr}`;
-
-    try {
-      const result = await executeManagedAi(dataSource, 'kpa.selection-summary', {
-        systemPrompt,
-        userPrompt,
-        config: buildConfigResolver(dataSource, 'store'),
-        timeoutMs: 5000,
-        meta: { service: 'kpa', callerName: 'KpaSelectionSummarize' },
-      });
-      const parsed = JSON.parse(result.content);
-      res.json({ success: true, data: { ...parsed, source: 'ai' as const } });
-    } catch (e: any) {
-      console.error('[KPA AI Selection Summarize] Failed, using rule-based fallback:', e.message);
-
-      // Rule-based fallback: count by type/organization/status
-      const statusCounts: Record<string, number> = {};
-      const orgCounts: Record<string, number> = {};
-      const typeCounts: Record<string, number> = {};
-      for (const item of items) {
-        if (item.status) statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
-        if (item.organization_id) orgCounts[item.organization_id] = (orgCounts[item.organization_id] || 0) + 1;
-        if (item.request_type) typeCounts[item.request_type] = (typeCounts[item.request_type] || 0) + 1;
-      }
-
-      const patterns: string[] = [];
-      if (Object.keys(typeCounts).length > 0) patterns.push(`유형별: ${Object.entries(typeCounts).map(([k, v]) => `${k} ${v}건`).join(', ')}`);
-      if (Object.keys(orgCounts).length > 0) patterns.push(`${Object.keys(orgCounts).length}개 조직에서 요청`);
-
-      res.json({
-        success: true,
-        data: {
-          summary: `선택된 ${items.length}개 항목 분석 결과`,
-          patterns,
-          recommendations: items.length >= 5 ? ['일괄 처리를 권장합니다'] : [],
-          warnings: [],
-          source: 'rule-based' as const,
-        },
-      });
-    }
-  }));
 
   // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
   //   '/pharmacy-requests' 라우트 폐지 (신청/승인/반려/알림 전량 제거).
   //   매장 운영 권한은 약국 경영자 회원 승인(Path B)에서 자동 부여된다.
 
-  // Legal Documents routes (WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V3)
-  router.use('/', createLegalDocumentsController(dataSource, coreRequireAuth as any, requireKpaScope));
-
   // ============================================================================
   // AUTHENTICATED USER ROUTES — requireAuth only (no admin/operator scope)
   // ============================================================================
-
-  // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA user context (moved from /auth/login + /auth/me)
-  router.use('/me-context', createMeContextController(dataSource, coreRequireAuth as any));
 
   // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
   // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='kpa' 전달.
@@ -404,10 +199,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1
   //   KPA 한정 mount. K-Cosmetics 는 자체 storefront 정비 상태가 달라 이번 범위 밖.
   router.use('/store-hub/external-sales', createStoreExternalSalesController(dataSource, coreRequireAuth as any, 'kpa'));
-
-  // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
-  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='kpa' 전달.
-  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Info routes (WO-KPA-PHARMACY-INFO-EDIT-FLOW-V1)
   // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='kpa' 명시 (canonical)
@@ -592,16 +383,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   );
   router.use('/stores', kpaStoreQrStaffController);
 
-  const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
-  router.use('/stores', kpaTemplateController);
-
-  const kpaLayoutController = createLayoutController(dataSource, coreRequireAuth as any);
-  router.use('/stores', kpaLayoutController);
-
-  // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1: unified settings + channel config
-  const kpaStoreSettingsController = createStoreSettingsController(dataSource, coreRequireAuth as any);
-  router.use('/stores', kpaStoreSettingsController);
-
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership
   // WO-KPA-BRANCH-SCOPE-VALIDATION-V1: User's KPA membership info for branch scope validation
@@ -647,339 +428,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Published Assets routes — public storefront/signage/promotion rendering
   // WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
   router.use('/published-assets', createPublishedAssetsController(dataSource));
-
-  // ============================================================================
-  // Forum Routes - /api/v1/kpa/forum/*
-  // Approved independent community reads/writes; scoped administration/moderation
-  // ============================================================================
-  const forumRouter = Router();
-  const forumController = new ForumController();
-
-  // Optional auth must run before context resolution so userId is available
-  forumRouter.use(optionalAuth as any);
-
-  // WO-FORUM-SCOPE-SEPARATION-V1: community scope — organizationId 미설정
-  // 커뮤니티 포럼은 organizationId IS NULL인 글만 조회/생성
-  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
-  //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface — Pharmacy-Hub `/pharmacy-hub/forum` 과
-  //   같은 독립 Community(저장 코드 kpa-society + pharmacy-hub). 읽기·쓰기는 현재 독립
-  //   커뮤니티 승인으로 판정하며 pharmacy 사업 가입과 별개다. 구조 변경·중재는 기존 guard를 유지한다.
-  forumRouter.use(forumContextMiddleware({
-    serviceCode: 'kpa',
-    communityKey: 'pharmacy',
-    scope: 'community',
-  }));
-  const pharmacyWrite = requireCommunityAccess('pharmacy');
-  // The legacy alias serves the same independent community ledger. Reads must
-  // pass its current approval gate too, including directory, comments and stats.
-  forumRouter.use(pharmacyWrite);
-
-  // Health check
-  forumRouter.get('/health', forumController.health.bind(forumController));
-
-  // Statistics
-  forumRouter.get('/stats', optionalAuth, forumController.getStats.bind(forumController));
-
-  // Posts
-  forumRouter.get('/posts', optionalAuth, forumController.listPosts.bind(forumController));
-  // Must be before /posts/:id to prevent 'tags' being matched as :id param
-  forumRouter.get('/posts/tags/popular', optionalAuth, forumController.getPopularTags.bind(forumController));
-  forumRouter.get('/posts/:id', optionalAuth, forumController.getPost.bind(forumController));
-  forumRouter.post('/posts', authenticate, pharmacyWrite, forumController.createPost.bind(forumController));
-  forumRouter.put('/posts/:id', authenticate, pharmacyWrite, forumController.updatePost.bind(forumController));
-  forumRouter.delete('/posts/:id', authenticate, pharmacyWrite, forumController.deletePost.bind(forumController));
-  forumRouter.post('/posts/:id/like', authenticate, pharmacyWrite, forumController.toggleLike.bind(forumController));
-  // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8 (routing defect fix)
-  //   KPA 프런트(forumApi.pinPost)는 `/api/v1/kpa/forum/posts/:id/pin` 을 호출하는데 remount 에
-  //   빠져 있어 404 였다(WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1 기능이 실질 사망).
-  //   신규 기능이 아니라 공통 핸들러·가드를 그대로 서비스 스코프에 remount 하는 정합 조치다.
-  forumRouter.patch('/posts/:id/pin', authenticate, pharmacyWrite, forumController.pinPost.bind(forumController));
-
-  // Comments
-  forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
-  forumRouter.post('/comments', authenticate, pharmacyWrite, forumController.createComment.bind(forumController));
-  // WO-FORUM-COMMENT-ROUTE-STANDARDIZATION-V1: RESTful nested 경로 추가 (프론트 정합)
-  forumRouter.post('/posts/:postId/comments', authenticate, pharmacyWrite, forumController.createComment.bind(forumController));
-  forumRouter.delete('/posts/:postId/comments/:id', authenticate, pharmacyWrite, forumController.deleteComment.bind(forumController));
-  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
-  //   댓글 수정 route 만 remount 되지 않아 KPA 만 댓글 수정을 못 했다.
-  //   공통 service-forum.routes.ts 와 동일 경로·핸들러 그대로 사용한다(신규 로직 0).
-  forumRouter.put('/comments/:id', authenticate, pharmacyWrite, forumController.updateComment.bind(forumController));
-
-  // Forum Directory (읽기: 독립 커뮤니티 승인, 쓰기: 기존 admin scope)
-  // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)
-  forumRouter.get('/categories', forumController.listForums.bind(forumController));
-  // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 (before :id to avoid param matching)
-  forumRouter.get('/categories/mine', authenticate, forumController.listMyForums.bind(forumController));
-  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyForum.bind(forumController));
-  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteForum.bind(forumController));
-  forumRouter.get('/categories/:id', forumController.getForum.bind(forumController));
-  // Structure creation/modification/deletion → Admin only (410 stubs)
-  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), forumController.createForum.bind(forumController));
-  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.updateForum.bind(forumController));
-  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.deleteForum.bind(forumController));
-
-  // Moderation (operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
-  forumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), forumController.getModerationQueue.bind(forumController));
-  forumRouter.post('/moderation/:type/:id', authenticate, requireKpaScope('kpa:operator'), forumController.moderateContent.bind(forumController));
-
-  // WO-KPA-A-FORUM-MEMBERSHIP-TABLE-AND-JOIN-API-V1: 폐쇄형 포럼 멤버십 API
-  forumRouter.use('/', createForumMembershipController(dataSource, authenticate as any));
-
-  router.use('/forum', forumRouter);
-
-  // LMS Routes — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: `/api/v1/kpa/lms/*` 제거.
-  //   KPA runtime 은 LMS 를 소유하지 않는다. 학습·강사·운영 API 는 `/api/v1/lms/*` (Lecture 전용) 만 존재한다.
-
-  // ============================================================================
-  // Credit Routes - /api/v1/kpa/credits/* (WO-O4O-CREDIT-SYSTEM-V1)
-  // ============================================================================
-  const creditRouter = Router();
-  creditRouter.get('/me', authenticate, asyncHandler(CreditController.getMyBalance));
-  creditRouter.get('/me/transactions', authenticate, asyncHandler(CreditController.getMyTransactions));
-  router.use('/credits', creditRouter);
-
-  // ============================================================================
-  // Home Routes - /api/v1/kpa/home/*
-  // WO-KPA-HOME-PHASE1-V1: Home page summary endpoints
-  // ============================================================================
-  const homeRouter = Router();
-
-  // GET /home/notices - 공지사항 (APP-CONTENT Phase 2: ContentQueryService)
-  homeRouter.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const limit = parseInt(req.query.limit as string) || 5;
-    const data = await contentService.listForHome(['notice'], limit);
-    res.json({ success: true, data });
-  }));
-
-  // GET /home/community - 포럼 최근글 + featured 콘텐츠 (APP-FORUM Phase 1: ForumQueryService)
-  homeRouter.get('/community', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
-    const postLimit = parseInt(req.query.postLimit as string) || 5;
-    const featuredLimit = parseInt(req.query.featuredLimit as string) || 3;
-
-    const posts = await forumService.listRecentPosts(postLimit);
-    const featured = await contentService.listFeatured(['notice', 'news'], featuredLimit);
-
-    res.json({
-      success: true,
-      data: { posts, featured },
-    });
-  }));
-
-  // GET /home/signage - 디지털 사이니지 미리보기 (APP-SIGNAGE Phase 1: SignageQueryService)
-  homeRouter.get('/signage', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const mediaLimit = parseInt(req.query.mediaLimit as string) || 6;
-    const playlistLimit = parseInt(req.query.playlistLimit as string) || 4;
-    const data = await signageService.listForHome(mediaLimit, playlistLimit);
-    res.json({ success: true, data });
-  }));
-
-  // GET /home/forum-hub - 포럼 허브 요약 (멀티 포럼 — forum_category_requests 기반)
-  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  // ?sort=default|recent|popular|joined  ?q=검색어
-  homeRouter.get('/forum-hub', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
-    const sort = (req.query.sort as string) || 'default';
-    const keyword = (req.query.q as string) || '';
-    // WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1: 멤버십 상태 포함을 위해 항상 전달
-    const userId = (req as any).user?.id as string | undefined;
-    const data = await forumService.listForumHub({ sort, keyword, userId });
-    res.json({ success: true, data });
-  }));
-
-  // GET /home/forum/:slug - 포럼 단건 조회 (멀티 포럼)
-  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  homeRouter.get('/forum/:slug', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
-    const slug = String(req.params.slug || '').trim();
-    if (!slug) {
-      res.status(400).json({ success: false, error: 'INVALID_SLUG' });
-      return;
-    }
-    const forum = await forumService.getForumBySlug(slug);
-    if (!forum) {
-      res.status(404).json({ success: false, error: 'FORUM_NOT_FOUND' });
-      return;
-    }
-    res.json({ success: true, data: forum });
-  }));
-
-  // GET /home/forum/:slug/posts - 포럼의 게시글 목록 (멀티 포럼)
-  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  homeRouter.get('/forum/:slug/posts', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
-    const slug = String(req.params.slug || '').trim();
-    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
-    const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
-    if (!slug) {
-      res.status(400).json({ success: false, error: 'INVALID_SLUG' });
-      return;
-    }
-    const forum = await forumService.getForumBySlug(slug);
-    if (!forum) {
-      res.status(404).json({ success: false, error: 'FORUM_NOT_FOUND' });
-      return;
-    }
-    // WO-O4O-KPA-MEMBER_ONLY-FORUM-ACCESS-GUARD-FIX-V1: closed forum 멤버십 검증
-    if (forum.forumType === 'closed') {
-      const userId: string | undefined = (req as any).user?.id;
-      const userRoles: string[] = (req as any).user?.roles || [];
-      const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:super_admin'];
-      if (!userRoles.some((r) => BYPASS_ROLES.includes(r))) {
-        let allowed = false;
-        if (userId) {
-          const [member] = await dataSource.query(
-            `SELECT role FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
-            [forum.id, userId],
-          );
-          if (member) {
-            allowed = true;
-          } else {
-            // Fallback: forum creator (before membership backfill)
-            const [forumRow] = await dataSource.query(
-              `SELECT requester_id FROM forum_category_requests WHERE id = $1 LIMIT 1`,
-              [forum.id],
-            );
-            if (forumRow?.requester_id === userId) allowed = true;
-          }
-        }
-        if (!allowed) {
-          res.status(403).json({
-            success: false,
-            error: 'This is a closed forum. Membership is required.',
-            code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { forumId: forum.id },
-          });
-          return;
-        }
-      }
-    }
-    const posts = await forumService.listForumPosts(forum.id, { limit, offset });
-    res.json({ success: true, data: { forum, posts } });
-  }));
-
-  // GET /home/forum-activity - 포럼 카테고리별 최근 활동 (APP-FORUM Phase 3: ForumQueryService)
-  // ?sort=recent|popular|recommended  ?limit=5
-  homeRouter.get('/forum-activity', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
-    const sort = (req.query.sort as string) || 'recent';
-    const limit = Math.min(parseInt(req.query.limit as string) || 5, 10);
-    const data = await forumService.listForumActivity({ sort, limit });
-    res.json({ success: true, data });
-  }));
-
-  // GET /home/latest — 통합 최신 활동 피드 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1)
-  // ?type=all|forum|content|resource|signage  ?limit=20
-  homeRouter.get('/latest', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const filterType = ((req.query.type as string) || 'all').toLowerCase();
-    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
-    const perLimit = filterType === 'all' ? 10 : limit;
-
-    type LatestItem = {
-      type: string;
-      id: string;
-      title: string;
-      authorName?: string;
-      createdAt: string;
-      href: string;
-    };
-    const items: LatestItem[] = [];
-    const tasks: Promise<void>[] = [];
-
-    const user = (req as any).user;
-    const mayReadForum = (filterType === 'all' || filterType === 'forum') && user?.id
-      ? (await resolveCommunityWorkspace(dataSource, user, 'pharmacy'))?.allowed === true
-      : false;
-    if (mayReadForum) {
-      tasks.push((async () => {
-        const posts = await forumService.listRecentPosts(perLimit);
-        for (const p of posts) {
-          items.push({
-            type: 'forum', id: p.id, title: p.title,
-            authorName: p.authorName || undefined,
-            createdAt: new Date(p.createdAt).toISOString(),
-            href: `/forum/post/${p.id}`,
-          });
-        }
-      })());
-    }
-
-    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: 'course' 탭 제거 (lms_courses 는 KPA 데이터가 아니다).
-
-    if (filterType === 'all' || filterType === 'content') {
-      tasks.push((async () => {
-        // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
-        //   read-compat — 'ready' 포함. 저장 표준(WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1)
-        //   상 기본 저장 status 는 'ready'('저장=즉시 사용 가능')인데 홈 피드는 'published' 만 읽어
-        //   저장 즉시 노출돼야 할 콘텐츠가 피드에서 사라졌다. 쓰기 어휘는 그대로 두고 읽기만 정렬한다.
-        const rows: any[] = await dataSource.query(
-          `SELECT c.id, c.title, c.created_at,
-                  COALESCE(c.author_name, u.name) AS author_name
-           FROM kpa_contents c LEFT JOIN users u ON c.created_by = u.id
-           WHERE c.status IN ('ready', 'published') AND c.is_deleted = false
-             AND (c.sub_type IS NULL OR c.sub_type != 'resource')
-           ORDER BY c.created_at DESC LIMIT $1`,
-          [perLimit],
-        );
-        for (const r of rows) {
-          items.push({
-            type: 'content', id: r.id, title: r.title,
-            authorName: r.author_name ?? undefined,
-            createdAt: new Date(r.created_at).toISOString(),
-            href: `/content/${r.id}`,
-          });
-        }
-      })());
-    }
-
-    if (filterType === 'all' || filterType === 'resource') {
-      tasks.push((async () => {
-        const rows: any[] = await dataSource.query(
-          `SELECT c.id, c.title, c.created_at,
-                  COALESCE(c.author_name, u.name) AS author_name
-           FROM kpa_contents c LEFT JOIN users u ON c.created_by = u.id
-           WHERE c.status IN ('ready', 'published') AND c.is_deleted = false
-             AND c.sub_type = 'resource'
-           ORDER BY c.created_at DESC LIMIT $1`,
-          [perLimit],
-        );
-        for (const r of rows) {
-          items.push({
-            type: 'resource', id: r.id, title: r.title,
-            authorName: r.author_name ?? undefined,
-            createdAt: new Date(r.created_at).toISOString(),
-            href: `/content/${r.id}`,
-          });
-        }
-      })());
-    }
-
-    if (filterType === 'all' || filterType === 'signage') {
-      tasks.push((async () => {
-        const signageData = await signageService.listForHome(perLimit, 0);
-        for (const m of signageData.media) {
-          // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
-          //   기존에는 전 항목이 허브(`/signage`)로 이동해 어느 항목을 눌러도 같은 화면이었다.
-          //   개별 상세 라우트 `/signage/media/:id` 는 이미 존재하고 id 도 동일 엔티티
-          //   (signage_media.id) 이므로 연결한다. 단, 공개 상세 API
-          //   (GET /api/signage/:serviceKey/public/media/:id) 는 scope='global' +
-          //   source IN ('hq','supplier','community') 만 반환하므로, 그 조건을 만족하지 않는
-          //   항목(예: source='store')은 상세로 보내면 404 가 된다 → 기존 허브 이동을 유지한다.
-          const source = (m as any).source;
-          const isPubliclyViewable =
-            (m as any).scope === 'global' && ['hq', 'supplier', 'community'].includes(source);
-          items.push({
-            type: 'signage', id: m.id, title: m.name,
-            authorName: (m as any).uploaderName ?? undefined,
-            createdAt: new Date(m.createdAt).toISOString(),
-            href: isPubliclyViewable ? `/signage/media/${m.id}` : `/signage`,
-          });
-        }
-      })());
-    }
-
-    await Promise.allSettled(tasks);
-    items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    res.json({ success: true, data: items.slice(0, limit) });
-  }));
-
-  router.use('/home', homeRouter);
 
   // ============================================================================
   // News Routes - /api/v1/kpa/news/*
@@ -1366,43 +814,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         publishedAt: c.publishedAt,
         expiresAt: c.expiresAt,
       })),
-    });
-  }));
-
-  // ============================================================================
-  // Operator Audit Log Routes - /api/v1/kpa/operator/audit-logs
-  // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1
-  // ============================================================================
-  router.get('/operator/audit-logs', authenticate, requireKpaScope('kpa:admin'), asyncHandler(async (req: Request, res: Response) => {
-    const { action_type, target_type, operator_id, page = '1', limit = '20' } = req.query;
-
-    const qb = auditRepo.createQueryBuilder('log')
-      .orderBy('log.created_at', 'DESC');
-
-    if (action_type) {
-      qb.andWhere('log.action_type = :action_type', { action_type });
-    }
-    if (target_type) {
-      qb.andWhere('log.target_type = :target_type', { target_type });
-    }
-    if (operator_id) {
-      qb.andWhere('log.operator_id = :operator_id', { operator_id });
-    }
-
-    const pageNum = parseInt(page as string) || 1;
-    const limitNum = Math.min(parseInt(limit as string) || 20, 100);
-
-    qb.skip((pageNum - 1) * limitNum).take(limitNum);
-
-    const [logs, total] = await qb.getManyAndCount();
-
-    res.json({
-      success: true,
-      data: logs,
-      total,
-      page: pageNum,
-      limit: limitNum,
-      totalPages: Math.ceil(total / limitNum),
     });
   }));
 
@@ -1847,368 +1258,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     router.use('/contents', contentRouter);
   }
 
-  // ============================================================================
-  // OPERATOR RESOURCES MANAGEMENT — WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1
-  // 자료실 운영 관리 전용 라우트. kpa_contents 테이블 재사용 (member-driven content).
-  // /operator/docs(콘텐츠 허브)와 분리된 운영 진입점.
-  // ============================================================================
-  {
-    const opResourcesRouter = Router();
-
-    // GET /operator/resources — 운영자 자료실 목록 (모든 status 포함)
-    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
-    opResourcesRouter.get(
-      '/',
-      authenticate,
-      requireKpaScope('kpa:operator') as any,
-      asyncHandler(kpaContentCore.operatorList),
-    );
-
-    // PATCH /operator/resources/:id/status — 상태 변경 (숨김/노출)
-    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
-    opResourcesRouter.patch(
-      '/:id/status',
-      authenticate,
-      requireKpaScope('kpa:operator') as any,
-      asyncHandler(kpaContentCore.operatorUpdateStatus),
-    );
-
-    // DELETE /operator/resources/:id — soft delete
-    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
-    opResourcesRouter.delete(
-      '/:id',
-      authenticate,
-      requireKpaScope('kpa:operator') as any,
-      asyncHandler(kpaContentCore.operatorRemove),
-    );
-
-    router.use('/operator/resources', opResourcesRouter);
-  }
-
-  // ============================================================================
-  // Signage Community Management Routes — /api/v1/kpa/signage
-  // WO-KPA-SIGNAGE-VIDEO-PLAYLIST-STRUCTURE-REFORM-V2
-  // ============================================================================
-  {
-    const signageRouter = Router();
-
-    // ── helpers ──
-    function detectVideoSource(url: string): { sourceType: string; embedId: string | null; mediaType: string } {
-      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-      if (ytMatch) return { sourceType: 'youtube', embedId: ytMatch[1], mediaType: 'youtube' };
-      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-      if (vimeoMatch) return { sourceType: 'vimeo', embedId: vimeoMatch[1], mediaType: 'video' };
-      return { sourceType: 'url', embedId: null, mediaType: 'video' };
-    }
-
-    function isSignageOperatorOrAdmin(user: any): boolean {
-      if (!user?.roles) return false;
-      return user.roles.some((r: string) =>
-        r === 'kpa:operator' || r === 'kpa:admin' || r === 'platform:super_admin'
-      );
-    }
-
-    // POST /signage/media — 동영상 등록
-    signageRouter.post('/media', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
-      const { name, sourceUrl, description, tags, duration } = req.body;
-      if (!name?.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
-      if (!sourceUrl?.trim()) return res.status(400).json({ success: false, error: 'URL을 입력하세요' });
-
-      const { sourceType, embedId, mediaType } = detectVideoSource(sourceUrl.trim());
-      const tagArray = (Array.isArray(tags) ? tags : [])
-        .map((t: string) => String(t).trim().replace(/^#/, ''))
-        .filter(Boolean)
-        .filter((t: string) => t.length <= 30);
-      const uniqueTags = [...new Set(tagArray)];
-      if (uniqueTags.length === 0) {
-        return res.status(400).json({ success: false, error: '태그를 최소 1개 이상 입력해주세요' });
-      }
-      const durationSec = duration && Number(duration) > 0 ? Number(duration) : null;
-
-      const result = await dataSource.query(
-        `INSERT INTO signage_media
-          ("serviceKey", "organizationId", name, description, "mediaType", "sourceType", "sourceUrl", "embedId", duration, tags, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
-         VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, 'community', 'global', 'active', $10, now(), now())
-         RETURNING *`,
-        ['kpa-society', name.trim(), description?.trim() || null, mediaType, sourceType, sourceUrl.trim(), embedId, durationSec, uniqueTags, userId]
-      );
-      res.status(201).json({ success: true, data: result[0] });
-    }));
-
-    // PATCH /signage/media/:id — 동영상 수정
-    signageRouter.patch('/media/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
-      const { id } = req.params;
-
-      // 1. 존재 + 소유권 확인
-      const existing = await dataSource.query(
-        `SELECT id, "createdByUserId" FROM signage_media WHERE id = $1 AND "deletedAt" IS NULL`, [id]
-      );
-      if (!existing.length) return res.status(404).json({ success: false, error: '동영상을 찾을 수 없습니다' });
-      if (existing[0].createdByUserId !== userId && !isSignageOperatorOrAdmin((req as any).user)) {
-        return res.status(403).json({ success: false, error: '수정 권한이 없습니다' });
-      }
-
-      // 2. 수정 가능 필드 추출
-      const { name, description, sourceUrl, duration, tags } = req.body;
-
-      // 3. 동적 SET 절 구성
-      const sets: string[] = [];
-      const params: any[] = [];
-      let idx = 1;
-
-      if (name !== undefined) {
-        if (!name.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
-        sets.push(`name = $${idx++}`); params.push(name.trim());
-      }
-      if (description !== undefined) {
-        sets.push(`description = $${idx++}`); params.push(description?.trim() || null);
-      }
-      if (sourceUrl !== undefined) {
-        if (!sourceUrl.trim()) return res.status(400).json({ success: false, error: 'URL을 입력하세요' });
-        const { sourceType, embedId, mediaType } = detectVideoSource(sourceUrl.trim());
-        sets.push(`"sourceUrl" = $${idx++}`); params.push(sourceUrl.trim());
-        sets.push(`"sourceType" = $${idx++}`); params.push(sourceType);
-        sets.push(`"embedId" = $${idx++}`); params.push(embedId);
-        sets.push(`"mediaType" = $${idx++}`); params.push(mediaType);
-      }
-      if (duration !== undefined) {
-        sets.push(`duration = $${idx++}`); params.push(duration && Number(duration) > 0 ? Number(duration) : null);
-      }
-      if (tags !== undefined) {
-        const tagArray = (Array.isArray(tags) ? tags : [])
-          .map((t: string) => String(t).trim().replace(/^#/, ''))
-          .filter(Boolean)
-          .filter((t: string) => t.length <= 30);
-        const uniqueTags = [...new Set(tagArray)];
-        if (uniqueTags.length === 0) {
-          return res.status(400).json({ success: false, error: '태그를 최소 1개 이상 입력해주세요' });
-        }
-        sets.push(`tags = $${idx++}`); params.push(uniqueTags);
-      }
-
-      if (sets.length === 0) {
-        return res.status(400).json({ success: false, error: '수정할 내용이 없습니다' });
-      }
-
-      sets.push(`"updatedAt" = now()`);
-      params.push(id);
-      const result = await dataSource.query(
-        `UPDATE signage_media SET ${sets.join(', ')} WHERE id = $${idx} AND "deletedAt" IS NULL RETURNING *`,
-        params
-      );
-      res.json({ success: true, data: result[0] });
-    }));
-
-    // POST /signage/playlists — 플레이리스트 생성
-    signageRouter.post('/playlists', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
-      const { name, description, tags, items } = req.body;
-      if (!name?.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
-      if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ success: false, error: '항목을 추가하세요' });
-
-      const queryRunner = dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-      try {
-        // 1. Create playlist
-        const tagArray = Array.isArray(tags) ? tags.map((t: string) => String(t).trim()).filter(Boolean) : [];
-        const plResult = await queryRunner.query(
-          `INSERT INTO signage_playlists
-            ("serviceKey", "organizationId", name, description, status, source, scope, "loopEnabled", "itemCount", "totalDuration", "createdByUserId", tags, "createdAt", "updatedAt")
-           VALUES ('kpa-society', NULL, $1, $2, 'active', 'community', 'global', false, 0, 0, $3, $4::text[], now(), now())
-           RETURNING *`,
-          [name.trim(), description?.trim() || null, userId, tagArray]
-        );
-        const playlist = plResult[0];
-
-        // 2. Create items
-        let totalDuration = 0;
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          const itemUrl = item.sourceUrl?.trim();
-          if (!itemUrl) continue;
-
-          const { sourceType, embedId, mediaType } = detectVideoSource(itemUrl);
-          const itemDuration = item.duration && Number(item.duration) > 0 ? Number(item.duration) : 0;
-          const itemName = item.name?.trim() || itemUrl;
-
-          // Find or create media
-          const existing = await queryRunner.query(
-            `SELECT id FROM signage_media WHERE "sourceUrl" = $1 AND "serviceKey" = 'kpa-society' AND "deletedAt" IS NULL LIMIT 1`,
-            [itemUrl]
-          );
-
-          let mediaId: string;
-          if (existing.length > 0) {
-            mediaId = existing[0].id;
-          } else {
-            const mediaResult = await queryRunner.query(
-              `INSERT INTO signage_media
-                ("serviceKey", "organizationId", name, "mediaType", "sourceType", "sourceUrl", "embedId", duration, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
-               VALUES ('kpa-society', NULL, $1, $2, $3, $4, $5, $6, 'community', 'global', 'active', $7, now(), now())
-               RETURNING id`,
-              [itemName, mediaType, sourceType, itemUrl, embedId, itemDuration || null, userId]
-            );
-            mediaId = mediaResult[0].id;
-          }
-
-          // Create playlist item
-          await queryRunner.query(
-            `INSERT INTO signage_playlist_items ("playlistId", "mediaId", "sortOrder", duration, "isActive", "sourceType", "createdAt", "updatedAt")
-             VALUES ($1, $2, $3, $4, true, 'community', now(), now())`,
-            [playlist.id, mediaId, i, itemDuration]
-          );
-          totalDuration += itemDuration;
-        }
-
-        // 3. Update totals
-        await queryRunner.query(
-          `UPDATE signage_playlists SET "itemCount" = $1, "totalDuration" = $2, "updatedAt" = now() WHERE id = $3`,
-          [items.length, totalDuration, playlist.id]
-        );
-
-        await queryRunner.commitTransaction();
-
-        // Return playlist with items
-        const full = await dataSource.query(
-          `SELECT p.*, json_agg(json_build_object(
-              'id', pi.id, 'mediaId', pi."mediaId", 'sortOrder', pi."sortOrder", 'duration', pi.duration,
-              'media', json_build_object('id', m.id, 'name', m.name, 'sourceUrl', m."sourceUrl", 'sourceType', m."sourceType", 'duration', m.duration)
-            ) ORDER BY pi."sortOrder") AS items
-           FROM signage_playlists p
-           LEFT JOIN signage_playlist_items pi ON pi."playlistId" = p.id
-           LEFT JOIN signage_media m ON m.id = pi."mediaId"
-           WHERE p.id = $1
-           GROUP BY p.id`,
-          [playlist.id]
-        );
-        res.status(201).json({ success: true, data: full[0] });
-      } catch (err) {
-        await queryRunner.rollbackTransaction();
-        throw err;
-      } finally {
-        await queryRunner.release();
-      }
-    }));
-
-    // PATCH /signage/playlists/:id — 플레이리스트 수정
-    signageRouter.patch('/playlists/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
-      const playlistId = req.params.id;
-      const { name, description, tags, items } = req.body;
-
-      // Ownership check
-      const existing = await dataSource.query(
-        `SELECT id, "createdByUserId" FROM signage_playlists WHERE id = $1 AND "deletedAt" IS NULL`,
-        [playlistId]
-      );
-      if (existing.length === 0) return res.status(404).json({ success: false, error: '플레이리스트를 찾을 수 없습니다' });
-      if (existing[0].createdByUserId !== userId) {
-        const isOp = isSignageOperatorOrAdmin((req as any).user);
-        if (!isOp) return res.status(403).json({ success: false, error: '수정 권한이 없습니다' });
-      }
-
-      const queryRunner = dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-      try {
-        // 1. Update playlist fields
-        const tagArray = Array.isArray(tags) ? tags.map((t: string) => String(t).trim()).filter(Boolean) : [];
-        if (name?.trim()) {
-          await queryRunner.query(
-            `UPDATE signage_playlists SET name = $1, description = $2, tags = $3::text[], "updatedAt" = now() WHERE id = $4`,
-            [name.trim(), description?.trim() || null, tagArray, playlistId]
-          );
-        }
-
-        // 2. Replace items
-        if (Array.isArray(items)) {
-          await queryRunner.query(`DELETE FROM signage_playlist_items WHERE "playlistId" = $1`, [playlistId]);
-
-          let totalDuration = 0;
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const itemUrl = item.sourceUrl?.trim();
-            if (!itemUrl) continue;
-
-            const { sourceType, embedId, mediaType } = detectVideoSource(itemUrl);
-            const itemDuration = item.duration && Number(item.duration) > 0 ? Number(item.duration) : 0;
-            const itemName = item.name?.trim() || itemUrl;
-
-            const existingMedia = await queryRunner.query(
-              `SELECT id FROM signage_media WHERE "sourceUrl" = $1 AND "serviceKey" = 'kpa-society' AND "deletedAt" IS NULL LIMIT 1`,
-              [itemUrl]
-            );
-
-            let mediaId: string;
-            if (existingMedia.length > 0) {
-              mediaId = existingMedia[0].id;
-            } else {
-              const mediaResult = await queryRunner.query(
-                `INSERT INTO signage_media
-                  ("serviceKey", "organizationId", name, "mediaType", "sourceType", "sourceUrl", "embedId", duration, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
-                 VALUES ('kpa-society', NULL, $1, $2, $3, $4, $5, $6, 'community', 'global', 'active', $7, now(), now())
-                 RETURNING id`,
-                [itemName, mediaType, sourceType, itemUrl, embedId, itemDuration || null, userId]
-              );
-              mediaId = mediaResult[0].id;
-            }
-
-            await queryRunner.query(
-              `INSERT INTO signage_playlist_items ("playlistId", "mediaId", "sortOrder", duration, "isActive", "sourceType", "createdAt", "updatedAt")
-               VALUES ($1, $2, $3, $4, true, 'community', now(), now())`,
-              [playlistId, mediaId, i, itemDuration]
-            );
-            totalDuration += itemDuration;
-          }
-
-          await queryRunner.query(
-            `UPDATE signage_playlists SET "itemCount" = $1, "totalDuration" = $2, "updatedAt" = now() WHERE id = $3`,
-            [items.length, totalDuration, playlistId]
-          );
-        }
-
-        await queryRunner.commitTransaction();
-
-        const full = await dataSource.query(
-          `SELECT p.*, json_agg(json_build_object(
-              'id', pi.id, 'mediaId', pi."mediaId", 'sortOrder', pi."sortOrder", 'duration', pi.duration,
-              'media', json_build_object('id', m.id, 'name', m.name, 'sourceUrl', m."sourceUrl", 'sourceType', m."sourceType", 'duration', m.duration)
-            ) ORDER BY pi."sortOrder") AS items
-           FROM signage_playlists p
-           LEFT JOIN signage_playlist_items pi ON pi."playlistId" = p.id
-           LEFT JOIN signage_media m ON m.id = pi."mediaId"
-           WHERE p.id = $1
-           GROUP BY p.id`,
-          [playlistId]
-        );
-        res.json({ success: true, data: full[0] });
-      } catch (err) {
-        await queryRunner.rollbackTransaction();
-        throw err;
-      } finally {
-        await queryRunner.release();
-      }
-    }));
-
-    router.use('/signage', signageRouter);
-  }
-
   // Groupbuy Routes (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/groupbuy', createEventOfferController(dataSource, authenticate as any, optionalAuth as any, requireKpaScope));
-
-  // MyPage Routes (WO-O4O-ROUTES-REFACTOR-V1)
-  router.use('/mypage', createMypageController(dataSource, authenticate as any));
 
   // ============================================================================
   // Checkout Routes — WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
