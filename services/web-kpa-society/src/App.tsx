@@ -1,3 +1,4 @@
+import { BusinessContactPage, BusinessInboxPage } from './pages/contact/BusinessContactPages';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from './config/businessSite';
 import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
@@ -353,7 +354,9 @@ function App() {
           <Route path="/certificate/verify/:certificateId" element={<LectureCertificateVerifyRedirect />} />
 
           {/* 법정 · 문의 */}
-          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          <Route path="/contact/legacy" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          <Route path="/operator/inbox/business/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessInboxPage /></Layout>} />
+          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><BusinessContactPage /></Layout>} />
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
 

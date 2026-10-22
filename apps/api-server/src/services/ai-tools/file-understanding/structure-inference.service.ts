@@ -27,6 +27,7 @@ import {
 
 export interface InferFileStructureRequest {
   profile: StructureProfile;
+  usage?: 'file.structure' | 'hospital.structure';
   targetSchema: TargetSchema;
   timeoutMs?: number;
   /**
@@ -51,9 +52,10 @@ export interface InferFileStructureResult {
  * 동적 import 로 connection.js(엔티티 그래프·import 시 DB 초기화)를 **호출 시점**까지 지연한다.
  * 프로덕션 동작은 정적 import 시절과 동일(모듈은 앱 부팅 때 이미 초기화됨).
  */
-async function defaultResolveModel(): Promise<string> {
+async function defaultResolveModel(usage: 'file.structure' | 'hospital.structure'): Promise<string> {
   const { resolveEditingModel } = await import('../../../utils/ai-editing-model-resolver.js');
-  return resolveEditingModel();
+  const [{ AppDataSource }, { ModelControlService }] = await Promise.all([import('../../../database/connection.js'), import('../../ai-management/model-controls.js')]);
+  return (await new ModelControlService(AppDataSource).resolve(usage, { provider: 'gemini', model: await resolveEditingModel() })).model;
 }
 
 /** 기본 key resolver — ai_settings(DB 초기화 시) → env(GEMINI_API_KEY 등). */
@@ -156,7 +158,7 @@ function buildUserPrompt(profile: StructureProfile, schema: TargetSchema): strin
  * @throws execute()/JSON.parse 실패를 전파 — 호출측이 재시도·QUESTION 전략을 결정.
  */
 export async function inferFileStructure(request: InferFileStructureRequest): Promise<InferFileStructureResult> {
-  const model = await (request.resolveModel ? request.resolveModel() : defaultResolveModel());
+  const model = await (request.resolveModel ? request.resolveModel() : defaultResolveModel(request.usage ?? 'file.structure'));
   const apiKey = await (request.resolveApiKey ? request.resolveApiKey() : defaultResolveApiKey());
 
   const result = await execute({

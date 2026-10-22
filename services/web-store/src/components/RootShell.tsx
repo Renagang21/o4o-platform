@@ -1,3 +1,4 @@
+import { OperatorInboxLink } from '@o4o/operator-core-ui';
 /**
  * 공통 root shell — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥
  * 홈 · 내 매장 · 서비스 업무 · 내 서비스 · 설정을 제공한다. HUB 기능은 내 매장에 배치한다.
@@ -51,7 +52,8 @@ export default function RootShell() {
             {item.label}
           </NavLink>
         ))}
-        {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <NavLink to="/operator/pharmacy-memberships">매장 신청 심사</NavLink>}
+        {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <><NavLink to="/operator/pharmacy-memberships">매장 신청 심사</NavLink><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/store" href="/operator/inbox"/></>}
+        <a href="https://neture.co.kr/contact?service=store">Contact Us</a>
       </nav>
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}
@@ -65,7 +67,7 @@ export default function RootShell() {
     </header>
     <div className="content"><Outlet key={organizationId ?? 'no-store'} /></div>
     <footer className="footer">
-      <div className="footer-links">
+      <div className="footer-links"><Link to="/contact">문의하기</Link>
         <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>
         <a href={`${PLATFORM_ORIGIN}/privacy`}>개인정보처리방침</a>
         <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="link-button footer-o4o-home" />

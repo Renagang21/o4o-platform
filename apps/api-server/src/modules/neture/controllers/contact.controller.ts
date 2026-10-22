@@ -1,3 +1,5 @@
+import { serviceContactRecipients } from '../../contact-inquiry/contact-recipients.js';
+import { deliverOperatorNotifications } from '../../../modules/contact-inquiry/operator-delivery.js';
 /**
  * ContactController — WO-O4O-NETURE-CONTACT-PAGE-V1
  *
@@ -109,16 +111,9 @@ export function createContactController(dataSource: DataSource): Router {
       //   실패가 문의 접수(저장)를 실패시키지 않도록 try/catch 로 격리.
       let inappStatus = 'none';
       try {
-        const operators: { userId: string }[] = await dataSource.query(
-          `SELECT DISTINCT user_id AS "userId"
-             FROM role_assignments
-            WHERE role IN ('neture:operator','neture:admin')
-              AND is_active = true
-            LIMIT 50`,
-        );
+        const operators = await serviceContactRecipients(dataSource, 'neture', 'neture');
         if (operators.length > 0) {
-          await Promise.allSettled(
-            operators.map((op) =>
+          inappStatus = await deliverOperatorNotifications(operators, (op) =>
               notificationService.createNotification({
                 userId: op.userId,
                 type: 'contact.new',
@@ -131,9 +126,7 @@ export function createContactController(dataSource: DataSource): Router {
                   targetUrl: '/operator/contact-messages?status=new',
                 },
               }),
-            ),
-          );
-          inappStatus = 'sent';
+            );
         }
       } catch (notifyError) {
         inappStatus = 'fail';
@@ -155,7 +148,7 @@ export function createContactController(dataSource: DataSource): Router {
           phone: entity.phone,
           message: entity.message,
           createdAt: entity.createdAt,
-          adminManageUrl: '/admin/contact-messages',
+          adminManageUrl: '/operator/contact-messages',
         });
         emailStatus = r.emailStatus;
         autoReplyStatus = r.autoReplyStatus;

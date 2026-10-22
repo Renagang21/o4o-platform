@@ -6,7 +6,7 @@
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-21 (§15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-21 (§4·6-2 협업체별 업무·공개 모집 주문 조건, §15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 약국 협력사업 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -219,13 +219,14 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 | default | `spo.default_supply_enabled=true` ∧ `spo.price_general>0` ∧ 약국의 `pharmacy` 약국 협력사업 가입 active |
 | proposal | `sp.status='approved'` ∧ 약국 협력사업 `status='active'` ∧ 약국의 해당 약국 협력사업 가입 active ∧ (`target_organization_id IS NULL` ∨ = 약국) |
 | event | OPL `service_key='neture-event-offer'` ∧ `status='approved'` ∧ `is_active` ∧ 기간 내 ∧ 운영 조직 → 약국 협력사업 active ∧ 약국 가입 active |
-| recruitment | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 약국 협력사업 가입 active ∧ `supply_unit_price IS NOT NULL` |
+| recruitment (협업체 대상) | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 약국 협력사업 가입 active ∧ `supply_unit_price > 0` |
+| recruitment (일반 공개, 2026-10-21 보완) | 기존 `recruitmentPublicMatch()` 분류 ∧ `status='recruiting'` ∧ 선택 약국 조직의 application `approved` ∧ 명시된 `supply_unit_price > 0`. 협업체 가입·기본가·수취 주체를 추정하지 않음. §6-2 참조 |
 
 - 미가입 · 미승인 · 정지 · 종료 약국 협력사업 항목은 전체 탭 · 검색 · 상세 · 주문 API 어디에도 나오지 않는다(상세는 404 `SUPPLY_OPTION_NOT_AVAILABLE`).
 - 출처 탭·약국 협력사업 필터(`source=all|default|proposal|event|recruitment|sf:<key>`)는 접근 집합을 만든 **뒤** 거른다. 기존 통합 조회·필터와 회귀 테스트의 실제 범위를 먼저 확인한 뒤 필요한 화면 구획과 검증을 보완한다.
 - 가격 비교 · 최저가 자동 선택 · 경고 없음. 응답은 공급 경로 · 공급자 · 조건 · 단가를 그대로 보여준다.
 
-API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET .../supply-options/:kind/:id`.
+API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&business=&recruitment=&q=&page=` · `GET .../supply-options/:kind/:id`. 선택적 `business`는 공급 종류와 독립된 협업체 필터, `recruitment`는 승인된 모집에서 넘어온 단일 모집 필터다. `source=sf:<key>` 기존 URL도 유지한다.
 
 ---
 
@@ -280,6 +281,17 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 - 매장 소유권·가입·게시 상태는 서버가 검사한다. 매장 전환 시 화면 상태를 다시 만들고, 제품 API의 토큰 갱신 재시도는 최초 요청의 선택 매장 헤더를 유지한다. 사업 탭이나 선택 매장 헤더 자체를 권한 근거로 사용하지 않는다.
 - 상위 메뉴는 홈·내 매장·이용 사업·설정이다. 남아 있는 서비스별 업무 도구는 설정에서 접근한다. `/work/kpa-society/store/*` 및 PharmacyHub commerce의 제거는 별도 legacy 작업이다.
 
+
+### 6-2. 협업체별 업무 가시성과 같은 주문 흐름 (2026-10-21)
+
+근거 작업: [협업체별 상품·주문·컨텐츠 TODO](../work-orders/TODO-O4O-STORE-COOPERATION-WORKFLOWS-V1.md). 이 절은 이번 Store/Neture 로컬 개발 계약이며 운영 적용 완료를 뜻하지 않는다.
+
+- 상품·거래는 기존 상품 주문 목록을 시작점으로 사용하고 상품 주문·내 취급상품·주문 내역·판매처 모집을 간단한 업무 버튼으로 연결한다. 약국 공급 메뉴가 없는 매장은 기존 취급상품 시작점을 유지한다. 매장 컨텐츠에는 제공 자료·내 컨텐츠 입구를 노출한다. 기존 URL·capability와 네 주요 목적지는 유지한다.
+- 가입 탭의 근거는 선택 약국의 `semi_franchise_memberships` 원장이다. 제품·자료 수가 0이어도 활성 가입 탭을 남긴다. 조회 실패는 재시도, 정상 빈 결과는 해당 협업체에 자료가 없음을 표시한다. 내부 서비스 문맥이나 조합 개인 가입을 약국 사업 가입으로 대체하지 않는다.
+- 상품 주문의 `business`와 공급 종류 `source`를 독립적으로 유지한다. `business=__public__`는 일반 공개 모집의 화면 필터이며 협업체 키나 신규 가입이 아니다. `orderable`은 같은 공급 SQL로 판정하고, 참여 승인 및 주문 조건이 갖춰진 모집만 동일한 상품 주문→장바구니→주문 확정으로 연결한다.
+- 일반 공개의 분류는 기존 `recruitmentPublicMatch()`를 그대로 사용한다. 특히 협업체 미지정이어도 공급가가 있는 `neture-pharmacy`/`kpa-society` 기존 모집을 공개 모집으로 재분류하지 않는다. §3-6의 당초 신규 협업체 모집 생성 예시는 신규 생성 근거로 쓰지 않으며, [공급자 메뉴 정렬 WO](../work-orders/WO-O4O-SUPPLIER-BUSINESS-INFO-AND-MENU-ALIGNMENT-V1.md)의 신규 협업체 모집 종료와 기존 읽기·참여 계약을 유지한다.
+- 일반 모집 생성 화면은 현재 공급가를 입력하지 않는다. 공급가 없는 기존/신규 일반 모집은 표시·참여 신청은 유지하고 **주문 조건 확인 필요**로 안내한다. 소비자가·SPO 기본가를 공급가로 바꾸지 않는다. 공급가 입력·확정 계약은 공급자 후속 작업이며 실 PG·정산·수취 주체 확정도 이번 범위가 아니다. 공개 모집의 미확정 receiver는 공급자별 미확정 그룹으로 구분하고 기존 payment-first 경계를 유지한다.
+- 내 컨텐츠의 선택적 `business` 조회는 편집 가능한 본문이 아닌 불변 snapshot의 `semiFranchiseKey`를 사용한다. 원본 비공개·가입 종료 이후에도 매장 소유 사본과 과거 주문은 조회한다. 서비스 미가입 매장의 소유 컨텐츠 화면에는 약국 가입 조회를 추가하지 않는다. 계정·선택 약국 변경 뒤 이전 응답이 새 화면을 덮지 않도록 한다.
 
 ## 7. 커뮤니티
 

@@ -37,10 +37,10 @@ export interface ServiceMeta {
 
 export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   platform: { key: 'platform', label: 'Platform', badgeClass: 'text-red-700 bg-red-50' },
-  kpa: { key: 'kpa', label: 'KPA', badgeClass: 'text-blue-700 bg-blue-50' },
+  kpa: { key: 'kpa', label: '약국 경영지원 (기존)', badgeClass: 'text-blue-700 bg-blue-50' },
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
-  'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
+  'kpa-branch': { key: 'kpa-branch', label: '분회', badgeClass: 'text-sky-700 bg-sky-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
   supplier: { key: 'supplier', label: '공급자', badgeClass: 'text-amber-700 bg-amber-50' },
   funding: { key: 'funding', label: '유통참여형 펀딩', badgeClass: 'text-lime-700 bg-lime-50' },

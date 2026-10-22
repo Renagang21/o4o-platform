@@ -2,7 +2,10 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { StoreContentsSelector } from '../../StoreContentsSelector';
-const api = vi.hoisted(() => ({ store: 'A', list: vi.fn(), usage: vi.fn(), reimport: vi.fn() }));
+const api = vi.hoisted(() => ({ store: 'A', service: 'kpa-society' as string | null, list: vi.fn(), usage: vi.fn(), reimport: vi.fn(), businesses: vi.fn() }));
+vi.mock('../../../../contexts/StoreContext', () => ({useUnifiedStore:()=>({effectiveServiceKey:api.service})}));
+vi.mock('../../../../contexts/AuthContext', () => ({useAuth:()=>({user:{id:'fixture'}})}));
+vi.mock('../../../../api/neturePharmacy', () => ({neturePharmacyApi:{listSemiFranchises:api.businesses}}));
 vi.mock('../../../../hooks/useStoreOrganizationId', () => ({ useStoreOrganizationId: () => ({ organizationId: api.store }) }));
 vi.mock('../../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
 vi.mock('../../../../lib/serviceContext', () => ({ getActiveServiceKey: () => 'kpa-society' }));
@@ -11,7 +14,7 @@ vi.mock('../../../../components/store/StoreQrCreateModal', () => ({ StoreQrCreat
 vi.mock('../../ContentPdfExportModal', () => ({ ContentPdfExportModal: ({ open }: { open: boolean }) => open ? <p>PDF target open</p> : null }));
 const row = (id = 'one', origin = 'direct') => ({ id, selectionKey: `${origin}:${id}`, origin, title: `Fixture ${id}`, contentJson: { html: '<p>Fixture</p>' }, tags: ['Fixture tag'], hasSourceUpdate: false, createdAt: '2026-10-15T00:00:00Z' });
 const feed = (items = [row()], totalPages = 1) => ({ success: true, data: { items, total: items.length, totalPages } });
-beforeEach(() => { vi.restoreAllMocks(); vi.resetAllMocks(); api.store = 'A'; api.list.mockResolvedValue(feed()); api.usage.mockResolvedValue({ success: true, data: { usage: { qr: 2, tablet_display: 1, product_link: 0, pop_pdf: 0 } } }); });
+beforeEach(() => { vi.restoreAllMocks(); vi.resetAllMocks(); api.store = 'A'; api.service='kpa-society'; api.businesses.mockResolvedValue([]); api.list.mockResolvedValue(feed()); api.usage.mockResolvedValue({ success: true, data: { usage: { qr: 2, tablet_display: 1, product_link: 0, pop_pdf: 0 } } }); });
 afterEach(cleanup);
 const start = vi.fn(), remove = vi.fn(), afterRemove = vi.fn();
 function Location() { const location = useLocation(); return <p data-testid="location">{location.pathname}{location.search}</p>; }
@@ -66,6 +69,24 @@ it('modal mode never rewrites its host URL or exposes destructive actions', asyn
   await waitFor(() => expect(api.list.mock.calls[api.list.mock.calls.length - 1][0].search).toBe('Modal query'));
   expect(screen.getByTestId('location').textContent).toBe('/library?host=retained');
   expect(screen.queryByRole('button', { name: '선택 삭제' })).toBeNull();
+  expect(api.businesses).not.toHaveBeenCalled();
+});
+it('business filter reads owned copies independently and keeps unrelated URL parameters', async () => {
+  api.businesses.mockResolvedValue([{key:'network-a',name:'협업체 A',membershipStatus:'terminated',communityKey:null}]);
+  show('/library?pId=fixture&libraryPage=2');
+  fireEvent.click(await screen.findByRole('button',{name:'협업체 A'}));
+  await waitFor(()=>expect(api.list).toHaveBeenLastCalledWith(expect.objectContaining({page:1,source:'franchise',business:'network-a'})));
+  expect(screen.getByTestId('location').textContent).toContain('pId=fixture');
+  expect(screen.getByTestId('location').textContent).toContain('libraryBusiness=network-a');
+  fireEvent.click(screen.getByRole('button',{name:'내가 만든 콘텐츠'}));
+  await waitFor(()=>expect(api.list.mock.calls[api.list.mock.calls.length - 1][0].business).toBeUndefined());
+  expect(screen.getByTestId('location').textContent).not.toContain('libraryBusiness');
+});
+it('owned content without a service enrollment does not request pharmacy membership', async () => {
+  api.service=null; show();
+  await screen.findByRole('link',{name:'Fixture one'});
+  expect(api.businesses).not.toHaveBeenCalled();
+  expect(screen.queryByRole('region',{name:'협업체 선택'})).toBeNull();
 });
 it('store switch before React rerenders prevents using the old selected rows', async () => {
   show(); await select(); api.store = 'B';

@@ -40,7 +40,7 @@ export const menuPermissions: MenuPermission[] = [
   //   위 id 를 가진 메뉴 항목이 0건이므로 해당 설정은 평가되는 경로가 없었다.
   //   또한 "설정 없음 = 허용" 정책(아래 hasMenuPermission)이라 제거로 접근이 좁아질 수 없다.
   //
-  //   남긴 항목은 정적 메뉴에 실재하는 2건뿐이다: dashboard(무게이트) · core-users(실게이트).
+  //   남긴 항목은 정적 메뉴에 실재하는 현재 정적 메뉴다: dashboard · core-operators 등.
   //   WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§4):
   //   deny-by-default 전환에 따라 'dashboard' 도 명시적인 설정을 갖는다.
   //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
@@ -49,20 +49,6 @@ export const menuPermissions: MenuPermission[] = [
   { menuId: 'pharmacy-service-settings', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'dashboard',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-
-  // WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1:
-  // /users 는 platform super_admin 전용 RBAC 권한 할당 콘솔로 재정렬됨.
-  //
-  // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — 백엔드 경계로 재정렬:
-  //   화면이 실제 호출하는 API 는 `/api/v1/admin/users` 이고(UsersListClean.tsx:72),
-  //   그 guard 는 `ADMIN_ROLES = ['platform:super_admin']` 이다
-  //   (routes/admin/users.routes.ts:32).
-  //   기존 선언은 백엔드 allow-list 와 어긋난 역할을 나열해 **백엔드가 허용하는 사용자에게 메뉴를 숨기고**,
-  //   `super_admin` 을 포함해 **백엔드가 거부하는 사용자에게 메뉴를 보여주었다** — 양방향 불일치.
-  {
-    menuId: 'core-users',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 

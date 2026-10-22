@@ -1,11 +1,8 @@
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 import { PLATFORM_ADMIN_ROLES } from '@/config/rolePermissions';
 
-const UsersPage = lazy(() => import('@/pages/users'));
-const UserForm = lazy(() => import('@/pages/users/UserForm'));
-const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // Operators Management (admin.neture.co.kr)
 const OperatorsPage = lazy(() => import('@/pages/operators'));
@@ -74,35 +71,35 @@ export function UserRoutes() {
     <Route key="/users" path="/users" element={
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:read']}>
         <Suspense fallback={<PageLoader />}>
-          <UsersPage />
+          <Navigate to="/operators" replace />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/add" path="/users/add" element={
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:create']}>
         <Suspense fallback={<PageLoader />}>
-          <UserForm />
+          <Navigate to="/operators" replace />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/new" path="/users/new" element={
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:create']}>
         <Suspense fallback={<PageLoader />}>
-          <UserForm />
+          <Navigate to="/operators" replace />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/:id" path="/users/:id" element={
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:read']}>
         <Suspense fallback={<PageLoader />}>
-          <UserDetail />
+          <Navigate to="/operators" replace />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/:id/edit" path="/users/:id/edit" element={
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:update']}>
         <Suspense fallback={<PageLoader />}>
-          <UserForm />
+          <Navigate to="/operators" replace />
         </Suspense>
       </AdminProtectedRoute>
     } />,

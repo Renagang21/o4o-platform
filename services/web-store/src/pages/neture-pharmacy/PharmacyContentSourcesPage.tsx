@@ -4,7 +4,7 @@ import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigati
 /**
  * 이용 가능 콘텐츠 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  *
- *   GET  /api/v1/neture/pharmacy/store/contents?sf=&q=&page=&limit=  가입(active) 세미프랜차이즈의 게시 콘텐츠
+ *   GET  /api/v1/neture/pharmacy/store/contents?sf=&q=&page=&limit=  가입(active) 협업체의 게시 콘텐츠
  *   POST /api/v1/neture/pharmacy/store/contents/:id/copy              내 매장 사본(매장 소유 독립 사본) 만들기
  * 어떤 콘텐츠를 볼 수 있는지는 서버 판정이다(가입 상태 · 게시 상태). 화면은 응답을 그대로 보여준다.
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
@@ -15,9 +15,11 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
-import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, type SemiFranchiseRow } from '../../api/neturePharmacy';
+import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent } from '../../api/neturePharmacy';
 import { WORKSPACE_PATHS } from '../../config/workspace';
-import { BusinessTabs } from '../../components/BusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
+import { useStoreBusinesses } from './useStoreBusinesses';
+import { useAuth } from '../../contexts/AuthContext';
 import { CAREPHARM_MATERIAL_TAGS } from '@o4o/shared-space-ui';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { useUnifiedStore } from '../../contexts/StoreContext';
@@ -43,9 +45,16 @@ function ContentBody({ body }: { body: string | null }) {
   return <p className="whitespace-pre-wrap text-sm text-gray-700">{body}</p>;
 }
 
+function contentEmptyText(filtered: boolean, business: string, name: string): string {
+  if (filtered) return '검색 조건에 맞는 자료가 없습니다.';
+  if (business) return `${name}가 제공한 자료가 아직 없습니다.`;
+  return '이용할 수 있는 협업체 콘텐츠가 없습니다.';
+}
+
 export default function PharmacyContentSourcesPage() {
   const { organizationId } = useUnifiedStore();
-  return <PharmacyContentSources key={organizationId} />;
+  const { user } = useAuth();
+  return <PharmacyContentSources key={`${user?.id}:${organizationId}`} />;
 }
 
 function PharmacyContentSources() {
@@ -55,9 +64,10 @@ function PharmacyContentSources() {
   const copying = useRef(false);
   const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
   const { begin: beginSelection } = useLatestRequest();
-  const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
+  const businesses = useStoreBusinesses();
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
+  const savedLibraryPath = sf ? `${libraryPath}?libraryBusiness=${encodeURIComponent(sf)}` : libraryPath;
   const selectedContentId = params.get('content') || '';
   const q = params.get('q')?.trim() || '';
   const tag = params.get('tag')?.trim() || '';
@@ -75,12 +85,6 @@ function PharmacyContentSources() {
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
-
-  useEffect(() => {
-    neturePharmacyApi.listSemiFranchises()
-      .then((rows) => setFranchises(rows.filter((r) => r.membershipStatus === 'active')))
-      .catch(() => setFranchises([]));
-  }, []);
 
   const fetchList = useCallback(async () => {
     const isCurrent = beginSelection();
@@ -131,11 +135,11 @@ function PharmacyContentSources() {
   return (
     <PharmacyPage
       title="자료 가져오기"
-      description="가입한 세미프랜차이즈가 게시한 콘텐츠를 확인하고 내 매장 사본으로 가져와 편집할 수 있습니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다."
+      description="가입한 협업체가 게시한 콘텐츠를 확인하고 내 매장 사본으로 가져와 편집할 수 있습니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       <StoreLibraryNavigation section="sources" />
-      <BusinessTabs businesses={franchises} value={sf} onChange={key => { setQInput(''); updateFilters({ business: key, q: '', tag: '' }); }} />
+      <StoreBusinessTabs businesses={businesses} value={sf} onChange={key => { setQInput(''); updateFilters({ business: key, q: '', tag: '' }); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
           <Link key={s.key} to={s.key === 'store-library' ? libraryPath : s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
@@ -146,12 +150,12 @@ function PharmacyContentSources() {
       </section>
 
       <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-gray-200">
-        <span className="-mb-px border-b-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-700">가입 세미프랜차이즈</span>
+        <span className="-mb-px border-b-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-700">가입 협업체</span>
       </div>
 
       {copied && (
         <Notice>
-          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={libraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
+          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={savedLibraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
       {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
@@ -176,9 +180,9 @@ function PharmacyContentSources() {
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
-          <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.'}</p>
-          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.'}</p>
-          <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">세미프랜차이즈 보기</Link>
+          <p>{contentEmptyText(Boolean(q || tag), sf, storeBusinessName(businesses.rows, sf))}</p>
+          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '협업체가 게시한 자료는 이 공간에 표시됩니다. 이미 가져온 사본은 내 컨텐츠에서 확인하세요.'}</p>
+          <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">협업체 보기</Link>
         </div>
       ) : (
         <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">

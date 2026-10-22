@@ -43,8 +43,13 @@ export interface ContactInquiryListParams {
   limit?: number;
 }
 
+export interface ContactReply { id: string; message: string; status: 'sending' | 'sent' | 'failed'; createdAt: string }
+
 /** service 측이 구현해 주입하는 어댑터. 실패 시 throw(메시지). */
 export interface ContactInquiryApi {
+  getReplies?(serviceKey: string, id: string): Promise<ContactReply[]>;
+  sendReply?(serviceKey: string, id: string, input: { requestId: string; message: string }): Promise<{ id: string; status: string }>;
+  retryNotifications?(serviceKey: string, id: string): Promise<unknown>;
   list(serviceKey: string, params: ContactInquiryListParams): Promise<ContactInquiryListResult>;
   getDetail(serviceKey: string, id: string): Promise<ContactInquiryDetail>;
   setStatus(serviceKey: string, id: string, status: string): Promise<ContactInquiryDetail>;

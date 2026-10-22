@@ -8,6 +8,7 @@ export { ContactInquiryAdminPage } from './ContactInquiryAdminPage';
 export { CONTACT_STATUSES } from './types';
 export type {
   ContactInquiryApi,
+  ContactReply,
   ContactInquiryListItem,
   ContactInquiryDetail,
   ContactInquiryListResult,

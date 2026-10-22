@@ -496,3 +496,22 @@ https://github.com/GoogleCloudPlatform/cloud-sql-proxy/releases 에서 **v2** Wi
 ---
 
 *로컬 실행환경 단일 기준 문서. 실행환경 관련 안내는 이 문서에만 유지합니다.*
+
+
+### 서비스 문의·운영 업무함 PostgreSQL 검증
+
+문의 범위·역할·동시 수정·알림 실패·업무 SQL 검증은 기존 개발 DB와 분리한다.
+PostgreSQL 15를 loopback `127.0.0.1:55439`에 준비하고 로컬 전용 role `operator_inbox_fixture`에
+`CREATEDB` 및 관리 DB `postgres` 접속 권한을 부여한다. 같은 이름의 운영 계정이나 운영 접속값을 사용하지 않는다.
+전용 DB `o4o_operator_inbox_fixture`는 **없는 상태**여야 하며 wrapper가 생성·삭제한다.
+런타임 `DB_*` 설정은 사용하지 않는다. 인증은 준비한 전용 로컬 서버 설정을 따른다.
+
+```text
+pnpm run build:packages
+pnpm exec tsx scripts/dev/run-operator-inbox-fixture.ts
+```
+
+wrapper는 baseline·모든 incremental fingerprint, 신규 migration empty down/up을 검사하고 실제 HTTP/권한 테스트를 실행한다.
+기존 DB면 재사용/삭제를 거부하고 생성한 DB의 무작위 소유권 marker가 일치할 때만 제거한다.
+`Fixture cleanup PASS: database count 0`까지 확인한다. 직접 Jest를 실행해 PG 테스트가 skip된 결과는 통합 PASS가 아니다.
+테스트용 서버는 실행 담당이 종료하며 다른 DB·세션의 서버나 연결을 강제로 정리하지 않는다.

@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../config/businessSite';
 /**
  * MobileBottomNav — KPA-Society 모바일 하단 네비게이션
  *
@@ -39,7 +40,7 @@ import {
   getKpaUserDisplayName,
   KpaUserMenuItems,
 } from './KpaUserMenu';
-import { resolveNotificationTarget } from '../lib/notificationRouting';
+import { openNotificationTarget } from '../lib/notificationRouting';
 
 /** 프로필 시트 메뉴 항목과 같은 모양의 O4O 홈 버튼 */
 const O4O_HOME_SHEET_ITEM_CLASS =
@@ -76,7 +77,7 @@ export function MobileBottomNav() {
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
 
   // 알림 — KpaGlobalHeader 와 동일 serviceKey('kpa-society') source. 새 API 없음.
-  const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: 'kpa-society' });
+  const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key, pollIntervalMs: 30000 });
 
   const isCommunity = isCommunityActive(pathname);
   function handleNotifTab() {
@@ -87,9 +88,8 @@ export function MobileBottomNav() {
 
   function handleNotifItem(n: NotificationItem) {
     if (!n.isRead) void notif.markAsRead(n.id);
-    const target = resolveNotificationTarget(n);
     closeSheet();
-    if (target) navigate(target);
+    if (!openNotificationTarget(n, navigate)) navigate('/mypage');
   }
 
   async function handleLogout() {

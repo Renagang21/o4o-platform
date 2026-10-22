@@ -1,8 +1,8 @@
-import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { PublicServiceEntry, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
-/** Funding entry: login first, then participation and trial lists. Existing participant APIs and permissions are preserved. */
+/** Funding entry: public overview first; participant and trial lists require login. Existing participant APIs and permissions are preserved. */
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FlaskConical } from 'lucide-react';
 import {
   getTrials,
@@ -85,7 +85,7 @@ export function MarketTrialHubPage() {
   const myTrials = trials.filter((t) => participationMap.has(t.id));
 
   if (authLoading) return <output aria-live="polite" className="p-6">로그인 상태를 확인하고 있습니다…</output>;
-  if (!isAuthenticated) return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname + location.search)}`} replace />;
+  if (!isAuthenticated) return <PublicServiceEntry serviceKey="funding" contactHref="/contact" loginHref={`/login?returnUrl=${encodeURIComponent(location.pathname + location.search)}`} />;
   return (
     <>
     <div style={s.container}>

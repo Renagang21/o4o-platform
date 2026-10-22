@@ -24,7 +24,7 @@ describe("federation and cooperative route boundaries", () => {
       session={{ ...anonymousSession, userId: 'person', cooperativeOperators: [{ userId: 'person', cooperativeId: 'preview-a' }] }} businessClient={client}
     /></MemoryRouter>);
     expect(screen.getByText('이 조합의 운영 권한이 필요합니다.')).toBeTruthy();
-    expect(client.get.mock.calls.every(([path]) => path === "/home-presentation/cooperative/sample-coop-b")).toBe(true); expect(client.post).not.toHaveBeenCalled();
+    expect(client.get.mock.calls.every(([path]) => ["/home-presentation/cooperative/sample-coop-b","/notifications/unread-count?serviceKey=pharmcoop"].includes(path))).toBe(true); expect(client.post).not.toHaveBeenCalled();
   });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
@@ -46,7 +46,7 @@ describe("federation and cooperative route boundaries", () => {
     );
     const nav = screen.getByRole("navigation", { name: "협동조합 메뉴" });
     const links = [...nav.querySelectorAll("a")];
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(7);
     expect(
       links.every((link) =>
         link.getAttribute("href")?.startsWith("/sample-coop-a"),

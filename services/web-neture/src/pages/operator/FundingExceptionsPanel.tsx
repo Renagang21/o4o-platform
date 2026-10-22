@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   fundingExceptionsApi,
   FUNDING_EXCEPTION_LABELS,
@@ -16,7 +16,9 @@ const button = "min-h-11 rounded border px-3 text-sm disabled:opacity-50";
 const money = (amount: string | number | null) =>
   amount === null ? "미기록" : `${Number(amount).toLocaleString("ko-KR")}원`;
 export default function FundingExceptionsPanel() {
-  const [type, setType] = useState("all");
+  const [searchParams] = useSearchParams();
+  const initialType=searchParams.get("type")??"all";
+  const [type, setType] = useState(Object.prototype.hasOwnProperty.call(FUNDING_EXCEPTION_LABELS,initialType)?initialType:"all");
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<FundingException[]>([]);
   const [hasMore, setHasMore] = useState(false);
