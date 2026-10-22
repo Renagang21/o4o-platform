@@ -4,6 +4,7 @@ import {
   updateInput,
   searchInput,
   settingsSchema,
+  workspaceIdSchema,
 } from "../contracts.js";
 import {
   readSettings,
@@ -77,19 +78,31 @@ describe("external AI authority and persistence inputs", () => {
           .success,
       ).toBe(false);
   });
-  it("does not activate an unimplemented workspace adapter", async () => {
-    const settings = structuredClone(defaultSettings);
-    settings.targets.community.read = true;
-    await expect(
-      changeSettings({} as never, 0, settings),
-    ).rejects.toMatchObject({ code: "WORKSPACE_ADAPTER_NOT_READY" });
+  it("namespaces non-supplier spaces and rejects authority hidden in identifiers", () => {
+    for (const kind of ["store", "organization", "community"])
+      expect(workspaceIdSchema.safeParse(`${kind}:${id}`).success).toBe(true);
+    expect(workspaceIdSchema.safeParse(id).success).toBe(true);
+    for (const value of [
+      "platform:super_admin",
+      `supplier:${id}`,
+      "community:any",
+      `${id}:store`,
+    ])
+      expect(workspaceIdSchema.safeParse(value).success).toBe(false);
   });
   it("does not enable writing without reading", async () => {
-    const settings = structuredClone(defaultSettings);
-    settings.targets.supplier.write = true;
-    await expect(
-      changeSettings({} as never, 0, settings),
-    ).rejects.toMatchObject({ code: "READ_REQUIRED_FOR_WRITE" });
+    for (const kind of [
+      "supplier",
+      "store",
+      "organization",
+      "community",
+    ] as const) {
+      const settings = structuredClone(defaultSettings);
+      settings.targets[kind].write = true;
+      await expect(
+        changeSettings({} as never, 0, settings),
+      ).rejects.toMatchObject({ code: "READ_REQUIRED_FOR_WRITE" });
+    }
   });
   it("requires the write setting again for a delegated write", async () => {
     const settings = structuredClone(defaultSettings);

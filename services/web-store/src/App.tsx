@@ -1,3 +1,4 @@
+import ExternalAiDraftEntry from './pages/ExternalAiDraftEntry';
 import { ContactPage, OperatorInboxPage } from './pages/ContactPages';
 import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
 import StoreMultilingualConsultationPage from './pages/pharmacy/StoreMultilingualConsultationPage';
@@ -257,6 +258,7 @@ export default function App() {
       {/* 내 매장(약국) 신청 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
       <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
+      <Route path="/external-ai/drafts/:id" element={<ExternalAiDraftEntry />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/operator/inbox" element={<OperatorInboxPage />} />
       <Route path="/operator/pharmacy-memberships" element={<PharmacyReviewAccess />} />

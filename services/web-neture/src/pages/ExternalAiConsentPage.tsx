@@ -10,7 +10,7 @@ import {
 } from "../api/externalAi";
 
 export default function ExternalAiConsentPage() {
-  const { isAuthenticated, isLoading } = useAuth(),
+  const { isAuthenticated, isLoading, user } = useAuth(),
     { openLoginModal } = useLoginModal(),
     location = useLocation();
   const request = new URLSearchParams(location.search).get("request") ?? "";
@@ -40,7 +40,7 @@ export default function ExternalAiConsentPage() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, request, retry]);
+  }, [isAuthenticated, user?.id, request, retry]);
   async function complete(approve: boolean) {
     setBusy(true);
     setMessage("");
@@ -113,6 +113,18 @@ export default function ExternalAiConsentPage() {
                       }
                     />
                     {workspace.name}
+                    {workspace.kind && (
+                      <span className="text-sm text-gray-500">
+                        {
+                          {
+                            supplier: "공급자",
+                            store: "약국",
+                            organization: "협력조직",
+                            community: "커뮤니티 게시판",
+                          }[workspace.kind]
+                        }
+                      </span>
+                    )}
                     {!workspace.writable && (
                       <span className="text-sm text-gray-500">조회 가능</span>
                     )}

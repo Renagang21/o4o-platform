@@ -62,7 +62,7 @@ export default function ExternalAiConnectionsCard() {
             </span>
           </p>
           <p className="text-sm">
-            {item.workspaceNames?.join(", ") || "공급자 작업공간"}
+            {item.workspaceNames?.join(", ") || "허용한 작업공간"}
           </p>
           <p className="text-sm">
             자료 조회

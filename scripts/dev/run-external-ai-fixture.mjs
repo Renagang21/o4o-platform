@@ -19,6 +19,7 @@ import {
   changeSettings,
   readSettings,
 } from "../../apps/api-server/dist/modules/external-ai/settings/settings.service.js";
+import { ForumPostController } from "../../apps/api-server/dist/controllers/forum/ForumPostController.js";
 import { defaultSettings } from "../../apps/api-server/dist/modules/external-ai/contracts.js";
 
 const options = {
@@ -158,6 +159,7 @@ async function tests(db) {
   async function registerAndAuthorize(
     scopes = ["o4o:read", "o4o:draft:write"],
     workspaces = [supplierA],
+    actor = userA,
   ) {
     const registration = await fetch(base + "/register", {
       method: "POST",
@@ -189,11 +191,11 @@ async function tests(db) {
       "request",
     );
     const redirect = new URL(
-      await provider.consent(userA, request, workspaces, scopes),
+      await provider.consent(actor, request, workspaces, scopes),
     );
     assert.equal(redirect.searchParams.get("state"), "fixture-state");
     const code = redirect.searchParams.get("code");
-    return { code, verifier };
+    return { code, verifier, client };
   }
   try {
     await check("default OFF rejects MCP", async () => {
@@ -204,17 +206,17 @@ async function tests(db) {
     });
     await changeSettings(db, 0, settings);
     await check(
-      "settings reject stale revision and unimplemented adapter",
+      "settings reject stale revision and write without read",
       async () => {
         await assert.rejects(
           changeSettings(db, 0, settings),
           /SETTINGS_CONFLICT/,
         );
         const invalid = structuredClone(settings);
-        invalid.targets.community.read = true;
+        invalid.targets.community.write = true;
         await assert.rejects(
           changeSettings(db, 1, invalid),
-          /WORKSPACE_ADAPTER_NOT_READY/,
+          /READ_REQUIRED_FOR_WRITE/,
         );
       },
     );
@@ -685,12 +687,790 @@ async function tests(db) {
         );
       },
     );
+    await expandedTests(db, tools, provider, registerAndAuthorize, base, post);
     console.log(`External AI integration PASS: ${count} cases`);
   } finally {
     server.close();
     await once(server, "close");
   }
 }
+async function expandedTests(db, tools, provider, register, base, post) {
+  const [
+    owner,
+    staff,
+    member,
+    other,
+    coopUser,
+    store,
+    foreignStore,
+    businessOrg,
+    foreignOrg,
+    coopOrg,
+    business,
+    foreignBusiness,
+    coopBusiness,
+    cooperative,
+    board,
+    closedBoard,
+    businessBoard,
+    coopBoard,
+    product,
+    foreignProduct,
+  ] = Array.from({ length: 20 }, () => randomUUID());
+  for (const [id, label] of [
+    [owner, "owner"],
+    [staff, "staff"],
+    [member, "member"],
+    [other, "other"],
+    [coopUser, "coop"],
+  ])
+    await db.query(
+      `INSERT INTO users(id,email,status,"isActive","isEmailVerified") VALUES($1,$2,'active',true,true)`,
+      [id, `fixture-${label}@example.invalid`],
+    );
+  for (const [id, label] of [
+    [store, "store"],
+    [foreignStore, "other-store"],
+    [businessOrg, "business"],
+    [foreignOrg, "foreign-business"],
+    [coopOrg, "cooperative"],
+  ])
+    await db.query(
+      `INSERT INTO organizations(id,name,code,type) VALUES($1,$2,$2,'pharmacy')`,
+      [id, `external-fixture-${label}`],
+    );
+  for (const [org, user, role] of [
+    [store, owner, "owner"],
+    [store, staff, "staff"],
+    [foreignStore, other, "owner"],
+  ])
+    await db.query(
+      `INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,$3)`,
+      [org, user, role],
+    );
+  for (const [org, user, bizNo] of [
+    [store, owner, "fixture-business-1"],
+    [foreignStore, other, "fixture-business-2"],
+  ])
+    await db.query(
+      `INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,'active','Fixture pharmacy',$3,'fixture-license')`,
+      [org, user, bizNo],
+    );
+  for (const [id, key, org] of [
+    [business, "fixture-ai-business", businessOrg],
+    [foreignBusiness, "fixture-ai-other", foreignOrg],
+    [coopBusiness, "fixture-ai-coop", coopOrg],
+  ])
+    await db.query(
+      `INSERT INTO semi_franchises(id,key,name,organization_id,status) VALUES($1,$2,$2,$3,'active')`,
+      [id, key, org],
+    );
+  await db.query(
+    `INSERT INTO cooperatives(id,slug,name,semi_franchise_id,status) VALUES($1,'fixture-ai-coop','Fixture cooperative',$2,'active')`,
+    [cooperative, coopBusiness],
+  );
+  await db.query(
+    `INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,'operator')`,
+    [cooperative, coopUser],
+  );
+  await db.query(
+    `INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'neture:operator',true),($2,'kpa:store_member',true)`,
+    [owner, staff],
+  );
+  await db.query(
+    `INSERT INTO semi_franchise_operators(semi_franchise_id,user_id) VALUES($1,$2)`,
+    [business, owner],
+  );
+  await db.query(
+    `INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status) VALUES($1,$2,'active')`,
+    [business, store],
+  );
+  await db.query(
+    `INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'community','member','active'),($1,'neture','member','suspended'),($2,'neture','member','suspended'),($3,'neture','member','suspended')`,
+    [member, staff, coopUser],
+  );
+  for (const [id, org, name] of [
+    [product, store, "Fixture local product"],
+    [foreignProduct, foreignStore, "Foreign product"],
+  ])
+    await db.query(
+      `INSERT INTO store_local_products(id,organization_id,name,barcode) VALUES($1,$2,$3,NULL)`,
+      [id, org, name],
+    );
+  for (const [id, name, service, type] of [
+    [board, "Fixture shared board", "community", "open"],
+    [closedBoard, "Fixture closed board", "community", "closed"],
+    [businessBoard, "Fixture business board", `sf:${business}`, "open"],
+    [coopBoard, "Fixture cooperative board", `sf:${coopBusiness}`, "open"],
+  ])
+    await db.query(
+      `INSERT INTO forum_category_requests(id,name,description,status,service_code,requester_id,requester_name,forum_type,slug) VALUES($1,$2,'Fixture board','completed',$3,$4,'Fixture author',$5,$1::uuid::text)`,
+      [id, name, service, owner, type],
+    );
+  const snapshot = await readSettings(db),
+    settings = structuredClone(snapshot.settings);
+  for (const target of Object.values(settings.targets)) {
+    target.read = true;
+    target.write = true;
+  }
+  await changeSettings(db, snapshot.revision, settings);
+  const grantIds = [];
+  async function grant(
+    user,
+    workspaces,
+    scopes = ["o4o:read", "o4o:draft:write"],
+  ) {
+    const g = await register(scopes, workspaces, user);
+    const response = await post("/token", {
+      client_id: g.client.client_id,
+      grant_type: "authorization_code",
+      code: g.code,
+      code_verifier: g.verifier,
+      redirect_uri: provider.config.redirectUris[0],
+      resource: provider.resource.href,
+    });
+    assert.equal(response.status, 200);
+    const token = await response.json(),
+      info = await provider.verifyAccessToken(token.access_token);
+    const id = info.extra.connectionId;
+    grantIds.push(id);
+    return { id, token };
+  }
+  const storeId = `store:${store}`,
+    orgId = `organization:${business}`,
+    communityId = `community:${board}`,
+    businessCommunityId = `community:${businessBoard}`,
+    coopId = `organization:${coopBusiness}`,
+    coopCommunityId = `community:${coopBoard}`;
+  const ownerGrant = await grant(owner, [storeId, orgId, businessCommunityId]);
+  const memberGrant = await grant(member, [communityId]);
+  const coopGrant = await grant(coopUser, [coopId, coopCommunityId]);
+  const exec = (name, input, g = ownerGrant) =>
+    tools.execute(name, input, g.id);
+  const draft = (workspaceId, destination, title = "Fixture content") => ({
+    workspaceId,
+    destination,
+    title,
+    content:
+      "<h2>Fixture content</h2><p>Verified source only.</p><script>bad()</script>",
+    requestId: randomUUID(),
+  });
+  let storeDraft, orgDraft, communityDraft, coopDraft;
+  await check(
+    "all workspace kinds use live permissions; selected grants never expand",
+    async () => {
+      const a = await exec("list_workspaces", {});
+      assert.deepEqual(
+        a.workspaces.map((w) => w.id).sort(),
+        [storeId, orgId, businessCommunityId].sort(),
+      );
+      assert.ok(a.workspaces.every((w) => w.destinations.length && w.writable));
+      assert.equal(
+        (await exec("list_workspaces", {}, memberGrant)).workspaces[0].kind,
+        "community",
+      );
+      await assert.rejects(
+        grant(member, [`community:${closedBoard}`]),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await assert.rejects(
+        grant(owner, [`organization:${foreignBusiness}`]),
+        /WORKSPACE_FORBIDDEN/,
+      );
+    },
+  );
+  await check(
+    "store local product without barcode and foreign product isolation",
+    async () => {
+      const products = await exec("search_products", { workspaceId: storeId });
+      assert.equal(products.items.length, 1);
+      assert.equal(products.items[0].productId, product);
+      assert.equal(
+        (
+          await exec("get_product_context", {
+            workspaceId: storeId,
+            productId: product,
+          })
+        ).product.barcode,
+        null,
+      );
+      await assert.rejects(
+        exec("get_product_context", {
+          workspaceId: storeId,
+          productId: foreignProduct,
+        }),
+        /PRODUCT_NOT_FOUND/,
+      );
+    },
+  );
+  await check(
+    "store draft uses existing execution asset and material reader, no publication",
+    async () => {
+      const input = draft(storeId, "store_document");
+      storeDraft = await exec("save_content_draft", input);
+      assert.equal(storeDraft.status, "private_material");
+      assert.ok(!storeDraft.content.includes("<script>"));
+      assert.equal(storeDraft.id, (await exec("save_content_draft", input)).id);
+      const [asset] = await db.query(
+        `SELECT organization_id,source_type,usage_type FROM store_execution_assets WHERE id=$1`,
+        [storeDraft.id],
+      );
+      assert.equal(asset.organization_id, store);
+      assert.equal(asset.source_type, "generated");
+      assert.equal(asset.usage_type, null);
+      assert.equal(
+        (
+          await exec("get_material", {
+            workspaceId: storeId,
+            materialId: storeDraft.id,
+          })
+        ).id,
+        storeDraft.id,
+      );
+      assert.equal(
+        new URL(storeDraft.openUrl).searchParams.get("organizationId"),
+        store,
+      );
+      const update = {
+        ...draft(storeId, "store_document"),
+        content: "<p>Changed store text</p>",
+        contentId: storeDraft.id,
+        expectedRevision: storeDraft.revision,
+      };
+      storeDraft = await exec("update_content_draft", update);
+      await assert.rejects(
+        exec("update_content_draft", { ...update, requestId: randomUUID() }),
+        /CONTENT_CONFLICT/,
+      );
+    },
+  );
+  await check(
+    "store in-use QR and cross-destination writes cannot be silently changed",
+    async () => {
+      await db.query(
+        `INSERT INTO store_qr_codes(organization_id,title,library_item_id,slug) VALUES($1,'Fixture QR',$2,'fixture-external-qr')`,
+        [store, storeDraft.id],
+      );
+      const current = await exec("get_content_draft", {
+        workspaceId: storeId,
+        destination: "store_document",
+        contentId: storeDraft.id,
+      });
+      assert.equal(current.editable, false);
+      await assert.rejects(
+        exec("update_content_draft", {
+          ...draft(storeId, "store_document"),
+          contentId: current.id,
+          expectedRevision: current.revision,
+        }),
+        /CONTENT_NOT_EDITABLE/,
+      );
+      await assert.rejects(
+        exec("save_content_draft", draft(storeId, "business_content")),
+        /DESTINATION_FORBIDDEN/,
+      );
+    },
+  );
+  await check(
+    "business draft uses existing content service; published and review-source rows protected",
+    async () => {
+      orgDraft = await exec(
+        "save_content_draft",
+        draft(orgId, "business_content"),
+      );
+      const [row] = await db.query(
+        "SELECT semi_franchise_id,status,created_by,published_at FROM semi_franchise_contents WHERE id=$1",
+        [orgDraft.id],
+      );
+      assert.equal(row.semi_franchise_id, business);
+      assert.equal(row.created_by, owner);
+      assert.equal(row.status, "draft");
+      assert.equal(row.published_at, null);
+      const modified = await exec("update_content_draft", {
+        ...draft(orgId, "business_content"),
+        contentId: row.id ?? orgDraft.id,
+        expectedRevision: orgDraft.revision,
+      });
+      await db.query(
+        "UPDATE semi_franchise_contents SET status='published' WHERE id=$1",
+        [orgDraft.id],
+      );
+      await assert.rejects(
+        exec("update_content_draft", {
+          ...draft(orgId, "business_content"),
+          contentId: orgDraft.id,
+          expectedRevision: modified.revision,
+        }),
+        /CONTENT_NOT_EDITABLE/,
+      );
+      await assert.rejects(
+        exec("get_material", { workspaceId: orgId, materialId: storeDraft.id }),
+        /MATERIAL_NOT_FOUND/,
+      );
+      const [supplier] = await db.query(
+        "SELECT id FROM neture_suppliers ORDER BY slug LIMIT 1",
+      );
+      await db.query(
+        "UPDATE semi_franchise_contents SET status='draft', source_supplier_id=$2 WHERE id=$1",
+        [orgDraft.id, supplier.id],
+      );
+      const received = await exec("get_content_draft", {
+        workspaceId: orgId,
+        destination: "business_content",
+        contentId: orgDraft.id,
+      });
+      assert.equal(received.editable, false);
+      await assert.rejects(
+        exec("update_content_draft", {
+          ...draft(orgId, "business_content"),
+          contentId: orgDraft.id,
+          expectedRevision: received.revision,
+        }),
+        /CONTENT_NOT_EDITABLE/,
+      );
+      assert.equal(
+        (await exec("search_products", { workspaceId: orgId })).items.length,
+        0,
+      );
+    },
+  );
+  await check(
+    "community MCP HTTP draft is private, attributable, sanitized and idempotent",
+    async () => {
+      const mcp = new Client({ name: "Workspace Fixture", version: "1" });
+      await mcp.connect(
+        new StreamableHTTPClientTransport(
+          new URL("/api/external-ai/mcp", base),
+          {
+            requestInit: {
+              headers: {
+                Authorization: `Bearer ${memberGrant.token.access_token}`,
+              },
+            },
+          },
+        ),
+      );
+      try {
+        const input = draft(communityId, "community_post");
+        const result = await mcp.callTool({
+          name: "save_content_draft",
+          arguments: input,
+        });
+        assert.ok(!result.isError, JSON.stringify(result));
+        communityDraft = JSON.parse(result.content[0].text);
+        assert.equal(communityDraft.status, "draft");
+        assert.ok(!JSON.stringify(communityDraft.content).includes("<script>"));
+        const [saved] = await db.query(
+          "SELECT author_id,forum_id,published_at FROM forum_post WHERE id=$1",
+          [communityDraft.id],
+        );
+        assert.equal(saved.author_id, member);
+        assert.equal(saved.forum_id, board);
+        assert.equal(saved.published_at, null);
+        assert.equal(
+          (await exec("save_content_draft", input, memberGrant)).id,
+          communityDraft.id,
+        );
+      } finally {
+        await mcp.close();
+      }
+    },
+  );
+  class FixturePosts extends ForumPostController {
+    get postRepository() {
+      return db.getRepository("ForumPost");
+    }
+    get likeRepository() {
+      return db.getRepository("ForumPostLike");
+    }
+    async resolveForumPostInServiceScope(id, context) {
+      const q = this.postRepository
+        .createQueryBuilder("post")
+        .where("post.id = :id", { id });
+      this.applyContextFilter(q, "post", context);
+      return q.getOne();
+    }
+    async checkClosedForumAccess() {
+      return { allowed: true };
+    }
+  }
+  await check(
+    "existing forum API keeps private drafts out of foreign lists and detail URLs",
+    async () => {
+      const controller = new FixturePosts(),
+        context = {
+          scope: "community",
+          serviceCode: "community",
+          communityKey: "community",
+          forumStorageCodes: ["community"],
+        };
+      const response = () => {
+        const r = {
+          statusCode: 200,
+          body: null,
+          json(value) {
+            this.body = value;
+            return this;
+          },
+          status(value) {
+            this.statusCode = value;
+            return this;
+          },
+        };
+        return r;
+      };
+      for (const userId of [other, undefined]) {
+        const res = response();
+        await controller.getPost(
+          {
+            params: { id: communityDraft.id },
+            query: {},
+            user: userId ? { id: userId, roles: [] } : undefined,
+            forumContext: context,
+          },
+          res,
+        );
+        assert.equal(res.statusCode, 404);
+        const list = response();
+        await controller.listPosts(
+          {
+            query: { status: "draft" },
+            user: userId ? { id: userId, roles: [] } : undefined,
+            forumContext: context,
+          },
+          list,
+        );
+        assert.equal(list.statusCode, 200);
+        assert.ok(!list.body.data.some((p) => p.id === communityDraft.id));
+      }
+      const own = response();
+      await controller.getPost(
+        {
+          params: { id: communityDraft.id },
+          query: {},
+          user: { id: member, roles: [] },
+          forumContext: context,
+        },
+        own,
+      );
+      assert.equal(own.statusCode, 200);
+      assert.equal(own.body.data.id, communityDraft.id);
+      const mine = response();
+      await controller.listPosts(
+        {
+          query: { author: "me" },
+          user: { id: member, roles: [] },
+          forumContext: context,
+        },
+        mine,
+      );
+      assert.ok(mine.body.data.some((p) => p.id === communityDraft.id));
+    },
+  );
+  await check(
+    "another member cannot read or replace another author draft",
+    async () => {
+      await db.query(
+        `INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'community','member','active')`,
+        [other],
+      );
+      const otherGrant = await grant(other, [communityId]);
+      assert.equal(
+        (await exec("list_materials", { workspaceId: communityId }, otherGrant))
+          .items.length,
+        0,
+      );
+      await assert.rejects(
+        exec(
+          "get_material",
+          { workspaceId: communityId, materialId: communityDraft.id },
+          otherGrant,
+        ),
+        /MATERIAL_NOT_FOUND/,
+      );
+      await assert.rejects(
+        exec(
+          "update_content_draft",
+          {
+            ...draft(communityId, "community_post"),
+            contentId: communityDraft.id,
+            expectedRevision: communityDraft.revision,
+          },
+          otherGrant,
+        ),
+        /CONTENT_NOT_FOUND/,
+      );
+      const update = {
+        ...draft(communityId, "community_post"),
+        content: "<p>Changed community text</p>",
+        contentId: communityDraft.id,
+        expectedRevision: communityDraft.revision,
+      };
+      communityDraft = await exec("update_content_draft", update, memberGrant);
+      await assert.rejects(
+        exec(
+          "update_content_draft",
+          { ...update, requestId: randomUUID() },
+          memberGrant,
+        ),
+        /CONTENT_CONFLICT/,
+      );
+    },
+  );
+  await check(
+    "user publishes the delegated draft through the existing forum API; external edits then stop",
+    async () => {
+      const controller = new FixturePosts(),
+        res = {
+          statusCode: 200,
+          body: null,
+          json(value) {
+            this.body = value;
+            return this;
+          },
+          status(value) {
+            this.statusCode = value;
+            return this;
+          },
+        };
+      await controller.updatePost(
+        {
+          params: { id: communityDraft.id },
+          user: { id: member, roles: [] },
+          body: {
+            title: "User reviewed title",
+            content: "<p>User reviewed body</p>",
+            status: "publish",
+          },
+          forumContext: {
+            scope: "community",
+            serviceCode: "community",
+            communityKey: "community",
+            forumStorageCodes: ["community"],
+          },
+        },
+        res,
+      );
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.success, true);
+      const [published] = await db.query(
+        "SELECT status,published_at FROM forum_post WHERE id=$1",
+        [communityDraft.id],
+      );
+      assert.equal(published.status, "publish");
+      assert.ok(published.published_at);
+      await assert.rejects(
+        exec(
+          "update_content_draft",
+          {
+            ...draft(communityId, "community_post"),
+            contentId: communityDraft.id,
+            expectedRevision: communityDraft.revision,
+          },
+          memberGrant,
+        ),
+        /CONTENT_NOT_EDITABLE/,
+      );
+      assert.ok(
+        (
+          await exec(
+            "list_materials",
+            { workspaceId: communityId },
+            memberGrant,
+          )
+        ).items.some((p) => p.id === communityDraft.id),
+      );
+    },
+  );
+  await check(
+    "closed board membership and own service suspension are rechecked",
+    async () => {
+      await db.query(
+        `INSERT INTO forum_category_members(forum_category_id,user_id,role) VALUES($1,$2,'member')`,
+        [closedBoard, member],
+      );
+      const closedGrant = await grant(member, [`community:${closedBoard}`]);
+      await exec(
+        "save_content_draft",
+        draft(`community:${closedBoard}`, "community_post"),
+        closedGrant,
+      );
+      await db.query(
+        "DELETE FROM forum_category_members WHERE forum_category_id=$1 AND user_id=$2",
+        [closedBoard, member],
+      );
+      await assert.rejects(
+        exec(
+          "list_materials",
+          { workspaceId: `community:${closedBoard}` },
+          closedGrant,
+        ),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await db.query(
+        "UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='community'",
+        [member],
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: communityId }, memberGrant),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await db.query(
+        "UPDATE service_memberships SET status='active' WHERE user_id=$1 AND service_key='community'",
+        [member],
+      );
+    },
+  );
+  await check(
+    "business community member and operator cannot cross another business board",
+    async () => {
+      const row = await exec(
+        "save_content_draft",
+        draft(businessCommunityId, "community_post"),
+      );
+      assert.equal(row.status, "draft");
+      await assert.rejects(
+        grant(member, [businessCommunityId]),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await db.query(
+        "UPDATE semi_franchise_memberships SET status='suspended' WHERE semi_franchise_id=$1 AND organization_id=$2",
+        [business, store],
+      );
+      // Its assigned operator remains allowed; a member's enrollment cannot grant operator rights.
+      assert.equal(
+        (await exec("list_materials", { workspaceId: businessCommunityId }))
+          .items[0].id,
+        row.id,
+      );
+    },
+  );
+  await check(
+    "approved staff use own store without a personal Neture membership; revocation immediate",
+    async () => {
+      const staffGrant = await grant(staff, [storeId]);
+      const item = await exec(
+        "save_content_draft",
+        draft(storeId, "store_document"),
+        staffGrant,
+      );
+      assert.equal(item.status, "private_material");
+      await db.query(
+        "UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='kpa:store_member'",
+        [staff],
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: storeId }, staffGrant),
+        /WORKSPACE_FORBIDDEN/,
+      );
+    },
+  );
+  await check(
+    "cooperative operator and its forum use scoped roles without unrelated main membership",
+    async () => {
+      coopDraft = await exec(
+        "save_content_draft",
+        draft(coopId, "business_content"),
+        coopGrant,
+      );
+      assert.equal(coopDraft.status, "draft");
+      assert.ok(
+        coopDraft.openUrl.includes("/fixture-ai-coop/operator/contents/"),
+      );
+      const item = await exec(
+        "save_content_draft",
+        draft(coopCommunityId, "community_post"),
+        coopGrant,
+      );
+      assert.ok(item.openUrl.includes("/fixture-ai-coop/community?edit="));
+      await db.query(
+        "UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2",
+        [cooperative, coopUser],
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: coopId }, coopGrant),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: coopCommunityId }, coopGrant),
+        /WORKSPACE_FORBIDDEN/,
+      );
+    },
+  );
+  await check(
+    "per-kind admin stop affects old grants without stopping other kinds",
+    async () => {
+      const snapshot = await readSettings(db),
+        changed = structuredClone(snapshot.settings);
+      changed.targets.community = { read: false, write: false };
+      await changeSettings(db, snapshot.revision, changed);
+      await assert.rejects(
+        exec("list_materials", { workspaceId: communityId }, memberGrant),
+        /EXTERNAL_AI_DISABLED/,
+      );
+      await exec("list_materials", { workspaceId: storeId });
+      assert.equal(
+        (await exec("list_workspaces", {}, memberGrant)).workspaces.length,
+        0,
+      );
+      await changeSettings(db, snapshot.revision + 1, settings);
+    },
+  );
+  await check(
+    "store suspension and business operator expiration stop existing grants",
+    async () => {
+      await db.query(
+        "UPDATE neture_pharmacy_memberships SET status='suspended' WHERE organization_id=$1",
+        [store],
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: storeId }),
+        /WORKSPACE_FORBIDDEN/,
+      );
+      await db.query(
+        "UPDATE role_assignments SET valid_until=now()-interval '1 second' WHERE user_id=$1 AND role='neture:operator'",
+        [owner],
+      );
+      await assert.rejects(
+        exec("list_materials", { workspaceId: orgId }),
+        /WORKSPACE_FORBIDDEN/,
+      );
+    },
+  );
+  await check(
+    "expanded cleanup removes only expired/revoked connection data and retains authored content",
+    async () => {
+      await db.query(
+        "UPDATE external_ai_connections SET revoked_at=now() WHERE id=ANY($1::uuid[])",
+        [grantIds],
+      );
+      await provider.cleanup();
+      assert.equal(
+        (
+          await db.query(
+            "SELECT count(*)::int AS n FROM external_ai_connections",
+          )
+        )[0].n,
+        0,
+      );
+      for (const [table, id] of [
+        ["store_execution_assets", storeDraft.id],
+        ["semi_franchise_contents", coopDraft.id],
+        ["forum_post", communityDraft.id],
+      ])
+        assert.equal(
+          (
+            await db.query(
+              `SELECT count(*)::int AS n FROM ${table} WHERE id=$1`,
+              [id],
+            )
+          )[0].n,
+          1,
+        );
+    },
+  );
+}
+
 async function main() {
   const control = new DataSource({ ...options, database: "postgres" });
   await control.initialize();

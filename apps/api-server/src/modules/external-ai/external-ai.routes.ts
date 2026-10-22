@@ -18,13 +18,19 @@ import {
   ExternalAiOAuthProvider,
   type ConnectionConfig,
 } from "./auth/oauth-provider.js";
-import { scopes, ExternalAiError, settingsSchema } from "./contracts.js";
+import {
+  scopes,
+  ExternalAiError,
+  settingsSchema,
+  workspaceIdSchema,
+  targetKinds,
+} from "./contracts.js";
 import {
   readSettings,
   changeSettings,
   assertEnabled,
 } from "./settings/settings.service.js";
-import { SupplierAdapter } from "./adapters/supplier.adapter.js";
+import { AdapterRegistry } from "./adapters/registry.js";
 import { createMcpRouter } from "./mcp/mcp.routes.js";
 import { createBrowserWriteGuard } from "./auth/browser-write.middleware.js";
 
@@ -45,7 +51,7 @@ export function createExternalAiRoutes(
   const root = Router(),
     management = Router(),
     user = Router();
-  const adapter = config ? new SupplierAdapter(db, config.webOrigin) : null;
+  const adapter = config ? new AdapterRegistry(db, config.webOrigin) : null;
   const provider = config
     ? new ExternalAiOAuthProvider(
         db,
@@ -99,12 +105,7 @@ export function createExternalAiRoutes(
           ...snapshot,
           configured: !!config,
           mcpUrl: provider?.resource.href ?? null,
-          adapters: [
-            { kind: "supplier", ready: true },
-            { kind: "store", ready: false },
-            { kind: "organization", ready: false },
-            { kind: "community", ready: false },
-          ],
+          adapters: targetKinds.map((kind) => ({ kind, ready: true })),
           errors,
         },
       });
@@ -169,9 +170,11 @@ export function createExternalAiRoutes(
         pending = await provider.pending(request);
       const client = await provider.clientsStore.getClient(pending.client_id);
       const settings = await assertEnabled(db);
-      const workspaces = (await adapter.workspaces(userId(req))).map((w) => ({
+      const workspaces = (
+        await adapter.workspaces(userId(req), db, settings)
+      ).map((w) => ({
         ...w,
-        writable: w.writable && settings.targets.supplier.write,
+        writable: w.writable && settings.targets[w.kind].write,
       }));
       res.json({
         success: true,
@@ -190,12 +193,13 @@ export function createExternalAiRoutes(
       const body = z
         .object({
           request: z.string(),
-          workspaces: z.array(z.string().uuid()).min(1).max(50),
+          workspaces: z.array(workspaceIdSchema).min(1).max(50),
           scopes: z.array(z.enum(scopes)).min(1).max(2),
         })
         .strict()
         .parse(req.body);
-      const available = await adapter.workspaces(userId(req));
+      const settings = await assertEnabled(db);
+      const available = await adapter.workspaces(userId(req), db, settings);
       if (
         new Set(body.workspaces).size !== body.workspaces.length ||
         body.workspaces.some(

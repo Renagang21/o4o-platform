@@ -47,7 +47,9 @@ export const defaultSettings: ExternalAiSettings = {
 export interface Workspace {
   id: string;
   name: string;
-  kind: "supplier";
+  kind: (typeof targetKinds)[number];
+  destinations?: string[];
+  products?: boolean;
   writable: boolean;
 }
 export interface Connection {
@@ -69,13 +71,23 @@ export class ExternalAiError extends Error {
 export const destinationSchema = z.enum([
   "library_document",
   "store_description",
+  "store_document",
+  "business_content",
+  "community_post",
+]);
+export const workspaceIdSchema = z.union([
+  z.string().uuid(),
+  z
+    .string()
+    .regex(
+      /^(store|organization|community):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+    ),
 ]);
 export const workspaceInput = z
   .object({
-    workspaceId: z
-      .string()
-      .uuid()
-      .describe("list_workspaces에서 선택한 작업공간 id"),
+    workspaceId: workspaceIdSchema.describe(
+      "list_workspaces에서 선택한 작업공간 id",
+    ),
   })
   .strict();
 const pagination = {
@@ -89,7 +101,9 @@ export const productInput = workspaceInput
     productId: z
       .string()
       .uuid()
-      .describe("search_products의 productId. masterId가 아닙니다."),
+      .describe(
+        "search_products의 productId. 작업공간에서 반환한 식별자를 그대로 사용합니다.",
+      ),
   })
   .strict();
 export const materialInput = workspaceInput

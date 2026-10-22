@@ -23,15 +23,9 @@ export async function changeSettings(
   input: unknown,
 ) {
   const settings = settingsSchema.parse(input);
-  // An unchecked adapter must not become available just because a UI checkbox was checked.
   if (
-    ["store", "organization", "community"].some((k) => {
-      const value = settings.targets[k as keyof typeof settings.targets];
-      return value.read || value.write;
-    })
+    Object.values(settings.targets).some((value) => value.write && !value.read)
   )
-    throw new ExternalAiError("WORKSPACE_ADAPTER_NOT_READY");
-  if (settings.targets.supplier.write && !settings.targets.supplier.read)
     throw new ExternalAiError("READ_REQUIRED_FOR_WRITE");
   if (
     new Set(settings.examples.map((e) => e.id)).size !==
@@ -64,8 +58,9 @@ export async function assertEnabled(
   if (
     !settings.enabled ||
     !settings.chatgptEnabled ||
-    !settings.targets.supplier.read ||
-    (write && !settings.targets.supplier.write)
+    !Object.values(settings.targets).some(
+      (target) => target.read && (!write || target.write),
+    )
   ) {
     throw new ExternalAiError("EXTERNAL_AI_DISABLED", 403);
   }

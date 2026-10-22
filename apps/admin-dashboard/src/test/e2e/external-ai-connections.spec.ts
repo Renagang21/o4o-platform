@@ -76,9 +76,9 @@ for (const viewport of [
                 mcpUrl: "https://api.example.invalid/api/external-ai/mcp",
                 adapters: [
                   { kind: "supplier", ready: true },
-                  { kind: "store", ready: false },
-                  { kind: "organization", ready: false },
-                  { kind: "community", ready: false },
+                  { kind: "store", ready: true },
+                  { kind: "organization", ready: true },
+                  { kind: "community", ready: true },
                 ],
                 errors: [],
               },
@@ -95,8 +95,24 @@ for (const viewport of [
         .click();
       await page.getByLabel("외부 AI 연결 사용").check();
       await page.getByLabel("ChatGPT 연결 허용").check();
-      await page.getByLabel("자료 조회", { exact: true }).check();
-      await page.getByLabel("초안 저장·수정", { exact: true }).check();
+      await page
+        .getByRole("group", { name: "공급자", exact: true })
+        .getByLabel("자료 조회", { exact: true })
+        .check();
+      await page
+        .getByRole("group", { name: "공급자", exact: true })
+        .getByLabel("초안 저장·수정", { exact: true })
+        .check();
+      for (const name of ["약국", "협력조직", "커뮤니티"]) {
+        await page
+          .getByRole("group", { name, exact: true })
+          .getByLabel("자료 조회", { exact: true })
+          .check();
+        await page
+          .getByRole("group", { name, exact: true })
+          .getByLabel("초안 저장·수정", { exact: true })
+          .check();
+      }
       await page.getByRole("button", { name: "예제 추가" }).click();
       await page.getByLabel("예제 이름").fill("직원 안내");
       await page
@@ -113,9 +129,14 @@ for (const viewport of [
       await expect(page.getByLabel("외부 AI 연결 사용")).toBeChecked();
       await expect(page.getByLabel("예제 이름")).toHaveValue("직원 안내");
       await page.getByRole("button", { name: "이 예제 삭제" }).click();
-      await page.getByLabel("자료 조회", { exact: true }).uncheck();
+      await page
+        .getByRole("group", { name: "공급자", exact: true })
+        .getByLabel("자료 조회", { exact: true })
+        .uncheck();
       await expect(
-        page.getByLabel("초안 저장·수정", { exact: true }),
+        page
+          .getByRole("group", { name: "공급자", exact: true })
+          .getByLabel("초안 저장·수정", { exact: true }),
       ).not.toBeChecked();
       await page.getByRole("button", { name: "설정 저장" }).click();
       await expect(

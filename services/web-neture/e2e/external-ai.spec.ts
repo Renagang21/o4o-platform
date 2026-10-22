@@ -59,6 +59,25 @@ async function fixture(page: Page, loggedIn = true) {
                 id: "workspace-a",
                 name: "합성 공급자 작업공간",
                 writable: true,
+                kind: "supplier",
+              },
+              {
+                id: "store:fixture",
+                name: "합성 약국",
+                kind: "store",
+                writable: true,
+              },
+              {
+                id: "organization:fixture",
+                name: "합성 협력조직",
+                kind: "organization",
+                writable: true,
+              },
+              {
+                id: "community:fixture",
+                name: "합성 게시판",
+                kind: "community",
+                writable: true,
               },
             ],
           },
@@ -66,7 +85,12 @@ async function fixture(page: Page, loggedIn = true) {
       if (path === "/api/external-ai/consent" && req.method() === "POST") {
         expect(req.postDataJSON()).toEqual({
           request: "fixture-request",
-          workspaces: ["workspace-a"],
+          workspaces: [
+            "workspace-a",
+            "store:fixture",
+            "organization:fixture",
+            "community:fixture",
+          ],
           scopes: ["o4o:read", "o4o:draft:write"],
         });
         return json({
@@ -119,7 +143,9 @@ test("explicit consent selects named workspace and returns to client", async ({
   await expect(
     page.getByRole("button", { name: "선택한 범위로 연결" }),
   ).toBeDisabled();
-  await page.getByLabel("합성 공급자 작업공간").check();
+  await page.getByLabel(/합성 공급자 작업공간/).check();
+  for (const name of ["합성 약국", "합성 협력조직", "합성 게시판"])
+    await page.getByLabel(new RegExp(name)).check();
   await page.getByLabel("초안 저장·수정").check();
   expect(
     await page.evaluate(
@@ -148,4 +174,98 @@ test("anonymous visitor uses the existing login entry", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "선택한 범위로 연결" }),
   ).toHaveCount(0);
+});
+
+test("community private draft keeps its format and publishes only on explicit user submission", async ({
+  page,
+}) => {
+  await fixture(page);
+  const id = "5ae1b092-6a63-4a55-b0a1-cad583079e66";
+  let published = false;
+  const post = () => ({
+    id,
+    title: "외부 AI 작성 초안",
+    slug: "fixture-draft",
+    status: published ? "publish" : "draft",
+    authorId: "fixture-user",
+    author: { id: "fixture-user", name: "합성 사용자" },
+    content: [
+      {
+        id: "heading",
+        type: "heading",
+        content: "상품 안내 제목",
+        attributes: { level: 2 },
+      },
+      {
+        id: "body",
+        type: "paragraph",
+        content:
+          "근거 자료를 확인하여 사용자가 게시하기 전에 검토할 내용입니다.",
+      },
+    ],
+    createdAt: "2026-10-22T00:00:00Z",
+    viewCount: 0,
+    likeCount: 0,
+    commentCount: 0,
+    allowComments: false,
+    showContactOnPost: false,
+  });
+  // The real app chooses its community profile from hostname. Serve its local Vite assets at that origin.
+  await page.route("https://community.neture.co.kr/**", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname.startsWith("/api/")) return route.fallback();
+    const response = await route.fetch({
+      url: `http://127.0.0.1:3102${url.pathname}${url.search}`,
+    });
+    await route.fulfill({ response });
+  });
+  await page.route(
+    (url) => url.pathname.startsWith("/api/"),
+    async (route) => {
+      const path = new URL(route.request().url()).pathname;
+      if (path === "/api/v1/communities/community/access")
+        return route.fulfill({
+          json: {
+            success: true,
+            data: {
+              communityKey: "community",
+              name: "커뮤니티",
+              kind: "independent",
+              allowed: true,
+              canManage: false,
+              canJoin: false,
+              membershipStatus: "active",
+            },
+          },
+        });
+      if (path.startsWith("/api/v1/communities/community/forum/posts/")) {
+        if (route.request().method() === "PUT") {
+          expect(route.request().postDataJSON().status).toBe("publish");
+          published = true;
+        }
+        return route.fulfill({ json: { success: true, data: post() } });
+      }
+      return route.fallback();
+    },
+  );
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(
+    `https://community.neture.co.kr/communities/community/forum/write?edit=${id}`,
+  );
+  const submit = page.getByRole("button", {
+    name: "검토한 초안 게시",
+    exact: true,
+  });
+  await expect(submit).toBeVisible();
+  await expect(
+    page
+      .locator('[contenteditable="true"] h2')
+      .filter({ hasText: "상품 안내 제목" }),
+  ).toBeVisible();
+  expect(published).toBe(false);
+  await submit.click();
+  await expect(page).toHaveURL(/\/post\/fixture-draft/);
+  expect(published).toBe(true);
+  expect(errors).toEqual([]);
 });

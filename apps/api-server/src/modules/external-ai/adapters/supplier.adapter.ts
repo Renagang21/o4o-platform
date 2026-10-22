@@ -61,6 +61,8 @@ export class SupplierAdapter {
         id: c.supplierId,
         name: c.organizationName ?? "공급자 작업공간",
         kind: "supplier",
+        destinations: ["library_document", "store_description"],
+        products: true,
         writable: c.status === "ACTIVE",
       }));
     const legacy = await resolveSupplierForUser(db as DataSource, userId, null);
@@ -70,6 +72,8 @@ export class SupplierAdapter {
         id: legacy.supplierId,
         name: "공급자 작업공간",
         kind: "supplier",
+        destinations: ["library_document", "store_description"],
+        products: true,
         writable: legacy.status === "ACTIVE",
       },
     ];

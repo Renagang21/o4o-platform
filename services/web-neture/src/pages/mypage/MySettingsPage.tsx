@@ -79,7 +79,7 @@ export default function MySettingsPage() {
         onLogout={logout}
       />
       <SocialAccountConnections client={authClient} />
-      <ExternalAiConnectionsCard />
+      <ExternalAiConnectionsCard key={user.id} />
       <PasswordSecuritySettings client={authClient} notify={{ success: toast.success }} onSessionEnded={() => openLoginModal('/mypage/settings')} />
     </MyPageLayout>
   );

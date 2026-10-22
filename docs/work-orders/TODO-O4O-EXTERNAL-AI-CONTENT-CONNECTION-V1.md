@@ -1,6 +1,6 @@
 # TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1
 
-> 상태: ACTIVE — 개발·검증·push 완료, 통합·운영 활성화 대기 · 작성일: 2026-10-22
+> 상태: ACTIVE — 전체 작업공간 개발·검증 완료, 같은 branch push 인계 · 운영 활성화 전 · 작성일: 2026-10-22
 > 사용자 승인: 외부 AI 콘텐츠 제작 설계 전체 개발, 검증·commit·push까지. PR·병합·배포·운영 DB 적용은 이번 범위 밖.
 > 기준: main `7dc02646da`. 전용 branch `wo/external-ai-content-connection`.
 
@@ -24,11 +24,21 @@ O4O는 외부 ChatGPT 모델·구독·비용·토큰·대화 이력을 관리하
 - [x] 관리자·사용자 desktop/mobile 브라우저 검증, 관련 type/lint/build
 - [x] 변경 경로·검증·미실행·운영 적용 조건을 기록하고 commit·push
 
-## 후속 적용 대상
+## 전체 범위 연속 작업 (2026-10-22 사용자 지시)
 
-최초 검증은 공급자다. 약국·협력조직·커뮤니티는 기존 저장·초안·작성 권한 계약을 확인한 adapter만
-노출한다. 준비하지 않은 adapter는 기능 체크만으로 사용할 수 없으며 화면에 준비 상태를 명시한다.
-이미지·영상 파일 전달, 다른 외부 AI의 실제 client 호환, 소비자 공개 조회는 완료로 보고하지 않는다.
+작업을 나누지 않고 같은 branch에서 공급자·약국·협력조직·공동/사업 커뮤니티를 모두 연결한다.
+
+- [x] 기존 약국 원장·직원 권한·자료함 편집/이용 경계 조사 및 adapter
+- [x] 협력사업/협동조합 운영 관계·기존 콘텐츠 draft 원장 연결
+- [x] 독립 커뮤니티 및 사업 게시판의 가입·폐쇄형 게시판·작성자 권한 연결
+- [x] 작업공간 종류별 설정·동의·실행 시 재검증, 저장처/상품 지원 범위 안내
+- [x] O4O 편집 화면에서 초안 열기·명시적 게시 흐름 확인 및 보완
+- [x] 네 종류 모두 격리 DB/MCP 왕복·오소유·중지·권한 회수·충돌·멱등 검증
+- [x] 관리자·동의 UI desktop/mobile 및 영향 소비처 검증
+- [x] 설계/CHECK 최종 정합·commit·push (PR·병합·배포 제외)
+
+이미지·영상의 바이너리 전달 및 실제 외부 provider 생성 호출은 기존 텍스트 초안 연결 계약에 포함되지 않는다.
+영상 구성안·상품 설명·일반 글 등 텍스트 콘텐츠는 기존 공간에 저장하며 실제 파일은 기존 제작환경에서 관리한다.
 
 ## 검증·운영 경계
 
@@ -37,8 +47,11 @@ O4O는 외부 ChatGPT 모델·구독·비용·토큰·대화 이력을 관리하
 신규 migration은 push에 포함하지만 운영에 적용하지 않는다. 연결 기본값은 중지다.
 
 개발 검증 결과와 운영 적용 조건은 [CHECK](../checks/CHECK-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)에 기록한다.
-현재 로컬 검증: 격리 DB 24건, API 91건, admin 446건, Neture 17건, desktop/mobile 8건 PASS.
-frontend 전체 타입, API/admin 타입·빌드, API bundle, admin/Neture production build, lint ratchet,
-정적 guard와 문서 검사를 완료했다. 실제 ChatGPT·Google 인증, PR·병합·배포·운영 DB 적용은 미실행이다.
+현재 로컬 검증: 격리 DB/MCP 40건, API 164건, admin 446건, Neture 24건,
+Store 6건, 약국/메가팜 공통 게시판 9건, 조합 16건, desktop/mobile 12건 PASS.
+frontend 전체 타입·API 타입/컴파일·bundle, 변경 5개 웹 build, 정적 검사와 문서 검사를 완료했다.
+일반 게시판의 draft 비공개 누락도 보완하여 실제 원장 저장부터 본인의 게시까지 검증했다.
+테스트 DB 0개 및 전용 컨테이너 제거를 확인했다. 실제 ChatGPT·Google 인증, PR·병합·배포·운영 DB 적용은 미실행이다.
 
-구현 commit `9b0067ef7a`를 위 작업 branch에 push했고, 인계 상태 기록을 후속 문서 commit으로 함께 보낸다.
+최초 구현 `9b0067ef7a` 및 상태 기록 `5a1382dfd7` 뒤의 같은 branch에서 전체 범위를 연속 보완했다.
+최종 원격 HEAD는 완료 보고에서 확인한다. 새 migration 추가 없이 최초 연결 원장 6개 테이블과 기존 콘텐츠 원장을 사용한다.

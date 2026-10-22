@@ -86,4 +86,42 @@ describe("external AI consent", () => {
     fireEvent.click(screen.getByText("다시 확인"));
     await screen.findByText("공급자 A");
   });
+  it("clears workspace and write selections when the signed-in account changes", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { id: "first" },
+    } as ReturnType<typeof useAuth>);
+    const ui = show();
+    fireEvent.click(await screen.findByLabelText("공급자 A"));
+    fireEvent.click(screen.getByLabelText("초안 저장·수정"));
+    vi.mocked(getExternalConsent).mockResolvedValue({
+      clientName: "Fixture AI",
+      scopes: ["o4o:read", "o4o:draft:write"],
+      workspaces: [{ id: "space-c", name: "새 계정 작업공간", writable: true }],
+    });
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { id: "second" },
+    } as ReturnType<typeof useAuth>);
+    ui.rerender(
+      <MemoryRouter
+        initialEntries={["/external-ai/connect?request=fixture-request"]}
+      >
+        <ExternalAiConsentPage />
+      </MemoryRouter>,
+    );
+    await screen.findByText("새 계정 작업공간");
+    expect(
+      (screen.getByLabelText("초안 저장·수정") as HTMLInputElement).checked,
+    ).toBe(false);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "선택한 범위로 연결",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+  });
 });

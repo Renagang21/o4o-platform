@@ -8,15 +8,16 @@ import {
 } from "../contracts.js";
 import { loadConnection, tokenHash } from "../auth/oauth-provider.js";
 import { assertEnabled } from "../settings/settings.service.js";
-import { SupplierAdapter } from "../adapters/supplier.adapter.js";
+import { AdapterRegistry } from "../adapters/registry.js";
+import type { DraftInput } from "../adapters/adapter.js";
 
 export class ExternalAiToolService {
-  readonly adapter: SupplierAdapter;
+  readonly registry: AdapterRegistry;
   constructor(
     readonly db: DataSource,
     webOrigin: URL,
   ) {
-    this.adapter = new SupplierAdapter(db, webOrigin);
+    this.registry = new AdapterRegistry(db, webOrigin);
   }
   async execute(
     name: ToolName,
@@ -38,14 +39,14 @@ export class ExternalAiToolService {
           throw new ExternalAiError("SCOPE_FORBIDDEN", 403);
         if (name === "list_workspaces") {
           const workspaces = (
-            await this.adapter.workspaces(connection.userId, db)
+            await this.registry.workspaces(connection.userId, db, settings)
           ).filter((w) => connection.workspaces.includes(w.id));
           return {
             workspaces: workspaces.map((w) => ({
               ...w,
               writable:
                 w.writable &&
-                settings.targets.supplier.write &&
+                settings.targets[w.kind].write &&
                 connection.scopes.includes("o4o:draft:write"),
             })),
             examples: settings.examples,
@@ -54,42 +55,52 @@ export class ExternalAiToolService {
         const workspaceId = input.workspaceId as string;
         if (!connection.workspaces.includes(workspaceId))
           throw new ExternalAiError("WORKSPACE_FORBIDDEN", 403);
-        await this.adapter.authorize(connection.userId, workspaceId, write, db);
+        const { adapter, id } = await this.registry.authorize(
+          connection.userId,
+          workspaceId,
+          write,
+          db,
+          settings,
+        );
+        this.registry.resolve(
+          workspaceId,
+          input.destination as string | undefined,
+        );
         switch (name) {
           case "search_products":
-            return this.adapter.products(
+            return adapter.products(
               db,
-              workspaceId,
+              id,
               input.query as string,
               input.page as number,
               input.limit as number,
             );
           case "get_product_context":
-            return this.adapter.productContext(
-              db,
-              workspaceId,
-              input.productId as string,
-            );
+            return adapter.productContext(db, id, input.productId as string);
           case "list_materials":
-            return this.adapter.materials(
+            return adapter.materials(
               db,
-              workspaceId,
+              id,
               input.query as string,
               input.page as number,
               input.limit as number,
+              connection.userId,
             );
           case "get_material":
-            return this.adapter.material(
+            return adapter.material(
               db,
-              workspaceId,
+              id,
               input.materialId as string,
+              connection.userId,
             );
           case "get_content_draft":
-            return this.adapter.content(
+            return adapter.content(
               db,
-              workspaceId,
+              id,
               input.destination as string,
               input.contentId as string,
+              false,
+              connection.userId,
             );
           default: {
             const requestId = input.requestId as string;
@@ -104,18 +115,20 @@ export class ExternalAiToolService {
             if (existing[0]) {
               if (existing[0].fingerprint !== fingerprint)
                 throw new ExternalAiError("REQUEST_ID_REUSED", 409);
-              return this.adapter.content(
+              return adapter.content(
                 db,
-                workspaceId,
+                id,
                 input.destination as string,
                 existing[0].result.id,
+                false,
+                connection.userId,
               );
             }
-            const result = await this.adapter.save(
+            const result = await adapter.save(
               db,
               connection.userId,
-              workspaceId,
-              input as unknown as Parameters<SupplierAdapter["save"]>[3],
+              id,
+              input as unknown as DraftInput,
             );
             await db.query(
               `INSERT INTO external_ai_requests(connection_id,request_id,fingerprint,result,expires_at)

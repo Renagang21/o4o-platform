@@ -33,9 +33,9 @@ const snapshot = (): ExternalAiSnapshot => ({
   },
   adapters: [
     { kind: "supplier", ready: true },
-    { kind: "store", ready: false },
-    { kind: "organization", ready: false },
-    { kind: "community", ready: false },
+    { kind: "store", ready: true },
+    { kind: "organization", ready: true },
+    { kind: "community", ready: true },
   ],
   errors: [],
 });
@@ -48,16 +48,20 @@ describe("external AI management", () => {
   it("shows prepared targets and no external model/cost controls", async () => {
     render(<ExternalAiConnections />);
     await screen.findByLabelText("외부 AI 연결 사용");
-    expect(screen.getAllByText("연결 준비 중")).toHaveLength(3);
+    expect(screen.queryByText("연결 준비 중")).not.toBeInTheDocument();
+    for (const name of ["공급자", "약국", "협력조직", "커뮤니티"])
+      expect(screen.getByRole("group", { name })).toBeInTheDocument();
     expect(screen.queryByText("모델 선택")).not.toBeInTheDocument();
     expect(screen.queryByText("토큰 사용량")).not.toBeInTheDocument();
   });
   it("changes read/write together and saves the current revision", async () => {
     render(<ExternalAiConnections />);
-    const read = await screen.findByLabelText("자료 조회");
+    const read = await screen
+      .findAllByLabelText("자료 조회")
+      .then((inputs) => inputs[0]);
     fireEvent.click(read);
-    expect(screen.getByLabelText("초안 저장·수정")).not.toBeChecked();
-    expect(screen.getByLabelText("초안 저장·수정")).toBeDisabled();
+    expect(screen.getAllByLabelText("초안 저장·수정")[0]).not.toBeChecked();
+    expect(screen.getAllByLabelText("초안 저장·수정")[0]).toBeDisabled();
     fireEvent.click(screen.getByText("설정 저장"));
     await waitFor(() =>
       expect(saveExternalAi).toHaveBeenCalledWith(

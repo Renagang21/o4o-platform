@@ -10,7 +10,12 @@ export interface ExternalConnection {
 export interface ConsentInfo {
   clientName: string;
   scopes: string[];
-  workspaces: Array<{ id: string; name: string; writable: boolean }>;
+  workspaces: Array<{
+    id: string;
+    name: string;
+    writable: boolean;
+    kind?: "supplier" | "store" | "organization" | "community";
+  }>;
 }
 export async function listExternalConnections(): Promise<ExternalConnection[]> {
   const result = await api.get(`${base}/connections`);

@@ -147,6 +147,8 @@ export default function ExternalAiConnections() {
               {data.adapters.map((adapter) => (
                 <div
                   key={adapter.kind}
+                  role="group"
+                  aria-label={names[adapter.kind]}
                   className="flex flex-wrap items-center gap-4"
                 >
                   <span className="w-24 font-medium">
