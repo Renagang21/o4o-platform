@@ -681,13 +681,13 @@ async function tests(db) {
       },
     );
     await check(
-      "cleanup removes revoked grants and delegated credentials",
+      "cleanup removes delegated credentials and retains recent quota parents",
       async () => {
         await provider.cleanup();
         assert.equal(
           (
             await db.query(
-              "SELECT count(*)::int AS n FROM external_ai_connections",
+              "SELECT count(*)::int AS n FROM external_ai_connections WHERE revoked_at IS NULL AND expires_at>now()",
             )
           )[0].n,
           0,
@@ -1834,7 +1834,7 @@ async function expandedTests(db, tools, provider, register, base, post) {
     },
   );
   await check(
-    "per-user write quota covers separate connections without accepting a fresh draft",
+    "per-user quota survives revocation and cleanup until the write history expires",
     async () => {
       const copies = Array.from({ length: 4 }, () => randomUUID());
       for (const id of copies)
@@ -1864,6 +1864,52 @@ async function expandedTests(db, tools, provider, register, base, post) {
         assert.equal(
           (await db.query("SELECT count(*)::int AS n FROM forum_post"))[0].n,
           before,
+        );
+        await db.query(
+          "UPDATE external_ai_connections SET revoked_at=now() WHERE id=ANY($1::uuid[])",
+          [copies.slice(0, 3)],
+        );
+        await provider.cleanup();
+        assert.equal(
+          (
+            await db.query(
+              "SELECT count(*)::int AS n FROM external_ai_connections WHERE id=ANY($1::uuid[])",
+              [copies.slice(0, 3)],
+            )
+          )[0].n,
+          3,
+        );
+        await assert.rejects(
+          tools.execute(
+            "save_content_draft",
+            draft(communityId, "community_post"),
+            copies[3],
+          ),
+          { code: "WRITE_QUOTA_EXCEEDED", status: 429 },
+        );
+        await db.query(
+          "UPDATE external_ai_requests SET expires_at=now()-interval '1 second' WHERE connection_id=ANY($1::uuid[])",
+          [copies.slice(0, 3)],
+        );
+        await provider.cleanup();
+        assert.equal(
+          (
+            await db.query(
+              "SELECT count(*)::int AS n FROM external_ai_connections WHERE id=ANY($1::uuid[])",
+              [copies.slice(0, 3)],
+            )
+          )[0].n,
+          0,
+        );
+        assert.equal(
+          (
+            await tools.execute(
+              "save_content_draft",
+              draft(communityId, "community_post"),
+              copies[3],
+            )
+          ).status,
+          "draft",
         );
       } finally {
         await db.query(
@@ -1966,8 +2012,15 @@ async function expandedTests(db, tools, provider, register, base, post) {
       await provider.cleanup();
       assert.equal(
         (
+          await db.query(`SELECT count(*)::int AS n FROM external_ai_credentials t
+        JOIN external_ai_connections c ON c.id=t.connection_id WHERE c.revoked_at IS NOT NULL OR c.expires_at<=now()`)
+        )[0].n,
+        0,
+      );
+      assert.equal(
+        (
           await db.query(
-            "SELECT count(*)::int AS n FROM external_ai_connections",
+            "SELECT count(*)::int AS n FROM external_ai_connections WHERE revoked_at IS NULL AND expires_at>now()",
           )
         )[0].n,
         0,

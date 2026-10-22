@@ -581,10 +581,12 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     await this.db.transaction(async (db) => {
       await db.query("DELETE FROM external_ai_requests WHERE expires_at<now()");
       await db.query(
-        "DELETE FROM external_ai_credentials WHERE expires_at<now()",
+        `DELETE FROM external_ai_credentials WHERE expires_at<now() OR connection_id IN
+          (SELECT id FROM external_ai_connections WHERE expires_at<now() OR revoked_at IS NOT NULL)`,
       );
       await db.query(
-        "DELETE FROM external_ai_connections WHERE expires_at<now() OR revoked_at IS NOT NULL",
+        `DELETE FROM external_ai_connections c WHERE (expires_at<now() OR revoked_at IS NOT NULL)
+          AND NOT EXISTS (SELECT 1 FROM external_ai_requests r WHERE r.connection_id=c.id AND r.expires_at>now())`,
       );
       await db.query(`DELETE FROM external_ai_clients c WHERE c.created_at<now()-interval '30 days'
         AND NOT EXISTS(SELECT 1 FROM external_ai_connections g WHERE g.client_id=c.id)
