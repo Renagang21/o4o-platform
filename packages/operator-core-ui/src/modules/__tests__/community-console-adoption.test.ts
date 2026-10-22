@@ -7,16 +7,17 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const read = (p: string) => readFileSync(p, 'utf-8');
 
 const B21_WRAPPERS = [
-  'services/web-kpa-society/src/pages/operator/CommunityManagementPage.tsx',
   'services/web-neture/src/pages/admin/CommunityManagementPage.tsx',
 ];
 
-const C7_WRAPPERS = [
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 운영자 화면은 제거됐다 — pharmacy 운영 화면이 필요하면 새로 만든다.
+const KPA_RETIRED_WRAPPERS = [
+  'services/web-kpa-society/src/pages/operator/CommunityManagementPage.tsx',
   'services/web-kpa-society/src/pages/operator/OperatorContentHubPage.tsx',
 ];
 
@@ -40,19 +41,9 @@ describe('B21 운영자 커뮤니티 콘솔 adoption', () => {
   });
 });
 
-describe('C7 운영자 콘텐츠 허브 adoption', () => {
-  it.each(C7_WRAPPERS)('%s 는 OperatorContentHubConsole 을 소비한다', (path) => {
-    const src = read(path);
-    expect(src).toContain("@o4o/operator-core-ui/modules/operator-content-hub");
-    expect(src).toContain('OperatorContentHubConsole');
-  });
-
-  it.each(C7_WRAPPERS)('%s 는 목록/컬럼/모달을 자체 구현하지 않는다', (path) => {
-    const src = read(path);
-    expect(src).not.toContain('<table');
-    expect(src).not.toContain('DataTable');
-    expect(src).not.toContain('ListColumnDef');
-    expect(src).not.toContain('window.confirm');
+describe('옛 KPA 운영자 wrapper 제거 (WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)', () => {
+  it.each(KPA_RETIRED_WRAPPERS)('%s 는 존재하지 않는다', (path) => {
+    expect(existsSync(path)).toBe(false);
   });
 });
 

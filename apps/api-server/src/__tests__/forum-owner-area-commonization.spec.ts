@@ -63,14 +63,19 @@ interface OwnerPage {
   before: number;
 }
 
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA-Society 마이페이지 포럼 소유자 2화면(285 + 381)과
+//   forumOwnerAdapter 는 옛 KPA 화면 제거로 삭제됐다 — census 에서 제외하고 부재를 아래에서 고정한다.
+const KPA_RETIRED_OWNER_FILES = [
+  'services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx',
+  'services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx',
+  'services/web-kpa-society/src/api/forumOwnerAdapter.ts',
+];
+
 const DASHBOARD_PAGES: OwnerPage[] = [
-  { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 285 },
   { service: 'Neture', file: 'services/web-neture/src/pages/supplier/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 576 },
 ];
 
-const MEMBER_PAGES: OwnerPage[] = [
-  { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 381 },
-];
+const MEMBER_PAGES: OwnerPage[] = [];
 
 /** census 시점 이미 복제로 존재하던 4서비스 — 감축 폭 단언의 기준이 된다. */
 const CENSUS_PAGES = [...DASHBOARD_PAGES, ...MEMBER_PAGES];
@@ -99,7 +104,6 @@ const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
 
 /** 서비스 어댑터 (endpoint 배선 + accent 만 담당) */
 const ADAPTERS: Array<{ service: string; file: string }> = [
-  { service: 'KPA-Society', file: 'services/web-kpa-society/src/api/forumOwnerAdapter.ts' },
   { service: 'Neture', file: 'services/web-neture/src/services/forumOwnerAdapter.ts' },
 ];
 
@@ -177,7 +181,8 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
     const beforeTotal = CENSUS_PAGES.reduce((sum, p) => sum + p.before, 0);
     const afterTotal = CENSUS_PAGES.reduce((sum, p) => sum + loc(p.file), 0);
     // 2177 → 1242: K-Cosmetics 2화면(581 + 354)은 앱 퇴역 삭제로 census 에서 제외 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-    expect(beforeTotal).toBe(1242);
+    // 1242 → 576: KPA-Society 2화면(285 + 381)은 옛 KPA 화면 제거로 제외 — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7.
+    expect(beforeTotal).toBe(576);
     expect(afterTotal).toBeLessThan(beforeTotal / 5);
   });
 });
@@ -242,22 +247,8 @@ describe('서비스 고유 정책이 보존된다', () => {
     expect(page).toContain("requestFormHref: basePath ? `${basePath}/request` : '/supplier/forum/request-category'");
   });
 
-  it('KPA — 신청 내역은 통합 신청함으로 유지 (fetchMyRequests 미주입 + 안내 slot)', () => {
-    const adapter = read('services/web-kpa-society/src/api/forumOwnerAdapter.ts');
-    expect(adapter).not.toContain('fetchMyRequests:');
-
-    const page = read('services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx');
-    expect(page).toContain('noticeSlot');
-    expect(page).toContain('/mypage/my-requests?entityType=forum_category');
-  });
-
-  it('KPA — 마이페이지 소속(레이아웃 · 네비 · route) 유지', () => {
-    const dash = read('services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx');
-    expect(dash).toContain('MyPageLayout');
-
-    const members = read('services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx');
-    expect(members).toContain('MyPageNavigation');
-    expect(members).toContain("backHref=\"/mypage/my-forums\"");
+  it.each(KPA_RETIRED_OWNER_FILES)('KPA — 옛 마이페이지 포럼 소유자 화면 %s 는 존재하지 않는다 (D7)', (p) => {
+    expect(fs.existsSync(path.join(REPO, p))).toBe(false);
   });
 });
 

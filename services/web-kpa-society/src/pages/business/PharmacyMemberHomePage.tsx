@@ -106,7 +106,6 @@ export default function PharmacyMemberHomePage() {
       {!showConversations && business.communityKey && <Link to={`${forumPath}/write`} className="inline-flex min-h-11 items-center text-sm font-medium text-blue-700">회원 게시판에서 이야기를 나눠 주세요 →</Link>}
     </>}
     <nav aria-label="회원 지원" className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-200 pt-5 text-sm text-slate-600">
-      <Link to="/service-guide">이용 안내</Link>
       <Link to={membershipPath}>내 참여 상태</Link>
       <Link to={businessPath(business.key, 'tools')}>업무 바로가기</Link>
       <Link to="/contact">본부 문의</Link>
