@@ -644,6 +644,7 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
           key={`${session.userId}:${cooperative.id}`}
           client={businessClient}
           businessKey={cooperative.businessKey}
+          currentUserId={session.userId ?? undefined}
           canManage={access.canManage}
         />
       ) : (

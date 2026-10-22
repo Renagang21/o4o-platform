@@ -703,7 +703,7 @@ export async function createForumComment(
  */
 export async function updateForumPost(
   postId: string,
-  payload: { title?: string; content?: any; categorySlug?: string; type?: string }
+  payload: { title?: string; content?: any; categorySlug?: string; type?: string; status?: 'publish' }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
     const response = await api.put(`${forumBase()}/posts/${postId}`, payload);

@@ -103,6 +103,7 @@ import { AddSupplierProposalTerms1792221000000 } from '../migrations/17922210000
 import { CreateCooperativeManagement1792300000000 } from '../migrations/1792300000000-CreateCooperativeManagement.js';
 
 import { AddContactInquiryOrganization1792540800000 } from '../migrations/1792540800000-AddContactInquiryOrganization.js';
+import { CreateExternalAiConnections1792635132325 } from '../migrations/1792635132325-CreateExternalAiConnections.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -141,6 +142,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddSupplierProposalTerms1792221000000,
   CreateCooperativeManagement1792300000000,
   AddContactInquiryOrganization1792540800000,
+  CreateExternalAiConnections1792635132325,
 ];
 
 export function incrementalMigrationNames(): string[] {
