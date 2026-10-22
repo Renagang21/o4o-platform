@@ -9,5 +9,6 @@
  */
 import { createFooterLegalLoader } from '@o4o/shared-space-ui';
 import { api } from './apiClient';
+import { CURRENT_HOST_PROFILE } from './hostProfile';
 
-export const loadFooterLegal = createFooterLegalLoader(async (path) => (await api.get(path)).data);
+export const loadFooterLegal = createFooterLegalLoader(async (path) => (await api.get(CURRENT_HOST_PROFILE === 'carepharm' ? '/neture/businesses/carepharm/legal/footer-legal' : path)).data);

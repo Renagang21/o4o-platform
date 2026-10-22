@@ -19,12 +19,13 @@ import {
 } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
 
-const SERVICE_KEY = 'neture';
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
+const SERVICE_KEY = CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : 'neture';
 
 /** public 정책 문서 조회. 미게시/없음(404) → null. 그 외 오류는 throw. */
 export async function loadPolicy(serviceKey: string, documentType: string): Promise<PolicyDocumentDto | null> {
   try {
-    const res = await api.get(`/public/services/${serviceKey}/policies/${documentType}`);
+    const res = await api.get(CURRENT_HOST_PROFILE === 'carepharm' ? `/neture/businesses/carepharm/legal/policies/${documentType}` : `/public/services/${serviceKey}/policies/${documentType}`);
     return res.data?.data ?? null;
   } catch (err: any) {
     if (err?.response?.status === 404) return null;

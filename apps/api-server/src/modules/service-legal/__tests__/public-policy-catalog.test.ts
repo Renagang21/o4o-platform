@@ -15,6 +15,11 @@ function makeApp() {
 }
 
 describe('canonical 서비스의 게시 문서 공개 조회', () => {
+  it('does not bypass the active business adapter through the generic enrollment route', async () => {
+    const { app, findOne } = makeApp();
+    expect((await request(app).get('/public/services/business:11111111-1111-4111-8111-111111111111/enrollment-policies')).status).toBe(404);
+    expect(findOne).not.toHaveBeenCalled();
+  });
   it.each(['supplier', 'funding', 'community', 'kpa-branch'])('%s: 동의 gate의 본문은 현재 published 문서로 조회한다', async serviceKey => {
     const { app, findOne } = makeApp();
     const result = await request(app).get(`/public/services/${serviceKey}/policies/terms`);

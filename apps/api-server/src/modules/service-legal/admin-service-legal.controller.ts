@@ -1,5 +1,6 @@
 import { readCurrentPolicyDocument } from '../policy-acceptance/policy-document-evidence.service.js';
 import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-policy.service.js';
+import { isBusinessPolicyScope } from '../neture-pharmacy/services/business-policy-scope.js';
 /**
  * Admin Service Legal Controller
  *
@@ -25,7 +26,7 @@ import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-
  */
 
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { ActionLogService } from '@o4o/action-log-core';
 import { authenticate } from '../../middleware/auth.middleware.js';
@@ -72,7 +73,7 @@ function normalizeStr(v: unknown): string | null {
   return s.length === 0 ? null : s;
 }
 
-export function createAdminServiceLegalController(dataSource: DataSource): Router {
+export function createAdminServiceLegalController(dataSource: DataSource, scopeGuard: (level: 'admin' | 'operator') => RequestHandler = requireServiceLegalScope): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
@@ -97,7 +98,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/legal-profile',
     authenticate,
-    requireServiceLegalScope('operator'),
+    scopeGuard('operator'),
     async (req: Request, res: Response) => {
       try {
         const profile = await profileRepo.findOne({ where: { service_key: req.params.serviceKey } });
@@ -112,7 +113,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.put(
     '/:serviceKey/legal-profile',
     authenticate,
-    requireServiceLegalScope('admin'),
+    scopeGuard('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -155,7 +156,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/policies',
     authenticate,
-    requireServiceLegalScope('operator'),
+    scopeGuard('operator'),
     async (req: Request, res: Response) => {
       try {
         const where: any = { service_key: req.params.serviceKey };
@@ -176,7 +177,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/policies/:id',
     authenticate,
-    requireServiceLegalScope('operator'),
+    scopeGuard('operator'),
     async (req: Request, res: Response) => {
       try {
         const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey } });
@@ -194,7 +195,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.post(
     '/:serviceKey/policies',
     authenticate,
-    requireServiceLegalScope('admin'),
+    scopeGuard('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -245,7 +246,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.put(
     '/:serviceKey/policies/:id',
     authenticate,
-    requireServiceLegalScope('admin'),
+    scopeGuard('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -324,7 +325,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.patch(
     '/:serviceKey/policies/:id/publish',
     authenticate,
-    requireServiceLegalScope('admin'),
+    scopeGuard('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -353,7 +354,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
               && (doc.version < 2 || !doc.effective_date)) {
               throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_NOT_READY', '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.', 400);
             }
-            if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < 2 || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '새 서비스 신청 정책은 새 버전과 확정된 시행일이 필요합니다.', 400);
+            if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < (isBusinessPolicyScope(doc.service_key) ? 1 : 2) || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '서비스 신청 정책은 유효한 버전과 확정된 시행일이 필요합니다.', 400);
             // Validate before demoting any published row; notice must not activate future terms.
             assertPolicyEffectiveForPublication(doc.effective_date);
             if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG) {
@@ -426,7 +427,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.patch(
     '/:serviceKey/policies/:id/lifecycle',
     authenticate,
-    requireServiceLegalScope('admin'),
+    scopeGuard('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;

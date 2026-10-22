@@ -1,11 +1,12 @@
 import { resolveSessionServiceKey } from "../utils/session-origin.js";
 
 describe("cooperative session boundary", () => {
-  it("uses its own logout/revocation scope independently of pharmacy and Neture", () => {
-    expect(resolveSessionServiceKey("https://pharmcoop.neture.co.kr")).toBe("coop");
+  it("uses the common Neture account session across pharmacy businesses", () => {
+    expect(resolveSessionServiceKey("https://pharmcoop.neture.co.kr")).toBe("neture");
     expect(resolveSessionServiceKey("https://pharmacy.neture.co.kr")).toBe(
-      "kpa-society",
+      "neture",
     );
+    for (const key of ["megapharm", "carepharm"]) expect(resolveSessionServiceKey(`https://${key}.neture.co.kr`)).toBe("neture");
     expect(resolveSessionServiceKey("https://neture.co.kr")).toBe("neture");
   });
   it.each([

@@ -1,6 +1,6 @@
 import { CooperativeNotificationLink, CooperativeNotifications } from './Notifications';
 import { OperatorInbox, OperatorInboxLink } from '@o4o/operator-core-ui';
-import { ScopedContactForm } from '@o4o/shared-space-ui';
+import { ScopedContactForm, PolicyDocumentViewer, PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { MemberForum } from "./MemberForum";
 import { MyCooperatives, MyUpdates } from "./Participation";
 import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
@@ -16,6 +16,7 @@ import {
 import {
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -118,6 +119,8 @@ export function App({
           <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
           <Route path=":cooperativeSlug" element={<CooperativeLayout />}>
             <Route index element={<CooperativeHome />} />
+            <Route path="policy" element={<CooperativePolicy documentType="terms" />} />
+            <Route path="privacy" element={<CooperativePolicy documentType="privacy" />} />
             <Route path="contact" element={<CooperativeContactPage local />} />
             <Route path="operator/inbox" element={<CooperativeInboxPage local />} />
             <Route path="membership" element={<Membership />} />
@@ -473,8 +476,38 @@ function CooperativeLayout() {
       </nav>
       {businessClient && cooperativeAccess(session,cooperative.id).canManage && <OperatorInboxLink key={`${session.userId}:${cooperative.id}`} client={businessClient} endpoint={`/operator-inbox/cooperative/${cooperative.slug}`} href={`/${cooperative.slug}/operator/inbox`}/>}
       <Outlet context={cooperative} />
+      <CooperativeLegal key={cooperative.id} cooperative={cooperative} />
     </>
   );
+}
+
+function CooperativeLegal({ cooperative }: { cooperative: Cooperative }) {
+  const { businessClient, preview } = useContext(Context);
+  const loadProfile = useCallback(async () => {
+    if (!businessClient || !cooperative.businessKey || preview) return null;
+    return (await businessClient.get(`/neture/businesses/${encodeURIComponent(cooperative.businessKey)}/legal/footer-legal`)).data.data;
+  }, [businessClient, cooperative.businessKey, preview]);
+  return <aside className="section">
+    <SiteLink to={`/${cooperative.slug}/policy`}>이용약관</SiteLink>{' · '}
+    <SiteLink to={`/${cooperative.slug}/privacy`}>개인정보처리방침</SiteLink>
+    <PublicLegalFooterInfo serviceKey={cooperative.businessKey ?? ''} loadProfile={loadProfile} />
+  </aside>;
+}
+
+function CooperativePolicy({ documentType }: { documentType: 'terms' | 'privacy' }) {
+  const cooperative = useOutletContext<Cooperative>();
+  const { businessClient, preview } = useContext(Context);
+  const loadPolicy = useCallback(async () => {
+    if (!businessClient || !cooperative.businessKey || preview) return null;
+    try {
+      return (await businessClient.get(`/neture/businesses/${encodeURIComponent(cooperative.businessKey)}/legal/policies/${documentType}`)).data.data;
+    } catch (error) {
+      if ((error as { response?: { status?: number } })?.response?.status === 404) return null;
+      throw error;
+    }
+  }, [businessClient, cooperative.businessKey, documentType, preview]);
+  return <PolicyDocumentViewer key={`${cooperative.id}:${documentType}`} serviceKey={cooperative.policyScope ?? ''} documentType={documentType}
+    heading={documentType === 'terms' ? '이용약관' : '개인정보처리방침'} loadPolicy={loadPolicy} />;
 }
 
 function CooperativeHome() {
@@ -560,9 +593,11 @@ function Membership() {
           status === "withdrawn" ||
           status === "rejected") && (
           <MembershipApplication
-            key={cooperative.id}
+            key={`${session.userId}:${cooperative.id}`}
             client={businessClient}
             coop={cooperative.id}
+            businessKey={cooperative.businessKey}
+            policyScope={cooperative.policyScope}
             onChanged={onSessionChanged}
           />
         )}
@@ -799,7 +834,7 @@ function CooperativeContactPage({local=false}:{local?:boolean}) {
   const {businessClient}=useContext(Context); const {cooperativeSlug}=useParams();
   if(!businessClient)return <p>문의 연결을 확인해 주세요.</p>;
   const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
-  return <ScopedContactForm key={endpoint} client={businessClient} endpoint={endpoint} privacyHref="https://neture.co.kr/privacy"/>;
+  return <ScopedContactForm key={endpoint} client={businessClient} endpoint={endpoint} privacyHref={local ? `/${encodeURIComponent(cooperativeSlug ?? '')}/privacy` : 'https://neture.co.kr/privacy'}/>;
 }
 function CooperativeInboxPage({local=false}:{local?:boolean}) {
   const {businessClient,session,cooperatives}=useContext(Context);const {cooperativeSlug}=useParams();

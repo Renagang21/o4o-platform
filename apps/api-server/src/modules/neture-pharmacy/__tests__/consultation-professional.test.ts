@@ -3,6 +3,8 @@ import { saveStaffFeatures } from '../services/staff-feature-permissions.js';
 it('uses an explicit boolean confirmation and treats failed reads as unavailable', async () => {
   const query = jest.fn().mockResolvedValue([{ confirmed: true }]);
   expect(await consultationProfessionalConfirmed({ query }, 'user', 'store')).toBe(true);
+  expect(query.mock.calls[0][0]).not.toMatch(/kpa_pharmacist_profiles|kpa_members/);
+  expect(query.mock.calls[0][1]).toEqual(['user', 'store']);
   query.mockResolvedValue([{ confirmed: false }]);
   expect(await consultationProfessionalConfirmed({ query }, 'user', 'store')).toBe(false);
   query.mockResolvedValue([{ confirmed: 'true' }]);
