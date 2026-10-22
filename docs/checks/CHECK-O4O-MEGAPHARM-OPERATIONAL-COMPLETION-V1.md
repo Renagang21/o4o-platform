@@ -52,3 +52,5 @@ API 선택 회귀에는 별도 격리 DB로 실행한 새 운영 API 8건과 담
 Codex P1(기존 Pharmacy handoff 세션 범위)을 반영했다. 기존 kpa-society 이동 대상은 pharmacy.neture.co.kr에서만 교환하는 고정 transport alias이며 최종 세션은 neture다. 기존 My Home·내 매장 링크를 유지하고, 다른 Origin의 교환·대표 Neture 토큰의 타 호스트 교환은 거절한다. CarePharm 전용 경로 제한도 유지한다.
 
 Handoff·세션·로그아웃 관련 9 suite 142 PASS. 이 중 실제 격리 PostgreSQL 토큰 원장·client·교환 흐름 21개를 실행했고, 네 사업 호스트의 공통 계정 로그아웃과 다른 호스트의 Pharmacy 토큰 교환 거절을 확인했다. 이 검증은 앞의 API 선택 회귀와 일부 중복이다. 관련 shared-space-ui 165 PASS·API 타입·Neture build를 재검증했다.
+
+계정 인증/카탈로그 소비처 대조: 공통 session scope와 회원가입 약관의 기존 기대값을 새 neture 계정 문맥으로 정렬했다. 서비스별 가입·과거 동의 원장을 바꾸지 않는다. 관련 21 suite 414 PASS(별도 opt-in 73개 제외).

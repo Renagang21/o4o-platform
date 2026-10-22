@@ -51,7 +51,7 @@ describe('canonical 호스트 (생성)', () => {
 
 describe('옛 호스트 수용 (session-origin)', () => {
   it.each([
-    ['https://pharmacy.neture.co.kr', 'kpa-society'],
+    ['https://pharmacy.neture.co.kr', 'neture'],
     ['https://retail.neture.co.kr', 'k-cosmetics'],
   ])('%s → %s', (origin, key) => {
     expect(resolveSessionServiceKey(origin)).toBe(key);
@@ -122,8 +122,8 @@ describe('kpa-branch — canonical kpa.neture.co.kr (WO-O4O-KPA-BRANCH-SERVICE-C
     expect(new URL(getServiceOrigin('kpa-branch')).pathname).toBe('/');
   });
 
-  it('pharmacy.neture.co.kr(kpa-society) 와 kpa.neture.co.kr(kpa-branch) 는 서로 다른 서비스로 판정된다', () => {
-    expect(resolveSessionServiceKey('https://pharmacy.neture.co.kr')).toBe('kpa-society');
+  it('pharmacy 공통 계정 세션과 분회 세션은 구분하고 legacy 공개 Origin은 유지한다', () => {
+    expect(resolveSessionServiceKey('https://pharmacy.neture.co.kr')).toBe('neture');
     expect(resolveSessionServiceKey('https://kpa.neture.co.kr')).toBe('kpa-branch');
     // role prefix 별칭 `kpa` 는 kpa-society 로만 흡수된다 — 분회로 재해석하지 않는다.
     expect(getServicePublicOrigin('kpa')).toBe('https://pharmacy.neture.co.kr');
