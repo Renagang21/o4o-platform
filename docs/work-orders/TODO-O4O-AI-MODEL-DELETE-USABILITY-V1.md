@@ -12,7 +12,7 @@
 - [x] T02 고정 기본 목록과 실제 기본/선택/정책 참조를 구분하고 제한 해제 조건 확정
 - [x] T03 사용처 변경 이후 삭제 가능하도록 참조 판정과 사용자 안내 구현
 - [x] T04 정책/fallback 보호·삭제 후 설정 해제 방지·재조회·desktop/mobile 검증
-- [ ] T05 문서 보완·경로별 commit·push 및 미검증 범위 보고
+- [x] T05 문서 보완·경로별 commit·push 및 미검증 범위 보고
 
 ## 조사
 
@@ -56,4 +56,14 @@
 
 새 전체 공통 설정을 도입하지 않았다. 번역 두 사용처는 모델 선택만 독립적이며 한도/정산 scope와 활성 설정은 기존 계약을 공유한다. 지정 모델이 실패할 때의 별도 fallback 선택 기능은 후속이다.
 
-현재 `DEPLOYMENT=REQUIRED`, main 병합·운영 배포 미실행. 본 문서는 첫 commit/push 전 snapshot이며 실제 SHA·push·clean 여부는 Git 인계에서 확인한다. worktree `/workspace/o4o-wt/ai-model-delete-usability`, branch `wo/ai-model-delete-usability`는 통합 전 `KEEP`이다.
+현재 `DEPLOYMENT=REQUIRED`, main 병합·운영 배포 미실행. 기능 commit `c79a2edf63`의 원격 push를 확인했다. 이 종료 문서 보완은 별도 문서 commit으로 남기며 최종 SHA·원격 동일 여부·clean은 Git 인계에서 확인한다. PR 생성/PR CI는 아직 수행하지 않았다. worktree `/workspace/o4o-wt/ai-model-delete-usability`, branch `wo/ai-model-delete-usability`는 통합 전 `KEEP`이다.
+
+
+## WORKTREE_DISPOSITION
+
+- base: `3917a9522d50936e405db28d59a4ae9febff628f`
+- main integration / deployment: 미실행 / REQUIRED
+- local verification: 위 실제 실행 기록 통과, 운영 Google/유료 요청 미검증
+- task fixture: DB·컨테이너 잔존 0, 기준 checkout 변경 없음
+- verdict: KEEP — push 완료 branch를 후속 통합·검토용으로 보존
+- 문서 정합: 삭제 제한의 실제 참조·정책 우선순위·번역 모델 분리를 TODO와 정본 후속 개발 절에 반영. 기존 실행 이력과 canonical index 상태는 수정하지 않음.
