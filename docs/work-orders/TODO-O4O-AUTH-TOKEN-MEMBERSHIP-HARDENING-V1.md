@@ -1,6 +1,6 @@
 # TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED (승인된 구현·검증·branch push 범위)
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (KST)
 > **근거**: 사용자 인증 잔여 조사 후 TODO 작성 → 문서·코드 대조·계획 보완 → 구현·검증 → commit·push 지시
 > **상위 WO**: [WO-O4O-AUTH-REFACTOR-V1](WO-O4O-AUTH-REFACTOR-V1.md)의 인증 보안 보완 후속
@@ -30,7 +30,7 @@ CORE_CHANGE 사유: 사용자가 앞선 조사 결과의 수정·검증·push를
 - [x] V01: 실패 사례를 먼저 재현하고 단위·격리 PostgreSQL 회귀로 보완을 검증한다.
 - [x] V02: API 타입/배포 빌드·관련 소비처 회귀·lint·문서/민감정보·diff 검사를 수행한다. 전체 lint의 기존 실패는 아래 구분한다.
 - [x] D01: 과거 기록을 보존하고 현재 잔여·해소 항목 및 사용자 실제 인증/시행일 대기 항목을 구분한다.
-- [ ] G01: 변경 경로만 commit·명시 branch push 후 commit SHA·검증·미해결 사항을 인계한다.
+- [x] G01: 변경 경로만 commit·명시 branch push 후 commit SHA·검증·미해결 사항을 인계한다.
 
 ## 조사 후 보완 기준
 
@@ -128,7 +128,31 @@ push 준비 중 `origin/main`은 `7dc02646dab2808258133139b3ca0714ec3cc14b`로 �
 자동 merge/rebase·타 작업 수정을 하지 않았다. 검증 기준은 위 시작 SHA이며 통합 담당은 최신 main의
 약국 화면 정리와 함께 PR CI/review 및 필요한 통합 검증을 수행한다.
 
+## push 결과·통합 담당 인계
+
+- repository: `Renagang21/o4o-platform`
+- branch: `wo/auth-token-membership-hardening-v1`
+- 소스·검증 문서 commit: `517c33bfb4c94e5c14672355d8456f87c3b1c597`
+- 명시 branch push 성공 후 `git ls-remote --heads`로 원격 SHA 일치를 확인했다.
+- 이 완료 기록은 같은 branch의 후속 문서 commit으로 push한다. 최종 branch HEAD는 인계 시 별도로 확인한다.
+- PR 생성·required PR CI/Codex review 운영·main 통합·배포는 수행하지 않았다. 전체 lint의 기존46오류와
+  별도 fixture/실계정 미실행 범위는 위 표 그대로 인계한다. integration-ready 판정을 대신하지 않는다.
+
 DEPLOYMENT: REQUIRED_AFTER_MERGE — 이번 종료 범위는 push까지이며 적용·배포는 통합 담당에게 인계한다.
 
 문서 정합: 앞선 조사와 현재 코드의 차이를 본 TODO에서 추적한다. 과거 WO/CHECK와 정본 색인은 다시 쓰지 않는다.
-WORKTREE_DISPOSITION: KEEP — 구현·검증·push 및 후속 통합을 위한 전용 작업공간이다.
+WORKTREE_DISPOSITION
+
+```text
+worktree: /workspace/o4o-wt/auth-token-membership-hardening-v1
+branch: wo/auth-token-membership-hardening-v1
+base: 3917a9522d50936e405db28d59a4ae9febff628f
+main integration: NOT_EXECUTED (통합 담당 인계)
+CI: 로컬 검증은 위 표 / PR gate 미판정
+deployment: REQUIRED_AFTER_MERGE / NOT_EXECUTED
+smoke: 로컬 Neture PC/mobile 8/8 / 실제 OAuth·SMTP 미실행
+uncommitted/untracked: 소스 push 확인 시 0/0; 이 완료 기록 push 후 재확인
+other session usage: 이번 전용 작업공간만 사용
+branch-only commits: 소스 517c33bfb4 및 후속 완료 기록
+verdict: KEEP (통합 담당의 PR·검토·후속 수정·병합 대기)
+```
