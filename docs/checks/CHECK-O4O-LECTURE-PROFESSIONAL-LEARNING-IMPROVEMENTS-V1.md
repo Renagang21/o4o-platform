@@ -8,7 +8,7 @@
 
 독립 Lecture의 공개 목록·목차, 전문 강의 정보, 영상 bookmark, 기존 교재, 수료증 미발급 복구, 강의 맥락 문의를 보완했다. [현재 사용 안내](../guides/LECTURE-PROFESSIONAL-LEARNING.md)에 동작과 한계를 기록했다. TODO별 상태는 WO를 따른다. 강사 신청서 경력 저장, 샘플 영상 공개 확대, 자막은 완료로 표시하지 않는다.
 
-작업 branch: `wo/lecture-professional-learning-improvements`. 기준 main: `b5a5423587e341958302e08f26815d45df2983d5`. 기존 `/workspace/o4o-platform/SETUP.md` 수정은 이 작업에 섞지 않았다. 새 schema·migration·dependency 선언·lockfile 변경은 없다.
+작업 branch: `wo/lecture-professional-learning-improvements`. 기준 main: `b5a5423587e341958302e08f26815d45df2983d5`. 기존 `/workspace/o4o-platform/SETUP.md` 수정은 이 작업에 섞지 않았다. 새 schema·migration·workspace dependency 선언·lockfile 변경은 없다. 통합 단계의 기존 runtime dependency 배선 보정은 아래에 별도로 기록한다.
 
 ## Shared Module Change Verification
 
@@ -73,3 +73,11 @@
 PR·병합·배포·운영 데이터 변경은 실행하지 않는다. 작업 branch와 최종 SHA는 종료 보고에서 전달한다. 통합 담당은 현재 main과 변경 충돌·required CI·Codex review를 확인하고 별도 권한과 절차에 따라 통합한다. 배포 전 실제 개발용 DB/자료 제공 환경에서 protected media와 PostgreSQL 15 전체 flow를 확인한다. worktree는 후속 수정용으로 보존한다.
 
 문서 정합: 오래된 LMS 기준의 KPA·K-Cosmetics 프런트 설명은 현행 Lecture 구현과 다르며 이번 개선 기준으로 사용하지 않았다. 과거 정본을 일괄 재작성하지 않고 Lecture 사용 안내와 서비스 색인 연결을 추가했다.
+
+## 2026-10-22 통합 단계 — 운영 패키징 보정
+
+사용자의 후속 main 병합·배포 지시로 PR #767을 생성했다. 최신 main `7d66199160e200a487344d70480d1f1d9a0f45ab`를 작업 branch에 merge했고, 해당 HEAD의 CI Gate와 Codex review(no findings)가 통과했다.
+
+직전 main의 Promote는 migration 성공 뒤 Cloud Run 배포에서 실패했다. 상세 로그 호스트 접근이 차단되어 그 실패의 직접 원인으로 단정하지 않았다. 별도로 실제 tsup bundle을 생성해 점검한 결과, main에 추가된 MCP SDK의 정적 import 5개가 남지만 Docker용 `package.production.json`에는 해당 패키지가 없었다. API workspace에 이미 선언된 동일 버전 `@modelcontextprotocol/sdk@1.32.1`을 운영 manifest에 연결했다. API 기능·권한·schema 변경은 하지 않았다.
+
+Docker와 같은 `npm install --omit=dev --ignore-scripts`를 별도 임시 디렉터리에서 실행한 후 Node 22.18.0으로 실제 bundle의 정적 external import 59개 resolve와 MCP SDK entry point 5개 동적 load가 모두 통과했다. 임시 설치·bundle은 checkout 밖에 두었다. 운영 manifest 보정 후의 CI·병합·배포 SHA와 결과는 후속 종료 보고에서 확정한다.
