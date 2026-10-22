@@ -98,6 +98,26 @@ function isOpaqueSocialProof(req: Request, section: string, field: string, value
   return field === 'idToken' && value.length <= 16384 && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value);
 }
 
+/** External OAuth values are opaque too. Only new exact routes/fields and bounded URL-safe proofs;
+ * SDK PKCE/client/resource checks and hashed one-use credentials remain mandatory downstream.
+ */
+function isOpaqueExternalAiProof(req: Request, section: string, field: string, value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  const flow = /^[A-Za-z0-9_-]{43}$/.test(value);
+  if (req.method === 'GET' && section === 'query') {
+    if (req.path === '/authorize') {
+      if (field === 'code_challenge') return flow;
+      if (field === 'state') return value.length > 0 && value.length <= 2048 && /^[A-Za-z0-9._~-]+$/.test(value);
+    }
+    return req.path === '/api/external-ai/consent' && field === 'request' && flow;
+  }
+  if (req.method !== 'POST' || section !== 'body') return false;
+  if (['/api/external-ai/consent','/api/external-ai/consent/deny'].includes(req.path)) return field === 'request' && flow;
+  if (req.path !== '/token') return false;
+  if (field === 'code' || field === 'refresh_token') return flow;
+  return field === 'code_verifier' && /^[A-Za-z0-9._~-]{43,128}$/.test(value);
+}
+
 export function sqlInjectionDetection(req: Request, res: Response, next: NextFunction) {
   // Retired Passport `/api/v1/social/*` routes remain excluded from the proof contract above.
 
@@ -117,7 +137,8 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
 
   // Preserve the request for downstream validation; only filter this heuristic's candidates.
   const candidates = (section: string, fields: Record<string, unknown>) => Object.fromEntries(
-    Object.entries(fields || {}).filter(([field, value]) => !isOpaqueSocialProof(req, section, field, value))
+    Object.entries(fields || {}).filter(([field, value]) => !isOpaqueSocialProof(req, section, field, value)
+      && !isOpaqueExternalAiProof(req, section, field, value))
   );
   const query = candidates('query', req.query);
   const body = candidates('body', req.body);

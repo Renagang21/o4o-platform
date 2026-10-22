@@ -60,7 +60,7 @@ describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services �
     const g = operatorGroup(m)!;
     expect(g.items.map((i) => i.id)).toEqual(['operator:kpa-society:operator']);
     expect(g.items.map((i) => i.action)).toEqual([
-      { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' },
+      { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator/semi-franchises' },
     ]);
     expect(g.title).toBe('서비스 운영');
     expect(g.items.map((i) => [i.label, i.note])).toEqual([['O4O 약국 경영지원', undefined]]);
@@ -92,7 +92,7 @@ describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services �
     const g = operatorGroup(m)!;
     expect(g.items.map((i) => [i.id, i.action])).toEqual([
       ['operator:neture', { kind: 'internal', to: '/operator' }],
-      ['operator:kpa-society:admin', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/admin' }],
+      ['operator:kpa-society:admin', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator/semi-franchises' }],
     ]);
     expect(g.items.map((i) => [i.label, i.note])).toEqual([['Neture', undefined], ['O4O 약국 경영지원', '관리자']]);
     expect(m.platformAdmin).toBeNull();

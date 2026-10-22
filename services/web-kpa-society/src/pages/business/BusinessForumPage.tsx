@@ -74,7 +74,7 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
     setError('');
     try {
       if (editId && post) {
-        await authClient.api.put(`${apiBase}/posts/${post.id}`, { title, content: editorHtml });
+        await authClient.api.put(`${apiBase}/posts/${post.id}`, { title, content: editorHtml, ...(post.status === 'draft' ? { status: 'publish' } : {}) });
         navigate(`${base}/post/${encodeURIComponent(post.slug)}`);
       } else {
         const forumId = category || categories[0]?.id;
@@ -98,10 +98,12 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
     <h2 className="mb-2 text-xl font-semibold text-slate-900">{editId ? '게시글 수정' : '이야기 나누기'}</h2>
     <p className="mb-6 text-sm leading-6 text-slate-500">약국 운영의 경험과 질문을 회원들과 나눠 주세요.</p>
     {error && <p role="alert">{error}</p>}
+    {post?.status === 'draft' && <p className="mb-4 rounded border p-3">비공개 초안입니다. 게시하면 이 게시판 이용자에게 공개됩니다.</p>}
     {!editId && <label className="mb-5 flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">게시판 <select className="min-h-11 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 py-2" value={category || categories[0]?.id || ''} onChange={e => setParams({ category: e.target.value })}>
       {categories.map(board => <option key={board.id} value={board.id}>{board.name}</option>)}
     </select></label>}
     {(!editId || post) && <ForumWriteForm key={post?.id ?? category} initialTitle={post?.title} initialContentHtml={postContentHtml(post?.content)}
+      submitLabel={post?.status === 'draft' ? '검토한 초안 게시' : editId ? '수정하기' : '등록하기'}
       onSubmit={submit} onCancel={() => navigate(base)} onInvalid={() => setError('제목과 내용을 입력해 주세요.')} />}
   </div>;
   if (view === 'post' && post) return <BusinessPostArticle post={post} comments={comments} commentTotal={commentTotal}
