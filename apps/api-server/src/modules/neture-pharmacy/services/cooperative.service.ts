@@ -7,7 +7,7 @@ export class CooperativeService {
   constructor(private readonly db: DataSource) {}
   directory() {
     return this.db.query(`SELECT c.id, c.slug, c.name, c.introduction,
-      c.eligibility_description AS "eligibilityDescription", sf.key AS "businessKey"
+      c.eligibility_description AS "eligibilityDescription", sf.key AS "businessKey", ('business:'||sf.id::text) AS "policyScope"
       FROM cooperatives c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id
       WHERE c.status = 'active' AND sf.status = 'active' ORDER BY c.name, c.slug`);
   }

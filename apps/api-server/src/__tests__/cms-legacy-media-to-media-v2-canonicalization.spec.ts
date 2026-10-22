@@ -136,7 +136,8 @@ describe('CMS legacy media → Media V2 정본화', () => {
 
     it('제거된 딥링크는 compatibility 화면 없이 상위 경로로만 보낸다', () => {
       const kpa = read(join(SERVICES, 'web-kpa-society', 'src', 'App.tsx'));
-      expect(kpa).toMatch(/path="\/my-content" element=\{<Navigate to="\/mypage" replace \/>\}/);
+      // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 옛 /my-content 딥링크도 두지 않는다(404).
+      expect(kpa).not.toMatch(/path="\/my-content"/);
       expect(kpa).not.toMatch(/MyContentPage/);
       const neture = read(join(SERVICES, 'web-neture', 'src', 'App.tsx'));
       expect(neture).toMatch(/path="\/workspace\/my-content" element=\{<Navigate to="\/" replace \/>\}/);

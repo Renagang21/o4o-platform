@@ -1,4 +1,5 @@
 import { AiModelCatalog, ModelControlStatus, UsageModelSelection, useAiModelControls } from './AiModelControls';
+import ExternalAiConnections from './external-ai/ExternalAiConnections';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -32,6 +33,17 @@ function timestamp(value: string) {
 }
 
 export default function AiManagement() {
+  const [area,setArea]=useState<'internal'|'external'>('internal');
+  return <div className="space-y-5">
+    <nav aria-label="AI 연결 구분" className="flex flex-wrap gap-2">
+      <button className={button} aria-pressed={area==='internal'} onClick={()=>setArea('internal')}>O4O 내부 AI</button>
+      <button className={button} aria-pressed={area==='external'} onClick={()=>setArea('external')}>외부 AI 연결</button>
+    </nav>
+    {area==='internal'?<InternalAiManagement/>:<ExternalAiConnections/>}
+  </div>;
+}
+
+function InternalAiManagement() {
   const modelControl = useAiModelControls();
   const [data, setData] = useState<AiManagementSnapshot | null>(null);
   const [loading, setLoading] = useState(true);

@@ -1,4 +1,5 @@
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
+import { readPlayback, savePlayback, validPlaybackPosition } from '../services/PlaybackService.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
@@ -233,6 +234,35 @@ export class EnrollmentController extends BaseController {
         return BaseController.notFound(res, error.message);
       }
 
+      return BaseController.error(res, error);
+    }
+  }
+
+  static async playback(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+      if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+      if (!(await guardCourseScope(req, res, courseId))) return;
+      const enrollment = await EnrollmentService.getInstance().getEnrollmentByUserAndCourse(userId, courseId);
+      if (!enrollment) return BaseController.notFound(res, 'Enrollment not found');
+      if (!['approved', 'in_progress', 'completed'].includes(enrollment.status)) {
+        return BaseController.forbidden(res, '수강 승인 후 이용할 수 있습니다.');
+      }
+      if (req.method === 'GET') {
+        const lessonId = typeof req.query.lessonId === 'string' ? req.query.lessonId : undefined;
+        return BaseController.ok(res, { playback: await readPlayback(enrollment.id, courseId, lessonId) });
+      }
+      const { lessonId, positionSeconds } = req.body;
+      if (typeof lessonId !== 'string' || !validPlaybackPosition(positionSeconds)) {
+        return BaseController.badRequest(res, '유효한 레슨과 재생 위치가 필요합니다.');
+      }
+      const lesson = await AppDataSource.getRepository('Lesson').findOne({ where: { id: lessonId } });
+      if (!lesson || lesson.courseId !== courseId || !lesson.isPublished) return BaseController.notFound(res, 'Lesson not found');
+      if (lesson.type !== 'video') return BaseController.badRequest(res, '영상 레슨만 위치를 저장할 수 있습니다.');
+      return BaseController.ok(res, { playback: await savePlayback(enrollment.id, lessonId, positionSeconds) });
+    } catch (error: any) {
+      logger.error('[EnrollmentController.playback] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

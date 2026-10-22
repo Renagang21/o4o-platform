@@ -25,31 +25,30 @@ const exists = (rel: string) => fs.existsSync(path.join(REPO_ROOT, rel));
 
 /** Store-facing 화면 — WO1~3 census 합집합(일반 콘텐츠 4 · 제작 자료 2 · 목적별 13, 중복 제거) */
 const STORE_FILES = [
-  // KPA
-  'services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyPopPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx',
+  // Store (store.neture.co.kr — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면 제거 후 정본)
+  'services/web-store/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
+  'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
+  'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreLocalProductsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
+  'services/web-store/src/pages/pharmacy/productionTargets.tsx',
+  'services/web-store/src/pages/pharmacy/StoreLibraryContentsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreQRPage.tsx',
 ];
 
 /** 이번 WO 에서 건드리지 않는 non-Store AI 소비처(대표) — 존재 + AI 연결 유지 */
 const NON_STORE_AI_FILES = [
-  'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx', // Community(/content/*) — 이름만 Store 아님
-  'services/web-kpa-society/src/pages/forum/ForumWritePage.tsx',
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 Community 작성 화면(ContentWritePage · ForumWritePage)은 제거됐다.
   // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: KPA/PH 강사 화면 은퇴 → Lecture 강사 화면(공통 편집기 기본 AI 유지)
   'services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx',
 ];
 
-const QR_PAGE = 'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
+const QR_PAGE = 'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
 const AI_ROUTES = 'apps/api-server/src/routes/ai-proxy.routes.ts';
 
 describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (A) Store dead aiRequestHeaders 0', () => {
@@ -151,7 +150,7 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (D) Store AiContentModal / 
     });
   }
   it('productionTargets — dead AiContentModal 진입 매핑(PRODUCTION_TARGET_TO_AI_MODE · AiModeForProduction) 제거', () => {
-    const src = read('services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx');
+    const src = read('services/web-store/src/pages/pharmacy/productionTargets.tsx');
     expect(src).not.toMatch(/export (const|type) (PRODUCTION_TARGET_TO_AI_MODE|AiModeForProduction)\b/);
     expect(src).not.toMatch(/productionTargetToAiMode\s*\(/);
   });
@@ -226,10 +225,9 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (E) non-Store · content-ed
       expect(src).not.toContain('showInternalAi={false}');
     }
   });
-  it('ContentWritePage 는 Community 화면(/content/* · CommunityContentWriteShell)이라 Store 대상이 아니다', () => {
-    const src = read('services/web-kpa-society/src/pages/contents/ContentWritePage.tsx');
-    expect(src).toContain('CommunityContentWriteShell');
-    expect(read('services/web-kpa-society/src/App.tsx')).toMatch(/path="\/content\/documents\/new"[^\n]*<ContentWritePage/);
+  it('KPA 옛 Community 작성 화면(ContentWritePage)은 제거됐다 — /content/* route 없음 (D7)', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx'))).toBe(false);
+    expect(read('services/web-kpa-society/src/App.tsx')).not.toContain('<ContentWritePage');
   });
   it('aiDescription read 경로 불변 — store-qr.service · store-library-feed.controller · QrLandingPage', () => {
     expect(read('apps/api-server/src/services/store/store-qr.service.ts')).toContain("aiDescription");

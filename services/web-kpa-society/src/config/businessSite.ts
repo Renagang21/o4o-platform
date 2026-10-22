@@ -16,7 +16,7 @@ export function resolveBusinessSite(
     name:
       configuredName?.trim() ||
       (key === "megapharm" ? "메가팜 · 창고형약국" : "O4O 약국"),
-    authServiceKey: key === "pharmacy" ? "kpa-society" : "neture",
+    authServiceKey: "neture",
   };
 }
 export const BUSINESS_SITE = resolveBusinessSite(

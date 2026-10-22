@@ -28,14 +28,14 @@ import logger from '../../utils/logger.js';
 import { getEnrollmentPolicies } from '../policy-acceptance/service-enrollment-policy.service.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 
-export function createPublicServiceLegalController(dataSource: DataSource): Router {
+export function createPublicServiceLegalController(dataSource: DataSource, supportedScope: (key: string) => boolean = isSupportedLegalServiceKey): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
 
   function guardServiceKey(req: Request, res: Response, allowCatalogPolicy = false): string | null {
     const { serviceKey } = req.params;
-    if (!serviceKey || (!isSupportedLegalServiceKey(serviceKey) && !(allowCatalogPolicy && getService(serviceKey)))) {
+    if (!serviceKey || (!supportedScope(serviceKey) && !(allowCatalogPolicy && getService(serviceKey)))) {
       res.status(404).json({
         success: false,
         error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' },
@@ -64,6 +64,7 @@ export function createPublicServiceLegalController(dataSource: DataSource): Rout
 
   router.get('/:serviceKey/enrollment-policies', async (req, res) => {
     res.set('Cache-Control', 'no-store');
+    if (!guardServiceKey(req, res)) return;
     try {
       const documents = await getEnrollmentPolicies(dataSource, req.params.serviceKey);
       res.json({ success: true, data: documents.map(doc => ({ policyDocumentId: doc.id, serviceKey: doc.service_key,

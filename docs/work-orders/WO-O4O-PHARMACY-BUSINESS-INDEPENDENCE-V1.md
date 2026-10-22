@@ -19,6 +19,8 @@
 | D3 | **약관 · 정책 문서는 사업별로 따로 둔다.** 내용이 비슷해도 하나를 공유하지 않는다. 각 사업의 약관은 그 사업에 속하며 그 사업 단위로 관리 · 게시 · 동의 기록한다. | 사용자 2026-10-20 |
 | D4 | 기존 `service_key='kpa-society'` 회원 · 약관 동의 · 콘텐츠는 의미 없는 테스트 데이터다. 데이터 이전 단계를 두지 않는다. | 사용자 2026-10-20 |
 | D5 | 사업 식별은 서비스 키가 아니라 사업 데이터 행(`semi_franchises.key`)으로 한다. 이 결정은 유지한다(D1 은 pharmacy 를 이 방식에 맞추는 것). | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) L59 · [RBAC-ROLE-CATALOG-V1](../rbac/RBAC-ROLE-CATALOG-V1.md) L164-182 |
+| D7 | **옛 KPA 운영 · 관리 화면은 남기지 않는다.** `kpa:operator` · `kpa:admin` 으로 들어가는 운영 콘솔(`/operator/*` · `/admin/*`)과 그 화면이 쓰는 KPA 전용 화면을 이전하지 않고 삭제한다. pharmacy 에 필요한 운영 화면은 다른 세 사업과 같은 사업 운영 화면(`/operator/semi-franchises`) 기준으로 새로 만든다. | 사용자 2026-10-21 |
+| D8 | **KPA 분회와 같이 쓰던 테이블과의 관계를 끊는다.** pharmacy 는 `kpa_organizations` · `kpa_members` · `kpa_pharmacist_profiles` 를 읽거나 쓰지 않는다. KPA 분회는 새로 만들 예정이며, 그 테이블 설계는 분회를 새로 만들 때 정한다. 이 WO 는 분회 쪽 테이블 · 코드를 바꾸지 않는다. | 사용자 2026-10-21 |
 | D6 | **은퇴 도메인 관련 내용은 전부 삭제한다**: `kpa-society.co.kr` · `k-cosmetics.site` · `glycopharm.co.kr` · `pharmacyhub.co.kr` · `siteguide.co.kr` · `glucoseview.co.kr`. 혼선을 막기 위해서다. 옛 주소 지원(CORS · 쿠키 · 세션 판정 · 분회 옛 경로 이동)도 남기지 않는다. 외부 DNS 는 사용자가 정리 완료(2026-10-20). | 사용자 2026-10-20 |
 
 D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공통 계정 축(`neture`)이다. 사업 독립은 사업 가입 원장 · 사업 범위 데이터 · 사업별 약관으로 구현한다. 이 해석이 사용자 의도와 다르면 단계 1 시작 전에 정정한다.
@@ -83,6 +85,28 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 - `services/web-kpa-society`: `'kpa-society'` 하드코딩을 `BUSINESS_SITE` 기반 사업 범위 키로 교체. megapharm 도메인에서 pharmacy 데이터가 보이지 않음을 실브라우저로 확인.
 - `services/web-neture`(carepharm) · `services/web-pharmacy-coop`(pharmcoop): 사업별 약관 · 가입 흐름을 같은 수준으로 맞춘다.
 
+### 단계 4-a — 프런트 1차: 옛 KPA 화면 삭제 (D7 · D8) · 완료(이 branch)
+- `services/web-kpa-society/src` 파일 329개 삭제 — 옛 운영 · 관리 콘솔(`/operator/*` · `/admin/*` · `routes/OperatorRoutes`), 로컬 매장 화면(`pages/pharmacy` 64개 — 같은 화면의 정본은 `services/web-store/src/pages/pharmacy`), 가이드 · 서비스 소개, KPA 커뮤니티 홈 · 콘텐츠 · 자료실 · 설문 · 참여 · 마이페이지 KPA 화면, 그 화면만 쓰던 `api/*` · 컴포넌트.
+- 매장 진입: `/store/*` · `/hub/*` · `/store-hub/*` 는 조건 없이 `KpaUnifiedStoreHandoff` 로 store.neture.co.kr 에 넘긴다(`PharmacyGuard` · 로컬 layout · `isUnifiedStoreHandoffEnabled` 제거). 공개 · 기기 경로(`/tablet/*` · `/store/:slug/products/:id` · `/store/:slug/blog*` · `/qr/:slug` · 다국어 · 외국인 제휴 · `/public/signage`)는 handoff 밖에 그대로 둔다.
+- 송출(TV) `/store/marketing/signage/play/:playlistId` 는 로컬 재생 화면이 없어졌으므로 `toKpaScopedStorePath` 가 서비스 지정 트리로 바꾸지 않고 web-store 최상위 chrome-free route 로 보낸다(그대로 두면 `/work/kpa-society/store/...` 에 route 가 없어 404).
+- D8: `AuthContext` 의 `/kpa/me-context` 보강(`activityType` · `isStoreOwner` · `kpaMembership`) 제거. 매장 접근 판정은 handoff 목적지가 한다.
+- 계약 테스트 정렬: 삭제 파일을 읽던 api-server spec 18개 · operator-core-ui 2개 · shared-space-ui 4개를 "파일 없음 · route 없음" 단언 또는 web-store 정본 단언으로 바꿨다.
+- 검증: web-kpa-society vitest 16 files / 121 tests PASS · `tsc --noEmit` PASS · `pnpm run build` PASS · KPA 참조 api-server spec 26 suites / 682 tests PASS · operator-core-ui 20 · shared-space-ui 136 PASS. 실브라우저 smoke 미실행(배포 전).
+
+- PR #760 리뷰 대응: 삭제된 화면을 가리키는 외부 진입이 404 가 되지 않게 호환 이동을 두었다. `/operator/*` · `/admin/*` → `/operator/semi-franchises`(Neture My Home 운영 카드), `/operator/collaboration-requests` → `/operator/inbox/business/{key}`(문의 알림 · Neture 문의 화면), `/mypage/*` → `/`(회원 알림), `/guide/*` → `/`(web-store `GuideBackLink`). 원본 링크(`web-neture/lib/home-entry.ts` · `contact-request.controller.ts` · `member.controller.ts` · web-store `GuideBackLink`)의 정리는 단계 3 에서 한다.
+
+#### 이번 단계에서 발견 · 미해결 — 처리 결과 (2026-10-22, branch `wo/pharmacy-stage4a-residuals`)
+1. **공급자 콘텐츠 handoff 대상 막다른 길 — 처리.** `supplier-content-handoff-targets.ts` 에 규칙 4(수신 · 승인 화면이 있어야 한다)와 `RECEIVER_UNAVAILABLE = {'kpa-society'}` 를 두어 대상에서 뺐다. 현재 제공 대상은 0 이며 Neture 공급자 자료함은 대상이 없으면 제공 영역을 숨긴다(`SupplierLibraryPage` `handoffTargets.length > 0`). 수신 화면을 pharmacy.neture.co.kr 에 새로 만들 때 이 집합에서 뺀다. 이미 제공돼 pending 인 행(`cms_contents` serviceKey `kpa` · `kpa_approval_requests`)은 운영 DB 를 조회하지 않았다 — 단계 5 집계 때 함께 본다.
+2. ~~**QR 랜딩 fallback**~~ — PR #760 리뷰에서 처리: 인라인 본문이 없는 page QR 은 삭제된 `/content/:id` 로 보내지 않고 미공개 안내를 표시한다.
+3. **`VITE_UNIFIED_STORE_HANDOFF` 미사용 — 처리.** 배포 workflow 의 env · `--build-arg`, `services/web-kpa-society/Dockerfile` 의 ARG/ENV, `vite-env.d.ts` 선언을 제거했다. 해석 함수 `isUnifiedStoreHandoffEnabled`(`packages/store-ui-core`)는 소비 앱이 없지만 공용 패키지 export 라 남겼다(별도 정리 대상).
+4. **web-store 잘못된 origin 버그 — 처리.** `StoreQrAiDescriptionPage`(QR 공개 주소) · `StoreContentEditPage`(공개 보기 주소 · 링크) · `StoreAssetSelectorModal`(블로그 주소)이 `window.location.origin`(store.neture.co.kr — 공개 route 없음) 대신 `getActiveServicePublicOrigin()` 을 쓴다. "공개 보기" 는 앱 내부 `<Link>` 가 아니라 서비스 공개 주소를 새 탭으로 연다. 결제 복귀(`ForeignVisitorSalesSupportPage`)와 URL 파싱 base(`MultilingualPublicActions`)는 store 호스트가 맞아 그대로 두었다.
+5. **공유 guide copy 잔재 — 처리.** `packages/shared-space-ui/src/guide/copy/kpa.ts` 와 index export 를 삭제했다(`check-literal-consumers` 소비처 0). 공용 guide 컴포넌트 테스트는 로컬 fixture 로 바꿨다.
+6. **`/api/v1/kpa/*` backend — 조사만, 별도 WO.** route 별 프런트 소비처 census 결과 아직 쓰는 것: organizations 목록 · force-assets · 공급자 my-offers/event-offers/signage media · seller-recruitments · `POST /contact-requests` · legal published · news 운영 · notices · contents 조회 · groupbuy enriched/stats · checkout/orders · store-hub · pharmacy · store · assets · qr · playlists · multilingual · stores/:slug(blog/pop/video/qr) · supplier screen-sets. 프런트 소비처 0: members/* · qualifications · instructor* · forum-requests · community-hub · operator(summary/actions/approvals/product-applications/recruitment-exposure/contact-requests/ai/legal/audit-logs/resources/blog·pop·video) · groupbuy-admin · supplier content-submissions · signage campaign-requests/reports · join-inquiries · me-context · me/membership · forum/* · credits · home/* · news public/delete/batch · contents 쓰기 · signage media/playlists · groupbuy participation · mypage/* · payments · b2b/payments · health · pharmacy/store/config · stores template/layout/settings/channels. 삭제는 API contract 변경이고 이 route 를 읽는 api-server spec 이 많아(terms-acceptance-gate · me-context contract · member.controller 등) 이번에 하지 않았다. 남은 프런트 고아 파일(web-store `api/resources.ts` · `api/news.ts`, web-kpa-society `api/contactRequest.ts` 운영 함수, operator-core-ui `CmsContentManager` · `KpaEditUserModal` · `SupplierContentInbox` · `ProductApplicationManagementConsole`, operator-ux-core `RecruitmentExposureConsole`)도 그 WO 에서 함께 본다.
+7. **web-store 이벤트 오퍼 상품 링크 — 처리.** `EventOfferContentPanel` 의 막다른 `/event-offers/:id` 링크를 상품명 표시로 바꿨다. 상세 화면이 생기면 다시 연결한다.
+8. sitemap 은 남은 공개 주소(`/` · `/contact`)만 두도록 이번에 정리했다.
+9. **호환 이동의 원본 링크 — 처리.** `web-neture/lib/home-entry.ts` 의 pharmacy 운영 · 관리 진입 → `/operator/semi-franchises`, 문의 알림 `targetUrl` · 메일 `adminManageUrl` → `/operator/inbox/business/pharmacy`, 회원 승인 알림 `targetUrl` → `/`, web-store `GuideBackLink` 3곳과 `/guide/*` 이동(`ServiceGuideRedirect`) 제거. pharmacy 앱의 호환 redirect 는 이미 저장된 알림 때문에 남긴다.
+- 검증: shared-space-ui 17 files / 162 · web-neture 142 / 1251 · web-store 62 / 761 vitest PASS, api-server 관련 jest 17 suites / 412 PASS, `tsc --noEmit`(api-server · web-store · web-kpa-society · web-neture) PASS, `scripts/ci` deploy-workflow-diff 21 PASS. 실브라우저 smoke 미실행(배포 전).
+
 ### 단계 5 — 테스트 데이터 정리
 - 운영 DB read-only 로 `kpa-society` 범위 테스트 데이터 건수를 집계한다. 삭제는 운영 write 라 건별 사용자 승인 후 실행한다.
 
@@ -131,3 +155,9 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 3. 각 사업이 자기 약관 · 정책 문서를 갖고, 가입 · 동의 기록이 사업 단위로 남는다.
 4. megapharm · pharmacy 도메인에서 각자 쓴 포럼 · 콘텐츠 · 미디어 · 사이니지 데이터가 서로 보이지 않음을 실브라우저와 API 응답으로 확인한다.
 5. 남은 명칭 잔재(단계 6)는 목록과 처리 여부를 CHECK 에 기록한다.
+
+## 2026-10-22 연결 작업 — 메가팜 운영 완성 WO
+
+[메가팜 운영 완성 WO](WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)에서 D1/D3 일부와 D8의 상담 판정을 연결한다. 네 사업 호스트의 세션은 neture로 정렬하고, 사업별 법정정보·약관은 기존 테이블의 business:<사업 UUID> 범위로 관리·공개·동의한다. 매장 약사 사용 확인에서 kpa_pharmacist_profiles 읽기를 제거한다. PR #760의 옛 운영·설문·로컬 매장 사본 제거는 보존한다.
+
+이 연결로 본 WO 전체가 완료되는 것은 아니다. 기존 kpa-society catalog/공통 Store 및 내 매장 신청의 legacy 정책 키, 남은 backend 소비처 정리·운영 데이터 삭제·인프라 이름 변경은 이 WO의 후속 범위로 남는다. 실제 사업 약관 게시·경영자의 사용 확인·현장 음성 품질은 자동 설정하지 않는다. 이번 검증과 Delivery 결과는 연결 WO/CHECK와 해당 PR에서 추적한다.

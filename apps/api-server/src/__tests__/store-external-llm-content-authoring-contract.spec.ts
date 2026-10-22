@@ -29,13 +29,13 @@ const TABLET_EDITOR = 'packages/tablet-screen-set-editor/src/index.tsx';
 
 /** 일반 콘텐츠 제작(GENERAL_AUTHORING) — 직접 LlmAssistPanel 소비 */
 const GENERAL_AUTHORING = [
-  'services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
+  'services/web-store/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
+  'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
 ];
 /** 제작 자료(PRODUCTION_MATERIAL) — 직접 소비 */
 const PRODUCTION_MATERIAL_DIRECT = [
-  'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
+  'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
 ];
 // 셸 소비처(KCos ProductionMaterialEditorPage)는 앱 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
@@ -136,13 +136,16 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (C) Store 소비처
     });
   }
 
-  it('StoreDirectContentPage · StoreContentEditPage · KPA ProductionMaterialEditorPage — 적용 시 initialHtml 과 editorContent 동시 갱신', () => {
+  // web-store 정본은 draft session 으로 두 값을 묶는다 — changeDraft(..., true) 가 편집기 초기값과 내용을 함께 바꾼다.
+  it('StoreDirectContentPage · StoreContentEditPage · ProductionMaterialEditorPage — 적용 시 initialHtml 과 editorContent 동시 갱신', () => {
     for (const rel of [
-      'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
-      'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
-      'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
+      'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
+      'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
+      'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
     ]) {
-      expect(read(rel)).toContain('onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}');
+      const src = read(rel);
+      expect(src).toContain('onApplyHtml={setEditorInitialHtml}');
+      expect(src).toContain('const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);');
     }
   });
 
@@ -158,7 +161,7 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (C) Store 소비처
   });
 
   it('KPA ProductionMaterialEditorPage — 낡은 AI 초안 문구 제거', () => {
-    const src = read('services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx');
+    const src = read('services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx');
     expect(src).not.toContain('AI 제작 자료 초안 편집');
     expect(src).not.toContain('AI가 정리한 내용을 편집하거나');
   });
@@ -169,7 +172,7 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (D) 비범위 보�
     expect(read('packages/content-editor/src/components/RichTextEditor.tsx')).toMatch(/showInternalAi\s*=\s*true/);
   });
   it('Store 목록 가이드 ContentCreationGuideModal 은 삭제·변경하지 않는다', () => {
-    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/pages/pharmacy/ContentCreationGuideModal.tsx'))).toBe(true);
-    expect(read('services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx')).toContain('<ContentCreationGuideModal');
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-store/src/pages/pharmacy/ContentCreationGuideModal.tsx'))).toBe(true);
+    expect(read('services/web-store/src/pages/pharmacy/StoreLibraryContentsPage.tsx')).toContain('<ContentCreationGuideModal');
   });
 });
