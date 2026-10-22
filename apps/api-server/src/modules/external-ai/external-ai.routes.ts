@@ -34,6 +34,7 @@ import { AdapterRegistry } from "./adapters/registry.js";
 import { createMcpRouter } from "./mcp/mcp.routes.js";
 import {
   createBrowserWriteGuard,
+  createAdminBrowserWriteGuard,
   externalAiAccountOrigins,
 } from "./auth/browser-write.middleware.js";
 import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
@@ -92,7 +93,11 @@ export function createExternalAiRoutes(
     config?.adminOrigin?.origin ?? "https://admin.neture.co.kr",
     ...externalAiAccountOrigins,
   ]);
-  management.use(authenticate, requireAdmin, browserWrite);
+  management.use(
+    authenticate,
+    requireAdmin,
+    createAdminBrowserWriteGuard(config?.adminOrigin?.origin),
+  );
   management.get(
     "/",
     wrap(async (_req, res) => {

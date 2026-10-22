@@ -10,6 +10,13 @@ export const externalAiAccountOrigins = [
   "https://carepharm.neture.co.kr",
 ] as const;
 
+/** User account origins must never authorize global management writes. */
+export function createAdminBrowserWriteGuard(
+  origin = "https://admin.neture.co.kr",
+) {
+  return createBrowserWriteGuard([origin]);
+}
+
 /** Existing browser-session authentication runs first. Bodyless DELETE still requires a trusted Origin. */
 export function createBrowserWriteGuard(origins: readonly string[]) {
   return (req: Request, res: Response, next: NextFunction) => {

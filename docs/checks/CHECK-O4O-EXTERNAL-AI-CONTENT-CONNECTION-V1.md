@@ -204,3 +204,12 @@ PR의 Codex 지적 2건을 보완했다.
 DB 전역 pending 1,000개/client별 100개의 상한과 만료 pending 회수를 같은 lock/transaction에 적용했다.
 compile·변경 lint 및 공식 HTTP 429/추가 저장 없음·client별 상한/만료 회수·두 provider의 마지막 슬롯
 동시 요청을 검증했다. 기존 사례를 포함한 격리 DB/SDK **46건 PASS**, fixture DB 0개를 확인했다.
+
+후속 재리뷰 2건도 반영했다. 사용자 연결 해제와 전역 설정 변경의 Origin guard를 분리해 관리자 PUT은
+admin Origin에서만 허용한다. MegaPharm의 사업 콘텐츠 편집 링크도 해당 사업 호스트로 반환한다.
+관련 Jest는 관리자/계정 Origin 분리를 포함하여 **25건 PASS**, compile·변경 lint PASS다. DB 통합 46건에서
+사업 콘텐츠와 게시판 양쪽의 약국/MegaPharm 결과 URL을 확인했다.
+
+CI `39751638821`의 웹 job에서 기존 `consultation-speech.test.tsx` 47행의 음성 텍스트 단언 실패를 확인했다.
+이번 변경에 포함하지 않은 파일이다. 로컬에서 동일 Store 전체 테스트 **63파일/765건 PASS**를 확인했으며
+이 파일을 임의 수정하거나 검증 gate를 완화하지 않았다. 후속 최종 커밋의 CI에서 전체를 다시 확인한다.

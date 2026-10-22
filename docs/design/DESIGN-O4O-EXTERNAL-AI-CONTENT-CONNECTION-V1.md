@@ -113,3 +113,5 @@ access/refresh는 이 회수 대상이 아니다. 여러 서버에서 마지막 
 공통 계정 설정이 있는 main·www·supplier·funding·community·CarePharm의 정확한 Origin에서 연결 해제를
 허용한다. 임의 하위 도메인이나 Origin 반사는 허용하지 않는다. 약국·MegaPharm의 커뮤니티 초안 검토 URL은
 각 사업의 현재 서브도메인 `/community/write`로 반환한다.
+관리자 전역 설정 변경은 별도 guard로 admin Origin 하나만 허용한다. 공통 계정 Origin 목록을 관리자 쓰기에
+재사용하지 않는다. MegaPharm 사업 콘텐츠 초안도 MegaPharm 운영 화면으로 반환한다.

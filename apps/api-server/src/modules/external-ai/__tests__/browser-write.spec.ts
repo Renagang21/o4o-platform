@@ -1,5 +1,6 @@
 import {
   createBrowserWriteGuard,
+  createAdminBrowserWriteGuard,
   externalAiAccountOrigins,
 } from "../auth/browser-write.middleware.js";
 import type { Request, Response } from "express";
@@ -10,6 +11,7 @@ function request(
   providedOrigin?: string,
   json = false,
   origins: readonly string[] = [origin],
+  guard = createBrowserWriteGuard(origins),
 ) {
   const req = {
     method,
@@ -18,14 +20,43 @@ function request(
   };
   const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
   const next = jest.fn();
-  createBrowserWriteGuard(origins)(
-    req as unknown as Request,
-    res as unknown as Response,
-    next,
-  );
+  guard(req as unknown as Request, res as unknown as Response, next);
   return { res, next };
 }
 describe("delegation browser write boundary", () => {
+  it.each(externalAiAccountOrigins)(
+    "rejects admin configuration writes from account host %s",
+    (host) => {
+      const result = request(
+        "PUT",
+        host,
+        true,
+        [],
+        createAdminBrowserWriteGuard(),
+      );
+      expect(result.res.status).toHaveBeenCalledWith(403);
+      expect(result.next).not.toHaveBeenCalled();
+    },
+  );
+  it("allows configuration writes only from the exact configured admin origin", () => {
+    for (const host of [
+      "https://admin.neture.co.kr",
+      "http://localhost:4173",
+    ]) {
+      expect(
+        request("PUT", host, true, [], createAdminBrowserWriteGuard(host)).next,
+      ).toHaveBeenCalled();
+      expect(
+        request(
+          "PUT",
+          `${host}.attacker.invalid`,
+          true,
+          [],
+          createAdminBrowserWriteGuard(host),
+        ).res.status,
+      ).toHaveBeenCalledWith(403);
+    }
+  });
   it.each(externalAiAccountOrigins)(
     "allows account connection revocation from %s",
     (host) => {

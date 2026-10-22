@@ -1638,6 +1638,15 @@ async function expandedTests(db, tools, provider, register, base, post) {
             opened.openUrl,
             `https://${key}.neture.co.kr/community/write?edit=${row.id}`,
           );
+          const businessContent = await exec("get_content_draft", {
+            workspaceId: orgId,
+            destination: "business_content",
+            contentId: orgDraft.id,
+          });
+          assert.equal(
+            businessContent.openUrl,
+            `https://${key}.neture.co.kr/operator/semi-franchises/${key}/contents/${orgDraft.id}/edit`,
+          );
         } finally {
           await db.query("UPDATE semi_franchises SET key=$1 WHERE id=$2", [
             originalBusiness.key,
