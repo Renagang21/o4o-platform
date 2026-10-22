@@ -10,6 +10,9 @@ export const KPA_SCOPED_STORE_BASE = '/work/kpa-society/store';
 
 export function toKpaScopedStorePath(returnPath: string): string {
   // 제공 자료 화면은 공통 /store/library 트리에만 있다. 조직은 목적지 Store gate가 확인한다.
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 사이니지 재생(TV · chrome-free)은 store.neture.co.kr 의 공통
+  //   `/store/marketing/signage/play/:playlistId` 최상위 route 에만 있다 — 서비스 지정 트리로 보내면 404 다.
+  if (/^\/store\/marketing\/signage\/play\/[^/?#]+(?:[?#]|$)/.test(returnPath)) return returnPath;
   if (/^\/store\/library\/(?:content|supplier-library|multilingual-product-contents|blog|pop|qr|video|signage|screen-set)(?:[/?#]|$)/.test(returnPath)) return returnPath;
   if (returnPath === '/store' || returnPath.startsWith('/store/') || returnPath.startsWith('/store?')) {
     return `/work/kpa-society${returnPath}`;

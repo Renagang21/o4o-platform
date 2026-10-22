@@ -234,23 +234,13 @@ describe('공통 View 순수성', () => {
 
 // K-Cosmetics wrapper(services/web-k-cosmetics) 단언은 앱 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
-describe('KPA — 서비스 고유 View 유지 (공통 primitive 소비)', () => {
-  it('KPA 콘텐츠 목록은 canonical table 축을 유지하고 공통 검색 primitive 를 쓴다', () => {
-    const src = read('services/web-kpa-society/src/pages/contents/ContentListPage.tsx');
-    expect(src).toContain('CommunityContentSearchBar');
-    expect(src).toContain("from '../../api/content'");
-  });
-
-  it('KPA 콘텐츠 상세는 공통 표시 View + KPA 정책(추천/감사/가져가기)을 유지한다', () => {
-    const src = read('services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx');
-    expect(src).toContain('CommunityContentDetailView');
-    expect(src).toContain('AppreciationPanel');
-    expect(src).toContain('importContentToStore');
-  });
-
-  it('KPA 자료실은 공통 ResourcesHubTemplate 을 유지한다', () => {
-    const src = read('services/web-kpa-society/src/pages/resources/ResourcesHubPage.tsx');
-    expect(src).toContain('ResourcesHubTemplate');
+describe('KPA — 옛 콘텐츠/자료실 화면 제거 (WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)', () => {
+  it.each([
+    'services/web-kpa-society/src/pages/contents/ContentListPage.tsx',
+    'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',
+    'services/web-kpa-society/src/pages/resources/ResourcesHubPage.tsx',
+  ])('%s 는 존재하지 않는다 (필요 시 pharmacy.neture.co.kr 에서 새로 만든다)', (p) => {
+    expect(fs.existsSync(path.join(REPO_ROOT, p))).toBe(false);
   });
 });
 

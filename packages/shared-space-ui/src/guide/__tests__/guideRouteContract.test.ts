@@ -79,13 +79,7 @@ function collectRoutes(dir: string): Set<string> {
 
 type Svc = { key: string; dir: string; copy: string; extra?: Array<[string, string]> };
 const SERVICES: Svc[] = [
-  {
-    key: 'kpa',
-    dir: 'services/web-kpa-society',
-    copy: 'kpa.ts',
-    // /operator/* 는 별도 sub-router 로 위임된다.
-    extra: [['services/web-kpa-society/src/routes/OperatorRoutes.tsx', '/operator']],
-  },
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy(web-kpa-society) 의 /guide · /service-guide 화면은 제거됐다 — 대조할 route 표가 없다.
   // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. copy 파일(copy/k-cosmetics.ts)도 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
 ];

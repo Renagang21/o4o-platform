@@ -6,36 +6,6 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://pharmacy.neture.co.kr/forum</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://pharmacy.neture.co.kr/lms</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://pharmacy.neture.co.kr/resources</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://pharmacy.neture.co.kr/content</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://pharmacy.neture.co.kr/guide/intro</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://pharmacy.neture.co.kr/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://pharmacy.neture.co.kr/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
