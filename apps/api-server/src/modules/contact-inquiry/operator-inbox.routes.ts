@@ -1,4 +1,7 @@
-import { recordOperation } from "../../services/operations/operation-audit.js";
+import {
+  OperationError,
+  recordOperation,
+} from "../../services/operations/operation-audit.js";
 import {
   Router,
   type Request,
@@ -23,6 +26,8 @@ import {
 } from "./inbox-scope.js";
 import { serviceContactRecipients } from "./contact-recipients.js";
 import { deliverOperatorNotifications } from "./operator-delivery.js";
+import { ContactReplyService } from "./contact-reply.service.js";
+import { retryInboxNotification } from "./operator-retry.js";
 import { readInboxTasks } from "./inbox-tasks.js";
 
 type ScopedRequest = Request & { inboxScope: InboxScope };
@@ -55,7 +60,11 @@ export function createOperatorInboxRoutes(ds: DataSource) {
       try {
         await fn(req as ScopedRequest, res);
       } catch (e) {
-        if (e instanceof NeturePharmacyError)
+        if (e instanceof OperationError) {
+          res
+            .status(e.status)
+            .json({ success: false, error: e.message, code: e.code });
+        } else if (e instanceof NeturePharmacyError)
           res
             .status(e.httpStatus)
             .json({ success: false, error: e.message, code: e.code });
@@ -83,7 +92,10 @@ export function createOperatorInboxRoutes(ds: DataSource) {
       // Service receipt/settings/delivery stay on the already-deployed canonical controller.
       // 308 preserves POST + body; organization-owned spaces retain their separate scope below.
       if (req.inboxScope.kind === "service") {
-        res.redirect(308, `/api/v1/public/services/${req.inboxScope.serviceKey}/contact-inquiries`);
+        res.redirect(
+          308,
+          `/api/v1/public/services/${req.inboxScope.serviceKey}/contact-inquiries`,
+        );
         return;
       }
       const body = req.body ?? {};
@@ -127,58 +139,73 @@ export function createOperatorInboxRoutes(ds: DataSource) {
             .digest("hex"),
         ],
       );
-      let delivery = "fail";
-      let assignmentDelivery: string | undefined;
       try {
-        const recipients = await inboxRecipients(ds, scope);
-        if (!recipients.length) {
-          // Assignment alerts disclose only the public space, never an inquiry reference or content.
-          delivery = "none";
-          assignmentDelivery = "fail";
-          assignmentDelivery = await deliverOperatorNotifications(
-            await serviceContactRecipients(ds, "neture", "neture"),
-            (op) => notificationService.createNotification({
-              userId: op.userId,
-              type: "contact.new",
-              title: "문의 담당자 지정이 필요합니다",
-              message: `${scope.name} 문의 담당자를 확인해 주세요.`,
-              serviceKey: "neture",
-              metadata: {
-                assignmentRequired: true,
-                assignmentReceipt: createHash("sha256").update(saved.id).digest("hex"),
-                sourceServiceKey: scope.serviceKey,
-                scopeKind: scope.kind,
-                scopeKey: scope.key,
-                targetUrl: "/operator",
-              },
-            }),
+        await ds.transaction(async (manager) => {
+          await manager.query(
+            "SELECT id FROM contact_inquiries WHERE id=$1 FOR UPDATE",
+            [saved.id],
           );
-        } else delivery = await deliverOperatorNotifications(
-          recipients,
-          (op) =>
-            notificationService.createNotification({
-              userId: op.userId,
-              type: "contact.new",
-              title: `${scope.name} 새 문의`,
-              message: subject,
-              serviceKey: inboxNotificationServiceKey(scope),
-              organizationId: scope.organizationId ?? undefined,
-              metadata: {
-                contactInquiryId: saved.id,
-                targetUrl: inboxNotificationTarget(scope),
-              },
-            }),
-        );
+          let delivery = "fail";
+          let assignmentDelivery: string | undefined;
+          try {
+            const recipients = await inboxRecipients(manager, scope);
+            if (!recipients.length) {
+              // Assignment alerts disclose only the public space, never an inquiry reference or content.
+              delivery = "none";
+              assignmentDelivery = "fail";
+              assignmentDelivery = await deliverOperatorNotifications(
+                await serviceContactRecipients(manager, "neture", "neture"),
+                (op) =>
+                  notificationService.createNotification({
+                    userId: op.userId,
+                    type: "contact.new",
+                    title: "문의 담당자 지정이 필요합니다",
+                    message: `${scope.name} 문의 담당자를 확인해 주세요.`,
+                    serviceKey: "neture",
+                    metadata: {
+                      assignmentRequired: true,
+                      assignmentReceipt: createHash("sha256")
+                        .update(saved.id)
+                        .digest("hex"),
+                      sourceServiceKey: scope.serviceKey,
+                      scopeKind: scope.kind,
+                      scopeKey: scope.key,
+                      targetUrl: "/operator",
+                    },
+                  }),
+              );
+            } else
+              delivery = await deliverOperatorNotifications(recipients, (op) =>
+                notificationService.createNotification({
+                  userId: op.userId,
+                  type: "contact.new",
+                  title: `${scope.name} 새 문의`,
+                  message: subject,
+                  serviceKey: inboxNotificationServiceKey(scope),
+                  organizationId: scope.organizationId ?? undefined,
+                  metadata: {
+                    contactInquiryId: saved.id,
+                    targetUrl: inboxNotificationTarget(scope),
+                  },
+                }),
+              );
+          } catch {
+            /* Persisted contact remains available even if recipient lookup or transport fails. */
+          }
+          try {
+            await manager.query(
+              "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
+              [
+                saved.id,
+                `inapp:${delivery}${assignmentDelivery === undefined ? "" : `;assignment:${assignmentDelivery}`}`,
+              ],
+            );
+          } catch {
+            /* pending remains visible as incomplete delivery */
+          }
+        });
       } catch {
-        /* Persisted contact remains available even if recipient lookup or transport fails. */
-      }
-      try {
-        await ds.query(
-          "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
-          [saved.id, `inapp:${delivery}${assignmentDelivery === undefined ? "" : `;assignment:${assignmentDelivery}`}`],
-        );
-      } catch {
-        /* pending remains visible as incomplete delivery */
+        // Receipt succeeds independently of delivery; pending remains visible for manual recovery.
       }
       res
         .status(201)
@@ -193,7 +220,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
     "/:kind/:key/manage",
     run(async (req, res) => {
       const [contact] = await ds.query(
-        `SELECT COUNT(*) FILTER(WHERE status IN ('received','in_review'))::int AS pending,MIN(created_at) FILTER(WHERE status IN ('received','in_review')) AS oldest,COUNT(*) FILTER(WHERE status IN ('received','in_review') AND (notification_status IS NULL OR notification_status !~ '^inapp:sent(;|$)'))::int AS "deliveryAttention" FROM contact_inquiries WHERE ${scopeWhere}`,
+        `SELECT COUNT(*) FILTER(WHERE status IN ('received','in_review'))::int AS pending,MIN(created_at) FILTER(WHERE status IN ('received','in_review')) AS oldest,COUNT(*) FILTER(WHERE status IN ('received','in_review') AND (notification_status IS NULL OR notification_status !~ '^inapp:(sent|off)(;|$)'))::int AS "deliveryAttention" FROM contact_inquiries WHERE ${scopeWhere}`,
         fields(req.inboxScope),
       );
       res.json({
@@ -216,11 +243,13 @@ export function createOperatorInboxRoutes(ds: DataSource) {
       const status = req.query.status ?? "";
       if (
         typeof status !== "string" ||
-        (status && status !== "open" && !statuses.includes(status))
+        (status &&
+          !["open", "delivery"].includes(status) &&
+          !statuses.includes(status))
       )
         throw bad("문의 상태를 확인해 주세요.");
       const params = [...fields(req.inboxScope), status];
-      const where = `${scopeWhere} AND ($3::text='' OR ($3='open' AND status IN ('received','in_review')) OR status=$3)`;
+      const where = `${scopeWhere} AND ($3::text='' OR ($3='open' AND status IN ('received','in_review')) OR ($3='delivery' AND status IN ('received','in_review') AND (notification_status IS NULL OR notification_status !~ '^inapp:(sent|off)(;|$)')) OR status=$3)`;
       const [total] = await ds.query(
         `SELECT COUNT(*)::int AS total FROM contact_inquiries WHERE ${where}`,
         params,
@@ -260,10 +289,15 @@ export function createOperatorInboxRoutes(ds: DataSource) {
           "문의를 찾을 수 없습니다.",
         );
       const history = await ds.query(
-        `SELECT action_key AS action,created_at AS at,meta->>'beforeStatus' AS "beforeStatus",meta->>'afterStatus' AS "afterStatus" FROM action_logs WHERE service_key=$1 AND action_key='operator.contact_update' AND status='success' AND meta->>'contactId'=$2 AND (meta->>'organizationId') IS NOT DISTINCT FROM $3::text ORDER BY created_at DESC,id DESC LIMIT 30`,
+        `SELECT action_key AS action,user_id AS "actorId",created_at AS at,meta->>'beforeStatus' AS "beforeStatus",meta->>'afterStatus' AS "afterStatus",meta->>'afterNote' AS "afterNote" FROM action_logs WHERE service_key=$1 AND action_key='operator.contact_update' AND status='success' AND meta->>'contactId'=$2 AND (meta->>'organizationId') IS NOT DISTINCT FROM $3::text ORDER BY created_at DESC,id DESC LIMIT 30`,
         [req.inboxScope.serviceKey, row.id, req.inboxScope.organizationId],
       );
-      res.json({ success: true, data: { ...row, history } });
+      const replies = await new ContactReplyService(ds).history(
+        req.inboxScope.serviceKey,
+        row.id,
+        req.inboxScope.organizationId,
+      );
+      res.json({ success: true, data: { ...row, history, replies } });
     }),
   );
   router.patch(
@@ -282,7 +316,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
       const row = await ds.transaction(async (manager) => {
         await assertInboxWriter(manager, req.inboxScope, req.user!.id);
         const [before] = await manager.query(
-          `SELECT status FROM contact_inquiries WHERE ${scopeWhere} AND id=$3 FOR UPDATE`,
+          `SELECT status,internal_note FROM contact_inquiries WHERE ${scopeWhere} AND id=$3 FOR UPDATE`,
           [...fields(req.inboxScope), req.params.id],
         );
         const [saved] = rowsOf(
@@ -313,12 +347,51 @@ export function createOperatorInboxRoutes(ds: DataSource) {
             contactId: saved.id,
             organizationId: req.inboxScope.organizationId,
             beforeStatus: before.status,
+            beforeNote: before.internal_note,
+            afterNote: internalNote,
             afterStatus: status,
           },
         );
         return saved;
       });
       res.json({ success: true, data: row });
+    }),
+  );
+  router.post(
+    "/:kind/:key/manage/contacts/:id/replies",
+    apiLimiter,
+    run(async (req, res) => {
+      if (!uuid.test(req.params.id)) throw bad("문의를 확인해 주세요.");
+      const scope = req.inboxScope;
+      const result = await new ContactReplyService(ds).reply(
+        scope.serviceKey,
+        req.params.id,
+        req.user!.id,
+        req.body ?? {},
+        {
+          organizationId: scope.organizationId,
+          name: scope.name,
+          authorize: (manager) =>
+            assertInboxWriter(manager, scope, req.user!.id),
+        },
+      );
+      res.json({ success: true, data: result });
+    }),
+  );
+  router.post(
+    "/:kind/:key/manage/contacts/:id/retry-notification",
+    apiLimiter,
+    run(async (req, res) => {
+      if (!uuid.test(req.params.id)) throw bad("문의를 확인해 주세요.");
+      res.json({
+        success: true,
+        data: await retryInboxNotification(
+          ds,
+          req.inboxScope,
+          req.params.id,
+          req.user!.id,
+        ),
+      });
     }),
   );
   return router;

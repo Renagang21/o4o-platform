@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Page from './OperatorCertificatesPage';
-const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn() }));
+const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn(), certificateOperations: vi.fn() }));
 vi.mock('../../api/lecture', () => ({ operatorApi: api, errorMessage: () => '처리 실패' }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: vi.fn(), error: vi.fn() }) }));
 beforeEach(() => vi.resetAllMocks());
@@ -61,4 +61,12 @@ it('blocks other certificate commands during issue and ignores a late unmounted 
   render(<MemoryRouter><Page /></MemoryRouter>);
   expect((screen.getByLabelText('수료증 id') as HTMLInputElement).value).toBe('');
   expect(screen.queryByText(/OLD/)).toBeNull();
+});
+
+it('loads private revocation history and clears it when the target changes', async () => {
+ api.certificateOperations.mockResolvedValue({data:{operations:[{actorId:'synthetic-operator',at:'2026-10-22',reason:'잘못된 발급'}]}});
+ render(<MemoryRouter><Page /></MemoryRouter>);
+ fireEvent.change(screen.getByLabelText('수료증 id'),{target:{value:'cert-a'}});
+ fireEvent.click(screen.getByRole('button',{name:'폐기 이력 조회'}));await screen.findByText(/잘못된 발급/);
+ fireEvent.change(screen.getByLabelText('수료증 id'),{target:{value:'cert-b'}});expect(screen.queryByText(/잘못된 발급/)).toBeNull();
 });

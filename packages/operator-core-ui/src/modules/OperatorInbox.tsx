@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface InboxClient {
   get(url: string): Promise<{ data: { data: any } }>;
+  post?(url: string, body: unknown): Promise<{ data: { data: any } }>;
   patch(url: string, body: unknown): Promise<{ data: { data: any } }>;
 }
 interface Task {
@@ -33,11 +34,20 @@ interface Contact {
   phone?: string;
   message?: string;
   internalNote?: string;
+  replies?: {
+    id: string;
+    message: string;
+    status: string;
+    createdAt: string;
+    actorId?: string;
+  }[];
   history?: {
     action: string;
     at: string;
     beforeStatus: string;
     afterStatus: string;
+    actorId?: string;
+    afterNote?: string | null;
   }[];
 }
 const labels: Record<string, string> = {
@@ -46,6 +56,23 @@ const labels: Record<string, string> = {
   answered: "답변 완료",
   closed: "종료",
   spam: "스팸",
+};
+const deliveryLabel = (value: string | null) => {
+  if (value?.startsWith("sending:")) return "접수 알림 결과 확인 중";
+  const state = value?.match(/(?:^|;)inapp:([^;]+)/)?.[1];
+  return (
+    (
+      {
+        sent: "담당자 알림 전달 완료",
+        partial: "담당자 알림 일부 미전달",
+        fail: "담당자 알림 전달 실패",
+        none: "담당자 지정·전달 확인 필요",
+        unassigned: "담당자 지정 필요",
+        off: "담당자 알림 비활성",
+        pending: "담당자 알림 확인 필요",
+      } as Record<string, string>
+    )[state ?? ""] ?? "알림 상태 확인 필요"
+  );
 };
 const panel = {
   border: "1px solid #cbd5e1",
@@ -90,6 +117,8 @@ export function OperatorInbox({
   const [loading, setLoading] = useState(false),
     [detailLoading, setDetailLoading] = useState(false),
     [busy, setBusy] = useState(false);
+  const [reply, setReply] = useState("");
+  const replyRequest = useRef<{ id: string; message: string } | null>(null);
   const lifecycle = useRef({ alive: true, list: 0, detail: 0, writing: false });
   useEffect(() => {
     const state = { alive: true, list: 0, detail: 0, writing: false };
@@ -135,6 +164,8 @@ export function OperatorInbox({
     if (state.writing) return;
     const seq = ++state.detail;
     setDetail(null);
+    setReply("");
+    replyRequest.current = null;
     setDetailError("");
     setNotice("");
     setDetailLoading(true);
@@ -175,6 +206,26 @@ export function OperatorInbox({
       );
       if (!state.alive) return;
       setDetail({ ...r.data.data, history: detail.history });
+      try {
+        const refreshed = await client.get(
+          `${endpoint}/manage/contacts/${encodeURIComponent(detail.id)}`,
+        );
+        if (!state.alive) return;
+        setDetail((current) =>
+          current
+            ? {
+                ...current,
+                history: refreshed.data.data.history,
+                replies: refreshed.data.data.replies,
+              }
+            : current,
+        );
+      } catch {
+        if (state.alive)
+          setDetailError(
+            "처리 이력을 조회하지 못했습니다. 저장된 내용은 유지됩니다. 문의를 다시 열어 주세요.",
+          );
+      }
       setNotice(
         (await load())
           ? "문의 처리 내용을 저장했습니다."
@@ -186,6 +237,71 @@ export function OperatorInbox({
           (e as { response?: { status?: number } })?.response?.status === 409
             ? "다른 운영자가 수정했거나 권한이 변경됐습니다. 입력은 유지됩니다. 현재 문의를 다시 열어 확인해 주세요."
             : "저장하지 못했습니다. 입력은 유지됩니다. 다시 시도해 주세요.",
+        );
+    } finally {
+      state.writing = false;
+      if (state.alive) setBusy(false);
+    }
+  }
+  async function command(kind: "reply" | "retry") {
+    const state = lifecycle.current;
+    if (state.writing || !detail || !client.post) return;
+    state.writing = true;
+    setBusy(true);
+    setDetailError("");
+    setNotice("");
+    const id = detail.id;
+    try {
+      let body: unknown = {};
+      if (kind === "reply") {
+        if (!replyRequest.current || replyRequest.current.message !== reply)
+          replyRequest.current = { id: crypto.randomUUID(), message: reply };
+        body = { requestId: replyRequest.current.id, message: reply };
+      }
+      const response = await client.post(
+        `${endpoint}/manage/contacts/${encodeURIComponent(id)}/${kind === "reply" ? "replies" : "retry-notification"}`,
+        body,
+      );
+      if (!state.alive) return;
+      const result = response.data.data;
+      setNotice(
+        kind === "reply"
+          ? result.status === "sent"
+            ? "답변 발송을 완료했습니다."
+            : result.status === "failed"
+              ? "답변 발송에 실패했습니다. 이력을 확인하고 새 답변으로 다시 작성해 주세요."
+              : "발송 결과를 확인 중입니다. 같은 답변을 다시 발송하지 않습니다."
+          : result.status === "sent"
+            ? `담당자 알림을 확인했습니다. 새 전달 ${result.created}건 (기존 전달 중복 없음).`
+            : result.status === "off"
+              ? "이 문의창구의 앱 알림은 설정에서 비활성화되어 있습니다."
+              : "현재 수신할 담당자가 없습니다. 담당자 지정 후 다시 확인해 주세요.",
+      );
+      if (kind === "reply" && result.status === "sent") {
+        setReply("");
+        replyRequest.current = null;
+      }
+      try {
+        const fresh = await client.get(
+          `${endpoint}/manage/contacts/${encodeURIComponent(id)}`,
+        );
+        if (!state.alive) return;
+        setDetail(fresh.data.data);
+        setStatus(fresh.data.data.status);
+        if (!(await load()))
+          setDetailError(
+            "처리는 완료됐지만 목록 조회에 실패했습니다. 다시 실행하지 말고 새로고침해 주세요.",
+          );
+      } catch {
+        if (state.alive)
+          setDetailError(
+            "처리는 접수됐지만 상세 조회에 실패했습니다. 다시 실행하지 말고 문의를 다시 열어 이력을 확인해 주세요.",
+          );
+      }
+    } catch {
+      if (state.alive)
+        setDetailError(
+          "처리 결과를 확인하지 못했습니다. 입력은 유지됩니다. 답변 재시도는 같은 요청 번호를 사용합니다. 권한과 이력을 확인해 주세요.",
         );
     } finally {
       state.writing = false;
@@ -231,7 +347,8 @@ export function OperatorInbox({
           </ul>
           <p>
             전달 확인 필요에는 수신자 없음·실패·일부 실패·전달 상태 미확인이
-            포함됩니다. 이메일 재발송은 실행하지 않습니다.
+            포함됩니다. 문의 상세에서 담당자 알림을 다시 확인할 수 있습니다.
+            답변 발송과 담당자 알림은 별개입니다.
           </p>
         </div>
       )}
@@ -250,6 +367,7 @@ export function OperatorInbox({
             }}
           >
             <option value="open">미처리</option>
+            <option value="delivery">알림 전달 확인 필요</option>
             <option value="">전체</option>
             {Object.entries(labels).map(([v, l]) => (
               <option key={v} value={v}>
@@ -274,7 +392,7 @@ export function OperatorInbox({
               </button>{" "}
               · {labels[c.status]} ·{" "}
               {new Date(c.createdAt).toLocaleDateString("ko-KR")} ·{" "}
-              {c.notificationStatus || "알림 상태 미확인"}
+              {deliveryLabel(c.notificationStatus)}
             </li>
           ))}
         </ul>
@@ -352,13 +470,79 @@ export function OperatorInbox({
                   {new Date(h.at).toLocaleString("ko-KR")} ·{" "}
                   {labels[h.beforeStatus] ?? h.beforeStatus} →{" "}
                   {labels[h.afterStatus] ?? h.afterStatus}
+                  {h.actorId && <> · 처리자 {h.actorId}</>}
+                  {h.afterNote && (
+                    <p style={{ whiteSpace: "pre-wrap" }}>
+                      처리 메모: {h.afterNote}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>
           )}
           <p>
-            내부 처리 기록입니다. 문의자에게 답변 이메일을 발송하지 않습니다.
+            아래 상태·메모 저장은 내부 처리입니다. 문의자에게 보낼 답변은 별도로
+            작성해 발송하세요.
           </p>
+          {client.post && (
+            <section aria-label="문의 답변과 알림 복구">
+              <h3>문의자에게 답변</h3>
+              <label>
+                답변 내용{" "}
+                <textarea
+                  aria-label="답변 내용"
+                  style={{ ...control, display: "block", width: "100%" }}
+                  rows={5}
+                  maxLength={5000}
+                  disabled={busy}
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                />
+              </label>
+              <button
+                type="button"
+                style={control}
+                disabled={
+                  busy ||
+                  !reply.trim() ||
+                  ["closed", "spam"].includes(detail.status)
+                }
+                onClick={() => void command("reply")}
+              >
+                답변 이메일 발송
+              </button>
+              <p>
+                발송 결과가 불명확하면 같은 요청을 재확인합니다. 이력에서 실패가
+                확인된 답변은 내용을 수정해 새 답변으로 발송할 수 있습니다.
+              </p>
+              <ul aria-label="답변 발송 이력">
+                {detail.replies?.map((r) => (
+                  <li key={r.id}>
+                    {new Date(r.createdAt).toLocaleString("ko-KR")} ·{" "}
+                    {(
+                      {
+                        sent: "발송 완료",
+                        failed: "발송 실패",
+                        sending: "결과 확인 중",
+                      } as Record<string, string>
+                    )[r.status] ?? "확인 필요"}
+                    {r.actorId && <> · 처리자 {r.actorId}</>}
+                    <p style={{ whiteSpace: "pre-wrap" }}>{r.message}</p>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                style={control}
+                disabled={
+                  busy || !["received", "in_review"].includes(detail.status)
+                }
+                onClick={() => void command("retry")}
+              >
+                담당자 알림 재확인·미전달 복구
+              </button>
+            </section>
+          )}
           <button
             style={control}
             disabled={
@@ -388,9 +572,9 @@ export function OperatorInboxLink({
   href: string;
   requireAccess?: boolean;
 }) {
-  const [state, setState] = useState<"loading" | "pending" | "clear" | "error" | "denied">(
-    "loading",
-  );
+  const [state, setState] = useState<
+    "loading" | "pending" | "clear" | "error" | "denied"
+  >("loading");
   useEffect(() => {
     let active = true;
     let running = false;
@@ -411,8 +595,14 @@ export function OperatorInboxLink({
           );
         }
       } catch (error) {
-        const status=(error as {response?:{status?:number}})?.response?.status;
-        if (active) setState(requireAccess && status && [401,403,404].includes(status) ? "denied" : "error");
+        const status = (error as { response?: { status?: number } })?.response
+          ?.status;
+        if (active)
+          setState(
+            requireAccess && status && [401, 403, 404].includes(status)
+              ? "denied"
+              : "error",
+          );
       } finally {
         running = false;
       }
