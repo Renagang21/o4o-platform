@@ -80,3 +80,7 @@
 사용자 `메인으로 병합 배포` 지시로 이 공간에서 PR·CI/리뷰·병합·배포를 이어간다. 최신 main `64f314d0ab`를 기존 개발 branch에 정상 merge하며 #767의 미발급 수료증 복구 목록·강의 개선을 보존하고 이번 operator 폐기 이력을 함께 연결했다. 충돌 3개는 controller import와 화면/테스트의 양쪽 기능을 유지해 해소했다. 기존 #766의 외부 AI 및 migration·package 변경은 선행 main 변경이며 이번 작업의 신규 migration은 없다. 통합 검증·배포 결과는 후속 기록한다.
 
 - PR #769 Codex P2: 앱 알림 비활성 상태의 복구 응답만 off이고 원장은 fail/pending을 유지하던 문제를 수정한다. 기존 email/autoreply 성공 증거를 보존해 off를 원장·감사에 저장하고 전달 확인 목록에서 제외하는 실제 DB 회귀를 추가했다. 현재 설정을 다시 켜면 해당 문의에서 현재 담당자 알림을 복구할 수 있다.
+
+- PR #769 추가 P2: 조직 문의 접수의 transaction 안에서 전역 NotificationService가 별도 pool 연결을 요구하던 경로를 제거한다. 같은 manager로 알림을 저장하고 commit 후에만 SSE를 전파한다. pool 최대1에서 동시6개 접수와 상태 저장 실패 rollback 시 알림/SSE 미노출을 실제 DB로 검증한다. 알림 재통지 뒤 조회는 저장 전 상태·메모 초안을 보존하며 성공 답변만 서버 answered 상태를 반영한다.
+
+- 추가 P2 보완 후 PostgreSQL fixture 24개(pool1 동시 접수·rollback/SSE 포함), 업무함 UI 9개, API 타입 검사·집중 ESLint PASS. 최초 전달은 commit 후 SSE를 유지하고 복구 알림의 기존 polling 소비도 보존한다.

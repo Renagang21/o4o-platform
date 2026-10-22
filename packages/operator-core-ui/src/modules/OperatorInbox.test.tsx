@@ -66,6 +66,10 @@ it('reply network retry keeps the request id and unsaved note; completed send do
 it('notification repair is explicit and does not send an email or change work status',async()=>{
  const api={...client(),post:vi.fn().mockResolvedValue(wrap({status:'sent',created:0}))};
  render(<OperatorInbox client={api} endpoint="/scope"/>);fireEvent.click(await screen.findByRole('button',{name:'합성 문의'}));await screen.findByText('합성 문의 본문');
+ fireEvent.change(screen.getByLabelText('문의 처리 상태'),{target:{value:'in_review'}});
+ fireEvent.change(screen.getByLabelText('내부 메모'),{target:{value:'보존할 메모'}});
  fireEvent.click(screen.getByRole('button',{name:'담당자 알림 재확인·미전달 복구'}));await screen.findByText(/새 전달 0건/);
+ expect((screen.getByLabelText('문의 처리 상태') as HTMLSelectElement).value).toBe('in_review');
+ expect((screen.getByLabelText('내부 메모') as HTMLTextAreaElement).value).toBe('보존할 메모');
  expect(api.post).toHaveBeenCalledExactlyOnceWith('/scope/manage/contacts/synthetic/retry-notification',{});expect(api.patch).not.toHaveBeenCalled();
 });

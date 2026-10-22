@@ -13,7 +13,10 @@ import { createHash } from "node:crypto";
 import { requireAuth } from "../../middleware/auth.middleware.js";
 import { apiLimiter } from "../../middleware/rateLimiter.js";
 import { NeturePharmacyError, rowsOf } from "../neture-pharmacy/constants.js";
-import { notificationService } from "../../services/NotificationService.js";
+import {
+  notificationEventHub,
+  type NotificationEmitPayload,
+} from "../../services/forum/NotificationEventHub.js";
 import {
   resolveInboxScope,
   inboxDestination,
@@ -25,7 +28,11 @@ import {
   type InboxScope,
 } from "./inbox-scope.js";
 import { serviceContactRecipients } from "./contact-recipients.js";
-import { deliverOperatorNotifications } from "./operator-delivery.js";
+import {
+  deliverOperatorNotifications,
+  persistOperatorNotification,
+  type OperatorNotificationInput,
+} from "./operator-delivery.js";
 import { ContactReplyService } from "./contact-reply.service.js";
 import { retryInboxNotification } from "./operator-retry.js";
 import { readInboxTasks } from "./inbox-tasks.js";
@@ -140,7 +147,16 @@ export function createOperatorInboxRoutes(ds: DataSource) {
         ],
       );
       try {
-        await ds.transaction(async (manager) => {
+        const notifications = await ds.transaction(async (manager) => {
+          const pending: NotificationEmitPayload[] = [];
+          const send = async (input: OperatorNotificationInput) => {
+            const notification = await persistOperatorNotification(
+              manager,
+              input,
+            );
+            pending.push(notification);
+            return notification;
+          };
           await manager.query(
             "SELECT id FROM contact_inquiries WHERE id=$1 FOR UPDATE",
             [saved.id],
@@ -156,7 +172,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
               assignmentDelivery = await deliverOperatorNotifications(
                 await serviceContactRecipients(manager, "neture", "neture"),
                 (op) =>
-                  notificationService.createNotification({
+                  send({
                     userId: op.userId,
                     type: "contact.new",
                     title: "문의 담당자 지정이 필요합니다",
@@ -176,7 +192,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
               );
             } else
               delivery = await deliverOperatorNotifications(recipients, (op) =>
-                notificationService.createNotification({
+                send({
                   userId: op.userId,
                   type: "contact.new",
                   title: `${scope.name} 새 문의`,
@@ -192,18 +208,22 @@ export function createOperatorInboxRoutes(ds: DataSource) {
           } catch {
             /* Persisted contact remains available even if recipient lookup or transport fails. */
           }
-          try {
-            await manager.query(
-              "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
-              [
-                saved.id,
-                `inapp:${delivery}${assignmentDelivery === undefined ? "" : `;assignment:${assignmentDelivery}`}`,
-              ],
-            );
-          } catch {
-            /* pending remains visible as incomplete delivery */
-          }
+          await manager.query(
+            "UPDATE contact_inquiries SET notification_status=$2 WHERE id=$1",
+            [
+              saved.id,
+              `inapp:${delivery}${assignmentDelivery === undefined ? "" : `;assignment:${assignmentDelivery}`}`,
+            ],
+          );
+          return pending;
         });
+        for (const notification of notifications) {
+          try {
+            notificationEventHub.emitNotification(notification);
+          } catch {
+            /* durable polling remains available */
+          }
+        }
       } catch {
         // Receipt succeeds independently of delivery; pending remains visible for manual recovery.
       }

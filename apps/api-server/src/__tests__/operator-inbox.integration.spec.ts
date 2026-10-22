@@ -6,6 +6,7 @@ import { ContactInquiry } from '../modules/contact-inquiry/entities/ContactInqui
 let db:DataSource;
 jest.mock('../database/connection.js',()=>({AppDataSource:{get isInitialized(){return !!db?.isInitialized;},query:(...args:any[])=>db.query(args[0],args[1]),getRepository:()=>({})}}));
 jest.mock('../services/email.service.js',()=>({emailService:{sendEmail:jest.fn().mockResolvedValue({success:true})}}));
+jest.mock('../services/forum/NotificationEventHub.js',()=>({notificationEventHub:{emitNotification:jest.fn()}}));
 jest.mock('../services/NotificationService.js',()=>({notificationService:{createNotification:jest.fn().mockResolvedValue({})}}));
 jest.mock('../middleware/auth.middleware.js',()=>({requireAuth:async(req:any,res:any,next:any)=>{
  const id=req.headers['x-test-user'];if(!id)return res.sendStatus(401);
@@ -24,7 +25,9 @@ import { createOperatorInboxRoutes } from '../modules/contact-inquiry/operator-i
 import { resolveInboxScope,inboxRecipients,assertInboxWriter } from '../modules/contact-inquiry/inbox-scope';
 import { readInboxTasks } from '../modules/contact-inquiry/inbox-tasks';
 import { deliverOperatorNotifications } from '../modules/contact-inquiry/operator-delivery';
-import { notificationService } from '../services/NotificationService';
+import * as operatorDelivery from '../modules/contact-inquiry/operator-delivery';
+import { notificationEventHub } from '../services/forum/NotificationEventHub';
+const notificationWriter=jest.spyOn(operatorDelivery,'persistOperatorNotification');
 import { AddContactInquiryOrganization1792540800000 } from '../database/migrations/1792540800000-AddContactInquiryOrganization';
 
 const integration=process.env.O4O_OPERATOR_INBOX_PG_TEST==='1'?describe:describe.skip;
@@ -63,10 +66,10 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   const [{count:after}]=await db.query('SELECT COUNT(*)::int AS count FROM contact_inquiries');expect(after).toBe(before);
  });
  it('derives organization on server; notifies only local operators',async()=>{
-  (notificationService.createNotification as jest.Mock).mockClear();
+  notificationWriter.mockClear();
   const r=await request(app).post(`${base}/cooperative/inbox-a/contact`).send({...payload,organizationId:otherOrg,serviceKey:'funding',sourcePath:'/forged'}).expect(201);contactId=r.body.data.id;
   const [row]=await db.query('SELECT * FROM contact_inquiries WHERE id=$1',[contactId]);expect(row.organization_id).toBe(org);expect(row.service_key).toBe('neture');expect(row.source_path).toBe('/inbox-a/contact');expect(row.notification_status).toBe('inapp:sent');
-  expect(notificationService.createNotification).toHaveBeenCalledTimes(1);expect(notificationService.createNotification).toHaveBeenCalledWith(expect.objectContaining({userId:local,serviceKey:'pharmcoop',organizationId:org,metadata:expect.objectContaining({targetUrl:'/inbox-a/operator/inbox'})}));
+  expect(notificationWriter).toHaveBeenCalledTimes(1);expect(notificationWriter).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({userId:local,serviceKey:'pharmcoop',organizationId:org,metadata:expect.objectContaining({targetUrl:'/inbox-a/operator/inbox'})}));
  });
  it('federation and another cooperative operator cannot see local contacts',async()=>{
   await request(app).get(`${base}/cooperative/inbox-a/manage/contacts`).set('x-test-user',fed).expect(403);
@@ -95,9 +98,9 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
     await db.query("INSERT INTO semi_franchises(id,key,name,organization_id) VALUES($1,$2,'Synthetic business',$3) ON CONFLICT(key) DO UPDATE SET organization_id=EXCLUDED.organization_id,status='active'",[businessId,key,organizationId]);
     await db.query('INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,$2,true)',[businessOp,`neture:${key}_operator`]);
    }
-   (notificationService.createNotification as jest.Mock).mockClear();
+   notificationWriter.mockClear();
    const response=await request(app).post(`${base}/business/${key}/contact`).send(payload).expect(201);
-   expect(notificationService.createNotification).toHaveBeenCalledWith(expect.objectContaining({userId:businessOp,serviceKey,metadata:expect.objectContaining({targetUrl:`/operator/inbox/business/${key}`})}));
+   expect(notificationWriter).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({userId:businessOp,serviceKey,metadata:expect.objectContaining({targetUrl:`/operator/inbox/business/${key}`})}));
    const [row]=await db.query('SELECT service_key,organization_id,notification_status FROM contact_inquiries WHERE id=$1',[response.body.data.id]);
    expect(row.service_key).toBe('neture');expect(row.organization_id).toBeTruthy();expect(row.notification_status).toBe('inapp:sent');
   }
@@ -112,7 +115,7 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   await db.query("UPDATE service_memberships SET status='active' WHERE user_id=$1 AND service_key='supplier'",[supplier]);
  });
  it('delivery failure preserves contact and exposes an attention count',async()=>{
-  (notificationService.createNotification as jest.Mock).mockRejectedValueOnce(new Error('synthetic transport failure'));
+  notificationWriter.mockRejectedValueOnce(new Error('synthetic transport failure'));
   const r=await request(app).post(`${base}/cooperative/inbox-a/contact`).send(payload).expect(201);
   const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:fail');
   const summary=await request(app).get(`${base}/cooperative/inbox-a/manage`).set('x-test-user',local).expect(200);expect(summary.body.data.contact.deliveryAttention).toBe(1);
@@ -139,20 +142,20 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   finally{await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[coop,local]);}
  });
  it('alerts central operations without exposing an unassigned inquiry',async()=>{
-  (notificationService.createNotification as jest.Mock).mockClear();
+  notificationWriter.mockClear();
   await request(app).post(`${base}/service/store/contact`).send(payload).expect(308).expect('Location','/api/v1/public/services/store/contact-inquiries');
   await db.query('UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
   const r=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
   await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
   const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none;assignment:sent');
-  const alerts=(notificationService.createNotification as jest.Mock).mock.calls.map(args=>args[0]);
+  const alerts=notificationWriter.mock.calls.map(args=>args[1]);
   expect(alerts).toHaveLength(1);expect(alerts[0]).toMatchObject({userId:central,serviceKey:'neture',metadata:{assignmentRequired:true,targetUrl:'/operator',scopeKind:'cooperative',scopeKey:'inbox-b'}});
   for(const privateValue of [r.body.data.id,payload.subject,payload.message,payload.email])expect(JSON.stringify(alerts[0])).not.toContain(privateValue);
   await request(app).get(`${base}/cooperative/inbox-b/manage/contacts/${r.body.data.id}`).set('x-test-user',central).expect(403);
  });
  it('preserves receipt and exposes central assignment notification failure',async()=>{
   await db.query('UPDATE cooperative_roles SET revoked_at=now() WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
-  (notificationService.createNotification as jest.Mock).mockRejectedValueOnce(Error('synthetic central delivery failure'));
+  notificationWriter.mockRejectedValueOnce(Error('synthetic central delivery failure'));
   const r=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
   const [row]=await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[r.body.data.id]);expect(row.notification_status).toBe('inapp:none;assignment:fail');
   await db.query('UPDATE cooperative_roles SET revoked_at=NULL WHERE cooperative_id=$1 AND user_id=$2',[otherCoop,other]);
@@ -187,6 +190,7 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   expect((await db.query('SELECT status FROM contact_inquiries WHERE id=$1',[failed.body.data.id]))[0].status).toBe('received');
  });
  it('concurrent repair deduplicates durable notifications and assigned recipients receive old undelivered receipts',async()=>{
+  notificationWriter.mockRejectedValueOnce(Error('Synthetic initial delivery failure'));
   const receipt=await request(app).post(`${base}/cooperative/inbox-b/contact`).send(payload).expect(201);
   const id=receipt.body.data.id,url=`${base}/cooperative/inbox-b/manage/contacts/${id}/retry-notification`;
   await request(app).post(url).set('x-test-user',local).expect(403);
@@ -248,6 +252,27 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   expect((await db.query('SELECT metadata FROM lms_certificates WHERE id=$1',[certificate]))[0].metadata).toBeNull();
   await db.query("UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='lecture:operator'",[actor]);
   await expect(revokeLectureCertificate(db,certificate,actor,'Other reason')).rejects.toMatchObject({httpStatus:403});
+ });
+ it('scoped submissions share one pool connection and emit only committed notifications',async()=>{
+  const narrow=new DataSource({...db.options,extra:{max:1,connectionTimeoutMillis:1000}} as any);await narrow.initialize();
+  try {
+   const isolated=express();isolated.use(express.json());isolated.use(base,createOperatorInboxRoutes(narrow));
+   const responses=await Promise.all(Array.from({length:6},()=>request(isolated).post(`${base}/cooperative/inbox-a/contact`).send(payload)));
+   expect(responses.map(r=>r.status)).toEqual(Array(6).fill(201));
+   for(const response of responses){
+    const id=response.body.data.id;
+    expect((await db.query("SELECT COUNT(*)::int AS n FROM notifications WHERE metadata->>'contactInquiryId'=$1",[id]))[0].n).toBe(1);
+   }
+  } finally {await narrow.destroy();}
+  await db.query(`CREATE FUNCTION reject_synthetic_delivery_state() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.subject='Synthetic rollback delivery' THEN RAISE EXCEPTION 'Synthetic delivery state failure'; END IF; RETURN NEW; END $$`);
+  await db.query('CREATE TRIGGER reject_synthetic_delivery_state BEFORE UPDATE ON contact_inquiries FOR EACH ROW EXECUTE FUNCTION reject_synthetic_delivery_state()');
+  try {
+   (notificationEventHub.emitNotification as jest.Mock).mockClear();
+   const response=await request(app).post(`${base}/cooperative/inbox-a/contact`).send({...payload,subject:'Synthetic rollback delivery'}).expect(201);
+   expect((await db.query("SELECT COUNT(*)::int AS n FROM notifications WHERE metadata->>'contactInquiryId'=$1",[response.body.data.id]))[0].n).toBe(0);
+   expect(notificationEventHub.emitNotification).not.toHaveBeenCalled();
+   expect((await db.query('SELECT notification_status FROM contact_inquiries WHERE id=$1',[response.body.data.id]))[0].notification_status).toBe('inapp:pending');
+  } finally {await db.query('DROP TRIGGER reject_synthetic_delivery_state ON contact_inquiries');await db.query('DROP FUNCTION reject_synthetic_delivery_state()');}
  });
  it('migration refuses a down that would expose scoped contacts',async()=>{
   const q=db.createQueryRunner();try{await expect(new AddContactInquiryOrganization1792540800000().down(q)).rejects.toThrow('SCOPED_CONTACT_INQUIRIES_EXIST');}finally{await q.release();}

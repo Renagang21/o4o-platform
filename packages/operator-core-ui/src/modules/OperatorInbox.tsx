@@ -287,7 +287,7 @@ export function OperatorInbox({
         );
         if (!state.alive) return;
         setDetail(fresh.data.data);
-        setStatus(fresh.data.data.status);
+        if (kind === "reply") setStatus(fresh.data.data.status);
         if (!(await load()))
           setDetailError(
             "처리는 완료됐지만 목록 조회에 실패했습니다. 다시 실행하지 말고 새로고침해 주세요.",
