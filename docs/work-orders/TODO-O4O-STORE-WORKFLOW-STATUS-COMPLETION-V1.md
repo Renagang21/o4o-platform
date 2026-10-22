@@ -1,6 +1,6 @@
 # 내 매장 일상 업무·대시보드 상태 보완 TODO
 
-> **상태**: COMPLETED
+> **상태**: ACTIVE
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (한국시간)
 > **근거**: 미흡점 조사 후 사용자 지시 — TODO 작성·문서/코드 대조·계획 보완·개발·검증·commit·push
 > **종료점**: 전용 branch push 후 인계. PR 생성·main 병합·배포 제외.
@@ -42,3 +42,15 @@
 ## 개발 종료
 
 개발 commit `709f10a03d`을 전용 branch에 push하고 원격 HEAD 일치를 확인했다. Store 전체 781/API 관련 35/합성 브라우저 40 PASS, Store/API build·타입·집중 lint 통과다. 결과 기록 보완도 같은 branch에 push하며 PR·main 병합·배포는 통합 담당 범위로 남긴다.
+
+## 동일 WO 후속 — 최신 main 결합 검증
+
+사용자가 기존 세 개선의 최신 main 결합·재검증까지 요청하여 같은 전용 branch에서 이어간다. 앞선 개발 종료 기록은 시작 main `3917a9522d` 기준이며, 이번 후속은 main `7dc02646da`를 포함한 결과를 검증한다. PR·main 병합·배포는 계속 제외한다.
+
+- [x] 최신 main 명시 fetch, 원격 개발 HEAD `addc51af69`·clean·진행 중 Git operation 없음 확인.
+- [x] main 변경 371개 경로와 개발 26개 경로의 겹침 0, 정본/지침·의존성·workflow 변경 없음 확인.
+- [x] clean 상태에서 `origin/main`을 같은 개발 branch에 일반 merge. 이력 재작성 없음. 결합 commit `8bbe9f1778`.
+- [x] 결합 상태의 frozen 설치·Store 전체 회귀/build·관련 API 회귀/타입/build·집중 lint 실행.
+- [x] 실제 컴포넌트+합성 API의 desktop/mobile 주요 흐름 재검증, 전용 서버/브라우저 종료 확인.
+- [x] 최신 코드와 CHECK의 소비처/검증 기준을 맞추고 결과·미검증 경계 기록.
+- [ ] 문서 정합·민감정보·정확한 stage 범위 점검 후 같은 branch push, 원격 HEAD 일치·clean 확인.

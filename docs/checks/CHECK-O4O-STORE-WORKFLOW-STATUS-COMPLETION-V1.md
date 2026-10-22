@@ -2,9 +2,9 @@
 
 > **상태**: ACTIVE
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (한국시간)
-> **개발 검증**: LOCAL_VALIDATED · **main/운영 반영**: 미실행
+> **개발 검증**: LOCAL_VALIDATED (최신 main 결합 검증 포함) · **main/운영 반영**: 미실행
 > **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 사용자 종료점 commit·push, PR 제외
-> **기준**: main `3917a9522d` · branch `wo/store-workflow-status-completion`
+> **기준**: 시작 main `3917a9522d` · 최신 결합 main `7dc02646da` · branch `wo/store-workflow-status-completion`
 > **정본**: [약국 매장 설계 §6-1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#6-1-내-매장-운영-화면과-업무-흐름-2026-10-09)
 
 ## 대조와 구현
@@ -23,7 +23,7 @@
 
 상담 초안·사용처 표시·위치 이동/복귀·대시보드 조회는 작은 로컬 함수/훅으로 정돈했다. 공통 Core·DB/migration·의존성·권한·workflow 변경은 없다. API 보완은 위 상태 보고뿐이다. 사이니지 재생 경로·PG·공급가·개인 가입→약국 자격·AI 이력 계약은 변경하지 않았다.
 
-## 실제 실행 검증
+## 최초 개발 시점의 실제 실행 검증
 
 | 검사 | 결과 |
 |---|---|
@@ -42,9 +42,9 @@
 
 각 흐름의 page error·외부/미처리 합성 API·페이지 가로 넘침은 0이다. 모바일 대시보드·QR 배치와 PC 상담 이미지를 직접 확인했다. 합성 브라우저의 소스·결과·스크린샷은 저장소 밖 `/workspace/.o4o-workflow-status-browser-20261022/`, 설치/build/test/lint 로그는 `/workspace/.o4o-workflow-status-20261022/`에 보존한다. Store build의 기존 큰 chunk 안내는 유지했다.
 
-## 인계와 후속
+## 최초 인계 시점과 후속 경계
 
-push 전 재확인한 main은 `7dc02646da`(#760 KPA 구 화면 철거)다. 변경 371개 경로와 이번 작업의 겹침은 0이며 의존성·workflow 변경도 없다. 시작 기준의 KPA 기존 홈/wrapper가 새 main에서 제거된 것을 확인했다. 이 개발 branch에 자동 merge/rebase하지 않았으며 위 검증은 시작 main `3917a9522d`와의 결합 결과다. 최신 main과의 최종 결합 검증은 통합 담당 범위다.
+최초 push 전 재확인한 main은 `7dc02646da`(#760 KPA 구 화면 철거)였다. 변경 371개 경로와 이번 작업의 겹침은 0이며 의존성·workflow 변경도 없다. 시작 기준의 KPA 기존 홈/wrapper가 새 main에서 제거된 것을 확인했다. 최초 인계에서는 자동 merge/rebase하지 않았으며 위 검증은 시작 main `3917a9522d`와의 결합 결과다. 이후 사용자 요청에 따른 최신 main 결합 검증은 아래에 별도로 기록한다.
 
 PR·PR CI·main 병합·배포는 실행하지 않는다. 개발 commit `709f10a03d13bfca57d5a743e7008fabd16a22b0`을 전용 branch에 push하고 최초 원격 HEAD 일치와 clean 상태를 확인했다. 이 결과 기록 보완도 같은 branch에 commit·push하며 최종 제출 HEAD는 완료 보고에서 인계한다. 통합 담당은 제출 branch/HEAD와 최신 main의 차이를 확인하고 API/Store 결합 상태·필수 CI/리뷰를 검증한다. 이 CHECK는 배포 또는 실사용 완료 증적이 아니다.
 
@@ -53,7 +53,7 @@ PR·PR CI·main 병합·배포는 실행하지 않는다. 개발 commit `709f10a
 ```text
 WORKTREE_DISPOSITION
 worktree: /workspace/o4o-wt/store-workflow-status-completion
-branch: wo/store-workflow-status-completion / base: 3917a9522d
+branch: wo/store-workflow-status-completion / base: 3917a9522d (후속에서 7dc02646da 결합)
 main integration: 미실행 / CI: PR 미생성으로 미실행 / deployment: 통합 담당 후속
 smoke: 실제 컴포넌트+합성 API PC/모바일 40 PASS; 실계정·기기 검증 미실행
 other session usage: 없음(이번 세션 전용) / verdict: KEEP
@@ -61,3 +61,29 @@ reason: push 인계 후 통합 검토·수정 재현용. 기존 작업 트리·�
 ```
 
 문서 정합: 현재 약국 설계 §6-1에 업무/상태 표시 계약을 맞추고 TODO·CHECK를 작성했다. 과거 기록·canonical index의 상태·정책 판정은 변경하지 않았다.
+
+## 동일 WO 후속 — 최신 main 결합 검증
+
+사용자 요청에 따라 동일 전용 branch/worktree에서 후속 검증을 시작했다. 원격 개발 HEAD `addc51af69`와 clean 상태를 확인하고 최신 main `7dc02646da`를 일반 merge했다. 결합 commit은 `8bbe9f1778`이며 충돌·이력 재작성은 없다. 이는 개발 branch 내부의 결합이며 main 반영이 아니다.
+
+KPA 기존 홈/wrapper는 이 최신 main에서 제거됐다. 앞선 역방향 소비처 설명은 최초 개발 조사 시점의 기록이다. 현재 유효한 소비처는 공통 client와 Store wrapper/`homeOverview`이며 서버의 KPA namespace 등록은 유지된다. 삭제된 KPA 화면을 복구하거나 별도 약국협력 서비스의 역할·권한을 변경하지 않는다.
+
+결합 시 기존 개발 26개 파일의 commit 간 diff가 0임을 확인했다. 아래 검사는 모두 main `7dc02646da`를 포함한 결합 commit `8bbe9f1778` 위에서 다시 실행했다. 앞선 검증과 중복 합산하지 않는다.
+
+| 결합 상태 검사 | 결과 |
+|---|---|
+| 설치 | `pnpm install --frozen-lockfile --verify-store-integrity=true --offline` PASS. lockfile 변경 없음 |
+| Store 전체 | `pnpm --filter store-web test` — 63 files / **781 PASS** |
+| API 회귀 | 기존 관련 2개와 main에서 변경한 정적 계약 18개를 `jest --runInBand --no-coverage --runTestsByPath`로 실행 — 20 suites / **582 PASS** |
+| Store production | `pnpm --filter store-web build` PASS (TypeScript 포함). 기존 큰 chunk 안내 유지 |
+| API 타입/production | `pnpm --filter @o4o/api-server run type-check` 및 `run build` PASS. 이미 빌드한 의존 workspace 재사용, 관련 의존 소스 변경 없음 |
+| 집중 lint | 기존 개발 TS/TSX 23개 `eslint --no-cache --max-warnings=0` PASS |
+| PC·모바일 브라우저 | 같은 실제 컴포넌트+합성 API/인증/매장 검사 — 2 mount × 2 viewport × 10 흐름 = **40 PASS** |
+
+브라우저 첫 시도는 개발 서버 첫 진입의 12초 제한 초과로 검사 0건에서 중단됐다. 서버 HTTP 200과 build 종료를 확인한 뒤 동일 검사로 재실행하여 40건을 통과했다. 앱 코드·검사 조건·제한 시간은 바꾸지 않았다. 최초 실패 로그/결과도 별도 보존한다. 최종 검사의 page error·외부/미처리 합성 API·페이지 가로 넘침은 0이며, PC 상담과 모바일 QR 배치 이미지를 다시 직접 확인했다.
+
+후속 로그는 기존 증적 폴더의 `continuation-*`, 브라우저 최종 결과는 기존 `results.json`이다. 이전 결과는 `results-before-main-combination.json`, 최초 제한 시간 초과 결과는 `results-initial-cold-start-timeout.json`으로 보존했다. 검사 브라우저를 종료하고 이번 전용 Vite 프로세스를 종료했다. 전용 포트 종료를 확인한 뒤 push한다.
+
+실제 계정·DB·기기·운영 변경 및 AI 이력 계약은 계속 미실행 범위다. PR·PR CI·main 병합·배포도 실행하지 않는다. 후속 결합과 검증 기록을 동일 branch에 push하고 원격 HEAD/clean을 확인하여 최종 제출 HEAD를 인계한다.
+
+문서 정합(동일 WO 후속): TODO·CHECK 2개에 최신 main 결합 기준·현행 소비처·재검증 결과를 맞췄다. 기존 설계 계약은 유지하며 별도 정책·정본 색인 변경은 없다.
