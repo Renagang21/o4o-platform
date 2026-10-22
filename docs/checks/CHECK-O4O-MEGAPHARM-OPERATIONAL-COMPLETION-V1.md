@@ -1,7 +1,10 @@
 # 메가팜 협업체 운영 완성 검증
 
 - 작성일: 2026-10-22
-- 상태: 기능 PR #761 병합, 배포 전 기존 세션 호환 보완 중
+> **상태**: COMPLETED
+> **최종 갱신**: 2026-10-22
+
+- 결과: 기능 PR #761·보완 PR #763 병합, 최종 main CI·Promote·운영 공개 읽기 확인 완료. 실계정 로그인·실기기 음성은 미검증
 - 작업: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)
 - 정본: [약국 설계 §15-9](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#15-9-사업-운영-도구와-사업별-약관-2026-10-22), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md)
 
@@ -66,3 +69,44 @@ CI 전체 회귀 보완: 첫 전체 실행에서 관리자 guard 인벤토리 2�
 후속 PR #763의 전체 회귀에서 기존 소스 표현을 직접 고정한 service-logout-auth-boundary 1건이 실패했다. Origin을 지역 변수로 추출한 현재 코드에서도 그 값이 req.get(origin)에서 오고 본문이 세션 범위를 정하지 않는다는 두 단언으로 갱신했다. 원래 보안 조건과 런타임 교차 Origin 거절은 유지한다. 관련 경계/로그아웃 38 PASS 후 CI를 다시 실행한다.
 
 공통 UI 소비처 CSS 검증: 협동조합의 기존 Tailwind 스캔 범위에는 새로 소비하는 법정정보·약관 설정 및 테이블/메뉴 스타일이 빠져 있었다. operator-core-ui/operator-ux-core/shared-space-ui/ui 패키지를 스캔하도록 정렬했다. production CSS에서 약관 페이지 폭·본문 편집 높이·테두리·저장 버튼 선택자 생성을 확인했다. 협동조합 build·70개 테스트 PASS, 협동조합 테마의 PC/390px 브라우저 74개 PASS 및 저장 버튼의 실제 표시를 재확인했다.
+
+## 최종 통합·운영 점검 기록
+
+- 기능 [PR #761](https://github.com/Renagang21/o4o-platform/pull/761): main 96f914ede6118b86daa43874bce0caac1d32a106. 최종 PR CI 및 main CI PASS.
+- 호환·CSS [PR #763](https://github.com/Renagang21/o4o-platform/pull/763): 최종 HEAD 4a855b1fd8625c25772b89cbb11d39dbbb25f87b, [전체 CI PASS](https://github.com/Renagang21/o4o-platform/actions/runs/39721946961), 같은 HEAD Codex review 완료·미해결 지적 없음.
+- #763 main 병합: efcf96ec28f431eafab033454ae1bd7fe24a9571, 2026-10-22 04:33 UTC. [main CI PASS](https://github.com/Renagang21/o4o-platform/actions/runs/39723002629), 배포 결과는 아래에 확정 기록한다.
+- 운영 버전 7dc02646da부터 최종 코드까지 migration/schema 관련 경로 변경 없음. 실제 법정정보·동의·역할·유료 자격·약사 확인의 운영 입력은 수행하지 않았다.
+- 격리 PostgreSQL 17 테스트 데이터 클러스터 3개는 종료·전체 삭제했고 잔존 데이터 디렉터리 0개를 확인했다. 다른 로컬 클러스터는 건드리지 않았다.
+
+앞의 개별 UI suite 수치는 #762 통합 전 로컬 실행 기록이다. #762에서 폐기한 기존 안내 경로의 테스트 수를 최종 main 모집단으로 다시 주장하지 않는다. 통합 뒤 관련 경계/관리자 inventory 46개, 협동조합 70개, 브라우저 74개는 별도로 재실행했다. 최종 전체 모집단 판정은 위 CI를 따른다.
+
+정본 테스트 계정 파일 docs/local/TEST-ACCOUNTS.local.md는 전용 worktree와 기준 checkout 양쪽에서 찾지 못했다. 따라서 실계정 로그인 완료·실제 계정의 사업 운영/직원 메뉴·실제 마이크 품질은 운영 검증 범위에 포함하지 않는다. Demo/운영 계정으로 대체하지 않았다.
+
+### 배포 확정
+
+자동 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/39724009546)는 인증 변경을 LEVEL 3으로 분류해 배포를 보류했다. 최신 main/CI PASS·동시 배포 없음·새 migration 없음 확인 후 사용자 배포 승인 범위에서 [Promote 39724170327](https://github.com/Renagang21/o4o-platform/actions/runs/39724170327)를 실행했다. 전체 workflow와 Report PASS, commit production 상태는 DEPLOYED다.
+
+| 대상 | 결과 |
+|---|---|
+| api, admin, neture, kpa-society, lecture, store, kpa-branch | 7개 모두 efcf96ec28f431eafab033454ae1bd7fe24a9571 serving 확인 |
+| 운영 schema/data 변경 | 신규 migration·약관/동의/사업 역할/유료/전문인 확인 입력 없음 |
+| 배포 경로 | 기존 reusable workflow, API 선행 및 verified rollout 사용. freeze·CI·ref 경계 우회 없음 |
+
+### 운영 읽기·브라우저 결과
+
+| 확인 | 결과 |
+|---|---|
+| API health/ready | 200 |
+| 사업 정보 및 새 운영 집계/약관 API의 비로그인 요청 | 401 AUTH_REQUIRED |
+| generic UUID 사업 scope 우회 | 404 UNKNOWN_SERVICE |
+| pharmacy/megapharm/carepharm 가입용 정책 조회 | 503 POLICY_UNAVAILABLE — 실제 약관 미게시 상태에서 신청 차단 유지 |
+| 협동조합 공개 directory | 200, 공개 항목 0개. 실제 개별 조합의 운영 약관 페이지 확인은 제외 |
+| pharmacy/megapharm/carepharm/pharmcoop 홈 | 1440/390px 총 8개 PASS, HTTP 200·page error 0·가로 넘침 0 |
+| pharmacy/megapharm/carepharm 약관·개인정보 직접 URL | 1440/390px 총 12개 PASS. 자기 사업의 문서 API만 조회, 타 사업/legacy 정책 요청 0 |
+| 미게시 문서 표시 | 문서 API 404 뒤 중립 empty 상태 표시. 가짜 문안·다른 사업 문서 대체 없음 |
+
+운영 브라우저 최초 실행은 이 클라우드 검사 프록시의 CA를 Chromium이 신뢰하지 않아 실패했다. 시스템 HTTPS 검증으로 환경 CA임을 확인하고 해당 환경 CA의 공개키만 허용한 별도 브라우저로 재실행했다. 서버 인증서·시스템 신뢰 저장소·운영 설정은 바꾸지 않았다. 약관 페이지의 networkidle 대기는 시간 초과하여, 재실행은 문서 응답 수신과 실제 empty 상태 표시를 완료 기준으로 삼았다. 홈 8개 및 정책 페이지 12개 모두 통과했다.
+
+스크린샷·브라우저 JSON·상태 요약은 작업 환경의 임시 artifact로 보관하고 Public 저장소에 운영 응답 원문을 넣지 않았다. 이 확인은 실제 계정 로그인·실제 운영 권한·마이크/외부 AI 정확도를 검증하지 않는다. 실제 사업의 법정정보·같은 버전 terms/privacy 게시와 사업 등록/기능 설정은 담당 관리자가 해야 한다.
+
+문서 정합: 약국 설계·My Home의 현행 기준 및 OPEN 독립 정비 WO의 범위를 유지했다. 이 WO와 CHECK를 완료 기록으로 확정하며, 독립 정비 전체·운영 입력까지 완료했다고 확대하지 않는다. 종료 문서만의 후속 main commit은 실행 코드 serving SHA와 구분한다.
