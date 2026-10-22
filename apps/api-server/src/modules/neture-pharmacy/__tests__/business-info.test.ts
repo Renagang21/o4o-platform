@@ -1,8 +1,8 @@
 import { getBusinessInfo } from '../services/business-info.js';
 describe('business application metadata', () => {
   it('returns only public application fields and performs a parameterized active-business read', async () => {
-    const exec = { query: jest.fn(async (_sql: string, _params: unknown[]) => [{ key: 'pharmacy', name: '사업', communityKey: 'members', registrationConditions: '조건', payment_receiver_key: 'private', operator_user_id: 'private' }]) };
-    expect(await getBusinessInfo(exec, 'pharmacy')).toEqual({ key: 'pharmacy', name: '사업', communityKey: 'members', registrationConditions: '조건' });
+    const exec = { query: jest.fn(async (_sql: string, _params: unknown[]) => [{ id: '11111111-1111-4111-8111-111111111111', key: 'pharmacy', name: '사업', communityKey: 'members', registrationConditions: '조건', payment_receiver_key: 'private', operator_user_id: 'private' }]) };
+    expect(await getBusinessInfo(exec, 'pharmacy')).toEqual({ policyScope: 'business:11111111-1111-4111-8111-111111111111', key: 'pharmacy', name: '사업', communityKey: 'members', registrationConditions: '조건' });
     expect(exec.query).toHaveBeenCalledWith(expect.stringContaining("status = 'active'"), ['pharmacy']);
     expect(exec.query).toHaveBeenCalledTimes(1);
     const sql = exec.query.mock.calls[0][0];

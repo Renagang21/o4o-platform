@@ -1,3 +1,4 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '../legal/ServiceEnrollmentPolicyAgreement';
 import { BusinessHomeShowcase } from './BusinessHomeShowcase';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -9,7 +10,7 @@ export interface CooperationClient {
   get(path: string, config?: { params?: Record<string, unknown>; headers?: Record<string, string> }): Promise<{ data: { data: any } }>;
   post(path: string, body?: unknown, config?: { headers?: Record<string, string> }): Promise<unknown>;
 }
-interface Business { key: string; name: string; communityKey: string | null; registrationConditions: string | null }
+interface Business { policyScope: string; key: string; name: string; communityKey: string | null; registrationConditions: string | null }
 interface Access { kind: string; businessKey?: string; allowed: boolean; canManage: boolean }
 interface StoreAccess { businessKey: string; organizationId: string; allowed: boolean; membershipStatus: string | null }
 interface Membership { key: string; membershipStatus: string | null; reason?: string | null }
@@ -132,6 +133,7 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
 }
 
 function Participation({ model, business, access, client, onChanged }: { model: CooperationModel; business: Business; access: Access; client: CooperationClient; onChanged: () => void }) {
+  const agreement = useServiceEnrollmentPolicies(business.policyScope, async () => (await client.get(`/neture/businesses/${encodeURIComponent(model.key)}/legal/enrollment-policies`)).data.data, business.key);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -148,11 +150,11 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     return () => { alive = false; };
   }, [client, model.key, access.canManage]);
   const act = async (action: 'apply' | 'withdraw') => {
-    if (busy || (action === 'apply' && (!accepted || staleConditions))) return;
+    if (busy || (action === 'apply' && (!accepted || staleConditions || !agreement.ready))) return;
     if (action === 'withdraw' && !window.confirm('이 서비스의 가입 신청을 취소하거나 탈퇴하시겠습니까?')) return;
     setBusy(true); setError('');
-    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note } : {}); onChanged(); }
-    catch (e: any) { if (e.response?.data?.code === 'CONDITIONS_CHANGED' || e.response?.data?.error?.code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); } setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.'); }
+    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note, policyReferences: agreement.references } : {}); onChanged(); }
+    catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code ?? e.response?.data?.error?.code)) agreement.reload(); if (e.response?.data?.code === 'CONDITIONS_CHANGED' || e.response?.data?.error?.code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); } setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.'); }
     finally { setBusy(false); }
   };
   const status = membership?.membershipStatus;
@@ -164,7 +166,8 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     {!loading && membership && !access.canManage && !['active', 'pending', 'suspended'].includes(status ?? '') && <>
       <label className="block"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> 이 서비스의 참여 조건을 확인했습니다.</label>
       <label className="block">추가 신청 내용<textarea maxLength={2000} value={note} onChange={e => setNote(e.target.value)} className="mt-2 block w-full rounded border p-3" /></label>
-      <button className="rounded bg-teal-800 px-5 py-3 text-white disabled:opacity-50" disabled={!accepted || busy || staleConditions} onClick={() => void act('apply')}>가입 신청</button>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
+      <button className="rounded bg-teal-800 px-5 py-3 text-white disabled:opacity-50" disabled={!accepted || busy || staleConditions || !agreement.ready} onClick={() => void act('apply')}>가입 신청</button>
     </>}
     {staleConditions && <button className="underline" onClick={onChanged}>최신 참여 조건 다시 확인</button>}
     {!loading && membership && !access.canManage && ['active', 'pending', 'suspended'].includes(status ?? '') && <button disabled={busy} onClick={() => void act('withdraw')}>{status === 'pending' ? '신청 취소' : '서비스 탈퇴'}</button>}

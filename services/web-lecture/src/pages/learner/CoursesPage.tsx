@@ -2,7 +2,7 @@
  * 강의 목록 — `@o4o/lms-ui` CourseListView 재사용 (WO Phase 2 §11 Learner)
  * 공개 목록: published 만. 비로그인 = visibility=public 강제(서버). serviceKey 는 서버가 lecture 로 고정.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CourseListView, type CourseCardView } from '@o4o/lms-ui';
 import { learnerApi, type LectureCourse } from '../../api/lecture';
@@ -32,6 +32,7 @@ function toCard(c: LectureCourse): CourseCardView {
 export default function CoursesPage() {
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
+  const requestId = useRef(0);
   const [courses, setCourses] = useState<CourseCardView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -42,15 +43,17 @@ export default function CoursesPage() {
   const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
-    setLoading(true); setError(false);
+    const request = ++requestId.current;
+    setCourses([]); setLoading(true); setError(false);
     try {
       const res = await learnerApi.getCourses<LectureCourse>({ status: 'published', page, limit: PAGE_SIZE, ...(query ? { search: query } : {}) });
+      if (request !== requestId.current) return;
       setCourses((res.data ?? []).map(toCard));
       setTotalPages(res.pagination?.totalPages ?? res.totalPages ?? 1);
       setTotal(res.pagination?.total ?? res.data?.length ?? 0);
-    } catch { setError(true); } finally { setLoading(false); }
-  }, [page, query]);
-  useEffect(() => { void load(); }, [load]);
+    } catch { if (request === requestId.current) setError(true); } finally { if (request === requestId.current) setLoading(false); }
+  }, [page, query, isAuthenticated, user?.id]);
+  useEffect(() => { void load(); return () => { requestId.current += 1; }; }, [load]);
 
   const gate = isAuthenticated && !hasLectureMembership(user?.memberships)
     ? <div className="notice">로그인은 되어 있지만 O4O 강의 서비스 이용 자격이 없어 공개 강의만 볼 수 있습니다. 수강 신청은 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
@@ -59,6 +62,7 @@ export default function CoursesPage() {
       : null;
 
   return <main className="page page-wide">
+    {gate}
     <CourseListView
       courses={courses}
       loading={loading}
@@ -69,7 +73,6 @@ export default function CoursesPage() {
       headerSlot={<div className="page-head"><h1>강의</h1><p className="muted">O4O 강의 서비스의 공개 강의 목록입니다.</p></div>}
       search={{ value: search, onChange: setSearch, onSubmit: () => { setPage(1); setQuery(search.trim()); }, placeholder: '강의 검색' }}
       countSlot={<span className="muted">총 {total}개</span>}
-      gateSlot={gate}
       emptyState={<div className="empty">등록된 강의가 없습니다.</div>}
       paginationSlot={totalPages > 1 && <div className="pager">
         <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>이전</button>

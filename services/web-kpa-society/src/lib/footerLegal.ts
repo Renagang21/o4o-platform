@@ -8,10 +8,11 @@
  * 미설정/비활성/오류 → null (푸터는 법정정보 영역만 비표시). 동작 불변.
  */
 import { createFooterLegalLoader } from '@o4o/shared-space-ui';
+import { BUSINESS_SITE } from '../config/businessSite';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
-export const loadFooterLegal = createFooterLegalLoader(async (path) => {
-  const res = await fetch(`${API_BASE}/api/v1${path}`);
+export const loadFooterLegal = createFooterLegalLoader(async () => {
+  const res = await fetch(`${API_BASE}/api/v1/neture/businesses/${encodeURIComponent(BUSINESS_SITE.key)}/legal/footer-legal`);
   return res.ok ? res.json() : null;
 });

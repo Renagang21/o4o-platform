@@ -45,29 +45,7 @@ export { GuideFeaturesPage } from './GuideFeaturesPage.js';
 export { GuideFeatureManualPage } from './GuideFeatureManualPage.js';
 
 // Copy
-export {
-  kpaGuideIntroProps,
-  kpaGuideIntroStructureProps,
-  kpaGuideIntroKpaProps,
-  kpaGuideIntroOperationProps,
-  kpaGuideIntroConceptProps,
-  kpaGuideUsageProps,
-  kpaGuideFeaturesProps,
-  kpaGuideFeatureForumProps,
-  kpaGuideFeatureResourcesProps,
-  kpaGuideFeatureContentProps,
-  kpaGuideFeatureSignageProps,
-  kpaGuideFeatureStoreProps,
-  kpaGuideFeatureQrTabletProps,
-  kpaGuideFeaturePopProps,
-  kpaGuideFeatureProductionMaterialsProps,
-  kpaGuideFeatureBlogProps,
-  kpaGuideFeatureSurveyProps,
-  // WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide
-  kpaGuideForStoreOwnerProps,
-  kpaGuideForOperatorProps,
-  kpaGuideForMemberProps,
-} from './copy/kpa.js';
+// KPA(pharmacy) guide copy(copy/kpa.ts)는 소비 화면이 없어 제거 — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7
 
 
 // WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
@@ -119,7 +97,6 @@ export {
 // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1
 //   /service-guide 공통 서비스 소개 landing + 서비스별 config
 export { GuideServiceIntroPage } from './GuideServiceIntroPage.js';
-export { kpaServiceIntroProps } from './copy/kpa.js';
 
 // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
 //   PharmacyHub 는 공통 Guide View 를 그대로 채택하고 copy/config 만 주입한다.

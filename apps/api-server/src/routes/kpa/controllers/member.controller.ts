@@ -910,7 +910,7 @@ export function createMemberController(
               metadata: {
                 memberId: member.id,
                 decision: newStatus,
-                targetUrl: isApproved ? '/mypage' : '/mypage',
+                targetUrl: '/',
               },
             });
           } catch (notifyError) {

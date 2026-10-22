@@ -94,7 +94,10 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
     const target = cooperationDestination('pharmacy', 'participation');
     const href = new URL(await requestServiceHandoff(api, target));
     expect(href.origin).toBe('https://pharmacy.neture.co.kr');
-    expect((await exchange(href.searchParams.get('token')!, href.origin)).statusCode).toBe(200);
+    const result = await exchange(href.searchParams.get('token')!, href.origin);
+    expect(result.statusCode).toBe(200);
+    expect(result.body.data.targetServiceKey).toBe('neture');
+    expect(generateTokens.mock.calls.at(-1)?.[5]).toBe('neture');
     await expect(requestServiceHandoff(api, { ...cooperationDestination('carepharm', 'home'), origin: 'https://evil.test' })).rejects.toThrow('Invalid service handoff');
   });
   it('connects the CarePharm Study entry through the existing lecture issuer and exchange contract', async () => {
