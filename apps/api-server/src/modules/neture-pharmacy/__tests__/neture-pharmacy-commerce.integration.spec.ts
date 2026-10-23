@@ -952,6 +952,55 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
       } finally {if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result;}
     });
+    it('rechecks store-owner agreements at prepare and confirm despite a warm middleware cache', async () => {
+      const f = await order(); const ids: string[] = [];
+      const publish = async (version: number) => {
+        const [doc] = await ds.query(`INSERT INTO service_policy_documents(service_key,document_type,title,content,version,status,effective_date,published_at)
+          VALUES('kpa-society','store_owner_agreement','Synthetic store agreement','Synthetic agreement body',$1,'published',CURRENT_DATE,NOW()) RETURNING id`, [version]);
+        ids.push(doc.id); return doc.id;
+      };
+      const accept = (id: string, version: number) => policyAcceptanceService.recordAcceptance({ userId: f.owner, serviceKey: 'kpa-society', documentType: 'store_owner_agreement', policyDocumentId: id, version }, ds);
+      try {
+        policyAcceptanceService.invalidateAll();
+        expect(await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(f.owner, 'kpa-society', ds)).toEqual([]);
+        const first = await publish(1);
+        await expect(payments.prepare(f.owner, f.orgId, f.group.paymentGroupId)).rejects.toMatchObject({ httpStatus: 428, code: 'STORE_OWNER_AGREEMENT_REQUIRED' });
+        expect(await ds.query('SELECT id FROM o4o_payments WHERE "orderId"=$1', [f.group.paymentGroupId])).toEqual([]);
+        await accept(first, 1);
+        const prepared = await payments.prepare(f.owner, f.orgId, f.group.paymentGroupId);
+        await ds.query("UPDATE service_policy_documents SET status='draft' WHERE id=$1", [first]);
+        const second = await publish(2);
+        await expect(payments.confirm(f.owner, f.orgId, { paymentId: prepared.paymentId, paymentGroupId: f.group.paymentGroupId })).rejects.toHaveProperty('code', 'STORE_OWNER_AGREEMENT_REQUIRED');
+        expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1', [prepared.paymentId]))[0].status).toBe('CREATED');
+        await accept(second, 2);
+        expect(await payments.confirm(f.owner, f.orgId, { paymentId: prepared.paymentId, paymentGroupId: f.group.paymentGroupId })).toMatchObject({ status: 'PAID' });
+      } finally {
+        await ds.query('DELETE FROM user_policy_acceptances WHERE policy_document_id=ANY($1::uuid[])', [ids]);
+        await ds.query('DELETE FROM service_policy_documents WHERE id=ANY($1::uuid[])', [ids]);
+        policyAcceptanceService.invalidateAll();
+      }
+    });
+    it('waits for an in-flight store agreement publication before confirming payment', async () => {
+      const f = await order(); const prepared = await payments.prepare(f.owner, f.orgId, f.group.paymentGroupId);
+      const writer = ds.createQueryRunner(); await writer.connect(); await writer.startTransaction();
+      let docId: string | undefined; let result: Promise<unknown> | undefined;
+      try {
+        await writer.query('SELECT pg_advisory_xact_lock(hashtext($1))', ['service-policy:kpa-society']);
+        const [doc] = await writer.query(`INSERT INTO service_policy_documents(service_key,document_type,title,content,version,status,effective_date,published_at)
+          VALUES('kpa-society','store_owner_agreement','Synthetic concurrent agreement','Synthetic body',1,'published',CURRENT_DATE,NOW()) RETURNING id`);
+        docId = doc.id;
+        result = payments.confirm(f.owner, f.orgId, { paymentId: prepared.paymentId, paymentGroupId: f.group.paymentGroupId }).then(() => ({ paid: true }), error => ({ code: error.code }));
+        let blocked = false;
+        for (let i = 0; i < 100; i++) { blocked = (await writer.query("SELECT 1 FROM pg_locks WHERE NOT granted AND locktype='advisory'")).length > 0; if (blocked) break; await new Promise(resolve => setTimeout(resolve, 10)); }
+        expect(blocked).toBe(true); await writer.commitTransaction();
+        expect(await result).toEqual({ code: 'STORE_OWNER_AGREEMENT_REQUIRED' });
+        expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1', [prepared.paymentId]))[0].status).toBe('CREATED');
+      } finally {
+        if (writer.isTransactionActive) await writer.rollbackTransaction(); await writer.release(); if (result) await result;
+        if (docId) await ds.query('DELETE FROM service_policy_documents WHERE id=$1', [docId]);
+        policyAcceptanceService.invalidateAll();
+      }
+    });
     it('uses real legal controllers and current business roles for policy publication and stale-form rejection', async () => {
       const legalDs=new DataSource({type:'postgres',url:DB_URL,entities:[ServicePolicyDocument,ServiceLegalProfile],synchronize:false});await legalDs.initialize();
       const app=express();app.use(express.json());app.use((req,_res,next)=>{(req as any).user={id:req.get('X-Fixture-Actor'),roles:['neture:carepharm_admin']};next();});

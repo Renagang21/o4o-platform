@@ -90,3 +90,5 @@
 통합 중 중복 import는 수정 후 type-check를 다시 통과했다. Sonar 지적의 정렬 비교 함수 2건은 명시적 비교로 수정하고 PostgreSQL 55건을 재실행했다. Codex가 발견한 기존 공급조건 테스트의 구 schema/역방향 기대값은 `neture_pharmacy_memberships.status`, membership ID 및 대상 약국 active 가입 검증으로 함께 정리하고 해당 suite 17건을 실제 실행했다. 업무 규칙을 테스트의 옛 기대에 맞춰 완화하지 않았다.
 
 통합 PR: [#779](https://github.com/Renagang21/o4o-platform/pull/779). 최종 HEAD·CI·Sonar·CodeQL·Codex 리뷰·스레드 처리·병합 SHA·Delivery/Promote 및 serving 확인은 이 PR의 최종 인계 기록과 GitHub `production` status를 따른다. 기존 운영 개통 항목은 여전히 별도이며 실제 회원 승인·사업 등록·정책 게시·실 PG·운영 데이터 write를 수행하지 않는다.
+
+추가 Codex P2에 따라 매장 경영자 이용계약도 결제 transaction에서 재판정한다. 기존 `PolicyAcceptanceService` 규칙을 transaction 전용 인스턴스로 호출해 middleware 게시 캐시를 사용하지 않고, 계약 게시 advisory lock 및 현재 문서·승낙 행의 공유 잠금으로 준비/확정 중의 개정·승낙 변경을 직렬화한다. 직원 경로의 기존 권한 규칙은 유지한다. 따뜻한 middleware 캐시를 둔 상태의 준비/확정 거절→최신 계약 승낙 후 성공, 게시 transaction과의 실제 lock 경합→거절을 추가했다. canonical 공급·결제 57건과 공급조건 17건, 총 PostgreSQL 74건을 다시 실행해 통과했다.
