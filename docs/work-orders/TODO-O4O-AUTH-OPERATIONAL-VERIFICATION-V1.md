@@ -160,6 +160,12 @@ cluster 시작 전 handler를 등록하고 자식 실행을 비동기로 바꿨�
   조건으로 관찰 방법을 교정하여 두 신호를 다시 검증했다. runner의 포트 경계는 완화하지 않았다.
 - 비동기 전환 후 정상 실행도 10 suites/173 PASS·SKIP0·DB0·cluster 제거 PASS, 집중 ESLint/문법 검사 PASS.
 
+별도 SonarCloud 초회는 Reliability D/Security D로 실패했다. GitHub annotation의3건은
+고정 `/tmp` 경로·finally 안 throw·중첩 template literal이다. 시스템 tmpdir 아래의 mkdtemp를
+사용하고, 정리 잔존 실패는 finally에서 다시 throw하지 않고 실패 상태로 기록하며,
+정적인 DB 이름 목록의 SQL 표현을 분리했다. 실제 운영 연결·정리 대상 범위는 바꾸지 않았다.
+해당 보완 후 신호 중단·정상 정리 검증과 최종 외부 분석 결과를 PR에서 함께 확인한다.
+
 최종 source HEAD의 CI·Codex·main 병합·post-merge CI·Delivery 판정은 PR #783에서 추적한다.
 이 후속을 운영 OAuth/메일 실수신 검증 완료로 확대하지 않는다.
 

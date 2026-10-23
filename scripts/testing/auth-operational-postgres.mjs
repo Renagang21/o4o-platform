@@ -6,6 +6,7 @@ import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,6 +18,7 @@ const databases = [
   'o4o_auth_hardening_test', 'o4o_auth_phase2_test', 'o4o_auth_phase4a_test',
   'o4o_signup_test', 'o4o_operator_inbox_fixture', 'o4o_platform',
 ];
+const databaseNamesSql = databases.map(name => "'" + name + "'").join(',');
 const tests = [
   'src/services/auth/__tests__/token-membership-hardening.integration.test.ts',
   'src/services/auth/__tests__/browserSession.integration.test.ts',
@@ -115,7 +117,7 @@ try {
     throw new Error('PostgreSQL 15 tools are required');
   }
   await requireFreePort();
-  directory = mkdtempSync('/tmp/o4o-auth-operational-');
+  directory = mkdtempSync(join(tmpdir(), 'o4o-auth-operational-'));
   const data = join(directory, 'data');
   const socket = join(directory, 'socket');
   mkdirSync(socket, { mode: 0o700 });
@@ -159,10 +161,14 @@ try {
     if (running) {
       try {
         for (const name of databases) await sql(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
-        const remaining = await sql(`SELECT count(*) FROM pg_database WHERE datname IN (${databases.map(name => `'${name}'`).join(',')})`, true);
-        if (remaining !== '0') throw new Error('Fixture databases remain');
-        console.log('Remaining fixture databases: 0');
-        cleaned = true;
+        const remaining = await sql(`SELECT count(*) FROM pg_database WHERE datname IN (${databaseNamesSql})`, true);
+        if (remaining === '0') {
+          console.log('Remaining fixture databases: 0');
+          cleaned = true;
+        } else {
+          failure = true;
+          console.error('Fixture cleanup failed: fixture databases remain');
+        }
       } catch (error) {
         failure = true;
         console.error(`Fixture cleanup failed: ${error.message}`);
