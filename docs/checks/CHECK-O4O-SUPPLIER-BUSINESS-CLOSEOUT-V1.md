@@ -80,3 +80,11 @@ API 첫 회 실행에서 전용 URL/port 미지정인 3 suites·41 tests는 skip
 최신 main `825e6b4500`를 추가 merge해 다른 커뮤니티 변경을 보존했다. 실제 PostgreSQL 제안 조건/재시도 및 HTTP 23건, canonical baseline+전체 incremental prefix 지문을 검증한 별도 DB의 commerce 50건 PASS. 미가입/대기/반려/정지/탈퇴 대상의 제안 승인 후 비노출·신규 주문 차단, 기존 주문 후 협업체 정지/탈퇴·제안 종료·사업/공급 출처 비활성에도 원 주문 금액으로 결제 가능, 종료 transaction과 결제의 독립 처리, 구매 actor/선택 약국·직원 권한·계약 동의·중복/스냅샷 보호를 실제 SQL로 확인했다. API 전체 타입·변경 파일 lint·diff 검사 PASS. commerce 임시 DB는 wrapper의 소유권 확인 후 완전 삭제했다.
 
 commerce 설계 §17-3을 사용자 확정 내용으로 정정하고 WO에 최신 통합 범위를 기록했다. 이전 개발/통합 후보의 검증 사실은 당시 기록으로 유지한다. 새 schema/migration·배포 설정 변경은 없다. 최종 PR·main·CI/리뷰·Delivery·운영 확인 결과는 후속 기록과 GitHub에서 확인한다.
+
+## PR #781 리뷰 보완 — 주문 확정 동시성
+
+Codex P2(리뷰 comment 4358265678)의 자격 확인/주문 생성 사이 TOCTOU를 보완했다. 각 기존 주문 그룹에서 장바구니 행, 공급 출처, 협업체/회원, SPO·공급자·Master 및 모집 신청 행을 정렬 순서로 잠그고 SSOT를 다시 읽은 뒤 주문·생성 로그·장바구니 제거·이벤트 예약을 같은 QueryRunner transaction으로 commit한다. 기다리는 동안 조건/수량이 바뀌면 해당 그룹을 실패로 돌려 재확인하며 다른 그룹의 부분 성공은 유지한다. 결제 시점의 협업체 자격 재검사는 복구하지 않는다.
+
+공통 CheckoutService.createOrder에는 optional EntityManager만 추가했다. Neture 약국 경로만 이를 전달하고 기존 다른 호출은 종전 repository/연결·의약품 차단·로그 경로를 유지한다. OrderCreator 내부 계약과 Neture route/실제 SQL fixture도 같은 manager를 전달한다. 신규 원장·schema·범용 framework 없음. 소비처는 기존 checkout createOrder 호출부 전체 검색으로 확인했으며 기본 경로 의약품 거래 차단 회귀와 실제 checkout을 함께 검증했다.
+
+실제 PostgreSQL commerce 52건 PASS(회원 철회가 먼저 commit하면 신규 주문 거부, 주문 잠금이 먼저면 주문 commit 뒤 철회·이후 결제 허용). 실제 checkout/bridge/배송/정산 8건 PASS(실제 주문/로그 저장 후 강제 실패 시 주문·로그 rollback과 장바구니 유지 포함). 제안 조건·매장 협력사업 및 공통 의약품 차단 46건 PASS. 각각의 canonical bootstrap 임시 DB 완전 삭제를 확인했다. API 전체 타입과 변경 파일 lint를 확인하며 기존 checkout.service.ts의 미사용 uuidv4 warning은 별개다. 최종 HEAD의 원격 CI·Sonar·Codex 재검증 후 병합한다.

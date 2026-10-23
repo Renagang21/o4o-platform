@@ -92,10 +92,10 @@ const provisioner: PharmacyStoreProvisioner = {
 };
 
 /** checkoutService.createOrder 와 같은 계산(subtotal 합 + 배송비 스냅샷)으로 checkout_orders 행을 만든다. */
-const sqlOrderCreator: OrderCreator = async (dto) => {
+const sqlOrderCreator: OrderCreator = async (dto, manager) => {
   const subtotal = dto.items.reduce((s, it) => s + it.subtotal, 0);
   const shippingFee = dto.shippingFeeSnapshot ?? 0;
-  const [o] = await ds.query(
+  const [o] = await manager.query(
     `INSERT INTO checkout_orders ("orderNumber", "buyerId", "sellerId", "supplierId", "sellerOrganizationId",
        subtotal, "shippingFee", "totalAmount", items, metadata, "shippingAddress")
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb)
@@ -955,6 +955,42 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         await writer.commitTransaction();
         expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('PAID');
       } finally {if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result;}
+    });
+    it('rejects a new order when withdrawal commits during checkout eligibility evaluation', async () => {
+      const f=await order();await cart.add(f.owner,f.orgId,{kind:'proposal',id:f.proposal.id,quantity:1});
+      const writer=ds.createQueryRunner();await writer.connect();await writer.startTransaction();
+      let result: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        await writer.query("UPDATE semi_franchise_memberships SET status='suspended' WHERE id=$1",[f.businessMembershipId]);
+        result=cart.checkout(f.owner,f.orgId);
+        let blocked=false;
+        for(let i=0;i<100;i++) { blocked=(await writer.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10)); }
+        expect(blocked).toBe(true);await writer.commitTransaction();
+        expect(await result).toMatchObject({createdOrders:[],failedItems:[{code:'SUPPLY_OPTION_NOT_AVAILABLE'}]});
+        expect((await ds.query('SELECT count(*)::int AS n FROM checkout_orders WHERE "buyerId"=$1',[f.owner]))[0].n).toBe(1);
+        const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+        expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).toMatchObject({status:'PAID'});
+      } finally { if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result; }
+    });
+    it('holds checkout eligibility until its order commits, then permits later membership withdrawal', async () => {
+      const f=await order();await cart.add(f.owner,f.orgId,{kind:'proposal',id:f.proposal.id,quantity:1});
+      let signal!:()=>void, finish!:()=>void;
+      const started=new Promise<void>(resolve=>{signal=resolve;});const release=new Promise<void>(resolve=>{finish=resolve;});
+      const atomicCart=new PharmacyCartService(ds,new EventOfferService(ds),async(dto,manager)=>{
+        const saved=await sqlOrderCreator(dto,manager);signal();await release;return saved;
+      });
+      const checkout=atomicCart.checkout(f.owner,f.orgId);await started;
+      let withdrawn:Promise<unknown>|undefined;
+      try {
+        withdrawn=ds.query("UPDATE semi_franchise_memberships SET status='terminated' WHERE id=$1",[f.businessMembershipId]);
+        let blocked=false;
+        for(let i=0;i<100;i++){blocked=(await ds.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10));}
+        expect(blocked).toBe(true);finish();
+        const result=await checkout;await withdrawn;
+        expect(result.failedItems).toEqual([]);expect(result.createdOrders).toHaveLength(1);
+        const group=result.paymentGroups[0];const prepared=await payments.prepare(f.owner,f.orgId,group.paymentGroupId);
+        expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:group.paymentGroupId})).toMatchObject({status:'PAID'});
+      } finally { finish();await checkout;if(withdrawn)await withdrawn; }
     });
     it('rechecks store-owner agreements at prepare and confirm despite a warm middleware cache', async () => {
       const f = await order(); const ids: string[] = [];

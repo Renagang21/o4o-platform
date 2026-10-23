@@ -140,7 +140,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const supplierContents = new SupplierBusinessContentService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
   const recruitments = new SemiFranchiseRecruitmentService(dataSource);
-  const cart = new PharmacyCartService(dataSource, new EventOfferService(dataSource), (dto) => checkoutService.createOrder(dto));
+  const cart = new PharmacyCartService(dataSource, new EventOfferService(dataSource), (dto, manager) => checkoutService.createOrder(dto, manager));
   const payments = new PharmacyPaymentService(dataSource, new CheckoutFulfillmentBridgeService(dataSource));
   const contents = new SemiFranchiseContentService(dataSource, async (input) => {
     const { snapshot } = await new AssetCopyService(dataSource).copyResolved(input);

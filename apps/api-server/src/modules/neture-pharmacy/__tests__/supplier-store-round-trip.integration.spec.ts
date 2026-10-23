@@ -274,8 +274,23 @@ integration('supplier → store → payment → shipment → settlement (real Po
       .toEqual({ approval_status: 'APPROVED', price_general: 0, default_supply_enabled: false });
   });
 
+  it('rolls back the real order, creation log and cart removal as one checkout transaction', async () => {
+    const beforeOrders=await ds.getRepository(CheckoutOrder).count();
+    const beforeLogs=await ds.getRepository(OrderLog).count();
+    const cart=new PharmacyCartService(ds,new EventOfferService(ds),async(dto,manager)=>{
+      await checkoutService.createOrder(dto,manager);throw new Error('Synthetic checkout failure after save');
+    });
+    const item=await cart.add(ownerId,organizationId,{kind:'default',id:offerId,quantity:1});
+    const result=await cart.checkout(ownerId,organizationId);
+    expect(result.createdOrders).toEqual([]);expect(result.failedItems).toHaveLength(1);
+    expect(await ds.getRepository(CheckoutOrder).count()).toBe(beforeOrders);
+    expect(await ds.getRepository(OrderLog).count()).toBe(beforeLogs);
+    expect((await cart.list(ownerId,organizationId)).map(row=>row.id)).toContain(item.id);
+    await cart.remove(ownerId,organizationId,item.id);
+  });
+
   it('completes the pharmacy purchase with the real checkout and bridge, and preserves settlement scope', async () => {
-    const cart = new PharmacyCartService(ds, new EventOfferService(ds), dto => checkoutService.createOrder(dto));
+    const cart = new PharmacyCartService(ds, new EventOfferService(ds), (dto, manager) => checkoutService.createOrder(dto, manager));
     const bridge = new CheckoutFulfillmentBridgeService(ds);
     const payment = new PharmacyPaymentService(ds, bridge, () => 'test');
     const orders = new SupplierOrderService(ds);
