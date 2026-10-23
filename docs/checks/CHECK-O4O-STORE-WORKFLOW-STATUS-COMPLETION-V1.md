@@ -1,6 +1,6 @@
 # 내 매장 일상 업무·대시보드 상태 보완 검증
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (한국시간)
 > **개발 검증**: LOCAL_VALIDATED (2026-10-23) · **main/운영 반영**: DEPLOYED · api,store
 > **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 최초 개발 push 완료, 사용자 후속 지시로 PR·main 병합·배포 완료
@@ -150,3 +150,5 @@ record disposition: 문서 PR main 반영·post-merge 확인 후 표준 정리
 ```
 
 문서 정합(통합 완료): TODO를 COMPLETED로 갱신하고 CHECK에 검증 HEAD·CI·리뷰·병합·배포·운영 읽기·미검증·작업공간 정리 결과를 맞췄다. 현재 설계 정본과 정책은 추가 변경하지 않았다. 문서 결과 반영은 runtime 변경이 없어 배포 NOT_APPLICABLE이다.
+
+문서 PR #773 검토에서 종료된 TODO와 CHECK의 ACTIVE 상태 불일치 1건을 지적받았다. 현행 문서 lifecycle에 따라 이 CHECK도 COMPLETED로 맞췄다. 실계정·기기 미검증은 이 트랙의 미완료 작업으로 두지 않고 위의 후속 검증 경계로 보존한다. 기록용 작업공간은 이 문서의 main 반영 뒤 표준 종료 절차로 정리한다.
