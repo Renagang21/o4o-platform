@@ -95,3 +95,19 @@ KPA 기존 홈/wrapper는 이 최신 main에서 제거됐다. 앞선 역방향 �
 최신 main의 변경 260개 경로와 기존 개발 26개 경로를 대조했다. 겹치는 QR 안내 링크 제거와 약국 설계 문서는 일반 merge `eb9a77b3bb`에서 충돌 없이 보존했다. main에 이미 반영된 외부 AI·인증·사업 독립 변경을 되돌리지 않는다. 이번 main 대비 변경에는 migration·의존성·workflow가 없다. 앞선 CHECK의 미반영 표기는 각 개발 종료 시점의 기록이며 현재 통합 결과는 이 절에 추가한다.
 
 결합 상태 검증·CI/리뷰·병합·배포·미검증 경계는 실제 실행 후 기록한다. 기존 실계정·운영 업무 데이터·기기 검증 제한은 유지한다.
+
+### 통합 로컬 검증과 PR
+
+PR [#772](https://github.com/Renagang21/o4o-platform/pull/772)를 생성했다. 최신 main 결합 상태의 frozen 설치(무결성 검증 유지)와 변경된 의존 workspace 빌드를 다시 수행했다.
+
+| 검사 | 결과 |
+|---|---|
+| Store 전체 | 64 files / **785 PASS** |
+| API 관련 | 6 suites / **90 PASS**. 상태 loader·기존 제품/서비스 guard·Store 진입/공통 업무공간·가입 경계·약사 상담 확인 |
+| Store/API build·타입 | Store production(TypeScript 포함), API type-check 및 production build PASS |
+| 집중 lint | 기존 변경 23개 + CI 보완 테스트 1개, 오류·경고 0 |
+| PC·모바일 합성 브라우저 | 기존 2 mount × 2 viewport × 10 흐름 = **40 PASS**. page error·외부/미처리 API·페이지 가로 넘침 0 |
+
+PC 상담과 모바일 QR 배치 이미지를 직접 확인했다. 검사 브라우저·이번 전용 Vite를 종료하고 포트 4392 종료를 확인했다. 통합 로그·최종 브라우저 결과와 대표 이미지는 저장소 밖 `/workspace/.o4o-store-integration-20261023/`에 보존한다. 실제 로그인·운영 번역·음성 장치·DB·기기 업무 검증은 수행하지 않았다.
+
+최초 PR CI `39891219181`의 Web job에서 `consultation-speech.test.tsx`가 음성 입력 콜백 직후 빈 값을 읽어 실패했다. 로컬 전체/집중 검사에서는 재현되지 않았다. React 상태 반영을 `await act`로 기다리도록 해당 테스트 한 줄을 보완했고, 문장 기대값·자동 번역 금지·명시 번역 확인은 유지했다. runtime 코드는 바꾸지 않았다. 보완 후 Store 전체 785개와 해당 파일 lint를 다시 통과했다. 이 보완을 같은 PR에 push하고 정확한 새 HEAD의 CI·자동 Codex 리뷰를 재확인한다.

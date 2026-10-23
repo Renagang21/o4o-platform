@@ -61,7 +61,7 @@
 
 - [x] 개발 원격 HEAD·clean·현행 ruleset·기존 PR 없음·진행 중 배포 없음 확인.
 - [x] 최신 main `cd091bc221`의 260개 변경 경로 대조. 겹침은 QR 안내 링크 제거와 설계 문서 2곳이며 일반 merge `eb9a77b3bb`로 양쪽 변경 보존.
-- [ ] 최신 결합 상태 frozen 설치·Store/API 관련 검증·build·집중 lint·PC/모바일 합성 검증.
+- [x] 최신 결합 상태 frozen 설치·Store 785/API 90·Store/API build·타입·집중 lint·PC/모바일 합성 40 PASS. CI의 음성 콜백 검사 대기 보완 후 Store 전체 재통과.
 - [ ] 개발 branch push 후 PR 생성, 정확한 HEAD의 필수 CI 및 Codex 지적/스레드 확인·처리.
 - [ ] main 재확인·검증 HEAD 고정 PR merge·post-merge CI 확인.
 - [ ] 현행 Delivery 판정·API/Store 운영 반영 확인, 로그인 없는 읽기 검증.
