@@ -1,6 +1,6 @@
 # 커뮤니티 약업계 주요 소식
 
-> 상태: IN_PROGRESS · 작성일: 2026-10-21 · 범위: community 전용 뉴스·운영 AI 초안
+> 상태: COMPLETED · 작성일: 2026-10-21 · 최종 확인: 2026-10-23 · 범위: community 전용 뉴스·운영 AI 초안
 
 ## 사용자 확정
 
@@ -16,7 +16,7 @@
 - [x] 현재 커뮤니티 운영자만 실행/열람/적용. AI 결과는 자동 게시하지 않고 기존 초안 편집에 적용한다.
 - [x] 의미 있는 API/모델 출력 검증·비용/동시성/권한 회귀 및 웹 build·PC/모바일 확인.
 - [x] 실제 사이트의 허용 수집 경로 확인 후 수집 연결·중복 URL 처리·정기 실행 검증(2026-10-23).
-- [ ] push·리뷰·main 병합·배포·공개 확인. 2026-10-23 수집 잔여 구현·검증 후 사용자 지시에 따라 통합한다.
+- [x] push·리뷰·main 병합·배포·공개 확인. 2026-10-23 PR #748 main 병합 및 API/Neture 배포·공개 smoke 완료(아래 종료 기록).
 
 ## 최소 구현 경계
 
@@ -56,7 +56,7 @@
 - [x] 매 실행 robots 안내·대기시간을 적용. 고정 HTTPS 출처·응답 크기·시간 제한·redirect 금지.
 - [x] 한국 날짜별 수집 예약, URL 중복 방지, 매체 장애 구분, 운영자 수동 실행/결과 조회.
 - [x] 기존 앱 scheduler에서 일일 수집·AI 초안 정리. 시스템 실행과 운영자 실행을 구분하고 기존 AI 활성화·quota·일일 예약을 공유. 자동 게시 없음.
-- [ ] 실제 사이트 읽기 검증, 합성 DB·비용/권한·웹 회귀, CI/리뷰, main 병합·API/웹 서빙 확인.
+- [x] 실제 사이트 읽기 검증, 합성 DB·비용/권한·웹 회귀, CI/리뷰, main 병합·API/웹 서빙 확인.
 
 
 ## 2026-10-23 수집·정기 실행 구현 검증
@@ -75,3 +75,17 @@
 문서 정합: 과거403/수집 미구현 기록과 사용자 보류 이력은 당시 상태로 보존하고, 오늘의 접속 해소·수집 구현 및 정기 실행의 가동 조건을 구분했다. 최종 CI·리뷰·main·배포 상태는 확정 후 후속 기록한다.
 
 수집 UI 후속 회귀: 늦은 수집 응답이 편집 중인 제목·본문을 초기화하거나 다른 탭/페이지의 목록을 덮어쓰지 않도록 현재 목록 범위를 확인해 목록만 갱신한다. 패널 종료 뒤에는 갱신 callback을 실행하지 않는다. 웹14개·build·lint·complexity 검증 통과.
+
+
+## 2026-10-23 통합·배포 종료 기록
+
+- [PR #748](https://github.com/Renagang21/o4o-platform/pull/748) main 병합 완료. 기능 main SHA: `2b66fcda1b6e3a55e16898bf2265c78b57314a6b`.
+- 최신 PR HEAD `a96ff912dd82db2249a0ca16f74666380377b5a2` CI Gate·CodeQL·SonarCloud 통과, 병합 직전 미해결 리뷰 스레드0.
+- 병합 후 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/39928263916) 통과.
+- 기존 serving `e20c00f4531473cf110a44a8d6af3b6ff9ed16b6`부터 새 SHA까지 schema/bootstrap/incremental/migration 변경0을 확인했다. 새 일일 작업의 DB write 때문에 LEVEL3으로 판정되어 사용자 지시에 따라 기존 Promote를 API/Neture로 한정해 실행했다. freeze·CI·권한 gate를 우회하지 않았다.
+- [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39929852017) 성공. API 성공 뒤 Neture를 배포했으며 최종 serving SHA 검증 및 commit status `production = success`, `DEPLOYED · deploy: api,neture`를 확인했다.
+- 실제 `community.neture.co.kr` 첫 화면/새 JavaScript의 `news-collection` 코드 제공, 공개 홈 API의 공지·뉴스·포럼·콘텐츠·자료실 응답 구조, 뉴스 수집/AI 결과 운영 endpoint의 비로그인401을 확인했다. 운영 데이터·본문·계정 정보는 보고/문서에 복제하지 않았다.
+- 운영자는 `/operator/communities/home`의 ‘약업계 주요 소식’에서 수집 결과와 AI 초안을 검토한 뒤 저장·게시한다. 이번 공개 smoke는 실제 Google 운영자 세션이나 유료 모델 시험 호출을 포함하지 않는다. 공개 지정·게시를 자동 수행하지 않는 정책과 서비스 가동 시 일일 실행 조건을 유지한다.
+- 이 종료 기록은 문서-only이며 `DEPLOYMENT=NOT_APPLICABLE`이다. 앱 재배포나 새 운영 데이터 변경을 요구하지 않는다.
+
+문서 정합: 최초 수집 차단·중간 보류 기록은 당시 이력으로 유지하고, 현재 구현·검증·main 및 운영 반영 완료 근거를 이 절에 확정했다.
