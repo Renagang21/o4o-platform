@@ -55,6 +55,32 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     await fixture.ds.query('UPDATE neture_suppliers SET base_shipping_fee=3000,free_shipping_threshold=50000');
     await fixture.ds.query('UPDATE organization_members SET left_at=NULL');
   });
+  it('replays simultaneous requests once and preserves ended proposals on retry', async () => {
+    const requestId=randomUUID();
+    const results=await Promise.all(Array.from({length:4},()=>create(sf.key,{requestId})));
+    expect(new Set(results.map(p=>p.id))).toEqual(new Set([requestId]));
+    expect(results.filter(p=>!p.reused)).toHaveLength(1);
+    expect((await service.supplierList(supplier))).toHaveLength(1);
+    await service.supplierEnd(supplier,requestId,requester);
+    await fixture.ds.query("UPDATE semi_franchises SET status='closed' WHERE id=$1",[sf.id]);
+    try { expect(await create(sf.key,{requestId})).toMatchObject({id:requestId,status:'ended',reused:true}); }
+    finally { await fixture.ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[sf.id]); }
+  });
+  it('rejects reused IDs with changed conditions, requester or supplier without exposing the record',async()=>{
+    const requestId=randomUUID();await create(sf.key,{requestId});
+    for(const extra of [{unitPrice:1001},{note:'changed'},{terms:{...terms,baseShippingFee:0}},{semiFranchiseKey:other.key},{targetOrganizationId:buyerOrg}]) {
+      await expect(create(sf.key,{requestId,...extra})).rejects.toMatchObject({httpStatus:409,code:'PROPOSAL_REQUEST_CONFLICT'});
+    }
+    const input={requestId,offerId:offer,semiFranchiseKey:sf.key,unitPrice:1000,terms};
+    await expect(service.supplierCreate(supplier,operator,input)).rejects.toMatchObject({httpStatus:409});
+    await expect(service.supplierCreate(randomUUID(),requester,input)).rejects.toMatchObject({httpStatus:409});
+    expect((await service.supplierList(supplier))).toHaveLength(1);
+  });
+  it('allows independently requested identical offers and rejects malformed retry IDs',async()=>{
+    await create(sf.key,{requestId:randomUUID()});await create(sf.key,{requestId:randomUUID()});
+    expect((await service.supplierList(supplier))).toHaveLength(2);
+    await expect(create(sf.key,{requestId:'bad'})).rejects.toMatchObject({httpStatus:400,code:'INVALID_REQUEST_ID'});
+  });
   it('captures legacy API defaults at request time, independent of later supplier changes',async()=>{
     const p=await create(sf.key,{terms:undefined});
     await fixture.ds.query('UPDATE neture_suppliers SET base_shipping_fee=9000,free_shipping_threshold=NULL');
@@ -62,19 +88,19 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     await service.operatorDecide(sf,operator,p.id,'approve');
     expect(await getSupplyOption(fixture.ds,buyerOrg,'proposal',p.id)).toMatchObject({baseShippingFee:3000,freeShippingThreshold:50000});
   });
-  it('keeps independent business terms and requires the designated pharmacy to belong to that business',async()=>{
+  it('keeps independent business terms without requiring target business membership at request or approval',async()=>{
     await fixture.ds.query('DELETE FROM semi_franchise_memberships WHERE semi_franchise_id=$1',[other.id]);
-    const a=await create();
     try {
-      await expect(create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}})).rejects.toMatchObject({code:'TARGET_MEMBERSHIP_REQUIRED'});
-      expect(await fixture.ds.query('SELECT id FROM supply_proposals WHERE semi_franchise_id=$1',[other.id])).toEqual([]);
+      const a=await create();
+      const b=await create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}});
+      await service.operatorDecide(other,operator,b.id,'approve');
+      const rows=await service.supplierList(supplier);
+      expect(rows.find(r=>r.id===a.id).termsSnapshot.baseShippingFee).toBe(2000);
+      expect(rows.find(r=>r.id===b.id)).toMatchObject({status:'approved',termsSnapshot:{baseShippingFee:0}});
+      expect(await getSupplyOption(fixture.ds,buyerOrg,'proposal',b.id)).toBeNull();
     } finally {
       await fixture.ds.query(`INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status) VALUES ($1,$2,'active')`,[other.id,buyerOrg]);
     }
-    const b=await create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}});
-    const rows=await service.supplierList(supplier);
-    expect(rows.find(r=>r.id===a.id).termsSnapshot.baseShippingFee).toBe(2000);
-    expect(rows.find(r=>r.id===b.id).termsSnapshot.baseShippingFee).toBe(0);
   });
   it.each([['requester',requester],['canonical owner',owner],['legacy owner',legacy]])('blocks self approval by %s',async(_label,actor)=>{
     const p=await create();await expect(service.operatorDecide(sf,actor,p.id,'approve')).rejects.toMatchObject({code:'SELF_APPROVAL_FORBIDDEN'});

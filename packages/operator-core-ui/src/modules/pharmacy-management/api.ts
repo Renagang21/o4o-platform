@@ -279,6 +279,8 @@ export const neturePharmacySupplierApi = {
 
   listProposals: () => get<SupplyProposal[]>('/neture/supplier/supply-proposals'),
   createProposal: (input: {
+    /** Stable UUID for an unchanged draft; replay returns the existing proposal. */
+    requestId?: string;
     offerId: string;
     semiFranchiseKey: string;
     targetOrganizationId?: string;

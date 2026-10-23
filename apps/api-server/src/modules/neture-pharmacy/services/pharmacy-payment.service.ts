@@ -10,7 +10,7 @@
  */
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { assertPaymentStoreAccess, assertPaymentSupplyAccess } from './pharmacy-payment-access.js';
+import { assertPaymentStoreAccess } from './pharmacy-payment-access.js';
 import {
   NETURE_PHARMACY_PAYMENT_SOURCE,
   NETURE_PHARMACY_SERVICE_KEY,
@@ -112,7 +112,6 @@ export class PharmacyPaymentService {
       await this.lockGroup(m, paymentGroupId);
       const { targets, amount, receiverKey } = this.payable(await this.groupOrders(m, buyerId, organizationId, paymentGroupId));
       await assertPaymentStoreAccess(m, buyerId, organizationId);
-      await assertPaymentSupplyAccess(m, organizationId, targets);
       const orderIds = targets.map((o) => o.id).sort(byId);
 
       // 같은 묶음 · 같은 주문 · 같은 금액의 준비된 결제가 있으면 재사용(중복 준비 방지). 다르면 닫고 새로 만든다.
@@ -183,7 +182,6 @@ export class PharmacyPaymentService {
       }
 
       const { targets, amount } = this.payable(orders);
-      await assertPaymentSupplyAccess(m, organizationId, targets);
       const currentIds = targets.map((o) => o.id).sort(byId);
       // 금액 · 대상 주문이 준비 시점과 같아야 한다(그 사이 취소 · 변경되면 다시 준비).
       if (Math.round(Number(payment.amount)) !== amount || JSON.stringify(currentIds) !== JSON.stringify(orderIds)) {
