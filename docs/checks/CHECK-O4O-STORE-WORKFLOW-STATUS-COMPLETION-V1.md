@@ -1,9 +1,9 @@
 # 내 매장 일상 업무·대시보드 상태 보완 검증
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (한국시간)
-> **개발 검증**: LOCAL_VALIDATED (최신 main 결합 검증 포함) · **main/운영 반영**: 미실행
-> **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 사용자 종료점 commit·push, PR 제외
+> **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (한국시간)
+> **개발 검증**: LOCAL_VALIDATED (2026-10-22) · **main/운영 반영**: 2026-10-23 통합 진행 중
+> **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 최초 개발 push 완료, 사용자 후속 지시로 PR·main 병합·배포 진행
 > **기준**: 시작 main `3917a9522d` · 최신 결합 main `7dc02646da` · branch `wo/store-workflow-status-completion`
 > **정본**: [약국 매장 설계 §6-1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#6-1-내-매장-운영-화면과-업무-흐름-2026-10-09)
 
@@ -87,3 +87,11 @@ KPA 기존 홈/wrapper는 이 최신 main에서 제거됐다. 앞선 역방향 �
 실제 계정·DB·기기·운영 변경 및 AI 이력 계약은 계속 미실행 범위다. PR·PR CI·main 병합·배포도 미실행이다. 후속 결합과 검증 기록 `0b0fa24eb23dc46318a693af529b2a4b3ff1347b`를 동일 branch에 push하고 원격 HEAD 일치·clean을 확인했다. TODO 완료 상태 기록도 같은 branch에 push하며 최종 제출 HEAD는 완료 보고에서 인계한다. worktree는 통합 검토/수정 재현을 위해 KEEP한다.
 
 문서 정합(동일 WO 후속): TODO·CHECK 2개에 최신 main 결합 기준·현행 소비처·재검증 결과를 맞췄다. 기존 설계 계약은 유지하며 별도 정책·정본 색인 변경은 없다.
+
+## 통합·배포 후속 — 2026-10-23
+
+사용자가 이 공간에 main 병합·배포를 지시했다. 원격 개발 HEAD `46a6dec358`·clean·기존 PR 없음과 실제 ruleset(PR 필수·`CI Gate`·필수 승인 0)을 확인했다. 진행 중 배포는 없으며 최신 main `cd091bc221`의 production status는 성공이다.
+
+최신 main의 변경 260개 경로와 기존 개발 26개 경로를 대조했다. 겹치는 QR 안내 링크 제거와 약국 설계 문서는 일반 merge `eb9a77b3bb`에서 충돌 없이 보존했다. main에 이미 반영된 외부 AI·인증·사업 독립 변경을 되돌리지 않는다. 이번 main 대비 변경에는 migration·의존성·workflow가 없다. 앞선 CHECK의 미반영 표기는 각 개발 종료 시점의 기록이며 현재 통합 결과는 이 절에 추가한다.
+
+결합 상태 검증·CI/리뷰·병합·배포·미검증 경계는 실제 실행 후 기록한다. 기존 실계정·운영 업무 데이터·기기 검증 제한은 유지한다.
