@@ -64,7 +64,7 @@ export function decodeOriginalName(name: string): string {
   // 이미 유니코드 한글(AC00-D7AF, 1100-11FF, 3130-318F)이 포함돼 있으면 올바른 상태
   if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(name)) return name;
   // 비ASCII 바이트가 있을 때만 재해석 시도
-  if (/[^\x00-\x7F]/.test(name)) {
+  if (/[\u0080-\uFFFF]/.test(name)) {
     const decoded = Buffer.from(name, 'latin1').toString('utf8');
     if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(decoded)) return decoded;
   }

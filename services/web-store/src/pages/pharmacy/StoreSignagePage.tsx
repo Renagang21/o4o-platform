@@ -38,7 +38,6 @@ import { useState, useEffect, useCallback, useMemo, useRef, useId } from 'react'
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  GuideBackLink,
   // WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B: 공통 사이니지 순수 로직
   SIGNAGE_DAY_LABELS as DAY_LABELS,
   formatSignageDate as formatDate,
@@ -536,7 +535,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           </div>
           <h1 className="text-2xl font-bold text-slate-900">디지털사이니지 운영</h1>
           <p className="text-sm text-slate-500 mt-1">안내 자료를 재생목록으로 묶고 보여줄 시간을 정합니다. 아래 현황은 저장된 일정 기준이며 실제 기기 재생 확인은 별도입니다.</p>
-          <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="디지털사이니지 운영 방법" /></div>
         </div>
         <div className="flex gap-2">
           <button

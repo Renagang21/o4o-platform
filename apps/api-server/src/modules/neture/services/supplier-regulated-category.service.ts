@@ -29,7 +29,7 @@ const SUPPLIER_REMOVABLE_STATUSES: RegulatedCategoryStatus[] = ['not_requested',
 
 function decodeOriginalName(name: string): string {
   if (/[ᄀ-ᇿ㄰-㆏가-힯]/.test(name)) return name;
-  if (/[^\x00-\x7F]/.test(name)) {
+  if (/[\u0080-\uFFFF]/.test(name)) {
     const decoded = Buffer.from(name, 'latin1').toString('utf8');
     if (/[ᄀ-ᇿ㄰-㆏가-힯]/.test(decoded)) return decoded;
   }

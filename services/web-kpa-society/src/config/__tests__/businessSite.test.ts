@@ -3,7 +3,7 @@ import { resolveBusinessSite } from "../businessSite";
 it("reuses the pharmacy application for megapharm without requiring pharmacy business membership", () => {
   expect(resolveBusinessSite("pharmacy.neture.co.kr")).toMatchObject({
     key: "pharmacy",
-    authServiceKey: "kpa-society",
+    authServiceKey: "neture",
   });
   expect(resolveBusinessSite("megapharm.neture.co.kr")).toMatchObject({
     key: "megapharm",

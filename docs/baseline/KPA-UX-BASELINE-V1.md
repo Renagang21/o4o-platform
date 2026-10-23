@@ -5,6 +5,8 @@
 > **Date: 2026-02-17**
 > **WO: WO-O4O-KPA-UX-BASELINE-FREEZE-V1**
 
+> **부분 대체 (2026-10-22 · 사용자 결정 D7, [WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)):** KPA-a/b/c 옛 단일 도메인 구조는 은퇴했고(2026-10-20), 옛 KPA 운영 · 관리 화면과 그 화면만 쓰던 API(`/kpa/operator` summary · actions · approvals · contact-requests · ai · audit-logs · resources 등, 단계 4-a 6항)는 소비처 0 으로 제거됐다. 아래 "API 계약 변경 금지" 는 제거된 면에는 적용되지 않는다. 본문은 이력으로 보존한다.
+
 ---
 
 ## 1. Purpose

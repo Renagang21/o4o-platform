@@ -697,26 +697,15 @@ describe('Static regression guards', () => {
     }
   });
 
-  it('KPA forum mount 는 pin route 를 remount 한다 (프런트 계약 정합)', () => {
+  it('KPA 전용 forum · home forum mount 는 제거됐다 (WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a, 소비처 0)', () => {
     const kpa = read('routes/kpa/kpa.routes.ts');
-    expect(kpa).toContain("forumRouter.patch('/posts/:id/pin'");
-  });
-
-  it('legacy KPA reads and home Forum summaries use independent community approval', () => {
-    const kpa = read('routes/kpa/kpa.routes.ts');
-    expect(kpa.indexOf('forumRouter.use(pharmacyWrite);')).toBeLessThan(kpa.indexOf("forumRouter.get('/posts'"));
-    expect(kpa).toContain('forumRouter.use(pharmacyWrite);');
-    for (const route of ['/community', '/forum-hub', '/forum/:slug', '/forum/:slug/posts', '/forum-activity']) {
-      expect(kpa).toContain(`homeRouter.get('${route}', optionalAuth, pharmacyWrite,`);
-    }
-    expect(kpa).toContain("await resolveCommunityWorkspace(dataSource, user, 'pharmacy')");
-    expect(kpa).toContain('if (mayReadForum) {');
+    expect(kpa).not.toContain('forumRouter');
+    expect(kpa).not.toContain('homeRouter');
+    expect(kpa).not.toContain("router.use('/forum'");
     expect(read('routes/neture/controllers/neture.controller.ts')).toContain("router.get('/home/forum', optionalAuth, requireCommunityAccess('o4o-general'),");
   });
 
   it('서비스 forum mount 는 forumContextMiddleware 계약을 유지한다', () => {
-    const kpa = read('routes/kpa/kpa.routes.ts');
-    expect(kpa).toContain('forumContextMiddleware({');
     const serviceForum = read('routes/forum/service-forum.routes.ts');
     expect(serviceForum).toContain('createServiceForumRouter');
   });

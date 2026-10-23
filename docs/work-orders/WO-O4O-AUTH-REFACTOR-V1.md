@@ -1,6 +1,10 @@
 # WO-O4O-AUTH-REFACTOR-V1
 
 > **상태**: ACTIVE · **작성일**: 2026-10-08
+
+> **2026-10-22 후속**: 사용자 잔여 조사·수정·검증·push 지시에 따른 토큰 수명·분회 가입 동시성·Google 시도 제한 보완은
+> [별도 TODO](TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1.md)에 기록한다. 기존 단계별 완료와 날짜별 실패는 당시 기록으로 보존한다.
+> 이번 소스의 main 통합·운영 배포, 실제 OAuth·일반 상태별 계정·시행일 정책 검증 완료를 뜻하지 않는다.
 > **근거**: 사용자 기획 검토 및 단계별 구현·push 승인
 > **정책 정본**: [인증·서비스 가입](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [Identity V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md), [Demo 계정](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)
 

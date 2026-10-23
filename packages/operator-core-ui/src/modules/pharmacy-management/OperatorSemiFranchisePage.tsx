@@ -1,3 +1,4 @@
+import { BusinessOperationsPanel } from './BusinessOperationsPanel';
 import { BusinessHomeShowcaseManager } from './BusinessHomeShowcaseManager';
 import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
 /**
@@ -109,6 +110,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
 
       {contactUrl && <a className="text-blue-700 underline" href={contactUrl}>이 사업 문의 관리</a>}
       <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
+      <BusinessOperationsPanel key={`operations:${sfKey}`} businessKey={sfKey} />
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.filter(t => !tabs || tabs.includes(t.key)).map((t) => (
@@ -177,6 +179,12 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
                       <div className="font-medium text-gray-900">{m.organizationName || '-'}</div>
                       {m.application?.note && <p className="text-xs whitespace-pre-wrap">신청 내용: {m.application.note}</p>}
                       {m.application?.conditions && <p className="text-xs whitespace-pre-wrap">신청 시 가입 조건: {m.application.conditions}</p>}
+                      {!!m.application?.applicationPolicies?.length && <details className="mt-2 text-xs">
+                        <summary>신청 시 약관 · 개인정보 확인 기록</summary>
+                        <ul className="mt-2 space-y-1">{m.application.applicationPolicies.map(policy => <li key={policy.policyDocumentId} className="break-all">
+                          {policy.serviceKey} · {policy.documentType === 'terms' ? '이용약관 동의' : '개인정보 안내 확인'} · 버전 {policy.version}<br />문서 {policy.policyDocumentId}<br />본문 확인값 {policy.contentHash}
+                        </li>)}</ul>
+                      </details>}
                       {m.organizationAddress && <div className="text-xs text-gray-500">{m.organizationAddress}</div>}
                     </td>
                     <td className={TD}>{m.businessNumber || '-'}</td>

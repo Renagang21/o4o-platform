@@ -321,11 +321,11 @@ describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Supplier → Service Operator 수신함 (WO §12)', () => {
-  it('제공 대상 2 서비스 모두 운영자 진입이 있다: KPA=/operator/approvals(자체 승인) · PH=/operator/supplier-contents(공통 inbox) — K-Cos 는 운영 종료로 제외', () => {
+  it('수신(승인) 화면이 없는 서비스는 제공 대상이 아니다 — 현재 대상 0 (K-Cos · PH 운영 종료, KPA 수신 화면 제거)', () => {
     const targets = listSupplierContentHandoffTargets().map((t) => t.key).sort();
-    expect(targets).toEqual(['kpa-society']);
+    expect(targets).toEqual([]);
     // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 /operator/approvals 화면은 제거됐다.
-    //   수신 화면은 pharmacy.neture.co.kr 에 새로 만든다(미해결 — backend 대상 목록은 별도 WO).
+    //   수신 화면을 pharmacy.neture.co.kr 에 새로 만들 때 RECEIVER_UNAVAILABLE 에서 뺀다.
   });
 
   it('공통 inbox 는 serviceKey 경계 + authorRole=supplier 로만 읽고, 기존 CMS 상태 전이만 호출한다 (새 원장 · workflow 0)', () => {

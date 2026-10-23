@@ -12,6 +12,10 @@
  *   3. `workspace.workspaceMode === 'standard'` — 매장 사업 서비스(Store Workspace 보유)여야 제공 경로가 성립한다.
  *      · `neture`(special) 는 공급자 자신의 서비스이므로 제외.
  *      · `kpa-branch`(none) · `cafe24-b2b`(undecided) 는 자동 제외 — 임의 포함 금지 (WO §10).
+ *   4. 제공된 콘텐츠를 검토·승인할 수신 화면이 있어야 한다 — `RECEIVER_UNAVAILABLE` 에 있으면 제외.
+ *      · `kpa-society`(pharmacy.neture.co.kr): 옛 KPA 운영 화면(/operator/approvals) 제거로 승인 화면이 없다
+ *        (WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7). 제공하면 pending 으로 영구 정체되므로
+ *        수신 화면을 새로 만들 때까지 대상에서 뺀다.
  *
  * 이 파일은 서비스를 하드코딩하지 않는다. 카탈로그 metadata 가 바뀌면 대상도 함께 바뀐다.
  *
@@ -36,8 +40,12 @@ const CMS_SERVICE_KEY_OVERRIDE: Readonly<Record<string, string>> = Object.freeze
   'kpa-society': 'kpa',
 });
 
+/** 수신(검토·승인) 화면이 아직 없는 서비스 — 규칙 4 */
+const RECEIVER_UNAVAILABLE: ReadonlySet<string> = new Set(['kpa-society']);
+
 export function isSupplierContentHandoffTarget(service: O4OService | undefined): boolean {
   if (!service) return false;
+  if (RECEIVER_UNAVAILABLE.has(service.key)) return false;
   const ws = service.workspace;
   return ws.operatorWorkspaceEnabled === true && ws.workspaceMode === 'standard';
 }

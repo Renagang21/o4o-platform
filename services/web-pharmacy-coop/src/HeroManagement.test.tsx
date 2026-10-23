@@ -109,14 +109,14 @@ it.each([local, federation, anonymousSession])(
   async (session) => {
     const { client } = open("/beta/operator/home-presentation", session);
     expect(screen.getByText("이 조합의 운영 권한이 필요합니다.")).toBeTruthy();
-    await waitFor(() =>
-      expect(client.get).toHaveBeenCalledWith(
-        "/home-presentation/cooperative/beta",
+    expect(
+      client.get.mock.calls.every(([p]) => p.startsWith("/operator-inbox/") || p === "/notifications/unread-count?serviceKey=pharmcoop" || p.endsWith("/footer-legal")),
+    ).toBe(true);
+    expect(
+      client.get.mock.calls.some(
+        ([p]) => p.startsWith("/home-presentation/") && p.endsWith("/manage"),
       ),
-    );
-    expect(client.get.mock.calls.some(([p]) => p.startsWith("/home-presentation/") && p.endsWith("/manage"))).toBe(
-      false,
-    );
+    ).toBe(false);
     expect(client.put).not.toHaveBeenCalled();
   },
 );
@@ -134,7 +134,11 @@ it("연합회 operator는 연합회 Hero 관리에 진입한다", async () => {
 it("조합 operator 역할만으로 연합회 Hero에 접근할 수 없다", () => {
   const { client } = open("/operator/home-presentation", local);
   expect(screen.getByText("연합회 운영 권한이 필요합니다.")).toBeTruthy();
-  expect(client.get.mock.calls.every(([path])=>path === "/notifications/unread-count?serviceKey=pharmcoop")).toBe(true);
+  expect(
+    client.get.mock.calls.every(
+      ([path]) => path === "/notifications/unread-count?serviceKey=pharmcoop",
+    ),
+  ).toBe(true);
 });
 it.each([
   ["/operator", federation, "/operator/home-presentation"],
@@ -144,7 +148,7 @@ it.each([
   (path, session, target) => {
     open(path, session);
     expect(
-      screen.getByRole("link", { name: "Hero 관리" }).getAttribute("href"),
+      screen.getByRole("link", { name: "홈 화면 편집" }).getAttribute("href"),
     ).toBe(target);
   },
 );

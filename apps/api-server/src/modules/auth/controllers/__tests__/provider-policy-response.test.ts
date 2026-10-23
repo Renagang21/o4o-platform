@@ -28,8 +28,8 @@ import { policyAcceptanceService } from '../../../policy-acceptance/policy-accep
 
 const handlers = [EmailAuthController.login, GoogleAuthController.login, GoogleAuthController.signup, SocialAuthController.completeLogin, SocialAuthController.signup];
 beforeEach(() => { mockDemo = false; jest.clearAllMocks(); });
-it.each(handlers)('이메일/Google/Kakao 로그인·가입 응답은 origin의 세션 범위를 적용하고 body의 서비스 선택으로 바꾸지 않는다: %p', async handler => {
-  const req: any = { body: { idToken: 'fixture', token: 'fixture', code: 'fixture', serviceKey: 'kpa-society', consents: {} }, ip: '127.0.0.1', headers: {}, get: (name: string) => name === 'origin' ? 'https://neture.co.kr' : 'api.neture.co.kr' };
+it.each(handlers.flatMap(handler => ['https://neture.co.kr', 'https://pharmacy.neture.co.kr'].map(origin => [handler, origin] as const)))('이메일/Google/Kakao 로그인·가입 응답은 origin의 세션 범위를 적용하고 body의 서비스 선택으로 바꾸지 않는다: %p %s', async (handler, origin) => {
+  const req: any = { body: { idToken: 'fixture', token: 'fixture', code: 'fixture', serviceKey: 'kpa-society', consents: {} }, ip: '127.0.0.1', headers: {}, get: (name: string) => name === 'origin' ? origin : 'api.neture.co.kr' };
   const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis() };
   await handler(req, res);
   expect(policyAcceptanceService.getEnforcedPendingForUser).toHaveBeenCalledWith('synthetic-user', 'neture');
@@ -41,7 +41,7 @@ it.each(handlers)('Demo 예외도 같은 provider 세션 응답 판정을 따른
   const req: any = { body: { idToken: 'fixture', token: 'fixture', code: 'fixture', consents: {} }, ip: '127.0.0.1', headers: {}, get: (name: string) => name === 'origin' ? 'https://pharmacy.neture.co.kr' : 'api.neture.co.kr' };
   const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis() };
   await handler(req, res);
-  expect(policyAcceptanceService.getEnforcedPendingForUser).toHaveBeenCalledWith('synthetic-user', 'kpa-society');
+  expect(policyAcceptanceService.getEnforcedPendingForUser).toHaveBeenCalledWith('synthetic-user', 'neture');
   expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ user: expect.objectContaining({ pendingPolicyAcceptances: [] }) }) }));
 });
 

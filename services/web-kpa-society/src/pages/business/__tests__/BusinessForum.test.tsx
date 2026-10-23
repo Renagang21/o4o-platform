@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
-const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn() }));
+const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner' } }), authClient: { api: transport } }));
 vi.mock('@o4o/shared-space-ui', async importOriginal => ({
   ...await importOriginal<typeof import('@o4o/shared-space-ui')>(),
@@ -65,4 +65,14 @@ it.each([false, true])('일반 참여자는 공지 상태를 변경할 수 없�
   mount('post', '/community/post/notice'); await screen.findByText('사업 안내');
   expect(screen.queryByRole('button', { name: /공지 해제|공지로 고정/ })).toBeNull();
   expect(transport.patch).not.toHaveBeenCalled();
+});
+
+it('외부 AI가 저장한 초안은 사용자 제출 시 기존 글을 게시하고 새 글을 중복 생성하지 않는다', async () => {
+  transport.get.mockImplementation(async (path: string) => ({ data: { data: path.endsWith('/categories') ? [] : { id: 'draft', slug: 'draft-slug', title: '비공개 글', content: '<p>검토 본문</p>', status: 'draft', authorId: 'owner' } } }));
+  transport.put.mockResolvedValue({ data: { data: {} } });
+  mount('write', '/community?edit=draft');
+  const button = await screen.findByRole('button', { name: '작성 완료' });
+  expect(transport.put).not.toHaveBeenCalled(); fireEvent.click(button);
+  await waitFor(() => expect(transport.put).toHaveBeenCalledWith('/communities/business-only/forum/posts/draft', expect.objectContaining({ status: 'publish' })));
+  expect(transport.post).not.toHaveBeenCalled();
 });

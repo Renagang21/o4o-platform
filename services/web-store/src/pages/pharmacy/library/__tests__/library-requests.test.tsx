@@ -125,20 +125,20 @@ it('never loads or mutates without an active store', async () => {
 });
 it('usage summary completes instead of cancelling itself on its pending state update', async () => {
   const { result, rerender } = renderHook(() => useContentUsage(['direct', 'direct']));
-  await waitFor(() => expect(result.current.direct?.usage.qr).toBe(2));
+  await waitFor(() => expect(result.current.values.direct?.usage.qr).toBe(2));
   rerender(); expect(api.usage).toHaveBeenCalledOnce();
 });
 it('usage summary ignores old document responses after changing the target', async () => {
   const pending = deferred<{ success: boolean; data: { usage: { qr: number } } }>(); api.usage.mockReturnValueOnce(pending.promise);
   const { result, rerender } = renderHook(({ ids }) => useContentUsage(ids), { initialProps: { ids: ['old'] } });
-  rerender({ ids: ['new'] }); await waitFor(() => expect(result.current.new?.usage.qr).toBe(2));
+  rerender({ ids: ['new'] }); await waitFor(() => expect(result.current.values.new?.usage.qr).toBe(2));
   await act(async () => { pending.resolve({ success: true, data: { usage: { qr: 99 } } }); await pending.promise; });
-  expect(result.current.old).toBeUndefined();
+  expect(result.current.values.old).toBeUndefined();
 });
 it('failed usage remains optional and never blocks the library', async () => {
   api.usage.mockResolvedValue({ success: false, data: { usage: { qr: 99 } } });
   const { result } = renderHook(() => useContentUsage(['direct']));
-  await waitFor(() => expect(result.current.direct).toBeNull());
+  await waitFor(() => expect(result.current.values.direct).toBeNull());
 });
 
 it('snapshot display metadata rejects objects and unknown resource kinds without losing its copied body', async () => {

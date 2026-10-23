@@ -42,8 +42,8 @@ export function AppRoutes() {
     //   ⚠ 공용 자산은 건드리지 않는다:
     //     - `@o4o/forum-core` 패키지(admin-ui 포함) 와 `packages/forum-core/src/index.ts`
     //       재수출은 그대로 둔다. 공용 모듈이며 이 WO 의 범위가 아니다.
-    //     - 백엔드 `/api/v1/forum` · `/api/v1/kpa/forum` 도 그대로 둔다 —
-    //       서비스 프런트가 실사용 중이다.
+    //     - 백엔드 `/api/v1/forum` 도 그대로 둔다 — 서비스 프런트가 실사용 중이다.
+    //       (`/api/v1/kpa/forum` 은 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 소비처 0 으로 제거.)
     //     - (후속) `components/routing/ViewComponentRegistry.ts` 는 WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1
     //       에서 DEAD_ABSTRACTION 으로 디렉터리째 제거됐다.
 
@@ -55,7 +55,7 @@ export function AppRoutes() {
     //   백엔드 라우트(`createRoutes`)와 호출 대상 API(`/yaksa/forum/communities/*`) 도
     //   구현이 존재하지 않았다 — 상세 근거는
     //   docs/checks/WO-O4O-FORUM-YAKSA-AND-LEGACY-BUILD-TEST-RESIDUE-BOUNDARY-AUDIT-V1-CHECK.md
-    //   현재 운영 중인 공용 포럼(/forum 계열, /api/v1/forum · /api/v1/kpa/forum)은 영향 없음.
+    //   현재 운영 중인 공용 포럼(/forum 계열, /api/v1/forum)은 영향 없음.
 
     // Pharmacy AI Insight - 약사 전용 AI 인사이트 (Phase 5)
     <Route key="/pharmacy-ai-insight" path="/pharmacy-ai-insight" element={

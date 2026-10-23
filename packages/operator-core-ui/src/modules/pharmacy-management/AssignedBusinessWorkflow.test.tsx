@@ -124,3 +124,11 @@ it('restricts cooperative tabs even on a direct membership URL and keeps its own
   await waitFor(() => expect(api.listContents).toHaveBeenCalledWith('pharmacy', 'all'));
   expect(screen.getByRole('link', { name: '콘텐츠 작성' }).getAttribute('href')).toBe('/test/operator/contents/new');
 });
+
+it('shows the policy version/hash attached to the application being reviewed', async () => {
+ api.listAssignedSemiFranchises.mockResolvedValue([{key:'carepharm',name:'Care fixture',status:'active'}]);
+ api.listSfMemberships.mockResolvedValue([{id:'application',organizationName:'Fixture pharmacy',status:'pending',application:{conditions:'Original conditions',applicationPolicies:[{serviceKey:'carepharm',documentType:'terms',policyDocumentId:'document-a',version:2,contentHash:'original-content-hash',acceptanceKind:'agreement'}]}}]);
+ render(<MemoryRouter><Page businessKey="carepharm" /></MemoryRouter>);
+ await screen.findByText('Fixture pharmacy');fireEvent.click(screen.getByText('신청 시 약관 · 개인정보 확인 기록'));
+ expect(screen.getByText(/버전 2/)).toBeTruthy();expect(screen.getByText(/original-content-hash/)).toBeTruthy();
+});

@@ -41,7 +41,7 @@ import {
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
-import { getActiveServiceKey } from '../../lib/serviceContext';
+import { getActiveServiceKey, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
 import { emptySnapshotDraft, loadSnapshot, saveSnapshot, snapshotDraftFromRecord } from './authoring/contentAuthoringAdapters';
 import type { UsageSettings, DisplayMode } from './authoring/contentAuthoringModels';
@@ -75,7 +75,8 @@ export default function StoreContentEditPage() {
   const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);
   const updateUsage = (patch: Partial<UsageSettings>) => session.changeDraft({ usage: { ...usage, ...patch } });
 
-  const publicUrl = snapshotId && orgId ? `${window.location.origin}/view/${snapshotId}?org=${orgId}` : '';
+  // 공개 보기(/view)는 store 호스트가 아니라 서비스 앱이 서빙한다 — 서비스 공개 origin 으로 만든다.
+  const publicUrl = snapshotId && orgId ? `${getActiveServicePublicOrigin()}/view/${snapshotId}?org=${orgId}` : '';
 
   if (loading) {
     return (
@@ -140,14 +141,15 @@ export default function StoreContentEditPage() {
           </div>
           <div className="flex items-center gap-2">
             {source === 'store' && orgId && (
-              <Link
-                to={`/view/${snapshotId}?org=${orgId}`}
+              <a
+                href={publicUrl}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
               >
                 <Eye className="w-4 h-4" />
                 공개 보기
-              </Link>
+              </a>
             )}
             <button
               onClick={handleSave}
