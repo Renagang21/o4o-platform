@@ -43,7 +43,7 @@ const codeOnly = (src: string) =>
     .join('\n');
 
 const APPROVAL = path.join(SRC, 'services', 'approval', 'MembershipApprovalService.ts');
-const KPA_MEMBER = path.join(SRC, 'routes', 'kpa', 'controllers', 'member.controller.ts');
+// KPA member.controller 는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 /kpa/members mount 와 함께 제거(소비처 0).
 const ADMIN_USER = path.join(SRC, 'controllers', 'admin', 'AdminUserController.ts');
 const PLATFORM_ACCOUNTS = path.join(SRC, 'routes', 'admin', 'platform-accounts.routes.ts');
 
@@ -52,7 +52,7 @@ const DEACTIVATE_SQL = /UPDATE\s+users\s+SET[^`]*status\s*=\s*'deleted'/i;
 
 describe('서비스 관계 종료는 전역 Identity 를 건드리지 않는다', () => {
   it('대상 파일이 실재한다 (guard 가 빈 집합으로 통과하지 않는다)', () => {
-    for (const f of [APPROVAL, KPA_MEMBER, ADMIN_USER, PLATFORM_ACCOUNTS]) {
+    for (const f of [APPROVAL, ADMIN_USER, PLATFORM_ACCOUNTS]) {
       expect({ f, exists: fs.existsSync(f) }).toEqual({ f, exists: true });
     }
   });
@@ -75,13 +75,6 @@ describe('서비스 관계 종료는 전역 Identity 를 건드리지 않는다'
       // membership 종료 자체는 그대로 살아 있어야 한다(기능을 지운 것이 아니다).
       expect(code).toMatch(/DELETE FROM service_memberships/);
       expect(code).toMatch(/UPDATE service_memberships SET status = 'withdrawn'/);
-    });
-
-    it('KPA member.controller — hard delete 에 없다', () => {
-      const code = codeOnly(read(KPA_MEMBER));
-      expect(DEACTIVATE_SQL.test(code)).toBe(false);
-      // KPA 관계 종료는 유지
-      expect(code).toMatch(/DELETE FROM role_assignments WHERE user_id = \$1 AND role LIKE 'kpa:%'/);
     });
 
     it('활성 runtime 전체에 membership 유래 users 비활성화가 없다', () => {

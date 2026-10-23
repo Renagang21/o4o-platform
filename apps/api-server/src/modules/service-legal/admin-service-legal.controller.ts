@@ -1,5 +1,7 @@
+import { isBusinessPolicyScope } from '../neture-pharmacy/services/business-policy-scope.js';
 import { readCurrentPolicyDocument } from '../policy-acceptance/policy-document-evidence.service.js';
 import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-policy.service.js';
+import { isBusinessPolicyScope } from '../neture-pharmacy/services/business-policy-scope.js';
 /**
  * Admin Service Legal Controller
  *
@@ -25,7 +27,7 @@ import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-
  */
 
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { ActionLogService } from '@o4o/action-log-core';
 import { authenticate } from '../../middleware/auth.middleware.js';
@@ -72,7 +74,7 @@ function normalizeStr(v: unknown): string | null {
   return s.length === 0 ? null : s;
 }
 
-export function createAdminServiceLegalController(dataSource: DataSource): Router {
+export function createAdminServiceLegalController(dataSource: DataSource, requireLegalScope: (level: 'admin' | 'operator') => RequestHandler = requireServiceLegalScope): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
@@ -97,7 +99,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/legal-profile',
     authenticate,
-    requireServiceLegalScope('operator', dataSource),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const profile = await profileRepo.findOne({ where: { service_key: req.params.serviceKey } });
@@ -112,7 +114,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.put(
     '/:serviceKey/legal-profile',
     authenticate,
-    requireServiceLegalScope('admin', dataSource),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -155,7 +157,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/policies',
     authenticate,
-    requireServiceLegalScope('operator', dataSource),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const where: any = { service_key: req.params.serviceKey };
@@ -176,7 +178,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.get(
     '/:serviceKey/policies/:id',
     authenticate,
-    requireServiceLegalScope('operator', dataSource),
+    requireLegalScope('operator'),
     async (req: Request, res: Response) => {
       try {
         const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey } });
@@ -194,7 +196,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.post(
     '/:serviceKey/policies',
     authenticate,
-    requireServiceLegalScope('admin', dataSource),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -212,19 +214,14 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
           error: { code: 'VALIDATION_ERROR', message: 'title 은 필수입니다.' },
         });
       }
-      const carePharmPolicy = serviceKey === 'carepharm' && ['terms', 'privacy'].includes(String(documentType));
-      const policySlug = carePharmPolicy ? `carepharm-service-${documentType}` : normalizeStr(slug);
-      if (carePharmPolicy && ((slug && slug !== policySlug) || (version !== undefined && (!Number.isInteger(version) || version < 2)))) {
-        return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'CarePharm 가입 약관은 지정 문서 유형과 버전 2 이상으로 등록하세요.' } });
-      }
       try {
         const doc = policyRepo.create({
           service_key: serviceKey,
           document_type: String(documentType),
           title: cleanTitle,
-          slug: policySlug,
+          slug: normalizeStr(slug),
           content: typeof content === 'string' ? content : '',
-          version: Number.isInteger(version) && version > 0 ? version : carePharmPolicy ? 2 : 1,
+          version: Number.isInteger(version) && version > 0 ? version : 1,
           status: 'draft',
           effective_date: effectiveDate ? new Date(effectiveDate) : null,
           change_reason: normalizeStr(changeReason),
@@ -250,7 +247,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.put(
     '/:serviceKey/policies/:id',
     authenticate,
-    requireServiceLegalScope('admin', dataSource),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -271,15 +268,15 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
           // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §5: published 문서 무결성.
           //   승낙 이력이 "어느 문서·본문에 동의했는가" 를 가리키므로 게시 중인 row 의 본문·버전·시행일·표식은
           //   덮어쓰지 않는다. 변경은 새 draft → 새 version → publish (구 published 는 draft 로 내려가 보존).
-          const acceptedCarePharm = serviceKey === 'carepharm' && (await manager.query('SELECT 1 FROM user_policy_acceptances WHERE policy_document_id=$1 LIMIT 1', [doc.id])).length > 0;
-          if (doc.status === 'published' || acceptedCarePharm) {
+          const acceptedBusinessPolicy = isBusinessPolicyScope(serviceKey) && (await manager.query('SELECT 1 FROM user_policy_acceptances WHERE policy_document_id=$1 LIMIT 1', [doc.id])).length > 0;
+          if (doc.status === 'published' || acceptedBusinessPolicy) {
             const toTime = (v: unknown) => (v ? new Date(v as string | Date).getTime() : null);
             const immutableTouched =
               (typeof content === 'string' && content !== doc.content)
               || (Number.isInteger(version) && version > 0 && version !== doc.version)
               || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date))
               || slugChanged;
-            if (immutableTouched || (acceptedCarePharm && title !== undefined && normalizeStr(title) !== doc.title)) {
+            if (immutableTouched || (acceptedBusinessPolicy && title !== undefined && normalizeStr(title) !== doc.title)) {
               throw new ServicePolicyLifecycleError('PUBLISHED_POLICY_IMMUTABLE', '게시 중인 문서의 본문·버전·시행일·표식은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.', 409);
             }
           }
@@ -330,7 +327,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.patch(
     '/:serviceKey/policies/:id/publish',
     authenticate,
-    requireServiceLegalScope('admin', dataSource),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
@@ -359,7 +356,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
               && (doc.version < 2 || !doc.effective_date)) {
               throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_NOT_READY', '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.', 400);
             }
-            if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < 2 || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '새 서비스 신청 정책은 새 버전과 확정된 시행일이 필요합니다.', 400);
+            if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < (isBusinessPolicyScope(doc.service_key) ? 1 : 2) || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '서비스 신청 정책은 유효한 버전과 확정된 시행일이 필요합니다.', 400);
             // Validate before demoting any published row; notice must not activate future terms.
             assertPolicyEffectiveForPublication(doc.effective_date);
             if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG) {
@@ -432,7 +429,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
   router.patch(
     '/:serviceKey/policies/:id/lifecycle',
     authenticate,
-    requireServiceLegalScope('admin', dataSource),
+    requireLegalScope('admin'),
     async (req: Request, res: Response) => {
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;

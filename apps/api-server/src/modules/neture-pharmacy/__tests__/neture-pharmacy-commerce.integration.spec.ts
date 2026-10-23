@@ -1,12 +1,13 @@
+import { businessOperationsRoutes } from '../business-operations.routes.js';
+import { businessPolicyScope } from '../services/business-policy-scope.js';
 import express from 'express';
 import request from 'supertest';
-import { createAdminServiceLegalController } from '../../service-legal/admin-service-legal.controller.js';
-import { createPublicServiceLegalController } from '../../service-legal/public-service-legal.controller.js';
 import { ServicePolicyDocument } from '../../service-legal/entities/ServicePolicyDocument.entity.js';
 import { ServiceLegalProfile } from '../../service-legal/entities/ServiceLegalProfile.entity.js';
 import { computePolicyContentHash } from '../../policy-acceptance/policy-acceptance.service.js';
 // Authentication is a test boundary; all business/role/policy authorization below uses the real database.
-jest.mock('../../../middleware/auth.middleware.js', () => ({ authenticate: (_req: unknown, _res: unknown, next: () => void) => next() }));
+jest.mock('../../../middleware/auth.middleware.js', () => ({ authenticate: (_req: unknown, _res: unknown, next: () => void) => next(), requireAuth: (req: any, res: any, next: () => void) => req.user ? next() : res.sendStatus(401) }));
+import { fixtureBusinessPolicies } from './fixtures/business-policies.js';
 import { eventIndexState, transitionEventIndex } from '../operations/event-index-transition.js';
 import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoard } from '../../../services/community/community-workspace.service.js';
 /**
@@ -134,7 +135,7 @@ async function approvedPharmacy() {
 
 async function joinSemiFranchise(orgId: string, owner: string, key: string, sfOperator: string) {
   const sf = (await sfs.getByKey(key))!;
-  const app = await sfs.apply(orgId, owner, key);
+  const app = await sfs.apply(orgId, owner, key, { policyReferences: await fixtureBusinessPolicies(ds, key) });
   await sfs.decideMembership(sf, sfOperator, app.id, 'approve');
   return app.id as string;
 }
@@ -238,7 +239,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const sf = await sfs.create({ key, name: 'Synthetic conditions', registrationConditions: 'Original condition' });
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key)).rejects.toMatchObject({ code: 'CONDITIONS_REQUIRED' });
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Stale condition' })).rejects.toMatchObject({ code: 'CONDITIONS_CHANGED' });
-      await sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Original condition', note: 'Synthetic note' });
+      await sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Original condition', note: 'Synthetic note', policyReferences: await fixtureBusinessPolicies(ds, key) });
       expect((await sfs.listMemberships(sf))[0].application).toMatchObject({ conditions: 'Original condition', accepted: true, note: 'Synthetic note' });
       await sfs.update(key, { registrationConditions: 'Updated condition' });
       expect((await sfs.getByKey(key))?.registration_conditions).toBe('Updated condition');
@@ -297,7 +298,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
     it('기본 승인은 세미프랜차이즈 가입을 자동 승인하지 않고, 비담당 운영자는 처리할 수 없다', async () => {
       const p = await approvedPharmacy();
-      const app = await sfs.apply(p.orgId, p.owner, 'pharmacy');
+      const app = await sfs.apply(p.orgId, p.owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
       expect(app.status).toBe('pending');
       const stranger = await user();
       await role(stranger, 'neture:operator');
@@ -339,7 +340,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_semi_franchise', pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: null });
 
       const sf = (await sfs.getByKey('pharmacy'))!;
-      const app = await sfs.apply(row.organization_id, owner, 'pharmacy');
+      const app = await sfs.apply(row.organization_id, owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'semi_franchise_pending', semiFranchiseMembershipStatus: 'pending' });
       await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve');
       expect(await access(owner)).toMatchObject({ allowed: true, next: null, pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'active' });
@@ -803,15 +804,17 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
   describe('CarePharm 가입 → 공급 승인 → 선택 약국 결제 경계', () => {
     let care: Awaited<ReturnType<SemiFranchiseService['getByKey']>>;
     let careOperator: string;
+    let scope: string;
     let references: Array<{ policyDocumentId: string; version: number; documentType: 'terms' | 'privacy' }>;
     beforeAll(async () => {
       careOperator = await user(); await role(careOperator, 'neture:carepharm_admin');
       await sfs.create({ key: 'carepharm', name: 'Synthetic Care business' });
       care = await sfs.getByKey('carepharm');
+      scope = businessPolicyScope(care!.id);
       references = [];
       for (const type of ['terms', 'privacy'] as const) {
         const [doc] = await ds.query(`INSERT INTO service_policy_documents(service_key,document_type,title,content,slug,version,status,effective_date,published_at)
-          VALUES('carepharm',$1,$2,$3,$4,2,'published',CURRENT_DATE,NOW()) RETURNING id`, [type,`Synthetic ${type}`,`Synthetic exact ${type} body`,`carepharm-service-${type}`]);
+          VALUES($5,$1,$2,$3,$4,2,'published',CURRENT_DATE,NOW()) RETURNING id`, [type,`Synthetic ${type}`,`Synthetic exact ${type} body`,`${scope}-service-${type}`,scope]);
         references.push({ policyDocumentId: doc.id, version: 2, documentType: type });
       }
     });
@@ -833,20 +836,20 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
     }
     it('requires CarePharm documents and never borrows pharmacy/another service consent', async () => {
       const pharmacy = await approvedPharmacy();
-      await ds.query("UPDATE service_policy_documents SET status='draft' WHERE service_key='carepharm'");
+      await ds.query("UPDATE service_policy_documents SET status='draft' WHERE service_key=$1",[scope]);
       try { await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm')).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE'); }
       finally { await ds.query("UPDATE service_policy_documents SET status='published' WHERE id=ANY($1::uuid[])", [references.map(r => r.policyDocumentId)]); }
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm')).rejects.toHaveProperty('code', 'ENROLLMENT_POLICY_REQUIRED');
       await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, 'carepharm', { policyReferences: references.map(r => ({ ...r, version: 1 })) })).rejects.toHaveProperty('code', 'POLICY_VERSION_MISMATCH');
       expect(await ds.query('SELECT 1 FROM semi_franchise_memberships WHERE semi_franchise_id=$1 AND organization_id=$2', [care!.id, pharmacy.orgId])).toEqual([]);
-      expect(await ds.query("SELECT 1 FROM user_policy_acceptances WHERE user_id=$1 AND service_key='carepharm'", [pharmacy.owner])).toEqual([]);
+      expect(await ds.query("SELECT 1 FROM user_policy_acceptances WHERE user_id=$1 AND service_key=$2", [pharmacy.owner,scope])).toEqual([]);
     });
     it('stores exact version/hash and application evidence without requiring pharmacy cooperation membership', async () => {
       const pharmacy = await member();
       const [stored] = await ds.query("SELECT metadata->'semiFranchiseApplications'->'carepharm' AS application FROM organizations WHERE id=$1", [pharmacy.orgId]);
-      expect(stored.application.applicationPolicies).toEqual(expect.arrayContaining([expect.objectContaining({ serviceKey: 'carepharm', version: 2, contentHash: computePolicyContentHash('Synthetic exact terms body'), acceptanceKind: 'agreement' })]));
+      expect(stored.application.applicationPolicies).toEqual(expect.arrayContaining([expect.objectContaining({ serviceKey: scope, version: 2, contentHash: computePolicyContentHash('Synthetic exact terms body'), acceptanceKind: 'agreement' })]));
       expect(await ds.query("SELECT 1 FROM semi_franchise_memberships sfm JOIN semi_franchises sf ON sf.id=sfm.semi_franchise_id WHERE sfm.organization_id=$1 AND sf.key='pharmacy'", [pharmacy.orgId])).toEqual([]);
-      expect((await ds.query("SELECT meta FROM action_logs WHERE user_id=$1 AND service_key='carepharm' AND action_key='service:application_policy'", [pharmacy.owner]))).toHaveLength(1);
+      expect((await ds.query("SELECT meta FROM action_logs WHERE user_id=$1 AND service_key=$2 AND action_key='service:application_policy'", [pharmacy.owner,scope]))).toHaveLength(1);
     });
     it.each([null, 'pending', 'rejected', 'suspended', 'terminated'])('rejects a designated pharmacy with CarePharm membership %s', async status => {
       const pharmacy = await approvedPharmacy(); const product = await supplierWithProduct({ price: 10000 });
@@ -952,8 +955,8 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
     it('uses real legal controllers and current business roles for policy publication and stale-form rejection', async () => {
       const legalDs=new DataSource({type:'postgres',url:DB_URL,entities:[ServicePolicyDocument,ServiceLegalProfile],synchronize:false});await legalDs.initialize();
       const app=express();app.use(express.json());app.use((req,_res,next)=>{(req as any).user={id:req.get('X-Fixture-Actor'),roles:['neture:carepharm_admin']};next();});
-      app.use('/admin/services',createAdminServiceLegalController(legalDs));app.use('/public/services',createPublicServiceLegalController(legalDs));
-      const endpoint='/admin/services/carepharm/policies';const other=await user();await role(other,'neture:megapharm_admin');
+      app.use('/neture',businessOperationsRoutes(legalDs));
+      const endpoint='/neture/operator/semi-franchises/carepharm/legal/policies';const other=await user();await role(other,'neture:megapharm_admin');
       const reader=await user();await role(reader,'neture:carepharm_operator');
       try {
         expect((await request(app).get(endpoint).set('X-Fixture-Actor',reader)).status).toBe(200);
@@ -964,18 +967,18 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         await sfs.assignOperator('carepharm',central,operatorId);
         expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(200);
         await ds.query("UPDATE semi_franchises SET status='closed' WHERE id=$1",[care!.id]);
-        expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(403);
+        expect((await request(app).get(endpoint).set('X-Fixture-Actor',central)).status).toBe(404);
         await ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care!.id]);
         const current=references;
         for(const type of ['privacy','terms'] as const){
           const created=await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:type,title:`Synthetic revised ${type}`,content:`Revised ${type}`,version:3,effectiveDate:'2026-01-01'});
           expect(created.status).toBe(201);
-          expect(created.body.data.slug).toBe(`carepharm-service-${type}`);
+          expect(created.body.data.slug).toBe(`${scope}-service-${type}`);
           expect((await request(app).patch(`${endpoint}/${created.body.data.id}/publish`).set('X-Fixture-Actor',careOperator).send({action:'publish'})).status).toBe(200);
         }
-        expect((await request(app).get('/public/services/carepharm/enrollment-policies')).body.data).toHaveLength(2);
-        expect((await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:'terms',title:'Invalid old version',version:1})).status).toBe(400);
-        expect((await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:'terms',title:'Invalid marker',slug:'neture-service-terms',version:4})).status).toBe(400);
+        expect((await request(app).get('/neture/businesses/carepharm/legal/enrollment-policies')).body.data).toHaveLength(2);
+        // Business policies allow their first version 1; no legacy CarePharm-only minimum applies.
+        const fixed=await request(app).post(endpoint).set('X-Fixture-Actor',careOperator).send({documentType:'terms',title:'Synthetic fixed scope',slug:'neture-service-terms',version:4});expect(fixed.status).toBe(201);expect(fixed.body.data.slug).toBe(`${scope}-service-terms`);
         const pharmacy=await approvedPharmacy();
         await expect(sfs.apply(pharmacy.orgId,pharmacy.owner,'carepharm',{policyReferences:current})).rejects.toHaveProperty('code','POLICY_VERSION_MISMATCH');
         const old=current[0];

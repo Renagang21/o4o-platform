@@ -483,6 +483,7 @@ const OperatorContactMessagesPage = lazy(() => import('./pages/operator/Operator
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
+const ExternalAiConsentPage = lazy(() => import('./pages/ExternalAiConsentPage'));
 // Resources (O4O 공통 구조 — /resources)
 const NetureResourcesPage = lazy(() => import('./pages/resources/NetureResourcesPage'));
 
@@ -679,6 +680,7 @@ function App() {
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
+            <Route path="/external-ai/connect" element={<ExternalAiConsentPage />} />
             <Route path="/register" element={<RegisterRedirect />} />
             {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.
                 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 service_credentials 흐름의 부활이 아니다.) */}
@@ -767,8 +769,8 @@ function App() {
                   CMS(cms/public/page) 라우터가 프로덕션에 마운트되어 있지 않아 항상 404 →
                   "준비 중" 만 노출되던 경로. 다른 4서비스와 같은 service_policy_documents
                   public API + 공통 PolicyDocumentViewer 로 정렬한다. */}
-              <Route path="/terms" element={<TermsPage serviceKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : 'neture'} />} />
-              <Route path="/privacy" element={<PrivacyPage serviceKey={CURRENT_HOST_PROFILE === 'carepharm' ? 'carepharm' : 'neture'} />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/policies/account-update" element={<AccountPolicyNoticePage />} />
 
               {/* WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10~§14:
@@ -1253,7 +1255,6 @@ function App() {
               {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/operator/home-presentation/neture" element={<HomePresentationPage surface="neture" />} />
-              <Route path="/operator/legal/carepharm" element={<ServiceLegalSettingsPage serviceKey="carepharm" />} />
               <Route path="/operator/home-presentation/carepharm" element={<HomePresentationPage surface="carepharm" />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}

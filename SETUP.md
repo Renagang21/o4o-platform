@@ -187,13 +187,15 @@ Listening on 127.0.0.1:5442
 
 ```bash
 pnpm run build:packages                # 최초 1회 또는 packages/ 수정 시
-pnpm run dev:admin                     # Admin Dashboard  → http://localhost:5173
+pnpm run dev:admin                     # Admin Dashboard  → http://localhost:3001
 pnpm run dev:api                       # API 서버         → http://localhost:3002 (.env PORT)
 pnpm --filter @o4o/web-neture dev      # web-neture       → http://localhost:3000
 pnpm run dev                           # Admin Dashboard (= dev:admin)
 ```
 
 API 상태 확인: `curl http://localhost:3002/health`
+
+Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard/package.json`의 `dev` 명령이 `vite --port 3001`을 실행하므로 `vite.config.ts`의 기본 포트(5173)보다 우선합니다.
 
 로컬 API 포트 **3002** 가 기준입니다(`apps/api-server/.env.example` `PORT` · web-neture dev 기본값 · `@o4o/auth-client` localhost 기본값).
 소스의 `PORT || 8080` 은 Cloud Run runtime 기본값이며 로컬 기준이 아닙니다.

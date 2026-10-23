@@ -49,10 +49,13 @@ describe('WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1', () => {
       expect(src).not.toContain(`appId: 'supplierops'`);
     });
 
-    it('공급자 canonical backend 는 그대로 마운트되어 있다', () => {
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a: 소비처 0 인 두 mount 는 제거됐고,
+    //   web-neture 가 쓰는 공급자 면(/supplier · /supplier/signage/media · /supplier/screen-sets)만 남는다.
+    it('공급자 backend 는 소비처가 있는 면만 마운트되어 있다', () => {
       const src = read('routes', 'kpa', 'kpa.routes.ts');
-      expect(src).toContain(`'/supplier/content-submissions'`);
-      expect(src).toContain(`'/supplier/signage/campaign-requests'`);
+      expect(src).not.toContain(`'/supplier/content-submissions'`);
+      expect(src).not.toContain(`'/supplier/signage/campaign-requests'`);
+      expect(src).toContain(`'/supplier/signage/media'`);
     });
   });
 

@@ -72,7 +72,7 @@ async function main(): Promise<void> {
       for (const c of d) {
         byCode[c] = (byCode[c] || 0) + 1;
         (docsByCode[c] ||= new Set()).add(r.id);
-        (samples[c] ||= []).length < 4 && samples[c].push(`[${u.kind}] ${u.text.slice(0, 90)}`);
+        if ((samples[c] ||= []).length < 4) samples[c].push(`[${u.kind}] ${u.text.slice(0, 90)}`);
       }
     }
     if (hits.length) { damagedDocs.add(r.id); detail.push({ koId: r.id, masterId: r.mid, productName: r.pname, sourceType: r.st, hits: hits.slice(0, 5) }); }

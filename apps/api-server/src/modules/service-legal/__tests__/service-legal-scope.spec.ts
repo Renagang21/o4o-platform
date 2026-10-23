@@ -43,7 +43,7 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('lecture')).toBe(true);
   });
 
-  it('현재 관리 대상 서비스와 CarePharm 정책 공간을 포함한다', () => {
+  it('현재 관리 대상 7개 canonical key만 포함한다', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',
@@ -52,7 +52,6 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
       'community',
       'funding',
       'supplier',
-      'carepharm',
     ].sort());
   });
 });

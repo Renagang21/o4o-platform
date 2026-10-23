@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies, cleanupFixtureBusinessPolicies } from './fixtures/business-policies.js';
 import express from 'express';
 import request from 'supertest';
 import { randomUUID } from 'crypto';
@@ -114,6 +115,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
   afterAll(async () => {
     jest.restoreAllMocks();
     if (!db?.isInitialized) return;
+    await cleanupFixtureBusinessPolicies(db, businesses);
     await db.query(`DELETE FROM semi_franchise_memberships WHERE semi_franchise_id=ANY($1::uuid[])`, [businesses]);
     await db.query(`DELETE FROM semi_franchises WHERE id=ANY($1::uuid[])`, [businesses]);
     await db.query(`DELETE FROM neture_pharmacy_memberships WHERE applicant_user_id=ANY($1::uuid[])`, [users]);
@@ -141,7 +143,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
     // Registration alone never enrolls a pharmacy.
     expect((await get(tablet)).status).toBe(403);
     for (const key of keys) {
-      await settings.apply(store, owner, key);
+      await settings.apply(store, owner, key, { policyReferences: await fixtureBusinessPolicies(db, key) });
       expect((await get(tablet)).status).toBe(key === keys[0] ? 403 : 200);
       const [membership] = await db.query(`SELECT id FROM semi_franchise_memberships WHERE organization_id=$1
         AND semi_franchise_id=(SELECT id FROM semi_franchises WHERE key=$2)`, [store, key]);

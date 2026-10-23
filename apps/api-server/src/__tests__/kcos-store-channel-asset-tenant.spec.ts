@@ -61,7 +61,7 @@ describe('§5 view — StoreChannelsView 자산 통제 축은 optional 이다', 
     // 마지막 소비처였던 web-store 의 K-Cosmetics 매장 화면은 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거됐다.
     //   View 본체(store-ui-core) 정리는 후속 후보다(공통 모듈 — 이번 범위 밖).
     expect(existsSync(join(REPO, 'services/web-store/src/services/kcos/pages/store/StoreChannelsPage.tsx'))).toBe(false);
-    const kpa = read('services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx');
-    expect(kpa).not.toMatch(/StoreChannelsView/);
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 매장 화면은 제거됐다(매장 = store.neture.co.kr).
+    expect(existsSync(join(REPO, 'services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx'))).toBe(false);
   });
 });

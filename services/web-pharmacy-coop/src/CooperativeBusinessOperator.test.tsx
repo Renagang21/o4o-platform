@@ -57,7 +57,7 @@ it("reuses the scoped supply, own-content and supplier-approval operator workflo
   };
   expect(props.businessKey).toBe("business-a");
   expect(props.forumHref()).toBe("/coop-a/community");
-  expect(props.tabs).toEqual(["proposals", "contents"]);
+  expect(props.tabs).toEqual(["contents"]);
   expect(props.contentEditHref("business-a")).toBe(
     "/coop-a/operator/contents/new",
   );
@@ -76,4 +76,22 @@ it("keeps own authoring inside the cooperative URL with an explicit backend busi
     businessKey: "business-b",
     returnPath: "/coop-b/operator?tab=contents",
   });
+});
+
+it("restricts the supply task to the proposals tab without mounting content editing", () => {
+  render(
+    <MemoryRouter>
+      <Page
+        businessKey="business-a"
+        slug="coop-a"
+        client={client}
+        task="proposals"
+      />
+    </MemoryRouter>,
+  );
+  expect(shared.operator.mock.calls.at(-1)![0]).toMatchObject({
+    businessKey: "business-a",
+    tabs: ["proposals"],
+  });
+  expect(shared.editor).not.toHaveBeenCalled();
 });

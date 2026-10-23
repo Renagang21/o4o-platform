@@ -2,6 +2,7 @@ import { BUSINESS_SITE } from '../../config/businessSite';
 import { authClient } from '../../contexts/AuthContext';
 
 export interface Business {
+  policyScope: string;
   key: string;
   name: string;
   communityKey: string | null;

@@ -27,6 +27,7 @@ import { BusinessRegistrationDocumentService } from './services/business-registr
  *
  * 권한은 API 에서 판정한다 — 화면 메뉴 숨김으로 대신하지 않는다.
  */
+import { businessOperationsRoutes } from './business-operations.routes.js';
 import { Router } from 'express';
 import type { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
@@ -117,6 +118,7 @@ function actionParam<T extends string>(req: Req, allowed: readonly T[]): T {
 
 export function createNeturePharmacyRoutes(dataSource: DataSource, consultationDependencies?: ConsultationDependencies): ExpressRouter {
   const router: ExpressRouter = Router();
+  router.use(businessOperationsRoutes(dataSource));
   const membership = new PharmacyMembershipService(dataSource, createPharmacyStoreProvisioner(dataSource));
   const semiFranchises = new SemiFranchiseService(dataSource);
   const showcase = new BusinessHomeShowcaseService(dataSource);

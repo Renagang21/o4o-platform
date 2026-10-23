@@ -169,7 +169,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
   const location = useLocation();
   const pathname = location.pathname.replace(/\/+$/, '');
-  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && (pathname === '/operator' || pathname === '/operator/home-presentation/carepharm' || pathname === '/operator/legal/carepharm'));
+  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && (pathname === '/operator' || pathname === '/operator/home-presentation/carepharm'));
   const scopedRoles = businessPath ? getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE) : [];
   return (
     <RouteGuard

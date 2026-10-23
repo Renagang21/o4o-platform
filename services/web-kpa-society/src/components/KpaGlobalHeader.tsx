@@ -16,13 +16,13 @@ import BusinessStoreShortcut from '../pages/business/BusinessStoreShortcut';
  *   - 사용자 드롭다운 메뉴 구성
  */
 
-import { useNavigate, useMatch, Link } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useMatch } from 'react-router-dom';
+import { useCallback } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
-import { getKpaServiceRoleLabel, KpaUserMenuItems, useKpaUserRoles } from './KpaUserMenu';
+import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { openNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
 import { authClient } from '../contexts/AuthContext';
@@ -30,7 +30,6 @@ import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
 } from '../config/navigation';
-import { creditApi } from '../api/credit';
 import { PHARMACY_HEADER_BRAND } from '../config/brand';
 import { notificationsApi } from '../api/notifications';
 
@@ -38,26 +37,12 @@ import { notificationsApi } from '../api/notifications';
 
 export function KpaGlobalHeader() {
   const { user, logout, isLoading } = useAuth();
-  const { isStoreOwner } = useKpaUserRoles(user);
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
   const businessMatch = useMatch('/businesses/:businessKey/*');
   const isHostWorkspace = !businessMatch || businessMatch.params.businessKey === BUSINESS_SITE.key;
   // The business workspace owns its task navigation; the header retains account/store utilities.
-  const [creditBalance, setCreditBalance] = useState<number | null>(null);
-
-  // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
-  // user 객체 참조 전체 대신 user.id만 의존 — fetchKpaContext Phase2 갱신 시
-  // user 참조가 바뀌어도 동일 사용자이면 재호출 방지.
-  useEffect(() => {
-    if (!user) { setCreditBalance(null); return; }
-    creditApi.getMyBalance()
-      .then((res: any) => {
-        const bal = res?.data?.data?.balance ?? res?.data?.balance ?? null;
-        if (typeof bal === 'number') setCreditBalance(bal);
-      })
-      .catch(() => { /* 실패 시 뱃지 숨김 */ });
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 크레딧 뱃지(/mypage/credits)는 마이페이지와 함께 삭제했다.
 
   // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
   // 알림 — kpa-society serviceKey 로 backend 가 저장하므로 동일 키로 필터.
@@ -96,7 +81,7 @@ export function KpaGlobalHeader() {
 
   // User 정보 변환
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.
-  // side effects(creditApi, notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
+  // side effects(notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
   const headerUser = user
     ? {
         displayName: getUserDisplayName(user),
@@ -131,24 +116,9 @@ export function KpaGlobalHeader() {
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && isStoreOwner && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" />{user?.roles?.some(role=>['neture:admin','neture:operator',...pharmacyCollaboratorRoles(BUSINESS_SITE.key)].includes(role)) && <OperatorInboxLink requireAccess key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} endpoint={`/operator-inbox/business/${BUSINESS_SITE.key}`} href={`/operator/inbox/business/${BUSINESS_SITE.key}`}/>}</span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" />{user?.roles?.some(role=>['neture:admin','neture:operator',...pharmacyCollaboratorRoles(BUSINESS_SITE.key)].includes(role)) && <OperatorInboxLink requireAccess key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} endpoint={`/operator-inbox/business/${BUSINESS_SITE.key}`} href={`/operator/inbox/business/${BUSINESS_SITE.key}`}/>}</span>}
       utilitySlot={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {user && creditBalance !== null && (
-            <Link
-              to="/mypage/credits"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '4px 10px', borderRadius: 999,
-                background: '#fef9c3', color: '#854d0e',
-                fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                border: '1px solid #fde047',
-              }}
-              title="크레딧 잔액 — 클릭하면 이력을 확인할 수 있습니다"
-            >
-              ⭐ {creditBalance.toLocaleString()} C
-            </Link>
-          )}
           {/* WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1: 로그인 사용자에게만 표시 */}
           {user && (
             <NotificationBell

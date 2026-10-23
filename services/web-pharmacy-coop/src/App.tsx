@@ -1,12 +1,27 @@
-import { CooperativeNotificationLink, CooperativeNotifications } from './Notifications';
-import { OperatorInbox, OperatorInboxLink } from '@o4o/operator-core-ui';
-import { ScopedContactForm } from '@o4o/shared-space-ui';
+import {
+  CooperativeNotificationLink,
+  CooperativeNotifications,
+} from "./Notifications";
+import { OperatorInbox, OperatorInboxLink } from "@o4o/operator-core-ui";
+import {
+  ScopedContactForm,
+  PolicyDocumentViewer,
+  PublicLegalFooterInfo,
+} from "@o4o/shared-space-ui";
+import { CooperativeNews, RecentMemberStories } from "./CooperativeNews";
+import { ServiceOperatorManagement } from "@o4o/operator-core-ui";
 import { MemberForum } from "./MemberForum";
 import { MyCooperatives, MyUpdates } from "./Participation";
-import { BusinessHomeShowcase, HomePresentationEditor, ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import {
+  BusinessHomeShowcase,
+  HomePresentationEditor,
+  ServiceHomeHero,
+  ServiceHomePromotion,
+} from "@o4o/shared-space-ui";
 import {
   FederationManagementPanel,
   MemberManagementPanel,
+  CooperativeSettings,
   MembershipApplication,
   AffiliationApplication,
   PersonalHistory,
@@ -16,6 +31,7 @@ import {
 import {
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -35,6 +51,7 @@ import {
   useLocation,
   useOutletContext,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 import {
   anonymousSession,
@@ -63,14 +80,20 @@ function SiteLink({
   to,
   children,
   className,
+  current,
 }: {
   to: string;
   children: React.ReactNode;
   className?: string;
+  current?: boolean;
 }) {
   const { preview } = useContext(Context);
   return (
-    <Link className={className} to={`${to}${preview ? "?preview=1" : ""}`}>
+    <Link
+      className={className}
+      aria-current={current ? "page" : undefined}
+      to={`${to}${preview ? `${to.includes("?") ? "&" : "?"}preview=1` : ""}`}
+    >
       {children}
     </Link>
   );
@@ -111,15 +134,32 @@ export function App({
             element={<PersonalSpace updates />}
           />
           <Route path="contact" element={<CooperativeContactPage />} />
-          <Route path="notifications" element={<CooperativeNotificationPage />} />
+          <Route
+            path="notifications"
+            element={<CooperativeNotificationPage />}
+          />
           <Route path="operator/inbox" element={<CooperativeInboxPage />} />
           <Route path="about" element={<FederationAbout />} />
           <Route path="operator" element={<FederationManagement />} />
-          <Route path="operator/home-presentation" element={<FederationHeroManagement />} />
+          <Route
+            path="operator/home-presentation"
+            element={<FederationHeroManagement />}
+          />
           <Route path=":cooperativeSlug" element={<CooperativeLayout />}>
             <Route index element={<CooperativeHome />} />
+            <Route
+              path="policy"
+              element={<CooperativePolicy documentType="terms" />}
+            />
+            <Route
+              path="privacy"
+              element={<CooperativePolicy documentType="privacy" />}
+            />
             <Route path="contact" element={<CooperativeContactPage local />} />
-            <Route path="operator/inbox" element={<CooperativeInboxPage local />} />
+            <Route
+              path="operator/inbox"
+              element={<CooperativeInboxPage local />}
+            />
             <Route path="membership" element={<Membership />} />
             <Route
               path="community"
@@ -131,7 +171,10 @@ export function App({
             />
             <Route path="services" element={<Services />} />
             <Route path="operator" element={<CooperativeManagement />} />
-            <Route path="operator/home-presentation" element={<CooperativeHeroManagement />} />
+            <Route
+              path="operator/home-presentation"
+              element={<CooperativeHeroManagement />}
+            />
             <Route
               path="operator/contents/new"
               element={<CooperativeManagement editor />}
@@ -178,16 +221,32 @@ function Layout() {
           <nav aria-label="연합회 메뉴">
             <SiteLink to="/">연합회 홈</SiteLink>
             <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
-            <SiteLink to="/about">연합회 소개</SiteLink><SiteLink to="/contact">문의하기</SiteLink>
+            <SiteLink to="/about">연합회 소개</SiteLink>
+            <SiteLink to="/contact">문의하기</SiteLink>
             {session.userId && (
               <>
                 <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
                 <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
-                {businessClient&&!preview&&<CooperativeNotificationLink key={session.userId} client={businessClient}/>}
+                {businessClient && !preview && (
+                  <CooperativeNotificationLink
+                    key={session.userId}
+                    client={businessClient}
+                  />
+                )}
               </>
             )}
             {canManageFederation(session) && (
-              <><SiteLink to="/operator">연합회 운영</SiteLink>{businessClient&&<OperatorInboxLink key={session.userId} client={businessClient} endpoint="/operator-inbox/service/pharmcoop" href="/operator/inbox"/>}</>
+              <>
+                <SiteLink to="/operator">연합회 운영</SiteLink>
+                {businessClient && (
+                  <OperatorInboxLink
+                    key={session.userId}
+                    client={businessClient}
+                    endpoint="/operator-inbox/service/pharmcoop"
+                    href="/operator/inbox"
+                  />
+                )}
+              </>
             )}
           </nav>
           <span className="account-status">
@@ -247,48 +306,64 @@ function FederationHome() {
   const { businessClient, preview } = useContext(Context);
   return (
     <>
-      {businessClient && !preview ? <ServiceHomeHero surface="pharmcoop" client={businessClient}
-        title={["조합의 힘을 모아, 약국의 내일을 함께."]}
-        description={["각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다."]}
-        eyebrow="함께하는 약국, 연결되는 협동조합"
-        actions={<div className="actions"><SiteLink className="button outline" to="/cooperatives">소속 협동조합 찾기 ↗</SiteLink><SiteLink to="/about">연합회 알아보기 →</SiteLink></div>} /> : <section className="hero">
-        <div>
-          <p className="eyebrow">함께하는 약국, 연결되는 협동조합</p>
-          <h1>
-            조합의 힘을 모아,
-            <br />
-            약국의 내일을 함께.
-          </h1>
-          <p className="hero-description">
-            각 협동조합의 자율성을 지키며
-            <br />더 나은 약국 경영과 협력의 기반을 만들어갑니다.
-          </p>
-          <div className="actions">
-            <SiteLink className="button light" to="/cooperatives">
-              소속 협동조합 찾기 <span aria-hidden="true">↗</span>
-            </SiteLink>
-            <SiteLink className="hero-link" to="/about">
-              연합회 알아보기 →
-            </SiteLink>
+      {businessClient && !preview ? (
+        <ServiceHomeHero
+          surface="pharmcoop"
+          client={businessClient}
+          title={["조합의 힘을 모아, 약국의 내일을 함께."]}
+          description={[
+            "각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다.",
+          ]}
+          eyebrow="함께하는 약국, 연결되는 협동조합"
+          actions={
+            <div className="actions">
+              <SiteLink className="button outline" to="/cooperatives">
+                소속 협동조합 찾기 ↗
+              </SiteLink>
+              <SiteLink to="/about">연합회 알아보기 →</SiteLink>
+            </div>
+          }
+        />
+      ) : (
+        <section className="hero">
+          <div>
+            <p className="eyebrow">함께하는 약국, 연결되는 협동조합</p>
+            <h1>
+              조합의 힘을 모아,
+              <br />
+              약국의 내일을 함께.
+            </h1>
+            <p className="hero-description">
+              각 협동조합의 자율성을 지키며
+              <br />더 나은 약국 경영과 협력의 기반을 만들어갑니다.
+            </p>
+            <div className="actions">
+              <SiteLink className="button light" to="/cooperatives">
+                소속 협동조합 찾기 <span aria-hidden="true">↗</span>
+              </SiteLink>
+              <SiteLink className="hero-link" to="/about">
+                연합회 알아보기 →
+              </SiteLink>
+            </div>
           </div>
-        </div>
-        <div
-          className="hero-network"
-          aria-label="연합회와 개별 협동조합의 연결"
-        >
-          <div className="network-center">
-            협동조합
-            <br />
-            <strong>연합회</strong>
+          <div
+            className="hero-network"
+            aria-label="연합회와 개별 협동조합의 연결"
+          >
+            <div className="network-center">
+              협동조합
+              <br />
+              <strong>연합회</strong>
+            </div>
+            <div className="network-row">
+              <span>협동조합</span>
+              <span>협동조합</span>
+              <span>협동조합</span>
+            </div>
+            <p>독립적으로 운영하고, 함께 연결됩니다.</p>
           </div>
-          <div className="network-row">
-            <span>협동조합</span>
-            <span>협동조합</span>
-            <span>협동조합</span>
-          </div>
-          <p>독립적으로 운영하고, 함께 연결됩니다.</p>
-        </div>
-      </section>}
+        </section>
+      )}
       <section className="section">
         <div className="section-heading">
           <div>
@@ -315,7 +390,13 @@ function FederationHome() {
         </div>
       </section>
       <Directory compact />
-      {businessClient && !preview && <ServiceHomePromotion surface="pharmcoop" client={businessClient} publishedOnly />}
+      {businessClient && !preview && (
+        <ServiceHomePromotion
+          surface="pharmcoop"
+          client={businessClient}
+          publishedOnly
+        />
+      )}
       <section className="store-callout">
         <div>
           <p className="eyebrow">약국 경영자 공통 공간</p>
@@ -432,13 +513,16 @@ function FederationAbout() {
 }
 
 function CooperativeLayout() {
+  const { pathname } = useLocation();
   const { cooperativeSlug = "" } = useParams();
-  const { cooperatives, preview, businessClient, session } = useContext(Context);
+  const { cooperatives, preview, businessClient, session } =
+    useContext(Context);
   const cooperative = validCooperativeSlug(cooperativeSlug)
     ? cooperatives.find((row) => row.slug === cooperativeSlug)
     : undefined;
   if (!cooperative) return <NotFound />;
   const base = `/${cooperative.slug}`;
+  const home = pathname === base || pathname === `${base}/`;
   return (
     <>
       <div className="breadcrumb">
@@ -446,21 +530,34 @@ function CooperativeLayout() {
         <span aria-hidden="true">/</span>
         <span>{cooperative.name}</span>
       </div>
-      {businessClient && !preview ? <ServiceHomeHero key={cooperative.id} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient}
-        title={[cooperative.name]} description={[cooperative.introduction]} eyebrow="개별 협동조합 공간" /> : <section className="coop-heading">
-        <p className="eyebrow">개별 협동조합 공간</p>
-        <h1>{cooperative.name}</h1>
-        <p>{cooperative.introduction}</p>
-      </section>}
+      {home && businessClient && !preview ? (
+        <ServiceHomeHero
+          key={cooperative.id}
+          surface="cooperative"
+          cooperativeSlug={cooperative.slug}
+          client={businessClient}
+          title={[cooperative.name]}
+          description={[cooperative.introduction]}
+          eyebrow="개별 협동조합 공간"
+        />
+      ) : (
+        <section className="coop-heading">
+          <p className="eyebrow">개별 협동조합 공간</p>
+          <h1>{cooperative.name}</h1>
+          <p>{cooperative.introduction}</p>
+        </section>
+      )}
       <nav className="coop-nav" aria-label="협동조합 메뉴">
         {[
           ["", "조합 홈"],
+          ["/materials", "조합 소식·자료"],
+          ["/community", "조합원 이야기"],
+          ["/services", "조합 서비스"],
           ["/membership", "가입·내 참여"],
-          ["/community", "회원 게시판"],
-          ["/materials", "조합 자료"],
-          ["/services", "서비스"],
           ["/contact", "조합 문의"],
-          ["/operator", "조합 운영"],
+          ...(cooperativeAccess(session, cooperative.id).canManage
+            ? [["/operator", "조합 운영"]]
+            : []),
         ].map(([path, label]) => (
           <NavLink
             key={path}
@@ -471,9 +568,75 @@ function CooperativeLayout() {
           </NavLink>
         ))}
       </nav>
-      {businessClient && cooperativeAccess(session,cooperative.id).canManage && <OperatorInboxLink key={`${session.userId}:${cooperative.id}`} client={businessClient} endpoint={`/operator-inbox/cooperative/${cooperative.slug}`} href={`/${cooperative.slug}/operator/inbox`}/>}
+      {businessClient &&
+        cooperativeAccess(session, cooperative.id).canManage && (
+          <OperatorInboxLink
+            key={`${session.userId}:${cooperative.id}`}
+            client={businessClient}
+            endpoint={`/operator-inbox/cooperative/${cooperative.slug}`}
+            href={`/${cooperative.slug}/operator/inbox`}
+          />
+        )}
       <Outlet context={cooperative} />
+      <CooperativeLegal key={cooperative.id} cooperative={cooperative} />
     </>
+  );
+}
+
+function CooperativeLegal({ cooperative }: { cooperative: Cooperative }) {
+  const { businessClient, preview } = useContext(Context);
+  const loadProfile = useCallback(async () => {
+    if (!businessClient || !cooperative.businessKey || preview) return null;
+    return (
+      await businessClient.get(
+        `/neture/businesses/${encodeURIComponent(cooperative.businessKey)}/legal/footer-legal`,
+      )
+    ).data.data;
+  }, [businessClient, cooperative.businessKey, preview]);
+  return (
+    <aside className="section">
+      <SiteLink to={`/${cooperative.slug}/policy`}>이용약관</SiteLink>
+      {" · "}
+      <SiteLink to={`/${cooperative.slug}/privacy`}>개인정보처리방침</SiteLink>
+      <PublicLegalFooterInfo
+        serviceKey={cooperative.businessKey ?? ""}
+        loadProfile={loadProfile}
+      />
+    </aside>
+  );
+}
+
+function CooperativePolicy({
+  documentType,
+}: {
+  documentType: "terms" | "privacy";
+}) {
+  const cooperative = useOutletContext<Cooperative>();
+  const { businessClient, preview } = useContext(Context);
+  const loadPolicy = useCallback(async () => {
+    if (!businessClient || !cooperative.businessKey || preview) return null;
+    try {
+      return (
+        await businessClient.get(
+          `/neture/businesses/${encodeURIComponent(cooperative.businessKey)}/legal/policies/${documentType}`,
+        )
+      ).data.data;
+    } catch (error) {
+      if (
+        (error as { response?: { status?: number } })?.response?.status === 404
+      )
+        return null;
+      throw error;
+    }
+  }, [businessClient, cooperative.businessKey, documentType, preview]);
+  return (
+    <PolicyDocumentViewer
+      key={`${cooperative.id}:${documentType}`}
+      serviceKey={cooperative.policyScope ?? ""}
+      documentType={documentType}
+      heading={documentType === "terms" ? "이용약관" : "개인정보처리방침"}
+      loadPolicy={loadPolicy}
+    />
   );
 }
 
@@ -481,48 +644,123 @@ function CooperativeHome() {
   const cooperative = useOutletContext<Cooperative>();
   const { businessClient, session, preview } = useContext(Context);
   const access = cooperativeAccess(session, cooperative.id);
+  const allowed = access.isMember || access.canManage;
+  const connected = allowed && businessClient && cooperative.businessKey;
+  const membershipLabels = {
+    pending: "심사 대기",
+    active: "가입 승인",
+    rejected: "반려",
+    suspended: "이용 정지",
+    withdrawn: "탈퇴",
+  };
   return (
     <section className="section">
-      <div className="member-welcome">
-        <div>
-          <p className="eyebrow">경험을 나누고, 함께 성장하는 공간</p>
-          <h2>조합의 소식과 필요한 자료를 한곳에서.</h2>
-          <p>회원 활동은 조합에서, 약국 경영 업무는 내 매장에서 이어갑니다.</p>
+      <div className="coop-home-layout">
+        <div className="coop-home-main">
+          <section className="card" aria-label="주요 조합 소식·자료">
+            <div className="section-heading">
+              <h2>주요 소식·자료</h2>
+              <SiteLink
+                className="text-link"
+                to={`/${cooperative.slug}/materials`}
+              >
+                전체 보기 →
+              </SiteLink>
+            </div>
+            <p>
+              조합에서 직접 작성하거나 검토하여 게시한 소식과 약국 경영
+              자료입니다.
+            </p>
+            {connected ? (
+              <CooperativeNews
+                key={`${session.userId}:${cooperative.id}`}
+                client={businessClient}
+                businessKey={cooperative.businessKey!}
+                slug={cooperative.slug}
+                operator={access.canManage}
+                compact
+              />
+            ) : (
+              <p>
+                {allowed
+                  ? "게시 자료 연결을 준비하고 있습니다."
+                  : "이 조합의 가입 승인 후 소식·자료를 확인할 수 있습니다."}
+              </p>
+            )}
+          </section>
+          <section className="card spaced" aria-label="최근 조합원 이야기">
+            <div className="section-heading">
+              <h2>최근 조합원 이야기</h2>
+              <SiteLink
+                className="text-link"
+                to={`/${cooperative.slug}/community`}
+              >
+                전체 보기 →
+              </SiteLink>
+            </div>
+            <p>조합원끼리 질문하고 약국 경영 경험을 나누는 공간입니다.</p>
+            {connected ? (
+              <RecentMemberStories
+                key={`${session.userId}:${cooperative.id}`}
+                client={businessClient}
+                businessKey={cooperative.businessKey!}
+                slug={cooperative.slug}
+              />
+            ) : (
+              <p>
+                {allowed
+                  ? "게시판 연결을 준비하고 있습니다."
+                  : "이 조합의 가입 승인 후 이야기에 참여할 수 있습니다."}
+              </p>
+            )}
+          </section>
         </div>
-        <SiteLink className="button" to={`/${cooperative.slug}/membership`}>
-          가입 자격 확인 →
-        </SiteLink>
+        <aside className="coop-home-aside" aria-label="내 조합 참여">
+          <section className="card">
+            <h2>내 참여 상태</h2>
+            <p>
+              {access.status
+                ? membershipLabels[access.status]
+                : session.userId
+                  ? "아직 가입하지 않은 조합입니다."
+                  : "로그인 후 가입 상태를 확인하세요."}
+            </p>
+            <SiteLink
+              className="text-link"
+              to={`/${cooperative.slug}/membership`}
+            >
+              가입·내 참여 확인 →
+            </SiteLink>
+          </section>
+          <section className="card spaced">
+            <h2>조합 서비스</h2>
+            <p>공급 안내와 기존 강의·내 매장 서비스를 확인합니다.</p>
+            <SiteLink
+              className="text-link"
+              to={`/${cooperative.slug}/services`}
+            >
+              서비스 보기 →
+            </SiteLink>
+          </section>
+          {access.canManage && (
+            <section className="card spaced">
+              <h2>조합 운영</h2>
+              <p>조합원, 소식·자료, 공급 제안을 관리합니다.</p>
+              <SiteLink className="button" to={`/${cooperative.slug}/operator`}>
+                운영 화면으로 →
+              </SiteLink>
+            </section>
+          )}
+        </aside>
       </div>
-      {businessClient && cooperative.businessKey && (
-        <BusinessHomeShowcase
+      {businessClient && !preview && (
+        <ServiceHomePromotion
+          surface="cooperative"
+          cooperativeSlug={cooperative.slug}
           client={businessClient}
-          businessKey={cooperative.businessKey}
-          accountId={session.userId ?? undefined}
-          cooperative
-          operator={access.canManage}
+          publishedOnly
         />
       )}
-      <div className="cards two">
-        <div className="card">
-          <h2>조합 공지</h2>
-          <p>이 조합의 공지 데이터가 연결되면 표시합니다.</p>
-        </div>
-        <div className="card">
-          <h2>회원들의 이야기</h2>
-          <p>승인된 조합원과 소식을 나누는 게시판입니다.</p>
-          <SiteLink className="text-link" to={`/${cooperative.slug}/community`}>
-            게시판 이용 안내 →
-          </SiteLink>
-        </div>
-      </div>
-      <div className="card spaced">
-        <h2>조합 자료</h2>
-        <p>조합에서 제공하는 사업 자료와 약국 경영 지원 콘텐츠를 확인합니다.</p>
-        <SiteLink className="text-link" to={`/${cooperative.slug}/materials`}>
-          자료 이용 안내 →
-        </SiteLink>
-      </div>
-      {businessClient && !preview && <ServiceHomePromotion surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} publishedOnly />}
     </section>
   );
 }
@@ -560,9 +798,11 @@ function Membership() {
           status === "withdrawn" ||
           status === "rejected") && (
           <MembershipApplication
-            key={cooperative.id}
+            key={`${session.userId}:${cooperative.id}`}
             client={businessClient}
             coop={cooperative.id}
+            businessKey={cooperative.businessKey}
+            policyScope={cooperative.policyScope}
             onChanged={onSessionChanged}
           />
         )}
@@ -609,22 +849,37 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
           key={`${session.userId}:${cooperative.id}`}
           client={businessClient}
           businessKey={cooperative.businessKey}
+          currentUserId={session.userId ?? undefined}
           canManage={access.canManage}
         />
       ) : (
-        <BusinessHomeShowcase
+        <CooperativeNews
+          key={`${session.userId}:${cooperative.id}`}
           client={businessClient}
           businessKey={cooperative.businessKey}
-          accountId={session.userId ?? undefined}
-          cooperative
+          slug={cooperative.slug}
           operator={access.canManage}
-          only="content"
         />
       );
   }
   return (
     <section className="section">
-      <h2>{kind === "community" ? "회원 게시판" : "조합 자료"}</h2>
+      <h2>{kind === "community" ? "조합원 이야기" : "조합 소식·자료"}</h2>
+      <p>
+        {kind === "community"
+          ? "조합원끼리 질문과 경험을 나눕니다."
+          : "조합 운영자가 작성하거나 검토해 게시한 공식 소식과 자료입니다."}
+      </p>
+      {access.canManage && (
+        <p>
+          <SiteLink
+            className="text-link"
+            to={`/${cooperative.slug}/operator?work=${kind === "community" ? "boards" : "contents"}`}
+          >
+            {kind === "community" ? "게시판 관리 →" : "소식·자료 관리 →"}
+          </SiteLink>
+        </p>
+      )}
       {content}
       <SiteLink className="text-link" to={`/${cooperative.slug}/membership`}>
         가입·내 참여 확인 →
@@ -634,12 +889,32 @@ function MemberSection({ kind }: { kind: "community" | "materials" }) {
 }
 
 function Services() {
+  const cooperative = useOutletContext<Cooperative>();
+  const { session, businessClient } = useContext(Context);
+  const access = cooperativeAccess(session, cooperative.id);
   return (
     <section className="section">
       <h2>조합 서비스와 약국 경영지원</h2>
       <p className="lead">
         각 조합이 제공할 서비스를 직접 관리하고, 약국 경영자 공통 업무는 기존 내
         매장을 이용합니다.
+      </p>
+      {businessClient &&
+        cooperative.businessKey &&
+        (access.isMember || access.canManage) && (
+          <BusinessHomeShowcase
+            key={`${session.userId}:${cooperative.id}`}
+            client={businessClient}
+            businessKey={cooperative.businessKey}
+            accountId={session.userId ?? undefined}
+            cooperative
+            operator={access.canManage}
+          />
+        )}
+      <p>
+        <a className="text-link" href="https://study.neture.co.kr">
+          회원 대상 강의·세미나 확인 ↗
+        </a>
       </p>
       <div className="cards three">
         <InfoCard
@@ -676,16 +951,52 @@ function Services() {
 
 function FederationManagement() {
   const { session, businessClient, preview } = useContext(Context);
+  const [params] = useSearchParams();
+  const admin = session.federationOperators.some(
+    (r) => r.userId === session.userId && r.role === "admin",
+  );
+  const task = params.get("work") || "cooperatives";
   if (businessClient && !preview && canManageFederation(session))
     return (
-      <><p><SiteLink to="/operator/inbox">운영 알림·문의함</SiteLink> · <SiteLink to="/operator/home-presentation">Hero 관리</SiteLink></p><FederationManagementPanel
-        key={session.userId}
-        client={businessClient}
-        admin={session.federationOperators.some(
-          (r) => r.userId === session.userId && r.role === "admin",
+      <WorkLayout
+        title="연합회 운영"
+        items={[
+          ["/operator", "산하 조합·가입 심사", task === "cooperatives"],
+          ["/operator/inbox", "운영 알림·문의함", false],
+          ...(admin
+            ? ([
+                [
+                  "/operator?work=operators",
+                  "연합회 운영자 관리",
+                  task === "operators",
+                ],
+              ] as WorkItem[])
+            : []),
+          ["/operator/home-presentation", "홈 화면 편집", false],
+        ]}
+      >
+        {task === "cooperatives" ? (
+          <FederationManagementPanel
+            key={session.userId}
+            client={businessClient}
+            admin={admin}
+            userId={session.userId!}
+            showOperators={false}
+          />
+        ) : task === "operators" && admin ? (
+          <ServiceOperatorManagement
+            key={session.userId}
+            client={businessClient}
+            scope="pharmcoop"
+            title="연합회 Operator 지정 · 해제"
+          />
+        ) : (
+          <Empty
+            title="이 업무를 이용할 수 없습니다."
+            text="업무 메뉴와 운영 권한을 확인해 주세요."
+          />
         )}
-        userId={session.userId!}
-      /></>
+      </WorkLayout>
     );
   return (
     <section className="section">
@@ -704,14 +1015,78 @@ function FederationManagement() {
 
 function FederationHeroManagement() {
   const { session, businessClient, preview } = useContext(Context);
-  if (!businessClient || preview || !canManageFederation(session)) return <Empty title="연합회 운영 권한이 필요합니다." text="현재 연합회 운영자만 편집할 수 있습니다." />;
-  return <><SiteLink to="/operator">연합회 운영으로</SiteLink><HomePresentationEditor key={session.userId} surface="pharmcoop" client={businessClient} /></>;
+  if (!businessClient || preview || !canManageFederation(session))
+    return (
+      <Empty
+        title="연합회 운영 권한이 필요합니다."
+        text="현재 연합회 운영자만 편집할 수 있습니다."
+      />
+    );
+  return (
+    <>
+      <SiteLink to="/operator">연합회 운영으로</SiteLink>
+      <HomePresentationEditor
+        key={session.userId}
+        surface="pharmcoop"
+        client={businessClient}
+      />
+    </>
+  );
 }
 function CooperativeHeroManagement() {
   const cooperative = useOutletContext<Cooperative>();
   const { session, businessClient, preview } = useContext(Context);
-  if (!businessClient || preview || !cooperativeAccess(session, cooperative.id).canManage) return <Empty title="이 조합의 운영 권한이 필요합니다." text="다른 조합 또는 연합회 역할만으로 편집할 수 없습니다." />;
-  return <><SiteLink to={`/${cooperative.slug}/operator`}>조합 운영으로</SiteLink><HomePresentationEditor key={`${session.userId}:${cooperative.id}`} surface="cooperative" cooperativeSlug={cooperative.slug} client={businessClient} heading="h2" /></>;
+  if (
+    !businessClient ||
+    preview ||
+    !cooperativeAccess(session, cooperative.id).canManage
+  )
+    return (
+      <Empty
+        title="이 조합의 운영 권한이 필요합니다."
+        text="다른 조합 또는 연합회 역할만으로 편집할 수 없습니다."
+      />
+    );
+  return (
+    <>
+      <SiteLink to={`/${cooperative.slug}/operator`}>조합 운영으로</SiteLink>
+      <HomePresentationEditor
+        key={`${session.userId}:${cooperative.id}`}
+        surface="cooperative"
+        cooperativeSlug={cooperative.slug}
+        client={businessClient}
+        heading="h2"
+      />
+    </>
+  );
+}
+
+type WorkItem = [string, string, boolean];
+function WorkLayout({
+  title,
+  items,
+  children,
+}: Readonly<{ title: string; items: WorkItem[]; children: React.ReactNode }>) {
+  return (
+    <section className="section">
+      <h2>{title}</h2>
+      <div className="coop-work-layout">
+        <nav className="coop-work-nav" aria-label={`${title} 업무`}>
+          {items.map(([to, label, active]) => (
+            <SiteLink
+              key={to}
+              to={to}
+              className={active ? "selected" : undefined}
+              current={active}
+            >
+              {label}
+            </SiteLink>
+          ))}
+        </nav>
+        <div className="coop-work-main">{children}</div>
+      </div>
+    </section>
+  );
 }
 
 function CooperativeManagement({
@@ -720,11 +1095,50 @@ function CooperativeManagement({
   const cooperative = useOutletContext<Cooperative>();
   const { session, businessClient, onSessionChanged } = useContext(Context);
   const { canManage, isAdmin } = cooperativeAccess(session, cooperative.id);
-  if (canManage && cooperative.businessKey && businessClient)
+  const [params] = useSearchParams();
+  const task = editor
+    ? "contents"
+    : params.get("work") ||
+      (params.get("tab") === "contents"
+        ? "contents"
+        : params.get("tab") === "proposals"
+          ? "proposals"
+          : "overview");
+  const base = `/${cooperative.slug}/operator`;
+  if (canManage && cooperative.businessKey && businessClient) {
+    const items: WorkItem[] = [
+      [base, "운영 개요", task === "overview"],
+      [`${base}?work=members`, "조합원 관리", task === "members"],
+      [`${base}?work=contents`, "소식·자료 관리", task === "contents"],
+      [`${base}?work=boards`, "조합원 이야기 관리", task === "boards"],
+      [`${base}?work=proposals`, "공급 제안 심사", task === "proposals"],
+      ...(isAdmin
+        ? ([
+            [
+              `${base}?work=settings`,
+              "가입 자격·운영자 설정",
+              task === "settings",
+            ],
+          ] as WorkItem[])
+        : []),
+      [`${base}/inbox`, "운영 알림·문의함", false],
+      [`${base}/home-presentation`, "홈 화면 편집", false],
+    ];
     return (
-      <>
-        {!editor && <p><SiteLink to={`/${cooperative.slug}/operator/inbox`}>운영 알림·문의함</SiteLink> · <SiteLink to={`/${cooperative.slug}/operator/home-presentation`}>Hero 관리</SiteLink></p>}
-        {!editor && (
+      <WorkLayout title="조합 운영" items={items}>
+        {task === "overview" ? (
+          <>
+            <h3>{cooperative.name} 운영</h3>
+            <p>담당 업무를 선택해 신청 검토와 소식·자료 게시를 진행하세요.</p>
+            <div className="cards two">
+              {items.slice(1).map(([to, label]) => (
+                <SiteLink key={to} className="card" to={to}>
+                  {label} →
+                </SiteLink>
+              ))}
+            </div>
+          </>
+        ) : task === "members" ? (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
             client={businessClient}
@@ -732,41 +1146,54 @@ function CooperativeManagement({
             admin={isAdmin}
             onChanged={onSessionChanged}
             userId={session.userId!}
+            showSettings={false}
+          />
+        ) : task === "settings" && isAdmin ? (
+          <CooperativeSettings
+            client={businessClient}
+            cooperative={cooperative}
+            userId={session.userId!}
+            onChanged={onSessionChanged}
+          />
+        ) : task === "boards" ? (
+          <MemberForum
+            key={`${session.userId}:${cooperative.id}:boards`}
+            client={businessClient}
+            businessKey={cooperative.businessKey}
+            canManage
+            boardsOnly
+          />
+        ) : task === "contents" || task === "proposals" ? (
+          <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
+            <CooperativeBusinessOperator
+              key={`${session.userId}:${cooperative.id}:${task}:${editor}`}
+              businessKey={cooperative.businessKey}
+              slug={cooperative.slug}
+              client={businessClient}
+              editor={editor}
+              task={task}
+            />
+          </Suspense>
+        ) : (
+          <Empty
+            title="이 업무를 이용할 수 없습니다."
+            text="업무 메뉴와 운영 권한을 확인해 주세요."
           />
         )}
-        <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
-          <CooperativeBusinessOperator
-            key={cooperative.id}
-            businessKey={cooperative.businessKey}
-            slug={cooperative.slug}
-            client={businessClient}
-            editor={editor}
-          />
-        </Suspense>
-      </>
+      </WorkLayout>
     );
+  }
   return (
     <section className="section">
       <h2>조합 운영</h2>
-      {canManage ? (
-        <div className="cards two">
-          <InfoCard
-            number="01"
-            title="조합원 관리"
-            text="이 조합의 개인 가입 신청·심사·회원 상태 관리를 연결할 공간입니다."
-          />
-          <InfoCard
-            number="02"
-            title="서비스 관리"
-            text="이 조합의 공지·게시판·자료·서비스 관리를 연결할 공간입니다."
-          />
-        </div>
-      ) : (
-        <Empty
-          title="이 조합의 운영 권한이 필요합니다."
-          text="연합회 운영자나 다른 조합의 운영자라는 이유만으로 접근할 수 없습니다."
-        />
-      )}
+      <Empty
+        title={
+          canManage
+            ? "조합 운영 연결 준비 중"
+            : "이 조합의 운영 권한이 필요합니다."
+        }
+        text="연합회 운영자나 다른 조합의 운영자라는 이유만으로 접근할 수 없습니다."
+      />
     </section>
   );
 }
@@ -795,22 +1222,57 @@ function NotFound() {
   );
 }
 
-function CooperativeContactPage({local=false}:{local?:boolean}) {
-  const {businessClient}=useContext(Context); const {cooperativeSlug}=useParams();
-  if(!businessClient)return <p>문의 연결을 확인해 주세요.</p>;
-  const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
-  return <ScopedContactForm key={endpoint} client={businessClient} endpoint={endpoint} privacyHref="https://neture.co.kr/privacy"/>;
+function CooperativeContactPage({ local = false }: { local?: boolean }) {
+  const { businessClient } = useContext(Context);
+  const { cooperativeSlug } = useParams();
+  if (!businessClient) return <p>문의 연결을 확인해 주세요.</p>;
+  const endpoint = local
+    ? `/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug ?? "")}`
+    : "/operator-inbox/service/pharmcoop";
+  return (
+    <ScopedContactForm
+      key={endpoint}
+      client={businessClient}
+      endpoint={endpoint}
+      privacyHref={
+        local
+          ? `/${encodeURIComponent(cooperativeSlug ?? "")}/privacy`
+          : "https://neture.co.kr/privacy"
+      }
+    />
+  );
 }
-function CooperativeInboxPage({local=false}:{local?:boolean}) {
-  const {businessClient,session,cooperatives}=useContext(Context);const {cooperativeSlug}=useParams();
-  if(!businessClient||!session.userId)return <p>로그인 후 담당 운영 권한을 확인해 주세요.</p>;
-  const coop=local?cooperatives.find(c=>c.slug===cooperativeSlug):null;
-  if(local?(!coop||!cooperativeAccess(session,coop.id).canManage):!canManageFederation(session))return <p>해당 공간의 운영 권한이 필요합니다.</p>;
-  const endpoint=local?`/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug??'')}`:'/operator-inbox/service/pharmcoop';
-  return <OperatorInbox key={`${session.userId}:${endpoint}`} client={businessClient} endpoint={endpoint}/>;
+function CooperativeInboxPage({ local = false }: { local?: boolean }) {
+  const { businessClient, session, cooperatives } = useContext(Context);
+  const { cooperativeSlug } = useParams();
+  if (!businessClient || !session.userId)
+    return <p>로그인 후 담당 운영 권한을 확인해 주세요.</p>;
+  const coop = local
+    ? cooperatives.find((c) => c.slug === cooperativeSlug)
+    : null;
+  if (
+    local
+      ? !coop || !cooperativeAccess(session, coop.id).canManage
+      : !canManageFederation(session)
+  )
+    return <p>해당 공간의 운영 권한이 필요합니다.</p>;
+  const endpoint = local
+    ? `/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug ?? "")}`
+    : "/operator-inbox/service/pharmcoop";
+  return (
+    <OperatorInbox
+      key={`${session.userId}:${endpoint}`}
+      client={businessClient}
+      endpoint={endpoint}
+    />
+  );
 }
 
-function CooperativeNotificationPage(){
- const {session,businessClient,preview}=useContext(Context);
- return session.userId&&businessClient&&!preview?<CooperativeNotifications key={session.userId} client={businessClient}/>:<p>로그인 후 문의 알림을 확인해 주세요.</p>;
+function CooperativeNotificationPage() {
+  const { session, businessClient, preview } = useContext(Context);
+  return session.userId && businessClient && !preview ? (
+    <CooperativeNotifications key={session.userId} client={businessClient} />
+  ) : (
+    <p>로그인 후 문의 알림을 확인해 주세요.</p>
+  );
 }

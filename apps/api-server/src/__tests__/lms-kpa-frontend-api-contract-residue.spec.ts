@@ -26,49 +26,19 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')
 // (A) 동작 — 실제 요청 URL assert (request spy)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** KPA `services/web-kpa-society/src/api/client.ts` 의 base 결합 규칙과 동일. */
-const KPA_SERVICE_BASE = 'https://api.neture.co.kr/api/v1/kpa';
-const KPA_CORE_BASE = 'https://api.neture.co.kr/api/v1';
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA appreciation client(api/appreciation.ts)와
+//   소비 화면(forum · contents · mypage)은 옛 KPA 화면 제거로 삭제됐다. 재도입 시 이 계약을 다시 세운다.
+const KPA_APPRECIATION_RETIRED = [
+  'services/web-kpa-society/src/api/appreciation.ts',
+  'services/web-kpa-society/src/pages/forum/ForumDetailPage.tsx',
+  'services/web-kpa-society/src/pages/forum/ForumListPage.tsx',
+  'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',
+  'services/web-kpa-society/src/pages/mypage/MyDashboardPage.tsx',
+];
 
-describe('KPA appreciation client — 실제 요청 URL', () => {
-  const src = read('services/web-kpa-society/src/api/appreciation.ts');
-
-  /** client 소스에서 endpoint 문자열을 뽑아 base 와 결합한 실제 URL 을 만든다. */
-  function requestedUrl(fnName: string, args: Record<string, string> = {}): string {
-    const idx = src.indexOf(`${fnName}:`);
-    expect(idx).toBeGreaterThan(-1);
-    const slice = src.slice(idx, idx + 400);
-    const usesCore = /coreApiClient\.(get|post)/.test(slice);
-    const base = usesCore ? KPA_CORE_BASE : KPA_SERVICE_BASE;
-    const m = slice.match(/coreApiClient|apiClient/) && slice.match(/[`']((?:\/|\$)[^`']*)[`']/);
-    expect(m).toBeTruthy();
-    let endpoint = (m as RegExpMatchArray)[1];
-    for (const [k, v] of Object.entries(args)) {
-      endpoint = endpoint.split('${' + k + '}').join(v);
-    }
-    return `${base}${endpoint}`;
-  }
-
-  it('getSummary 는 canonical `/api/v1/appreciation/:type/:id/summary` 로 나간다', () => {
-    expect(requestedUrl('getSummary', { targetType: 'lms_course', targetId: 'C1' }))
-      .toBe('https://api.neture.co.kr/api/v1/appreciation/lms_course/C1/summary');
-  });
-
-  it('getRecent 는 canonical `/api/v1/appreciation/:type/:id/recent` 로 나간다', () => {
-    expect(requestedUrl('getRecent', { targetType: 'forum_post', targetId: 'P1' }))
-      .toBe('https://api.neture.co.kr/api/v1/appreciation/forum_post/P1/recent');
-  });
-
-  it('send / my-sent / my-received 도 동일 canonical base 를 쓴다', () => {
-    expect(requestedUrl('send')).toBe('https://api.neture.co.kr/api/v1/appreciation/send');
-    expect(requestedUrl('getMySent')).toBe('https://api.neture.co.kr/api/v1/appreciation/my-sent');
-    expect(requestedUrl('getMyReceived')).toBe('https://api.neture.co.kr/api/v1/appreciation/my-received');
-  });
-
-  it('어떤 호출도 `/api/v1/kpa/appreciation` 으로 나가지 않는다', () => {
-    for (const fn of ['send', 'getMySent', 'getMyReceived', 'getSummary', 'getRecent']) {
-      expect(requestedUrl(fn)).not.toContain('/api/v1/kpa/appreciation');
-    }
+describe('KPA appreciation client — 제거됨 (D7)', () => {
+  it.each(KPA_APPRECIATION_RETIRED)('%s 는 존재하지 않는다', (rel) => {
+    expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
   });
 });
 
@@ -117,24 +87,6 @@ describe('certificate 프런트 계약 — dead path 0', () => {
       const src = read(rel);
       expect(src).not.toContain('/certificates/course/');
       expect(src).not.toContain('/certificates/:id/download');
-    }
-  });
-});
-
-describe('appreciation 소비 화면 — client 단일 경유', () => {
-  // Lecture Phase 2 §14: KPA LmsCourseDetailPage 는 삭제 — appreciation 소비처에서 제외
-  const consumers = [
-    'services/web-kpa-society/src/pages/forum/ForumDetailPage.tsx',
-    'services/web-kpa-society/src/pages/forum/ForumListPage.tsx',
-    'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',
-    'services/web-kpa-society/src/pages/mypage/MyDashboardPage.tsx',
-  ];
-
-  it('화면은 URL 을 직접 만들지 않고 appreciation client 만 소비한다', () => {
-    for (const rel of consumers) {
-      const src = read(rel);
-      expect(src).toContain("from '../../api/appreciation'");
-      expect(src).not.toContain('/appreciation/');
     }
   });
 });

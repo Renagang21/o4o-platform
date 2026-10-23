@@ -4,7 +4,8 @@ import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import type { StoreWorkspaceOutlet } from '../../components/layouts/StoreWorkspaceShell';
 import { workspaceItems } from '../../config/storeWorkspace';
 import { MapPin } from 'lucide-react';
-import { StoreExecutionHomeView, type StoreExecutionGroup, type StoreExecutionQrInput } from '@o4o/store-ui-core';
+import { StoreExecutionHomeView, type StoreExecutionQrInput } from '@o4o/store-ui-core';
+import { StoreExecutionActions } from './operations/StoreExecutionActions';
 import { colors } from '../../styles/theme';
 import { fetchTablets } from '../../api/tabletDisplays';
 import { getStoreQrCodes } from '../../api/storeQr';
@@ -40,6 +41,7 @@ export default function StoreExecutionPage(props: ExecutionProps) {
 }
 function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionProps) {
   const { pathname } = useLocation();
+  const { key: scope } = useStoreOperationScope();
   const allows = (key: string) => !availableKeys || availableKeys.includes(key);
   const base = storeWorkspaceBase(pathname);
   const tabletAllowed = allows('tablet-displays'), qrAllowed = allows('qr');
@@ -51,10 +53,6 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
     { label: '태블릿', error: tablets.error, loading: tablets.loading, reload: tablets.reload },
     { label: 'QR', error: qrs.error, loading: qrs.loading, reload: qrs.reload },
   ];
-  const groupLinks = (group: StoreExecutionGroup) => <nav className="flex flex-wrap gap-3 text-sm text-blue-700">
-    {allows('tablet-displays') && group.tablets.length > 0 && <Link className="min-h-11 content-center" to={`${base}/commerce/tablet-displays?workspace=use`}>이 위치의 화면 변경</Link>}
-    {allows('qr') && group.qrs.length > 0 && <Link className="min-h-11 content-center" to={`${base}/marketing/qr?workspace=use`}>QR 배치·출력</Link>}
-  </nav>;
   return <div className="max-w-5xl mx-auto px-4 py-6 space-y-5">
     <header className="flex flex-wrap items-start justify-between gap-3">
       <div><h1 className="text-xl font-bold flex items-center gap-2"><MapPin size={20} />{workspace ? '매장 운영' : '위치별 저장 설정'}</h1>
@@ -80,7 +78,7 @@ function ExecutionSession({ workspace, navigation, availableKeys }: ExecutionPro
     {(tabletAllowed || qrAllowed) && (loading || !failed || (!tablets.error && tablets.data.length > 0) || (!qrs.error && qrs.data.items.length > 0)) && <StoreExecutionHomeView
       tablets={tablets.error ? [] : tablets.data} qrs={qrs.error ? [] : qrs.data.items} loading={loading}
       labels={{ summaryTablets: tabletAllowed ? '조회한 태블릿' : '태블릿 조회 제외', summaryQrPlaced: qrAllowed ? '위치 등록 QR' : 'QR 조회 제외', summaryScans: 'QR 누적 스캔', unplacedHint: '배치 위치가 등록되지 않은 QR입니다. QR 배치·출력에서 위치를 지정할 수 있습니다.', ...(!tabletAllowed ? { emptyAll: '조회한 QR이 없습니다', emptyHint: 'QR 배치·출력에서 저장한 QR을 확인해 주세요.' } : !qrAllowed ? { emptyAll: '조회한 태블릿이 없습니다', emptyHint: '태블릿 화면 변경에서 저장한 태블릿을 확인해 주세요.' } : {}) }}
-      palette={{ primary: colors.primary }} renderGroupLinks={groupLinks}
+      palette={{ primary: colors.primary }} renderGroupLinks={group => <StoreExecutionActions group={group} base={base} scope={scope} tabletAllowed={tabletAllowed} qrAllowed={qrAllowed} />}
       emptyAction={allows('tablet-displays') ? <Link to={`${base}/commerce/tablet-displays?workspace=use`}>태블릿 화면 적용으로 가기</Link> : undefined}
     />}
   </div>;

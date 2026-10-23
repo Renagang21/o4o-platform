@@ -99,7 +99,7 @@ export function getBulkTemplateColumns(key: string | null | undefined): string[]
 export function buildBulkTemplateCsv(key: string): string {
   const cols = getBulkTemplateColumns(key);
   const header = cols.map((c) => (/[",\n]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c)).join(',');
-  return `﻿${header}\r\n`;
+  return `\uFEFF${header}\r\n`;
 }
 
 /* ------------------------------------------------------------------ */

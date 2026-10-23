@@ -133,8 +133,6 @@ export interface ServiceLegalSettingsPageProps {
   api: ServiceLegalApi;
   /** 화면 상단 제목(선택). 기본 '서비스 설정 — 법정정보·약관'. */
   title?: string;
-  /** 서비스 가입 문서의 새 초안 기본 버전. 기존 서비스는 1. */
-  newPolicyVersion?: number;
   /**
    * 노출할 탭(선택). 기본: 전체 `['profile', 'policies', 'status']`.
    * 정책문서 트랙을 별도(legacy)로 운영하는 서비스는 `['profile']` 등 부분 노출로

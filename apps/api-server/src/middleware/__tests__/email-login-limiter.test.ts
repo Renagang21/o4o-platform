@@ -6,7 +6,7 @@
  */
 import express from 'express';
 import request from 'supertest';
-import { createEmailLoginLimiter, strictLimiter } from '../rateLimiter.js';
+import { createEmailLoginLimiter, createGoogleAuthLimiters, strictLimiter } from '../rateLimiter.js';
 
 const GOOD = { email: 'user@example.com', password: 'right-pass1!' };
 const BAD = { email: 'user@example.com', password: 'wrong' };
@@ -23,7 +23,7 @@ function app() {
   a.set('trust proxy', true); // 테스트에서 X-Forwarded-For 로 클라이언트 IP 를 바꾼다
   a.use(express.json());
   a.post('/email/login', limiter, handler);
-  a.post('/google/login', google); // 실제 라우트와 같이 limiter 없음
+  a.post('/google/login', createGoogleAuthLimiters().login, google);
   return { a, handler, google };
 }
 
@@ -73,11 +73,12 @@ describe('이메일 로그인 횟수 제한 — 15분 실패 5회', () => {
     expect((await post(a, '10.1.4.2', GOOD)).status).toBe(200);
   });
 
-  it('Google 로그인 경로에는 영향이 없다', async () => {
+  it('Google 로그인은 이메일과 별도 실패 횟수를 센다', async () => {
     const { a, google } = app();
     for (let i = 0; i < 6; i += 1) await post(a, '10.1.5.1', BAD);
     expect((await post(a, '10.1.5.1', BAD)).status).toBe(429);
-    for (let i = 0; i < 8; i += 1) expect((await post(a, '10.1.5.1', {}, '/google/login')).status).toBe(401);
-    expect(google).toHaveBeenCalledTimes(8);
+    for (let i = 0; i < 5; i += 1) expect((await post(a, '10.1.5.1', {}, '/google/login')).status).toBe(401);
+    expect((await post(a, '10.1.5.1', {}, '/google/login')).status).toBe(429);
+    expect(google).toHaveBeenCalledTimes(5);
   });
 });

@@ -71,10 +71,16 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     expect(existsSync(join(KPA, 'api', 'storePop.ts'))).toBe(false);
   });
 
-  it('KPA `marketing/pop` 은 V2 redirect 이고 `pop` 단축 route 도 V2 로 간다', () => {
-    for (const app of [kpaApp]) {
-      expect(app).toMatch(/path="marketing\/pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
-      expect(app).toMatch(/path="pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 는 내 매장 handoff 하나 — redirect 는 web-store 가 갖는다.
+  it('KPA 에는 로컬 POP route 가 없다', () => {
+    expect(kpaApp).toMatch(/<Route path="\/store\/\*" element=\{<KpaUnifiedStoreHandoff \/>\} \/>/);
+    expect(kpaApp).not.toMatch(/StorePopV2Page|path="marketing\/pop/);
+  });
+
+  it('내 매장 `marketing/pop` 은 V2 redirect 이고 `pop` 단축 route 도 V2 로 간다', () => {
+    for (const app of [codeOnly(read(join(REPO, 'services', 'web-store', 'src'), 'App.tsx'))]) {
+      expect(app).toMatch(/path="marketing\/pop"\s+element=\{<Navigate to=\{`\$\{S\}\/marketing\/pop-v2`\} replace \/>\}/);
+      expect(app).toMatch(/path="pop"\s+element=\{<Navigate to=\{`\$\{S\}\/marketing\/pop-v2`\} replace \/>\}/);
       expect(app).not.toMatch(/<StorePopPage \/>|StorePopPage'\)/);
       expect(app).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
     }
@@ -97,11 +103,9 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     expect((menu.match(/subPath: '\/marketing\/pop-v2'/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('가이드 copy 의 POP route 는 pop-v2 다 (KPA — KCos copy 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거)', () => {
-    for (const f of ['kpa.ts']) {
-      const src = codeOnly(read(GUIDE, f));
-      expect(src).not.toMatch(/'\/store\/marketing\/pop'/);
-      expect(src).toMatch(/'\/store\/marketing\/pop-v2'/);
+  it('옛 POP route 를 담던 매장 가이드 copy 는 남아 있지 않다 (KCos — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 · KPA — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)', () => {
+    for (const f of ['kpa.ts', 'k-cosmetics.ts']) {
+      expect(existsSync(join(GUIDE, f))).toBe(false);
     }
   });
 });

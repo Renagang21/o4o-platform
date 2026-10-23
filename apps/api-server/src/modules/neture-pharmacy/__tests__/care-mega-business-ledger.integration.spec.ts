@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies, cleanupFixtureBusinessPolicies } from './fixtures/business-policies.js';
 import express from 'express';
 import request from 'supertest';
 import { randomUUID } from 'crypto';
@@ -40,7 +41,6 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   const businesses: string[] = [];
   let admin: string, owner: string, careOperator: string, megaAdmin: string;
   let store: string;
-  const policies: Array<{ documentType: string; policyDocumentId: string; version: number }> = [];
   const base = '/api/v1/neture';
   const as = (user: string) => ({
     get: (path: string) => request(app).get(base + path).set('x-fixture-user', user).set('x-store-organization-id', store),
@@ -50,13 +50,6 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
 
   beforeAll(async () => {
     db = await new DataSource({ type: 'postgres', url, entities: [] }).initialize();
-    for (const type of ['terms', 'privacy']) {
-      const [doc] = await db.query(`INSERT INTO service_policy_documents
-        (service_key, document_type, title, slug, content, version, status, effective_date, published_at)
-        VALUES ('carepharm', $1, 'Synthetic enrollment policy', $2, 'Synthetic policy body', 2, 'published', NOW(), NOW()) RETURNING id`,
-      [type, `carepharm-service-${type}`]);
-      policies.push({ documentType: type, policyDocumentId: doc.id, version: 2 });
-    }
     const existing = await db.query(`SELECT key FROM semi_franchises WHERE key = ANY($1::text[])`, [KEYS]);
     if (existing.length) throw new Error('fixture DB already has carepharm/megapharm rows — use a fresh database');
     const created = await db.query(
@@ -101,11 +94,9 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   afterAll(async () => {
     jest.restoreAllMocks();
     if (!db?.isInitialized) return;
+    await cleanupFixtureBusinessPolicies(db, businesses);
     // FK 순서대로 이 suite 가 만든 행만 지운다(고정 SQL · id 는 bind).
     const cleanup: Array<[string, string[]]> = [
-      ['DELETE FROM action_logs WHERE user_id = ANY($1::uuid[])', users],
-      ['DELETE FROM user_policy_acceptances WHERE user_id = ANY($1::uuid[])', users],
-      ['DELETE FROM service_policy_documents WHERE id = ANY($1::uuid[])', policies.map(p => p.policyDocumentId)],
       ['DELETE FROM semi_franchise_memberships WHERE semi_franchise_id = ANY($1::uuid[])', businesses],
       ['DELETE FROM semi_franchises WHERE id = ANY($1::uuid[])', businesses],
       ['DELETE FROM neture_pharmacy_memberships WHERE organization_id = ANY($1::uuid[])', orgs],
@@ -156,9 +147,7 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   it('isolates each business operator while both applications are pending, then approves each', async () => {
     const ids: Record<string, string> = {};
     for (const key of KEYS) {
-      const applied = await as(owner).post(`/pharmacy/semi-franchises/${key}/apply`, {
-        conditions: '', ...(key === 'carepharm' ? { policyReferences: policies } : {}),
-      });
+      const applied = await as(owner).post(`/pharmacy/semi-franchises/${key}/apply`, { conditions: '', policyReferences: await fixtureBusinessPolicies(db, key) });
       expect(applied.status).toBe(200);
       expect(applied.body.data.status).toBe('pending');
       ids[key] = applied.body.data.id;

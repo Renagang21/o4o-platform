@@ -1,16 +1,16 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '../legal/ServiceEnrollmentPolicyAgreement';
 import { BusinessHomeShowcase } from './BusinessHomeShowcase';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import type { CooperationModel } from './models';
 import { CAREPHARM_MATERIAL_TAGS } from './carepharmMaterials';
-import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '../legal/ServiceEnrollmentPolicyAgreement';
 
 export interface CooperationClient {
   get(path: string, config?: { params?: Record<string, unknown>; headers?: Record<string, string> }): Promise<{ data: { data: any } }>;
   post(path: string, body?: unknown, config?: { headers?: Record<string, string> }): Promise<unknown>;
 }
-interface Business { key: string; name: string; communityKey: string | null; registrationConditions: string | null }
+interface Business { policyScope: string; key: string; name: string; communityKey: string | null; registrationConditions: string | null }
 interface Access { kind: string; businessKey?: string; allowed: boolean; canManage: boolean }
 interface StoreAccess { businessKey: string; organizationId: string; allowed: boolean; membershipStatus: string | null }
 interface Membership { key: string; membershipStatus: string | null; reason?: string | null }
@@ -133,8 +133,7 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
 }
 
 function Participation({ model, business, access, client, onChanged }: { model: CooperationModel; business: Business; access: Access; client: CooperationClient; onChanged: () => void }) {
-  const agreement = useServiceEnrollmentPolicies(model.key, () => model.key === 'carepharm'
-    ? client.get('/public/services/carepharm/enrollment-policies').then(r => r.data.data) : Promise.resolve([]));
+  const agreement = useServiceEnrollmentPolicies(business.policyScope, async () => (await client.get(`/neture/businesses/${encodeURIComponent(model.key)}/legal/enrollment-policies`)).data.data, business.key);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -154,7 +153,7 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     if (busy || (action === 'apply' && (!accepted || staleConditions || !agreement.ready))) return;
     if (action === 'withdraw' && !window.confirm('이 서비스의 가입 신청을 취소하거나 탈퇴하시겠습니까?')) return;
     setBusy(true); setError('');
-    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note, ...(model.key === 'carepharm' ? { policyReferences: agreement.references } : {}) } : {}); onChanged(); }
+    try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note, policyReferences: agreement.references } : {}); onChanged(); }
     catch (e: any) {
       const code = e.response?.data?.code ?? e.response?.data?.error?.code;
       if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED', 'POLICY_UNAVAILABLE'].includes(code)) {
@@ -173,9 +172,9 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     {business.registrationConditions && <p className="whitespace-pre-wrap">{business.registrationConditions}</p>}
     {!loading && !error && !access.canManage && !membership && <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>}
     {!loading && membership && !access.canManage && !['active', 'pending', 'suspended'].includes(status ?? '') && <>
-      {model.key === 'carepharm' && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
       <label className="block"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> 이 서비스의 참여 조건을 확인했습니다.</label>
       <label className="block">추가 신청 내용<textarea maxLength={2000} value={note} onChange={e => setNote(e.target.value)} className="mt-2 block w-full rounded border p-3" /></label>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
       <button className="rounded bg-teal-800 px-5 py-3 text-white disabled:opacity-50" disabled={!accepted || busy || staleConditions || !agreement.ready} onClick={() => void act('apply')}>가입 신청</button>
     </>}
     {staleConditions && <button className="underline" onClick={onChanged}>최신 참여 조건 다시 확인</button>}

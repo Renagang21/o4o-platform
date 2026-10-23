@@ -232,7 +232,9 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
   //   (service-catalog joinEnabled=false). 그래서 '가입 가능한 서비스' 에도 나타나지 않는다.
   //   서비스 운영 화면(`/admin/communities`)은 대표 호스트에 있고 SUBDOMAIN_OPERATOR_SCREENS 로 진입한다.
   community: { home: '/' },
-  'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 운영 · 관리 콘솔(`/operator` · `/admin`)은 삭제됐다 —
+  //   pharmacy 운영은 다른 협력사업과 같은 사업 운영 화면으로 들어간다(operator · admin scope 공통).
+  'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator/semi-franchises', admin: '/operator/semi-franchises', join: '/register' },
   // k-cosmetics: 운영 종료 — 매장 · 운영자 · 가입 진입을 만들지 않는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},

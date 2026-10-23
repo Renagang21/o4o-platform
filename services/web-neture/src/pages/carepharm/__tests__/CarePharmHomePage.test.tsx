@@ -10,18 +10,17 @@ vi.mock('../../../lib/apiClient', () => ({ api: { get: state.get, post: state.po
 vi.mock('../CarePharmNotices', () => ({ CarePharmNotices: () => null }));
 vi.mock('@o4o/shared-space-ui', async original => ({ ...await original<typeof import('@o4o/shared-space-ui')>(), ServiceHomeHero: () => <h1>만성질환관리</h1>, ServiceHomePromotion: () => null }));
 import CarePharmHomePage from '../CarePharmHomePage';
-const business = { key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };
+const business = { policyScope: 'business:11111111-1111-4111-8111-111111111111', key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };
+const policies = ['terms', 'privacy'].map((documentType, i) => ({ serviceKey: business.policyScope, documentType, policyDocumentId: `22222222-2222-4222-8222-22222222222${i}`, version: 1, title: documentType, content: 'Fixture policy' }));
 let access: { kind: string; businessKey: string; allowed: boolean; canManage: boolean };
 let membership: string | null;
-const policyDocs = ['terms','privacy'].map((documentType,i) => ({ policyDocumentId: `${i+1}1111111-1111-4111-8111-111111111111`, serviceKey:'carepharm',documentType,version:2,title:documentType === 'terms' ? 'CarePharm 신청 약관' : 'CarePharm 개인정보 안내',content:'합성 정책 본문' }));
-const accept = () => screen.getAllByRole('checkbox').forEach(box => fireEvent.click(box));
 const response = (data: unknown) => ({ data: { data } });
 const mount = (view: 'home' | 'participation' | 'materials' | 'tools' = 'home') => render(<MemoryRouter><CarePharmHomePage view={view} /></MemoryRouter>);
 beforeEach(() => {
   state.get.mockReset(); state.post.mockReset(); state.login.mockReset(); state.authenticated = true; state.account = 'owner'; membership = null;
   access = { kind: 'semi-franchise', businessKey: 'carepharm', allowed: false, canManage: false };
   state.get.mockImplementation(async (path: string) => {
-    if (path.endsWith('/enrollment-policies')) return response(policyDocs);
+    if (path.endsWith('/enrollment-policies')) return response(policies);
     if (path.endsWith('/showcase')) return response({ businessKey:'carepharm',items:[] });
     if (path.endsWith('/businesses/carepharm/store-access')) return response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: access.allowed, membershipStatus: access.allowed ? 'active' : membership });
     if (path.endsWith('/businesses/carepharm')) return response(business);
@@ -76,16 +75,16 @@ describe('CarePharm cooperation service', () => {
     state.post.mockImplementation(async () => { membership = 'pending'; return response({}); });
     mount('participation'); await screen.findByText('미가입');
     expect(screen.getByRole('button', { name: '가입 신청' }).hasAttribute('disabled')).toBe(true);
-    accept(); fireEvent.change(screen.getByRole('textbox'), { target: { value: '참여 신청' } });
+    await screen.findByText('privacy · 버전 1'); for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box); fireEvent.change(screen.getByRole('textbox'), { target: { value: '참여 신청' } });
     fireEvent.click(screen.getByRole('button', { name: '가입 신청' }));
     await screen.findByText('승인 대기');
-    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청', policyReferences: policyDocs.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId,version,documentType })) }, { headers: { 'X-Store-Organization-Id': 'owned-store' } });
+    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })) }, { headers: { 'X-Store-Organization-Id': 'owned-store' } });
   });
   it('requires fresh condition acceptance after server rejects stale conditions', async () => {
     state.post.mockRejectedValue({ response: { data: { code: 'CONDITIONS_CHANGED' } } });
-    mount('participation'); await screen.findByText('미가입'); accept();
+    mount('participation'); await screen.findByText('privacy · 버전 1'); for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
     fireEvent.click(screen.getByRole('button', { name: '가입 신청' })); await screen.findByRole('alert');
-    expect((screen.getByLabelText('이 서비스의 참여 조건을 확인했습니다.') as HTMLInputElement).checked).toBe(false);
+    expect((screen.getByRole('checkbox', { name: '이 서비스의 참여 조건을 확인했습니다.' }) as HTMLInputElement).checked).toBe(false);
     expect(screen.getByRole('button', { name: '가입 신청' }).hasAttribute('disabled')).toBe(true);
     expect(screen.getByRole('button', { name: '최신 참여 조건 다시 확인' })).toBeTruthy();
   });
@@ -258,8 +257,8 @@ it('keeps home as an overview and loads member material bodies only in the mater
 
 it('requires refreshed policy acknowledgement while preserving the application note', async () => {
  state.post.mockRejectedValue({response:{data:{code:'POLICY_VERSION_MISMATCH'}}});
- mount('participation');await screen.findByText('미가입');await screen.findByText('CarePharm 신청 약관 · 버전 2');
- fireEvent.change(screen.getByRole('textbox'),{target:{value:'유지할 신청 내용'}});accept();
+ mount('participation');await screen.findByText('미가입');await screen.findByText('terms · 버전 1');
+ fireEvent.change(screen.getByRole('textbox'),{target:{value:'유지할 신청 내용'}});screen.getAllByRole('checkbox').forEach(box=>fireEvent.click(box));
  fireEvent.click(screen.getByRole('button',{name:'가입 신청'}));await screen.findByText(/입력 내용은 유지됩니다/);
  await waitFor(()=>expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true));
  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('유지할 신청 내용');

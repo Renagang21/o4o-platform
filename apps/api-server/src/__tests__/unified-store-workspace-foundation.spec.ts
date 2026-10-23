@@ -231,8 +231,11 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   });
 
   // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
-  it('기존 서비스의 /store 라우트는 그대로다 (기능 이전 0)', () => {
-    expect(readRepo('services/web-kpa-society/src/App.tsx')).toContain('<Route path="/store/workspace"');
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 로컬 /store/* 화면은 제거됐고 전부 내 매장으로 이전한다.
+  it('pharmacy 의 /store 트리는 로컬 화면 없이 내 매장 handoff 하나다', () => {
+    const app = readRepo('services/web-kpa-society/src/App.tsx');
+    expect(app).not.toContain('<Route path="/store/workspace"');
+    expect(app).toContain('<Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />');
   });
 
   it('deploy-web-services.yml 에 store-web 이 등록되어 있다', () => {
@@ -248,29 +251,27 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
 describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 보존)', () => {
   const kpa = readRepo('services/web-kpa-society/src/App.tsx');
 
-  it('pharmacy는 옛 가드 전에 이전하고 PH는 기존 handoff 조건을 보존한다', () => {
-    expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
-    expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
-    expect(norm(kpa)).toContain('<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>');
-    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
-  });
-
-  it('제외 표면: PH PG callback(/store-owner/payment · requireStoreOwnerRole=false) 과 송출 화면은 handoff 대상이 아니다', () => {
-    // requireStoreOwnerRole=false 분기는 MembershipGate → ShellLayout 직결(게이트 없음)
-    // 송출 화면은 layout wrapper(=게이트 포함) 없이 가드만
-    expect(norm(kpa)).toContain('element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}');
-  });
-
-  it("pharmacy 배포만 handoff를 활성화하고 PH는 기본 false를 보존한다", () => {
-    for (const svc of ['web-kpa-society']) {
-      const df = readRepo(`services/${svc}/Dockerfile`);
-      expect(df).toContain(`ARG VITE_UNIFIED_STORE_HANDOFF=${svc === 'web-kpa-society' ? 'true' : 'false'}`);
-      expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 로컬 매장 화면 · PharmacyGuard 제거 → handoff 는 무조건이다.
+  it('pharmacy 는 /store · /hub · /store-hub 를 조건 없이 내 매장으로 이전한다', () => {
+    expect(kpa).toContain('kpaStoreServicesApi.resolveWorkspaceEntryUrl(scopedPath)');
+    expect(kpa).not.toContain('isUnifiedStoreHandoffEnabled');
+    expect(kpa).not.toContain('PharmacyGuard');
+    for (const p of ['/store/*', '/hub/*', '/store-hub/*']) {
+      expect(kpa).toContain(`<Route path="${p}" element={<KpaUnifiedStoreHandoff />} />`);
     }
-    const wf = readRepo('.github/workflows/deploy-web-services.yml');
-    expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
-    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length ?? 0).toBe(0);
-    expect(wf).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
+  });
+
+  it('송출 화면(TV)은 내 매장의 chrome-free 최상위 route 로 간다 — 로컬 재생 화면 없음', () => {
+    expect(kpa).not.toContain('SignagePlaybackPage');
+    expect(readRepo('services/web-kpa-society/src/lib/unifiedStoreScope.ts')).toContain(String.raw`signage\/play`);
+    expect(readRepo('services/web-store/src/App.tsx')).toContain('${S}/marketing/signage/play/:playlistId');
+  });
+
+  // handoff 가 무조건이 되어 활성화 build 입력은 Dockerfile · 배포 workflow · 타입 선언에서 제거됐다.
+  it('handoff 활성화 build 입력(VITE_UNIFIED_STORE_HANDOFF)이 남아 있지 않다', () => {
+    expect(readRepo('services/web-kpa-society/Dockerfile')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('services/web-kpa-society/src/vite-env.d.ts')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('.github/workflows/deploy-web-services.yml')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
   });
 
   it('handoff 발급은 같은 POST /auth/handoff 의 targetWorkspace=store 분기다 (신규 엔드포인트 0 · 가짜 serviceKey 0)', () => {

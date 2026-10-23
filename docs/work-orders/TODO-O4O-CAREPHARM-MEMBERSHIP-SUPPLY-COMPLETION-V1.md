@@ -76,3 +76,11 @@
 - 작업 branch: `wo/carepharm-membership-supply-completion`. 개발 시작점은 위 기준 main이다. 확인 시 `origin/main`은 `7dc02646dab2808258133139b3ca0714ec3cc14b`로 5 commit 이동했으며 변경 파일 교집합은 0이다. 자동 merge/rebase하지 않았다. 통합 담당이 최신 main 기준 CI·리뷰를 수행한다.
 - PR 생성·원격 CI·main 병합·배포는 이번 공간에서 실행하지 않는다. branch와 worktree는 통합/후속 수정용으로 `KEEP`한다. commit·push 결과와 정확한 원격 HEAD·미커밋 상태는 최종 인계 메시지에 기록한다.
 - 문서 정합: 조사로 보완한 신청 경영자 권한·CarePharm 증빙·대상 약국 가입·결제 재판정 계약을 commerce 설계 §17-3에 연결했다. 기존 WO 기록 유지, SUPERSEDED 표기 0건, 링크 추가 2건, 별도 WO 제안 0건. 남은 운영 개통은 위 항목으로 구분한다.
+
+## 2026-10-23 통합·배포 후속 (사용자 추가 지시)
+
+사용자가 이 공간에서 main 병합과 배포를 지시했다. 위 개발 종료 당시의 범위와 실행 결과는 당시 기록으로 유지하며, 이후 상태는 이 절과 최종 통합 인계로 구분한다.
+
+최신 main `5a6ab8f23582d8708186459c8c887d68da00ceff`에는 사업별 법정정보·약관이 `business:<semi_franchises.id>`로 분리된 §15-9 구현이 먼저 들어왔다. 통합에서는 이 정본을 우선한다. 앞선 조사·구현 기록의 `carepharm` 정책 namespace, 최소 버전 2, `/operator/legal/carepharm` 전용 편집 경로는 **SUPERSEDED**이며, 담당 사업의 기존 ‘현장 요구 · 사업 약관’ 도구와 `/neture/operator/semi-franchises/:key/legal`을 사용한다. 첫 버전 1을 허용하고 다른 사업·계정 문서의 대체 사용은 거부한다. 별도 legacy namespace·UI·guard는 제거했다.
+
+현재 main의 사업 범위·문서 정책·역할 격리를 유지하면서 신청/탈퇴의 현재 경영자 관계, 대상 약국의 해당 사업 가입, 결제 준비/확정 자격 재검증, 정책 개정 시 신청 메모 보존을 결합했다. 승낙된 역사 문서 불변성은 기존 controller에서 business UUID 범위에 적용한다. 초기 개발 branch의 검증 결과를 이 통합 HEAD의 결과로 간주하지 않고 새 canonical schema·사업 정책 fixture로 다시 검증한다. 병합은 정상 PR gate를 따르며 bypass하지 않는다.

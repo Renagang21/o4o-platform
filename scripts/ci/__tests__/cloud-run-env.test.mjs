@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { currentPlainEnv, planOptionalEnv, resolveOptionalEnv, setEnvFlag } from '../cloud-run-env.mjs';
+import { assertCurrentKnown, currentPlainEnv, planOptionalEnv, resolveOptionalEnv, setEnvFlag } from '../cloud-run-env.mjs';
 
 const svc = (env) => ({ spec: { template: { spec: { containers: [{ env }] } } } });
 
@@ -36,6 +36,25 @@ describe('optional env', () => {
 
   it('서비스 조회 실패(null) → carry 없이 set/omit', () => {
     assert.deepEqual(planOptionalEnv(['A', 'B'], { A: 'v' }, null).map((p) => p.action), ['set', 'omit']);
+  });
+
+  it('--require-current: 서비스 조회 실패면 판정하지 않고 실패 (외부 AI 설정을 지우지 않는다)', () => {
+    assert.throws(() => assertCurrentKnown(null, true));
+    assert.doesNotThrow(() => assertCurrentKnown(null, false));
+    assert.doesNotThrow(() => assertCurrentKnown(svc([]), true));
+  });
+
+  it('외부 AI 설정: 저장소 값 없음 · 운영 값 있음 → carry (쉼표 목록 포함)', () => {
+    const names = ['EXTERNAL_AI_ISSUER_URL', 'EXTERNAL_AI_REDIRECT_URIS'];
+    const plan = planOptionalEnv(names, {}, svc([
+      { name: 'EXTERNAL_AI_ISSUER_URL', value: 'https://api.example.invalid' },
+      { name: 'EXTERNAL_AI_REDIRECT_URIS', value: 'https://a.example.invalid/cb,https://b.example.invalid/cb' },
+    ]));
+    assert.deepEqual(plan.map((p) => p.action), ['carry', 'carry']);
+    assert.equal(
+      setEnvFlag(plan[1].name, plan[1].value),
+      '--set-env-vars=^@@^EXTERNAL_AI_REDIRECT_URIS=https://a.example.invalid/cb,https://b.example.invalid/cb',
+    );
   });
 
   it('flag 형식 — 쉼표 값은 구분자 문법 · 잘못된 이름 거부', () => {
