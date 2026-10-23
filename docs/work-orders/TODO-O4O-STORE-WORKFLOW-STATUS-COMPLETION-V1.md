@@ -1,6 +1,6 @@
 # 내 매장 일상 업무·대시보드 상태 보완 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (한국시간)
 > **근거**: 미흡점 조사 후 사용자 지시 — TODO 작성·문서/코드 대조·계획 보완·개발·검증·commit·push
 > **종료점**: 최초 개발은 push 후 인계. 2026-10-23 사용자 후속 지시로 이 공간에서 PR·main 병합·배포와 결과 기록까지 진행.
@@ -62,7 +62,8 @@
 - [x] 개발 원격 HEAD·clean·현행 ruleset·기존 PR 없음·진행 중 배포 없음 확인.
 - [x] 최신 main `cd091bc221`의 260개 변경 경로 대조. 겹침은 QR 안내 링크 제거와 설계 문서 2곳이며 일반 merge `eb9a77b3bb`로 양쪽 변경 보존.
 - [x] 최신 결합 상태 frozen 설치·Store 785/API 90·Store/API build·타입·집중 lint·PC/모바일 합성 40 PASS. CI의 음성 콜백 검사 대기 보완 후 Store 전체 재통과.
-- [ ] 개발 branch push 후 PR 생성, 정확한 HEAD의 필수 CI 및 Codex 지적/스레드 확인·처리.
-- [ ] main 재확인·검증 HEAD 고정 PR merge·post-merge CI 확인.
-- [ ] 현행 Delivery 판정·API/Store 운영 반영 확인, 로그인 없는 읽기 검증.
-- [ ] CHECK·TODO 결과 기록, 문서 정합, 자기 작업공간의 정리 가능 여부 확인 및 종료.
+- [x] 개발 branch push 후 PR #772 생성. HEAD `77e8195307`의 필수 CI 및 17개 check 통과, Codex 지적·미해결 스레드 0.
+- [x] main 재확인·검증 HEAD 고정 PR merge. main commit `8c44ffde13`.
+- [x] post-merge CI `39893076095` 성공 확인.
+- [x] Delivery `39894078073` 성공, production `DEPLOYED · api,store`. 비로그인 HTTP 11개·공개 자산 3개 PASS.
+- [x] CHECK·TODO 결과 기록·문서 정합 확인. main 포함·clean·세션 사용 없음 확인 후 코드 작업공간과 로컬/원격 branch 제거. 기록 branch는 문서 PR 반영 뒤 같은 안전 절차로 정리.
