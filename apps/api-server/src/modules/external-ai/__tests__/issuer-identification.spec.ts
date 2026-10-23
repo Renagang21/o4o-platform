@@ -40,6 +40,26 @@ function app() {
   return server;
 }
 
+function authorize(query: Record<string, string>) {
+  return request(app())
+    .get("/authorize")
+    .query({
+      client_id: "client-1",
+      redirect_uri: redirectUri,
+      response_type: "code",
+      code_challenge: "x".repeat(43),
+      code_challenge_method: "S256",
+      ...query,
+    });
+}
+
+function clientRedirect(location: string) {
+  const url = new URL(location);
+  expect(url.origin + url.pathname).toBe(redirectUri);
+  expect(url.searchParams.get("iss")).toBe("https://api.example.invalid/");
+  return url.searchParams;
+}
+
 describe("RFC 9207 issuer identification", () => {
   it("advertises iss support with the same issuer as the protected resource", async () => {
     const as = await request(app()).get("/.well-known/oauth-authorization-server");
@@ -54,47 +74,22 @@ describe("RFC 9207 issuer identification", () => {
   });
 
   it("returns iss on authorization error redirects to the client", async () => {
-    const res = await request(app()).get("/authorize").query({
-      client_id: "client-1",
-      redirect_uri: redirectUri,
-      response_type: "code",
-      code_challenge: "x".repeat(43),
-      code_challenge_method: "plain",
-      state: "s1",
-    });
+    const res = await authorize({ code_challenge_method: "plain", state: "s1" });
     expect(res.status).toBe(302);
-    const location = new URL(res.headers.location);
-    expect(location.origin + location.pathname).toBe(redirectUri);
-    expect(location.searchParams.get("error")).toBe("invalid_request");
-    expect(location.searchParams.get("iss")).toBe("https://api.example.invalid/");
+    expect(clientRedirect(res.headers.location).get("error")).toBe("invalid_request");
   });
 
   it("returns iss with state when the provider rejects a valid request", async () => {
     // Connection settings are absent in the mocked database, so the provider refuses.
-    const res = await request(app()).get("/authorize").query({
-      client_id: "client-1",
-      redirect_uri: redirectUri,
-      response_type: "code",
-      code_challenge: "x".repeat(43),
-      code_challenge_method: "S256",
-      state: "s1",
-    });
+    const res = await authorize({ state: "s1" });
     expect(res.status).toBe(302);
-    const location = new URL(res.headers.location);
-    expect(location.origin + location.pathname).toBe(redirectUri);
-    expect(location.searchParams.get("error")).toBeTruthy();
-    expect(location.searchParams.get("state")).toBe("s1");
-    expect(location.searchParams.get("iss")).toBe("https://api.example.invalid/");
+    const params = clientRedirect(res.headers.location);
+    expect(params.get("error")).toBeTruthy();
+    expect(params.get("state")).toBe("s1");
   });
 
   it("does not answer an unregistered redirect URI with a redirect", async () => {
-    const res = await request(app()).get("/authorize").query({
-      client_id: "client-1",
-      redirect_uri: "https://attacker.example.invalid/cb",
-      response_type: "code",
-      code_challenge: "x".repeat(43),
-      code_challenge_method: "S256",
-    });
+    const res = await authorize({ redirect_uri: "https://attacker.example.invalid/cb" });
     expect(res.status).toBe(400);
     expect(res.headers.location).toBeUndefined();
   });
