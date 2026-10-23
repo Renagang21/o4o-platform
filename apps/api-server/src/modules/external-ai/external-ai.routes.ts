@@ -6,7 +6,11 @@ import {
 } from "express";
 import type { DataSource } from "typeorm";
 import { z, ZodError } from "zod";
-import { mcpAuthRouter } from "@modelcontextprotocol/sdk/server/auth/router.js";
+import {
+  createOAuthMetadata,
+  mcpAuthRouter,
+} from "@modelcontextprotocol/sdk/server/auth/router.js";
+import { metadataHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/metadata.js";
 import {
   requireAuth,
   requireAdmin,
@@ -37,6 +41,10 @@ import {
   createAdminBrowserWriteGuard,
   externalAiAccountOrigins,
 } from "./auth/browser-write.middleware.js";
+import {
+  issuerOnAuthorizationRedirects,
+  withIssuerIdentification,
+} from "./auth/issuer-identification.js";
 import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
 
 type Handler = (req: Request, res: Response) => Promise<unknown>;
@@ -244,11 +252,23 @@ export function createExternalAiRoutes(
   root.use("/api/external-ai", user);
   if (provider) {
     // Mount MCP before the browser-session router (below reordering) — OAuth token only, never cookie auth.
-    const oauth = mcpAuthRouter({
+    const authServer = {
       provider,
       issuerUrl: config!.issuer,
-      resourceServerUrl: provider.resource,
       scopesSupported: [...scopes],
+    };
+    // RFC 9207: advertise and return `iss` so ChatGPT can use its stable redirect URI.
+    root.use(
+      "/.well-known/oauth-authorization-server",
+      metadataHandler(withIssuerIdentification(createOAuthMetadata(authServer))),
+    );
+    root.use(
+      "/authorize",
+      issuerOnAuthorizationRedirects(config!.issuer, config!.redirectUris),
+    );
+    const oauth = mcpAuthRouter({
+      ...authServer,
+      resourceServerUrl: provider.resource,
       resourceName: "O4O 콘텐츠 연결",
       authorizationOptions: {
         rateLimit: {
