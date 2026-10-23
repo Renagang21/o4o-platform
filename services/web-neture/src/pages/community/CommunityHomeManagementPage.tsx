@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { CommunityNewsCollectionPanel } from "./CommunityNewsCollectionPanel";
+import { useEffect, useRef, useState } from "react";
+import { CommunityNewsReviewPanel } from "./CommunityNewsReviewPanel";
 import { Link } from "react-router-dom";
 import {
   homeApi,
@@ -69,7 +71,9 @@ export default function CommunityHomeManagementPage() {
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [version, setVersion] = useState(0);
+  const listScope = useRef("");
   useEffect(() => {
+    listScope.current = `${kind}:${page}:${forumSearch}`;
     let active = true;
     setLoading(true);
     setItems([]);
@@ -102,6 +106,21 @@ export default function CommunityHomeManagementPage() {
       active = false;
     };
   }, [kind, version, page, forumSearch]);
+  const refreshCollectedNews = async () => {
+    const scope = `${kind}:${page}:${forumSearch}`;
+    if (kind !== "news" || listScope.current !== scope) return;
+    try {
+      const data = await homeApi.manage("news", page);
+      if (listScope.current !== scope) return;
+      setItems(data.items);
+      setHasNext(data.hasNext);
+    } catch {
+      if (listScope.current === scope)
+        setError(
+          "수집은 끝났지만 등록 목록을 갱신하지 못했습니다. 뉴스 탭을 다시 열어 주세요.",
+        );
+    }
+  };
   const save = async () => {
     setBusy(true);
     setError("");
@@ -240,6 +259,30 @@ export default function CommunityHomeManagementPage() {
           />
         </section>
       )}
+      {kind === "news" && (
+        <CommunityNewsCollectionPanel
+          onCollected={() => void refreshCollectedNews()}
+        />
+      )}
+      {kind === "news" && (
+        <CommunityNewsReviewPanel
+          onApply={(item, reviewId) => {
+            setId(item.id);
+            setForm({
+              ...item,
+              kind: "news",
+              status: "draft",
+              audience: "members",
+              isPinned: false,
+              sortOrder: 0,
+              newsReviewId: reviewId,
+            });
+            setMessage(
+              "AI 정리를 초안에 채웠습니다. 확인 후 저장·게시 상태를 선택해 주세요.",
+            );
+          }}
+        />
+      )}
       {!loading && kind !== "forum" && (
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-xl border bg-white p-5">
@@ -321,7 +364,7 @@ export default function CommunityHomeManagementPage() {
             )}
             <label className="block">
               {kind === "news"
-                ? "약사공론 기사 원문 URL"
+                ? "기사 원문 URL (약사공론·데일리팜·메디파나)"
                 : "자료·외부 링크 URL (선택)"}
               <input
                 type="url"
@@ -335,8 +378,9 @@ export default function CommunityHomeManagementPage() {
             </label>
             {kind === "news" && (
               <p className="text-xs text-slate-500">
-                약사공론 기사 제목과 원문 링크를 등록합니다. 본문을 복제하거나
-                자동 수집하지 않습니다.
+                세 매체의 기사 제목·제공 요약·원문 링크를 등록합니다. 같은 주요
+                이슈는 약사공론을 우선 연결하며, AI 정리는 게시 전 초안으로
+                확인합니다.
               </p>
             )}
             <div className="flex flex-wrap gap-4">
