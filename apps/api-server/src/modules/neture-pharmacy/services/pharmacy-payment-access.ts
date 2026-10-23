@@ -51,7 +51,7 @@ export async function assertPaymentSupplyAccess(m: Executor, organizationId: str
     // Table names come exclusively from the fixed SupplyKind whitelist above.
     await m.query(`SELECT id FROM ${SOURCE_TABLE[ref.kind]} WHERE id=$1 FOR SHARE`, [ref.id]);
   }
-  const businesses = [...new Set(refs.map(ref => ref.item.metadata?.semiFranchiseKey).filter((key): key is string => typeof key === 'string'))].sort();
+  const businesses = [...new Set(refs.map(ref => ref.item.metadata?.semiFranchiseKey).filter((key): key is string => typeof key === 'string'))].sort((a, b) => a.localeCompare(b, 'en'));
   for (const key of businesses) {
     const [business] = await m.query(`SELECT id FROM semi_franchises WHERE key=$1 AND status='active' FOR SHARE`, [key]);
     if (!business) throw unavailable();
@@ -59,7 +59,7 @@ export async function assertPaymentSupplyAccess(m: Executor, organizationId: str
       AND organization_id=$2 AND status='active' FOR SHARE`, [business.id, organizationId]);
     if (!membership) throw unavailable();
   }
-  for (const id of [...new Set(refs.map(ref => ref.item.productId!))].sort()) {
+  for (const id of [...new Set(refs.map(ref => ref.item.productId!))].sort((a, b) => a.localeCompare(b, 'en'))) {
     await m.query(`SELECT spo.id FROM supplier_product_offers spo
       JOIN neture_suppliers ns ON ns.id=spo.supplier_id JOIN product_masters pm ON pm.id=spo.master_id
       WHERE spo.id=$1 FOR SHARE OF spo,ns,pm`, [id]);
