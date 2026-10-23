@@ -106,3 +106,7 @@ Codex P2(comment 4358472964)의 공급자 비활성·상품 반려와 이벤트 
 Codex P2(comment 4358534611)에 따라 ProductCleanupOperationsService.merge의 Master → SPO 순서도 반영했다. 최종 잠금 순서는 공급자 → Master → SPO → 사업/회원 → 공급 출처다. 각 row class 안은 ID 정렬을 유지한다. 상품 반려/서비스 반려·게시 변경/재고 갱신/공급자 비활성·Master 상태/병합 경로의 실제 잠금과 후속 변경을 함께 조사했으며 다른 서비스 경로는 변경하지 않았다.
 
 실제 PostgreSQL commerce 56건 PASS. Master를 선점한 writer가 주문 대기 중 SPO NOWAIT 잠금을 얻고 Master 연결을 변경한 뒤 commit하면 주문은 변경된 공급조건으로 거부되고 예약 수량은 보존된다. 기존 공급자/상품 관리 처리, 동시 이벤트 주문, 기존 주문 결제 회귀도 통과했다. fixture DB 잔존 0, 자체 cluster 제거 확인. API 전체 타입·변경 파일 lint PASS. 최종 원격 검증 후 통합한다.
+
+## Sonar 신뢰성 gate 보완
+
+직전 원격 Sonar의 D Reliability 원인은 새 잠금 helper의 comparator 없는 sort 3곳이었다. 공급자/Master/SPO UUID를 다른 잠금과 동일한 명시적 localeCompare(en)로 정렬하도록 수정했다. ID와 잠금 순서 정책은 유지한다. 정렬 함수만의 수정 후 API 전체 타입·helper lint·diff를 재검증하며, 실제 PostgreSQL 56건은 직전 본문에 기록한 구현 검증이다. 최종 HEAD의 Sonar gate를 다시 확인한다. 순차 잠금에 필요한 await-in-loop 등 유지보수 권고를 병렬 실행으로 치환하지 않는다.

@@ -11,13 +11,13 @@ const SOURCE: Record<SupplyKind, string> = {
 export async function lockCheckoutSupply(m: EntityManager, organizationId: string, options: SupplyOption[]) {
   // Lifecycle: supplier → listings; master merge: masters → offers; rejection: offers → listings.
   // Keep each row class ordered and avoid a planner-dependent multi-table lock order.
-  for (const id of [...new Set(options.map(o => o.supplierId))].sort()) {
+  for (const id of [...new Set(options.map(o => o.supplierId))].sort((a, b) => a.localeCompare(b, 'en'))) {
     await m.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR SHARE', [id]);
   }
-  for (const id of [...new Set(options.map(o => o.masterId))].sort()) {
+  for (const id of [...new Set(options.map(o => o.masterId))].sort((a, b) => a.localeCompare(b, 'en'))) {
     await m.query('SELECT id FROM product_masters WHERE id=$1 FOR SHARE', [id]);
   }
-  for (const id of [...new Set(options.map(o => o.offerId))].sort()) {
+  for (const id of [...new Set(options.map(o => o.offerId))].sort((a, b) => a.localeCompare(b, 'en'))) {
     await m.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR SHARE', [id]);
   }
   const refs = [...new Map(options.map(o => [`${o.kind}:${o.optionId}`, o])).values()]
