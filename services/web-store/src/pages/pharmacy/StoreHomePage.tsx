@@ -63,13 +63,6 @@ function StoreHomeSession() {
       message: `상담 요청 ${signals.pendingTabletRequests}건 대기`,
       to: `${base}/requests`,
     });
-  if (signals?.pendingSalesRequests)
-    signalItems.push({
-      key: "sales",
-      tone: "violet",
-      message: `판매 요청 ${signals.pendingSalesRequests}건 대기`,
-      to: "/work/kpa-society/commerce/products",
-    });
   const metrics: StoreHomeMetricItem[] = [
     {
       key: "library",
@@ -149,11 +142,11 @@ function StoreHomeSession() {
                 {signals &&
                   (signalItems.length ? (
                     <StoreHomeSignalList items={signalItems} />
-                  ) : (
+                  ) : Object.values(signals).some(value => value === 0) ? (
                     <p role="status" className="text-sm text-slate-500">
-                      조회된 주문·상담·판매 요청 대기 항목이 없습니다.
+                      확인된 업무에는 대기 항목이 없습니다.
                     </p>
-                  ))}
+                  ) : null)}
               </>
             )}
           </section>

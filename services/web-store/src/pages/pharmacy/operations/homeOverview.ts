@@ -4,11 +4,26 @@ import { getListings } from '../../../api/pharmacyProducts';
 import { apiClient } from '../../../api/client';
 import type { LiveSignals } from '../../../api/storeHub';
 
+const signalLabels = { newOrders: '주문 현황', pendingTabletRequests: '상담 요청' } as const;
+type SignalKey = keyof typeof signalLabels;
+type HomeSignals = Record<SignalKey, number | null>;
+type SignalResponse = LiveSignals & { availability?: Partial<Record<SignalKey, string>> };
+
+function readSignals(data: SignalResponse) {
+  const signals: HomeSignals = { newOrders: null, pendingTabletRequests: null };
+  const unavailable: string[] = [];
+  for (const key of Object.keys(signalLabels) as SignalKey[]) {
+    if (data.availability?.[key] === 'available' && Number.isSafeInteger(data[key]) && data[key] >= 0) signals[key] = data[key];
+    else unavailable.push(signalLabels[key]);
+  }
+  return { signals, unavailable };
+}
+
 export interface HomeOverview {
   analytics: MarketingAnalyticsData | null;
   libraryCount: number | null;
   productCount: number | null;
-  signals: LiveSignals | null;
+  signals: HomeSignals | null;
   unavailable: string[];
 }
 export const emptyOverview: HomeOverview = { analytics: null, libraryCount: null, productCount: null, signals: null, unavailable: [] };
@@ -37,18 +52,17 @@ export async function loadHomeOverview(organizationId: string): Promise<HomeOver
       return data.filter(item => item.is_active).length;
     }),
     // Keep the envelope: the shared live-signals convenience wrapper substitutes zeros for null data.
-    apiClient.get<{ success: boolean; data: LiveSignals }>('/store-hub/live-signals').then(result => {
-      const data = confirmed(result);
-      if (![data.newOrders, data.pendingTabletRequests, data.pendingSalesRequests, data.surveyRequests].every(count)) throw new Error('Invalid signals');
-      return data;
-    }),
+    apiClient.get<{ success: boolean; data: SignalResponse }>('/store-hub/live-signals').then(result => readSignals(confirmed(result))),
   ] as const);
   const labels = ['홍보 성과', '보관 자료', '진열 상품', '처리할 업무'];
   return {
     analytics: results[0].status === 'fulfilled' ? results[0].value : null,
     libraryCount: results[1].status === 'fulfilled' ? results[1].value : null,
     productCount: results[2].status === 'fulfilled' ? results[2].value : null,
-    signals: results[3].status === 'fulfilled' ? results[3].value : null,
-    unavailable: results.flatMap((result, index) => result.status === 'rejected' ? [labels[index]] : []),
+    signals: results[3].status === 'fulfilled' ? results[3].value.signals : null,
+    unavailable: [
+      ...results.flatMap((result, index) => result.status === 'rejected' ? [labels[index]] : []),
+      ...(results[3].status === 'fulfilled' ? results[3].value.unavailable : []),
+    ],
   };
 }
