@@ -680,6 +680,177 @@ async function tests(db) {
         );
       },
     );
+    // ── 후속(외부 AI 연결 후속): 권한 변경 · 해제 응답 · 재연결 ──
+    async function connectWith(
+      existingClient,
+      scopes,
+      replaceExisting = false,
+      workspaces = [supplierA],
+      actor = userA,
+    ) {
+      const verifier = randomBytes(48).toString("base64url"),
+        challenge = createHash("sha256").update(verifier).digest("base64url");
+      const url = new URL("/authorize", base);
+      Object.entries({
+        client_id: existingClient.client_id,
+        redirect_uri: config.redirectUris[0],
+        response_type: "code",
+        code_challenge_method: "S256",
+        code_challenge: challenge,
+        scope: scopes.join(" "),
+        state: "fixture-state",
+        resource: provider.resource.href,
+      }).forEach(([k, v]) => url.searchParams.set(k, v));
+      const started = await fetch(url, { redirect: "manual" });
+      assert.equal(started.status, 302);
+      const request = new URL(started.headers.get("location")).searchParams.get(
+        "request",
+      );
+      const code = new URL(
+        await provider.consent(actor, request, workspaces, scopes, replaceExisting),
+      ).searchParams.get("code");
+      const response = await post("/token", {
+        grant_type: "authorization_code",
+        client_id: existingClient.client_id,
+        code,
+        code_verifier: verifier,
+        redirect_uri: config.redirectUris[0],
+        resource: provider.resource.href,
+      });
+      assert.equal(response.status, 200);
+      const issued = await response.json();
+      const id = (await provider.verifyAccessToken(issued.access_token)).extra
+        .connectionId;
+      return { tokens: issued, id };
+    }
+    const active = async (id) =>
+      (
+        await db.query(
+          "SELECT count(*)::int AS n FROM external_ai_connections WHERE id=$1 AND revoked_at IS NULL",
+          [id],
+        )
+      )[0].n === 1;
+    const revokeClient = (c) =>
+      db.query(
+        "UPDATE external_ai_connections SET revoked_at=now() WHERE client_id=$1 AND revoked_at IS NULL",
+        [c.client_id],
+      );
+    const draftArgs = () => ({
+      workspaceId: supplierA,
+      destination: "library_document",
+      requestId: randomUUID(),
+      title: "Fixture denied",
+      content: "<p>Fixture denied</p>",
+    });
+    await check(
+      "read-only connection still lists write tools and gets SCOPE_FORBIDDEN on call",
+      async () => {
+        const { client: readClient } = await registerAndAuthorize(["o4o:read"]);
+        const { tokens: readTokens, id } = await connectWith(readClient, ["o4o:read"]);
+        const mcp = new Client({ name: "o4o-fixture-client", version: "1.0.0" });
+        try {
+          await mcp.connect(
+            new StreamableHTTPClientTransport(provider.resource, {
+              requestInit: {
+                headers: { authorization: `Bearer ${readTokens.access_token}` },
+              },
+            }),
+          );
+          const list = await mcp.listTools();
+          assert.equal(list.tools.length, 8);
+          assert.ok(list.tools.some((t) => t.name === "save_content_draft"));
+          const denied = await mcp.callTool({
+            name: "save_content_draft",
+            arguments: draftArgs(),
+          });
+          assert.ok(denied.isError);
+          const body = JSON.parse(denied.content[0].text);
+          assert.equal(body.code, "SCOPE_FORBIDDEN", JSON.stringify(body));
+          assert.match(body.message, /초안 저장·수정/);
+        } finally {
+          await mcp.close();
+        }
+        assert.ok(await active(id));
+        await revokeClient(readClient);
+      },
+    );
+    await check(
+      "revoked connection: refresh answers invalid_grant (400), MCP 401 invalid_token, tools CONNECTION_REVOKED",
+      async () => {
+        const { client: c } = await registerAndAuthorize(["o4o:read"]);
+        const { tokens: t, id } = await connectWith(c, ["o4o:read"]);
+        await db.query("UPDATE external_ai_connections SET revoked_at=now() WHERE id=$1", [id]);
+        const refreshed = await post("/token", {
+          grant_type: "refresh_token",
+          client_id: c.client_id,
+          refresh_token: t.refresh_token,
+          resource: provider.resource.href,
+        });
+        assert.equal(refreshed.status, 400);
+        assert.equal((await refreshed.json()).error, "invalid_grant");
+        await assert.rejects(
+          tools.execute("list_workspaces", {}, id),
+          (e) => e.code === "CONNECTION_REVOKED" && e.status === 401,
+        );
+        const mcpCall = await fetch(provider.resource, {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${t.access_token}`,
+            "content-type": "application/json",
+            accept: "application/json, text/event-stream",
+          },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+        });
+        assert.equal(mcpCall.status, 401);
+        assert.match(mcpCall.headers.get("www-authenticate") ?? "", /invalid_token/);
+        await revokeClient(c);
+      },
+    );
+    await check("expired connection refresh answers invalid_grant", async () => {
+      const { client: c } = await registerAndAuthorize(["o4o:read"]);
+      const { tokens: t, id } = await connectWith(c, ["o4o:read"]);
+      await db.query(
+        "UPDATE external_ai_connections SET expires_at=now()-interval '1 second' WHERE id=$1",
+        [id],
+      );
+      await db.query(
+        "UPDATE external_ai_credentials SET expires_at=now()+interval '1 hour' WHERE connection_id=$1 AND kind='refresh'",
+        [id],
+      );
+      const refreshed = await post("/token", {
+        grant_type: "refresh_token",
+        client_id: c.client_id,
+        refresh_token: t.refresh_token,
+        resource: provider.resource.href,
+      });
+      assert.equal(refreshed.status, 400);
+      assert.equal((await refreshed.json()).error, "invalid_grant");
+      await revokeClient(c);
+    });
+    await check(
+      "reconnect with the same client replaces only when asked; other clients and users are untouched",
+      async () => {
+        const { client: same } = await registerAndAuthorize(["o4o:read"]);
+        const { client: other } = await registerAndAuthorize(["o4o:read"]);
+        const first = await connectWith(same, ["o4o:read"]);
+        const otherConn = await connectWith(other, ["o4o:read"]);
+        const kept = await connectWith(same, ["o4o:read"], false);
+        assert.ok(await active(first.id));
+        assert.ok(await active(kept.id));
+        const replaced = await connectWith(same, ["o4o:read", "o4o:draft:write"], true);
+        assert.ok(!(await active(first.id)));
+        assert.ok(!(await active(kept.id)));
+        assert.ok(await active(replaced.id));
+        assert.ok(await active(otherConn.id));
+        const foreign = await connectWith(same, ["o4o:read"], false, [supplierB], userB);
+        await connectWith(same, ["o4o:read"], true);
+        assert.ok(await active(foreign.id));
+        await db.query(
+          "UPDATE external_ai_connections SET revoked_at=now() WHERE client_id IN ($1,$2) AND revoked_at IS NULL",
+          [same.client_id, other.client_id],
+        );
+      },
+    );
     await check(
       "cleanup removes delegated credentials and retains recent quota parents",
       async () => {

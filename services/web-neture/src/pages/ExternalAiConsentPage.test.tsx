@@ -75,9 +75,48 @@ describe("external AI consent", () => {
         "fixture-request",
         ["workspace-a"],
         ["o4o:read", "o4o:draft:write"],
+        false,
       ),
     );
     await screen.findByText(/연결을 처리하지 못했습니다/);
+  });
+  const withExisting = () => {
+    vi.mocked(getExternalConsent).mockResolvedValue({
+      clientName: "Fixture AI",
+      scopes: ["o4o:read"],
+      workspaces: [{ id: "workspace-a", name: "공급자 A", writable: true }],
+      existingConnections: 2,
+    });
+    vi.mocked(approveExternalConsent).mockResolvedValue("https://client.example.invalid/cb");
+    vi.stubGlobal("location", { ...window.location, assign: vi.fn() });
+  };
+  it("offers to replace existing connections of the same app, replacing by default", async () => {
+    withExisting();
+    show();
+    await screen.findByText(/이미 연결된 O4O 연결이 2개/);
+    expect((screen.getByLabelText(/이전 연결을 이 연결로 바꾸기/) as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(screen.getByLabelText("공급자 A"));
+    fireEvent.click(screen.getByText("선택한 범위로 연결"));
+    await waitFor(() =>
+      expect(approveExternalConsent).toHaveBeenCalledWith("fixture-request", ["workspace-a"], ["o4o:read"], true),
+    );
+    vi.unstubAllGlobals();
+  });
+  it("keeps existing connections when the user unchecks replace (separate AI account)", async () => {
+    withExisting();
+    show();
+    fireEvent.click(await screen.findByLabelText(/이전 연결을 이 연결로 바꾸기/));
+    fireEvent.click(screen.getByLabelText("공급자 A"));
+    fireEvent.click(screen.getByText("선택한 범위로 연결"));
+    await waitFor(() =>
+      expect(approveExternalConsent).toHaveBeenCalledWith("fixture-request", ["workspace-a"], ["o4o:read"], false),
+    );
+    vi.unstubAllGlobals();
+  });
+  it("shows no replace option for a first connection", async () => {
+    show();
+    await screen.findByText("공급자 A");
+    expect(screen.queryByLabelText(/이전 연결을 이 연결로 바꾸기/)).toBeNull();
   });
   it("reports expired requests and offers retry", async () => {
     vi.mocked(getExternalConsent).mockRejectedValueOnce(new Error("expired"));

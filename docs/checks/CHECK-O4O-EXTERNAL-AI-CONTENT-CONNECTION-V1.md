@@ -247,3 +247,40 @@ API compile·변경 lint와 전체 PostgreSQL/공식 SDK 통합 **50건 PASS**�
   3. 연결 해제 후 ChatGPT 에 구체 오류 코드 대신 "failed internally" 가 표시된다(토큰 갱신 400).
   4. 동의 화면에서 로그인하면 동의 화면이 아닌 매장 홈으로 이동한다.
 - **앱 공개 등록**: 등록안은 작성했고 공개 제출은 하지 않았다. 개발자 인증·도메인 확인 토큰·심사용 계정·시연 영상·로고·지원 연락처는 사용자 확인 대상이다.
+
+## 8. 후속 보완 — 동의 복귀·권한/해제 응답·재연결·등록 자료·설명 불일치 조사 (2026-10-23)
+
+Branch: `wo/external-ai-connection-followup` (기준 main `825e6b4500`). 운영 배포·DB write 없음.
+
+| §7 후속 후보 | 원인 | 조치 |
+|---|---|---|
+| 4. 동의 화면 로그인 후 매장 홈 이동 | 이메일·Google 로그인은 `returnUrl` 로 복귀했으나 **Demo 로그인**이 `returnUrl` 을 무시하고 역할별 착지(매장 handoff)로 이동 | `LoginModal` Demo 경로도 `returnUrl`(`/workspace/` 제외) 우선. 지정이 없을 때 기존 Demo 착지 불변 |
+| 1. 권한 변경 후 도구 새로 고침 필요 | 쓰기 도구를 연결 범위에 따라 등록 → 재연결로 권한이 바뀌어도 클라이언트의 기존 목록에 쓰기 도구 없음 | 8개 도구 항상 등록. 권한 없는 쓰기 호출은 기존 실행 검사가 `SCOPE_FORBIDDEN` + 재연결 안내로 거부 |
+| 3. 해제 후 "failed internally" | 해제·만료 연결의 토큰 갱신이 `invalid_token`(토큰 endpoint 오류 코드 아님) 400 으로 응답. 도구 실행 중 해제는 일반 실패 코드 | code·refresh 교환은 `invalid_grant` 로 응답(재연결 유도). 실행 중 해제·만료는 `CONNECTION_REVOKED`(401) + 재연결 안내. MCP bearer 는 기존 401 `invalid_token` 유지 |
+| 2. 다시 연결 시 이전 연결 잔존 | 재연결이 새 연결만 만들고 이전 연결 정리 경로 없음. 같은 앱이라도 다른 AI 계정의 정상 복수 연결이 있을 수 있어 자동 해제는 부적합 | 동의 화면이 같은 사용자·같은 앱의 활성 연결 수를 보여 주고 "이전 연결을 이 연결로 바꾸기"(기본 선택) 를 묻는다. 선택 시에만 같은 transaction 에서 같은 사용자·같은 client 의 이전 연결 해제. 다른 앱·다른 사용자·유지 선택은 불변. 계정 설정 목록에 연결 시각 표시 |
+
+### 8-1. 검증
+
+| 검증 | 결과 |
+|---|---|
+| DB fixture(로컬 test 전용 PostgreSQL · 실제 OAuth/MCP 경로) `node scripts/dev/run-external-ai-fixture.mjs` | PASS 54줄(신규 4: 읽기 연결의 도구 8개 노출+`SCOPE_FORBIDDEN` · 해제 시 refresh `invalid_grant`/MCP 401/도구 `CONNECTION_REVOKED` · 만료 시 refresh `invalid_grant` · 같은 client 재연결 교체/유지/타 client·타 사용자 불변), fixture DB 정리 0 |
+| web-neture 전체 Vitest | 1275 중 1274 PASS. 실패 1건은 `demoAccounts.test` 의 소스 전수 스캔 5초 timeout(D: worktree 디스크) — 단독 재실행 시 timeout 연장으로 4/4 PASS(10.8s), 코드 문제 아님 |
+| LoginModal · 동의 화면 · 연결 카드 집중 테스트 | 신규 Demo 복귀 2건 · 기존 연결 교체/유지 2건 · 첫 연결 1건 포함 PASS |
+| API 외부 AI jest (`src/modules/external-ai` · opaque-fields) | 단독 재실행 5 suite 45/45 PASS. 최초 실행은 web 전체 테스트와 동시 실행 중 2 suite 실패로 집계됐으나 상세 로그를 남기지 못해 원인 미확인 — 재실행 결과만 근거로 한다 |
+| type-check | api-server · web-neture 0 오류 |
+| 변경 파일 ESLint | 0 오류 |
+
+실제 ChatGPT 재연결·도구 새로 고침 체감은 배포 후 실계정으로만 확인할 수 있다 — 이번에는 미실행.
+
+### 8-2. 헤모텐캡슐 설명 불일치 — 원인 (운영 DB read-only, 사용자 승인 후)
+
+- 상품 정본: 헤모텐캡슐 master 2건(바코드별, 제조사 A). 검증 매장 진열은 그중 1건을 가리킨다 — 진열·검색 ID 매핑은 정상.
+- 참조 자료: 두 master 의 canonical 설명(ko `mfds_easy_drug` 08-05 · en `mfds_drug_otc_nutrition_combo` 08-07)이 제목만 헤모텐캡슐이고 **본문 개요·효능은 다른 품목(훼로바프리미엄캡슐, 제조사 B)의 e약은요 원문**이다. 07-22 의 이전 설명(deprecated)은 정상이었다.
+- 근본 원인: 두 master 의 `product_identifiers` `MFDS_CODE` 가 다른 품목(훼로바프리미엄캡슐)의 품목기준코드로 연결되어 있다. easy-drug 렌더는 master→`MFDS_CODE`→e약은요 원문 순으로 원문을 고르므로 다른 품목 원문이 정본 설명이 되었고, `get_product_context` 가 그대로 전달해 ChatGPT 결과도 틀어졌다. 외부 AI 코드 결함이 아니다.
+- 범위 추정: 품목코드 하나에 제조사 2곳 이상의 master 가 연결된 경우 4,899 코드·32,990 master. 위탁제조 등 정상 사례가 섞여 있어 그대로 오류 수는 아니다. 본문 제품명 ≠ master 상품명 표본에서도 성분 유사 타 품목(예: 같은 성분 다른 브랜드) 사례가 확인됐다.
+- 생성 결과: 시험 초안은 §7 에서 삭제되어 원문 대조는 위 정본 설명 기준으로 했다.
+- **후속(별도 WO · 운영 write 승인 필요)**: `MFDS_CODE` 연결 재검증(본문 제품명·제조사·바코드 교차) → 잘못 연결된 master 의 canonical 설명 회수/재생성. 그 전까지 외부 AI 제출 심사 자료의 의약품 설명 사용은 주의.
+
+### 8-3. 앱 등록 자료
+
+`apps/api-server/src/modules/external-ai/submission/` — `chatgpt-app-submission.json`(앱 정보 · 도구 8개 hint·근거 · 시험 5/부정 3) · `app-submission-draft.md`(양식 항목 · 사용자 확인 항목 · 심사 점검). 원래 로컬 `app-submission-draft.md` 는 이 PC 에서 찾지 못해 코드 기준으로 새로 작성했다. 공개 제출 미실행.

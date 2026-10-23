@@ -5,6 +5,7 @@ export interface ExternalConnection {
   clientName: string;
   workspaceNames: string[];
   scopes: string[];
+  createdAt?: string;
   expiresAt: string;
 }
 export interface ConsentInfo {
@@ -16,6 +17,8 @@ export interface ConsentInfo {
     writable: boolean;
     kind?: "supplier" | "store" | "organization" | "community";
   }>;
+  /** 같은 앱으로 이미 쓰는 활성 연결 수 — 재연결이면 이전 연결을 바꿀지 사용자가 고른다 */
+  existingConnections?: number;
 }
 export async function listExternalConnections(): Promise<ExternalConnection[]> {
   const result = await api.get(`${base}/connections`);
@@ -34,11 +37,13 @@ export async function approveExternalConsent(
   request: string,
   workspaces: string[],
   scopes: string[],
+  replaceExisting = false,
 ) {
   const result = await api.post(`${base}/consent`, {
     request,
     workspaces,
     scopes,
+    replaceExisting,
   });
   return result.data.data.redirectUrl as string;
 }
