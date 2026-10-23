@@ -405,6 +405,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       redirect.searchParams.set("code", code);
       if (pending.data.state !== undefined)
         redirect.searchParams.set("state", pending.data.state);
+      redirect.searchParams.set("iss", this.config.issuer.href);
       return redirect.href;
     });
   }
@@ -419,6 +420,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       redirect.searchParams.set("error", "access_denied");
       if (pending.data.state !== undefined)
         redirect.searchParams.set("state", pending.data.state);
+      redirect.searchParams.set("iss", this.config.issuer.href);
       return redirect.href;
     });
   }
