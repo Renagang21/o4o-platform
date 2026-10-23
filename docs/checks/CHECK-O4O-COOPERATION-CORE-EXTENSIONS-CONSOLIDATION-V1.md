@@ -64,3 +64,9 @@ auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 
 - 오래된 사업 독립 WO의 테스트 데이터 삭제·인프라 이름 변경 및 부분 사용 KPA router/공개 export 정리는 이번 비파괴 공통화로 완료됐다고 보고하지 않는다. 기존 기능·의존 소비처 분석과 별도 실행 범위가 필요하다.
 
 문서 정합: 현 main의 완료·미확인·운영 입력 항목을 이 CHECK와 WO에 통합했다. 과거 COMPLETED 기록을 재작성하거나 canonical index의 상태를 임의 변경하지 않았다.
+
+## Git 전달
+
+구현 commit `f6d9429468`을 `origin/wo/pharmacy-cooperation-core-extensions`에 push했다. 원격은 해당 branch의 신규 생성과 PR 생성 URL을 반환했다. main 직접 push·PR gate 우회·force push는 하지 않았다. 현재 PR 미생성·원격 CI 미확인·main 미통합·이번 변경 운영 미배포다. 네트워크 설정 적용 뒤 기존 branch에서 후속 작업을 이어간다.
+
+새 문서 파일 링크·민감정보 패턴·diff check PASS. 7개 소비 앱 빌드 뒤 추적 manifest/lockfile 변경은 0이다. 검사용으로 시작한 로컬 preview 프로세스는 종료했다. 이전 세션의 기존 서버·다른 작업공간은 종료/삭제하지 않았다. 본 checkout/branch는 후속 통합·수정용으로 KEEP한다.

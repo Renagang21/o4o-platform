@@ -30,7 +30,8 @@
 - [x] 공유 UI·운영 UI·Pharmacy/MegaPharm·CarePharm·Pharmcoop 회귀 검증
 - [x] 영향 앱 빌드·제품 타입·lint·정적 소비처 검사. 공유 패키지 전체 tsc의 미변경 테스트 타입 오류는 CHECK에 별도 기록
 - [x] 구현/병합/배포/실제 운영 준비를 구분한 [결과 기록](../checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)
-- [ ] 검증한 변경만 commit·push 및 외부 접근이 허용되는 범위의 통합 절차
+- [x] 검증한 변경만 commit·push — 구현 `f6d9429468`, 전용 branch 원격 push 성공
+- [ ] 원격 CI·PR·리뷰·main 통합·배포 — 프록시의 GitHub API CONNECT 403으로 차단, 필요한 네트워크 설정 초안 저장
 
 ## 운영 준비 · 별도 결정
 
