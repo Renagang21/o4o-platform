@@ -342,11 +342,8 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
     );
   });
 
-  it('취급매장 모집은 서버가 확정한 조직으로 행별 판정한다', () => {
-    const browse = read('modules/neture/controllers/store-seller-recruitment-browse.controller.ts');
-    expect(browse).toContain("storeOrganizationId: (req as Request & { organizationId?: string }).organizationId ?? ''");
-    expect(browse).not.toContain('semiFranchiseAccessKeyFor');
-  });
+  // 취급매장 모집 browse(store-seller-recruitment-browse.controller · /kpa mount 전용)는
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 소비처 0 으로 제거됐다.
 
   it('세미프랜차이즈 모집 신청 POST 는 실제 모집 행 기준으로 직접 호출을 방어한다', () => {
     const svc = read('modules/neture/services/seller-recruitment.service.ts');

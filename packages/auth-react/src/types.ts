@@ -109,7 +109,7 @@ export interface ServiceAuthConfig<TUser> {
   getAccessToken: () => string | null;
   /**
    * 인증 확정 직후 훅(로그인 성공 / 세션 복구 성공 공통).
-   * KPA 의 `/kpa/me-context` 후속 로딩처럼 서비스 고유 컨텍스트를 채울 때 쓴다.
+   * 서비스 고유 컨텍스트를 인증 직후 채울 때 쓴다(옛 KPA `/kpa/me-context` 는 제거됨).
    * fire-and-forget 이며 실패해도 인증 상태를 되돌리지 않는다.
    */
   onAuthenticated?: (user: TUser) => void;
