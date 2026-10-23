@@ -84,3 +84,9 @@
 최신 main `5a6ab8f23582d8708186459c8c887d68da00ceff`에는 사업별 법정정보·약관이 `business:<semi_franchises.id>`로 분리된 §15-9 구현이 먼저 들어왔다. 통합에서는 이 정본을 우선한다. 앞선 조사·구현 기록의 `carepharm` 정책 namespace, 최소 버전 2, `/operator/legal/carepharm` 전용 편집 경로는 **SUPERSEDED**이며, 담당 사업의 기존 ‘현장 요구 · 사업 약관’ 도구와 `/neture/operator/semi-franchises/:key/legal`을 사용한다. 첫 버전 1을 허용하고 다른 사업·계정 문서의 대체 사용은 거부한다. 별도 legacy namespace·UI·guard는 제거했다.
 
 현재 main의 사업 범위·문서 정책·역할 격리를 유지하면서 신청/탈퇴의 현재 경영자 관계, 대상 약국의 해당 사업 가입, 결제 준비/확정 자격 재검증, 정책 개정 시 신청 메모 보존을 결합했다. 승낙된 역사 문서 불변성은 기존 controller에서 business UUID 범위에 적용한다. 초기 개발 branch의 검증 결과를 이 통합 HEAD의 결과로 간주하지 않고 새 canonical schema·사업 정책 fixture로 다시 검증한다. 병합은 정상 PR gate를 따르며 bypass하지 않는다.
+
+통합 후 실제 로컬 검증: canonical PostgreSQL 공급·주문 55 PASS, 사업별 HTTP/직원 권한 회귀 5 PASS, 기존 공급조건 PostgreSQL suite 17 PASS. API 정책·법정정보·사업 운영 단위 검사 75 PASS, CarePharm 화면·layout 41 PASS, 공통 사업 운영 도구 61 PASS, API type-check·Neture production build·변경 source lint(error 0) 통과. production bundle의 PC 1440 / 모바일 390 합성 API 화면에서 사업 UUID 정책만 조회, 오래된 동의 거절·메모 보존·새 동의 후 신청·미게시 차단·재시도·공개 약관 표시를 확인했다. 테스트 데이터는 전용 loopback DB에만 생성하고 schema/DB 잔존을 확인해 컨테이너와 임시 접속정보를 제거한다.
+
+통합 중 중복 import는 수정 후 type-check를 다시 통과했다. Sonar 지적의 정렬 비교 함수 2건은 명시적 비교로 수정하고 PostgreSQL 55건을 재실행했다. Codex가 발견한 기존 공급조건 테스트의 구 schema/역방향 기대값은 `neture_pharmacy_memberships.status`, membership ID 및 대상 약국 active 가입 검증으로 함께 정리하고 해당 suite 17건을 실제 실행했다. 업무 규칙을 테스트의 옛 기대에 맞춰 완화하지 않았다.
+
+통합 PR: [#779](https://github.com/Renagang21/o4o-platform/pull/779). 최종 HEAD·CI·Sonar·CodeQL·Codex 리뷰·스레드 처리·병합 SHA·Delivery/Promote 및 serving 확인은 이 PR의 최종 인계 기록과 GitHub `production` status를 따른다. 기존 운영 개통 항목은 여전히 별도이며 실제 회원 승인·사업 등록·정책 게시·실 PG·운영 데이터 write를 수행하지 않는다.
