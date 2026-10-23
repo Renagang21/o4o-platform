@@ -1029,8 +1029,9 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(8);
       } finally { finish(); await one; if (two) await two; }
     });
-    it.each(['supplier', 'offer'] as const)('orders event checkout locks after the %s lifecycle lock', async kind => {
+    it.each(['supplier', 'offer', 'master'] as const)('orders event checkout locks after the %s lifecycle lock', async kind => {
       const product = await supplierWithProduct({ price: 10000 }); const store = await member();
+      const target = kind === 'master' ? await supplierWithProduct({ price: 10000 }) : null;
       const event = await events.supplierCreate(product.supplierId, product.supplierUser, {
         offerId: product.offerId, semiFranchiseKey: 'carepharm', eventPrice: 6000, totalQuantity: 10,
         startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString(),
@@ -1040,9 +1041,10 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const writer = ds.createQueryRunner(); await writer.connect(); await writer.startTransaction();
       let checkout: ReturnType<PharmacyCartService['checkout']> | undefined;
       try {
-        // Same first row and listing update order as supplier deactivation/product rejection.
+        // Mirror supplier deactivation, product rejection, and Master → offer merge ordering.
         if (kind === 'supplier') await writer.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR UPDATE', [product.supplierId]);
-        else await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [product.offerId]);
+        else if (kind === 'offer') await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [product.offerId]);
+        else await writer.query('SELECT id FROM product_masters WHERE id=$1 FOR UPDATE', [product.masterId]);
         checkout = cart.checkout(store.owner, store.orgId);
         let blocked = false;
         for (let i = 0; i < 100; i++) {
@@ -1051,13 +1053,15 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
           await new Promise(resolve => setTimeout(resolve, 10));
         }
         expect(blocked).toBe(true);
-        // A checkout must not own the listing while waiting for the lifecycle's first row.
+        // Waiting checkout must not own a later row needed by the lifecycle writer.
+        if (kind === 'master') await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE NOWAIT', [product.offerId]);
         await writer.query('SELECT id FROM organization_product_listings WHERE id=$1 FOR UPDATE NOWAIT', [event.id]);
         if (kind === 'supplier') await writer.query("UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1", [product.supplierId]);
-        else await writer.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1', [product.offerId]);
-        await writer.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [event.id]);
+        else if (kind === 'offer') await writer.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1', [product.offerId]);
+        else await writer.query('UPDATE supplier_product_offers SET master_id=$1 WHERE id=$2', [target!.masterId, product.offerId]);
+        if (kind !== 'master') await writer.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [event.id]);
         await writer.commitTransaction();
-        expect(await checkout).toMatchObject({ createdOrders: [], failedItems: [{ code: 'SUPPLY_OPTION_NOT_AVAILABLE' }] });
+        expect(await checkout).toMatchObject({ createdOrders: [], failedItems: [{ code: kind === 'master' ? 'SUPPLY_OPTION_CHANGED' : 'SUPPLY_OPTION_NOT_AVAILABLE' }] });
         expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(10);
       } finally { if (writer.isTransactionActive) await writer.rollbackTransaction(); await writer.release(); if (checkout) await checkout; }
     });

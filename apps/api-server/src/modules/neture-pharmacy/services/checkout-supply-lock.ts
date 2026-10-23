@@ -9,16 +9,16 @@ const SOURCE: Record<SupplyKind, string> = {
 
 /** Hold eligibility rows until the order and cart removal commit. Revalidation follows these locks. */
 export async function lockCheckoutSupply(m: EntityManager, organizationId: string, options: SupplyOption[]) {
-  // Lifecycle transitions lock the supplier/offer before deactivating listings.
+  // Lifecycle: supplier → listings; master merge: masters → offers; rejection: offers → listings.
   // Keep each row class ordered and avoid a planner-dependent multi-table lock order.
   for (const id of [...new Set(options.map(o => o.supplierId))].sort()) {
     await m.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR SHARE', [id]);
   }
-  for (const id of [...new Set(options.map(o => o.offerId))].sort()) {
-    await m.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR SHARE', [id]);
-  }
   for (const id of [...new Set(options.map(o => o.masterId))].sort()) {
     await m.query('SELECT id FROM product_masters WHERE id=$1 FOR SHARE', [id]);
+  }
+  for (const id of [...new Set(options.map(o => o.offerId))].sort()) {
+    await m.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR SHARE', [id]);
   }
   const refs = [...new Map(options.map(o => [`${o.kind}:${o.optionId}`, o])).values()]
     .sort((a, b) => `${a.kind}:${a.optionId}`.localeCompare(`${b.kind}:${b.optionId}`, 'en'));
