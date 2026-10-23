@@ -143,6 +143,26 @@ lint 현재 오류는 0이나 기존 ratchet script의 허용 baseline은46이�
 - 다음 재개는 최신 테스트 계정 출처·동시 운영 작업 여부·담당 운영자/수신함과 생성 데이터
   정리 경로를 확인하는 단계다. 시간 조건의 정책 게시와 새 schema 작업을 자동 실행하지 않는다.
 
+## 2026-10-23 main 통합 후속·리뷰 보완
+
+사용자가 main 통합·배포를 지시하여 [PR #783](https://github.com/Renagang21/o4o-platform/pull/783)을 생성했다.
+최신 main `07c739e423`의 추가52경로와 이번4경로의 교집합은0, schema 변경도0이며 충돌 없이 동기화했다.
+동기화 후 PostgreSQL173·공개 홈/문의 PC/mobile16·API 타입·전체 lint 오류0/기존 경고933을 재확인했다.
+
+Codex 리뷰 P2: 실행 중 SIGINT/SIGTERM을 받으면 Node의 기본 종료가 finally를 건너뛰어 임시 DB가 남을 수 있었다.
+cluster 시작 전 handler를 등록하고 자식 실행을 비동기로 바꿨다. 중단은 pnpm/Jest의 전용 process group에
+전달하며, 짧은 PG 시작/종료 명령은 끝낸 뒤 정리한다. 정리 중 추가 신호가 정리를 중단하지 않게 했다.
+정리 SQL은 이번 cluster의 private socket에서 정확한 fixture DB만 종료·삭제한다. 운영 selector는 받지 않는다.
+
+- SIGINT(서버 시작 직후): exit130, fixture DB0·cluster 제거·포트 재사용 PASS.
+- SIGTERM(Jest 실행 단계): exit143, fixture DB0·cluster 제거·포트 재사용 PASS.
+- 중단 검증 helper의 최초 일반 bind는 TIME_WAIT을 점유로 오인했다. 실제 서버와 같은 SO_REUSEADDR
+  조건으로 관찰 방법을 교정하여 두 신호를 다시 검증했다. runner의 포트 경계는 완화하지 않았다.
+- 비동기 전환 후 정상 실행도 10 suites/173 PASS·SKIP0·DB0·cluster 제거 PASS, 집중 ESLint/문법 검사 PASS.
+
+최종 source HEAD의 CI·Codex·main 병합·post-merge CI·Delivery 판정은 PR #783에서 추적한다.
+이 후속을 운영 OAuth/메일 실수신 검증 완료로 확대하지 않는다.
+
 문서 정합: 오래된 잔여 계획의 미배포·E2E 드리프트와 최신 완료 기록을 구분한다. 과거 기록·정본 색인은 재작성하지 않는다.
 
 WORKTREE_DISPOSITION: KEEP — `wo/auth-operational-verification-v1` / `/workspace/o4o-wt/auth-operational-verification-v1`, source push 완료·실계정 검증 및 통합 전 후속 수정 대기. 기준 checkout `work`/`c7f2c29eb4`와 다른 세션 worktree는 변경하지 않았다.

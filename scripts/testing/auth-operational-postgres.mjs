@@ -2,7 +2,7 @@
  * Prerequisites: SETUP.md install/build; initdb, pg_ctl and psql on PATH (PG15).
  * Run from any directory: node scripts/testing/auth-operational-postgres.mjs
  */
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -39,18 +39,60 @@ Object.assign(environment, {
   DB_PASSWORD: randomUUID(), JWT_SECRET: randomUUID(), JWT_REFRESH_SECRET: randomUUID(),
   PGHOST: '127.0.0.1', PGPORT: String(port), PGUSER: 'o4o_local', PGDATABASE: 'postgres',
 });
-function run(command, args, { capture = false, required = true, env = environment } = {}) {
-  const result = spawnSync(command, args, {
-    cwd: repository, env, encoding: 'utf8', stdio: capture ? 'pipe' : 'inherit',
-    maxBuffer: 16 * 1024 * 1024,
+let interruption;
+let activeCommand;
+let cleaning = false;
+function signalCommand(command, signal) {
+  if (!command?.interruptible || !command.child.pid) return;
+  try { process.kill(-command.child.pid, signal); }
+  catch (error) {
+    if (error.code !== 'ESRCH') command.child.kill(signal);
+  }
+}
+function onInterrupt(signal) {
+  if (!interruption) console.error(`Interrupted by ${signal}; cleaning disposable fixtures`);
+  interruption ??= signal;
+  if (!cleaning) signalCommand(activeCommand, signal);
+}
+const signalHandlers = new Map(['SIGINT', 'SIGTERM'].map(signal => {
+  const handler = () => onInterrupt(signal);
+  process.on(signal, handler);
+  return [signal, handler];
+}));
+
+async function run(command, args, { capture = false, required = true, env = environment } = {}) {
+  if (interruption && !cleaning) throw new Error(`Interrupted by ${interruption}`);
+  // Interrupt the whole pnpm/Jest process group. Let short PG administration
+  // commands finish so startup/shutdown cannot race removal of the data directory.
+  const current = {
+    interruptible: command === 'pnpm',
+    child: spawn(command, args, {
+      cwd: repository, env, stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+      detached: command === 'pnpm',
+    }),
+  };
+  activeCommand = current;
+  const result = await new Promise(done => {
+    let stdout = '';
+    let error;
+    current.child.stdout?.setEncoding('utf8').on('data', data => { stdout += data; });
+    current.child.stderr?.resume();
+    current.child.once('error', value => { error = value; });
+    current.child.once('close', (status, signal) => done({ status, signal, error, stdout }));
   });
+  if (activeCommand === current) activeCommand = undefined;
+  if (interruption && !cleaning) {
+    // pnpm may exit before a grandchild. Retire the remaining owned process group.
+    signalCommand(current, 'SIGKILL');
+    throw new Error(`Interrupted by ${interruption}`);
+  }
   if (required && (result.error || result.status !== 0)) {
     throw new Error(`${command} failed (${result.error?.code ?? result.status ?? result.signal})`);
   }
   return result;
 }
-function sql(statement, capture = false) {
-  return run('psql', ['-X', '-v', 'ON_ERROR_STOP=1', '-At', '-c', statement], { capture }).stdout?.trim();
+async function sql(statement, capture = false) {
+  return (await run('psql', ['-X', '-v', 'ON_ERROR_STOP=1', '-At', '-c', statement], { capture })).stdout?.trim();
 }
 async function requireFreePort() {
   await new Promise((done, reject) => {
@@ -66,10 +108,10 @@ let failure = false;
 try {
   if (process.platform !== 'linux') throw new Error('These Unix-socket fixtures require Linux');
   if (process.versions.node !== pinned.node) throw new Error('Activate the Node version pinned by SETUP.md');
-  if (run('pnpm', ['--version'], { capture: true }).stdout.trim() !== pinned.pnpm) {
+  if ((await run('pnpm', ['--version'], { capture: true })).stdout.trim() !== pinned.pnpm) {
     throw new Error('Activate the pnpm version pinned by SETUP.md');
   }
-  if (!/PostgreSQL\) 15\./.test(run('initdb', ['--version'], { capture: true }).stdout)) {
+  if (!/PostgreSQL\) 15\./.test((await run('initdb', ['--version'], { capture: true })).stdout)) {
     throw new Error('PostgreSQL 15 tools are required');
   }
   await requireFreePort();
@@ -80,25 +122,25 @@ try {
   // Administrative SQL uses our private socket, never an existing TCP listener.
   environment.PGHOST = socket;
   clusterCreated = true;
-  run('initdb', ['-D', data, '-U', 'o4o_local', '--auth=trust', '--encoding=UTF8', '--locale=C']);
-  run('pg_ctl', ['-D', data, '-l', join(directory, 'server.log'), '-o', `-h 127.0.0.1 -p ${port} -k ${socket}`, '-w', 'start']);
-  sql('CREATE ROLE o4o_fixture LOGIN SUPERUSER');
-  sql('CREATE ROLE operator_inbox_fixture LOGIN SUPERUSER');
-  sql('CREATE DATABASE o4o_operator_inbox_fixture OWNER operator_inbox_fixture');
+  await run('initdb', ['-D', data, '-U', 'o4o_local', '--auth=trust', '--encoding=UTF8', '--locale=C']);
+  await run('pg_ctl', ['-D', data, '-l', join(directory, 'server.log'), '-o', `-h 127.0.0.1 -p ${port} -k ${socket}`, '-w', 'start']);
+  await sql('CREATE ROLE o4o_fixture LOGIN SUPERUSER');
+  await sql('CREATE ROLE operator_inbox_fixture LOGIN SUPERUSER');
+  await sql('CREATE DATABASE o4o_operator_inbox_fixture OWNER operator_inbox_fixture');
 
   // Use the actual baseline + incremental manifest and fingerprint assertions.
   // These explicit selectors point only at the cluster just created above.
   console.log('Applying canonical schema to the disposable fixture');
-  run('pnpm', ['--filter', '@o4o/api-server', 'run', 'migration:run']);
+  await run('pnpm', ['--filter', '@o4o/api-server', 'run', 'migration:run']);
   for (const name of ['o4o_auth_phase2_test', 'o4o_auth_phase4a_test']) {
-    sql(`CREATE DATABASE ${name} OWNER o4o_fixture TEMPLATE o4o_operator_inbox_fixture`);
+    await sql(`CREATE DATABASE ${name} OWNER o4o_fixture TEMPLATE o4o_operator_inbox_fixture`);
   }
   for (const name of ['o4o_auth_hardening_test', 'o4o_signup_test']) {
-    sql(`CREATE DATABASE ${name} OWNER o4o_fixture`);
+    await sql(`CREATE DATABASE ${name} OWNER o4o_fixture`);
   }
-  sql('CREATE DATABASE o4o_platform OWNER o4o_local');
+  await sql('CREATE DATABASE o4o_platform OWNER o4o_local');
   console.log('Running auth/contact fixtures (provider and SMTP transports remain mocked)');
-  run('pnpm', ['--filter', '@o4o/api-server', 'exec', 'jest', '--runInBand', '--runTestsByPath', ...tests, '--silent'], {
+  await run('pnpm', ['--filter', '@o4o/api-server', 'exec', 'jest', '--runInBand', '--runTestsByPath', ...tests, '--silent'], {
     env: {
       ...environment, O4O_AUTH_HARDENING_TEST_PORT: String(port),
       O4O_AUTH_SESSION_TEST_PORT: String(port), O4O_SIGNUP_TEST_PORT: String(port),
@@ -109,14 +151,15 @@ try {
   failure = true;
   console.error(error.message);
 } finally {
+  cleaning = true;
   if (clusterCreated) {
     const data = join(directory, 'data');
-    const running = run('pg_ctl', ['-D', data, 'status'], { capture: true, required: false }).status === 0;
+    const running = (await run('pg_ctl', ['-D', data, 'status'], { capture: true, required: false })).status === 0;
     let cleaned = !running;
     if (running) {
       try {
-        for (const name of databases) sql(`DROP DATABASE IF EXISTS ${name}`);
-        const remaining = sql(`SELECT count(*) FROM pg_database WHERE datname IN (${databases.map(name => `'${name}'`).join(',')})`, true);
+        for (const name of databases) await sql(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
+        const remaining = await sql(`SELECT count(*) FROM pg_database WHERE datname IN (${databases.map(name => `'${name}'`).join(',')})`, true);
         if (remaining !== '0') throw new Error('Fixture databases remain');
         console.log('Remaining fixture databases: 0');
         cleaned = true;
@@ -124,7 +167,7 @@ try {
         failure = true;
         console.error(`Fixture cleanup failed: ${error.message}`);
       }
-      const stopped = run('pg_ctl', ['-D', data, '-m', 'fast', '-w', 'stop'], { required: false });
+      const stopped = await run('pg_ctl', ['-D', data, '-m', 'fast', '-w', 'stop'], { required: false });
       if (stopped.status !== 0) { failure = true; cleaned = false; }
     }
     if (cleaned) {
@@ -136,5 +179,6 @@ try {
   } else if (directory) {
     rmSync(directory, { recursive: true });
   }
+  for (const [signal, handler] of signalHandlers) process.removeListener(signal, handler);
 }
-process.exitCode = failure ? 1 : 0;
+process.exitCode = interruption ? (interruption === 'SIGINT' ? 130 : 143) : failure ? 1 : 0;
