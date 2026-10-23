@@ -166,12 +166,9 @@ export class ExternalAiToolService {
       });
     } catch (error) {
       // 호출 도중 연결이 해제·만료되면 loadConnection 이 InvalidTokenError 를 던진다 — 일반 실패가 아니라 재연결 안내 대상.
-      const code =
-        error instanceof ExternalAiError
-          ? error.code
-          : error instanceof InvalidTokenError
-            ? "CONNECTION_REVOKED"
-            : "EXTERNAL_AI_OPERATION_FAILED";
+      let code = "EXTERNAL_AI_OPERATION_FAILED";
+      if (error instanceof ExternalAiError) code = error.code;
+      else if (error instanceof InvalidTokenError) code = "CONNECTION_REVOKED";
       // Only bounded tool/code metadata; no tokens, document text or client/user names.
       if (code !== "WRITE_QUOTA_EXCEEDED")
         await this.db

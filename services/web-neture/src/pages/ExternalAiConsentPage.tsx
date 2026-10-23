@@ -182,7 +182,7 @@ export default function ExternalAiConsentPage() {
                       onChange={(event) =>
                         setReplaceExisting(event.target.checked)
                       }
-                    />
+                    />{" "}
                     이전 연결을 이 연결로 바꾸기(이전 연결 해제)
                   </label>
                   <p className="text-sm text-gray-600">

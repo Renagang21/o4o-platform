@@ -163,6 +163,28 @@ async function tests(db) {
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams(body),
     });
+  /** /authorize 를 시작해 PKCE verifier 와 동의 요청 값을 돌려준다 (등록 · 재연결 공용). */
+  async function startAuthorization(target, scopes) {
+    const verifier = randomBytes(48).toString("base64url"),
+      challenge = createHash("sha256").update(verifier).digest("base64url");
+    const url = new URL("/authorize", base);
+    Object.entries({
+      client_id: target.client_id,
+      redirect_uri: config.redirectUris[0],
+      response_type: "code",
+      code_challenge_method: "S256",
+      code_challenge: challenge,
+      scope: scopes.join(" "),
+      state: "fixture-state",
+      resource: provider.resource.href,
+    }).forEach(([k, v]) => url.searchParams.set(k, v));
+    const started = await fetch(url, { redirect: "manual" });
+    assert.equal(started.status, 302);
+    const request = new URL(started.headers.get("location")).searchParams.get(
+      "request",
+    );
+    return { verifier, request };
+  }
   async function registerAndAuthorize(
     scopes = ["o4o:read", "o4o:draft:write"],
     workspaces = [supplierA],
@@ -179,24 +201,7 @@ async function tests(db) {
     });
     assert.equal(registration.status, 201);
     client = await registration.json();
-    const verifier = randomBytes(48).toString("base64url"),
-      challenge = createHash("sha256").update(verifier).digest("base64url");
-    const url = new URL("/authorize", base);
-    Object.entries({
-      client_id: client.client_id,
-      redirect_uri: config.redirectUris[0],
-      response_type: "code",
-      code_challenge_method: "S256",
-      code_challenge: challenge,
-      scope: scopes.join(" "),
-      state: "fixture-state",
-      resource: provider.resource.href,
-    }).forEach(([k, v]) => url.searchParams.set(k, v));
-    const started = await fetch(url, { redirect: "manual" });
-    assert.equal(started.status, 302);
-    const request = new URL(started.headers.get("location")).searchParams.get(
-      "request",
-    );
+    const { verifier, request } = await startAuthorization(client, scopes);
     const redirect = new URL(
       await provider.consent(actor, request, workspaces, scopes),
     );
@@ -688,24 +693,7 @@ async function tests(db) {
       workspaces = [supplierA],
       actor = userA,
     ) {
-      const verifier = randomBytes(48).toString("base64url"),
-        challenge = createHash("sha256").update(verifier).digest("base64url");
-      const url = new URL("/authorize", base);
-      Object.entries({
-        client_id: existingClient.client_id,
-        redirect_uri: config.redirectUris[0],
-        response_type: "code",
-        code_challenge_method: "S256",
-        code_challenge: challenge,
-        scope: scopes.join(" "),
-        state: "fixture-state",
-        resource: provider.resource.href,
-      }).forEach(([k, v]) => url.searchParams.set(k, v));
-      const started = await fetch(url, { redirect: "manual" });
-      assert.equal(started.status, 302);
-      const request = new URL(started.headers.get("location")).searchParams.get(
-        "request",
-      );
+      const { verifier, request } = await startAuthorization(existingClient, scopes);
       const code = new URL(
         await provider.consent(actor, request, workspaces, scopes, replaceExisting),
       ).searchParams.get("code");
