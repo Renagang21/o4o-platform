@@ -77,3 +77,12 @@ auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 
 - Codex 리뷰의 Store 메가팜 이동 경로 지적을 반영했다. 직접 로그인 사업은 handoff 요청 없이 목적 URL로 이동하며 CarePharm의 기존 handoff는 유지한다. 가입자 공간·신청 관리 회귀 테스트를 포함한 해당 파일 6개 테스트가 통과했다. 수정 HEAD는 재검증·리뷰 대상이다.
 - 사용자 요청으로 [CarePharm 이용약관](../design/DRAFT-CAREPHARM-BUSINESS-TERMS-V1.md)과 [개인정보처리방침](../design/DRAFT-CAREPHARM-BUSINESS-PRIVACY-V1.md) 초안을 작성했다. 사용자는 별도 사업자 사용 및 아직 회사가 없으므로 사업자 정보를 빈칸으로 유지하도록 확인했다. O4O 법정정보로 대체하지 않았으며 운영 게시·가입 차단 해제는 하지 않았다.
 - 문서 정합: 위 Git 전달 절은 당시 기록이다. 현재 PR 생성 완료, main 통합·배포는 아직 미완료다. 약관은 문서 초안 작성 완료와 실제 운영 게시 미완료를 구분한다.
+
+## 배포 확인 및 승인된 Pharmcoop 후속 — 2026-10-24 (Asia/Seoul)
+
+- [PR #784](https://github.com/Renagang21/o4o-platform/pull/784)는 `6cfb1c0b3b7df95cfa6f46119e8423e7c2ecee39`로 main 병합됐다. 최신 PR·main CI와 Codex 리뷰를 통과했고 Store 이동 지적은 수정·해결됐다.
+- [Delivery 39969310284](https://github.com/Renagang21/o4o-platform/actions/runs/39969310284)가 성공했다. `production=success / DEPLOYED`이며 admin, neture(CarePharm 포함), kpa-society(Pharmacy/MegaPharm), lecture, store, kpa-branch 배포·검증을 완료했다. API는 런타임 변경이 없어 배포 대상이 아니었다.
+- [Pharmcoop 39970209879](https://github.com/Renagang21/o4o-platform/actions/runs/39970209879)는 API 동일 SHA 확인 단계에서 실패했다. fixture 생성·프런트 배포·트래픽 전환은 skipped였으며 이 실행의 데이터 변경은 없다.
+- 사용자는 Pharmcoop 배포 설정 수정안을 승인했다. 같은 WO의 연속 배포 보완으로 기존 격리 checkout/branch를 유지한다. 전체 이력을 fetch하고, frontend_only에서는 기존 Delivery 판정기의 API serving→target 결과가 `UP_TO_DATE` 또는 `BEHIND_NO_RUNTIME_CHANGE`이며 배포 불필요일 때만 허용한다. API 변경·알 수 없는 serving·분기된 이력은 차단하며 fixture 경로의 동일 SHA·이미지 고정 조건은 유지한다.
+- 신규 migration·운영 DB 데이터·권한·freeze·CI gate·revision 검증 조건은 변경하지 않는다. 이 후속의 main 반영·Pharmcoop 실제 배포 결과는 아직 미확인이다.
+- 문서 정합: 일반 Delivery 배포 완료 / Pharmcoop 배포 후속 진행 / CarePharm 약관 초안 main 반영·운영 미게시. 이전 절의 미완료 표시는 당시 시점 기록이다.
