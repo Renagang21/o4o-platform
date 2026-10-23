@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
  * - 승인은 대상 세미프랜차이즈 담당 운영자만(호출 측이 requireOperatorOf 로 범위를 넘긴다).
  * - 제안 가격은 수정하지 않는다 — 종료 후 새 제안. 제안 반려 · 종료는 제품(SPO) 상태에 연쇄하지 않는다.
  */
-import type { DataSource, EntityManager } from "typeorm";
+import type { DataSource } from "typeorm";
 import { NeturePharmacyError, rowsOf } from "../constants.js";
 import type { SemiFranchiseRow } from "./semi-franchise.service.js";
 
@@ -53,15 +53,6 @@ const PROPOSAL_VIEW = `
     LEFT JOIN organizations tgt ON tgt.id = sp.target_organization_id
     LEFT JOIN users decision_actor ON decision_actor.id = sp.decided_by
     LEFT JOIN users end_actor ON end_actor.id = sp.ended_by`;
-
-async function assertTargetMembership(m: Pick<EntityManager, 'query'>, businessId: string, target: string | null) {
-  if (!target) return;
-  const [member] = await m.query(`SELECT sfm.id FROM semi_franchise_memberships sfm
-    JOIN neture_pharmacy_memberships npm ON npm.organization_id=sfm.organization_id AND npm.status='active'
-    WHERE sfm.semi_franchise_id=$1 AND sfm.organization_id=$2::uuid AND sfm.status='active'
-    FOR SHARE OF sfm,npm`, [businessId, target]);
-  if (!member) throw new NeturePharmacyError(409, 'TARGET_MEMBERSHIP_REQUIRED', '대상 약국이 이 협업체의 승인된 회원이 아닙니다. 가입 상태를 확인한 뒤 다시 요청해 주세요.');
-}
 
 export class SupplyProposalService {
   constructor(private readonly dataSource: DataSource) {}
@@ -192,7 +183,6 @@ export class SupplyProposalService {
             "대상 약국을 찾을 수 없습니다.",
           );
       }
-      await assertTargetMembership(m, sf.id, target);
       const terms = proposalTerms(input.terms, {
         baseShippingFee: offer.base_shipping_fee,
         freeShippingThreshold: offer.free_shipping_threshold,
@@ -276,7 +266,6 @@ export class SupplyProposalService {
       if (action === "approve") {
         const [active] = await m.query(`SELECT id FROM semi_franchises WHERE id=$1 AND status='active' FOR SHARE`, [sf.id]);
         if (!active) throw new NeturePharmacyError(409, 'BUSINESS_NOT_ACTIVE', '운영 중인 협업체에서만 공급을 승인할 수 있습니다.');
-        await assertTargetMembership(m, sf.id, current.target_organization_id);
         // Use the canonical resolver, including its observable legacy fallback, rather than a second identity path.
         const supplier =
           current.requested_by === operatorId

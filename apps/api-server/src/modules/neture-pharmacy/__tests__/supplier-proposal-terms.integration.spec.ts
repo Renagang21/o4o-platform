@@ -88,19 +88,19 @@ local('independent supplier proposal terms (isolated PostgreSQL)', () => {
     await service.operatorDecide(sf,operator,p.id,'approve');
     expect(await getSupplyOption(fixture.ds,buyerOrg,'proposal',p.id)).toMatchObject({baseShippingFee:3000,freeShippingThreshold:50000});
   });
-  it('keeps independent business terms and requires the designated pharmacy to belong to that business',async()=>{
+  it('keeps independent business terms without requiring target business membership at request or approval',async()=>{
     await fixture.ds.query('DELETE FROM semi_franchise_memberships WHERE semi_franchise_id=$1',[other.id]);
-    const a=await create();
     try {
-      await expect(create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}})).rejects.toMatchObject({code:'TARGET_MEMBERSHIP_REQUIRED'});
-      expect(await fixture.ds.query('SELECT id FROM supply_proposals WHERE semi_franchise_id=$1',[other.id])).toEqual([]);
+      const a=await create();
+      const b=await create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}});
+      await service.operatorDecide(other,operator,b.id,'approve');
+      const rows=await service.supplierList(supplier);
+      expect(rows.find(r=>r.id===a.id).termsSnapshot.baseShippingFee).toBe(2000);
+      expect(rows.find(r=>r.id===b.id)).toMatchObject({status:'approved',termsSnapshot:{baseShippingFee:0}});
+      expect(await getSupplyOption(fixture.ds,buyerOrg,'proposal',b.id)).toBeNull();
     } finally {
       await fixture.ds.query(`INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status) VALUES ($1,$2,'active')`,[other.id,buyerOrg]);
     }
-    const b=await create(other.key,{targetOrganizationId:buyerOrg,terms:{...terms,baseShippingFee:0}});
-    const rows=await service.supplierList(supplier);
-    expect(rows.find(r=>r.id===a.id).termsSnapshot.baseShippingFee).toBe(2000);
-    expect(rows.find(r=>r.id===b.id).termsSnapshot.baseShippingFee).toBe(0);
   });
   it.each([['requester',requester],['canonical owner',owner],['legacy owner',legacy]])('blocks self approval by %s',async(_label,actor)=>{
     const p=await create();await expect(service.operatorDecide(sf,actor,p.id,'approve')).rejects.toMatchObject({code:'SELF_APPROVAL_FORBIDDEN'});
