@@ -68,6 +68,11 @@ export default function ExternalAiConnectionsCard() {
             자료 조회
             {item.scopes.includes("o4o:draft:write") ? " · 초안 저장·수정" : ""}
           </p>
+          {item.createdAt && (
+            <p className="text-sm text-gray-600">
+              연결한 때: {new Date(item.createdAt).toLocaleString("ko-KR")}
+            </p>
+          )}
           <p className="text-sm text-gray-600">
             연결 만료: {new Date(item.expiresAt).toLocaleString("ko-KR")}
           </p>

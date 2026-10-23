@@ -143,6 +143,20 @@ export async function loadConnection(
   };
 }
 
+/**
+ * 토큰 endpoint(code · refresh 교환)용 연결 조회. 해제·만료된 연결은 `invalid_grant` 로 답한다 —
+ * `invalid_token` 은 토큰 endpoint 오류 코드가 아니어서 클라이언트가 재연결 안내 대신 내부 오류로 표시했다.
+ */
+async function loadGrantConnection(db: Queryable, id: string, lock = false): Promise<Connection> {
+  try {
+    return await loadConnection(db, id, lock);
+  } catch (error) {
+    if (error instanceof InvalidTokenError)
+      throw new InvalidGrantError("O4O 연결이 해제되었거나 만료되었습니다. 다시 연결해 주세요.");
+    throw error;
+  }
+}
+
 export class ExternalAiOAuthProvider implements OAuthServerProvider {
   readonly resource: URL;
   constructor(
@@ -356,6 +370,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     request: string,
     workspaces: string[],
     allowedScopes: string[],
+    replaceExisting = false,
   ) {
     return this.db.transaction(async (manager) => {
       await assertEnabled(
@@ -392,6 +407,14 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
           JSON.stringify(chosen),
         ],
       );
+      // 재연결: 사용자가 고른 경우에만 같은 사용자 · 같은 앱(client)의 이전 연결을 해제한다.
+      // 다른 앱의 연결과, 같은 앱이라도 사용자가 유지를 고른 연결(별도 계정 등 정상 복수 연결)은 그대로 둔다.
+      if (replaceExisting)
+        await manager.query(
+          `UPDATE external_ai_connections SET revoked_at=now()
+          WHERE user_id=$1 AND client_id=$2 AND id<>$3 AND revoked_at IS NULL`,
+          [userId, pending.client_id, id],
+        );
       await manager.query(
         `UPDATE external_ai_credentials SET consumed_at=now() WHERE hash=$1`,
         [pending.hash],
@@ -448,7 +471,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
   ) {
     const row = await this.credential(this.db, code, "code", client.client_id);
     if (row.consumed_at) throw new InvalidGrantError("이미 사용한 코드입니다.");
-    await loadConnection(this.db, row.connection_id);
+    await loadGrantConnection(this.db, row.connection_id);
     return row.data.codeChallenge as string;
   }
   private async issue(
@@ -498,7 +521,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       );
       if (row.consumed_at || redirectUri !== row.data.redirectUri)
         throw new InvalidGrantError("코드 또는 반환 주소가 올바르지 않습니다.");
-      const connection = await loadConnection(manager, row.connection_id, true);
+      const connection = await loadGrantConnection(manager, row.connection_id, true);
       await manager.query(
         "UPDATE external_ai_credentials SET consumed_at=now() WHERE hash=$1",
         [row.hash],
@@ -529,7 +552,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         );
         return null;
       }
-      const connection = await loadConnection(manager, row.connection_id, true);
+      const connection = await loadGrantConnection(manager, row.connection_id, true);
       if (
         requestedScopes &&
         (requestedScopes.length !== connection.scopes.length ||

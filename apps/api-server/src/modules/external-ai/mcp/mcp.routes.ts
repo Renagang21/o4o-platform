@@ -52,6 +52,10 @@ const recovery: Record<string, string> = {
     "다른 내용에는 새 requestId를 사용하세요. 저장 재시도에만 같은 requestId를 사용합니다.",
   WRITE_QUOTA_EXCEEDED:
     "O4O 연결 저장 한도에 도달했습니다. 자동 재시도를 중지하고 나중에 다시 시도하세요.",
+  SCOPE_FORBIDDEN:
+    "이 연결에는 초안 저장·수정 권한이 없습니다. 사용자에게 O4O 연결을 다시 하면서 '초안 저장·수정'을 허용하도록 안내하세요. 자동 재시도는 하지 마세요.",
+  CONNECTION_REVOKED:
+    "O4O 연결이 해제되었거나 만료되었습니다. 사용자에게 O4O 를 다시 연결하도록 안내하세요. 자동 재시도는 하지 마세요.",
 };
 export function createMcpRouter(
   db: DataSource,
@@ -128,9 +132,9 @@ export function createMcpRouter(
       const connectionId = auth?.extra?.connectionId;
       if (typeof connectionId !== "string")
         throw new ExternalAiError("AUTH_REQUIRED", 401);
+      // 쓰기 도구도 항상 등록한다 — 권한은 호출 시 ExternalAiToolService 가 연결 범위로 판정한다(SCOPE_FORBIDDEN).
+      // 권한별로 도구 목록이 달라지면 재연결로 권한을 바꾼 뒤 클라이언트가 목록을 새로 읽기 전까지 쓰기 도구가 보이지 않는다.
       for (const name of Object.keys(toolSchemas) as ToolName[]) {
-        if (writeTools.has(name) && !auth.scopes.includes("o4o:draft:write"))
-          continue;
         server.registerTool(
           name,
           {

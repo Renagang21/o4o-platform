@@ -144,7 +144,7 @@ export function createExternalAiRoutes(
     wrap(async (req, res) => {
       const rows = await db.query(
         `SELECT g.id,c.metadata->>'client_name' AS "clientName",g.workspaces,g.scopes,
-      g.expires_at AS "expiresAt" FROM external_ai_connections g JOIN external_ai_clients c ON c.id=g.client_id
+      g.created_at AS "createdAt",g.expires_at AS "expiresAt" FROM external_ai_connections g JOIN external_ai_clients c ON c.id=g.client_id
       WHERE g.user_id=$1 AND g.revoked_at IS NULL AND g.expires_at>now() ORDER BY g.created_at DESC`,
         [userId(req)],
       );
@@ -190,12 +190,19 @@ export function createExternalAiRoutes(
         ...w,
         writable: w.writable && settings.targets[w.kind].write,
       }));
+      // 같은 앱(client)으로 이미 쓰는 연결 수 — 재연결인지 별도 계정 연결인지는 사용자가 동의 화면에서 고른다.
+      const [existing] = await db.query(
+        `SELECT count(*)::int AS n FROM external_ai_connections
+        WHERE user_id=$1 AND client_id=$2 AND revoked_at IS NULL AND expires_at>now()`,
+        [userId(req), pending.client_id],
+      );
       res.json({
         success: true,
         data: {
           clientName: client?.client_name ?? "외부 AI",
           scopes: pending.data.scopes,
           workspaces,
+          existingConnections: existing?.n ?? 0,
         },
       });
     }),
@@ -209,6 +216,7 @@ export function createExternalAiRoutes(
           request: z.string(),
           workspaces: z.array(workspaceIdSchema).min(1).max(50),
           scopes: z.array(z.enum(scopes)).min(1).max(2),
+          replaceExisting: z.boolean().optional(),
         })
         .strict()
         .parse(req.body);
@@ -231,6 +239,7 @@ export function createExternalAiRoutes(
         body.request,
         body.workspaces,
         body.scopes,
+        body.replaceExisting === true,
       );
       res.json({ success: true, data: { redirectUrl } });
     }),

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { DataSource } from "typeorm";
+import { InvalidTokenError } from "@modelcontextprotocol/sdk/server/auth/errors.js";
 import {
   toolSchemas,
   writeTools,
@@ -164,10 +165,10 @@ export class ExternalAiToolService {
         }
       });
     } catch (error) {
-      const code =
-        error instanceof ExternalAiError
-          ? error.code
-          : "EXTERNAL_AI_OPERATION_FAILED";
+      // 호출 도중 연결이 해제·만료되면 loadConnection 이 InvalidTokenError 를 던진다 — 일반 실패가 아니라 재연결 안내 대상.
+      let code = "EXTERNAL_AI_OPERATION_FAILED";
+      if (error instanceof ExternalAiError) code = error.code;
+      else if (error instanceof InvalidTokenError) code = "CONNECTION_REVOKED";
       // Only bounded tool/code metadata; no tokens, document text or client/user names.
       if (code !== "WRITE_QUOTA_EXCEEDED")
         await this.db
@@ -188,9 +189,8 @@ export class ExternalAiToolService {
             );
           })
           .catch(() => undefined);
-      throw error instanceof ExternalAiError
-        ? error
-        : new ExternalAiError(code, 503);
+      if (error instanceof ExternalAiError) throw error;
+      throw new ExternalAiError(code, code === "CONNECTION_REVOKED" ? 401 : 503);
     }
   }
 }

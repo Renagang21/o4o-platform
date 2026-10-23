@@ -16,7 +16,8 @@ export default function ExternalAiConsentPage() {
   const request = new URLSearchParams(location.search).get("request") ?? "";
   const [data, setData] = useState<ConsentInfo | null>(null),
     [selected, setSelected] = useState<string[]>([]),
-    [write, setWrite] = useState(false);
+    [write, setWrite] = useState(false),
+    [replaceExisting, setReplaceExisting] = useState(true);
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [retry, setRetry] = useState(0);
@@ -26,6 +27,7 @@ export default function ExternalAiConsentPage() {
     setData(null);
     setSelected([]);
     setWrite(false);
+    setReplaceExisting(true);
     setMessage("");
     getExternalConsent(request)
       .then((value) => {
@@ -50,6 +52,7 @@ export default function ExternalAiConsentPage() {
             request,
             selected,
             write ? ["o4o:read", "o4o:draft:write"] : ["o4o:read"],
+            (data?.existingConnections ?? 0) > 0 && replaceExisting,
           )
         : await denyExternalConsent(request);
       window.location.assign(redirect);
@@ -162,6 +165,32 @@ export default function ExternalAiConsentPage() {
                   계정 설정에서 해제할 수 있습니다.
                 </p>
               </fieldset>
+              {(data.existingConnections ?? 0) > 0 && (
+                <fieldset
+                  disabled={busy}
+                  className="space-y-2 rounded border p-4"
+                >
+                  <legend>기존 연결</legend>
+                  <p className="text-sm text-gray-600">
+                    이 앱으로 이미 연결된 O4O 연결이 {data.existingConnections}개
+                    있습니다.
+                  </p>
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={replaceExisting}
+                      onChange={(event) =>
+                        setReplaceExisting(event.target.checked)
+                      }
+                    />{" "}
+                    이전 연결을 이 연결로 바꾸기(이전 연결 해제)
+                  </label>
+                  <p className="text-sm text-gray-600">
+                    다른 AI 계정에서 따로 쓰는 연결이면 선택을 해제하세요. 연결은
+                    내 계정 설정에서 언제든 해제할 수 있습니다.
+                  </p>
+                </fieldset>
+              )}
               <div className="flex flex-wrap gap-3">
                 <button
                   disabled={busy || !selected.length}

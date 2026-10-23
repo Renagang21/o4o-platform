@@ -138,6 +138,16 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       return;
     }
 
+    // 호출자가 돌아갈 화면을 지정했으면(외부 AI 연결 동의 · 보호 화면 진입 등) 역할별 Demo 착지보다 그 화면이 우선이다.
+    //   handleLoginSuccess 와 같은 returnUrl 계약 — /workspace/ 는 그쪽과 같이 제외한다.
+    if (returnUrl && !returnUrl.startsWith('/workspace/')) {
+      navigate(returnUrl);
+      demoBusyRef.current = false;
+      setDemoBusy(null);
+      onClose();
+      return;
+    }
+
     // 서브 호스트(펀딩 · 커뮤니티 · CarePharm) 세션은 그 origin 에 묶인다 — 대표 호스트 경로로 보내면 세션을 잃는다.
     if (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community' || CURRENT_HOST_PROFILE === 'carepharm') {
       navigate(returnUrl || '/');

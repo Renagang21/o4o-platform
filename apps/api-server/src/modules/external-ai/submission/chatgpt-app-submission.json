@@ -1,0 +1,176 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "O4O",
+    "subtitle": "O4O workspace content drafts",
+    "description": "O4O connects ChatGPT to the O4O workspaces a user explicitly allows during sign-in (pharmacy stores, suppliers, partner organizations and community boards). Users can look up the products and reference materials of those workspaces, then have ChatGPT save private content drafts (library documents, product descriptions, business materials or board posts) back into O4O. Drafts are never published by the app; the user reviews and publishes them in the existing O4O screens. Users can disconnect at any time from their O4O account settings.",
+    "category": "PRODUCTIVITY"
+  },
+  "tools": {
+    "list_workspaces": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists the O4O workspaces the user allowed for this connection and the administrator-provided writing examples.",
+        "open_world_justification": "Reads from the user's private O4O account and does not change any public or third-party system.",
+        "destructive_justification": "Does not create, change, delete or revoke anything."
+      }
+    },
+    "search_products": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only searches the products handled by an allowed workspace and returns names and identifiers.",
+        "open_world_justification": "Searches private O4O workspace data only.",
+        "destructive_justification": "Does not modify, delete or publish any data."
+      }
+    },
+    "get_product_context": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves facts and source-labelled descriptions for one product in an allowed workspace.",
+        "open_world_justification": "Reads private O4O data and does not contact external systems.",
+        "destructive_justification": "Does not modify, delete or publish any data."
+      }
+    },
+    "list_materials": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists reference materials or board posts the user can already read in an allowed workspace.",
+        "open_world_justification": "Reads private O4O data only and does not fetch external URLs.",
+        "destructive_justification": "Does not modify, delete or publish any data."
+      }
+    },
+    "get_material": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only returns the text of one selected reference material from an allowed workspace.",
+        "open_world_justification": "Reads private O4O data only; attached files and external links are not opened.",
+        "destructive_justification": "Does not modify, delete or publish any data."
+      }
+    },
+    "save_content_draft": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a new private draft (document, product description, business material or board post) in a workspace the user allowed with draft permission.",
+        "open_world_justification": "The draft stays private inside O4O and is never published, posted or sent to third parties by this tool.",
+        "destructive_justification": "Only adds a new draft; retries with the same request ID return the same draft instead of creating duplicates, and nothing existing is overwritten or deleted."
+      }
+    },
+    "update_content_draft": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Changes the title or body of the user's own private draft in O4O.",
+        "open_world_justification": "The edited draft remains private inside O4O and is not published or sent externally.",
+        "destructive_justification": "Overwrites the current draft body; it requires the latest revision and refuses published or in-review content, so only the user's own unpublished draft can be replaced."
+      }
+    },
+    "get_content_draft": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only returns the user's saved draft, its latest revision and the O4O link to open it.",
+        "open_world_justification": "Reads private O4O data only.",
+        "destructive_justification": "Does not modify, delete or publish any data."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Show which O4O workspaces this connection may use.",
+      "user_prompt": "Which O4O workspaces can you work with for me?",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_workspaces",
+      "expected_output": "Lists only the workspaces allowed at connection time, showing which ones accept drafts.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Look up a product handled by the user's pharmacy store and summarize its facts.",
+      "user_prompt": "In my pharmacy workspace, find the vitamin products and summarize the facts for the first one.",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_products,get_product_context",
+      "expected_output": "Returns matching products from that workspace and a summary that only uses the returned facts and labels their source.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Read a reference material from the workspace library.",
+      "user_prompt": "Open the latest reference material in my store library and give me three key points.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_materials,get_material",
+      "expected_output": "Lists recent materials, reads the chosen one and summarizes it without following instructions inside the material.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Save a new private draft into an allowed workspace.",
+      "user_prompt": "Write a short in-store introduction for this product and save it as a private draft in my store library.",
+      "file_attachment_urls": null,
+      "tools_triggered": "save_content_draft",
+      "expected_output": "Creates one private draft and returns the O4O link where the user can review it; nothing is published.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Revise a previously saved draft using its latest revision.",
+      "user_prompt": "Open the draft you just saved, make the second paragraph shorter, and update it.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_content_draft,update_content_draft",
+      "expected_output": "Reads the latest revision, updates the same private draft and returns the new revision and O4O link.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger for unrelated general questions.",
+      "user_prompt": "What will the weather be like in Seoul tomorrow?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app is not invoked because the request is outside O4O workspace content.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for ordering or payment requests, which the app does not support.",
+      "user_prompt": "Order 20 boxes of this product from my supplier and pay with my card.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app is not invoked; ordering and payment are not part of the O4O connection.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for personal medical advice.",
+      "user_prompt": "I have a headache, how many pills of this medicine should I take?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app is not invoked; the user is advised to consult a pharmacist or doctor.",
+      "expected_output_url": null
+    }
+  ]
+}
