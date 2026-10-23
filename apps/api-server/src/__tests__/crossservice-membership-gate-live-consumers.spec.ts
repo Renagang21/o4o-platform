@@ -22,6 +22,7 @@ jest.mock('../database/connection.js', () => ({
 
 import { requireSignageOperator, requireSignageStore } from '../middleware/signage-role.middleware.js';
 import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
+import { AppDataSource } from '../database/connection.js';
 
 function makeRes() {
   const res: any = {};
@@ -120,7 +121,6 @@ describe('membership scope guard — 정본은 DB 다 (정지 즉시성)', () =>
   });
 
   it('JWT 에 membership 이 없으면 DB 를 보지 않고 즉시 거부한다 (질의 증가 없음)', async () => {
-    const { AppDataSource } = require('../database/connection.js');
     (AppDataSource.query as jest.Mock).mockClear();
     const req: any = { user: { id: 'u1', roles: [], memberships: [] } };
     const res = makeRes();

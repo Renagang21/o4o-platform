@@ -33,6 +33,8 @@
  */
 
 import { resolveServiceKeys } from '../routes/platform/store-public/store-public-utils';
+import * as fs from 'fs';
+import * as path from 'path';
 import { ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY } from '@o4o/security-core';
 
 describe('A. canonical alias 쌍이 모두 해석된다', () => {
@@ -53,8 +55,6 @@ describe('A. canonical alias 쌍이 모두 해석된다', () => {
   });
 
   it('로컬 하드코딩 맵을 다시 만들지 않는다 (SSOT 파생 유지)', () => {
-    const fs = require('fs') as typeof import('fs');
-    const path = require('path') as typeof import('path');
     const src = fs.readFileSync(
       path.resolve(__dirname, '../routes/platform/store-public/store-public-utils.ts'),
       'utf-8',

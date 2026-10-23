@@ -17,6 +17,7 @@ import {
   normalizeResponse,
   mapActions,
   GeminiProvider,
+  OpenAIProvider,
   execute,
 } from '@o4o/ai-core';
 import type {
@@ -301,20 +302,16 @@ describe('Action Mapper', () => {
 
 describe('Provider structural checks', () => {
   it('GeminiProvider has correct id', () => {
-    // Import at test time to avoid actual API calls
-    const { GeminiProvider } = require('@o4o/ai-core');
     const provider = new GeminiProvider();
     expect(provider.id).toBe('gemini');
   });
 
   it('OpenAIProvider has correct id', () => {
-    const { OpenAIProvider } = require('@o4o/ai-core');
     const provider = new OpenAIProvider();
     expect(provider.id).toBe('openai');
   });
 
   it('GeminiProvider.complete rejects without API key', async () => {
-    const { GeminiProvider } = require('@o4o/ai-core');
     const provider = new GeminiProvider();
 
     await expect(
@@ -323,7 +320,6 @@ describe('Provider structural checks', () => {
   });
 
   it('OpenAIProvider.complete rejects without API key', async () => {
-    const { OpenAIProvider } = require('@o4o/ai-core');
     const provider = new OpenAIProvider();
 
     await expect(

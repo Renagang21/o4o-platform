@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Certificate } from '@o4o/lms-core';
+import { Certificate, type Enrollment } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
-import { EnrollmentService } from './EnrollmentService.js';
+import { EnrollmentService, type UpdateEnrollmentRequest } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import { revokeLectureCertificate } from './certificate-operation.service.js';
 import logger from '../../../utils/logger.js';
@@ -157,10 +157,10 @@ export class CertificateService extends BaseService<Certificate> {
     const saved = await this.certificateRepository.save(certificate);
 
     // Update enrollment with certificate ID
-    await this.enrollmentService.updateEnrollment(enrollment.id, {
-      // @ts-ignore
+    const certificateLink: UpdateEnrollmentRequest & Pick<Enrollment, 'certificateId'> = {
       certificateId: saved.id
-    });
+    };
+    await this.enrollmentService.updateEnrollment(enrollment.id, certificateLink);
 
     logger.info(`[LMS] Certificate issued`, {
       certificateId: saved.id,
