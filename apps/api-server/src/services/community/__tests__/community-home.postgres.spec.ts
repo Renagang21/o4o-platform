@@ -1,3 +1,9 @@
+import {
+  collectNews,
+  collectScheduledNews,
+  getNewsCollection,
+} from "../community-news-collection.service";
+import { reviewScheduledNews } from "../community-news-review.service";
 import { reviewNews, getNewsReview } from "../community-news-review.service";
 import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
@@ -75,6 +81,9 @@ run("community home PostgreSQL visibility and persistence", () => {
     });
     await db.initialize();
     await db.query(`CREATE SCHEMA ${schema}`);
+    await db.query(
+      "CREATE TABLE ai_query_policy(id int PRIMARY KEY,ai_enabled boolean NOT NULL)",
+    );
     for (const table of [
       "cms_contents",
       "forum_category_requests",
@@ -94,6 +103,9 @@ run("community home PostgreSQL visibility and persistence", () => {
     }
   });
   beforeEach(async () => {
+    await db.query(
+      "INSERT INTO ai_query_policy(id,ai_enabled) VALUES(1,true) ON CONFLICT(id) DO UPDATE SET ai_enabled=true",
+    );
     for (const table of [
       "cms_contents",
       "forum_category_requests",
@@ -563,5 +575,94 @@ run("community home PostgreSQL visibility and persistence", () => {
     expect((await reviewNews(db, actor, generate)).state).toBe("failed");
     expect((await reviewNews(db, actor, generate)).state).toBe("failed");
     expect(generate).toHaveBeenCalledTimes(1);
+  });
+  it("reserves collection before network work, deduplicates canonical URLs and shares scheduled/manual daily work", async () => {
+    const now = new Date("2026-10-23T00:00:00Z");
+    const loader = jest.fn(async (source: string) => {
+      expect((await getNewsCollection(db, actor, now))?.state).toBe("pending");
+      expect((await collectScheduledNews(db, now, loader as any)).state).toBe(
+        "pending",
+      );
+      const host = {
+        kpanews: "kpanews.co.kr",
+        dailypharm: "dailypharm.com",
+        medipana: "medipana.com",
+      }[source];
+      return [
+        {
+          title: "검증용 주요 기사 제목",
+          summary: "제공 요약",
+          linkUrl: `https://${host}/news?id=1&utm_source=fixture`,
+        },
+      ];
+    });
+    const result = await collectNews(db, actor, now, loader as any);
+    expect(result.state).toBe("done");
+    expect(result.sources.map((s) => s.added)).toEqual([1, 1, 1]);
+    expect((await collectNews(db, actor, now, loader as any)).id).toBe(
+      result.id,
+    );
+    expect(loader).toHaveBeenCalledTimes(3);
+    const again = await collectScheduledNews(
+      db,
+      new Date("2026-10-24T00:00:00Z"),
+      loader as any,
+    );
+    expect(again.sources.map((s) => s.added)).toEqual([0, 0, 0]);
+    const review = await reviewScheduledNews(
+      db,
+      async (input) =>
+        input.map((i) => ({
+          ...i,
+          sourceName: "매체",
+          recommended: false,
+          reason: "",
+          articleIds: [i.id],
+        })),
+      now,
+    );
+    expect(review.state).toBe("done");
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    const records = await db.query(
+      `SELECT status,"createdBy" FROM cms_contents WHERE metadata->>'kind'='news-review'`,
+    );
+    expect(records).toEqual([{ status: "draft", createdBy: null }]);
+    const callback = jest.fn();
+    expect((await reviewNews(db, actor, callback, now)).id).toBe(review.id);
+    expect(callback).not.toHaveBeenCalled();
+  });
+  it("isolates publisher failure and keeps successful imports as private drafts", async () => {
+    const result = await collectScheduledNews(
+      db,
+      new Date(),
+      async (source) => {
+        if (source === "dailypharm") throw Error("ROBOTS_BLOCKED");
+        return [
+          {
+            title: "검증용 주요 기사 제목",
+            summary: "",
+            linkUrl: `https://${source === "kpanews" ? "kpanews.co.kr" : "medipana.com"}/news?id=1`,
+          },
+        ];
+      },
+    );
+    expect(result.state).toBe("partial");
+    expect(result.sources[1]).toEqual({
+      id: "dailypharm",
+      added: 0,
+      status: "ROBOTS_BLOCKED",
+    });
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    expect((await managedHomeItems(db, actor, "news")).items).toHaveLength(2);
+    await expect(getEditorial(db, user, result.id)).rejects.toMatchObject({
+      status: 404,
+    });
+    const callback = jest.fn();
+    await db.query("UPDATE ai_query_policy SET ai_enabled=false");
+    await expect(reviewScheduledNews(db, callback)).rejects.toThrow(
+      "AI_DISABLED",
+    );
+    expect(callback).not.toHaveBeenCalled();
+    await expect(collectNews(db, "forbidden")).rejects.toThrow("forbidden");
   });
 });

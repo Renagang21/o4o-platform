@@ -1,3 +1,4 @@
+import { requireNewsAutomationEnabled } from "./community-news-review.service.js";
 import { randomUUID } from "node:crypto";
 import { runAiExtension } from "@o4o/ai-core";
 import { AppDataSource } from "../../database/connection.js";
@@ -12,9 +13,9 @@ import {
 } from "./community-news-policy.js";
 import logger from "../../utils/logger.js";
 
-export async function generateNewsSuggestions(
+async function generate(
   input: readonly NewsCandidate[],
-  actor: string,
+  actor: string | undefined,
 ) {
   const policy = await AppDataSource.getRepository(AiQueryPolicy).findOneBy({
     id: 1,
@@ -31,7 +32,7 @@ export async function generateNewsSuggestions(
         requestId: randomUUID(),
         serviceId: "community",
         featureId: "industry-news",
-        actorId: actor,
+        actorId: actor ?? "community-news-scheduler",
         audience: "staff",
       },
       materials: [],
@@ -60,7 +61,8 @@ export async function generateNewsSuggestions(
     },
     {
       authorize: async () => {
-        await requireCommunityManager(AppDataSource, actor);
+        if (actor) await requireCommunityManager(AppDataSource, actor);
+        else await requireNewsAutomationEnabled(AppDataSource);
         return true;
       },
       record: async (event) => {
@@ -69,4 +71,17 @@ export async function generateNewsSuggestions(
     },
   );
   return run.output;
+}
+
+export function generateNewsSuggestions(
+  input: readonly NewsCandidate[],
+  actor: string,
+) {
+  return generate(input, actor);
+}
+/** Server job only: platform-funded draft work, with no impersonated user or publication authority. */
+export function generateScheduledNewsSuggestions(
+  input: readonly NewsCandidate[],
+) {
+  return generate(input, undefined);
 }

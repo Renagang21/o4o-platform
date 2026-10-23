@@ -70,7 +70,25 @@ export function newsSourceName(link?: string): string {
     return "원문";
   }
 }
+export interface NewsCollection {
+  id: string;
+  day: string;
+  state: "pending" | "done" | "partial" | "failed";
+  sources: { id: string; added: number; status: string }[];
+}
 export const homeApi = {
+  collection: async () =>
+    (await api.get("/communities/community/management/news-collection")).data
+      .data as NewsCollection | null,
+  collect: async () =>
+    (
+      await api.post(
+        "/communities/community/management/news-collection",
+        {},
+        { timeout: 90000 },
+      )
+    ).data.data as NewsCollection,
+
   review: async () =>
     (await api.get("/communities/community/management/news-review")).data
       .data as NewsReview | null,

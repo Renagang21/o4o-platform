@@ -1,3 +1,4 @@
+import { CommunityNewsCollectionPanel } from "./CommunityNewsCollectionPanel";
 import { useEffect, useState } from "react";
 import { CommunityNewsReviewPanel } from "./CommunityNewsReviewPanel";
 import { Link } from "react-router-dom";
@@ -240,6 +241,11 @@ export default function CommunityHomeManagementPage() {
             onPage={setPage}
           />
         </section>
+      )}
+      {kind === "news" && (
+        <CommunityNewsCollectionPanel
+          onCollected={() => setVersion((v) => v + 1)}
+        />
       )}
       {kind === "news" && (
         <CommunityNewsReviewPanel

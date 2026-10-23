@@ -22,7 +22,7 @@ export interface NewsReview {
 }
 const scope = `"serviceKey"='community' AND "organizationId" IS NULL AND metadata->>'section'='community-editorial'`;
 const control = `${scope} AND metadata->>'kind'='news-review' AND status='draft'`;
-const dayOf = (now: Date) =>
+export const newsDay = (now: Date) =>
   new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
     year: "numeric",
@@ -50,7 +50,7 @@ export async function getNewsReview(
   now = new Date(),
 ) {
   await requireCommunityManager(db, actor);
-  return read(db, dayOf(now));
+  return read(db, newsDay(now));
 }
 async function candidates(db: Query): Promise<NewsCandidate[]> {
   const rows =
@@ -83,8 +83,14 @@ async function candidates(db: Query): Promise<NewsCandidate[]> {
   return selected;
 }
 
-/** A durable daily reservation precedes paid work; failures/process loss never permit another attempt that day. */
-export async function reviewNews(
+/** Scheduled authority is internal and separately gated; no HTTP route accepts a system actor. */
+export async function requireNewsAutomationEnabled(db: Query) {
+  const [policy] = await db.query(
+    "SELECT ai_enabled FROM ai_query_policy WHERE id=1",
+  );
+  if (policy?.ai_enabled !== true) throw new Error("AI_DISABLED");
+}
+export function reviewNews(
   db: Db,
   actor: string,
   generate: (
@@ -92,10 +98,34 @@ export async function reviewNews(
     actor: string,
   ) => Promise<NewsSuggestion[]>,
   now = new Date(),
+) {
+  return runReview(
+    db,
+    actor,
+    (items) => generate(items, actor),
+    (m) => requireCommunityManager(m, actor),
+    now,
+  );
+}
+export function reviewScheduledNews(
+  db: Db,
+  generate: (items: readonly NewsCandidate[]) => Promise<NewsSuggestion[]>,
+  now = new Date(),
+) {
+  return runReview(db, null, generate, requireNewsAutomationEnabled, now);
+}
+
+/** A durable daily reservation precedes paid work; failures/process loss never permit another attempt that day. */
+async function runReview(
+  db: Db,
+  actor: string | null,
+  generate: (items: readonly NewsCandidate[]) => Promise<NewsSuggestion[]>,
+  authorize: (db: Query) => Promise<void>,
+  now = new Date(),
 ): Promise<NewsReview> {
-  const day = dayOf(now);
+  const day = newsDay(now);
   const started = await db.transaction(async (m) => {
-    await requireCommunityManager(m, actor);
+    await authorize(m);
     const [lock] = await m.query(
       `SELECT pg_try_advisory_xact_lock(hashtext('community-news-review')) AS locked`,
     );
@@ -135,19 +165,19 @@ export async function reviewNews(
   if (!started.input) return started.review;
   let items: NewsSuggestion[];
   try {
-    items = await generate(started.input, actor);
-    await requireCommunityManager(db, actor);
+    items = await generate(started.input);
+    await authorize(db);
   } catch {
     await db.query(
       `UPDATE cms_contents SET metadata=metadata||'{"state":"failed"}'::jsonb,"updatedAt"=NOW() WHERE ${control} AND id=$1`,
       [started.review.id],
     );
     // The reservation remains durable, but a revoked manager cannot receive even a failed result.
-    await requireCommunityManager(db, actor);
+    await authorize(db);
     return { ...started.review, state: "failed" };
   }
   await db.transaction(async (m) => {
-    await requireCommunityManager(m, actor);
+    await authorize(m);
     await m.query(
       `UPDATE cms_contents SET metadata=metadata||$2::jsonb,"updatedAt"=NOW() WHERE ${control} AND id=$1`,
       [started.review.id, JSON.stringify({ state: "done", items })],

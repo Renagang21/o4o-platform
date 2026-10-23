@@ -2,7 +2,10 @@ const policy = jest.fn();
 const account = jest.fn();
 const authorize = jest.fn().mockResolvedValue(undefined);
 jest.mock("../../../database/connection", () => ({
-  AppDataSource: { getRepository: () => ({ findOneBy: policy }) },
+  AppDataSource: {
+    query: jest.fn(async () => [{ ai_enabled: true }]),
+    getRepository: () => ({ findOneBy: policy }),
+  },
 }));
 jest.mock("../../../modules/ai-policy/ai-accounted-execution", () => ({
   executeAccountedAi: (...args: unknown[]) => account(...args),
@@ -20,7 +23,10 @@ jest.mock("../../../utils/logger", () => ({
   __esModule: true,
   default: { info: jest.fn() },
 }));
-import { generateNewsSuggestions } from "../community-news-ai.service";
+import {
+  generateNewsSuggestions,
+  generateScheduledNewsSuggestions,
+} from "../community-news-ai.service";
 const input = [
   {
     id: "a",
@@ -71,4 +77,30 @@ it("never invokes provider when disabled or manager authorization is revoked", a
   authorize.mockRejectedValue(Error("revoked"));
   await expect(generateNewsSuggestions(input, "actor")).rejects.toThrow();
   expect(account).not.toHaveBeenCalled();
+});
+
+it("scheduled draft uses platform service accounting without impersonating a user", async () => {
+  account.mockResolvedValue({
+    content: JSON.stringify([
+      {
+        articleIds: ["a"],
+        representativeId: "a",
+        summary: "제공된 요약",
+        recommended: false,
+        reason: "",
+      },
+    ]),
+    provider: "gemini",
+    model: "configured-model",
+    promptTokens: 10,
+    completionTokens: 10,
+    requestId: "fixture",
+  });
+  expect((await generateScheduledNewsSuggestions(input))[0].id).toBe("a");
+  expect(authorize).not.toHaveBeenCalled();
+  expect(account.mock.calls[0][2]).toEqual({
+    scope: "SERVICE_QUERY",
+    serviceKey: "community",
+    userId: undefined,
+  });
 });

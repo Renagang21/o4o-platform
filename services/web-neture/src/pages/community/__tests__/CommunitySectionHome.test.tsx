@@ -15,6 +15,8 @@ const api = vi.hoisted(() => ({
   forum: vi.fn(),
   pinForum: vi.fn(),
   review: vi.fn().mockResolvedValue(null),
+  collection: vi.fn().mockResolvedValue(null),
+  collect: vi.fn(),
   runReview: vi.fn(),
 }));
 vi.mock("../../../contexts", () => ({ useAuth: () => ({ user: null }) }));

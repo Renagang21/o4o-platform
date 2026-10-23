@@ -1,4 +1,8 @@
 import {
+  collectNews,
+  getNewsCollection,
+} from "../services/community/community-news-collection.service.js";
+import {
   getNewsReview,
   reviewNews,
 } from "../services/community/community-news-review.service.js";
@@ -158,6 +162,18 @@ export function createCommunityHomeRoutes(
     handle((req) =>
       reviewNews(AppDataSource, req.user!.id, generateNewsSuggestions),
     ),
+  );
+  router.get(
+    "/community/management/news-collection",
+    apiLimiter,
+    authenticate,
+    handle((req) => getNewsCollection(AppDataSource, req.user!.id)),
+  );
+  router.post(
+    "/community/management/news-collection",
+    apiLimiter,
+    authenticate,
+    handle((req) => collectNews(AppDataSource, req.user!.id)),
   );
   return router;
 }
