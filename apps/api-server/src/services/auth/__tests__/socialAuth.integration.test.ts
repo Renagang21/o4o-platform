@@ -20,12 +20,28 @@ const integration = Number.isInteger(port) && port > 1024 && ![5432,5442].includ
 integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
   let owner: SocialLinkContext; let other: string; let flows: SocialFlowService; let links: SocialLinkService;
   const password = 'SyntheticFixture123!'; const origin = 'https://neture.co.kr';
+  async function removeFixtureUsers(ids: string[]) {
+    if (!ids.length) return;
+    // The canonical schema deliberately does not cascade retained consent history.
+    // Remove only this fixture's child records before its synthetic users.
+    await db.transaction(async manager => {
+      await manager.query('DELETE FROM user_policy_acceptances WHERE user_id=ANY($1::uuid[])', [ids]);
+      await manager.query('DELETE FROM users WHERE id=ANY($1::uuid[])', [ids]);
+    });
+    expect(await db.query('SELECT id FROM users WHERE id=ANY($1::uuid[])', [ids])).toHaveLength(0);
+    expect(await db.query('SELECT id FROM user_policy_acceptances WHERE user_id=ANY($1::uuid[])', [ids])).toHaveLength(0);
+  }
   beforeAll(async () => { db = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username: 'o4o_fixture', database: 'o4o_auth_phase2_test', entities: [], synchronize: false, logging: false }); await db.initialize();
     await db.query(`CREATE TABLE IF NOT EXISTS service_policy_documents (id uuid PRIMARY KEY, service_key text NOT NULL, document_type text NOT NULL, version integer NOT NULL, title text NOT NULL, content text NOT NULL, slug text, status text NOT NULL, published_at timestamptz DEFAULT now());
       CREATE TABLE IF NOT EXISTS user_policy_acceptances (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid REFERENCES users(id) ON DELETE CASCADE, service_key text NOT NULL, policy_document_id uuid REFERENCES service_policy_documents(id), document_type text NOT NULL, version integer NOT NULL, content_hash text NOT NULL, acceptance_kind text NOT NULL, accepted_at timestamptz NOT NULL, UNIQUE(user_id,service_key,policy_document_id))`);
     await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,status,published_at) VALUES($1,'neture','terms',1,'Fixture terms','Fixture agreement','published',now())",[termsPolicy.policyDocumentId]);
   });
-  afterAll(async () => { if (db?.isInitialized) { await db.query('DELETE FROM service_policy_documents WHERE id=$1',[termsPolicy.policyDocumentId]); await db.destroy(); } });
+  afterAll(async () => {
+    if (db?.isInitialized) {
+      try { await db.query('DELETE FROM service_policy_documents WHERE id=$1', [termsPolicy.policyDocumentId]); }
+      finally { await db.destroy(); }
+    }
+  });
   beforeEach(async () => {
     const family = randomUUID();
     const rows = await db.query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified","refreshTokenFamily") VALUES ($1,'Social fixture','active',true,true,$2) RETURNING id`, [`${randomUUID()}@fixture.invalid`,family]);
@@ -35,7 +51,7 @@ integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
     flows=new SocialFlowService(db);
     links=new SocialLinkService({db,flows,kakao:{exchangeCode:jest.fn(async()=>({providerId:'123456',emailVerified:false}))},google:{verifyGoogleIdToken:jest.fn(async()=>({sub:'google-fixture',audience:'client',issuer:'https://accounts.google.com',expiresAt:new Date(Date.now()+60000)}))}});
   });
-  afterEach(async () => { await db.query('DELETE FROM users WHERE id=ANY($1::uuid[])',[[owner.userId,other]]); await db.query("DELETE FROM auth_social_flows WHERE user_id IS NULL AND origin=$1",[origin]); });
+  afterEach(async () => { await removeFixtureUsers([owner.userId, other]); await db.query("DELETE FROM auth_social_flows WHERE user_id IS NULL AND origin=$1",[origin]); });
   const verified = async () => {
     const permit=await links.reauthenticatePassword(owner,password);
     const proof=await links.startLink(owner,permit.token,permit.binding,'kakao','/mypage/settings');
@@ -111,7 +127,10 @@ integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
   }
   const signupInput = () => ({email:`${randomUUID()}@fixture.invalid`,name:'Synthetic signup',phone:'01000000000',consents:{terms:true,privacy:true,termsPolicy}});
   async function signupGrant(identity:object) {return flows.create('kakao-signup','kakao',origin,'neture',identity);}
-  async function removeSignup(email:string){await db.query('DELETE FROM users WHERE email=$1',[email]);}
+  async function removeSignup(email: string) {
+    const rows: { id: string }[] = await db.query('SELECT id FROM users WHERE email=$1', [email]);
+    await removeFixtureUsers(rows.map(row => row.id));
+  }
   it.each([false,true])('signup requires O4O email verification when provider verification=%s and never creates a session for an unverified address',async verified=>{
     jest.mocked(generateTokensWithContext).mockClear();jest.mocked(emailAuthService.sendVerificationMail).mockClear();
     const input=signupInput();const identity={providerId:'567890',email:verified?'different@fixture.invalid':input.email,emailVerified:verified};const grant=await signupGrant(identity);

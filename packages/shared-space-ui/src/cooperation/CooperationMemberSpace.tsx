@@ -154,7 +154,15 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     if (action === 'withdraw' && !window.confirm('이 서비스의 가입 신청을 취소하거나 탈퇴하시겠습니까?')) return;
     setBusy(true); setError('');
     try { await client.post(`${BASE}/semi-franchises/${encodeURIComponent(model.key)}/${action}`, action === 'apply' ? { acceptedConditions: true, conditions: business.registrationConditions ?? '', note, policyReferences: agreement.references } : {}); onChanged(); }
-    catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code ?? e.response?.data?.error?.code)) agreement.reload(); if (e.response?.data?.code === 'CONDITIONS_CHANGED' || e.response?.data?.error?.code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); } setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.'); }
+    catch (e: any) {
+      const code = e.response?.data?.code ?? e.response?.data?.error?.code;
+      if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED', 'POLICY_UNAVAILABLE'].includes(code)) {
+        agreement.reload(); setError('서비스 약관이 변경되었거나 준비 중입니다. 입력 내용은 유지됩니다. 약관을 다시 확인해 주세요.');
+      } else {
+        if (code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); }
+        setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.');
+      }
+    }
     finally { setBusy(false); }
   };
   const status = membership?.membershipStatus;
