@@ -77,8 +77,8 @@ function Workspace({ view }: { view: WorkspaceView }) {
     setError('');
     const suffix = location.pathname.startsWith(basePath) ? location.pathname.slice(basePath.length) : '';
     const destination = cooperationDestination(workspace.businessKey, 'community');
-    const returnPath = `${destination.returnPath}${suffix}${location.search}${location.hash}`;
-    if (!isAuthenticated) {
+    const returnPath = destination.preserveForumPath === false ? destination.returnPath : `${destination.returnPath}${suffix}${location.search}${location.hash}`;
+    if (!isAuthenticated || destination.navigation === 'public') {
       window.location.assign(`${destination.origin}${returnPath}`);
     } else {
       requestServiceHandoff(api, { ...destination, returnPath })

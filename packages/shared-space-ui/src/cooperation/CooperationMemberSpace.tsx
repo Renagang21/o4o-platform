@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import type { CooperationModel } from './models';
-import { CAREPHARM_MATERIAL_TAGS } from './carepharmMaterials';
+import type { CooperationMaterialGuide } from './core';
 
 export interface CooperationClient {
   get(path: string, config?: { params?: Record<string, unknown>; headers?: Record<string, string> }): Promise<{ data: { data: any } }>;
@@ -31,7 +31,7 @@ export type CooperationView = 'home' | 'participation' | 'materials' | 'tools';
 
 /** A model-specific service uses the same organization approval and content contracts as Pharmacy. */
 export function CooperationMemberSpace(props: {
-  model: CooperationModel; client: CooperationClient; accountId?: string;
+  model: CooperationModel; client: CooperationClient; accountId?: string; materialsGuide?: Readonly<CooperationMaterialGuide>;
   view?: CooperationView; onLogin: () => void; onEnterStore: () => Promise<string>;
 }) {
   const { model, accountId, view = 'home' } = props;
@@ -39,7 +39,7 @@ export function CooperationMemberSpace(props: {
   // Remounting on scope changes prevents another account/model's data from flashing.
   return <MemberSpace key={scope} {...props} view={view} />;
 }
-function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore }: Parameters<typeof CooperationMemberSpace>[0]) {
+function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, materialsGuide }: Parameters<typeof CooperationMemberSpace>[0]) {
   const [state, setState] = useState<{ business: Business; access: Access; stores: { organizationId: string; organizationName: string }[] } | null>(null);
   const [params, setParams] = useSearchParams();
   const requestedStore = params.get('store');
@@ -96,7 +96,7 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore }: 
     {!state && !issue && <p role="status">회원 이용 상태를 확인하고 있습니다…</p>}
     {state && <>
       {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주세요</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
-      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
+      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources materialsGuide={materialsGuide} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
 
       {view === 'home' && state.access.canManage && <BusinessHomeShowcase client={client} businessKey={model.key} accountId={accountId} operator />}
       {state.access.canManage && <Link to="/operator/semi-franchises" className="block underline">참여 약국 · 공급 승인 · 콘텐츠 운영</Link>}
@@ -104,8 +104,8 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore }: 
 
   </section>;
 }
-function SelectedMemberResources({ model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId }: {
-  model: CooperationModel; organizationId: string; client: CooperationClient; view?: CooperationView; accountId?: string;
+function SelectedMemberResources({ model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId, materialsGuide }: {
+  model: CooperationModel; organizationId: string; client: CooperationClient; view?: CooperationView; accountId?: string; materialsGuide?: Readonly<CooperationMaterialGuide>;
   storeSearch: string; busy: boolean; onEnterStore: () => Promise<void>;
 }) {
   const [access, setAccess] = useState<StoreAccess | null>(null);
@@ -127,7 +127,7 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
   return <>
     {view === 'home' && <div className="rounded-xl bg-teal-950 p-6 text-white"><h3 className="text-xl font-semibold">함께하는 {model.name}</h3><p className="my-4">회원 게시판에서 경험을 나누고 사업 자료를 내 약국에서 활용하세요.</p><Link className="mr-6 underline" to={model.communityPath + storeSearch}>회원 게시글 보기</Link><Link className="underline" to={"/materials" + storeSearch}>자료실 보기</Link><Link className="ml-6 underline" to={"/tools" + storeSearch}>내 매장 업무 안내</Link></div>}
     {view === 'home' && <BusinessHomeShowcase client={client} businessKey={model.key} organizationId={organizationId} accountId={accountId} />}
-    {view === 'materials' && <Materials model={model} client={client} />}
+    {view === 'materials' && <Materials model={model} client={client} guide={materialsGuide} />}
     {view === 'tools' && <div className="rounded-xl border p-6"><h2 className="text-xl font-semibold">내 약국 업무</h2><p className="my-4">승인된 공급 상품·콘텐츠와 이 사업이 제공하는 약국 업무는 내 약국에서 이용합니다.</p><button disabled={busy} onClick={() => void onEnterStore()} className="rounded-lg bg-teal-800 px-5 py-3 text-white disabled:opacity-50">{busy ? '이동 중…' : '내 약국으로'}</button></div>}
   </>;
 }
@@ -181,7 +181,7 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     {!loading && membership && !access.canManage && ['active', 'pending', 'suspended'].includes(status ?? '') && <button disabled={busy} onClick={() => void act('withdraw')}>{status === 'pending' ? '신청 취소' : '서비스 탈퇴'}</button>}
   </div>;
 }
-function Materials({ model, client }: { model: CooperationModel; client: CooperationClient }) {
+function Materials({ model, client, guide }: { model: CooperationModel; client: CooperationClient; guide?: Readonly<CooperationMaterialGuide> }) {
   const [params, setParams] = useSearchParams();
   const q = params.get('q')?.trim() || '';
   const tag = params.get('tag')?.trim() || '';
@@ -208,13 +208,13 @@ function Materials({ model, client }: { model: CooperationModel; client: Coopera
     return () => { alive = false; };
   }, [client, model.key, page, q, tag, scope, retry]);
   return <div className="space-y-4 rounded-xl border p-4 sm:p-6"><h2 className="text-xl font-semibold">사업 자료</h2>
-    {model.key === 'carepharm' && <p className="text-sm leading-6 text-slate-600">주제별 자료 묶음과 약국 운영 실무자료를 찾아보세요. 내 매장에서 사본을 가져와 우리 약국에 맞게 활용할 수 있습니다.</p>}
+    {guide && <p className="text-sm leading-6 text-slate-600">{guide.memberDescription}</p>}
     <form className="flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); filter({ q: qInput.trim() }); }}>
       <input aria-label="자료 제목·요약 검색" placeholder="제목 · 요약 검색" value={qInput} onChange={event => setQInput(event.target.value)} className="min-h-11 min-w-0 flex-1 rounded border px-3" />
       <button className="min-h-11 rounded border px-4" type="submit">검색</button>
       {(q || tag) && <button type="button" className="min-h-11 rounded border px-4" onClick={() => { setQInput(''); filter({ q: '', tag: '' }); }}>검색 초기화</button>}
     </form>
-    {model.key === 'carepharm' && <label className="block text-sm">자료 태그<select aria-label="자료 태그" value={tag} onChange={event => filter({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...CAREPHARM_MATERIAL_TAGS, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>}
+    {guide && <label className="block text-sm">자료 태그<select aria-label="자료 태그" value={tag} onChange={event => filter({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...guide.tags, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>}
     {error ? <><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>다시 시도</button></> : !state || state.scope !== scope ? <p role="status">자료를 불러오고 있습니다…</p> : <>
     <p className="text-sm text-slate-600">{state.total}개 자료{tag && ` · ${tag}`}</p>
     {!state.items.length && <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.'}</p>}

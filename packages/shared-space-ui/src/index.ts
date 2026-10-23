@@ -331,6 +331,8 @@ export { ServiceHomeHero, ServiceHomePromotion, HomeHeroView, HomePromotionView,
 export type { HomePresentationClient } from "./home-presentation/HomePresentation";
 export { HomePresentationEditor } from "./home-presentation/HomePresentationEditor";
 export { COOPERATION_MODELS, cooperationDestination, type CooperationModel } from './cooperation/models';
+export { COOPERATION_EXTENSIONS, getCooperationExtension } from './cooperation/extensions';
+export type { CooperationExtension, CooperationMaterialGuide } from './cooperation/core';
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { CAREPHARM_MATERIAL_TAGS, CAREPHARM_MATERIAL_OUTLINES } from './cooperation/carepharmMaterials';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
