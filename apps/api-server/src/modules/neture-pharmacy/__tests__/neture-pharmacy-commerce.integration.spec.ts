@@ -1029,6 +1029,38 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(8);
       } finally { finish(); await one; if (two) await two; }
     });
+    it.each(['supplier', 'offer'] as const)('orders event checkout locks after the %s lifecycle lock', async kind => {
+      const product = await supplierWithProduct({ price: 10000 }); const store = await member();
+      const event = await events.supplierCreate(product.supplierId, product.supplierUser, {
+        offerId: product.offerId, semiFranchiseKey: 'carepharm', eventPrice: 6000, totalQuantity: 10,
+        startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString(),
+      });
+      await events.operatorDecide(care!, careOperator, event.id, 'approve');
+      await cart.add(store.owner, store.orgId, { kind: 'event', id: event.id, quantity: 1 });
+      const writer = ds.createQueryRunner(); await writer.connect(); await writer.startTransaction();
+      let checkout: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        // Same first row and listing update order as supplier deactivation/product rejection.
+        if (kind === 'supplier') await writer.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR UPDATE', [product.supplierId]);
+        else await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [product.offerId]);
+        checkout = cart.checkout(store.owner, store.orgId);
+        let blocked = false;
+        for (let i = 0; i < 100; i++) {
+          blocked = (await writer.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length > 0;
+          if (blocked) break;
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        expect(blocked).toBe(true);
+        // A checkout must not own the listing while waiting for the lifecycle's first row.
+        await writer.query('SELECT id FROM organization_product_listings WHERE id=$1 FOR UPDATE NOWAIT', [event.id]);
+        if (kind === 'supplier') await writer.query("UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1", [product.supplierId]);
+        else await writer.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1', [product.offerId]);
+        await writer.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [event.id]);
+        await writer.commitTransaction();
+        expect(await checkout).toMatchObject({ createdOrders: [], failedItems: [{ code: 'SUPPLY_OPTION_NOT_AVAILABLE' }] });
+        expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(10);
+      } finally { if (writer.isTransactionActive) await writer.rollbackTransaction(); await writer.release(); if (checkout) await checkout; }
+    });
     it('rechecks store-owner agreements at prepare and confirm despite a warm middleware cache', async () => {
       const f = await order(); const ids: string[] = [];
       const publish = async (version: number) => {

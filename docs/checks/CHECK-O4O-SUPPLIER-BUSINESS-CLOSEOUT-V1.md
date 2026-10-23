@@ -94,3 +94,9 @@ Codex P2(리뷰 comment 4358265678)의 자격 확인/주문 생성 사이 TOCTOU
 Codex P2(comment 4358372034)의 이벤트 shared→exclusive 잠금 승격 교착을 수정했다. 정렬된 출처 잠금에서 이벤트만 처음부터 FOR UPDATE를 사용하고 다른 출처는 FOR SHARE를 유지한다. 대기 중 바뀔 수 있는 가용 재고·잔여 행사 수량은 계약 비교에서 제외하되 현재 재고 검사와 실제 예약의 수량/약국/주문 한도 검사는 유지한다. 가격·조건·수취 주체 등 나머지 스냅샷 차이는 계속 주문 생성을 거부한다.
 
 실제 PostgreSQL commerce 53건 PASS. 첫 예약을 멈춘 상태에서 두 번째 약국 주문이 예약 진입 전에 대기하며, 해제 후 양쪽 주문 성공·행사 수량 10→8을 검증했다. canonical bootstrap 임시 DB는 완전 삭제(잔존 0)했다. API 전체 타입·변경 파일 lint·diff 검사 PASS. 결제 직전 협업체 회원/공급 출처 재검사는 추가하지 않았다.
+
+## PR #781 재리뷰 보완 — 관리 처리와 잠금 순서
+
+Codex P2(comment 4358472964)의 공급자 비활성·상품 반려와 이벤트 주문 사이 역순 잠금을 수정했다. 공급자 → SPO → Master를 각각 ID 정렬로 먼저 잠근 뒤 사업/회원·공급 출처를 잠근다. planner에 의존하는 JOIN 다중 테이블 잠금을 제거하고 기존 lifecycle의 공급자/상품 → listing 순서에 맞췄다.
+
+실제 PostgreSQL commerce 55건 PASS. 공급자/상품 선행 잠금 각각에 대해 checkout이 대기 중일 때 lifecycle writer의 listing NOWAIT 잠금이 성공하고, 비활성 처리 commit 후 신규 주문이 거부되며 행사 수량이 유지되는 것을 확인했다. 두 약국 동시 행사 주문 성공 및 주문 후 협업체 변경에도 결제 가능한 회귀도 통과했다. 테스트 초안의 공급자 enum 표기 오류는 실제 enum으로 수정 후 전체 55건을 재실행했다. canonical fixture DB 잔존 0 및 자체 PostgreSQL cluster 제거 확인. API 전체 타입·변경 파일 lint·diff 검사 PASS. 새 schema/migration은 없다.

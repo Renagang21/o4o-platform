@@ -9,20 +9,27 @@ const SOURCE: Record<SupplyKind, string> = {
 
 /** Hold eligibility rows until the order and cart removal commit. Revalidation follows these locks. */
 export async function lockCheckoutSupply(m: EntityManager, organizationId: string, options: SupplyOption[]) {
+  // Lifecycle transitions lock the supplier/offer before deactivating listings.
+  // Keep each row class ordered and avoid a planner-dependent multi-table lock order.
+  for (const id of [...new Set(options.map(o => o.supplierId))].sort()) {
+    await m.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR SHARE', [id]);
+  }
+  for (const id of [...new Set(options.map(o => o.offerId))].sort()) {
+    await m.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR SHARE', [id]);
+  }
+  for (const id of [...new Set(options.map(o => o.masterId))].sort()) {
+    await m.query('SELECT id FROM product_masters WHERE id=$1 FOR SHARE', [id]);
+  }
   const refs = [...new Map(options.map(o => [`${o.kind}:${o.optionId}`, o])).values()]
     .sort((a, b) => `${a.kind}:${a.optionId}`.localeCompare(`${b.kind}:${b.optionId}`, 'en'));
+  const keys = [...new Set(options.map(o => o.semiFranchiseKey).filter((key): key is string => !!key))].sort((a,b)=>a.localeCompare(b,'en'));
+  for (const key of keys) await m.query('SELECT id FROM semi_franchises WHERE key=$1 FOR SHARE', [key]);
+  await m.query('SELECT organization_id FROM semi_franchise_memberships WHERE organization_id=$1 ORDER BY semi_franchise_id FOR SHARE', [organizationId]);
   for (const o of refs) {
     // Reservation updates event quantities; avoid shared-to-exclusive lock upgrades.
     const lock = o.kind === 'event' ? 'UPDATE' : 'SHARE';
     await m.query(`SELECT id FROM ${SOURCE[o.kind]} WHERE id=$1 FOR ${lock}`, [o.optionId]);
   }
-  const keys = [...new Set(options.map(o => o.semiFranchiseKey).filter((key): key is string => !!key))].sort((a,b)=>a.localeCompare(b,'en'));
-  for (const key of keys) await m.query('SELECT id FROM semi_franchises WHERE key=$1 FOR SHARE', [key]);
-  await m.query('SELECT organization_id FROM semi_franchise_memberships WHERE organization_id=$1 ORDER BY semi_franchise_id FOR SHARE', [organizationId]);
-  const offers = [...new Set(options.map(o => o.offerId))].sort((a,b)=>a.localeCompare(b,'en'));
-  for (const id of offers) await m.query(`SELECT spo.id FROM supplier_product_offers spo
-    JOIN neture_suppliers ns ON ns.id=spo.supplier_id JOIN product_masters pm ON pm.id=spo.master_id
-    WHERE spo.id=$1 FOR SHARE OF spo,ns,pm`, [id]);
   for (const o of refs.filter(o => o.kind === 'recruitment')) await m.query(`SELECT recruitment_id FROM seller_recruitment_applications
     WHERE recruitment_id=$1 AND applicant_organization_id=$2 FOR SHARE`, [o.optionId, organizationId]);
 }
