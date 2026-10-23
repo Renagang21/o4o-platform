@@ -1,4 +1,3 @@
-import { isBusinessPolicyScope } from '../neture-pharmacy/services/business-policy-scope.js';
 import { readCurrentPolicyDocument } from '../policy-acceptance/policy-document-evidence.service.js';
 import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-policy.service.js';
 import { isBusinessPolicyScope } from '../neture-pharmacy/services/business-policy-scope.js';
