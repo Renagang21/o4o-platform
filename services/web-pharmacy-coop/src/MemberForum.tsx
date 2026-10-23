@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ForumPostContent, forumContentToHtml, ForumWriteForm, type ForumWriteFormPayload } from "@o4o/shared-space-ui";
+import {
+  ForumPostContent,
+  forumContentToHtml,
+  ForumWriteForm,
+  type ForumWriteFormPayload,
+} from "@o4o/shared-space-ui";
 import type { PharmacyManagementClient as Client } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import { LoadFeedback, useRows, workError } from "./Participation";
 
@@ -21,7 +26,14 @@ export function MemberForum({
   businessKey,
   currentUserId,
   canManage,
-}: Readonly<{ client: Client; businessKey: string; currentUserId?: string; canManage: boolean }>) {
+  boardsOnly = false,
+}: Readonly<{
+  client: Client;
+  businessKey: string;
+  currentUserId?: string;
+  canManage: boolean;
+  boardsOnly?: boolean;
+}>) {
   const [communityKey, setCommunityKey] = useState<string | null>(null);
   const [error, setError] = useState(""),
     [version, setVersion] = useState(0);
@@ -53,6 +65,7 @@ export function MemberForum({
       communityKey={communityKey}
       currentUserId={currentUserId}
       canManage={canManage}
+      boardsOnly={boardsOnly}
     />
   ) : (
     <LoadFeedback
@@ -67,7 +80,14 @@ function ForumWorkspace({
   communityKey,
   currentUserId,
   canManage,
-}: Readonly<{ client: Client; communityKey: string; currentUserId?: string; canManage: boolean }>) {
+  boardsOnly,
+}: Readonly<{
+  client: Client;
+  communityKey: string;
+  currentUserId?: string;
+  canManage: boolean;
+  boardsOnly: boolean;
+}>) {
   const root = `/communities/${encodeURIComponent(communityKey)}`;
   const base = `${root}/forum`;
   const [params, setParams] = useSearchParams();
@@ -82,6 +102,7 @@ function ForumWorkspace({
   const [totalPages, setTotalPages] = useState(1);
   const boards = useRows<Board>(client, `${base}/categories`);
   useEffect(() => {
+    if (boardsOnly) return;
     let live = true;
     setPosts(null);
     setDetail(null);
@@ -110,8 +131,23 @@ function ForumWorkspace({
     return () => {
       live = false;
     };
-  }, [client, base, page, postId, version]);
+  }, [client, base, page, postId, version, boardsOnly]);
   const reload = () => setVersion((v) => v + 1);
+  if (boardsOnly)
+    return canManage ? (
+      <div className="coop-management">
+        <h2>조합원 이야기 게시판 관리</h2>
+        <LoadFeedback
+          error={boards.error}
+          loading={boards.rows === null}
+          retry={boards.refresh}
+        />
+        <ul>{boards.rows?.map((b) => <li key={b.id}>{b.name}</li>)}</ul>
+        <BoardForm client={client} root={root} onSaved={boards.refresh} />
+      </div>
+    ) : (
+      <p>이 조합의 운영 권한이 필요합니다.</p>
+    );
   return (
     <div className="coop-management">
       <LoadFeedback error={error} loading={!posts && !detail} retry={reload} />
@@ -124,10 +160,32 @@ function ForumWorkspace({
             <article className="card spaced">
               <h3>{detail.title}</h3>
               <p>{detail.author?.name || "조합원"}</p>
-              {editId && detail.status === 'draft' && detail.authorId === currentUserId ?
-                <DraftReview key={detail.id} post={detail} client={client} base={base} onSaved={() => { setParams({ post: detail.id }); reload(); }} /> :
-                <ForumPostContent content={detail.content} escapePlainText />}
-              {detail.status === 'draft' && detail.authorId === currentUserId && !editId && <button type="button" onClick={() => setParams({ edit: detail.id })}>초안 검토·게시</button>}
+              {editId &&
+              detail.status === "draft" &&
+              detail.authorId === currentUserId ? (
+                <DraftReview
+                  key={detail.id}
+                  post={detail}
+                  client={client}
+                  base={base}
+                  onSaved={() => {
+                    setParams({ post: detail.id });
+                    reload();
+                  }}
+                />
+              ) : (
+                <ForumPostContent content={detail.content} escapePlainText />
+              )}
+              {detail.status === "draft" &&
+                detail.authorId === currentUserId &&
+                !editId && (
+                  <button
+                    type="button"
+                    onClick={() => setParams({ edit: detail.id })}
+                  >
+                    초안 검토·게시
+                  </button>
+                )}
             </article>
           )}
         </>
@@ -180,9 +238,6 @@ function ForumWorkspace({
               boards={boards.rows}
               onSaved={reload}
             />
-          )}
-          {canManage && (
-            <BoardForm client={client} root={root} onSaved={boards.refresh} />
           )}
         </>
       )}
@@ -244,7 +299,7 @@ function ForumPostForm({
         }
       }}
     >
-      <h3>회원 글쓰기</h3>
+      <h3>조합원 글쓰기</h3>
       <label>
         <span>게시판</span>
         <select
@@ -344,17 +399,47 @@ function BoardForm({
 }
 
 /** Explicit user publication in the existing business forum, separate from delegated draft writes. */
-function DraftReview({ post, client, base, onSaved }: Readonly<{ post: Post; client: Client; base: string; onSaved: () => void }>) {
-  const [error, setError] = useState('');
+function DraftReview({
+  post,
+  client,
+  base,
+  onSaved,
+}: Readonly<{
+  post: Post;
+  client: Client;
+  base: string;
+  onSaved: () => void;
+}>) {
+  const [error, setError] = useState("");
   const submit = async ({ title, editorHtml }: ForumWriteFormPayload) => {
-    setError('');
+    setError("");
     try {
-      await client.put(`${base}/posts/${encodeURIComponent(post.id)}`, { title, content: editorHtml, status: 'publish' });
+      await client.put(`${base}/posts/${encodeURIComponent(post.id)}`, {
+        title,
+        content: editorHtml,
+        status: "publish",
+      });
       onSaved();
-    } catch (e) { setError(workError(e)); }
+    } catch (e) {
+      setError(workError(e));
+    }
   };
-  return <section><p>비공개 초안입니다. 검토 후 게시하면 이 조합 게시판 이용자에게 공개됩니다.</p>
-    {error && <p role="alert">{error}</p>}
-    <ForumWriteForm initialTitle={post.title} initialContentHtml={forumContentToHtml(post.content, { escapePlainText: true })} submitLabel="검토한 초안 게시" onSubmit={submit} onCancel={onSaved} />
-  </section>;
+  return (
+    <section>
+      <p>
+        비공개 초안입니다. 검토 후 게시하면 이 조합 게시판 이용자에게
+        공개됩니다.
+      </p>
+      {error && <p role="alert">{error}</p>}
+      <ForumWriteForm
+        initialTitle={post.title}
+        initialContentHtml={forumContentToHtml(post.content, {
+          escapePlainText: true,
+        })}
+        submitLabel="검토한 초안 게시"
+        onSubmit={submit}
+        onCancel={onSaved}
+      />
+    </section>
+  );
 }
