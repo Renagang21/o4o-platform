@@ -48,6 +48,14 @@ const KEY_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 export class SemiFranchiseService {
   constructor(private readonly dataSource: DataSource) {}
 
+  private async requireApplicant(m: Pick<DataSource, 'query'>, userId: string, organizationId: string) {
+    const [owner] = await m.query(`SELECT om.organization_id FROM organization_members om
+      JOIN neture_pharmacy_memberships npm ON npm.organization_id=om.organization_id AND npm.status='active'
+      WHERE om.user_id=$1 AND om.organization_id=$2 AND om.left_at IS NULL AND om.role IN ('owner','admin','manager')
+      FOR SHARE OF om,npm`, [userId, organizationId]);
+    if (!owner) throw new NeturePharmacyError(403, 'BUSINESS_APPLICANT_REQUIRED', '협업체 가입 신청·탈퇴는 해당 약국의 경영자급 권한이 필요합니다.');
+  }
+
   async getByKey(key: string): Promise<SemiFranchiseRow | null> {
     const rows = await this.dataSource.query(`SELECT ${SF_COLUMNS} FROM semi_franchises sf WHERE sf.key = $1`, [key]);
     return rows[0] ?? null;
@@ -84,6 +92,7 @@ export class SemiFranchiseService {
       throw new NeturePharmacyError(400, 'INVALID_APPLICATION', '추가 신청 내용은 2000자 이내로 입력해 주세요.');
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, userId);
+      await this.requireApplicant(m, userId, organizationId);
       const [sf]: SemiFranchiseRow[] = await m.query(`SELECT sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, owner.metadata->>'registrationConditions' AS registration_conditions FROM semi_franchises sf JOIN organizations owner ON owner.id = sf.organization_id WHERE sf.key = $1 FOR SHARE OF sf, owner`, [key]);
       if (!sf || sf.status !== 'active') throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
       if (sf.registration_conditions && application.acceptedConditions !== true)
@@ -130,17 +139,21 @@ export class SemiFranchiseService {
   }
 
   /** 약국 본인 탈퇴 · 신청 취소 → terminated */
-  async withdraw(organizationId: string, key: string) {
-    const sf = await this.requireActive(key);
-    const rows = rowsOf(await this.dataSource.query(
-      `UPDATE semi_franchise_memberships
-          SET status = 'terminated', reason = '약국 탈퇴', decided_at = NOW(), decided_by = NULL, updated_at = NOW()
-        WHERE semi_franchise_id = $1 AND organization_id = $2 AND status IN ('pending','active','suspended')
-      RETURNING id, status`,
-      [sf.id, organizationId],
-    ));
-    if (!rows[0]) throw new NeturePharmacyError(409, 'NOT_A_MEMBER', '탈퇴할 가입이 없습니다.');
-    return rows[0];
+  async withdraw(organizationId: string, userId: string, key: string) {
+    return this.dataSource.transaction(async m => {
+      await assertNetureMainMembershipActive(m, userId);
+      await this.requireApplicant(m, userId, organizationId);
+      const sf = await this.requireActive(key);
+      const rows = rowsOf(await m.query(
+        `UPDATE semi_franchise_memberships
+            SET status = 'terminated', reason = '약국 탈퇴', decided_at = NOW(), decided_by = NULL, updated_at = NOW()
+          WHERE semi_franchise_id = $1 AND organization_id = $2 AND status IN ('pending','active','suspended')
+        RETURNING id, status`,
+        [sf.id, organizationId],
+      ));
+      if (!rows[0]) throw new NeturePharmacyError(409, 'NOT_A_MEMBER', '탈퇴할 가입이 없습니다.');
+      return rows[0];
+    });
   }
 
   // ─── 담당 운영자 ────────────────────────────────────────────────────────

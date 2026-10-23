@@ -68,7 +68,7 @@ export interface SemiFranchise {
 }
 
 export interface SemiFranchiseMembership {
-  application?: { conditions?: string; note?: string; accepted?: boolean };
+  application?: { conditions?: string; note?: string; accepted?: boolean; applicationPolicies?: { serviceKey: string; documentType: string; policyDocumentId: string; version: number; contentHash: string; acceptanceKind: string }[] };
   id: string;
   status: string;
   appliedAt: string;

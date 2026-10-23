@@ -254,3 +254,21 @@ it('keeps home as an overview and loads member material bodies only in the mater
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
   expect(screen.getByRole('link', { name: '내 매장 업무 안내' }).getAttribute('href')).toBe('/tools?store=owned-store');
 });
+
+it('requires refreshed policy acknowledgement while preserving the application note', async () => {
+ state.post.mockRejectedValue({response:{data:{code:'POLICY_VERSION_MISMATCH'}}});
+ mount('participation');await screen.findByText('미가입');await screen.findByText('terms · 버전 1');
+ fireEvent.change(screen.getByRole('textbox'),{target:{value:'유지할 신청 내용'}});screen.getAllByRole('checkbox').forEach(box=>fireEvent.click(box));
+ fireEvent.click(screen.getByRole('button',{name:'가입 신청'}));await screen.findByText(/입력 내용은 유지됩니다/);
+ await waitFor(()=>expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true));
+ expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('유지할 신청 내용');
+ expect((screen.getByLabelText('서비스 이용약관 동의 (필수)') as HTMLInputElement).checked).toBe(false);
+});
+it('blocks application and offers retry when CarePharm policies are unavailable', async () => {
+ const original=state.get.getMockImplementation()!;
+ state.get.mockImplementation((path,config)=>path.endsWith('/enrollment-policies')?Promise.reject(new Error('unpublished')):original(path,config));
+ mount('participation');await screen.findByText('서비스 약관을 불러오지 못했습니다.');
+ fireEvent.click(screen.getByLabelText('이 서비스의 참여 조건을 확인했습니다.'));
+ expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true);
+ expect(state.post).not.toHaveBeenCalled();
+});

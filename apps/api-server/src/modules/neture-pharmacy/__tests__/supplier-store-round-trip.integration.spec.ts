@@ -289,14 +289,14 @@ integration('supplier → store → payment → shipment → settlement (real Po
     expect(await bridge.bridgeCheckoutOrderToNetureFulfillment({ checkoutOrderId }))
       .toMatchObject({ bridged: false, skippedReason: 'PAYMENT_NOT_READY' });
 
-    const prepared = await payment.prepare(ownerId, group.paymentGroupId);
+    const prepared = await payment.prepare(ownerId, organizationId, group.paymentGroupId);
     expect(prepared.amount).toBe(27000);
-    expect(await payment.prepare(ownerId, group.paymentGroupId))
+    expect(await payment.prepare(ownerId, organizationId, group.paymentGroupId))
       .toMatchObject({ paymentId: prepared.paymentId, reused: true });
-    await expect(payment.confirm(operatorId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId }))
+    await expect(payment.confirm(operatorId, organizationId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId }))
       .rejects.toMatchObject({ code: 'PAYMENT_NOT_FOUND' });
-    await payment.confirm(ownerId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId });
-    await payment.confirm(ownerId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId });
+    await payment.confirm(ownerId, organizationId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId });
+    await payment.confirm(ownerId, organizationId, { paymentId: prepared.paymentId, paymentGroupId: group.paymentGroupId });
     const projected = await ds.query("SELECT id,metadata FROM neture_orders WHERE metadata->>'checkoutOrderId'=$1", [checkoutOrderId]);
     expect(projected).toHaveLength(1);
     expect(projected[0].metadata).toMatchObject({ testPayment: true, buyerOrganizationId: organizationId });
