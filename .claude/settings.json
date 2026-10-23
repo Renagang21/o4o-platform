@@ -650,7 +650,9 @@
       "Bash(npm publish *)",
       "PowerShell(npm publish *)",
       "Bash(pnpm publish *)",
-      "PowerShell(pnpm publish *)"
+      "PowerShell(pnpm publish *)",
+      "Bash(gh pr merge *--admin*)",
+      "PowerShell(gh pr merge *--admin*)"
     ]
   }
 }
