@@ -2,9 +2,9 @@
 
 > **상태**: ACTIVE
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (한국시간)
-> **개발 검증**: LOCAL_VALIDATED (2026-10-22) · **main/운영 반영**: 2026-10-23 통합 진행 중
-> **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 최초 개발 push 완료, 사용자 후속 지시로 PR·main 병합·배포 진행
-> **기준**: 시작 main `3917a9522d` · 최신 결합 main `7dc02646da` · branch `wo/store-workflow-status-completion`
+> **개발 검증**: LOCAL_VALIDATED (2026-10-23) · **main/운영 반영**: DEPLOYED · api,store
+> **범위**: [TODO](../work-orders/TODO-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md) · 최초 개발 push 완료, 사용자 후속 지시로 PR·main 병합·배포 완료
+> **기준**: 시작 main `3917a9522d` · 최종 결합 main `cd091bc221` · 개발 HEAD `77e8195307` · 병합 main `8c44ffde13`
 > **정본**: [약국 매장 설계 §6-1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#6-1-내-매장-운영-화면과-업무-흐름-2026-10-09)
 
 ## 대조와 구현
@@ -111,3 +111,42 @@ PR [#772](https://github.com/Renagang21/o4o-platform/pull/772)를 생성했다. 
 PC 상담과 모바일 QR 배치 이미지를 직접 확인했다. 검사 브라우저·이번 전용 Vite를 종료하고 포트 4392 종료를 확인했다. 통합 로그·최종 브라우저 결과와 대표 이미지는 저장소 밖 `/workspace/.o4o-store-integration-20261023/`에 보존한다. 실제 로그인·운영 번역·음성 장치·DB·기기 업무 검증은 수행하지 않았다.
 
 최초 PR CI `39891219181`의 Web job에서 `consultation-speech.test.tsx`가 음성 입력 콜백 직후 빈 값을 읽어 실패했다. 로컬 전체/집중 검사에서는 재현되지 않았다. React 상태 반영을 `await act`로 기다리도록 해당 테스트 한 줄을 보완했고, 문장 기대값·자동 번역 금지·명시 번역 확인은 유지했다. runtime 코드는 바꾸지 않았다. 보완 후 Store 전체 785개와 해당 파일 lint를 다시 통과했다. 이 보완을 같은 PR에 push하고 정확한 새 HEAD의 CI·자동 Codex 리뷰를 재확인한다.
+
+### PR 검증·main 병합
+
+수정 후 HEAD `77e81953077ed01ba1daef72e8d834e6ce0a2753`의 PR CI [39891841923](https://github.com/Renagang21/o4o-platform/actions/runs/39891841923)가 성공했다. 최초 실패했던 Web job을 포함해 필수 `CI Gate`와 전체 check 17개가 통과/정상 skip이며, CodeQL·Guard 검사도 성공했다. 앞선 수정 전 CI는 새 push 뒤 취소했다. 동일 HEAD의 Codex 자동 재검토는 completed·지적 0·미해결 0, review thread 0이었다.
+
+main이 `cd091bc221`에 그대로 있음을 재확인하고 검증한 HEAD로 고정하여 PR #772를 일반 merge했다. 병합 commit은 `8c44ffde138df57f36f5089773a782befcadd9af`다. 개발 HEAD가 main의 조상이며 branch-only commit 0임을 확인했다. bypass·auto-merge·main direct push는 사용하지 않았다.
+
+병합 후 CI [39893076095](https://github.com/Renagang21/o4o-platform/actions/runs/39893076095)도 성공했다. Delivery [39894078073](https://github.com/Renagang21/o4o-platform/actions/runs/39894078073)가 시작됐으며 실제 운영 반영 결과를 이어서 확인한다. 변경 범위 기준 배포 분류는 LEVEL_2·api/store이고 migration·고위험 경로는 없다. 실제 serving 기준의 Delivery 판정은 별도로 확인한다. 결과 기록은 최신 main에서 별도 전용 branch/worktree `wo/store-workflow-deploy-record`에 작성하고 코드 배포 완료 뒤 문서만 PR로 반영한다.
+
+### 운영 배포와 읽기 검증 완료
+
+Delivery [39894078073](https://github.com/Renagang21/o4o-platform/actions/runs/39894078073)가 success로 완료됐다. target은 병합 main `8c44ffde138df57f36f5089773a782befcadd9af`다. API를 먼저 verified 배포하고 성공 후 Store를 배포했다. 최종 serving SHA 재조회와 commit status `production`은 **success · `DEPLOYED · deploy: api,store`**다. 수동 promote·freeze/권한/배포 설정 변경은 하지 않았다.
+
+| 운영 읽기 확인 | 결과와 한계 |
+|---|---|
+| API `/health/ready` | 200 |
+| Store 홈·상담·실행 현황·QR·태블릿·자료함·서비스 지정 진입 | 8개 URL 모두 200. SPA 제공 확인이며 로그인 후 업무 검증은 아님 |
+| 인증 없는 live-signals·상담 context | 각각 401. 인증 경계 유지 |
+| 공개 화면 자산 | 상담 방향별 마지막 입력/번역 안내, 부분 사용처 표시, QR 매장 문맥 변경 안내가 있는 현재 JS 3개 모두 200·본문 확인 |
+
+비로그인 HTTP **11/11**, 공개 자산 **3/3 PASS**다. 배포 전에는 없던 상담 안내가 배포 후 현재 entry module에 포함된 것을 확인했다. 원본 운영 응답이나 사용자 자료는 문서/로그에 저장하지 않았고 상태·공개 자산 URL·표시문 존재 여부만 저장했다. 실행 스크립트·결과는 통합 증적 폴더의 `public-smoke.py`·`public-smoke-results.json`, Delivery job 결과는 `delivery-result.json`이다.
+
+실계정 로그인·실제 고객 번역/마이크·직원 초대/승인/해제·정상 업무의 매장 간 격리·QR 출력/스캔·태블릿/사이니지 연결/재생은 미실행이다. 이번 운영 확인은 로그인 없는 읽기뿐이며 유료 AI·운영 업무 데이터 쓰기·신규 migration을 추가하지 않았다. 매장별 AI 이력/직원 접근 해제 Core 계약은 후속 범위로 유지한다.
+
+코드 작업공간은 main 포함·branch-only commit 0·clean·untracked 0·해당 경로 사용 프로세스 0을 확인한 뒤 제거했다. 로컬/원격 개발 branch도 정상 삭제했고 기준 checkout 상태가 그대로임을 확인했다. 과거 다른 세션의 작업 트리·branch는 정리하지 않았다. 로그·결과·대표 이미지는 저장소 밖에 보존한다.
+
+```text
+WORKTREE_DISPOSITION (통합 후)
+code worktree: /workspace/o4o-wt/store-workflow-status-completion — REMOVED
+code branch: wo/store-workflow-status-completion — local/remote REMOVED
+main integration: PR #772 / 8c44ffde13
+CI: PR 39891841923 PASS / main 39893076095 PASS
+deployment: Delivery 39894078073 PASS / DEPLOYED api,store
+smoke: 합성 브라우저 40 PASS / 운영 HTTP 11·공개 자산 3 PASS / 실계정·기기 미실행
+record worktree: /workspace/o4o-wt/store-workflow-deploy-record
+record disposition: 문서 PR main 반영·post-merge 확인 후 표준 정리
+```
+
+문서 정합(통합 완료): TODO를 COMPLETED로 갱신하고 CHECK에 검증 HEAD·CI·리뷰·병합·배포·운영 읽기·미검증·작업공간 정리 결과를 맞췄다. 현재 설계 정본과 정책은 추가 변경하지 않았다. 문서 결과 반영은 runtime 변경이 없어 배포 NOT_APPLICABLE이다.
