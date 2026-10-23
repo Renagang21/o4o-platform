@@ -86,3 +86,12 @@ auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 
 - 사용자는 Pharmcoop 배포 설정 수정안을 승인했다. 같은 WO의 연속 배포 보완으로 기존 격리 checkout/branch를 유지한다. 전체 이력을 fetch하고, frontend_only에서는 기존 Delivery 판정기의 API serving→target 결과가 `UP_TO_DATE` 또는 `BEHIND_NO_RUNTIME_CHANGE`이며 배포 불필요일 때만 허용한다. API 변경·알 수 없는 serving·분기된 이력은 차단하며 fixture 경로의 동일 SHA·이미지 고정 조건은 유지한다.
 - 신규 migration·운영 DB 데이터·권한·freeze·CI gate·revision 검증 조건은 변경하지 않는다. 이 후속의 main 반영·Pharmcoop 실제 배포 결과는 아직 미확인이다.
 - 문서 정합: 일반 Delivery 배포 완료 / Pharmcoop 배포 후속 진행 / CarePharm 약관 초안 main 반영·운영 미게시. 이전 절의 미완료 표시는 당시 시점 기록이다.
+
+## 최종 실행 확인 — 2026-10-24 (Asia/Seoul)
+
+- [PR #787](https://github.com/Renagang21/o4o-platform/pull/787)의 수정 HEAD `521ec12c7f`는 CI·CodeQL·SonarCloud·최신 Codex 리뷰를 통과했다. 로컬 배포 판정 93 tests와 실제 workflow guard 추출 실행 5경우(동일 SHA·API 무변경 허용, API 변경·serving 불명·조상 관계 불일치 차단)가 통과했다.
+- PR 병합 직전 다른 PR #785로 main이 이동했으나 사전 동기화를 놓친 채 병합했다. 충돌 없이 합쳐진 main `1bbf7fd4fd63289c0db4a93cf1bc5cdb8c7fc145`를 다시 받아 판정 테스트 93개를 재실행했고 [main CI 40037642098](https://github.com/Renagang21/o4o-platform/actions/runs/40037642098)가 성공했다. 이후 배포 전에 main SHA·진행 중 배포 유무를 다시 확인했다.
+- API 인증 변경 때문에 Delivery는 `HELD_LEVEL_3`로 판정했다. 새 migration이 없음을 확인하고 기존 사용자 main 배포 지시와 일반 promote 정책에 따라 [40039498391](https://github.com/Renagang21/o4o-platform/actions/runs/40039498391)을 실행했다. API·Neture 배포·검증 및 serving report가 성공했고 `production=success / DEPLOYED · deploy: api,neture`다.
+- [Pharmcoop 40040518137](https://github.com/Renagang21/o4o-platform/actions/runs/40040518137)은 같은 main SHA로 `frontend_only=true`, `apply=false` 실행 성공. API 호환성, 새 revision readiness, 인증된 `/`·`/test`·`/login` HTML smoke, reviewed revision 트래픽 100% 확인 단계가 모두 성공했다. 조합 fixture 생성 단계는 skipped다. 공개 도메인 DNS/IAM을 변경하거나 공개 도메인 직접 접속 검증을 완료했다고 주장하지 않는다.
+- 실제 도메인 직접 접속과 Actions 원문 로그 다운로드는 이 환경의 proxy403으로 제한됐다. 배포 증거는 GitHub API의 workflow/job/step 결과 및 production commit status다. 합성 UI 검증과 운영 serving 검증, 실계정·기기 검증은 구분한다.
+- 문서 정합: 이 WO의 개발·main 통합·배포는 완료다. CarePharm 약관은 초안만 반영됐고 운영 미게시이며, 법정정보는 사용자 요청대로 빈칸이다. 사업별 설정·실계정·실매장·음성 검증은 운영 준비의 별도 잔여로 유지한다. 앞 절의 실패·대기는 각 실행 당시 기록이다.

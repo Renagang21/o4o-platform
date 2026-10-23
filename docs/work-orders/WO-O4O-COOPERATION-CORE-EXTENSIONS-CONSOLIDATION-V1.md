@@ -1,6 +1,6 @@
 # 약국 협업 사업 통합 개발 · Core + Extension 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED — 승인된 개발·main 통합·배포 완료. 실제 운영 준비는 아래 별도 항목
 > **작성일**: 2026-10-23 (Asia/Seoul)
 > **근거**: 사용자 지시 — Pharmacy·MegaPharm·Pharmcoop·CarePharm의 분리 작업을 이 공간에서 이어가고 잔여 작업을 마무리하며 core + extension으로 정리
 
@@ -10,7 +10,7 @@
 
 - PR #765는 main `772296cb6d`, PR #772는 main `8c44ffde13`에 이미 병합됐다. pull ref HEAD가 현재 main의 조상임을 Git으로 확인했다. 다시 구현하거나 중복 통합하지 않는다.
 - PR #761·#763의 공통 neture 세션, 사업 UUID 범위 약관, 직원 숙지 자료, 사업 운영자 요구 집계가 이미 존재한다. 이전 조사에서 미구현으로 분류한 항목은 현 main 기준으로 재판정한다.
-- GitHub REST/GraphQL 조회는 이 환경에서 Forbidden이다. Git fetch와 병합 이력 확인은 성공했다. 병합 사실과 현재 CI·운영 serving 상태를 혼동하지 않는다.
+- 시작 당시 GitHub REST/GraphQL 조회는 Forbidden이었으나 이후 접근이 복구됐다. 최신 통합·배포 결과는 아래 완료 기록과 CHECK를 따른다.
 
 ## 구조와 소비처
 
@@ -31,7 +31,7 @@
 - [x] 영향 앱 빌드·제품 타입·lint·정적 소비처 검사. 공유 패키지 전체 tsc의 미변경 테스트 타입 오류는 CHECK에 별도 기록
 - [x] 구현/병합/배포/실제 운영 준비를 구분한 [결과 기록](../checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)
 - [x] 검증한 변경만 commit·push — 구현 `f6d9429468`, 전용 branch 원격 push 성공
-- [ ] 원격 CI·PR·리뷰·main 통합·배포 — 프록시의 GitHub API CONNECT 403으로 차단, 필요한 네트워크 설정 초안 저장
+- [x] 원격 CI·PR·리뷰·main 통합·배포 — API 접근 복구 후 PR #784·#787 병합, 일반 Delivery 및 Pharmcoop 배포·검증 완료. 아래 완료 기록 참조
 
 ## 운영 준비 · 별도 결정
 
@@ -40,3 +40,12 @@
 ERP Assistant는 확보 가능한 POS·발주 자료와 지원 업무가 확정되기 전까지 별도 검토다. 공동 상품 기획·공급 계약·펀딩 방식은 사업자 결정이며 이번 공통화에서 정책을 만들지 않는다. 운영 DB write/DDL·migration·새 의존성·배포 인프라 변경은 이 정비에 추가하지 않는다.
 
 문서 정합: 과거 COMPLETED 기록을 재작성하지 않는다. 이 문서와 후속 CHECK에서 최신 main의 완료 근거와 실제 잔여를 연결한다.
+
+## 완료 확인 — 2026-10-24 (Asia/Seoul)
+
+- 구현·통합: PR #784 및 승인된 배포 설정 후속 PR #787. 후속 main `1bbf7fd4fd63289c0db4a93cf1bc5cdb8c7fc145`의 CI PASS, 최신 PR Codex 리뷰 지적 없음.
+- 배포: 일반 Delivery `39969310284` 성공으로 Pharmacy/MegaPharm 및 공유 소비 앱 반영. 이후 main에 먼저 포함된 PR #785의 외부 AI API 변경을 포함해 일반 promote `40039498391`로 API·Neture 배포 성공. production status `DEPLOYED`.
+- Pharmcoop: `40040518137`에서 frontend_only 배포 성공. API 호환성·revision readiness·인증 HTTP smoke·트래픽 전환 검증 PASS, 조합 fixture 단계 skipped.
+- 사용자는 후속으로 CarePharm 약관 초안 작성을 요청했고, 별도 회사가 아직 없으므로 법정정보를 빈칸으로 두도록 확인했다. 초안 두 문서는 main에 반영했으며 운영 게시·신규 가입 차단 해제는 미실행이다. 이는 위 초기 운영 준비 절의 문안 생성 제외 범위를 사용자 지시로 확장한 후속이다.
+- 사용자가 승인한 배포 설정 수정은 Pharmcoop 프런트의 API 호환성 확인과 전체 Git 이력 조회에 한정했다. DB schema·새 migration·신규 역할을 추가하지 않았다.
+- 실제 운영자 설정·약관 게시·실계정·실매장·기기·음성 검증과 ERP/POS 신규 업무 설계는 운영 준비·별도 범위이며 이 WO의 미완료 개발 체크리스트로 남기지 않는다. 상세 근거는 [CHECK](../checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)의 최신 완료 절에 둔다.
