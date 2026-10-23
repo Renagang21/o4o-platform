@@ -70,3 +70,10 @@ auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 
 구현 commit `f6d9429468`을 `origin/wo/pharmacy-cooperation-core-extensions`에 push했다. 원격은 해당 branch의 신규 생성과 PR 생성 URL을 반환했다. main 직접 push·PR gate 우회·force push는 하지 않았다. 현재 PR 미생성·원격 CI 미확인·main 미통합·이번 변경 운영 미배포다. 네트워크 설정 적용 뒤 기존 branch에서 후속 작업을 이어간다.
 
 새 문서 파일 링크·민감정보 패턴·diff check PASS. 7개 소비 앱 빌드 뒤 추적 manifest/lockfile 변경은 0이다. 검사용으로 시작한 로컬 preview 프로세스는 종료했다. 이전 세션의 기존 서버·다른 작업공간은 종료/삭제하지 않았다. 본 checkout/branch는 후속 통합·수정용으로 KEEP한다.
+
+## 통합 후속 — 2026-10-23
+
+- GitHub API 접근 복구 후 최신 main `5423efa3b8`을 충돌 없이 병합하고 [PR #784](https://github.com/Renagang21/o4o-platform/pull/784)를 생성했다. 최초 HEAD의 CI Gate·API 3개 shard·영향 앱 빌드·CodeQL·SonarCloud가 통과했다.
+- Codex 리뷰의 Store 메가팜 이동 경로 지적을 반영했다. 직접 로그인 사업은 handoff 요청 없이 목적 URL로 이동하며 CarePharm의 기존 handoff는 유지한다. 가입자 공간·신청 관리 회귀 테스트를 포함한 해당 파일 6개 테스트가 통과했다. 수정 HEAD는 재검증·리뷰 대상이다.
+- 사용자 요청으로 [CarePharm 이용약관](../design/DRAFT-CAREPHARM-BUSINESS-TERMS-V1.md)과 [개인정보처리방침](../design/DRAFT-CAREPHARM-BUSINESS-PRIVACY-V1.md) 초안을 작성했다. 사용자는 별도 사업자 사용 및 아직 회사가 없으므로 사업자 정보를 빈칸으로 유지하도록 확인했다. O4O 법정정보로 대체하지 않았으며 운영 게시·가입 차단 해제는 하지 않았다.
+- 문서 정합: 위 Git 전달 절은 당시 기록이다. 현재 PR 생성 완료, main 통합·배포는 아직 미완료다. 약관은 문서 초안 작성 완료와 실제 운영 게시 미완료를 구분한다.
