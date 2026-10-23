@@ -1,10 +1,11 @@
 # TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1
 
 > **상태**: COMPLETED (승인된 구현·검증·branch push 범위)
-> **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-22 (KST)
+> **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (KST)
 > **근거**: 사용자 인증 잔여 조사 후 TODO 작성 → 문서·코드 대조·계획 보완 → 구현·검증 → commit·push 지시
 > **상위 WO**: [WO-O4O-AUTH-REFACTOR-V1](WO-O4O-AUTH-REFACTOR-V1.md)의 인증 보안 보완 후속
 > **종료 범위**: branch push 후 통합 담당 인계. PR 생성·병합·배포·운영 DB/계정/OAuth 설정 변경 없음.
+> **후속 단계**: 2026-10-23 사용자 main 병합·배포 지시로 PR #771 진행. 위 종료 범위와 아래 최초 검증·인계 기록은 당시 사실로 보존한다.
 
 ## 기준과 승인 범위
 
@@ -156,3 +157,19 @@ other session usage: 이번 전용 작업공간만 사용
 branch-only commits: 소스 517c33bfb4 및 후속 완료 기록
 verdict: KEEP (통합 담당의 PR·검토·후속 수정·병합 대기)
 ```
+
+## 2026-10-23 통합 시 CI 계약 보완
+
+- [x] 최신 main 동기화와 선행 lint PR #770 병합 반영. 전체 lint 오류0·기존 경고948, API 타입 검사 PASS.
+- [x] 인증 PR #771의 첫 API shard2 실패를 로컬 같은 묶음에서 재현: 1 suite/1조건 FAIL,
+  189 suites/3096조건 PASS·기존 fixture162조건 SKIP. 실패는 아래 정적 소유 파일 목록 한 곳이다.
+- [x] `google-only-auth-cleanup.spec.ts`의 이메일 확인 토큰 소유 파일 목록에
+  이번 분리 파일 `services/auth/email-auth-token.service.ts` 하나를 명시한다.
+  전체 runtime 전수 검사·옛 service/entity/route 금지·account-erasure 쓰기 금지는 유지한다.
+- [x] 수정 후 기존 인증 은퇴/재유입 차단 3 suites·82조건 PASS, 변경 테스트 ESLint 오류0·diff check PASS.
+
+원인은 승인된 새 토큰 수명 모듈을 기존 소스 전수 가드의 명시 목록에 빠뜨린 것이다.
+목록을 디렉터리 wildcard로 넓히거나 검사를 제외하지 않는다. runtime/auth 정책 변경은 없다.
+확인된 같은 실패의 중복 실행을 피하려고 구 HEAD의 CI 재시도는 취소하고, 수정 HEAD에서 CI를 다시 실행한다.
+최종 HEAD CI·Codex·main 병합·Delivery 및 실제 readiness 결과는
+[PR #771](https://github.com/Renagang21/o4o-platform/pull/771)의 통합 체크리스트에서 추적한다.
