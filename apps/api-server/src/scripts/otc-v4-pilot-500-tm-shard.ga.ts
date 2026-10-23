@@ -195,7 +195,11 @@ function runRekey(): void {
   const applied: Array<{ ko: string; submittedKey: string; rule: string; similarity: number; diffAt: number; shard: number }> = [];
   const unresolved: Array<{ ko: string; reason: string; best?: string; score?: number }> = [];
   /** 보이지 않는 제어문자(C0/C1) 제거 + NFC — 공식 원문에 섞인 U+009E 류를 제출측이 누락한 경우를 흡수. */
-  const ctrlFree = (s: string): string => s.normalize('NFC').replace(/[ ---]/g, '');
+  const ctrlFree = (s: string): string => s.normalize('NFC').split('').filter(char => {
+      const code = char.charCodeAt(0);
+      return code === 0x09 || code === 0x0a || code === 0x0d ||
+        (code >= 0x20 && (code < 0x7f || code > 0x9f));
+    }).join('');
   for (const ko of pending) {
     // 규칙 1 — 제어문자만 제거하면 완전 동일. 추정이 개입하지 않으므로 가장 안전하다.
     const exactAfterStrip = [...submitted.entries()].filter(([k]) => ctrlFree(k) === ctrlFree(ko));

@@ -108,7 +108,8 @@ function buildQrContentDisposition(title: string | null | undefined, slug: strin
   const raw = (title || '').trim();
   // 파일시스템 금지문자/제어문자 제거 + 공백 정리, 길이 제한
   const safe = (raw || `qr-${slug}`)
-    .replace(/[\\/:*?"<>|\x00-\x1f]/g, ' ')
+    .replace(/[\\/:*?"<>|]/g, ' ')
+    .split('').map(char => char.charCodeAt(0) < 0x20 ? ' ' : char).join('')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 80) || `qr-${slug}`;

@@ -31,7 +31,7 @@ function main(): void {
     const key = keys[idx];
     if (j.entries[key] && j.entries[key] !== en) overwrites.push(`${lineStr}`);
     j.entries[key] = en;
-    ann[key] && (j.annotations[key].filled = true);
+    if (ann[key]) j.annotations[key].filled = true;
     set++;
   }
   j.filled = keys.filter((k) => j.entries[k]).length;
