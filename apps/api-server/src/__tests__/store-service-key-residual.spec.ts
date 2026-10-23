@@ -41,10 +41,8 @@ describe('Store service-key residual integrity', () => {
     expect(src).not.toMatch(/opl\.service_key\s*=\s*'kpa'/);
   });
 
-  it('KPA 운영자 이벤트 오퍼 pending KPI 는 승인 큐와 같은 key 를 센다', () => {
-    const src = read('routes/kpa/services/operator-dashboard.service.ts');
-    expect(src).toMatch(/service_key = 'kpa-groupbuy' AND status = 'pending'/);
-  });
+  // KPA 운영자 대시보드(operator-dashboard.service · /kpa/operator summary)는
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 소비처 0 으로 제거됐다.
 
   // ── enrollment write: canonical only ──────────────────────────────
   it('enrollment write 경로에 legacy service_code 리터럴이 없다', () => {

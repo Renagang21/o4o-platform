@@ -134,3 +134,17 @@ migration 자체가 계정·권한·예시 조합을 생성하지 않는다.
 조합 admin은 운영 화면에서 가입 자격·제출 안내를 변경하고 사유를 남긴다. operator나 연합회 역할은 이를 대행하지 못한다. 기존 회원 상태·약사/내 매장 권한은 바꾸지 않는다.
 연합회 조합/개별 조합 회원 상태 집계를 제공한다. 회원 게시판은 실제 businessKey의 communityKey로 기존 API를 이용하며 목록·직접 본문·페이지 이동·글쓰기와 운영자 게시판 개설을 연결한다.
 공급/콘텐츠 승인은 기존 운영 탭을, 매장 자료 복사는 기존 내 매장을 사용한다. 신규 migration과 운영 데이터 등록은 없다.
+
+## 2026-10-21 포럼 분리·화면 배치
+
+[화면 트리·설계](../../docs/design/DESIGN-O4O-COOPERATIVE-FORUM-LAYOUT-V1.md)와 [개발 TODO](../../docs/work-orders/TODO-O4O-COOPERATIVE-FORUM-LAYOUT-V1.md)를 따른다.
+`/community`는 조합원 이야기(회원 작성), `/materials`는 조합 소식·자료(운영자 작성 및 공급자 자료 승인·게시)다.
+공식 소식·자료는 기존 showcase가 허용하는 게시·노출 content만 표시하고 제품 항목은 제외한다. 직접 상세는 `?item=`으로 연다.
+홈은 진열 순서의 주요 소식·자료 최대 3건, 최근 조합원 이야기 최대 5건과 참여 상태를 표시한다. 별도 공지 분류·고정 기능은 추가하지 않았다.
+서비스 화면에는 기존 제품·콘텐츠 진열과 강의·내 매장 링크를 유지한다. 개인 조합원 자격을 구매·매장 권한으로 바꾸지 않는다.
+
+조합 운영은 개요와 `?work=members|contents|boards|proposals|settings` 업무로 나누고 선택한 업무만 연결한다.
+`settings`는 조합 admin 전용이며 가입 기준과 조합 operator 관리를 제공한다. 일반 포럼 게시판 개설은 `boards`로 옮겼다.
+`/operator?tab=contents|proposals`와 기존 콘텐츠 작성·편집 URL은 계속 동작한다. 홈 Hero 편집도 기존 경로를 유지한다.
+연합회는 산하 조합 심사와 `?work=operators`의 연합회 operator 관리(admin 전용)를 분리한다.
+개발·검증·push와 실제 운영 배포는 구분한다. 새 migration·운영 데이터 등록·공통 모듈 변경은 없다.

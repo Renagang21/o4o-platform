@@ -119,7 +119,12 @@ async function main(): Promise<void> {
       // 필드별 편집 그룹핑
       const koFields = new Map<string, Edit[]>();
       const enFields = new Map<string, Edit[]>();
-      for (const e of g.edits) (e.lang === 'ko' ? koFields : enFields).get(e.field)?.push(e) ?? (e.lang === 'ko' ? koFields : enFields).set(e.field, [e]);
+      for (const e of g.edits) {
+        const fields = e.lang === 'ko' ? koFields : enFields;
+        const edits = fields.get(e.field);
+        if (edits) edits.push(e);
+        else fields.set(e.field, [e]);
+      }
 
       // 멱등: 이미 반영됐는지(첫 edit 의 repl 존재로 근사)
       const first = g.edits[0];

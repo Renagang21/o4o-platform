@@ -45,7 +45,7 @@ export default function NetureLayout() {
                   /terms · /privacy 는 route 가 존재한다(공통 PolicyDocumentViewer). 다른 서비스
                   푸터와 같은 축으로 노출한다 — route 있는 실기능을 숨기지 않는다. */}
               <Link to="/terms" className="hover:text-primary-600 transition-colors">
-                {CURRENT_HOST_PROFILE === 'carepharm' ? '플랫폼 이용약관' : '이용약관'}
+                {CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 이용약관' : '이용약관'}
               </Link>
               <Link to="/privacy" className="hover:text-primary-600 transition-colors">
                 개인정보처리방침

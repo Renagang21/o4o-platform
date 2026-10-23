@@ -59,6 +59,9 @@ Supplier·Store·Organization·Community를 같은 연결 모듈에서 지원한
 
 공식 MCP SDK OAuth handler로 code+S256 PKCE, client/redirect/resource/scope 검증, 토큰 재발급·폐기를 처리한다.
 허용 redirect URI는 서버 배포 설정의 exact allowlist. 임의 URL metadata fetch나 client 이름 신뢰는 하지 않는다.
+발급자 식별(RFC 9207): metadata에 `authorization_response_iss_parameter_supported: true`를 선언하고,
+client로 돌아가는 모든 인가 응답(동의 성공·사용자 거절·SDK 검증 오류)에 metadata와 같은 `iss`를 붙인다.
+ChatGPT는 이 조건을 만족하는 서버에 고정 반환 주소 `https://chatgpt.com/connector_platform_oauth_redirect`를 쓴다.
 연결 시작 시 만료되는 요청을 만들고 기존 웹 로그인→명시적 동의→선택한 workspace와 scope에 한해 code를 발급한다.
 access 15분, refresh/연결 최대 30일을 초기값으로 사용한다. refresh는 회전하고 재사용은 연결 폐기한다.
 매 도구 실행에서 연결·계정·작업공간 종류별 관리자 설정·현재 업무 관계·그 서비스가 요구하는 가입/약관과 대상 소유를 확인한다.
@@ -85,6 +88,10 @@ ChatGPT 대화·요청 본문·자료 본문·토큰을 오류 기록에 넣지 
 
 기본 OFF. 운영 활성화 전에 migration, canonical HTTPS issuer/web URL/redirect allowlist 설정,
 실제 ChatGPT connector의 지원 조건·OAuth 왕복과 Google 로그인 검증이 필요하다.
+운영 설정은 `deploy-api.yml`이 공급한다. URL 4개(`EXTERNAL_AI_ISSUER_URL`·`EXTERNAL_AI_WEB_ORIGIN`·
+`EXTERNAL_AI_ADMIN_ORIGIN`·`EXTERNAL_AI_REDIRECT_URIS`)는 저장소 variable 값, 없으면 현재 운영 값을 유지하며
+현재 값을 조회하지 못하면 배포를 멈춘다. 암호화 키는 variable `EXTERNAL_AI_CREDENTIAL_SECRET_NAME`이 가리키는
+Secret Manager 참조로만 연결한다(값은 GitHub·문서에 두지 않는다).
 사용자 콘텐츠 저장은 기존 서비스의 공개/검수/등재와 별개이며 이번 도구가 이를 대행하지 않는다.
 SDK client HTTP round-trip과 격리 PostgreSQL로 PKCE/code 재사용/resource/refresh 회전/소유/중지/
 연결 해제/멱등/동시 수정/HTML sanitize/desktop·mobile UI를 검증한다.

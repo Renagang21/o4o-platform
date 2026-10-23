@@ -166,7 +166,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
     expect((await edit(keys[1], [])).status).toBe(200);
     expect((await get(tablet)).status).toBe(200);
     expect((await edit(keys[1], ['tablet', 'multilingual-content'])).status).toBe(200);
-    await settings.withdraw(store, keys[0]);
+    await settings.withdraw(store, owner, keys[0]);
     expect((await get(tablet)).status).toBe(200);
     const closed = await request(app).patch(base + '/admin/semi-franchises/' + keys[1])
       .set('x-fixture-user', admin).send({ status: 'closed' });
@@ -248,7 +248,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       await settings.update(businessKey, { status: 'active' });
       expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(200);
       expect((await configure('paid', ['store-staff-support'])).status).toBe(200);
-      await settings.withdraw(store, businessKey);
+      await settings.withdraw(store, owner, businessKey);
       expect((await get(base + '/pharmacy/staff-support/products')).status).toBe(200);
       await db.query(`UPDATE settings SET value='{"features":["unknown"]}'::jsonb WHERE key=$1`, [policies[0]]);
       expect((await get(base + '/pharmacy/service-features')).status).toBe(503);

@@ -20,6 +20,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { hasAnyServiceRole, hasServiceRole } from '../utils/role.utils';
 
 // ─────────────────────────────────────────────────────
@@ -107,7 +108,6 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
 
   // Verify KPA_SCOPE_CONFIG has correct allowed roles and platform bypass
   it('KPA_SCOPE_CONFIG contains frozen role list and blocks platform bypass', () => {
-    const { KPA_SCOPE_CONFIG } = require('@o4o/security-core');
 
     // All expected roles must be in allowedRoles
     for (const role of KPA_SCOPE_ALLOWED_ROLES) {

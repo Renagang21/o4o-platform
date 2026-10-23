@@ -96,14 +96,7 @@ export type {
   CommonEditUserModalProps,
 } from './modules/members';
 
-// KPA EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1)
-export { KpaEditUserModal } from './modules/members';
-export type {
-  KpaMemberStatus,
-  KpaMemberBusinessInfo,
-  KpaMemberForEdit,
-  KpaEditUserModalProps,
-} from './modules/members';
+// KPA EditUserModal 은 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 /kpa/members API 와 함께 제거(소비처 0).
 
 // Dashboard Modules (WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1)
 export { AxisNavigationSection } from './dashboard/AxisNavigationSection';

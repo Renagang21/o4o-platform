@@ -69,6 +69,7 @@ vi.mock("../../../../api/tabletDisplays", async (original) => ({
   }),
   fetchOperatorCommonIdleSelection: async () => null,
   fetchTabletDevices: async () => [],
+  fetchCornerContents: async () => ({ items: [], currentScreenSetId: null }),
   fetchProductPool: async () => ({
     supplierProducts: [],
     localProducts: [{ id: "product", name: "Product" }],
@@ -222,6 +223,30 @@ const wrap = (
   child: React.ReactNode,
   path = "/store/commerce/tablet-displays",
 ) => <MemoryRouter initialEntries={[path]}>{child}</MemoryRouter>;
+it('opens the selected confirmed location once and rejects its navigation after a store switch', async () => {
+  api.tablets.push({ id: 'target', name: 'Selected tablet', location: 'Corner B', is_active: true });
+  const tree = <MemoryRouter initialEntries={[{ pathname: '/store/commerce/tablet-displays', search: '?workspace=use', state: {
+    storeOperationEntry: { scope: 'A:kpa-society', kind: 'tablet', id: 'target', returnPath: '/store/execution?workspace=use', returnState: null },
+  } }]}><TabletPage /></MemoryRouter>;
+  const h = render(tree);
+  await screen.findByRole('heading', { name: 'Corner B', level: 3 });
+  fireEvent.click(screen.getByRole('button', { name: '닫기' }));
+  h.rerender(tree);
+  expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
+  expect(screen.getByRole('link', { name: '위치별 현황으로 돌아가기' }).getAttribute('href')).toBe('/store/execution?workspace=use');
+  api.store = api.active = 'B'; h.rerender(<MemoryRouter initialEntries={[]}><TabletPage /></MemoryRouter>);
+  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.');
+  expect(screen.queryByRole('link', { name: '위치별 현황으로 돌아가기' })).toBeNull();
+  expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
+});
+it('does not choose a different tablet when the requested location is missing from the current list', async () => {
+  render(<MemoryRouter initialEntries={[{ pathname: '/store/commerce/tablet-displays', search: '?workspace=use', state: {
+    storeOperationEntry: { scope: 'A:kpa-society', kind: 'tablet', id: 'missing', returnPath: '/store/execution', returnState: null },
+  } }]}><TabletPage /></MemoryRouter>);
+  await screen.findByText(/선택한 위치를 현재 목록에서 확인하지 못했습니다/);
+  expect(screen.queryByText('이 코너에 준비된 화면이 아직 없습니다. 아래에서 화면을 골라 바로 사용할 수 있습니다.')).toBeNull();
+  expect(screen.getByRole('button', { name: '위치 다시 확인' })).toBeTruthy();
+});
 it("screen-set list failure has retry rather than a usable empty library", async () => {
   api.sets.mockRejectedValueOnce(new Error("private"));
   render(<TabletScreenSetManager onToast={vi.fn()} />);

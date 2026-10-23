@@ -81,7 +81,9 @@ export function attributeFunctions(present: AIng[], mf: string): AttrResult {
   for (const k of skinKeys) {
     if (!FN[k].re.test(mf)) continue;
     const cap = capableOf(k);
-    if (cap.length === 1) cap[0]!.funcs.includes(k) && draft.get(cap[0]!)!.add(k);
+    if (cap.length === 1) {
+      if (cap[0]!.funcs.includes(k)) draft.get(cap[0]!)!.add(k);
+    }
     else if (cap.length >= 2) return { ok: false, reason: `SKIN_AMBIGUOUS:${k}` };
   }
   // jointOnly 와 joint 동시 부여 방지: joint 있으면 jointOnly 제거(상위 문구).

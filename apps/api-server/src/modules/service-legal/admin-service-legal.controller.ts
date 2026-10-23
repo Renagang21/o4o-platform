@@ -267,14 +267,15 @@ export function createAdminServiceLegalController(dataSource: DataSource, requir
           // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §5: published 문서 무결성.
           //   승낙 이력이 "어느 문서·본문에 동의했는가" 를 가리키므로 게시 중인 row 의 본문·버전·시행일·표식은
           //   덮어쓰지 않는다. 변경은 새 draft → 새 version → publish (구 published 는 draft 로 내려가 보존).
-          if (doc.status === 'published') {
+          const acceptedBusinessPolicy = isBusinessPolicyScope(serviceKey) && (await manager.query('SELECT 1 FROM user_policy_acceptances WHERE policy_document_id=$1 LIMIT 1', [doc.id])).length > 0;
+          if (doc.status === 'published' || acceptedBusinessPolicy) {
             const toTime = (v: unknown) => (v ? new Date(v as string | Date).getTime() : null);
             const immutableTouched =
               (typeof content === 'string' && content !== doc.content)
               || (Number.isInteger(version) && version > 0 && version !== doc.version)
               || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date))
               || slugChanged;
-            if (immutableTouched) {
+            if (immutableTouched || (acceptedBusinessPolicy && title !== undefined && normalizeStr(title) !== doc.title)) {
               throw new ServicePolicyLifecycleError('PUBLISHED_POLICY_IMMUTABLE', '게시 중인 문서의 본문·버전·시행일·표식은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.', 409);
             }
           }

@@ -252,7 +252,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
     semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));
   router.post('/pharmacy/semi-franchises/:key/withdraw', ...store, handle(async (req) =>
-    semiFranchises.withdraw(org(req), req.params.key)));
+    semiFranchises.withdraw(org(req), req.user!.id, req.params.key)));
 
   router.get('/pharmacy/store/supply-options', ...store, handle(async (req) => listSupplyOptions(dataSource, org(req), {
     source: typeof req.query.source === 'string' ? req.query.source : undefined,
@@ -310,14 +310,14 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.post('/pharmacy/payments/prepare', ...store, handle(async (req) => {
     const groupId = req.body?.paymentGroupId;
     if (!isUuid(groupId)) throw new NeturePharmacyError(400, 'INVALID_REQUEST', 'paymentGroupId 가 필요합니다.');
-    return payments.prepare(req.user!.id, groupId);
+    return payments.prepare(req.user!.id, org(req), groupId);
   }));
   router.post('/pharmacy/payments/confirm', ...store, handle(async (req) => {
     const { paymentId, paymentGroupId } = req.body ?? {};
     if (!isUuid(paymentId) || !isUuid(paymentGroupId)) {
       throw new NeturePharmacyError(400, 'INVALID_REQUEST', 'paymentId · paymentGroupId 가 필요합니다.');
     }
-    return payments.confirm(req.user!.id, { paymentId, paymentGroupId });
+    return payments.confirm(req.user!.id, org(req), { paymentId, paymentGroupId });
   }));
 
   // ─── Neture 운영자 — 내 매장(약국) 신청 ────────────────────────────────────────────

@@ -174,6 +174,8 @@ Home
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
 
+> **KPA 옛 운영 면 부분 대체 (2026-10-22 · 사용자 결정 D7, [WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)):** 옛 KPA 운영 · 관리 화면(`kpa:operator` · `kpa:admin` 콘솔)은 은퇴했다. 그 화면만 쓰던 KPA backend 면 — `/kpa/operator` summary · actions · approvals · contact-requests · ai summarize · audit-logs · resources — 은 소비처 0 으로 제거됐다(단계 4-a 6항). 이 절의 "KPA 는 자체 승인 정책(`kpa_approval_requests`, `/operator/approvals`) 유지" 와 "`/operator/*` route 는 전부 KEEP_CANONICAL" 은 위 KPA 면에 대해서는 현행 계약이 아니다. 약국 협력사업 운영 화면은 다른 세 사업과 같은 사업 운영 화면(`/operator/semi-franchises`) 기준으로 새로 만든다. 다른 서비스 · 공통 셸 · 나머지 KPA `/operator/*`(제작 API · product-applications 등) 판정은 그대로다.
+
 
 - **공통 셸 재작성 0.** `OperatorAreaShell` · `DomainIASidebar` · `OperatorDashboardLayout` · `DataTable` 은 보존. 바뀐 것은 IA 메타데이터(`@o4o/operator-ux-core` `DEFAULT_OPERATOR_DOMAIN_IA` = `service_operation / business_operation / operations_management`), 서비스 `operatorMenuGroups.ts` 의 항목 단위 `domain` override(`OperatorMenuItem.domain`, additive · 표시 전용), 대시보드 축 재편(3도메인), 최소 공통 컴포넌트 2개다. 셸 안에 서비스별 if 분기는 없다.
 - **표준 Service Operator = KPA Society · K-Cosmetics · Pharmacy-Hub** (STANDARD_CANDIDATE, 서비스 전용 도메인 IA config 없음 — PH 의 전용 config 는 은퇴). **Neture = SPECIAL** (자체 `NETURE_OPERATOR_DOMAIN_IA` 유지). kpa-branch = NO_STORE_WORKSPACE/특수(분회 slug 아래 운영 화면) · cafe24-b2b = UNDECIDED.

@@ -23,6 +23,7 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { useLibraryScope } from './library/useLibraryScope';
 import { useContentUsage } from './library/useContentUsage';
+import { ContentUsageSummary } from './library/ContentUsageSummary';
 import { LibraryBusinessFilter } from './library/LibraryBusinessFilter';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -33,7 +34,6 @@ import { DataTable, type Column, ActionBar } from '@o4o/ui';
 import {
   storeLibraryApi,
   type LibraryContentItem,
-  type StoreContentUsage,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import type { ProductionSourceItem } from './productionTargets';
@@ -115,19 +115,6 @@ function formatDate(iso?: string | null): string {
   if (!iso) return '-';
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
-}
-
-// WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
-//   사용처 count 를 "QR 2 · 태블릿 1 · 취급제품 3에서 사용 중" 형태 라벨로. 0이면 자료함 전용 안내.
-//   미조회(undefined)/조회중(null)은 라벨 없음(호출부에서 렌더 생략).
-function usageSummaryLabel(u: StoreContentUsage | null | undefined): string | null {
-  if (!u) return null;
-  const parts: string[] = [];
-  if (u.usage.qr > 0) parts.push(`QR ${u.usage.qr}`);
-  if (u.usage.tablet_display > 0) parts.push(`태블릿 ${u.usage.tablet_display}`);
-  if (u.usage.product_link > 0) parts.push(`취급제품 ${u.usage.product_link}`);
-  if (u.usage.pop_pdf > 0) parts.push(`POP ${u.usage.pop_pdf}`);
-  return parts.length > 0 ? `${parts.join(' · ')}에서 사용 중` : '자료함에만 있음 (사용 중 아님)';
 }
 
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
@@ -317,7 +304,7 @@ function DocumentsSection({
   const { total, totalPages } = documents;
   useEffect(() => { if (!loading && !loadError && page > totalPages) setPage(totalPages); }, [loading, loadError, page, totalPages]);
   const selected = useMemo(() => new Set(rows.filter(row => selection.has(row.selectionKey)).map(row => row.selectionKey)), [rows, selection]);
-  const usageById = useContentUsage(rows.filter(row => row.origin === 'direct' && row.hasSourceUpdate).map(row => row.id));
+  const { values: usageById, reload: reloadUsage } = useContentUsage(rows.filter(row => row.origin === 'direct' && row.hasSourceUpdate).map(row => row.id));
   const reloadVersion = `${reloadKey}:${internalReload}`;
   const lastReloadVersion = useRef(reloadVersion);
   useEffect(() => {
@@ -498,9 +485,9 @@ function DocumentsSection({
             )}
             {/* WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
                 원본 갱신됨 사본의 사용처 요약(QR/태블릿/취급제품/POP). 덮어쓰기 판단 근거 — 표시 전용. */}
-            {row.hasSourceUpdate && usageSummaryLabel(usageById[row.id]) && (
-              <span style={styles.usageSummary} title="이 사본이 현재 사용되고 있는 위치입니다. (태블릿 블록·동영상 일부는 집계에서 제외)">
-                {usageSummaryLabel(usageById[row.id])}
+            {row.origin === 'direct' && row.hasSourceUpdate && (
+              <span style={styles.usageSummary}>
+                <ContentUsageSummary usage={usageById[row.id]} onRetry={reloadUsage} />
               </span>
             )}
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 콘텐츠 표식 (SSOT=aiDescriptionMode, 단일/코너 구분) */}
@@ -599,7 +586,7 @@ function DocumentsSection({
         ),
       },
     ],
-    [mode, base, returnState, applyTag, handleReimport, reimportingId, removing, usageById],
+    [mode, base, returnState, applyTag, handleReimport, reimportingId, removing, usageById, reloadUsage],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;

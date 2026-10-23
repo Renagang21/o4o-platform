@@ -53,10 +53,12 @@ import {
   emailTokenLimiter,
   findLoginIdLimiter,
   findLoginIdInputLimiter,
+  createGoogleAuthLimiters,
 } from '../../../middleware/rateLimiter.js';
 import { requireJsonBody } from '../../../middleware/require-json-body.middleware.js';
 
 const router: IRouter = Router();
+const googleLimiters = createGoogleAuthLimiters();
 
 // CORE_CHANGE: WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1 (user-approved phase 4).
 // New browser-bound routes. Retired /google/link and legacy passport routes stay retired.
@@ -90,11 +92,13 @@ router.post('/social/link/confirm',requireJsonBody,requireAuth,emailTokenLimiter
 router.get('/google/config', asyncHandler(GoogleAuthController.config));
 router.post(
   '/google/login',
+  googleLimiters.login,
   validateDto(GoogleLoginRequestDto),
   asyncHandler(GoogleAuthController.login)
 );
 router.post(
   '/google/signup',
+  googleLimiters.signup,
   validateDto(GoogleSignupRequestDto),
   asyncHandler(GoogleAuthController.signup)
 );

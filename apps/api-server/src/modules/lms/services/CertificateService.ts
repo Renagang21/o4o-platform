@@ -1,10 +1,11 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Certificate } from '@o4o/lms-core';
+import { Certificate, type Enrollment } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
-import { EnrollmentService } from './EnrollmentService.js';
+import { EnrollmentService, type UpdateEnrollmentRequest } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
+import { revokeLectureCertificate } from './certificate-operation.service.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
@@ -156,10 +157,10 @@ export class CertificateService extends BaseService<Certificate> {
     const saved = await this.certificateRepository.save(certificate);
 
     // Update enrollment with certificate ID
-    await this.enrollmentService.updateEnrollment(enrollment.id, {
-      // @ts-ignore
+    const certificateLink: UpdateEnrollmentRequest & Pick<Enrollment, 'certificateId'> = {
       certificateId: saved.id
-    });
+    };
+    await this.enrollmentService.updateEnrollment(enrollment.id, certificateLink);
 
     logger.info(`[LMS] Certificate issued`, {
       certificateId: saved.id,
@@ -284,18 +285,8 @@ export class CertificateService extends BaseService<Certificate> {
     return updated;
   }
 
-  async revokeCertificate(id: string): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.revoke();
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate revoked`, { id: updated.id });
-
-    return updated;
+  async revokeCertificate(id: string, actorId?: string, reason: unknown = ''): Promise<Certificate> {
+    return Object.assign(new Certificate(), await revokeLectureCertificate(AppDataSource, id, actorId, reason));
   }
 
   async renewCertificate(id: string, months: number = 12): Promise<Certificate> {

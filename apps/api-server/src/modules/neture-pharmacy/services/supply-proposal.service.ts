@@ -5,7 +5,7 @@
  * - 승인은 대상 세미프랜차이즈 담당 운영자만(호출 측이 requireOperatorOf 로 범위를 넘긴다).
  * - 제안 가격은 수정하지 않는다 — 종료 후 새 제안. 제안 반려 · 종료는 제품(SPO) 상태에 연쇄하지 않는다.
  */
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 import { NeturePharmacyError,
   rowsOf,
 } from '../constants.js';
@@ -49,6 +49,15 @@ const PROPOSAL_VIEW = `
     LEFT JOIN users decision_actor ON decision_actor.id = sp.decided_by
     LEFT JOIN users end_actor ON end_actor.id = sp.ended_by`;
 
+async function assertTargetMembership(m: Pick<EntityManager, 'query'>, businessId: string, target: string | null) {
+  if (!target) return;
+  const [member] = await m.query(`SELECT sfm.id FROM semi_franchise_memberships sfm
+    JOIN neture_pharmacy_memberships npm ON npm.organization_id=sfm.organization_id AND npm.status='active'
+    WHERE sfm.semi_franchise_id=$1 AND sfm.organization_id=$2::uuid AND sfm.status='active'
+    FOR SHARE OF sfm,npm`, [businessId, target]);
+  if (!member) throw new NeturePharmacyError(409, 'TARGET_MEMBERSHIP_REQUIRED', '대상 약국이 이 협업체의 승인된 회원이 아닙니다. 가입 상태를 확인한 뒤 다시 요청해 주세요.');
+}
+
 export class SupplyProposalService {
   constructor(private readonly dataSource: DataSource) {}
 
@@ -61,37 +70,40 @@ export class SupplyProposalService {
     if (!Number.isInteger(unitPrice) || unitPrice <= 0 || unitPrice > 2147483647) {
       throw new NeturePharmacyError(400, 'INVALID_PRICE', '공급 가격은 0보다 큰 정수(원)여야 합니다.');
     }
-    const [offer] = await this.dataSource.query(
-      `SELECT spo.id, spo.approval_status, ns.base_shipping_fee, ns.free_shipping_threshold
-         FROM supplier_product_offers spo JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-        WHERE spo.id = $1::uuid AND spo.supplier_id = $2::uuid AND spo.deleted_at IS NULL`,
-      [input.offerId, supplierId],
-    );
-    if (!offer) throw new NeturePharmacyError(404, 'OFFER_NOT_FOUND', '공급 제품을 찾을 수 없습니다.');
-    if (offer.approval_status !== 'APPROVED') {
-      // 제품 등록 승인과 공급 제안 승인은 다른 단계다 — 등록 승인이 먼저다.
-      throw new NeturePharmacyError(409, 'PRODUCT_NOT_APPROVED', '제품 등록 승인 후 공급 제안을 낼 수 있습니다.');
-    }
-    const [sf] = await this.dataSource.query(
-      `SELECT id FROM semi_franchises WHERE key = $1 AND status = 'active'`,
-      [input.semiFranchiseKey],
-    );
-    if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
-    const target = input.targetOrganizationId || null;
-    if (target) {
-      const [pharmacy] = await this.dataSource.query(
-        `SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id = $1::uuid`,
-        [target],
+    return this.dataSource.transaction(async m => {
+      const [offer] = await m.query(
+        `SELECT spo.id, spo.approval_status, ns.base_shipping_fee, ns.free_shipping_threshold
+           FROM supplier_product_offers spo JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          WHERE spo.id = $1::uuid AND spo.supplier_id = $2::uuid AND spo.deleted_at IS NULL`,
+        [input.offerId, supplierId],
       );
-      if (!pharmacy) throw new NeturePharmacyError(400, 'INVALID_TARGET', '대상 약국을 찾을 수 없습니다.');
-    }
-    const terms = proposalTerms(input.terms, { baseShippingFee: offer.base_shipping_fee, freeShippingThreshold: offer.free_shipping_threshold });
-    const [row] = await this.dataSource.query(
-      `INSERT INTO supply_proposals (offer_id, semi_franchise_id, target_organization_id, unit_price, note, status, requested_by, terms_snapshot)
-       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7::jsonb) RETURNING id, status`,
-      [offer.id, sf.id, target, unitPrice, input.note?.trim()?.slice(0, 1000) || null, userId, JSON.stringify(terms)],
-    );
-    return row;
+      if (!offer) throw new NeturePharmacyError(404, 'OFFER_NOT_FOUND', '공급 제품을 찾을 수 없습니다.');
+      if (offer.approval_status !== 'APPROVED') {
+        // 제품 등록 승인과 공급 제안 승인은 다른 단계다 — 등록 승인이 먼저다.
+        throw new NeturePharmacyError(409, 'PRODUCT_NOT_APPROVED', '제품 등록 승인 후 공급 제안을 낼 수 있습니다.');
+      }
+      const [sf] = await m.query(
+        `SELECT id FROM semi_franchises WHERE key = $1 AND status = 'active' FOR SHARE`,
+        [input.semiFranchiseKey],
+      );
+      if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
+      const target = input.targetOrganizationId || null;
+      if (target) {
+        const [pharmacy] = await m.query(
+          `SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id = $1::uuid`,
+          [target],
+        );
+        if (!pharmacy) throw new NeturePharmacyError(400, 'INVALID_TARGET', '대상 약국을 찾을 수 없습니다.');
+      }
+      await assertTargetMembership(m, sf.id, target);
+      const terms = proposalTerms(input.terms, { baseShippingFee: offer.base_shipping_fee, freeShippingThreshold: offer.free_shipping_threshold });
+      const [row] = await m.query(
+        `INSERT INTO supply_proposals (offer_id, semi_franchise_id, target_organization_id, unit_price, note, status, requested_by, terms_snapshot)
+         VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7::jsonb) RETURNING id, status`,
+        [offer.id, sf.id, target, unitPrice, input.note?.trim()?.slice(0, 1000) || null, userId, JSON.stringify(terms)],
+      );
+      return row;
+    });
   }
 
   async supplierList(supplierId: string) {
@@ -122,7 +134,7 @@ export class SupplyProposalService {
   async operatorDecide(sf: SemiFranchiseRow, operatorId: string, proposalId: string, action: ProposalAction, reason?: string | null) {
     return this.dataSource.transaction(async (m) => {
       const [current] = await m.query(
-        `SELECT sp.id, sp.status, sp.requested_by,
+        `SELECT sp.id, sp.status, sp.requested_by, sp.target_organization_id,
                 spo.supplier_id, ns.organization_id AS supplier_organization_id
            FROM supply_proposals sp JOIN supplier_product_offers spo ON spo.id = sp.offer_id
            JOIN neture_suppliers ns ON ns.id = spo.supplier_id
@@ -132,6 +144,9 @@ export class SupplyProposalService {
       // 다른 세미프랜차이즈의 제안은 처리할 수 없다(존재도 드러내지 않음).
       if (!current) throw new NeturePharmacyError(404, 'PROPOSAL_NOT_FOUND', '제안을 찾을 수 없습니다.');
       if (action === 'approve') {
+        const [active] = await m.query(`SELECT id FROM semi_franchises WHERE id=$1 AND status='active' FOR SHARE`, [sf.id]);
+        if (!active) throw new NeturePharmacyError(409, 'BUSINESS_NOT_ACTIVE', '운영 중인 협업체에서만 공급을 승인할 수 있습니다.');
+        await assertTargetMembership(m, sf.id, current.target_organization_id);
         // Use the canonical resolver, including its observable legacy fallback, rather than a second identity path.
         const supplier = current.requested_by === operatorId ? null
           : await resolveSupplierForUser(this.dataSource, operatorId, current.supplier_organization_id);
