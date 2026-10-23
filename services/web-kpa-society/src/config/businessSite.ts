@@ -1,3 +1,5 @@
+import { getCooperationExtension } from '@o4o/shared-space-ui';
+
 /** Shared pharmacy application: business configuration never grants membership or a role. */
 export function resolveBusinessSite(
   hostname: string,
@@ -11,12 +13,13 @@ export function resolveBusinessSite(
       : "pharmacy");
   if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(key))
     throw new Error("Invalid pharmacy business site key");
+  const extension = getCooperationExtension(key);
   return {
     key,
     name:
       configuredName?.trim() ||
-      (key === "megapharm" ? "메가팜 · 창고형약국" : "O4O 약국"),
-    authServiceKey: "neture",
+      (extension?.siteName ?? "O4O 약국"),
+    authServiceKey: extension?.model.sessionServiceKey ?? "neture",
   };
 }
 export const BUSINESS_SITE = resolveBusinessSite(

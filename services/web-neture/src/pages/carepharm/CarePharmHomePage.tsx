@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import './carepharm-home.css';
 import { Link, useLocation } from 'react-router-dom';
-import { COOPERATION_MODELS, CooperationMemberSpace, ServiceHomeHero, type CooperationView } from '@o4o/shared-space-ui';
+import { COOPERATION_EXTENSIONS, CooperationMemberSpace, ServiceHomeHero, type CooperationView } from '@o4o/shared-space-ui';
 import { CarePharmNotices } from './CarePharmNotices';
 import { CarePharmWorkspaces } from './CarePharmWorkspaces';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import { useAuth, useLoginModal } from '../../contexts';
 import { api } from '../../lib/apiClient';
+
+const extension = COOPERATION_EXTENSIONS.carepharm;
 
 /** Public introduction stays available independently of the protected member workspace. */
 export default function CarePharmHomePage({ view = 'home' }: { view?: CooperationView }) {
@@ -16,11 +18,11 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
   useEffect(() => {
     if (view === 'home' && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView?.();
   }, [view, location.hash, location.key]);
-  const memberSpace = <CooperationMemberSpace model={COOPERATION_MODELS.carepharm} client={api}
+  const memberSpace = <CooperationMemberSpace model={extension.model} materialsGuide={extension.materials} client={api}
     accountId={isAuthenticated ? user?.id : undefined} view={view}
     onLogin={() => openLoginModal(location.pathname + location.search)}
     onEnterStore={() => requestServiceHandoff(api, {
-      workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(COOPERATION_MODELS.carepharm.storePath)}`,
+      workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(extension.model.storePath)}`,
     })} />;
   if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
   return <div className="carepharm-home">
