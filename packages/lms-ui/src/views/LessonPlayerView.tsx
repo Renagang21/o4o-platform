@@ -32,6 +32,8 @@ import type {
   LmsSubmissionData,
   LmsViewConfig,
 } from './contracts';
+import { ResumeVideo } from './ResumeVideo';
+import { LessonResources } from './LessonResources';
 import { extractErrorMessage, resolveCoursePath, resolveLessonPath } from './contracts';
 
 /** 백엔드 완료 정책 임계값과 동일한 기준으로 클라이언트 메트릭을 수집한다. */
@@ -178,7 +180,7 @@ export function LessonPlayerView({
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, lessonId, port, hasQuizSupport, hasAssignmentSupport]);
+  }, [courseId, lessonId, config.accountId, port, hasQuizSupport, hasAssignmentSupport]);
 
   useEffect(() => {
     if (courseId && lessonId) void loadAll();
@@ -205,9 +207,12 @@ export function LessonPlayerView({
   const handleTimeUpdate = () => {
     const v = videoRef.current;
     if (!v) return;
-    watchedSecondsRef.current = Math.max(watchedSecondsRef.current, v.currentTime);
+    // Only actually played ranges count. Restoring/seeking a bookmark is not attendance.
+    let played = 0;
+    for (let i = 0; i < v.played.length; i += 1) played += v.played.end(i) - v.played.start(i);
+    watchedSecondsRef.current = Math.max(watchedSecondsRef.current, played);
     if (v.duration > 0) {
-      progressRatioRef.current = Math.max(progressRatioRef.current, v.currentTime / v.duration);
+      progressRatioRef.current = Math.max(progressRatioRef.current, played / v.duration);
     }
   };
 
@@ -399,9 +404,10 @@ export function LessonPlayerView({
   }
 
   return (
-    <div style={playerLayoutStyle}>
+    <div className="lms-player-layout" style={playerLayoutStyle}>
+      <style>{`@media(max-width:760px){.lms-player-layout{flex-direction:column}.lms-player-sidebar{width:100%!important;height:auto!important;max-height:280px;position:static!important}.lms-player-main{height:auto!important;min-height:65vh}}`}</style>
       {/* 사이드바 — 커리큘럼 + 진도 */}
-      <aside style={sidebarStyle}>
+      <aside className="lms-player-sidebar" style={sidebarStyle}>
         <div style={{ padding: '20px 16px', borderBottom: '1px solid #1e293b' }}>
           <NavLink
             to={resolveCoursePath(config, courseId)}
@@ -446,21 +452,26 @@ export function LessonPlayerView({
       </aside>
 
       {/* 본문 */}
-      <main style={mainStyle} ref={contentRef} onScroll={handleContentScroll}>
+      <main className="lms-player-main" style={mainStyle} ref={contentRef} onScroll={handleContentScroll}>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '32px 24px 64px' }}>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', margin: '0 0 20px' }}>
             {lesson.title}
           </h1>
 
           {lesson.type === 'video' && lesson.videoUrl && (
-            <video
-              ref={videoRef}
+            <ResumeVideo
+              key={`${config.accountId ?? 'anonymous'}:${courseId}:${lessonId}`}
+              videoRef={videoRef}
               src={lesson.videoUrl}
-              controls
+              courseId={courseId}
+              lessonId={lessonId}
+              enabled={config.isAuthenticated && ['approved', 'in_progress', 'completed'].includes(enrollment?.status ?? '')}
+              port={port}
               onTimeUpdate={handleTimeUpdate}
-              style={{ width: '100%', borderRadius: '12px', background: '#000', marginBottom: '24px' }}
             />
           )}
+
+          <LessonResources attachments={lesson.attachments ?? []} />
 
           {lesson.content && (
             <div style={{ marginBottom: '24px' }}>

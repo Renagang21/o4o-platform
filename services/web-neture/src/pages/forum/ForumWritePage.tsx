@@ -27,6 +27,7 @@ import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
 import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { blocksToHtml } from '@o4o/forum-core/utils';
 import { libraryDocumentText } from '../supplier/libraryDocumentText';
 import { supplierApi } from '../../lib/api';
 import { CarePharmPostGuide } from '../carepharm/CarePharmPostGuide';
@@ -37,7 +38,6 @@ import {
   updateForumPost,
   fetchForumPostBySlug,
   fetchUserContactSettings,
-  extractTextContent,
   type UserContactSettings,
 } from '../../services/forumApi';
 
@@ -146,6 +146,7 @@ export function ForumWritePage({
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState<string | null>(null);
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
@@ -179,10 +180,10 @@ export function ForumWritePage({
         if (response?.data) {
           setTitle(response.data.title);
           setEditSlug(response.data.slug);
-          const text = typeof response.data.content === 'string'
-            ? response.data.content
-            : extractTextContent(response.data.content);
-          setEditorHtml(`<p>${text.split('\n').join('</p><p>')}</p>`);
+          setEditStatus(response.data.status);
+          const html = typeof response.data.content === 'string'
+            ? response.data.content : blocksToHtml(response.data.content);
+          setEditorHtml(html);
           setShowContactOnPost(response.data.showContactOnPost || false);
         } else {
           setError('수정할 게시글을 찾을 수 없습니다.');
@@ -254,6 +255,7 @@ export function ForumWritePage({
       const base = (backPath || '/forum').replace(/\/$/, '');
       const response = await updateForumPost(editPostId, {
         title: payload.title,
+        ...(editStatus === 'draft' ? { status: 'publish' as const } : {}),
         ...(allowAnnouncement && (payload.type === 'discussion' || payload.type === 'announcement') ? { type: payload.type } : {}),
         content: blocks,
         categorySlug: categorySlug,
@@ -390,6 +392,7 @@ export function ForumWritePage({
         </div>
       )}
 
+      {editStatus === 'draft' && <p className="my-4 rounded border p-3">비공개 초안입니다. 내용을 검토한 뒤 게시하면 이 게시판 이용자에게 공개됩니다.</p>}
       {/* Form: create/edit 공통 ForumWriteForm (WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1) */}
         <ForumWriteForm
           showPostType={allowAnnouncement}
@@ -401,8 +404,8 @@ export function ForumWritePage({
           titleMaxLength={200}
           contentLabel={`내용 (최소 ${MIN_CONTENT_LENGTH}자)`}
           contentPlaceholder="의견을 작성해주세요..."
-          submitLabel={isEditMode ? '수정하기' : '등록하기'}
-          submittingLabel={isEditMode ? '수정 중...' : '등록 중...'}
+          submitLabel={isEditMode ? editStatus === 'draft' ? '검토한 초안 게시' : '수정하기' : '등록하기'}
+          submittingLabel={isEditMode ? editStatus === 'draft' ? '게시 중...' : '수정 중...' : '등록 중...'}
           cancelLabel="취소"
           theme="blue"
           onCancel={handleCancel}

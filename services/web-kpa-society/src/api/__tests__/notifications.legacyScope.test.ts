@@ -9,7 +9,7 @@ beforeEach(() => {
   });
 });
 it.each(["kpa-society", "megapharm"])(
-  "preserves the legacy history alongside %s inquiries",
+  "queries only %s notifications",
   async (serviceKey) => {
     expect(
       await notificationsApi.getUnreadCount({
@@ -23,10 +23,7 @@ it.each(["kpa-society", "megapharm"])(
       page: 2,
       limit: 5,
     });
-    const scope =
-      serviceKey === "megapharm"
-        ? { serviceKeys: "megapharm,kpa-society" }
-        : { serviceKey };
+    const scope = { serviceKey };
     expect(state.get.mock.calls[0][1]).toEqual({
       ...scope,
       organizationId: "organization",

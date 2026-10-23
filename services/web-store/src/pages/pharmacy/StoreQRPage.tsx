@@ -67,7 +67,6 @@ import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
 import {
-  GuideBackLink,
   StoreQrOperationBoard,
   StoreQrPlacementPanel,
   StoreQrPlacementAnalyticsPanel,
@@ -430,7 +429,6 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             취급제품 화면에서 따로 출력합니다
           </p>
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <GuideBackLink to="/guide/features/qr" label="QR 활용 방법" />
             {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 기준 안내 보조 버튼 */}
             <button
               type="button"

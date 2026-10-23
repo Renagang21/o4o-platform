@@ -68,7 +68,7 @@ const PROHIBIT = /(마십시오|마세요|말고|말며|금지|금기|삼가|피
 function formFromName(name: string): string {
   const n = String(name || '');
   if (/연질캡슐|경질캡슐|캡슐/.test(n)) return '캡슐';
-  if (/정|정\(|밀리그램\)?정|당의정|서방정|츄어블정|필름코팅정|정$/.test(n)) return '정';
+  if (n.includes('정\b') || /정\(|밀리그램\)?정|당의정|서방정|츄어블정|필름코팅정|정$/.test(n)) return '정';
   if (/산제|과립|세립/.test(n)) return '산';
   if (/시럽|액|드롭/.test(n)) return '액';
   return '';

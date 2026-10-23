@@ -534,7 +534,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 ### 15-6. megapharm 공통 사업 구조와 직원 현장 지원 (2026-10-16)
 
 - `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
-- 기본 pharmacy 호스트의 인증 서비스 문맥은 종전대로 kpa-society다. 독립 사업 호스트는 공통 Neture 계정을 사용하고 사업별 가입 권한을 별도 검증한다. megapharm은 Neture session domain으로 등록하여 pharmacy 협력사업 가입을 추가 전제로 요구하지 않는다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
+- pharmacy·megapharm·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 기존 `kpa-society` handoff 대상은 pharmacy 호스트에서만 교환하는 고정 이동 alias로 수용하며 최종 세션은 neture다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
 - `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
 - `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
 - 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
@@ -572,7 +572,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 - 세 기능은 기존 관리자 기본/유료/협력사업 선택 목록과 My Home 직원 허용에 등록한다. 약국 규모·도메인·특정 사업 key 조건을 추가하지 않는다. 기존 유료 미설정 두 기능과 기존 직원 호환 세 기능에 새 상담을 자동 추가하지 않는다. 운영에서 제공 대상을 정해 선택해야 한다.
 - 문자 입력·영어/중국어/일본어/베트남어/태국어/인도네시아어와 한국어 양방향 번역이다. 고객에게 크게 보여주기·새 상담/내용 지우기를 제공한다. 사용자 후속 답변에 따라 첫 버전에 브라우저 음성 입력·번역문 읽어주기를 포함한다. 자동 의료 답변·약 선택/복용 판단·상담 이력·QR 자가 상담은 포함하지 않는다.
-- 약사 모드는 `requiresProfessional`로 표시한다. 사용 확인은 사용자 결정에 따라 경영자가 My Home에서 해당 직원이 약사임을 확인하고 기능을 허용하는 방식이다. 경영자 본인은 같은 My Home에서 본인 사용 확인을 저장할 수 있다. 이는 공식 면허 검증 표시가 아니며 기존 `kpa_pharmacist_profiles.license_verified=true` 확인 값도 읽는다. 별도 중앙 면허 심사/직원 등급 체계를 추가하지 않는다. 유료·협력사업 가입 또는 소유 관계만으로 약사 사용을 허용하지 않는다.
+- 약사 모드는 `requiresProfessional`로 표시한다. 사용 확인은 사용자 결정에 따라 경영자가 My Home에서 해당 직원이 약사임을 확인하고 기능을 허용하는 방식이다. 경영자 본인은 같은 My Home에서 본인 사용 확인을 저장할 수 있다. 이는 공식 면허 검증 표시가 아니며 해당 약국의 경영자가 남긴 확인만 읽는다. 기존 KPA 개인 면허 테이블을 읽어 확인을 대신하지 않는다(2026-10-22, 사업 독립 정비 D8). 별도 중앙 면허 심사/직원 등급 체계를 추가하지 않는다. 유료·협력사업 가입 또는 소유 관계만으로 약사 사용을 허용하지 않는다.
 - 약국별 확인은 기존 `organization_members.metadata.pharmacyPharmacistConfirmed` boolean이다. 직원의 허용 기능과 확인은 동일 UPDATE, 최종 승인 때는 기존 Role 발급과 같은 트랜잭션으로 저장한다. 실제 owner만 양성 확인을 남길 수 있고 직원 본인 확인 우회는 거절한다. 재초대는 이전 개별 기능·확인을 초기화한다. 새 자격/role/면허 검증 원장은 만들지 않는다.
 - API: `GET /neture/pharmacy/multilingual-consultation/context`, `POST /neture/pharmacy/multilingual-consultation/translate`, `PUT /neture/pharmacy/pharmacist-confirmation`. 기존 인증·약국·owner/staff 접근과 선택 조직을 사용한다. 번역 body는 mode/language/direction과 text 또는 직원용 phrase key다. client user/organization/약사 주장으로 자격을 만들지 않는다.
 - 비전문 직원의 한국어 응답은 서버가 가진 짧은 안내 문구만 사용한다. 자유 입력 text를 outgoing 직원 응대에 넣으면 거절한다. 약사 연결 안내를 기본 제공하며 증상 판정·의약품 추천을 생성하지 않는다.
@@ -809,3 +809,13 @@ pathRules:
 정상 계정·이메일 확인·Neture 명시 정지/탈퇴 차단과 매 요청 역할 유효기간 확인을 유지한다.
 역할 목록은 [RBAC 카탈로그](../rbac/RBAC-ROLE-CATALOG-V1.md#약국-협업체-운영자-지정--2026-10-18),
 구현·검증은 [WO](../work-orders/WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1.md)를 따른다.
+
+### 15-9. 사업 운영 도구와 사업별 약관 (2026-10-22)
+
+- 담당 사업의 기존 운영 화면에 ‘현장 요구 · 사업 약관’을 둔다. 별도 관리자 메뉴나 범용 정책 엔진은 추가하지 않는다. 월별 세 항목(위치를 못 찾음·미취급 상품 요청·약사 연결)은 기존 매장 공통 집계다. 해당 사업의 현재 활성 가입 및 약국 승인 active 매장만 조회하며, 복수 가입 매장의 수치를 사업 독점 실적으로 보지 않는다. 조회·권한 오류는 빈 집계로 대체하지 않는다.
+- 법정정보·약관은 기존 service_legal_profiles/service_policy_documents/user_policy_acceptances를 재사용하고 저장 범위는 `business:<semi_franchises.id>`(45자)다. URL의 사업 키로 활성 사업을 찾은 뒤 서버가 범위를 고정한다. 사업 담당 operator는 조회만, 해당 사업 admin만 수정·게시한다. 개별 조합은 자기 cooperative_roles의 admin을 따르며 연합회·다른 사업 권한으로 우회하지 않는다.
+- 공개 푸터·약관 페이지·참여 동의는 해당 사업 문서만 읽는다. 일반 서비스 API의 관리 범위를 넓히지 않는다. 새 사업은 동일 버전의 게시된 이용약관·개인정보 안내 및 확정된 시행일을 준비해야 신청할 수 있다(사업 첫 버전 1 허용). 문서 미설정·부분 게시·버전 불일치는 503, 동의 누락·오래된 문서 참조는 409다. 공통 계정 가입 약관과 사업 참여 동의는 별개다.
+- 신청과 동의 원장·본문 해시·신청별 정책 연결 기록은 같은 트랜잭션으로 저장한다. 기존 가입 조건/추가 신청 내용의 스냅샷도 유지한다. 개별 협동조합의 개인 가입도 같은 사업 범위의 문서를 확인한다. 실제 문안·동의·사업 역할·유료 자격을 자동 생성하지 않는다.
+- 자료 편집의 ‘직원 숙지 자료로 사용’은 기존 `staff-quick-guide` 태그를 선택한다. 나머지 태그를 유지하고 총 20개 제한을 따른다. 게시·활성 사업 가입 여부에 따라 내 매장의 ‘짧게 익히기’에 표시한다. 과제·시험·별도 관리 담당자 체계는 추가하지 않는다.
+
+작업·검증: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md), [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md). 사업 독립 정비 WO 전체의 데이터 삭제·카탈로그/인프라 이름 변경 완료를 뜻하지 않는다.

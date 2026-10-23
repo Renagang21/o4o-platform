@@ -1413,7 +1413,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const kpaContentCore = createContentResourceCore(
     dataSource,
-    createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog }),
+    createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog,
+      atomicAudit: async (manager, user, actionType, targetType, targetId, metadata = {}) => {
+        const repo = manager.getRepository(KpaAuditLog);
+        await repo.save(repo.create({ operator_id: user.id,
+          operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+          action_type: actionType, target_type: targetType, target_id: targetId, metadata }));
+      },
+    }),
   );
 
   // ============================================================================

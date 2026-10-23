@@ -24,7 +24,7 @@ describe("federation and cooperative route boundaries", () => {
       session={{ ...anonymousSession, userId: 'person', cooperativeOperators: [{ userId: 'person', cooperativeId: 'preview-a' }] }} businessClient={client}
     /></MemoryRouter>);
     expect(screen.getByText('이 조합의 운영 권한이 필요합니다.')).toBeTruthy();
-    expect(client.get.mock.calls.every(([path]) => ["/home-presentation/cooperative/sample-coop-b","/notifications/unread-count?serviceKey=pharmcoop"].includes(path))).toBe(true); expect(client.post).not.toHaveBeenCalled();
+    expect(client.get.mock.calls.every(([path]) => ["/home-presentation/cooperative/sample-coop-b","/notifications/unread-count?serviceKey=pharmcoop", "/neture/businesses/business-preview-b/legal/footer-legal"].includes(path))).toBe(true); expect(client.post).not.toHaveBeenCalled();
   });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");

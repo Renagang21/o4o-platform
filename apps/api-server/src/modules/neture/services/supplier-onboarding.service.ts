@@ -28,7 +28,7 @@ function isMailOrderSalesStatus(value: string): value is MailOrderSalesStatus {
 
 function decodeOriginalName(name: string): string {
   if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(name)) return name;
-  if (/[^\x00-\x7F]/.test(name)) {
+  if (/[\u0080-\uFFFF]/.test(name)) {
     const decoded = Buffer.from(name, 'latin1').toString('utf8');
     if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(decoded)) return decoded;
   }

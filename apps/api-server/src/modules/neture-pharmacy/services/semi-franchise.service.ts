@@ -12,6 +12,7 @@ import { businessCommunityKeyTaken } from '../../../services/community/community
  * - 담당 운영자 판정 = 사업 한정 역할 또는 유효 Neture 운영 역할 + 활성 담당 관계.
  * - 세미프랜차이즈를 추가해도 코드 분기를 늘리지 않는다(행 + 운영 조직 1개).
  */
+import { businessPolicyScope } from './business-policy-scope.js';
 import type { DataSource } from 'typeorm';
 import {
   NeturePharmacyError,
@@ -89,9 +90,10 @@ export class SemiFranchiseService {
         throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주세요.');
       if ((application.conditions ?? '') !== (sf.registration_conditions ?? ''))
         throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
-      const policies = key === 'pharmacy' ? await recordEnrollmentPolicies(m, userId, 'kpa-society', application.policyReferences) : [];
+      const policyScope = businessPolicyScope(sf.id);
+      const policies = await recordEnrollmentPolicies(m, userId, policyScope, application.policyReferences);
       const saveApplication = async (membershipId: string) => {
-        if (key === 'pharmacy') await recordEnrollmentApplication(m, userId, 'kpa-society', { type: 'pharmacy_business_application', id: membershipId, resourceId: sf.id, conditions: { conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null } }, policies);
+        await recordEnrollmentApplication(m, userId, policyScope, { type: 'pharmacy_business_application', id: membershipId, resourceId: sf.id, conditions: { conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null } }, policies);
         return m.query(
         `UPDATE organizations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{semiFranchiseApplications}',
           COALESCE(metadata->'semiFranchiseApplications', '{}'::jsonb) || jsonb_build_object($2::text, $3::jsonb)) WHERE id = $1`,

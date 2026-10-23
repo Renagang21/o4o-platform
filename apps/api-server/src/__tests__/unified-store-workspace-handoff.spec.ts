@@ -292,7 +292,7 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(norm(query.mock.calls[0][0])).toContain('INSERT INTO handoff_tokens');
     // 출발은 Origin 이 아니라 토큰 claim 이 증명한다 — 이 대역의 토큰은 claim 이 없으므로 'unknown' (§8 5차).
     expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
-    expect(res.body.data.targetService.key).toBe('kpa-society');
+    expect(res.body.data.targetService.key).toBe('neture');
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
@@ -442,18 +442,18 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(generateTokens).not.toHaveBeenCalled();
   });
 
-  it('service 토큰은 기존 계약 그대로 — active 재검증 통과 시 targetServiceKey · organization 조회 0 · origin 제한 0', async () => {
+  it('pharmacy transport 토큰은 neture 계정 세션 발급 · organization 조회 0 · 정확한 pharmacy origin만 허용', async () => {
     consumedService();
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce(memberships);
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.targetServiceKey).toBe('kpa-society');
+    expect(res.body.data.targetServiceKey).toBe('neture');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
     // SERVICE handoff 는 대상 서비스 키와 그 서비스의 세대를 새긴다 —
     //   그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'google');
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'google');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
   });
 
@@ -467,7 +467,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'password');
     expect(linkedAccountsQuery).not.toHaveBeenCalled();
   });
 
@@ -478,7 +478,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'password');
   });
 
   it('원장 password + 발급 뒤 platform 역할이 붙음 → 403 PASSWORD_SESSION_NOT_ALLOWED · 토큰 발급 0', async () => {
@@ -500,7 +500,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'password');
   });
 
   it("원장 'google' + platform 역할 → Google 세션 그대로 (명시적 claim)", async () => {
@@ -511,7 +511,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'google');
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'google');
   });
 
   it.each([false, true])('Kakao exchange preserves the method; platform account=%s', async (platform) => {
@@ -524,7 +524,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
       expect(generateTokens).not.toHaveBeenCalled();
     } else {
       expect(res.statusCode).toBe(200);
-      expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'kakao');
+      expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'neture', 0, 'kakao');
     }
   });
 
