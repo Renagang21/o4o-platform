@@ -62,3 +62,13 @@ API 첫 회 실행에서 전용 URL/port 미지정인 3 suites·41 tests는 skip
 - 브라우저 context 종료. production preview도 최종 검증 후 정지했다. 합성 스크린샷·요약/실행 로그는 저장소 밖 `/workspace/artifacts/supplier-business-closeout` 및 `/tmp/supplier-closeout-*`에 보관한다.
 - 구현 `18e2bf82df28e71a36448f0e327d734eca028fd3` push 및 원격 일치를 확인했다. 기준 main과 push 직전 main은 `7dc02646da`로 동일하다. 마감 기록의 최종 SHA는 완료 보고에서 확인한다. PR·원격 CI/Sonar·main 통합·배포는 이번 사용자 범위 밖이다.
 - 작업공간은 KEEP: main 미통합이며 검토·후속 수정 인계에 필요하다.
+
+## 통합 후보 검증 — 2026-10-23
+
+사용자의 main 병합·배포 지시로 같은 작업 브랜치를 통합 담당 공간에서 계속 사용한다. 최신 main `e20c00f453`를 merge했다. 공급 제안 서비스의 충돌은 재시도 UUID/동시성 보호와 최신 main의 협업체 상태·대상 회원 검증을 결합한 후보로 해결했다. main의 다른 서비스·공통 API·의존성/배포 변경은 유지했다.
+
+정책 판정 대기: main PR #779와 commerce 설계 §17-3은 대상 약국의 협업체 active 가입 검사와 결제 직전 제안/가입 재검사를 추가했다. 이전 사용자 결정·이 WO의 개발 범위와 다르므로 두 항목을 사용자에게 확인했다. 현재 후보가 이 검사를 보존하는 것은 사용자 결정 확정을 뜻하지 않는다. 답변 전 main 병합·배포는 하지 않는다. 과거 개발 기록의 ‘추가 검사 없음’은 당시 기준 main에 대한 결과로 보존한다.
+
+통합 후보의 실제 PostgreSQL 제안 조건/재시도 및 HTTP 2 suites·23 tests PASS. 공급자 화면 12 files·147 tests PASS. 첫 실행은 기존 프로필 저장 완료 타이머가 unmount 뒤 React 상태를 갱신해 `window is not defined` 오류가 발생했다. 마지막 알림 타이머 교체·unmount cleanup 및 늦은 응답의 UI 갱신 방어를 추가하고 타이머 해제 회귀를 포함해 오류 없이 재통과했다. 전체 타입·CI·리뷰의 최종 상태와 정책 판정은 이후 통합 결과로 구분한다.
+
+검토 PR: #781 (draft). 운영 migration·운영 DB 쓰기·사용자 대신 승인 처리 없음.
