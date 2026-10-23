@@ -14,6 +14,10 @@ const api = vi.hoisted(() => ({
   save: vi.fn(),
   forum: vi.fn(),
   pinForum: vi.fn(),
+  review: vi.fn().mockResolvedValue(null),
+  collection: vi.fn().mockResolvedValue(null),
+  collect: vi.fn(),
+  runReview: vi.fn(),
 }));
 vi.mock("../../../contexts", () => ({ useAuth: () => ({ user: null }) }));
 vi.mock("../communityHomeApi", async () => ({
@@ -65,7 +69,7 @@ describe("community section home", () => {
     await screen.findByText("notice-pin");
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((x) => x.textContent),
-    ).toEqual(["공지사항", "약사공론 뉴스", "포럼", "콘텐츠", "자료실"]);
+    ).toEqual(["공지사항", "약업계 주요 소식", "포럼", "콘텐츠", "자료실"]);
     const content = screen.getByRole("region", { name: "콘텐츠" });
     expect(within(content).getAllByRole("listitem")).toHaveLength(11);
     expect(within(content).getByText("상시 노출")).toBeTruthy();
@@ -158,8 +162,8 @@ describe("community section home", () => {
     api.manage.mockResolvedValue({ items: [], hasNext: false, page: 1 });
     mount(<Management />);
     await screen.findByText("등록된 항목이 없습니다.");
-    fireEvent.click(screen.getByRole("button", { name: "약사공론 뉴스" }));
-    await screen.findByLabelText("약사공론 기사 원문 URL");
+    fireEvent.click(screen.getByRole("button", { name: "약업계 주요 소식" }));
+    await screen.findByLabelText("기사 원문 URL (약사공론·데일리팜·메디파나)");
     expect(screen.queryByLabelText("본문")).toBeNull();
   });
 
@@ -210,6 +214,39 @@ describe("community section home", () => {
     );
     await waitFor(() =>
       expect(api.pinForum).toHaveBeenCalledWith("old-post", true),
+    );
+  });
+  it("refreshes collected news without discarding an in-progress editorial draft", async () => {
+    api.manage.mockResolvedValue({ items: [], hasNext: false });
+    let finish!: (value: any) => void;
+    api.collect.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    mount(<Management />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "약업계 주요 소식", exact: true }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText("오늘의 기사 수집").hasAttribute("disabled"),
+      ).toBe(false),
+    );
+    fireEvent.click(screen.getByText("오늘의 기사 수집"));
+    fireEvent.change(screen.getByLabelText("제목"), {
+      target: { value: "편집 중인 제목" },
+    });
+    finish({
+      day: "2026-10-23",
+      state: "done",
+      sources: [{ id: "kpanews", added: 2, status: "ok" }],
+    });
+    await screen.findByText("약사공론: 신규 2개");
+    await waitFor(() => expect(api.manage).toHaveBeenCalledTimes(3));
+    expect((screen.getByLabelText("제목") as HTMLInputElement).value).toBe(
+      "편집 중인 제목",
     );
   });
 });

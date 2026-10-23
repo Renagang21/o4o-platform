@@ -248,7 +248,7 @@ describe("supplier task navigation", () => {
     mount(`${path}?${key}=${value}`, `${path}?${key}=missing`);
     await waitFor(() => expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe(value));
     fireEvent.click(screen.getByRole('link', { name: '검증 대상 변경' }));
-    await screen.findByRole('alert');
+    await screen.findByText(/요청한 상품은 공급 가능한 승인 상품 목록에 없습니다/);
     expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe('');
   });
 

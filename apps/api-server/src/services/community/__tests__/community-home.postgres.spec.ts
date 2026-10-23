@@ -1,3 +1,10 @@
+import {
+  collectNews,
+  collectScheduledNews,
+  getNewsCollection,
+} from "../community-news-collection.service";
+import { reviewScheduledNews } from "../community-news-review.service";
+import { reviewNews, getNewsReview } from "../community-news-review.service";
 import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from "../../../database/bootstrap/canonical-schema-baseline";
@@ -74,6 +81,9 @@ run("community home PostgreSQL visibility and persistence", () => {
     });
     await db.initialize();
     await db.query(`CREATE SCHEMA ${schema}`);
+    await db.query(
+      "CREATE TABLE ai_query_policy(id int PRIMARY KEY,ai_enabled boolean NOT NULL)",
+    );
     for (const table of [
       "cms_contents",
       "forum_category_requests",
@@ -93,6 +103,9 @@ run("community home PostgreSQL visibility and persistence", () => {
     }
   });
   beforeEach(async () => {
+    await db.query(
+      "INSERT INTO ai_query_policy(id,ai_enabled) VALUES(1,true) ON CONFLICT(id) DO UPDATE SET ai_enabled=true",
+    );
     for (const table of [
       "cms_contents",
       "forum_category_requests",
@@ -474,5 +487,182 @@ run("community home PostgreSQL visibility and persistence", () => {
     await expect(
       db.transaction((m) => pinHomeForum(m, actor, foreign, true)),
     ).rejects.toMatchObject({ status: 404 });
+  });
+  it("reserves daily AI work durably across concurrent operators and keeps controls private", async () => {
+    const draft = await save(
+      data({
+        kind: "news",
+        status: "draft",
+        linkUrl: "https://dailypharm.com/user/news/1",
+      }),
+    );
+    let resolve!: (value: any[]) => void;
+    let started!: () => void;
+    const hasStarted = new Promise<void>((r) => {
+      started = r;
+    });
+    const generate = jest.fn(async () => {
+      started();
+      return new Promise<any[]>((r) => {
+        resolve = r;
+      });
+    });
+    const first = reviewNews(db, actor, generate);
+    await hasStarted;
+    expect((await getNewsReview(db, actor))?.state).toBe("pending");
+    expect((await reviewNews(db, actor, generate)).state).toBe("pending");
+    resolve([
+      {
+        id: draft.id,
+        title: "제목",
+        summary: "요약",
+        linkUrl: "https://dailypharm.com/user/news/1",
+        sourceName: "데일리팜",
+        recommended: true,
+        reason: "실무 해설",
+        articleIds: [draft.id],
+      },
+    ]);
+    const done = await first;
+    expect(done.state).toBe("done");
+    expect(generate).toHaveBeenCalledTimes(1);
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    expect(
+      (await managedHomeItems(db, actor, "news")).items.map((i: any) => i.id),
+    ).toEqual([draft.id]);
+    await expect(getEditorial(db, user, done.id)).rejects.toMatchObject({
+      status: 404,
+    });
+    const applied = await save(
+      data({
+        kind: "news",
+        status: "published",
+        linkUrl: "https://dailypharm.com/user/news/1",
+        newsReviewId: done.id,
+      }),
+      draft.id,
+    );
+    expect(
+      (await getEditorial(db, user, applied.id)).newsRecommendation.recommended,
+    ).toBe(true);
+    await expect(
+      save(
+        data({
+          kind: "news",
+          linkUrl: "https://medipana.com/other",
+          newsReviewId: done.id,
+        }),
+        draft.id,
+      ),
+    ).rejects.toMatchObject({ code: "INVALID_NEWS_REVIEW" });
+    const edited = await save(
+      data({ kind: "news", linkUrl: "https://medipana.com/other" }),
+      draft.id,
+    );
+    expect(
+      (await getEditorial(db, user, edited.id)).newsRecommendation,
+    ).toBeNull();
+  });
+  it("persists a failed AI attempt and refuses another charge that day", async () => {
+    await save(
+      data({
+        kind: "news",
+        status: "draft",
+        linkUrl: "https://www.medipana.com/article/1",
+      }),
+    );
+    const generate = jest.fn().mockRejectedValue(Error("provider failure"));
+    expect((await reviewNews(db, actor, generate)).state).toBe("failed");
+    expect((await reviewNews(db, actor, generate)).state).toBe("failed");
+    expect(generate).toHaveBeenCalledTimes(1);
+  });
+  it("reserves collection before network work, deduplicates canonical URLs and shares scheduled/manual daily work", async () => {
+    const now = new Date("2026-10-23T00:00:00Z");
+    const loader = jest.fn(async (source: string) => {
+      expect((await getNewsCollection(db, actor, now))?.state).toBe("pending");
+      expect((await collectScheduledNews(db, now, loader as any)).state).toBe(
+        "pending",
+      );
+      const host = {
+        kpanews: "kpanews.co.kr",
+        dailypharm: "dailypharm.com",
+        medipana: "medipana.com",
+      }[source];
+      return [
+        {
+          title: "검증용 주요 기사 제목",
+          summary: "제공 요약",
+          linkUrl: `https://${host}/news?id=1&utm_source=fixture`,
+        },
+      ];
+    });
+    const result = await collectNews(db, actor, now, loader as any);
+    expect(result.state).toBe("done");
+    expect(result.sources.map((s) => s.added)).toEqual([1, 1, 1]);
+    expect((await collectNews(db, actor, now, loader as any)).id).toBe(
+      result.id,
+    );
+    expect(loader).toHaveBeenCalledTimes(3);
+    const again = await collectScheduledNews(
+      db,
+      new Date("2026-10-24T00:00:00Z"),
+      loader as any,
+    );
+    expect(again.sources.map((s) => s.added)).toEqual([0, 0, 0]);
+    const review = await reviewScheduledNews(
+      db,
+      async (input) =>
+        input.map((i) => ({
+          ...i,
+          sourceName: "매체",
+          recommended: false,
+          reason: "",
+          articleIds: [i.id],
+        })),
+      now,
+    );
+    expect(review.state).toBe("done");
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    const records = await db.query(
+      `SELECT status,"createdBy" FROM cms_contents WHERE metadata->>'kind'='news-review'`,
+    );
+    expect(records).toEqual([{ status: "draft", createdBy: null }]);
+    const callback = jest.fn();
+    expect((await reviewNews(db, actor, callback, now)).id).toBe(review.id);
+    expect(callback).not.toHaveBeenCalled();
+  });
+  it("isolates publisher failure and keeps successful imports as private drafts", async () => {
+    const result = await collectScheduledNews(
+      db,
+      new Date(),
+      async (source) => {
+        if (source === "dailypharm") throw Error("ROBOTS_BLOCKED");
+        return [
+          {
+            title: "검증용 주요 기사 제목",
+            summary: "",
+            linkUrl: `https://${source === "kpanews" ? "kpanews.co.kr" : "medipana.com"}/news?id=1`,
+          },
+        ];
+      },
+    );
+    expect(result.state).toBe("partial");
+    expect(result.sources[1]).toEqual({
+      id: "dailypharm",
+      added: 0,
+      status: "ROBOTS_BLOCKED",
+    });
+    expect((await communityHome(db, null)).news.recent).toEqual([]);
+    expect((await managedHomeItems(db, actor, "news")).items).toHaveLength(2);
+    await expect(getEditorial(db, user, result.id)).rejects.toMatchObject({
+      status: 404,
+    });
+    const callback = jest.fn();
+    await db.query("UPDATE ai_query_policy SET ai_enabled=false");
+    await expect(reviewScheduledNews(db, callback)).rejects.toThrow(
+      "AI_DISABLED",
+    );
+    expect(callback).not.toHaveBeenCalled();
+    await expect(collectNews(db, "forbidden")).rejects.toThrow("forbidden");
   });
 });

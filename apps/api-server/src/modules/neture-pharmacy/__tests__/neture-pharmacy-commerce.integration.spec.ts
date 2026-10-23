@@ -92,10 +92,10 @@ const provisioner: PharmacyStoreProvisioner = {
 };
 
 /** checkoutService.createOrder 와 같은 계산(subtotal 합 + 배송비 스냅샷)으로 checkout_orders 행을 만든다. */
-const sqlOrderCreator: OrderCreator = async (dto) => {
+const sqlOrderCreator: OrderCreator = async (dto, manager) => {
   const subtotal = dto.items.reduce((s, it) => s + it.subtotal, 0);
   const shippingFee = dto.shippingFeeSnapshot ?? 0;
-  const [o] = await ds.query(
+  const [o] = await manager.query(
     `INSERT INTO checkout_orders ("orderNumber", "buyerId", "sellerId", "supplierId", "sellerOrganizationId",
        subtotal, "shippingFee", "totalAmount", items, metadata, "shippingAddress")
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb)
@@ -851,12 +851,14 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await ds.query("SELECT 1 FROM semi_franchise_memberships sfm JOIN semi_franchises sf ON sf.id=sfm.semi_franchise_id WHERE sfm.organization_id=$1 AND sf.key='pharmacy'", [pharmacy.orgId])).toEqual([]);
       expect((await ds.query("SELECT meta FROM action_logs WHERE user_id=$1 AND service_key=$2 AND action_key='service:application_policy'", [pharmacy.owner,scope]))).toHaveLength(1);
     });
-    it.each([null, 'pending', 'rejected', 'suspended', 'terminated'])('rejects a designated pharmacy with CarePharm membership %s', async status => {
+    it.each([null, 'pending', 'rejected', 'suspended', 'terminated'])('approves a designated pharmacy without exposing supply to CarePharm membership %s', async status => {
       const pharmacy = await approvedPharmacy(); const product = await supplierWithProduct({ price: 10000 });
       await joinSemiFranchise(pharmacy.orgId, pharmacy.owner, 'pharmacy', pharmacyOperator);
       if (status) await ds.query('INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status,applied_by) VALUES($1,$2,$3,$4)', [care!.id, pharmacy.orgId, status, pharmacy.owner]);
-      await expect(proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 8000 })).rejects.toHaveProperty('code', 'TARGET_MEMBERSHIP_REQUIRED');
-      expect(await ds.query('SELECT 1 FROM supply_proposals WHERE offer_id=$1', [product.offerId])).toEqual([]);
+      const proposal=await proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 8000 });
+      await expect(proposals.operatorDecide(care!,careOperator,proposal.id,'approve')).resolves.toMatchObject({status:'approved'});
+      expect(await getSupplyOption(ds,pharmacy.orgId,'proposal',proposal.id)).toBeNull();
+      await expect(cart.add(pharmacy.owner,pharmacy.orgId,{kind:'proposal',id:proposal.id,quantity:1})).rejects.toHaveProperty('code','SUPPLY_OPTION_NOT_AVAILABLE');
     });
     it('does not let staff or an unrelated actor apply or withdraw for a pharmacy', async () => {
       const f=await member();const staff=await user();await role(staff,'kpa:store_member');
@@ -866,42 +868,46 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await expect(sfs.withdraw(f.orgId,await user(),'carepharm')).rejects.toHaveProperty('code','BUSINESS_APPLICANT_REQUIRED');
       expect((await ds.query('SELECT status FROM semi_franchise_memberships WHERE id=$1',[f.businessMembershipId]))[0].status).toBe('active');
     });
-    it('rechecks a target that withdrew after the request, preserving the pending proposal', async () => {
+    it('allows approval after target withdrawal while keeping the supply hidden', async () => {
       const pharmacy = await member(); const product = await supplierWithProduct({ price: 10000 });
       const proposal = await proposals.supplierCreate(product.supplierId, product.supplierUser, { offerId: product.offerId, semiFranchiseKey: 'carepharm', targetOrganizationId: pharmacy.orgId, unitPrice: 8000 });
       await sfs.withdraw(pharmacy.orgId, pharmacy.owner, 'carepharm');
-      await expect(proposals.operatorDecide(care!, careOperator, proposal.id, 'approve')).rejects.toHaveProperty('code', 'TARGET_MEMBERSHIP_REQUIRED');
-      expect((await ds.query('SELECT status,decided_by FROM supply_proposals WHERE id=$1', [proposal.id]))[0]).toEqual({ status: 'pending', decided_by: null });
+      await expect(proposals.operatorDecide(care!, careOperator, proposal.id, 'approve')).resolves.toMatchObject({status:'approved'});
+      expect(await getSupplyOption(ds,pharmacy.orgId,'proposal',proposal.id)).toBeNull();
     });
-    it.each(['suspended', 'terminated'])('blocks payment preparation after business membership becomes %s', async status => {
+    it.each(['suspended', 'terminated'])('prepares existing orders after business membership becomes %s', async status => {
       const f = await order();
       await ds.query('UPDATE semi_franchise_memberships SET status=$2 WHERE id=$1', [f.businessMembershipId,status]);
-      await expect(payments.prepare(f.owner,f.orgId,f.group.paymentGroupId)).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
-      expect(await ds.query('SELECT 1 FROM o4o_payments WHERE "orderId"=$1',[f.group.paymentGroupId])).toEqual([]);
+      const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+      expect(prepared.amount).toBe(21000);
+      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).resolves.toMatchObject({status:'PAID'});
+      expect(await getSupplyOption(ds,f.orgId,'proposal',f.proposal.id)).toBeNull();
     });
-    it('blocks confirmation after proposal termination without marking payment/order paid', async () => {
+    it('completes an existing order after proposal termination', async () => {
       const f=await order(); const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
       await proposals.operatorDecide(care!,careOperator,f.proposal.id,'end');
-      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
-      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
-      expect((await ds.query('SELECT "paymentStatus" FROM checkout_orders WHERE id=$1',[f.orderId]))[0].paymentStatus).toBe('pending');
-      expect(bridged).not.toContain(f.orderId);
+      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).resolves.toMatchObject({status:'PAID'});
+      expect((await ds.query('SELECT "paymentStatus" FROM checkout_orders WHERE id=$1',[f.orderId]))[0].paymentStatus).toBe('paid');
+      expect(bridged).toContain(f.orderId);
     });
-    it.each(['business','offer','supplier','pharmacy'])('rejects confirmation after %s is disabled', async what => {
+    it.each(['business','offer','supplier','pharmacy'])('keeps order settlement independent of %s supply availability', async what => {
       const f=await order();const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
       if(what==='business')await ds.query("UPDATE semi_franchises SET status='closed' WHERE id=$1",[care!.id]);
       if(what==='offer')await ds.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1',[f.offerId]);
       if(what==='supplier')await ds.query("UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1",[f.supplierId]);
       if(what==='pharmacy')await ds.query("UPDATE neture_pharmacy_memberships SET status='suspended' WHERE organization_id=$1",[f.orgId]);
-      try {await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code',what==='pharmacy'?'STORE_ACCESS_REQUIRED':'PAYMENT_SUPPLY_NOT_AVAILABLE');}
-      finally {if(what==='business')await ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care!.id]);}
-      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+      try {
+        const payment=payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId});
+        if(what==='pharmacy')await expect(payment).rejects.toHaveProperty('code','STORE_ACCESS_REQUIRED');
+        else await expect(payment).resolves.toMatchObject({status:'PAID'});
+      } finally {if(what==='business')await ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[care!.id]);}
+      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe(what==='pharmacy'?'CREATED':'PAID');
     });
-    it('rechecks membership between preparation and confirmation', async () => {
+    it('continues an existing order after membership is suspended between preparation and confirmation', async () => {
       const f=await order();const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
       await sfs.decideMembership(care!,careOperator,f.businessMembershipId,'suspend');
-      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).rejects.toHaveProperty('code','PAYMENT_SUPPLY_NOT_AVAILABLE');
-      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+      await expect(payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).resolves.toMatchObject({status:'PAID'});
+      expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('PAID');
     });
     it('preserves approved staff payment access and checks current staff role on confirmation', async () => {
       const f=await order();const staff=await user();await role(staff,'kpa:store_member');
@@ -938,19 +944,126 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(bridged.filter(id=>id===f.orderId)).toHaveLength(1);
       expect((await ds.query('SELECT reserved_quantity FROM supplier_product_offers WHERE id=$1',[f.offerId]))[0].reserved_quantity).toBe(2);
     });
-    it('waits for an in-flight proposal termination and refuses a stale confirmation', async () => {
+    it('pays an existing order without waiting for an in-flight proposal termination', async () => {
       const f=await order(); const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
       const writer=ds.createQueryRunner();await writer.connect();await writer.startTransaction();
       let result: Promise<unknown>|undefined;
       try {
         await writer.query("UPDATE supply_proposals SET status='ended' WHERE id=$1",[f.proposal.id]);
         result=payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId}).then(()=>({success:true}),error=>({code:error.code}));
-        let blocked=false;
-        for(let i=0;i<100;i++){blocked=(await writer.query("SELECT 1 FROM pg_locks WHERE NOT granted")).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10));}
-        expect(blocked).toBe(true);await writer.commitTransaction();
-        expect(await result).toEqual({code:'PAYMENT_SUPPLY_NOT_AVAILABLE'});
-        expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('CREATED');
+        expect(await result).toEqual({success:true});
+        await writer.commitTransaction();
+        expect((await ds.query('SELECT status FROM o4o_payments WHERE id=$1',[prepared.paymentId]))[0].status).toBe('PAID');
       } finally {if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result;}
+    });
+    it('rejects a new order when withdrawal commits during checkout eligibility evaluation', async () => {
+      const f=await order();await cart.add(f.owner,f.orgId,{kind:'proposal',id:f.proposal.id,quantity:1});
+      const writer=ds.createQueryRunner();await writer.connect();await writer.startTransaction();
+      let result: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        await writer.query("UPDATE semi_franchise_memberships SET status='suspended' WHERE id=$1",[f.businessMembershipId]);
+        result=cart.checkout(f.owner,f.orgId);
+        let blocked=false;
+        for(let i=0;i<100;i++) { blocked=(await writer.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10)); }
+        expect(blocked).toBe(true);await writer.commitTransaction();
+        expect(await result).toMatchObject({createdOrders:[],failedItems:[{code:'SUPPLY_OPTION_NOT_AVAILABLE'}]});
+        expect((await ds.query('SELECT count(*)::int AS n FROM checkout_orders WHERE "buyerId"=$1',[f.owner]))[0].n).toBe(1);
+        const prepared=await payments.prepare(f.owner,f.orgId,f.group.paymentGroupId);
+        expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:f.group.paymentGroupId})).toMatchObject({status:'PAID'});
+      } finally { if(writer.isTransactionActive)await writer.rollbackTransaction();await writer.release();if(result)await result; }
+    });
+    it('holds checkout eligibility until its order commits, then permits later membership withdrawal', async () => {
+      const f=await order();await cart.add(f.owner,f.orgId,{kind:'proposal',id:f.proposal.id,quantity:1});
+      let signal!:()=>void, finish!:()=>void;
+      const started=new Promise<void>(resolve=>{signal=resolve;});const release=new Promise<void>(resolve=>{finish=resolve;});
+      const atomicCart=new PharmacyCartService(ds,new EventOfferService(ds),async(dto,manager)=>{
+        const saved=await sqlOrderCreator(dto,manager);signal();await release;return saved;
+      });
+      const checkout=atomicCart.checkout(f.owner,f.orgId);await started;
+      let withdrawn:Promise<unknown>|undefined;
+      try {
+        withdrawn=ds.query("UPDATE semi_franchise_memberships SET status='terminated' WHERE id=$1",[f.businessMembershipId]);
+        let blocked=false;
+        for(let i=0;i<100;i++){blocked=(await ds.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length>0;if(blocked)break;await new Promise(resolve=>setTimeout(resolve,10));}
+        expect(blocked).toBe(true);finish();
+        const result=await checkout;await withdrawn;
+        expect(result.failedItems).toEqual([]);expect(result.createdOrders).toHaveLength(1);
+        const group=result.paymentGroups[0];const prepared=await payments.prepare(f.owner,f.orgId,group.paymentGroupId);
+        expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:group.paymentGroupId})).toMatchObject({status:'PAID'});
+      } finally { finish();await checkout;if(withdrawn)await withdrawn; }
+    });
+    it('serializes concurrent event reservations without lock upgrades or rejecting changed availability', async () => {
+      const product = await supplierWithProduct({ price: 10000 });
+      const first = await member(); const second = await member();
+      const event = await events.supplierCreate(product.supplierId, product.supplierUser, {
+        offerId: product.offerId, semiFranchiseKey: 'carepharm', eventPrice: 6000, totalQuantity: 10,
+        startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString(),
+      });
+      await events.operatorDecide(care!, careOperator, event.id, 'approve');
+      for (const store of [first, second]) await cart.add(store.owner, store.orgId, { kind: 'event', id: event.id, quantity: 1 });
+      const reserver = new EventOfferService(ds);
+      let entered = 0, signal!: () => void, finish!: () => void;
+      const started = new Promise<void>(resolve => { signal = resolve; });
+      const release = new Promise<void>(resolve => { finish = resolve; });
+      const concurrentCart = new PharmacyCartService(ds, {
+        reserveEventOfferListing: async (runner, params) => {
+          entered++;
+          if (entered === 1) { signal(); await release; }
+          return reserver.reserveEventOfferListing(runner, params);
+        },
+        incrementListingQuantity: (...args) => reserver.incrementListingQuantity(...args),
+      }, sqlOrderCreator);
+      const one = concurrentCart.checkout(first.owner, first.orgId); await started;
+      let two: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        two = concurrentCart.checkout(second.owner, second.orgId);
+        let blocked = false;
+        for (let i = 0; i < 100; i++) {
+          blocked = (await ds.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length > 0;
+          if (blocked) break;
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        expect(blocked).toBe(true); expect(entered).toBe(1); finish();
+        const results = await Promise.all([one, two]);
+        for (const result of results) { expect(result.failedItems).toEqual([]); expect(result.createdOrders).toHaveLength(1); }
+        expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(8);
+      } finally { finish(); await one; if (two) await two; }
+    });
+    it.each(['supplier', 'offer', 'master'] as const)('orders event checkout locks after the %s lifecycle lock', async kind => {
+      const product = await supplierWithProduct({ price: 10000 }); const store = await member();
+      const target = kind === 'master' ? await supplierWithProduct({ price: 10000 }) : null;
+      const event = await events.supplierCreate(product.supplierId, product.supplierUser, {
+        offerId: product.offerId, semiFranchiseKey: 'carepharm', eventPrice: 6000, totalQuantity: 10,
+        startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString(),
+      });
+      await events.operatorDecide(care!, careOperator, event.id, 'approve');
+      await cart.add(store.owner, store.orgId, { kind: 'event', id: event.id, quantity: 1 });
+      const writer = ds.createQueryRunner(); await writer.connect(); await writer.startTransaction();
+      let checkout: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        // Mirror supplier deactivation, product rejection, and Master → offer merge ordering.
+        if (kind === 'supplier') await writer.query('SELECT id FROM neture_suppliers WHERE id=$1 FOR UPDATE', [product.supplierId]);
+        else if (kind === 'offer') await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [product.offerId]);
+        else await writer.query('SELECT id FROM product_masters WHERE id=$1 FOR UPDATE', [product.masterId]);
+        checkout = cart.checkout(store.owner, store.orgId);
+        let blocked = false;
+        for (let i = 0; i < 100; i++) {
+          blocked = (await writer.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length > 0;
+          if (blocked) break;
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        expect(blocked).toBe(true);
+        // Waiting checkout must not own a later row needed by the lifecycle writer.
+        if (kind === 'master') await writer.query('SELECT id FROM supplier_product_offers WHERE id=$1 FOR UPDATE NOWAIT', [product.offerId]);
+        await writer.query('SELECT id FROM organization_product_listings WHERE id=$1 FOR UPDATE NOWAIT', [event.id]);
+        if (kind === 'supplier') await writer.query("UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1", [product.supplierId]);
+        else if (kind === 'offer') await writer.query('UPDATE supplier_product_offers SET is_active=false WHERE id=$1', [product.offerId]);
+        else await writer.query('UPDATE supplier_product_offers SET master_id=$1 WHERE id=$2', [target!.masterId, product.offerId]);
+        if (kind !== 'master') await writer.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [event.id]);
+        await writer.commitTransaction();
+        expect(await checkout).toMatchObject({ createdOrders: [], failedItems: [{ code: kind === 'master' ? 'SUPPLY_OPTION_CHANGED' : 'SUPPLY_OPTION_NOT_AVAILABLE' }] });
+        expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(10);
+      } finally { if (writer.isTransactionActive) await writer.rollbackTransaction(); await writer.release(); if (checkout) await checkout; }
     });
     it('rechecks store-owner agreements at prepare and confirm despite a warm middleware cache', async () => {
       const f = await order(); const ids: string[] = [];
