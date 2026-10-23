@@ -1,3 +1,5 @@
+import { newsSource } from "./community-news-policy.js";
+import { recommendationFor } from "./community-news-review.service.js";
 import { COMMUNITY_HOME_PIN_SQL } from "./community-home-pins.js";
 import type { EntityManager } from "typeorm";
 import type { CommunityAccessUser } from "../../utils/community-access.resolver.js";
@@ -20,7 +22,7 @@ const TYPES: Record<HomeKind, string> = {
 };
 const UUID = /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 const SCOPE = `"serviceKey"='community' AND "organizationId" IS NULL AND metadata->>'section'='${EDITORIAL_SECTION}'`;
-const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience`;
+const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience,metadata->'newsRecommendation' AS "newsRecommendation"`;
 function fail(status: number, code: string, message: string): never {
   throw new CommunityManagementError(status, code, message);
 }
@@ -49,14 +51,15 @@ function validateEditorialLink(kind: HomeKind, linkUrl: string) {
       (url.port && url.port !== "443")
     )
       fail(400, "INVALID_HOME_LINK", "HTTPS 링크를 입력해 주세요.");
-    if (
-      kind === "news" &&
-      !["www.kpanews.co.kr", "kpanews.co.kr"].includes(url.hostname)
-    )
-      fail(400, "INVALID_NEWS_SOURCE", "약사공론 원문 주소를 입력해 주세요.");
+    if (kind === "news" && !newsSource(linkUrl))
+      fail(
+        400,
+        "INVALID_NEWS_SOURCE",
+        "약사공론·데일리팜·메디파나 기사 원문 주소를 입력해 주세요.",
+      );
   }
   if (kind === "news" && !linkUrl)
-    fail(400, "INVALID_NEWS_SOURCE", "약사공론 원문 주소가 필요합니다.");
+    fail(400, "INVALID_NEWS_SOURCE", "기사 원문 주소가 필요합니다.");
 }
 export function parseEditorial(input: Record<string, unknown>) {
   const kind = homeKind(input.kind);
@@ -225,10 +228,11 @@ export async function saveEditorial(
   await db.query(
     "SELECT pg_advisory_xact_lock(hashtext('community-editorial'))",
   );
+  let newsRecommendation: unknown;
   if (id) {
     homeUuid(id);
     const [existing] = await db.query(
-      `SELECT id,metadata->>'kind' AS kind FROM cms_contents WHERE ${SCOPE} AND id=$1 FOR UPDATE`,
+      `SELECT id,"linkUrl",metadata,metadata->>'kind' AS kind FROM cms_contents WHERE ${SCOPE} AND id=$1 FOR UPDATE`,
       [id],
     );
     if (existing?.kind !== item.kind)
@@ -237,6 +241,22 @@ export async function saveEditorial(
         "HOME_ITEM_NOT_FOUND",
         "같은 분류의 커뮤니티 항목을 선택해 주세요.",
       );
+    if (item.kind === "news" && existing.linkUrl === item.linkUrl)
+      newsRecommendation = existing.metadata?.newsRecommendation;
+  }
+  if (item.kind === "news" && input.newsReviewId !== undefined) {
+    if (!id)
+      fail(
+        400,
+        "INVALID_NEWS_REVIEW",
+        "기존 기사 초안에 AI 정리를 적용해 주세요.",
+      );
+    newsRecommendation = await recommendationFor(
+      db,
+      input.newsReviewId,
+      id!,
+      item.linkUrl,
+    );
   }
   if (item.isPinned) {
     const rows = await db.query(
@@ -254,6 +274,7 @@ export async function saveEditorial(
     section: EDITORIAL_SECTION,
     kind: item.kind,
     audience: item.audience,
+    ...(newsRecommendation ? { newsRecommendation } : {}),
   });
   const params = [
     item.title,
