@@ -146,10 +146,13 @@ export function createMcpRouter(
           async (args) => {
             try {
               const result = await tools.execute(name, args, connectionId);
+              // ChatGPT reads structuredContent as the tool result; a JSON-only text
+              // block whose object has a top-level `content` key reached the model as {}.
               return {
                 content: [
                   { type: "text" as const, text: JSON.stringify(result) },
                 ],
+                structuredContent: result as Record<string, unknown>,
               };
             } catch (error) {
               const code =
