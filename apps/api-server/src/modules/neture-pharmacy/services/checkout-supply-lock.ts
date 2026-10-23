@@ -12,7 +12,9 @@ export async function lockCheckoutSupply(m: EntityManager, organizationId: strin
   const refs = [...new Map(options.map(o => [`${o.kind}:${o.optionId}`, o])).values()]
     .sort((a, b) => `${a.kind}:${a.optionId}`.localeCompare(`${b.kind}:${b.optionId}`, 'en'));
   for (const o of refs) {
-    await m.query(`SELECT id FROM ${SOURCE[o.kind]} WHERE id=$1 FOR SHARE`, [o.optionId]);
+    // Reservation updates event quantities; avoid shared-to-exclusive lock upgrades.
+    const lock = o.kind === 'event' ? 'UPDATE' : 'SHARE';
+    await m.query(`SELECT id FROM ${SOURCE[o.kind]} WHERE id=$1 FOR ${lock}`, [o.optionId]);
   }
   const keys = [...new Set(options.map(o => o.semiFranchiseKey).filter((key): key is string => !!key))].sort((a,b)=>a.localeCompare(b,'en'));
   for (const key of keys) await m.query('SELECT id FROM semi_franchises WHERE key=$1 FOR SHARE', [key]);

@@ -304,7 +304,10 @@ export class PharmacyCartService {
         for (const line of group.lines) {
           const current = await getSupplyOption(qr.manager, organizationId, line.option.kind, line.option.optionId);
           if (!current) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_NOT_AVAILABLE', '이용할 수 없는 공급 옵션입니다.');
-          if (JSON.stringify(current) !== JSON.stringify(line.option)) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_CHANGED', '공급조건이 변경되었습니다. 장바구니를 다시 확인해 주세요.');
+          // Availability can decrease while waiting for another checkout; terms must stay fixed.
+          const terms = (option: SupplyOption) => ({ ...option, availableStock: null, totalQuantity: null });
+          if (current.trackInventory && current.availableStock !== null && current.availableStock < line.quantity) throw new NeturePharmacyError(409, 'INSUFFICIENT_STOCK', '재고가 부족합니다.');
+          if (JSON.stringify(terms(current)) !== JSON.stringify(terms(line.option))) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_CHANGED', '공급조건이 변경되었습니다. 장바구니를 다시 확인해 주세요.');
         }
         for (const line of eventLines) await this.eventReserver.reserveEventOfferListing(qr, {
           listingId: line.option.optionId, serviceKey: SEMI_FRANCHISE_EVENT_SERVICE_KEY, userId: buyerId, quantity: line.quantity,

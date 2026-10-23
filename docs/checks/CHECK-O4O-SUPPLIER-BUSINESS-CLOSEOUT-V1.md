@@ -88,3 +88,9 @@ Codex P2(리뷰 comment 4358265678)의 자격 확인/주문 생성 사이 TOCTOU
 공통 CheckoutService.createOrder에는 optional EntityManager만 추가했다. Neture 약국 경로만 이를 전달하고 기존 다른 호출은 종전 repository/연결·의약품 차단·로그 경로를 유지한다. OrderCreator 내부 계약과 Neture route/실제 SQL fixture도 같은 manager를 전달한다. 신규 원장·schema·범용 framework 없음. 소비처는 기존 checkout createOrder 호출부 전체 검색으로 확인했으며 기본 경로 의약품 거래 차단 회귀와 실제 checkout을 함께 검증했다.
 
 실제 PostgreSQL commerce 52건 PASS(회원 철회가 먼저 commit하면 신규 주문 거부, 주문 잠금이 먼저면 주문 commit 뒤 철회·이후 결제 허용). 실제 checkout/bridge/배송/정산 8건 PASS(실제 주문/로그 저장 후 강제 실패 시 주문·로그 rollback과 장바구니 유지 포함). 제안 조건·매장 협력사업 및 공통 의약품 차단 46건 PASS. 각각의 canonical bootstrap 임시 DB 완전 삭제를 확인했다. API 전체 타입과 변경 파일 lint를 확인하며 기존 checkout.service.ts의 미사용 uuidv4 warning은 별개다. 최종 HEAD의 원격 CI·Sonar·Codex 재검증 후 병합한다.
+
+## PR #781 재리뷰 보완 — 이벤트 동시 예약
+
+Codex P2(comment 4358372034)의 이벤트 shared→exclusive 잠금 승격 교착을 수정했다. 정렬된 출처 잠금에서 이벤트만 처음부터 FOR UPDATE를 사용하고 다른 출처는 FOR SHARE를 유지한다. 대기 중 바뀔 수 있는 가용 재고·잔여 행사 수량은 계약 비교에서 제외하되 현재 재고 검사와 실제 예약의 수량/약국/주문 한도 검사는 유지한다. 가격·조건·수취 주체 등 나머지 스냅샷 차이는 계속 주문 생성을 거부한다.
+
+실제 PostgreSQL commerce 53건 PASS. 첫 예약을 멈춘 상태에서 두 번째 약국 주문이 예약 진입 전에 대기하며, 해제 후 양쪽 주문 성공·행사 수량 10→8을 검증했다. canonical bootstrap 임시 DB는 완전 삭제(잔존 0)했다. API 전체 타입·변경 파일 lint·diff 검사 PASS. 결제 직전 협업체 회원/공급 출처 재검사는 추가하지 않았다.

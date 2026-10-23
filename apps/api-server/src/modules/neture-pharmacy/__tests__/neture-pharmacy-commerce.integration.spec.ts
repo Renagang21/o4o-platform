@@ -992,6 +992,43 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         expect(await payments.confirm(f.owner,f.orgId,{paymentId:prepared.paymentId,paymentGroupId:group.paymentGroupId})).toMatchObject({status:'PAID'});
       } finally { finish();await checkout;if(withdrawn)await withdrawn; }
     });
+    it('serializes concurrent event reservations without lock upgrades or rejecting changed availability', async () => {
+      const product = await supplierWithProduct({ price: 10000 });
+      const first = await member(); const second = await member();
+      const event = await events.supplierCreate(product.supplierId, product.supplierUser, {
+        offerId: product.offerId, semiFranchiseKey: 'carepharm', eventPrice: 6000, totalQuantity: 10,
+        startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString(),
+      });
+      await events.operatorDecide(care!, careOperator, event.id, 'approve');
+      for (const store of [first, second]) await cart.add(store.owner, store.orgId, { kind: 'event', id: event.id, quantity: 1 });
+      const reserver = new EventOfferService(ds);
+      let entered = 0, signal!: () => void, finish!: () => void;
+      const started = new Promise<void>(resolve => { signal = resolve; });
+      const release = new Promise<void>(resolve => { finish = resolve; });
+      const concurrentCart = new PharmacyCartService(ds, {
+        reserveEventOfferListing: async (runner, params) => {
+          entered++;
+          if (entered === 1) { signal(); await release; }
+          return reserver.reserveEventOfferListing(runner, params);
+        },
+        incrementListingQuantity: (...args) => reserver.incrementListingQuantity(...args),
+      }, sqlOrderCreator);
+      const one = concurrentCart.checkout(first.owner, first.orgId); await started;
+      let two: ReturnType<PharmacyCartService['checkout']> | undefined;
+      try {
+        two = concurrentCart.checkout(second.owner, second.orgId);
+        let blocked = false;
+        for (let i = 0; i < 100; i++) {
+          blocked = (await ds.query('SELECT 1 FROM pg_locks WHERE NOT granted')).length > 0;
+          if (blocked) break;
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        expect(blocked).toBe(true); expect(entered).toBe(1); finish();
+        const results = await Promise.all([one, two]);
+        for (const result of results) { expect(result.failedItems).toEqual([]); expect(result.createdOrders).toHaveLength(1); }
+        expect((await ds.query('SELECT total_quantity FROM organization_product_listings WHERE id=$1', [event.id]))[0].total_quantity).toBe(8);
+      } finally { finish(); await one; if (two) await two; }
+    });
     it('rechecks store-owner agreements at prepare and confirm despite a warm middleware cache', async () => {
       const f = await order(); const ids: string[] = [];
       const publish = async (version: number) => {
