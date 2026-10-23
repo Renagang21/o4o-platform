@@ -225,3 +225,25 @@ API compile·변경 lint와 전체 PostgreSQL/공식 SDK 통합 **50건 PASS**�
 연결의 최소 부모 행만 기록 만료까지 유지하고, 해당 자격은 cleanup에서 제거한다. 사용자 상한은 해제 연결의
 최근 요청도 포함한다. 실제 DB에서 세 연결의 저장 상한 도달 → 해제 → cleanup → 새 연결 저장 거부 →
 요청 기록 만료 → cleanup → 부모 행 삭제/정상 저장 회복을 확인했다. 전체 통합 **50건 PASS**, compile·lint PASS다.
+
+## 7. 운영 활성화·실제 ChatGPT 연결 검증 (2026-10-23)
+
+- **배포**: PR #775(운영 활성화)·#778(MCP 결과 `structuredContent` 동시 반환)을 merge 했다. #765(KPA 정리, auth-backend LEVEL_3)가
+  선행 포함되어 Delivery 가 `HELD_LEVEL_3` 로 판정했고, 기존 promote 실행으로 `5a6ab8f23` 가 반영되었다. 서빙 revision 의
+  commit label 일치·Ready·트래픽 100%, MCP 무인증 401·PRM 200 을 확인했다.
+- **관리자 설정**: 외부 AI 연결 사용·ChatGPT 연결 허용·약국 자료 조회·약국 초안 저장·수정 = 켬. 나머지 범위는 끔.
+- **실제 ChatGPT 연결(약국 경영자 Demo 계정, 사용자가 직접 Google/이메일 로그인)**
+  - 동의 화면에서 작업공간·권한 선택 → 연결 생성. `list_workspaces`·`search_products`·`get_product_context`·`list_materials`·`get_material` PASS.
+  - `get_material` 이 ChatGPT 에서 `{}` 로 전달되던 문제는 #778 반영 후 키·title 정상 확인(PASS).
+  - 동의하지 않은 다른 매장 작업공간 지정 → `WORKSPACE_FORBIDDEN` (격리 PASS).
+  - 초안 권한으로 재연결 후 `save_content_draft` → `update_content_draft`(revision 갱신) → `get_content_draft` 일치 PASS.
+    `openUrl` 로 O4O 매장 제작 자료 편집 화면에서 제목·수정 본문을 확인했다(비공개 상태).
+  - O4O 계정 설정에서 연결 해제 → 두 연결 모두 `revoked_at` 기록, 이후 ChatGPT 도구 호출 실패·토큰 갱신 400 (차단 PASS).
+- **테스트 자료**: 시험 초안 1건과 저장 요청 기록 2건을 사용자 승인 후 id·조직·제목 조건으로 삭제했다. 잔존 0건 확인.
+  해제된 연결 2건은 감사 기록으로 유지한다.
+- **관찰된 후속 후보(이번 범위 외)**
+  1. 권한별 도구 등록 때문에 쓰기 권한 재연결 후 ChatGPT 에서 "도구 새로 고침"이 필요했다 — 쓰기 도구는 항상 등록하고 호출 시 권한으로 거부하는 방식 검토.
+  2. ChatGPT "다시 연결"은 새 연결을 만들고 이전 연결을 해제하지 않는다 — 같은 client 재연결 시 이전 연결 정리 검토.
+  3. 연결 해제 후 ChatGPT 에 구체 오류 코드 대신 "failed internally" 가 표시된다(토큰 갱신 400).
+  4. 동의 화면에서 로그인하면 동의 화면이 아닌 매장 홈으로 이동한다.
+- **앱 공개 등록**: 등록안은 작성했고 공개 제출은 하지 않았다. 개발자 인증·도메인 확인 토큰·심사용 계정·시연 영상·로고·지원 연락처는 사용자 확인 대상이다.
