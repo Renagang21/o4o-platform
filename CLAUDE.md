@@ -58,7 +58,7 @@
 통합 담당: PR 검토 → CI · Codex → 순차 PR merge → post-merge 확인 → 필요한 배포 · 검증 → 결과 전달 → worktree 종료 정리
 ```
 
-- **개발 담당의 기본 종료점은 로컬 검증 · commit · push 후 인계다.** 수정 요청을 받은 경우에도 같은 작업 branch에 추가 push하고 재인계한다. PR 생성 · CI·리뷰 운영 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기존 PR 재사용 또는 PR 생성 후 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
+- **개발 담당의 기본 종료점은 로컬 검증 · commit · push 후 인계다.** 수정 요청을 받은 경우에도 같은 작업 branch에 추가 push하고 재인계한다. PR 생성 · CI·리뷰 운영 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기존 PR 재사용 또는 PR 생성 후 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). 사용자가 배포 · merge 를 요청한 세션은 통합 담당으로 지정된 것으로 본다(아래 **명령 실행 원칙**).
 - **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
@@ -98,9 +98,11 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 
 ## 명령 실행 원칙
 
-`.claude/settings.json` 의 ask 규칙은 allow 보다 우선한다. 한 줄로 묶인 명령에 ask 대상이 하나라도 섞이면 **전체가 승인 대상**이 되어, 무엇을 승인하는지 흐려진다.
+- **배포 요청 = 자율 진행.** 사용자가 배포 · merge 를 요청하면 그 세션은 통합 담당으로 지정된 것으로 보고, 작업 branch push → PR 생성 → 필수 CI 통과 → PR merge → 배포 workflow 실행(merge 후 `delivery.yml` 자동 · 필요 시 `deploy-api` · `deploy-web-services` · `deploy-admin` 을 `gh workflow run`)까지 중간 승인 없이 진행한다. CI · branch protection 우회 · 비활성화는 금지한다.
+- **`promote.yml`(LEVEL_3: migration · auth)** 은 사용자 메시지에 promote 또는 LEVEL_3 가 명시된 경우에만 실행한다.
+- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다.
+- ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
 
-- `gh api` 는 다른 명령과 `;` · `&&` · `|` 로 묶지 말고 단독으로 실행한다.
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
 - `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
 - 결과 표시용 `echo` 는 생략한다.
