@@ -1,3 +1,4 @@
+import { executeManagedAi } from '../../services/ai-management/runtime-models.js';
 import { isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from '../cms-content/cms-reserved-presentation.js';
 /**
  * KPA Routes
@@ -133,7 +134,6 @@ import { createMypageController } from './controllers/mypage.controller.js';
 import { createMeContextController } from './controllers/me-context.controller.js'; // WO-KPA-LOGIN-LATENCY-CLEANUP-V1
 import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
 import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
-import { execute } from '@o4o/ai-core';
 import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
 import {
   SUMMARIZE_SYSTEM_PROMPT, buildSummarizeUserPrompt,
@@ -339,7 +339,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const userPrompt = `다음 ${items.length}개 항목을 분석해 주세요.${context ? `\n맥락: ${context}` : ''}\n\n데이터:\n${dataStr}`;
 
     try {
-      const result = await execute({
+      const result = await executeManagedAi(dataSource, 'kpa.selection-summary', {
         systemPrompt,
         userPrompt,
         config: buildConfigResolver(dataSource, 'store'),
@@ -1413,7 +1413,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const kpaContentCore = createContentResourceCore(
     dataSource,
-    createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog }),
+    createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog,
+      atomicAudit: async (manager, user, actionType, targetType, targetId, metadata = {}) => {
+        const repo = manager.getRepository(KpaAuditLog);
+        await repo.save(repo.create({ operator_id: user.id,
+          operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+          action_type: actionType, target_type: targetType, target_id: targetId, metadata }));
+      },
+    }),
   );
 
   // ============================================================================
@@ -1758,7 +1765,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
       try {
-        const result = await execute({
+        const result = await executeManagedAi(dataSource, 'kpa.content-summary', {
           systemPrompt: SUMMARIZE_SYSTEM_PROMPT,
           userPrompt: buildSummarizeUserPrompt(content.title, content.blocks),
           config: buildConfigResolver(dataSource, 'store'),
@@ -1793,7 +1800,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
       try {
-        const result = await execute({
+        const result = await executeManagedAi(dataSource, 'kpa.content-extraction', {
           systemPrompt: EXTRACT_SYSTEM_PROMPT,
           userPrompt: buildExtractUserPrompt(content.title, content.blocks),
           config: buildConfigResolver(dataSource, 'store'),
@@ -1824,7 +1831,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
       try {
-        const result = await execute({
+        const result = await executeManagedAi(dataSource, 'kpa.content-tags', {
           systemPrompt: TAG_SYSTEM_PROMPT,
           userPrompt: buildTagUserPrompt(content.title, content.blocks, content.category),
           config: buildConfigResolver(dataSource, 'store'),

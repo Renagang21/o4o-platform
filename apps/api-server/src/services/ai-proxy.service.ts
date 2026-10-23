@@ -1,3 +1,5 @@
+import { isReasoningGenerationModel } from '@o4o/ai-core';
+import { ModelControlService } from './ai-management/model-controls.js';
 /**
  * AI Proxy Service
  * Sprint 2 - P1: Server-side LLM proxy with security, retry, and timeout
@@ -112,11 +114,7 @@ class AIProxyService {
 
     try {
       // 1. Resolve and validate model
-      const resolvedModel = this.resolveModel(request.provider, request.model);
-      request = { ...request, model: resolvedModel };
-
-      // 2. Validate request
-      this.validateRequest(request);
+      request = await this.prepareManagedRequest(request, 'admin.blocks');
 
       // 2. Estimate prompt size for logging
       const promptSize = (request.systemPrompt + request.userPrompt).length;
@@ -229,7 +227,25 @@ class AIProxyService {
   /**
    * Validate request against whitelist and parameter limits
    */
-  private validateRequest(request: AIGenerateRequest): void {
+  private async prepareManagedRequest(request: AIGenerateRequest, usage: string): Promise<AIGenerateRequest> {
+    const service = new ModelControlService(AppDataSource);
+    const fallback = { provider: request.provider, model: request.model || this.resolveModel(request.provider) };
+    const selected = await service.resolve(usage, fallback);
+    const registered = await service.allows(selected.provider, selected.model);
+    if (registered === false) throw this.createError('VALIDATION_ERROR', 'AI_MODEL_REMOVED', false);
+    const model = registered ? selected.model : this.resolveModel(selected.provider as AIProvider, selected.model);
+    const provider = selected.provider as AIProvider;
+    // The main block generator materializes Gemini's token default before the server selection.
+    // A managed provider switch may lower that budget, never increase the selected provider's cap.
+    const maxTokens = selected.managed && provider !== request.provider && typeof request.maxTokens === 'number'
+      ? Math.min(request.maxTokens, PARAMETER_LIMITS.maxTokens[provider])
+      : request.maxTokens;
+    const resolved = { ...request, provider, model, maxTokens };
+    this.validateRequest(resolved, registered === true);
+    return resolved;
+  }
+
+  private validateRequest(request: AIGenerateRequest, registered = false): void {
     const { provider, model, temperature, maxTokens, topP, topK } = request;
 
     // Check provider
@@ -243,7 +259,7 @@ class AIProxyService {
 
     // Check model whitelist (gemini: 정적 whitelist ∪ Google 동적 목록)
     const allowedModels = MODEL_WHITELIST[provider] as readonly string[];
-    const modelAllowed =
+    const modelAllowed = registered ||
       (allowedModels as string[]).includes(model) || (provider === 'gemini' && isGeminiModelAllowedSync(model));
     if (!modelAllowed) {
       throw this.createError(
@@ -391,8 +407,9 @@ class AIProxyService {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
-          temperature,
-          max_tokens: maxTokens,
+          ...(isReasoningGenerationModel(model)
+            ? { max_completion_tokens: maxTokens }
+            : { temperature, max_tokens: maxTokens }),
           response_format: { type: 'json_object' },
         }),
         signal: controller.signal,
@@ -670,11 +687,12 @@ class AIProxyService {
     request: Omit<AIGenerateRequest, 'provider' | 'model'>,
     userId: string,
     requestId: string,
-    opts: { surface?: EditingSurface } = {},
+    opts: { surface?: EditingSurface; usage?: string } = {},
   ): Promise<AIRawContentResponse> {
-    const { provider, model } = await resolveEditingProvider({ surface: opts.surface });
+    const previous = await resolveEditingProvider({ surface: opts.surface });
+    const { provider, model } = await new ModelControlService(AppDataSource).resolve(opts.usage ?? 'editor.content', previous);
     if (provider === 'gemini') {
-      return this.generateRawContent({ ...request, provider: 'gemini', model }, userId, requestId);
+      return this.generateRawContent({ ...request, provider: 'gemini', model }, userId, requestId, opts.usage ?? 'editor.content');
     }
     // 비-gemini: 현재 Qwen(Singapore International)만 transport 배선(저위험 surface 실험).
     // key 미설정 / 호출 실패 시 운영 안정성 위해 Gemini fallback (UX 깨지지 않음).
@@ -700,7 +718,7 @@ class AIProxyService {
         provider, surface: opts.surface, requestId,
       });
     }
-    return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId);
+    return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId, opts.usage ?? 'editor.content');
   }
 
   /**
@@ -801,6 +819,7 @@ class AIProxyService {
     request: AIGenerateRequest,
     userId: string,
     requestId: string,
+    usage = 'editor.content',
   ): Promise<AIRawContentResponse> {
     const startTime = Date.now();
 
@@ -808,9 +827,7 @@ class AIProxyService {
       throw this.createError('VALIDATION_ERROR', 'generateRawContent only supports gemini provider', false);
     }
 
-    const resolvedModel = this.resolveModel(request.provider, request.model);
-    request = { ...request, model: resolvedModel };
-    this.validateRequest(request);
+    request = await this.prepareManagedRequest(request, usage);
 
     const promptSize = (request.systemPrompt + request.userPrompt).length;
     logger.info('AI raw content request started', {

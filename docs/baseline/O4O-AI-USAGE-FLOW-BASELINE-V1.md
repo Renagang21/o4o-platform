@@ -9,6 +9,8 @@
 *Date: 2026-04-23*
 *Last aligned with production: 2026-09-14 (WO-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-REALIGNMENT-V1 · 이전 WO-O4O-AI-USAGE-FLOW-BASELINE-REALIGNMENT-V1)*
 
+> **정책 확장 2026-10-22:** 사용자 승인에 따라 외부 AI의 자료 조회·초안 저장 직접 연결을 허용한다. 이 정책 추가는 운영 연결·배포 완료를 뜻하지 않는다. 아래 External 설명과 연결 설계·TODO를 따른다.
+
 > **2026-09-14 정렬 요지** — AI 의 위치를 4축으로 나눈다. ① 플랫폼 **일반 업무 진입** = Home AI(가능).
 > ② **매장 콘텐츠의 Creative/Strategy**(기획·스토리·초안) = **사용자 자신의 외부 AI**(ChatGPT/Gemini/Claude 등) 사용 가능·권장 가능.
 > ③ **매장 제작 실행** = O4O 표준 제작환경(편집기 · POP/QR/Blog/상품설명/태블릿/사이니지/영상 · Media Library · VIDEO Job).
@@ -33,7 +35,9 @@
 | **Execution** | POP, QR, 블로그, 상품 상세 설명 | 실행 + 노출 |
 
 Entry 레이어는 HUB→편집기 흐름의 **대체가 아니라 상위 진입점**이다. 상세는 §11.
-External 레이어는 O4O 가 호출·연동·저장하지 않는다 — 안내(`ContentCreationGuideModal`)와 복사/붙여넣기 도구(`LlmAssistPanel`)로 **가져오는 지점**만 돕는다(§15).
+External 레이어의 창작·모델 선택·구독·비용·대화는 사용자 외부 AI가 담당한다. 기존 안내(`ContentCreationGuideModal`)와 복사/붙여넣기 도구(`LlmAssistPanel`)를 유지한다.
+2026-10-22 사용자 결정으로, 외부 AI가 사용자 동의와 기존 업무 권한 안에서 자료를 조회하고 초안을 저장하는 직접 연결을 추가한다.
+범위·인증·보관은 [외부 AI 연결 설계](../design/DESIGN-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md), 구현·검증·운영 상태는 [TODO](../work-orders/TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)를 따른다. O4O가 외부 AI의 LLM 호출·대화 수집을 대행하는 변경은 아니다.
 
 ---
 
@@ -477,7 +481,7 @@ WorkScope 타입의 `executionMode: 'local' | 'hybrid'` 와 capability `local_re
 
 | 단계 | 주체 | O4O 코드 접점 |
 |---|---|---|
-| 기획 · 스토리 · 초안 (Creative / Strategy) | **사용자의 외부 AI** | 없음(플랫폼 밖). O4O 는 LLM API 호출·계정 연동·대화 저장을 하지 않는다 |
+| 기획 · 스토리 · 초안 (Creative / Strategy) | **사용자의 외부 AI** | O4O는 외부 LLM 호출·모델/구독/비용 관리·대화 수집을 하지 않는다. 명시적 연결 허용 시 기존 자료 조회·초안 저장만 연결한다(§1 External 설명·외부 AI 연결 설계) |
 | 가져오기 · 누락 확인 (Normalize / Handoff) | O4O Guide | `ContentCreationGuideModal`(KPA) · `LlmAssistPanel`(`@o4o/content-editor`, 태블릿 코너) · 편집기 HTML 탭 |
 | 제작 실행 (Execute / Manage / Reuse) | O4O 표준 제작환경 | `StartProductionModal` → POP V2 / QR / Blog / 상품설명 · Production Materials 편집 · Media Library V2 · VIDEO Job · Temporary Output |
 | 편집 보조 · 구조화 · 내부 자동화 (Assist) | O4O 내부 AI (**선택**) | Toolbar `AI 정리`(`AiContentModal`, `/api/ai/content`) · Product AI pipeline(§5.1) · Home AI(§11) |

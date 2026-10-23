@@ -21,6 +21,7 @@ import { aiAdminService } from '../services/ai-admin.service.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
+import { ModelControlError } from '../services/ai-management/model-controls.js';
 import { createAiManagementRouter } from './ai-management.routes.js';
 
 const router: Router = Router();
@@ -96,8 +97,9 @@ router.put('/engines/:id/activate', authenticate, requireAdmin, async (req, res:
       message: `${engine?.name} 엔진이 활성화되었습니다.`,
     });
   } catch (error: any) {
-    return res.status(400).json({
+    return res.status(error instanceof ModelControlError ? error.status : 400).json({
       success: false,
+      ...(error instanceof ModelControlError ? { code: error.code } : {}),
       error: error.message || '엔진 활성화 중 오류가 발생했습니다.',
     });
   }

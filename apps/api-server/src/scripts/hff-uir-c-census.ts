@@ -84,7 +84,7 @@ async function main(): Promise<void> {
           // 이 라벨만 미해소이고 기존 해소 키가 0 이면 = 이 라벨이 곧 그 제품의 유일 원료 후보
           if (uniq.length === 1 && known.size === 0) {
             soleCount[lb] = (soleCount[lb] ?? 0) + 1;
-            (samples[lb] ??= []).length < 4 && samples[lb].push({ stmt, name: r.name.trim(), base: normalizeSpecText(r.base || '').slice(0, 300), fn: normalizeSpecText(r.fn || '').slice(0, 240), srv: normalizeSpecText(r.srv || '').slice(0, 120) });
+            if ((samples[lb] ??= []).length < 4) samples[lb].push({ stmt, name: r.name.trim(), base: normalizeSpecText(r.base || '').slice(0, 300), fn: normalizeSpecText(r.fn || '').slice(0, 240), srv: normalizeSpecText(r.srv || '').slice(0, 120) });
           }
         }
       }

@@ -96,6 +96,7 @@ export function createKpaListRowMapper(mapCmsStatus: (s: string) => unknown) {
 export function createKpaContentResourceConfig(options: {
   mapCmsStatus: (s: string) => unknown;
   audit: AuditHook;
+  atomicAudit?: ContentResourceConfig["atomicAudit"];
 }): ContentResourceConfig {
   return {
     // 물리 테이블 분리가 서비스 경계다 — 명시 주입 (Core 에 기본값 없음)
@@ -116,6 +117,7 @@ export function createKpaContentResourceConfig(options: {
     resolveListVisibility: resolveKpaListVisibility,
     mapListRow: createKpaListRowMapper(options.mapCmsStatus),
     audit: options.audit,
+    atomicAudit: options.atomicAudit,
     auditEntityType: 'kpa_content',
   };
 }

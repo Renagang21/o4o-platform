@@ -17,14 +17,43 @@ function open(path: string, session: SessionSnapshot = anonymousSession) {
 }
 
 describe("federation and cooperative route boundaries", () => {
-  it('does not mount the authenticated backend for another cooperative operator, including direct editor URLs', () => {
-    const client = { get: vi.fn(), post: vi.fn(), patch: vi.fn(), put: vi.fn(), delete: vi.fn() };
-    render(<MemoryRouter initialEntries={['/sample-coop-b/operator/contents/new']}><App
-      cooperatives={previewCooperatives.map(row => ({ ...row, businessKey: `business-${row.id}` }))}
-      session={{ ...anonymousSession, userId: 'person', cooperativeOperators: [{ userId: 'person', cooperativeId: 'preview-a' }] }} businessClient={client}
-    /></MemoryRouter>);
-    expect(screen.getByText('이 조합의 운영 권한이 필요합니다.')).toBeTruthy();
-    expect(client.get.mock.calls.every(([path]) => path === "/home-presentation/cooperative/sample-coop-b")).toBe(true); expect(client.post).not.toHaveBeenCalled();
+  it("does not mount the authenticated backend for another cooperative operator, including direct editor URLs", () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      patch: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+    };
+    render(
+      <MemoryRouter initialEntries={["/sample-coop-b/operator/contents/new"]}>
+        <App
+          cooperatives={previewCooperatives.map((row) => ({
+            ...row,
+            businessKey: `business-${row.id}`,
+          }))}
+          session={{
+            ...anonymousSession,
+            userId: "person",
+            cooperativeOperators: [
+              { userId: "person", cooperativeId: "preview-a" },
+            ],
+          }}
+          businessClient={client}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("이 조합의 운영 권한이 필요합니다.")).toBeTruthy();
+    expect(
+      client.get.mock.calls.every(([path]) =>
+        [
+          "/home-presentation/cooperative/sample-coop-b",
+          "/notifications/unread-count?serviceKey=pharmcoop",
+          "/neture/businesses/business-preview-b/legal/footer-legal",
+        ].includes(path),
+      ),
+    ).toBe(true);
+    expect(client.post).not.toHaveBeenCalled();
   });
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
@@ -48,7 +77,7 @@ describe("federation and cooperative route boundaries", () => {
     );
     const nav = screen.getByRole("navigation", { name: "협동조합 메뉴" });
     const links = [...nav.querySelectorAll("a")];
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(6);
     expect(nav.textContent).toContain("조합 소식·자료");
     expect(nav.textContent).toContain("조합원 이야기");
     expect(nav.textContent).not.toContain("조합 운영");

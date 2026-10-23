@@ -1,6 +1,10 @@
 import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
 import { ServiceOperatorManagement } from "@o4o/operator-core-ui";
+import {
+  ServiceEnrollmentPolicyAgreement,
+  useServiceEnrollmentPolicies,
+} from "@o4o/shared-space-ui";
 import type { PharmacyManagementClient } from "@o4o/operator-core-ui/modules/pharmacy-management";
 import type { Cooperative } from "./domain";
 type Client = PharmacyManagementClient;
@@ -485,30 +489,54 @@ export function MemberManagementPanel({
 export function MembershipApplication({
   client,
   coop,
+  businessKey,
+  policyScope,
   onChanged,
 }: Readonly<{
   client: Client;
   coop: string;
+  businessKey?: string;
+  policyScope?: string;
   onChanged?: () => void;
 }>) {
   const [reason, setReason] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [done, setDone] = useState(false);
+  const agreement = useServiceEnrollmentPolicies(
+    policyScope ?? "",
+    async () => {
+      if (!businessKey || !policyScope) throw new Error("Business unavailable");
+      return (
+        await client.get(
+          `/neture/businesses/${encodeURIComponent(businessKey)}/legal/enrollment-policies`,
+        )
+      ).data.data;
+    },
+    coop,
+  );
   return (
     <form
       className="card spaced coop-management"
       onSubmit={async (e) => {
         e.preventDefault();
-        if (busy) return;
+        if (busy || !agreement.ready) return;
         setBusy(true);
         setError("");
         try {
-          await client.post(`${base}/${coop}/applications`, { reason });
+          await client.post(`${base}/${coop}/applications`, {
+            reason,
+            policyReferences: agreement.references,
+          });
           setDone(true);
           onChanged?.();
         } catch (err) {
           setError(errorText(err));
+          if (
+            (err as { response?: { status?: number } })?.response?.status ===
+            409
+          )
+            agreement.reload();
         } finally {
           setBusy(false);
         }
@@ -524,7 +552,11 @@ export function MembershipApplication({
           onChange={(e) => setReason(e.target.value)}
         />
       </label>
-      <button type="submit" disabled={busy || done || !reason.trim()}>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
+      <button
+        type="submit"
+        disabled={busy || done || !reason.trim() || !agreement.ready}
+      >
         가입·보완 신청
       </button>
       <Feedback

@@ -38,8 +38,8 @@ const SEC_TO_FIELD: Record<string, keyof EnV3Payload> = {
 /** 결정론적 문장 분해. 십진수(숫자.숫자) 미분할. 한글/닫는괄호 뒤 마침표를 경계로. 줄바꿈도 경계. */
 export function splitSentences(text: string): string[] {
   if (!text) return [];
-  const marked = text.replace(/([가-힣)\]])\.(\s*)/g, '$1.');
-  return marked.split(/[\n]+/).map((s) => s.trim()).filter(Boolean);
+  const marked = text.replace(/([가-힣)\]])\.(\s*)/g, '$1.\u0001');
+  return marked.split('\u0001').join('\n').split(/\n+/).map((s) => s.trim()).filter(Boolean);
 }
 
 interface Rec { fp: string; unit: string; gencode: string; route: string; form: string; repName: string | null; official: Record<string, string>; }

@@ -10,8 +10,8 @@ export default function MenuDebug() {
 
   // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
   //   기존에는 'tools' 를 하드코딩해 조사했으나, 해당 메뉴·설정이 모두 제거되어 진단 가치가 없어졌다.
-  //   현재 실제로 게이트가 적용되는 유일한 항목인 'core-users' 로 교체한다.
-  const GATED_MENU_ID = 'core-users';
+  //   현재 실제로 게이트가 적용되는 유일한 항목인 'core-operators' 로 교체한다.
+  const GATED_MENU_ID = 'core-operators';
   const gatedMenuItem = adminMenuStatic.find(m => m.id === GATED_MENU_ID);
   const gatedPermission = menuPermissions.find(m => m.menuId === GATED_MENU_ID);
   const hasGatedAccess = hasMenuPermission(userRoles, userPermissions, GATED_MENU_ID);

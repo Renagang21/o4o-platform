@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 const read = (path: string) => readFileSync(resolve(process.cwd(), 'src', path), 'utf8');
 
@@ -23,12 +23,12 @@ it('product supply, seller recruitment and listing flows do not consult the reti
 it('other service entry points cannot restore role editing or advertise the removed policy page', () => {
   const readRepo = (path: string) => readFileSync(resolve(process.cwd(), '../..', path), 'utf8');
   const neture = readRepo('services/web-neture/src/App.tsx');
-  const kpa = readRepo('services/web-kpa-society/src/routes/OperatorRoutes.tsx');
   expect(neture).not.toContain('<RoleManagementPage');
-  expect(kpa).not.toContain('<RoleManagementPage');
   expect(neture).toContain('<Route path="/admin/roles" element={<Navigate to="/admin" replace />} />');
-  expect(kpa).toContain('<Navigate to="/operator" replace />');
-  for (const app of ['web-neture', 'web-kpa-society']) {
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 운영/관리 화면(OperatorRoutes · operatorMenuGroups)은 제거됐다.
+  expect(existsSync(resolve(process.cwd(), '../..', 'services/web-kpa-society/src/routes/OperatorRoutes.tsx'))).toBe(false);
+  expect(readRepo('services/web-kpa-society/src/App.tsx')).not.toContain('RoleManagementPage');
+  for (const app of ['web-neture']) {
     const menu = readRepo(`services/${app}/src/config/operatorMenuGroups.ts`);
     expect(menu).not.toMatch(/label: '역할 관리/);
     expect(menu).not.toContain('서비스 대상 정책 (플랫폼)');

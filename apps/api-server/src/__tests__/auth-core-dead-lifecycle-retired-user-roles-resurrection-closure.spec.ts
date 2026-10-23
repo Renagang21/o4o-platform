@@ -112,7 +112,7 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
       //   (조회 2지점은 라우트에 연결돼 있지도 않아 항상 빈 목록을 읽었다).
       //   "정본이라 보존한다" 가 아니라 "은퇴했다" 가 현재 계약이므로 아래에서 부재를 고정한다.
       for (const name of ['User', 'Role', 'RoleAssignment', 'LoginAttempt', 'LinkedAccount', 'ServiceMembership']) {
-        expect({ name, hit: new RegExp(`import \{ ${name} \}`).test(registry) }).toEqual({ name, hit: true });
+        expect({ name, hit: registry.includes(`import { ${name} }`) }).toEqual({ name, hit: true });
       }
     });
 
@@ -131,7 +131,7 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
       }
       const registry = read(join(SRC, 'database', 'entities.ts'));
       for (const name of ['ServiceCredential', 'PasswordResetToken']) {
-        expect({ name, imported: new RegExp(`import \{ ${name} \}`).test(registry) })
+        expect({ name, imported: registry.includes(`import { ${name} }`) })
           .toEqual({ name, imported: false });
       }
       // LoginAttempt 는 FROZEN auth-core 소유라 유지된다(위 목록에 남아 있다).

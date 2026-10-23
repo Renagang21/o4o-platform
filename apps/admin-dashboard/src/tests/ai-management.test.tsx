@@ -13,6 +13,13 @@ import { unifiedApi } from "../api/unified-client";
 vi.mock("../api/unified-client", () => ({
   unifiedApi: { raw: { get: vi.fn(), put: vi.fn() } },
 }));
+vi.mock("../api/ai-management", async (original) => ({
+  ...await original<typeof import('../api/ai-management')>(),
+  getAiModelControls: async () => ({ revision: 0,
+    models: [{ provider: 'gemini', id: 'fixture-code-model', name: 'fixture-code-model', capabilities: ['text'] }],
+    selections: {}, deleted: [], protectedModels: [], targets: [], usageTargets: {},
+  }),
+}));
 const get = vi.mocked(unifiedApi.raw.get);
 const reply = (data: unknown) => ({ data: { success: true, data } });
 const item = (id: string, name: string, group = "store") => ({
@@ -146,7 +153,7 @@ describe("AI usage inventory and connection status", () => {
     await screen.findByRole("alert");
     expect(screen.getAllByText("설정 조회 실패").length).toBeGreaterThan(0);
     expect(screen.queryByText("적용 완료")).not.toBeInTheDocument();
-    expect(screen.getByText(/현재는 조회 기능/)).toBeInTheDocument();
+    expect(screen.getByText(/사용 중지 설정과 실제 공급자 인증/)).toBeInTheDocument();
   });
 
   it("shows an empty filtered list and separates planned features", async () => {
@@ -164,7 +171,7 @@ describe("AI usage inventory and connection status", () => {
     );
   });
 
-  it("shows provider metadata as unverified code models, not live availability or successful authentication", async () => {
+  it("shows registered provider metadata without claiming live availability or successful authentication", async () => {
     get.mockResolvedValue(reply(snapshot()));
     renderPage();
     await screen.findByRole("heading", { name: "AI 운영 관리" });

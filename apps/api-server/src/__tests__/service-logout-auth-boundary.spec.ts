@@ -268,7 +268,8 @@ describe('3. 관리자 화면 origin 도 명시적 세션 범위를 갖는다', 
 
   it('로그아웃 컨트롤러는 범위를 본문이 아니라 origin 에서 얻는다 (소스 고정)', () => {
     const src = read('modules/auth/controllers/auth-session.controller.ts');
-    expect(src).toContain("resolveSessionServiceKey(req.get('origin'))");
+    expect(src).toContain("const origin = req.get('origin');");
+    expect(src).toContain('const originService = resolveSessionServiceKey(origin);');
     // 본문 serviceKey 를 세션 귀속으로 쓰면 남의 서비스 세션을 끊을 수 있다.
     expect(src).not.toMatch(/logout\([^)]*req\.body/);
   });

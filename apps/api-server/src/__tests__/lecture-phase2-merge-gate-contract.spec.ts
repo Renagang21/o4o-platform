@@ -1373,9 +1373,8 @@ describe('정적 계약', () => {
   });
 
   it('11차 P2-35: PharmacyHub 가이드·KPA 홈 피드에 내부 강의 안내가 남아 있지 않다', () => {
-    const home = read('services/web-kpa-society/src/pages/HomeLatestPage.tsx');
-    expect(home).not.toContain("{ key: 'course'");
-    expect(home).not.toContain("label: '강의'");
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 홈 피드 화면 자체가 제거됐다(재도입 금지).
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/pages/HomeLatestPage.tsx'))).toBe(false);
   });
   it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');

@@ -55,7 +55,10 @@ async function main(): Promise<void> {
     const holdSample: Record<string, string[]> = {};
     const ingCount: Record<string, number> = {};
     const unmatchedLabels: Record<string, number> = {};
-    const H = (code: string, s: string): void => { hold[code] = (hold[code] ?? 0) + 1; (holdSample[code] ??= []).length < 4 && holdSample[code].push(s); };
+    const H = (code: string, s: string): void => {
+      hold[code] = (hold[code] ?? 0) + 1;
+      if ((holdSample[code] ??= []).length < 4) holdSample[code].push(s);
+    };
     const funnel = { scanned: 0, inShard: 0, unpromoted: 0, notTaken: 0, noBracket: 0, singleSpec: 0, sfMatched: 0, solid: 0, ready: 0 };
     const seen = new Set<string>();
     let emitted = 0, passedSkip = 0;

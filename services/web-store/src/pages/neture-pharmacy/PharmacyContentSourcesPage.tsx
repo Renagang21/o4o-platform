@@ -4,7 +4,7 @@ import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigati
 /**
  * 이용 가능 콘텐츠 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  *
- *   GET  /api/v1/neture/pharmacy/store/contents?sf=&q=&page=&limit=  가입(active) 세미프랜차이즈의 게시 콘텐츠
+ *   GET  /api/v1/neture/pharmacy/store/contents?sf=&q=&page=&limit=  가입(active) 협업체의 게시 콘텐츠
  *   POST /api/v1/neture/pharmacy/store/contents/:id/copy              내 매장 사본(매장 소유 독립 사본) 만들기
  * 어떤 콘텐츠를 볼 수 있는지는 서버 판정이다(가입 상태 · 게시 상태). 화면은 응답을 그대로 보여준다.
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
@@ -15,9 +15,12 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
-import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, type SemiFranchiseRow } from '../../api/neturePharmacy';
+import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent } from '../../api/neturePharmacy';
 import { WORKSPACE_PATHS } from '../../config/workspace';
-import { BusinessTabs } from '../../components/BusinessTabs';
+import { StoreBusinessTabs, storeBusinessName } from './StoreBusinessTabs';
+import { useStoreBusinesses } from './useStoreBusinesses';
+import { useAuth } from '../../contexts/AuthContext';
+import { CAREPHARM_MATERIAL_TAGS } from '@o4o/shared-space-ui';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
@@ -42,9 +45,16 @@ function ContentBody({ body }: { body: string | null }) {
   return <p className="whitespace-pre-wrap text-sm text-gray-700">{body}</p>;
 }
 
+function contentEmptyText(filtered: boolean, business: string, name: string): string {
+  if (filtered) return '검색 조건에 맞는 자료가 없습니다.';
+  if (business) return `${name}가 제공한 자료가 아직 없습니다.`;
+  return '이용할 수 있는 협업체 콘텐츠가 없습니다.';
+}
+
 export default function PharmacyContentSourcesPage() {
   const { organizationId } = useUnifiedStore();
-  return <PharmacyContentSources key={organizationId} />;
+  const { user } = useAuth();
+  return <PharmacyContentSources key={`${user?.id}:${organizationId}`} />;
 }
 
 function PharmacyContentSources() {
@@ -54,33 +64,36 @@ function PharmacyContentSources() {
   const copying = useRef(false);
   const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
   const { begin: beginSelection } = useLatestRequest();
-  const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
+  const businesses = useStoreBusinesses();
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
+  const savedLibraryPath = sf ? `${libraryPath}?libraryBusiness=${encodeURIComponent(sf)}` : libraryPath;
   const selectedContentId = params.get('content') || '';
-  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); p.delete('content'); return p; }); };
-  const [qInput, setQInput] = useState('');
-  const [q, setQ] = useState('');
-  const [page, setPage] = useState(1);
+  const q = params.get('q')?.trim() || '';
+  const tag = params.get('tag')?.trim() || '';
+  const rawPage = Number(params.get('page'));
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const [qInput, setQInput] = useState(q);
+  useEffect(() => { setQInput(q); }, [q]);
+  const updateFilters = (changes: Record<string, string>) => setParams(previous => {
+    const next = new URLSearchParams(previous); next.delete('content'); next.delete('page');
+    for (const [key, value] of Object.entries(changes)) { if (value) next.set(key, value); else next.delete(key); }
+    return next;
+  });
   const [copied, setCopied] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  useEffect(() => {
-    neturePharmacyApi.listSemiFranchises()
-      .then((rows) => setFranchises(rows.filter((r) => r.membershipStatus === 'active')))
-      .catch(() => setFranchises([]));
-  }, []);
-
   const fetchList = useCallback(async () => {
     const isCurrent = beginSelection();
     invalidateCopy();
     setSelectionError(null);
     setCopyError(null); setCopied(null);
-    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
-    if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
+    const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, ...(tag ? { tag } : {}), page, limit: PAGE_SIZE });
+    if (sf && result.items.some(item => item.semiFranchiseKey !== sf)) throw new Error('Material business scope mismatch');
+    if (!selectedContentId || page !== 1 || q || tag || result.items.some(item => item.id === selectedContentId)) return result;
     // A linked material may not be on this page. The existing detail API rechecks store membership.
     try {
       const selected = await neturePharmacyApi.getContent(selectedContentId);
@@ -90,18 +103,13 @@ function PharmacyContentSources() {
       if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주세요.');
       return result;
     }
-  }, [sf, q, page, selectedContentId, invalidateCopy, beginSelection]);
+  }, [sf, q, tag, page, selectedContentId, invalidateCopy, beginSelection]);
   const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
   useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
-  const clearSelectedContent = () => {
-    setParams(previous => { const next = new URLSearchParams(previous); next.delete('content'); return next; });
-  };
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
-    clearSelectedContent();
-    setPage(1);
-    setQ(qInput.trim());
+    updateFilters({ q: qInput.trim() });
   };
 
   const copy = async (c: SemiFranchiseContent) => {
@@ -127,11 +135,11 @@ function PharmacyContentSources() {
   return (
     <PharmacyPage
       title="자료 가져오기"
-      description="가입한 세미프랜차이즈가 게시한 콘텐츠를 확인하고 내 매장 사본으로 가져와 편집할 수 있습니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다."
+      description="가입한 협업체가 게시한 콘텐츠를 확인하고 내 매장 사본으로 가져와 편집할 수 있습니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       <StoreLibraryNavigation section="sources" />
-      <BusinessTabs businesses={franchises} value={sf} onChange={key => { setSf(key); setPage(1); }} />
+      <StoreBusinessTabs businesses={businesses} value={sf} onChange={key => { setQInput(''); updateFilters({ business: key, q: '', tag: '' }); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
           <Link key={s.key} to={s.key === 'store-library' ? libraryPath : s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
@@ -142,12 +150,12 @@ function PharmacyContentSources() {
       </section>
 
       <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-gray-200">
-        <span className="-mb-px border-b-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-700">가입 세미프랜차이즈</span>
+        <span className="-mb-px border-b-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-700">가입 협업체</span>
       </div>
 
       {copied && (
         <Notice>
-          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={libraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
+          '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={savedLibraryPath} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
       {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
@@ -156,19 +164,25 @@ function PharmacyContentSources() {
         <input
           className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
           placeholder="제목 · 요약 검색"
+          aria-label="자료 제목·요약 검색"
           value={qInput}
           onChange={(e) => setQInput(e.target.value)}
         />
         <button type="submit" className={btn.secondary}>검색</button>
+        {(q || tag) && <button type="button" className={btn.secondary} onClick={() => { setQInput(''); updateFilters({ q: '', tag: '' }); }}>검색 초기화</button>}
       </form>
+      {sf === 'carepharm' && <section aria-label="CarePharm 자료 찾기" className="mb-4 space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
+        <p>주제별 자료 묶음과 운영 실무자료를 사본으로 가져온 뒤 내 자료함에서 편집하세요.</p>
+        <label>자료 태그<select aria-label="자료 태그" value={tag} onChange={event => updateFilters({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...CAREPHARM_MATERIAL_TAGS, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      </section>}
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
-          <p>이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.</p>
-          <p className="mt-1">세미프랜차이즈에 가입하면 그 세미프랜차이즈가 게시한 콘텐츠를 이용할 수 있습니다.</p>
-          <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">세미프랜차이즈 보기</Link>
+          <p>{contentEmptyText(Boolean(q || tag), sf, storeBusinessName(businesses.rows, sf))}</p>
+          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '협업체가 게시한 자료는 이 공간에 표시됩니다. 이미 가져온 사본은 내 컨텐츠에서 확인하세요.'}</p>
+          <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">협업체 보기</Link>
         </div>
       ) : (
         <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
@@ -181,6 +195,7 @@ function PharmacyContentSources() {
                     <p className="font-medium text-gray-900">{c.title}</p>
                     {c.summary && <p className="mt-1 text-sm text-gray-600">{c.summary}</p>}
                     <p className="mt-1 text-xs text-gray-500">{c.semiFranchiseName} · 게시 {formatDate(c.publishedAt)}</p>
+                    {Array.isArray(c.tags) && <div className="mt-2 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} type="button" className="min-h-11 max-w-full break-words rounded-full border px-3 text-xs" onClick={() => updateFilters({ tag: value })}>{value}</button>)}</div>}
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button className={btn.secondary} onClick={() => setExpandedId(expanded ? null : c.id)}>
@@ -204,9 +219,9 @@ function PharmacyContentSources() {
 
       {!loading && total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button className={btn.secondary} disabled={page <= 1} onClick={() => { clearSelectedContent(); setPage((p) => p - 1); }}>이전</button>
+          <button className={btn.secondary} disabled={page <= 1} onClick={() => updateFilters({ page: String(page - 1) })}>이전</button>
           <span className="text-gray-600">{page} / {totalPages}</span>
-          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => { clearSelectedContent(); setPage((p) => p + 1); }}>다음</button>
+          <button className={btn.secondary} disabled={page >= totalPages} onClick={() => updateFilters({ page: String(page + 1) })}>다음</button>
         </div>
       )}
     </PharmacyPage>

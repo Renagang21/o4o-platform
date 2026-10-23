@@ -42,6 +42,9 @@ const admin: SessionSnapshot = {
     { userId: "admin", cooperativeId: "one", role: "admin" },
   ],
 };
+function isFrameRead(path: string) {
+  return path.startsWith("/operator-inbox/") || path === "/notifications/unread-count?serviceKey=pharmcoop" || path.endsWith("/footer-legal");
+}
 function open(path: string, session = admin) {
   const client = {
     get: vi.fn(async () => ({ data: { data: null } })),
@@ -64,7 +67,9 @@ it("mounts just the selected task, follows task links and preserves legacy conte
   const nav = screen.getByRole("navigation", { name: "조합 운영 업무" });
   fireEvent.click(within(nav).getByText("조합원 관리"));
   await screen.findByText("개인 회원 심사 본문");
-  expect(within(nav).getByText("조합원 관리").getAttribute("aria-current")).toBe("page");
+  expect(
+    within(nav).getByText("조합원 관리").getAttribute("aria-current"),
+  ).toBe("page");
   expect(screen.queryByText("contents 업무 본문")).toBeNull();
   fireEvent.click(within(nav).getByText("공급 제안 심사"));
   await screen.findByText("proposals 업무 본문");
@@ -75,11 +80,17 @@ it("mounts just the selected task, follows task links and preserves legacy conte
 it("keeps the overview light and preserves content editor URLs", async () => {
   const client = open("/one/operator");
   expect(screen.getByText("검증 조합 운영")).toBeTruthy();
-  expect(client.get).not.toHaveBeenCalled();
-  expect(screen.queryByText("개인 회원 심사 본문")).toBeNull();
   expect(
     client.get.mock.calls.every(([path]) =>
-      String(path).startsWith("/home-presentation/"),
+      isFrameRead(String(path)),
+    ),
+  ).toBe(true);
+  expect(screen.queryByText("개인 회원 심사 본문")).toBeNull();
+  expect(
+    client.get.mock.calls.every(
+      ([path]) =>
+        String(path).startsWith("/home-presentation/") ||
+        isFrameRead(String(path)),
     ),
   ).toBe(true);
   cleanup();
@@ -124,10 +135,16 @@ it("keeps member-only data out of an unaffiliated home and hides operations", as
     screen.getByRole("region", { name: "최근 조합원 이야기" }),
   ).toBeTruthy();
   expect(screen.queryByRole("link", { name: "운영 화면으로 →" })).toBeNull();
-  await waitFor(() => expect(client.get).toHaveBeenCalledWith("/home-presentation/cooperative/one"));
+  await waitFor(() =>
+    expect(client.get).toHaveBeenCalledWith(
+      "/home-presentation/cooperative/one",
+    ),
+  );
   expect(
-    client.get.mock.calls.every(([path]) =>
-      String(path).startsWith("/home-presentation/"),
+    client.get.mock.calls.every(
+      ([path]) =>
+        String(path).startsWith("/home-presentation/") ||
+        isFrameRead(String(path)),
     ),
   ).toBe(true);
 });

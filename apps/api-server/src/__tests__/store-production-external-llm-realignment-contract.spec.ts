@@ -34,19 +34,19 @@ const VIEW_PD = 'packages/store-ui-core/src/components/product-descriptions/Stor
 /** WO 2 CHECK 기준 TARGET_SPECIFIC 13 (fresh census 2026-09-18 — drift 0) */
 const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILINGUAL' | 'QR', string[]> = {
   BLOG: [
-    'services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx',
+    'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
   ],
   POP: [
-    'services/web-kpa-society/src/pages/pharmacy/PharmacyPopPage.tsx',
+    'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
   ],
   PRODUCT_DESCRIPTION: [
-    'services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx',
-    'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
+    'services/web-store/src/pages/pharmacy/StoreLocalProductsPage.tsx',
+    'services/web-store/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
   ],
   MULTILINGUAL: [
-    'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
+    'services/web-store/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
   ],
-  QR: ['services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx'],
+  QR: ['services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx'],
 };
 const ALL_TARGETS = Object.values(TARGET_SPECIFIC).flat();
 const TASK_BY_GROUP: Record<keyof typeof TARGET_SPECIFIC, string> = {

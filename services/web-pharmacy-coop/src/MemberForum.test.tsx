@@ -30,6 +30,7 @@ function client() {
     delete: vi.fn(),
   };
 }
+vi.mock('@o4o/shared-space-ui', async importOriginal => ({ ...await importOriginal<typeof import('@o4o/shared-space-ui')>(), ForumWriteForm: (p: { submitLabel: string; onSubmit: (v: unknown) => void }) => <button onClick={() => p.onSubmit({ title: '검토한 조합 글', editorHtml: '<p>확인한 내용</p>' })}>{p.submitLabel}</button> }));
 afterEach(cleanup);
 const open = (
   api: ReturnType<typeof client>,
@@ -178,4 +179,16 @@ describe("cooperative business forum", () => {
     await screen.findByText("안전한 본문");
     expect(view.container.querySelector("script")).toBeNull();
   });
+});
+
+it('조합 회원 자신의 비공개 초안은 명시적으로 검토·게시한다', async () => {
+  const api = client();
+  const original = api.get.getMockImplementation()!;
+  api.get.mockImplementation(async path => path.endsWith('/posts/draft') ? { data: { data: { id: 'draft', title: '초안', content: '본문', status: 'draft', authorId: 'member' } } } : original(path));
+  api.put.mockResolvedValue({ data: { success: true } });
+  render(<MemoryRouter initialEntries={['/one/community?edit=draft']}><MemberForum client={api} businessKey="coop-one" currentUserId="member" canManage={false} /></MemoryRouter>);
+  const button = await screen.findByRole('button', { name: '검토한 초안 게시' });
+  expect(api.put).not.toHaveBeenCalled(); fireEvent.click(button);
+  await waitFor(() => expect(api.put).toHaveBeenCalledWith(`${root}/forum/posts/draft`, { title: '검토한 조합 글', content: '<p>확인한 내용</p>', status: 'publish' }));
+  expect(api.post).not.toHaveBeenCalled();
 });

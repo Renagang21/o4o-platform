@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies } from './fixtures/business-policies.js';
 import { OrganizationStore } from '../../store-core/entities/organization-store.entity.js';
 import { ServiceProduct } from '../../../routes/kpa/entities/service-product.entity.js';
 import { OrganizationProductListing } from '../../store-core/entities/organization-product-listing.entity.js';
@@ -139,7 +140,7 @@ integration('supplier → store → payment → shipment → settlement (real Po
     const franchises = new SemiFranchiseService(ds);
     await franchises.assignOperator('pharmacy', operatorId, operatorId);
     const franchise = (await franchises.getByKey('pharmacy'))!;
-    const joined = await franchises.apply(organizationId, ownerId, 'pharmacy');
+    const joined = await franchises.apply(organizationId, ownerId, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
     await franchises.decideMembership(franchise, operatorId, joined.id, 'approve');
   });
 

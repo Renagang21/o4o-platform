@@ -9,6 +9,7 @@ export type MembershipStatus =
 export interface Cooperative {
   /** Explicit backend business binding, never inferred from the display slug or personal membership. */
   businessKey?: string;
+  policyScope?: string;
   id: string;
   slug: string;
   name: string;
@@ -96,6 +97,8 @@ export function membershipIdentity(
 const reservedSlugs = new Set([
   "cooperatives",
   "about",
+        "contact",
+        "notifications",
   "operator",
   "preview",
   "login",

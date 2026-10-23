@@ -38,7 +38,8 @@ describe('DirectoryShell', () => {
     expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('https://neture.co.kr/signup');
     const nav = screen.getByRole('navigation', { name: '분회 서비스' });
     const hrefs = Array.from(nav.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/', '/join', '/me']);
+    expect(hrefs).toEqual(['/', '/join', '/me', 'https://neture.co.kr/contact?service=kpa-branch']);
+    expect(screen.queryByRole('link', { name: '문의 관리' })).toBeNull();
     expect(screen.getByTestId('directory-footer')).toBeTruthy();
   });
 

@@ -99,10 +99,6 @@ export default function QrLandingPage() {
       return;
     }
 
-    if (landingType === 'page' && landingTargetId) {
-      navigate(`/content/${landingTargetId}`);
-      return;
-    }
   };
 
   // ── Loading ──
@@ -167,7 +163,8 @@ export default function QrLandingPage() {
 
   // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠는 공개 landing 에서 본문을 바로 렌더한다
   //   (앱 내부 /content/:id 인증 화면으로 보내지 않음). content_hub 콘텐츠만 inline 데이터 보유 —
-  //   그 외(blog/cms/pop ref) pageContent=null 이면 아래 카드+버튼 redirect 폴백.
+  //   그 외(blog/cms/pop ref) pageContent=null 이면 아래 카드에 미공개 안내만 둔다.
+  //   WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 /content/:id 화면이 삭제돼 redirect 폴백은 없다.
   if (data.landingType === 'page' && data.pageContent) {
     const pc = data.pageContent;
     return (
@@ -219,7 +216,8 @@ export default function QrLandingPage() {
   }
 
   const config = LANDING_TYPE_CONFIG[data.landingType] || LANDING_TYPE_CONFIG.link;
-  const hasAction = !!data.landingTargetId || (data.landingType === 'tablet' && !!data.storeSlug);
+  const pageUnavailable = data.landingType === 'page' && !data.pageContent;
+  const hasAction = !pageUnavailable && (!!data.landingTargetId || (data.landingType === 'tablet' && !!data.storeSlug));
 
   return (
     <div style={styles.page}>
@@ -258,6 +256,10 @@ export default function QrLandingPage() {
                 <ContentRenderer html={data.productDetails.descriptionHtml} variant="product-detail" />
               )}
             </div>
+          )}
+
+          {pageUnavailable && (
+            <p style={styles.description}>이 콘텐츠는 현재 공개되어 있지 않습니다. 매장에 문의해 주세요.</p>
           )}
 
           {/* Action Button */}
