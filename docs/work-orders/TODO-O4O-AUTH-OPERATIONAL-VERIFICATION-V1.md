@@ -29,7 +29,7 @@
 - [x] 분산 시도 제한의 현행 저장소와 선택지·작업 범위를 구체화(설계 입력, 구현 전).
 - [x] 2026-11-13 KST 정책 게시 전제와 재동의 검증 절차 재확인. 시행 전 게시하지 않음.
 - [x] 이메일 선택 입력·은퇴 테이블·미사용 데이터 정리의 선행 조사와 별도 실행 경계 정리.
-- [ ] 코드/문서 정합·검증 결과·남은 조건을 기록하고 commit·명시 branch push.
+- [x] 코드/문서 정합·검증 결과·남은 조건을 기록하고 commit·명시 branch push(아래 결과).
 
 ## 조사 후 보완과 검증 경계
 
@@ -129,7 +129,21 @@ pnpm exec playwright test --config=e2e/auth-runtime/playwright.config.ts
 lint 현재 오류는 0이나 기존 ratchet script의 허용 baseline은46이다. 이 CI 기준 정비는 인증
 운영 검증과 별도 infrastructure 범위로 남기고 이번 변경으로 기준이나 workflow를 수정하지 않았다.
 
+## push 결과와 재개 지점
+
+- repository: `Renagang21/o4o-platform`
+- branch: `wo/auth-operational-verification-v1`
+- 소스·실행 기록 commit: `fdcfe7ed9b47f298d23f2c94dd3f386e333440df`
+- 명시 branch push 후 `git ls-remote --heads`로 원격 SHA 일치를 확인했다.
+- 이 push 완료 기록은 같은 branch의 후속 문서 commit으로 보존한다.
+- 검증 기준 main은 push 직전 fetch에서도 `e20c00f453`로 같았다. 자동 merge/rebase 없음.
+- PR·원격 CI/Codex·main 병합은 미실행이다. 로컬 검증 성공을 integration-ready 판정으로 확대하지 않는다.
+- 공개 운영 E2E는 기존64 PASS + 수정 후 신규16 PASS의 중복 없는80조건이다. 첫 신규 실패4와
+  재검증 이력은 위에 남겼다. 실제 OAuth/일반 운영 상태 계정/SMTP 실수신은 미실행이다.
+- 다음 재개는 최신 테스트 계정 출처·동시 운영 작업 여부·담당 운영자/수신함과 생성 데이터
+  정리 경로를 확인하는 단계다. 시간 조건의 정책 게시와 새 schema 작업을 자동 실행하지 않는다.
+
 문서 정합: 오래된 잔여 계획의 미배포·E2E 드리프트와 최신 완료 기록을 구분한다. 과거 기록·정본 색인은 재작성하지 않는다.
 
-WORKTREE_DISPOSITION: KEEP — `wo/auth-operational-verification-v1` / `/workspace/o4o-wt/auth-operational-verification-v1`, 검증·후속 수정 진행 중.
+WORKTREE_DISPOSITION: KEEP — `wo/auth-operational-verification-v1` / `/workspace/o4o-wt/auth-operational-verification-v1`, source push 완료·실계정 검증 및 통합 전 후속 수정 대기. 기준 checkout `work`/`c7f2c29eb4`와 다른 세션 worktree는 변경하지 않았다.
 DEPLOYMENT: NOT_APPLICABLE — 테스트·로컬 fixture runner·검증 기록만 변경. 운영 runtime·schema·dependency·workflow 변경 없음.
