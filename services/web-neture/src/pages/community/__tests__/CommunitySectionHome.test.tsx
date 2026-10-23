@@ -216,4 +216,37 @@ describe("community section home", () => {
       expect(api.pinForum).toHaveBeenCalledWith("old-post", true),
     );
   });
+  it("refreshes collected news without discarding an in-progress editorial draft", async () => {
+    api.manage.mockResolvedValue({ items: [], hasNext: false });
+    let finish!: (value: any) => void;
+    api.collect.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    mount(<Management />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "약업계 주요 소식", exact: true }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText("오늘의 기사 수집").hasAttribute("disabled"),
+      ).toBe(false),
+    );
+    fireEvent.click(screen.getByText("오늘의 기사 수집"));
+    fireEvent.change(screen.getByLabelText("제목"), {
+      target: { value: "편집 중인 제목" },
+    });
+    finish({
+      day: "2026-10-23",
+      state: "done",
+      sources: [{ id: "kpanews", added: 2, status: "ok" }],
+    });
+    await screen.findByText("약사공론: 신규 2개");
+    await waitFor(() => expect(api.manage).toHaveBeenCalledTimes(3));
+    expect((screen.getByLabelText("제목") as HTMLInputElement).value).toBe(
+      "편집 중인 제목",
+    );
+  });
 });

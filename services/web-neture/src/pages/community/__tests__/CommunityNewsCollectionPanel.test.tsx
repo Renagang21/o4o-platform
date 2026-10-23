@@ -51,3 +51,25 @@ it("shows an explicit fetch error without claiming there are no articles", async
   expect(screen.queryByText("신규 0개")).toBeNull();
   expect(api.collect).not.toHaveBeenCalled();
 });
+
+it("does not refresh a different workspace after the pending panel unmounts", async () => {
+  let finish!: (value: any) => void;
+  api.collect.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const changed = vi.fn();
+  const view = render(<CommunityNewsCollectionPanel onCollected={changed} />);
+  await waitFor(() =>
+    expect(screen.getByText("오늘의 기사 수집").hasAttribute("disabled")).toBe(
+      false,
+    ),
+  );
+  fireEvent.click(screen.getByText("오늘의 기사 수집"));
+  view.unmount();
+  finish({ day: "2026-10-23", state: "done", sources: [] });
+  await waitFor(() => expect(api.collect).toHaveBeenCalledTimes(1));
+  expect(changed).not.toHaveBeenCalled();
+});

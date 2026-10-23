@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { homeApi, type NewsCollection } from "./communityHomeApi";
 const names: Record<string, string> = {
   kpanews: "약사공론",
@@ -11,7 +11,9 @@ export function CommunityNewsCollectionPanel({
   const [value, setValue] = useState<NewsCollection | null>(null),
     [busy, setBusy] = useState(true),
     [error, setError] = useState("");
+  const mounted = useRef(false);
   useEffect(() => {
+    mounted.current = true;
     let active = true;
     homeApi
       .collection()
@@ -26,20 +28,24 @@ export function CommunityNewsCollectionPanel({
       });
     return () => {
       active = false;
+      mounted.current = false;
     };
   }, []);
   const load = async (run: boolean) => {
     setBusy(true);
     setError("");
     try {
-      setValue(await (run ? homeApi.collect() : homeApi.collection()));
-      if (run) onCollected();
+      const result = await (run ? homeApi.collect() : homeApi.collection());
+      if (!mounted.current) return;
+      setValue(result);
+      if (result && result.state !== "pending") onCollected();
     } catch {
-      setError(
-        "수집 결과를 확인하지 못했습니다. 결과 다시 확인을 눌러 주세요.",
-      );
+      if (mounted.current)
+        setError(
+          "수집 결과를 확인하지 못했습니다. 결과 다시 확인을 눌러 주세요.",
+        );
     } finally {
-      setBusy(false);
+      if (mounted.current) setBusy(false);
     }
   };
   return (

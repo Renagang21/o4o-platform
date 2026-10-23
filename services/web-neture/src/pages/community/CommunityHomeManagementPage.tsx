@@ -1,5 +1,5 @@
 import { CommunityNewsCollectionPanel } from "./CommunityNewsCollectionPanel";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CommunityNewsReviewPanel } from "./CommunityNewsReviewPanel";
 import { Link } from "react-router-dom";
 import {
@@ -71,7 +71,9 @@ export default function CommunityHomeManagementPage() {
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [version, setVersion] = useState(0);
+  const listScope = useRef("");
   useEffect(() => {
+    listScope.current = `${kind}:${page}:${forumSearch}`;
     let active = true;
     setLoading(true);
     setItems([]);
@@ -104,6 +106,21 @@ export default function CommunityHomeManagementPage() {
       active = false;
     };
   }, [kind, version, page, forumSearch]);
+  const refreshCollectedNews = async () => {
+    const scope = `${kind}:${page}:${forumSearch}`;
+    if (kind !== "news" || listScope.current !== scope) return;
+    try {
+      const data = await homeApi.manage("news", page);
+      if (listScope.current !== scope) return;
+      setItems(data.items);
+      setHasNext(data.hasNext);
+    } catch {
+      if (listScope.current === scope)
+        setError(
+          "수집은 끝났지만 등록 목록을 갱신하지 못했습니다. 뉴스 탭을 다시 열어 주세요.",
+        );
+    }
+  };
   const save = async () => {
     setBusy(true);
     setError("");
@@ -244,7 +261,7 @@ export default function CommunityHomeManagementPage() {
       )}
       {kind === "news" && (
         <CommunityNewsCollectionPanel
-          onCollected={() => setVersion((v) => v + 1)}
+          onCollected={() => void refreshCollectedNews()}
         />
       )}
       {kind === "news" && (
