@@ -77,3 +77,16 @@ it('uses a bounded plain-text translation prompt and rejects malformed or markup
   }
   expect(consultationTranslationExtension.parse('{"translation":"Plain words"}')).toEqual({ translation: 'Plain words' });
 });
+
+it('keeps Korean local and adds typed counter staff guidance without professional escalation', async () => {
+  const input = { mode: 'counter-staff', language: 'ko', direction: 'to-customer', text: 'Original guidance' };
+  const output = await service.translate('staff', 'store', input);
+  expect(output.translation).toBe('Original guidance');
+  expect(translate).not.toHaveBeenCalled(); expect(professional).not.toHaveBeenCalled();
+  features = [];
+  await expect(service.translate('staff', 'store', input)).rejects.toMatchObject({ code: 'SERVICE_FEATURE_REQUIRED' });
+});
+it('enforces fixed floor-staff phrases for Korean as well as foreign languages', async () => {
+  await expect(service.translate('staff', 'store', { mode: 'floor-staff', language: 'ko', direction: 'to-customer', text: 'Free-form outgoing' })).rejects.toMatchObject({ code: 'STAFF_PHRASE_REQUIRED' });
+  expect(translate).not.toHaveBeenCalled();
+});

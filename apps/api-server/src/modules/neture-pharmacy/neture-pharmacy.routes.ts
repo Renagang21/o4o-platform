@@ -1,3 +1,5 @@
+import { ConsultationGuidanceService } from './services/consultation-guidance.js';
+import { createConsultationGuidanceSelector } from './services/consultation-guidance.extension.js';
 import { BusinessHomeShowcaseService } from './services/business-home-showcase.service.js';
 import { cooperativeManagementRoutes } from './cooperative-management.routes.js';
 import { cooperativeRole } from './services/cooperative-management.service.js';
@@ -8,6 +10,8 @@ import { PharmacyServicePolicyService } from './services/service-feature-policy.
 import { saveStaffFeatures } from './services/staff-feature-permissions.js';
 import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './services/consultation-professional.js';
 import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
+import { ConsultationStationService } from './services/consultation-stations.js';
+import { consultationWorkspaceRoutes } from './consultation-workspace.routes.js';
 import { createConsultationTranslator } from './services/consultation-translator.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
@@ -133,9 +137,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   }));
   router.use('/cooperative-management', cooperativeManagementRoutes(dataSource));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
-  const consultation = new MultilingualConsultationService(dataSource, consultationDependencies ?? {
-    translate: createConsultationTranslator(dataSource), professional: (userId, organizationId) => consultationProfessionalConfirmed(dataSource, userId, organizationId),
-  });
+  const consultationDeps = consultationDependencies ?? {
+    translate: createConsultationTranslator(dataSource), professional: (userId:string, organizationId:string) => consultationProfessionalConfirmed(dataSource, userId, organizationId),
+  };
+  const consultation = new MultilingualConsultationService(dataSource,consultationDeps);
   const proposals = new SupplyProposalService(dataSource);
   const supplierContents = new SupplierBusinessContentService(dataSource);
   const events = new SemiFranchiseEventService(dataSource);
@@ -173,6 +178,18 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const businessOperator = [requireAuth, cooperativeBusinessGuard];
   const businessAdmin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
+  const stationProducts = new StoreStaffSupportService(dataSource);
+  const guidance=new ConsultationGuidanceService(dataSource,
+    (actor,org,mode)=>consultation.requireMode(actor,org,mode),
+    async(actor,org)=>{await serviceFeatures.require(actor,org,'store-staff-support');},
+    consultationDependencies?.selectGuidance ?? createConsultationGuidanceSelector(dataSource),consultationDeps.translate);
+  const stations = new ConsultationStationService(dataSource,
+    (actor,organizationId,mode)=>consultation.requireMode(actor,organizationId,mode),
+    async (actor,organizationId,input)=>{
+      await serviceFeatures.require(actor,organizationId,'store-staff-support');
+      return stationProducts.product(organizationId,input.productKind,input.productId);
+    },(actor,org,proof)=>guidance.verify(actor,org,proof));
+  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance));
   const featurePolicyAdmin: RequestHandler = (req, res, next) => {
     if (req.body?.serviceFeatures === undefined) return next();
     return (requireRole(['platform:super_admin']) as RequestHandler)(req, res, next);
@@ -404,7 +421,11 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
     message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주세요.' } });
   router.post('/pharmacy/multilingual-consultation/translate', ...store, consultationLimiter, handle(async (req, res) => {
-    res.setHeader('Cache-Control', 'private, no-store'); return consultation.translate(req.user!.id, org(req), req.body ?? {});
+    res.setHeader('Cache-Control', 'private, no-store');
+    const input = req.body ?? {};
+    if (input.stationId !== undefined) await stations.validate(req.user!.id,org(req),input.stationId,input.epoch);
+    const result = await consultation.translate(req.user!.id, org(req), input);
+    return input.stationId === undefined ? result : stations.recordTranslation(req.user!.id,org(req),input.stationId,input.epoch,result);
   }));
   router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);

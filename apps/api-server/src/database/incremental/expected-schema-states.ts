@@ -320,6 +320,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'AddContactInquiryOrganization1792540800000', fingerprint: '8ed889abb7221d1f8fda81b8dd89b9b2bd473806011d0ee8e484eed3c91f9956', fingerprintLineCount: 6776 },
   // Isolated PostgreSQL 16: every prior canonical prefix matched; empty down/up restores previous state.
   { appliedThrough: 'CreateExternalAiConnections1792635132325', fingerprint: '4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3', fingerprintLineCount: 6838 },
+  // Isolated PostgreSQL 15: all prior prefixes and empty down/up verified.
+  { appliedThrough: 'CreateStoreConsultationStations1792815861315', fingerprint: 'd9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb', fingerprintLineCount: 6869 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

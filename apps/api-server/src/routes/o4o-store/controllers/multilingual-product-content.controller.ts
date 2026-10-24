@@ -1,3 +1,4 @@
+import { pickFallbackPage } from "../utils/multilingual-locale.js";
 import { requirePharmacyFeature } from '../../../modules/neture-pharmacy/service-feature-access.js';
 /**
  * Multilingual Product Content Controller
@@ -145,20 +146,6 @@ async function loadGroupWithPages(
   return { ...groupRows[0], pages };
 }
 
-function pickFallbackPage(pages: any[], requestedLocale: Locale | null, defaultLocale: string): any | null {
-  if (requestedLocale) {
-    const requested = pages.find((p) => p.locale === requestedLocale && p.status === 'published');
-    if (requested) return { ...requested, resolvedLocale: requested.locale, fallbackReason: null };
-  }
-  const english = pages.find((p) => p.locale === 'en' && p.status === 'published');
-  if (english) return { ...english, resolvedLocale: english.locale, fallbackReason: 'requested_locale_missing' };
-  const defaultPage = pages.find((p) => p.locale === defaultLocale && p.status === 'published');
-  if (defaultPage) return { ...defaultPage, resolvedLocale: defaultPage.locale, fallbackReason: 'requested_locale_missing' };
-  const korean = pages.find((p) => p.locale === 'ko' && p.status === 'published');
-  if (korean) return { ...korean, resolvedLocale: korean.locale, fallbackReason: 'requested_locale_missing' };
-  return null;
-}
-
 // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
 // Hard-to-guess url-safe key for the unauthenticated public/QR landing.
 function generatePublicKey(): string {
@@ -238,7 +225,7 @@ export function createMultilingualProductContentController(
       }
 
       const requested = isOneOf(req.query.locale, LOCALES) ? (req.query.locale as Locale) : null;
-      const page = pickFallbackPage(pages, requested, group.defaultLocale);
+      const page = pickFallbackPage<any>(pages, requested, group.defaultLocale);
 
       res.json({
         success: true,

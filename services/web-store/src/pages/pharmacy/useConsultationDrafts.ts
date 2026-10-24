@@ -17,5 +17,12 @@ export function useConsultationDrafts<T>(direction: ConsultationDirection) {
     ...previous, [direction]: { ...previous[direction], result },
   })), [direction]);
   const clearDrafts = useCallback(() => setDrafts(emptyDrafts<T>()), []);
-  return { ...drafts[direction], setText, setResult, clearDrafts };
+  const receiveText = useCallback((target: ConsultationDirection, text: string) => setDrafts(previous => ({
+    ...previous, [target]: { text, result: null },
+  })), []);
+  const clearResults = useCallback(() => setDrafts(previous => ({
+    'to-customer': { ...previous['to-customer'], result: null },
+    'to-staff': { ...previous['to-staff'], result: null },
+  })), []);
+  return { ...drafts[direction], incomingText: drafts['to-staff'].text, clearResults, setText, setResult, clearDrafts, receiveText };
 }
