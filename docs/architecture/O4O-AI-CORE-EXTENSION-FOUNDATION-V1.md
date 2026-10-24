@@ -249,7 +249,7 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 ## 13. 전체 AI 업무 Core + Extension 재정비 준비 (2026-10-24)
 
-[정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)와 [업무 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)는 main `7f3d783cc2bac349679639db5d7afc232388d660`의 코드·문서에 사용자 업무 1~11 및 추가 업무를 대조한 구현 전 준비다. 이번 변경은 문서만이며 새로운 runtime 계약·권한·모델/가격 정책·메뉴·운영 설정을 적용하지 않는다. §11/§12의 완료/운영 기록은 당시 증거로 유지한다.
+[정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)와 [업무 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)는 main `7f3d783cc2`에서 시작해 최종 점검 중 `355d77e861`까지 재대조한 구현 전 준비다. 사용자 업무 1~11 및 추가 업무를 코드·문서에 연결했다. 이번 변경은 문서만이며 새로운 runtime 계약·권한·모델/가격 정책·메뉴·운영 설정을 적용하지 않는다. §11/§12의 완료/운영 기록은 당시 증거로 유지한다.
 
 기존 `AiBusinessExtension`·`runAiExtension`·host authorize/record·모델 관리·회계/quota·편집기·외부 AI adapter를 재사용한다. 상품 지식/등록, 콘텐츠 제작/재사용, 현황/운영, 자료 기반 지원, 교육/커뮤니티, 개인 자동화는 정비할 업무 묶음이며 새 기반/패키지 개수를 뜻하지 않는다.
 
@@ -257,5 +257,6 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 - 첫 후속 적용은 기존 현황 설명 Extension에 매장/공급자의 허용 지표를 연결하는 것으로 계획한다. 매장 도우미의 화면 문맥·입력과 실제 지표 조회를 구분하며 관리자 Copilot API의 guard를 일반 사용자에게 낮추지 않는다.
 - 자료 버전·출처·집계 시각은 우선 업무 입력/host에서 검증한다. Core 필드·상태 변경 도구·공통 저장소를 선제적으로 추가하지 않는다. 현재 실행기는 read/draft이며 새 실행 도구는 별도 수용 기준이 필요하다.
 - 사용처별 모델 지정과 비용/한도·중지 연결은 별도 검증한다. 최근 뉴스·상담·전문 호출과 사용처 목록의 대응, 약국 사업/분회/협력 모임의 업무 문맥 정합은 TODO에 남겼다. 전체 호출의 이관 완료로 해석하지 않는다.
+- 상품 DB는 기존 [상품 정정 작업공간](../guides/products/O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md)을 재사용하고 AI 보완 초안과 공식 반영을 분리한다. [전문 정보 원칙](../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)의 목적별 구성·상품 사실/전문 참고정보·근거 구분을 유지한다. 전문 주제를 일괄 제외하거나 기존 QR 자료를 공식 DB로 자동 채택하지 않는다.
 
 후속 순서는 공통 정합/첫 적용 → 상품·콘텐츠 → 운영·협력 모임 → 상담·교육·자동화 정합이다. 각 단계는 전체 소비처·권한·원본/초안 소유·비용·오류 회귀를 확인한 뒤 전환한다. 실제 구현·main 통합·실계정 및 운영 검증은 후속 실행 결과로만 완료 표시한다.

@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
 > **근거 WO/IR**: [전체 정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
-> **조사 기준**: main `7f3d783cc2bac349679639db5d7afc232388d660`
+> **조사 기준**: main `355d77e861` (초기 `7f3d783cc2` 이후 PR #800의 상품 정정·전문 정보 원칙을 재대조)
 
 ## 1. 조사 범위와 판정
 
@@ -19,7 +19,7 @@
 
 | 업무 | 현재 구현과 경계 | 공통화·확장 대상 | 대상 자료·권한·결과 |
 |---|---|---|---|
-| 1. 상품 DB 관리 | [OCR][ocr], [태그][tag], [상품 콘텐츠][product] 호출. [검색/추천][recommend] 자체는 태그·DB 기반 | 상품명·규격 정규화, 중복 후보, 원문과 등록 정보의 누락·불일치 제안 | 기존 Master/Offer 권한. 전역 초안과 원본을 비교하고 정본 수정은 기존 확정 절차 |
+| 1. 상품 DB 관리 | [OCR][ocr], [태그][tag], [상품 콘텐츠][product] 호출. [상품 정정 작업공간][correction]은 기준 버전·대상 선택·보완 초안·정기 점검의 수동 운영 기반. 검색/추천 자체는 태그·DB 기반 | 기존 정정 작업에 상품명·규격 정규화, 중복 후보, 원문/전문 근거별 누락·불일치 제안 연결 | 기존 Master/Offer 권한. 정정 작업공간의 super_admin·버전·원문 fingerprint 유지. 보완 초안과 공식 DB 반영 분리 |
 | 2. 내 매장 콘텐츠 제작 | [공통 편집 생성][editor], [번역][translation], [외부 연결][external] | 자료 기반 정리·번역·용도 변환·누락 검사. 사용자 외부 AI 초안의 편집·재사용 | 매장 소유 자료·버전·언어·대상. 제작 자료/초안 저장 후 미리보기·검수·게시 분리 |
 | 3. 내 매장 대시보드 | [AI 도우미][store-ai]는 화면명·입력·최근 대화 전달. [홈 집계][store-overview]는 별도이며 실패를 null/unavailable로 보존 | 기존 집계에 근거한 현황·할 일 설명 | 선택 매장·현재 actor의 허용 집계. 원인/기간 미확인 표시, 상세 업무 링크 |
 | 4. 공급자 상품 등록 | [HTML 등록 보조][import-ui]는 파서. [등록 공통 서비스][import-service]에 AI 상품 콘텐츠 생성 연결 | 파일/이미지 필드 추출, Master 매칭, 규격·이미지·유통조건 누락 검사 | 자기 공급자 후보·원본·필드별 출처. 검토한 값을 기존 등록 API로 저장 |
@@ -35,7 +35,7 @@
 
 | 업무 | 확인한 기반 | 정비·확장 후보 |
 |---|---|---|
-| 고객 다국어 상담 | [상담 번역][consult-translation], [공개 상품 문단 선택 Extension][guidance] | 게시 자료 근거·주의사항 보존·직원 인계. 환자별 진단/처방 생성은 범위 밖 |
+| 고객 다국어 상담 | [상담 번역][consult-translation], [공개 상품 문단 선택 Extension][guidance] | 게시 자료 근거·주의사항 보존·직원 인계. 전문 정보/판단 지원과 전문인이 확정한 개인별 판단을 구분 |
 | 직원 업무·교육 | [상품/진열 위치·직원 안내 자료][staff] 검색. 검색 자체는 AI 아님 | 내부 자료 질의·교육 안내. 고객 공개 자료와 별도 allowlist |
 | 상품 탐색·B2B 구매 준비 | [태그 추천][recommend]·기존 상품/거래 서비스 | 규격·공급조건 비교, 문의·발주 준비 초안. 소비자 결제 기능 복구 없음 |
 | 강의·학습 지원 | [LMS Extension 실행][lms], 편집기 강의 생성 | 퀴즈 해설·과제 피드백·복습 안내. 성적·수강 자격 확정 분리 |
@@ -50,7 +50,7 @@
 ## 4. 코드와 문서 대조로 보완한 항목
 
 1. **새 Core를 만들 필요가 없다.** [실행 계약][contract]에는 context·materials·funding·authorize/record가 있고 [runAiExtension][runner]은 read/draft를 실행한다. 자료 버전·출처·집계 시각은 먼저 업무 입력/서버 조립에 담고, 공통 필드 추가는 실제 복수 소비처의 필요를 확인한 뒤 판단한다.
-2. **현재 서비스 설명이 일부 어긋난다.** [카탈로그][service-catalog]의 `kpa-society`는 약국 사업자 매장 운영 서비스다. [서비스 AI][service-query]의 DOMAIN_RULES는 약사회 조직·회원 업무를 설명한다. 현재 업무 의미·카탈로그 소비처·기존 테스트를 함께 대조할 실행 TODO가 필요하다.
+2. **현재 서비스 설명이 일부 어긋난다.** [카탈로그][service-catalog]의 `kpa-society`는 약국 사업자 매장 운영 서비스다. [서비스 AI][service-query]의 DOMAIN_RULES는 여전히 약사회 조직·회원 업무를 설명한다. PR #800에서 전문 정보 일괄 제한 문장은 제거됐지만 업무 의미 차이는 남아 있다. 기존 테스트와 대조하되 제거된 전문 정보 제한을 복구하지 않는다.
 3. **매장·공급자 첫 적용은 기존 지표부터 사용한다.** 매장 홈의 홍보 성과·보관 자료·진열 상품·가용한 업무 신호, 공급자의 KPI·상품 성과·유통·추세가 후보 자료다. 실제 지표 조회가 없는 기존 [StoreAiInsight 클래스][store-insight]를 새 대시보드로 재활성화하지 않는다. 관련 생성 소비처는 이번 추적에서 확인하지 못했다.
 4. **관리자 요약 API를 일반 사용자에게 열 수 없다.** [현재 guard][copilot-controller]를 유지하고 각 도메인의 기존 접근 판정 아래 host를 조립한다. 클라이언트가 보내는 metrics·organizationId·role은 자료 조회 권한의 근거가 아니다.
 5. **모델 관리와 회계 연결은 다르다.** [executeManagedAi][runtime-models]는 관리자 모델 선택 후 execute를 호출한다. [회계 실행][accounting]·quota 경유 여부는 개별 경로에서 확인한다. 목록의 모델 등록이 모든 transport·Vision·TTS의 실행/중지/비용 지원을 뜻하지 않는다.
@@ -58,6 +58,7 @@
 7. **새 호출을 관리 목록과 대조한다.** 뉴스와 상담 문단 선택은 카탈로그의 독립 사용처로 확인되지 않는다. 상담 문단 선택은 PRODUCT_CONTENT 정책을 재사용하고 뉴스는 SERVICE_QUERY 회계를 사용한다. 기존 scope를 복제하지 않고 usage·Extension·scope의 대응을 후속 확정한다.
 8. **외부 AI 연결은 별도 기존 기반이다.** [외부 연결 TODO][external-todo]의 MCP/OAuth·adapter·권한·초안 저장을 그대로 활용한다. 사용자 외부 AI의 대화·토큰·구독 비용과 O4O 내부 API 사용량을 합치지 않는다. 실제 외부 앱 승인·연결 활성·운영 인증 성공은 소스 조사와 별도다.
 9. **공통화는 전체 소비처를 기준으로 한다.** 상품 지식·콘텐츠·현황 설명·자료 기반 지원·교육/커뮤니티·개인 자동화의 6묶음은 작업 분류다. 6개 새 패키지·범용 prompt·계층 추가를 미리 확정하지 않는다.
+10. **동시 병합된 상품 정비를 재사용한다.** 최종 점검 중 PR #800이 병합되어 해당 main을 작업 branch에 정상 merge하고 관련 코드/문서를 재대조했다. [수동 정기 운영][correction-todo]은 예약 AI·자동 수정이 아니며 별도 정정 저장소를 만들 필요가 없다. [전문 판단·AI 활용 원칙][professional]의 professional/ai-support/consumer-qr 목적, 상품 사실/전문 참고정보의 출처·확인일·검수 상태를 유지한다. 전문 주제를 일괄 제외하지 않고 제안과 확정된 개인별 판단을 구분한다. 기존 QR 자료의 공식 DB 채택은 판정 보류다.
 
 ## 5. 문서·동시 작업의 연결
 
@@ -65,6 +66,7 @@
 - [사용처 제어 설계](../design/DESIGN-O4O-AI-USAGE-CONTROL-V1.md): DRAFT인 전체 중지/회계/설정 제안. 모델 CRUD의 구현 완료와 설계 전체 완료를 구분한다.
 - [콘텐츠 운영 원칙](../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md): 내부 AI 선택적 보조·외부 AI 직접 연결·기존 공급자 창작 경계. O4O 비용 부담 금지로 해석하지 않는다.
 - [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md): 서비스별 편의 추상화보다 전체 소비처·권한·저장 책임을 우선한다.
+- [상품 정정 작업공간][correction]·[상품 관리 계획](../guides/products/O4O-ADMIN-PRODUCT-MANAGEMENT-PLAN-V1.md)·[전문 정보 원칙][professional]: 관리자 수동 작업·보완 초안·확정 반영 분리 및 목적별 근거 전달의 기존 기반.
 - [운영자 일상 업무 TODO](../work-orders/TODO-O4O-OPERATOR-DAILY-WORKFLOW-COMPLETION-V1.md), 상담·협력 모임·Assistant 기존 작업: 구현 시작 시 최신 main/인계 HEAD·문서 상태·소유 경로를 다시 확인한다. 과거 TODO만 보고 미완료 또는 구현 가능으로 판단하지 않는다.
 
 ## 6. 이번 조사 이후의 판정
@@ -111,3 +113,6 @@
 [accounting]: ../../apps/api-server/src/modules/ai-policy/ai-accounted-execution.ts
 [model-todo]: ../work-orders/TODO-O4O-AI-MODEL-DELETE-USABILITY-V1.md
 [external-todo]: ../work-orders/TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md
+[correction]: ../guides/products/O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md
+[correction-todo]: ../work-orders/TODO-O4O-PRODUCT-MANAGEMENT-MANUAL-OPERATIONS-V1.md
+[professional]: ../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md
