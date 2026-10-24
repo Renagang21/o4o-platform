@@ -336,6 +336,7 @@ export type { CooperationExtension, CooperationMaterialGuide } from './cooperati
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { CAREPHARM_MATERIAL_TAGS, CAREPHARM_MATERIAL_OUTLINES } from './cooperation/carepharmMaterials';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
+export { CooperationMemberHomeLayout, CooperationMemberNavigation, type CooperationMemberLink } from './cooperation/CooperationMemberPresentation';
 
 export { ScopedContactForm } from "./legal/ScopedContactForm.js";
 export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, serviceContactUrl } from './service-entry/PublicServiceEntry';
