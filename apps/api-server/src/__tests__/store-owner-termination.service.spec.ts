@@ -32,16 +32,20 @@ describe('StoreOwnerTerminationService', () => {
     expect(queries.some(q=>q.includes("purge_due_at=COALESCE(purge_due_at,$2::timestamptz + interval '7 days')"))).toBe(true);
   });
 
-  it('preserves organization-shared data when another Store service is active', async () => {
+  it('preserves organization-shared data while a K-Cosmetics enrollment remains active', async () => {
     const now=new Date('2026-09-18T00:00:00Z');
-    const ds=fakeDs((sql)=>{
+    const ds=fakeDs((sql,params)=>{
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
         id:'1', service_key:'kpa-society', organization_id:'2', user_id:'3', status:'terminated',
         requested_at:now, requested_by:null, return_requested:false, return_completed_at:null,
         termination_effective_at:now, purge_due_at:now, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:now, updated_at:now,
       }];
-      if (sql.includes('service_code<>')) return [{ '?column?':1 }];
+      if (sql.includes('service_code<>')) {
+        expect(params[0]).toBe('2');
+        expect(params[2]).toBe('kpa-society');
+        return params[1].includes('k-cosmetics') ? [{ '?column?':1 }] : [];
+      }
       if (sql.includes('COUNT(*)::int n')) return [{ n:2 }];
       return [];
     });
@@ -73,7 +77,7 @@ describe('StoreOwnerTerminationService', () => {
     const ds=fakeDs((sql)=>{
       queries.push(sql);
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'terminated',
+        id:'1', service_key:'kpa-society', organization_id:'2', user_id:'3', status:'terminated',
         requested_at:due, requested_by:null, return_requested:false, return_completed_at:null,
         termination_effective_at:due, purge_due_at:due, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:due, updated_at:due,
@@ -97,7 +101,7 @@ describe('StoreOwnerTerminationService', () => {
     const now=new Date('2026-09-18T00:00:00Z');
     const ds=fakeDs((sql)=>{
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'return_pending',
+        id:'1', service_key:'kpa-society', organization_id:'2', user_id:'3', status:'return_pending',
         requested_at:now, requested_by:null, return_requested:true, return_completed_at:null,
         termination_effective_at:now, purge_due_at:null, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:now, updated_at:now,
@@ -118,4 +122,12 @@ it('blocks new PH termination cases before database access', async () => {
  const ds = fakeDs(() => []);
  await expect(new StoreOwnerTerminationService(ds).createCase({ serviceKey: 'pharmacy-hub', organizationId: 'org', userId: 'user' })).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
  expect(ds.query).not.toHaveBeenCalled();
+});
+
+it('does not reopen retired K-Cosmetics termination or touch its data', async () => {
+  const query = jest.fn();
+  const svc = new StoreOwnerTerminationService({ query } as any);
+  await expect(svc.createCase({ serviceKey: 'k-cosmetics' as any, organizationId: '2', userId: '3' }))
+    .rejects.toMatchObject({ code: 'STORE_OWNER_TERMINATION_SERVICE_NOT_ALLOWED' });
+  expect(query).not.toHaveBeenCalled();
 });

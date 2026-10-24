@@ -73,3 +73,15 @@ describe('platform inquiry — retired type', () => {
     expect(mockRepo.create).toHaveBeenCalledWith(expect.objectContaining({ type: 'platform' }));
   });
 });
+
+it.each(['unknown', '', 'PLATFORM', 'glucoseview', null, ['platform'], { type: 'platform' }])(
+  'rejects unregistered inquiry type %j without DB writes or email', async type => {
+    mockRepo.create.mockClear();
+    mockRepo.save.mockClear();
+    const res = makeRes();
+    await submitInquiry(req({ ...base, type }), res as any);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.code).toBe('INVALID_INQUIRY_TYPE');
+    expect(mockRepo.save).not.toHaveBeenCalled();
+  },
+);

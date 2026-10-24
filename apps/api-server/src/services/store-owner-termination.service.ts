@@ -9,7 +9,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from './auth/demo-account.service.js';
 
-export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society', 'k-cosmetics'] as const;
+export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society'] as const;
 export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number] | 'pharmacy-hub';
 
 type CaseStatus =
@@ -33,7 +33,6 @@ const SERVICE_CONFIG: Record<StoreOwnerContractServiceKey, ServiceConfig> = {
   // Legacy persisted cases only; createCase rejects this retired namespace.
   'pharmacy-hub': { role: 'pharmacy-hub:store_owner', contentKeys: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
   'kpa-society': { role: 'kpa:store_owner', contentKeys: ['kpa', 'kpa-society'], slugKeys: ['kpa'] },
-  'k-cosmetics': { role: 'cosmetics:store_owner', contentKeys: ['k-cosmetics', 'cosmetics'], slugKeys: ['cosmetics'] },
 };
 
 /** 공유 Store 데이터 보호 시 현재 store-capable enrollment 로 취급할 축. */
@@ -660,19 +659,6 @@ export class StoreOwnerTerminationService {
                           SELECT id FROM organization_product_listings WHERE organization_id=$1 AND service_key=ANY($2::text[]))`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM organization_product_listings WHERE organization_id=$1 AND service_key=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM platform_store_slugs WHERE store_id=$1 AND service_key=ANY($2::text[])`, [c.organizationId,cfg.slugKeys]);
-
-        if (c.serviceKey === 'k-cosmetics') {
-          const stores = await m.query(`SELECT id FROM cosmetics.cosmetics_stores WHERE organization_id=$1`, [c.organizationId]);
-          const storeIds = stores.map((r:any)=>r.id);
-          if (storeIds.length) {
-            await m.query(`DELETE FROM cosmetics.cosmetics_store_playlist_items WHERE playlist_id IN (
-                              SELECT id FROM cosmetics.cosmetics_store_playlists WHERE store_id=ANY($1::uuid[]))`, [storeIds]);
-            await m.query(`DELETE FROM cosmetics.cosmetics_store_playlists WHERE store_id=ANY($1::uuid[])`, [storeIds]);
-            await m.query(`DELETE FROM cosmetics.cosmetics_store_listings WHERE store_id=ANY($1::uuid[])`, [storeIds]);
-            await m.query(`DELETE FROM cosmetics.cosmetics_store_members WHERE store_id=ANY($1::uuid[])`, [storeIds]);
-            await m.query(`DELETE FROM cosmetics.cosmetics_stores WHERE id=ANY($1::uuid[])`, [storeIds]);
-          }
-        }
 
         if (!preview.hasOtherActiveStoreService) {
           // 조직 공용 Store 데이터 — 마지막 활성 Store 서비스가 끝나는 경우에만 파기한다.
