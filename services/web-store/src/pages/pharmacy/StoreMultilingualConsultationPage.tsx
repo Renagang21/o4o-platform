@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ConsultationSelectors,
   ConsultationInput,
@@ -239,7 +239,7 @@ function Consultation({
     };
   }, [organizationId, retry, initialMode]);
 
-  const clear = () => {
+  const clear = useCallback(() => {
     speech.reset();
     version.current++;
     clearDrafts();
@@ -251,7 +251,26 @@ function Consultation({
     setPendingVoice(null);
     focusReply.current = false;
     dialog.current?.close();
-  };
+  }, [speech.reset, clearDrafts]);
+  const applyLanguage = useCallback((value: string) => {
+    speech.reset();
+    version.current++;
+    setBusy(false);
+    clearResults();
+    setReplyLanguage(previous => incomingText.trim() ? previous || language : "");
+    setLanguage(value);
+    dialog.current?.close();
+  }, [speech.reset, clearResults, incomingText, language]);
+  useEffect(() => {
+    if (connected?.language && connected.language !== language)
+      applyLanguage(connected.language);
+  }, [connected?.language, language, applyLanguage]);
+  const previousEpoch = useRef<string | null>(null);
+  useEffect(() => {
+    const next = connected?.epoch || null, previous = previousEpoch.current;
+    previousEpoch.current = next;
+    if (previous && previous !== next) clear();
+  }, [connected?.epoch, clear]);
   const changeDirection = (next: ConsultationDirection) => {
     if (next === direction) return;
     speech.reset();
@@ -407,24 +426,13 @@ function Consultation({
                 setMode(value);
               }}
               onLanguage={(value) => {
-                const apply = () => {
-                  speech.reset();
-                  version.current++;
-                  setBusy(false);
-                  clearResults();
-                  if (incomingText.trim())
-                    setReplyLanguage(replyLanguage || language);
-                  else setReplyLanguage("");
-                  setLanguage(value);
-                  dialog.current?.close();
-                };
                 if (connected)
                   void station
                     .action({ action: "language", language: value })
                     .then((ok) => {
-                      if (ok) apply();
+                      if (ok) applyLanguage(value);
                     });
-                else apply();
+                else applyLanguage(value);
               }}
             />
             {!!connected && (

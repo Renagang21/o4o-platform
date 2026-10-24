@@ -129,3 +129,46 @@ it('discards inactive content on pagehide and preserves input on language correc
   fireEvent.click(screen.getByRole('button', { name: '직원 → 고객' }));
   expect((translation().getByRole('textbox') as HTMLTextAreaElement).value).toBe('Another outgoing draft');
 });
+
+async function renderCounterWithHeartbeat(heartbeat: () => unknown) {
+  const c = context(); c.data.modes = [{ ...modes[0], allowed: true }]; state.get.mockResolvedValue(c);
+  const room = { id: 'room', epoch: 'epoch', stationKey: 'counter-1', name: 'Fixture counter', mode: 'counter-pharmacist', language: 'en', active: true, connected: true, shared: {}, reply: null, version: 1 };
+  state.post.mockImplementation(async (path, body) => path.endsWith('/heartbeat') ? heartbeat() : path.endsWith('/open') ? { success: true, data: room } : result(body));
+  render(<Page />);
+  await act(async () => {});
+  fireEvent.click(screen.getByRole('button', { name: '매대 상담 시작' }));
+  await act(async () => {});
+  fireEvent.change(screen.getByLabelText('고객에게 전달할 한국어 문장'), { target: { value: 'Current draft' } });
+  fireEvent.change(screen.getByLabelText('상담 안내 요청'), { target: { value: 'Current inquiry' } });
+  fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+  await act(async () => {});
+  expect(screen.getAllByText('Translated words').length).toBeGreaterThan(0);
+  return room;
+}
+it('synchronizes another tab language while preserving drafts and invalidating previous results', async () => {
+  vi.useFakeTimers();
+  try {
+    let room: unknown;
+    room = await renderCounterWithHeartbeat(() => ({ success: true, data: { ...(room as object), language: 'ja', version: 2 } }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect((screen.getByLabelText('고객 언어') as HTMLSelectElement).value).toBe('ja');
+    expect((screen.getByLabelText('고객에게 전달할 한국어 문장') as HTMLTextAreaElement).value).toBe('Current draft');
+    expect((screen.getByLabelText('상담 안내 요청') as HTMLInputElement).value).toBe('Current inquiry');
+    expect(screen.queryByText('Translated words')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+    await act(async () => {});
+    expect(state.post.mock.calls[state.post.mock.calls.length - 1][1].language).toBe('ja');
+  } finally { cleanup(); vi.useRealTimers(); }
+});
+it('clears expired consultation drafts and offers a fresh explicit open after takeover', async () => {
+  vi.useFakeTimers();
+  try {
+    await renderCounterWithHeartbeat(() => { throw Object.assign(new Error('consultation changed'), { code: 'CONSULTATION_CHANGED' }); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect(screen.getByRole('button', { name: '매대 상담 시작' })).toBeTruthy();
+    expect((screen.getByLabelText('고객에게 전달할 한국어 문장') as HTMLTextAreaElement).value).toBe('');
+    expect((screen.getByLabelText('상담 안내 요청') as HTMLInputElement).value).toBe('');
+    expect(screen.queryByText('Translated words')).toBeNull();
+    expect((screen.getByLabelText('상담 방식') as HTMLSelectElement).disabled).toBe(false);
+  } finally { cleanup(); vi.useRealTimers(); }
+});

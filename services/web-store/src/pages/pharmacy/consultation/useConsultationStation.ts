@@ -108,8 +108,16 @@ export function useConsultationStation(
           setError("");
         }
       } catch (e) {
-        if (!cancelled && generation.current === version)
+        if (!cancelled && generation.current === version) {
           setError((e as Error).message);
+          if ((e as { code?: string }).code === "CONSULTATION_CHANGED") {
+            generation.current++;
+            current.current = null;
+            setRoom(null);
+            setPairing(null);
+            setConflict(false);
+          }
+        }
       } finally {
         inFlight = false;
       }

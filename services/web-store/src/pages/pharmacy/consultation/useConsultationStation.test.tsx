@@ -104,3 +104,21 @@ it("retains the same connected room during an accepted language correction", asy
   expect(view.result.current.room?.active).toBe(true);
   expect(api.openConsultationStation).toHaveBeenCalledTimes(1);
 });
+it("keeps the room on a transient heartbeat failure but releases an expired epoch for reopening", async () => {
+  vi.useFakeTimers();
+  try {
+    api.stationHeartbeat.mockRejectedValueOnce(new Error("temporary network failure"))
+      .mockRejectedValueOnce(Object.assign(new Error("consultation changed"), { code: "CONSULTATION_CHANGED" }));
+    api.createConsultationPairing.mockResolvedValueOnce({ code: "fixture-code" });
+    const view = renderHook(() => useConsultationStation("store", "counter-staff", "ko", "counter-1"));
+    await act(async () => { await view.result.current.open(); await view.result.current.pair(); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect(view.result.current.room?.epoch).toBe("generation");
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect(view.result.current.room).toBeNull();
+    expect(view.result.current.pairing).toBeNull();
+    api.openConsultationStation.mockResolvedValueOnce({ ...room, epoch: "new-epoch", version: 2 });
+    await act(async () => { await view.result.current.open(); });
+    expect(view.result.current.room?.epoch).toBe("new-epoch");
+  } finally { cleanup(); vi.useRealTimers(); }
+});
