@@ -6,6 +6,7 @@ import type {
   ProductCorrectionRule,
   ProductCorrectionScope,
 } from '@o4o/types';
+import { expandRegulatoryTypeAliases } from '../promotion/adapters/supplier/supplier-regulatory-type.js';
 import { CorrectionError } from './contracts.js';
 
 type Reader = Pick<DataSource | EntityManager, 'query'>;
@@ -23,7 +24,9 @@ export function previewQuery(
   };
   const where = ["m.status = 'ACTIVE'"];
   if (rule.regulatoryTypes.length)
-    where.push(`m.regulatory_type = ANY(${bind(rule.regulatoryTypes)}::text[])`);
+    where.push(
+      `lower(trim(m.regulatory_type)) = ANY(${bind(expandRegulatoryTypeAliases(rule.regulatoryTypes))}::text[])`,
+    );
   if (scope.search)
     where.push(
       `(position(lower(${bind(scope.search)}) in lower(m.name)) > 0 OR m.barcode = $${params.length})`,

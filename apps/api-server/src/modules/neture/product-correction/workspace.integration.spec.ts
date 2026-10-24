@@ -51,7 +51,15 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
         ids[i],
         `상품${String(i).padStart(2, '0')}`,
         i === 27 ? 'ARCHIVED' : 'ACTIVE',
-        i < 2 ? 'DRUG' : i === 2 ? 'HEALTH_FUNCTIONAL' : 'GENERAL',
+        i < 2
+          ? 'DRUG'
+          : i === 2
+            ? 'HEALTH_FUNCTIONAL'
+            : i === 3
+              ? '건강기능식품'
+              : i === 4
+                ? '일반'
+                : 'GENERAL',
         i === 0 ? null : '제조사',
         '500mg',
         null,
@@ -142,7 +150,9 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
     const drug = await service.saveRule({ ...definition, regulatoryTypes: ['DRUG'] }, 'admin');
     expect((await service.preview(drug.id, { search: '', page: 1 })).total).toBe(2);
     const health = await service.saveRule({ ...definition, regulatoryTypes: ['HEALTH_FUNCTIONAL'] }, 'admin');
-    expect((await service.preview(health.id, { search: '', page: 1 })).total).toBe(1);
+    expect((await service.preview(health.id, { search: '', page: 1 })).total).toBe(2);
+    const general = await service.saveRule({ ...definition, regulatoryTypes: ['GENERAL'] }, 'admin');
+    expect((await service.preview(general.id, { search: '', page: 1 })).total).toBe(23);
     expect((await service.preview(rule.id, { search: "' OR true --", page: 1 })).total).toBe(0);
     expect((await service.preview(rule.id, { search: '%', page: 1 })).total).toBe(0);
   });
