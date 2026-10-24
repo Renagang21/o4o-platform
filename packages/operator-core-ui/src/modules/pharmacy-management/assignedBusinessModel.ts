@@ -1,15 +1,18 @@
-export type Tab = 'memberships' | 'proposals' | 'events' | 'recruitments' | 'contents';
+export type Tab = 'overview' | 'settings' | 'memberships' | 'proposals' | 'events' | 'recruitments' | 'contents';
 export type Msg = { type: 'success' | 'error'; text: string } | null;
 
 export const TABS: Array<{ key: Tab; label: string }> = [
+  { key: 'overview', label: '운영 홈' },
   { key: 'memberships', label: '가입 신청' },
   { key: 'proposals', label: '공급 제안' },
   { key: 'events', label: '이벤트' },
   { key: 'recruitments', label: '모집 조건' },
   { key: 'contents', label: '콘텐츠' },
+  { key: 'settings', label: '사업 설정' },
 ];
 
 export const DEFAULT_STATUS: Record<Tab, string> = {
+  overview: '', settings: '',
   memberships: 'pending',
   proposals: 'pending',
   events: 'pending',
@@ -20,6 +23,7 @@ export const DEFAULT_STATUS: Record<Tab, string> = {
 export const isTab = (v: string | null): v is Tab => TABS.some((t) => t.key === v);
 
 export const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
+  overview: [], settings: [],
   memberships: [
     { value: 'pending', label: '대기' },
     { value: 'active', label: '활성' },

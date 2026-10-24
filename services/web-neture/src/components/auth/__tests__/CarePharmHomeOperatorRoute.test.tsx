@@ -17,6 +17,11 @@ it.each([
   ['neture:pharmacy_operator', '/operator/home-presentation/carepharm/', false],
   ['neture:pharmacy_operator', '/operator/home-presentation/carepharm', false],
   ['neture:carepharm_operator', '/operator/members', false],
+  ['neture:carepharm_operator', '/operator/inbox/business/carepharm', true],
+  ['neture:carepharm_admin', '/operator/inbox/business/carepharm', true],
+  ['neture:carepharm_operator', '/operator/inbox/business/carepharm/', true],
+  ['neture:carepharm_operator', '/operator/inbox/business/pharmacy', false],
+  ['neture:pharmacy_operator', '/operator/inbox/business/carepharm', false],
 ] as const)('applies %s only to its business-owned editor at %s', (role, path, allowed) => {
   state.role = role;
   render(<MemoryRouter initialEntries={[path]}><OperatorRoute><p>홈 편집 화면</p></OperatorRoute></MemoryRouter>);

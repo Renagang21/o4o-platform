@@ -47,7 +47,9 @@ type BusinessPageProps = Readonly<{
   contactHref?: (businessKey: string) => string | undefined;
   contentEditHref?: (businessKey: string, contentId?: string) => string;
   tabs?: readonly Tab[];
+  showSettingsPanels?: boolean;
   forumHref?: (business: SemiFranchise) => string;
+  renderOverview?: (business: SemiFranchise) => ReactNode;
   renderBusinessHome?: (business: SemiFranchise) => ReactNode;
 }>;
 
@@ -55,8 +57,8 @@ export default function OperatorSemiFranchisePage(props: BusinessPageProps = {})
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
 }
 
-function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusinessHome, contentEditHref, tabs }: BusinessPageProps) {
-  const workspace = useAssignedBusinessWorkspace(businessKey, tabs);
+function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusinessHome, renderOverview, contentEditHref, tabs, showSettingsPanels = true }: BusinessPageProps) {
+  const workspace = useAssignedBusinessWorkspace(businessKey, tabs ?? (renderOverview ? ['overview', 'memberships', 'proposals', 'events', 'recruitments', 'contents', 'settings'] : ['memberships', 'proposals', 'events', 'recruitments', 'contents']));
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
     interactionLocked, decision, reason, setReason, decisionError, run, confirmDecision, cancelDecision,
@@ -109,11 +111,13 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
       </PageHeader>
 
       {contactUrl && <a className="text-blue-700 underline" href={contactUrl}>이 사업 문의 관리</a>}
-      <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
-      <BusinessOperationsPanel key={`operations:${sfKey}`} businessKey={sfKey} />
+      {showSettingsPanels && (!renderOverview || tab === 'settings') && <>
+        <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
+        <BusinessOperationsPanel key={`operations:${sfKey}`} businessKey={sfKey} />
+      </>}
       <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
-        {TABS.filter(t => !tabs || tabs.includes(t.key)).map((t) => (
+        {TABS.filter(t => tabs ? tabs.includes(t.key) : renderOverview || (t.key !== 'overview' && t.key !== 'settings')).map((t) => (
           <button
             key={t.key}
             type="button"
@@ -128,6 +132,8 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
         ))}
       </div>
 
+      {tab === 'overview' && currentBusiness && renderOverview?.(currentBusiness)}
+      {tab !== 'overview' && tab !== 'settings' && <>
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
@@ -401,6 +407,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
 
         {tab === 'contents' && <OperatorContentsTable workspace={workspace} contentEditHref={contentEditHref} />}
       </div>}
+      </>}
     </div>
   );
 }

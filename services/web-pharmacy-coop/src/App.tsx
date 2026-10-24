@@ -2,7 +2,7 @@ import {
   CooperativeNotificationLink,
   CooperativeNotifications,
 } from "./Notifications";
-import { OperatorInbox, OperatorInboxLink } from "@o4o/operator-core-ui";
+import { CooperationOperationsOverview, OperatorInbox, OperatorInboxLink } from "@o4o/operator-core-ui";
 import {
   ScopedContactForm,
   PolicyDocumentViewer,
@@ -1108,6 +1108,7 @@ function CooperativeManagement({
       [`${base}?work=contents`, "소식·자료 관리", task === "contents"],
       [`${base}?work=boards`, "조합원 이야기 관리", task === "boards"],
       [`${base}?work=proposals`, "공급 제안 심사", task === "proposals"],
+      [`${base}?work=business-settings`, "자료 진열·사업 약관", task === "business-settings"],
       ...(isAdmin
         ? ([
             [
@@ -1123,17 +1124,23 @@ function CooperativeManagement({
     return (
       <WorkLayout title="조합 운영" items={items}>
         {task === "overview" ? (
-          <>
-            <h3>{cooperative.name} 운영</h3>
-            <p>담당 업무를 선택해 신청 검토와 소식·자료 게시를 진행하세요.</p>
-            <div className="cards two">
-              {items.slice(1).map(([to, label]) => (
-                <SiteLink key={to} className="card" to={to}>
-                  {label} →
-                </SiteLink>
-              ))}
-            </div>
-          </>
+          <CooperationOperationsOverview
+            scopeKey={`${session.userId}:${cooperative.id}`}
+            client={businessClient}
+            endpoint={`/operator-inbox/cooperative/${encodeURIComponent(cooperative.slug)}`}
+            inboxHref={`${base}/inbox`}
+            taskHref={key => {
+              const tasks: Record<string, string> = { "cooperative-members": "members", withdrawals: "members", contents: "contents", proposals: "proposals" };
+              return tasks[key] ? `${base}?work=${tasks[key]}` : undefined;
+            }}
+            areas={[
+              { title: "공지", description: "조합원에게 전할 안내를 게시판의 공지로 게시합니다.", links: [{ label: "조합원 게시판 관리", href: `${base}?work=boards` }, { label: "공개 홈 편집", href: `${base}/home-presentation` }] },
+              { title: "자료", description: "소식·자료를 검토하고 게시·보관합니다.", links: [{ label: "소식·자료 관리", href: `${base}?work=contents` }] },
+              { title: "참여 사업", description: "조합에 접수된 공급 제안을 검토하고 처리합니다.", links: [{ label: "공급 제안 심사", href: `${base}?work=proposals` }] },
+              { title: "지원", description: "문의 처리 상태와 답변·알림 전달 결과를 확인합니다.", links: [{ label: "문의 처리", href: `${base}/inbox` }] },
+              { title: "조합원·운영 설정", description: "개인 조합원의 가입·탈퇴를 관리합니다. 약국 단위 사업 가입과 구분합니다.", links: [{ label: "조합원 관리", href: `${base}?work=members` }, { label: "자료 진열·사업 약관", href: `${base}?work=business-settings` }, ...(isAdmin ? [{ label: "가입 자격·운영자 설정", href: `${base}?work=settings` }] : [])] },
+            ]}
+          />
         ) : task === "members" ? (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
@@ -1159,7 +1166,7 @@ function CooperativeManagement({
             canManage
             boardsOnly
           />
-        ) : task === "contents" || task === "proposals" ? (
+        ) : task === "contents" || task === "proposals" || task === "business-settings" ? (
           <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
             <CooperativeBusinessOperator
               key={`${session.userId}:${cooperative.id}:${task}:${editor}`}
@@ -1167,7 +1174,7 @@ function CooperativeManagement({
               slug={cooperative.slug}
               client={businessClient}
               editor={editor}
-              task={task}
+              task={task === "business-settings" ? "settings" : task}
             />
           </Suspense>
         ) : (
