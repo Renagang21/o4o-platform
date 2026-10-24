@@ -197,8 +197,9 @@ function Layout() {
   const { preview, session, businessClient } = useContext(Context);
   const location = useLocation();
   useEffect(() => {
-    window.scrollTo?.(0, 0);
-  }, [location.pathname]);
+    // Explicit anchors are restored by their page; do not reset them afterwards.
+    if (!location.hash) window.scrollTo?.(0, 0);
+  }, [location.pathname, location.hash]);
   return (
     <>
       <a href="#main" className="skip-link">

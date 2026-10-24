@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
@@ -170,4 +170,23 @@ it('keeps the selected cooperative personal status separate from another active 
   expect(summary.textContent).toContain('조합원 본인의 가입 상태');
   expect(screen.getByText('이 조합의 가입 승인 후 소식·자료를 확인할 수 있습니다.')).toBeTruthy();
   expect(screen.queryByRole('link', { name: '운영 화면으로 →' })).toBeNull();
+});
+
+it.each(['/sample-coop-a#cooperative-news', '/sample-coop-a/materials'])('keeps the news anchor after layout scroll restoration from %s', path => {
+  const events: string[] = [];
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView');
+  Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: function(this: Element) { events.push(this.id); } });
+  vi.mocked(window.scrollTo).mockImplementation(() => { events.push('top'); });
+  try {
+    open(path);
+    const nav = screen.getByRole('navigation', { name: '협동조합 메뉴' });
+    if (!path.includes('#')) fireEvent.click(within(nav).getByRole('link', { name: '소식' }));
+    expect(events.at(-1)).toBe('cooperative-news');
+    fireEvent.click(within(nav).getByRole('link', { name: '홈' }));
+    expect(events.at(-1)).toBe('top');
+  } finally {
+    vi.mocked(window.scrollTo).mockImplementation(() => {});
+    if (descriptor) Object.defineProperty(Element.prototype, 'scrollIntoView', descriptor);
+    else Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+  }
 });
