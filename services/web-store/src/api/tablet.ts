@@ -12,6 +12,11 @@
  */
 import type { IdlePlaylistItem, TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 
+/** Public kiosk requests never carry an employee cookie, even on the Store origin. */
+function publicTabletFetch(url: string, init?: RequestInit) {
+  return fetch(url, { ...init, credentials: 'omit', cache: 'no-store' });
+}
+
 function getApiBase(): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
   return `${base}/api/v1/stores`;
@@ -45,7 +50,7 @@ export async function fetchTabletProducts(
 
   const qs = query.toString();
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/products${qs ? `?${qs}` : ''}`;
-  const res = await fetch(url);
+  const res = await publicTabletFetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch products');
   // WO-O4O-KPA-TABLET-PUBLIC-LOCAL-PRODUCTS-FIX-V1:
@@ -80,7 +85,7 @@ export async function submitTabletInterest(
   body: { masterId: string; customerName?: string; customerNote?: string },
 ): Promise<InterestSubmitResult> {
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/interest`;
-  const res = await fetch(url, {
+  const res = await publicTabletFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -107,7 +112,7 @@ export async function submitQrPageConsultation(
   },
 ): Promise<InterestSubmitResult> {
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/interest`;
-  const res = await fetch(url, {
+  const res = await publicTabletFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...body, source: 'qr', landingType: 'page' }),
@@ -122,7 +127,7 @@ export async function checkTabletInterestStatus(
   interestId: string,
 ): Promise<InterestStatusDetail> {
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/interest/${interestId}`;
-  const res = await fetch(url);
+  const res = await publicTabletFetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');
   return json.data;
@@ -137,7 +142,7 @@ export async function checkTabletInterestStatus(
 export async function fetchTabletIdle(slug: string, tabletId?: string): Promise<IdlePlaylistItem[]> {
   const qs = tabletId ? `?tabletId=${encodeURIComponent(tabletId)}` : '';
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/idle${qs}`;
-  const res = await fetch(url);
+  const res = await publicTabletFetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch idle playlist');
   return Array.isArray(json.data?.items) ? json.data.items : [];
@@ -159,7 +164,7 @@ export interface TabletDisplaySettings {
  */
 export async function fetchTabletSettings(slug: string): Promise<TabletDisplaySettings> {
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/settings`;
-  const res = await fetch(url);
+  const res = await publicTabletFetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch tablet settings');
   return json.data;
@@ -179,7 +184,7 @@ export async function fetchTabletScreen(slug: string, tabletId?: string, languag
   const qs = params.toString() ? `?${params.toString()}` : '';
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/screen${qs}`;
   try {
-    const res = await fetch(url);
+    const res = await publicTabletFetch(url);
     const json = await res.json();
     if (!json.success) return null;
     return (json.data ?? null) as TabletScreenResponse | null;
@@ -240,7 +245,7 @@ async function readJson(res: Response): Promise<any> {
 
 /** 연결 코드 확인 — 어느 매장인지·위치 목록. 잘못된/만료 코드는 PAIRING_CODE_INVALID. */
 export async function pairingLookup(code: string): Promise<PairingLookupResult> {
-  const res = await fetch(`${getApiBase()}/tablet-pairing/lookup`, {
+  const res = await publicTabletFetch(`${getApiBase()}/tablet-pairing/lookup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
@@ -257,7 +262,7 @@ export async function pairingLookup(code: string): Promise<PairingLookupResult> 
 
 /** 연결 확정 — 기기 이름·위치 선택 후 토큰 발급(1회). */
 export async function pairingClaim(input: { code: string; deviceName?: string; locationId?: string | null }): Promise<StoredTabletDevice> {
-  const res = await fetch(`${getApiBase()}/tablet-pairing/claim`, {
+  const res = await publicTabletFetch(`${getApiBase()}/tablet-pairing/claim`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -294,7 +299,7 @@ export interface DeviceHeartbeat {
  * 기기 heartbeat(POST — last_seen_at 갱신). 토큰이 무효/해제되면 401 → 호출자는 저장된 기기 정보를 지운다.
  */
 export async function deviceHeartbeat(slug: string, deviceToken: string): Promise<DeviceHeartbeat> {
-  const res = await fetch(`${getApiBase()}/${encodeURIComponent(slug)}/tablet/device/heartbeat`, {
+  const res = await publicTabletFetch(`${getApiBase()}/${encodeURIComponent(slug)}/tablet/device/heartbeat`, {
     method: 'POST',
     headers: { [TABLET_DEVICE_TOKEN_HEADER]: deviceToken },
   });

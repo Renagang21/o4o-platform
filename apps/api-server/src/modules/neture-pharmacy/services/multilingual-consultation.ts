@@ -9,10 +9,12 @@ import { roleAssignmentService } from '../../auth/services/role-assignment.servi
 
 export const CONSULTATION_MODES = [
   { key: 'counter-pharmacist', label: '매대 약사 상담', feature: 'multilingual-consultation', professional: true },
+  { key: 'counter-staff', label: '매대 직원 안내', feature: 'multilingual-staff-response', professional: false },
   { key: 'floor-staff', label: '매장 직원 응대', feature: 'multilingual-staff-response', professional: false },
   { key: 'floor-pharmacist', label: '매장 약사 상담', feature: 'multilingual-pharmacist-consultation', professional: true },
 ] as const;
 export type ConsultationMode = typeof CONSULTATION_MODES[number]['key'];
+export const CONSULTATION_SCREEN_LANGUAGES = [{ key: 'ko', label: '한국어' }, ...CONSULTATION_LANGUAGES];
 export const CONSULTATION_STAFF_PHRASES = [
   { key: 'welcome', text: '안녕하세요. 무엇을 도와드릴까요?' },
   { key: 'show-product', text: '찾으시는 상품 이름이나 사진을 보여 주세요.' },
@@ -37,7 +39,8 @@ export class MultilingualConsultationService {
   async context(userId: string, organizationId: string) {
     const access = await this.features.resolve(userId, organizationId);
     const professional = await this.deps.professional(userId, organizationId);
-    return { organizationId, languages: CONSULTATION_LANGUAGES, phrases: CONSULTATION_STAFF_PHRASES,
+    return { organizationId, languages: CONSULTATION_SCREEN_LANGUAGES, phrases: CONSULTATION_STAFF_PHRASES,
+      supportAllowed: access.features.some(feature => feature.key === 'store-staff-support' && feature.allowed === true),
       modes: CONSULTATION_MODES.map(mode => ({ ...mode,
         entitled: access.features.some(feature => feature.key === mode.feature && feature.allowed === true),
         allowed: access.features.some(feature => feature.key === mode.feature && feature.allowed === true) && (!mode.professional || professional),
@@ -62,9 +65,15 @@ export class MultilingualConsultationService {
     }
   }
 
+  async requireMode(userId: string, organizationId: string, key: string) {
+    const mode = CONSULTATION_MODES.find(item => item.key === key);
+    if (!mode) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식을 확인해 주세요.');
+    await this.authorize(userId, organizationId, mode);
+  }
+
   async translate(userId: string, organizationId: string, input: Record<string, unknown>) {
     const mode = CONSULTATION_MODES.find(item => item.key === input.mode);
-    if (!mode || !CONSULTATION_LANGUAGES.some(language => language.key === input.language) ||
+    if (!mode || !CONSULTATION_SCREEN_LANGUAGES.some(language => language.key === input.language) ||
       typeof input.direction !== 'string' || !['to-customer', 'to-staff'].includes(input.direction)) {
       throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식과 언어를 확인해 주세요.');
     }
@@ -80,6 +89,7 @@ export class MultilingualConsultationService {
       text = input.text.trim();
     }
     await this.authorize(userId, organizationId, mode);
+    if (input.language === 'ko') return { organizationId, mode: mode.key, direction: input.direction, language: 'ko', source: text, translation: text };
     const language = input.language as ConsultationLanguage;
     const output = await this.deps.translate({ text, source: input.direction === 'to-customer' ? 'ko' : language,
       target: input.direction === 'to-customer' ? language : 'ko' }, {
