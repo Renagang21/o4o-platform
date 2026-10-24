@@ -55,7 +55,7 @@ const emptyRule: ProductCorrectionRuleInput = {
 const groups = {
   GENERAL: '일반상품',
   DRUG: '의약품',
-  HEALTH_FUNCTIONAL_FOOD: '건강기능식품',
+  HEALTH_FUNCTIONAL: '건강기능식품',
   COSMETIC: '화장품',
   MEDICAL_DEVICE: '의료기기',
   QUASI_DRUG: '의약외품',

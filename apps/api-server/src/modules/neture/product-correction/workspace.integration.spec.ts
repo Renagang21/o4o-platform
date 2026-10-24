@@ -9,6 +9,8 @@ import { parseRule } from './contracts.js';
 const integration = process.env.CORRECTION_TEST_DATABASE_URL ? describe : describe.skip;
 integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
   let pool: Pool;
+  const schema = `o4o_correction_${randomUUID().replace(/-/g, '')}`;
+  let schemaCreated = false;
   let service: ProductCorrectionWorkspace;
   let operations: ProductCorrectionOperationsService;
   let failPreview = false;
@@ -38,7 +40,9 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
     const url = new URL(process.env.CORRECTION_TEST_DATABASE_URL!);
     if (!['127.0.0.1', 'localhost'].includes(url.hostname) || url.pathname !== '/correction_review')
       throw new Error('Only the dedicated local correction_review database is allowed');
-    pool = new Pool({ connectionString: url.toString() });
+    pool = new Pool({ connectionString: url.toString(), options: `-c search_path=${schema}` });
+    await pool.query(`CREATE SCHEMA "${schema}"`);
+    schemaCreated = true;
     await pool.query(`CREATE TABLE settings(key varchar(100) PRIMARY KEY,value jsonb,type varchar(50),description text,"createdAt" timestamp DEFAULT NOW(),"updatedAt" timestamp DEFAULT NOW());
       CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,status text,regulatory_type text,manufacturer_name text,specification text,barcode text);
       CREATE TABLE shared_product_descriptions(id uuid PRIMARY KEY,master_id uuid,content text,updated_at timestamptz,source_type text,source_ref_id text,description_type text,language text,status text,deleted_at timestamptz);`);
@@ -47,7 +51,7 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
         ids[i],
         `상품${String(i).padStart(2, '0')}`,
         i === 27 ? 'ARCHIVED' : 'ACTIVE',
-        i < 2 ? 'DRUG' : 'GENERAL',
+        i < 2 ? 'DRUG' : i === 2 ? 'HEALTH_FUNCTIONAL' : 'GENERAL',
         i === 0 ? null : '제조사',
         '500mg',
         null,
@@ -101,9 +105,20 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
     operations = new ProductCorrectionOperationsService(db);
   });
   afterAll(async () => {
-    if (pool) {
-      expect(await snapshot()).toBe(before);
-      await pool.end();
+    if (!pool) return;
+    try {
+      if (before) expect(await snapshot()).toBe(before);
+    } finally {
+      try {
+        if (schemaCreated) {
+          await pool.query(`DROP SCHEMA "${schema}" CASCADE`);
+          expect(
+            (await pool.query('SELECT 1 FROM pg_namespace WHERE nspname=$1', [schema])).rows,
+          ).toHaveLength(0);
+        }
+      } finally {
+        await pool.end();
+      }
     }
   });
 
@@ -126,6 +141,8 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
     }
     const drug = await service.saveRule({ ...definition, regulatoryTypes: ['DRUG'] }, 'admin');
     expect((await service.preview(drug.id, { search: '', page: 1 })).total).toBe(2);
+    const health = await service.saveRule({ ...definition, regulatoryTypes: ['HEALTH_FUNCTIONAL'] }, 'admin');
+    expect((await service.preview(health.id, { search: '', page: 1 })).total).toBe(1);
     expect((await service.preview(rule.id, { search: "' OR true --", page: 1 })).total).toBe(0);
     expect((await service.preview(rule.id, { search: '%', page: 1 })).total).toBe(0);
   });

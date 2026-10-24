@@ -274,4 +274,16 @@ describe('관리자 상품 보정 작업', () => {
     fireEvent.click(screen.getByRole('button', { name: '현황 새로고침' }));
     await screen.findByText(/기록 0건/);
   });
+  it('saves the canonical health-functional regulatory type used by product creation', async () => {
+    mocks.api.saveRule.mockResolvedValue({ ...rule, revision: 2, regulatoryTypes: ['HEALTH_FUNCTIONAL'] });
+    render(<ProductCorrectionWorkspace />);
+    await selectRule();
+    fireEvent.click(screen.getByLabelText('건강기능식품'));
+    fireEvent.click(screen.getByRole('button', { name: '기준 저장' }));
+    await screen.findByText('기준 v2 저장 완료');
+    expect(mocks.api.saveRule).toHaveBeenCalledWith(
+      expect.objectContaining({ regulatoryTypes: ['HEALTH_FUNCTIONAL'] }),
+      rule,
+    );
+  });
 });
