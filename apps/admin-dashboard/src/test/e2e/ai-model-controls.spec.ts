@@ -16,6 +16,11 @@ async function fixture(
     deleted: [] as string[],
     selections: {} as Record<string, { provider: string; model: string }>,
     protectedModels: ["gemini:gemini-fixture"],
+    modelReferences: {
+      "gemini:gemini-fixture": [
+        { kind: "runtime", label: "공통 기본 실행 경로" },
+      ],
+    } as Record<string, { kind: string; label: string; target?: string }[]>,
     targets: [
       {
         id: "home.chat",
@@ -143,6 +148,18 @@ async function fixture(
             (x) => x.provider + ":" + x.model,
           ),
         ];
+        control.modelReferences = {
+          "gemini:gemini-fixture": [
+            { kind: "runtime", label: "공통 기본 실행 경로" },
+          ],
+        };
+        for (const x of Object.values(control.selections)) {
+          (control.modelReferences[x.provider + ":" + x.model] ??= []).push({
+            kind: "usage",
+            label: "홈 대화",
+            target: "home.chat",
+          });
+        }
         return json(
           { success: true, data: control },
           req.method() === "POST" ? 201 : 200,
@@ -174,11 +191,9 @@ for (const viewport of [
       await page
         .getByRole("tab", { name: "API·모델 연결", exact: true })
         .click();
-      const openai = page
-        .getByRole("article")
-        .filter({
-          has: page.getByRole("heading", { name: "OpenAI", exact: true }),
-        });
+      const openai = page.getByRole("article").filter({
+        has: page.getByRole("heading", { name: "OpenAI", exact: true }),
+      });
       await openai.getByRole("button", { name: "모델 등록" }).click();
       let dialog = page.getByRole("dialog", { name: "모델 등록" });
       await expect(dialog.getByLabel("모델 ID", { exact: true })).toBeFocused();
@@ -249,24 +264,24 @@ for (const viewport of [
       await page
         .getByRole("tab", { name: "API·모델 연결", exact: true })
         .click();
-      await expect(
-        page.getByRole("button", { name: "gpt-e2e-fixture 삭제", exact: true }),
-      ).toBeDisabled();
-      await page
-        .getByRole("tab", { name: "사용처·현재 설정", exact: true })
-        .click();
-      await choice.selectOption("");
-      await page
-        .getByRole("button", { name: "사용 모델 저장", exact: true })
-        .click();
-      await expect(page.getByText(/사용 모델을 저장했습니다/)).toBeVisible();
-      await page
-        .getByRole("tab", { name: "API·모델 연결", exact: true })
-        .click();
-      page.once("dialog", (event) => event.accept());
       await page
         .getByRole("button", { name: "gpt-e2e-fixture 삭제", exact: true })
         .click();
+      dialog = page.getByRole("dialog", { name: "모델 삭제 설정" });
+      await expect(
+        dialog.getByRole("button", { name: "모델 삭제", exact: true }),
+      ).toBeDisabled();
+      await dialog
+        .getByLabel("홈 대화 · 사용 모델", { exact: true })
+        .selectOption("gemini:gemini-fixture");
+      await dialog
+        .getByRole("button", { name: "사용 모델 저장", exact: true })
+        .click();
+      await expect(dialog.getByText(/사용 관계가 해제됐습니다/)).toBeVisible();
+      await dialog
+        .getByRole("button", { name: "모델 삭제", exact: true })
+        .click();
+      await expect(dialog).toHaveCount(0);
       await expect(
         page.getByText("모델을 삭제했습니다.", { exact: true }),
       ).toBeVisible();
@@ -277,9 +292,17 @@ for (const viewport of [
       await expect(
         page.getByRole("button", { name: "gpt-e2e-fixture 수정", exact: true }),
       ).toHaveCount(0);
+      await page
+        .getByRole("button", { name: "gemini-fixture 삭제", exact: true })
+        .click();
+      dialog = page.getByRole("dialog", { name: "모델 삭제 설정" });
       await expect(
-        page.getByRole("button", { name: "gemini-fixture 삭제", exact: true }),
+        dialog.getByText(/서버 환경 설정에서 필요한 모델/),
+      ).toBeVisible();
+      await expect(
+        dialog.getByRole("button", { name: "모델 삭제", exact: true }),
       ).toBeDisabled();
+      await dialog.getByRole("button", { name: "닫기", exact: true }).click();
       await page.screenshot({
         path: info.outputPath("model-catalog.png"),
         fullPage: true,

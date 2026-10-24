@@ -1,4 +1,7 @@
-import { prepareManagedAiRequest } from '../../services/ai-management/runtime-models.js';
+import {
+  ModelControlService,
+  type ModelProvider,
+} from "../../services/ai-management/model-controls.js";
 /**
  * AiPolicyExecutorService — WO-O4O-AI-POLICY-SYSTEM-V1
  *
@@ -15,14 +18,14 @@ import { prepareManagedAiRequest } from '../../services/ai-management/runtime-mo
  *   2. process.env.{PROVIDER}_API_KEY
  */
 
-import type { DataSource } from 'typeorm';
-import type { ExecuteResult, AIExecuteProviderId } from '@o4o/ai-core';
-import type { AiPolicyScope } from './ai-policy-scope.js';
-import { AiLlmPolicy } from './entities/ai-llm-policy.entity.js';
-import { AiQuotaService } from './ai-quota.service.js';
-import { AiAccountedExecution } from './ai-accounted-execution.js';
-import { resolveAiApiKey } from '../../utils/ai-key.util.js';
-import { GEMINI_CANONICAL_MODEL } from '../../types/ai-proxy.types.js';
+import type { DataSource } from "typeorm";
+import type { ExecuteResult, AIExecuteProviderId } from "@o4o/ai-core";
+import type { AiPolicyScope } from "./ai-policy-scope.js";
+import { AiLlmPolicy } from "./entities/ai-llm-policy.entity.js";
+import { AiQuotaService } from "./ai-quota.service.js";
+import { AiAccountedExecution } from "./ai-accounted-execution.js";
+import { resolveAiApiKey } from "../../utils/ai-key.util.js";
+import { GEMINI_CANONICAL_MODEL } from "../../types/ai-proxy.types.js";
 
 // ─────────────────────────────────────────────────────
 // Cache
@@ -42,9 +45,12 @@ const CACHE_TTL_MS = 60_000; // 1분
 export interface PolicyExecuteOverrides {
   maxTokens?: number;
   temperature?: number;
+  /** Used only until this logical usage has an administrator model selection. */
   model?: string;
-  responseMode?: 'json' | 'text';
+  responseMode?: "json" | "text";
   userId?: string;
+  /** Server-owned logical usage; never forwarded from a client model override. */
+  usage?: "store.translation" | "pharmacy.consultation";
 }
 
 // ─────────────────────────────────────────────────────
@@ -77,12 +83,29 @@ export class AiPolicyExecutorService {
     const policy = await this.resolvePolicy(scope);
     if (!policy.isEnabled)
       throw new Error(`AI_DISABLED: scope '${scope}' is disabled`);
+    const usage =
+      scope === "PRODUCT_CONTENT"
+        ? "product.content"
+        : scope === "CONTENT_TRANSLATION"
+          ? (overrides?.usage ?? "store.translation")
+          : undefined;
+    const selected = usage
+      ? await new ModelControlService(this.dataSource).resolve(usage, {
+          provider: policy.provider as ModelProvider,
+          model: overrides?.model ?? policy.model,
+        })
+      : {
+          provider: policy.provider,
+          model: overrides?.model ?? policy.model,
+          managed: false,
+        };
     if (
-      !['gemini', 'openai'].includes(policy.provider) ||
-      (policy.fallbackProvider &&
-        !['gemini', 'openai'].includes(policy.fallbackProvider))
+      !["gemini", "openai"].includes(selected.provider) ||
+      (!selected.managed &&
+        policy.fallbackProvider &&
+        !["gemini", "openai"].includes(policy.fallbackProvider))
     )
-      throw new Error('AI_PROVIDER_UNSUPPORTED');
+      throw new Error("AI_PROVIDER_UNSUPPORTED");
     const maxTokens = overrides?.maxTokens ?? policy.maxTokens;
     if (
       !Number.isSafeInteger(maxTokens) ||
@@ -90,14 +113,14 @@ export class AiPolicyExecutorService {
       !Number.isSafeInteger(policy.retryMax) ||
       policy.retryMax < 1
     )
-      throw new Error('AI_POLICY_INVALID');
-    const apiKey = await this.resolveApiKey(policy.provider);
+      throw new Error("AI_POLICY_INVALID");
+    const apiKey = await this.resolveApiKey(selected.provider);
     const responseMode = (overrides?.responseMode ??
       policy.responseMode ??
-      'json') as 'json' | 'text';
+      "json") as "json" | "text";
     const config = {
       apiKey,
-      model: overrides?.model ?? policy.model,
+      model: selected.model,
       temperature: overrides?.temperature ?? Number(policy.temperature),
       maxTokens,
       timeoutMs: policy.timeoutMs,
@@ -108,14 +131,14 @@ export class AiPolicyExecutorService {
     const primary = {
       systemPrompt,
       userPrompt,
-      provider: policy.provider as AIExecuteProviderId,
+      provider: selected.provider as AIExecuteProviderId,
       responseMode,
       config,
       retry: { maxAttempts: policy.retryMax, delayMs: policy.retryDelayMs },
       meta: { service: scope, callerName: `Policy:${scope}` },
     };
     const fallback =
-      policy.fallbackProvider && policy.fallbackModel
+      !selected.managed && policy.fallbackProvider && policy.fallbackModel
         ? {
             ...primary,
             provider: policy.fallbackProvider as AIExecuteProviderId,
@@ -129,7 +152,7 @@ export class AiPolicyExecutorService {
           }
         : undefined;
     return new AiAccountedExecution(this.dataSource, this.quotaService).invoke(
-      ['PRODUCT_CONTENT', 'CONTENT_TRANSLATION'].includes(scope) ? await prepareManagedAiRequest(this.dataSource, scope === 'PRODUCT_CONTENT' ? 'product.content' : 'store.translation', primary) : primary,
+      primary,
       { scope, userId: overrides?.userId },
       fallback,
     );
@@ -165,8 +188,8 @@ export class AiPolicyExecutorService {
         return policy;
       }
     } catch (error) {
-      if ((error as { code?: string }).code !== '42P01')
-        throw new Error('AI_POLICY_UNAVAILABLE');
+      if ((error as { code?: string }).code !== "42P01")
+        throw new Error("AI_POLICY_UNAVAILABLE");
       // Missing legacy policy table alone retains the documented canonical fallback.
     }
 
@@ -174,14 +197,14 @@ export class AiPolicyExecutorService {
     // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: 'gemini-3.0-flash' (non-existent) → 'gemini-2.5-flash' (canonical).
     const fallback = Object.assign(new AiLlmPolicy(), {
       scope,
-      provider: 'gemini',
+      provider: "gemini",
       model: GEMINI_CANONICAL_MODEL,
       temperature: 0.3,
       maxTokens: 2048,
       topP: null,
       topK: null,
       timeoutMs: 10000,
-      responseMode: 'json',
+      responseMode: "json",
       fallbackProvider: null,
       fallbackModel: null,
       isEnabled: true,
