@@ -1,6 +1,7 @@
 # 내 매장 상담·태블릿 독립 실행 검증
 
-> **상태**: COMPLETED — 개발·로컬 검증 범위
+> **상태**: COMPLETED
+> **완료 범위**: 개발·로컬 검증 범위
 > **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (한국시간)
 > **사용자 지시**: TODO → 코드·문서 대조/보완 → 연결된 업무 전체 개발 → 검증·commit·push. PR·main 병합·배포 제외.
 > **기준**: main `0d0d878a19794628fdba5bbc1086e9052c3d634a` · branch `wo/store-consultation-tablet-workspace`

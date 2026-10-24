@@ -1,6 +1,7 @@
 # 내 매장 상담·태블릿 현장 실행 정비 TODO
 
-> **상태**: COMPLETED — 개발·로컬 검증, Git 결과는 최종 인계 참조
+> **상태**: COMPLETED
+> **완료 범위**: 개발·로컬 검증, Git 결과는 최종 인계 참조
 > **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (한국시간)
 > **근거**: 사용자 확정 — 작업을 작게 나누지 않고 TODO → 코드·문서 대조/보완 → 개발 → 검증·commit·push.
 > **기준**: main `0d0d878a19794628fdba5bbc1086e9052c3d634a` · branch `wo/store-consultation-tablet-workspace`
