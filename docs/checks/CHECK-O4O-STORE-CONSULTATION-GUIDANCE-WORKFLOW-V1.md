@@ -84,3 +84,7 @@ push 전 재확인한 main `0c0575aa35`의 추가 변경은 협력사업 operato
 선택 SonarCloud 검사는 기준 main에서도 실패 상태이며 필수 ruleset은 `CI Gate`다. 이번 변경의 HTML 태그 제거 정규식에 대한 과도한 backtracking 지적은 API의 기존 직접 의존성 `node-html-parser`를 재사용해 수정했다(추가 의존성/lockfile 변경 없음). script/style 제외·문단/엔티티 처리·긴 비정상 태그 회귀를 포함한 API 25 suites / 179 tests PASS, 기존 187 tests SKIP. API build와 해당 소스 lint도 통과했다.
 
 자료 digest의 키 정렬은 locale과 무관한 UTF-16 순서가 의도된 계약이다. `localeCompare` 사용 권고를 적용하면 서버 locale/ICU에 따라 정렬이 달라질 수 있으므로 변경하지 않는다. Sonar의 복잡도·표기 관련 결과는 필수 CI·Codex의 기능/보안 판정과 구분해 최종 통합 기록에 남긴다. 검사 실패를 전부 통과로 표기하지 않는다.
+
+진열 태블릿의 오류 영역이 kiosk-core의 fixed 전체화면 뒤에 가려지는 후속 P2 1건을 수정했다. Store adapter의 오류 banner를 kiosk의 overlay보다 위에 두고, 기기 연결 오류와 진열 설정 오류를 분리했다. 401 연결 해제 안내는 설정 재조회 성공에 지워지지 않으며, 재시도는 heartbeat도 즉시 다시 실행한다. Core를 변경하지 않았다.
+
+진열 복구 회귀 2건·Store build/lint PASS. 실제 kiosk/API adapter에 합성 공개 응답을 연결한 desktop 1280×800·mobile 390×844 브라우저에서 `elementFromPoint`로 재시도/재연결 버튼이 최상단임을 확인하고 실제 클릭→설정 복구·setup 이동을 검증했다. page error·가로 overflow·직원 header 0, 합성 screenshot 직접 확인. 운영/실기기 자료는 사용하지 않았다.

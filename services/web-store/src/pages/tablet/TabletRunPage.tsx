@@ -46,8 +46,10 @@ function TabletRuntime({
     [version, setVersion] = useState<string>();
   const [idle, setIdle] = useState<IdlePlaylistItem[]>([]),
     [settings, setSettings] = useState<TabletKioskDisplaySettings>();
-  const [error, setError] = useState(""),
+  const [deviceError, setDeviceError] = useState(""),
+    [settingsError, setSettingsError] = useState(""),
     [retry, setRetry] = useState(0);
+  const error = deviceError || settingsError;
   const tabletId = device ? location : queryTabletId;
   useEffect(() => {
     if (!device) return;
@@ -59,12 +61,13 @@ function TabletRuntime({
         if (!cancelled) {
           setLocation(value.locationId || undefined);
           setVersion(value.version);
-          setError("");
+          setDeviceError("");
         }
       } catch (e) {
         if (!cancelled) {
-          setError("태블릿 연결 상태를 확인하지 못했습니다.");
+          setDeviceError("태블릿 연결 상태를 확인하지 못했습니다.");
           if ((e as { status?: number }).status === 401) {
+            setDeviceError("태블릿 연결이 해제되었습니다. 기기를 다시 연결해 주세요.");
             clearStoredTabletDevice();
             setDevice(null);
           }
@@ -78,10 +81,10 @@ function TabletRuntime({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [device, slug]);
+  }, [device, slug, retry]);
   useEffect(() => {
     let alive = true;
-    setError("");
+    setSettingsError("");
     setIdle([]);
     setSettings(undefined);
     Promise.all([fetchTabletIdle(slug, tabletId), fetchTabletSettings(slug)])
@@ -92,7 +95,7 @@ function TabletRuntime({
         }
       })
       .catch(() => {
-        if (alive) setError("일부 진열 설정을 불러오지 못했습니다.");
+        if (alive) setSettingsError("일부 진열 설정을 불러오지 못했습니다.");
       });
     return () => {
       alive = false;
@@ -114,7 +117,7 @@ function TabletRuntime({
   return (
     <div className="min-h-screen bg-slate-50">
       {error && (
-        <div role="alert" className="flex flex-wrap gap-3 bg-amber-50 p-3">
+        <div role="alert" className="fixed inset-x-0 top-0 z-[1100] flex flex-wrap items-center gap-3 bg-amber-50 p-3 shadow-lg">
           <p>{error}</p>
           <button
             className="min-h-11 rounded border px-4"
