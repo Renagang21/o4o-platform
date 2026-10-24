@@ -9,7 +9,9 @@ import { learnerApi, type LectureCourse } from '../../api/lecture';
 import { LECTURE_ACCENT, coursePath } from '../../lib/lmsViewAdapter';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasLectureMembership } from '../../components/AccessGate';
-import { INQUIRY_URL } from '../../config/service';
+import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
+import { api } from '../../lib/apiClient';
+import { INQUIRY_URL, STUDY_HERO } from '../../config/service';
 
 const PAGE_SIZE = 12;
 
@@ -62,6 +64,7 @@ export default function CoursesPage() {
       : null;
 
   return <main className="page page-wide">
+    <ServiceHomeHero surface="lecture" client={api} heading="h1" title={STUDY_HERO.title} description={STUDY_HERO.description} />
     {gate}
     <CourseListView
       courses={courses}
@@ -70,7 +73,7 @@ export default function CoursesPage() {
       onRetry={() => void load()}
       accent={LECTURE_ACCENT}
       hrefFor={(c) => coursePath(c.id)}
-      headerSlot={<div className="page-head"><h1>강의</h1><p className="muted">O4O 강의 서비스의 공개 강의 목록입니다.</p></div>}
+      headerSlot={<div className="page-head"><h2>강의</h2><p className="muted">O4O 강의 서비스의 공개 강의 목록입니다.</p></div>}
       search={{ value: search, onChange: setSearch, onSubmit: () => { setPage(1); setQuery(search.trim()); }, placeholder: '강의 검색' }}
       countSlot={<span className="muted">총 {total}개</span>}
       emptyState={<div className="empty">등록된 강의가 없습니다.</div>}
@@ -80,5 +83,6 @@ export default function CoursesPage() {
         <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>다음</button>
       </div>}
     />
+    <ServiceHomePromotion surface="lecture" client={api} />
   </main>;
 }
