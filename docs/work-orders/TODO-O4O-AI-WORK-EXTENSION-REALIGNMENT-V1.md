@@ -19,7 +19,7 @@
 - [x] P04 Core·업무 Extension·외부 연결·서비스 책임과 기존 계약의 충족/보완 구분
 - [x] P05 단계별 실행 TODO·첫 적용·검증·후속 위험 범위 보완
 - [x] P06 문서 정합·링크·민감정보·변경 범위 검증
-- [ ] P07 문서 commit/push 및 branch·SHA·검증·미해결 사항 인계
+- [x] P07 문서 commit/push 및 branch·SHA·검증·미해결 사항 인계
 
 ## 3. 기준·산출물·기존 작업 연결
 
@@ -155,6 +155,8 @@
 | CI 범위 판정 | `detect-affected.mjs --files-from`으로 docs_only/docs_fast_eligible=true, API·웹 배포 영향 false 확인 |
 | 문서 소비 테스트 | 같은 판정기의 docs-specs가 선택한 `archive-retention-and-tracked-backup-disposition.spec.ts`와 `store-role-registry-alignment.spec.ts`: Jest 2 suites / 22 tests PASS |
 
-문서 변경 범위 3개 파일의 staged scope·공백 검사를 통과했다. 준비 P07 push 결과는 원격 확인 후 기록한다. 코드/API/운영 기능 테스트는 이번 문서 변경의 수행 결과로 합산하지 않는다. PR을 생성하지 않으므로 PR CI·원격 Codex 리뷰는 미실행이다.
+문서 변경 범위 3개 파일의 staged scope·공백 검사를 통과했다. 준비 본문 commit `ba0d80e5c71b6ea9345fe43ba3ba6c0116729118`을 `wo/ai-work-extension-preparation`에 push하고 원격 branch SHA 일치를 확인했다. 이 완료 기록을 포함하는 최종 HEAD는 인계 보고를 따른다. 코드/API/운영 기능 테스트는 이번 문서 변경의 수행 결과로 합산하지 않는다. PR을 생성하지 않으므로 PR CI·원격 Codex 리뷰는 미실행이다.
 
 문서 정합: 기존 구조 문서 §13에서 새 업무 연결표·단일 TODO를 연결했다. 과거 조사/완료 기록·canonical index·정책·실행 계약은 변경하지 않았다.
+
+WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/ai-work-extension-preparation` · 기준 main `7f3d783cc2` · main integration 미실행 · local docs checks/consumer tests PASS · deployment NOT_APPLICABLE · 운영 smoke 미실행 · `KEEP` (push 후 인계, 병합 전 후속 수정용). S1~S4 구현·서비스 담당의 실제 업무 검증은 미실행이다.
