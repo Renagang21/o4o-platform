@@ -3,6 +3,7 @@
 > 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-24 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
+> 전체 업무 재정비 준비: [단일 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [업무·코드 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
 > 조사 기준: `3c95dc170103f739a3e3a33b20f85350ae0ecef5`. 코드 존재는 현행 사업 기능이라는 증거가 아니다.
 
 **현재 범위:** 기존 Core/업무 Extension·가격/quota·Runtime/editor 정비는 main에 통합됐으며 승인된 quota migration·7개 서비스 배포가 완료됐다.
@@ -245,3 +246,16 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 공통 질의 정책을 직접 사용하는 커뮤니티 수동·예약 뉴스 생성은 개별 사용처 모델 지정에 연결되지 않았다. 따라서 관리 가능한 사용처를 모두 다른 모델로 지정해도 공통 질의 정책의 모델 참조는 유지한다. 기존 공통 정책에서 모델을 명시적으로 바꾼 뒤에만 이전 참조를 해제한다. 모델 삭제가 정책을 자동 수정하거나 뉴스의 provider·과금·권한 계약을 바꾸지 않는다(2026-10-24 PR #792 통합 리뷰 보완).
 
 [PR #792](https://github.com/Renagang21/o4o-platform/pull/792)는 main `c99123518fe74099b9f471f06cdd90bf7c5709de`에 병합됐다. 이후 문서만 추가한 `abb602b9569217abf2e20de155e2f60210da5d50`을 대상으로 [Delivery 40074053472](https://github.com/Renagang21/o4o-platform/actions/runs/40074053472)가 API·관리자 verified rollout과 최종 serving SHA 검증을 성공했고 `production=success / DEPLOYED`로 확정했다. 이 시점의 배포 증거를 이후 live 상태나 실제 운영 모델 저장·유료 공급자 시험 호출의 증거로 확대하지 않는다. 새로운 schema·migration 파일이나 dependency 변경은 없고, 기존 표준 배포의 migration Job은 성공했다.
+
+## 13. 전체 AI 업무 Core + Extension 재정비 준비 (2026-10-24)
+
+[정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)와 [업무 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)는 main `7f3d783cc2bac349679639db5d7afc232388d660`의 코드·문서에 사용자 업무 1~11 및 추가 업무를 대조한 구현 전 준비다. 이번 변경은 문서만이며 새로운 runtime 계약·권한·모델/가격 정책·메뉴·운영 설정을 적용하지 않는다. §11/§12의 완료/운영 기록은 당시 증거로 유지한다.
+
+기존 `AiBusinessExtension`·`runAiExtension`·host authorize/record·모델 관리·회계/quota·편집기·외부 AI adapter를 재사용한다. 상품 지식/등록, 콘텐츠 제작/재사용, 현황/운영, 자료 기반 지원, 교육/커뮤니티, 개인 자동화는 정비할 업무 묶음이며 새 기반/패키지 개수를 뜻하지 않는다.
+
+- Core는 공통 실행·문맥·권한 callback·이력과 runtime 계약을 유지하고, 업무 Extension은 자료·출력·업무 규칙을 담당한다. 서버가 기존 도메인 권한으로 자료를 구성하고 저장·게시·주문 확인은 기존 업무 API가 수행한다.
+- 첫 후속 적용은 기존 현황 설명 Extension에 매장/공급자의 허용 지표를 연결하는 것으로 계획한다. 매장 도우미의 화면 문맥·입력과 실제 지표 조회를 구분하며 관리자 Copilot API의 guard를 일반 사용자에게 낮추지 않는다.
+- 자료 버전·출처·집계 시각은 우선 업무 입력/host에서 검증한다. Core 필드·상태 변경 도구·공통 저장소를 선제적으로 추가하지 않는다. 현재 실행기는 read/draft이며 새 실행 도구는 별도 수용 기준이 필요하다.
+- 사용처별 모델 지정과 비용/한도·중지 연결은 별도 검증한다. 최근 뉴스·상담·전문 호출과 사용처 목록의 대응, 약국 사업/분회/협력 모임의 업무 문맥 정합은 TODO에 남겼다. 전체 호출의 이관 완료로 해석하지 않는다.
+
+후속 순서는 공통 정합/첫 적용 → 상품·콘텐츠 → 운영·협력 모임 → 상담·교육·자동화 정합이다. 각 단계는 전체 소비처·권한·원본/초안 소유·비용·오류 회귀를 확인한 뒤 전환한다. 실제 구현·main 통합·실계정 및 운영 검증은 후속 실행 결과로만 완료 표시한다.
