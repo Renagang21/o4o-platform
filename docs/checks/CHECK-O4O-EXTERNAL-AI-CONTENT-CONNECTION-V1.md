@@ -284,3 +284,28 @@ Branch: `wo/external-ai-connection-followup` (기준 main `825e6b4500`). 운영 
 ### 8-3. 앱 등록 자료
 
 `apps/api-server/src/modules/external-ai/submission/` — `chatgpt-app-submission.json`(앱 정보 · 도구 8개 hint·근거 · 시험 5/부정 3) · `app-submission-draft.md`(양식 항목 · 사용자 확인 항목 · 심사 점검). 원래 로컬 `app-submission-draft.md` 는 이 PC 에서 찾지 못해 코드 기준으로 새로 작성했다. 공개 제출 미실행.
+
+## 9. 운영 실제 ChatGPT 최종 실사용 검증 (2026-10-24)
+
+- **대상 배포**: §8 보완은 PR #785(`1bbf7fd4fd`)로 반영. 검증 시점 서빙은 API `1c6374083f` · Neture web `0d0d878a19`로 둘 다 `1bbf7fd4fd`를 포함하고, 이후 외부 AI 코드 변경은 없다. 추가 코드 수정·배포 없음.
+- **방법**: 담당자가 시험 전용 Chrome 프로필을 CDP로 직접 조작했다. ChatGPT·Google 로그인만 사용자가 했다. DB 확인은 read-only 채널로 했다.
+- **계정**: 사용자 Google 계정은 소속 약국 0건이라 작업공간이 없다. 따라서 본 시험은 매장 경영자 Demo 계정(테스트 약국)으로 했다. 다른 약국 대조에는 그 계정이 소속되지 않은 KPA 매장 하나를 썼다.
+
+| 항목 | 결과 |
+|---|---|
+| Google 로그인 후 동의 화면 복귀 | PASS — 같은 `request` 동의 화면 복귀. 계정에 약국이 없어 "연결할 수 있는 작업공간이 없습니다" 표시(정상) |
+| Demo 로그인 후 동의 화면 복귀 | PASS — 같은 동의 화면, 작업공간 표시 |
+| 읽기 연결의 도구 노출·쓰기 거부 | PASS — 도구 8개 노출, `save_content_draft` → `SCOPE_FORBIDDEN` + 재연결 안내 |
+| 쓰기 권한 재연결 후 도구 새로 고침 없이 저장·수정 | PASS — 같은 채팅에서 save → update(revision 갱신) → get 일치 |
+| O4O 편집 화면 확인 | PASS — `openUrl` → 로그인 후 제작 자료 편집 화면 복귀, 수정 제목·본문 표시, 비공개(사용처 없음) |
+| 재연결 시 이전 연결 유지 | PASS — 선택 해제 시 이전 연결 활성 유지(2개 공존) |
+| 재연결 시 이전 연결 교체 | PASS — 동의 화면 "기존 연결 2개" 안내, 기본 선택으로 연결 시 이전 2개가 새 연결과 같은 transaction 시각으로 해제 |
+| 다른 약국 작업공간 차단 | PASS — 미소속 매장 지정 `search_products` → `WORKSPACE_FORBIDDEN`, 데이터 노출 없음 |
+| 연결 해제 후 차단 | PASS — O4O 설정에서 해제 후 ChatGPT가 "연결이 만료되었습니다… 다시 연결" 안내(§7의 "failed internally" 아님) |
+| 재인증 후 연결·조회 | PASS — 재연결 후 보류 요청 재개, `list_workspaces`·`get_content_draft` 성공(새 권한대로 쓰기 false) |
+
+- **시험 자료 정리(사용자 지시 범위)**: 시험 초안 1건(id·조직·제목·출처 조건)과 저장 요청 기록 2건(연결·요청 id 조건)을 건수 검증 transaction으로 삭제했다. 잔존 0건 확인. 마지막 활성 연결은 O4O 설정에서 해제했다(활성 0).
+  해제된 연결 4건·자격정보는 기존 매시간 정리(`ExternalAiOAuthProvider.cleanup`)가 지운다. 기록 시점에는 정리 대기 중이다.
+  오류 기록 2건(도구명·코드만 저장)은 1년 보존 정책대로 유지한다.
+- **관찰(결함 아님)**: ChatGPT 재연결 직후 이전 응답 하나가 "이 응답을 불러오지 못했습니다"로 표시됐다. 응답 내용은 표시 전에 이미 확인했고, ChatGPT 화면 쪽 표시 현상으로 본다.
+- **앱 공개 제출**: 계속 보류.
