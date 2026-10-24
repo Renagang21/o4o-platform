@@ -2,7 +2,7 @@
 
 > **기준일**: 2026-10-24 (Asia/Seoul)
 > **WO**: [회원 홈 1단계](../work-orders/WO-O4O-COOPERATION-MEMBER-HOME-LAYOUT-V1.md)
-> **상태**: 로컬 구현·검증 완료, PR/main 통합·운영 배포 미완료
+> **상태**: 회원 홈 1단계 로컬 검증·main 통합·운영 배포 완료. 후속 업무/실계정 운영 준비는 별도
 
 ## 구현
 
@@ -39,7 +39,18 @@
 
 ## 남은 실행과 운영 준비
 
-- PR 생성·최신 CI/리뷰·main 통합 및 일반 Delivery/Pharmcoop frontend_only 결과는 아직 미확인이다.
+- 로컬 검증 시점에 미확인이었던 PR·최신 CI/리뷰·main 통합 및 배포 결과는 아래 최종 실행 확인에서 완료 근거를 구분한다.
 - CarePharm 약관의 법정정보 빈칸·운영 미게시 상태는 유지했다. 실계정·실매장·기기·음성 검증과 사업 운영 설정은 별도 운영 준비다.
 
-문서 정합: 회원 홈 1단계의 로컬 구현 완료와 main 통합·배포 미완료를 구분한다. 기존 협업체 core/extension 작업의 완료 기록은 변경하지 않는다.
+문서 정합: 회원 홈 1단계의 개발·main 통합·배포 완료와 후속 업무/실계정 운영 준비를 구분한다. 기존 협업체 core/extension 작업의 완료 기록은 변경하지 않는다.
+
+## 최종 실행 확인 — 2026-10-24 (Asia/Seoul)
+
+- 작업 시작 뒤 추가된 main PR #789는 수정 경로가 겹치지 않아 push 전 rebase하고 Lecture 소비 앱을 재빌드했다. 병합 직전 main이 `1c6374083f`로 유지됨을 확인했다.
+- [PR #790](https://github.com/Renagang21/o4o-platform/pull/790) HEAD `9f6cc270433937acbf8a5786dec55dc64798824a`: [CI 40059355298](https://github.com/Renagang21/o4o-platform/actions/runs/40059355298)·CodeQL·SonarCloud PASS, 최신 Codex 리뷰 completed / 추가 finding 없음, 이전 2개 thread 해결. 오래된 자기 PR CI만 취소했으며 다른 작업의 CI나 운영 배포는 취소하지 않았다.
+- 초기 전체 실행 1,686개 이후 추가한 5개 회귀 사례를 포함해 CarePharm 40개·Pharmcoop 84개 집중 재검증 PASS. 공개 공지 접근 실패·비홈 분리, CarePharm 비동기 gate 뒤 anchor 복원, Pharmcoop 직접/다른 페이지 소식 이동과 홈 복귀를 실패 재현 후 검증했다. 최종 변경 뒤 각 앱 타입/production build와 집중 lint도 통과했다.
+- main `0d0d878a19794628fdba5bbc1086e9052c3d634a`로 merge 후 fetch하여 모든 작업 commit이 main에 포함되고 코드 diff가 없음을 확인했다. [main CI 40060917421](https://github.com/Renagang21/o4o-platform/actions/runs/40060917421) PASS.
+- [Delivery 40061671026](https://github.com/Renagang21/o4o-platform/actions/runs/40061671026) 성공. admin, neture(CarePharm), kpa-society(Pharmacy/MegaPharm), lecture, store, kpa-branch의 새 revision·트래픽 전환·serving report가 성공했다. `production=success / DEPLOYED`. 이번 UI 변경에는 API 재배포가 필요하지 않아 기존 API를 유지했다.
+- 진행 중 배포가 없고 main이 같은 SHA임을 확인한 뒤 [Pharmcoop 40062079618](https://github.com/Renagang21/o4o-platform/actions/runs/40062079618)을 순차 실행했다. `frontend_only=true`, `apply=false`, API compatibility·revision readiness·인증된 `/`·`/test`·`/login` HTML smoke·검토한 revision 트래픽 100% 확인 PASS. fixture 단계 skipped, 조합·회원 데이터 생성 없음.
+- 실제 회원 로그인·가입·약국 업무·운영 설정 및 DNS/IAM 변경을 실행하지 않았다. 배포 검증은 workflow의 revision/HTTP/traffic 결과이며 로컬 합성 사용 흐름 및 실계정 검증과 구분한다. 직접 웹사이트 확인만으로 비공개 회원 기능이 검증됐다고 해석하지 않는다.
+- 로컬 화면 검증용으로 시작한 preview 프로세스는 종료했다. 이 cloud checkout은 연결된 개발·검증 환경으로 유지하며 타 작업의 branch/worktree는 정리하지 않았다.
