@@ -186,6 +186,51 @@ fixture("durable model controls on isolated PostgreSQL", () => {
       "gemini-2.0-flash",
     ); // historical policy is not rewritten.
   });
+  it("keeps the shared query model until direct consumers' policy changes", async () => {
+    await db.query("INSERT INTO ai_query_policy VALUES ($1)", [
+      "gemini-2.5-flash",
+    ]);
+    const service = new ModelControlService(db);
+    let state = await service.snapshot();
+    const targets = [
+      ...new Set(
+        state.modelReferences["gemini:gemini-2.5-flash"].flatMap((ref) =>
+          ref.target ? [ref.target] : [],
+        ),
+      ),
+    ];
+    expect(targets.length).toBeGreaterThan(0);
+    for (const target of targets)
+      state = await service.change(state.revision, actor, {
+        action: "select",
+        target,
+        selection: { provider: "gemini", model: "gemini-3.8-flash" },
+      });
+    await expect(
+      service.change(state.revision, actor, {
+        action: "delete",
+        provider: "gemini",
+        id: "gemini-2.5-flash",
+      }),
+    ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+    expect((await service.snapshot()).revision).toBe(state.revision);
+    expect(
+      (await db.query("SELECT default_model FROM ai_query_policy"))[0],
+    ).toEqual({ default_model: "gemini-2.5-flash" });
+    await withAiModelControlLock(db, (manager) =>
+      manager.query("UPDATE ai_query_policy SET default_model=$1", [
+        "gemini-3.8-flash",
+      ]),
+    );
+    await service.change(state.revision, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.5-flash",
+    });
+    expect((await new ModelControlService(db).snapshot()).deleted).toContain(
+      "gemini:gemini-2.5-flash",
+    );
+  });
   it("serializes policy validation/write against retirement in both lock orders", async () => {
     const service = new ModelControlService(db);
     const gemini = {

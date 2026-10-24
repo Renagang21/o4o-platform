@@ -355,6 +355,13 @@ export class ModelControlService {
         label:
           row.label ?? "기존 공통·범위·연결 정책 또는 장애 시 대체 모델 설정",
       };
+      // News generation still uses resolveEditingModel directly. Managed selections
+      // do not replace that shared policy: only an explicit policy change releases it.
+      if (row.source === "query")
+        add(keyOf(row.provider, row.model), {
+          kind: "policy",
+          label: "공통 질의 정책 직접 사용 (커뮤니티 뉴스 등)",
+        });
       if (targets) {
         for (const target of targets)
           if (!control.selections[target])

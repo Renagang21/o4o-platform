@@ -624,7 +624,7 @@ it("releases a legacy scope primary and fallback only after every consuming usag
   ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
 });
 
-it("retains every legacy query-policy consumer until all are explicitly configured", async () => {
+it("retains the query-policy model for direct consumers after every managed usage changes", async () => {
   const f = fixture();
   f.references.push({
     provider: "gemini",
@@ -635,7 +635,9 @@ it("retains every legacy query-policy consumer until all are explicitly configur
   let state = await service.snapshot();
   const targets = [
     ...new Set(
-      state.modelReferences["gemini:gemini-2.5-flash"].map((x) => x.target!),
+      state.modelReferences["gemini:gemini-2.5-flash"].flatMap((x) =>
+        x.target ? [x.target] : [],
+      ),
     ),
   ];
   expect(targets).toEqual(
@@ -655,7 +657,18 @@ it("retains every legacy query-policy consumer until all are explicitly configur
       selection: { provider: "gemini", model: "gemini-3.8-flash" },
     });
   }
-  expect(state.protectedModels).not.toContain("gemini:gemini-2.5-flash");
+  expect(state.protectedModels).toContain("gemini:gemini-2.5-flash");
+  await expect(
+    service.change(state.revision, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.5-flash",
+    }),
+  ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+  expect((await service.snapshot()).revision).toBe(state.revision);
+  // News generation still follows the shared policy, not a managed usage selection.
+  // Only changing that policy releases its old model; no policy is changed by deletion.
+  f.references[0].model = "gemini-3.8-flash";
   state = await service.change(state.revision, actor, {
     action: "delete",
     provider: "gemini",
@@ -667,5 +680,6 @@ it("retains every legacy query-policy consumer until all are explicitly configur
       target: "home.chat",
       selection: null,
     }),
-  ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
+  ).resolves.toMatchObject({ revision: state.revision + 1 });
+  expect(await service.allows("gemini", "gemini-2.5-flash")).toBe(false);
 });
