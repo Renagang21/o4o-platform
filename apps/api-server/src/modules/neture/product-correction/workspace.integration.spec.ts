@@ -3,12 +3,16 @@ import { Pool } from 'pg';
 import { randomUUID } from 'node:crypto';
 import type { DataSource } from 'typeorm';
 import { ProductCorrectionWorkspace } from './workspace.service.js';
+import { ProductCorrectionOperationsService } from './operations.service.js';
 import { parseRule } from './contracts.js';
 
 const integration = process.env.CORRECTION_TEST_DATABASE_URL ? describe : describe.skip;
 integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
   let pool: Pool;
   let service: ProductCorrectionWorkspace;
+  let operations: ProductCorrectionOperationsService;
+  let failPreview = false;
+  let pausePreview: (() => Promise<void>) | null = null;
   const ids = Array.from({ length: 28 }, () => randomUUID());
   const definition = {
     title: '정기 확인',
@@ -70,7 +74,18 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
         try {
           await client.query('BEGIN');
           const result = await fn({
-            query: async (sql: string, args?: unknown[]) => (await client.query(sql, args)).rows,
+            query: async (sql: string, args?: unknown[]) => {
+              if (pausePreview && sql.includes('FROM product_masters')) {
+                const pause = pausePreview;
+                pausePreview = null;
+                await pause();
+              }
+              if (failPreview && sql.includes('FROM product_masters')) {
+                failPreview = false;
+                throw new Error('synthetic query failure');
+              }
+              return (await client.query(sql, args)).rows;
+            },
           });
           await client.query('COMMIT');
           return result;
@@ -83,6 +98,7 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
       },
     } as unknown as DataSource;
     service = new ProductCorrectionWorkspace(db);
+    operations = new ProductCorrectionOperationsService(db);
   });
   afterAll(async () => {
     if (pool) {
@@ -196,5 +212,251 @@ integration('상품 보정 작업 공간 — isolated PostgreSQL', () => {
     await expect(service.preview(rule.id, { search: '', page: 1 })).rejects.toMatchObject({
       code: 'RULE_DISABLED',
     });
+  });
+  it('records page inspection, preserves failures, and retries only the failed scope', async () => {
+    const rule = await service.saveRule(definition, 'admin');
+    const run = await operations.execute(rule.id, { revision: 1, scope: { search: '', page: 2 } }, 'admin');
+    expect(run.status).toBe('completed');
+    expect(run.totalCandidates).toBe(27);
+    expect(run.returnedCount).toBe(2);
+    expect(run.result!.items.every((p) => p.runId === run.id)).toBe(true);
+    expect((await operations.runs()).items[0]).not.toHaveProperty('result');
+    failPreview = true;
+    const failed = await operations.execute(
+      rule.id,
+      { revision: 1, scope: { search: '商品', page: 1 } },
+      'admin',
+    );
+    expect(failed.status).toBe('failed');
+    expect(failed.totalCandidates).toBeNull();
+    expect(failed.errorCode).toBe('CHECK_FAILED');
+    const retried = await operations.retry(failed.id, 'admin');
+    expect(retried.status).toBe('completed');
+    expect(retried.scope).toEqual(failed.scope);
+    expect(retried.retryOf).toBe(failed.id);
+    expect((await operations.run(failed.id)).status).toBe('failed');
+    await expect(operations.retry(run.id, 'admin')).rejects.toMatchObject({ code: 'RUN_NOT_FAILED' });
+    const interruptedId = randomUUID();
+    await pool.query('INSERT INTO settings(key,value,type) VALUES($1,$2::jsonb,$3)', [
+      'product-correction:run:' + interruptedId,
+      JSON.stringify({
+        ...run,
+        id: interruptedId,
+        status: 'running',
+        result: undefined,
+        startedAt: '2000-01-01T00:00:00.000Z',
+        finishedAt: null,
+      }),
+      'product_correction_run',
+    ]);
+    expect((await operations.retry(interruptedId, 'admin')).status).toBe('completed');
+    expect((await operations.run(interruptedId)).errorCode).toBe('INTERRUPTED');
+
+    await service.saveRule({ ...definition, instructions: 'new version' }, 'admin', rule.id, 1);
+    await expect(operations.retry(failed.id, 'admin')).rejects.toMatchObject({ code: 'RULE_CHANGED' });
+  });
+  it('serializes concurrent selections and connects existing tasks instead of duplicating them', async () => {
+    const rule = await service.saveRule(definition, 'admin');
+    const run = await operations.execute(rule.id, { revision: 1, scope: { search: '', page: 1 } }, 'admin');
+    const selected = run
+      .result!.items.slice(0, 2)
+      .map((p) => ({ id: p.id, fingerprint: p.fingerprint, runId: run.id }));
+    const input = {
+      title: 'duplicate selection',
+      ruleId: rule.id,
+      ruleRevision: 1,
+      scope: { search: '', page: 1 },
+      selected,
+    };
+    const result = await Promise.all([
+      service.createBatch(input, 'admin'),
+      service.createBatch(input, 'admin'),
+    ]);
+    expect(result[0].id).toBe(result[1].id);
+    expect(result.map((b) => b.selectionResult!.createdCount).sort()).toEqual([0, 2]);
+    expect(result.find((b) => b.selectionResult!.createdCount === 0)!.selectionResult!.reused).toHaveLength(
+      2,
+    );
+    const forged = {
+      ...input,
+      selected: [
+        {
+          ...selected[0],
+          runId: (
+            await operations.execute(rule.id, { revision: 1, scope: { search: 'absent', page: 1 } }, 'admin')
+          ).id,
+        },
+      ],
+    };
+    await expect(service.createBatch(forged, 'admin')).rejects.toMatchObject({
+      code: 'INVALID_RUN_SELECTION',
+    });
+    const mixed = await service.createBatch(
+      {
+        ...input,
+        selected: [
+          selected[0],
+          { id: run.result!.items[2].id, fingerprint: run.result!.items[2].fingerprint, runId: run.id },
+        ],
+      },
+      'admin',
+    );
+    expect(mixed.items).toHaveLength(1);
+    expect(mixed.selectionResult!.reused).toHaveLength(1);
+  });
+  it('records verified outcomes, dates, history and latest-work operations without product writes', async () => {
+    const rule = await service.saveRule(definition, 'admin');
+    const page = await service.preview(rule.id, { search: '', page: 1 });
+    const input = {
+      title: 'periodic operations',
+      ruleId: rule.id,
+      ruleRevision: 1,
+      scope: { search: '', page: 1 },
+      selected: page.items.slice(0, 2).map((p) => ({ id: p.id, fingerprint: p.fingerprint })),
+    };
+    let batch = await service.createBatch(input, 'admin');
+    const taskId = batch.items[0].id;
+    await expect(
+      service.saveTask(
+        batch.id,
+        taskId,
+        { revision: 1, state: 'no_change', draft: '', notes: 'confirmed', sources: '' },
+        'admin',
+      ),
+    ).rejects.toThrow();
+    batch = await service.saveTask(
+      batch.id,
+      taskId,
+      {
+        revision: 1,
+        state: 'no_change',
+        draft: '',
+        notes: 'confirmed source',
+        sources: 'official reference',
+      },
+      'admin',
+    );
+    const reviewed = batch.items[0];
+    expect(new Date(reviewed.nextReviewAt!).getTime() - new Date(reviewed.reviewedAt!).getTime()).toBe(
+      30 * 86400000,
+    );
+    const same = await service.saveTask(
+      batch.id,
+      taskId,
+      {
+        revision: 2,
+        state: 'no_change',
+        draft: '',
+        notes: 'confirmed source',
+        sources: 'official reference',
+      },
+      'admin',
+    );
+    expect(same.revision).toBe(2);
+    expect(same.items[0].reviewedAt).toBe(reviewed.reviewedAt);
+    expect((await service.createBatch(input, 'admin')).selectionResult!.createdCount).toBe(0);
+    const other = batch.items[1].id;
+    await expect(
+      service.saveTask(
+        batch.id,
+        other,
+        {
+          revision: 2,
+          state: 'needs_source',
+          draft: '',
+          notes: 'waiting',
+          sources: '',
+          followUpAt: '2000-01-01T00:00:00.000Z',
+        },
+        'admin',
+      ),
+    ).rejects.toMatchObject({ code: 'FOLLOWUP_MUST_BE_FUTURE' });
+    batch = await service.saveTask(
+      batch.id,
+      other,
+      {
+        revision: 2,
+        state: 'needs_source',
+        draft: '',
+        notes: 'waiting on source',
+        sources: '',
+        followUpAt: new Date(Date.now() + 86400000).toISOString(),
+      },
+      'admin',
+    );
+    expect(batch.items[1].reviewedAt).toBeNull();
+    expect(batch.items[1].nextReviewAt).toBeNull();
+    const history = await operations.taskVersions(batch.id, taskId);
+    expect(history.map((v) => v.batchRevision)).toEqual([2, 1]);
+    expect(history[1].task.state).toBe('pending');
+    // Advance only synthetic workflow metadata to test due filters; original product triggers remain active.
+    await pool.query(
+      `UPDATE settings SET value=jsonb_set(jsonb_set(value,'{items,0,nextReviewAt}','"2000-01-01T00:00:00.000Z"'),'{items,1,followUpAt}','"2000-01-01T00:00:00.000Z"') WHERE key=$1`,
+      ['product-correction:batch:' + batch.id],
+    );
+    expect((await operations.operations('due')).items.some((i) => i.taskId === taskId)).toBe(true);
+    expect((await operations.operations('followup')).items.some((i) => i.taskId === other)).toBe(true);
+    const renewed = await service.createBatch({ ...input, selected: [input.selected[0]] }, 'admin');
+    expect(renewed.selectionResult!.createdCount).toBe(1);
+    expect((await operations.operations('due')).items.some((i) => i.taskId === taskId)).toBe(false);
+    await service.saveTask(
+      batch.id,
+      taskId,
+      {
+        revision: batch.revision,
+        state: 'no_change',
+        draft: '',
+        notes: '과거 작업 메모 보완',
+        sources: '공식 원문',
+      },
+      'admin',
+    );
+    expect((await operations.operations('open')).items.some((i) => i.taskId === renewed.items[0].id)).toBe(
+      true,
+    );
+    expect((await service.createBatch({ ...input, selected: [input.selected[0]] }, 'admin')).id).toBe(
+      renewed.id,
+    );
+
+    await service.saveRule({ ...definition, instructions: 'updated criterion' }, 'admin', rule.id, 1);
+    const outdated = await operations.operations('outdated');
+    expect(outdated.items.some((i) => i.ruleId === rule.id)).toBe(true);
+    expect((await service.batch(batch.id)).ruleSnapshot.revision).toBe(1);
+    expect(await snapshot()).toBe(before);
+  });
+  it('does not let a late inspection worker overwrite recovered interruption history', async () => {
+    const rule = await service.saveRule(definition, 'admin');
+    let release!: () => void;
+    let entered!: () => void;
+    const started = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    const barrier = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    pausePreview = async () => {
+      entered();
+      await barrier;
+    };
+    const pending = operations.execute(rule.id, { revision: 1, scope: { search: '', page: 1 } }, 'admin');
+    await started;
+    const row = (
+      await pool.query(
+        `SELECT key,value FROM settings WHERE type='product_correction_run' AND value->'ruleSnapshot'->>'id'=$1`,
+        [rule.id],
+      )
+    ).rows[0];
+    await pool.query(
+      `UPDATE settings SET value=jsonb_set(value,'{startedAt}','"2000-01-01T00:00:00.000Z"') WHERE key=$1`,
+      [row.key],
+    );
+    try {
+      const retry = await operations.retry(row.value.id, 'admin');
+      expect(retry.status).toBe('completed');
+    } finally {
+      release();
+    }
+    expect((await pending).status).toBe('failed');
+    expect((await operations.run(row.value.id)).errorCode).toBe('INTERRUPTED');
   });
 });

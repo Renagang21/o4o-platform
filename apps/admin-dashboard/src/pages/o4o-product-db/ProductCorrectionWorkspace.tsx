@@ -9,8 +9,10 @@ import type {
   ProductCorrectionRuleInput,
   ProductCorrectionTask,
   ProductCorrectionTaskState,
+  ProductCorrectionTaskVersion,
 } from '@o4o/types';
 import { productCorrectionApi as api } from '@/api/product-correction.api';
+import ProductCorrectionOperations, { ProductCorrectionRuns } from './ProductCorrectionOperations';
 import { useProductDbWriteAccess } from './useProductDbWriteAccess';
 
 const inputClass = 'w-full rounded border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100';
@@ -30,6 +32,9 @@ const states: Record<ProductCorrectionTaskState, string> = {
   needs_source: '근거 확인 필요',
   review_ready: '검토 대기 (미적용)',
   deferred: '보류',
+  no_change: '수정 불필요 (검토 완료)',
+  reviewed: '변경안 검토 완료 (미적용)',
+  excluded: '대상 제외 (검토 완료)',
 };
 const purposes = {
   professional: '전문인용',
@@ -75,6 +80,9 @@ export default function ProductCorrectionWorkspace() {
   const [loading, setLoading] = useState(false);
   const [working, setWorking] = useState(false);
   const [rulesLoading, setRulesLoading] = useState(true);
+  const [refresh, setRefresh] = useState(0);
+  const [focusTaskId, setFocusTaskId] = useState('');
+  const [reused, setReused] = useState<Array<{ batchId: string; taskId: string; productName: string }>>([]);
   const readSequence = useRef(0);
   const batchSequence = useRef(0);
   const historySequence = useRef(0);
@@ -121,6 +129,7 @@ export default function ProductCorrectionWorkspace() {
     setLoading(false);
     setPreview(null);
     setSelected({});
+    setReused([]);
     setError('');
   };
   const runPreview = async (page = 1) => {
@@ -130,12 +139,15 @@ export default function ProductCorrectionWorkspace() {
     setLoading(true);
     setError('');
     try {
-      const data = await api.preview(rule.id, { search, page });
+      const data = await api.preview(rule.id, { search, page }, rule.revision);
       if (seq === readSequence.current && key === context.current) setPreview(data);
     } catch (e) {
       if (seq === readSequence.current && key === context.current) setError(message(e));
     } finally {
-      if (seq === readSequence.current) setLoading(false);
+      if (seq === readSequence.current) {
+        setLoading(false);
+        setRefresh((v) => v + 1);
+      }
     }
   };
   const saveRule = async (definition: ProductCorrectionRuleInput) => {
@@ -159,12 +171,15 @@ export default function ProductCorrectionWorkspace() {
       setWorking(false);
     }
   };
-  const openBatch = async (id: string) => {
+  const openBatch = async (id: string, taskId = '') => {
     const seq = ++batchSequence.current;
     setError('');
     try {
       const result = await api.batch(id);
-      if (seq === batchSequence.current) setBatch(result);
+      if (seq === batchSequence.current) {
+        setBatch(result);
+        setFocusTaskId(taskId);
+      }
     } catch (e) {
       if (seq === batchSequence.current) setError(message(e));
     }
@@ -186,9 +201,15 @@ export default function ProductCorrectionWorkspace() {
         batchSequence.current++;
         setBatch(created);
         setSelected({});
-        setNotice('작업 묶음을 만들었습니다. 상품 원본은 변경되지 않았습니다.');
+        const reusedItems = created.selectionResult?.reused ?? [];
+        setReused(reusedItems);
+        setFocusTaskId(reusedItems[0]?.batchId === created.id ? reusedItems[0].taskId : '');
+        setNotice(
+          `새 작업 ${created.selectionResult?.createdCount ?? created.items.length}개 · 기존 작업 연결 ${reusedItems.length}개. 상품 원본은 변경되지 않았습니다.`,
+        );
       }
       await loadHistory(1);
+      setRefresh((v) => v + 1);
     } catch (e) {
       if (key === context.current) setError(message(e));
     } finally {
@@ -196,6 +217,12 @@ export default function ProductCorrectionWorkspace() {
       setWorking(false);
     }
   };
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('batch');
+    const taskId = params.get('task') ?? '';
+    if (id && /^[0-9a-f-]{36}$/i.test(id)) void openBatch(id, taskId);
+  }, []);
   return (
     <section
       className="space-y-5 rounded-lg border border-blue-200 bg-white p-4"
@@ -208,7 +235,8 @@ export default function ProductCorrectionWorkspace() {
           적용되지 않습니다.
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          점검 주기는 관리자 작업 계획용입니다. 자동 실행·자동 수정은 하지 않습니다.
+          점검 주기는 검토 완료 후 다음 점검일 계산에 사용합니다. 점검은 수동으로 실행하며 상품을 자동
+          수정하지 않습니다.
         </p>
       </div>
       {error && (
@@ -221,6 +249,17 @@ export default function ProductCorrectionWorkspace() {
           {notice}
         </p>
       )}
+      <ProductCorrectionOperations refresh={refresh} onOpen={(id, taskId) => void openBatch(id, taskId)} />
+      <ProductCorrectionRuns canWrite={canWrite} refresh={refresh} onRetry={() => setRefresh((v) => v + 1)} />
+      {reused.map((item) => (
+        <button
+          key={item.taskId}
+          className={secondary}
+          onClick={() => void openBatch(item.batchId, item.taskId)}
+        >
+          {item.productName} 기존 작업 열기
+        </button>
+      ))}
       {rulesLoading ? (
         <p>기준 불러오는 중…</p>
       ) : (
@@ -271,7 +310,7 @@ export default function ProductCorrectionWorkspace() {
             </label>
             <button
               className={buttonClass}
-              disabled={loading || working || !rule.enabled}
+              disabled={!canWrite || loading || working || !rule.enabled}
               onClick={() => void runPreview()}
             >
               대상 점검
@@ -343,14 +382,14 @@ export default function ProductCorrectionWorkspace() {
               <div className="flex gap-2">
                 <button
                   className={secondary}
-                  disabled={loading || preview.page <= 1}
+                  disabled={!canWrite || loading || preview.page <= 1}
                   onClick={() => void runPreview(preview.page - 1)}
                 >
                   이전 대상
                 </button>
                 <button
                   className={secondary}
-                  disabled={loading || preview.page * preview.pageSize >= preview.total}
+                  disabled={!canWrite || loading || preview.page * preview.pageSize >= preview.total}
                   onClick={() => void runPreview(preview.page + 1)}
                 >
                   다음 대상
@@ -407,7 +446,8 @@ export default function ProductCorrectionWorkspace() {
       </section>
       {batch && (
         <BatchEditor
-          key={batch.id}
+          key={`${batch.id}:${focusTaskId}`}
+          initialTaskId={focusTaskId}
           batch={batch}
           canWrite={canWrite}
           onSave={async (task, input) => {
@@ -419,6 +459,7 @@ export default function ProductCorrectionWorkspace() {
               setNotice('작업 기록 저장 완료 — 상품 원본에는 적용되지 않았습니다.');
             }
             await loadHistory(batchPage);
+            setRefresh((v) => v + 1);
           }}
         />
       )}
@@ -731,17 +772,21 @@ function RuleEditor({
 
 function BatchEditor({
   batch,
+  initialTaskId,
   canWrite,
   onSave,
 }: {
   batch: ProductCorrectionBatch;
+  initialTaskId?: string;
   canWrite: boolean;
   onSave: (
     task: ProductCorrectionTask,
-    input: Pick<ProductCorrectionTask, 'state' | 'draft' | 'notes' | 'sources'>,
+    input: Pick<ProductCorrectionTask, 'state' | 'draft' | 'notes' | 'sources' | 'followUpAt'>,
   ) => Promise<void>;
 }) {
-  const [taskId, setTaskId] = useState(batch.items[0]?.id ?? '');
+  const [taskId, setTaskId] = useState(
+    batch.items.some((item) => item.id === initialTaskId) ? initialTaskId! : batch.items[0]?.id || '',
+  );
   const task = batch.items.find((i) => i.id === taskId);
   return (
     <section className="space-y-3 rounded border p-4" aria-label="선택 상품 보완 작업">
@@ -772,6 +817,7 @@ function BatchEditor({
         <TaskEditor
           key={`${task.id}:${task.updatedAt}`}
           task={task}
+          batchId={batch.id}
           rule={batch.ruleSnapshot}
           canWrite={canWrite}
           onSave={(input) => onSave(task, input)}
@@ -782,22 +828,36 @@ function BatchEditor({
 }
 function TaskEditor({
   task,
+  batchId,
   rule,
   canWrite,
   onSave,
 }: {
   task: ProductCorrectionTask;
+  batchId: string;
   rule: ProductCorrectionRule;
   canWrite: boolean;
-  onSave: (input: Pick<ProductCorrectionTask, 'state' | 'draft' | 'notes' | 'sources'>) => Promise<void>;
+  onSave: (
+    input: Pick<ProductCorrectionTask, 'state' | 'draft' | 'notes' | 'sources' | 'followUpAt'>,
+  ) => Promise<void>;
 }) {
   const [form, setForm] = useState({
     state: task.state,
     draft: task.draft,
     notes: task.notes,
     sources: task.sources,
+    followUpAt: task.followUpAt ?? null,
   });
   const [error, setError] = useState('');
+  const [versions, setVersions] = useState<ProductCorrectionTaskVersion[]>([]);
+  const [historyPage, setHistoryPage] = useState(0);
+  const versionSequence = useRef(0);
+  useEffect(() => {
+    const sequence = versionSequence;
+    return () => {
+      sequence.current++;
+    };
+  }, []);
   const [saving, setSaving] = useState(false);
   const lock = useRef(false);
   const requestText = `상품 보완 검토 작업 (원본 적용 없음)\n기준: ${rule.title} v${rule.revision}\n지침:\n${rule.instructions}\n상품: ${task.product.name}\n이용 목적: ${purposes[rule.purpose]}\n대상: ${rule.descriptionType} / ${rule.language}\n상품군: ${task.product.regulatoryType} / 제조사: ${task.product.manufacturerName ?? '미확인'} / 규격: ${task.product.specification ?? '미확인'}\n기존 원문${task.product.sourceTruncated ? ' (앞부분만, 전체 원문 추가 확인 필요)' : ''}:\n${task.product.sourceContent}\n출처: ${task.product.sourceType ?? '미확인'} / ${task.product.sourceRefId ?? '미확인'}\n상품 사실과 전문 참고정보를 구분하고 각각의 출처·확인일을 기록하세요. 수치의 기준량을 추정하거나 일반 사용 안내를 제품 고유 사용법으로 바꾸지 마세요. 질병명·진단·감별 정보는 단어만으로 배제하지 말고 해당 이용 목적과 전문 근거에 맞게 구성하세요. 확인되지 않은 내용은 필요한 근거로 표시하세요. 보완 초안과 근거·검토 메모를 작성하고 공식 데이터 변경·게시 완료로 표현하지 마세요.`;
@@ -840,6 +900,34 @@ function TaskEditor({
           ))}
         </select>
       </label>
+      <p className="text-xs text-gray-600">
+        검토 완료: {task.reviewedAt ? new Date(task.reviewedAt).toLocaleString() : '미완료'} · 다음 점검:{' '}
+        {task.nextReviewAt ? new Date(task.nextReviewAt).toLocaleString() : '없음'}
+      </p>
+      {['needs_source', 'deferred'].includes(form.state) && (
+        <label className="block text-sm">
+          재확인 예정일
+          <input
+            aria-label="재확인 예정일"
+            type="datetime-local"
+            className={inputClass}
+            disabled={!canWrite || saving}
+            value={
+              form.followUpAt
+                ? new Date(
+                    new Date(form.followUpAt).getTime() -
+                      new Date(form.followUpAt).getTimezoneOffset() * 60000,
+                  )
+                    .toISOString()
+                    .slice(0, 16)
+                : ''
+            }
+            onChange={(e) =>
+              setForm({ ...form, followUpAt: e.target.value ? new Date(e.target.value).toISOString() : null })
+            }
+          />
+        </label>
+      )}
       {(['draft', 'notes', 'sources'] as const).map((field) => (
         <label key={field} className="block text-sm">
           {{ draft: '보완 초안 (미적용)', notes: '검토 메모', sources: '확인 근거·출처' }[field]}
@@ -884,8 +972,62 @@ function TaskEditor({
           {error}
         </p>
       )}
+      <div className="flex flex-wrap gap-2">
+        <button
+          className={secondary}
+          onClick={async () => {
+            const seq = ++versionSequence.current;
+            try {
+              const data = await api.taskVersions(batchId, task.id, 1);
+              if (seq === versionSequence.current) {
+                setVersions(data);
+                setHistoryPage(1);
+              }
+            } catch (e) {
+              if (seq === versionSequence.current) setError(message(e));
+            }
+          }}
+        >
+          작업 저장 이력
+        </button>
+        {historyPage > 0 && (
+          <button
+            className={secondary}
+            disabled={versions.length < 10}
+            onClick={async () => {
+              const seq = ++versionSequence.current;
+              try {
+                const data = await api.taskVersions(batchId, task.id, historyPage + 1);
+                if (seq === versionSequence.current) {
+                  setVersions(data);
+                  setHistoryPage((p) => p + 1);
+                }
+              } catch (e) {
+                if (seq === versionSequence.current) setError(message(e));
+              }
+            }}
+          >
+            이전 저장 더 보기
+          </button>
+        )}
+      </div>
+      {versions.map((v) => (
+        <details key={v.batchRevision}>
+          <summary>
+            저장 v{v.batchRevision} · {states[v.task.state]} · {new Date(v.task.updatedAt).toLocaleString()}
+          </summary>
+          <pre className="whitespace-pre-wrap break-words text-sm">
+            {v.task.draft}
+            {'\n'}
+            {v.task.notes}
+            {'\n'}
+            {v.task.sources}
+          </pre>
+        </details>
+      ))}
       <p className="text-xs text-gray-600">
-        검토 대기에는 초안·메모·근거가 모두 필요합니다. 이 저장은 상품 정보나 공식 설명서를 바꾸지 않습니다.
+        검토 대기·변경안 검토 완료에는 초안·메모·근거가 필요합니다. 수정 불필요·대상 제외에는 메모·근거, 근거
+        대기·보류에는 사유·재확인일이 필요합니다. 이 저장은 상품 원본을 바꾸지 않습니다.
       </p>
     </div>
   );

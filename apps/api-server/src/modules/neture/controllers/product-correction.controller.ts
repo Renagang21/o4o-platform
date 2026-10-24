@@ -5,12 +5,14 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
 import { ProductCorrectionWorkspace } from '../product-correction/workspace.service.js';
+import { ProductCorrectionOperationsService } from '../product-correction/operations.service.js';
 import { CorrectionError } from '../product-correction/contracts.js';
 import logger from '../../../utils/logger.js';
 
 export function createProductCorrectionController(db: DataSource): Router {
   const router = Router();
   const workspace = new ProductCorrectionWorkspace(db);
+  const operations = new ProductCorrectionOperationsService(db);
   router.use(authenticate);
   router.use(requireAdmin);
   const uuid = z.string().uuid();
@@ -87,6 +89,46 @@ export function createProductCorrectionController(db: DataSource): Router {
     requireProductDbWrite,
     run((req) =>
       workspace.saveTask(uuid.parse(req.params.id), uuid.parse(req.params.taskId), req.body, actor(req)),
+    ),
+  );
+  router.post(
+    '/rules/:id/runs',
+    requireProductDbWrite,
+    run((req) => operations.execute(uuid.parse(req.params.id), req.body, actor(req))),
+  );
+  router.get(
+    '/runs',
+    run((req) => operations.runs(z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page))),
+  );
+  router.get(
+    '/runs/:id',
+    run((req) => operations.run(uuid.parse(req.params.id))),
+  );
+  router.post(
+    '/runs/:id/retry',
+    requireProductDbWrite,
+    run((req) => operations.retry(uuid.parse(req.params.id), actor(req))),
+  );
+  router.get(
+    '/operations',
+    run((req) =>
+      operations.operations(
+        z
+          .enum(['all', 'open', 'due', 'followup', 'reviewed', 'outdated'])
+          .default('all')
+          .parse(req.query.filter),
+        z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page),
+      ),
+    ),
+  );
+  router.get(
+    '/batches/:id/items/:taskId/versions',
+    run((req) =>
+      operations.taskVersions(
+        uuid.parse(req.params.id),
+        uuid.parse(req.params.taskId),
+        z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page),
+      ),
     ),
   );
   return router;

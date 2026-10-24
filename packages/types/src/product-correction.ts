@@ -29,6 +29,7 @@ export interface ProductCorrectionScope {
   page: number;
 }
 export interface ProductCorrectionMatch {
+  runId?: string;
   id: string;
   name: string;
   regulatoryType: string;
@@ -45,6 +46,7 @@ export interface ProductCorrectionMatch {
   reason: string;
 }
 export interface ProductCorrectionPreview {
+  runId?: string;
   ruleRevision: number;
   total: number;
   page: number;
@@ -56,7 +58,10 @@ export type ProductCorrectionTaskState =
   | 'in_progress'
   | 'needs_source'
   | 'review_ready'
-  | 'deferred';
+  | 'deferred'
+  | 'no_change'
+  | 'reviewed'
+  | 'excluded';
 export interface ProductCorrectionTask {
   id: string;
   product: ProductCorrectionMatch;
@@ -66,6 +71,9 @@ export interface ProductCorrectionTask {
   sources: string;
   updatedAt: string;
   updatedBy: string;
+  followUpAt?: string | null;
+  reviewedAt?: string | null;
+  nextReviewAt?: string | null;
 }
 export interface ProductCorrectionBatch {
   id: string;
@@ -86,4 +94,65 @@ export interface ProductCorrectionBatchSummary {
   createdAt: string;
   updatedAt: string;
   itemCount: number;
+}
+
+export interface ProductCorrectionBatchResult extends ProductCorrectionBatch {
+  selectionResult?: {
+    createdCount: number;
+    reused: Array<{ batchId: string; taskId: string; productName: string }>;
+  };
+}
+export interface ProductCorrectionRun {
+  id: string;
+  ruleSnapshot: ProductCorrectionRule;
+  scope: ProductCorrectionScope;
+  status: 'running' | 'completed' | 'failed';
+  startedAt: string;
+  finishedAt: string | null;
+  actorId: string;
+  totalCandidates: number | null;
+  returnedCount: number;
+  result?: ProductCorrectionPreview;
+  errorCode?: string;
+  retryOf?: string;
+}
+export type ProductCorrectionRunSummary = Omit<ProductCorrectionRun, 'ruleSnapshot' | 'result'> & {
+  ruleTitle: string;
+  ruleId: string;
+  ruleRevision: number;
+};
+export type ProductCorrectionOperationFilter = 'all' | 'open' | 'due' | 'followup' | 'reviewed' | 'outdated';
+export interface ProductCorrectionOperation {
+  batchId: string;
+  taskId: string;
+  productId: string;
+  productName: string;
+  ruleId: string;
+  ruleTitle: string;
+  ruleRevision: number;
+  state: ProductCorrectionTaskState;
+  followUpAt: string | null;
+  reviewedAt: string | null;
+  nextReviewAt: string | null;
+  outdated: boolean;
+}
+export interface ProductCorrectionOperations {
+  counts: {
+    total: number;
+    products: number;
+    open: number;
+    due: number;
+    followup: number;
+    reviewed: number;
+    outdated: number;
+  };
+  items: ProductCorrectionOperation[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+export interface ProductCorrectionTaskVersion {
+  batchId: string;
+  batchRevision: number;
+  task: ProductCorrectionTask;
 }

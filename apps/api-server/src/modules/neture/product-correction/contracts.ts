@@ -60,7 +60,15 @@ export const batchSchema = z
     ruleRevision: z.number().int().positive(),
     scope: previewSchema,
     selected: z
-      .array(z.object({ id: z.string().uuid(), fingerprint: z.string().regex(/^[a-f0-9]{64}$/) }).strict())
+      .array(
+        z
+          .object({
+            id: z.string().uuid(),
+            fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+            runId: z.string().uuid().optional(),
+          })
+          .strict(),
+      )
       .min(1)
       .max(50),
   })
@@ -68,18 +76,37 @@ export const batchSchema = z
 export const taskSchema = z
   .object({
     revision: z.number().int().positive(),
-    state: z.enum(['pending', 'in_progress', 'needs_source', 'review_ready', 'deferred']),
+    state: z.enum([
+      'pending',
+      'in_progress',
+      'needs_source',
+      'review_ready',
+      'deferred',
+      'no_change',
+      'reviewed',
+      'excluded',
+    ]),
+    followUpAt: z.string().datetime().nullable().optional(),
     draft: z.string().max(30000),
     notes: z.string().max(8000),
     sources: z.string().max(8000),
   })
   .strict()
   .refine(
-    (v) => v.state !== 'review_ready' || Boolean(v.draft.trim() && v.notes.trim() && v.sources.trim()),
+    (v) =>
+      !['review_ready', 'reviewed'].includes(v.state) ||
+      Boolean(v.draft.trim() && v.notes.trim() && v.sources.trim()),
     {
       message: '검토 대기는 초안·검토 메모·근거가 필요합니다',
     },
-  );
+  )
+  .refine(
+    (v) => !['no_change', 'excluded'].includes(v.state) || Boolean(v.notes.trim() && v.sources.trim()),
+    { message: '종료에는 검토 메모와 근거가 필요합니다' },
+  )
+  .refine((v) => !['needs_source', 'deferred'].includes(v.state) || Boolean(v.notes.trim() && v.followUpAt), {
+    message: '대기·보류에는 사유와 재확인일이 필요합니다',
+  });
 export function parseRule(input: unknown): ProductCorrectionRuleInput {
   return ruleSchema.parse(input) as ProductCorrectionRuleInput;
 }
@@ -89,3 +116,10 @@ export const BATCH_TYPE = 'product_correction_batch';
 export const ruleKey = (id: string) => `product-correction:rule:${id}`;
 export const batchKey = (id: string) => `product-correction:batch:${id}`;
 export const versionKey = (id: string, revision: number) => `product-correction:version:${id}:${revision}`;
+
+export const RUN_TYPE = 'product_correction_run';
+export const TASK_VERSION_TYPE = 'product_correction_task_version';
+export const runKey = (id: string) => `product-correction:run:${id}`;
+export const taskVersionKey = (id: string, revision: number) =>
+  `product-correction:task-version:${id}:${revision}`;
+export const CLOSED_STATES = ['no_change', 'reviewed', 'excluded'];

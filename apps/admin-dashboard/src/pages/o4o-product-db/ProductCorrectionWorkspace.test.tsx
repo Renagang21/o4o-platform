@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ProductCorrectionWorkspace from './ProductCorrectionWorkspace';
 const mocks = vi.hoisted(() => ({
@@ -12,6 +12,10 @@ const mocks = vi.hoisted(() => ({
     createBatch: vi.fn(),
     batch: vi.fn(),
     saveTask: vi.fn(),
+    operations: vi.fn(),
+    runs: vi.fn(),
+    retryRun: vi.fn(),
+    taskVersions: vi.fn(),
   },
   access: { allowed: true },
 }));
@@ -53,6 +57,15 @@ const batch = {
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.access.allowed = true;
+  mocks.api.operations.mockResolvedValue({
+    counts: { total: 0, products: 0, open: 0, due: 0, followup: 0, reviewed: 0, outdated: 0 },
+    items: [],
+    total: 0,
+    page: 1,
+    pageSize: 10,
+  });
+  mocks.api.runs.mockResolvedValue({ items: [], total: 0 });
+  mocks.api.taskVersions.mockResolvedValue([]);
   mocks.api.rules.mockResolvedValue([rule]);
   mocks.api.batches.mockResolvedValue({ items: [], total: 0 });
   mocks.api.preview.mockResolvedValue({ ruleRevision: 1, total: 1, page: 1, pageSize: 25, items: [product] });
@@ -138,5 +151,127 @@ describe('관리자 상품 보정 작업', () => {
     await selectRule();
     expect(screen.getByLabelText('검토·보완 지침')).toBeDisabled();
     expect(screen.getByRole('button', { name: '기준 저장' })).toBeDisabled();
+  });
+  it('records no-change review and displays the server-calculated next inspection date', async () => {
+    mocks.api.saveTask.mockImplementation(async (_batch, _task, input) => ({
+      ...batch,
+      revision: 2,
+      items: [
+        {
+          ...batch.items[0],
+          ...input,
+          reviewedAt: '2026-10-24T12:00:00.000Z',
+          nextReviewAt: '2026-11-23T12:00:00.000Z',
+          updatedAt: '2026-10-24T12:00:00.000Z',
+        },
+      ],
+    }));
+    render(<ProductCorrectionWorkspace />);
+    await createWork();
+    fireEvent.change(screen.getByLabelText('작업 상태'), { target: { value: 'no_change' } });
+    fireEvent.change(screen.getByLabelText('검토 메모'), { target: { value: '원문 수치 관계 확인' } });
+    fireEvent.change(screen.getByLabelText('확인 근거·출처'), { target: { value: '공식 원문과 확인일' } });
+    fireEvent.click(screen.getByRole('button', { name: '작업 기록 저장' }));
+    await screen.findByText(/작업 기록 저장 완료/);
+    expect(mocks.api.saveTask).toHaveBeenCalledWith(
+      batch,
+      batch.items[0],
+      expect.objectContaining({ state: 'no_change', draft: '' }),
+    );
+    expect(screen.getByText(/검토 완료:.*다음 점검:/)).not.toHaveTextContent('다음 점검: 없음');
+  });
+  it('sends a follow-up date for source-waiting tasks without marking them complete', async () => {
+    mocks.api.saveTask.mockResolvedValue({ ...batch, revision: 2 });
+    render(<ProductCorrectionWorkspace />);
+    await createWork();
+    fireEvent.change(screen.getByLabelText('작업 상태'), { target: { value: 'needs_source' } });
+    fireEvent.change(screen.getByLabelText('재확인 예정일'), { target: { value: '2030-01-03T10:00' } });
+    fireEvent.change(screen.getByLabelText('검토 메모'), { target: { value: '추가 원문 요청' } });
+    fireEvent.click(screen.getByRole('button', { name: '작업 기록 저장' }));
+    await screen.findByText(/작업 기록 저장 완료/);
+    expect(mocks.api.saveTask).toHaveBeenCalledWith(
+      batch,
+      batch.items[0],
+      expect.objectContaining({
+        state: 'needs_source',
+        followUpAt: new Date('2030-01-03T10:00').toISOString(),
+      }),
+    );
+  });
+  it('connects existing work and exposes previous saved versions', async () => {
+    mocks.api.createBatch.mockResolvedValue({
+      ...batch,
+      selectionResult: {
+        createdCount: 0,
+        reused: [{ batchId: batch.id, taskId: batch.items[0].id, productName: product.name }],
+      },
+    });
+    mocks.api.batch.mockResolvedValue(batch);
+    mocks.api.taskVersions.mockResolvedValue([
+      { batchId: batch.id, batchRevision: 1, task: { ...batch.items[0], draft: '이전에 저장한 초안' } },
+    ]);
+    render(<ProductCorrectionWorkspace />);
+    await createWork();
+    expect(screen.getByRole('status')).toHaveTextContent('새 작업 0개 · 기존 작업 연결 1개');
+    fireEvent.click(screen.getByRole('button', { name: '검증용 상품 기존 작업 열기' }));
+    await waitFor(() => expect(mocks.api.batch).toHaveBeenCalledWith(batch.id));
+    fireEvent.click(screen.getByRole('button', { name: '작업 저장 이력' }));
+    await screen.findByText('이전에 저장한 초안');
+  });
+  it('shows failed page inspection history and retries the recorded scope', async () => {
+    mocks.api.runs.mockResolvedValue({
+      total: 1,
+      items: [
+        {
+          id: 'run-1',
+          ruleTitle: rule.title,
+          ruleRevision: 1,
+          scope: { search: '비타민', page: 2 },
+          status: 'failed',
+          startedAt: '2026-10-24',
+          totalCandidates: null,
+          returnedCount: 0,
+        },
+      ],
+    });
+    mocks.api.retryRun.mockResolvedValue({ status: 'completed' });
+    render(<ProductCorrectionWorkspace />);
+    await screen.findByText(/점검 실패/);
+    expect(screen.getByText(/검색: 비타민/)).toHaveTextContent('후보 확인 실패');
+    fireEvent.click(screen.getByRole('button', { name: '실패 범위 다시 실행' }));
+    await waitFor(() => expect(mocks.api.retryRun).toHaveBeenCalledWith('run-1'));
+  });
+  it('ignores an older operations response after the filter changes', async () => {
+    let resolve!: (value: unknown) => void;
+    const fresh = {
+      counts: { total: 17, products: 1, open: 1, due: 0, followup: 0, reviewed: 0, outdated: 0 },
+      items: [],
+      total: 0,
+      page: 1,
+      pageSize: 10,
+    };
+    mocks.api.operations
+      .mockImplementationOnce(
+        () =>
+          new Promise((r) => {
+            resolve = r;
+          }),
+      )
+      .mockResolvedValue(fresh);
+    render(<ProductCorrectionWorkspace />);
+    fireEvent.change(screen.getByLabelText('관리 현황 조건'), { target: { value: 'open' } });
+    await screen.findByText(/기록 17건/);
+    await act(async () => {
+      resolve({ ...fresh, counts: { ...fresh.counts, total: 999 } });
+    });
+    expect(screen.queryByText(/기록 999건/)).not.toBeInTheDocument();
+  });
+  it('shows an operations failure without presenting a successful zero count and allows refresh', async () => {
+    mocks.api.operations.mockRejectedValueOnce(new Error('temporary read failure'));
+    render(<ProductCorrectionWorkspace />);
+    await screen.findByText('정기 관리 현황을 불러오지 못했습니다.');
+    expect(screen.queryByText(/기록 0건/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '현황 새로고침' }));
+    await screen.findByText(/기록 0건/);
   });
 });

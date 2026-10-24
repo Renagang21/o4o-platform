@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import type { DataSource, EntityManager } from 'typeorm';
+import type { DataSource } from 'typeorm';
 import type {
   ProductCorrectionBatch,
   ProductCorrectionBatchSummary,
+  ProductCorrectionBatchResult,
+  ProductCorrectionRun,
+  ProductCorrectionTask,
   ProductCorrectionRule,
   ProductCorrectionScope,
 } from '@o4o/types';
@@ -18,34 +21,15 @@ import {
   taskSchema,
   versionKey,
   VERSION_TYPE,
+  CLOSED_STATES,
+  runKey,
+  RUN_TYPE,
+  taskVersionKey,
+  TASK_VERSION_TYPE,
 } from './contracts.js';
 import { preview } from './preview.js';
 
-type Db = Pick<DataSource | EntityManager, 'query'>;
-/** Only this namespace of settings is writable. No product, description, identifier or candidate mutations. */
-async function read<T>(db: Db, key: string, type: string, lock = false): Promise<T> {
-  const rows = await db.query(
-    `SELECT value FROM settings WHERE key=$1 AND type=$2${lock ? ' FOR UPDATE' : ''}`,
-    [key, type],
-  );
-  if (!rows[0]) throw new CorrectionError('NOT_FOUND', 404);
-  return rows[0].value as T;
-}
-async function insert(db: Db, key: string, type: string, value: unknown) {
-  await db.query('INSERT INTO settings(key,value,type,description) VALUES($1,$2::jsonb,$3,$4)', [
-    key,
-    JSON.stringify(value),
-    type,
-    '상품 보정 기준·작업 기록 (원본 적용 없음)',
-  ]);
-}
-async function replace(db: Db, key: string, type: string, value: unknown) {
-  await db.query('UPDATE settings SET value=$1::jsonb,"updatedAt"=NOW() WHERE key=$2 AND type=$3', [
-    JSON.stringify(value),
-    key,
-    type,
-  ]);
-}
+import { read, insert, replace, type Db } from './records.js';
 export class ProductCorrectionWorkspace {
   constructor(private db: DataSource) {}
   async rules(): Promise<ProductCorrectionRule[]> {
@@ -53,7 +37,7 @@ export class ProductCorrectionWorkspace {
       "SELECT value FROM settings WHERE type=$1 AND key LIKE $2 ORDER BY value->>'updatedAt' DESC,key",
       [RULE_TYPE, 'product-correction:rule:%'],
     );
-    return rows.map((r: { value: ProductCorrectionRule; ProductCorrectionScope }) => r.value);
+    return rows.map((r: { value: ProductCorrectionRule }) => r.value);
   }
   rule(id: string, db: Db = this.db, lock = false) {
     return read<ProductCorrectionRule>(db, ruleKey(id), RULE_TYPE, lock);
@@ -82,7 +66,7 @@ export class ProductCorrectionWorkspace {
       "SELECT value FROM settings WHERE type=$1 AND key LIKE $2 ORDER BY (value->>'revision')::int DESC",
       [VERSION_TYPE, `product-correction:version:${id}:%`],
     );
-    return rows.map((r: { value: ProductCorrectionRule; ProductCorrectionScope }) => r.value);
+    return rows.map((r: { value: ProductCorrectionRule }) => r.value);
   }
   async preview(id: string, scope: unknown) {
     return preview(this.db, await this.rule(id), previewSchema.parse(scope) as ProductCorrectionScope);
@@ -129,6 +113,44 @@ export class ProductCorrectionWorkspace {
       ) {
         throw new CorrectionError('PRODUCT_SOURCE_CHANGED', 409);
       }
+      for (const selected of data.selected) {
+        if (!selected.runId) continue; // compatibility with the original read-only preview client
+        const run = await read<ProductCorrectionRun>(db, runKey(selected.runId), RUN_TYPE);
+        if (
+          run.status !== 'completed' ||
+          run.ruleSnapshot.id !== rule.id ||
+          run.ruleSnapshot.revision !== rule.revision ||
+          run.scope.search !== scope.search ||
+          !run.result?.items.some((p) => p.id === selected.id && p.fingerprint === selected.fingerprint)
+        )
+          throw new CorrectionError('INVALID_RUN_SELECTION', 409);
+      }
+      const reused: NonNullable<ProductCorrectionBatchResult['selectionResult']>['reused'] = [];
+      const fresh = [] as typeof matches.items;
+      for (const product of matches.items) {
+        const existing = await db.query(
+          `SELECT b.value->>'id' AS "batchId",t->>'id' AS "taskId",t->'product'->>'name' AS "productName"
+          FROM settings b CROSS JOIN LATERAL jsonb_array_elements(b.value->'items') t
+          WHERE b.type=$1 AND b.key LIKE 'product-correction:batch:%' AND b.value->'ruleSnapshot'->>'id'=$2
+            AND (b.value->'ruleSnapshot'->>'revision')::int=$3 AND t->'product'->>'id'=$4 AND t->'product'->>'fingerprint'=$5
+            AND (t->>'state' NOT IN ('no_change','reviewed','excluded') OR NULLIF(t->>'nextReviewAt','')::timestamptz>NOW())
+          ORDER BY (t->>'state' NOT IN ('no_change','reviewed','excluded')) DESC,b."createdAt" DESC,t->>'updatedAt' DESC,b.key LIMIT 1`,
+          [BATCH_TYPE, rule.id, rule.revision, product.id, product.fingerprint],
+        );
+        if (existing[0]) reused.push(existing[0]);
+        else
+          fresh.push({
+            ...product,
+            ...(data.selected.find((p) => p.id === product.id)?.runId
+              ? { runId: data.selected.find((p) => p.id === product.id)!.runId }
+              : {}),
+          });
+      }
+      if (!fresh.length)
+        return {
+          ...(await this.batch(reused[0].batchId, db)),
+          selectionResult: { createdCount: 0, reused },
+        } as ProductCorrectionBatchResult;
       const now = new Date().toISOString();
       const batch: ProductCorrectionBatch = {
         id: randomUUID(),
@@ -139,7 +161,7 @@ export class ProductCorrectionWorkspace {
         createdBy: actorId,
         createdAt: now,
         updatedAt: now,
-        items: matches.items.map((product) => ({
+        items: fresh.map((product) => ({
           id: randomUUID(),
           product,
           state: 'pending',
@@ -151,7 +173,10 @@ export class ProductCorrectionWorkspace {
         })),
       };
       await insert(db, batchKey(batch.id), BATCH_TYPE, batch);
-      return batch;
+      return {
+        ...batch,
+        selectionResult: { createdCount: fresh.length, reused },
+      } as ProductCorrectionBatchResult;
     });
   }
   async saveTask(batchId: string, taskId: string, input: unknown, actorId: string) {
@@ -162,6 +187,28 @@ export class ProductCorrectionWorkspace {
       const item = batch.items.find((i) => i.id === taskId);
       if (!item) throw new CorrectionError('TASK_NOT_FOUND', 404);
       const now = new Date().toISOString();
+      const followUpAt = ['needs_source', 'deferred'].includes(data.state) ? (data.followUpAt ?? null) : null;
+      if (followUpAt && new Date(followUpAt).getTime() <= Date.now())
+        throw new CorrectionError('FOLLOWUP_MUST_BE_FUTURE');
+      const unchanged =
+        item.state === data.state &&
+        item.draft === data.draft &&
+        item.notes === data.notes &&
+        item.sources === data.sources &&
+        (item.followUpAt ?? null) === followUpAt;
+      if (unchanged) return batch;
+      // Preserve the previous saved version, including legacy records on their first edit.
+      const previousKey = taskVersionKey(item.id, batch.revision);
+      await db.query(
+        `INSERT INTO settings(key,value,type,description) VALUES($1,$2::jsonb,$3,$4) ON CONFLICT(key) DO NOTHING`,
+        [
+          previousKey,
+          JSON.stringify({ batchId, batchRevision: batch.revision, task: item }),
+          TASK_VERSION_TYPE,
+          '상품 검토 기록 이력',
+        ],
+      );
+      const closed = CLOSED_STATES.includes(data.state);
       Object.assign(item, {
         state: data.state,
         draft: data.draft,
@@ -169,10 +216,20 @@ export class ProductCorrectionWorkspace {
         sources: data.sources,
         updatedBy: actorId,
         updatedAt: now,
-      });
+        followUpAt,
+        reviewedAt: closed ? now : null,
+        nextReviewAt: closed
+          ? new Date(new Date(now).getTime() + batch.ruleSnapshot.cadenceDays * 86400000).toISOString()
+          : null,
+      } satisfies Partial<ProductCorrectionTask>);
       batch.revision++;
       batch.updatedAt = now;
       await replace(db, batchKey(batchId), BATCH_TYPE, batch);
+      await insert(db, taskVersionKey(item.id, batch.revision), TASK_VERSION_TYPE, {
+        batchId,
+        batchRevision: batch.revision,
+        task: item,
+      });
       return batch;
     });
   }

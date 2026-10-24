@@ -68,4 +68,33 @@ describe('상품 보정 관리자 API 권한·입력 경계', () => {
     ).toBe(400);
     expect(query).not.toHaveBeenCalled();
   });
+  it.each([
+    '/correction/operations',
+    '/correction/runs',
+    '/correction/batches/00000000-0000-4000-8000-000000000001/items/00000000-0000-4000-8000-000000000002/versions',
+  ])('guards new read path %s before SQL', async (path) => {
+    expect((await request(app).get(path).set('x-test-user', 'neture-admin')).status).toBe(403);
+    expect(query).not.toHaveBeenCalled();
+  });
+  it.each([
+    '/correction/rules/00000000-0000-4000-8000-000000000001/runs',
+    '/correction/runs/00000000-0000-4000-8000-000000000001/retry',
+  ])('guards new write path %s before SQL', async (path) => {
+    expect((await request(app).post(path).set('x-test-user', 'legacy-admin').send({})).status).toBe(403);
+    expect(query).not.toHaveBeenCalled();
+  });
+  it('rejects unknown operation filters and incomplete inspection inputs', async () => {
+    expect(
+      (await request(app).get('/correction/operations?filter=invalid').set('x-test-user', 'platform')).status,
+    ).toBe(400);
+    expect(
+      (
+        await request(app)
+          .post('/correction/rules/00000000-0000-4000-8000-000000000001/runs')
+          .set('x-test-user', 'platform')
+          .send({ scope: { page: 1 } })
+      ).status,
+    ).toBe(400);
+    expect(query).not.toHaveBeenCalled();
+  });
 });
