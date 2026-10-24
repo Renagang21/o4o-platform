@@ -187,13 +187,15 @@ Listening on 127.0.0.1:5442
 
 ```bash
 pnpm run build:packages                # 최초 1회 또는 packages/ 수정 시
-pnpm run dev:admin                     # Admin Dashboard  → http://localhost:5173
+pnpm run dev:admin                     # Admin Dashboard  → http://localhost:3001
 pnpm run dev:api                       # API 서버         → http://localhost:3002 (.env PORT)
 pnpm --filter @o4o/web-neture dev      # web-neture       → http://localhost:3000
 pnpm run dev                           # Admin Dashboard (= dev:admin)
 ```
 
 API 상태 확인: `curl http://localhost:3002/health`
+
+Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard/package.json`의 `dev` 명령이 `vite --port 3001`을 실행하므로 `vite.config.ts`의 기본 포트(5173)보다 우선합니다.
 
 로컬 API 포트 **3002** 가 기준입니다(`apps/api-server/.env.example` `PORT` · web-neture dev 기본값 · `@o4o/auth-client` localhost 기본값).
 소스의 `PORT || 8080` 은 Cloud Run runtime 기본값이며 로컬 기준이 아닙니다.
@@ -496,3 +498,22 @@ https://github.com/GoogleCloudPlatform/cloud-sql-proxy/releases 에서 **v2** Wi
 ---
 
 *로컬 실행환경 단일 기준 문서. 실행환경 관련 안내는 이 문서에만 유지합니다.*
+
+
+### 서비스 문의·운영 업무함 PostgreSQL 검증
+
+문의 범위·역할·동시 수정·알림 실패·업무 SQL 검증은 기존 개발 DB와 분리한다.
+PostgreSQL 15를 loopback `127.0.0.1:55439`에 준비하고 로컬 전용 role `operator_inbox_fixture`에
+`CREATEDB` 및 관리 DB `postgres` 접속 권한을 부여한다. 같은 이름의 운영 계정이나 운영 접속값을 사용하지 않는다.
+전용 DB `o4o_operator_inbox_fixture`는 **없는 상태**여야 하며 wrapper가 생성·삭제한다.
+런타임 `DB_*` 설정은 사용하지 않는다. 인증은 준비한 전용 로컬 서버 설정을 따른다.
+
+```text
+pnpm run build:packages
+pnpm exec tsx scripts/dev/run-operator-inbox-fixture.ts
+```
+
+wrapper는 baseline·모든 incremental fingerprint, 신규 migration empty down/up을 검사하고 실제 HTTP/권한 테스트를 실행한다.
+기존 DB면 재사용/삭제를 거부하고 생성한 DB의 무작위 소유권 marker가 일치할 때만 제거한다.
+`Fixture cleanup PASS: database count 0`까지 확인한다. 직접 Jest를 실행해 PG 테스트가 skip된 결과는 통합 PASS가 아니다.
+테스트용 서버는 실행 담당이 종료하며 다른 DB·세션의 서버나 연결을 강제로 정리하지 않는다.

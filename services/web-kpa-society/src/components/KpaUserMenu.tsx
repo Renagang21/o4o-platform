@@ -1,69 +1,37 @@
 /**
- * KpaUserMenu — KPA 사용자 프로필 메뉴 SSOT
+ * KpaUserMenu — 약국 협력사업 사이트 사용자 프로필 메뉴 SSOT
  *
  * WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1
  *
- * 역할별 대시보드 진입점 + 계정 메뉴(마이페이지/설정)를 단일 소스로 제공한다.
- * 데스크톱 프로필 드롭다운(KpaGlobalHeader.userMenuItems)과 모바일 프로필 시트
- * (MobileBottomNav '내정보')가 동일 데이터를 재사용하도록 하기 위한 공용 컴포넌트.
+ * 데스크톱 프로필 드롭다운(KpaGlobalHeader)과 모바일 프로필 시트(MobileBottomNav '내정보')가
+ * 동일 항목을 재사용하도록 하기 위한 공용 컴포넌트.
  *
- * 역할 판정은 기존 SSOT(@o4o/auth-utils)만 사용 — 새 권한 로직 없음.
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7 · D8:
+ *   옛 KPA 관리자 · 운영 대시보드와 마이페이지는 삭제했다. 매장 소유 판정(/kpa/me-context)도 읽지 않으므로
+ *   '내 매장' 은 로그인 사용자 모두에게 보이고, 접근 판정은 store.neture.co.kr handoff 목적지가 한다.
  */
 
-import { LayoutDashboard, Settings, Shield, Store, UserRound } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { GlobalHeaderMenuItem } from '@o4o/ui';
 import { getUserDisplayName } from '@o4o/account-ui';
-import { isOperatorOrAbove, isAdminOrAbove, isStoreOwnerDual } from '@o4o/auth-utils';
 import type { User as UserType } from '../contexts';
-
-export interface KpaUserRoles {
-  isAdmin: boolean;
-  isOperator: boolean;
-  isStoreOwner: boolean;
-}
-
-/** 기존 KpaGlobalHeader 와 동일한 역할 판정 SSOT */
-export function useKpaUserRoles(user: UserType | null): KpaUserRoles {
-  return {
-    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §13: legacy `lms:instructor` 판정 제거 (runtime consumer 0)
-    isAdmin: user ? isAdminOrAbove(user.roles, 'kpa') : false,
-    isOperator: user ? isOperatorOrAbove(user.roles, 'kpa') : false,
-    isStoreOwner: isStoreOwnerDual(user?.roles ?? [], 'kpa:store_owner', user?.isStoreOwner),
-  };
-}
 
 /**
  * 사용자 표시 이름 — displayName > 성+이름 > name > email prefix > '사용자'
  *
  * WO-O4O-SERVICE-USER-DISPLAY-NAME-COMMONIZATION-G1-V1:
  *   계산 본체는 `@o4o/account-ui` 의 `getUserDisplayName` 정본 하나뿐이다.
- *   이 export 는 소비처(`KpaGlobalHeader` · `MobileBottomNav`)의 기존 import 경로를
- *   유지하기 위한 얇은 위임이며, 우선순위·fallback 은 정본과 동일하다.
  */
 export function getKpaUserDisplayName(user: UserType | null): string {
   return getUserDisplayName(user);
 }
 
-/** 현재 로그인 사용자의 KPA 서비스 내 최고 유효 역할을 명시한다. */
+/** 플랫폼 최고 관리자만 역할을 명시한다. 사업별 역할은 사업 화면이 표시한다. */
 export function getKpaServiceRoleLabel(user: UserType | null): string | undefined {
-  const roles = user?.roles ?? [];
-  if (roles.includes('platform:super_admin')) {
-    return 'KPA 서비스 · 플랫폼 최고 관리자 (platform:super_admin)';
-  }
-  if (roles.includes('kpa:admin')) {
-    return 'KPA 서비스 · 서비스 관리자 (kpa:admin)';
-  }
-  if (roles.includes('kpa:operator')) {
-    return 'KPA 서비스 · 서비스 운영자 (kpa:operator)';
-  }
-  return undefined;
+  return user?.roles?.includes('platform:super_admin') ? '플랫폼 최고 관리자 (platform:super_admin)' : undefined;
 }
 
-/**
- * 역할별 대시보드 + 계정 메뉴 항목 (로그아웃 제외 — 소비처가 각자 렌더).
- * WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 규칙 유지:
- *   관리자·운영은 역할별 독립 표시 / 내 매장=store_owner. (강의 대시보드 항목은 Phase 2 §14 로 제거)
- */
+/** 프로필 메뉴 항목 (로그아웃 제외 — 소비처가 각자 렌더). */
 export function KpaUserMenuItems({
   user,
   onItemClick,
@@ -71,33 +39,10 @@ export function KpaUserMenuItems({
   user: UserType | null;
   onItemClick?: () => void;
 }) {
-  const { isAdmin, isOperator, isStoreOwner } = useKpaUserRoles(user);
+  if (!user) return null;
   return (
-    <>
-      {isAdmin && (
-        <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
-          관리자 대시보드
-        </GlobalHeaderMenuItem>
-      )}
-      {isOperator && (
-        <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
-          운영 대시보드
-        </GlobalHeaderMenuItem>
-      )}
-      {isStoreOwner && (
-        <GlobalHeaderMenuItem to="/store" icon={<Store className="w-4 h-4" />} onClick={onItemClick}>
-          내 매장
-        </GlobalHeaderMenuItem>
-      )}
-      <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>
-        마이페이지
-      </GlobalHeaderMenuItem>
-      <GlobalHeaderMenuItem to="/mypage/profile" icon={<UserRound className="w-4 h-4" />} onClick={onItemClick}>
-        프로필
-      </GlobalHeaderMenuItem>
-      <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />} onClick={onItemClick}>
-        설정
-      </GlobalHeaderMenuItem>
-    </>
+    <GlobalHeaderMenuItem to="/store" icon={<Store className="w-4 h-4" />} onClick={onItemClick}>
+      내 매장
+    </GlobalHeaderMenuItem>
   );
 }

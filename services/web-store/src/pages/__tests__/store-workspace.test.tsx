@@ -22,6 +22,7 @@ import {
 } from "../../components/store/StoreWorkflowNavigation";
 
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
+vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
 vi.mock('../pharmacy/StoreExecutionPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>실행 현황</h1>{navigation}</> }));
 
@@ -31,6 +32,7 @@ vi.mock("../../contexts/AuthContext", () => ({
 
 vi.mock("../../contexts/StoreContext", () => ({
   useUnifiedStore: () => ({
+    organizationId: 'fixture-store',
     effectiveServiceKey: "kpa-society",
     scopedServiceKey: "kpa-society",
     services: [],
@@ -44,6 +46,44 @@ function Location() {
   const location = useLocation();
   return <output data-testid="location">{JSON.stringify(location)}</output>;
 }
+
+it.each(['/store', '/work/kpa-society/store'])('restores the former product landing only for its current scoped return: %s', async base => {
+  const path = `${base}/workspace/commerce?q=Fixture&source=local&page=2`;
+  render(<MemoryRouter initialEntries={[{pathname:base+'/workspace/commerce',search:'?q=Fixture&source=local&page=2',state:{productReturn:{path,scope:'fixture-store:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route path={base} element={<StoreWorkspaceShell config={{...config,basePath:base}}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+      <Route path="my-products" element={<><h1>상품 목록</h1><Location/></>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 목록'});
+  expect(screen.queryByRole('heading',{name:'상품 주문'})).toBeNull();
+  const location=JSON.parse(screen.getByTestId('location').textContent!);
+  expect(location.pathname).toBe(base+'/my-products');
+  expect(location.state.productReturn).toEqual({path:base+'/my-products'+location.search,scope:'fixture-store:kpa-society',selectedKey:'local:one'});
+});
+it.each([
+  ['another-store:kpa-society','/store/workspace/commerce'],
+  ['fixture-store:another-service','/store/workspace/commerce'],
+  ['fixture-store:kpa-society','/store/my-products'],
+])('ignores a product return for a different scope or exact route: %s %s', async (scope,path) => {
+  render(<MemoryRouter initialEntries={[{pathname:'/store/workspace/commerce',state:{productReturn:{path,scope,selectedKey:'local:one'}}}]}><Routes>
+    <Route path="/store" element={<StoreWorkspaceShell config={config}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 주문'});
+  expect(screen.queryByRole('heading',{name:'상품 목록'})).toBeNull();
+});
+it('a saved product return cannot restore a menu removed by capability filtering', async () => {
+  const filtered={...config,menuSections:config.menuSections?.map(section=>({...section,items:section.items.filter(item=>item.key!=='my-products')}))};
+  render(<MemoryRouter initialEntries={[{pathname:'/store/workspace/commerce',state:{productReturn:{path:'/store/workspace/commerce',scope:'fixture-store:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route path="/store" element={<StoreWorkspaceShell config={filtered}/>}>
+      <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce"/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'상품 주문'});
+  expect(screen.queryByRole('heading',{name:'상품 목록'})).toBeNull();
+});
 
 describe("업무 배치와 기존 경로", () => {
   it("직원 지원은 약국 메뉴와 업무 그룹에만 노출된다", () => {
@@ -286,9 +326,9 @@ it('필터된 자료·상품 진입을 목적지의 새 안내 시작에서 다�
   expect((await screen.findByText('현재 이용할 수 있는 업무가 없습니다.')).textContent).toContain('현재 이용할 수 있는 업무가 없습니다');
 });
 
-it('상품 목적지는 메뉴 카드를 거치지 않고 실제 상품 목록을 표시한다', async () => {
+it('상품 목적지는 주문 상품 목록을 먼저 표시하고 기존 취급상품 진입을 보존한다', async () => {
  render(<MemoryRouter initialEntries={['/store/workspace/commerce']}><Routes><Route path="/store" element={<StoreWorkspaceShell config={config} />}><Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce" />} /></Route></Routes></MemoryRouter>);
- expect(await screen.findByRole('heading', {name:'상품 목록'})).toBeTruthy();
+ expect(await screen.findByRole('heading', {name:'상품 주문'})).toBeTruthy();
  expect(screen.getByRole('link', {name:'공급 상품'}).closest('details')?.open).toBe(false);
  fireEvent.click(screen.getByText('전체 업무'));
  expect(screen.getByRole('link', {name:'공급 상품'}).getAttribute('href')).toBe('/store/pharmacy/supply');

@@ -11,7 +11,7 @@
  */
 import { DEFAULT_SEMI_FRANCHISE_KEY, SEMI_FRANCHISE_EVENT_SERVICE_KEY, type SupplyKind } from '../constants.js';
 import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
-import { recruitmentTargetMatch } from './recruitment-target.js';
+import { recruitmentTargetMatch, recruitmentPublicMatch } from './recruitment-target.js';
 
 import type { ProposalTerms } from './proposal-terms.js';
 
@@ -26,7 +26,7 @@ export interface SupplyOption {
   productName: string;
   supplierId: string;
   supplierName: string;
-  semiFranchiseKey: string;
+  semiFranchiseKey: string | null;
   semiFranchiseName: string;
   paymentReceiverKey: string | null;
   unitPrice: number;
@@ -98,7 +98,17 @@ const ACCESS_CTE = `
       JOIN base b ON b.master_id::text = sr.product_id AND b.supplier_user_id::text = sr.seller_id
       JOIN seller_recruitment_applications sra
         ON sra.recruitment_id = sr.id AND sra.applicant_organization_id = $1 AND sra.status = 'approved'
-     WHERE sr.exposure_status = 'approved' AND sr.status = 'recruiting' AND sr.supply_unit_price IS NOT NULL
+     WHERE sr.exposure_status = 'approved' AND sr.status = 'recruiting' AND sr.supply_unit_price > 0
+    UNION ALL
+    -- Public recruitment: the selected pharmacy's approved application and explicit price are required.
+    -- No inferred franchise membership, fallback price or payment receiver.
+    SELECT 'recruitment', sr.id, b.*, NULL::varchar, '공급자 직접 모집'::varchar, NULL::varchar,
+           sr.supply_unit_price, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL::jsonb
+      FROM seller_recruitments sr
+      JOIN base b ON b.master_id::text = sr.product_id AND b.supplier_user_id::text = sr.seller_id
+      JOIN seller_recruitment_applications sra
+        ON sra.recruitment_id = sr.id AND sra.applicant_organization_id = $1 AND sra.status = 'approved'
+     WHERE ${recruitmentPublicMatch()} AND sr.status = 'recruiting' AND sr.supply_unit_price > 0
   )`;
 
 const SELECT_OPTION = `
@@ -134,6 +144,8 @@ function normalize(row: any): SupplyOption {
 export interface SupplyOptionFilter {
   /** all · default · proposal · event · recruitment · sf:<key> */
   source?: string;
+  business?: string;
+  recruitment?: string;
   q?: string;
   page?: number;
   limit?: number;
@@ -147,24 +159,36 @@ export async function listSupplyOptions(
 ): Promise<{ items: SupplyOption[]; total: number }> {
   const source = (filter.source ?? 'all').trim();
   const kind = (['default', 'proposal', 'event', 'recruitment'] as const).find((k) => k === source) ?? null;
-  const sfKey = source.startsWith('sf:') ? source.slice(3) : null;
+  const sfKey = filter.business?.trim() || (source.startsWith('sf:') ? source.slice(3) : null);
+  const publicOnly = sfKey === '__public__';
+  const recruitment = filter.recruitment?.trim() || null;
   const q = filter.q?.trim() ? `%${filter.q.trim()}%` : null;
   const limit = Math.min(Math.max(Number(filter.limit) || 50, 1), 200);
   const offset = (Math.max(Number(filter.page) || 1, 1) - 1) * limit;
-  const where = `WHERE ($2::text IS NULL OR o.kind = $2) AND ($3::text IS NULL OR o.sf_key = $3)
-                   AND ($4::text IS NULL OR o.product_name ILIKE $4 OR o.supplier_name ILIKE $4)`;
+  const where = (publicIndex: number, recruitmentIndex: number) => `WHERE ($2::text IS NULL OR o.kind = $2) AND ($3::text IS NULL OR o.sf_key = $3)
+                   AND ($4::text IS NULL OR o.product_name ILIKE $4 OR o.supplier_name ILIKE $4)
+                   AND (NOT $${publicIndex}::boolean OR (o.kind = 'recruitment' AND o.sf_key IS NULL))
+                   AND ($${recruitmentIndex}::text IS NULL OR (o.kind = 'recruitment' AND o.option_id::text = $${recruitmentIndex}))`;
 
   const rows = await exec.query(
-    `WITH ${ACCESS_CTE} ${SELECT_OPTION} ${where}
+    `WITH ${ACCESS_CTE} ${SELECT_OPTION} ${where(7, 8)}
       ORDER BY o.product_name, o.kind, o.unit_price, o.option_id
       LIMIT $5 OFFSET $6`,
-    [organizationId, kind, sfKey, q, limit, offset],
+    [organizationId, kind, publicOnly ? null : sfKey, q, limit, offset, publicOnly, recruitment],
   );
   const [{ count }] = await exec.query(
-    `WITH ${ACCESS_CTE} SELECT count(*)::int AS count FROM options o ${where}`,
-    [organizationId, kind, sfKey, q],
+    `WITH ${ACCESS_CTE} SELECT count(*)::int AS count FROM options o ${where(5, 6)}`,
+    [organizationId, kind, publicOnly ? null : sfKey, q, publicOnly, recruitment],
   );
   return { items: rows.map(normalize), total: count };
+}
+
+/** One read for the existing browse result; never infer orderability from a client badge. */
+export async function orderableRecruitmentIds(exec: Exec, organizationId: string, ids: string[]): Promise<Set<string>> {
+  if (!ids.length) return new Set();
+  const rows = await exec.query(`WITH ${ACCESS_CTE} SELECT option_id::text AS id FROM options
+    WHERE kind = 'recruitment' AND option_id::text = ANY($2::text[])`, [organizationId, ids]);
+  return new Set(rows.map(row => row.id as string));
 }
 
 /** 단건 판정 — 상세 · 장바구니 담기 · 주문 확정. 이용할 수 없으면 null(존재를 드러내지 않는다). */

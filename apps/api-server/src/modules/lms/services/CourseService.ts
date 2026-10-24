@@ -1,3 +1,5 @@
+import { serviceContactRecipients } from '../../contact-inquiry/contact-recipients.js';
+import { deliverOperatorNotifications } from '../../contact-inquiry/operator-delivery.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
@@ -421,18 +423,37 @@ export class CourseService extends BaseService<Course> {
       metadata: { before, after: updated.status },
     });
 
+    try {
+      await deliverOperatorNotifications(
+        await serviceContactRecipients(AppDataSource, 'lecture', 'lecture'),
+        op => notificationService.createNotification({
+          userId: op.userId, type: 'lms.course_submitted', serviceKey: SERVICE_KEYS.LECTURE,
+          title: '강의 심사 요청', message: updated.title,
+          metadata: { courseId: updated.id, targetUrl: `/service-entry/lecture?returnPath=${encodeURIComponent(`/operator/courses/${updated.id}/review`)}` },
+        }),
+      );
+    } catch {
+      logger.warn('[LMS] operator notification failed; pending review remains in work inbox');
+    }
+
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
-    await notificationService.createNotification({
-      userId: updated.instructorId,
-      organizationId: updated.organizationId,
-      type: 'lms.course_submitted',
-      title: '강의 검토 요청',
-      message: '강의가 검토 요청 상태로 변경되었습니다.',
-      metadata: {
-        courseId: updated.id,
-        courseTitle: updated.title,
-      },
-    });
+    try {
+      await notificationService.createNotification({
+        userId: updated.instructorId,
+        organizationId: updated.organizationId,
+        serviceKey: SERVICE_KEYS.LECTURE,
+        type: 'lms.course_submitted',
+        title: '강의 검토 요청',
+        message: '강의가 검토 요청 상태로 변경되었습니다.',
+        metadata: {
+          courseId: updated.id,
+          courseTitle: updated.title,
+          targetUrl: `/service-entry/lecture?returnPath=${encodeURIComponent(`/instructor/courses/${updated.id}/edit`)}`,
+        },
+      });
+    } catch {
+      logger.warn('[LMS] course notification delivery failed; saved state is preserved');
+    }
 
     return updated;
   }
@@ -476,17 +497,23 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
-    await notificationService.createNotification({
-      userId: updated.instructorId,
-      organizationId: updated.organizationId,
-      type: 'lms.course_approved',
-      title: '강의 승인 완료',
-      message: '강의가 승인되었습니다.',
-      metadata: {
-        courseId: updated.id,
-        courseTitle: updated.title,
-      },
-    });
+    try {
+      await notificationService.createNotification({
+        userId: updated.instructorId,
+        organizationId: updated.organizationId,
+        serviceKey: SERVICE_KEYS.LECTURE,
+        type: 'lms.course_approved',
+        title: '강의 승인 완료',
+        message: '강의가 승인되었습니다.',
+        metadata: {
+          courseId: updated.id,
+          courseTitle: updated.title,
+          targetUrl: `/service-entry/lecture?returnPath=${encodeURIComponent(`/instructor/courses/${updated.id}/edit`)}`,
+        },
+      });
+    } catch {
+      logger.warn('[LMS] course notification delivery failed; saved state is preserved');
+    }
 
     return updated;
   }
@@ -536,18 +563,24 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
-    await notificationService.createNotification({
-      userId: updated.instructorId,
-      organizationId: updated.organizationId,
-      type: 'lms.course_rejected',
-      title: '강의 반려',
-      message: '강의가 반려되었습니다.',
-      metadata: {
-        courseId: updated.id,
-        courseTitle: updated.title,
-        rejectionReason: trimmed,
-      },
-    });
+    try {
+      await notificationService.createNotification({
+        userId: updated.instructorId,
+        organizationId: updated.organizationId,
+        serviceKey: SERVICE_KEYS.LECTURE,
+        type: 'lms.course_rejected',
+        title: '강의 반려',
+        message: '강의가 반려되었습니다.',
+        metadata: {
+          courseId: updated.id,
+          courseTitle: updated.title,
+          targetUrl: `/service-entry/lecture?returnPath=${encodeURIComponent(`/instructor/courses/${updated.id}/edit`)}`,
+          rejectionReason: trimmed,
+        },
+      });
+    } catch {
+      logger.warn('[LMS] course notification delivery failed; saved state is preserved');
+    }
 
     return updated;
   }

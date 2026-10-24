@@ -122,6 +122,7 @@ import { createSignageRoutes, createSignagePublicRoutes } from '../routes/signag
 // 프로덕션 3 테이블 전부 0행. canonical 재생 경로는 Tablet ScreenSet 축이다.
 // → docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
 import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.js';
+import { createExternalAiRoutes } from '../modules/external-ai/external-ai.routes.js';
 
 // ============================================================================
 // PHASE 1: Core routes — registered BEFORE server listen
@@ -221,6 +222,13 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
 // PHASE 2: Domain routes — registered AFTER DB init (inside startServer)
 // ============================================================================
 export async function registerDomainRoutes(app: Application, dataSource: DataSource): Promise<void> {
+  // Delegation is separate from platform login; module settings default to OFF.
+  const externalAi=createExternalAiRoutes(dataSource);
+  app.use(externalAi.router);
+  if(externalAi.provider) {
+    const cleanup=setInterval(()=>{void externalAi.provider!.cleanup().catch(()=>logger.warn('[External AI] cleanup unavailable'));},60*60*1000);
+    cleanup.unref();
+  }
   try {
     // ========================================================================
     // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1
@@ -327,6 +335,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     const { createPublicContactInquiryController } = await import('../modules/contact-inquiry/public-contact-inquiry.controller.js');
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
+
+    const { createOperatorInboxRoutes } = await import('../modules/contact-inquiry/operator-inbox.routes.js');
+    app.use('/api/v1/operator-inbox', createOperatorInboxRoutes(dataSource));
 
     // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');

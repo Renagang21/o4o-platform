@@ -10,6 +10,9 @@ type CertificateAction = { kind: 'issue'; userId: string; courseId: string }
 export function useOperatorCertificates() {
   const toast = useToast();
   const lifecycle = useRef({ mounted: false, pending: false });
+  // A failed renew/revoke retried with the same input reuses its operationId, so a request that reached the
+  // server before the failure is not applied twice. Success or a different input starts a new id.
+  const retry = useRef<{ key: string; id: string } | null>(null);
   const [issue, setIssue] = useState({ userId: '', courseId: '' });
   const [issued, setIssued] = useState<{ certificate: LectureCertificate; userId: string; courseId: string } | null>(null);
   const [targetId, setTargetId] = useState('');
@@ -39,8 +42,13 @@ export function useOperatorCertificates() {
         const certificate = response.data.certificate;
         setIssued({ certificate, userId: action.userId, courseId: action.courseId });
         setTargetId(certificate.id); setVerifyCode(certificate.verificationCode ?? '');
-      } else if (action.kind === 'renew') await operatorApi.renewCertificate(action.id, action.months);
-      else await operatorApi.revokeCertificate(action.id, action.reason);
+      } else {
+        const key = JSON.stringify(action);
+        if (retry.current?.key !== key) retry.current = { key, id: crypto.randomUUID() };
+        if (action.kind === 'renew') await operatorApi.renewCertificate(action.id, action.months, retry.current.id);
+        else await operatorApi.revokeCertificate(action.id, action.reason, retry.current.id);
+        retry.current = null;
+      }
       if (!state.mounted) return false;
       setMessage({ error: false, text: `${label} 완료 · ${target}` }); toast.success(`${label} 완료`);
       return true;

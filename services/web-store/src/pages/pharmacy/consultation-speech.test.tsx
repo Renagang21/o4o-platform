@@ -43,7 +43,7 @@ it('starts only on a click, places final voice text in the editor, and waits for
   expect(Recognition.instances).toHaveLength(0);
   fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' }));
   expect(latest().lang).toBe('ko-KR'); expect(latest().continuous).toBe(false); expect(latest().interimResults).toBe(false);
-  act(() => latest().result('한국어 상담 문장'));
+  await act(async () => latest().result('한국어 상담 문장'));
   expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('한국어 상담 문장');
   expect(state.post).not.toHaveBeenCalled();
   expect((screen.getByRole('button', { name: '번역하기' }) as HTMLButtonElement).disabled).toBe(true);

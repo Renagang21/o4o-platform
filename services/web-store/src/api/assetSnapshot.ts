@@ -392,6 +392,7 @@ export interface LibraryContentItem {
   sourceGroup?: 'franchise' | 'operator' | 'community' | 'mine';
   /** franchise 일 때 세미프랜차이즈 이름(복사 시점 원본 기준) */
   sourceName?: string | null;
+  sourceBusinessKey?: string | null;
   title: string;
   contentJson: Record<string, unknown>;
   /** snapshot.created_at 또는 direct.updated_at — 통합 정렬 기준 */
@@ -429,6 +430,7 @@ export const storeLibraryApi = {
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 'franchise' = 가입 세미프랜차이즈 콘텐츠 사본
     source?: 'operator' | 'community' | 'mine' | 'ai-description' | 'franchise';
     tag?: string;
+    business?: string;
   }) => {
     const query: Record<string, string> = {};
     if (params?.page) query.page = String(params.page);
@@ -437,6 +439,7 @@ export const storeLibraryApi = {
     if (params?.type) query.type = params.type;
     if (params?.source) query.source = params.source;
     if (params?.tag) query.tag = params.tag;
+    if (params?.business) query.business = params.business;
     return apiClient.get<{ success: boolean; data: PaginatedLibraryContents }>(
       '/store-library/contents',
       Object.keys(query).length > 0 ? query : undefined,

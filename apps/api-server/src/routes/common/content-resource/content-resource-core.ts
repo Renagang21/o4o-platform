@@ -33,7 +33,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, type EntityManager } from 'typeorm';
 
 export type AuthMiddleware = (...args: any[]) => any;
 
@@ -155,6 +155,8 @@ export interface ContentResourceConfig {
   mapListRow?: RowMapper;
   /** 감사 로그 훅 (KPA) */
   audit?: AuditHook;
+  /** Required audit in the same transaction as the mutation. Legacy hook is skipped when supplied. */
+  atomicAudit?: (manager: EntityManager, user: any, action: string, entityType: string, entityId: string, meta?: Record<string, unknown>) => Promise<void>;
   /** 감사 로그 entityType (예: 'kpa_content') */
   auditEntityType?: string;
 }
@@ -251,6 +253,17 @@ export function createContentResourceCore(
     if (!config.audit) return;
     await config.audit(user, action, auditEntity, entityId, meta);
   };
+
+  async function mutate<T>(fn: (exec: Pick<EntityManager, 'query'>) => Promise<{ value: T; user: any; action: string; id: string; meta: Record<string, unknown> }>): Promise<T> {
+    if (config.atomicAudit) return dataSource.transaction(async manager => {
+      const result = await fn(manager);
+      await config.atomicAudit!(manager, result.user, result.action, auditEntity, result.id, result.meta);
+      return result.value;
+    });
+    const result = await fn(dataSource);
+    await runAudit(result.user, result.action, result.id, result.meta);
+    return result.value;
+  }
 
   async function list(req: Request, res: Response): Promise<void> {
     try {
@@ -374,11 +387,10 @@ export function createContentResourceCore(
         fail(res, 403, 'FORBIDDEN', '삭제 권한이 없습니다');
         return;
       }
-      await dataSource.query(
-        `UPDATE ${table} SET is_deleted = true, updated_at = NOW() WHERE id = $1`,
-        [existing.id],
-      );
-      await runAudit(user, 'CONTENT_DELETED', existing.id, { title: existing.title });
+      await mutate(async exec => {
+        await exec.query(`UPDATE ${table} SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
+        return { value: true, user: user, action: 'CONTENT_DELETED', id: existing.id, meta: { title: existing.title } };
+      });
       res.json({ success: true, data: { deleted: true, id: existing.id } });
     } catch (err) {
       internalError(res, prefix, 'DELETE /contents/:id', err, '삭제 중 오류가 발생했습니다');
@@ -464,15 +476,12 @@ export function createContentResourceCore(
         return;
       }
 
-      const [updated] = await dataSource.query(
-        `UPDATE ${table} SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-        [newStatus, existing.id],
-      );
-      // 감사 meta 는 기존 KPA 구현과 동일하게 from/to 를 남긴다.
-      await runAudit((req as any).user, 'RESOURCE_STATUS_CHANGED', updated.id, {
-        title: updated.title,
-        from: existing.status,
-        to: newStatus,
+      const updated = await mutate(async exec => {
+        const current = config.atomicAudit ? (await exec.query(`SELECT id,title,status FROM ${table} WHERE id=$1 AND is_deleted=false FOR UPDATE`, [existing.id]))[0] : existing;
+        if (!current) throw new Error('Resource changed');
+        const result = await exec.query(`UPDATE ${table} SET status=$1,updated_at=NOW() WHERE id=$2 RETURNING *`, [newStatus, existing.id]);
+        const rows = Array.isArray(result[0]) ? result[0] : result;
+        return { value: rows[0], user: (req as any).user, action: 'RESOURCE_STATUS_CHANGED', id: existing.id, meta: { title: current.title, from: current.status, to: newStatus } };
       });
       res.json({ success: true, data: updated });
     } catch (err) {
@@ -490,11 +499,10 @@ export function createContentResourceCore(
         fail(res, 404, 'NOT_FOUND', '자료를 찾을 수 없습니다');
         return;
       }
-      await dataSource.query(
-        `UPDATE ${table} SET is_deleted = true, updated_at = NOW() WHERE id = $1`,
-        [existing.id],
-      );
-      await runAudit((req as any).user, 'RESOURCE_DELETED', existing.id, { title: existing.title });
+      await mutate(async exec => {
+        await exec.query(`UPDATE ${table} SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
+        return { value: true, user: (req as any).user, action: 'RESOURCE_DELETED', id: existing.id, meta: { title: existing.title } };
+      });
       res.json({ success: true, data: { deleted: true, id: existing.id } });
     } catch (err) {
       internalError(res, prefix, 'DELETE /operator/resources/:id', err, '삭제 중 오류가 발생했습니다');

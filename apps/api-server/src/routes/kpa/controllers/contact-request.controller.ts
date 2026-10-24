@@ -1,11 +1,15 @@
+import { serviceContactRecipients } from '../../../modules/contact-inquiry/contact-recipients.js';
+import { deliverOperatorNotifications } from '../../../modules/contact-inquiry/operator-delivery.js';
 /**
  * ContactRequest Controller — KPA-Society 협업·교육 문의
  *
  * WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
  *
  * kpa.routes.ts에서 직접 핸들러로 등록:
- *   POST /contact-requests           — 공개
- *   GET  /operator/contact-requests  — kpa:operator 이상
+ *   POST /contact-requests           — 공개 (기존 클라이언트 호환 유지)
+ *
+ * operator 목록 · 상태 변경(GET/PATCH /operator/contact-requests)은
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 6항에서 옛 KPA 운영 화면과 함께 제거(소비처 0).
  */
 
 import { Request, Response, RequestHandler } from 'express';
@@ -86,27 +90,18 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
     // (1) in-app: 기존 동작 유지 — kpa:operator + kpa:admin 에게 알림. best-effort.
     let inappStatus = 'none';
     try {
-      const operators: { userId: string }[] = await dataSource.query(
-        `SELECT DISTINCT user_id AS "userId"
-           FROM role_assignments
-          WHERE role IN ('kpa:operator','kpa:admin')
-            AND is_active = true
-          LIMIT 20`,
-      );
+      const operators = await serviceContactRecipients(dataSource, 'kpa', 'kpa-society');
       if (operators.length > 0) {
-        await Promise.allSettled(
-          operators.map((op) =>
+        inappStatus = await deliverOperatorNotifications(operators, (op) =>
             notificationService.createNotification({
               userId: op.userId,
               type: 'contact.new',
               title: `새 문의: ${typeLabel}`,
               message: `${name!.trim()} 님이 문의를 남겼습니다.`,
               serviceKey: 'kpa-society',
-              metadata: { contactRequestId: saved.id, contactType: type },
+              metadata: { contactRequestId: saved.id, contactType: type, targetUrl: '/operator/inbox/business/pharmacy' },
             }),
-          ),
-        );
-        inappStatus = 'sent';
+          );
       }
     } catch (err) {
       inappStatus = 'fail';
@@ -128,7 +123,7 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
         phone: saved.phone,
         message: saved.message,
         createdAt: saved.createdAt,
-        adminManageUrl: '/operator/collaboration-requests',
+        adminManageUrl: '/operator/inbox/business/pharmacy',
       });
       emailStatus = r.emailStatus;
       autoReplyStatus = r.autoReplyStatus;
@@ -145,77 +140,6 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
     return res.status(201).json({
       success: true,
       data: { id: saved.id, status: saved.status },
-    });
-  });
-}
-
-/** PATCH /api/v1/kpa/operator/contact-requests/:id/status — kpa:operator+ */
-export function updateContactRequestStatusHandler(dataSource: DataSource): RequestHandler {
-  const repo = () => dataSource.getRepository(ContactRequest);
-
-  return asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body as { status?: string };
-
-    if (!status || !['pending', 'reviewing', 'done'].includes(status)) {
-      return res.status(400).json({
-        success: false,
-        error: '유효하지 않은 상태값입니다. (pending | reviewing | done)',
-        code: 'VALIDATION_ERROR',
-      });
-    }
-
-    const entity = await repo().findOne({
-      where: { id, service_key: 'kpa-society', type: 'partner' },
-    });
-    if (!entity) {
-      return res.status(404).json({ success: false, error: '문의를 찾을 수 없습니다.', code: 'NOT_FOUND' });
-    }
-
-    entity.status = status as ContactRequest['status'];
-    const saved = await repo().save(entity);
-
-    return res.json({ success: true, data: { id: saved.id, status: saved.status } });
-  });
-}
-
-/** GET /api/v1/kpa/operator/contact-requests — kpa:operator+ */
-export function listContactRequestsHandler(dataSource: DataSource): RequestHandler {
-  const repo = () => dataSource.getRepository(ContactRequest);
-
-  return asyncHandler(async (req: Request, res: Response) => {
-    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10));
-    const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit ?? '20'), 10)));
-    const skip = (page - 1) * limit;
-    const statusFilter = req.query.status as string | undefined;
-    const typeFilter = req.query.type as string | undefined;
-
-    const qb = repo()
-      .createQueryBuilder('cr')
-      .where('cr.service_key = :sk', { sk: 'kpa-society' })
-      .andWhere('cr.type = :ownedType', { ownedType: 'partner' })
-      .orderBy('cr.createdAt', 'DESC')
-      .skip(skip)
-      .take(limit);
-
-    if (statusFilter && ['pending', 'reviewed', 'closed'].includes(statusFilter)) {
-      qb.andWhere('cr.status = :status', { status: statusFilter });
-    }
-    if (typeFilter && ['partner', 'education'].includes(typeFilter)) {
-      qb.andWhere('cr.type = :type', { type: typeFilter });
-    }
-
-    const [items, total] = await qb.getManyAndCount();
-
-    return res.json({
-      success: true,
-      data: {
-        items,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
     });
   });
 }

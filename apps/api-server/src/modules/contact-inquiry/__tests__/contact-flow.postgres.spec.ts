@@ -95,7 +95,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     CREATE TABLE semi_franchises(id uuid,key text);
     CREATE TABLE semi_franchise_operators(semi_franchise_id uuid,user_id uuid,revoked_at timestamptz);
     CREATE TABLE action_logs(id uuid DEFAULT gen_random_uuid(),service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamptz DEFAULT clock_timestamp());
-    CREATE TABLE contact_inquiries(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_key varchar(50),inquiry_type varchar(50),name varchar(100),email varchar(255),phone varchar(50),organization_name varchar(200),subject varchar(300),message text,privacy_consent boolean,status varchar(20),source_path varchar(300),user_agent text,ip_hash varchar(64),notification_status varchar(100),handled_at timestamp,handled_by uuid,internal_note text,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now());`);
+    CREATE TABLE contact_inquiries(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_key varchar(50),organization_id uuid,inquiry_type varchar(50),name varchar(100),email varchar(255),phone varchar(50),organization_name varchar(200),subject varchar(300),message text,privacy_consent boolean,status varchar(20),source_path varchar(300),user_agent text,ip_hash varchar(64),notification_status varchar(100),handled_at timestamp,handled_by uuid,internal_note text,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now());`);
     for (const id of [supplier, central, suspended, expired])
       await db.query(`INSERT INTO users VALUES($1,'active',true,true)`, [id]);
     await db.query(
@@ -653,6 +653,23 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
           .send({ requestId: randomUUID(), message: "답변" })
       ).status,
     ).toBe(404);
+    expect(emailService.sendEmail).not.toHaveBeenCalled();
+  });
+  it("excludes organization-owned inquiries from every service-only management path", async () => {
+    const before = await request(app).get('/admin/services/supplier/contact-inquiries/summary').set('x-test-user',supplier);
+    const id = randomUUID();
+    await db.query(`INSERT INTO contact_inquiries(id,service_key,organization_id,name,email,subject,message,privacy_consent,status)
+      VALUES($1,'supplier',$2,'Synthetic','synthetic@example.invalid','Private organization','Synthetic text',true,'received')`,[id,randomUUID()]);
+    const list=await request(app).get('/admin/services/supplier/contact-inquiries').set('x-test-user',supplier);
+    expect(list.body.data.items.some((item:any)=>item.id===id)).toBe(false);
+    const summary=await request(app).get('/admin/services/supplier/contact-inquiries/summary').set('x-test-user',supplier);
+    expect(summary.body.data.newCount).toBe(before.body.data.newCount);
+    for(const path of ['', '/replies']) await request(app).get(`/admin/services/supplier/contact-inquiries/${id}${path}`).set('x-test-user',supplier).expect(404);
+    for(const path of ['status','note']) await request(app).patch(`/admin/services/supplier/contact-inquiries/${id}/${path}`).set('x-test-user',supplier).send({status:'closed',internalNote:'Not permitted'}).expect(404);
+    await request(app).post(`/admin/services/supplier/contact-inquiries/${id}/retry-notifications`).set('x-test-user',supplier).expect(404);
+    await request(app).post(`/admin/services/supplier/contact-inquiries/${id}/replies`).set('x-test-user',supplier).send({requestId:randomUUID(),message:'Not permitted'}).expect(404);
+    const [row]=await db.query('SELECT status,internal_note FROM contact_inquiries WHERE id=$1',[id]);
+    expect(row).toEqual({status:'received',internal_note:null});
     expect(emailService.sendEmail).not.toHaveBeenCalled();
   });
   it("honors explicit legacy business assignment without granting unrelated business access", async () => {

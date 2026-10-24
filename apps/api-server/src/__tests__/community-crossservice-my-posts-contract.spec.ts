@@ -19,7 +19,8 @@ const POST_CONTROLLER = fs.readFileSync(
 );
 
 const SERVICE_FORUM_MOUNTS = [
-  { service: 'kpa-society', file: '../routes/kpa/kpa.routes.ts' },
+  // kpa-society forum mount(/kpa/forum)는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 소비처 0 으로 제거
+  //   (약사 커뮤니티는 /communities/:key 공통 면을 쓴다).
   // k-cosmetics forum mount(routes/cosmetics/cosmetics.routes.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
   { service: 'neture', file: '../routes/neture/neture.routes.ts' },
 ];

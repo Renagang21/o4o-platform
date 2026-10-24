@@ -6,6 +6,7 @@ import { BaseService } from '../../../common/base.service.js';
 import { Course, Enrollment, EnrollmentStatus, Progress, ProgressStatus } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { CompletionService } from './CompletionService.js';
+import { keepCertificateLink } from './certificate-operation.service.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
@@ -475,6 +476,8 @@ export class EnrollmentService extends BaseService<Enrollment> {
           error: (chainErr as Error).message,
         });
       }
+      // The chain linked the issued certificate; the final save below must not write the stale null back.
+      await keepCertificateLink(AppDataSource, enrollment);
       await grantRewardIfConfigured({
         event: 'course_complete',
         amount: resolveRewardAmount('course_complete', { course }),

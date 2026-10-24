@@ -1,3 +1,4 @@
+import { COOPERATION_EXTENSIONS } from '@o4o/shared-space-ui';
 import { Link } from 'react-router-dom';
 import type { HomeEntryData } from '../../lib/home-entry';
 import { HOST_ORIGIN } from '../../lib/hostProfile';
@@ -5,10 +6,10 @@ import { HOST_ORIGIN } from '../../lib/hostProfile';
 type Service = { key: string; description: string; label: string; href: string; documentNavigation?: boolean };
 const groups: { title: string; services: Service[]; publicOnly?: boolean }[] = [
   { title: '약국 협력사업 참여', services: [
-    { key: 'kpa-society', description: 'O4O를 이용하는 약국의 일상 업무를 지원합니다.', label: 'O4O 약국 경영지원', href: 'https://pharmacy.neture.co.kr/' },
+    { key: 'kpa-society', description: 'O4O를 이용하는 약국의 일상 업무를 지원합니다.', label: 'O4O 약국 경영지원', href: `${COOPERATION_EXTENSIONS.pharmacy.model.origin}/` },
     { key: 'carepharm', description: 'CarePharm에서 만성질환관리 협력사업과 참여 정보를 확인합니다.', label: '만성질환관리', href: `${HOST_ORIGIN.carepharm}/` },
-    { key: 'cooperative', description: '약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.', label: '약국/약사협동조합', href: 'https://pharmcoop.neture.co.kr/' },
-    { key: 'megapharm', description: '메가팜의 창고형 약국 협력사업과 참여 정보를 확인합니다.', label: '창고형 약국', href: 'https://megapharm.neture.co.kr/' },
+    { key: 'cooperative', description: '약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.', label: '약국/약사협동조합', href: `${COOPERATION_EXTENSIONS.pharmcoop.model.origin}/` },
+    { key: 'megapharm', description: '메가팜의 창고형 약국 협력사업과 참여 정보를 확인합니다.', label: '창고형 약국', href: `${COOPERATION_EXTENSIONS.megapharm.model.origin}/` },
   ] },
   { title: '약국 경영·공급 활동', services: [
     { key: 'store', description: '내 매장의 제품·콘텐츠와 운영 업무를 관리합니다.', label: '내 매장', href: 'https://store.neture.co.kr/' },

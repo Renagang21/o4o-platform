@@ -6,6 +6,7 @@ vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await orig
 vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => 'kpa-society' }));
 vi.mock('../../api/neturePharmacy', () => ({ neturePharmacyApi: mocks, pharmacyErrorCode: () => '', pharmacyErrorMessage: (_e: unknown, fallback: string) => fallback || '요청 실패' }));
 vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, stores: [{ organizationId: mocks.organizationId, memberRole: mocks.role }], effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({user:{id:'fixture'}}) }));
 vi.mock('../../lib/apiClient', () => ({ api: {} }));
 vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: mocks.handoff }));
 vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
@@ -59,7 +60,7 @@ it('매장을 바꾸면 이전 매장의 늦은 자료 응답을 버린다', asy
   const { rerender } = render(tree());
   mocks.organizationId = 'store-b';
   rerender(tree());
-  await screen.findByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
+  await screen.findByText('이용할 수 있는 협업체 콘텐츠가 없습니다.');
   await act(async () => release({ items: [content], total: 1 }));
   expect(screen.queryByText('선택한 자료')).toBeNull();
 });
@@ -94,7 +95,7 @@ it.each(['page', 'search'])('링크 선택 자료는 %s 변경 뒤 결과에 다
     fireEvent.change(screen.getByPlaceholderText('제목 · 요약 검색'), { target: { value: '새 검색' } });
     fireEvent.click(screen.getByRole('button', { name: '검색' }));
   }
-  await screen.findByText(mode === 'search' ? '검색 조건에 맞는 자료가 없습니다.' : '이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.');
+  await screen.findByText(mode === 'search' ? '검색 조건에 맞는 자료가 없습니다.' : 'network-a가 제공한 자료가 아직 없습니다.');
   expect(screen.queryByText('선택한 자료')).toBeNull();
   expect(mocks.getContent).toHaveBeenCalledTimes(1);
 });

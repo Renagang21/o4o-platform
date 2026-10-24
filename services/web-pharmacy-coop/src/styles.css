@@ -393,23 +393,6 @@ p {
 .coop-heading p {
   max-width: 750px;
 }
-.coop-nav {
-  display: flex;
-  gap: 25px;
-  overflow-x: auto;
-  border-bottom: 1px solid #dbe5df;
-  font-size: 14px;
-  white-space: nowrap;
-}
-.coop-nav a {
-  padding: 14px 0;
-  border-bottom: 3px solid transparent;
-}
-.coop-nav a.active {
-  color: #17694f;
-  border-bottom-color: #17694f;
-  font-weight: 700;
-}
 .member-welcome {
   padding: 30px;
   border-radius: 14px;
@@ -550,3 +533,92 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .coop-management button { padding: .55rem .85rem; border: 1px solid #8faea3; border-radius: .4rem; background: #fff; color: #163c35; margin: .2rem; font: inherit; }
 .coop-management button:not(:disabled):hover { background: #e8f2ed; }
 .coop-management button:focus-visible { outline: 3px solid #238775; outline-offset: 2px; }
+
+/* Member home uses the shared cooperation presentation; operations keep their own layout. */
+.coop-work-main {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.publication-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.publication-list li {
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e8e3;
+}
+.publication-list li:last-child {
+  border-bottom: 0;
+}
+.publication-list a {
+  color: #17694f;
+  font-weight: 600;
+}
+.publication-list p {
+  margin: 8px 0 0;
+  color: #586d63;
+}
+.coop-work-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.coop-work-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #dbe5df;
+  border-radius: 12px;
+  background: #fff;
+}
+.coop-work-nav a {
+  padding: 12px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+.coop-work-nav a.selected {
+  background: #e8f2ed;
+  color: #17694f;
+  font-weight: 700;
+}
+.coop-work-main > .section {
+  margin-top: 0;
+}
+.coop-work-main .cards {
+  gap: 16px;
+}
+.coop-work-main .card {
+  padding: 20px;
+}
+.coop-work-main select {
+  max-width: 100%;
+}
+.coop-work-main .overflow-x-auto {
+  max-width: 100%;
+}
+@media (max-width: 760px) {
+  .coop-work-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .coop-work-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .coop-work-nav a {
+    padding: 10px;
+  }
+  .cooperation-member-home-content .section-heading {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .header-row nav { min-width: 0; width: 100%; overflow-x: auto; flex-wrap: nowrap; gap: 20px; }
+  .header-row nav a { flex-shrink: 0; white-space: nowrap; }
+}

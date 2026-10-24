@@ -244,7 +244,11 @@ function runRekey(): void {
    *    ASCII 마침표는 의도적으로 제외한다(문장 종결과 구분자를 섞지 않기 위해).
    */
   const ctrlFree = (s: string): string => s.normalize('NFC')
-    .replace(/[ ---]/g, '')
+    .split('').filter(char => {
+      const code = char.charCodeAt(0);
+      return code === 0x09 || code === 0x0a || code === 0x0d ||
+        (code >= 0x20 && (code < 0x7f || code > 0x9f));
+    }).join('')
     // 한글 사이에 낌 마침표도 구분자로 본다(예: 어지러움.구토). 문장 종결 마침표는 대상 아님.
     .replace(/(?<=[가-힣])\.(?=[가-힣])/g, '·')
     .replace(/[··•‧∙⋅・ㆍ･]/g, '·');

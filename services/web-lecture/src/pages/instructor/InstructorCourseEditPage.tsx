@@ -11,6 +11,8 @@ import {
   type CourseInput, type LectureCourse, type LectureLesson, type LessonInput, type LessonType,
   type LectureQuiz, type QuizQuestionDraft, type LectureAssignment,
 } from '../../api/lecture';
+import { ProfessionalInfoFields } from '../../components/ProfessionalInfoFields';
+import { LessonMediaFields, supportedVideoUrl } from '../../components/LessonMediaFields';
 import { useToast } from '../../components/Toast';
 
 const LESSON_TYPES: { value: LessonType; label: string }[] = [
@@ -41,7 +43,7 @@ export default function InstructorCourseEditPage() {
       const [c, l] = await Promise.all([instructorApi.getCourse(courseId), instructorApi.lessons(courseId)]);
       const data = c.data.course;
       setCourse(data);
-      setForm({ title: data.title, description: data.description ?? '', thumbnail: data.thumbnail, tags: data.tags ?? [], visibility: data.visibility, requiresApproval: data.requiresApproval });
+      setForm({ title: data.title, description: data.description ?? '', thumbnail: data.thumbnail, tags: data.tags ?? [], visibility: data.visibility, requiresApproval: data.requiresApproval, metadata: { professionalInfo: data.metadata?.professionalInfo ?? {} } });
       setTagsText((data.tags ?? []).join(', '));
       setLessons([...(l.data ?? [])].sort((a, b) => a.order - b.order));
     } catch (err) { toast.error(errorMessage(err, '강의를 불러오지 못했습니다.')); }
@@ -73,6 +75,8 @@ export default function InstructorCourseEditPage() {
   async function saveLesson() {
     if (!courseId || !editing) return;
     if (!editing.data.title.trim()) { toast.error('레슨 제목을 입력하세요.'); return; }
+    if (editing.data.type === 'video' && !supportedVideoUrl(editing.data.videoUrl ?? '')) { toast.error('HTTPS MP4·WebM·Ogg 파일 주소를 입력하세요.'); return; }
+    if (editing.data.attachments?.some(f => !f.name.trim() || !/^https:\/\//i.test(f.url) || (() => { try { return new URL(f.url).protocol !== 'https:'; } catch { return true; } })())) { toast.error('자료 이름과 유효한 HTTPS 주소를 입력하세요.'); return; }
     setSaving(true);
     try {
       if (editing.id) await instructorApi.updateLesson(editing.id, editing.data);
@@ -115,6 +119,7 @@ export default function InstructorCourseEditPage() {
       <h2>기본 정보</h2>
       <label className="field"><span>제목</span><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label>
       <label className="field"><span>소개</span><textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
+      <ProfessionalInfoFields value={form.metadata?.professionalInfo ?? {}} onChange={professionalInfo => setForm({ ...form, metadata: { professionalInfo } })} />
       <label className="field"><span>썸네일 URL</span><input value={form.thumbnail ?? ''} onChange={(e) => setForm({ ...form, thumbnail: e.target.value || null })} /></label>
       <label className="field"><span>태그 (쉼표 구분 · 1개 이상 필수)</span><input value={tagsText} placeholder="예: 복약지도, 기초" onChange={(e) => setTagsText(e.target.value)} /></label>
       <div className="field-row">
@@ -136,7 +141,7 @@ export default function InstructorCourseEditPage() {
           <div className="list-actions">
             <button type="button" className="btn btn-ghost" onClick={() => void move(i, -1)} disabled={i === 0}>↑</button>
             <button type="button" className="btn btn-ghost" onClick={() => void move(i, 1)} disabled={i === lessons.length - 1}>↓</button>
-            <button type="button" className="btn btn-ghost" onClick={() => setEditing({ id: l.id, data: { title: l.title, type: l.type, description: l.description ?? '', content: l.content ?? '', videoUrl: l.videoUrl ?? '', duration: l.duration, isPublished: l.isPublished ?? true } })}>편집</button>
+            <button type="button" className="btn btn-ghost" onClick={() => setEditing({ id: l.id, data: { title: l.title, type: l.type, description: l.description ?? '', content: l.content ?? '', videoUrl: l.videoUrl ?? '', duration: l.duration, isPublished: l.isPublished ?? true, attachments: l.attachments ?? [] } })}>편집</button>
             {(l.type === 'quiz' || l.type === 'assignment') && <Link className="btn btn-ghost" to={`/instructor/lessons/${l.id}/${l.type}?courseId=${courseId}`}>{l.type === 'quiz' ? '퀴즈 구성' : '과제 구성'}</Link>}
             {l.type === 'assignment' && <Link className="btn btn-ghost" to={`/instructor/lessons/${l.id}/submissions`}>제출물</Link>}
             <button type="button" className="btn btn-ghost danger" onClick={() => void removeLesson(l.id)}>삭제</button>
@@ -156,7 +161,7 @@ export default function InstructorCourseEditPage() {
         <label className="field"><span>학습 시간(분)</span><input type="number" min={0} value={editing.data.duration ?? 0} onChange={(e) => setEditing({ ...editing, data: { ...editing.data, duration: Number(e.target.value) } })} /></label>
         <label className="field check"><input type="checkbox" checked={editing.data.isPublished !== false} onChange={(e) => setEditing({ ...editing, data: { ...editing.data, isPublished: e.target.checked } })} /><span>공개</span></label>
       </div>
-      {editing.data.type === 'video' && <label className="field"><span>영상 URL</span><input value={editing.data.videoUrl ?? ''} onChange={(e) => setEditing({ ...editing, data: { ...editing.data, videoUrl: e.target.value } })} /></label>}
+      <LessonMediaFields value={editing.data} onChange={data => setEditing({ ...editing, data })} />
       <div className="field"><span>본문</span>
         <RichTextEditor value={editing.data.content ?? ''} onChange={(c) => setEditing((prev) => prev ? { ...prev, data: { ...prev.data, content: c.html } } : prev)} placeholder="레슨 본문을 입력하세요" minHeight="260px" preset="full" />
       </div>

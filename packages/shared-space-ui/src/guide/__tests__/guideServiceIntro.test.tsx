@@ -4,16 +4,15 @@
  * WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §15
  *
  * 1) Shared landing 렌더 계약 (제목/lead · 카드 · 선택 섹션 · 링크)
- * 2) Adoption 정적 고정 — KPA wrapper 가 공통 View 를 쓰는지
- * 3) Route contract — /guide · /guide/intro · /guide/usage · /guide/features · /service-guide 관계 유지
+ * 2) Adoption 정적 고정 — 옛 KPA wrapper · copy 가 남아 있지 않은지
+ * 3) Route contract — pharmacy 에 guide 화면이 없고 Neture /guide 는 자체 landing 유지
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { GuideServiceIntroPage } from '../GuideServiceIntroPage.js';
-import { kpaServiceIntroProps } from '../copy/kpa.js';
 import type { GuideServiceIntroPageProps } from '../types.js';
 
 const ROOT = resolve(__dirname, '../../../../..');
@@ -29,11 +28,42 @@ function renderPage(props: GuideServiceIntroPageProps) {
   );
 }
 
-const SERVICES: [string, GuideServiceIntroPageProps][] = [
-  ['KPA', kpaServiceIntroProps],
-  // K-Cosmetics 는 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
-  // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
-];
+// 서비스 copy 를 소비하는 화면이 없어(KPA copy 제거 — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)
+//   렌더 계약은 모든 선택 블록을 채운 테스트 전용 fixture 로 고정한다.
+const fullFixture: GuideServiceIntroPageProps = {
+  headline: '서비스 소개 제목',
+  lead: '서비스 소개 설명',
+  heroActions: [
+    { to: '/login', label: '시작하기' },
+    { to: '/contact', label: '문의하기' },
+  ],
+  intro: { title: '서비스 소개', paragraphs: ['첫 문단', '둘째 문단'] },
+  audiences: {
+    title: '이용 대상',
+    cards: [
+      { icon: 'span', title: '매장 경영자', desc: '설명' },
+      { icon: 'span', title: '운영자', desc: '설명' },
+    ],
+  },
+  features: {
+    title: '주요 기능',
+    cards: [
+      { icon: 'span', title: '자료', desc: '설명' },
+      { icon: 'span', title: '커뮤니티', desc: '설명' },
+    ],
+  },
+  steps: { title: '이용 흐름', items: [{ no: '01', title: '가입' }, { no: '02', title: '이용' }] },
+  contact: { title: '문의 안내', body: '문의 안내 본문', action: { to: '/contact', label: '문의하기' } },
+  relatedGuide: {
+    title: '기능 사용 가이드',
+    links: [
+      { to: '/guide/intro', label: '이용 안내' },
+      { to: '/guide/features', label: '기능 안내' },
+    ],
+  },
+};
+
+const SERVICES: [string, GuideServiceIntroPageProps][] = [['fixture', fullFixture]];
 
 describe('GuideServiceIntroPage — 렌더 계약', () => {
   it.each(SERVICES)('%s: headline · lead · 모든 카드 · step 을 렌더한다', (_name, props) => {
@@ -80,7 +110,7 @@ describe('GuideServiceIntroPage — 렌더 계약', () => {
   });
 
   it('mobile-friendly: 카드 그리드가 1열 기본 + sm 이상 다열이다', () => {
-    const { container } = renderPage(kpaServiceIntroProps);
+    const { container } = renderPage(fullFixture);
     const grids = [...container.querySelectorAll('div')].filter((d) =>
       (d.getAttribute('class') ?? '').includes('grid-cols-1'),
     );
@@ -89,57 +119,35 @@ describe('GuideServiceIntroPage — 렌더 계약', () => {
   });
 
   it('renderText 가 있으면 lead 와 intro 문단을 대체 렌더한다', () => {
-    renderPage({ ...kpaServiceIntroProps, renderText: (key) => `[[${key}]]` });
+    renderPage({ ...fullFixture, renderText: (key) => `[[${key}]]` });
     expect(screen.getByText('[[hero-lead]]')).toBeTruthy();
     expect(screen.getByText('[[intro-0]]')).toBeTruthy();
   });
 });
 
 describe('Adoption — 서비스 wrapper 가 공통 View 를 쓴다', () => {
-  const WRAPPERS: [string, string, string][] = [
-    ['KPA', 'services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx', 'kpaServiceIntroProps'],
-    // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-  ];
-
-  it.each(WRAPPERS)('%s wrapper 는 GuideServiceIntroPage + copy config 만 사용한다', (_n, path, props) => {
-    const src = read(path);
-    expect(src).toContain('GuideServiceIntroPage');
-    expect(src).toContain(props);
-    expect(src).toContain('@o4o/shared-space-ui');
-    // 공통화 후 wrapper 는 자체 레이아웃/데이터를 다시 들고 있지 않는다.
-    expect(src).not.toContain('lucide-react');
-    expect(src).not.toContain('className=');
-    expect(src.split('\n').length).toBeLessThan(30);
+  // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA ServiceGuidePage wrapper 도 제거됐다 — 현재 GuideServiceIntroPage 를 소비하는 wrapper 는 없다.
+  it('옛 KPA 서비스 소개 wrapper 와 KPA guide copy 는 존재하지 않는다', () => {
+    expect(existsSync(resolve(ROOT, 'services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx'))).toBe(false);
+    expect(existsSync(resolve(ROOT, 'packages/shared-space-ui/src/guide/copy/kpa.ts'))).toBe(false);
+    expect(read('packages/shared-space-ui/src/guide/index.ts')).not.toContain("from './copy/kpa.js'");
   });
 });
 
 describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
-  const APPS: [string, string][] = [
-    ['KPA', 'services/web-kpa-society/src/App.tsx'],
-  ];
-
-  it.each(APPS)('%s: /service-guide 와 기존 guide deep-link 가 모두 유지된다', (_n, path) => {
-    const src = read(path);
-    for (const p of ['service-guide', 'guide/intro', 'guide/usage', 'guide/features']) {
-      expect(src).toMatch(new RegExp(`path="/?${p}"`));
-    }
-  });
-
-  it.each(APPS)('%s: /guide 는 canonical 진입점(/guide/intro) 으로 보낸다', (_n, path) => {
-    const src = read(path);
-    expect(src).toMatch(/path="\/?guide"\s+element=\{<Navigate to="\/guide\/intro" replace \/>\}/);
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 /guide · /service-guide 화면을 두지 않는다.
+  //   남은 /guide/* 는 web-store GuideBackLink 가 404 가 되지 않게 홈으로 보내는 호환 이동 하나뿐이다.
+  it('KPA(pharmacy) App 에 guide · service-guide 화면 route 가 없다 (홈 호환 이동만)', () => {
+    const src = read('services/web-kpa-society/src/App.tsx');
+    expect(src).not.toMatch(/path="\/?service-guide(\/|")/);
+    const guideRoutes = src.match(/<Route path="\/?guide[^"]*"[^\n]*/g) ?? [];
+    expect(guideRoutes).toEqual(['<Route path="/guide/*" element={<Navigate to="/" replace />} />']);
   });
 
   it('Neture 의 /guide 는 자체 landing 을 유지한다 (redirect 로 덮지 않는다)', () => {
     const src = read('services/web-neture/src/App.tsx');
     expect(src).toMatch(/path="\/guide"/);
     expect(src).not.toMatch(/path="\/guide"\s+element=\{<Navigate/);
-  });
-
-  it('guide intro 하단에 서비스 소개(/service-guide) 연결이 있다', () => {
-    for (const f of ['kpa.ts']) {
-      const src = read(`packages/shared-space-ui/src/guide/copy/${f}`);
-      expect(src).toContain("serviceGuide: { label: '서비스 소개', to: '/service-guide' }");
-    }
   });
 });

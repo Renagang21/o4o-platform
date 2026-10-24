@@ -1,3 +1,6 @@
+import ScopedContactPage from './pages/ScopedContactPage';
+import OperatorInboxEntryPage from './pages/operator/OperatorInboxEntryPage';
+import OperatorInboxPage from './pages/operator/OperatorInboxPage';
 import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
@@ -68,7 +71,6 @@ import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
 } from './pages/community';
-import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 import SupplierServiceEntry from './pages/SupplierServiceEntry';
 import SupplierLandingPage from './pages/SupplierLandingPage';
@@ -481,6 +483,7 @@ const OperatorContactMessagesPage = lazy(() => import('./pages/operator/Operator
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
+const ExternalAiConsentPage = lazy(() => import('./pages/ExternalAiConsentPage'));
 // Resources (O4O 공통 구조 — /resources)
 const NetureResourcesPage = lazy(() => import('./pages/resources/NetureResourcesPage'));
 
@@ -677,6 +680,7 @@ function App() {
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
+            <Route path="/external-ai/connect" element={<ExternalAiConsentPage />} />
             <Route path="/register" element={<RegisterRedirect />} />
             {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.
                 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 service_credentials 흐름의 부활이 아니다.) */}
@@ -756,9 +760,11 @@ function App() {
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
               <Route path="/mypage/communities" element={<Navigate to="/" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/contact" element={<ScopedContactPage />} />
               <Route path="/operator/service-contact/:serviceKey/settings" element={<ServiceContactSettingsPage />} />
               <Route path="/operator/service-contact/:serviceKey" element={<ServiceContactPage />} />
+              <Route path="/operator/inbox/open/:kind/:scopeKey" element={<OperatorInboxEntryPage />} />
+              <Route path="/operator/inbox/business/:businessKey" element={<OperatorInboxPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
                   CMS(cms/public/page) 라우터가 프로덕션에 마운트되어 있지 않아 항상 404 →
                   "준비 중" 만 노출되던 경로. 다른 4서비스와 같은 service_policy_documents
@@ -1153,6 +1159,7 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
               <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/inbox/supplier" element={<OperatorInboxPage serviceKey="supplier" />} />
               <Route path="/operator/service-members/supplier" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/service-members/supplier/:id" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/home-presentation/supplier" element={<HomePresentationPage surface="supplier" />} />
@@ -1165,6 +1172,7 @@ function App() {
             }>
               {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/operator/inbox/funding" element={<OperatorInboxPage serviceKey="funding" />} />
               <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
@@ -1178,6 +1186,7 @@ function App() {
                 <SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />
               </SubdomainOperatorRoute>
             }>
+              <Route path="/operator/inbox/community" element={<OperatorInboxPage serviceKey="community" />} />
               <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
@@ -1215,6 +1224,7 @@ function App() {
             }>
               {/* ─── Operator 공통 라우트 (adminOnly 제외) ─── */}
               <Route path="/operator" element={<NetureOperatorDashboard />} />
+              <Route path="/operator/inbox/neture" element={<OperatorInboxPage serviceKey="neture" />} />
               {/* WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
                   /operator/members 를 표준 경로로 추가. /operator/users 는 legacy alias 로 유지. */}
               <Route path="/operator/members" element={<UsersManagementPage />} />

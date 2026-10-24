@@ -1,5 +1,10 @@
-import { HomePresentationEditor } from "@o4o/shared-space-ui";
-import { authClient } from "../../lib/apiClient";
+import { HomePresentationEditor } from '@o4o/shared-space-ui';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../lib/apiClient';
+
 export default function HomePresentationPage() {
-  return <HomePresentationEditor surface="lecture" client={authClient.api} />;
+  const { user } = useAuth();
+  return <main className="page page-wide">
+    <HomePresentationEditor key={user?.id ?? 'anonymous'} surface="lecture" client={api} />
+  </main>;
 }

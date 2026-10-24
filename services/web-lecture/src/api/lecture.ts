@@ -31,7 +31,11 @@ export type CourseVisibility = 'public' | 'members';
 export interface Pagination { total: number; page: number; limit: number; totalPages: number }
 export type Paginated<T> = { success: boolean; data: T[]; pagination?: Pagination };
 
+export interface ProfessionalInfo { audience?: string; outcomes?: string; prerequisites?: string; instructorBio?: string; expertise?: string; reviewedAt?: string }
+export interface LessonAttachment { name: string; url: string; type: string; size: number }
+
 export interface LectureCourse {
+  metadata?: Record<string, unknown> & { professionalInfo?: ProfessionalInfo };
   id: string;
   title: string;
   description: string | null;
@@ -39,6 +43,7 @@ export interface LectureCourse {
   status: CourseStatus;
   visibility: CourseVisibility;
   contentKind?: string;
+  category?: string | null;
   serviceKey?: string | null;
   instructorId: string;
   instructorName?: string | null;
@@ -68,6 +73,8 @@ export interface LectureLesson {
   duration: number;
   isPublished?: boolean;
   isPreview?: boolean;
+  isFree?: boolean;
+  attachments?: LessonAttachment[];
 }
 
 export interface LectureEnrollment {
@@ -161,6 +168,7 @@ export interface InstructorApplication {
 }
 
 export interface CourseInput {
+  metadata?: { professionalInfo?: ProfessionalInfo };
   title: string;
   description: string;
   thumbnail?: string | null;
@@ -169,6 +177,7 @@ export interface CourseInput {
   requiresApproval?: boolean;
 }
 export interface LessonInput {
+  attachments?: LessonAttachment[];
   title: string;
   type: LessonType;
   description?: string | null;
@@ -270,6 +279,7 @@ export interface OperatorCourseReviewLesson {
 }
 export interface OperatorCourseReview {
   course: {
+    professionalInfo?: ProfessionalInfo;
     id: string;
     title: string;
     description: string | null;
@@ -287,7 +297,16 @@ export interface OperatorCourseReview {
   readOnly: true;
 }
 
+export interface MissingCertificate { enrollmentId: string; userId: string; courseId: string; userName?: string; courseTitle: string }
+export interface CertificateState { isValid?: boolean; expiresAt?: string | null }
+/** 운영자 전용 수료증 처리 이력 (발급·갱신·수정·폐기). 학습자·공개 검증 응답에는 포함되지 않는다. */
+export interface CertificateOperation {
+  actorId: string | null; at: string; action: 'issue' | 'renew' | 'update' | 'revoke';
+  reason: string | null; before: CertificateState | null; after: CertificateState | null;
+  months?: number | null; changedFields?: string[] | null; trigger?: 'operator' | 'completion' | null;
+}
 export const operatorApi = {
+  missingCertificates: (search = '') => lmsHttp.get<LmsApiResponse<{ items: MissingCertificate[] }>>('/lms/operator/certificates/missing', { search }),
   courses: (params?: { status?: string; search?: string; page?: number; limit?: number; contentKind?: string }) =>
     lmsHttp.get<Paginated<LectureCourse>>('/lms/operator/courses', { contentKind: 'all', ...(params ?? {}) }),
   /** 운영자 검토 전용 read-only 조회 (11차 P2) — 수강 등록·write 없음. */
@@ -309,10 +328,13 @@ export const operatorApi = {
 
   issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
     lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
-  revokeCertificate: (id: string, reason?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason }),
-  renewCertificate: (id: string, months?: number) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, months ? { months } : {}),
+  certificateOperations: (id: string, page = 1) =>
+    lmsHttp.get<LmsApiResponse<{ operations: CertificateOperation[]; page: number; hasMore: boolean }>>(`/lms/certificates/${id}/operations`, { page }),
+  /** operationId: 같은 요청의 재시도는 이력·변경을 한 번만 남긴다. */
+  revokeCertificate: (id: string, reason?: string, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason, ...(operationId ? { operationId } : {}) }),
+  renewCertificate: (id: string, months?: number, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, { ...(months ? { months } : {}), ...(operationId ? { operationId } : {}) }),
 };
 
 /** 백엔드 오류 메시지 추출 (axios envelope `{ success:false, error, code }`). */

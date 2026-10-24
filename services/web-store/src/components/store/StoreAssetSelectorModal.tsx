@@ -28,6 +28,7 @@ import { listContentHubItems } from '../../api/contentHub';
 import { fetchStaffBlogPosts } from '../../api/blogStaff';
 import type { StaffBlogPost } from '../../api/blogStaff';
 import { getStoreSlug } from '../../api/pharmacyInfo';
+import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
 //   다국어 제품 콘텐츠(store_multilingual_product_content_*)를 QR 대상 소스로 추가(opt-in).
 //   선택 시 idempotent publicKey 발급 → 공개 landing URL 로 link 형 QR 연결(기존 다국어 화면 재사용).
@@ -349,7 +350,7 @@ export function StoreAssetSelectorModal({
     if (source === 'blog') {
       if (!selectedBlog) return;
       const url = slugRef.current
-        ? `${window.location.origin}/store/${slugRef.current}/blog/${selectedBlog.slug}`
+        ? `${getActiveServicePublicOrigin()}/store/${slugRef.current}/blog/${selectedBlog.slug}`
         : '';
       onSelect({
         id: selectedBlog.id,

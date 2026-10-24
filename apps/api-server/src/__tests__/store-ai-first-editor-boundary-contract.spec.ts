@@ -26,17 +26,17 @@ const TOOLBAR = 'packages/content-editor/src/components/Toolbar.tsx';
 
 /** 활성 Store-facing RichTextEditor 직접 소비처 (fresh census 2026-09-18, main 1af2abdc4 기준) */
 const STORE_DIRECT_CONSUMERS = [
-  // KPA Store (/store/*)
-  'services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyPopPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
+  // Store (store.neture.co.kr — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면 제거 후 정본)
+  'services/web-store/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
+  'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreLocalProductsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
 ];
 
 /** Store 전용 공유 셸 — 셸 내부에서 false 고정 */
@@ -45,10 +45,9 @@ const STORE_ONLY_SHELL = 'packages/store-ui-core/src/components/ProductionMateri
 /** 다역할 공유 셸 — passthrough. Store 소비처가 false 전달 */
 const TABLET_EDITOR = 'packages/tablet-screen-set-editor/src/index.tsx';
 const TABLET_STORE_CONSUMERS = [
-  'services/web-kpa-society/src/pages/pharmacy/TabletScreenSetManager.tsx',
+  'services/web-store/src/pages/pharmacy/TabletScreenSetManager.tsx',
 ];
 const TABLET_NON_STORE_CONSUMERS = [
-  'services/web-kpa-society/src/pages/operator/tablet/OperatorTabletScreenSetsPage.tsx',
   'services/web-neture/src/pages/supplier/SupplierTabletScreenSetsPage.tsx',
 ];
 
@@ -133,7 +132,7 @@ describe('WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1 — 공통 편집기 내부 A
 
     it('Store 영역에서 활성 RichTextEditor 소비처가 계약 목록 밖에 없다 (census drift 가드)', () => {
       const storeDirs = [
-        'services/web-kpa-society/src/pages/pharmacy',
+        'services/web-store/src/pages/pharmacy',
       ];
       const found: string[] = [];
       for (const dir of storeDirs) {

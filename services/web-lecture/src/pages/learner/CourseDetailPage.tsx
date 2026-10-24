@@ -1,3 +1,4 @@
+import { ProfessionalInfoSummary } from '../../components/ProfessionalInfoFields';
 import { useMemo, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
@@ -23,10 +24,11 @@ export default function CourseDetailPage() {
   } }), [courseId, user?.id]);
   return <main className="page page-wide">
     <CourseDetailView
+      key={`${config.accountId ?? "anonymous"}:${courseId}`}
       courseId={courseId}
       port={port}
       config={config}
-      renderAfterCourseCard={({ enrollment }) => config.isAuthenticated && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}
+      renderAfterCourseCard={({ enrollment, course, enrollmentIneligible }) => <><ProfessionalInfoSummary value={course.professionalInfo} />{config.isAuthenticated && !enrollmentIneligible && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}</>}
       renderDescription={(course) => course.description ? <ContentRenderer html={course.description} /> : null}
     />
   </main>;

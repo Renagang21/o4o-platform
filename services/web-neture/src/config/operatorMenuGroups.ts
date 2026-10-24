@@ -18,6 +18,7 @@ import type { OperatorDomainIAConfig } from '@o4o/operator-ux-core';
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [
     { label: '대시보드', path: '/operator', exact: true },
+    { label: '운영 알림·문의함', path: '/operator/inbox/neture' },
     { label: 'Action Queue', path: '/operator/actions' },
   ],
   users: [

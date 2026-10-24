@@ -36,6 +36,22 @@ describe('LMS 자동 수료 체인 — 수료증 발급 전 enrollment 저장 (�
     expect(between).toContain('await this.enrollmentRepository.save(enrollment);');
   });
 
+  // WO-O4O-LECTURE-CERTIFICATE-OPERATION-HISTORY-UNIFICATION-V1: 체인이 발급하며 연결한 certificateId 를
+  // 호출부가 이전에 읽은 enrollment 의 재저장(TypeORM save diff)이 null 로 되돌리지 않는다.
+  it.each(CASES)('%s: createCompletion 이후 같은 메서드의 재저장 전에 certificateId 연결을 보존한다', (file) => {
+    // 메서드 단위(2칸 들여쓰기 async 선언)로 나눠, 체인 뒤에 재저장이 있는 메서드만 검사한다.
+    const methods = read(file).split(/\n {2}(?=(?:public |private |protected )?async )/);
+    const chained = methods.filter(m => m.includes('createCompletion(')
+      && m.indexOf('this.enrollmentRepository.save(enrollment)', m.indexOf('createCompletion(')) > -1);
+    expect(chained.length).toBeGreaterThan(0);
+    for (const method of chained) {
+      const chainAt = method.indexOf('createCompletion(');
+      const keepAt = method.indexOf('await keepCertificateLink(AppDataSource, enrollment);', chainAt);
+      expect(keepAt).toBeGreaterThan(chainAt);
+      expect(keepAt).toBeLessThan(method.indexOf('this.enrollmentRepository.save(enrollment)', chainAt));
+    }
+  });
+
   it('CertificateService 는 DB 의 enrollment 완료 상태를 계속 검사한다 (계약 불변)', () => {
     const cert = read('CertificateService.ts');
     expect(cert).toContain('if (!enrollment.isCompleted())');

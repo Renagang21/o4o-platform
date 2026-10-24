@@ -1,6 +1,7 @@
+import { useSupplierBusinessProfile } from '../profile/useSupplierBusinessProfile';
 import { supplierReviewApi } from '../../../lib/api/supplierReview';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import SupplierProfilePage from '../SupplierProfilePage';
 
 const api = vi.hoisted(() => ({
@@ -387,4 +388,20 @@ vi.mock('../../../lib/api/supplierReview', async (importOriginal) => {
 beforeEach(() => {
   vi.mocked(supplierReviewApi.queue).mockResolvedValue({ items: [], hasMore: false });
   vi.mocked(supplierReviewApi.list).mockImplementation(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 }));
+});
+
+describe('supplier profile save notice lifetime', () => {
+  it('replaces the saved timer on repeated saves and releases it on unmount', async () => {
+    vi.useFakeTimers();
+    try {
+      const hook = renderHook(() => useSupplierBusinessProfile());
+      act(() => hook.result.current.initializeProfile(profile));
+      await act(async () => { await hook.result.current.handleSave(); });
+      expect(vi.getTimerCount()).toBe(1);
+      await act(async () => { await hook.result.current.handleSave(); });
+      expect(vi.getTimerCount()).toBe(1);
+      hook.unmount();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
+  });
 });

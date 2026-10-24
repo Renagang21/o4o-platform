@@ -5,6 +5,7 @@ import { Certificate } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { EnrollmentService } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
+import { changeLectureCertificate, recordCertificateIssue, revokeLectureCertificate } from './certificate-operation.service.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
@@ -95,18 +96,6 @@ export class CertificateService extends BaseService<Certificate> {
     //   재참여 후 재완료가 발생하더라도 수료증을 재발급하지 않는다.
     //   (아래 dedup 체크에서 throw — CompletionService에서 catch 처리)
     // ────────────────────────────────────────────────────────────────────────────────
-    // Check if certificate already exists
-    const existing = await this.certificateRepository.findOne({
-      where: {
-        userId: data.userId,
-        courseId: data.courseId
-      }
-    });
-
-    if (existing) {
-      throw new Error('Certificate already issued for this user and course');
-    }
-
     // Get course and enrollment info
     const course = await this.courseService.getCourse(data.courseId);
     if (!course) {
@@ -126,39 +115,61 @@ export class CertificateService extends BaseService<Certificate> {
       throw new Error('Course must be completed before issuing certificate');
     }
 
-    // Generate certificate number and verification code
-    const certificateNumber = Certificate.generateCertificateNumber();
-    const verificationCode = Certificate.generateVerificationCode();
-
-    // Create certificate
-    const certificate = this.certificateRepository.create({
-      userId: data.userId,
-      courseId: data.courseId,
-      certificateNumber,
-      verificationCode,
-      finalScore: data.finalScore || enrollment.finalScore,
-      credits: course.credits,
-      completedAt: enrollment.completedAt || new Date(),
-      issuedBy,
-      issuerName: data.issuerName,
-      issuerTitle: data.issuerTitle,
-      isValid: true,
-      metadata: {
-        ...data.metadata,
-        courseDuration: course.duration,
-        enrollmentDate: enrollment.enrolledAt,
-        completionDate: enrollment.completedAt,
-        instructor: course.instructorId,
-        organization: course.organizationId
+    // WO-O4O-LECTURE-CERTIFICATE-OPERATION-HISTORY-UNIFICATION-V1: completion re-check, duplicate check,
+    // certificate row, enrollment link and issue history commit together under the enrollment row lock.
+    const saved = await AppDataSource.transaction(async manager => {
+      const [locked] = await manager.query(
+        'SELECT status, "completedAt" FROM lms_enrollments WHERE id=$1 FOR UPDATE',
+        [enrollment.id]
+      );
+      if (!locked || locked.status !== 'completed') {
+        throw new Error('Course must be completed before issuing certificate');
       }
-    });
 
-    const saved = await this.certificateRepository.save(certificate);
+      const existing = await manager.query(
+        'SELECT 1 FROM lms_certificates WHERE "userId"=$1 AND "courseId"=$2 LIMIT 1',
+        [data.userId, data.courseId]
+      );
+      if (existing.length) {
+        throw new Error('Certificate already issued for this user and course');
+      }
 
-    // Update enrollment with certificate ID
-    await this.enrollmentService.updateEnrollment(enrollment.id, {
-      // @ts-ignore
-      certificateId: saved.id
+      const repository = manager.getRepository(Certificate);
+      const certificate = repository.create({
+        userId: data.userId,
+        courseId: data.courseId,
+        certificateNumber: Certificate.generateCertificateNumber(),
+        verificationCode: Certificate.generateVerificationCode(),
+        finalScore: data.finalScore || enrollment.finalScore,
+        credits: course.credits,
+        completedAt: locked.completedAt || enrollment.completedAt || new Date(),
+        issuedBy,
+        issuerName: data.issuerName,
+        issuerTitle: data.issuerTitle,
+        isValid: true,
+        metadata: {
+          ...data.metadata,
+          courseDuration: course.duration,
+          enrollmentDate: enrollment.enrolledAt,
+          completionDate: enrollment.completedAt,
+          instructor: course.instructorId,
+          organization: course.organizationId
+        }
+      });
+
+      let row: Certificate;
+      try {
+        row = await repository.save(certificate);
+      } catch (error: any) {
+        // lms_certificates_userId_courseId_key: a concurrent issue for the same pair won.
+        if (error?.code === '23505' || error?.driverError?.code === '23505') {
+          throw new Error('Certificate already issued for this user and course');
+        }
+        throw error;
+      }
+      await manager.query('UPDATE lms_enrollments SET "certificateId"=$1 WHERE id=$2', [row.id, enrollment.id]);
+      await recordCertificateIssue(manager, row, issuedBy);
+      return row;
     });
 
     logger.info(`[LMS] Certificate issued`, {
@@ -265,50 +276,25 @@ export class CertificateService extends BaseService<Certificate> {
     return { certificates, total };
   }
 
-  async updateCertificate(id: string, input: UpdateCertificateRequest): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
+  async updateCertificate(id: string, input: UpdateCertificateRequest, actorId?: string, operationId?: unknown): Promise<Certificate> {
     // PR #225 merge-gate 11차 P1: allowlist 밖 키(courseId · userId · id)는 여기서 제거한다.
     const data = pickUpdatableCertificateFields(input);
+    const updated = await changeLectureCertificate(AppDataSource, id, actorId, 'update', { patch: data, operationId });
 
-    // Update fields
-    Object.assign(certificate, data);
+    logger.info(`[LMS] Certificate updated`, { id });
 
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate updated`, { id: updated.id });
-
-    return updated;
+    return Object.assign(new Certificate(), updated);
   }
 
-  async revokeCertificate(id: string): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
-
-    certificate.revoke();
-    const updated = await this.certificateRepository.save(certificate);
-
-    logger.info(`[LMS] Certificate revoked`, { id: updated.id });
-
-    return updated;
+  async revokeCertificate(id: string, actorId?: string, reason: unknown = '', operationId?: unknown): Promise<Certificate> {
+    return Object.assign(new Certificate(), await revokeLectureCertificate(AppDataSource, id, actorId, reason, operationId));
   }
 
-  async renewCertificate(id: string, months: number = 12): Promise<Certificate> {
-    const certificate = await this.getCertificate(id);
-    if (!certificate) {
-      throw new Error(`Certificate not found: ${id}`);
-    }
+  async renewCertificate(id: string, months: unknown = 12, actorId?: string, operationId?: unknown): Promise<Certificate> {
+    const updated = await changeLectureCertificate(AppDataSource, id, actorId, 'renew', { months, operationId });
 
-    certificate.renew(months);
-    const updated = await this.certificateRepository.save(certificate);
+    logger.info(`[LMS] Certificate renewed`, { id, months });
 
-    logger.info(`[LMS] Certificate renewed`, { id: updated.id, months });
-
-    return updated;
+    return Object.assign(new Certificate(), updated);
   }
 }

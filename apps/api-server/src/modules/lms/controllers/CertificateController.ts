@@ -1,6 +1,9 @@
+import { AppDataSource } from '../../../database/connection.js';
+import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
+import { listCertificateOperations, listMissingCertificates } from '../services/certificate-operation.service.js';
 import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7
@@ -42,6 +45,17 @@ export class CertificateController extends BaseController {
         : null,
       issuer: certificate.issuerName || 'O4O LMS',
     };
+  }
+
+  /** Operator recovery queue; does not broaden private certificate reads. */
+  static async missingCertificates(req: Request, res: Response): Promise<any> {
+    try {
+      const items = await listMissingCertificates(AppDataSource, req.query.search);
+      return BaseController.ok(res, { items });
+    } catch (error: any) {
+      logger.error('[CertificateController.missingCertificates] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
   }
 
   static async issueCertificate(req: Request, res: Response): Promise<any> {
@@ -213,10 +227,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.updateCertificate(id, data);
+      const certificate = await service.updateCertificate(id, data, (req as any).user?.id, data?.operationId);
 
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
+      if (error instanceof OperationError) return res.status(error.status).json({ success: false, error: error.message, code: error.code });
       logger.error('[CertificateController.updateCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {
@@ -234,16 +249,29 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.revokeCertificate(id);
+      const certificate = await service.revokeCertificate(id, req.user!.id, req.body?.reason ?? '', req.body?.operationId);
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
     } catch (error: any) {
+      if (error instanceof OperationError) return res.status(error.status).json({ success: false, error: error.message, code: error.code });
       logger.error('[CertificateController.revokeCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {
         return BaseController.notFound(res, error.message);
       }
 
+      return BaseController.error(res, error);
+    }
+  }
+
+  /** Operator-only issue/renew/update/revoke history (WO-O4O-LECTURE-CERTIFICATE-OPERATION-HISTORY-UNIFICATION-V1). */
+  static async certificateOperations(req: Request, res: Response): Promise<any> {
+    try {
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, req.params.id))) return;
+      return BaseController.ok(res, await listCertificateOperations(AppDataSource, req.params.id, req.query.page));
+    } catch (error: any) {
+      if (error instanceof OperationError) return res.status(error.status).json({ success: false, error: error.message, code: error.code });
+      logger.error('[CertificateController.certificateOperations] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }
@@ -256,10 +284,11 @@ export class CertificateController extends BaseController {
 
       if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
-      const certificate = await service.renewCertificate(id, months);
+      const certificate = await service.renewCertificate(id, months, (req as any).user?.id, req.body?.operationId);
 
       return BaseController.ok(res, { certificate, message: 'Certificate renewed successfully' });
     } catch (error: any) {
+      if (error instanceof OperationError) return res.status(error.status).json({ success: false, error: error.message, code: error.code });
       logger.error('[CertificateController.renewCertificate] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {

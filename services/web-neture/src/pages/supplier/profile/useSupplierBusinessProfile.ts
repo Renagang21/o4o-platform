@@ -1,8 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { isSelectableBusinessEntityType } from '@o4o/types';
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../../lib/api';
 
 export function useSupplierBusinessProfile() {
+  const mounted = useRef(true);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+    };
+  }, []);
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -152,12 +161,14 @@ export function useSupplierBusinessProfile() {
       shippingMountain: shippingMountain.trim() === '' ? null : shippingMountain,
     });
 
+    if (!mounted.current) return;
     setSaving(false);
 
     if (result.success) {
       setSaved(true);
       setPrefilled(false);
-      setTimeout(() => setSaved(false), 3000);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 3000);
     } else {
       setError(result.error || '저장에 실패했습니다.');
     }

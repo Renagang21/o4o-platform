@@ -162,18 +162,22 @@ describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 �
   };
 
   it('옛 HUB는 가입 상태를 목적지에서 판정하며 내 매장 기능으로 항상 이전한다', () => {
-    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
+    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff />} />');
     expect(kpa).toContain("'/store/pharmacy/supply'");
     expect(kpa).toContain('`/store/library/${resource}`');
   });
 
-  it('내 매장·업무공간 handoff가 옛 KPA guard보다 먼저 동작한다', () => {
-    expect(kpa).toContain('<Route path="/store" element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
-    expect(kpa).toContain('<Route element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA guard · 로컬 매장 화면은 제거됐다.
+  it('내 매장 handoff 앞에 옛 KPA guard · 로컬 매장 layout 이 없다', () => {
+    expect(kpa).toContain('<Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />');
+    expect(kpa).not.toContain('PharmacyGuard');
+    expect(kpa).not.toContain('KpaStoreLayoutWrapper');
+    expect(kpa).not.toContain('KpaStoreWorkspaceWrapper');
   });
 
   it('공개 · 기기 경로는 /store gate 밖의 최상위 절대 경로로 선언돼 있다', () => {
-    for (const p of ['/store/marketing/signage/play/:playlistId', '/store/:slug/products/:id', '/store/:slug/blog', '/store/:slug/blog/:postSlug',
+    // 송출(/store/marketing/signage/play/:id)은 로컬 route 없이 handoff 가 공통 최상위 route 로 보낸다(unifiedStoreScope).
+    for (const p of ['/store/:slug/products/:id', '/store/:slug/blog', '/store/:slug/blog/:postSlug',
       '/qr/:slug', '/tablet/:slug', '/tablet/setup', '/multilingual-products/:publicKey', '/foreign-visitor/affiliate/:shortCode']) {
       const decl = routeDecl(kpa, `path="${p}"`);
       expect(decl).not.toContain('UnifiedStoreHandoff');
@@ -181,17 +185,17 @@ describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 �
   });
 });
 
-describe('KPA 앱 — 매장 handoff는 서비스 경로로, pharmacy 배포만 활성화', () => {
+describe('KPA 앱 — 매장 handoff는 서비스 경로로, 활성화 flag 없음', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
   it('handoff api 는 toKpaScopedStorePath 를 거친다', () => {
-    expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
-    expect(kpa).toContain('toKpaScopedStorePath(returnPath)');
-    expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
+    expect(kpa).toContain('const scopedPath = toKpaScopedStorePath(returnPath);');
+    expect(kpa).toContain('kpaStoreServicesApi.resolveWorkspaceEntryUrl(scopedPath)');
+    // D7: 활성화 flag 는 읽지 않는다 — handoff 는 무조건이다.
+    expect(kpa).not.toContain('isUnifiedStoreHandoffEnabled');
   });
-  it('배포 workflow는 pharmacy 앱만 명시적으로 활성화하고 다른 서비스 기본값은 보존한다', () => {
+  it('배포 workflow 에 더 이상 쓰지 않는 handoff 활성화 build 입력이 없다', () => {
     const deployment = read('.github/workflows/deploy-web-services.yml');
-    expect(deployment).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
-    expect(deployment).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
+    expect(deployment).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
   });
 });
 
@@ -203,10 +207,12 @@ describe('K-Cosmetics 공개 서비스 종료 — store 호스트는 종료된 �
     expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/*`} element={KcosRetired} />');
     expect(app).not.toMatch(/k-cosmetics[^\n]*element=\{gated\(/);
   });
-  it('이용 방법 이동은 서비스 문맥이 K-Cosmetics 일 수 없으므로 종료 호스트로 replace 하지 않는다', () => {
+  it('서비스 공개 origin 은 종료 호스트를 돌려줄 수 없고, 이용 방법(/guide/*) 이동 경로는 남아 있지 않다', () => {
     // UnifiedServiceKey 에서 k-cosmetics 가 빠져 getActiveServicePublicOrigin() 이 종료 호스트를 돌려줄 수 없다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     expect(svc).not.toMatch(/k-cosmetics\.site|retail\.neture\.co\.kr/);
-    expect(app).toContain('window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);');
+    // pharmacy 가이드 화면 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)로 GuideBackLink · /guide/* 이동도 제거됐다.
+    expect(app).not.toContain('ServiceGuideRedirect');
+    expect(app).not.toContain('path="/guide/*"');
   });
   it('종료 안내는 약국 화면으로 redirect 하지 않는다', () => {
     const notice = app.slice(app.indexOf('const KcosRetired'), app.indexOf('const S = '));

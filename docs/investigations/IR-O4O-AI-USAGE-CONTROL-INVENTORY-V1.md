@@ -1,7 +1,7 @@
 # IR-O4O-AI-USAGE-CONTROL-INVENTORY-V1
 
-> **상태**: ACTIVE — 사용처 조사 완료, 후속 관리 설계·구현은 별도 작업
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
+> **상태**: ACTIVE — 작성 기준의 조사 snapshot; 이후 구현 대응은 마지막 절 참조
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 요청 「AI 사용처 조사표 작성」
 
 - 조사 기준: `main`의 `b54074d038c87a3c3b490639aa90d06bc3c4daea` (PR #717 병합 시점)
@@ -9,6 +9,8 @@
 - 변경 범위: 이 조사 문서 1개. 애플리케이션·설정·DB·정본 변경 없음
 - 검증 수준: **소스와 route 등록 연결 조사**. 운영 배포본, 활성 키, DB 정책값, 실제 호출량·청구 금액은 미확인
 - 배포 판정: **NOT_APPLICABLE** — 문서만 변경
+
+아래 A01–A31·X01 및 개발 스크립트 표의 제어/회계 상태는 위 조사 기준 revision의 기록이다. 이후 모델 관리 구현과 새 소비처가 추가됐으므로 현재 플랫폼 전체 호출의 완전한 목록이나 현행 미구현 목록으로 사용하지 않는다. 원래 표를 과거부터 구현돼 있었던 것처럼 다시 쓰지 않고, 2026-10-24 대응을 마지막 절에 분리한다.
 
 ## 1. 조사 결과와 범위
 
@@ -109,7 +111,7 @@ A19의 **논리 생성과 실제 공급자 시도 수는 다르다**. `generateA
 | 관리자 [SimpleAIGenerator][admin-generator], [BlockCodeGenerator](../../apps/admin-dashboard/src/services/ai/BlockCodeGenerator.ts) | A17 | `SimpleAIGenerator`는 `/api` base 사용; `BlockCodeGenerator`의 다른 client/base 경로는 실제 소비 여부와 함께 후속 확인 |
 | 관리자 [pop.api](../../apps/admin-dashboard/src/api/pop.api.ts) | A19 | 전역 상품 콘텐츠 생성 API 호출 확인 |
 | Store [StoreMultilingualConsultationPage](../../services/web-store/src/pages/pharmacy/StoreMultilingualConsultationPage.tsx) | A21 | 번역은 서버, 음성 입력·읽기는 브라우저 기능 |
-| KPA [OperatorContentDetailPage](../../services/web-kpa-society/src/pages/operator/OperatorContentDetailPage.tsx), [ProductApplicationManagementPage](../../services/web-kpa-society/src/pages/operator/ProductApplicationManagementPage.tsx) | A22~A25 | 선택 목록/본문의 요약·추출·태그 호출 확인 |
+| KPA 작성 시점 코드: [OperatorContentDetailPage](https://github.com/Renagang21/o4o-platform/blob/b54074d038c87a3c3b490639aa90d06bc3c4daea/services/web-kpa-society/src/pages/operator/OperatorContentDetailPage.tsx), [ProductApplicationManagementPage](https://github.com/Renagang21/o4o-platform/blob/b54074d038c87a3c3b490639aa90d06bc3c4daea/services/web-kpa-society/src/pages/operator/ProductApplicationManagementPage.tsx) | A22~A25 | 조사 revision에서 선택 목록/본문의 요약·추출·태그 호출 확인. 현재 화면의 존재·운영 활성 근거로 사용하지 않음 |
 | Neture [HubPage](../../services/web-neture/src/pages/hub/HubPage.tsx) | A30 | [App route][neture-app]의 `/workspace/hub` → `HubPage` → `REFRESH_AI`/`ai-refresh` POST 소비 코드 확인. 실제 운영 이용은 미확인 |
 
 ## 5. 외부 호출과 구분해야 하는 코드·계획
@@ -254,3 +256,21 @@ api.anthropic.com, dashscope, audio/transcriptions, SpeechRecognition
 개발 smoke도 동일 기준으로 보완했다. 범용 파일 스크립트의 MAX_ATTEMPTS=2는 외부 HTTP 전체 상한이 아니며 내부 Core·Gemini JSON 재시도를 포함하면 실패 반복 시 최대 8요청 예가 가능하다. grounding smoke는 Core 기본 2시도이고 text 모드라 JSON 내부 재시도는 없다. 둘 다 실제 호출·청구 검증은 수행하지 않았다.
 
 추가 검토 보완: 업로드 후 자동 Google Vision OCR을 X01 전문 외부 API로 별도 기록했다. 고정 TEXT_DETECTION·ADC 계열 인증·이미지 단위 비용을 생성형 모델/토큰과 구분하며 현재 모델 관리에 연결됐다고 표시하지 않는다.
+
+## 2026-10-24 구현 대응과 조사 경계
+
+기존 PR #721의 통합을 계속하면서 main `6589f07eca`를 동기화했다. 원래 조사 기준 `b54074d038`과 A01–A31/X01 번호는 바꾸지 않는다. 아래는 알려진 후속 구현과의 대응이며 전체 신규 사용처 재조사나 운영 재검증이 아니다. 현재 범위의 근거는 [AI 공통 기반 §12-1/§12-2](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)와 각 구현 PR이다.
+
+| 기존 조사·제안 | 후속 확인 | 남은 구분 |
+| --- | --- | --- |
+| 관리자 모델 목록·사용처별 선택·동시 저장 보호 | #754의 CRUD·선택·모델 제어 document revision CAS, #792의 호출 직전 선택 우선 적용이 main·운영 반영됨 | 이 revision은 모델 제어 문서의 동시 저장 보호다. 전체 실행 정책 버전·복원·다중 인스턴스 중지 admission의 완료 근거가 아님 |
+| A20 매장 콘텐츠 번역 / A21 상담 번역 | #792에서 `store.translation`·`pharmacy.consultation` 모델 선택을 분리하고 기존 공유 선택을 읽기 호환으로 보존 | 기존 `CONTENT_TRANSLATION` 활성·quota·회계 scope는 공유. 번역별 독립 중지·한도 정책까지 분리한 것은 아님 |
+| 코드/정책의 이전 모델 참조 | #792에서 실제 잔여 참조를 표시하고 삭제한 모델로 되돌아가는 지정 해제를 거부 | 환경·공통 기본·미연결 정책의 보호는 유지. 모든 사용처 지정을 바꿨다는 이유만으로 모든 정책 참조를 해제하지 않음 |
+| 원래 31행 밖에 추가된 뉴스 생성 | [커뮤니티 뉴스 서비스](../../apps/api-server/src/services/community/community-news-ai.service.ts)의 수동·예약 생성은 공통 resolver를 직접 사용 | 개별 managed target에 연결되지 않았고 공통 정책 모델을 계속 보호한다. 뉴스 제어·집계 상태를 A01–A31 전체 연결 수치에 임의 포함하지 않음 |
+| 통합 중지·직접 transport/멀티모달 비용·전문 OCR/STT | 별도 설계·구현 범위 | X01을 생성형 모델 관리의 연결 수에 더하거나 실제 공급자 인증·요금 검증 완료로 표시하지 않음 |
+
+#754의 2026-10-21 배포 기록은 [모델 관리 CHECK](../checks/CHECK-O4O-AI-MODEL-MANAGEMENT-V1.md)에, #792의 보완·2026-10-24 API/관리자 배포 `abb602b956`은 해당 PR과 공통 기반 §12-2에 있다. 당시 30/31 모델 선택 연결 수치는 이후 모든 AI 호출의 완전한 census나 전체 비용·중지 연결 완료를 뜻하지 않는다. 외부 개인 ChatGPT 연결·등록 준비는 별도 문서/작업이며 개인 계정 사용량을 플랫폼 API 비용과 합치지 않는다.
+
+이번 정합은 문서 2개만 변경한다. 기존 표의 유료 smoke나 운영 API·DB·공급자 호출은 실행하지 않는다. DRAFT 설계 통합을 신규 기능/정책/DB 변경 승인이나 전문 API 활성화로 해석하지 않는다. 최신 문서 CI·Codex·main 통합·NO_DEPLOY 결과는 [PR #721](https://github.com/Renagang21/o4o-platform/pull/721)에 기록한다.
+
+현재 main에서 제거된 두 KPA 화면의 상대 링크는 원래 조사 SHA에 실제 파일이 있음을 확인한 뒤 고정 코드 링크로 바꿨다. 과거 호출 근거를 보존하는 조치이며 화면·route를 복구하거나 현재 소비처로 재등록하지 않는다.

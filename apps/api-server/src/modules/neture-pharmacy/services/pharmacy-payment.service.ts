@@ -10,6 +10,7 @@
  */
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { assertPaymentStoreAccess } from './pharmacy-payment-access.js';
 import {
   NETURE_PHARMACY_PAYMENT_SOURCE,
   NETURE_PHARMACY_SERVICE_KEY,
@@ -45,6 +46,8 @@ interface GroupOrder {
   payment_status: string;
   total_amount: string;
   receiver_key: string | null;
+  organization_id: string;
+  items: Array<{ productId?: string; metadata?: Record<string, any> }>;
 }
 
 /** 주문 id 집합 비교용 결정적 정렬(코드 포인트 순). */
@@ -68,11 +71,11 @@ export class PharmacyPaymentService {
     await m.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`neture-pharmacy-payment:${paymentGroupId}`]);
   }
 
-  private async groupOrders(m: { query: DataSource['query'] }, buyerId: string, paymentGroupId: string): Promise<GroupOrder[]> {
+  private async groupOrders(m: { query: DataSource['query'] }, buyerId: string, organizationId: string, paymentGroupId: string): Promise<GroupOrder[]> {
     const orders: GroupOrder[] = await m.query(
       `SELECT id::text AS id, "buyerId"::text AS buyer_id, status::text AS status,
               "paymentStatus"::text AS payment_status, "totalAmount" AS total_amount,
-              metadata->>'receiverKey' AS receiver_key
+              metadata->>'receiverKey' AS receiver_key, "sellerOrganizationId"::text AS organization_id, items
          FROM checkout_orders
         WHERE metadata->>'paymentGroupId' = $1 AND metadata->>'serviceKey' = $2
         ORDER BY id
@@ -80,7 +83,7 @@ export class PharmacyPaymentService {
       [paymentGroupId, NETURE_PHARMACY_SERVICE_KEY],
     );
     // 다른 구매자의 결제 묶음은 존재를 드러내지 않는다.
-    if (orders.length === 0 || orders.some((o) => o.buyer_id !== buyerId)) {
+    if (orders.length === 0 || orders.some((o) => o.buyer_id !== buyerId || o.organization_id !== organizationId)) {
       throw new NeturePharmacyError(404, 'PAYMENT_GROUP_NOT_FOUND', '결제할 주문을 찾을 수 없습니다.');
     }
     return orders;
@@ -102,12 +105,13 @@ export class PharmacyPaymentService {
     return { targets, amount, receiverKey: [...receivers][0] };
   }
 
-  async prepare(buyerId: string, paymentGroupId: string) {
+  async prepare(buyerId: string, organizationId: string, paymentGroupId: string) {
     const mode = this.mode();
     assertPayable(mode);
     return this.dataSource.transaction(async (m) => {
       await this.lockGroup(m, paymentGroupId);
-      const { targets, amount, receiverKey } = this.payable(await this.groupOrders(m, buyerId, paymentGroupId));
+      const { targets, amount, receiverKey } = this.payable(await this.groupOrders(m, buyerId, organizationId, paymentGroupId));
+      await assertPaymentStoreAccess(m, buyerId, organizationId);
       const orderIds = targets.map((o) => o.id).sort(byId);
 
       // 같은 묶음 · 같은 주문 · 같은 금액의 준비된 결제가 있으면 재사용(중복 준비 방지). 다르면 닫고 새로 만든다.
@@ -140,7 +144,7 @@ export class PharmacyPaymentService {
     });
   }
 
-  async confirm(buyerId: string, input: { paymentId?: string; paymentGroupId?: string }) {
+  async confirm(buyerId: string, organizationId: string, input: { paymentId?: string; paymentGroupId?: string }) {
     const { paymentId, paymentGroupId } = input;
     if (!paymentId || !paymentGroupId) {
       throw new NeturePharmacyError(400, 'INVALID_REQUEST', 'paymentId · paymentGroupId 가 필요합니다.');
@@ -164,6 +168,8 @@ export class PharmacyPaymentService {
         throw new NeturePharmacyError(404, 'PAYMENT_NOT_FOUND', '결제 정보를 찾을 수 없습니다.');
       }
       const orderIds: string[] = [...(payment.metadata?.checkoutOrderIds ?? [])].sort(byId);
+      const orders = await this.groupOrders(m, buyerId, organizationId, paymentGroupId);
+      await assertPaymentStoreAccess(m, buyerId, organizationId);
       if (payment.status === 'PAID') {
         return { alreadyPaid: true, orderIds, testPayment: payment.metadata?.testPayment === true };
       }
@@ -175,7 +181,7 @@ export class PharmacyPaymentService {
         throw new NeturePharmacyError(409, 'PAYMENT_MODE_CHANGED', '다시 결제를 준비해 주세요.');
       }
 
-      const { targets, amount } = this.payable(await this.groupOrders(m, buyerId, paymentGroupId));
+      const { targets, amount } = this.payable(orders);
       const currentIds = targets.map((o) => o.id).sort(byId);
       // 금액 · 대상 주문이 준비 시점과 같아야 한다(그 사이 취소 · 변경되면 다시 준비).
       if (Math.round(Number(payment.amount)) !== amount || JSON.stringify(currentIds) !== JSON.stringify(orderIds)) {

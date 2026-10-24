@@ -23,13 +23,11 @@ export interface TenantContext {
 }
 
 // Extend Express Request type
-declare global {
-  namespace Express {
-    interface Request {
-      tenantId?: string | null;
-      tenant?: TenantContext | null;
-      serviceGroup?: ServiceGroup;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    tenantId?: string | null;
+    tenant?: TenantContext | null;
+    serviceGroup?: ServiceGroup;
   }
 }
 
