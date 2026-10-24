@@ -11,6 +11,7 @@ import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionService } from './CompletionService.js';
+import { keepCertificateLink } from './certificate-operation.service.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
 import { CourseService } from './CourseService.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
@@ -426,6 +427,8 @@ export class QuizService {
       } catch (completionError) {
         logger.warn('[Quiz] Completion creation failed', { courseId, userId, error: (completionError as Error).message });
       }
+      // The chain linked the issued certificate; the save below must not write the stale null back.
+      await keepCertificateLink(AppDataSource, enrollment);
     }
 
     await this.enrollmentRepository.save(enrollment);
