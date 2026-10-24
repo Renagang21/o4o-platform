@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import './carepharm-home.css';
 import { Link, useLocation } from 'react-router-dom';
 import { COOPERATION_EXTENSIONS, CooperationMemberSpace, ServiceHomeHero, type CooperationView } from '@o4o/shared-space-ui';
@@ -10,6 +10,19 @@ import { api } from '../../lib/apiClient';
 
 const extension = COOPERATION_EXTENSIONS.carepharm;
 
+/** The member gate may remount this public slot after loading; restore its anchor then. */
+function MemberHomeNews() {
+  const { hash } = useLocation();
+  const section = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (hash === '#news') section.current?.scrollIntoView?.({ block: 'start' });
+  }, [hash]);
+  return <section ref={section} id="news" aria-labelledby="carepharm-member-news" className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5">
+    <h2 id="carepharm-member-news" className="mb-4 text-xl font-semibold">공지·안내</h2>
+    <CarePharmNotices />
+  </section>;
+}
+
 /** Public introduction stays available independently of the protected member workspace. */
 export default function CarePharmHomePage({ view = 'home' }: { view?: CooperationView }) {
   const { user, isAuthenticated } = useAuth();
@@ -18,10 +31,7 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
   useEffect(() => {
     if (view === 'home' && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView?.();
   }, [view, location.hash, location.key]);
-  const memberNews = <section id="news" aria-labelledby="carepharm-member-news" className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5">
-    <h2 id="carepharm-member-news" className="mb-4 text-xl font-semibold">공지·안내</h2>
-    <CarePharmNotices />
-  </section>;
+  const memberNews = <MemberHomeNews />;
   const memberSpace = <CooperationMemberSpace model={extension.model} materialsGuide={extension.materials} client={api}
     accountId={isAuthenticated ? user?.id : undefined} view={view} homeNews={isAuthenticated ? memberNews : undefined}
     onLogin={() => openLoginModal(location.pathname + location.search)}

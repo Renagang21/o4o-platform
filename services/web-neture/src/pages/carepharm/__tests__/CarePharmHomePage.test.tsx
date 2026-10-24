@@ -301,3 +301,24 @@ it('keeps home notices out of a denied material workspace', async () => {
   await screen.findByText(/이 서비스의 가입 승인 후/);
   expect(screen.queryByRole('heading', { name: '공지·안내' })).toBeNull();
 });
+
+it('scrolls to the current home news section after the pharmacy gate replaces its loading view', async () => {
+  access.allowed = true;
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView');
+  const scroll = vi.fn();
+  Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
+  try {
+    let finish!: (value: unknown) => void;
+    const previous = state.get.getMockImplementation()!;
+    state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access')
+      ? new Promise(resolve => { finish = resolve; }) : previous(path, config));
+    render(<MemoryRouter initialEntries={['/?store=owned-store#news']}><CarePharmHomePage /></MemoryRouter>);
+    await waitFor(() => expect(finish).toBeTypeOf('function'));
+    await act(async () => finish(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: true, membershipStatus: 'active' })));
+    await screen.findByRole('complementary', { name: '내 참여와 지원' });
+    expect(scroll.mock.contexts).toContain(document.getElementById('news'));
+  } finally {
+    if (descriptor) Object.defineProperty(Element.prototype, 'scrollIntoView', descriptor);
+    else Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+  }
+});

@@ -21,7 +21,7 @@
 | Neture/CarePharm 앱 | 149 files / 1,285 tests PASS |
 | Pharmcoop 앱 | 11 files / 82 tests PASS |
 | 합계 | 198 files / 1,686 tests PASS |
-| 마지막 홈 조정 후 집중 재검증 | CarePharm 39(추가 공개 공지/접근 실패 2경우 포함), Pharmcoop 82 tests PASS |
+| 마지막 홈 조정 후 집중 재검증 | CarePharm 40(공개 공지/접근 실패 2경우와 비동기 재배치 anchor 1경우 추가), Pharmcoop 82 tests PASS |
 | 실제 소비 앱 3개 | TypeScript 및 production build PASS, 최종 CSS/소개 조정 뒤 Vite build 재검증 PASS |
 | 다른 공유 소비 앱 | Store·Lecture·KPA Branch의 타입/production build, Admin 직접 Vite build PASS |
 | 공유 제품 소스 타입 검사 | 테스트 파일을 제외한 기존 로컬 production tsconfig 검사 PASS |
