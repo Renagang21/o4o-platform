@@ -634,6 +634,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product DB Maintenance route:', maintenanceError);
     }
 
+    // 기준/선택 작업은 독립 settings namespace에 저장. 상품 원본 적용 경로 없음.
+    const { createProductCorrectionController } = await import('../modules/neture/controllers/product-correction.controller.js');
+    app.use('/api/v1/admin/o4o-product-db/correction', createProductCorrectionController(dataSource));
+
     // 24-e2h. Register Product Master Audit Log (read-only) — master 작업 이력 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1)
     try {

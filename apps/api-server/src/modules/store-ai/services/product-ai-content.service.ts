@@ -1,5 +1,5 @@
 import type { DataSource, Repository } from 'typeorm';
-import { PRODUCT_CONTENT_PROMPTS } from '@o4o/ai-prompts/store';
+import { PRODUCT_CONTENT_PROMPTS, buildProductContentSystemPrompt } from '@o4o/ai-prompts/store';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { ProductAiContent } from '../entities/product-ai-content.entity.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
@@ -51,7 +51,7 @@ export class ProductAiContentService {
       const userPrompt = prompt.user(product);
 
       // LLM 호출: AiPolicyExecutorService가 retry / key 해석 / usage logging 담당
-      const result = await this.aiPolicyExecutor.execute('PRODUCT_CONTENT', prompt.system, userPrompt);
+      const result = await this.aiPolicyExecutor.execute('PRODUCT_CONTENT', buildProductContentSystemPrompt(contentType, product), userPrompt);
 
       const parsed = JSON.parse(result.content) as LlmContentResponse;
       if (!parsed.content || typeof parsed.content !== 'string') {
