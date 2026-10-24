@@ -132,9 +132,10 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
     }).catch(() => { if (alive) setError('선택한 약국의 서비스 이용 상태를 확인하지 못했습니다.'); });
     return () => { alive = false; };
   }, [client, model.key, organizationId, retry]);
-  if (error) return <div><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>이용 상태 다시 확인</button></div>;
-  if (!access) return <p role="status">선택한 약국의 가입 승인을 확인하고 있습니다…</p>;
-  if (!access.allowed) return <div className="rounded-xl border p-6"><p>이 서비스의 가입 승인 후 회원 게시글·사업 자료·업무 도구를 이용할 수 있습니다.</p><p>{statusName[access.membershipStatus ?? ''] ?? '미가입'}</p><Link className="mt-4 inline-block underline" to={model.participationPath + storeSearch}>참여 신청 · 상태 확인</Link>{homeNews}</div>;
+  const publicHomeNews = view === 'home' ? homeNews : null;
+  if (error) return <><div><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>이용 상태 다시 확인</button></div>{publicHomeNews}</>;
+  if (!access) return <><p role="status">선택한 약국의 가입 승인을 확인하고 있습니다…</p>{publicHomeNews}</>;
+  if (!access.allowed) return <div className="rounded-xl border p-6"><p>이 서비스의 가입 승인 후 회원 게시글·사업 자료·업무 도구를 이용할 수 있습니다.</p><p>{statusName[access.membershipStatus ?? ''] ?? '미가입'}</p><Link className="mt-4 inline-block underline" to={model.participationPath + storeSearch}>참여 신청 · 상태 확인</Link>{publicHomeNews}</div>;
   return <>
     {view === 'home' && <CooperationMemberHomeLayout summary={<>
       <section className="rounded-xl border border-slate-200 bg-white p-5">

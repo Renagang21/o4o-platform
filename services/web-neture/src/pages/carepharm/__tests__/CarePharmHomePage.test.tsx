@@ -286,3 +286,18 @@ it('uses the common member menu while retaining the selected pharmacy and existi
   expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/businesses/carepharm/store-access', { headers: { 'X-Store-Organization-Id': 'owned-store' } });
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
 });
+it('retains public home notices when the selected pharmacy access check fails', async () => {
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access')
+    ? Promise.reject({ response: { status: 403 } }) : previous(path, config));
+  mount();
+  await screen.findByRole('button', { name: '이용 상태 다시 확인' });
+  expect(screen.getByRole('heading', { name: '공지·안내' })).toBeTruthy();
+  expect(screen.queryByRole('complementary', { name: '내 참여와 지원' })).toBeNull();
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/showcase') || path.endsWith('/store/contents'))).toBe(false);
+});
+it('keeps home notices out of a denied material workspace', async () => {
+  mount('materials');
+  await screen.findByText(/이 서비스의 가입 승인 후/);
+  expect(screen.queryByRole('heading', { name: '공지·안내' })).toBeNull();
+});
