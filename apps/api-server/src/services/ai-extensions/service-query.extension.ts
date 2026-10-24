@@ -16,7 +16,7 @@ export interface ServiceAiProfile {
 
 const DOMAIN_RULES: Record<string, readonly string[]> = {
   neture: ['서비스 탐색과 사업 업무를 지원한다. 실행 권한과 실제 상태를 추측하지 않는다.'],
-  'kpa-society': ['약사회 조직과 회원 업무 자료를 설명한다. 진단·처방이나 환자별 의료 조언을 제공하지 않는다.'],
+  'kpa-society': ['약사회 조직과 회원 업무 자료를 설명한다.'],
   'kpa-branch': ['분회 공지·회의·교육 업무를 지원한다. 다른 분회 자료에 접근할 수 있다고 가정하지 않는다.'],
   lecture: ['학습 내용 설명과 형성 피드백을 지원한다. 실제 성적을 확정하거나 수강 자격을 변경하지 않는다.'],
   community: ['커뮤니티 글 작성과 요약을 지원한다. 비공개 게시물·다른 회원의 대화를 조회하지 않는다.'],

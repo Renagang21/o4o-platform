@@ -8,6 +8,9 @@
 
 export interface ProductContentInput {
   id: string;
+  purpose?: 'professional' | 'ai-support' | 'consumer-qr';
+  productFacts?: string;
+  professionalReference?: { content: string; source: string; reviewStatus: 'reviewed' | 'pending' };
   regulatoryName: string;
   marketingName: string;
   specification?: string | null;
@@ -43,7 +46,7 @@ export const PRODUCT_DESCRIPTION_SYSTEM = `당신은 약국/건강기능식품 �
 - 100자~300자 사이로 작성하세요.
 - 건강기능식품 광고 심의 기준을 준수하세요 (과대 광고 금지).
 - 소비자가 이해하기 쉬운 한국어로 작성하세요.
-- 핵심 효능, 성분, 복용 대상을 포함하세요.`;
+- 제공된 근거에 있는 효능, 성분, 사용 대상을 설명하세요. 근거가 없는 항목은 만들지 말고 확인 필요로 표시하세요.`;
 
 export const POP_SHORT_SYSTEM = `당신은 약국 매장 POP(Point of Purchase) 문구 전문가입니다.
 
@@ -122,6 +125,16 @@ export const SIGNAGE_TEXT_SYSTEM = `당신은 디지털 사이니지 콘텐츠 �
 export function buildProductUserPrompt(product: ProductContentInput, purpose: string): string {
   const parts: string[] = [];
   parts.push(`[${purpose} 생성 요청]`);
+  parts.push(`이용 목적: ${product.purpose ?? 'consumer-qr'}`);
+  parts.push('상품 사실과 전문 참고정보를 구분하세요. 질병명·진단·감별 과정을 주제 자체로 배제하지 마세요.');
+  parts.push('상품 고유 사실은 제공된 상품 근거에서만 사용하고, 전문 참고정보를 제품의 확정 효과로 바꾸지 마세요.');
+  parts.push('자료가 부족하면 필요한 근거를 명시하고, 상담 안내만으로 설명을 대신하지 마세요.');
+  parts.push('제품명·태그·OCR만으로 효능·성분·용법을 추측하지 마세요.');
+  if (product.productFacts?.trim()) parts.push(`[상품 사실 근거]\n${product.productFacts.trim()}`);
+  if (product.professionalReference?.content.trim()) {
+    const ref = product.professionalReference;
+    parts.push(`[전문 참고정보 — ${ref.reviewStatus === 'reviewed' && ref.source.trim() ? '검수됨' : '검수 대기·확정 근거로 사용하지 않음'}]\n출처: ${ref.source.trim() || '미확인'}\n${ref.content.trim()}`);
+  }
   parts.push('');
   parts.push(`[상품 정보]`);
   parts.push(`- 식약처명: ${product.regulatoryName}`);
@@ -168,3 +181,21 @@ export const PRODUCT_CONTENT_PROMPTS: Record<ProductAiContentType, {
     user: (p) => buildProductUserPrompt(p, '사이니지 문구'),
   },
 };
+
+/** 소비자용 짧은 문구와 전문 판단지원 본문을 분리한다. */
+export function buildProductContentSystemPrompt(type: ProductAiContentType, product: ProductContentInput): string {
+  if ((type === 'product_description' || type === 'qr_description') &&
+      (product.purpose === 'professional' || product.purpose === 'ai-support')) {
+    return `당신은 전문인의 상품 이해·상담 판단을 지원하는 설명 작성 도우미입니다.
+- 이용 목적: ${product.purpose}.
+- 제공된 상품 사실과 별도 출처가 있는 전문 참고정보를 구분하세요.
+- 질병명·진단·감별 과정, 판단 근거·추가 확인 사항을 충분히 설명하세요. 소비자용 글자 수 제한이나 구매 유도 목적을 적용하지 마세요.
+- 검수 대기·출처 미확인 자료는 확정 근거로 사용하지 마세요. 근거 없는 상품 효능·개인별 확정 진단·처방을 만들지 마세요.
+- 상담 안내로 설명을 대신하지 마세요. 출처와 검토 필요 사항을 본문에 보존하세요.
+- 반드시 {"content":"설명 본문"} JSON만 출력하세요.`;
+  }
+  return PRODUCT_CONTENT_PROMPTS[type].system + `
+- 상품 고유 사실과 전문 참고정보를 구분하고 제공된 근거만 사용하세요. 없는 효능·성분·용법을 만들지 마세요.
+- 질병명·진단 과정 등 전문 주제를 일괄 배제하지 마세요. 검수 대기·출처 미확인 자료는 확정 근거로 사용하지 마세요.
+- 근거와 사용 맥락을 유지하고, 상담 안내만으로 설명을 대신하지 마세요.`;
+}

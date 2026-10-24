@@ -222,7 +222,8 @@ describe('WO3 — product-description (가장 엄격한 사실성)', () => {
     expect(p).toContain('상품 상세 설명을 HTML 로 작성');
     expect(p).toContain('제품명만 보고 성분·효능·원산지 등을 추측해 쓰지 마세요');
     expect(p).toContain('원문에 없는 사용법·주의사항·보관법을 만들어 넣지 마세요');
-    expect(p).toContain('질병을 치료·예방한다는 표현을 추가하지 마세요');
+    expect(p).toContain('확인된 허가 효능·질병명을 보존');
+    expect(p).not.toContain('질병을 치료·예방한다는 표현을 추가하지 마세요');
     expect(p).toContain('확인되지 않은 수치(함량·용량·가격·기간 등)를 만들어 넣지 마세요');
     // 비건강이라 HEALTH 조항(상담 톤)은 없음 — 제품 계약과 별개
     expect(p).not.toContain('약사 등 전문가와 상담');
@@ -286,5 +287,39 @@ describe('WO3 — WO2 create/revise 출력 불변(회귀 가드)', () => {
       expect(p).not.toContain('제품명만 보고 성분·효능·원산지');
       expect(p).not.toContain('로만 작성하세요');
     }
+  });
+});
+
+
+describe('전문 활용 목적과 근거 분리 (CR-022 · AR-007)', () => {
+  it.each(['professional', 'ai-support'] as const)('목적 %s는 소비자 구매 유도·짧은 안내를 강제하지 않는다', purpose => {
+    const p = buildStoreContentAuthoringPrompt({ task: 'qr', purpose, productName: '검증 상품',
+      evidence: [{ kind: 'professional-reference', title: '검토 자료', source: '전문 지침', content: '진단 과정과 감별 근거', reviewStatus: 'reviewed', checkedAt: '2026-10-24' }] });
+    expect(p).toContain('진단·감별 과정');
+    expect(p).toContain('[전문 참고정보 근거]');
+    expect(p).toContain('출처: 전문 지침');
+    expect(p).toContain('확인일: 2026-10-24');
+    expect(p).not.toContain('장문을 쓰지 마세요');
+    expect(p).not.toContain('휴대폰 화면에서 읽기 쉬운 짧은 안내');
+  });
+  it('상품 원문과 출처 없는 검수 대기 전문자료를 서로 다른 근거로 표시한다', () => {
+    const p = buildStoreContentAuthoringPrompt({ task: 'product-description', purpose: 'ai-support', evidence: [
+      { kind: 'product-fact', title: '허가문서', source: '공식 원문', content: '허가 효능 원문', reviewStatus: 'reviewed' },
+      { kind: 'professional-reference', title: '미확인 자료', source: '', content: '추가 확인 사항', reviewStatus: 'reviewed' },
+    ] });
+    expect(p).toContain('[상품 사실 근거]');
+    expect(p).toContain('[전문 참고정보 근거]');
+    expect(p).toContain('출처 미확인 — 확정 근거로 사용하지 않음');
+    expect(p).toContain('검수 대기');
+    expect(p).toContain('해당 제품의 허가 효능으로 바꾸지 마세요');
+    expect(p).not.toContain('증상이 있으면 약사 등 전문가와 상담하라는 안내 톤');
+  });
+  it('소비자 QR의 가독성과 번역 원문 불변 계약은 유지한다', () => {
+    const qr = buildStoreContentAuthoringPrompt({ task: 'qr', purpose: 'consumer-qr', productName: '검증 상품' });
+    expect(qr).toContain('모바일 가독성 우선');
+    const translation = buildStoreContentAuthoringPrompt({ task: 'translate', purpose: 'professional', referenceHtml: '<p>진단 과정 원문</p>', sourceLocale: 'ko', targetLocale: 'en' });
+    expect(translation).toContain('원문의 제품 사실을 추가하거나 빼지 마세요');
+    expect(translation).toContain('<p>진단 과정 원문</p>');
+    expect(translation).not.toContain('증상이 있으면 약사 등 전문가와 상담하라는 안내 톤');
   });
 });

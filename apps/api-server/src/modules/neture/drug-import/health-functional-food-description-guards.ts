@@ -172,8 +172,14 @@ export function sourceFidelityGuard(
   return { beyondSource: reasons.length > 0, reasons };
 }
 
+// 제품 효과의 단정·의약품으로의 오인을 검사한다. 처방·진단·복용법 같은 주제어 자체는 금지하지 않는다.
 const MEDICINE_LIKE_PATTERN =
-  /치료(하|합니다|되|효과|제)|완치|치유(하|되|합니다)|낫(는다|게|습니다|아)|예방(하|합니다|되|효과)|반드시\s*효과|확실(히|한)\s*효과|특효|즉효|처방|복용(하세요|하십시오|법|하면)/;
+  /(?:치료|예방|치유)(?:합니다|된다|됩니다|한다|해요)|완치(?:합니다|된다|됩니다|한다)|낫(?:습니다|는다)|(?:치료|예방)\s*효과(?:가|를)?\s*(?:있|보장)|반드시\s*효과|확실(?:히|한)\s*효과|특효|즉효|(?:이|본|해당)\s*(?:제품|상품|건강기능식품)[^.!?\n]{0,30}(?:치료제|예방약|처방약|의약품)(?:입니다|이다)|복용(?:하세요|하십시오)/;
+
+// Adnominal product claims need their own context check: “치료하는 제품” is a claim,
+// while “치료하는 제품이 아닙니다” or a discussion of treatment processes is not.
+const ADNOMINAL_PRODUCT_CLAIM = /(?:치료|예방|치유|완치)(?:하|해\s*주|되|시키)는\s*(?:데\s*도움을\s*주는\s*)?(?:건강기능식품|건기식|제품|상품|영양제|성분|유산균|비타민|효과|효능|기능)/g;
+const DIRECT_CLAIM_NEGATION = /^(?:이|가|은|는)?\s*(?:아니|아닌|아닙|없|(?:확인|입증|검증)되지\s*않)/;
 
 export interface MedicineLikeResult {
   medicineLike: boolean;
@@ -194,6 +200,10 @@ export function medicineLikeWordingGuard(draft: HealthFunctionalFoodStoreDescrip
   const hits: string[] = [];
   const m = scan.match(new RegExp(MEDICINE_LIKE_PATTERN, 'g'));
   if (m) hits.push(...Array.from(new Set(m)));
+  for (const claim of scan.matchAll(ADNOMINAL_PRODUCT_CLAIM)) {
+    const afterClaim = scan.slice(claim.index! + claim[0].length);
+    if (!DIRECT_CLAIM_NEGATION.test(afterClaim)) hits.push(claim[0]);
+  }
   return { medicineLike: hits.length > 0, hits };
 }
 

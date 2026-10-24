@@ -49,6 +49,8 @@ services/ 서비스(KPA·KCos·Neture) (제품군과 직교)
 
 ---
 
+상품설명서의 전문 판단 지원·AI 활용·매장 QR 적용 범위는 [전문 활용 원칙(CR-022 · AR-007)](../products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)을 먼저 확인한다. 기존 QR 설명서의 공식 DB 채택 여부는 판정 보류다.
+
 ## 2. 무엇부터 읽나 (역할별)
 
 - **O4O 상품 상세설명서 작업** → O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1 → 해당 제품군 Guide → WORKFLOW.

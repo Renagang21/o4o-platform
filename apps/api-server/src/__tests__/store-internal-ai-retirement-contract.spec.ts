@@ -50,6 +50,22 @@ const NON_STORE_AI_FILES = [
 
 const QR_PAGE = 'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
 const AI_ROUTES = 'apps/api-server/src/routes/ai-proxy.routes.ts';
+const PRODUCT_ASSIST = 'services/web-store/src/components/product-description/ProductDescriptionAssist.tsx';
+function externalSources(src: string): string[] {
+  const sources = src.includes('<LlmAssistPanel') ? [src] : [];
+  if (src.includes('<ProductDescriptionAssist')) {
+    expect(src).toMatch(/import \{[^}]*ProductDescriptionAssist[^}]*\} from ['"][^'"]*product-description\/ProductDescriptionAssist['"]/);
+    const wrapper = read(PRODUCT_ASSIST);
+    expect(wrapper).toContain('<LlmAssistPanel');
+    expect(wrapper).toContain('buildStoreContentAuthoringPrompt(');
+    expect(wrapper).toContain('onApplyHtml={onApplyHtml}');
+    expect(wrapper).not.toMatch(/fetch\(|apiClient\.|authClient\.|\/api\/ai\//);
+    sources.push(wrapper);
+  }
+  expect(sources.length).toBeGreaterThan(0);
+  return sources;
+}
+
 
 describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (A) Store dead aiRequestHeaders 0', () => {
   for (const rel of STORE_FILES) {
@@ -84,9 +100,12 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (B) QR 페이지 legacy 내
     expect(src).not.toContain("from '../../contexts/AuthContext'");
   });
   it('외부 LLM 경로 존재 — LlmAssistPanel + Prompt Core task=qr + 결과→편집기(자동 저장/QR 없음)', () => {
-    expect(src).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
+    for (const entry of externalSources(src)) {
+      expect(entry).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
+      expect(entry).toContain('label={STORE_LLM_ASSIST_LABEL}');
+      expect(entry).toContain('buildStoreContentAuthoringPrompt(');
+    }
     expect(src).toContain("task: 'qr'");
-    expect(src).toContain('label={STORE_LLM_ASSIST_LABEL}');
     expect(src).toContain('onApplyHtml={handleExternalApply}');
     const apply = src.slice(src.indexOf('const handleExternalApply'), src.indexOf('// 콘텐츠 저장(없으면 생성)'));
     expect(apply).not.toMatch(/ensureContentSaved|createQr\(|handleUpdate|handleSaveAndCreate|apiClient\.post/);
@@ -199,9 +218,11 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (F) 통합 내 매장(servi
     const violations: string[] = [];
     for (const rel of editorFiles) {
       const src = read(rel);
-      if (!/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/.test(src)) violations.push(`${rel}: LlmAssistPanel import`);
-      if (!/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/.test(src)) violations.push(`${rel}: Prompt Core import`);
-      if (!src.includes('label={STORE_LLM_ASSIST_LABEL}')) violations.push(`${rel}: 라벨`);
+      for (const entry of externalSources(src)) {
+        if (!/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/.test(entry)) violations.push(`${rel}: LlmAssistPanel import`);
+        if (!/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/.test(entry)) violations.push(`${rel}: Prompt Core import`);
+        if (!entry.includes('label={STORE_LLM_ASSIST_LABEL}')) violations.push(`${rel}: 라벨`);
+      }
       if (src.includes('[결과 조건]') || src.includes('HTML 만 반환')) violations.push(`${rel}: Prompt 전문 복사본`);
     }
     expect(violations).toEqual([]);

@@ -9,6 +9,7 @@
 - 프롬프트는 **역할 · 입력 · 출력 형식**을 명시한다(AR-001).
 - 근거 자료(원문)를 프롬프트에 함께 주입한다(→ [AI-GROUNDING](AI-GROUNDING.md), AR-002).
 - 출력은 구조화(스키마/필드)하여 검수·후처리가 가능하게 한다.
+- 상품설명서에는 [전문 판단·AI 활용 원칙](../products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)(AR-007)을 적용한다. 전문인용·AI 활용용·매장 QR 용도를 명시하고, 전문 주제를 일괄 배제하는 프롬프트를 사용하지 않는다.
 - 금지·안전 제약을 프롬프트에 포함한다(→ [AI-SAFETY](AI-SAFETY.md), AR-004).
 
 ## 최소 구조

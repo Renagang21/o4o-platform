@@ -120,3 +120,4 @@ export * from './ai-provider-guardrail.js';
 // 선행: IR-O4O-BUSINESS-REGISTRATION-FIELDS-CROSSSERVICE-AUDIT-V1
 export * from './business-registration.js';
 export * from "./home-presentation.js";
+export * from './product-correction.js';

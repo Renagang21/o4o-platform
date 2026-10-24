@@ -136,6 +136,7 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
       'operator-supplier-store-description-review.controller.ts',
       'product-content-browse.controller.ts',
       'product-db-maintenance.controller.ts',
+      'product-correction.controller.ts',
       'product-description-qr-summary.controller.ts',
       'product-image-quality.controller.ts',
       'product-landing.controller.ts',
@@ -196,6 +197,12 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
 
     /** 공통 정본을 바꾸는 write route 는 명시 guard 를 유지한다 (다층 방어). */
     const GUARDED: Array<[string, string]> = [
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/rules/:id/runs'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/runs/:id/retry'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/rules'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.put('/rules/:id'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/batches'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.patch('/batches/:id/items/:taskId'"],
       ['modules/neture/controllers/product-master-create.controller.ts', "router.post('/'"],
       ['modules/neture/controllers/product-master-status.controller.ts', "router.patch('/:id/status'"],
       ['modules/neture/controllers/product-master-description.controller.ts', "router.post('/:id/store-descriptions'"],
@@ -215,10 +222,11 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
     ];
 
     it.each(GUARDED)('%s 의 %s 는 requireProductDbWrite 를 단다', (file, route) => {
-      const s = src(file);
-      const idx = s.indexOf(route);
+      const s = src(file).replace(/\s+/g, '');
+      const normalized = route.replace(/\s+/g, '');
+      const idx = s.indexOf(normalized);
       expect(idx).toBeGreaterThan(-1);
-      expect(s.slice(idx, idx + route.length + 40)).toContain('requireProductDbWrite');
+      expect(s.slice(idx, idx + normalized.length + 40)).toContain('requireProductDbWrite');
     });
 
     /** 서비스 경계 안의 작업은 계속 서비스 운영자에게 열려 있어야 한다 (§6.3 — 필수 업무를 막지 않는다). */

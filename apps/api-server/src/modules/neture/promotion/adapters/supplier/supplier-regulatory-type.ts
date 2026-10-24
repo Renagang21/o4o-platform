@@ -26,3 +26,13 @@ export function canonicalizeRegulatoryType(raw: string | null | undefined): Prom
   if (!key) return null;
   return ALIASES[key] ?? null;
 }
+
+/** Read-only filtering of supported stored aliases; this does not rewrite product identities. */
+export function expandRegulatoryTypeAliases(rawTypes: readonly string[]): string[] {
+  return [...new Set(rawTypes.flatMap(raw => {
+    const canonical = canonicalizeRegulatoryType(raw);
+    return canonical
+      ? Object.entries(ALIASES).filter(([, value]) => value === canonical).map(([alias]) => alias)
+      : [raw.trim().toLowerCase()];
+  }))];
+}
