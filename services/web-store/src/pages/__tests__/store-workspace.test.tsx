@@ -21,6 +21,7 @@ import {
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
 
+vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
@@ -349,8 +350,10 @@ it.each(['/store', '/work/kpa-society/store'])('상담 첫 화면은 기존 기�
       </Route>
     </Routes></MemoryRouter>);
     await screen.findByRole('heading', {name:'상담'});
-    expect(screen.getByRole('link', {name:'다국어 상담 시작'}).getAttribute('href')).toBe(base + '/multilingual-consultation');
-    expect(screen.getByRole('link', {name:'상품 위치·기본 안내'}).getAttribute('href')).toBe(base + '/staff-support');
+    const consultation = await screen.findByRole('link', {name:/매장 약사 상담/});
+    expect(consultation.getAttribute('href')).toBe('/consultation/staff?store=fixture-store&mode=floor-pharmacist&station=counter-1');
+    expect(consultation.getAttribute('target')).toBe('_blank');
+    expect(screen.getByRole('link', {name:/매대 소비자 화면/}).getAttribute('href')).toBe('/consultation/customer');
     expect(screen.getByRole('link', {name:'상담 요청 확인'}).getAttribute('href')).toBe(base + '/requests');
     expect(screen.queryByRole('link', {name:'재생할 안내·순서 변경'})).toBeNull();
     expect(screen.queryByRole('heading', {name:'실행 현황'})).toBeNull();

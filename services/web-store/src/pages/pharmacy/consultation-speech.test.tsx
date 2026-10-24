@@ -1,4 +1,6 @@
-import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render as rtlRender, renderHook, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: MemoryRouter });
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ org: 'store', user: 'owner', get: vi.fn(), post: vi.fn() }));
 vi.mock('../../api/client', () => ({ coreApiClient: state }));
@@ -41,13 +43,13 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 it('starts only on a click, places final voice text in the editor, and waits for explicit translation', async () => {
   render(<Page />); await screen.findByRole('textbox');
   expect(Recognition.instances).toHaveLength(0);
-  fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' }));
+  fireEvent.click(screen.getByRole('button', { name: '직원·약사가 말하기' }));
   expect(latest().lang).toBe('ko-KR'); expect(latest().continuous).toBe(false); expect(latest().interimResults).toBe(false);
   await act(async () => latest().result('한국어 상담 문장'));
   expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('한국어 상담 문장');
   expect(state.post).not.toHaveBeenCalled();
   expect((screen.getByRole('button', { name: '번역하기' }) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(screen.getByRole('button', { name: '음성 입력 마치기' })); expect(latest().stop).toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: '말하기 마치기' })); expect(latest().stop).toHaveBeenCalled();
   act(() => latest().onend?.());
   fireEvent.click(screen.getByRole('button', { name: '번역하기' })); await screen.findAllByText('Translated words');
   expect(state.post.mock.calls[0][1].text).toBe('한국어 상담 문장');
@@ -55,10 +57,10 @@ it('starts only on a click, places final voice text in the editor, and waits for
 it('keeps nonprofessional outgoing phrases fixed and records the customer in the selected language', async () => {
   render(<Page />); await screen.findByRole('textbox');
   fireEvent.change(screen.getByLabelText('상담 방식'), { target: { value: 'floor-staff' } });
-  expect(screen.queryByRole('button', { name: '마이크 켜기' })).toBeNull(); expect(screen.queryByRole('textbox')).toBeNull();
+  expect(screen.queryByRole('button', { name: '직원·약사가 말하기' })).toBeNull(); expect(screen.queryByRole('textbox')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
   fireEvent.change(screen.getByLabelText('고객 언어'), { target: { value: 'ja' } });
-  fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' })); expect(latest().lang).toBe('ja-JP');
+  fireEvent.click(screen.getByRole('button', { name: '고객이 말하기' })); expect(latest().lang).toBe('ja-JP');
   act(() => { latest().result('顧客の質問'); latest().onend?.(); });
   fireEvent.click(screen.getByRole('button', { name: '번역하기' })); await screen.findAllByText('Translated words');
   fireEvent.click(screen.getByRole('button', { name: '번역문 읽어주기' }));
@@ -67,7 +69,7 @@ it('keeps nonprofessional outgoing phrases fixed and records the customer in the
 it.each(['not-allowed', 'no-speech', 'network', 'audio-capture', 'language-not-supported'])('keeps typed input usable after recognition error %s', async error => {
   render(<Page />); const editor = await screen.findByRole('textbox');
   fireEvent.change(editor, { target: { value: 'Typed words' } });
-  fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' }));
+  fireEvent.click(screen.getByRole('button', { name: '직원·약사가 말하기' }));
   act(() => latest().onerror?.({ error }));
   expect(screen.getByRole('status').textContent).toMatch(/문자/);
   expect((editor as HTMLTextAreaElement).value).toBe('Typed words');
@@ -75,19 +77,19 @@ it.each(['not-allowed', 'no-speech', 'network', 'audio-capture', 'language-not-s
 });
 it('bounds voice text and drops callbacks after language, account, store, pagehide and unmount', async () => {
   const view = render(<Page />); await screen.findByRole('textbox');
-  fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' })); act(() => latest().result('a'.repeat(1100)));
+  fireEvent.click(screen.getByRole('button', { name: '직원·약사가 말하기' })); act(() => latest().result('a'.repeat(1100)));
   expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toHaveLength(1000);
   expect(screen.getByRole('alert').textContent).toContain('1,000자');
   for (const change of ['language', 'account', 'store', 'pagehide']) {
-    if (screen.queryByRole('button', { name: '음성 입력 마치기' })) act(() => latest().onend?.());
-    fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' })); const previous = latest();
+    if (screen.queryByRole('button', { name: '말하기 마치기' })) act(() => latest().onend?.());
+    fireEvent.click(screen.getByRole('button', { name: '직원·약사가 말하기' })); const previous = latest();
     if (change === 'language') fireEvent.change(screen.getByLabelText('고객 언어'), { target: { value: 'ja' } });
     else if (change === 'pagehide') fireEvent(window, new Event('pagehide'));
     else { if (change === 'account') state.user = 'other'; else state.org = 'other-store'; view.rerender(<Page />); await screen.findByRole('textbox'); }
     expect(previous.abort).toHaveBeenCalled(); act(() => previous.result('STALE'));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
   }
-  fireEvent.click(screen.getByRole('button', { name: '마이크 켜기' })); const previous = latest(); view.unmount();
+  fireEvent.click(screen.getByRole('button', { name: '직원·약사가 말하기' })); const previous = latest(); view.unmount();
   expect(previous.abort).toHaveBeenCalled(); act(() => previous.result('STALE'));
 });
 it('reads only on demand, selects current voices, cancels playback and ignores late playback errors', async () => {

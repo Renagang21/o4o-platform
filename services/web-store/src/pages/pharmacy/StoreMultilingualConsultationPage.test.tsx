@@ -1,4 +1,6 @@
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render as rtlRender, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: MemoryRouter });
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ org: 'store', user: 'staff', get: vi.fn(), post: vi.fn() }));
 vi.mock('../../api/client', () => ({ coreApiClient: state }));
@@ -69,6 +71,7 @@ it('keeps input on translation failure, supports retry and distinguishes failed 
 });
 it('keeps professional modes unavailable when only a service entitlement exists', async () => {
   render(<Page />); const select = await screen.findByLabelText('상담 방식');
+  fireEvent.click(screen.getByText(/상담 방식·고객 언어 ·/));
   expect((within(select).getByRole('option', { name: '매대 약사 상담 · 약사 사용 확인 필요' }) as HTMLOptionElement).disabled).toBe(true);
 });
 it('clears the customer utterance when leaving the browser page', async () => {
