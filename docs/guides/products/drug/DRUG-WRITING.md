@@ -13,6 +13,8 @@ Rule: [DR-008](DRUG-RULE-REGISTRY.md) · 공통: [CR-001~CR-006](../../common/CO
 
 소비자 중심(CR-001)·원문 우선(CR-002)·과장 금지(CR-003)·grounding 필수(CR-004)·혼동 방지(CR-005)·안전 안내(CR-006)는 [content-authoring 원칙](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md)을 따른다.
 
+전문 판단 정보의 허용 범위와 전문 참고정보의 근거 구분은 [CR-022 · AR-007](../O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)을 함께 적용한다. 소비자 설명서의 표현 방식을 B2B·AI 활용 설명서 전체에 강제하지 않는다.
+
 ## 2. 의약품 전용
 
 - 제목 = **성분 + 함량 + 제형**(브랜드 제목 금지). 질환명·증상명 회피 금지.

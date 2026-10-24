@@ -31,8 +31,8 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'r
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 import { Sparkles, ArrowLeft, QrCode, ExternalLink, Trash2, Plus } from 'lucide-react';
-import { RichTextEditor, ContentRenderer, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
-import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
+import { RichTextEditor, ContentRenderer, type EditorContent } from '@o4o/content-editor';
+import { ProductDescriptionAssist } from '../../components/product-description/ProductDescriptionAssist';
 import { toast } from '@o4o/error-handling';
 import { apiClient } from '../../api/client';
 import { createStoreQrCode } from '../../api/storeQr';
@@ -191,18 +191,6 @@ export default function StoreQrAiDescriptionPage() {
     return lines.join('\n');
   }, [mode, emphasis, validCornerItems]);
 
-  const buildExternalPrompt = useCallback(
-    ({ additionalInstruction }: { additionalInstruction: string }) =>
-      buildStoreContentAuthoringPrompt({
-        task: 'qr',
-        title: mode === 'corner' ? cornerName.trim() : title.trim() || null,
-        productName: mode === 'single' ? productName.trim() : null,
-        currentHtml: generated ? editorContent.html : null,
-        referenceText: externalReferenceText,
-        additionalInstruction,
-      }),
-    [mode, cornerName, title, productName, generated, editorContent, externalReferenceText],
-  );
 
   // 결과 HTML → 편집기(editorSeed + editorContent 동시 갱신). 저장·QR 생성은 하지 않는다(사용자가 기존 버튼을 누른다).
   //   aiDescription 은 화면 구조 정보만(provider·model·generatedAt 없음). 코너 항목의 per-item descriptionHtml 은 만들지 않는다
@@ -488,15 +476,11 @@ export default function StoreQrAiDescriptionPage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
               {/* 외부 LLM 경로 — 입력이 갖춰졌을 때만 노출. 이 화면의 유일한 작성 경로(WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1) */}
               {canAuthor ? (
-                <LlmAssistPanel
-                  label={STORE_LLM_ASSIST_LABEL}
-                  contextLabel={
-                    mode === 'single'
-                      ? 'QR 안내 콘텐츠 — 입력한 상품명·강조점만으로 작성합니다'
-                      : 'QR 코너 안내 콘텐츠 — 입력한 코너명·상품 항목·강조점만으로 작성합니다'
-                  }
-                  guideText={buildExternalPrompt}
-                  currentHtml={generated ? editorContent.html : undefined}
+                <ProductDescriptionAssist key={`${mode}:${productName}:${cornerName}:${externalReferenceText}`}
+                  context={{ task: 'qr', purpose: 'consumer-qr',
+                    title: mode === 'corner' ? cornerName.trim() : title.trim() || null,
+                    productName: mode === 'single' ? productName.trim() : null,
+                    currentHtml: generated ? editorContent.html : null, referenceText: externalReferenceText }}
                   onApplyHtml={handleExternalApply}
                 />
               ) : (

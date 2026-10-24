@@ -117,6 +117,14 @@ describe('medicineLikeWordingGuard', () => {
     expect(medicineLikeWordingGuard(draft({ summary: '이 제품은 당뇨를 치료합니다' })).medicineLike).toBe(true);
     expect(medicineLikeWordingGuard(draft({ sections: { mainFunction: ['감기를 예방합니다'], howToTake: [], caution: [] } })).medicineLike).toBe(true);
   });
+  it.each(['전문 참고: 처방 여부를 확인합니다.', '질병명과 진단 과정·감별 근거를 확인합니다.', '제품은 질병을 치료하지 않습니다.', '처방약 복용법을 확인한 뒤 상담합니다.'])(
+    '전문 설명·부정 문맥은 주제어만으로 거절하지 않음: %s', summary => {
+      expect(medicineLikeWordingGuard(draft({ summary })).medicineLike).toBe(false);
+    });
+  it.each(['이 제품은 처방약입니다.', '질병 치료 효과가 있습니다.', '복용하세요'])(
+    '제품 효과 단정과 의약품 오인은 계속 검출: %s', summary => {
+      expect(medicineLikeWordingGuard(draft({ summary })).medicineLike).toBe(true);
+    });
   it('caution 의 질환/의약품 표현은 검사 대상 아님', () => {
     const d = draft({ summary: '건강에 도움을 주는 제품', sections: { mainFunction: [], howToTake: [], caution: ['질환이 있거나 의약품 복용 시 전문가와 상담하십시오'] } });
     expect(medicineLikeWordingGuard(d).medicineLike).toBe(false);
