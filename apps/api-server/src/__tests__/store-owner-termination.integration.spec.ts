@@ -46,7 +46,7 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
   },60_000);
 
   it('deletes target-service rows but preserves organization-shared rows and operator originals when another Store service stays active',async()=>{
-    await seedIdentity(ds,USER,'store1@example.test',ORG,'STOREINT1','kpa-society','kpa:store_owner','k-cosmetics');
+    await seedIdentity(ds,USER,'store1@example.test',ORG,'STOREINT1','kpa-society','kpa:store_owner','cafe24-b2b');
     await ds.query(`INSERT INTO store_local_products (organization_id,name) VALUES ($1,'공용 매장상품')`,[ORG]);
     await ds.query(`INSERT INTO store_pops (store_id,service_key,author_role,title,slug,content) VALUES ($1,'kpa-society','store','매장 POP','store-pop','본문')`,[ORG]);
     await ds.query(`INSERT INTO store_pops (store_id,service_key,author_role,title,slug,content) VALUES (NULL,'kpa-society','operator','운영자 원본','operator-pop','원본')`);
@@ -65,7 +65,7 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
     expect(Number((await ds.query(`SELECT COUNT(*) n FROM store_pops WHERE store_id=$1 AND author_role='store'`,[ORG]))[0].n)).toBe(0);
     expect(Number((await ds.query(`SELECT COUNT(*) n FROM store_pops WHERE store_id IS NULL AND author_role='operator' AND slug='operator-pop'`))[0].n)).toBe(1);
     expect(Number((await ds.query(`SELECT COUNT(*) n FROM store_local_products WHERE organization_id=$1`,[ORG]))[0].n)).toBe(1);
-    expect((await ds.query(`SELECT status FROM organization_service_enrollments WHERE organization_id=$1 AND service_code='k-cosmetics'`,[ORG]))[0].status).toBe('active');
+    expect((await ds.query(`SELECT status FROM organization_service_enrollments WHERE organization_id=$1 AND service_code='cafe24-b2b'`,[ORG]))[0].status).toBe('active');
   },60_000);
 
   it('purges organization-shared Store data after the final Store service ends and anonymizes the now-unused organization',async()=>{

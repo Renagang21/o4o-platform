@@ -27,6 +27,7 @@ const INQUIRY_TYPE_LABELS: Record<InquiryType, string> = {
 
 // 서비스 폐기로 은퇴한 문의 유형 (접수 거부)
 const RETIRED_INQUIRY_TYPES = new Set<string>(['siteguide']);
+const ALLOWED_INQUIRY_TYPES = new Set<string>(Object.keys(INQUIRY_TYPE_LABELS));
 
 /**
  * 문의 제출 (공개)
@@ -60,6 +61,14 @@ export async function submitInquiry(req: Request, res: Response) {
         success: false,
         error: '더 이상 접수하지 않는 문의 유형입니다.',
         code: 'RETIRED_INQUIRY_TYPE',
+      });
+    }
+
+    if (typeof type !== 'string' || !ALLOWED_INQUIRY_TYPES.has(type)) {
+      return res.status(400).json({
+        success: false,
+        error: '접수하지 않는 문의 유형입니다.',
+        code: 'INVALID_INQUIRY_TYPE',
       });
     }
 
