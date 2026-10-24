@@ -95,6 +95,7 @@ jest.mock('../services/ai-tools/work-run-executor.js', () => {
 });
 
 const executeMock = jest.fn();
+jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedAi: jest.fn((_db: unknown, request: unknown) => executeMock(request)) }));
 jest.mock('../utils/ai-provider-runtime.js', () => {
   const actual = jest.requireActual('../utils/ai-provider-runtime.js');
   return { ...actual, resolveAiTarget: jest.fn(async () => ({ provider: 'gemini', model: 'gemini-test', apiKey: 'k' })) };
@@ -102,6 +103,7 @@ jest.mock('../utils/ai-provider-runtime.js', () => {
 jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) => executeMock(...a) }));
 
 import logger from '../utils/logger.js';
+import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 import { buildPlannerUserPrompt, describeExecutionIntent } from '../services/ai-tools/work-agent-runtime.js';
 import { elementEvidenceText, isIdentifyingQuote, normalizeEvidenceText, validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
 import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assistant-planning.js';
@@ -254,8 +256,9 @@ describe('① 업무 이해(실행 전)', () => {
     executeMock.mockResolvedValueOnce({ content: JSON.stringify({ goal: 'g', outcome: 'information', criteria: [{ text: 'a' }] }) });
     const tail = '마지막에 결과 표를 확인해줘';
     const request = `${'가'.repeat(1500)} ${tail}`;
-    const u = await createLlmTaskUnderstander(ds)({ request });
+    const u = await createLlmTaskUnderstander(ds, ME)({ request });
     expect(u).toMatchObject({ source: 'ai', goal: 'g' });
+    expect(executeAccountedAi).toHaveBeenCalledWith(ds, expect.anything(), { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: ME });
     const sent = executeMock.mock.calls[0][0] as { userPrompt: string; meta: { callerName: string } };
     expect(sent.meta.callerName).toBe('TaskUnderstanding');
     expect(sent.userPrompt).toContain(tail);
@@ -269,9 +272,10 @@ describe('① 업무 이해(실행 전)', () => {
   it('의미 검증기 — 알 수 없는 · 화면 조건이 아닌 id 가 섞이면 무효(null)로 사용자 확인 · 정상 응답은 그대로', async () => {
     const criteria = [C1, C2_USER];
     const ev = [{ criterionId: 'c1', source: 'screen' as const, quote: 'x', grounded: true }];
-    const verify = createLlmCompletionVerifier(ds);
+    const verify = createLlmCompletionVerifier(ds, ME);
     executeMock.mockResolvedValueOnce({ content: '{"unmet":["c99"]}' });
     expect(await verify({ goal: 'g', criteria, evidence: ev })).toBeNull();
+    expect(executeAccountedAi).toHaveBeenCalledWith(ds, expect.anything(), { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: ME });
     executeMock.mockResolvedValueOnce({ content: '{"unmet":["c2"]}' }); // 사용자 확인 조건은 검증 대상이 아니다
     expect(await verify({ goal: 'g', criteria, evidence: ev })).toBeNull();
     executeMock.mockResolvedValueOnce({ content: '{"unmet":["c1"]}' });

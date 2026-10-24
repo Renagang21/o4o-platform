@@ -1,3 +1,5 @@
+import { AiOverviewPanel } from '@o4o/ai-components';
+import { supplierCopilotApi } from '../../lib/api/supplier/copilot';
 /**
  * SupplierDashboardPage — 공급자 홈 (운영 현황 중심)
  *
@@ -17,13 +19,14 @@
  *  8. 지표 분석 (Copilot 집계 블록 — 접기 가능, 하단 배치)
  *
  * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E (2026-09-23):
- *   공급자 표면의 내부 LLM 진입점을 0 으로 만든다. LLM 이 생성하던
+ *   당시 공급자 표면의 내부 LLM 진입점을 0 으로 만들었다. LLM 이 생성하던
  *   'AI 공급자 요약' · 'AI 상품 분석' · '추천 전략' 블록을 제거했다.
  *   남은 블록(상품 성과 · 매장 확산 · 인기/성장 상품)은 전부 SQL 집계 지표다.
+ *   2026-10-24 사용자 승인으로 자기 공급자 집계의 내부 AI 현황 설명만 추가했다.
  *   문안 생성은 외부 LLM('ChatGPT로 작업')이 담당한다.
  *
  * 원칙:
- *  - 기존 API 재사용만. 신규 backend / 복합 dashboard API 없음.
+ *  - 지표는 기존 API 재사용. AI 설명은 명시 요청 시 서버 집계 전용 경로를 사용한다.
  *  - 정확히 계산 가능한 수치만 표시. 추정·하드코딩 금지.
  *  - Promise.allSettled — 일부 API 실패가 전체 대시보드를 무너뜨리지 않는다.
  */
@@ -85,6 +88,12 @@ export default function SupplierDashboardPage() {
           {loading ? '로딩...' : '새로고침'}
         </button>
       </div>
+
+      <AiOverviewPanel scopeKey={`${user?.id ?? ''}:${profile?.id ?? ''}`} disabled={loading || !profile?.id} load={async () => {
+        const result = await supplierCopilotApi.explainOverview();
+        if (result.supplierId !== profile?.id) throw new Error('SUPPLIER_CONTEXT_CHANGED');
+        return result;
+      }} />
 
       {/* ── 1. 처리 필요 ── */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">

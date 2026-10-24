@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { runAiExtension } from "@o4o/ai-core";
 import { AppDataSource } from "../../database/connection.js";
 import { AiQueryPolicy } from "../../entities/AiQueryPolicy.js";
-import { executeAccountedAi } from "../../modules/ai-policy/ai-accounted-execution.js";
+import { createAccountedExtensionRuntime } from "../ai-extensions/accounted-runtime.js";
 import { resolveEditingModel } from "../../utils/ai-editing-model-resolver.js";
 import { resolveAiApiKey } from "../../utils/ai-key.util.js";
 import { requireCommunityManager } from "./community-management.service.js";
@@ -38,27 +38,13 @@ async function generate(
       materials: [],
       funding: { payer: "platform" },
     },
-    {
-      invoke: async (prompt) => {
-        const result = await executeAccountedAi(
-          AppDataSource,
-          {
-            ...prompt,
-            provider: "gemini",
-            responseMode: "text",
-            config: { apiKey, model, temperature: 0.1, maxTokens: 1800 },
-            timeoutMs: 24000,
-            retry: { maxAttempts: 1 },
-            meta: {
-              service: "community",
-              callerName: "community.industry-news",
-            },
-          },
-          { scope: "SERVICE_QUERY", serviceKey: "community", userId: actor },
-        );
-        return { ...result, provider: result.provider ?? "gemini" };
-      },
-    },
+    createAccountedExtensionRuntime(AppDataSource, {
+      request: { provider: 'gemini', responseMode: 'text',
+        config: { apiKey, model, temperature: 0.1, maxTokens: 1800 },
+        timeoutMs: 24000, retry: { maxAttempts: 1 },
+        meta: { service: 'community', callerName: 'community.industry-news' } },
+      accounting: { scope: 'SERVICE_QUERY', serviceKey: 'community', userId: actor },
+    }),
     {
       authorize: async () => {
         if (actor) await requireCommunityManager(AppDataSource, actor);

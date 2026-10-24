@@ -172,6 +172,10 @@ export class AiManagementService {
     query: ReadResult<PolicyRow[]>,
     policies: ReadResult<PolicyRow[]>,
   ): Configuration {
+    if (def.id === 'product.ocr') return {
+      state: 'code', provider: 'google-vision', model: 'TEXT_DETECTION', enabled: null,
+      description: '별도 전문 OCR API입니다. 실행 활성·인증·공통 모델 선택/중지·비용 연결은 확인되지 않았습니다.',
+    };
     if (def.selection === "scope") {
       if (policies.state === "unavailable")
         return {

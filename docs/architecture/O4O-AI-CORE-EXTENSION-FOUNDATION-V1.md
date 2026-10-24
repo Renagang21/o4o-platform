@@ -260,3 +260,22 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 - 상품 DB는 기존 [상품 정정 작업공간](../guides/products/O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md)을 재사용하고 AI 보완 초안과 공식 반영을 분리한다. [전문 정보 원칙](../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)의 목적별 구성·상품 사실/전문 참고정보·근거 구분을 유지한다. 전문 주제를 일괄 제외하거나 기존 QR 자료를 공식 DB로 자동 채택하지 않는다.
 
 후속 순서는 공통 정합/첫 적용 → 상품·콘텐츠 → 운영·협력 모임 → 상담·교육·자동화 정합이다. 각 단계는 전체 소비처·권한·원본/초안 소유·비용·오류 회귀를 확인한 뒤 전환한다. 실제 구현·main 통합·실계정 및 운영 검증은 후속 실행 결과로만 완료 표시한다.
+
+## 14. 업무 공통 연결과 첫 적용 — 개발 branch (2026-10-24)
+
+사용자 후속 지시로 같은 [TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 S1~S4를 연속 작업했다. 아래는 `wo/ai-work-extension-preparation`의 구현 상태다. §11/§12의 main·운영 완료 기록과 구분하며 이번 변경은 push까지만 인계한다. 검증·잔여 범위는 [CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)를 따른다.
+
+공통 실행은 기존 `AiBusinessExtension`/`runAiExtension`을 유지한다. 서버의 [policy runtime](../../apps/api-server/src/services/ai-extensions/policy-runtime.ts)은 기존 `AiPolicyExecutorService`에, [accounted runtime](../../apps/api-server/src/services/ai-extensions/accounted-runtime.ts)은 기존 모델 선택과 `executeAccountedAi`에 연결하는 조립 함수다. 공급자 adapter·quota·원장·Task·Memory를 새로 만들지 않는다. 번역 2종·상담 게시 문단 선택·LMS·운영자 설명·Copilot·뉴스가 같은 조립 경로를 재사용한다. 각 host의 허용 자료·기존 시간 제한/재시도·대체 응답·저장은 유지한다.
+
+| 실제 업무 | 자료·권한·결과 | 정책·모델 |
+|---|---|---|
+| 매장 홈 현황 설명 | 기존 매장 guard와 현재 owner/허용 직원 관계로 선택 매장 집계만 조회. `null`과 확인된 0건을 구분. 응답 전 권한 재확인 | STORE_INSIGHT, `store.overview` 모델 지정. 서버 host의 기존 serviceKey를 canonical 서비스로 확인해 비용 귀속 |
+| 공급자 홈 현황 설명 | ACTIVE인 자기 공급자 식별을 재확인하고 기존 KPI의 수치만 조회. 사용자가 요청할 때만 실행 | OPERATOR_INSIGHT, `supplier.overview` 모델 지정 |
+| 약국 경영 협력 모임 현황 설명 | 해당 모임의 현행 admin/operator 역할로 회원 상태 집계만 조회. 개인 원문과 다른 모임 자료 제외 | OPERATOR_INSIGHT, `cooperative.overview` 모델 지정 |
+| 상품 정정 검토 초안 | 기존 super_admin·작업 묶음 revision·task·원문 fingerprint 검증. 별도 제안 미리보기 → 사용자 선택으로 편집 폼에 삽입 → 기존 저장. 공식 상품 자동 변경 없음 | 기존 PRODUCT_CONTENT 모델·한도 공유. `product.correction-draft`는 같은 정책의 사용처 alias |
+
+세 현황 host는 기존 `operator-insight` Extension과 공통 화면 패널을 사용한다. 자료 조회 전·Core 실행 직전·응답 전달 전 권한을 검사한다. UI는 자동 요청/재시도하지 않고 범위 변경 시 늦은 응답을 폐기한다. AI 설명·제안은 기존 처리 API의 실행 성공 증거가 아니다. 공급자 자체 집계의 내부 AI 요약은 [콘텐츠 운영 원칙 §3](../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md#3-표준-반복-standard-loop)·[Supplier 경계](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md)에 사용자 승인을 반영했다. 공급자 창작·외부 계정 책임과 자동 업무 처리 경계는 유지한다.
+
+상품 태그 호출에는 PRODUCT_TAGGING 예약·정산을, Assistant의 이해/완료 검증 호출에는 인증된 사용자 기준 SERVICE_QUERY 예약·정산을 연결했다. 전자는 기존 서버 작업의 actor를 추정하지 않아 전역/scope 한도만 적용하며 사용자별 귀속은 후속이다. 뉴스는 공통 질의 모델·활성 설정과 기존 삭제 참조 보호를 유지한다. 관리 목록의 뉴스·상담 문단 선택·OCR 및 새 업무 연결은 실행/운영/청구 완료 표시와 다르다. OCR은 전문 Google Vision API로 표시하며 생성형 모델 선택과 공통 비용 연결은 미지원이다.
+
+이번 지원 부담 주체는 기존 platform이다. 다른 payer는 명시적으로 거부하며 store/user/external-account 청구 구현 완료를 뜻하지 않는다. Home·계획·화면 판독·멀티모달 직접 transport, Qwen 편집·TTS·전문 OCR의 전체 비용/중지 이관과 상태 변경 도구 확대는 TODO에 남긴다. schema/migration·운영 모델·가격·인증 설정은 변경하지 않았다.

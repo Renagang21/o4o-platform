@@ -31,6 +31,8 @@ export interface AiUsageDefinition {
   stop: "query" | "scope" | "none";
   scope?: string;
   note: string;
+  /** Some specialist/shared-policy consumers are observable without an independent model selector. */
+  modelSelectable?: boolean;
 }
 
 function entry(
@@ -60,6 +62,26 @@ function entry(
 }
 
 export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
+  {
+    ...entry('A32', 'community.news', '커뮤니티 뉴스 검토·추천', 'shared', '텍스트', 'query', 'connected', 'query',
+      '공통 질의 정책의 Gemini 모델·활성 설정을 사용합니다. 초안 검토이며 자동 게시하지 않습니다.', 'SERVICE_QUERY'),
+    modelSelectable: false,
+  },
+  entry('A33', 'pharmacy.guidance', '상담용 게시 상품 근거 선택', 'store', '구조화', 'scope', 'connected', 'scope',
+    '게시된 문단 ID만 선택합니다. 상품 콘텐츠와 모델·활성·한도 정책을 공유합니다.', 'PRODUCT_CONTENT'),
+  {
+    ...entry('X01', 'product.ocr', '상품 이미지 OCR', 'product', '이미지 문자 인식', 'fixed', 'unconnected', 'none',
+      'Google Vision 전문 API입니다. 생성형 모델 선택·공통 비용/한도에 아직 연결되지 않았습니다.'),
+    modelSelectable: false,
+  },
+  entry('A34', 'store.overview', '내 매장 현황 설명', 'store', '구조화', 'scope', 'connected', 'scope',
+    '서버가 선택 매장 권한으로 조회한 지표만 설명합니다. 수동 요청이며 업무를 자동 실행하지 않습니다.', 'STORE_INSIGHT'),
+  entry('A35', 'supplier.overview', '공급자 현황 설명', 'neture', '구조화', 'scope', 'connected', 'scope',
+    '공급자 자신의 집계만 수동 요청으로 설명합니다. 상품 등록·게시·주문·정산을 실행하지 않습니다.', 'OPERATOR_INSIGHT'),
+  entry('A36', 'cooperative.overview', '협력 모임 운영 현황 설명', 'neture', '구조화', 'scope', 'connected', 'scope',
+    '해당 모임의 현행 운영 역할로 조회한 회원 상태 집계를 설명합니다. 다른 모임·개인정보 원문을 전달하지 않습니다.', 'OPERATOR_INSIGHT'),
+  entry('A37', 'product.correction-draft', '상품 정정 검토 초안', 'product', '구조화', 'scope', 'connected', 'scope',
+    '기존 정정 작업의 원문·기준·근거로 검토 초안만 생성합니다. 상품 콘텐츠 정책을 공유하며 공식 DB를 수정하지 않습니다.', 'PRODUCT_CONTENT'),
   entry(
     "A01",
     "service.query",
@@ -167,9 +189,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "텍스트",
     "runtime",
-    "unconnected",
+    "connected",
     "none",
-    "계획 기능과 실행 코드를 공유하지만 업무 단계는 구분해야 합니다.",
+    "이해·완료 판정은 인증된 사용자 기준 SERVICE_QUERY 예약·정산에 연결됩니다. 계획·화면 판독의 직접 호출과 구분합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A11",
@@ -255,9 +278,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "product",
     "구조화",
     "fixed",
-    "unconnected",
+    "connected",
     "none",
-    "사용 모델 지정을 우선하며, 지정하지 않으면 기존 서버 코드의 Gemini 모델을 사용합니다.",
+    "사용 모델 지정을 우선하며, 지정하지 않으면 기존 서버 코드의 Gemini 모델을 사용하며 PRODUCT_TAGGING 예약·정산을 거칩니다.",
+    "PRODUCT_TAGGING",
   ),
   entry(
     "A19",

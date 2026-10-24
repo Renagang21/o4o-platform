@@ -1,6 +1,6 @@
-import { resolveManagedAiTarget, prepareManagedAiRequest } from '../../../services/ai-management/runtime-models.js';
+import { resolveManagedAiTarget } from '../../../services/ai-management/runtime-models.js';
 import { AppDataSource } from '../../../database/connection.js';
-import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
+import { createAccountedExtensionRuntime } from '../../../services/ai-extensions/accounted-runtime.js';
 /**
  * Operator AI LLM Service
  *
@@ -49,16 +49,12 @@ export class OperatorAiLlmService {
         extension: operatorActionsExtension, input: ctx,
         context: { requestId: randomUUID(), serviceId: 'neture', featureId: 'operator-actions', actorId, audience: 'staff' },
         materials: [], funding: { payer: 'platform' },
-      }, {
-        invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, 'operator.actions', { ...prompt, provider, responseMode: 'json',
-            config: { apiKey, model, maxTokens: 500, temperature: 0.2 },
-            timeoutMs: 3000, retry: { maxAttempts: 1, delayMs: 0 },
-            meta: { service: 'neture', callerName: 'OperatorAiLlm' },
-          }), { scope: 'OPERATOR_ACTIONS', serviceKey: 'neture', userId: actorId });
-          return { ...result, provider: result.provider ?? provider };
-        },
-      }, {
+      }, createAccountedExtensionRuntime(AppDataSource, {
+        usage: 'operator.actions',
+        request: { provider, responseMode: 'json', config: { apiKey, model, maxTokens: 500, temperature: 0.2 },
+          timeoutMs: 3000, retry: { maxAttempts: 1, delayMs: 0 }, meta: { service: 'neture', callerName: 'OperatorAiLlm' } },
+        accounting: { scope: 'OPERATOR_ACTIONS', serviceKey: 'neture', userId: actorId },
+      }), {
         // Existing requireAuth + requireNetureScope guards construct this aggregate-only input.
         authorize: async context => context.actorId === actorId,
         record: async event => { logger.info('[AI_EXTENSION]', event); },

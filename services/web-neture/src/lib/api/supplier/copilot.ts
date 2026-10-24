@@ -9,10 +9,15 @@ import type {
 // ==================== Supplier Copilot API ====================
 //
 // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E:
-// Copilot 은 SQL 집계 기반 지표만 제공한다. 공급자 표면에서 내부 LLM 을 호출하는
-// 진입점(AI insight · AI tag)은 없다. 문안 생성은 외부 LLM('ChatGPT로 작업')이 담당한다.
+// 기본 지표는 SQL 집계다. 2026-10-24 사용자 승인으로 자기 공급자 집계의 내부 AI 설명을 추가했다.
+// AI 설명은 명시적 요청만 처리하며 등록·게시·주문·정산을 실행하지 않는다.
 
 export const supplierCopilotApi = {
+  async explainOverview() {
+    const { data } = await api.post('/neture/supplier/copilot/ai-overview', {});
+    if (data?.success !== true || !data.data) throw new Error('AI_UNAVAILABLE');
+    return data.data;
+  },
   async getKpi(): Promise<SupplierKpiSummary> {
     try {
       const response = await api.get('/neture/supplier/copilot/kpi');

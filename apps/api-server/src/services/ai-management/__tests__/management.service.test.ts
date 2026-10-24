@@ -42,14 +42,14 @@ describe("AI management source inventory", () => {
   it("keeps logical usages unique, all audit rows covered, and mixed controls separate", async () => {
     const { db } = fixture();
     const data = await new AiManagementService(db, {}).snapshot();
-    expect(data.usages).toHaveLength(31);
-    expect(new Set(data.usages.map((x) => x.id)).size).toBe(31);
-    expect(data.usages.map((x) => x.evidenceId)).toEqual(
-      Array.from(
-        { length: 31 },
-        (_, i) => `A${String(i + 1).padStart(2, "0")}`,
-      ),
-    );
+    expect(data.usages).toHaveLength(AI_USAGE_CATALOG.length);
+    expect(new Set(data.usages.map((x) => x.id)).size).toBe(AI_USAGE_CATALOG.length);
+    expect(new Set(data.usages.map((x) => x.evidenceId)).size).toBe(data.usages.length);
+    expect(data.usages.map((x) => x.evidenceId)).toEqual(expect.arrayContaining(['A01', 'A31', 'X01']));
+    expect(data.usages.find(x => x.id === 'product.ocr')).toMatchObject({ modelSelectable: false,
+      configuration: { provider: 'google-vision', model: 'TEXT_DETECTION' } });
+    expect(data.usages.find(x => x.id === 'assistant.understanding')).toMatchObject({ accounting: 'connected', scope: 'SERVICE_QUERY', stop: 'none' });
+    expect(data.usages.find(x => x.id === 'product.tagging')).toMatchObject({ accounting: 'connected', scope: 'PRODUCT_TAGGING', stop: 'none' });
     expect(
       data.usages.find((x) => x.evidenceId === "A01")?.configuration.enabled,
     ).toBe(false);

@@ -1,6 +1,6 @@
-import { resolveManagedAiTarget, prepareManagedAiRequest } from '../../../services/ai-management/runtime-models.js';
+import { resolveManagedAiTarget } from '../../../services/ai-management/runtime-models.js';
 import { AppDataSource } from '../../../database/connection.js';
-import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
+import { createAccountedExtensionRuntime } from '../../../services/ai-extensions/accounted-runtime.js';
 import { randomUUID } from 'node:crypto';
 import { lmsAssistanceExtension } from './lms-assistance.extension.js';
 import type { LmsAssistanceInput } from './lms-assistance.extension.js';
@@ -103,16 +103,12 @@ export class LmsAIService {
         extension: lmsAssistanceExtension, input,
         context: { requestId: randomUUID(), serviceId: 'lecture', featureId: `lms.${kind}`, actorId, audience: 'staff' },
         materials: [], funding: { payer: 'platform' },
-      }, {
-        invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, await prepareManagedAiRequest(AppDataSource, `lms.${kind}`, { ...prompt, provider, responseMode: 'json',
-            config: { apiKey, model, maxTokens: 700, temperature: 0.4 },
-            timeoutMs: TIMEOUT_MS, retry: { maxAttempts: 1, delayMs: 0 },
-            meta: { service: 'lms', callerName: `LmsAI.${kind}` },
-          }), { scope: 'LMS_ASSISTANCE', serviceKey: 'lecture', userId: actorId });
-          return { ...result, provider: result.provider ?? provider };
-        },
-      }, {
+      }, createAccountedExtensionRuntime(AppDataSource, {
+        usage: `lms.${kind}`,
+        request: { provider, responseMode: 'json', config: { apiKey, model, maxTokens: 700, temperature: 0.4 },
+          timeoutMs: TIMEOUT_MS, retry: { maxAttempts: 1, delayMs: 0 }, meta: { service: 'lms', callerName: `LmsAI.${kind}` } },
+        accounting: { scope: 'LMS_ASSISTANCE', serviceKey: 'lecture', userId: actorId },
+      }), {
         // Authenticated request's own submitted text only; no course/learner DB lookup or grade mutation.
         authorize: async context => !!actorId && context.actorId === actorId,
         record: async event => { logger.info('[AI_EXTENSION]', event); },

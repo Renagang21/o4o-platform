@@ -75,6 +75,27 @@
 
 문서 정합: 종전 조사 snapshot·완료 WO/CHECK·canonical index를 다시 쓰지 않았다. 기존 구조 문서에 준비 범위와 진입 링크를 추가하고, 발견한 코드/업무 문맥 차이는 실행 TODO로 남긴다.
 
+## 7. 후속 코드 대조·구현 판정 (2026-10-24)
+
+§1~§6은 준비 당시 조사다. 사용자 후속 지시로 기존 main `355d77e861`을 포함한 같은 branch에서 아래 연결을 구현했다. push 전 `origin/main=197b41d0b5`의 후속 상품 배포 기록·CMS/퇴역 slug·서비스 종료 경계 변경도 대조했으며 이번 소스 경로와 직접 중첩되지 않는다. 운영 적용과 구분한 검증 근거는 [CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md), 실제 공통 계약은 [기반 문서 §14](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#14-업무-공통-연결과-첫-적용--개발-branch-2026-10-24)에 있다.
+
+| 판정 | 대상 | 코드 점검·결과 |
+|---|---|---|
+| MERGE | 번역 2종·상담 근거 선택 | `policy-runtime.ts`로 기존 policy 실행 조립만 공통화. 게시된 문단 ID 선택·번역 원문 범위·각 서비스의 권한/저장 유지 |
+| MERGE | LMS·운영자 Actions·Copilot·뉴스 | `accounted-runtime.ts`로 기존 모델/회계 조립 재사용. 뉴스의 공유 질의 정책·scheduler 무사용자 귀속과 기존 fallback 유지 |
+| CONNECT | 매장·공급자·협력 모임 현황 | `dashboard-overview.service.ts`의 기존 insight Extension 실행을 3개 권한 host에서 재사용. 화면은 `AiOverviewPanel`과 각 인증 client를 사용. 임의 지표·대상 입력 거부 |
+| CONNECT | 상품 DB 정정 검토 | 기존 `ProductCorrectionWorkspace`의 저장된 원문·기준·근거를 `productCorrectionExtension`에 연결. 기준/작업 버전 충돌·권한 회수는 거부. 생성과 사용자 삽입/기존 저장 분리 |
+| CONNECT | 태그·Assistant 이해/완료 검증 | 기존 모델 경로 뒤에 PRODUCT_TAGGING / SERVICE_QUERY 예약·정산 연결. 새 quota나 작업 원장 없음 |
+| KEEP | 콘텐츠 편집·자료함·외부 AI adapter | 기존 편집기·미리보기·검수·초안 저장·MCP/OAuth 책임 유지. 공급자 자체 집계 설명 허용이 내부 창작 전면 전환을 뜻하지 않음 |
+| KEEP | 운영자 업무 큐·상담 자료·직원 지원 | 추천 이후 기존 대상 선택·문의/신청/콘텐츠 처리 API와 권한/이력 재사용. 고객용 게시 문단과 직원 자료의 접근 정책 유지 |
+| KEEP | Assistant Task·계획·실행 노드·Memory | 기존 이해/완료 근거·사용자 최종 확정·중단/재개 계약 유지. 이번 변경은 두 LLM 판정 호출의 비용 연결이며 새 Assistant/고정 workflow 없음 |
+| DEFER | 전문/직접 transport 비용·중지 | 전문 OCR·Home/계획/화면 판독·research/멀티모달·Qwen 편집·음성의 완전한 admission/가격/사용량 이관. 카탈로그 등록을 완료 증거로 사용하지 않음 |
+| DEFER | 신규 상태 변경 도구·실계정 운영 검증 | 대상/version에 묶인 확인·멱등 처리 도구 확대, 실제 역할별 로그인·외부 모델 성공·청구/한도 운영 검증은 미실행 |
+
+자료 소유는 유지한다. ProductMaster·전역 상품 AI 콘텐츠는 기존 플랫폼 권한, 공급자 Offer·자료함은 자기 공급자 권한, 매장 보관/제작 자료와 번역은 선택 조직 권한을 따른다. 정정 검토 초안은 기존 작업 기록에만 사용자가 저장하며 Master·Offer·매장 콘텐츠를 자동 갱신하지 않는다. 신규 현황 요청은 원문·상담·개인정보 대신 서버 집계 수치만 모델로 보낸다.
+
+사용자 답변으로 공급자 자체 집계의 요청 기반 내부 AI 요약을 허용하도록 콘텐츠 운영 원칙·Supplier 경계와 Assistant의 정책 참조를 갱신했다. 기존 금지를 삭제해 모든 공급자 자동화를 허용하지 않았으며, Auth/RBAC Core·메뉴 재배치·결제·정산·운영 인증 설정은 변경하지 않았다. 모델 선택은 업무와 분리하되 `pharmacy.guidance`와 `product.correction-draft`는 기존 PRODUCT_CONTENT 정책을 공유한다. 뉴스는 독립 선택이 없으며 OCR은 전문 API 미연결 상태를 명시한다.
+
 [ocr]: ../../apps/api-server/src/modules/store-ai/services/product-ocr.service.ts
 [tag]: ../../apps/api-server/src/modules/store-ai/services/product-ai-tagging.service.ts
 [product]: ../../apps/api-server/src/modules/store-ai/services/product-ai-content.service.ts
