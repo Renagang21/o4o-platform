@@ -1,12 +1,12 @@
 # 한국어·다국어 상담 업무 검증
 
 > **상태**: ACTIVE
-> **개발 결과**: 개발·로컬 검증 완료. main 통합·운영 검증 전 기록으로 유지.
+> **개발 결과**: 개발·로컬 검증·main 통합·비로그인 운영 점검 완료. 실제 계정·현장 검증은 별도다.
 > **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (한국시간)
 > **사용자 지시**: TODO → 문서·코드 대조/보완 → 연결된 업무 개발 → 검증·commit·push. PR·main 병합·배포 제외.
 > **기준**: main `3431c010f4` · branch `wo/store-consultation-guidance-workflow`
 > **선행 의존**: `a0e8a252fc`의 독립 상담·고객·진열 실행을 새 전용 worktree에서 병합(`46b6d6ae09`). 기존 작업 트리는 보존했다.
-> **운영 상태**: 미반영. 개발 검증과 실계정·현장·유료 provider 검증은 구분한다.
+> **운영 상태**: 2026-10-24 API·admin·Store 반영 완료(`97f2262170`). 실계정·현장·유료 provider 검증은 구분한다.
 
 ## 조사와 보완
 
@@ -88,3 +88,30 @@ push 전 재확인한 main `0c0575aa35`의 추가 변경은 협력사업 operato
 진열 태블릿의 오류 영역이 kiosk-core의 fixed 전체화면 뒤에 가려지는 후속 P2 1건을 수정했다. Store adapter의 오류 banner를 kiosk의 overlay보다 위에 두고, 기기 연결 오류와 진열 설정 오류를 분리했다. 401 연결 해제 안내는 설정 재조회 성공에 지워지지 않으며, 재시도는 heartbeat도 즉시 다시 실행한다. Core를 변경하지 않았다.
 
 진열 복구 회귀 2건·Store build/lint PASS. 실제 kiosk/API adapter에 합성 공개 응답을 연결한 desktop 1280×800·mobile 390×844 브라우저에서 `elementFromPoint`로 재시도/재연결 버튼이 최상단임을 확인하고 실제 클릭→설정 복구·setup 이동을 검증했다. page error·가로 overflow·직원 header 0, 합성 screenshot 직접 확인. 운영/실기기 자료는 사용하지 않았다.
+
+## main 통합 확정 (2026-10-24)
+
+직전 개발 인계에서 선행 상담 migration의 운영 적용이 남아 있음을 알린 뒤, 사용자가 ‘push된 파일을 모두 main으로 병합 → 배포’를 지시했다. 통합 범위는 선행 독립 상담·태블릿과 이번 한국어/다국어 상담, 그에 필요한 상담 상태 테이블 1개 및 API·admin·Store다. 추가 DB schema·업무 데이터 변경·배포 설정 변경은 포함하지 않는다.
+
+- PR [#798](https://github.com/Renagang21/o4o-platform/pull/798), 검증 HEAD `27ed7507975233077a3a6ebd3f502da08da3bb8e`를 고정해 merge했다. main commit `97f22621707326b6c3f61caf22b91e395bfe21b0`, 2026-10-24 21:44:04 한국시간.
+- 필수 ruleset은 `CI Gate`(추가 human approval 0)임을 직전에 재확인했다. PR CI [40094351362](https://github.com/Renagang21/o4o-platform/actions/runs/40094351362) 및 CodeQL PASS, Codex P2 6건 보완 후 해당 HEAD 재리뷰 지적 0·미해결 thread 0. admin bypass·auto-merge·main 직접 push를 사용하지 않았다.
+- 최신 로컬 검증은 Store 69 files / 815 tests, API 25 suites / 179 tests, 기존 API 환경 의존 187 tests SKIP, 마지막 상담 집중 48 tests·진열 복구 2 tests PASS다. SQL 20검사와 상담 브라우저 10묶음·진열 복구 2개 viewport, API/Store/admin build·타입 검사 PASS. 수정 소스 신규 lint 경고 0, 기존 router/controller warning 4건은 별도다. fixture DB 잔존 0과 컨테이너 정리를 확인했다.
+- 선택 [SonarCloud](https://sonarcloud.io/dashboard?id=Renagang21_o4o-platform&pullRequest=798)는 실패 상태다(D Reliability / B Security). 기준 main에서도 실패하던 별도 검사이며 ruleset 필수 항목이 아니다. 확인된 HTML backtracking 지적은 수정했고, 전체 Sonar 지적 해소로 보고하지 않는다. UTF-16 digest 정렬·복잡도·표기 및 fixture 관련 annotation이 남아 있다. 공개 API 상세 조회는 이 환경에서 연결되지 않아 GitHub가 제공한 summary/annotation까지만 확인했다.
+- 병합 후 CI [40095157339](https://github.com/Renagang21/o4o-platform/actions/runs/40095157339)와 운영 배포 결과는 아래 운영 기록에서 확정한다. 실계정·현장 기기·유료 AI 품질 검증과 구분한다.
+
+## 운영 배포·조회 확인 (2026-10-24)
+
+병합 후 [CI 40095157339](https://github.com/Renagang21/o4o-platform/actions/runs/40095157339)와 [CodeQL 40095157378](https://github.com/Renagang21/o4o-platform/actions/runs/40095157378)이 성공했다. [Delivery 40095897625](https://github.com/Renagang21/o4o-platform/actions/runs/40095897625)는 `HELD_LEVEL_3`로 API·그에 의존하는 admin/Store를 보류했다. 배포 시점에 main HEAD와 대상 SHA 일치·소유자 실행 계정·진행 중인 다른 Actions 배포 없음도 확인했다.
+
+[Promote 40096027406](https://github.com/Renagang21/o4o-platform/actions/runs/40096027406)을 main `97f22621707326b6c3f61caf22b91e395bfe21b0`, 서비스 `api,admin,store`로 실행했다. 2026-10-24 22:06:10 한국시간에 success로 끝났으며 production status는 **`DEPLOYED · deploy: api,admin,store`**다. 정상 migration job 외의 DB 직접 변경·freeze/배포 설정 변경·별도 태그 배포를 하지 않았다.
+
+- API의 `Run database migrations` SUCCESS. 포함된 migration은 `CreateStoreConsultationStations1792815861315` 1개다. 기존 업무 데이터의 seed/update/delete는 실행하지 않았다.
+- API 새 revision의 traffic 전 준비 상태 검사 → traffic 전환 → 전환 뒤 검증 SUCCESS.
+- admin·Store의 새 revision smoke/traffic 전환 SUCCESS. 최종 Report가 세 서비스의 serving SHA를 대상 commit으로 확인했다(각 서비스 단일 revision 100% 판정).
+- 비로그인 운영 점검 PASS: `/api/health/ready`·`/api/health/database` 200, Store의 `/consultation/customer`·`/consultation/staff`·`/tablet/setup`·`/store/workspace/use` 문서 200.
+- Store 배포 entry `/assets/index-B-Re2h0d.js`에서 독립 route와 새 상담 안내·언어 UI·태블릿 복구 코드, admin entry `/assets/index-jv2GAKac.js`에서 상담 배치 API 연결을 확인했다.
+- 비로그인 매장 배치 GET과 존재하지 않는 합성 기기의 상담 조회는 401. Store origin의 상담 API OPTIONS는 204 및 해당 origin 허용을 확인했다. 유효 기기 연결·로그인·고객 정보·업무 write·AI 호출은 하지 않았다. 최초 점검 스크립트의 누락된 `/pharmacy` 경로를 수정한 뒤 올바른 route에서 재확인했다.
+
+실제 계정·태블릿/마이크·현장 상담과 언어별 품질 검증은 이번 배포 확인에 포함하지 않았다. 선택 SonarCloud의 실패 상태도 그대로 인계한다. 이 문서는 남은 실사용 검증의 근거로 ACTIVE를 유지한다. 선행 CHECK/TODO의 상태 헤더 2개는 의미를 바꾸지 않고 정본 enum과 완료 범위 줄로 정리했으며 과거 본문은 유지했다.
+
+문서 정합: 통합·운영 기록 및 현재 반영 상태 갱신 / 상태 헤더 2건 정본화 / canonical index·과거 실행 본문·정책 변경 없음.
