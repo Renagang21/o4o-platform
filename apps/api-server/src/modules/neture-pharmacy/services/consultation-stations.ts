@@ -190,7 +190,15 @@ export class ConsultationStationService {
   }
   async heartbeat(actor: string, org: string, id: string, input: Json) {
     const row = await this.owned(actor, org, id, input.epoch);
-    return this.snapshot(await this.update(row, "operator_seen_at=now()"));
+    // A heartbeat publishes no content. Accept a concurrent language correction,
+    // but still fence the actor and consultation generation.
+    const [current] = await this.query(
+      `UPDATE store_consultation_stations SET operator_seen_at=now(),version=version+1,updated_at=now()
+       WHERE id=$1 AND organization_id=$2 AND operator_user_id=$3 AND epoch=$4 AND active=true RETURNING *`,
+      [row.id, org, actor, row.epoch],
+    );
+    if (!current) fail(409, "CONSULTATION_CHANGED", "상담이 변경되었습니다. 다시 확인해 주세요.");
+    return this.snapshot(current);
   }
   async pairing(actor: string, org: string, id: string, input: Json) {
     const row = await this.owned(actor, org, id, input.epoch);

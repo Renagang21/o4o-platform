@@ -231,3 +231,24 @@ it("keeps an unsent reply in its original input language when staff changes the 
   expect(JSON.parse(reply![1].body).language).toBe("ko");
   expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("ja");
 });
+
+it.each([null, { kind: "guidance", title: "New guidance", text: "Replacement material", language: "ko" }])("stops old speech on shared replacement/withdrawal while retaining an unsent reply: %j", async (shared) => {
+  vi.useFakeTimers();
+  const synth = { cancel: vi.fn(), speak: vi.fn(), getVoices: () => [] };
+  vi.stubGlobal("speechSynthesis", synth);
+  vi.stubGlobal("SpeechSynthesisUtterance", class { constructor(public text: string) {} });
+  try {
+    render(<Page />);
+    await act(async () => {});
+    fireEvent.change(screen.getByLabelText("전달할 내용"), { target: { value: "Unsent draft" } });
+    fireEvent.click(screen.getByRole("button", { name: "읽어주기" }));
+    expect(synth.speak).toHaveBeenCalledTimes(1);
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect(synth.cancel).not.toHaveBeenCalled();
+    requests.mockImplementationOnce(() => ok({ ...state(), version: 2, shared }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
+    expect(synth.cancel).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "읽기 중지" })).toBeNull();
+    expect((screen.getByLabelText("전달할 내용") as HTMLTextAreaElement).value).toBe("Unsent draft");
+  } finally { cleanup(); vi.useRealTimers(); }
+});

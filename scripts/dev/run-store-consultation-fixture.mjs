@@ -662,6 +662,21 @@ async function guidanceTests(db) {
     assert.equal((await service.read(peer)).shared, null);
     assert.equal((await service.read(peer)).language, "ko");
   });
+  await check("heartbeat accepts a concurrent language correction without expiring the consultation", async () => {
+    let enter, release;
+    const entered = new Promise(resolve => { enter = resolve; });
+    const barrier = new Promise(resolve => { release = resolve; });
+    const delayed = new ConsultationStationService(db, async (a, o, m) => { await authorize(a, o, m); enter(); await barrier; }, async () => ({ name: "Fixture product", location: "A-1" }));
+    const heartbeat = delayed.heartbeat(actor, org, room.id, { epoch: room.epoch });
+    await entered;
+    room = await service.action(actor, org, room.id, { epoch: room.epoch, action: "language", language: "ja" });
+    release();
+    const renewed = await heartbeat;
+    assert.equal(renewed.epoch, room.epoch);
+    assert.equal(renewed.language, "ja");
+    assert.equal(renewed.active, true);
+    assert.equal(renewed.connected, true);
+  });
 }
 async function serve(db) {
   const service = stations(db),

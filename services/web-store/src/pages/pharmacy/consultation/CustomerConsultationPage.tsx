@@ -57,6 +57,7 @@ export default function CustomerConsultationPage() {
   const textRef = useRef(text);
   textRef.current = text;
   const resetSpeech = speech.reset;
+  const stopReading = speech.stopReading;
   useEffect(() => {
     alive.current = true;
     const forget = () => {
@@ -120,6 +121,8 @@ export default function CustomerConsultationPage() {
           latest.current.version > value.version
         )
           return;
+        if (JSON.stringify(latest.current?.shared ?? null) !== JSON.stringify(value.shared ?? null))
+          stopReading();
         latest.current = value;
         setScreen(value);
         setError("");
@@ -164,7 +167,7 @@ export default function CustomerConsultationPage() {
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", hidden);
     };
-  }, [credential, retry, reset, resetSpeech]);
+  }, [credential, retry, reset, resetSpeech, stopReading]);
   const pair = async () => {
     if (lock.current || !code.trim()) return;
     lock.current = true;
