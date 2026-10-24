@@ -29,6 +29,12 @@ describe('KPA 매장 경영자 /store → store.neture.co.kr/work/kpa-society/st
     expect(toKpaScopedStorePath('/store/library/contents')).toBe('/work/kpa-society/store/library/contents');
   });
 
+  it('사이니지 재생(TV)은 공통 chrome-free route 로 간다 — 옛 pharmacy 북마크 보존 (D7)', () => {
+    expect(entry('/store/marketing/signage/play/p1')).toBe('/store/marketing/signage/play/p1');
+    expect(entry('/store/marketing/signage/play/p1', '?loop=1')).toBe('/store/marketing/signage/play/p1?loop=1');
+    expect(entry('/store/marketing/signage/playlist')).toBe('/work/kpa-society/store/marketing/signage/playlist');
+  });
+
   it('접두만 같은 경로는 바꾸지 않는다', () => {
     expect(toKpaScopedStorePath('/store-hub')).toBe('/store-hub');
     expect(toKpaScopedStorePath('/stores')).toBe('/stores');

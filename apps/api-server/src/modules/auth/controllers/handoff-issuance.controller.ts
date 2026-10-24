@@ -186,7 +186,7 @@ export class HandoffIssuanceController extends BaseController {
       );
     }
 
-    if (alias && !isCarePharmHandoffPath(safeReturnPath ?? '/')) {
+    if (alias?.key === 'carepharm' && !isCarePharmHandoffPath(safeReturnPath ?? '/')) {
       return BaseController.error(res, 'Invalid CarePharm handoff path', 400, 'VALIDATION_ERROR');
     }
 

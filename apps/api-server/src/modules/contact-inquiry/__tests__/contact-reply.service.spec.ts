@@ -90,3 +90,11 @@ it("rejects invalid content and idempotency identifiers before any mutation", as
   ).rejects.toMatchObject({ status: 400 });
   expect(f.events).toHaveLength(0);
 });
+
+it("keeps an uncertain provider send claimed and never automatically resends", async () => {
+ const f=fixture();f.send.mockRejectedValueOnce(Error('uncertain transport'));
+ const input={requestId,message:'Uncertain reply'};
+ expect((await f.service.reply('supplier',contactId,'operator',input)).status).toBe('sending');
+ expect((await f.service.reply('supplier',contactId,'operator',input)).status).toBe('sending');
+ expect(f.send).toHaveBeenCalledTimes(1);expect(f.events.map(x=>x.delivery)).toEqual(['sending']);expect(f.answered()).toBe(false);
+});

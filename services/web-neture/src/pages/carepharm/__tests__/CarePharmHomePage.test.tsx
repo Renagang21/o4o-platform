@@ -10,7 +10,8 @@ vi.mock('../../../lib/apiClient', () => ({ api: { get: state.get, post: state.po
 vi.mock('../CarePharmNotices', () => ({ CarePharmNotices: () => null }));
 vi.mock('@o4o/shared-space-ui', async original => ({ ...await original<typeof import('@o4o/shared-space-ui')>(), ServiceHomeHero: () => <h1>만성질환관리</h1>, ServiceHomePromotion: () => null }));
 import CarePharmHomePage from '../CarePharmHomePage';
-const business = { key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };
+const business = { policyScope: 'business:11111111-1111-4111-8111-111111111111', key: 'carepharm', name: '만성질환관리', communityKey: 'business:carepharm', registrationConditions: '참여 조건' };
+const policies = ['terms', 'privacy'].map((documentType, i) => ({ serviceKey: business.policyScope, documentType, policyDocumentId: `22222222-2222-4222-8222-22222222222${i}`, version: 1, title: documentType, content: 'Fixture policy' }));
 let access: { kind: string; businessKey: string; allowed: boolean; canManage: boolean };
 let membership: string | null;
 const response = (data: unknown) => ({ data: { data } });
@@ -19,6 +20,7 @@ beforeEach(() => {
   state.get.mockReset(); state.post.mockReset(); state.login.mockReset(); state.authenticated = true; state.account = 'owner'; membership = null;
   access = { kind: 'semi-franchise', businessKey: 'carepharm', allowed: false, canManage: false };
   state.get.mockImplementation(async (path: string) => {
+    if (path.endsWith('/enrollment-policies')) return response(policies);
     if (path.endsWith('/showcase')) return response({ businessKey:'carepharm',items:[] });
     if (path.endsWith('/businesses/carepharm/store-access')) return response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: access.allowed, membershipStatus: access.allowed ? 'active' : membership });
     if (path.endsWith('/businesses/carepharm')) return response(business);
@@ -73,16 +75,16 @@ describe('CarePharm cooperation service', () => {
     state.post.mockImplementation(async () => { membership = 'pending'; return response({}); });
     mount('participation'); await screen.findByText('미가입');
     expect(screen.getByRole('button', { name: '가입 신청' }).hasAttribute('disabled')).toBe(true);
-    fireEvent.click(screen.getByRole('checkbox')); fireEvent.change(screen.getByRole('textbox'), { target: { value: '참여 신청' } });
+    await screen.findByText('privacy · 버전 1'); for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box); fireEvent.change(screen.getByRole('textbox'), { target: { value: '참여 신청' } });
     fireEvent.click(screen.getByRole('button', { name: '가입 신청' }));
     await screen.findByText('승인 대기');
-    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청' }, { headers: { 'X-Store-Organization-Id': 'owned-store' } });
+    expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/carepharm/apply', { acceptedConditions: true, conditions: '참여 조건', note: '참여 신청', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })) }, { headers: { 'X-Store-Organization-Id': 'owned-store' } });
   });
   it('requires fresh condition acceptance after server rejects stale conditions', async () => {
     state.post.mockRejectedValue({ response: { data: { code: 'CONDITIONS_CHANGED' } } });
-    mount('participation'); await screen.findByText('미가입'); fireEvent.click(screen.getByRole('checkbox'));
+    mount('participation'); await screen.findByText('privacy · 버전 1'); for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
     fireEvent.click(screen.getByRole('button', { name: '가입 신청' })); await screen.findByRole('alert');
-    expect((screen.getByRole('checkbox') as HTMLInputElement).checked).toBe(false);
+    expect((screen.getByRole('checkbox', { name: '이 서비스의 참여 조건을 확인했습니다.' }) as HTMLInputElement).checked).toBe(false);
     expect(screen.getByRole('button', { name: '가입 신청' }).hasAttribute('disabled')).toBe(true);
     expect(screen.getByRole('button', { name: '최신 참여 조건 다시 확인' })).toBeTruthy();
   });
@@ -251,4 +253,72 @@ it('keeps home as an overview and loads member material bodies only in the mater
   access.allowed = true; mount(); await screen.findByRole('link', { name: '자료실 보기' });
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
   expect(screen.getByRole('link', { name: '내 매장 업무 안내' }).getAttribute('href')).toBe('/tools?store=owned-store');
+});
+
+it('requires refreshed policy acknowledgement while preserving the application note', async () => {
+ state.post.mockRejectedValue({response:{data:{code:'POLICY_VERSION_MISMATCH'}}});
+ mount('participation');await screen.findByText('미가입');await screen.findByText('terms · 버전 1');
+ fireEvent.change(screen.getByRole('textbox'),{target:{value:'유지할 신청 내용'}});screen.getAllByRole('checkbox').forEach(box=>fireEvent.click(box));
+ fireEvent.click(screen.getByRole('button',{name:'가입 신청'}));await screen.findByText(/입력 내용은 유지됩니다/);
+ await waitFor(()=>expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true));
+ expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('유지할 신청 내용');
+ expect((screen.getByLabelText('서비스 이용약관 동의 (필수)') as HTMLInputElement).checked).toBe(false);
+});
+it('blocks application and offers retry when CarePharm policies are unavailable', async () => {
+ const original=state.get.getMockImplementation()!;
+ state.get.mockImplementation((path,config)=>path.endsWith('/enrollment-policies')?Promise.reject(new Error('unpublished')):original(path,config));
+ mount('participation');await screen.findByText('서비스 약관을 불러오지 못했습니다.');
+ fireEvent.click(screen.getByLabelText('이 서비스의 참여 조건을 확인했습니다.'));
+ expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true);
+ expect(state.post).not.toHaveBeenCalled();
+});
+
+it('uses the common member menu while retaining the selected pharmacy and existing access gate', async () => {
+  access.allowed = true;
+  render(<MemoryRouter initialEntries={['/?store=owned-store']}><CarePharmHomePage /></MemoryRouter>);
+  await screen.findByRole('complementary', { name: '내 참여와 지원' });
+  const nav = screen.getByRole('navigation', { name: '회원 공간 메뉴' });
+  const links = [...nav.querySelectorAll('a')];
+  expect(links.map(link => link.textContent)).toEqual(['홈', '소식', '자료', '참여 안내', '회원 교류', '지원']);
+  expect(links.find(link => link.textContent === '자료')?.getAttribute('href')).toBe('/materials?store=owned-store');
+  expect(links.find(link => link.textContent === '참여 안내')?.getAttribute('href')).toBe('/my/participation?store=owned-store');
+  expect(document.querySelectorAll('#news')).toHaveLength(1);
+  expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/businesses/carepharm/store-access', { headers: { 'X-Store-Organization-Id': 'owned-store' } });
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
+it('retains public home notices when the selected pharmacy access check fails', async () => {
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access')
+    ? Promise.reject({ response: { status: 403 } }) : previous(path, config));
+  mount();
+  await screen.findByRole('button', { name: '이용 상태 다시 확인' });
+  expect(screen.getByRole('heading', { name: '공지·안내' })).toBeTruthy();
+  expect(screen.queryByRole('complementary', { name: '내 참여와 지원' })).toBeNull();
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/showcase') || path.endsWith('/store/contents'))).toBe(false);
+});
+it('keeps home notices out of a denied material workspace', async () => {
+  mount('materials');
+  await screen.findByText(/이 서비스의 가입 승인 후/);
+  expect(screen.queryByRole('heading', { name: '공지·안내' })).toBeNull();
+});
+
+it('scrolls to the current home news section after the pharmacy gate replaces its loading view', async () => {
+  access.allowed = true;
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView');
+  const scroll = vi.fn();
+  Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
+  try {
+    let finish!: (value: unknown) => void;
+    const previous = state.get.getMockImplementation()!;
+    state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/store-access')
+      ? new Promise(resolve => { finish = resolve; }) : previous(path, config));
+    render(<MemoryRouter initialEntries={['/?store=owned-store#news']}><CarePharmHomePage /></MemoryRouter>);
+    await waitFor(() => expect(finish).toBeTypeOf('function'));
+    await act(async () => finish(response({ businessKey: 'carepharm', organizationId: 'owned-store', allowed: true, membershipStatus: 'active' })));
+    await screen.findByRole('complementary', { name: '내 참여와 지원' });
+    expect(scroll.mock.contexts).toContain(document.getElementById('news'));
+  } finally {
+    if (descriptor) Object.defineProperty(Element.prototype, 'scrollIntoView', descriptor);
+    else Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+  }
 });

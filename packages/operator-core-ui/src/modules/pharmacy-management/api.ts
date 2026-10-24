@@ -68,7 +68,7 @@ export interface SemiFranchise {
 }
 
 export interface SemiFranchiseMembership {
-  application?: { conditions?: string; note?: string; accepted?: boolean };
+  application?: { conditions?: string; note?: string; accepted?: boolean; applicationPolicies?: { serviceKey: string; documentType: string; policyDocumentId: string; version: number; contentHash: string; acceptanceKind: string }[] };
   id: string;
   status: string;
   appliedAt: string;
@@ -279,6 +279,8 @@ export const neturePharmacySupplierApi = {
 
   listProposals: () => get<SupplyProposal[]>('/neture/supplier/supply-proposals'),
   createProposal: (input: {
+    /** Stable UUID for an unchanged draft; replay returns the existing proposal. */
+    requestId?: string;
     offerId: string;
     semiFranchiseKey: string;
     targetOrganizationId?: string;

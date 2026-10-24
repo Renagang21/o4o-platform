@@ -12,7 +12,7 @@
  *   - ID 기준: kpa_members.id (users.id 와 다름)
  *   - 분리 API: PATCH /members/:id/info (기본 정보) + PATCH /members/:id/status (상태 변경)
  *   - activity_type → store_owner 자동 연동 로직 등 KPA 전용 비즈니스 규칙 존재
- *   → KpaEditUserModal 로 별도 유지. 통합 금지.
+ *   → 옛 KpaEditUserModal 로 분리했으나 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 제거(소비처 0).
  *
  * Props:
  *   userId  — 편집 대상 users.id (UUID)

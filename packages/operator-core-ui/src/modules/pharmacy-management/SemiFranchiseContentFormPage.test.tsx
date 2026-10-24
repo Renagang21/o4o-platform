@@ -7,6 +7,19 @@ vi.mock('./api', () => ({ neturePharmacyOperatorApi: api, STATUS_CLASS: {}, STAT
 vi.mock('@o4o/content-editor', () => ({ RichTextEditor: ({ value, onChange }: any) => <textarea value={value} onChange={event => onChange({ html: event.target.value })} /> }));
 beforeEach(() => vi.resetAllMocks());
 afterEach(cleanup);
+it('adds and removes the quick guide flag without losing other tags', async () => {
+  api.getContent.mockResolvedValue({ ...content('직원 안내'), tags: ['기존 자료'] });
+  show(); await screen.findByDisplayValue('직원 안내');
+  fireEvent.click(screen.getByRole('checkbox', { name: '직원 숙지 자료로 사용' }));
+  expect((screen.getByLabelText('태그') as HTMLInputElement).value).toBe('기존 자료, staff-quick-guide');
+  fireEvent.click(screen.getByRole('checkbox', { name: '직원 숙지 자료로 사용' }));
+  expect((screen.getByLabelText('태그') as HTMLInputElement).value).toBe('기존 자료');
+});
+it('requires a spare tag slot before adding the guide flag', async () => {
+  api.getContent.mockResolvedValue({ ...content('안내'), tags: Array.from({ length: 20 }, (_, i) => `tag-${i}`) });
+  show(); await screen.findByDisplayValue('안내');
+  expect((screen.getByRole('checkbox', { name: '직원 숙지 자료로 사용' }) as HTMLInputElement).disabled).toBe(true);
+});
 const content = (title: string) => ({ title, status: 'draft', summary: '', body: '', tags: [], semiFranchiseName: '합성 사업', semiFranchiseKey: 'b' });
 function Switch({ target }: { target: string }) { const go = useNavigate(), location = useLocation(); return <><button onClick={() => go(target)}>다른 사업</button><output data-testid="path">{location.pathname}</output></>; }
 function show(target = '/operator/semi-franchises/b/contents/two/edit') {

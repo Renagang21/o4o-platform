@@ -1,3 +1,4 @@
+import { fixtureBusinessPolicies, cleanupFixtureBusinessPolicies } from './fixtures/business-policies.js';
 import express from 'express';
 import request from 'supertest';
 import { randomUUID } from 'crypto';
@@ -93,6 +94,7 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   afterAll(async () => {
     jest.restoreAllMocks();
     if (!db?.isInitialized) return;
+    await cleanupFixtureBusinessPolicies(db, businesses);
     // FK 순서대로 이 suite 가 만든 행만 지운다(고정 SQL · id 는 bind).
     const cleanup: Array<[string, string[]]> = [
       ['DELETE FROM semi_franchise_memberships WHERE semi_franchise_id = ANY($1::uuid[])', businesses],
@@ -145,7 +147,7 @@ suite('CarePharm · MegaPharm business ledger alignment (PostgreSQL + HTTP)', ()
   it('isolates each business operator while both applications are pending, then approves each', async () => {
     const ids: Record<string, string> = {};
     for (const key of KEYS) {
-      const applied = await as(owner).post(`/pharmacy/semi-franchises/${key}/apply`, { conditions: '' });
+      const applied = await as(owner).post(`/pharmacy/semi-franchises/${key}/apply`, { conditions: '', policyReferences: await fixtureBusinessPolicies(db, key) });
       expect(applied.status).toBe(200);
       expect(applied.body.data.status).toBe('pending');
       ids[key] = applied.body.data.id;

@@ -6,7 +6,7 @@
  *   이벤트는 reserveEventOfferListing 원자 차감 → (수취 주체, 공급자) 그룹별 checkoutService.createOrder() 단일 지점.
  * - paymentGroupId 는 수취 주체(receiverKey)별 1개 — 수취 주체가 다른 주문을 한 결제로 묶지 않는다(D1).
  */
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 import { randomUUID } from 'crypto';
 import {
   NETURE_PHARMACY_ORDER_SOURCE,
@@ -20,6 +20,7 @@ import {
   type SupplyKind,
   rowsOf,
 } from '../constants.js';
+import { lockCheckoutSupply } from './checkout-supply-lock.js';
 import { getSupplyOption, type SupplyOption } from './supply-access.js';
 import { calculateSupplierShippingFee } from '../../../services/shipping/supplier-shipping.js';
 import type { CreateOrderDto } from '../../../services/checkout.service.js';
@@ -32,7 +33,7 @@ export interface EventReserver {
   incrementListingQuantity(listingId: string, qty: number): Promise<void>;
 }
 
-export type OrderCreator = (dto: CreateOrderDto) => Promise<{ id: string; orderNumber: string; totalAmount: number | string; subtotal: number | string; shippingFee: number | string }>;
+export type OrderCreator = (dto: CreateOrderDto, manager: EntityManager) => Promise<{ id: string; orderNumber: string; totalAmount: number | string; subtotal: number | string; shippingFee: number | string }>;
 
 const SOURCE_TYPE_BY_KIND: Record<SupplyKind, string> = {
   default: 'neture_default',
@@ -80,7 +81,7 @@ export interface CheckoutGroup {
 export function groupCheckoutLines(lines: CheckoutLine[]): CheckoutGroup[] {
   const groups = new Map<string, CheckoutGroup>();
   for (const line of lines) {
-    const receiverKey = receiverKeyOf(line.option.semiFranchiseKey, line.option.paymentReceiverKey);
+    const receiverKey = receiverKeyOf(line.option.semiFranchiseKey ?? `supplier:${line.option.supplierId}`, line.option.paymentReceiverKey);
     // New fixed conditions cannot share shipping/minimum amounts across businesses or different terms.
     const termsKey = line.option.termsSnapshot ? JSON.stringify([
       line.option.semiFranchiseKey, line.option.baseShippingFee, line.option.freeShippingThreshold, line.option.minOrderAmount ?? 0,
@@ -252,40 +253,7 @@ export class PharmacyCartService {
           code: 'MIN_ORDER_AMOUNT_NOT_MET', message: `해당 협업체 조건의 최소 주문금액(${group.lines[0].option.minOrderAmount}원)을 충족하지 못했습니다.` });
         continue;
       }
-      // 2a. 이벤트 수량 원자 차감 (기존 함수 그대로)
       const eventLines = group.lines.filter((l) => l.option.kind === 'event');
-      const reservations: Array<{ listingId: string; qty: number }> = [];
-      if (eventLines.length > 0) {
-        const qr = this.dataSource.createQueryRunner();
-        await qr.connect();
-        await qr.startTransaction();
-        try {
-          for (const l of eventLines) {
-            const { decrementedQty } = await this.eventReserver.reserveEventOfferListing(qr, {
-              listingId: l.option.optionId,
-              serviceKey: SEMI_FRANCHISE_EVENT_SERVICE_KEY,
-              userId: buyerId,
-              quantity: l.quantity,
-            });
-            reservations.push({ listingId: l.option.optionId, qty: decrementedQty });
-          }
-          await qr.commitTransaction();
-        } catch (e: any) {
-          if (qr.isTransactionActive) await qr.rollbackTransaction();
-          for (const l of group.lines) {
-            failedItems.push({
-              itemId: l.cartItemId,
-              productName: l.option.productName,
-              code: e?.code || 'RESERVATION_FAILED',
-              message: e?.message || '이벤트 수량 확인에 실패했습니다.',
-            });
-          }
-          continue;
-        } finally {
-          await qr.release();
-        }
-      }
-
       // 2b. 주문 생성 — 단일 지점
       const paymentGroupId = paymentGroupIds.get(group.receiverKey) ?? randomUUID();
       paymentGroupIds.set(group.receiverKey, paymentGroupId);
@@ -322,7 +290,28 @@ export class PharmacyCartService {
       const groupSubtotal = items.reduce((s, it) => s + it.subtotal, 0);
       const shippingPolicy = { baseShippingFee: first.baseShippingFee, freeShippingThreshold: first.freeShippingThreshold };
       const shipping = calculateSupplierShippingFee(groupSubtotal, shippingPolicy);
+      const qr = this.dataSource.createQueryRunner();
       try {
+        await qr.connect();
+        await qr.startTransaction();
+        const currentCart = await qr.query(`SELECT id,quantity FROM store_cart_items
+          WHERE id=ANY($1::uuid[]) AND buyer_id=$2 AND organization_id=$3 AND service_key=$4 ORDER BY id FOR UPDATE`,
+          [group.lines.map(l=>l.cartItemId),buyerId,organizationId,NETURE_PHARMACY_SERVICE_KEY]);
+        if (currentCart.length !== group.lines.length || group.lines.some(l => !currentCart.some((r: {id:string;quantity:number}) => r.id === l.cartItemId && r.quantity === l.quantity))) {
+          throw new NeturePharmacyError(409, 'CART_ITEM_CHANGED', '장바구니가 변경되었습니다. 다시 확인해 주세요.');
+        }
+        await lockCheckoutSupply(qr.manager, organizationId, group.lines.map(l=>l.option));
+        for (const line of group.lines) {
+          const current = await getSupplyOption(qr.manager, organizationId, line.option.kind, line.option.optionId);
+          if (!current) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_NOT_AVAILABLE', '이용할 수 없는 공급 옵션입니다.');
+          // Availability can decrease while waiting for another checkout; terms must stay fixed.
+          const terms = (option: SupplyOption) => ({ ...option, availableStock: null, totalQuantity: null });
+          if (current.trackInventory && current.availableStock !== null && current.availableStock < line.quantity) throw new NeturePharmacyError(409, 'INSUFFICIENT_STOCK', '재고가 부족합니다.');
+          if (JSON.stringify(terms(current)) !== JSON.stringify(terms(line.option))) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_CHANGED', '공급조건이 변경되었습니다. 장바구니를 다시 확인해 주세요.');
+        }
+        for (const line of eventLines) await this.eventReserver.reserveEventOfferListing(qr, {
+          listingId: line.option.optionId, serviceKey: SEMI_FRANCHISE_EVENT_SERVICE_KEY, userId: buyerId, quantity: line.quantity,
+        });
         const saved = await this.createOrder({
           buyerId,
           sellerId: organizationId,
@@ -345,12 +334,13 @@ export class PharmacyCartService {
             cartItemIds: group.lines.map((l) => l.cartItemId),
             fulfillmentVisibility: 'hidden_until_paid',
           },
-        });
-        await this.dataSource.query(
+        }, qr.manager);
+        await qr.query(
           `DELETE FROM store_cart_items
             WHERE id = ANY($1::uuid[]) AND buyer_id = $2 AND organization_id = $4 AND service_key = $3`,
           [group.lines.map((l) => l.cartItemId), buyerId, NETURE_PHARMACY_SERVICE_KEY, organizationId],
         );
+        await qr.commitTransaction();
         createdOrders.push({
           orderId: saved.id,
           orderNumber: saved.orderNumber,
@@ -360,7 +350,7 @@ export class PharmacyCartService {
           totalAmount: Number(saved.totalAmount),
         });
       } catch (e: any) {
-        for (const r of reservations) await this.eventReserver.incrementListingQuantity(r.listingId, r.qty);
+        if (qr.isTransactionActive) await qr.rollbackTransaction();
         for (const l of group.lines) {
           failedItems.push({
             itemId: l.cartItemId,
@@ -369,7 +359,7 @@ export class PharmacyCartService {
             message: e?.message || '주문 생성에 실패했습니다.',
           });
         }
-      }
+      } finally { await qr.release(); }
     }
 
     const paymentGroups = [...paymentGroupIds.entries()]

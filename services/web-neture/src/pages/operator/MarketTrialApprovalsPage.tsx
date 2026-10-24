@@ -15,7 +15,7 @@ import FundingExceptionsPanel from './FundingExceptionsPanel';
 import { OperatorDialog } from './OperatorDialog';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useState, useEffect, useCallback, useRef, type RefObject } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
 import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from '../../api/trial';
 
@@ -51,7 +51,9 @@ type PageTab = 'trials' | 'forum-failures' | 'exceptions';
 
 export default function MarketTrialApprovalsPage() {
   const dialogFallback = useRef<HTMLHeadingElement>(null);
-  const [pageTab, setPageTab] = useState<PageTab>('trials');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageTab: PageTab = ['forum-failures','exceptions'].includes(searchParams.get('tab')??'') ? searchParams.get('tab') as PageTab : 'trials';
+  const setPageTab = (tab:PageTab) => setSearchParams(tab==='trials'?{}:{tab});
 
   return (
     <div className="p-6">

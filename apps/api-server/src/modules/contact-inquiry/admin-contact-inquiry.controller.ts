@@ -25,7 +25,7 @@ import { contactService, requireContactScope } from './contact-service-scope.js'
 
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import type { DataSource } from 'typeorm';
+import { IsNull, type DataSource } from 'typeorm';
 import { ContactInquiry } from './entities/ContactInquiry.entity.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
@@ -94,13 +94,13 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   const manageGuard = requireContactScope(dataSource, 'operator');
   const replies = new ContactReplyService(dataSource);
   router.get('/:serviceKey/contact-inquiries/summary', authenticate, manageGuard, async (req,res,next) => {
-    try { const newCount=await repo.count({where:{service_key:req.params.serviceKey,status:'received'}});res.json({success:true,data:{newCount}}); }
+    try { const newCount=await repo.count({where:{service_key:req.params.serviceKey,organization_id:IsNull(),status:'received'}});res.json({success:true,data:{newCount}}); }
     catch(error){next(error);}
   });
 
   router.get('/:serviceKey/contact-inquiries/:id/replies', authenticate, manageGuard, apiLimiter, async (req,res,next) => {
     try {
-      const item = await repo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey } });
+      const item = await repo.findOne({ where: { id: req.params.id, service_key: req.params.serviceKey, organization_id: IsNull() } });
       if (!item) return res.status(404).json({ success:false,error:{code:'NOT_FOUND',message:'문의를 찾을 수 없습니다.'} });
       res.json({success:true,data:await replies.history(req.params.serviceKey,req.params.id)});
     } catch(error) { next(error); }
@@ -132,7 +132,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     if (!serviceKey) return;
     try {
       const { status, page = '1', limit = '20' } = req.query;
-      const qb = repo.createQueryBuilder('i').where('i.service_key = :sk', { sk: serviceKey });
+      const qb = repo.createQueryBuilder('i').where('i.service_key = :sk', { sk: serviceKey }).andWhere('i.organization_id IS NULL');
       if (status && typeof status === 'string') qb.andWhere('i.status = :status', { status });
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(Math.max(1, Number(limit)), 100);
@@ -156,7 +156,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     const serviceKey = guardServiceKey(req, res);
     if (!serviceKey) return;
     try {
-      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey, organization_id: IsNull() } });
       if (!item) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
       res.json({ success: true, data: toDetail(item) });
     } catch (error) {
@@ -174,12 +174,12 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
       return res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: '유효하지 않은 상태입니다.' } });
     }
     try {
-      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey, organization_id: IsNull() } });
       if (!item) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
-      await repo.update({ id: item.id, service_key: serviceKey }, {
+      await repo.update({ id: item.id, service_key: serviceKey, organization_id: IsNull() }, {
         status, handled_at: new Date(), handled_by: req.user!.id,
       });
-      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey } });
+      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey, organization_id: IsNull() } });
       if (!saved) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
       res.json({ success: true, data: toDetail(saved) });
     } catch (error) {
@@ -194,13 +194,13 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
     if (!serviceKey) return;
     const { internalNote } = req.body ?? {};
     try {
-      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+      const item = await repo.findOne({ where: { id: req.params.id, service_key: serviceKey, organization_id: IsNull() } });
       if (!item) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
-      await repo.update({ id: item.id, service_key: serviceKey }, {
+      await repo.update({ id: item.id, service_key: serviceKey, organization_id: IsNull() }, {
         internal_note: typeof internalNote === 'string' ? internalNote : null,
         handled_by: req.user!.id,
       });
-      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey } });
+      const saved = await repo.findOne({ where: { id: item.id, service_key: serviceKey, organization_id: IsNull() } });
       if (!saved) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문의를 찾을 수 없습니다.' } });
       res.json({ success: true, data: toDetail(saved) });
     } catch (error) {

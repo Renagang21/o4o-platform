@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   cleanup,
+  act,
   fireEvent,
   render,
   screen,
@@ -104,7 +105,7 @@ it.each(["main", "supplier", "funding"])(
 it("exposes CarePharm inquiries for a server-confirmed legacy business assignee", async () => {
   state.profile = "carepharm";
   state.user.roles = ["neture:operator"];
-  state.get.mockResolvedValue({ data: { data: { newCount: 3 } } });
+  state.get.mockImplementation(async(path:string)=>({data:{data:path.includes('/operator-inbox/')?{contact:{pending:3},tasks:[]}:{newCount:3}}}));
   render(
     <MemoryRouter>
       <NetureGlobalHeader />
@@ -113,4 +114,14 @@ it("exposes CarePharm inquiries for a server-confirmed legacy business assignee"
   expect(
     await screen.findByRole("link", { name: "문의 관리 · 새 문의 3" }),
   ).toBeTruthy();
+  const inbox=await screen.findByRole("link",{name:/운영 알림·문의함.*미처리 업무 있음/});
+  expect(inbox.getAttribute('href')).toBe('/operator/inbox/business/carepharm');
+});
+
+it('does not expose a CarePharm business inbox to a central operator without assignment',async()=>{
+ state.profile='carepharm';state.user.roles=['neture:operator'];
+ render(<MemoryRouter><NetureGlobalHeader/></MemoryRouter>);
+ await act(async()=>{});
+ expect(state.get).toHaveBeenCalledWith('/operator-inbox/business/carepharm/manage');
+ expect(screen.queryByRole('link',{name:/운영 알림·문의함/})).toBeNull();
 });

@@ -16,15 +16,10 @@ jest.mock('../common/middleware/membership-guard.middleware.js', () => ({
 }));
 // Unrelated route factories are isolated; the actual inline news handlers and shared reader run below.
 jest.mock('../routes/kpa/controllers/organization.controller.js', () => ({createOrganizationController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/member.controller.js', () => ({createMemberController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/operator-summary.controller.js', () => ({createOperatorSummaryController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/event-offer-operator.controller.js', () => ({createEventOfferOperatorController: () => jest.requireActual('express').Router()}));
-jest.mock('../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js', () => ({createServiceRecruitmentExposureProxyController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/supplier-offers.controller.js', () => ({createSupplierOffersController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/join-inquiry.controller.js', () => ({createJoinInquiryAdminRoutes: () => jest.requireActual('express').Router(), createJoinInquiryPublicRoutes: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/contact-request.controller.js', () => ({createContactRequestHandler: () => jest.requireActual('express').Router(), listContactRequestsHandler: () => jest.requireActual('express').Router(), updateContactRequestStatusHandler: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/store-hub.controller.js', () => ({createStoreHubController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/o4o-store/controllers/pharmacy-store-config.controller.js', () => ({createPharmacyStoreConfigController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/pharmacy-info.controller.js', () => ({createPharmacyInfoController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/pharmacy-products.controller.js', () => ({createPharmacyProductsController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/operator-product-applications.controller.js', () => ({createOperatorProductApplicationsController: () => jest.requireActual('express').Router()}));
@@ -43,7 +38,6 @@ jest.mock('../routes/o4o-store/controllers/multilingual-product-content.controll
 jest.mock('../routes/o4o-store/controllers/store-playlist.controller.js', () => ({createStorePlaylistController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/store-channel-products.controller.js', () => ({createStoreChannelProductsController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/store-external-sales.controller.js', () => ({createStoreExternalSalesController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/o4o-store/controllers/kpa-store-template.controller.js', () => ({createKpaStoreTemplateController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/kpa-checkout.controller.js', () => ({createKpaCheckoutController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/kpa-payment.controller.js', () => ({createKpaPaymentController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/blog.controller.js', () => ({createBlogController: () => jest.requireActual('express').Router()}));
@@ -57,24 +51,8 @@ jest.mock('../routes/o4o-store/controllers/operator-qr.controller.js', () => ({c
 jest.mock('../routes/o4o-store/controllers/operator-screen-set.controller.js', () => ({createOperatorScreenSetController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/supplier-screen-set.controller.js', () => ({createSupplierScreenSetController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/o4o-store/controllers/qr.controller.js', () => ({createStoreQrStaffController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/o4o-store/controllers/layout.controller.js', () => ({createLayoutController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/o4o-store/controllers/store-settings.controller.js', () => ({createStoreSettingsController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/instructor.controller.js', () => ({createInstructorController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/forum-request.controller.js', () => ({createForumRequestController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/forum-membership.controller.js', () => ({createForumMembershipController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/content-approval.controller.js', () => ({createContentApprovalController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/supplier-content.controller.js', () => ({createSupplierContentController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/supplier-signage-report.controller.js', () => ({createSupplierSignageReportController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/supplier-campaign-request.controller.js', () => ({createSupplierCampaignRequestController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/supplier-signage-media.controller.js', () => ({createSupplierSignageMediaController: () => jest.requireActual('express').Router()}));
-jest.mock('../modules/neture/controllers/store-seller-recruitment-browse.controller.js', () => ({createStoreSellerRecruitmentBrowseController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/community-hub.controller.js', () => ({createCommunityHubController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/legal-documents.controller.js', () => ({createLegalDocumentsController: () => jest.requireActual('express').Router()}));
 jest.mock('../routes/kpa/controllers/event-offer.controller.js', () => ({createEventOfferController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/mypage.controller.js', () => ({createMypageController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/me-context.controller.js', () => ({createMeContextController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/qualification.controller.js', () => ({createQualificationController: () => jest.requireActual('express').Router()}));
-jest.mock('../routes/kpa/controllers/instructor-dashboard.controller.js', () => ({createInstructorDashboardController: () => jest.requireActual('express').Router()}));
 
 jest.mock('../controllers/forum/ForumController.js', () => ({ForumController: class { constructor() { return new Proxy({}, { get: () => () => {} }); } }}));
 jest.mock('../modules/credit/controllers/CreditController.js', () => ({CreditController: class { constructor() { return new Proxy({}, { get: () => () => {} }); } }}));

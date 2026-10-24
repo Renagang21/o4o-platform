@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import { Router, type Request } from "express";
 import type { DataSource } from "typeorm";
 import { requireAuth } from "../../middleware/auth.middleware.js";
@@ -34,7 +35,7 @@ export function cooperativeManagementRoutes(db: DataSource) {
       try {
         res.json({ success: true, data: await fn(req) });
       } catch (error) {
-        if (error instanceof NeturePharmacyError)
+        if (error instanceof NeturePharmacyError || error instanceof PolicyAcceptanceError)
           res
             .status(error.httpStatus)
             .json({ success: false, error: error.message, code: error.code });
@@ -137,7 +138,7 @@ export function cooperativeManagementRoutes(db: DataSource) {
   router.post(
     "/:coop/applications",
     run((req) =>
-      service.applyMembership(actor(req), id(req, "coop"), req.body?.reason),
+      service.applyMembership(actor(req), id(req, "coop"), req.body?.reason, req.body?.policyReferences),
     ),
   );
   router.get(

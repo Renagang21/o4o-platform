@@ -24,7 +24,7 @@ beforeEach(() => {
   vi.resetAllMocks(); api.store = 'A';
   api.analytics.mockResolvedValue({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } });
   api.scans.mockResolvedValue({ success: true, data: [] }); api.assets.mockResolvedValue({ success: true, data: { total: 0, items: [] } });
-  api.products.mockResolvedValue({ success: true, data: [] }); api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 } });
+  api.products.mockResolvedValue({ success: true, data: [] }); api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0, availability: { newOrders: 'available', pendingTabletRequests: 'available' } } });
   api.list.mockImplementation(async () => ({ success: true, data: { items: [item('one', api.store)], total: 1 } }));
   api.update.mockImplementation(async (id: string, status: string) => ({ success: true, data: { snapshotId: id, publishStatus: status } }));
 });
@@ -37,7 +37,7 @@ it('home starts work before overview finishes and loads recent activity only whe
   expect(api.scans).not.toHaveBeenCalled();
   expect(screen.getByText(/매장 현황을 불러오는 중/)).toBeTruthy();
   await act(async () => resolve({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } }));
-  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
   fireEvent.click(screen.getByText('최근 QR 활동 보기'));
   await screen.findByText('최근 활동 기록이 없습니다');
   expect(api.scans).toHaveBeenCalledTimes(1);
@@ -62,7 +62,25 @@ it('home shortcuts preserve the selected service path without displaying all too
   expect(screen.getByRole('link', { name: '매장 컨텐츠' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
   expect(screen.getByRole('link', { name: '운영 확인' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/use');
   expect(screen.queryByRole('link', { name: 'QR 배치·출력' })).toBeNull();
-  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
+});
+it('home preserves confirmed work while retrying one unavailable signal source', async () => {
+  api.signals.mockResolvedValueOnce({ success: true, data: { newOrders: 0, pendingTabletRequests: 3, availability: { newOrders: 'unavailable', pendingTabletRequests: 'available' } } });
+  render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
+  await screen.findByText('상담 요청 3건 대기');
+  expect(screen.getByRole('alert').textContent).toContain('주문 현황');
+  expect(screen.queryByText('확인된 업무에는 대기 항목이 없습니다.')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '현황 다시 시도' }));
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
+  expect(screen.queryByRole('alert')).toBeNull();
+});
+it('home never declares empty work for an unconfirmed or legacy signal response', async () => {
+  api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 } });
+  render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.getByRole('alert').textContent).toContain('주문 현황 · 상담 요청');
+  expect(screen.queryByText('확인된 업무에는 대기 항목이 없습니다.')).toBeNull();
+  expect(screen.getByRole('link', { name: '운영 확인' })).toBeTruthy();
 });
 it('publishing page reports load failure and recovers through the existing panel retry', async () => {
   api.list.mockRejectedValueOnce(Error('synthetic'));

@@ -8,6 +8,28 @@ const SESSION = '00000000-0000-4000-8000-000000000001';
 const req = (body = {}, origin = 'https://neture.co.kr') => ({ body, user: { id: 'fixture-user' }, headers: { authorization: 'Bearer fixture' }, cookies: {}, get: () => origin } as any);
 beforeEach(() => { jest.clearAllMocks(); logout.mockResolvedValue(undefined); verifyAccessToken.mockReturnValue({ serviceKey: 'neture', sessionId: SESSION }); });
 describe('browser logout and refresh HTTP contract', () => {
+  it.each([['pharmacy', 'kpa-society'], ['pharmcoop', 'coop']])('terminates an existing %s session using its original signed scope %s', async (business, scope) => {
+    verifyAccessToken.mockReturnValue({ serviceKey: scope, sessionId: SESSION });
+    const res = mockHandoffRes();
+    await AuthSessionController.logout(req({ serviceKey: 'neture' }, `https://${business}.neture.co.kr`), res);
+    expect(res.statusCode).toBe(200);
+    expect(logout).toHaveBeenCalledWith('fixture-user', scope, SESSION);
+    expect(res.body.data.scope).toMatchObject({ serviceKey: scope, serverRevoked: true });
+  });
+  it.each([['pharmacy', 'coop'], ['pharmcoop', 'kpa-society'], ['neture', 'kpa-society'], ['megapharm', 'kpa-society'], ['carepharm', 'coop']])('does not retire a signed %s session from the wrong host/scope %s', async (business, scope) => {
+    verifyAccessToken.mockReturnValue({ serviceKey: scope, sessionId: SESSION });
+    const res = mockHandoffRes();
+    await AuthSessionController.logout(req({}, business === 'neture' ? 'https://neture.co.kr' : `https://${business}.neture.co.kr`), res);
+    expect(res.statusCode).toBe(401);
+    expect(logout).not.toHaveBeenCalled();
+  });
+  it.each(['pharmacy', 'megapharm', 'carepharm', 'pharmcoop'])('revokes the common account session at %s after direct login or handoff', async business => {
+    const res = mockHandoffRes();
+    await AuthSessionController.logout(req({}, `https://${business}.neture.co.kr`), res);
+    expect(res.statusCode).toBe(200);
+    expect(logout).toHaveBeenCalledWith('fixture-user', 'neture', SESSION);
+    expect(res.body.data.scope).toMatchObject({ serviceKey: 'neture', serverRevoked: true });
+  });
   it('authenticates expired access using the cookie refresh snapshot without publishing fresh credentials', async () => {
     verifyAccessToken.mockReturnValueOnce(null);
     refreshTokens.mockResolvedValueOnce({ accessToken: 'internal-access', refreshToken: 'internal-refresh' });

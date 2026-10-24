@@ -23,6 +23,8 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { useLibraryScope } from './library/useLibraryScope';
 import { useContentUsage } from './library/useContentUsage';
+import { ContentUsageSummary } from './library/ContentUsageSummary';
+import { LibraryBusinessFilter } from './library/LibraryBusinessFilter';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
@@ -32,7 +34,6 @@ import { DataTable, type Column, ActionBar } from '@o4o/ui';
 import {
   storeLibraryApi,
   type LibraryContentItem,
-  type StoreContentUsage,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import type { ProductionSourceItem } from './productionTargets';
@@ -68,7 +69,7 @@ const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'operator', label: '운영자 제공' },
   { key: 'community', label: '커뮤니티 가져옴' },
-  { key: 'franchise', label: '세미프랜차이즈' },
+  { key: 'franchise', label: '협업체에서 가져옴' },
   { key: 'mine', label: '내가 만든 콘텐츠' },
   { key: 'ai-description', label: 'AI 설명' },
 ];
@@ -116,19 +117,6 @@ function formatDate(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-// WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
-//   사용처 count 를 "QR 2 · 태블릿 1 · 취급제품 3에서 사용 중" 형태 라벨로. 0이면 자료함 전용 안내.
-//   미조회(undefined)/조회중(null)은 라벨 없음(호출부에서 렌더 생략).
-function usageSummaryLabel(u: StoreContentUsage | null | undefined): string | null {
-  if (!u) return null;
-  const parts: string[] = [];
-  if (u.usage.qr > 0) parts.push(`QR ${u.usage.qr}`);
-  if (u.usage.tablet_display > 0) parts.push(`태블릿 ${u.usage.tablet_display}`);
-  if (u.usage.product_link > 0) parts.push(`취급제품 ${u.usage.product_link}`);
-  if (u.usage.pop_pdf > 0) parts.push(`POP ${u.usage.pop_pdf}`);
-  return parts.length > 0 ? `${parts.join(' · ')}에서 사용 중` : '자료함에만 있음 (사용 중 아님)';
-}
-
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처는 피드의 sourceGroup(불변 snapshot.source_service 기준)으로 판정한다.
   //   사본 contentJson 은 매장 편집으로 바뀌므로 출처 판정에 쓰지 않는다(편집 후 '커뮤니티' 로 바뀌던 결함).
@@ -170,7 +158,7 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
     it.origin === 'direct' || it.origin === 'execution-asset'
       ? '내 매장'
       : isFranchise
-        ? `세미프랜차이즈${semiFranchiseName ? ` · ${semiFranchiseName}` : ''}`
+        ? semiFranchiseName || '협업체'
         : readString(it.contentJson, 'authorName') || '-';
   return {
     id: it.id,
@@ -261,6 +249,7 @@ function DocumentsSection({
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
   const [source, setSource] = useState<SourceFilter>(() => mode === 'page' ? SOURCE_TABS.find(tab => tab.key === params.get('librarySource'))?.key ?? 'all' : 'all');
   const [activeTag, setActiveTag] = useState<string | null>(() => mode === 'page' ? params.get('libraryTag') : null);
+  const [business, setBusiness] = useState(() => mode === 'page' ? params.get('libraryBusiness') || '' : '');
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1: 재가져오기 진행중 표식 + 내부 목록 새로고침 트리거
   const [reimportingId, setReimportingId] = useState<string | null>(null);
   const [internalReload, setInternalReload] = useState(0);
@@ -270,7 +259,7 @@ function DocumentsSection({
 
 
   // 출처 탭/태그 필터 변경 시 1페이지로 리셋
-  const changeSource = useCallback((s: SourceFilter) => { setSource(s); setPage(1); }, []);
+  const changeSource = useCallback((s: SourceFilter) => { setSource(s); setBusiness(''); setPage(1); }, []);
   const applyTag = useCallback((t: string) => { setActiveTag(t); setPage(1); }, []);
   const clearTag = useCallback(() => { setActiveTag(null); setPage(1); }, []);
 
@@ -283,17 +272,17 @@ function DocumentsSection({
     return () => clearTimeout(handle);
   }, [searchInput, searchQuery]);
 
-  const queryKey = JSON.stringify([page, searchQuery, source, activeTag]);
+  const queryKey = JSON.stringify([page, searchQuery, source, activeTag, business]);
   useEffect(() => {
     if (mode !== 'page') return;
     const next = new URLSearchParams(params);
     const filters = { librarySearch: searchQuery, librarySource: source === 'all' ? '' : source,
-      libraryTag: activeTag ?? '', libraryPage: page === 1 ? '' : String(page) };
+      libraryTag: activeTag ?? '', libraryPage: page === 1 ? '' : String(page), libraryBusiness: business };
     for (const [key, value] of Object.entries(filters)) {
       if (value) next.set(key, value); else next.delete(key);
     }
     if (next.toString() !== params.toString()) setParams(next, { replace: true });
-  }, [mode, params, setParams, searchQuery, source, activeTag, page]);
+  }, [mode, params, setParams, searchQuery, source, activeTag, page, business]);
   const loadDocuments = useCallback(async () => {
     if (!isCurrent()) throw new Error('No active store');
     const res = await storeLibraryApi.listContents({
@@ -301,11 +290,12 @@ function DocumentsSection({
       search: searchQuery || undefined,
       source: source !== 'all' ? source : undefined,
       tag: activeTag || undefined,
+      ...(business ? { business } : {}),
     });
     if (!res.success || !res.data) throw new Error('DOCUMENT_LOAD_FAILED');
     return { queryKey, rows: res.data.items.map(toDocumentRow), total: res.data.total,
       totalPages: Math.max(1, res.data.totalPages) };
-  }, [page, searchQuery, source, activeTag, queryKey, isCurrent]);
+  }, [page, searchQuery, source, activeTag, business, queryKey, isCurrent]);
   const { data: documents, loading: reading, error: loadError, reload: retryDocuments } = useStoreResource(
     loadDocuments, { queryKey: null as string | null, rows: [] as DocumentRow[], total: 0, totalPages: 1 },
   );
@@ -314,7 +304,7 @@ function DocumentsSection({
   const { total, totalPages } = documents;
   useEffect(() => { if (!loading && !loadError && page > totalPages) setPage(totalPages); }, [loading, loadError, page, totalPages]);
   const selected = useMemo(() => new Set(rows.filter(row => selection.has(row.selectionKey)).map(row => row.selectionKey)), [rows, selection]);
-  const usageById = useContentUsage(rows.filter(row => row.origin === 'direct' && row.hasSourceUpdate).map(row => row.id));
+  const { values: usageById, reload: reloadUsage } = useContentUsage(rows.filter(row => row.origin === 'direct' && row.hasSourceUpdate).map(row => row.id));
   const reloadVersion = `${reloadKey}:${internalReload}`;
   const lastReloadVersion = useRef(reloadVersion);
   useEffect(() => {
@@ -495,9 +485,9 @@ function DocumentsSection({
             )}
             {/* WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
                 원본 갱신됨 사본의 사용처 요약(QR/태블릿/취급제품/POP). 덮어쓰기 판단 근거 — 표시 전용. */}
-            {row.hasSourceUpdate && usageSummaryLabel(usageById[row.id]) && (
-              <span style={styles.usageSummary} title="이 사본이 현재 사용되고 있는 위치입니다. (태블릿 블록·동영상 일부는 집계에서 제외)">
-                {usageSummaryLabel(usageById[row.id])}
+            {row.origin === 'direct' && row.hasSourceUpdate && (
+              <span style={styles.usageSummary}>
+                <ContentUsageSummary usage={usageById[row.id]} onRetry={reloadUsage} />
               </span>
             )}
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 콘텐츠 표식 (SSOT=aiDescriptionMode, 단일/코너 구분) */}
@@ -596,7 +586,7 @@ function DocumentsSection({
         ),
       },
     ],
-    [mode, base, returnState, applyTag, handleReimport, reimportingId, removing, usageById],
+    [mode, base, returnState, applyTag, handleReimport, reimportingId, removing, usageById, reloadUsage],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
@@ -620,6 +610,9 @@ function DocumentsSection({
 
       {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 (page 모드 전용) */}
       {mode === 'page' && (
+        <><LibraryBusinessFilter value={business} onChange={value => {
+          setBusiness(value); setSource(value ? 'franchise' : 'all'); setPage(1);
+        }} />
         <div style={styles.sourceTabBar}>
           {SOURCE_TABS.map(({ key, label }) => {
             const active = source === key;
@@ -635,7 +628,7 @@ function DocumentsSection({
               </button>
             );
           })}
-        </div>
+        </div></>
       )}
 
       <div style={styles.sectionHeader}>

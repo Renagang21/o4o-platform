@@ -1,4 +1,4 @@
-import { ServiceContactInboxLink } from '@o4o/shared-space-ui';
+import { COOPERATION_EXTENSIONS, ServiceContactInboxLink } from '@o4o/shared-space-ui';
 import { useEffect, useState } from "react";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import { AuthClient, getAccessToken } from "@o4o/auth-client";
@@ -87,7 +87,7 @@ export function ConnectedApp() {
   return (
     <>
       <div className="container" aria-label="계정">
-        <ServiceContactInboxLink client={authClient.api} serviceKey="pharmcoop" accountId={auth.user?.id} enabled={!!auth.user?.id} />
+        <ServiceContactInboxLink client={authClient.api} serviceKey={COOPERATION_EXTENSIONS.pharmcoop.model.key} accountId={auth.user?.id} enabled={!!auth.user?.id} />
         {auth.user ? (
           <button onClick={() => void auth.logout()}>로그아웃</button>
         ) : (

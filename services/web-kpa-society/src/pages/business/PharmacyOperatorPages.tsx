@@ -7,7 +7,7 @@ import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage } from '@o4o/op
 export function PharmacyOperatorPage() {
   const { user } = useAuth();
   if (!user) return null;
-  return <>{user.roles?.includes(`neture:${BUSINESS_SITE.key}_admin`) && <ServiceOperatorManagement key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} scope={BUSINESS_SITE.key} />}<OperatorSemiFranchisePage contactHref={key => ["pharmacy","carepharm","megapharm","pharmcoop"].includes(key) ? `https://neture.co.kr/operator/service-contact/${key === "pharmacy" ? "kpa-society" : key}` : undefined} key={user.id} businessKey={BUSINESS_SITE.key}
+  return <><Link to={`/operator/inbox/business/${BUSINESS_SITE.key}`}>운영 알림·문의함</Link>{user.roles?.includes(`neture:${BUSINESS_SITE.key}_admin`) && <ServiceOperatorManagement key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} scope={BUSINESS_SITE.key} />}<OperatorSemiFranchisePage contactHref={key => ["pharmacy","carepharm","megapharm","pharmcoop"].includes(key) ? `https://neture.co.kr/operator/service-contact/${key === "pharmacy" ? "kpa-society" : key}` : undefined} key={user.id} businessKey={BUSINESS_SITE.key}
     forumHref={() => '/community'} renderBusinessHome={() => <>
       <Link to="/">사업 홈 확인</Link><Link to="/home-presentation">Hero · 광고 관리</Link>
     </>} /></>;

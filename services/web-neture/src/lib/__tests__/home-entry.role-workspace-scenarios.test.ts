@@ -115,7 +115,7 @@ describe('시나리오', () => {
   it('단일 서비스 운영자: 서비스 운영 카드 버튼 1개 = 서비스 이름 → /operator', () => {
     const m = buildHomeEntryModel(user(['kpa:operator']), base({ operatorServices: [op('kpa-society')] }));
     expect(card(m, 'operator').items).toEqual([
-      { id: 'operator:kpa-society:operator', label: 'O4O 약국 경영지원', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' } },
+      { id: 'operator:kpa-society:operator', label: 'O4O 약국 경영지원', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator/semi-franchises' } },
     ]);
   });
 

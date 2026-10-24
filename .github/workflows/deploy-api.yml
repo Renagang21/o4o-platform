@@ -613,6 +613,24 @@ jobs:
           --names AI_DEFAULT_PROVIDER,AI_DEFAULT_MODEL_OPENAI,TOSS_PAYMENTS_CLIENT_KEY,TOSS_PAYMENTS_SECRET_KEY \
           --out "$RUNNER_TEMP/optional-env"
 
+    # WO-O4O-EXTERNAL-AI-PRODUCTION-ACTIVATION-V1 — 외부 AI(ChatGPT) 연결 설정 4개.
+    #   저장소 variable 값 있음 → 설정 · 없음 → 현재 운영 값 유지 · 둘 다 없음 → 생략(모듈은 미설정 503 · 기본 OFF).
+    #   현재 서비스 조회에 실패하면 운영 값을 지운 채 배포하지 않도록 이 step 이 실패한다(--require-current).
+    #   암호화 키는 env 로 다루지 않는다 — 아래 deploy step 이 Secret Manager 참조로 연결한다.
+    - name: Resolve external AI connection env (carry · stop if unknown)
+      if: inputs.migrate_only != 'true'
+      env:
+        OPTENV_EXTERNAL_AI_ISSUER_URL: ${{ vars.EXTERNAL_AI_ISSUER_URL }}
+        OPTENV_EXTERNAL_AI_WEB_ORIGIN: ${{ vars.EXTERNAL_AI_WEB_ORIGIN }}
+        OPTENV_EXTERNAL_AI_ADMIN_ORIGIN: ${{ vars.EXTERNAL_AI_ADMIN_ORIGIN }}
+        OPTENV_EXTERNAL_AI_REDIRECT_URIS: ${{ vars.EXTERNAL_AI_REDIRECT_URIS }}
+      run: |
+        node scripts/ci/cloud-run-env.mjs optional \
+          --service ${{ env.SERVICE_NAME }} \
+          --names EXTERNAL_AI_ISSUER_URL,EXTERNAL_AI_WEB_ORIGIN,EXTERNAL_AI_ADMIN_ORIGIN,EXTERNAL_AI_REDIRECT_URIS \
+          --require-current true \
+          --out "$RUNNER_TEMP/external-ai-env"
+
     # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만. 배포 전 traffic(pin/latest · 이전 revision)을 기록한다.
     - name: Record traffic before deploy (verified rollout)
       if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
@@ -624,6 +642,7 @@ jobs:
         NETURE_PHARMACY_PAYMENT_MODE: ${{ vars.NETURE_PHARMACY_PAYMENT_MODE }}
         KAKAO_REST_CLIENT_ID: ${{ vars.KAKAO_CLIENT_ID }}
         KAKAO_SECRET_RESOURCE: ${{ vars.KAKAO_CLIENT_SECRET_NAME }}
+        EXTERNAL_AI_SECRET_RESOURCE: ${{ vars.EXTERNAL_AI_CREDENTIAL_SECRET_NAME }}
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
@@ -642,6 +661,16 @@ jobs:
         fi
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
+
+        # External AI connection: plain URLs from the step above; the credential key only as a Secret Manager reference.
+        # When the variable is unset an existing secret binding persists (--update-secrets is not a full replacement).
+        EXTERNAL_AI_ENV=()
+        if [ -s "$RUNNER_TEMP/external-ai-env" ]; then mapfile -d '' EXTERNAL_AI_ENV < "$RUNNER_TEMP/external-ai-env"; fi
+        if [ -n "$EXTERNAL_AI_SECRET_RESOURCE" ]; then
+          [[ "$EXTERNAL_AI_SECRET_RESOURCE" =~ ^[[:alnum:]_-]+$ ]] || { echo 'Invalid external AI Secret Manager resource name'; exit 1; }
+          gcloud secrets describe "$EXTERNAL_AI_SECRET_RESOURCE" --project=${{ env.PROJECT_ID }} --format='value(name)' >/dev/null
+          EXTERNAL_AI_ENV+=("--update-secrets=EXTERNAL_AI_CREDENTIAL_KEY=$EXTERNAL_AI_SECRET_RESOURCE:latest")
+        fi
 
         # WO-NETURE-PHARMACY-PAYMENT-MODE-WORKFLOW-V1 — Neture 약국 결제 모드는 저장소 variable 로만 관리한다(carry 없음 —
         #   콘솔 값이 남지 않게). 'test' 또는 미설정만 허용. 미설정 → 주입 안 함 → 코드 기본 disabled(503 PAYMENT_NOT_CONFIGURED).
@@ -712,6 +741,7 @@ jobs:
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           "${KAKAO_ENV[@]}" \
           "${OPTIONAL_ENV[@]}" \
+          "${EXTERNAL_AI_ENV[@]}" \
           "${PAYMENT_ENV[@]}" \
           "${ROLLOUT_ARGS[@]}" \
           --update-labels="o4o-commit-sha=${{ github.sha }}" \

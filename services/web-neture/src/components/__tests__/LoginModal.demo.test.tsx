@@ -46,6 +46,7 @@ function mount(onClose = vi.fn(), returnUrl?: string) {
         <Route path="/" element={<LoginModal isOpen onClose={onClose} returnUrl={returnUrl} />} />
         <Route path="/supplier/dashboard" element={<div data-testid="supplier-dashboard" />} />
         <Route path="/carepharm-return" element={<div data-testid="carepharm-return" />} />
+        <Route path="/external-ai/connect" element={<div data-testid="external-ai-consent" />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -107,6 +108,26 @@ describe('LoginModal — 체험하기', () => {
     expect(screen.queryByTestId('supplier-dashboard')).toBeNull();
     expect(assign).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('외부 AI 연결 동의 화면에서 매장 경영자 Demo → 매장 handoff 대신 동의 화면으로 복귀', async () => {
+    loginWithEmail.mockResolvedValue({ success: true, user: { id: 'o1' } });
+    resolveSingleStoreWorkspaceUrl.mockResolvedValue('https://pharmacy.example.test/auth/handoff?code=x');
+    const onClose = mount(vi.fn(), '/external-ai/connect?request=fixture');
+    fireEvent.click(screen.getByRole('button', { name: '매장 경영자 Demo 체험' }));
+    await waitFor(() => expect(screen.getByTestId('external-ai-consent')).toBeTruthy());
+    expect(resolveSingleStoreWorkspaceUrl).not.toHaveBeenCalled();
+    expect(assign).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+    expect(sessionStorage.getItem('neture_login_explicit_nav')).toBe('1');
+  });
+
+  it('공급자 Demo 도 returnUrl 이 있으면 그 화면으로 복귀(역할 착지보다 우선)', async () => {
+    loginWithEmail.mockResolvedValue({ success: true, user: { id: 's1' } });
+    mount(vi.fn(), '/external-ai/connect?request=fixture');
+    fireEvent.click(screen.getByRole('button', { name: '공급자 Demo 체험' }));
+    await waitFor(() => expect(screen.getByTestId('external-ai-consent')).toBeTruthy());
+    expect(screen.queryByTestId('supplier-dashboard')).toBeNull();
   });
 
   it('매장 경영자 Demo → 로그인 → 같은 handoff URL 로 이동', async () => {

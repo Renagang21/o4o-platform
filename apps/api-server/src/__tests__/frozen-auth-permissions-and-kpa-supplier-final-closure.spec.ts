@@ -90,11 +90,13 @@ describe('WO-O4O-FROZEN-AUTH-PERMISSIONS-DB-AND-KPA-SUPPLIER-ENDPOINT-FINAL-CLOS
   describe('C축 — /kpa/supplier/* canonical 면은 은퇴되지 않는다', () => {
     const routes = () => read('routes', 'kpa', 'kpa.routes.ts');
 
-    it('3 endpoint 마운트가 유지된다', () => {
+    // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a: 소비처 0 인 3 endpoint 는 제거됐다
+    //   (공급자 콘텐츠 제출은 Neture 자료함 handoff → supplier-content.service 경로가 담당).
+    it('소비처 0 인 3 endpoint 마운트는 제거됐다', () => {
       const src = routes();
-      expect(src).toContain(`'/supplier/content-submissions'`);
-      expect(src).toContain(`'/supplier/signage/campaign-requests'`);
-      expect(src).toContain(`'/supplier/signage'`);
+      expect(src).not.toContain(`router.use('/supplier/content-submissions'`);
+      expect(src).not.toContain(`router.use('/supplier/signage/campaign-requests'`);
+      expect(src).not.toContain(`router.use('/supplier/signage',`);
     });
 
     it('web-neture 가 소비하는 supplier 면도 유지된다 (은퇴 오판 방지)', () => {

@@ -10,6 +10,7 @@ import {
 } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 import { CompletionService } from './CompletionService.js';
+import { keepCertificateLink } from './certificate-operation.service.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
 import { CourseService } from './CourseService.js';
 // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: reward 는 정책 설정 시에만 지급
@@ -370,6 +371,8 @@ export class AssignmentService {
           error: (err as Error).message,
         });
       }
+      // The chain linked the issued certificate; the save below must not write the stale null back.
+      await keepCertificateLink(AppDataSource, enrollment);
 
       // course_complete reward (정책 설정 시에만, path-independent — D1 해소)
       const courseCompleteAmount = resolveRewardAmount('course_complete', { course: assignmentCourse });

@@ -12,7 +12,7 @@
  *   - 미입력/형식 오류 client 검증 + 서버 검증 이중.
  */
 
-import { type CSSProperties, useId, useState } from 'react';
+import { type CSSProperties, useState, useRef, useId } from 'react';
 
 export interface ContactInquiryPayload {
   inquiryType: string;
@@ -71,7 +71,7 @@ export function PublicContactForm({
   completionNotice,
   theme,
 }: PublicContactFormProps) {
-  const formId = useId();
+  const id = useId();
   const accent = theme?.accent || '#0f172a';
   const [form, setForm] = useState({
     inquiryType: inquiryTypes[0]?.value ?? 'other',
@@ -85,6 +85,7 @@ export function PublicContactForm({
     company_website: '', // honeypot
   });
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -103,9 +104,10 @@ export function PublicContactForm({
   const [receiptId, setReceiptId] = useState<string | undefined>();
 
   async function handleSubmit() {
-    if (submitting) return;
+    if (submittingRef.current) return;
     const v = validate();
     if (v) { setError(v); return; }
+    submittingRef.current = true;
     setSubmitting(true);
     setError(null);
     try {
@@ -126,6 +128,7 @@ export function PublicContactForm({
     } catch (err: any) {
       setError(err?.message || '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -147,42 +150,42 @@ export function PublicContactForm({
       {error && <div role="alert" style={S.error}>{error}</div>}
 
       <div style={S.field}>
-        <label style={S.label} htmlFor={`${formId}-inquiryType`}>문의 유형</label>
-        <select style={S.input} id={`${formId}-inquiryType`} value={form.inquiryType} onChange={(e) => set('inquiryType', e.target.value)}>
+        <label htmlFor={`${id}-inquiryType`} style={S.label}>문의 유형</label>
+        <select style={S.input} id={`${id}-inquiryType`} disabled={submitting} value={form.inquiryType} onChange={(e) => set('inquiryType', e.target.value)}>
           {inquiryTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
       </div>
 
       <div style={S.row}>
         <div style={{ ...S.field, flex: 1 }}>
-          <label style={S.label} htmlFor={`${formId}-name`}>이름 *</label>
-          <input style={S.input} id={`${formId}-name`} value={form.name} onChange={(e) => set('name', e.target.value)} />
+          <label htmlFor={`${id}-name`} style={S.label}>이름 *</label>
+          <input style={S.input} id={`${id}-name`} disabled={submitting} value={form.name} onChange={(e) => set('name', e.target.value)} />
         </div>
         <div style={{ ...S.field, flex: 1 }}>
-          <label style={S.label} htmlFor={`${formId}-email`}>이메일 *</label>
-          <input style={S.input} type="email" id={`${formId}-email`} value={form.email} onChange={(e) => set('email', e.target.value)} />
+          <label htmlFor={`${id}-email`} style={S.label}>이메일 *</label>
+          <input style={S.input} type="email" id={`${id}-email`} disabled={submitting} value={form.email} onChange={(e) => set('email', e.target.value)} />
         </div>
       </div>
 
       <div style={S.row}>
         <div style={{ ...S.field, flex: 1 }}>
-          <label style={S.label} htmlFor={`${formId}-phone`}>연락처</label>
-          <input style={S.input} id={`${formId}-phone`} value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="010-0000-0000" />
+          <label htmlFor={`${id}-phone`} style={S.label}>연락처</label>
+          <input style={S.input} id={`${id}-phone`} disabled={submitting} value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="010-0000-0000" />
         </div>
         <div style={{ ...S.field, flex: 1 }}>
-          <label style={S.label} htmlFor={`${formId}-organizationName`}>{organizationLabel}</label>
-          <input style={S.input} id={`${formId}-organizationName`} value={form.organizationName} onChange={(e) => set('organizationName', e.target.value)} />
+          <label htmlFor={`${id}-organizationName`} style={S.label}>{organizationLabel}</label>
+          <input style={S.input} id={`${id}-organizationName`} disabled={submitting} value={form.organizationName} onChange={(e) => set('organizationName', e.target.value)} />
         </div>
       </div>
 
       <div style={S.field}>
-        <label style={S.label} htmlFor={`${formId}-subject`}>제목 *</label>
-        <input style={S.input} id={`${formId}-subject`} value={form.subject} onChange={(e) => set('subject', e.target.value)} />
+        <label htmlFor={`${id}-subject`} style={S.label}>제목 *</label>
+        <input style={S.input} id={`${id}-subject`} disabled={submitting} value={form.subject} onChange={(e) => set('subject', e.target.value)} />
       </div>
 
       <div style={S.field}>
-        <label style={S.label} htmlFor={`${formId}-message`}>문의 내용 *</label>
-        <textarea style={S.textarea} id={`${formId}-message`} value={form.message} onChange={(e) => set('message', e.target.value)} />
+        <label htmlFor={`${id}-message`} style={S.label}>문의 내용 *</label>
+        <textarea style={S.textarea} id={`${id}-message`} disabled={submitting} value={form.message} onChange={(e) => set('message', e.target.value)} />
       </div>
 
       {/* honeypot — 사용자 비표시 */}

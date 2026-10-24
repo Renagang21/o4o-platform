@@ -100,7 +100,7 @@ export class AuthAccountController extends BaseController {
 
       // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
       // pharmacistQualification, activityType, kpaMembership는
-      // 프론트엔드에서 GET /api/v1/kpa/me-context로 별도 조회
+      // 는 응답에 싣지 않는다(옛 GET /api/v1/kpa/me-context 는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 제거)
 
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       const ud = userData as Record<string, unknown>;
@@ -327,7 +327,7 @@ export class AuthAccountController extends BaseController {
 
       // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
       // pharmacistQualification, activityType, kpaMembership는
-      // 프론트엔드에서 GET /api/v1/kpa/me-context로 별도 조회
+      // 는 응답에 싣지 않는다(옛 GET /api/v1/kpa/me-context 는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 제거)
 
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       const ud = userData as Record<string, unknown>;

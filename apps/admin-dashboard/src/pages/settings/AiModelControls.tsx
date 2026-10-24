@@ -122,6 +122,7 @@ export function AiModelCatalog({
     previous?: ManagedAiModel;
     revision: number;
   } | null>(null);
+  const [deleting, setDeleting] = useState<ManagedAiModel | null>(null);
   const data = control.data;
   return (
     <div className="space-y-4">
@@ -228,16 +229,18 @@ export function AiModelCatalog({
                           </button>
                           <button
                             className={button + " text-red-700"}
-                            disabled={
-                              protectedModel || control.busy || control.loading
-                            }
+                            disabled={control.busy || control.loading}
                             aria-label={model.id + " 삭제"}
                             title={
                               protectedModel
-                                ? "사용 설정 또는 코드 기본 모델은 먼저 사용 관계를 정리해야 합니다."
+                                ? "삭제를 위해 변경할 사용처와 설정을 확인합니다."
                                 : undefined
                             }
                             onClick={() => {
+                              if (protectedModel) {
+                                setDeleting(model);
+                                return;
+                              }
                               if (
                                 !window.confirm(
                                   provider.name +
@@ -267,6 +270,13 @@ export function AiModelCatalog({
           </article>
         );
       })}
+      {deleting && data && (
+        <ModelDeletionDialog
+          model={deleting}
+          control={control}
+          onClose={() => setDeleting(null)}
+        />
+      )}
       {editing && data && (
         <ModelDialog
           initial={editing.previous}
@@ -295,6 +305,138 @@ export function AiModelCatalog({
         />
       )}
     </div>
+  );
+}
+function ModelDeletionDialog({
+  model,
+  control,
+  onClose,
+}: {
+  model: ManagedAiModel;
+  control: ModelController;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const data = control.data!;
+  const key = model.provider + ":" + model.id;
+  const protectedModel = data.protectedModels.includes(key);
+  const references = data.modelReferences[key] ?? [];
+  const targetIds = [
+    ...new Set(references.flatMap((x) => (x.target ? [x.target] : []))),
+  ];
+  useEffect(() => {
+    const dialog = ref.current;
+    const previous = document.activeElement;
+    if (dialog?.showModal) dialog.showModal();
+    else dialog?.setAttribute("open", "");
+    return () => {
+      dialog?.close?.();
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus();
+    };
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      aria-label="모델 삭제 설정"
+      className="fixed inset-0 max-h-[90vh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-xl p-5 backdrop:bg-black/40"
+      onCancel={(event) => {
+        event.preventDefault();
+        if (!control.busy) onClose();
+      }}
+    >
+      <h3 className="break-all text-lg font-semibold">
+        모델 삭제 · {model.name}
+      </h3>
+      <p className="my-3 text-sm">
+        이 모델을 사용하는 곳에 다른 모델을 지정하고 저장해 주세요. 모든 사용
+        관계가 해제되면 삭제할 수 있습니다. 다른 호환 모델이 없다면 먼저 모델을
+        등록해 주세요.
+      </p>
+      {references.some((x) => x.kind === "policy") && (
+        <div className="my-3 text-sm text-amber-800">
+          <ul className="mb-2 list-inside list-disc">
+            {[
+              ...new Set(
+                references
+                  .filter((x) => x.kind === "policy")
+                  .map((x) => x.label),
+              ),
+            ].map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
+          기존 공통·범위·연결 정책 또는 장애 시 대체 모델에도 등록돼 있습니다.
+          아래 사용처가 기존 정책을 따르는 경우 다른 모델을 지정해 해제할 수
+          있습니다. 별도 사용처가 없는 연결·범위 정책은 해당 설정에서 변경해야
+          합니다. 사용 중지된 정책도 포함하며 자동으로 바꾸지 않습니다.
+        </div>
+      )}
+      {references.some((x) => x.kind === "runtime") && (
+        <p className="my-3 text-sm text-amber-800">
+          공통 기본 실행 경로 또는 서버 환경 설정에서 필요한 모델입니다. 이
+          화면의 사용처 지정만으로 삭제할 수 없으며 해당 실행 설정의 변경이
+          필요합니다.
+        </p>
+      )}
+      {targetIds.map((id) => {
+        const target = data.targets.find((x) => x.id === id);
+        return (
+          target && (
+            <SelectionForm
+              key={id + ":" + data.revision}
+              target={target}
+              control={control}
+            />
+          )
+        );
+      })}
+      {protectedModel && !references.length && (
+        <p className="my-3 text-sm text-amber-800">
+          기존 설정에서 보호하는 모델입니다. 최신 모델 설정을 다시 불러와 사용
+          관계를 확인해 주세요.
+        </p>
+      )}
+      {!protectedModel && (
+        <p role="status" className="my-3 text-sm">
+          사용 관계가 해제됐습니다. 모델을 삭제할 수 있습니다.
+        </p>
+      )}
+      <p className="my-3 text-sm text-gray-600">
+        과거 사용량과 이미 생성된 결과는 유지됩니다.
+      </p>
+      {control.error && (
+        <p role="alert" className="my-3 text-sm text-red-700">
+          {control.error}
+        </p>
+      )}
+      <div className="mt-4 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          className={button}
+          disabled={control.busy}
+          onClick={onClose}
+        >
+          닫기
+        </button>
+        <button
+          type="button"
+          className={button + " text-red-700"}
+          disabled={protectedModel || control.busy || control.loading}
+          onClick={async () => {
+            if (
+              await control.run(
+                () => deleteAiModel(model, data.revision),
+                "모델을 삭제했습니다.",
+              )
+            )
+              onClose();
+          }}
+        >
+          모델 삭제
+        </button>
+      </div>
+    </dialog>
   );
 }
 function ModelDialog({
@@ -547,8 +689,9 @@ function SelectionForm({
       )}
       <p className="text-sm text-gray-600">
         진행 중인 요청과 이미 생성된 결과는 바뀌지 않습니다. 과금 경로는 기존
-        가격·한도 검사를 통과해야 실행됩니다. 기존 재시도·장애 시 대체 모델
-        정책은 유지됩니다.
+        가격·한도 검사를 통과해야 실행됩니다. 관리자 지정이 있으면 이전 정책의
+        대체 모델로 자동 복귀하지 않습니다. 같은 모델의 재시도 제한은
+        유지됩니다.
       </p>
       <button
         type="submit"

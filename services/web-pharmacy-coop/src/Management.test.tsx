@@ -11,6 +11,7 @@ import {
   FederationManagementPanel,
   MemberManagementPanel,
   RoleManagement,
+  MembershipApplication,
 } from "./Management";
 const coop = {
   id: "c",
@@ -47,6 +48,28 @@ function client() {
   };
 }
 afterEach(cleanup);
+it('requires the cooperative own policy pair and submits only those current references', async () => {
+  const api = client();
+  const policyScope = 'business:11111111-1111-4111-8111-111111111111';
+  const policies = ['terms', 'privacy'].map((documentType, i) => ({ serviceKey: policyScope, documentType, policyDocumentId: `22222222-2222-4222-8222-22222222222${i}`, version: 1, title: documentType, content: 'Synthetic policy' }));
+  api.get.mockResolvedValue({ data: { data: policies } } as any);
+  render(<MembershipApplication client={api} coop="c" businessKey="coop-one" policyScope={policyScope} />);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '가입 자격 확인' } });
+  expect((screen.getByRole('button', { name: '가입·보완 신청' }) as HTMLButtonElement).disabled).toBe(true);
+  await screen.findByText('privacy · 버전 1');
+  for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
+  fireEvent.click(screen.getByRole('button', { name: '가입·보완 신청' }));
+  await screen.findByText('가입 신청을 접수했습니다.');
+  expect(api.post).toHaveBeenCalledWith('/neture/cooperative-management/c/applications', { reason: '가입 자격 확인', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })) });
+  expect(api.get).toHaveBeenCalledWith('/neture/businesses/coop-one/legal/enrollment-policies');
+});
+it('keeps an unconfigured cooperative application disabled instead of substituting Neture policies', async () => {
+  const api = client();
+  render(<MembershipApplication client={api} coop="c" />);
+  await screen.findByRole('alert');
+  expect(api.get).not.toHaveBeenCalled();
+  expect((screen.getByRole('button', { name: '가입·보완 신청' }) as HTMLButtonElement).disabled).toBe(true);
+});
 describe("scoped administration work", () => {
   it("operator sends a review request without exposing final decisions or role assignment", async () => {
     const api = client();

@@ -1,7 +1,7 @@
 # AI 모델 관리 및 사용 모델 지정 검증
 
 > **상태**: ACTIVE — 운영 배포·검증 완료, 정리 전 snapshot; 최종 실행 기록은 아래 링크 참조
-> **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
+> **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
 > **근거 WO/IR**: [모델 관리 TODO](../work-orders/TODO-O4O-AI-MODEL-MANAGEMENT-V1.md)
 > **관련 정본**: [AI 공통 기반 §12](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#12-관리자-ai-운영-조회-기반--main운영-반영-2026-10-20)
 
@@ -163,3 +163,18 @@ Chromium desktop1280×800/mobile390×844에서 settings·AI settings·operators�
 같은 WO의 기존 branch를 main으로 fast-forward한 뒤 이 종료 문서·TODO·정본 현황만 보완한다. 이 절은 문서 병합·실제 worktree 정리 전 snapshot이다. 일회성 테스트 DB/컨테이너 잔존 0은 이미 확인했으나 현재 branch/worktree를 아직 삭제하지 않았다. 문서 CI/Codex·main 통합·post-merge/NO_DEPLOY 확인 후 자기 worktree와 main 포함 branch만 정상 절차로 정리하며, 최종 결과는 [정리 실행 기록](https://github.com/Renagang21/o4o-platform/pull/754#issuecomment-6314873874)에 갱신한다.
 
 문서 정합: 모델 관리의 개발 단계/실제 배포를 구분하고 quota rollback 실패의 후속 해소·리뷰 보완·운영 한계를 기록했다. 새 canonical index 등록이나 범위 밖 정책 변경은 하지 않았다.
+
+## 종료 문서 재정합 — 2026-10-24
+
+사용자의 미병합 PR 정리 지시에 따라 기존 PR #755와 같은 branch를 계속 사용한다. 원격 이력을 재작성하지 않고 main `fd559d061973a4e49d9a2fb521f01f5c6d12cd63`을 merge했다. 유일한 충돌인 공통 기반 문서에서 #754의 2026-10-21 배포 기록과 #792의 2026-10-24 보완을 모두 보존했다. 이 동기화에 들어온 application 변경은 이미 main의 내용이며, 이번 PR의 차이는 문서 3개뿐이다.
+
+| 항목 | 현재 구분 |
+| --- | --- |
+| 모델 CRUD·사용처 선택·revision CAS·삭제 표식·공통 transaction lock | #754에서 main·운영 반영. 앞 배포 SHA와 revision은 당시 검증 증거 |
+| 사용처별 선택 우선·매장/상담 번역의 모델 선택 분리·삭제 사유 표시 | #792에서 main·운영 반영. 번역 활성·quota scope의 독립 정책까지 완료한 것은 아님 |
+| 뉴스처럼 공통 질의 정책을 직접 사용하는 경로 | 별도 managed target으로 연결하지 않음. 공통 정책 모델 참조를 유지해 삭제를 막고 명시적 정책 변경 뒤 해제 |
+| 통합 중지 admission·모든 직접 transport/멀티모달의 비용 이관·전문 OCR/STT | 별도 후속. 30/31 연결 수치를 플랫폼 전체 호출의 완전한 목록이나 비용/중지 완료로 사용하지 않음 |
+
+#792의 merge SHA는 `c99123518fe74099b9f471f06cdd90bf7c5709de`이며, 이후 문서 변경을 포함한 `abb602b9569217abf2e20de155e2f60210da5d50`의 [Delivery 40074053472](https://github.com/Renagang21/o4o-platform/actions/runs/40074053472)가 API·관리자 배포와 serving SHA 검증을 성공해 `production=success / DEPLOYED`로 확정했다. #754의 과거 배포 기록을 이 최신 배포 증거로 덮어쓰지 않는다. 이번 문서 정리에서는 운영 API/DB/모델 설정이나 유료 공급자를 호출하지 않았다.
+
+문서 CI·최신 HEAD Codex·main 통합·post-merge/NO_DEPLOY의 실제 결과는 [PR #755](https://github.com/Renagang21/o4o-platform/pull/755)에 기록한다. 이전 환경·PC의 worktree 정리는 소유자와 보존 파일을 확인하기 전 완료 처리하지 않는다. 이 창에서 만든 작업용 checkout과 다른 PC의 자원을 구분한다. DEPLOYMENT=NOT_APPLICABLE.

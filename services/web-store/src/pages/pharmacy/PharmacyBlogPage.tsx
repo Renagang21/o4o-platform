@@ -40,7 +40,6 @@ import { Send, Archive as ArchiveIcon, Trash2 } from 'lucide-react';
 // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
 //   editor / settings 화면 본체는 3서비스 공통 Core 를 소비한다(목록은 KPA 전용 DataTable + 일괄 실행 모델 유지).
 import {
-  GuideBackLink,
   StoreBlogEditorPanel,
   StoreBlogSettingsPanel,
   storeBlogBtnStyle,
@@ -535,7 +534,6 @@ function BlogSession({ service, isCurrent }: { service?: string; isCurrent: () =
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
             매장 블로그 게시글을 관리합니다.
           </p>
-          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/blog" label="블로그 작성 방법" /></div>
         </div>
         {/* WO-O4O-KPA-STORE-BLOG-META-V1: 블로그 설정 진입 */}
         {/* WO-O4O-STORE-CREATION-CTA-EMPTY-STATE-FIX-V1: "블로그 글 만들기" CTA 복원 */}

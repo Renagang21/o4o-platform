@@ -1,15 +1,14 @@
 /**
- * ServiceJoinService — Google-only 시대의 서비스 가입 write-path SSOT
+ * ServiceJoinService — 인증된 공통 계정의 서비스 가입 write-path
  *
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
  *
  * 전환 전: 서비스 가입 = `AuthRegisterController.register`
  *   (email + password 로 users 를 만들고 service_memberships + service_credentials 를 함께 생성)
- * 전환 후: 서비스 가입 = **이미 Google 로 인증된 users.id 에 membership 을 다는 일**
+ * 전환 후: 서비스 가입 = **인증된 users.id 에 membership 을 다는 일**
  *
  * 따라서 이 경로는
- *   - users 를 만들지 않는다 (신규 계정은 `POST /auth/google/signup` 하나뿐이다)
- *   - credential 을 만들지 않는다 (password 축이 없다)
+ *   - users 나 로그인 credential 을 만들지 않는다 (Google/이메일/카카오 인증과 분리)
  *   - email 로 사용자를 찾지 않는다 (Identity Key 는 session 의 users.id 다)
  *   - status 는 항상 'pending' 이다 (운영자 승인 전 active 금지)
  *
@@ -58,37 +57,39 @@ export class ServiceJoinService {
    */
   static async apply(input: ServiceJoinInput): Promise<ServiceJoinResult> {
     const { userId, serviceKey, role } = input;
-
-    const existing: { id: string; status: string }[] = await AppDataSource.query(
-      `SELECT id, status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-      [userId, serviceKey],
-    );
-
-    if (existing.length > 0) {
+    // CORE_CHANGE: TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1.
+    // The unique key handles first-application races; the row lock shares approval's
+    // serialization boundary. Never write from a pre-approval status snapshot.
+    const result: ServiceJoinResult = await AppDataSource.transaction(async manager => {
+      const inserted: { id: string }[] = await manager.query(
+        `INSERT INTO service_memberships (user_id, service_key, status, role, created_at, updated_at)
+         VALUES ($1, $2, 'pending', $3, NOW(), NOW())
+         ON CONFLICT (user_id, service_key) DO NOTHING RETURNING id`, [userId, serviceKey, role],
+      );
+      if (inserted.length) return { outcome: 'created', status: 'pending' };
+      const existing: { id: string; status: ExistingMembershipStatus }[] = await manager.query(
+        `SELECT id, status FROM service_memberships
+          WHERE user_id = $1 AND service_key = $2 FOR UPDATE`, [userId, serviceKey],
+      );
       const current = existing[0];
+      if (!current) throw new Error('Service membership changed during application; retry required');
       if (!REAPPLIABLE.has(current.status)) {
-        return { outcome: 'duplicate', status: current.status as ExistingMembershipStatus };
+        return { outcome: 'duplicate', status: current.status };
       }
       // rejected / suspended → pending 재신청. active 직접 전환은 금지다.
-      await AppDataSource.query(
+      await manager.query(
         `UPDATE service_memberships
             SET status = 'pending', role = $2, updated_at = NOW()
           WHERE id = $1`,
         [current.id, role],
       );
-      await ServiceJoinService.fillMissingProfile(input);
-      logger.info('[ServiceJoin] membership reapplied', { serviceKey, role });
       return { outcome: 'reapplied', status: 'pending' };
+    });
+    if (result.outcome !== 'duplicate') {
+      await ServiceJoinService.fillMissingProfile(input);
+      logger.info('[ServiceJoin] membership application saved', { serviceKey, role, outcome: result.outcome });
     }
-
-    await AppDataSource.query(
-      `INSERT INTO service_memberships (user_id, service_key, status, role, created_at, updated_at)
-       VALUES ($1, $2, 'pending', $3, NOW(), NOW())`,
-      [userId, serviceKey, role],
-    );
-    await ServiceJoinService.fillMissingProfile(input);
-    logger.info('[ServiceJoin] membership created', { serviceKey, role });
-    return { outcome: 'created', status: 'pending' };
+    return result;
   }
 
   /**

@@ -87,6 +87,11 @@ function makeHarness(
       return hit ? [{ demo_type: 'STORE_OWNER' }] : [];
     }
     if (s.startsWith('SELECT id FROM users WHERE id = $1 FOR UPDATE')) return store.users.filter((u) => u.id === p[0]).map((u) => ({ id: u.id }));
+    if (s.startsWith('SELECT email, "refreshTokenFamily"')) return store.users.filter(u => u.id === p[0]).map(u => ({
+      email: u.email, token_family: u.refreshTokenFamily ?? null, email_verified: u.isEmailVerified,
+      account_active: u.isActive, status: u.status,
+    }));
+    if (s.startsWith('SELECT user_id FROM')) return tokenTable(s).filter(r => r.token_hash === p[0] && live(r)).map(r => ({ user_id: r.user_id }));
     if (s.startsWith('SELECT id FROM users WHERE lower(email)')) {
       return store.users.filter((u) => u.email.toLowerCase() === p[0]).slice(0, 2).map((u) => ({ id: u.id }));
     }
@@ -98,21 +103,29 @@ function makeHarness(
     }
     if (s.startsWith('DELETE FROM')) {
       const t = tokenTable(s);
-      const keep = t.filter((r) => !(r.user_id === p[0] && (r.consumed_at != null || r.expires_at < nowRef.t)));
+      const keep = t.filter(r => !(s.includes('WHERE token_hash')
+        ? r.token_hash === p[0] && r.consumed_at != null
+        : r.user_id === p[0] && r.expires_at < nowRef.t));
       t.splice(0, t.length, ...keep);
       return [];
     }
     if (s.includes('SET consumed_at = now() WHERE user_id')) {
-      tokenTable(s).filter((r) => r.user_id === p[0] && r.consumed_at == null).forEach((r) => (r.consumed_at = nowRef.t));
+      tokenTable(s).filter(r => r.user_id === p[0] && r.consumed_at == null && (!s.includes('token_hash <>') || r.token_hash !== p[1])).forEach(r => (r.consumed_at = nowRef.t));
       return [];
     }
     if (s.startsWith('INSERT INTO email_verification_tokens')) {
-      store.evt.push({ user_id: p[0], email: p[1], token_hash: p[2], expires_at: p[3], consumed_at: null });
+      store.evt.push({ user_id: p[0], email: p[1], token_hash: p[2], expires_at: p[3], consumed_at: nowRef.t });
       return [];
     }
     if (s.startsWith('INSERT INTO password_reset_tokens')) {
-      store.prt.push({ user_id: p[0], token_hash: p[1], expires_at: p[2], consumed_at: null });
+      store.prt.push({ user_id: p[0], token_hash: p[1], expires_at: p[2], consumed_at: nowRef.t });
       return [];
+    }
+    if (s.includes('SET consumed_at = NULL')) {
+      const hit = tokenTable(s).find(r => r.token_hash === p[0] && r.consumed_at != null && r.expires_at > nowRef.t);
+      if (!hit) return [[], 0];
+      hit.consumed_at = null;
+      return [[{ user_id: hit.user_id }], 1];
     }
     if (s.includes('WHERE token_hash = $1')) {
       const t = tokenTable(s);
@@ -230,6 +243,8 @@ function makeHarness(
 
   return {
     service,
+    dataSource,
+    manager,
     get store() {
       return store;
     },
@@ -242,6 +257,11 @@ function makeHarness(
     nowRef,
     lastLinkToken,
     semiFranchiseResolver,
+    seedToken(userId: string) {
+      const plain = `synthetic-reset-link-${uuid()}`;
+      store.prt.push({ user_id: userId, token_hash: hashToken(plain), expires_at: new Date(nowRef.t.getTime() + 1800000), consumed_at: null });
+      return plain;
+    },
     addUser(u: Partial<Row>) {
       const row = Object.assign(new User(), {
         id: uuid(),
@@ -276,6 +296,62 @@ describe('EmailAuthService', () => {
   beforeAll(() => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-email-auth';
     process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-jwt-refresh-secret-email-auth';
+  });
+
+  describe('token lifecycle hardening', () => {
+    it('changing a password invalidates every preexisting reset link', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const user = h.store.users[0];
+      user.isEmailVerified = true;
+      await h.service.requestPasswordReset(user.email, META);
+      const oldToken = h.lastLinkToken('/reset-password');
+      await h.service.setPasswordForUser(user.id, { currentPassword: GOOD_PW, newPassword: 'changed123!' });
+      await expectCode(h.service.resetPassword(oldToken, 'reset1234!'), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(await h.passwords.verifyPassword(user.id, 'changed123!')).toBe(true);
+    });
+
+    it('a successful reset invalidates other outstanding reset links for that user', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const user = h.store.users[0];
+      await h.service.requestPasswordReset(user.email, META);
+      const token = h.lastLinkToken('/reset-password');
+      const sibling = 'synthetic-sibling-reset-token-with-enough-entropy';
+      h.store.prt.push({ user_id: user.id, token_hash: hashToken(sibling), expires_at: new Date(h.nowRef.t.getTime() + 60000), consumed_at: null });
+      await h.service.resetPassword(token, 'reset1234!');
+      await expectCode(h.service.resetPassword(sibling, 'again1234!'), 'INVALID_OR_EXPIRED_TOKEN');
+    });
+
+    it('a failed verification mail leaves the previously delivered link usable', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      h.mailer.sendEmail.mockResolvedValueOnce({ success: false });
+      await h.service.resendVerification(h.store.users[0].email, META);
+      await expect(h.service.verifyEmail(token)).resolves.toHaveProperty('maskedEmail');
+    });
+
+    it('a failed verification write rolls token consumption back so the link can be retried', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      const original = h.dataSource.getRepository;
+      let fail = true;
+      jest.spyOn(h.manager, 'getRepository').mockImplementation((entity: any) => {
+        const repo = original(entity);
+        if (entity === User) {
+          const update = repo.update;
+          repo.update = jest.fn(async (...args: any[]) => {
+            if (fail) { fail = false; throw new Error('synthetic verification write failure'); }
+            return (update as any)(...args);
+          });
+        }
+        return repo;
+      });
+      await expect(h.service.verifyEmail(token)).rejects.toThrow('synthetic verification write failure');
+      await expect(h.service.verifyEmail(token)).resolves.toHaveProperty('maskedEmail');
+    });
   });
 
   describe('V1 가입', () => {
@@ -496,7 +572,7 @@ describe('EmailAuthService', () => {
       await h2.service.requestPasswordReset('admin@example.com', META);
       expect(h2.mails).toHaveLength(0);
       expect(h2.store.prt).toHaveLength(0);
-      const token: string = await (h2.service as any).issueToken('reset', admin.id, 30 * 60 * 1000);
+      const token = h2.seedToken(admin.id);
       await expectCode(h2.service.resetPassword(token, 'newpass99$'), 'PASSWORD_SESSION_NOT_ALLOWED');
       expect(h2.store.creds.get(admin.id)).toBe('fakehash:x');
       expect(h2.revoked).toEqual([]);
@@ -700,7 +776,7 @@ describe('EmailAuthService', () => {
       const h = makeHarness();
       const g = h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
       // 정책 변경 전에 발급된 토큰 등 — forgot 을 거치지 않은 토큰을 직접 만든다
-      const token: string = await (h.service as any).issueToken('reset', g.id, 30 * 60 * 1000);
+      const token = h.seedToken(g.id);
       await expectCode(h.service.resetPassword(token, 'newpass99$'), 'INVALID_OR_EXPIRED_TOKEN');
       expect(h.store.creds.size).toBe(0);
       expect(h.revoked).toEqual([]);

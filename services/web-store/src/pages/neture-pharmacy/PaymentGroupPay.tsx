@@ -11,8 +11,9 @@
  * 서버가 거부하면 성공으로 보이지 않는다(오류 문구를 그대로 보여준다).
  */
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type PaymentMode } from '../../api/neturePharmacy';
-import { btn, formatWon } from './shared';
+import { btn, formatWon, pharmacyStorePath } from './shared';
 
 const UNAVAILABLE_TEXT: Record<string, string> = {
   PAYMENT_NOT_CONFIGURED: '결제가 아직 설정되지 않아 결제할 수 없습니다.',
@@ -55,6 +56,7 @@ export function PaymentGroupPay({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [supplyUnavailable, setSupplyUnavailable] = useState(false);
   const [paid, setPaid] = useState<{ testPayment: boolean } | null>(null);
 
   const unavailable = paymentUnavailableText(mode);
@@ -64,6 +66,7 @@ export function PaymentGroupPay({
     if (!window.confirm(`테스트 결제를 진행합니다. 실제 결제가 아니며 공급자 지급 · 정산 근거가 아닙니다.\n결제 금액 ${formatWon(amount)}`)) return;
     setBusy(true);
     setError(null);
+    setSupplyUnavailable(false);
     try {
       const prepared = await neturePharmacyApi.preparePayment(paymentGroupId);
       const confirmed = await neturePharmacyApi.confirmPayment(prepared.paymentId, paymentGroupId);
@@ -72,6 +75,7 @@ export function PaymentGroupPay({
       onPaid?.();
     } catch (e) {
       const code = pharmacyErrorCode(e);
+      setSupplyUnavailable(code === 'PAYMENT_SUPPLY_NOT_AVAILABLE');
       setError((code && UNAVAILABLE_TEXT[code]) || pharmacyErrorMessage(e, '결제를 처리하지 못했습니다.'));
     } finally {
       setBusy(false);
@@ -94,6 +98,11 @@ export function PaymentGroupPay({
         {busy ? '결제 처리 중...' : `테스트 결제 (실제 결제 아님) · ${formatWon(amount)}`}
       </button>
       {error && <p className="mt-1 text-xs text-red-600" role="alert">{error}</p>}
+      {supplyUnavailable && <div className="mt-2 flex flex-wrap gap-3 text-sm">
+        <Link className="underline" to={pharmacyStorePath('semiFranchises')}>협업체 가입 상태 확인</Link>
+        <Link className="underline" to={pharmacyStorePath('supply')}>현재 공급제품 확인</Link>
+        <p className="w-full text-slate-600">기존 미결제 주문은 주문 내역에서 취소할 수 있습니다.</p>
+      </div>}
     </div>
   );
 }

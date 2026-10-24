@@ -95,7 +95,7 @@ export class Cafe24ConnectionService {
     assertTokenEncryptionConfigured();
 
     const mallId = token.mall_id || opts.mallId;
-    const shopNo = opts.shopNo ?? Number(token.shop_no ?? 1) ?? 1;
+    const shopNo = opts.shopNo ?? Number(token.shop_no ?? 1);
 
     const existing = await this.findByMall(mallId, shopNo);
     const patch: Partial<Cafe24Connection> = {

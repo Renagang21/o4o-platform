@@ -112,6 +112,16 @@ export function createEmailLoginLimiter() {
 /** 로그인 — IP 당 15분 실패 5회 (성공 로그인은 세지 않음) */
 export const emailLoginLimiter = createEmailLoginLimiter();
 
+/** Independent buckets keep Google attempts from exhausting email/Kakao login quotas.
+ * TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1: same existing per-instance policy.
+ */
+export function createGoogleAuthLimiters() {
+  return {
+    login: createEmailLoginLimiter(),
+    signup: emailAuthLimiter(60 * 60 * 1000, 10, '가입 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.'),
+  };
+}
+
 /** 가입 — IP 당 1시간 10회 */
 export const emailSignupLimiter = emailAuthLimiter(
   60 * 60 * 1000,

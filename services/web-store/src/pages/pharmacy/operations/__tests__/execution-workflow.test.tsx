@@ -1,7 +1,9 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import Execution from '../../StoreExecutionPage';
+import { readStoreOperationEntry } from '../storeOperationEntry';
+import { StoreOperationReturn } from '../StoreExecutionActions';
 const api = vi.hoisted(() => ({ store: 'A', tablets: vi.fn(), qrs: vi.fn() }));
 vi.mock('../../../../hooks/useStoreOrganizationId', () => ({ useStoreOrganizationId: () => ({ organizationId: api.store }) }));
 vi.mock('../../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
@@ -70,4 +72,36 @@ it('the detail route inherits filtered workspace capabilities without explicit p
   expect(api.qrs).toHaveBeenCalledOnce();
   expect(screen.queryByRole('link', { name: '태블릿 화면 변경' })).toBeNull();
   expect(screen.getByRole('heading', { name: '위치별 저장 설정' })).toBeTruthy();
+});
+
+it.each(['/store', '/work/kpa-society/store'])('passes the selected location and preserves return context under %s', async base => {
+  api.tablets.mockResolvedValue([tablet(), { ...tablet('Tablet B'), id: 'two' }]);
+  api.qrs.mockResolvedValue({ success: true, data: { items: [{ id: 'qr-two', title: 'Counter QR', primaryPlacement: 'Counter', activePlacementCount: 1, isActive: true, landable: true, scanCount: 0 }], total: 1 } });
+  function Destination() {
+    const location = useLocation();
+    const kind = location.pathname.endsWith('/qr') ? 'qr' : 'tablet';
+    const entry = readStoreOperationEntry(location.state, `${api.store}:kpa-society`, base, kind);
+    return <><p>Selected {entry?.id ?? 'none'}</p><p>{location.state?.tab ?? 'Operation context only'}</p><StoreOperationReturn entry={entry} /></>;
+  }
+  function Current() { const location = useLocation(); return <output data-testid="current">{location.pathname}{location.search}{location.hash} {JSON.stringify(location.state)}</output>; }
+  render(<MemoryRouter initialEntries={[{ pathname: `${base}/execution`, search: '?workspace=use&location=Counter', hash: '#Counter', state: { draft: 'preserved', tab: 'contents' } }]}>
+    <Current /><Routes><Route path={`${base}/execution`} element={<Execution />} /><Route path={`${base}/commerce/tablet-displays`} element={<Destination />} /><Route path={`${base}/marketing/qr`} element={<Destination />} /></Routes>
+  </MemoryRouter>);
+  const actions = await screen.findByRole('navigation', { name: 'Counter 작업' });
+  fireEvent.click(within(actions).getByText('이 위치의 화면 변경 (2)'));
+  fireEvent.click(within(actions).getByRole('link', { name: 'Tablet B' }));
+  expect(screen.getByText('Selected two')).toBeTruthy();
+  expect(screen.getByText('Operation context only')).toBeTruthy();
+  fireEvent.click(screen.getByRole('link', { name: '위치별 현황으로 돌아가기' }));
+  expect(screen.getByTestId('current').textContent).toBe(`${base}/execution?workspace=use&location=Counter#Counter {"draft":"preserved","tab":"contents"}`);
+  fireEvent.click(within(await screen.findByRole('navigation', { name: 'Counter 작업' })).getByRole('link', { name: 'QR 배치·출력' }));
+  expect(screen.getByText('Selected qr-two')).toBeTruthy();
+});
+
+it.each([
+  { scope: 'B:kpa-society', returnPath: '/store/execution' },
+  { scope: 'A:kpa-society', returnPath: '/work/kpa-society/store/execution' },
+  { scope: 'A:kpa-society', returnPath: 'https://example.test/store/execution' },
+])('rejects a target hint from another store or return workspace: %j', value => {
+  expect(readStoreOperationEntry({ storeOperationEntry: { ...value, kind: 'qr', id: 'one', returnState: null } }, 'A:kpa-society', '/store', 'qr')).toBeNull();
 });

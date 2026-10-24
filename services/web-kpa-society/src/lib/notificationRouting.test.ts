@@ -72,3 +72,10 @@ it("retains existing KPA internal store navigation", () => {
 it("leaves the caller fallback available when a notification has no target", () => {
   expect(openNotificationTarget(notice(), vi.fn(), vi.fn())).toBe(false);
 });
+it.each(['pharmacy','megapharm'])('opens organization inquiry alerts inside the %s app',key=>{
+ const navigate=vi.fn(),assign=vi.fn();
+ const path=`/operator/inbox/business/${key}`;
+ expect(openNotificationTarget(notice(path),navigate,assign)).toBe(true);
+ expect(navigate).toHaveBeenCalledExactlyOnceWith(path);
+ expect(assign).not.toHaveBeenCalled();
+});

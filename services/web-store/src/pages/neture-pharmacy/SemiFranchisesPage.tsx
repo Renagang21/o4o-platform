@@ -50,7 +50,10 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
     setBusyKey(row.key); setError(null);
     try {
       const destination = cooperationDestination(row.key, section);
-      const href = await requestServiceHandoff(api, { ...destination, returnPath: `${destination.returnPath}?store=${encodeURIComponent(organizationId)}` });
+      const returnPath = `${destination.returnPath}?store=${encodeURIComponent(organizationId)}`;
+      const href = destination.navigation === 'public'
+        ? new URL(returnPath, destination.origin).href
+        : await requestServiceHandoff(api, { ...destination, returnPath });
       if (isCurrent()) window.location.assign(href);
     } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); } }
   };

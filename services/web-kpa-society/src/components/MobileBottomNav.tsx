@@ -60,8 +60,7 @@ function isCommunityActive(pathname: string): boolean {
     pathname.startsWith('/community') ||
     pathname.startsWith('/materials') ||
     pathname.startsWith('/my/participation') ||
-    pathname.startsWith('/forum') ||
-    pathname.startsWith('/resources')
+    pathname.startsWith('/tools')
   );
 }
 

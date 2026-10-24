@@ -2,10 +2,10 @@ import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { getBusinessInfo } from '../services/business-info.js';
 import { resolveSemiFranchiseBusinessAccess, resolveSemiFranchiseCommunityAccess } from '../services/semi-franchise-community-access.js';
 
-const sf = { id: 'immutable-business-id', key: 'pharmacy', status: 'active' };
+const sf = { id: '11111111-1111-4111-8111-111111111111', key: 'pharmacy', status: 'active' };
 function executor(allowed: boolean) {
   return { query: jest.fn(async (sql: string, _params: unknown[]) => {
-    if (sql.includes('SELECT sf.key, sf.name')) return [{ key: sf.key, name: '사업', communityKey: null }];
+    if (sql.includes('SELECT sf.id, sf.key, sf.name')) return [{ id: sf.id, key: sf.key, name: '사업', communityKey: null }];
     if (sql.includes('SELECT id, key, status')) return [sf];
     if (sql.includes('FROM cooperatives WHERE semi_franchise_id=$1')) return [];
     if (sql.includes('FROM semi_franchises sf WHERE sf.id=$2')) return [];

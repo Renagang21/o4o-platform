@@ -6,7 +6,7 @@
  * 주문/결제 DB 영속화 서비스
  */
 
-import { Repository } from 'typeorm';
+import { Repository, type EntityManager } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '../database/connection.js';
 import {
@@ -143,12 +143,12 @@ class CheckoutService {
    * 판정에는 DataSource 가 필요하므로 연결만 확보한다 — 연결 실패 시에는 게이트 코드로
    * 바꿔치지 않고 **기존과 동일한 오류를 그대로 던진다**(주문은 어차피 생성되지 않는다).
    */
-  private async assertNoDrugItems(items: OrderItem[]): Promise<void> {
-    if (!AppDataSource.isInitialized) {
+  private async assertNoDrugItems(items: OrderItem[], manager?: EntityManager): Promise<void> {
+    if (!manager && !AppDataSource.isInitialized) {
       await AppDataSource.initialize();
     }
     await assertNoDrugInCommerceOrThrow(
-      AppDataSource,
+      manager ?? AppDataSource,
       (items ?? []).map(toCommerceRefFromOrderItem),
     );
   }
@@ -156,14 +156,15 @@ class CheckoutService {
   /**
    * 주문 생성
    */
-  async createOrder(dto: CreateOrderDto): Promise<CheckoutOrder> {
+  async createOrder(dto: CreateOrderDto, manager?: EntityManager): Promise<CheckoutOrder> {
     // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1:
     //   주문 경로의 최종 방어선. `ensureInitialized()` · 금액 계산 · 주문 row 생성보다
     //   **먼저** items 전량을 일괄 판정한다. 의약품이 하나라도 섞이면 주문 전체를 거부한다
     //   (부분 주문 생성 없음). 모든 createOrder 호출부가 이 한 지점을 공유한다.
-    await this.assertNoDrugItems(dto.items);
+    await this.assertNoDrugItems(dto.items, manager);
 
-    await this.ensureInitialized();
+    if (!manager) await this.ensureInitialized();
+    const orderRepository = manager?.getRepository(CheckoutOrder) ?? this.orderRepository!;
 
     const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
     // WO-O4O-CHECKOUT-CREATEORDER-SHIPPING-RESPONSIBILITY-CLEANUP-V1:
@@ -177,7 +178,7 @@ class CheckoutService {
     const discount = 0;
     const totalAmount = subtotal + shippingFee - discount;
 
-    const order = this.orderRepository!.create({
+    const order = orderRepository.create({
       orderNumber: this.generateOrderNumber(),
       buyerId: dto.buyerId,
       sellerId: dto.sellerId,
@@ -194,7 +195,7 @@ class CheckoutService {
       metadata: dto.metadata,
     });
 
-    const savedOrder = await this.orderRepository!.save(order);
+    const savedOrder = await orderRepository.save(order);
 
     // 로그 기록
     await this.createLog({
@@ -204,7 +205,7 @@ class CheckoutService {
       performedBy: dto.buyerId,
       performerType: 'consumer',
       message: `주문 생성: ${savedOrder.orderNumber}`,
-    });
+    }, manager);
 
     logger.info('Order created:', {
       orderId: savedOrder.id,
@@ -522,9 +523,10 @@ class CheckoutService {
     performerType: string;
     message?: string;
     metadata?: Record<string, any>;
-  }): Promise<OrderLog> {
-    const log = this.logRepository!.create(data);
-    return await this.logRepository!.save(log);
+  }, manager?: EntityManager): Promise<OrderLog> {
+    const repository = manager?.getRepository(OrderLog) ?? this.logRepository!;
+    const log = repository.create(data);
+    return await repository.save(log);
   }
 
   /**

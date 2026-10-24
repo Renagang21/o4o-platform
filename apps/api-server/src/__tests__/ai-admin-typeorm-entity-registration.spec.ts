@@ -169,7 +169,7 @@ function fakeRepo() {
   };
 }
 
-function loadApp(options: { registered: Set<string>; admin?: boolean }) {
+async function loadApp(options: { registered: Set<string>; admin?: boolean }) {
   const { registered, admin = true } = options;
 
   jest.resetModules();
@@ -202,8 +202,7 @@ function loadApp(options: { registered: Set<string>; admin?: boolean }) {
     },
   }));
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const router = require('../routes/ai-admin.routes.js').default;
+  const { default: router } = await import('../routes/ai-admin.routes.js');
   const app = express();
   app.use(express.json());
   app.use('/api/ai/admin', router);
@@ -215,13 +214,13 @@ describe('§2/§7 ai-admin 라우터 runtime 계약', () => {
   jest.setTimeout(30000);
 
   it('entity 미등록이면 GET /engines 는 production 과 동일하게 500 이다(회귀 재현)', async () => {
-    const app = loadApp({ registered: new Set<string>() });
+    const app = await loadApp({ registered: new Set<string>() });
     const res = await request(app).get('/api/ai/admin/engines');
     expect(res.status).toBe(500);
   });
 
   it('현재 entities.ts 등록 상태에서는 GET /engines 가 200 이다', async () => {
-    const app = loadApp({ registered: registeredEntityNames() });
+    const app = await loadApp({ registered: registeredEntityNames() });
     const res = await request(app).get('/api/ai/admin/engines');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -230,7 +229,7 @@ describe('§2/§7 ai-admin 라우터 runtime 계약', () => {
   });
 
   it('500 을 빈 배열/빈 객체로 삼키지 않는다', async () => {
-    const app = loadApp({ registered: new Set<string>() });
+    const app = await loadApp({ registered: new Set<string>() });
     const res = await request(app).get('/api/ai/admin/engines');
     expect(res.status).not.toBe(200);
     expect(res.body.success).toBe(false);
@@ -238,7 +237,7 @@ describe('§2/§7 ai-admin 라우터 runtime 계약', () => {
   });
 
   it('500 응답 body 에 TypeORM 내부 문자열을 노출하지 않는다', async () => {
-    const app = loadApp({ registered: new Set<string>() });
+    const app = await loadApp({ registered: new Set<string>() });
     const res = await request(app).get('/api/ai/admin/engines');
     const body = JSON.stringify(res.body);
     expect(body).not.toContain('No metadata');
@@ -249,7 +248,7 @@ describe('§2/§7 ai-admin 라우터 runtime 계약', () => {
 // ── (4) 권한 계약 ───────────────────────────────────────────────────────────
 describe('§6 권한 계약', () => {
   it('requireAdmin 불충족이면 200 이 아니라 403 이다(권한을 넓혀 통과시키지 않는다)', async () => {
-    const app = loadApp({ registered: registeredEntityNames(), admin: false });
+    const app = await loadApp({ registered: registeredEntityNames(), admin: false });
     for (const p of ['/dashboard', '/engines', '/policy', '/usage']) {
       const res = await request(app).get(`/api/ai/admin${p}`);
       expect(res.status).toBe(403);
