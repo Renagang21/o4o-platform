@@ -23,7 +23,7 @@ export default function SiteShell() {
           <summary>업무 메뉴</summary>
           <nav aria-label="강의 업무 메뉴">
             {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
-            {canAccess('operator', user) && <><Link to="/operator">운영</Link><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/lecture" href="/operator/inbox"/>{canAccess('admin', user) && <Link to="/operator/operators">Operator 지정 · 해제</Link>}<ServiceContactInboxLink client={authClient.api} serviceKey="lecture" accountId={user?.id} enabled={canAccess('operator',user)} href="/operator/contact" />{canAccess('admin',user) && <a href="https://neture.co.kr/operator/service-contact/lecture/settings">문의 알림 설정</a>}<Link to="/operator/members">회원 관리</Link></>}
+            {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/home-presentation">Hero · 광고 관리</Link><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/lecture" href="/operator/inbox"/>{canAccess('admin', user) && <Link to="/operator/operators">Operator 지정 · 해제</Link>}<ServiceContactInboxLink client={authClient.api} serviceKey="lecture" accountId={user?.id} enabled={canAccess('operator',user)} href="/operator/contact" />{canAccess('admin',user) && <a href="https://neture.co.kr/operator/service-contact/lecture/settings">문의 알림 설정</a>}<Link to="/operator/members">회원 관리</Link></>}
           </nav>
         </details>}
       </nav>
