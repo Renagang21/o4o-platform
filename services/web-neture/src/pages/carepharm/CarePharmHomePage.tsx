@@ -18,13 +18,26 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
   useEffect(() => {
     if (view === 'home' && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView?.();
   }, [view, location.hash, location.key]);
+  const memberNews = <section id="news" aria-labelledby="carepharm-member-news" className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5">
+    <h2 id="carepharm-member-news" className="mb-4 text-xl font-semibold">공지·안내</h2>
+    <CarePharmNotices />
+  </section>;
   const memberSpace = <CooperationMemberSpace model={extension.model} materialsGuide={extension.materials} client={api}
-    accountId={isAuthenticated ? user?.id : undefined} view={view}
+    accountId={isAuthenticated ? user?.id : undefined} view={view} homeNews={isAuthenticated ? memberNews : undefined}
     onLogin={() => openLoginModal(location.pathname + location.search)}
     onEnterStore={() => requestServiceHandoff(api, {
       workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(extension.model.storePath)}`,
     })} />;
   if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
+  if (isAuthenticated) return <div className="carepharm-home mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">
+    <header id="about" className="scroll-mt-24 border-b border-slate-200 pb-5">
+      <p className="text-sm font-semibold text-teal-700">CarePharm · 협력약국 공간</p>
+      <h1 className="mt-2 text-2xl font-semibold text-slate-900">함께 나누고, 내 약국에서 활용합니다</h1>
+      <p className="mt-3 text-sm text-slate-600">협업체 참여는 이곳에서 확인하고, 승인된 약국의 업무는 내 매장에서 이용합니다.</p>
+    </header>
+    {memberSpace}
+    <CarePharmWorkspaces />
+  </div>;
   return <div className="carepharm-home">
     <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm" title={['관리 자료와 현장 경험을,', '약국의 협업으로']} description={['사업자와 참여 약국이 만성질환 관리 자료와 현장 경험을 나누고, 내 약국에서 활용합니다.']} />
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-8">

@@ -272,3 +272,17 @@ it('blocks application and offers retry when CarePharm policies are unavailable'
  expect(screen.getByRole('button',{name:'가입 신청'}).hasAttribute('disabled')).toBe(true);
  expect(state.post).not.toHaveBeenCalled();
 });
+
+it('uses the common member menu while retaining the selected pharmacy and existing access gate', async () => {
+  access.allowed = true;
+  render(<MemoryRouter initialEntries={['/?store=owned-store']}><CarePharmHomePage /></MemoryRouter>);
+  await screen.findByRole('complementary', { name: '내 참여와 지원' });
+  const nav = screen.getByRole('navigation', { name: '회원 공간 메뉴' });
+  const links = [...nav.querySelectorAll('a')];
+  expect(links.map(link => link.textContent)).toEqual(['홈', '소식', '자료', '참여 안내', '회원 교류', '지원']);
+  expect(links.find(link => link.textContent === '자료')?.getAttribute('href')).toBe('/materials?store=owned-store');
+  expect(links.find(link => link.textContent === '참여 안내')?.getAttribute('href')).toBe('/my/participation?store=owned-store');
+  expect(document.querySelectorAll('#news')).toHaveLength(1);
+  expect(state.get).toHaveBeenCalledWith('/neture/pharmacy/businesses/carepharm/store-access', { headers: { 'X-Store-Organization-Id': 'owned-store' } });
+  expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
+});
