@@ -1,7 +1,7 @@
 # O4O ChatGPT 앱 등록안 (공개 제출 전 확인용)
 
-> 상태: DRAFT — 공개 제출 전 사용자 확인 필요 · 작성일: 2026-10-23
-> 제출 양식에 올리는 파일: 같은 폴더의 [`chatgpt-app-submission.json`](chatgpt-app-submission.json) (App Info · MCP Server · Testing 일부 자동 채움)
+> 상태: DRAFT — 공개 제출 전 사용자 확인 필요 · 작성일: 2026-10-23 · 최종 갱신: 2026-10-24
+> **2026-10-24 등록 절차 확인**: 현재 공식 안내는 plugin.json·mcp.json·참조 자산을 포함한 ZIP 제출이다. [현재 등록 준비 자료](../../../../../../docs/design/DESIGN-O4O-CHATGPT-PUBLIC-SUBMISSION-PACK-V1.md)의 문안·패키지 초안·심사 안내를 먼저 사용한다. 이 문서와 같은 폴더의 [기존 JSON](chatgpt-app-submission.json)은 도구·옛 양식 참고 자료이며, 그대로 현재 제출 파일로 올리지 않는다. 현재 운영 대상은 약국이며 아래 넓은 adapter 범위를 전부 활성화한 것으로 소개하지 않는다.
 > 근거: 도구 정의·annotation 은 `../mcp/mcp.routes.ts`, 동작은 `../tools/tool.service.ts` · `../adapters/*` 를 직접 확인했다.
 > 원래 로컬 scratchpad 의 `app-submission-draft.md` 는 이 PC 에서 찾지 못했다. 이 문서는 코드·CHECK 기준으로 새로 작성했다 — 원본이 다른 PC 에 있으면 차이를 대조한다.
 
