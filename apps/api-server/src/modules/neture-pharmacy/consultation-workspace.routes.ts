@@ -1,3 +1,4 @@
+import type { ConsultationGuidanceService } from "./services/consultation-guidance.js";
 import { Router, type Request, type RequestHandler } from "express";
 import type { DataSource } from "typeorm";
 import rateLimit from "express-rate-limit";
@@ -29,13 +30,11 @@ const handle =
           .status(error.httpStatus)
           .json({ success: false, code: error.code, error: error.message });
       else
-        res
-          .status(503)
-          .json({
-            success: false,
-            code: "CONSULTATION_UNAVAILABLE",
-            error: "상담 연결을 확인하지 못했습니다. 다시 시도해 주세요.",
-          });
+        res.status(503).json({
+          success: false,
+          code: "CONSULTATION_UNAVAILABLE",
+          error: "상담 연결을 확인하지 못했습니다. 다시 시도해 주세요.",
+        });
     }
   };
 
@@ -44,6 +43,7 @@ export function consultationWorkspaceRoutes(
   stations: ConsultationStationService,
   store: RequestHandler[],
   admin: RequestHandler[],
+  guidance?: ConsultationGuidanceService,
 ) {
   const router = Router(),
     layouts = new ConsultationLayoutService(db);
@@ -63,6 +63,47 @@ export function consultationWorkspaceRoutes(
         error: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
       },
     });
+  if (guidance)
+    router.post(
+      "/pharmacy/consultation-guidance",
+      ...store,
+      limits(30),
+      handle(async (req) => {
+        const input = req.body ?? {},
+          organizationId = org(req);
+        if (input.stationId !== undefined)
+          await stations.validate(
+            req.user!.id!,
+            organizationId,
+            input.stationId,
+            input.epoch,
+          );
+        const prepared = await guidance.prepare(
+          req.user!.id!,
+          organizationId,
+          input,
+        );
+        const { proof, ...data } = prepared;
+        const deliveryId =
+          proof && input.stationId !== undefined
+            ? await stations.recordGuidance(
+                req.user!.id!,
+                organizationId,
+                input.stationId,
+                input.epoch,
+                proof,
+              )
+            : undefined;
+        return {
+          ...data,
+          organizationId,
+          mode: input.mode,
+          language: input.language,
+          deliveryId,
+          sourceVersion: proof?.sourceVersion,
+        };
+      }),
+    );
   router.get(
     "/pharmacy/consultation-layout",
     ...store,

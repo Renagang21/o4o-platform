@@ -39,6 +39,7 @@ export function ConsultationSelectors({
   onMode,
   onLanguage,
   locked,
+  modeLocked,
 }: Readonly<{
   context: Context;
   mode: string;
@@ -46,15 +47,16 @@ export function ConsultationSelectors({
   onMode: (value: string) => void;
   onLanguage: (value: string) => void;
   locked?: boolean;
+  modeLocked?: boolean;
 }>) {
   return (
     <div className="grid gap-4 rounded-xl border bg-white p-4 sm:grid-cols-2">
       <label className="space-y-1">
         <span className="block text-sm font-medium">상담 방식</span>
-        <select
+        <select aria-label="상담 방식"
           className="w-full rounded border p-2"
           value={mode}
-          disabled={locked}
+          disabled={locked || modeLocked}
           onChange={(event) => onMode(event.target.value)}
         >
           {context.modes.map((item) => (
@@ -66,7 +68,7 @@ export function ConsultationSelectors({
       </label>
       <label className="space-y-1">
         <span className="block text-sm font-medium">고객 언어</span>
-        <select
+        <select aria-label="고객 언어"
           className="w-full rounded border p-2"
           value={language}
           disabled={locked}

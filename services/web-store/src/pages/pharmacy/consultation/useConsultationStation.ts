@@ -46,7 +46,7 @@ export function useConsultationStation(
     return () => {
       alive.current = false;
     };
-  }, [scope, mode, language, stationKey]);
+  }, [scope, mode, stationKey]);
   const run = useCallback(
     async <T>(operation: () => Promise<T>, accept: (value: T) => void) => {
       if (lock.current) return false;

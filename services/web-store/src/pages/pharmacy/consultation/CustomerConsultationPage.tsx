@@ -1,3 +1,4 @@
+import { consultationUi } from "./consultationLocale";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   customerRequest,
@@ -52,6 +53,9 @@ export default function CustomerConsultationPage() {
         [previous, words].filter(Boolean).join(" ").slice(0, 1000),
       ),
   );
+  const copy = consultationUi(screen?.language || language);
+  const textRef = useRef(text);
+  textRef.current = text;
   const resetSpeech = speech.reset;
   useEffect(() => {
     alive.current = true;
@@ -105,6 +109,12 @@ export default function CustomerConsultationPage() {
           setLanguage(value.language);
           resetSpeech();
         }
+        if (
+          latest.current?.epoch === value.epoch &&
+          latest.current.language !== value.language &&
+          !textRef.current.trim()
+        )
+          setLanguage(value.language);
         if (
           latest.current?.epoch === value.epoch &&
           latest.current.version > value.version
@@ -217,7 +227,8 @@ export default function CustomerConsultationPage() {
         latest.current?.epoch === current.epoch
       ) {
         setText("");
-        setNotice("직원에게 전달했습니다. / Sent to staff.");
+        setNotice(copy.sent);
+        setLanguage(latest.current.language);
       }
     } catch (e) {
       if (alive.current && generation.current === version)
@@ -242,9 +253,7 @@ export default function CustomerConsultationPage() {
   return (
     <main className="mx-auto min-h-screen max-w-5xl space-y-6 bg-slate-50 p-5 sm:p-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">
-          고객 상담 · Customer consultation
-        </h1>
+        <h1 className="text-2xl font-bold">{copy.title}</h1>
         {credential && <span>{credential.name}</span>}
       </header>
       {error && (
@@ -255,7 +264,7 @@ export default function CustomerConsultationPage() {
           <p>{error}</p>
           {credential && (
             <button className={button} onClick={() => setRetry((n) => n + 1)}>
-              다시 연결 확인 / Retry
+              {copy.retry}
             </button>
           )}
         </div>
@@ -286,21 +295,31 @@ export default function CustomerConsultationPage() {
         </section>
       ) : !screen || screen.state === "waiting" ? (
         <section className="rounded-xl bg-white p-8 text-center">
-          <h2 className="text-3xl">상담을 준비하고 있습니다.</h2>
-          <p className="mt-4 text-xl">Please wait for the staff.</p>
+          <h2 className="text-3xl">{copy.waiting}</h2>
         </section>
       ) : (
         <>
           <section
-            aria-label="고객에게 전달된 안내"
+            aria-label={copy.guidance}
             className="space-y-5 rounded-2xl border bg-white p-6 sm:p-10"
           >
             <h2 className="text-xl font-medium">
-              {screen.shared?.title ||
-                "직원의 안내를 기다려 주세요. / Waiting for guidance."}
+              {screen.shared?.title || copy.guidance}
             </h2>
             {screen.shared && (
               <>
+                {screen.shared.fallbackUsed && (
+                  <p className="rounded bg-amber-50 p-3">
+                    {copy.fallback} ({screen.shared.language})
+                  </p>
+                )}
+                {screen.shared.translated && <p>{copy.translated}</p>}
+                {screen.shared.source && (
+                  <p className="text-sm">
+                    {copy.source}: {screen.shared.source.title} (
+                    {screen.shared.source.language})
+                  </p>
+                )}
                 <p
                   className="whitespace-pre-wrap break-words text-3xl leading-relaxed sm:text-5xl"
                   lang={screen.shared.language || "ko"}
@@ -319,7 +338,7 @@ export default function CustomerConsultationPage() {
                           )
                     }
                   >
-                    {speech.speaking ? "읽기 중지 / Stop" : "읽어주기 / Listen"}
+                    {speech.speaking ? copy.stop : copy.listen}
                   </button>
                 )}
                 {screen.shared.publicKey && (
@@ -327,23 +346,21 @@ export default function CustomerConsultationPage() {
                     className={button}
                     target="_blank"
                     rel="noreferrer"
-                    href={`https://pharmacy.neture.co.kr/multilingual-products/${encodeURIComponent(screen.shared.publicKey)}`}
+                    href={`https://pharmacy.neture.co.kr/multilingual-products/${encodeURIComponent(screen.shared.publicKey)}?locale=${encodeURIComponent(screen.shared.requestedLanguage || screen.language)}`}
                   >
-                    제품 설명 / Product details ↗
+                    {copy.details} ↗
                   </a>
                 )}
               </>
             )}
           </section>
           <section
-            aria-label="고객 답변"
+            aria-label={copy.reply}
             className="space-y-4 rounded-xl border bg-white p-5"
           >
-            <h2 className="text-xl font-semibold">
-              말씀해 주세요. / Your reply
-            </h2>
+            <h2 className="text-xl font-semibold">{copy.reply}</h2>
             <label className="block">
-              언어 / Language{" "}
+              {copy.language}{" "}
               <select
                 className="min-h-14 rounded border p-3"
                 value={language}
@@ -371,16 +388,14 @@ export default function CustomerConsultationPage() {
                     : speech.startListening(language)
                 }
               >
-                {speech.listening
-                  ? "음성 입력 마치기 / Finish"
-                  : "눌러서 말하기 / Tap to speak"}
+                {speech.listening ? copy.finish : copy.speak}
               </button>
             )}
             <label className="block">
-              <span>전달할 내용 / Message</span>
+              <span>{copy.message}</span>
               <textarea
                 autoComplete="off"
-                aria-label="고객 답변 입력"
+                aria-label={copy.message}
                 className="mt-2 min-h-28 w-full rounded border p-3 text-xl"
                 maxLength={1000}
                 value={text}
@@ -393,12 +408,9 @@ export default function CustomerConsultationPage() {
               disabled={busy || speech.listening || !text.trim()}
               onClick={() => void send()}
             >
-              직원에게 전달 / Send
+              {copy.send}
             </button>
-            <p className="text-sm text-slate-600">
-              이름·연락처를 입력하지 마세요. 음성은 브라우저의 인식 서비스로
-              전달될 수 있습니다. / Please do not enter personal details.
-            </p>
+            <p className="text-sm text-slate-600">{copy.privacy}</p>
           </section>
         </>
       )}
@@ -407,7 +419,7 @@ export default function CustomerConsultationPage() {
       {credential && (
         <details className="border-t pt-4">
           <summary className="min-h-12 cursor-pointer">
-            기기 연결 설정 / Device connection
+            {copy.connection}
           </summary>
           <button className={button} onClick={forgetDevice}>
             이 브라우저의 연결 지우기

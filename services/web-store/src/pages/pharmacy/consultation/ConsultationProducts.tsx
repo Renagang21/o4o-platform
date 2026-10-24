@@ -12,10 +12,14 @@ export function ConsultationProducts({
   onShare,
   onShow,
   busy,
+  onSelect,
+  selectLabel,
 }: {
   query: string;
   onShare?: (p: ConsultationProduct) => void;
-  onShow: (p: ConsultationProduct) => void;
+  onShow?: (p: ConsultationProduct) => void;
+  onSelect?: (p: ConsultationProduct) => void;
+  selectLabel?: string;
   busy: boolean;
 }) {
   const [items, setItems] = useState<ConsultationProduct[]>([]),
@@ -75,12 +79,23 @@ export function ConsultationProducts({
           <h3 className="text-lg font-semibold">{p.name}</h3>
           <p>위치: {p.location || "등록된 위치 없음"}</p>
           <div className="flex flex-wrap gap-2">
-            <button
-              className="min-h-12 rounded border px-4"
-              onClick={() => onShow(p)}
-            >
-              이 화면에서 크게 보기
-            </button>
+            {onSelect && (
+              <button
+                disabled={busy}
+                className="min-h-12 rounded border px-4"
+                onClick={() => onSelect(p)}
+              >
+                {selectLabel || "이 상품 선택"}
+              </button>
+            )}
+            {onShow && (
+              <button
+                className="min-h-12 rounded border px-4"
+                onClick={() => onShow(p)}
+              >
+                이 화면에서 크게 보기
+              </button>
+            )}
             {onShare && (
               <button
                 className="min-h-12 rounded border px-4 disabled:opacity-50"

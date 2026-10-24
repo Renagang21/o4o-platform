@@ -54,7 +54,7 @@ it("uses a separate capability without login cookies or store headers and never 
   expect(options.cache).toBe("no-store");
   expect(options.headers).toEqual({ "Content-Type": "application/json" });
   expect(JSON.parse(options.body)).toEqual({ id, token });
-  fireEvent.change(screen.getByLabelText("고객 답변 입력"), {
+  fireEvent.change(screen.getByLabelText("전달할 내용"), {
     target: { value: "Private reply" },
   });
   expect(
@@ -68,7 +68,7 @@ it("clears old guidance on failed lookup, retains the device for retry, and revo
   render(<Page />);
   await screen.findByText("Confirmed guidance");
   requests.mockRejectedValueOnce(new Error("offline"));
-  fireEvent.click(screen.getByText("기기 연결 설정 / Device connection"));
+  fireEvent.click(screen.getByText("기기 연결 설정"));
   // pageshow is a new read generation, including a browser back/forward restoration.
   fireEvent(window, new Event("pageshow"));
   await screen.findByText("offline");
@@ -81,9 +81,7 @@ it("clears old guidance on failed lookup, retains the device for retry, and revo
     status: 403,
     json: async () => ({ success: false, error: "access revoked" }),
   }));
-  fireEvent.click(
-    screen.getByRole("button", { name: "다시 연결 확인 / Retry" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "다시 연결 확인" }));
   await screen.findByText("고객 화면 연결");
   expect(
     localStorage.getItem("o4o:consultation-customer-device:v1"),
@@ -99,18 +97,16 @@ it("ignores an old reply completion after the device has been forgotten", async 
         finish = resolve;
       }),
   );
-  fireEvent.change(screen.getByLabelText("고객 답변 입력"), {
+  fireEvent.change(screen.getByLabelText("전달할 내용"), {
     target: { value: "Reply in flight" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "직원에게 전달 / Send" }));
-  fireEvent.click(screen.getByText("기기 연결 설정 / Device connection"));
+  fireEvent.click(screen.getByRole("button", { name: "직원에게 전달" }));
+  fireEvent.click(screen.getByText("기기 연결 설정"));
   fireEvent.click(
     screen.getByRole("button", { name: "이 브라우저의 연결 지우기" }),
   );
   await act(async () => finish(await ok({ sent: true })));
-  expect(
-    screen.queryByText("직원에게 전달했습니다. / Sent to staff."),
-  ).toBeNull();
+  expect(screen.queryByText("직원에게 전달했습니다.")).toBeNull();
   expect(screen.queryByText("Confirmed guidance")).toBeNull();
 });
 it("pairing prevents duplicate clicks and preserves a failed code", async () => {
@@ -139,7 +135,7 @@ it("pairing prevents duplicate clicks and preserves a failed code", async () => 
 it("clears a previous customer draft when a fresh consultation generation arrives", async () => {
   render(<Page />);
   await screen.findByText("Confirmed guidance");
-  fireEvent.change(screen.getByLabelText("고객 답변 입력"), {
+  fireEvent.change(screen.getByLabelText("전달할 내용"), {
     target: { value: "Previous customer" },
   });
   requests.mockImplementationOnce(() =>
@@ -148,7 +144,7 @@ it("clears a previous customer draft when a fresh consultation generation arrive
   fireEvent(window, new Event("pageshow"));
   await waitFor(() =>
     expect(
-      (screen.getByLabelText("고객 답변 입력") as HTMLTextAreaElement).value,
+      (screen.getByLabelText("전달할 내용") as HTMLTextAreaElement).value,
     ).toBe(""),
   );
   expect(screen.queryByText("Confirmed guidance")).toBeNull();
@@ -157,26 +153,81 @@ it("clears a previous customer draft when a fresh consultation generation arrive
 it("preserves an unsent reply across a transient read failure only for the same consultation epoch", async () => {
   render(<Page />);
   await screen.findByText("Confirmed guidance");
-  fireEvent.change(screen.getByLabelText("고객 답변 입력"), {
+  fireEvent.change(screen.getByLabelText("전달할 내용"), {
     target: { value: "Unsent current reply" },
   });
   requests.mockRejectedValueOnce(new Error("temporary outage"));
   fireEvent(window, new Event("pageshow"));
   await screen.findByText("temporary outage");
-  expect(screen.queryByLabelText("고객 답변 입력")).toBeNull();
-  fireEvent.click(
-    screen.getByRole("button", { name: "다시 연결 확인 / Retry" }),
-  );
+  expect(screen.queryByLabelText("전달할 내용")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "다시 연결 확인" }));
   await waitFor(() =>
     expect(
-      (screen.getByLabelText("고객 답변 입력") as HTMLTextAreaElement).value,
+      (screen.getByLabelText("전달할 내용") as HTMLTextAreaElement).value,
     ).toBe("Unsent current reply"),
   );
   requests.mockImplementationOnce(() => ok(state("new-customer", 7)));
   fireEvent(window, new Event("pageshow"));
   await waitFor(() =>
     expect(
-      (screen.getByLabelText("고객 답변 입력") as HTMLTextAreaElement).value,
+      (screen.getByLabelText("전달할 내용") as HTMLTextAreaElement).value,
     ).toBe(""),
   );
+});
+
+it("uses native Japanese controls and makes source-language fallback explicit", async () => {
+  requests.mockImplementation(() =>
+    ok({
+      ...state(),
+      language: "ja",
+      languages: [
+        { key: "ko", label: "한국어" },
+        { key: "ja", label: "日本語" },
+      ],
+      shared: {
+        kind: "guidance",
+        title: "Fixture product",
+        text: "한국어 원문",
+        language: "ko",
+        requestedLanguage: "ja",
+        fallbackUsed: true,
+        publicKey: "source-key",
+        source: { title: "게시 자료", language: "ko" },
+      },
+    }),
+  );
+  render(<Page />);
+  await screen.findByRole("heading", { name: "お客様のご相談" });
+  expect(screen.getByRole("button", { name: "スタッフに送信" })).toBeTruthy();
+  expect(screen.getByText(/選択した言語の資料がない/)).toBeTruthy();
+  expect(
+    screen.getByRole("link", { name: "商品説明 ↗" }).getAttribute("href"),
+  ).toContain("?locale=ja");
+});
+it("keeps an unsent reply in its original input language when staff changes the target language", async () => {
+  render(<Page />);
+  await screen.findByText("Confirmed guidance");
+  fireEvent.change(screen.getByLabelText("전달할 내용"), {
+    target: { value: "아직 보내지 않은 답변" },
+  });
+  requests.mockImplementationOnce(() =>
+    ok({
+      ...state(),
+      language: "ja",
+      languages: [
+        { key: "ko", label: "한국어" },
+        { key: "ja", label: "日本語" },
+      ],
+    }),
+  );
+  fireEvent(window, new Event("pageshow"));
+  await screen.findByText("Confirmed guidance");
+  expect(
+    (screen.getByLabelText("伝える内容") as HTMLTextAreaElement).value,
+  ).toBe("아직 보내지 않은 답변");
+  fireEvent.click(screen.getByRole("button", { name: "スタッフに送信" }));
+  await screen.findByText("スタッフに送信しました。");
+  const reply = requests.mock.calls.find(call => String(call[0]).endsWith("/reply"));
+  expect(JSON.parse(reply![1].body).language).toBe("ko");
+  expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("ja");
 });

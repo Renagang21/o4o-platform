@@ -8,6 +8,10 @@ export interface SharedConsultation {
   text: string;
   language?: string;
   publicKey?: string | null;
+  requestedLanguage?: string;
+  source?: { title: string; language: string };
+  fallbackUsed?: boolean;
+  translated?: boolean;
 }
 export interface CustomerReply {
   id: string;
@@ -172,4 +176,61 @@ export function validCustomerScreen(value: CustomerScreen): boolean {
       (typeof value.shared.title === "string" &&
         typeof value.shared.text === "string"))
   );
+}
+
+export type GuidanceIntent =
+  | "find-product"
+  | "location"
+  | "product-details"
+  | "pharmacist"
+  | "help";
+export interface GuidanceCard extends SharedConsultation {
+  language: string;
+  requestedLanguage: string;
+  source?: { title: string; language: string };
+  fallbackUsed?: boolean;
+  translated?: boolean;
+}
+export interface GuidanceResult {
+  organizationId: string;
+  mode: string;
+  language: string;
+  state: "ready" | "clarify" | "empty";
+  intent: GuidanceIntent | null;
+  message?: string;
+  card?: GuidanceCard;
+  deliveryId?: string;
+  sourceVersion?: string;
+  selection?: { sourceVersion: string; passageIds: number[] };
+  canTranslate?: boolean;
+  aiSelected?: boolean;
+  publicKey?: string | null;
+}
+export async function prepareConsultationGuidance(input: {
+  mode: string;
+  language: string;
+  intent: GuidanceIntent;
+  question: string;
+  productKind?: string;
+  productId?: string;
+  useAi?: boolean;
+  translateMaterial?: boolean;
+  selection?: { sourceVersion: string; passageIds: number[] };
+  stationId?: string;
+  epoch?: string;
+}) {
+  const r = await coreApiClient.post<Envelope<GuidanceResult>>(
+    `${CONSULTATION_BASE}/consultation-guidance`,
+    input,
+  );
+  if (
+    !r.success ||
+    !["ready", "clarify", "empty"].includes(r.data?.state) ||
+    (r.data.state === "ready" &&
+      (!r.data.card ||
+        typeof r.data.card.text !== "string" ||
+        typeof r.data.card.language !== "string"))
+  )
+    throw new Error("상담 안내 응답을 확인하지 못했습니다.");
+  return r.data;
 }

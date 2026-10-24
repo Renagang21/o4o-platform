@@ -82,3 +82,25 @@ it("keeps a failed end visible and only confirms an accepted server action", asy
   expect(accepted).toBe(true);
   expect(view.result.current.room?.active).toBe(false);
 });
+it("retains the same connected room during an accepted language correction", async () => {
+  const view = renderHook(
+    ({ language }) =>
+      useConsultationStation("store", "counter-staff", language, "counter-1"),
+    { initialProps: { language: "ko" } },
+  );
+  await act(async () => {
+    await view.result.current.open();
+  });
+  api.stationAction.mockResolvedValueOnce({
+    ...room,
+    language: "ja",
+    version: 2,
+  });
+  await act(async () => {
+    await view.result.current.action({ action: "language", language: "ja" });
+  });
+  view.rerender({ language: "ja" });
+  expect(view.result.current.room?.epoch).toBe("generation");
+  expect(view.result.current.room?.active).toBe(true);
+  expect(api.openConsultationStation).toHaveBeenCalledTimes(1);
+});

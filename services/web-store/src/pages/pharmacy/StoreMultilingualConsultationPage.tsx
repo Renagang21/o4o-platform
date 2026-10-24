@@ -14,10 +14,7 @@ import {
   ConsultationStationPanel,
   ConsultationIncomingReply,
 } from "./consultation/ConsultationStationPanel";
-import {
-  ConsultationProducts,
-  type ConsultationProduct,
-} from "./consultation/ConsultationProducts";
+import { ConsultationGuidancePanel } from "./consultation/ConsultationGuidancePanel";
 import { coreApiClient } from "../../api/client";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUnifiedStore } from "../../contexts/StoreContext";
@@ -106,20 +103,27 @@ function Consultation({
   const [replyLanguage, setReplyLanguage] = useState("");
   const [direction, setDirection] =
     useState<ConsultationDirection>("to-customer");
-  const { text, result, setText, setResult, clearDrafts, receiveText } =
-    useConsultationDrafts<Result>(direction);
+  const {
+    text,
+    result,
+    setText,
+    setResult,
+    clearDrafts,
+    receiveText,
+    clearResults,
+    incomingText,
+  } = useConsultationDrafts<Result>(direction);
   const [phrase, setPhrase] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  const [productText, setProductText] = useState(""),
-    [productQuery, setProductQuery] = useState("");
-  const [quick, setQuick] = useState(false),
-    [productDisplay, setProductDisplay] = useState<ConsultationProduct | null>(
-      null,
-    );
-  const productDialog = useRef<HTMLDialogElement>(null);
-  const voiceTarget = useRef<"product" | "sentence">("sentence");
+  const [guidanceVoice, setGuidanceVoice] = useState<{
+    text: string;
+    sequence: number;
+  } | null>(null);
+  const [guidanceReset, setGuidanceReset] = useState(0);
+  const voiceSequence = useRef(0);
+  const voiceTarget = useRef<"guidance" | "sentence">("sentence");
   const [pendingVoice, setPendingVoice] =
     useState<ConsultationDirection | null>(null);
   const station = useConsultationStation(
@@ -148,9 +152,8 @@ function Consultation({
   const speech = useConsultationSpeech(
     `${organizationId}:${mode}:${inputLanguage}:${direction}`,
     (words) => {
-      if (voiceTarget.current === "product") {
-        setProductText(words.slice(0, 80));
-        setProductQuery(words.slice(0, 80));
+      if (voiceTarget.current === "guidance") {
+        setGuidanceVoice({ text: words, sequence: ++voiceSequence.current });
         return;
       }
       version.current++;
@@ -179,6 +182,8 @@ function Consultation({
     const forget = () => {
       version.current++;
       clearDrafts();
+      setGuidanceVoice(null);
+      setGuidanceReset((value) => value + 1);
       setBusy(false);
       focusReply.current = false;
       dialog.current?.close();
@@ -239,11 +244,8 @@ function Consultation({
     version.current++;
     clearDrafts();
     setReplyLanguage("");
-    setProductText("");
-    setProductQuery("");
-    setProductDisplay(null);
-    setQuick(false);
-    productDialog.current?.close();
+    setGuidanceVoice(null);
+    setGuidanceReset((value) => value + 1);
     setError("");
     setBusy(false);
     setPendingVoice(null);
@@ -395,7 +397,8 @@ function Consultation({
               {context.languages.find((l) => l.key === language)?.label}
             </summary>
             <ConsultationSelectors
-              locked={!!connected || station.busy}
+              locked={station.busy}
+              modeLocked={!!connected}
               context={context}
               mode={mode}
               language={language}
@@ -404,13 +407,30 @@ function Consultation({
                 setMode(value);
               }}
               onLanguage={(value) => {
-                clear();
-                setLanguage(value);
+                const apply = () => {
+                  speech.reset();
+                  version.current++;
+                  setBusy(false);
+                  clearResults();
+                  if (incomingText.trim())
+                    setReplyLanguage(replyLanguage || language);
+                  else setReplyLanguage("");
+                  setLanguage(value);
+                  dialog.current?.close();
+                };
+                if (connected)
+                  void station
+                    .action({ action: "language", language: value })
+                    .then((ok) => {
+                      if (ok) apply();
+                    });
+                else apply();
               }}
             />
             {!!connected && (
               <p className="text-sm text-slate-600">
-                상담 방식·언어 변경은 현재 매대 상담을 종료한 뒤 가능합니다.
+                상담 방식은 종료 후 변경합니다. 언어는 상담을 유지하며 바꿀 수
+                있습니다.
               </p>
             )}
           </details>
@@ -444,117 +464,35 @@ function Consultation({
             </>
           )}
           {current?.allowed && (
-            <div
-              className="grid grid-cols-2 gap-3 sm:grid-cols-4"
-              aria-label="현장 빠른 안내"
-            >
-              {["상품 찾기", "위치 안내", "제품 설명"].map((label) => (
-                <button
-                  key={label}
-                  className="min-h-16 rounded-xl border bg-white p-3 font-semibold"
-                  disabled={!context.supportAllowed}
-                  onClick={() => setQuick(true)}
-                >
-                  {label}
-                </button>
-              ))}
-              <button
-                className="min-h-16 rounded-xl border bg-white p-3 font-semibold"
-                onClick={() => {
-                  const notice = context.phrases.find(
-                    (p) => p.key === "pharmacist",
-                  );
-                  if (notice && connected)
-                    void station.action({
-                      action: "share",
-                      kind: "notice",
-                      phrase: notice.key,
-                    });
-                  setProductDisplay({
-                    id: "notice",
-                    kind: "local",
-                    name: "약사에게 문의해 주세요.",
-                    location: "",
-                  });
-                  productDialog.current?.showModal();
-                }}
-              >
-                약사 연결 안내
-              </button>
-            </div>
-          )}
-          {quick && context.supportAllowed && (
-            <section
-              aria-label="상담 상품 찾기"
-              className="space-y-3 rounded-xl border bg-white p-4"
-            >
-              <h2 className="font-semibold">상품 이름으로 찾기</h2>
-              <form
-                className="flex flex-wrap gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  speech.reset();
-                  setProductQuery(productText.trim());
-                }}
-              >
-                <input
-                  className="min-h-12 min-w-0 rounded border p-3"
-                  aria-label="상담 상품 이름"
-                  value={productText}
-                  maxLength={80}
-                  onChange={(e) => setProductText(e.target.value)}
-                />
-                <button
-                  className="min-h-12 rounded border px-4"
-                  disabled={!productText.trim()}
-                >
-                  찾기
-                </button>
-                {speech.inputSupported && (
-                  <button
-                    type="button"
-                    className="min-h-12 rounded border px-4"
-                    onClick={() => {
-                      speech.reset();
-                      voiceTarget.current = "product";
-                      speech.startListening("ko");
-                    }}
-                  >
-                    상품 이름 말하기
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="min-h-12 rounded border px-4"
-                  onClick={() => {
-                    speech.reset();
-                    setQuick(false);
-                  }}
-                >
-                  접기
-                </button>
-              </form>
-              <ConsultationProducts
-                query={productQuery}
-                busy={station.busy}
-                onShow={(p) => {
-                  setProductDisplay(p);
-                  productDialog.current?.showModal();
-                }}
-                onShare={
-                  connected
-                    ? (p) => {
-                        void station.action({
-                          action: "share",
-                          kind: "product",
-                          productKind: p.kind,
-                          productId: p.id,
-                        });
-                      }
-                    : undefined
-                }
-              />
-            </section>
+            <ConsultationGuidancePanel
+              key={`${organizationId}:${mode}:${guidanceReset}`}
+              organizationId={organizationId}
+              mode={mode}
+              language={language}
+              supportAllowed={context.supportAllowed === true}
+              locked={station.busy}
+              room={connected}
+              onShare={(id) =>
+                station.action({
+                  action: "share",
+                  kind: "guidance",
+                  deliveryId: id,
+                })
+              }
+              onVoice={() => {
+                speech.reset();
+                voiceTarget.current = "guidance";
+                speech.startListening("ko");
+              }}
+              onRead={speech.read}
+              onStopReading={speech.stopReading}
+              voice={guidanceVoice}
+              inquiry={
+                direction === "to-staff"
+                  ? result?.translation || (inputLanguage === "ko" ? text : "")
+                  : undefined
+              }
+            />
           )}
           {!current?.allowed ? (
             <p className="rounded border bg-amber-50 p-4">
@@ -583,12 +521,27 @@ function Consultation({
                   </button>
                 ))}
               </div>
-              {direction === "to-staff" && replyLanguage && (
-                <p className="text-sm">
-                  고객 답변 언어:{" "}
-                  {context.languages.find((l) => l.key === replyLanguage)
-                    ?.label || replyLanguage}
-                </p>
+              {direction === "to-staff" && (
+                <label className="block text-sm">
+                  고객 문장 언어{" "}
+                  <select
+                    className="min-h-11 rounded border p-2"
+                    value={inputLanguage}
+                    onChange={(event) => {
+                      speech.reset();
+                      version.current++;
+                      setBusy(false);
+                      setResult(null);
+                      setReplyLanguage(event.target.value);
+                    }}
+                  >
+                    {context.languages.map((l) => (
+                      <option key={l.key} value={l.key}>
+                        {l.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               )}
               <p className="text-xs text-slate-500">
                 같은 상담 중에는 양쪽의 마지막 입력과 번역을 유지합니다. 다른
@@ -723,35 +676,6 @@ function Consultation({
           )}
         </>
       )}
-      <dialog
-        ref={productDialog}
-        aria-label="고객용 상품 안내"
-        className="w-11/12 max-w-4xl space-y-5 rounded-xl p-6 backdrop:bg-black/50"
-      >
-        <h2 className="break-words text-3xl sm:text-5xl">
-          {productDisplay?.name}
-        </h2>
-        {productDisplay?.id !== "notice" && (
-          <p className="text-2xl">
-            위치: {productDisplay?.location || "직원에게 확인해 주세요."}
-          </p>
-        )}
-        {productDisplay?.publicKey && (
-          <a
-            className="inline-flex min-h-12 items-center rounded border px-4"
-            target="_blank"
-            rel="noreferrer"
-            href={`https://pharmacy.neture.co.kr/multilingual-products/${encodeURIComponent(productDisplay.publicKey)}`}
-          >
-            제품 설명 ↗
-          </a>
-        )}
-        <form method="dialog">
-          <button className="min-h-14 rounded border px-5">
-            상담 화면으로
-          </button>
-        </form>
-      </dialog>
       <CustomerDialog
         dialogRef={dialog}
         result={result}

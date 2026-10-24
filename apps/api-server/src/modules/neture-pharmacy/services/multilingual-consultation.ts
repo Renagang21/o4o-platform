@@ -25,6 +25,7 @@ export const CONSULTATION_STAFF_PHRASES = [
 ] as const;
 
 export interface ConsultationDependencies {
+  selectGuidance?: import('./consultation-guidance.extension.js').GuidanceSelector;
   translate: ConsultationTranslator;
   professional: (userId: string, organizationId: string) => Promise<boolean>;
 }

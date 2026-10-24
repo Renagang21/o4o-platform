@@ -1,3 +1,8 @@
+import {
+  consultationCopy,
+  validConsultationLanguage,
+} from "./consultation-copy.js";
+import type { GuidanceProof } from "./consultation-guidance.js";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { DataSource } from "typeorm";
 import { NeturePharmacyError } from "../constants.js";
@@ -52,6 +57,11 @@ export class ConsultationStationService {
     private readonly db: DataSource,
     private readonly authorize: StationAuthorization,
     private readonly product: StationProduct,
+    private readonly verifyGuidance?: (
+      actor: string,
+      org: string,
+      proof: GuidanceProof,
+    ) => Promise<void>,
   ) {}
   private async query(sql: string, values: unknown[]) {
     const result = await this.db.query(sql, values);
@@ -230,9 +240,41 @@ export class ConsultationStationService {
     );
     return { ...result, deliveryId };
   }
+  async recordGuidance(
+    actor: string,
+    org: string,
+    id: string,
+    epoch: unknown,
+    proof: GuidanceProof,
+  ) {
+    const row = await this.owned(actor, org, id, epoch);
+    if (proof.mode !== row.mode || proof.requestedLanguage !== row.language)
+      fail(409, "CONSULTATION_CHANGED", "상담 언어나 방식이 변경되었습니다.");
+    if (!this.verifyGuidance)
+      fail(503, "GUIDANCE_UNAVAILABLE", "상담 안내를 확인하지 못했습니다.");
+    await this.verifyGuidance!(actor, org, proof);
+    const deliveryId = randomUUID();
+    await this.update(
+      row,
+      "translation=jsonb_set(translation,'{guidance}',$5::jsonb),operator_seen_at=now()",
+      [JSON.stringify({ ...proof, deliveryId })],
+    );
+    return deliveryId;
+  }
   async action(actor: string, org: string, id: string, input: Json) {
     const row = await this.owned(actor, org, id, input.epoch);
     switch (input.action) {
+      case "language": {
+        if (!validConsultationLanguage(input.language))
+          fail(400, "INVALID_LANGUAGE", "고객 언어를 확인해 주세요.");
+        return this.snapshot(
+          await this.update(
+            row,
+            "language=$5,shared='{}',translation='{}',operator_seen_at=now()",
+            [input.language],
+          ),
+        );
+      }
       case "end":
         return this.snapshot(
           await this.update(
@@ -262,7 +304,24 @@ export class ConsultationStationService {
       }
       case "share": {
         let shared: Json;
-        if (input.kind === "translation") {
+        let sharedProof: Json | null = null;
+        if (input.kind === "guidance") {
+          const prepared = row.translation.guidance;
+          if (
+            !prepared ||
+            prepared.deliveryId !== input.deliveryId ||
+            prepared.requestedLanguage !== row.language ||
+            !this.verifyGuidance
+          )
+            fail(409, "GUIDANCE_CHANGED", "공유할 안내를 다시 준비해 주세요.");
+          await this.verifyGuidance!(
+            actor,
+            org,
+            prepared as unknown as GuidanceProof,
+          );
+          shared = prepared.card as Json;
+          sharedProof = prepared;
+        } else if (input.kind === "translation") {
           const draft = row.translation["to-customer"];
           if (!draft || draft.deliveryId !== input.deliveryId)
             fail(
@@ -282,8 +341,9 @@ export class ConsultationStationService {
             kind: "product",
             title: product.name,
             text: product.location
-              ? `위치: ${product.location}`
-              : "직원에게 상품 위치를 확인해 주세요.",
+              ? `${consultationCopy(row.language).location}: ${product.location}`
+              : consultationCopy(row.language).missingLocation,
+            language: row.language,
             publicKey: product.publicKey ?? null,
           };
         } else if (input.kind === "notice") {
@@ -295,17 +355,25 @@ export class ConsultationStationService {
           shared = {
             kind: "notice",
             title: "매장 안내",
-            text: phrase.text,
-            language: "ko",
+            text:
+              input.phrase === "pharmacist"
+                ? consultationCopy(row.language).pharmacist
+                : phrase.text,
+            language: input.phrase === "pharmacist" ? row.language : "ko",
           };
         } else
           return fail(400, "INVALID_SHARE", "공유할 안내를 선택해 주세요.");
         // Recheck after the resource lookup and compare the generation in the UPDATE.
         await this.authorize(actor, org, row.mode);
         return this.snapshot(
-          await this.update(row, "shared=$5::jsonb,operator_seen_at=now()", [
-            JSON.stringify(shared),
-          ]),
+          await this.update(
+            row,
+            "shared=$5::jsonb,translation=CASE WHEN $6::jsonb IS NULL THEN translation-'shared-guidance' ELSE jsonb_set(translation,'{shared-guidance}',$6::jsonb) END,operator_seen_at=now()",
+            [
+              JSON.stringify(shared),
+              sharedProof ? JSON.stringify(sharedProof) : null,
+            ],
+          ),
         );
       }
       default:
@@ -380,6 +448,42 @@ export class ConsultationStationService {
         "상담이 변경되었습니다. 다시 확인해 주세요.",
       );
     const active = current.active && recent(current.operator_seen_at);
+    let visible =
+      active && Object.keys(current.shared).length ? current.shared : null;
+    const proof = current.translation["shared-guidance"];
+    if (visible && proof && this.verifyGuidance) {
+      try {
+        await this.verifyGuidance(
+          current.operator_user_id,
+          current.organization_id,
+          proof as unknown as GuidanceProof,
+        );
+      } catch (error) {
+        if (
+          error instanceof NeturePharmacyError &&
+          [403, 404, 409].includes(error.httpStatus)
+        )
+          visible = null;
+        else throw error;
+      }
+    }
+    const [unchanged] = await this.query(
+      "SELECT id FROM store_consultation_stations WHERE id=$1 AND device_hash=$2 AND epoch=$3 AND language=$4 AND active=$5 AND shared=$6::jsonb",
+      [
+        current.id,
+        hash(String(input.token)),
+        current.epoch,
+        current.language,
+        current.active,
+        JSON.stringify(current.shared),
+      ],
+    );
+    if (!unchanged)
+      fail(
+        409,
+        "CONSULTATION_CHANGED",
+        "상담이 변경되었습니다. 다시 확인해 주세요.",
+      );
     return {
       id: current.id,
       name: current.name,
@@ -387,8 +491,7 @@ export class ConsultationStationService {
       version: Number(current.version),
       language: current.language,
       state: active ? "active" : "waiting",
-      shared:
-        active && Object.keys(current.shared).length ? current.shared : null,
+      shared: visible,
       languages: CONSULTATION_SCREEN_LANGUAGES,
     };
   }

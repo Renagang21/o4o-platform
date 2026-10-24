@@ -1,3 +1,4 @@
+import { CONSULTATION_SCREEN_LANGUAGES } from "../../apps/api-server/dist/modules/neture-pharmacy/services/multilingual-consultation.js";
 /** Build api-server first. Disposable loopback PostgreSQL only; never reads production DB variables. */
 import "reflect-metadata";
 import assert from "node:assert/strict";
@@ -14,14 +15,15 @@ import { ConsultationStationService } from "../../apps/api-server/dist/modules/n
 import { StoreStaffSupportService } from "../../apps/api-server/dist/modules/neture-pharmacy/services/store-staff-support.js";
 import { ConsultationLayoutService } from "../../apps/api-server/dist/modules/neture-pharmacy/services/consultation-layout.js";
 import { consultationWorkspaceRoutes } from "../../apps/api-server/dist/modules/neture-pharmacy/consultation-workspace.routes.js";
+import { ConsultationGuidanceService } from "../../apps/api-server/dist/modules/neture-pharmacy/services/consultation-guidance.js";
 import { NeturePharmacyError } from "../../apps/api-server/dist/modules/neture-pharmacy/constants.js";
 const options = {
   type: "postgres",
   host: "127.0.0.1",
-  port: 55446,
-  username: "consultation_fixture",
+  port: 55456,
+  username: "consultation_guidance_fixture",
 };
-const database = "o4o_store_consultation_fixture",
+const database = "o4o_consultation_guidance_fixture",
   marker = `store-consultation:${randomUUID()}`;
 let count = 0;
 async function check(name, fn) {
@@ -41,11 +43,24 @@ const authorize = async (user, store) => {
       "Synthetic access denied",
     );
 };
+const guidanceFor = (db) =>
+  new ConsultationGuidanceService(
+    db,
+    authorize,
+    async () => {},
+    async () => [2],
+    async ({ text }) => ({ translation: "Translated: " + text }),
+  );
 const stations = (db) =>
-  new ConsultationStationService(db, authorize, async (_a, o) => {
-    assert.equal(o, org);
-    return { name: "Fixture product", location: "A-1", publicKey: null };
-  });
+  new ConsultationStationService(
+    db,
+    authorize,
+    async (_a, o) => {
+      assert.equal(o, org);
+      return { name: "Fixture product", location: "A-1", publicKey: null };
+    },
+    (a, o, p) => guidanceFor(db).verify(a, o, p),
+  );
 const input = {
   stationKey: "counter-1",
   name: "Fixture counter",
@@ -483,8 +498,153 @@ async function tests(db) {
       1,
     );
   });
+  await guidanceTests(db);
   await db.query("DELETE FROM store_consultation_stations");
   console.log(`Consultation SQL fixture ${count} checks PASS`);
+}
+async function guidanceTests(db) {
+  const group = "66666666-6666-4666-8666-666666666666",
+    page = "77777777-7777-4777-8777-777777777777",
+    product = "55555555-5555-4555-8555-555555555555";
+  await db.query(
+    `INSERT INTO store_multilingual_product_content_groups(id,organization_id,target_kind,target_id,title,public_key,status) VALUES($1,$2,'local',$3,'Fixture published guide','fixture-public-guide','published')`,
+    [group, org, product],
+  );
+  await db.query(
+    `INSERT INTO store_multilingual_product_content_pages(id,group_id,locale,title,summary,content_format,content,status) VALUES($1,$2,'ko','Fixture source','첫 번째 공개 문단','html',$3::jsonb,'published')`,
+    [
+      page,
+      group,
+      JSON.stringify({
+        html: "<p>두 번째 공개 문단</p><p>세 번째 공개 문단</p>",
+      }),
+    ],
+  );
+  const guides = guidanceFor(db),
+    service = stations(db),
+    base = {
+      mode: "counter-pharmacist",
+      language: "ko",
+      intent: "product-details",
+      question: "Private inquiry",
+      productKind: "local",
+      productId: product,
+    };
+  let room = await service.open(actor, org, {
+      ...input,
+      stationKey: "counter-guide",
+    }),
+    prepared,
+    delivery,
+    peer;
+  await check(
+    "guidance resolves only current store published source and marks missing locale",
+    async () => {
+      prepared = await guides.prepare(actor, org, { ...base, language: "ja" });
+      assert.equal(prepared.card.language, "ko");
+      assert.equal(prepared.card.fallbackUsed, true);
+      await assert.rejects(guides.prepare(actor, otherOrg, base), {
+        code: "STORE_ACCESS_REQUIRED",
+      });
+    },
+  );
+  await check(
+    "AI selection is verbatim, server-issued and never persists the question",
+    async () => {
+      prepared = await guides.prepare(actor, org, { ...base, useAi: true });
+      assert.equal(prepared.card.text, "두 번째 공개 문단");
+      delivery = await service.recordGuidance(
+        actor,
+        org,
+        room.id,
+        room.epoch,
+        prepared.proof,
+      );
+      await service.action(actor, org, room.id, {
+        epoch: room.epoch,
+        action: "share",
+        kind: "guidance",
+        deliveryId: delivery,
+      });
+      const pairing = await service.pairing(actor, org, room.id, {
+        epoch: room.epoch,
+      });
+      peer = await service.claim({ code: pairing.code });
+      const screen = await service.read(peer);
+      assert.equal(screen.shared.text, "두 번째 공개 문단");
+      assert.equal(JSON.stringify(screen).includes("sourceVersion"), false);
+      const [row] = await db.query(
+        "SELECT translation FROM store_consultation_stations WHERE id=$1",
+        [room.id],
+      );
+      assert.equal(JSON.stringify(row).includes("Private inquiry"), false);
+      await assert.rejects(
+        service.action(actor, org, room.id, {
+          epoch: room.epoch,
+          action: "share",
+          kind: "guidance",
+          deliveryId: randomUUID(),
+        }),
+        { code: "GUIDANCE_CHANGED" },
+      );
+    },
+  );
+  await check(
+    "withdrawn guidance disappears from customer reads and cannot be newly shared",
+    async () => {
+      await db.query(
+        "UPDATE store_multilingual_product_content_pages SET status='draft',updated_at=now() WHERE id=$1",
+        [page],
+      );
+      assert.equal((await service.read(peer)).shared, null);
+      await assert.rejects(
+        service.action(actor, org, room.id, {
+          epoch: room.epoch,
+          action: "share",
+          kind: "guidance",
+          deliveryId: delivery,
+        }),
+        { code: "GUIDANCE_SOURCE_CHANGED" },
+      );
+      await db.query(
+        "UPDATE store_multilingual_product_content_pages SET status='published',updated_at=now() WHERE id=$1",
+        [page],
+      );
+    },
+  );
+  await check(
+    "language correction keeps the session, device and pending reply, invalidating prepared output",
+    async () => {
+      await service.reply({
+        ...peer,
+        epoch: room.epoch,
+        text: "Unsent follow-up",
+        language: "ko",
+      });
+      const oldEpoch = room.epoch;
+      room = await service.action(actor, org, room.id, {
+        epoch: room.epoch,
+        action: "language",
+        language: "ja",
+      });
+      assert.equal(room.epoch, oldEpoch);
+      assert.equal(room.connected, true);
+      assert.equal(room.reply.text, "Unsent follow-up");
+      assert.equal((await service.read(peer)).language, "ja");
+      assert.equal((await service.read(peer)).shared, null);
+      await assert.rejects(
+        service.recordGuidance(actor, org, room.id, room.epoch, prepared.proof),
+        { code: "CONSULTATION_CHANGED" },
+      );
+    },
+  );
+  await check('localized pharmacist notice retains its proof through a JSONB round trip',async()=>{
+    const notice=await guides.prepare(actor,org,{...base,intent:'pharmacist',language:'ja'});
+    const id=await service.recordGuidance(actor,org,room.id,room.epoch,notice.proof);
+    await service.action(actor,org,room.id,{epoch:room.epoch,action:'share',kind:'guidance',deliveryId:id});
+    assert.equal((await service.read(peer)).shared.text,'薬の選び方や服用については、薬剤師にご相談ください。');
+  });
+
 }
 async function serve(db) {
   const service = stations(db),
@@ -505,7 +665,7 @@ async function serve(db) {
       : res.status(403).json({ success: false });
   app.use(
     "/api/v1/neture",
-    consultationWorkspaceRoutes(db, service, [guard], [deny]),
+    consultationWorkspaceRoutes(db, service, [guard], [deny], guidanceFor(db)),
   );
   app.get(
     "/api/v1/neture/pharmacy/multilingual-consultation/context",
@@ -515,11 +675,8 @@ async function serve(db) {
         success: true,
         data: {
           organizationId: org,
-          languages: [
-            { key: "ko", label: "한국어" },
-            { key: "en", label: "English" },
-          ],
-          phrases: [
+          languages: CONSULTATION_SCREEN_LANGUAGES,
+        phrases: [
             { key: "pharmacist", text: "약사에게 연결해 드리겠습니다." },
           ],
           supportAllowed: true,
@@ -608,9 +765,9 @@ async function serve(db) {
         ],
       }),
   );
-  const server = app.listen(55447, "127.0.0.1");
+  const server = app.listen(55457, "127.0.0.1");
   await once(server, "listening");
-  console.log("FIXTURE_SERVER_READY 55447");
+  console.log("FIXTURE_SERVER_READY 55457");
   await Promise.race([once(process, "SIGINT"), once(process, "SIGTERM")]);
   await new Promise((resolve) => server.close(resolve));
 }
