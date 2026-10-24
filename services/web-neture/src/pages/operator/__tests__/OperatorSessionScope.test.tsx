@@ -4,17 +4,17 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 const mocks = vi.hoisted(() => ({ user: { id: 'operator-a' } as { id: string } | null, get: vi.fn(), post: vi.fn(), patch: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));
-vi.mock('../../../lib/apiClient', () => ({ api: mocks }));
+vi.mock('../../../lib/apiClient', () => ({ api: mocks, authClient: { api: mocks } }));
 vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: vi.fn() }));
 vi.mock('@o4o/content-editor', () => ({ RichTextEditor: () => <div>본문 편집기</div> }));
 import NeturePage from '../OperatorSemiFranchisePage';
 import NetureEditor from '../SemiFranchiseContentFormPage';
 import { PharmacyOperatorPage as PharmacyPage, PharmacyOperatorContentPage as PharmacyEditor } from '../../../../../web-kpa-society/src/pages/business/PharmacyOperatorPages';
-vi.mock('../../../../../web-kpa-society/src/contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));
+vi.mock('../../../../../web-kpa-society/src/contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }), authClient: { api: mocks } }));
 const envelope = (data: unknown) => ({ data: { success: true, data } });
 const sf = { key: 'pharmacy', name: '담당 사업 A', status: 'active', community_key: 'business:pharmacy' };
 describe.each([['Neture compatibility', NeturePage, NetureEditor], ['Pharmacy', PharmacyPage, PharmacyEditor]] as const)('%s operator account scope', (_label, Page, Editor) => {
-  const tree = (edit = false) => <MemoryRouter initialEntries={[edit ? '/operator/semi-franchises/pharmacy/contents/content-a/edit' : '/operator/semi-franchises']}><Routes>
+  const tree = (edit = false) => <MemoryRouter initialEntries={[edit ? '/operator/semi-franchises/pharmacy/contents/content-a/edit' : '/operator/semi-franchises?tab=memberships']}><Routes>
     <Route path="/operator/semi-franchises" element={<Page />} />
     <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<Editor />} />
   </Routes></MemoryRouter>;
@@ -61,7 +61,7 @@ describe('CarePharm operator adapter model scope', () => {
   afterEach(cleanup);
   it('forwards the requested model instead of showing every assigned business', async () => {
     mocks.get.mockImplementation(async (path: string) => envelope(path.endsWith('/semi-franchises') ? [sf, { ...sf, key: 'carepharm', name: '만성질환관리' }] : []));
-    render(<MemoryRouter><NeturePage businessKey="carepharm" /></MemoryRouter>);
+    render(<MemoryRouter initialEntries={['/operator/semi-franchises?tab=memberships']}><NeturePage businessKey="carepharm" /></MemoryRouter>);
     await waitFor(() => expect(mocks.get.mock.calls.some(([path]) => path.includes('/carepharm/memberships'))).toBe(true));
     expect(mocks.get.mock.calls.some(([path]) => path.includes('/pharmacy/memberships'))).toBe(false);
   });

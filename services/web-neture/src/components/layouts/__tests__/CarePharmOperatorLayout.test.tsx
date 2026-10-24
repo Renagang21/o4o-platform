@@ -23,13 +23,15 @@ function mount(path: string) {
     <Route path="/operator" element={<p>대표 대시보드</p>} />
     <Route path="/operator/semi-franchises" element={<Business />} />
     <Route path="/operator/home-presentation/carepharm" element={<HomeEditor />} />
+    <Route path="/operator/inbox/business/carepharm" element={<p>CarePharm 문의 처리</p>} />
+    <Route path="/operator/inbox/business/pharmacy" element={<p>다른 사업 문의</p>} />
     <Route path="/operator/members" element={<p>전체 회원 조회</p>} />
   </Route></Routes></MemoryRouter>);
 }
 afterEach(() => { cleanup(); state.host = 'carepharm'; state.switcher.mockClear(); });
 it.each(['/operator', '/operator/members'])('CarePharm routes %s to assigned-business work before mounting representative consoles', async path => {
   mount(path);
-  await screen.findByText('사업 업무?key=carepharm&tab=memberships');
+  await screen.findByText('사업 업무?key=carepharm&tab=overview');
   expect(screen.queryByText('대표 대시보드')).toBeNull(); expect(screen.queryByText('전체 회원 조회')).toBeNull();
   expect(screen.getByRole('link', { name: '회원 커뮤니티 운영' }).getAttribute('href')).toBe('/communities/business%3Acarepharm/forum');
   expect(screen.queryByText('Neture 전체 업무')).toBeNull(); expect(state.switcher).not.toHaveBeenCalled();
@@ -49,5 +51,14 @@ it('canonicalizes the editor trailing slash without losing query or hash', async
   mount('/operator/home-presentation/carepharm/?draft=1#preview');
   await screen.findByText('CarePharm 홈 편집');
   expect(screen.getByLabelText('현재 편집 주소').textContent).toBe('/operator/home-presentation/carepharm?draft=1#preview');
-  expect(screen.queryByText('사업 업무?key=carepharm&tab=memberships')).toBeNull();
+  expect(screen.queryByText('사업 업무?key=carepharm&tab=overview')).toBeNull();
+});
+
+it('opens the native CarePharm inbox while rejecting another business inbox', async () => {
+  const view = mount('/operator/inbox/business/carepharm');
+  expect(screen.getByText('CarePharm 문의 처리')).toBeTruthy();
+  view.unmount();
+  mount('/operator/inbox/business/pharmacy');
+  await screen.findByText('사업 업무?key=carepharm&tab=overview');
+  expect(screen.queryByText('다른 사업 문의')).toBeNull();
 });

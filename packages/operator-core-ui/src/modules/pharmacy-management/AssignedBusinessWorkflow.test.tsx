@@ -132,3 +132,17 @@ it('shows the policy version/hash attached to the application being reviewed', a
  await screen.findByText('Fixture pharmacy');fireEvent.click(screen.getByText('신청 시 약관 · 개인정보 확인 기록'));
  expect(screen.getByText(/버전 2/)).toBeTruthy();expect(screen.getByText(/original-content-hash/)).toBeTruthy();
 });
+
+it('opens the optional overview without loading hidden approval rows and keeps legacy direct tabs', async () => {
+  const view = render(<MemoryRouter><Page businessKey="pharmacy" renderOverview={business => <h2>{business.name} 운영 개요</h2>} /></MemoryRouter>);
+  await screen.findByText('가상 약국 사업 운영 개요');
+  expect(api.listSfMemberships).not.toHaveBeenCalled();
+  expect(api.listContents).not.toHaveBeenCalled();
+  expect(screen.queryByText('메인 진열 관리 · 처리 이력')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '가입 신청' }));
+  await waitFor(() => expect(api.listSfMemberships).toHaveBeenCalledWith('pharmacy', 'pending'));
+  view.unmount(); api.listSfMemberships.mockClear();
+  render(<MemoryRouter initialEntries={['/operator/semi-franchises?key=pharmacy&tab=contents']}><Page businessKey="pharmacy" renderOverview={() => <p>운영 개요</p>} /></MemoryRouter>);
+  await waitFor(() => expect(api.listContents).toHaveBeenCalledWith('pharmacy', 'all'));
+  expect(api.listSfMemberships).not.toHaveBeenCalled();
+});
