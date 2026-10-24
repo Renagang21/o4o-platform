@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { parse as parseHtml } from "node-html-parser";
 import type { DataSource } from "typeorm";
 import { NeturePharmacyError } from "../constants.js";
 import { pickFallbackPage } from "../../../routes/o4o-store/utils/multilingual-locale.js";
@@ -54,6 +55,7 @@ type Material = {
   version: string;
   passages: Array<{ id: number; text: string }>;
 };
+// Digest key order is deliberately locale-independent UTF-16 order.
 function canonical(value: unknown): unknown {
   if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) return value.map(canonical);
@@ -95,19 +97,12 @@ export function consultationIntent(
   return null;
 }
 function plain(value: string) {
-  return value
-    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "")
-    .replace(/<\/(?:p|div|li|h[1-6])\s*>|<br\s*\/?>/gi, "\n\n")
-    .replace(/<[^>]*>/g, "")
-    .replace(
-      /&(nbsp|amp|lt|gt|quot|apos);/g,
-      (_, key: string) =>
-        ({ nbsp: " ", amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" })[
-          key
-        ] ?? "",
-    )
-    .trim();
+  // Reuse the API's existing parser instead of backtracking over malformed tags.
+  const root = parseHtml(value);
+  for (const node of root.querySelectorAll("script, style")) node.remove();
+  return root.structuredText.replace(/\n/g, "\n\n").trim();
 }
+
 function passages(page: Page) {
   const body =
     typeof page.content?.html === "string"

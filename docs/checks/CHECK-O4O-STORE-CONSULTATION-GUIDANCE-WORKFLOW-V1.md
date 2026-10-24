@@ -80,3 +80,7 @@ push 전 재확인한 main `0c0575aa35`의 추가 변경은 협력사업 operato
 추가 리뷰의 P2 2건을 보완했다. 콘텐츠를 쓰지 않는 heartbeat는 담당자/매장/epoch를 원자 비교하면서 동시 언어 수정의 현재 행을 반환한다. 실제 세대 만료와 단순 언어 경쟁을 구분해 초안을 잘못 지우지 않는다. SQL barrier 회귀에서 수정 전 409 실패 → 수정 후 같은 epoch·최신 언어·기기 연결 유지, 전체 SQL 20검사 PASS를 확인했다. 공유 콘텐츠 UPDATE의 언어 비교는 유지한다.
 
 고객 안내가 교체·철회되면 이전 읽어주기만 중지한다. 같은 자료의 heartbeat·미전송 고객 입력·음성 입력은 유지한다. 같은 epoch에서 자료 교체/철회 각각을 검사한 고객 화면 10건, 최종 상담 집중 5 files / 48 tests PASS. API/Store build 및 수정 소스 lint 오류/신규 경고 0, fixture DB count 0 확인. 실제 음성 장치의 재생 품질은 여전히 미실행이다.
+
+선택 SonarCloud 검사는 기준 main에서도 실패 상태이며 필수 ruleset은 `CI Gate`다. 이번 변경의 HTML 태그 제거 정규식에 대한 과도한 backtracking 지적은 API의 기존 직접 의존성 `node-html-parser`를 재사용해 수정했다(추가 의존성/lockfile 변경 없음). script/style 제외·문단/엔티티 처리·긴 비정상 태그 회귀를 포함한 API 25 suites / 179 tests PASS, 기존 187 tests SKIP. API build와 해당 소스 lint도 통과했다.
+
+자료 digest의 키 정렬은 locale과 무관한 UTF-16 순서가 의도된 계약이다. `localeCompare` 사용 권고를 적용하면 서버 locale/ICU에 따라 정렬이 달라질 수 있으므로 변경하지 않는다. Sonar의 복잡도·표기 관련 결과는 필수 CI·Codex의 기능/보안 판정과 구분해 최종 통합 기록에 남긴다. 검사 실패를 전부 통과로 표기하지 않는다.

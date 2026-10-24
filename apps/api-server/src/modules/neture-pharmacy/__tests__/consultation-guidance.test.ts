@@ -304,3 +304,13 @@ it("translates the selected excerpt without rerunning AI and rejects stale or in
     ),
   ).rejects.toMatchObject({ code: "GUIDANCE_SOURCE_CHANGED" });
 });
+
+it('extracts readable published paragraphs with the existing parser and excludes script/style bodies', async () => {
+ pages[0].summary=null;pages[0].content={html:'<p>첫 설명 &amp; 원문 &#49;</p><script>hidden instructions</script><style>hidden style</style><p>다음 문단</p>'};
+ const r=await service.prepare('staff','store',input({useAi:true}));
+ expect(r.card?.text).toBe('다음 문단');expect(select.mock.calls[0][0].passages).toEqual([{id:1,text:'첫 설명 & 원문 1'},{id:2,text:'다음 문단'}]);
+});
+it('handles a long malformed tag suffix without changing the published summary',async()=>{
+ pages[0].content={html:'<'.repeat(25000)};
+ const r=await service.prepare('staff','store',input());expect(r.card?.text).toBe('첫 번째 공개 설명입니다.');
+});
