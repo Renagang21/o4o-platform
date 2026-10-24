@@ -1,6 +1,6 @@
 # 약국 협업체 회원 홈 공통 배치 — 1단계
 
-> **상태**: ACTIVE — 구현·검증 진행, main 통합·배포 미완료
+> **상태**: COMPLETED — 회원 홈 1단계의 개발·main 통합·배포 완료. 후속 업무 개발과 운영 준비는 별도
 > **작성일**: 2026-10-24 (Asia/Seoul)
 > **근거**: 프랜차이즈 회원 포털 비교 기획 후 사용자가 개인 조합원 가입과 약국 단위 가입의 분리를 확인하고 진행을 지시
 
@@ -36,9 +36,16 @@
 - [x] 구현 및 가입/권한 경계 회귀 검증
 - [x] 공통 모듈·세 소비 앱 테스트·관련 소비 앱 빌드
 - [x] PC·모바일 합성 API 화면 검증
-- [ ] PR·CI·최신 리뷰·main 통합
-- [ ] 일반 Delivery 및 Pharmcoop frontend_only 배포·검증
+- [x] PR·CI·최신 리뷰·main 통합
+- [x] 일반 Delivery 및 Pharmcoop frontend_only 배포·검증
 
 문서 정합: 회원 홈 1단계의 개발·통합·배포와 후속 업무 개발·실계정 운영 검증을 구분한다. CarePharm 약관은 별도 사업자 미설립에 따라 법정정보가 빈칸인 초안이며 운영 게시 상태를 바꾸지 않는다.
 
 로컬 검증 근거: [CHECK](../checks/CHECK-O4O-COOPERATION-MEMBER-HOME-LAYOUT-V1.md). 실행 테스트 1,686개, 7개 소비 앱 production build, 합성 브라우저 19흐름을 통과했다.
+
+## 완료 확인 — 2026-10-24 (Asia/Seoul)
+
+- [PR #790](https://github.com/Renagang21/o4o-platform/pull/790)의 최신 HEAD `9f6cc27043`는 CI·CodeQL·SonarCloud와 최신 Codex 리뷰를 통과했다. 공개 공지 독립 표시와 소식 anchor에 대한 리뷰 지적은 수정·회귀 검증·해결 처리했다.
+- main `0d0d878a19794628fdba5bbc1086e9052c3d634a`의 [CI 40060917421](https://github.com/Renagang21/o4o-platform/actions/runs/40060917421) PASS. [Delivery 40061671026](https://github.com/Renagang21/o4o-platform/actions/runs/40061671026)에서 공유 프런트 6개 배포·검증 및 serving report 성공, production status `DEPLOYED`.
+- [Pharmcoop 40062079618](https://github.com/Renagang21/o4o-platform/actions/runs/40062079618)의 frontend_only 배포 성공. API 호환성·revision readiness·인증 HTTP smoke·트래픽 100% 전환 확인 PASS. fixture 생성은 skipped.
+- 후속은 공지 확인 상태·교육 진도·개별 사업 참여·내 문의 상태의 기존 API/정책 대조와 연결이다. 이 1단계 완료를 후속 업무 구현 완료로 해석하지 않는다. CarePharm 약관 운영 게시와 실계정·실매장·기기 검증도 별도 운영 준비다.
