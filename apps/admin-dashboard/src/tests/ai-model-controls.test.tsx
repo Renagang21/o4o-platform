@@ -71,6 +71,11 @@ beforeEach(() => {
     selections: {},
     deleted: [],
     protectedModels: ["gemini:gemini-default"],
+    modelReferences: {
+      "gemini:gemini-default": [
+        { kind: "runtime", label: "공통 기본 실행 경로" },
+      ],
+    },
     targets: [
       {
         id: "home.chat",
@@ -99,6 +104,22 @@ beforeEach(() => {
         ...state,
         revision: state.revision + 1,
         selections,
+        modelReferences: {
+          "gemini:gemini-default": [
+            { kind: "runtime", label: "공통 기본 실행 경로" },
+          ],
+          ...(body.selection
+            ? {
+                [body.selection.provider + ":" + body.selection.model]: [
+                  {
+                    kind: "usage" as const,
+                    label: "홈 대화",
+                    target: "home.chat",
+                  },
+                ],
+              }
+            : {}),
+        },
         protectedModels: [
           "gemini:gemini-default",
           ...Object.values(selections).map(
@@ -169,7 +190,16 @@ it("registers, edits, selects and deletes only after releasing the selection; pe
   });
   fireEvent.click(screen.getByRole("button", { name: "사용 모델 저장" }));
   await screen.findByText(/사용 모델을 저장했습니다/);
-  expect(screen.getByRole("button", { name: "gpt-new 삭제" })).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "gpt-new 삭제" }));
+  const deletion = screen.getByRole("dialog", { name: "모델 삭제 설정" });
+  expect(
+    within(deletion).getByRole("button", { name: "모델 삭제", exact: true }),
+  ).toBeDisabled();
+  expect(within(deletion).getByLabelText("홈 대화 · 사용 모델")).toHaveValue(
+    "openai:gpt-new",
+  );
+  expect(api.delete).not.toHaveBeenCalled();
+  fireEvent.click(within(deletion).getByRole("button", { name: "닫기" }));
   expect(api.put).toHaveBeenLastCalledWith(
     "/ai/admin/management/model-selections/home.chat",
     { revision: 2, selection: { provider: "openai", model: "gpt-new" } },
@@ -191,9 +221,12 @@ it("registers, edits, selects and deletes only after releasing the selection; pe
   expect(
     screen.queryByRole("button", { name: "gpt-new 수정" }),
   ).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "gemini-default 삭제" }));
   expect(
-    screen.getByRole("button", { name: "gemini-default 삭제" }),
-  ).toBeDisabled();
+    within(screen.getByRole("dialog", { name: "모델 삭제 설정" })).getByText(
+      /서버 환경 설정에서 필요한 모델/,
+    ),
+  ).toBeInTheDocument();
 });
 it("allows only a label edit for a protected runtime model", async () => {
   render(<Page />);
@@ -204,6 +237,62 @@ it("allows only a label edit for a protected runtime model", async () => {
   expect(within(dialog).getByLabelText("모델 ID")).toBeDisabled();
   expect(within(dialog).getByLabelText("이미지·PDF")).toBeDisabled();
   expect(within(dialog).getByLabelText("표시 이름")).not.toBeDisabled();
+});
+it("changes the consuming model and deletes from the same dialog without navigating away", async () => {
+  state.models.push({
+    provider: "openai",
+    id: "gpt-new",
+    name: "정리 대상",
+    capabilities: ["text"],
+  });
+  state.selections = { "home.chat": { provider: "openai", model: "gpt-new" } };
+  state.protectedModels.push("openai:gpt-new");
+  state.modelReferences["openai:gpt-new"] = [
+    { kind: "usage", label: "홈 대화", target: "home.chat" },
+  ];
+  render(<Page />);
+  fireEvent.click(await screen.findByRole("button", { name: "gpt-new 삭제" }));
+  const dialog = screen.getByRole("dialog", { name: "모델 삭제 설정" });
+  fireEvent.change(within(dialog).getByLabelText("홈 대화 · 사용 모델"), {
+    target: { value: "gemini:gemini-default" },
+  });
+  fireEvent.click(
+    within(dialog).getByRole("button", { name: "사용 모델 저장" }),
+  );
+  await within(dialog).findByText(/사용 관계가 해제됐습니다/);
+  fireEvent.click(
+    within(dialog).getByRole("button", { name: "모델 삭제", exact: true }),
+  );
+  await screen.findByText("모델을 삭제했습니다.");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(api.delete).toHaveBeenCalledWith(
+    "/ai/admin/management/models/openai/gpt-new",
+    { data: { revision: 1 } },
+  );
+  expect(state.selections["home.chat"]).toEqual({
+    provider: "gemini",
+    model: "gemini-default",
+  });
+});
+
+it("explains a configured policy reference and keeps deletion blocked", async () => {
+  state.modelReferences["gemini:gemini-default"] = [
+    { kind: "policy", label: "기존 정책" },
+  ];
+  render(<Page />);
+  fireEvent.click(
+    await screen.findByRole("button", { name: "gemini-default 삭제" }),
+  );
+  const dialog = screen.getByRole("dialog", { name: "모델 삭제 설정" });
+  expect(
+    within(dialog).getByText(/사용 중지된 정책도 포함/),
+  ).toBeInTheDocument();
+  expect(
+    within(dialog).getByRole("button", { name: "모델 삭제", exact: true }),
+  ).toBeDisabled();
+  fireEvent.click(within(dialog).getByRole("button", { name: "닫기" }));
+  expect(api.put).not.toHaveBeenCalled();
+  expect(api.delete).not.toHaveBeenCalled();
 });
 it("keeps entered values on a server conflict without claiming success or retrying the write", async () => {
   api.post.mockRejectedValue({

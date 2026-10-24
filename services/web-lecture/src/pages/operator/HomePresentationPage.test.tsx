@@ -1,0 +1,20 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { initialHomePresentation } from '../../../../../packages/types/src/home-presentation';
+const mocks = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn() }));
+vi.mock('../../lib/apiClient', () => ({ api: mocks }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'synthetic-lecture-operator' } }) }));
+import HomePresentationPage from './HomePresentationPage';
+afterEach(() => { cleanup(); vi.resetAllMocks(); });
+it('loads and publishes only the lecture presentation using the existing revision contract', async () => {
+  const draft = initialHomePresentation('lecture');
+  mocks.get.mockResolvedValue({ data: { success: true, data: { revision: 2, draft, published: null } } });
+  mocks.put.mockImplementation(async (_url, body) => ({ data: { success: true, data: { revision: 3, draft: body.config, published: body.config } } }));
+  render(<HomePresentationPage />);
+  const titles = await screen.findAllByLabelText('제목');
+  fireEvent.change(titles[0], { target: { value: '이번 주 학습 안내' } });
+  fireEvent.click(screen.getByRole('button', { name: '공개 반영' }));
+  await screen.findByText('공개 화면에 반영했습니다.');
+  expect(mocks.get).toHaveBeenCalledWith('/home-presentation/lecture/manage');
+  await waitFor(() => expect(mocks.put).toHaveBeenCalledWith('/home-presentation/lecture/manage', expect.objectContaining({ revision: 2, publish: true, config: expect.objectContaining({ slides: expect.arrayContaining([expect.objectContaining({ title: '이번 주 학습 안내' })]) }) })));
+});

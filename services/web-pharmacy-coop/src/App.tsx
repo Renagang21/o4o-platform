@@ -2,7 +2,7 @@ import {
   CooperativeNotificationLink,
   CooperativeNotifications,
 } from "./Notifications";
-import { OperatorInbox, OperatorInboxLink } from "@o4o/operator-core-ui";
+import { CooperationOperationsOverview, OperatorInbox, OperatorInboxLink } from "@o4o/operator-core-ui";
 import {
   ScopedContactForm,
   PolicyDocumentViewer,
@@ -14,6 +14,8 @@ import { MemberForum } from "./MemberForum";
 import { MyCooperatives, MyUpdates } from "./Participation";
 import {
   BusinessHomeShowcase,
+  CooperationMemberHomeLayout,
+  CooperationMemberNavigation,
   HomePresentationEditor,
   ServiceHomeHero,
   ServiceHomePromotion,
@@ -44,7 +46,6 @@ const CooperativeBusinessOperator = lazy(
 );
 import {
   Link,
-  NavLink,
   Outlet,
   Route,
   Routes,
@@ -196,8 +197,9 @@ function Layout() {
   const { preview, session, businessClient } = useContext(Context);
   const location = useLocation();
   useEffect(() => {
-    window.scrollTo?.(0, 0);
-  }, [location.pathname]);
+    // Explicit anchors are restored by their page; do not reset them afterwards.
+    if (!location.hash) window.scrollTo?.(0, 0);
+  }, [location.pathname, location.hash]);
   return (
     <>
       <a href="#main" className="skip-link">
@@ -513,8 +515,11 @@ function FederationAbout() {
 }
 
 function CooperativeLayout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const { cooperativeSlug = "" } = useParams();
+  useEffect(() => {
+    if (hash === '#cooperative-news') document.getElementById('cooperative-news')?.scrollIntoView?.();
+  }, [pathname, hash, cooperativeSlug]);
   const { cooperatives, preview, businessClient, session } =
     useContext(Context);
   const cooperative = validCooperativeSlug(cooperativeSlug)
@@ -530,6 +535,7 @@ function CooperativeLayout() {
         <span aria-hidden="true">/</span>
         <span>{cooperative.name}</span>
       </div>
+      <div className={session.userId && home ? 'cooperation-member-intro' : undefined}>
       {home && businessClient && !preview ? (
         <ServiceHomeHero
           key={cooperative.id}
@@ -547,27 +553,18 @@ function CooperativeLayout() {
           <p>{cooperative.introduction}</p>
         </section>
       )}
-      <nav className="coop-nav" aria-label="협동조합 메뉴">
-        {[
-          ["", "조합 홈"],
-          ["/materials", "조합 소식·자료"],
-          ["/community", "조합원 이야기"],
-          ["/services", "조합 서비스"],
-          ["/membership", "가입·내 참여"],
-          ["/contact", "조합 문의"],
-          ...(cooperativeAccess(session, cooperative.id).canManage
-            ? [["/operator", "조합 운영"]]
-            : []),
-        ].map(([path, label]) => (
-          <NavLink
-            key={path}
-            end
-            to={`${base}${path}${preview ? "?preview=1" : ""}`}
-          >
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      </div>
+      <CooperationMemberNavigation label="협동조합 메뉴" items={[
+        { key: 'home', label: '홈', to: base + (preview ? '?preview=1' : ''), end: true },
+        { key: 'news', label: '소식', to: base + (preview ? '?preview=1' : '') + '#cooperative-news', end: true },
+        { key: 'materials', label: '자료', to: base + '/materials' + (preview ? '?preview=1' : '') },
+        { key: 'participation', label: '참여 안내', to: base + '/membership' + (preview ? '?preview=1' : '') },
+        { key: 'community', label: '회원 교류', to: base + '/community' + (preview ? '?preview=1' : '') },
+        { key: 'support', label: '지원', to: base + '/contact' + (preview ? '?preview=1' : '') },
+        { key: 'services', label: '조합 서비스', to: base + '/services' + (preview ? '?preview=1' : '') },
+        ...(cooperativeAccess(session, cooperative.id).canManage
+          ? [{ key: 'operator', label: '조합 운영', to: base + '/operator' + (preview ? '?preview=1' : '') }] : []),
+      ]} />
       {businessClient &&
         cooperativeAccess(session, cooperative.id).canManage && (
           <OperatorInboxLink
@@ -655,9 +652,46 @@ function CooperativeHome() {
   };
   return (
     <section className="section">
-      <div className="coop-home-layout">
-        <div className="coop-home-main">
-          <section className="card" aria-label="주요 조합 소식·자료">
+      <CooperationMemberHomeLayout summaryLabel="내 조합 참여" summary={<>
+          <section className="card">
+            <h2>내 참여 상태</h2>
+            <p>조합원 본인의 가입 상태입니다. 약국 이용 자격은 내 매장에서 별도로 확인합니다.</p>
+            <p>
+              {access.status
+                ? membershipLabels[access.status]
+                : session.userId
+                  ? "아직 가입하지 않은 조합입니다."
+                  : "로그인 후 가입 상태를 확인하세요."}
+            </p>
+            <SiteLink
+              className="text-link"
+              to={`/${cooperative.slug}/membership`}
+            >
+              가입·내 참여 확인 →
+            </SiteLink>
+          </section>
+          <section className="card spaced">
+            <h2>회원 지원</h2>
+            <p>공급 안내와 기존 강의·내 매장 서비스를 확인합니다.</p>
+            <SiteLink
+              className="text-link"
+              to={`/${cooperative.slug}/services`}
+            >
+              서비스 보기 →
+            </SiteLink>
+            <SiteLink className="text-link block mt-3" to={`/${cooperative.slug}/contact`}>조합에 문의하기 →</SiteLink>
+          </section>
+          {access.canManage && (
+            <section className="card spaced">
+              <h2>조합 운영</h2>
+              <p>조합원, 소식·자료, 공급 제안을 관리합니다.</p>
+              <SiteLink className="button" to={`/${cooperative.slug}/operator`}>
+                운영 화면으로 →
+              </SiteLink>
+            </section>
+          )}
+      </>}>
+          <section id="cooperative-news" className="card scroll-mt-24" aria-label="주요 조합 소식·자료">
             <div className="section-heading">
               <h2>주요 소식·자료</h2>
               <SiteLink
@@ -714,45 +748,7 @@ function CooperativeHome() {
               </p>
             )}
           </section>
-        </div>
-        <aside className="coop-home-aside" aria-label="내 조합 참여">
-          <section className="card">
-            <h2>내 참여 상태</h2>
-            <p>
-              {access.status
-                ? membershipLabels[access.status]
-                : session.userId
-                  ? "아직 가입하지 않은 조합입니다."
-                  : "로그인 후 가입 상태를 확인하세요."}
-            </p>
-            <SiteLink
-              className="text-link"
-              to={`/${cooperative.slug}/membership`}
-            >
-              가입·내 참여 확인 →
-            </SiteLink>
-          </section>
-          <section className="card spaced">
-            <h2>조합 서비스</h2>
-            <p>공급 안내와 기존 강의·내 매장 서비스를 확인합니다.</p>
-            <SiteLink
-              className="text-link"
-              to={`/${cooperative.slug}/services`}
-            >
-              서비스 보기 →
-            </SiteLink>
-          </section>
-          {access.canManage && (
-            <section className="card spaced">
-              <h2>조합 운영</h2>
-              <p>조합원, 소식·자료, 공급 제안을 관리합니다.</p>
-              <SiteLink className="button" to={`/${cooperative.slug}/operator`}>
-                운영 화면으로 →
-              </SiteLink>
-            </section>
-          )}
-        </aside>
-      </div>
+      </CooperationMemberHomeLayout>
       {businessClient && !preview && (
         <ServiceHomePromotion
           surface="cooperative"
@@ -1112,6 +1108,7 @@ function CooperativeManagement({
       [`${base}?work=contents`, "소식·자료 관리", task === "contents"],
       [`${base}?work=boards`, "조합원 이야기 관리", task === "boards"],
       [`${base}?work=proposals`, "공급 제안 심사", task === "proposals"],
+      [`${base}?work=business-settings`, "자료 진열·사업 약관", task === "business-settings"],
       ...(isAdmin
         ? ([
             [
@@ -1127,17 +1124,23 @@ function CooperativeManagement({
     return (
       <WorkLayout title="조합 운영" items={items}>
         {task === "overview" ? (
-          <>
-            <h3>{cooperative.name} 운영</h3>
-            <p>담당 업무를 선택해 신청 검토와 소식·자료 게시를 진행하세요.</p>
-            <div className="cards two">
-              {items.slice(1).map(([to, label]) => (
-                <SiteLink key={to} className="card" to={to}>
-                  {label} →
-                </SiteLink>
-              ))}
-            </div>
-          </>
+          <CooperationOperationsOverview
+            scopeKey={`${session.userId}:${cooperative.id}`}
+            client={businessClient}
+            endpoint={`/operator-inbox/cooperative/${encodeURIComponent(cooperative.slug)}`}
+            inboxHref={`${base}/inbox`}
+            taskHref={key => {
+              const tasks: Record<string, string> = { "cooperative-members": "members", withdrawals: "members", contents: "contents", proposals: "proposals" };
+              return tasks[key] ? `${base}?work=${tasks[key]}` : undefined;
+            }}
+            areas={[
+              { title: "공지", description: "조합원에게 전할 안내를 게시판의 공지로 게시합니다.", links: [{ label: "조합원 게시판 관리", href: `${base}?work=boards` }, { label: "공개 홈 편집", href: `${base}/home-presentation` }] },
+              { title: "자료", description: "소식·자료를 검토하고 게시·보관합니다.", links: [{ label: "소식·자료 관리", href: `${base}?work=contents` }] },
+              { title: "참여 사업", description: "조합에 접수된 공급 제안을 검토하고 처리합니다.", links: [{ label: "공급 제안 심사", href: `${base}?work=proposals` }] },
+              { title: "지원", description: "문의 처리 상태와 답변·알림 전달 결과를 확인합니다.", links: [{ label: "문의 처리", href: `${base}/inbox` }] },
+              { title: "조합원·운영 설정", description: "개인 조합원의 가입·탈퇴를 관리합니다. 약국 단위 사업 가입과 구분합니다.", links: [{ label: "조합원 관리", href: `${base}?work=members` }, { label: "자료 진열·사업 약관", href: `${base}?work=business-settings` }, ...(isAdmin ? [{ label: "가입 자격·운영자 설정", href: `${base}?work=settings` }] : [])] },
+            ]}
+          />
         ) : task === "members" ? (
           <MemberManagementPanel
             key={`${session.userId}:${cooperative.id}`}
@@ -1163,7 +1166,7 @@ function CooperativeManagement({
             canManage
             boardsOnly
           />
-        ) : task === "contents" || task === "proposals" ? (
+        ) : task === "contents" || task === "proposals" || task === "business-settings" ? (
           <Suspense fallback={<p>업무 화면을 불러오고 있습니다…</p>}>
             <CooperativeBusinessOperator
               key={`${session.userId}:${cooperative.id}:${task}:${editor}`}
@@ -1171,7 +1174,7 @@ function CooperativeManagement({
               slug={cooperative.slug}
               client={businessClient}
               editor={editor}
-              task={task}
+              task={task === "business-settings" ? "settings" : task}
             />
           </Suspense>
         ) : (

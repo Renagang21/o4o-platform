@@ -1,0 +1,64 @@
+.cooperation-member-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #dbe4e9;
+}
+.cooperation-member-nav > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #dbe4e9;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.5;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.cooperation-member-nav > a[aria-current] {
+  border-color: #0f5960;
+  background: #0f5960;
+  color: #fff;
+  font-weight: 600;
+}
+.cooperation-member-nav > a:focus-visible {
+  outline: 3px solid #0891b2;
+  outline-offset: 3px;
+}
+.cooperation-member-home-grid { display: grid; gap: 24px; align-items: start; }
+.cooperation-member-home-summary,
+.cooperation-member-home-content { display: grid; gap: 24px; min-width: 0; }
+.cooperation-member-home-summary > *,
+.cooperation-member-home-content > * { min-width: 0; margin-top: 0; }
+.cooperation-member-home-summary { overflow-wrap: anywhere; }
+.cooperation-member-home-summary > section {
+  padding: 20px;
+  border: 1px solid #dbe4e9;
+  border-radius: 12px;
+  background: #fff;
+}
+.cooperation-member-home-summary h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.cooperation-member-home-summary .text-link { display: block; }
+.cooperation-member-intro .home-hero[data-home-identity],
+.cooperation-member-intro .home-hero.home-hero-full { width: 100%; padding: 24px; margin: 0; border-radius: 12px; }
+.cooperation-member-intro .home-hero[data-home-identity] .home-hero-main { min-height: 0; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+.cooperation-member-intro .home-hero[data-home-identity] .home-hero-title { font-size: clamp(1.25rem, 3vw, 1.875rem) !important; line-height: 1.4 !important; }
+.cooperation-member-intro .home-hero-description { min-height: 0; margin-top: 12px; }
+.cooperation-member-intro .home-hero-art,
+.cooperation-member-intro .home-hero-visual { display: none; }
+.cooperation-member-intro .home-hero-image { max-height: 180px; object-fit: contain; }
+@media (min-width: 1024px) {
+  .cooperation-member-home-grid { grid-template-columns: minmax(0, 1fr) 280px; }
+  .cooperation-member-home-content { grid-column: 1; grid-row: 1; }
+  .cooperation-member-home-summary { grid-column: 2; grid-row: 1; }
+}

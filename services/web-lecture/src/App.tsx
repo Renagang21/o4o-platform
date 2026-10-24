@@ -1,3 +1,4 @@
+import HomePresentationPage from './pages/operator/HomePresentationPage';
 import NotificationsPage from './pages/NotificationsPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
 import ServiceOperatorsPage from './pages/operator/ServiceOperatorsPage';
@@ -69,6 +70,7 @@ export default function App() {
       <Route element={<AccessGate area="admin" />}><Route path="/operator/operators" element={<ServiceOperatorsPage />} /></Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
+        <Route path="/operator/home-presentation" element={<HomePresentationPage />} />
         <Route path="/operator/inbox" element={<OperatorInboxPage />} />
         <Route path="/operator/members" element={<OperatorMembersPage />} />
         <Route path="/operator/members/:id" element={<OperatorMembersPage />} />

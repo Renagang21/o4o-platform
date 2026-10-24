@@ -1,5 +1,8 @@
 import ExternalAiDraftEntry from './pages/ExternalAiDraftEntry';
 import { ContactPage, OperatorInboxPage } from './pages/ContactPages';
+import CustomerConsultationPage from './pages/pharmacy/consultation/CustomerConsultationPage';
+import TabletRunPage from './pages/tablet/TabletRunPage';
+import TabletSetupPage from './pages/tablet/TabletSetupPage';
 import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
 import StoreMultilingualConsultationPage from './pages/pharmacy/StoreMultilingualConsultationPage';
 import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
@@ -178,7 +181,7 @@ function storeChildRoutes() {
         <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
         <Route path="staff-support" element={<StoreStaffSupportPage />} />
-        <Route path="multilingual-consultation" element={<StoreMultilingualConsultationPage />} />
+        <Route path="multilingual-consultation" element={<LegacyConsultationEntry />} />
         <Route path="requests" element={<TabletRequestsPage />} />
         {/* 매장 자료함 · 콘텐츠 */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
@@ -222,7 +225,16 @@ function storeChildRoutes() {
 }
 
 export default function App() {
-  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+  return <BrowserRouter><Suspense fallback={Loading}><Routes>
+    <Route path="/consultation/customer" element={<CustomerConsultationPage />} />
+    <Route path="/tablet/setup" element={<TabletSetupPage />} />
+    <Route path="/tablet/:slug" element={<TabletRunPage />} />
+    <Route path="/*" element={<WorkspaceApp />} />
+  </Routes></Suspense></BrowserRouter>;
+}
+export function WorkspaceApp() {
+  return <AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+    <Route path="/consultation/staff" element={gated(<StoreMultilingualConsultationPage />)} />
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
@@ -322,7 +334,7 @@ export default function App() {
 
       <Route path="*" element={NotFound} />
     </Route>
-  </Routes></Suspense></TermsAcceptanceGate></StoreProvider></AuthProvider></BrowserRouter>;
+  </Routes></Suspense></TermsAcceptanceGate></StoreProvider></AuthProvider>;
 }
 
 function LegacyHubRedirect() {
@@ -332,4 +344,9 @@ function LegacyHubRedirect() {
   const sources = ['content', 'supplier-library', 'multilingual-product-contents', 'blog', 'pop', 'qr', 'video', 'signage', 'screen-set'];
   const destination = destinations[rest] || (sources.includes(rest.split('/')[0]) ? `${S}/library/${rest}` : `${S}${PP.contents}`);
   return <Navigate to={`${destination}${search}${hash}`} replace />;
+}
+
+function LegacyConsultationEntry() {
+  const location = useLocation();
+  return <Navigate to={`/consultation/staff${location.search}`} replace />;
 }

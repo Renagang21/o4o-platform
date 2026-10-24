@@ -18,7 +18,7 @@ export default function CooperativeBusinessOperator({
   slug: string;
   client: PharmacyManagementClient;
   editor?: boolean;
-  task?: "contents" | "proposals";
+  task?: "contents" | "proposals" | "settings";
 }>) {
   const [configured, setConfigured] = useState<PharmacyManagementClient | null>(
     null,
@@ -39,6 +39,7 @@ export default function CooperativeBusinessOperator({
       businessKey={businessKey}
       forumHref={() => `/${encodeURIComponent(slug)}/community`}
       tabs={[task]}
+      showSettingsPanels={task === "settings"}
       contentEditHref={(_key, id) =>
         id
           ? `${base}/contents/${encodeURIComponent(id)}/edit`

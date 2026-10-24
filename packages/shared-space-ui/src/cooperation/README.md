@@ -12,6 +12,8 @@ extensions/index.ts             네 extension 조합
 models.ts                       기존 handoff 계약과 공개 호스트 이동 adapter
 CooperationMemberSpace.tsx       약국 조직 회원용 공통 화면
 BusinessHomeShowcase.tsx         서버가 허용한 사업 자료·제품 전시
+CooperationMemberPresentation.tsx 메뉴 활성 위치·회원 홈 배치 (데이터 조회/자격 판정 없음)
+cooperation-member-presentation.css 공통 메뉴·PC 2열·모바일 참여 상태 우선 표시
 ```
 
 의존 방향은 extension → core다. core는 특정 사업을 import하지 않으며, 조합 지점인 `extensions/index.ts`가 각 설정을 등록한다. 공유 회원 화면은 자료 안내·태그를 props로 받고 사업 키 조건문으로 CarePharm을 선택하지 않는다. 공통 운영 콘텐츠 편집기는 조합 지점의 registry에서 자료 작성 도움을 선택한다.
@@ -28,5 +30,7 @@ BusinessHomeShowcase.tsx         서버가 허용한 사업 자료·제품 전�
 공통 backend는 기존 `modules/neture-pharmacy`의 사업·콘텐츠·공급·정책 API를 재사용한다. 개별 조합은 기존 cooperative services와 personal membership adapter를 유지한다. 조합 개인 가입을 `CooperationMemberSpace`의 약국 조직 가입으로 대체하지 않는다. 사업 이름·주소·태그는 자격 증거가 아니며 요청마다 서버가 현재 사용자·사업·약국/조합 범위를 검사한다.
 
 새 사업별 표시를 추가할 때는 extension과 조합 지점만 변경하고, 회원/권한 API는 기존 서버 계약을 먼저 확인한다. 공개 경로는 해당 origin 내부 경로만 등록한다. registry는 입력을 복사·동결하므로 한 화면이 다른 사업 설정을 덮어쓰지 않는다.
+
+회원 홈의 `CooperationMemberHomeLayout`은 참여/지원 summary와 본문을 표시 slot으로 받는다. `CooperationMemberNavigation`은 각 앱이 실제 경로·현재 권한에 따라 구성한 링크만 표시하며 홈과 소식 anchor를 구분한다. 약국 선택 query와 조합 slug/preview는 호출 앱이 보존한다. Pharmcoop은 이 표시 모듈만 사용하고 약국 조직 가입용 `CooperationMemberSpace`를 사용하지 않는다. 관련 1단계 범위는 [회원 홈 WO](../../../../docs/work-orders/WO-O4O-COOPERATION-MEMBER-HOME-LAYOUT-V1.md)를 따른다.
 
 검증: 저장소 루트에서 `pnpm exec vitest run --config packages/shared-space-ui/vitest.config.mjs`. 영향 소비 앱과 운영 UI 테스트·빌드를 함께 실행한다. 이번 범위와 결과는 [WO](../../../../docs/work-orders/WO-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md), [CHECK](../../../../docs/checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)를 따른다.

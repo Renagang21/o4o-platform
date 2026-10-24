@@ -33,7 +33,7 @@ fixture("durable model controls on isolated PostgreSQL", () => {
     );
     await db.query("CREATE TABLE ai_query_policy (default_model varchar(100))");
     await db.query(
-      "CREATE TABLE ai_llm_policies (provider varchar(20),model varchar(100),fallback_provider varchar(20),fallback_model varchar(100),is_enabled boolean)",
+      "CREATE TABLE ai_llm_policies (provider varchar(20),model varchar(100),fallback_provider varchar(20),fallback_model varchar(100),is_enabled boolean,scope varchar(100))",
     );
     // Older physical schema has config but no entity defaultmodel/defaultModel column.
     await db.query(
@@ -129,7 +129,7 @@ fixture("durable model controls on isolated PostgreSQL", () => {
       JSON.stringify({ model: "gpt-4o" }),
     ]);
     await db.query(
-      "INSERT INTO ai_llm_policies VALUES ('gemini','gemini-2.0-flash','openai','gpt-4.1',false)",
+      "INSERT INTO ai_llm_policies(provider,model,fallback_provider,fallback_model,is_enabled) VALUES ('gemini','gemini-2.0-flash','openai','gpt-4.1',false)",
     );
     const service = new ModelControlService(db);
     const snapshot = await service.snapshot();
@@ -151,6 +151,85 @@ fixture("durable model controls on isolated PostgreSQL", () => {
       }),
     ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
     expect(await db.query("SELECT key FROM settings")).toEqual([]);
+  });
+  it("releases the scoped legacy model only after all translations select their own model", async () => {
+    await db.query(
+      "INSERT INTO ai_llm_policies VALUES ('gemini','gemini-2.0-flash','openai','gpt-4.1',true,'CONTENT_TRANSLATION')",
+    );
+    const service = new ModelControlService(db);
+    let state = await service.change(0, actor, {
+      action: "select",
+      target: "store.translation",
+      selection: { provider: "gemini", model: "gemini-3.8-flash" },
+    });
+    expect(
+      state.modelReferences["gemini:gemini-2.0-flash"].map((x) => x.target),
+    ).toEqual(["pharmacy.consultation"]);
+    state = await service.change(state.revision, actor, {
+      action: "select",
+      target: "pharmacy.consultation",
+      selection: { provider: "gemini", model: "gemini-3.8-flash" },
+    });
+    state = await service.change(state.revision, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.0-flash",
+    });
+    await expect(
+      service.change(state.revision, actor, {
+        action: "select",
+        target: "store.translation",
+        selection: null,
+      }),
+    ).rejects.toMatchObject({ code: "AI_MODEL_REMOVED" });
+    expect((await db.query("SELECT model FROM ai_llm_policies"))[0].model).toBe(
+      "gemini-2.0-flash",
+    ); // historical policy is not rewritten.
+  });
+  it("keeps the shared query model until direct consumers' policy changes", async () => {
+    await db.query("INSERT INTO ai_query_policy VALUES ($1)", [
+      "gemini-2.5-flash",
+    ]);
+    const service = new ModelControlService(db);
+    let state = await service.snapshot();
+    const targets = [
+      ...new Set(
+        state.modelReferences["gemini:gemini-2.5-flash"].flatMap((ref) =>
+          ref.target ? [ref.target] : [],
+        ),
+      ),
+    ];
+    expect(targets.length).toBeGreaterThan(0);
+    for (const target of targets)
+      state = await service.change(state.revision, actor, {
+        action: "select",
+        target,
+        selection: { provider: "gemini", model: "gemini-3.8-flash" },
+      });
+    await expect(
+      service.change(state.revision, actor, {
+        action: "delete",
+        provider: "gemini",
+        id: "gemini-2.5-flash",
+      }),
+    ).rejects.toMatchObject({ code: "AI_MODEL_IN_USE" });
+    expect((await service.snapshot()).revision).toBe(state.revision);
+    expect(
+      (await db.query("SELECT default_model FROM ai_query_policy"))[0],
+    ).toEqual({ default_model: "gemini-2.5-flash" });
+    await withAiModelControlLock(db, (manager) =>
+      manager.query("UPDATE ai_query_policy SET default_model=$1", [
+        "gemini-3.8-flash",
+      ]),
+    );
+    await service.change(state.revision, actor, {
+      action: "delete",
+      provider: "gemini",
+      id: "gemini-2.5-flash",
+    });
+    expect((await new ModelControlService(db).snapshot()).deleted).toContain(
+      "gemini:gemini-2.5-flash",
+    );
   });
   it("serializes policy validation/write against retirement in both lock orders", async () => {
     const service = new ModelControlService(db);

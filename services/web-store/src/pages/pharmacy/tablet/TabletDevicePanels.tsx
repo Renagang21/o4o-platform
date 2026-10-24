@@ -4,7 +4,6 @@ import {
   cornerPrimaryLabel,
   type TabletCornerItem,
 } from "@o4o/tablet-screen-set-editor";
-import { getActiveServicePublicOrigin } from "../../../lib/serviceContext";
 import type {
   TabletPairing,
   useTabletDevices,
@@ -95,7 +94,7 @@ export function TabletPairingModal({
           </p>
           <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
             <div className="text-[11px] text-slate-400">연결 주소</div>
-            <div className="font-mono text-sm break-all select-all">{`${getActiveServicePublicOrigin()}/tablet/setup`}</div>
+            <div className="font-mono text-sm break-all select-all">{`${window.location.origin}/tablet/setup`}</div>
           </div>
           <div className="rounded-xl bg-teal-50 border border-teal-100 px-4 py-4 text-center">
             <div className="text-[11px] text-teal-700">연결 코드</div>
