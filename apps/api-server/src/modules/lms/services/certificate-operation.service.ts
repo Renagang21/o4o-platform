@@ -1,3 +1,4 @@
+import { certificateRenewalExpiry } from "./certificate-renewal-expiry.js";
 import type { DataSource, EntityManager } from "typeorm";
 import {
   assertInboxWriter,
@@ -189,9 +190,9 @@ export async function changeLectureCertificate(
     } else if (action === "renew") {
       // Same rule as Certificate.renew(): expiresAt = now + months, isValid = true (also re-validates a revoked row).
       after = await updateRow(
-        `UPDATE lms_certificates SET "isValid"=true, "expiresAt"=now() + make_interval(months => $2)
+        `UPDATE lms_certificates SET "isValid"=true, "expiresAt"=$2
          WHERE id=$1 RETURNING *`,
-        [id, months],
+        [id, certificateRenewalExpiry(months!)],
       );
     } else {
       // Column names come only from the fixed CHANGE_FIELDS allowlist; values are bound parameters.

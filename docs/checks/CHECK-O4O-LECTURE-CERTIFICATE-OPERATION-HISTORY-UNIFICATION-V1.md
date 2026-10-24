@@ -60,3 +60,7 @@ PostgreSQL 15 위의 실행은 이 환경에 PG15 · Docker 가 없어 하지 �
 - 이미 null 로 저장된 `certificateId` 과거 행 보정은 데이터 변경이라 별도 승인 대상이다(현재 운영 대상 0건).
 
 문서 정합: 해당 없음
+
+## 통합 리뷰 보완 — 갱신 달력 계산
+
+PR #789 Codex 리뷰에서 PostgreSQL 월 interval이 월말을 보정해 기존 `Certificate.renew()`의 JavaScript `setMonth()` overflow와 달라지는 점을 확인했다. 동일한 JavaScript 달력 계산으로 만료일을 만든 뒤 잠금 트랜잭션 안에서 저장하도록 보완했다. 평년·윤년 월말, 윤일 12개월 갱신, 연도 경계의 회귀 4건과 자동 수료 연결 계약을 통합 환경에서 실행해 2 suite 12건이 통과했다. 운영 데이터 변경·과거 행 보정은 수행하지 않았다.
