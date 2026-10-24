@@ -177,8 +177,8 @@ export class ConsultationStationService {
   private async update(row: Row, sql: string, values: unknown[] = []) {
     const [updated] = await this.query(
       `UPDATE store_consultation_stations SET ${sql},version=version+1,updated_at=now()
-      WHERE id=$1 AND organization_id=$2 AND operator_user_id=$3 AND epoch=$4 AND active=true RETURNING *`,
-      [row.id, row.organization_id, row.operator_user_id, row.epoch, ...values],
+      WHERE id=$1 AND organization_id=$2 AND operator_user_id=$3 AND epoch=$4 AND active=true AND language=$${values.length + 5} RETURNING *`,
+      [row.id, row.organization_id, row.operator_user_id, row.epoch, ...values, row.language],
     );
     if (!updated)
       fail(

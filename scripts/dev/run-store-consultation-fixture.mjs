@@ -645,6 +645,23 @@ async function guidanceTests(db) {
     assert.equal((await service.read(peer)).shared.text,'薬の選び方や服用については、薬剤師にご相談ください。');
   });
 
+  await check("language change wins over an already validating customer share", async () => {
+    const notice = await guides.prepare(actor, org, { ...base, intent: "pharmacist", language: "ja" });
+    const id = await service.recordGuidance(actor, org, room.id, room.epoch, notice.proof);
+    let enter, release;
+    const entered = new Promise(resolve => { enter = resolve; });
+    const barrier = new Promise(resolve => { release = resolve; });
+    const delayed = new ConsultationStationService(db, authorize, async () => ({ name: "Fixture product", location: "A-1" }), async (a, o, proof) => {
+      enter(); await barrier; await guides.verify(a, o, proof);
+    });
+    const sharing = delayed.action(actor, org, room.id, { epoch: room.epoch, action: "share", kind: "guidance", deliveryId: id });
+    await entered;
+    room = await service.action(actor, org, room.id, { epoch: room.epoch, action: "language", language: "ko" });
+    release();
+    await assert.rejects(sharing, { code: "CONSULTATION_CHANGED" });
+    assert.equal((await service.read(peer)).shared, null);
+    assert.equal((await service.read(peer)).language, "ko");
+  });
 }
 async function serve(db) {
   const service = stations(db),

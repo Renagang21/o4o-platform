@@ -7,7 +7,7 @@ import {
   type ConsultationStation,
 } from "../../../api/consultationWorkspace";
 
-/** Opening is explicit. Mode/language controls stay locked until the current session ends. */
+/** Opening is explicit. A language correction keeps the current room and paired device. */
 export function useConsultationStation(
   scope: string,
   mode: string,

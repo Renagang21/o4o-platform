@@ -64,3 +64,11 @@ SQL/브라우저 검증은 고정 loopback의 세션 전용 PostgreSQL 컨테이
 push 전 재확인한 main `0c0575aa35`의 추가 변경은 협력사업 operator 영역이며 이번 수정 경로와 중첩이 없다. 자동 merge/rebase 없이 개발 branch를 인계한다. 선행 branch의 기능도 이번 branch에 포함되므로 통합 시 선행 작업과 중복 처리하지 않는다. 작업 트리는 병합 전 후속 수정용 `KEEP`이다.
 
 문서 정합: 설계 §15-8·15-8-1의 상담 언어/업무·게시 자료 보조 계약 정렬 1건 / 이번 TODO·CHECK 작성 / 과거 CHECK 재작성·canonical index 변경·SUPERSEDED 추가 없음.
+
+## main 통합 검증·리뷰 보완 (2026-10-24)
+
+사용자의 후속 ‘push된 파일 main 병합 → 배포’ 지시에 따라 이 공간에서 통합을 진행한다. PR [#798](https://github.com/Renagang21/o4o-platform/pull/798)은 선행 독립 실행과 이번 상담 업무를 함께 포함한다. 최신 main `0c0575aa35`를 `51fe7eb9c2`로 충돌 없이 결합한 뒤 Store 808건, API 177건, Store/admin build를 다시 통과했다.
+
+통합 자체 점검과 Codex 리뷰에서 같은 담당자가 두 탭을 열어 고객 언어 변경과 공유를 동시에 진행하면 예전 언어의 안내가 다시 저장될 수 있음을 확인했다(P2 1건). 현재 상담의 모든 공통 UPDATE에 준비 당시 언어 비교를 추가했다. epoch·담당자·매장뿐 아니라 언어가 바뀐 오래된 공유/준비 결과도 거절한다. 기존 테이블·권한·API 계약은 추가 변경하지 않았다.
+
+격리 PostgreSQL의 검증 대기 barrier로 경쟁 상태를 재현했다. 수정 전에는 기대한 거절이 없어 실패했고, 수정 후에는 `CONSULTATION_CHANGED`로 거절·고객 공유 공란을 확인했다. 기존 18검사와 추가 동시성 1검사, 전체 prefix/empty down-up·populated down 거절 총 19검사 PASS. API build·해당 소스 lint PASS, fixture DB count 0 재확인. 운영 DB는 건드리지 않았다. PR CI·재리뷰·배포 결과는 통합 종료 기록에서 확정한다.
