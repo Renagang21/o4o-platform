@@ -476,7 +476,7 @@ export default function StoreQrAiDescriptionPage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
               {/* 외부 LLM 경로 — 입력이 갖춰졌을 때만 노출. 이 화면의 유일한 작성 경로(WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1) */}
               {canAuthor ? (
-                <ProductDescriptionAssist key={`${mode}:${productName}:${cornerName}:${externalReferenceText}`}
+                <ProductDescriptionAssist key={`${editContentId ?? 'new'}:${mode}`}
                   context={{ task: 'qr', purpose: 'consumer-qr',
                     title: mode === 'corner' ? cornerName.trim() : title.trim() || null,
                     productName: mode === 'single' ? productName.trim() : null,
