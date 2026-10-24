@@ -170,6 +170,7 @@ function Consultation({
     },
   );
   const startListening = speech.startListening;
+  const resetSpeech = speech.reset;
   useEffect(() => {
     if (pendingVoice && pendingVoice === direction) {
       voiceTarget.current = "sentence";
@@ -240,7 +241,7 @@ function Consultation({
   }, [organizationId, retry, initialMode]);
 
   const clear = useCallback(() => {
-    speech.reset();
+    resetSpeech();
     version.current++;
     clearDrafts();
     setReplyLanguage("");
@@ -251,16 +252,16 @@ function Consultation({
     setPendingVoice(null);
     focusReply.current = false;
     dialog.current?.close();
-  }, [speech.reset, clearDrafts]);
+  }, [resetSpeech, clearDrafts]);
   const applyLanguage = useCallback((value: string) => {
-    speech.reset();
+    resetSpeech();
     version.current++;
     setBusy(false);
     clearResults();
     setReplyLanguage(previous => incomingText.trim() ? previous || language : "");
     setLanguage(value);
     dialog.current?.close();
-  }, [speech.reset, clearResults, incomingText, language]);
+  }, [resetSpeech, clearResults, incomingText, language]);
   useEffect(() => {
     if (connected?.language && connected.language !== language)
       applyLanguage(connected.language);
