@@ -136,6 +136,7 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
       'operator-supplier-store-description-review.controller.ts',
       'product-content-browse.controller.ts',
       'product-db-maintenance.controller.ts',
+      'product-correction.controller.ts',
       'product-description-qr-summary.controller.ts',
       'product-image-quality.controller.ts',
       'product-landing.controller.ts',
@@ -196,6 +197,10 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
 
     /** 공통 정본을 바꾸는 write route 는 명시 guard 를 유지한다 (다층 방어). */
     const GUARDED: Array<[string, string]> = [
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/rules'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.put('/rules/:id'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/batches'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.patch('/batches/:id/items/:taskId'"],
       ['modules/neture/controllers/product-master-create.controller.ts', "router.post('/'"],
       ['modules/neture/controllers/product-master-status.controller.ts', "router.patch('/:id/status'"],
       ['modules/neture/controllers/product-master-description.controller.ts', "router.post('/:id/store-descriptions'"],

@@ -8,6 +8,7 @@
  * ProductMaster/ProductIdentifier 미변경, hard delete 없음.
  */
 
+import ProductCorrectionWorkspace from './ProductCorrectionWorkspace';
 import { useState, type ReactNode } from 'react';
 import { Settings, AlertTriangle, PlayCircle, Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -32,6 +33,8 @@ export default function ProductDbMaintenancePage() {
         <h2 className="text-lg font-semibold text-gray-800">데이터 정비</h2>
       </div>
 
+      <ProductCorrectionWorkspace />
+      <details className="rounded border border-gray-200 p-4"><summary className="cursor-pointer text-sm font-semibold">기존 후보 정합화 작업</summary><div className="mt-4 space-y-4">
       <MaintenanceArchiveCard
         title="등록 완료 고아 후보 정합화"
         description={
@@ -55,6 +58,7 @@ export default function ProductDbMaintenancePage() {
         dryRunFn={dryRunCancelledDrugPending}
         applyFn={applyCancelledDrugPending}
       />
+      </div></details>
     </div>
   );
 }
