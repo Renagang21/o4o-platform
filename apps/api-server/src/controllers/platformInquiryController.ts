@@ -56,7 +56,7 @@ export async function submitInquiry(req: Request, res: Response) {
 
     // 은퇴한 유형은 접수하지 않는다 — 삭제한 'siteguide' 문의가 공개 접수로 다시 생기지 않게 한다
     // (CHECK-O4O-SITEGUIDE-RETIREMENT-V1 §5). 다른 유형 값의 처리는 바꾸지 않는다.
-    if (RETIRED_INQUIRY_TYPES.has(String(type))) {
+    if (typeof type === 'string' && RETIRED_INQUIRY_TYPES.has(type)) {
       return res.status(400).json({
         success: false,
         error: '더 이상 접수하지 않는 문의 유형입니다.',

@@ -74,7 +74,7 @@ describe('platform inquiry — retired type', () => {
   });
 });
 
-it.each(['unknown', '', 'PLATFORM', 'glucoseview', null, ['platform'], { type: 'platform' }])(
+it.each(['unknown', '', 'PLATFORM', 'glucoseview', null, ['platform'], { type: 'platform' }, { toString: null }, { toString: 'platform' }])(
   'rejects unregistered inquiry type %j without DB writes or email', async type => {
     mockRepo.create.mockClear();
     mockRepo.save.mockClear();

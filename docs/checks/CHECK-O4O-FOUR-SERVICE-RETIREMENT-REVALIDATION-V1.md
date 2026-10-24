@@ -28,3 +28,9 @@
 - 실계정/브라우저/운영 DB/메일/Cloud 변경을 실행하지 않았다. SQL 제거만으로 운영 데이터 삭제나 table DROP 완료를 뜻하지 않는다.
 - migration·DDL·데이터 삭제·도메인 종료는 이번 변경에 없다. #610의 조직·QR 경계와 snapshot second-pass는 별도 잔여다.
 - CI·Codex·main 통합 후 API 배포 검증이 필요하다. 기존 #615 전체 완료로 닫힘 사유를 덮어쓰지 않는다. 개발 worktree는 KEEP.
+
+## 같은 WO 후속 — 비문자열 type의 변환 예외
+
+#803 main 병합 후 배포 전 입력 검토에서 `{toString: null}` 또는 `{toString: 'platform'}` 형태의 JSON type이 기존 retired 검사 `String(type)`에서 예외를 내 500을 반환하는 사례 2개를 재현했다(기존 코드 2 FAIL / 12 PASS). retired 검사도 문자열에만 적용하고 비문자열은 아래 allowlist 검사에서 400으로 거부한다. 정상 유형/siteguide의 기존 오류 코드·무쓰기 계약을 보존한다. #803은 이미 병합됐으므로 동일 WO/branch 후속 수정으로 검증·push 후 별도 후속 PR에서 통합하며, 배포는 이 수정을 포함한 최신 main 기준으로 진행한다. 원본 #615 branch를 수정하거나 보호 이력을 재작성하지 않는다.
+
+후속 로컬 검증: 통합 17 suites / 276 tests PASS, PostgreSQL opt-in 1 suite / 1 test SKIP. API production build·변경 lint·문서 링크/민감정보·diff 검사 PASS. 최종 main/CI/배포 결과는 후속 PR에 기록한다.
