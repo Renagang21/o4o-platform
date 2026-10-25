@@ -276,7 +276,7 @@ export class AiManagementService {
           OR (l."promptTokens" = 0 AND l."completionTokens" = 0)) AS usage_unknown
       FROM ai_usage_logs l WHERE l."createdAt" >= $1 AND l."createdAt" < $2
         AND NOT EXISTS (SELECT 1 FROM ai_usage_reservations r
-          WHERE r.provider_request_id = l."requestId"::text AND r.pricing->0->'invocation' IS NOT NULL)
+          WHERE r.provider_request_id = l."requestId" AND r.pricing->0->'invocation' IS NOT NULL)
       UNION ALL
       SELECT COALESCE(r.receipt->>'provider', r.pricing->0->>'provider') AS provider,
         COALESCE(r.receipt->>'model', r.pricing->0->'invocation'->>'model') AS model,

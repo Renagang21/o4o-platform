@@ -10,7 +10,7 @@
 
 선행 텍스트 회계 `d11cb4afa19b258409408a5822e342361594ca77`과 이를 포함하는 전문 호출 회계 `2d91d80128f6160811501a3e1fa90a32523cd39d`을 한 PR로 통합한다. 원격 두 branch의 SHA를 확인했고 기존 동일 AI PR은 없었다. 별도 서비스의 PR은 이 AI 통합에 섞지 않는다.
 
-사용자의 이번 지시는 이 공간에서 PR 생성·CI/리뷰·병합·정상 배포를 진행할 권한이다. 기존 main checkout의 `work` branch/`1b158cf4c1`은 보존하고 새 main 기반 전용 worktree에서 원본 개발 branch를 정상 merge했다. 통합 후 `apps`·`packages`·`scripts`·`.github` 소스는 `2d91d80128`과 차이 0이다. 신규 migration·DB DDL·결제 계약·credential·배포 workflow 변경은 없다.
+사용자의 이번 지시는 이 공간에서 PR 생성·CI/리뷰·병합·정상 배포를 진행할 권한이다. 기존 main checkout의 `work` branch/`1b158cf4c1`은 보존하고 새 main 기반 전용 worktree에서 원본 개발 branch를 정상 merge했다. 최초 통합 후 `apps`·`packages`·`scripts`·`.github` 소스는 `2d91d80128`과 차이 0이었으며 이후 §5의 실제 PostgreSQL 리뷰 보완을 추가했다. 신규 운영 migration·DB DDL·결제 계약·credential·배포 workflow 변경은 없다.
 
 ## 2. 기술 검증 근거
 
@@ -34,5 +34,11 @@
 통합 PR은 [#811](https://github.com/Renagang21/o4o-platform/pull/811)이다. PR·CI·review·merge·배포 결과는 확인한 사실만 이 절에 보완한다. 실제 유료 AI 호출·운영 DB 조회/변경·새 가격/한도 저장은 실행하지 않았다.
 
 문서 정합: 이번 문서는 선행 개발 CHECK의 push 인계와 후속 main/배포 상태를 구분한다. 원래 개발 검증 기록을 배포 완료로 바꾸지 않는다.
+
+## 5. PR 리뷰 보완 — UUID 비교
+
+Codex의 P1은 관리 집계의 `provider_request_id = requestId::text` 비교였다. 두 실제 컬럼은 모두 UUID이며 한쪽만 text로 변환하면 PostgreSQL이 쿼리를 거부한다. UUID끼리 비교하도록 불필요한 cast 1개를 제거했다. schema/API/권한 변경은 없다.
+
+기존 SQLite 검증은 PG cast를 제거해 이 문제를 숨겼다. 기존 격리 quota fixture 계약과 같은 loopback `55447`·전용 사용자·임시 DB만 사용하는 PostgreSQL 회귀 4건을 추가했다. 실제 PostgreSQL 16의 UUID·enum·JSONB 컬럼과 수정하지 않은 production query로 빈 원장·성공/실패 중복·OCR/Qwen 미확정을 확인한다. 수정 전 4건 실패로 재현했고 수정 후 신규 집계·기존 quota schema/예약/모델 제어 **4 suite/28 tests PASS**다. 운영 DB 설정은 소비하지 않았으며 Docker tmpfs에 생성한 fixture만 사용했다. 마지막 테스트 후 전용 DB·컨테이너 잔존을 확인한다.
 
 WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-accounting-main-integration-20261025` · `wo/ai-accounting-main-integration-20261025` · base `23717b6dc0` · `KEEP` (PR/배포 결과 확인 전).
