@@ -30,10 +30,10 @@ export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, o
       } else {
         const response = await storeDescriptionApi.list(id);
         if (!response.success || !Array.isArray(response.data?.items)) throw new Error('Invalid source');
-        const pages = response.data.items.filter(p => p.status.toLowerCase() === 'published' && p.contentHtml?.trim());
+        const pages = response.data.items.filter(p => p.status.toLowerCase() === 'canonical' && p.contentHtml?.trim());
         const page = pages.find(p => p.language === locale) || pages.find(p => p.language === 'ko') || pages[0];
         if (page) value = { html: sanitizeRichHtml(page.contentHtml!), title: page.title,
-          source: `O4O 게시 상품 설명 · ${page.language} · ${page.updatedAt}` };
+          source: `O4O 매장용 상품 설명 · ${page.language} · ${page.updatedAt}` };
       }
       if (!current() || !isCurrent()) return;
       if (value?.html.trim()) { setEvidence(value); onLoaded(value); } else setEmpty(true);

@@ -32,3 +32,5 @@ PR #813의 첫 HEAD `7bac1d00e1`은 Codex 지적 0건·보안/품질/웹 build �
 GitHub 로그 호스트 접근은 환경 허용 목록의 403으로 막혀 있다. 기존 도메인을 보존하고 `results-receiver.actions.githubusercontent.com`만 추가한 초안을 저장했으며 적용/게시 완료로 표시하지 않는다. 로컬 재현과 사용자의 로그로 원인을 확인했고 개발·CI 보완은 계속 진행한다.
 
 수정 HEAD `56e7795b82`의 CI는 API 3개 shard가 모두 통과했다. 웹 build에 포함된 Store 검사에서는 음성 회귀 1건이 실패했다(848건 중 847 PASS). GitHub annotation과 사용자가 제공한 전체 로그에서 같은 `consultation-speech.test.tsx:66`을 확인했다. 음성 이벤트 직후 저장한 DOM 참조로 버튼을 동기 조회하던 검사를 현재 화면 재조회·인식 시작 상태 확인·비동기 ASR callback 완료 후 단언하도록 바꿨다. 원래 조작/문장/명시 실행 검사를 유지하고 예기치 않은 인식 abort 없음도 추가했다. `CI=true`에서 음성 18건의 5개 순서 seed 전부 PASS·Store 전체 848 PASS·lint PASS. 새 HEAD로 CI와 검토를 다시 확인한다.
+
+HEAD `521d375f44`의 자동 검토에서 P2 1건을 확인했다. O4O 취급 상품 원문 endpoint는 `canonical` 매장용 설명만 반환하지만 Picker가 `published`만 허용해 정상 자료를 빈 결과로 처리했다. 실제 controller/DTO 계약에 맞춰 canonical만 선택하도록 수정했다. canonical 응답의 요청 언어/한국어 대체·draft/published 제외·본문 없음/실패/재시도와 명시 삽입을 검증했다. Picker 6건·Store 전체 851건·Store build/lint PASS. 해당 지적은 수정 commit push 후 해결 처리하고 최신 HEAD를 재검토한다.
