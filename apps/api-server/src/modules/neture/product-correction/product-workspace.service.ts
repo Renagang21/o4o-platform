@@ -14,7 +14,7 @@ const link = (productId: string, args: Record<string, string>) =>
 export class ProductCorrectionProductWorkspace {
   constructor(private readonly db: DataSource) {}
 
-  async detail(productId: string, section: ProductWorkspaceSection, page: number) {
+  detail(productId: string, section: ProductWorkspaceSection, page: number) {
     return this.db.transaction(async (db) => {
       await db.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
       await db.query("SET LOCAL statement_timeout='15s'");
@@ -46,9 +46,11 @@ export class ProductCorrectionProductWorkspace {
         default:
           from = `FROM settings WHERE type=$2 AND value->>'productId'=$1`;
           params.push({ proposals: PROPOSAL_TYPE, renewals: RENEWAL, edits: 'product_correction_edit_event' }[section]);
-          order = section === 'edits' ? `value->>'at' DESC,key` : section === 'proposals'
-            ? `COALESCE(value->>'appliedAt',value->>'reviewedAt',value->>'createdAt') DESC,key`
-            : `value->>'updatedAt' DESC,key`;
+          order = {
+            edits: `value->>'at' DESC,key`,
+            proposals: `COALESCE(value->>'appliedAt',value->>'reviewedAt',value->>'createdAt') DESC,key`,
+            renewals: `value->>'updatedAt' DESC,key`,
+          }[section];
       }
       const count = await db.query(`SELECT COUNT(*)::int AS total ${from}`, params);
       const rows = await db.query(`SELECT ${projection} ${from} ORDER BY ${order} LIMIT 10 OFFSET $${params.length + 1}`,
@@ -66,8 +68,11 @@ export class ProductCorrectionProductWorkspace {
         }
         if (section === 'proposals') {
           const proposal = source as ProductCorrectionProposal;
+          let state = 'pending';
+          if (proposal.appliedAt) state = 'applied';
+          else if (proposal.reviewedAt) state = 'reviewed';
           return { id: proposal.id, title: `${proposal.ruleSnapshot.title} · 변경안 v${proposal.revision}`,
-            state: proposal.appliedAt ? 'applied' : proposal.reviewedAt ? 'reviewed' : 'pending',
+            state,
             at: proposal.appliedAt ?? proposal.reviewedAt ?? proposal.createdAt, notes: proposal.reviewNote,
             evidence: proposal.evidence, changes: proposal.changes,
             href: link(productId, { batch: proposal.batchId, task: proposal.taskId, proposal: proposal.id }) };

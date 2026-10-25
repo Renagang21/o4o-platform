@@ -36,7 +36,9 @@ async function main() {
     if (db.isInitialized) await db.destroy();
   }
 }
-void main().catch(() => {
+try {
+  await main();
+} catch {
   console.error('PRODUCT_CORRECTION_WORKER_FAILED');
   process.exitCode = 1;
-});
+}

@@ -3,6 +3,13 @@ export interface WorkerTick {
   pagesProcessed: number;
   schedulesStarted: number;
 }
+const workerRuntime = { now: () => Date.now(), stopped: () => false };
+function parseBudget(raw: string | undefined, limit: number) {
+  if (!raw || !/^\d+$/.test(raw)) throw new Error('INVALID_WORKER_BUDGET');
+  const value = Number(raw);
+  if (value < 1 || value > limit) throw new Error('INVALID_WORKER_BUDGET');
+  return value;
+}
 export function parseCorrectionWorkerArgs(args: string[]) {
   if (args.length === 1 && args[0] === '--help') return null;
   let run = false, maxTicks = 100, maxSeconds = 240;
@@ -10,9 +17,7 @@ export function parseCorrectionWorkerArgs(args: string[]) {
     if (args[i] === '--run' && !run) { run = true; continue; }
     if (args[i] !== '--max-ticks' && args[i] !== '--max-seconds') throw new Error('INVALID_WORKER_ARGUMENTS');
     const key = args[i], raw = args[++i];
-    if (!raw || !/^\d+$/.test(raw)) throw new Error('INVALID_WORKER_BUDGET');
-    const value = Number(raw), limit = key === '--max-ticks' ? 1000 : 600;
-    if (value < 1 || value > limit) throw new Error('INVALID_WORKER_BUDGET');
+    const value = parseBudget(raw, key === '--max-ticks' ? 1000 : 600);
     if (key === '--max-ticks') maxTicks = value; else maxSeconds = value;
   }
   if (!run) throw new Error('WORKER_RUN_REQUIRED');
@@ -23,7 +28,7 @@ export function parseCorrectionWorkerArgs(args: string[]) {
 export async function runCorrectionWorker(
   service: { tick: (now: Date, source: 'job') => Promise<WorkerTick> },
   budget: { maxTicks: number; maxSeconds: number },
-  runtime = { now: () => Date.now(), stopped: () => false },
+  runtime = workerRuntime,
 ) {
   const started = runtime.now();
   let ticks = 0, pagesProcessed = 0, schedulesStarted = 0;

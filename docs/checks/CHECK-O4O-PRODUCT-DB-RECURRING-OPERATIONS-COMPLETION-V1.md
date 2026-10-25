@@ -42,3 +42,7 @@
 ## PR #822 공식 검증 후속
 
 초기 통합 HEAD 4ead677b50의 CodeQL과 Codex(지적 없음)는 통과했다. 공식 Code Quality Check는 새 CLI entry의 console.log 2개가 기존 production console guard에 걸려 실패했다. CLI의 명시적 help/JSON 결과 출력은 process.stdout.write로 바꾸고 guard를 로컬 재현·재검증했다. 검사 예외·baseline·workflow는 변경하지 않는다. bundle 재빌드/help/기존 worker 회귀 후 같은 PR에 수정 push하고 최신 HEAD의 공식 검증을 확인한다.
+
+수정 HEAD 94d93ba21b의 필수 CI Gate·CodeQL·Codex(지적 없음)는 통과했으나 비필수 SonarCloud가 신규 신뢰성 등급 C로 실패했다. 노출된 지적 10건(버튼 type/라벨 간격, CLI 파서 복잡도·기본 인자, 중첩 조건 표현, 테스트 hook 순서, 불필요 async/Promise chain)을 동작 보존 정비로 수정한다. SQL 조건·정렬 우선순위·예산·권한·상품 쓰기 계약은 바꾸지 않고 최신 HEAD에서 재검증한다. 기준·workflow·제외 규칙은 완화하지 않는다.
+
+Sonar 정비 후 API/worker/HTTP 44개·상품별 UI 3개·실제 DB 상품 scope/pagination 1개, API 타입·bundle/help·packaged worker TLS DB 처리·lint·console guard를 다시 확인했다. 기존 50,000개 부하는 SQL 의미/처리 로직 변경이 없어 반복하지 않았으며 위 최종 성공 회차를 유지한다. 추가 회귀 수치를 기존 전체 통과 수와 중복 합산하지 않는다.

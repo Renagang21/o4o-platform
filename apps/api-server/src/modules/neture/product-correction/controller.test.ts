@@ -28,6 +28,7 @@ const app = express();
 app.use(express.json());
 app.use('/correction', createProductCorrectionController({ query } as never));
 describe('상품 보정 관리자 API 권한·입력 경계', () => {
+  beforeEach(() => query.mockClear());
   it('keeps product-scoped workspace reads behind existing authentication and validates scope', async () => {
     const path = '/correction/products/00000000-0000-4000-8000-000000000001/workspace';
     expect((await request(app).get(path)).status).toBe(401);
@@ -37,7 +38,6 @@ describe('상품 보정 관리자 API 권한·입력 경계', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
-  beforeEach(() => query.mockClear());
   it.each(['get', 'post'] as const)(
     '%s denies unauthenticated requests before database access',
     async (method) => {

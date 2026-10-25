@@ -11,7 +11,11 @@ const states: Record<string, string> = {
   excluded: '대상 제외', applied: '반영 완료', done: '갱신 검토 종료', saved: '저장 완료',
 };
 const date = (value?: string) => value ? new Date(value).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '없음';
-const show = (value: unknown) => value == null ? '(없음)' : typeof value === 'string' ? value : JSON.stringify(value);
+function show(value: unknown) {
+  if (value == null) return '(없음)';
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value);
+}
 const button = 'rounded border px-3 py-2 disabled:opacity-40';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -46,11 +50,11 @@ export default function ProductCorrectionProductPanel() {
     <h4 className="font-semibold">상품별 자료 · 정비 · 갱신 이력</h4>
     <p className="text-sm">상품 상세나 검토 작업에서 연결해 열 수 있습니다. 현행 원문과 과거 작업의 당시 자료를 구분해 확인하세요. 이 조회는 상품을 수정하거나 작업을 실행하지 않습니다.</p>
     <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void load(input.trim()); }}>
-      <label className="min-w-0 flex-1">상품 ID
+      <label className="min-w-0 flex-1"><span className="block">상품 ID</span>
         <input className="w-full rounded border p-2" aria-label="상품 관리 이력 ID" value={input}
           onChange={(e) => { sequence.current++; setBusy(false); setInput(e.target.value); }} />
       </label>
-      <button className={button} disabled={busy}>상품 자료·이력 조회</button>
+      <button type="submit" className={button} disabled={busy}>상품 자료·이력 조회</button>
     </form>
     {error && <p role="alert">{error} 현재 표시된 자료는 마지막 성공한 조회입니다.</p>}
     {data && <>
