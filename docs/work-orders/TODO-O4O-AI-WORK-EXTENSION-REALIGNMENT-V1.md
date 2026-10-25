@@ -213,3 +213,9 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/a
 기존 native transport·모델 선택·backoff·역할/자료/실행 검증을 유지한다. Core의 중첩 JSON retry·부분 사용량 누락·안전한 가격 오류 전달을 보강했으며 새로운 Task/Memory·DB schema/migration·결제 정책을 추가하지 않았다. 자세한 가격/단위 계약·소비처·검증은 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)를 따른다.
 
 S2-2/S4-4의 주요 **코드 연결**은 이번 묶음에 포함했다. 다만 실제 전문 모델별 가격/profile·입출력/검색 예산과 native 사용량 미반환 처리의 운영 검증은 남아 있으므로 전체 항목을 운영 완료로 바꾸지 않는다. 전문 profile이 없으면 503으로 차단되며 이 상태를 승인 없이 즉시 배포하지 않는다. 사용자/매장 청구·외부 계정 연결·새 상태 변경 도구·실계정/유료 호출은 별도다. 새 branch는 최신 main `4ee5a8ecda`와 선행 미병합 `d11cb4afa1`을 포함하며 이번 종료점은 push 인계다.
+
+## 14. 후속 main 통합·배포 인계 (2026-10-25)
+
+§12/§13의 개발 변경은 사용자의 후속 병합·배포 지시에 따라 PR #811/main `67654de1fe`에 함께 반영했다. 관리자 사용량 조회의 UUID/text 비교 P1을 수정하고 실제 PostgreSQL 회귀·기존 quota/모델 제어 28건과 관련 API 162건을 확인했다. 최신 운영 적용 증거와 가용성 제한은 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다.
+
+해당 지시는 비용 보호를 포함한 코드 배포이며 가격 미설정 전문 기능의 실제 사용 활성화를 뜻하지 않는다. S2-2/S4-4의 가격·예산·실제 계정 검증과 사용자/매장 청구·외부 계정 연결은 계속 남는다. PR Sonar의 신규 코드 중복률 4.5%(기준 3%)도 후속 정비 대상이며 필수 CI/보안 검증 통과와 구분한다.

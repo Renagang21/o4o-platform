@@ -376,7 +376,7 @@ store 가 `resolved` 여도 system prompt 에는
 
 ### 11.6 비용 · 사용량 현재 상태
 
-2026-10-25 [텍스트 회계 후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)와 이를 포함하는 [전문 호출 회계 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 `wo/ai-specialized-runtime-accounting` 개발 상태를 반영한다. main/운영 적용은 아직 별도이며 실제 유료 호출·운영 한도 검증을 완료한 기록이 아니다. 전문 경로는 명시 모델 가격/profile 준비 전 provider 호출을 차단하므로 운영 설정 확인 없이 배포 가능으로 판단하지 않는다.
+2026-10-25 [텍스트 회계 후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)와 이를 포함하는 [전문 호출 회계 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)는 PR #811/main `67654de1fe`에 통합됐다. 운영 적용의 실제 증거는 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따르며 실제 유료 호출·운영 한도 검증 완료를 뜻하지 않는다. 사용자 지시에 따른 코드 배포에서도 전문 경로는 명시 모델 가격/profile 준비 전 provider 호출을 차단한다. 코드 연결과 실제 사용 활성화를 구분한다.
 
 | 항목 | 현재 |
 |---|---|

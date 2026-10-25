@@ -308,3 +308,9 @@ host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home
 관리 조회는 native 예약/receipt와 기존 로그를 중복 없이 합치며 enum 밖 Qwen/Google Vision·미확정 audio/crash 기록을 포함한다. 원문·이미지/audio·검색어는 공통 원장에 남기지 않는다. 비용은 추정 정책이며 실제 invoice나 외부 제공업체의 강제 결제 상한이 아니다.
 
 **운영 준비:** 명시 모델 요율/profile이 없으면 native 호출은 503으로 차단한다. 운영 설정을 변경하거나 유료 시험 호출·PR/병합/배포를 실행하지 않았다. [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 로컬 검증과 [TODO §4](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)의 실제 모델/요율·단위·예산·미확정 처리 수용 조건을 확인한 뒤 통합/배포를 판단한다. 전체 AI 화면·직원/소비자 상담·외부 계정/사용자 직접 청구 완료를 뜻하지 않는다.
+
+## 17. 회계 후속 main 통합·운영 적용 (2026-10-25)
+
+사용자의 후속 main 병합·배포 지시로 §15/§16의 개발 변경을 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 반영했다. 관리 집계의 UUID 비교에서 불필요한 text cast를 제거했고 실제 PostgreSQL의 UUID·enum·JSONB로 회귀를 추가했다. 새 운영 schema/migration·권한·가격·credential·workflow 변경은 없다.
+
+§15/§16의 미병합 기록은 당시 개발 단계의 증거다. 현재 통합·배포·검증 결과는 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. 코드 배포에서도 가격 미설정 native 호출의 선차단은 유지한다. 실제 사용 활성화에는 모델별 명시 요율/profile·예산과 사용량 미반환 정산 검증이 필요하며, 유료 호출·외부 계정/매장·사용자 청구 완료로 확장하지 않는다.
