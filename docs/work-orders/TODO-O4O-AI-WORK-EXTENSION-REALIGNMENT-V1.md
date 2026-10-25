@@ -180,10 +180,10 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/a
 
 | 미체크 항목 | 이번에 끝난 부분 | 후속으로 남긴 부분 |
 |---|---|---|
-| S2-2 | 태그·상품 전역 콘텐츠의 기존 모델/회계 연결 대조, 태그 비용 연결, OCR 전문 API 분리 표시 | 전문 OCR의 공통 중지·가격/사용량 이관. 태그 서버 작업의 인증 actor 전달/사용자별 귀속 |
+| S2-2 | 태그·상품 전역 콘텐츠의 기존 모델/회계 연결 대조, 태그 비용 연결, OCR 전문 API 분리 표시 | 전문 OCR의 공통 중지·가격/사용량 이관. 인증 요청의 사용자 귀속 후속은 아래 §12 참조. 인증 actor가 없는 가져오기 작업에는 신원을 추정하지 않음 |
 | S3-2 | 기존 운영자 설명/Actions와 업무 큐·처리 화면 KEEP | 설명에서 처리 대상 선택으로 이어지는 신규 UI·상태 변경 도구 확대 |
 | S3-4 | 새 현황 API의 인증·조직/공급자/모임 격리·권한 회수, 상품 검토안 revision 충돌 회귀 | 새 처리 도구의 대상/version 확인·멱등 실행 수용 기준. 실제 계정·운영 데이터 검증 |
-| S4-4 | 실제 사용처별 현재 연결·능력·모델 선택/거부·미연결 표시와 기존 지원 회귀 | Home/계획/vision/research·멀티모달 직접 호출, Qwen 편집·TTS·전문 OCR의 전체 비용/admission 이관 |
+| S4-4 | 실제 사용처별 현재 연결·능력·모델 선택/거부·미연결 표시와 기존 지원 회귀 | 텍스트 Home/계획/파일 추론 연결 후속은 아래 §12 참조. vision/research·멀티모달 직접 호출, Qwen 편집·TTS·전문 OCR의 전체 비용/admission 이관 |
 
 모델 선택은 기존 관리 화면/경로를 사용한다. 상품 보완 초안·상담 근거 선택은 PRODUCT_CONTENT를 공유하고, 현황 3종은 각 usage로 선택한다. 뉴스는 공통 질의 모델·활성·삭제 보호를 유지한다. 관리 목록 추가만으로 실제 운영 호출·인증·청구가 검증됐다고 표시하지 않는다. platform 외 payer의 실제 청구·신규 외부 계정/유료 계약·운영 가격 정책은 별도다.
 
@@ -198,3 +198,9 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/a
 같은 SHA의 API·관리자·Neture·약국 사업 웹·매장 웹을 기존 verified Delivery/promote로 배포했다. 협력 모임 웹은 기존 비공개 서비스에 frontend-only로 배포하고 fixture provision을 건너뛰었다. API 준비 상태 200·AI 경로 4곳의 무인증 401·공개 웹 4곳의 200/HTML, 협력 모임의 Ready·비공개 HTTP·100% 트래픽을 확인했다. workflow·serving label·검증 범위는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 기록했다.
 
 실제 계정의 업무 처리·AI 응답 품질·실제 한도/청구 검증은 미실행이며 기존 미체크 항목은 유지한다. 신규 AI 구현·부담 주체/요금 정책·외부 계정 연결을 이번 배포로 완료 표시하지 않는다. 이 종료 기록의 후속 반영은 문서-only(`DEPLOYMENT = NOT_APPLICABLE`)이며 runtime 재배포를 요구하지 않는다. 같은 WO의 문서 인계까지 반영한 뒤 자기 branch/worktree를 정리하고, 향후 독립 작업은 최신 main의 새 작업공간에서 시작한다.
+
+## 12. 비용·quota 텍스트 경로 후속 — 개발 branch (2026-10-25)
+
+새 [TODO](TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)를 먼저 만들고 실제 호출과 정본을 대조했다. `wo/ai-runtime-accounting-completion`에서 홈 텍스트·텍스트 첨부/대체·일반/강화 텍스트 계획·로그인/공개 파일 구조 추론을 기존 회계 실행기에 연결한다. 상품 태그 생성/제안·상품 콘텐츠 생성·태그 후속 생성은 기존 업무 권한 판정 후 인증 actor를 전달한다. 태그 실패 뒤 후속 콘텐츠 생성은 시작하지 않는다. 기존 가져오기 작업은 확인된 actor가 없어 사용자 귀속을 추정하지 않는다.
+
+공개 파일 추론은 별도 hospital 청구 서비스를 신설하지 않고 현재 Neture 기능으로 `SERVICE_QUERY/neture`에 귀속하며 익명 사용자 한도를 만들지 않는다. 이미지/검색 도구/OCR/음성의 전문 과금과 외부 계정 청구는 이번 텍스트 계약의 지원 범위가 아니다. 따라서 S2-2/S4-4 전체 완료 표시는 유지하지 않으며 미체크 상태를 보존한다. 현황 목록의 connected/partial과 실제 제한·저장/오류·검증은 [후속 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)를 따른다. 이번 후속은 push 인계이며 §11의 main/운영 배포 증거와 합산하지 않는다.

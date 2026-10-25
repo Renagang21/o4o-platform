@@ -375,18 +375,20 @@ store 가 `resolved` 여도 system prompt 에는
 
 ### 11.6 비용 · 사용량 현재 상태
 
+2026-10-25 [텍스트 회계 후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)의 `wo/ai-runtime-accounting-completion` 개발 상태를 반영한다. main/운영 적용은 아직 별도이며 실제 유료 호출·운영 한도 검증을 완료한 기록이 아니다.
+
 | 항목 | 현재 |
 |---|---|
 | rate limit | 있음 — `dynamicLimiter('free')` (60초 / 10회) |
 | maxTokens | 있음 — 2048 |
 | input length 제한 | 있음 — 2000자 (`HOME_CHAT_MAX_MESSAGE_LENGTH`, `/api/ai/query` 와 동일) |
 | retry 제한 | 있음 — `maxAttempts: 1` |
-| **토큰 사용량 DB 집계** | **없음** |
+| **텍스트 토큰 사용량 DB 집계** | 기존 `executeAccountedAi` → `ai_usage_logs`·예약/정산에 연결 |
+| 호출 전 quota | 텍스트는 `SERVICE_QUERY/neture`·인증 사용자 한도. 클라이언트 WorkScope와 청구 귀속을 혼동하지 않음 |
+| 이미지·PDF native 해석 | 공통 비용 미연결. 텍스트 fallback만 연결하며 관리 목록은 partial |
 | **conversation 원문 저장** | **없음** |
 
-Home AI 는 `@o4o/ai-core execute()` 를 직접 호출하며 `AiPolicyExecutorService` 를 경유하지 않는다.
-따라서 편집기·파이프라인 경로와 달리 **`ai_usage_logs` 에 기록이 남지 않는다.**
-비용/사용량 telemetry 는 향후 후속 과제로 둔다(§14).
+Home AI는 기존 `executeAccountedAi`를 통해 Core를 소비하며 모델 선택·업무 권한 경로를 유지한다. 별도 scope 정책 실행기로 바꾸거나 SERVICE_QUERY 질의 중지 설정이 홈에도 적용된다고 표시하지 않는다. 한도 초과는 429, 한도 DB/가격 장애는 503으로 거부하며 자동 유료 재시도를 유도하지 않는다. 원장에는 본문 없는 사용자·모델·사용량·비용 메타데이터만 남기고, 사용량이 누락되면 무료 사용으로 확정하지 않는다. V0의 직접 호출·미집계는 이 연결 이전의 상태다.
 
 ### 11.7 Conversation 상태 (V0 계약)
 
@@ -397,7 +399,7 @@ message persistence   = 없음
 ```
 
 두 번째 질문은 이전 질문의 문맥을 **자동으로 기억하지 않는다.**
-이는 결함이 아니라 **V0 계약의 일부**다 (DB write 0 을 유지하기 위한 의도적 설계).
+이는 결함이 아니라 **대화 원문을 영속화하지 않는 V0 계약의 일부**다. 비용·사용량 메타데이터 기록은 conversation/message 저장과 구분한다.
 대화 맥락 유지가 필요해지면 별도 WO 로 다룬다.
 
 ---

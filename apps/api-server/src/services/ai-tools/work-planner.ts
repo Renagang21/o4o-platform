@@ -1,5 +1,4 @@
 import type { DataSource } from 'typeorm';
-import { execute } from '@o4o/ai-core';
 import logger from '../../utils/logger.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
 import { describeObservationElement, type ProposalRejectReason, type WorkGoal, type WorkImageInput, type WorkObservation, type WorkStepRecord, type ExecutionIntent } from './work-agent-contract.js';
@@ -250,9 +249,8 @@ export function extractJson(text: string): unknown {
 
 
 /**
- * LLM Planner — 기존 provider abstraction 재사용(§44). 텍스트만이면 `@o4o/ai-core` execute(json 모드),
- * 이미지가 있고 provider 가 gemini 면 기존 `/api/ai/vision/analyze` 와 같은 generateContent inline_data 경로.
- * openai 는 이미지 입력 경로가 없다 — 이미지는 무시하고 텍스트로만 계획한다(프롬프트에 그 사실을 적는다).
+ * LLM Planner — 텍스트는 기존 공통 비용 실행기 → Core execute(json 모드)를 소비한다.
+ * Gemini/OpenAI 이미지는 기존 native vision transport를 유지하며 아직 공통 비용 계약에 연결되지 않았다.
  */
 /** provider · model · key 해석기. 기본은 운영 SSOT(`resolveAiTarget`). 실 smoke 하네스가 entity 층 없이 같은 planner 코드를 돌릴 때만 주입한다. */
 export type PlannerTargetResolver = (dataSource: DataSource) => Promise<{ provider: 'gemini' | 'openai'; model: string; apiKey: string }>;
@@ -293,13 +291,13 @@ export function createPlannerTargetResolverForProvider(provider: 'gemini' | 'ope
 }
 
 
-export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, false));
+export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch, actorId?: string): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, false), false, actorId);
 }
 
 
-export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true), true);
+export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch, actorId?: string): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true), true, actorId);
 }
 
 
@@ -350,6 +348,7 @@ export function createLlmPlanner(
   fetchImpl: typeof fetch = fetch,
   resolveTarget: PlannerTargetResolver = defaultTargetResolver,
   strong = false,
+  actorId?: string,
 ): WorkPlanner {
   return {
     kind: 'llm',
@@ -402,7 +401,8 @@ export function createLlmPlanner(
           clearTimeout(timer);
         }
       }
-      const result = await execute({
+      const { executeAccountedAi } = await import('../../modules/ai-policy/ai-accounted-execution.js');
+      const result = await executeAccountedAi(dataSource, {
         systemPrompt: WORK_PLANNER_SYSTEM_PROMPT,
         userPrompt: input.image ? `${userPrompt}\n\n(주의: 이 provider 는 이미지를 볼 수 없다. 이미지 값이 필요하면 takeover(user_judgment_required).)` : userPrompt,
         provider,
@@ -411,7 +411,7 @@ export function createLlmPlanner(
         timeoutMs: 40_000,
         retry: { maxAttempts: 1 },
         meta: { service: 'work-agent', callerName: 'WorkPlanner' },
-      });
+      }, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: actorId });
       return extractJson(result.content);
     },
   };
@@ -425,6 +425,7 @@ export function createLlmPlanner(
 export function createStrongLlmPlanner(
   dataSource: DataSource,
   fetchImpl: typeof fetch = fetch,
+  actorId?: string,
 ): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver, true);
+  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver, true, actorId);
 }

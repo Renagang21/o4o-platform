@@ -288,3 +288,11 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
 
 확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
+
+## 15. 텍스트 회계 연결 보완 — 개발 branch (2026-10-25)
+
+[후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에서 남은 실행 경로를 재조사했다. `wo/ai-runtime-accounting-completion`은 새 Core/원장을 만들지 않고 기존 `AiAccountedExecution`을 홈·첨부 텍스트 대체, 일반/강화 텍스트 계획, 인증/공개 파일 구조 추론 host에서 소비한다. 파일 추론·첨부 helper에는 텍스트 invocation을 명시적으로 주입해 업무 해석과 서버 비용 경계를 분리한다. standalone 파일 smoke는 자기 환경 계정의 transport를 명시적으로 전달하며 서버 원장 검증을 대신하지 않는다.
+
+host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home/계획/파일은 `SERVICE_QUERY/neture`, 상품 태그는 `PRODUCT_TAGGING`, 상품 콘텐츠는 기존 `PRODUCT_CONTENT` 정책을 사용한다. 공개 파일 추론은 사용자 신원을 만들지 않는다. 상품 태그 실패 시 후속 콘텐츠 생성은 중단하지만 기존 fire-and-forget 응답·업무 저장/권한 계약은 유지한다. 대화/파일/생성 원문은 공통 비용 로그에 기록하지 않는다. 한도 초과·한도 DB/가격 장애를 provider rate limit과 구분하며 성공 후 정산 장애가 유료 재호출을 만들지 않게 한다.
+
+native 이미지·PDF·화면 판독, 검색 도구 비용, Qwen·OCR·TTS는 현재 텍스트 가격/요청 계약으로 지원 완료를 주장하지 않는다. 관리 목록에서 홈 첨부·작업 계획은 partial이며 전체 작업 비용 통제를 뜻하지 않는다. 플랫폼 부담 외 실제 사용자/매장 청구·외부 계정 연결과 운영 가격·한도 검증도 후속이다. [검증 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에 소비처·회귀·미실행을 기록하며 main 병합/배포는 이번 개발 종료 범위에 포함하지 않는다.
