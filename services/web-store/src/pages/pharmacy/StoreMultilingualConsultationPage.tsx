@@ -489,10 +489,16 @@ function Consultation({
                 })
               }
               onVoice={() => {
+                if (speech.listening && voiceTarget.current === "guidance") {
+                  speech.finishListening();
+                  return;
+                }
                 speech.reset();
                 voiceTarget.current = "guidance";
                 speech.startListening("ko");
               }}
+              voiceSupported={speech.inputSupported}
+              voiceListening={speech.listening && voiceTarget.current === "guidance"}
               onRead={speech.read}
               onStopReading={speech.stopReading}
               voice={guidanceVoice}

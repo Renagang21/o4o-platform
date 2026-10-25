@@ -12,6 +12,7 @@ import {
   type ConsultationProduct,
 } from "./ConsultationProducts";
 const button = "min-h-12 rounded-lg border px-4 py-3 disabled:opacity-50";
+type GuidanceRequest = Parameters<typeof prepareConsultationGuidance>[0];
 const labels: Record<string, string> = {
   ko: "한국어",
   en: "영어",
@@ -36,6 +37,8 @@ export function ConsultationGuidancePanel({
   room,
   onShare,
   onVoice,
+  voiceSupported,
+  voiceListening,
   onRead,
   onStopReading,
   voice,
@@ -49,6 +52,8 @@ export function ConsultationGuidancePanel({
   room: ConsultationStation | null;
   onShare: (id: string) => Promise<boolean>;
   onVoice: () => void;
+  voiceSupported: boolean;
+  voiceListening: boolean;
   onRead: (text: string, language: string) => void;
   onStopReading: () => void;
   voice: { text: string; sequence: number } | null;
@@ -63,15 +68,15 @@ export function ConsultationGuidancePanel({
     [result, setResult] = useState<GuidanceResult | null>(null),
     [error, setError] = useState(""),
     [loading, setBusy] = useState(false);
-  const busy = loading || locked;
+  const busy = loading || locked || voiceListening;
   const [notice, setNotice] = useState(""),
     [showing, setShowing] = useState(false);
   const generation = useRef(0),
     alive = useRef(false),
     lock = useRef(false),
     dialog = useRef<HTMLDialogElement>(null);
-  const input = useRef<HTMLInputElement>(null),
-    lastVoice = useRef(0);
+  const lastVoice = useRef(0),
+    lastAttempt = useRef<GuidanceRequest | null>(null);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -80,6 +85,7 @@ export function ConsultationGuidancePanel({
   }, []);
   useEffect(() => {
     generation.current++;
+    lastAttempt.current = null;
     setResult(null);
     setError("");
     setNotice("");
@@ -91,16 +97,24 @@ export function ConsultationGuidancePanel({
     if (!voice || voice.sequence === lastVoice.current) return;
     lastVoice.current = voice.sequence;
     setQuestion(voice.text);
-    input.current?.focus();
+    setError("");
   }, [voice]);
-  const prepare = async (
-    next: GuidanceIntent = intent,
-    product = selected,
-    useAi = false,
-    translateMaterial = false,
-    words = question,
-  ) => {
-    if (lock.current || locked) return;
+  const prepare = async (options: Partial<GuidanceRequest> = {}) => {
+    if (lock.current || locked || voiceListening) return;
+    const input: GuidanceRequest = {
+      mode,
+      language,
+      intent,
+      question,
+      ...(selected ? { productKind: selected.kind, productId: selected.id } : {}),
+      useAi: false,
+      translateMaterial: false,
+      ...(options.translateMaterial && result?.selection ? { selection: result.selection } : {}),
+      ...(room?.active ? { stationId: room.id, epoch: room.epoch } : {}),
+      ...options,
+    };
+    // A manual retry repeats this operation, including AI/translation and selected passages.
+    lastAttempt.current = input;
     const request = ++generation.current;
     lock.current = true;
     setBusy(true);
@@ -110,21 +124,7 @@ export function ConsultationGuidancePanel({
     setShowing(false);
     onStopReading();
     try {
-      const data = await prepareConsultationGuidance({
-        mode,
-        language,
-        intent: next,
-        question: words,
-        ...(product
-          ? { productKind: product.kind, productId: product.id }
-          : {}),
-        useAi,
-        translateMaterial,
-        ...(translateMaterial && result?.selection
-          ? { selection: result.selection }
-          : {}),
-        ...(room?.active ? { stationId: room.id, epoch: room.epoch } : {}),
-      });
+      const data = await prepareConsultationGuidance(input);
       if (!alive.current || generation.current !== request) return;
       if (
         data.organizationId !== organizationId ||
@@ -199,10 +199,11 @@ export function ConsultationGuidancePanel({
     setSelected(p);
     setChoose(false);
     setResult(null);
-    void prepare(
-      intent === "help" || intent === "pharmacist" ? "product-details" : intent,
-      p,
-    );
+    void prepare({
+      intent: intent === "help" || intent === "pharmacist" ? "product-details" : intent,
+      productKind: p.kind,
+      productId: p.id,
+    });
   };
   return (
     <section
@@ -222,7 +223,7 @@ export function ConsultationGuidancePanel({
             onClick={() => {
               setIntent(key);
               setResult(null);
-              void prepare(key);
+              void prepare({ intent: key });
             }}
           >
             {label}
@@ -233,31 +234,37 @@ export function ConsultationGuidancePanel({
         className="flex flex-wrap gap-2"
         onSubmit={(e) => {
           e.preventDefault();
-          void prepare("help");
+          void prepare({ intent: "help" });
         }}
       >
         <input
-          ref={input}
           aria-label="상담 안내 요청"
           className="min-h-12 w-full min-w-0 rounded-lg border p-3 sm:w-auto sm:flex-1"
           placeholder="원하는 안내를 말하거나 적어주세요"
           maxLength={1000}
           value={question}
           disabled={busy}
-          onChange={(e) => setQuestion(e.target.value)}
+          onChange={(e) => {
+            setQuestion(e.target.value);
+            setError("");
+          }}
         />
         <button className={button} disabled={busy || !question.trim()}>
           안내 찾기
         </button>
-        <button
-          type="button"
-          className={button}
-          disabled={busy}
-          onClick={onVoice}
-        >
-          말로 안내 요청
-        </button>
+        {voiceSupported && (
+          <button
+            type="button"
+            className={button}
+            disabled={loading || locked}
+            aria-pressed={voiceListening}
+            onClick={onVoice}
+          >
+            {voiceListening ? "요청 말하기 마치기" : "말로 안내 요청"}
+          </button>
+        )}
       </form>
+      {voiceListening && <p role="status">요청을 듣고 있습니다. 말을 마친 뒤 안내를 찾아 주세요.</p>}
       {voice?.text && (
         <p className="text-xs text-slate-500">
           음성으로 입력한 요청을 확인한 뒤 안내를 찾아 주세요.
@@ -269,7 +276,7 @@ export function ConsultationGuidancePanel({
           disabled={busy}
           onClick={() => {
             setQuestion(inquiry);
-            void prepare("help", selected, false, false, inquiry);
+            void prepare({ intent: "help", question: inquiry });
           }}
         >
           고객 질문으로 안내 찾기
@@ -306,7 +313,7 @@ export function ConsultationGuidancePanel({
           <button
             className={button}
             disabled={busy}
-            onClick={() => void prepare()}
+            onClick={() => void prepare(lastAttempt.current ?? {})}
           >
             같은 안내 다시 준비
           </button>
@@ -377,6 +384,7 @@ export function ConsultationGuidancePanel({
             </button>
             <button
               className={button}
+              disabled={busy}
               onClick={() => onRead(result.card!.text, result.card!.language)}
             >
               안내 읽어주기
@@ -385,7 +393,7 @@ export function ConsultationGuidancePanel({
               <button
                 className={button}
                 disabled={busy || !question.trim()}
-                onClick={() => void prepare(intent, selected, true)}
+                onClick={() => void prepare({ useAi: true })}
               >
                 AI로 관련 문단 추리기
               </button>
@@ -394,7 +402,7 @@ export function ConsultationGuidancePanel({
               <button
                 className={button}
                 disabled={busy}
-                onClick={() => void prepare(intent, selected, false, true)}
+                onClick={() => void prepare({ translateMaterial: true })}
               >
                 선택 언어로 번역 준비
               </button>
