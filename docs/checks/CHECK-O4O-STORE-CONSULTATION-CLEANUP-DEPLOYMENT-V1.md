@@ -41,6 +41,8 @@
 
 ## 4. push·인계
 
-새 branch는 선행 상담 branch의 의존 commit과 최신 main을 함께 포함한다. 통합 시 **이 branch 하나**를 검토해 중복 PR을 만들지 않는다. 원격 SHA·작업 트리·PR CI 상태는 push 후 같은 branch에 기록한다. 기준 checkout과 기존 worktree는 유지한다.
+새 branch는 선행 상담 branch의 의존 commit과 최신 main을 함께 포함한다. 통합 시 **이 branch 하나**를 검토해 중복 PR을 만들지 않는다. 코드 commit **`1dc32336c91ead681923eaeeb0dd27de19fb662b`** push와 원격 SHA 일치를 확인했다. 코드 SHA check-runs 0건·commit status 항목 0건·이 branch PR 0건으로 **PR CI 미실행**이다. aggregate `pending`은 CI 작업이 실행 중이라는 뜻이 아니다. 완료 기록도 같은 branch에 문서 commit으로 push한다.
+
+전용 worktree `/workspace/o4o-wt/store-consultation-cleanup-deployment`는 통합 검토용으로 유지한다. resolver 합성 실행 증거는 `/workspace/.o4o-consultation-cleanup-deploy-20261025/`에 있으며 테스트 임시 디렉터리는 제거했다. 문서 3개 민감정보 guard·branch 변경 51개 파일 credential 값 대조·상대 링크 13개·diff whitespace 검사 PASS. 기준 checkout과 기존 worktree는 수정/삭제하지 않았다.
 
 문서 정합: 발견 2건(환경 전체 교체의 중지 값 소실 가능성, timer와 물리 파기 시간의 구분) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건. 데이터 범위에 개발 배포 연결과 실행 한계를 반영했다.
