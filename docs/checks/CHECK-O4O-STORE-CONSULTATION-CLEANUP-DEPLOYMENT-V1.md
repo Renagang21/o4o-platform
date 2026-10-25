@@ -6,7 +6,7 @@
 > **branch**: `wo/store-consultation-cleanup-deployment`
 > **작업**: [TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CLEANUP-DEPLOYMENT-V1.md) · [데이터 범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md)
 > **사용자 정정**: 실기기·현장 음성·약사 검수는 차후로 미루고 개발에 집중. 이번 결과는 개발/push이며 실제 운영 활성화 완료가 아니다.
-> **후속 지시**: 이후 사용자가 main 병합·배포를 지시했다. 아래 §1~4는 개발/push 당시 증거이며 통합·운영 결과는 [통합 WO](../work-orders/WO-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
+> **후속 지시**: 이후 사용자가 main 병합·배포를 지시했다. 아래 §1~4는 개발/push 당시 증거이며 통합·운영 결과는 [통합 WO](../work-orders/WO-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md) · [통합·배포 CHECK](CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
 
 ## 1. 코드·문서 대조와 수정
 

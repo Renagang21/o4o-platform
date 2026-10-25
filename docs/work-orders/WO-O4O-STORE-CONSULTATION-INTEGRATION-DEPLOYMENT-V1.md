@@ -1,6 +1,6 @@
 # 내 매장 상담·컨텐츠·채널 정비 main 통합·배포
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25
 > **사용자 지시**: ‘main에 병합 배포’. 이 공간에서 PR·CI/검토·병합·배포를 진행한다. 만료 상담 정리 운영 활성화 지시를 포함하며 실기기·현장 음성·약사 검수는 사용자가 후속으로 연기했다.
 > **기준 main**: `42dddc91b5ee18605c62b9c3e55091137dcd2b7f`
@@ -11,11 +11,17 @@
 
 - [x] 원격 HEAD·PR 유무·현재 main ruleset 확인. 기존 PR 0건, PR 필수/CI Gate/필수 human approval 0 기준. 진행 중 타 Promote와 운영 변경을 겹치지 않음.
 - [x] 최신 main 정상 merge(`faecd1705c`). AI 정본의 충돌은 내 매장 §14-2와 최신 회계 §15~17을 함께 보존. 선행 API/Store·정리 job/배포 설정을 유지.
-- [ ] 최신 Core/인증 변경과 결합한 API/Store·관련 테스트·build를 확인하고 PR 생성. source HEAD에 고정된 CI·자동 검토·미해결 지적을 확인/처리.
-- [ ] 진행 중 운영 배포가 완료된 뒤 최신 main 위치·HEAD·CI/review를 다시 확인하고 PR을 순차 병합. 우회/force push/auto-merge 사용 안 함.
-- [ ] post-merge CI·Delivery 판정 확인. API 설정 변경은 MANUAL/GATED. 현재 serving→target 범위에 새 schema/migration이 없는지 확인하고 기존 Promote에서 API/Store를 verified 배포.
-- [ ] API/웹 공개 smoke와 실제 serving SHA·상담 cleanup mode/중지 flag를 확인. 관측하지 못한 실제 정리 count·기기/언어/약사 품질은 별도 표시.
-- [ ] CHECK/정본·PR에 통합/배포와 검증 한계를 기록하고 정확한 main/remote 상태를 인계.
+- [x] 최신 Core/인증 변경과 결합한 API/Store·관련 테스트·build 확인. PR #813 최종 source `5bdf961f3f`의 CI Gate·Codex 지적 0건·스레드 해결을 확인.
+- [x] 진행 중 운영 배포 0건·최신 main 위치·HEAD·CI/review를 확인하고 PR #813을 HEAD 고정해 병합. main `fda3f672d1`. 우회/force push/auto-merge 사용 안 함.
+- [x] post-merge CI `40182288786`·Delivery `40183053153`의 LEVEL 3 보류 확인. API serving→target에 새 schema/migration 없음. 기존 Promote `40183174373`에서 API/Store verified 배포 SUCCESS.
+- [x] Report의 실제 serving SHA 재확인·production `DEPLOYED · deploy: api,store`, API/웹 공개 smoke 13/13 PASS. cleanup 명시 apply/중지 값 보존 처리 SUCCESS. 현재 enabled 값·실제 정리 count/본문 파기·현장/약사 품질 미관측을 구분해 인계.
+- [x] [최종 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)·정본과 PR에 통합/배포·검증 한계를 기록. 배포 SHA `fda3f672d19f08c7eb43e1b464d690a500efbc82`와 후속 문서-only 반영을 구분.
+
+## 확정 결과
+
+PR [#813](https://github.com/Renagang21/o4o-platform/pull/813)을 검증한 source `5bdf961f3f`로 고정해 main `fda3f672d1`에 병합했다. 최종 source/병합 후 CI·Codex 지적 0건을 확인했으며 API/Store 운영 배포와 공개 검증을 마쳤다. 상세 실행·로컬 검증·배포 근거는 최종 CHECK에 모았다. 이 후속 결과 기록은 문서-only `DEPLOYMENT=NOT_APPLICABLE`이다.
+
+실제 마이크/기기·약사 검수는 사용자가 연기했다. 운영 계정 업무·유료 AI·테스트 업무 데이터를 실행/생성하지 않았다. 기존 enabled=false는 보존하며 현재 값·실제 정리 count/본문 파기는 미관측이다. 이 운영 관측 한계가 개발/배포 결과에 포함된다.
 
 ## 범위
 

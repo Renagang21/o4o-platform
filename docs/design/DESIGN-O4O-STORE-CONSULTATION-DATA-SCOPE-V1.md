@@ -2,9 +2,9 @@
 
 > **상태**: ACTIVE
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25
-> **기준 main**: `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d`
-> **작업**: [통합 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md) · [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md)
-> **위상**: 사용자 선택에 따른 업무 범위와 개발 branch 구현 기준. main 반영·운영 적용 상태는 CHECK로 구분하며 공통 Core·개인정보 보존 정본을 대체하지 않는다.
+> **구현 main**: `fda3f672d19f08c7eb43e1b464d690a500efbc82` (초기 개발 기준 `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d`)
+> **작업**: [통합 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md) · [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)
+> **위상**: 사용자 선택에 따른 업무 범위와 main 구현 기준. 운영 적용·관측 상태는 CHECK로 구분하며 공통 Core·개인정보 보존 정본을 대체하지 않는다.
 
 ## 0. 사용자 결정 (2026-10-25)
 
@@ -48,7 +48,7 @@
 | 매장별 재사용 | 기존 승인된 상품/컨텐츠·채널 업무 자산을 현재 매장 권한으로 조회. URL·client storeId는 권한 증거가 아님 | 상담 원문 장기 이력은 만들지 않음 |
 | 경영자·직원 조회 | 조회/재사용 시 현재 매장 접근과 자료 권한을 재확인. 권한 거부 후 화면 문맥과 늦은 응답을 폐기 | 직원 간 상담 원문 공유·경영자 원문 전체 열람은 추가하지 않음 |
 | 약사·직원·고객 자료 | 약사 모드만 전문 판단 초안에 접근. 기존 약사 사용 확인·기능 허용을 서버에서 재확인. 직접 입력한 전문 자료는 출처/확인 필수이며 현재 세션에서만 사용 | 비공개 전문 문헌의 영구 원장·새 자격 체계 |
-| 종료와 방치 | 명시 종료·다음 고객에서 비움. 만료 상태 정리 job과 kill switch 개발, 기본 dry-run | apply 활성화·운영 관측·백업 보존 집행은 배포/운영 담당 |
+| 종료와 방치 | 명시 종료·다음 고객에서 비움. 만료 상태 정리 job과 kill switch, 로컬 기본 dry-run·production 명시 apply | 운영 설정/실행 관측은 §6·CHECK, 백업 보존 집행은 운영 담당 |
 | 전송과 기록 | 허용한 질문/게시 자료/확인한 참고자료만 기존 provider 정책에 전달. 원문·토큰은 로그에서 제외, 기존 비용 metadata만 기록 | 실제 provider 응답 품질/비용·개인정보 공통 처리방침 정합 |
 | 경험의 재사용 | 검토·저장/발행·기기 적용 등 기존 업무 결과를 다시 선택해 사용 | 별도 다매장 자동 학습·새 평가/집계 원장은 추가하지 않음 |
 
@@ -80,3 +80,9 @@ O4O 취급 상품 원문은 기존 `storeDescriptionApi.list`의 `canonical` 매
 실제 마이크·현장 소음·약사 언어 검수·provider 응답 품질/비용·권한 회수·물리 QR/기기 재생은 브라우저 합성 검증과 구분한다. 특히 운영 상담의 준비·공유·기기 pairing은 업무 상태를 기록하므로 읽기 전용 로그인 승인만으로 실행하지 않는다.
 
 문서 정합: 사용자 선택에 따라 DRAFT 검토안을 현행 업무 범위로 갱신했다. 사용자 이력 코드와 보존 정본의 과거 미사용 서술 차이는 공통 담당의 후속 확인으로 남긴다. 운영 반영/실기기 검증 여부는 CHECK를 따른다.
+
+## 6. main·운영 설정 반영 (2026-10-25)
+
+PR #813으로 main `fda3f672d1`에 통합했다. 기존 production/WIF Promote `40183174373`에서 API·Store 배포와 serving SHA 재확인이 성공했다(`DEPLOYED · api,store`). API의 현재 설정 조회·cleanup env 처리·새 리비전 준비 상태 검사·트래픽 전환이 성공했고 공개 smoke 13건이 통과했다. production은 `CONSULTATION_STATE_CLEANUP_MODE=apply`를 명시하고 현재 `CONSULTATION_STATE_CLEANUP_ENABLED`를 보존한다. 코드 자체의 로컬 기본 dry-run은 유지한다.
+
+기존 enabled=false는 apply 배포 후에도 중지 상태다. 실제 현재 enabled 값과 정리 실행 count/본문 파기는 이 환경에서 관측하지 못했다. 설정 처리 성공을 실제 정리 완료로 확대하지 않는다. 프로세스 timer·Cloud Run scale-to-zero에 따른 실행 한계와 현장/약사 검수 연기는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
