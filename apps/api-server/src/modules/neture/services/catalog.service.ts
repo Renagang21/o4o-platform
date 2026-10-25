@@ -1,3 +1,4 @@
+import { changedProductValues, enqueueProductEditRenewals } from '../product-correction/edit-renewal.service.js';
 import { Repository } from 'typeorm';
 import type { DataSource } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
@@ -54,6 +55,7 @@ export interface MasterResolveResult {
 }
 
 export class NetureCatalogService {
+  constructor(private readonly dataSource: DataSource = AppDataSource) {}
   // Lazy repositories
   private _masterRepo?: Repository<ProductMaster>;
   private _categoryRepo?: Repository<ProductCategory>;
@@ -62,28 +64,28 @@ export class NetureCatalogService {
 
   private get masterRepo(): Repository<ProductMaster> {
     if (!this._masterRepo) {
-      this._masterRepo = AppDataSource.getRepository(ProductMaster);
+      this._masterRepo = this.dataSource.getRepository(ProductMaster);
     }
     return this._masterRepo;
   }
 
   private get categoryRepo(): Repository<ProductCategory> {
     if (!this._categoryRepo) {
-      this._categoryRepo = AppDataSource.getRepository(ProductCategory);
+      this._categoryRepo = this.dataSource.getRepository(ProductCategory);
     }
     return this._categoryRepo;
   }
 
   private get brandRepo(): Repository<Brand> {
     if (!this._brandRepo) {
-      this._brandRepo = AppDataSource.getRepository(Brand);
+      this._brandRepo = this.dataSource.getRepository(Brand);
     }
     return this._brandRepo;
   }
 
   private get imageRepo(): Repository<ProductImage> {
     if (!this._imageRepo) {
-      this._imageRepo = AppDataSource.getRepository(ProductImage);
+      this._imageRepo = this.dataSource.getRepository(ProductImage);
     }
     return this._imageRepo;
   }
@@ -315,11 +317,12 @@ export class NetureCatalogService {
    */
   async updateProductMaster(
     masterId: string,
-    updates: Record<string, unknown>
+    updates: Record<string, unknown>,
+    actorId?: string | null,
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
     // Immutable Guard — 런타임 보호
     const violatedFields = NetureCatalogService.MASTER_IMMUTABLE_FIELDS.filter(
-      (field) => field in updates
+      (field) => field in updates,
     );
     if (violatedFields.length > 0) {
       return {
@@ -328,42 +331,74 @@ export class NetureCatalogService {
       };
     }
 
-    const master = await this.masterRepo.findOne({ where: { id: masterId } });
-    if (!master) {
-      return { success: false, error: 'MASTER_NOT_FOUND' };
-    }
+    return this.dataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(ProductMaster);
+      const master = await repo.findOne({
+        where: { id: masterId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!master) {
+        return { success: false, error: 'MASTER_NOT_FOUND' };
+      }
 
-    // 허용 필드만 적용
-    if ('name' in updates && typeof updates.name === 'string') {
-      master.name = updates.name;
-    }
-    if ('brandName' in updates) {
-      master.brandName = updates.brandName as string | null;
-    }
-    // WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1: 확장 필드
-    // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
-    if ('categoryId' in updates) {
-      master.categoryId = (updates.categoryId as string | null) || null;
-    }
-    if ('brandId' in updates) {
-      master.brandId = (updates.brandId as string | null) || null;
-    }
-    if ('specification' in updates) {
-      master.specification = updates.specification as string | null;
-    }
-    if ('originCountry' in updates) {
-      master.originCountry = updates.originCountry as string | null;
-    }
-    if ('tags' in updates && Array.isArray(updates.tags)) {
-      master.tags = updates.tags as string[];
-    }
-    // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: 의약품 분류 refine 허용 (mutable, 허용값만)
-    if ('drugCategory' in updates) {
-      master.drugCategory = normalizeDrugCategory(updates.drugCategory as string | null);
-    }
+      const before = { ...master };
+      // 허용 필드만 적용
+      if ('name' in updates && typeof updates.name === 'string') {
+        master.name = updates.name;
+      }
+      if ('brandName' in updates) {
+        master.brandName = updates.brandName as string | null;
+      }
+      // WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1: 확장 필드
+      // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
+      if ('categoryId' in updates) {
+        master.categoryId = (updates.categoryId as string | null) || null;
+      }
+      if ('brandId' in updates) {
+        master.brandId = (updates.brandId as string | null) || null;
+      }
+      if ('specification' in updates) {
+        master.specification = updates.specification as string | null;
+      }
+      if ('originCountry' in updates) {
+        master.originCountry = updates.originCountry as string | null;
+      }
+      if ('tags' in updates && Array.isArray(updates.tags)) {
+        master.tags = updates.tags as string[];
+      }
+      // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: 의약품 분류 refine 허용 (mutable, 허용값만)
+      if ('drugCategory' in updates) {
+        master.drugCategory = normalizeDrugCategory(updates.drugCategory as string | null);
+      }
 
-    const saved = await this.masterRepo.save(master);
-    return { success: true, data: saved };
+      const changes = changedProductValues(
+        before as unknown as Record<string, unknown>,
+        master as unknown as Record<string, unknown>,
+        [
+          'name',
+          'brandName',
+          'specification',
+          'originCountry',
+          'tags',
+          'categoryId',
+          'brandId',
+          'drugCategory',
+        ],
+      );
+      if (!changes.length) return { success: true, data: master };
+      await repo.save(master);
+      // Re-read database-normalized values rather than recording the submitted representation.
+      const saved = await repo.findOneOrFail({ where: { id: masterId } });
+      const persistedChanges = changedProductValues(before as unknown as Record<string, unknown>, saved as unknown as Record<string, unknown>, ['name', 'brandName', 'specification', 'originCountry', 'tags', 'categoryId', 'brandId', 'drugCategory']);
+      await enqueueProductEditRenewals(manager, {
+        productId: saved.id,
+        productName: saved.name,
+        origin: 'catalog-edit',
+        actorId: actorId ?? null,
+        changes: persistedChanges,
+      });
+      return { success: true, data: saved };
+    });
   }
 
   /**

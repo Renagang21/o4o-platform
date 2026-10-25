@@ -1,3 +1,4 @@
+import { CorrectionError } from '../product-correction/contracts.js';
 /**
  * ProductMasterDescription Controller — 관리자 직접 등록: 매장용(STORE) 상세설명서 저작 (admin)
  *
@@ -124,7 +125,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
         descriptionType,
         createdBy: actor,
       });
-      const canonical = await service.setCanonical(candidate.id, actor);
+      const canonical = await service.setCanonical(candidate.id, actor, { trackAdminEdit: true });
 
       res.status(201).json({
         success: true,
@@ -137,6 +138,10 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
         },
       });
     } catch (err) {
+      if (err instanceof CorrectionError) {
+        res.status(err.status).json({ success: false, code: err.code, error: '다른 설명서가 먼저 저장됐습니다. 최신 설명서를 다시 확인해 주세요.' });
+        return;
+      }
       const msg = err instanceof Error ? err.message : String(err);
       // sanitize 후 빈 본문 등 서비스 검증 실패는 400 로 매핑
       if (/empty after sanitization/i.test(msg)) {

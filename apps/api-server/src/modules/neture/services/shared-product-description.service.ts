@@ -1,3 +1,5 @@
+import { CorrectionError } from '../product-correction/contracts.js';
+import { changedProductValues, enqueueProductEditRenewals } from '../product-correction/edit-renewal.service.js';
 /**
  * SharedProductDescriptionService — O4O 공용 상품설명 후보 풀 / canonical 대표 설명
  *
@@ -567,12 +569,27 @@ export class SharedProductDescriptionService {
   async setCanonical(
     id: string,
     actorId?: string | null,
-    opts?: { demotedStatus?: 'candidate' | 'hidden'; audit?: CanonicalReplaceAuditInput },
+    opts?: {
+      demotedStatus?: 'candidate' | 'hidden';
+      audit?: CanonicalReplaceAuditInput;
+      trackAdminEdit?: boolean;
+    },
   ): Promise<SharedProductDescription> {
     const demotedStatus = opts?.demotedStatus ?? 'candidate';
     return this.dataSource.transaction(async (manager) => {
       const repo = manager.getRepository(SharedProductDescription);
-      const target = await repo.findOne({ where: { id } });
+      let target = await repo.findOne({ where: { id } });
+      let editedProductName: string | null = null;
+      if (target && opts?.trackAdminEdit) {
+        // Match the product-first lock order used by correction apply and ordinary edits.
+        const masters = await manager.query(
+          'SELECT name FROM product_masters WHERE id=$1 FOR UPDATE',
+          [target.masterId],
+        );
+        if (!masters[0]) throw new Error('ProductMaster not found');
+        editedProductName = masters[0].name;
+        target = await repo.findOne({ where: { id }, lock: { mode: 'pessimistic_write' } });
+      }
       if (!target) {
         throw new Error('SharedProductDescription not found');
       }
@@ -580,6 +597,26 @@ export class SharedProductDescriptionService {
         throw new Error('Cannot set a deleted description as canonical');
       }
       const targetLanguage = target.language ?? 'ko';
+      let editChanges: ReturnType<typeof changedProductValues> = [];
+      let checkedCanonicalId: string | null = null;
+      if (opts?.trackAdminEdit) {
+        if (target.status === 'canonical') return target;
+        const previous = await manager.query(
+          `SELECT id,content,summary FROM shared_product_descriptions WHERE master_id=$1 AND description_type=$2 AND COALESCE(language,'ko')=$3 AND status='canonical' AND deleted_at IS NULL ORDER BY updated_at DESC,id LIMIT 1 FOR UPDATE`,
+          [target.masterId, target.descriptionType, targetLanguage],
+        );
+        checkedCanonicalId = previous[0]?.id ?? null;
+        editChanges = changedProductValues(
+          {
+            descriptionContent: previous[0]?.content ?? null,
+            descriptionSummary: previous[0]?.summary ?? null,
+          },
+          { descriptionContent: target.content, descriptionSummary: target.summary ?? null },
+          ['descriptionContent', 'descriptionSummary'],
+        );
+        if (previous[0] && !editChanges.length)
+          return repo.findOneOrFail({ where: { id: previous[0].id } });
+      }
 
       // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1:
       //   교체 감사 로그를 남기려면 "강등 전"의 기존 canonical id 를 트랜잭션 안에서 먼저 캡처한다.
@@ -597,23 +634,38 @@ export class SharedProductDescriptionService {
       //   (master_id, description_type, COALESCE(language,'ko')) 당 1개. 다른 언어/타입 canonical 은
       //   건드리지 않는다(ko canonical 이 있어도 zh 를 canonical 로 승격 가능).
       // 강등 UPDATE 가 승격 save 보다 먼저 실행되어 partial-unique(canonical 1개) 위반 없음.
-      await repo
-        .createQueryBuilder()
-        .update(SharedProductDescription)
-        .set({ status: demotedStatus, updatedBy: actorId ?? null })
-        .where('master_id = :masterId', { masterId: target.masterId })
-        .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
-        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: targetLanguage })
-        .andWhere('status = :status', { status: 'canonical' })
-        .andWhere('id != :id', { id })
-        .andWhere('deleted_at IS NULL')
-        .execute();
+      if (!opts?.trackAdminEdit || checkedCanonicalId) {
+        const demotion = repo
+          .createQueryBuilder()
+          .update(SharedProductDescription)
+          .set({ status: demotedStatus, updatedBy: actorId ?? null })
+          .where('master_id = :masterId', { masterId: target.masterId })
+          .andWhere('description_type = :descriptionType', {
+            descriptionType: target.descriptionType,
+          })
+          .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, {
+            language: targetLanguage,
+          })
+          .andWhere('status = :status', { status: 'canonical' })
+          .andWhere('id != :id', { id })
+          .andWhere('deleted_at IS NULL');
+        if (opts?.trackAdminEdit)
+          demotion.andWhere('id = :checkedCanonicalId', { checkedCanonicalId });
+        await demotion.execute();
+      }
 
       target.status = 'canonical';
       target.curatedBy = actorId ?? null;
       target.curatedAt = new Date();
       target.updatedBy = actorId ?? null;
-      const saved = await repo.save(target);
+      let saved: SharedProductDescription;
+      try {
+        saved = await repo.save(target);
+      } catch (error) {
+        if (opts?.trackAdminEdit && (error as { code?: string })?.code === '23505')
+          throw new CorrectionError('PRODUCT_SOURCE_CHANGED', 409);
+        throw error;
+      }
 
       // 감사 로그 — **실제 교체가 일어난 경우에만** insert(중복/no-op 방지).
       //   조건: audit 요청됨 + demotedStatus='hidden'(교체 경로) + 강등된 기존 canonical 이 실제로 있었고
@@ -641,6 +693,16 @@ export class SharedProductDescriptionService {
             }),
           );
         }
+      }
+      if (opts?.trackAdminEdit) {
+        await enqueueProductEditRenewals(manager, {
+          productId: saved.masterId,
+          productName: editedProductName!,
+          origin: 'admin-description',
+          actorId: actorId ?? null,
+          changes: editChanges,
+          fallback: { type: saved.descriptionType, language: saved.language ?? 'ko' },
+        });
       }
       return saved;
     });
