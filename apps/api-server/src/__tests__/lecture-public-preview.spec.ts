@@ -15,8 +15,12 @@ it.each(['javascript:alert(1)','http://example.invalid/a.mp4','https://u:p@examp
 it('does not return a missing or disabled preview', async () => {
  query.mockResolvedValue([]); expect(await getPublicPreview(db,'c','l')).toBeNull();
 });
-it('does not select media, body, attachments, quiz or metadata for the anonymous list', async () => {
- query.mockResolvedValue([]); await listPublicPreviews(db,'c');
- const [sql,params]=query.mock.calls[0];expect(params).toEqual(['c']);
- expect(sql.split('FROM')[0]).toBe('SELECT l.id, l.title, l.duration ');
+it('filters unsafe media consistently while projecting no media, body or metadata in the list', async () => {
+ query.mockResolvedValue([
+  {id:'good',title:'Sample',duration:1,videoUrl:'https://example.invalid/a.mp4',content:'secret',metadata:{private:true}},
+  {id:'missing',videoUrl:null}, {id:'page',videoUrl:'https://example.invalid/page'},
+  {id:'credentials',videoUrl:'https://u:p@example.invalid/a.mp4'},
+ ]);
+ expect(await listPublicPreviews(db,'c')).toEqual([{id:'good',title:'Sample',duration:1}]);
+ expect(query.mock.calls[0][1]).toEqual(['c']);
 });
