@@ -1,7 +1,7 @@
 # 내 매장 상담 사용성·AI 데이터 계약 검증
 
 > **상태**: ACTIVE
-> **완료 범위**: 사용성 보완·코드/문서 조사·로컬 검증. 실사용 미확인 범위와 push 종료는 아래에서 구분한다.
+> **완료 범위**: 사용성 보완·코드/문서 조사·로컬 검증·작업 branch push. 실사용 미확인 범위와 운영 미반영은 아래에서 구분한다.
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25
 > **기준 main**: `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d`
 > **branch**: `wo/store-consultation-usability-and-data-contract`
@@ -66,6 +66,8 @@ page error 0·가로 overflow 0. 합성 모바일 고객 dialog·복구 화면�
 ## 6. Git 인계
 
 개발 담당 종료점은 commit·named branch push다. PR·main 병합·배포·운영 migration은 이번 범위가 아니다. PR 미생성으로 PR CI는 미실행이며 운영 반영으로 보고하지 않는다.
+
+코드/검토안 commit `03b9a127d410818a408e4afe6e572c47d625cb73`을 위 branch에 push했다. push 직전 최신 origin/main `b7d2cfd86e` 일치·예상 staged 9개 파일·공백/민감정보·문서 상대 링크 13개를 확인했다. GitHub check-runs와 commit status는 각각 0건이며 CI 성공/실패 판정이 없다. 이 push 종료 기록의 추가 변경은 문서 2개뿐이다.
 
 `WORKTREE_DISPOSITION = KEEP`: `/workspace/o4o-wt/store-consultation-usability-and-data-contract`. 후속 통합/리뷰 보완을 위해 유지한다. 다른 worktree·기준 checkout의 파일/branch/작업 상태는 변경하지 않았다. 최종 push SHA·원격 일치·미커밋 상태는 종료 인계에서 확정한다.
 

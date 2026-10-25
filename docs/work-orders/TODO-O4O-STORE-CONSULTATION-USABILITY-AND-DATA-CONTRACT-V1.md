@@ -1,6 +1,7 @@
 # 내 매장 상담 사용성·AI 데이터 계약 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
+> **완료 범위**: 사용성 보완·데이터 계약 검토안·로컬 검증·작업 branch push. 현장 검증·Core 계약 확정·운영 반영 제외.
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25
 > **사용자 지시**: 다음 작업 제안 후 ‘진행하자’. 상담 실사용 점검과 매장 AI 데이터 계약 조사를 함께 진행하고 확인한 불편을 개발·검증하여 push까지 인계한다.
 > **시작 main**: `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d`
@@ -21,7 +22,7 @@
 - [x] 공통 사용자 이력과 현재 상담 상태의 저장/노출/삭제 차이, 매장별 영구 이력 연결의 선행 조건을 문서로 정리.
 - [x] frozen lockfile 설치·변경 범위 회귀·타입/build·집중 lint·desktop/tablet/mobile 실제 컴포넌트 브라우저 검증.
 - [x] 실계정 읽기 전용 검증의 허용 범위와 실행 가능 여부를 확인. 실제 장치/유료 AI/언어 품질의 미확인 항목을 합성 검증과 구분.
-- [ ] TODO·CHECK·설계 정합·민감정보·staged 범위 확인 후 commit·named branch push·원격 SHA/clean/CI 상태 인계.
+- [x] TODO·CHECK·설계 정합·민감정보·staged 범위 확인 후 commit·named branch push·원격 SHA/clean/CI 상태 인계.
 
 ## 최초 대조와 다음 확인
 
@@ -43,3 +44,7 @@
 - [상담·AI 데이터 범위 검토안](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md)에 현재 상태와 후속 매장별 이력·직원 해제·비공개 전문 자료·방치 상태 파기·경험 재사용의 미결정 항목을 구분했다. Core/이력/정책·DB·API·의존성 변경 없음.
 - 실계정은 이전 승인 범위에서 로그인/매장 목록/상담 설정만 읽기 전용 확인했다. SETUP에 따라 상세 계정 검증 결과는 Git 제외 로컬 계정 파일의 확인 상태/기록 표에만 남긴다. 비밀번호 재설정·초대/승인·상담 연결/공유·유료 AI·운영 업무 write는 하지 않았다. 실제 계정값·매장명·응답 원문은 기록하지 않는다.
 - 최종 Store 72 files / 831 tests·상담 집중 56 tests, Store 타입/build·수정 소스 lint 오류/경고 0, 실제 컴포넌트/adapter 브라우저 3개 viewport·24묶음 PASS. [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-USABILITY-AND-DATA-CONTRACT-V1.md)에 실행·미확인·인계 범위를 구분했다.
+
+## push 종료
+
+코드/검토안 commit `03b9a127d410818a408e4afe6e572c47d625cb73`을 지정 branch로 push했다. push 직전 origin/main은 시작과 같은 `b7d2cfd86e`였다. GitHub check-runs 0건·commit status 0건을 확인했으며 필수 CI 통과로 표시하지 않는다. PR 생성·main 병합·배포는 수행하지 않았다. 이 완료 기록은 문서만 변경하며 최종 원격 SHA/clean은 종료 보고에서 확인한다. 작업 트리는 통합/리뷰 보완용 `KEEP`이다.
