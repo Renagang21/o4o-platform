@@ -11,6 +11,7 @@
 export { AiSummaryButton } from './components/AiSummaryButton';
 export { AiSummaryModal } from './components/AiSummaryModal';
 export { AiPreviewModal } from './components/AiPreviewModal';
+export { AiOverviewPanel, type AiOverviewData } from './components/AiOverviewPanel';
 
 // Icons
 export {

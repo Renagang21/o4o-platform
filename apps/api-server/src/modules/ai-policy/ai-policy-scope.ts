@@ -43,4 +43,4 @@ export const SERVICE_FOR_SCOPE: Record<AiPolicyScope, string> = {
 };
 
 /** These features accept a verified catalogue service binding rather than a fixed legacy service. */
-export const DYNAMIC_SERVICE_SCOPES: readonly AiPolicyScope[] = ['SERVICE_QUERY', 'OPERATOR_INSIGHT', 'OPERATOR_ACTIONS', 'LMS_ASSISTANCE'];
+export const DYNAMIC_SERVICE_SCOPES: readonly AiPolicyScope[] = ['SERVICE_QUERY', 'STORE_INSIGHT', 'OPERATOR_INSIGHT', 'OPERATOR_ACTIONS', 'LMS_ASSISTANCE'];

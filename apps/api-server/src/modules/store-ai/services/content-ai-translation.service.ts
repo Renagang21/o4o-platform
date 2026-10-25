@@ -1,3 +1,4 @@
+import { createPolicyExtensionRuntime } from '../../../services/ai-extensions/policy-runtime.js';
 import { randomUUID } from 'node:crypto';
 import type { DataSource } from 'typeorm';
 import { runAiExtension, AiExtensionError } from '@o4o/ai-core';
@@ -41,16 +42,9 @@ export class ContentTranslationService {
         },
         materials: [{ id: access.contentId, kind: 'store-content', audience: 'staff' }],
         funding: { payer: 'platform' },
-      }, {
-        invoke: async (prompt, context, funding) => {
-          // This adapter uses the existing platform-funded policy. Other account/funding adapters are separate.
-          if (funding.payer !== 'platform') throw new AiExtensionError('FUNDING_UNSUPPORTED');
-          const result = await this.aiPolicyExecutor.execute('CONTENT_TRANSLATION', prompt.systemPrompt, prompt.userPrompt, {
-            maxTokens: 6000, temperature: 0.2, userId: context.actorId,
-          });
-          return { ...result, provider: result.provider ?? 'unknown' };
-        },
-      }, {
+      }, createPolicyExtensionRuntime(this.aiPolicyExecutor, 'CONTENT_TRANSLATION', {
+        maxTokens: 6000, temperature: 0.2,
+      }), {
         authorize: () => access.authorize(),
         record: async event => { logger.info('[AI_EXTENSION]', event); },
       });

@@ -1,4 +1,4 @@
-import { executeManagedAi } from '../../../services/ai-management/runtime-models.js';
+import { executeManagedAccountedAi } from '../../../services/ai-extensions/accounted-runtime.js';
 import type { DataSource, Repository } from 'typeorm';
 
 import { PRODUCT_TAGGING_SYSTEM, PRODUCT_TAGGING_B2B_SYSTEM } from '@o4o/ai-prompts/store';
@@ -62,18 +62,17 @@ export class ProductAiTaggingService {
     try {
       const userPrompt = this.buildB2cUserPrompt(product);
 
-      const result = await executeManagedAi(this.dataSource, 'product.tagging', {
+      const result = await executeManagedAccountedAi(this.dataSource, 'product.tagging', {
         systemPrompt: PRODUCT_TAGGING_SYSTEM,
         userPrompt,
         config: this.configResolver,
         meta: { service: 'store', callerName: 'ProductAiTaggingService' },
-      });
+      }, { scope: 'PRODUCT_TAGGING' });
       const parsed = JSON.parse(result.content) as LlmTagResponse;
 
       if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
         console.error('[ProductAiTag] Invalid LLM response: missing tags', {
           productId: product.id,
-          content: result.content.slice(0, 200),
         });
         return;
       }
@@ -125,12 +124,12 @@ export class ProductAiTaggingService {
         ? this.buildB2bUserPrompt(product)
         : this.buildB2cUserPrompt(product);
 
-      const result = await executeManagedAi(this.dataSource, 'product.tagging', {
+      const result = await executeManagedAccountedAi(this.dataSource, 'product.tagging', {
         systemPrompt,
         userPrompt,
         config: this.configResolver,
         meta: { service: 'store', callerName: `ProductAiTaggingService.suggestTags.${purpose}` },
-      });
+      }, { scope: 'PRODUCT_TAGGING' });
       const parsed = JSON.parse(result.content) as LlmTagResponse;
 
       if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {

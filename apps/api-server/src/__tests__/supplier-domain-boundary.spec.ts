@@ -8,7 +8,7 @@
  * 이미 CLOSED 인 축의 동작 테스트를 복제하지 않는다 — 기존 regression suite 가 담당한다.
  *
  *   §1  5축 · Workspace IA
- *   §2  Products — ProductMaster write=0 · 내부 LLM=0
+ *   §2  Products — ProductMaster write=0 · 등록/자료 인계의 내부 LLM=0
  *   §3  Distribution — 입력축 vs 파생 표기
  *   §4  Orders / Payment — PAYMENT-FIRST · UNPAID fulfillment=0
  *   §5  Shipping — 외부 택배사 연동=0
@@ -98,7 +98,8 @@ describe('§2 Products — ProductMaster 는 플랫폼 SSOT', () => {
     expect(mapper).toContain('supplierid');
   });
 
-  it('Supplier 경로에 내부 LLM 호출이 없다', () => {
+  // 2026-10-24 승인한 자기 집계 현황 설명은 별도 overview host에서 검증한다.
+  it('Supplier 등록·자료 인계·계정 처리 경로에 내부 LLM 호출이 없다', () => {
     for (const rel of [
       `${API}/modules/neture/controllers/supplier-product-candidate.controller.ts`,
       `${API}/modules/neture/services/supplier-library-handoff.service.ts`,

@@ -74,6 +74,9 @@ export const productCorrectionApi = {
       `/batches?page=${page}`,
     ),
   batch: (id: string) => call<ProductCorrectionBatch>('get', `/batches/${id}`),
+  aiDraft: (batchId: string, taskId: string, revision: number) =>
+    call<{ draft: string; missingEvidence: string[]; taskId: string; batchRevision: number; sourceFingerprint: string }>(
+      'post', `/batches/${batchId}/items/${taskId}/ai-draft`, { revision }),
   createBatch: (
     rule: ProductCorrectionRule,
     scope: ProductCorrectionScope,

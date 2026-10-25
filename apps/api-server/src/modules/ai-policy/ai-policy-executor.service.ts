@@ -50,7 +50,9 @@ export interface PolicyExecuteOverrides {
   responseMode?: "json" | "text";
   userId?: string;
   /** Server-owned logical usage; never forwarded from a client model override. */
-  usage?: "store.translation" | "pharmacy.consultation";
+  usage?: "store.translation" | "pharmacy.consultation" | "supplier.overview" | "cooperative.overview";
+  /** Domain host supplies the verified catalogue binding for dynamic scopes only. */
+  serviceKey?: string;
 }
 
 // ─────────────────────────────────────────────────────
@@ -83,12 +85,17 @@ export class AiPolicyExecutorService {
     const policy = await this.resolvePolicy(scope);
     if (!policy.isEnabled)
       throw new Error(`AI_DISABLED: scope '${scope}' is disabled`);
-    const usage =
+    if (overrides?.usage &&
+      (['supplier.overview', 'cooperative.overview'].includes(overrides.usage) ? scope !== 'OPERATOR_INSIGHT' : scope !== 'CONTENT_TRANSLATION'))
+      throw new Error('AI_POLICY_USAGE_MISMATCH');
+    const usage = overrides?.usage ?? (
       scope === "PRODUCT_CONTENT"
         ? "product.content"
         : scope === "CONTENT_TRANSLATION"
           ? (overrides?.usage ?? "store.translation")
-          : undefined;
+          : scope === 'STORE_INSIGHT'
+            ? 'store.overview'
+          : undefined);
     const selected = usage
       ? await new ModelControlService(this.dataSource).resolve(usage, {
           provider: policy.provider as ModelProvider,
@@ -153,7 +160,7 @@ export class AiPolicyExecutorService {
         : undefined;
     return new AiAccountedExecution(this.dataSource, this.quotaService).invoke(
       primary,
-      { scope, userId: overrides?.userId },
+      { scope, userId: overrides?.userId, ...(overrides?.serviceKey ? { serviceKey: overrides.serviceKey } : {}) },
       fallback,
     );
   }

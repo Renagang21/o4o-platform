@@ -31,6 +31,7 @@ import express from 'express';
 import request from 'supertest';
 
 const executeMock = jest.fn();
+jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedAi: (_db: unknown, request: unknown) => executeMock(request) }));
 const runWorkAgentMock = jest.fn();
 const runSurfaceMock = jest.fn();
 const runWebResearchMock = jest.fn();

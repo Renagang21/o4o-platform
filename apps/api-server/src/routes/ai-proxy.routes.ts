@@ -1688,7 +1688,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
     // Personal Assistant Phase A — Assistant → Task → Execution. 실행 본체(performWorkAgentRun)는 그대로이고,
     // Task 는 구조만 남긴다(원문 미저장). taskId 는 additive — 기존 work 필드의 의미는 바뀌지 않는다.
-    const understandLlm = createLlmTaskUnderstander(AppDataSource);
+    const understandLlm = createLlmTaskUnderstander(AppDataSource, userId);
     const { reply, task } = await runAssistantWorkTask(
       AppDataSource,
       { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
@@ -1697,7 +1697,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
       // 이해 모델은 실행 가능할 때만 부른다 — 노드 미연결 · 권한 없음 · 형식 오류면 모델 없이 결정적 기본 이해(실행은 같은 이유로 거절된다).
       {
         understand: async (u) => ((await checkWorkAgentRunnable(userId, workBody, { requireCapability: true })).ok ? understandLlm(u) : null),
-        verify: createLlmCompletionVerifier(AppDataSource),
+        verify: createLlmCompletionVerifier(AppDataSource, userId),
       },
     );
     if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);

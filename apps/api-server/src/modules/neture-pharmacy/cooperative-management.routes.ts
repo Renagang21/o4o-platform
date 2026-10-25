@@ -7,6 +7,11 @@ import { requireAuth } from "../../middleware/auth.middleware.js";
 import { CooperativeManagementService } from "./services/cooperative-management.service.js";
 import { NeturePharmacyError } from "./constants.js";
 import { isUuid } from "./services/pharmacy-cart.service.js";
+import { explainOverview } from '../../services/ai-extensions/dashboard-overview.service.js';
+import { resolveServiceAiProfile } from '../../services/ai-extensions/service-query.extension.js';
+import { createPolicyExtensionRuntime } from '../../services/ai-extensions/policy-runtime.js';
+import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
+import { AiExtensionError } from '@o4o/ai-core';
 
 /** Authentication is common; role checks are live, scoped, and performed in the service transaction. */
 export function cooperativeManagementRoutes(db: DataSource) {
@@ -46,6 +51,38 @@ export function cooperativeManagementRoutes(db: DataSource) {
       }
     };
   const actor = (req: Request) => req.user!.id;
+  router.post('/:coop/ai-overview', async (req, res, next) => {
+    try {
+      if (!req.body || Array.isArray(req.body) || typeof req.body !== 'object' || Object.keys(req.body).length)
+        throw new NeturePharmacyError(400, 'INVALID_INPUT', '별도 자료 입력 없이 현재 모임의 현황을 조회합니다.');
+      const coop = id(req, 'coop'), actorId = actor(req);
+      const base = resolveServiceAiProfile('neture');
+      if (!base) throw new AiExtensionError('INVALID_CONTEXT');
+      const data = await explainOverview({
+        actorId, featureId: 'cooperative.overview',
+        profile: { ...base, name: '약국 경영 협력 모임', description: '선택한 모임의 회원 상태 집계를 설명한다.' },
+        authorize: async () => { await service.requireLocal(db, actorId, coop); return true; },
+        load: async () => {
+          const rows: Array<{ status: string; count: number }> = await db.query(
+            'SELECT status,COUNT(*)::int AS count FROM cooperative_memberships WHERE cooperative_id=$1 GROUP BY status', [coop]);
+          const known = { pending: '심사 대기', active: '활성', rejected: '거절', suspended: '정지', withdrawn: '자격 종료' };
+          return { collectedAt: new Date().toISOString(), metrics: {
+            total: { label: '전체 회원 기록', value: rows.reduce((total, row) => total + row.count, 0) },
+            ...Object.fromEntries(Object.entries(known).map(([status, label]) => [status, { label: `회원 상태 ${label}`, value: rows.find(row => row.status === status)?.count ?? 0 }])),
+          } };
+        },
+        runtime: createPolicyExtensionRuntime(createPolicyExecutor(db), 'OPERATOR_INSIGHT', {
+          usage: 'cooperative.overview', serviceKey: 'neture', maxTokens: 1000, temperature: 0.1, responseMode: 'json',
+        }),
+      });
+      res.json({ success: true, data: { ...data, cooperativeId: coop } });
+    } catch (error) {
+      if (error instanceof AiExtensionError) {
+        res.status(error.code === 'ACCESS_DENIED' ? 403 : error.code === 'QUOTA_EXCEEDED' ? 429 : 503).json({ success: false, code: error.code });
+      } else if (error instanceof NeturePharmacyError) res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
+      else next(error);
+    }
+  });
   router.get(
     "/my-cooperatives",
     run((req) => service.myCooperatives(actor(req))),

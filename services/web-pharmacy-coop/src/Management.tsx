@@ -1,3 +1,4 @@
+import { AiOverviewPanel } from '@o4o/ai-components';
 import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
 import { ServiceOperatorManagement } from "@o4o/operator-core-ui";
@@ -408,6 +409,12 @@ export function MemberManagementPanel({
   return (
     <section className="section coop-management">
       <h2>조합원 관리 · {admin ? "admin" : "operator"}</h2>
+      <AiOverviewPanel scopeKey={`${userId}:${cooperative.id}`} load={async () => {
+        const response = await client.post(`${base}/${cooperative.id}/ai-overview`, {});
+        const result = response.data?.data;
+        if (response.data?.success !== true || result?.cooperativeId !== cooperative.id) throw new Error('COOPERATIVE_CONTEXT_CHANGED');
+        return result;
+      }} />
       {work.data && (
         <StatusSummary rows={work.data as Member[]} noun="조합원" />
       )}

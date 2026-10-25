@@ -27,6 +27,7 @@ module.exports = {
     }],
   },
   moduleNameMapper: {
+    '^@o4o/ai-prompts/(.*)$': '<rootDir>/../../packages/ai-prompts/src/$1/index.ts',
     '^@o4o/security-core$': '<rootDir>/../../packages/security-core/src/index.ts',
     '^@o4o/ai-core$': '<rootDir>/../../packages/ai-core/src/index.ts',
     // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1:
