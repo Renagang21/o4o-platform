@@ -32,7 +32,8 @@ import request from 'supertest';
 
 const executeMock = jest.fn();
 const accountedMock = jest.fn();
-jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedAi: (...args: unknown[]) => accountedMock(...args) }));
+const nativeMock = jest.fn();
+jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedAi: (...args: unknown[]) => accountedMock(...args), executeAccountedNativeAi: (...args: unknown[]) => nativeMock(...args) }));
 const runWorkAgentMock = jest.fn();
 const runSurfaceMock = jest.fn();
 const runWebResearchMock = jest.fn();
@@ -167,6 +168,7 @@ beforeEach(() => {
   testUserRoles = ['user'];
   netureStatusMock.mockResolvedValue('active');
   executeMock.mockResolvedValue({ content: '텍스트 답변', model: 'gemini-test' });
+  nativeMock.mockImplementation(async (_db: unknown, _request: unknown, _account: unknown, invoke: () => Promise<{ value: unknown }>) => (await invoke()).value);
   accountedMock.mockImplementation((_db: unknown, input: unknown) => executeMock(input));
   runWorkAgentMock.mockResolvedValue(workResult());
   runSurfaceMock.mockResolvedValue({
@@ -665,5 +667,40 @@ it('authenticated hospital research uses the hospital model target', async () =>
   });
   const response = await request(app).post('/api/ai/request').send({ text: '공개 약품 정보를 조사해줘', surface: 'hospital-drug' });
   expect(response.status).toBe(200);
-  expect(runWebResearchMock).toHaveBeenCalledWith({ query: 'synthetic research', usage: 'hospital.research' });
+  expect(runWebResearchMock).toHaveBeenCalledWith({ query: 'synthetic research', usage: 'hospital.research' }, '00000000-0000-4000-8000-000000000001');
+});
+
+
+describe('native Home and image analysis admission', () => {
+  const image = { name: 'fixture.png', mimeType: 'image/png', base64: 'QUJD' };
+  it('inline Home uses verified actor and native accounting exactly once', async () => {
+    await request(app).post('/api/ai/request').send({ text: '사진 설명', attachments: [image], userId: 'forged' }).expect(200);
+    expect(nativeMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ kind: 'multimodal' }), {
+      scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: '00000000-0000-4000-8000-000000000001',
+    }, expect.any(Function));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(accountedMock).not.toHaveBeenCalled();
+  });
+  it.each([['QUOTA_EXCEEDED', 429], ['AI_PRICING_NOT_CONFIGURED', 503]] as const)('native Home rejects %s before fetch', async (code, status) => {
+    nativeMock.mockRejectedValueOnce(new Error(code));
+    await request(app).post('/api/ai/request').send({ text: '사진 설명', attachments: [image] }).expect(status);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(nativeMock).toHaveBeenCalledTimes(1);
+  });
+  it('image analysis keeps authentication and maps admission refusal without provider work', async () => {
+    await request(app).post('/api/ai/vision/analyze').set('x-test-anon', '1').send({ imageBase64: 'QUJD' }).expect(401);
+    expect(nativeMock).not.toHaveBeenCalled();
+    nativeMock.mockRejectedValueOnce(new Error('QUOTA_EXCEEDED'));
+    await request(app).post('/api/ai/vision/analyze').send({ imageBase64: 'QUJD' }).expect(429);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+
+it.each([['AI_PRICING_NOT_CONFIGURED', 503, 'AI_ACCOUNTING_UNAVAILABLE'], ['upstream failed', 502, 'AI_ERROR']])('hospital surface separates admission failure %s from the legacy provider error contract', async (failure, status, code) => {
+  runSurfaceMock.mockRejectedValueOnce(new Error(failure as string));
+  const result = await request(app).post('/api/ai/request').send({ text: '공개 약품 정보를 조사해줘', surface: 'hospital-drug' });
+  expect(result.status).toBe(status);
+  expect(result.body.code).toBe(code);
+  expect(nativeMock).not.toHaveBeenCalled();
 });

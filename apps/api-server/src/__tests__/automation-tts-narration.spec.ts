@@ -9,6 +9,9 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+import type { AiNativeInvocation } from '../modules/ai-policy/ai-native-metering.js';
+const invokeNative: AiNativeInvocation = async (_request, invoke) => (await invoke()).value;
+
 import {
   TTS_MAX_TEXT_LENGTH,
   TTS_PROVIDERS,
@@ -69,14 +72,14 @@ describe('TTS narrow endpoint — TtsNarrationService', () => {
   it('key 미설정 → 503 TTS_PROVIDER_NOT_CONFIGURED, provider 호출 없음', async () => {
     const fetchMock = jest.fn();
     const svc = new TtsNarrationService(async () => '', fetchMock);
-    expect(await asyncCode(svc.synthesize(req))).toBe('TTS_PROVIDER_NOT_CONFIGURED:503');
+    expect(await asyncCode(svc.synthesize(req, invokeNative))).toBe('TTS_PROVIDER_NOT_CONFIGURED:503');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('openai: canonical model · instructions · Bearer 헤더 · mp3 바이너리 반환', async () => {
     const fetchMock = jest.fn(async () => okResponse(Buffer.from('ID3mp3')));
     const svc = new TtsNarrationService(async () => 'sk-test', fetchMock);
-    const r = await svc.synthesize(req);
+    const r = await svc.synthesize(req, invokeNative);
     expect(r.model).toBe('gpt-4o-mini-tts');
     expect(r.mimeType).toBe('audio/mpeg');
     expect(r.audio.toString()).toBe('ID3mp3');
@@ -103,7 +106,7 @@ describe('TTS narrow endpoint — TtsNarrationService', () => {
     );
     const svc = new TtsNarrationService(async () => 'AIza-test', fetchMock);
     const g = validateTtsRequest({ provider: 'gemini', text: '경도 육백', style: '차분하게' });
-    const r = await svc.synthesize(g);
+    const r = await svc.synthesize(g, invokeNative);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent');
     expect(url).not.toContain('AIza-test');
@@ -122,18 +125,18 @@ describe('TTS narrow endpoint — TtsNarrationService', () => {
 
   it('gemini: 오디오 파트 없음 → 502 TTS_PROVIDER_NO_AUDIO', async () => {
     const svc = new TtsNarrationService(async () => 'k', async () => okResponse(JSON.stringify({ candidates: [{ content: { parts: [{ text: 'no' }] } }] })));
-    expect(await asyncCode(svc.synthesize(validateTtsRequest({ provider: 'gemini', text: 'a' })))).toBe('TTS_PROVIDER_NO_AUDIO:502');
+    expect(await asyncCode(svc.synthesize(validateTtsRequest({ provider: 'gemini', text: 'a' }), invokeNative))).toBe('TTS_PROVIDER_NO_AUDIO:502');
   });
 
   it('provider HTTP 오류 → 502 (429 는 RATE_LIMITED) · 네트워크 실패 → 502 UNREACHABLE · 응답에 provider 본문 비노출', async () => {
     const failing = new TtsNarrationService(async () => 'k', async () => new Response('{"error":"secret detail sk-xyz"}', { status: 401 }));
-    expect(await asyncCode(failing.synthesize(req))).toBe('TTS_PROVIDER_FAILED:502');
+    expect(await asyncCode(failing.synthesize(req, invokeNative))).toBe('TTS_PROVIDER_FAILED:502');
     const limited = new TtsNarrationService(async () => 'k', async () => new Response('slow down', { status: 429 }));
-    expect(await asyncCode(limited.synthesize(req))).toBe('TTS_PROVIDER_RATE_LIMITED:502');
+    expect(await asyncCode(limited.synthesize(req, invokeNative))).toBe('TTS_PROVIDER_RATE_LIMITED:502');
     const down = new TtsNarrationService(async () => 'k', async () => {
       throw new Error('ECONNRESET');
     });
-    expect(await asyncCode(down.synthesize(req))).toBe('TTS_PROVIDER_UNREACHABLE:502');
+    expect(await asyncCode(down.synthesize(req, invokeNative))).toBe('TTS_PROVIDER_UNREACHABLE:502');
   });
 
   it('pcmToWav 헤더 크기 계산', () => {

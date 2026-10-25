@@ -1,3 +1,4 @@
+jest.mock('../modules/neture/services/image-storage.service.js', () => ({ ImageStorageService: class {} }));
 /** Product permissions precede AI, verified actors reach all interactive billing paths, failure stops fan-out. */
 import express from 'express';
 import request from 'supertest';
@@ -16,6 +17,7 @@ jest.mock('../middleware/auth.middleware.js', () => ({
   },
 }));
 
+import { ProductImportCommonService } from '../modules/neture/services/product-import-common.service.js';
 import { createProductAiTagRouter } from '../modules/store-ai/controllers/product-ai-tag.controller.js';
 import { createProductAiContentRouter } from '../modules/store-ai/controllers/product-ai-content.controller.js';
 import { ProductAiTaggingService } from '../modules/store-ai/services/product-ai-tagging.service.js';
@@ -96,4 +98,11 @@ it('invalid tag output fails quietly without saving or exposing generated text',
   await expect(new ProductAiTaggingService(db).generateTags(product, actor)).resolves.toBe(false);
   expect(repo.save).not.toHaveBeenCalled();
   expect(JSON.stringify(jest.mocked(console.error).mock.calls)).not.toContain('sensitive-generated-output');
+});
+
+
+it.each([actor, undefined])('import generation uses only the actor forwarded by its authorized host: %s', async userId => {
+  await new ProductImportCommonService(db).triggerAiContentGeneration([product], userId);
+  expect(policyCall).toHaveBeenCalledTimes(5);
+  for (const call of policyCall.mock.calls) expect(call[3]).toEqual({ userId });
 });

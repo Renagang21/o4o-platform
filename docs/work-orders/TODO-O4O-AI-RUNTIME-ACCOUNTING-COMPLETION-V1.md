@@ -1,6 +1,7 @@
 # AI 실행 경로의 비용·quota 연결 후속 정비
 
-> **상태**: DEVELOPMENT_COMPLETE · push 인계 (main/운영 미반영)
+> **상태**: COMPLETED
+> **개발 결과**: push 인계 (main/운영 미반영)
 > **작성일**: 2026-10-25 (Asia/Seoul)
 > **근거**: 사용자 AI 후속 작업 진행 지시 · [전체 정비 TODO](TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 S2-2/S4-4
 > **기준**: main `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d` · `wo/ai-runtime-accounting-completion`
@@ -55,3 +56,6 @@
 실행한 명령·결과·소비처 영향과 미실행은 [CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)를 따른다. 새 작업공간은 기준 main checkout 밖에 분리했으며 다른 worktree를 수정하지 않는다. 배포가 필요한 코드 변경은 `DEPLOYMENT = REQUIRED`로 인계하되 개발 완료를 운영 반영 완료로 표시하지 않는다.
 
 최종 로컬 검증: API Jest 627 suites 중 576 PASS / 51 SKIP, 9,304 tests PASS / 760 SKIP, 실패 0. 공통 package·API build, API·Neture·hospital·admin 타입 검사, 변경 18개 TS/MTS lint, 웹 소비 테스트 30건과 문서 5개 민감정보/상대 링크 검사를 통과했다. 제외된 테스트를 실행 성공으로 합산하지 않는다. 새 API/provider를 운영에서 호출하거나 모델·가격·한도·인증 설정을 저장하지 않았다. 최종 commit SHA·원격 일치는 인계 보고를 따른다.
+
+
+후속 전문 호출 개발: [TODO](TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)·[CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md). 새 branch `wo/ai-specialized-runtime-accounting`은 이 텍스트 commit도 포함한다. Native·직접 호출 공통 회계와 가져오기 host의 현재 인증 actor 전달을 추가했으며 §3의 DEFER/actor 부재 설명은 텍스트 회차 당시 상태다. 운영 요율/profile 준비·실제 검증과 main/배포는 별도다.

@@ -16,7 +16,7 @@
  */
 
 import { randomUUID } from 'crypto';
-import type { AIGroundingMetadata, AIProviderConfig, AIProviderResponse, AIProvider as AIProviderInterface } from './types.js';
+import type { AIGroundingMetadata, AIProviderConfig, AIProvider as AIProviderInterface } from './types.js';
 import { GeminiProvider } from './providers/gemini.provider.js';
 import { OpenAIProvider } from './providers/openai.provider.js';
 
@@ -71,6 +71,7 @@ export interface ExecuteResult {
   promptTokens: number;
   /** 출력 토큰 수 */
   completionTokens: number;
+  usageKnown?: boolean;
   /** 총 소요 시간 (ms) */
   durationMs: number;
   /** 요청 고유 ID */
@@ -140,6 +141,7 @@ export async function execute(request: ExecuteRequest): Promise<ExecuteResult> {
   // grounding 이면 응답 모드 기본값을 'text' 로 분리한다(JSON 강제와 병용 불가).
   const providerConfig: AIProviderConfig = {
     ...config,
+    singleAttempt: true,
     responseMode: request.responseMode ?? config.responseMode ?? (grounding ? 'text' : 'json'),
     timeoutMs: request.timeoutMs ?? config.timeoutMs,
     ...(grounding !== undefined ? { grounding } : {}),
@@ -165,6 +167,7 @@ export async function execute(request: ExecuteRequest): Promise<ExecuteResult> {
         model: response.model,
         promptTokens: response.promptTokens,
         completionTokens: response.completionTokens,
+        ...(response.usageKnown !== undefined ? { usageKnown: response.usageKnown } : {}),
         durationMs: Date.now() - start,
         requestId,
         ...(response.grounding !== undefined ? { grounding: response.grounding } : {}),

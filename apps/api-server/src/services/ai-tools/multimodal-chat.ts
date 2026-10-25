@@ -11,6 +11,7 @@
  * 이미지 · PDF base64 는 이 함수의 인자 → 요청 body 로만 흐른다. 로그 · DB · 파일에 쓰지 않는다.
  */
 
+import { geminiNativeUsage, type AiNativeInvocation } from '../../modules/ai-policy/ai-native-metering.js';
 import type { execute } from '@o4o/ai-core';
 import type { AttachmentPart } from './attachment-reader.js';
 import type { RuntimeProvider } from '../../utils/ai-provider-runtime.js';
@@ -38,9 +39,11 @@ export const INLINE_NOT_SUPPORTED_NOTE =
   '(주의: 현재 AI 제공자는 이미지·PDF 첨부를 직접 볼 수 없습니다. 첨부 이미지/PDF 의 내용은 모른다고 답하고, 텍스트로 붙은 자료만 사용하세요.)';
 
 /** Hosts own text-call admission/accounting; the native inline transport remains separate. */
-export async function executeMultimodalChat(input: MultimodalChatInput, invokeText: typeof execute): Promise<MultimodalChatResult> {
+export async function executeMultimodalChat(input: MultimodalChatInput, invokeText: typeof execute, invokeNative: AiNativeInvocation): Promise<MultimodalChatResult> {
   const inline = input.parts.filter((p): p is Extract<AttachmentPart, { kind: 'inline' }> => p.kind === 'inline');
   if (inline.length > 0 && input.provider === 'gemini') {
+    if (!input.apiKey) throw new Error('AI_NOT_CONFIGURED');
+    return invokeNative({ kind: 'multimodal', provider: input.provider, model: input.model, textBytes: Buffer.byteLength(input.systemPrompt + input.userPrompt, 'utf8'), maxOutputTokens: 2048 }, async () => {
     const fetchImpl = input.fetchImpl ?? fetch;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(input.model)}:generateContent?key=${encodeURIComponent(input.apiKey)}`;
     const controller = new AbortController();
@@ -68,12 +71,13 @@ export async function executeMultimodalChat(input: MultimodalChatInput, invokeTe
         // 상태코드만 실어 normalizeAiError 가 코드로 접게 한다(원문 · 키는 싣지 않는다).
         throw new Error(`multimodal provider ${response.status}`);
       }
-      const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+      const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] } & Parameters<typeof geminiNativeUsage>[0];
       const content = data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
-      return { content, model: input.model, inlineDelivered: true };
+      return { value: { content, model: input.model, inlineDelivered: true }, usage: geminiNativeUsage(data) };
     } finally {
       clearTimeout(timer);
     }
+    });
   }
 
   const userPrompt = inline.length > 0 ? `${input.userPrompt}\n\n${INLINE_NOT_SUPPORTED_NOTE}` : input.userPrompt;

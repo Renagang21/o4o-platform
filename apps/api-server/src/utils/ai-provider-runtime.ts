@@ -270,7 +270,7 @@ export function normalizeAiError(error: unknown): NormalizedAiError {
   // Server admission failures are not provider rate limits and must not trigger paid retries.
   if (raw === 'QUOTA_EXCEEDED') return { code: 'QUOTA_EXCEEDED', retryable: false };
   if (raw === 'AI_QUOTA_UNAVAILABLE') return { code: 'AI_QUOTA_UNAVAILABLE', retryable: false };
-  if (['AI_PRICING_INVALID', 'AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID'].includes(raw))
+  if (['AI_PRICING_INVALID', 'AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID', 'AI_USAGE_INVALID'].includes(raw))
     return { code: 'AI_ACCOUNTING_UNAVAILABLE', retryable: false };
 
   // execute() 가 붙이는 접두사 — provider 도달 전 단계.

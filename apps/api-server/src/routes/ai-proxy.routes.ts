@@ -34,7 +34,8 @@ import { isSupportedOutputType, buildSystemPrompt, buildUserPrompt, parseRespons
 // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
 
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
-import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
+import { geminiNativeUsage } from '../modules/ai-policy/ai-native-metering.js';
+import { executeAccountedAi, executeAccountedNativeAi } from '../modules/ai-policy/ai-accounted-execution.js';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
 import { NETURE_MAIN_MEMBERSHIP_MESSAGES, NETURE_MEMBERSHIP_REQUIRED } from '../modules/neture/services/neture-main-membership.js';
@@ -105,6 +106,8 @@ router.post('/generate', authenticate, async (req, res: Response) => {
     );
     return res.json({ ...response, requestId });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     const status = error.type === 'RATE_LIMIT_ERROR' ? 429
                  : error.type === 'AUTH_ERROR' ? 401
                  : error.type === 'VALIDATION_ERROR' ? 400
@@ -136,7 +139,7 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 
   const { imageBase64, mimeType = 'image/jpeg', prompt } = req.body;
 
-  if (!imageBase64) {
+  if (typeof imageBase64 !== 'string' || !imageBase64) {
     return res.status(400).json({ success: false, error: 'imageBase64 is required' });
   }
 
@@ -165,9 +168,10 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
     const { model } = await new ModelControlService(AppDataSource).resolve('image.analysis', { provider: 'gemini', model: await resolveEditingModel() });
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+    const data = await executeAccountedNativeAi(AppDataSource, { kind: 'multimodal', provider: 'gemini', model, textBytes: Buffer.byteLength(systemPrompt, 'utf8'), maxOutputTokens: 1000 }, { scope: 'AI_PROXY', userId }, async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
-
+    try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -193,15 +197,15 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
       signal: controller.signal,
     });
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
-      const errorBody = await response.text();
-      logger.error('Vision AI provider error', { status: response.status, body: errorBody });
+      logger.error('Vision AI provider error', { status: response.status });
       throw new Error(`Gemini Vision API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const value = await response.json();
+    return { value, usage: geminiNativeUsage(value) };
+    } finally { clearTimeout(timeoutId); }
+    });
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
@@ -223,10 +227,12 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 
     return res.json({ success: true, result });
   } catch (error: any) {
-    logger.error('Vision AI error', { userId, error: error.message });
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
+    logger.error('Vision AI error', { userId, code: admission.code });
     return res.status(500).json({
       success: false,
-      error: error.message || 'Vision AI 분석 중 오류가 발생했습니다.',
+      error: 'Vision AI 분석 중 오류가 발생했습니다.',
     });
   }
 });
@@ -439,6 +445,8 @@ router.post('/content', authenticate, async (req, res: Response) => {
       usageWarning: usageWarning.detected ? usageWarning : undefined,
     });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     const status = error.type === 'RATE_LIMIT_ERROR' ? 429
                  : error.type === 'AUTH_ERROR' ? 401
                  : error.type === 'VALIDATION_ERROR' ? 400
@@ -682,6 +690,8 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
         { usage: 'editor.url' },
       );
     } catch (aiError: any) {
+      const admission = normalizeAiError(aiError);
+      if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
       logger.error('[url-to-blocks] AI 생성 실패', { requestId, error: aiError.message, type: aiError.type });
       const isTimeout = aiError.type === 'TIMEOUT_ERROR' || aiError.message?.includes('abort');
       const isRateLimit = aiError.type === 'RATE_LIMIT_ERROR';
@@ -826,6 +836,8 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       usageWarning: fetchedUsageWarning?.detected ? fetchedUsageWarning : undefined,
     });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     logger.error('[url-to-blocks] 오류', { requestId, error: error.message });
     return res.status(500).json({
       success: false,
@@ -957,6 +969,8 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
       requestId,
     });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     const status = error.type === 'RATE_LIMIT_ERROR' ? 429
                  : error.type === 'AUTH_ERROR' ? 401
                  : error.type === 'VALIDATION_ERROR' ? 400
@@ -1124,6 +1138,8 @@ router.post('/course-structure', authenticate, async (req, res: Response) => {
     logger.info('[course-structure] 완료', { requestId, userId, count: lessons.length });
     return res.json({ success: true, lessons, requestId });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     logger.error('[course-structure] 오류', { requestId, error: error.message });
     return res.status(500).json({
       success: false,
@@ -1258,6 +1274,8 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
     logger.info('[lesson-body] 완료', { requestId, userId, length: safeHtml.length });
     return res.json({ success: true, html: safeHtml, requestId });
   } catch (error: any) {
+    const admission = normalizeAiError(error);
+    if (isAiAccountingError(admission.code)) return res.status(aiErrorHttpStatus(admission.code)).json({ success: false, error: aiErrorUserMessage(admission.code), code: admission.code });
     logger.error('[lesson-body] 오류', { requestId, error: error.message });
     return res.status(500).json({
       success: false,
@@ -1409,7 +1427,8 @@ async function performHomeChat(
 
     const result = attachmentParts.some((p) => p.kind === 'inline')
       ? await executeMultimodalChat({ provider, model, apiKey, systemPrompt, userPrompt, parts: attachmentParts, timeoutMs: HOME_CHAT_TIMEOUT_MS },
-          request => executeAccountedAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId }))
+          request => executeAccountedAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId }),
+          (request, invoke) => executeAccountedNativeAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId }, invoke))
       : await executeAccountedAi(AppDataSource, {
           systemPrompt,
           userPrompt,
@@ -1538,7 +1557,7 @@ async function performHospitalDrugRequest(
       {
         exec: (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
         research: async (query) => {
-          const r = await runWebResearch({ query, usage: 'hospital.research' });
+          const r = await runWebResearch({ query, usage: 'hospital.research' }, userId);
           return { content: r.content, model: r.model, grounding: r.grounding };
         },
       },
@@ -1565,9 +1584,10 @@ async function performHospitalDrugRequest(
       reason: result.plan,
     };
   } catch (error: unknown) {
-    logger.error('hospital-drug surface error', { userId, error: (error as { message?: string })?.message });
+    const normalized = normalizeAiError(error);
+    logger.error('hospital-drug surface error', { userId, code: normalized.code });
     return {
-      reply: { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } },
+      reply: { status: isAiAccountingError(normalized.code) ? aiErrorHttpStatus(normalized.code) : 502, body: { success: false, error: isAiAccountingError(normalized.code) ? aiErrorUserMessage(normalized.code) : '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: isAiAccountingError(normalized.code) ? normalized.code : 'AI_ERROR' } },
       kind: 'chat',
       reason: 'error',
     };

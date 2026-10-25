@@ -295,4 +295,16 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home/계획/파일은 `SERVICE_QUERY/neture`, 상품 태그는 `PRODUCT_TAGGING`, 상품 콘텐츠는 기존 `PRODUCT_CONTENT` 정책을 사용한다. 공개 파일 추론은 사용자 신원을 만들지 않는다. 상품 태그 실패 시 후속 콘텐츠 생성은 중단하지만 기존 fire-and-forget 응답·업무 저장/권한 계약은 유지한다. 대화/파일/생성 원문은 공통 비용 로그에 기록하지 않는다. 한도 초과·한도 DB/가격 장애를 provider rate limit과 구분하며 성공 후 정산 장애가 유료 재호출을 만들지 않게 한다.
 
-native 이미지·PDF·화면 판독, 검색 도구 비용, Qwen·OCR·TTS는 현재 텍스트 가격/요청 계약으로 지원 완료를 주장하지 않는다. 관리 목록에서 홈 첨부·작업 계획은 partial이며 전체 작업 비용 통제를 뜻하지 않는다. 플랫폼 부담 외 실제 사용자/매장 청구·외부 계정 연결과 운영 가격·한도 검증도 후속이다. [검증 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에 소비처·회귀·미실행을 기록하며 main 병합/배포는 이번 개발 종료 범위에 포함하지 않는다.
+§15의 텍스트 단계에서는 native 이미지·PDF·화면 판독, 검색 도구 비용, Qwen·OCR·TTS 지원 완료를 주장하지 않았고 홈 첨부·작업 계획은 partial이었다. 전문 호출 후속 개발 상태는 §16을 따른다. 플랫폼 부담 외 실제 사용자/매장 청구·외부 계정 연결과 운영 가격·한도 검증도 후속이다. [검증 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에 소비처·회귀·미실행을 기록하며 main 병합/배포는 이번 개발 종료 범위에 포함하지 않는다.
+
+## 16. 전문 호출·기존 직접 호출의 회계 연결 — 개발 branch (2026-10-25)
+
+[전문 실행 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)에서 §15의 후속을 한 묶음으로 정비했다. `wo/ai-specialized-runtime-accounting`은 작업 시작 시 main `4ee5a8ecda`에서 시작하고 미병합 선행 `d11cb4afa1`을 정상 merge했다. 이미지/PDF·Gemini/OpenAI 화면 계획·이미지 분석·검색·OCR·음성·Qwen과 기존 편집/URL/강의 직접 호출을 같은 예약/정산에 연결한다. 이전 main·운영 기록은 이번 branch의 배포 증거가 아니다.
+
+서버 내부 `AiNativeInvocation`은 기존 transport의 결과와 타입 있는 사용량만 기존 `AiAccountedExecution.invokeNative`에 전달한다. provider wildcard 텍스트 요율을 전문 단가로 쓰지 않는다. 모델별 `native` profile은 기존 가격 catalog 안에서 입력/출력 예산·이미지/검색 요청/검색 질의/문자 단위를 표현한다. 사용량이 누락되면 기존 보류/reconcile을 사용하고, 성공 후 기록 장애는 유료 재호출하지 않는다. Core 실행기는 Gemini 내부 JSON retry와 중첩되지 않게 실제 시도 수를 통제하며 선택적 `usageKnown`으로 부분 누락을 구분한다. Extension의 안전한 가격 오류 코드는 보존한다.
+
+기존 AIProxy의 provider별 출력 상한·backoff를 유지하며 실제 시도마다 먼저 예약한다. Qwen provider 실패 후 canonical Gemini fallback도 같은 회계를 거치고, quota/가격 거부는 fallback하지 않는다. OCR 업로드와 카탈로그 가져오기 후 콘텐츠에는 host가 검증한 현재 actor를 전달하며 사용자 신원이 없는 내부 작업은 그대로 미지정이다. 업무 권한/자료 공개·저장·실행 확인·Task/Memory를 바꾸지 않는다.
+
+관리 조회는 native 예약/receipt와 기존 로그를 중복 없이 합치며 enum 밖 Qwen/Google Vision·미확정 audio/crash 기록을 포함한다. 원문·이미지/audio·검색어는 공통 원장에 남기지 않는다. 비용은 추정 정책이며 실제 invoice나 외부 제공업체의 강제 결제 상한이 아니다.
+
+**운영 준비:** 명시 모델 요율/profile이 없으면 native 호출은 503으로 차단한다. 운영 설정을 변경하거나 유료 시험 호출·PR/병합/배포를 실행하지 않았다. [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 로컬 검증과 [TODO §4](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)의 실제 모델/요율·단위·예산·미확정 처리 수용 조건을 확인한 뒤 통합/배포를 판단한다. 전체 AI 화면·직원/소비자 상담·외부 계정/사용자 직접 청구 완료를 뜻하지 않는다.

@@ -175,6 +175,7 @@ export class OpenAIProvider implements AIProvider {
       model,
       promptTokens: data.usage?.prompt_tokens ?? 0,
       completionTokens: data.usage?.completion_tokens ?? 0,
+      ...(!Number.isSafeInteger(data.usage?.prompt_tokens) || !Number.isSafeInteger(data.usage?.completion_tokens) ? { usageKnown: false } : {}),
     };
   }
 }

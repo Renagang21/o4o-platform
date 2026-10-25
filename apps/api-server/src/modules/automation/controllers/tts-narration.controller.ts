@@ -1,3 +1,5 @@
+import { executeAccountedNativeAi } from '../../ai-policy/ai-accounted-execution.js';
+import { normalizeAiError, aiErrorHttpStatus, aiErrorUserMessage, isAiAccountingError } from '../../../utils/ai-provider-runtime.js';
 import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 /**
  * TTS Narration API — WO-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1
@@ -24,7 +26,7 @@ export function createTtsNarrationRouter(ds: DataSource): Router {
     try {
       if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) throw new MediaCatalogError('INVALID_BODY');
       const request = validateTtsRequest(req.body);
-      const result = await service.synthesize(request);
+      const result = await service.synthesize(request, (native, invoke) => executeAccountedNativeAi(ds, native, { scope: 'AI_PROXY', userId: req.user!.id }, invoke));
       res.setHeader('Content-Type', result.mimeType);
       res.setHeader('Content-Length', String(result.audio.length));
       res.setHeader('Cache-Control', 'private, no-store');
@@ -38,7 +40,9 @@ export function createTtsNarrationRouter(ds: DataSource): Router {
         res.status(error.status).json({ success: false, error: error.message, code: error.code });
         return;
       }
-      logger.error('[TTS] synthesize failed:', error);
+      const normalized = normalizeAiError(error);
+      if (isAiAccountingError(normalized.code)) return res.status(aiErrorHttpStatus(normalized.code)).json({ success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code });
+      logger.error('[TTS] synthesize failed', { code: normalized.code });
       res.status(500).json({ success: false, code: 'TTS_FAILED' });
     }
   });

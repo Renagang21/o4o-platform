@@ -1,3 +1,4 @@
+import { geminiNativeUsage, openAiNativeUsage } from '../../modules/ai-policy/ai-native-metering.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../utils/logger.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
@@ -250,7 +251,7 @@ export function extractJson(text: string): unknown {
 
 /**
  * LLM Planner — 텍스트는 기존 공통 비용 실행기 → Core execute(json 모드)를 소비한다.
- * Gemini/OpenAI 이미지는 기존 native vision transport를 유지하며 아직 공통 비용 계약에 연결되지 않았다.
+ * Gemini/OpenAI 이미지는 기존 native vision transport와 공통 예약/정산을 사용한다.
  */
 /** provider · model · key 해석기. 기본은 운영 SSOT(`resolveAiTarget`). 실 smoke 하네스가 entity 층 없이 같은 planner 코드를 돌릴 때만 주입한다. */
 export type PlannerTargetResolver = (dataSource: DataSource) => Promise<{ provider: 'gemini' | 'openai'; model: string; apiKey: string }>;
@@ -357,7 +358,12 @@ export function createLlmPlanner(
       const { resolveManagedAiTarget } = await import('../ai-management/runtime-models.js');
       const { provider, model, apiKey } = await resolveManagedAiTarget(dataSource, strong ? 'work.planning.strong' : input.image ? 'work.vision' : 'work.planning', fallback);
       const userPrompt = buildPlannerUserPrompt(input);
+      const { executeAccountedNativeAi } = await import('../../modules/ai-policy/ai-accounted-execution.js');
+      if (input.image && !apiKey) throw new Error('AI_NOT_CONFIGURED');
+      const nativeAccount = { scope: 'SERVICE_QUERY' as const, serviceKey: 'neture', userId: actorId };
+      const nativeRequest = { kind: 'multimodal' as const, provider, model, textBytes: Buffer.byteLength(WORK_PLANNER_SYSTEM_PROMPT + userPrompt, 'utf8'), maxOutputTokens: 800 };
       if (input.image && provider === 'gemini') {
+        const content = await executeAccountedNativeAi(dataSource, nativeRequest, nativeAccount, async () => {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 40_000);
@@ -373,11 +379,13 @@ export function createLlmPlanner(
             signal: controller.signal,
           });
           if (!response.ok) throw new Error(`planner provider ${response.status}`);
-          const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-          return extractJson(data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '');
+          const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] } & Parameters<typeof geminiNativeUsage>[0];
+          return { value: data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '', usage: geminiNativeUsage(data) };
         } finally {
           clearTimeout(timer);
         }
+        });
+        return extractJson(content);
       }
       // Capability B(Astra Screen) B1 — WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A §6 후속.
       //   B0 실측(2026-09-19, gpt-6-astra · 사분면 fixture 4/4 · text-only 대조 0/4) PASS 뒤에만 연 분기다.
@@ -385,6 +393,7 @@ export function createLlmPlanner(
       //   image_url(data URI) 한 자리 · 키는 Authorization 헤더에만(URL · 로그 · 프롬프트에 base64/키 없음) ·
       //   reasoning 세대(gpt-6.x)라 temperature 없이 max_completion_tokens · JSON 응답 모드(ai-core openai provider 와 동일 규칙).
       if (input.image && provider === 'openai') {
+        const content = await executeAccountedNativeAi(dataSource, nativeRequest, nativeAccount, async () => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 40_000);
         try {
@@ -395,11 +404,13 @@ export function createLlmPlanner(
             signal: controller.signal,
           });
           if (!response.ok) throw new Error(`planner provider ${response.status}`);
-          const data = (await response.json()) as { choices?: { message?: { content?: string | { type?: string; text?: string }[] } }[] };
-          return extractJson(openAiMessageText(data?.choices?.[0]?.message?.content));
+          const data = (await response.json()) as { choices?: { message?: { content?: string | { type?: string; text?: string }[] } }[] } & Parameters<typeof openAiNativeUsage>[0];
+          return { value: openAiMessageText(data?.choices?.[0]?.message?.content), usage: openAiNativeUsage(data) };
         } finally {
           clearTimeout(timer);
         }
+        });
+        return extractJson(content);
       }
       const { executeAccountedAi } = await import('../../modules/ai-policy/ai-accounted-execution.js');
       const result = await executeAccountedAi(dataSource, {

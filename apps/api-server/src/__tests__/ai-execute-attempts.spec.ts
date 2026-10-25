@@ -11,3 +11,18 @@ it('reports provider attempts for conservative cost reconciliation without chang
     expect(fetch).toHaveBeenCalledTimes(2);
   } finally {global.fetch=savedFetch;warn.mockRestore();}
 });
+
+
+it('Core execute owns Gemini JSON retries, so maxAttempts also bounds real paid calls', async () => {
+  const { execute } = await import('@o4o/ai-core');
+  const original = global.fetch;
+  const fetchMock = jest.fn()
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: 'invalid JSON' }] } }] }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: '{}' }] } }], usageMetadata: { promptTokenCount: 2, candidatesTokenCount: 3 } }) });
+  global.fetch = fetchMock;
+  try {
+    const result = await execute({ systemPrompt: 'system', userPrompt: 'user', provider: 'gemini', config: { apiKey: 'synthetic-key', model: 'normal' }, retry: { maxAttempts: 2, delayMs: 0 } });
+    expect(result.attempts).toBe(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  } finally { global.fetch = original; }
+});

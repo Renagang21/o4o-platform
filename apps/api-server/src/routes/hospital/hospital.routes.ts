@@ -226,7 +226,9 @@ export function createHospitalRoutes(): Router {
       const reply = await runHospitalAiRequest(text);
       return res.json({ success: true, data: reply });
     } catch (error) {
-      logger.error('hospital ai request failed', { error: error instanceof Error ? error.message : String(error) });
+      const normalized = normalizeAiError(error);
+      logger.error('hospital ai request failed', { code: normalized.code });
+      if (isAiAccountingError(normalized.code)) return res.status(aiErrorHttpStatus(normalized.code)).json({ success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code });
       return res.status(502).json({ success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' });
     }
   });

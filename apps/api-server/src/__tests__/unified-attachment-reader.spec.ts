@@ -10,6 +10,7 @@
  */
 
 import AdmZip from 'adm-zip';
+import type { AiNativeInvocation } from '../modules/ai-policy/ai-native-metering.js';
 import { execute } from '@o4o/ai-core';
 import * as XLSX from 'xlsx';
 import {
@@ -136,6 +137,8 @@ describe('home-chat 프롬프트 — 첨부 사실', () => {
   });
 });
 
+const invokeNative: AiNativeInvocation = async (_request, invoke) => (await invoke()).value;
+
 describe('multimodal chat', () => {
   beforeEach(() => jest.clearAllMocks());
   const base = { model: 'gemini-x', apiKey: 'k', systemPrompt: 'S', userPrompt: 'U', timeoutMs: 5_000 } as const;
@@ -154,7 +157,7 @@ describe('multimodal chat', () => {
         { kind: 'text', name: 'n.txt', mimeType: 'text/plain', text: 'ignored here', truncated: false },
       ],
       fetchImpl,
-    }, execute);
+    }, execute, invokeNative);
     expect(r).toEqual({ content: '읽었습니다', model: 'gemini-x', inlineDelivered: true });
     expect(calls).toHaveLength(1);
     expect(execute).not.toHaveBeenCalled();
@@ -169,12 +172,12 @@ describe('multimodal chat', () => {
   it('gemini 오류는 상태코드만 실은 Error (키 · 원문 비노출)', async () => {
     const fetchImpl = (async () => ({ ok: false, status: 429, json: async () => ({}) }) as unknown as Response) as unknown as typeof fetch;
     await expect(
-      executeMultimodalChat({ ...base, provider: 'gemini', parts: [{ kind: 'inline', name: 'a.png', mimeType: 'image/png', base64: 'QUJD' }], fetchImpl }, execute),
+      executeMultimodalChat({ ...base, provider: 'gemini', parts: [{ kind: 'inline', name: 'a.png', mimeType: 'image/png', base64: 'QUJD' }], fetchImpl }, execute, invokeNative),
     ).rejects.toThrow(/^multimodal provider 429$/);
   });
 
   it('gemini 가 아니면 텍스트 경로 + "볼 수 없다" 안내 (본 척하지 않는다)', async () => {
-    const r = await executeMultimodalChat({ ...base, provider: 'openai', parts: [{ kind: 'inline', name: 'a.png', mimeType: 'image/png', base64: 'QUJD' }] }, execute);
+    const r = await executeMultimodalChat({ ...base, provider: 'openai', parts: [{ kind: 'inline', name: 'a.png', mimeType: 'image/png', base64: 'QUJD' }] }, execute, invokeNative);
     expect(r.inlineDelivered).toBe(false);
     expect(r.content).toBe('TEXT-PATH:noted');
     expect(execute).toHaveBeenCalledTimes(1);
@@ -182,7 +185,7 @@ describe('multimodal chat', () => {
   });
 
   it('inline 첨부가 없으면 provider 와 무관하게 텍스트 경로 · 안내 없음', async () => {
-    const r = await executeMultimodalChat({ ...base, provider: 'gemini', parts: [{ kind: 'text', name: 'n.txt', mimeType: 'text/plain', text: 'x', truncated: false }] }, execute);
+    const r = await executeMultimodalChat({ ...base, provider: 'gemini', parts: [{ kind: 'text', name: 'n.txt', mimeType: 'text/plain', text: 'x', truncated: false }] }, execute, invokeNative);
     expect(r).toEqual({ content: 'TEXT-PATH:plain', model: 'm', inlineDelivered: false });
   });
 });

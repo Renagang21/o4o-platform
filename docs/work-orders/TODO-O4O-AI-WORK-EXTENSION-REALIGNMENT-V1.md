@@ -204,3 +204,12 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/a
 새 [TODO](TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)를 먼저 만들고 실제 호출과 정본을 대조했다. `wo/ai-runtime-accounting-completion`에서 홈 텍스트·텍스트 첨부/대체·일반/강화 텍스트 계획·로그인/공개 파일 구조 추론을 기존 회계 실행기에 연결한다. 상품 태그 생성/제안·상품 콘텐츠 생성·태그 후속 생성은 기존 업무 권한 판정 후 인증 actor를 전달한다. 태그 실패 뒤 후속 콘텐츠 생성은 시작하지 않는다. 기존 가져오기 작업은 확인된 actor가 없어 사용자 귀속을 추정하지 않는다.
 
 공개 파일 추론은 별도 hospital 청구 서비스를 신설하지 않고 현재 Neture 기능으로 `SERVICE_QUERY/neture`에 귀속하며 익명 사용자 한도를 만들지 않는다. 이미지/검색 도구/OCR/음성의 전문 과금과 외부 계정 청구는 이번 텍스트 계약의 지원 범위가 아니다. 따라서 S2-2/S4-4 전체 완료 표시는 유지하지 않으며 미체크 상태를 보존한다. 현황 목록의 connected/partial과 실제 제한·저장/오류·검증은 [후속 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)를 따른다. 이번 후속은 push 인계이며 §11의 main/운영 배포 증거와 합산하지 않는다.
+
+
+## 13. 전문 호출·기존 직접 호출 후속 — 개발 branch (2026-10-25)
+
+사용자 지시에 따라 [전문 실행 TODO](TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)를 만들고 비용 단위와 실제 host를 재대조했다. 이미지/PDF·Gemini/OpenAI 일반/강화 화면 계획·이미지 분석·공개/인증 검색·OCR·TTS·Qwen과 같은 실행기의 편집/URL/매장 활용/강의 생성도 함께 예약·정산에 연결한다. 카탈로그 가져오기 후 콘텐츠에는 기존 관리자 guard를 통과한 현재 actor를 전달한다. Native·legacy 로그 중복을 제거하고 enum 밖 provider와 미확정 사용량을 같은 관리자 조회에 표시한다.
+
+기존 native transport·모델 선택·backoff·역할/자료/실행 검증을 유지한다. Core의 중첩 JSON retry·부분 사용량 누락·안전한 가격 오류 전달을 보강했으며 새로운 Task/Memory·DB schema/migration·결제 정책을 추가하지 않았다. 자세한 가격/단위 계약·소비처·검증은 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)를 따른다.
+
+S2-2/S4-4의 주요 **코드 연결**은 이번 묶음에 포함했다. 다만 실제 전문 모델별 가격/profile·입출력/검색 예산과 native 사용량 미반환 처리의 운영 검증은 남아 있으므로 전체 항목을 운영 완료로 바꾸지 않는다. 전문 profile이 없으면 503으로 차단되며 이 상태를 승인 없이 즉시 배포하지 않는다. 사용자/매장 청구·외부 계정 연결·새 상태 변경 도구·실계정/유료 호출은 별도다. 새 branch는 최신 main `4ee5a8ecda`와 선행 미병합 `d11cb4afa1`을 포함하며 이번 종료점은 push 인계다.
