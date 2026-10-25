@@ -1,6 +1,6 @@
 # 약국 협업체 회원·운영자 통합 업무 검증
 
-> **상태**: COMPLETED — 개발·격리 검증 기록. main 통합·운영 DB 적용·배포 완료를 뜻하지 않음
+> **상태**: COMPLETED — 개발·통합·운영 배포 검증 기록. 실계정·실매장 검증은 미실행
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25 (Asia/Seoul)
 > **근거 WO**: [WO-O4O-COOPERATION-MEMBER-OPERATOR-WORKFLOWS-V2](../work-orders/WO-O4O-COOPERATION-MEMBER-OPERATOR-WORKFLOWS-V2.md)
 
@@ -30,7 +30,7 @@
 - 빈 상태 down 결과는 직전 schema `ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb`, 6,903 lines로 복원됐다. 재적용은 같은 신규 fingerprint를 반환했다.
 - 실제 배포용으로 빌드한 `dist/migrate.js`를 별도의 새 로컬 DB에 실행했다. bootstrap·41개 incremental·post-migration assertion PASS. 재실행도 schema assertion PASS이며 중복 migration은 없었다.
 - 기존 account-erasure writer fence를 새 테이블 5개 모두에 적용했다. 공유 업무·개인 식별정보의 제거/보존 분류를 자동 승인하거나 새 법정 보존기간을 만들지 않는다. 기존 수동 검토·fail-closed 원칙을 유지한다.
-- API 통합 fixture는 `afterAll`에서 자기 scope·계정·조직·문의·알림·감사/버전 기록을 삭제하고 해당 계정 잔존 0건을 검사한다. 별도 기존 회귀 suite의 schema도 자체 종료 절차로 제거한다. 전용 container/volume은 최종 검증 후 종료·제거한다.
+- API 통합 fixture는 `afterAll`에서 자기 scope·계정·조직·문의·알림·감사/버전 기록을 삭제하고 해당 계정 잔존 0건을 검사한다. 별도 기존 회귀 suite의 schema도 자체 종료 절차로 제거한다. 전용 container/volume은 최종 검증 후 종료·제거했다.
 
 ## 브라우저 검증
 
@@ -60,7 +60,28 @@
 - 실제 UI 소비처: web-kpa-society·web-neture·web-pharmacy-coop·web-store·web-lecture·web-kpa-branch·admin-dashboard. API-server의 관련 import는 테스트 소비이며 API 자체 build도 검증했다.
 - 공통 UI는 새 전용 CSS class와 명시적 account/scope/선택 약국 key를 사용한다. 기존 공개 소식·게시판 공지·공급 제안·상품 모집·매장 사본과 legal profile은 별도 의미로 유지한다.
 - 새 원장 없이 존재하던 1단계의 링크 정리 완료와 이번 2단계의 실제 업무 기록 개발을 구분한다. 자료의 공개 범위는 기존 활성 회원 전용을 유지하며 세부 대상 확대·교육 수료 원장·실결제·ERP/POS는 추가하지 않았다.
-- 작업 branch에 검증한 변경만 commit·push하고 PR HEAD의 CI·리뷰를 확인한다. **운영 migration은 미적용**이다. 적용 승인 전 main merge·production dispatch를 완료했다고 보고하지 않는다.
-- `WORKTREE_DISPOSITION`: `/workspace/o4o-platform`, branch `wo/cooperation-member-operator-workflows-v2`, base `b7d2cfd86e`, verdict `KEEP` — 운영 적용 판단과 후속 수정에 필요. 이전 완료 branch나 다른 세션의 작업공간은 변경하지 않는다.
+- 개발 인계 당시에는 운영 migration 미적용 상태였다. 이후 사용자의 명시적인 통합·배포 지시로 아래 운영 반영 결과를 확인했다.
+- `WORKTREE_DISPOSITION`: `/workspace/o4o-platform`, 기능 branch `wo/cooperation-member-operator-workflows-v2`는 main 병합 완료. 현재 기록 branch `wo/cooperation-workflows-deployment-record-20261025`, base `7a75dcf666`, verdict `KEEP` — 배포 기록과 운영 검증 후속 인계용. 이전 완료 branch나 다른 세션의 작업공간은 변경하지 않는다.
 
-문서 정합: 이 CHECK의 COMPLETED는 명시한 개발 검증에 한정한다. WO는 운영 적용 대기 상태를 유지하며, 운영 migration·API·웹·Pharmcoop 배포와 실계정 검증은 각각 실제 결과를 확인한 뒤 갱신한다.
+문서 정합: 앞의 로컬 검증과 아래 운영 반영 결과를 구분한다. 개발·통합·배포 완료가 실계정·실매장 검증 완료를 뜻하지 않는다.
+
+
+## 2026-10-25 운영 반영 검증
+
+| 단계 | 실제 결과 |
+|---|---|
+| 기능 PR | [#808](https://github.com/Renagang21/o4o-platform/pull/808) MERGED. HEAD `0bfcaad868`의 CI Gate·API 3분할·Code Quality·Web/Admin build·CodeQL·Sonar PASS, Codex completed·finding0·미해결0 |
+| main | `7a75dcf6664b6b538846b117fbf355676d1a0f3a`. [main CI 40193561845](https://github.com/Renagang21/o4o-platform/actions/runs/40193561845)의 CI Gate·전체 테스트/빌드 PASS |
+| 통제 배포 | 자동 Delivery의 LEVEL_3 보류를 확인한 뒤 승인 범위로 [Promote 40194525136](https://github.com/Renagang21/o4o-platform/actions/runs/40194525136) 실행, SUCCESS |
+| Migration·API | 단일 migration Job의 `Run database migrations` SUCCESS. API revision readiness·traffic switch·post-switch 검증 SUCCESS. 별도 DB 접속·seed·이력 수정·rollback 강행 없음 |
+| 공유 소비처 | API·Admin·Neture·KPA Society·Lecture·Store·KPA Branch 배포와 최종 serving SHA 검사 SUCCESS. `production`: `DEPLOYED` |
+| Pharmcoop | [40195429634](https://github.com/Renagang21/o4o-platform/actions/runs/40195429634), 같은 SHA·`frontend_only=true`·`apply=false`, SUCCESS. API 호환성·private smoke·트래픽 전환 SUCCESS, fixture provision skipped |
+| 공개 smoke | Pharmacy·MegaPharm·CarePharm·Pharmcoop 홈 HTTP 200. 준비 상태 JSON HTTP 200. 새 business/cooperative 회원 API의 비로그인 요청 HTTP 401 `AUTH_REQUIRED` |
+
+추가 통합 검증에서 Pharmacy/MegaPharm 지원 메뉴의 다중 약국 미선택·잘못된 선택·단일 자동 선택·유효 선택을 8건 검증했다. 전체 Pharmacy 20파일148 PASS와 production build PASS. 로컬 병렬 실행 중 기존 UI 대기 1건이 만료됐지만 같은 assertion의 집중30건·전체 순차148건이 재통과했고 CI에서도 통과했다. assertion이나 timeout을 완화하지 않았다.
+
+실제 production bundle과 합성 API로 두 호스트 × PC/390px의 4개 추가 브라우저 흐름이 PASS다. 공지 게시/확인·활동 신청/승인/진행/완료·지원 메뉴/문의/배정·자료 개정/교육과 pageerror/수평 넘침0을 재확인했다. 앞의 4호스트8개 결과와 별도 기록이며 실계정 결과가 아니다.
+
+격리 PG container/volume과 preview 서버는 제거했고 운영 DB에 테스트 fixture를 넣지 않았다. 배포 검증에서 실제 계정 가입·운영자 권한 부여·공지/신청/문의 생성·메일 발송·실결제/배송·음성/기기 연결은 수행하지 않았다. CarePharm 법정정보 빈칸·약관 미게시·신규 가입 차단은 유지했다.
+
+현재 잔여는 WO의 **운영 개통과 추가 개발 구분** 표를 따른다. 과거 #772·#765는 MERGED이며 해당 merge commit이 main의 ancestor임을 확인했다. 자료별 세부 공개 범위·교육 수료·ERP/POS 등 별도 범위와 실제 운영 입력을 이번 배포 누락으로 표시하지 않는다.
