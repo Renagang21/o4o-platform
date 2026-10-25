@@ -54,3 +54,13 @@ API 최초 전체 실행은 567 suites / 9,199 tests가 통과했으나 4 suites
 공급자 정책은 사용자가 허용한 자체 집계 설명 범위로 콘텐츠 운영 원칙·Supplier 경계·Assistant의 정책 참조에 반영했다. 과거 WO/CHECK·canonical index·Auth/RBAC Core는 변경하지 않았다. 문서 정합 검사: 변경 7개 문서의 민감정보 패턴 0건, 상대 파일 링크 165개·이번 변경의 anchor 7개 유효, `git diff --check` PASS.
 
 WORKTREE_DISPOSITION: worktree `/workspace/o4o-wt/ai-work-extension-preparation` · branch `wo/ai-work-extension-preparation` · base `355d77e861` 포함 · main integration/원격 CI/배포/운영 smoke 미실행 · local fixture smoke PASS · verdict KEEP. 최종 SHA와 미커밋/원격 일치는 push 후 인계 보고를 따른다.
+
+## 6. main 통합·배포 실행 (2026-10-25)
+
+사용자가 main 병합·배포를 명시 지시하여 이 공간에서 통합을 이어간다. 위 개발/push-only 기록은 이전 회차의 증거다. 구현 HEAD `fd4caf2cbf7d958718fd688db391eecf2860c12b`에 최신 main `b88031578952e727702c83c027cc848053408f89`를 정상 merge했다(`97a4be4efd`, 충돌 없음). 통합한 상태에서 API build와 핵심 Jest 7 suites / 58 tests PASS를 확인했다. 기존 전체/화면 검증과 합산하지 않는다.
+
+현재 main ruleset은 PR 필수·`CI Gate` 필수·필수 human approval 0·삭제/force push 금지다. 기존 동일 head PR은 없었으며 새 PR에서 정확한 HEAD의 required CI·리뷰·미해결 사항을 확인한 뒤 병합한다. 운영 배포 workflow는 기존 경로를 사용하고 freeze·CI·WIF/계정 gate를 변경하지 않는다. Actions 변수 직접 조회는 앱 권한 403이므로 freeze가 해제됐다고 추정하지 않고 workflow의 실제 판정을 따른다.
+
+변경에는 새 migration·DDL·운영 설정·인증 정보가 없다. 기존 API 배포의 migration Job과 verified rollout은 표준 경로로 유지한다. 일반 Delivery가 서비스별 serving SHA와 누적 diff를 판정하고 필요하면 소유자 `promote.yml` 경로로 승인된 target만 배포한다. 협력 모임 웹은 별도 `deploy-cooperative.yml`의 `frontend_only=true` 경로를 사용하여 조합·회원·운영자 데이터 등록/변경 없이 웹만 배포한다. API 반영과 동일 SHA/호환성 확인 후 진행한다.
+
+실행 전 조회한 최근 CI·Delivery·Promote는 모두 완료 상태였고 진행 중인 운영 배포는 없었다. PR/병합 SHA·CI·최종 배포/서빙 결과와 공개 smoke의 확정 결과는 확인 후 이 절에 기록한다. 실제 유료 AI 호출·업무 데이터 생성·신규 외부 계약/인증 설정은 이번 배포 검증에 포함하지 않는다.
