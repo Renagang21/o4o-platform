@@ -1,7 +1,7 @@
 # COLLABORATOR-START-HERE
 
 > **대상**: O4O 에 새로 참여하는 사람 공동개발자 · **일자**: 2026-09-30
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-14 — AI 공통 기반·운영 적용 및 신규 개발자 착수 안내 정합
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-25 — AI 공통 회계 통합·전문 기능 가격 준비 경계 반영
 > 기술 교육 문서가 아니다. **"O4O 가 무엇을 중요하게 보는가, 이 저장소를 어떻게 읽어야 하는가, 어디부터 보면 되는가"** 만 다룬다.
 > 규칙의 원문은 각 정본 문서에 있고, 이 문서는 그 문서들을 가리키기만 한다.
 
@@ -34,7 +34,7 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 현행 여부가 궁금하면 [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) 를 본다. 문서별 상태(ACTIVE · FROZEN · 판정 대기)가 적혀 있다. `docs/checks/` · `docs/work-orders/` · `docs/ir/` · `docs/investigations/` · `docs/archive/` 는 **과거 시점의 실행 기록**이므로 현재 정책으로 읽지 않는다.
 
-### AI 개발의 현재 기준 — 2026-10-14
+### AI 개발의 현재 기준 — 2026-10-25
 
 신규 개발자는 현재 `main`에서 로컬 개발·테스트·PR 작업을 시작할 수 있다. 다음 공통 기반이 구현·통합됐다.
 
@@ -43,11 +43,11 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 - Work Agent의 관찰·계획·실행·Task 책임을 분리하고 요청별 state를 공유한다. 공통 콘텐츠 편집기의 문맥 변경·늦은 응답·저장 중복 처리도 정비했다.
 - 누적 변경은 PR #549/#552/#557로 main에 반영됐다. 승인된 quota migration과 API·admin·neture·kpa-society·lecture·store·kpa-branch 배포가 성공했고, 배포 후 읽기 전용 HTTP 점검 16/16이 통과했다.
 
-이는 모든 서비스 화면의 AI 기능이나 Windows/실계정 업무 자동화가 검증됐다는 뜻은 아니다. 최신 Sonar 등급, 실계정 사용량·비용·한도, 직접 transport/멀티모달 전체 비용 이관, 매장·사용자 청구/외부 계정 연결은 후속 확인·개발 범위다. 신규 PC 설치·로그인도 해당 PC에서 검증한다.
+이는 모든 서비스 화면의 AI 기능이나 Windows/실계정 업무 자동화가 검증됐다는 뜻은 아니다. 전문 AI의 실제 모델별 가격·예산 설정과 실계정 사용량·비용·한도, Sonar 중복률 정비, 매장·사용자 청구/외부 계정 연결은 후속 확인·개발 범위다. 신규 PC 설치·로그인도 해당 PC에서 검증한다.
 
 책임과 적용 범위는 [AI Core + Extension 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md), 운영 증거는 [최종 통합·배포 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)를 읽는다. CHECK는 적용 증거이며 사업·권한 정책을 대신하지 않는다.
 
-2026-10-25 후속 개발은 [전문 AI TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)와 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)를 따른다. `wo/ai-specialized-runtime-accounting`은 선행 텍스트 정비도 포함하며 이미지/PDF·화면·검색·OCR·TTS·Qwen·편집/강의 직접 호출을 기존 회계에 연결한다. 이 기록은 main/배포 완료가 아니다. native 요율/profile 미준비 시 provider 이전에 503으로 거부하므로 운영 적용 전 현재 모델별 가격·예산을 검토해야 한다. 일반 개발/fixture 테스트에는 운영 key나 유료 호출이 필요하지 않다.
+2026-10-25 선행 텍스트·전문 호출 정비는 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 병합됐다. 이미지/PDF·화면·검색·OCR·TTS·Qwen·편집/강의 직접 호출을 기존 회계에 연결하며, 관리자 집계의 UUID 비교 오류도 실제 PostgreSQL에서 재현·수정했다. 구현 계약은 [전문 AI TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md), 개발 검증은 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md), 최신 운영 적용 증거는 [후속 통합·배포 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. native 요율/profile 미준비 시 provider 이전에 503으로 거부하므로 코드 배포를 전문 기능의 실제 사용 활성화로 해석하지 않는다. 일반 개발/fixture 테스트에는 운영 key나 유료 호출이 필요하지 않다.
 
 ## 3. 첫 공동개발 대상 — O4O Personal Assistant의 약국 경영 업무 지원
 
