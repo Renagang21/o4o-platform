@@ -38,3 +38,7 @@
 독립 worker가 이미지에 포함되어도 외부 Job/Scheduler가 자동으로 설정되지는 않는다. 이번 범위에서 운영 Cloud Run Job/Scheduler·IAM·secret·주기·배포를 만들거나 변경하지 않았다. 해당 설정과 서버 휴면 상태의 실제 예약 검증은 **향후 승인된 통합·배포 단계의 운영 적용 조건**이다. 원본을 쓰는 worker가 아니라 후보 점검/작업 기록용 runner다. 예산은 tick 사이에서 확인하므로 진행 중 페이지의 timeout 여유를 별도 Job 설정에 포함해야 한다.
 
 최신 main 이동은 작업 전용 branch에서만 확인한다. 실제 main 기술 gate·CI/리뷰는 PR의 최신 HEAD로 판정하며 자동 병합은 설정하지 않는다. 사용자 지시대로 main 통합 전 상태를 보존한다.
+
+## PR #822 공식 검증 후속
+
+초기 통합 HEAD 4ead677b50의 CodeQL과 Codex(지적 없음)는 통과했다. 공식 Code Quality Check는 새 CLI entry의 console.log 2개가 기존 production console guard에 걸려 실패했다. CLI의 명시적 help/JSON 결과 출력은 process.stdout.write로 바꾸고 guard를 로컬 재현·재검증했다. 검사 예외·baseline·workflow는 변경하지 않는다. bundle 재빌드/help/기존 worker 회귀 후 같은 PR에 수정 push하고 최신 HEAD의 공식 검증을 확인한다.
