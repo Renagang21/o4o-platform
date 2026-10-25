@@ -14,6 +14,6 @@ ARG VITE_PARTNER_API_ORIGIN=https://api.neture.co.kr
 ENV VITE_PARTNER_API_ORIGIN=$VITE_PARTNER_API_ORIGIN
 RUN pnpm --filter @o4o/web-partner build
 FROM nginxinc/nginx-unprivileged:1.28-alpine
-COPY services/web-partner/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chmod=644 services/web-partner/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/services/web-partner/dist /usr/share/nginx/html
 EXPOSE 8080

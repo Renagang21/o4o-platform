@@ -152,3 +152,10 @@
 - [ ] 운영 migration 2개 실행 승인·정상 배포, 공개 URL·serving SHA 확인
 
 첫 Partner 웹 서비스가 운영에 없다면 기존 배포 계정은 IAM을 변경할 수 없으므로 서비스 공개 접근 부여·도메인 연결은 소유자 최초 설정이 필요하다. 첫 서비스/serving SHA를 알 수 없는 경우 Promote는 fail-closed이며 기존 검증 gate를 완화하지 않는다. 파일 업로드는 운영 영속 저장소 설정 전 비활성 상태를 유지한다. 운영 임시 디스크에 저장하도록 설정하지 않는다.
+
+### 통합 로컬 검증
+
+- API 의존성을 현재 main 버전으로 재빌드한 뒤 API type-check와 production build 통과. 프런트 62개·PostgreSQL API 16개·배포 관련 전체 단위 테스트 363개 통과. migration contract 21 PASS / 0 FAIL.
+- 실제 Partner Docker image build·8080 컨테이너 HTTP 200과 Chromium 기능/32개 responsive 검사 통과. nginx 설정은 COPY 시 명시적으로 0644를 부여하여 unprivileged 사용자도 읽도록 검증했다.
+- PR #820 생성. PR CI·review·main 병합과 운영 배포는 아직 진행 단계이며 완료 판정은 실제 GitHub 결과로 확인한다.
+- 이 환경의 운영 도메인 probe는 outbound CONNECT 403으로 차단되었다. 이것만으로 운영 사이트 장애라고 판정하지 않는다. 운영 API의 신규 경로는 배포 전 404다. 운영 데이터·계정 변경은 수행하지 않았다.
