@@ -16,6 +16,29 @@ const read = (p) => readFileSync(path.join(ROOT, p), 'utf-8');
 const DEPLOY = ['.github/workflows/deploy-api.yml', '.github/workflows/deploy-web-services.yml', '.github/workflows/deploy-admin.yml'];
 const count = (text, re) => (text.match(re) ?? []).length;
 
+describe('상담 정리 운영 설정은 기존 verified API 배포 경로에서만 연결한다', () => {
+  it('현재 중지 설정을 조회해 보존하고 조회 실패면 배포를 멈춘다', () => {
+    const wf = read(DEPLOY[0]);
+    const section = /- name: Resolve consultation cleanup env \(preserve stop\)([\s\S]*?)(?=\n {4}- name:)/.exec(wf)?.[1] ?? '';
+    assert.match(section, /if: inputs\.migrate_only != 'true'/);
+    assert.match(section, /OPTENV_CONSULTATION_STATE_CLEANUP_MODE: apply/);
+    assert.doesNotMatch(section, /OPTENV_CONSULTATION_STATE_CLEANUP_ENABLED:/);
+    assert.match(section, /node scripts\/ci\/cloud-run-env\.mjs optional/);
+    assert.match(section, /--names CONSULTATION_STATE_CLEANUP_MODE,CONSULTATION_STATE_CLEANUP_ENABLED/);
+    assert.match(section, /--require-current true/);
+    assert.match(section, /--out "\$RUNNER_TEMP\/consultation-cleanup-env"/);
+    assert.ok(wf.indexOf('Resolve consultation cleanup env') < wf.indexOf('- name: Deploy to Cloud Run'));
+  });
+
+  it('생성한 flag 파일을 실제 gcloud 배포에 넘기고 중지 값을 강제 활성화하지 않는다', () => {
+    const wf = read(DEPLOY[0]);
+    const deploy = /- name: Deploy to Cloud Run([\s\S]*?)(?=\n {4}- name:)/.exec(wf)?.[1] ?? '';
+    assert.match(deploy, /mapfile -d '' CONSULTATION_CLEANUP_ENV < "\$RUNNER_TEMP\/consultation-cleanup-env"/);
+    assert.match(deploy, /gcloud run deploy[\s\S]*"\$\{CONSULTATION_CLEANUP_ENV\[@\]\}"/);
+    assert.doesNotMatch(deploy, /CONSULTATION_STATE_CLEANUP_ENABLED=true/);
+  });
+});
+
 describe('Phase 1 — CI gate 는 모든 배포 경로 앞에 있다', () => {
   for (const file of DEPLOY) {
     it(`${file}: ci-gate job 이 --enforce 로 CI green 을 요구한다`, () => {

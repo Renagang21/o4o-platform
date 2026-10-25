@@ -80,4 +80,6 @@ push 직전 read-only fetch에서 main은 `23717b6dc0`으로 이동했다. 작�
 
 문서 정합: 전체 AI 구조·사용 흐름 baseline·전체 TODO·선행 텍스트 TODO·SETUP·신규 개발자 안내에서 현재 branch와 운영 준비 경계를 연결한다. 선행 TODO/CHECK의 상태 표기만 문서 생명주기의 `COMPLETED`로 맞추고 이전 검증 기록은 유지했다. 이전 main/운영 배포 증거와 이번 로컬 검증을 혼동하지 않는다.
 
+이후 사용자의 main 병합·배포 지시로 선행 텍스트 정비와 함께 PR #811/main `67654de1fe`에 반영됐다. 이 문서의 push-only·실제 PG 생략은 당시 개발 검증의 범위다. 후속 통합에서는 UUID 비교 P1을 실제 PostgreSQL에서 재현·수정했고 집계/기존 quota·모델 제어 28건을 확인했다. 최신 CI·배포·가용성 제한은 [후속 CHECK](CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다.
+
 WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-specialized-runtime-accounting` · `wo/ai-specialized-runtime-accounting` · base `4ee5a8ecda` · prerequisite `d11cb4afa1` · main integration/PR CI/deployment 미실행 · `KEEP` (미병합 push 인계·후속 수정용).

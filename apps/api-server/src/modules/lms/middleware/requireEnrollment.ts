@@ -107,154 +107,163 @@ const ASSIGNMENT_COURSE_SQL = `
 
 export function requireEnrollment(options?: RequireEnrollmentOptions) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user?.id;
-    if (!userId) {
-      return res.status(401).json({ success: false, error: 'Unauthorized' });
-    }
-
-    // courseId 결정
-    let courseId = req.params.courseId;
-
-    // lesson 경로인 경우: lessonId → courseId 역추적
-    const lessonParam = req.params.id ?? req.params.lessonId;
-    if (!courseId && lessonParam && options?.checkLesson) {
-      const lessonRepo = AppDataSource.getRepository('Lesson');
-      const lesson = await lessonRepo.findOne({
-        where: { id: lessonParam },
-        select: ['id', 'courseId'],
-      });
-      if (!lesson) {
-        return res.status(404).json({ success: false, error: 'Lesson not found' });
-      }
-      courseId = (lesson as any).courseId;
-    }
-
-    // 평가 제출 경로: quizId · assignmentId → courseId 역추적 (Raw SQL parameter binding — CLAUDE.md §7 Guard Rule 2)
-    if (!courseId && (options?.checkQuiz || options?.checkAssignment)) {
-      const isQuiz = Boolean(options?.checkQuiz);
-      const id = isQuiz ? req.params.quizId : req.params.assignmentId;
-      const notFound = isQuiz ? 'Quiz not found' : 'Assignment not found';
-      if (!id) {
-        return res.status(404).json({ success: false, error: notFound });
-      }
-      const rows: Array<{ course_id: string | null }> = await AppDataSource.query(
-        isQuiz ? QUIZ_COURSE_SQL : ASSIGNMENT_COURSE_SQL,
-        [id],
-      );
-      const resolved = rows?.[0]?.course_id;
-      if (!resolved) {
-        return res.status(404).json({ success: false, error: notFound });
-      }
-      courseId = resolved;
-    }
-
-    if (!courseId) {
-      return next(); // courseId를 결정할 수 없으면 통과 (다른 미들웨어/컨트롤러가 처리)
-    }
-
-    // Course 조회 — visibility, isPaid, requiresApproval 모두 로드
-    const courseRepo = AppDataSource.getRepository(Course);
-    const course = await courseRepo.findOne({
-      where: { id: courseId },
-      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey', 'instructorId', 'status'],
-    });
-
-    if (!course) {
-      return res.status(404).json({ success: false, error: 'Course not found' });
-    }
-
-    // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §3 / §5:
-    // service boundary 는 enrollment 권한과 별개이며 항상 먼저 판정한다.
-    // enrollment 가 있어도 타 서비스 course/lesson 에는 접근할 수 없다.
-    let serviceScope: string | undefined;
     try {
-      serviceScope = resolveLmsServiceScope(req);
-    } catch (e) {
-      if (e instanceof InvalidLmsServiceKeyError) {
-        return res
-          .status(400)
-          .json({ success: false, error: '알 수 없는 serviceKey 입니다', code: INVALID_SERVICE_KEY_CODE });
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Unauthorized' });
       }
-      throw e;
-    }
-    if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
-      // non-disclosure — scope 밖 resource 는 존재를 드러내지 않는다
-      const message = options?.checkLesson ? 'Lesson not found' : 'Course not found';
-      return res.status(404).json({ success: false, error: message });
-    }
 
-    // 13차 Codex P1: scope 다음, 학습자 정책보다 먼저 — 게시 상태 판정.
-    // 비노출은 403 이 아니라 404 (CourseController.getCourse 와 동일한 non-disclosure).
-    if (
-      (course as any).status !== CourseStatus.PUBLISHED &&
-      !(await canSeeUnpublishedCourse(req, userId, (course as any).instructorId))
-    ) {
-      const message = options?.checkLesson
-        ? 'Lesson not found'
-        : options?.checkQuiz
-          ? 'Quiz not found'
-          : options?.checkAssignment
-            ? 'Assignment not found'
-            : 'Course not found';
-      return res.status(404).json({ success: false, error: message });
-    }
+      // courseId 결정
+      let courseId = req.params.courseId;
 
-    // 7차 P2-8 + 9차 P2-10: scope 판정 이후에만 — 소유 강사(현재 role + active membership)·
-    // lecture:admin 은 자기 강의의 평가를 수강 없이 읽는다.
-    if (options?.allowCourseOwner && (await canReadOwnCourseAssessments(req, userId, (course as any).instructorId))) {
-      return next();
-    }
-
-    // MEMBERS 강의: active lecture membership 이 선행 조건이다 (role 불요 · break-glass 만 예외).
-    // PUBLIC 강의는 membership 을 요구하지 않는다 — 다만 아래 enrollment 판정은 건너뛰지 않는다.
-    if (course.visibility !== CourseVisibility.PUBLIC && !isPlatformSuperAdmin(req)) {
-      const membershipStatus = await resolveLectureMembershipStatus(req);
-      if (membershipStatus === 'not_found') {
-        return res.status(403).json({
-          success: false,
-          error: '회원 전용 강의입니다. O4O 강의 서비스 가입이 필요합니다.',
-          code: 'MEMBERSHIP_NOT_FOUND',
+      // lesson 경로인 경우: lessonId → courseId 역추적
+      const lessonParam = req.params.id ?? req.params.lessonId;
+      if (!courseId && lessonParam && options?.checkLesson) {
+        const lessonRepo = AppDataSource.getRepository('Lesson');
+        const lesson = await lessonRepo.findOne({
+          where: { id: lessonParam },
+          select: ['id', 'courseId'],
         });
+        if (!lesson) {
+          return res.status(404).json({ success: false, error: 'Lesson not found' });
+        }
+        courseId = (lesson as any).courseId;
       }
-      if (membershipStatus === 'inactive') {
-        return res.status(403).json({
-          success: false,
-          error: '서비스 멤버십이 활성 상태가 아닙니다.',
-          code: 'MEMBERSHIP_NOT_ACTIVE',
-        });
+
+      // 평가 제출 경로: quizId · assignmentId → courseId 역추적 (Raw SQL parameter binding — CLAUDE.md §7 Guard Rule 2)
+      if (!courseId && (options?.checkQuiz || options?.checkAssignment)) {
+        const isQuiz = Boolean(options?.checkQuiz);
+        const id = isQuiz ? req.params.quizId : req.params.assignmentId;
+        const notFound = isQuiz ? 'Quiz not found' : 'Assignment not found';
+        if (!id) {
+          return res.status(404).json({ success: false, error: notFound });
+        }
+        const rows: Array<{ course_id: string | null }> = await AppDataSource.query(
+          isQuiz ? QUIZ_COURSE_SQL : ASSIGNMENT_COURSE_SQL,
+          [id],
+        );
+        const resolved = rows?.[0]?.course_id;
+        if (!resolved) {
+          return res.status(404).json({ success: false, error: notFound });
+        }
+        courseId = resolved;
       }
+
+      if (!courseId) {
+        return next(); // courseId를 결정할 수 없으면 통과 (다른 미들웨어/컨트롤러가 처리)
+      }
+
+      // Course 조회 — visibility, isPaid, requiresApproval 모두 로드
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({
+        where: { id: courseId },
+        select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey', 'instructorId', 'status'],
+      });
+
+      if (!course) {
+        return res.status(404).json({ success: false, error: 'Course not found' });
+      }
+
+      // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §3 / §5:
+      // service boundary 는 enrollment 권한과 별개이며 항상 먼저 판정한다.
+      // enrollment 가 있어도 타 서비스 course/lesson 에는 접근할 수 없다.
+      let serviceScope: string | undefined;
+      try {
+        serviceScope = resolveLmsServiceScope(req);
+      } catch (e) {
+        if (e instanceof InvalidLmsServiceKeyError) {
+          return res
+            .status(400)
+            .json({ success: false, error: '알 수 없는 serviceKey 입니다', code: INVALID_SERVICE_KEY_CODE });
+        }
+        throw e;
+      }
+      if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
+        // non-disclosure — scope 밖 resource 는 존재를 드러내지 않는다
+        const message = options?.checkLesson ? 'Lesson not found' : 'Course not found';
+        return res.status(404).json({ success: false, error: message });
+      }
+
+      // 13차 Codex P1: scope 다음, 학습자 정책보다 먼저 — 게시 상태 판정.
+      // 비노출은 403 이 아니라 404 (CourseController.getCourse 와 동일한 non-disclosure).
+      if (
+        (course as any).status !== CourseStatus.PUBLISHED &&
+        !(await canSeeUnpublishedCourse(req, userId, (course as any).instructorId))
+      ) {
+        const message = options?.checkLesson
+          ? 'Lesson not found'
+          : options?.checkQuiz
+            ? 'Quiz not found'
+            : options?.checkAssignment
+              ? 'Assignment not found'
+              : 'Course not found';
+        return res.status(404).json({ success: false, error: message });
+      }
+
+      // 7차 P2-8 + 9차 P2-10: scope 판정 이후에만 — 소유 강사(현재 role + active membership)·
+      // lecture:admin 은 자기 강의의 평가를 수강 없이 읽는다.
+      if (options?.allowCourseOwner && (await canReadOwnCourseAssessments(req, userId, (course as any).instructorId))) {
+        return next();
+      }
+
+      // MEMBERS 강의: active lecture membership 이 선행 조건이다 (role 불요 · break-glass 만 예외).
+      // PUBLIC 강의는 membership 을 요구하지 않는다 — 다만 아래 enrollment 판정은 건너뛰지 않는다.
+      if (course.visibility !== CourseVisibility.PUBLIC && !isPlatformSuperAdmin(req)) {
+        const membershipStatus = await resolveLectureMembershipStatus(req);
+        if (membershipStatus === 'not_found') {
+          return res.status(403).json({
+            success: false,
+            error: '회원 전용 강의입니다. O4O 강의 서비스 가입이 필요합니다.',
+            code: 'MEMBERSHIP_NOT_FOUND',
+          });
+        }
+        if (membershipStatus === 'inactive') {
+          return res.status(403).json({
+            success: false,
+            error: '서비스 멤버십이 활성 상태가 아닙니다.',
+            code: 'MEMBERSHIP_NOT_ACTIVE',
+          });
+        }
+      }
+
+      // 9차 P1-18: 유료·승인 강의의 enrollment 요구는 visibility 와 독립이다.
+      // 종전에는 PUBLIC 이면 여기 오기 전에 통과시켜, "공개 + 승인 필요" 강의에서 승인 없이
+      // quiz attempt / assignment submission 이 저장되고 합격 보상까지 나갈 수 있었다.
+      const needsEnrollmentCheck = course.isPaid || course.requiresApproval;
+
+      if (!needsEnrollmentCheck) {
+        // 무료·승인불필요 강의 → (PUBLIC) 또는 (MEMBERS + membership) 만으로 통과
+        return next();
+      }
+
+      // 유료 또는 강사 승인 필요 → 승인된 Enrollment 확인
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+      const enrollment = await enrollmentRepo.findOne({
+        where: {
+          userId,
+          courseId,
+          status: In([EnrollmentStatus.APPROVED, EnrollmentStatus.IN_PROGRESS, EnrollmentStatus.COMPLETED]),
+        },
+      });
+
+      if (!enrollment) {
+        const errorMessage = course.isPaid
+          ? '유료 강의는 결제 후 수강할 수 있습니다'
+          : '강사 승인 후 수강할 수 있습니다';
+        const errorCode = course.isPaid ? 'ENROLLMENT_REQUIRED' : 'APPROVAL_REQUIRED';
+        return res.status(403).json({ success: false, error: errorMessage, code: errorCode });
+      }
+
+      // enrollment 정보를 요청에 첨부
+      (req as any).enrollment = enrollment;
+      next();
+    } catch (error) {
+      // PostgreSQL rejects malformed UUIDs before a resource can be loaded.
+      if ((error as { code?: string })?.code === '22P02') {
+        return res.status(400).json({ success: false, error: 'Invalid resource identifier', code: 'INVALID_RESOURCE_ID' });
+      }
+      // Express 4 does not forward rejected middleware promises automatically.
+      return next(error);
     }
-
-    // 9차 P1-18: 유료·승인 강의의 enrollment 요구는 visibility 와 독립이다.
-    // 종전에는 PUBLIC 이면 여기 오기 전에 통과시켜, "공개 + 승인 필요" 강의에서 승인 없이
-    // quiz attempt / assignment submission 이 저장되고 합격 보상까지 나갈 수 있었다.
-    const needsEnrollmentCheck = course.isPaid || course.requiresApproval;
-
-    if (!needsEnrollmentCheck) {
-      // 무료·승인불필요 강의 → (PUBLIC) 또는 (MEMBERS + membership) 만으로 통과
-      return next();
-    }
-
-    // 유료 또는 강사 승인 필요 → 승인된 Enrollment 확인
-    const enrollmentRepo = AppDataSource.getRepository(Enrollment);
-    const enrollment = await enrollmentRepo.findOne({
-      where: {
-        userId,
-        courseId,
-        status: In([EnrollmentStatus.APPROVED, EnrollmentStatus.IN_PROGRESS, EnrollmentStatus.COMPLETED]),
-      },
-    });
-
-    if (!enrollment) {
-      const errorMessage = course.isPaid
-        ? '유료 강의는 결제 후 수강할 수 있습니다'
-        : '강사 승인 후 수강할 수 있습니다';
-      const errorCode = course.isPaid ? 'ENROLLMENT_REQUIRED' : 'APPROVAL_REQUIRED';
-      return res.status(403).json({ success: false, error: errorMessage, code: errorCode });
-    }
-
-    // enrollment 정보를 요청에 첨부
-    (req as any).enrollment = enrollment;
-    next();
   };
 }

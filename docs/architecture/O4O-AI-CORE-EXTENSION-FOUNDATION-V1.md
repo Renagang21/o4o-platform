@@ -289,6 +289,14 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
 
+### 14-2. 내 매장 전문 판단 지원 — 개발·통합 이력 (2026-10-25)
+
+`pharmacy.consultation.support`는 약국 도메인의 현재 역할/기능·약사 사용 확인·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
+
+사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 개발 당시 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도였다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [개발 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md).
+
+후속 사용자 지시로 PR #813을 main `fda3f672d1`에 통합했다. 기존 verified Promote `40183174373`에서 API·Store가 DEPLOYED이며 명시 apply/기존 중지 값 보존 처리와 공개 smoke 13건이 통과했다. 실제 enabled 값·정리 count/본문 파기와 약사/현장 품질은 미관측이며, 실제 provider/업무 검증 완료로 해석하지 않는다. 운영 반영 범위와 한계는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
+
 ## 15. 텍스트 회계 연결 보완 — 개발 branch (2026-10-25)
 
 [후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에서 남은 실행 경로를 재조사했다. `wo/ai-runtime-accounting-completion`은 새 Core/원장을 만들지 않고 기존 `AiAccountedExecution`을 홈·첨부 텍스트 대체, 일반/강화 텍스트 계획, 인증/공개 파일 구조 추론 host에서 소비한다. 파일 추론·첨부 helper에는 텍스트 invocation을 명시적으로 주입해 업무 해석과 서버 비용 경계를 분리한다. standalone 파일 smoke는 자기 환경 계정의 transport를 명시적으로 전달하며 서버 원장 검증을 대신하지 않는다.
@@ -308,3 +316,9 @@ host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home
 관리 조회는 native 예약/receipt와 기존 로그를 중복 없이 합치며 enum 밖 Qwen/Google Vision·미확정 audio/crash 기록을 포함한다. 원문·이미지/audio·검색어는 공통 원장에 남기지 않는다. 비용은 추정 정책이며 실제 invoice나 외부 제공업체의 강제 결제 상한이 아니다.
 
 **운영 준비:** 명시 모델 요율/profile이 없으면 native 호출은 503으로 차단한다. 운영 설정을 변경하거나 유료 시험 호출·PR/병합/배포를 실행하지 않았다. [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 로컬 검증과 [TODO §4](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)의 실제 모델/요율·단위·예산·미확정 처리 수용 조건을 확인한 뒤 통합/배포를 판단한다. 전체 AI 화면·직원/소비자 상담·외부 계정/사용자 직접 청구 완료를 뜻하지 않는다.
+
+## 17. 회계 후속 main 통합·운영 적용 (2026-10-25)
+
+사용자의 후속 main 병합·배포 지시로 §15/§16의 개발 변경을 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 반영했다. 관리 집계의 UUID 비교에서 불필요한 text cast를 제거했고 실제 PostgreSQL의 UUID·enum·JSONB로 회귀를 추가했다. 새 운영 schema/migration·권한·가격·credential·workflow 변경은 없다.
+
+§15/§16의 미병합 기록은 당시 개발 단계의 증거다. 현재 통합·배포·검증 결과는 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. 코드 배포에서도 가격 미설정 native 호출의 선차단은 유지한다. 실제 사용 활성화에는 모델별 명시 요율/profile·예산과 사용량 미반환 정산 검증이 필요하며, 유료 호출·외부 계정/매장·사용자 청구 완료로 확장하지 않는다.

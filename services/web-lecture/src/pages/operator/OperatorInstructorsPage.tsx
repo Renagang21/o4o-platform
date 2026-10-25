@@ -37,6 +37,10 @@ export default function OperatorInstructorsPage() {
       {items.map((a) => <li key={a.id} className="list-item">
         <div className="list-main"><span className="list-title">{a.user?.name ?? a.user?.email ?? a.userId}</span><span className={`badge badge-${a.status}`}>{a.status}</span></div>
         <div className="list-meta muted">{a.user?.email} · 신청 {a.createdAt?.slice(0, 10)}{a.reviewNote ? ` · 메모: ${a.reviewNote}` : ''}</div>
+        {(a.bio || a.expertise) && <dl className="list-meta" style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+          {a.bio && <><dt>강사 소개</dt><dd>{a.bio}</dd></>}
+          {a.expertise && <><dt>전문 분야</dt><dd>{a.expertise}</dd></>}
+        </dl>}
         {a.status === 'pending' && <div className="list-actions">
           <button type="button" className="btn btn-primary" disabled={busy !== null || loading || !!error} onClick={() => void approve(a.id)}>승인</button>
           <button type="button" className="btn btn-ghost danger" disabled={busy !== null || loading || !!error} onClick={() => { clearActionError(); setRejection({ id: a.id, label: a.user?.name ?? a.userId, scope: status }); }}>반려</button>

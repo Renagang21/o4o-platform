@@ -68,3 +68,7 @@ Core `execute`가 retry를 소유해 Gemini 내부 JSON retry와 중첩되지 �
 ## 5. 검증·인계
 
 실제 실행 결과와 소비처 영향은 [검증 CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)에 기록한다. 실계정/실유료 호출·운영 DB·가격/한도/credential 변경·PR/병합/배포는 수행하지 않는다. `DEPLOYMENT = REQUIRED`이나 가격 준비와 통합 검증 전 배포 가능 판정이 아니다. 폐기된 메뉴/서비스나 사용 여부 미확인 legacy HUB를 복구하지 않는다.
+
+## 6. 후속 main 통합 (2026-10-25)
+
+§5까지는 개발 단계의 push 인계 기록이다. 이후 사용자가 main 병합·배포를 지시해 선행 텍스트 정비와 함께 PR #811/main `67654de1fe`에 통합했다. 최신 운영 적용과 실제 PostgreSQL 리뷰 보완·가용성 제한은 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)에 기록한다. 코드 배포는 §4의 가격 준비·실제 사용 활성화까지 완료했다는 뜻이 아니며, 가격 미설정 호출 선차단은 그대로 유지한다.

@@ -41,6 +41,7 @@ export interface LmsLessonData {
   durationMinutes?: number;
   isPreview?: boolean;
   videoUrl?: string | null;
+  captions?: import('./captionTracks').LmsCaptionTrack[];
   /** HTML 문자열. 실제 렌더는 `renderContent` slot 에서 서비스가 수행(sanitize 포함). */
   content?: string | null;
   attachments?: Array<{ name: string; url: string; type?: string; size?: number }>;

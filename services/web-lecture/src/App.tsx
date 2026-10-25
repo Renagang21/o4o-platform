@@ -1,3 +1,4 @@
+import PublicPreviewPage from './pages/learner/PublicPreview';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import NotificationsPage from './pages/NotificationsPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+      <Route path="/courses/:courseId/preview/:lessonId" element={<PublicPreviewPage />} />
       <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonPage />} />
       <Route path="/certificates/verify/:code" element={<CertificateVerifyPage />} />
       {/* PDF QR · 기존 서비스(KPA/KCos/PH) 외부 이동 경로 — certificate id 기반 (§17) */}

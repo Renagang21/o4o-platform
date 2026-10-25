@@ -613,6 +613,19 @@ jobs:
           --names AI_DEFAULT_PROVIDER,AI_DEFAULT_MODEL_OPENAI,TOSS_PAYMENTS_CLIENT_KEY,TOSS_PAYMENTS_SECRET_KEY \
           --out "$RUNNER_TEMP/optional-env"
 
+    # Production uses the approved cleanup mode; preserve an operator's existing stop switch.
+    # A failed current-service read must stop deployment instead of silently removing that switch.
+    - name: Resolve consultation cleanup env (preserve stop)
+      if: inputs.migrate_only != 'true'
+      env:
+        OPTENV_CONSULTATION_STATE_CLEANUP_MODE: apply
+      run: |
+        node scripts/ci/cloud-run-env.mjs optional \
+          --service ${{ env.SERVICE_NAME }} \
+          --names CONSULTATION_STATE_CLEANUP_MODE,CONSULTATION_STATE_CLEANUP_ENABLED \
+          --require-current true \
+          --out "$RUNNER_TEMP/consultation-cleanup-env"
+
     # WO-O4O-EXTERNAL-AI-PRODUCTION-ACTIVATION-V1 — 외부 AI(ChatGPT) 연결 설정 4개.
     #   저장소 variable 값 있음 → 설정 · 없음 → 현재 운영 값 유지 · 둘 다 없음 → 생략(모듈은 미설정 503 · 기본 OFF).
     #   현재 서비스 조회에 실패하면 운영 값을 지운 채 배포하지 않도록 이 step 이 실패한다(--require-current).
@@ -661,6 +674,8 @@ jobs:
         fi
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
+        CONSULTATION_CLEANUP_ENV=()
+        if [ -s "$RUNNER_TEMP/consultation-cleanup-env" ]; then mapfile -d '' CONSULTATION_CLEANUP_ENV < "$RUNNER_TEMP/consultation-cleanup-env"; fi
 
         # External AI connection: plain URLs from the step above; the credential key only as a Secret Manager reference.
         # When the variable is unset an existing secret binding persists (--update-secrets is not a full replacement).
@@ -741,6 +756,7 @@ jobs:
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           "${KAKAO_ENV[@]}" \
           "${OPTIONAL_ENV[@]}" \
+          "${CONSULTATION_CLEANUP_ENV[@]}" \
           "${EXTERNAL_AI_ENV[@]}" \
           "${PAYMENT_ENV[@]}" \
           "${ROLLOUT_ARGS[@]}" \

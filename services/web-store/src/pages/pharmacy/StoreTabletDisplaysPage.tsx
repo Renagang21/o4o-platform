@@ -463,7 +463,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   // Toast — WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 변경 직후 '되돌리기' 액션(선택).
   const [toast, setToast] = useState<TabletOperationToast | null>(null);
-  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast);
+  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast, isCurrent);
   const [error, setError] = useState<string | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.

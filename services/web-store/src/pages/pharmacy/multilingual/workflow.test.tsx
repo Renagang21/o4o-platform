@@ -7,7 +7,7 @@ import { StoreMultilingualContentsMyPage } from '../StoreMultilingualContentsMyP
 import Editor from '../StoreProductMultilingualContentPage';
 import { MultilingualPublicActions } from '../../../components/MultilingualPublicActions';
 import { hasPublishableMlcPage, hasPublishableMlcSummary, type StoreMlcGroupDetail, type StoreMlcPageDetail, type StoreMlcLocale, type StoreMlcStatus } from '../../../api/multilingualProductContentStore';
-const api = vi.hoisted(() => ({ store: 'A', active: 'A', hub: vi.fn(), list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), page: vi.fn(), status: vi.fn(), resolve: vi.fn(), imported: vi.fn(), products: vi.fn(), key: vi.fn(), qr: vi.fn(), success: vi.fn(), error: vi.fn() }));
+const api = vi.hoisted(() => ({ store: 'A', active: 'A', hub: vi.fn(), list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), page: vi.fn(), status: vi.fn(), resolve: vi.fn(), imported: vi.fn(), products: vi.fn(), key: vi.fn(), qr: vi.fn(), success: vi.fn(), error: vi.fn(), assist: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ getAccessToken: () => 'synthetic' }));
 vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store }) }));
 vi.mock('../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.active }));
@@ -18,7 +18,7 @@ vi.mock('@o4o/error-handling', () => ({ toast: { success: api.success, error: ap
 vi.mock('@o4o/content-editor', () => ({
   sanitizeRichHtml: (html: string) => html,
   RichTextEditor: ({ value, onChange, editable }: { value: string; onChange: (value: { html: string }) => void; editable: boolean }) => <textarea aria-label="본문" value={value} disabled={!editable} onChange={e => onChange({ html: e.target.value })} />,
-  LlmAssistPanel: () => null,
+  LlmAssistPanel: (props: { guideText: (input: { additionalInstruction: string }) => string; onApplyHtml: (html: string) => void }) => { api.assist(props); return null; },
 }));
 const localePage = (locale: StoreMlcLocale = 'ko', title = 'Saved KO', status: StoreMlcStatus = 'draft'): StoreMlcPageDetail => ({ id: locale, groupId: 'group', locale, title, status, contentFormat: 'html', content: { html: `<p>${title}</p>` }, summary: 'Saved summary', assets: [], buttons: [], isDefault: locale === 'ko', sortOrder: 0, updatedAt: '' });
 const group = (patch: Partial<StoreMlcGroupDetail> = {}): StoreMlcGroupDetail => ({ id: 'group', organizationId: 'A', title: 'Store guide', targetKind: 'local', targetId: 'local-a', defaultLocale: 'ko', contentKey: 'default', sourceType: 'operator_hub', status: 'draft', pages: [localePage(), localePage('en', 'Saved EN')], metadata: {}, createdAt: '', updatedAt: '', ...patch });
@@ -42,6 +42,30 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 async function openImport() { render(wrap(<HubMultilingualContentLibraryPage />)); fireEvent.click(await screen.findByRole('button', { name: '가져오기' })); await screen.findByLabelText('연결할 제품'); }
+it.each([
+  ['Korean source authoring', 'ko', false],
+  ['English with a Korean source', 'en', true],
+  ['English without a source', 'en', false],
+] as const)('%s keeps its task/language and only applies the reviewed draft', async (_label, locale, hasSource) => {
+  const value = group({ pages: hasSource ? [localePage('ko', 'Reviewed source')] : [] });
+  api.list.mockResolvedValue([value]); api.get.mockResolvedValue(value);
+  editor(); await screen.findByLabelText('언어별 제목');
+  if (locale === 'en') fireEvent.click(screen.getByRole('button', { name: /English/ }));
+  await waitFor(() => expect(api.assist).toHaveBeenCalled());
+  const props = api.assist.mock.calls[api.assist.mock.calls.length - 1][0];
+  const prompt = props.guideText({ additionalInstruction: '' });
+  if (locale === 'ko') expect(prompt).toContain('매장 손님이 읽을 상품 상세 설명을 HTML 로 작성해 주세요.');
+  else {
+    expect(prompt).toContain('아래 매장 상품 안내 본문을 다른 언어로 옮겨 주세요.');
+    expect(prompt).toContain('결과 언어: English');
+    if (hasSource) { expect(prompt).toContain('기준 본문 언어: 한국어'); expect(prompt).toContain('<p>Reviewed source</p>'); }
+    else expect(prompt).not.toContain('[기준 본문 HTML');
+  }
+  act(() => props.onApplyHtml('<p>Reviewed draft</p>'));
+  expect((screen.getByLabelText('본문') as HTMLTextAreaElement).value).toBe('<p>Reviewed draft</p>');
+  expect(api.create).not.toHaveBeenCalled(); expect(api.update).not.toHaveBeenCalled();
+  expect(api.page).not.toHaveBeenCalled(); expect(api.status).not.toHaveBeenCalled(); expect(api.key).not.toHaveBeenCalled();
+});
 it('keeps failed product reads distinct from empty results and retries', async () => {
   api.products.mockRejectedValueOnce(new Error('private diagnostic'));
   render(wrap(<HubMultilingualContentLibraryPage />)); fireEvent.click(await screen.findByRole('button', { name: '가져오기' }));

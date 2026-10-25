@@ -1,5 +1,7 @@
 import { ConsultationGuidanceService } from './services/consultation-guidance.js';
 import { createConsultationGuidanceSelector } from './services/consultation-guidance.extension.js';
+import { ConsultationSupportService } from './services/consultation-support.js';
+import { createConsultationSupportRunner } from './services/consultation-support.extension.js';
 import { BusinessHomeShowcaseService } from './services/business-home-showcase.service.js';
 import { cooperativeManagementRoutes } from './cooperative-management.routes.js';
 import { cooperativeRole } from './services/cooperative-management.service.js';
@@ -189,7 +191,9 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
       await serviceFeatures.require(actor,organizationId,'store-staff-support');
       return stationProducts.product(organizationId,input.productKind,input.productId);
     },(actor,org,proof)=>guidance.verify(actor,org,proof));
-  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance));
+  const consultationSupport = new ConsultationSupportService(guidance,
+    consultationDependencies?.supportConsultation ?? createConsultationSupportRunner(dataSource));
+  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport));
   const featurePolicyAdmin: RequestHandler = (req, res, next) => {
     if (req.body?.serviceFeatures === undefined) return next();
     return (requireRole(['platform:super_admin']) as RequestHandler)(req, res, next);

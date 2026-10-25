@@ -7,6 +7,7 @@ import { AppDataSource } from '../database/connection.js';
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
+import { consultationStateCleanupJob } from '../jobs/consultation-state-cleanup.job.js';
 import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
@@ -219,6 +220,7 @@ export class StartupService {
       // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
       privacyRetentionJob.start();
       operatorInvitationRetentionJob.start();
+      consultationStateCleanupJob.start();
       logger.info('✅ Privacy Retention Job started');
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
@@ -313,6 +315,7 @@ export class StartupService {
       privacyRetentionJob.stop();
       operatorInvitationRetentionJob.stop();
       productCorrectionJob.stop();
+      consultationStateCleanupJob.stop();
       communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');

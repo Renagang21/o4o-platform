@@ -1,3 +1,4 @@
+import { PublicPreviewList } from './PublicPreview';
 import { ProfessionalInfoSummary } from '../../components/ProfessionalInfoFields';
 import { useMemo, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -28,7 +29,7 @@ export default function CourseDetailPage() {
       courseId={courseId}
       port={port}
       config={config}
-      renderAfterCourseCard={({ enrollment, course, enrollmentIneligible }) => <><ProfessionalInfoSummary value={course.professionalInfo} />{config.isAuthenticated && !enrollmentIneligible && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}</>}
+      renderAfterCourseCard={({ enrollment, course, enrollmentIneligible }) => <><ProfessionalInfoSummary value={course.professionalInfo} />{course.visibility === 'public' && <PublicPreviewList courseId={courseId} />}{config.isAuthenticated && !enrollmentIneligible && (!enrollment || ['cancelled', 'rejected', 'expired'].includes(enrollment.status ?? '')) ? <ServiceEnrollmentPolicyAgreement agreement={agreement} /> : null}</>}
       renderDescription={(course) => course.description ? <ContentRenderer html={course.description} /> : null}
     />
   </main>;
