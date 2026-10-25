@@ -177,6 +177,21 @@ export class ServiceOperatorInvitationService {
     }
     return user;
   }
+  private async requireUnassignedRole(
+    m: EntityManager,
+    scope: InvitationScope,
+    target: string,
+  ) {
+    if (scope.scope_type === "cooperative") return; // Cooperative-specific writer validates its own scoped role rows.
+    const [prior] = await m.query(
+      `SELECT is_active,(valid_from>now()) AS starts_later,(valid_until<now()) AS ended FROM role_assignments
+      WHERE user_id=$1 AND role=$2 ORDER BY is_active DESC,assigned_at DESC,id DESC LIMIT 1 FOR SHARE`,
+      [target, scope.role],
+    );
+    if (prior && (prior.starts_later || prior.ended))
+      fail("OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED");
+    if (prior?.is_active) fail("OPERATOR_ALREADY_ACTIVE");
+  }
   async create(input: InviteInput): Promise<OperatorInvite> {
     // Validate the catalog before touching a transaction.
     invitationScope(
@@ -218,14 +233,7 @@ export class ServiceOperatorInvitationService {
       ).length
     )
       fail("USER_SELECTION_REQUIRED");
-    if (user && scope.scope_type !== "cooperative") {
-      const active = await m.query(
-        `SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active=true
-        AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) FOR SHARE`,
-        [user.id, scope.role],
-      );
-      if (active.length) fail("OPERATOR_ALREADY_ACTIVE");
-    }
+    if (user) await this.requireUnassignedRole(m, scope, user.id);
     await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       hash(
         `${email}:${scope.service_key}:${scope.role}:${scope.scope_type}:${scope.scope_key}`,
@@ -475,6 +483,7 @@ export class ServiceOperatorInvitationService {
         fail("INVALID_OR_EXPIRED_INVITATION", 400);
       const user = await this.prove(m, i, userId),
         scope = this.scope(i);
+      await this.requireUnassignedRole(m, scope, user.id);
       const ensured = await activateInvitation(
         m,
         scope,

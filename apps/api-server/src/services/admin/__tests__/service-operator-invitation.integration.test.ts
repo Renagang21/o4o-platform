@@ -606,6 +606,20 @@ integration(
       await query("UPDATE branch_memberships SET status='left',left_at=NOW() WHERE user_id=$1",[target]);
       await expect(service.accept(token(),target)).rejects.toMatchObject({code:'NOT_BRANCH_MEMBER'});expect(assignRole).not.toHaveBeenCalled();
     });
+    it('does not overwrite a role granted by another admin while the invitation was pending',async()=>{
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      const until=new Date('2099-01-01T00:00:00Z');
+      await query("INSERT INTO role_assignments(user_id,role,is_active,assigned_by,valid_until) VALUES($1,'lecture:operator',true,$2,$3)",[target,admin,until]);
+      await expect(service.accept(token(),target)).rejects.toMatchObject({code:'OPERATOR_ALREADY_ACTIVE'});
+      expect(assignRole).not.toHaveBeenCalled();
+      const [row]=await query("SELECT assigned_by,valid_until FROM role_assignments WHERE user_id=$1 AND role='lecture:operator'",[target]);
+      expect(row.assigned_by).toBe(admin);expect(new Date(row.valid_until).getTime()).toBe(until.getTime());
+    });
+    it.each([true,false])('requires schedule review rather than silently changing an active=%s scheduled role',async(active)=>{
+      await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'lecture:operator',$2,'2099-01-01')",[target,active]);
+      await expect(service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'})).rejects.toMatchObject({code:'OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED'});
+      expect(mails).toHaveLength(0);expect(assignRole).not.toHaveBeenCalled();
+    });
     it('rollback refuses stored consent evidence and leaves the table intact',async()=>{
       await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
       const q=db.createQueryRunner();await q.startTransaction();
