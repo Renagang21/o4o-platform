@@ -324,6 +324,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateStoreConsultationStations1792815861315', fingerprint: 'd9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb', fingerprintLineCount: 6869 },
   // Isolated PostgreSQL 15: preserve all main prefixes, append operator invitation consent/privacy schema.
   { appliedThrough: 'CreateServiceOperatorInvitations1792886400000', fingerprint: 'b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea', fingerprintLineCount: 6901 },
+  // Isolated PostgreSQL 15.18: main prefixes plus Lecture profile verified after integration.
+  { appliedThrough: 'AddLectureInstructorProfile1792886400001', fingerprint: 'ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb', fingerprintLineCount: 6903 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

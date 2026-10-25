@@ -67,3 +67,5 @@ export type { LessonPlayerViewProps } from './views/LessonPlayerView';
 // 카드형 강의 목록 공통 View (WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1)
 export { CourseListView } from './views/CourseListView';
 export type { CourseListViewProps, CourseListFilterOption } from './views/CourseListView';
+
+export { readCaptionTracks, validCaptionTrack, type LmsCaptionTrack } from './views/captionTracks';

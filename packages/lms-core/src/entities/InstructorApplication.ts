@@ -36,6 +36,12 @@ export class InstructorApplication {
   @Column({ type: 'varchar', length: 20, default: 'pending' })
   status!: string;
 
+  @Column({ type: 'varchar', length: 3000, nullable: true })
+  bio?: string | null;
+
+  @Column({ type: 'varchar', length: 1000, nullable: true })
+  expertise?: string | null;
+
   @Column({ type: 'uuid', nullable: true })
   reviewedBy?: string;
 

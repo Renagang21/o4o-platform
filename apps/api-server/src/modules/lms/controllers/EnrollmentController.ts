@@ -315,6 +315,9 @@ export class EnrollmentController extends BaseController {
       const enrollment = await service.getEnrollmentByUserAndCourse(userId, courseId);
 
       if (!enrollment) return BaseController.notFound(res, 'Enrollment not found');
+      if (!['approved', 'in_progress', 'completed'].includes(enrollment.status)) {
+        return BaseController.forbidden(res, '수강 승인 후 이용할 수 있습니다.');
+      }
 
       if (completed && lessonId) {
         // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson.type별 완료 정책 강제

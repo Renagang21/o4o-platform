@@ -68,7 +68,12 @@ describe('Lecture Service Foundation', () => {
 
   it('reference seed 는 migration 이 아니라 CLI 이며, 사용자 membership/role_assignment나 LMS 데이터를 건드리지 않는다', () => {
     const migrationsDir = resolve(ROOT, 'database/migrations');
-    expect(readdirSync(migrationsDir).filter((f) => /Lecture/i.test(f))).toEqual([]);
+    // The authorized profile change is schema-only; service reference seed remains a CLI.
+    const lectureMigrations = readdirSync(migrationsDir).filter((f) => /Lecture/i.test(f));
+    expect(lectureMigrations).toEqual(['1792886400001-AddLectureInstructorProfile.ts']);
+    const profileMigration = readFileSync(resolve(migrationsDir, lectureMigrations[0]), 'utf8');
+    expect(profileMigration).toContain('ALTER TABLE lms_instructor_applications ADD COLUMN bio');
+    expect(profileMigration).not.toMatch(/\b(?:INSERT\s+INTO|UPDATE\s+[a-z_]|DELETE\s+FROM)\b/i);
     expect(seed).toMatch(/INSERT INTO platform_services/);
     expect(seed).toMatch(/ON CONFLICT \(code\) DO UPDATE/);
     expect(seed).toMatch(/ON CONFLICT \(name\) DO UPDATE/);

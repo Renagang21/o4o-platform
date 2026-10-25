@@ -1,14 +1,18 @@
+import { readCaptionTracks, type LmsCaptionTrack } from './captionTracks';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import type { LmsLearnerPort } from './contracts';
 
 /** Playback bookmarks do not hydrate or increment completion metrics. */
-export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, onTimeUpdate }: {
+export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, onTimeUpdate, captions }: {
   videoRef: RefObject<HTMLVideoElement | null>; src: string; courseId: string; lessonId: string;
+  captions?: LmsCaptionTrack[];
   enabled: boolean; port: LmsLearnerPort; onTimeUpdate: () => void;
 }) {
   const [position, setPosition] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [videoError, setVideoError] = useState(false);
+  const [captionError, setCaptionError] = useState(false);
+  useEffect(() => setCaptionError(false), [src, captions]);
   const [readFailed, setReadFailed] = useState(false);
   const [readAttempt, setReadAttempt] = useState(0);
   const active = useRef(false);
@@ -56,10 +60,13 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
         video.currentTime = Math.min(position, Math.max(0, video.duration - 1)); setPosition(null);
       }
     }}>이전 위치 {Math.floor(position / 60)}분 {Math.floor(position % 60)}초부터 이어보기</button>}
-    <video ref={videoRef} src={src} controls preload="metadata"
+    <video ref={videoRef} src={src} crossOrigin={readCaptionTracks(captions).length ? 'anonymous' : undefined} controls preload="metadata"
       onTimeUpdate={() => { changed.current = true; onTimeUpdate(); void save(); }}
       onPause={() => void save(true)} onEnded={() => void save(true)} onError={() => setVideoError(true)}
-      style={{ width: '100%', borderRadius: 12, background: '#000', marginBottom: 12 }} />
+      style={{ width: '100%', borderRadius: 12, background: '#000', marginBottom: 12 }}>
+      {readCaptionTracks(captions).map((track, index) => <track key={`${track.src}:${index}`} kind="captions" src={track.src} srcLang={track.srcLang} label={track.label} ref={element => { if (element) element.onerror = () => setCaptionError(true); }} />)}
+    </video>
+    {captionError && <p role="alert">자막을 불러오지 못했습니다. 영상은 계속 재생할 수 있습니다.</p>}
     {videoError && <div role="alert">영상을 재생하지 못했습니다. 주소와 접근 권한을 확인해 주세요. <button type="button" onClick={() => { setVideoError(false); videoRef.current?.load(); }}>다시 불러오기</button></div>}
     {enabled && port.savePlayback && <button type="button" onClick={() => void save(true)}>현재 위치 저장</button>}
     {readFailed && <button type="button" onClick={() => setReadAttempt(n => n + 1)}>이어보기 위치 다시 조회</button>}
