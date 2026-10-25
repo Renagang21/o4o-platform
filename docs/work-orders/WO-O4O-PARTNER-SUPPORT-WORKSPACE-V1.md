@@ -137,3 +137,18 @@
 
 - 최종 웹/API production build와 API type-check, ESLint 통과. migration contract 21 PASS / 0 FAIL, unsafe route guard 위반 0건, 문서 민감정보 검사·diff 검사 통과.
 - 브라우저 harness 종료 후 테스트 schema 잔존 0건 확인. 이번 작업 전용 PostgreSQL 컨테이너·볼륨과 생성한 임시 자격정보·검증 helper를 삭제했다.
+
+
+## main 통합·배포 — 2026-10-25 후속 승인
+
+사용자가 이 공간에 `main통합 배포`를 지시했다. 이전 개발 단계의 통합 금지는 이 후속 작업에 적용하지 않는다. main은 PR과 required CI를 통해서만 반영한다. 운영 migration은 검증 결과와 대상을 제시한 뒤 명시적 실행 승인을 받아 정상 Promote로 실행하며, freeze·CI·WIF·ref 경계를 우회하지 않는다.
+
+- [x] 최신 main `7a75dcf666`과 작업 브랜치 비교, 기존 PR 없음·main ruleset 확인
+- [x] main의 기존 migration 41개 순서를 보존하고 미배포 Partner 2개를 `1792886600000`, `1792886700000`으로 뒤에 등록. 이전 timestamp와 중간 fingerprint는 개발 단계 기록이며 운영 적용값이 아니다.
+- [x] 격리 PostgreSQL 15 canonical bootstrap과 기존 41개 prefix 일치, 신규 42/43번째 적용·빈 상태 down/up 확인
+- [x] 신규 공간 fingerprint `3d408172c0b5a9b2d548ed5584248d08e61e6bf2e9eb40ee4961a0e57414c8f5` (7,076줄), media/read fingerprint `418afd534087a5c269051506237b6b3bf69c9ad9ef160fddfd138dbda6b7ec4f` (7,111줄) 재산출
+- [x] Partner 웹의 신규 Docker/nginx, affected/CD registry·동일 freeze/CI/verified 배포 job 등록. 기존 6개 웹 소비처의 배포 gate 유지
+- [ ] 통합 빌드·회귀 검사 완료 후 작업 브랜치 push, PR required CI·review 확인과 main 병합
+- [ ] 운영 migration 2개 실행 승인·정상 배포, 공개 URL·serving SHA 확인
+
+첫 Partner 웹 서비스가 운영에 없다면 기존 배포 계정은 IAM을 변경할 수 없으므로 서비스 공개 접근 부여·도메인 연결은 소유자 최초 설정이 필요하다. 첫 서비스/serving SHA를 알 수 없는 경우 Promote는 fail-closed이며 기존 검증 gate를 완화하지 않는다. 파일 업로드는 운영 영속 저장소 설정 전 비활성 상태를 유지한다. 운영 임시 디스크에 저장하도록 설정하지 않는다.
