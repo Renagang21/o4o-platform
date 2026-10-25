@@ -16,6 +16,7 @@ import type { StoreWorkspaceOutlet } from "../../components/layouts/StoreWorkspa
 import { getRecentScans } from "../../api/storeAnalytics";
 import { useStoreResource } from "./hooks/useStoreResource";
 import { useStoreHomeOverview } from "./operations/useStoreHomeOverview";
+import { StoreOverviewExplanation } from '../../components/store/StoreOverviewExplanation';
 
 export function StoreHomePage() {
   const { key } = useStoreOperationScope();
@@ -101,6 +102,7 @@ function StoreHomeSession() {
         statusSlot={
           <>
             <StoreAiSlot />
+            <StoreOverviewExplanation />
             <nav aria-label="매장 빠른 작업" className="mb-4 flex flex-wrap gap-2 text-sm">
               {product && <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}${product.subPath}`}>상품 보기</Link>}
               <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>매장 컨텐츠</Link>

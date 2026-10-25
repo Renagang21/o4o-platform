@@ -53,6 +53,31 @@ function fixture() {
   };
 }
 afterEach(() => jest.restoreAllMocks());
+it.each([
+  ['STORE_INSIGHT', 'store.overview', undefined],
+  ['OPERATOR_INSIGHT', 'supplier.overview', 'supplier.overview'],
+  ['OPERATOR_INSIGHT', 'cooperative.overview', 'cooperative.overview'],
+] as const)('selects the managed model for %s / %s without legacy fallback', async (scope, target, usage) => {
+  const f = fixture();
+  f.control.selections[target] = { provider: 'openai', model: 'gpt-current' };
+  const invoke = jest.spyOn(AiAccountedExecution.prototype, 'invoke').mockResolvedValue({ content: 'synthetic' } as any);
+  await f.executor.execute(scope, 'system', 'user', { usage, userId: 'actor-fixture', serviceKey: 'neture' });
+  expect(invoke.mock.calls[0][0]).toMatchObject({ provider: 'openai', config: { model: 'gpt-current' } });
+  expect(invoke.mock.calls[0][1]).toEqual({ scope, userId: 'actor-fixture', serviceKey: 'neture' });
+  expect(invoke.mock.calls[0][2]).toBeUndefined();
+});
+it('rejects an overview usage on a translation scope before invoking or accounting', async () => {
+  const f = fixture();
+  const invoke = jest.spyOn(AiAccountedExecution.prototype, 'invoke');
+  await expect(f.executor.execute('CONTENT_TRANSLATION', 'system', 'user', { usage: 'supplier.overview' })).rejects.toThrow('AI_POLICY_USAGE_MISMATCH');
+  expect(invoke).not.toHaveBeenCalled();
+});
+it('keeps the disabled scope gate ahead of overview model selection', async () => {
+  const f = fixture(); f.policy.isEnabled = false;
+  const invoke = jest.spyOn(AiAccountedExecution.prototype, 'invoke');
+  await expect(f.executor.execute('OPERATOR_INSIGHT', 'system', 'user', { usage: 'cooperative.overview' })).rejects.toThrow('AI_DISABLED');
+  expect(invoke).not.toHaveBeenCalled(); expect(f.db.query).not.toHaveBeenCalled();
+});
 it("uses the latest per-usage model despite a cached policy, caller model override and legacy fallback", async () => {
   const f = fixture();
   const invoke = jest

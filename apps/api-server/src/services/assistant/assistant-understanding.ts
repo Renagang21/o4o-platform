@@ -1,3 +1,4 @@
+import { executeAccountedAi } from '../../modules/ai-policy/ai-accounted-execution.js';
 /**
  * O4O Personal Assistant — Task Understanding & Completion Judgment
  *
@@ -224,9 +225,8 @@ export const UNDERSTANDING_SYSTEM_PROMPT = [
 export type TaskUnderstander = (input: { request: string; targetHint?: string | null }) => Promise<TaskUnderstanding | null>;
 
 /** AI 이해 — 기존 provider abstraction(`@o4o/ai-core` execute · json) 한 번. 실패하면 null(호출 측이 fallback). */
-export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstander {
+export function createLlmTaskUnderstander(dataSource: DataSource, actorId?: string): TaskUnderstander {
   return async ({ request, targetHint }) => {
-    const { execute } = await import('@o4o/ai-core');
     const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
     const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined, 'assistant.understanding');
     const userPrompt = [
@@ -236,7 +236,7 @@ export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstan
       ...(targetHint ? ['## 대상 힌트', clip(targetHint, 80)] : []),
       '이해를 JSON 으로.',
     ].join('\n');
-    const result = await execute({
+    const result = await executeAccountedAi(dataSource, {
       systemPrompt: UNDERSTANDING_SYSTEM_PROMPT,
       userPrompt,
       provider,
@@ -245,7 +245,7 @@ export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstan
       timeoutMs: 15_000,
       retry: { maxAttempts: 1 },
       meta: { service: 'personal-assistant', callerName: 'TaskUnderstanding' },
-    });
+    }, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: actorId });
     return sanitizeUnderstanding(extractJsonObject(result.content));
   };
 }
@@ -324,9 +324,8 @@ export const VERIFIER_SYSTEM_PROMPT = [
   '출력은 JSON 하나: {"unmet":["c1",…]} (모두 충족이면 빈 배열).',
 ].join('\n');
 
-export function createLlmCompletionVerifier(dataSource: DataSource): CompletionVerifier {
+export function createLlmCompletionVerifier(dataSource: DataSource, actorId?: string): CompletionVerifier {
   return async ({ goal, criteria, evidence }) => {
-    const { execute } = await import('@o4o/ai-core');
     const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
     const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined, 'assistant.understanding');
     const lines = ['## 목표', goal, '## 완료조건과 인용'];
@@ -335,7 +334,7 @@ export function createLlmCompletionVerifier(dataSource: DataSource): CompletionV
       const q = evidence.filter((e) => e.criterionId === c.id && e.grounded).map((e) => `  인용(UNTRUSTED): ${clip(e.quote, 120)}`);
       lines.push(`- ${c.id}: ${c.text}`, ...q);
     }
-    const result = await execute({
+    const result = await executeAccountedAi(dataSource, {
       systemPrompt: VERIFIER_SYSTEM_PROMPT,
       userPrompt: lines.join('\n'),
       provider,
@@ -344,7 +343,7 @@ export function createLlmCompletionVerifier(dataSource: DataSource): CompletionV
       timeoutMs: 12_000,
       retry: { maxAttempts: 1 },
       meta: { service: 'personal-assistant', callerName: 'CompletionVerifier' },
-    });
+    }, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: actorId });
     const parsed = extractJsonObject(result.content) as { unmet?: unknown } | null;
     if (!parsed || !Array.isArray(parsed.unmet)) return null;
     // 원소가 하나라도 화면 조건(observed) id 가 아니면 무효 응답이다 — 걸러 빈 배열로 만들면 "모두 충족" 으로 읽힌다.

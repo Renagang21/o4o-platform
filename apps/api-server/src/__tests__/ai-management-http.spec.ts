@@ -2,6 +2,7 @@ import express from "express";
 import request from "supertest";
 import { AppDataSource } from "../database/connection.js";
 import adminRouter from "../routes/ai-admin.routes.js";
+import { AI_USAGE_CATALOG } from "../services/ai-management/catalog.js";
 
 jest.mock("../services/ai-admin.service.js", () => ({ aiAdminService: {} }));
 // Exercise the mount's authentication/role gate, not an alternate unguarded test mount.
@@ -42,7 +43,11 @@ it("returns the inventory only to the platform admin and keeps the inventory roo
     .get("/api/ai/admin/management")
     .set("x-fixture-role", "platform:super_admin")
     .expect(200);
-  expect(reply.body.data.usages).toHaveLength(31);
+  expect(reply.body.data.usages).toHaveLength(AI_USAGE_CATALOG.length);
+  expect(reply.body.data.usages).toEqual(expect.arrayContaining([
+    expect.objectContaining({ id: 'supplier.overview', accounting: 'connected' }),
+    expect.objectContaining({ id: 'product.ocr', accounting: 'unconnected', modelSelectable: false }),
+  ]));
   expect(reply.headers["cache-control"]).toBe("private, no-store");
   await request(app)
     .put("/api/ai/admin/management")

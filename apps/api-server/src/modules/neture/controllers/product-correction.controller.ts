@@ -8,6 +8,8 @@ import { ProductCorrectionWorkspace } from '../product-correction/workspace.serv
 import { ProductCorrectionOperationsService } from '../product-correction/operations.service.js';
 import { CorrectionError } from '../product-correction/contracts.js';
 import logger from '../../../utils/logger.js';
+import { generateProductCorrectionDraft } from '../product-correction/ai-draft.service.js';
+import { AiExtensionError } from '@o4o/ai-core';
 
 export function createProductCorrectionController(db: DataSource): Router {
   const router = Router();
@@ -25,6 +27,11 @@ export function createProductCorrectionController(db: DataSource): Router {
     try {
       res.json({ success: true, data: await fn(req) });
     } catch (error) {
+      if (error instanceof AiExtensionError) {
+        res.status(error.code === 'QUOTA_EXCEEDED' ? 429 : error.code === 'ACCESS_DENIED' ? 403 : 503)
+          .json({ success: false, code: error.code, error: 'AI 초안을 준비하지 못했습니다. 수동 검토를 계속할 수 있습니다.' });
+        return;
+      }
       if (error instanceof ZodError) {
         res.status(400).json({ success: false, code: 'INVALID_INPUT', error: '입력값을 확인해 주세요.' });
         return;
@@ -84,6 +91,12 @@ export function createProductCorrectionController(db: DataSource): Router {
     '/batches/:id',
     run((req) => workspace.batch(uuid.parse(req.params.id))),
   );
+  router.post('/batches/:id/items/:taskId/ai-draft', requireProductDbWrite, run(req => {
+    const body = z.object({ revision: z.number().int().positive() }).strict().parse(req.body);
+    return generateProductCorrectionDraft(db, {
+      batchId: uuid.parse(req.params.id), taskId: uuid.parse(req.params.taskId), revision: body.revision, actorId: actor(req),
+    });
+  }));
   router.patch(
     '/batches/:id/items/:taskId',
     requireProductDbWrite,

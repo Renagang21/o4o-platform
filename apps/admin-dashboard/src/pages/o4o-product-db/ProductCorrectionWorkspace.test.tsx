@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
     runs: vi.fn(),
     retryRun: vi.fn(),
     taskVersions: vi.fn(),
+    aiDraft: vi.fn(),
   },
   access: { allowed: true },
 }));
@@ -86,6 +87,31 @@ async function createWork() {
   await screen.findByLabelText('보완 초안');
 }
 describe('관리자 상품 보정 작업', () => {
+  it('requests a separate AI proposal without overwriting edits or saving official data', async () => {
+    mocks.api.aiDraft.mockResolvedValue({ draft: '합성 AI 검토안', missingEvidence: ['전체 원문 확인'], taskId: 'task-1', batchRevision: 1, sourceFingerprint: product.fingerprint });
+    render(<ProductCorrectionWorkspace />);
+    await createWork();
+    fireEvent.change(screen.getByLabelText('보완 초안'), { target: { value: '사용자가 편집 중인 내용' } });
+    fireEvent.click(screen.getByRole('button', { name: 'AI 보완 초안 요청' }));
+    await screen.findByText('합성 AI 검토안');
+    expect(mocks.api.aiDraft).toHaveBeenCalledWith('batch-1', 'task-1', 1);
+    expect((screen.getByLabelText('보완 초안') as HTMLTextAreaElement).value).toBe('사용자가 편집 중인 내용');
+    expect(mocks.api.saveTask).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '이 검토안을 보완 초안에 넣기' }));
+    expect((screen.getByLabelText('보완 초안') as HTMLTextAreaElement).value).toBe('합성 AI 검토안');
+    expect(mocks.api.saveTask).not.toHaveBeenCalled();
+  });
+  it('preserves manual edits when AI returns a conflict', async () => {
+    mocks.api.aiDraft.mockRejectedValue(new Error('BATCH_CHANGED'));
+    render(<ProductCorrectionWorkspace />);
+    await createWork();
+    fireEvent.change(screen.getByLabelText('보완 초안'), { target: { value: '수동 검토 내용' } });
+    fireEvent.click(screen.getByRole('button', { name: 'AI 보완 초안 요청' }));
+    await screen.findByText(/BATCH_CHANGED/);
+    expect((screen.getByLabelText('보완 초안') as HTMLTextAreaElement).value).toBe('수동 검토 내용');
+    expect(mocks.api.saveTask).not.toHaveBeenCalled();
+    expect(mocks.api.aiDraft).toHaveBeenCalledTimes(1);
+  });
   it('edits criteria and keeps version history accessible', async () => {
     mocks.api.saveRule.mockResolvedValue({ ...rule, revision: 2, instructions: '새 검토 기준' });
     render(<ProductCorrectionWorkspace />);

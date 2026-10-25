@@ -6,6 +6,7 @@ WORKDIR /app
 RUN npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
+COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
@@ -29,6 +30,7 @@ COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set
 COPY services/web-store/package.json ./services/web-store/
 RUN pnpm install --filter store-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
 COPY packages/types/ ./packages/types/
+COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/

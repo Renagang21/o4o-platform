@@ -71,6 +71,8 @@ const overridableDefaults: Record<string, string[]> = {
 };
 const sharedScopes: Record<string, string> = {
   "product.content": "policy.PRODUCT_CONTENT",
+  "pharmacy.guidance": "policy.PRODUCT_CONTENT",
+  "product.correction-draft": "policy.PRODUCT_CONTENT",
 };
 // Execution consumers of resolveEditingModel / AiQueryPolicy, not inventory metadata.
 const queryPolicyTargets = [
@@ -107,18 +109,21 @@ const multiProvider = new Set([
   "policy.PRODUCT_CONTENT",
   "store.translation",
   "pharmacy.consultation",
+  "store.overview",
+  "supplier.overview",
+  "cooperative.overview",
 ]);
 export const MODEL_TARGETS = [
   ...new Map(
     AI_USAGE_CATALOG.filter(
-      (x) => !["audio.synthesis", "supplier.hub"].includes(x.id),
+      (x) => x.modelSelectable !== false && !["audio.synthesis", "supplier.hub"].includes(x.id),
     ).map((usage) => {
       const id = modelTargetId(usage.id);
       return [
         id,
         {
           id,
-          name: usage.name,
+          name: id === 'policy.PRODUCT_CONTENT' ? '상품 콘텐츠·보완 초안·상담 근거 선택' : usage.name,
           providers: (usage.id === "admin.blocks"
             ? ["gemini", "openai", "claude"]
             : multiProvider.has(id)
@@ -347,6 +352,10 @@ export class ModelControlService {
           ? queryPolicyTargets
           : row.source === "scope" && row.scope === "PRODUCT_CONTENT"
             ? ["policy.PRODUCT_CONTENT"]
+            : row.source === 'scope' && row.scope === 'STORE_INSIGHT'
+              ? ['store.overview']
+              : row.source === 'scope' && row.scope === 'OPERATOR_INSIGHT'
+                ? ['supplier.overview', 'cooperative.overview']
             : row.source === "scope" && row.scope === "CONTENT_TRANSLATION"
               ? ["store.translation", "pharmacy.consultation"]
               : undefined;

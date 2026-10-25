@@ -24,6 +24,7 @@ import { getCapabilityMeta } from '@o4o/capabilities';
 // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change endpoint reuses existing core service.
 import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
 import { loadStoreLiveSignals } from './store-hub-live-signals.js';
+import { createStoreOverviewAiHandler } from './store-overview-ai.controller.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -68,6 +69,7 @@ export function createStoreHubController(
   // WO-O4O-STORE-HUB-OPTIONAL-AUTH-MIGRATION-V1: serviceKey 전파 →
   //   read-only GET endpoint 도 cross-service routing 차단 (req.organizationId 미설정).
   const optionalAuth = optionalStoreAuth(dataSource, serviceKey);
+  router.post('/ai-overview', optionalAuth, requirePharmacyOwner, createStoreOverviewAiHandler(dataSource, serviceKey));
 
   /**
    * GET /store-hub/overview
