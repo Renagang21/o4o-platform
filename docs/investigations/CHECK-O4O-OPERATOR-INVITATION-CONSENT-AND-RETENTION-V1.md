@@ -30,7 +30,7 @@
 
 ## CI 후속
 
-CI가 지적한 manifest import 선언 순서를 실행 배열과 같은 append 순서로 정렬했다. SQL·실행 배열·fingerprint는 변경하지 않았다. migration contract C04/C09를 포함한22개 검사 PASS. 최신 기능 HEAD의 CI·Codex 결과를 다시 확인한다. 격리 PG 컨테이너·fixture 데이터는 검증 후 제거했고 잔존 컨테이너0을 확인했다.
+CI가 지적한 manifest import 선언 순서를 실행 배열과 같은 append 순서로 정렬했다. SQL·실행 배열·fingerprint는 변경하지 않았다. migration contract C04/C09를 포함한21개 검사 PASS. 최신 기능 HEAD의 CI·Codex 결과를 다시 확인한다. 격리 PG 컨테이너·fixture 데이터는 검증 후 제거했고 잔존 컨테이너0을 확인했다.
 
 ## 운영 미실행·남은 Gate
 
