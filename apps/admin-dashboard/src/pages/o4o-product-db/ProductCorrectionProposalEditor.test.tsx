@@ -111,6 +111,58 @@ describe('수동 변경안 승인·반영', () => {
     expect(screen.getByLabelText('변경안 이력')).toHaveValue(id);
     expect(api.proposal).toHaveBeenCalledTimes(1);
   });
+  it.each([false, true])('explicitly reopens the latest saved revision after conflict (applied=%s)', async (applied) => {
+    api.proposals.mockResolvedValue([proposal]);
+    api.reviewProposal.mockRejectedValueOnce(new Error('PROPOSAL_CHANGED'));
+    const latest = {
+      ...proposal, batchId: 'batch', taskId: 'task', revision: applied ? 3 : 2,
+      reviewNote: '다른 관리자의 저장 의견', reviewedAt: '2026-10-25T01:00:00Z',
+      ...(applied ? { appliedAt: '2026-10-25T02:00:00Z', appliedFields: ['name'] } : {}),
+      changes: [{ ...proposal.changes[0], decision: 'approved' }],
+    };
+    api.proposal.mockResolvedValue(latest);
+    renderEditor();
+    await fill();
+    fireEvent.change(screen.getByLabelText('변경안 이력'), { target: { value: 'proposal' } });
+    fireEvent.change(screen.getByLabelText('변경안 검토 의견'), { target: { value: '미저장 검토 의견' } });
+    fireEvent.click(screen.getByText('승인·반려 결과 저장'));
+    await screen.findByRole('alert');
+    api.proposals.mockResolvedValue([latest]);
+    fireEvent.click(screen.getByText('최신 원본·변경안 이력 불러오기'));
+    await waitFor(() => expect(screen.getByText('최신 원본·변경안 이력 불러오기')).not.toBeDisabled());
+    expect(screen.getByLabelText('변경안 검토 의견')).toHaveValue('미저장 검토 의견');
+    expect(screen.getByLabelText('저장된 변경안 비교')).toHaveTextContent('변경안 v1');
+    fireEvent.click(screen.getByRole('button', { name: '현재 변경안 최신 저장본 다시 열기 (검토 입력 교체)' }));
+    await waitFor(() => expect(screen.getByLabelText('변경안 검토 의견')).toHaveValue('다른 관리자의 저장 의견'));
+    expect(api.proposal).toHaveBeenCalledWith('proposal');
+    expect(screen.getByLabelText('저장된 변경안 비교')).toHaveTextContent(`변경안 v${latest.revision}`);
+    expect(screen.getByLabelText('상품명 승인 (미선택은 반려)')).toBeChecked();
+    expect(screen.getByLabelText('상품명 제안 값')).toHaveValue('수정 상품');
+    expect(screen.getByLabelText('근거 1 출처')).toHaveValue('포장 확인');
+    expect(api.applyProposal).not.toHaveBeenCalled();
+    if (applied) {
+      expect(screen.queryByText('선택 항목 원본에 반영')).not.toBeInTheDocument();
+      expect(screen.getByText('승인·반려 결과 저장')).toBeDisabled();
+    } else {
+      expect(screen.getByText('선택 항목 원본에 반영')).toBeDisabled();
+      api.reviewProposal.mockResolvedValue({ ...latest, revision: 3 });
+      fireEvent.click(screen.getByText('승인·반려 결과 저장'));
+      await waitFor(() => expect(api.reviewProposal).toHaveBeenLastCalledWith(latest, [{ field: 'name', decision: 'approved' }], latest.reviewNote));
+    }
+  });
+  it('preserves current review inputs when reopening the saved revision fails', async () => {
+    api.proposals.mockResolvedValue([proposal]);
+    api.proposal.mockRejectedValue(new Error('조회 실패'));
+    renderEditor(); await load();
+    fireEvent.change(screen.getByLabelText('변경안 이력'), { target: { value: 'proposal' } });
+    fireEvent.change(screen.getByLabelText('변경안 검토 의견'), { target: { value: '보존할 의견' } });
+    fireEvent.click(screen.getByLabelText('상품명 승인 (미선택은 반려)'));
+    fireEvent.click(screen.getByRole('button', { name: '현재 변경안 최신 저장본 다시 열기 (검토 입력 교체)' }));
+    await screen.findByRole('alert');
+    expect(screen.getByLabelText('변경안 검토 의견')).toHaveValue('보존할 의견');
+    expect(screen.getByLabelText('상품명 승인 (미선택은 반려)')).toBeChecked();
+    expect(screen.getByLabelText('저장된 변경안 비교')).toHaveTextContent('변경안 v1');
+  });
   it('stores structured evidence and suggestion without approving or applying', async () => {
     renderEditor();
     await fill();

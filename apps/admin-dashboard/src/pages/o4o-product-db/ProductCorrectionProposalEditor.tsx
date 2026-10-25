@@ -351,6 +351,27 @@ export default function ProductCorrectionProposalEditor({
       )}
       {proposal && (
         <div className="space-y-3 rounded border p-3" aria-label="저장된 변경안 비교">
+          <p className="text-sm">
+            최신 저장본을 다시 열면 현재 승인 선택·검토 의견·반영 선택을 저장본으로 교체합니다.
+            작성 중인 새 제안과 근거는 유지합니다.
+          </p>
+          <button
+            type="button"
+            className={buttonClass}
+            disabled={busy}
+            onClick={() =>
+              void execute(async () => {
+                const latest = await api.proposal(proposal.id);
+                if (!active.current) return;
+                if (latest.id !== proposal.id || latest.batchId !== batchId || latest.taskId !== taskId)
+                  throw new Error('요청한 작업의 변경안이 아닙니다.');
+                remember(latest);
+                setNotice('현재 변경안의 최신 저장본을 열었습니다. 저장된 판정을 확인하세요.');
+              })
+            }
+          >
+            현재 변경안 최신 저장본 다시 열기 (검토 입력 교체)
+          </button>
           <p>
             기준: {proposal.ruleSnapshot.title} v{proposal.ruleSnapshot.revision} · 변경안 v
             {proposal.revision}
