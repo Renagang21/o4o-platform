@@ -47,6 +47,8 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 책임과 적용 범위는 [AI Core + Extension 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md), 운영 증거는 [최종 통합·배포 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)를 읽는다. CHECK는 적용 증거이며 사업·권한 정책을 대신하지 않는다.
 
+2026-10-25 후속 개발은 [전문 AI TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)와 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)를 따른다. `wo/ai-specialized-runtime-accounting`은 선행 텍스트 정비도 포함하며 이미지/PDF·화면·검색·OCR·TTS·Qwen·편집/강의 직접 호출을 기존 회계에 연결한다. 이 기록은 main/배포 완료가 아니다. native 요율/profile 미준비 시 provider 이전에 503으로 거부하므로 운영 적용 전 현재 모델별 가격·예산을 검토해야 한다. 일반 개발/fixture 테스트에는 운영 key나 유료 호출이 필요하지 않다.
+
 ## 3. 첫 공동개발 대상 — O4O Personal Assistant의 약국 경영 업무 지원
 
 ### 서비스 정의

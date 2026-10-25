@@ -1,5 +1,5 @@
+import { geminiNativeUsage, openAiNativeUsage } from '../../modules/ai-policy/ai-native-metering.js';
 import type { DataSource } from 'typeorm';
-import { execute } from '@o4o/ai-core';
 import logger from '../../utils/logger.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
 import { describeObservationElement, type ProposalRejectReason, type WorkGoal, type WorkImageInput, type WorkObservation, type WorkStepRecord, type ExecutionIntent } from './work-agent-contract.js';
@@ -250,9 +250,8 @@ export function extractJson(text: string): unknown {
 
 
 /**
- * LLM Planner — 기존 provider abstraction 재사용(§44). 텍스트만이면 `@o4o/ai-core` execute(json 모드),
- * 이미지가 있고 provider 가 gemini 면 기존 `/api/ai/vision/analyze` 와 같은 generateContent inline_data 경로.
- * openai 는 이미지 입력 경로가 없다 — 이미지는 무시하고 텍스트로만 계획한다(프롬프트에 그 사실을 적는다).
+ * LLM Planner — 텍스트는 기존 공통 비용 실행기 → Core execute(json 모드)를 소비한다.
+ * Gemini/OpenAI 이미지는 기존 native vision transport와 공통 예약/정산을 사용한다.
  */
 /** provider · model · key 해석기. 기본은 운영 SSOT(`resolveAiTarget`). 실 smoke 하네스가 entity 층 없이 같은 planner 코드를 돌릴 때만 주입한다. */
 export type PlannerTargetResolver = (dataSource: DataSource) => Promise<{ provider: 'gemini' | 'openai'; model: string; apiKey: string }>;
@@ -293,13 +292,13 @@ export function createPlannerTargetResolverForProvider(provider: 'gemini' | 'ope
 }
 
 
-export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, false));
+export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch, actorId?: string): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, false), false, actorId);
 }
 
 
-export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true), true);
+export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch, actorId?: string): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true), true, actorId);
 }
 
 
@@ -350,6 +349,7 @@ export function createLlmPlanner(
   fetchImpl: typeof fetch = fetch,
   resolveTarget: PlannerTargetResolver = defaultTargetResolver,
   strong = false,
+  actorId?: string,
 ): WorkPlanner {
   return {
     kind: 'llm',
@@ -358,7 +358,12 @@ export function createLlmPlanner(
       const { resolveManagedAiTarget } = await import('../ai-management/runtime-models.js');
       const { provider, model, apiKey } = await resolveManagedAiTarget(dataSource, strong ? 'work.planning.strong' : input.image ? 'work.vision' : 'work.planning', fallback);
       const userPrompt = buildPlannerUserPrompt(input);
+      const { executeAccountedNativeAi } = await import('../../modules/ai-policy/ai-accounted-execution.js');
+      if (input.image && !apiKey) throw new Error('AI_NOT_CONFIGURED');
+      const nativeAccount = { scope: 'SERVICE_QUERY' as const, serviceKey: 'neture', userId: actorId };
+      const nativeRequest = { kind: 'multimodal' as const, provider, model, textBytes: Buffer.byteLength(WORK_PLANNER_SYSTEM_PROMPT + userPrompt, 'utf8'), maxOutputTokens: 800 };
       if (input.image && provider === 'gemini') {
+        const content = await executeAccountedNativeAi(dataSource, nativeRequest, nativeAccount, async () => {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 40_000);
@@ -374,11 +379,13 @@ export function createLlmPlanner(
             signal: controller.signal,
           });
           if (!response.ok) throw new Error(`planner provider ${response.status}`);
-          const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-          return extractJson(data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '');
+          const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] } & Parameters<typeof geminiNativeUsage>[0];
+          return { value: data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '', usage: geminiNativeUsage(data) };
         } finally {
           clearTimeout(timer);
         }
+        });
+        return extractJson(content);
       }
       // Capability B(Astra Screen) B1 — WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A §6 후속.
       //   B0 실측(2026-09-19, gpt-6-astra · 사분면 fixture 4/4 · text-only 대조 0/4) PASS 뒤에만 연 분기다.
@@ -386,6 +393,7 @@ export function createLlmPlanner(
       //   image_url(data URI) 한 자리 · 키는 Authorization 헤더에만(URL · 로그 · 프롬프트에 base64/키 없음) ·
       //   reasoning 세대(gpt-6.x)라 temperature 없이 max_completion_tokens · JSON 응답 모드(ai-core openai provider 와 동일 규칙).
       if (input.image && provider === 'openai') {
+        const content = await executeAccountedNativeAi(dataSource, nativeRequest, nativeAccount, async () => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 40_000);
         try {
@@ -396,13 +404,16 @@ export function createLlmPlanner(
             signal: controller.signal,
           });
           if (!response.ok) throw new Error(`planner provider ${response.status}`);
-          const data = (await response.json()) as { choices?: { message?: { content?: string | { type?: string; text?: string }[] } }[] };
-          return extractJson(openAiMessageText(data?.choices?.[0]?.message?.content));
+          const data = (await response.json()) as { choices?: { message?: { content?: string | { type?: string; text?: string }[] } }[] } & Parameters<typeof openAiNativeUsage>[0];
+          return { value: openAiMessageText(data?.choices?.[0]?.message?.content), usage: openAiNativeUsage(data) };
         } finally {
           clearTimeout(timer);
         }
+        });
+        return extractJson(content);
       }
-      const result = await execute({
+      const { executeAccountedAi } = await import('../../modules/ai-policy/ai-accounted-execution.js');
+      const result = await executeAccountedAi(dataSource, {
         systemPrompt: WORK_PLANNER_SYSTEM_PROMPT,
         userPrompt: input.image ? `${userPrompt}\n\n(주의: 이 provider 는 이미지를 볼 수 없다. 이미지 값이 필요하면 takeover(user_judgment_required).)` : userPrompt,
         provider,
@@ -411,7 +422,7 @@ export function createLlmPlanner(
         timeoutMs: 40_000,
         retry: { maxAttempts: 1 },
         meta: { service: 'work-agent', callerName: 'WorkPlanner' },
-      });
+      }, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: actorId });
       return extractJson(result.content);
     },
   };
@@ -425,6 +436,7 @@ export function createLlmPlanner(
 export function createStrongLlmPlanner(
   dataSource: DataSource,
   fetchImpl: typeof fetch = fetch,
+  actorId?: string,
 ): WorkPlanner {
-  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver, true);
+  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver, true, actorId);
 }

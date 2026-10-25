@@ -1,3 +1,4 @@
+import { executeAccountedNativeAi } from '../../modules/ai-policy/ai-accounted-execution.js';
 import { ModelControlService } from '../ai-management/model-controls.js';
 /**
  * Web Research Service — 범용 Gemini Web Research(grounding) 소비자
@@ -70,13 +71,14 @@ export interface WebResearchResult {
  *
  * @throws execute() 의 실패(키 부재·provider 오류 등)를 그대로 전파 — 호출측이 에러 전략 결정.
  */
-export async function runWebResearch(request: WebResearchRequest): Promise<WebResearchResult> {
+export async function runWebResearch(request: WebResearchRequest, actorId?: string): Promise<WebResearchResult> {
   // 1. admin SSOT → 모델 해석 (하드코딩 금지, resolver 가 항상 유효한 gemini 모델 반환)
   const fallbackModel = await resolveEditingModel();
   const { model } = await new ModelControlService(AppDataSource).resolve(request.usage ?? 'research.authenticated', { provider: 'gemini', model: fallbackModel });
 
   // 2. Gemini 키 해석 (ai_settings → env, 코드/로그에 기록하지 않음)
   const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+  if (!apiKey) throw new Error('AI_NOT_CONFIGURED');
 
   // 3. 범용 grounding 호출 — model 은 admin 해석값, provider 는 gemini 고정
   let result: ExecuteResult | undefined;
@@ -86,10 +88,14 @@ export async function runWebResearch(request: WebResearchRequest): Promise<WebRe
     materials: [], funding: { payer: 'platform' },
   }, {
     invoke: async prompt => {
-      result = await execute({ ...prompt, provider: 'gemini', grounding: true,
+      result = await executeAccountedNativeAi(AppDataSource, { kind: 'grounding', provider: 'gemini', model, textBytes: Buffer.byteLength(prompt.systemPrompt + prompt.userPrompt, 'utf8'), maxOutputTokens: 2048, unit: 'request', units: 1 },
+        { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: actorId }, async () => {
+      const response = await execute({ ...prompt, provider: 'gemini', grounding: true,
         config: { apiKey, model }, timeoutMs: request.timeoutMs ?? WEB_RESEARCH_TIMEOUT_MS,
         retry: { maxAttempts: WEB_RESEARCH_MAX_ATTEMPTS },
         meta: { service: 'web-research', callerName: 'runWebResearch' },
+      });
+      return { value: response, usage: { inputTokens: response.usageKnown === false ? undefined : response.promptTokens, outputTokens: response.usageKnown === false ? undefined : response.completionTokens, units: response.grounding?.used ? 1 : undefined, searchQueries: response.grounding?.queries?.length } };
       });
       return { ...result, provider: result.provider ?? 'gemini' };
     },

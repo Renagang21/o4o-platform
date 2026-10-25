@@ -35,12 +35,26 @@ interface GeminiAPIResponse {
     promptTokenCount?: number;
     candidatesTokenCount?: number;
     totalTokenCount?: number;
+    thoughtsTokenCount?: number;
+    toolUsePromptTokenCount?: number;
   };
   error?: {
     code: number;
     message: string;
     status: string;
   };
+}
+
+/** Candidate text can exclude billable thinking/audio tokens. Keep the existing response shape. */
+function outputTokenCount(usage: GeminiAPIResponse['usageMetadata']): number {
+  return Math.max((usage?.candidatesTokenCount ?? 0) + (usage?.thoughtsTokenCount ?? 0),
+    (usage?.totalTokenCount ?? 0) - (usage?.promptTokenCount ?? 0) - (usage?.toolUsePromptTokenCount ?? 0), 0);
+}
+
+function hasTokenUsage(usage: GeminiAPIResponse['usageMetadata']): boolean {
+  const valid = (n: unknown) => Number.isSafeInteger(n) && (n as number) >= 0;
+  return !!usage && valid(usage.promptTokenCount) && valid(usage.thoughtsTokenCount ?? 0) && valid(usage.toolUsePromptTokenCount ?? 0) &&
+    (valid(usage.candidatesTokenCount) || (!(usage.toolUsePromptTokenCount ?? 0) && valid(usage.totalTokenCount)));
 }
 
 export class GeminiProvider implements AIStreamProvider {
@@ -90,7 +104,8 @@ export class GeminiProvider implements AIStreamProvider {
     // Attempt with retry on parse failure
     let lastError: Error | null = null;
 
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const parseRetries = config.singleAttempt ? 0 : MAX_RETRIES;
+    for (let attempt = 0; attempt <= parseRetries; attempt++) {
       try {
         const data = await this.callAPI(url, body, config.timeoutMs);
         return this.parseResponse(data, model, effectiveMode, useGrounding);
@@ -98,7 +113,7 @@ export class GeminiProvider implements AIStreamProvider {
         lastError = error instanceof Error ? error : new Error(String(error));
 
         // Only retry on JSON parse failures, not API errors
-        if (attempt < MAX_RETRIES && lastError.message.includes('JSON')) {
+        if (attempt < parseRetries && lastError.message.includes('JSON')) {
           console.warn(`[GEMINI] JSON parse failed, retrying (attempt ${attempt + 1})`);
           continue;
         }
@@ -143,6 +158,8 @@ export class GeminiProvider implements AIStreamProvider {
 
     let accumulated = '';
     let promptTokens = 0;
+    let originalPromptTokens = 0;
+    let toolPromptTokens = 0;
     let completionTokens = 0;
 
     try {
@@ -195,8 +212,10 @@ export class GeminiProvider implements AIStreamProvider {
 
             // Capture usage metadata (usually in last chunk)
             if (parsed.usageMetadata) {
-              promptTokens = parsed.usageMetadata.promptTokenCount ?? promptTokens;
-              completionTokens = parsed.usageMetadata.candidatesTokenCount ?? completionTokens;
+              originalPromptTokens = parsed.usageMetadata.promptTokenCount ?? originalPromptTokens;
+              toolPromptTokens = parsed.usageMetadata.toolUsePromptTokenCount ?? toolPromptTokens;
+              promptTokens = originalPromptTokens + toolPromptTokens;
+              completionTokens = outputTokenCount({ ...parsed.usageMetadata, promptTokenCount: originalPromptTokens, toolUsePromptTokenCount: toolPromptTokens });
             }
           } catch {
             // Skip unparseable SSE lines
@@ -276,15 +295,16 @@ export class GeminiProvider implements AIStreamProvider {
       try {
         JSON.parse(content);
       } catch {
-        throw new Error(`Gemini JSON parse failed: ${content.slice(0, 200)}`);
+        throw new Error('Gemini JSON parse failed');
       }
     }
 
     const response: AIProviderResponse = {
       content,
       model,
-      promptTokens: data.usageMetadata?.promptTokenCount ?? 0,
-      completionTokens: data.usageMetadata?.candidatesTokenCount ?? 0,
+      promptTokens: (data.usageMetadata?.promptTokenCount ?? 0) + (data.usageMetadata?.toolUsePromptTokenCount ?? 0),
+      completionTokens: outputTokenCount(data.usageMetadata),
+      ...(!hasTokenUsage(data.usageMetadata) ? { usageKnown: false } : {}),
     };
 
     // Grounding metadata (additive) — grounding 요청 시에만 채운다.
