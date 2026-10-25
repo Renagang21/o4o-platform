@@ -288,3 +288,9 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
 
 확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
+
+### 14-2. 내 매장 전문 판단 지원 — 개발 branch (2026-10-25)
+
+`pharmacy.consultation.support`는 약국 도메인의 현재 역할/기능·약사 사용 확인·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
+
+사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md). 이 절은 해당 branch의 개발 기록이며 §14-1의 운영 완료 범위를 확장하지 않는다.

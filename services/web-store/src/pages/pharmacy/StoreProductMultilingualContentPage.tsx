@@ -16,8 +16,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, ArrowLeft, Send, Globe } from 'lucide-react';
-import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
-import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
+import { RichTextEditor } from '@o4o/content-editor';
+import { ProductDescriptionAssist } from '../../components/product-description/ProductDescriptionAssist';
+import { ProductEvidencePicker, type ProductEvidenceSelection } from '../../components/product-description/ProductEvidencePicker';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreMlcGroup,
@@ -38,6 +39,7 @@ import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
+import { MultilingualChannelActions } from './multilingual/MultilingualChannelActions';
 
 interface PageDraft {
   title: string;
@@ -89,6 +91,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
 
   const [activeLocale, setActiveLocale] = useState<StoreMlcLocale>('ko');
   const [drafts, setDrafts] = useState<Record<string, PageDraft>>({});
+  const [productEvidence, setProductEvidence] = useState<ProductEvidenceSelection | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingGroup, setIsSavingGroup] = useState(false);
@@ -324,7 +327,9 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
         </div>
 
         {/* QR / 고객용 링크 — 그룹이 있을 때만. publicKey QR(언어 탭 랜딩). */}
-        {group && <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={isSavingGroup || isSavingPage || dirty} onPublished={refreshPublication} acquireLock={acquirePublicLock} />}
+        {group && <><MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={isSavingGroup || isSavingPage || dirty} onPublished={refreshPublication} acquireLock={acquirePublicLock} />
+          <MultilingualChannelActions groupId={group.id} locale={activeLocale} disabled={busy || dirty}
+            published={group.pages.some(p => p.status === 'published')} /></>}
       </div>
 
       {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주세요.</p>}
@@ -444,25 +449,25 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
                 <label className="block text-sm font-medium text-slate-700">본문 (HTML)</label>
                 {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §22~§23: 외부 LLM 번역/현지화(task='translate'). 결과는 이 언어 draft.html 에만 반영 —
                     자동 임시저장·발행·QR 생성 없음(기존 버튼을 사용자가 누른다). */}
-                {!busy && !unsupported && <LlmAssistPanel
-                  label={STORE_LLM_ASSIST_LABEL}
-                  contextLabel={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 본문 — 기준 본문을 이 언어로 옮기거나 현재 본문을 다듬습니다`}
-                  guideText={({ additionalInstruction }) =>
-                    buildStoreContentAuthoringPrompt({
-                      task: 'translate',
+              </div>
+              {isTargetKind(targetKind) && targetId && <ProductEvidencePicker key={`${targetKind}:${targetId}:${activeLocale}`}
+                kind={targetKind} id={targetId} locale={activeLocale} disabled={busy || unsupported} isCurrent={isCurrent}
+                onLoaded={setProductEvidence} onInsert={html => setActiveDraft({ html: [activeDraft.html, html].filter(Boolean).join('\n') })} />}
+                {!busy && !unsupported && <ProductDescriptionAssist key={`assist:${group.id}:${activeLocale}`}
+                  context={{
+                      task: translateSource?.html ? 'translate' : 'product-description',
                       title: activeDraft.title || title,
                       productName,
                       currentHtml: activeDraft.html,
                       referenceHtml: translateSource?.html ?? null,
                       sourceLocale: translateSource?.locale ?? null,
                       targetLocale: activeLocale,
-                      additionalInstruction,
-                    })
-                  }
-                  currentHtml={activeDraft.html}
+                      purpose: 'consumer-qr',
+                      evidence: productEvidence ? [{ kind: 'product-fact', title: productEvidence.title,
+                        source: productEvidence.source, content: productEvidence.html, reviewStatus: 'pending' }] : [],
+                    }}
                   onApplyHtml={(html) => setActiveDraft({ html })}
                 />}
-              </div>
               {unsupported && <p role="status" className="text-sm text-amber-800">이 언어는 HTML 편집을 지원하지 않는 형식입니다. 원본 형식을 유지하며 발행 내용 보기에서 확인해 주세요.</p>}
               <RichTextEditor showInternalAi={false}
                 key={`${group.id}:${activeLocale}`}
