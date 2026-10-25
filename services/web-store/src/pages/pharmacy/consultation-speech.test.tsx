@@ -58,18 +58,20 @@ it('starts only on a click, places final voice text in the editor, and waits for
 });
 it('finishes a guidance voice request beside its microphone button and waits for recognition before preparing', async () => {
   render(<Page />); await screen.findByLabelText('고객에게 전달할 한국어 문장');
-  const guidance = within(screen.getByRole('region', { name: '상담 안내 준비' }));
-  fireEvent.click(guidance.getByRole('button', { name: '말로 안내 요청' }));
+  const guidance = () => within(screen.getByRole('region', { name: '상담 안내 준비' }));
+  fireEvent.click(guidance().getByRole('button', { name: '말로 안내 요청' }));
+  await guidance().findByRole('button', { name: '요청 말하기 마치기' });
   const recognition = latest();
-  act(() => recognition.result('상품 위치를 알려주세요'));
-  expect((guidance.getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(guidance.getByRole('button', { name: '요청 말하기 마치기' }));
+  await act(async () => recognition.result('상품 위치를 알려주세요'));
+  expect(recognition.abort).not.toHaveBeenCalled();
+  expect((guidance().getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(guidance().getByRole('button', { name: '요청 말하기 마치기' }));
   expect(recognition.stop).toHaveBeenCalledOnce();
   expect(state.post).not.toHaveBeenCalled();
-  act(() => recognition.onend?.());
-  expect((guidance.getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(false);
-  expect((guidance.getByRole('textbox') as HTMLInputElement).value).toBe('상품 위치를 알려주세요');
-  expect(document.activeElement).not.toBe(guidance.getByRole('textbox'));
+  await act(async () => recognition.onend?.());
+  expect((guidance().getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(false);
+  expect((guidance().getByRole('textbox') as HTMLInputElement).value).toBe('상품 위치를 알려주세요');
+  expect(document.activeElement).not.toBe(guidance().getByRole('textbox'));
 });
 it('keeps nonprofessional outgoing phrases fixed and records the customer in the selected language', async () => {
   render(<Page />); await screen.findByLabelText('고객에게 전달할 한국어 문장');

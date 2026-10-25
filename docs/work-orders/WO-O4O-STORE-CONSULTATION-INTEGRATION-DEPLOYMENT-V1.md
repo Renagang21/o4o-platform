@@ -30,3 +30,5 @@ PR #813의 첫 HEAD `7bac1d00e1`은 Codex 지적 0건·보안/품질/웹 build �
 검사는 한국어 원문 작성/번역 분기와 참조/결과 언어 전달을 확인하도록 보완했다. 함께 점검해 외국어 탭에 기준 본문이 없을 때도 결과 언어가 빠지지 않도록 번역 prompt를 유지했다. UI에서 한국어 첫 작성·원문 있는 영어·원문 없는 영어의 실제 guide 생성과 결과의 편집기 반영/자동 저장·발행 없음 3건을 추가했다. 집중 계약 113·다국어 UI 39·Store build·변경 파일 lint PASS. 최신 HEAD로 필수 CI/자동 검토를 다시 확인한다. 검사를 삭제/skip하거나 gate를 낮추지 않았다.
 
 GitHub 로그 호스트 접근은 환경 허용 목록의 403으로 막혀 있다. 기존 도메인을 보존하고 `results-receiver.actions.githubusercontent.com`만 추가한 초안을 저장했으며 적용/게시 완료로 표시하지 않는다. 로컬 재현과 사용자의 로그로 원인을 확인했고 개발·CI 보완은 계속 진행한다.
+
+수정 HEAD `56e7795b82`의 CI는 API 3개 shard가 모두 통과했다. 웹 build에 포함된 Store 검사에서는 음성 회귀 1건이 실패했다(848건 중 847 PASS). GitHub annotation과 사용자가 제공한 전체 로그에서 같은 `consultation-speech.test.tsx:66`을 확인했다. 음성 이벤트 직후 저장한 DOM 참조로 버튼을 동기 조회하던 검사를 현재 화면 재조회·인식 시작 상태 확인·비동기 ASR callback 완료 후 단언하도록 바꿨다. 원래 조작/문장/명시 실행 검사를 유지하고 예기치 않은 인식 abort 없음도 추가했다. `CI=true`에서 음성 18건의 5개 순서 seed 전부 PASS·Store 전체 848 PASS·lint PASS. 새 HEAD로 CI와 검토를 다시 확인한다.
