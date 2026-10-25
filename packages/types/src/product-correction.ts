@@ -156,3 +156,55 @@ export interface ProductCorrectionTaskVersion {
   batchRevision: number;
   task: ProductCorrectionTask;
 }
+
+/** P2: explicit proposals, independent from legacy review task states. */
+export type ProductCorrectionField =
+  | 'name'
+  | 'brandName'
+  | 'specification'
+  | 'originCountry'
+  | 'tags'
+  | 'descriptionContent';
+export type ProductCorrectionValue = string | string[] | null;
+export interface ProductCorrectionEvidence {
+  id: string;
+  kind: 'product-fact' | 'professional-reference';
+  source: string;
+  checkedOn: string;
+  fields: ProductCorrectionField[];
+  status: 'confirmed' | 'unconfirmed';
+}
+export interface ProductCorrectionContext {
+  fingerprint: string;
+  values: Record<ProductCorrectionField, ProductCorrectionValue>;
+  descriptionId: string | null;
+  descriptionSummary?: string | null;
+}
+export interface ProductCorrectionChange {
+  field: ProductCorrectionField;
+  before: ProductCorrectionValue;
+  after: ProductCorrectionValue;
+  reason: string;
+  evidenceIds: string[];
+  decision: 'pending' | 'approved' | 'rejected';
+}
+export interface ProductCorrectionProposal {
+  id: string;
+  batchId: string;
+  taskId: string;
+  productId: string;
+  revision: number;
+  ruleSnapshot: ProductCorrectionRule;
+  baseline: ProductCorrectionContext;
+  evidence: ProductCorrectionEvidence[];
+  changes: ProductCorrectionChange[];
+  createdAt: string;
+  createdBy: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reviewNote?: string;
+  appliedAt?: string;
+  appliedBy?: string;
+  appliedFields?: ProductCorrectionField[];
+  resultingDescriptionId?: string | null;
+}

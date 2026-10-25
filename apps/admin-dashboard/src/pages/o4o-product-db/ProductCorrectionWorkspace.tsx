@@ -1,3 +1,5 @@
+import ProductCorrectionProposalQueue from './ProductCorrectionProposalQueue';
+import ProductCorrectionProposalEditor from './ProductCorrectionProposalEditor';
 import { useEffect, useRef, useState } from 'react';
 import type {
   ProductCorrectionBatch,
@@ -231,14 +233,15 @@ export default function ProductCorrectionWorkspace() {
       <div>
         <h3 className="text-lg font-semibold">상품 보정 작업 공간</h3>
         <p className="mt-1 text-sm text-gray-600">
-          기준 관리 → 대상 점검 → 상품 선택 → 보완안 준비. 저장되는 것은 기준과 작업 기록이며 상품 원본에
-          적용되지 않습니다.
+          기준 관리 → 대상 점검 → 상품 선택 → 보완안 준비 → 변경안 검토·선택 반영.
+          기준과 작업 기록 저장은 원본을 변경하지 않으며, 별도의 선택 반영에서만 상품 원본을 변경합니다.
         </p>
         <p className="mt-1 text-xs text-gray-500">
           점검 주기는 검토 완료 후 다음 점검일 계산에 사용합니다. 점검은 수동으로 실행하며 상품을 자동
           수정하지 않습니다.
         </p>
       </div>
+      <ProductCorrectionProposalQueue />
       {error && (
         <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">
           {error}
@@ -813,6 +816,7 @@ function BatchEditor({
           </option>
         ))}
       </select>
+      {task && <ProductCorrectionProposalEditor key={task.id} batchId={batch.id} taskId={task.id} canWrite={canWrite} />}
       {task && (
         <TaskEditor
           key={`${task.id}:${task.updatedAt}`}

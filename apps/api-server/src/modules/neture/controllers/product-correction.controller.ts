@@ -8,12 +8,14 @@ import { ProductCorrectionWorkspace } from '../product-correction/workspace.serv
 import { ProductCorrectionOperationsService } from '../product-correction/operations.service.js';
 import { CorrectionError } from '../product-correction/contracts.js';
 import logger from '../../../utils/logger.js';
+import { ProductCorrectionProposalService } from '../product-correction/proposal.service.js';
 import { generateProductCorrectionDraft } from '../product-correction/ai-draft.service.js';
 import { AiExtensionError } from '@o4o/ai-core';
 
 export function createProductCorrectionController(db: DataSource): Router {
   const router = Router();
   const workspace = new ProductCorrectionWorkspace(db);
+  const proposals = new ProductCorrectionProposalService(db);
   const operations = new ProductCorrectionOperationsService(db);
   router.use(authenticate);
   router.use(requireAdmin);
@@ -144,5 +146,56 @@ export function createProductCorrectionController(db: DataSource): Router {
       ),
     ),
   );
+  router.get(
+    '/batches/:id/items/:taskId/change-context',
+    run((req) => proposals.context(uuid.parse(req.params.id), uuid.parse(req.params.taskId))),
+  );
+  router.get(
+    '/batches/:id/items/:taskId/proposals',
+    run((req) => proposals.list(uuid.parse(req.params.id), uuid.parse(req.params.taskId))),
+  );
+  router.post(
+    '/batches/:id/items/:taskId/proposals',
+    requireProductDbWrite,
+    run((req) =>
+      proposals.create(
+        uuid.parse(req.params.id),
+        uuid.parse(req.params.taskId),
+        req.body,
+        actor(req),
+      ),
+    ),
+  );
+  router.get(
+    '/proposals',
+    run((req) =>
+      proposals.queue(
+        z
+          .enum(['all', 'pending', 'reviewed', 'applied', 'failed'])
+          .default('all')
+          .parse(req.query.filter),
+        z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page),
+      ),
+    ),
+  );
+  router.get(
+    '/proposals/:id/versions',
+    run((req) => proposals.versions(uuid.parse(req.params.id))),
+  );
+  router.get(
+    '/proposals/:id/attempts',
+    run((req) => proposals.attempts(uuid.parse(req.params.id))),
+  );
+  router.post(
+    '/proposals/:id/review',
+    requireProductDbWrite,
+    run((req) => proposals.review(uuid.parse(req.params.id), req.body, actor(req))),
+  );
+  router.post(
+    '/proposals/:id/apply',
+    requireProductDbWrite,
+    run((req) => proposals.apply(uuid.parse(req.params.id), req.body, actor(req))),
+  );
+  router.get('/proposals/:id', run(req => proposals.proposal(uuid.parse(req.params.id))));
   return router;
 }
