@@ -1,7 +1,7 @@
 # CHECK-O4O-PHARMACY-APP-NAME-RESIDUE-AND-DEPLOY-SCOPE-V1
 
 - 작성: 2026-10-25 · branch `wo/pharmacy-stage6-name-residue` · base `42dddc91b5`
-- 상태: ACTIVE · 로컬 정리 · 검증 완료, main 통합 · 배포 전(배포는 LEVEL_3 promote 필요) · 운영 이름 전환은 미실행(§5)
+- 상태: ACTIVE · PR #817 main 통합(`c63e370594`) · 운영 배포 완료(§7) · 운영 이름 전환은 미실행(§5)
 - 연결: [WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md) 단계 6 · DONE_CRITERIA 5
 - 범위: 약국 공통 앱(`services/web-kpa-society` · Cloud Run `kpa-society-web`)의 명칭 잔재 목록과 처리 여부, Lecture 전용 변경이 약국 앱을 배포한 원인 수정
 
@@ -100,3 +100,20 @@ Cloud Run 이름을 바꾸는 것은 **새 서비스를 만들고 트래픽을 �
 | 앱 디렉터리 `services/web-kpa-society` | 잔여 — 이름 결정 대기 |
 | 서비스 키 `kpa-society` | 잔여 — 단계 3 · 5 |
 | 명칭 잔재 목록 · 처리 여부 기록(DONE_CRITERIA 5) | 이 문서 |
+
+## 7. 운영 반영 (2026-10-25)
+
+- PR #817 병합 → merge commit `c63e370594`. 검증한 head `583d59e589` 로 고정해 병합했다.
+- main CI 1차 FAIL: web-store `src/pages/pharmacy/operations/__tests__/blog-workflow.test.tsx` 의 "store switch remounts the editor before a delayed save can reload the new store" 1건(spy 호출 1회 기대 · 2회). 같은 commit 에서 단독 6회 PASS 라 재현되지 않았다. 이 변경과 무관한 타이밍 flaky 로 보고 실패 job 만 재실행 → PASS. 1차 실패 동안 Delivery 는 4개 서비스 전부 `BLOCKED_CI` 로 배포 0.
+- Delivery(재판정): neture · kpa-branch = LEVEL_2 자동 배포, kpa-society · store = `HELD_LEVEL_3`(Dockerfile `deploy-infra`). lecture · api · admin · hospital-pharmacy = 런타임 변경 없음.
+- promote(LEVEL_3, 사용자 명시 승인, `services=kpa-society,store`) → 두 서비스 배포.
+
+| 서비스 | 경로 | revision | 트래픽 | 확인 |
+|---|---|---|---|---|
+| neture | Delivery | `neture-web-02061-guf` | 100% | neture.co.kr 200 |
+| kpa-branch | Delivery | `kpa-branch-web-00346-soq` | 100% | kpa.neture.co.kr 200 |
+| kpa-society | promote | `kpa-society-web-02284-cug` | 100% | pharmacy · megapharm 200, 새 JS asset 200 |
+| store | promote | `store-web-00335-qer` | 100% | store.neture.co.kr 200, 새 JS asset 200 |
+
+- 실브라우저 smoke: 미실행 — UI 이름 · 메뉴 · 경로 변경이 없는 의존성 선언 정리라 HTTP · asset 확인으로 갈음했다.
+- 후속: web-store `blog-workflow` 타이밍 테스트 안정화는 별도 작업이다(다시 main CI 를 막을 수 있다).
