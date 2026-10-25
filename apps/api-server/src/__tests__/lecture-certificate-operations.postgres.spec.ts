@@ -2,7 +2,7 @@
  * Creates and drops its own database on a disposable PostgreSQL. Never point it at an application database.
  * Run: O4O_LECTURE_CERT_OPS_PG_PORT=<port> [O4O_LECTURE_CERT_OPS_PG_USER=<superuser>] jest --runTestsByPath <this file>
  */
-import { AddLectureInstructorProfile1792886400001 } from '../database/migrations/1792886400000-AddLectureInstructorProfile';
+import { AddLectureInstructorProfile1792886400001 } from '../database/migrations/1792886400001-AddLectureInstructorProfile';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../database/bootstrap/canonical-schema-baseline.js';
