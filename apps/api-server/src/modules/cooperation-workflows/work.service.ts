@@ -353,8 +353,8 @@ export class CooperationWorkService {
         ? await requireMember(manager, scope, user, organization, true)
         : null;
       const [application] = await manager.query(
-        `SELECT a.*,w.state AS work_state FROM cooperation_activity_applications a JOIN cooperation_work_items w ON w.id=a.work_id
-        WHERE w.${workScope.replace(" AND cooperative_id", " AND w.cooperative_id")} AND a.id=$3 FOR UPDATE OF a`,
+        `SELECT a.*,w.state AS work_state,EXISTS(SELECT 1 FROM cooperation_work_revisions v WHERE v.work_id=w.id AND v.snapshot->>'state'='active') AS has_started FROM cooperation_activity_applications a JOIN cooperation_work_items w ON w.id=a.work_id
+        WHERE w.${workScope.replace(" AND cooperative_id", " AND w.cooperative_id")} AND a.id=$3 FOR UPDATE OF a FOR SHARE OF w`,
         [...scopeParams(scope), id],
       );
       if (
@@ -372,7 +372,8 @@ export class CooperationWorkService {
         assertApplicationTransition(application.state, String(body.state));
         if (
           body.state === "completed" &&
-          !["active", "ended"].includes(application.work_state)
+          (!["active", "ended"].includes(application.work_state) ||
+            !application.has_started)
         )
           throw invalid("진행을 시작한 활동만 완료 기록을 남길 수 있습니다.");
         if (

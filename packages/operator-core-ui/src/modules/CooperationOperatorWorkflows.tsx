@@ -605,6 +605,9 @@ function WorkDetail({
               key={`${a.id}:${a.version}`}
               item={a}
               workState={data.work.state}
+              hasStarted={data.revisions.some(
+                (revision: any) => revision.snapshot.state === "active",
+              )}
               state={state}
             />
           ))}
@@ -639,9 +642,11 @@ function ApplicationDecision({
   item,
   state,
   workState,
+  hasStarted,
 }: {
   item: any;
   workState: string;
+  hasStarted: boolean;
   state: ReturnType<typeof useWorkflowData>;
 }) {
   const [note, setNote] = useState(""),
@@ -693,7 +698,7 @@ function ApplicationDecision({
           ) : (
             <button
               type="button"
-              disabled={!["active", "ended"].includes(workState)}
+              disabled={!hasStarted || !["active", "ended"].includes(workState)}
               onClick={() => decide("completed")}
             >
               활동 완료 기록

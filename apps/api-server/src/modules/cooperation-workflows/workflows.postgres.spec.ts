@@ -769,6 +769,48 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
       view.activities.find((item: any) => item.id === draft.id),
     ).toMatchObject({ state: "ended", application_state: "completed" });
   });
+  it.each([false, true])(
+    "allows completion after ending only with prior progress: %s",
+    async (started) => {
+      const activity = { ...input, kind: "activity", required: false };
+      const draft = await works.save(cooperative, op, undefined, activity);
+      let current = await works.save(cooperative, op, draft.id, {
+        ...activity,
+        state: "recruiting",
+        version: 1,
+      });
+      const application = await works.apply(
+        cooperative,
+        member,
+        undefined,
+        draft.id,
+        { version: current.version, note: "참여" },
+      );
+      const approved = await works.decide(cooperative, op, application.id, {
+        state: "approved",
+        version: application.version,
+        note: "",
+      });
+      if (started)
+        current = await works.save(cooperative, op, draft.id, {
+          ...activity,
+          state: "active",
+          version: current.version,
+        });
+      await works.save(cooperative, op, draft.id, {
+        ...activity,
+        state: "ended",
+        version: current.version,
+      });
+      const complete = works.decide(cooperative, op, application.id, {
+        state: "completed",
+        version: approved.version,
+        note: "활동 확인",
+      });
+      if (started) expect((await complete).state).toBe("completed");
+      else await expect(complete).rejects.toMatchObject({ httpStatus: 400 });
+    },
+  );
   it("opens only the relevant pending queues and keeps full counts separate from a page", async () => {
     const noticeQueue = await get(
       base + "/manage?workFilter=notice-pending",

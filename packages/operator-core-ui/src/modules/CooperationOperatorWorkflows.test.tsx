@@ -8,6 +8,51 @@ import {
 import { afterEach, expect, it, vi } from "vitest";
 import { CooperationOperatorWorkflows } from "./CooperationOperatorWorkflows";
 afterEach(cleanup);
+it.each([false, true])(
+  "requires progress history before recording completion for an ended activity: %s",
+  async (started) => {
+    const work = {
+      id: "activity",
+      title: "종료 활동",
+      body: "활동 내용",
+      kind: "activity",
+      state: "ended",
+      version: 3,
+      target_ids: [],
+    };
+    const client = api();
+    client.get.mockImplementation(async (path) => ({
+      data: {
+        data: path.includes("/manage/work/")
+          ? {
+              work,
+              revisions: started
+                ? [{ version: 2, snapshot: { ...work, state: "active" } }]
+                : [],
+              counts: { total: 1, completed: 0 },
+              recipients: [],
+              applications: [
+                {
+                  id: "application",
+                  name: "참여자",
+                  state: "approved",
+                  version: 1,
+                },
+              ],
+            }
+          : { ...data(), work: { items: [work], total: 1 } },
+      },
+    }));
+    render(tree(client));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "편집·처리 현황" }),
+    );
+    const complete = await screen.findByRole("button", {
+      name: "활동 완료 기록",
+    });
+    expect((complete as HTMLButtonElement).disabled).toBe(!started);
+  },
+);
 const data = () => ({
   work: { items: [], total: 0 },
   materials: { items: [], total: 0 },

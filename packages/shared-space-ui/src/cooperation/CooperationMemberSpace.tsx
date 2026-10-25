@@ -44,6 +44,7 @@ export function CooperationMemberSpace(props: {
 }
 function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, materialsGuide, homeNews }: Parameters<typeof CooperationMemberSpace>[0]) {
   const [state, setState] = useState<{ business: Business; access: Access; stores: { organizationId: string; organizationName: string }[] } | null>(null);
+  const [memberAccess, setMemberAccess] = useState<{ organizationId: string; allowed: boolean } | null>(null);
   const [params, setParams] = useSearchParams();
   const requestedStore = params.get('store');
   const organizationId = requestedStore ? state?.stores.find(store => store.organizationId === requestedStore)?.organizationId : state?.stores.length === 1 ? state.stores[0].organizationId : undefined;
@@ -95,7 +96,7 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
       { key: 'materials', label: '자료', to: '/materials' + storeSearch },
       { key: 'participation', label: '참여 안내', to: model.participationPath + storeSearch },
       { key: 'community', label: '회원 교류', to: model.communityPath + storeSearch },
-      { key: 'support', label: '지원', to: state?.access.canManage ? `/operator/inbox/business/${encodeURIComponent(model.key)}` : '/' + storeSearch + '#cooperation-support' },
+      { key: 'support', label: '지원', to: state?.access.canManage ? `/operator/inbox/business/${encodeURIComponent(model.key)}` : organizationId && memberAccess?.organizationId === organizationId && memberAccess.allowed ? '/' + storeSearch + '#cooperation-support' : '/contact' },
     ]} />
     {issue && <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
       <p role={issue.unavailable ? 'status' : 'alert'}>{issue.message}</p>
@@ -107,7 +108,7 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
     {!state && !issue && <p role="status">회원 이용 상태를 확인하고 있습니다…</p>}
     {state && <>
       {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주세요</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
-      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
+      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources onAccess={setMemberAccess} materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
 
       {view === 'home' && state.access.canManage && <BusinessHomeShowcase client={client} businessKey={model.key} accountId={accountId} operator />}
       {state.access.canManage && <Link to="/operator/semi-franchises" className="block underline">참여 약국 · 공급 승인 · 콘텐츠 운영</Link>}
@@ -116,7 +117,8 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
 
   </section>;
 }
-function SelectedMemberResources({ model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId, materialsGuide, homeNews }: {
+function SelectedMemberResources({ onAccess, model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId, materialsGuide, homeNews }: {
+  onAccess: (access: { organizationId: string; allowed: boolean } | null) => void;
   model: CooperationModel; organizationId: string; client: CooperationClient; view?: CooperationView; accountId?: string; homeNews?: ReactNode; materialsGuide?: Readonly<CooperationMaterialGuide>;
   storeSearch: string; busy: boolean; onEnterStore: () => Promise<void>;
 }) {
@@ -125,14 +127,14 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
   const [retry, setRetry] = useState(0);
   useEffect(() => {
     let alive = true;
-    setAccess(null); setError('');
+    setAccess(null); setError(''); onAccess(null);
     client.get(`${BASE}/businesses/${encodeURIComponent(model.key)}/store-access`).then(response => {
       const data: StoreAccess = response.data.data;
       if (data.businessKey !== model.key || data.organizationId !== organizationId || typeof data.allowed !== 'boolean') throw new Error('Store/business scope mismatch');
-      if (alive) setAccess(data);
+      if (alive) { setAccess(data); onAccess({ organizationId, allowed: data.allowed }); }
     }).catch(() => { if (alive) setError('선택한 약국의 서비스 이용 상태를 확인하지 못했습니다.'); });
     return () => { alive = false; };
-  }, [client, model.key, organizationId, retry]);
+  }, [client, model.key, organizationId, retry, onAccess]);
   const publicHomeNews = view === 'home' ? homeNews : null;
   if (error) return <><div><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>이용 상태 다시 확인</button></div>{publicHomeNews}</>;
   if (!access) return <><p role="status">선택한 약국의 가입 승인을 확인하고 있습니다…</p>{publicHomeNews}</>;
