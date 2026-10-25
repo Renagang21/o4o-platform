@@ -179,3 +179,8 @@
 - Partner 화면은 기존 공통 `PasswordInput`을 정상 package export로 소비하도록 변경했다. 공통 소스·인증 API·허용 목록·CI 검사 범위는 변경하지 않았다. 비밀번호는 controlled 상태에서 제출 직후와 세션 초기화 시 비우며 저장하지 않는다.
 - 기존 workspace auth-react/client/utils와 저장소에 이미 등록된 router 7.9.6을 소비하도록 package/lock importer 및 Docker dependency closure를 함께 반영했다. scoped frozen/offline install 성공, 별도 외부 버전 업그레이드는 없다.
 - 원인 검사 `legacy-password-auth-retirement.spec.ts` 48 tests, 프런트 64 tests, 웹 production build·변경 파일 ESLint·새 Docker image build 통과. 로컬 도구 32 화면 검사와 API를 mock한 로그인 화면 4개 폭·공통 보기/숨기기 동작도 확인했다. 실패 원인 발견 후 수정·새 CI로 검증하며 이전 실패를 단순한 flaky로 판정하지 않는다.
+
+### Refresh 일시 장애 보존
+
+- 추가 Codex P2 지적을 반영했다. refresh의 실제 401 인증 실패만 만료로 처리하고, 503/429·네트워크 오류는 그대로 전달한다. 일시 장애가 사용자/공간을 초기화하거나 작성 중 화면을 닫지 않게 하는 오류 분류 수정이며 실제 인증 실패 차단은 유지한다.
+- 503/429·네트워크·실제 만료와 동시 요청의 실패/재시도 복구 5개 회귀를 추가했다. 프런트 총 69 tests·웹 production build·변경 파일 ESLint 통과. API/인증 Core의 오류 계약·재시도 한도·쿠키 정책은 변경하지 않았다.

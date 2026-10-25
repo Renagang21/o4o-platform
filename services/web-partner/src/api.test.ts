@@ -60,6 +60,48 @@ describe("Partner cookie API client", () => {
       fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh")),
     ).toHaveLength(1);
   });
+  it.each([503, 429])("preserves refresh %i failures instead of reporting a session expiry", async (status) => {
+    const fetch = vi.fn()
+      .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+      .mockResolvedValueOnce(response(status, { code: "AUTH_TEMPORARILY_UNAVAILABLE" }));
+    vi.stubGlobal("fetch", fetch);
+    await expect(partnerApi.list()).rejects.toMatchObject({ status, code: "AUTH_TEMPORARILY_UNAVAILABLE" });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+  it("preserves a refresh network failure without converting it to 401", async () => {
+    const fetch = vi.fn().mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+      .mockRejectedValueOnce(new TypeError("network"));
+    vi.stubGlobal("fetch", fetch);
+    await expect(partnerApi.list()).rejects.toThrow("서버에 연결하지 못했습니다");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+  it("still reports actual refresh authentication rejection as session expiry", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+      .mockResolvedValueOnce(response(401, { code: "REFRESH_TOKEN_EXPIRED" })));
+    await expect(partnerApi.list()).rejects.toMatchObject({ status: 401, code: "INVALID_TOKEN" });
+  });
+  it("releases a failed single-flight refresh so a later retry can recover", async () => {
+    let refreshed = false, retrying = false;
+    const fetch = vi.fn(async (url: string) => {
+      if (url.includes("/auth/refresh")) {
+        if (!retrying) return response(503, { code: "AUTH_TEMPORARILY_UNAVAILABLE" });
+        refreshed = true;
+        return response(200, { success: true, data: {} });
+      }
+      return refreshed ? response(200, { success: true, data: [] }) : response(401, { code: "INVALID_TOKEN" });
+    });
+    vi.stubGlobal("fetch", fetch);
+    const outcomes = await Promise.allSettled([partnerApi.list(), partnerApi.list()]);
+    for (const result of outcomes) {
+      expect(result.status).toBe("rejected");
+      if (result.status === "rejected") expect(result.reason).toMatchObject({ status: 503 });
+    }
+    expect(fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh"))).toHaveLength(1);
+    retrying = true;
+    expect(await partnerApi.list()).toEqual([]);
+    expect(fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh"))).toHaveLength(2);
+  });
   it("does not retry invalid login or expose server error details", async () => {
     const fetch = vi.fn().mockResolvedValue(
       response(401, {

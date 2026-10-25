@@ -155,7 +155,10 @@ export async function request<T>(
       refreshing = request("/api/v1/auth/refresh", "POST", {}, false)
         .then(
           () => true,
-          () => false,
+          (error: unknown) => {
+            if (error instanceof ApiError && error.status === 401) return false;
+            throw error;
+          },
         )
         .finally(() => {
           refreshing = null;
