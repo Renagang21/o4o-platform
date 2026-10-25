@@ -1,3 +1,4 @@
+jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedNativeAi: async (_db: unknown, _request: unknown, _account: unknown, invoke: () => Promise<{ value: unknown }>) => (await invoke()).value }));
 import { aiProxyService } from "../services/ai-proxy.service.js";
 import { aiAdminService } from "../services/ai-admin.service.js";
 import { ModelControlService } from "../services/ai-management/model-controls.js";
@@ -16,9 +17,6 @@ it.each(["gpt-6-astra", "gpt-5-mini", "o3", "gpt-4.1"])(
     const key = jest
       .spyOn(aiProxyService as any, "getApiKey")
       .mockResolvedValue("synthetic-key");
-    const log = jest
-      .spyOn(aiProxyService as any, "saveUsageLog")
-      .mockResolvedValue(undefined);
     const original = global.fetch;
     const fetchMock = jest.fn(
       async () =>
@@ -65,7 +63,6 @@ it.each(["gpt-6-astra", "gpt-5-mini", "o3", "gpt-4.1"])(
       resolve.mockRestore();
       allows.mockRestore();
       key.mockRestore();
-      log.mockRestore();
     }
   },
 );
@@ -153,9 +150,6 @@ it.each(["openai", "claude"] as const)(
         model: "synthetic-managed-model",
         result: { blocks: [] },
       });
-    const log = jest
-      .spyOn(aiProxyService as any, "saveUsageLog")
-      .mockResolvedValue(undefined);
     try {
       await expect(
         aiProxyService.generateContent(
@@ -177,12 +171,12 @@ it.each(["openai", "claude"] as const)(
           maxTokens: 8192,
         }),
         "synthetic-request",
+        "synthetic-actor",
       );
     } finally {
       resolve.mockRestore();
       allows.mockRestore();
       call.mockRestore();
-      log.mockRestore();
     }
   },
 );

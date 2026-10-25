@@ -248,7 +248,8 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 - 업무 Extension/Core/가격·quota 테스트는 기존 mock·격리 fixture를 사용합니다. 실계정/유료 호출 smoke는 계정·개발용 key·허용 업무 범위를 준비한 뒤 수행하며 로컬 정적 검사와 구분합니다.
 - 호출 전 예약/admission에서 quota 원장 미준비·DB 장애가 발생하면 `AI_QUOTA_UNAVAILABLE`로 provider 호출을 거부합니다. 공통 질의의 한도 초과 429·이 단계의 DB 장애 503을 검사에서 우회하지 않습니다.
 - provider 호출 성공 후 정산/receipt 저장이 실패하면 생성 결과를 반환하고 reconciliation 경고와 미해결 예약을 남깁니다. 이를 호출 전 거부와 같은 503으로 기대하거나 성공한 유료 호출을 자동 재전송하지 않습니다. 남은 사용량은 확인된 증거로 정산하며 TTL만으로 해제하지 않습니다.
-- 비용은 가격 version/model에 따른 추정치입니다. `AI_PRICING_CATALOG` 미설정 시 기존 provider 추정 단가를 사용하며 실제 invoice나 사용자 청구 금액이 아닙니다. 새 모델별 요금 설정·운영 billing 정책 변경은 별도 작업입니다.
+- 비용은 가격 version/model에 따른 추정치입니다. 기존 Gemini/OpenAI/Claude 텍스트는 `AI_PRICING_CATALOG` 미설정 시 종전 provider 추정 단가를 사용하며 실제 invoice나 사용자 청구 금액이 아닙니다. 새 모델별 요금 설정·운영 billing 정책 변경은 별도 작업입니다.
+- **전문 AI 개발 branch(2026-10-25):** `wo/ai-specialized-runtime-accounting`의 이미지/PDF·화면·검색·OCR·음성에는 기존 가격 catalog의 명시 모델별 native profile/예산이 필요합니다. Qwen 텍스트도 명시 모델 token 요율이 필요합니다. 미준비 시 `AI_PRICING_NOT_CONFIGURED` → 503으로 provider 이전에 차단합니다. 입력/출력/검색·이미지/문자 단위·사용량 보류 규칙은 [전문 실행 TODO §4](docs/work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)를 따릅니다. 테스트 synthetic 요율을 운영에 복사하거나 quota 검사를 우회하지 않습니다. 이 branch의 local 검증/push와 main·운영 적용을 구분합니다.
 
 ---
 

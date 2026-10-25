@@ -11,6 +11,7 @@
  *   - 새 inference engine 만들지 않음 — 현재 서비스(`inferFileStructure`)를 그대로 호출.
  *   - 모델 하드코딩 금지 — 서비스가 `resolveEditingModel()`(admin SSOT, fallback gemini-3.8-flash) 사용.
  *   - API key 는 env 로만 주입. 키를 코드·문서·로그·출력 어디에도 기록하지 않는다.
+ *   - standalone 호출자는 자기 환경 계정의 Core transport를 명시적으로 주입한다. 서버의 플랫폼 quota/원장 검증 하네스가 아니다.
  *
  * 실행(키는 현재 셸 세션에만):
  *   $env:GEMINI_API_KEY="<key>"; npx tsx scripts/ai/generic-file-understanding-smoke.mts; Remove-Item Env:GEMINI_API_KEY
@@ -20,6 +21,7 @@
  */
 
 import 'reflect-metadata';
+import { execute } from '@o4o/ai-core';
 
 import { decodeWorkbook } from '../../apps/api-server/src/services/ai-tools/file-understanding/decode.js';
 import { profileWorkbook } from '../../apps/api-server/src/services/ai-tools/file-understanding/profile.js';
@@ -166,7 +168,7 @@ async function main() {
         timeoutMs: TIMEOUT_MS,
         resolveModel,
         resolveApiKey,
-      });
+      }, execute);
       inference = r.inference;
       usedModel = r.model;
       break;
