@@ -8,6 +8,7 @@ import { supportedVideoUrl } from '../../components/LessonMediaFields';
 const auth = vi.hoisted(() => ({ user: null, isAuthenticated: false }));
 const courses = vi.hoisted(() => vi.fn());
 vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => auth }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: { success: true, data: null } })) } }));
 vi.mock('../../api/lecture', () => ({ learnerApi: { getCourses: courses } }));
 vi.mock('../../lib/lmsViewAdapter', () => ({ LECTURE_ACCENT: '#302b73', coursePath: (id: string) => `/courses/${id}` }));
 import CoursesPage from './CoursesPage';

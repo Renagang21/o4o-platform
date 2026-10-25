@@ -1,3 +1,4 @@
+import { adminServiceOperatorInvitations, serviceOperatorInvitationAcceptance } from '../routes/admin/service-operator-invitations.routes.js';
 import { createHomePresentationRoutes } from '../routes/home-presentation/home-presentation.routes.js';
 /**
  * Route registration extracted from main.ts
@@ -67,8 +68,6 @@ import storeOwnerTerminationRoutes from '../routes/admin/store-owner-termination
 
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
-import { createStoreNetworkRoutes } from '../routes/platform/store-network.routes.js';
-import { createPhysicalStoreRoutes } from '../routes/platform/physical-store.routes.js';
 import { createSlugRoutes } from '../routes/platform/slug.routes.js';
 import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.js';
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
@@ -183,6 +182,8 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/users', adminUsersRoutes);
   // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
+  app.use('/api/v1/admin/service-operator-invitations', adminServiceOperatorInvitations);
+  app.use('/api/v1/service-operator-invitations', serviceOperatorInvitationAcceptance);
   app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
   app.use('/api/v1/service-operator-management', createServiceOperatorManagementRoutes(AppDataSource, requireAuth));
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
@@ -340,6 +341,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     const { createOperatorInboxRoutes } = await import('../modules/contact-inquiry/operator-inbox.routes.js');
     app.use('/api/v1/operator-inbox', createOperatorInboxRoutes(dataSource));
+    const { createCooperationWorkflowRoutes } = await import('../modules/cooperation-workflows/routes.js');
+    app.use('/api/v1/cooperation-workflows', createCooperationWorkflowRoutes(dataSource));
 
     // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
@@ -360,13 +363,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/platform-services', createPlatformServicesRoutes(dataSource));
     logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
 
-    // 8.8. Register Store Network Dashboard routes (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
-    app.use('/api/v1/admin/store-network', createStoreNetworkRoutes(dataSource));
-    logger.info('✅ Store Network Dashboard routes registered at /api/v1/admin/store-network');
-
-    // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
-    app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(dataSource));
-    logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
+    // Retired K-Cosmetics store-network/physical-stores APIs have no active UI consumers.
 
     app.use('/api/v1/admin/store-owner-terminations', storeOwnerTerminationRoutes);
     logger.info('✅ Store Owner Termination routes registered at /api/v1/admin/store-owner-terminations');
@@ -635,6 +632,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (maintenanceError) {
       logger.error('Failed to register Product DB Maintenance route:', maintenanceError);
     }
+
+    // 기준/선택 작업은 독립 settings namespace에 저장. 상품 원본 적용 경로 없음.
+    const { createProductCorrectionController } = await import('../modules/neture/controllers/product-correction.controller.js');
+    app.use('/api/v1/admin/o4o-product-db/correction', createProductCorrectionController(dataSource));
 
     // 24-e2h. Register Product Master Audit Log (read-only) — master 작업 이력 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1)

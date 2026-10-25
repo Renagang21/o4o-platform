@@ -1,5 +1,6 @@
 import type { StoreDashboardConfig, StoreMenuSectionItem } from '@o4o/store-ui-core';
 import { Link, useLocation } from 'react-router-dom';
+import { ConsultationLauncher } from './consultation/ConsultationLauncher';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { StoreOperationsNavigation } from '../../components/store/StoreOperationsNavigation';
 import { currentStoreOperation, workspaceGroups } from '../../config/storeWorkspace';
@@ -45,8 +46,9 @@ export default function StoreOperationsPage({ config }: { config: StoreDashboard
     {selected ? <section key={selected.key} aria-labelledby="operation-heading" className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
       <h2 id="operation-heading" className="text-lg font-semibold text-slate-900">{selected.title}</h2>
       <p className="mt-1 text-sm text-slate-600">{selected.description}</p>
+      {selected.key === 'consultation' && <div className="mt-5"><ConsultationLauncher /></div>}
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        {selected.primary.map(item => <Link key={item.key} to={`${config.basePath}${item.subPath}`} aria-label={actionLabels[item.key] ?? item.label}
+        {selected.primary.filter(item => selected.key !== 'consultation' || !['multilingual-consultation', 'staff-support'].includes(item.key)).map(item => <Link key={item.key} to={`${config.basePath}${item.subPath}`} aria-label={actionLabels[item.key] ?? item.label}
           className="rounded-xl border border-slate-200 p-4 hover:border-teal-600 hover:bg-teal-50 focus-visible:outline-teal-700">
           <span className="block font-semibold text-teal-800">{actionLabels[item.key] ?? item.label} →</span>
           {actionDescriptions[item.key] && <span className="mt-2 block text-sm leading-6 text-slate-600">{actionDescriptions[item.key]}</span>}

@@ -89,3 +89,12 @@ describe.each([
     expect(reject).toHaveBeenCalledTimes(1);
   });
 });
+
+it('shows applicant bio/expertise as plain review text without creating HTML elements', async () => {
+  const bio = '<img src=x onerror=alert(1)>';
+  mocks.applications.mockResolvedValue({ data: [{ ...row('검증 신청자', 'pending'), bio, expertise: '실무 분야' }] });
+  const { container } = render(<MemoryRouter><OperatorInstructorsPage /></MemoryRouter>);
+  await screen.findByText(bio);
+  expect(screen.getByText('실무 분야')).toBeTruthy();
+  expect(container.querySelector('img')).toBeNull();
+});

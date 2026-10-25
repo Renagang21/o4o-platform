@@ -31,6 +31,8 @@ export interface AiUsageDefinition {
   stop: "query" | "scope" | "none";
   scope?: string;
   note: string;
+  /** Some specialist/shared-policy consumers are observable without an independent model selector. */
+  modelSelectable?: boolean;
 }
 
 function entry(
@@ -60,6 +62,26 @@ function entry(
 }
 
 export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
+  {
+    ...entry('A32', 'community.news', '커뮤니티 뉴스 검토·추천', 'shared', '텍스트', 'query', 'connected', 'query',
+      '공통 질의 정책의 Gemini 모델·활성 설정을 사용합니다. 초안 검토이며 자동 게시하지 않습니다.', 'SERVICE_QUERY'),
+    modelSelectable: false,
+  },
+  entry('A33', 'pharmacy.guidance', '상담용 게시 상품 근거 선택', 'store', '구조화', 'scope', 'connected', 'scope',
+    '게시된 문단 ID만 선택합니다. 상품 콘텐츠와 모델·활성·한도 정책을 공유합니다.', 'PRODUCT_CONTENT'),
+  {
+    ...entry('X01', 'product.ocr', '상품 이미지 OCR', 'product', '이미지 문자 인식', 'fixed', 'connected', 'none',
+      'Google Vision 이미지 단위 예약·정산과 업로드 host의 인증 사용자를 연결합니다. 명시 OCR 가격이 필요하며 생성형 모델 선택은 제공하지 않습니다.', 'PRODUCT_CONTENT'),
+    modelSelectable: false,
+  },
+  entry('A34', 'store.overview', '내 매장 현황 설명', 'store', '구조화', 'scope', 'connected', 'scope',
+    '서버가 선택 매장 권한으로 조회한 지표만 설명합니다. 수동 요청이며 업무를 자동 실행하지 않습니다.', 'STORE_INSIGHT'),
+  entry('A35', 'supplier.overview', '공급자 현황 설명', 'neture', '구조화', 'scope', 'connected', 'scope',
+    '공급자 자신의 집계만 수동 요청으로 설명합니다. 상품 등록·게시·주문·정산을 실행하지 않습니다.', 'OPERATOR_INSIGHT'),
+  entry('A36', 'cooperative.overview', '협력 모임 운영 현황 설명', 'neture', '구조화', 'scope', 'connected', 'scope',
+    '해당 모임의 현행 운영 역할로 조회한 회원 상태 집계를 설명합니다. 다른 모임·개인정보 원문을 전달하지 않습니다.', 'OPERATOR_INSIGHT'),
+  entry('A37', 'product.correction-draft', '상품 정정 검토 초안', 'product', '구조화', 'scope', 'connected', 'scope',
+    '기존 정정 작업의 원문·기준·근거로 검토 초안만 생성합니다. 상품 콘텐츠 정책을 공유하며 공식 DB를 수정하지 않습니다.', 'PRODUCT_CONTENT'),
   entry(
     "A01",
     "service.query",
@@ -79,9 +101,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "텍스트",
     "runtime",
-    "unconnected",
+    "connected",
     "none",
-    "사용 모델을 지정하지 않으면 Gemini는 공통 모델값, OpenAI는 서버 기본값을 사용합니다.",
+    "텍스트 호출은 SERVICE_QUERY/neture 예약·정산과 인증 사용자 한도를 거칩니다. 사용 모델 지정과 제공자별 기본값을 유지합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A03",
@@ -90,9 +113,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "이미지·PDF",
     "runtime",
-    "unconnected",
+    "connected",
     "none",
-    "현재 홈 첨부 직접 해석은 Gemini 경로입니다. 다른 공급자의 텍스트 대체와 구분해야 합니다.",
+    "텍스트와 Gemini 이미지/PDF가 공통 예약·정산을 사용합니다. native 모델별 가격·입력 예산이 필요하며 첨부 원문은 원장에 저장하지 않습니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A04",
@@ -101,9 +125,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "검색 근거",
     "editing",
-    "unconnected",
+    "connected",
     "none",
-    "검색 도구 비용을 포함한 공통 집계는 연결되지 않았습니다.",
+    "검색 요청/검색 질의 단위의 명시 요율과 예산을 사용합니다. 검색 사용량이 없으면 비용을 무료로 확정하지 않고 보류합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A05",
@@ -112,9 +137,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "hospital",
     "검색 근거",
     "editing",
-    "unconnected",
+    "connected",
     "none",
-    "비로그인 공개 도구입니다. 요청 제한과 비용 관리는 별개입니다.",
+    "공개 기능의 기존 요청 제한과 익명 문맥을 유지하며 SERVICE_QUERY/neture에 귀속합니다. 명시 검색 요율이 필요합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A06",
@@ -123,9 +149,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "구조화",
     "editing",
-    "unconnected",
+    "connected",
     "none",
-    "파일 파싱 후 필요한 경우에만 AI 추론이 발생합니다.",
+    "파일 파싱 후 필요한 AI 텍스트 추론만 SERVICE_QUERY/neture와 인증 사용자에 귀속합니다. 파싱·캐시는 유료 호출을 만들지 않습니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A07",
@@ -134,9 +161,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "hospital",
     "구조화",
     "editing",
-    "unconnected",
+    "connected",
     "none",
-    "공개 파일 추론의 서비스·비용 귀속은 별도 확인이 필요합니다.",
+    "공개 Neture 기능의 텍스트 추론을 SERVICE_QUERY/neture에 귀속합니다. 사용자 신원을 추정하지 않으며 기존 공개 요청 제한을 유지합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A08",
@@ -145,9 +173,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "텍스트·강화 추론",
     "strong",
-    "unconnected",
+    "connected",
     "none",
-    "일반/강화 모델과 여러 계획 단계가 있어 작업 한 건이 여러 호출을 만들 수 있습니다.",
+    "일반·강화 텍스트/화면 계획을 호출별로 예약·정산합니다. native 입력 예산은 모델별 준비가 필요하며 실행 권한을 바꾸지 않습니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A09",
@@ -156,9 +185,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "이미지",
     "runtime",
-    "unconnected",
+    "connected",
     "none",
-    "Gemini/OpenAI 화면 판독 경로가 있습니다. 작업 분기와 서버 설정에 따라 결정됩니다.",
+    "Gemini/OpenAI 화면 입력의 명시 가격·입력 예산을 사용합니다. 이미지 bytes를 토큰으로 추정하지 않습니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A10",
@@ -167,9 +197,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "neture",
     "텍스트",
     "runtime",
-    "unconnected",
+    "connected",
     "none",
-    "계획 기능과 실행 코드를 공유하지만 업무 단계는 구분해야 합니다.",
+    "이해·완료 판정은 인증된 사용자 기준 SERVICE_QUERY 예약·정산에 연결됩니다. 계획·화면 판독의 직접 호출과 구분합니다.",
+    "SERVICE_QUERY",
   ),
   entry(
     "A11",
@@ -178,9 +209,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editor",
     "구조화·출력 종류별",
     "editing-provider",
-    "partial",
+    "connected",
     "none",
-    "허용된 출력 종류에서 Qwen을 사용할 수 있습니다. Qwen의 공통 비용 기록은 미연결입니다.",
+    "편집 요청과 Qwen·Gemini 대체를 실제 시도마다 예약·정산합니다. Qwen은 명시 토큰 요율이 필요하며 한도/가격 거부는 대체 호출하지 않습니다.",
+    "AI_PROXY",
   ),
   entry(
     "A12",
@@ -189,9 +221,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editor",
     "구조화",
     "editing",
-    "partial",
+    "connected",
     "none",
-    "토큰 기록은 있으나 공통 비용·한도 예약은 미연결입니다.",
+    "기존 URL 변환·출력 검증을 유지하며 실제 생성 시도마다 인증 사용자 한도를 확인합니다.",
+    "AI_PROXY",
   ),
   entry(
     "A13",
@@ -200,9 +233,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editor",
     "구조화·출력 종류별",
     "editing-provider",
-    "partial",
+    "connected",
     "none",
-    "편집 생성과 경로를 공유합니다. 실제 공급자와 대체 호출을 구분해야 합니다.",
+    "편집 생성과 같은 비용 경로입니다. 원문/초안 저장·업무 권한은 기존 흐름을 유지합니다.",
+    "AI_PROXY",
   ),
   entry(
     "A14",
@@ -211,9 +245,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "lecture",
     "구조화",
     "editing",
-    "partial",
+    "connected",
     "none",
-    "답안 분석과는 별도 생성 경로입니다.",
+    "강의 구조 생성의 실제 시도마다 기존 모델·재시도 간격을 유지하며 예약·정산합니다. 자동 게시하지 않습니다.",
+    "AI_PROXY",
   ),
   entry(
     "A15",
@@ -222,9 +257,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "lecture",
     "텍스트",
     "editing",
-    "partial",
+    "connected",
     "none",
-    "사용 모델을 지정하지 않으면 공통 모델값을 읽습니다. 공통 중지는 검사하지 않습니다.",
+    "강의 본문 생성의 모델·출력 상한을 유지하며 인증 사용자별 예약·정산합니다. 공통 중지 설정을 임의 적용하지 않습니다.",
+    "AI_PROXY",
   ),
   entry(
     "A16",
@@ -233,9 +269,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editor",
     "이미지",
     "editing",
-    "unconnected",
+    "connected",
     "none",
-    "직접 이미지 API 호출이며 편집 토큰 기록 경로도 거치지 않습니다.",
+    "인증된 이미지 분석을 native 예약·정산에 연결합니다. 명시 모델별 가격·입력 예산이 필요합니다.",
+    "AI_PROXY",
   ),
   entry(
     "A17",
@@ -244,9 +281,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "editor",
     "구조화",
     "request",
-    "partial",
+    "connected",
     "none",
-    "관리자 사용 모델 지정을 우선하며, 지정하지 않으면 요청의 공급자·모델 선택을 사용합니다. 실제 사용 확인은 별도입니다.",
+    "관리자 블록 생성의 기존 모델·출력·재시도를 유지하며 실제 호출별 예약을 먼저 수행합니다.",
+    "AI_PROXY",
   ),
   entry(
     "A18",
@@ -255,9 +293,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "product",
     "구조화",
     "fixed",
-    "unconnected",
+    "connected",
     "none",
-    "사용 모델 지정을 우선하며, 지정하지 않으면 기존 서버 코드의 Gemini 모델을 사용합니다.",
+    "기존 모델 선택과 PRODUCT_TAGGING 예약·정산을 유지하고, 대화형 생성·제안에 인증 사용자를 전달합니다. 실패한 태그 생성은 후속 콘텐츠 생성을 시작하지 않습니다.",
+    "PRODUCT_TAGGING",
   ),
   entry(
     "A19",
@@ -268,7 +307,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "scope",
     "connected",
     "scope",
-    "상품 콘텐츠 정책을 사용합니다. 현재 호출의 사용자 귀속 보완이 필요합니다.",
+    "상품 콘텐츠 정책을 사용하며 인증된 생성 요청·태그 후속 생성에 사용자를 전달합니다. 사용자 신원이 없는 가져오기 작업은 사용자 한도를 추정하지 않습니다.",
     "PRODUCT_CONTENT",
   ),
   entry(
@@ -405,9 +444,10 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "shared",
     "음성 합성",
     "tts",
-    "unconnected",
+    "connected",
     "none",
-    "API는 남아 있으나 전용 호출 화면의 현재 이용은 미확인입니다. 동영상 메뉴를 복구하지 않습니다.",
+    "음성 전용 native 가격·예산이 필요합니다. 사용량 없는 바이너리 응답은 예산을 보류합니다. 폐기된 동영상 메뉴를 복구하지 않습니다.",
+    "AI_PROXY",
   ),
 ];
 

@@ -30,7 +30,7 @@ local('supplier originals → business review copies (isolated PostgreSQL)', () 
       CREATE TABLE semi_franchise_contents (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), semi_franchise_id uuid,
         title text, summary text, body text, thumbnail_url text, attachments jsonb DEFAULT '[]', tags jsonb DEFAULT '[]',
         status text DEFAULT 'draft' CONSTRAINT semi_franchise_contents_status_check CHECK (status IN ('draft','published','archived')),
-        created_by uuid, updated_by uuid, published_at timestamptz, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now());
+        created_by uuid, updated_by uuid, published_at timestamptz, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now(), revision integer DEFAULT 1,category text DEFAULT '',education_url text);
     `);
     const runner = fixture.ds.createQueryRunner();
     await new AddSupplierBusinessContentRequests1792215000000().up(runner);

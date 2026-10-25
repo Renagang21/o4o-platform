@@ -6,6 +6,7 @@ WORKDIR /app
 RUN npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
+COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
@@ -16,7 +17,6 @@ COPY packages/block-renderer/package.json ./packages/block-renderer/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/account-ui/package.json ./packages/account-ui/
-COPY packages/lms-client/package.json ./packages/lms-client/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
 COPY packages/screen-content-core/package.json ./packages/screen-content-core/
@@ -29,6 +29,7 @@ COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set
 COPY services/web-store/package.json ./services/web-store/
 RUN pnpm install --filter store-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
 COPY packages/types/ ./packages/types/
+COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
@@ -39,7 +40,6 @@ COPY packages/block-renderer/ ./packages/block-renderer/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/account-ui/ ./packages/account-ui/
-COPY packages/lms-client/ ./packages/lms-client/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
 COPY packages/screen-content-core/ ./packages/screen-content-core/
@@ -57,7 +57,6 @@ RUN pnpm --fail-if-no-match --filter @o4o/ui build
 RUN pnpm --fail-if-no-match --filter @o4o/content-editor build
 RUN pnpm --fail-if-no-match --filter @o4o/block-renderer build
 RUN pnpm --fail-if-no-match --filter @o4o/account-ui build
-RUN pnpm --fail-if-no-match --filter @o4o/lms-client build
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_SERVICE_URL=https://store.neture.co.kr

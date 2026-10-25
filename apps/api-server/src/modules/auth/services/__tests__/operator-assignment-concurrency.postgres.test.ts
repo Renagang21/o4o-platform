@@ -4,6 +4,7 @@ import { DataSource, Entity, PrimaryColumn } from "typeorm";
 jest.mock("../../../../database/connection.js", () => ({
   AppDataSource: { getRepository: jest.fn(), transaction: jest.fn() },
 }));
+import { ServiceOperatorInvitationService } from "../../../../services/admin/service-operator-invitation.service.js";
 import { getCachedRoles, setCachedRoles } from "../../utils/role-cache.js";
 import { AppDataSource } from "../../../../database/connection.js";
 import { RoleAssignment } from "../../entities/RoleAssignment.js";
@@ -61,7 +62,11 @@ suite(
     valid_from timestamp DEFAULT now(),valid_until timestamp,assigned_at timestamp DEFAULT now(),assigned_by uuid,
     scope_type varchar(50) DEFAULT 'global',scope_id uuid,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now());
     CREATE UNIQUE INDEX one_active_operator ON role_assignments(user_id,role) WHERE is_active;
-    CREATE TABLE action_logs(service_key text,user_id uuid,action_key text,source text,status text,meta jsonb);`);
+    CREATE TABLE action_logs(service_key text,user_id uuid,action_key text,source text,status text,meta jsonb);
+    CREATE TABLE service_operator_invitations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),invited_email text,service_key text,role text,
+      target_user_id uuid,purpose text,status text DEFAULT 'pending',expires_at timestamptz,accepted_user_id uuid,invited_by_user_id uuid,
+      created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now(),accepted_at timestamptz,token_hash text,scope_type text,scope_key text);
+    CREATE UNIQUE INDEX pending_invite ON service_operator_invitations(lower(invited_email),service_key,role,scope_type,scope_key) WHERE status='pending';`);
       (AppDataSource.getRepository as jest.Mock).mockImplementation(() =>
         db.getRepository(RoleAssignment),
       );
@@ -73,7 +78,7 @@ suite(
     });
     beforeEach(async () => {
       await db.query(
-        "TRUNCATE users,service_memberships,linked_accounts,demo_accounts,role_assignments,action_logs",
+        "TRUNCATE service_operator_invitations,users,service_memberships,linked_accounts,demo_accounts,role_assignments,action_logs",
       );
       await db.query(
         `INSERT INTO users(id,name,email,status) VALUES($1,'Service Admin','service@example.invalid','active'),($2,'Central Admin','central@example.invalid','active'),($3,'Target','target@example.invalid','active')`,
@@ -110,109 +115,62 @@ suite(
       }
       throw Error("second writer did not wait for the canonical operator lock");
     }
-    it("central first: service assignment waits, preserves assigner/validity, and creates no false audit", async () => {
-      const held = deferred(),
-        release = deferred();
-      const centralWrite = db.transaction(async (m) => {
-        await writer.assignRole(
-          { userId: target.toUpperCase(), role, assignedBy: central, validUntil: until },
-          m,
-        );
-        held.resolve();
-        await release.promise;
+    const input = { actorId: admin, targetUserId: target, serviceKey: "funding", role,
+      scopeType: "service" as const, scopeKey: "funding" };
+    it("central grant first: invitation creation waits and cannot overwrite its assigner or validity", async () => {
+      const held = deferred(), release = deferred();
+      const centralWrite = db.transaction(async m => {
+        await writer.assignRole({userId: target.toUpperCase(), role, assignedBy: central, validUntil: until}, m);
+        held.resolve(); await release.promise;
       });
       await held.promise;
-      const local = service.change(admin, "funding", target.toUpperCase(), true);
-      try {
-        await waitForBlockedOperator();
-      } finally {
-        release.resolve();
-      }
+      const invitations = new ServiceOperatorInvitationService(db, async()=>true);
+      const local = invitations.create(input).then(()=>null, e=>e);
+      try { await waitForBlockedOperator(); } finally { release.resolve(); }
       await centralWrite;
-      expect((await local).changed).toBe(false);
-      const [row] = await db.query(
-        "SELECT assigned_by,valid_until FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active",
-        [target, role],
-      );
-      expect(row.assigned_by).toBe(central);
-      expect(new Date(row.valid_until).getTime()).toBe(until.getTime());
+      expect(await local).toMatchObject({code: "OPERATOR_ALREADY_ACTIVE"});
+      const [row] = await db.query("SELECT assigned_by,valid_until FROM role_assignments WHERE user_id=$1 AND role=$2",[target,role]);
+      expect(row.assigned_by).toBe(central); expect(new Date(row.valid_until).getTime()).toBe(until.getTime());
       expect(await db.query("SELECT * FROM action_logs")).toHaveLength(0);
     });
-    it("service first: central standalone writer waits for its transaction and both operations finish without duplicate rows", async () => {
-      const held = deferred(),
-        release = deferred();
-      const scoped = new ServiceOperatorManagementService({
-        transaction: (fn: any) =>
-          db.transaction(async (m) => {
-            const result = await fn(m);
-            held.resolve();
-            await release.promise;
-            return result;
-          }),
-      } as any);
-      const local = scoped.change(admin, "funding", target, true);
-      await held.promise;
-      const centralWrite = writer.assignRole({
-        userId: target.toUpperCase(),
-        role,
-        assignedBy: central,
-        validUntil: until,
+    it("invitation preparation first: canonical writer waits, and pending consent never grants a role", async () => {
+      const held = deferred(), release = deferred();
+      const invitations = new ServiceOperatorInvitationService(db, async()=>true);
+      const local = db.transaction(async m => {
+        await invitations.prepare(m,input); held.resolve(); await release.promise;
       });
-      try {
-        await waitForBlockedOperator();
-      } finally {
-        release.resolve();
-      }
-      expect((await local).changed).toBe(true);
-      await centralWrite;
-      expect(
-        await db.query(
-          "SELECT * FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active",
-          [target, role],
-        ),
-      ).toHaveLength(1);
-      expect(await db.query("SELECT * FROM action_logs")).toHaveLength(1);
+      await held.promise;
+      expect(await db.query("SELECT * FROM role_assignments WHERE user_id=$1",[target])).toHaveLength(0);
+      const centralWrite = writer.assignRole({userId:target.toUpperCase(),role,assignedBy:central,validUntil:until});
+      try { await waitForBlockedOperator(); } finally { release.resolve(); }
+      await local; await centralWrite;
+      expect(await db.query("SELECT * FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active",[target,role])).toHaveLength(1);
+      expect(await db.query("SELECT * FROM action_logs")).toHaveLength(0);
     });
-    it("standalone canonical revoke and later grant retain the canonical round trip", async () => {
-      await writer.assignRole({ userId: target.toUpperCase(), role, assignedBy: central });
-      await writer.removeRole(target, role);
-      expect(
-        await db.query(
-          "SELECT * FROM role_assignments WHERE user_id=$1 AND is_active",
-          [target],
-        ),
-      ).toHaveLength(0);
-      await service.change(admin, "funding", target, true);
-      expect(
-        await db.query(
-          "SELECT * FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active",
-          [target, role],
-        ),
-      ).toHaveLength(1);
+    it("acceptance clears an auth cache filled before its transaction commits", async () => {
+      let token = "";
+      const invitations = new ServiceOperatorInvitationService(db, async(_to,url)=>{token=new URL(url).hash.slice(7);return true;});
+      await invitations.create(input);
+      let observed: string[] = [], calls=0;
+      const acceptance = new ServiceOperatorInvitationService({query:db.query.bind(db),transaction: (fn:any)=>db.transaction(async m=>{
+        const result=await fn(m);calls++;
+        if(calls===2){const rows=await db.query("SELECT role FROM role_assignments WHERE user_id=$1 AND is_active",[target]);observed=rows.map((r:any)=>r.role);setCachedRoles(target,observed);}
+        return result;
+      })} as any,async()=>true);
+      await acceptance.accept(token,target.toUpperCase().toLowerCase());
+      expect(observed).toEqual([]);expect(getCachedRoles(target)).toBeNull();
+      expect(await db.query("SELECT * FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active",[target,role])).toHaveLength(1);
     });
-
-    it.each([true, false])(
-      "outer %s mutation clears a pre-commit auth/me cache snapshot after commit",
-      async (assign) => {
-        if (!assign) await service.change(admin, "funding", target, true);
-        let observed: string[] = [];
-        const scoped = new ServiceOperatorManagementService({
-          transaction: (fn: any) =>
-            db.transaction(async (m) => {
-              const result = await fn(m);
-              const rows = await db.query(
-                "SELECT role FROM role_assignments WHERE user_id=$1 AND is_active",
-                [target],
-              );
-              observed = rows.map((r: any) => r.role);
-              setCachedRoles(target, observed);
-              return result;
-            }),
-        } as any);
-        await scoped.change(admin, "funding", target.toUpperCase(), assign);
-        expect(observed).toEqual(assign ? [] : [role]);
-        expect(getCachedRoles(target)).toBeNull();
-      },
-    );
+    it("immediate revocation clears a pre-commit auth cache and retains a minimal revocation event", async () => {
+      await writer.assignRole({userId:target,role,assignedBy:central});
+      let observed:string[]=[];
+      const scoped=new ServiceOperatorManagementService({transaction:(fn:any)=>db.transaction(async m=>{
+        const result=await fn(m);const rows=await db.query("SELECT role FROM role_assignments WHERE user_id=$1 AND is_active",[target]);
+        observed=rows.map((r:any)=>r.role);setCachedRoles(target,observed);return result;
+      })} as any);
+      await scoped.change(admin,"funding",target.toUpperCase(),false);
+      expect(observed).toEqual([role]);expect(getCachedRoles(target)).toBeNull();
+      expect(await db.query("SELECT status,invited_email,token_hash FROM service_operator_invitations")).toEqual([{status:"revoked",invited_email:null,token_hash:null}]);
+    });
   },
 );

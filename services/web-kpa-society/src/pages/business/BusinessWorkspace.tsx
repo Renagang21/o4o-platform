@@ -1,9 +1,10 @@
 import { BUSINESS_SITE } from '../../config/businessSite';
-import { PublicServiceEntry } from '@o4o/shared-space-ui';
+import { CooperationMemberNavigation, PublicServiceEntry } from '@o4o/shared-space-ui';
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { businessApi, businessBase, businessPath, communityApiBase, pharmacyApiBase, businessError, type Business, type ParticipantAccess } from './api';
+import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 
 export interface BusinessContext { business: Business; access: ParticipantAccess | null }
 export const useBusiness = () => useOutletContext<BusinessContext>();
@@ -16,6 +17,10 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const [state, setState] = useState<(BusinessContext & { loadedFor: string }) | null>(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
+  const memberStore = useBusinessMaterialStore(
+    memberLayout && state?.loadedFor === `${user?.id}:${businessKey}` && !!state.access?.allowed && !state.access.canManage,
+    businessKey,
+  );
   useEffect(() => {
     let alive = true;
     setState(null); setError('');
@@ -46,7 +51,19 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
       <NavLink to={`${businessPath(businessKey, 'forum')}/manage`}>게시판 운영</NavLink>
       {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}
     </nav> : null;
-  if (memberLayout) return <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{operatorNavigation}<Outlet context={state} /></div>;
+  const homePath = businessKey === BUSINESS_SITE.key ? '/' : base;
+  let supportHref = '/contact';
+  if (state.access?.canManage) supportHref = `/operator/inbox/business/${encodeURIComponent(businessKey)}`;
+  else if (state.access?.allowed && memberStore.organizationId) supportHref = `${homePath}?store=${encodeURIComponent(memberStore.organizationId)}#cooperation-support`;
+  const memberNavigation = <CooperationMemberNavigation items={[
+    { key: 'home', label: '홈', to: homePath + storeSearch, end: true },
+    { key: 'news', label: '소식', to: homePath + storeSearch + '#business-news', end: true },
+    { key: 'materials', label: '자료', to: businessPath(businessKey, 'materials') + storeSearch },
+    { key: 'participation', label: '참여 안내', to: businessPath(businessKey, 'participation') + storeSearch },
+    { key: 'community', label: '회원 교류', to: businessPath(businessKey, 'forum') + storeSearch },
+    { key: 'support', label: '지원', to: supportHref },
+  ]} />;
+  if (memberLayout) return <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{memberNavigation}{operatorNavigation}<Outlet context={state} /></div>;
   return <div className="mx-auto max-w-6xl px-4 py-6">
     <h1 className="text-2xl font-semibold">{state.business.name}</h1>
     <p className="mt-2 text-sm text-slate-600" role="status">{state.access?.canManage ? '담당 운영자' : state.access?.allowed ? '참여 승인 · 이용 가능' : '참여 신청·승인 상태는 참여 신청에서 확인할 수 있습니다.'}</p>

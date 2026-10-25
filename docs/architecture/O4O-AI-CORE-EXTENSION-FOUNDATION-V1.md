@@ -1,12 +1,14 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-21 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-25 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
+> 전체 업무 재정비 준비: [단일 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [업무·코드 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
 > 조사 기준: `3c95dc170103f739a3e3a33b20f85350ae0ecef5`. 코드 존재는 현행 사업 기능이라는 증거가 아니다.
 
 **현재 범위:** 기존 Core/업무 Extension·가격/quota·Runtime/editor 정비는 main에 통합됐으며 승인된 quota migration·7개 서비스 배포가 완료됐다.
-현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. 관리자 조회 배포와 모델 관리 후속 개발 상태는 §12/§12-1에서 구분한다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
+현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. 관리자 조회 단계·모델 관리·사용처별 선택과 삭제 보호의 반영 상태는 §12/§12-1/§12-2에서 구분한다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
+업무 재정비의 추가 연결과 2026-10-25 main·운영 반영 증거는 §14-1에서 구분한다.
 공통 기반 적용은 모든 전문 route의 비용 이관·모든 화면 AI UI·실계정 업무 검증 완료를 뜻하지 않는다.
 
 ## 1. 최초 조사 당시 구조·문제 (2026-10-13)
@@ -219,14 +221,114 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 - 사용량은 기존 `ai_usage_logs`의 공급자/모델/scope 기록을 한 번만 집계한다. 서비스·기능별 전체 통계, 실제 유료 시도 수, 공급자 청구로 표시하지 않는다. 비용 누락·토큰 누락(기존 0/0 기록 포함)·기능 미분류·조회 실패를 구분하고 금액을 현재 단가로 다시 계산하지 않는다.
 - 관리자 UI는 사용처·현재 설정 / API·모델 연결 / 사용량·비용을 제공한다. 기존 공통 질의 설정 경로와 수정 기능은 유지하면서 그 활성화가 전체 AI 중지를 뜻하지 않음을 표시한다.
 
-기능별 모델 쓰기·버전·중지 admission, 번역 override 분리, 모든 직접 transport/멀티모달의 비용 이관과 실제 적용 증거는 **후속 TODO**다. 이 조회 기반 구현이 §11의 남은 실행/운영 검증을 완료하지 않는다. DB schema·migration·한도·키·부담 주체·운영 설정은 바꾸지 않았다.
+첫 조회 단계에서 후속으로 남긴 모델 쓰기·revision CAS는 §12-1, 사용처별 모델 우선 적용과 번역 모델 선택 분리는 §12-2에서 반영했다. 통합 중지 admission, 번역별 독립 활성·한도 정책, 모든 직접 transport/멀티모달의 비용 이관과 전체 운영 적용 증거는 **후속 TODO**다. 조회·모델 선택 구현만으로 §11의 남은 실행/운영 검증을 완료한 것으로 보지 않는다. 이 조회 단계는 DB schema·migration·한도·키·부담 주체·운영 설정을 바꾸지 않았다.
 
-### 12-1. 모델 관리·사용처 선택 후속 개발 (2026-10-21, main 통합 전)
+### 12-1. 모델 관리·사용처 선택 — main·운영 반영 (2026-10-21)
 
-[모델 관리 TODO](../work-orders/TODO-O4O-AI-MODEL-MANAGEMENT-V1.md)의 후속 개발로 기존 관리자 `/settings`에 공급자별 모델 신규/수정/삭제와 사용처별 모델 선택을 추가했다. §12의 배포 증거는 첫 조회 단계의 기록이다. 이번 branch의 구현을 main·운영 반영 완료로 해석하지 않는다. [검증 CHECK](../checks/CHECK-O4O-AI-MODEL-MANAGEMENT-V1.md)에 적용 경로·회귀·기존 rollback 테스트 실패와 실계정 미검증 범위를 구분했다.
+[모델 관리 TODO](../work-orders/TODO-O4O-AI-MODEL-MANAGEMENT-V1.md)의 후속 개발로 기존 관리자 `/settings`에 공급자별 모델 신규/수정/삭제와 사용처별 모델 선택을 추가했다. [PR #754](https://github.com/Renagang21/o4o-platform/pull/754)로 main에 병합했으며 `1adf577e38a7e580f1bbc0499a871c943cecc289`의 API·관리자 100% serving을 확인했다. §12의 증거는 첫 조회 단계의 기록이다. [검증 CHECK](../checks/CHECK-O4O-AI-MODEL-MANAGEMENT-V1.md)에 현재 revision·CI·회귀·quota rollback 테스트 해소와 실계정 미검증 범위를 구분했다. 이 배포 기록이 이후의 live 상태를 대신하지 않는다.
 
-기존 `settings`의 `ai:model-controls:v1`에 모델·삭제 표식·사용처 지정과 revision을 함께 저장한다. 기존 인증 뒤의 관리 API가 CAS로 저장하며 GET은 초기화하지 않는다. 사용 중/기본 모델은 삭제나 ID·지원 기능 변경을 막고 표시 이름 수정은 허용한다. 저장/조회 실패를 성공으로 표시하지 않으며 credential·base URL·prompt·응답은 새 설정에 저장/노출하지 않는다.
+기존 `settings`의 `ai:model-controls:v1`에 모델·삭제 표식·사용처 지정과 revision을 함께 저장한다. 기존 인증 뒤의 관리 API가 CAS로 저장하며 GET은 초기화하지 않는다. 모델 참조 확인·변경과 기존 공통 질의 정책 저장/엔진 활성화는 같은 transaction 잠금으로 직렬화하고 삭제된 모델 참조를 재검사한다. 사용 중/기본 모델은 삭제나 ID·지원 기능 변경을 막고 표시 이름 수정은 허용한다. 저장/조회 실패를 성공으로 표시하지 않으며 credential·base URL·prompt·응답은 새 설정에 저장/노출하지 않는다.
 
-선택값은 다음 새 호출에서 기존 adapter·인가·가격/quota·retry/fallback 앞에 적용한다. 기존 요청·결과 캐시·이력은 수정하지 않는다. 31개 논리적 사용처 중 이전 공급자 HUB 한 곳은 현행 이용 미확인으로 제외하고 30개에 연결했다. 매장 번역/약국 상담 번역은 기존 공유 scope 유지, 음성 합성은 기존 provider·voice·format에 맞는 모델만 지정한다. 공급자 등록은 지원·인증·가격의 실시간 검증이 아니다. Qwen·DeepSeek 목록 CRUD가 새 실행 adapter 지원을 뜻하지 않는다.
+선택값은 다음 새 호출에서 기존 adapter·인가·가격/quota·retry/fallback 앞에 적용한다. 기존 요청·결과 캐시·이력은 수정하지 않는다. 당시 카탈로그의 31개 논리적 사용처 중 이전 공급자 HUB 한 곳은 현행 이용 미확인으로 제외하고 30개에 연결했다. 이 수치는 이후 추가된 뉴스 등 모든 AI 호출의 완전한 목록이 아니다. 매장 번역/약국 상담 번역은 기존 공유 과금 scope를 유지하며 모델 선택 분리는 §12-2를 따른다. 음성 합성은 기존 provider·voice·format에 맞는 모델만 지정한다. 공급자 등록은 지원·인증·가격의 실시간 검증이 아니다. Qwen·DeepSeek 목록 CRUD가 새 실행 adapter 지원을 뜻하지 않는다.
 
-통합 중지 admission, 번역별 독립 정책, 직접 transport/멀티모달의 전체 비용 이관과 운영 인증·유료 호출 검증은 여전히 후속 범위다. 기존 Core/Frozen·schema/migration·부담 주체를 바꾸지 않았다.
+통합 중지 admission, 번역별 독립 활성·한도 정책, 직접 transport/멀티모달의 전체 비용 이관과 운영 인증·유료 호출 검증은 여전히 후속 범위다. 번역 모델 선택의 독립 지정과 이 후속 정책을 혼동하지 않는다. 기존 Core/Frozen·schema/migration·부담 주체를 바꾸지 않았다.
+
+관리자 블록의 기존 OpenAI 요청은 Core의 세대별 파라미터 판정을 재사용하며 공급자 전환 시 토큰 예산은 선택 공급자의 기존 상한 이하로 낮춘다. DB 키만 있는 인사이트와 로그인 병원 조사 target, 등록 모델의 text 능력 우선 검증도 연결했다. 실제 Google 로그인·운영 설정 변경·유료 모델/가격 성공은 공개 응답과 합성 회귀만으로 완료했다고 표시하지 않는다. 추가 전문 OCR 등 조사 대상은 [조사/설계 통합 PR #721](https://github.com/Renagang21/o4o-platform/pull/721)과 구현 기록을 구분하며 현재 모델 선택 연결에 포함했다고 추정하지 않는다.
+
+
+### 12-2. 사용처별 모델 우선 적용·삭제 정비 — main·운영 반영 (2026-10-24)
+
+[삭제 정비 TODO](../work-orders/TODO-O4O-AI-MODEL-DELETE-USABILITY-V1.md)는 사용자 결정에 따라 사용처별 관리자 모델 지정을 우선한다. 기존 코드/요청/캐시된 정책에 다른 모델이 있어도 지정된 사용처의 다음 새 호출은 관리자 모델을 사용한다. 새 전체 공통 모델 설정은 도입하지 않는다. 진행 중 호출·기존 결과·한도/회계 계약은 유지한다.
+
+§12-1의 번역 공유는 기존 저장/과금 정책의 이력이다. 매장 콘텐츠와 약국 상담의 모델 지정만 분리하며 기존 공유 지정은 양쪽에 보존한다. 관리자 지정이 있는 상품/번역 호출은 이전 scope fallback으로 돌아가지 않는다. 기존 정책 row·과거 이력을 자동으로 다시 쓰지 않는다.
+
+모델 삭제 보호는 실제로 남아 있는 기본/선택/정책 소비처를 표시하고 다른 모델로 변경한 뒤 해제한다. 공통 기본 실행 경로·서버 환경·미연결 정책 참조는 유지한다. 삭제한 모델로 돌아가는 지정 해제도 거부한다. 실제 검증·Git 상태·미확인 범위는 TODO와 아래 실행 근거를 따른다.
+
+공통 질의 정책을 직접 사용하는 커뮤니티 수동·예약 뉴스 생성은 개별 사용처 모델 지정에 연결되지 않았다. 따라서 관리 가능한 사용처를 모두 다른 모델로 지정해도 공통 질의 정책의 모델 참조는 유지한다. 기존 공통 정책에서 모델을 명시적으로 바꾼 뒤에만 이전 참조를 해제한다. 모델 삭제가 정책을 자동 수정하거나 뉴스의 provider·과금·권한 계약을 바꾸지 않는다(2026-10-24 PR #792 통합 리뷰 보완).
+
+[PR #792](https://github.com/Renagang21/o4o-platform/pull/792)는 main `c99123518fe74099b9f471f06cdd90bf7c5709de`에 병합됐다. 이후 문서만 추가한 `abb602b9569217abf2e20de155e2f60210da5d50`을 대상으로 [Delivery 40074053472](https://github.com/Renagang21/o4o-platform/actions/runs/40074053472)가 API·관리자 verified rollout과 최종 serving SHA 검증을 성공했고 `production=success / DEPLOYED`로 확정했다. 이 시점의 배포 증거를 이후 live 상태나 실제 운영 모델 저장·유료 공급자 시험 호출의 증거로 확대하지 않는다. 새로운 schema·migration 파일이나 dependency 변경은 없고, 기존 표준 배포의 migration Job은 성공했다.
+
+## 13. 전체 AI 업무 Core + Extension 재정비 준비 (2026-10-24)
+
+[정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)와 [업무 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)는 main `7f3d783cc2`에서 시작해 최종 점검 중 `355d77e861`까지 재대조한 구현 전 준비다. 사용자 업무 1~11 및 추가 업무를 코드·문서에 연결했다. 이번 변경은 문서만이며 새로운 runtime 계약·권한·모델/가격 정책·메뉴·운영 설정을 적용하지 않는다. §11/§12의 완료/운영 기록은 당시 증거로 유지한다.
+
+기존 `AiBusinessExtension`·`runAiExtension`·host authorize/record·모델 관리·회계/quota·편집기·외부 AI adapter를 재사용한다. 상품 지식/등록, 콘텐츠 제작/재사용, 현황/운영, 자료 기반 지원, 교육/커뮤니티, 개인 자동화는 정비할 업무 묶음이며 새 기반/패키지 개수를 뜻하지 않는다.
+
+- Core는 공통 실행·문맥·권한 callback·이력과 runtime 계약을 유지하고, 업무 Extension은 자료·출력·업무 규칙을 담당한다. 서버가 기존 도메인 권한으로 자료를 구성하고 저장·게시·주문 확인은 기존 업무 API가 수행한다.
+- 첫 후속 적용은 기존 현황 설명 Extension에 매장/공급자의 허용 지표를 연결하는 것으로 계획한다. 매장 도우미의 화면 문맥·입력과 실제 지표 조회를 구분하며 관리자 Copilot API의 guard를 일반 사용자에게 낮추지 않는다.
+- 자료 버전·출처·집계 시각은 우선 업무 입력/host에서 검증한다. Core 필드·상태 변경 도구·공통 저장소를 선제적으로 추가하지 않는다. 현재 실행기는 read/draft이며 새 실행 도구는 별도 수용 기준이 필요하다.
+- 사용처별 모델 지정과 비용/한도·중지 연결은 별도 검증한다. 최근 뉴스·상담·전문 호출과 사용처 목록의 대응, 약국 사업/분회/협력 모임의 업무 문맥 정합은 TODO에 남겼다. 전체 호출의 이관 완료로 해석하지 않는다.
+- 상품 DB는 기존 [상품 정정 작업공간](../guides/products/O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md)을 재사용하고 AI 보완 초안과 공식 반영을 분리한다. [전문 정보 원칙](../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)의 목적별 구성·상품 사실/전문 참고정보·근거 구분을 유지한다. 전문 주제를 일괄 제외하거나 기존 QR 자료를 공식 DB로 자동 채택하지 않는다.
+
+후속 순서는 공통 정합/첫 적용 → 상품·콘텐츠 → 운영·협력 모임 → 상담·교육·자동화 정합이다. 각 단계는 전체 소비처·권한·원본/초안 소유·비용·오류 회귀를 확인한 뒤 전환한다. 실제 구현·main 통합·실계정 및 운영 검증은 후속 실행 결과로만 완료 표시한다.
+
+## 14. 업무 공통 연결과 첫 적용 — 개발 branch (2026-10-24)
+
+사용자 후속 지시로 같은 [TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 S1~S4를 연속 작업했다. 아래는 `wo/ai-work-extension-preparation`의 구현 상태다. §11/§12의 main·운영 완료 기록과 구분하며 이번 변경은 push까지만 인계한다. 검증·잔여 범위는 [CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)를 따른다.
+
+공통 실행은 기존 `AiBusinessExtension`/`runAiExtension`을 유지한다. 서버의 [policy runtime](../../apps/api-server/src/services/ai-extensions/policy-runtime.ts)은 기존 `AiPolicyExecutorService`에, [accounted runtime](../../apps/api-server/src/services/ai-extensions/accounted-runtime.ts)은 기존 모델 선택과 `executeAccountedAi`에 연결하는 조립 함수다. 공급자 adapter·quota·원장·Task·Memory를 새로 만들지 않는다. 번역 2종·상담 게시 문단 선택·LMS·운영자 설명·Copilot·뉴스가 같은 조립 경로를 재사용한다. 각 host의 허용 자료·기존 시간 제한/재시도·대체 응답·저장은 유지한다.
+
+| 실제 업무 | 자료·권한·결과 | 정책·모델 |
+|---|---|---|
+| 매장 홈 현황 설명 | 기존 매장 guard와 현재 owner/허용 직원 관계로 선택 매장 집계만 조회. `null`과 확인된 0건을 구분. 응답 전 권한 재확인 | STORE_INSIGHT, `store.overview` 모델 지정. 서버 host의 기존 serviceKey를 canonical 서비스로 확인해 비용 귀속 |
+| 공급자 홈 현황 설명 | ACTIVE인 자기 공급자 식별을 재확인하고 기존 KPI의 수치만 조회. 사용자가 요청할 때만 실행 | OPERATOR_INSIGHT, `supplier.overview` 모델 지정 |
+| 약국 경영 협력 모임 현황 설명 | 해당 모임의 현행 admin/operator 역할로 회원 상태 집계만 조회. 개인 원문과 다른 모임 자료 제외 | OPERATOR_INSIGHT, `cooperative.overview` 모델 지정 |
+| 상품 정정 검토 초안 | 기존 super_admin·작업 묶음 revision·task·원문 fingerprint 검증. 별도 제안 미리보기 → 사용자 선택으로 편집 폼에 삽입 → 기존 저장. 공식 상품 자동 변경 없음 | 기존 PRODUCT_CONTENT 모델·한도 공유. `product.correction-draft`는 같은 정책의 사용처 alias |
+
+세 현황 host는 기존 `operator-insight` Extension과 공통 화면 패널을 사용한다. 자료 조회 전·Core 실행 직전·응답 전달 전 권한을 검사한다. UI는 자동 요청/재시도하지 않고 범위 변경 시 늦은 응답을 폐기한다. AI 설명·제안은 기존 처리 API의 실행 성공 증거가 아니다. 공급자 자체 집계의 내부 AI 요약은 [콘텐츠 운영 원칙 §3](../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md#3-표준-반복-standard-loop)·[Supplier 경계](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md)에 사용자 승인을 반영했다. 공급자 창작·외부 계정 책임과 자동 업무 처리 경계는 유지한다.
+
+상품 태그 호출에는 PRODUCT_TAGGING 예약·정산을, Assistant의 이해/완료 검증 호출에는 인증된 사용자 기준 SERVICE_QUERY 예약·정산을 연결했다. 전자는 기존 서버 작업의 actor를 추정하지 않아 전역/scope 한도만 적용하며 사용자별 귀속은 후속이다. 뉴스는 공통 질의 모델·활성 설정과 기존 삭제 참조 보호를 유지한다. 관리 목록의 뉴스·상담 문단 선택·OCR 및 새 업무 연결은 실행/운영/청구 완료 표시와 다르다. OCR은 전문 Google Vision API로 표시하며 생성형 모델 선택과 공통 비용 연결은 미지원이다.
+
+이번 지원 부담 주체는 기존 platform이다. 다른 payer는 명시적으로 거부하며 store/user/external-account 청구 구현 완료를 뜻하지 않는다. Home·계획·화면 판독·멀티모달 직접 transport, Qwen 편집·TTS·전문 OCR의 전체 비용/중지 이관과 상태 변경 도구 확대는 TODO에 남긴다. schema/migration·운영 모델·가격·인증 설정은 변경하지 않았다.
+
+### 14-1. main 통합·운영 반영 (2026-10-25)
+
+[PR #805](https://github.com/Renagang21/o4o-platform/pull/805)는 main `8de024e92cb071790408ca403e110abb4cc29d61`에 병합됐다. PR/main CI와 CodeQL, PR SonarCloud 분석을 확인했고 자동 리뷰의 정산 상세·정책 표시 P2 2건을 같은 branch에서 수정·회귀한 뒤 병합했다. STORE_INSIGHT 상세는 실제 reservation의 service/month에 귀속하며 기존 기본 service·정산 총액/확정·결제는 유지한다. 관리 목록은 카탈로그에서 scope 정책 조회 대상을 모아 새 현황 3종의 저장 모델·활성/중지 설정을 표시한다.
+
+같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
+
+확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
+
+### 14-2. 내 매장 전문 판단 지원 — 개발·통합 이력 (2026-10-25)
+
+`pharmacy.consultation.support`는 약국 도메인의 현재 역할/기능·약사 사용 확인·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
+
+사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 개발 당시 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도였다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [개발 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md).
+
+후속 사용자 지시로 PR #813을 main `fda3f672d1`에 통합했다. 기존 verified Promote `40183174373`에서 API·Store가 DEPLOYED이며 명시 apply/기존 중지 값 보존 처리와 공개 smoke 13건이 통과했다. 실제 enabled 값·정리 count/본문 파기와 약사/현장 품질은 미관측이며, 실제 provider/업무 검증 완료로 해석하지 않는다. 운영 반영 범위와 한계는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
+
+## 15. 텍스트 회계 연결 보완 — 개발 branch (2026-10-25)
+
+[후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에서 남은 실행 경로를 재조사했다. `wo/ai-runtime-accounting-completion`은 새 Core/원장을 만들지 않고 기존 `AiAccountedExecution`을 홈·첨부 텍스트 대체, 일반/강화 텍스트 계획, 인증/공개 파일 구조 추론 host에서 소비한다. 파일 추론·첨부 helper에는 텍스트 invocation을 명시적으로 주입해 업무 해석과 서버 비용 경계를 분리한다. standalone 파일 smoke는 자기 환경 계정의 transport를 명시적으로 전달하며 서버 원장 검증을 대신하지 않는다.
+
+host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home/계획/파일은 `SERVICE_QUERY/neture`, 상품 태그는 `PRODUCT_TAGGING`, 상품 콘텐츠는 기존 `PRODUCT_CONTENT` 정책을 사용한다. 공개 파일 추론은 사용자 신원을 만들지 않는다. 상품 태그 실패 시 후속 콘텐츠 생성은 중단하지만 기존 fire-and-forget 응답·업무 저장/권한 계약은 유지한다. 대화/파일/생성 원문은 공통 비용 로그에 기록하지 않는다. 한도 초과·한도 DB/가격 장애를 provider rate limit과 구분하며 성공 후 정산 장애가 유료 재호출을 만들지 않게 한다.
+
+§15의 텍스트 단계에서는 native 이미지·PDF·화면 판독, 검색 도구 비용, Qwen·OCR·TTS 지원 완료를 주장하지 않았고 홈 첨부·작업 계획은 partial이었다. 전문 호출 후속 개발 상태는 §16을 따른다. 플랫폼 부담 외 실제 사용자/매장 청구·외부 계정 연결과 운영 가격·한도 검증도 후속이다. [검증 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에 소비처·회귀·미실행을 기록하며 main 병합/배포는 이번 개발 종료 범위에 포함하지 않는다.
+
+## 16. 전문 호출·기존 직접 호출의 회계 연결 — 개발 branch (2026-10-25)
+
+[전문 실행 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)에서 §15의 후속을 한 묶음으로 정비했다. `wo/ai-specialized-runtime-accounting`은 작업 시작 시 main `4ee5a8ecda`에서 시작하고 미병합 선행 `d11cb4afa1`을 정상 merge했다. 이미지/PDF·Gemini/OpenAI 화면 계획·이미지 분석·검색·OCR·음성·Qwen과 기존 편집/URL/강의 직접 호출을 같은 예약/정산에 연결한다. 이전 main·운영 기록은 이번 branch의 배포 증거가 아니다.
+
+서버 내부 `AiNativeInvocation`은 기존 transport의 결과와 타입 있는 사용량만 기존 `AiAccountedExecution.invokeNative`에 전달한다. provider wildcard 텍스트 요율을 전문 단가로 쓰지 않는다. 모델별 `native` profile은 기존 가격 catalog 안에서 입력/출력 예산·이미지/검색 요청/검색 질의/문자 단위를 표현한다. 사용량이 누락되면 기존 보류/reconcile을 사용하고, 성공 후 기록 장애는 유료 재호출하지 않는다. Core 실행기는 Gemini 내부 JSON retry와 중첩되지 않게 실제 시도 수를 통제하며 선택적 `usageKnown`으로 부분 누락을 구분한다. Extension의 안전한 가격 오류 코드는 보존한다.
+
+기존 AIProxy의 provider별 출력 상한·backoff를 유지하며 실제 시도마다 먼저 예약한다. Qwen provider 실패 후 canonical Gemini fallback도 같은 회계를 거치고, quota/가격 거부는 fallback하지 않는다. OCR 업로드와 카탈로그 가져오기 후 콘텐츠에는 host가 검증한 현재 actor를 전달하며 사용자 신원이 없는 내부 작업은 그대로 미지정이다. 업무 권한/자료 공개·저장·실행 확인·Task/Memory를 바꾸지 않는다.
+
+관리 조회는 native 예약/receipt와 기존 로그를 중복 없이 합치며 enum 밖 Qwen/Google Vision·미확정 audio/crash 기록을 포함한다. 원문·이미지/audio·검색어는 공통 원장에 남기지 않는다. 비용은 추정 정책이며 실제 invoice나 외부 제공업체의 강제 결제 상한이 아니다.
+
+**운영 준비:** 명시 모델 요율/profile이 없으면 native 호출은 503으로 차단한다. 운영 설정을 변경하거나 유료 시험 호출·PR/병합/배포를 실행하지 않았다. [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 로컬 검증과 [TODO §4](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)의 실제 모델/요율·단위·예산·미확정 처리 수용 조건을 확인한 뒤 통합/배포를 판단한다. 전체 AI 화면·직원/소비자 상담·외부 계정/사용자 직접 청구 완료를 뜻하지 않는다.
+
+## 17. 회계 후속 main 통합·운영 적용 (2026-10-25)
+
+사용자의 후속 main 병합·배포 지시로 §15/§16의 개발 변경을 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 반영했다. 관리 집계의 UUID 비교에서 불필요한 text cast를 제거했고 실제 PostgreSQL의 UUID·enum·JSONB로 회귀를 추가했다. 새 운영 schema/migration·권한·가격·credential·workflow 변경은 없다.
+
+§15/§16의 미병합 기록은 당시 개발 단계의 증거다. 현재 통합·배포·검증 결과는 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. 코드 배포에서도 가격 미설정 native 호출의 선차단은 유지한다. 실제 사용 활성화에는 모델별 명시 요율/profile·예산과 사용량 미반환 정산 검증이 필요하며, 유료 호출·외부 계정/매장·사용자 청구 완료로 확장하지 않는다.
+
+## 18. 가격·예산 준비 도구 — 후속 개발 (2026-10-25)
+
+[가격 준비 TODO](../work-orders/TODO-O4O-AI-PRICING-READINESS-V1.md)의 `wo/ai-pricing-readiness`는 기존 가격/native 계획기에 명시 catalog를 전달하고 기존 quota 판정을 순수 함수로 재사용하는 오프라인 CLI를 제공한다. 미확정 모델/요율·native 예산과 보류 포함 quota를 제공 표본에서 검사한다. 가격·원장·모델 선택 기반을 중복 생성하거나 provider·DB를 호출하지 않는다. user quota·현재 모델 해석·실사용/배포는 미검증으로 남긴다.
+
+같은 작업에서 비용 한도 경계의 부동소수점 오판을 원장과 같은 소수 8자리 정수 비교로 보완했다. 원자 예약·locking·scope/service/user·기간·보류/정산·업무 권한은 유지한다. source 실행·검증과 실제 요율/설정 적용은 [운영 준비 guide](../guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)·[CHECK](../checks/CHECK-O4O-AI-PRICING-READINESS-V1.md)를 따른다. 이 개발 기록은 §17 이후의 운영 배포나 실제 전문 기능 활성화 증거가 아니다.
+
+### 18-1. 가격 도구·비용 비교 main 통합 (2026-10-25)
+
+후속 사용자 지시로 §18의 개발 변경을 [PR #815](https://github.com/Renagang21/o4o-platform/pull/815)/main `fcae70f142`에 통합했다. 이전 push 단계의 기록은 보존하며 main CI·실제 서빙 SHA·배포/공개 검증 결과는 [통합 CHECK](../checks/CHECK-O4O-AI-PRICING-INTEGRATION-20261025.md)를 따른다. source CLI/예제를 운영 이미지의 실행 기능이나 실제 요율·계정·한도 준비 완료로 확대하지 않는다.

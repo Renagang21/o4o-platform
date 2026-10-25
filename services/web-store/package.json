@@ -18,10 +18,8 @@
     "@o4o/block-renderer": "workspace:*",
     "@o4o/content-editor": "workspace:*",
     "@o4o/error-handling": "workspace:*",
-    "@o4o/lms-client": "workspace:*",
     "@o4o/operator-core-ui": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
-    "@o4o/screen-content-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-products-ui": "workspace:*",
@@ -36,7 +34,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hot-toast": "^2.4.1",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "@o4o/ai-components": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

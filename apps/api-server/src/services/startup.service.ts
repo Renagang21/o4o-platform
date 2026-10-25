@@ -1,3 +1,5 @@
+import { operatorInvitationRetentionJob } from '../jobs/operator-invitation-retention.job.js';
+import { productCorrectionJob } from '../jobs/product-correction.job.js';
 import { communityNewsJob } from '../jobs/community-news.job.js';
 import { AppDataSource } from '../database/connection.js';
 // MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
@@ -5,6 +7,7 @@ import { AppDataSource } from '../database/connection.js';
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
+import { consultationStateCleanupJob } from '../jobs/consultation-state-cleanup.job.js';
 import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
@@ -216,10 +219,13 @@ export class StartupService {
       // WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1
       // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
       privacyRetentionJob.start();
+      operatorInvitationRetentionJob.start();
+      consultationStateCleanupJob.start();
       logger.info('✅ Privacy Retention Job started');
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
       // 종료일 도래 시 Store 공개표면 중단, 종료+7일 도래 시 반환 완료 건 파기 재시도.
+      productCorrectionJob.start();
       communityNewsJob.start();
       storeOwnerTerminationJob.start();
       logger.info('✅ Store Owner Termination Job started');
@@ -307,6 +313,9 @@ export class StartupService {
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();
+      operatorInvitationRetentionJob.stop();
+      productCorrectionJob.stop();
+      consultationStateCleanupJob.stop();
       communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');

@@ -75,6 +75,7 @@ export interface LectureLesson {
   isPreview?: boolean;
   isFree?: boolean;
   attachments?: LessonAttachment[];
+  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
 }
 
 export interface LectureEnrollment {
@@ -177,7 +178,9 @@ export interface CourseInput {
   requiresApproval?: boolean;
 }
 export interface LessonInput {
+  isFree?: boolean;
   attachments?: LessonAttachment[];
+  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
   title: string;
   type: LessonType;
   description?: string | null;
@@ -198,8 +201,8 @@ export const learnerApi = {
   getLesson: (lessonId: string) =>
     lmsHttp.get<LmsApiResponse<{ lesson: LectureLesson }>>(`/lms/lessons/${lessonId}`),
   /** 강사 신청 (학습자 = active membership). */
-  applyInstructor: (policyReferences?: EnrollmentPolicyReference[]) =>
-    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply', { policyReferences }),
+  applyInstructor: (policyReferences?: EnrollmentPolicyReference[], profile?: { bio?: string; expertise?: string }) =>
+    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply', { policyReferences, bio: profile?.bio, expertise: profile?.expertise }),
   /** 공개 수료증 검증 (비로그인 허용). */
   verifyCertificate: (verificationCode: string) =>
     lmsHttp.get<LmsApiResponse<any>>(`/lms/certificates/verify/${encodeURIComponent(verificationCode)}`),
@@ -298,6 +301,13 @@ export interface OperatorCourseReview {
 }
 
 export interface MissingCertificate { enrollmentId: string; userId: string; courseId: string; userName?: string; courseTitle: string }
+export interface CertificateState { isValid?: boolean; expiresAt?: string | null }
+/** 운영자 전용 수료증 처리 이력 (발급·갱신·수정·폐기). 학습자·공개 검증 응답에는 포함되지 않는다. */
+export interface CertificateOperation {
+  actorId: string | null; at: string; action: 'issue' | 'renew' | 'update' | 'revoke';
+  reason: string | null; before: CertificateState | null; after: CertificateState | null;
+  months?: number | null; changedFields?: string[] | null; trigger?: 'operator' | 'completion' | null;
+}
 export const operatorApi = {
   missingCertificates: (search = '') => lmsHttp.get<LmsApiResponse<{ items: MissingCertificate[] }>>('/lms/operator/certificates/missing', { search }),
   courses: (params?: { status?: string; search?: string; page?: number; limit?: number; contentKind?: string }) =>
@@ -321,12 +331,13 @@ export const operatorApi = {
 
   issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
     lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
-  certificateOperations: (id: string) =>
-    lmsHttp.get<LmsApiResponse<{ operations: { actorId: string; at: string; reason: string }[] }>>(`/lms/certificates/${id}/operations`),
-  revokeCertificate: (id: string, reason?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason }),
-  renewCertificate: (id: string, months?: number) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, months ? { months } : {}),
+  certificateOperations: (id: string, page = 1) =>
+    lmsHttp.get<LmsApiResponse<{ operations: CertificateOperation[]; page: number; hasMore: boolean }>>(`/lms/certificates/${id}/operations`, { page }),
+  /** operationId: 같은 요청의 재시도는 이력·변경을 한 번만 남긴다. */
+  revokeCertificate: (id: string, reason?: string, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason, ...(operationId ? { operationId } : {}) }),
+  renewCertificate: (id: string, months?: number, operationId?: string) =>
+    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, { ...(months ? { months } : {}), ...(operationId ? { operationId } : {}) }),
 };
 
 /** 백엔드 오류 메시지 추출 (axios envelope `{ success:false, error, code }`). */

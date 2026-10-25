@@ -62,4 +62,18 @@ describe('optional env', () => {
     assert.equal(setEnvFlag('A', 'x,y'), '--set-env-vars=^@@^A=x,y');
     assert.throws(() => setEnvFlag('a-b', 'x'));
   });
+
+  it('상담 정리 apply 배포에서도 운영 중지 flag를 보존하고 없던 enabled 값을 만들지 않는다', () => {
+    const names = ['CONSULTATION_STATE_CLEANUP_MODE', 'CONSULTATION_STATE_CLEANUP_ENABLED'];
+    const provided = { CONSULTATION_STATE_CLEANUP_MODE: 'apply' };
+    const plan = planOptionalEnv(names, provided, svc([
+      { name: names[0], value: 'dry-run' }, { name: names[1], value: 'false' },
+    ]));
+    assert.deepEqual(plan.map(p => setEnvFlag(p.name, p.value)), [
+      '--set-env-vars=CONSULTATION_STATE_CLEANUP_MODE=apply',
+      '--set-env-vars=CONSULTATION_STATE_CLEANUP_ENABLED=false',
+    ]);
+    assert.equal(planOptionalEnv(names, provided, svc([]))[1].action, 'omit');
+    assert.throws(() => assertCurrentKnown(null, true));
+  });
 });

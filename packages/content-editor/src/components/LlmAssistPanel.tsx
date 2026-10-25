@@ -266,7 +266,7 @@ export function LlmAssistPanel({
 
               <div style={{ fontSize: '11px', color: '#92400e', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 12px', lineHeight: 1.7 }}>
                 <b>확인해 주세요.</b> LLM 이 쓴 내용은 사실과 다를 수 있습니다. 게시 전에 담당자가 직접 확인해 주세요.
-                의약품·건강 관련 내용은 질병을 치료·예방한다고 단정하지 않습니다.
+                상품 사실과 전문 참고정보는 각각의 근거와 대조하고, 판단 지원 내용은 담당자가 검토해 주세요.
               </div>
 
               <div>

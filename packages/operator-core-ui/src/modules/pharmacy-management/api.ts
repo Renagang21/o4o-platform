@@ -161,6 +161,7 @@ export interface SemiFranchiseRecruitment {
 
 /** 세미프랜차이즈 콘텐츠 — 운영자 작성 · 게시. 게시본은 활성 가입 약국만 열람 · 매장 사본으로 복사한다. */
 export interface SemiFranchiseContent {
+  revision?: number;
   id: string;
   title: string;
   summary: string | null;
@@ -179,6 +180,7 @@ export interface SemiFranchiseContent {
 }
 
 export interface SemiFranchiseContentInput {
+  expectedRevision?: number;
   title: string;
   summary?: string;
   body?: string;
@@ -251,8 +253,8 @@ export const neturePharmacyOperatorApi = {
     send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents`, input),
   updateContent: (key: string, id: string, input: SemiFranchiseContentInput) =>
     send<{ id: string; status: string }>('patch', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`, input),
-  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction, reason?: string) =>
-    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`, { reason }),
+  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction, reason?: string, expectedRevision?: number) =>
+    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`, { reason, ...(expectedRevision !== undefined ? { expectedRevision } : {}) }),
 };
 
 // ─── Neture 관리자 ──────────────────────────────────────────────────────────

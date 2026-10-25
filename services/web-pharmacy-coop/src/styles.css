@@ -393,23 +393,6 @@ p {
 .coop-heading p {
   max-width: 750px;
 }
-.coop-nav {
-  display: flex;
-  gap: 25px;
-  overflow-x: auto;
-  border-bottom: 1px solid #dbe5df;
-  font-size: 14px;
-  white-space: nowrap;
-}
-.coop-nav a {
-  padding: 14px 0;
-  border-bottom: 3px solid transparent;
-}
-.coop-nav a.active {
-  color: #17694f;
-  border-bottom-color: #17694f;
-  font-weight: 700;
-}
 .member-welcome {
   padding: 30px;
   border-radius: 14px;
@@ -551,21 +534,10 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .coop-management button:not(:disabled):hover { background: #e8f2ed; }
 .coop-management button:focus-visible { outline: 3px solid #238775; outline-offset: 2px; }
 
-/* Cooperative home and operations follow the same reading order on small screens. */
-.coop-home-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 24px;
-  align-items: start;
-}
-.coop-home-main,
-.coop-home-aside,
+/* Member home uses the shared cooperation presentation; operations keep their own layout. */
 .coop-work-main {
   min-width: 0;
   overflow-wrap: anywhere;
-}
-.coop-home-aside h2 {
-  font-size: 18px;
 }
 .publication-list {
   list-style: none;
@@ -628,7 +600,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   max-width: 100%;
 }
 @media (max-width: 760px) {
-  .coop-home-layout,
   .coop-work-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
@@ -641,7 +612,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   .coop-work-nav a {
     padding: 10px;
   }
-  .coop-home-main .section-heading {
+  .cooperation-member-home-content .section-heading {
     gap: 14px;
     flex-wrap: wrap;
   }

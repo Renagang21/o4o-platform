@@ -1,22 +1,6 @@
-/**
- * WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1 — membership 상태 보존 계약
- *
- * 계약: **ensure membership existence ≠ approve / reactivate membership**
- *
- * `POST /admin/users` 는 기존 사용자에게 role·membership 을 추가하는 upsert 경로다.
- * (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §18 로
- *  credential·신규 user 생성은 이 경로에서 은퇴했다. membership 보존 계약은 그대로다.)
- * 이 경로가 기존 `service_memberships.status` 를 `active` 로 승격하면
- * 정지(suspended)·반려(rejected)·탈퇴(withdrawn)·승인대기(pending) 회원이
- * **역할 추가만으로 서비스 접근 권한을 되찾는다.**
- *
- * membership 상태 변경은 canonical 경로(`MembershipApprovalService`
- * approve/reject/suspend/reactivate — approved_by·approved_at·role 동기화 포함)만 담당한다.
- *
- * 고정하는 계약:
- *   - membership 없음 → 신규 생성(status='active') = 기존 계약 유지
- *   - membership 있음 → status·role 을 **건드리지 않는다** (save 호출 0회)
- *   - 응답에 membershipPolicy 로 어떤 처리가 있었는지 명시한다(조용한 동작 금지)
+/** Legacy direct assignment now rejects without writes.
+ * Keep suspended/status/password/membership cases as no-write guards.
+ * Actual acceptance preserves membership status/role in service-operator-invitation.integration.test.ts.
  */
 import 'reflect-metadata';
 
@@ -121,6 +105,14 @@ const membership = (status: string) => ({
   role: 'user',
 });
 
+function expectInvitationRequired(res: any) {
+  expect(res.status).toHaveBeenCalledWith(400);
+  expect(res.json.mock.calls[0][0]).toMatchObject({ success: false, code: 'OPERATOR_INVITATION_REQUIRED' });
+  expect(transactionMock).not.toHaveBeenCalled();
+  expect(assignRoleMock).not.toHaveBeenCalled();
+  expect(hashPasswordMock).not.toHaveBeenCalled();
+}
+
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'existing@example.com',
@@ -159,8 +151,8 @@ describe('기존 membership 상태는 role 추가로 바뀌지 않는다', () =>
     expect(rec.membershipSaves).toHaveLength(0);
 
     const payload = res.json.mock.calls[0][0];
-    expect(payload.success).toBe(true);
-    expect(payload.membershipPolicy).toBe('KEEP_EXISTING_STATUS');
+    expect(payload.success).toBe(false);
+    expectInvitationRequired(res);
   });
 
   it('기존 active → role 추가 → active 유지 (기존 동작 보존)', async () => {
@@ -173,7 +165,6 @@ describe('기존 membership 상태는 role 추가로 바뀌지 않는다', () =>
     await new AdminUserController().createUser(body() as any, res);
 
     expect(rec.membershipSaves).toHaveLength(0);
-    expect(res.json.mock.calls[0][0].membershipPolicy).toBe('KEEP_EXISTING_STATUS');
   });
 
   it('기존 membership 의 role 도 덮어쓰지 않는다', async () => {
@@ -193,8 +184,8 @@ describe('기존 membership 상태는 role 추가로 바뀌지 않는다', () =>
 
 // ─── 2. membership 없음 → 신규 생성 계약 유지 ────────────────────────────────
 
-describe('membership 이 없으면 기존 신규 생성 계약을 유지한다', () => {
-  it('기존 사용자 + membership 없음 → active 로 생성', async () => {
+describe('legacy 요청은 membership 이 없어도 쓰지 않는다', () => {
+  it('기존 사용자 + membership 없음 → 초대 수락 전 생성하지 않음', async () => {
     const rec = install({
       existingUser: { ...EXISTING_USER },
       existingMembership: null,
@@ -203,14 +194,7 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
     const res = mockRes();
     await new AdminUserController().createUser(body() as any, res);
 
-    expect(rec.membershipSaves).toHaveLength(1);
-    expect(rec.membershipSaves[0]).toMatchObject({
-      userId: 'user-1',
-      serviceKey: 'kpa-society',
-      status: 'active',
-      role: 'operator',
-    });
-    expect(res.json.mock.calls[0][0].membershipPolicy).toBe('CREATED');
+    expect(rec.membershipSaves).toHaveLength(0);
   });
 
   it('미가입 사용자 → membership 도 만들지 않는다 (가입 후 지정만 가능하다)', async () => {
@@ -222,8 +206,8 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다.
-    expect(res.json.mock.calls[0][0].code).toBe('USER_SIGNUP_REQUIRED');
+    // Both existing users and new emails use explicit invitation acceptance.
+    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
     expect(rec.membershipSaves).toHaveLength(0);
   });
 });
@@ -240,11 +224,9 @@ describe('credential 을 쓰지 않아도 membership 보존 계약은 그대로�
     const res = mockRes();
     await new AdminUserController().createUser(body() as any, res);
 
-    const payload = res.json.mock.calls[0][0];
-    // 운영자 인증은 Google 하나다 — service_credentials 는 이 경로에서 생기지 않는다.
-    expect(payload.credentialPolicy).toBe('NOT_APPLICABLE');
+    // The retired route never creates credentials.
+    expectInvitationRequired(res);
     expect(rec.credentials).toHaveLength(0);
     expect(rec.membershipSaves).toHaveLength(0);
-    expect(payload.membershipPolicy).toBe('KEEP_EXISTING_STATUS');
   });
 });

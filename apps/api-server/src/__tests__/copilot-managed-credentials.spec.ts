@@ -10,11 +10,11 @@ jest.mock("../modules/ai-policy/ai-accounted-execution.js", () => ({
 }));
 jest.mock("@o4o/ai-core", () => ({
   ...jest.requireActual("@o4o/ai-core"),
-  runAiExtension: jest.fn(async (_request, adapter) => {
+  runAiExtension: jest.fn(async (request, adapter) => {
     await adapter.invoke({
       systemPrompt: "synthetic",
       userPrompt: "synthetic",
-    });
+    }, request.context, request.funding);
     return {
       output: {
         riskLevel: "low",

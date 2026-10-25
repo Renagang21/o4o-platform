@@ -20,3 +20,5 @@ export {
   type TranslationLocale,
   type ContentTranslationInput,
 } from './content-translation.prompt.js';
+
+export { buildProductContentSystemPrompt } from './product-content.prompt.js';

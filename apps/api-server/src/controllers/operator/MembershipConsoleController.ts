@@ -1,3 +1,4 @@
+import { ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 /**
  * MembershipConsoleController — Extension Layer
@@ -1309,6 +1310,12 @@ export class MembershipConsoleController {
 
       if (isRetiredRoleValue(roleEntity.serviceKey) || isRetiredRoleValue(roleEntity.name)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
+        return;
+      }
+
+      if (scope.isPlatformAdmin && (ASSIGNABLE_OPERATOR_ROLES.includes(role) || ASSIGNABLE_OPERATOR_ROLES.includes(roleEntity.name)
+        || roleEntity.isAdminRole || roleEntity.roleKey === 'operator' || isAdminTierRoleName(role) || isAdminTierRoleName(roleEntity.name))) {
+        res.status(403).json({ success: false, code: 'OPERATOR_INVITATION_REQUIRED', error: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하세요.' });
         return;
       }
 

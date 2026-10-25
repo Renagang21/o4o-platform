@@ -4,7 +4,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { CourseStatusBadge, LmsLoading } from '@o4o/lms-ui';
+import { CourseStatusBadge, LmsLoading, validCaptionTrack, readCaptionTracks } from '@o4o/lms-ui';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
   instructorApi, errorMessage, errorStatus,
@@ -77,6 +77,7 @@ export default function InstructorCourseEditPage() {
     if (!editing.data.title.trim()) { toast.error('레슨 제목을 입력하세요.'); return; }
     if (editing.data.type === 'video' && !supportedVideoUrl(editing.data.videoUrl ?? '')) { toast.error('HTTPS MP4·WebM·Ogg 파일 주소를 입력하세요.'); return; }
     if (editing.data.attachments?.some(f => !f.name.trim() || !/^https:\/\//i.test(f.url) || (() => { try { return new URL(f.url).protocol !== 'https:'; } catch { return true; } })())) { toast.error('자료 이름과 유효한 HTTPS 주소를 입력하세요.'); return; }
+    if (editing.data.metadata?.captions?.some(track => !validCaptionTrack(track))) { toast.error('자막의 HTTPS WebVTT 주소·언어 코드·표시 이름을 확인하세요.'); return; }
     setSaving(true);
     try {
       if (editing.id) await instructorApi.updateLesson(editing.id, editing.data);
@@ -141,7 +142,7 @@ export default function InstructorCourseEditPage() {
           <div className="list-actions">
             <button type="button" className="btn btn-ghost" onClick={() => void move(i, -1)} disabled={i === 0}>↑</button>
             <button type="button" className="btn btn-ghost" onClick={() => void move(i, 1)} disabled={i === lessons.length - 1}>↓</button>
-            <button type="button" className="btn btn-ghost" onClick={() => setEditing({ id: l.id, data: { title: l.title, type: l.type, description: l.description ?? '', content: l.content ?? '', videoUrl: l.videoUrl ?? '', duration: l.duration, isPublished: l.isPublished ?? true, attachments: l.attachments ?? [] } })}>편집</button>
+            <button type="button" className="btn btn-ghost" onClick={() => setEditing({ id: l.id, data: { title: l.title, type: l.type, description: l.description ?? '', content: l.content ?? '', videoUrl: l.videoUrl ?? '', duration: l.duration, isPublished: l.isPublished ?? true, isFree: l.isFree ?? false, attachments: l.attachments ?? [], metadata: { ...l.metadata, captions: readCaptionTracks(l.metadata?.captions) } } })}>편집</button>
             {(l.type === 'quiz' || l.type === 'assignment') && <Link className="btn btn-ghost" to={`/instructor/lessons/${l.id}/${l.type}?courseId=${courseId}`}>{l.type === 'quiz' ? '퀴즈 구성' : '과제 구성'}</Link>}
             {l.type === 'assignment' && <Link className="btn btn-ghost" to={`/instructor/lessons/${l.id}/submissions`}>제출물</Link>}
             <button type="button" className="btn btn-ghost danger" onClick={() => void removeLesson(l.id)}>삭제</button>
@@ -161,6 +162,7 @@ export default function InstructorCourseEditPage() {
         <label className="field"><span>학습 시간(분)</span><input type="number" min={0} value={editing.data.duration ?? 0} onChange={(e) => setEditing({ ...editing, data: { ...editing.data, duration: Number(e.target.value) } })} /></label>
         <label className="field check"><input type="checkbox" checked={editing.data.isPublished !== false} onChange={(e) => setEditing({ ...editing, data: { ...editing.data, isPublished: e.target.checked } })} /><span>공개</span></label>
       </div>
+      {editing.data.type === 'video' && <label className="field check"><input type="checkbox" checked={!!editing.data.isFree} onChange={e => setEditing({ ...editing, data: { ...editing.data, isFree: e.target.checked } })} /><span>미리보기 공개 (비로그인 포함)</span><small>공개 강의가 발행되고 이 영상 차시도 공개일 때 영상 주소가 공개됩니다. 교재·본문·진도는 공개되지 않습니다.</small></label>}
       <LessonMediaFields value={editing.data} onChange={data => setEditing({ ...editing, data })} />
       <div className="field"><span>본문</span>
         <RichTextEditor value={editing.data.content ?? ''} onChange={(c) => setEditing((prev) => prev ? { ...prev, data: { ...prev.data, content: c.html } } : prev)} placeholder="레슨 본문을 입력하세요" minHeight="260px" preset="full" />

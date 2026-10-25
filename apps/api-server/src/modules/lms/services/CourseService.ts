@@ -1,3 +1,4 @@
+import { CourseValidationError } from '../utils/course-validation-error.js';
 import { serviceContactRecipients } from '../../contact-inquiry/contact-recipients.js';
 import { deliverOperatorNotifications } from '../../contact-inquiry/operator-delivery.js';
 import { Repository } from 'typeorm';
@@ -140,7 +141,7 @@ export class CourseService extends BaseService<Course> {
     // O4O Tag Policy V1 — sanitize + required
     const sanitizedTags = sanitizeCourseTags(data.tags);
     if (sanitizedTags.length === 0) {
-      throw new Error('태그를 1개 이상 입력해주세요');
+      throw new CourseValidationError('태그를 1개 이상 입력해주세요');
     }
 
     const course = this.courseRepository.create({
@@ -291,7 +292,7 @@ export class CourseService extends BaseService<Course> {
     if (data.tags !== undefined) {
       const sanitizedTags = sanitizeCourseTags(data.tags);
       if (sanitizedTags.length === 0) {
-        throw new Error('태그를 1개 이상 입력해주세요');
+        throw new CourseValidationError('태그를 1개 이상 입력해주세요');
       }
       data.tags = sanitizedTags;
     }

@@ -4,8 +4,8 @@ import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
 import { createPartnerSupportRoutes } from "../partner.routes";
 import { emptyPartnerWorkspace } from "../partner.schema";
-import { CreatePartnerSupportSpaces1792886400000 } from "../../../database/migrations/1792886400000-CreatePartnerSupportSpaces";
-import { AddPartnerMediaAndReadState1792886500000 } from "../../../database/migrations/1792886500000-AddPartnerMediaAndReadState";
+import { CreatePartnerSupportSpaces1792886600000 } from "../../../database/migrations/1792886600000-CreatePartnerSupportSpaces";
+import { AddPartnerMediaAndReadState1792886700000 } from "../../../database/migrations/1792886700000-AddPartnerMediaAndReadState";
 import { DiskMediaStore, MAX_MEDIA_BYTES } from "../partner.media";
 import { mkdtemp, rm, writeFile, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -127,8 +127,8 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     const q = db.createQueryRunner();
     await q.connect();
     try {
-      await new CreatePartnerSupportSpaces1792886400000().up(q);
-      await new AddPartnerMediaAndReadState1792886500000().up(q);
+      await new CreatePartnerSupportSpaces1792886600000().up(q);
+      await new AddPartnerMediaAndReadState1792886700000().up(q);
     } finally {
       await q.release();
     }
@@ -434,7 +434,7 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     await q.connect();
     try {
       await expect(
-        new CreatePartnerSupportSpaces1792886400000().down(q),
+        new CreatePartnerSupportSpaces1792886600000().down(q),
       ).rejects.toThrow("PARTNER_SUPPORT_DATA_EXISTS");
     } finally {
       await q.release();

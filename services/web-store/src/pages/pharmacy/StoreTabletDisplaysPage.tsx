@@ -71,7 +71,6 @@ import TabletScreenSetManager from './TabletScreenSetManager';
 import { templateLabel, TabletCornerBoard, cornerPrimaryLabel } from '@o4o/tablet-screen-set-editor';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
-import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 카드에서 바로 여는 '화면 바꾸기'(1동작 교체).
 import TabletCornerSwapModal from './TabletCornerSwapModal';
 
@@ -307,7 +306,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   const publicTabletUrl = (tabletId: string): string => {
     // 공개 태블릿 경로는 서비스 앱이 서빙한다(store 호스트에는 /tablet 없음) — URL-FIRST-CENSUS §7-6
-    const base = getActiveServicePublicOrigin();
+    const base = window.location.origin;
     return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
   };
 
@@ -464,7 +463,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   // Toast — WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 변경 직후 '되돌리기' 액션(선택).
   const [toast, setToast] = useState<TabletOperationToast | null>(null);
-  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast);
+  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast, isCurrent);
   const [error, setError] = useState<string | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.

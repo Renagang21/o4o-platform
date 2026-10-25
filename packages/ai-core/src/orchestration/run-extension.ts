@@ -13,10 +13,10 @@ export class AiExtensionError extends Error {
 function safeCode(error: unknown): string {
   if (error instanceof AiExtensionError) return error.code;
   const message = error instanceof Error ? error.message : '';
+  if (['AI_QUOTA_UNAVAILABLE', 'AI_POLICY_UNAVAILABLE', 'AI_PRICING_INVALID', 'AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID', 'AI_USAGE_INVALID'].includes(message)) return message;
   if (/AI_NOT_CONFIGURED|NOT_CONFIGURED|API key missing|is not configured/.test(message)) return 'NOT_CONFIGURED';
   if (/QUOTA_EXCEEDED/.test(message)) return 'QUOTA_EXCEEDED';
   if (/AI_DISABLED/.test(message)) return 'AI_DISABLED';
-  if (['AI_QUOTA_UNAVAILABLE', 'AI_POLICY_UNAVAILABLE', 'AI_PRICING_INVALID', 'AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_CURRENCY_UNSUPPORTED'].includes(message)) return message;
   return 'PROVIDER_FAILED';
 }
 

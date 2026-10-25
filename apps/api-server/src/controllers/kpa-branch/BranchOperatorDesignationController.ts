@@ -1,3 +1,5 @@
+import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
+import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
 /**
  * BranchOperatorDesignationController — 개별 분회 운영자 지정·해제 (분회 서비스 관리자)
  *
@@ -21,6 +23,7 @@ function service(): BranchOperatorDesignationService {
 }
 
 function sendError(res: Response, error: unknown): boolean {
+  if (error instanceof ServiceOperatorInvitationError) { invitationFailure(res,error); return true; }
   if (!(error instanceof BranchOperatorDesignationError)) return false;
   res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
   return true;
@@ -57,7 +60,7 @@ export const BranchOperatorDesignationController = {
 
   async release(req: Request, res: Response): Promise<void> {
     try {
-      const data = await service().release(req.params.branchId, req.params.userId);
+      const data = await service().release(req.params.branchId, req.params.userId, req.user!.id);
       res.json({ success: true, data });
     } catch (error) {
       if (!sendError(res, error)) throw error;

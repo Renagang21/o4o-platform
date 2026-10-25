@@ -131,15 +131,15 @@ describe("scoped administration work", () => {
     expect(screen.queryByText("조합 admin 지정·해제")).toBeNull();
     expect(screen.getByRole("button", { name: "보완 요청" })).toBeTruthy();
   });
-  it("federation admin assignment uses a local admin grant and requires a reason", async () => {
+  it("federation admin sends a consent invitation; a reason remains required only for revocation", async () => {
     const api = client();
     render(<RoleManagement client={api} coop="c" federation userId="f" />);
-    const button = screen.getByRole("button", { name: "조합 admin 지정" });
+    const button = screen.getByRole("button", { name: "조합 admin 초대" });
     expect(button).toHaveProperty("disabled", true);
     fireEvent.change(screen.getByLabelText("기존 계정 이메일"), {
       target: { value: "admin@example.invalid" },
     });
-    fireEvent.change(screen.getByLabelText("지정·해제 사유"), {
+    fireEvent.change(screen.getByLabelText("해제 사유 (권한 회수 시 필수)"), {
       target: { value: "조합 관리자 지정" },
     });
     fireEvent.click(button);
@@ -149,7 +149,7 @@ describe("scoped administration work", () => {
         {
           email: "admin@example.invalid",
           role: "admin",
-          reason: "조합 관리자 지정",
+          reason: "운영자 초대 요청",
         },
       ),
     );

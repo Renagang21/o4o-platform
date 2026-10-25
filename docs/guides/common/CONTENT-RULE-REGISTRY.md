@@ -13,7 +13,7 @@
 | **CR-001** | 소비자 중심 · 목적 우선순위(선택 > 안전 > 상담 > 정보). 성분 설명 자체가 목적 아님 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-002** | 공식 원문(허가사항·e약은요 등) 우선 — 기억·AI·인터넷·홍보는 열위 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-003** | 과장·우월성 단정 금지("더 좋다/부작용 없다/빨리 낫는다" 등). **최상급은 대상 전수 비교 근거 없이 금지**, **그룹 공통 사항을 그 제품만의 장점처럼 배치 금지**(허위 차별화) — 실패 유형 ③④ | content-authoring/CONTENT-AUTHORING-PRINCIPLES §3·§4-1 | active |
-| **CR-004** | Grounding 필수 — 원문 근거 없으면 확장·창작 금지. **원문에 없는 것은 "근거 없음"이지 "허용"이 아니다**(제약의 부재 ≠ 자유의 근거) — 실패 유형 ①⑤ | content-authoring/CONTENT-AUTHORING-PRINCIPLES §4·§4-1 | active |
+| **CR-004** | Grounding 필수 — 원문 근거 없으면 확장·창작 금지. **상품 원문에 없는 제품 사실은 "근거 없음"이지 "허용"이 아니다**(제약의 부재 ≠ 자유의 근거) — 실패 유형 ①⑤ | content-authoring/CONTENT-AUTHORING-PRINCIPLES §4·§4-1 · 전문 참고정보는 CR-022 | active |
 | **CR-005** | 소비자 오해·혼동 방지 — 사용 맥락(경로·형태)이 다르면 분리 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-006** | 안전성 안내 필수 — 전문가/진료 연결 기준 명시 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-007** | 원천 부재 시 추정 금지 → HOLD (SOURCE GAP 일반형; "안전 판단"이지 실패 아님). **근거 부족 제품은 제작하지 않음** — 제품명·분류 불명확 또는 고유 원료·함량·기능성·사용법 등 핵심 근거 미확인 시 미작성·보류(유사/다른 제품으로 대체 금지, 보수적 추정 설명서 금지). 전 상품군 공통 | WORKFLOW · content-authoring | active |
@@ -30,8 +30,8 @@
 | **CR-018** | DOCUMENT-INDEX = 단일 진입점(새 합류자는 여기부터). CLAUDE.md는 규칙 복사 없이 INDEX 포인터만 | DOCUMENT-INDEX · CLAUDE.md | active |
 | **CR-019** | products·services 축은 직교. 서비스는 자체 Rule Registry 없이 CR/DR/AR/OR를 Rule ID로 참조 | DOCUMENT-ARCHITECTURE §2 · services/*/README | active |
 | **CR-020** | 매장용 설명서 콘텐츠 = **`<style>` 없는 시맨틱 HTML + `sd-*` 클래스 계약**(전 제품군 공통). 반응형·색·테마는 공용 렌더러 담당(`ContentRenderer variant="store-description"`). **인라인 style·어휘 밖 임의 class·제품군별 재정의 금지**. 클래스 CSS 정의의 SSOT = 코드(`ContentRenderer.tsx`) | content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT | active |
-
 | **CR-021** | **내부 편집 주석은 소비자 콘텐츠·번역 대상에서 제외**한다(작성자용 메모·큐레이션 지시·그룹 경계 설명 등). **단 삭제가 아니라 분리다** — 주석에만 있는 안전 근거(예: 같은 성분 고함량이 전문의약품 / 제형명과 실제 투여경로 불일치)는 **작성자·번역자가 반드시 열람**해야 한다. 초안 형식에서는 본문 선두 인용 블록(`>`)이 이 주석에 해당. **구현 원칙 = 주석 삭제가 아니라 소비자 렌더 소스를 구조화 필드로 고정**(주석이 원천 배제됨) — 분리 구조 설계 = [CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1](../../checks/CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1.md) | content-authoring/CONTENT-AUTHORING-PRINCIPLES · 실증 = `CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` · 설계 = `CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1` | active |
+| **CR-022** | B2B·AI 활용·매장 QR 설명서에서 질병명·진단·감별 등 전문 판단 정보를 일괄 배제하지 않는다. 상품 사실·전문 참고정보·판단 지원·소비자 안내를 구분한다. 기존 QR 자료의 공식 DB 채택은 보류 | [PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY](../products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md) | active |
 
-> 신규 공통 규칙은 CR-022부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다.
+> 신규 공통 규칙은 CR-023부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다.
 > CR-021 은 HFF-R07(번호·편집 라벨 금지)이 건기식 한정이라 의약품에 미적용이던 것을 **2개 제품군 공통으로 승격**한 것이다(제품군 Guide 는 이를 복사하지 않고 Rule ID 로 참조). 운영/Git/문서 관리 규칙은 CR이 아니라 [OR](OPERATIONAL-RULE-REGISTRY.md)에 등재한다.

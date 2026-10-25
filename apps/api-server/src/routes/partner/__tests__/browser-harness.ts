@@ -3,8 +3,8 @@ import express, { type RequestHandler } from "express";
 import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
 import { createPartnerSupportRoutes } from "../partner.routes.js";
-import { CreatePartnerSupportSpaces1792886400000 } from "../../../database/migrations/1792886400000-CreatePartnerSupportSpaces.js";
-import { AddPartnerMediaAndReadState1792886500000 } from "../../../database/migrations/1792886500000-AddPartnerMediaAndReadState.js";
+import { CreatePartnerSupportSpaces1792886600000 } from "../../../database/migrations/1792886600000-CreatePartnerSupportSpaces.js";
+import { AddPartnerMediaAndReadState1792886700000 } from "../../../database/migrations/1792886700000-AddPartnerMediaAndReadState.js";
 import { DiskMediaStore } from "../partner.media.js";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -46,8 +46,8 @@ async function main() {
     const q = db.createQueryRunner();
     await q.connect();
     try {
-      await new CreatePartnerSupportSpaces1792886400000().up(q);
-      await new AddPartnerMediaAndReadState1792886500000().up(q);
+      await new CreatePartnerSupportSpaces1792886600000().up(q);
+      await new AddPartnerMediaAndReadState1792886700000().up(q);
     } finally {
       await q.release();
     }

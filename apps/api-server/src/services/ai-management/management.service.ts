@@ -87,13 +87,16 @@ export class AiManagementService {
   }
 
   async snapshot() {
+    const policyScopes = [...new Set(AI_USAGE_CATALOG.flatMap(definition =>
+      definition.selection === 'scope' && definition.scope ? [definition.scope] : [],
+    ))];
     const [query, policies, credentials] = await Promise.all([
       this.read<PolicyRow[]>(
         "SELECT default_model AS model, ai_enabled AS enabled FROM ai_query_policy WHERE id = 1",
       ),
       this.read<PolicyRow[]>(
         "SELECT scope, provider, model, is_enabled AS enabled FROM ai_llm_policies WHERE scope = ANY($1)",
-        [["PRODUCT_CONTENT", "CONTENT_TRANSLATION"]],
+        [policyScopes],
       ),
       // Resolve presence in SQL; credential values never enter this service or its response.
       this.read<{ provider: string; configured: boolean }[]>(
@@ -172,6 +175,10 @@ export class AiManagementService {
     query: ReadResult<PolicyRow[]>,
     policies: ReadResult<PolicyRow[]>,
   ): Configuration {
+    if (def.id === 'product.ocr') return {
+      state: 'code', provider: 'google-vision', model: 'TEXT_DETECTION', enabled: null,
+      description: '별도 전문 OCR API이며 이미지 단위 예약·정산에 연결됐습니다. 명시 요율·실행 인증 준비는 별도이고 공통 생성형 모델 선택/중지는 제공하지 않습니다.',
+    };
     if (def.selection === "scope") {
       if (policies.state === "unavailable")
         return {
@@ -264,10 +271,22 @@ export class AiManagementService {
       // Legacy accounting writes omitted provider usage as 0/0, not NULL.
       // Neither NULL nor a zero-token generation proves that the call was free.
       `WITH recorded AS (
-      SELECT provider, model, scope, status, "promptTokens", "completionTokens", "costEstimated",
-        ("promptTokens" IS NULL OR "completionTokens" IS NULL
-          OR ("promptTokens" = 0 AND "completionTokens" = 0)) AS usage_unknown
-      FROM ai_usage_logs WHERE "createdAt" >= $1 AND "createdAt" < $2
+      SELECT l.provider::text AS provider, l.model, l.scope, l.status::text AS status, l."promptTokens", l."completionTokens", l."costEstimated",
+        (l."promptTokens" IS NULL OR l."completionTokens" IS NULL
+          OR (l."promptTokens" = 0 AND l."completionTokens" = 0)) AS usage_unknown
+      FROM ai_usage_logs l WHERE l."createdAt" >= $1 AND l."createdAt" < $2
+        AND NOT EXISTS (SELECT 1 FROM ai_usage_reservations r
+          WHERE r.provider_request_id = l."requestId" AND r.pricing->0->'invocation' IS NOT NULL)
+      UNION ALL
+      SELECT COALESCE(r.receipt->>'provider', r.pricing->0->>'provider') AS provider,
+        COALESCE(r.receipt->>'model', r.pricing->0->'invocation'->>'model') AS model,
+        r.scope, COALESCE(r.outcome, 'pending') AS status,
+        COALESCE((r.receipt->'native'->>'inputTokens')::bigint, 0) AS "promptTokens",
+        COALESCE((r.receipt->'native'->>'outputTokens')::bigint, 0) AS "completionTokens",
+        r.actual_cost AS "costEstimated",
+        NOT COALESCE((r.receipt->'native'->>'usageKnown')::boolean, false) AS usage_unknown
+      FROM ai_usage_reservations r WHERE r.created_at >= $1 AND r.created_at < $2
+        AND r.pricing->0->'invocation' IS NOT NULL AND r.status IN ('reserved','pending','settled')
       )
       SELECT provider::text AS provider, model, scope,
       COUNT(*)::text AS records,
@@ -334,7 +353,7 @@ export class AiManagementService {
       total: { ...total, cost: formatMoney(total.cost) },
       coverage: "partial" as const,
       notice:
-        "기존 원장에 기록된 건만 집계합니다. 기록 건수는 실제 유료 시도 수와 다를 수 있고, 미연결 호출은 제외됩니다. 추정 비용은 공급자 청구가 아닙니다. 서비스·기능별 전체 통계는 아직 연결되지 않았습니다.",
+        "기존 로그와 전문 호출 예약 이력을 중복 없이 집계합니다. 미확정 사용량·비용은 확인된 무료 사용이 아닙니다. 기록 건수는 실제 유료 시도 수와 다를 수 있고, 미연결 호출은 제외됩니다. 추정 비용은 공급자 청구가 아닙니다. 서비스·기능별 전체 통계는 아직 연결되지 않았습니다.",
     };
   }
 }

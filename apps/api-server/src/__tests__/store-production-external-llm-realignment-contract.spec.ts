@@ -26,6 +26,22 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')
 
 const PROMPT_CORE = 'packages/store-ui-core/src/llm/storeContentAuthoringPrompt.ts';
 const PROMPT_TEST = 'packages/store-ui-core/src/__tests__/storeContentAuthoringPrompt.test.ts';
+const PRODUCT_ASSIST = 'services/web-store/src/components/product-description/ProductDescriptionAssist.tsx';
+function externalSources(src: string): string[] {
+  const sources = src.includes('<LlmAssistPanel') ? [src] : [];
+  if (src.includes('<ProductDescriptionAssist')) {
+    expect(src).toMatch(/import \{[^}]*ProductDescriptionAssist[^}]*\} from ['"][^'"]*product-description\/ProductDescriptionAssist['"]/);
+    const wrapper = read(PRODUCT_ASSIST);
+    expect(wrapper).toContain('<LlmAssistPanel');
+    expect(wrapper).toContain('buildStoreContentAuthoringPrompt(');
+    expect(wrapper).toContain('onApplyHtml={onApplyHtml}');
+    expect(wrapper).not.toMatch(/fetch\(|apiClient\.|authClient\.|\/api\/ai\//);
+    sources.push(wrapper);
+  }
+  expect(sources.length).toBeGreaterThan(0);
+  return sources;
+}
+
 
 const VIEW_BLOG = 'packages/store-ui-core/src/components/blog/StoreBlogManageView.tsx';
 const VIEW_POP = 'packages/store-ui-core/src/components/pop-staff/StorePopStaffView.tsx';
@@ -49,11 +65,10 @@ const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILIN
   QR: ['services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx'],
 };
 const ALL_TARGETS = Object.values(TARGET_SPECIFIC).flat();
-const TASK_BY_GROUP: Record<keyof typeof TARGET_SPECIFIC, string> = {
+const TASK_BY_GROUP: Record<Exclude<keyof typeof TARGET_SPECIFIC, 'MULTILINGUAL'>, string> = {
   BLOG: "task: 'blog'",
   POP: "task: 'pop'",
   PRODUCT_DESCRIPTION: "task: 'product-description'",
-  MULTILINGUAL: "task: 'translate'",
   QR: "task: 'qr'",
 };
 
@@ -83,7 +98,8 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (A) Prompt Cor
   });
   it('§12 상품 설명 사실성 계약 · §13 translate 계약 · §9~§11 형식 계약 문구 존재', () => {
     expect(src).toContain('제품명만 보고 성분·효능·원산지 등을 추측해 쓰지 마세요');
-    expect(src).toContain('질병을 치료·예방한다는 표현을 추가하지 마세요');
+    expect(src).toContain('확인된 허가 효능·질병명을 보존하고, 근거 없는 치료·예방 효과를 제품에 부여하지 마세요');
+    expect(src).not.toContain('질병을 치료·예방한다는 표현을 추가하지 마세요');
     expect(src).toContain('숫자·단위·제품명·고유명사는 임의로 바꾸지 마세요');
     expect(src).toContain('h1 은 사용하지 마세요');
     expect(src).toContain('짧은 포인트 2~5개');
@@ -133,10 +149,19 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPE
       describe(`${group} · ${rel}`, () => {
         const src = read(rel);
         it('LlmAssistPanel + buildStoreContentAuthoringPrompt + STORE_LLM_ASSIST_LABEL + 목적 task', () => {
-          expect(src).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
-          expect(src).toMatch(/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/);
-          expect(src).toContain('label={STORE_LLM_ASSIST_LABEL}');
-          expect(src).toContain(TASK_BY_GROUP[group]);
+          for (const entry of externalSources(src)) {
+            expect(entry).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
+            expect(entry).toMatch(/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/);
+            expect(entry).toContain('label={STORE_LLM_ASSIST_LABEL}');
+          }
+          if (group === 'MULTILINGUAL') {
+            // Korean source authoring and language translation share the reviewed product assist.
+            // Foreign-language drafts must retain the target-language contract even without a source page.
+            expect(src).toContain("task: activeLocale === 'ko' && !translateSource?.html ? 'product-description' : 'translate'");
+            expect(src).toContain('referenceHtml: translateSource?.html ?? null');
+            expect(src).toContain('sourceLocale: translateSource?.locale ?? null');
+            expect(src).toContain('targetLocale: activeLocale');
+          } else expect(src).toContain(TASK_BY_GROUP[group]);
           expect(src).toContain('onApplyHtml=');
         });
         it('Prompt 전문 복사본 없음 · showInternalAi={false} 유지 · AiContentModal / /api/ai/content 재연결 0', () => {
@@ -211,7 +236,9 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (D) QR provena
   it('Prompt Context = 사용자가 입력한 값만(상품명·코너명·강조점·항목) — 새 fetch 없음', () => {
     const block = src.slice(src.indexOf('const externalReferenceText'), src.indexOf('const handleExternalApply'));
     expect(block).not.toMatch(/fetch\(|apiClient\./);
-    expect(block).toContain("task: 'qr'");
+    const assist = src.slice(src.indexOf('<ProductDescriptionAssist'), src.indexOf('onApplyHtml={handleExternalApply}'));
+    expect(assist).toContain("task: 'qr'");
+    expect(assist).toContain('referenceText: externalReferenceText');
   });
 });
 

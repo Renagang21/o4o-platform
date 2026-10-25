@@ -1,3 +1,4 @@
+import { createPolicyExtensionRuntime } from '../../../services/ai-extensions/policy-runtime.js';
 import { randomUUID } from 'node:crypto';
 import type { DataSource } from 'typeorm';
 import { runAiExtension, AiExtensionError } from '@o4o/ai-core';
@@ -40,13 +41,9 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
         } }, input, materials: [], funding: { payer: 'platform' },
         context: { requestId: randomUUID(), serviceId: 'store', featureId: consultationTranslationExtension.id,
           actorId: access.actorId, organizationId: access.organizationId, audience: 'staff' },
-      }, {
-        invoke: async (prompt, context) => {
-          const response = await policy.execute('CONTENT_TRANSLATION', prompt.systemPrompt, prompt.userPrompt,
-            { maxTokens: 2048, temperature: 0, responseMode: 'json', userId: context.actorId });
-          return { ...response, provider: response.provider ?? 'unknown' };
-        },
-      }, { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });
+      }, createPolicyExtensionRuntime(policy, 'CONTENT_TRANSLATION', {
+        maxTokens: 2048, temperature: 0, responseMode: 'json', usage: 'pharmacy.consultation',
+      }), { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });
       return result.output;
     } catch (error) {
       if (error instanceof AiExtensionError && error.code === 'QUOTA_EXCEEDED') {

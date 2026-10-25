@@ -356,9 +356,10 @@ export class NetureService {
 
   async updateProductMaster(
     masterId: string,
-    updates: Record<string, unknown>
+    updates: Record<string, unknown>,
+    actorId?: string | null
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
-    return this.catalogService.updateProductMaster(masterId, updates);
+    return this.catalogService.updateProductMaster(masterId, updates, actorId);
   }
 
   async getAllProductMasters() {

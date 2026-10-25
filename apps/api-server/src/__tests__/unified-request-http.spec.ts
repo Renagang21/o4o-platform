@@ -31,6 +31,9 @@ import express from 'express';
 import request from 'supertest';
 
 const executeMock = jest.fn();
+const accountedMock = jest.fn();
+const nativeMock = jest.fn();
+jest.mock('../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedAi: (...args: unknown[]) => accountedMock(...args), executeAccountedNativeAi: (...args: unknown[]) => nativeMock(...args) }));
 const runWorkAgentMock = jest.fn();
 const runSurfaceMock = jest.fn();
 const runWebResearchMock = jest.fn();
@@ -54,7 +57,9 @@ jest.mock('../utils/logger.js', () => ({
   __esModule: true,
   default: { info: (...a: unknown[]) => logInfo(...a), warn: (...a: unknown[]) => logWarn(...a), error: (...a: unknown[]) => logError(...a), debug: jest.fn() },
 }));
-jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true } }));
+jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true, query: jest.fn(async () => []) } }));
+jest.mock('../utils/ai-editing-model-resolver.js', () => ({ resolveEditingModel: async () => 'gemini-test' }));
+jest.mock('../utils/ai-key.util.js', () => ({ resolveAiApiKey: async () => 'synthetic-key' }));
 jest.mock('../modules/neture/services/neture-main-membership.js', () => ({
   ...jest.requireActual('../modules/neture/services/neture-main-membership.js'),
   getNetureMainMembershipStatus: (...a: unknown[]) => netureStatusMock(...a),
@@ -71,13 +76,14 @@ jest.mock('../utils/ai-provider-runtime.js', () => {
 });
 jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) => executeMock(...a) }));
 const plannerFactoryCalls: string[] = [];
+const plannerActors: Array<string | undefined> = [];
 jest.mock('../services/ai-tools/work-agent-runtime.js', () => ({
   runWorkAgent: (...a: unknown[]) => runWorkAgentMock(...a),
   createLlmPlanner: () => { plannerFactoryCalls.push('default'); return { kind: 'llm', plan: jest.fn() }; },
   createStrongLlmPlanner: () => { plannerFactoryCalls.push('default-strong'); return { kind: 'llm', plan: jest.fn() }; },
   // Capability C — per-task provider planner 쌍(전역 provider 불변).
-  createLlmPlannerForProvider: (_ds: unknown, provider: string) => { plannerFactoryCalls.push(`provider:${provider}`); return { kind: 'llm', plan: jest.fn() }; },
-  createStrongLlmPlannerForProvider: (_ds: unknown, provider: string) => { plannerFactoryCalls.push(`provider-strong:${provider}`); return { kind: 'llm', plan: jest.fn() }; },
+  createLlmPlannerForProvider: (_ds: unknown, provider: string, _fetch: unknown, actor?: string) => { plannerFactoryCalls.push(`provider:${provider}`); plannerActors.push(actor); return { kind: 'llm', plan: jest.fn() }; },
+  createStrongLlmPlannerForProvider: (_ds: unknown, provider: string, _fetch: unknown, actor?: string) => { plannerFactoryCalls.push(`provider-strong:${provider}`); plannerActors.push(actor); return { kind: 'llm', plan: jest.fn() }; },
 }));
 // ai-proxy.service 는 DB entity 를 끌고 온다 — 이 spec 이 쓰는 두 경로는 그것을 쓰지 않는다.
 jest.mock('../services/ai-proxy.service.js', () => ({ aiProxyService: {} }));
@@ -158,9 +164,12 @@ function workResult(over: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  plannerActors.length = 0;
   testUserRoles = ['user'];
   netureStatusMock.mockResolvedValue('active');
   executeMock.mockResolvedValue({ content: '텍스트 답변', model: 'gemini-test' });
+  nativeMock.mockImplementation(async (_db: unknown, _request: unknown, _account: unknown, invoke: () => Promise<{ value: unknown }>) => (await invoke()).value);
+  accountedMock.mockImplementation((_db: unknown, input: unknown) => executeMock(input));
   runWorkAgentMock.mockResolvedValue(workResult());
   runSurfaceMock.mockResolvedValue({
     answer: '원내 결합 답변',
@@ -184,6 +193,7 @@ describe('POST /api/ai/request', () => {
     const empty = await request(app).post('/api/ai/request').send({ text: '   ' });
     expect(empty.status).toBe(400);
     expect(empty.body.code).toBe('EMPTY_MESSAGE');
+    expect(accountedMock).not.toHaveBeenCalled();
   });
 
   it('① text-only 일반 질문 → chat (Work Agent 미호출)', async () => {
@@ -198,6 +208,28 @@ describe('POST /api/ai/request', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('홈 텍스트는 인증 사용자·서버 서비스로 귀속하며 body의 사용자·서비스 주장을 쓰지 않는다', async () => {
+    await request(app).post('/api/ai/request').send({ text: 'UDCA가 뭐야?', userId: 'forged-user', serviceKey: 'forged-service' }).expect(200);
+    expect(accountedMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ provider: 'gemini' }), {
+      scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: '00000000-0000-4000-8000-000000000001',
+    });
+  });
+
+  it.each([
+    ['QUOTA_EXCEEDED', 429, 'QUOTA_EXCEEDED'],
+    ['AI_QUOTA_UNAVAILABLE', 503, 'AI_QUOTA_UNAVAILABLE'],
+    ['AI_PRICING_INVALID', 503, 'AI_ACCOUNTING_UNAVAILABLE'],
+  ])('홈 요청의 %s는 안전한 상태를 반환하고 재호출하지 않는다', async (failure, status, code) => {
+    accountedMock.mockRejectedValueOnce(new Error(failure as string));
+    const r = await request(app).post('/api/ai/home-chat').send({ message: 'UDCA가 뭐야?' });
+    expect(r.status).toBe(status);
+    expect(r.body.code).toBe(code);
+    expect(r.body.error).not.toMatch(/잠시 후|AI_PRICING_INVALID/);
+    expect(accountedMock).toHaveBeenCalledTimes(1);
+    expect(executeMock).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   // WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 (E) — work 로 온 Goal 은 screen modality 이므로
   // planner 쌍이 openai(Astra vision · Capability B) 로 만들어진다. 전역 AI_DEFAULT_PROVIDER 는 건드리지 않는다.
   it('②-C. work 경로의 Goal(등재 대상) → planner 쌍이 per-task provider openai 로 생성된다 · 전역 provider env 불변', async () => {
@@ -206,6 +238,7 @@ describe('POST /api/ai/request', () => {
     const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘' });
     expect(r.body.data.kind).toBe('work');
     expect(plannerFactoryCalls).toEqual(['provider:openai', 'provider-strong:openai']);
+    expect(plannerActors).toEqual(Array(2).fill('00000000-0000-4000-8000-000000000001'));
     expect(process.env.AI_DEFAULT_PROVIDER).toBe(before);
     expect(logInfo.mock.calls.find((c) => c[0] === 'work-agent task modality')?.[1]).toEqual(expect.objectContaining({ modality: 'screen', provider: 'openai' }));
   });
@@ -444,6 +477,27 @@ describe('POST /api/ai/request', () => {
   });
 });
 
+describe('authenticated file structure accounting host', () => {
+  const file = { fileBase64: b64('name\nexample\n'), targetSchema: { id: 'generic', fields: [{ key: 'label', description: '이름', required: true }] } };
+
+  it('file host forwards verified user and server service, ignoring body accounting claims', async () => {
+    executeMock.mockResolvedValueOnce({ model: 'gemini-test', content: JSON.stringify({ confidence: 0.9, warnings: [], sheets: [{ sheetName: 'Sheet1', unmappedColumns: [], regions: [{ startRow: 0, headerRow: 0, dataStartRow: 1, confidence: 0.9, columns: [{ sourceColumn: 0, targetField: 'label', confidence: 0.9 }] }] }] }) });
+    await request(app).post('/api/ai/file-understanding').send({ ...file, userId: 'forged', serviceKey: 'forged' }).expect(200);
+    expect(accountedMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ provider: 'gemini' }), {
+      scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: '00000000-0000-4000-8000-000000000001',
+    });
+  });
+
+  it.each([['QUOTA_EXCEEDED', 429], ['AI_QUOTA_UNAVAILABLE', 503]] as const)('file host reports %s without retrying', async (code, status) => {
+    accountedMock.mockRejectedValueOnce(new Error(code));
+    const r = await request(app).post('/api/ai/file-understanding').send(file);
+    expect(r.status).toBe(status);
+    expect(r.body.code).toBe(code);
+    expect(accountedMock).toHaveBeenCalledTimes(1);
+    expect(executeMock).not.toHaveBeenCalled();
+  });
+});
+
 describe('⑬ Personal Assistant Phase A — Task (additive)', () => {
   beforeEach(() => {
     taskStoreCalls.length = 0;
@@ -613,5 +667,40 @@ it('authenticated hospital research uses the hospital model target', async () =>
   });
   const response = await request(app).post('/api/ai/request').send({ text: '공개 약품 정보를 조사해줘', surface: 'hospital-drug' });
   expect(response.status).toBe(200);
-  expect(runWebResearchMock).toHaveBeenCalledWith({ query: 'synthetic research', usage: 'hospital.research' });
+  expect(runWebResearchMock).toHaveBeenCalledWith({ query: 'synthetic research', usage: 'hospital.research' }, '00000000-0000-4000-8000-000000000001');
+});
+
+
+describe('native Home and image analysis admission', () => {
+  const image = { name: 'fixture.png', mimeType: 'image/png', base64: 'QUJD' };
+  it('inline Home uses verified actor and native accounting exactly once', async () => {
+    await request(app).post('/api/ai/request').send({ text: '사진 설명', attachments: [image], userId: 'forged' }).expect(200);
+    expect(nativeMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ kind: 'multimodal' }), {
+      scope: 'SERVICE_QUERY', serviceKey: 'neture', userId: '00000000-0000-4000-8000-000000000001',
+    }, expect.any(Function));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(accountedMock).not.toHaveBeenCalled();
+  });
+  it.each([['QUOTA_EXCEEDED', 429], ['AI_PRICING_NOT_CONFIGURED', 503]] as const)('native Home rejects %s before fetch', async (code, status) => {
+    nativeMock.mockRejectedValueOnce(new Error(code));
+    await request(app).post('/api/ai/request').send({ text: '사진 설명', attachments: [image] }).expect(status);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(nativeMock).toHaveBeenCalledTimes(1);
+  });
+  it('image analysis keeps authentication and maps admission refusal without provider work', async () => {
+    await request(app).post('/api/ai/vision/analyze').set('x-test-anon', '1').send({ imageBase64: 'QUJD' }).expect(401);
+    expect(nativeMock).not.toHaveBeenCalled();
+    nativeMock.mockRejectedValueOnce(new Error('QUOTA_EXCEEDED'));
+    await request(app).post('/api/ai/vision/analyze').send({ imageBase64: 'QUJD' }).expect(429);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+
+it.each([['AI_PRICING_NOT_CONFIGURED', 503, 'AI_ACCOUNTING_UNAVAILABLE'], ['upstream failed', 502, 'AI_ERROR']])('hospital surface separates admission failure %s from the legacy provider error contract', async (failure, status, code) => {
+  runSurfaceMock.mockRejectedValueOnce(new Error(failure as string));
+  const result = await request(app).post('/api/ai/request').send({ text: '공개 약품 정보를 조사해줘', surface: 'hospital-drug' });
+  expect(result.status).toBe(status);
+  expect(result.body.code).toBe(code);
+  expect(nativeMock).not.toHaveBeenCalled();
 });

@@ -43,11 +43,14 @@ const admin: SessionSnapshot = {
   ],
 };
 function isFrameRead(path: string) {
-  return path.startsWith("/operator-inbox/") || path === "/notifications/unread-count?serviceKey=pharmcoop" || path.endsWith("/footer-legal");
+  return path.startsWith("/cooperation-workflows/cooperative/one/manage?") || path.startsWith("/operator-inbox/") || path === "/notifications/unread-count?serviceKey=pharmcoop" || path.endsWith("/footer-legal");
 }
 function open(path: string, session = admin) {
   const client = {
-    get: vi.fn(async () => ({ data: { data: null } })),
+    get: vi.fn(async (path: string) => ({ data: { data: path === "/operator-inbox/cooperative/one/manage" ? {
+      name: "검증 조합", contact: { pending: 1, oldest: null, deliveryAttention: 0 },
+      tasks: [{ key: "cooperative-members", label: "개인 가입 검토", count: 2, oldest: null, available: true }, { key: "withdrawals", label: "개인 탈퇴 요청", count: 1, oldest: null, available: true }],
+    } : path.startsWith("/cooperation-workflows/") ? { work: { items: [], total: 0 }, materials: { items: [], total: 0 }, support: { items: [], total: 0, unassigned: 0, overdue: 0 }, subjects: { items: [], total: 0 }, operators: [], summary: { notices: 0, applications: 0 } } : null } })),
     post: vi.fn(),
     patch: vi.fn(),
     put: vi.fn(),
@@ -79,7 +82,7 @@ it("mounts just the selected task, follows task links and preserves legacy conte
 });
 it("keeps the overview light and preserves content editor URLs", async () => {
   const client = open("/one/operator");
-  expect(screen.getByText("검증 조합 운영")).toBeTruthy();
+  expect(screen.getByRole("region", { name: "협업체 운영 홈" })).toBeTruthy();
   expect(
     client.get.mock.calls.every(([path]) =>
       isFrameRead(String(path)),
@@ -147,4 +150,16 @@ it("keeps member-only data out of an unaffiliated home and hides operations", as
         isFrameRead(String(path)),
     ),
   ).toBe(true);
+});
+
+it("routes personal membership and withdrawal counts to cooperative management and separates business settings", async () => {
+  const client = open("/one/operator");
+  await screen.findByRole("link", { name: "개인 가입 검토 2건" });
+  expect(screen.getByRole("link", { name: "개인 가입 검토 2건" }).getAttribute("href")).toBe("/one/operator?work=members");
+  expect(screen.getByRole("link", { name: "개인 탈퇴 요청 1건" }).getAttribute("href")).toBe("/one/operator?work=members");
+  expect(client.get.mock.calls.some(([path]) => String(path).includes("/memberships"))).toBe(false);
+  const nav = screen.getByRole("navigation", { name: "조합 운영 업무" });
+  fireEvent.click(within(nav).getByText("자료 진열·사업 약관"));
+  await screen.findByText("settings 업무 본문");
+  expect(screen.queryByText("조합 자격 설정 본문")).toBeNull();
 });

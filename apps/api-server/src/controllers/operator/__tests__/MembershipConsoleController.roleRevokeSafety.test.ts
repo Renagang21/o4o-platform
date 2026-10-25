@@ -676,3 +676,13 @@ describe.each(['assign', 'remove'] as const)('%s catalogue resolution preserves 
   });
 
 });
+
+it.each(['lecture:operator','operator','lecture:admin'])('platform admin cannot bypass email acceptance through member roles (%s)',async role=>{
+  primeRole(role);
+  mockGetRoleByName.mockResolvedValue({name:role,serviceKey:'lecture',roleKey:role.endsWith('admin')?'admin':'operator',isAssignable:true,isAdminRole:role.endsWith('admin')});
+  const req=makeReq(TARGET_ID,role,PLATFORM_SCOPE);req.body={role};
+  const response=makeRes();await controller.assignMemberRole(req,response);
+  expect(response.status).toHaveBeenCalledWith(403);
+  expect(response.json.mock.calls[0][0]).toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+  expect(mockAssignRole).not.toHaveBeenCalled();
+});

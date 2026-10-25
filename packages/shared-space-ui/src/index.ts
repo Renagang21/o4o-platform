@@ -336,9 +336,14 @@ export type { CooperationExtension, CooperationMaterialGuide } from './cooperati
 export { CooperationMemberSpace, type CooperationClient, type CooperationView } from './cooperation/CooperationMemberSpace';
 export { CAREPHARM_MATERIAL_TAGS, CAREPHARM_MATERIAL_OUTLINES } from './cooperation/carepharmMaterials';
 export { BusinessHomeShowcase } from './cooperation/BusinessHomeShowcase';
+export { CooperationMemberHomeLayout, CooperationMemberNavigation, type CooperationMemberLink } from './cooperation/CooperationMemberPresentation';
 
 export { ScopedContactForm } from "./legal/ScopedContactForm.js";
 export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, serviceContactUrl } from './service-entry/PublicServiceEntry';
 export type { PublicServiceKey } from './service-entry/PublicServiceEntry';
 export { PublicServiceContact } from './service-entry/PublicServiceContact';
 export { ServiceContactInboxLink, useServiceContactCount } from './service-entry/ServiceContactInboxLink';
+
+export { PendingOperatorInvitations } from './PendingOperatorInvitations';
+export { CooperationMemberWorkflows, workflowEndpoint, workflowLabels, workflowDate, plainBody, safeEducationUrl, useWorkflowData, WorkflowMessages, WorkflowPager } from './cooperation/CooperationWorkflows';
+export type { WorkflowProps, WorkflowClient } from './cooperation/CooperationWorkflows';

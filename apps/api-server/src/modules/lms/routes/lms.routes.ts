@@ -1,3 +1,4 @@
+import { PublicPreviewController } from '../controllers/PublicPreviewController.js';
 import { hardDeleteLectureCourse } from '../services/lecture-course-cleanup.service.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Router, Request, Response } from 'express';
@@ -60,6 +61,10 @@ router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));
 // COURSE ROUTES
 // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Write ops require instructor/admin
 // ========================================
+
+// Explicit anonymous previews; protected lesson/enrollment routes below are unchanged.
+router.get('/courses/:courseId/previews', ipBurstLimiter, apiLimiter, asyncHandler(PublicPreviewController.list));
+router.get('/courses/:courseId/previews/:lessonId', ipBurstLimiter, apiLimiter, asyncHandler(PublicPreviewController.get));
 
 // POST /api/v1/lms/courses - Create Course
 router.post('/courses', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.createCourse));

@@ -40,6 +40,17 @@ interface Control {
   deleted: string[];
   selections: Record<string, ModelSelection>;
 }
+interface ModelReference {
+  kind: "usage" | "policy" | "runtime";
+  label: string;
+  target?: string;
+}
+type ModelReferences = Record<string, ModelReference[]>;
+type PolicyReference = ModelSelection & {
+  label?: string;
+  source?: string;
+  scope?: string;
+};
 type Database = Pick<DataSource, "query" | "isInitialized">;
 const CAPABILITIES: readonly ModelCapability[] = [
   "text",
@@ -48,11 +59,41 @@ const CAPABILITIES: readonly ModelCapability[] = [
   "speech",
 ];
 const keyOf = (provider: string, model: string) => provider + ":" + model;
+// These defaults are reached only when the corresponding managed selection is absent.
+// Keep this list aligned with the actual callers, not the model catalog/whitelist.
+const overridableDefaults: Record<string, string[]> = {
+  "gemini:gemini-2.5-pro": ["work.planning.strong"],
+  "openai:gpt-5-mini": ["admin.blocks"],
+  "openai:gpt-4o-mini": ["lms.quiz", "lms.assignment", "operator.actions"],
+  "openai:gpt-4o-mini-tts": ["audio.synthesis.openai"],
+  "gemini:gemini-3.1-flash-tts-preview": ["audio.synthesis.gemini"],
+  "claude:claude-sonnet-4.5": ["admin.blocks"],
+};
 const sharedScopes: Record<string, string> = {
   "product.content": "policy.PRODUCT_CONTENT",
-  "store.translation": "policy.CONTENT_TRANSLATION",
-  "pharmacy.consultation": "policy.CONTENT_TRANSLATION",
+  "pharmacy.guidance": "policy.PRODUCT_CONTENT",
+  "product.correction-draft": "policy.PRODUCT_CONTENT",
 };
+// Execution consumers of resolveEditingModel / AiQueryPolicy, not inventory metadata.
+const queryPolicyTargets = [
+  "service.query",
+  "home.chat",
+  "home.attachments",
+  "research.authenticated",
+  "hospital.research",
+  "file.structure",
+  "hospital.structure",
+  "work.planning",
+  "work.vision",
+  "assistant.understanding",
+  "editor.content",
+  "editor.url",
+  "editor.store-use",
+  "lecture.structure",
+  "lecture.body",
+  "image.analysis",
+  "operator.insight",
+];
 export const modelTargetId = (usage: string) => sharedScopes[usage] ?? usage;
 const multiProvider = new Set([
   "home.chat",
@@ -66,22 +107,23 @@ const multiProvider = new Set([
   "operator.actions",
   "supplier.hub",
   "policy.PRODUCT_CONTENT",
-  "policy.CONTENT_TRANSLATION",
+  "store.translation",
+  "pharmacy.consultation",
+  "store.overview",
+  "supplier.overview",
+  "cooperative.overview",
 ]);
 export const MODEL_TARGETS = [
   ...new Map(
     AI_USAGE_CATALOG.filter(
-      (x) => !["audio.synthesis", "supplier.hub"].includes(x.id),
+      (x) => x.modelSelectable !== false && !["audio.synthesis", "supplier.hub"].includes(x.id),
     ).map((usage) => {
       const id = modelTargetId(usage.id);
       return [
         id,
         {
           id,
-          name:
-            id === "policy.CONTENT_TRANSLATION"
-              ? "매장 콘텐츠·약국 상담 번역 (공유)"
-              : usage.name,
+          name: id === 'policy.PRODUCT_CONTENT' ? '상품 콘텐츠·보완 초안·상담 근거 선택' : usage.name,
           providers: (usage.id === "admin.blocks"
             ? ["gemini", "openai", "claude"]
             : multiProvider.has(id)
@@ -217,7 +259,13 @@ function parse(input: unknown): Control {
     deleted: [...value.deleted],
     selections: { ...value.selections },
   };
-  for (const [id, selection] of Object.entries(value.selections)) {
+  const legacyTranslation = parsed.selections["policy.CONTENT_TRANSLATION"];
+  if (legacyTranslation) {
+    parsed.selections["store.translation"] ??= legacyTranslation;
+    parsed.selections["pharmacy.consultation"] ??= legacyTranslation;
+    delete parsed.selections["policy.CONTENT_TRANSLATION"];
+  }
+  for (const [id, selection] of Object.entries(parsed.selections)) {
     checkSelection(parsed, id, selection);
     parsed.selections[id] = {
       provider: selection.provider,
@@ -275,53 +323,98 @@ export class ModelControlService {
         "모델 설정을 조회할 수 없습니다.",
       );
     const control = await this.read();
+    const modelReferences = this.references(
+      control,
+      await this.databaseReferences(),
+    );
     return {
       ...control,
-      protectedModels: [...(await this.references(control))],
+      protectedModels: Object.keys(modelReferences),
+      modelReferences,
       targets: MODEL_TARGETS,
       usageTargets: Object.fromEntries(
         AI_USAGE_CATALOG.map((x) => [x.id, modelTargetId(x.id)]),
       ),
     };
   }
-  private async references(
+  private references(
     control: Control,
-    includeSelections = true,
-  ): Promise<Set<string>> {
-    // All configured policies count, including disabled ones: re-enabling must not reference a removed model.
-    const rows = await this.db.query(
-      "SELECT 'gemini' AS provider,default_model AS model FROM ai_query_policy UNION ALL SELECT provider,model FROM ai_llm_policies UNION ALL SELECT fallback_provider AS provider,fallback_model AS model FROM ai_llm_policies WHERE fallback_model IS NOT NULL UNION ALL SELECT provider,COALESCE(to_jsonb(s)->>'defaultmodel',to_jsonb(s)->>'defaultModel',to_jsonb(s)->'config'->>'model',to_jsonb(s)->'config'->>'defaultModel') AS model FROM ai_settings s",
-    );
-    const refs = new Set<string>(
-      rows
-        .filter((x: ModelSelection) => x.provider && x.model)
-        .map((x: ModelSelection) => keyOf(x.provider, x.model)),
-    );
-    if (includeSelections)
-      for (const x of Object.values(control.selections))
-        refs.add(keyOf(x.provider, x.model));
-    // Existing runtime fallback and explicitly configured environment models remain available.
+    rows: PolicyReference[],
+  ): ModelReferences {
+    const refs: ModelReferences = {};
+    const add = (key: string, reference: ModelReference) => {
+      (refs[key] ??= []).push(reference);
+    };
+    for (const row of rows) {
+      if (!row.provider || !row.model) continue;
+      const targets =
+        row.source === "query"
+          ? queryPolicyTargets
+          : row.source === "scope" && row.scope === "PRODUCT_CONTENT"
+            ? ["policy.PRODUCT_CONTENT"]
+            : row.source === 'scope' && row.scope === 'STORE_INSIGHT'
+              ? ['store.overview']
+              : row.source === 'scope' && row.scope === 'OPERATOR_INSIGHT'
+                ? ['supplier.overview', 'cooperative.overview']
+            : row.source === "scope" && row.scope === "CONTENT_TRANSLATION"
+              ? ["store.translation", "pharmacy.consultation"]
+              : undefined;
+      const reference: ModelReference = {
+        kind: "policy",
+        label:
+          row.label ?? "기존 공통·범위·연결 정책 또는 장애 시 대체 모델 설정",
+      };
+      // News generation still uses resolveEditingModel directly. Managed selections
+      // do not replace that shared policy: only an explicit policy change releases it.
+      if (row.source === "query")
+        add(keyOf(row.provider, row.model), {
+          kind: "policy",
+          label: "공통 질의 정책 직접 사용 (커뮤니티 뉴스 등)",
+        });
+      if (targets) {
+        for (const target of targets)
+          if (!control.selections[target])
+            add(keyOf(row.provider, row.model), { ...reference, target });
+      } else add(keyOf(row.provider, row.model), reference);
+    }
+    const usage = (key: string, target: string) =>
+      add(key, {
+        kind: "usage",
+        target,
+        label: MODEL_TARGETS.find((x) => x.id === target)!.name,
+      });
+    for (const [target, x] of Object.entries(control.selections))
+      usage(keyOf(x.provider, x.model), target);
+    for (const [key, targets] of Object.entries(overridableDefaults))
+      for (const target of targets)
+        if (!control.selections[target]) usage(key, target);
+    // Shared fallback and environment values retain their conservative protection.
+    // gemini-2.5-flash is not a managed runtime default; DB policies still protect it when referenced.
     for (const [provider, ids] of Object.entries({
       gemini: [
         GEMINI_CANONICAL_MODEL,
-        "gemini-2.5-flash",
-        "gemini-2.5-pro",
-        "gemini-3.1-flash-tts-preview",
         process.env.AI_DEFAULT_MODEL,
         process.env.AI_STRONG_MODEL,
       ],
       openai: [
         "gpt-6-astra",
-        "gpt-5-mini",
-        "gpt-4o-mini",
-        "gpt-4o-mini-tts",
         process.env.AI_DEFAULT_MODEL_OPENAI,
         process.env.AI_STRONG_MODEL_OPENAI,
       ],
-      claude: ["claude-sonnet-4.5"],
     }))
-      for (const id of ids) if (id) refs.add(keyOf(provider, id));
+      for (const id of ids)
+        if (id)
+          add(keyOf(provider, id), {
+            kind: "runtime",
+            label: "공통 기본 실행 경로 또는 서버 환경 설정",
+          });
     return refs;
+  }
+  private async databaseReferences(): Promise<PolicyReference[]> {
+    // Disabled policies and fallback references remain protected for later re-enabling.
+    return this.db.query(
+      "SELECT 'gemini' AS provider,default_model AS model,'공통 질의 기본 모델' AS label,'query' AS source,NULL::text AS scope FROM ai_query_policy UNION ALL SELECT provider,model,'범위별 AI 정책 기본 모델' AS label,'scope' AS source,to_jsonb(p)->>'scope' AS scope FROM ai_llm_policies p UNION ALL SELECT fallback_provider AS provider,fallback_model AS model,'범위별 AI 정책의 장애 시 대체 모델' AS label,'scope' AS source,to_jsonb(p)->>'scope' AS scope FROM ai_llm_policies p WHERE fallback_model IS NOT NULL UNION ALL SELECT provider,COALESCE(to_jsonb(s)->>'defaultmodel',to_jsonb(s)->>'defaultModel',to_jsonb(s)->'config'->>'model',to_jsonb(s)->'config'->>'defaultModel') AS model,'공급자 연결 기본 모델' AS label,'connection' AS source,NULL::text AS scope FROM ai_settings s",
+    );
   }
   async change(expected: unknown, actorId: string, mutation: ModelMutation) {
     if (!this.db.isInitialized)
@@ -361,9 +454,9 @@ export class ModelControlService {
         "AI_MODEL_CONTROL_CONFLICT",
         "다른 관리자가 변경했습니다. 최신 목록을 다시 조회해 주세요.",
       );
-    let baseReferences: Set<string>;
+    let referenceRows: PolicyReference[];
     try {
-      baseReferences = await this.references(control, false);
+      referenceRows = await this.databaseReferences();
     } catch {
       return fail(
         503,
@@ -372,16 +465,24 @@ export class ModelControlService {
       );
     }
     if (mutation.action === "select") {
-      const target = MODEL_TARGETS.find((x) => x.id === mutation.target);
-      if (!target)
+      // Old clients may still submit the former shared target during a rolling release.
+      const targets =
+        mutation.target === "policy.CONTENT_TRANSLATION"
+          ? MODEL_TARGETS.filter((x) =>
+              ["store.translation", "pharmacy.consultation"].includes(x.id),
+            )
+          : MODEL_TARGETS.filter((x) => x.id === mutation.target);
+      if (!targets.length)
         return fail(400, "AI_MODEL_TARGET_INVALID", "사용처를 확인해 주세요.");
-      if (mutation.selection === null) delete control.selections[target.id];
-      else {
-        checkSelection(control, target.id, mutation.selection!);
-        control.selections[target.id] = {
-          provider: mutation.selection!.provider,
-          model: mutation.selection!.model,
-        };
+      for (const target of targets) {
+        if (mutation.selection === null) delete control.selections[target.id];
+        else {
+          checkSelection(control, target.id, mutation.selection!);
+          control.selections[target.id] = {
+            provider: mutation.selection!.provider,
+            model: mutation.selection!.model,
+          };
+        }
       }
     } else {
       const oldKey = keyOf(mutation.provider ?? "", mutation.id ?? "");
@@ -407,13 +508,7 @@ export class ModelControlService {
         (nextKey !== oldKey ||
           model?.capabilities.join(",") !== old.capabilities.join(","))
       ) {
-        const refs = new Set([
-          ...baseReferences,
-          ...Object.values(control.selections).map((x) =>
-            keyOf(x.provider, x.model),
-          ),
-        ]);
-        if (refs.has(oldKey))
+        if (this.references(control, referenceRows)[oldKey])
           return fail(
             409,
             "AI_MODEL_IN_USE",
@@ -428,6 +523,23 @@ export class ModelControlService {
       control.deleted = [...new Set(control.deleted)].filter(
         (x) => x !== nextKey,
       );
+    }
+    const modelReferences = this.references(control, referenceRows);
+    if (control.deleted.some((key) => modelReferences[key]))
+      return fail(
+        409,
+        "AI_MODEL_REMOVED",
+        "지정을 해제하면 삭제한 기본 모델이 다시 필요합니다. 다른 등록 모델을 지정하거나 이전 모델을 다시 등록해 주세요.",
+      );
+    for (const [key, targets] of Object.entries(overridableDefaults)) {
+      const model = control.models.find((x) => keyOf(x.provider, x.id) === key);
+      if (model)
+        for (const target of targets)
+          if (!control.selections[target])
+            checkSelection(control, target, {
+              provider: model.provider,
+              model: model.id,
+            });
     }
     if (control.models.length > 250)
       return fail(400, "AI_MODEL_LIMIT", "등록 모델 수 제한을 초과했습니다.");
@@ -454,14 +566,8 @@ export class ModelControlService {
     }
     return {
       ...control,
-      protectedModels: [
-        ...new Set([
-          ...baseReferences,
-          ...Object.values(control.selections).map((x) =>
-            keyOf(x.provider, x.model),
-          ),
-        ]),
-      ],
+      protectedModels: Object.keys(modelReferences),
+      modelReferences,
       targets: MODEL_TARGETS,
       usageTargets: Object.fromEntries(
         AI_USAGE_CATALOG.map((x) => [x.id, modelTargetId(x.id)]),

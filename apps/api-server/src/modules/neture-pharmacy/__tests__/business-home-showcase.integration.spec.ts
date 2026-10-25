@@ -35,7 +35,7 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
       CREATE TABLE supplier_product_offers(id uuid,master_id uuid,supplier_id uuid,business_short_description text,approval_status text,is_active boolean,deleted_at timestamptz);
       CREATE TABLE supply_proposals(id uuid,semi_franchise_id uuid,offer_id uuid,status text,target_organization_id uuid,created_at timestamptz DEFAULT now());
       CREATE TABLE semi_franchise_contents(id uuid,semi_franchise_id uuid,title text,summary text,body text,status text,source_supplier_id uuid,
-        source_item_id uuid,created_by uuid,updated_by uuid,updated_at timestamptz,published_at timestamptz,review_reason text);
+        source_item_id uuid,created_by uuid,updated_by uuid,updated_at timestamptz,published_at timestamptz,review_reason text, revision integer DEFAULT 1,category text DEFAULT '',education_url text);
       CREATE TABLE action_logs(id uuid DEFAULT gen_random_uuid(),service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamptz DEFAULT now());`);
     await batch(`INSERT INTO organizations VALUES($1,'Business','business','{}'),($2,'Store','pharmacy','{}');
       INSERT INTO users(id) VALUES($3),($4);`,[owner,store,user,reviewer]);

@@ -40,6 +40,7 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 import { useCallback, type CSSProperties } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, FileText, Loader2 } from 'lucide-react';
+import { ProductDescriptionAssist } from '../../components/product-description/ProductDescriptionAssist';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import type { EditorContent } from '@o4o/content-editor';
@@ -228,6 +229,12 @@ export default function ProductionMaterialEditorPage() {
 
       {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 적용 시 initialHtml(편집기 value)·editorContent(저장값) 동시 갱신 */}
       <div style={{ marginBottom: 8 }}>
+        {selectedType === 'product-description' ? (
+          <ProductDescriptionAssist key={editId ?? 'product-description'} context={{
+            task: 'product-description', title, currentHtml: editorContent.html,
+            sourceTitle: state.sourceMetadata?.sourceTitle, sourceOrigin: state.sourceMetadata?.sourceOrigin,
+          }} onApplyHtml={setEditorInitialHtml} />
+        ) : (
         <LlmAssistPanel
           label={STORE_LLM_ASSIST_LABEL}
           contextLabel="매장 제작 자료 — 새로 작성하거나 현재 내용을 다듬습니다"
@@ -243,6 +250,7 @@ export default function ProductionMaterialEditorPage() {
           onApplyHtml={setEditorInitialHtml}
           onNotify={(message, kind) => session.notify(message, kind === 'success')}
         />
+        )}
       </div>
 
       {/* Editor */}

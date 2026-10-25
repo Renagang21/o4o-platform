@@ -3,6 +3,7 @@
  *
  * 전부 `platform:super_admin` 전용이다. 비밀번호를 받는 필드는 어디에도 없다.
  */
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import { operatorAssignmentController } from '../../controllers/admin/OperatorAssignmentController.js';
@@ -13,6 +14,7 @@ const ADMIN_ROLES = ['platform:super_admin'];
 
 router.use(authenticate);
 router.use(requireRole(ADMIN_ROLES));
+router.use(apiLimiter);
 
 // (A) 직접 지정 — 대상은 언제나 userId
 router.get('/roles', operatorAssignmentController.listRoles);

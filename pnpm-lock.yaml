@@ -2360,9 +2360,6 @@ importers:
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -2409,12 +2406,6 @@ importers:
       '@o4o/account-ui':
         specifier: workspace:*
         version: link:../../packages/account-ui
-      '@o4o/admin-ux-core':
-        specifier: workspace:*
-        version: link:../../packages/admin-ux-core
-      '@o4o/ai-components':
-        specifier: workspace:*
-        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -2436,42 +2427,21 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
-      '@o4o/lms-client':
-        specifier: workspace:*
-        version: link:../../packages/lms-client
-      '@o4o/lms-ui':
-        specifier: workspace:*
-        version: link:../../packages/lms-ui
-      '@o4o/operator-core':
-        specifier: workspace:*
-        version: link:../../packages/operator-core
       '@o4o/operator-core-ui':
         specifier: workspace:*
         version: link:../../packages/operator-core-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
-      '@o4o/screen-content-core':
-        specifier: workspace:*
-        version: link:../../packages/screen-content-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
-      '@o4o/store-asset-policy-core':
-        specifier: workspace:*
-        version: link:../../packages/store-asset-policy-core
-      '@o4o/store-products-ui':
-        specifier: workspace:*
-        version: link:../../packages/store-products-ui
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
       '@o4o/tablet-kiosk-core':
         specifier: workspace:*
         version: link:../../packages/tablet-kiosk-core
-      '@o4o/tablet-screen-set-editor':
-        specifier: workspace:*
-        version: link:../../packages/tablet-screen-set-editor
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -2621,18 +2591,12 @@ importers:
       '@o4o/hub-core':
         specifier: workspace:*
         version: link:../../packages/hub-core
-      '@o4o/operator-core':
-        specifier: workspace:*
-        version: link:../../packages/operator-core
       '@o4o/operator-core-ui':
         specifier: workspace:*
         version: link:../../packages/operator-core-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
-      '@o4o/screen-content-core':
-        specifier: workspace:*
-        version: link:../../packages/screen-content-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
@@ -2642,9 +2606,6 @@ importers:
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
-      '@o4o/tablet-kiosk-core':
-        specifier: workspace:*
-        version: link:../../packages/tablet-kiosk-core
       '@o4o/tablet-screen-set-editor':
         specifier: workspace:*
         version: link:../../packages/tablet-screen-set-editor
@@ -2715,6 +2676,9 @@ importers:
 
   services/web-pharmacy-coop:
     dependencies:
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -2764,6 +2728,9 @@ importers:
 
   services/web-store:
     dependencies:
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/account-ui':
         specifier: workspace:*
         version: link:../../packages/account-ui
@@ -2785,18 +2752,12 @@ importers:
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling
-      '@o4o/lms-client':
-        specifier: workspace:*
-        version: link:../../packages/lms-client
       '@o4o/operator-core-ui':
         specifier: workspace:*
         version: link:../../packages/operator-core-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
-      '@o4o/screen-content-core':
-        specifier: workspace:*
-        version: link:../../packages/screen-content-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui

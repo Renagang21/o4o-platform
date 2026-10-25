@@ -320,10 +320,17 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'AddContactInquiryOrganization1792540800000', fingerprint: '8ed889abb7221d1f8fda81b8dd89b9b2bd473806011d0ee8e484eed3c91f9956', fingerprintLineCount: 6776 },
   // Isolated PostgreSQL 16: every prior canonical prefix matched; empty down/up restores previous state.
   { appliedThrough: 'CreateExternalAiConnections1792635132325', fingerprint: '4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3', fingerprintLineCount: 6838 },
-  // Isolated PostgreSQL 15 canonical bootstrap + all ordered prefixes; no production reads.
-  { appliedThrough: 'CreatePartnerSupportSpaces1792886400000', fingerprint: '78d2aee502dffdd04b9b8b075341a23bf51d44e95672e70351f46bfb6f4ef2e5', fingerprintLineCount: 6893 },
-  // Task-isolated PostgreSQL 15, canonical baseline + ordered prefixes; no production reads.
-  { appliedThrough: 'AddPartnerMediaAndReadState1792886500000', fingerprint: '75835f71568a80334d64a06279a72931b8fbd414273535643bb45bc6da3d65d0', fingerprintLineCount: 6928 },
+  // Isolated PostgreSQL 15: all prior prefixes and empty down/up verified.
+  { appliedThrough: 'CreateStoreConsultationStations1792815861315', fingerprint: 'd9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb', fingerprintLineCount: 6869 },
+  // Isolated PostgreSQL 15: preserve all main prefixes, append operator invitation consent/privacy schema.
+  { appliedThrough: 'CreateServiceOperatorInvitations1792886400000', fingerprint: 'b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea', fingerprintLineCount: 6901 },
+  // Isolated PostgreSQL 15.18: main prefixes plus Lecture profile verified after integration.
+  { appliedThrough: 'AddLectureInstructorProfile1792886400001', fingerprint: 'ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb', fingerprintLineCount: 6903 },
+  // Isolated PostgreSQL 15: prior prefixes, empty down/up, and workflow integration verified.
+  { appliedThrough: 'CreateCooperationMemberWorkflows1792886400002', fingerprint: '54230274de3a1c420410f8e634196fc10edbe2e317a06b7647bf12fe6f8e118b', fingerprintLineCount: 7021 },
+  // Integrated main prefixes and empty down/up verified in isolated PostgreSQL 15.
+  { appliedThrough: 'CreatePartnerSupportSpaces1792886600000', fingerprint: '3d408172c0b5a9b2d548ed5584248d08e61e6bf2e9eb40ee4961a0e57414c8f5', fingerprintLineCount: 7076 },
+  { appliedThrough: 'AddPartnerMediaAndReadState1792886700000', fingerprint: '418afd534087a5c269051506237b6b3bf69c9ad9ef160fddfd138dbda6b7ec4f', fingerprintLineCount: 7111 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
