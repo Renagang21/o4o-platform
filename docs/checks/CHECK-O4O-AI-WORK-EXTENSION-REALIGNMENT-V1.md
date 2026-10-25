@@ -64,3 +64,5 @@ WORKTREE_DISPOSITION: worktree `/workspace/o4o-wt/ai-work-extension-preparation`
 변경에는 새 migration·DDL·운영 설정·인증 정보가 없다. 기존 API 배포의 migration Job과 verified rollout은 표준 경로로 유지한다. 일반 Delivery가 서비스별 serving SHA와 누적 diff를 판정하고 필요하면 소유자 `promote.yml` 경로로 승인된 target만 배포한다. 협력 모임 웹은 별도 `deploy-cooperative.yml`의 `frontend_only=true` 경로를 사용하여 조합·회원·운영자 데이터 등록/변경 없이 웹만 배포한다. API 반영과 동일 SHA/호환성 확인 후 진행한다.
 
 실행 전 조회한 최근 CI·Delivery·Promote는 모두 완료 상태였고 진행 중인 운영 배포는 없었다. PR/병합 SHA·CI·최종 배포/서빙 결과와 공개 smoke의 확정 결과는 확인 후 이 절에 기록한다. 실제 유료 AI 호출·업무 데이터 생성·신규 외부 계약/인증 설정은 이번 배포 검증에 포함하지 않는다.
+
+[PR #805](https://github.com/Renagang21/o4o-platform/pull/805)의 자동 리뷰에서 정산 상세·정책 표시 P2 2건을 확인해 같은 branch에서 보완했다. STORE_INSIGHT를 기존 동적 서비스 scope 집계에 포함하여 실제 reservation의 service/month에 따라 상세를 계산하고 전역 scope 총액을 다른 서비스에 더하지 않는다. 기존 service 미지정 호출의 `store` 기본값과 정산 총액·확정/결제 경로는 유지한다. 관리 목록의 scope 정책 조회 대상도 카탈로그의 실제 `selection=scope` 정의에서 모아 매장·공급자·협력 모임의 저장 모델·활성/중지 설정을 표시한다. 재현 회귀를 포함한 정산/관리/HTTP 4 suites / 51 tests와 API build·변경 파일 lint PASS를 확인했다. 새 DDL·원장 보정·운영 정산 상태 변경은 없다.

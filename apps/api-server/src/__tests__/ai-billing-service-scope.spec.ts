@@ -21,3 +21,25 @@ it('surfaces a breakdown DB failure instead of returning a misleading empty succ
   const query=jest.fn().mockResolvedValueOnce([{id:1,period:'2026-10',serviceKey:'neture',status:'draft'}]).mockRejectedValueOnce(new Error('db unavailable'));
   await expect(new AiBillingService({query} as any).getDetail(1)).rejects.toThrow('AI_BILLING_BREAKDOWN_UNAVAILABLE');
 });
+it.each([
+  ['kpa-society', 2, 50, 0.2],
+  ['store', 1, 25, 0.1],
+] as const)('uses STORE_INSIGHT receipts for %s without adding the global scope total', async (serviceKey, requests, tokens, cost) => {
+  const query = jest.fn(async (sql: string, params: unknown[]) => {
+    if (sql.includes('ai_billing_summary')) return [{ id: 1, period: '2026-10', serviceKey, totalRequests: requests, totalTokens: tokens, totalCost: cost, adjustmentAmount: 0, finalCost: cost, status: 'draft' }];
+    if (sql.includes('ai_usage_aggregate')) return [
+      { scope: 'STORE_INSIGHT', limitType: 'requests', currentValue: 999 },
+      { scope: 'STORE_INSIGHT', limitType: 'tokens', currentValue: 999 },
+      { scope: 'STORE_INSIGHT', limitType: 'cost', currentValue: 999 },
+    ];
+    if (sql.includes('ai_usage_reservations')) {
+      expect(sql).toContain('WHERE service_key = $1 AND monthly_key = $2');
+      expect(params).toEqual([serviceKey, '2026-10', expect.arrayContaining(['STORE_INSIGHT'])]);
+      return [{ scope: 'STORE_INSIGHT', requests, tokens, cost }];
+    }
+    throw new Error('unexpected query');
+  });
+  const result = await new AiBillingService({ query } as any).getDetail(1);
+  expect(result.scopeBreakdown).toEqual([{ scope: 'STORE_INSIGHT', requests, tokens, cost }]);
+  expect(result.scopeBreakdown[0].cost).toBe(result.summary.totalCost);
+});

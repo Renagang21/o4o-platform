@@ -26,10 +26,12 @@ function fixture() {
       cost: "0.00000001",
     },
   ];
-  const query = jest.fn(async (sql: string) => {
+  const query = jest.fn(async (sql: string, params?: unknown[]) => {
     if (sql.includes("FROM ai_query_policy"))
       return [{ model: "fixture-query", enabled: false }];
-    if (sql.includes("FROM ai_llm_policies")) return policies;
+    if (sql.includes("FROM ai_llm_policies")) return policies.filter(policy =>
+      (params?.[0] as string[] | undefined)?.includes(policy.scope),
+    );
     if (sql.includes("FROM ai_settings"))
       return [{ provider: "gemini", configured: true }];
     if (sql.includes("FROM ai_usage_logs")) return usage;
@@ -39,6 +41,18 @@ function fixture() {
 }
 
 describe("AI management source inventory", () => {
+  it('reads the saved insight scope policies used by all three overview hosts', async () => {
+    const { db, policies } = fixture();
+    policies.push(
+      { scope: 'STORE_INSIGHT', provider: 'openai', model: 'fixture-store', enabled: false },
+      { scope: 'OPERATOR_INSIGHT', provider: 'gemini', model: 'fixture-operator', enabled: true },
+    );
+    const data = await new AiManagementService(db, {}).snapshot();
+    expect(data.usages.find(row => row.id === 'store.overview')?.configuration).toMatchObject({ state: 'stored', provider: 'openai', model: 'fixture-store', enabled: false });
+    for (const id of ['supplier.overview', 'cooperative.overview'])
+      expect(data.usages.find(row => row.id === id)?.configuration).toMatchObject({ state: 'stored', provider: 'gemini', model: 'fixture-operator', enabled: true });
+    expect(db.query).toHaveBeenCalledWith(expect.stringContaining('WHERE scope = ANY($1)'), [expect.arrayContaining(['PRODUCT_CONTENT', 'CONTENT_TRANSLATION', 'STORE_INSIGHT', 'OPERATOR_INSIGHT'])]);
+  });
   it("keeps logical usages unique, all audit rows covered, and mixed controls separate", async () => {
     const { db } = fixture();
     const data = await new AiManagementService(db, {}).snapshot();
