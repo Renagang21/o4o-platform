@@ -202,6 +202,7 @@ export default function ProductMasterDetailPage() {
         <ArrowLeft className="w-4 h-4" /> 목록으로
       </button>
 
+      {id && <a className="mb-3 block text-sm text-blue-700 underline" href={`/admin/o4o-product-db/maintenance?product=${encodeURIComponent(id)}#product-workspace`}>이 상품의 자료·정비·갱신 이력 열기</a>}
       {loading ? (
         <div className="text-gray-400 py-10 text-center">불러오는 중…</div>
       ) : error ? (

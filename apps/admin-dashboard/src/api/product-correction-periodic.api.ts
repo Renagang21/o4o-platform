@@ -14,6 +14,19 @@ export interface Page<T> {
   page: number;
   pageSize: number;
 }
+export type ProductWorkspaceSection = 'descriptions' | 'tasks' | 'proposals' | 'renewals' | 'edits';
+export interface ProductWorkspaceItem {
+  id: string; title: string; state: string; at: string; href: string;
+  notes?: string; sources?: string; content?: string; summary?: string; truncated?: boolean;
+  sourceType?: string; sourceRefId?: string; nextReviewAt?: string; followUpAt?: string;
+  evidence?: Array<{ id: string; kind: string; source: string; checkedOn: string; status: string }>;
+  changes?: Array<{ field: string; before: unknown; after: unknown; reason?: string; decision?: string }>;
+}
+export interface ProductWorkspaceDetail extends Page<ProductWorkspaceItem> {
+  product: { id: string; name: string; barcode: string | null; manufacturerName: string | null;
+    specification: string | null; regulatoryType: string; status: string };
+  section: ProductWorkspaceSection;
+}
 export interface PeriodicDashboard {
   renewalOpen: number;
   proposalPending: number;
@@ -26,6 +39,8 @@ export interface PeriodicDashboard {
   noticeUnread: number;
   evidenceWaiting: number;
   lastTickAt: string | null;
+  worker?: { source?: 'server' | 'job'; lastSucceededAt?: string; lastFailedAt?: string;
+    lastErrorCode?: string | null; lastDurationMs?: number; pagesProcessed?: number } | null;
 }
 export interface RenewalDetail {
   record: ProductDescriptionRenewal;
@@ -44,6 +59,7 @@ const messages: Record<string, string> = {
   SCHEDULE_FUTURE_REQUIRED: '한국시간 기준으로 미래 최초 실행 시각을 지정하세요.',
   RENEWAL_CHANGED: '갱신 작업이 변경됐습니다. 최신 기록을 다시 확인하세요.',
   PRODUCT_SOURCE_CHANGED: '상품·설명서 원문이 바뀌었습니다. 최신 자료를 다시 불러와 검토하세요.',
+  MASTER_NOT_FOUND: '상품을 찾을 수 없습니다. 상품 ID를 확인하세요.',
   INVALID_INPUT: '입력값을 확인하세요. 갱신 검토에는 목적과 메모가 필요합니다.',
 };
 async function call<T>(
@@ -67,6 +83,8 @@ async function call<T>(
   }
 }
 export const productCorrectionPeriodicApi = {
+  productWorkspace: (id: string, section: ProductWorkspaceSection = 'descriptions', page = 1) =>
+    call<ProductWorkspaceDetail>('get', `/products/${encodeURIComponent(id)}/workspace?section=${section}&page=${page}`),
   dashboard: () => call<PeriodicDashboard>('get', '/periodic/dashboard'),
   renewals: (state: 'open' | 'all' = 'open', page = 1) =>
     call<Page<ProductDescriptionRenewal>>('get', `/renewals?state=${state}&page=${page}`),

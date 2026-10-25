@@ -123,6 +123,20 @@ async function open(canWrite = true) {
   await screen.findByLabelText('통합 관리 현황');
 }
 describe('상품 정기 관리 4~6번', () => {
+  it('reopens a linked renewal only on explicit navigation and shows independent worker health', async () => {
+    window.history.replaceState(null, '', '/?renewal=edit-event%3ASTORE%3Ako');
+    mocks.api.dashboard.mockResolvedValue({ worker: { source: 'job', lastSucceededAt: '2026-10-25T00:00:00Z', lastErrorCode: 'WORKER_TICK_FAILED' } });
+    try {
+      render(<ProductCorrectionPeriodicPanel canWrite={true} />);
+      expect(mocks.api.renewal).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByText('연결된 설명서 갱신 검토 열기'));
+      await screen.findByLabelText('갱신 검토 메모');
+      expect(mocks.api.renewal).toHaveBeenCalledWith('edit-event:STORE:ko');
+      expect(screen.getByText(/독립 정기 작업/)).toHaveTextContent('작업 실패');
+      expect(mocks.api.saveRenewal).not.toHaveBeenCalled();
+    } finally { window.history.replaceState(null, '', '/'); }
+  });
+
   it('does not run a job or enable scheduling when merely opening the dashboard', async () => {
     await open();
     expect(mocks.api.createBulk).not.toHaveBeenCalled();
