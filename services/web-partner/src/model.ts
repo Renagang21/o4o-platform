@@ -309,7 +309,7 @@ export function parseWorkspace(raw: string): Workspace {
         (!Number.isSafeInteger(row.views) || (row.views as number) < 0)
       )
         throw new Error("조회수 형식이 올바르지 않습니다.");
-      if (key === "activities") calendarDate(row.publishedAt as string);
+      if (key === "activities") validCalendarDate(row.publishedAt as string);
       if (
         key === "settlements" &&
         (!Number.isSafeInteger(row.amount) ||

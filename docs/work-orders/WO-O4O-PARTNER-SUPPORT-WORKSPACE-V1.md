@@ -166,3 +166,9 @@
 - 실제 PostgreSQL 회귀 17개 통과. schema별 API/browser harness의 fence adapter와 실제 canonical public 함수 검증을 구분했다. canonical 43 prefix와 신규 down/up 재확인 후 실제 public 함수가 6개 테이블의 파기 대상 UUID 쓰기를 모두 `ACCOUNT_ERASURE_PENDING`으로 차단함을 확인했다.
 - 최종 fingerprint: 공간 `71c8439bec809c03e55cc68068877cb8f39d567afbf203e78254281a191fdc07` (7,080줄), media/read `4accc1af6999af30ee278a666edeafb6d978b2846ef9876fd2b43e58cc4144a3` (7,117줄). 위 최초 통합 산출값을 대체한다.
 - 별도 발견: 기존 main canonical prefix 41에는 이미 fence 누락 테이블 10개가 있다(`ai_usage_reservations`, `cooperatives`, `external_ai_*` 6개, `member_paid_service_entitlements`, `store_consultation_stations`). Partner 적용 전후 누락 수가 동일함을 확인했다. 이 기존 Core/다른 도메인 문제는 임의 수정하지 않았으며 운영 계정 파기 전체 정상으로 보고하지 않는다. 해당 도메인 통합 담당의 별도 검토가 필요하다.
+
+### PR 재검토 보완 — 세션·날짜·검증 스크립트
+
+- 서버 모드 재진입 시 기존 개인/공간/알림 상태를 먼저 초기화하고 401을 공통 오류 처리로 전달한다. 세션 만료 후 로컬→서버 복귀·재로그인 회귀를 추가했다. 재연결 중 모드 전환을 잠그고 안정된 callback 의존성을 사용한다.
+- snapshot 역직렬화의 활동일은 유효한 달력 날짜만 검사한다. 미래 날짜 제한은 등록/수정 입력에 유지하여 참여자의 시간대 차이로 저장 자료 전체를 거부하지 않는다. 프런트 64 tests·웹 build·32 화면 브라우저 검사·변경 파일 ESLint 통과.
+- GitHub CI console 검사에서 잡힌 테스트 harness의 준비 로그를 console.info로 변경했다. 규칙·제외 범위·baseline은 변경하지 않았다. Sonar가 지적한 고정 /tmp 스크린샷 파일 경로는 mkdtemp로 만든 0700 전용 폴더 안으로 옮겼다. 전체 ESLint 실측 1 error는 기존 baseline 46 이하로 ratchet 통과했다(기존 오류는 임의 수정하지 않았다).

@@ -8,7 +8,8 @@ import {
   waitFor,
 } from "@testing-library/react";
 import WorkspacePortal from "./WorkspacePortal";
-import { ApiError, partnerApi } from "./api";
+import { ApiError, partnerApi, type ServerSpace } from "./api";
+import { emptyWorkspace } from "./model";
 
 vi.mock("./api", async (importOriginal) => {
   const original = await importOriginal<typeof import("./api")>();
@@ -17,6 +18,7 @@ vi.mock("./api", async (importOriginal) => {
     partnerApi: {
       me: vi.fn(),
       list: vi.fn(),
+      load: vi.fn(),
       login: vi.fn(),
       join: vi.fn(),
       logout: vi.fn(),
@@ -70,6 +72,26 @@ describe("공동공간 진입", () => {
     await screen.findByRole("button", { name: "공동공간 만들기" });
     expect(new URLSearchParams(location.search).has("mode")).toBe(false);
     expect(partnerApi.me).toHaveBeenCalledTimes(count + 1);
+  });
+  it("세션 만료 후 서버 재연결 시 이전 사용자와 공동공간을 제거한다", async () => {
+    const space: ServerSpace = { id: "private-space", name: "비공개 테스트 공간", role: "owner",
+      revision: 0, updated_at: "2026-01-01T00:00:00Z", workspace: emptyWorkspace() };
+    vi.mocked(partnerApi.list).mockResolvedValue([space]);
+    vi.mocked(partnerApi.load).mockResolvedValue(space);
+    render(<WorkspacePortal />);
+    await screen.findByRole("option", { name: "비공개 테스트 공간 · 소유자" });
+    fireEvent.change(screen.getByLabelText("이용할 공동공간"), { target: { value: space.id } });
+    await screen.findByRole("button", { name: "공동공간 관리" });
+    fireEvent.click(screen.getByRole("button", { name: "로컬 도구 이용" }));
+    vi.mocked(partnerApi.me).mockRejectedValueOnce(new ApiError(401, "UNAUTHENTICATED"));
+    fireEvent.click(screen.getByRole("button", { name: "서버 공동공간 연결" }));
+    await screen.findByRole("button", { name: "로그인", exact: true });
+    expect(screen.queryByLabelText("이용할 공동공간")).toBeNull();
+    expect(screen.queryByText("테스트 사용자님의 공동공간")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "기존 로그인 확인" }));
+    await screen.findByLabelText("이용할 공동공간");
+    expect((screen.getByLabelText("이용할 공동공간") as HTMLSelectElement).value).toBe("");
+    expect(screen.queryByRole("button", { name: "공동공간 관리" })).toBeNull();
   });
   it("실패한 로그인에서도 비밀번호를 입력창과 브라우저 저장소에 남기지 않는다", async () => {
     vi.mocked(partnerApi.me).mockRejectedValue(

@@ -1,11 +1,14 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, mkdtemp } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 
 // The backend uses a test-only identity adapter and real isolated PostgreSQL.
 // This test makes no claim about real-account login or production deployment.
 const origin = "http://127.0.0.1:3011";
+const artifacts = await mkdtemp(join(tmpdir(), "partner-server-browser-"));
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
   args: ["--no-sandbox"],
@@ -497,11 +500,11 @@ try {
     );
   }
   await owner.screenshot({
-    path: "/tmp/partner-server-desktop.png",
+    path: join(artifacts, "partner-server-desktop.png"),
     fullPage: true,
   });
   await viewer.screenshot({
-    path: "/tmp/partner-server-mobile.png",
+    path: join(artifacts, "partner-server-mobile.png"),
     fullPage: true,
   });
   assert.deepEqual(errors, []);

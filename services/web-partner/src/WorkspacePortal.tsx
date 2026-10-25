@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import App from "./App";
 import {
   partnerApi,
@@ -68,7 +68,20 @@ export default function WorkspacePortal() {
     window.addEventListener("hashchange", capture);
     return () => window.removeEventListener("hashchange", capture);
   }, []);
-  const run = async (work: () => Promise<void>) => {
+  const clearSession = useCallback(() => {
+    setNotifications([]);
+    setShowNotifications(false);
+    setSpaces([]);
+    setMembers([]);
+    setEvents([]);
+    setInvites([]);
+    setManage(false);
+    setUser(null);
+    setSelected(null);
+    snapshot.current = null;
+    setInviteLink("");
+  }, []);
+  const run = useCallback(async (work: () => Promise<void>) => {
     if (busyRef.current) return;
     busyRef.current = true;
     setBusy(true);
@@ -78,17 +91,7 @@ export default function WorkspacePortal() {
       await work();
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) {
-        setNotifications([]);
-        setShowNotifications(false);
-        setSpaces([]);
-        setMembers([]);
-        setEvents([]);
-        setInvites([]);
-        setManage(false);
-        setUser(null);
-        setSelected(null);
-        snapshot.current = null;
-        setInviteLink("");
+        clearSession();
       }
       if (e instanceof ApiError && e.code === "SPACE_NOT_FOUND") {
         setSelected(null);
@@ -104,24 +107,18 @@ export default function WorkspacePortal() {
       busyRef.current = false;
       setBusy(false);
     }
-  };
-  const connect = async () => {
+  }, [clearSession]);
+  const connect = useCallback(async () => {
+    clearSession();
     const u = await partnerApi.me();
     setUser(u);
     setSpaces(await partnerApi.list());
-  };
+  }, [clearSession]);
   useEffect(() => {
     if (mode === "server")
-      void run(async () => {
-        try {
-          await connect();
-        } catch (e) {
-          if (e instanceof ApiError && e.status === 401) return;
-          throw e;
-        }
-      });
+      void run(connect);
     // Each explicit mode entry revalidates the cookie session. No login mutation on mount.
-  }, [mode]);
+  }, [mode, run, connect]);
   const choose = async (id: string) => {
     const s = await partnerApi.load(id);
     snapshot.current = s;
@@ -191,6 +188,7 @@ export default function WorkspacePortal() {
         )}
         <button
           className="button quiet"
+          disabled={busy}
           onClick={() => {
             const next = mode === "local" ? "server" : "local";
             const url = new URL(location.href);

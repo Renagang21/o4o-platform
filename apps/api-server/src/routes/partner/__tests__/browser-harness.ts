@@ -106,7 +106,7 @@ async function main() {
       ),
     );
     const server = app.listen(3012, "127.0.0.1", () =>
-      console.log("PARTNER_TEST_HARNESS_READY"),
+      console.info("PARTNER_TEST_HARNESS_READY"),
     );
     let closing = false;
     const close = async () => {

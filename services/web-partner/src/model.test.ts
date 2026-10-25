@@ -134,6 +134,16 @@ describe("로컬 저장 무결성", () => {
       error: "",
     });
   });
+  it("저장된 활동 날짜는 열람자의 오늘과 무관하게 읽되 잘못된 달력 날짜는 거부한다", () => {
+    const w = fixture();
+    w.activities.push({ id: "timezone-activity", createdAt: "2026-01-01T00:00:00Z",
+      proposalId: "proposal-1", creatorId: "creator-1", url: "https://example.com/post",
+      publishedAt: "2999-01-01", views: 0 });
+    expect(parseWorkspace(JSON.stringify(w)).activities[0].publishedAt).toBe("2999-01-01");
+    expect(() => calendarDate("2999-01-01")).toThrow();
+    w.activities[0].publishedAt = "2026-02-30";
+    expect(() => parseWorkspace(JSON.stringify(w))).toThrow();
+  });
   it.each([
     "{broken",
     '{"version":99}',

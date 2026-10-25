@@ -1,5 +1,8 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
+import { mkdtemp } from "node:fs/promises";
 
 // Local isolated browser only. No real accounts, production API or payment calls.
 const origin = process.env.PARTNER_TEST_ORIGIN || "http://localhost:3011";
@@ -8,6 +11,7 @@ assert(
   ["localhost", "127.0.0.1", "[::1]"].includes(target.hostname),
   "Only loopback smoke targets are allowed.",
 );
+const artifacts = await mkdtemp(join(tmpdir(), "partner-browser-"));
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
   args: ["--no-sandbox"],
@@ -41,7 +45,7 @@ try {
     await page.getByRole("heading", { level: 1 }).textContent(),
     "홍보를 함께 만드는 공간",
   );
-  await page.screenshot({ path: "/tmp/partner-desktop.png", fullPage: true });
+  await page.screenshot({ path: join(artifacts, "partner-desktop.png"), fullPage: true });
   await visit("proposals");
   await page.getByLabel("사업자·브랜드", { exact: true }).fill("테스트 브랜드");
   await page
@@ -208,7 +212,7 @@ try {
   }
   await phone.setViewportSize({ width: 390, height: 844 });
   await phone.goto(`${origin}/?mode=local#home`);
-  await phone.screenshot({ path: "/tmp/partner-mobile.png", fullPage: true });
+  await phone.screenshot({ path: join(artifacts, "partner-mobile.png"), fullPage: true });
   await phone
     .getByRole("navigation", { name: "주 메뉴" })
     .getByRole("link", { name: "홍보 제안" })
