@@ -29,3 +29,16 @@
 ## 구현·검증 결과
 
 우선순위 4~6번의 개발·검증을 완료했다. [운영 안내](../guides/products/O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md)와 [검증 기록](../checks/CHECK-O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md)을 따른다. 이 트랙은 commit·push에서 종료하고 PR 생성·main 병합·배포·운영 보정을 수행하지 않는다.
+
+## 후속 통합 검토 TODO
+
+사용자의 후속 검토 지시에 따른 같은 WO의 연속 작업이다. 기존 branch를 유지하고 commit/push에서 종료한다.
+
+- [x] R1. 실제 저장 계약과 합성 fixture 대조·키 길이 초과 재현 및 수정
+- [x] R2. 동시 설명서 승격 덮어쓰기 재현·충돌 차단
+- [x] R3. 저장 성공 후 조회 실패·직접 링크 미저장 의견 보존
+- [x] R4. worker 선점 전 serialization 충돌과 실제 페이지 실패 구분
+- [x] R5. 기준부터 예약 재점검까지 격리 DB 전체 업무 검증·PC/모바일 재점검
+- [x] R6. 기존 CHECK·운영 안내 갱신·같은 branch commit/push (PR·배포 제외)
+
+[후속 검토 결과](../checks/CHECK-O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md#후속-통합-검토--2026-10-25)를 따른다.

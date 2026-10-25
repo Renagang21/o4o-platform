@@ -51,6 +51,7 @@ export default function ProductCorrectionProposalEditor({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const active = useRef(true);
+  const openedRequest = useRef<string | null>(null);
   const lock = useRef(false);
   useEffect(() => {
     active.current = true;
@@ -94,14 +95,15 @@ export default function ProductCorrectionProposalEditor({
       ]);
       if (!active.current) return;
       const requestedId = new URLSearchParams(window.location.search).get('proposal');
-      const requested = requestedId && /^[0-9a-f-]{36}$/i.test(requestedId)
+      const requested = requestedId && requestedId !== openedRequest.current && /^[0-9a-f-]{36}$/i.test(requestedId)
         ? await api.proposal(requestedId) : null;
       if (!active.current) return;
       setContext(source);
       if (requested && requested.batchId === batchId && requested.taskId === taskId) {
         setHistory([requested, ...saved.filter(p => p.id !== requested.id)]);
+        openedRequest.current = requestedId;
         showProposal(requested);
-      } else setHistory(saved);
+      } else setHistory(proposal && !saved.some(p => p.id === proposal.id) ? [...saved, proposal] : saved);
       // Keep typed suggestions on refresh; the current baseline is always displayed separately.
       setNotice('최신 원본과 변경안 이력을 불러왔습니다. 입력 중인 제안은 유지됩니다.');
     });

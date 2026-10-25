@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 export const RENEWAL = 'product_description_renewal';
 export const BULK = 'product_correction_bulk';
@@ -8,7 +9,14 @@ export const renewalKey = (id: string) => `product-correction:renewal:${id}`;
 export const bulkKey = (id: string) => `product-correction:bulk:${id}`;
 export const populationKey = (id: string) => `product-correction:population:${id}`;
 export const scheduleKey = (id: string) => `product-correction:schedule:${id}`;
-export const noticeKey = (id: string) => `product-correction:notice:${id}`;
+/** settings.key is varchar(100); preserve existing short keys and deterministically bound long identities. */
+const boundedKey = (key: string) =>
+  key.length <= 100
+    ? key
+    : `product-correction:hash:${createHash('sha256').update(key).digest('hex')}`;
+export const noticeKey = (id: string) => boundedKey(`product-correction:notice:${id}`);
+export const renewalVersionKey = (id: string, revision: number) =>
+  boundedKey(`${renewalKey(id)}:version:${revision}`);
 export const bulkSchema = z
   .object({
     ruleId: z.string().uuid(),

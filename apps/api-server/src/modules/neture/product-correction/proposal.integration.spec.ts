@@ -14,6 +14,7 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
   let batch: ProductCorrectionBatch;
   let schemaCreated = false;
   let failAudit = false;
+  let afterSourceRead: (() => Promise<void>) | null = null;
   const schema = `o4o_apply_${randomUUID().replace(/-/g, '')}`;
   const productId = randomUUID(),
     taskId = randomUUID(),
@@ -32,7 +33,7 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
     });
     await pool.query(`CREATE SCHEMA "${schema}"`);
     schemaCreated = true;
-    await pool.query(`CREATE TABLE settings (key text PRIMARY KEY,value jsonb NOT NULL,type text,description text,"createdAt" timestamptz DEFAULT now(),"updatedAt" timestamptz DEFAULT now());
+    await pool.query(`CREATE TABLE settings (key varchar(100) PRIMARY KEY,value jsonb NOT NULL,type varchar(50),description text,"createdAt" timestamptz DEFAULT now(),"updatedAt" timestamptz DEFAULT now());
       CREATE TABLE product_masters (id uuid PRIMARY KEY,name varchar(255),brand_name varchar(255),specification text,origin_country varchar(100),tags jsonb DEFAULT '[]',status text DEFAULT 'ACTIVE',barcode text,manufacturer_name text,updated_at timestamptz DEFAULT now());
       CREATE TABLE shared_product_descriptions (id uuid PRIMARY KEY,master_id uuid,description_type text,language text,content text,summary text,source_type text,source_ref_id uuid,status text,created_by uuid,updated_by uuid,curated_by uuid,curated_at timestamptz,updated_at timestamptz DEFAULT now(),created_at timestamptz DEFAULT now(),deleted_at timestamptz);
       CREATE UNIQUE INDEX canonical_unique ON shared_product_descriptions(master_id,description_type,COALESCE(language,'ko')) WHERE status='canonical' AND deleted_at IS NULL;`);
@@ -91,7 +92,13 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
                 args?.[2] === 'product_correction_proposal_version'
               )
                 throw new Error('synthetic audit failure');
-              return (await client.query(sql, args)).rows;
+              const rows = (await client.query(sql, args)).rows;
+              if (afterSourceRead && sql.includes('SELECT to_jsonb(d)')) {
+                const action = afterSourceRead;
+                afterSourceRead = null;
+                await action();
+              }
+              return rows;
             },
           });
           await client.query('COMMIT');
@@ -108,6 +115,7 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
   });
   beforeEach(async () => {
     failAudit = false;
+    afterSourceRead = null;
     await pool.query('TRUNCATE product_masters,shared_product_descriptions');
     await pool.query(
       "INSERT INTO product_masters(id,name,brand_name,specification,origin_country,tags,barcode,manufacturer_name) VALUES($1,'원본 상품','원본 브랜드','500mg','KR','[\"원본\"]','SYNTHETIC','합성 제조사')",
@@ -330,7 +338,14 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
     expect(
       (await service.queue('failed', 1)).items.some((p: { id: string }) => p.id === proposal.id),
     ).toBe(true);
-    expect((await pool.query("SELECT * FROM settings WHERE type='product_description_renewal' AND value->>'proposalId'=$1", [proposal.id])).rowCount).toBe(0);
+    expect(
+      (
+        await pool.query(
+          "SELECT * FROM settings WHERE type='product_description_renewal' AND value->>'proposalId'=$1",
+          [proposal.id],
+        )
+      ).rowCount,
+    ).toBe(0);
     failAudit = false;
     expect(
       (await service.apply(proposal.id, { revision: proposal.revision, fields: ['name'] }, actor))
@@ -344,17 +359,53 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
       service.apply(first.id, { revision: first.revision, fields: ['name'] }, actor),
       service.apply(second.id, { revision: second.revision, fields: ['tags'] }, actor),
     ]);
-    expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1);
-    const rejected = results.find(r => r.status === 'rejected') as PromiseRejectedResult;
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    const rejected = results.find((r) => r.status === 'rejected') as PromiseRejectedResult;
     expect(rejected.reason).toMatchObject({ code: 'PRODUCT_SOURCE_CHANGED' });
   });
   it('creates a first description without modifying a different type canonical', async () => {
     await pool.query('DELETE FROM shared_product_descriptions WHERE id=$1', [descriptionId]);
     const proposal = await approved(['descriptionContent']);
     expect(proposal.baseline.descriptionId).toBeNull();
-    const applied = await service.apply(proposal.id, { revision: proposal.revision, fields: ['descriptionContent'] }, actor);
+    const applied = await service.apply(
+      proposal.id,
+      { revision: proposal.revision, fields: ['descriptionContent'] },
+      actor,
+    );
     expect(applied.resultingDescriptionId).toBeDefined();
-    expect((await pool.query("SELECT status FROM shared_product_descriptions WHERE id=$1", [otherId])).rows[0].status).toBe('canonical');
+    expect(
+      (await pool.query('SELECT status FROM shared_product_descriptions WHERE id=$1', [otherId]))
+        .rows[0].status,
+    ).toBe('canonical');
+  });
+  it('does not demote a canonical promoted after an empty-description source check', async () => {
+    await pool.query('DELETE FROM shared_product_descriptions WHERE id=$1', [descriptionId]);
+    const candidateId = randomUUID();
+    await pool.query(
+      "INSERT INTO shared_product_descriptions(id,master_id,description_type,language,content,status) VALUES($1,$2,'STORE','ko','경쟁 관리자의 설명','candidate')",
+      [candidateId, productId],
+    );
+    const proposal = await approved();
+    afterSourceRead = async () => {
+      await pool.query("UPDATE shared_product_descriptions SET status='canonical' WHERE id=$1", [
+        candidateId,
+      ]);
+    };
+    await expect(
+      service.apply(
+        proposal.id,
+        { revision: proposal.revision, fields: ['name', 'descriptionContent'] },
+        actor,
+      ),
+    ).rejects.toMatchObject({ code: 'PRODUCT_SOURCE_CHANGED' });
+    expect(
+      (
+        await pool.query('SELECT status,content FROM shared_product_descriptions WHERE id=$1', [
+          candidateId,
+        ])
+      ).rows[0],
+    ).toEqual({ status: 'canonical', content: '경쟁 관리자의 설명' });
+    expect((await pool.query('SELECT name FROM product_masters')).rows[0].name).toBe('원본 상품');
   });
   it('checks review revisions, duplicates, empty sanitized HTML, inactive products and protected fields', async () => {
     const proposal = await approved(['tags']);

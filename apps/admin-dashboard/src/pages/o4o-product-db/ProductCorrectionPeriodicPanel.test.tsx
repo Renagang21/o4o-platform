@@ -103,6 +103,12 @@ beforeEach(() => {
     totalPages: 1,
     page: 1,
   });
+  mocks.api.acknowledge.mockResolvedValue({
+    id: 'notice',
+    title: '후보 점검 완료',
+    createdAt: '2026-10-25T00:00:00Z',
+    acknowledgedAt: '2026-10-25T01:00:00Z',
+  });
   mocks.api.schedules.mockResolvedValue(empty);
   mocks.api.schedule.mockResolvedValue(null);
   mocks.api.notices.mockResolvedValue({
@@ -197,6 +203,36 @@ describe('상품 정기 관리 4~6번', () => {
     expect(screen.getByText('실행 재개·재시도')).not.toBeDisabled();
     expect(mocks.api.controlBulk).not.toHaveBeenCalled();
     expect(mocks.api.stepBulk).not.toHaveBeenCalled();
+  });
+  it('keeps a created job visible when its result refresh fails instead of reporting creation failure', async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText('정기 관리 기준'), { target: { value: 'rule' } });
+    await waitFor(() => expect(screen.getByLabelText('예약 예정 한국시간')).not.toHaveValue(''));
+    mocks.api.createBulk.mockResolvedValue({ ...job, status: 'queued', cursor: 0 });
+    mocks.api.bulkPages.mockRejectedValue(new Error('후속 조회 실패'));
+    fireEvent.click(screen.getByText('대량 후보 점검 만들기'));
+    await screen.findByText(/작업은 저장됐지만 최신 현황/);
+    expect(screen.getByRole('status')).toHaveTextContent('고정 후보 목록을 저장했습니다');
+    expect(screen.getByLabelText('선택 대량 점검')).toHaveTextContent('0/28');
+    expect(mocks.api.createBulk).toHaveBeenCalledTimes(1);
+  });
+  it('preserves the saved schedule revision after a failed dashboard refresh', async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText('정기 관리 기준'), { target: { value: 'rule' } });
+    await waitFor(() => expect(screen.getByLabelText('예약 예정 한국시간')).not.toHaveValue(''));
+    mocks.api.saveSchedule.mockResolvedValue({ id: 'rule', revision: 1 });
+    mocks.api.dashboard.mockRejectedValue(new Error('현황 실패'));
+    fireEvent.click(screen.getByText('예약 저장'));
+    await screen.findByText(/작업은 저장됐지만 최신 현황/);
+    expect(screen.getByRole('status')).toHaveTextContent('예약을 저장했습니다');
+    fireEvent.change(screen.getByLabelText('예약 간격'), { target: { value: '31' } });
+    fireEvent.click(screen.getByText('예약 저장'));
+    await waitFor(() =>
+      expect(mocks.api.saveSchedule).toHaveBeenLastCalledWith(
+        'rule',
+        expect.objectContaining({ revision: 1, intervalDays: 31 }),
+      ),
+    );
   });
   it('keeps all write actions disabled without common product DB write access', async () => {
     await open(false);

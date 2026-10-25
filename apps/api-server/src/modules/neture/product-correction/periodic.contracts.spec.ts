@@ -1,4 +1,11 @@
-import { bulkSchema, scheduleSchema, controlSchema, renewalSchema } from './periodic.contracts.js';
+import {
+  bulkSchema,
+  scheduleSchema,
+  controlSchema,
+  renewalSchema,
+  noticeKey,
+  renewalVersionKey,
+} from './periodic.contracts.js';
 const id = '00000000-0000-4000-8000-000000000001';
 it('requires an explicit admin schedule, Korean timezone and bounded interval', () => {
   const value = {
@@ -33,4 +40,15 @@ it('requires a source fingerprint, purpose and review note before closing a rene
   expect(renewalSchema.safeParse({ ...value, notes: '' }).success).toBe(false);
   expect(renewalSchema.safeParse({ ...value, purposes: [] }).success).toBe(false);
   expect(renewalSchema.safeParse({ ...value, publish: true }).success).toBe(false);
+});
+
+it('bounds long deterministic storage keys to the actual settings varchar(100) contract', () => {
+  const event = `schedule-error:${id}:2026-10-25T01:00:00.000Z`;
+  expect(noticeKey(event).length).toBeLessThanOrEqual(100);
+  expect(noticeKey(event)).toBe(noticeKey(event));
+  expect(noticeKey(event)).not.toBe(noticeKey(event + 'x'));
+  expect(noticeKey('backlog:2026-10-25')).toBe('product-correction:notice:backlog:2026-10-25');
+  expect(
+    renewalVersionKey(`${id}:SUPPLIER_STORE:abcdefghijklmnop`, 12345).length,
+  ).toBeLessThanOrEqual(100);
 });

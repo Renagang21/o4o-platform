@@ -3,7 +3,14 @@ import type { DataSource } from 'typeorm';
 import type { ProductCorrectionProposal, ProductDescriptionRenewal } from '@o4o/types';
 import { CorrectionError } from './contracts.js';
 import { read, insert, replace, type Db } from './records.js';
-import { NOTICE, noticeKey, RENEWAL, renewalKey, renewalSchema } from './periodic.contracts.js';
+import {
+  NOTICE,
+  noticeKey,
+  RENEWAL,
+  renewalKey,
+  renewalVersionKey,
+  renewalSchema,
+} from './periodic.contracts.js';
 
 export async function notice(db: Db, id: string, kind: string, referenceId: string, title: string) {
   await db.query(
@@ -142,7 +149,7 @@ export class ProductDescriptionRenewalService {
       });
       await insert(
         db,
-        `${renewalKey(id)}:version:${previous.revision}`,
+        renewalVersionKey(id, previous.revision),
         'product_description_renewal_version',
         previous,
       );

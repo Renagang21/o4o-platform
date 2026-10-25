@@ -143,6 +143,19 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
     setRules(definitions);
     setOpened(true);
   };
+  // A committed mutation must never be reported as failed because the subsequent read failed.
+  const afterSaved = async (message: string, followUp?: () => Promise<void>) => {
+    if (active.current) setNotice(message);
+    try {
+      if (followUp) await followUp();
+      await refresh();
+    } catch {
+      if (active.current)
+        setError(
+          '작업은 저장됐지만 최신 현황을 불러오지 못했습니다. 같은 작업을 다시 만들지 말고 현황을 새로고침하세요.',
+        );
+    }
+  };
   const openJob = async (id: string, page = 1) => {
     const result = await api.bulkPages(id, page);
     if (active.current) {
@@ -352,11 +365,10 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                       });
                       if (active.current) {
                         setRenewal({ ...renewal, record: saved });
-                        setNotice(
-                          '갱신 검토 기록을 저장했습니다. 설명서·QR 원본은 변경하지 않았습니다.',
-                        );
                       }
-                      await refresh();
+                      await afterSaved(
+                        '갱신 검토 기록을 저장했습니다. 설명서·QR 원본은 변경하지 않았습니다.',
+                      );
                     })
                   }
                 >
@@ -437,12 +449,26 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
               onClick={() =>
                 void run(async () => {
                   const result = await api.createBulk(rules.find((r) => r.id === ruleId)!, search);
-                  await openJob(result.id);
-                  await refresh();
-                  if (active.current)
-                    setNotice(
-                      '고정 후보 목록을 저장했습니다. 서버 worker 또는 다음 25개 점검으로 처리합니다.',
-                    );
+                  if (active.current) {
+                    setPages({ job: result, run: null, totalPages: 0, page: 1 });
+                    setSelected([]);
+                    setBatchLink('');
+                    setJobs((previous) => ({
+                      items: [
+                        result,
+                        ...(previous?.page === 1 ? previous.items : []).filter(
+                          (j) => j.id !== result.id,
+                        ),
+                      ],
+                      total: (previous?.total ?? 0) + 1,
+                      page: 1,
+                      pageSize: 10,
+                    }));
+                  }
+                  await afterSaved(
+                    '고정 후보 목록을 저장했습니다. 서버 worker 또는 다음 25개 점검으로 처리합니다.',
+                    () => openJob(result.id),
+                  );
                 })
               }
             >
@@ -500,9 +526,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                         nextDueAt: new Date(`${nextDue}:00+09:00`).toISOString(),
                       });
                       if (active.current) setSchedule(result);
-                      await refresh();
-                      if (active.current)
-                        setNotice('예약을 저장했습니다. 상품 자동 수정은 수행하지 않습니다.');
+                      await afterSaved('예약을 저장했습니다. 상품 자동 수정은 수행하지 않습니다.');
                     })
                   }
                 >
@@ -588,9 +612,17 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                     disabled={!canWrite || busy || !['queued', 'running'].includes(job.status)}
                     onClick={() =>
                       void run(async () => {
-                        await api.stepBulk(job.id);
-                        await openJob(job.id, pages.page);
-                        await refresh();
+                        const result = await api.stepBulk(job.id);
+                        if (result && active.current)
+                          setPages((previous) =>
+                            previous ? { ...previous, job: result } : previous,
+                          );
+                        await afterSaved(
+                          result
+                            ? '후보 점검 처리 결과를 저장했습니다.'
+                            : '다른 처리 요청이 진행 중이거나 점검할 항목이 없습니다. 실행 상태를 확인하세요.',
+                          () => openJob(job.id, pages.page),
+                        );
                       })
                     }
                   >
@@ -606,9 +638,14 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                       }
                       onClick={() =>
                         void run(async () => {
-                          await api.controlBulk(job, action);
-                          await openJob(job.id, pages.page);
-                          await refresh();
+                          const result = await api.controlBulk(job, action);
+                          if (active.current)
+                            setPages((previous) =>
+                              previous ? { ...previous, job: result } : previous,
+                            );
+                          await afterSaved('실행 제어를 저장했습니다.', () =>
+                            openJob(job.id, pages.page),
+                          );
                         })
                       }
                     >
@@ -732,8 +769,19 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                   disabled={!canWrite || busy || !!n.acknowledgedAt}
                   onClick={() =>
                     void run(async () => {
-                      await api.acknowledge(n.id);
-                      await refresh();
+                      const saved = await api.acknowledge(n.id);
+                      if (active.current)
+                        setNotices((previous) =>
+                          previous
+                            ? {
+                                ...previous,
+                                items: previous.items.map((item) =>
+                                  item.id === saved.id ? saved : item,
+                                ),
+                              }
+                            : previous,
+                        );
+                      await afterSaved('알림 확인을 저장했습니다. 실제 작업 완료와는 별개입니다.');
                     })
                   }
                 >

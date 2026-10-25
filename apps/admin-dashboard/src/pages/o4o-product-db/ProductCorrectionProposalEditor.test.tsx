@@ -95,6 +95,22 @@ describe('수동 변경안 승인·반영', () => {
     expect(screen.getByLabelText('변경안 이력')).toHaveValue(id);
   });
 
+  it('keeps unsaved review opinions when refreshing a proposal opened from a direct link', async () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    api.proposal.mockResolvedValue({ ...proposal, id, batchId: 'batch', taskId: 'task' });
+    window.history.replaceState(null, '', `/?proposal=${id}`);
+    renderEditor(); await load();
+    await screen.findByLabelText('저장된 변경안 비교');
+    fireEvent.change(screen.getByLabelText('변경안 검토 의견'), { target: { value: '아직 저장하지 않은 의견' } });
+    fireEvent.click(screen.getByLabelText('상품명 승인 (미선택은 반려)'));
+    fireEvent.click(screen.getByText('최신 원본·변경안 이력 불러오기'));
+    await waitFor(() => expect(api.changeContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByText('최신 원본·변경안 이력 불러오기')).not.toBeDisabled());
+    expect(screen.getByLabelText('변경안 검토 의견')).toHaveValue('아직 저장하지 않은 의견');
+    expect(screen.getByLabelText('상품명 승인 (미선택은 반려)')).toBeChecked();
+    expect(screen.getByLabelText('변경안 이력')).toHaveValue(id);
+    expect(api.proposal).toHaveBeenCalledTimes(1);
+  });
   it('stores structured evidence and suggestion without approving or applying', async () => {
     renderEditor();
     await fill();

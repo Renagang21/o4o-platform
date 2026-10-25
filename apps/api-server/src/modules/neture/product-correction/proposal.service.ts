@@ -327,17 +327,19 @@ export class ProductCorrectionProposalService {
         let descriptionId = current.descriptionId;
         const description = selected.find((c) => c.field === 'descriptionContent');
         if (description) {
-          // Same canonical contract as the manual description writer; one atomic product-level transaction.
-          await db.query(
-            `UPDATE shared_product_descriptions SET status='candidate',updated_by=$4,updated_at=NOW()
-          WHERE master_id=$1 AND description_type=$2 AND COALESCE(language,'ko')=$3 AND status='canonical' AND deleted_at IS NULL`,
-            [
-              proposal.productId,
-              proposal.ruleSnapshot.descriptionType,
-              proposal.ruleSnapshot.language,
-              actor,
-            ],
-          );
+          // Demote only the locked, checked canonical. A newly promoted candidate must cause a unique conflict, never be silently replaced.
+          if (current.descriptionId)
+            await db.query(
+              `UPDATE shared_product_descriptions SET status='candidate',updated_by=$4,updated_at=NOW()
+          WHERE master_id=$1 AND description_type=$2 AND COALESCE(language,'ko')=$3 AND status='canonical' AND deleted_at IS NULL AND id=$5`,
+              [
+                proposal.productId,
+                proposal.ruleSnapshot.descriptionType,
+                proposal.ruleSnapshot.language,
+                actor,
+                current.descriptionId,
+              ],
+            );
           descriptionId = randomUUID();
           await db.query(
             `INSERT INTO shared_product_descriptions

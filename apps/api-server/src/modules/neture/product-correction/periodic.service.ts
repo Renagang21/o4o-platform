@@ -236,7 +236,10 @@ export class ProductCorrectionPeriodicService {
           );
         return job;
       });
-    } catch {
+    } catch (error) {
+      // REPEATABLE READ may reject an otherwise unlocked row changed after this snapshot.
+      // No page was claimed: defer to a fresh tick instead of reporting a failed inspection.
+      if (!attempted && (error as { code?: string })?.code === '40001') return null;
       // The failed page, result and cursor all rolled back. A late failure cannot overwrite a control action.
       if (!attempted) throw new CorrectionError('BULK_STEP_FAILED', 503);
       const original = attempted as ProductCorrectionBulkJob;

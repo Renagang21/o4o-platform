@@ -5,6 +5,7 @@ import type { DataSource } from 'typeorm';
 import type { ProductCorrectionProposal, ProductCorrectionRule } from '@o4o/types';
 import { ProductCorrectionPeriodicService } from './periodic.service.js';
 import { ProductDescriptionRenewalService, enqueueDescriptionRenewals } from './renewal.service.js';
+import { ProductCorrectionProposalService } from './proposal.service.js';
 import { ProductCorrectionWorkspace } from './workspace.service.js';
 import { bulkKey } from './periodic.contracts.js';
 const integration = process.env.CORRECTION_TEST_DATABASE_URL ? describe : describe.skip;
@@ -18,7 +19,8 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
   let schemaCreated = false,
     failPreview = false,
     failRenewal = false,
-    failPopulation = false;
+    failPopulation = false,
+    failClaim = false;
   const actor = randomUUID(),
     ids = Array.from({ length: 28 }, () => randomUUID());
   const definition = {
@@ -43,8 +45,8 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
     });
     await pool.query(`CREATE SCHEMA "${schema}"`);
     schemaCreated = true;
-    await pool.query(`CREATE TABLE settings (key text PRIMARY KEY,value jsonb NOT NULL,type text,description text,"createdAt" timestamptz DEFAULT now(),"updatedAt" timestamptz DEFAULT now());
-      CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,regulatory_type text,manufacturer_name text,specification text,barcode text,status text,updated_at timestamptz DEFAULT now());
+    await pool.query(`CREATE TABLE settings (key varchar(100) PRIMARY KEY,value jsonb NOT NULL,type varchar(50),description text,"createdAt" timestamptz DEFAULT now(),"updatedAt" timestamptz DEFAULT now());
+      CREATE TABLE product_masters(id uuid PRIMARY KEY,name text,regulatory_type text,manufacturer_name text,specification text,barcode text,status text,brand_name text,origin_country text,tags jsonb DEFAULT '[]',updated_at timestamptz DEFAULT now());
       CREATE TABLE shared_product_descriptions(id uuid PRIMARY KEY,master_id uuid,description_type text,language text,status text,content text,summary text,source_type text,source_ref_id uuid,updated_at timestamptz DEFAULT now(),deleted_at timestamptz);`);
     for (const [i, id] of ids.entries())
       await pool.query(
@@ -63,6 +65,10 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
           await client.query('BEGIN');
           const result = await fn({
             query: async (sql: string, args?: unknown[]) => {
+              if (failClaim && sql.includes('FOR UPDATE SKIP LOCKED')) {
+                failClaim = false;
+                throw Object.assign(new Error('synthetic concurrent claim'), { code: '40001' });
+              }
               if (failPopulation && sql.startsWith('SELECT m.id'))
                 throw new Error('synthetic population failure');
               if (failPreview && sql.includes('COUNT(*)') && sql.includes('FROM product_masters'))
@@ -94,8 +100,9 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
     failPreview = false;
     failRenewal = false;
     failPopulation = false;
+    failClaim = false;
     await pool.query('TRUNCATE settings');
-    await pool.query("UPDATE product_masters SET status='ACTIVE'");
+    await pool.query("UPDATE product_masters SET status='ACTIVE',specification='500mg'");
   });
   afterAll(async () => {
     if (!pool) return;
@@ -152,6 +159,16 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
       "SELECT value->>'bulkPage' AS page FROM settings WHERE type='product_correction_run'",
     );
     expect(new Set(rows.rows.map((r) => r.page)).size).toBe(rows.rowCount);
+  });
+  it('defers a serialization conflict before claiming without recording a failed page', async () => {
+    const job = await create(await rule());
+    failClaim = true;
+    expect(await service.step(job.id)).toBeNull();
+    expect(await service.job(job.id)).toMatchObject({ cursor: 0, attempts: 0, status: 'queued' });
+    expect(
+      (await service.notices()).items.filter((item) => item.kind === 'bulk-failed'),
+    ).toHaveLength(0);
+    expect((await service.step(job.id))!.cursor).toBe(25);
   });
   it('pauses, rejects stale controls, resumes from the same cursor and preserves cancelled results', async () => {
     const job = await create(await rule());
@@ -424,6 +441,13 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
     failPopulation = true;
     await service.tick(due);
     expect((await service.schedule(r.id))!.errorCode).toBe('SCHEDULE_START_FAILED');
+    const errorNotice = (await service.notices()).items.find(
+      (item) => item.kind === 'schedule-delayed',
+    )!;
+    await service.acknowledge(errorNotice.id, actor);
+    expect(
+      (await service.notices()).items.find((item) => item.id === errorNotice.id)!.acknowledgedAt,
+    ).toBeDefined();
     expect((await service.jobs()).total).toBe(0);
     expect(
       (await pool.query("SELECT * FROM settings WHERE type='product_correction_occurrence'"))
@@ -433,6 +457,159 @@ integration('상품 정기 운영 — isolated PostgreSQL', () => {
     await service.tick(new Date(due.getTime() + 6 * 60000));
     expect((await service.jobs()).total).toBe(1);
     expect((await service.schedule(r.id))!.errorCode).toBeUndefined();
+  });
+  it('completes the administrator workflow from criteria through bulk selection, approved apply, renewal review and scheduled recheck', async () => {
+    const r = await rule();
+    const job = await service.create(
+      { ruleId: r.id, revision: r.revision, search: '상품 00' },
+      actor,
+    );
+    await service.step(job.id);
+    const product = (await service.pages(job.id)).run!.result!.items[0];
+    const batch = await workspace.createBatch(
+      {
+        title: '전체 흐름 합성 검증',
+        ruleId: r.id,
+        ruleRevision: r.revision,
+        scope: { search: '상품 00', page: 1 },
+        selected: [{ id: product.id, fingerprint: product.fingerprint, runId: product.runId }],
+      },
+      actor,
+    );
+    const proposals = new ProductCorrectionProposalService(db);
+    const context = await proposals.context(batch.id, batch.items[0].id),
+      evidenceId = randomUUID();
+    const proposal = await proposals.create(
+      batch.id,
+      batch.items[0].id,
+      {
+        fingerprint: context.fingerprint,
+        evidence: [
+          {
+            id: evidenceId,
+            kind: 'product-fact',
+            source: '합성 포장 원문',
+            checkedOn: '2026-10-24',
+            fields: ['specification'],
+            status: 'confirmed',
+          },
+        ],
+        changes: [
+          {
+            field: 'specification',
+            after: '600mg',
+            reason: '합성 포장 대조',
+            evidenceIds: [evidenceId],
+          },
+        ],
+      },
+      actor,
+    );
+    expect(
+      (await pool.query('SELECT specification FROM product_masters WHERE id=$1', [product.id]))
+        .rows[0].specification,
+    ).toBe('500mg');
+    const reviewed = await proposals.review(
+      proposal.id,
+      {
+        revision: 1,
+        note: '근거 확인',
+        decisions: [{ field: 'specification', decision: 'approved' }],
+      },
+      actor,
+    );
+    const applied = await proposals.apply(
+      proposal.id,
+      { revision: reviewed.revision, fields: ['specification'] },
+      actor,
+    );
+    expect(applied.appliedAt).toBeDefined();
+    expect(
+      (await pool.query('SELECT specification FROM product_masters WHERE id=$1', [product.id]))
+        .rows[0].specification,
+    ).toBe('600mg');
+    const renewal = (await renewals.list('open')).items.find(
+      (item) => item.proposalId === proposal.id && item.descriptionType === 'STORE',
+    )!;
+    const detail = await renewals.detail(renewal.id);
+    await renewals.update(
+      renewal.id,
+      {
+        revision: 1,
+        fingerprint: detail.fingerprint,
+        state: 'done',
+        purposes: ['professional', 'consumer-qr'],
+        notes: '최신 상품과 설명서 대조, 추가 본문 변경 불필요',
+      },
+      actor,
+    );
+    expect((await renewals.detail(renewal.id)).record.state).toBe('done');
+    const due = new Date(Date.now() + 60000);
+    await service.saveSchedule(
+      r.id,
+      {
+        revision: 0,
+        enabled: true,
+        intervalDays: 30,
+        timeZone: 'Asia/Seoul',
+        nextDueAt: due.toISOString(),
+      },
+      actor,
+    );
+    await service.tick(due);
+    expect((await service.jobs()).total).toBe(2);
+    const scheduled = (await service.jobs()).items.find((item) => item.scheduleId === r.id)!;
+    expect(scheduled.status).toBe('completed');
+    const alert = (await service.notices()).items.find(
+      (item) => item.referenceId === scheduled.id,
+    )!;
+    await service.acknowledge(alert.id, actor);
+    expect(
+      (await service.notices()).items.find((item) => item.id === alert.id)!.acknowledgedBy,
+    ).toBe(actor);
+    expect(
+      (await pool.query('SELECT specification FROM product_masters WHERE id=$1', [product.id]))
+        .rows[0].specification,
+    ).toBe('600mg');
+  });
+  it('persists renewal history for a legitimate long legacy language within settings key limits', async () => {
+    const r = await rule();
+    const legacyId = randomUUID();
+    await pool.query(
+      "INSERT INTO shared_product_descriptions(id,master_id,description_type,language,status,content,source_type) VALUES($1,$2,'SUPPLIER_STORE','abcdefghijklmnop','canonical','합성 기존 원문','manual')",
+      [legacyId, ids[0]],
+    );
+    try {
+      const proposal = {
+        id: randomUUID(),
+        productId: ids[0],
+        batchId: randomUUID(),
+        taskId: randomUUID(),
+        ruleSnapshot: r,
+        appliedFields: ['specification'],
+        baseline: { values: { name: '합성 상품' } },
+        changes: [],
+      } as unknown as ProductCorrectionProposal;
+      await db.transaction((manager) => enqueueDescriptionRenewals(manager, proposal));
+      const record = (await renewals.list('open')).items.find(
+        (item) => item.descriptionId === legacyId,
+      )!;
+      const detail = await renewals.detail(record.id);
+      await renewals.update(
+        record.id,
+        {
+          revision: 1,
+          fingerprint: detail.fingerprint,
+          state: 'in_progress',
+          purposes: ['professional'],
+          notes: '기존 언어 자료 검토',
+        },
+        actor,
+      );
+      expect(await renewals.versions(record.id)).toHaveLength(1);
+    } finally {
+      await pool.query('DELETE FROM shared_product_descriptions WHERE id=$1', [legacyId]);
+    }
   });
   it('never mutates product originals when preparing, running, scheduling or acknowledging', async () => {
     const before = JSON.stringify(
