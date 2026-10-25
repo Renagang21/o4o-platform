@@ -1,3 +1,5 @@
+import { ProductCorrectionPeriodicService } from '../product-correction/periodic.service.js';
+import { ProductDescriptionRenewalService } from '../product-correction/renewal.service.js';
 import { Router, type Request, type Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { z, ZodError } from 'zod';
@@ -8,12 +10,18 @@ import { ProductCorrectionWorkspace } from '../product-correction/workspace.serv
 import { ProductCorrectionOperationsService } from '../product-correction/operations.service.js';
 import { CorrectionError } from '../product-correction/contracts.js';
 import logger from '../../../utils/logger.js';
+import { ProductCorrectionProposalService } from '../product-correction/proposal.service.js';
 import { generateProductCorrectionDraft } from '../product-correction/ai-draft.service.js';
 import { AiExtensionError } from '@o4o/ai-core';
 
 export function createProductCorrectionController(db: DataSource): Router {
   const router = Router();
+  const periodic = new ProductCorrectionPeriodicService(db);
+  const renewals = new ProductDescriptionRenewalService(db);
+  const page = (req: Request) => z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page);
+  const opaque = z.string().min(1).max(250).regex(/^[A-Za-z0-9:._-]+$/);
   const workspace = new ProductCorrectionWorkspace(db);
+  const proposals = new ProductCorrectionProposalService(db);
   const operations = new ProductCorrectionOperationsService(db);
   router.use(authenticate);
   router.use(requireAdmin);
@@ -144,5 +152,72 @@ export function createProductCorrectionController(db: DataSource): Router {
       ),
     ),
   );
+  router.get(
+    '/batches/:id/items/:taskId/change-context',
+    run((req) => proposals.context(uuid.parse(req.params.id), uuid.parse(req.params.taskId))),
+  );
+  router.get(
+    '/batches/:id/items/:taskId/proposals',
+    run((req) => proposals.list(uuid.parse(req.params.id), uuid.parse(req.params.taskId))),
+  );
+  router.post(
+    '/batches/:id/items/:taskId/proposals',
+    requireProductDbWrite,
+    run((req) =>
+      proposals.create(
+        uuid.parse(req.params.id),
+        uuid.parse(req.params.taskId),
+        req.body,
+        actor(req),
+      ),
+    ),
+  );
+  router.get(
+    '/proposals',
+    run((req) =>
+      proposals.queue(
+        z
+          .enum(['all', 'pending', 'reviewed', 'applied', 'failed'])
+          .default('all')
+          .parse(req.query.filter),
+        z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page),
+      ),
+    ),
+  );
+  router.get(
+    '/proposals/:id/versions',
+    run((req) => proposals.versions(uuid.parse(req.params.id))),
+  );
+  router.get(
+    '/proposals/:id/attempts',
+    run((req) => proposals.attempts(uuid.parse(req.params.id))),
+  );
+  router.post(
+    '/proposals/:id/review',
+    requireProductDbWrite,
+    run((req) => proposals.review(uuid.parse(req.params.id), req.body, actor(req))),
+  );
+  router.post(
+    '/proposals/:id/apply',
+    requireProductDbWrite,
+    run((req) => proposals.apply(uuid.parse(req.params.id), req.body, actor(req))),
+  );
+  router.get('/proposals/:id', run(req => proposals.proposal(uuid.parse(req.params.id))));
+  router.get('/periodic/dashboard', run(() => periodic.dashboard()));
+  router.get('/renewals', run(req => renewals.list(z.enum(['open','all']).default('open').parse(req.query.state), page(req))));
+  router.get('/renewals/:id', run(req => renewals.detail(opaque.parse(req.params.id))));
+  router.get('/renewals/:id/versions', run(req => renewals.versions(opaque.parse(req.params.id))));
+  router.patch('/renewals/:id', requireProductDbWrite, run(req => renewals.update(opaque.parse(req.params.id), req.body, actor(req))));
+  router.get('/bulk', run(req => periodic.jobs(page(req))));
+  router.post('/bulk', requireProductDbWrite, run(req => periodic.create(req.body, actor(req))));
+  router.get('/bulk/:id/pages', run(req => periodic.pages(uuid.parse(req.params.id), page(req))));
+  router.get('/bulk/:id/controls', run(req => periodic.controls(uuid.parse(req.params.id))));
+  router.post('/bulk/:id/control', requireProductDbWrite, run(req => periodic.control(uuid.parse(req.params.id), req.body, actor(req))));
+  router.post('/bulk/:id/step', requireProductDbWrite, run(req => periodic.step(uuid.parse(req.params.id))));
+  router.get('/schedules', run(req => periodic.schedules(page(req))));
+  router.get('/rules/:id/schedule', run(req => periodic.schedule(uuid.parse(req.params.id))));
+  router.put('/rules/:id/schedule', requireProductDbWrite, run(req => periodic.saveSchedule(uuid.parse(req.params.id), req.body, actor(req))));
+  router.get('/notices', run(req => periodic.notices(page(req))));
+  router.post('/notices/:id/acknowledge', requireProductDbWrite, run(req => periodic.acknowledge(opaque.parse(req.params.id), actor(req))));
   return router;
 }

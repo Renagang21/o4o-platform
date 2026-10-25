@@ -197,6 +197,15 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
 
     /** 공통 정본을 바꾸는 write route 는 명시 guard 를 유지한다 (다층 방어). */
     const GUARDED: Array<[string, string]> = [
+      ['modules/neture/controllers/product-correction.controller.ts', "router.patch('/renewals/:id'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/bulk'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/bulk/:id/control'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/bulk/:id/step'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.put('/rules/:id/schedule'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/notices/:id/acknowledge'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/batches/:id/items/:taskId/proposals'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/proposals/:id/review'"],
+      ['modules/neture/controllers/product-correction.controller.ts', "router.post('/proposals/:id/apply'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.post('/rules/:id/runs'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.post('/runs/:id/retry'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.post('/rules'"],

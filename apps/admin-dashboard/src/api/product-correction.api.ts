@@ -1,5 +1,10 @@
 import { authClient } from '@o4o/auth-client';
 import type {
+  ProductCorrectionContext,
+  ProductCorrectionProposal,
+  ProductCorrectionEvidence,
+  ProductCorrectionField,
+  ProductCorrectionValue,
   ProductCorrectionBatch,
   ProductCorrectionBatchResult,
   ProductCorrectionRun,
@@ -18,6 +23,15 @@ import type {
 
 const BASE = '/admin/o4o-product-db/correction';
 const messages: Record<string, string> = {
+  PROPOSAL_CHANGED: '변경안 버전이 바뀌었습니다. 이력을 다시 불러와 비교해 주세요.',
+  ALREADY_APPLIED: '이미 반영된 변경안입니다. 이력에서 결과를 확인해 주세요.',
+  APPROVAL_REQUIRED: '승인한 항목만 반영할 수 있습니다.',
+  CONFIRMED_EVIDENCE_REQUIRED:
+    '승인할 항목의 확인된 근거가 필요합니다. 기본정보에는 상품 사실 근거를 연결하세요.',
+  INVALID_EVIDENCE_LINK: '변경 항목에 연결된 근거를 확인해 주세요.',
+  UNCHANGED_FIELD: '원본과 같은 값인 항목은 변경 선택을 해제하세요.',
+  INVALID_FIELD_VALUE: '변경 값의 형식과 길이를 확인해 주세요.',
+  PRODUCT_NOT_ACTIVE: '현재 사용 중인 상품만 반영할 수 있습니다.',
   RULE_CHANGED: '기준이 변경됐습니다. 최신 기준을 다시 확인하고 점검해 주세요.',
   BATCH_CHANGED: '다른 작업이 먼저 저장됐습니다. 입력 내용을 보존한 뒤 작업 묶음을 다시 열어 비교해 주세요.',
   PRODUCT_SOURCE_CHANGED: '선택 후 상품 원문 또는 대상 조건이 바뀌었습니다. 다시 점검해 주세요.',
@@ -42,6 +56,71 @@ async function call<T>(method: 'get' | 'post' | 'put' | 'patch', path: string, b
   }
 }
 export const productCorrectionApi = {
+  proposal: (id: string) => call<ProductCorrectionProposal>('get', `/proposals/${id}`),
+  proposalQueue: (filter: 'all' | 'pending' | 'reviewed' | 'applied' | 'failed', page = 1) =>
+    call<{
+      items: Array<{
+        id: string;
+        batchId: string;
+        taskId: string;
+        productName: string;
+        createdAt: string;
+        reviewedAt: string | null;
+        appliedAt: string | null;
+      }>;
+      total: number;
+      page: number;
+      pageSize: number;
+    }>('get', `/proposals?filter=${filter}&page=${page}`),
+  changeContext: (batchId: string, taskId: string) =>
+    call<ProductCorrectionContext>('get', `/batches/${batchId}/items/${taskId}/change-context`),
+  proposals: (batchId: string, taskId: string) =>
+    call<ProductCorrectionProposal[]>('get', `/batches/${batchId}/items/${taskId}/proposals`),
+  proposalAttempts: (id: string) =>
+    call<
+      Array<{
+        at: string;
+        actor: string;
+        revision: number;
+        fields: ProductCorrectionField[];
+        code: string;
+      }>
+    >('get', `/proposals/${id}/attempts`),
+  proposalVersions: (id: string) =>
+    call<ProductCorrectionProposal[]>('get', `/proposals/${id}/versions`),
+  createProposal: (
+    batchId: string,
+    taskId: string,
+    input: {
+      fingerprint: string;
+      evidence: ProductCorrectionEvidence[];
+      changes: Array<{
+        field: ProductCorrectionField;
+        after: ProductCorrectionValue;
+        reason: string;
+        evidenceIds: string[];
+      }>;
+    },
+  ) =>
+    call<ProductCorrectionProposal>('post', `/batches/${batchId}/items/${taskId}/proposals`, input),
+  reviewProposal: (
+    proposal: ProductCorrectionProposal,
+    decisions: Array<{
+      field: ProductCorrectionField;
+      decision: 'approved' | 'rejected';
+    }>,
+    note: string,
+  ) =>
+    call<ProductCorrectionProposal>('post', `/proposals/${proposal.id}/review`, {
+      revision: proposal.revision,
+      decisions,
+      note,
+    }),
+  applyProposal: (proposal: ProductCorrectionProposal, fields: ProductCorrectionField[]) =>
+    call<ProductCorrectionProposal>('post', `/proposals/${proposal.id}/apply`, {
+      revision: proposal.revision,
+      fields,
+    }),
   rules: () => call<ProductCorrectionRule[]>('get', '/rules'),
   saveRule: (rule: ProductCorrectionRuleInput, current?: ProductCorrectionRule) =>
     current

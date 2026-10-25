@@ -156,3 +156,119 @@ export interface ProductCorrectionTaskVersion {
   batchRevision: number;
   task: ProductCorrectionTask;
 }
+
+/** P2: explicit proposals, independent from legacy review task states. */
+export type ProductCorrectionField =
+  | 'name'
+  | 'brandName'
+  | 'specification'
+  | 'originCountry'
+  | 'tags'
+  | 'descriptionContent';
+export type ProductCorrectionValue = string | string[] | null;
+export interface ProductCorrectionEvidence {
+  id: string;
+  kind: 'product-fact' | 'professional-reference';
+  source: string;
+  checkedOn: string;
+  fields: ProductCorrectionField[];
+  status: 'confirmed' | 'unconfirmed';
+}
+export interface ProductCorrectionContext {
+  fingerprint: string;
+  values: Record<ProductCorrectionField, ProductCorrectionValue>;
+  descriptionId: string | null;
+  descriptionSummary?: string | null;
+}
+export interface ProductCorrectionChange {
+  field: ProductCorrectionField;
+  before: ProductCorrectionValue;
+  after: ProductCorrectionValue;
+  reason: string;
+  evidenceIds: string[];
+  decision: 'pending' | 'approved' | 'rejected';
+}
+export interface ProductCorrectionProposal {
+  id: string;
+  batchId: string;
+  taskId: string;
+  productId: string;
+  revision: number;
+  ruleSnapshot: ProductCorrectionRule;
+  baseline: ProductCorrectionContext;
+  evidence: ProductCorrectionEvidence[];
+  changes: ProductCorrectionChange[];
+  createdAt: string;
+  createdBy: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reviewNote?: string;
+  appliedAt?: string;
+  appliedBy?: string;
+  appliedFields?: ProductCorrectionField[];
+  resultingDescriptionId?: string | null;
+}
+
+/** Follow-up operations: review candidates and schedules never mutate product originals. */
+export interface ProductDescriptionRenewal {
+  id: string;
+  productId: string;
+  productName: string;
+  proposalId: string;
+  batchId: string;
+  taskId: string;
+  descriptionType: ProductCorrectionRule['descriptionType'];
+  language: string;
+  descriptionId: string | null;
+  changedFields: ProductCorrectionField[];
+  purposes: Array<ProductCorrectionRule['purpose']>;
+  state: 'pending' | 'in_progress' | 'done' | 'excluded';
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+  notes: string;
+  completedBy?: string;
+  updatedBy?: string;
+}
+export interface ProductCorrectionBulkJob {
+  id: string;
+  revision: number;
+  ruleSnapshot: ProductCorrectionRule;
+  search: string;
+  status: 'queued' | 'running' | 'paused' | 'retry_wait' | 'failed' | 'completed' | 'cancelled';
+  total: number;
+  cursor: number;
+  matched: number;
+  skipped: number;
+  attempts: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  nextRetryAt?: string;
+  errorCode?: string;
+  scheduleId?: string;
+  occurrenceAt?: string;
+}
+export interface ProductCorrectionSchedule {
+  id: string;
+  revision: number;
+  ruleId: string;
+  enabled: boolean;
+  intervalDays: number;
+  timeZone: 'Asia/Seoul';
+  nextDueAt: string;
+  lastJobId?: string;
+  lastStartedAt?: string;
+  missedOccurrences: number;
+  errorCode?: string;
+  updatedBy: string;
+}
+export interface ProductCorrectionNotice {
+  id: string;
+  title: string;
+  createdAt: string;
+  kind: 'bulk-completed' | 'bulk-failed' | 'schedule-delayed' | 'renewal' | 'backlog';
+  referenceId: string;
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+}
