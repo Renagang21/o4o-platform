@@ -1,3 +1,4 @@
+import ProductCorrectionPeriodicPanel from './ProductCorrectionPeriodicPanel';
 import ProductCorrectionProposalQueue from './ProductCorrectionProposalQueue';
 import ProductCorrectionProposalEditor from './ProductCorrectionProposalEditor';
 import { useEffect, useRef, useState } from 'react';
@@ -241,6 +242,7 @@ export default function ProductCorrectionWorkspace() {
           수정하지 않습니다.
         </p>
       </div>
+      <ProductCorrectionPeriodicPanel canWrite={canWrite} />
       <ProductCorrectionProposalQueue />
       {error && (
         <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">

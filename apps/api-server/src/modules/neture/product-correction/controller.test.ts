@@ -84,6 +84,23 @@ describe('상품 보정 관리자 API 권한·입력 경계', () => {
     expect(query).not.toHaveBeenCalled();
   });
   it.each([
+    ['get', '/correction/periodic/dashboard'],
+    ['get', '/correction/renewals'],
+    ['get', '/correction/renewals/renewal-id'],
+    ['get', '/correction/renewals/renewal-id/versions'],
+    ['patch', '/correction/renewals/renewal-id'],
+    ['get', '/correction/bulk'],
+    ['get', '/correction/bulk/00000000-0000-4000-8000-000000000001/controls'],
+    ['post', '/correction/bulk'],
+    ['get', '/correction/bulk/00000000-0000-4000-8000-000000000001/pages'],
+    ['post', '/correction/bulk/00000000-0000-4000-8000-000000000001/control'],
+    ['post', '/correction/bulk/00000000-0000-4000-8000-000000000001/step'],
+    ['get', '/correction/schedules'],
+    ['get', '/correction/rules/00000000-0000-4000-8000-000000000001/schedule'],
+    ['put', '/correction/rules/00000000-0000-4000-8000-000000000001/schedule'],
+    ['get', '/correction/notices'],
+    ['post', '/correction/notices/notice-id/acknowledge'],
+
     ['get', '/correction/proposals'],
     ['get', '/correction/proposals/00000000-0000-4000-8000-000000000001'],
     ['get', '/correction/proposals/00000000-0000-4000-8000-000000000001/attempts'],
@@ -104,7 +121,7 @@ describe('상품 보정 관리자 API 권한·입력 경계', () => {
     ['post', '/correction/proposals/00000000-0000-4000-8000-000000000001/apply'],
   ])('guards selective apply %s %s before database access', async (method, path) => {
     for (const user of [undefined, 'neture-admin', 'legacy-admin']) {
-      let req = request(app)[method as 'get' | 'post'](path);
+      let req = request(app)[method as 'get' | 'post' | 'put' | 'patch'](path);
       if (user) req = req.set('x-test-user', user);
       expect((await req.send({})).status).toBe(user ? 403 : 401);
     }

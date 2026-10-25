@@ -70,3 +70,7 @@ API는 `/api/v1/admin/o4o-product-db/correction` 아래의 기준/버전/preview
 반영 권한은 기존 `platform:super_admin`이다. 상품별 transaction으로 선택한 기본정보·canonical 교체·성공 이력을 함께 저장한다. 변경안 잠금/revision과 전체 원본 fingerprint를 검사하며 같은 선택·승인 버전의 재전송은 같은 결과를 반환한다. 제조사·바코드·허가·규제·상태·이미지·분류·매장 제작물·QR은 변경하지 않는다. 설명서 변경은 같은 상품/유형/언어만 교체하고 이전 Resource를 candidate로 보존한다. 공용 canonical을 읽는 서비스의 표시에는 영향을 줄 수 있다.
 
 신규 저장은 기존 settings에 `product-correction:proposal:*`, 버전, `product-correction:apply-attempt:*`를 사용하며 migration은 없다. 기존 P1 API의 원본 미적용 계약은 유지한다. 신규 API는 작업별 `change-context`/`proposals`, `/proposals` 현황, `/proposals/:id` 및 `versions`/`attempts`/`review`/`apply`다. AI 관련 기존 main 구현은 수정하지 않으며 이 흐름에서 AI를 호출하지 않는다. 예약·대량 점검은 후속 범위다.
+
+## 4~6번 후속 운영 (개발 브랜치 구현, 미배포)
+
+P2 반영 후 설명서 갱신 작업 연결, 통합 관리 현황, 대량 점검·예약·관리자 알림은 [후속 운영 안내](O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md)를 따른다. 후보 점검·갱신 검토를 원본 반영·게시 완료와 구분하며 AI 확장·운영 배포는 포함하지 않는다.

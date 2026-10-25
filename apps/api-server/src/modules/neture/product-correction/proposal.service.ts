@@ -18,6 +18,7 @@ import {
   PROPOSAL_TYPE,
   PROPOSAL_VERSION_TYPE,
 } from './proposal.contracts.js';
+import { enqueueDescriptionRenewals } from './renewal.service.js';
 import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
 const columns = {
@@ -361,6 +362,7 @@ export class ProductCorrectionProposalService {
           appliedFields: data.fields,
           resultingDescriptionId: descriptionId,
         });
+        await enqueueDescriptionRenewals(db, proposal);
         return this.save(db, proposal);
       });
     } catch (error) {

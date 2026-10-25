@@ -208,3 +208,67 @@ export interface ProductCorrectionProposal {
   appliedFields?: ProductCorrectionField[];
   resultingDescriptionId?: string | null;
 }
+
+/** Follow-up operations: review candidates and schedules never mutate product originals. */
+export interface ProductDescriptionRenewal {
+  id: string;
+  productId: string;
+  productName: string;
+  proposalId: string;
+  batchId: string;
+  taskId: string;
+  descriptionType: ProductCorrectionRule['descriptionType'];
+  language: string;
+  descriptionId: string | null;
+  changedFields: ProductCorrectionField[];
+  purposes: Array<ProductCorrectionRule['purpose']>;
+  state: 'pending' | 'in_progress' | 'done' | 'excluded';
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+  notes: string;
+  completedBy?: string;
+  updatedBy?: string;
+}
+export interface ProductCorrectionBulkJob {
+  id: string;
+  revision: number;
+  ruleSnapshot: ProductCorrectionRule;
+  search: string;
+  status: 'queued' | 'running' | 'paused' | 'retry_wait' | 'failed' | 'completed' | 'cancelled';
+  total: number;
+  cursor: number;
+  matched: number;
+  skipped: number;
+  attempts: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  nextRetryAt?: string;
+  errorCode?: string;
+  scheduleId?: string;
+  occurrenceAt?: string;
+}
+export interface ProductCorrectionSchedule {
+  id: string;
+  revision: number;
+  ruleId: string;
+  enabled: boolean;
+  intervalDays: number;
+  timeZone: 'Asia/Seoul';
+  nextDueAt: string;
+  lastJobId?: string;
+  lastStartedAt?: string;
+  missedOccurrences: number;
+  errorCode?: string;
+  updatedBy: string;
+}
+export interface ProductCorrectionNotice {
+  id: string;
+  title: string;
+  createdAt: string;
+  kind: 'bulk-completed' | 'bulk-failed' | 'schedule-delayed' | 'renewal' | 'backlog';
+  referenceId: string;
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+}

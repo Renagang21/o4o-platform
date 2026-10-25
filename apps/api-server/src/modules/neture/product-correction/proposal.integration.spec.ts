@@ -330,6 +330,7 @@ integration('수동 변경안 선택 반영 — isolated PostgreSQL', () => {
     expect(
       (await service.queue('failed', 1)).items.some((p: { id: string }) => p.id === proposal.id),
     ).toBe(true);
+    expect((await pool.query("SELECT * FROM settings WHERE type='product_description_renewal' AND value->>'proposalId'=$1", [proposal.id])).rowCount).toBe(0);
     failAudit = false;
     expect(
       (await service.apply(proposal.id, { revision: proposal.revision, fields: ['name'] }, actor))

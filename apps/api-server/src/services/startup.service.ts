@@ -1,3 +1,4 @@
+import { productCorrectionJob } from '../jobs/product-correction.job.js';
 import { communityNewsJob } from '../jobs/community-news.job.js';
 import { AppDataSource } from '../database/connection.js';
 // MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
@@ -220,6 +221,7 @@ export class StartupService {
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
       // 종료일 도래 시 Store 공개표면 중단, 종료+7일 도래 시 반환 완료 건 파기 재시도.
+      productCorrectionJob.start();
       communityNewsJob.start();
       storeOwnerTerminationJob.start();
       logger.info('✅ Store Owner Termination Job started');
@@ -307,6 +309,7 @@ export class StartupService {
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();
+      productCorrectionJob.stop();
       communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');
