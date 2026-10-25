@@ -131,3 +131,8 @@ inspect 이후 실제 수락에서 INVALID_OR_EXPIRED_INVITATION이 반환되는
 - 최신 main이 삭제한 KPA member controller와 테스트는 되살리지 않는다. 기존 서비스 가입 상태와 퇴역 서비스 정책을 보존한다.
 
 검증·소비처 영향·운영 경계는 [이번 CHECK](../investigations/CHECK-O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)에 기록한다. 이 Phase의 운영 DB write·실제 사용자 권한 변경·메일 발송은 미실행이다.
+
+
+## 2026-10-25 운영 반영 완료
+
+사용자가 신규 초대 테이블 migration과 자동 파기의 운영 적용을 승인했다. #641을 main `4ee5a8ecda200a1bddf08d8f00b869e5f4c76806`으로 병합했고, main CI·Promote 배포·최종 serving SHA 검증이 성공했다. API·관리자·Neture·KPA·강의·매장·분회 및 협동조합 프런트엔드에 반영했다. 실제 초대·메일 발송·계정 권한 변경·조합 fixture 생성은 검증에 사용하지 않았다. 앞 절의 미실행 표기는 각 사전 검증 단계의 이력이며, 실제 운영 반영 결과와 리뷰 근거는 [CHECK의 운영 반영 결과](../investigations/CHECK-O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)에 추가했다. 정책·실행 코드·배포 설정 변경 없이 문서 정합만 완료한다.
