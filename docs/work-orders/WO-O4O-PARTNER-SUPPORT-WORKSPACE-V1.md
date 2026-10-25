@@ -52,6 +52,7 @@
 
 ## TODO — 외부 연결과 운영 인계
 
+- [ ] 최신 main 통합 시 migration 순서·fingerprint 재검증: 마지막 fetch의 `23717b6dc0`에서 동일 manifest/expected-state 파일이 변경되었다. 이번 fingerprint는 준비된 checkout의 prefix를 검증한 값이며, 통합 담당은 병합 후 격리 PostgreSQL에서 새 순서로 재산출·검증해야 한다. 자동 merge/reset은 수행하지 않았다.
 - [ ] 실제 O4O 개발용 계정의 기존 인증 미들웨어·약관·세션 정책 end-to-end 검증
 - [ ] 파일 업로드용 영속 스토리지와 콘텐츠 버전 관리 (현재 원본 URL·사용 범위·텍스트 자료 지원)
 - [ ] 외부 전환 수집·검증 출처·기간·중복 처리
