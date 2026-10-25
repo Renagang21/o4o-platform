@@ -1,7 +1,7 @@
 # CHECK-O4O-PHARMACY-APP-NAME-RESIDUE-AND-DEPLOY-SCOPE-V1
 
 - 작성: 2026-10-25 · branch `wo/pharmacy-stage6-name-residue` · base `42dddc91b5`
-- 상태: ACTIVE · 로컬 정리 · 검증 완료, main 통합 · 배포 전 · 운영 이름 전환은 미실행(§5)
+- 상태: ACTIVE · 로컬 정리 · 검증 완료, main 통합 · 배포 전(배포는 LEVEL_3 promote 필요) · 운영 이름 전환은 미실행(§5)
 - 연결: [WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md) 단계 6 · DONE_CRITERIA 5
 - 범위: 약국 공통 앱(`services/web-kpa-society` · Cloud Run `kpa-society-web`)의 명칭 잔재 목록과 처리 여부, Lecture 전용 변경이 약국 앱을 배포한 원인 수정
 
@@ -39,17 +39,22 @@
 |---|---|
 | `pnpm install --frozen-lockfile` | PASS — lockfile 추가 변동 0 |
 | `pnpm --filter "@o4o/web-kpa-society^..." build`(약국 앱 closure, 순차) | PASS |
-| `pnpm run build:packages`(전체 병렬) | FAIL — `digital-signage-core` 등 closure 밖 package 병렬 tsc 중 Node 네이티브 크래시(exit 2147483651). 이 변경과 무관, 위 closure 빌드로 대체 |
+| `pnpm run build:packages`(전체) | 1차 FAIL → 재실행 PASS. 1차는 설치 · 테스트가 동시에 돌던 중 병렬 tsc 가 `Fatal process out of memory: Zone`(로컬 메모리). `digital-signage-core` 단독 빌드 PASS, 다른 작업 없이 재실행 PASS |
+| 2차(web-neture · web-store · web-kpa-branch) frozen install | PASS — lockfile 은 세 importer 의 삭제 18줄만 |
+| web-neture 의존 package 빌드 · `tsc --noEmit` · `vite build` · vitest | PASS · PASS · PASS · 151 files / 1313 |
+| web-store 의존 package 빌드 · `type-check`(`tsc -b`) · `vite build` · vitest | PASS · PASS · PASS · 77 files / 851 |
+| web-kpa-branch 의존 package 빌드 · `type-check`(`tsc -b`) · `vite build` · vitest | PASS · PASS · PASS · 4 files / 25 |
 | 약국 앱 `tsc --noEmit` · `vite build` | PASS · PASS |
 | 약국 앱 vitest | PASS — 19 files / 140 tests |
-| `node --test scripts/ci/__tests__/detect-affected.test.mjs` | PASS — 80 (신규 §23b · §23c 포함) |
+| `node --test scripts/ci/__tests__/detect-affected.test.mjs` | PASS — 80 (§23b 는 2차에서 전 Web 서비스로 확장, §23c 에 store 단언 추가) |
 | deploy-risk · deploy-orchestrate · level3-precision · deploy-workflow-diff · deploy-workflow-gates | PASS — 227 |
 | api-server `unified-store-workspace-foundation.spec`(약국 Dockerfile 을 읽는 spec) | PASS — 22 |
 | `node scripts/check-doc-sensitive.mjs` · `git diff --check` | PASS · PASS |
 | 브라우저(390 · 1440px) | 해당 없음 — UI 이름 · 메뉴 · 경로 변경 없음 |
 | 세션 전용 DB | 해당 없음 — DB 검증 불필요, 생성 데이터 0 |
 
-- API · LEVEL 3 · freeze · SHA/CI gate 판정 코드는 바꾸지 않았다. 이 변경이 main 에 들어가면 약국 앱 자체 변경이므로 `kpa-society` 1개만 Web 배포 대상이 된다(§4 이후 판정 실측).
+- API · LEVEL 3 · freeze · SHA/CI gate 판정 코드는 바꾸지 않았다.
+- **이 변경의 배포 판정(실측):** Dockerfile 변경이 `deploy-infra` 규칙에 걸려 **LEVEL_3** 이다. 자동 Delivery 는 진행하지 않고, 통합 담당이 promote(LEVEL_3)를 명시 승인받아 실행해야 한다. API 배포는 없다(API closure 밖).
 
 ## 4. 명칭 잔재 목록과 처리 여부
 
@@ -62,14 +67,18 @@
 | R5 | 서비스 키 `kpa-society` | 비문서 파일 412개, 운영 DB(`service_memberships` · `platform_services` · 콘텐츠 행 등) | **유지** | 단계 3(서비스 키 일반화) · 단계 5(테스트 데이터 정리) 범위. 문자열 치환 금지 |
 | R6 | 문서 · 주석의 `kpa-society-web` 서술(`scripts/README.md`, `.github/workflows/README.md`, `setup-middlewares.ts:74` 주석) | 현행 이름 그대로 맞다 | **유지** | 실제 Cloud Run 이름이 바뀌기 전까지는 정확한 서술 |
 
-### 범위 밖에서 발견 — 보고만
+### 다른 Web 서비스의 같은 잔재 — 처리(2026-10-25 2차)
 
-다른 Web 서비스에도 import 0건인 선언이 있다. 같은 종류의 불필요 배포가 생길 수 있으나 약국 앱 작업 범위 밖이라 고치지 않았다.
+다른 Web 서비스에도 src import 0건인 선언이 있었다. 같은 종류의 불필요 배포(예: Lecture 의 `lms-client` 변경 → store 배포)를 막기 위해 함께 정리하고, §23b 를 전 Web 서비스로 넓혔다.
 
-- `services/web-neture`: `@o4o/operator-core` · `@o4o/screen-content-core` · `@o4o/tablet-kiosk-core`
-- `services/web-store`: `@o4o/lms-client` · `@o4o/screen-content-core` — Lecture 의 `lms-client` 변경이 store 를 배포시킨다
-- `services/web-kpa-branch`: `@o4o/types`
-- 약국 앱 Dockerfile 이 closure 밖 `packages/hub-core` · `packages/utils` 를 COPY 한다(판정에는 영향 없음).
+| 서비스 | 뺀 선언 | closure 에서 빠짐 | 함께 정리한 설정 |
+|---|---|---|---|
+| web-neture | `operator-core` · `screen-content-core` · `tablet-kiosk-core` | `operator-core` | tailwind `operator-core` glob. 나머지 둘은 `tablet-screen-set-editor` 를 통해 계속 쓰이므로 Dockerfile · tailwind 유지 |
+| web-store | `lms-client` · `screen-content-core` | `lms-client` | Dockerfile COPY 2 · `lms-client` build 1, vite alias, `tsconfig.app.json` paths. `screen-content-core` 는 계속 transitive |
+| web-kpa-branch | `types` | 없음(공통 package 12개를 통해 transitive) | 없음 |
+
+- web-neture Dockerfile 의 `operator-core` COPY 는 **남겼다.** 빌드 단계가 없는 무해한 복사이고, Dockerfile 을 고치면 `deploy-risk` 가 neture 배포를 LEVEL_3 로 올린다. 약국 앱 Dockerfile 의 closure 밖 `hub-core` · `utils` COPY 도 같은 이유로 남겼다. 다음에 그 Dockerfile 을 고치는 작업에서 함께 정리한다.
+- 약국 앱 · web-store 의 Dockerfile 은 고쳐야 했다 — closure 밖이 된 `lms-client` 를 `pnpm --filter … build` 하는 줄이 남으면 이미지 안에 그 devDependency(typescript)가 설치되지 않는다.
 
 ## 5. 운영 이름 전환안 (미실행)
 
