@@ -1,3 +1,5 @@
+import { productRuleTemplates, createProductRuleDraft } from './product-rule-templates';
+import ProductCorrectionProductPanel from './ProductCorrectionProductPanel';
 import ProductCorrectionPeriodicPanel from './ProductCorrectionPeriodicPanel';
 import ProductCorrectionProposalQueue from './ProductCorrectionProposalQueue';
 import ProductCorrectionProposalEditor from './ProductCorrectionProposalEditor';
@@ -238,8 +240,8 @@ export default function ProductCorrectionWorkspace() {
           기준과 작업 기록 저장은 원본을 변경하지 않으며, 별도의 선택 반영에서만 상품 원본을 변경합니다.
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          점검 주기는 검토 완료 후 다음 점검일 계산에 사용합니다. 점검은 수동으로 실행하며 상품을 자동
-          수정하지 않습니다.
+          점검 주기는 검토 완료 후 다음 점검일 계산에 사용합니다. 수동·대량·예약 점검은 후보를 찾으며
+          상품을 자동 수정하지 않습니다.
         </p>
       </div>
       <ProductCorrectionPeriodicPanel canWrite={canWrite} />
@@ -254,6 +256,7 @@ export default function ProductCorrectionWorkspace() {
           {notice}
         </p>
       )}
+      <ProductCorrectionProductPanel />
       <ProductCorrectionOperations refresh={refresh} onOpen={(id, taskId) => void openBatch(id, taskId)} />
       <ProductCorrectionRuns canWrite={canWrite} refresh={refresh} onRetry={() => setRefresh((v) => v + 1)} />
       {reused.map((item) => (
@@ -523,6 +526,16 @@ function RuleEditor({
   return (
     <section className="space-y-3" aria-label="보정 기준 편집">
       <h4 className="font-semibold">1. 보정 기준 편집</h4>
+      {!rule && <fieldset className="space-y-2 rounded border p-3" disabled={!canWrite || busy}>
+        <legend>운영 기준 초안</legend>
+        <p className="text-sm">버튼을 누르면 작성 중인 기준 입력을 초안으로 바꿉니다. 목적·유형·언어·주기는 유지하며 사용 여부는 꺼집니다. 편집 후 저장해야 등록됩니다.</p>
+        <div className="flex flex-wrap gap-2">{productRuleTemplates.map((template) => (
+          <button key={template.id} type="button" className={secondary}
+            onClick={() => setDraft(createProductRuleDraft(template.id, draft))}>
+            {template.title} 초안 사용
+          </button>
+        ))}</div>
+      </fieldset>}
       <label className="block text-sm">
         기준 이름
         <input
@@ -895,6 +908,7 @@ function TaskEditor({
   const requestText = `상품 보완 검토 작업 (원본 적용 없음)\n기준: ${rule.title} v${rule.revision}\n지침:\n${rule.instructions}\n상품: ${task.product.name}\n이용 목적: ${purposes[rule.purpose]}\n대상: ${rule.descriptionType} / ${rule.language}\n상품군: ${task.product.regulatoryType} / 제조사: ${task.product.manufacturerName ?? '미확인'} / 규격: ${task.product.specification ?? '미확인'}\n기존 원문${task.product.sourceTruncated ? ' (앞부분만, 전체 원문 추가 확인 필요)' : ''}:\n${task.product.sourceContent}\n출처: ${task.product.sourceType ?? '미확인'} / ${task.product.sourceRefId ?? '미확인'}\n상품 사실과 전문 참고정보를 구분하고 각각의 출처·확인일을 기록하세요. 수치의 기준량을 추정하거나 일반 사용 안내를 제품 고유 사용법으로 바꾸지 마세요. 질병명·진단·감별 정보는 단어만으로 배제하지 말고 해당 이용 목적과 전문 근거에 맞게 구성하세요. 확인되지 않은 내용은 필요한 근거로 표시하세요. 보완 초안과 근거·검토 메모를 작성하고 공식 데이터 변경·게시 완료로 표현하지 마세요.`;
   return (
     <div className="space-y-3">
+      <a className="block text-sm text-blue-700 underline" href={`/admin/o4o-product-db/maintenance?product=${task.product.id}&batch=${batchId}&task=${task.id}#product-workspace`}>이 상품의 자료·정비·갱신 이력 열기</a>
       <details>
         <summary>점검 당시 원문·작업 안내</summary>
         <p className="text-xs">

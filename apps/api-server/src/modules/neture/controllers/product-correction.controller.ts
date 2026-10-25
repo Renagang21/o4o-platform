@@ -1,3 +1,4 @@
+import { ProductCorrectionProductWorkspace } from '../product-correction/product-workspace.service.js';
 import { ProductCorrectionPeriodicService } from '../product-correction/periodic.service.js';
 import { ProductDescriptionRenewalService } from '../product-correction/renewal.service.js';
 import { Router, type Request, type Response } from 'express';
@@ -203,6 +204,8 @@ export function createProductCorrectionController(db: DataSource): Router {
     run((req) => proposals.apply(uuid.parse(req.params.id), req.body, actor(req))),
   );
   router.get('/proposals/:id', run(req => proposals.proposal(uuid.parse(req.params.id))));
+  router.get('/products/:id/workspace', run(req => new ProductCorrectionProductWorkspace(db).detail(
+    uuid.parse(req.params.id), z.enum(['descriptions','tasks','proposals','renewals','edits']).default('descriptions').parse(req.query.section), page(req))));
   router.get('/periodic/dashboard', run(() => periodic.dashboard()));
   router.get('/renewals', run(req => renewals.list(z.enum(['open','all']).default('open').parse(req.query.state), page(req))));
   router.get('/renewals/:id', run(req => renewals.detail(opaque.parse(req.params.id))));

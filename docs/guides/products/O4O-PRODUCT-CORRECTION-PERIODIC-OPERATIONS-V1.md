@@ -1,7 +1,7 @@
 # 상품 보정 후속 운영 — 설명서 갱신·현황·대량 점검·예약 V1
 
 > **상태**: ACTIVE · **작성일**: 2026-10-25
-> **구현 상태**: 개발 브랜치 구현·검증. main 병합·운영 배포 전.
+> **구현 상태**: PR #816 main 병합·공식 Promote 운영 배포 완료. 독립 worker 등 이번 후속은 아래 별도 안내 참조.
 > **근거**: 사용자 우선순위 4~6번을 한 번에 구현·push하라는 지시. AI 확장·PR·병합·배포 제외.
 > **선행**: [P1·P2 운영 안내](O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md) · [실행 TODO](../../work-orders/TODO-O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md)
 
@@ -9,7 +9,7 @@
 
 관리자 → O4O 상품 DB → 데이터 정비 → 상품 보정 작업 공간의 **설명서 갱신 · 대량 점검 · 예약·알림** 영역이다. 조회와 쓰기는 모두 기존 `platform:super_admin`만 가능하다. 현황 열기는 실행·예약·상품 수정을 시작하지 않는다.
 
-이 브랜치는 미병합 P2 `fd7a40fc70`을 포함한다. 새 우선순위 4~6번은 그 위의 연속 기능이며, 이전 PR #807의 병합을 되살리지 않는다. P1 배포 완료 기록을 이번 기능의 운영 배포 증거로 사용하지 않는다.
+P2·우선순위 4~6번·일반 편집 연결은 PR #816으로 함께 main에 병합됐다. 배포 target a81448f0b1의 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/40192579965)가 API·관리자·관련 웹 5개 배포와 serving 검증을 완료했다. 과거 닫힌 PR #807과 구분한다.
 
 ## 2. 상품 보정 반영과 설명서 갱신 작업 연결
 
@@ -66,3 +66,7 @@
 기존 settings의 `product-correction:renewal:*`, `bulk:*`, `population:*`, `schedule:*`, `occurrence:*`, `notice:*`, worker key를 사용한다. schema migration·새 권한·외부 메시지·AI 호출·운영 데이터 보정은 없다. 설정 key의 100자 제한을 넘는 알림·갱신 버전 키는 결정적 해시로 저장하되 논리 ID와 기존 짧은 키는 유지한다. 인덱스·장기 전용 저장소와 이력 보관 용량은 후속 설계 대상이다. 현황·목록은 페이지당 10개, 결과는 25개, 갱신·제어 이력은 최근 20개 표시하며 기록을 자동 삭제하지 않는다.
 
 서버가 처리 중인 원본은 조회 전용이다. 실제 원본 변경은 별도 P2 명시적 승인·선택 반영 또는 기존 편집 경로에서만 수행한다. 이번 개발 검증은 세션 전용 합성 DB·fixture이며 운영 계정·상품·예약을 만들지 않았다.
+
+## 후속 독립 실행·상품별 연결 (개발 branch, 미병합)
+
+[정기 운영 완성 안내](O4O-PRODUCT-DB-RECURRING-OPERATIONS-COMPLETION-V1.md)에 기준 초안·상품별 자료/이력·DB tick 잠금·독립 worker와 준비 조건을 정리했다. 외부 Job/Scheduler를 실제 설정하기 전에는 위 서버 휴면 한계가 운영에서 해소됐다고 주장하지 않는다. 이번 후속은 PR CI·검토까지이며 main 병합·배포·운영 인프라 설정은 하지 않는다.
