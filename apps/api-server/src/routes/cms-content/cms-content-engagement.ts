@@ -11,7 +11,6 @@ import { ORDINARY_CMS_CONTENT_SQL } from './cms-reserved-presentation.js';
  *   migration `20260210000001-AddContentViewCountAndRecommendations` 로 **이미 존재**한다.
  *   지금까지 소비하는 route 가 하나도 없어 dead schema 였을 뿐이다.
  *   따라서 이 파일은 schema/migration 을 0 으로 두고 **소비자만** 추가한다.
- *   (§6 "`pharmacy_hub_contents` 신규 table 을 만들지 않는다" 와 같은 결론)
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 왜 서비스 분기가 없는가
@@ -35,6 +34,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
+import { isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -106,11 +106,12 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
   /** 상세와 같은 가시성 경계. 보이지 않으면 null (호출부는 404). */
   const loadVisible = async (id: string, userId: string | null) => {
     const rows: any[] = await dataSource.query(
-      `SELECT id, status, "authorRole", "createdBy" FROM cms_contents WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL} LIMIT 1`,
+      `SELECT id, status, "authorRole", "createdBy", "serviceKey" FROM cms_contents WHERE id = $1 AND ${ORDINARY_CMS_CONTENT_SQL} LIMIT 1`,
       [id],
     );
     const row = rows[0];
     if (!row) return null;
+    if (isRetiredServiceValue(row.serviceKey)) throw new RetiredServiceError();
     if (row.status === 'published') return row;
     if (userId && row.createdBy === userId) return row;
     return null;
@@ -139,6 +140,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
       );
       res.json({ success: true, data: { viewCount: Number(updated?.[0]?.viewCount ?? 0) } });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[CMS] Failed to increment view count:', error);
       res.status(500).json({
         success: false,
@@ -205,6 +207,7 @@ export function createCmsContentEngagementRoutes(deps: { dataSource: DataSource 
         data: { recommendCount: Number(counted?.[0]?.count ?? 0), isRecommendedByMe },
       });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[CMS] Failed to toggle recommendation:', error);
       res.status(500).json({
         success: false,

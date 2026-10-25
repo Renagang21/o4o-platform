@@ -34,6 +34,7 @@ jest.mock(
 );
 
 import { createCmsContentSlotRoutes } from '../routes/cms-content/cms-content-slot.handler.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 const SLOTS = [
   {
@@ -47,10 +48,36 @@ const SLOTS = [
   {
     id: 's-2',
     slotKey: 'home-hero',
+    serviceKey: 'neture',
+    isActive: true,
+    sortOrder: 0,
+    content: { id: 'c-2', title: 'Neture hero', status: 'published' },
+  },
+  {
+    // 퇴역 서비스(PharmacyHub)에 저장된 slot — 공개 응답에 실리지 않아야 한다
+    id: 's-3',
+    slotKey: 'home-hero',
     serviceKey: 'pharmacy-hub',
     isActive: true,
     sortOrder: 0,
-    content: { id: 'c-2', title: 'PH hero', status: 'published' },
+    content: { id: 'c-3', title: 'PH hero', status: 'published' },
+  },
+  {
+    // KPA slot 에 저장된 퇴역 서비스 콘텐츠 — 공개 응답에 실리지 않아야 한다
+    id: 's-4',
+    slotKey: 'home-hero',
+    serviceKey: 'kpa-society',
+    isActive: true,
+    sortOrder: 1,
+    content: { id: 'c-4', title: 'PH content', status: 'published', serviceKey: 'pharmacy-hub' },
+  },
+  {
+    id: 's-5', slotKey: 'home-hero', serviceKey: 'kpa-society', isActive: true, sortOrder: 2,
+    content: { id: 'c-5', title: 'Wrong service', status: 'published', serviceKey: 'neture' },
+  },
+  {
+    id: 's-6', slotKey: 'home-hero', serviceKey: 'pharmacy-hub', isActive: false, sortOrder: 3,
+    content: null,
   },
 ];
 
@@ -86,8 +113,8 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     expect(lastWhere).toBeNull();
   });
 
-  it('serviceKey=pharmacy-hub 는 타 서비스 slot 을 반환하지 않는다', async () => {
-    const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=pharmacy-hub');
+  it('serviceKey=neture 는 타 서비스 slot 을 반환하지 않는다', async () => {
+    const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=neture');
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(1);
     expect(res.body.data[0].content.id).toBe('c-2');
@@ -98,7 +125,15 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=kpa');
     expect(res.status).toBe(200);
     expect(res.body.meta.serviceKeys).toEqual(['kpa-society', 'kpa']);
-    expect(res.body.data[0].content.id).toBe('c-1');
+    expect(res.body.data.map((d: any) => d.content.id)).toEqual(['c-1']);
+  });
+
+  it('저장된 퇴역 서비스 slot · 콘텐츠는 cross-service 조회에서도 빠진다', async () => {
+    const res = await request(makeApp())
+      .get('/cms/slots/home-hero?activeOnly=false')
+      .set('x-test-admin', '1');
+    expect(res.status).toBe(200);
+    expect(res.body.data.map((d: any) => d.content.id)).toEqual(['c-1', 'c-2']);
   });
 
   it('platform:super_admin 은 serviceKey 없이 cross-service 조회 가능', async () => {
@@ -108,5 +143,63 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     expect(res.status).toBe(200);
     expect(res.body.meta.crossService).toBe(true);
     expect(res.body.data).toHaveLength(2);
+  });
+});
+
+/** Platform scope changes must validate existing content, not only replacements. */
+describe('slot updates preserve content/service boundaries', () => {
+  function updateApp(contentService: string | null = 'kpa-society') {
+    jest.mocked(roleAssignmentService.hasAnyRole).mockResolvedValue(true);
+    const slot = { id: 'slot-a', slotKey: 'home', contentId: 'content-a', serviceKey: 'kpa-society', isLocked: false };
+    const save = jest.fn(async (value: unknown) => value);
+    const remove = jest.fn();
+    const deleteSlots = jest.fn();
+    const dataSource: any = { getRepository: (entity: { name: string }) => entity.name === 'CmsContentSlot'
+      ? { findOne: jest.fn(async () => ({ ...slot })), find: jest.fn(async () => [{ ...slot }]), save, remove, delete: deleteSlots }
+      : { findOne: jest.fn(async () => ({ id: 'content-a', serviceKey: contentService })) } };
+    const app = express();
+    app.use(express.json());
+    app.use((req: any, _res, next) => { req.user = { id: 'admin-a', roles: ['platform:super_admin'] }; next(); });
+    app.use('/cms', createCmsContentSlotRoutes({ dataSource }));
+    return { app, save, remove, deleteSlots };
+  }
+
+  it.each([{ serviceKey: 'neture' }, { serviceKey: 'neture', contentId: 'content-a' }])(
+    'rejects moving existing KPA content to a Neture slot: %j', async body => {
+      const { app, save } = updateApp();
+      const response = await request(app).put('/cms/slots/slot-a').send(body);
+      expect(response.status).toBe(400);
+      expect(response.body.error.code).toBe('SERVICE_SCOPE_MISMATCH');
+      expect(save).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a stored retired content reference even when the content ID is resent', async () => {
+    const { app, save } = updateApp('pharmacy-hub');
+    const response = await request(app).put('/cms/slots/slot-a').send({ contentId: 'content-a' });
+    expect(response.status).toBe(410);
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it.each([{ sortOrder: 2 }, { isActive: false }])('rejects metadata-only changes to a slot linked to retired content: %j', async body => {
+    const { app, save } = updateApp('pharmacy-hub');
+    expect((await request(app).put('/cms/slots/slot-a').send(body)).status).toBe(410);
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('rejects direct and empty bulk deletion of a live-service slot linked to retired content', async () => {
+    const { app, remove, deleteSlots } = updateApp('pharmacy-hub:legacy');
+    expect((await request(app).delete('/cms/slots/slot-a')).status).toBe(410);
+    expect((await request(app).put('/cms/slots/home/contents').send({ contents: [] })).status).toBe(410);
+    expect(remove).not.toHaveBeenCalled();
+    expect(deleteSlots).not.toHaveBeenCalled();
+  });
+
+  it('preserves aliases and permits moving platform content to a service slot', async () => {
+    const alias = updateApp();
+    expect((await request(alias.app).put('/cms/slots/slot-a').send({ serviceKey: 'kpa' })).status).toBe(200);
+    const global = updateApp(null);
+    expect((await request(global.app).put('/cms/slots/slot-a').send({ serviceKey: 'neture' })).status).toBe(200);
+    expect(global.save).toHaveBeenCalledWith(expect.objectContaining({ serviceKey: 'neture', contentId: 'content-a' }));
   });
 });

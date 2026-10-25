@@ -24,11 +24,13 @@ import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
 import { optionalAuth, requireAuth } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import {
   resolveCmsReadScope,
   resolveCmsServiceKeys,
   canonicalizeCmsServiceKey,
   isSameCmsService,
+  findCmsSlotContentConflict,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
 
@@ -191,6 +193,15 @@ export function createCmsContentSlotRoutes(deps: {
   const router = Router();
   const { dataSource } = deps;
 
+  const hasRetiredStoredSlot = async (slot: { serviceKey: string | null; contentId?: string }): Promise<boolean> => {
+    if (isRetiredServiceValue(slot.serviceKey)) return true;
+    if (!slot.contentId) return false;
+    const content = await dataSource.getRepository(CmsContent).findOne({
+      where: { id: slot.contentId }, select: ['serviceKey'],
+    });
+    return isRetiredServiceValue(content?.serviceKey);
+  };
+
   /**
    * GET /cms/slots/:slotKey
    * Get content items assigned to a specific slot
@@ -243,15 +254,20 @@ export function createCmsContentSlotRoutes(deps: {
         order: { sortOrder: 'ASC' },
       });
 
+      // 저장된 퇴역 · 타 서비스 콘텐츠는 공개 응답에 싣지 않는다 (배치 시점 판정과 같은 기준)
+      const placeableSlots = slots.filter(
+        slot => findCmsSlotContentConflict(slot.content?.serviceKey, slot.serviceKey) === null,
+      );
+
       // Filter by time window if active
       const filteredSlots = activeOnly === 'true'
-        ? slots.filter(slot => {
+        ? placeableSlots.filter(slot => {
             const startsOk = !slot.startsAt || slot.startsAt <= now;
             const endsOk = !slot.endsAt || slot.endsAt >= now;
             const contentPublished = slot.content?.status === 'published';
             return startsOk && endsOk && contentPublished;
           })
-        : slots;
+        : placeableSlots;
       const ordinarySlots = filteredSlots.filter(slot => !isHomePresentationMetadata(slot.content?.metadata));
 
       res.json({
@@ -467,6 +483,18 @@ export function createCmsContentSlotRoutes(deps: {
         });
         return;
       }
+      const slotConflict = findCmsSlotContentConflict(content.serviceKey, serviceKey);
+      if (slotConflict === 'retired') {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+      if (slotConflict === 'mismatch') {
+        res.status(400).json({
+          success: false,
+          error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
+        });
+        return;
+      }
 
       const slotRepo = dataSource.getRepository(CmsContentSlot);
 
@@ -553,6 +581,11 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
+      if (await hasRetiredStoredSlot(slot)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+
       // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
       const isModifyingLockFields = isLocked !== undefined || lockedBy !== undefined ||
                                      lockedReason !== undefined || lockedUntil !== undefined;
@@ -593,10 +626,11 @@ export function createCmsContentSlotRoutes(deps: {
         return;
       }
 
-      // Verify content if being changed
-      if (contentId && contentId !== slot.contentId) {
+      // Validate the resulting pair even when only the slot's service is changed.
+      const nextContentId = contentId || slot.contentId;
+      if (nextContentId && (contentId !== undefined || serviceKey !== undefined)) {
         const contentRepo = dataSource.getRepository(CmsContent);
-        const content = await contentRepo.findOne({ where: { id: contentId } });
+        const content = await contentRepo.findOne({ where: { id: nextContentId } });
         if (!content || isHomePresentationMetadata(content.metadata)) {
           res.status(400).json({
             success: false,
@@ -604,7 +638,19 @@ export function createCmsContentSlotRoutes(deps: {
           });
           return;
         }
-        slot.contentId = contentId;
+        const slotConflict = findCmsSlotContentConflict(content.serviceKey, serviceKey !== undefined ? serviceKey : slot.serviceKey);
+        if (slotConflict === 'retired') {
+          res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+          return;
+        }
+        if (slotConflict === 'mismatch') {
+          res.status(400).json({
+            success: false,
+            error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
+          });
+          return;
+        }
+        slot.contentId = nextContentId;
       }
 
       // Update fields
@@ -673,6 +719,11 @@ export function createCmsContentSlotRoutes(deps: {
           success: false,
           error: { code: 'SERVICE_SCOPE_DENIED', message: `Not authorized to manage slots for service: ${slot.serviceKey}` },
         });
+        return;
+      }
+
+      if (await hasRetiredStoredSlot(slot)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
         return;
       }
 
@@ -769,6 +820,20 @@ export function createCmsContentSlotRoutes(deps: {
           });
           return;
         }
+        for (const existingContent of existingContents) {
+          const slotConflict = findCmsSlotContentConflict(existingContent.serviceKey, serviceKey);
+          if (slotConflict === 'retired') {
+            res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+            return;
+          }
+          if (slotConflict === 'mismatch') {
+            res.status(400).json({
+              success: false,
+              error: { code: 'SERVICE_SCOPE_MISMATCH', message: 'Content belongs to a different service than the slot' },
+            });
+            return;
+          }
+        }
       }
 
       // Build scope condition
@@ -778,6 +843,14 @@ export function createCmsContentSlotRoutes(deps: {
       }
       if (organizationId) {
         scopeWhere.organizationId = organizationId;
+      }
+
+      // 퇴역 서비스 slot 은 교체(삭제 후 재생성) 대상이 아니다 — serviceKey 없이 호출한 admin 의 일괄 삭제 포함.
+      const existingScopeSlots = await slotRepo.find({ where: scopeWhere, select: ['id', 'serviceKey', 'contentId'] });
+      const retiredExistingSlots = await Promise.all(existingScopeSlots.map(hasRetiredStoredSlot));
+      if (isRetiredServiceValue(serviceKey) || retiredExistingSlots.some(Boolean)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
       }
 
       // Delete existing slots for this slotKey/scope

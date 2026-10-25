@@ -2,7 +2,7 @@
 
 > **상태**: ACTIVE · **작성일**: 2026-10-24
 > **근거**: 관리자에서 기준을 수정·보완하고 해당 상품을 선택하여 주기적으로 작업한다는 사용자 지시
-> **구현 상태**: 개발 브랜치에서 수동 정기 운영 P1까지 구현. 운영 배포는 별도 확인.
+> **구현 상태**: 수동 정기 운영 P1까지 main 병합·운영 배포 완료. [통합·배포 검증](../../checks/CHECK-O4O-PRODUCT-MANAGEMENT-INTEGRATION-AND-DELIVERY-V1.md) 참조.
 > **상위 원칙**: [상품설명서 전문 판단·AI 활용 원칙](O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)
 
 ## 목적

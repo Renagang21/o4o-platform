@@ -67,8 +67,6 @@ import storeOwnerTerminationRoutes from '../routes/admin/store-owner-termination
 
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
-import { createStoreNetworkRoutes } from '../routes/platform/store-network.routes.js';
-import { createPhysicalStoreRoutes } from '../routes/platform/physical-store.routes.js';
 import { createSlugRoutes } from '../routes/platform/slug.routes.js';
 import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.js';
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
@@ -358,13 +356,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/platform-services', createPlatformServicesRoutes(dataSource));
     logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
 
-    // 8.8. Register Store Network Dashboard routes (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
-    app.use('/api/v1/admin/store-network', createStoreNetworkRoutes(dataSource));
-    logger.info('✅ Store Network Dashboard routes registered at /api/v1/admin/store-network');
-
-    // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
-    app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(dataSource));
-    logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
+    // Retired K-Cosmetics store-network/physical-stores APIs have no active UI consumers.
 
     app.use('/api/v1/admin/store-owner-terminations', storeOwnerTerminationRoutes);
     logger.info('✅ Store Owner Termination routes registered at /api/v1/admin/store-owner-terminations');
