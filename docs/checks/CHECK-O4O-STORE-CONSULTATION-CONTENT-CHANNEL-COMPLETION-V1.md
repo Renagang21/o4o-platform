@@ -69,10 +69,18 @@ Chromium, **1440×1000·1280×800·390×844**에서 실제 Store 화면·API cli
 
 ## 5. 통합·운영 담당 인계
 
-- **DEPLOYMENT = REQUIRED**: API + Store 코드이며 현재 개발 종료점은 push다. PR·main 병합·배포는 수행하지 않는다. 새 branch의 원격 SHA/CI 상태는 push 후 기록한다.
+- **DEPLOYMENT = REQUIRED**: API + Store 코드이며 현재 개발 종료점은 push다. PR·main 병합·배포는 수행하지 않았다. 새 branch의 원격 SHA/CI 상태는 §6을 따른다.
 - **정리 job 활성화는 미실행**: 기본 dry-run은 읽기/집계뿐이다. 배포 후 aggregate count/오류를 관측하고 적용 시 `CONSULTATION_STATE_CLEANUP_MODE=apply`, 중지는 `CONSULTATION_STATE_CLEANUP_ENABLED=false`. 본문이나 실제 계정값은 로그에 넣지 않는다. 60초 주기·batch 적체를 포함한 운영 정리 완료를 아직 주장하지 않는다.
 - **실계정/현장 미확인**: 현행 직원 Secret은 선행 읽기 전용 확인에서 로그인 거부였다. 갱신 없이 재시도·비밀번호 변경·역할 발급하지 않았다. 실제 직원 초대/승인/해제·매장 격리, 물리 QR 인쇄/스캔, 별도 태블릿/사이니지 연결·재생, 현장 마이크·언어/약사 품질·유료 provider 결과/비용은 검증하지 않았다.
 - 태블릿 undo의 재조회는 낡은 작업을 막지만 다른 작업자와의 서버 원자적 CAS를 제공하지 않는다. 실제 적용 직후 화면/기기 확인은 필요하다.
 - 보존 정본의 과거 `ai_query_logs` 미사용 서술과 현행 사용자 질의 저장/조회 코드가 다르다. 운영 row/이용량은 조회하지 않았으며 공통 개인정보/AI 담당의 현재 사용 상태 확인 항목이다. 이번 원문 없는 재사용 결정으로 공통 개인 이력 계약을 바꾸지는 않는다.
+
+## 6. push 결과·인계
+
+코드 commit **[`e8693bb60b18a51189ed5b0caef71cd8cba392ef`](https://github.com/Renagang21/o4o-platform/commit/e8693bb60b18a51189ed5b0caef71cd8cba392ef)**을 named branch에 push했고 `ls-remote` SHA 일치를 확인했다. 선행 2개 commit을 포함한다. push 직전 origin/main 재조회는 기준 SHA와 같았다.
+
+코드 SHA의 GitHub check-runs 0건·commit status 항목 0건, 이 branch의 PR 0건이다. aggregate status의 `pending`은 등록된 CI 작업이 있다는 뜻이 아니며 **PR CI·외부 자동 검토는 미실행**이다. 로컬 통과를 원격 CI 통과로 표시하지 않는다. 완료 기록은 동일 branch의 후속 문서 commit으로 push한다.
+
+전용 worktree `/workspace/o4o-wt/store-consultation-content-channel-completion`은 통합 검토용으로 유지한다. 작업용 Vite를 중지했고 격리 SQL 컨테이너/DB는 정리했다. 기준 checkout과 다른 worktree·원격 branch는 수정/삭제하지 않았다. 운영 반영/정리 job 활성화와 실제 검증은 §5에 남아 있다.
 
 문서 정합: 발견 2건(상담절 anchor 이동, 개인 질의 이력의 과거 운영 서술과 코드 차이) / SUPERSEDED 표기 0건 / 링크 수정 2건 / 별도 WO 제안 0건. 업무 범위·약국 설계·Core 적용 기록을 보완했으며 개인정보 정본의 운영 수치를 추정해 수정하지 않았다.
