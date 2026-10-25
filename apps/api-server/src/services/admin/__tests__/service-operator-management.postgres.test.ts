@@ -174,13 +174,10 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
     },
   );
-  it("Google link is required and failed input does not write", async () => {
-    await setup();
-    await db.ds.query("DELETE FROM linked_accounts");
-    await expect(
-      s.change(actor, "funding", target, true),
-    ).rejects.toMatchObject({ code: "GOOGLE_LINK_REQUIRED" });
-    expect(await db.ds.query("SELECT * FROM action_logs")).toHaveLength(0);
+  it("an email-only verified active member can accept a service-admin invitation", async () => {
+    await setup();await db.ds.query("DELETE FROM linked_accounts");
+    await inviteAndAccept(actor,"funding",target);
+    expect(roleAssignmentService.assignRole).toHaveBeenCalledTimes(1);
   });
   it("protects fixed Demo target roles", async () => {
     await setup();

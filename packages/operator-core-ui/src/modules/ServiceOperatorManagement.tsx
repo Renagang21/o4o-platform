@@ -118,7 +118,7 @@ function OperatorManagementPanel({
         관리합니다.
       </p>
       <p className="text-sm text-gray-600">
-        지정 대상은 Google 계정을 연결하고 이 서비스를 이용할 수 있는
+        초대 대상은 이메일 인증을 완료하고 이 서비스를 이용할 수 있는
         회원입니다. 서비스 가입·정지 상태는 변경하지 않습니다.
       </p>
       {notice && <p role="status">{notice}</p>}
@@ -211,13 +211,12 @@ function OperatorManagementPanel({
                     >
                       <span className="min-w-0 break-all">
                         {p.name || p.email} · {p.email}
-                        {!p.hasGoogleLink ? " · Google 연결 필요" : ""}
+
                       </span>
                       <button
                         type="button"
                         disabled={
                           busy ||
-                          !p.hasGoogleLink ||
                           data.operators.some((o) => o.userId === p.userId)
                         }
                         onClick={() => void change(p, true)}

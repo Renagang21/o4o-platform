@@ -32,6 +32,10 @@
 
 CI가 지적한 manifest import 선언 순서를 실행 배열과 같은 append 순서로 정렬했다. SQL·실행 배열·fingerprint는 변경하지 않았다. migration contract C04/C09를 포함한21개 검사 PASS. 최신 기능 HEAD의 CI·Codex 결과를 다시 확인한다. 격리 PG 컨테이너·fixture 데이터는 검증 후 제거했고 잔존 컨테이너0을 확인했다.
 
+## 이메일 계정·Demo 후속
+
+Codex P1에 따라 서비스 운영자의 Google 연결 필수 검사를 제거했다. 인증된 활성·이메일 확인 계정/서비스·조직 자격과 본인 수락은 유지하고 `platform:*`의 Google 전용 경계는 보존한다. 전체 관리자 기존 계정 초대·미가입자 이메일 가입 후 수락·서비스 관리자 초대·미인증 계정 거절을 실제 PG에서 검증했다. 관련6 suite154 PASS(실제 PG43 포함), 분회 Demo 보호18·공통 초대UI8·전체 관리자 Google 전용 password/session 경계70 PASS. 관리자 사업별 신규 초대4건도 기존 즉시 부여 대신 초대 API·수락 전 권한0 계약으로 정렬 후 PASS. 관리자 전체34 suite466 PASS. API tsc·Admin build 재통과. 로컬 shard2 전체 재현의 Demo3건과 cwd 의존4건은 Demo 기대값 정렬 후 CI와 같은 api-server cwd에서 관련22건 PASS로 확인했다(범위 밖 cwd 의존 spec은 수정하지 않음). API 분할 실패의 옛 분회 즉시 지정 기대값은 실제 Demo 판정/자격 검증·수락 전 권한0으로 정렬했다.
+
 ## 운영 미실행·남은 Gate
 
 실제 DB migration·메일 전달·사용자 권한 변경·새 개인정보 처리방침 게시·main 병합/배포는 미실행이다. 새 table과 자동 파기 job을 운영에 적용하기 전 AGENTS §5의 명시 승인을 받는다. 최신 main 통합 뒤 CI·최신 HEAD Codex·미해결 finding을 확인해야 한다. 실제 메일/계정 smoke는 사용자가 승인한 대상과 안전한 검증 절차를 먼저 확정한다.

@@ -68,7 +68,7 @@ it("searches only the selected scope and sends userId without role overrides", a
     "운영자 초대 메일을 보냈습니다. 본인 수락 후 권한이 활성화됩니다.",
   );
 });
-it("a missing Google link disables designation", async () => {
+it("an email-only active member can receive a consent invitation", async () => {
   await show();
   managementGet.mockResolvedValueOnce(
     snapshot([], [{ ...person, hasGoogleLink: false }]),
@@ -77,7 +77,7 @@ it("a missing Google link disables designation", async () => {
   expect(
     (screen.getByRole("button", { name: "초대" }) as HTMLButtonElement)
       .disabled,
-  ).toBe(true);
+  ).toBe(false);
 });
 it("cancelled confirmation sends no mutation", async () => {
   await show();

@@ -168,13 +168,6 @@ export class ServiceOperatorInvitationService {
     )
       fail("ACCOUNT_INACTIVE", 403);
     await demoAccountService.assertNotDemoAccount(id, m);
-    if (scope.scope_type !== "cooperative") {
-      const google = await m.query(
-        `SELECT id FROM linked_accounts WHERE "userId"=$1 AND provider='google' FOR SHARE`,
-        [id],
-      );
-      if (!google.length) fail("GOOGLE_LINK_REQUIRED", 409);
-    }
     return user;
   }
   private async requireUnassignedRole(

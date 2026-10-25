@@ -107,10 +107,10 @@ function BusinessLedgerCell({ serviceKey, ledger }: { serviceKey: string; ledger
 
 /**
  * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 신규 권한은 초대와 본인 수락 뒤 활성화한다.
- *   기존 Google 연결 계정은 ID로 선택하고 미가입자는 이메일로 초대한다.
+ *   기존 계정은 ID로 선택하고 미가입자는 이메일로 초대한다.
  */
 
-/** 지정 후보 — 서버가 Google 연결 여부까지 함께 준다(연결 없으면 지정 대상이 아니다). */
+/** 초대 후보 — Google 연결 여부는 참고 정보이며 서비스 운영자 초대를 제한하지 않는다. */
 interface OperatorCandidate {
   userId: string;
   email: string;
@@ -587,7 +587,7 @@ export default function OperatorsPage() {
           actions={[
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
             // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17:
-            //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 Google 로 로그인하며
+            //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 본인 계정으로 로그인하며
             //   관리자가 타인의 비밀번호를 만들거나 재설정하는 경로는 존재하지 않는다.
             { key: 'revoke', label: `권한 해제 (${row.roleMeta.label})`, variant: 'danger', onClick: () => handleRevokeRole(row) },
           ]}
@@ -829,7 +829,7 @@ export default function OperatorsPage() {
 
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 기존 사용자 선택과 미가입 이메일 초대를 구분한다.
-                  미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다. */}
+                  미가입자는 이메일 초대 후 본인이 가입·수락한다. */}
 
               {/* 대상 —
                   WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §1·§5·§7
@@ -896,7 +896,7 @@ export default function OperatorsPage() {
                           key={c.userId}
                           className={`flex items-start gap-2 p-2 text-sm cursor-pointer ${
                             selectedCandidate?.userId === c.userId ? 'bg-blue-50' : 'hover:bg-gray-50'
-                          } ${c.hasGoogleLink ? '' : 'opacity-70'}`}
+                          } `}
                         >
                           <input
                             type="radio"
@@ -932,7 +932,7 @@ export default function OperatorsPage() {
                   )}
                   <p className="mt-1 text-xs text-slate-500">
                     검색 결과가 없으면 이름·이메일과 검색어를 먼저 확인하세요. 공통 계정이 없다면 본인이 가입하고,
-                    기존 계정에 Google이 연결되지 않았다면 본인이 계정 설정에서 연결한 뒤 지정하세요.
+                    이메일 계정도 본인 인증과 초대 수락을 완료하면 서비스 운영 권한을 받을 수 있습니다.
                     해당 서비스의 사전 가입은 지정의 필수 조건이 아닙니다.
                   </p>
                 </div>

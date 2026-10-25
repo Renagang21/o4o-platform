@@ -169,16 +169,6 @@ export class ServiceOperatorManagementService {
             "ACTIVE_SERVICE_MEMBER_REQUIRED",
             "승인된 활성 서비스 회원만 지정할 수 있습니다.",
           );
-        const google = await m.query(
-          `SELECT id FROM linked_accounts WHERE "userId"=$1 AND provider='google' FOR SHARE`,
-          [target],
-        );
-        if (!google.length)
-          throw new OperationError(
-            409,
-            "GOOGLE_LINK_REQUIRED",
-            "본인의 Google 계정 연결 후 지정할 수 있습니다.",
-          );
         const [prior] = await m.query(
           `SELECT is_active,valid_from,valid_until FROM role_assignments
           WHERE user_id=$1 AND role=$2 ORDER BY is_active DESC,assigned_at DESC,id DESC LIMIT 1 FOR UPDATE`,

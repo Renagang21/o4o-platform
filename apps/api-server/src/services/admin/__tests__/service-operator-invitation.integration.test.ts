@@ -606,6 +606,23 @@ integration(
       await query("UPDATE branch_memberships SET status='left',left_at=NOW() WHERE user_id=$1",[target]);
       await expect(service.accept(token(),target)).rejects.toMatchObject({code:'NOT_BRANCH_MEMBER'});expect(assignRole).not.toHaveBeenCalled();
     });
+    it('allows a verified email-only account to inspect and explicitly accept a service operator invitation',async()=>{
+      await query('DELETE FROM linked_accounts WHERE "userId"=$1',[target]);
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      expect(assignRole).not.toHaveBeenCalled();await service.inspect(token(),target);await service.accept(token(),target);
+      expect(assignRole).toHaveBeenCalledTimes(1);
+    });
+    it('lets an invited unregistered recipient sign up with email only and then consent',async()=>{
+      await service.create({actorId:admin,email:'new-email-only@fixture.invalid',serviceKey:'lecture',role:'lecture:operator'});
+      const recipient=await user('new-email-only@fixture.invalid');await query('DELETE FROM linked_accounts WHERE "userId"=$1',[recipient]);
+      await service.inspect(token(),recipient);expect(assignRole).not.toHaveBeenCalled();await service.accept(token(),recipient);
+      expect(assignRole).toHaveBeenCalledTimes(1);
+    });
+    it('still refuses an unverified email-only recipient before granting any privilege',async()=>{
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      await query('DELETE FROM linked_accounts WHERE "userId"=$1',[target]);await query('UPDATE users SET "isEmailVerified"=false WHERE id=$1',[target]);
+      await expect(service.accept(token(),target)).rejects.toMatchObject({code:'ACCOUNT_INACTIVE'});expect(assignRole).not.toHaveBeenCalled();
+    });
     it('does not overwrite a role granted by another admin while the invitation was pending',async()=>{
       await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
       const until=new Date('2099-01-01T00:00:00Z');
