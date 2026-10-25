@@ -40,3 +40,12 @@ PR 생성·main 병합·배포는 별도 지시 없이 진행하지 않는다. A
 - diff 기반 배포 위험 검사는 상품 정기 worker의 DB 쓰기로 LEVEL_3이다. 향후 통합 담당의 정식 PR·CI·리뷰 및 통제된 배포 절차가 필요하다. 로컬 검증은 GitHub CI나 운영 배포 성공을 대신하지 않는다.
 
 PR 생성·main 병합·배포·운영 데이터 변경은 수행하지 않는다.
+
+## 승인 범위 변경: PR·CI·리뷰 진행 (2026-10-25)
+
+앞의 push 종료 기록 이후 사용자가 PR 생성·CI·리뷰·필요 수정 push까지 진행하도록 승인했다. main 병합·자동 병합·배포는 계속 보류한다. 동일 WO/branch에서 [PR #816](https://github.com/Renagang21/o4o-platform/pull/816)을 생성했다.
+
+- PR 준비 시 origin/main이 d083f2f716으로 이동했다. 개발 branch에 merge(51f624cb4a)했고 startup 종료 충돌 한 곳은 상품 정기 worker와 상담 정리 worker 양쪽 stop을 모두 유지했다. 시작 코드도 양쪽을 보존한다. 최신 main의 상담·강의·인증·배포 workflow 변경은 그대로 유지했다.
+- 병합 후 API 타입 검사와 상품 worker·상담 정리·강의·인증·관리자 설명서 HTTP 회귀 5개 suite / 59개를 통과했다. 앞 절의 전체 로컬 검증 수치는 당시 commit 기준 기록이며 최신 main의 모든 신규 테스트까지 재실행한 수치로 해석하지 않는다.
+- 실제 main ruleset은 PR 필수·CI Gate 필수·필수 human approval 0이다. PR 자동 병합은 설정하지 않았다. CI 및 Codex 리뷰의 최종 결과는 PR의 실제 최신 HEAD와 검사·리뷰 기록으로 확인한다.
+- Delivery 자동 경로는 main push의 CI 완료에만 반응하며 PR CI로 운영 배포를 시작하지 않는다. workflow·ruleset·freeze·운영 자원 설정을 바꾸지 않았다.

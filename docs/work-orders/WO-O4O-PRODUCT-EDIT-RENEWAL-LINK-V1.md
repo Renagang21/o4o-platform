@@ -35,3 +35,7 @@
 - [x] 배포 위험 LEVEL_3 확인 및 운영 경계 기록
 
 이 후속도 개발 branch push까지다. 정식 PR·CI·main 병합·배포는 통합 담당 단계로 남긴다. 상세 결과는 연결된 CHECK에 추가 기록한다.
+
+## 후속 승인: 병합 전 PR·CI·리뷰
+
+기존 push 종료 후 사용자가 [PR #816](https://github.com/Renagang21/o4o-platform/pull/816)의 생성·CI·리뷰·필요 수정 push를 승인했다. 동일 WO/branch를 유지해 최신 main 호환성 점검을 이어간다. 이전 push-only 문구는 당시 수행 범위의 기록이다. **main 병합·자동 병합·배포는 승인 범위에서 제외되어 보류한다.** 최종 검사는 PR 최신 HEAD를 기준으로 확인하고 상세 이력은 CHECK에 기록한다.
