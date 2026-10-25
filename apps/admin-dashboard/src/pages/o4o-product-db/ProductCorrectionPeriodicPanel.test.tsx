@@ -193,6 +193,81 @@ describe('상품 정기 관리 4~6번', () => {
       expect.arrayContaining([expect.objectContaining({ id: 'product' })]),
     );
   });
+  it.each([1, 0])(
+    'preserves every reused task link with %i new tasks',
+    async (createdCount) => {
+      const reused = [
+        { batchId: 'existing-a', taskId: 'task-a', productName: '기존 상품 A' },
+        { batchId: 'existing-b', taskId: 'task-b', productName: '기존 상품 B' },
+      ];
+      mocks.createBatch.mockResolvedValue({
+        id: createdCount ? 'new-batch' : 'existing-a',
+        items: [],
+        selectionResult: { createdCount, reused },
+      });
+      const candidates = [
+        ...reused.map((item) => ({ id: item.taskId, name: item.productName })),
+        ...(createdCount ? [{ id: 'new-product', name: '신규 상품' }] : []),
+      ].map((item) => ({
+        ...item,
+        reason: '확인',
+        fingerprint: 'a'.repeat(64),
+        runId: 'run',
+      }));
+      mocks.api.bulkPages.mockResolvedValue({
+        job,
+        run: { result: { items: candidates } },
+        totalPages: 1,
+        page: 1,
+      });
+      await open();
+      fireEvent.click(screen.getByRole('button', { name: /실행 결과 열기:/ }));
+      await screen.findByLabelText('선택 대량 점검');
+      for (const item of candidates)
+        fireEvent.click(screen.getByLabelText(`${item.name} · 확인`));
+      fireEvent.click(screen.getByText('이 결과에서 선택 상품 작업 만들기'));
+      for (const item of reused) {
+        expect(
+          await screen.findByRole('link', {
+            name: `${item.productName} 기존 작업 열기`,
+          }),
+        ).toHaveAttribute(
+          'href',
+          `/admin/o4o-product-db/maintenance?batch=${item.batchId}&task=${item.taskId}`,
+        );
+      }
+      expect(mocks.createBatch).toHaveBeenCalledWith(
+        rule,
+        { search: undefined, page: 1 },
+        expect.any(String),
+        candidates,
+      );
+      expect(screen.getByRole('status')).toHaveTextContent(
+        `새 작업 ${createdCount}개 · 기존 작업 연결 2개`,
+      );
+      if (createdCount) {
+        expect(
+          screen.getByRole('link', { name: '선택 상품 작업 열기' }),
+        ).toHaveAttribute(
+          'href',
+          '/admin/o4o-product-db/maintenance?batch=new-batch',
+        );
+      } else {
+        expect(
+          screen.queryByRole('link', { name: '선택 상품 작업 열기' }),
+        ).not.toBeInTheDocument();
+      }
+      fireEvent.click(screen.getByRole('button', { name: /실행 결과 열기:/ }));
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('link', { name: '기존 상품 A 기존 작업 열기' }),
+        ).not.toBeInTheDocument(),
+      );
+      expect(
+        screen.queryByRole('link', { name: '기존 상품 B 기존 작업 열기' }),
+      ).not.toBeInTheDocument();
+    },
+  );
   it('keeps exhausted failures stopped until an explicit manual resume', async () => {
     const failed = { ...job, status: 'failed', attempts: 3, errorCode: 'BULK_STEP_FAILED' };
     mocks.api.bulkPages.mockResolvedValue({ job: failed, run: null, totalPages: 0, page: 1 });

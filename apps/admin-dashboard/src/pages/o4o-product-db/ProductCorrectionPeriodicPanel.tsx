@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type {
+  ProductCorrectionBatchResult,
   ProductCorrectionMatch,
   ProductCorrectionRule,
   ProductCorrectionSchedule,
@@ -109,6 +110,9 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
     [pages, setPages] = useState<Awaited<ReturnType<typeof api.bulkPages>> | null>(null);
   const [selected, setSelected] = useState<ProductCorrectionMatch[]>([]),
     [batchLink, setBatchLink] = useState('');
+  const [reused, setReused] = useState<
+    NonNullable<ProductCorrectionBatchResult['selectionResult']>['reused']
+  >([]);
   const [schedules, setSchedules] = useState<Awaited<ReturnType<typeof api.schedules>> | null>(
       null,
     ),
@@ -179,6 +183,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
       setPages(result);
       setSelected([]);
       setBatchLink('');
+      setReused([]);
     }
   };
   const openRenewal = async (id: string) => {
@@ -488,6 +493,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                     setPages({ job: result, run: null, totalPages: 0, page: 1 });
                     setSelected([]);
                     setBatchLink('');
+                    setReused([]);
                     setJobs((previous) => ({
                       items: [
                         result,
@@ -753,10 +759,15 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                         selected,
                       );
                       if (active.current) {
-                        setBatchLink(`/admin/o4o-product-db/maintenance?batch=${batch.id}`);
+                        const createdCount = batch.selectionResult?.createdCount ?? batch.items.length;
+                        const reusedItems = batch.selectionResult?.reused ?? [];
+                        setBatchLink(
+                          createdCount ? `/admin/o4o-product-db/maintenance?batch=${batch.id}` : '',
+                        );
+                        setReused(reusedItems);
                         setSelected([]);
                         setNotice(
-                          `선택 작업 연결: 새 작업 ${batch.selectionResult?.createdCount ?? batch.items.length}개. 기존 작업 재사용 여부를 확인하세요.`,
+                          `선택 작업 연결: 새 작업 ${createdCount}개 · 기존 작업 연결 ${reusedItems.length}개. 상품 원본은 변경되지 않았습니다.`,
                         );
                       }
                     })
@@ -769,6 +780,15 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                     선택 상품 작업 열기
                   </a>
                 )}
+                {reused.map((item) => (
+                  <a
+                    key={`${item.batchId}:${item.taskId}`}
+                    className="block text-blue-700 underline"
+                    href={`/admin/o4o-product-db/maintenance?batch=${item.batchId}&task=${item.taskId}`}
+                  >
+                    {item.productName} 기존 작업 열기
+                  </a>
+                ))}
                 <div className="flex gap-3">
                   <button
                     type="button"
