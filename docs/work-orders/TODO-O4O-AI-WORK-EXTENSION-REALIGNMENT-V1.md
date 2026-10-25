@@ -1,9 +1,11 @@
 # O4O AI 업무 Core + Extension 정비 TODO
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
+> **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-25 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 요청 — 전체 AI 업무의 Core + Extension 재정리 준비, TODO 선작성 → 코드·문서 대조 보완 → push
 > **관련 정본**: [AI 공통 기반](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md) · [AI 활용 흐름](../baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md)
+
+**현재 상태 (2026-10-25):** 준비와 연속 구현을 거쳐 사용자 지시로 main 병합·이번 운영 배포를 완료했다(§11). 아래 준비/push-only 회차의 범위는 당시 기록이며, 미체크 후속 항목과 실계정·유료 AI 검증은 남아 있다.
 
 ## 1. 이번 작업과 종료점
 
@@ -187,4 +189,12 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-work-extension-preparation` · `wo/a
 
 새 API는 `/api/v1/kpa/store-hub/ai-overview`, 기존 supplier router의 `/copilot/ai-overview`, 기존 cooperative-management의 `/:coop/ai-overview`, 상품 정정의 `/batches/:id/items/:taskId/ai-draft`다. 앞의 3종은 빈 body만, 상품 검토안은 기존 작업 revision만 받는다. 화면의 임의 지표/actor/조직을 신뢰하지 않는다. 후자는 기존 product DB write guard 아래에서 초안 제안만 반환하고 공식 DB·작업 기록을 자동 저장하지 않는다.
 
-검증 명령·실제 결과·fixture/운영 구분은 [실행 CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)에 모은다. schema/migration·운영 설정·실제 AI 호출·PR/CI·병합·배포는 이번에 실행하지 않는다. 후속 통합 시 기존 main 변경과 branch HEAD를 재대조한다. worktree는 병합 전 수정용 KEEP이다.
+검증 명령·실제 결과·fixture/운영 구분은 [실행 CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)에 모았다. 이 개발/push-only 회차에서는 schema/migration·운영 설정·실제 AI 호출·PR/CI·병합·배포를 실행하지 않았고 worktree를 병합 전 수정용 KEEP으로 인계했다. 2026-10-25 통합·배포 후속 결과는 §11을 따른다.
+
+## 11. 사용자 지시에 따른 main 통합·배포 결과 (2026-10-25)
+
+사용자의 별도 main 병합·배포 지시로 같은 WO의 통합을 이어갔다. 기존 main을 정상 merge하고 PR #805의 정확한 HEAD에서 필수 CI Gate·자동 분석·리뷰 지적 해소를 확인한 뒤 main `8de024e92cb071790408ca403e110abb4cc29d61`에 병합했다. main CI도 PASS했다. 통합 중 확인한 STORE_INSIGHT 정산 상세의 서비스 귀속과 새 현황 정책 조회 누락은 수정·회귀했으며 정산 총액/확정·결제·운영 설정은 바꾸지 않았다.
+
+같은 SHA의 API·관리자·Neture·약국 사업 웹·매장 웹을 기존 verified Delivery/promote로 배포했다. 협력 모임 웹은 기존 비공개 서비스에 frontend-only로 배포하고 fixture provision을 건너뛰었다. API 준비 상태 200·AI 경로 4곳의 무인증 401·공개 웹 4곳의 200/HTML, 협력 모임의 Ready·비공개 HTTP·100% 트래픽을 확인했다. workflow·serving label·검증 범위는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 기록했다.
+
+실제 계정의 업무 처리·AI 응답 품질·실제 한도/청구 검증은 미실행이며 기존 미체크 항목은 유지한다. 신규 AI 구현·부담 주체/요금 정책·외부 계정 연결을 이번 배포로 완료 표시하지 않는다. 이 종료 기록의 후속 반영은 문서-only(`DEPLOYMENT = NOT_APPLICABLE`)이며 runtime 재배포를 요구하지 않는다. 같은 WO의 문서 인계까지 반영한 뒤 자기 branch/worktree를 정리하고, 향후 독립 작업은 최신 main의 새 작업공간에서 시작한다.

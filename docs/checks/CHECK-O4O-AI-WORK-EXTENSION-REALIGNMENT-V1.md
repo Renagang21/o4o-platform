@@ -1,9 +1,11 @@
 # O4O AI 업무 Core + Extension 연결 검증
 
-> **상태**: ACTIVE — 개발 branch 검증·인계. 운영 적용은 미실행
-> **작성일**: 2026-10-24 (Asia/Seoul)
+> **상태**: ACTIVE — 개발 검증·main 통합·이번 배포 완료. 실계정 업무·유료 AI 검증과 후속 범위는 남음
+> **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-25 (Asia/Seoul)
 > **근거 WO/IR**: [전체 정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [조사 §7](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#7-후속-코드-대조구현-판정-2026-10-24)
 > **현행 계약**: [기반 문서 §14](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md#14-업무-공통-연결과-첫-적용--개발-branch-2026-10-24) · [공급자 경계](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md)
+
+**기록 구분:** §1~§5는 2026-10-24 개발/push-only 회차의 증거다. 현재 main·배포 확정 결과는 §6-1을 따른다.
 
 ## 1. 검증 범위와 기준
 
@@ -66,3 +68,28 @@ WORKTREE_DISPOSITION: worktree `/workspace/o4o-wt/ai-work-extension-preparation`
 실행 전 조회한 최근 CI·Delivery·Promote는 모두 완료 상태였고 진행 중인 운영 배포는 없었다. PR/병합 SHA·CI·최종 배포/서빙 결과와 공개 smoke의 확정 결과는 확인 후 이 절에 기록한다. 실제 유료 AI 호출·업무 데이터 생성·신규 외부 계약/인증 설정은 이번 배포 검증에 포함하지 않는다.
 
 [PR #805](https://github.com/Renagang21/o4o-platform/pull/805)의 자동 리뷰에서 정산 상세·정책 표시 P2 2건을 확인해 같은 branch에서 보완했다. STORE_INSIGHT를 기존 동적 서비스 scope 집계에 포함하여 실제 reservation의 service/month에 따라 상세를 계산하고 전역 scope 총액을 다른 서비스에 더하지 않는다. 기존 service 미지정 호출의 `store` 기본값과 정산 총액·확정/결제 경로는 유지한다. 관리 목록의 scope 정책 조회 대상도 카탈로그의 실제 `selection=scope` 정의에서 모아 매장·공급자·협력 모임의 저장 모델·활성/중지 설정을 표시한다. 재현 회귀를 포함한 정산/관리/HTTP 4 suites / 51 tests와 API build·변경 파일 lint PASS를 확인했다. 새 DDL·원장 보정·운영 정산 상태 변경은 없다.
+
+### 6-1. 통합·배포 확정 결과
+
+PR #805의 최종 HEAD `ba1338e0596863e9623b4dc5cf43482b06b2ccb2`에서 [PR CI 40147773182](https://github.com/Renagang21/o4o-platform/actions/runs/40147773182)의 필수 CI Gate·API 3개 shard·품질 검사·관리자/영향 웹 빌드가 PASS했다. CodeQL·SonarCloud PR 분석도 PASS했다. 앞 HEAD의 CI는 수정 push로 대체돼 취소됐으며 검증 근거로 합산하지 않는다. 자동 리뷰 P2 2건은 재현·수정·회귀 후 해결 처리했고 미해결 thread는 0건이었다. 필수 human approval 0인 실제 ruleset을 따랐고 bypass/force push를 사용하지 않았다.
+
+main `b880315789`를 포함한 상태에서 병합 직전 HEAD·CI·thread·main을 재대조했다. PR #805는 main `8de024e92cb071790408ca403e110abb4cc29d61`에 병합됐다. 이 main의 [CI 40148604543](https://github.com/Renagang21/o4o-platform/actions/runs/40148604543)와 [CodeQL 40148604539](https://github.com/Renagang21/o4o-platform/actions/runs/40148604539)도 PASS했다.
+
+| 대상 | 확정 결과 | 실행 근거 |
+|---|---|---|
+| API | `8de024e92c` DEPLOYED · revision `o4o-core-api-04192-zil` | [Delivery 40149352759](https://github.com/Renagang21/o4o-platform/actions/runs/40149352759)의 verified rollout·최종 serving label 확인 |
+| 관리자 | `8de024e92c` DEPLOYED · revision `o4o-admin-dashboard-01592-kes` | 같은 Delivery의 API 성공 후 배포·최종 label 확인 |
+| Neture | `8de024e92c` DEPLOYED · revision `neture-web-02055-qin` | 같은 Delivery의 API 성공 후 배포·최종 label 확인 |
+| 약국 사업 웹 | `8de024e92c` DEPLOYED · revision `kpa-society-web-02275-lac` | 같은 Delivery의 API 성공 후 배포·최종 label 확인 |
+| 매장 웹 | 같은 `8de024e92c` DEPLOYED | [Promote 40150140161](https://github.com/Renagang21/o4o-platform/actions/runs/40150140161), `services=store`로 한정한 verified 배포·최종 production status success |
+| 협력 모임 웹 | 같은 `8de024e92c`의 기존 비공개 서비스 배포 성공 | [Cooperative 40150536479](https://github.com/Renagang21/o4o-platform/actions/runs/40150536479), `frontend_only=true`, `apply=false`. API 호환성·Ready·비공개 HTTP·100% 트래픽 확인 PASS, fixture provision SKIPPED |
+
+매장 웹은 `LEVEL_3 (deploy-infra services/web-store/Dockerfile)`로 자동 배포가 보류됐다. 자동 Delivery가 끝난 뒤 진행 중인 다른 배포가 없고 main HEAD·CI가 일치함을 확인해 기존 소유자 promote 경로를 실행했다. 당시 commit status는 `HELD_LEVEL_3/pending`에서 `DEPLOYED/success`로 바뀌었다. API·다른 웹을 중복 승격하지 않았다. 협력 모임 웹도 앞 배포 완료 후 순차 실행했으며 공개 IAM·DNS·인증 설정을 변경하지 않았다.
+
+기존 API 배포의 표준 migration Job은 성공했다. 이번 변경에는 새 migration/DDL이 없고, 조합·회원 fixture 생성·정산 확정/결제·업무 데이터 보정은 수행하지 않았다. GitHub의 decision ZIP artifact는 이 클라우드의 storage egress 403으로 직접 내려받지 못했으며 우회하지 않았다. 대신 완료된 workflow의 Report 로그·job/step 결과·commit production status를 대조했다. 이 기록은 해당 실행 시점의 증거이며 이후 live 상태를 대신하지 않는다.
+
+**배포 후 공개 smoke:** API `/health/ready` 200, 새 매장·공급자·협력 모임·상품 정정 AI POST 경로 4곳의 무인증 요청 모두 401(`AUTH_REQUIRED`) PASS. Neture·매장·관리자·약국 사업의 공개 웹 4곳은 HTTP 200/HTML PASS다. 이 9개 관측은 API 반영 후와 웹 반영 후에 나눠 확인했다. 협력 모임은 workflow의 기존 비공개 URL `/`, `/test`, `/login` HTTP 검증과 100% 트래픽 확인을 별도로 통과했다.
+
+실제 계정으로 각 업무를 수행하거나 유료 AI 응답·모델 인증/품질·청구액·실제 한도 초과를 검증한 것은 아니다. smoke는 AI 호출을 요청하지 않았고 주문·게시 등 업무 데이터를 만들지 않았다. 직원/소비자 자료 구분·공식 DB 반영·실행 도구 확대 등의 남은 범위는 기존 TODO 그대로다. 이 확정 결과를 구조 문서와 TODO에 반영하는 후속 변경은 문서-only이며 runtime 재배포 대상이 아니다.
+
+문서 정합: 공급자 정책 변경·현재 코드 연결·main/운영 증거를 구분했다. 이전 조사·준비·push-only 결과는 역사로 유지하고 현재 상태 진입점에서 이 절을 연결한다. 같은 WO의 종료 기록까지 main 반영·post-merge 확인 후 자기 worktree만 정리하며 다른 worktree와 기준 checkout은 변경하지 않는다.

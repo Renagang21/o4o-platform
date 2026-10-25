@@ -1,6 +1,6 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-24 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-25 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
 > 전체 업무 재정비 준비: [단일 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [업무·코드 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
@@ -8,6 +8,7 @@
 
 **현재 범위:** 기존 Core/업무 Extension·가격/quota·Runtime/editor 정비는 main에 통합됐으며 승인된 quota migration·7개 서비스 배포가 완료됐다.
 현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. 관리자 조회 단계·모델 관리·사용처별 선택과 삭제 보호의 반영 상태는 §12/§12-1/§12-2에서 구분한다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
+업무 재정비의 추가 연결과 2026-10-25 main·운영 반영 증거는 §14-1에서 구분한다.
 공통 기반 적용은 모든 전문 route의 비용 이관·모든 화면 AI UI·실계정 업무 검증 완료를 뜻하지 않는다.
 
 ## 1. 최초 조사 당시 구조·문제 (2026-10-13)
@@ -279,3 +280,11 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 상품 태그 호출에는 PRODUCT_TAGGING 예약·정산을, Assistant의 이해/완료 검증 호출에는 인증된 사용자 기준 SERVICE_QUERY 예약·정산을 연결했다. 전자는 기존 서버 작업의 actor를 추정하지 않아 전역/scope 한도만 적용하며 사용자별 귀속은 후속이다. 뉴스는 공통 질의 모델·활성 설정과 기존 삭제 참조 보호를 유지한다. 관리 목록의 뉴스·상담 문단 선택·OCR 및 새 업무 연결은 실행/운영/청구 완료 표시와 다르다. OCR은 전문 Google Vision API로 표시하며 생성형 모델 선택과 공통 비용 연결은 미지원이다.
 
 이번 지원 부담 주체는 기존 platform이다. 다른 payer는 명시적으로 거부하며 store/user/external-account 청구 구현 완료를 뜻하지 않는다. Home·계획·화면 판독·멀티모달 직접 transport, Qwen 편집·TTS·전문 OCR의 전체 비용/중지 이관과 상태 변경 도구 확대는 TODO에 남긴다. schema/migration·운영 모델·가격·인증 설정은 변경하지 않았다.
+
+### 14-1. main 통합·운영 반영 (2026-10-25)
+
+[PR #805](https://github.com/Renagang21/o4o-platform/pull/805)는 main `8de024e92cb071790408ca403e110abb4cc29d61`에 병합됐다. PR/main CI와 CodeQL, PR SonarCloud 분석을 확인했고 자동 리뷰의 정산 상세·정책 표시 P2 2건을 같은 branch에서 수정·회귀한 뒤 병합했다. STORE_INSIGHT 상세는 실제 reservation의 service/month에 귀속하며 기존 기본 service·정산 총액/확정·결제는 유지한다. 관리 목록은 카탈로그에서 scope 정책 조회 대상을 모아 새 현황 3종의 저장 모델·활성/중지 설정을 표시한다.
+
+같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
+
+확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
