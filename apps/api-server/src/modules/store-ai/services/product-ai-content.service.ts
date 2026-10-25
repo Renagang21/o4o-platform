@@ -5,6 +5,7 @@ import { ProductAiContent } from '../entities/product-ai-content.entity.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
 import { createPolicyExecutor } from '../../ai-policy/ai-policy-factory.js';
 import type { AiPolicyExecutorService } from '../../ai-policy/ai-policy-executor.service.js';
+import { normalizeAiError } from '../../../utils/ai-provider-runtime.js';
 
 /**
  * ProductAiContentService — WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1
@@ -40,6 +41,7 @@ export class ProductAiContentService {
   async generateContent(
     product: ProductContentInput,
     contentType: ProductAiContentType,
+    actorId?: string,
   ): Promise<ProductAiContent | null> {
     try {
       const prompt = PRODUCT_CONTENT_PROMPTS[contentType];
@@ -51,14 +53,14 @@ export class ProductAiContentService {
       const userPrompt = prompt.user(product);
 
       // LLM 호출: AiPolicyExecutorService가 retry / key 해석 / usage logging 담당
-      const result = await this.aiPolicyExecutor.execute('PRODUCT_CONTENT', buildProductContentSystemPrompt(contentType, product), userPrompt);
+      const result = await this.aiPolicyExecutor.execute('PRODUCT_CONTENT', buildProductContentSystemPrompt(contentType, product), userPrompt,
+        { userId: actorId });
 
       const parsed = JSON.parse(result.content) as LlmContentResponse;
       if (!parsed.content || typeof parsed.content !== 'string') {
         console.error('[ProductAiContent] Invalid LLM response: missing content', {
           productId: product.id,
           contentType,
-          raw: result.content.slice(0, 200),
         });
         return null;
       }
@@ -66,11 +68,10 @@ export class ProductAiContentService {
       // upsert: 같은 product + content_type이면 교체 (전역 단일 행 계약)
       return await this.upsertContent(product.id, contentType, parsed.content, result.model);
     } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
       console.error('[ProductAiContent] generation failed:', {
         productId: product.id,
         contentType,
-        error: msg,
+        code: normalizeAiError(error).code,
       });
       return null;
     }
@@ -79,7 +80,7 @@ export class ProductAiContentService {
   /**
    * 모든 content_type의 AI 콘텐츠를 일괄 생성.
    */
-  async generateAllContents(product: ProductContentInput): Promise<ProductAiContent[]> {
+  async generateAllContents(product: ProductContentInput, actorId?: string): Promise<ProductAiContent[]> {
     const types: ProductAiContentType[] = [
       'product_description',
       'pop_short',
@@ -90,7 +91,7 @@ export class ProductAiContentService {
 
     const results: ProductAiContent[] = [];
     for (const contentType of types) {
-      const result = await this.generateContent(product, contentType);
+      const result = await this.generateContent(product, contentType, actorId);
       if (result) results.push(result);
     }
     return results;

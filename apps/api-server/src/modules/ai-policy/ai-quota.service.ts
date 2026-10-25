@@ -179,6 +179,7 @@ export class AiQuotaService {
         model: string;
         price: AiPriceSnapshot;
         attempts: number;
+        native?: { kind: string; unit: string | null; units: number | null; usageKnown: boolean; inputTokens?: number | null; outputTokens?: number | null };
       };
     },
   ): Promise<void> {
@@ -219,7 +220,7 @@ export class AiQuotaService {
           cost: 0,
         };
         const status =
-          uncertain.requests || uncertain.tokens || uncertain.cost
+          uncertain.requests || uncertain.tokens || uncertain.cost || receipt.detail?.native?.usageKnown === false
             ? 'pending'
             : 'settled';
         await manager.query(

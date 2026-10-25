@@ -20,6 +20,7 @@ import { ImageStorageService } from './image-storage.service.js';
 import { ProductAiContentService } from '../../store-ai/services/product-ai-content.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { generateSlug } from '../../../utils/slug.js';
+import { normalizeAiError } from '../../../utils/ai-provider-runtime.js';
 import logger from '../../../utils/logger.js';
 
 /** 이미지 1건 복사 결과 (WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1) */
@@ -269,13 +270,13 @@ export class ProductImportCommonService {
   /**
    * AI 콘텐츠 생성 파이프라인 (fire-and-forget)
    */
-  async triggerAiContentGeneration(inputs: ProductContentInput[]): Promise<void> {
+  async triggerAiContentGeneration(inputs: ProductContentInput[], actorId?: string): Promise<void> {
     for (const input of inputs) {
       try {
-        await this.aiContentService.generateAllContents(input);
-        logger.info(`[ImportCommon] AI content generated: master=${input.id}`);
+        const contents = await this.aiContentService.generateAllContents(input, actorId);
+        logger.info('[ImportCommon] AI content generation finished', { productId: input.id, generated: contents.length });
       } catch (err) {
-        logger.warn(`[ImportCommon] AI content failed: master=${input.id}:`, err);
+        logger.warn('[ImportCommon] AI content generation failed', { productId: input.id, code: normalizeAiError(err).code });
       }
     }
   }

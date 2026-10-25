@@ -19,6 +19,8 @@ import {
   type AiPriceCatalog,
 } from './ai-pricing.js';
 import type { AiPolicyScope } from './ai-policy-scope.js';
+import { randomUUID } from 'crypto';
+import { prepareNativePlan, measuredNativeUsage, type AiNativeRequest, type AiNativeOutcome } from './ai-native-metering.js';
 
 export interface AiAccountingContext {
   scope: AiPolicyScope;
@@ -123,6 +125,48 @@ export class AiAccountedExecution {
     const outcome = await this.callProviders(plan, account, reservation);
     await this.settleResult(plan, outcome, account, reservation);
     return outcome.result;
+  }
+
+  /** Same admission/settlement for existing native transports; no provider registry or second ledger. */
+  async invokeNative<T>(request: AiNativeRequest, account: AiAccountingContext, invoke: () => Promise<AiNativeOutcome<T>>): Promise<T> {
+    request = { ...request };
+    account = { ...account };
+    const plan = prepareNativePlan(request);
+    const reservation = await this.quota.reserve(account.scope, account.userId, plan.budget, [{ ...plan.price, invocation: { kind: request.kind, model: request.model } }], account.serviceKey);
+    const requestId = randomUUID();
+    const started = Date.now();
+    // Provider/response failures retain the reservation: dispatch may already be billable.
+    let outcome: AiNativeOutcome<T>;
+    try { outcome = await invoke(); } catch (error) {
+      try {
+        await this.quota.settle(reservation, { requests: 0, tokens: 0, cost: 0 }, async manager => {
+          if (['gemini', 'openai', 'claude'].includes(request.provider))
+            await this.record(manager, account, request.provider, request.model, undefined, Date.now() - started, 0, requestId);
+        }, { providerRequestId: requestId, outcome: 'error', uncertain: plan.budget,
+          detail: { provider: request.provider, model: request.model, price: plan.price, attempts: 1, native: { kind: request.kind, unit: plan.profile.unit ?? null, units: null, usageKnown: false } } });
+      } catch { console.warn('[AiPolicy] native failure receipt unavailable', { scope: account.scope, reservationId: reservation.id }); }
+      throw error;
+    }
+    try {
+      const measured = measuredNativeUsage(plan, outcome.usage);
+      if (measured && (measured.tokens > plan.budget.tokens || measured.cost > plan.budget.cost))
+        console.warn('[AiPolicy] native estimate exceeded', { scope: account.scope, reservationId: reservation.id });
+      const usage = measured ?? { requests: 1, tokens: 0, cost: 0 };
+      await this.quota.settle(reservation, usage, async manager => {
+        // PostgreSQL's legacy enum cannot represent Qwen/Google Vision. Their actual provider is in the receipt.
+        if (!['gemini', 'openai', 'claude'].includes(request.provider)) return;
+        const result = { requestId, promptTokens: measured ? outcome.usage?.inputTokens ?? 0 : 0, completionTokens: measured ? outcome.usage?.outputTokens ?? 0 : 0 } as ExecuteResult;
+        await this.record(manager, account, request.provider, request.model, result, Date.now() - started, usage.cost);
+      }, {
+        providerRequestId: requestId, outcome: 'success',
+        ...(!measured ? { uncertain: { ...plan.budget, requests: 0 } } : {}),
+        detail: { provider: request.provider, model: request.model, price: plan.price, attempts: 1,
+          native: { kind: request.kind, unit: plan.profile.unit ?? null, units: measured && plan.profile.unit ? (plan.profile.unit === 'search-query' ? outcome.usage?.searchQueries : outcome.usage?.units) ?? null : null, usageKnown: !!measured, inputTokens: measured ? outcome.usage?.inputTokens ?? 0 : null, outputTokens: measured ? outcome.usage?.outputTokens ?? 0 : null } },
+      });
+    } catch {
+      console.warn('[AiPolicy] native receipt unavailable', { scope: account.scope, reservationId: reservation.id });
+    }
+    return outcome.value;
   }
 
   private async prepare(
@@ -257,10 +301,10 @@ export class AiAccountedExecution {
     let { uncertain } = outcome;
     try {
       const actualPrice = resolveAiPrice(plan.catalog, provider, result.model);
-      const promptTokens = result.promptTokens ?? 0,
-        completionTokens = result.completionTokens ?? 0;
+      const promptTokens = result.usageKnown === false ? 0 : result.promptTokens ?? 0,
+        completionTokens = result.usageKnown === false ? 0 : result.completionTokens ?? 0;
       const cost = estimateAiCost(actualPrice, promptTokens, completionTokens);
-      if (promptTokens === 0 && completionTokens === 0 && result.content) {
+      if (result.usageKnown === false || (promptTokens === 0 && completionTokens === 0 && result.content)) {
         // An omitted usage report is unknown usage, not proof that a nonempty generation was free.
         uncertain = sumBudgets(plan.primary.budget, plan.fallback?.budget);
       }
@@ -273,7 +317,7 @@ export class AiAccountedExecution {
             account,
             provider,
             result.model,
-            result,
+            result.usageKnown === false ? { ...result, promptTokens: 0, completionTokens: 0 } : result,
             result.durationMs,
             cost,
           ),
@@ -306,13 +350,14 @@ export class AiAccountedExecution {
     result: ExecuteResult | undefined,
     durationMs: number,
     cost?: number,
+    failureRequestId?: string,
   ): Promise<void> {
     const repo = manager.getRepository(AIUsageLog);
     const log = repo.create({
       scope: account.scope,
       provider: provider as AIProvider,
       model,
-      requestId: result?.requestId,
+      requestId: result?.requestId ?? failureRequestId,
       promptTokens: result?.promptTokens ?? 0,
       completionTokens: result?.completionTokens ?? 0,
       totalTokens:
@@ -337,4 +382,8 @@ export function executeAccountedAi(
   account: AiAccountingContext,
 ): Promise<ExecuteResult> {
   return new AiAccountedExecution(dataSource).invoke(request, account);
+}
+
+export function executeAccountedNativeAi<T>(dataSource: DataSource, request: AiNativeRequest, account: AiAccountingContext, invoke: () => Promise<AiNativeOutcome<T>>): Promise<T> {
+  return new AiAccountedExecution(dataSource).invokeNative(request, account, invoke);
 }

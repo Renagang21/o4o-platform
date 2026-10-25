@@ -119,7 +119,7 @@ export function createCatalogImportRoutes(_dataSource: DataSource): Router {
         return res.status(400).json({ success: false, error: 'SUPPLIER_ID_REQUIRED' });
       }
 
-      const result = await service.applyJob(req.params.id, supplierId);
+      const result = await service.applyJob(req.params.id, supplierId, (req as AuthRequest).user.id);
       if (!result.success) {
         return res.status(400).json({ success: false, error: result.error });
       }

@@ -347,6 +347,8 @@ export const optionalAuth = async (
     if (user?.isActive && optionalAllowed && sessionMethodAllowed &&
         await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily)) {
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
+      // Match requireAuth: membership evidence comes only from the verified user token.
+      user.memberships = (payload as any).memberships || [];
       req.user = user;
     }
 

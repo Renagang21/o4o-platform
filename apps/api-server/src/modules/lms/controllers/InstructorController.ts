@@ -1,3 +1,4 @@
+import { InvalidInstructorProfile, normalizeInstructorProfile } from '../services/instructor-profile.js';
 import { recordEnrollmentApplication, recordEnrollmentPolicies } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 import { Request, Response } from 'express';
@@ -66,6 +67,7 @@ export class InstructorController extends BaseController {
         return BaseController.unauthorized(res);
       }
 
+      const profile = normalizeInstructorProfile(req.body);
       const saved = await AppDataSource.transaction(async manager => {
       const repo = manager.getRepository(InstructorApplication);
 
@@ -86,7 +88,7 @@ export class InstructorController extends BaseController {
       }
 
       const policies = await recordEnrollmentPolicies(manager, userId, 'lecture', req.body?.policyReferences);
-      const application = repo.create({ userId, status: 'pending' });
+      const application = repo.create({ userId, status: 'pending', ...profile });
       const saved = await repo.save(application);
       await recordEnrollmentApplication(manager, userId, 'lecture', { type: 'instructor_application', id: saved.id }, policies);
       return saved;
@@ -99,6 +101,7 @@ export class InstructorController extends BaseController {
 
       return BaseController.created(res, { application: saved });
     } catch (error: any) {
+      if (error instanceof InvalidInstructorProfile) return res.status(400).json({ success: false, code: error.code, error: error.message });
       if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
       if (error.httpStatus === 400) return BaseController.badRequest(res, error.message);
       logger.error('[InstructorController.apply] Error', { error: error.message });
