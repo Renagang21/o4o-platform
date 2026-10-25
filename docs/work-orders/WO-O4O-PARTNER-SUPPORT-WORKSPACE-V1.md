@@ -159,3 +159,10 @@
 - 실제 Partner Docker image build·8080 컨테이너 HTTP 200과 Chromium 기능/32개 responsive 검사 통과. nginx 설정은 COPY 시 명시적으로 0644를 부여하여 unprivileged 사용자도 읽도록 검증했다.
 - PR #820 생성. PR CI·review·main 병합과 운영 배포는 아직 진행 단계이며 완료 판정은 실제 GitHub 결과로 확인한다.
 - 이 환경의 운영 도메인 probe는 outbound CONNECT 403으로 차단되었다. 이것만으로 운영 사이트 장애라고 판정하지 않는다. 운영 API의 신규 경로는 배포 전 404다. 운영 데이터·계정 변경은 수행하지 않았다.
+
+### PR 리뷰 보완 — 계정 파기 writer fence
+
+- Codex P1 지적을 반영해 신규 6개 테이블에 기존 `account_erasure_write_fence` INSERT/UPDATE trigger를 등록했다. Core 함수나 기존 계정 파기 정책은 변경하지 않는다.
+- 실제 PostgreSQL 회귀 17개 통과. schema별 API/browser harness의 fence adapter와 실제 canonical public 함수 검증을 구분했다. canonical 43 prefix와 신규 down/up 재확인 후 실제 public 함수가 6개 테이블의 파기 대상 UUID 쓰기를 모두 `ACCOUNT_ERASURE_PENDING`으로 차단함을 확인했다.
+- 최종 fingerprint: 공간 `71c8439bec809c03e55cc68068877cb8f39d567afbf203e78254281a191fdc07` (7,080줄), media/read `4accc1af6999af30ee278a666edeafb6d978b2846ef9876fd2b43e58cc4144a3` (7,117줄). 위 최초 통합 산출값을 대체한다.
+- 별도 발견: 기존 main canonical prefix 41에는 이미 fence 누락 테이블 10개가 있다(`ai_usage_reservations`, `cooperatives`, `external_ai_*` 6개, `member_paid_service_entitlements`, `store_consultation_stations`). Partner 적용 전후 누락 수가 동일함을 확인했다. 이 기존 Core/다른 도메인 문제는 임의 수정하지 않았으며 운영 계정 파기 전체 정상으로 보고하지 않는다. 해당 도메인 통합 담당의 별도 검토가 필요하다.

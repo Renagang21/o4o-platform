@@ -35,6 +35,8 @@ async function main() {
     viewer: { id: randomUUID(), name: "테스트 열람자" },
   };
   try {
+    // Isolated auth/storage harness: the real privacy fence is verified by canonical migration checks.
+    await db.query(`CREATE FUNCTION account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$`);
     await db.query(
       "CREATE TABLE users(id uuid PRIMARY KEY,name text NOT NULL)",
     );

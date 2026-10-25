@@ -41,6 +41,10 @@ export class CreatePartnerSupportSpaces1792886600000
     await q.query(
       "CREATE INDEX partner_support_events_space ON partner_support_events(space_id, created_at DESC)",
     );
+    // Required by the global account-erasure writer manifest, including empty tables.
+    for (const table of ["partner_support_spaces", "partner_support_members", "partner_support_invites", "partner_support_events"]) {
+      await q.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${table} FOR EACH ROW EXECUTE FUNCTION account_erasure_write_fence()`);
+    }
   }
   async down(q: QueryRunner): Promise<void> {
     await q.query(`DO $$ BEGIN IF EXISTS(SELECT 1 FROM partner_support_spaces)

@@ -24,6 +24,10 @@ export class AddPartnerMediaAndReadState1792886700000
       user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       last_event_seq bigint NOT NULL DEFAULT 0 CHECK(last_event_seq>=0), PRIMARY KEY(space_id,user_id)
     )`);
+    // Required by the global account-erasure writer manifest, including empty tables.
+    for (const table of ["partner_support_files", "partner_support_reads"]) {
+      await q.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${table} FOR EACH ROW EXECUTE FUNCTION account_erasure_write_fence()`);
+    }
   }
   async down(q: QueryRunner): Promise<void> {
     await q.query(`DO $$ BEGIN IF EXISTS(SELECT 1 FROM partner_support_files) OR EXISTS(SELECT 1 FROM partner_support_reads)

@@ -116,6 +116,8 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     });
     await db.initialize();
     await db.query(`CREATE SCHEMA "${schema}"`);
+    // Isolated auth/storage harness: the real privacy fence is verified by canonical migration checks.
+    await db.query(`CREATE FUNCTION account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$`);
     await db.query(
       "CREATE TABLE users(id uuid PRIMARY KEY,name text NOT NULL)",
     );
@@ -145,6 +147,18 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
       await db.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
       await db.destroy();
     }
+  });
+
+  it("registers the enabled INSERT/UPDATE erasure fence on all six Partner tables", async () => {
+    const rows = await db.query(`SELECT c.relname, t.tgtype FROM pg_trigger t
+      JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=$1 AND t.tgname='account_erasure_write_fence' AND t.tgenabled='O'
+      ORDER BY c.relname`, [schema]);
+    expect(rows.map((r: {relname:string}) => r.relname)).toEqual([
+      "partner_support_events", "partner_support_files", "partner_support_invites",
+      "partner_support_members", "partner_support_reads", "partner_support_spaces",
+    ]);
+    for (const row of rows) expect(Number(row.tgtype) & 23).toBe(23);
   });
 
   it("requires authentication and JSON for mutations", async () => {
