@@ -7,7 +7,7 @@
  *   decodeWorkbook(bytes)            → 시트별 문자열 행렬 (decode)
  *   profileWorkbook(decoded)         → StructureProfile (A · AI 입력 최소 표본)
  *   computeStructureFingerprint(p)   → 캐시 키 (G · 같은 형식이면 AI 재호출 없음)
- *   inferFileStructure({profile,..}) → FileStructureInference (C · Gemini 구조 해석)
+ *   inferFileStructure({profile,..}, invoke) → FileStructureInference (C · host가 비용 실행 연결)
  *   evaluateConfidence(inf, schema)  → ConfidenceVerdict (E · 낮은 항목만 QUESTION)
  *   normalizeRows(decoded, inf, sc)  → NormalizedRecord[] (F · 결정론적 전체 행 정규화)
  *

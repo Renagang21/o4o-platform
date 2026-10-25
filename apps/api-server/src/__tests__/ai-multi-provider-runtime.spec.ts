@@ -25,6 +25,7 @@ import {
   resolveModelForProvider,
   normalizeAiError,
   aiErrorUserMessage,
+  aiErrorHttpStatus,
   FALLBACK_DEFAULT_PROVIDER,
   OPENAI_DEFAULT_MODEL,
   type AiErrorCode,
@@ -273,6 +274,7 @@ describe('오류 정규화 — provider 무관 공통 코드', () => {
     const codes: AiErrorCode[] = [
       'AI_NOT_CONFIGURED', 'INVALID_PROVIDER', 'AUTH_ERROR', 'RATE_LIMIT', 'INSUFFICIENT_QUOTA',
       'TIMEOUT', 'PROVIDER_UNAVAILABLE', 'INVALID_MODEL', 'PROVIDER_ERROR',
+      'QUOTA_EXCEEDED', 'AI_QUOTA_UNAVAILABLE', 'AI_ACCOUNTING_UNAVAILABLE',
     ];
     for (const c of codes) {
       const m = aiErrorUserMessage(c);
@@ -280,5 +282,18 @@ describe('오류 정규화 — provider 무관 공통 코드', () => {
       expect(m.length).toBeGreaterThan(0);
       expect(m).not.toMatch(/sk-|api key|gpt-|gemini/i);
     }
+  });
+
+  it.each([
+    ['QUOTA_EXCEEDED', 'QUOTA_EXCEEDED', 429],
+    ['AI_QUOTA_UNAVAILABLE', 'AI_QUOTA_UNAVAILABLE', 503],
+    ['AI_PRICING_INVALID', 'AI_ACCOUNTING_UNAVAILABLE', 503],
+    ['AI_PRICING_NOT_CONFIGURED', 'AI_ACCOUNTING_UNAVAILABLE', 503],
+    ['AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_ACCOUNTING_UNAVAILABLE', 503],
+    ['AI_POLICY_INVALID', 'AI_ACCOUNTING_UNAVAILABLE', 503],
+  ] as const)('서버 비용 진입 실패 %s는 provider rate limit 재시도를 유도하지 않는다', (raw, code, status) => {
+    expect(normalizeAiError(new Error(raw))).toEqual({ code, retryable: false });
+    expect(aiErrorHttpStatus(code)).toBe(status);
+    expect(aiErrorUserMessage(code)).not.toMatch(/잠시 후/);
   });
 });

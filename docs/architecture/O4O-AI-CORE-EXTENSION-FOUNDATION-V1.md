@@ -288,3 +288,23 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
 
 확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
+
+## 15. 텍스트 회계 연결 보완 — 개발 branch (2026-10-25)
+
+[후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에서 남은 실행 경로를 재조사했다. `wo/ai-runtime-accounting-completion`은 새 Core/원장을 만들지 않고 기존 `AiAccountedExecution`을 홈·첨부 텍스트 대체, 일반/강화 텍스트 계획, 인증/공개 파일 구조 추론 host에서 소비한다. 파일 추론·첨부 helper에는 텍스트 invocation을 명시적으로 주입해 업무 해석과 서버 비용 경계를 분리한다. standalone 파일 smoke는 자기 환경 계정의 transport를 명시적으로 전달하며 서버 원장 검증을 대신하지 않는다.
+
+host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home/계획/파일은 `SERVICE_QUERY/neture`, 상품 태그는 `PRODUCT_TAGGING`, 상품 콘텐츠는 기존 `PRODUCT_CONTENT` 정책을 사용한다. 공개 파일 추론은 사용자 신원을 만들지 않는다. 상품 태그 실패 시 후속 콘텐츠 생성은 중단하지만 기존 fire-and-forget 응답·업무 저장/권한 계약은 유지한다. 대화/파일/생성 원문은 공통 비용 로그에 기록하지 않는다. 한도 초과·한도 DB/가격 장애를 provider rate limit과 구분하며 성공 후 정산 장애가 유료 재호출을 만들지 않게 한다.
+
+§15의 텍스트 단계에서는 native 이미지·PDF·화면 판독, 검색 도구 비용, Qwen·OCR·TTS 지원 완료를 주장하지 않았고 홈 첨부·작업 계획은 partial이었다. 전문 호출 후속 개발 상태는 §16을 따른다. 플랫폼 부담 외 실제 사용자/매장 청구·외부 계정 연결과 운영 가격·한도 검증도 후속이다. [검증 CHECK](../checks/CHECK-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)에 소비처·회귀·미실행을 기록하며 main 병합/배포는 이번 개발 종료 범위에 포함하지 않는다.
+
+## 16. 전문 호출·기존 직접 호출의 회계 연결 — 개발 branch (2026-10-25)
+
+[전문 실행 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)에서 §15의 후속을 한 묶음으로 정비했다. `wo/ai-specialized-runtime-accounting`은 작업 시작 시 main `4ee5a8ecda`에서 시작하고 미병합 선행 `d11cb4afa1`을 정상 merge했다. 이미지/PDF·Gemini/OpenAI 화면 계획·이미지 분석·검색·OCR·음성·Qwen과 기존 편집/URL/강의 직접 호출을 같은 예약/정산에 연결한다. 이전 main·운영 기록은 이번 branch의 배포 증거가 아니다.
+
+서버 내부 `AiNativeInvocation`은 기존 transport의 결과와 타입 있는 사용량만 기존 `AiAccountedExecution.invokeNative`에 전달한다. provider wildcard 텍스트 요율을 전문 단가로 쓰지 않는다. 모델별 `native` profile은 기존 가격 catalog 안에서 입력/출력 예산·이미지/검색 요청/검색 질의/문자 단위를 표현한다. 사용량이 누락되면 기존 보류/reconcile을 사용하고, 성공 후 기록 장애는 유료 재호출하지 않는다. Core 실행기는 Gemini 내부 JSON retry와 중첩되지 않게 실제 시도 수를 통제하며 선택적 `usageKnown`으로 부분 누락을 구분한다. Extension의 안전한 가격 오류 코드는 보존한다.
+
+기존 AIProxy의 provider별 출력 상한·backoff를 유지하며 실제 시도마다 먼저 예약한다. Qwen provider 실패 후 canonical Gemini fallback도 같은 회계를 거치고, quota/가격 거부는 fallback하지 않는다. OCR 업로드와 카탈로그 가져오기 후 콘텐츠에는 host가 검증한 현재 actor를 전달하며 사용자 신원이 없는 내부 작업은 그대로 미지정이다. 업무 권한/자료 공개·저장·실행 확인·Task/Memory를 바꾸지 않는다.
+
+관리 조회는 native 예약/receipt와 기존 로그를 중복 없이 합치며 enum 밖 Qwen/Google Vision·미확정 audio/crash 기록을 포함한다. 원문·이미지/audio·검색어는 공통 원장에 남기지 않는다. 비용은 추정 정책이며 실제 invoice나 외부 제공업체의 강제 결제 상한이 아니다.
+
+**운영 준비:** 명시 모델 요율/profile이 없으면 native 호출은 503으로 차단한다. 운영 설정을 변경하거나 유료 시험 호출·PR/병합/배포를 실행하지 않았다. [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 로컬 검증과 [TODO §4](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)의 실제 모델/요율·단위·예산·미확정 처리 수용 조건을 확인한 뒤 통합/배포를 판단한다. 전체 AI 화면·직원/소비자 상담·외부 계정/사용자 직접 청구 완료를 뜻하지 않는다.

@@ -101,7 +101,7 @@ export function createSupplierImageHandlers(
           import('../../../store-ai/services/product-ocr.service.js')
             .then(({ ProductOcrService }) => {
               const ocrService = new ProductOcrService(dataSource);
-              return ocrService.extractAndSave(masterId, image.id, url);
+              return ocrService.extractAndSave(masterId, image.id, url, req.user!.id);
             })
             .catch(() => {});
         }
