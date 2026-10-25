@@ -1,3 +1,4 @@
+import { CourseValidationError } from '../utils/course-validation-error.js';
 import { Request, Response } from 'express';
 import { CourseStatus, CourseVisibility } from '@o4o/lms-core';
 import { BaseController } from '../../../common/base.controller.js';
@@ -108,6 +109,7 @@ export class CourseController extends BaseController {
 
       return BaseController.created(res, { course });
     } catch (error: any) {
+      if (error instanceof CourseValidationError) return BaseController.error(res, error, 400);
       logger.error('[CourseController.createCourse] Error', { error: error.message });
       return BaseController.error(res, error);
     }
@@ -251,6 +253,7 @@ export class CourseController extends BaseController {
 
       return BaseController.ok(res, { course: updated });
     } catch (error: any) {
+      if (error instanceof CourseValidationError) return BaseController.error(res, error, 400);
       logger.error('[CourseController.updateCourse] Error', { error: error.message });
 
       if (error.message && error.message.includes('not found')) {

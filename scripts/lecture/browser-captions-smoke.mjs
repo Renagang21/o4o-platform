@@ -6,7 +6,7 @@ import { chromium } from "@playwright/test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -14,7 +14,14 @@ const scratch = await mkdtemp(join(tmpdir(), "lecture-captions-"));
 let browser, server;
 try {
   const media = join(scratch, "fixture.webm");
-  const generated = spawnSync("ffmpeg", [
+  const ffmpeg =
+    process.env.LECTURE_FFMPEG_EXECUTABLE_PATH || "/usr/bin/ffmpeg";
+  if (!isAbsolute(ffmpeg) || !existsSync(ffmpeg)) {
+    throw new Error(
+      "Set LECTURE_FFMPEG_EXECUTABLE_PATH to an installed ffmpeg absolute path",
+    );
+  }
+  const generated = spawnSync(ffmpeg, [
     "-loglevel",
     "error",
     "-f",

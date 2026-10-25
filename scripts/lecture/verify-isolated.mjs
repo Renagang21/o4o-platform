@@ -66,6 +66,8 @@ run(
     "src/__tests__/canonical-database-bootstrap-incremental-migration-separation.spec.ts",
     "src/__tests__/database-migration-ownership-startup-health-final-closure.spec.ts",
     "src/__tests__/lecture-playback-boundary.spec.ts",
+    "src/__tests__/lecture-isolated-findings.spec.ts",
+    "src/common/auth/__tests__/passwordSessionBoundary.test.ts",
   ],
   fileURLToPath(new URL("../../apps/api-server/", import.meta.url)),
 );

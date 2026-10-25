@@ -24,7 +24,7 @@ node scripts/lecture/verify-isolated.mjs --postgres-port 55439
 node scripts/lecture/browser-captions-smoke.mjs
 ```
 
-ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 합성 계정·약관·API fixture를 사용한 신청 소개/전문 분야 입력→운영자 검토 표시와 실제 text track cue 로딩·편집·삭제·390/1440px 넘침 및 비로그인 미리보기 목록 503→재시도·링크 진입·직접 URL·소개 복귀를 검사한다. 미리보기에서 보호 API·쓰기 요청이 발생하지 않는지도 확인한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
+ffmpeg(libvpx)와 Playwright Chromium이 필요하다. ffmpeg는 PATH 검색 없이 `/usr/bin/ffmpeg`를 사용한다. Windows·macOS 등 다른 위치에서는 `LECTURE_FFMPEG_EXECUTABLE_PATH`에 설치된 실행 파일의 절대 경로를 지정한다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 합성 계정·약관·API fixture를 사용한 신청 소개/전문 분야 입력→운영자 검토 표시와 실제 text track cue 로딩·편집·삭제·390/1440px 넘침 및 비로그인 미리보기 목록 503→재시도·링크 진입·직접 URL·소개 복귀를 검사한다. 미리보기에서 보호 API·쓰기 요청이 발생하지 않는지도 확인한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
 
 ## 실제 로그인·역할별 흐름
 
@@ -64,3 +64,8 @@ ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`
 생성한 전용 업무 데이터와 연결 데이터의 완전 삭제·잔존 여부를 확인한다. 기존 사용자 데이터와 보안·감사 보존기록은 삭제하지 않는다. 종료 후 전용 browser context·임시 cluster를 닫는다. Windows worktree 정리는 모든 junction/symlink를 확인·해제한 뒤 자기 작업공간만 삭제한다. 이 클라우드 작업에서 다른 PC 파일을 삭제했다고 보고하지 않는다.
 
 보고에는 검사 SHA/시각/프런트·API·DB/PG 버전/역할, 항목별 PASS·FAIL·BLOCKED·미실행, 마스킹된 근거, 데이터 생성·삭제·잔존 수량, Git 상태, 문서 정합을 기록한다. 실제 개인정보·응답 원문·비밀번호·토큰·쿠키를 public repo에 남기지 않는다.
+
+
+## 격리 검증에서 발견한 접근·오류 처리 회귀
+
+`verify-isolated.mjs`는 승인 대기·거절·취소·만료 상태의 진도 완료 요청 거절(403, 완료 체인 호출 0), 승인된 수강의 완료 유지, 타 서비스 404, 잘못된 UUID 400, lesson/course/quiz/assignment DB 오류의 Express 오류 전달과 후속 health 요청을 검사한다. 공통 인증의 검증된 사용자 토큰 memberships 전달은 Lecture·Neture·KPA·K-Cosmetics별로 검사하며 서비스 토큰은 비로그인 처리한다. 태그 없는 강의 생성은 400이고 DB 장애는 500을 유지한다. 이 항목은 합성 HTTP·단위 검증이며 사용자가 수행한 PostgreSQL 17.9 로그인 검증의 재실행을 뜻하지 않는다.
