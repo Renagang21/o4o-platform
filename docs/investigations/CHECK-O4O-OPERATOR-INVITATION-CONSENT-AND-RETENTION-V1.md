@@ -8,9 +8,10 @@
 ## 구현·격리 검증
 
 - 영향 API Jest 20 suite **354 PASS**(격리 PostgreSQL15 opt-in 포함). 플랫폼35·서비스별72·실제 canonical lock/cache4건 포함. 잘못된 본인/범위, actor 권한 회수, 소속 이탈, 재발송 기한 고정, deadline/cleanup backlog, 취소·수락 경쟁, 계정 삭제, commit 실패 무발송, ephemeral 메일 무기록을 검증했다.
-- 격리 canonical bootstrap·등록 migration의 모든 기존 prefix와 신규 fingerprint 일치. 새 migration은 빈 테이블만 down을 허용하며 실제 운영 DDL은 실행하지 않았다.
+- 격리 canonical bootstrap·등록 migration의 모든 기존 prefix와 신규 fingerprint 일치. 새 migration은 빈 테이블만 down을 허용하며, 실제 PG에서 자료 존재 시 거절·빈 테이블 rollback 복구를 확인했다. 실제 운영 DDL은 실행하지 않았다.
 - API tsc PASS, 공통 packages build PASS. Admin·Neture·분회·조합 production build PASS. unsafe route guard 위반0, 문서 민감정보 패턴0. 최종 CI·Codex는 push HEAD로 별도 판정한다.
-- UI focused: Admin16, Neture 수락/복귀18, 공통 위임8, 공통 pending3 PASS. 분회 전체25 PASS. 조합 전체85 중 변경 전 문구를 기대한1건 수정 후 관련15 PASS(나머지는 앞 실행에서 PASS; 중복 합산하지 않음).
+- 최신 main `b7d2cfd86e`(#806) 통합 뒤 API tsc·영향 API354 재통과. 추가한 rollback 안전성 2건을 포함한 실제 PG37 PASS(별도 실행). Neture 전체151 suite1313 PASS, 조합 전체11 suite85 PASS. Neture production build 재통과.
+- UI focused: Admin16, Neture 수락/복귀18, 공통 위임8, 공통 pending3 PASS. 분회 전체25 PASS. 조합 전체85 PASS.
 - 실제 Chromium 1440×1000·390×844: 실제 수락/공통 pending component와 합성 auth/API로 명시 수락 전 활성화 요청0, URL fragment 제거, 재발송·취소 후 목록 갱신, 수평 넘침0, pageerror0. 실제 로그인·메일·계정 권한 변경을 검증했다고 주장하지 않는다.
 
 ## Consumer Impact Matrix

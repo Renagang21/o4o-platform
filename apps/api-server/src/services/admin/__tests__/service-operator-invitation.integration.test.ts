@@ -1,3 +1,4 @@
+import { CreateServiceOperatorInvitations1792886400000 } from '../../../database/migrations/1792886400000-CreateServiceOperatorInvitations.js';
 import { retainOperatorInvitations } from '../operator-invitation-retention.js';
 import 'reflect-metadata';
 import { createHash, randomUUID } from 'node:crypto';
@@ -604,6 +605,19 @@ integration(
       await service.create({actorId:admin,targetUserId:target,serviceKey:'kpa-branch',role:'kpa-branch:operator',scopeType:'branch',scopeKey:branch.id});
       await query("UPDATE branch_memberships SET status='left',left_at=NOW() WHERE user_id=$1",[target]);
       await expect(service.accept(token(),target)).rejects.toMatchObject({code:'NOT_BRANCH_MEMBER'});expect(assignRole).not.toHaveBeenCalled();
+    });
+    it('rollback refuses stored consent evidence and leaves the table intact',async()=>{
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      const q=db.createQueryRunner();await q.startTransaction();
+      try { await expect(new CreateServiceOperatorInvitations1792886400000().down(q)).rejects.toThrow('empty table'); }
+      finally { await q.rollbackTransaction();await q.release(); }
+      expect(await query('SELECT id FROM service_operator_invitations')).toHaveLength(1);
+    });
+    it('empty-table rollback is transactional and preserves schema when rolled back',async()=>{
+      const q=db.createQueryRunner();await q.startTransaction();
+      try { await new CreateServiceOperatorInvitations1792886400000().down(q);expect(await q.query("SELECT to_regclass('service_operator_invitations') AS relation")).toEqual([{relation:null}]); }
+      finally { await q.rollbackTransaction();await q.release(); }
+      expect(await query("SELECT to_regclass('service_operator_invitations') AS relation")).toEqual([{relation:'service_operator_invitations'}]);
     });
     async function cooperative() {
       const [org]=await query("INSERT INTO organizations(name,code) VALUES('Fixture federation',$1) RETURNING id",[randomUUID()]);
