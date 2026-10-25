@@ -250,7 +250,7 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 - provider 호출 성공 후 정산/receipt 저장이 실패하면 생성 결과를 반환하고 reconciliation 경고와 미해결 예약을 남깁니다. 이를 호출 전 거부와 같은 503으로 기대하거나 성공한 유료 호출을 자동 재전송하지 않습니다. 남은 사용량은 확인된 증거로 정산하며 TTL만으로 해제하지 않습니다.
 - 비용은 가격 version/model에 따른 추정치입니다. 기존 Gemini/OpenAI/Claude 텍스트는 `AI_PRICING_CATALOG` 미설정 시 종전 provider 추정 단가를 사용하며 실제 invoice나 사용자 청구 금액이 아닙니다. 새 모델별 요금 설정·운영 billing 정책 변경은 별도 작업입니다.
 - **전문 AI 개발 branch(2026-10-25):** `wo/ai-specialized-runtime-accounting`의 이미지/PDF·화면·검색·OCR·음성에는 기존 가격 catalog의 명시 모델별 native profile/예산이 필요합니다. Qwen 텍스트도 명시 모델 token 요율이 필요합니다. 미준비 시 `AI_PRICING_NOT_CONFIGURED` → 503으로 provider 이전에 차단합니다. 입력/출력/검색·이미지/문자 단위·사용량 보류 규칙은 [전문 실행 TODO §4](docs/work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md#4-구현-계약과-운영-준비-항목)를 따릅니다. 테스트 synthetic 요율을 운영에 복사하거나 quota 검사를 우회하지 않습니다. 이 branch의 local 검증/push와 main·운영 적용을 구분합니다.
-- **가격/예산 사전 점검:** `node --import tsx apps/api-server/src/scripts/ai-pricing-readiness.ts --help`로 파일 기반 검사를 실행할 수 있습니다. [운영 준비 guide](docs/guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)의 null 예제는 실제 선택 모델/bytes를 채우기 전에는 거부합니다. CLI는 DB/provider·credential·배포에 연결하지 않으며 운영 단가/설정 활성화를 대신하지 않습니다. 직접 Node entry의 종료 코드 0/1/2를 사용하고 pnpm filter exec의 래퍼 종료 코드와 혼동하지 않습니다. 코드의 main 통합·배포 관측은 [후속 CHECK](docs/checks/CHECK-O4O-AI-PRICING-INTEGRATION-20261025.md)를 따릅니다.
+- **가격/예산 점검 후속 개발:** `wo/ai-pricing-readiness`에서는 `node --import tsx apps/api-server/src/scripts/ai-pricing-readiness.ts --help`로 파일 기반 사전 점검을 실행할 수 있습니다. [운영 준비 guide](docs/guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)의 null 예제는 실제 선택 모델/bytes를 채우기 전에는 거부합니다. CLI는 DB/provider·credential·배포에 연결하지 않으며 운영 단가/설정 활성화를 대신하지 않습니다. 직접 Node entry의 종료 코드 0/1/2를 사용하고 pnpm filter exec의 래퍼 종료 코드와 혼동하지 않습니다.
 
 ---
 
