@@ -1067,6 +1067,65 @@ test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency
   assert.deepEqual(failures, [], `UNDECLARED_USED workspace import:\n${failures.join('\n')}`);
 });
 
+/**
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 단계 6 — §23 의 반대 방향(약국 앱 한정).
+ *
+ * 단계 4-a 에서 옛 KPA 화면을 지운 뒤에도 `services/web-kpa-society/package.json` 에
+ * `@o4o/lms-ui` · `@o4o/lms-client` 등 9개 선언이 남아, Lecture 전용 변경(42dddc91b,
+ * `packages/lms-ui`)이 약국 앱을 함께 배포했다. 판정기는 선언 graph 를 정본으로 보므로
+ * 쓰지 않는 선언을 남기지 않는 것으로 막는다. 예외 목록은 두지 않는다.
+ * 같은 잔재가 web-neture · web-store(`@o4o/lms-client` → Lecture 변경이 store 배포) ·
+ * web-kpa-branch 에도 있어 전 Web 서비스에 적용한다.
+ */
+test('§23b. Web 서비스의 직접 @o4o 선언은 전부 src 에서 실제로 import 된다 (DECLARED_UNUSED 0)', () => {
+  const failures = [];
+  for (const entry of webServiceClosures(graph).values()) {
+    const sources = [];
+    const walk = (d) => {
+      for (const it of readdirSync(d, { withFileTypes: true })) {
+        if (it.name === 'node_modules' || it.name === 'dist') continue;
+        const abs = path.join(d, it.name);
+        if (it.isDirectory()) walk(abs);
+        else if (/\.(ts|tsx|js|jsx|mjs|cjs|css)$/.test(it.name)) sources.push(abs);
+      }
+    };
+    walk(path.join(REPO_ROOT, entry.dir, 'src'));
+    const code = sources
+      .map((f) => readFileSync(f, 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, ''))
+      .join('\n');
+    for (const pkg of graph.byName.get(entry.name).deps) {
+      if (!new RegExp(`['"]${pkg.replace(/[/]/g, '\\/')}(?:\\/[^'"]*)?['"]`).test(code)) failures.push(`${entry.key}: ${pkg}`);
+    }
+  }
+  assert.deepEqual(failures, [], `DECLARED_UNUSED (선언만 있고 src 에서 import 하지 않음):\n${failures.join('\n')}`);
+});
+
+test('§23c. Lecture 전용 package 변경은 약국 앱을 배포하지 않고, 약국 앱 · 실사용 공통 모듈 변경은 감지한다', () => {
+  for (const pkg of ['@o4o/lms-ui', '@o4o/lms-client']) {
+    const v = webOf([`M\t${graph.byName.get(pkg).dir}/src/index.ts`]);
+    assert.equal(v.services['kpa-society'], false, `${pkg} → 약국 앱 배포 안 함`);
+    assert.equal(v.services.store, false, `${pkg} → store 배포 안 함`);
+    assert.equal(v.services.lecture, true, `${pkg} → lecture 는 계속 배포`);
+    assert.equal(v.fallback, false);
+  }
+  // 42dddc91b 의 Web 쪽 변경 그대로 — lecture 만 나와야 한다.
+  assert.deepEqual(
+    onOf(webOf([
+      'M\tpackages/lms-ui/src/views/LessonPlayerView.tsx',
+      'M\tpackages/lms-core/src/entities/InstructorApplication.ts',
+      'M\tservices/web-lecture/src/App.tsx',
+    ])),
+    ['lecture'],
+  );
+  assert.equal(webOf(['M\tservices/web-kpa-society/src/App.tsx']).services['kpa-society'], true);
+  assert.equal(webOf(['M\tservices/web-kpa-society/package.json']).services['kpa-society'], true);
+  for (const pkg of ['@o4o/shared-space-ui', '@o4o/auth-react', '@o4o/store-ui-core']) {
+    assert.ok(consumersOf(pkg).includes('kpa-society'), `전제: 약국 앱은 ${pkg} 를 쓴다`);
+    const v = webOf([`M\t${graph.byName.get(pkg).dir}/src/index.ts`]);
+    assert.equal(v.services['kpa-society'], true, `${pkg} → 약국 앱 배포 감지`);
+  }
+});
+
 /* ---------------------------------------------------------------------------
  * WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §22 (Case J1~J16)
  *

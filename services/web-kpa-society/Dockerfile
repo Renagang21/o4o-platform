@@ -27,27 +27,18 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
-COPY packages/operator-core/package.json ./packages/operator-core/
 COPY packages/hub-core/package.json ./packages/hub-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
-COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
-COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
-COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
-COPY packages/screen-content-core/package.json ./packages/screen-content-core/
-COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/block-renderer/package.json ./packages/block-renderer/
 COPY packages/slide-app/package.json ./packages/slide-app/
 COPY packages/content-core/package.json ./packages/content-core/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/account-ui/package.json ./packages/account-ui/
-COPY packages/lms-client/package.json ./packages/lms-client/
-COPY packages/lms-ui/package.json ./packages/lms-ui/
-COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -67,27 +58,18 @@ COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
-COPY packages/operator-core/ ./packages/operator-core/
 COPY packages/hub-core/ ./packages/hub-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
-COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
-COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
-COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
-COPY packages/screen-content-core/ ./packages/screen-content-core/
-COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/block-renderer/ ./packages/block-renderer/
 COPY packages/slide-app/ ./packages/slide-app/
 COPY packages/content-core/ ./packages/content-core/
 COPY packages/utils/ ./packages/utils/
 COPY packages/account-ui/ ./packages/account-ui/
-COPY packages/lms-client/ ./packages/lms-client/
-COPY packages/lms-ui/ ./packages/lms-ui/
-COPY packages/store-products-ui/ ./packages/store-products-ui/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
@@ -102,7 +84,6 @@ RUN pnpm --filter @o4o/forum-core build
 RUN pnpm --filter @o4o/content-editor build
 RUN pnpm --filter @o4o/block-renderer build
 RUN pnpm --filter @o4o/account-ui build
-RUN pnpm --filter @o4o/lms-client build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

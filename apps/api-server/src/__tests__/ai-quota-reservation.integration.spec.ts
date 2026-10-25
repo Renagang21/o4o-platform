@@ -41,6 +41,14 @@ fixture('durable quota admission on isolated PostgreSQL', () => {
     expect((await query("SELECT id FROM ai_usage_reservations WHERE status='reserved'")).length).toBe(3);
     expect(await query('SELECT * FROM ai_usage_aggregate')).toEqual([]); // reservations are not billing usage
   });
+  it.each([[0.1, 0.2], [0.2, 0.1]])('admits exact decimal cost capacity with %s settled and %s reserved', async (settled, held) => {
+    await limit('global','*','cost','daily',0.3);
+    const first = await quota().reserve('CONTENT_TRANSLATION','user-a',{...budget,cost:settled},[price]);
+    await quota().settle(first,{requests:1,tokens:1,cost:settled},async()=>{},receipt);
+    await expect(quota().reserve('CONTENT_TRANSLATION','user-a',{...budget,cost:held},[price])).resolves.toMatchObject({ id: expect.any(String) });
+    await expect(quota().reserve('CONTENT_TRANSLATION','user-a',{...budget,cost:0.00000001},[price])).rejects.toThrow('QUOTA_EXCEEDED');
+    expect(await query('SELECT status FROM ai_usage_reservations ORDER BY status')).toEqual([{status:'reserved'},{status:'settled'}]);
+  });
   it.each([
     ['global','*','requests','daily',0], ['service','store','tokens','monthly',99],
     ['scope','CONTENT_TRANSLATION','cost','daily',0.009], ['user','user-a','requests','monthly',0],
