@@ -28,6 +28,10 @@
 | mail-core/API | ephemeral 전달만 audit 생략, 다른 업무 메일 유지 | package build·mail privacy3 |
 | 퇴역 K-Cosmetics/PH runtime | 경로 복구·신규 지정 범위 확대 없음 | catalogue/retirement guards·main 비교 |
 
+## CI 후속
+
+CI가 지적한 manifest import 선언 순서를 실행 배열과 같은 append 순서로 정렬했다. SQL·실행 배열·fingerprint는 변경하지 않았다. migration contract C04/C09를 포함한22개 검사 PASS. 최신 기능 HEAD의 CI·Codex 결과를 다시 확인한다. 격리 PG 컨테이너·fixture 데이터는 검증 후 제거했고 잔존 컨테이너0을 확인했다.
+
 ## 운영 미실행·남은 Gate
 
 실제 DB migration·메일 전달·사용자 권한 변경·새 개인정보 처리방침 게시·main 병합/배포는 미실행이다. 새 table과 자동 파기 job을 운영에 적용하기 전 AGENTS §5의 명시 승인을 받는다. 최신 main 통합 뒤 CI·최신 HEAD Codex·미해결 finding을 확인해야 한다. 실제 메일/계정 smoke는 사용자가 승인한 대상과 안전한 검증 절차를 먼저 확정한다.

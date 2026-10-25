@@ -1,4 +1,3 @@
-import { CreateServiceOperatorInvitations1792886400000 } from '../migrations/1792886400000-CreateServiceOperatorInvitations.js';
 /**
  * Incremental migration manifest
  * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1,
@@ -106,6 +105,7 @@ import { CreateCooperativeManagement1792300000000 } from '../migrations/17923000
 import { AddContactInquiryOrganization1792540800000 } from '../migrations/1792540800000-AddContactInquiryOrganization.js';
 import { CreateExternalAiConnections1792635132325 } from '../migrations/1792635132325-CreateExternalAiConnections.js';
 import { CreateStoreConsultationStations1792815861315 } from '../migrations/1792815861315-CreateStoreConsultationStations.js';
+import { CreateServiceOperatorInvitations1792886400000 } from '../migrations/1792886400000-CreateServiceOperatorInvitations.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
