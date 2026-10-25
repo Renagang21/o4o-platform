@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { businessApi, businessBase, businessPath, communityApiBase, pharmacyApiBase, businessError, type Business, type ParticipantAccess } from './api';
+import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 
 export interface BusinessContext { business: Business; access: ParticipantAccess | null }
 export const useBusiness = () => useOutletContext<BusinessContext>();
@@ -16,6 +17,10 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const [state, setState] = useState<(BusinessContext & { loadedFor: string }) | null>(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
+  const memberStore = useBusinessMaterialStore(
+    memberLayout && state?.loadedFor === `${user?.id}:${businessKey}` && !!state.access?.allowed && !state.access.canManage,
+    businessKey,
+  );
   useEffect(() => {
     let alive = true;
     setState(null); setError('');
@@ -47,13 +52,16 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
       {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}
     </nav> : null;
   const homePath = businessKey === BUSINESS_SITE.key ? '/' : base;
+  let supportHref = '/contact';
+  if (state.access?.canManage) supportHref = `/operator/inbox/business/${encodeURIComponent(businessKey)}`;
+  else if (state.access?.allowed && memberStore.organizationId) supportHref = `${homePath}?store=${encodeURIComponent(memberStore.organizationId)}#cooperation-support`;
   const memberNavigation = <CooperationMemberNavigation items={[
     { key: 'home', label: '홈', to: homePath + storeSearch, end: true },
     { key: 'news', label: '소식', to: homePath + storeSearch + '#business-news', end: true },
     { key: 'materials', label: '자료', to: businessPath(businessKey, 'materials') + storeSearch },
     { key: 'participation', label: '참여 안내', to: businessPath(businessKey, 'participation') + storeSearch },
     { key: 'community', label: '회원 교류', to: businessPath(businessKey, 'forum') + storeSearch },
-    { key: 'support', label: '지원', to: state.access?.canManage ? `/operator/inbox/business/${encodeURIComponent(businessKey)}` : state.access?.allowed ? homePath + storeSearch + '#cooperation-support' : '/contact' },
+    { key: 'support', label: '지원', to: supportHref },
   ]} />;
   if (memberLayout) return <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{memberNavigation}{operatorNavigation}<Outlet context={state} /></div>;
   return <div className="mx-auto max-w-6xl px-4 py-6">

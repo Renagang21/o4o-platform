@@ -14,13 +14,13 @@
 | 기존 자료·선택 약국·진열 실제 SQL 회귀 | 3파일·33건 PASS. 격리된 별도 DB와 suite별 schema 사용. 기존 테스트 fixture에 신규 optional metadata 열을 trailing column으로 추가해 기존 positional INSERT 계약 유지 |
 | shared-space-ui 전체 | 22파일·196건 PASS. 신규 14건은 공지 확인/활동 신청/문의 실패 입력 보존·중복 방지·scope 전환의 늦은 응답 차단·안전한 교육 링크·쓰기 성공과 조회 실패 구분 |
 | operator-core-ui 전체 | 30파일·213건 PASS. 신규 5건은 개인 대상의 초안 저장·배정 충돌 재시도·실패한 초안 보존. 기존 자료 작성·심사 회귀도 포함 |
-| web-kpa-society 전체 | 19파일·140건 PASS |
+| web-kpa-society 전체 | 20파일·148건 PASS |
 | web-neture 전체 | 151파일·1,313건 PASS |
 | web-pharmacy-coop 전체 | 11파일·85건 PASS |
 | 제품 build | API `tsc -p tsconfig.build.json`, Pharmacy/MegaPharm·Neture/CarePharm·Pharmcoop 및 Store·Lecture·KPA Branch·Admin 소비 앱 build PASS. 직접 영향 3개 웹은 최종 UI 변경 후 재빌드 |
 | 품질·구조 | 신규 모듈 집중 ESLint 오류/경고 0, migration contract 21 PASS / 0 FAIL, diff·문서 민감정보 검사 PASS |
 
-테스트 수는 중복 실행을 합산하지 않은 2,004건이다. 일부 기존 Neture 펀딩 테스트는 실패 응답 시나리오에서 jsdom network stderr를 출력하지만 assertion은 PASS다. 기존 bundle 크기·Browserslist 경고와 API Jest의 기존 forceExit 안내는 이번 기능 실패로 계산하지 않는다.
+테스트 수는 중복 실행을 합산하지 않은 2,012건이다. 일부 기존 Neture 펀딩 테스트는 실패 응답 시나리오에서 jsdom network stderr를 출력하지만 assertion은 PASS다. 기존 bundle 크기·Browserslist 경고와 API Jest의 기존 forceExit 안내는 이번 기능 실패로 계산하지 않는다.
 
 ## Migration 검증
 
@@ -52,6 +52,7 @@
 - 리뷰에서 발견한 모집 대상 회원 정지 후 활동 상태 변경 차단을 수정했다. 약국 단위와 개인 조합원 각각의 실제 SQL 회귀 2건을 추가했고 신규 대상 선택·모집 후 대상 변경의 차단은 유지했다.
 - 재리뷰 지적도 수정했다. CarePharm 지원 메뉴는 선택 약국의 실제 활성 승인 확인 후에만 회원 문의로 연결한다(약국 없음·승인 대기·조회 실패는 공개 문의). 종료된 활동은 immutable 개정 이력에 진행 상태가 있어야 완료 기록을 허용하며 API·운영자 UI 양쪽에 적용했다. 실제 SQL 2건·회원 공간 4건·운영 화면 2건의 회귀를 추가했다.
 - SonarCloud의 명시적 정렬 비교 함수·저장 함수 복잡도 지적은 UUID 정렬 비교 함수 지정과 기존 상태 검증 함수 분리로 정리했다. 동작·schema 변경 없이 관련 모델·SQL 회귀와 API build를 재검증했다.
+- Pharmacy·MegaPharm도 계정 단위 승인과 선택 약국을 구분한다. 기존 활성 가입 약국 선택 hook을 재사용해 다중 약국 미선택·잘못된 명시 선택은 공개 문의로 연결하고, 단일 자동 선택·유효한 선택은 해당 약국의 회원 문의로 연결했다. 두 사업의 8개 회귀를 추가했다. 상품 정정 main `bcb89b863c`의 별도 변경도 보존했다.
 - 최신 main 반영 후 공통 UI 2개·직접 소비 앱 3개의 전체 suite와 API 통합, 직접 영향 웹·API build를 다시 확인했다.
 
 ## 소비처와 인계
