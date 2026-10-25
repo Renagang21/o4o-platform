@@ -54,6 +54,12 @@ describe("cooperation workflow contracts", () => {
     ));
   it("validates times, required body and target identifiers", () => {
     expect(workInput(input)).toMatchObject(input);
+    const first = "11111111-1111-4111-8111-111111111111";
+    const last = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    expect(
+      workInput({ ...input, targetIds: [last.toUpperCase(), first, last] })
+        .targetIds,
+    ).toEqual([first, last]);
     expect(() => workInput({ ...input, body: "" })).toThrow();
     expect(() => workInput({ ...input, targetIds: ["not-a-uuid"] })).toThrow();
     expect(() =>

@@ -86,7 +86,7 @@ export function workInput(body: Record<string, unknown>): WorkInput {
     state: String(body.state),
     targetIds: [
       ...new Set((body.targetIds as string[]).map((id) => id.toLowerCase())),
-    ].sort(),
+    ].sort((a, b) => a.localeCompare(b)),
   };
   if (result.startsAt && result.endsAt && result.startsAt >= result.endsAt)
     throw invalid("종료일은 시작일 이후여야 합니다.");

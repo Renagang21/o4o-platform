@@ -24,6 +24,25 @@ const missing = () =>
     "COOPERATION_WORK_NOT_FOUND",
     "이 공간에서 이용할 수 있는 업무가 아닙니다.",
   );
+function assertWorkUpdate(
+  previous: any,
+  input: ReturnType<typeof workInput>,
+  version: unknown,
+) {
+  if (previous.version !== version || previous.kind !== input.kind)
+    throw conflict();
+  assertWorkTransition(previous.state, input.state, input.kind);
+  if (
+    input.kind === "activity" &&
+    previous.state !== "draft" &&
+    JSON.stringify(
+      [...(previous.target_ids as string[])].sort((a, b) => a.localeCompare(b)),
+    ) !== JSON.stringify(input.targetIds)
+  )
+    throw invalid(
+      "모집을 시작한 활동의 대상은 변경할 수 없습니다. 별도 활동을 작성해 주세요.",
+    );
+}
 export class CooperationWorkService {
   constructor(private readonly ds: DataSource) {}
   async subjects(scope: InboxScope, offset = 0) {
@@ -74,18 +93,7 @@ export class CooperationWorkService {
           [...scopeParams(scope), id],
         );
         if (!previous) throw missing();
-        if (previous.version !== body.version || previous.kind !== input.kind)
-          throw conflict();
-        assertWorkTransition(previous.state, input.state, input.kind);
-        if (
-          input.kind === "activity" &&
-          previous.state !== "draft" &&
-          JSON.stringify([...previous.target_ids].sort()) !==
-            JSON.stringify(input.targetIds)
-        )
-          throw invalid(
-            "모집을 시작한 활동의 대상은 변경할 수 없습니다. 별도 활동을 작성해 주세요.",
-          );
+        assertWorkUpdate(previous, input, body.version);
       } else if (input.state !== "draft")
         throw invalid("먼저 초안을 저장한 뒤 게시·모집을 시작해 주세요.");
       const source = subjectSource(scope);
