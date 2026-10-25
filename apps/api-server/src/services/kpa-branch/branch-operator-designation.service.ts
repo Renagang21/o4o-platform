@@ -1,3 +1,5 @@
+import type { DataSource } from 'typeorm';
+import { recordOperatorRevocation } from '../admin/operator-invitation-retention.js';
 /**
  * 개별 분회 운영자 지정·해제 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
@@ -58,7 +60,7 @@ export class BranchOperatorDesignationService {
       throw new BranchOperatorDesignationError(404, 'BRANCH_NOT_FOUND', '분회를 찾을 수 없습니다.');
     }
     const rows = await this.db.query(
-      `SELECT id, name FROM kpa_organizations WHERE id = $1 AND type = $2 AND is_active = true`,
+      `SELECT id, name FROM kpa_organizations WHERE id = $1 AND type = $2 AND is_active = true FOR SHARE`,
       [branchId, BRANCH_ORG_TYPE],
     );
     if (!rows?.length) throw new BranchOperatorDesignationError(404, 'BRANCH_NOT_FOUND', '분회를 찾을 수 없습니다.');
@@ -71,7 +73,7 @@ export class BranchOperatorDesignationService {
       throw new BranchOperatorDesignationError(409, 'NOT_BRANCH_MEMBER', '이 분회의 소속 회원이 아닙니다.');
     }
     const rows = await this.db.query(
-      `SELECT 1 FROM branch_memberships WHERE organization_id = $1 AND user_id = $2 AND status = 'active' LIMIT 1`,
+      `SELECT 1 FROM branch_memberships WHERE organization_id = $1 AND user_id = $2 AND status = 'active' LIMIT 1 FOR SHARE`,
       [branchId, userId],
     );
     if (!rows?.length) {
@@ -124,28 +126,30 @@ export class BranchOperatorDesignationService {
   }
 
   /** 지정 — 이 분회 active 소속 + 서비스 membership active 인 사람만. 이미 운영자면 그대로(멱등). */
-  async designate(branchId: string, userId: string, actorUserId: string): Promise<{ assigned: boolean }> {
-    await this.requireBranch(branchId);
-    await this.requireActiveBranchMember(branchId, userId);
-    const sm = await this.db.query(
-      `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-      [userId, KPA_BRANCH_SERVICE_KEY],
-    );
-    if (sm?.[0]?.status !== 'active') {
-      throw new BranchOperatorDesignationError(
-        409,
-        'SERVICE_MEMBERSHIP_NOT_ACTIVE',
-        '분회 서비스 가입이 승인된(active) 회원만 운영자로 지정할 수 있습니다. 먼저 서비스 가입 승인을 처리하세요.',
-      );
-    }
-    await this.rejectDemoAccount(userId);
-    if (await roleAssignmentService.hasRole(userId, KPA_BRANCH_OPERATOR_ROLE)) return { assigned: false };
-    await roleAssignmentService.assignRole({ userId, role: KPA_BRANCH_OPERATOR_ROLE, assignedBy: actorUserId });
-    return { assigned: true };
+  async validateInvitationGrant(actor: string, branch: string, target?: string): Promise<void> {
+    const rows=await this.db.query(`SELECT ra.id FROM role_assignments ra JOIN users u ON u.id=ra.user_id
+      WHERE ra.user_id=$1 AND ra.role IN ('kpa-branch:admin','platform:super_admin') AND ra.is_active=true
+      AND (ra.valid_from IS NULL OR ra.valid_from<=now()) AND (ra.valid_until IS NULL OR ra.valid_until>=now())
+      AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved')
+      AND (ra.role='platform:super_admin' OR EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='kpa-branch' AND sm.status='active'))
+      FOR SHARE OF ra,u`,[actor]);
+    if (!rows.length) throw new BranchOperatorDesignationError(403,'SERVICE_ADMIN_REQUIRED','분회 서비스 Admin 권한이 필요합니다.');
+    await this.requireBranch(branch);
+    if (!target) return;
+    await this.requireActiveBranchMember(branch,target);
+    const members=await this.db.query("SELECT user_id FROM service_memberships WHERE user_id=$1 AND service_key='kpa-branch' AND status='active' FOR SHARE",[target]);
+    if (!members.length) throw new BranchOperatorDesignationError(409,'SERVICE_MEMBERSHIP_NOT_ACTIVE','활성 분회 서비스 회원만 초대할 수 있습니다.');
+    await this.rejectDemoAccount(target);
+  }
+  async designate(branchId: string, userId: string, actorUserId: string): Promise<{ assigned: boolean; invited: boolean }> {
+    const { ServiceOperatorInvitationService }=await import('../admin/service-operator-invitation.service.js');
+    await new ServiceOperatorInvitationService(this.db as DataSource).create({actorId:actorUserId,targetUserId:userId,
+      role:KPA_BRANCH_OPERATOR_ROLE,serviceKey:'kpa-branch',scopeType:'branch',scopeKey:branchId});
+    return {assigned:false,invited:true};
   }
 
   /** 해제 — 이 분회 active 소속자의 운영자 역할만. 다른 분회 운영자는 이 분회 id 로 해제할 수 없다. */
-  async release(branchId: string, userId: string): Promise<{ removed: boolean }> {
+  async release(branchId: string, userId: string, actorUserId: string): Promise<{ removed: boolean }> {
     await this.requireBranch(branchId);
     await this.requireActiveBranchMember(branchId, userId);
     if (!(await roleAssignmentService.hasRole(userId, KPA_BRANCH_OPERATOR_ROLE))) {
@@ -153,6 +157,7 @@ export class BranchOperatorDesignationService {
     }
     await this.rejectDemoAccount(userId);
     await roleAssignmentService.removeRole(userId, KPA_BRANCH_OPERATOR_ROLE);
+    await recordOperatorRevocation(this.db,actorUserId,userId,'kpa-branch',KPA_BRANCH_OPERATOR_ROLE,'branch',branchId);
     return { removed: true };
   }
 }

@@ -1,3 +1,4 @@
+import { PendingOperatorInvitations } from '@o4o/shared-space-ui';
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface OperatorManagementClient {
@@ -87,7 +88,7 @@ function OperatorManagementPanel({
     if (locked.current || loading) return;
     if (
       !window.confirm(
-        `${person.name || person.email} 님의 이 서비스 Operator 권한을 ${assign ? "지정" : "해제"}하시겠습니까?`,
+        `${person.name || person.email} 님의 이 서비스 Operator 권한을 ${assign ? "초대" : "해제"}하시겠습니까?`,
       )
     )
       return;
@@ -100,7 +101,7 @@ function OperatorManagementPanel({
       if (assign) await client.post(path, {});
       else await client.delete(path);
       if (!mounted.current) return;
-      setNotice(`Operator 권한을 ${assign ? "지정" : "해제"}했습니다.`);
+      setNotice(assign ? "운영자 초대 메일을 보냈습니다. 본인 수락 후 권한이 활성화됩니다." : "Operator 권한을 해제했습니다.");
       await load(search); // A failed refresh preserves the success notice and disables stale actions.
     } catch (e) {
       if (mounted.current) setError(failure(e));
@@ -113,11 +114,11 @@ function OperatorManagementPanel({
     <section className="space-y-4 rounded-lg border bg-white p-5">
       <h2 className="text-xl font-semibold">{title}</h2>
       <p>
-        이 서비스의 Operator만 지정·해제합니다. Admin 권한은 전체 관리자가
+        이 서비스의 Operator만 초대·해제합니다. Admin 권한은 전체 관리자가
         관리합니다.
       </p>
       <p className="text-sm text-gray-600">
-        지정 대상은 Google 계정을 연결하고 이 서비스를 이용할 수 있는
+        초대 대상은 이메일 인증을 완료하고 이 서비스를 이용할 수 있는
         회원입니다. 서비스 가입·정지 상태는 변경하지 않습니다.
       </p>
       {notice && <p role="status">{notice}</p>}
@@ -210,19 +211,18 @@ function OperatorManagementPanel({
                     >
                       <span className="min-w-0 break-all">
                         {p.name || p.email} · {p.email}
-                        {!p.hasGoogleLink ? " · Google 연결 필요" : ""}
+
                       </span>
                       <button
                         type="button"
                         disabled={
                           busy ||
-                          !p.hasGoogleLink ||
                           data.operators.some((o) => o.userId === p.userId)
                         }
                         onClick={() => void change(p, true)}
                         className="rounded border p-2"
                       >
-                        지정
+                        초대
                       </button>
                     </li>
                   ))}
@@ -232,6 +232,7 @@ function OperatorManagementPanel({
           </>
         )
       )}
+      {data && <PendingOperatorInvitations client={client} kind="service" scope={scope} version={version.current} />}
     </section>
   );
 }

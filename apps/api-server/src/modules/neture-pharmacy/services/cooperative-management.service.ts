@@ -1,3 +1,4 @@
+import { recordOperatorRevocation } from '../../../services/admin/operator-invitation-retention.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { businessPolicyScope } from './business-policy-scope.js';
@@ -43,7 +44,7 @@ function reason(value: unknown): string {
 }
 async function usable(exec: Exec, id: string) {
   const [u] = await exec.query(
-    `SELECT id FROM users WHERE id=$1 AND status IN ('active','approved') AND "isActive"=true AND "isEmailVerified"=true`,
+    `SELECT id FROM users WHERE id=$1 AND status IN ('active','approved') AND "isActive"=true AND "isEmailVerified"=true FOR SHARE`,
     [id],
   );
   if (!u) throw denied();
@@ -56,7 +57,7 @@ export async function federationRole(
     `SELECT role FROM role_assignments WHERE user_id=$1
     AND role IN ('neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true
     AND (valid_from IS NULL OR valid_from<=CURRENT_TIMESTAMP)
-    AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP)`,
+    AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP) FOR SHARE`,
     [id],
   );
   if (
@@ -268,44 +269,33 @@ export class CooperativeManagementService {
       !["admin", "operator"].includes(role)
     )
       throw invalid();
-    const text = reason(note);
-    return await this.db.transaction(async (m) => {
-      await this.lock(m, coop);
-      if (role === "admin") await this.requireFederation(m, actor, true);
-      else await this.requireLocal(m, actor, coop, true);
-      const [target] = await m.query(
-        `SELECT id FROM users WHERE lower(email)=lower($1) AND status IN ('active','approved') AND "isActive"=true AND "isEmailVerified"=true FOR SHARE`,
-        [email.trim()],
-      );
-      if (!target)
-        throw new NeturePharmacyError(
-          400,
-          "COOPERATIVE_TARGET_UNAVAILABLE",
-          "가입·이메일 인증이 완료된 활성 계정을 확인해 주세요.",
-        );
-      if (
-        (
-          await m.query(
-            "SELECT 1 FROM cooperative_roles WHERE cooperative_id=$1 AND user_id=$2 AND revoked_at IS NULL",
-            [coop, target.id],
-          )
-        ).length
-      )
-        throw new NeturePharmacyError(
-          409,
-          "COOPERATIVE_ROLE_EXISTS",
-          "기존 역할을 해제한 뒤 지정해 주세요.",
-        );
-      const [row] = await m.query(
-        "INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,$3) RETURNING id",
-        [coop, target.id, role],
-      );
-      await this.audit(m, coop, actor, target.id, "role_assign", text, {
-        previous: null,
-        next: role,
-      });
-      return row;
+    reason(note);
+    const target=await this.db.transaction(async m=> {
+      await this.validateInvitationGrant(m,actor,coop,role);
+      const [user]=await m.query(`SELECT id FROM users WHERE lower(email)=lower($1) AND status IN ('active','approved')
+        AND "isActive"=true AND "isEmailVerified"=true FOR SHARE`,[email.trim()]);
+      if (!user) throw new NeturePharmacyError(400,'COOPERATIVE_TARGET_UNAVAILABLE','활성 계정을 확인해 주세요.');
+      return user.id as string;
     });
+    const { ServiceOperatorInvitationService }=await import('../../../services/admin/service-operator-invitation.service.js');
+    const invite=await new ServiceOperatorInvitationService(this.db).create({actorId:actor,targetUserId:target,
+      serviceKey:'neture',role:`cooperative:${role}`,scopeType:'cooperative',scopeKey:coop});
+    return {id:invite.id,invited:true};
+  }
+  async validateInvitationGrant(m: Exec, actor: string, coop: string, role: string, target?: string) {
+    if (!['admin','operator'].includes(role)) throw invalid();
+    await this.lock(m,coop);
+    if (role==='admin') await this.requireFederation(m,actor,true);
+    else await this.requireLocal(m,actor,coop,true);
+    if (!target) return;
+    await usable(m,target);
+    const rows=await m.query('SELECT 1 FROM cooperative_roles WHERE cooperative_id=$1 AND user_id=$2 AND revoked_at IS NULL',[coop,target]);
+    if (rows.length) throw new NeturePharmacyError(409,'COOPERATIVE_ROLE_EXISTS','이미 관리 역할이 있습니다.');
+  }
+  async activateInvitation(m: Exec, actor: string, coop: string, target: string, role: string) {
+    const [row]=await m.query('INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,$3) RETURNING id',[coop,target,role]);
+    await this.audit(m,coop,actor,target,'role_assign','운영자 초대 본인 수락',{previous:null,next:role});
+    return row;
   }
   async revokeRole(actor: string, coop: string, roleId: string, note: unknown) {
     const text = reason(note);
@@ -347,6 +337,7 @@ export class CooperativeManagementService {
         "UPDATE cooperative_roles SET revoked_at=now() WHERE id=$1",
         [roleId],
       );
+      await recordOperatorRevocation(m,actor,row.user_id,'neture',`cooperative:${row.role}`,'cooperative',coop);
       await this.audit(m, coop, actor, row.user_id, "role_revoke", text, {
         previous: row.role,
         next: null,

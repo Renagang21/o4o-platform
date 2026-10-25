@@ -1,22 +1,6 @@
-/**
- * WO-O4O-ADMIN-USER-UPSERT-STATUS-PRESERVATION-V1 — 계정 상태 보존 계약 회귀 가드
- *
- * 계약: **기존 사용자 upsert ≠ 계정 상태 재승인**
- *
- * `POST /admin/users` 는 기존 사용자에게 role·service_membership·service_credential 을
- * 추가하는 경로다. 이 경로가 user-global `status` / `isActive` 를 바꾸면
- * 정지(suspended) 계정이 역할 추가만으로 조용히 되살아난다.
- *
- * 조사 결과(census) 현재 구현은 기존 사용자 분기에서 users 행을 저장하지 않으므로
- * 상태를 바꾸지 않는다. 본 테스트는 그 계약을 **고정**해 향후 회귀를 막는다.
- *   - 기존 사용자 분기에서 User repository 의 save/insert 가 호출되지 않는다
- *   - 응답의 user.status 는 요청 body 의 status 가 아니라 **기존 값**이다
- *   - body 에 status/isActive 를 실어 보내도 기존 사용자 상태는 바뀌지 않는다
- *     (상태 변경은 PATCH /admin/users/:id/status 전용 계약)
- *
- * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §18 로
- * 이 경로에서 **신규 user 생성과 비밀번호 수신이 은퇴**했다. 위 보존 계약은 그대로 두고,
- * 은퇴한 두 입력이 조용히 무시되지 않고 명시 코드로 거절되는지를 함께 고정한다.
+/** Legacy direct assignment now rejects without writes.
+ * Keep suspended/status/password/membership cases as no-write guards.
+ * Actual acceptance preserves membership status/role in service-operator-invitation.integration.test.ts.
  */
 import 'reflect-metadata';
 
@@ -122,6 +106,14 @@ const APPROVED_USER = {
   lastName: '홍',
 };
 
+function expectInvitationRequired(res: any) {
+  expect(res.status).toHaveBeenCalledWith(400);
+  expect(res.json.mock.calls[0][0]).toMatchObject({ success: false, code: 'OPERATOR_INVITATION_REQUIRED' });
+  expect(transactionMock).not.toHaveBeenCalled();
+  expect(assignRoleMock).not.toHaveBeenCalled();
+  expect(hashPasswordMock).not.toHaveBeenCalled();
+}
+
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'suspended@example.com',
@@ -147,22 +139,23 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
 
     // User repository 로의 save/insert 가 한 번도 일어나지 않아야 한다.
     expect(rec.userSaves).toHaveLength(0);
-    // membership 은 정상적으로 추가된다 (기능은 살아 있다).
-    expect(rec.memberships).toHaveLength(1);
+    // No membership is created before explicit invitation acceptance.
+    expect(rec.memberships).toHaveLength(0);
+    expectInvitationRequired(res);
     // credential 은 이 경로에서 더 이상 만들어지지 않는다 (§18).
     expect(rec.credentials).toHaveLength(0);
   });
 
-  it('응답의 status 는 기존 suspended 를 그대로 반영한다', async () => {
+  it('기존 suspended 계정의 직접 지정을 쓰기 전에 거절한다', async () => {
     install({ existingUser: { ...SUSPENDED_USER } });
     const res = mockRes();
     await new AdminUserController().createUser(body() as any, res);
 
     const payload = res.json.mock.calls[0][0];
-    expect(payload.success).toBe(true);
-    expect(payload.isExistingUser).toBe(true);
-    expect(payload.user.status).toBe('suspended');
-    expect(payload.user.isActive).toBe(false);
+    expect(payload.success).toBe(false);
+    expectInvitationRequired(res);
+    expect(payload.isExistingUser).toBeUndefined();
+    expectInvitationRequired(res);
   });
 
   it('body 에 status/isActive 를 실어 보내도 기존 사용자 상태는 바뀌지 않는다', async () => {
@@ -175,9 +168,7 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
     );
 
     expect(rec.userSaves).toHaveLength(0);
-    const payload = res.json.mock.calls[0][0];
-    expect(payload.user.status).toBe('suspended');
-    expect(payload.user.isActive).toBe(false);
+    expectInvitationRequired(res);
   });
 
   it('실제 회귀 케이스: 정지된 검증 계정에 kpa:store_owner 를 다시 부여하는 요청은 이제 400 으로 거절된다', async () => {
@@ -214,17 +205,15 @@ describe('B. 기존 approved 사용자 — 상태 그대로', () => {
     );
 
     expect(rec.userSaves).toHaveLength(0);
-    const payload = res.json.mock.calls[0][0];
-    expect(payload.user.status).toBe('approved');
-    expect(payload.user.isActive).toBe(true);
+    expectInvitationRequired(res);
   });
 });
 
 // ─── C. 은퇴한 입력 — 조용히 무시하지 않고 명시 코드로 거절한다 (§18) ───────
 
 describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
-  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 미가입자는 Google 가입 후 지정 대상이 된다.
-  it('미가입 email → 400 USER_SIGNUP_REQUIRED (users 를 만들지 않는다)', async () => {
+  // New emails cannot create accounts through legacy direct assignment.
+  it('미가입 email → 400 OPERATOR_INVITATION_REQUIRED (users 를 만들지 않는다)', async () => {
     const rec = install({ existingUser: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -233,7 +222,7 @@ describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0].code).toBe('USER_SIGNUP_REQUIRED');
+    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
     // 어떤 행도 쓰지 않는다.
     expect(rec.userSaves).toHaveLength(0);
     expect(rec.memberships).toHaveLength(0);

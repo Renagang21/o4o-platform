@@ -2,6 +2,7 @@ import { AiOverviewPanel } from '@o4o/ai-components';
 import { EligibilitySettings, StatusSummary } from "./Participation";
 import { useEffect, useState } from "react";
 import { ServiceOperatorManagement } from "@o4o/operator-core-ui";
+import { PendingOperatorInvitations } from "@o4o/shared-space-ui";
 import {
   ServiceEnrollmentPolicyAgreement,
   useServiceEnrollmentPolicies,
@@ -223,12 +224,12 @@ export function RoleManagement({
   const role = federation ? "admin" : "operator";
   return (
     <section className="card spaced coop-management">
-      <h3>조합 {role} 지정·해제</h3>
+      <h3>조합 {role} 초대·해제</h3>
       <Feedback {...work} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          void work.send(`${base}/${coop}/roles`, { email, role, reason });
+          void work.send(`${base}/${coop}/roles`, { email, role, reason: "운영자 초대 요청" });
         }}
       >
         <label>
@@ -241,16 +242,15 @@ export function RoleManagement({
           />
         </label>
         <label>
-          <span>지정·해제 사유</span>
+          <span>해제 사유 (권한 회수 시 필수)</span>
           <textarea
-            required
             maxLength={2000}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
         </label>
-        <button type="submit" disabled={work.busy || !reason.trim()}>
-          조합 {role} 지정
+        <button type="submit" disabled={work.busy || !email.trim()}>
+          조합 {role} 초대
         </button>
       </form>
       {(work.data as Role[] | null)?.map((r) => (
@@ -271,6 +271,7 @@ export function RoleManagement({
           )}
         </p>
       ))}
+      <PendingOperatorInvitations key={`${coop}:${role}`} client={client} kind="cooperative" scope={coop} role={role} version={work.version} />
       <History
         client={client}
         coop={coop}

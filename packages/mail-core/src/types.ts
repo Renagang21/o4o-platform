@@ -1,6 +1,8 @@
 // Mail Core Types
 
 export interface EmailOptions {
+  /** Do not persist recipient, body, token or transport error for ephemeral invitation delivery. */
+  ephemeral?: boolean;
   to: string | string[];
   subject: string;
   template?: string;

@@ -38,6 +38,12 @@
 
 ---
 
+## 2.1 운영자 초대·권한 변경 이력 — 2026-10-25 사용자 확정
+
+[운영자 초대·본인 수락 및 보존 정책](O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)을 적용한다. 초대 링크는 최초 7일, 초대용 이메일·token은 수락·취소·만료 후 파기한다. actor/대상 최소 식별자·역할·범위·시각·처리 상태의 최소 이력은 생성 후 Asia/Seoul 달력 1년 보관 후 파기한다. 다른 보안·법정 업무기록의 별도 정책을 초대 본문·token의 연장 근거로 사용하지 않는다. 확정 정책과 신규 migration·자동 집행·처리방침 게시·실제 배포는 구분한다.
+
+---
+
 ## 3. 일반 문의정보 (`contact_inquiries`)
 
 - 대상: 이름 · 이메일 · 전화번호 · 소속 · 문의 제목 · 문의 내용 · source path · User-Agent · IP hash(원본 IP 미저장) · 문의 처리내역(`handled_at · handled_by · internal_note`)

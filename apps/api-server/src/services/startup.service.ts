@@ -1,3 +1,4 @@
+import { operatorInvitationRetentionJob } from '../jobs/operator-invitation-retention.job.js';
 import { communityNewsJob } from '../jobs/community-news.job.js';
 import { AppDataSource } from '../database/connection.js';
 // MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
@@ -216,6 +217,7 @@ export class StartupService {
       // WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1
       // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
       privacyRetentionJob.start();
+      operatorInvitationRetentionJob.start();
       logger.info('✅ Privacy Retention Job started');
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
@@ -307,6 +309,7 @@ export class StartupService {
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();
+      operatorInvitationRetentionJob.stop();
       communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');

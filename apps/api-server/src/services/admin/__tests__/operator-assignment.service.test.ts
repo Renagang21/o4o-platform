@@ -91,77 +91,14 @@ const LINKED = { id: 'la-1', userId: 'user-1', provider: 'google' };
 
 beforeEach(() => jest.clearAllMocks());
 
-describe('assign — 역할 부여', () => {
-  it('Google 연결된 기존 사용자에게 role 과 membership 만 부여한다', async () => {
-    const h = makeHarness({ user: USER, linked: LINKED });
-
-    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'lecture', role: 'lecture:operator', assignedBy: 'admin-1' });
-
-    expect(r).toMatchObject({
-      userId: 'user-1',
-      serviceKey: 'lecture',
-      role: 'lecture:operator',
-      rolePolicy: 'ASSIGNED',
-      membershipPolicy: 'CREATED',
-    });
-    expect(assignRoleMock).toHaveBeenCalledWith(
-      { userId: 'user-1', role: 'lecture:operator', assignedBy: 'admin-1' },
-      expect.anything(),
-    );
-    expect(h.writes.users).toHaveLength(0);
-    expect(h.writes.credentials).toHaveLength(0);
-    expect(h.writes.linkedAccounts).toHaveLength(0);
-    expect(h.writes.memberships).toHaveLength(1);
+describe('legacy assign requires email confirmation', () => {
+  it.each([true,false])('never grants immediately (Google linked=%s)', async linked => {
+    const h=makeHarness({user:USER,linked:linked?LINKED:null});
+    await expect(h.service.assign({userId:USER.id,serviceKey:'lecture',role:'lecture:operator'})).rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+    expect(assignRoleMock).not.toHaveBeenCalled();expect(h.dataSource.transaction).not.toHaveBeenCalled();expect(h.writes.memberships).toHaveLength(0);
   });
-
-  it('전부 한 트랜잭션 안에서 일어난다', async () => {
-    const h = makeHarness({ user: USER, linked: LINKED });
-    await h.service.assign({ userId: 'user-1', serviceKey: 'kpa-society', role: 'kpa:operator' });
-    expect(h.dataSource.transaction).toHaveBeenCalledTimes(1);
-    // role prefix 'kpa' → canonical 'kpa-society' 로 membership 을 만든다.
-    expect(h.writes.memberships[0]).toMatchObject({ serviceKey: 'kpa-society', status: 'active', role: 'operator' });
-  });
-
-  it('없는 사용자는 404 USER_NOT_FOUND — 만들지 않는다', async () => {
-    const h = makeHarness({ user: null });
-    await expect(h.service.assign({ userId: 'ghost', serviceKey: 'lecture', role: 'lecture:operator' }))
-      .rejects.toMatchObject({ code: 'USER_NOT_FOUND', statusCode: 404 });
-    expect(h.writes.users).toHaveLength(0);
-    expect(assignRoleMock).not.toHaveBeenCalled();
-  });
-
-  it('Google 연결이 없으면 409 GOOGLE_LINK_REQUIRED — 대신 연결해 주지 않는다', async () => {
-    const h = makeHarness({ user: USER, linked: null });
-    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'lecture', role: 'lecture:operator' }))
-      .rejects.toMatchObject({ code: 'GOOGLE_LINK_REQUIRED', statusCode: 409 });
-    expect(h.writes.linkedAccounts).toHaveLength(0);
-    expect(h.writes.credentials).toHaveLength(0);
-    expect(assignRoleMock).not.toHaveBeenCalled();
-  });
-
-  it('platform:super_admin 은 이 경로로 부여할 수 없다', async () => {
-    const h = makeHarness({ user: USER, linked: LINKED });
-    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'platform', role: 'platform:super_admin' }))
-      .rejects.toBeInstanceOf(OperatorRoleContractError);
-    expect(h.dataSource.transaction).not.toHaveBeenCalled();
-  });
-
-  it('role 과 serviceKey 가 어긋나면 SERVICE_KEY_MISMATCH — 트랜잭션 전에 걸린다', async () => {
-    const h = makeHarness({ user: USER, linked: LINKED });
-    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'lecture', role: 'kpa:operator' }))
-      .rejects.toMatchObject({ code: 'SERVICE_KEY_MISMATCH' });
-    expect(h.dataSource.transaction).not.toHaveBeenCalled();
-  });
-
-  it('기존 membership 상태를 승격하지 않고 그대로 보고한다', async () => {
-    const h = makeHarness({
-      user: USER,
-      linked: LINKED,
-      existingMembership: { userId: 'user-1', serviceKey: 'lecture', status: 'pending' },
-    });
-    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'lecture', role: 'lecture:operator' });
-    expect(h.writes.memberships).toHaveLength(0);
-    expect(r).toMatchObject({ membershipPolicy: 'KEEP_EXISTING_STATUS', membershipStatuses: { 'lecture': 'pending' } });
+  it('continues to reject platform roles',async()=>{
+    const h=makeHarness();await expect(h.service.assign({userId:USER.id,serviceKey:'platform',role:'platform:super_admin'})).rejects.toBeInstanceOf(OperatorRoleContractError);
   });
 });
 
@@ -198,10 +135,9 @@ describe('collaborator assignment preserves the canonical account and membership
   it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => ['admin','operator'].map(level => `neture:${key}_${level}`)))('%s never grants Neture-wide administration or activates suspended membership', async role => {
     const h = makeHarness({ user: USER, linked: LINKED,
       existingMembership: { userId: 'user-1', serviceKey: 'neture', status: 'suspended' } });
-    const result = await h.service.assign({ userId: 'user-1', serviceKey: 'neture', role });
-    expect(assignRoleMock).toHaveBeenCalledTimes(1);
-    expect(assignRoleMock).toHaveBeenCalledWith({ userId: 'user-1', role }, expect.anything());
-    expect(result).toMatchObject({ serviceKey: 'neture', role, membershipPolicy: 'KEEP_EXISTING_STATUS', membershipStatuses: { neture: 'suspended' } });
+    await expect(h.service.assign({ userId:'user-1',serviceKey:'neture',role }))
+      .rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+    expect(assignRoleMock).not.toHaveBeenCalled();
     expect(h.writes.memberships).toEqual([]);
     expect(h.writes.users).toEqual([]);
     expect(h.writes.linkedAccounts).toEqual([]);
@@ -209,10 +145,9 @@ describe('collaborator assignment preserves the canonical account and membership
 });
 
 
-it('central assignment invalidates a cache populated immediately before transaction commit',async()=>{
-  const h=makeHarness({user:USER,linked:LINKED});
-  const original=h.dataSource.transaction.getMockImplementation()!;
-  h.dataSource.transaction.mockImplementation(async(fn:any)=>{const value=await original(fn);setCachedRoles(USER.id,[]);return value;});
-  await h.service.assign({userId:USER.id,serviceKey:'neture',role:'neture:operator'});
-  expect(getCachedRoles(USER.id)).toBeNull();
+it('legacy central assignment refuses immediate writes without consuming cached roles',async()=>{
+  const h=makeHarness({user:USER,linked:LINKED});setCachedRoles(USER.id,[]);
+  await expect(h.service.assign({userId:USER.id,serviceKey:'neture',role:'neture:operator'}))
+    .rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+  expect(h.dataSource.transaction).not.toHaveBeenCalled();
 });

@@ -69,17 +69,17 @@ export class MailService {
       }
 
       // Send email via transport
-      const info = await this.transport.send(mailOptions);
+      const info = await this.transport.send(mailOptions, options.ephemeral);
 
       // Record to EmailLog (fire-and-forget)
-      this.transport.logEmail(recipient, fromEmail, subject, 'sent', info.messageId, template || 'custom').catch(() => {});
+      if (!options.ephemeral) this.transport.logEmail(recipient, fromEmail, subject, 'sent', info.messageId, template || 'custom').catch(() => {});
 
       return { success: true };
     } catch (error: any) {
       // Record failure to EmailLog (fire-and-forget)
-      this.transport.logEmail(recipient, fromEmail, options.subject, 'failed', undefined, options.template || 'custom', error.message).catch(() => {});
+      if (!options.ephemeral) this.transport.logEmail(recipient, fromEmail, options.subject, 'failed', undefined, options.template || 'custom', error.message).catch(() => {});
 
-      return { success: false, error: error.message || 'Failed to send email' };
+      return { success: false, error: options.ephemeral ? 'Ephemeral email delivery failed' : error.message || 'Failed to send email' };
     }
   }
 
@@ -352,8 +352,8 @@ export class MailService {
     await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청 결과 안내`, html, text: htmlToText(html) });
   }
 
-  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: sendOperatorInvitationEmail 은퇴 — 운영자 이메일 초대 흐름을 제거했다.
-  //   운영자 지정은 "Google 로 가입 후 관리자가 직접 지정" 으로 일원화한다.
+  // Legacy sendOperatorInvitationEmail remains retired. Explicit consent invitations
+  // use the API invitation service and ephemeral delivery instead.
   async sendSecurityAlert(email: string, alertData: {
     type: 'suspicious_login_attempts' | 'account_locked' | 'password_changed' | 'new_device_login';
     details: {

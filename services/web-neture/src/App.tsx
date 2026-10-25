@@ -1,3 +1,5 @@
+import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
+import OperatorInvitePage from './pages/OperatorInvitePage';
 import ScopedContactPage from './pages/ScopedContactPage';
 import OperatorInboxEntryPage from './pages/operator/OperatorInboxEntryPage';
 import OperatorInboxPage from './pages/operator/OperatorInboxPage';
@@ -611,6 +613,7 @@ function PostLoginRedirect() {
 
 // 인증 모달 렌더링 컴포넌트 (로그인 + 회원가입)
 function ModalRenderer() {
+  useEffect(() => serveOperatorInvitationContinuation(), []);
   const { activeModal, closeModal, loginReturnUrl } = useLoginModal();
   return (
     <>
@@ -679,6 +682,7 @@ function App() {
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
+            <Route path="/operator-invite" element={<OperatorInvitePage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/external-ai/connect" element={<ExternalAiConsentPage />} />
             <Route path="/register" element={<RegisterRedirect />} />
