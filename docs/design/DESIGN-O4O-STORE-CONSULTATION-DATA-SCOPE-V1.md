@@ -27,7 +27,7 @@
 
 담당 화면 응답이 90초 이상 없으면 고객 조회는 대기 상태를 반환한다. 새 정리 job은 같은 연결 만료 기준을 사용해 현재 전달 본문·미확인 답변·연결 코드를 비우고 active를 해제하며 epoch를 교체한다. 기기 해시·자리와 저장된 업무 자산은 유지한다. 60초 주기·회당 최대 200행·잠긴 행 건너뛰기로 동시 heartbeat를 보호하며 대량 적체는 여러 회차에 나누어 처리한다.
 
-**기본 실행은 dry-run이며 운영 자동 파기가 활성화됐다는 의미가 아니다.** 통합/배포 담당자가 관측 결과를 확인하고 `CONSULTATION_STATE_CLEANUP_MODE=apply`를 명시해야 쓴다. `CONSULTATION_STATE_CLEANUP_ENABLED=false`로 중지한다. 이 기준은 현재 화면 전달 상태의 정리 기준이며 백업·다른 저장 자산의 보존기간이나 AI 사용 metadata 1년을 바꾸지 않는다. 명시 종료/다음 상담에서 본문을 비우는 기존 계약도 유지한다.
+**job 자체의 기본 실행은 dry-run이며 운영 자동 파기가 활성화됐다는 의미가 아니다.** 후속 [배포 연결 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CLEANUP-DEPLOYMENT-V1.md)는 기존 API 배포에 `CONSULTATION_STATE_CLEANUP_MODE=apply`를 명시하고 현재 중지 값을 보존한다. main/배포 전에는 활성화 완료가 아니며 통합 담당자가 적용/관측 결과를 확인한다. `CONSULTATION_STATE_CLEANUP_ENABLED=false`로 중지한다. job은 시작 시와 프로세스가 실행 중인 동안 timer로 확인하므로 Cloud Run scale-to-zero/CPU 중지·batch 적체까지 포함한 90초 내 물리 파기 SLA는 보장하지 않는다. 이 기준은 현재 화면 전달 상태의 정리 기준이며 백업·다른 저장 자산의 보존기간이나 AI 사용 metadata 1년을 바꾸지 않는다. 명시 종료/다음 상담에서 본문을 비우는 기존 계약도 유지한다.
 
 근거: [약국 설계 §15-8](DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#15-8-내-매장-상담다국어와-현장-실행-2026-10-24-사용자-확정), `services/web-store/src/pages/pharmacy/useConsultationDrafts.ts`, `consultation/CustomerConsultationPage.tsx`, `apps/api-server/src/modules/neture-pharmacy/services/consultation-stations.ts`, `apps/api-server/src/controllers/ai/AiQueryController.ts#getHistory`, `apps/api-server/src/services/ai-query.service.ts#getUserLogs`.
 
