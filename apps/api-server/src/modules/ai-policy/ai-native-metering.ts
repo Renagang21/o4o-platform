@@ -1,5 +1,5 @@
 /** Native transports supply measurements; accounting stays in the existing executor and ledger. */
-import { loadAiPriceCatalog, resolveAiPrice, estimateAiCost, type AiNativeKind, type AiNativePriceProfile, type AiPriceSnapshot } from './ai-pricing.js';
+import { loadAiPriceCatalog, resolveAiPrice, estimateAiCost, type AiPriceCatalog, type AiNativeKind, type AiNativePriceProfile, type AiPriceSnapshot } from './ai-pricing.js';
 import type { AiQuotaUsage } from './ai-quota.service.js';
 
 export interface AiNativeRequest {
@@ -29,8 +29,8 @@ function cost(price: AiPriceSnapshot, profile: AiNativePriceProfile, input: numb
   return Math.round(total * 1e8) / 1e8;
 }
 
-export function prepareNativePlan(request: AiNativeRequest): NativePlan {
-  const price = resolveAiPrice(loadAiPriceCatalog(), request.provider, request.model);
+export function prepareNativePlan(request: AiNativeRequest, catalog: AiPriceCatalog = loadAiPriceCatalog()): NativePlan {
+  const price = resolveAiPrice(catalog, request.provider, request.model);
   const profile = price.native?.[request.kind] ?? (request.kind === 'text' ? { maxInputTokens: request.textBytes ?? 0, maxOutputTokens: request.maxOutputTokens ?? 2048 } : undefined);
   if ((price.match !== 'model' && (request.kind !== 'text' || !['gemini', 'openai', 'claude'].includes(request.provider))) || !profile) throw new Error('AI_PRICING_NOT_CONFIGURED');
   // OCR has image billing; grounding must explicitly include search-request policy costs.
