@@ -82,7 +82,7 @@ const QR_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   cosmetics: 'k-cosmetics',
   // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1: role prefix 와 catalog key 동일
-  // (service-catalog.ts `pharmacy-hub` → pharmacyhub.co.kr). 본 controller 는 서비스별
+  // (service-catalog.ts `pharmacy-hub` → 옛 PH 도메인). 본 controller 는 서비스별
   // 명시 serviceKey 로만 mount 되며 pharmacy-hub mount 는 아직 없다.
   // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1: role prefix 와 catalog key 동일.
   // 본 controller 는 cafe24-b2b 로 mount 되지 않는다 (Pilot 범위 밖 — §14).
@@ -108,7 +108,8 @@ function buildQrContentDisposition(title: string | null | undefined, slug: strin
   const raw = (title || '').trim();
   // 파일시스템 금지문자/제어문자 제거 + 공백 정리, 길이 제한
   const safe = (raw || `qr-${slug}`)
-    .replace(/[\\/:*?"<>|\x00-\x1f]/g, ' ')
+    .replace(/[\\/:*?"<>|]/g, ' ')
+    .split('').map(char => char.charCodeAt(0) < 0x20 ? ' ' : char).join('')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 80) || `qr-${slug}`;

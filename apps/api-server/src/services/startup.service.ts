@@ -1,9 +1,10 @@
+import { operatorInvitationRetentionJob } from '../jobs/operator-invitation-retention.job.js';
+import { communityNewsJob } from '../jobs/community-news.job.js';
 import { AppDataSource } from '../database/connection.js';
 // MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
 // settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
-import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
 import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
@@ -199,10 +200,9 @@ export class StartupService {
       // Settlement Scheduler removed (Phase 8-3 - legacy commerce)
       logger.info('✅ Settlement Scheduler skipped (legacy commerce removed)');
 
-      // WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1
-      // Auto-advance RECRUITING trials whose fundingEndAt has elapsed.
-      marketTrialLifecycleJob.start();
-      logger.info('✅ Market Trial Lifecycle Job started');
+      // Offline funding collection: no automatic date/target-based result transition.
+      // Funding result decisions are recorded by the operator.
+      logger.info('✅ Funding automatic result transitions disabled');
 
       // WO-O4O-SPD-REVISION-REQUEST-EXPIRY-SCHEDULER-V1
       // 공급자 STORE 설명서 수정 요청(revision_requested) 만료(due<now) 자동 hard delete — 매일(부팅+24h).
@@ -217,10 +217,12 @@ export class StartupService {
       // WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1
       // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
       privacyRetentionJob.start();
+      operatorInvitationRetentionJob.start();
       logger.info('✅ Privacy Retention Job started');
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
       // 종료일 도래 시 Store 공개표면 중단, 종료+7일 도래 시 반환 완료 건 파기 재시도.
+      communityNewsJob.start();
       storeOwnerTerminationJob.start();
       logger.info('✅ Store Owner Termination Job started');
     } catch (schedulerError) {
@@ -303,10 +305,12 @@ export class StartupService {
     try {
       // settlementScheduler removed (Phase 8-3 - legacy commerce)
       // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
-      marketTrialLifecycleJob.stop();
+      // No automatic funding lifecycle worker.
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();
+      operatorInvitationRetentionJob.stop();
+      communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {

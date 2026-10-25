@@ -185,9 +185,9 @@ export default function OpsMetricsDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ops Metrics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">운영 상태</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Platform operational health at a glance
+            서비스와 콘텐츠 게시의 운영 상태를 확인합니다.
           </p>
         </div>
         <div className="flex items-center gap-4">

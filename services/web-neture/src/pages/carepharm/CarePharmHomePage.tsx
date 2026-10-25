@@ -1,61 +1,69 @@
-import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import './carepharm-home.css';
+import { Link, useLocation } from 'react-router-dom';
+import { COOPERATION_EXTENSIONS, CooperationMemberSpace, ServiceHomeHero, type CooperationView } from '@o4o/shared-space-ui';
+import { CarePharmNotices } from './CarePharmNotices';
+import { CarePharmWorkspaces } from './CarePharmWorkspaces';
+import { requestServiceHandoff } from '@o4o/auth-react';
 import { useAuth, useLoginModal } from '../../contexts';
 import { api } from '../../lib/apiClient';
-import type { CommunityWorkspace } from '../community/CommunityWorkspacePage';
 
-/** A branded entry to an existing community, not a new membership or permission system. */
-export default function CarePharmHomePage() {
+const extension = COOPERATION_EXTENSIONS.carepharm;
+
+/** The member gate may remount this public slot after loading; restore its anchor then. */
+function MemberHomeNews() {
+  const { hash } = useLocation();
+  const section = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (hash === '#news') section.current?.scrollIntoView?.({ block: 'start' });
+  }, [hash]);
+  return <section ref={section} id="news" aria-labelledby="carepharm-member-news" className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5">
+    <h2 id="carepharm-member-news" className="mb-4 text-xl font-semibold">공지·안내</h2>
+    <CarePharmNotices />
+  </section>;
+}
+
+/** Public introduction stays available independently of the protected member workspace. */
+export default function CarePharmHomePage({ view = 'home' }: { view?: CooperationView }) {
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
-  const [workspace, setWorkspace] = useState<CommunityWorkspace | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [retry, setRetry] = useState(0);
+  const location = useLocation();
   useEffect(() => {
-    let active = true;
-    setLoading(true); setError(false); setWorkspace(null);
-    api.get('/communities').then((r: { data: { data: { communities: CommunityWorkspace[] } } }) => {
-      if (active) setWorkspace(r.data.data.communities.find(c => c.communityKey === 'carepharm' && c.kind === 'independent') ?? null);
-    }).catch(() => { if (active) setError(true); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [user?.id, retry]);
-
-  return <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
-    <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm"
-      title={['만성질환 관리,', '약국이 함께합니다']}
-      description={['만성질환 관리에 함께하는 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.']}
-      actions={!isAuthenticated && <button type="button" onClick={() => openLoginModal('/')} className="o4o-cta">로그인하기</button>} />
-
-    <section aria-labelledby="carepharm-activities" className="mt-12">
-      <h2 id="carepharm-activities" className="text-2xl font-semibold text-slate-900">함께 나누는 활동</h2>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {[
-          ['현장 경험', '약국에서 만나는 만성질환 관리 경험과 고민을 나눕니다.'],
-          ['자료 공유', '복약 상담과 지속적인 건강 관리에 도움이 되는 자료를 함께 살펴봅니다.'],
-          ['약국 협업', '참여 약국 간 교류를 이어가며 모임의 활동을 함께 만들어갑니다.'],
-        ].map(([title, description]) => <article key={title} className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="text-lg font-semibold text-teal-900">{title}</h3>
-          <p className="mt-3 leading-7 text-slate-600">{description}</p>
-        </article>)}
-      </div>
-    </section>
-
-    <ServiceHomePromotion surface="carepharm" client={api} />
-    <section aria-labelledby="carepharm-entry" className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <h2 id="carepharm-entry" className="text-2xl font-semibold text-slate-900">모임 참여</h2>
-      {loading ? <p role="status" className="mt-4 text-slate-600">모임 참여 안내를 확인하고 있습니다…</p>
-        : error ? <div className="mt-4"><p role="alert">모임 참여 안내를 불러오지 못했습니다.</p>
-          <button type="button" onClick={() => setRetry(n => n + 1)} className="mt-3 min-h-11 text-teal-800 underline">다시 시도</button></div>
-        : workspace ? <>
-          <p className="mt-4 text-slate-600">{workspace.allowed ? '참여 중인 모임에서 소식과 자료를 확인하세요.' : workspace.membershipStatus === 'pending' ? '참여 신청을 확인하고 있습니다. 승인 후 회원 활동을 이용할 수 있습니다.' : '모임 공간에서 참여 자격과 신청 절차를 확인하세요.'}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/communities/carepharm/forum" className="min-h-11 rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white">{workspace.allowed ? '모임 공간으로' : '참여 안내 보기'}</Link>
-            <Link to="/communities/carepharm/public" className="min-h-11 rounded-xl border border-teal-800 px-5 py-3 font-semibold text-teal-800">공개 소식 보기</Link>
-          </div>
-        </> : <p className="mt-4 text-slate-600">모임 참여 안내를 준비하고 있습니다. 안내가 열리면 이곳에서 확인하실 수 있습니다.</p>}
-    </section>
+    if (view === 'home' && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView?.();
+  }, [view, location.hash, location.key]);
+  const memberNews = <MemberHomeNews />;
+  const memberSpace = <CooperationMemberSpace model={extension.model} materialsGuide={extension.materials} client={api}
+    accountId={isAuthenticated ? user?.id : undefined} view={view} homeNews={isAuthenticated ? memberNews : undefined}
+    onLogin={() => openLoginModal(location.pathname + location.search)}
+    onEnterStore={() => requestServiceHandoff(api, {
+      workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(extension.model.storePath)}`,
+    })} />;
+  if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
+  if (isAuthenticated) return <div className="carepharm-home mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">
+    <header id="about" className="scroll-mt-24 border-b border-slate-200 pb-5">
+      <p className="text-sm font-semibold text-teal-700">CarePharm · 협력약국 공간</p>
+      <h1 className="mt-2 text-2xl font-semibold text-slate-900">함께 나누고, 내 약국에서 활용합니다</h1>
+      <p className="mt-3 text-sm text-slate-600">협업체 참여는 이곳에서 확인하고, 승인된 약국의 업무는 내 매장에서 이용합니다.</p>
+    </header>
+    {memberSpace}
+    <CarePharmWorkspaces />
+  </div>;
+  return <div className="carepharm-home">
+    <ServiceHomeHero surface="carepharm" client={api} eyebrow="CarePharm" title={['관리 자료와 현장 경험을,', '약국의 협업으로']} description={['사업자와 참여 약국이 만성질환 관리 자료와 현장 경험을 나누고, 내 약국에서 활용합니다.']} />
+    <div className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-8">
+      <section id="about" aria-labelledby="carepharm-about" className="scroll-mt-24">
+        <p className="text-sm font-semibold text-teal-700">CarePharm 소개</p>
+        <h2 id="carepharm-about" className="mt-2 text-2xl font-semibold text-slate-900">함께 나누고, 내 약국에서 활용합니다</h2>
+        <p className="mt-4 max-w-3xl leading-7 text-slate-600">만성질환관리 사업자와 가입 약국이 소식과 사업 자료를 함께 나누는 공동공간입니다. 협업체 참여는 이곳에서 신청하고, 승인된 약국의 업무는 내 매장에서 이용합니다.</p>
+        <Link to="/my/participation" className="mt-5 inline-flex rounded-lg bg-teal-800 px-5 py-3 text-sm font-semibold text-white">참여 안내 보기</Link>
+      </section>
+      <section id="news" aria-labelledby="carepharm-news" className="scroll-mt-24 border-t border-slate-200 pt-8">
+        <h2 id="carepharm-news" className="text-xl font-semibold text-slate-900">공지·안내</h2>
+        <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">협업체 운영자가 게시한 소식과 참여 안내를 확인하세요.</p>
+        <CarePharmNotices />
+      </section>
+      <CarePharmWorkspaces />
+      <section aria-label="회원 서비스" className="rounded-2xl border border-slate-200 bg-white">{memberSpace}</section>
+    </div>
   </div>;
 }

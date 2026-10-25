@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useState } from "react";
 import { Link, useLocation, useOutletContext } from "react-router-dom";
 import { BookOpen, Package, QrCode, BarChart3 } from "lucide-react";
@@ -62,13 +63,6 @@ function StoreHomeSession() {
       message: `상담 요청 ${signals.pendingTabletRequests}건 대기`,
       to: `${base}/requests`,
     });
-  if (signals?.pendingSalesRequests)
-    signalItems.push({
-      key: "sales",
-      tone: "violet",
-      message: `판매 요청 ${signals.pendingSalesRequests}건 대기`,
-      to: "/work/kpa-society/commerce/products",
-    });
   const metrics: StoreHomeMetricItem[] = [
     {
       key: "library",
@@ -86,7 +80,7 @@ function StoreHomeSession() {
     },
     {
       key: "products",
-      label: "진열 상품",
+      label: "진열 중인 O4O 제품",
       value: productCount ?? undefined,
       icon: <Package size={20} />,
     },
@@ -100,46 +94,19 @@ function StoreHomeSession() {
   return (
     <div className="max-w-[1100px]">
       <StoreHomeShell
-        title="내 매장 홈"
-        subtitle="할 일을 시작하고 선택한 매장의 현황을 확인하세요."
+        title="매장 대시보드"
+        subtitle="선택한 매장의 확인할 일과 이용 현황입니다."
         loading={loading}
         onRefresh={reload}
         statusSlot={
-          <section
-            className="mb-6 rounded-xl border border-teal-200 bg-teal-50 p-5"
-            aria-label="업무 시작"
-          >
-            <h2 className="text-lg font-semibold text-teal-950">
-              무엇을 하시겠어요?
-            </h2>
-            <p className="mt-2 text-sm text-teal-900">
-              상품을 찾고, 안내를 준비하거나 사용 중인 안내를 변경할 수
-              있습니다.
-            </p>
-            <nav
-              aria-label="매장 업무 시작"
-              className="mt-4 grid gap-3 sm:grid-cols-3"
-            >
-              {[
-                {
-                  label: "상품 찾기",
-                  to: product
-                    ? `${base}${product.subPath}`
-                    : `${base}/workspace/commerce`,
-                },
-                { label: "안내 준비", to: `${base}/workspace/studio` },
-                { label: "매장 안내 변경", to: `${base}/workspace/use` },
-              ].map((action) => (
-                <Link
-                  key={action.label}
-                  to={action.to}
-                  className="rounded-xl border border-teal-200 bg-white px-4 py-4 text-sm font-semibold text-teal-900 hover:border-teal-700"
-                >
-                  {action.label} →
-                </Link>
-              ))}
+          <>
+            <StoreAiSlot />
+            <nav aria-label="매장 빠른 작업" className="mb-4 flex flex-wrap gap-2 text-sm">
+              {product && <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}${product.subPath}`}>상품 보기</Link>}
+              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>매장 컨텐츠</Link>
+              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/use`}>운영 확인</Link>
             </nav>
-          </section>
+          </>
         }
         signalsSlot={
           <section
@@ -175,11 +142,11 @@ function StoreHomeSession() {
                 {signals &&
                   (signalItems.length ? (
                     <StoreHomeSignalList items={signalItems} />
-                  ) : (
+                  ) : Object.values(signals).some(value => value === 0) ? (
                     <p role="status" className="text-sm text-slate-500">
-                      조회된 주문·상담·판매 요청 대기 항목이 없습니다.
+                      확인된 업무에는 대기 항목이 없습니다.
                     </p>
-                  ))}
+                  ) : null)}
               </>
             )}
           </section>

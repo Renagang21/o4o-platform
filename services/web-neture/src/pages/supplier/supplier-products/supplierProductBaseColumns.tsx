@@ -21,28 +21,9 @@ function deriveSubmissionStatus(product: SupplierProduct): {
   bg: string;
   text: string;
 } {
-  // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링
-  const approvals = (product.serviceApprovals || []).filter((a) => a.serviceKey !== 'neture');
-
-  // offer-level APPROVED (legacy) 우선
-  if (product.approvalStatus === 'APPROVED') {
-    return APPROVAL_STATUS_BADGE.approved;
-  }
-
-  if (approvals.length === 0) {
-    return APPROVAL_STATUS_BADGE.none;
-  }
-
-  const hasRejected = approvals.some((a) => a.status === 'rejected');
-  if (hasRejected) {
-    return APPROVAL_STATUS_BADGE.rejected;
-  }
-
-  const allApproved = approvals.every((a) => a.status === 'approved');
-  if (allApproved) {
-    return APPROVAL_STATUS_BADGE.approved;
-  }
-
+  const status = product.approvalStatus.toLowerCase();
+  if (status === 'approved') return APPROVAL_STATUS_BADGE.approved;
+  if (status === 'rejected') return APPROVAL_STATUS_BADGE.rejected;
   return APPROVAL_STATUS_BADGE.pending;
 }
 
@@ -234,7 +215,7 @@ export const baseColumns: ListColumnDef<SupplierProduct>[] = [
   },
   {
     key: 'approvalStatus',
-    header: '승인',
+    header: '등록 승인',
     width: '90px',
     align: 'center',
     sortable: true,

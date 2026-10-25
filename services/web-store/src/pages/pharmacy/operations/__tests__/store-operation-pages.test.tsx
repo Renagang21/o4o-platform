@@ -24,7 +24,7 @@ beforeEach(() => {
   vi.resetAllMocks(); api.store = 'A';
   api.analytics.mockResolvedValue({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } });
   api.scans.mockResolvedValue({ success: true, data: [] }); api.assets.mockResolvedValue({ success: true, data: { total: 0, items: [] } });
-  api.products.mockResolvedValue({ success: true, data: [] }); api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 } });
+  api.products.mockResolvedValue({ success: true, data: [] }); api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0, availability: { newOrders: 'available', pendingTabletRequests: 'available' } } });
   api.list.mockImplementation(async () => ({ success: true, data: { items: [item('one', api.store)], total: 1 } }));
   api.update.mockImplementation(async (id: string, status: string) => ({ success: true, data: { snapshotId: id, publishStatus: status } }));
 });
@@ -33,11 +33,11 @@ it('home starts work before overview finishes and loads recent activity only whe
   let resolve!: (value: unknown) => void;
   api.analytics.mockReturnValueOnce(new Promise(r => { resolve = r; }));
   render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '안내 준비 →' })).toBeTruthy();
+  expect(screen.getByRole('link', { name: '매장 컨텐츠' })).toBeTruthy();
   expect(api.scans).not.toHaveBeenCalled();
   expect(screen.getByText(/매장 현황을 불러오는 중/)).toBeTruthy();
   await act(async () => resolve({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } }));
-  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
   fireEvent.click(screen.getByText('최근 QR 활동 보기'));
   await screen.findByText('최근 활동 기록이 없습니다');
   expect(api.scans).toHaveBeenCalledTimes(1);
@@ -59,10 +59,28 @@ it('home overview and optional activity failures have separate retries and never
 });
 it('home shortcuts preserve the selected service path without displaying all tools', async () => {
   render(<MemoryRouter initialEntries={['/work/kpa-society/store']}><StoreHomePage /></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '안내 준비 →' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
-  expect(screen.getByRole('link', { name: '매장 안내 변경 →' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/use');
+  expect(screen.getByRole('link', { name: '매장 컨텐츠' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
+  expect(screen.getByRole('link', { name: '운영 확인' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/use');
   expect(screen.queryByRole('link', { name: 'QR 배치·출력' })).toBeNull();
-  await screen.findByText('조회된 주문·상담·판매 요청 대기 항목이 없습니다.');
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
+});
+it('home preserves confirmed work while retrying one unavailable signal source', async () => {
+  api.signals.mockResolvedValueOnce({ success: true, data: { newOrders: 0, pendingTabletRequests: 3, availability: { newOrders: 'unavailable', pendingTabletRequests: 'available' } } });
+  render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
+  await screen.findByText('상담 요청 3건 대기');
+  expect(screen.getByRole('alert').textContent).toContain('주문 현황');
+  expect(screen.queryByText('확인된 업무에는 대기 항목이 없습니다.')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '현황 다시 시도' }));
+  await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
+  expect(screen.queryByRole('alert')).toBeNull();
+});
+it('home never declares empty work for an unconfirmed or legacy signal response', async () => {
+  api.signals.mockResolvedValue({ success: true, data: { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 } });
+  render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.getByRole('alert').textContent).toContain('주문 현황 · 상담 요청');
+  expect(screen.queryByText('확인된 업무에는 대기 항목이 없습니다.')).toBeNull();
+  expect(screen.getByRole('link', { name: '운영 확인' })).toBeTruthy();
 });
 it('publishing page reports load failure and recovers through the existing panel retry', async () => {
   api.list.mockRejectedValueOnce(Error('synthetic'));
@@ -110,11 +128,13 @@ it('store switch closes the old QR target and missing direct identity exposes no
   rerender(<MemoryRouter><StoreContentNextSteps /></MemoryRouter>);
   expect(screen.queryByRole('button', { name: '이 콘텐츠로 QR 만들기' })).toBeNull();
 });
-it('use landing retains the configured targets and distinguishes publishing from actual playback', () => {
+it('use landing keeps only permitted targets when execution capability is absent', async () => {
   const config = { basePath: '/work/kpa-society/store', menuSections: [{ items: [{ key: 'library-contents', label: '자료함', subPath: '/library/contents' }, { key: 'qr', label: 'QR', subPath: '/marketing/qr' }] }] };
-  render(<MemoryRouter initialEntries={['/use']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
-  fireEvent.click(screen.getByText('세부 업무'));
+  render(<MemoryRouter initialEntries={['/work/kpa-society/store/workspace/use']}><Routes><Route element={<Outlet context={{ config }} />}><Route path="/work/kpa-society/store/workspace/use" element={<StoreWorkspacePage area="use" />} /></Route></Routes></MemoryRouter>);
+  await screen.findByRole('heading', { name: 'QR' });
+  fireEvent.click(screen.getByText('배치·이용 현황 확인'));
+  expect(screen.queryByRole('link', { name: '위치별 저장 설정' })).toBeNull();
   expect(screen.getByRole('link', { name: /게시·활용 상태/ }).getAttribute('href')).toBe('/work/kpa-society/store/content');
   expect(screen.getByRole('link', { name: /QR 배치·출력/ }).getAttribute('href')).toContain('workspace=use');
-  expect(screen.getByText(/게시됨은 기기 연결·재생 완료/)).toBeTruthy();
+  expect(screen.queryByRole('navigation', { name: '상담 참고 자료' })).toBeNull();
 });

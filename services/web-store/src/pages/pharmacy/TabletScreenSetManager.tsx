@@ -114,6 +114,10 @@ interface Props {
    *   미지정이면 기존처럼 목록부터 시작한다. 세트를 못 찾으면 목록에 머물고 안내만 띄운다.
    */
   autoEditId?: string | null;
+  /** 같은 id 재요청을 구분하는 요청 식별자(누를 때마다 증가). 미지정이면 id 당 1회. */
+  autoEditKey?: number;
+  /** 자동 편집 요청을 소비(상세 조회 성공·실패 무관)했음을 알린다. 호출부는 요청을 비운다. */
+  onAutoEditHandled?: (key: number) => void;
 }
 
 export default function TabletScreenSetManager(props: Readonly<Props>) {
@@ -125,7 +129,7 @@ async function loadScreenSets() {
   if (!Array.isArray(sets)) throw new Error('Invalid screen sets');
   return sets;
 }
-function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId, isCurrent }: Props & { isCurrent: () => boolean }) {
+function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId, autoEditKey, onAutoEditHandled, isCurrent }: Props & { isCurrent: () => boolean }) {
   const onToast = useCallback((notice: Toast) => { if (isCurrent()) notify(notice); }, [notify, isCurrent]);
   const { data: sets, loading, error: listError, reload } = useStoreResource(loadScreenSets, []);
   const refresh = useCallback(() => { if (isCurrent()) void reload(); }, [isCurrent, reload]);
@@ -133,6 +137,8 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
   const sessions = useLatestStoreRequest();
   const [openingId, setOpeningId] = useState<string | null>(null);
   const mutation = useRef(false);
+  const savedHeader = useRef<ScreenSet | null>(null);
+  const [savedSet, setSavedSet] = useState<ScreenSet | null>(null);
   const [busy, setBusy] = useState(false);
 
   // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 인라인 생성/편집 UI → 단계형 제작 셸.
@@ -155,7 +161,15 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
     pool: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreProductPool(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
     qr: async () => { if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.'); const data = await fetchStoreQrOptions(); if (!builder.current()) throw new Error('편집 대상이 변경되었습니다.'); return data; },
   }), [builder]);
-  const builderApi = useMemo(() => createScreenSetSession({ ...defaultStoreBuilderReads, ...captureScreenSetWrites() }, builder?.current ?? (() => false)), [builder]);
+  const builderApi = useMemo(() => {
+    const session = createScreenSetSession({ ...defaultStoreBuilderReads, ...captureScreenSetWrites() }, builder?.current ?? (() => false));
+    const remember = async (operation: Promise<ScreenSet>) => {
+      const header = await operation;
+      if (builder?.current()) savedHeader.current = header;
+      return header;
+    };
+    return { ...session, create: (input: Parameters<typeof session.create>[0]) => remember(session.create(input)), update: (id: string, input: Parameters<typeof session.update>[1]) => remember(session.update(id, input)) };
+  }, [builder]);
   const closeBuilder = () => { sessions.cancel(); setBuilder(null); setMediaPickerTarget(null); };
 
   // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
@@ -176,6 +190,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
       if (!current() || !isCurrent()) return;
       if (detail.id !== id) throw new Error('Invalid screen set');
       const session = sessions.begin();
+      savedHeader.current = null; setSavedSet(null);
       setBuilder({ detail, current: () => session() && isCurrent() });
     } catch { if (current() && isCurrent()) onToast({ type: 'error', message: '화면 상세를 불러오지 못했습니다. 다시 수정 버튼을 눌러 주세요.' }); }
     finally { if (current() && isCurrent()) setOpeningId(null); }
@@ -185,23 +200,30 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
     if (mutation.current || !isCurrent()) return;
     edits.cancel(); setOpeningId(null);
     const session = sessions.begin();
+    savedHeader.current = null; setSavedSet(null);
     setBuilder({ detail: null, current: () => session() && isCurrent() });
   }, [edits, sessions, isCurrent]);
 
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1:
   //   QR 목록에서 넘어온 화면 세트 편집기를 1회만 자동 오픈한다(호출부가 history state 를 즉시 비우므로
   //   재마운트로 반복 열리지 않는다). 보관·삭제된 세트는 상세 조회가 404 → openEdit 이 안내 토스트만 띄운다.
-  const autoEditDone = useRef(false);
+  //   요청마다(autoEditKey) 한 번씩 처리한다 — 편집기를 닫은 뒤 같은 안내를 다시 요청해도 열린다.
+  const handledAutoEdit = useRef<string | null>(null);
   useEffect(() => {
-    if (!autoEditId || autoEditDone.current) return;
+    if (!autoEditId) return;
+    const key = autoEditKey ?? 0;
+    const request = `${key}:${autoEditId}`;
+    if (handledAutoEdit.current === request) return;
     let disposed = false;
     void Promise.resolve().then(async () => {
       if (disposed) return;
       await openEdit(autoEditId);
-      if (!disposed) autoEditDone.current = true;
+      if (disposed) return;
+      handledAutoEdit.current = request;
+      onAutoEditHandled?.(key);
     });
     return () => { disposed = true; edits.cancel(); };
-  }, [autoEditId, openEdit, edits]);
+  }, [autoEditId, autoEditKey, openEdit, edits, onAutoEditHandled]);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1: 사용자 문구 '보관' → '리스트에서 제거'(내부는 archived/soft-delete 그대로).
   const handleArchive = async (set: ScreenSet) => {
@@ -242,10 +264,17 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
   if (builder) {
     return (
       <>
+        {builder.detail && <p role="note" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          현재 사용 위치: {(usageBySet[builder.detail.id] ?? []).join(', ') || '없음'}. 저장하면 이 안내를 사용하는 화면과 공개 중인 기존 QR에도 변경 내용이 반영됩니다. 실제 기기 표시는 기기에서 확인하세요.
+        </p>}
         <TabletContentStepBuilder
           initialDetail={builder.detail}
           onCancel={closeBuilder}
-          onSaved={() => { if (isCurrent()) { if (builder.current()) closeBuilder(); void reload(); } }}
+          onSaved={() => {
+            if (!builder.current()) return;
+            setSavedSet(savedHeader.current ?? builder.detail);
+            closeBuilder(); void reload();
+          }}
           onToast={(notice) => { if (builder.current()) onToast(notice); }}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}
@@ -284,14 +313,10 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
-          <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
-          <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
-          <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(코너에서 사용/연결 중이면 먼저 해제해야 합니다).</p>
-        </div>
+        <p className="text-sm text-slate-600">안내를 만들거나 수정한 뒤 사용할 위치에 적용하세요. 같은 안내를 여러 위치에서 사용할 수 있습니다.</p>
 
         {openingId && <p role="status">화면 상세 불러오는 중… <button type="button" onClick={() => { edits.cancel(); setOpeningId(null); }}>불러오기 취소</button></p>}
-        {listError ? <div role="alert">{listError}<button type="button" onClick={() => void reload()} className="min-h-11 underline ml-2">다시 시도</button></div> : <TabletContentLibraryList
+        {listError ? <div role="alert">{savedSet && <p>“{savedSet.name}” 내용은 저장되었습니다. 목록을 다시 불러온 뒤 적용할 위치를 선택하세요.</p>}{listError}<button type="button" onClick={() => void reload()} className="min-h-11 underline ml-2">다시 시도</button></div> : <TabletContentLibraryList
           isCurrent={isCurrent}
           sets={sets}
           loading={loading}
@@ -309,7 +334,8 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
           onPreviewContext={onPreviewContext}
           tablets={tablets}
           onApplyToTablet={onApplyToTablet}
-          highlightId={highlightId}
+          highlightId={savedSet?.id ?? highlightId}
+          savedSet={savedSet}
         />}
       </div>
     </div>

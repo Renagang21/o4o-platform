@@ -25,32 +25,47 @@ const exists = (rel: string) => fs.existsSync(path.join(REPO_ROOT, rel));
 
 /** Store-facing 화면 — WO1~3 census 합집합(일반 콘텐츠 4 · 제작 자료 2 · 목적별 13, 중복 제거) */
 const STORE_FILES = [
-  // KPA
-  'services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/PharmacyPopPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx',
-  'services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx',
+  // Store (store.neture.co.kr — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면 제거 후 정본)
+  'services/web-store/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
+  'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
+  'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
+  'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreLocalProductsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
+  'services/web-store/src/pages/pharmacy/productionTargets.tsx',
+  'services/web-store/src/pages/pharmacy/StoreLibraryContentsPage.tsx',
+  'services/web-store/src/pages/pharmacy/StoreQRPage.tsx',
 ];
 
 /** 이번 WO 에서 건드리지 않는 non-Store AI 소비처(대표) — 존재 + AI 연결 유지 */
 const NON_STORE_AI_FILES = [
-  'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx', // Community(/content/*) — 이름만 Store 아님
-  'services/web-kpa-society/src/pages/forum/ForumWritePage.tsx',
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 Community 작성 화면(ContentWritePage · ForumWritePage)은 제거됐다.
   // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: KPA/PH 강사 화면 은퇴 → Lecture 강사 화면(공통 편집기 기본 AI 유지)
   'services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx',
 ];
 
-const QR_PAGE = 'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
+const QR_PAGE = 'services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
 const AI_ROUTES = 'apps/api-server/src/routes/ai-proxy.routes.ts';
+const PRODUCT_ASSIST = 'services/web-store/src/components/product-description/ProductDescriptionAssist.tsx';
+function externalSources(src: string): string[] {
+  const sources = src.includes('<LlmAssistPanel') ? [src] : [];
+  if (src.includes('<ProductDescriptionAssist')) {
+    expect(src).toMatch(/import \{[^}]*ProductDescriptionAssist[^}]*\} from ['"][^'"]*product-description\/ProductDescriptionAssist['"]/);
+    const wrapper = read(PRODUCT_ASSIST);
+    expect(wrapper).toContain('<LlmAssistPanel');
+    expect(wrapper).toContain('buildStoreContentAuthoringPrompt(');
+    expect(wrapper).toContain('onApplyHtml={onApplyHtml}');
+    expect(wrapper).not.toMatch(/fetch\(|apiClient\.|authClient\.|\/api\/ai\//);
+    sources.push(wrapper);
+  }
+  expect(sources.length).toBeGreaterThan(0);
+  return sources;
+}
+
 
 describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (A) Store dead aiRequestHeaders 0', () => {
   for (const rel of STORE_FILES) {
@@ -85,9 +100,12 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (B) QR 페이지 legacy 내
     expect(src).not.toContain("from '../../contexts/AuthContext'");
   });
   it('외부 LLM 경로 존재 — LlmAssistPanel + Prompt Core task=qr + 결과→편집기(자동 저장/QR 없음)', () => {
-    expect(src).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
+    for (const entry of externalSources(src)) {
+      expect(entry).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
+      expect(entry).toContain('label={STORE_LLM_ASSIST_LABEL}');
+      expect(entry).toContain('buildStoreContentAuthoringPrompt(');
+    }
     expect(src).toContain("task: 'qr'");
-    expect(src).toContain('label={STORE_LLM_ASSIST_LABEL}');
     expect(src).toContain('onApplyHtml={handleExternalApply}');
     const apply = src.slice(src.indexOf('const handleExternalApply'), src.indexOf('// 콘텐츠 저장(없으면 생성)'));
     expect(apply).not.toMatch(/ensureContentSaved|createQr\(|handleUpdate|handleSaveAndCreate|apiClient\.post/);
@@ -151,7 +169,7 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (D) Store AiContentModal / 
     });
   }
   it('productionTargets — dead AiContentModal 진입 매핑(PRODUCTION_TARGET_TO_AI_MODE · AiModeForProduction) 제거', () => {
-    const src = read('services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx');
+    const src = read('services/web-store/src/pages/pharmacy/productionTargets.tsx');
     expect(src).not.toMatch(/export (const|type) (PRODUCTION_TARGET_TO_AI_MODE|AiModeForProduction)\b/);
     expect(src).not.toMatch(/productionTargetToAiMode\s*\(/);
   });
@@ -200,9 +218,11 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (F) 통합 내 매장(servi
     const violations: string[] = [];
     for (const rel of editorFiles) {
       const src = read(rel);
-      if (!/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/.test(src)) violations.push(`${rel}: LlmAssistPanel import`);
-      if (!/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/.test(src)) violations.push(`${rel}: Prompt Core import`);
-      if (!src.includes('label={STORE_LLM_ASSIST_LABEL}')) violations.push(`${rel}: 라벨`);
+      for (const entry of externalSources(src)) {
+        if (!/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/.test(entry)) violations.push(`${rel}: LlmAssistPanel import`);
+        if (!/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/.test(entry)) violations.push(`${rel}: Prompt Core import`);
+        if (!entry.includes('label={STORE_LLM_ASSIST_LABEL}')) violations.push(`${rel}: 라벨`);
+      }
       if (src.includes('[결과 조건]') || src.includes('HTML 만 반환')) violations.push(`${rel}: Prompt 전문 복사본`);
     }
     expect(violations).toEqual([]);
@@ -226,10 +246,9 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (E) non-Store · content-ed
       expect(src).not.toContain('showInternalAi={false}');
     }
   });
-  it('ContentWritePage 는 Community 화면(/content/* · CommunityContentWriteShell)이라 Store 대상이 아니다', () => {
-    const src = read('services/web-kpa-society/src/pages/contents/ContentWritePage.tsx');
-    expect(src).toContain('CommunityContentWriteShell');
-    expect(read('services/web-kpa-society/src/App.tsx')).toMatch(/path="\/content\/documents\/new"[^\n]*<ContentWritePage/);
+  it('KPA 옛 Community 작성 화면(ContentWritePage)은 제거됐다 — /content/* route 없음 (D7)', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx'))).toBe(false);
+    expect(read('services/web-kpa-society/src/App.tsx')).not.toContain('<ContentWritePage');
   });
   it('aiDescription read 경로 불변 — store-qr.service · store-library-feed.controller · QrLandingPage', () => {
     expect(read('apps/api-server/src/services/store/store-qr.service.ts')).toContain("aiDescription");

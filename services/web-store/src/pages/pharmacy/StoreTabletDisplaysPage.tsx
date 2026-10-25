@@ -1,3 +1,6 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
+import { hasStoreOperationEntry, readStoreOperationEntry, type StoreOperationEntry } from './operations/storeOperationEntry';
+import { StoreOperationReturn } from './operations/StoreExecutionActions';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -68,7 +71,6 @@ import TabletScreenSetManager from './TabletScreenSetManager';
 import { templateLabel, TabletCornerBoard, cornerPrimaryLabel } from '@o4o/tablet-screen-set-editor';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
-import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 카드에서 바로 여는 '화면 바꾸기'(1동작 교체).
 import TabletCornerSwapModal from './TabletCornerSwapModal';
 
@@ -114,6 +116,9 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   const navigate = useNavigate();
   const location = useLocation();
   const base = storeWorkspaceBase(location.pathname);
+  const { key: operationScope } = useStoreOperationScope();
+  const operationEntry = readStoreOperationEntry(location.state, operationScope, base, 'tablet');
+  const consumedEntry = useRef<StoreOperationEntry | null>(null);
 
   // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 두 업무를 탭으로 분리.
   //   'corners'  = 코너별 운영(코너 선택 → 현재 콘텐츠 · 교체 · 화면 열기)
@@ -136,7 +141,22 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
     if (mode === 'use') setActiveTab('corners');
   }, [location.search]);
   const [highlightScreenSetId] = useState<string | null>(navState?.highlightScreenSetId ?? null);
-  const [autoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
+  // 편집 요청은 누를 때마다 새 key 를 받는다. 같은 안내 재편집·다른 위치에서 같은 안내 편집도 매번 처리되고,
+  // 편집기가 요청을 소비하면(onAutoEditHandled) 비워서 탭 재진입 때 다시 열리지 않는다.
+  const autoEditSeq = useRef(0);
+  const [autoEditRequest, setAutoEditRequest] = useState<{ id: string; key: number } | null>(
+    navState?.editScreenSetId ? { id: navState.editScreenSetId, key: 0 } : null,
+  );
+  const requestScreenSetEdit = (id: string) => {
+    autoEditSeq.current += 1;
+    setAutoEditRequest({ id, key: autoEditSeq.current });
+    setActiveTab('contents');
+    // 탭 버튼과 같은 URL 모드로 맞춘다 — 그래야 '위치별 운영'(use)으로 다시 돌아갈 수 있다.
+    navigate(withWorkspaceMode(`${location.pathname}${location.search}`, 'studio'), { state: location.state });
+  };
+  const handleAutoEditHandled = useCallback((key: number) => {
+    setAutoEditRequest((request) => (request?.key === key ? null : request));
+  }, []);
   // 소비 후 history state 제거(새로고침·뒤로가기 시 재트리거 방지).
   useEffect(() => {
     if (navState?.tab || navState?.highlightScreenSetId || navState?.editScreenSetId) {
@@ -151,6 +171,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   //   legacy 값은 세트가 적용되지 않은 코너(current_screen_set_id 없음)의 fallback 경로에서만 화면을 결정하므로
   //   제거하지 않고 보존한다.
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [advancedPanel, setAdvancedPanel] = useState<'common' | 'idle' | 'settings' | 'products'>('idle');
 
   // Tablet state
   const {
@@ -189,7 +210,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
       })
       .catch(() => { /* 코너 카드 부가정보 실패는 무시(카드 자체는 표시) */ });
     return () => { cancelled = true; };
-  }, [tablets.length]);
+  }, [tablets.length, activeTab]);
   useEffect(() => {
     if (!showGuide) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowGuide(false); };
@@ -285,7 +306,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   const publicTabletUrl = (tabletId: string): string => {
     // 공개 태블릿 경로는 서비스 앱이 서빙한다(store 호스트에는 /tablet 없음) — URL-FIRST-CENSUS §7-6
-    const base = getActiveServicePublicOrigin();
+    const base = window.location.origin;
     return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
   };
 
@@ -447,6 +468,14 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
   const [swapCorner, setSwapCorner] = useState<{ tabletId: string; name: string } | null>(null);
+  useEffect(() => {
+    if (!operationEntry || consumedEntry.current === operationEntry || loadingTablets || tabletListError || !isCurrent()) return;
+    const target = tablets.find(tablet => tablet.id === operationEntry.id);
+    if (!target) return;
+    consumedEntry.current = operationEntry;
+    setActiveTab('corners'); setSelectedTabletId(target.id);
+    setSwapCorner({ tabletId: target.id, name: cornerPrimaryLabel(target) });
+  }, [operationEntry, tablets, loadingTablets, tabletListError, isCurrent]);
   // §3: 미리보기 모달 보기 전환(태블릿=넓게 / 휴대전화=390px).
   const [previewView, setPreviewView] = useState<'tablet' | 'mobile'>('tablet');
 
@@ -703,6 +732,9 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   return (
     <div className="space-y-6">
       <StoreWorkflowNavigation subject="태블릿" />
+      <StoreOperationReturn entry={operationEntry} />
+      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.</p>}
+      {operationEntry && !loadingTablets && !tabletListError && !tablets.some(tablet => tablet.id === operationEntry.id) && <p role="alert" className="text-sm text-amber-800">선택한 위치를 현재 목록에서 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void loadTablets()}>위치 다시 확인</button></p>}
       {previewLoading && <p role="status">고객 화면 불러오는 중… <button type="button" onClick={handleClosePreview} className="min-h-11 underline">미리보기 불러오기 취소</button></p>}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -740,6 +772,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
         </div>
       </div>
 
+      <StoreAiSlot label="태블릿 안내" />
       {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 상단 탭 — 코너별 운영 / 태블릿 콘텐츠 */}
       <div className="flex gap-1 border-b border-slate-200">
         {([
@@ -926,6 +959,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                     {pairingBusyId === t.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Link2 className="w-3 h-3" />} 태블릿 연결
                   </button>
                 </div>
+                {t.currentScreenSetId && <button type="button" onClick={(event) => { event.stopPropagation(); requestScreenSetEdit(t.currentScreenSetId!); }} className="mt-2 min-h-11 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm font-semibold text-teal-800">현재 안내 수정</button>}
                 {list.length > 0 && (
                   <ul className="mt-1.5 space-y-0.5">
                     {list.map((d) => (
@@ -1117,6 +1151,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
               {/* WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너 = 연결(store_tablet_corner_contents) 기반.
                   연결 목록 · 현재 사용 중 · 빠른 교체 · 순서 · 연결 추가/해제. 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭. */}
+              {selectedTablet?.currentScreenSetId && <button type="button" onClick={() => requestScreenSetEdit(selectedTablet.currentScreenSetId!)} className="min-h-11 w-full rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white">현재 안내 수정</button>}
               {selectedTabletId && (
                 <TabletCornerContentsPanel
                   tabletId={selectedTabletId}
@@ -1149,6 +1184,11 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
               {showAdvanced && (
               <>
+              <nav aria-label="태블릿 상세 설정 항목" className="flex flex-wrap gap-2">
+                {([['idle', '대기 화면'], ['settings', '화면 설정'], ['products', '상품 진열'], ['common', '공통 영상']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={advancedPanel === key} onClick={() => setAdvancedPanel(key)} className={`min-h-11 rounded-lg border px-3 text-sm ${advancedPanel === key ? 'border-teal-700 bg-teal-50 text-teal-800' : 'bg-white'}`}>{label}</button>)}
+              </nav>
+              <div hidden={advancedPanel !== 'common'}>
+
           {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
           {selectedTabletId && (
             <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
@@ -1194,6 +1234,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              </div>
           {/* Loading pool */}
           {loadingPool && (
             <div className="flex items-center justify-center py-12">
@@ -1202,6 +1243,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              <div hidden={advancedPanel !== 'idle'}>
           {/* Idle Playlist Editor (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) */}
           {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -1252,6 +1294,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             </div>
           )}
 
+              </div><div hidden={advancedPanel !== 'settings'}>
           {/* 전시 설정 (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통 */}
           {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -1332,6 +1375,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
           )}
 
           {settingsLoadError && <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{settingsLoadError}<button type="button" className="ml-3 underline" onClick={() => setSettingsRetry(value => value + 1)}>다시 시도</button></div>}
+              </div><div hidden={advancedPanel !== 'products'}>
           {/* Editor */}
           {!loadingPool && pool && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1586,7 +1630,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
               </div>
             </div>
           )}
-              </>
+              </div></>
               )}{/* /고급 설정 (WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1) */}
             </div>{/* /우측: 선택 코너 현재 구성 */}
           </div>{/* /위치·코너 2단 그리드 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}
@@ -1598,7 +1642,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
       {activeTab === 'contents' && (
         <div className="space-y-3">
           <p className="text-sm text-slate-500">
-            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 연결·교체는 <b>코너별 운영</b> 탭에서 합니다.
+            고객에게 보여줄 안내를 준비합니다. 저장한 뒤 바로 사용할 위치를 선택할 수 있습니다.
           </p>
           <TabletScreenSetManager
             onToast={setToast}
@@ -1609,7 +1653,9 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             onApplyToTablet={handleApplyToTablet}
             highlightId={highlightScreenSetId}
             // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1: QR 목록 → 해당 화면 세트 편집기 직행.
-            autoEditId={autoEditScreenSetId}
+            autoEditId={autoEditRequest?.id ?? null}
+            autoEditKey={autoEditRequest?.key}
+            onAutoEditHandled={handleAutoEditHandled}
           />
         </div>
       )}

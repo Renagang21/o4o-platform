@@ -17,7 +17,7 @@ import { resolveApprovedStoreMemberOrganization } from '../../../utils/store-mem
  *   하되 source 미발견 (SOURCE_NOT_FOUND) 으로 처리된다.
  *
  * Uses Core Controller Factory with KPA-specific config:
- * - Roles: kpa:admin, kpa:operator, kpa:pharmacist, kpa:store_owner
+ * - Roles: kpa:admin, kpa:operator, kpa:store_owner
  * - Org: selected authorized store, with legacy KPA membership fallback
  * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents content/resource + blog placeholder)
  * - Asset types: cms, signage, lesson, content, resource, blog (placeholder)
@@ -43,7 +43,7 @@ export function createAssetSnapshotController(
     // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
     //   가져온다. 조직은 선택 매장을 반영하는 KPA 어댑터와 내 매장 신청 원장이 확정한다.
-    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner', 'kpa:store_member'],
+    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:store_owner', 'neture:store_owner', 'kpa:store_member'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),
     noOrgErrorCode: 'NO_ORGANIZATION',

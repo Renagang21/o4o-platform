@@ -23,6 +23,7 @@ import { StoreCapabilityService } from '../../../modules/store-core/services/sto
 import { getCapabilityMeta } from '@o4o/capabilities';
 // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change endpoint reuses existing core service.
 import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
+import { loadStoreLiveSignals } from './store-hub-live-signals.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -706,46 +707,7 @@ export function createStoreHubController(
     optionalAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const organizationId = req.organizationId;
-        const userId = req.user?.id;
-
-        const signals = {
-          newOrders: 0,
-          pendingTabletRequests: 0,
-          pendingSalesRequests: 0,
-          surveyRequests: 0,
-        };
-
-        // 1. Unfulfilled paid orders — action signal, not daily stat
-        if (organizationId) {
-          try {
-            const rows = await dataSource.query(
-              `SELECT COUNT(*)::int AS count
-               FROM checkout_orders
-               WHERE "sellerOrganizationId" = $1
-                 AND status = 'paid'`,
-              [organizationId]
-            );
-            signals.newOrders = rows[0]?.count || 0;
-          } catch { /* checkout_orders may not exist */ }
-        }
-
-        // 2. Pending tablet interest requests
-        // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: tablet_service_requests → tablet_interest_requests
-        if (organizationId) {
-          try {
-            const rows = await dataSource.query(
-              `SELECT COUNT(*)::int AS count
-               FROM tablet_interest_requests
-               WHERE organization_id = $1
-                 AND status = 'REQUESTED'`,
-              [organizationId]
-            );
-            signals.pendingTabletRequests = rows[0]?.count || 0;
-          } catch { /* table may not exist */ }
-        }
-
-        // pendingSalesRequests · surveyRequests 는 출처 테이블이 없어 기본값(0)을 유지한다.
+        const signals = await loadStoreLiveSignals(dataSource, req.organizationId);
 
         res.json({ success: true, data: signals });
       } catch (error: any) {

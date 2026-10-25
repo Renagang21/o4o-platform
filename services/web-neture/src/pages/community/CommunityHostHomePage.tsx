@@ -1,39 +1,204 @@
-import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../../lib/apiClient';
-import { useAuth } from '../../contexts';
-import type { CommunityWorkspace } from './CommunityWorkspacePage';
+import { ServiceHomeHero, ServiceHomePromotion } from "@o4o/shared-space-ui";
+import { api } from "../../lib/apiClient";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts";
+import {
+  homeApi,
+  newsSourceName,
+  itemHref,
+  SECTION_NAMES,
+  SECTION_PATHS,
+  type CommunityHome,
+  type HomeItem,
+  type EditorialKind,
+} from "./communityHomeApi";
 
+export function PreviewItems({
+  items,
+  section,
+  member,
+  pinned = false,
+}: Readonly<{
+  items: HomeItem[];
+  section: EditorialKind | "forum";
+  member: boolean;
+  pinned?: boolean;
+}>) {
+  return (
+    <ul className="divide-y divide-slate-100">
+      {items.map((item) => (
+        <li key={item.id} className="py-3">
+          <div className="flex items-start gap-2">
+            {pinned && (
+              <span className="shrink-0 rounded bg-emerald-50 px-2 py-1 text-xs text-emerald-800">
+                상시 노출
+              </span>
+            )}
+            <a
+              href={itemHref(item, section, member)}
+              {...(section === "news"
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+              className="min-w-0 break-words font-medium text-slate-900 hover:text-emerald-700"
+            >
+              {item.title}
+              {section === "news" ? " ↗" : ""}
+            </a>
+            {section === "news" &&
+              item.newsRecommendation?.recommended === true && (
+                <span className="shrink-0 rounded bg-sky-50 px-2 py-1 text-xs text-sky-800">
+                  AI 추천
+                </span>
+              )}
+          </div>
+          {(item.summary || item.excerpt) && (
+            <p className="mt-1 line-clamp-2 break-words text-sm text-slate-600">
+              {item.summary || item.excerpt}
+            </p>
+          )}
+          <p className="mt-1 text-xs text-slate-500">
+            {section === "news" && `${newsSourceName(item.linkUrl)} · `}
+            {section !== "news" && item.boardName && `${item.boardName} · `}
+            {new Date(item.createdAt).toLocaleDateString("ko-KR")}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+function HomeSection({
+  section,
+  data,
+}: Readonly<{
+  section: EditorialKind | "forum";
+  data: CommunityHome;
+}>) {
+  const preview = data[section];
+  return (
+    <section
+      aria-label={SECTION_NAMES[section]}
+      className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6"
+    >
+      <header className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-slate-900">
+          {SECTION_NAMES[section]}
+        </h2>
+        <Link
+          to={
+            section === "forum" && !data.member
+              ? "/communities/community/public"
+              : SECTION_PATHS[section]
+          }
+          className="min-h-11 content-center text-sm text-emerald-700"
+        >
+          {SECTION_NAMES[section]} 바로가기 →
+        </Link>
+      </header>
+      <PreviewItems
+        items={preview.pinned}
+        section={section}
+        member={data.member}
+        pinned
+      />
+      {!!preview.recent.length && (
+        <>
+          <h3 className="mt-3 text-xs font-semibold text-slate-500">
+            최근 항목
+          </h3>
+          <PreviewItems
+            items={preview.recent}
+            section={section}
+            member={data.member}
+          />
+        </>
+      )}
+      {!preview.pinned.length && !preview.recent.length && (
+        <p className="py-5 text-sm text-slate-500">
+          현재 열람 가능한 항목이 없습니다.
+        </p>
+      )}
+      {section === "news" && (
+        <a
+          href="https://www.kpanews.co.kr/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-block min-h-11 content-center text-sm text-emerald-700"
+        >
+          약사공론 바로가기 ↗
+        </a>
+      )}
+    </section>
+  );
+}
 export default function CommunityHostHomePage() {
   const { user } = useAuth();
-  const [rows, setRows] = useState<CommunityWorkspace[]>([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [retry, setRetry] = useState(0);
+  const [data, setData] = useState<CommunityHome | null>(null),
+    [error, setError] = useState(false),
+    [retry, setRetry] = useState(0);
   useEffect(() => {
     let active = true;
-    setError(''); setRows([]); setLoading(true);
-    api.get('/communities').then((r: { data: { data: { communities: CommunityWorkspace[] } } }) => { if (active) setRows(r.data.data.communities); })
-      .catch(() => { if (active) setError('커뮤니티 목록을 불러오지 못했습니다.'); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    setData(null);
+    setError(false);
+    homeApi
+      .home()
+      .then((result) => {
+        if (active) setData(result);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      });
+    return () => {
+      active = false;
+    };
   }, [user?.id, retry]);
-  return <div className="mx-auto max-w-6xl px-4 py-8">
-    <h1 className="text-2xl font-semibold">커뮤니티 · 단체활동</h1>
-    <div className="mt-6"><ServiceHomeHero surface="community" client={api} heading="h2" /></div>
-    {loading && <output aria-live="polite" className="mt-6">커뮤니티 목록을 확인하고 있습니다…</output>}
-    {error && <div className="mt-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)} className="mt-3 text-blue-700">다시 시도</button></div>}
-    <ul className="mt-6 divide-y border-y">
-      {rows.filter(c => c.kind === 'independent').map(c => <li key={c.communityKey} className="py-2">
-        <Link to={`/communities/${encodeURIComponent(c.communityKey)}/forum`} className="flex justify-between gap-4 py-4">
-          <span><strong className="block">{c.name}</strong><span className="text-sm text-slate-600">{c.allowed ? '참여 가능' : c.membershipStatus === 'pending' ? '승인 대기' : '이용 자격 확인'}</span></span><span aria-hidden>→</span>
-        </Link>
-        <Link to={`/communities/${encodeURIComponent(c.communityKey)}/public`} className="mb-2 inline-block min-h-11 text-sm text-blue-700">공개 게시글 보기 →</Link>
-      </li>)}
-    </ul>
-    {!loading && !error && !rows.some(c => c.kind === 'independent') && <p className="mt-4">등록된 커뮤니티가 없습니다.</p>}
-    <ServiceHomePromotion surface="community" client={api} />
-    <Link to="/mypage/communities" className="mt-6 inline-block text-sm text-blue-700">커뮤니티 개설 신청 · 운영</Link>
-  </div>;
+  return (
+    <main>
+      <h1 className="sr-only">커뮤니티</h1>
+      <ServiceHomeHero surface="community" client={api} heading="h2" />
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
+        {!data && !error && (
+          <output className="block">커뮤니티 소식을 불러오고 있습니다…</output>
+        )}
+        {error && (
+          <div role="alert" className="rounded-xl border bg-white p-5">
+            소식을 불러오지 못했습니다.{" "}
+            <button
+              type="button"
+              onClick={() => setRetry((n) => n + 1)}
+              className="min-h-11 text-emerald-700"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
+        {data && (
+          <>
+            <div className="grid items-start gap-6 md:grid-cols-2">
+              <HomeSection section="notice" data={data} />
+              <HomeSection section="news" data={data} />
+            </div>
+            <HomeSection section="forum" data={data} />
+            <HomeSection section="content" data={data} />
+            <HomeSection section="resource" data={data} />
+            <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
+              <ServiceHomePromotion surface="community" client={api} />
+            </aside>
+            {!data.member && (
+              <aside className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
+                공개 항목을 둘러볼 수 있습니다. 회원 전용 자료와 글쓰기는{" "}
+                <Link
+                  to="/communities/community/forum"
+                  className="font-medium text-emerald-700 underline"
+                >
+                  로그인·가입 및 이용 상태 확인
+                </Link>{" "}
+                후 이용해 주세요.
+              </aside>
+            )}
+          </>
+        )}
+      </div>
+    </main>
+  );
 }

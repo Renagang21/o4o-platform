@@ -1,3 +1,4 @@
+import { parsePharmacyCollaboratorRole } from '@o4o/types';
 /**
  * 운영자 등록 화면 계약 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §16·§17·§21
  *
@@ -50,9 +51,14 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
   it('모든 역할은 자신이 속한 서비스 prefix 를 갖는다', () => {
     for (const [serviceKey, options] of Object.entries(ASSIGNABLE_ROLES)) {
       for (const opt of options) {
-        expect(opt.value.split(':')[0]).toBe(serviceKey);
+        expect(parsePharmacyCollaboratorRole(opt.value)?.businessKey ?? opt.value.split(':')[0]).toBe(serviceKey);
       }
     }
+  });
+
+  it.each(['pharmacy','carepharm','megapharm','pharmcoop'])('%s는 두 운영 역할이 있고 타 사업 역할을 포함하지 않는다', key => {
+    expect(ASSIGNABLE_ROLES[key].map(option => option.value)).toEqual([`neture:${key}_admin`, `neture:${key}_operator`]);
+    expect(ASSIGNABLE_ROLES[key].map(option => option.label)).toEqual(['Admin', 'Operator']);
   });
 
   it('역할 값에 중복이 없다', () => {

@@ -70,7 +70,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
+describe('로그인 전 — 공개 서비스 우선', () => {
   it('AI 입력 → 전체 서비스 → 소식 순서로 표시한다', () => {
     mount();
     expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
@@ -82,7 +82,7 @@ describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
     const groups = ['약국 협력사업 참여', '약국 경영·공급 활동', '커뮤니티·단체활동', '제품·유통 사업 참여', '기타'];
     const links = groups.flatMap(linksOf);
     expect(links.map(l => l.href)).toEqual([
-      'https://pharmacy.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
+      'https://pharmacy.neture.co.kr/', 'https://carepharm.neture.co.kr/', 'https://pharmcoop.neture.co.kr/', 'https://megapharm.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
       'https://community.neture.co.kr', 'https://kpa.neture.co.kr/', 'https://study.neture.co.kr/',
       'https://funding.neture.co.kr/', '/services/partner', '/hospital',
     ]);
@@ -94,9 +94,9 @@ describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
     }
   });
 
-  it('Google 시작 CTA 하나 · 우상단 로그인 하나 — 회원가입 버튼 없음 (같은 Google 흐름)', () => {
+  it('로그인은 모달을 열고 회원가입은 가입 화면으로 직접 연결한다', () => {
     mount();
-    expect(screen.queryByRole('button', { name: '회원가입' })).toBeNull();
+    expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('/signup');
     fireEvent.click(screen.getByTestId('home-google-start'));
     fireEvent.click(screen.getByTestId('home-login-button'));
     expect(openLoginModal).toHaveBeenCalledTimes(2);
@@ -107,6 +107,7 @@ describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
     auth.isLoading = true;
     mount();
     expect(screen.queryByTestId('home-google-start')).toBeNull();
+    expect(before(document.querySelector('.home-hero-frame')!, screen.getByTestId('home-composer'))).toBe(true);
   });
 
   it('비로그인 AI 제출은 실행하지 않고 로그인으로 보낸다 · 첫 사용 안내는 보이지 않는다', () => {
@@ -125,12 +126,12 @@ describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
   });
 });
 
-describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
+describe('로그인 후 — 가입 서비스 우선', () => {
   beforeEach(() => {
     Object.assign(auth, { user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] }, isAuthenticated: true });
   });
 
-  it('워드마크 → 무엇을 도와드릴까요 → Composer → HomeEntryPanel', () => {
+  it('AI 입력 → 가입 서비스 → 탐색', () => {
     mount();
     const prompt = screen.getByText('무엇을 도와드릴까요?', { selector: 'p' });
     expect(before(prompt, screen.getByTestId('home-composer'))).toBe(true);
@@ -160,14 +161,21 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
   expect(screen.getByRole("heading", { name: "전체 서비스" })).toBeTruthy();
   expect(screen.queryByTestId("entry-panel")).toBeNull();
   expect(screen.queryByTestId("home-composer")).toBeNull();
+  expect(before(document.querySelector(".home-hero-frame")!, screen.getByRole("heading", { name: "O4O AI" }))).toBe(true);
   expect(screen.queryByTestId("home-google-start")).toBeNull();
   expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
 });
 
 
-it('keeps the anonymous AI composer before the added service Hero', () => {
+it.each([false, true])('places a single full-width Hero, then AI and services (authenticated=%s)', (signedIn) => {
+  if (signedIn) Object.assign(auth, {user:{id:'synthetic',name:'샘플',roles:[]}, isAuthenticated:true});
   mount();
-  const hero = document.querySelector('main .home-presentation');
+  const hero = document.querySelector('.home-hero-frame');
+  expect(document.querySelectorAll('.home-hero-frame')).toHaveLength(1);
   expect(hero).toBeTruthy();
-  expect(before(screen.getByTestId('home-composer'), hero!)).toBe(true);
+  expect(before(hero!, screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
+  expect(screen.getByRole('heading', { level: 2, name: 'O4O AI' })).toBeTruthy();
+  expect(before(hero!, screen.getByTestId('home-composer'))).toBe(true);
+  if (signedIn) expect(before(screen.getByTestId('home-composer'), screen.getByTestId('entry-panel'))).toBe(true);
+  expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
 });

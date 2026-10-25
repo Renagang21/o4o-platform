@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useId,
   useRef,
   useState,
@@ -8,7 +9,6 @@ import {
 } from "react";
 import {
   HOME_SURFACE_INFO,
-  initialHomePresentation,
   parseHomePresentation,
   safeHomeUrl,
   visibleHomePresentation,
@@ -16,6 +16,7 @@ import {
   type HomePresentation,
 } from "@o4o/types";
 import "./home-presentation.css";
+import { HeroArtwork, heroIdentity, initialIdentityPresentation } from "./HomeHeroIdentity";
 
 export interface HomePresentationClient {
   get: (url: string) => Promise<{ data: { success: boolean; data: any } }>;
@@ -28,7 +29,12 @@ export function homePresentationPath(
   surface: HomeSurface,
   branchSlug?: string,
   businessKey?: string,
+  cooperativeSlug?: string,
 ) {
+  if (surface === "cooperative") {
+    if (!cooperativeSlug) throw new Error("협동조합을 먼저 선택해 주세요.");
+    return `/home-presentation/cooperative/${encodeURIComponent(cooperativeSlug)}`;
+  }
   if (surface === "branch") {
     if (!branchSlug) throw new Error("분회를 먼저 선택해 주세요.");
     return `/kpa-branch/branches/${encodeURIComponent(branchSlug)}/home-presentation`;
@@ -39,29 +45,37 @@ export function homePresentationManagePath(
   surface: HomeSurface,
   branchSlug?: string,
   businessKey?: string,
+  cooperativeSlug?: string,
 ) {
   return surface === "branch"
     ? `/kpa-branch/branches/${encodeURIComponent(branchSlug ?? "")}/operator/home-presentation`
-    : `${homePresentationPath(surface, branchSlug, businessKey)}/manage`;
+    : `${homePresentationPath(surface, branchSlug, businessKey, cooperativeSlug)}/manage`;
 }
 interface PublicProps {
   surface: HomeSurface;
   client?: Pick<HomePresentationClient, "get">;
   branchSlug?: string;
   businessKey?: string;
+  cooperativeSlug?: string;
 }
 function useHomePresentation({
   surface,
   client,
   branchSlug,
   businessKey,
+  cooperativeSlug,
 }: PublicProps) {
   const [state, setState] = useState<{
     scope: string;
     document: HomePresentation | null;
     ready: boolean;
   }>({ scope: "", document: null, ready: false });
-  const endpoint = homePresentationPath(surface, branchSlug, businessKey);
+  const endpoint = homePresentationPath(
+    surface,
+    branchSlug,
+    businessKey,
+    cooperativeSlug,
+  );
   useEffect(() => {
     let active = true;
     setState({ scope: endpoint, document: null, ready: false });
@@ -104,7 +118,7 @@ function useHomePresentation({
   const current =
     state.scope === endpoint ? state : { document: null, ready: false };
   return {
-    config: current.document ?? initialHomePresentation(surface),
+    config: current.document ?? initialIdentityPresentation(surface, businessKey),
     ready: current.ready,
     hasPublished: current.document !== null,
   };
@@ -112,6 +126,7 @@ function useHomePresentation({
 
 interface HeroViewProps {
   surface: HomeSurface;
+  businessKey?: string;
   config: HomePresentation;
   actions?: ReactNode;
   children?: ReactNode;
@@ -123,6 +138,7 @@ interface HeroViewProps {
 }
 export function HomeHeroView({
   surface,
+  businessKey,
   config,
   actions,
   children,
@@ -132,6 +148,8 @@ export function HomeHeroView({
   accent,
   className = "",
 }: HeroViewProps) {
+  const identity = heroIdentity(surface, businessKey);
+  const identityName = identity === "megapharm" ? "메가팜 · 창고형약국" : HOME_SURFACE_INFO[surface].name;
   const [index, setIndex] = useState(0);
   const [, refreshSchedule] = useState(0);
   useEffect(() => {
@@ -152,12 +170,13 @@ export function HomeHeroView({
     setIndex((activeIndex + amount + items.length) % items.length);
   const style = {
     "--home-accent": accent ?? HOME_SURFACE_INFO[surface].accent,
+    ...(accent ? { "--hero-primary": accent } : {}),
   } as CSSProperties;
   if (!active)
     return (
       <header className="home-presentation home-plain-title" style={style}>
         <Heading id={id}>
-          {fallbackTitle ?? HOME_SURFACE_INFO[surface].name}
+          {fallbackTitle ?? identityName}
         </Heading>
         {actions}
         {children}
@@ -166,6 +185,7 @@ export function HomeHeroView({
   return (
     <section
       className={`home-presentation home-hero ${className}`}
+      data-home-identity={identity}
       style={style}
       aria-labelledby={id}
       aria-roledescription={items.length > 1 ? "슬라이드" : undefined}
@@ -189,7 +209,7 @@ export function HomeHeroView({
       <div className="home-hero-main">
         <div className="home-hero-copy" aria-live="polite" aria-atomic="true">
           <p className="home-hero-eyebrow">
-            {active.eyebrow || HOME_SURFACE_INFO[surface].name}
+            {active.eyebrow || identityName}
           </p>
           <Heading id={id} className="home-hero-title">
             {active.title}
@@ -200,6 +220,7 @@ export function HomeHeroView({
               {active.linkText} <span aria-hidden="true">↗</span>
             </a>
           )}
+          {identity === "lecture" && actions && <div className="home-hero-actions">{actions}</div>}
         </div>
         {active.imageUrl && safeHomeUrl(active.imageUrl) ? (
           <img
@@ -209,15 +230,10 @@ export function HomeHeroView({
             loading="lazy"
           />
         ) : (
-          <div className="home-hero-art" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <span>o4o</span>
-          </div>
+          <HeroArtwork identity={identity} />
         )}
       </div>
-      {actions && <div className="home-hero-actions">{actions}</div>}
+      {identity !== "lecture" && actions && <div className="home-hero-actions">{actions}</div>}
       {items.length > 1 && (
         <div className="home-hero-controls" aria-label="Hero 슬라이드 조작">
           <div className="home-hero-dots">
@@ -256,6 +272,32 @@ export function ServiceHomeHero(
       eyebrow?: ReactNode;
     },
 ) {
+  const frame = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    const measure = () => {
+      const width = document.documentElement.clientWidth;
+      if (!width) return;
+      element.style.setProperty("--home-page-width", `${width}px`);
+      element.style.setProperty(
+        "--home-page-left",
+        `${element.getBoundingClientRect().left}px`,
+      );
+    };
+    measure();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(measure);
+    observer?.observe(document.documentElement);
+    observer?.observe(element);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
   const { config: initial, hasPublished } = useHomePresentation(props);
   // Keep the service's established first headline and primary entry actions until an operator publishes.
   const config =
@@ -278,11 +320,14 @@ export function ServiceHomeHero(
         }
       : initial;
   return (
-    <HomeHeroView
-      {...props}
-      config={config}
-      fallbackTitle={props.title?.join("\n")}
-    />
+    <div ref={frame} className="home-hero-frame">
+      <HomeHeroView
+        {...props}
+        className={`home-hero-full ${props.className ?? ""}`}
+        config={config}
+        fallbackTitle={props.title?.join("\n")}
+      />
+    </div>
   );
 }
 export function HomePromotionView({
@@ -330,9 +375,11 @@ export function HomePromotionView({
     </aside>
   );
 }
-export function ServiceHomePromotion(props: PublicProps) {
-  const { config, ready } = useHomePresentation(props);
-  return ready ? (
+export function ServiceHomePromotion(
+  props: PublicProps & { publishedOnly?: boolean },
+) {
+  const { config, ready, hasPublished } = useHomePresentation(props);
+  return ready && (!props.publishedOnly || hasPublished) ? (
     <HomePromotionView surface={props.surface} config={config} />
   ) : null;
 }

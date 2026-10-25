@@ -117,6 +117,35 @@ describe('medicineLikeWordingGuard', () => {
     expect(medicineLikeWordingGuard(draft({ summary: '이 제품은 당뇨를 치료합니다' })).medicineLike).toBe(true);
     expect(medicineLikeWordingGuard(draft({ sections: { mainFunction: ['감기를 예방합니다'], howToTake: [], caution: [] } })).medicineLike).toBe(true);
   });
+
+  it.each([
+    '당뇨를 치료하는 건강기능식품으로 일상에서 섭취할 수 있습니다.',
+    '질병을 예방하는 제품입니다.',
+    '질환을 치유하는 영양제입니다.',
+    '당뇨를 치료해 주는 유산균입니다.',
+    '질병을 치료하는 효과가 있으며 부작용은 없습니다.',
+    '질병을 치료하는 데 도움을 주는 건기식입니다.',
+  ])('제품 효과의 관형형 단정도 검출: %s', summary => {
+    expect(medicineLikeWordingGuard(draft({summary})).medicineLike).toBe(true);
+  });
+  it.each([
+    '당뇨를 치료하는 과정과 감별 진단을 전문 참고정보로 설명합니다.',
+    '이것은 당뇨를 치료하는 건강기능식품이 아닙니다.',
+    '질병을 치료하는 제품은 아니며 일반 식품입니다.',
+    '질병을 예방하는 것이 아닌 일반적인 영양 보충입니다.',
+    '질병을 치료하는 효과가 없습니다.',
+    '질병을 치료하는 효과가 입증되지 않습니다.',
+  ])('전문 과정 설명·직접 부정은 관형형만으로 거절하지 않음: %s', summary => {
+    expect(medicineLikeWordingGuard(draft({summary})).medicineLike).toBe(false);
+  });
+  it.each(['전문 참고: 처방 여부를 확인합니다.', '질병명과 진단 과정·감별 근거를 확인합니다.', '제품은 질병을 치료하지 않습니다.', '처방약 복용법을 확인한 뒤 상담합니다.'])(
+    '전문 설명·부정 문맥은 주제어만으로 거절하지 않음: %s', summary => {
+      expect(medicineLikeWordingGuard(draft({ summary })).medicineLike).toBe(false);
+    });
+  it.each(['이 제품은 처방약입니다.', '질병 치료 효과가 있습니다.', '복용하세요'])(
+    '제품 효과 단정과 의약품 오인은 계속 검출: %s', summary => {
+      expect(medicineLikeWordingGuard(draft({ summary })).medicineLike).toBe(true);
+    });
   it('caution 의 질환/의약품 표현은 검사 대상 아님', () => {
     const d = draft({ summary: '건강에 도움을 주는 제품', sections: { mainFunction: [], howToTake: [], caution: ['질환이 있거나 의약품 복용 시 전문가와 상담하십시오'] } });
     expect(medicineLikeWordingGuard(d).medicineLike).toBe(false);
@@ -147,6 +176,11 @@ describe('classifyPreGeneration / classifyDraft', () => {
   it('draft: 의약품 단정 → FAIL_MEDICINE_LIKE (우선)', () => {
     const s = seed({ mainFunction: '피로 개선에 도움을 줄 수 있음', functionalClaims: ['피로 개선에 도움을 줄 수 있음'], caution: '주의' });
     const d = draft({ summary: '피로를 완치합니다', sections: { mainFunction: ['피로 개선에 도움'], howToTake: ['1일 1회'], caution: ['주의사항'] } });
+    expect(classifyDraft(s, d, [])).toBe('FAIL_MEDICINE_LIKE');
+  });
+  it('draft: summary의 관형형 치료 효과도 검토 통과시키지 않음', () => {
+    const s = seed({ mainFunction: '피로 개선에 도움을 줄 수 있음', functionalClaims: ['피로 개선에 도움을 줄 수 있음'], intake: '1일 1회', caution: '주의' });
+    const d = draft({ summary: '당뇨를 치료하는 건강기능식품으로 일상에서 섭취할 수 있습니다.', sections: { mainFunction: ['피로 개선에 도움을 줄 수 있습니다'], howToTake: ['1일 1회 섭취'], caution: ['주의사항을 지켜주세요'] } });
     expect(classifyDraft(s, d, [])).toBe('FAIL_MEDICINE_LIKE');
   });
   it('draft: 정상 → PASS_READY_FOR_REVIEW', () => {

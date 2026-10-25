@@ -6,6 +6,7 @@
 > **2026-10-04 개정**: `main` 직접 커밋 운영은 종료됐다. 작업은 전용 worktree + branch, `main` 반영은 명시적으로 지정된 통합 담당이 기술 gate 충족 후
 > PR merge 로만 한다 — 정본은 [`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy). 이 문서는 그 안의
 > stage · commit · push 안전 계약을 다룬다.
+> **2026-10-16 개정**: 개발 담당은 로컬 검증 · commit · push 후 인계하며, PR 생성부터는 통합 담당이 맡는다. PC 이동에도 PR 생성을 선행 조건으로 요구하지 않는다.
 
 ---
 
@@ -60,8 +61,8 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 - 개별 stage 가 **불가능**한 형태(같은 파일에 두 작업이 섞임)
 
 **완료 조건**은 저장소 전체 clean 이 아니라
-`이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + PR 생성 + 검증 결과 · CI 상태 · 미해결 사항 인계`이다.
-개발 담당은 수정 요청에도 추가 push 후 재인계하며, PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경을 자동으로 진행하지 않는다. 사용자가 명시적으로 지정한 통합 담당 공간만 기술 gate를 확인해 순차 병합 · 배포 결과 검증을 수행한다. 기존 GitHub Actions 자동 배포는 유지한다. `main` 포함은 merge 후의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
+`이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계`이다.
+개발 담당은 PR을 생성하지 않고, 수정 요청에도 같은 branch에 추가 push 후 재인계한다. PR CI 미실행·확인된 실패는 인계에 명시한다. PR 생성 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 개발 담당이 수행하지 않는다. 사용자가 명시적으로 지정한 통합 담당 공간이 기존 PR 재사용 또는 PR 생성부터 CI·리뷰 운영 · 기술 gate 확인 · 순차 병합 · 배포 결과 검증까지 수행한다. 기존 GitHub Actions 자동 배포는 유지한다. `main` 포함은 merge 후의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
 
 ---
 
@@ -76,15 +77,15 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 ```text
 [ ] 작업 worktree 완전 clean                 (git status --short 출력이 비어 있음 — staged A · M · D · R · T · C · U · 미추적 ?? 모두 0)
 [ ] 작업 branch 의 commit 이 원격에 push 됨   (git fetch origin && git log origin/<branch>..HEAD 가 비어 있음)
-[ ] 작업 branch 의 PR 이 열려 있음            (gh pr view <branch> · merge 는 하지 않음)
-[ ] 인계 메모 push 됨                         (/handoff — HANDOFF.md 를 branch · PR 에 커밋)
+[ ] 인계에 저장소 · branch · commit SHA 기록   (PR 이 있으면 링크 · 상태, 없으면 미생성으로 명시)
+[ ] 인계 메모 push 됨                         (/handoff — HANDOFF.md 를 작업 branch 에 커밋 · push)
 [ ] 현재 작업에 필요한 미추적 파일 없음
 [ ] 기준 main checkout 에 로컬 전용 commit · dirty 없음 (있으면 다른 세션 소유로 보고, 정리하지 않음)
 ```
 
 미추적 파일 항목이 핵심이다. 미추적 파일은 push 되지 않으므로,
 다음 PC 에서 이어서 쓸 파일이 남아 있으면 **먼저 커밋하거나 명시적으로 포기**해야 한다.
-다음 PC 에서는 `/start` 로 동기화 · 인계(열린 PR 의 HANDOFF.md 포함)를 확인한 뒤,
+다음 PC 에서는 `/start` 로 작업 branch의 동기화 · 인계(기존 PR이 있으면 그 상태 포함)를 확인한 뒤,
 같은 branch 를 이어 쓰려면 그 branch 로 전용 worktree 를 만든다:
 
 ```bash

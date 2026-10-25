@@ -8,7 +8,7 @@
  *
  * 유지 규칙:
  *   - 라우트 추가 시 동시 등록
- *   - 인증 필요 경로(store, mypage, operator 등)는 등록 불필요 (robots.txt Disallow 처리)
+ *   - 인증 필요 경로(store, operator 등)는 등록 불필요 (robots.txt Disallow 처리)
  *   - 블로그 게시물은 useBlogSeo 가 override — 이 파일에 개별 등록 불필요
  */
 
@@ -46,36 +46,7 @@ export const kpaSeoRegistry: SeoRegistry = {
     description: PHARMACY_HOME_DESCRIPTION,
     ogType: 'website',
   },
-  '/forum': {
-    title: '포럼 — O4O 약국',
-    description: '약사 전문가 토론 및 정보 공유 공간.',
-    ogType: 'website',
-  },
-  '/forum/all': {
-    title: '전체 포럼 — O4O 약국',
-    description: '모든 포럼 게시글 목록.',
-    ogType: 'website',
-  },
-  '/resources': {
-    title: '자료실 — O4O 약국',
-    description: '약국 운영에 필요한 자료 모음.',
-    ogType: 'website',
-  },
-  '/content': {
-    title: '콘텐츠 — O4O 약국',
-    description: '약사 커뮤니티 콘텐츠 허브.',
-    ogType: 'website',
-  },
-  '/guide/intro': {
-    title: '이용 가이드 — O4O 약국',
-    description: 'O4O 약국 서비스 이용 안내.',
-    ogType: 'website',
-  },
-  '/about': {
-    title: 'O4O 약국 소개',
-    description: 'O4O 약국 서비스 소개 — 약국의 정보와 업무를 하나로 연결합니다.',
-    ogType: 'website',
-  },
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 공개 화면(/forum · /resources · /content · /guide · /about)은 삭제했다.
   '/contact': {
     title: '협업과 연결 — O4O 약국',
     description: 'O4O 약국 협업 안내.',

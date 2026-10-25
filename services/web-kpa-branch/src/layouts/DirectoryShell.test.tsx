@@ -7,12 +7,12 @@
  */
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 const auth = vi.hoisted(() => ({ isAuthenticated: false }));
 vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: auth.isAuthenticated, isLoading: false, logout: vi.fn() }),
+  useAuth: () => ({ isAuthenticated: auth.isAuthenticated, isLoading: false, user: auth.isAuthenticated ? {id:'fixture',name:'검증용 분회 회원',email:'member@example.invalid'} : null, logout: vi.fn() }),
 }));
 vi.mock('../lib/apiClient', () => ({ authClient: { api: { get: vi.fn(), post: vi.fn() } } }));
 
@@ -35,9 +35,11 @@ describe('DirectoryShell', () => {
     expect(header.textContent).toContain('약사회 분회');
     expect(screen.getAllByTestId('o4o-home-button').length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: '로그인' }).getAttribute('href')).toBe('/login');
+    expect(screen.getByRole('link', { name: '회원가입' }).getAttribute('href')).toBe('https://neture.co.kr/signup');
     const nav = screen.getByRole('navigation', { name: '분회 서비스' });
     const hrefs = Array.from(nav.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/', '/join', '/me']);
+    expect(hrefs).toEqual(['/', '/join', '/me', 'https://neture.co.kr/contact?service=kpa-branch']);
+    expect(screen.queryByRole('link', { name: '문의 관리' })).toBeNull();
     expect(screen.getByTestId('directory-footer')).toBeTruthy();
   });
 
@@ -46,5 +48,9 @@ describe('DirectoryShell', () => {
     renderShell();
     expect(screen.getAllByTestId('o4o-home-button').length).toBeGreaterThan(0);
     expect(screen.queryByRole('link', { name: '로그인' })).toBeNull();
+    const account = screen.getByRole('button', { name: '계정 메뉴' });
+    expect(account.textContent).toContain('검증용 분회 회원');
+    fireEvent.click(account);
+    expect(screen.getByRole('button', { name: 'O4O 로그아웃' })).toBeTruthy();
   });
 });

@@ -21,18 +21,15 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
-  { label: '커뮤니티', href: '/' },
-  { label: '회원 게시글', href: '/community' },
-  { label: '사업 자료', href: '/materials' },
-  { label: 'Contact Us', href: '/contact' },
+  { label: '사업 소식', href: '/#business-news' },
+  { label: '운영 자료', href: '/materials' },
+  { label: '제품 정보', href: '/#business-products' },
+  { label: '회원 게시판', href: '/community' },
 ];
 
-// WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 단일 진입점 (커뮤니티 중심 공개 안내)
-export const KPA_SERVICE_GUIDE_NAV_ITEM: GlobalHeaderNavItem = { label: '서비스 안내', href: '/service-guide' };
-export const KPA_ABOUT_NAV_ITEM: GlobalHeaderNavItem = { label: 'About', href: '/about' };
-export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', href: '/contact' };
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 서비스 안내(/service-guide) · 소개(/about) 화면은 삭제했다.
 
-// 내 매장은 회원 초기화면의 업무 바로가기·계정 메뉴에서 제공한다.
+// 내 매장은 상단 계정 영역과 기존 계정 메뉴에서 제공한다.
 // 콘텐츠 메뉴에 매장 실행 업무를 섞지 않는다.
 
 // ─── Footer Nav ──────────────────────────────────────────────────────────────
@@ -51,7 +48,7 @@ export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', hre
  * (약사회 조직 페이지 아님) — 그룹 · 링크 모두 서비스 브랜드로 표시한다.
  */
 export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
-  { title: '약국 협력사업', links: KPA_BASE_NAV },
+  { title: '약국 협력사업', links: [...KPA_BASE_NAV, { label: '본부 문의', href: '/contact' }] },
   { title: '약관', links: [
     { label: '이용약관', href: '/policy' },
     { label: '개인정보처리방침', href: '/privacy' },

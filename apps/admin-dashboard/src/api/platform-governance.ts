@@ -1,10 +1,9 @@
 /**
  * Platform Admin API client — WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1
  *
- * 기존 backend platform API 재사용(신규 API 없음):
+ * 플랫폼 계정·사용자 API:
  *   GET   /api/v1/admin/platform-accounts
  *   PATCH /api/v1/admin/platform-accounts/:id/status     { isActive }
- *   GET   /api/v1/admin/platform-services
  * guard(backend): platform:super_admin (+ 서버측 SELF_LOCK / LAST_SUPER_ADMIN / SUPER_ADMIN_ONLY).
  */
 
@@ -46,20 +45,6 @@ export interface PlatformUsersParams {
   status?: string;
 }
 
-export interface PlatformService {
-  id: string;
-  code: string;
-  name: string;
-  shortDescription: string | null;
-  entryUrl: string | null;
-  serviceType: string;
-  approvalRequired: boolean;
-  isFeatured: boolean;
-  featuredOrder: number;
-  status: string; // 'active' | 'hidden'
-  iconEmoji: string | null;
-}
-
 /** axios 오류 → 사용자 메시지(권한 우회 없이 상태/서버 메시지 표시). */
 function toError(err: any): Error {
   const status = err?.response?.status;
@@ -82,12 +67,6 @@ export const platformAdminApi = {
   async setAccountStatus(id: string, isActive: boolean): Promise<void> {
     try {
       await api.patch(`/admin/platform-accounts/${id}/status`, { isActive });
-    } catch (err) { throw toError(err); }
-  },
-  async getServices(): Promise<PlatformService[]> {
-    try {
-      const res = await api.get('/admin/platform-services');
-      return res.data?.data ?? [];
     } catch (err) { throw toError(err); }
   },
   // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영)

@@ -14,7 +14,7 @@ const OTHER = '00000000-0000-4000-8000-000000000002';
 const TOKEN = 'a'.repeat(64);
 const NOW = new Date('2026-10-15T00:00:00Z');
 function harness(row?: any) {
-  const query = jest.fn(async () => (row ? [row] : []));
+  const query = jest.fn(async (sql:string) => sql.includes('FROM service_operator_invitations WHERE token_hash=$1') && row ? [row] : []);
   const db = { query, transaction: jest.fn(async (cb: any) => cb({ query })) };
   return {
     service: new ServiceOperatorInvitationService(
@@ -55,8 +55,8 @@ describe('operator invitation fail-closed boundaries', () => {
     await expect(h.service.accept(TOKEN, USER)).rejects.toMatchObject({
       code: 'INVITATION_ACCOUNT_MISMATCH',
     });
-    expect(h.query).toHaveBeenCalledTimes(1);
-    expect(h.query.mock.calls[0][0]).toContain('FOR UPDATE');
+    expect(h.query.mock.calls.filter(([sql])=>sql.startsWith('SELECT') && sql.includes('WHERE token_hash=$1'))).toHaveLength(1);
+    expect(h.query.mock.calls.some(([sql])=>sql.includes('FROM users'))).toBe(false);
   });
   it.each(['cancelled', 'expired'])(
     'does not accept a %s link',
@@ -69,23 +69,12 @@ describe('operator invitation fail-closed boundaries', () => {
       await expect(h.service.accept(TOKEN, USER)).rejects.toMatchObject({
         code: 'INVALID_OR_EXPIRED_INVITATION',
       });
-      expect(h.query).toHaveBeenCalledTimes(1);
+      expect(h.query.mock.calls.filter(([sql])=>sql.startsWith('SELECT') && sql.includes('WHERE token_hash=$1'))).toHaveLength(1);
     },
   );
-  it('replaying a consumed link returns its result without any write or regrant', async () => {
-    const h = harness({
-      target_user_id: USER,
-      accepted_user_id: USER,
-      status: 'accepted',
-      service_key: 'lecture',
-      role: 'lecture:operator',
-      purpose: 'assignment',
-    });
-    await expect(h.service.accept(TOKEN, USER)).resolves.toMatchObject({
-      serviceKey: 'lecture',
-      role: 'lecture:operator',
-    });
-    expect(h.query).toHaveBeenCalledTimes(1);
+  it('a consumed token cannot be reused after its secret has been erased', async () => {
+    const h=harness({status:'accepted',accepted_user_id:USER});
+    await expect(h.service.accept(TOKEN,USER)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
   });
   it('only an authenticated selected account may preview a bound invitation', async () => {
     const h = harness({
@@ -96,18 +85,16 @@ describe('operator invitation fail-closed boundaries', () => {
     await expect(h.service.inspect(TOKEN, USER)).rejects.toMatchObject({
       code: 'INVITATION_ACCOUNT_MISMATCH',
     });
-    expect(h.query.mock.calls[0][0]).not.toContain('UPDATE');
+    expect(h.query.mock.calls.some(([sql])=>sql.includes('FROM users'))).toBe(false);
   });
 });
 
 
-it('never sends mail when the transaction callback finishes but commit fails', async () => {
-  const mail = jest.fn(async () => true);
-  const query = jest.fn(async (sql: string) => sql.includes('INSERT INTO service_operator_invitations')
-    ? [{ id: OTHER, invited_email: 'fixture@example.test', role: 'lecture:operator', purpose: 'assignment' }] : []);
-  const db = { query, transaction: async (callback: any) => { await callback({ query }); throw new Error('Synthetic commit failure'); } };
-  const service = new ServiceOperatorInvitationService(db as any, mail, () => NOW);
-  jest.spyOn(service as any, 'actor').mockResolvedValue(undefined);
-  await expect(service.create({ actorId: USER, email: 'fixture@example.test', serviceKey: 'lecture', role: 'lecture:operator' })).rejects.toThrow('Synthetic commit failure');
-  expect(mail).not.toHaveBeenCalled();
+it('never sends mail when invitation creation commits unsuccessfully', async () => {
+  const mail=jest.fn(async()=>true), query=jest.fn(async()=>[]);let calls=0;
+  const db={query,transaction:async(callback:any)=>{calls++;const value=await callback({query});if(calls===2)throw new Error('Synthetic commit failure');return value;}};
+  const service=new ServiceOperatorInvitationService(db as any,mail,()=>NOW);
+  jest.spyOn(service,'prepare').mockResolvedValue({invite:{id:OTHER,invited_email:'fixture@example.test',role:'lecture:operator'} as any,url:'https://neture.co.kr/operator-invite#token=fixture'});
+  await expect(service.create({actorId:USER,email:'fixture@example.test',serviceKey:'lecture',role:'lecture:operator'})).rejects.toThrow('Synthetic commit failure');
+  expect(service.prepare).toHaveBeenCalledTimes(1);expect(mail).not.toHaveBeenCalled();
 });

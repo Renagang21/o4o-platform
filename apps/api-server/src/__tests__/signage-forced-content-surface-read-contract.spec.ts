@@ -73,6 +73,22 @@ describe('WO-O4O-SIGNAGE-FORCED-CONTENT-SURFACE-READ-CONTRACT-CLOSURE-V2', () =>
   describe('signage playback reader — findPublicPlaylistItems', () => {
     const body = methodBody(repoSrc, 'findPublicPlaylistItems');
 
+    it('public UNION projections have matching column counts and media-id positions', () => {
+      const sql = body.match(/`(SELECT[\s\S]*?)`/)![1];
+      const projections = sql.split(/UNION ALL/).map(part => part.match(/SELECT([\s\S]*?)FROM/)![1]);
+      const columns = projections.map(projection => {
+        let depth = 0;
+        return [...projection].reduce((count, char) => {
+          if (char === '(') depth++;
+          if (char === ')') depth--;
+          return count + (char === ',' && depth === 0 ? 1 : 0);
+        }, 1);
+      });
+      expect(columns).toEqual([7, 7]);
+      expect(projections[0]).toMatch(/NULL::uuid AS "forcedMediaId"\s*$/);
+      expect(projections[1]).toMatch(/fc\.media_id AS "forcedMediaId"\s*$/);
+    });
+
     it('forced content UNION 이 target_surface 를 필터한다', () => {
       expect(body).toMatch(/FROM signage_forced_content/);
       expect(body).toMatch(/target_surface\s+IN\s*\('signage','both'\)/);

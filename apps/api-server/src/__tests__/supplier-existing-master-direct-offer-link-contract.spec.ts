@@ -7,7 +7,7 @@
  *   3. (은퇴) 레거시 POST /products · createSupplierOffer · validateCreateInput · MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED 는 사라졌다
  *   4. Offer 유일성 계약(findDuplicateOffer 선검사 → save → 23505 fallback) 은 primitive 안에 1회만 있다
  *   5. 컨트롤러: `/products/from-master` 는 requireAuth → requireActiveSupplier, 상태 매핑 404/409, body.supplierId 미사용
- *   6. DRUG gate 완화 0(guard 파일 무접촉) · DDL/migration 0
+ *   6. 상품·조직 정합 검사 유지 · DDL/migration 0 (대상 정책은 후속 사용자 결정으로 제거)
  *
  * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.3 · §2.4 로
  *   "두 경로 공유" · "레거시 불변" · "web-neture 미호출" 기대는 더 이상 유효하지 않다 — 이 파일은 그 자리에서 은퇴 계약으로 뒤집었다.
@@ -26,7 +26,7 @@ const CONTROLLER = 'apps/api-server/src/modules/neture/controllers/supplier-prod
 const ERROR_CODES = 'apps/api-server/src/modules/neture/constants/offer-error-code.ts';
 const NETURE_SERVICE = 'apps/api-server/src/modules/neture/neture.service.ts';
 
-// Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
+// Inspect all write responsibilities, including the separate publication gate.
 const offerSrc = [
   OFFER_SERVICE,
   OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
@@ -125,11 +125,17 @@ describe('② persistence primitive 공유 — 복사 0', () => {
     }
   });
 
-  it('DRUG gate · 약국 전용 서비스 검사 · service approval 은 primitive 안에 있다 (완화 0)', () => {
-    expect(primitiveBody).toContain('assertDrugOfferAllowed(');
-    expect(primitiveBody).toContain("action: 'OFFER_CREATE'");
-    expect(primitiveBody).toContain('assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, filteredServiceKeys)');
-    expect(primitiveBody).toContain('createPendingApprovals(');
+  it('등록은 미게시·심사 대기로 저장하고 DRUG 게시·서비스 승인 gate는 별도 경로에서 유지한다', () => {
+    for (const state of ['isPublic: false', 'isActive: false', 'defaultSupplyEnabled: false', 'serviceKeys: []', 'approvalStatus: OfferApprovalStatus.PENDING']) {
+      expect(primitiveBody).toContain(state);
+    }
+    expect(fromMasterBody).toContain('assertRegulatedPermit(');
+    expect(primitiveBody).not.toContain('createPendingApprovals(');
+    const publication = stripComments(read(OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-distribution.service.ts')));
+    expect(publication).toContain('assertDrugOfferAllowed(');
+    expect(publication).not.toContain('ServiceAudienceService');
+    expect(publication).toContain('PRODUCT_NOT_APPROVED');
+    expect(publication).toContain('createPendingApprovals(');
   });
 
 });
@@ -181,13 +187,14 @@ describe('④ 컨트롤러 /products/from-master 계약', () => {
   });
 });
 
-describe('⑤ 무접촉 — DRUG guard · DDL/migration', () => {
+describe('⑤ 상품·조직 정합 검사 · DDL/migration', () => {
   const guard = read('apps/api-server/src/modules/neture/guards/drug-access.guard.ts');
 
-  it('drug-access.guard: DRUG_SERVICE_CONTEXT_REQUIRED / PUBLIC 금지 / 비약국 금지 코드 3종 그대로', () => {
-    expect(guard).toContain('DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN');
+  it('상품 미확정·서비스 문맥·조직 불일치는 거부하고 업종 대상 정책은 사용하지 않는다', () => {
+    expect(guard).toContain('DRUG_PRODUCT_UNRESOLVED');
     expect(guard).toContain('DRUG_SERVICE_CONTEXT_REQUIRED');
-    expect(guard).toContain('DRUG_NON_PHARMACY_SERVICE');
+    expect(guard).toContain('DRUG_ORG_CONTEXT_MISMATCH');
+    expect(guard).not.toContain('service_audience_policies');
     expect(guard).not.toMatch(/from-master|EXISTING-MASTER-DIRECT/i);
   });
 

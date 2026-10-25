@@ -20,7 +20,8 @@ export interface AdminUserDto {
   _id?: string;
   firstName?: string;
   lastName?: string;
-  name?: string;
+  name?: string | null;
+  nickname?: string | null;
   username?: string;
   email?: string;
   roles?: string[];
@@ -67,10 +68,18 @@ function toDateString(v?: string | Date): string {
   }
 }
 
-function resolveUserName(u: AdminUserDto): string {
-  if (u.name) return u.name;
+/**
+ * 표시 이름: name → 성·이름 → 닉네임. 모두 비면 '이름 미등록'.
+ * 이메일은 같은 셀 아래 줄에 따로 보이므로 이름 자리에 반복하지 않는다.
+ */
+export const UNNAMED_USER_LABEL = '이름 미등록';
+
+export function resolveUserName(u: AdminUserDto): string {
+  const name = u.name?.trim();
+  if (name) return name;
   const combined = `${u.lastName ?? ''} ${u.firstName ?? ''}`.trim();
-  return combined || 'Unknown';
+  if (combined) return combined;
+  return u.nickname?.trim() || UNNAMED_USER_LABEL;
 }
 
 function resolveUsername(u: AdminUserDto): string {

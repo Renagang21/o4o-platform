@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { StoreWorkspacePage } from '../pharmacy/StoreWorkspacePage';
+import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
 import StoreHandledProductsPage from '../pharmacy/StoreHandledProductsPage';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import MyServicesPage from '../MyServicesPage';
@@ -14,7 +16,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => mocks.organizationId }));
 vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => mocks.serviceKey }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, effectiveServiceKey: mocks.serviceKey, workServiceKeys: [] }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));
 vi.mock('../../api/localProducts', () => ({ createLocalProduct: mocks.create, updateLocalProduct: mocks.update, getLocalProduct: mocks.single }));
@@ -49,10 +51,54 @@ beforeEach(() => {
   mocks.orders.mockResolvedValue([]);
 });
 
+it('returning from product guidance restores selection only from the current confirmed product page', async () => {
+  const path = '/store/workspace/commerce?q=Sample&source=local&page=2&limit=50';
+  const row = { sourceType: 'local', sourceId: 'one', name: 'Sample', isActive: true };
+  mocks.products.mockResolvedValue({ items: [row], pagination: { total: 51 } });
+  render(<MemoryRouter initialEntries={[{ pathname: '/store/workspace/commerce', search: '?q=Sample&source=local&page=2&limit=50',
+    state: { productReturn: { path, scope: 'store-a:kpa-society', selectedKey: 'local:one' } },
+  }]}><StoreHandledProductsPage workspace /></MemoryRouter>);
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
+  expect(mocks.products).toHaveBeenCalledWith({ page: 2, limit: 50, search: 'Sample', source: 'local' });
+});
+it.each(['/store','/work/kpa-society/store'])('workspace returns preserve the actual handled-product selection and query: %s', async base => {
+  const search='?q=Sample&source=local&page=2&limit=50',path=base+'/workspace/commerce'+search;
+  mocks.products.mockResolvedValue({items:[{sourceType:'local',sourceId:'one',name:'Sample',isActive:true}],pagination:{total:51}});
+  const config={...withPharmacyStoreMenu(UNIFIED_STORE_CONFIG),basePath:base};
+  render(<MemoryRouter initialEntries={[{pathname:base+'/workspace/commerce',search,state:{productReturn:{path,scope:'store-a:kpa-society',selectedKey:'local:one'}}}]}><Routes>
+    <Route element={<Outlet context={{config}}/>}>
+      <Route path={base+'/workspace/commerce'} element={<StoreWorkspacePage area="commerce"/>}/>
+      <Route path={base+'/my-products'} element={<StoreHandledProductsPage/>}/>
+    </Route>
+  </Routes></MemoryRouter>);
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
+  expect(mocks.products).toHaveBeenCalledWith({page:2,limit:50,search:'Sample',source:'local'});
+  expect(mocks.supply).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'Updated'}});
+  await waitFor(()=>expect(mocks.products).toHaveBeenLastCalledWith({page:1,limit:50,search:'Updated',source:'local'}));
+  expect(mocks.supply).not.toHaveBeenCalled();
+});
+it('browser back from guidance also restores the originating product selection and query', async () => {
+  mocks.products.mockResolvedValue({ items: [{ sourceType: 'local', sourceId: 'one', name: 'Sample', isActive: true }], pagination: { total: 51 } });
+  function Back() { const navigate = useNavigate(); return <button onClick={() => navigate(-1)}>브라우저 뒤로</button>; }
+  render(<MemoryRouter initialEntries={['/store/workspace/commerce?q=Sample&source=local&page=2&limit=50']}><Routes>
+    <Route path="/store/workspace/commerce" element={<StoreHandledProductsPage workspace />} />
+    <Route path="/store/library/contents" element={<Back />} />
+  </Routes></MemoryRouter>);
+  await screen.findByText('Sample');
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.click(screen.getByRole('button', { name: '콘텐츠 만들기' }));
+  fireEvent.click(await screen.findByRole('button', { name: '브라우저 뒤로' }));
+  await screen.findByText('1개 선택됨');
+  expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('Sample');
+});
+
 describe('내 매장 경영지원', () => {
   it('약국 문맥에서 자료 가져오기 입구를 제공한다', () => {
     mount(<StoreLibraryNavigation section="mine" />);
-    expect(screen.getByRole('link', { name: '자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents');
+    expect(screen.getByRole('link', { name: '제공 자료' }).getAttribute('href')).toBe('/store/pharmacy/contents');
   });
   it('PharmacyHub 문맥에서는 약국 전용 자료 입구를 숨기고 내 자료함 기능을 보존한다', () => {
     mocks.serviceKey = 'pharmacy-hub';
@@ -92,8 +138,22 @@ describe('내 매장 경영지원', () => {
   it('공급 탭은 승인 사업만 제공하고 선택한 사업 조건을 서버에 전달한다', async () => {
     mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
     fireEvent.click(await screen.findByRole('button', { name: '혈당관리 사업' }));
-    await waitFor(() => expect(mocks.supply).toHaveBeenLastCalledWith(expect.objectContaining({ source: 'sf:diabetes' })));
+    await waitFor(() => expect(mocks.supply).toHaveBeenLastCalledWith(expect.objectContaining({ business: 'diabetes' })));
     expect(screen.queryByRole('button', { name: '승인 대기 사업' })).toBeNull();
+  });
+  it('공급 제안의 승인된 배송조건과 최소금액을 약국에 표시한다', async () => {
+    mocks.supply.mockResolvedValue({items:[{kind:'proposal',optionId:'proposal-a',offerId:'offer-a',productName:'조건 제품',supplierName:'가상 공급자',semiFranchiseKey:'diabetes',semiFranchiseName:'혈당관리 사업',unitPrice:1000,
+      termsSnapshot:{version:1,baseShippingFee:2000,freeShippingThreshold:50000,minOrderAmount:10000}}],total:1});
+    mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
+    await screen.findByText('조건 제품');
+    expect(screen.getByText(/배송비 2,000원/)).toBeTruthy();
+    expect(screen.getByText(/50,000원 이상 무료배송/)).toBeTruthy();
+    expect(screen.getByText(/최소 주문 10,000원/)).toBeTruthy();
+  });
+  it('과거 제안에 고정 조건을 만들어 표시하지 않는다', async () => {
+    mocks.supply.mockResolvedValue({items:[{kind:'proposal',optionId:'proposal-a',offerId:'offer-a',productName:'기존 제품',supplierName:'가상 공급자',semiFranchiseKey:'pharmacy',semiFranchiseName:'기본 약국 사업',unitPrice:1000,termsSnapshot:null}],total:1});
+    mount(<SupplyOptionsPage />, '/store/pharmacy/supply');
+    await screen.findByText('기존 제품');expect(screen.getByText(/기존 제안 · 공급자 공통 배송정책 적용/)).toBeTruthy();
   });
   it('제공 자료는 사업별 조회하고 독립 사본 원칙을 표시한다', async () => {
     mount(<PharmacyContentSourcesPage />, '/store/pharmacy/contents?business=diabetes');
@@ -118,7 +178,7 @@ function deferred<T>() {
   const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
   return { promise, resolve, reject };
 }
-const sourceRow = (title: string) => ({ id: title, title, summary: null, body: null, tags: [], semiFranchiseName: '사업', publishedAt: null });
+const sourceRow = (title: string) => ({ id: title, title, summary: null, body: null, tags: [], semiFranchiseKey: 'diabetes', semiFranchiseName: '사업', publishedAt: null });
 const supplyRow = (productName: string) => ({ productName, kind: 'default', optionId: productName, supplierName: '공급자', unitPrice: 100, semiFranchiseName: '사업', semiFranchiseKey: 'diabetes' });
 
 describe('사업 조회 응답 순서', () => {

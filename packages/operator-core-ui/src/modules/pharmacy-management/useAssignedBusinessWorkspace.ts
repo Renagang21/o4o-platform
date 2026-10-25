@@ -7,6 +7,7 @@ export interface BusinessDecision {
   id: string;
   label: string;
   needsReason: boolean;
+  reasonRequired?: boolean;
   target: string;
   call: (reason?: string) => Promise<unknown>;
 }
@@ -14,6 +15,7 @@ const errorText = (error: unknown, fallback: string) => error instanceof Error &
 
 function loadBusinessRows(key: string, tab: Tab, status: string) {
   switch (tab) {
+    case 'overview': case 'settings': return Promise.resolve([]);
     case 'memberships': return api.listSfMemberships(key, status);
     case 'proposals': return api.listProposals(key, status);
     case 'events': return api.listEvents(key, status);
@@ -23,10 +25,10 @@ function loadBusinessRows(key: string, tab: Tab, status: string) {
 }
 
 /** 기존 담당 사업의 조회·심사 수명. 사업 scope와 요청 세대를 함께 소유한다. */
-export function useAssignedBusinessWorkspace(businessKey?: string) {
+export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?: readonly Tab[]) {
   const [searchParams] = useSearchParams();
   const queryTab = searchParams.get('tab');
-  const initialTab: Tab = isTab(queryTab) ? queryTab : 'memberships';
+  const initialTab: Tab = isTab(queryTab) && (!allowedTabs || allowedTabs.includes(queryTab)) ? queryTab : allowedTabs?.[0] ?? 'memberships';
   const initialKey = useRef(searchParams.get('key'));
   const [franchises, setFranchises] = useState<SemiFranchise[] | null>(null);
   const [sfKey, setSfKey] = useState('');
@@ -84,9 +86,9 @@ export function useAssignedBusinessWorkspace(businessKey?: string) {
   }, [sfKey, tab, status]);
   useEffect(() => { void load(); }, [load]);
 
-  const run = (id: string, label: string, needsReason: boolean, call: BusinessDecision['call'], target = id) => {
+  const run = (id: string, label: string, needsReason: boolean, call: BusinessDecision['call'], target = id, reasonRequired = false) => {
     if (changingScope.current || submitting.current || decisionRef.current || loading || loadError) return;
-    const next = { id, label, needsReason, call, target };
+    const next = { id, label, needsReason, call, target, reasonRequired };
     decisionRef.current = next; setDecision(next); setReason(''); setDecisionError(''); setMessage(null);
   };
   const cancelDecision = () => {
@@ -96,6 +98,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string) {
   const confirmDecision = async () => {
     const selected = decisionRef.current;
     if (changingScope.current || !selected || submitting.current || loading || loadError) return;
+    if (selected.reasonRequired && !reason.trim()) { setDecisionError('반려 사유를 입력해 주세요.'); return; }
     const state = lifecycle.current;
     const current = () => state.mounted && lifecycle.current === state;
     submitting.current = true; setBusyId(selected.id); setDecisionError('');
@@ -120,7 +123,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string) {
     clearRows(); setSfKey(key);
   };
   const selectTab = (next: Tab) => {
-    if (locked() || next === tab) return;
+    if (locked() || next === tab || (allowedTabs && !allowedTabs.includes(next))) return;
     clearRows(); setTab(next); setStatus(DEFAULT_STATUS[next]);
   };
   const selectStatus = (next: string) => {

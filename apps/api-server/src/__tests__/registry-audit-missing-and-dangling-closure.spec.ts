@@ -64,8 +64,10 @@ describe('block registry — 이름은 소스 선언값이 정본이다', () => 
 
   it('`SlideBlock.tsx` 를 스캔에서 배제하지 않는다 (실재하는 정의 파일이다)', () => {
     const src = readRoot(BLOCK_SCANNER);
-    // 주석에는 사례로 언급되므로 exclude 패턴 형태만 막는다.
-    expect(src).not.toContain('/\/SlideBlock\.tsx$/');
+    // 주석의 예시가 아니라 실제 exclude 배열에 있는 패턴만 검사한다.
+    const exclude = src.match(/const exclude = \[([\s\S]*?)\];/)?.[1];
+    expect(exclude).toBeDefined();
+    expect(exclude).not.toContain(String.raw`/\/SlideBlock\.tsx$/`);
   });
 
   it('선언값과 파일명이 다른 블록이 실제로 존재한다 — 회귀 고정', () => {

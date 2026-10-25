@@ -198,10 +198,18 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("supplier task navigation", () => {
+  it('shows retirement guidance for old recruitment links without a creation form', async () => {
+    mount('/supplier/semi-franchise-recruitments?masterId=master-a');
+    await screen.findByRole('heading', { name: '세미프랜차이즈 모집 종료' });
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('button', { name: '모집 만들기' })).toBeNull();
+    expect(api.products).not.toHaveBeenCalled();
+    expect(screen.getByRole('link', { name: '공급 제안으로 이동' }).getAttribute('href')).toBe('/supplier/supply-proposals');
+  });
+
   it.each([
     ["/supplier/supply-proposals?offer=offer-a", "offer-a"],
     ["/supplier/semi-franchise-events?offer=offer-a", "offer-a"],
-    ["/supplier/semi-franchise-recruitments?masterId=master-a", "master-a"],
   ])(
     "keeps the selected approved product when creating an activity at %s",
     async (path, expected) => {
@@ -222,7 +230,6 @@ describe("supplier task navigation", () => {
   it.each([
     "/supplier/supply-proposals?offer=missing",
     "/supplier/semi-franchise-events?offer=missing",
-    "/supplier/semi-franchise-recruitments?masterId=missing",
   ])(
     "leaves selection empty rather than substituting another activity product at %s",
     async (path) => {
@@ -237,12 +244,11 @@ describe("supplier task navigation", () => {
   it.each([
     ['/supplier/supply-proposals', 'offer', 'offer-a'],
     ['/supplier/semi-franchise-events', 'offer', 'offer-a'],
-    ['/supplier/semi-franchise-recruitments', 'masterId', 'master-a'],
   ])('clears the previous selection when the requested product changes to missing at %s', async (path, key, value) => {
     mount(`${path}?${key}=${value}`, `${path}?${key}=missing`);
     await waitFor(() => expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe(value));
     fireEvent.click(screen.getByRole('link', { name: '검증 대상 변경' }));
-    await screen.findByRole('alert');
+    await screen.findByText(/요청한 상품은 공급 가능한 승인 상품 목록에 없습니다/);
     expect((screen.getAllByRole('combobox')[0] as HTMLSelectElement).value).toBe('');
   });
 

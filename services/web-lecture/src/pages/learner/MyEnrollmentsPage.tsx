@@ -1,9 +1,10 @@
 /** 내 강의 (수강 목록 · 진행) — `/lms/enrollments/me` (WO Phase 2 §11 Learner) */
+import { useAuth } from '../../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CourseProgressBar, LmsEmptyState, LmsLoading } from '@o4o/lms-ui';
 import { learnerApi, errorMessage, type LectureEnrollment } from '../../api/lecture';
-import { coursePath } from '../../lib/lmsViewAdapter';
+import { lecturePort, lessonPath, coursePath } from '../../lib/lmsViewAdapter';
 
 const STATUS_LABEL: Record<string, string> = {
   pending: '승인 대기', approved: '승인됨', in_progress: '학습 중', completed: '수료', rejected: '반려', cancelled: '취소', expired: '만료',
@@ -11,6 +12,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function MyEnrollmentsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [continuing, setContinuing] = useState<string | null>(null);
   const [items, setItems] = useState<LectureEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +21,7 @@ export default function MyEnrollmentsPage() {
 
   useEffect(() => {
     let alive = true;
+    setItems([]);
     setLoading(true);
     setError(null);
     (async () => {
@@ -28,7 +32,20 @@ export default function MyEnrollmentsPage() {
       finally { if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
-  }, [reloadKey]);
+  }, [reloadKey, user?.id]);
+
+  async function continueLearning(enrollment: LectureEnrollment) {
+    setContinuing(enrollment.id); setError(null);
+    try {
+      const [lessons, bookmark] = await Promise.all([
+        lecturePort.getCurriculum!(enrollment.courseId), lecturePort.getPlayback!(enrollment.courseId),
+      ]);
+      const target = lessons.find(l => l.id === bookmark?.lessonId && !enrollment.metadata?.completedLessonIds?.includes(l.id))
+        ?? lessons.find(l => !enrollment.metadata?.completedLessonIds?.includes(l.id));
+      navigate(target ? lessonPath(enrollment.courseId, target.id) : coursePath(enrollment.courseId));
+    } catch (err) { setError(errorMessage(err, '이어서 학습할 레슨을 확인하지 못했습니다. 다시 시도해 주세요.')); }
+    finally { setContinuing(null); }
+  }
 
   return <main className="page page-wide">
     <div className="page-head"><h1>내 강의</h1><p className="muted">수강 신청한 강의와 진행 상황입니다.</p></div>
@@ -41,6 +58,7 @@ export default function MyEnrollmentsPage() {
           <Link to={coursePath(e.courseId)} className="list-title">{e.course?.title ?? '강의'}</Link>
           <span className={`badge badge-${e.status}`}>{STATUS_LABEL[e.status] ?? e.status}</span>
         </div>
+        {['approved', 'in_progress'].includes(e.status) && <button type="button" className="btn" disabled={continuing !== null} onClick={() => void continueLearning(e)}>{continuing === e.id ? '확인 중...' : '이어서 학습'}</button>}
         <CourseProgressBar percent={e.progressPercentage ?? e.progress ?? 0} />
         <div className="list-meta muted">완료 {e.completedLessons ?? 0}/{e.course?.lessonCount ?? '-'} 레슨</div>
       </li>)}

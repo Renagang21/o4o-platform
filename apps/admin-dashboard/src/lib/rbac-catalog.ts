@@ -1,3 +1,4 @@
+import { PHARMACY_COLLABORATORS, parsePharmacyCollaboratorRole, type PharmacyCollaboratorKey } from '@o4o/types';
 /**
  * RBAC Catalog (admin-dashboard local)
  *
@@ -26,7 +27,7 @@ export const SERVICE_KEYS = [
   'funding',
 ] as const;
 
-export type ServiceKey = (typeof SERVICE_KEYS)[number];
+export type ServiceKey = (typeof SERVICE_KEYS)[number] | PharmacyCollaboratorKey;
 
 export interface ServiceMeta {
   key: string;
@@ -36,13 +37,17 @@ export interface ServiceMeta {
 
 export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   platform: { key: 'platform', label: 'Platform', badgeClass: 'text-red-700 bg-red-50' },
-  kpa: { key: 'kpa', label: 'KPA', badgeClass: 'text-blue-700 bg-blue-50' },
+  kpa: { key: 'kpa', label: '약국 경영지원 (기존)', badgeClass: 'text-blue-700 bg-blue-50' },
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
-  'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
+  'kpa-branch': { key: 'kpa-branch', label: '분회', badgeClass: 'text-sky-700 bg-sky-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
   supplier: { key: 'supplier', label: '공급자', badgeClass: 'text-amber-700 bg-amber-50' },
   funding: { key: 'funding', label: '유통참여형 펀딩', badgeClass: 'text-lime-700 bg-lime-50' },
+  pharmacy: { key: 'pharmacy', label: PHARMACY_COLLABORATORS.pharmacy.label, badgeClass: 'text-teal-700 bg-teal-50' },
+  carepharm: { key: 'carepharm', label: PHARMACY_COLLABORATORS.carepharm.label, badgeClass: 'text-teal-700 bg-teal-50' },
+  megapharm: { key: 'megapharm', label: PHARMACY_COLLABORATORS.megapharm.label, badgeClass: 'text-teal-700 bg-teal-50' },
+  pharmcoop: { key: 'pharmcoop', label: PHARMACY_COLLABORATORS.pharmcoop.label, badgeClass: 'text-teal-700 bg-teal-50' },
 };
 
 export interface RoleMeta {
@@ -89,6 +94,8 @@ export interface ParsedRole {
 }
 
 export function parseRole(raw: string): ParsedRole {
+  const scoped = parsePharmacyCollaboratorRole(raw);
+  if (scoped) return { raw, service: scoped.businessKey, serviceKey: scoped.businessKey, roleKey: scoped.level, isPlatformLegacy: false };
   if (raw.includes(':')) {
     const [svc, rk] = raw.split(':');
     const known = (SERVICE_KEYS as readonly string[]).includes(svc);

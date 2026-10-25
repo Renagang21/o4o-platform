@@ -2,7 +2,7 @@ import { api as homePresentationApi } from '../lib/apiClient';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 /**
  * O4O representative home. Canonical policy: O4O-HOME-SERVICE-DISCOVERY-V1.
- * AI → personal workspace → public service discovery → news.
+ * 2026-10-18 user-directed presentation: full-width Hero → AI → joined services / public discovery → news.
  * The existing AI request, attachment, session and membership checks remain the execution boundary.
  * Public discovery is independent of authentication and service membership.
  */
@@ -297,7 +297,7 @@ export default function O4OHomePage() {
   const isSuperAdmin = !!user?.roles?.some((r) => String(r) === 'platform:super_admin');
   const netureGateStatus = netureMainStatus && netureMainStatus !== 'active' && !isSuperAdmin ? netureMainStatus : null;
 
-  // AI Composer 는 하나다 — 로그인 전후로 **위치만** 다르다(복제하지 않는다).
+  // AI Composer는 로그인 전후 모두 Hero 바로 아래 단일 영역에서 표시한다.
   const composerArea = (
     <>
       {/*
@@ -545,12 +545,13 @@ export default function O4OHomePage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* 최소 계정 영역만. 상단 navigation·서비스 메뉴바 없음.
+      {/* 대표 브랜드와 기존 계정 메뉴.
           WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4:
-          로그인 전 = 로그인 하나(Google — 가입 겸용) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
+          로그인 전 = 로그인 · 회원가입(/signup) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
           모바일도 같은 메뉴(작은 계정 메뉴). */}
-      <div className="flex items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
-        {isAuthenticated && user && <Link to="/mypage" className="font-medium text-slate-800 no-underline">My Home</Link>}
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
+        <Link to="/" aria-label="O4O 대표 홈" className="mr-auto text-2xl font-semibold tracking-tight text-slate-900 no-underline">O4O</Link>
+        {isAuthenticated && user && <Link to="/mypage" className="rounded-full border border-slate-200 px-4 py-2 font-medium text-slate-800 no-underline hover:bg-slate-50">My Home</Link>}
         {isAuthenticated && user ? (
           <div className="relative" ref={accountMenuRef}>
             <button
@@ -599,82 +600,64 @@ export default function O4OHomePage() {
             )}
           </div>
         ) : (
-          // 로그인은 모달 하나(이메일 · Google). 이메일 가입은 모달의 '회원가입'(/signup).
-          <button
-            type="button"
-            onClick={() => openLoginModal()}
-            data-testid="home-login-button"
-            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
-          >
-            <UserCircle className="h-5 w-5" />
-            <span>로그인</span>
-          </button>
+          <>
+            <Link to="/signup" className="rounded-full bg-slate-900 px-4 py-2 font-medium text-white no-underline hover:bg-slate-700">회원가입</Link>
+            <button
+              type="button"
+              onClick={() => openLoginModal()}
+              data-testid="home-login-button"
+              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
+            >
+              <UserCircle className="h-5 w-5" />
+              <span>로그인</span>
+            </button>
+          </>
         )}
       </div>
 
       <nav aria-label="대표 홈 메뉴" className="flex justify-center gap-6 px-4 py-3 text-sm"><a href="#all-services-title">전체 서비스</a><Link to="/contact">Contact Us</Link></nav>
 
-      {canUseHomeWorkspace ? (
-        /* 로그인 후 = AI + 내 업무 시작 (WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1 — 구조 불변) */
-        <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24">
-          <h1 className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
-
-          <h2 className="mt-6 mb-0 text-lg font-semibold">O4O AI</h2>
-          <p className="mt-2 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
-
-          {netureGateStatus ? (
+      <main className="flex flex-1 flex-col items-center px-4 pb-16 [word-break:keep-all]">
+        <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
+        <section aria-labelledby="home-ai-title" className="mt-6 flex w-full flex-col items-center text-center">
+          <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
+          <p className="mt-2 mb-0 text-sm text-slate-500">{canUseHomeWorkspace ? '무엇을 도와드릴까요?' : '질문하거나 필요한 업무를 요청할 수 있습니다.'}</p>
+          {canUseHomeWorkspace && netureGateStatus ? (
             <NetureMembershipNotice status={netureGateStatus} />
           ) : (
             <>
-              {introBanner}
+              {canUseHomeWorkspace && introBanner}
               {hasPendingTerms ? null : composerArea}
             </>
           )}
+          {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
+        </section>
 
-          {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
-          <HomeEntryPanel
-            summary
-            user={user}
-            data={entry.data}
-            loading={entry.loading}
-            error={entry.error}
-            onReload={entry.reload}
-          />
-
-          <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h2" />
-          <ServiceDiscovery />
-          <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-3xl" />
-        </main>
-      ) : (
-        <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-6 [word-break:keep-all] sm:pt-14">
-          <section aria-labelledby="home-intro-title" className="flex w-full max-w-2xl flex-col items-center text-center">
-            <h1 id="home-intro-title" className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
-            {!authLoading && !hasPendingTerms && (
-              <button
-                type="button"
-                onClick={() => openLoginModal()}
-                data-testid="home-google-start"
-                className="mt-7 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
-              >
-                {/* WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 모달은 이메일 · Google 둘 다 연다 — Google 한정 라벨 정정 */}
-                로그인하고 시작하기
-              </button>
-            )}
-            {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
-          </section>
-
-          <section aria-labelledby="home-ai-title" className="mt-8 flex w-full max-w-xl flex-col items-center text-center">
-            <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
-            <p className="mt-2 mb-0 text-sm text-slate-500">질문하거나 필요한 업무를 요청할 수 있습니다.</p>
-            {hasPendingTerms ? null : composerArea}
-          </section>
-          <div className="mt-8 w-full max-w-5xl"><ServiceHomeHero surface="neture" client={homePresentationApi} heading="h2" /></div>
-          <ServiceDiscovery />
-
-          {/* 공개 소식 — 실제 글이 있을 때만(0건이면 빈 섹션을 두지 않는다). 로딩 · 오류는 그대로 보인다. */}
-          <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-2xl text-left" />
-        </main>
-      )}
+        {canUseHomeWorkspace ? (
+          <>
+            {/* 서비스 목록 안에서는 가입 서비스를 먼저 표시한다. My Home은 상단 계정 영역에서 진입한다. */}
+            <HomeEntryPanel servicesOnly user={user} data={entry.data} loading={entry.loading} error={entry.error} onReload={entry.reload} />
+            <ServiceDiscovery personalized data={entry.error || entry.loading ? null : entry.data} />
+          </>
+        ) : (
+          <>
+            <ServiceDiscovery />
+            <section aria-label="서비스 시작" className="flex w-full max-w-2xl flex-col items-center text-center">
+              {!authLoading && !hasPendingTerms && (
+                <button
+                  type="button"
+                  onClick={() => openLoginModal()}
+                  data-testid="home-google-start"
+                  className="mt-7 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
+                >
+                  로그인하고 시작하기
+                </button>
+              )}
+            </section>
+          </>
+        )}
+        <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-3xl text-left" />
+      </main>
 
       <div className="mx-auto w-full max-w-5xl px-4"><ServiceHomePromotion surface="neture" client={homePresentationApi} /></div>
 

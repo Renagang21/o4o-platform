@@ -1,5 +1,7 @@
+import { useSupplierBusinessProfile } from '../profile/useSupplierBusinessProfile';
+import { supplierReviewApi } from '../../../lib/api/supplierReview';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import SupplierProfilePage from '../SupplierProfilePage';
 
 const api = vi.hoisted(() => ({
@@ -24,7 +26,9 @@ vi.mock('../../../lib/api', () => ({
   REGULATED_CATEGORY_ORDER: ['general', 'drug'],
   REGULATED_CATEGORY_LABELS: { general: '일반 상품', drug: '의약품' },
 }));
-vi.mock('@o4o/account-ui', () => ({ BusinessRegistrationFields: () => null }));
+vi.mock('@o4o/account-ui', async () => ({
+  BusinessRegistrationFields: (await import('../../../../../../packages/account-ui/src/components/BusinessRegistrationFields')).BusinessRegistrationFields,
+}));
 vi.mock('@o4o/ui', () => ({
   AddressSearch: ({
     onChange,
@@ -52,6 +56,7 @@ const profile = {
   status: 'active',
   representativeName: '검증 대표',
   businessNumber: 'FIXTURE-BUSINESS',
+  businessEntityType: 'individual',
   managerName: '검증 담당자',
   contactEmailVisibility: 'public',
   _prefilled: true,
@@ -197,6 +202,51 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
   });
+  it.each(['', 'simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'])(
+    'requires an explicit individual/corporation choice for %s without guessing', async (legacy) => {
+      api.profile.getProfile.mockResolvedValue({ ...profile, businessEntityType: legacy });
+      render(<SupplierProfilePage />);
+      await loaded();
+      const select = screen.getByRole('combobox', { name: /사업자 구분/ }) as HTMLSelectElement;
+      expect(select.required).toBe(true);
+      expect(select.value).toBe('');
+      expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
+      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      expect(api.profile.updateProfile).not.toHaveBeenCalled();
+      fireEvent.change(select, { target: { value: 'corporation' } });
+      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ businessEntityType: 'corporation' }),
+      ));
+    },
+  );
+  it('edits the registered business name and restores the saved name after reopening', async () => {
+    const page = render(<SupplierProfilePage />);
+    await loaded();
+    const input = screen.getByLabelText('상호명') as HTMLInputElement;
+    expect(input.disabled).toBe(false);
+    expect(input.value).toBe(profile.name);
+    fireEvent.change(input, { target: { value: '  변경 공급자  ' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ name: '변경 공급자' }),
+    ));
+    await screen.findByRole('button', { name: '저장됨' });
+    page.unmount();
+    api.profile.getProfile.mockResolvedValue({ ...profile, name: '변경 공급자' });
+    render(<SupplierProfilePage />);
+    await loaded();
+    expect((screen.getByLabelText('상호명') as HTMLInputElement).value).toBe('변경 공급자');
+  });
+  it('does not submit a blank business name', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.change(screen.getByLabelText('상호명'), { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await screen.findByText('상호명을 1~255자로 입력해 주세요.');
+    expect(api.profile.updateProfile).not.toHaveBeenCalled();
+  });
   it('edits contact and shipping values through their visible field labels', async () => {
     render(<SupplierProfilePage />);
     await loaded();
@@ -324,5 +374,34 @@ describe('SupplierProfilePage existing section ownership', () => {
     fireEvent.click(screen.getByRole('button', { name: '증빙 열람' }));
     await screen.findByText('증빙 문서를 열 수 없습니다.');
     expect(api.categories.remove).not.toHaveBeenCalled();
+  });
+});
+
+vi.mock('../../../lib/api/supplierReview', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../../../lib/api/supplierReview')>();
+  return { ...original, supplierReviewApi: { ...original.supplierReviewApi,
+    queue: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+    list: vi.fn(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 })),
+  } };
+});
+
+beforeEach(() => {
+  vi.mocked(supplierReviewApi.queue).mockResolvedValue({ items: [], hasMore: false });
+  vi.mocked(supplierReviewApi.list).mockImplementation(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 }));
+});
+
+describe('supplier profile save notice lifetime', () => {
+  it('replaces the saved timer on repeated saves and releases it on unmount', async () => {
+    vi.useFakeTimers();
+    try {
+      const hook = renderHook(() => useSupplierBusinessProfile());
+      act(() => hook.result.current.initializeProfile(profile));
+      await act(async () => { await hook.result.current.handleSave(); });
+      expect(vi.getTimerCount()).toBe(1);
+      await act(async () => { await hook.result.current.handleSave(); });
+      expect(vi.getTimerCount()).toBe(1);
+      hook.unmount();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
   });
 });

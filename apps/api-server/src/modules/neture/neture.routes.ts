@@ -31,7 +31,6 @@ import { createInventoryController } from './controllers/inventory.controller.js
 import { createSupplierSettlementController } from './controllers/supplier-settlement.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
 import { createSupplierProductImageController } from './controllers/supplier-product-image.controller.js';
-import { createAdminServiceAudienceController } from './controllers/admin-service-audience.controller.js';
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
 import { createSellerController } from './controllers/seller.controller.js';
 // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 판매자 모집(비-Partner)
@@ -107,7 +106,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/admin', createAdminController(dataSource));
   router.use('/admin', createAdminSettlementController(dataSource));
   // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1: 약국 대상 서비스 정책 (admin)
-  router.use('/admin/service-audience-policies', createAdminServiceAudienceController(dataSource));
   // WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1
   router.use('/admin', createAdminDashboardController(dataSource));
 

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { DataSource } from "typeorm";
+import type { DataSource, EntityManager } from "typeorm";
 import {
   HOME_SURFACE_INFO,
   parseHomePresentation,
@@ -49,9 +49,11 @@ export class HomePresentationService {
     expectedRevision: number,
     publish: boolean,
     userId: string,
+    authorize?: (manager: EntityManager) => Promise<void>,
   ): Promise<HomePresentationState> {
     const config = parseHomePresentation(value);
     return this.ds.transaction(async (manager) => {
+      await authorize?.(manager);
       // Serialize first insert as well as edits; no unique index/migration required.
       await manager.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",

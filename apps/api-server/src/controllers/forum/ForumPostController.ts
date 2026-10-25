@@ -80,6 +80,12 @@ export class ForumPostController extends ForumControllerBase {
         queryBuilder.andWhere('post.authorId = :myAuthorId', { myAuthorId: uid });
       }
 
+      // DRAFT is author-private even when a caller explicitly filters by status.
+      // Operators use the existing review workflow; an operating role does not disclose another author's draft.
+      queryBuilder.andWhere('(post.status IS DISTINCT FROM :privateDraftStatus OR post.authorId = :privateDraftAuthor)', {
+        privateDraftStatus: PostStatus.DRAFT, privateDraftAuthor: uid ?? null,
+      });
+
       // Forum filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
       if (pinnedFilter !== undefined) queryBuilder.andWhere('post.isPinned = :pinnedFilter', { pinnedFilter: pinnedFilter === 'true' });
       if (typeFilter !== undefined) queryBuilder.andWhere('post.type = :postTypeFilter', { postTypeFilter: typeFilter });
@@ -220,7 +226,7 @@ export class ForumPostController extends ForumControllerBase {
 
       const post = await qb.getOne();
 
-      if (!post) {
+      if (!post || (post.status && post.status === PostStatus.DRAFT && post.authorId !== this.getUserFromReq(req).userId)) {
         res.status(404).json({
           success: false,
           error: 'Post not found',
@@ -450,7 +456,7 @@ export class ForumPostController extends ForumControllerBase {
       // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
       // Author-only self-service; platform admin/super_admin retained as governance override.
       // Service operator moderation is handled via dedicated /forum/operator/* endpoints.
-      if (post.authorId !== userId && !isPlatformAdmin(userRoles)) {
+      if (post.authorId !== userId && !(isPlatformAdmin(userRoles) && this.getForumContext(req)?.communityKey !== 'community')) {
         res.status(403).json({
           success: false,
           error: 'Permission denied',
@@ -477,7 +483,11 @@ export class ForumPostController extends ForumControllerBase {
       }
       if (excerpt !== undefined) post.excerpt = excerpt;
       if (type !== undefined) post.type = type;
-      if (status !== undefined) post.status = status;
+      if (status !== undefined) {
+        const firstDraftPublication = post.status === PostStatus.DRAFT && status === PostStatus.PUBLISHED;
+        post.status = status;
+        if (firstDraftPublication) post.publishedAt = new Date();
+      }
       if (tags !== undefined) {
         post.tags = [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))];
       }
@@ -552,7 +562,7 @@ export class ForumPostController extends ForumControllerBase {
       // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
       // Author-only self-service; platform admin/super_admin retained as governance override.
       // Service operator moderation is handled via dedicated /forum/operator/* endpoints.
-      if (post.authorId !== userId && !isPlatformAdmin(userRoles) && !this.getForumContext(req)?.communityOperator) {
+      if (post.authorId !== userId && !(isPlatformAdmin(userRoles) && this.getForumContext(req)?.communityKey !== 'community') && !this.getForumContext(req)?.communityOperator) {
         res.status(403).json({
           success: false,
           error: 'Permission denied',

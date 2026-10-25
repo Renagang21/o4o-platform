@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   HOME_SURFACE_INFO,
-  initialHomePresentation,
   parseHomePresentation,
   type HomeMessage,
   type HomePresentation,
@@ -15,11 +14,18 @@ import {
   type HomePresentationClient,
 } from "./HomePresentation";
 
+import {
+  HERO_DESIGN,
+  heroIdentity,
+  initialIdentityPresentation,
+} from "./HomeHeroIdentity";
+
 export interface HomePresentationEditorProps {
   surface: HomeSurface;
   client: HomePresentationClient;
   branchSlug?: string;
   businessKey?: string;
+  cooperativeSlug?: string;
   heading?: "h1" | "h2";
 }
 export function HomePresentationEditor({
@@ -27,12 +33,23 @@ export function HomePresentationEditor({
   client,
   branchSlug,
   businessKey,
+  cooperativeSlug,
   heading = "h1",
 }: HomePresentationEditorProps) {
   const Heading = heading;
-  const endpoint = homePresentationManagePath(surface, branchSlug, businessKey);
+  const design = HERO_DESIGN[heroIdentity(surface, businessKey)];
+  const serviceName =
+    surface === "pharmacy" && businessKey === "megapharm"
+      ? "메가팜 · 창고형약국"
+      : HOME_SURFACE_INFO[surface].name;
+  const endpoint = homePresentationManagePath(
+    surface,
+    branchSlug,
+    businessKey,
+    cooperativeSlug,
+  );
   const [config, setConfig] = useState<HomePresentation>(() =>
-    initialHomePresentation(surface),
+    initialIdentityPresentation(surface, businessKey),
   );
   const [revision, setRevision] = useState(0);
   const [published, setPublished] = useState<HomePresentation | null>(null);
@@ -68,7 +85,7 @@ export function HomePresentationEditor({
           throw new Error("INVALID_RESPONSE");
         const draft = state.draft
           ? parseHomePresentation(state.draft)
-          : initialHomePresentation(surface);
+          : initialIdentityPresentation(surface, businessKey);
         const live = state.published
           ? parseHomePresentation(state.published)
           : null;
@@ -91,7 +108,7 @@ export function HomePresentationEditor({
       active = false;
       generation.current = scopeGeneration + 1;
     };
-  }, [client, endpoint, retry, surface]);
+  }, [client, endpoint, retry, surface, businessKey]);
   useEffect(() => {
     if (!dirty) return;
     const warn = (event: BeforeUnloadEvent) => {
@@ -184,7 +201,7 @@ export function HomePresentationEditor({
       [section]: [
         ...config[section],
         {
-          ...initialHomePresentation(surface).slides[0],
+          ...initialIdentityPresentation(surface, businessKey).slides[0],
           id: crypto.randomUUID(),
           title: "새 안내",
           description: "",
@@ -197,22 +214,39 @@ export function HomePresentationEditor({
   return (
     <section
       className="home-presentation home-editor"
-      aria-label={`${HOME_SURFACE_INFO[surface].name} 홈 편집`}
+      aria-label={`${serviceName} 홈 편집`}
     >
       <header>
         <p className="home-editor-eyebrow">HOME CONTENT</p>
-        <Heading>Hero · 광고 관리</Heading>
+        <Heading>
+          {surface === "carepharm"
+            ? "Hero · 공개 공지 관리"
+            : "Hero · 광고 관리"}
+        </Heading>
         <p>
-          {HOME_SURFACE_INFO[surface].name} ·{" "}
-          {HOME_SURFACE_INFO[surface].purpose}
+          {serviceName} · {HOME_SURFACE_INFO[surface].purpose}
         </p>
       </header>
       <p className="home-editor-help">
         이곳의 안내는 공개 콘텐츠입니다. 회원 전용 자료와 개인정보는 넣지
-        마세요. Hero는 서비스 안내 최대 3개입니다. 홍보 영역은 현재 게시 기간에
-        해당하는 첫 번째 항목을 보여줍니다. 광고는 광고주를 표시하며, 초기
-        콘텐츠는 자체 서비스 안내입니다.
+        마세요. Hero는 서비스 안내 최대 3개입니다.{" "}
+        {surface === "carepharm"
+          ? "공지·안내 목록에는 현재 게시 기간에 해당하는 항목을 모두 표시합니다."
+          : "홍보 영역은 현재 게시 기간에 해당하는 첫 번째 항목을 보여줍니다."}{" "}
+        광고는 광고주를 표시하며, 초기 콘텐츠는 자체 서비스 안내입니다.
       </p>
+      <aside
+        className="home-editor-design-guide"
+        aria-label="이 서비스의 Hero 제작 안내"
+      >
+        <h2>{design.name} 디자인</h2>
+        <p>{design.guidance}</p>
+        <p>
+          권장 이미지: {design.image}. 가로형 이미지를 사용하고, 중요한 내용은
+          가운데에 배치해 주세요. 이미지가 없으면 서비스 전용 그래픽이
+          표시됩니다.
+        </p>
+      </aside>
       {loading && <p role="status">홈 화면 구성을 불러오고 있습니다…</p>}
       {error && (
         <p role="alert" className="home-editor-error">
@@ -268,7 +302,9 @@ export function HomePresentationEditor({
                   change({ ...config, enabled: event.target.checked })
                 }
               />{" "}
-              Hero·홍보 노출 사용
+              {surface === "carepharm"
+                ? "Hero·공개 공지 노출 사용"
+                : "Hero·홍보 노출 사용"}
             </label>
             <p>
               끄고 공개 반영하면 홍보를 숨깁니다. 서비스의 기본 제목과 업무
@@ -289,7 +325,9 @@ export function HomePresentationEditor({
                 <h2>
                   {section === "slides"
                     ? "Hero 슬라이드"
-                    : "광고 · 서비스 안내"}
+                    : surface === "carepharm"
+                      ? "공개 공지 · 안내"
+                      : "광고 · 서비스 안내"}
                 </h2>
                 <button
                   type="button"
@@ -471,12 +509,23 @@ export function HomePresentationEditor({
             {preview && (
               <>
                 <HomeHeroView
+                  businessKey={businessKey}
                   key={`${surface}:${previewPublished}`}
                   surface={surface}
                   config={preview}
                   heading="h2"
                 />
-                <HomePromotionView surface={surface} config={preview} />
+                {surface === "carepharm" ? (
+                  preview.promotions.map((item) => (
+                    <HomePromotionView
+                      key={item.id}
+                      surface={surface}
+                      config={{ ...preview, promotions: [item] }}
+                    />
+                  ))
+                ) : (
+                  <HomePromotionView surface={surface} config={preview} />
+                )}
               </>
             )}
           </section>

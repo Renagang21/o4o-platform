@@ -1,4 +1,5 @@
 import { ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
 /**
  * MembershipConsoleController — Extension Layer
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
@@ -348,7 +349,7 @@ export class MembershipConsoleController {
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
-        roleMap[row.user_id] = row.roles || [];
+        roleMap[row.user_id] = (row.roles || []).filter((value: string) => !isRetiredRoleValue(value));
       }
 
       // Batch fetch service_memberships (scoped by service)
@@ -522,7 +523,7 @@ export class MembershipConsoleController {
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         },
-        roles: roleRows.map((r: any) => ({
+        roles: roleRows.filter((r: any) => !isRetiredRoleValue(r.role)).map((r: any) => ({
           id: r.id,
           role: r.role,
           isActive: r.is_active,
@@ -1196,20 +1197,6 @@ export class MembershipConsoleController {
       // WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
       // hard delete는 service admin 이상만 허용.
       // operator-only role(service:operator)은 soft delete만 가능.
-      if (mode === 'hard' && !scope.isPlatformAdmin) {
-        const userRoles: string[] = (req as any).user?.roles ?? [];
-        const hasAdminRole = userRoles.some(
-          (r) => r === 'platform:super_admin' || r.endsWith(':admin'),
-        );
-        if (!hasAdminRole) {
-          res.status(403).json({
-            success: false,
-            error: 'Hard delete requires admin role. Use soft delete (mode=soft) for deactivation.',
-            code: 'HARD_DELETE_FORBIDDEN',
-          });
-          return;
-        }
-      }
 
       // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1 — Authorization capability ≠ Mutation target scope
       //
@@ -1247,6 +1234,13 @@ export class MembershipConsoleController {
         return;
       }
 
+      // The admin tier belongs to the selected service, not any other service role.
+      const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(targetServiceKey);
+      if (mode === 'hard' && !scope.isPlatformAdmin && !(req as any).user?.roles?.includes(`${rolePrefix}:admin`)) {
+        res.status(403).json({ success: false, code: 'HARD_DELETE_FORBIDDEN', error: '해당 서비스 admin 권한이 필요합니다.' });
+        return;
+      }
+
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
       if (await rejectDemoAccountTarget(res, userId)) return;
 
@@ -1265,6 +1259,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
+      if (error instanceof OperationError) { res.status(error.status).json({ success: false, code: error.code, error: error.message }); return; }
       if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] deleteMember error', {
         userId: req.params.userId,

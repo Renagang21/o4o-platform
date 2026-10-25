@@ -1,4 +1,7 @@
 import HomePresentationPage from './pages/operator/HomePresentationPage';
+import NotificationsPage from './pages/NotificationsPage';
+import OperatorInboxPage from './pages/operator/OperatorInboxPage';
+import ServiceOperatorsPage from './pages/operator/ServiceOperatorsPage';
 import OperatorMembersPage from './pages/operator/OperatorMembersPage';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -43,6 +46,7 @@ export default function App() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:courseId" element={<CourseDetailPage />} />
       <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonPage />} />
@@ -63,9 +67,11 @@ export default function App() {
         <Route path="/instructor/lessons/:lessonId/assignment" element={<InstructorAssignmentPage />} />
         <Route path="/instructor/lessons/:lessonId/submissions" element={<InstructorSubmissionsPage />} />
       </Route>
+      <Route element={<AccessGate area="admin" />}><Route path="/operator/operators" element={<ServiceOperatorsPage />} /></Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
         <Route path="/operator/home-presentation" element={<HomePresentationPage />} />
+        <Route path="/operator/inbox" element={<OperatorInboxPage />} />
         <Route path="/operator/members" element={<OperatorMembersPage />} />
         <Route path="/operator/members/:id" element={<OperatorMembersPage />} />
         {/* 11차 P2: 운영자 검토 전용 read-only 화면 (수강 등록·편집 권한 없음) */}

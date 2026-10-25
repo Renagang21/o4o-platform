@@ -14,7 +14,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AlertCircle, CheckCircle, FileText, Loader2, Mail, Phone, Save } from 'lucide-react';
-import { getBusinessEntityTypeLabel } from '@o4o/types';
+import { getBusinessEntityTypeLabel, isSelectableBusinessEntityType } from '@o4o/types';
 import { BusinessRegistrationFields } from './BusinessRegistrationFields.js';
 
 export interface BusinessProfileData {
@@ -193,6 +193,9 @@ export function BusinessProfileSection({
 
   const validate = (): string[] => {
     const errs: string[] = [];
+    if (!isSelectableBusinessEntityType(form.businessEntityType)) {
+      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+    }
     if (form.taxInvoiceEmail && !EMAIL_RE.test(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
     }

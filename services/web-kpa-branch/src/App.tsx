@@ -33,7 +33,7 @@ import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
  * (분회별 별도 배포·별도 백엔드 없음 — 번들 하나가 두 진입 방식을 모두 처리한다).
  *
  * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
- *   당시 공용 진입은 `kpa-society.co.kr/kpa/{slug}` 였다. `/kpa` 는 router basename 으로만
+ *   당시 공용 진입은 옛 약국 앱 도메인의 `/kpa/{slug}` 였다(도메인 은퇴). `/kpa` 는 router basename 으로만
  *   흡수하므로 아래 라우트 트리는 그대로 유지된다 (basePath 는 여전히 `/{slug}`).
  *
  * WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:

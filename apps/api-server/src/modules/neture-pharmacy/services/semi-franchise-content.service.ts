@@ -1,3 +1,5 @@
+import { resolveSupplierForUser } from '../../neture/middleware/supplier-context.resolver.js';
+import { recordOperation } from '../../../services/operations/operation-audit.js';
 /**
  * 세미프랜차이즈 콘텐츠 자료함 — DESIGN §6 · §15 (WO TODO 3-3)
  *
@@ -58,6 +60,9 @@ const VIEW = `
     FROM semi_franchise_contents c
     JOIN semi_franchises sf ON sf.id = c.semi_franchise_id`;
 
+/** Review provenance is for the receiving operator, not member-library DTOs. */
+const OPERATOR_VIEW = VIEW.replace('SELECT c.id,', 'SELECT c.source_item_id AS "sourceItemId", c.review_reason AS "reviewReason", c.id,');
+
 /** 약국 조직이 지금 볼 수 있는 콘텐츠 조건 ($1 = organizationId) */
 const PHARMACY_SCOPE = `
   c.status = 'published' AND sf.status = 'active'
@@ -75,13 +80,13 @@ export class SemiFranchiseContentService {
   async operatorList(sf: SemiFranchiseRow, status?: string) {
     const s = status && status !== 'all' ? status : null;
     return this.dataSource.query(
-      `${VIEW} WHERE c.semi_franchise_id = $1 AND ($2::text IS NULL OR c.status = $2) ORDER BY c.updated_at DESC`,
+      `${OPERATOR_VIEW} WHERE c.semi_franchise_id = $1 AND ($2::text IS NULL OR c.status = $2) ORDER BY c.updated_at DESC`,
       [sf.id, s],
     );
   }
 
   async operatorGet(sf: SemiFranchiseRow, id: string) {
-    const [row] = await this.dataSource.query(`${VIEW} WHERE c.id = $1::uuid AND c.semi_franchise_id = $2`, [id, sf.id]);
+    const [row] = await this.dataSource.query(`${OPERATOR_VIEW} WHERE c.id = $1::uuid AND c.semi_franchise_id = $2`, [id, sf.id]);
     if (!row) throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '콘텐츠를 찾을 수 없습니다.');
     return row;
   }
@@ -113,7 +118,7 @@ export class SemiFranchiseContentService {
           attachments = COALESCE($10::jsonb, attachments),
           tags = COALESCE($11::jsonb, tags),
           updated_by = $12, updated_at = NOW()
-        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status <> 'archived'
+        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status IN ('draft','pending','published')
       RETURNING id, status`,
       [
         id, sf.id, c.title ?? null,
@@ -130,38 +135,61 @@ export class SemiFranchiseContentService {
   }
 
   /** 게시 · 보관(게시 중단). 보관된 콘텐츠는 약국에 보이지 않지만 이미 만든 매장 사본은 매장 소유로 남는다. */
-  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive') {
-    const to = action === 'publish' ? 'published' : 'archived';
-    const from = action === 'publish' ? ['draft', 'archived'] : ['draft', 'published'];
-    const rows = rowsOf(await this.dataSource.query(
+  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive' | 'reject', reason?: string) {
+    const to = action === 'publish' ? 'published' : action === 'reject' ? 'rejected' : 'archived';
+    const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
+    if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
+      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
+    return this.dataSource.transaction(async manager => {
+      const [current] = await manager.query(`SELECT c.title, c.status, c.created_by, c.source_supplier_id,
+        ns.organization_id FROM semi_franchise_contents c LEFT JOIN neture_suppliers ns ON ns.id=c.source_supplier_id
+        WHERE c.id=$1 AND c.semi_franchise_id=$2 FOR UPDATE OF c`, [id, sf.id]);
+      if (!current) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+      if (!from.includes(current.status) || (action === 'publish' && current.status === 'archived' && current.source_supplier_id))
+        throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+      if (action === 'publish' && current.source_supplier_id) {
+        const supplier = current.created_by === userId ? null : await resolveSupplierForUser(this.dataSource, userId, current.organization_id);
+        if (current.created_by === userId || (supplier?.kind === 'resolved' && supplier.supplierId === current.source_supplier_id))
+          throw new NeturePharmacyError(403, 'SELF_APPROVAL_FORBIDDEN', '본인 또는 공급 업무를 담당하는 공급자의 자료는 승인할 수 없습니다.');
+      }
+      const rows = rowsOf(await manager.query(
       `UPDATE semi_franchise_contents
           SET status = $3::text, updated_by = $4, updated_at = NOW(),
+              review_reason = $6,
               published_at = CASE WHEN $3::text = 'published' THEN NOW() ELSE published_at END
         WHERE id = $1::uuid AND semi_franchise_id = $2 AND status = ANY($5::text[])
+          AND NOT ($3 = 'published' AND status = 'archived' AND source_item_id IS NOT NULL)
       RETURNING id, status`,
-      [id, sf.id, to, userId, from],
+      [id, sf.id, to, userId, from, action === 'reject' ? reason!.trim().slice(0, 1000) : null],
     ));
     if (!rows[0]) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+    await recordOperation(manager, 'neture', userId, 'business.content.status', {
+      businessId: sf.id, businessKey: sf.key, itemId: `content:${id}`, title: current.title, before: current.status, after: to,
+      reason: action === 'reject' ? reason!.trim().slice(0, 1000) : null,
+    });
     return rows[0];
+    });
   }
 
   // ─── 약국 ──────────────────────────────────────────────────────────────
 
   /** 가입한(active) 세미프랜차이즈의 게시 콘텐츠. sfKey 로 한 세미프랜차이즈만 볼 수 있다. */
-  async pharmacyList(organizationId: string, filter: { sfKey?: string; q?: string; page?: number; limit?: number } = {}) {
+  async pharmacyList(organizationId: string, filter: { sfKey?: string; q?: string; tag?: string; page?: number; limit?: number } = {}) {
     const limit = Math.min(Math.max(Number(filter.limit) || 30, 1), 100);
     const offset = (Math.max(Number(filter.page) || 1, 1) - 1) * limit;
     const sfKey = filter.sfKey?.trim() || null;
     const q = filter.q?.trim() ? `%${filter.q.trim()}%` : null;
+    const tag = filter.tag?.trim() || null;
     const where = `WHERE ${PHARMACY_SCOPE} AND ($2::text IS NULL OR sf.key = $2)
-                     AND ($3::text IS NULL OR c.title ILIKE $3 OR c.summary ILIKE $3)`;
+                     AND ($3::text IS NULL OR c.title ILIKE $3 OR c.summary ILIKE $3)
+                     AND ($4::text IS NULL OR c.tags @> jsonb_build_array($4::text))`;
     const items = await this.dataSource.query(
-      `${VIEW} ${where} ORDER BY c.published_at DESC NULLS LAST, c.id LIMIT $4 OFFSET $5`,
-      [organizationId, sfKey, q, limit, offset],
+      `${VIEW} ${where} ORDER BY c.published_at DESC NULLS LAST, c.id LIMIT $5 OFFSET $6`,
+      [organizationId, sfKey, q, tag, limit, offset],
     );
     const [{ count }] = await this.dataSource.query(
       `SELECT count(*)::int AS count FROM semi_franchise_contents c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id ${where}`,
-      [organizationId, sfKey, q],
+      [organizationId, sfKey, q, tag],
     );
     return { items, total: count };
   }

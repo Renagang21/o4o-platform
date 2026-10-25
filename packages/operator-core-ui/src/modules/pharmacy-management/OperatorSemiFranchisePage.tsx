@@ -1,3 +1,6 @@
+import { BusinessOperationsPanel } from './BusinessOperationsPanel';
+import { BusinessHomeShowcaseManager } from './BusinessHomeShowcaseManager';
+import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
 /**
  * OperatorSemiFranchisePage — 담당 약국 협력사업 (/operator/semi-franchises)
  *
@@ -9,6 +12,8 @@
  *   가입 신청 목록은 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장 신청 상태를 함께 보여준다.
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
+import type { ReactNode } from 'react';
+import type { Tab } from './assignedBusinessModel';
 import { Link } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
@@ -34,23 +39,31 @@ import {
 } from './PharmacyCommerceUi';
 import { TABS, FILTERS, PROPOSAL_ACTIONS, EVENT_ACTIONS, CONTENT_ACTIONS, RECRUITMENT_ACTIONS } from './assignedBusinessModel';
 import { useAssignedBusinessWorkspace } from './useAssignedBusinessWorkspace';
+import { SupplyProposalDetails } from './SupplyProposalDetails';
 import { BusinessDecisionDialog } from './BusinessDecisionDialog';
 
 type BusinessPageProps = Readonly<{
   businessKey?: string;
+  contactHref?: (businessKey: string) => string | undefined;
+  contentEditHref?: (businessKey: string, contentId?: string) => string;
+  tabs?: readonly Tab[];
+  showSettingsPanels?: boolean;
   forumHref?: (business: SemiFranchise) => string;
+  renderOverview?: (business: SemiFranchise) => ReactNode;
+  renderBusinessHome?: (business: SemiFranchise) => ReactNode;
 }>;
 
 export default function OperatorSemiFranchisePage(props: BusinessPageProps = {}) {
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
 }
 
-function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
+function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusinessHome, renderOverview, contentEditHref, tabs, showSettingsPanels = true }: BusinessPageProps) {
+  const workspace = useAssignedBusinessWorkspace(businessKey, tabs ?? (renderOverview ? ['overview', 'memberships', 'proposals', 'events', 'recruitments', 'contents', 'settings'] : ['memberships', 'proposals', 'events', 'recruitments', 'contents']));
   const {
     franchises, sfKey, tab, status, rows, loading, busyId, message, loadError, assignmentError,
     interactionLocked, decision, reason, setReason, decisionError, run, confirmDecision, cancelDecision,
     load, retryAssignments, selectBusiness, selectTab, selectStatus,
-  } = useAssignedBusinessWorkspace(businessKey);
+  } = workspace;
 
   const positive = (a: string) => a === 'approve' || a === 'reactivate';
 
@@ -68,13 +81,14 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
         <PageHeader title="담당 약국 협력사업" />
         <Message message={message} />
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          담당으로 지정된 약국 협력사업이 없습니다. Neture 관리자에게 담당 지정을 요청하세요.
+          담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하세요.
         </div>
       </div>
     );
   }
 
   const currentBusiness = franchises.find(f => f.key === sfKey);
+  const contactUrl = currentBusiness && contactHref?.(sfKey);
   return (
     <div className="space-y-4 p-6">
       {decision && <BusinessDecisionDialog decision={decision} businessName={currentBusiness?.name || sfKey}
@@ -96,12 +110,14 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
         </select>
       </PageHeader>
 
-      {currentBusiness?.status === 'active' && <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
-        <Link to={forumHref?.(currentBusiness) ?? `/communities/${encodeURIComponent(currentBusiness.community_key || `business:${sfKey}`)}/forum`}>참여자 게시판</Link>
-        <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
-      </nav>}
+      {contactUrl && <a className="text-blue-700 underline" href={contactUrl}>이 사업 문의 관리</a>}
+      {showSettingsPanels && (!renderOverview || tab === 'settings') && <>
+        <BusinessHomeShowcaseManager key={sfKey} businessKey={sfKey} />
+        <BusinessOperationsPanel key={`operations:${sfKey}`} businessKey={sfKey} />
+      </>}
+      <BusinessNavigation business={currentBusiness} forumHref={forumHref} renderBusinessHome={renderBusinessHome} />
       <div className="flex flex-wrap gap-1 border-b border-gray-200">
-        {TABS.map((t) => (
+        {TABS.filter(t => tabs ? tabs.includes(t.key) : renderOverview || (t.key !== 'overview' && t.key !== 'settings')).map((t) => (
           <button
             key={t.key}
             type="button"
@@ -116,15 +132,18 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
         ))}
       </div>
 
+      {tab === 'overview' && currentBusiness && renderOverview?.(currentBusiness)}
+      {tab !== 'overview' && tab !== 'settings' && <>
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
+            <li>공급자가 요청한 자료는 검토 대기 상태입니다. 내용을 확인한 후 승인·게시하거나 사유를 적어 반려하세요. 커뮤니티에는 게시되지 않습니다.</li>
             <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
           </ul>
           <Link
-            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/new`}
+            to={contentEditHref?.(sfKey) ?? `/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/new`}
             className="shrink-0 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
           >
             콘텐츠 작성
@@ -166,6 +185,12 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
                       <div className="font-medium text-gray-900">{m.organizationName || '-'}</div>
                       {m.application?.note && <p className="text-xs whitespace-pre-wrap">신청 내용: {m.application.note}</p>}
                       {m.application?.conditions && <p className="text-xs whitespace-pre-wrap">신청 시 가입 조건: {m.application.conditions}</p>}
+                      {!!m.application?.applicationPolicies?.length && <details className="mt-2 text-xs">
+                        <summary>신청 시 약관 · 개인정보 확인 기록</summary>
+                        <ul className="mt-2 space-y-1">{m.application.applicationPolicies.map(policy => <li key={policy.policyDocumentId} className="break-all">
+                          {policy.serviceKey} · {policy.documentType === 'terms' ? '이용약관 동의' : '개인정보 안내 확인'} · 버전 {policy.version}<br />문서 {policy.policyDocumentId}<br />본문 확인값 {policy.contentHash}
+                        </li>)}</ul>
+                      </details>}
                       {m.organizationAddress && <div className="text-xs text-gray-500">{m.organizationAddress}</div>}
                     </td>
                     <td className={TD}>{m.businessNumber || '-'}</td>
@@ -222,19 +247,22 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{p.productName}</div>
                       <div className="text-xs text-gray-500">{formatDateTime(p.createdAt)}</div>
+                      <SupplyProposalDetails proposal={p} />
                     </td>
-                    <td className={TD}>{p.supplierName || '-'}</td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[6rem]`}>{p.supplierName || '-'}</td>
+                    <td className={`${TD} min-w-[7rem]`}>
                       {formatWon(p.unitPrice)}
+                      <SupplyProposalTermsSummary terms={p.termsSnapshot} />
                       {p.priceGeneral !== null && <div className="text-xs text-gray-500">공급가 {formatWon(p.priceGeneral)}</div>}
                     </td>
-                    <td className={TD}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
-                    <td className={TD}>{p.note || '-'}</td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[8rem]`}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
+                    <td className={`${TD} min-w-[6rem]`}>{p.note || '-'}</td>
+                    <td className={`${TD} min-w-[4rem]`}>
                       <StatusBadge status={p.status} />
                       {p.reason && <div className="mt-1 text-xs text-gray-500">{p.reason}</div>}
+                      <SupplyProposalHistory proposal={p} />
                     </td>
-                    <td className={TD}>
+                    <td className={`${TD} min-w-[8rem]`}>
                       <div className="flex flex-wrap gap-1">
                         {(PROPOSAL_ACTIONS[p.status] ?? []).map((a) => (
                           <ActionButton
@@ -377,8 +405,72 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
           </table>
         )}
 
-        {tab === 'contents' && (
-          <table className="w-full min-w-[640px] divide-y divide-gray-200">
+        {tab === 'contents' && <OperatorContentsTable workspace={workspace} contentEditHref={contentEditHref} />}
+      </div>}
+      </>}
+    </div>
+  );
+}
+
+
+function BusinessNavigation({ business, forumHref, renderBusinessHome }: {
+  business: SemiFranchise | undefined;
+  forumHref?: BusinessPageProps['forumHref'];
+  renderBusinessHome?: BusinessPageProps['renderBusinessHome'];
+}) {
+  if (business?.status !== 'active') return null;
+  const forum = forumHref?.(business) ?? `/communities/${encodeURIComponent(business.community_key || `business:${business.key}`)}/forum`;
+  return <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
+    {renderBusinessHome?.(business)}
+    <Link to={forum}>참여자 게시판</Link>
+    <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
+  </nav>;
+}
+
+
+function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ workspace: ReturnType<typeof useAssignedBusinessWorkspace>; contentEditHref?: BusinessPageProps["contentEditHref"] }>) {
+  const { rows, loading, interactionLocked, sfKey, run } = workspace;
+  let contentRows: ReactNode;
+  if (loading) contentRows = <EmptyRow colSpan={6} text="불러오는 중..." />;
+  else if (!rows.length) contentRows = <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />;
+  else contentRows = (rows as SemiFranchiseContent[]).map((c) => (
+                  <tr key={c.id}>
+                    <td className={TD}>
+                      <div className="font-medium text-gray-900">{c.title}</div>
+                      {c.sourceItemId && <div className="text-xs text-blue-700">공급자 등재 요청</div>}
+                      {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
+                    </td>
+                    <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
+                    <td className={TD}>{formatDateTime(c.publishedAt)}</td>
+                    <td className={TD}>{formatDateTime(c.updatedAt)}</td>
+                    <td className={TD}>
+                      <StatusBadge status={c.status} />
+                      {c.reviewReason && <p className="text-xs text-gray-500">{c.reviewReason}</p>}
+                    </td>
+                    <td className={TD}>
+                      <div className="flex flex-wrap gap-1">
+                        {!['archived', 'rejected'].includes(c.status) && (
+                          <Link
+                            to={contentEditHref?.(sfKey, c.id) ?? `/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
+                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            수정
+                          </Link>
+                        )}
+                        {(c.sourceItemId && c.status === 'archived' ? [] : CONTENT_ACTIONS[c.status] ?? []).map((a) => (
+                          <ActionButton
+                            key={a.action}
+                            label={a.label}
+                            action={a.action}
+                            disabled={interactionLocked || loading}
+                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ));
+  return (<table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>제목</th>
@@ -390,51 +482,7 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <EmptyRow colSpan={6} text="불러오는 중..." />
-              ) : rows.length === 0 ? (
-                <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />
-              ) : (
-                (rows as SemiFranchiseContent[]).map((c) => (
-                  <tr key={c.id}>
-                    <td className={TD}>
-                      <div className="font-medium text-gray-900">{c.title}</div>
-                      {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
-                    </td>
-                    <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
-                    <td className={TD}>{formatDateTime(c.publishedAt)}</td>
-                    <td className={TD}>{formatDateTime(c.updatedAt)}</td>
-                    <td className={TD}>
-                      <StatusBadge status={c.status} />
-                    </td>
-                    <td className={TD}>
-                      <div className="flex flex-wrap gap-1">
-                        {c.status !== 'archived' && (
-                          <Link
-                            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
-                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            수정
-                          </Link>
-                        )}
-                        {(CONTENT_ACTIONS[c.status] ?? []).map((a) => (
-                          <ActionButton
-                            key={a.action}
-                            label={a.label}
-                            action={a.action}
-                            disabled={interactionLocked || loading}
-                            onClick={() => run(c.id, a.label, false, () => api.setContentStatus(sfKey, c.id, a.action), c.title)}
-                          />
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+              {contentRows}
             </tbody>
-          </table>
-        )}
-      </div>}
-    </div>
-  );
+          </table>);
 }

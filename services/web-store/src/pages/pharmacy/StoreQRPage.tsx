@@ -1,3 +1,6 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
+import { hasStoreOperationEntry, readStoreOperationEntry, type StoreOperationEntry } from './operations/storeOperationEntry';
+import { StoreOperationReturn } from './operations/StoreExecutionActions';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { printQrSelection } from './qr/printQrSelection';
 import { useQrCreation } from './qr/useQrCreation';
@@ -25,7 +28,7 @@ import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/st
 import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { useState, useEffect, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
-import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
+import { QrCode, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
 //   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
@@ -64,7 +67,6 @@ import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
 import {
-  GuideBackLink,
   StoreQrOperationBoard,
   StoreQrPlacementPanel,
   StoreQrPlacementAnalyticsPanel,
@@ -82,11 +84,13 @@ type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 // @o4o/store-ui-core 의 StoreQrOperationBoard 안으로 옮겼다
 // (WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1 의 해법을 Core 로 승격).
 
-async function loadQrCodes(): Promise<StoreQrCode[]> {
-  const response = await getStoreQrCodes({ limit: 100, includeInactive: true });
-  if (!response.success || !response.data) throw new Error('QR_LOAD_FAILED');
+async function loadQrCodes(limit = 100): Promise<StoreQrCode[]> {
+  const response = await getStoreQrCodes({ limit, includeInactive: true });
+  if (!response.success || !Array.isArray(response.data?.items)) throw new Error('QR_LOAD_FAILED');
   return response.data.items;
 }
+// Match the execution overview's bounded read when resolving its selected QR.
+const loadOperationQrCodes = () => loadQrCodes(200);
 
 export function StoreQRPage() {
   const scope = useStoreOperationScope();
@@ -96,11 +100,15 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const { organizationId } = useStoreOrganizationId();
   const location = useLocation();
   const base = storeWorkspaceBase(location.pathname);
+  const { key: operationScope } = useStoreOperationScope();
+  const operationEntry = readStoreOperationEntry(location.state, operationScope, base, 'qr');
+  const consumedEntry = useRef<StoreOperationEntry | null>(null);
+  const [focusTarget, setFocusTarget] = useState(true);
   const navigate = useNavigate();
   const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
   const [createdTitle, setCreatedTitle] = useState<string | null>(null);
 
-  const { data: items, setData: setItems, loading, error: listError, reload: fetchItems } = useStoreResource(loadQrCodes, []);
+  const { data: items, setData: setItems, loading, error: listError, reload: fetchItems } = useStoreResource(operationEntry ? loadOperationQrCodes : loadQrCodes, []);
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 + QR 설정 모달
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: 'screen_set'(태블릿 코너) 추가.
   const [listFilter, setListFilter] = useState<QrListFilter>('all');
@@ -283,6 +291,12 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     analyticsLoading,
     handleShowAnalytics,
   } = useQrOperations(fetchItems, organizationId);
+  useEffect(() => {
+    if (!operationEntry || consumedEntry.current === operationEntry || loading || listError || !isCurrent() || !items.some(item => item.id === operationEntry.id)) return;
+    consumedEntry.current = operationEntry;
+    setFocusTarget(true); setListFilter('all'); setSelectedIds(new Set([operationEntry.id]));
+    if (placementId !== operationEntry.id) void handleShowPlacements(operationEntry.id);
+  }, [operationEntry, items, loading, listError, isCurrent, placementId, handleShowPlacements]);
 
   const apiBase = import.meta.env.VITE_API_BASE_URL
     ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/${getActiveServicePrefix()}`
@@ -294,7 +308,8 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
 
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
   //   보관 코너 QR 은 일괄 출력 대상에서도 제외한다(개별 출력 차단과 동일 기준).
-  const printableItems = items.filter((i) => !isArchivedCornerQr(i));
+  const operationItems = focusTarget && operationEntry ? items.filter(item => item.id === operationEntry.id) : items;
+  const printableItems = operationItems.filter((i) => !isArchivedCornerQr(i));
 
   const handleSelectAll = () => {
     if (selectedIds.size === printableItems.length) {
@@ -365,17 +380,17 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
   //   일반 QR · AI 설명 QR · 코너 QR 구분을 유지한다(코너 QR 은 화면 세트 저장 시 자동 생성 — 수동 생성 경로 없음).
-  const filteredItems = items.filter((q) => {
+  const filteredItems = operationItems.filter((q) => {
     if (listFilter === 'ai') return !!q.aiDescriptionMode;
     if (listFilter === 'content') return q.landingType === 'page' && !q.aiDescriptionMode;
     if (listFilter === 'screen_set') return q.landingType === 'screen_set';
     return true;
   });
-  const aiCount = items.filter((q) => !!q.aiDescriptionMode).length;
-  const contentCount = items.filter((q) => q.landingType === 'page' && !q.aiDescriptionMode).length;
-  const cornerCount = items.filter((q) => q.landingType === 'screen_set').length;
+  const aiCount = operationItems.filter((q) => !!q.aiDescriptionMode).length;
+  const contentCount = operationItems.filter((q) => q.landingType === 'page' && !q.aiDescriptionMode).length;
+  const cornerCount = operationItems.filter((q) => q.landingType === 'screen_set').length;
   const FILTER_TABS: { key: QrListFilter; label: string; count: number }[] = [
-    { key: 'all', label: '전체', count: items.length },
+    { key: 'all', label: '전체', count: operationItems.length },
     { key: 'content', label: '콘텐츠 연결', count: contentCount },
     { key: 'ai', label: 'AI 설명', count: aiCount },
     { key: 'screen_set', label: '태블릿 코너', count: cornerCount },
@@ -383,22 +398,19 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
   //   홈 '활성 QR' KPI 와 **같은 판정(landable)** 으로 센 값. 두 화면의 숫자가 어긋나지 않아야 한다.
   //   landable 미제공(구버전 응답)이면 isActive 로 안전 폴백.
-  const activeCount = items.filter((q) => q.landable ?? q.isActive).length;
-  const archivedCount = items.length - activeCount;
+  const activeCount = operationItems.filter((q) => q.landable ?? q.isActive).length;
+  const archivedCount = operationItems.length - activeCount;
 
   return (
     <div style={styles.container}>
       <StoreWorkflowNavigation subject="QR" />
+      <StoreOperationReturn entry={operationEntry} />
+      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="mb-3 text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주세요.</p>}
+      {operationEntry && !loading && !listError && <div className="mb-3 text-sm text-slate-600">
+        {items.some(item => item.id === operationEntry.id) ? <><span>선택한 QR의 배치·출력을 열었습니다. </span>{focusTarget && <button type="button" className="min-h-11 underline" onClick={() => setFocusTarget(false)}>전체 QR 보기</button>}</>
+          : <p role="alert">선택한 QR을 현재 조회한 목록에서 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void fetchItems()}>QR 다시 확인</button></p>}
+      </div>}
       {createdTitle && <div role="status" className="mb-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">{createdTitle} QR을 저장했습니다. <Link className="font-semibold underline" to={withWorkspaceMode(`${location.pathname}${location.search}`, 'use')}>배치·출력으로 이어가기</Link></div>}
-      {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
-      <div style={{ marginBottom: '16px' }}>
-        <GuideBlock
-          variant="warning"
-          title="QR 코드는 '연결 대상'을 저장합니다"
-          description="QR 코드는 내용을 직접 저장하지 않고, 고객이 스캔했을 때 이동할 연결 대상을 저장합니다. 운영자가 제공한 QR 템플릿을 가져오거나, 내 자료/외부 URL을 연결해 새 QR을 만들 수 있습니다."
-        />
-      </div>
-
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -417,7 +429,6 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             취급제품 화면에서 따로 출력합니다
           </p>
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <GuideBackLink to="/guide/features/qr" label="QR 활용 방법" />
             {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 기준 안내 보조 버튼 */}
             <button
               type="button"
@@ -453,13 +464,24 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       </div>
 
+      <StoreAiSlot label="QR 관리" />
+      <details className="mb-3 text-sm text-slate-600"><summary className="min-h-11 cursor-pointer content-center">QR 연결·파일 안내</summary>      {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
+      <div style={{ marginBottom: '16px' }}>
+        <GuideBlock
+          variant="warning"
+          title="QR 코드는 '연결 대상'을 저장합니다"
+          description="QR 코드는 내용을 직접 저장하지 않고, 고객이 스캔했을 때 이동할 연결 대상을 저장합니다. 운영자가 제공한 QR 템플릿을 가져오거나, 내 자료/외부 URL을 연결해 새 QR을 만들 수 있습니다."
+        />
+      </div>
+
+</details>
       {/* Batch Print Toolbar */}
       {statusBusy && <p role="status" className="mb-3 text-sm text-slate-600">QR 상태 변경 중…</p>}
       {statusNotice && <p role="status" className="mb-3 text-sm text-teal-800">{statusNotice}</p>}
       {statusError && <div role="alert" className="mb-3 text-sm text-red-700">QR 상태 변경 결과를 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void changeQrStatus(statusError.id, statusError.active)}>QR 상태 변경 다시 시도</button></div>}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
       {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
-      {items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
+      {workspaceMode === 'use' && items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
 
       {workspaceMode === 'studio' && <StoreQrCreateForms
         creating={creating}
@@ -482,7 +504,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           카드형 → @o4o/ui DataTable. 자체 selectedIds (Set<string>) + handleBulkPrint
           (외부 toolbar) 는 그대로 보존 — DataTable rowSelection 은 Set ↔ Array 변환만.
           analytics 토글은 행 아래 펼침이 직접 지원 안 되므로 표 하단에 별도 패널로 표시. */}
-      <div style={styles.body}>
+      <div style={styles.body} hidden={workspaceMode === 'studio' && creating}>
         {!loading && !listError && items.length === 0 && (!creating || workspaceMode === 'use') ? (
           <div style={styles.emptyState}>
             {/* WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
@@ -511,15 +533,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 <FolderOpen size={14} />
                 콘텐츠·자료·내 매장 제작자료에서 QR 만들기
               </button>
-              <button
-                type="button"
-                disabled
-                style={styles.emptyCtaDisabled}
-                title="준비 중 — 외부 URL은 내 자료함에 자료로 등록한 뒤 QR로 만들 수 있습니다."
-              >
-                <ExternalLink size={14} />
-                외부 URL QR 만들기 (준비 중)
-              </button>
+
             </div>
           </div>
         ) : (

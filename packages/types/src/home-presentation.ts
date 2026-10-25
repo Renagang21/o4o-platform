@@ -8,6 +8,8 @@ export const HOME_SURFACES = [
   "pharmacy",
   "lecture",
   "branch",
+  "pharmcoop",
+  "cooperative",
 ] as const;
 export type HomeSurface = (typeof HOME_SURFACES)[number];
 export interface HomeMessage {
@@ -81,6 +83,18 @@ export const HOME_SURFACE_INFO: Record<
     accent: "#6652a1",
     purpose: "강의를 만나고 나의 배움을 이어가는 학습 공간",
   },
+  pharmcoop: {
+    name: "약국 협동조합 연합회",
+    serviceKey: "neture",
+    accent: "#123f38",
+    purpose: "독립된 협동조합의 협력과 연결",
+  },
+  cooperative: {
+    name: "협동조합",
+    serviceKey: "neture",
+    accent: "#226c66",
+    purpose: "우리 조합의 소식과 참여 안내",
+  },
   branch: {
     name: "분회",
     serviceKey: "kpa-branch",
@@ -116,8 +130,8 @@ const COPY: Record<HomeSurface, [string, string, string, string]> = {
   carepharm: [
     "만성질환 관리, 약국이 함께합니다",
     "참여 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.",
-    "꾸준한 상담을 함께 고민합니다",
-    "복약 상담과 지속적인 건강 관리에 도움이 되는 현장 경험을 나눠보세요.",
+    "함께 나누는 약국 경영 자료",
+    "회원 자료와 협업체 소식을 확인하고 내 약국에서 활용하세요.",
   ],
   pharmacy: [
     "약국의 일상에 든든한 연결",
@@ -130,6 +144,18 @@ const COPY: Record<HomeSurface, [string, string, string, string]> = {
     "관심 있는 강의를 만나고, 나의 학습을 이어가세요.",
     "나의 속도로 이어가는 학습",
     "공개 강의를 살펴보고 수강 중인 학습과 자료를 확인하세요.",
+  ],
+  pharmcoop: [
+    "조합의 힘을 모아, 약국의 내일을 함께.",
+    "각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다.",
+    "함께하는 협동조합",
+    "소속 조합의 소식과 참여 안내를 확인하세요.",
+  ],
+  cooperative: [
+    "조합의 소식과 필요한 자료를 한곳에서.",
+    "회원 활동은 조합에서, 약국 경영 업무는 내 매장에서 이어갑니다.",
+    "우리 조합의 참여 안내",
+    "가입 자격과 조합의 소식을 확인하세요.",
   ],
   branch: [
     "가까운 소식, 함께하는 분회",
@@ -158,10 +184,12 @@ export function initialHomePresentation(
   });
   return {
     enabled: true,
-    slides: [
-      message("welcome", title, description),
-      message("discover", secondTitle, secondDescription),
-    ],
+    slides: ["carepharm", "pharmcoop", "cooperative"].includes(surface)
+      ? [message("welcome", title, description)]
+      : [
+          message("welcome", title, description),
+          message("discover", secondTitle, secondDescription),
+        ],
     promotions: [
       message(
         "service-introduction",

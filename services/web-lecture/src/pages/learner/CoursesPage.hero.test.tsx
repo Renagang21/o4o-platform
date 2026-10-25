@@ -1,0 +1,33 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { initialHomePresentation } from '../../../../../packages/types/src/home-presentation';
+const mocks = vi.hoisted(() => ({ get: vi.fn(), courses: vi.fn() }));
+vi.mock('../../lib/apiClient', () => ({ api: { get: mocks.get } }));
+vi.mock('../../api/lecture', () => ({ learnerApi: { getCourses: mocks.courses } }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: null, isAuthenticated: false }) }));
+import CoursesPage from './CoursesPage';
+beforeEach(() => { mocks.courses.mockResolvedValue({ data: [] }); });
+afterEach(() => { cleanup(); vi.resetAllMocks(); });
+it('shows the learning identity above the catalog even without a publication', async () => {
+  mocks.get.mockResolvedValue({ data: { success: true, data: null } });
+  render(<MemoryRouter><CoursesPage /></MemoryRouter>);
+  const heading = await screen.findByRole('heading', { level: 1 });
+  expect(heading.textContent).toContain('필요한 지식을');
+  expect(screen.getByRole('heading', { level: 2, name: '강의' })).toBeTruthy();
+  await waitFor(() => expect(mocks.get).toHaveBeenCalledWith('/home-presentation/lecture'));
+  expect(await screen.findByText('등록된 강의가 없습니다.')).toBeTruthy();
+});
+it('uses the lecture publication and hides slides when the operator disables them', async () => {
+  const published = initialHomePresentation('lecture');
+  published.slides[0].title = '운영자가 게시한 학습 안내';
+  mocks.get.mockResolvedValue({ data: { success: true, data: published } });
+  const view = render(<MemoryRouter><CoursesPage /></MemoryRouter>);
+  expect(await screen.findByRole('heading', { name: '운영자가 게시한 학습 안내' })).toBeTruthy();
+  view.unmount();
+  published.enabled = false;
+  render(<MemoryRouter><CoursesPage /></MemoryRouter>);
+  await waitFor(() => expect(document.querySelector('.home-plain-title')).not.toBeNull());
+  expect(screen.queryByRole('heading', { name: '운영자가 게시한 학습 안내' })).toBeNull();
+  expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('필요한 지식을');
+});

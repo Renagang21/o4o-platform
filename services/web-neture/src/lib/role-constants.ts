@@ -1,3 +1,4 @@
+import { pharmacyCollaboratorRoles } from '@o4o/types';
 /**
  * Neture Role Constants — SSOT
  *
@@ -7,7 +8,7 @@
  * 기능 동작 변경 없음.
  */
 
-import { isServiceAccessAllowed, type UserLike } from './membershipGate';
+import { getServiceMembershipStatus, isServiceAccessAllowed, type UserLike } from './membershipGate';
 
 // ─── Role Strings ──────────────────────────────────────────────────────────
 
@@ -118,6 +119,7 @@ export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
 export type SubdomainOperatorLevel = 'admin' | 'operator';
 
 export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: SubdomainOperatorLevel): string[] {
+  if (key === 'community') return level === 'operator' ? ['community:operator', 'community:admin'] : ['community:admin'];
   if (level === 'operator') {
     return [`${key}:operator`, `${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
   }
@@ -135,14 +137,22 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   path: string;
   key: SubdomainOperatorKey;
   level: SubdomainOperatorLevel;
+  primaryEntry?: boolean;
 }> = Object.freeze([
   { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
+  { path: '/operator/market-trial/operators', key: 'funding', level: 'admin', primaryEntry: false },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
-  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 전용 지정 업무는 이 화면에서 수행한다.
+  // Community service operation uses its own service roles; legacy admin URL redirects to the service workspace.
   { path: '/admin/communities', key: 'community', level: 'admin' },
   { path: '/operator/communities', key: 'community', level: 'operator' },
+  { path: '/operator/inbox/supplier', key: 'supplier', level: 'operator', primaryEntry: false },
+  { path: '/operator/inbox/funding', key: 'funding', level: 'operator', primaryEntry: false },
+  { path: '/operator/inbox/community', key: 'community', level: 'operator', primaryEntry: false },
+  { path: '/operator/service-contact/supplier', key: 'supplier', level: 'operator' },
+  { path: '/operator/service-contact/funding', key: 'funding', level: 'operator' },
+  { path: '/operator/service-contact/community', key: 'community', level: 'operator' },
   { path: '/operator/service-members/supplier', key: 'supplier', level: 'operator' },
   { path: '/operator/service-members/funding', key: 'funding', level: 'operator' },
   { path: '/operator/service-members/community', key: 'community', level: 'operator' },
@@ -163,15 +173,18 @@ export type SubdomainOperatorViewer = UserLike | null | undefined;
 /**
  * 메뉴 항목 경로가 서브도메인 운영자 화면이면 **`SubdomainOperatorRoute` 와 같은 조건**일 때만 true:
  *   범위 역할(`{key}:{level}`, admin ⊃ operator) **그리고** 그 서비스 membership active.
- *   `platform:super_admin` 은 membership 없이 통과(MembershipGate · 백엔드 platformBypass 와 같음).
+ *   supplier/funding의 platform bypass는 유지한다. community는 자체 역할과 active membership을 모두 요구한다.
  * 역할만 남고 membership 이 없거나 pending · suspended 인 계정은 route 에서 막히므로 링크도 숨긴다.
  * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
  */
 export function canSeeSubdomainOperatorPath(viewer: SubdomainOperatorViewer, path: string): boolean {
-  if (path === '/admin/semi-franchises' || path.startsWith('/admin/semi-franchises/')) return !!viewer?.roles?.includes('platform:super_admin');
+  if (['/admin/semi-franchises', '/admin/pharmacy-service-settings'].some(prefix => path === prefix || path.startsWith(`${prefix}/`))) return !!viewer?.roles?.includes('platform:super_admin');
   const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
   if (!screen) return true;
-  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && isServiceAccessAllowed(viewer, screen.key);
+  const memberAllowed = screen.key === 'community'
+    ? getServiceMembershipStatus(viewer, 'community') === 'active'
+    : isServiceAccessAllowed(viewer, screen.key);
+  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && memberAllowed;
 }
 
 /**
@@ -201,4 +214,13 @@ export function withoutUnreachableSubdomainOperatorLinks<
   return (items ?? []).filter((item) =>
     [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(viewer, p)),
   );
+}
+
+/** The main host redirects this entry to pharmacy; CarePharm owns its local entry.
+ * Other collaborators use their own application's operator navigation.
+ */
+export function getBusinessOperatorRolesForHost(profile: string): string[] {
+  if (profile === 'carepharm') return pharmacyCollaboratorRoles('carepharm');
+  if (profile === 'main') return pharmacyCollaboratorRoles('pharmacy');
+  return [];
 }

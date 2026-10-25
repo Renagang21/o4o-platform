@@ -32,12 +32,12 @@ export const supplierKpaEventOfferApi = {
         }) => res.data.data.offers || [],
       ),
 
-  proposeOffer: (offerId: string): Promise<ProposeOfferResult> =>
+  proposeOffer: (offerId: string, conditions: ProposeEventConditions): Promise<ProposeOfferResult> =>
     api
       .post<{
         success: boolean;
         data: ProposeOfferResult;
-      }>('/kpa/supplier/event-offers', { offerId })
+      }>('/kpa/supplier/event-offers', { offerId, ...conditions })
       .then((res: { data: { success: boolean; data: ProposeOfferResult } }) => res.data.data),
 
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1 + WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1

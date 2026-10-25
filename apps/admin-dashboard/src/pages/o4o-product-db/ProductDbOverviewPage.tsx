@@ -1,3 +1,4 @@
+import ProductCorrectionOperations from './ProductCorrectionOperations';
 /**
  * ProductDbOverviewPage — O4O 상품 DB 운영 대시보드 (read-only)
  *
@@ -166,6 +167,7 @@ export default function ProductDbOverviewPage() {
 
   return (
     <div className="space-y-8">
+      <ProductCorrectionOperations />
       {/* ── 1. 오늘 처리할 작업 (가장 위) ─────────────────────────────── */}
       <section>
         <h2 className="text-base font-semibold text-gray-800 mb-1">오늘 처리할 작업</h2>

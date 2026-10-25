@@ -75,6 +75,13 @@ function FieldError({ error }: Readonly<{ error?: string }>) {
   return error && <p className="text-xs text-red-500 mt-1">{error}</p>;
 }
 
+function koreanLocalTime(value?:string){
+ if(!value)return '';
+ const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(value));
+ const get=(t:string)=>parts.find(p=>p.type===t)?.value??'';
+ return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}`;
+}
+function fromKoreanLocal(value:string){return new Date(`${value.length===10?value+'T00:00:00':value}+09:00`).toISOString();}
 function fundingPayload({ title, oneLiner, videoUrl, description, outcomeDescription, maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays, targetAmount, trialUnitPrice, rewardRate, salesScenarioContent, outcomeType }: FundingFormValues): CreateTrialPayload {
   const scenarioHtml = salesScenarioContent?.trim();
   return {
@@ -87,8 +94,8 @@ function fundingPayload({ title, oneLiner, videoUrl, description, outcomeDescrip
       ? { expectedType: outcomeType, description: outcomeDescription.trim() }
       : undefined,
     maxParticipants: maxParticipants ? Number(maxParticipants) : undefined,
-    fundingStartAt: new Date(fundingStartAt).toISOString(),
-    fundingEndAt: new Date(fundingEndAt).toISOString(),
+    fundingStartAt: fromKoreanLocal(fundingStartAt),
+    fundingEndAt: fromKoreanLocal(fundingEndAt),
     trialPeriodDays: Number(trialPeriodDays),
     // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
     targetAmount: targetAmount ? Number(targetAmount) : undefined,
@@ -121,8 +128,8 @@ export default function FundingCreatePage({
   const [outcomeType, setOutcomeType] = useState<'product' | 'cash'>(initialData?.outcomeSnapshot?.expectedType || 'product');
   const [outcomeDescription, setOutcomeDescription] = useState(initialData?.outcomeSnapshot?.description || '');
   const [maxParticipants, setMaxParticipants] = useState(initialData?.maxParticipants ? String(initialData.maxParticipants) : '');
-  const [fundingStartAt, setFundingStartAt] = useState(initialData?.startDate ? initialData.startDate.slice(0, 10) : '');
-  const [fundingEndAt, setFundingEndAt] = useState(initialData?.endDate ? initialData.endDate.slice(0, 10) : '');
+  const [fundingStartAt, setFundingStartAt] = useState(koreanLocalTime(initialData?.startDate));
+  const [fundingEndAt, setFundingEndAt] = useState(koreanLocalTime(initialData?.endDate));
   const [trialPeriodDays, setTrialPeriodDays] = useState(initialData?.trialPeriodDays ? String(initialData.trialPeriodDays) : '30');
   // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
   const [targetAmount, setTargetAmount] = useState(initialData?.targetAmount ? String(initialData.targetAmount) : '');
@@ -192,6 +199,8 @@ export default function FundingCreatePage({
 
     try {
       const payload = fundingPayload(values);
+      if(initialData?.startDate&&fundingStartAt===koreanLocalTime(initialData.startDate))payload.fundingStartAt=initialData.startDate;
+      if(initialData?.endDate&&fundingEndAt===koreanLocalTime(initialData.endDate))payload.fundingEndAt=initialData.endDate;
 
       const id = await saveFundingDraft(payload);
       if (!current()) return;
@@ -494,10 +503,10 @@ export default function FundingCreatePage({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="funding-fundingStartAt" className="block text-sm font-medium text-gray-700 mb-1">
-                  모집 시작일 <span className="text-red-500">*</span>
+                  모집 시작일 (한국 시간) <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local" step={1}
                   id="funding-fundingStartAt"
               value={fundingStartAt}
                   onChange={(e) => setFundingStartAt(e.target.value)}
@@ -506,10 +515,10 @@ export default function FundingCreatePage({
               </div>
               <div>
                 <label htmlFor="funding-fundingEndAt" className="block text-sm font-medium text-gray-700 mb-1">
-                  모집 종료일 <span className="text-red-500">*</span>
+                  모집 종료일 (한국 시간) <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local" step={1}
                   id="funding-fundingEndAt"
               value={fundingEndAt}
                   onChange={(e) => setFundingEndAt(e.target.value)}

@@ -36,27 +36,7 @@ export function useSupplierCandidateSubmission(
     setSubmitting(true);
     setSubmitError('');
 
-    // 1) 이미지: 파일은 미디어 라이브러리(master-less)에 먼저 업로드해 URL 로 바꾼다. 라이브러리 항목은 URL 그대로.
-    //    실패한 파일은 Candidate 에서 제외하고 안내한다(제출 자체는 계속).
-    let imageFailures = 0;
-    let imageUrl: string | null = null;
-    if (thumbnailSource?.kind === 'file') {
-      const up = await mediaApi.upload(thumbnailSource.file, true, undefined, 'product-thumbnail');
-      if (up.success && up.data?.url) imageUrl = up.data.url;
-      else imageFailures += 1;
-    } else if (thumbnailSource?.kind === 'library') {
-      imageUrl = thumbnailSource.url;
-    }
-    const contentImageUrls: string[] = [];
-    for (const item of contentItems) {
-      if (item.kind === 'library') {
-        contentImageUrls.push(item.url);
-        continue;
-      }
-      const up = await mediaApi.upload(item.file, true, undefined, 'description');
-      if (up.success && up.data?.url) contentImageUrls.push(up.data.url);
-      else imageFailures += 1;
-    }
+    const { imageFailures, imageUrl, contentImageUrls } = await uploadCandidateImages(media);
 
     // 2) 규제 정보: 제품 유형(진입 선택) → regulatoryType/drugCategory. 규제 카테고리면 규제명·허가번호 포함.
     const regulatoryType = (productType?.regulatoryType || form.regulatoryType || 'GENERAL') as
@@ -84,15 +64,8 @@ export function useSupplierCandidateSubmission(
       mfdsPermitNumber: isRegulated ? form.mfdsPermitNumber.trim() || null : null,
       imageUrl,
       contentImageUrls,
-      offerDraft: {
-        priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
-        consumerReferencePrice: form.consumerReferencePrice
-          ? Number(form.consumerReferencePrice)
-          : null,
-        consumerShortDescription: consumerShortDesc || null,
-        // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-        isFeatured: form.isFeatured,
-      },
+      offerDraft: { consumerShortDescription: consumerShortDesc || null },
+
     });
     setSubmitting(false);
 
@@ -121,4 +94,31 @@ export function useSupplierCandidateSubmission(
     submitting,
     handleSubmit,
   };
+}
+
+async function uploadCandidateImages(media: ReturnType<typeof useSupplierCandidateMedia>) {
+  const { thumbnailSource, contentItems } = media;
+    // 1) 이미지: 파일은 미디어 라이브러리(master-less)에 먼저 업로드해 URL 로 바꾼다. 라이브러리 항목은 URL 그대로.
+    //    실패한 파일은 Candidate 에서 제외하고 안내한다(제출 자체는 계속).
+    let imageFailures = 0;
+    let imageUrl: string | null = null;
+    if (thumbnailSource?.kind === 'file') {
+      const up = await mediaApi.upload(thumbnailSource.file, true, undefined, 'product-thumbnail');
+      if (up.success && up.data?.url) imageUrl = up.data.url;
+      else imageFailures += 1;
+    } else if (thumbnailSource?.kind === 'library') {
+      imageUrl = thumbnailSource.url;
+    }
+    const contentImageUrls: string[] = [];
+    for (const item of contentItems) {
+      if (item.kind === 'library') {
+        contentImageUrls.push(item.url);
+        continue;
+      }
+      const up = await mediaApi.upload(item.file, true, undefined, 'description');
+      if (up.success && up.data?.url) contentImageUrls.push(up.data.url);
+      else imageFailures += 1;
+    }
+
+  return { imageFailures, imageUrl, contentImageUrls };
 }

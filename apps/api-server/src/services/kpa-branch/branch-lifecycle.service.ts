@@ -1,3 +1,4 @@
+import { ServiceOperatorInvitationService, type PreparedInvitation } from '../admin/service-operator-invitation.service.js';
 /**
  * 분회 개설 신청·승인 lifecycle
  *
@@ -166,7 +167,8 @@ export class BranchLifecycleService {
     | { outcome: 'created'; branch: KpaOrganization; request: BranchCreationRequestRow }
     | { outcome: 'slug_conflict'; slug: string; reason: 'taken' | 'reserved' }
   > {
-    return this.dataSource.transaction(async (m) => {
+    let invitation: PreparedInvitation | undefined;
+    const result = await this.dataSource.transaction(async (m) => {
       const found: BranchCreationRequestRow[] = await m.query(
         `SELECT * FROM branch_creation_requests WHERE id = $1`,
         [input.requestId],
@@ -229,7 +231,7 @@ export class BranchLifecycleService {
       );
 
       // 신청자가 첫 운영자가 된다 — 세 축을 모두 만든다.
-      await this.grantFirstOperator(m, request.requester_user_id, branch.id, input.reviewerUserId);
+      invitation = await this.grantFirstOperator(m, request.requester_user_id, branch.id, input.reviewerUserId);
 
       const updated: BranchCreationRequestRow[] = await m.query(
         `UPDATE branch_creation_requests
@@ -242,6 +244,8 @@ export class BranchLifecycleService {
 
       return { outcome: 'created' as const, branch, request: updated[0] };
     });
+    if (invitation) await new ServiceOperatorInvitationService(this.dataSource).deliver(invitation);
+    return result;
   }
 
   /** 개설 거절 — 사유를 남기고 분회를 만들지 않는다. */
@@ -311,7 +315,7 @@ export class BranchLifecycleService {
     userId: string,
     branchId: string,
     reviewerUserId: string,
-  ): Promise<void> {
+  ): Promise<PreparedInvitation> {
     const repo = m.getRepository(BranchMembership);
     const existing = await repo.findOne({
       where: { user_id: userId, organization_id: branchId, status: 'active' },
@@ -332,10 +336,8 @@ export class BranchLifecycleService {
     // 운영자 역할은 **canonical 경로**로만 준다. RBAC SSOT 는 frozen(F9)이고, 이 서비스가
     // 활성 행 탐색 -> 비활성 이력 행 복원 순서를 이미 처리한다(`unique_active_role_per_user`
     // 가 (user_id, role) WHERE is_active 라 직접 INSERT 는 23505 를 만들 수 있다).
-    await roleAssignmentService.assignRole(
-      { userId, role: KPA_BRANCH_OPERATOR_ROLE, assignedBy: reviewerUserId },
-      m,
-    );
+
+    return new ServiceOperatorInvitationService(this.dataSource).prepare(m,{actorId:reviewerUserId,targetUserId:userId,serviceKey:'kpa-branch',role:KPA_BRANCH_OPERATOR_ROLE,scopeType:'branch',scopeKey:branchId});
   }
 }
 

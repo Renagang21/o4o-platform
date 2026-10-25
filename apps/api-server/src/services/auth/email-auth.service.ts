@@ -41,6 +41,7 @@ import {
 import { passwordCredentialService } from './password-credential.service.js';
 import logger from '../../utils/logger.js';
 import { EmailAuthRecovery } from './email-auth.recovery.js';
+import { EmailAuthTokenService } from './email-auth-token.service.js';
 import {
   EmailAuthError,
   EmailAuthRequestMeta,
@@ -48,10 +49,6 @@ import {
   EmailLoginInput,
   EmailAuthSession,
   VERIFICATION_TOKEN_TTL_MS,
-  TokenKind,
-  TOKEN_TABLE,
-  hashToken,
-  newPlainToken,
   resolveMailLinkOrigin,
   Queryable,
   MailSender,
@@ -79,6 +76,7 @@ export type { PasswordSessionIssuer } from './email-auth.shared.js';
 export type { EmailAuthServiceDeps } from './email-auth.shared.js';
 
 export class EmailAuthService {
+  private readonly tokens: EmailAuthTokenService;
   private readonly _dataSource?: EmailAuthServiceDeps['dataSource'];
 
   private readonly passwords: PasswordStore;
@@ -116,6 +114,7 @@ export class EmailAuthService {
           context,
         ));
     this.now = deps.now ?? (() => new Date());
+    this.tokens = new EmailAuthTokenService(() => this.dataSource, this.now);
     this.resolveSemiFranchiseAccess =
       deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
     this.revokeAllSessions =
@@ -298,25 +297,21 @@ export class EmailAuthService {
 
   /** POST /auth/email/verify — 토큰 소비 → `isEmailVerified=true`. 자동 로그인하지 않는다. */
   async verifyEmail(plainToken: string): Promise<{ maskedEmail: string }> {
-    const row = await this.consumeToken('verification', plainToken);
-    if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-
-    const user = await this.dataSource
-      .getRepository(User)
-      .findOne({ where: { id: row.user_id } });
-    // 토큰 발급 뒤 주소가 바뀌었으면 옛 주소의 확인은 현재 주소를 확인하지 않는다.
-    if (
-      !user ||
-      normalizeLoginEmail(user.email) !== normalizeLoginEmail(row.email)
-    ) {
-      throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-    }
-    if (!user.isEmailVerified) {
-      await this.dataSource
-        .getRepository(User)
-        .update({ id: user.id }, { isEmailVerified: true });
-    }
-    return { maskedEmail: maskLoginEmail(user.email) };
+    return this.dataSource.transaction(async manager => {
+      const row = await this.tokens.consume('verification', plainToken, manager);
+      if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
+      const repo = manager.getRepository(User);
+      const user = await repo.findOne({ where: { id: row.user_id } });
+      // Address validation, account update and final consumption roll back together.
+      if (!user || normalizeLoginEmail(user.email) !== normalizeLoginEmail(row.email)) {
+        throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
+      }
+      if (!user.isEmailVerified) await repo.update({ id: user.id }, { isEmailVerified: true });
+      await manager.query(
+        `UPDATE email_verification_tokens SET consumed_at = now() WHERE user_id = $1 AND consumed_at IS NULL`, [user.id],
+      );
+      return { maskedEmail: maskLoginEmail(user.email) };
+    });
   }
 
   /** Social callers must first prove the linked provider identity; this does not open an HTTP route. */
@@ -324,32 +319,16 @@ export class EmailAuthService {
     user: User,
     sessionServiceKey: string | null,
   ): Promise<boolean> {
-    const plain = await this.issueToken(
-      'verification',
-      user.id,
-      VERIFICATION_TOKEN_TTL_MS,
-      normalizeLoginEmail(user.email),
-    );
-    const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email#token=${encodeURIComponent(plain)}`;
-    try {
+    return this.tokens.send('verification', user, VERIFICATION_TOKEN_TTL_MS, async plain => {
+      const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email#token=${encodeURIComponent(plain)}`;
       const mailer = await this.mailer();
-      const result = await mailer.sendEmail({
+      return mailer.sendEmail({
         to: user.email,
         subject: '[O4O] 이메일 주소를 확인해 주세요',
         template: 'email-verification',
         data: { verifyUrl, year: String(this.now().getFullYear()) },
       });
-      if (!result.success)
-        logger.warn('[EmailAuth] verification mail not sent', {
-          error: result.error,
-        });
-      return result.success;
-    } catch (error) {
-      logger.warn('[EmailAuth] verification mail failed', {
-        error: (error as Error).message,
-      });
-      return false;
-    }
+    });
   }
 
   // ── 로그인 ──────────────────────────────────────────────────────────────
@@ -466,72 +445,6 @@ export class EmailAuthService {
 
   // ── 내부 ────────────────────────────────────────────────────────────────
 
-  /**
-   * 새 1회용 토큰을 만들고 **평문을 반환**한다(메일 링크에만 쓴다). DB 에는 해시만 들어간다.
-   * 같은 사용자의 미사용 토큰은 소비 처리해 가장 최근 링크 하나만 살아 있게 한다.
-   */
-  private async issueToken(
-    kind: TokenKind,
-    userId: string,
-    ttlMs: number,
-    email?: string,
-  ): Promise<string> {
-    const table = TOKEN_TABLE[kind];
-    const plain = newPlainToken();
-    const expiresAt = new Date(this.now().getTime() + ttlMs);
-    await this.dataSource.query(
-      `DELETE FROM ${table} WHERE user_id = $1 AND (consumed_at IS NOT NULL OR expires_at < now())`,
-      [userId],
-    );
-    await this.dataSource.query(
-      `UPDATE ${table} SET consumed_at = now() WHERE user_id = $1 AND consumed_at IS NULL`,
-      [userId],
-    );
-    if (kind === 'verification') {
-      await this.dataSource.query(
-        `INSERT INTO email_verification_tokens (user_id, email, token_hash, expires_at) VALUES ($1, $2, $3, $4)`,
-        [userId, email ?? '', hashToken(plain), expiresAt],
-      );
-    } else {
-      await this.dataSource.query(
-        `INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)`,
-        [userId, hashToken(plain), expiresAt],
-      );
-    }
-    return plain;
-  }
-
-  /** 원자적 소비 — 동시 두 요청 중 하나만 행을 돌려받는다. */
-  private async consumeToken(
-    kind: TokenKind,
-    plainToken: string,
-    manager?: Queryable,
-  ): Promise<{ user_id: string; email: string } | null> {
-    if (
-      typeof plainToken !== 'string' ||
-      plainToken.length < 20 ||
-      plainToken.length > 200
-    )
-      return null;
-    const table = TOKEN_TABLE[kind];
-    const returning =
-      kind === 'verification' ? 'user_id, email' : `user_id, '' AS email`;
-    const result: unknown = await (manager ?? this.dataSource).query(
-      `UPDATE ${table} SET consumed_at = now()
-        WHERE token_hash = $1 AND consumed_at IS NULL AND expires_at > now()
-        RETURNING ${returning}`,
-      [hashToken(plainToken)],
-    );
-    // TypeORM(pg) 는 UPDATE … RETURNING 을 [rows, affected] 로 돌려준다.
-    const rows = (
-      Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result
-    ) as Array<{
-      user_id: string;
-      email: string;
-    }>;
-    return rows?.[0] ?? null;
-  }
-
   private async logActivity(
     userId: string,
     meta: EmailAuthRequestMeta,
@@ -566,10 +479,9 @@ export class EmailAuthService {
       readRoles: this.readRoles,
       revokeAllSessions: this.revokeAllSessions,
       findUserByLoginEmail: (email) => this.findUserByLoginEmail(email),
-      issueToken: (kind, id, ttl, email) =>
-        this.issueToken(kind, id, ttl, email),
+      sendTokenMail: (kind, user, ttl, deliver) => this.tokens.send(kind, user, ttl, deliver),
       consumeToken: (kind, token, manager) =>
-        this.consumeToken(kind, token, manager),
+        this.tokens.consume(kind, token, manager),
       mailer: () => this.mailer(),
     }));
   }

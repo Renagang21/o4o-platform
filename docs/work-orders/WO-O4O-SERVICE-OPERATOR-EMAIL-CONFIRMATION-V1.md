@@ -117,3 +117,17 @@ inspect 이후 실제 수락에서 INVALID_OR_EXPIRED_INVITATION이 반환되는
 수락 만료/다른 계정/일시 오류와 storage get/set/remove 차단 StrictMode를 포함한 focused25 PASS, Neture 전체1036 PASS, production build PASS, 변경 lint 오류0/기존 경고1. API·schema 변경 없고 운영 DB·SMTP·메일 발송·DDL은 미실행이다. 최종 CI·Codex는 새 head로 다시 확인한다.
 
 후속 경계 확인: storage 읽기는 가능하지만 쓰기만 quota 오류가 나는 경우 기존 다른 token으로 되돌아가지 않도록 메모리 상태를 우선하고, remove만 실패해도 종료 token이 부활하지 않게 했다. 이 두 회귀를 포함한 focused27 PASS, 최종 Neture build·변경 lint PASS. 전체1036은 앞 단계 결과다.
+
+## 2026-10-25 연속 Phase — 본인 수락 통일과 보존·파기
+
+이 절이 앞 단계의 기존 운영자 재확인·전체 관리자 전용 지정·재발송 기한 연장·옛 migration 계획을 대체한다. 사용자 확정 정본은 [운영자 초대·본인 수락 및 보존 정책](../baseline/O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)이다. 같은 #641 branch를 전용 worktree에서 계속 사용하며 공개 이력을 재작성하지 않는다.
+
+- 전체 관리자·서비스/사업 Admin·분회·조합의 신규 역할은 초대 → 본인 수락 → 활성화. 기존 활성 역할은 유지하고 재확인을 요구하지 않는다. 회수는 기존 보호를 유지해 즉시 실행한다.
+- 최초 7일, 재발송 secret 교체만 허용. 수락·취소·만료 후 초대용 email/hash 제거. 최소 이력은 생성 후 서울 달력 1년(2월29일→다음 해3월1일), 계정 제거 시 식별 연결 제거.
+- 기존 미배포 migration을 최신 main manifest 끝의 `CreateServiceOperatorInvitations1792886400000`로 교체했다. 기존 fingerprint prefix는 그대로이며 새 prefix 6901줄/hash `b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea`를 추가했다. 운영 migration 미실행.
+- 실제 actor/대상/소속/권한을 수락 transaction 안에서 재검사한다. canonical target lock·scope lock을 보존하고 cache는 commit 후 무효화한다. 분회 개설 승인도 같은 transaction에서 초대를 준비하고 commit 후에만 메일을 보낸다.
+- dedicated retention job(1분 주기·replica advisory lock·bounded batch)과 POST 경로에서 만료 자료를 정리한다. GET 목록은 상태를 쓰지 않고 만료 연락처를 가린다. job 주기는 절대 파기 지연 상한이 아니며 배포 전 실행·backlog 모니터링 점검이 필요하다.
+- ephemeral 초대 메일은 EmailLog·recipient/본문/preview/transport error 복제를 금지하고 일반 업무 메일 audit은 유지한다.
+- 최신 main이 삭제한 KPA member controller와 테스트는 되살리지 않는다. 기존 서비스 가입 상태와 퇴역 서비스 정책을 보존한다.
+
+검증·소비처 영향·운영 경계는 [이번 CHECK](../investigations/CHECK-O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)에 기록한다. 이 Phase의 운영 DB write·실제 사용자 권한 변경·메일 발송은 미실행이다.

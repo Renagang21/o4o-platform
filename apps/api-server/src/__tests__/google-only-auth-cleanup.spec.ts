@@ -107,10 +107,12 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
     it('이메일 인증 체인 (옛 구조)', () => {
       // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 확인은 새 구조로 다시 생겼다 — 해시 토큰
       //   발급/검증은 email-auth만, 승인된 account-erasure는 소유 토큰 파기만 허용한다.
+      //   토큰 수명 처리를 분리한 email-auth-token도 같은 인증 경계의 명시적 소유자다.
       //   옛 서비스·entity·경로 이름은 여전히 금지다.
       expect(offenders(/EmailVerificationService|EmailVerificationToken/)).toEqual([]);
       expect(offenders(/resend-verification|verifyEmailGet/)).toEqual([]);
       expect(offenders(/email_verification_tokens/)).toEqual([
+        path.join('services','auth','email-auth-token.service.ts'),
         path.join('services','auth','email-auth.service.ts'),
         path.join('services','auth','email-auth.shared.ts'),
         path.join('services','privacy','account-erasure.service.ts'),
@@ -130,8 +132,18 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/OperatorInvitation|operator_invitations|operator-invitations/)).toEqual([
         path.join('bootstrap','register-routes.ts'),
         path.join('controllers','admin','OperatorAssignmentController.ts'),
+        path.join('controllers','kpa-branch','BranchOperatorDesignationController.ts'),
+        path.join('jobs','operator-invitation-retention.job.ts'),
+        path.join('modules','neture-pharmacy','cooperative-management.routes.ts'),
+        path.join('modules','neture-pharmacy','services','cooperative-management.service.ts'),
         path.join('routes','admin','service-operator-invitations.routes.ts'),
+        path.join('routes','service-operator-management.routes.ts'),
+        path.join('services','admin','operator-invitation-error.ts'),
+        path.join('services','admin','operator-invitation-retention.ts'),
         path.join('services','admin','service-operator-invitation.service.ts'),
+        path.join('services','admin','service-operator-management.service.ts'),
+        path.join('services','kpa-branch','branch-lifecycle.service.ts'),
+        path.join('services','kpa-branch','branch-operator-designation.service.ts'),
         path.join('services','privacy','account-erasure.service.ts'),
       ].sort());
       expect(fs.existsSync(path.join(SRC,'services','admin','operator-invitation.service.ts'))).toBe(false);

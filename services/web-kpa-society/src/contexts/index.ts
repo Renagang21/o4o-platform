@@ -1,5 +1,4 @@
 export { AuthProvider, useAuth, getAccessToken } from './AuthContext';
 export type { User } from './AuthContext';
-export { ACTIVITY_TYPE_LABELS } from './AuthContext';
 export { ServiceProvider, useService } from './ServiceContext';
 export type { KpaServiceId } from './ServiceContext';

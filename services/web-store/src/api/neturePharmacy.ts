@@ -64,12 +64,13 @@ export interface SemiFranchiseRow {
 export type SupplyKind = 'default' | 'proposal' | 'event' | 'recruitment';
 
 export interface SupplyOption {
+  termsSnapshot?: { version: 1; baseShippingFee: number; freeShippingThreshold: number | null; minOrderAmount: number } | null;
   kind: SupplyKind;
   optionId: string;
   offerId: string;
   productName: string;
   supplierName: string;
-  semiFranchiseKey: string;
+  semiFranchiseKey: string | null;
   semiFranchiseName: string;
   unitPrice: number;
   targetOrganizationId: string | null;
@@ -83,6 +84,7 @@ export interface SupplyOption {
 }
 
 export interface PharmacyRecruitment {
+  orderable?: boolean;
   id: string;
   productName: string;
   supplierName: string;
@@ -148,7 +150,7 @@ export interface PharmacyOrder {
   createdAt: string;
   paidAt: string | null;
   supplierId: string | null;
-  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number; metadata?: { semiFranchiseKey?: string } }> | null;
+  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number; metadata?: { semiFranchiseKey?: string | null; supplyKind?: SupplyKind } }> | null;
   paymentGroupId: string | null;
   receiverKey: string | null;
   testPayment: boolean;
@@ -194,7 +196,9 @@ export const neturePharmacyApi = {
   },
 
   async listSemiFranchises(): Promise<SemiFranchiseRow[]> {
-    return (await coreApiClient.get<Envelope<SemiFranchiseRow[]>>(`${P}/semi-franchises`)).data ?? [];
+    const result = await coreApiClient.get<Envelope<SemiFranchiseRow[]>>(`${P}/semi-franchises`);
+    if (!result.success || !Array.isArray(result.data)) throw new Error('협업체 목록을 확인하지 못했습니다.');
+    return result.data;
   },
   async applySemiFranchise(key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}): Promise<unknown> {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/apply`, application)).data;
@@ -203,14 +207,16 @@ export const neturePharmacyApi = {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/withdraw`)).data;
   },
 
-  async listSupplyOptions(params: { source?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SupplyOption[]; total: number }> {
+  async listSupplyOptions(params: { source?: string; business?: string; recruitment?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SupplyOption[]; total: number }> {
     const res = await coreApiClient.get<Envelope<{ items: SupplyOption[]; total: number }>>(`${P}/store/supply-options`, params);
-    return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
+    if (!res.success || !Array.isArray(res.data?.items) || !Number.isSafeInteger(res.data.total)) throw new Error('공급 상품을 확인하지 못했습니다.');
+    return res.data;
   },
 
-  async listContents(params: { sf?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
+  async listContents(params: { sf?: string; q?: string; tag?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
     const res = await coreApiClient.get<Envelope<{ items: SemiFranchiseContent[]; total: number }>>(`${P}/store/contents`, params);
-    return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
+    if (!res.success || !Array.isArray(res.data?.items) || !Number.isSafeInteger(res.data.total)) throw new Error('제공 자료를 확인하지 못했습니다.');
+    return res.data;
   },
   async getContent(id: string): Promise<SemiFranchiseContent> {
     return (await coreApiClient.get<Envelope<SemiFranchiseContent>>(`${P}/store/contents/${encodeURIComponent(id)}`)).data;
@@ -221,7 +227,9 @@ export const neturePharmacyApi = {
   },
 
   async listRecruitments(): Promise<PharmacyRecruitment[]> {
-    return (await coreApiClient.get<Envelope<PharmacyRecruitment[]>>(`${P}/recruitments`)).data ?? [];
+    const result = await coreApiClient.get<Envelope<PharmacyRecruitment[]>>(`${P}/recruitments`);
+    if (!result.success || !Array.isArray(result.data)) throw new Error('모집 목록을 확인하지 못했습니다.');
+    return result.data;
   },
   async applyRecruitment(id: string): Promise<unknown> {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/recruitments/${encodeURIComponent(id)}/apply`)).data;
@@ -251,7 +259,9 @@ export const neturePharmacyApi = {
   },
 
   async listOrders(): Promise<PharmacyOrder[]> {
-    return (await coreApiClient.get<Envelope<PharmacyOrder[]>>(`${P}/orders`)).data ?? [];
+    const result = await coreApiClient.get<Envelope<PharmacyOrder[]>>(`${P}/orders`);
+    if (!result.success || !Array.isArray(result.data)) throw new Error('주문 내역을 확인하지 못했습니다.');
+    return result.data;
   },
   async cancelOrder(id: string): Promise<unknown> {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/orders/${encodeURIComponent(id)}/cancel`, {})).data;

@@ -1,6 +1,7 @@
 /** Owner-only operations entry. Defaults to read-only plan; public targets come from one shared config. */
 import { Client } from 'pg';
 import { writeFileSync } from 'node:fs';
+import { runDemoOwnerParticipation } from './demo-owner-participation.service.js';
 import { runDemoAccountReconcile } from './demo-account-reconcile.service.js';
 import { readPassword, safeInventoryError } from '../../../../scripts/deployment/pharmacy-hub-qr-probes.mjs';
 
@@ -13,7 +14,8 @@ async function main() {
     ...(mode==='plan'?{options:'-c default_transaction_read_only=on'}:{})});
   try {
     await client.connect();
-    const summary=await runDemoAccountReconcile({query:async(sql,params)=>(await client.query(sql,params)).rows},
+    const operation=process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' ? runDemoOwnerParticipation : runDemoAccountReconcile;
+    const summary=await operation({query:async(sql,params)=>(await client.query(sql,params)).rows},
       {apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST});
     console.log(JSON.stringify(summary));
     // Same sanitized result in native Actions annotations, independently reviewable through the GitHub API.

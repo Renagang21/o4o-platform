@@ -27,10 +27,10 @@ const HOST_BY_NAME: Readonly<Record<string, SubHost>> = Object.freeze({
 const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.freeze({
   // /workspace/* 는 공급자 운영 화면(SupplierOpsLayout)과 공급자 레거시 리다이렉트다.
   // 기존 공급자 포럼 주소는 아래 community adapter 가 먼저 처리한다.
-  supplier: ['/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
-  funding: ['/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
-  community: ['/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
-  carepharm: ['/communities/carepharm/forum', '/communities/carepharm/public'],
+  supplier: ['/operator/inbox/supplier', '/operator/service-contact/supplier', '/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
+  funding: ['/operator/inbox/funding', '/operator/service-contact/funding', '/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
+  community: ['/operator/inbox/community', '/operator/service-contact/community', '/operator/legal/community', '/operator/home-presentation/community', '/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
+  carepharm: ['/operator/inbox/business/carepharm', '/operator/service-contact/carepharm', '/my/participation', '/materials', '/tools', '/news', '/operator/home-presentation/carepharm', '/communities/business%3Acarepharm/forum', '/communities/business:carepharm/forum', '/operator/semi-franchises'],
 });
 
 /**
@@ -38,6 +38,7 @@ const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.free
  *   (토큰은 origin 별 localStorage 라, 대표 호스트로 보내면 로그인이 이어지지 않는다.)
  */
 const SHARED_PREFIXES: readonly string[] = [
+  '/operator/inbox/open',
   '/handoff',
   '/login',
   '/register',
@@ -108,7 +109,7 @@ export function decideHost(
   }
 
   // Preserve old forum addresses while the community owns the actual workspace.
-  const generalBase = '/communities/o4o-general/forum';
+  const generalBase = '/communities/community/forum';
   let forumPath: string | null = null;
   if (matchesPrefix(pathname, '/forum')) forumPath = generalBase + pathname.slice('/forum'.length);
   else if (pathname === '/community') forumPath = generalBase;
@@ -128,15 +129,22 @@ export function decideHost(
     return { kind: 'external', href: `https://community.neture.co.kr${forumPath}${query.size ? `?${query}` : ''}${hash}` };
   }
 
+  // The business operator entry stays on CarePharm; its existing role guard and assigned-business API still apply.
+  if (profile === 'carepharm' && pathname === '/operator') return { kind: 'stay' };
+
   const managementOrigins: Record<string, string> = {
     '/operator/pharmacy-memberships': 'https://store.neture.co.kr',
     '/operator/semi-franchises': 'https://pharmacy.neture.co.kr',
     '/admin/semi-franchises': 'https://admin.neture.co.kr',
+    '/admin/pharmacy-service-settings': 'https://admin.neture.co.kr',
     '/admin/platform': 'https://admin.neture.co.kr',
     '/admin/settings/service-audience': 'https://admin.neture.co.kr',
   };
   for (const [prefix, origin] of Object.entries(managementOrigins)) {
-    if (matchesPrefix(pathname, prefix)) return { kind: 'external', href: `${origin}${suffix}` };
+    if (matchesPrefix(pathname, prefix)) {
+      if (profile === 'carepharm' && prefix === '/operator/semi-franchises') return { kind: 'stay' };
+      return { kind: 'external', href: `${origin}${suffix}` };
+    }
   }
 
   if (profile === 'main') {

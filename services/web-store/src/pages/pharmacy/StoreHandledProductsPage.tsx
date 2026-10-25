@@ -2,8 +2,10 @@
  * 상품 원장과 매장 소유권은 기존 API 계약을 유지한다. 공급 상품 주문과는 별개다.
  */
 
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
+import { StoreCommerceNavigation } from '../../components/store/StoreCommerceNavigation';
 import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
-import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -39,6 +41,7 @@ import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 import { StoreNewProductRequestModal } from './StoreNewProductRequestModal';
 import { StoreProductRequestsListModal } from './StoreProductRequestsListModal';
 import type { StoreProductRequest } from '../../api/storeProductRequests';
+import { readProductGuidanceReturn } from './productGuidance/productGuidanceRoute';
 
 // WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
 const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
@@ -61,12 +64,15 @@ function parsePage(v: string | null): number {
   return Number.isInteger(n) && n >= 1 ? n : 1;
 }
 
-export default function StoreHandledProductsPage() {
+interface ProductPageProps { workspace?: boolean; navigation?: ReactNode }
+export default function StoreHandledProductsPage(props: ProductPageProps) {
   const { key } = useStoreOperationScope();
-  return <HandledProductsSession key={key} />;
+  return <HandledProductsSession key={key} {...props} />;
 }
-function HandledProductsSession() {
-  const { pathname } = useLocation();
+function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
+  const location = useLocation();
+  const { pathname } = location;
+  const { key: scope } = useStoreOperationScope();
   const base = storeWorkspaceBase(pathname);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -93,6 +99,8 @@ function HandledProductsSession() {
   const [reloadKey, setReloadKey] = useState(0);
   // WO-...-STANDARD-TABLE-V1: 행 선택(현재 페이지 기준). key = rowKey(it).
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const productReturn = readProductGuidanceReturn(location.state, scope, base);
+  const returning = useRef(productReturn?.path === location.pathname + location.search ? productReturn : null);
   // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 제거 진행 중 플래그
   const [removing, setRemoving] = useState(false);
 
@@ -140,6 +148,9 @@ function HandledProductsSession() {
         if (cancelled) return;
         setItems(d.items);
         setTotal(d.pagination.total);
+        const key = returning.current?.selectedKey;
+        returning.current = null;
+        if (key && d.items.some(item => rowKey(item) === key)) setSelected(new Set([key]));
       })
       .catch((e: any) => {
         if (!cancelled) setError(e?.message || '목록을 불러오지 못했습니다');
@@ -258,6 +269,14 @@ function HandledProductsSession() {
 
   const selectedItems = useMemo(() => items.filter((it) => selected.has(rowKey(it))), [items, selected]);
   const singleSelected = selectedItems.length === 1 ? selectedItems[0] : null;
+  const openProductGuidance = () => {
+    if (!singleSelected || !organizationId) return;
+    const origin = { path: location.pathname + location.search, scope, selectedKey: rowKey(singleSelected) };
+    // Preserve this history entry too, so browser Back has the same confirmed selection.
+    navigate(origin.path, { replace: true, state: { ...location.state, productReturn: origin } });
+    const params = new URLSearchParams({ create: '1', pType: singleSelected.sourceType, pId: singleSelected.sourceId, pName: singleSelected.name, pStore: organizationId });
+    navigate(`${base}/library/contents?${params}`, { state: { productReturn: origin } });
+  };
 
   // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 내 매장 제품에서 제거(연결 해제) — 1건/다건.
   const handleRemove = useCallback(async () => {
@@ -309,27 +328,25 @@ function HandledProductsSession() {
   ];
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="px-4 py-4 sm:px-6 sm:py-6">
       {/* WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1: header/설명은 공통 파트,
           breadcrumb·아이콘·액션 버튼은 KPA 문구/동작 그대로 slot 주입. */}
       <HandledProductsPageHeader
         breadcrumb={
-          <>
+          !workspace && <>
             <span>매장 제품</span>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral700 }}>{STORE_PRODUCT_NAME}</span>
           </>
         }
         icon={<Boxes size={20} style={{ color: colors.primary }} />}
-        title={STORE_PRODUCT_NAME}
-        description={
-          <>
-            O4O DB 기반 제품과 직접 등록 제품을 한곳에서 관리합니다. O4O 구매 이력 없이 등록·활용할 수 있습니다.
-            실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다.
-          </>
-        }
-        actions={
-          <>
+        title={workspace ? '상품·거래' : STORE_PRODUCT_NAME}
+        description="상품을 찾고 선택해 상세정보·안내 작업을 시작하세요."
+      />
+
+      <StoreAiSlot />
+      <StoreCommerceNavigation />
+      <nav aria-label="상품 빠른 작업" className="relative mb-3 flex flex-wrap items-center gap-2">
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
@@ -341,9 +358,10 @@ function HandledProductsSession() {
           <button onClick={openLocalCreate} disabled={localSaving} style={styles.primaryBtn}>
             <PlusCircle size={14} /> 직접 등록하기
           </button>
-          <details className="relative rounded-lg border border-slate-200 bg-white p-2 text-sm">
-            <summary className="min-h-7 cursor-pointer content-center">등록·진열 관리</summary>
-            <div className="mt-2 flex flex-wrap gap-2">
+          <details className="rounded-lg border border-slate-200 bg-white text-sm">
+            <summary className="min-h-11 cursor-pointer content-center px-3">더보기</summary>
+            <div className="absolute left-0 z-30 mt-1 w-[min(21rem,calc(100vw-3rem))] max-h-[60vh] overflow-y-auto rounded-xl border bg-white p-3 shadow-lg">
+            <div className="flex flex-wrap gap-2">
           <button onClick={() => navigate(`${base}/product-settings`)} style={styles.refreshBtn}>제품 진열 설정</button>
           <button onClick={openNewRequest} style={styles.requestBtn}>
             <PlusCircle size={14} />
@@ -359,11 +377,10 @@ function HandledProductsSession() {
             새로고침
           </button>
             </div>
+            {navigation}
+            </div>
           </details>
-          </>
-        }
-      />
-
+      </nav>
       <nav aria-label="제품 등록 방식" className="flex flex-wrap gap-2 mb-4">
         {([['all', '전체'], ['listing', 'O4O DB 기반'], ['local', '직접 등록']] as const).map(([key, label]) =>
           <button key={key} type="button" aria-pressed={source === key} onClick={() => { setPage(1); patchParams({ source: key === 'all' ? null : key, page: null }); }} className={`rounded-lg border px-3 py-2 text-sm ${source === key ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-200'}`}>{label}</button>
@@ -415,7 +432,9 @@ function HandledProductsSession() {
                 매장용 상세설명서 보기
               </button>}
               {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => editLocal(singleSelected.sourceId)}>직접 등록 제품 수정</button>}
-              <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/library/contents?create=1&pType=${singleSelected.sourceType}&pId=${encodeURIComponent(singleSelected.sourceId)}&pName=${encodeURIComponent(singleSelected.name)}&pStore=${encodeURIComponent(organizationId ?? '')}`)}>콘텐츠 만들기</button>
+              <button type="button" style={styles.importBtn} onClick={openProductGuidance}>콘텐츠 만들기</button>
+
+              <details className="relative"><summary className="min-h-11 cursor-pointer content-center px-3 text-sm">더보기</summary><div className="absolute right-0 z-20 mt-1 flex w-60 flex-col gap-2 rounded-xl border bg-white p-3 shadow-lg">
               <button type="button" style={styles.importBtn} onClick={() => navigate(`${base}/commerce/tablet-displays?workspace=use`)}>태블릿에 활용</button>
               {/* WO-O4O-KPA-STORE-MULTILINGUAL-PRODUCT-CONTENT-ENTRY-LINK-V1: 기존 다국어 상품콘텐츠 저작 화면 진입점 연결.
                   handledProducts sourceType('local'|'listing')·sourceId 를 route param(targetKind·targetId)에 그대로 전달. */}
@@ -436,6 +455,7 @@ function HandledProductsSession() {
                 <QrCode size={13} />
                 {singleSelected.sourceType === 'listing' ? '상품 QR 출력' : '콘텐츠 QR 만들기'}
               </button>
+              </div></details>
             </>
           )}
           {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 내 매장 제품에서 제거(연결 해제, 원본 무접촉). 1건/다건 공통. */}
@@ -511,9 +531,9 @@ function HandledProductsSession() {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
-  container: { padding: '24px', maxWidth: '1180px', margin: '0 auto' },
+  container: { maxWidth: '1180px', margin: '0 auto' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
-  primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
+  primaryBtn: { minHeight: 44, display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-V1: 신규 요청 버튼(보조 강조 톤)
   requestBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#EFF6FF', border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer', fontWeight: 500 },
   pageSizeLabel: { display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: colors.neutral500 },

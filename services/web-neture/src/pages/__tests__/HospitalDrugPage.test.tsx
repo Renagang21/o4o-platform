@@ -80,14 +80,15 @@ const compositeResult = (message: string) => ({
 });
 
 describe('원내 약품 안내 — 게이트1 옵션 C', () => {
-  it('미인증에서도 입력창이 열리고 로그인 UI 를 두지 않는다', async () => {
+  it('미인증에서도 조회할 수 있고 계정 가입은 별도 화면으로 연결한다', async () => {
     probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
     render(<HospitalDrugPage />);
 
     expect(await screen.findByTestId('hospital-drug-input')).toBeTruthy();
-    // 로그인/회원가입 진입이 없어야 한다.
     expect(screen.queryByText('로그인')).toBeNull();
-    expect(screen.queryByText('회원가입')).toBeNull();
+    const signup = screen.getByRole('link', { name: 'O4O 회원가입' });
+    expect(signup.getAttribute('href')).toBe('/signup');
+    expect(signup.getAttribute('target')).toBe('_blank');
   });
 
   it('정상 응답이면 답을 보여준다', async () => {

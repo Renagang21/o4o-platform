@@ -37,6 +37,10 @@ const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freez
   carepharm: '만성질환 관리 약국 협업 모임',
 });
 
+const LOGIN_BRAND: Readonly<Record<HostProfile, string>> = {
+  main: 'Neture', supplier: 'Neture', funding: 'Neture', community: '커뮤니티', carepharm: 'CarePharm',
+};
+
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -134,6 +138,16 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       return;
     }
 
+    // 호출자가 돌아갈 화면을 지정했으면(외부 AI 연결 동의 · 보호 화면 진입 등) 역할별 Demo 착지보다 그 화면이 우선이다.
+    //   handleLoginSuccess 와 같은 returnUrl 계약 — /workspace/ 는 그쪽과 같이 제외한다.
+    if (returnUrl && !returnUrl.startsWith('/workspace/')) {
+      navigate(returnUrl);
+      demoBusyRef.current = false;
+      setDemoBusy(null);
+      onClose();
+      return;
+    }
+
     // 서브 호스트(펀딩 · 커뮤니티 · CarePharm) 세션은 그 origin 에 묶인다 — 대표 호스트 경로로 보내면 세션을 잃는다.
     if (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community' || CURRENT_HOST_PROFILE === 'carepharm') {
       navigate(returnUrl || '/');
@@ -169,10 +183,10 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}
+    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
-      <LoginCard brand={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm' : 'Neture'} tone="green" heading="h2" title={CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
+      <LoginCard brand={LOGIN_BRAND[CURRENT_HOST_PROFILE]} tone="green" heading="h2" title={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
 
               {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
               <EmailLoginForm<User>

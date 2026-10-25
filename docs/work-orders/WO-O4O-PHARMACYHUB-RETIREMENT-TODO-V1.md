@@ -463,3 +463,13 @@ V3 #627 병합 후 최신 main e6202355a에서 개발 plan38730535162와 미디�
 ### 2026-10-15 후속 V5 — 전체600초 제한
 
 V4 개발 plan run38738916090은 Cloud Logging에서 task 전체600초 종료를 확인했다. 성공 census가 없어 WIF/apply는 계속 보류한다. V5에서 leaf UUID PK 테이블의 비UUID 열을 한 번에 순회하고 PH 대상 집합을 한 번 읽어 재사용한다. 검사 범위·timeout·보호 조건은 유지한다. 검증과 운영 재실행은 [참조 검사 CHECK의 후속 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 구분해 기록한다. #610·#615는 PH 운영 창 뒤 통합한다.
+
+### 2026-10-16 V6 — job runner 단계 진단·GitHub 재시도·참조 검사 병목
+
+**진단 (운영 관찰, 수정 전).** V5 병합 후 df5f28a93에서 개발 plan run38767007199(job ph-dev-38767007199-1)를 실행했다. Cloud Run worker는 약597초 만에 고정 census(41행 삭제 대상·공급 제안19행 보존)를 출력하고 exit(0)으로 끝났으나, Actions는 PH_JOB_NOT_CONFIRMED로 실패했다. 원인은 개발·미디어 wrapper의 메시지 필터였다. `PH_JOB_` 형식이 아닌 오류(운영 쓰기 gate 차단, GitHub 조회 실패, 예상하지 못한 예외)를 모두 같은 문구로 덮었다. 그래서 execute --wait, 실행 후 gate, job 정리 중 어디서 실패했는지 남지 않았다. 이 run의 정확한 실패 단계는 기록이 없어 확정할 수 없다. 597초 plan 성공만으로 apply를 진행하지 않는다.
+
+**수정.** [참조 검사 CHECK의 V6 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 범위와 검증을 기록한다. 실패 단계를 진단 코드 `PH_JOB_STAGE_FAILED stage=… cause=…`로 남긴다. GitHub 조회는 일시 오류에만 최대 3회 재시도한다. 단계별·worker phase별 소요 시간을 기록한다. full index가 없는 UUID 열은 같은 테이블의 단일 구간 순회에 포함한다. timeout·검사 범위·보호 조건은 바꾸지 않았다. 운영 job 재실행·삭제와 WIF 변경도 하지 않았다. 남은 job 13개(ph-dev 9·ph-media 4)는 통합 담당이 정리한다.
+
+### 2026-10-16 V6 후속 (V7) — UUID 묶음 퇴행 수정
+
+V6 통합 검증 결과는 병합 보류였다. 합성 workload에서 V6가 약9배 느렸고, 200만행 stress는 미완료였다. 이 기록은 그대로 유지한다. 원인은 두 가지였다. 묶음 안의 UUID 열을 text로 바꿔 전체 token 정규식을 적용했고, inline된 판정식이 집계마다 두 번 평가됐다. 수정 후 UUID 열은 native 일치와 짧은 legacy token fallback을 쓰고, 판정식은 한 번만 평가한다. 보호 조건·timeout·검사 범위는 바꾸지 않았다. 같은 합성 workload에서 V7의 소요 시간은 V5와 동등했다(10만행 약2.8초, 50만행 약14.7초 대 15.3초). V6 퇴행은 해소됐지만 V5 대비 개선은 아니다. 200만행 stress는 이번에도 300초 test timeout에 도달해 전체 PASS가 아니다. 운영 600초 여유도 입증하지 않았다. 측정·검증 상세는 [참조 검사 CHECK의 V7 절](../checks/CHECK-O4O-PHARMACYHUB-REFERENCE-BATCHES-V4.md)에 있다. CI·리뷰·병합·운영 plan은 통합 담당이 진행한다. 남은 job 13개도 통합 담당이 정리한다.

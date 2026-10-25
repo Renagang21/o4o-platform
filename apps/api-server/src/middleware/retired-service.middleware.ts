@@ -1,6 +1,13 @@
 import type { RequestHandler, Response } from 'express';
 
 const retiredKeys = new Set(['pharmacy-hub', 'pharmacy-hub-event-offer']);
+// Historical definitions without a current workspace or permission contract.
+const retiredRoles = new Set([
+  'platform:admin', 'platform:operator', 'platform:manager', 'platform:vendor',
+  'platform:member', 'platform:contributor',
+  'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator',
+  'kpa:pharmacist', 'kpa:student', 'lms:instructor',
+]);
 const scopeFields = ['serviceId', 'serviceKey', 'service_key', 'serviceCode', 'service_code', 'sourceService',
   'membershipServiceKey', 'membershipRole', 'targetServiceKey', 'sourceServiceKey', 'serviceKeys', 'service_keys', 'role', 'roles'] as const;
 export function isRetiredServiceValue(value: unknown): boolean {
@@ -16,7 +23,7 @@ export function isRetiredRoleValue(value: unknown): boolean {
   if (isRetiredServiceValue(value)) return true;
   if (typeof value !== 'string') return false;
   const key = value.trim();
-  return key === 'cosmetics' || key === 'k-cosmetics' || key.startsWith('cosmetics:') || key.startsWith('k-cosmetics:');
+  return retiredRoles.has(key) || key === 'cosmetics' || key === 'k-cosmetics' || key.startsWith('cosmetics:') || key.startsWith('k-cosmetics:');
 }
 
 export class RetiredServiceError extends Error {

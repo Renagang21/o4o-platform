@@ -29,9 +29,6 @@ export function useSignagePlaylists(organizationId: string) {
   const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
   const [playlistKeyword, setPlaylistKeyword] = useState("");
-  const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>(
-    [],
-  );
 
   // ── Add video modal state ──
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
@@ -318,10 +315,13 @@ export function useSignagePlaylists(organizationId: string) {
     setShowLibrarySelector(open);
     setAddModalSaving(false);
   };
+  const acceptCreatedPlaylist = (playlist: StorePlaylist) => {
+    setPlaylists(previous => [playlist, ...previous.filter(item => item.id !== playlist.id)]);
+    changeSelectedPlaylist(playlist.id);
+  };
   useEffect(() => {
     setSelectedPlaylistId(null);
     setPlaylistActionError(null);
-    setSelectedPlaylistKeys([]);
     setPlaylists([]);
     setPlaylistError(null);
     setBusyPlaylistIds(
@@ -366,8 +366,6 @@ export function useSignagePlaylists(organizationId: string) {
     playlistItemsLoading,
     playlistKeyword,
     setPlaylistKeyword,
-    selectedPlaylistKeys,
-    setSelectedPlaylistKeys,
     showAddVideoModal,
     setShowAddVideoModal: changeAddVideoModal,
     addModalSearch,
@@ -383,5 +381,6 @@ export function useSignagePlaylists(organizationId: string) {
     handleDeleteItem,
     handleBulkAdd,
     handleMoveItem,
+    acceptCreatedPlaylist,
   };
 }

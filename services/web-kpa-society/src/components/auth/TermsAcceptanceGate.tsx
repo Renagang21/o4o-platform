@@ -1,3 +1,4 @@
+import { BUSINESS_SITE } from '../../config/businessSite';
 /**
  * TermsAcceptanceGate — KPA Society 기존 회원 이용약관 재동의 게이트
  *
@@ -24,9 +25,9 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       onAccept={acceptPendingPolicies}
       onLogout={logout}
       allowPaths={ALLOW_PATHS}
-      serviceName="O4O 약국"
+      serviceName={BUSINESS_SITE.name}
       termsPath="/policy"
-      termsServiceKey="kpa-society"
+      termsServiceKey={BUSINESS_SITE.authServiceKey}
     >
       {children}
     </PolicyAcceptanceGate>

@@ -1,0 +1,64 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { MemoryRouter, Outlet, Route, Routes, useLocation } from 'react-router-dom';
+const state = vi.hoisted(() => ({ host: 'carepharm', switcher: vi.fn() }));
+vi.mock('../../../lib/hostProfile', () => ({ get CURRENT_HOST_PROFILE() { return state.host; } }));
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'operator' } }) }));
+vi.mock('../../../config/operatorCapabilities', () => ({ ENABLED_CAPABILITIES: [] }));
+vi.mock('../../../config/operatorMenuGroups', () => ({ UNIFIED_MENU: { dashboard: [{ label: 'Neture 전체 업무', path: '/operator' }] }, NETURE_OPERATOR_DOMAIN_IA: {} }));
+vi.mock('../../../lib/role-constants', () => ({ withoutUnreachableSubdomainOperatorItems: (items: unknown) => items }));
+vi.mock('../../NetureGlobalHeader', () => ({ NetureGlobalHeader: () => <header>서비스 헤더</header> }));
+vi.mock('../../NetureBottomNav', () => ({ NetureBottomNav: () => null }));
+vi.mock('../../../lib/apiClient', () => ({ api: {} }));
+vi.mock('@o4o/operator-ux-core', () => ({
+  createOperatorServicesApi: () => ({}),
+  OperatorServiceSwitcher: (props: unknown) => { state.switcher(props); return <p>서비스 전환</p>; },
+  OperatorAreaShell: ({ menuItems, children, header }: any) => <>{header}<nav>{Object.values(menuItems).flat().map((item: any) => <a key={item.path} href={item.path}>{item.label}</a>)}</nav>{children ?? <Outlet />}</>,
+}));
+import OperatorLayout from '../OperatorLayoutWrapper';
+function Business() { const location = useLocation(); return <p>사업 업무{location.search}</p>; }
+function HomeEditor() { const location = useLocation(); return <><p>CarePharm 홈 편집</p><output aria-label="현재 편집 주소">{location.pathname}{location.search}{location.hash}</output></>; }
+function mount(path: string) {
+  return render(<MemoryRouter initialEntries={[path]}><Routes><Route element={<OperatorLayout />}>
+    <Route path="/operator" element={<p>대표 대시보드</p>} />
+    <Route path="/operator/semi-franchises" element={<Business />} />
+    <Route path="/operator/home-presentation/carepharm" element={<HomeEditor />} />
+    <Route path="/operator/inbox/business/carepharm" element={<p>CarePharm 문의 처리</p>} />
+    <Route path="/operator/inbox/business/pharmacy" element={<p>다른 사업 문의</p>} />
+    <Route path="/operator/members" element={<p>전체 회원 조회</p>} />
+  </Route></Routes></MemoryRouter>);
+}
+afterEach(() => { cleanup(); state.host = 'carepharm'; state.switcher.mockClear(); });
+it.each(['/operator', '/operator/members'])('CarePharm routes %s to assigned-business work before mounting representative consoles', async path => {
+  mount(path);
+  await screen.findByText('사업 업무?key=carepharm&tab=overview');
+  expect(screen.queryByText('대표 대시보드')).toBeNull(); expect(screen.queryByText('전체 회원 조회')).toBeNull();
+  expect(screen.getByRole('link', { name: '회원 커뮤니티 운영' }).getAttribute('href')).toBe('/communities/business%3Acarepharm/forum');
+  expect(screen.queryByText('Neture 전체 업무')).toBeNull(); expect(state.switcher).not.toHaveBeenCalled();
+});
+it('preserves the existing Neture layout and service switcher on the representative host', () => {
+  state.host = 'main'; mount('/operator');
+  expect(screen.getByText('대표 대시보드')).toBeTruthy(); expect(screen.getByText('Neture 전체 업무')).toBeTruthy();
+  expect(state.switcher).toHaveBeenCalledWith(expect.objectContaining({ currentServiceKey: 'neture' }));
+});
+it('mounts its native home editor and exposes its dedicated menu', () => {
+  mount('/operator/home-presentation/carepharm');
+  expect(screen.getByText('CarePharm 홈 편집')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '홈 · 공개 공지' }).getAttribute('href')).toBe('/operator/home-presentation/carepharm');
+  expect(screen.queryByText('대표 대시보드')).toBeNull();
+});
+it('canonicalizes the editor trailing slash without losing query or hash', async () => {
+  mount('/operator/home-presentation/carepharm/?draft=1#preview');
+  await screen.findByText('CarePharm 홈 편집');
+  expect(screen.getByLabelText('현재 편집 주소').textContent).toBe('/operator/home-presentation/carepharm?draft=1#preview');
+  expect(screen.queryByText('사업 업무?key=carepharm&tab=overview')).toBeNull();
+});
+
+it('opens the native CarePharm inbox while rejecting another business inbox', async () => {
+  const view = mount('/operator/inbox/business/carepharm');
+  expect(screen.getByText('CarePharm 문의 처리')).toBeTruthy();
+  view.unmount();
+  mount('/operator/inbox/business/pharmacy');
+  await screen.findByText('사업 업무?key=carepharm&tab=overview');
+  expect(screen.queryByText('다른 사업 문의')).toBeNull();
+});

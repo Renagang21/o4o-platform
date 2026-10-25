@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * CreateContentFromResourcesModal — 빈 편집기 직접 작성 → direct 콘텐츠 제작
@@ -16,13 +17,15 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
  *   - WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: Store 편집기 내부 AI(aiRequestHeaders) 은퇴 — 외부 LLM(ChatGPT로 작업)만 남는다.
  *
  * 흐름:
- *   콘텐츠 제작 → 빈 편집기(제목/태그/본문) → 직접 작성 또는 붙여넣기 → 저장
+ *   상품 진입 → 기존 안내·등록 정보 확인 → 기존 안내 수정 또는 새 안내 작성
+ *   자료함 직접 작성 → 빈 편집기(제목/선택 태그/본문) → 직접 작성 또는 붙여넣기 → 저장
  *   → POST /store-contents → navigate('/store/content/direct/:id')
  */
 
-import {  type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Save, Loader2 } from 'lucide-react';
+import { ProductDescriptionAssist } from '../../components/product-description/ProductDescriptionAssist';
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -32,6 +35,10 @@ import { createOrUpdateDirect, emptyTextDraft, validateNewContent, type CreatedC
 import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
+import { ProductGuidanceContext } from './productGuidance/ProductGuidanceContext';
+import { productGuidanceEditPath } from './productGuidance/productGuidanceMaterials';
+import type { LinkedContentItem } from '../../api/assetSnapshot';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 
 // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
 //   매장 경영활용 제품에서 진입 시 연결 대상 제품 정보. 저장 시 top-level productRef 로 전달되어
@@ -51,9 +58,13 @@ interface Props {
 
 export function CreateContentFromResourcesModal({ open, onClose, onCreated, product }: Props) {
   const navigate = useNavigate();
-  const { base, returnState } = useStoreLibraryRoute();
+  const { base, returnState, productReturn } = useStoreLibraryRoute();
 
   const { organizationId } = useStoreOrganizationId();
+  const { key: scope, isCurrent } = useStoreOperationScope();
+  const [composing, setComposing] = useState(false);
+  useEffect(() => setComposing(false), [open, scope, product?.sourceType, product?.sourceId]);
+  const showEditor = !product || composing;
   const session = useContentAuthoringSession<TextContentDraft, CreatedContent>({
     organizationId, serviceKey: getActiveServiceKey(), target: `create:${product?.sourceType ?? ''}:${product?.sourceId ?? ''}`,
     enabled: open, initialDraft: emptyTextDraft,
@@ -62,7 +73,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
     validate: validateNewContent,
     onSaved: (saved, unchanged) => {
       onCreated?.(saved.id);
-      if (unchanged) { onClose(); navigate(`${base}/content/direct/${saved.id}`, { state: returnState }); }
+      if (unchanged) navigate(`${base}/content/direct/${saved.id}`, { state: returnState, replace: !!productReturn });
     },
   });
   const { title, tags, html: editorHtml } = session.draft;
@@ -72,11 +83,15 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   const setEditorHtml = (html: string) => session.changeDraft({ html }, true);
   const handleEditorChange = (content: EditorContent) => session.changeDraft({ html: content.html });
 
+  const canLeave = () => !saving && (!(title.trim() || editorHtml.trim() && editorHtml !== '<p></p>' || tags.length > 0) ||
+    window.confirm('저장하지 않은 작성 내용을 버리고 닫으시겠습니까?'));
   const requestClose = () => {
-    if (saving) return;
-    if ((title.trim() || editorHtml.trim() && editorHtml !== '<p></p>' || tags.length > 0) &&
-      !window.confirm('저장하지 않은 작성 내용을 버리고 닫으시겠습니까?')) return;
+    if (!canLeave()) return;
     onClose();
+  };
+  const openLinkedContent = (item: LinkedContentItem) => {
+    const path = productGuidanceEditPath(item, base);
+    if (path && isCurrent() && canLeave()) navigate(path, { state: returnState, replace: !!productReturn });
   };
   if (!open) return null;
 
@@ -95,6 +110,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
         </header>
 
         <div style={styles.body}>
+          <StoreAiSlot priority={2} label="안내 작성" />
           {session.error && <p role="alert" className="mb-3 text-sm text-red-700">{session.error}<button type="button" onClick={() => void session.reload()} className="ml-2 underline">다시 시도</button></p>}
           {session.notice && <output role={session.notice.ok ? 'status' : 'alert'} className={session.notice.ok ? 'mb-3 text-sm text-green-700' : 'mb-3 text-sm text-red-700'}>{session.notice.message}</output>}
           {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품에서 진입한 경우 연결 대상 표시 */}
@@ -107,7 +123,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
               </span>
             </div>
           )}
-
+          {product && <ProductGuidanceContext product={product} compact={showEditor} disabled={saving} onOpenContent={openLinkedContent} />}
+          {showEditor ? <>
           <p style={styles.guideHint}>
             외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 초안을 붙여넣고 편집한 뒤 저장하세요.
           </p>
@@ -124,15 +141,20 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
             />
           </div>
 
-          <div style={styles.composeRow}>
-            <label htmlFor="create-content-tags" style={styles.label}>콘텐츠 태그</label>
-            <TagInput id="create-content-tags" tags={tags} onChange={setTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
-          </div>
+          <details style={styles.composeRow}>
+            <summary className="min-h-11 cursor-pointer content-center text-sm text-slate-600">태그 추가 (선택)</summary>
+            <TagInput id="create-content-tags" tags={tags} onChange={setTags} placeholder="콘텐츠 태그 (Enter·쉼표로 구분)" />
+          </details>
 
           <div style={styles.composeRow}>
             <label style={styles.label}>매장 콘텐츠 본문</label>
             {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM(사용자 ChatGPT 등) 작업 — Prompt 는 store-ui-core 순수 함수, 결과는 편집기로만 */}
             <div style={{ marginBottom: 8 }}>
+              {product ? (
+                <ProductDescriptionAssist key={`${product.sourceType}:${product.sourceId}`} context={{
+                  task: 'product-description', title, currentHtml: editorHtml, productName: product.name,
+                }} onApplyHtml={setEditorHtml} />
+              ) : (
               <LlmAssistPanel
                 label={STORE_LLM_ASSIST_LABEL}
                 contextLabel="매장 콘텐츠 본문 — 새로 작성하거나 현재 내용을 다듬습니다"
@@ -140,13 +162,13 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
                   task: resolveStoreContentLlmTask(editorHtml),
                   title,
                   currentHtml: editorHtml,
-                  productName: product?.name,
                   additionalInstruction,
                 })}
                 currentHtml={editorHtml}
                 onApplyHtml={(html) => setEditorHtml(html)}
                 onNotify={(message, kind) => session.notify(message, kind === 'success')}
               />
+              )}
             </div>
             <div style={styles.editorWrap}>
               <RichTextEditor showInternalAi={false}
@@ -158,15 +180,16 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
               />
             </div>
           </div>
+          </> : <p style={styles.guideHint}>상품 정보를 확인한 뒤 기존 안내를 수정하거나 새 안내를 작성하세요.</p>}
         </div>
 
         <footer style={styles.footer}>
-          <span style={styles.footerHint}>본문을 직접 작성하거나 붙여넣은 뒤 저장하세요</span>
+          <span style={styles.footerHint}>{showEditor ? '내용을 확인한 뒤 저장하세요' : '상품 한 개의 안내를 준비합니다'}</span>
           <div style={styles.footerActions}>
             <button type="button" onClick={requestClose} style={styles.secondaryBtn} disabled={saving}>
               취소
             </button>
-            <button
+            {!showEditor ? <button type="button" style={styles.primaryBtn} onClick={() => setComposing(true)}>새 안내 작성</button> : <button
               type="button"
               onClick={handleSave}
               disabled={!canSave}
@@ -178,7 +201,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
                 <Save size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
               )}
               {saving ? '저장 중...' : '내 자료함 콘텐츠로 저장'}
-            </button>
+            </button>}
           </div>
         </footer>
       </div>

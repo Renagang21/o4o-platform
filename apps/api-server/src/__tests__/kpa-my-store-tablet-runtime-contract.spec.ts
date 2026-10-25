@@ -50,6 +50,17 @@ const makeDataSource = () => {
   });
   const base = stub.dataSource.query;
   stub.dataSource.query = jest.fn(async (sql: string, params: any[] = []) => {
+    // Feature gating queries are distinct from the store organization ledger lookup.
+    if (sql.includes('SELECT status FROM neture_pharmacy_memberships')) {
+      return LEDGER_ACTIVE_ORGS.includes(params[0]) ? [{ status: 'active' }] : [];
+    }
+    if (sql.includes('FROM semi_franchises sf')) {
+      return [{ key: 'test-business', name: 'Test business', features: ['tablet'] }];
+    }
+    if (sql.includes('FROM settings WHERE key')) return [];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'owner', configured: false }];
+    if (sql.includes('SELECT user_id AS "ownerUserId"')) return [{ ownerUserId: 'owner-kpa' }];
+    if (sql.includes('FROM member_paid_service_entitlements')) return [];
     if (sql.includes('neture_pharmacy_memberships')) {
       return LEDGER_ACTIVE_ORGS.map((organization_id) => ({ organization_id, role: 'owner' }));
     }

@@ -3,7 +3,7 @@ import type {
   SupplierRequest,
   AuthenticatedRequest,
 } from '../../middleware/neture-identity.middleware.js';
-import { SupplierProfileFieldUnsupportedError } from '../../services/supplier.service.js';
+import { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError } from '../../services/supplier.service.js';
 import logger from '../../../../utils/logger.js';
 import type { NetureService } from '../../neture.service.js';
 
@@ -29,6 +29,7 @@ export function createSupplierProfileHandlers(
       try {
         const supplierId = (req as SupplierRequest).supplierId;
         const {
+          name,
           contactEmail,
           contactPhone,
           contactWebsite,
@@ -71,6 +72,7 @@ export function createSupplierProfileHandlers(
           shippingMountain,
         } = req.body;
         const result = await netureService.updateSupplierProfile(supplierId, {
+          name,
           contactEmail,
           contactPhone,
           contactWebsite,
@@ -106,6 +108,18 @@ export function createSupplierProfileHandlers(
         }
         res.json({ success: true, data: result });
       } catch (error) {
+        if (error instanceof SupplierProfileEntityTypeInvalidError) {
+          return res.status(400).json({
+            success: false, error: 'SUPPLIER_PROFILE_ENTITY_TYPE_INVALID',
+            message: '세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.',
+          });
+        }
+        if (error instanceof SupplierProfileNameInvalidError) {
+          return res.status(400).json({
+            success: false, error: 'SUPPLIER_PROFILE_NAME_INVALID',
+            message: '상호명을 1~255자로 입력해 주세요.',
+          });
+        }
         // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 9: canonical 저장 위치가 없는 필드는 조용히 버리지 않고 400 으로 거부한다.
         if (error instanceof SupplierProfileFieldUnsupportedError) {
           return res.status(400).json({

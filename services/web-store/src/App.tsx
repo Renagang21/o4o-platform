@@ -1,3 +1,11 @@
+import ExternalAiDraftEntry from './pages/ExternalAiDraftEntry';
+import { ContactPage, OperatorInboxPage } from './pages/ContactPages';
+import CustomerConsultationPage from './pages/pharmacy/consultation/CustomerConsultationPage';
+import TabletRunPage from './pages/tablet/TabletRunPage';
+import TabletSetupPage from './pages/tablet/TabletSetupPage';
+import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
+import StoreMultilingualConsultationPage from './pages/pharmacy/StoreMultilingualConsultationPage';
+import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
 /**
  * Unified Store Workspace 라우트 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥ · §8-3
  *
@@ -8,7 +16,7 @@
  * 공통 기능은 KPA canonical 트리(pages/pharmacy)를 서비스 prefix 만 동적으로 바꿔 1회 mount 한다(복사 3벌 금지).
  * 서비스 종속 기능은 /work/<serviceKey> 아래에만 있다. 모든 업무 화면은 StoreGate(매장 선택·서버 재검증) 뒤에 있다.
  */
-import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from 'react';
+import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyMembershipReviewPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
@@ -19,7 +27,6 @@ import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
 import UnifiedStoreLayout, { ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
-import { getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedStoreLibraryLayout from './components/layouts/UnifiedStoreLibraryLayout';
 import HomePage from './pages/HomePage';
@@ -93,8 +100,6 @@ const ForeignVisitorSalesSupportPaymentFailPage = named(() => import('./pages/ph
 const ForeignVisitorPartnersPage = named(() => import('./pages/pharmacy/ForeignVisitorPartnersPage'), 'ForeignVisitorPartnersPage');
 const ForeignVisitorPartnerQrCodesPage = named(() => import('./pages/pharmacy/ForeignVisitorPartnerQrCodesPage'), 'ForeignVisitorPartnerQrCodesPage');
 
-// ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
-
 // ── 매장 HUB ─────────────────────────────────────────────────────────────────
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
 const HubContentLibraryPage = named(() => import('./pages/pharmacy/HubContentLibraryPage'), 'HubContentLibraryPage');
@@ -120,7 +125,7 @@ const gated = (el: ReactElement) => <StoreGate>{el}</StoreGate>;
 const Loading = <div className="p-8 text-center text-sm text-slate-500">불러오는 중...</div>;
 const NotFound = <main className="center-card"><section className="card"><h1>페이지를 찾을 수 없습니다</h1></section></main>;
 /**
- * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · k-cosmetics.site)가 종료됐다
+ * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · 옛 K-Cosmetics 도메인)가 종료됐다
  * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). 이 앱의 K-Cosmetics 화면은 종료 안내만 보여 준다.
  * 같은 기능이라는 근거가 없으므로 약국 화면으로 보내지 않는다. 화면 코드는 PHASE1B 에서 삭제했다
  * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
@@ -140,18 +145,6 @@ const PP = PHARMACY_STORE_PATHS;
 /** 약국 화면 subPath(앞의 `/` 제거) — `/store/*` · `/work/kpa-society/store/*` 자식 route 용 */
 const rel = (p: string) => p.replace(/^\//, '');
 const pharmacyOnly = (el: ReactElement) => <PharmacyContextOnly>{el}</PharmacyContextOnly>;
-
-/**
- * 이용 방법(`/guide/*`)은 서비스 앱이 서빙한다 — 이식 화면의 GuideBackLink 가 store 호스트에서 404 가 되지 않게
- * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15). (K-Cosmetics 는 더 이상 서비스 문맥이 될 수 없다 — PHASE1B)
- */
-function ServiceGuideRedirect() {
-  const { pathname, search } = useLocation();
-  useEffect(() => {
-    window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);
-  }, [pathname, search]);
-  return null;
-}
 
 /**
  * 내 매장 화면(공통 컴포넌트) — `/store/*` 와 서비스 지정 `/work/<serviceKey>/store/*` 두 곳에 같은 트리를 mount 한다.
@@ -187,6 +180,8 @@ function storeChildRoutes() {
         <Route path="marketing/pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
+        <Route path="staff-support" element={<StoreStaffSupportPage />} />
+        <Route path="multilingual-consultation" element={<LegacyConsultationEntry />} />
         <Route path="requests" element={<TabletRequestsPage />} />
         {/* 매장 자료함 · 콘텐츠 */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
@@ -221,6 +216,7 @@ function storeChildRoutes() {
         <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
         <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
         <Route path={rel(PP.contents)} element={pharmacyOnly(<PharmacyContentSourcesPage />)} />
+        <Route path="pharmacy/carepharm" element={pharmacyOnly(<CarePharmToolsPage />)} />
         <Route path={rel(PP.recruitments)} element={pharmacyOnly(<PharmacyRecruitmentsPage />)} />
         <Route path={rel(PP.cart)} element={pharmacyOnly(<PharmacyCartPage />)} />
         <Route path={rel(PP.orders)} element={pharmacyOnly(<PharmacyOrdersPage />)} />
@@ -229,11 +225,19 @@ function storeChildRoutes() {
 }
 
 export default function App() {
-  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+  return <BrowserRouter><Suspense fallback={Loading}><Routes>
+    <Route path="/consultation/customer" element={<CustomerConsultationPage />} />
+    <Route path="/tablet/setup" element={<TabletSetupPage />} />
+    <Route path="/tablet/:slug" element={<TabletRunPage />} />
+    <Route path="/*" element={<WorkspaceApp />} />
+  </Routes></Suspense></BrowserRouter>;
+}
+export function WorkspaceApp() {
+  return <AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+    <Route path="/consultation/staff" element={gated(<StoreMultilingualConsultationPage />)} />
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
-    <Route path="/guide/*" element={<ServiceGuideRedirect />} />
 
     <Route element={<RootShell />}>
       <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
@@ -252,6 +256,9 @@ export default function App() {
       {/* 내 매장(약국) 신청 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
       <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
+      <Route path="/external-ai/drafts/:id" element={<ExternalAiDraftEntry />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/operator/inbox" element={<OperatorInboxPage />} />
       <Route path="/operator/pharmacy-memberships" element={<PharmacyReviewAccess />} />
 
       {/* ── 내 매장(공통 기능 1회) ── */}
@@ -327,7 +334,7 @@ export default function App() {
 
       <Route path="*" element={NotFound} />
     </Route>
-  </Routes></Suspense></TermsAcceptanceGate></StoreProvider></AuthProvider></BrowserRouter>;
+  </Routes></Suspense></TermsAcceptanceGate></StoreProvider></AuthProvider>;
 }
 
 function LegacyHubRedirect() {
@@ -337,4 +344,9 @@ function LegacyHubRedirect() {
   const sources = ['content', 'supplier-library', 'multilingual-product-contents', 'blog', 'pop', 'qr', 'video', 'signage', 'screen-set'];
   const destination = destinations[rest] || (sources.includes(rest.split('/')[0]) ? `${S}/library/${rest}` : `${S}${PP.contents}`);
   return <Navigate to={`${destination}${search}${hash}`} replace />;
+}
+
+function LegacyConsultationEntry() {
+  const location = useLocation();
+  return <Navigate to={`/consultation/staff${location.search}`} replace />;
 }

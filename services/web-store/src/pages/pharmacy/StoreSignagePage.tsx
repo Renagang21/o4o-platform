@@ -1,4 +1,8 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { videoPreviewUrl } from './signage/videoPreview';
+import { SignageQuickStart } from './signage/SignageQuickStart';
+import { SignagePlaylistPreview } from './signage/SignagePlaylistPreview';
+import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, type SignageEditTarget, type SignageMediaDraft } from './signage/signageMediaDraft';
@@ -30,11 +34,10 @@ import { StoreSignageScheduleForm } from './StoreSignageScheduleForm';
 import { StoreSignageMediaEditor } from './StoreSignageMediaEditor';
 import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, useId } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  GuideBackLink,
   // WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B: 공통 사이니지 순수 로직
   SIGNAGE_DAY_LABELS as DAY_LABELS,
   formatSignageDate as formatDate,
@@ -136,6 +139,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
   const location = useLocation();
   const base = storeWorkspaceBase(location.pathname);
+  const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
   // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1:
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
@@ -167,6 +171,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     deletingScheduleIds,
     scheduleError,
     schedulePlaylistError,
+    schedulePlaylistLoading,
     signagePlaylists,
     showScheduleForm,
     editingSchedule,
@@ -181,6 +186,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     schIsActive,
     schSaving,
     schSaveError,
+    savedSchedule,
     setShowScheduleForm,
     setSchName,
     setSchPlaylistId,
@@ -226,8 +232,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     playlistItemsLoading,
     playlistKeyword,
     setPlaylistKeyword,
-    selectedPlaylistKeys,
-    setSelectedPlaylistKeys,
     showAddVideoModal,
     setShowAddVideoModal,
     addModalSearch,
@@ -243,7 +247,31 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     handleDeleteItem,
     handleBulkAdd,
     handleMoveItem,
+    acceptCreatedPlaylist,
   } = useSignagePlaylists(organizationId);
+  const [quickStart, setQuickStart] = useState(false);
+  const [playlistPreview, setPlaylistPreview] = useState(false);
+  const [savedGuide, setSavedGuide] = useState<string | null>(null);
+  const consumedEntry = useRef('');
+  const addVideoTitleId = useId();
+  const closeAddVideo = () => {
+    if (playlistBusy || addModalSaving) return;
+    setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch('');
+  };
+  useEffect(() => {
+    const entry = location.state as { signagePlaylistId?: string; addSignageMaterials?: boolean; openSignageSchedule?: boolean } | null;
+    const entryKey = `${location.key}:${entry?.signagePlaylistId}`;
+    if (!entry?.signagePlaylistId || consumedEntry.current === entryKey || playlistLoading) return;
+    const target = playlists.find(item => item.id === entry.signagePlaylistId);
+    if (!target) return;
+    consumedEntry.current = entryKey;
+    if (activeTab === 'playlist') {
+      setSelectedPlaylistId(target.id);
+      if (entry.addSignageMaterials) setShowAddVideoModal(true);
+    } else if (activeTab === 'schedules' && entry.openSignageSchedule && target.publishStatus === 'published') {
+      resetScheduleForm(); setSchPlaylistId(target.id); setSchName(`${target.name} 재생`); setShowScheduleForm(true);
+    }
+  }, [location.key, location.state, activeTab, playlists, playlistLoading, setSelectedPlaylistId, setShowAddVideoModal, resetScheduleForm, setSchPlaylistId, setSchName, setShowScheduleForm]);
 
   // ── Direct video registration (signage_media) ──
   const mediaReads = useLatestStoreRequest();
@@ -259,7 +287,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const [regVideoStatus, setRegVideoStatus] = useState<'draft' | 'active'>('active');
   const [regVideoSaving, setRegVideoSaving] = useState(false);
   const [regVideoError, setRegVideoError] = useState('');
-  const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
   // Target and draft belong to one editor, with one change action.
   const [editingTarget, setEditingTarget] = useState<SignageEditTarget | null>(null);
@@ -348,6 +375,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       ? { kind: 'direct', media: video._media }
       : video._snapshot ? { kind: 'snapshot', snapshot: video._snapshot } : null;
     if (!target) return;
+    if (target.kind === 'snapshot' && (target.snapshot.isLocked || target.snapshot.isForced)) return;
     const draft = readSignageMediaDraft(target);
     editTargetRef.current = target; editDraftRef.current = draft;
     setEditingTarget(target); setEditDraft(draft); setEditError('');
@@ -380,7 +408,10 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         setItems(previous => previous.map(item => item.id === target.snapshot.id
           ? { ...item, title: response.data.title, contentJson: response.data.contentJson } : item));
       }
-      if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
+      if (target.kind === 'direct') void loadSignageMedia(); else {
+        void fetchItems();
+        if (selectedPlaylistId) void loadPlaylistItems(selectedPlaylistId);
+      }
       if (editTargetRef.current === target && editDraftRef.current === draft) { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }
     } catch (error) {
       if (isCurrent() && organizationRef.current === store && editTargetRef.current === target) setEditError(error instanceof Error ? error.message : '저장에 실패했습니다.');
@@ -464,16 +495,25 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   };
 
   const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
+  const [clock, setClock] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setClock(new Date()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
 
   // ── 운영 가시화 계산 (WO-O4O-STORE-SIGNAGE-OPERATION-VISIBILITY-V1) ──
-  const currentSchedule = useMemo(() => getCurrentSchedule(schedules), [schedules]);
-  const nextSchedule = useMemo(() => getNextSchedule(schedules, currentSchedule?.id ?? null), [schedules, currentSchedule]);
+  const currentSchedule = scheduleError || scheduleLoading ? null : getCurrentSchedule(schedules);
+  const nextSchedule = scheduleError || scheduleLoading ? null : getNextSchedule(schedules, currentSchedule?.id ?? null);
 
   /** 현재 시간 기준 활성 스케줄에 연결된 playlistId 집합 */
   const activePlaylistIds = useMemo(() => {
-    const now = new Date();
-    return new Set(schedules.filter(s => isScheduleNowActive(s, now)).map(s => s.playlistId));
-  }, [schedules]);
+    return new Set(schedules.filter(s => isScheduleNowActive(s, clock)).map(s => s.storePlaylistId).filter(Boolean));
+  }, [schedules, clock]);
+
+  const openScheduleFor = (playlist: StorePlaylist) => {
+    if (playlist.publishStatus !== 'published') return;
+    navigate(withWorkspaceMode(`${base}/marketing/signage/schedules`, 'use'), { state: { signagePlaylistId: playlist.id, openSignageSchedule: true } });
+  };
 
   // WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리
   return (
@@ -494,8 +534,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <Link to={base} className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">디지털사이니지 운영</h1>
-          <p className="text-sm text-slate-500 mt-1">매장 화면에 송출할 콘텐츠를 등록하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
-          <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="디지털사이니지 운영 방법" /></div>
+          <p className="text-sm text-slate-500 mt-1">안내 자료를 재생목록으로 묶고 보여줄 시간을 정합니다. 아래 현황은 저장된 일정 기준이며 실제 기기 재생 확인은 별도입니다.</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -511,6 +550,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       </div>
 
+      <StoreAiSlot label="사이니지 안내" />
       {/* ─── Tab Bar ─────────────────────────────── */}
       <div className="flex flex-wrap gap-1 mb-1 border-b border-slate-200">
         <button
@@ -549,7 +589,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       </div>
 
       {/* ─── 현재 재생 상태 요약 패널 ─────────────── */}
-      <div className={`flex items-start gap-4 mb-6 px-4 py-3 rounded-xl border ${
+      {(workspaceMode === 'use' || activeTab === 'schedules') && <div className={`flex flex-wrap items-start gap-4 mb-6 px-4 py-3 rounded-xl border ${
         currentSchedule
           ? 'bg-green-50 border-green-200'
           : 'bg-slate-50 border-slate-200'
@@ -558,9 +598,9 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${currentSchedule ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
-            <span className="text-xs font-medium text-slate-500">현재 재생</span>
+            <span className="text-xs font-medium text-slate-500">현재 시간의 재생 일정</span>
           </div>
-          {currentSchedule ? (
+          {scheduleLoading ? <p className="text-sm text-slate-500">일정 확인 중…</p> : scheduleError ? <p role="alert" className="text-sm text-red-700">일정을 확인하지 못했습니다. <button type="button" onClick={() => void loadSchedules()} className="min-h-11 underline">일정 다시 시도</button></p> : currentSchedule ? (
             <div>
               <p className="text-sm font-semibold text-slate-900 truncate">
                 {playlists.find(p => p.id === currentSchedule.storePlaylistId)?.name
@@ -572,6 +612,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               <p className="text-xs text-slate-500 mt-0.5">
                 {currentSchedule.name} · {toHHMM(currentSchedule.startTime)} ~ {toHHMM(currentSchedule.endTime)}
               </p>
+              {currentSchedule.storePlaylistId && <button type="button" onClick={() => navigate(withWorkspaceMode(`${base}/marketing/signage/playlist`, 'studio'), { state: { signagePlaylistId: currentSchedule.storePlaylistId } })} className="min-h-11 text-sm text-teal-800 underline">현재 안내 수정</button>}
             </div>
           ) : (
             <p className="text-sm text-slate-400">현재 적용된 스케줄이 없습니다</p>
@@ -599,24 +640,31 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         >
           스케줄 관리
         </button>
-      </div>
+      </div>}
 
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
+          {savedGuide && <p role="status" className="mb-4 rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{savedGuide} 초안을 저장했습니다. 자료를 확인한 뒤 게시하고 재생 시간을 정하세요.</p>}
           {/* Create + list */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
             {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 모달 → 표준 /new 등록 페이지 */}
             <button
-              onClick={() => navigate(`${base}/marketing/signage/playlist/new`)}
+              disabled={loading || mediaLoading || !!listError || !!mediaLoadError}
+              onClick={() => setQuickStart(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               <Plus className="w-4 h-4" />
-              새 플레이리스트
+              새 안내 만들기
             </button>
           </div>
+          {listError && <p role="alert" className="mb-3 text-sm text-red-700">매장 자료를 불러오지 못했습니다. <button type="button" onClick={() => void fetchItems()} className="min-h-11 underline">매장 자료 다시 시도</button></p>}
+          <p className="mb-3 text-sm text-slate-600">자료 선택 → 확인·저장 → 게시 → 재생 시간 설정 순서로 준비합니다. <Link to={`${base}/marketing/signage/videos`} className="inline-flex min-h-11 items-center text-teal-800 underline">영상 등록·수정</Link></p>
+          <details className="mb-4 text-sm text-slate-600"><summary className="min-h-11 cursor-pointer">상세 관리</summary><Link to={`${base}/marketing/signage/playlist/new`} className="inline-flex min-h-11 items-center underline">이름만 먼저 정하고 자료 추가</Link></details>
 
+          <details open={!selectedPlaylistId} className="mb-4">
+          <summary className="min-h-11 cursor-pointer text-sm font-medium text-slate-700">{selectedPlaylistId ? `다른 안내 선택 · ${playlists.length}개` : '저장한 안내 선택'}</summary>
           {/* Playlist search */}
           {!playlistLoading && !playlistError && playlists.length > 0 && (
             <div className="relative mb-3">
@@ -644,15 +692,11 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">플레이리스트가 없습니다.</p>
-              <p className="text-xs mt-1">'새 플레이리스트' 버튼으로 플레이리스트를 만드세요.</p>
+              <p className="text-xs mt-1">'새 안내 만들기'에서 자료를 고르면 초안이 저장됩니다.</p>
             </div>
           ) : (
             <div className="mb-6">
               <DataTable<StorePlaylist>
-                rowSelection={{
-                  selectedRowKeys: selectedPlaylistKeys,
-                  onChange: setSelectedPlaylistKeys,
-                }}
                 columns={[
                   {
                     key: 'name',
@@ -726,13 +770,13 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                     key: 'inUse',
                     title: '사용',
                     align: 'center',
-                    render: (_v, pl) => activePlaylistIds.has(pl.id) ? (
+                    render: (_v, pl) => scheduleError || scheduleLoading ? <span className="text-xs text-slate-500">일정 확인 필요</span> : activePlaylistIds.has(pl.id) ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        사용 중
+                        현재 일정
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-400">미사용</span>
+                      <span className="text-xs text-slate-400">현재 일정 없음</span>
                     ),
                   },
                   {
@@ -776,11 +820,12 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             </div>
           )}
 
+          </details>
           {/* ── Playlist Builder ── */}
           {selectedPlaylistId && selectedPlaylist && (
             <div className="border border-slate-200 rounded-lg bg-white mt-2">
               {/* Builder header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-slate-100">
                 <div className="flex items-center gap-2 min-w-0">
                   <Play className="w-4 h-4 text-blue-600 flex-shrink-0" />
                   <span className="font-medium text-slate-800 truncate">{selectedPlaylist.name}</span>
@@ -788,6 +833,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
+                    disabled={playlistBusy}
                     onClick={() => setShowLibrarySelector(true)}
                     className="flex items-center gap-1 px-2.5 py-1 text-xs text-emerald-600 border border-emerald-300 rounded-md hover:bg-emerald-50"
                     title="HUB Library에서 추가"
@@ -796,6 +842,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                     라이브러리
                   </button>
                   <button
+                    disabled={playlistBusy}
                     onClick={() => { setAddModalSearch(''); setAddModalSelected(new Set()); setShowAddVideoModal(true); }}
                     className="flex items-center gap-1 px-2.5 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50"
                   >
@@ -804,6 +851,16 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                   </button>
                 </div>
               </div>
+
+              <section aria-label="선택 안내 다음 작업" className="space-y-3 border-b border-slate-100 bg-teal-50/40 p-4">
+                <p className="text-sm text-slate-700">자료·순서 변경은 바로 저장됩니다. 실제 재생 화면은 다시 열어 확인하세요. 등록 영상에서 가져온 사본은 원본과 자동 동기화되지 않습니다. 필수 자료의 잠금·시간 조건은 유지됩니다.</p>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" disabled={playlistItemsLoading || !!playlistItemsError || !playlistItems.length} onClick={() => setPlaylistPreview(true)} className="min-h-11 rounded-lg border border-teal-300 bg-white px-3 text-sm disabled:opacity-50">저장된 안내 미리보기</button>
+                  <button type="button" disabled={playlistBusy || !playlistItems.length || !!playlistItemsError || playlistItemsLoading} onClick={() => void handleTogglePublish(selectedPlaylist)} className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm disabled:opacity-50">{selectedPlaylist.publishStatus === 'published' ? '게시 중단' : '자료 확인 후 게시'}</button>
+                  <button type="button" disabled={selectedPlaylist.publishStatus !== 'published' || !playlistItems.length || !!playlistItemsError || playlistItemsLoading} onClick={() => openScheduleFor(selectedPlaylist)} className="min-h-11 rounded-lg bg-teal-700 px-3 text-sm text-white disabled:opacity-50">이 안내의 재생 시간 정하기</button>
+                  {selectedPlaylist.publishStatus === 'published' && <a href={`/store/marketing/signage/play/${encodeURIComponent(selectedPlaylist.id)}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center px-3 text-sm text-teal-800 underline">재생 화면 열기</a>}
+                </div>
+              </section>
 
               {/* Total duration summary */}
               {playlistItems.length > 0 && (
@@ -876,6 +933,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                         {/* Title + meta */}
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-slate-800 truncate">{item.title}</div>
+                          {!item.isLocked && !item.isForced && unifiedVideos.find(video => video._snapshot?.id === item.snapshotId && !video.isLocked && !video.isForced) && <button type="button" onClick={() => handleOpenEdit(unifiedVideos.find(video => video._snapshot?.id === item.snapshotId)!)} className="min-h-11 text-sm text-teal-800 underline">이 안내 자료 수정</button>}
                           <div className="flex items-center gap-2 mt-0.5">
                             {st && (
                               <span className={`px-1.5 py-0 rounded text-[9px] font-semibold ${st === 'youtube' ? 'bg-red-100 text-red-600' : st === 'vimeo' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
@@ -915,9 +973,15 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       )}
 
+      {quickStart && <SignageQuickStart videos={unifiedVideos} organizationId={organizationId} isCurrent={isCurrent}
+        onSaved={playlist => { acceptCreatedPlaylist(playlist); setSavedGuide(playlist.name); setQuickStart(false); void fetchItems(); void loadPlaylists(); }}
+        onClose={draft => { setQuickStart(false); if (draft) acceptCreatedPlaylist(draft); void loadPlaylists(); }} />}
+      {playlistPreview && selectedPlaylist && <SignagePlaylistPreview key={selectedPlaylist.id} name={selectedPlaylist.name} items={playlistItems} onClose={() => setPlaylistPreview(false)} />}
+
       {/* ═══ Schedule Tab ══════════════════════════ */}
       {activeTab === 'schedules' && (
         <div>
+          {savedSchedule && <div role="status" className="mb-4 space-y-2 rounded-lg bg-teal-50 p-4 text-sm text-teal-900"><p>{savedSchedule.name} 일정을 저장했습니다. 실제 기기의 재생 결과는 별도로 확인하세요.</p><Link to={`${base}/marketing/signage/player`} className="inline-flex min-h-11 items-center underline">재생할 안내 확인</Link></div>}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">스케줄</h2>
             <button
@@ -933,6 +997,11 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           {showScheduleForm && <StoreSignageScheduleForm
             editing={!!editingSchedule}
             playlists={playlists}
+            broadcast={!!editingSchedule && !editingSchedule.storePlaylistId}
+            broadcastPlaylists={signagePlaylists}
+            playlistsLoading={editingSchedule && !editingSchedule.storePlaylistId ? schedulePlaylistLoading : playlistLoading}
+            playlistsError={editingSchedule && !editingSchedule.storePlaylistId ? schedulePlaylistError : playlistError}
+            onRetryPlaylists={() => { void (editingSchedule && !editingSchedule.storePlaylistId ? loadSignagePlaylists() : loadPlaylists()); }}
             schName={schName}
             schPlaylistId={schPlaylistId}
             schPriority={schPriority}
@@ -1304,10 +1373,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       ) : (
         <>
           <DataTable<UnifiedVideoItem>
-            rowSelection={{
-              selectedRowKeys: selectedVideoKeys,
-              onChange: setSelectedVideoKeys,
-            }}
             columns={[
               {
                 key: 'title',
@@ -1500,19 +1565,12 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
 
       {/* ── Add Video Modal (WO-O4O-STORE-SIGNAGE-PLAYLIST-BUILDER-V1) ── */}
       {showAddVideoModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={e => { if (e.target === e.currentTarget) { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); } }}
-          onKeyDown={e => { if (e.key === 'Escape') { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); } }}
-          role="dialog"
-          aria-modal="true"
-          tabIndex={-1}
-        >
+        <AuthoringDialog labelId={addVideoTitleId} onClose={closeAddVideo}>
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col" style={{ maxHeight: '80vh' }}>
             {/* Modal header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div>
-                <h3 className="text-sm font-semibold text-slate-800">내 동영상에서 추가</h3>
+                <h3 id={addVideoTitleId} className="text-sm font-semibold text-slate-800">내 동영상에서 추가</h3>
                 <p className="text-xs text-slate-400 mt-0.5">선택한 동영상이 플레이리스트에 추가됩니다</p>
               </div>
               {addModalSelected.size > 0 && (
@@ -1527,6 +1585,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <input
+                  disabled={addModalSaving || playlistBusy}
                   type="text"
                   value={addModalSearch}
                   onChange={e => setAddModalSearch(e.target.value)}
@@ -1556,6 +1615,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 return (
                   <button
                     key={v.id}
+                    disabled={addModalSaving || playlistBusy}
                     onClick={() => {
                       setAddModalSelected(prev => {
                         const next = new Set(prev);
@@ -1614,7 +1674,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             {/* Footer */}
             <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
               <button
-                onClick={() => { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); }}
+                disabled={addModalSaving || playlistBusy}
+                onClick={closeAddVideo}
                 className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
               >
                 취소
@@ -1629,14 +1690,14 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               </button>
             </div>
           </div>
-        </div>
+        </AuthoringDialog>
       )}
 
       {/* Asset Selector Modal (WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1) */}
       <StoreAssetSelectorModal
         open={showLibrarySelector}
         onSelect={handleAddFromLibrary}
-        onClose={() => setShowLibrarySelector(false)}
+        onClose={() => { if (!playlistBusy) setShowLibrarySelector(false); }}
         usageType="signage"
       />
 

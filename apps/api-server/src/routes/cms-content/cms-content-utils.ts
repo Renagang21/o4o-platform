@@ -9,6 +9,7 @@ import {
   resolveCanonicalServiceKey,
   resolveRolePrefixFromCanonicalServiceKey,
 } from '@o4o/security-core';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 
 // WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: local type aliases (matches CmsContent entity)
 export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
@@ -98,6 +99,19 @@ export function resolveCmsRolePrefix(serviceKey: string): string {
 export function isSameCmsService(a: string | null | undefined, b: string | null | undefined): boolean {
   if (!a || !b) return a === b || (!a && !b);
   return canonicalizeCmsServiceKey(a) === canonicalizeCmsServiceKey(b);
+}
+
+/**
+ * slot 에 배치할 콘텐츠의 서비스 경계 판정. 퇴역 서비스 콘텐츠는 배치하지 않고,
+ * 양쪽 serviceKey 가 모두 있으면 같은 canonical service 여야 한다 (platform 콘텐츠 = null 은 허용).
+ */
+export function findCmsSlotContentConflict(
+  contentServiceKey: string | null | undefined,
+  slotServiceKey: string | null | undefined,
+): 'retired' | 'mismatch' | null {
+  if (isRetiredServiceValue(contentServiceKey) || isRetiredServiceValue(slotServiceKey)) return 'retired';
+  if (contentServiceKey && slotServiceKey && !isSameCmsService(contentServiceKey, slotServiceKey)) return 'mismatch';
+  return null;
 }
 
 /** platform admin 판정 근거 — mutation 측 `authorizeCmsMutation` 과 **동일한 근거**를 쓴다. */

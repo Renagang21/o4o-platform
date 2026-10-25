@@ -9,7 +9,8 @@
  *   해석되어 **정상 활성 앱까지 비활성으로 판정**되었다(메뉴 숨김 / app-disabled 리다이렉트).
  *
  *   → 게이팅에는 인증 사용자용 read-only 계약 `GET /api/v1/apps/availability` 를 사용한다.
- *     플랫폼 관리자의 앱 관리 화면(AppStorePage 등)은 기존 `/admin/apps` 를 계속 사용한다.
+ *     관리자 AppStore 화면은 WO-O4O-ADMIN-MENU-TIDY-PHASE1-V1에서 제거됐다.
+ *     이 훅은 공용 기능 가용성 판정만 담당한다.
  *
  *   query key 도 분리한다: 'appAvailability' (게이팅) ↔ 관리 화면의 설치 앱 목록.
  *   서로 다른 의미의 응답을 같은 캐시에 담지 않는다.

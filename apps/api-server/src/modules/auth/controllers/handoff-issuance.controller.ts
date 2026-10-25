@@ -1,3 +1,4 @@
+import { getHandoffServiceAlias, isCarePharmHandoffPath } from '../../../config/handoff-service-aliases.js';
 import { getNetureMainMembershipStatus } from '../../neture/services/neture-main-membership.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
@@ -174,7 +175,8 @@ export class HandoffIssuanceController extends BaseController {
 
     // ── SERVICE HANDOFF (기존 로직 불변) ─────────────────────────────────────
     // Validate target service exists
-    const targetService = getService(targetServiceKey);
+    const alias = getHandoffServiceAlias(targetServiceKey);
+    const targetService = getService(alias?.sessionServiceKey ?? targetServiceKey);
     if (!targetService) {
       return BaseController.error(
         res,
@@ -184,13 +186,17 @@ export class HandoffIssuanceController extends BaseController {
       );
     }
 
+    if (alias?.key === 'carepharm' && !isCarePharmHandoffPath(safeReturnPath ?? '/')) {
+      return BaseController.error(res, 'Invalid CarePharm handoff path', 400, 'VALIDATION_ERROR');
+    }
+
     // ── REPRESENTATIVE ENTRY RETURN (O4O 홈 → neture.co.kr) ─────────────────
     //   WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §5-2:
     //   대표 진입 복귀는 neture membership 을 요구하지 않는다(O4O 계정 인증 ≠ 서비스 회원권).
     //   "아무 서비스 active membership" 도 자격으로 쓰지 않는다 — 자격은 활성 O4O 계정 + 살아 있는 세션뿐.
     //   계정 상태는 requireAuth 가 DB 기준으로 이미 판정했다(blocked 403 · restricted 는 이 경로 비허용).
     //   목적지는 대표 홈 '/' · My Home '/mypage' 와 열거된 복귀 맥락뿐이다. membership·role 생성 0.
-    if (isRepresentativeEntryTarget(targetService.key)) {
+    if (!alias && isRepresentativeEntryTarget(targetService.key)) {
       // Only representative home and the personal home, with a finite informational source.
       const representativePath = safeReturnPath || '/';
       if (
@@ -278,7 +284,7 @@ export class HandoffIssuanceController extends BaseController {
       //   basePath 를 가진 서비스는 host 루트가 다른 서비스이므로 origin helper 로 base URL 을 만든다.
       //   (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch → https://kpa.neture.co.kr/handoff)
       const targetOrigin =
-        getServiceOrigin(targetService.key) ??
+        alias?.origin ?? getServiceOrigin(targetService.key) ??
         `https://${targetService.domain}`;
       const targetUrl =
         `${targetOrigin}/handoff?token=${handoffToken}` +

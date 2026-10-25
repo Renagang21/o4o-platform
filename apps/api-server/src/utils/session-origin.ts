@@ -53,10 +53,8 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
   // Keep admin/workspace special hosts exact, before this catalog-only normalization.
   const catalogHost = host.startsWith('www.') ? host.slice(4) : host;
   // canonical `domain` 과 수용 전용 `legacyDomains` 를 같은 서비스로 본다 — 옛 호스트(인쇄 QR · 북마크)로
-  // 들어온 로그인도 같은 서비스 세션이다. 판정은 host 만 본다(path 무시): kpa-society.co.kr 은 kpa-society 의
-  // 옛 호스트이고 그 아래 `/kpa/*` 는 옛 분회 공용 경로지만 여기서는 kpa-society 다. 분회 세션은 canonical
-  // kpa.neture.co.kr 에서만 kpa-branch 로 귀속되며, 분회 앱이 옛 경로 방문을 그 호스트로 옮긴다
-  // (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1).
+  // 들어온 로그인도 같은 서비스 세션이다. 판정은 host 만 본다(path 무시). 분회 세션은 canonical
+  // kpa.neture.co.kr 에서만 kpa-branch 로 귀속된다(WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1).
   return (
     O4O_SERVICES.find(
       (svc) =>

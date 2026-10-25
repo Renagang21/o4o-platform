@@ -19,6 +19,9 @@
  * 사용법
  *   OPTENV_AI_DEFAULT_PROVIDER="${{ vars.AI_DEFAULT_PROVIDER }}" … \
  *   node scripts/ci/cloud-run-env.mjs optional --service o4o-core-api --names A,B --out "$RUNNER_TEMP/optional-env"
+ *
+ * `--require-current true`: 현재 서비스 조회에 실패하면 carry 할 값을 모르므로 판정하지 않고 실패한다
+ *   (외부 AI 연결 설정 — 저장소 값이 비어 있어도 운영 값이 지워진 채 배포되지 않게 한다).
  */
 
 import { spawnSync } from 'node:child_process';
@@ -47,6 +50,13 @@ export function setEnvFlag(name, value) {
   return value.includes(',') ? `--set-env-vars=^@@^${name}=${value}` : `--set-env-vars=${name}=${value}`;
 }
 
+/** 현재 값을 반드시 알아야 하는 묶음: 조회 실패면 배포를 멈춘다. */
+export function assertCurrentKnown(service, requireCurrent) {
+  if (requireCurrent && !service) {
+    throw new Error('현재 Cloud Run 설정을 조회하지 못했습니다 — 값을 지우지 않도록 배포를 중단합니다.');
+  }
+}
+
 export function planOptionalEnv(names, providedByName, service) {
   const current = currentPlainEnv(service);
   return names.map((name) => ({ name, ...resolveOptionalEnv(providedByName[name], current[name]) }));
@@ -67,6 +77,7 @@ function main() {
   );
   // 서비스 조회 실패 = 현재 값을 모름 → carry 없이 set/omit 만 (빈 값은 여전히 만들지 않는다)
   const service = out.status === 0 ? JSON.parse(out.stdout || 'null') : null;
+  assertCurrentKnown(service, args['require-current'] === 'true');
   if (!service) console.log(`⚠️ ${args.service} describe 실패 — carry 없이 판정`);
 
   const plan = planOptionalEnv(names, provided, service);

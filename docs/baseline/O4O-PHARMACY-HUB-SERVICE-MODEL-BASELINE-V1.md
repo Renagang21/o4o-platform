@@ -10,7 +10,7 @@
 2. **식별자와 권한**: `pharmacy-hub` 서비스 등록, PH namespace의 membership/role/권한·호환 adapter를 제거 대상으로 삼는다. 옛 식별자를 공통 resolver·등록 목록에 남긴 사실은 현행 운영 근거가 아니다. Neture 및 다른 서비스의 가입·역할·권한은 유지한다.
 3. **공급과 결제**: PH 직접 opt-in·`pharmacy_hub_cart` producer·PH 주문/결제 표면은 폐기한다. 공용 offer/checkout/payment/fulfillment/콘텐츠 테이블 전체를 지우지 않는다. `service_keys`에서 PH만 제거해 빈 배열의 기본 공급 의미로 상품이 새로 노출되지 않도록 현행 소비처와 노출 계약을 확인한다. Neture B2B·Store B2B·Neture 약국·구독 및 공통 PaymentCore/Freeze 계약은 그대로다.
 4. **데이터**: PH 전용 데이터는 재사용을 위해 보관하지 않고 삭제한다. 실제 schema/FK·전용 귀속·타 서비스 소비처를 확인한 뒤 계획을 고정하고 transaction 단위로 삭제·잔여 검증한다. 공용 조직/사용자/상품/약사 자격/Neture 데이터는 PH 표기만으로 삭제하지 않는다. 법정 보유 대상은 별도 확인하며 서비스 폐기를 보유기간 면제로 해석하지 않는다. 과거 migration과 migration history는 보존하고 다시 실행하지 않는다.
-5. **도메인 종료**: 2026-10-12 사용자가 PH 데이터는 사용 이력이 없는 개발 데이터이며 재사용·유사 개발 계획이 없음을 확인하고, 기존 인쇄 QR 리다이렉트 보존 정책을 철회했다. `pharmacyhub.co.kr`·`www.pharmacyhub.co.kr` 리다이렉트, 전용 DNS·인증서·도메인 연결도 종료 대상이다. 공유 LB/IP·다른 도메인의 인증서·Neture/KPA QR 기능은 제거하지 않는다. 실제 DNS 관리 주체와 인증서 소비처를 조사하고 PH 연결만 분리한다.
+5. **도메인 종료**: 2026-10-12 사용자가 PH 데이터는 사용 이력이 없는 개발 데이터이며 재사용·유사 개발 계획이 없음을 확인하고, 기존 인쇄 QR 리다이렉트 보존 정책을 철회했다. 옛 PH 도메인(루트 · www) 리다이렉트, 전용 DNS·인증서·도메인 연결도 종료 대상이다. 공유 LB/IP·다른 도메인의 인증서·Neture/KPA QR 기능은 제거하지 않는다. 실제 DNS 관리 주체와 인증서 소비처를 조사하고 PH 연결만 분리한다.
 6. **완료 경계**: 정책 확정·코드 push·main 병합·API 배포는 운영 삭제 완료와 다르다. PH 전용 Cloud Run/backend/NEG는 앞선 phase에서 제거됐으며, 현재 최종 phase는 잔여 코드/PH 전용 개발 데이터/도메인 연결 종료다. 공용 소비처와 FK를 확인하고 운영 단독 창에서 삭제·잔여 검증 후 전체 완료로 기록한다. PH workflow는 Demo/Store 유지관리도 포함하므로 그 기능을 보존·분리한 뒤 PH 전용 도구만 제거한다. 현행 실행 상태는 [폐기 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 기록한다.
 
 
@@ -29,7 +29,7 @@
 > **상태**: ACTIVE · **제정일**: 2026-08-21
 > **근거 WO**: `WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1`
 > **적용 범위**: Pharmacy-Hub 서비스의 역할 모델 · 가입 · 운영자 capability · 매장 HUB 공급 유입
-> **호스트 정합 (2026-10-03)**: `pharmacyhub.co.kr` 은 **호환 호스트**다 — 새 독립 서비스를 두지 않고 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향, `pharmacy-hub` 키 · role 은 호환 식별자로 보존 ([`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2-2 · `CHECK-O4O-URL-FIRST-CENSUS-V1` §9). 본문의 역할 모델은 그대로 유효하다.
+> **호스트 정합 (2026-10-03, 도메인은 2026-10-12 종료 · DNS 정리 완료 2026-10-20)**: 옛 PH 도메인은 당시 **호환 호스트**였다 — 새 독립 서비스를 두지 않고 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향, `pharmacy-hub` 키 · role 은 호환 식별자로 보존 ([`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2-2 · `CHECK-O4O-URL-FIRST-CENSUS-V1` §9). 본문의 역할 모델은 그대로 유효하다.
 > **상위 규칙**: [`CLAUDE.md`](../../CLAUDE.md) → [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) → [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 
 ---
@@ -228,7 +228,7 @@ Pharmacy-Hub 는 이 축을 **재사용**하며 전용 자격 테이블·전용 
 ## 8. 프로덕션 검증 상태 (최종)
 
 > `WO-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1` (2026-08-21)
-> 실제 프로덕션(`pharmacyhub.co.kr` · `api.neture.co.kr`)에서 역할별 가입·승인·진입을
+> 실제 프로덕션(옛 PH 도메인 · `api.neture.co.kr`)에서 역할별 가입·승인·진입을
 > end-to-end 로 검증했다. 아래가 **최종 상태**이며, 이 축은 더 이상 분할 WO 로 쪼개지 않는다.
 > 상세 결과 → [`CHECK-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1`](../checks/CHECK-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1.md)
 

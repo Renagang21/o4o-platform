@@ -46,7 +46,6 @@ const readBackendRoles = (source: string, constName: string): string[] => {
 
 /** 플랫폼 전역 경계를 쓰는 화면: 메뉴 id ↔ route 경로 ↔ route 소스. */
 const PLATFORM_SCOPED_SCREENS = [
-  { menuId: 'core-users', path: '/users', source: USERS_ROUTES },
   // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1
   //   `/operators` 도 같은 `/api/v1/admin/users` 를 소비한다. 선행 정렬 WO 가 이 화면을
   //   빠뜨려 legacy 역할이 진입 후 전 API 403 을 받고 있었다 → 같은 계약으로 등재한다.
@@ -82,7 +81,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
   const boundary = [...PLATFORM_ADMIN_ROLES];
 
   it.each([['platform:super_admin']])('%s 는 메뉴도 보이고 route 도 통과한다', (role) => {
-    expect(hasMenuPermission([role], [], 'core-users')).toBe(true);
+    expect(hasMenuPermission([role], [], 'core-operators')).toBe(true);
     expect(hasRequiredRoles({ roles: [role] }, boundary)).toBe(true);
   });
 
@@ -90,7 +89,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
   it.each([['admin'], ['super_admin'], ['operator'], ['kpa:admin'], ['neture:operator'], ['user']])(
     '%s 는 메뉴도 안 보이고 route 도 통과하지 못한다',
     (role) => {
-      expect(hasMenuPermission([role], [], 'core-users')).toBe(false);
+      expect(hasMenuPermission([role], [], 'core-operators')).toBe(false);
       expect(hasRequiredRoles({ roles: [role] }, boundary)).toBe(false);
     },
   );

@@ -373,3 +373,32 @@ describe('경영자 — 복제 · description', () => {
     expect(notFound.status).toBe(404);
   });
 });
+
+it('rechecks paid owner eligibility for staff device runtime and pairing after cancellation', async () => {
+  const state = makeState();
+  const { app, dataSource } = makeApps(state);
+  const original = dataSource.query.getMockImplementation();
+  let paid = false;
+  dataSource.query.mockImplementation(async (sql: string, params: unknown[]) => {
+    if (sql.includes('SELECT status FROM neture_pharmacy_memberships')) return [{ status: 'active' }];
+    if (sql.includes('FROM settings WHERE key')) return [];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return state.members
+      .filter(member => member.organization_id === params[0] && member.user_id === params[1])
+      .map(member => ({ role: member.role, configured: false }));
+    if (sql.includes('FROM semi_franchises sf')) return [];
+    if (sql.includes('AS "ownerUserId"')) return [{ ownerUserId: 'owner-member' }];
+    if (sql.includes('FROM member_paid_service_entitlements')) {
+      expect(params).toEqual(['owner-member']);
+      return paid ? [{ user_id: 'owner-member' }] : [];
+    }
+    return original(sql, params);
+  });
+  expect((await request(app).get('/store/tablet-runtime/device').set(hdr())).status).toBe(403);
+  paid = true;
+  expect((await request(app).get('/store/tablet-runtime/device').set(hdr())).status).toBe(200);
+  paid = false;
+  expect((await request(app).get('/store/tablet-runtime/device').set(hdr())).status).toBe(403);
+  state.device = { ...state.device, device_token_hash: null, pairing_code: '123456', is_active: false };
+  expect((await request(app).post('/stores/tablet-pairing/claim').send({ code: '123456' })).status).toBe(403);
+  expect(state.device.device_token_hash).toBeNull();
+});

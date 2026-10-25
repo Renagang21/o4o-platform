@@ -1,3 +1,5 @@
+import { recordOperation } from '../operations/operation-audit.js';
+import { assertOrdinaryServiceMember } from '../operations/service-relationship-protection.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 /**
  * MembershipApprovalService — Core-level approval logic
@@ -528,21 +530,6 @@ export class MembershipApprovalService {
             });
           }
         }
-      }
-
-      // STEP5: WO-O4O-KCOSMETICS-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1
-      //   k-cosmetics 승인 시 cosmetics_members upsert (service_memberships 가 SSOT).
-      //   cosmetics_members.status CHECK: 'active' | 'suspended' | 'withdrawn' 만 허용.
-      //   row 없으면 skeleton 생성, 있으면 active 동기화 (sub_role 보존).
-      //   거절 시에는 cosmetics_members row 생성하지 않음 (rejectMembership 에서 처리 없음).
-      if (membership.service_key === 'k-cosmetics') {
-        logger.info('[APPROVAL][STEP5] cosmetics_members upsert', { userId });
-        await queryRunner.query(
-          `INSERT INTO cosmetics_members (user_id, membership_type, status, created_at, updated_at)
-           VALUES ($1, 'cosmetics_member', 'active', NOW(), NOW())
-           ON CONFLICT (user_id) DO UPDATE SET status = 'active', updated_at = NOW()`,
-          [userId]
-        );
       }
 
       await queryRunner.commitTransaction();
@@ -1393,6 +1380,7 @@ export class MembershipApprovalService {
       }
 
       if (mode === 'hard') {
+        await assertOrdinaryServiceMember(queryRunner, userId, serviceKeys);
         // WO-O4O-HARD-DELETE-SERVICE-SCOPED-V1:
         // users는 공통 Identity — 절대 삭제 금지.
         // serviceKey 범위의 데이터만 정리한다.
@@ -1468,6 +1456,11 @@ export class MembershipApprovalService {
           [userId]
         );
 
+        for (const serviceKey of serviceKeys) {
+          await recordOperation(queryRunner, serviceKey, deletedBy, 'member.admin.relationship_cleanup', {
+            userId, mode: 'hard', commonIdentityDeleted: false, authoredActivityDeleted: false,
+          });
+        }
         await queryRunner.commitTransaction();
         logger.info('[ApprovalService] HARD_DELETE_SUCCESS', {
           userId, deletedBy, serviceKeys, isPlatformAdmin,

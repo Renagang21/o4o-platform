@@ -3,7 +3,7 @@
  *
  * WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1
  *
- * platform-admin section 내부 navigation(플랫폼 홈 / 계정 관리 / 서비스 관리)만 제공.
+ * platform-admin section 내부 navigation(플랫폼 홈 / 계정 관리 / 사용자 조회)만 제공.
  * 전체 Neture admin sidebar 와 통합하지 않는다(section 내부 한정).
  * guard 는 상위 PlatformRoute(platform:super_admin)가 담당.
  */
@@ -13,12 +13,8 @@ import { ShieldCheck } from 'lucide-react';
 
 const NAV = [
   { to: '/admin/platform', label: '플랫폼 홈', end: true },
-  { to: '/admin/platform/accounts', label: '계정 관리', end: false },
-  { to: '/admin/platform/services', label: '서비스 관리', end: false },
+  { to: '/settings/admin-accounts', label: '전체 관리자 계정', end: false },
   { to: '/admin/platform/users', label: '사용자 조회', end: false },
-  { to: '/admin/platform/roles', label: '역할 관리', end: false },
-  // WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1
-  { to: '/admin/platform/service-audience', label: '서비스 대상 정책', end: false },
 ];
 
 export default function PlatformSectionLayout() {
@@ -34,14 +30,14 @@ export default function PlatformSectionLayout() {
           platform admin
         </span>
       </div>
-      <nav className="flex gap-1 border-b border-slate-200 mb-6">
+      <nav aria-label="플랫폼 관리 메뉴" className="flex gap-1 overflow-x-auto border-b border-slate-200 mb-6">
         {NAV.map((n) => (
           <NavLink
             key={n.to}
             to={n.to}
             end={n.end}
             className={({ isActive }) =>
-              `px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors no-underline ${
+              `shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors no-underline ${
                 isActive
                   ? 'text-slate-900 border-slate-800'
                   : 'text-slate-500 border-transparent hover:text-slate-700'

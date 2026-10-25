@@ -1,3 +1,4 @@
+import { cooperativeAdminTransferRequired } from './cooperative-erasure-review.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { AuthProvider } from '../../types/account-linking.js';
@@ -44,6 +45,9 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
   service_operator_invitations: ['target_user_id', 'accepted_user_id'],
+  cooperative_memberships: ['user_id'],
+  cooperative_roles: ['user_id'],
+  cooperative_management_events: ['actor_id', 'subject_id'],
 };
 
 export function calendarExpiry(created: Date, years: 1 | 2): Date {
@@ -287,6 +291,7 @@ export class AccountErasureService {
         AND EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='community' AND sm.status='active')
         AND NOT EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')))`, [user.id]);
     if (soleAdmin.n) codes.push('COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED');
+    if (await cooperativeAdminTransferRequired(m,user.id as string)) codes.push('COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED');
     for (const t of await this.tables(m)) {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
@@ -360,7 +365,16 @@ export class AccountErasureService {
       if (!t) continue;
       let where = owners.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
       if (table === 'service_operator_invitations') {
-        where = `(${where}) OR (target_user_id IS NULL AND lower(invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
+        where = `(${where}) OR invited_by_user_id::text=$1 OR (target_user_id IS NULL AND lower(invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
+        // Keep the time-limited event, not this subject's identity or delivery data.
+        await m.query(`UPDATE service_operator_invitations SET
+          status=CASE WHEN status='pending' THEN 'cancelled' ELSE status END,
+          invited_email=NULL,token_hash=NULL,
+          target_user_id=CASE WHEN target_user_id::text=$1 THEN NULL ELSE target_user_id END,
+          accepted_user_id=CASE WHEN accepted_user_id::text=$1 THEN NULL ELSE accepted_user_id END,
+          invited_by_user_id=CASE WHEN invited_by_user_id::text=$1 THEN NULL ELSE invited_by_user_id END
+          WHERE ${where}`,[userId]);
+        continue;
       }
       if (where) await m.query(`DELETE FROM public.${quote(table)} WHERE ${where}`, [userId]);
     }

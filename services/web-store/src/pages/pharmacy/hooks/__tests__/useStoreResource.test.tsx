@@ -29,3 +29,17 @@ it('a failed refresh retains the last confirmed data and exposes the failure', a
   expect(result.current.data).toEqual(['saved']);
   expect(result.current.error).toBeTruthy();
 });
+it('disabled resources never load or retry and reject a response from before disabling', async () => {
+  let resolve!: (value: string[]) => void;
+  const load = vi.fn().mockImplementation(() => new Promise<string[]>(done => { resolve = done; }));
+  const { result, rerender } = renderHook(({ enabled }) => useStoreResource<string[]>(load, [], enabled), { initialProps: { enabled: false } });
+  await act(() => result.current.reload());
+  expect(load).not.toHaveBeenCalled();
+  expect(result.current.loading).toBe(false);
+  rerender({ enabled: true });
+  expect(load).toHaveBeenCalledOnce();
+  rerender({ enabled: false });
+  await act(async () => resolve(['not available']));
+  expect(result.current.data).toEqual([]);
+  expect(result.current.error).toBeNull();
+});

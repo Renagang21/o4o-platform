@@ -1,3 +1,5 @@
+vi.mock('../../components/supplier/SupplierActiveFundings',()=>({default:()=>null}));
+import { supplierReviewApi } from '../../lib/api/supplierReview';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -98,4 +100,17 @@ it('focuses the rejection reason and cancels back to the detail action without w
   fireEvent(dialog, new Event('cancel', { cancelable: true }));
   await waitFor(() => expect(document.activeElement).toBe(trigger));
   expect(api.rejectSupplier).not.toHaveBeenCalled();
+});
+
+vi.mock('../../lib/api/supplierReview', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../../lib/api/supplierReview')>();
+  return { ...original, supplierReviewApi: { ...original.supplierReviewApi,
+    queue: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+    list: vi.fn(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 })),
+  } };
+});
+
+beforeEach(() => {
+  vi.mocked(supplierReviewApi.queue).mockResolvedValue({ items: [], hasMore: false });
+  vi.mocked(supplierReviewApi.list).mockImplementation(async (supplierId: string) => ({ supplierId, current: null, requests: [], actions: [], hasMore: false, page: 1 }));
 });

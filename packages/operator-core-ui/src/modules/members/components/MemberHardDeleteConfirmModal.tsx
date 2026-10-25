@@ -29,6 +29,9 @@ export type MemberHardDeleteConfirmModalProps = {
   member: MemberHardDeleteTarget | null;
   serviceLabel: string;
   loading?: boolean;
+  /** Explicit service relationship cleanup wording for scoped membership APIs. */
+  relationshipOnly?: boolean;
+  confirmDisabled?: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void> | void;
   /** 서비스별 위험 정보 / 활동 경고 등 부가 정보를 받는 optional slot. */
@@ -42,6 +45,8 @@ export function MemberHardDeleteConfirmModal({
   member,
   serviceLabel,
   loading = false,
+  relationshipOnly = false,
+  confirmDisabled = false,
   onClose,
   onConfirm,
   children,
@@ -49,12 +54,14 @@ export function MemberHardDeleteConfirmModal({
   const [confirmInput, setConfirmInput] = useState('');
 
   useEffect(() => {
-    if (!open) setConfirmInput('');
-  }, [open]);
+    setConfirmInput('');
+  }, [open, member?.id]);
 
   if (!open || !member) return null;
 
-  const canSubmit = confirmInput.trim() === CONFIRM_KEYWORD && !loading;
+  const keyword = relationshipOnly ? '가입정리' : CONFIRM_KEYWORD;
+  const actionLabel = relationshipOnly ? '서비스 가입 정리' : '완전삭제';
+  const canSubmit = confirmInput.trim() === keyword && !loading && !confirmDisabled;
   const displayName = member.name?.trim() || member.email || '이름 없음';
 
   const handleSubmit = async () => {
@@ -64,11 +71,11 @@ export function MemberHardDeleteConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto mx-4 p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900">회원 완전삭제</h3>
+            <h3 className="text-lg font-bold text-slate-900">{relationshipOnly ? actionLabel : '회원 완전삭제'}</h3>
           </div>
           <button
             type="button"
@@ -85,7 +92,7 @@ export function MemberHardDeleteConfirmModal({
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm font-medium text-red-700">이 작업은 복구할 수 없습니다.</p>
             <p className="text-xs text-red-600 mt-1">
-              계정과 연결된 멤버십·역할 정보가 모두 삭제되며 되돌릴 수 없습니다.
+              {relationshipOnly ? '해당 서비스의 가입 관계를 정리합니다. 공통 계정·다른 서비스 가입·게시글·댓글·감사 기록 전체를 삭제하는 기능이 아닙니다.' : '계정과 연결된 멤버십·역할 정보가 모두 삭제되며 되돌릴 수 없습니다.'}
             </p>
           </div>
 
@@ -121,7 +128,7 @@ export function MemberHardDeleteConfirmModal({
 
           <div className="space-y-1.5">
             <label htmlFor="member-hard-delete-confirm" className="text-xs text-slate-600">
-              계속하려면 <span className="font-semibold text-red-600">{CONFIRM_KEYWORD}</span> 를 입력하세요.
+              계속하려면 <span className="font-semibold text-red-600">{keyword}</span> 를 입력하세요.
             </label>
             <input
               id="member-hard-delete-confirm"
@@ -129,7 +136,7 @@ export function MemberHardDeleteConfirmModal({
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               disabled={loading}
-              placeholder={CONFIRM_KEYWORD}
+              placeholder={keyword}
               autoComplete="off"
               className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 disabled:bg-slate-50"
             />
@@ -143,7 +150,7 @@ export function MemberHardDeleteConfirmModal({
               className="w-full px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:bg-red-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {loading ? '삭제 중...' : '완전삭제'}
+              {loading ? '처리 중...' : actionLabel}
             </button>
             <button
               type="button"

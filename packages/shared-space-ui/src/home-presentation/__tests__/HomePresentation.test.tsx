@@ -19,6 +19,7 @@ import {
   HomeHeroView,
   HomePromotionView,
   ServiceHomeHero,
+  ServiceHomePromotion,
 } from "../HomePresentation";
 import { HomePresentationEditor } from "../HomePresentationEditor";
 afterEach(() => {
@@ -38,7 +39,7 @@ describe("home presentation contract and public display", () => {
     (surface) => {
       const defaults = initialHomePresentation(surface);
       expect(parseHomePresentation(defaults)).toEqual(defaults);
-      expect(defaults.slides.length).toBeGreaterThan(1);
+      expect(defaults.slides.length).toBe(["carepharm", "pharmcoop", "cooperative"].includes(surface) ? 1 : 2);
       expect(defaults.slides.length).toBeLessThanOrEqual(3);
       expect(
         defaults.promotions.every(
@@ -150,7 +151,7 @@ describe("home presentation contract and public display", () => {
     await act(async () => finish(response(previous)));
     expect(screen.queryByText("이전 서비스 콘텐츠")).toBeNull();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
-      "제품의 가능성",
+      "새로운 제품",
     );
   });
 });
@@ -211,6 +212,19 @@ it("preserves the branch identity and primary entry when an operator hides promo
 });
 
 describe("operator editor", () => {
+  it("labels and previews every CarePharm public notice while retaining the published-only API contract", async () => {
+    const draft = initialHomePresentation("carepharm");
+    draft.promotions.push({ ...draft.promotions[0], id: "second", title: "두 번째 공지" });
+    const client = { get: vi.fn().mockResolvedValue(response({ ...state(), draft })), put: vi.fn() };
+    render(<HomePresentationEditor surface="carepharm" client={client} />);
+    expect(await screen.findByRole("heading", { name: "Hero · 공개 공지 관리" })).toBeTruthy();
+    await screen.findAllByLabelText("제목");
+    expect(client.get).toHaveBeenCalledExactlyOnceWith("/home-presentation/carepharm/manage");
+    const preview = screen.getByRole("region", { name: "홈 화면 미리보기" });
+    expect(within(preview).getByText("두 번째 공지")).toBeTruthy();
+    expect(within(preview).getByText("CarePharm 이용 안내")).toBeTruthy();
+    expect(screen.getByLabelText("Hero·공개 공지 노출 사용")).toBeTruthy();
+  });
   it("distinguishes a failed read from an empty first configuration and blocks saving", async () => {
     const client = {
       get: vi.fn().mockRejectedValue(new Error("fixture")),
@@ -324,4 +338,25 @@ describe("operator editor", () => {
     );
     expect(screen.getAllByLabelText("제목")).toHaveLength(3);
   });
+});
+
+
+it("shows only operator-published announcements when requested, without suppressing existing consumers' defaults", async () => {
+  const client = { get: vi.fn().mockResolvedValue(response(null)) };
+  const ui = render(<ServiceHomePromotion surface="carepharm" client={client} publishedOnly />);
+  await waitFor(() => expect(client.get).toHaveBeenCalled());
+  expect(screen.queryByText('CarePharm 이용 안내')).toBeNull();
+  ui.unmount();
+  render(<ServiceHomePromotion surface="neture" client={client} />);
+  await screen.findByText('O4O 이용 안내');
+});
+it("retains operator-published multiple CarePharm banners and Study announcements", async () => {
+  const published = initialHomePresentation('carepharm');
+  published.slides.push({ ...published.slides[0], id: 'event', title: '운영자가 개설한 교육 안내' });
+  published.promotions[0] = { ...published.promotions[0], title: '회원 교육 개설', linkUrl: 'https://neture.co.kr/service-entry/lecture?returnPath=%2F', linkText: '교육 안내 확인' };
+  const client = { get: vi.fn().mockResolvedValue(response(published)) };
+  render(<><ServiceHomeHero surface="carepharm" client={client} /><ServiceHomePromotion surface="carepharm" client={client} publishedOnly /></>);
+  expect((await screen.findByRole('link', { name: /교육 안내 확인/ })).getAttribute('href')).toBe('https://neture.co.kr/service-entry/lecture?returnPath=%2F');
+  fireEvent.click(screen.getByRole('button', { name: '다음 안내' }));
+  expect(screen.getByRole('heading', { name: '운영자가 개설한 교육 안내' })).toBeTruthy();
 });

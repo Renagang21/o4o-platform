@@ -46,7 +46,7 @@ describe('operator mail acceptance', () => {
   it('removes the secret from the URL and never accepts on page load or preview', async () => {
     render(<OperatorInvitePage />);
     await waitFor(() =>
-      expect(screen.getByText(/lecture · lecture:operator/)).toBeTruthy(),
+      expect(screen.getByText(/lecture · 서비스 운영자/)).toBeTruthy(),
     );
     expect(window.location.hash).toBe('');
     expect(h.post.mock.calls.every(([path]) => path.endsWith('/inspect'))).toBe(
@@ -148,7 +148,7 @@ it.each([['INVALID_OR_EXPIRED_INVITATION', false], ['INVITATION_ACCOUNT_MISMATCH
     return { data: { data: { serviceKey: 'lecture', role: 'lecture:operator', purpose: 'assignment' } } };
   });
   render(<OperatorInvitePage />);
-  await screen.findByText(/lecture · lecture:operator/);
+  await screen.findByText(/lecture · 서비스 운영자/);
   fireEvent.click(screen.getByRole('button', { name: '이 계정으로 확인·수락' }));
   await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '초대에 지정된 계정과 다릅니다. 지정된 계정으로 로그인하세요.' : '수락하지 못했습니다. 링크 만료·취소 또는 권한 회수 여부를 관리자에게 확인하세요.');
   expect(sessionStorage.getItem('o4o_operator_invite')).toBe(retained ? TOKEN : null);
@@ -157,7 +157,7 @@ it.each([['INVALID_OR_EXPIRED_INVITATION', false], ['INVITATION_ACCOUNT_MISMATCH
 it('keeps a valid incoming token in memory with storage blocked, including StrictMode, and scrubs the fragment', async () => {
   for (const method of ['getItem','setItem','removeItem'] as const) vi.spyOn(Storage.prototype, method).mockImplementation(() => { throw new Error('Storage unavailable'); });
   render(<StrictMode><OperatorInvitePage /></StrictMode>);
-  await screen.findByText(/lecture · lecture:operator/);
+  await screen.findByText(/lecture · 서비스 운영자/);
   expect(window.location.hash).toBe('');
   expect(h.post).toHaveBeenCalledWith('/service-operator-invitations/inspect', { token: TOKEN });
   fireEvent.click(screen.getByRole('button', { name: '이 계정으로 확인·수락' }));

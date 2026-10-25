@@ -1,3 +1,7 @@
+import { BusinessContactPage, BusinessInboxPage } from './pages/contact/BusinessContactPages';
+import { pharmacyCollaboratorRoles } from '@o4o/types';
+import { BUSINESS_SITE } from './config/businessSite';
+import { PharmacyOperatorPage, PharmacyOperatorContentPage } from './pages/business/PharmacyOperatorPages';
 import BusinessHomePresentationPage from './pages/business/BusinessHomePresentationPage';
 import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
 import PharmacyLegacyRedirect, { LegacyAwareBusinessWorkspace } from './pages/business/PharmacyLegacyRedirect';
@@ -10,10 +14,10 @@ import BusinessForumManagementPage from './pages/business/BusinessForumManagemen
 import { MyHomeButton, O4OHomeButton } from '@o4o/auth-react';
 import { RoleGuard } from './components/auth/RoleGuard';
 import { authClient as pharmacyManagementAuthClient } from './contexts/AuthContext';
-import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
-import { useEffect, useMemo, useState, lazy, Suspense, type ReactNode } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -21,295 +25,57 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 import { Layout } from './components';
-import { MobileBottomNav } from './components/MobileBottomNav';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, NotFound } from '@o4o/ui';
-import { templates, usePageSeo, StoreFacingFooter } from '@o4o/shared-space-ui';
+import { templates, usePageSeo } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { kpaSeoRegistry, KPA_SEO_DEFAULTS, applyPharmacyUrlMeta } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
-import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
-import PostLoginRedirect from './components/PostLoginRedirect';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: RegisterModal(email+password 가입) 은 은퇴했다.
 //   가입은 로그인 모달의 'Google 로 계속하기' 하나가 겸한다.
 // WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1: 정적 import —
 //   lazy 면 AuthProvider 의 세션 복구 effect 가 chunk 로드보다 먼저 실행돼 stale 토큰 guard 가 늦는다.
 import HandoffPage from './pages/HandoffPage';
-// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 화면은 은퇴했다.
-// WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
 
-// Forum pages — Phase 2 lazy (barrel unwound)
-// WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
-
-
-// LMS / Instructor 화면 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14:
-// KPA 는 LMS runtime surface 를 소유하지 않는다. 레거시 경로는 독립 강의 서비스(LECTURE_SERVICE_URL)로 외부 이동한다.
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14:
+// 레거시 LMS 경로는 독립 강의 서비스(LECTURE_SERVICE_URL)로 외부 이동한다.
 import { LECTURE_SERVICE_URL } from './config/navigation';
 
-// Events pages — Phase 2 lazy
-const EventsHomePage = lazy(() => import('./pages/events/EventsHomePage').then(m => ({ default: m.EventsHomePage })));
+// WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → store.neture.co.kr handoff
+import { createStoreServicesApi, mapLegacyStorePathToUnified } from '@o4o/store-ui-core';
+import { coreApiClient } from './api/client';
 
-// Participation pages — Phase 2 lazy (barrel unwound). QuestionType은 enum이라 별도 유지.
-const ParticipationListPage = lazy(() => import('./pages/participation/ParticipationListPage').then(m => ({ default: m.ParticipationListPage })));
-const ParticipationCreatePage = lazy(() => import('./pages/participation/ParticipationCreatePage').then(m => ({ default: m.ParticipationCreatePage })));
-const ParticipationRespondPage = lazy(() => import('./pages/participation/ParticipationRespondPage').then(m => ({ default: m.ParticipationRespondPage })));
-const ParticipationResultPage = lazy(() => import('./pages/participation/ParticipationResultPage').then(m => ({ default: m.ParticipationResultPage })));
-// WO-O4O-SURVEY-CORE-PHASE1-V1: /content/surveys/new에서 allowedQuestionTypes/hideScopeField 사용
-import { QuestionType } from './pages/participation/types';
-// WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1: 회원용 설문 목록/상세
-const SurveyListPage = lazy(() => import('./pages/survey/SurveyListPage'));
-const SurveyDetailPage = lazy(() => import('./pages/survey/SurveyDetailPage'));
-
-// Event Offer pages — Phase 2 lazy (barrel unwound)
-// WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1: legacy EventOfferListPage 제거.
-//   canonical = KpaEventOfferPage (enriched ViewModel) — /store-hub/event-offers
-const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
-// WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): canonical store cart 확인 화면
-// Supplier pages — Phase 2 lazy
-const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage').then(m => ({ default: m.SupplierEventOfferPage })));
-
-// Signage pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
-const ContentHubPage = lazy(() => import('./pages/signage/ContentHubPage'));
-const PlaylistEditorPage = lazy(() => import('./pages/signage/PlaylistEditorPage'));
-const PlaylistDetailPage = lazy(() => import('./pages/signage/PlaylistDetailPage'));
-const MediaDetailPage = lazy(() => import('./pages/signage/MediaDetailPage'));
+// Signage — public rendering only (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1)
 const PublicSignagePage = lazy(() => import('./pages/signage/PublicSignagePage'));
-const SignageFullscreenPlayerPage = lazy(() => import('./pages/signage/SignageFullscreenPlayerPage'));
 
-// Legal pages — Phase 2 lazy (barrel unwound)
+// Legal (WO-KPA-LEGAL-PAGES-V1) · Contact (WO-O4O-KPA-CONTACT-PAGE-IMPLEMENTATION-V1)
 const PolicyPage = lazy(() => import('./pages/legal/PolicyPage').then(m => ({ default: m.PolicyPage })));
 const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
-
-// MyPage pages — Phase 2 lazy (barrel unwound; 9 named + 4 default-as-named)
-const MyDashboardPage = lazy(() => import('./pages/mypage/MyDashboardPage').then(m => ({ default: m.MyDashboardPage })));
-const MyProfilePage = lazy(() => import('./pages/mypage/MyProfilePage').then(m => ({ default: m.MyProfilePage })));
-const MySettingsPage = lazy(() => import('./pages/mypage/MySettingsPage').then(m => ({ default: m.MySettingsPage })));
-const MyQualificationsPage = lazy(() => import('./pages/mypage/MyQualificationsPage').then(m => ({ default: m.MyQualificationsPage })));
-const MyCreditsPage = lazy(() => import('./pages/mypage/MyCreditsPage').then(m => ({ default: m.MyCreditsPage })));
-// default-as-named (wrapper 불필요)
-const MyRequestsPage = lazy(() => import('./pages/mypage/MyRequestsPage'));
-
-// Admin Routes (KPA-Society 관리자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
-const AdminRoutes = lazy(() => import('./routes/AdminRoutes').then(m => ({ default: m.AdminRoutes })));
-
-// Operator Routes (서비스 운영자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
-const OperatorRoutes = lazy(() => import('./routes/OperatorRoutes').then(m => ({ default: m.OperatorRoutes })));
-// Resources Hub — Phase 2 lazy
-const ResourcesHubPage = lazy(() => import('./pages/resources/ResourcesHubPage').then(m => ({ default: m.ResourcesHubPage })));
-const ResourceWritePage = lazy(() => import('./pages/resources/ResourceWritePage').then(m => ({ default: m.ResourceWritePage })));
-
-// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: MobilePharmacyPage RETIRE —
-//   /mobile/pharmacy → /store/workspace (Store Workspace Home 이 모바일에서도 같은 상위 구조를 맡는다)
-
-// Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
-
-// Guide Pages — Phase 2 lazy (14 pages)
-const GuideIntroPage = lazy(() => import('./pages/guide/GuideIntroPage').then(m => ({ default: m.GuideIntroPage })));
-const GuideIntroStructurePage = lazy(() => import('./pages/guide/GuideIntroStructurePage').then(m => ({ default: m.GuideIntroStructurePage })));
-const GuideIntroKpaPage = lazy(() => import('./pages/guide/GuideIntroKpaPage').then(m => ({ default: m.GuideIntroKpaPage })));
-const GuideIntroOperationPage = lazy(() => import('./pages/guide/GuideIntroOperationPage').then(m => ({ default: m.GuideIntroOperationPage })));
-const GuideIntroConceptPage = lazy(() => import('./pages/guide/GuideIntroConceptPage').then(m => ({ default: m.GuideIntroConceptPage })));
-const GuideUsagePage = lazy(() => import('./pages/guide/GuideUsagePage').then(m => ({ default: m.GuideUsagePage })));
-const GuideFeaturesPage = lazy(() => import('./pages/guide/GuideFeaturesPage').then(m => ({ default: m.GuideFeaturesPage })));
-const GuideFeatureForumPage = lazy(() => import('./pages/guide/GuideFeatureForumPage').then(m => ({ default: m.GuideFeatureForumPage })));
-const GuideFeatureResourcesPage = lazy(() => import('./pages/guide/GuideFeatureResourcesPage').then(m => ({ default: m.GuideFeatureResourcesPage })));
-const GuideFeatureContentPage = lazy(() => import('./pages/guide/GuideFeatureContentPage').then(m => ({ default: m.GuideFeatureContentPage })));
-const GuideFeatureSignagePage = lazy(() => import('./pages/guide/GuideFeatureSignagePage').then(m => ({ default: m.GuideFeatureSignagePage })));
-const GuideFeatureQrTabletPage = lazy(() => import('./pages/guide/GuideFeatureQrTabletPage').then(m => ({ default: m.GuideFeatureQrTabletPage })));
-const GuideFeaturePopPage = lazy(() => import('./pages/guide/GuideFeaturePopPage').then(m => ({ default: m.GuideFeaturePopPage })));
-const GuideFeatureProductionMaterialsPage = lazy(() => import('./pages/guide/GuideFeatureProductionMaterialsPage').then(m => ({ default: m.GuideFeatureProductionMaterialsPage })));
-const GuideFeatureBlogPage = lazy(() => import('./pages/guide/GuideFeatureBlogPage').then(m => ({ default: m.GuideFeatureBlogPage })));
-const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStorePage').then(m => ({ default: m.GuideFeatureStorePage })));
-// WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1
-const GuideFeatureSurveyPage = lazy(() => import('./pages/guide/GuideFeatureSurveyPage').then(m => ({ default: m.GuideFeatureSurveyPage })));
-// WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide
-const GuideForStoreOwnerPage = lazy(() => import('./pages/guide/GuideForStoreOwnerPage').then(m => ({ default: m.GuideForStoreOwnerPage })));
-const GuideForOperatorPage = lazy(() => import('./pages/guide/GuideForOperatorPage').then(m => ({ default: m.GuideForOperatorPage })));
-const GuideForMemberPage = lazy(() => import('./pages/guide/GuideForMemberPage').then(m => ({ default: m.GuideForMemberPage })));
-
-// Community Home (WO-KPA-COMMUNITY-HOME-V1)
-// 최신 활동 전체 보기 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1)
-const HomeLatestPage = lazy(() => import('./pages/HomeLatestPage').then(m => ({ default: m.HomeLatestPage })));
-
-// About Page (WO-O4O-KPA-ABOUT-PAGE-IMPLEMENTATION-V1)
-const AboutPage = lazy(() => import('./pages/about/AboutPage'));
-// Contact Page (WO-O4O-KPA-CONTACT-PAGE-IMPLEMENTATION-V1)
 const ContactPage = lazy(() => import('./pages/contact/ContactPage'));
-// Service Guide Page (WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1) — 약사·약대생 커뮤니티 중심 공개 안내
-const ServiceGuidePage = lazy(() => import('./pages/service-guide/ServiceGuidePage'));
 
-// Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
-
-// Service Detail Pages — Phase 2 lazy (barrel unwound)
-const PharmacyServicePage = lazy(() => import('./pages/services/PharmacyServicePage').then(m => ({ default: m.PharmacyServicePage })));
-const ForumServicePage = lazy(() => import('./pages/services/ForumServicePage').then(m => ({ default: m.ForumServicePage })));
-
-// Join Pages — Phase 2 lazy (barrel unwound)
-const PharmacyJoinPage = lazy(() => import('./pages/join/PharmacyJoinPage').then(m => ({ default: m.PharmacyJoinPage })));
-
-// Pharmacy Management — Phase 2 lazy (barrel unwound; 20 named + 4 default-as-named)
-const PharmacyPage = lazy(() => import('./pages/pharmacy/PharmacyPage').then(m => ({ default: m.PharmacyPage })));
-const PharmacyB2BPage = lazy(() => import('./pages/pharmacy/PharmacyB2BPage').then(m => ({ default: m.PharmacyB2BPage })));
-const PharmacyApprovalGatePage = lazy(() => import('./pages/pharmacy/PharmacyApprovalGatePage').then(m => ({ default: m.PharmacyApprovalGatePage })));
-// WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
-// WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기, 내 매장 POP 사본 관리
-const PharmacyPopPage = lazy(() => import('./pages/pharmacy/PharmacyPopPage').then(m => ({ default: m.PharmacyPopPage })));
-// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기, 내 매장 동영상 사본 관리 (QR 전용)
-// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 매장 HUB 타블렛 화면(운영자 원본) 진열 + 가져오기
-const PharmacyVideoPage = lazy(() => import('./pages/pharmacy/PharmacyVideoPage').then(m => ({ default: m.PharmacyVideoPage })));
-// WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 (매장 사본은 기존 StoreQRPage)
-// WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
-// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Supplier → Store Hub UI 편입 (supplier-library adapter · 열람 전용)
-const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
-const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
-const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
-const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
-// WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
-//   온라인 판매(seller) 주문 관리/상세 은퇴 — 매장이 판매자인 소비자 주문 축
-//   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3). 메뉴 SSOT 는 다른 세션 WIP 로 미변경이라
-//   404 대신 은퇴 안내 화면을 렌더한다.
-const OnlineSalesOrdersRetiredPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrdersRetiredPage').then(m => ({ default: m.OnlineSalesOrdersRetiredPage })));
-// WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
-const ForeignVisitorSalesSupportPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPage').then(m => ({ default: m.ForeignVisitorSalesSupportPage })));
-// WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 페이지
-const ForeignVisitorSalesSupportPaymentSuccessPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPaymentResultPage').then(m => ({ default: m.ForeignVisitorSalesSupportPaymentSuccessPage })));
-const ForeignVisitorSalesSupportPaymentFailPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPaymentResultPage').then(m => ({ default: m.ForeignVisitorSalesSupportPaymentFailPage })));
-// WO-O4O-FOREIGN-VISITOR-PARTNER-MANAGEMENT-UI-V1: 유입 파트너 관리
-const ForeignVisitorPartnersPage = lazy(() => import('./pages/pharmacy/ForeignVisitorPartnersPage').then(m => ({ default: m.ForeignVisitorPartnersPage })));
-// WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1: 파트너별 제휴마케팅 QR 관리
-const ForeignVisitorPartnerQrCodesPage = lazy(() => import('./pages/pharmacy/ForeignVisitorPartnerQrCodesPage').then(m => ({ default: m.ForeignVisitorPartnerQrCodesPage })));
-const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
-// WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
-const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
-// WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여(매장 경영자)
-const SellerRecruitmentsBrowsePage = lazy(() => import('./pages/pharmacy/SellerRecruitmentsBrowsePage'));
-// WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결 placeholder)
-const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
-// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
-const StorePlaylistCreatePage = lazy(() => import('./pages/pharmacy/StorePlaylistCreatePage').then(m => ({ default: m.StorePlaylistCreatePage })));
-const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
-// WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1: 매장 실행 홈(태블릿+QR 배치 현황)
-const StoreExecutionPage = lazy(() => import('./pages/pharmacy/StoreExecutionPage'));
-// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
-const StoreQrAiDescriptionPage = lazy(() => import('./pages/pharmacy/StoreQrAiDescriptionPage'));
-// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: POP V2 (공통 Core adapter)
-const StorePopV2Page = lazy(() => import('./pages/pharmacy/StorePopV2Page').then(m => ({ default: m.StorePopV2Page })));
-const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
-const StoreHomePage = lazy(() => import('./pages/pharmacy/StoreHomePage').then(m => ({ default: m.StoreHomePage })));
-const ProductMarketingPage = lazy(() => import('./pages/pharmacy/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
-const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuilderPage').then(m => ({ default: m.ProductPopBuilderPage })));
-// WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 / 내 제작물 canonical 페이지
-const StoreLibraryContentsPage = lazy(() => import('./pages/pharmacy/StoreLibraryContentsPage'));
-const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibraryResourcesPage'));
-// WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1:
-//   KPA 의 제작 자료 목록은 자료함 > 콘텐츠(/store/library/contents)로 통합되어 별도 list 화면이 없다.
-// WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 C):
-//   위 통합으로 고아가 된 StoreProductionMaterialsPage / SelectContentsForProductionModal /
-//   ProductionTypeSelectorModal 3개 파일을 삭제했다(활성 참조 0). K-Cosmetics 는
-//   list route 가 살아 있어 각 서비스 자체 파일을 그대로 사용한다.
-// WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 (:id/edit 딥링크 전용)
-const ProductionMaterialEditorPage = lazy(() => import('./pages/pharmacy/ProductionMaterialEditorPage'));
-const StoreProductDescriptionsPage = lazy(() => import('./pages/pharmacy/StoreProductDescriptionsPage'));
-// default-as-named (wrapper 불필요)
-const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
-const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
-const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
-const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
-// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회
-const StoreHandledProductsPage = lazy(() => import('./pages/pharmacy/StoreHandledProductsPage'));
-// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 저작 (한/중 HTML + publicKey QR)
-const StoreProductMultilingualContentPage = lazy(() => import('./pages/pharmacy/StoreProductMultilingualContentPage'));
-const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
-// Pharmacy specific (not in barrel)
-const StoreOrderWorktablePage = lazy(() => import('./pages/pharmacy/StoreOrderWorktablePage').then(m => ({ default: m.StoreOrderWorktablePage })));
-const SignagePlaybackPage = lazy(() => import('./pages/pharmacy/SignagePlaybackPage').then(m => ({ default: m.SignagePlaybackPage })));
-const SignagePlayerSelectPage = lazy(() => import('./pages/pharmacy/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
-const PharmacyInfoPage = lazy(() => import('./pages/pharmacy/PharmacyInfoPage').then(m => ({ default: m.PharmacyInfoPage })));
-
-// WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
-import { StoreProductsManagerPage } from '@o4o/store-products-ui';
-
-// WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import {
-  MyStoreShell,
-  KPA_SOCIETY_STORE_CONFIG,
-  // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Home / My Store / Store Hub / My Services 상위 구조
-  StoreWorkspaceNav,
-  StoreWorkspaceShell,
-  StoreWorkspaceHomeView,
-  MyServicesView,
-  createStoreServicesApi,
-  resolveStoreWorkspacePaths,
-  // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → 통합 Store Workspace handoff (빌드 플래그, 기본 OFF)
-  mapLegacyStorePathToUnified,
-  isUnifiedStoreHandoffEnabled,
-} from '@o4o/store-ui-core';
-import { coreApiClient } from './api/client';
-import { fetchStoreCapabilities } from './api/storeHub';
-import { getUserDisplayName } from '@o4o/account-ui';
-// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
-import { loadFooterLegal } from './lib/footerLegal';
-import { KpaGlobalHeader } from './components/KpaGlobalHeader';
-// WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: SupplierList/DetailPage 제거
-//   - 사이드바 미노출, mock-only, /store-hub/b2b 와 redundant
-//   - 백엔드 미연결 placeholder
-
-// Work Pages — Phase 2 lazy (barrel unwound)
-const WorkPage = lazy(() => import('./pages/work/WorkPage').then(m => ({ default: m.WorkPage })));
-const WorkTasksPage = lazy(() => import('./pages/work/WorkTasksPage').then(m => ({ default: m.WorkTasksPage })));
-const WorkDisplayPage = lazy(() => import('./pages/work/WorkDisplayPage').then(m => ({ default: m.WorkDisplayPage })));
-const WorkCommunityPage = lazy(() => import('./pages/work/WorkCommunityPage').then(m => ({ default: m.WorkCommunityPage })));
-
-// AuthGate는 정적 유지 (Guard)
-// ActivitySetupPage / PendingApprovalPage — Phase 2 lazy
-const ActivitySetupPage = lazy(() => import('./pages/ActivitySetupPage').then(m => ({ default: m.ActivitySetupPage })));
-const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').then(m => ({ default: m.PendingApprovalPage })));
-
-
-// WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1: getDefaultRouteByRole 사용 제거
-
-// WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
-import { PharmacyGuard } from './components/auth/PharmacyGuard';
-import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
-// WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 옛 KPA HUB 주문 진입 → Neture 약국은 새 commerce 안내
-import { NetureCommerceRedirect } from './components/neture-commerce/NetureCommerceRedirect';
-import { isNetureCommerceUser } from './lib/netureCommerce';
-// WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
-
-// Tablet Kiosk — Phase 2 lazy
+// Tablet Kiosk — public
 const TabletStorePage = lazy(() => import('./pages/tablet/TabletStorePage').then(m => ({ default: m.TabletStorePage })));
 // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 연결(6자리 코드) 온보딩
 const TabletSetupPage = lazy(() => import('./pages/tablet/TabletSetupPage').then(m => ({ default: m.TabletSetupPage })));
 
-// Store Blog — Phase 2 lazy
+// Store Blog — public
 const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage').then(m => ({ default: m.StoreBlogPage })));
 const StoreBlogPostPage = lazy(() => import('./pages/store/StoreBlogPostPage').then(m => ({ default: m.StoreBlogPostPage })));
 
-// WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈/checkout/payment 은퇴.
-//   StorefrontProductDetailPage 만 QR 제품 랜딩(landingType='product') 전용으로 존치한다.
+// WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: StorefrontProductDetailPage 만 QR 제품 랜딩(landingType='product') 전용으로 존치한다.
 const StorefrontProductDetailPage = lazy(() => import('./pages/storefront/StorefrontProductDetailPage').then(m => ({ default: m.StorefrontProductDetailPage })));
 
-// Public Content View — Phase 2 lazy (default-as-named, wrapper 불필요)
+// Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
 const PublicContentViewPage = lazy(() => import('./pages/content/PublicContentViewPage'));
 const PrintContentPage = lazy(() => import('./pages/content/PrintContentPage'));
 
-// Contents Hub — Phase 2 lazy (barrel unwound)
-const ContentListPage = lazy(() => import('./pages/contents/ContentListPage').then(m => ({ default: m.ContentListPage })));
-const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage').then(m => ({ default: m.ContentDetailPage })));
-const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
-// WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1: 문서형 콘텐츠 전용 목록
-const ContentDocumentsPage = lazy(() => import('./pages/contents/ContentDocumentsPage').then(m => ({ default: m.ContentDocumentsPage })));
-// WO-KPA-CONTENT-SURVEYS-LIST-V1: 설문조사 전용 목록 (콘텐츠 허브 하위)
-const ContentSurveysPage = lazy(() => import('./pages/contents/ContentSurveysPage').then(m => ({ default: m.ContentSurveysPage })));
-
-// QR Landing Page — Phase 2 lazy
+// QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
 // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 외국인 고객용 다국어 상품 안내 (public, no auth)
 const MultilingualProductPublicLandingPage = lazy(() => import('./pages/public/MultilingualProductPublicLandingPage').then(m => ({ default: m.MultilingualProductPublicLandingPage })));
@@ -317,17 +83,15 @@ const MultilingualProductPublicLandingPage = lazy(() => import('./pages/public/M
 const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/public/ForeignVisitorAffiliatePublicLandingPage').then(m => ({ default: m.ForeignVisitorAffiliatePublicLandingPage })));
 
 /**
- * KPA Society - 커뮤니티 서비스
+ * 약국 협력사업 사이트 (pharmacy.neture.co.kr · megapharm 호스트)
  *
- * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §5:
- * `/` 는 커뮤니티 홈(canonical)이다. 과거 `/demo/*`(지부·분회 데모) 영역은 존재하지 않으며
- * 지부·분회 기능은 별도 분회 서비스(services/web-kpa-branch) 소관이다.
+ * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7:
+ *   옛 KPA 운영 · 관리 · 매장 · 마이페이지 화면은 이전 없이 삭제했다. 남는 것은
+ *   사업 화면(semi_franchises.key 기준) · 인증 · 사업 운영(/operator/semi-franchises) ·
+ *   매장 handoff(store.neture.co.kr) · 외부 서비스 이동 · 법정 화면 · 공개 랜딩(QR · 태블릿 · 블로그 등)뿐이다.
  */
 
-const SERVICE_NAME = 'O4O 약국';
-
-// ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
-// Service User 인증 제거, Platform User 단일 인증으로 통합
+const SERVICE_NAME = BUSINESS_SITE.name;
 
 /**
  * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
@@ -368,102 +132,17 @@ function LoginRoute() {
 
 /**
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   /register 는 canonical URL 로 유지하되 로그인 모달을 연다(같은 Google 버튼이 가입을 겸한다).
+ *   /register 는 기존 진입 URL 을 유지하며 공통 계정 가입 화면으로 연결한다.
  */
 function RegisterRoute() {
-  const { openRegisterModal } = useAuthModal();
-
   useEffect(() => {
-    openRegisterModal();
-  }, [openRegisterModal]);
-
-  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">약국 협력사업을 이용하려면 로그인해 주세요.</p></Layout>;
-}
-
-/**
- * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
- * /mypage 비로그인 시 /login 으로 redirect.
- * isLoading 동안은 빈 화면 — 깜빡임 방지.
- */
-function MyPageGuard({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
-  }
-  return <>{children}</>;
-}
-
-/**
- * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
- * (페이지 → 모달 전환 후 하위호환용)
- */
-// WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1:
-// RoleBasedHome 제거 — "/" 는 항상 커뮤니티 홈 (역할 기반 자동 redirect 없음)
-// 역할별 대시보드 진입은 Header 드롭다운("운영 대시보드" 등) 명시적 링크로만 제공
-// WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1:
-// DashboardRoute 제거 — /dashboard는 /mypage로 리다이렉트 처리
-
-// FunctionGateRedirect removed — WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
-// /select-function → /setup-activity 리다이렉트로 대체
-
-/**
- * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 3
- * WO-O4O-GLOBAL-LAYOUT-HOTFIX-V1: GlobalHeader 추가 + StoreTopBar 숨김
- * Store Core v1.0 — KPA-a Store Dashboard Layout Wrapper
- */
-function KpaStoreLayoutWrapper() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  // WO-KPA-SOCIETY-STORE-LAYOUT-ORGNAME-TO-PHARMACY-NAME-FIX-V1:
-  // 분회명(membershipOrgName) 대신 실제 약국명을 표시
-  const [pharmacyName, setPharmacyName] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    let cancelled = false;
-    getPharmacyInfo().then((info) => {
-      if (!cancelled && info?.name) setPharmacyName(info.name);
-    }).catch(() => {});
-    return () => { cancelled = true; };
+    // Automatic legacy redirect must not trap Back navigation on /register.
+    window.location.replace('https://neture.co.kr/signup');
   }, []);
 
-  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국은 옛 발주 내역(kpa-society 회원 전용 backend) 메뉴를
-  //   보지 않는다 — 주문 내역은 내 매장의 새 commerce. 직접 URL 은 NetureCommerceRedirect 가 안내한다. KPA 회원 메뉴 불변.
-  const netureCommerce = isNetureCommerceUser(user);
-  const storeConfig = useMemo(
-    () => netureCommerce
-      ? {
-          ...KPA_SOCIETY_STORE_CONFIG,
-          menuSections: KPA_SOCIETY_STORE_CONFIG.menuSections?.map((section) => ({
-            ...section,
-            items: section.items.filter((item) => item.key !== 'orders'),
-          })),
-        }
-      : KPA_SOCIETY_STORE_CONFIG,
-    [netureCommerce],
-  );
-
-  return (
-    <MyStoreShell
-      config={storeConfig}
-      fetchCapabilities={fetchStoreCapabilities}
-      userName={user ? getUserDisplayName(user) : ''}
-      homeLink="/"
-      orgName={pharmacyName}
-      onLogout={() => { logout(); navigate('/'); }}
-      header={<KpaGlobalHeader />}
-      banner={<StoreWorkspaceNav paths={KPA_STORE_WORKSPACE_PATHS} accent="blue" />}
-      footer={<KpaStoreFooter />}
-      below={<KpaStoreBelow />}
-    />
-  );
+  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">O4O 회원가입 화면으로 이동합니다.</p></Layout>;
 }
 
-/** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath 파생) */
-const KPA_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(KPA_SOCIETY_STORE_CONFIG);
 /** /api/v1 루트 클라이언트 → work-scope/store-services · auth/handoff */
 const kpaStoreServicesApi = createStoreServicesApi({
   get: (url) => coreApiClient.get(url),
@@ -471,24 +150,17 @@ const kpaStoreServicesApi = createStoreServicesApi({
 });
 
 /**
- * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 기존 /store · /store-hub · workspace/services 진입을
- * store.neture.co.kr 통합 Store Workspace 로 handoff. `VITE_UNIFIED_STORE_HANDOFF` 빌드 플래그(기본 OFF)로
- * cutover 를 한 줄로 전환한다. 매장 승인 여부는 목적지의 기존 조직·원장 게이트가 판정한다. 신청·심사는 소유 게이트와 구분한다.
- * handoff 실패 시 기존 화면으로 fallback — 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4 · WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7:
+ *   /store · /hub · /store-hub 진입은 모두 store.neture.co.kr 통합 Store Workspace 로 handoff 한다.
+ *   이 사이트에는 매장 화면이 없다. 매장 접근 판정은 목적지의 조직 · 원장 게이트가 한다.
  */
-const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
-/** 공통 매장 화면(/store/...) returnPath → KPA 서비스 지정 매장 화면(/work/kpa-society/store/...) — §21-13 */
-const kpaStoreHandoffApi = {
-  resolveWorkspaceEntryUrl: (returnPath: string) => kpaStoreServicesApi.resolveWorkspaceEntryUrl(toKpaScopedStorePath(returnPath)),
-};
-function KpaUnifiedStoreHandoff({ children, force = false }: { children?: ReactNode; force?: boolean }) {
+function KpaUnifiedStoreHandoff() {
   const { user, isLoading } = useAuth();
   const location = useLocation();
-  const enabled = force || UNIFIED_STORE_HANDOFF_ENABLED;
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    if (!enabled || isLoading) return;
+    if (isLoading) return;
     let active = true;
     setError(false);
     const legacyHub = location.pathname.match(/^\/(?:hub|store-hub)(?:\/(.*))?$/);
@@ -498,16 +170,17 @@ function KpaUnifiedStoreHandoff({ children, force = false }: { children?: ReactN
       : resource === 'cart' ? '/store/pharmacy/cart'
         : libraryResources.includes(resource.split('/')[0]) ? `/store/library/${resource}` : '/store/pharmacy/contents';
     const returnPath = (legacyHub ? hubPath + location.search : mapLegacyStorePathToUnified('kpa-society', location.pathname, location.search)) + location.hash;
-    if (!user) { window.location.replace(`https://store.neture.co.kr${toKpaScopedStorePath(returnPath)}`); return; }
-    kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath).then(url => {
+    /** 공통 매장 화면(/store/...) returnPath → KPA 서비스 지정 매장 화면(/work/kpa-society/store/...) — §21-13 */
+    const scopedPath = toKpaScopedStorePath(returnPath);
+    if (!user) { window.location.replace(`https://store.neture.co.kr${scopedPath}`); return; }
+    kpaStoreServicesApi.resolveWorkspaceEntryUrl(scopedPath).then(url => {
       if (!active) return;
       const target = new URL(url);
       if (target.origin !== 'https://store.neture.co.kr' || target.pathname !== '/handoff') throw new Error('Invalid target');
       window.location.replace(target.href);
     }).catch(() => { if (active) setError(true); });
     return () => { active = false; };
-  }, [enabled, isLoading, user?.id, location.pathname, location.search, location.hash, attempt]);
-  if (!enabled) return <>{children}</>;
+  }, [isLoading, user?.id, location.pathname, location.search, location.hash, attempt]);
   return error ? <main className="p-8"><p role="alert">내 매장으로 로그인 상태를 전달하지 못했습니다.</p><button onClick={() => setAttempt(v => v + 1)}>다시 시도</button></main> : <p className="p-8">내 매장으로 이동하는 중입니다…</p>;
 }
 
@@ -520,7 +193,7 @@ function PharmacistCommunityRedirect() {
     if (isLoading) return;
     let active = true;
     setFailed(false);
-    const base = '/communities/pharmacy/forum';
+    const base = '/communities/community/forum';
     const suffix = location.pathname.startsWith('/mypage/my-forums')
       ? '/owned' + location.pathname.slice('/mypage/my-forums'.length)
       : location.pathname.slice('/forum'.length);
@@ -544,84 +217,6 @@ function PharmacistCommunityRedirect() {
     return () => { active = false; };
   }, [location.pathname, location.search, location.hash, user?.id, isLoading, attempt]);
   return failed ? <main className="p-8"><p role="alert">커뮤니티로 로그인 상태를 전달하지 못했습니다.</p><button onClick={() => setAttempt(v => v + 1)}>다시 시도</button></main> : <p className="p-8">커뮤니티로 이동하는 중입니다…</p>;
-}
-
-function KpaStoreFooter() {
-  return (
-    <StoreFacingFooter
-      serviceKey="kpa-society"
-      serviceName="약사회"
-      loadProfile={loadFooterLegal}
-      links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
-    />
-  );
-}
-
-function KpaStoreBelow() {
-  return (
-    <>
-      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
-          내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
-      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
-      <MobileBottomNav />
-    </>
-  );
-}
-
-/**
- * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6 · §10:
- *   Store Workspace Home(/store/workspace) · My Services(/store/services) 의 합성 셸.
- *   KpaStoreLayoutWrapper 와 같은 header/footer/below 를 쓰고 사이드바만 없다. 가드는 PharmacyGuard 그대로.
- */
-function KpaStoreWorkspaceWrapper() {
-  return (
-    <StoreWorkspaceShell
-      paths={KPA_STORE_WORKSPACE_PATHS}
-      accent="blue"
-      header={<KpaGlobalHeader />}
-      footer={<KpaStoreFooter />}
-      below={<KpaStoreBelow />}
-    />
-  );
-}
-
-function KpaStoreWorkspaceHomePage() {
-  const [pharmacy, setPharmacy] = useState<{ name?: string; organizationId?: string } | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    getPharmacyInfo().then((info) => { if (!cancelled && info) setPharmacy(info); }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-  return (
-    <StoreWorkspaceHomeView
-      paths={KPA_STORE_WORKSPACE_PATHS}
-      accent="blue"
-      storeName={pharmacy?.name}
-      serviceName="O4O 약국"
-    />
-  );
-}
-
-function KpaMyServicesPage() {
-  const [organizationId, setOrganizationId] = useState<string | null | undefined>(undefined);
-  useEffect(() => {
-    let cancelled = false;
-    getPharmacyInfo()
-      .then((info) => { if (!cancelled) setOrganizationId(info?.organizationId ?? null); })
-      .catch(() => { if (!cancelled) setOrganizationId(null); });
-    return () => { cancelled = true; };
-  }, []);
-  // 조직 id 를 알기 전엔 조회하지 않는다 (복수 매장 사용자의 ambiguous 방지)
-  if (organizationId === undefined) return null;
-  return (
-    <MyServicesView
-      api={kpaStoreServicesApi}
-      currentServiceKey="kpa-society"
-      currentMyStorePath={KPA_STORE_WORKSPACE_PATHS.myStore}
-      organizationId={organizationId}
-      accent="blue"
-    />
-  );
 }
 
 /** WO-STORE-SLUG-UNIFICATION-V1: /kpa/store/:slug → /store/:slug redirect */
@@ -674,39 +269,18 @@ function App() {
       <LoginModalProvider>
       <BrowserRouter>
         <SeoWatcher />
-        {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
         {/* WO-O4O-TEMPLATE-PROVIDER-V1: 서비스 디자인 토큰 자동 주입 */}
         <TemplateProvider template={templates[kpaConfig.template]}>
         <O4OToastProvider />
-        {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
+        {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1) */}
         <LoginModal />
-        {/* WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: KPA context 완료 후 역할 기반 redirect fallback */}
-        <PostLoginRedirect />
         {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
         <TermsAcceptanceGate>
         <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* =========================================================
-           * 커뮤니티 서비스 (Community Service) — KPA-Society 본체
-           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
-           *
-           * SCOPE: 커뮤니티 중심 서비스
-           * - / : 커뮤니티 홈 (canonical)
-           * - /dashboard : /mypage 리다이렉트 (WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1)
-           * - /forum/* : 커뮤니티 포럼
-           * - /services/* : 서비스 소개 페이지
-           * - /join/* : 서비스 참여 페이지
-           * - /pharmacy/* : 약국 경영지원 (실 서비스)
-           * - /work/* : 근무약사 업무
-           *
-           * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3:
-           * 지부·분회(구 SVC-B / `/demo/*`) 진입점은 본체에 두지 않는다 — 분회 서비스 소관.
-           *
-           * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
-           * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
-           * ========================================================= */}
-          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout /></Layout>}>
+          {/* 사업 화면 — 호스트 사업(BUSINESS_SITE.key) · /businesses/:businessKey */}
+          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey={BUSINESS_SITE.key} memberLayout /></Layout>}>
             <Route path="/" element={<PharmacyMemberHomePage />} />
             <Route path="/my/participation" element={<BusinessParticipationPage />} />
             <Route path="/home-presentation" element={<BusinessHomePresentationPage />} />
@@ -724,7 +298,7 @@ function App() {
               <Route path="manage" element={<BusinessForumManagementPage view="manage" />} />
             </Route>
           </Route>
-          <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
+          {BUSINESS_SITE.key === 'pharmacy' && <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />}
           <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
             <Route index element={<PharmacyMemberHomePage />} />
             <Route path="home-presentation" element={<BusinessHomePresentationPage />} />
@@ -744,466 +318,69 @@ function App() {
             </Route>
           </Route>
 
-          {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
-          <Route path="/setup-activity" element={<ActivitySetupPage />} />
-          <Route path="/pending-approval" element={<PendingApprovalPage />} />
-
-          {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
-          <Route path="/home/latest" element={<Layout serviceName={SERVICE_NAME}><HomeLatestPage /></Layout>} />
-          {/* /library/content → / 리다이렉트 (WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 제거) */}
-          <Route path="/library/content" element={<Navigate to="/" replace />} />
-
-          {/* ========================================
-           * 커뮤니티 포럼 (메인 서비스)
-           * WO-KPA-COMMUNITY-FORUM-ROUTES-V1
-           *
-           * / 경로의 커뮤니티 홈에서 접근하는 포럼
-           * ======================================== */}
-          <Route path="/forum/*" element={<PharmacistCommunityRedirect />} />
-
-          <Route path="/guide" element={<Navigate to="/guide/intro" replace />} />
-          <Route path="/guide/intro" element={<Layout serviceName={SERVICE_NAME}><GuideIntroPage /></Layout>} />
-          <Route path="/guide/intro/structure" element={<Layout serviceName={SERVICE_NAME}><GuideIntroStructurePage /></Layout>} />
-          <Route path="/guide/intro/kpa" element={<Layout serviceName={SERVICE_NAME}><GuideIntroKpaPage /></Layout>} />
-          <Route path="/guide/intro/operation" element={<Layout serviceName={SERVICE_NAME}><GuideIntroOperationPage /></Layout>} />
-          <Route path="/guide/intro/concept" element={<Layout serviceName={SERVICE_NAME}><GuideIntroConceptPage /></Layout>} />
-          <Route path="/guide/usage" element={<Layout serviceName={SERVICE_NAME}><GuideUsagePage /></Layout>} />
-          <Route path="/guide/features" element={<Layout serviceName={SERVICE_NAME}><GuideFeaturesPage /></Layout>} />
-          <Route path="/guide/features/forum" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureForumPage /></Layout>} />
-          <Route path="/guide/features/resources" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureResourcesPage /></Layout>} />
-          <Route path="/guide/features/content" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureContentPage /></Layout>} />
-          <Route path="/guide/features/signage" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSignagePage /></Layout>} />
-          <Route path="/guide/features/qr" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureQrTabletPage /></Layout>} />
-          <Route path="/guide/features/pop" element={<Layout serviceName={SERVICE_NAME}><GuideFeaturePopPage /></Layout>} />
-          <Route path="/guide/features/production-materials" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureProductionMaterialsPage /></Layout>} />
-          <Route path="/guide/features/blog" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureBlogPage /></Layout>} />
-          <Route path="/guide/features/store" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureStorePage /></Layout>} />
-          {/* WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1 */}
-          <Route path="/guide/features/survey" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSurveyPage /></Layout>} />
-          {/* WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide */}
-          <Route path="/guide/for/store-owner" element={<Layout serviceName={SERVICE_NAME}><GuideForStoreOwnerPage /></Layout>} />
-          <Route path="/guide/for/operator" element={<Layout serviceName={SERVICE_NAME}><GuideForOperatorPage /></Layout>} />
-          <Route path="/guide/for/member" element={<Layout serviceName={SERVICE_NAME}><GuideForMemberPage /></Layout>} />
-
-          {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
-              WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3·§15:
-              지부(/services/branch) · 분회(/services/division) 소개 alias 제거.
-              대상 화면은 이미 사라졌고 유입 링크도 0 이라 "/ 로 되돌리는" redirect 만 남아 있었다.
-              지부·분회는 별도 분회 서비스(services/web-kpa-branch) 소관이다. */}
-          <Route path="/services/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicePage /></Layout>} />
-          <Route path="/services/forum" element={<Layout serviceName={SERVICE_NAME}><ForumServicePage /></Layout>} />
-
-          {/* Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
-          <Route path="/join/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyJoinPage /></Layout>} />
-
-          {/* ========================================
-           * 약국 경영지원 — /pharmacy/* 레거시 경로
-           * WO-STORE-CORE-MENU-ALIGNMENT-V1: /store/* 로 리다이렉트
-           *
-           * /pharmacy (게이트)와 /pharmacy/approval은 유지
-           * 나머지는 /store/* 기준으로 리다이렉트
-           * ======================================== */}
-          {/* 게이트: 인증/승인 분기 (PharmacyPage 자체에 완전한 게이트 로직) */}
-          <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
-          {/* /pharmacy/* → /store 리다이렉트 (wildcard 통합) */}
-          <Route path="/pharmacy/*" element={<Navigate to="/store" replace />} />
-
-          {/* ========================================
-           * 약국 서비스 신청 게이트
-           * WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
-           * - Service User 로그인 제거, Platform User 단일 인증
-           * - 약국 승인 미완료 시 신청 폼 표시
-           * ======================================== */}
-          {/* WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거 (자체 인증 체크) */}
-          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyApprovalGatePage /></Layout>} />
-
-          {/* ========================================
-           * 근무약사 업무 화면 (개인 기준)
-           * WO-KPA-WORK-IMPLEMENT-V1
-           * - /pharmacy와 명확히 분리된 개인 업무 화면
-           * - 경영/결정 기능 배제
-           * ======================================== */}
-          <Route path="/work" element={<Layout serviceName={SERVICE_NAME}><WorkPage /></Layout>} />
-          <Route path="/work/tasks" element={<Layout serviceName={SERVICE_NAME}><WorkTasksPage /></Layout>} />
-          <Route path="/work/display" element={<Layout serviceName={SERVICE_NAME}><WorkDisplayPage /></Layout>} />
-          <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
-
-          {/* =========================================================
-           * SCOPE: 인증 라우트 (Canonical Auth Routes)
-           * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1:
-           *   /login, /register canonical URL 유지 (모달 오버레이)
-           * ========================================================= */}
+          {/* 인증 — /login, /register canonical URL 유지 (모달 오버레이) */}
           <Route path="/handoff" element={<HandoffPage />} />
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/register" element={<RegisterRoute />} />
           {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 경로는 은퇴했다. */}
           <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
           <Route path="/reset-password" element={<Navigate to="/login" replace />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          {/* HUB incoming addresses now enter the actual My Store materials/supply workspace. */}
-          <Route path="/hub/*" element={<KpaUnifiedStoreHandoff force />} />
-          <Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />
-          {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
-          <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />
-          {/* 자료 등록/수정 (WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1) */}
-          <Route path="/resources/new" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
-          <Route path="/resources/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
-          {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
-          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><OperatorSemiFranchisePage businessKey="pharmacy" forumHref={business => business.key === 'pharmacy' ? '/community' : `/businesses/${encodeURIComponent(business.key)}/forum`} /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><SemiFranchiseContentFormPage businessKey="pharmacy" /></Layout></RoleGuard>} />
-          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin']} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><SemiFranchiseContentFormPage businessKey="pharmacy" /></Layout></RoleGuard>} />
-          <Route path="/operator/*" element={<OperatorRoutes />} />
 
-          {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
-          <Route path="/supplier/event-offers" element={<Layout serviceName={SERVICE_NAME}><SupplierEventOfferPage /></Layout>} />
+          {/* 사업 운영 — semi_franchises 기준. 옛 /operator/* · /admin/* 콘솔은 삭제 (D7) */}
+          <Route path="/operator/semi-franchises" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/new" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<RoleGuard allowedRoles={['neture:operator','neture:admin', ...pharmacyCollaboratorRoles(BUSINESS_SITE.key)]} enforceMembership={false}><Layout serviceName={SERVICE_NAME}><PharmacyOperatorContentPage /></Layout></RoleGuard>} />
+          {/* 삭제된 화면을 가리키는 외부 진입(My Home 운영 카드 · 문의 알림 · 회원 알림 · 이용 방법 링크)의 호환 이동 */}
+          <Route path="/operator/collaboration-requests" element={<Navigate to={`/operator/inbox/business/${BUSINESS_SITE.key}`} replace />} />
+          <Route path="/operator/*" element={<Navigate to="/operator/semi-franchises" replace />} />
+          <Route path="/admin/*" element={<Navigate to="/operator/semi-franchises" replace />} />
+          <Route path="/mypage/*" element={<Navigate to="/" replace />} />
+          <Route path="/guide/*" element={<Navigate to="/" replace />} />
 
-          {/* ========================================
-           * 커뮤니티 서비스 라우트 (메인 서비스)
-           * WO-KPA-COMMUNITY-ROOT-ROUTES-V1
-           *
-           * / 경로의 커뮤니티 홈에서 접근하는 서비스들
-           * ======================================== */}
+          {/* 내 매장 — store.neture.co.kr handoff 전용 (송출 화면 포함, web-store 가 호스팅) */}
+          <Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />
+          <Route path="/hub/*" element={<KpaUnifiedStoreHandoff />} />
+          <Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff />} />
+          <Route path="/pharmacy/*" element={<Navigate to="/store" replace />} />
+          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: COMPAT_REDIRECT */}
+          <Route path="/mobile/pharmacy" element={<Navigate to="/store/workspace" replace />} />
 
-          {/* /my-content (구 "내 콘텐츠 관리", WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1) 는 제거됐다 —
-              WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
-              backend /api/v1/dashboard/assets 의 cms_media 축이 운영에 존재한 적이 없어 화면이 동작한 적이 없다.
-              대체 화면·compatibility route 없이 기존 안전한 상위 경로(/mypage)로 보낸다. */}
-          <Route path="/my-content" element={<Navigate to="/mypage" replace />} />
-
-          {/* ──────────────────────────────────────────────────────────────────
-              Content Hub
-              WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
-              WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1):
-                문서·설문 등록 라우트 도입.
-                레거시 /content/new* 는 canonical 라우트로 redirect.
-              ────────────────────────────────────────────────────────────────── */}
-          <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><ContentListPage /></Layout>} />
-
-          {/* 섹션별 등록 — Phase 1 신규 라우트 */}
-          <Route path="/content/documents/new" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
-          <Route path="/content/surveys/new" element={
-            <Layout serviceName={SERVICE_NAME}>
-              <ParticipationCreatePage
-                pageTitle="새 설문 만들기"
-                pageDescription="구성원 의견을 수집하는 설문을 만듭니다"
-                breadcrumb={[
-                  { label: '홈', href: '/' },
-                  { label: '콘텐츠', href: '/content' },
-                  { label: '설문', href: '/content/surveys' },
-                  { label: '새 설문' },
-                ]}
-                returnTo="/content/surveys"
-                allowedQuestionTypes={[QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.FREE_TEXT]}
-                hideScopeField
-              />
-            </Layout>
-          } />
-          {/* 코스형 자료 폐기: 기존 북마크는 콘텐츠 허브로 복귀 */}
-          <Route path="/content/courses/new" element={<Navigate to="/content" replace />} />
-
-          {/* 섹션 목록
-              - /content/documents: WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1 — 문서형 콘텐츠 전용 목록
-              - /content/surveys: WO-KPA-CONTENT-SURVEYS-LIST-V1 — 전용 목록 페이지 */}
-          <Route path="/content/documents" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage /></Layout>} />
-          {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1:
-              자료실 — 동일 컴포넌트, sub_type='resource' 필터. 가져가기 흐름 동일. */}
-          <Route path="/content/resources" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage subType="resource" /></Layout>} />
-          <Route path="/content/surveys" element={<Layout serviceName={SERVICE_NAME}><ContentSurveysPage /></Layout>} />
-          <Route path="/content/courses" element={<Navigate to="/content" replace />} />
-          <Route path="/content/courses/:id" element={<Navigate to="/content" replace />} />
-
-          {/* 콘텐츠 상세/수정 (sub_type='content' 문서) */}
-          <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
-          <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
-
-          {/* Legacy redirects → 신규 섹션 라우트 */}
-          <Route path="/content/new" element={<Navigate to="/content/documents/new" replace />} />
-          <Route path="/content/write" element={<Navigate to="/content/documents/new" replace />} />
-          <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
-          <Route path="/content/new/course" element={<Navigate to="/content" replace />} />
-          <Route path="/content/new/lecture" element={<Navigate to="/content" replace />} />
-
-          {/* Legacy redirects: /contents → /content */}
-          <Route path="/contents" element={<Navigate to="/content" replace />} />
-          <Route path="/content/notice" element={<Navigate to="/content" replace />} />
-
-          {/* LMS / 강의 / 강사 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
-              KPA 는 LMS runtime surface 를 소유하지 않는다. 레거시 경로는 독립 강의 서비스로 외부 이동(public link) */}
+          {/* 약사 커뮤니티 · 강의 — 외부 서비스 이동 */}
+          <Route path="/forum/*" element={<PharmacistCommunityRedirect />} />
+          <Route path="/mypage/my-forums" element={<PharmacistCommunityRedirect />} />
+          <Route path="/mypage/my-forums/:forumId/members" element={<PharmacistCommunityRedirect />} />
           <Route path="/courses/*" element={<LectureExternalRedirect />} />
           <Route path="/instructors/*" element={<LectureExternalRedirect />} />
           <Route path="/instructor/*" element={<LectureExternalRedirect />} />
           <Route path="/lms/*" element={<LectureExternalRedirect />} />
-
-          {/* Signage (디지털 사이니지) */}
-          <Route path="/signage" element={<Layout serviceName={SERVICE_NAME}><ContentHubPage /></Layout>} />
-          <Route path="/signage/playlist/new" element={<Layout serviceName={SERVICE_NAME}><PlaylistEditorPage /></Layout>} />
-          <Route path="/signage/playlist/:id/edit" element={<Layout serviceName={SERVICE_NAME}><PlaylistEditorPage /></Layout>} />
-          <Route path="/signage/playlist/:id" element={<Layout serviceName={SERVICE_NAME}><PlaylistDetailPage /></Layout>} />
-          <Route path="/signage/media/:id" element={<Layout serviceName={SERVICE_NAME}><MediaDetailPage /></Layout>} />
-          {/* WO-KPA-SIGNAGE-FULLSCREEN-PLAYER-V1: 전체화면 재생 (Layout 없음) */}
-          <Route path="/signage/play/media/:mediaId" element={<SignageFullscreenPlayerPage />} />
-          <Route path="/signage/play/playlist/:playlistId" element={<SignageFullscreenPlayerPage />} />
-
-          {/* Events (이벤트) */}
-          <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />
-
-          {/* MyPage (마이페이지) — WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: MyPageGuard 적용 (비로그인 → /login redirect) */}
-          <Route path="/mypage" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout></MyPageGuard>} />
-          <Route path="/mypage/profile" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout></MyPageGuard>} />
-          <Route path="/mypage/settings" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MySettingsPage /></Layout></MyPageGuard>} />
-          {/* Phase 2 §14: 내 수강 · 학습 결과는 독립 강의 서비스 소유 */}
           <Route path="/mypage/certificates" element={<LectureExternalRedirect path="/my/certificates" />} />
           <Route path="/mypage/enrollments" element={<LectureExternalRedirect path="/my/enrollments" />} />
           <Route path="/mypage/completions" element={<LectureExternalRedirect path="/my/certificates" />} />
-          {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
-          <Route path="/mypage/my-forums" element={<PharmacistCommunityRedirect />} />
-          {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 레거시 리다이렉트 */}
-          <Route path="/mypage/my-forums/request" element={<Navigate to="/forum/request" replace />} />
-          {/* WO-KPA-A-FORUM-OWNER-MEMBER-MANAGEMENT-UI-V1: 포럼 회원 관리 */}
-          <Route path="/mypage/my-forums/:forumId/members" element={<PharmacistCommunityRedirect />} />
-          {/* WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1 */}
-          <Route path="/mypage/my-requests" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout></MyPageGuard>} />
-          {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
-          <Route path="/mypage/qualifications" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout></MyPageGuard>} />
-          {/* WO-O4O-CREDIT-SYSTEM-V1 */}
-          <Route path="/mypage/credits" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout></MyPageGuard>} />
+          {/* Phase 2 §17: 수료증 진위 확인은 독립 강의 서비스 소유 */}
+          <Route path="/certificate/verify/:certificateId" element={<LectureCertificateVerifyRedirect />} />
 
-          {/* Survey (설문조사) — WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1 */}
-          <Route path="/surveys" element={<Layout serviceName={SERVICE_NAME}><SurveyListPage /></Layout>} />
-          <Route path="/surveys/:id" element={<Layout serviceName={SERVICE_NAME}><SurveyDetailPage /></Layout>} />
-
-          {/* Participation (참여) */}
-          <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
-          <Route path="/participation/create" element={<Layout serviceName={SERVICE_NAME}><ParticipationCreatePage /></Layout>} />
-          <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
-          <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
-
-          {/* Event Offers (이벤트) */}
-          <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
-          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><NetureCommerceRedirect><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect></Layout>} />
-
-          {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
-          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: COMPAT_REDIRECT — 모바일 약국 경영 허브 → Store Workspace Home */}
-          <Route path="/mobile/pharmacy" element={<Navigate to="/store/workspace" replace />} />
-
-          {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
-          <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />
-          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
-          {/* WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개) */}
-          <Route path="/service-guide" element={<Layout serviceName={SERVICE_NAME}><ServiceGuidePage /></Layout>} />
-
-          {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
+          {/* 법정 · 문의 */}
+          <Route path="/contact/legacy" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          <Route path="/operator/inbox/business/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessInboxPage /></Layout>} />
+          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><BusinessContactPage /></Layout>} />
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
 
-          {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
+          {/* 공개 랜딩 — 매장 QR · 태블릿 · 블로그 · 콘텐츠 링크가 이 호스트로 발급된다 (no auth) */}
           <Route path="/tablet/setup" element={<TabletSetupPage />} />
           <Route path="/tablet/:slug" element={<TabletStorePage />} />
-
-          {/* ========================================
-           * Store Hub 운영 OS
-           * WO-O4O-STORE-HUB-STRUCTURE-REFACTOR-V1
-           *
-           * Dashboard / Operation / Marketing / Commerce / Analytics
-           * StoreDashboardLayout (store-ui-core) 기반 section sidebar
-           * PharmacyGuard로 인증/승인 보호
-           * ======================================== */}
-          {/* WO-O4O-KPA-STORE-SIGNAGE-PLAYLIST-TWO-VIEW-V1: 실제 송출(매장 화면) 보기 — layout chrome 격리.
-              PharmacyGuard(인증)만 적용하고 KpaStoreLayoutWrapper(header/sidebar/footer)는 미적용 →
-              header/sidebar/footer/탭/관리버튼이 송출 화면에 mount 되지 않음 (CSS 덮기 의존 제거). */}
-          <Route
-            path="/store/marketing/signage/play/:playlistId"
-            element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}
-          />
-          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6:
-              Store Workspace Home · My Services — 사이드바 없는 두 표면. 가드는 /store 와 동일(PharmacyGuard). */}
-          <Route element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>
-            <Route path="/store/workspace" element={<KpaStoreWorkspaceHomePage />} />
-            <Route path="/store/services" element={<KpaMyServicesPage />} />
-          </Route>
-          <Route path="/store" element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>
-            {/* Home (WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1) */}
-            <Route index element={<StoreHomePage />} />
-            {/* 레거시 /store/dashboard → /store 리다이렉트 */}
-            <Route path="dashboard" element={<Navigate to="/store" replace />} />
-
-            {/* Pharmacy Info (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1) */}
-            <Route path="info" element={<PharmacyInfoPage />} />
-
-            {/* WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 — 매장 실행 홈.
-                Pharmacy-Hub 의 `/store-owner/execution` 과 같은 공통 View 를 쓴다. */}
-            <Route path="execution" element={<StoreExecutionPage />} />
-
-            {/* Marketing */}
-            <Route path="marketing/qr" element={<StoreQRPage />} />
-            {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명 만들기 */}
-            <Route path="marketing/qr/ai-description" element={<StoreQrAiDescriptionPage />} />
-            {/* WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1: legacy 즉시 PDF 화면 은퇴 — 북마크 보호용 V2 redirect */}
-            <Route path="marketing/pop" element={<Navigate to="/store/marketing/pop-v2" replace />} />
-            <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
-            <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
-            <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
-            <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
-            <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
-            <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
-            <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
-            {/* WO-O4O-KPA-STORE-SIGNAGE-PLAYLIST-TWO-VIEW-V1: 실제 송출 보기(play)는 layout chrome 제거를 위해
-                store layout wrapper 밖 top-level route 로 격리 (아래 /store/marketing/signage/play/:playlistId). */}
-
-            {/* Commerce — WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: orderable → /hub/b2b canonical */}
-            <Route path="commerce/orderable" element={<Navigate to="/store-hub/b2b" replace />} />
-            <Route path="commerce/products" element={<PharmacyB2BPage />} />
-            <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
-            {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing)
-                WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1: OrganizationProductListing 기반
-                기본 O4O 주문 가능 상품 화면 — 포괄 heading "내 매장 상품" 대신 의미를 명시 주입. */}
-            {/* WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
-                /store/my-products = '취급 중인 O4O 제품'(타블렛/QR/사이니지/자체 온라인몰 활용 제품 관리).
-                기존 'O4O 주문 가능 상품' 프레이밍 제거. route 유지, 공유 StoreProductsManagerPage 재사용(문구 prop 주입). */}
-            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '내 매장 제품' → '취급 중인 O4O 제품' (라벨 prop만, route/공유 컴포넌트 무변경) */}
-            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage
-              title="취급 중인 O4O 제품"
-              description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 타블렛, QR, 사이니지, 자체 온라인몰 등 매장 서비스에 활용합니다."
-              registerButtonLabel="O4O 제품 취급 등록"
-              infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
-              emptyTitle="취급 중인 O4O 제품이 없습니다"
-              emptyDescription="O4O 제품을 취급 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
-            /></PharmacyOwnerOnlyGuard>} />
-            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
-            <Route path="handled-products" element={<PharmacyOwnerOnlyGuard><StoreHandledProductsPage /></PharmacyOwnerOnlyGuard>} />
-            {/* WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 저작 (한/중 HTML + publicKey 언어탭 QR) */}
-            <Route path="products/multilingual/:targetKind/:targetId" element={<PharmacyOwnerOnlyGuard><StoreProductMultilingualContentPage /></PharmacyOwnerOnlyGuard>} />
-            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
-            <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
-            {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}
-            <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
-            {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 실 페이지 (콘텐츠 / 자료) */}
-            <Route path="library/contents" element={<StoreLibraryContentsPage />} />
-            <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
-            {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정):
-                  list / new 는 활성 인바운드 0 인 legacy route 다.
-                  - list: 고유 검색·필터·편집 계약 없는 4소스 기술적 UNION → canonical 탐색 화면은
-                          자료함 > 콘텐츠(/store/library/contents) 가 이미 통합 표시한다.
-                  - new : list 의 CTA 에만 종속된 고아 생성 route. 신규 제작은 자료함 > 콘텐츠 /
-                          POP / QR-code / 블로그 / 상품 설명의 canonical 제작 흐름을 사용한다.
-                  과거 북마크·가이드 링크 보호를 위해 제거 대신 replace redirect(1홉) 로 수렴시킨다.
-                  KCos 는 정식 '제작 자료' 메뉴를 유지하므로 각 서비스 route 무변경.
-                  IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md */}
-            <Route path="library/production-materials" element={<Navigate to="/store/library/contents" replace />} />
-            <Route path="library/production-materials/new" element={<Navigate to="/store/library/contents" replace />} />
-            {/* WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1: 콘텐츠형 제작 자료 단건 편집 (같은 row update, QR library_item_id 무변경) */}
-            <Route path="library/production-materials/:id/edit" element={<ProductionMaterialEditorPage />} />
-            {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
-            <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
-            {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 쓰기 화면 → 소유자 전용 가드 정렬 (읽기 전용 handled-products 와 동일 기준) */}
-            <Route
-              path="commerce/local-products"
-              element={
-                <PharmacyOwnerOnlyGuard>
-                  <StoreLocalProductsPage />
-                </PharmacyOwnerOnlyGuard>
-              }
-            />
-            {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1: 구형 상품 정보 제작 화면 은퇴 (prod row 0). canonical "상품 상세정보" = handled-products 중심. 구 URL/북마크 대비 redirect 유지. */}
-            <Route path="execution/product-info" element={<Navigate to="/store/handled-products" replace />} />
-            <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
-            <Route path="commerce/order-worktable" element={<NetureCommerceRedirect><StoreOrderWorktablePage /></NetureCommerceRedirect>} />
-            <Route path="commerce/orders" element={<NetureCommerceRedirect><StoreOrdersPage /></NetureCommerceRedirect>} />
-            {/* WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여 */}
-            <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
-            {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
-            <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
-
-            {/* Analytics */}
-            <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />
-
-            {/* ── Legacy redirects (기존 URL 호환) ── */}
-            <Route path="qr" element={<Navigate to="/store/marketing/qr" replace />} />
-            <Route path="pop" element={<Navigate to="/store/marketing/pop-v2" replace />} />
-            <Route path="signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
-            <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
-            <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />
-            <Route path="products/b2c" element={<Navigate to="/store/commerce/products/b2c" replace />} />
-            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: products/suppliers legacy redirect 제거 */}
-            <Route path="orders" element={<Navigate to="/store/commerce/orders" replace />} />
-
-            {/* ── 상담 요청 처리 화면 (hidden route) ──
-                WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 최초 독립 메뉴로 승격.
-                WO-O4O-KPA-STORE-CONSULTATION-REQUEST-MENU-HIDDEN-ROUTE-CLEANUP-V1:
-                  사이드바 '상담 요청' 메뉴 제거 후 hidden route 로 전환.
-                  진입 동선 = (1) 요청 알림(metadata.targetUrl=/store/requests) 클릭, (2) URL 직접,
-                  (3) 홈 Live Signals '상담 요청 N건 대기' CTA. route/페이지/처리 기능 불변. */}
-            <Route path="requests" element={<TabletRequestsPage />} />
-
-            {/* WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 > 외국인 여행객 판매지원 */}
-            <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
-            {/* WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 (Toss 리다이렉트 착지) */}
-            <Route path="sales-channels/foreign-visitor/payment/success" element={<ForeignVisitorSalesSupportPaymentSuccessPage />} />
-            <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />
-            {/* WO-O4O-FOREIGN-VISITOR-PARTNER-MANAGEMENT-UI-V1: 유입 파트너 관리 */}
-            <Route path="sales-channels/foreign-visitor/partners" element={<ForeignVisitorPartnersPage />} />
-            {/* WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1: 파트너별 QR 관리 */}
-            <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
-            {/* WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1: 온라인 판매(B2C) 1급 메뉴 분리.
-                StoreChannelsPage 를 B2C 전용 section('settings'|'products') 모드로 재사용. */}
-            <Route path="online-sales/settings" element={<StoreChannelsPage section="settings" />} />
-            <Route path="online-sales/products" element={<StoreChannelsPage section="products" />} />
-            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1: 판매(seller) 주문 관리 은퇴 */}
-            <Route path="online-sales/orders" element={<OnlineSalesOrdersRetiredPage />} />
-            <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrdersRetiredPage />} />
-            {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
-            {/* /store/channels → 온라인 판매 설정으로 redirect (채널 관리 메뉴 제거) */}
-            <Route path="channels" element={<Navigate to="/store/online-sales/settings" replace />} />
-            <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />
-            <Route path="content" element={<StoreAssetsPage />} />
-            <Route path="content/blog" element={<PharmacyBlogPage />} />
-            {/* WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 POP 사본 관리 (운영자 HUB 에서 가져온 사본 수정) */}
-            <Route path="content/pop" element={<PharmacyPopPage />} />
-            {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 동영상 사본 관리 (가져온 사본 수정 + QR 생성 진입) */}
-            <Route path="content/video" element={<PharmacyVideoPage />} />
-            <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
-            <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
-            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: billing 라우트 제거 (사이드바 미노출, API 미연결 placeholder) */}
-            {/* WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈 디자인(PharmacyStorePage) 은퇴.
-                레이아웃/템플릿/테마는 자체 storefront 전용 설정이므로 함께 종료한다.
-                매장 기본정보는 /store/info(약국 정보) 가 정본 → 과거 북마크는 그리로 1홉 redirect. */}
-            <Route path="settings" element={<Navigate to="/store/info" replace />} />
-            <Route path="settings/layout" element={<Navigate to="/store/info" replace />} />
-            <Route path="settings/template" element={<Navigate to="/store/info" replace />} />
-          </Route>
-
-          {/* WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
-              자체몰 홈(/store/:slug) · checkout · payment 결과 route 제거.
-              제품 상세는 QR 제품 랜딩(landingType='product') 착지점으로만 존치한다. */}
           <Route path="/store/:slug/products/:id" element={<StorefrontProductDetailPage />} />
-
-          {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
           <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />
           <Route path="/store/:slug/blog/:postSlug" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPostPage /></Layout>} />
-
-          {/* WO-STORE-SLUG-UNIFICATION-V1: KPA store → unified store redirects */}
+          {/* WO-STORE-SLUG-UNIFICATION-V1: 인쇄된 옛 주소 보호 */}
           <Route path="/kpa/tablet/:slug" element={<KpaRedirect to="/tablet" />} />
           <Route path="/kpa/store/:slug/blog/:postSlug" element={<KpaRedirect to="/store" suffix="/blog/:postSlug" />} />
           <Route path="/kpa/store/:slug/blog" element={<KpaRedirect to="/store" suffix="/blog" />} />
-
-          {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
           <Route path="/view/:snapshotId/print" element={<PrintContentPage />} />
           <Route path="/view/:snapshotId" element={<PublicContentViewPage />} />
-          {/* Legacy redirect: /content/:snapshotId was moved to /view/:snapshotId */}
-
-          {/* QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public, no auth */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
-
-          {/* Multilingual Product Public Landing (WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1) — public, no auth */}
           <Route path="/multilingual-products/:publicKey" element={<MultilingualProductPublicLandingPage />} />
-
-          {/* Foreign Visitor Affiliate Landing (WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1) — public, no auth */}
           <Route path="/foreign-visitor/affiliate/:shortCode" element={<ForeignVisitorAffiliatePublicLandingPage />} />
-
-          {/* Certificate Verification — Phase 2 §17: 수료증 진위 확인은 독립 강의 서비스 소유 */}
-          <Route path="/certificate/verify/:certificateId" element={<LectureCertificateVerifyRedirect />} />
-
-          {/* Public Signage Rendering (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) — public, no auth */}
           <Route path="/public/signage" element={<PublicSignagePage />} />
 
           {/* 404 - 알 수 없는 경로 */}
@@ -1226,7 +403,7 @@ function App() {
  *
  * WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: canonical 404 형태로 정렬.
  * WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
- *   복제 마크업을 공통 @o4o/ui NotFound 로 교체. 보조 링크(커뮤니티 · 이용 가이드)는 children 유지.
+ *   복제 마크업을 공통 @o4o/ui NotFound 로 교체. 보조 링크(사업 홈 · 커뮤니티)는 children 유지.
  *
  * 선행: WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1 (404 = minimal nav)
  */
@@ -1235,11 +412,11 @@ function NotFoundPage() {
   return (
     <NotFound>
       <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
-      <Link to="/forum" className="text-slate-500 no-underline hover:underline">
-        커뮤니티
+      <Link to="/" className="text-slate-500 no-underline hover:underline">
+        사업 홈
       </Link>
-      <Link to="/guide/intro" className="text-slate-500 no-underline hover:underline">
-        이용 가이드
+      <Link to="/community" className="text-slate-500 no-underline hover:underline">
+        커뮤니티
       </Link>
     </NotFound>
   );

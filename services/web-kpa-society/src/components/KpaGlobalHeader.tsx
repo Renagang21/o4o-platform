@@ -1,3 +1,8 @@
+import { OperatorInboxLink } from '@o4o/operator-core-ui';
+import { useServiceContactCount } from '@o4o/shared-space-ui';
+import { pharmacyCollaboratorRoles } from '@o4o/types';
+import { BUSINESS_SITE } from '../config/businessSite';
+import BusinessStoreShortcut from '../pages/business/BusinessStoreShortcut';
 /**
  * KpaGlobalHeader — KPA Society 서비스의 GlobalHeader 브릿지
  *
@@ -11,21 +16,20 @@
  *   - 사용자 드롭다운 메뉴 구성
  */
 
-import { useNavigate, useMatch, Link } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useMatch } from 'react-router-dom';
+import { useCallback } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
-import { resolveNotificationTarget } from '../lib/notificationRouting';
+import { openNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
 import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
 } from '../config/navigation';
-import { creditApi } from '../api/credit';
 import { PHARMACY_HEADER_BRAND } from '../config/brand';
 import { notificationsApi } from '../api/notifications';
 
@@ -36,36 +40,24 @@ export function KpaGlobalHeader() {
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
   const businessMatch = useMatch('/businesses/:businessKey/*');
+  const isHostWorkspace = !businessMatch || businessMatch.params.businessKey === BUSINESS_SITE.key;
   // The business workspace owns its task navigation; the header retains account/store utilities.
-  const [creditBalance, setCreditBalance] = useState<number | null>(null);
-
-  // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
-  // user 객체 참조 전체 대신 user.id만 의존 — fetchKpaContext Phase2 갱신 시
-  // user 참조가 바뀌어도 동일 사용자이면 재호출 방지.
-  useEffect(() => {
-    if (!user) { setCreditBalance(null); return; }
-    creditApi.getMyBalance()
-      .then((res: any) => {
-        const bal = res?.data?.data?.balance ?? res?.data?.balance ?? null;
-        if (typeof bal === 'number') setCreditBalance(bal);
-      })
-      .catch(() => { /* 실패 시 뱃지 숨김 */ });
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 크레딧 뱃지(/mypage/credits)는 마이페이지와 함께 삭제했다.
 
   // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
   // 알림 — kpa-society serviceKey 로 backend 가 저장하므로 동일 키로 필터.
   // (KPA 로컬 SERVICE_KEY='kpa' 는 backend 와 불일치 — literal 'kpa-society' 사용)
   const notif = useNotifications(notificationsApi, {
     enabled: !!user,
-    serviceKey: 'kpa-society',
+    serviceKey: BUSINESS_SITE.key === 'pharmacy' ? 'kpa-society' : BUSINESS_SITE.key,
+    pollIntervalMs: 30000,
   });
 
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
       // WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
       //   라우팅 규칙을 resolveNotificationTarget(SSOT)로 이관 — MobileBottomNav 알림 시트와 공유.
-      const target = resolveNotificationTarget(n);
-      if (target) navigate(target);
+      openNotificationTarget(n, navigate);
     },
     [navigate],
   );
@@ -75,14 +67,21 @@ export function KpaGlobalHeader() {
     base: businessMatch ? [] : KPA_BASE_NAV,
     contextual: [],
     conditions: {},
-    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
-    guestTrailing: [],
+    trailing: [...(isHostWorkspace && (user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin' || pharmacyCollaboratorRoles(BUSINESS_SITE.key).includes(r)) ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
+    guestTrailing: [{ label: 'Contact Us', href: '/contact' }],
     isAuthenticated: !!user,
   });
 
+  // Explicit legacy business assignees have the same server-confirmed contact access.
+  const newContacts = useServiceContactCount({client:authClient.api,serviceKey:BUSINESS_SITE.key === 'pharmacy'?'kpa-society':BUSINESS_SITE.key,accountId:user?.id,enabled:!!user && !isLoading});
+  const contactAllowed = newContacts !== null;
+  if (contactAllowed) computedNav.push({label:newContacts?`문의 관리 · 새 문의 ${newContacts}`:'문의 관리',href:`https://neture.co.kr/operator/service-contact/${BUSINESS_SITE.key==='pharmacy'?'kpa-society':BUSINESS_SITE.key}`});
+
+  if (!computedNav.some(item => item.href === '/contact')) computedNav.push({label:'Contact Us',href:'/contact'});
+
   // User 정보 변환
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.
-  // side effects(creditApi, notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
+  // side effects(notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
   const headerUser = user
     ? {
         displayName: getUserDisplayName(user),
@@ -98,6 +97,11 @@ export function KpaGlobalHeader() {
     navigate('/');
   };
 
+  const accountMenu = user ? <ServiceAccountMenu key={user.id} displayName={getUserDisplayName(user)} email={user.email} roleLabel={getKpaServiceRoleLabel(user)} onLogout={handleLogout}>
+    <KpaUserMenuItems user={user} />
+  </ServiceAccountMenu> : undefined;
+  const accountLoading = isLoading ? <output>계정 확인 중</output> : undefined;
+
   return (
     <GlobalHeader
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 표시 이름 = O4O 약국 (serviceKey 불변) */
@@ -112,24 +116,9 @@ export function KpaGlobalHeader() {
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /></span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">{user && <BusinessStoreShortcut key={user.id} compact />}<MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" />{user?.roles?.some(role=>['neture:admin','neture:operator',...pharmacyCollaboratorRoles(BUSINESS_SITE.key)].includes(role)) && <OperatorInboxLink requireAccess key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} endpoint={`/operator-inbox/business/${BUSINESS_SITE.key}`} href={`/operator/inbox/business/${BUSINESS_SITE.key}`}/>}</span>}
       utilitySlot={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {user && creditBalance !== null && (
-            <Link
-              to="/mypage/credits"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '4px 10px', borderRadius: 999,
-                background: '#fef9c3', color: '#854d0e',
-                fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                border: '1px solid #fde047',
-              }}
-              title="크레딧 잔액 — 클릭하면 이력을 확인할 수 있습니다"
-            >
-              ⭐ {creditBalance.toLocaleString()} C
-            </Link>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {/* WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1: 로그인 사용자에게만 표시 */}
           {user && (
             <NotificationBell
@@ -147,6 +136,7 @@ export function KpaGlobalHeader() {
       /* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 규칙은 KpaUserMenuItems(SSOT)로 이동.
          데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
       userMenuItems={<KpaUserMenuItems user={user} />}
+      accountSlot={accountMenu ?? accountLoading}
       /* WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
          모바일 햄버거 drawer 는 사이트 nav 만 표시. 사용자 이름·이메일·역할별 대시보드·계정 메뉴·
          로그아웃은 모바일 하단 '내정보' 프로필 시트(MobileBottomNav)로 분리한다.

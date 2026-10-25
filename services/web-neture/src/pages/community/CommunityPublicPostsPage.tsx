@@ -26,7 +26,7 @@ export default function CommunityPublicPostsPage() {
   const current = loadedScope === scope ? result : null;
   const currentError = loadedScope === scope ? error : '';
   return <main className="mx-auto max-w-4xl px-4 py-8 [overflow-wrap:anywhere]">
-    <Link to="/" className="text-sm text-blue-700">커뮤니티 목록</Link>
+    <Link to="/" className="text-sm text-blue-700">커뮤니티 홈</Link>
     <h1 className="mt-4 text-2xl font-semibold">{current?.post?.title ?? `${current?.name ?? '커뮤니티'} · 공개 게시글`}</h1>
     <p className="mt-3 text-sm text-slate-600">운영자가 공개 지정한 글만 볼 수 있습니다. 회원 활동과 댓글은 가입 승인 후 회원 게시판에서 이용해 주세요.</p>
     <Link to={`/communities/${encodeURIComponent(communityKey)}/forum`} className="mt-3 inline-block text-sm text-blue-700">회원 게시판 · 이용 자격 확인 →</Link>

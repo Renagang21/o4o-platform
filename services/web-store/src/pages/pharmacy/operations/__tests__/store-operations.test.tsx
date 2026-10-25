@@ -21,7 +21,8 @@ function deferred<T>() {
 }
 const ok = <T,>(data: T) => ({ success: true, data });
 const analytics = { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] };
-const signals = { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 };
+const signals = { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0,
+  availability: { newOrders: 'available', pendingTabletRequests: 'available', pendingSalesRequests: 'not_supported', surveyRequests: 'not_supported' } };
 function asset(id = 'one', patch: Partial<StoreAssetItem> = {}): StoreAssetItem {
   return { id, organizationId: 'A', title: `Fixture ${id}`, assetType: 'cms', sourceService: 'kpa-society', sourceAssetId: 'source',
     createdBy: 'fixture', createdAt: '2026-10-15T00:00:00Z', publishStatus: 'draft', controlId: null, controlUpdatedAt: null,
@@ -43,7 +44,7 @@ async function publishing() {
 }
 it('confirmed zero overview values remain zeros and do not require a public slug', async () => {
   const result = await loadHomeOverview('A');
-  expect(result.libraryCount).toBe(0); expect(result.productCount).toBe(0); expect(result.signals).toEqual(signals);
+  expect(result.libraryCount).toBe(0); expect(result.productCount).toBe(0); expect(result.signals).toEqual({ newOrders: 0, pendingTabletRequests: 0 });
   expect(result.unavailable).toEqual([]); expect(api.signals).toHaveBeenCalledWith('/store-hub/live-signals');
 });
 it('independent failures retain available sources without inventing empty activity or zeros', async () => {
@@ -52,6 +53,24 @@ it('independent failures retain available sources without inventing empty activi
   const result = await loadHomeOverview('A');
   expect(result.analytics).toBeNull(); expect(result.signals).toBeNull();
   expect(result.libraryCount).toBe(0); expect(result.unavailable).toEqual(['홍보 성과', '처리할 업무']);
+});
+it('partial signal failure keeps confirmed work and reports only the unavailable source', async () => {
+  api.signals.mockResolvedValue(ok({ ...signals, pendingTabletRequests: 3, availability: { ...signals.availability, newOrders: 'unavailable' } }));
+  const result = await loadHomeOverview('A');
+  expect(result.signals).toEqual({ newOrders: null, pendingTabletRequests: 3 });
+  expect(result.unavailable).toEqual(['주문 현황']);
+});
+it('legacy responses without availability cannot claim confirmed empty work', async () => {
+  api.signals.mockResolvedValue(ok({ newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 }));
+  const result = await loadHomeOverview('A');
+  expect(result.signals).toEqual({ newOrders: null, pendingTabletRequests: null });
+  expect(result.unavailable).toEqual(['주문 현황', '상담 요청']);
+});
+it('malformed available counts do not hide another confirmed count', async () => {
+  api.signals.mockResolvedValue(ok({ ...signals, newOrders: -1, pendingTabletRequests: 2 }));
+  const result = await loadHomeOverview('A');
+  expect(result.signals).toEqual({ newOrders: null, pendingTabletRequests: 2 });
+  expect(result.unavailable).toEqual(['주문 현황']);
 });
 it('foreign-store assets and malformed overview metrics fail closed', async () => {
   api.assets.mockResolvedValue(ok({ total: 1, items: [asset('foreign', { organizationId: 'B' })] }));

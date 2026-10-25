@@ -43,7 +43,7 @@ function authoringSource(page: string, directory: string): string {
   return [page, ...modules].map((rel) => stripComments(read(rel))).join('\n');
 }
 
-// Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
+// Inspect registration and publication separately while retaining shared boundaries.
 const offerSrc = [
   OFFER_SERVICE,
   OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
@@ -95,18 +95,17 @@ describe('A. web-neture — 레거시 createSupplierOffer 소비 0 · 3 경로 c
     expect(lib).not.toMatch(/params\.set\('barcode'/);
   });
 
-  it('from-master 화면: createOfferFromMaster 호출 · Master 기준정보 키를 body 에 보내지 않음 · DRUG 는 PUBLIC 불가 + 서비스 ≥1', () => {
+  it('from-master 화면은 masterId만 등록하고 가격·게시 대상은 별도 업무로 남긴다', () => {
     const page = stripComments(read(`${WEB}/pages/supplier/SupplierProductFromMasterPage.tsx`));
     expect(page).toContain('supplierApi.createOfferFromMaster({');
     const call = page.slice(page.indexOf('supplierApi.createOfferFromMaster({'), page.indexOf('});', page.indexOf('supplierApi.createOfferFromMaster({')));
     for (const k of ['barcode', 'name:', 'regulatoryType', 'categoryId', 'brandName', 'manufacturerName', 'specification', 'originCountry', 'supplierId']) {
       expect(call).not.toContain(k);
     }
-    expect(call).toMatch(/isPublic: isDrug \? false : isPublic/);
-    expect(page).toMatch(/isDrug && serviceKeys\.length === 0/);
-    expect(page).toContain('DRUG_NON_PHARMACY_SERVICE');
-    expect(page).toContain('DRUG_SERVICE_CONTEXT_REQUIRED');
-    expect(page).toContain('DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN');
+    expect(call).toMatch(/createOfferFromMaster\(\{\s*masterId\s*,?\s*$/);
+    for (const key of ['isPublic', 'serviceKeys', 'priceGeneral', 'distributionType']) {
+      expect(call).not.toContain(key);
+    }
     const app = stripComments(read(`${WEB}/App.tsx`));
     expect(app).toContain('path="/supplier/products/from-master"');
   });
@@ -174,12 +173,17 @@ describe('C. 레거시 POST /supplier/products 라우트 제거', () => {
 });
 
 describe('D. 불변 — DRUG gate · unique · Admin/system resolveOrCreateMaster 소비자', () => {
-  it('drug-access.guard 3 코드 그대로 · assertDrugOfferAllowed 는 primitive 안에서 OFFER_CREATE 로 호출', () => {
+  it('상품·조직 정합 검사와 게시 경로의 가격·등록 승인을 유지한다', () => {
     const guard = read(`${NETURE}/guards/drug-access.guard.ts`);
-    for (const c of ['DRUG_PUBLIC_DISTRIBUTION_FORBIDDEN', 'DRUG_SERVICE_CONTEXT_REQUIRED', 'DRUG_NON_PHARMACY_SERVICE']) {
+    for (const c of ['DRUG_PRODUCT_UNRESOLVED', 'DRUG_SERVICE_CONTEXT_REQUIRED', 'DRUG_ORG_CONTEXT_MISMATCH']) {
       expect(guard).toContain(c);
     }
-    expect(offerSrc).toMatch(/assertDrugOfferAllowed\([\s\S]{0,400}action: 'OFFER_CREATE'/);
+    const publication = stripComments(read(`${NETURE}/services/supplier-offer-distribution.service.ts`));
+    expect(publication).toMatch(/assertDrugOfferAllowed\([\s\S]{0,400}action: nextPublic \? 'OFFER_PUBLISH' : 'OFFER_UPDATE'/);
+    expect(publication).not.toContain('ServiceAudienceService');
+    expect(publication).toContain('PRODUCT_NOT_APPROVED');
+    expect(publication).toContain('PRICE_REQUIRED');
+    expect(publication).toContain('createPendingApprovals(');
   });
 
   it('CatalogService.resolveOrCreateMaster 는 남아 있고 Admin/system 소비자가 계속 쓴다', () => {

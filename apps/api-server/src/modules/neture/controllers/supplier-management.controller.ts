@@ -14,6 +14,7 @@ import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js
 import { SupplierOnboardingService } from '../services/supplier-onboarding.service.js';
 import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 
+import { createSupplierReviewHandlers } from './supplier-review-handlers.js';
 import { createSupplierRegistrationHandlers } from './supplier-management/registration-handlers.js';
 import { createSupplierProfileHandlers } from './supplier-management/profile-handlers.js';
 import { createSupplierOnboardingHandlers } from './supplier-management/onboarding-handlers.js';
@@ -30,6 +31,11 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
   const profileHandlers = createSupplierProfileHandlers(netureService);
   const onboardingHandlers = createSupplierOnboardingHandlers(onboardingService);
   const categoryHandlers = createSupplierCategoryHandlers(regulatedCategoryService);
+
+  const review = createSupplierReviewHandlers(dataSource);
+  router.get('/review-requests', requireAuth, requireLinkedSupplier as RequestHandler, review.ownList);
+  router.post('/review-requests/:requestId/submit', requireAuth, requireLinkedSupplier as RequestHandler, review.submit);
+
 
   // POST /supplier/register
   router.post('/register', requireAuth, registrationHandlers.register);

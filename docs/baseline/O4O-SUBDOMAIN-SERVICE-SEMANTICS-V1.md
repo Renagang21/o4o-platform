@@ -24,6 +24,8 @@
 
 ---
 
+> **2026-10-16 사용자 정정**: 각 약국 협력모델은 독립 서비스이며 가입·승인은 해당 서비스에서 진행한다. 승인받은 협력모델이 제공하는 기능을 약국 개설약사의 내 약국에서 이용한다. 정비 근거: [WO-O4O-PHARMACY-COOPERATION-SERVICE-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-COOPERATION-SERVICE-INDEPENDENCE-V1.md). 문서 기준 정정이며 코드·DB·배포 변경을 뜻하지 않는다.
+
 ## 1. 핵심 원칙
 
 **2026-10-11 개인 공간 결정**: 개인 통합 공간의 이름은 **My Home**이다. 대표 홈과 독립 서비스의 로그인 후 공통 헤더에 직접 진입을 제공하고, 매장 업무 권한이 있는 사용자는 My Home과 내 매장을 구분해 이용한다. 참여·커뮤니티 활동·경영 통계·계정 설정은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. My Home은 사용자용 공간 명칭이며 새 서브도메인·serviceKey·role을 만드는 결정이 아니다. 기존 기술 경로를 유지해 공통 진입과 다중 화면을 운영에 반영했다(2026-10-11). 실제 로그인 검증의 제한은 [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)를 따른다.
@@ -44,9 +46,9 @@
 | 주소 | 주 대상 | 성격 | serviceKey (catalog) | role prefix | Store 연계 | 옛 주소 (보존) |
 |---|---|---|---|---|---|---|
 | `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · My Home 개인 공간 진입(운영 배포 완료, 인증 운영 검증 대기) · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
-| `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | `kpa-society.co.kr/kpa/{분회}` |
-| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | 전체 약국 지원 약국 협력사업 사업 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
-| `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | `k-cosmetics.site` |
+| `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | — (옛 도메인 은퇴 2026-10-20) |
+| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | 전체 약국 지원 약국 협력사업 사업 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | — (옛 도메인 은퇴 2026-10-20) |
+| `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | — (옛 도메인 은퇴 2026-10-20) |
 | `store.neture.co.kr` | **약국 경영자 · 허가된 매장 사용자** | 약국 하나의 내 매장 · 가입한 복수 서비스 이용, 중간 HUB 없음 | **없음** (`store-workspace.ts`: catalog 서비스 아님) | 약국 신규 원장과 기존 서비스 역할은 §3에서 구분 | 자기 자신 | 각 서비스 앱의 `/store` · `/store-hub` |
 | `supplier.neture.co.kr` | 공급자 | 공급자 서비스 | `supplier` | `supplier:admin` · `supplier:operator` (운영자 범위) | 이용 가능한 공급·자료를 내 매장에 제공 | `neture.co.kr/supplier` |
 | `study.neture.co.kr` | 강좌 이용자 · 운영자 | 강좌 · Neture 메인에서 접근 | `lecture` | catalog·해당 서비스 계약 참조 | 내 매장과 독립 | 기존 강좌 진입 |
@@ -69,7 +71,7 @@ Partner는 대표 홈에 **준비 중**으로 노출하고 서비스 설명 페�
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
 
 
-`pharmacyhub.co.kr` 에 새 독립 서비스를 만들지 않는다. 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향이며(URL-FIRST §9 · §6-1 B안 수정), `pharmacy-hub` 키 · `pharmacy-hub:*` role 은 기존 QR · 오퍼 · 주문을 읽는 **호환 식별자로 보존**한다. 옛 호스트의 QR · 결제 복귀 경로는 안전한 목적지가 검증될 때까지 유지한다.
+옛 PH 도메인은 종료됐다(2026-10-12 결정 · DNS 정리 2026-10-20). PH 에 새 독립 서비스를 만들지 않는다. 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향이며(URL-FIRST §9 · §6-1 B안 수정), `pharmacy-hub` 키 · `pharmacy-hub:*` role 은 기존 QR · 오퍼 · 주문을 읽는 **호환 식별자로 보존**한다.
 
 ---
 
@@ -82,6 +84,12 @@ Partner는 대표 홈에 **준비 중**으로 노출하고 서비스 설명 페�
 `store`의 `/hub/*`·`/store-hub/*`와 pharmacy의 옛 HUB 주소는 기능별 새 주소에 연결하는 adapter다. 사업 콘텐츠는 `/store/pharmacy/contents`, 일반 자료는 `/store/library/*`, 공급은 `/store/pharmacy/supply`를 사용한다. 중간 HUB 홈과 중복 화면은 제거했다. 공통 콘텐츠 API와 기존 출처·Copy 권한은 보존한다.
 
 이 내용은 현재 재배치 branch의 구현이다. 통합·배포·운영 검증 상태는 [CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)에 기록한다.
+
+### 3-1-1. 독립 서비스의 승인 결과와 내 약국 표시 (2026-10-16)
+
+각 약국 협력모델은 자기 서비스에서 가입 신청·심사·승인을 진행한다. 약국 개설약사가 해당 협력모델의 승인을 받으면 그 모델이 제공하는 업무·제품·콘텐츠가 본인의 내 약국에 표시된다. 여러 협력모델을 이용할 때는 각 서비스에서 각각 승인을 받으며, 내 약국은 승인된 서비스의 제공 부분을 함께 이용하는 공간이다.
+
+만성질환관리는 pharmacy와 별도 서비스다. pharmacy 가입을 만성질환관리의 가입 조건으로 삼거나, 내 약국에서 만성질환관리 서비스의 가입·승인을 대신 처리하는 구조로 해석하지 않는다. `semi_franchises` 등 기존 저장 구조나 공통 화면 재사용은 이 서비스 독립성을 바꾸지 않는다. 만성질환관리의 B2B·콘텐츠·회원 커뮤니티 운영과 내 약국의 CGM·무료혈당기 실행 업무는 [서비스 탐색 정본 §1.1–1.2](O4O-HOME-SERVICE-DISCOVERY-V1.md#11-독립-약국-협력모델-서비스와-내-약국-2026-10-16-사용자-확정)를 따른다. 이 기준은 코드·DB·운영 적용 완료를 의미하지 않는다.
 
 ### 3-2. 하위 운영 영역
 
@@ -124,8 +132,7 @@ owner/member permission          — 그 안에서 무엇을 할 수 있는가
 | `kpa:store_owner` · label `KPA Store Owner` | 이름은 "KPA" | 약국 서비스의 매장 경영자. 약사회 · 분회 소속을 뜻하지 않는다 |
 | serviceKey `k-cosmetics` · role prefix `cosmetics:*` | 이름은 "화장품" | 화장품 **및 일반 소매** 사업자 서비스(`retail.neture.co.kr`) |
 | catalog `kpa-society.description` | `약사 커뮤니티 서비스` | 사용자 노출 문자열(`/check-email` 등). 현재 의미와 다름 — 변경은 별도 WO |
-| 옛 분회 공용 경로 `kpa-society.co.kr/kpa/*` | 계속 서빙(인쇄 QR · 북마크) | catalog `kpa-branch.domain` 은 `kpa.neture.co.kr`(basePath 없음)이다. 세션 판정은 host 만 보므로 이 경로의 로그인은 `kpa-society` 로 귀속된다 — 분회 앱이 이 경로 방문을 같은 path 의 `kpa.neture.co.kr` 로 옮긴다(WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1). LB · DNS 정리는 별도 |
-| catalog `pharmacy-hub.domain` | `pharmacyhub.co.kr` | 호환 호스트(§2-2) |
+| 옛 약국 앱 도메인 (분회 공용 경로 포함) | 은퇴 (2026-10-20) | 코드 · CORS · 쿠키 · 세션 판정 · 분회 앱 이동 처리에서 제거했다. 약국 앱 = `pharmacy.neture.co.kr`, 분회 = `kpa.neture.co.kr`(basePath 없음). 근거 [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md). LB · DNS 정리는 그 WO 의 운영 단계 |
 | 「KPA Society」 · 「K-Cosmetics」 서비스명 | 문서 · 계약 원문 · 화면 | 내부 서비스 이름. 사업 의미는 §2 의 주소 기준으로 읽는다 |
 
 ---
@@ -137,6 +144,6 @@ owner/member permission          — 그 안에서 무엇을 할 수 있는가
 
 - [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) — 주소 결정 · 전환 진행 기록 (단일 TODO)
 - [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — Store · Service · Supplier 업무공간 상위 기준
-- [`KPA-SOCIETY-SERVICE-STRUCTURE`](KPA-SOCIETY-SERVICE-STRUCTURE.md) — `kpa-society` 앱 내부 화면 영역
+- [`KPA-SOCIETY-SERVICE-STRUCTURE`](KPA-SOCIETY-SERVICE-STRUCTURE.md) — SUPERSEDED (옛 단일 도메인 구조 · 2026-10-20)
 - [`O4O-STORE-OWNER-RBAC-STANDARD-V1`](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md) — store_owner 권한 판정
 - [`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) — `pharmacy-hub` 역할 모델

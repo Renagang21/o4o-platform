@@ -9,7 +9,7 @@
 > **근거 WO**: [`WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1`](../work-orders/WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1.md)
 > **소스 계약**: `apps/api-server/src/__tests__/supplier-domain-boundary.spec.ts`
 > **상위 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — 역할 경계가 충돌하면 그 문서가 우선
-> **작성**: 2026-09-26
+> **작성**: 2026-09-26 · **최종 갱신**: 2026-10-17 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)
 
 이 문서는 Supplier 영역을 **더 확장하기 위한 설계서가 아니다.** 여러 WO 를 거쳐 커진 구현을 초기 역할 정의로 수렴시킨 뒤 **경계를 동결한 기록**이다. 새 Supplier 기능 제안은 이 문서의 5축 안에 들어오는지를 먼저 통과해야 한다.
 
@@ -47,9 +47,10 @@ Supplier
 
 ```text
 공급자 홈 → 대시보드 (지금 할 일 / 기다리는 일)
-상품     → 상품 목록 · 상품 추가
-            판매활동: 판매자 모집 · 유통참여형 펀딩 · 이벤트 오퍼
-            세미프랜차이즈: 공급 제안 · 이벤트 · 모집
+상품     → 내 제품 · 제품 등록 · 서비스 게시 · 이벤트·특가
+            판매활동: 판매자 모집 · 유통참여형 펀딩
+            약국 협력사업: 공급 제안 · 모집
+            이벤트·특가 안에서 서비스 / 약국 협력사업 대상으로 이동(기존 URL 보존)
 주문     → 주문 처리·배송 · 통합 주문 현황 · 재고 관리 · 정산 내역
 콘텐츠   → 자료 현황 · 자료 보관함 · 매장용 상품 설명서
             태블릿 화면 자료 · 디지털 사이니지
@@ -58,7 +59,7 @@ Supplier
 
 2026-10-15 · [업무 동선 재배치 WO](../work-orders/WO-O4O-SUPPLIER-WORKSPACE-TASK-FLOW-V1.md):
 상품 추가 안에서 기존 표준 제품 공급 연결과 신규 제품 검토 요청을 구분하고, 단일·대량·소스 입력을 선택한다.
-대량·소스 입력의 기존 URL은 유지한다. 가격·유통 설정은 상품 상세에서 다룬다.
+대량·소스 입력의 기존 URL은 유지한다. 2026-10-16부터 가격·일반 공급 게시 설정은 별도 서비스 게시에서 다룬다.
 자료 현황은 기존 설명서·태블릿·사이니지의 상태를 조회하고 대상 ID·언어를 지정해 기존 편집기로 연결한다.
 자료 보관함(`neture_supplier_library_items`)과 각 결과물 원장은 합치지 않는다.
 신규 제품의 검토 요청 접수는 공급 상품 등록 완료가 아니며, 이후 운영자 확정·공급 연결은 기존 경계를 따른다.
@@ -102,16 +103,22 @@ Supplier
 | `service_keys` | **입력** | Supplier 가 고른 제공 대상 서비스 |
 | `allowed_seller_ids` | **입력** | PRIVATE 일 때의 지정 매장 범위 — **살아 있는 축이다**(대시보드 조회가 소비) |
 | `offer_service_approvals` | **SSOT** | 서비스 운영자의 공급 승인 |
-| `offer_service_prices` | **입력** | 서비스별 공급가 (Pharmacy-Hub 카트·목록이 소비) |
+| `offer_service_prices` | **입력** | 대상 서비스의 일반 공급가·이벤트 기준가 |
 | `distribution_type` | **파생** | 위 범위의 표기. `deriveDistributionType(isPublic, serviceKeys)` |
-| `supplier_product_offers.approval_status` | **파생** | `offer_service_approvals` 의 요약 |
+| `supplier_product_offers.approval_status` | **SSOT** | Neture 운영자의 제품 등록 승인. OSA와 독립 |
+| `supplier_product_offers.default_supply_enabled` | **입력** | Neture 약국 기본 공급의 명시적 게시 선택(default false) |
+| `supplier_product_offers.registration_rejection_reason` | **입력** | 제품 등록 반려 사유. 서비스 반려 사유와 독립이며 등록 승인 시 해제 |
 
 **파생 필드를 독립 입력으로 저장하지 않는다.** 저장되는 `distribution_type` 은 항상 `deriveDistributionType` 을 거친다. import 경로도 요청값을 입력축(`is_public`)으로 환원한 뒤 같은 규칙으로 파생시킨다 — 그렇지 않으면 `distribution_type='PUBLIC'` + `is_public=false` 처럼 **같은 행을 소비처마다 다르게 판정하는 모순 상태**가 생긴다.
 
 물리 컬럼 DROP 은 이 경계의 완료 조건이 아니다.
 
-**예외 — Neture 약국 매장 흐름 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 명시 WO)**
-- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 약국 협력사업 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
+**등록·게시 분리 — 2026-10-16, [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)**
+- 제품 등록 승인은 OSA 유무와 관계없이 `approval_status`에 기록한다. 승인 자체는 서비스 승인·listing 생성을 수행하지 않는다. 신규 등록은 미게시(`default_supply_enabled=false`, `is_public=false`, `service_keys=[]`)다.
+- Candidate는 제품 정보와 이미지·설명을 제출하고 가격 단계를 요구하지 않는다. 기존 Master 연결도 masterId만으로 요청할 수 있다. Master 기준정보·규제 검증은 유지한다.
+- `default_supply_enabled=true` + 양수 일반 공급가가 Neture 기본 공급의 명시적 게시 의사다. OSA 승인·반려·철회는 제품 승인이나 다른 서비스·이벤트 상태를 변경하지 않는다. 제품 등록 자체의 반려/정지는 기존 전체 접근 차단을 유지한다.
+- 일반 공급 게시는 등록 승인·활성을 확인한 뒤 기존 distribution API에서 대상·일반가·서비스 가격을 원자적으로 저장한다. 게시 중단은 서비스 가격을 지우지 않는다.
+- 기존 암묵적 기본 공급 대상(승인됨·service_keys 비어 있음)의 선택은 migration으로 보존한다. migration은 별도 운영 적용이 필요하며 branch push는 운영 반영이 아니다.
 - 약국 협력사업별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
 - Neture 약국 흐름의 이용 판정은 이 절의 축(`is_public` · `service_keys` · `allowed_seller_ids` · OSA)을 AND 로 더하지 않고 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 로 대체한다. 이 축들과 다른 서비스 흐름은 보존한다.
 
@@ -124,12 +131,16 @@ Supplier Library item → 대상 서비스 선택 → 제공 → Supplier 책임
 이후 검토 · 수정 · 복사 · 발행은 해당 서비스 운영자의 업무
 ```
 
-- 대상은 canonical catalog(`supplier-content-handoff-targets`) 만 허용한다.
-- 수신은 기존 계약 재사용: `cms_contents` (`authorRole='supplier'` · `status='pending'`), KPA 만 `kpa_approval_requests` 추가. **새 원장 · 상태 기계 · 전송 엔진 · lineage 없음.**
+- 기존 CMS 제공 대상은 canonical catalog(`supplier-content-handoff-targets`)만 허용한다.
+- **2026-10-17 · [콘텐츠 목적지 분리 WO](../work-orders/WO-O4O-SUPPLIER-CONTENT-POLICY-ALIGNMENT-V1.md)**: 자료함 저장, 커뮤니티 게시, 서비스 등재 요청은 독립 업무다. 원본은 기본 비공개이며 저장·제품 등록이 게시를 유발하지 않는다.
+- 약국 협력사업 대상은 활성 `semi_franchises` 행에서 선택한다. 기존 `semi_franchise_contents`에 원본 출처(`source_item_id`, `source_supplier_id`)가 있는 `pending` 검토 사본을 만들며, 담당 운영자만 승인·게시 또는 사유를 남겨 반려한다. 공급자는 자기 요청 상태·반려 사유만 조회한다. 공개 CMS 원장을 회원 전용 자료의 중간 저장소로 사용하지 않는다.
+- 같은 원본·사업의 살아 있는 수신(`pending`/`draft`/`published`)은 1개다. 동시 요청은 transaction advisory lock과 partial UNIQUE로 보호한다. 반려·보관 후에는 새 요청을 만들며, 보관된 공급자 수신본을 다시 게시하지 않는다. 원본 수정·삭제는 수신 사본과 기존 약국 사본에 전파되지 않는다.
+- 커뮤니티 게시 버튼은 기존 커뮤니티 가입·게시판 권한을 통과하는 별도 작성기로 이동한다. 사용자가 게시판과 공개 범위를 확인한 뒤 게시하며, 원본 링크·첨부는 자동 복사하지 않는다. 커뮤니티 가입은 서비스 콘텐츠 등재 요청의 전제가 아니다. 공급자 역할만으로 커뮤니티 권한을 부여하지 않는다.
+- 기존 CMS 경로의 수신은 기존 계약 재사용: `cms_contents` (`authorRole='supplier'` · `status='pending'`), KPA 만 `kpa_approval_requests` 추가. **새 원장 · 상태 기계 · 전송 엔진 · lineage 없음.**
 - **멱등성**: 같은 자료 + 같은 대상 서비스의 **살아 있는 수신은 1개를 넘지 않는다.** 출처는 `cms_contents.metadata.sourceRef` 에 태그하고(새 컬럼 0 · migration 0), 동시 요청은 `pg_advisory_xact_lock` 으로 직렬화한다. 재제공 시 HTTP 200 + `reused: true` 로 응답하며 새 행을 만들지 않는다.
 - `archived` 수신은 멱등 판정에서 제외한다 — 운영자가 내린 자료는 공급자가 다시 제공할 수 있어야 한다.
 
-**금지**: `Supplier → 특정 Store 직접 온라인 전송` · `Supplier → Community 직접 발행` · 새 Supplier CMS.
+**금지**: `Supplier → 특정 Store 직접 온라인 전송` · 공급자 역할을 근거로 Community 자동·직접 발행 · 새 Supplier CMS. 일반 커뮤니티 회원으로 별도 작성기에서 확인·게시하는 위 경로는 허용한다.
 
 ---
 
@@ -141,6 +152,7 @@ Supplier Library item → 대상 서비스 선택 → 제공 → Supplier 책임
 | **Seller Recruitment** | 모집 | Store/판매자 | 관계/참여 | 필요 시 이후 주문 |
 | **Market Trial** | 시험 프로그램 | 참여 Store | trial 결과 | 전환 후 일반 주문 |
 
+- 일반 공급 게시 없이 승인 제품으로 Event Offer를 진행할 수 있다. 일반가가 양수로 설정된 경우에만 특가 상한을 검사한다. 특가 자체는 양수·시작/종료일 필수이며 만료/취소는 일반 게시·제품 승인을 바꾸지 않는다.
 - **Event Offer = 특가 판매.** 참여 · 예약 · 구매의향 · 펀딩 의미를 만들지 않는다.
 - **Market Trial 의 사용자 노출 명칭은 `유통참여형 펀딩`** 이다(navigation · operator menu · SEO · Community 전체에서 쓰는 플랫폼 공통 제품명). 의미는 **참여 조건 기반 유통 검증**이며 **O4O 정산 기능을 제공하지 않는다**(`marketTrialCommerceDisabled`). 이름만으로 자금 모집 기능을 추론하지 않는다.
 - 공통 Program Framework · 공통 상태머신 · 공통 table 을 만들지 않는다. 코드가 서로 다른 위치에 있다는 이유만으로 옮기지 않는다.
@@ -227,4 +239,4 @@ Identity gate 가 열리기 전 금지: owner 이메일 요구 · `users` 생성
 
 ---
 
-*Version 1.0 · Status: Active (FROZEN) · Updated 2026-09-26*
+*Version 1.0 · Status: Active (FROZEN) · Updated 2026-10-17*

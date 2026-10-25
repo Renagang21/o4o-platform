@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../apiClient', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 
-import { fetchHomeEntryData, buildHomeEntryModel, type EntryCommunity, type HomeEntryData } from '../home-entry';
+import { fetchHomeEntryData, buildHomeEntryModel, resolveHomeEntryUrl, type EntryCommunity, type HomeEntryData } from '../home-entry';
 import type { User } from '../../contexts/AuthContext';
 
 const svc = (key: string, nameKo: string, status = 'active') => ({
@@ -114,9 +114,28 @@ describe('사업 참여자 공간은 해당 사업 서비스로 진입한다', (
       name: '약국 협력사업', canParticipate: true, reason: null, entries: [{ serviceKey: 'community', path: '/communities/members/forum' }] };
     const model = buildHomeEntryModel(user(), data([GENERAL, business, { ...business, businessKey: 'blocked', canParticipate: false }], {}));
     expect(model.groups.find(g => g.id === 'community')!.items.map(item => item.id)).toEqual(['community:o4o-general']);
-    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/businesses/pharmacy/forum' });
+    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/' });
     expect(model.myServices.some(item => item.id === 'business:blocked')).toBe(false);
   });
+  it('pharmacy 사업과 서비스에 모두 가입해도 루트 진입은 한 번만 표시한다', () => {
+    const input = data([], { 'kpa-society': 'active' });
+    input.businesses = [{ key: 'pharmacy', name: 'pharmacy', canParticipate: true }];
+    const entries = buildHomeEntryModel(user(), input).myServices;
+    expect(entries.filter(item => item.id === 'business:pharmacy' || item.id === 'svc:kpa-society')).toHaveLength(1);
+    expect(entries.find(item => item.id === 'business:pharmacy')).toMatchObject({label:'O4O 약국 경영지원', action:{kind:'handoff', serviceKey:'kpa-society', returnPath:'/'}});
+  });
+
+  it('pharmacy 루트 이동은 기존 세션 handoff의 루트 복귀 경로를 사용한다', async () => {
+    const { api } = await import('../apiClient');
+    vi.mocked(api.post).mockResolvedValueOnce({data:{data:{targetUrl:'https://pharmacy.neture.co.kr/handoff?code=synthetic'}}});
+    const input = data([], {});
+    input.businesses = [{key:'pharmacy',name:'pharmacy',canParticipate:true}];
+    const action = buildHomeEntryModel(user(), input).myServices[0].action;
+    if(action.kind !== 'handoff') throw new Error('Expected service handoff');
+    expect(await resolveHomeEntryUrl(action)).toContain('https://pharmacy.neture.co.kr/handoff');
+    expect(api.post).toHaveBeenCalledWith('/auth/handoff',{targetServiceKey:'kpa-society',returnPath:'/'});
+  });
+
 });
 
 
@@ -145,4 +164,24 @@ describe('현행 workspace 응답과 조회 실패 처리', () => {
     if (status === 404) expect((await fetchHomeEntryData()).communities).toEqual([]);
     else await expect(fetchHomeEntryData()).rejects.toMatchObject({ response: { status: 503 } });
   });
+});
+
+
+describe('독립 협력사업 참여자는 약국 서비스 가입 없이 실제 호스트로 진입한다', () => {
+ const business = (key: string): EntryCommunity => ({communityKey:`business:${key}`,businessKey:key,kind:'semi-franchise',name:'합성 사업',canParticipate:true,reason:null,entries:[]});
+ it('CarePharm은 기존 인증 alias를 사용하고 pharmacy handoff를 요청하지 않는다', async () => {
+  const model=buildHomeEntryModel(user(),data([business('carepharm')],{}));
+  const action=model.myServices.find(item=>item.id==='business:carepharm')!.action;
+  expect(action).toEqual({kind:'handoff',serviceKey:'carepharm',returnPath:'/'});
+  if(action.kind!=='handoff')throw Error('expected handoff');
+  const {api}=await import('../apiClient');
+  vi.mocked(api.post).mockReset().mockResolvedValue({data:{data:{targetUrl:'https://carepharm.neture.co.kr/handoff?token=synthetic'}}});
+  expect(await resolveHomeEntryUrl(action)).toBe('https://carepharm.neture.co.kr/handoff?token=synthetic');
+  expect(api.post).toHaveBeenCalledWith('/auth/handoff',{targetServiceKey:'carepharm',returnPath:'/'});
+ });
+ it('메가팜은 자기 공개 호스트로 연결하고 미승인 사업은 업무 진입을 만들지 않는다', () => {
+  const model=buildHomeEntryModel(user(),data([business('megapharm'),{...business('carepharm'),canParticipate:false}],{}));
+  expect(model.myServices.find(item=>item.id==='business:megapharm')?.action).toEqual({kind:'public',href:'https://megapharm.neture.co.kr/'});
+  expect(model.myServices.some(item=>item.id==='business:carepharm')).toBe(false);
+ });
 });

@@ -1,15 +1,18 @@
-export type Tab = 'memberships' | 'proposals' | 'events' | 'recruitments' | 'contents';
+export type Tab = 'overview' | 'settings' | 'memberships' | 'proposals' | 'events' | 'recruitments' | 'contents';
 export type Msg = { type: 'success' | 'error'; text: string } | null;
 
 export const TABS: Array<{ key: Tab; label: string }> = [
+  { key: 'overview', label: '운영 홈' },
   { key: 'memberships', label: '가입 신청' },
   { key: 'proposals', label: '공급 제안' },
   { key: 'events', label: '이벤트' },
   { key: 'recruitments', label: '모집 조건' },
   { key: 'contents', label: '콘텐츠' },
+  { key: 'settings', label: '사업 설정' },
 ];
 
 export const DEFAULT_STATUS: Record<Tab, string> = {
+  overview: '', settings: '',
   memberships: 'pending',
   proposals: 'pending',
   events: 'pending',
@@ -20,6 +23,7 @@ export const DEFAULT_STATUS: Record<Tab, string> = {
 export const isTab = (v: string | null): v is Tab => TABS.some((t) => t.key === v);
 
 export const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
+  overview: [], settings: [],
   memberships: [
     { value: 'pending', label: '대기' },
     { value: 'active', label: '활성' },
@@ -50,6 +54,8 @@ export const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
   ],
   contents: [
     { value: 'all', label: '전체' },
+    { value: 'pending', label: '등재 요청' },
+    { value: 'rejected', label: '반려' },
     { value: 'draft', label: '초안' },
     { value: 'published', label: '게시' },
     { value: 'archived', label: '보관' },
@@ -74,7 +80,8 @@ export const EVENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject' 
   approved: [{ action: 'cancel', label: '취소' }],
 };
 
-export const CONTENT_ACTIONS: Record<string, Array<{ action: 'publish' | 'archive'; label: string }>> = {
+export const CONTENT_ACTIONS: Record<string, Array<{ action: 'publish' | 'archive' | 'reject'; label: string }>> = {
+  pending: [{ action: 'publish', label: '승인·게시' }, { action: 'reject', label: '반려' }],
   draft: [
     { action: 'publish', label: '게시' },
     { action: 'archive', label: '보관' },

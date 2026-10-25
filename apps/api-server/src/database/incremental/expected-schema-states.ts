@@ -274,12 +274,56 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'e432641d0e05b803a6ac9c08822248e5f693b761f80664808c8214187a568b23',
     fingerprintLineCount: 6652,
   },
-  // Isolated PostgreSQL 17: preceding 6652-line state verified, then up/down/up tested.
+  // Isolated PostgreSQL 15: baseline + all prior prefixes verified; final up/down restores previous fingerprint.
   {
-    appliedThrough: 'CreateServiceOperatorConfirmations1792029600000',
-    fingerprint: 'c0656665679b99f40a43d01bdb754e651a472756ff650dfb3d766ce2e59a9e05',
-    fingerprintLineCount: 6680,
+    appliedThrough: 'SeparateSupplierRegistrationPublication1792110685889',
+    fingerprint: 'd5f952811de72bc7a10cb6517a4f966a05cda1b9c23f351c6f6e9b7da5f1406f',
+    fingerprintLineCount: 6654,
   },
+  // Isolated PostgreSQL 15: latest main (supplier publication) + member entitlement migration.
+  {
+    appliedThrough: 'CreateMemberPaidServiceEntitlements1792137600000',
+    fingerprint: '8bff6266b19ec25febfb59bfdcc36e8d8dcada715f3b8ec5883a8c01f765ec1b',
+    fingerprintLineCount: 6664,
+  },
+  // Isolated canonical bootstrap + every incremental prefix verified (after #663); final up/down restores previous fingerprint.
+  {
+    appliedThrough: 'CreateSupplierReviewRequests1792193756961',
+    fingerprint: '086af046804b172646d4bec9acd190b3dcb076ff10650c2a1b1833df2592d375',
+    fingerprintLineCount: 6694,
+  },
+  // Isolated PostgreSQL 15 canonical bootstrap + ordered incrementals, 2026-10-17.
+  {
+    appliedThrough: 'AddFundingOfflineState1792212000000',
+    fingerprint: '76c1307f0ee0a073e7ce53f9ae00e58c8695b6084842d42f6475bac35df58c04',
+    fingerprintLineCount: 6698,
+  },
+  // Isolated PostgreSQL 15 canonical bootstrap + all ordered incrementals; no production reads.
+  {
+    appliedThrough: 'AddSupplierBusinessContentRequests1792215000000',
+    fingerprint: 'be4a89ff7ed4ffd22e9ebaf2fdaf954c92f26672e3c4f20256e71ecec8490ce8',
+    fingerprintLineCount: 6703,
+  },
+  // Isolated PostgreSQL 15: every main prefix preserved, then independent personal cooperative enrollment.
+  {
+    appliedThrough: 'CreateCooperativeMemberships1792216000000',
+    fingerprint: '15996765a666dfc6dbea61e98f47a50a1aa580166d80fc08e3bb2a1206e667b4',
+    fingerprintLineCount: 6736,
+  },
+  // Isolated PostgreSQL 15 canonical bootstrap + all prior prefixes and empty-state down/up verified.
+  {
+    appliedThrough: 'AddSupplierProposalTerms1792221000000',
+    fingerprint: '2fe675793e6f86734ed83e4317047f7b2548e02c1fea92ae39bba083f8a8f644',
+    fingerprintLineCount: 6741,
+  },
+  { appliedThrough: 'CreateCooperativeManagement1792300000000', fingerprint: '63a1eff0d73093a57fc459f064d3e883b7b6a9c4de5b41b8c4768aa154ec6e3f', fingerprintLineCount: 6774 },
+  { appliedThrough: 'AddContactInquiryOrganization1792540800000', fingerprint: '8ed889abb7221d1f8fda81b8dd89b9b2bd473806011d0ee8e484eed3c91f9956', fingerprintLineCount: 6776 },
+  // Isolated PostgreSQL 16: every prior canonical prefix matched; empty down/up restores previous state.
+  { appliedThrough: 'CreateExternalAiConnections1792635132325', fingerprint: '4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3', fingerprintLineCount: 6838 },
+  // Isolated PostgreSQL 15: all prior prefixes and empty down/up verified.
+  { appliedThrough: 'CreateStoreConsultationStations1792815861315', fingerprint: 'd9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb', fingerprintLineCount: 6869 },
+  // Isolated PostgreSQL 15: preserve all main prefixes, append operator invitation consent/privacy schema.
+  { appliedThrough: 'CreateServiceOperatorInvitations1792886400000', fingerprint: 'b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea', fingerprintLineCount: 6901 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

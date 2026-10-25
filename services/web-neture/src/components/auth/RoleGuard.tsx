@@ -1,3 +1,5 @@
+import { getBusinessOperatorRolesForHost } from '../../lib/role-constants';
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 /**
  * RoleGuard / RouteGuard — Neture 역할 기반 접근 제어
  *
@@ -25,6 +27,7 @@ import {
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ROLES,
   subdomainOperatorRoles,
+  canSeeSubdomainOperatorPath,
   type SubdomainOperatorKey,
   type SubdomainOperatorLevel,
 } from '../../lib/role-constants';
@@ -90,6 +93,7 @@ function CommunityOperatorRoute({ children, level, fallback }: {
     return <p role="status" className="p-8">커뮤니티 운영 권한을 확인하고 있습니다…</p>;
   }
   return <CommunityGuard allowedRoles={subdomainOperatorRoles('community', level)}
+    isAllowed={() => canSeeSubdomainOperatorPath(user, level === 'admin' ? '/admin/communities' : '/operator/communities')}
     enforceMembership membershipServiceKey="community" fallback={fallback}>
     {children}
   </CommunityGuard>;
@@ -163,9 +167,13 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
  *   기존 redirectMap 제거 — admin이 /operator/* 에서 차단되던 구조 해소.
  */
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
+  const location = useLocation();
+  const pathname = location.pathname.replace(/\/+$/, '');
+  const businessPath = pathname === '/operator/semi-franchises' || pathname.startsWith('/operator/semi-franchises/') || (CURRENT_HOST_PROFILE === 'carepharm' && (pathname === '/operator' || pathname === '/operator/home-presentation/carepharm' || pathname === '/operator/inbox/business/carepharm'));
+  const scopedRoles = businessPath ? getBusinessOperatorRolesForHost(CURRENT_HOST_PROFILE) : [];
   return (
     <RouteGuard
-      allowedRoles={OPERATOR_OR_ABOVE_ROLES}
+      allowedRoles={[...OPERATOR_OR_ABOVE_ROLES, ...scopedRoles]}
       requireMembership="neture"
       fallback={fallback}
     >

@@ -1,3 +1,4 @@
+import { MyHomeWorkspaces } from '../../components/mypage/MyHomeWorkspaces';
 import { MyHomeStoreMembers } from '../../components/mypage/MyHomeStoreMembers';
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -81,7 +82,7 @@ function MyHomeContent({ view }: { view: View }) {
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <p className="text-slate-600">
-          {user.name}님의 서비스와 활동을 한곳에서 확인하세요.
+          {user.name}님의 개인 공간입니다. 필요한 업무로 이동하고 내 소식을 확인하세요.
         </p>
         {source && (
           <a className="text-sm text-blue-700 underline" href={source.origin}>
@@ -91,27 +92,26 @@ function MyHomeContent({ view }: { view: View }) {
       </div>
       {view === "overview" ? (
         <div id="my-home-overview" className="space-y-5">
-          <MyHomeNotifications accountId={user.id} previewLimit={3} />
-          <MyHomeStoreMembers key={user.id} accountId={user.id} onChanged={entry.reload} />
-          <HomeEntryPanel
-            key={user.id}
+          <MyHomeWorkspaces
             user={user}
             data={entry.data}
             loading={entry.loading}
             error={entry.error}
             onReload={entry.reload}
-            workspaceOnly
-            compactWorkspace
           />
+          <div className="grid min-w-0 items-start gap-5 lg:grid-cols-2">
+            <MyHomeNotifications accountId={user.id} previewLimit={3} />
+            <MyHomeStoreMembers key={user.id} accountId={user.id} onChanged={entry.reload} compact />
+          </div>
           <nav aria-label="내 현황 자세히 보기" className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="font-semibold text-slate-900">내 현황 자세히 보기</h2>
-            <p className="mt-1 text-sm text-slate-600">참여 기록과 통계는 필요한 화면에서 확인하세요.</p>
+            <p className="mt-1 text-sm text-slate-600">개인 활동과 매장 현황을 구분해 확인할 수 있습니다.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
                 {
                   to: "/mypage/services",
                   title: "참여 서비스",
-                  value: model ? `${model.myServices.length}개 서비스 · 이용 상태 확인`
+                  value: model ? "가입·참여 현황과 이용 상태 확인"
                     : entry.error ? "이용 상태를 불러오지 못했습니다" : "이용 상태 확인 중…",
                 },
                 { to: "/mypage/activity", title: "커뮤니티 활동", value: "내가 작성한 글 모아보기" },

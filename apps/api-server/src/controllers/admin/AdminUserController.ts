@@ -17,6 +17,7 @@ import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import { isPlatformAdmin } from '../../utils/role.utils.js';
+import { isRetiredRoleValue } from '../../middleware/retired-service.middleware.js';
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
 import {
   demoAccountService,
@@ -232,7 +233,7 @@ export class AdminUserController {
           [userIds]
         );
         for (const row of roleRows) {
-          roleMap[row.user_id] = row.roles || [];
+          roleMap[row.user_id] = (row.roles || []).filter((value: string) => !isRetiredRoleValue(value));
         }
       }
 

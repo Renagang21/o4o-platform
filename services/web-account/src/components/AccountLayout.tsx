@@ -46,6 +46,7 @@ export default function AccountLayout() {
           >
             O4O 로그인 화면으로 이동
           </a>
+          <a href={`${CANONICAL_ENTRY_URL.replace(/\/$/, '')}/signup`} className="mt-4 inline-block font-medium text-blue-600 hover:underline">회원가입</a>
         </div>
       </div>
     );

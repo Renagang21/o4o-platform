@@ -1,3 +1,4 @@
+import { readFundingParticipantActivity } from '../../services/funding/funding-participant-activity.service.js';
 /**
  * Market Trial Operator Controller
  *
@@ -39,6 +40,8 @@ import { hasFundingOperator } from '../../services/funding/funding-access.js';
 import { FundingWorkspaceService, FundingError } from '../../services/funding/funding-workspace.service.js';
 import { fundingReview, fundingForumSlug, fundingForumCode, FUNDING_PROGRESS_TRANSITIONS } from '../../services/funding/funding-review.js';
 import { participantFilters, participantCsvCell } from '../../services/funding/funding-participant-export.js';
+import { FundingOperatorExceptionsService } from '../../services/funding/funding-operator-exceptions.service.js';
+import { FundingRewardRecordService } from '../../services/funding/funding-reward-record.service.js';
 import { FundingPaymentRecordService } from '../../services/funding/funding-payment-record.service.js';
 import { forumFailureFilters, isForumFailureId } from '../../services/funding/funding-forum-failure-filters.js';
 
@@ -124,6 +127,30 @@ export class MarketTrialOperatorController {
    * GET /api/v1/neture/operator/market-trial
    * 전체 Trial 목록 (관리용)
    */
+  static async listExceptions(req: AuthRequest, res: Response) {
+    try {
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) throw new Error('DataSource unavailable');
+      const data = await new FundingOperatorExceptionsService(ds).list(req.query);
+      return res.json({ success: true, data });
+    } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      return res.status(500).json({ success: false, message: '예외 현황을 조회하지 못했습니다.' });
+    }
+  }
+  static async participantHistory(req: AuthRequest, res: Response) {
+    try {
+      if (![req.params.id, req.params.participantId].every(id => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id))) throw new FundingError(400, 'INVALID_PARTICIPANT_ID', '대상 정보를 확인해 주세요.');
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) throw new Error('DataSource unavailable');
+      const data = await new FundingOperatorExceptionsService(ds).history(req.params.id, req.params.participantId);
+      return res.json({ success: true, data });
+    } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      return res.status(500).json({ success: false, message: '처리 이력을 조회하지 못했습니다.' });
+    }
+  }
+
   static async listAll(req: AuthRequest, res: Response) {
     try {
       const { status } = req.query;
@@ -336,7 +363,7 @@ export class MarketTrialOperatorController {
            COUNT(p.id)::int                                            AS "participantCount",
            COUNT(p.id) FILTER (WHERE p."rewardType" = 'product')::int AS "productRewardCount"
          FROM market_trial_participants p
-         WHERE p."marketTrialId" = $1`,
+         WHERE p."marketTrialId" = $1 AND NOT COALESCE((p."offlineState"->>'withdrawn')::boolean,false)`,
         [id],
       );
 
@@ -393,6 +420,7 @@ export class MarketTrialOperatorController {
       const rows: Array<{
         id: string;
         participantName: string;
+        withdrawn: boolean;
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
@@ -420,6 +448,7 @@ export class MarketTrialOperatorController {
         `SELECT
            p.id,
            COALESCE(u.name, u.email, '알 수 없음') AS "participantName",
+           COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
            p."participantType",
            p."rewardType",
            p."rewardStatus",
@@ -452,13 +481,8 @@ export class MarketTrialOperatorController {
         params,
       );
 
-      // Full count (without filters) for summary — fetch settlement status counts too
-      const allRows: Array<{ rewardType: string | null; rewardStatus: string; settlementStatus: string }> = await ds.query(
-        `SELECT p."rewardType", p."rewardStatus", COALESCE(p."settlementStatus", 'pending') AS "settlementStatus"
-         FROM market_trial_participants p
-         WHERE p."marketTrialId" = $1`,
-        [id],
-      );
+      const historyRows = await readFundingParticipantActivity(ds, id);
+      const allRows = historyRows.filter(row => !row.withdrawn);
 
       const totalCount = allRows.length;
       const productCount = allRows.filter((r) => r.rewardType === 'product').length;
@@ -481,6 +505,8 @@ export class MarketTrialOperatorController {
         success: true,
         data: {
           summary: {
+            recordCount: historyRows.length,
+            withdrawnCount: historyRows.length - allRows.length,
             totalCount,
             productCount,
             cashCount,
@@ -506,6 +532,7 @@ export class MarketTrialOperatorController {
             return {
               id: r.id,
               name: r.participantName,
+              withdrawn: !!r.withdrawn,
               type: r.participantType,
               rewardType: r.rewardType,
               rewardStatus: r.rewardStatus,
@@ -572,18 +599,10 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
-      // Update participant rewardStatus
-      const result = await ds.query(
-        `WITH updated AS (UPDATE market_trial_participants
-         SET "rewardStatus" = $1, "updatedAt" = now()
-         WHERE id = $2 AND "marketTrialId" = $3
-         RETURNING id, "rewardType", "rewardStatus", "createdAt") SELECT * FROM updated`,
-        [rewardStatus, participantId, id],
-      );
-
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
+      const actorId = req.user?.id;
+      if (!actorId) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+      const updated = await new FundingRewardRecordService(ds).update(id, participantId, actorId, rewardStatus);
+      const result = [updated];
 
       res.json({
         success: true,
@@ -595,6 +614,7 @@ export class MarketTrialOperatorController {
         message: `이행 상태가 "${rewardStatus === 'fulfilled' ? '이행 완료' : '대기'}"로 변경되었습니다.`,
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Update participant reward status error:', error);
       res.status(500).json({ success: false, message: 'Failed to update participant status' });
     }
@@ -702,6 +722,7 @@ export class MarketTrialOperatorController {
       const conditions = ['p."marketTrialId" = $1', ...participantFilters(req.query, params)];
       const rows: Array<{
         participantName: string;
+        withdrawn: boolean;
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
@@ -717,6 +738,7 @@ export class MarketTrialOperatorController {
       }> = await ds.query(
         `SELECT
            COALESCE(u.name, u.email, '알 수 없음') AS "participantName",
+           COALESCE((p."offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
            p."participantType",
            p."rewardType",
            p."rewardStatus",
@@ -775,7 +797,7 @@ export class MarketTrialOperatorController {
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태', '참여 상태'];
       const trialTitle = trial.title || '';
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
@@ -789,7 +811,7 @@ export class MarketTrialOperatorController {
         rewardStatusLabel(r.rewardStatus), won(r.contributionAmount), paymentStatusLabel(r.paymentStatus),
         won(r.paidAmount), r.paidAt ? fmtDate(r.paidAt) : '-', r.confirmedAt ? fmtDate(r.confirmedAt) : '-',
         r.paymentReference, settlementChoiceLabel(r.settlementChoice), settlementStatusLabel(r.settlementStatus),
-        fmtDate(r.createdAt), trialTitle, trialStatusText,
+        fmtDate(r.createdAt), trialTitle, trialStatusText, r.withdrawn ? '철회' : '참여 유지',
       ].map(participantCsvCell).join(','));
 
       // BOM for Excel UTF-8 compatibility
@@ -1105,17 +1127,22 @@ async function computeKpiSnapshot(
        COUNT(*) FILTER (
          WHERE status IN ('development', 'outcome_confirming', 'fulfilled')
             OR "closeReason" = 'auto_target_reached'
+            OR "offlineState"->>'decision' = 'met'
        )::int AS successful,
-       COUNT(*) FILTER (WHERE "closeReason" = 'auto_target_missed')::int AS failed,
+       COUNT(*) FILTER (WHERE "closeReason" IN ('auto_target_missed','operator_target_missed'))::int AS failed,
        COALESCE(SUM("currentParticipants"), 0)::int AS total_participants,
-       COALESCE(SUM("currentAmount"), 0)::numeric AS total_recruiting_amount,
+       COALESCE(SUM(COALESCE(ledger.net_amount,0)), 0)::numeric AS total_recruiting_amount,
        AVG(
          CASE WHEN "targetAmount" > 0
-              THEN ("currentAmount" / "targetAmount") * 100
+              THEN (COALESCE(ledger.net_amount,0) / "targetAmount") * 100
               ELSE NULL
          END
        )::numeric AS avg_achievement_rate
      FROM market_trials
+     LEFT JOIN (
+       SELECT "marketTrialId", SUM(GREATEST(COALESCE("paidAmount",0)-COALESCE(("offlineState"->>'refundAmount')::numeric,0),0)) AS net_amount
+       FROM market_trial_participants WHERE "paymentStatus"='paid' GROUP BY "marketTrialId"
+     ) ledger ON ledger."marketTrialId"=market_trials.id
      ${where}`,
     params,
   );
@@ -1216,6 +1243,7 @@ async function computeTrialKpi(
     failed: number;
     refunded: number;
     paid_amount: string;
+    net_amount: string;
   }> = await ds.query(
     `SELECT
        COUNT(*)::int AS total,
@@ -1223,17 +1251,18 @@ async function computeTrialKpi(
        COUNT(*) FILTER (WHERE "paymentStatus" = 'unpaid')::int AS unpaid,
        COUNT(*) FILTER (WHERE "paymentStatus" = 'failed')::int AS failed,
        COUNT(*) FILTER (WHERE "paymentStatus" = 'refunded')::int AS refunded,
-       COALESCE(SUM("paidAmount"), 0)::numeric AS paid_amount
+       COALESCE(SUM("paidAmount"), 0)::numeric AS paid_amount,
+       COALESCE(SUM(CASE WHEN "paymentStatus"='paid' THEN GREATEST(COALESCE("paidAmount",0)-COALESCE(("offlineState"->>'refundAmount')::numeric,0),0) ELSE 0 END),0)::numeric AS net_amount
      FROM market_trial_participants
      WHERE "marketTrialId" = $1`,
     [trial.id],
   );
-  const r = rows[0] ?? { total: 0, paid: 0, unpaid: 0, failed: 0, refunded: 0, paid_amount: '0' };
+  const r = rows[0] ?? { total: 0, paid: 0, unpaid: 0, failed: 0, refunded: 0, paid_amount: '0', net_amount: '0' };
 
   return {
     trialId: trial.id,
     status: trial.status,
-    achievementRate: calculateAchievementRate(trial.currentAmount, trial.targetAmount),
+    achievementRate: calculateAchievementRate(Number(r.net_amount ?? 0), trial.targetAmount),
     participationRate: calculateParticipationRate(trial.currentParticipants, trial.maxParticipants ?? null),
     participantCount: Number(r.total),
     paidParticipantCount: Number(r.paid),

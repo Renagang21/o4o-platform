@@ -30,6 +30,7 @@ import { listStoreCapableServices } from '../../../utils/store-owner.utils.js';
 // 공급자 서비스 이용 상태(단일 출처) — 대표 홈 · 서비스 레이아웃이 role 문자열 대신 이 값을 쓴다.
 // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: serviceStates.partner 은퇴 (응답 = { supplier }).
 import { resolveNetureServiceStates } from '../../../modules/neture/services/neture-service-state.service.js';
+import { readHomeParticipation } from '../../../modules/neture/services/home-participation.service.js';
 
 /**
  * 대표 홈에서 "내 매장" 을 노출하는 서비스 — catalog `storeWorkspaceEnabled` ∩ store_owner role registry 파생.
@@ -137,8 +138,10 @@ export function createNetureHomeEntryController(
       // 공급자 = neture_suppliers 만(role fallback 제거) · netureMain = Neture 가입 상태 (CHECK §10 D · E5).
       // 요청자 본인 것만. 실제 API 접근은 neture-identity guard 가 같은 테이블로 다시 판정한다.
       const serviceStates = await resolveNetureServiceStates(dataSource, userId);
+      const participation = await readHomeParticipation(dataSource, userId);
 
-      return res.json({ success: true, data: { stores, branches, serviceStates } });
+      res.setHeader('Cache-Control', 'private, no-store');
+      return res.json({ success: true, data: { stores, branches, serviceStates, ...participation } });
     }),
   );
 

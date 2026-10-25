@@ -4,7 +4,7 @@ import { prepareValue } from 'pg/lib/utils.js';
 import { FundingPaymentRecordService, validatePaymentRecord } from '../funding-payment-record.service.js';
 
 const original = { id: 'participant', paymentStatus: 'paid', paidAmount: '12000.00', paymentReference: 'fixture-private-reference', paymentNote: 'fixture-private-note', paidAt: new Date('2026-10-01T00:00:00Z'), confirmedAt: new Date('2026-10-02T00:00:00Z') };
-const after = { ...original, paymentStatus: 'refunded', confirmedAt: new Date('2026-10-11T00:00:00Z'), updatedAt: new Date('2026-10-11T00:00:00Z') };
+const after = { ...original, paymentStatus: 'paid', confirmedAt: new Date('2026-10-11T00:00:00Z'), updatedAt: new Date('2026-10-11T00:00:00Z') };
 const actor = 'fixture-operator';
 let ds: DataSource;
 let manager: any;
@@ -12,7 +12,7 @@ let runner: any;
 let audit: any;
 beforeEach(() => {
   audit = { insert: jest.fn().mockResolvedValue({}) };
-  manager = { query: jest.fn().mockResolvedValueOnce([original]).mockResolvedValueOnce([after]), getRepository: jest.fn().mockReturnValue(audit) };
+  manager = { query: jest.fn().mockResolvedValueOnce([{id: "project"}]).mockResolvedValueOnce([original]).mockResolvedValueOnce([after]), getRepository: jest.fn().mockReturnValue(audit) };
   runner = { manager, connect: jest.fn(), startTransaction: jest.fn(), commitTransaction: jest.fn(), rollbackTransaction: jest.fn(), release: jest.fn() };
   // Exercise TypeORM's actual transaction orchestration without connecting to any database.
   ds = new DataSource({ type: 'postgres', entities: [] });
@@ -20,13 +20,21 @@ beforeEach(() => {
 });
 
 describe('offline payment record and audit transaction', () => {
-  it('locks only the trial participant and records actual returned values before commit', async () => {
-    const result = await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'refunded' });
-    expect(manager.query.mock.calls[0]).toEqual([expect.stringContaining('FOR UPDATE'), ['participant', 'project']]);
-    expect(manager.query.mock.calls[1][0]).toContain('WITH updated AS (UPDATE');
-    expect(manager.query.mock.calls[1][0]).toContain('SELECT * FROM updated');
+  it('rejects a cached-client refund status without a recorded offline refund', async () => {
+    await expect(new FundingPaymentRecordService(ds).update('project','participant',actor,{paymentStatus:'refunded'})).rejects.toMatchObject({status:409,code:'OFFLINE_REFUND_RECORD_REQUIRED'});
+    expect(manager.query).toHaveBeenCalledTimes(2);
+    expect(audit.insert).not.toHaveBeenCalled();
+    expect(runner.rollbackTransaction).toHaveBeenCalledTimes(1);
+    expect(runner.commitTransaction).not.toHaveBeenCalled();
+  });
+
+  it('locks the trial before its participant and records actual returned values before commit', async () => {
+    const result = await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid' });
+    expect(manager.query.mock.calls[1]).toEqual([expect.stringContaining('FOR UPDATE'), ['participant', 'project']]);
+    expect(manager.query.mock.calls[2][0]).toContain('WITH updated AS (UPDATE');
+    expect(manager.query.mock.calls[2][0]).toContain('SELECT * FROM updated');
     expect(manager.getRepository).toHaveBeenCalledWith(ActionLog);
-    expect(audit.insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: actor, meta: expect.objectContaining({ beforeStatus: 'paid', afterStatus: 'refunded', beforeAmount: 12000, afterAmount: 12000, referenceChanged: false, noteChanged: false }) }));
+    expect(audit.insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: actor, meta: expect.objectContaining({ beforeStatus: 'paid', afterStatus: 'paid', beforeAmount: 12000, afterAmount: 12000, referenceChanged: false, noteChanged: false }) }));
     const log = JSON.stringify(audit.insert.mock.calls);
     expect(log).not.toContain(original.paymentReference); expect(log).not.toContain(original.paymentNote);
     expect(result.paidAt).toBe('2026-10-01T00:00:00.000Z');
@@ -43,30 +51,30 @@ describe('offline payment record and audit transaction', () => {
   });
 
   it('explicit null amount is audited as null using the persisted row', async () => {
-    manager.query.mockReset().mockResolvedValueOnce([original]).mockResolvedValueOnce([{ ...after, paidAmount: null }]);
+    manager.query.mockReset().mockResolvedValueOnce([{id: "project"}]).mockResolvedValueOnce([original]).mockResolvedValueOnce([{ ...after, paidAmount: null }]);
     await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paidAmount: null });
     expect(audit.insert.mock.calls[0][0].meta.afterAmount).toBeNull();
-    const [sql, values] = manager.query.mock.calls[1];
+    const [sql, values] = manager.query.mock.calls[2];
     expect(sql).toContain('"paidAt" = COALESCE("paidAt",'); expect(values).toContain(null);
     expect(sql).not.toContain('settlementStatus'); expect(sql).not.toContain('forum');
   });
 
-  it.each(['unpaid', 'refunded', 'canceled'])('%s correction preserves first date, amount and reference when omitted', async paymentStatus => {
+  it.each(['unpaid', 'canceled'])('%s correction preserves first date, amount and reference when omitted', async paymentStatus => {
     await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus });
-    const sql = manager.query.mock.calls[1][0].split('RETURNING')[0];
+    const sql = manager.query.mock.calls[2][0].split('RETURNING')[0];
     expect(sql).not.toContain('"paidAt" ='); expect(sql).not.toContain('"paidAmount" ='); expect(sql).not.toContain('"paymentReference" =');
     expect(sql).toContain('"confirmedAt" =');
   });
 
   it('a participant belonging to another trial cannot be changed or audited', async () => {
-    manager.query.mockReset().mockResolvedValueOnce([]);
+    manager.query.mockReset().mockResolvedValueOnce([{id: "project"}]).mockResolvedValueOnce([]);
     await expect(new FundingPaymentRecordService(ds).update('other-project', 'participant', actor, { paymentStatus: 'paid' })).rejects.toMatchObject({ status: 404 });
-    expect(manager.query).toHaveBeenCalledTimes(1); expect(audit.insert).not.toHaveBeenCalled(); expect(runner.rollbackTransaction).toHaveBeenCalled();
+    expect(manager.query).toHaveBeenCalledTimes(2); expect(audit.insert).not.toHaveBeenCalled(); expect(runner.rollbackTransaction).toHaveBeenCalled();
   });
 
   it('binds private text with node-postgres while masking TypeORM query parameters', async () => {
     await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paymentReference: original.paymentReference, paymentNote: original.paymentNote });
-    const values = manager.query.mock.calls[1][1];
+    const values = manager.query.mock.calls[2][1];
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentReference);
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentNote);
     expect(JSON.stringify(values)).not.toContain(original.paymentReference);

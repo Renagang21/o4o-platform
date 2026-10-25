@@ -1,3 +1,5 @@
+import UsersListClean from '../users/UsersListClean';
+import BusinessOperatorAssignments from './BusinessOperatorAssignments';
 /**
  * OperatorsPage — Assignment-Row Canonical (operator-ux-core DataTable)
  *
@@ -59,12 +61,53 @@ import {
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
+import { Link } from 'react-router-dom';
+import {
+  parseBusinessLedgerResponse,
+  registerPresetPath,
+  resolveBusinessLedgerStatus,
+  type BusinessLedgerState,
+  type BusinessLedgerStatus,
+} from '@/lib/business-ledger';
+
+const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
+  loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
+  error: { label: '조회 실패', className: 'bg-amber-100 text-amber-800' },
+  unregistered: { label: '사업 미등록', className: 'bg-red-100 text-red-700' },
+  active: { label: '사업 운영', className: 'bg-green-100 text-green-800' },
+  closed: { label: '사업 마감', className: 'bg-gray-200 text-gray-700' },
+};
+
+/** 역할 행의 사업 원장 상태. 사업 한정 역할(pharmacy · carepharm · megapharm)이 아니면 '-'. */
+function BusinessLedgerCell({ serviceKey, ledger }: { serviceKey: string; ledger: BusinessLedgerState }) {
+  const status = resolveBusinessLedgerStatus(serviceKey, ledger);
+  if (status === 'not_applicable') return <span className="text-xs text-gray-400">-</span>;
+  const badge = LEDGER_BADGE[status];
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1">
+      <span
+        className={`px-2 py-0.5 rounded text-xs font-medium ${badge.className}`}
+        title={status === 'error' && ledger.status === 'error' ? ledger.message : undefined}
+      >
+        {badge.label}
+      </span>
+      {status === 'unregistered' && (
+        <Link
+          to={registerPresetPath(serviceKey)}
+          onClick={(e) => e.stopPropagation()}
+          className="text-xs text-blue-600 underline"
+        >
+          사업 등록
+        </Link>
+      )}
+    </span>
+  );
+}
 
 
 /**
- * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 경로는 **지정 하나**다.
- *   이미 O4O 에 있고 Google 이 연결된 사용자에게 권한을 준다(즉시 반영).
- *   미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다 — 이메일 초대 흐름은 은퇴했다.
+ * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 신규 권한은 초대와 본인 수락 뒤 활성화한다.
+ *   기존 Google 연결 계정은 ID로 선택하고 미가입자는 이메일로 초대한다.
  */
 
 /** 지정 후보 — 서버가 Google 연결 여부까지 함께 준다(연결 없으면 지정 대상이 아니다). */
@@ -90,6 +133,7 @@ interface UserFormState {
 }
 
 export default function OperatorsPage() {
+  const [showLegacy, setShowLegacy] = useState(false);
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
   // WO-O4O-OPERATORS-PAGE-SILENT-NOOP-FIX-V1:
@@ -123,9 +167,25 @@ export default function OperatorsPage() {
   const [invitationVersion, setInvitationVersion] = useState(0);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
+  // 사업 원장(semi_franchises) — 계정 상태와 별개. 실패는 '미등록'과 구분해 보여준다.
+  const [businessLedger, setBusinessLedger] = useState<BusinessLedgerState>({ status: 'loading' });
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const fetchBusinessLedger = async () => {
+    setBusinessLedger({ status: 'loading' });
+    try {
+      const response = await authClient.api.get('/neture/admin/semi-franchises');
+      setBusinessLedger({ status: 'ok', byKey: parseBusinessLedgerResponse(response.data) });
+    } catch (err: any) {
+      setBusinessLedger({
+        status: 'error',
+        message: err?.response?.data?.error || err?.message || '사업 원장을 조회하지 못했습니다.',
+      });
+    }
+  };
 
   /**
    * 운영자 목록 조회.
@@ -141,6 +201,7 @@ export default function OperatorsPage() {
    *     - HTTP 200 이지만 `success:false` 이거나 배열이 아닌 응답도 **실패로 판정**한다.
    */
   const fetchUsers = async () => {
+    void fetchBusinessLedger();
     try {
       setLoading(true);
       const response = await authClient.api.get('/admin/users', { params: { limit: 1000 } });
@@ -180,7 +241,7 @@ export default function OperatorsPage() {
 
   // assignment-row flatMap + operator-only preset filter
   const allRows = useMemo<AssignmentRow[]>(
-    () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role)),
+    () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role) && row.parsedRole.serviceKey !== 'platform'),
     [users],
   );
 
@@ -345,7 +406,7 @@ export default function OperatorsPage() {
       }
       // role prefix('kpa','cosmetics') ≠ canonical service_key('kpa-society','k-cosmetics').
       // 변환은 @o4o/security-core SSOT 에 위임한다 — 로컬 중복 매핑을 만들지 않는다.
-      const canonicalServiceKey = resolveCanonicalServiceKey(targetServiceKey);
+      const canonicalServiceKey = resolveCanonicalServiceKey(targetRole.split(':')[0]);
       const serviceLabel = SERVICES[targetServiceKey as keyof typeof SERVICES]?.label ?? targetServiceKey;
 
       await authClient.api.post('/admin/service-operator-invitations', {
@@ -370,16 +431,6 @@ export default function OperatorsPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const requestExistingConfirmation = async (row: AssignmentRow) => {
-    if (!window.confirm('기존 권한은 유지하며 선택한 운영자에게 확인 메일을 보냅니다. 진행할까요?')) return;
-    try {
-      await authClient.api.post('/admin/service-operator-invitations', {
-        targetUserId: row.userId, serviceKey: resolveCanonicalServiceKey(row.parsedRole.serviceKey), role: row.role,
-      });
-      toast.success('확인 메일을 보냈습니다.'); setInvitationVersion(v => v + 1);
-    } catch { toast.error('확인 메일을 보내지 못했습니다. 초대 목록에서 대기 중인 요청을 확인하세요.'); }
   };
 
   const toggleRole = (role: string) => {
@@ -453,7 +504,7 @@ export default function OperatorsPage() {
         if (!CATALOG_ROLE_VALUES.has(row.role)) return <span>대상 아님</span>;
         if (!invitations) return <span>확인 상태 미조회</span>;
         const invite = invitations.find(i => (i.target_user_id === row.userId || i.accepted_user_id === row.userId) && i.role === row.role);
-        return <span>{!invite ? '조회된 확인 없음' : invite.status === 'accepted' ? '확인 완료' : invite.status === 'cancelled' ? '확인 취소' : invite.expired ? '확인 만료' : '확인 대기'}</span>;
+        return <span>{!invite ? '기존 권한 유지' : invite.status === 'accepted' ? '확인 완료' : invite.status === 'cancelled' ? '확인 취소' : invite.expired ? '확인 만료' : '확인 대기'}</span>;
       },
     },
     {
@@ -493,8 +544,9 @@ export default function OperatorsPage() {
       ),
     },
     {
+      // 사용자 계정 상태(users.status). 역할 유효성 · 사업 개설과는 별개 — 사업은 다음 열.
       key: 'status',
-      header: 'Status',
+      header: '계정 상태',
       width: '100px',
       align: 'center',
       sortable: true,
@@ -509,6 +561,12 @@ export default function OperatorsPage() {
           {row.userIsActive ? 'Active' : 'Inactive'}
         </span>
       ),
+    },
+    {
+      key: 'businessLedger',
+      header: '사업 원장',
+      width: '150px',
+      render: (_, row) => <BusinessLedgerCell serviceKey={row.parsedRole.serviceKey} ledger={businessLedger} />,
     },
     {
       key: 'createdAt',
@@ -527,9 +585,6 @@ export default function OperatorsPage() {
       render: (_, row) => (
         <RowActionMenu
           actions={[
-            ...(CATALOG_ROLE_VALUES.has(row.role) ? [{ key: 'confirm-email', label: '운영자 확인 메일 보내기', onClick: () => {
-              void requestExistingConfirmation(row);
-            } }] : []),
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
             // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17:
             //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 Google 로 로그인하며
@@ -542,17 +597,17 @@ export default function OperatorsPage() {
   ];
 
   // Role facet 옵션 — 운영 권한만 노출 (admin/operator/super_admin/branch_*)
-  const operatorRoleOptions = getRoleOptions().filter((o) => isOperatorRole(o.value));
+  const operatorRoleOptions = getRoleOptions().filter(o => allRows.some(row => row.parsedRole.roleKey === o.value));
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="Operators Management"
-        subtitle="운영 권한(Admin / Operator) 할당 단위 — RBAC SSOT"
+        title="서비스 관리자·운영자"
+        subtitle="서비스별 담당자를 지정하고 운영 권한을 관리합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
-          { id: 'add', label: 'Add Operator', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
+          { id: 'add', label: '서비스 담당자 지정', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
@@ -573,7 +628,7 @@ export default function OperatorsPage() {
         <StatCard label="Operator Roles" value={stats.operators} color="text-blue-600" Icon={Shield} />
       </div>
 
-      {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 대기 탭 은퇴 — 이 화면은 운영 권한(role_assignments) 하나만 보여준다. */}
+      {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
       <>
       {/* FilterBar */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
@@ -582,13 +637,17 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: 'All Services', options: getServiceOptions() },
+            { key: 'service', placeholder: 'All Services', options: [...getServiceOptions().filter(option => option.value !== 'platform'), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: 'All Operator Roles', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
           onFilterChange={(k, v) => setFacets((prev) => ({ ...prev, [k]: v } as Facets))}
         />
       </div>
+
+      <p className="mb-4 rounded border bg-white p-4 text-sm">서비스별 Admin·Operator를 지정·해제합니다. 각 서비스 Admin은 자기 서비스에서 Operator를 관리할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+      <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
+      <BusinessOperatorAssignments />
 
       {/* WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1: ActionBar (선택 시 노출) */}
       {selectedIds.size > 0 && (
@@ -695,7 +754,7 @@ export default function OperatorsPage() {
             <dl className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
               <dt className="text-gray-500">이메일</dt>
               <dd className="col-span-2 text-gray-900">{detailTarget.userEmail}</dd>
-              <dt className="text-gray-500">상태</dt>
+              <dt className="text-gray-500">계정 상태</dt>
               <dd className="col-span-2">
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
@@ -705,6 +764,10 @@ export default function OperatorsPage() {
                   {detailTarget.userIsActive ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                   {detailTarget.userIsActive ? 'Active' : 'Inactive'}
                 </span>
+              </dd>
+              <dt className="text-gray-500">사업 원장</dt>
+              <dd className="col-span-2">
+                <BusinessLedgerCell serviceKey={detailTarget.parsedRole.serviceKey} ledger={businessLedger} />
               </dd>
               <dt className="text-gray-500">가입일</dt>
               <dd className="col-span-2 text-gray-900">{detailTarget.userCreatedAt || '-'}</dd>
@@ -765,7 +828,7 @@ export default function OperatorsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 유형 선택 은퇴 — 경로는 "기존 사용자 지정" 하나다.
+              {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 기존 사용자 선택과 미가입 이메일 초대를 구분한다.
                   미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다. */}
 
               {/* 대상 —
@@ -996,7 +1059,7 @@ export default function OperatorsPage() {
                         </div>
                         <div className="mt-2 text-xs text-slate-500">
                           요청에 실리는 값 — service key:{' '}
-                          <code>{resolveCanonicalServiceKey(targetServiceKey)}</code>
+                          <code>{resolveCanonicalServiceKey(targetRole.split(':')[0])}</code>
                           {targetRole && (
                             <>
                               {' '}· role: <code>{targetRole}</code>

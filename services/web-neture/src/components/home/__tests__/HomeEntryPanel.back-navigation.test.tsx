@@ -64,7 +64,7 @@ const service = (key: string, nameKo: string, domain: string): EntryService =>
 const data = {
   services: [
     service('neture', 'Neture', 'neture.co.kr'),
-    service('kpa-society', 'KPA Society', 'kpa-society.co.kr'),
+    service('kpa-society', 'KPA Society', 'pharmacy.neture.co.kr'),
     service('lecture', 'O4O 강의', 'lecture.co.kr'),
   ],
   stores: [],
@@ -141,11 +141,11 @@ describe('HomeEntryPanel — 뒤로가기(bfcache) 후 이동 중 상태 해제'
     expect(assign).not.toHaveBeenCalled();
   });
   it('이동 성공 후 busy 가 남고, pageshow(persisted) 에서 풀려 같은 서비스로 재이동할 수 있다', async () => {
-    apiPost.mockImplementation(() => resolved('https://kpa-society.co.kr/?h=1'));
+    apiPost.mockImplementation(() => resolved('https://pharmacy.neture.co.kr/?h=1'));
     renderPanel();
 
     await userEvent.click(handoffButton(KPA));
-    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://kpa-society.co.kr/?h=1'));
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://pharmacy.neture.co.kr/?h=1'));
     // 이동 직전 상태: 모든 handoff 버튼 disabled (bfcache 는 이 상태 그대로 복원한다)
     expect(handoffButton(KPA).disabled).toBe(true);
     expect(handoffButton(PH).disabled).toBe(true);
@@ -154,9 +154,9 @@ describe('HomeEntryPanel — 뒤로가기(bfcache) 후 이동 중 상태 해제'
     expect(handoffButton(KPA).disabled).toBe(false);
     expect(handoffButton(PH).disabled).toBe(false);
 
-    apiPost.mockImplementation(() => resolved('https://kpa-society.co.kr/?h=2'));
+    apiPost.mockImplementation(() => resolved('https://pharmacy.neture.co.kr/?h=2'));
     await userEvent.click(handoffButton(KPA));
-    await waitFor(() => expect(assign).toHaveBeenLastCalledWith('https://kpa-society.co.kr/?h=2'));
+    await waitFor(() => expect(assign).toHaveBeenLastCalledWith('https://pharmacy.neture.co.kr/?h=2'));
     expect(apiPost).toHaveBeenCalledTimes(2);
     expect(apiPost).toHaveBeenLastCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/forum' });
   });

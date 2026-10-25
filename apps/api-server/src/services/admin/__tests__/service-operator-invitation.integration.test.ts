@@ -1,3 +1,4 @@
+import { retainOperatorInvitations } from '../operator-invitation-retention.js';
 import 'reflect-metadata';
 import { createHash, randomUUID } from 'node:crypto';
 import { DataSource, type EntityManager } from 'typeorm';
@@ -49,6 +50,7 @@ integration(
         `INSERT INTO users(id,email,name,status,"isActive","isEmailVerified") VALUES($1,$2,'Synthetic operator','active',true,true)`,
         [id, email],
       );
+      await query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[id,`fixture-${id}`]);
       return id;
     }
     const token = () => mails[mails.length - 1].token;
@@ -95,6 +97,7 @@ integration(
         transaction: (cb: any) =>
           db.transaction(async (original) => {
             const m: any = {
+              connection: original.connection,
               query: original.query.bind(original),
               getRepository: (entity: any) => {
                 if ((entity?.name ?? entity) === 'User')
@@ -244,36 +247,21 @@ integration(
         code: 'INVITATION_ACCOUNT_MISMATCH',
       });
       expect(assignRole).not.toHaveBeenCalled();
-      expect((await service.list())[0].status).toBe('pending');
+      expect((await service.list(admin))[0].status).toBe('pending');
     });
-    it('confirms existing operators without changing role or membership', async () => {
-      await query(
-        "INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'lecture:operator',true)",
-        [target],
-      );
-      expect((await create()).purpose).toBe('confirmation');
-      await service.accept(token(), target);
+    it('does not require existing operators to reconfirm or change their membership', async () => {
+      await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'lecture:operator',true)",[target]);
+      await expect(create()).rejects.toMatchObject({code:'OPERATOR_ALREADY_ACTIVE'});
       expect(assignRole).not.toHaveBeenCalled();
-      expect(
-        await query('SELECT * FROM service_memberships WHERE user_id=$1', [
-          target,
-        ]),
-      ).toHaveLength(0);
+      expect(await query('SELECT * FROM service_memberships WHERE user_id=$1',[target])).toHaveLength(0);
     });
-    it('never resurrects a revoked existing role', async () => {
-      await query(
-        "INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'lecture:operator',true)",
-        [target],
-      );
-      await create();
-      await query(
-        'UPDATE role_assignments SET is_active=false WHERE user_id=$1',
-        [target],
-      );
-      await expect(service.accept(token(), target)).rejects.toMatchObject({
-        code: 'OPERATOR_ROLE_REVOKED',
-      });
-      expect(assignRole).not.toHaveBeenCalled();
+    it('erases delivery material immediately after acceptance and refuses token replay', async () => {
+      await create(); const secret=token();
+      await service.accept(secret,target);
+      expect((await query('SELECT invited_email,token_hash,target_user_id FROM service_operator_invitations'))[0])
+        .toEqual({invited_email:null,token_hash:null,target_user_id:null});
+      await expect(service.accept(secret,target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
+      expect(assignRole).toHaveBeenCalledTimes(1);
     });
     it.each(['pending', 'suspended', 'rejected', 'withdrawn', 'active'])(
       'preserves %s membership on acceptance',
@@ -302,7 +290,7 @@ integration(
       await expect(create()).rejects.toMatchObject({
         code: 'INVITATION_MAIL_FAILED',
       });
-      expect(await service.list()).toEqual([expect.objectContaining({ status: 'pending' })]);
+      expect(await service.list(admin)).toEqual([expect.objectContaining({ status: 'pending' })]);
       expect(assignRole).not.toHaveBeenCalled();
     });
     it('resending rotates the hash and expiry, invalidating the previous link', async () => {
@@ -354,7 +342,8 @@ integration(
       await expect(service.accept(token(), target)).rejects.toMatchObject({
         code: 'INVALID_OR_EXPIRED_INVITATION',
       });
-      await service.manage(invite.id, admin, 'cancel');
+      await expect(service.manage(invite.id,admin,'cancel')).rejects.toMatchObject({code:'INVITATION_NOT_PENDING'});
+      const fresh=await create(); await service.manage(fresh.id,admin,'cancel');
       await expect(service.accept(token(), target)).rejects.toMatchObject({
         code: 'INVALID_OR_EXPIRED_INVITATION',
       });
@@ -374,7 +363,7 @@ integration(
       now = new Date(now.getTime() + 8 * 86400_000);
       const next = await create();
       expect(next.id).not.toBe(old.id);
-      expect((await query('SELECT status FROM service_operator_invitations WHERE id=$1', [old.id]))[0].status).toBe('cancelled');
+      expect((await query('SELECT status FROM service_operator_invitations WHERE id=$1', [old.id]))[0].status).toBe('expired');
       await expect(service.accept(oldToken, target)).rejects.toMatchObject({ code: 'INVALID_OR_EXPIRED_INVITATION' });
       expect(assignRole).not.toHaveBeenCalled();
       await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:operator' });
@@ -403,13 +392,15 @@ integration(
     it('serializes simultaneous acceptances and never regrants a subsequently revoked role', async () => {
       await create();
       const t = token();
-      await Promise.all([service.accept(t, target), service.accept(t, target)]);
+      const results=await Promise.allSettled([service.accept(t,target),service.accept(t,target)]);
+      expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+      expect(results.filter(r=>r.status==='rejected')).toHaveLength(1);
       expect(assignRole).toHaveBeenCalledTimes(1);
       await query(
         'UPDATE role_assignments SET is_active=false WHERE user_id=$1',
         [target],
       );
-      await service.accept(t, target);
+      await expect(service.accept(t,target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
       expect(assignRole).toHaveBeenCalledTimes(1);
     });
     it('account erasure removes the target contact/confirmation and preserves a peer invitation', async () => {
@@ -475,7 +466,7 @@ integration(
         ),
       ).toHaveLength(0);
     });
-    it('erasing an inviter preserves a peer pending invitation, allowing re-endorsement', async () => {
+    it('erasing an inviter cancels delivery and preserves only the minimum peer event', async () => {
       await query(
         "INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",
         [target],
@@ -516,17 +507,17 @@ integration(
         target_user_id: other,
         accepted_user_id: null,
         invited_by_user_id: null,
-        status: 'pending',
+        status: 'cancelled',
       });
       now = new Date(now.getTime() + 61_000);
-      await service.manage(invitation.id, admin, 'resend');
-      await service.accept(token(), other);
+      await expect(service.manage(invitation.id,admin,'resend')).rejects.toMatchObject({code:'INVITATION_NOT_PENDING'});
+      await expect(service.accept(token(),other)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
       expect(
         await query(
           "SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:operator' AND is_active=true",
           [other],
         ),
-      ).toHaveLength(1);
+      ).toHaveLength(0);
     });
     it('rejects platform roles and cross-service role mismatches', async () => {
       await expect(
@@ -547,5 +538,93 @@ integration(
       ).rejects.toMatchObject({ code: 'SERVICE_KEY_MISMATCH' });
       expect(mails).toHaveLength(0);
     });
+    it('does not extend the original seven-day personal-data deadline on resend',async()=>{
+      const i=await create(), original=token();now=new Date(now.getTime()+61_000);
+      const resent=await service.manage(i.id,admin,'resend');expect(new Date(resent.expires_at).getTime()).toBe(new Date(i.expires_at).getTime());
+      await expect(service.accept(original,target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
+      await service.accept(token(),target);
+    });
+    it('expires and erases delivery data exactly at the deadline before any grant',async()=>{
+      const i=await create();now=new Date(i.expires_at);
+      await expect(service.accept(token(),target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
+      expect((await query('SELECT status,invited_email,token_hash FROM service_operator_invitations WHERE id=$1',[i.id]))[0])
+        .toEqual({status:'expired',invited_email:null,token_hash:null});expect(assignRole).not.toHaveBeenCalled();
+    });
+    it('calendar-year cleanup preserves leap-day events to March 1 and PostgreSQL submillisecond precision',async()=>{
+      const i=await create();await service.manage(i.id,admin,'cancel');
+      await query("UPDATE service_operator_invitations SET created_at='2024-02-28T15:00:00.123456Z' WHERE id=$1",[i.id]);
+      await db.transaction(m=>retainOperatorInvitations(m,new Date('2025-02-28T15:00:00.123Z')));
+      expect(await query('SELECT id FROM service_operator_invitations WHERE id=$1',[i.id])).toHaveLength(1);
+      await db.transaction(m=>retainOperatorInvitations(m,new Date('2025-02-28T15:00:00.124Z')));
+      expect(await query('SELECT id FROM service_operator_invitations WHERE id=$1',[i.id])).toHaveLength(0);
+    });
+    it('serializes cancellation versus acceptance without a partial role or delivery secret',async()=>{
+      const i=await create(), t=token();
+      const outcomes=await Promise.allSettled([service.accept(t,target),service.manage(i.id,admin,'cancel')]);
+      expect(outcomes.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+      const [row]=await query('SELECT status,invited_email,token_hash FROM service_operator_invitations WHERE id=$1',[i.id]);
+      expect(row.invited_email).toBeNull();expect(row.token_hash).toBeNull();
+      expect(await query("SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:operator' AND is_active=true",[target]))
+        .toHaveLength(row.status==='accepted'?1:0);
+    });
+    it('rechecks a service-admin inviter at acceptance instead of trusting creation-time authority',async()=>{
+      await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'funding:admin',true)",[admin]);
+      await query("INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'funding','active','customer'),($2,'funding','active','customer')",[admin,target]);
+      await service.create({actorId:admin,targetUserId:target,role:'funding:operator',serviceKey:'funding',scopeType:'service',scopeKey:'funding'});
+      await query("UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='funding:admin'",[admin]);
+      await expect(service.accept(token(),target)).rejects.toMatchObject({code:'SERVICE_ADMIN_REQUIRED'});
+      expect(assignRole).not.toHaveBeenCalled();
+    });
+    it('does not resend to a stale email after a selected account changes its address',async()=>{
+      const i=await create();await query("UPDATE users SET email='changed@fixture.invalid' WHERE id=$1",[target]);now=new Date(now.getTime()+61_000);
+      await expect(service.manage(i.id,admin,'resend')).rejects.toMatchObject({code:'INVITATION_ACCOUNT_MISMATCH'});
+      expect(mails).toHaveLength(1);
+    });
+
+    it('erases the expired requested secret even behind a cleanup backlog',async()=>{
+      const i=await create(),t=token();now=new Date(new Date(i.expires_at).getTime()+1);
+      await query(`INSERT INTO service_operator_invitations(invited_email,service_key,role,purpose,status,token_hash,expires_at,created_at)
+        SELECT 'backlog-'||n||'@fixture.invalid','lecture','lecture:operator','assignment','pending',lpad(n::text,64,'0'),$1::timestamptz-interval '1 day',$1::timestamptz-interval '8 days' FROM generate_series(1,501) n`,[now]);
+      await expect(service.accept(t,target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
+      expect((await query('SELECT invited_email,token_hash,status FROM service_operator_invitations WHERE id=$1',[i.id]))[0]).toEqual({invited_email:null,token_hash:null,status:'expired'});
+    });
+    it('binds a branch invitation to current branch membership and never grants before acceptance',async()=>{
+      const [branch]=await query("INSERT INTO kpa_organizations(name,type,is_active) VALUES('Fixture branch','group',true) RETURNING id");
+      await query("INSERT INTO branch_memberships(user_id,organization_id,status) VALUES($1,$2,'active')",[target,branch.id]);
+      await query("INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'kpa-branch','active','customer')",[target]);
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'kpa-branch',role:'kpa-branch:operator',scopeType:'branch',scopeKey:branch.id});
+      expect(assignRole).not.toHaveBeenCalled();
+      expect(await service.inspect(token(),target)).toMatchObject({scopeName:'Fixture branch'});
+      await service.accept(token(),target);expect(assignRole).toHaveBeenCalledTimes(1);
+    });
+    it('refuses a branch recipient who moved to another branch after invitation',async()=>{
+      const [branch]=await query("INSERT INTO kpa_organizations(name,type,is_active) VALUES('Fixture branch','group',true) RETURNING id");
+      await query("INSERT INTO branch_memberships(user_id,organization_id,status) VALUES($1,$2,'active')",[target,branch.id]);
+      await query("INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'kpa-branch','active','customer')",[target]);
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'kpa-branch',role:'kpa-branch:operator',scopeType:'branch',scopeKey:branch.id});
+      await query("UPDATE branch_memberships SET status='left',left_at=NOW() WHERE user_id=$1",[target]);
+      await expect(service.accept(token(),target)).rejects.toMatchObject({code:'NOT_BRANCH_MEMBER'});expect(assignRole).not.toHaveBeenCalled();
+    });
+    async function cooperative() {
+      const [org]=await query("INSERT INTO organizations(name,code) VALUES('Fixture federation',$1) RETURNING id",[randomUUID()]);
+      const [sf]=await query("INSERT INTO semi_franchises(key,name,organization_id,status) VALUES($1,'Fixture federation',$2,'active') RETURNING id",[randomUUID(),org.id]);
+      const [c]=await query("INSERT INTO cooperatives(slug,name,semi_franchise_id,status) VALUES($1,'Fixture cooperative',$2,'active') RETURNING id",[randomUUID(),sf.id]);return c.id;
+    }
+    it('activates a cooperative role only after consent and shows the recipient the cooperative name',async()=>{
+      const coop=await cooperative();await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'neture:pharmcoop_admin',true)",[admin]);
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'neture',role:'cooperative:admin',scopeType:'cooperative',scopeKey:coop});
+      expect(await query('SELECT * FROM cooperative_roles WHERE user_id=$1',[target])).toHaveLength(0);
+      expect(await service.inspect(token(),target)).toMatchObject({scopeName:'Fixture cooperative'});
+      await service.accept(token(),target);expect(await query("SELECT * FROM cooperative_roles WHERE user_id=$1 AND role='admin' AND revoked_at IS NULL",[target])).toHaveLength(1);
+    });
+    it('a cooperative admin can invite its own operator but cannot invite another cooperative or federation admin',async()=>{
+      const coop=await cooperative(),foreign=await cooperative();
+      await query("INSERT INTO cooperative_roles(cooperative_id,user_id,role) VALUES($1,$2,'admin')",[coop,admin]);
+      await expect(service.create({actorId:admin,targetUserId:target,serviceKey:'neture',role:'cooperative:admin',scopeType:'cooperative',scopeKey:coop})).rejects.toMatchObject({code:'COOPERATIVE_FORBIDDEN'});
+      await expect(service.create({actorId:admin,targetUserId:target,serviceKey:'neture',role:'cooperative:operator',scopeType:'cooperative',scopeKey:foreign})).rejects.toMatchObject({code:'COOPERATIVE_FORBIDDEN'});
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'neture',role:'cooperative:operator',scopeType:'cooperative',scopeKey:coop});
+      await service.accept(token(),target);expect(await query("SELECT * FROM cooperative_roles WHERE user_id=$1 AND role='operator' AND cooperative_id=$2",[target,coop])).toHaveLength(1);
+    });
+
   },
 );

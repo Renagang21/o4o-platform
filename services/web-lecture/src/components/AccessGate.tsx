@@ -12,9 +12,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { INQUIRY_URL, ROLES, SERVICE_KEY } from '../config/service';
 
-export type AccessArea = 'learner' | 'instructor' | 'operator';
+export type AccessArea = 'learner' | 'instructor' | 'operator' | 'admin';
 
 const AREA: Record<AccessArea, { title: string; roles: readonly string[] }> = {
+  admin: { title: '서비스 관리', roles: [ROLES.admin] },
   learner: { title: '내 학습', roles: [] },
   instructor: { title: '강사 공간', roles: [ROLES.instructor] },
   operator: { title: '운영 공간', roles: [ROLES.operator, ROLES.admin] },

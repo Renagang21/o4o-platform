@@ -54,11 +54,11 @@
 ## 실행 원칙
 
 ```text
-개발 담당: 조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR 생성 → 인계
+개발 담당: 조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → branch · commit SHA · 검증 결과 · 미해결 사항 인계
 통합 담당: PR 검토 → CI · Codex → 순차 PR merge → post-merge 확인 → 필요한 배포 · 검증 → 결과 전달 → worktree 종료 정리
 ```
 
-- **개발 담당의 기본 종료점은 검증 · commit · push · PR 생성 및 인계다.** 수정 요청을 받은 경우에도 기존 PR branch에 추가 push하고 재인계한다. PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
+- **개발 담당의 기본 종료점은 로컬 검증 · commit · push 후 인계다.** 수정 요청을 받은 경우에도 같은 작업 branch에 추가 push하고 재인계한다. PR 생성 · CI·리뷰 운영 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기존 PR 재사용 또는 PR 생성 후 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). 사용자가 배포 · merge 를 요청한 세션은 통합 담당으로 지정된 것으로 본다(아래 **명령 실행 원칙**).
 - **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
@@ -94,13 +94,15 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 - **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
 - 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 개발 담당의 완료 조건은 **이번 WO 범위 미커밋 변경 0건 + 작업 branch push + PR 생성 + 검증 결과 · CI 상태 · 미해결 사항 인계**다. CI 성공만으로 병합 권한을 얻지 않는다. 명시적으로 지정된 통합 담당만 병합 · post-merge 확인 · 필요한 배포 검증을 진행한다. 병합 전 branch/worktree는 후속 수정을 위해 보존한다. 상세는 [`AGENTS.md` §4-2](AGENTS.md#4-2-stage--commit--push).
+- 개발 담당의 완료 조건은 **이번 WO 범위 미커밋 변경 0건 + 작업 branch push + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계**다. PR 생성은 개발 담당의 완료 조건이 아니며, PR CI 미실행·확인된 실패는 인계에 명시한다. CI 성공만으로 병합 권한을 얻지 않는다. 명시적으로 지정된 통합 담당만 기존 PR 재사용 또는 PR 생성부터 CI·리뷰 운영 · 병합 · post-merge 확인 · 필요한 배포 검증까지 진행한다. 동일 변경의 중복 PR은 만들지 않는다. 병합 전 branch/worktree는 후속 수정을 위해 보존한다. 상세는 [`AGENTS.md` §4-2](AGENTS.md#4-2-stage--commit--push).
 
 ## 명령 실행 원칙
 
-`.claude/settings.json` 의 ask 규칙은 allow 보다 우선한다. 한 줄로 묶인 명령에 ask 대상이 하나라도 섞이면 **전체가 승인 대상**이 되어, 무엇을 승인하는지 흐려진다.
+- **배포 요청 = 자율 진행.** 사용자가 배포 · merge 를 요청하면 그 세션은 통합 담당으로 지정된 것으로 보고, 작업 branch push → PR 생성 → 필수 CI 통과 → PR merge → 배포 workflow 실행(merge 후 `delivery.yml` 자동 · 필요 시 `deploy-api` · `deploy-web-services` · `deploy-admin` 을 `gh workflow run`)까지 중간 승인 없이 진행한다. CI · branch protection 우회 · 비활성화는 금지한다.
+- **`promote.yml`(LEVEL_3: migration · auth)** 은 사용자 메시지에 promote 또는 LEVEL_3 가 명시된 경우에만 실행한다.
+- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다.
+- ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
 
-- `gh api` 는 다른 명령과 `;` · `&&` · `|` 로 묶지 말고 단독으로 실행한다.
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
 - `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
 - 결과 표시용 `echo` 는 생략한다.
@@ -208,7 +210,7 @@ K-Cosmetics(퇴역 결정 2026-10-05 · 운영 runtime 제거 완료 · 잔여 �
 
 ## 10. KPA Society 구조
 
-3개 서비스 공존(커뮤니티 / 분회 / 데모). 라우트 위치 ≠ 서비스 소속. 정본: [`KPA-SOCIETY-SERVICE-STRUCTURE`](docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md).
+옛 단일 도메인 3개 서비스 구조는 은퇴(SUPERSEDED 2026-10-20). 약국 협력사업 `pharmacy` 는 `megapharm` · `pharmcoop` · `carepharm` 과 동급 독립 사업, 분회는 `kpa.neture.co.kr`. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · 진행: [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](docs/work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md).
 
 ## 11. Operator Dashboard 표준
 
@@ -250,7 +252,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ## 15. Browser Verification Test Accounts
 
-- SSOT: `docs/local/TEST-ACCOUNT.txt` (로컬 전용 · git 미추적). 브라우저 검증 전 반드시 참조.
+- SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적 · 2026-10-16 기준 변경, 이전 `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조.
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

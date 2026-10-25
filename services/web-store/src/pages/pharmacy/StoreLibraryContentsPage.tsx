@@ -33,12 +33,12 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
  */
 
 import { STORE_CONTENTS_HEADING } from '../../config/storeLibraryLabels';
-import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useCallback, useEffect, useMemo, type CSSProperties, type ReactNode } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
-import { StorePageShell } from '@o4o/store-ui-core';
+import { StoreTaskPageShell as StorePageShell } from '../../components/store/StoreTaskPageShell';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
@@ -47,13 +47,15 @@ import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation'
 import { useLibraryScope } from './library/useLibraryScope';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
-export default function StoreLibraryContentsPage() {
+interface LibraryPageProps { workspace?: boolean; navigation?: ReactNode; quickLinks?: ReactNode }
+export default function StoreLibraryContentsPage(props: LibraryPageProps) {
   const { scope } = useLibraryScope();
-  return <LibraryContents key={scope} />;
+  return <LibraryContents key={scope} {...props} />;
 }
-function LibraryContents() {
+function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps) {
   const { organizationId } = useLibraryScope();
-  const { base } = useStoreLibraryRoute();
+  const { base, productReturn } = useStoreLibraryRoute();
+  const navigate = useNavigate();
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -84,6 +86,11 @@ function LibraryContents() {
 
   const closeCreateModal = useCallback(() => {
     setCreateFromResourcesOpen(false);
+    if (productCtx && productReturn) {
+      // Product entry already retains its query and selection; do not duplicate it on cancel.
+      navigate(-1);
+      return;
+    }
     // 제품 진입 파라미터 정리 — 닫은 뒤 새로고침해도 재오픈되지 않게.
     if (searchParams.get('create')) {
       setSearchParams(
@@ -95,7 +102,7 @@ function LibraryContents() {
         { replace: true },
       );
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, productCtx, productReturn, navigate]);
 
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
@@ -116,8 +123,9 @@ function LibraryContents() {
     <StorePageShell
       labels={{
         ...STORE_CONTENTS_HEADING,
+        ...(workspace ? { pageTitle: '매장 컨텐츠' } : {}),
         subtitle:
-          '매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.',
+          '저장한 안내를 선택해 수정하거나 새 안내를 만드세요.',
       }}
       Icon={BookOpen}
       iconColor={colors.primary}
@@ -131,8 +139,9 @@ function LibraryContents() {
             style={styles.createBtn}
           >
             <PenSquare size={14} />
-            콘텐츠 제작
+            새 안내
           </button>
+          {quickLinks}
           {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조 버튼(가이드 모달) */}
           <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
             <Lightbulb size={14} />
@@ -141,7 +150,7 @@ function LibraryContents() {
         </>
       }
     >
-      <StoreLibraryNavigation section="mine" />
+      {navigation ?? <StoreLibraryNavigation section="mine" />}
       {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주세요. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}

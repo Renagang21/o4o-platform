@@ -94,7 +94,7 @@ export interface O4OService {
    *
    * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
    *   **자기 host 를 갖지 않고 다른 서비스 host 의 path 아래에서** 서빙되는 서비스를 표현한다
-   *   (종전 kpa-branch = kpa-society.co.kr/kpa. WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1
+   *   (종전 kpa-branch 가 옛 약국 앱 도메인의 /kpa 아래였으나 WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1
    *   로 kpa.neture.co.kr 로 옮겨 현재 이 값을 쓰는 서비스는 없다 — 응답 계약 `basePath: ''` 는 유지). `domain` 은 언제나 순수 hostname 으로 유지하고
    *   (CORS origin·쿠키 도메인 판정이 hostname 을 전제한다), 경로는 여기에만 둔다.
    *   반드시 '/' 로 시작하고 trailing '/' 는 두지 않는다.
@@ -141,8 +141,8 @@ export const O4O_SERVICES: O4OService[] = [
     key: 'neture',
     name: 'Neture',
     domain: 'neture.co.kr',
-    // CarePharm은 기존 계정 센터의 세션을 사용하며 독립 serviceKey를 만들지 않는다.
-    sessionDomains: ['carepharm.neture.co.kr'],
+    // Pharmacy businesses share the O4O account session; business access is checked separately.
+    sessionDomains: ['pharmacy.neture.co.kr', 'carepharm.neture.co.kr', 'megapharm.neture.co.kr', 'pharmcoop.neture.co.kr'],
     description: 'O4O 공급자 및 유통 플랫폼',
     joinEnabled: true,
     // SPECIAL — O4O 대표 진입(REPRESENTATIVE_ENTRY_SERVICE_KEY) · 공급자 축. 매장 identity 축이 없다
@@ -154,7 +154,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'KPA Society',
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'pharmacy.neture.co.kr',
-    legacyDomains: ['kpa-society.co.kr'],
+    // 옛 약국 앱 도메인 legacyDomains 는 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
     // 사업 의미 = 약국 사업자 대상 세미프랜차이즈 운영 서비스 (docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
     //   role prefix `kpa:*` 는 이 키의 legacy 이름이며 KPA 분회(`kpa-branch` · kpa.neture.co.kr)가 아니다.
     //   WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1: description 을 정본 의미로 맞췄다.
@@ -175,7 +175,7 @@ export const O4O_SERVICES: O4OService[] = [
     name: 'K-Cosmetics',
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'retail.neture.co.kr',
-    legacyDomains: ['k-cosmetics.site'],
+    // 옛 K-Cosmetics 도메인 legacyDomains 는 도메인 은퇴로 제거(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
     // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
     // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.
@@ -208,21 +208,10 @@ export const O4O_SERVICES: O4OService[] = [
    * domain 은 플랫폼 기본 호스트다. 분회 자체 도메인은 branch_domains 로 연결하며
    * 분회별 별도 배포·별도 백엔드는 만들지 않는다.
    *
-   * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-   *   공용 공개 URL 은 별도 서브도메인이 아니라 `https://kpa-society.co.kr/kpa/{branchSlug}` 다
-   *   (LB `o4o-global-lb` / path-matcher-kpa-society 의 `/kpa`·`/kpa/*` pathRule).
-   *   따라서 domain=kpa-society.co.kr + basePath=/kpa 로 표현한다.
-   *   `/kpa` 는 URL prefix 일 뿐 tenant 가 아니다 — 분회는 slug 또는 Host 로만 해석한다.
-   *   WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: kpa-society 가 pharmacy.neture.co.kr 로
-   *   옮길 때 이 항목은 DEFERRED 였다(handoff · 분회 slug 해석을 함께 바꿔야 했다).
-   *
    * WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:
    *   canonical = `https://kpa.neture.co.kr/{branchSlug}` (basePath 없음 · 앱은 root 진입을 이미 판정한다).
    *   handoff · 공개 URL · 세션 귀속(로그인 · 로그아웃 범위)이 모두 이 domain 하나에서 나온다.
-   *   옛 공용 경로 `kpa-society.co.kr/kpa/*` 는 `legacyDomains` 에 넣지 **않는다** — 그 호스트의 루트는
-   *   kpa-society(약국 사업자 서비스) 앱이고 세션 판정은 path 를 보지 않는다. 대신 분회 앱이 그 경로로
-   *   들어온 방문을 canonical 호스트로 옮긴다(web-kpa-branch `lib/canonicalHost`) — 옛 경로에서 로그인하면
-   *   세션이 kpa-society 로 귀속되기 때문이다.
+   *   옛 약국 앱 도메인의 `/kpa/*` 공용 경로는 도메인 은퇴로 지원하지 않는다(WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1).
    * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */
@@ -254,24 +243,16 @@ export const O4O_SERVICES: O4OService[] = [
    * (Cloud Run 서비스를 서브도메인 수만큼 만들지 않는다) 주소와 권한 경계는 독립이다.
    * 호스트 라우팅은 이미 `services/web-neture/src/lib/hostProfile.ts` 가 갖고 있고
    * `community` 프로필의 `/` 가 진입이므로 `basePath` 를 두지 않는다.
-   * 개별 커뮤니티는 그 아래 개체(`communities.slug`)다.
-   *
-   * joinEnabled=false — **서비스 단위 자가 가입 경로를 열지 않는다.** 가입은 개별 커뮤니티
-   * 단위(승인형 하나)이고, `service_memberships('community')` 는 그 승인의 **결과로** 생긴다
-   * (community-lifecycle.service ensureServiceMembership). 여기를 true 로 두면 범용
-   * `POST /auth/services/community/join` 이 어느 커뮤니티에도 승인받지 않은 사람에게
-   * 서비스 진입 자격을 주어 개별 승인을 우회한다.
-   *
-   * platform_services row 는 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
-   * 같은 상태다. 데이터 전용 migration 은 스키마 지문이 직전 상태와 같아져 C22 에 걸린다.
+   * One service membership, requested directly and approved by community operators.
+   * Legacy entity/catalog approvals do not grant service membership.
    */
   {
     key: 'community',
     name: 'O4O Community',
     nameKo: '커뮤니티',
     domain: 'community.neture.co.kr',
-    description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
-    joinEnabled: false,
+    description: '자체 회원과 운영자가 정보와 경험을 나누는 독립 커뮤니티 서비스',
+    joinEnabled: true,
     // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
     workspace: OPERATOR_ONLY_WORKSPACE,
   },

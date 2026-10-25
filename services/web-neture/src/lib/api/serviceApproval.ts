@@ -160,9 +160,9 @@ export const operatorServiceApprovalApi = {
   },
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
-  async deletePendingOffer(offerId: string): Promise<{ success: boolean; error?: string }> {
+  async deletePendingOffer(offerId: string, reason: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await api.delete(`/neture/operator/product-cleanup/pending-offers/${offerId}`);
+      const response = await api.delete(`/neture/operator/product-cleanup/pending-offers/${offerId}`, { data: { reason } });
       return response.data;
     } catch (err: any) {
       return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };

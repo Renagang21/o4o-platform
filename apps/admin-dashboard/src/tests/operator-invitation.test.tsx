@@ -34,7 +34,7 @@ describe('operator invitation admin UI', () => {
       </MemoryRouter>,
     );
     fireEvent.click(
-      await screen.findByRole('button', { name: 'Add Operator' }),
+      await screen.findByRole('button', { name: '서비스 담당자 지정' }),
     );
     fireEvent.change(screen.getByLabelText('미가입자 초대 이메일'), {
       target: { value: 'new@example.com' },

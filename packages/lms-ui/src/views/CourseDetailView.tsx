@@ -8,7 +8,7 @@
  * 서비스 고유 영역(감사 포인트 패널 · 수료증 다운로드 등)은 slot 으로 주입한다.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { DEFAULT_ACCENT } from '../types';
 import { CourseVisibilityBadge } from '../components/CourseVisibilityBadge';
@@ -42,6 +42,7 @@ export interface CourseDetailSlotContext {
   lessons: LmsLessonData[];
   enrollment: LmsEnrollmentData | null;
   reload: () => void;
+  enrollmentIneligible?: boolean;
 }
 
 export interface CourseDetailViewProps {
@@ -76,6 +77,10 @@ export function CourseDetailView({
   const [error, setError] = useState<string | null>(null);
   /** 회원 전용 강의 + 비로그인 — 오류가 아니라 로그인 유도 상태. */
   const [needLogin, setNeedLogin] = useState(false);
+  const requestId = useRef(0);
+  const [lessonsError, setLessonsError] = useState<string | null>(null);
+  const [enrollmentError, setEnrollmentError] = useState(false);
+  const [enrollmentIneligible, setEnrollmentIneligible] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
 
   const requireLogin = useCallback(() => {
@@ -84,46 +89,48 @@ export function CourseDetailView({
   }, [config]);
 
   const loadData = useCallback(async () => {
+    const current = ++requestId.current;
+    setLoading(true); setError(null); setNeedLogin(false);
+    setCourse(null); setLessons([]); setEnrollment(null);
+    setLessonsError(null); setEnrollmentError(false); setEnrollmentIneligible(false);
     try {
-      setLoading(true);
-      setError(null);
-      setNeedLogin(false);
-
-      // 1) 강의 조회 — 회원제 강의 + 비로그인 시 MEMBERS_ONLY.
       const courseData = await port.getCourse(courseId);
+      const [outline, registration] = await Promise.allSettled([
+        (port.getCurriculum ?? port.getLessons)(courseId),
+        config.isAuthenticated && enrollmentEnabled ? port.getEnrollment(courseId) : Promise.resolve(null),
+      ]);
+      if (current !== requestId.current) return;
       setCourse(courseData);
-
-      // 2) 레슨 목록 — 서비스에 따라 인증/수강 여부에 따라 거부될 수 있다.
-      //    강의 표시 자체는 항상 보장하기 위해 별도 try/catch 로 감싼다.
-      try {
-        setLessons(await port.getLessons(courseId));
-      } catch {
-        setLessons([]);
+      if (outline.status === 'fulfilled') setLessons(outline.value);
+      else {
+        const status = outline.reason?.response?.status;
+        setLessonsError(status === 401 || status === 403
+          ? '목차를 보려면 로그인 또는 수강 권한이 필요합니다.'
+          : '목차를 불러오지 못했습니다. 다시 시도해 주세요.');
       }
-
-      // 3) 수강 정보 — 로그인 상태에서만. 미수강이면 조회 실패가 정상이다.
-      if (config.isAuthenticated && config.enrollmentEnabled !== false) {
-        try {
-          setEnrollment(await port.getEnrollment(courseId));
-        } catch {
-          setEnrollment(null);
-        }
-      } else {
-        setEnrollment(null);
+      if (registration.status === 'fulfilled') setEnrollment(registration.value);
+      else {
+        const reason = registration.reason;
+        const code = reason?.response?.data?.code;
+        if (reason?.response?.status === 403 && ['MEMBERSHIP_NOT_FOUND', 'MEMBERSHIP_NOT_ACTIVE'].includes(code)) {
+          setEnrollmentIneligible(true);
+        } else setEnrollmentError(true);
       }
     } catch (err) {
+      if (current !== requestId.current) return;
       if (isMembersOnlyError(err)) setNeedLogin(true);
       else setError(extractErrorMessage(err, labels.courseNotFoundDesc));
     } finally {
-      setLoading(false);
+      if (current === requestId.current) setLoading(false);
     }
     // config 객체는 매 렌더 새로 만들어질 수 있어 의존성에서 제외하고
     // 재조회 트리거는 courseId / 인증 상태로 한정한다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, config.isAuthenticated, config.enrollmentEnabled, port]);
+  }, [courseId, config.isAuthenticated, config.enrollmentEnabled, config.accountId, port]);
 
   useEffect(() => {
     if (courseId) void loadData();
+    return () => { requestId.current += 1; };
   }, [courseId, loadData]);
 
   const handleEnroll = async () => {
@@ -141,7 +148,7 @@ export function CourseDetailView({
       notify.success(labels.enrolledMessage);
       // 신청 직후 레슨 목록이 열리는 서비스가 있어 재조회한다.
       try {
-        setLessons(await port.getLessons(courseId));
+        setLessons(await (port.getCurriculum ?? port.getLessons)(courseId));
       } catch {
         /* 목록이 여전히 잠겨 있으면 기존 상태 유지 */
       }
@@ -184,7 +191,7 @@ export function CourseDetailView({
     );
   }
 
-  const slotCtx: CourseDetailSlotContext = { course, lessons, enrollment, reload: () => void loadData() };
+  const slotCtx: CourseDetailSlotContext = { course, lessons, enrollment, enrollmentIneligible, reload: () => void loadData() };
   const isArchived = course.status === 'archived';
   const completedIds = enrollment?.completedLessonIds ?? [];
   const firstLessonId = lessons[0]?.id ?? '';
@@ -233,7 +240,8 @@ export function CourseDetailView({
         </div>
       )}
 
-      <div style={contentGridStyle}>
+      <style>{`@media(max-width: 760px){.lms-course-grid{grid-template-columns:minmax(0,1fr)!important}.lms-course-sidebar{position:static!important}}`}</style>
+      <div className="lms-course-grid" style={contentGridStyle}>
         <div>
           <LmsCard>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
@@ -283,11 +291,9 @@ export function CourseDetailView({
 
           <LmsCard style={{ marginTop: '24px' }}>
             <h2 style={sectionTitleStyle}>{labels.lessonsSectionTitle}</h2>
-            {lessons.length === 0 ? (
+            {lessonsError ? <div role="alert"><p>{lessonsError}</p><button type="button" onClick={() => void loadData()}>다시 시도</button></div> : lessons.length === 0 ? (
               <p style={{ fontSize: '14px', color: '#94a3b8', margin: 0 }}>
-                {enrollment || !enrollmentEnabled
-                  ? `등록된 ${labels.lessonWord}이 아직 없습니다.`
-                  : `수강 신청 후 ${labels.lessonWord} 목록을 볼 수 있습니다.`}
+                {`등록된 ${labels.lessonWord}이 아직 없습니다.`}
               </p>
             ) : (
               <LessonList
@@ -304,14 +310,14 @@ export function CourseDetailView({
                   durationMinutes: lesson.durationMinutes,
                   completed: completedIds.includes(lesson.id),
                   isPreview: lesson.isPreview,
-                  locked: enrollmentEnabled ? !(enrollment || lesson.isPreview) : false,
+                  locked: enrollmentEnabled ? !(['approved', 'in_progress', 'completed'].includes(enrollment?.status ?? '') || lesson.isPreview) : false,
                 }))}
               />
             )}
           </LmsCard>
         </div>
 
-        <div style={sidebarStyle}>
+        <div className="lms-course-sidebar" style={sidebarStyle}>
           <LmsCard>
             {course.thumbnail ? (
               <img src={course.thumbnail} alt={course.title} style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }} />
@@ -331,7 +337,7 @@ export function CourseDetailView({
               </div>
             )}
 
-            {isArchived ? (
+            {enrollmentError ? <div role="alert"><p>수강 정보를 확인하지 못했습니다.</p><button type="button" onClick={() => void loadData()}>다시 시도</button></div> : isArchived ? (
               <div style={archivedCtaBoxStyle}>
                 <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 12px', lineHeight: 1.5 }}>
                   이 {labels.courseWord}는 종료되어 신규 신청이 불가합니다.
@@ -348,6 +354,11 @@ export function CourseDetailView({
                     {enrollment.status === 'completed' && certificateCta}
                   </>
                 )}
+              </div>
+            ) : enrollmentIneligible ? (
+              <div role="status">
+                <p>강의 서비스 이용 자격이 필요합니다. 공개 강의와 목차는 계속 확인할 수 있습니다.</p>
+                {config.enrollmentInquiryPath && <NavLink to={config.enrollmentInquiryPath} navigate={config.navigate} style={primaryButtonStyle(accent)}>이용 문의</NavLink>}
               </div>
             ) : enrollment ? (
               enrollment.status === 'pending' ? (

@@ -26,8 +26,8 @@ export type MembershipAction = 'approve' | 'reject' | 'suspend' | 'reactivate' |
 export type ProposalAction = 'approve' | 'reject' | 'end';
 export type EventAction = 'approve' | 'reject' | 'cancel';
 export type RecruitmentAction = 'approve' | 'reject';
-export type SemiFranchiseContentAction = 'publish' | 'archive';
-export type SemiFranchiseContentStatus = 'draft' | 'published' | 'archived';
+export type SemiFranchiseContentAction = 'publish' | 'archive' | 'reject';
+export type SemiFranchiseContentStatus = 'draft' | 'pending' | 'rejected' | 'published' | 'archived';
 
 export interface PharmacyMembership {
   id: string;
@@ -45,6 +45,7 @@ export interface PharmacyMembership {
 }
 
 export interface SemiFranchise {
+  service_features?: string[];
   registration_conditions?: string;
   id: string;
   key: string;
@@ -54,11 +55,20 @@ export interface SemiFranchise {
   payment_receiver_key: string | null;
   community_key: string | null;
   activeMemberCount?: number;
-  operators?: Array<{ userId: string; assignedAt: string }>;
+  operators?: Array<{ userId: string; assignedAt: string; name?: string | null; email?: string | null }>;
+  /** 운영자 관리 화면에서 지정한 사업 한정 역할 — 조회 전용(여기서 해제하지 않는다). */
+  roleOperators?: Array<{
+    userId: string;
+    role: string;
+    name: string | null;
+    email: string | null;
+    /** Neture 메인 이용 자격 — active 가 아니면 역할이 있어도 사업 운영 경로를 쓸 수 없다. */
+    membershipStatus?: string;
+  }>;
 }
 
 export interface SemiFranchiseMembership {
-  application?: { conditions?: string; note?: string; accepted?: boolean };
+  application?: { conditions?: string; note?: string; accepted?: boolean; applicationPolicies?: { serviceKey: string; documentType: string; policyDocumentId: string; version: number; contentHash: string; acceptanceKind: string }[] };
   id: string;
   status: string;
   appliedAt: string;
@@ -72,7 +82,27 @@ export interface SemiFranchiseMembership {
   pharmacistLicenseNumber: string | null;
 }
 
+export interface SupplyProposalTerms {
+  version: 1;
+  baseShippingFee: number;
+  freeShippingThreshold: number | null;
+  minOrderAmount: number;
+}
+
 export interface SupplyProposal {
+  termsSnapshot?: SupplyProposalTerms | null;
+  decidedBy?: string | null;
+  decidedByName?: string | null;
+  endedBy?: string | null;
+  endedByName?: string | null;
+  endReason?: string | null;
+  productSpecification?: string | null;
+  productManufacturer?: string | null;
+  productBarcode?: string | null;
+  productSummary?: string | null;
+  productDescription?: string | null;
+  baseShippingFee?: number | null;
+  freeShippingThreshold?: number | null;
   id: string;
   status: string;
   unitPrice: number;
@@ -138,6 +168,8 @@ export interface SemiFranchiseContent {
   thumbnailUrl: string | null;
   attachments: unknown[] | null;
   tags: string[] | null;
+  sourceItemId?: string | null;
+  reviewReason?: string | null;
   status: SemiFranchiseContentStatus;
   publishedAt: string | null;
   createdAt: string;
@@ -219,19 +251,20 @@ export const neturePharmacyOperatorApi = {
     send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents`, input),
   updateContent: (key: string, id: string, input: SemiFranchiseContentInput) =>
     send<{ id: string; status: string }>('patch', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`, input),
-  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction) =>
-    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`),
+  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction, reason?: string) =>
+    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`, { reason }),
 };
 
 // ─── Neture 관리자 ──────────────────────────────────────────────────────────
 
 export const neturePharmacyAdminApi = {
+  listServiceFeatures: () => get<Array<{ key: string; label: string }>>('/neture/admin/service-features'),
   listSemiFranchises: () => get<SemiFranchise[]>('/neture/admin/semi-franchises'),
-  createSemiFranchise: (input: { key: string; name: string; communityKey?: string; registrationConditions?: string }) =>
+  createSemiFranchise: (input: { key: string; name: string; communityKey?: string; registrationConditions?: string; serviceFeatures?: string[] }) =>
     send<SemiFranchise>('post', '/neture/admin/semi-franchises', input),
   updateSemiFranchise: (
     key: string,
-    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string },
+    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string; serviceFeatures?: string[] },
   ) => send<SemiFranchise>('patch', `/neture/admin/semi-franchises/${enc(key)}`, patch),
   assignOperator: (key: string, userId: string) =>
     send<{ assigned: boolean }>('post', `/neture/admin/semi-franchises/${enc(key)}/operators/${enc(userId)}`),
@@ -246,11 +279,14 @@ export const neturePharmacySupplierApi = {
 
   listProposals: () => get<SupplyProposal[]>('/neture/supplier/supply-proposals'),
   createProposal: (input: {
+    /** Stable UUID for an unchanged draft; replay returns the existing proposal. */
+    requestId?: string;
     offerId: string;
     semiFranchiseKey: string;
     targetOrganizationId?: string;
     unitPrice: number;
     note?: string;
+    terms?: Omit<SupplyProposalTerms, 'version'>;
   }) => send<{ id: string; status: string }>('post', '/neture/supplier/supply-proposals', input),
   endProposal: (id: string) => send('post', `/neture/supplier/supply-proposals/${enc(id)}/end`),
 

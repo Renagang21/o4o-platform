@@ -17,15 +17,20 @@ describe('signup policy boundary', () => {
     expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
     expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
   });
+  it('MegaPharm reuses the pharmacy app with the existing account signup and social session scope', () => {
+    const origin = 'https://megapharm.neture.co.kr';
+    expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
+    expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
+  });
   it.each(['https://carepharm.neture.co.kr.attacker.invalid', 'https://carepharm.neture.co.kr/path'])('CarePharm lookalike or path origin remains rejected: %s', origin => {
       expect(() => signupPolicyKeyFromOrigin(origin)).toThrow(expect.objectContaining({ code: 'SIGNUP_ORIGIN_NOT_ALLOWED' }));
       expect(() => socialOrigin({ get: () => origin } as never)).toThrow(expect.objectContaining({ code: 'SOCIAL_ORIGIN_NOT_ALLOWED' }));
     });
-  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr'])('preserves the pre-rollout signup agreement for %s', host => {
-    expect(signupPolicyKeyFromOrigin(`https://${host}`)).toBe(host === 'pharmacy.neture.co.kr' ? 'kpa-society' : 'neture');
+  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr','megapharm.neture.co.kr','pharmcoop.neture.co.kr'])('preserves the pre-rollout signup agreement for %s', host => {
+    expect(signupPolicyKeyFromOrigin(`https://${host}`)).toBe('neture');
   });
   it('uses the same account agreement for Society and catalog www alias', () => {
-    expect(signupPolicyKeyFromOrigin('https://pharmacy.neture.co.kr')).toBe('kpa-society');
+    expect(signupPolicyKeyFromOrigin('https://pharmacy.neture.co.kr')).toBe('neture');
     expect(signupPolicyKeyFromOrigin('https://www.neture.co.kr')).toBe('neture');
   });
   it.each([undefined, 'https://admin.neture.co.kr', 'https://unknown.invalid', 'https://neture.co.kr/path', 'https://neture.co.kr.evil.invalid', 'https://retail.neture.co.kr'])('rejects unknown/admin/retired origin %s', origin => {
@@ -56,7 +61,7 @@ describe('signup policy boundary', () => {
 
 
 describe('published common-account rollout', () => {
-  it.each([false, true])('returns the displayed pharmacy signup document and its own link when common publication=%s', async active => {
+  it.each([false, true])('Pharmacy signup uses the Neture account policy regardless of the legacy rollout marker=%s', async active => {
     const common = { id: 'common-doc', serviceKey: 'neture', documentType: 'terms', title: 'Common', contentHash: 'h', version: active ? 2 : 1, slug: active ? 'neture-account-terms' : null };
     const pharmacy = { ...common, id: 'pharmacy-doc', serviceKey: 'kpa-society', title: 'Pharmacy', version: 1, slug: null };
     const spy = jest.spyOn(policyAcceptanceService, 'getPublishedTermsForService').mockImplementation(async key => key === 'neture' ? common : pharmacy);
@@ -68,8 +73,8 @@ describe('published common-account rollout', () => {
     const res: any = { set: jest.fn().mockReturnThis(), status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
     try {
       await SignupTermsController.get(req, res);
-      const doc = active ? common : pharmacy;
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ policyDocumentId: doc.id, version: doc.version, privacyHref: active ? 'https://neture.co.kr/privacy' : 'https://pharmacy.neture.co.kr/privacy', privacyPolicy: expect.objectContaining({ version: doc.version }), termsHref: active ? 'https://neture.co.kr/terms' : 'https://pharmacy.neture.co.kr/policy' }) }));
+      const doc = common;
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ policyDocumentId: doc.id, version: doc.version, privacyHref: 'https://neture.co.kr/privacy', privacyPolicy: expect.objectContaining({ version: doc.version }), termsHref: 'https://neture.co.kr/terms' }) }));
       expect(res.set).toHaveBeenCalledWith('Cache-Control', 'no-store');
     } finally { privacyQuery.mockRestore(); spy.mockRestore(); }
   });

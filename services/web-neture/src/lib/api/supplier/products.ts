@@ -307,7 +307,10 @@ export const supplierProductsApi = {
   // 공급 방식(전체 공개 + 서비스 대상) 정식 변경 — 추가=pending/재심사, 제거=cancelled+listing 비활성.
   async updateDistribution(
     id: string,
-    input: { isPublic?: boolean; serviceKeys?: string[] },
+    input: {
+      isPublic?: boolean; serviceKeys?: string[]; defaultSupplyEnabled?: boolean; priceGeneral?: number;
+      servicePrices?: Array<{ serviceKey: string; unitPrice: number }>;
+    },
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await api.patch(`/neture/supplier/products/${id}/distribution`, input);

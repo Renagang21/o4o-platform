@@ -23,6 +23,8 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import { fetchActiveContent, type StorePlaylistActiveItem } from '../../api/signageSchedule';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
+import { apiClient } from '../../api/client';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = () => getActiveServiceKey();
@@ -205,6 +207,11 @@ function exitFullscreen() {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 export function SignagePlaybackPage() {
+  const scope = useStoreOperationScope();
+  return <PlaybackSession key={scope.key} />;
+}
+
+function PlaybackSession() {
   const { playlistId } = useParams<{ playlistId: string }>();
   const navigate = useNavigate();
   const { organizationId: storeOrganizationId, loading: storeOrgLoading } = useStoreOrganizationId();
@@ -214,6 +221,7 @@ export function SignagePlaybackPage() {
   const [playbackData, setPlaybackData] = useState<PlaybackData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [showControls, setShowControls] = useState(true);
   // WO-O4O-SIGNAGE-PLAYLIST-FULLSCREEN-CORE-PROMOTION-V1
@@ -227,67 +235,46 @@ export function SignagePlaybackPage() {
   // ── 플레이리스트 로드 ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!playlistId) return;
-    setLoading(true);
-
-    // ── Schedule mode ───────────────────────────────────────────────────────
-    if (isScheduleMode) {
-      // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1: canonical 매장 조직 사용.
-      //   해석은 비동기이므로 로딩 중에는 '조직 없음' 으로 단정하지 않는다.
-      if (storeOrgLoading) return;
-      const orgId = storeOrganizationId;
-      if (!orgId) {
-        setError('조직 정보를 찾을 수 없습니다.');
-        setLoading(false);
-        return;
+    let current = true;
+    setLoading(true); setError(null); setPlaybackData(null); setCurrentIdx(0); setPhase('start');
+    if (storeOrgLoading) return () => { current = false; };
+    const load = async (): Promise<PlaybackData> => {
+      if (isScheduleMode) {
+        if (!storeOrganizationId) throw new Error('STORE_REQUIRED');
+        const result = await fetchActiveContent(storeOrganizationId);
+        if (!result.schedule) throw new Error('NO_SCHEDULE');
+        return { name: result.schedule.name, isLoop: true, defaultDuration: 10, items: result.items.map(storeItemToPlaybackItem) };
       }
-      fetchActiveContent(orgId)
-        .then((result) => {
-          if (!result.schedule || result.items.length === 0) {
-            setError('현재 시간에 적용된 스케줄이 없습니다.\n게시된 플레이리스트를 직접 선택해 재생하세요.');
-            return;
-          }
-          const converted = result.items.map(storeItemToPlaybackItem);
-          setPlaybackData({
-            name: result.schedule.name,
-            isLoop: true,
-            defaultDuration: 10,
-            items: converted,
-          });
-        })
-        .catch(() => setError('활성 콘텐츠를 불러오지 못했습니다.'))
-        .finally(() => setLoading(false));
-      return;
-    }
-
-    // ── Direct mode (existing flow) ─────────────────────────────────────────
-    const token = getAccessToken();
-
-    // 1차: 인증 API (내 플레이리스트)
-    fetch(`${SIGNAGE_BASE()}/playlists/${playlistId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('not found');
-        return res.json();
-      })
-      .then((json) => {
-        const data = json?.data ?? json;
-        if (data?.id) { setPlaybackData(signagePlaylistToPlaybackData(data)); return; }
-        throw new Error('not found');
-      })
-      .catch(() =>
-        // 2차: 공개 API (HQ/community 플레이리스트)
-        publicContentApi.getPlaylist(playlistId).then((res) => {
-          if (res.success && res.data) {
-            setPlaybackData(signagePlaylistToPlaybackData(res.data));
-          } else {
-            setError('플레이리스트를 찾을 수 없습니다.');
-          }
-        }),
-      )
-      .catch(() => setError('플레이리스트를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading]);
+      // The selection page lists store_playlists. Resolve that same model with its existing
+      // public playback reader (published + active + forced/time-window filtering).
+      try {
+        const result = await apiClient.get<{ success: boolean; data: { name: string; items: StorePlaylistActiveItem[] } }>(`/store-playlists/public/${encodeURIComponent(playlistId)}`);
+        if (!result.success || !result.data) throw new Error('INVALID_PLAYLIST');
+        return { name: result.data.name, isLoop: true, defaultDuration: 10, items: result.data.items.map(storeItemToPlaybackItem) };
+      } catch (cause) {
+        if ((cause as { status?: number }).status !== 404) throw cause;
+      }
+      if (!current) throw new Error('STALE_REQUEST');
+      // Existing broadcast IDs retain their separate catalog and reader. Access failures
+      // are never retried through a public reader; only a missing ID reaches this fallback.
+      const token = getAccessToken();
+      const response = await fetch(`${SIGNAGE_BASE()}/playlists/${encodeURIComponent(playlistId)}`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), 'X-Organization-Id': storeOrganizationId },
+      });
+      if (response.ok) {
+        const json = await response.json();
+        return signagePlaylistToPlaybackData(json.data ?? json);
+      }
+      if (response.status !== 404 || !current) throw new Error('PLAYLIST_UNAVAILABLE');
+      const result = await publicContentApi.getPlaylist(playlistId);
+      if (!result.success || !result.data) throw new Error('PLAYLIST_UNAVAILABLE');
+      return signagePlaylistToPlaybackData(result.data);
+    };
+    void load().then(result => { if (current) setPlaybackData(result); })
+      .catch(cause => { if (current) setError(cause.message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하세요.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주세요.'); })
+      .finally(() => { if (current) setLoading(false); });
+    return () => { current = false; };
+  }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading, retry]);
 
   // ── 아이템 순서 정렬 ────────────────────────────────────────────────────────
   const items = playbackData?.items ?? [];
@@ -385,6 +372,7 @@ export function SignagePlaybackPage() {
               <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
             )}
             <p className="text-white/60 mb-4 whitespace-pre-line">{error ?? '플레이리스트를 찾을 수 없습니다.'}</p>
+            <button type="button" onClick={() => setRetry(value => value + 1)} className="mb-3 min-h-11 rounded-lg bg-white/10 px-4 text-sm text-white">다시 시도</button>
             {isScheduleMode ? (
               <button
                 onClick={() => navigate('/store/marketing/signage/player')}

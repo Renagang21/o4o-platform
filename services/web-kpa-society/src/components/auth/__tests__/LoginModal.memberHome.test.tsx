@@ -37,6 +37,8 @@ it('명시적 복귀 콜백을 기본 화면 이동보다 우선 실행한다', 
   expect(mocks.mark).toHaveBeenCalledOnce();
   expect(screen.queryByText('회원 초기화면')).toBeNull();
 });
-it('운영자는 기존 기본 업무 화면으로 이동한다', () => {
-  mocks.roles = ['kpa:operator', 'kpa:store_owner']; mount(); expect(screen.getByText('운영 업무 화면')).toBeTruthy();
+// WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 운영 콘솔(/operator)은 삭제 — 역할과 무관하게 회원 초기화면.
+it('옛 운영 역할도 삭제된 운영 콘솔이 아닌 회원 초기화면으로 이동한다', () => {
+  mocks.roles = ['kpa:operator', 'kpa:store_owner']; mount(); expect(screen.getByText('회원 초기화면')).toBeTruthy();
+  expect(screen.queryByText('운영 업무 화면')).toBeNull();
 });

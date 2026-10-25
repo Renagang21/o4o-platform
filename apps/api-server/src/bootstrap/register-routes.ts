@@ -1,3 +1,4 @@
+import { adminServiceOperatorInvitations, serviceOperatorInvitationAcceptance } from '../routes/admin/service-operator-invitations.routes.js';
 import { createHomePresentationRoutes } from '../routes/home-presentation/home-presentation.routes.js';
 /**
  * Route registration extracted from main.ts
@@ -44,8 +45,10 @@ import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import appAvailabilityRoutes from '../routes/app-availability.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
+import { AppDataSource } from '../database/connection.js';
+import { requireAuth } from '../middleware/auth.middleware.js';
+import { createServiceOperatorManagementRoutes } from '../routes/service-operator-management.routes.js';
 import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments.routes.js';
-import { adminServiceOperatorInvitations, serviceOperatorInvitationAcceptance } from '../routes/admin/service-operator-invitations.routes.js';
 // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F: paid-but-unbridged 복구
 import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
@@ -65,9 +68,6 @@ import storeOwnerTerminationRoutes from '../routes/admin/store-owner-termination
 
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
-import { createAdminPlatformServicesRoutes } from '../routes/platform-services/admin-platform-services.routes.js';
-import { createStoreNetworkRoutes } from '../routes/platform/store-network.routes.js';
-import { createPhysicalStoreRoutes } from '../routes/platform/physical-store.routes.js';
 import { createSlugRoutes } from '../routes/platform/slug.routes.js';
 import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.js';
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
@@ -121,6 +121,7 @@ import { createSignageRoutes, createSignagePublicRoutes } from '../routes/signag
 // 프로덕션 3 테이블 전부 0행. canonical 재생 경로는 Tablet ScreenSet 축이다.
 // → docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
 import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.js';
+import { createExternalAiRoutes } from '../modules/external-ai/external-ai.routes.js';
 
 // ============================================================================
 // PHASE 1: Core routes — registered BEFORE server listen
@@ -180,9 +181,10 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/users', adminUsersRoutes);
   // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
-  app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
   app.use('/api/v1/admin/service-operator-invitations', adminServiceOperatorInvitations);
   app.use('/api/v1/service-operator-invitations', serviceOperatorInvitationAcceptance);
+  app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
+  app.use('/api/v1/service-operator-management', createServiceOperatorManagementRoutes(AppDataSource, requireAuth));
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
   // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F:
   //   결제됐으나 공급자에게 전달되지 않은(paid-but-unbridged) 주문 탐지·복구 — 전 producer 공통.
@@ -221,6 +223,13 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
 // PHASE 2: Domain routes — registered AFTER DB init (inside startServer)
 // ============================================================================
 export async function registerDomainRoutes(app: Application, dataSource: DataSource): Promise<void> {
+  // Delegation is separate from platform login; module settings default to OFF.
+  const externalAi=createExternalAiRoutes(dataSource);
+  app.use(externalAi.router);
+  if(externalAi.provider) {
+    const cleanup=setInterval(()=>{void externalAi.provider!.cleanup().catch(()=>logger.warn('[External AI] cleanup unavailable'));},60*60*1000);
+    cleanup.unref();
+  }
   try {
     // ========================================================================
     // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1
@@ -323,12 +332,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
 
     // 8.2. Public Contact Inquiry (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
-    //   KCos 공개 문의 접수 + 운영자 in-app 알림. Neture/KPA 는 자체 경로 유지(미사용).
+    //   서비스별 공개 문의 접수 + 담당 운영자 알림. 이전 Neture/KPA 경로·이력은 유지.
     const { createPublicContactInquiryController } = await import('../modules/contact-inquiry/public-contact-inquiry.controller.js');
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
 
-    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — KCos 문의 조회·처리
+    const { createOperatorInboxRoutes } = await import('../modules/contact-inquiry/operator-inbox.routes.js');
+    app.use('/api/v1/operator-inbox', createOperatorInboxRoutes(dataSource));
+
+    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
     app.use('/api/v1/admin/services', createAdminContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry admin route registered at /api/v1/admin/services/:serviceKey/contact-inquiries');
@@ -345,16 +357,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     // 8.7. Register Platform Service Catalog routes (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
     app.use('/api/v1/platform-services', createPlatformServicesRoutes(dataSource));
-    app.use('/api/v1/admin/platform-services', createAdminPlatformServicesRoutes(dataSource));
     logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
 
-    // 8.8. Register Store Network Dashboard routes (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
-    app.use('/api/v1/admin/store-network', createStoreNetworkRoutes(dataSource));
-    logger.info('✅ Store Network Dashboard routes registered at /api/v1/admin/store-network');
-
-    // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
-    app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(dataSource));
-    logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
+    // Retired K-Cosmetics store-network/physical-stores APIs have no active UI consumers.
 
     app.use('/api/v1/admin/store-owner-terminations', storeOwnerTerminationRoutes);
     logger.info('✅ Store Owner Termination routes registered at /api/v1/admin/store-owner-terminations');
@@ -623,6 +628,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (maintenanceError) {
       logger.error('Failed to register Product DB Maintenance route:', maintenanceError);
     }
+
+    // 기준/선택 작업은 독립 settings namespace에 저장. 상품 원본 적용 경로 없음.
+    const { createProductCorrectionController } = await import('../modules/neture/controllers/product-correction.controller.js');
+    app.use('/api/v1/admin/o4o-product-db/correction', createProductCorrectionController(dataSource));
 
     // 24-e2h. Register Product Master Audit Log (read-only) — master 작업 이력 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1)

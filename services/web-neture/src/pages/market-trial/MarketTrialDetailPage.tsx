@@ -13,7 +13,8 @@ import { api } from '../../lib/apiClient';
  * - 허브(/market-trial)로 복귀
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {useLatestRequest} from '../../hooks/useLatestRequest';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   getTrial,
@@ -41,10 +42,23 @@ const REWARD_LABELS: Record<string, string> = {
   cash: '현금 보상',
 };
 
+function recruitmentWindow(trial: Trial, now = Date.now()) {
+  const start = Date.parse(trial.startDate ?? '');
+  const end = Date.parse(trial.endDate ?? '');
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 'unknown';
+  return now < start ? 'before' : now >= end ? 'ended' : 'open';
+}
+
 export function MarketTrialDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const scope=`${user?.id??'anonymous'}:${id}`;
+  const beginJoin=useLatestRequest(scope);
+  const joining=useRef(false);
+  const [reload,setReload]=useState(0);
+  const [loadedScope,setLoadedScope]=useState('');
+  const [clock,setClock]=useState(0);
   const agreement = useServiceEnrollmentPolicies('funding', async () => (await api.get('/public/services/funding/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${id}`);
 
   const [trial, setTrial] = useState<Trial | null>(null);
@@ -60,6 +74,7 @@ export function MarketTrialDetailPage() {
   useEffect(() => {
     if (!id) return;
     let active = true;
+    setIsLoading(true);setError(null);setTrial(null);setParticipation(null);setSelectedReward(null);setJoinError(null);setJoinSuccess(false);setJoinLoading(false);joining.current=false;
     const fetchData = async () => {
       try {
         const trialData = await getTrial(id);
@@ -70,32 +85,46 @@ export function MarketTrialDetailPage() {
         }
 
         if (isAuthenticated) {
-          const partData = await getParticipation(id).catch(() => null);
+          const partData = await getParticipation(id);
           if (active && partData) setParticipation(partData);
         }
       } catch {
-        if (active) setError('유통참여형 펀딩을 찾을 수 없습니다.');
+        if (active) setError('펀딩 또는 참여 현황을 불러오지 못했습니다. 다시 조회해 주세요.');
       } finally {
-        if (active) setIsLoading(false);
+        if (active) {setIsLoading(false);setLoadedScope(scope);}
       }
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, user?.id, scope, reload]);
+
+  useEffect(() => {
+    if (!trial || trial.status !== 'recruiting') return;
+    const now=Date.now();
+    const next=[Date.parse(trial.startDate ?? ''),Date.parse(trial.endDate ?? '')].filter(time=>Number.isFinite(time)&&time>now);
+    if (!next.length) return;
+    const timer=setTimeout(()=>setClock(value=>value+1),Math.min(Math.min(...next)-now,2147483647));
+    return ()=>clearTimeout(timer);
+  },[trial,clock]);
 
   const handleJoin = async () => {
-    if (!id || !selectedReward || joinLoading) return;
+    if (!id || !selectedReward || joinLoading || joining.current) return;
+    if (!trial || trial.status !== 'recruiting' || recruitmentWindow(trial) !== 'open' || (trial.maxParticipants != null && trial.currentParticipants >= trial.maxParticipants)) {
+      setClock(value=>value+1);setJoinError('현재는 참여 접수를 받고 있지 않습니다.');return;
+    }
     if (!isAuthenticated) {
       navigate(`/login?returnUrl=/market-trial/${id}`);
       return;
     }
+    const current=beginJoin();joining.current=true;
     setJoinLoading(true);
     setJoinError(null);
     try {
       if (!agreement.ready) { setJoinError('서비스 약관을 먼저 확인해 주세요.'); return; }
       const res = await joinTrial(id, selectedReward, agreement.references);
+      if(!current())return;
       if (res?.id) {
         setParticipation({
           id: res.id,
@@ -114,6 +143,7 @@ export function MarketTrialDetailPage() {
         setJoinError('참여 신청에 실패했습니다.');
       }
     } catch (err: unknown) {
+      if(!current())return;
       const e = err as { response?: { data?: { message?: string }; status?: number } };
       const msg = e?.response?.data?.message || '';
       const status = e?.response?.status;
@@ -136,11 +166,11 @@ export function MarketTrialDetailPage() {
         setJoinError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       }
     } finally {
-      setJoinLoading(false);
+      if(current()){joining.current=false;setJoinLoading(false);}
     }
   };
 
-  if (isLoading) {
+  if (isLoading || loadedScope!==scope) {
     return (
       <div style={s.centered}>
         <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>불러오는 중...</p>
@@ -153,6 +183,7 @@ export function MarketTrialDetailPage() {
       <div style={s.centered}>
         <p style={{ color: '#6B7280', fontSize: '1rem', marginBottom: '16px' }}>
           {error || '유통참여형 펀딩을 찾을 수 없습니다.'}
+          <button onClick={()=>setReload(v=>v+1)}>다시 조회</button>
         </p>
         <Link to="/market-trial" style={{ color: '#10B981', fontSize: '0.875rem', textDecoration: 'none' }}>
           ← 유통참여형 펀딩 허브로 돌아가기
@@ -166,6 +197,7 @@ export function MarketTrialDetailPage() {
   const rewardLabels = rewardOptions.map((r) => REWARD_LABELS[r] || r).filter(Boolean);
 
   const isRecruiting = trial.status === 'recruiting';
+  const windowState = recruitmentWindow(trial);
   const isFull = trial.maxParticipants != null && trial.currentParticipants >= trial.maxParticipants;
   const hasJoined = participation != null || joinSuccess;
 
@@ -379,7 +411,7 @@ export function MarketTrialDetailPage() {
               <span style={{ fontSize: '1.125rem', color: '#166534' }}>✓</span>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#166534', margin: 0 }}>
-                  참여 신청 완료
+                  {participation?.withdrawn ? '참여 철회 기록됨' : '참여 신청 완료'}
                 </p>
                 <p style={{ fontSize: '0.8125rem', color: '#15803D', margin: '2px 0 0 0' }}>
                   보상 방식: {REWARD_LABELS[participation?.rewardType || selectedReward || ''] || '선택됨'}
@@ -397,7 +429,7 @@ export function MarketTrialDetailPage() {
           </div>
         )}
 
-        {!hasJoined && isRecruiting && !isFull && (
+        {!hasJoined && isRecruiting && !isFull && windowState === 'open' && (
           <div>
             <p style={{ fontSize: '0.8125rem', color: '#6B7280', lineHeight: 1.5, marginBottom: '14px' }}>
               {isAuthenticated
@@ -464,6 +496,14 @@ export function MarketTrialDetailPage() {
                 ? '유통참여형 펀딩 참여 신청'
                 : '보상 방식을 선택해 주세요'}
             </button>
+          </div>
+        )}
+
+        {!hasJoined && isRecruiting && !isFull && windowState !== 'open' && (
+          <div style={s.infoBox}>
+            <p style={{fontSize:'0.875rem',color:'#6B7280',margin:0}}>
+              {windowState === 'before' ? '모집 시작 전입니다.' : windowState === 'ended' ? '모집이 마감되어 운영자의 모금 확인을 기다리고 있습니다.' : '모집 기간을 확인할 수 없어 참여를 접수할 수 없습니다.'}
+            </p>
           </div>
         )}
 

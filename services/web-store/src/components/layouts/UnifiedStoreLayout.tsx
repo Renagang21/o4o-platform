@@ -1,3 +1,4 @@
+import { usePharmacyFeatureAccess, pharmacyFeaturesForPath, filterPharmacyFeatureMenu, PharmacyFeatureNotice } from '../store/PharmacyFeatureAccess';
 /**
  * UnifiedStoreLayout — 내 매장(/store) 공통 골격. WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-3
  *
@@ -68,13 +69,23 @@ export function StoreAgreementGate({ serviceKey, children }: { serviceKey: Unifi
 /** 사이드바 + 본문(Outlet) — 내 매장 / 서비스 업무가 공유하는 골격 */
 export function StoreWorkDashboard({ config, withCapabilities = false, workspace = false, serviceWorkConfig, children }: { config: StoreDashboardConfig; withCapabilities?: boolean; workspace?: boolean; serviceWorkConfig?: StoreDashboardConfig; children?: ReactNode }) {
   const { user, logout } = useAuth();
-  const { organizationName, stores, organizationId } = useUnifiedStore();
+  const { organizationName, stores, organizationId, services } = useUnifiedStore();
+  const location = useLocation();
+  const pharmacy = services.some(service => service.serviceKey === 'kpa-society');
+  const featureAccess = usePharmacyFeatureAccess(organizationId, pharmacy, location.pathname, user?.id);
+  const requestedFeatures = pharmacy ? pharmacyFeaturesForPath(location.pathname) : [];
+  const featureAllowed = requestedFeatures.some(key => featureAccess.data?.features.some(feature => feature.key === key && feature.allowed === true));
+  const featureDenied = !!featureAccess.data && requestedFeatures.every(key => featureAccess.data?.features.some(feature => feature.key === key && feature.allowed === false));
+  const featureUnavailable = featureAccess.error || (!!featureAccess.data && !featureAllowed && !featureDenied);
+  const featurePending = requestedFeatures.length > 0 && !featureAllowed;
+  const featureNotice = featurePending ? <PharmacyFeatureNotice error={featureUnavailable} denied={featureDenied} reload={featureAccess.reload} /> : null;
   const isStaff = stores.some(store => store.organizationId === organizationId && store.memberRole === 'staff');
   const visibleConfig = isStaff ? { ...config, menuSections: config.menuSections?.map(section => ({ ...section, items: section.items.filter(item => item.key !== 'members') })) } : config;
   const navigate = useNavigate();
   const caps = useStoreCapabilities(withCapabilities ? fetchStoreCapabilities : undefined);
-  const resolvedConfig = resolveStoreMenu(visibleConfig, caps);
-  if (workspace) return <StoreWorkspaceShell config={resolvedConfig} organizationName={organizationName ?? undefined} serviceWorkConfig={serviceWorkConfig}>{children}</StoreWorkspaceShell>;
+  const resolvedConfig = resolveStoreMenu(pharmacy ? filterPharmacyFeatureMenu(visibleConfig, featureAccess.data) : visibleConfig, caps);
+  if (workspace) return <StoreWorkspaceShell config={resolvedConfig} organizationName={organizationName ?? undefined} serviceWorkConfig={serviceWorkConfig}>{featureNotice || children}</StoreWorkspaceShell>;
+  if (featureNotice) return featureNotice;
   return (
     <StoreDashboardLayout
       config={resolvedConfig}

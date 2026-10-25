@@ -57,11 +57,9 @@ export interface ForumContext {
 }
 
 // Extend Express Request
-declare global {
-  namespace Express {
-    interface Request {
-      forumContext?: ForumContext;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    forumContext?: ForumContext;
   }
 }
 

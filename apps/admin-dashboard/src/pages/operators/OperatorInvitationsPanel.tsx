@@ -5,7 +5,7 @@ export type Invite = {
   target_user_id: string | null;
   accepted_user_id: string | null;
   id: string;
-  invited_email: string;
+  invited_email: string | null;
   role: string;
   purpose: string;
   status: string;
@@ -62,8 +62,7 @@ export default function OperatorInvitationsPanel({
     >
       <h2 className="font-semibold">운영자 초대 · 이메일 확인</h2>
       <p className="text-sm text-gray-600">
-        새 지정은 수락 후 활성화됩니다. 기존 운영자는 권한을 유지하며 행
-        메뉴에서 확인 메일을 보낼 수 있습니다. 최근 200건을 표시합니다.
+        새 지정은 수락 후 활성화됩니다. 기존 운영자는 추가 확인 없이 권한을 유지합니다. 최근 200건을 표시합니다.
       </p>
       <button type="button" onClick={() => void load()}>
         목록 새로고침
@@ -75,17 +74,17 @@ export default function OperatorInvitationsPanel({
             key={row.id}
             className="flex flex-wrap items-center gap-3 py-3 text-sm"
           >
-            <span className="break-all">{row.invited_email}</span>
+            <span className="break-all">{row.invited_email ?? '초대용 개인정보 파기 완료'}</span>
             <code>{row.role}</code>
             <span>
-              {row.purpose === 'confirmation' ? '기존 지정 확인' : '신규 초대'}
+              {row.purpose === 'revocation' ? '권한 회수' : '운영자 초대'}
             </span>
             <span>
               {row.status === 'accepted'
                 ? '확인·수락 완료'
-                : row.status === 'cancelled'
+                : row.status === 'revoked' ? '회수 완료' : row.status === 'cancelled'
                   ? '취소'
-                  : row.expired
+                  : row.status === 'expired' || row.expired
                     ? '만료'
                     : '확인 대기'}
             </span>

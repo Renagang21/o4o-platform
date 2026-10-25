@@ -1,3 +1,4 @@
+import { parsePharmacyCollaboratorRole } from '@o4o/types';
 /**
  * Neture OperatorLayoutWrapper
  *
@@ -10,6 +11,8 @@
  *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/K-Cosmetics operator 정합).
  */
 
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
+import CarePharmOperatorLayout from './CarePharmOperatorLayout';
 import { filterMenuByRole } from '@o4o/ui';
 import { OperatorAreaShell, OperatorServiceSwitcher, createOperatorServicesApi } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
@@ -31,11 +34,17 @@ const netureOperatorServicesApi = createOperatorServicesApi({
 });
 
 export default function OperatorLayoutWrapper() {
+  const { user } = useAuth();
+  const scopedOnly = !!user?.roles?.some(r => parsePharmacyCollaboratorRole(r)) && !user.roles.some(r => ['neture:admin','neture:operator','platform:super_admin'].includes(r));
+  return CURRENT_HOST_PROFILE === 'carepharm' ? <CarePharmOperatorLayout /> : <NetureOperatorLayout scopedOnly={scopedOnly} />;
+}
+
+function NetureOperatorLayout({ scopedOnly = false }: { scopedOnly?: boolean }) {
   // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 「유통참여형 펀딩」 은 funding:operator 화면 — 그 역할과
   //   funding membership active 가 있을 때만 노출(route guard 와 같은 조건).
   const { user } = useAuth();
-  const menuItems = withoutUnreachableSubdomainOperatorItems(filterMenuByRole(UNIFIED_MENU, false), user);
+  const menuItems = scopedOnly ? { approvals: [{ label: '약국 협업체 운영', path: '/operator/semi-franchises' }] } : withoutUnreachableSubdomainOperatorItems(filterMenuByRole(UNIFIED_MENU, false), user);
 
   return (
     <>
@@ -43,12 +52,12 @@ export default function OperatorLayoutWrapper() {
         header={
           <>
             <NetureGlobalHeader />
-            <OperatorServiceSwitcher api={netureOperatorServicesApi} currentServiceKey="neture" />
+            {!scopedOnly && <OperatorServiceSwitcher api={netureOperatorServicesApi} currentServiceKey="neture" />}
           </>
         }
         menuItems={menuItems}
         capabilities={ENABLED_CAPABILITIES}
-        domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
+        domainIAConfig={scopedOnly ? undefined : NETURE_OPERATOR_DOMAIN_IA}
       />
       {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: operator 영역 모바일 하단 utility nav. */}
       <NetureBottomNav />

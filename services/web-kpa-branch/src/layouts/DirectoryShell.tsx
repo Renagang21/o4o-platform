@@ -1,3 +1,4 @@
+import { ServiceContactInboxLink } from '@o4o/shared-space-ui';
 /**
  * DirectoryShell — 공용 도메인 `/`(분회 찾기)의 헤더 · 푸터
  * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
@@ -8,7 +9,7 @@
  */
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { BRAND } from '../config/service';
@@ -35,9 +36,9 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 text-sm">
             <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
             {!isLoading && (isAuthenticated ? (
-              <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
+              <ServiceAccountMenu key={user?.id} displayName={user?.name || '사용자'} email={user?.email} onLogout={logout} />
             ) : (
-              <LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink>
+              <><LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink><a href="https://neture.co.kr/signup" className="font-medium text-primary-600">회원가입</a></>
             ))}
           </div>
         </div>
@@ -52,6 +53,8 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
               {n.label}
             </NavLink>
           ))}
+          <a href="https://neture.co.kr/contact?service=kpa-branch">Contact Us</a>
+          <ServiceContactInboxLink client={authClient.api} serviceKey="kpa-branch" accountId={user?.id} enabled={isAuthenticated && !isLoading} />
         </nav>
       </header>
 

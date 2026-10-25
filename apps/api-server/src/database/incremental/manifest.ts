@@ -1,3 +1,4 @@
+import { CreateServiceOperatorInvitations1792886400000 } from '../migrations/1792886400000-CreateServiceOperatorInvitations.js';
 /**
  * Incremental migration manifest
  * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1,
@@ -62,6 +63,7 @@ import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791
 import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 import { AlignSellerRecruitmentApplicationIdentity1791477914134 } from '../migrations/1791477914134-AlignSellerRecruitmentApplicationIdentity.js';
 
+
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
   /**
@@ -89,7 +91,21 @@ import { CreateAiUsageReservations1791870434349 } from '../migrations/1791870434
 // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 (assistant_run_frames.understanding)
 import { AddAssistantRunFrameUnderstanding1791970408318 } from '../migrations/1791970408318-AddAssistantRunFrameUnderstanding.js';
 
-import { CreateServiceOperatorConfirmations1792029600000 } from '../migrations/1792029600000-CreateServiceOperatorConfirmations.js';
+import { SeparateSupplierRegistrationPublication1792110685889 } from '../migrations/1792110685889-SeparateSupplierRegistrationPublication.js';
+import { CreateMemberPaidServiceEntitlements1792137600000 } from '../migrations/1792137600000-CreateMemberPaidServiceEntitlements.js';
+import { CreateSupplierReviewRequests1792193756961 } from '../migrations/1792193756961-CreateSupplierReviewRequests.js';
+import { AddFundingOfflineState1792212000000 } from '../migrations/1792212000000-AddFundingOfflineState.js';
+
+import { AddSupplierBusinessContentRequests1792215000000 } from '../migrations/1792215000000-AddSupplierBusinessContentRequests.js';
+
+import { CreateCooperativeMemberships1792216000000 } from '../migrations/1792216000000-CreateCooperativeMemberships.js';
+
+import { AddSupplierProposalTerms1792221000000 } from '../migrations/1792221000000-AddSupplierProposalTerms.js';
+import { CreateCooperativeManagement1792300000000 } from '../migrations/1792300000000-CreateCooperativeManagement.js';
+
+import { AddContactInquiryOrganization1792540800000 } from '../migrations/1792540800000-AddContactInquiryOrganization.js';
+import { CreateExternalAiConnections1792635132325 } from '../migrations/1792635132325-CreateExternalAiConnections.js';
+import { CreateStoreConsultationStations1792815861315 } from '../migrations/1792815861315-CreateStoreConsultationStations.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -119,7 +135,18 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AllowStoreStaffDemoAccounts1791810417566,
   CreateAiUsageReservations1791870434349,
   AddAssistantRunFrameUnderstanding1791970408318,
-  CreateServiceOperatorConfirmations1792029600000,
+  SeparateSupplierRegistrationPublication1792110685889,
+  CreateMemberPaidServiceEntitlements1792137600000,
+  CreateSupplierReviewRequests1792193756961,
+  AddFundingOfflineState1792212000000,
+  AddSupplierBusinessContentRequests1792215000000,
+  CreateCooperativeMemberships1792216000000,
+  AddSupplierProposalTerms1792221000000,
+  CreateCooperativeManagement1792300000000,
+  AddContactInquiryOrganization1792540800000,
+  CreateExternalAiConnections1792635132325,
+  CreateStoreConsultationStations1792815861315,
+  CreateServiceOperatorInvitations1792886400000,
 ];
 
 export function incrementalMigrationNames(): string[] {

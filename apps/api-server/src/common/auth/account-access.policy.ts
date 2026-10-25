@@ -139,7 +139,10 @@ export function normalizeRequestPath(rawUrl: string | undefined): string | null 
   }
 
   // 제어문자 / 널바이트 / 역슬래시 거부
-  if (/[\u0000-\u001f\u007f\\]/.test(path)) return null;
+  for (const char of path) {
+    const code = char.charCodeAt(0);
+    if (code < 0x20 || code === 0x7f || char === '\\') return null;
+  }
 
   // 중복 슬래시 축약
   path = path.replace(/\/{2,}/g, '/');

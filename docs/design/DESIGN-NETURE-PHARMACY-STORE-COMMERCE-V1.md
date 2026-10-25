@@ -6,7 +6,7 @@
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-24 (§15-8 독립 실행·한국어/다국어 상담 업무·게시 자료 기반 보조) · 2026-10-21 (§4·6-2 협업체별 업무·공개 모집 주문 조건, §15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 약국 협력사업 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -22,6 +22,8 @@ Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국
 - 테스트 데이터 승계 · backfill · 옛 주문 읽기 호환을 만들지 않는다(WO §6).
 
 ---
+
+> **2026-10-17 콘텐츠 등재 요청 보완**: [콘텐츠 목적지 분리 WO](../work-orders/WO-O4O-SUPPLIER-CONTENT-POLICY-ALIGNMENT-V1.md). 공급자 자료함 원본을 활성 협력사업에 요청하면 `semi_franchise_contents`에 `pending` 사본을 접수한다. 담당 운영자는 내용을 검토해 `published`로 승인·게시하거나 사유와 함께 `rejected`로 반려한다. 회원 약국 열람·복사는 기존 `published ∧ 사업 active ∧ 해당 약국 membership active`를 유지한다. 커뮤니티 게시와 원본 공개 여부는 변경하지 않는다. 기존 운영자 작성 자료는 `draft → published ↔ archived`를 유지한다. 보관 후 새 요청을 요구하는 규칙은 공급자 수신 사본에만 적용한다. 운영 적용은 별도 migration·배포가 필요하다.
 
 ## 1. 8개 관계
 
@@ -40,7 +42,7 @@ Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국
 
 | supplyKind | 원장 | 대상 약국 협력사업 | 단가 | 승인 |
 |---|---|---|---|---|
-| `default` | SPO (공급처 미지정 = `service_keys` 비어 있음) | `pharmacy` 고정 | `spo.price_general` | 제품 등록 승인(Neture 운영자)만 |
+| `default` | SPO (`default_supply_enabled=true`) | `pharmacy` 고정 | `spo.price_general` | 제품 등록 승인 + 공급자의 명시적 기본 공급 게시 |
 | `proposal` | `supply_proposals` | 제안의 `semi_franchise_id` | `proposal.unit_price` | 제품 등록 승인 + 대상 약국 협력사업 담당 운영자 승인 |
 | `event` | `organization_product_listings`(`service_key='neture-event-offer'`, `source_type='event-offer'`) | 이벤트 행의 `organization_id` = 약국 협력사업 운영 조직 | `opl.event_price` | 대상 약국 협력사업 담당 운영자 승인 |
 | `recruitment` | `seller_recruitments` + 조직 단위 `seller_recruitment_applications` | 모집의 `semi_franchise_id` | `recruitment.supply_unit_price` | 운영자 조건 승인(`exposure_status`) + 공급자 참여 승인 |
@@ -155,7 +157,9 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 
 - 공급자 가입 승인: `neture_suppliers` PENDING→ACTIVE, `supplier:operator`. 공급자 신청 · 승인 · 재활성화는 신청자의 현재 메인 이용 자격(active: 정상 계정·이메일 확인)을 **전제조건으로 확인만** 하며, Neture 가입 원장을 승인 · 반려 · 재활성화하지 않는다(과거 결합 제거 기록 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md) E3). 메인 자격 충족도 공급자 · 공급자 역할을 만들거나 복구하지 않는다.
 - 제품 등록 승인 = `supplier_product_offers.approval_status = 'APPROVED'`. 승인자는 Neture 운영자(현행 `approveProduct`).
-- **수정**: 공급처 미지정(`service_keys` 비어 있음) 제품은 OSA 행이 0 이라 `approveProduct` 로 APPROVED 가 될 수 없었다(IR B §1-3 결함). OSA 행이 하나도 없으면 `approval_status='APPROVED'`, `is_active=true` 를 직접 기록한다. OSA 행이 있는 제품(다른 서비스 흐름)은 기존 파생 규칙 그대로. → Supplier Domain §4 "approval_status = OSA 파생" 에 "OSA 0행 = 제품 등록 승인 직접 기록" 예외를 이 WO 근거로 명시한다(§10).
+- **2026-10-16 대체 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md):** OSA 유무와 무관하게 제품 등록 승인을 직접 기록한다. `is_active=true`는 제품 이용 가능 상태이고 게시 선택이 아니다. 승인 시 `default_supply_enabled=false`, `is_public=false`로 두며 OSA 승인·listing 생성은 수행하지 않는다.
+- 신규 등록에는 공급가·서비스 선택이 필요 없다. 등록 승인 후 별도 서비스 게시에서 기본 공급 여부·양수 일반가·서비스별 공급 대상을 결정한다. 기존 승인·공급처 미지정 상품의 기본 공급 선택은 migration이 보존한다.
+- OSA와 프로그램별 공급/이벤트 승인은 독립이다. 서비스의 반려·철회나 이벤트 종료는 제품 등록 승인을 변경하지 않는다.
 
 ### 3-4. 공급 제안 (R5 · R6)
 
@@ -178,7 +182,7 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 ```text
 공급자 → POST /api/v1/neture/supplier/semi-franchise-events {offerId, semiFranchiseKey, eventPrice, startAt, endAt, totalQuantity?, perStoreLimit?, perOrderLimit?}
          → OPL(organization_id = 약국 협력사업 운영 조직, service_key='neture-event-offer', source_type='event-offer', status='pending')
-         · eventPrice ≤ spo.price_general, 기간 필수(기존 createListing 규칙)
+         · eventPrice > 0, 기간 필수. 양수 일반 공급가가 설정된 경우 eventPrice ≤ spo.price_general
        → POST .../:id/cancel   (status='canceled', is_active=false — 삭제 · 종료)
 담당 운영자 → GET .../semi-franchises/:key/events?status=  ·  POST .../events/:id/{approve|reject|cancel}
 ```
@@ -212,16 +216,17 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 
 | 경로 | 추가 조건 |
 |---|---|
-| default | `cardinality(spo.service_keys)=0` ∧ 약국의 `pharmacy` 약국 협력사업 가입 active |
+| default | `spo.default_supply_enabled=true` ∧ `spo.price_general>0` ∧ 약국의 `pharmacy` 약국 협력사업 가입 active |
 | proposal | `sp.status='approved'` ∧ 약국 협력사업 `status='active'` ∧ 약국의 해당 약국 협력사업 가입 active ∧ (`target_organization_id IS NULL` ∨ = 약국) |
 | event | OPL `service_key='neture-event-offer'` ∧ `status='approved'` ∧ `is_active` ∧ 기간 내 ∧ 운영 조직 → 약국 협력사업 active ∧ 약국 가입 active |
-| recruitment | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 약국 협력사업 가입 active ∧ `supply_unit_price IS NOT NULL` |
+| recruitment (협업체 대상) | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 약국 협력사업 가입 active ∧ `supply_unit_price > 0` |
+| recruitment (일반 공개, 2026-10-21 보완) | 기존 `recruitmentPublicMatch()` 분류 ∧ `status='recruiting'` ∧ 선택 약국 조직의 application `approved` ∧ 명시된 `supply_unit_price > 0`. 협업체 가입·기본가·수취 주체를 추정하지 않음. §6-2 참조 |
 
 - 미가입 · 미승인 · 정지 · 종료 약국 협력사업 항목은 전체 탭 · 검색 · 상세 · 주문 API 어디에도 나오지 않는다(상세는 404 `SUPPLY_OPTION_NOT_AVAILABLE`).
 - 출처 탭·약국 협력사업 필터(`source=all|default|proposal|event|recruitment|sf:<key>`)는 접근 집합을 만든 **뒤** 거른다. 기존 통합 조회·필터와 회귀 테스트의 실제 범위를 먼저 확인한 뒤 필요한 화면 구획과 검증을 보완한다.
 - 가격 비교 · 최저가 자동 선택 · 경고 없음. 응답은 공급 경로 · 공급자 · 조건 · 단가를 그대로 보여준다.
 
-API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET .../supply-options/:kind/:id`.
+API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&business=&recruitment=&q=&page=` · `GET .../supply-options/:kind/:id`. 선택적 `business`는 공급 종류와 독립된 협업체 필터, `recruitment`는 승인된 모집에서 넘어온 단일 모집 필터다. `source=sf:<key>` 기존 URL도 유지한다.
 
 ---
 
@@ -276,6 +281,24 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 - 매장 소유권·가입·게시 상태는 서버가 검사한다. 매장 전환 시 화면 상태를 다시 만들고, 제품 API의 토큰 갱신 재시도는 최초 요청의 선택 매장 헤더를 유지한다. 사업 탭이나 선택 매장 헤더 자체를 권한 근거로 사용하지 않는다.
 - 상위 메뉴는 홈·내 매장·이용 사업·설정이다. 남아 있는 서비스별 업무 도구는 설정에서 접근한다. `/work/kpa-society/store/*` 및 PharmacyHub commerce의 제거는 별도 legacy 작업이다.
 
+2026-10-22 일상 업무·대시보드 상태 보완:
+
+- 다국어 상담은 같은 상담의 양방향 마지막 입력·번역만 화면 메모리에 유지한다. 고객 화면에서 답변 입력으로 이동할 수 있고 자동 번역·영구 이력 저장은 하지 않는다. 새 상담·언어/모드·계정/매장 변경·화면 이탈에서 초안을 폐기한다.
+- 원본 갱신 사본의 기존 사용처 조회는 부분 집계다. `coverage`의 태블릿 블록/영상 미집계와 POP 근사를 함께 표시하며 0을 전체 미사용으로 단정하지 않는다. 실패 재조회는 자료 선택을 보존한다.
+- 위치별 저장 설정에서 대상 QR/태블릿을 선택해 기존 배치/교체 패널로 연결한다. 현재 매장·서비스·목록의 대상 일치를 확인하고 같은 mount의 현황으로 복귀한다. 이동 state는 권한 근거가 아니다.
+- 대시보드 `/store-hub/live-signals`는 기존 숫자 4개와 경로·인증·집계 SQL을 유지하고 항목별 `availability`를 추가한다. 주문/상담은 `available|unavailable`, 출처가 없는 판매/설문은 `not_supported`다. 매장 문맥 미확인·DB 오류·잘못된 결과를 확인된 0건으로 취급하지 않는다. Store는 상태 없는 구버전 응답도 미확인으로 표시하고 정상 항목을 유지한 채 실패 항목을 재조회한다.
+
+
+### 6-2. 협업체별 업무 가시성과 같은 주문 흐름 (2026-10-21)
+
+근거 작업: [협업체별 상품·주문·컨텐츠 TODO](../work-orders/TODO-O4O-STORE-COOPERATION-WORKFLOWS-V1.md). 이 절은 이번 Store/Neture 로컬 개발 계약이며 운영 적용 완료를 뜻하지 않는다.
+
+- 상품·거래는 기존 상품 주문 목록을 시작점으로 사용하고 상품 주문·내 취급상품·주문 내역·판매처 모집을 간단한 업무 버튼으로 연결한다. 약국 공급 메뉴가 없는 매장은 기존 취급상품 시작점을 유지한다. 매장 컨텐츠에는 제공 자료·내 컨텐츠 입구를 노출한다. 기존 URL·capability와 네 주요 목적지는 유지한다.
+- 가입 탭의 근거는 선택 약국의 `semi_franchise_memberships` 원장이다. 제품·자료 수가 0이어도 활성 가입 탭을 남긴다. 조회 실패는 재시도, 정상 빈 결과는 해당 협업체에 자료가 없음을 표시한다. 내부 서비스 문맥이나 조합 개인 가입을 약국 사업 가입으로 대체하지 않는다.
+- 상품 주문의 `business`와 공급 종류 `source`를 독립적으로 유지한다. `business=__public__`는 일반 공개 모집의 화면 필터이며 협업체 키나 신규 가입이 아니다. `orderable`은 같은 공급 SQL로 판정하고, 참여 승인 및 주문 조건이 갖춰진 모집만 동일한 상품 주문→장바구니→주문 확정으로 연결한다.
+- 일반 공개의 분류는 기존 `recruitmentPublicMatch()`를 그대로 사용한다. 특히 협업체 미지정이어도 공급가가 있는 `neture-pharmacy`/`kpa-society` 기존 모집을 공개 모집으로 재분류하지 않는다. §3-6의 당초 신규 협업체 모집 생성 예시는 신규 생성 근거로 쓰지 않으며, [공급자 메뉴 정렬 WO](../work-orders/WO-O4O-SUPPLIER-BUSINESS-INFO-AND-MENU-ALIGNMENT-V1.md)의 신규 협업체 모집 종료와 기존 읽기·참여 계약을 유지한다.
+- 일반 모집 생성 화면은 현재 공급가를 입력하지 않는다. 공급가 없는 기존/신규 일반 모집은 표시·참여 신청은 유지하고 **주문 조건 확인 필요**로 안내한다. 소비자가·SPO 기본가를 공급가로 바꾸지 않는다. 공급가 입력·확정 계약은 공급자 후속 작업이며 실 PG·정산·수취 주체 확정도 이번 범위가 아니다. 공개 모집의 미확정 receiver는 공급자별 미확정 그룹으로 구분하고 기존 payment-first 경계를 유지한다.
+- 내 컨텐츠의 선택적 `business` 조회는 편집 가능한 본문이 아닌 불변 snapshot의 `semiFranchiseKey`를 사용한다. 원본 비공개·가입 종료 이후에도 매장 소유 사본과 과거 주문은 조회한다. 서비스 미가입 매장의 소유 컨텐츠 화면에는 약국 가입 조회를 추가하지 않는다. 계정·선택 약국 변경 뒤 이전 응답이 새 화면을 덮지 않도록 한다.
 
 ## 7. 커뮤니티
 
@@ -357,7 +380,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 | 기준 | 내용 |
 |---|---|
-| Supplier Domain §4 (approval_status = OSA 파생) | OSA 0행 제품은 Neture 운영자 승인이 `approval_status` 를 직접 기록 |
+| Supplier Domain §4 (등록·게시 분리) | 제품 등록 승인은 OSA와 독립이며 기본 공급은 명시적 게시 선택으로 판정 |
 | F8 §7 Checkout Guard | Neture 약국 주문은 §4 판정 + 별도 확정 서비스(`neture_pharmacy_cart`). 기존 3개 strategy 는 무변경 |
 | B2B-ORDER-CONTRACT §13-2 (strategy 가 유일한 서비스 분기점) | Neture 약국 축은 strategy 대신 §4 SSOT 모듈을 쓴다 |
 | F3 Store Layer | `isStoreOwner` 의 `kpa` 키 판정만 교체. 공통 Core 패키지 Public API 무변경 |
@@ -474,6 +497,113 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ---
 
+### 15-4. 공통 제공 기능 판정·최소 관리자 설정 (2026-10-16)
+
+- 협업체의 추가 제공 기능은 운영 조직 `organizations.metadata.serviceFeatures`에 저장한다. 새 테이블·migration·원장은 만들지 않는다. 미설정은 추가 제공 없음이며, 기존 가입·공급·원본/독립 사본 계약은 그대로다.
+- 전체 관리자 기존 사업 생성·수정 화면에 고정 기능 체크를 추가한다. 현재 목록은 `tablet`(태블릿), `multilingual-content`(다국어 상품 콘텐츠)뿐이다. 실시간 통역·전문인 상담·상품 진열 위치 업무가 구현됐다는 뜻이 아니다. 새 사업의 기존 기능 선택은 데이터 변경이며 새 업무 기능은 개발 대상이다.
+- `GET /api/v1/neture/admin/service-features`는 기존 `platform:super_admin` guard로 카탈로그를 제공한다. 기존 생성/수정 API의 `serviceFeatures`는 배열만 허용하고 미지원 키는 400, 중복은 정규화한다. 수정에서 필드 생략은 유지, `[]`는 명시적 해제다. 다른 조직 metadata는 보존한다.
+- `GET /api/v1/neture/pharmacy/service-features`는 기존 로그인·매장 접근 guard가 확정한 조직으로만 판정한다. 무료 초대 직원의 접근은 그대로이며, 유료회원·관리자·협업체 가입이 매장 접근이나 약사 업무 권한을 새로 부여하지 않는다.
+- 공통 판정기는 해당 약국의 기본 승인 active ∧ 해당 협업체 가입 active ∧ 사업 active인 제공 목록을 합친다. 기능은 중복하지 않고 제공 출처는 보존한다. 한 출처가 종료돼도 다른 유효 출처가 있으면 이용 가능하다. 별도 캐시 없이 요청마다 현행 원장·설정을 읽는다.
+- 개인회원 유료 원장은 확인되지 않았다. 기존 `store_paid_feature_entitlements`는 조직 단위이므로 개인회원 자격으로 재해석하지 않는다. 서버의 `MemberFeatureResolver(ownerUserId)` 연결점만 제공하며 HTTP의 유료 상태·기능 목록은 받지 않는다. 기본 응답 `memberEntitlement='not-connected'`이고, 협업체 제공이 없는 기능의 `allowed=null`은 **확인 미완료**다. 연결된 회원 원장이 없다고 미가입/무료로 판정하지 않는다. 협업체 제공이 확인되면 `allowed=true`는 확정할 수 있다.
+- 조회/설정 해석 실패는 503 `FEATURE_ACCESS_UNAVAILABLE`이며 빈 목록·미가입으로 바꾸지 않는다. 공통 `require()`는 모든 출처를 확인한 뒤에만 403을 반환하며 개인회원 미연결 시 필요한 기능을 확인할 수 없으면 503을 반환한다.
+- 이번 범위는 판정 API·관리자 설정이다. 내 매장 메뉴·기존 실행 endpoint의 전면 gating은 별도 담당이 연결한다. 기존 정상 기능을 새 설정 부재로 차단하지 않는다. 소비처는 판정 API의 `allowed === true`만 허용으로 사용하고 `null`을 이용 불가 안내가 아닌 연결/확인 미완료로 처리해야 한다. 전문인 자격·직원 작업 범위·자료 접근 guard는 독립적으로 유지한다.
+
+구현·검증·인계: [CHECK-O4O-PHARMACY-SERVICE-FEATURES-V1](../checks/CHECK-O4O-PHARMACY-SERVICE-FEATURES-V1.md).
+
+### 경영자 회원 유료 자격 기준 정정 (2026-10-16)
+
+유료 자격은 매장이 아닌 경영자 회원에게 귀속한다. 공통 판정은 접근 승인된 내 매장의 현재 `organization_members` owner(`left_at IS NULL`)를 조회하여 해당 경영자의 회원 유료 자격을 확인한다. 초대 직원은 무료회원이어도 그 매장의 제공 기능을 이용하며, 직원 개인의 유료 자격은 해당 매장 기능에 영향을 주지 않는다. 타 매장 경영자의 자격도 전파하지 않는다. 경영자 관계가 없거나 복수여서 확정할 수 없으면 503으로 반환한다. 기존 내 매장 접근 승인과 소속 매장 범위 검증은 그대로 필요하다.
+
+실제 경영자 회원 유료 원장 연결은 미완료이며, 매장 단위 이용권으로 대신하지 않는다. `MemberFeatureResolver(ownerUserId)` 연결 시 위 기준으로 조회한다. 미연결은 무료 판정이 아닌 확인 미완료 상태를 유지한다.
+
+### 15-5. 관리자 설정의 내 매장 적용·경영자 회원 원장 (2026-10-16)
+
+§15-4의 초기 단계(미연결 adapter·내 매장 미적용)를 이어 구현한다. 초기 구현은 협력사업별 별도 코드 분기 없이 `/admin/semi-franchises`를 독립 메뉴로 제공했다. 2026-10-21 현재 관리자 배치는 §15-7의 약국 서비스 설정 통합을 따른다. 동일 관리 화면은 전체 관리자 앱 및 Neture 호환 wrapper가 공유한다.
+
+- **회원 유료 원장**: `member_paid_service_entitlements`는 회원당 1행으로 `active`, 선택 만료일 `ends_at`, 최종 수정 관리자·시각만 관리한다. Core User·서비스 가입/역할·기존 매장 구독 원장을 바꾸지 않는다. 전체 관리자가 정확한 이메일로 회원 조회 후 활성·해제한다. 실제 결제 수납·자동 유료 전환은 포함하지 않는다. 만료는 `ends_at > NOW()`일 때만 유효하며 NULL은 기한 없음이다.
+- **회원 관리 API**: `GET /api/v1/neture/admin/member-paid-entitlements?email=...`, `PUT /api/v1/neture/admin/member-paid-entitlements/:userId`(`active:boolean`, `endsAt:ISO timestamp|null`). 기존 platform super admin guard를 적용한다. 클라이언트는 기존 API base(`/api/v1`)를 재사용한다.
+- **공통 판정**: 접근 guard가 확정한 약국의 현재 경영자 관계를 읽고 그 회원의 유료 원장을 조회한다. 유료 제공 기능은 §15-7의 관리자 설정을 따르며 미설정 시 기존 두 기능을 유지한다. 기본·협력사업 제공 기능과 합산하고 직원에게는 경영자 허용 범위를 함께 적용한다. 직원 개인 유료 자격은 사용하지 않는다. 원장 조회 오류/경영자 관계 미확정은 503이며, 정상 조회에서 행 없음·해제·만료만 미제공으로 본다.
+- **태블릿**: 공통 및 KPA 관리 API, 기기 직원 runtime, pairing, 공개 태블릿 정보·콘텐츠 실행 경로에 같은 약국 기능 판정을 적용한다. 기존 매장/기기 접근 guard를 먼저 유지한다. 비약국 조직의 기존 규칙은 변경하지 않는다.
+- **다국어 상품 콘텐츠**: 신규 제작·가져오기·편집 및 제공 원본 HUB는 기능 자격을 확인한다. 이미 보유한 독립 사본 읽기·이미 발행한 공개 QR 열람은 유지한다. 자료를 삭제하거나 탈퇴 시 자동 회수하지 않는다.
+- **내 매장 UI**: 공통/서비스 지정 layout에서 태블릿 메뉴 및 대상 URL 진입에 서버 판정을 적용한다. 다국어 HUB/상품별 편집 진입도 확인하며 보유 사본 목록은 유지한다. 매장 변경·경로 이동·창 복귀 시 재조회하고, 이전 조직/요청 결과를 재사용하지 않는다. 오류는 확인 실패·재시도로 안내한다. 서버 API는 매 실행마다 재검증하므로 열린 화면도 기능 권한을 우회하지 않는다.
+- 운영 적용은 별도 통합 담당이 신규 incremental migration(1792137600000)을 정상 migration job으로 먼저 적용한 뒤 API·관리자·내 매장 웹을 반영한다. 이번 작업의 종료점은 코드·문서·검증·push이며 운영 DB 변경/배포를 실행하지 않는다.
+
+구현·검증·인계: [CHECK-PHARMACY-FEATURE-APPLICATION-V1](../checks/CHECK-PHARMACY-FEATURE-APPLICATION-V1.md).
+
+
+### 15-6. megapharm 공통 사업 구조와 직원 현장 지원 (2026-10-16)
+
+- `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
+- pharmacy·megapharm·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 기존 `kpa-society` handoff 대상은 pharmacy 호스트에서만 교환하는 고정 이동 alias로 수용하며 최종 세션은 neture다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
+- `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
+- `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
+- 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
+- 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. 현장 고객 요구의 월별 집계는 전체 관리자 설정 화면에서 노출하지 않는다(2026-10-21 관리자 설정 통합). 기존 수집·저장과 관리자 API의 인증 경계는 보존하며, 서비스 운영자용 조회는 자기 사업/매장 범위를 확인하는 후속 작업이다. 다른 사업/매장 집계를 공유하는 권한을 추가하지 않는다.
+- 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 megapharm 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
+
+검증·운영 설정 인계: [CHECK-MEGAPHARM-STAFF-SUPPORT-V1](../checks/CHECK-MEGAPHARM-STAFF-SUPPORT-V1.md).
+
+### 15-7. 대상별 서비스 설정과 My Home 근무자 허용 (2026-10-18)
+
+전체 관리자 메뉴 `약국 서비스 설정`(`/admin/pharmacy-service-settings`)에서 **대상 → 제공 기능 선택**으로 관리한다. 대상은 기본 제공·유료회원·기존 등록 협력사업이다. 2026-10-21 사용자 승인으로 `약국 협력사업` 독립 메뉴를 제거하고 같은 설정 화면에 통합한다. 사업 추가 버튼으로 등록창을 열고, 협력사업 가입자 대상을 선택하면 사업 정보(이름·상태·가입 조건·추가 연결 설정)를 접어서 표시한다. 기능 편집은 기능 설정 한 곳에서만 한다. 운영자 지정·과거 개별 담당 관리 경로는 기존 `/operators`로 모으며, 사업 추가가 서비스별 새 화면이나 권한 분기를 만들지 않는다.
+
+- 첫 화면은 `기능 설정`, 두 번째 탭은 `회원 이용 자격`이다. 대상은 기본 제공(전체 약국)·유료회원·등록 협력사업의 가입자이며, 사업 등록만으로 기능이 자동 제공되지 않는다. 구 `/admin/semi-franchises` 주소는 query를 보존해 통합 주소로 이동한다. 연합회 기존 조회·운영자 관리 연결은 통합 화면에 유지하며 개별 조합 운영 권한을 새로 부여하지 않는다.
+- 회원 이용 자격은 정확한 이메일로 회원을 조회하고 기존 유료 활성/해제·만료일을 수정한다. 읽기 전용 조회에서 현재 경영자로 연결된 약국, 가입 상태, 공통 runtime 판정의 기능 제공 근거를 표시한다. 미승인 약국·조회 실패는 제공 기능 0건과 구분하며 전문인 확인을 대신하지 않는다. 금액별 유료 등급·결제 자동화는 추후 작업이다.
+- 기본/유료 정책은 기존 `settings`의 `pharmacy-service-features:default` / `pharmacy-service-features:paid`에 `{features,updatedBy}`로 저장한다. 미저장 기본은 `[]`, 미저장 유료는 기존 `tablet`·`multilingual-content`다. 저장된 `[]`는 명시적 제공 해제다. 잘못된 저장값·조회 실패는 503이며 미설정 기본값으로 덮지 않는다.
+- 사업 제공 기능은 기존 운영 조직의 `metadata.serviceFeatures`를 재사용한다. 관리 API `GET /neture/admin/service-feature-policies`, `PUT /neture/admin/service-feature-policies/:target`은 `platform:super_admin` 전용이다. target은 `default`, `paid`, `business:<등록 key>`이며, 기존 사업 수정 경로의 제공 기능 변경도 같은 전체 관리자 권한을 요구한다.
+- 약국의 기능은 기본 + 활성 협력사업 + 현재 경영자 회원 유료 제공 기능의 합집합이다. 유료/무료만 구분하며 약국 규모·협력사업 미가입 조건·유료 등급은 추가하지 않는다. 자격 하나가 끝나도 다른 제공 자격은 유지한다. 수납·자동 갱신·중복 결제/환불은 이 설정 작업 범위가 아니다.
+- 근무자의 실제 기능은 약국 기능과 경영자 허용의 교집합이다. My Home의 기존 직원 관리에서 최종 승인 시 선택하고 승인 후 수정한다. 기존 `organization_members.metadata.pharmacyServiceFeatures`만 추가 사용한다. Role·관계·매장 범위를 새로 만들거나 넓히지 않는다.
+- 미설정 기존 직원은 이전 세 기능 허용을 보존하며 미래 기능을 자동 허용하지 않는다. 신규 승인 시 허용 목록을 기존 Role 발급과 같은 트랜잭션으로 저장한다. 구 UI의 승인 요청에 목록이 없으면 전문인 확인이 필요한 기능을 제외한 승인 당시 약국 이용 목록을 저장한다. 명시적 `[]`도 유효하며 재초대는 과거 설정을 초기화한다.
+- 직원 수정 `PUT /neture/pharmacy/staff-feature-permissions/:userId`은 현재 매장 경영자만 가능하다. 현재 약국의 이용 범위 밖 기능, 다른 매장 직원, 경영자 관계 자체의 변경을 거절한다. 메뉴·직접 URL·직원 로그인 실행 API는 같은 공통 판정을 사용한다. 계정·매장 변경과 창 복귀 시 이전 결과를 재사용하지 않는다.
+- 공개 태블릿·기기 토큰은 기존 매장 자격을 유지하고 직원 로그인 runtime은 개별 허용도 검사한다. 공용 기기의 직원 식별은 후속 설계다. 보유 독립 사본·발행 공개 QR·사업 비공개 원본의 기존 접근 계약은 유지한다.
+- 설정 기반 도입 시 카탈로그는 실제 구현된 세 기능이었다. 문장 단위 다국어 상담·직원 응대·약사 사용 확인은 §15-8로 확장한다. 기능 이용권이 전문인 자격을 만들지 않는다.
+
+작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-SERVICE-POLICY-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-SERVICE-POLICY-V1.md). 운영 설정·배포는 이번 push 범위에 포함하지 않는다.
+
+### 15-8. 내 매장 상담·다국어와 현장 실행 (2026-10-24 사용자 확정)
+
+내 매장 매장 운영은 상담·고객·진열 화면의 준비와 연결을 담당한다. 실제 직원 상담은 `/consultation/staff`, 매대 고객 화면은 `/consultation/customer`, 진열 화면은 `/tablet/:slug`에서 관리 헤더 없이 실행한다. 기존 `/store/multilingual-consultation`과 서비스 지정 Store 경로는 같은 독립 상담 화면으로 연결한다. 아래 세 기능 중 하나라도 허용되면 상담 입구에 진입하며 각 실행은 해당 기능을 다시 확인한다. 기존 서비스 공개 태블릿 URL·인쇄 링크도 유지한다.
+
+| 기능 key | 모드 | 범위 |
+|---|---|---|
+| multilingual-consultation | 매대 약사 상담 | 약사가 입력한 문장과 고객 발화의 양방향 번역 |
+| multilingual-staff-response | 매장 직원 응대 / 매대 직원 안내 | 매장 직원은 고객 발화 번역·고정된 안내/약사 연결 문구. 매대 직원은 입력·음성 문장 번역을 병행하며 의료 답변을 생성하지 않음 |
+| multilingual-pharmacist-consultation | 매장 약사 상담 | 매장 현장에서 사용하는 약사 문장 번역, 같은 번역 엔진·PC/모바일 화면 재사용 |
+
+- 세 기능은 기존 관리자 기본/유료/협력사업 선택 목록과 My Home 직원 허용에 등록한다. 약국 규모·도메인·특정 사업 key 조건을 추가하지 않는다. 기존 유료 미설정 두 기능과 기존 직원 호환 세 기능에 새 상담을 자동 추가하지 않는다. 운영에서 제공 대상을 정해 선택해야 한다.
+- 문자 입력·영어/중국어/일본어/베트남어/태국어/인도네시아어와 한국어 양방향 번역이다. 한국어 선택은 외부 AI를 호출하지 않고 확인한 문장을 사용한다. 고객에게 크게 보여주기·새 상담/내용 지우기를 제공한다. 사용자 후속 답변에 따라 첫 버전에 브라우저 음성 입력·번역문 읽어주기를 포함한다. 자동 의료 답변·약 선택/복용 판단·상담 이력·QR 자가 상담은 포함하지 않는다.
+- 약사 모드는 `requiresProfessional`로 표시한다. 사용 확인은 사용자 결정에 따라 경영자가 My Home에서 해당 직원이 약사임을 확인하고 기능을 허용하는 방식이다. 경영자 본인은 같은 My Home에서 본인 사용 확인을 저장할 수 있다. 이는 공식 면허 검증 표시가 아니며 해당 약국의 경영자가 남긴 확인만 읽는다. 기존 KPA 개인 면허 테이블을 읽어 확인을 대신하지 않는다(2026-10-22, 사업 독립 정비 D8). 별도 중앙 면허 심사/직원 등급 체계를 추가하지 않는다. 유료·협력사업 가입 또는 소유 관계만으로 약사 사용을 허용하지 않는다.
+- 약국별 확인은 기존 `organization_members.metadata.pharmacyPharmacistConfirmed` boolean이다. 직원의 허용 기능과 확인은 동일 UPDATE, 최종 승인 때는 기존 Role 발급과 같은 트랜잭션으로 저장한다. 실제 owner만 양성 확인을 남길 수 있고 직원 본인 확인 우회는 거절한다. 재초대는 이전 개별 기능·확인을 초기화한다. 새 자격/role/면허 검증 원장은 만들지 않는다.
+- API: `GET /neture/pharmacy/multilingual-consultation/context`, `POST /neture/pharmacy/multilingual-consultation/translate`, `PUT /neture/pharmacy/pharmacist-confirmation`. 기존 인증·약국·owner/staff 접근과 선택 조직을 사용한다. 번역 body는 mode/language/direction과 text 또는 직원용 phrase key다. client user/organization/약사 주장으로 자격을 만들지 않는다.
+- 매장 공간의 비전문 직원(`floor-staff`) 응답은 서버가 가진 짧은 안내 문구만 사용한다. 자유 입력 text를 이 모드의 outgoing 직원 응대에 넣으면 거절한다. 매대 직원(`counter-staff`)은 기존 직원 응대 기능 아래 문자·음성 입력을 번역하며 약사 권한을 부여하지 않는다. 약사 연결 안내를 기본 제공하며 증상 판정·의약품 추천을 생성하지 않는다.
+- 음성 입력은 마이크 버튼을 누른 경우에만 시작하며 고객 방향은 선택 언어, 직원 방향은 한국어다. 입력 문장을 확인·수정하고 명시적으로 번역한다. 매장 직원의 outgoing 고정 문구에는 마이크를 제공하지 않는다. 읽어주기도 번역 결과/고객 화면에서 버튼으로 시작·중지하며 해당 방향의 번역 언어를 사용한다. 새 기능 key·별도 이용권을 추가하지 않는다.
+- 음성은 브라우저 Web Speech API를 사용한다. 브라우저/기기별 언어·API 지원이 다르며 마이크 권한 거절·무음·음성 미설치·재생/네트워크 오류는 안내하고 문자 상담을 유지한다. 음성 인식/읽어주기는 브라우저 서비스로 음성/문장이 전달될 수 있으며 클릭 전에 안내한다. O4O의 음성 파일 업로드/보관이나 새 음성 provider·인프라는 추가하지 않는다. 기기 간 현재 전달 상태는 아래의 별도 상담 도메인을 사용한다.
+- 계정·매장·언어·모드·방향 변경, 새 상담·화면 종료·백그라운드 전환은 인식과 재생을 중지하고 늦은 음성 이벤트를 폐기한다. 번역 중에는 마이크 입력을 시작하지 않으며 인식이 끝난 뒤 번역한다. 음성 인식 문장도 1,000자로 제한하고 기존 번역 API와 같은 검증을 따른다.
+- AI는 기존 Core Extension `pharmacy.consultation.translation`과 CONTENT_TRANSLATION 정책·플랫폼 부담·사용량/한도를 재사용한다. JSON plain-text 응답만 사용하고 입력 1,000자·출력 4,000자 이하, 언어·방향·출력 형식을 검증한다. 숫자 값과 통용 단위의 추가/누락/변경을 차단하되 번역의 의학적 정확성을 보증하는 판정으로 사용하지 않는다. 사람이 원문과 결과를 확인한다.
+- 매 실행 전후에 매장 Role/관계·제공 기능·개별 허용·약사 사용 확인을 재검사한다. 호출 중 회수된 권한으로 결과를 반환하지 않는다. 확인/원장 조회 오류는 503, 정상 자격 미충족은 403, AI 한도 초과는 429로 구분한다. 별도 사용자별 분당 요청 제한은 보조 수단이며 기존 quota를 대신하지 않는다.
+- 한 기기의 원문·번역 초안은 현재 화면 메모리에만 두고 계정/매장/모드 전환·새 상담·pagehide 때 비운다. 언어 수정은 입력·상품 선택을 유지하며 이전 언어의 준비 결과만 비운다. 같은 상담의 방향 전환은 양쪽의 마지막 입력·결과를 보존한다. 음성 파일·상담 문장을 로그·Local/Session Storage·AI Task/Memory에 저장하지 않는다. 기존 AI 사용량 이력에는 actor/모델/토큰/상태 metadata만 남긴다.
+- 관리자 앱의 약국 서비스 설정에서 약국별 `organizations.metadata.consultationLayout = standard|large`를 선택한다. 일반형은 매대 약사/고객, 대형은 매장 약사/일반 직원의 공용 한 화면과 매대 직원/고객의 두 화면을 제시한다. 이 값은 화면 배치 기본값이며 Role·제공 기능·개별 허용·약사 확인과 독립적이다. 협력사업 운영자에게 전체 관리자 설정 권한을 확대하지 않는다.
+- 매장 공간은 고객/직원 말하기와 4개 빠른 안내를 먼저 제공하고 입력은 보조로 둔다. 매대는 문자·음성을 함께 제공한다. 말하기 버튼은 발화 순서를 정하며 직원 인증을 대신하지 않는다. 상품·위치는 현재 매장의 활성 상품과 게시된 자료만 이용한다. 일상 요청은 명시한 업무와 짧은 요청의 단서로 상품 찾기·위치·게시 설명·약사 안내를 구분하며 부족한 정보 하나를 확인한다. 자동 의료 답변은 추가하지 않는다.
+- 매대 두 기기는 자리별 1회 코드(10분, 새 코드/새 상담/종료 시 이전 코드 폐기)로 연결한다. 고객 기기는 별도 무작위 토큰을 보관하고 서버는 해시만 보관한다. 로그인·진열 기기 토큰과 혼용하지 않는다. 고객 API는 쿠키/직원 Bearer 없이 POST capability 조회/답변만 허용한다. 공개 화면은 Auth/Store Provider 밖에 있고 직원의 비공개 업무 API를 사용하지 않는다.
+- `store_consultation_stations`는 매장/자리당 현재 담당자·상담 세대·마지막 번역(방향별)·공유 안내·미확인 고객 답변·연결 상태 1행만 보관한다. 고객에게는 직원이 명시적으로 공유한 내용만 전달한다. 새 상담/종료는 현재 문장·공유·답변을 비우며, 세대 비교와 원자 갱신으로 이전 응답·중복 claim·답변 덮어쓰기를 거절한다. 직원 접근·기능·약사 확인은 고객 조회/답변에서도 재검사한다.
+- 직원 창이 닫히거나 연결이 실패하면 고객 화면은 안내를 가린다. 서버는 담당 화면의 응답이 90초 이상 없으면 고객에게 대기 화면을 반환한다. 이는 연결 상태의 보호 시간이며 상담 시간 제한·영구 이력 보존/파기 정책이 아니다. 명시 종료 없이 닫힌 현재 DB 상태는 다음 새 상담에서 덮어쓰며 별도 자동 시간 삭제 작업은 없다. 영구 상담/AI 이력은 후속 계약으로 남긴다. 개인정보 입력을 피하도록 안내한다.
+- 기기 간 전달용 migration은 운영 반영 전 별도 승인을 받은 통합 담당자가 정상 migration job으로 적용한다. 코드·격리 검증·push가 운영 DB 적용/배포 완료를 의미하지 않는다. 이번 현장 실행 작업: [TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-TABLET-WORKSPACE-V1.md), [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-TABLET-WORKSPACE-V1.md).
+
+#### 15-8-1. 상담 업무·자료 기반 보조 (2026-10-24)
+
+- 네 빠른 업무는 상품 찾기·위치 안내·제품 설명·약사에게 안내다. 상품 선택과 마지막 질문은 현재 상담 문맥으로 유지한다. 약사 안내는 실제 호출/배정의 완료 표시가 아니다. 기존 약사/직원 기능 판정·약사 사용 확인을 사용한다.
+- 위치·고정 안내는 7개 언어 문구로 즉시 처리하며 위치 등록값·상품 이름은 원문 식별을 유지한다. 한국어 위치 메모의 번역은 명시 요청일 때 기존 상담 번역기로 준비한다. 고객 화면 조작 문구도 표시 언어를 따른다.
+- 설명은 현재 매장의 활성 상품에 연결된 공개 키가 있는 비보관 그룹의 게시 페이지만 읽는다. 기존 공개 resolve의 요청 언어 → 영어 → 기본 언어 → 한국어 순서를 같은 순수 함수로 사용한다. 실제 언어·출처·대체 여부를 명시하고 원문 링크에도 요청 언어를 보존한다. 텍스트가 없는 이미지/특수 형식 자료는 게시 원문으로 연결한다.
+- 기본 결과는 첫 게시 문단으로 짧게 제시한다. 사용자가 요청하면 `pharmacy.consultation.guidance` 읽기 Extension이 질문과 게시 자료에서 관련 문단 ID를 최대 3개 선택한다. 서버가 실제 문단을 그대로 구성한다. 임의 답변·새 복용량·진단·상품 추천을 생성하지 않는다. 일반 직원도 기존 허용 자료만 열람하며 자유 outgoing 문장의 고정 문구 제한은 유지한다.
+- 보조 Extension은 기존 Core 실행기와 `PRODUCT_CONTENT`의 상품 콘텐츠 모델 선택·플랫폼 부담·quota/회계를 사용한다. 상담 번역의 `pharmacy.consultation` 사용처는 최신 main의 독립 모델 선택을 유지한다. 새 Core/provider/Memory·모델 설정 원장은 만들지 않는다. 상담 질문을 공통 `/api/ai/query`나 개인 질문 이력에 저장하지 않는다.
+- 선택 언어 자료가 없으면 원문 언어를 표시한다. 한국어 게시 문단은 사용자 요청으로 기존 번역기를 거쳐 직원 확인 뒤 공유할 수 있다(1,000자 이하). AI로 선택한 문단은 현재 자료 버전·문단 ID를 재검증하여 그대로 번역하고 AI를 재호출하지 않는다. 기존 번역 계약이 지원하지 않는 언어 쌍은 숨은 다중 호출로 우회하지 않는다. 원문·번역 여부·대체 언어는 화면에서 구분한다.
+- 상담 중 언어 수정은 같은 상담 세대·기기·미확인 답변을 유지하고 예전 언어의 공유·준비 결과를 비운다. 고객의 미전송 답변은 원래 입력 언어와 함께 유지한다. 언어 변경 전 결과는 다시 준비해야 하며 모드는 종료 후 바꾼다.
+- 공유 전 현재 역할/기능·상품 활성·게시 자료 버전을 확인한다. 두 기기는 서버 발급 결과 ID로 공유하며 원문이 바뀌거나 비공개가 되면 거절한다. 이미 전달한 자료도 다음 고객 조회에서 현재 자격·게시 상태를 재검사하여 가린다. 한 화면의 고객 dialog도 표시 직전에 비용 없는 원문 재검증을 한다.
+- 기존 상담 행의 현재 준비/공유 JSON만 사용하고 새 schema·장기 이력은 추가하지 않는다. 본문과 질문은 로그·브라우저 저장소·AI Task/Memory에 기록하지 않는다. 이번 개발·검증: [TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md), [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md). 실계정·실제 기기/번역 품질·운영 적용은 개발 완료와 구분한다.
+
+작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md). 실제 외부 AI·실계정·운영 제공 정책·배포 검증은 실행 결과와 구분한다.
+
+
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
@@ -553,6 +683,8 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 2. §16-7 1단계 리다이렉트 적용 · 검증(인쇄 QR 경로 보존). 이후에도 **pharmacyhub.co.kr 도메인 · DNS · 인증서는 리다이렉트를 위해 계속 유지**한다(인쇄 QR 이 남아 있는 한).
 3. 남은 PH `CREATED` 결제 정리 · 진행 중 PH opt-in 주문 종료 확인(§16-5) · 이용 안내 문구 이전(§16-6, 운영자 편집).
 4. 그 뒤 §16-7 2단계(호스트 전체 리다이렉트) → PH web 서버(`pharmacy-hub-web`) · PH 고정 spec 정리. 도메인 · 인증서 해지는 인쇄 QR 폐기 판단 이후 별도.
+
+> **2026-10-16 후속 변경:** 아래 PH 비교·정리 위험 중 `service_keys`가 비면 기본 공급으로 노출된다는 전제는 [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)로 대체한다. 현행 기본 공급은 명시적 `default_supply_enabled`를 사용한다. PH 폐기 판단·주문 보존 경계는 유지한다.
 
 ### 16-5. 공급자 opt-in 배송 (PH 전용) — 조사 결과
 
@@ -681,3 +813,41 @@ pathRules:
 - kpa-society `service_memberships` 가 active 이면 기존 경로 그대로(약국 협력사업 조회 0). 기존 kpa-society 가입 · `kpa:store_owner` 를 Neture 자격으로 **재해석하지 않는다**. 판정은 membership · role 을 만들지 않는다(읽기만).
 - 미충족은 상태별 `next`(`apply_pharmacy` · `pharmacy_pending` · `pharmacy_suspended` · `apply_semi_franchise` · `semi_franchise_pending` · `semi_franchise_suspended`) + 안내 문구 + 신청 링크(store.neture.co.kr `/start-pharmacy` · `/store/pharmacy/semi-franchises`, 정지는 링크 없음).
 - 포럼은 사업 서비스 가입과 구분한다. 옛 pharmacy `/forum/*`는 community의 독립 약사 커뮤니티로 연결하며, 사업 회원 포럼은 별도 community_key와 해당 사업 가입을 검사한다(§7).
+
+## 2026-10-18 보완 — 네 약국 협업체 운영자 지정
+
+사용자가 전체 관리자 화면에서 pharmacy·carepharm·megapharm·pharmcoop 각각 Admin과 Operator를
+지정하도록 요청했다. 네 대상은 여전히 사업 식별자이며 별도 `service_memberships` 서비스가 아니다.
+`neture:{사업키}_admin/operator` 역할로 해당 사업만 운영한다. 기존 Neture 전체 역할을 복제하지 않는다.
+`pharmcoop` 역할은 연합회 산하 조합관리 범위다. 연합회 admin은 조합 최종 결정과 조합 admin 지정·해제를, operator는 조합 신청 검토·보완을 맡는다.
+개별 조합의 사업·회원관리는 `cooperative_roles`의 조합별 admin/operator 배정을 요구하며 연합회 역할을 상속하지 않는다.
+위의 기존 `neture:operator/admin` + 활성 담당 관계 방식은 비조합 사업에만 유지한다.
+상세 회원관리·권한 정책은 [협동조합 권한 설계](DESIGN-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md)를 따른다.
+신규 사업 자동 생성·기존 가입 승인·약국 소유권·참여 가입 동기화는 하지 않는다.
+정상 계정·이메일 확인·Neture 명시 정지/탈퇴 차단과 매 요청 역할 유효기간 확인을 유지한다.
+역할 목록은 [RBAC 카탈로그](../rbac/RBAC-ROLE-CATALOG-V1.md#약국-협업체-운영자-지정--2026-10-18),
+구현·검증은 [WO](../work-orders/WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1.md)를 따른다.
+
+### 15-9. 사업 운영 도구와 사업별 약관 (2026-10-22)
+
+- 담당 사업의 기존 운영 화면에 ‘현장 요구 · 사업 약관’을 둔다. 별도 관리자 메뉴나 범용 정책 엔진은 추가하지 않는다. 월별 세 항목(위치를 못 찾음·미취급 상품 요청·약사 연결)은 기존 매장 공통 집계다. 해당 사업의 현재 활성 가입 및 약국 승인 active 매장만 조회하며, 복수 가입 매장의 수치를 사업 독점 실적으로 보지 않는다. 조회·권한 오류는 빈 집계로 대체하지 않는다.
+- 법정정보·약관은 기존 service_legal_profiles/service_policy_documents/user_policy_acceptances를 재사용하고 저장 범위는 `business:<semi_franchises.id>`(45자)다. URL의 사업 키로 활성 사업을 찾은 뒤 서버가 범위를 고정한다. 사업 담당 operator는 조회만, 해당 사업 admin만 수정·게시한다. 개별 조합은 자기 cooperative_roles의 admin을 따르며 연합회·다른 사업 권한으로 우회하지 않는다.
+- 공개 푸터·약관 페이지·참여 동의는 해당 사업 문서만 읽는다. 일반 서비스 API의 관리 범위를 넓히지 않는다. 새 사업은 동일 버전의 게시된 이용약관·개인정보 안내 및 확정된 시행일을 준비해야 신청할 수 있다(사업 첫 버전 1 허용). 문서 미설정·부분 게시·버전 불일치는 503, 동의 누락·오래된 문서 참조는 409다. 공통 계정 가입 약관과 사업 참여 동의는 별개다.
+- 신청과 동의 원장·본문 해시·신청별 정책 연결 기록은 같은 트랜잭션으로 저장한다. 기존 가입 조건/추가 신청 내용의 스냅샷도 유지한다. 개별 협동조합의 개인 가입도 같은 사업 범위의 문서를 확인한다. 실제 문안·동의·사업 역할·유료 자격을 자동 생성하지 않는다.
+- 자료 편집의 ‘직원 숙지 자료로 사용’은 기존 `staff-quick-guide` 태그를 선택한다. 나머지 태그를 유지하고 총 20개 제한을 따른다. 게시·활성 사업 가입 여부에 따라 내 매장의 ‘짧게 익히기’에 표시한다. 과제·시험·별도 관리 담당자 체계는 추가하지 않는다.
+
+작업·검증: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md), [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md). 사업 독립 정비 WO 전체의 데이터 삭제·카탈로그/인프라 이름 변경 완료를 뜻하지 않는다.
+
+### 17-3. CarePharm 신청 증빙과 공급·결제 자격 재확인 (2026-10-22)
+
+공통 계정·세션과 사업별 독립 가입·승인 원장은 유지한다. CarePharm 신청은 해당 사업의 게시된 이용약관·개인정보 안내 두 문서의 ID와 버전을 제출하고, 기존 정책 승낙 원장에 본문 hash·승낙 시각을 기록한다. 약관이 준비되지 않았거나 버전이 변경되면 신규·재신청을 거부한다. 기존 active 가입에 자동 정지·재동의를 추가하지 않는다. 약국의 신청·탈퇴는 현재 owner/admin/manager 관계를 서버 transaction에서 확인한다.
+
+약관 저장 공간은 §15-9의 `business:<semi_franchises.id>`이며 인증 serviceKey 신설이 아니다. 담당 사업의 기존 ‘현장 요구 · 사업 약관’ 화면과 사업별 API로 문서를 작성·게시한다. 새 terms/privacy 문서의 가입 정책 표식은 서버가 지정하며 첫 버전 1을 허용한다. 다른 사업의 약관·승인은 대체 증빙이 되지 않으며, 승낙된 과거 문서는 게시 해제 후에도 본문·버전·시행일·표식·제목을 덮어쓰지 않는다.
+
+**2026-10-23 사용자 정정 — 제안 승인과 주문 이후 처리를 구분한다.** 특정 약국 대상 공급 제안 생성·승인 시 해당 협업체의 active 가입을 추가 검사하지 않는다. 기존 약국 원장 존재·공급자 소유권·담당 운영자 권한·제품 등록 승인 검증은 유지한다. 회원 자격은 §4의 상품 노출·장바구니·주문 생성 단계가 판단하므로 비회원에게는 공급이 노출되지 않고 신규 주문을 할 수 없다.
+
+주문 확정은 그룹별로 장바구니·공급 출처·회원 자격 행을 잠근 후 SSOT를 재판정하고, 주문·생성 로그·장바구니 제거·이벤트 예약을 같은 transaction으로 확정한다. 이 시점 이전의 가입 정지/공급 종료는 신규 주문을 거절하며, 주문 commit 이후의 변경은 기존 주문 처리를 막지 않는다.
+
+이미 생성된 주문의 결제 준비·확정에서 협업체 가입 정지/탈퇴나 제안 철회·종료·공급 출처의 현재 제공 가능성을 다시 검사하지 않는다. 주문의 확정 금액·배송조건을 유지하며 재고를 다시 예약하지 않는다. 주문 구매 actor·선택 약국 대응, 현재 계정/매장 접근권한, 계약 동의, 결제 모드·수취 주체·금액·주문/결제 상태·중복 결제 방지·멱등성·배송 이력 검증은 유지한다. 이 정정은 신규 주문 자격이나 로그인·소유권 검증을 완화하지 않는다. 근거와 검증은 [공급자 업무 마감 WO](../work-orders/WO-O4O-SUPPLIER-BUSINESS-CLOSEOUT-V1.md)를 따른다.
+
+변경·격리 PostgreSQL 및 화면 검증·별도 운영 개통 항목은 [통합 TODO](../work-orders/TODO-O4O-CAREPHARM-MEMBERSHIP-SUPPLY-COMPLETION-V1.md)에 기록한다. 실제 약관 문안 확정·사업 등록·담당자 지정·실계정 승인 검증은 코드 배포와 별도이다.

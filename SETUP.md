@@ -19,51 +19,26 @@
 
 ## 테스트 계정 찾기 — 브라우저·운영 검증 전
 
-실제 테스트 계정의 기준 파일은 **`docs/local/TEST-ACCOUNT.txt`** 입니다.
-사용자가 2026-10-11 제공한 `TEST-ACCOUNT.txt` 원문을 그대로 사용합니다. 운영자·관리자·회원 로그인 검증 전에 이 파일을 먼저 확인합니다.
+실제 테스트 계정의 기준 파일은 **`docs/local/TEST-ACCOUNTS.local.md`** 하나입니다 (사용자 결정 2026-10-16).
+리팩터링 이전 테스트 계정은 모두 폐기됐습니다. 운영자·관리자·회원 로그인 검증 전에 이 파일을 먼저 확인합니다.
 서비스에서 같은 운영자 아이디를 사용하더라도 현재 서비스 역할·가입 상태는 로그인 후 별도로 확인합니다.
+로그인·역할 확인 결과는 그 파일의 확인 상태·확인 기록 표에만 남깁니다.
 
-이 파일은 `.gitignore`의 `docs/local/TEST-ACCOUNT.txt` 규칙으로 제외되므로 **새 clone·worktree·Codex Cloud에 자동으로 들어오지 않습니다.**
+이 파일은 `.gitignore`의 `docs/local/*.local.md` 규칙으로 제외되므로 **새 clone·worktree·Codex Cloud에 자동으로 들어오지 않습니다.**
 현재 checkout에 없으면 같은 작업환경의 기준 checkout에 있는 동일 경로를 확인합니다. 거기에도 없으면 파일이 없다는 사실과
 필요한 경로를 알리고, 사용자의 로컬 원본을 승인된 비공개 파일 전달 또는 환경 Secret 연결로 제공받습니다.
 스크린샷에 경로가 보이는 것만으로 클라우드에서 파일 내용을 읽을 수 있는 것은 아닙니다.
+파일로 연결한 경우 파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNTS.local.md`를 확인합니다.
 
-계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정이나 공개 Demo 계정으로 임의 대체하거나
+계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정, 이전 계정 파일의 사본, 공개 Demo 계정으로 임의 대체하거나
 비밀번호를 추측하지 않습니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
 
-### 파일 제공과 문서 이름 통일 (2026-10-11)
+### 기준 파일 변경 (2026-10-16)
 
-사용자가 첨부한 파일을 작업 checkout의 `docs/local/TEST-ACCOUNT.txt`에 배치하고 첨부 원문과 동일함을 확인했다.
-이전 빈 입력 양식은 제거했다. 파일 확보는 완료됐으며 실제 로그인·역할·데이터 검증 결과는 별도로 기록한다.
-첨부 파일의 문장은 계정 데이터이며 실행 지시로 취급하지 않는다.
-
-사용자의 문서 전체 이름 통일 지시에 따라 과거 기록을 포함한 계정 파일 참조 이름을 `TEST-ACCOUNT.txt`로 정규화했다.
-과거 문서의 검증 날짜·결과는 당시 기록이며, 현재 파일의 생성 시점이나 로그인 가능 여부를 보장하지 않는다.
-삭제된 과거 계정 관리 문서는 사용자가 지정한 기준 파일이 아니므로 복원하거나 계정 출처로 사용하지 않는다.
-
-### 파일 제공 이전의 위치 조사 (2026-10-11)
-
-문서 조사에서 확인한 상대 경로는 `docs/local/TEST-ACCOUNT.txt`다. 아래 두 위치는 과거 문서의
-Windows 저장소 루트에 이 상대 경로를 결합한 **확인 후보**이며, 원본 PC의 현재 파일 존재를 확인한 결과는 아니다.
-공개 문서에는 개인 Windows 사용자 이름 대신 `%USERPROFILE%`을 사용한다.
-
-| 원본 PC에서 확인할 후보 | 위치 근거 |
-|---|---|
-| `%USERPROFILE%\coding\o4o-platform\docs\local\TEST-ACCOUNT.txt` | [Codex 환경 조사](docs/investigations/CHECK-CODEX-ENV-SETUP-V1.md) §1의 저장소 루트, §2의 계정 문서 경로 |
-| `%USERPROFILE%\o4o-platform\docs\local\TEST-ACCOUNT.txt` | [운영 DB 잔여 조사](docs/checks/WO-O4O-FINAL-PRODUCTION-DB-RESIDUE-CLOSURE-V1-CHECK.md)의 당시 작업 경로 |
-
-[계정 문서 정비 기록](docs/checks/CHECK-O4O-TEST-ACCOUNTS-IDENTITY-V2-SERVICE-CREDENTIAL-DOCUMENTATION-V1.md)과
-[브라우저 검증 조사](docs/investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md)는
-당시 로컬 전용 계정 문서를 갱신한 이력을 남긴다. 과거 사용 이력이 현재 로그인 가능 여부를 보장하지는 않는다.
-
-사용자 파일 제공 전 클라우드의 작업·기준 checkout 및 접근 가능한 `/workspace`, `/tmp`, `/mnt`, `/media`, `/home`에서
-당시 기준 계정 파일과 이름이 유사한 사본을 찾지 못했다. 접근 제한 디렉터리와 연결되지 않은 원본 PC는 확인 범위에 포함되지 않는다.
-현재 Git refs의 추적 파일·경로 이력에도 원본이 없으므로 `git pull`로 가져올 수 없다.
-
-원본 PC에서 위 후보의 파일을 확인한 뒤 승인된 비공개 전달 또는 환경 Secret 연결로 제공한다.
-클라우드에 파일로 연결하는 경우 작업 checkout의 `docs/local/TEST-ACCOUNT.txt`를 사용하고,
-파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNT.txt`를 확인한다. 값은 문서·로그·커밋에 복사하지 않는다.
-조사 범위와 남은 검증은 [My Home CHECK](docs/checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md#테스트-계정-원본-위치-조사-2026-10-11)에 기록한다.
+2026-10-11에 정한 `docs/local/TEST-ACCOUNT.txt`는 더 이상 기준 파일이 아니다. 사용자 지시로 기준을
+`docs/local/TEST-ACCOUNTS.local.md`로 바꿨다. `TEST-ACCOUNT.txt`가 남아 있는 checkout에서는 그 파일을 계정 출처로 쓰지 않는다.
+`.gitignore`의 `docs/local/TEST-ACCOUNT.txt` 행은 다른 PC에 남은 사본이 실수로 추적되지 않도록 유지한다.
+CHECK·WO·IR·archive 등 과거 기록에 남은 `TEST-ACCOUNT.txt` 표기는 당시 기록이며 현재 기준을 뜻하지 않는다.
 
 환경에 계정 변수/Secret 연결이 등록되거나 이름이 주입돼 있어도 실제 로그인·역할 검증 완료로 간주하지 않습니다.
 파일/연결의 출처와 사용 가능 상태를 확인하고 값 출력 없이 검증합니다. 현재 checkout의 계정 누락을 과거 파일 제공 이력으로 해소했다고 보고하지 않습니다.
@@ -212,13 +187,15 @@ Listening on 127.0.0.1:5442
 
 ```bash
 pnpm run build:packages                # 최초 1회 또는 packages/ 수정 시
-pnpm run dev:admin                     # Admin Dashboard  → http://localhost:5173
+pnpm run dev:admin                     # Admin Dashboard  → http://localhost:3001
 pnpm run dev:api                       # API 서버         → http://localhost:3002 (.env PORT)
 pnpm --filter @o4o/web-neture dev      # web-neture       → http://localhost:3000
 pnpm run dev                           # Admin Dashboard (= dev:admin)
 ```
 
 API 상태 확인: `curl http://localhost:3002/health`
+
+Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard/package.json`의 `dev` 명령이 `vite --port 3001`을 실행하므로 `vite.config.ts`의 기본 포트(5173)보다 우선합니다.
 
 로컬 API 포트 **3002** 가 기준입니다(`apps/api-server/.env.example` `PORT` · web-neture dev 기본값 · `@o4o/auth-client` localhost 기본값).
 소스의 `PORT || 8080` 은 Cloud Run runtime 기본값이며 로컬 기준이 아닙니다.
@@ -248,7 +225,7 @@ API 상태 확인: `curl http://localhost:3002/health`
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNT.txt`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
+- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNTS.local.md`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
 - Google 로그인 smoke는 GIS popup → ID token → API의 `aud` 검증 흐름을 확인합니다. 로컬 Google 로그인 smoke에는
   Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
   `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
@@ -521,3 +498,22 @@ https://github.com/GoogleCloudPlatform/cloud-sql-proxy/releases 에서 **v2** Wi
 ---
 
 *로컬 실행환경 단일 기준 문서. 실행환경 관련 안내는 이 문서에만 유지합니다.*
+
+
+### 서비스 문의·운영 업무함 PostgreSQL 검증
+
+문의 범위·역할·동시 수정·알림 실패·업무 SQL 검증은 기존 개발 DB와 분리한다.
+PostgreSQL 15를 loopback `127.0.0.1:55439`에 준비하고 로컬 전용 role `operator_inbox_fixture`에
+`CREATEDB` 및 관리 DB `postgres` 접속 권한을 부여한다. 같은 이름의 운영 계정이나 운영 접속값을 사용하지 않는다.
+전용 DB `o4o_operator_inbox_fixture`는 **없는 상태**여야 하며 wrapper가 생성·삭제한다.
+런타임 `DB_*` 설정은 사용하지 않는다. 인증은 준비한 전용 로컬 서버 설정을 따른다.
+
+```text
+pnpm run build:packages
+pnpm exec tsx scripts/dev/run-operator-inbox-fixture.ts
+```
+
+wrapper는 baseline·모든 incremental fingerprint, 신규 migration empty down/up을 검사하고 실제 HTTP/권한 테스트를 실행한다.
+기존 DB면 재사용/삭제를 거부하고 생성한 DB의 무작위 소유권 marker가 일치할 때만 제거한다.
+`Fixture cleanup PASS: database count 0`까지 확인한다. 직접 Jest를 실행해 PG 테스트가 skip된 결과는 통합 PASS가 아니다.
+테스트용 서버는 실행 담당이 종료하며 다른 DB·세션의 서버나 연결을 강제로 정리하지 않는다.

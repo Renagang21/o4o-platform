@@ -6,7 +6,7 @@
  *
  * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
  *   - 평문 credential 하드코딩 금지 (CLAUDE.md §15).
- *   - 자격증명 SSOT: `docs/local/TEST-ACCOUNT.txt`.
+ *   - 자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
  *
  * 추가 주의: 본 스크립트는 LoginModal 의 "약국 개설자" quick-login 버튼을
  * 클릭하는 흐름을 사용한다 (line ~74). 해당 버튼은
@@ -18,13 +18,13 @@ import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-const BASE_URL = process.env.KPA_URL || 'https://kpa-society.co.kr';
+const BASE_URL = process.env.KPA_URL || 'https://pharmacy.neture.co.kr';
 const COURSE_EDIT_PATH = '/instructor/courses/77d530a0-1bb3-4e1b-be3f-691811c1c40e';
 const TEST_EMAIL = process.env.TEST_EMAIL;
 const TEST_PASSWORD = process.env.TEST_PASSWORD;
 if (!TEST_EMAIL || !TEST_PASSWORD) {
   console.error('TEST_EMAIL and TEST_PASSWORD env vars required.');
-  console.error('See docs/local/TEST-ACCOUNT.txt for valid local credentials.');
+  console.error('See docs/local/TEST-ACCOUNTS.local.md for valid local credentials.');
   process.exit(1);
 }
 const OUT_DIR = resolve('scripts/verify/output/ai-modal');

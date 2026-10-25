@@ -62,6 +62,18 @@ router.get('/stream', (req: Request, res: Response) => {
 // Notification Endpoints
 // ============================================================================
 
+/** Optional scope union for legacy transitions. Recipient ownership always comes from authentication. */
+function readNotificationScope(req: Request, res: Response): {serviceKey?: string; serviceKeys?: string[]} | null {
+  if (req.query.serviceKeys === undefined) return {serviceKey:(req.query.serviceKey as string | undefined) || undefined};
+  const value=req.query.serviceKeys;
+  const keys=typeof value === 'string' ? value.split(',').map(key=>key.trim()) : [];
+  if (req.query.serviceKey !== undefined || keys.length===0 || keys.length>10 || keys.some(key=>!/^[a-z][a-z0-9_-]{0,99}$/.test(key))) {
+    res.status(400).json({success:false,error:'Invalid notification scope filters',code:'NOTIFICATION_SCOPE_INVALID'});
+    return null;
+  }
+  return {serviceKeys:[...new Set(keys)]};
+}
+
 router.get('/', async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
@@ -75,7 +87,8 @@ router.get('/', async (req: Request, res: Response) => {
     const isReadParam = req.query.isRead;
     const isRead =
       isReadParam === 'true' ? true : isReadParam === 'false' ? false : undefined;
-    const serviceKey = (req.query.serviceKey as string | undefined) || undefined;
+    const scope = readNotificationScope(req,res);
+    if (!scope) return;
     const organizationId = (req.query.organizationId as string | undefined) || undefined;
 
     const result = await notificationService.listNotifications({
@@ -83,7 +96,7 @@ router.get('/', async (req: Request, res: Response) => {
       page,
       limit,
       isRead,
-      serviceKey,
+      ...scope,
       organizationId,
     });
 
@@ -106,11 +119,12 @@ router.get('/unread-count', async (req: Request, res: Response) => {
       return;
     }
 
-    const serviceKey = (req.query.serviceKey as string | undefined) || undefined;
+    const scope = readNotificationScope(req,res);
+    if (!scope) return;
     const organizationId = (req.query.organizationId as string | undefined) || undefined;
 
     const count = await notificationService.getUnreadCount(user.id, {
-      serviceKey,
+      ...scope,
       organizationId,
     });
 

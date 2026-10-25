@@ -12,11 +12,13 @@
  * - 공식 경로 두 가지 (ROLE-WORKSPACE-ARCHITECTURE §2-1):
  *   ① Supplier → Store Hub: `공개` 자료는 매장 HUB 의 공급자 콘텐츠 소스로 노출된다 (매장이 선택).
  *   ② Supplier → Service Operator: '서비스에 제공' 액션으로 서비스 운영자에게 넘긴다 (운영자가 검토·발행).
- * - 특정 매장 직접 제공 없음. 제공 후 상태 추적은 이 화면의 책임이 아니다 (공급자 책임 종료).
+ * - 특정 매장 직접 제공 없음. 기존 CMS 제공는 운영자에게 인계하며, 협력사업 요청은 별도 수신 상태를 조회한다.
+ * - 자료함 저장 · 커뮤니티 작성기 이동 · 협력사업 등재 요청은 독립된 선택이다.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SupplierContentDestinations from './SupplierContentDestinations';
 import { Plus, FolderOpen, AlertCircle, Send } from 'lucide-react';
 import { supplierApi, type SupplierLibraryItem, type SupplierLibraryHandoffTarget } from '../../lib/api';
 import { DataTable, type Column } from '@o4o/ui';
@@ -53,6 +55,7 @@ type VisibilityFilter = 'all' | 'service' | 'personal';
 
 export default function SupplierLibraryPage() {
   const navigate = useNavigate();
+  const [businessItem, setBusinessItem] = useState<SupplierLibraryItem | null>(null);
   const [items, setItems] = useState<SupplierLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -236,14 +239,16 @@ export default function SupplierLibraryPage() {
       ),
     createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
     actions: (
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <button type="button" onClick={() => setBusinessItem(item)} className="text-sm text-blue-700">협력사업에 등재 요청</button>
+        <button type="button" onClick={() => navigate(`/communities/community/forum/write?library=${encodeURIComponent(item.id)}`)} className="text-sm text-blue-700">커뮤니티에 게시</button>
         {handoffTargets.length > 0 && (
           <button
             onClick={() => openHandoff(item)}
             title="서비스 운영자에게 제공"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0f766e', fontSize: '13px', fontWeight: 500 }}
           >
-            서비스에 제공
+            기타 서비스에 제공
           </button>
         )}
         <button
@@ -265,14 +270,14 @@ export default function SupplierLibraryPage() {
   return (
     <div style={{ padding: '32px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FolderOpen size={24} />
             콘텐츠 라이브러리
           </h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-            공급자 콘텐츠의 원천입니다. 공개 자료는 매장 HUB 에, 제공한 자료는 서비스 운영자에게 전달됩니다.
+            콘텐츠를 제작·보관하고, 커뮤니티 게시와 서비스 등재를 각각 선택합니다. 저장만으로 게시되지는 않습니다.
           </p>
         </div>
         <button
@@ -282,6 +287,8 @@ export default function SupplierLibraryPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             padding: '8px 16px',
             backgroundColor: '#2563eb',
             color: '#fff',
@@ -319,15 +326,19 @@ export default function SupplierLibraryPage() {
       <GuideBlock
         variant="info"
         title={guideTitle ?? '콘텐츠 라이브러리 이용 안내'}
-        description={guideDesc ?? '공급자가 만든 콘텐츠를 등록·관리하는 원천입니다. 여기서 매장 HUB 와 서비스 운영자 두 경로로 콘텐츠가 흘러갑니다.'}
+        description={guideDesc ?? '자료함은 원본 보관 장소입니다. 커뮤니티 게시와 서비스 등재 요청은 독립된 작업입니다.'}
         steps={guideSteps ?? [
-          '자료 등록 버튼으로 파일 또는 문서를 추가합니다.',
+          '자료 등록 버튼으로 파일 또는 문서를 추가합니다. 기본은 비공개 보관이며 자동 게시하지 않습니다.',
+          '커뮤니티에 게시를 누르면 별도 작성기로 이동합니다. 회원에게 공개할 수 있는 내용인지 확인한 뒤 게시하세요.',
+          '협력사업에 등재 요청하면 해당 운영자가 사본을 검토·게시하며 요청 현황에서 결과를 확인합니다.',
           '"공개" 로 등록한 자료는 매장 HUB 의 공급자 콘텐츠 소스에 노출되며, 매장이 직접 선택해 가져갑니다.',
           '"서비스에 제공" 으로 서비스를 고르면 해당 서비스 운영자에게 전달됩니다. 이후 검토·수정·게시는 운영자 업무입니다.',
           '특정 매장에 직접 보내는 기능은 없습니다. 매장용 상품 설명서·태블릿·사이니지는 콘텐츠 메뉴의 각 화면에서 등록합니다.',
         ]}
         compact
       />
+
+      <SupplierContentDestinations item={businessItem} onClose={() => setBusinessItem(null)} />
 
       {/* Visibility Filter Bar (WO-CONTENT-META-UI-VALIDATION-V1) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -429,7 +440,7 @@ export default function SupplierLibraryPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Send size={16} /> 서비스에 제공
+              <Send size={16} /> 기타 서비스에 제공
             </h3>
             <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', lineHeight: 1.6 }}>
               <b>{handoffItem.title}</b> 을(를) 선택한 서비스의 운영자에게 제공합니다.

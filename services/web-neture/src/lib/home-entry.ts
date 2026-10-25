@@ -16,7 +16,7 @@
  *
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
- *   - `GET /neture/home/entry`       분회(slug) · 공급자/메인 상태 (기존 서비스별 매장 목록은 신규 흐름에서 미사용)
+ *   - `GET /neture/home/entry`       분회(slug) · 공급자/메인 상태 · 협력사업 참여 판정 · 개인 협동조합 가입 (기존 서비스별 매장 목록은 신규 흐름에서 미사용)
  *   - `GET /work-scope/accessible-stores` Store와 같은 조직 기반 매장 목록
  *   - `user.roles` (from /auth/me)   platform:super_admin · 관리자 판정 (Neture RoleGuard 와 같은 상수)
  *   - `GET /communities`             Community Catalog + 참여 가능 여부 — **커뮤니티 진입의 유일한 출처**
@@ -136,6 +136,9 @@ export interface HomeEntryData {
   operatorServices?: EntryOperatorService[];
   /** Community Catalog + 참여 판정 (서버 확정). 없으면 빈 배열로 취급한다 */
   communities?: EntryCommunity[];
+  /** Business access is read from the business ledger, independently of the community directory. */
+  businesses?: { key: string; name: string; canParticipate: boolean; membershipStatus?: string | null }[];
+  cooperatives?: { id: string; slug: string; name: string; status: string }[];
 }
 
 // ─── 진입 액션 ────────────────────────────────────────────────────────────────
@@ -229,7 +232,9 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
   //   (service-catalog joinEnabled=false). 그래서 '가입 가능한 서비스' 에도 나타나지 않는다.
   //   서비스 운영 화면(`/admin/communities`)은 대표 호스트에 있고 SUBDOMAIN_OPERATOR_SCREENS 로 진입한다.
   community: { home: '/' },
-  'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 운영 · 관리 콘솔(`/operator` · `/admin`)은 삭제됐다 —
+  //   pharmacy 운영은 다른 협력사업과 같은 사업 운영 화면으로 들어간다(operator · admin scope 공통).
+  'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator/semi-franchises', admin: '/operator/semi-franchises', join: '/register' },
   // k-cosmetics: 운영 종료 — 매장 · 운영자 · 가입 진입을 만들지 않는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},
@@ -328,6 +333,8 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     serviceStates: normalizeServiceStates(entry.serviceStates),
     operatorServices,
     communities,
+    businesses: Array.isArray(entry.businesses) ? entry.businesses : undefined,
+    cooperatives: Array.isArray(entry.cooperatives) ? entry.cooperatives : [],
   };
 }
 
@@ -343,6 +350,26 @@ export function useHomeEntry(enabled: boolean, accountId?: string): UseHomeEntry
   const [tick, setTick] = useState(0);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refresh = () => {
+      if (document.visibilityState === 'hidden') return;
+      clearTimeout(timer);
+      timer = setTimeout(reload, 100);
+    };
+    const restored = (event: PageTransitionEvent) => { if (event.persisted) refresh(); };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    window.addEventListener('pageshow', restored);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      window.removeEventListener('pageshow', restored);
+    };
+  }, [enabled, reload]);
 
   useEffect(() => {
     setLoadedAccount(accountId);
@@ -612,7 +639,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   카드를 만들지 않는다(dead link 0).
     //   community 는 Admin(`/admin/communities`)과 Operator(`/operator/communities`)로 구분한다.
     // Policy settings remain secondary links, without replacing a service's primary management workspace.
-    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key && !s.path.startsWith('/operator/legal/'));
+    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key && s.primaryEntry !== false && !s.path.startsWith('/operator/legal/'));
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
       if (!screen) continue;
@@ -650,10 +677,22 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
-  for (const business of data.communities ?? []) {
-    if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
-    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`,
-      action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` } });
+  const businesses = data.businesses ?? (data.communities ?? [])
+    .filter(item => item.kind === 'semi-franchise' && item.businessKey)
+    .map(item => ({ key: item.businessKey!, name: item.name, canParticipate: item.canParticipate }));
+  for (const business of businesses) {
+    if (!business.canParticipate) continue;
+    // 독립 사업은 pharmacy 개인 가입을 요구하는 service handoff로 우회하지 않는다.
+    // CarePharm은 기존 alias, 메가팜은 공개 호스트(현재 별도 handoff alias 없음)를 사용한다.
+    let action: EntryAction = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.key)}` };
+    if (business.key === 'pharmacy') action = { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/' };
+    else if (business.key === 'carepharm') action = { kind: 'handoff', serviceKey: 'carepharm', returnPath: '/' };
+    else if (business.key === 'megapharm') action = { kind: 'public', href: 'https://megapharm.neture.co.kr/' };
+    myServices.push({ id: `business:${business.key}`, label: business.key === 'pharmacy' ? nameOf('kpa-society') : `${business.name} · 공동공간`, action });
+  }
+  for (const cooperative of data.cooperatives ?? []) {
+    if (cooperative.status !== 'active') continue;
+    myServices.push({ id: `cooperative:${cooperative.id}`, label: `약국/약사협동조합 · ${cooperative.name}`, action: { kind: 'public', href: `https://pharmcoop.neture.co.kr/${encodeURIComponent(cooperative.slug)}` } });
   }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
@@ -662,6 +701,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   }
   for (const svc of data.services) {
     if (svc.membership?.status !== 'active') continue;
+    if (svc.key === 'kpa-society' && businesses.some(business => business.key === 'pharmacy' && business.canParticipate)) continue;
     if (svc.key === 'neture') {
       myServices.push({ id: 'svc:neture', label: nameOf('neture'), note: '현재 화면', action: { kind: 'internal', to: '/mypage' } });
       continue;
@@ -687,6 +727,16 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 가입 · 이용 상태 (active 가 아닌 membership 만) ──
   const statusItems: StatusItem[] = [];
+  for (const business of data.businesses ?? []) {
+    if (business.canParticipate || !business.membershipStatus) continue;
+    const status = business.membershipStatus;
+    statusItems.push({ id: `status:business:${business.key}`, serviceName: business.name, status,
+      statusLabel: status === 'active' ? '이용 자격 확인 필요' : STATUS_LABELS[status] ?? (status === 'terminated' ? '이용 종료' : status) });
+  }
+  for (const cooperative of data.cooperatives ?? []) {
+    if (cooperative.status === 'active') continue;
+    statusItems.push({ id: `status:cooperative:${cooperative.id}`, serviceName: `약국/약사협동조합 · ${cooperative.name}`, status: cooperative.status, statusLabel: STATUS_LABELS[cooperative.status] ?? cooperative.status });
+  }
   for (const svcKey of ['supplier'] as const) {
     const status = states[svcKey].status;
     if (status === 'none' || status === 'active') continue;

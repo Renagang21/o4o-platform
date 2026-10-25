@@ -262,13 +262,15 @@ describe('§7-§8 · 연결 수정 호출이 backend 계약 경로를 가리킨�
     expect(existsSync(join(SRC, 'features', 'cpt-acf', 'services', 'acf.api.ts'))).toBe(false);
   });
 
-  it('내부 링크 오타 수정 — /apps/store · /settings/app-services', () => {
+  it('은퇴한 AppStore 연결 제거 · 설정 링크 보존', () => {
     const guard = stripAllComments(read('components/common/AppGuard.tsx'));
     expect(guard).not.toContain('/admin/appstore');
-    expect(guard).toContain('to="/apps/store"');
+    expect(guard).not.toContain('to="/apps/store"');
+    expect(guard).toContain('to="/admin"');
     const modal = stripAllComments(read('components/ai/SimpleAIModal.tsx'));
     expect(modal).not.toContain('/admin/settings/app-services');
-    expect(hasRoute('/apps/store')).toBe(true);
+    expect(hasRoute('/apps/store')).toBe(false);
+    expect(hasRoute('/admin/appstore/installed')).toBe(false);
   });
 
   it('backend 없는 dead helper 가 제거됐다', () => {

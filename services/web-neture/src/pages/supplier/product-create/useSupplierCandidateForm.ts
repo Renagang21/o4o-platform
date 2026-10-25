@@ -244,10 +244,6 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
         return '규제 카테고리 상품은 규제 유형과 규제명이 필수입니다.';
       }
     }
-    if (step === 2) {
-      const priceGeneral = Number(form.priceGeneral);
-      if (!priceGeneral || priceGeneral <= 0) return '공급가를 입력해주세요.';
-    }
     return null;
   };
 
@@ -258,7 +254,7 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
       return;
     }
     setSubmitError('');
-    setCurrentStep((s) => Math.min(s + 1, 3));
+    setCurrentStep((s) => Math.min(s + 1, 2));
   };
 
   const goBack = () => {

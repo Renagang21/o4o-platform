@@ -114,12 +114,11 @@ describe('배치 2 — 기존 메뉴 보존 및 무결성', () => {
     //   제거: 공급 자산 조회 · Force Asset 관리 (KPA 전용 → 메뉴만 제거, route 보존)
     //         매장 네트워크 · 오프라인 매장 (Cosmetics 단일 서비스 집계 → 메뉴·화면 제거)
     for (const [label, path] of [
-      ['RBAC Role Assignments', '/users'],
-      ['Service Operators', '/operators'],
+            ['서비스 관리자·운영자', '/operators'],
       // 'Membership → /admin/membership/dashboard' 는 레거시 약사회 도메인 전면 제거
       // (ab5570573)로 메뉴·route 가 함께 사라져 단언 대상에서 제외한다.
-      ['Platform Settings', '/settings'],
-      ['플랫폼 HUB', '/admin/platform/hub'],
+      ['플랫폼 설정', '/settings'],
+      ['서비스 상태', '/admin/platform/hub'],
     ] as const) {
       expect(pathOf(label)).toBe(path);
     }

@@ -1,3 +1,4 @@
+import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
  * StoreContentEditPage — 매장 콘텐츠 독립 편집
@@ -40,7 +41,7 @@ import {
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
-import { getActiveServiceKey } from '../../lib/serviceContext';
+import { getActiveServiceKey, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
 import { emptySnapshotDraft, loadSnapshot, saveSnapshot, snapshotDraftFromRecord } from './authoring/contentAuthoringAdapters';
 import type { UsageSettings, DisplayMode } from './authoring/contentAuthoringModels';
@@ -53,7 +54,7 @@ const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[
 
 export default function StoreContentEditPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
-  const { libraryPath } = useStoreLibraryRoute();
+  const { backPath, returnState, productReturn } = useStoreLibraryRoute();
 
   const { organizationId } = useStoreOrganizationId();
   const session = useContentAuthoringSession({
@@ -74,7 +75,8 @@ export default function StoreContentEditPage() {
   const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);
   const updateUsage = (patch: Partial<UsageSettings>) => session.changeDraft({ usage: { ...usage, ...patch } });
 
-  const publicUrl = snapshotId && orgId ? `${window.location.origin}/view/${snapshotId}?org=${orgId}` : '';
+  // 공개 보기(/view)는 store 호스트가 아니라 서비스 앱이 서빙한다 — 서비스 공개 origin 으로 만든다.
+  const publicUrl = snapshotId && orgId ? `${getActiveServicePublicOrigin()}/view/${snapshotId}?org=${orgId}` : '';
 
   if (loading) {
     return (
@@ -118,11 +120,17 @@ export default function StoreContentEditPage() {
       <div className="mb-6">
         {/* WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: 진입점(내 자료함 콘텐츠)으로 복귀 — canonical 정렬 */}
         <Link
-          to={libraryPath}
+          to={backPath}
+          state={returnState}
+          onClick={event => {
+            if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            const changed = session.record && JSON.stringify(session.draft) !== JSON.stringify(snapshotDraftFromRecord(session.record));
+            if (saving || (changed && !window.confirm('저장하지 않은 작성 내용을 버리고 돌아가시겠습니까?'))) event.preventDefault();
+          }}
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          내 자료함 콘텐츠로
+          {productReturn ? '상품 목록으로 돌아가기' : '내 자료함 콘텐츠로'}
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -133,14 +141,15 @@ export default function StoreContentEditPage() {
           </div>
           <div className="flex items-center gap-2">
             {source === 'store' && orgId && (
-              <Link
-                to={`/view/${snapshotId}?org=${orgId}`}
+              <a
+                href={publicUrl}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
               >
                 <Eye className="w-4 h-4" />
                 공개 보기
-              </Link>
+              </a>
             )}
             <button
               onClick={handleSave}
@@ -154,6 +163,7 @@ export default function StoreContentEditPage() {
         </div>
       </div>
 
+      <StoreAiSlot label="안내 편집" />
       {/* Title */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-slate-700 mb-1">제목</label>

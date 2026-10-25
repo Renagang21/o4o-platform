@@ -75,7 +75,7 @@ describe('service operator profile entry matches assigned service and route', ()
     expect(operatorLinks()).toEqual([]);
   });
 
-  it.each(Object.keys(paths) as ScopedHost[])('preserves full administrator route bypass for %s', profile => {
+  it.each(['supplier', 'funding'] as ScopedHost[])('preserves full administrator route bypass for %s', profile => {
     host.profile = profile;
     menu(user(['platform:super_admin'], ''));
     expect(operatorLinks()).toContain(paths[profile]);
@@ -105,4 +105,10 @@ describe('service operator profile entry matches assigned service and route', ()
     menu(user([]));
     expect(operatorLinks()).toEqual([]);
   });
+});
+
+it('community profile entry requires an explicit community assignment', () => {
+  host.profile = 'community';
+  menu(user(['platform:super_admin'], ''));
+  expect(operatorLinks()).toEqual([]);
 });

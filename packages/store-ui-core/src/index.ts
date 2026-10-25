@@ -524,5 +524,6 @@ export {
   resolveStoreContentLlmTask,
   isBlankStoreHtml,
   STORE_LLM_ASSIST_LABEL,
+  PRODUCT_DESCRIPTION_PURPOSE_LABELS,
 } from './llm/storeContentAuthoringPrompt';
-export type { StoreContentLlmTask, StoreContentLlmContext } from './llm/storeContentAuthoringPrompt';
+export type { StoreContentLlmTask, StoreContentLlmContext, ProductDescriptionPurpose, ProductDescriptionEvidence } from './llm/storeContentAuthoringPrompt';

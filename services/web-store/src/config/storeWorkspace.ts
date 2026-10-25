@@ -7,9 +7,15 @@ export type StoreWorkspaceArea = "home" | "commerce" | "studio" | "use";
 export const STORE_WORKSPACE_AREAS = [
   {
     key: "home",
-    label: "내 매장 홈",
+    label: "대시보드",
     subPath: "",
     description: "오늘 할 일과 매장 현황을 확인합니다.",
+  },
+  {
+    key: "use",
+    label: "매장 운영",
+    subPath: "/workspace/use",
+    description: "상담하고 매장의 사이니지·태블릿·QR을 운영합니다.",
   },
   {
     key: "commerce",
@@ -19,15 +25,9 @@ export const STORE_WORKSPACE_AREAS = [
   },
   {
     key: "studio",
-    label: "안내 만들기",
+    label: "매장 컨텐츠",
     subPath: "/workspace/studio",
     description: "상품과 자료를 골라 매장에서 사용할 안내를 준비합니다.",
-  },
-  {
-    key: "use",
-    label: "매장 운영",
-    subPath: "/workspace/use",
-    description: "저장된 안내를 적용·출력하고 사용 상태를 확인합니다.",
   },
 ] as const;
 
@@ -52,6 +52,8 @@ const studioKeys = new Set([
 const useKeys = new Set([
   "store-execution",
   "tablet-requests",
+  "staff-support",
+  "multilingual-consultation",
   "signage-schedules",
   "signage-player",
   "analytics-marketing",
@@ -164,7 +166,7 @@ export function currentWorkspaceArea(
       : "studio";
   }
   if (
-    /^\/(execution|requests|analytics|content$|marketing\/signage\/(schedules|player))(?:\/|$)/.test(
+    /^\/(execution|requests|staff-support|multilingual-consultation|analytics|content$|marketing\/signage\/(schedules|player))(?:\/|$)/.test(
       relative,
     )
   )
@@ -264,34 +266,65 @@ export function workspaceGroups(
         : area === "use"
           ? [
               group(
-                "status",
-                "사용 중인 안내 확인",
-                "위치별 현황과 자료의 게시 설정을 확인합니다. 실제 기기 동작은 별도로 확인하세요.",
-                ["store-execution"],
-                ["asset-status"],
-              ),
-              group(
-                "apply",
-                "적용·출력",
-                "저장한 안내를 태블릿·QR·사이니지에서 사용합니다.",
-                ["tablet-displays", "qr", "signage-playlist"],
-                ["signage-schedules", "signage-player", "pop"],
-              ),
-              group(
-                "requests",
-                "상담 요청",
-                "고객이 남긴 상담 요청을 확인하고 처리합니다.",
+                "consultation",
+                "상담",
+                "고객 응대에 필요한 상담 방식과 자료를 선택하세요.",
+                ["multilingual-consultation", "staff-support"],
                 ["tablet-requests"],
               ),
               group(
-                "analytics",
-                "이용 현황",
-                "실제로 집계된 QR 방문과 홍보 이용 기록을 확인합니다.",
+                "signage",
+                "사이니지",
+                "매장에서 재생할 안내를 고르고 순서와 재생 일정을 관리합니다.",
+                ["signage-playlist"],
+                ["signage-schedules", "signage-player"],
+              ),
+              group(
+                "tablet",
+                "태블릿",
+                "설치 위치와 고객에게 보여줄 화면을 관리합니다.",
+                ["tablet-displays"],
+              ),
+              group(
+                "qr",
+                "QR",
+                "고객이 열어볼 안내의 QR을 확인하고 배치·출력합니다.",
+                ["qr"],
+                ["pop"],
+              ),
+              group(
+                "details",
+                "배치·이용 현황",
+                "위치별 저장 설정, 게시 상태와 집계된 이용 기록을 확인합니다.",
+                ["store-execution", "asset-status"],
                 ["analytics-marketing"],
               ),
             ]
           : [];
   return groups.filter(
     (group) => group.primary.length || group.secondary.length,
+  );
+}
+
+/** Only existing, permission-filtered work groups become operation destinations. */
+export function storeOperationGroups(config: StoreDashboardConfig) {
+  return workspaceGroups(config, "use").filter((group) => group.key !== "details");
+}
+
+export function currentStoreOperation(
+  config: StoreDashboardConfig,
+  pathname: string,
+  search: string,
+): StoreWorkspaceGroup | undefined {
+  const groups = storeOperationGroups(config);
+  if (pathname === `${config.basePath}/workspace/use`) {
+    const topic = new URLSearchParams(search).get("topic");
+    return groups.find((group) => group.key === topic) ?? groups[0];
+  }
+  return groups.find((group) =>
+    [...group.primary, ...group.secondary].some((item) => {
+      const path = `${config.basePath}${item.subPath.split("?")[0]}`;
+      return pathname === path || pathname.startsWith(`${path}/`);
+    }),
   );
 }

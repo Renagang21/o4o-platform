@@ -1,57 +1,37 @@
-import { isLoginEmailShapeValid, normalizeLoginEmail } from '@o4o/auth-utils';
-import { createHash, randomBytes } from 'node:crypto';
-import type { DataSource, EntityManager } from 'typeorm';
-import { AppDataSource } from '../../database/connection.js';
-import { User } from '../../modules/auth/entities/User.js';
-import { resolveOperatorRole } from '../../config/operator-role-catalog.js';
-import { getServiceOrigin } from '../../config/service-catalog.js';
-import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
-import { ensureServiceMembershipsForRoles } from './service-membership-ensure.js';
-import { demoAccountService } from '../auth/demo-account.service.js';
-import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
+import { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
+import {
+  retainOperatorInvitations,
+  invitationReturningRows,
+} from "./operator-invitation-retention.js";
+import {
+  scopeForInvitationList,
+  invitationScope,
+  authorizeInvitation,
+  activateInvitation,
+  type InvitationScope,
+} from "./operator-invitation-scope.js";
+import { lockOperatorAssignments } from "../../modules/auth/services/operator-assignment-lock.js";
+import { recordOperation } from "../operations/operation-audit.js";
+import { isLoginEmailShapeValid, normalizeLoginEmail } from "@o4o/auth-utils";
+import { createHash, randomBytes } from "node:crypto";
+import type { DataSource, EntityManager } from "typeorm";
+import { AppDataSource } from "../../database/connection.js";
+import type { User } from "../../modules/auth/entities/User.js";
+import { getServiceOrigin } from "../../config/service-catalog.js";
+import { demoAccountService } from "../auth/demo-account.service.js";
+import { invalidateRoles } from "../../modules/auth/utils/role-cache.js";
 
-export class ServiceOperatorInvitationError extends Error {
-  constructor(
-    readonly code: string,
-    readonly statusCode = 409,
-  ) {
-    super(
-      (
-        {
-          FORBIDDEN: '전체관리자의 유효한 지정 권한을 확인할 수 없습니다.',
-          INVALID_USER_ID: '대상 계정 식별자가 올바르지 않습니다.',
-          USER_NOT_FOUND: '대상 계정을 찾을 수 없습니다.',
-          ACCOUNT_INACTIVE:
-            '사용할 수 없는 계정입니다. 계정 상태를 확인하세요.',
-          INVALID_EMAIL: '초대 이메일 주소를 확인하세요.',
-          USER_SELECTION_REQUIRED:
-            '이미 가입된 이메일입니다. 사용자 검색에서 대상 계정을 선택하세요.',
-          INVITATION_ALREADY_PENDING:
-            '확인 대기 중인 초대가 있습니다. 초대 목록에서 재발송 또는 취소하세요.',
-          INVALID_INVITATION_ID: '초대 식별자가 올바르지 않습니다.',
-          INVITATION_NOT_FOUND: '초대를 찾을 수 없습니다.',
-          INVITATION_MAIL_FAILED: '초대 상태는 저장되었지만 메일 발송이 확인되지 않았습니다. 목록을 새로고침하고 1분 후 재발송하거나 취소해 주세요.',
-          INVITATION_NOT_PENDING: '이미 수락되거나 취소된 초대입니다.',
-          INVITATION_RESEND_TOO_SOON: '재발송은 이전 발송 1분 후 가능합니다.',
-          INVALID_OR_EXPIRED_INVITATION:
-            '초대가 만료되었거나 취소·처리되었습니다. 메일 링크를 확인하세요.',
-          INVITATION_ACCOUNT_MISMATCH:
-            '초대받은 계정과 다릅니다. 지정된 계정으로 로그인하세요.',
-          OPERATOR_ROLE_REVOKED:
-            '운영 권한이 회수되어 확인할 수 없습니다. 전체관리자에게 문의하세요.',
-        } as Record<string, string>
-      )[code] ?? '초대 요청을 처리할 수 없습니다.',
-    );
-  }
-}
+export { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
 export type OperatorInvite = {
   id: string;
-  invited_email: string;
+  invited_email: string | null;
   service_key: string;
   role: string;
   target_user_id: string | null;
-  purpose: 'assignment' | 'confirmation';
-  status: 'pending' | 'accepted' | 'cancelled';
+  purpose: "assignment" | "confirmation" | "revocation";
+  status: "pending" | "accepted" | "cancelled" | "expired" | "revoked";
+  scope_type: InvitationScope["scope_type"];
+  scope_key: string;
   expires_at: Date;
   accepted_user_id: string | null;
   invited_by_user_id: string | null;
@@ -60,12 +40,12 @@ export type OperatorInvite = {
   accepted_at: Date | null;
 };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const hash = (s: string) => createHash('sha256').update(s).digest('hex');
+const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 const fail = (code: string, status = 409): never => {
   throw new ServiceOperatorInvitationError(code, status);
 };
 const COLUMNS =
-  'id,invited_email,service_key,role,target_user_id,purpose,status,expires_at,accepted_user_id,invited_by_user_id,created_at,updated_at,accepted_at';
+  "id,scope_type,scope_key,invited_email,service_key,role,target_user_id,purpose,status,expires_at,accepted_user_id,invited_by_user_id,created_at,updated_at,accepted_at";
 export type InvitationMailer = (
   to: string,
   url: string,
@@ -79,223 +59,380 @@ async function defaultMailer(
   role: string,
   confirmation: boolean,
 ): Promise<boolean> {
-  const { emailService } = await import('../email.service.js');
-  const action = confirmation ? '기존 운영자 지정 확인' : '운영자 초대 수락';
+  const { emailService } = await import("../email.service.js");
+  const action = confirmation ? "기존 운영자 지정 확인" : "운영자 초대 수락";
   const result = await emailService.sendEmail({
     to,
+    ephemeral: true,
     subject: `[O4O] ${action}`,
-    text: `${role} ${action} 요청입니다. 로그인 또는 가입 후 본인 계정과 서비스 역할을 확인하고 수락하세요.\n${url}\n7일 내 사용 가능하며 요청하지 않은 초대는 수락하지 마세요.`,
+    text: `${role} ${action} 요청입니다. 로그인 또는 가입 후 본인 계정과 서비스 역할을 확인하고 수락하세요.\n${url}\n7일 내 사용 가능하며 요청하지 않은 초대는 수락하지 마세요. 수락·취소·만료 시 초대용 이메일·토큰을 파기하고 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.`,
   });
   return result.success;
 }
 
-/** A mailbox proof is never a Google identity lookup or an implicit account merge. */
+export type InviteInput = {
+  email?: string;
+  targetUserId?: string;
+  serviceKey: string;
+  role: string;
+  actorId: string;
+  scopeType?: InvitationScope["scope_type"];
+  scopeKey?: string;
+};
+export type PreparedInvitation = { invite: OperatorInvite; url: string };
+/** All authority and target eligibility are checked again inside the acceptance transaction. */
 export class ServiceOperatorInvitationService {
   constructor(
     private readonly db: Pick<
       DataSource,
-      'transaction' | 'query'
+      "transaction" | "query"
     > = AppDataSource,
     private readonly sendMail: InvitationMailer = defaultMailer,
     private readonly now = () => new Date(),
   ) {}
 
-  async list(): Promise<Array<OperatorInvite & { expired: boolean }>> {
-    return this.db
-      .query(`SELECT ${COLUMNS},(status='pending' AND expires_at<=now()) AS expired
-      FROM service_operator_invitations ORDER BY created_at DESC LIMIT 200`);
+  private async expire(tokenHash?: string, id?: string) {
+    await this.db.transaction(async (m) => {
+      if (tokenHash || id)
+        await m.query(
+          `UPDATE service_operator_invitations SET status='expired',invited_email=NULL,token_hash=NULL,updated_at=$2
+        WHERE ${tokenHash ? "token_hash" : "id"}=$1 AND status='pending' AND expires_at<=$2`,
+          [tokenHash ?? id, this.now()],
+        );
+      await retainOperatorInvitations(m, this.now());
+    });
   }
-
-  private async actor(m: EntityManager, id: string): Promise<void> {
-    if (!UUID.test(id)) fail('FORBIDDEN', 403);
-    const rows = await m.query(
-      `SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-      WHERE u.id=$1 AND u."isActive"=true AND u.status IN ('active','approved')
-      AND ra.role='platform:super_admin' AND ra.is_active=true AND ra.valid_from<=now()
-      AND (ra.valid_until IS NULL OR ra.valid_until>=now()) FOR SHARE OF u,ra`,
+  async list(
+    actorId: string,
+  ): Promise<Array<OperatorInvite & { expired: boolean }>> {
+    return this.db.transaction(async (m) => {
+      await this.authority(
+        m,
+        {
+          scope_type: "platform",
+          scope_key: "",
+          role: "lecture:operator",
+          service_key: "lecture",
+        },
+        actorId,
+      );
+      const safeColumns = COLUMNS.replace(
+        "invited_email",
+        "CASE WHEN status='pending' AND expires_at<=now() THEN NULL ELSE invited_email END AS invited_email",
+      );
+      return m.query(`SELECT ${safeColumns},(status='pending' AND expires_at<=now()) AS expired
+        FROM service_operator_invitations ORDER BY created_at DESC LIMIT 200`);
+    });
+  }
+  private scope(invite: OperatorInvite): InvitationScope {
+    const s = invitationScope(
+      invite.scope_type ?? "platform",
+      invite.scope_key ?? "",
+      invite.role,
+      invite.service_key,
+    );
+    if (s.role !== invite.role || s.service_key !== invite.service_key)
+      fail("INVITATION_SCOPE_CHANGED");
+    return s;
+  }
+  private async authority(
+    m: EntityManager,
+    scope: InvitationScope,
+    actor: string,
+    target?: string,
+  ) {
+    if (!UUID.test(actor)) fail("FORBIDDEN", 403);
+    try {
+      await authorizeInvitation(m, scope, actor, target);
+    } catch (e) {
+      if (e instanceof Error && e.message === "INVITATION_ACTOR_FORBIDDEN")
+        fail("FORBIDDEN", 403);
+      throw e;
+    }
+  }
+  private async target(
+    m: EntityManager,
+    id: string,
+    scope: InvitationScope,
+  ): Promise<User> {
+    if (!UUID.test(id)) fail("INVALID_USER_ID", 400);
+    const [user]: User[] = await m.query(
+      'SELECT id,email,status,"isActive","isEmailVerified" FROM users WHERE id=$1 FOR SHARE',
       [id],
     );
-    if (!rows.length) fail('FORBIDDEN', 403);
-  }
-
-  private async target(m: EntityManager, id: string): Promise<User> {
-    if (!UUID.test(id)) fail('INVALID_USER_ID', 400);
-    const user = await m
-      .getRepository(User)
-      .findOne({ where: { id }, lock: { mode: 'pessimistic_read' } });
-    if (!user) fail('USER_NOT_FOUND', 404);
-    if (!user.isActive || !['active', 'approved'].includes(user.status))
-      fail('ACCOUNT_INACTIVE', 403);
+    if (!user) fail("USER_NOT_FOUND", 404);
+    if (
+      !user.isActive ||
+      !user.isEmailVerified ||
+      !["active", "approved"].includes(user.status)
+    )
+      fail("ACCOUNT_INACTIVE", 403);
     await demoAccountService.assertNotDemoAccount(id, m);
+    if (scope.scope_type !== "cooperative") {
+      const google = await m.query(
+        `SELECT id FROM linked_accounts WHERE "userId"=$1 AND provider='google' FOR SHARE`,
+        [id],
+      );
+      if (!google.length) fail("GOOGLE_LINK_REQUIRED", 409);
+    }
     return user;
   }
-
-  private async activeRole(
-    m: EntityManager,
-    userId: string,
-    role: string,
-  ): Promise<boolean> {
-    const rows = await m.query(
-      `SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2
-      AND is_active=true AND valid_from<=now() AND (valid_until IS NULL OR valid_until>=now()) FOR SHARE`,
-      [userId, role],
+  async create(input: InviteInput): Promise<OperatorInvite> {
+    // Validate the catalog before touching a transaction.
+    invitationScope(
+      input.scopeType,
+      input.scopeKey,
+      input.role,
+      input.serviceKey,
     );
-    return rows.length > 0;
+    await this.expire();
+    const p = await this.db.transaction((m) => this.prepare(m, input));
+    return this.deliver(p);
   }
-
-  private async prepareDelivery(
+  /** For a branch approval's existing transaction. Deliver only after that outer transaction commits. */
+  async prepare(
     m: EntityManager,
-    invite: OperatorInvite,
-  ): Promise<{ invite: OperatorInvite; url: string | null }> {
-    const token = randomBytes(32).toString('hex');
-    const expires = new Date(this.now().getTime() + 7 * 86400_000);
+    input: InviteInput,
+  ): Promise<PreparedInvitation> {
+    const scope = invitationScope(
+      input.scopeType,
+      input.scopeKey,
+      input.role,
+      input.serviceKey,
+    );
+    // Target lock precedes every role/cooperative mutation, including acceptance and revocation.
+    if (input.targetUserId)
+      await lockOperatorAssignments(m, input.targetUserId);
+    await this.authority(m, scope, input.actorId, input.targetUserId);
+    const user = input.targetUserId
+      ? await this.target(m, input.targetUserId, scope)
+      : null;
+    const email = normalizeLoginEmail(user?.email ?? input.email);
+    if (!isLoginEmailShapeValid(email)) fail("INVALID_EMAIL", 400);
+    if (
+      !user &&
+      (
+        await m.query("SELECT id FROM users WHERE lower(email)=$1 LIMIT 1", [
+          email,
+        ])
+      ).length
+    )
+      fail("USER_SELECTION_REQUIRED");
+    if (user && scope.scope_type !== "cooperative") {
+      const active = await m.query(
+        `SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active=true
+        AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) FOR SHARE`,
+        [user.id, scope.role],
+      );
+      if (active.length) fail("OPERATOR_ALREADY_ACTIVE");
+    }
+    await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      hash(
+        `${email}:${scope.service_key}:${scope.role}:${scope.scope_type}:${scope.scope_key}`,
+      ),
+    ]);
     await m.query(
-      `UPDATE service_operator_invitations SET token_hash=$2,expires_at=$3,updated_at=$4 WHERE id=$1`,
-      [invite.id, hash(token), expires, this.now()],
+      `UPDATE service_operator_invitations SET status='expired',invited_email=NULL,token_hash=NULL,updated_at=$4
+      WHERE lower(invited_email)=$1 AND service_key=$2 AND role=$3 AND status='pending' AND expires_at<=$4 AND scope_type=$5 AND scope_key=$6`,
+      [
+        email,
+        scope.service_key,
+        scope.role,
+        this.now(),
+        scope.scope_type,
+        scope.scope_key,
+      ],
     );
-    // Fixed catalog origin; request Origin/Host/returnUrl never control a mailed link.
-    const url = `${getServiceOrigin('neture')}/operator-invite#token=${token}`;
-    return { invite: { ...invite, expires_at: expires, updated_at: this.now() }, url };
+    const pending = await m.query(
+      `SELECT id FROM service_operator_invitations WHERE lower(invited_email)=$1
+      AND service_key=$2 AND role=$3 AND scope_type=$4 AND scope_key=$5 AND status='pending' FOR UPDATE`,
+      [email, scope.service_key, scope.role, scope.scope_type, scope.scope_key],
+    );
+    if (pending.length) fail("INVITATION_ALREADY_PENDING");
+    const token = randomBytes(32).toString("hex"),
+      now = this.now(),
+      expires = new Date(now.getTime() + 7 * 86400_000);
+    const [invite]: OperatorInvite[] = await m.query(
+      `INSERT INTO service_operator_invitations
+      (invited_email,service_key,role,target_user_id,purpose,invited_by_user_id,token_hash,expires_at,scope_type,scope_key,created_at,updated_at)
+      VALUES($1,$2,$3,$4,'assignment',$5,$6,$7,$8,$9,$10,$10) RETURNING ${COLUMNS}`,
+      [
+        email,
+        scope.service_key,
+        scope.role,
+        user?.id ?? null,
+        input.actorId,
+        hash(token),
+        expires,
+        scope.scope_type,
+        scope.scope_key,
+        now,
+      ],
+    );
+    return {
+      invite,
+      url: `${getServiceOrigin("neture")}/operator-invite#token=${token}`,
+    };
   }
-
-  private async deliverCommitted(prepared: { invite: OperatorInvite; url: string | null }): Promise<OperatorInvite> {
-    const { invite, url } = prepared;
-    if (!url) return invite;
+  async deliver(p: PreparedInvitation): Promise<OperatorInvite> {
     let sent = false;
     try {
       sent = await this.sendMail(
-        invite.invited_email,
-        url,
-        invite.role,
-        invite.purpose === 'confirmation',
+        p.invite.invited_email!,
+        p.url,
+        p.invite.role,
+        false,
       );
     } catch {
-      /* Do not log mailer errors: transports may include credentials or message bodies. */
+      /* Never log recipient/token/transport errors. */
     }
-    if (!sent) fail('INVITATION_MAIL_FAILED', 503);
-    return invite;
+    if (!sent) fail("INVITATION_MAIL_FAILED", 503);
+    return p.invite;
   }
-
-  async create(input: {
-    email?: string;
-    targetUserId?: string;
-    serviceKey: string;
-    role: string;
-    actorId: string;
-  }): Promise<OperatorInvite> {
-    const resolved = resolveOperatorRole(input.role, input.serviceKey);
-    const prepared = await this.db.transaction(async (m) => {
-      await this.actor(m, input.actorId);
-      const user = input.targetUserId
-        ? await this.target(m, input.targetUserId)
-        : null;
-      const email = normalizeLoginEmail(user ? user.email : input.email);
-      if (!isLoginEmailShapeValid(email)) fail('INVALID_EMAIL', 400);
-      // Email helps the admin select a person; it never silently selects their identity.
-      if (
-        !user &&
-        (
-          await m.query('SELECT id FROM users WHERE lower(email)=$1 LIMIT 1', [
-            email,
-          ])
-        ).length
-      ) {
-        fail('USER_SELECTION_REQUIRED');
-      }
-      await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
-        hash(`${email}:${resolved.serviceKey}:${resolved.role}`),
-      ]);
-      // Free the pending-only unique key even when the old row is beyond the list window.
-      await m.query(`UPDATE service_operator_invitations SET status='cancelled',updated_at=$4
-        WHERE lower(invited_email)=$1 AND service_key=$2 AND role=$3 AND status='pending' AND expires_at<=$4`,
-        [email, resolved.serviceKey, resolved.role, this.now()]);
-      const pending = await m.query(
-        `SELECT id FROM service_operator_invitations
-        WHERE lower(invited_email)=$1 AND service_key=$2 AND role=$3 AND status='pending' FOR UPDATE`,
-        [email, resolved.serviceKey, resolved.role],
+  async listScoped(
+    actor: string,
+    kind: InvitationScope["scope_type"],
+    key: string,
+    role = "operator",
+  ) {
+    const dummy = scopeForInvitationList(kind, key, role);
+    return this.db.transaction(async (m) => {
+      await this.authority(m, dummy, actor);
+      return m.query(
+        `SELECT ${COLUMNS} FROM service_operator_invitations WHERE scope_type=$1 AND scope_key=$2
+        AND status='pending' AND expires_at>$3 AND ($1<>'cooperative' OR role=$4) ORDER BY created_at DESC LIMIT 200`,
+        [kind, key, this.now(), dummy.role],
       );
-      if (pending.length) fail('INVITATION_ALREADY_PENDING');
-      const confirmation =
-        user && (await this.activeRole(m, user.id, resolved.role));
-      const [invite] = await m.query(
-        `INSERT INTO service_operator_invitations
-        (invited_email,service_key,role,target_user_id,purpose,invited_by_user_id,token_hash,expires_at)
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING ${COLUMNS}`,
-        [
-          email,
-          resolved.serviceKey,
-          resolved.role,
-          user?.id ?? null,
-          confirmation ? 'confirmation' : 'assignment',
-          input.actorId,
-          hash(randomBytes(32).toString('hex')),
-          this.now(),
-        ],
-      );
-      return this.prepareDelivery(m, invite);
     });
-    return this.deliverCommitted(prepared);
   }
-
   async manage(
     id: string,
-    actorId: string,
-    action: 'resend' | 'cancel',
+    actor: string,
+    action: "resend" | "cancel",
   ): Promise<OperatorInvite> {
-    if (!UUID.test(id)) fail('INVALID_INVITATION_ID', 400);
-    const prepared = await this.db.transaction(async (m) => {
-      await this.actor(m, actorId);
-      const [invite]: OperatorInvite[] = await m.query(
+    if (!UUID.test(id)) fail("INVALID_INVITATION_ID", 400);
+    await this.expire(undefined, id);
+    const result = await this.db.transaction(async (m) => {
+      const [pre]: OperatorInvite[] = await m.query(
+        `SELECT ${COLUMNS} FROM service_operator_invitations WHERE id=$1`,
+        [id],
+      );
+      if (!pre) fail("INVITATION_NOT_FOUND", 404);
+      if (pre.target_user_id)
+        await lockOperatorAssignments(m, pre.target_user_id);
+      await this.authority(m, this.scope(pre), actor);
+      const [row]: OperatorInvite[] = await m.query(
         `SELECT ${COLUMNS} FROM service_operator_invitations WHERE id=$1 FOR UPDATE`,
         [id],
       );
-      if (!invite) fail('INVITATION_NOT_FOUND', 404);
-      if (invite.status !== 'pending') fail('INVITATION_NOT_PENDING');
-      if (action === 'cancel') {
-        await m.query(
-          "UPDATE service_operator_invitations SET status='cancelled',updated_at=now() WHERE id=$1",
-          [id],
+      if (!row) fail("INVITATION_NOT_FOUND", 404);
+      await this.authority(m, this.scope(row), actor);
+      if (row.status !== "pending" || new Date(row.expires_at) <= this.now())
+        fail("INVITATION_NOT_PENDING");
+      if (action === "cancel") {
+        const [closed] = invitationReturningRows<OperatorInvite>(
+          await m.query(
+            `UPDATE service_operator_invitations SET status='cancelled',invited_email=NULL,token_hash=NULL,updated_at=$2 WHERE id=$1 RETURNING ${COLUMNS}`,
+            [id, this.now()],
+          ),
         );
-        return { invite: { ...invite, status: 'cancelled' as const }, url: null };
+        return { invite: closed, url: null };
       }
-      resolveOperatorRole(invite.role, invite.service_key);
-      if (invite.target_user_id) await this.target(m, invite.target_user_id);
-      if (this.now().getTime() - new Date(invite.updated_at).getTime() < 60_000)
-        fail('INVITATION_RESEND_TOO_SOON', 429);
-      await m.query(
-        'UPDATE service_operator_invitations SET invited_by_user_id=$2 WHERE id=$1',
-        [invite.id, actorId],
+      if (row.target_user_id) {
+        const user = await this.target(m, row.target_user_id, this.scope(row));
+        if (
+          normalizeLoginEmail(user.email) !==
+          normalizeLoginEmail(row.invited_email)
+        )
+          fail("INVITATION_ACCOUNT_MISMATCH", 403);
+      }
+      if (this.now().getTime() - new Date(row.updated_at).getTime() < 60_000)
+        fail("INVITATION_RESEND_TOO_SOON", 429);
+      // Resending changes the secret, not the original seven-day personal-data deadline.
+      const token = randomBytes(32).toString("hex");
+      const [invite] = invitationReturningRows<OperatorInvite>(
+        await m.query(
+          `UPDATE service_operator_invitations SET token_hash=$2,invited_by_user_id=$3,updated_at=$4 WHERE id=$1 RETURNING ${COLUMNS}`,
+          [id, hash(token), actor, this.now()],
+        ),
       );
-      return this.prepareDelivery(m, { ...invite, invited_by_user_id: actorId });
+      return {
+        invite,
+        url: `${getServiceOrigin("neture")}/operator-invite#token=${token}`,
+      };
     });
-    return this.deliverCommitted(prepared);
+    return result.url
+      ? this.deliver(result as PreparedInvitation)
+      : result.invite;
   }
-
+  private async prove(
+    m: EntityManager,
+    invite: OperatorInvite,
+    userId: string,
+  ) {
+    if (invite.target_user_id && invite.target_user_id !== userId)
+      fail("INVITATION_ACCOUNT_MISMATCH", 403);
+    const user = await this.target(m, userId, this.scope(invite));
+    if (
+      normalizeLoginEmail(user.email) !==
+      normalizeLoginEmail(invite.invited_email)
+    )
+      fail("INVITATION_ACCOUNT_MISMATCH", 403);
+    return user;
+  }
   async inspect(
     token: string,
     userId: string,
-  ): Promise<{ serviceKey: string; role: string; purpose: string }> {
+  ): Promise<{
+    serviceKey: string;
+    role: string;
+    purpose: string;
+    scopeName?: string;
+  }> {
     if (!/^[a-f0-9]{64}$/.test(token))
-      fail('INVALID_OR_EXPIRED_INVITATION', 400);
-    const [invite]: OperatorInvite[] = await this.db.query(
-      `SELECT ${COLUMNS} FROM service_operator_invitations WHERE token_hash=$1`,
-      [hash(token)],
-    );
-    if (
-      !invite ||
-      invite.status !== 'pending' ||
-      new Date(invite.expires_at).getTime() <= this.now().getTime()
-    )
-      fail('INVALID_OR_EXPIRED_INVITATION', 400);
-    if (invite.target_user_id && invite.target_user_id !== userId)
-      fail('INVITATION_ACCOUNT_MISMATCH', 403);
-    return {
-      serviceKey: invite.service_key,
-      role: invite.role,
-      purpose: invite.purpose,
-    };
+      fail("INVALID_OR_EXPIRED_INVITATION", 400);
+    await this.expire(hash(token));
+    return this.db.transaction(async (m) => {
+      const [i]: OperatorInvite[] = await m.query(
+        `SELECT ${COLUMNS} FROM service_operator_invitations WHERE token_hash=$1`,
+        [hash(token)],
+      );
+      if (!i || i.status !== "pending" || new Date(i.expires_at) <= this.now())
+        fail("INVALID_OR_EXPIRED_INVITATION", 400);
+      await this.prove(m, i, userId);
+      const labels: Record<string, string> = {
+        neture: "Neture",
+        supplier: "공급자 서비스",
+        funding: "펀딩 서비스",
+        community: "커뮤니티",
+        lecture: "강의 서비스",
+        "kpa-society": "KPA 서비스",
+        "kpa-branch": "분회 서비스",
+        pharmacy: "약국 서비스",
+        carepharm: "CarePharm",
+        megapharm: "MegaPharm",
+        pharmcoop: "약국 협업 연합",
+      };
+      const business = i.role.match(/^neture:([^:]+)_(?:admin|operator)$/)?.[1];
+      let scopeName: string | undefined =
+        labels[business || i.scope_key || i.service_key];
+      if (i.scope_type === "branch" || i.scope_type === "cooperative") {
+        const table =
+          i.scope_type === "branch" ? "kpa_organizations" : "cooperatives";
+        const [context] = await m.query(
+          `SELECT name FROM ${table} WHERE id=$1`,
+          [i.scope_key],
+        );
+        scopeName = context?.name;
+      }
+      return {
+        serviceKey: i.service_key,
+        role: i.role,
+        purpose: i.purpose,
+        ...(scopeName ? { scopeName } : {}),
+      };
+    });
   }
-
   async accept(
     token: string,
     userId: string,
@@ -307,65 +444,82 @@ export class ServiceOperatorInvitationService {
     membershipStatuses?: Record<string, string>;
   }> {
     if (!/^[a-f0-9]{64}$/.test(token))
-      fail('INVALID_OR_EXPIRED_INVITATION', 400);
+      fail("INVALID_OR_EXPIRED_INVITATION", 400);
+    await this.expire(hash(token));
     const result = await this.db.transaction(async (m) => {
-      const [invite]: OperatorInvite[] = await m.query(
+      // Same ordering as all canonical role writers. No row lock before the target lock.
+      await lockOperatorAssignments(m, userId);
+      const [pre]: OperatorInvite[] = await m.query(
+        `SELECT ${COLUMNS} FROM service_operator_invitations WHERE token_hash=$1`,
+        [hash(token)],
+      );
+      if (
+        !pre ||
+        pre.status !== "pending" ||
+        new Date(pre.expires_at) <= this.now()
+      )
+        fail("INVALID_OR_EXPIRED_INVITATION", 400);
+      if (pre.target_user_id && pre.target_user_id !== userId)
+        fail("INVITATION_ACCOUNT_MISMATCH", 403);
+      await this.authority(
+        m,
+        this.scope(pre),
+        pre.invited_by_user_id ?? "",
+        userId,
+      );
+      const [i]: OperatorInvite[] = await m.query(
         `SELECT ${COLUMNS} FROM service_operator_invitations WHERE token_hash=$1 FOR UPDATE`,
         [hash(token)],
       );
-      if (!invite || invite.status === 'cancelled')
-        fail('INVALID_OR_EXPIRED_INVITATION', 400);
-      if (invite.target_user_id && invite.target_user_id !== userId)
-        fail('INVITATION_ACCOUNT_MISMATCH', 403);
-      if (invite.status === 'accepted') {
-        if (invite.accepted_user_id !== userId)
-          fail('INVITATION_ACCOUNT_MISMATCH', 403);
-        return {
-          serviceKey: invite.service_key,
-          role: invite.role,
-          purpose: invite.purpose,
-        };
-      }
-      if (new Date(invite.expires_at).getTime() <= this.now().getTime())
-        fail('INVALID_OR_EXPIRED_INVITATION', 400);
-      const user = await this.target(m, userId);
-      resolveOperatorRole(invite.role, invite.service_key);
-      // The inviter must still have authority at the instant of acceptance.
-      await this.actor(m, invite.invited_by_user_id ?? '');
-      let ensured;
-      if (invite.purpose === 'confirmation') {
-        if (!(await this.activeRole(m, user.id, invite.role)))
-          fail('OPERATOR_ROLE_REVOKED');
-      } else {
-        await roleAssignmentService.assignRole(
-          {
-            userId: user.id,
-            role: invite.role,
-            assignedBy: invite.invited_by_user_id!,
-          },
-          m,
-        );
-        ensured = await ensureServiceMembershipsForRoles(
-          user.id,
-          [invite.role],
-          m,
-        );
-      }
+      if (!i || i.status !== "pending" || new Date(i.expires_at) <= this.now())
+        fail("INVALID_OR_EXPIRED_INVITATION", 400);
+      const user = await this.prove(m, i, userId),
+        scope = this.scope(i);
+      const ensured = await activateInvitation(
+        m,
+        scope,
+        i.invited_by_user_id ?? "",
+        user.id,
+      );
       await m.query(
-        `UPDATE service_operator_invitations SET status='accepted',accepted_user_id=$2,accepted_at=now(),updated_at=now() WHERE id=$1`,
-        [invite.id, user.id],
+        `UPDATE service_operator_invitations SET status='accepted',accepted_user_id=$2,target_user_id=NULL,
+        accepted_at=$3,updated_at=$3,invited_email=NULL,token_hash=NULL WHERE id=$1`,
+        [i.id, user.id, this.now()],
+      );
+      // One accepted grant consumes all duplicate pending grants for this exact permission.
+      await m.query(
+        `UPDATE service_operator_invitations SET status='cancelled',invited_email=NULL,token_hash=NULL,updated_at=$5
+        WHERE id<>$1 AND status='pending' AND role=$3 AND (target_user_id=$2 OR lower(invited_email)=$4)
+        AND (($6 IN ('platform','service') AND scope_type IN ('platform','service')) OR (scope_type=$6 AND scope_key=$7))`,
+        [
+          i.id,
+          user.id,
+          i.role,
+          normalizeLoginEmail(user.email),
+          this.now(),
+          i.scope_type,
+          i.scope_key,
+        ],
+      );
+      await recordOperation(
+        m,
+        i.service_key,
+        i.invited_by_user_id,
+        "admin.service_operator_assigned",
+        { scope: i.scope_key, targetUserId: user.id, role: i.role },
       );
       return {
-        serviceKey: invite.service_key,
-        role: invite.role,
-        purpose: invite.purpose,
-        ...(ensured && {
-          membershipPolicy: ensured.policy,
-          membershipStatuses: ensured.existingStatuses,
-        }),
+        serviceKey: i.service_key,
+        role: i.role,
+        purpose: i.purpose,
+        ...(ensured && "policy" in ensured
+          ? {
+              membershipPolicy: ensured.policy,
+              membershipStatuses: ensured.existingStatuses,
+            }
+          : {}),
       };
     });
-    // assignRole clears its cache inside the transaction; clear again after commit.
     invalidateRoles(userId);
     return result;
   }

@@ -11,10 +11,11 @@
  *   - 포럼 연계 실패: 포럼 자동 연계 실패 이력 조회 + resolve
  */
 
+import FundingExceptionsPanel from './FundingExceptionsPanel';
 import { OperatorDialog } from './OperatorDialog';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useState, useEffect, useCallback, useRef, type RefObject } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
 import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from '../../api/trial';
 
@@ -42,7 +43,7 @@ const FILTER_TABS: { label: string; value: string }[] = [
   { label: '종료', value: 'closed' },
 ];
 
-type PageTab = 'trials' | 'forum-failures';
+type PageTab = 'trials' | 'forum-failures' | 'exceptions';
 
 // ============================================================================
 // 메인 페이지
@@ -50,7 +51,9 @@ type PageTab = 'trials' | 'forum-failures';
 
 export default function MarketTrialApprovalsPage() {
   const dialogFallback = useRef<HTMLHeadingElement>(null);
-  const [pageTab, setPageTab] = useState<PageTab>('trials');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageTab: PageTab = ['forum-failures','exceptions'].includes(searchParams.get('tab')??'') ? searchParams.get('tab') as PageTab : 'trials';
+  const setPageTab = (tab:PageTab) => setSearchParams(tab==='trials'?{}:{tab});
 
   return (
     <div className="p-6">
@@ -59,16 +62,19 @@ export default function MarketTrialApprovalsPage() {
       </div>
 
       {/* 상단 페이지 탭 */}
-      <div className="flex gap-1 mb-6 border-b border-gray-200">
+      <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200">
         <PageTabButton active={pageTab === 'trials'} onClick={() => setPageTab('trials')}>
           유통참여형 펀딩 관리
+        </PageTabButton>
+        <PageTabButton active={pageTab === 'exceptions'} onClick={() => setPageTab('exceptions')}>
+          입금·이행 확인 대상
         </PageTabButton>
         <PageTabButton active={pageTab === 'forum-failures'} onClick={() => setPageTab('forum-failures')}>
           포럼 연계 실패
         </PageTabButton>
       </div>
 
-      {pageTab === 'trials' ? <TrialsPanel /> : <ForumSyncFailuresPanel dialogFallback={dialogFallback} />}
+      {pageTab === 'trials' ? <TrialsPanel /> : pageTab === 'exceptions' ? <FundingExceptionsPanel /> : <ForumSyncFailuresPanel dialogFallback={dialogFallback} />}
     </div>
   );
 }

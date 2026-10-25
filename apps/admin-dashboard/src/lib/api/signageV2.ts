@@ -430,7 +430,7 @@ const getBaseUrl = (serviceKey: string = DEFAULT_SERVICE_KEY) =>
 
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
 //   playlistApi · signageMediaApi · signageScheduleApi · templateApi 는 admin 소비처 0
-//   (admin 의 signage 화면은 /admin/digital-signage/content = ContentHub 조회 하나뿐) 이라 제거.
+//   이라 제거했다. 이후 관리자 ContentHub 조회 UI도 1차 메뉴 정비에서 제거됐다.
 //   남은 globalContentApi 는 backend `/api/signage/:serviceKey/global/*` 와 1:1.
 
 // Global Content API (Content Hub)

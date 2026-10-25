@@ -22,7 +22,19 @@ import { api } from '../lib/apiClient';
  * 권한 계약을 이미 갖고 있어 공통 경로를 그대로 유지한다.
  */
 function communityPathKey(): string | undefined {
-  return typeof window === 'undefined' ? undefined : /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
+  if (typeof window === 'undefined') return undefined;
+  const segment = /^\/communities\/([^/]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
+  if (segment) {
+    // React Router business keys contain a colon (often percent encoded).
+    // Decode once, then forumBase encodes the whole segment for the scoped API.
+    // Never let malformed encoding or dot/path segments become a generic API
+    // path (or a successful demo response).
+    let key: string;
+    try { key = decodeURIComponent(segment); } catch { throw new Error('Invalid community scope'); }
+    if (!/^[a-z0-9][a-z0-9:-]*$/i.test(key)) throw new Error('Invalid community scope');
+    return key;
+  }
+  return window.location.hostname === 'community.neture.co.kr' ? 'community' : undefined;
 }
 function fundingPathKey(): string | undefined {
   return typeof window === 'undefined' ? undefined : /^\/market-trial\/([a-f0-9-]+)\/forum(?:\/|$)/i.exec(window.location.pathname)?.[1];
@@ -691,7 +703,7 @@ export async function createForumComment(
  */
 export async function updateForumPost(
   postId: string,
-  payload: { title?: string; content?: any; categorySlug?: string; type?: string }
+  payload: { title?: string; content?: any; categorySlug?: string; type?: string; status?: 'publish' }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
     const response = await api.put(`${forumBase()}/posts/${postId}`, payload);

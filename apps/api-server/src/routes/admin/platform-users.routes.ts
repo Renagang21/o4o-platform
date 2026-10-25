@@ -22,6 +22,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
+import { isRetiredRoleValue } from '../../middleware/retired-service.middleware.js';
 
 const router: Router = Router();
 
@@ -84,7 +85,7 @@ router.get('/', requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Respo
       id: u.id,
       email: u.email,
       name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' ') || null,
-      roles: roleMap[u.id] || [],
+      roles: (roleMap[u.id] || []).filter(role => !isRetiredRoleValue(role)),
       status: u.status,
       isActive: u.isActive,
       createdAt: u.createdAt,

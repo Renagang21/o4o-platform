@@ -324,6 +324,11 @@ jobs:
     - name: Run tests (web-kpa-society Vitest)
       run: npx vitest run --config services/web-kpa-society/vitest.config.mjs
 
+    - name: Run tests and build (web-pharmacy-coop)
+      run: |
+        pnpm exec vitest run --config services/web-pharmacy-coop/vitest.config.mjs
+        pnpm --filter @o4o/web-pharmacy-coop build
+
     # WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §5 (선행 작업)
     # services/web-neture 의 Local Work Agent 연결 카드 회귀 테스트는
     # vitest.config.mjs 만 있고 workflow step 이 없어 로컬 전용이었다.
@@ -332,6 +337,13 @@ jobs:
     # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
     - name: Run tests (web-neture Vitest)
       run: npx vitest run --config services/web-neture/vitest.config.mjs
+
+    - name: Verify Neture production names transform and private maps
+      run: |
+        pnpm --dir services/web-neture/tools/obfuscation-pilot install --ignore-workspace --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+        pnpm --dir services/web-neture/tools/obfuscation-pilot test
+        # Match the Docker profile against the real app graph, not only fixtures.
+        NETURE_PRIVATE_DEBUG_DIR="$RUNNER_TEMP/neture-private-debug" NETURE_OBFUSCATION=names pnpm --filter @o4o/web-neture exec vite build --outDir "$RUNNER_TEMP/neture-names-build" --emptyOutDir
 
     # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
     # services/web-kpa-branch 에는 테스트 실행 경로가 없었다. 분회 개설 신청의 예약어 주소

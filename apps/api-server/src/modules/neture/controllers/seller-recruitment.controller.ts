@@ -143,7 +143,6 @@ export function createSellerRecruitmentController(deps: {
           SERVICE_KEY_REQUIRED: [400, '모집 대상 서비스를 선택해 주세요.'],
           OFFER_NOT_FOUND: [404, '등록된 제품(공급 오퍼)을 찾을 수 없습니다.'],
           OFFER_NOT_PRIVATE: [400, '판매자 모집은 PRIVATE(판매자 제한) 유통 제품만 가능합니다. 제품을 PRIVATE 유통으로 설정한 뒤 다시 시도해 주세요.'],
-          DRUG_SERVICE_NOT_PHARMACY_AUDIENCE: [400, '의약품·규제 상품은 약국 대상 서비스에만 모집할 수 있습니다.'],
           RECRUITMENT_ALREADY_EXISTS: [409, '이미 이 제품의 판매자 모집이 존재합니다.'],
         };
         const [status, message] = map[result.error] || [400, '모집 생성에 실패했습니다.'];

@@ -46,11 +46,16 @@ function isRateLimited(err: any): boolean {
 
 const SERVICE_KEY = 'kpa';
 
+// Each business reads its own notifications; legacy pharmacy history is not a MegaPharm source.
+function scopeParams(serviceKey?: string) {
+  return { serviceKey };
+}
+
 export const notificationsApi: NotificationApiClient = {
   async getUnreadCount(params) {
     try {
       const res = await coreApiClient.get<UnreadCountResponse>('/notifications/unread-count', {
-        serviceKey: params?.serviceKey,
+        ...scopeParams(params?.serviceKey),
         organizationId: params?.organizationId,
       });
       return res?.data?.count ?? 0;
@@ -71,7 +76,7 @@ export const notificationsApi: NotificationApiClient = {
       const res = await coreApiClient.get<ListResponse>('/notifications', {
         page: params.page,
         limit: params.limit,
-        serviceKey: params.serviceKey,
+        ...scopeParams(params.serviceKey),
         organizationId: params.organizationId,
       });
       const data = res?.data ?? {};

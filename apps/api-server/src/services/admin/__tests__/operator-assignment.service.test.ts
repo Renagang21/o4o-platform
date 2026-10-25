@@ -5,6 +5,7 @@
  * 쓰는 것은 role_assignments (+ 없을 때만 service_memberships) 뿐이다.
  */
 import 'reflect-metadata';
+import { getCachedRoles, setCachedRoles } from '../../../modules/auth/utils/role-cache.js';
 
 const assignRoleMock = jest.fn(async () => ({}));
 
@@ -127,4 +128,26 @@ describe('searchCandidates — 사람을 고르기 위한 검색', () => {
     await h.service.searchCandidates('example', 500);
     expect(h.qb.limit).toHaveBeenCalledWith(50);
   });
+});
+
+
+describe('collaborator assignment preserves the canonical account and membership state', () => {
+  it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => ['admin','operator'].map(level => `neture:${key}_${level}`)))('%s never grants Neture-wide administration or activates suspended membership', async role => {
+    const h = makeHarness({ user: USER, linked: LINKED,
+      existingMembership: { userId: 'user-1', serviceKey: 'neture', status: 'suspended' } });
+    await expect(h.service.assign({ userId:'user-1',serviceKey:'neture',role }))
+      .rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+    expect(assignRoleMock).not.toHaveBeenCalled();
+    expect(h.writes.memberships).toEqual([]);
+    expect(h.writes.users).toEqual([]);
+    expect(h.writes.linkedAccounts).toEqual([]);
+  });
+});
+
+
+it('legacy central assignment refuses immediate writes without consuming cached roles',async()=>{
+  const h=makeHarness({user:USER,linked:LINKED});setCachedRoles(USER.id,[]);
+  await expect(h.service.assign({userId:USER.id,serviceKey:'neture',role:'neture:operator'}))
+    .rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+  expect(h.dataSource.transaction).not.toHaveBeenCalled();
 });
