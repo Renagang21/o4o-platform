@@ -40,7 +40,7 @@ const same = (a: unknown, b: unknown): boolean => {
 };
 export class PartnerService {
   constructor(private db: DataSource) {}
-  private async space(
+  async space(
     q: EntityManager,
     userId: string,
     id: string,
@@ -58,7 +58,7 @@ export class PartnerService {
   private owner(s: Space) {
     if (s.role !== "owner") throw new PartnerError(403, "OWNER_REQUIRED");
   }
-  private async event(
+  async event(
     q: EntityManager,
     s: Space,
     actor: string,
@@ -128,6 +128,30 @@ export class PartnerService {
           before: before.get(key) ?? null,
           after: after.get(key) ?? null,
         }));
+      const oldAssets = new Map(s.workspace.assets.map((a) => [a.id, a]));
+      const newAssets = new Map(workspace.assets.map((a) => [a.id, a]));
+      const assetChanges = [
+        ...new Set([...oldAssets.keys(), ...newAssets.keys()]),
+      ]
+        .filter(
+          (key) =>
+            !same(oldAssets.get(key) ?? null, newAssets.get(key) ?? null),
+        )
+        .map((key) => ({
+          id: key,
+          before: oldAssets.get(key) ?? null,
+          after: newAssets.get(key) ?? null,
+        }));
+      const removed = [...oldAssets.keys()].filter(
+        (key) => !newAssets.has(key),
+      );
+      if (removed.length) {
+        const files = await q.query(
+          "SELECT 1 FROM partner_support_files WHERE space_id=$1 AND asset_id=ANY($2::uuid[]) AND deleted_at IS NULL LIMIT 1",
+          [id, removed],
+        );
+        if (files.length) throw new PartnerError(409, "ASSET_HAS_FILES");
+      }
       const [updated] = await q.query(
         `WITH updated AS (UPDATE partner_support_spaces SET workspace=$2::jsonb,revision=revision+1,updated_at=now() WHERE id=$1
         RETURNING *) SELECT * FROM updated`,
@@ -138,7 +162,7 @@ export class PartnerService {
         { ...s, revision: updated.revision },
         userId,
         "workspace_saved",
-        { settlements: changes },
+        { settlements: changes, assets: assetChanges },
       );
       return { ...updated, role: s.role };
     });
@@ -250,5 +274,52 @@ export class PartnerService {
       "SELECT id,actor_id,kind,revision,changes,created_at FROM partner_support_events WHERE space_id=$1 ORDER BY created_at DESC,id DESC LIMIT 100",
       [id],
     );
+  }
+  async assetVersions(userId: string, id: string, assetId: string) {
+    const s = await this.space(this.db.manager, userId, id);
+    if (!s.workspace.assets.some((a) => a.id === assetId))
+      throw new PartnerError(404, "ASSET_NOT_FOUND");
+    const events = await this.db.query(
+      `SELECT id,revision,created_at,changes->'assets' AS assets FROM partner_support_events
+      WHERE space_id=$1 AND changes->'assets' @> $2::jsonb ORDER BY sequence DESC LIMIT 30`,
+      [id, JSON.stringify([{ id: assetId }])],
+    );
+    return events
+      .map(
+        (e: {
+          id: string;
+          revision: number;
+          created_at: string;
+          assets: { id: string; after: unknown }[];
+        }) => ({
+          id: e.id,
+          revision: e.revision,
+          createdAt: e.created_at,
+          asset: e.assets.find((a) => a.id === assetId)?.after,
+        }),
+      )
+      .filter((e: { asset: unknown }) => e.asset);
+  }
+  async notifications(userId: string) {
+    return this.db.query(
+      `SELECT s.id,s.name,COALESCE(max(e.sequence),0)::text AS cursor,
+      count(e.id) FILTER(WHERE e.sequence>COALESCE(r.last_event_seq,0) AND e.actor_id IS DISTINCT FROM $1::uuid)::int AS unread
+      FROM partner_support_spaces s LEFT JOIN partner_support_members m ON m.space_id=s.id AND m.user_id=$1
+      LEFT JOIN partner_support_reads r ON r.space_id=s.id AND r.user_id=$1
+      LEFT JOIN partner_support_events e ON e.space_id=s.id
+      WHERE s.owner_id=$1 OR m.user_id=$1 GROUP BY s.id,s.name,r.last_event_seq ORDER BY s.updated_at DESC LIMIT 100`,
+      [userId],
+    );
+  }
+  async markRead(userId: string, id: string, cursor: string) {
+    return this.db.transaction(async (q) => {
+      await this.space(q, userId, id, true);
+      await q.query(
+        `INSERT INTO partner_support_reads(space_id,user_id,last_event_seq)
+        VALUES($1,$2,LEAST($3::bigint,COALESCE((SELECT max(sequence) FROM partner_support_events WHERE space_id=$1),0)))
+        ON CONFLICT(space_id,user_id) DO UPDATE SET last_event_seq=GREATEST(partner_support_reads.last_event_seq,EXCLUDED.last_event_seq)`,
+        [id, userId, cursor],
+      );
+    });
   }
 }

@@ -4,6 +4,11 @@ import { randomUUID } from "node:crypto";
 import { DataSource } from "typeorm";
 import { createPartnerSupportRoutes } from "../partner.routes.js";
 import { CreatePartnerSupportSpaces1792886400000 } from "../../../database/migrations/1792886400000-CreatePartnerSupportSpaces.js";
+import { AddPartnerMediaAndReadState1792886500000 } from "../../../database/migrations/1792886500000-AddPartnerMediaAndReadState.js";
+import { DiskMediaStore } from "../partner.media.js";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 async function main() {
   const target = new URL(process.env.PARTNER_TEST_DATABASE_URL || "");
@@ -22,6 +27,7 @@ async function main() {
     synchronize: false,
   });
   await db.initialize();
+  const mediaRoot = await mkdtemp(join(tmpdir(), "partner-media-browser-"));
   await db.query(`CREATE SCHEMA "${schema}"`);
   const actors = {
     owner: { id: randomUUID(), name: "테스트 사업자" },
@@ -41,6 +47,7 @@ async function main() {
     await q.connect();
     try {
       await new CreatePartnerSupportSpaces1792886400000().up(q);
+      await new AddPartnerMediaAndReadState1792886500000().up(q);
     } finally {
       await q.release();
     }
@@ -90,7 +97,11 @@ async function main() {
     );
     app.use(
       "/api/v1/partner-support",
-      createPartnerSupportRoutes(db, requireTestIdentity),
+      createPartnerSupportRoutes(
+        db,
+        requireTestIdentity,
+        new DiskMediaStore(mediaRoot),
+      ),
     );
     const server = app.listen(3012, "127.0.0.1", () =>
       console.log("PARTNER_TEST_HARNESS_READY"),
@@ -104,6 +115,7 @@ async function main() {
       );
       await db.query(`DROP SCHEMA "${schema}" CASCADE`);
       await db.destroy();
+      await rm(mediaRoot, { recursive: true, force: true });
       process.exit(0);
     };
     process.once("SIGINT", () => void close());
@@ -111,6 +123,7 @@ async function main() {
   } catch (e) {
     await db.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
     await db.destroy();
+    await rm(mediaRoot, { recursive: true, force: true });
     throw e;
   }
 }

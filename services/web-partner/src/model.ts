@@ -24,6 +24,9 @@ export type Creator = RecordBase & {
   channel: Channel;
   topic: string;
   portfolio: string;
+  channelProfiles?: { channel: Channel; url: string }[];
+  language?: string;
+  region?: string;
 };
 export type Asset = RecordBase & {
   title: string;
@@ -32,6 +35,9 @@ export type Asset = RecordBase & {
   content: string;
   url: string;
   usage: string;
+  folder?: string;
+  tags?: string[];
+  isTemplate?: boolean;
 };
 export type Activity = RecordBase & {
   proposalId: string;
@@ -39,6 +45,13 @@ export type Activity = RecordBase & {
   url: string;
   publishedAt: string;
   views: number | null;
+  assetId?: string | null;
+  metrics?: {
+    likes: number | null;
+    comments: number | null;
+    shares: number | null;
+    source: "manual" | "import";
+  };
 };
 export type Settlement = RecordBase & {
   proposalId: string;
@@ -47,6 +60,8 @@ export type Settlement = RecordBase & {
   amount: number;
   status: "recorded" | "paid";
   paidAt: string | null;
+  dueDate?: string | null;
+  externalReference?: string;
 };
 export type Workspace = {
   version: 1;
@@ -210,6 +225,72 @@ export function parseWorkspace(raw: string): Workspace {
       )
         throw new Error("저장된 필수 항목이 비어 있습니다.");
       ids.add(row.id as string);
+      if (key === "creators") {
+        if (
+          ["language", "region"].some(
+            (k) =>
+              row[k] !== undefined &&
+              (typeof row[k] !== "string" || (row[k] as string).length > 100),
+          )
+        )
+          throw new Error("프로필 지역·언어가 올바르지 않습니다.");
+        if (
+          row.channelProfiles !== undefined &&
+          (!Array.isArray(row.channelProfiles) ||
+            row.channelProfiles.length > 12 ||
+            row.channelProfiles.some(
+              (p) =>
+                !object(p) ||
+                !channel(p) ||
+                typeof p.url !== "string" ||
+                !p.url ||
+                !validUrl(p.url),
+            ))
+        )
+          throw new Error("추가 채널이 올바르지 않습니다.");
+      }
+      if (key === "assets") {
+        if (
+          row.folder !== undefined &&
+          (typeof row.folder !== "string" || row.folder.length > 100)
+        )
+          throw new Error("분류가 올바르지 않습니다.");
+        if (
+          row.tags !== undefined &&
+          (!Array.isArray(row.tags) ||
+            row.tags.length > 10 ||
+            row.tags.some(
+              (t) => typeof t !== "string" || !t.trim() || t.length > 30,
+            ))
+        )
+          throw new Error("태그가 올바르지 않습니다.");
+        if (row.isTemplate !== undefined && typeof row.isTemplate !== "boolean")
+          throw new Error("템플릿 형식이 올바르지 않습니다.");
+      }
+      if (key === "activities" && row.metrics !== undefined) {
+        if (
+          !object(row.metrics) ||
+          !["manual", "import"].includes(row.metrics.source as string) ||
+          ["likes", "comments", "shares"].some(
+            (k) =>
+              (row.metrics as Record<string, unknown>)[k] !== null &&
+              (!Number.isSafeInteger(
+                (row.metrics as Record<string, unknown>)[k],
+              ) ||
+                Number((row.metrics as Record<string, unknown>)[k]) < 0),
+          )
+        )
+          throw new Error("활동 지표가 올바르지 않습니다.");
+      }
+      if (key === "settlements") {
+        if (
+          row.externalReference !== undefined &&
+          (typeof row.externalReference !== "string" ||
+            row.externalReference.length > 250)
+        )
+          throw new Error("지급 참조가 올바르지 않습니다.");
+        if (row.dueDate != null) validCalendarDate(String(row.dueDate));
+      }
       if (["proposals", "creators", "assets"].includes(key) && !channel(row))
         throw new Error("지원하지 않는 채널입니다.");
       const urls =
@@ -250,7 +331,53 @@ export function parseWorkspace(raw: string): Workspace {
     )
       throw new Error("연결된 제안 또는 홍보자가 없습니다.");
   }
+  for (const row of workspace.activities)
+    if (
+      row.assetId != null &&
+      !workspace.assets.some((a) => a.id === row.assetId)
+    )
+      throw new Error("연결된 콘텐츠가 없습니다.");
   return workspace;
+}
+
+export function validCalendarDate(value: string): string {
+  const d = new Date(`${value}T00:00:00Z`);
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
+    !Number.isFinite(d.getTime()) ||
+    d.toISOString().slice(0, 10) !== value
+  )
+    throw new Error("올바른 날짜를 입력해 주세요.");
+  return value;
+}
+export function tags(value: string): string[] {
+  const result = [
+    ...new Set(
+      value
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean),
+    ),
+  ];
+  if (result.length > 10 || result.some((v) => v.length > 30))
+    throw new Error("태그는 30자 이내로 최대 10개 입력해 주세요.");
+  return result;
+}
+export function channelProfiles(
+  value: string,
+): NonNullable<Creator["channelProfiles"]> {
+  const rows = value
+    .split(/\r?\n/)
+    .map((v) => v.trim())
+    .filter(Boolean);
+  if (rows.length > 12) throw new Error("추가 채널은 최대 12개입니다.");
+  return rows.map((row) => {
+    const [c, ...rest] = row.split("|");
+    const channel = c.trim() as Channel;
+    if (!channels.includes(channel))
+      throw new Error("채널명 | https://주소 형식으로 입력해 주세요.");
+    return { channel, url: webUrl(rest.join("|").trim()) };
+  });
 }
 
 export function loadWorkspace(storage: Pick<Storage, "getItem">): {
@@ -284,10 +411,22 @@ export function settlementCsv(workspace: Workspace): string {
     return `"${(/^[\s]*[=+@\-\t\r\n]/.test(text) ? `'${text}` : text).replaceAll('"', '""')}"`;
   };
   const rows: (string | number)[][] = [
-    ["제안", "홍보자", "내역", "금액(KRW)", "상태", "등록시각", "지급기록시각"],
+    [
+      "settlementId",
+      "제안",
+      "홍보자",
+      "내역",
+      "금액(KRW)",
+      "상태",
+      "등록시각",
+      "지급기록시각",
+      "dueDate",
+      "reference",
+    ],
   ];
   for (const s of workspace.settlements)
     rows.push([
+      s.id,
       workspace.proposals.find((p) => p.id === s.proposalId)?.title ?? "",
       workspace.creators.find((c) => c.id === s.creatorId)?.name ?? "",
       s.memo,
@@ -295,6 +434,8 @@ export function settlementCsv(workspace: Workspace): string {
       s.status === "paid" ? "외부 지급 기록" : "미지급 기록",
       s.createdAt,
       s.paidAt ?? "",
+      s.dueDate ?? "",
+      s.externalReference ?? "",
     ]);
   return "\uFEFF" + rows.map((row) => row.map(cell).join(",")).join("\r\n");
 }

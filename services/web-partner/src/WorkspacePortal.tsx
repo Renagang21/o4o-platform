@@ -4,6 +4,7 @@ import {
   partnerApi,
   ApiError,
   type AuditEvent,
+  type Notification,
   type Invitation,
   type Member,
   type ServerSpace,
@@ -49,6 +50,8 @@ export default function WorkspacePortal() {
   const [members, setMembers] = useState<Member[]>([]);
   const [invites, setInvites] = useState<Invitation[]>([]);
   const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]),
+    [showNotifications, setShowNotifications] = useState(false);
   const [inviteLink, setInviteLink] = useState("");
   const [joinToken, setJoinToken] = useState("");
   useEffect(() => {
@@ -75,6 +78,13 @@ export default function WorkspacePortal() {
       await work();
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) {
+        setNotifications([]);
+        setShowNotifications(false);
+        setSpaces([]);
+        setMembers([]);
+        setEvents([]);
+        setInvites([]);
+        setManage(false);
         setUser(null);
         setSelected(null);
         snapshot.current = null;
@@ -165,6 +175,20 @@ export default function WorkspacePortal() {
         {mode === "local" ? "브라우저 작업공간" : "서버 공동공간"}
       </span>
       <div className="button-row">
+        {mode === "server" && user && (
+          <button
+            className="button quiet"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                setNotifications(await partnerApi.notifications());
+                setShowNotifications(!showNotifications);
+              })
+            }
+          >
+            공동공간 알림
+          </button>
+        )}
         <button
           className="button quiet"
           onClick={() => {
@@ -199,6 +223,8 @@ export default function WorkspacePortal() {
                 setMembers([]);
                 setEvents([]);
                 setInvites([]);
+                setNotifications([]);
+                setShowNotifications(false);
               })
             }
           >
@@ -220,6 +246,43 @@ export default function WorkspacePortal() {
     <>
       {toolbar}
       <section className="server-console" aria-label="서버 공동공간">
+        {showNotifications && user && (
+          <div className="panel">
+            <h2>공동공간 변경 알림</h2>
+            <p className="hint">
+              다른 참여자가 자료·파일·활동을 변경하면 확인할 수 있습니다. 본인이
+              만든 변경은 제외합니다.
+            </p>
+            {notifications.map((n) => (
+              <div className="notification-row" key={n.id} data-space-id={n.id}>
+                <span>
+                  {n.name} · 새 변경 {n.unread}건
+                </span>
+                <div className="button-row">
+                  <button
+                    className="text-button"
+                    disabled={busy}
+                    onClick={() => void run(() => choose(n.id))}
+                  >
+                    공간 열기
+                  </button>
+                  <button
+                    className="text-button"
+                    disabled={busy || !n.unread}
+                    onClick={() =>
+                      void run(async () => {
+                        await partnerApi.markRead(n.id, n.cursor);
+                        setNotifications(await partnerApi.notifications());
+                      })
+                    }
+                  >
+                    읽음으로 표시
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {error && (
           <p className="message failure" role="alert">
             {error}
@@ -630,6 +693,7 @@ export default function WorkspacePortal() {
         <App
           key={`${selected.id}-${epoch}`}
           remote={{
+            spaceId: selected.id,
             workspace: selected.workspace,
             role: selected.role,
             name: selected.name,

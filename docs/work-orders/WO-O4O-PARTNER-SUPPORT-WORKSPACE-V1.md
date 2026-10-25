@@ -50,11 +50,32 @@
 - [x] 서버/로컬 모드 전환과 새로고침 유지, StrictMode 초대 fragment 처리, 모바일 권한별 화면
 - [x] 로컬 PostgreSQL 및 세 브라우저 테스트용 세션의 전체 공유 흐름 검증
 
+## 통합 전 개발 묶음 — 사용자 승인 범위
+
+사용자 지시: TODO와 검증 기준을 먼저 확인하고 가능한 기능을 한 묶음으로 구현·검증·push한다. main merge/rebase·PR·운영 DB·배포는 수행하지 않는다.
+기존 `wo/partner-support-workspace-v1` 연속 작업이며 시작 HEAD는 `5de6c0489f`다.
+
+- [x] 사전 확인: 깨끗한 checkout·기존 프런트 테스트/빌드·API 타입 검사, 추가 패키지 없이 구현 가능 여부
+- [x] 인증된 이미지·영상 업로드/다운로드/미리보기, 공간별 권한·용량 제한·파일 버전 (로컬 디스크 adapter, 운영 영속 스토리지는 별도 연결)
+- [x] 콘텐츠 분류·태그·템플릿·텍스트 버전 이력/복원, 자료에서 제작 도구로 이어지는 흐름
+- [x] 홍보자 복수 채널·언어·지역 프로필
+- [x] 게시 활동 CSV 일괄 등록·중복 방지·직접 입력 지표와 콘텐츠별 비교 리포트
+- [x] 지급 예정일·기간/상태별 명세·외부 지급 결과 CSV 가져오기 (실송금·세금 계산 제외)
+- [x] 공동공간 변경 알림·계정별 읽음 상태, 협의/계약 관리 추가 금지
+- [x] API/웹 검사·실제 일회성 PostgreSQL·권한/부정 입력/충돌/파일 무결성 테스트·desktop/mobile 브라우저 검증
+- [x] TODO 결과 갱신·검증 범위 점검 (정리·commit·push 결과는 완료 보고로 인계)
+
+검증 기준: 다른 공간의 파일/이력을 읽을 수 없어야 한다. 열람자는 쓰기 불가, 편집자는 정산 변경 불가다. 파일명/경로·MIME 위장·초과 용량을 거부한다. 가져오기는 전체 검증 후 저장하며 중복/오류 시 부분 반영하지 않는다. CSV 지표는 직접 등록한 정보임을 표시한다. 이전 데이터/백업은 계속 읽을 수 있어야 하며 실제 외부 AI/SNS/지급을 호출하지 않는다. DB 검증은 task 전용 컨테이너와 schema에서만 실행한다.
+
+### 사전 설계 확인
+
+기존 snapshot JSON에 선택 필드를 추가해 호환성을 유지한다. 파일은 JSON에 base64로 넣지 않고 별도 권한 검사된 API로 취급한다. 파일 metadata와 알림 읽음 cursor는 별도 테이블, 콘텐츠 텍스트 버전은 기존 변경 이벤트에 기록한다. 스토리지 미설정 시 업로드는 명확히 거부한다. 기존 전역 인증/role/commerce 계약은 변경하지 않는다.
+
 ## TODO — 외부 연결과 운영 인계
 
-- [ ] 최신 main 통합 시 migration 순서·fingerprint 재검증: 마지막 fetch의 `23717b6dc0`에서 동일 manifest/expected-state 파일이 변경되었다. 이번 fingerprint는 준비된 checkout의 prefix를 검증한 값이며, 통합 담당은 병합 후 격리 PostgreSQL에서 새 순서로 재산출·검증해야 한다. 자동 merge/reset은 수행하지 않았다.
+- [ ] 최신 main 통합 시 migration 순서·fingerprint 재검증: 마지막 fetch의 `c63e370594`에서 동일 manifest/expected-state 파일이 변경되었다. 이번 fingerprint는 준비된 checkout의 prefix를 검증한 값이며, 통합 담당은 병합 후 격리 PostgreSQL에서 새 순서로 재산출·검증해야 한다. 자동 merge/reset은 수행하지 않았다.
 - [ ] 실제 O4O 개발용 계정의 기존 인증 미들웨어·약관·세션 정책 end-to-end 검증
-- [ ] 파일 업로드용 영속 스토리지와 콘텐츠 버전 관리 (현재 원본 URL·사용 범위·텍스트 자료 지원)
+- [ ] 운영 영속 스토리지·공유 볼륨/객체 저장소 연결 및 개인정보 파기·백업 정책 검증 (로컬 파일 저장·파일/텍스트 버전은 구현·격리 검증 완료)
 - [ ] 외부 전환 수집·검증 출처·기간·중복 처리
 - [ ] 실제 송금·원천징수·세금 처리 제공자 연결 (현재 수동 지급 기록·명세·감사 이력)
 - [ ] AI 생성 서비스 연결 (현재는 규칙 기반 템플릿)
@@ -101,3 +122,18 @@
 - Chromium: 세 격리 세션 간 공유, 일회용 초대, 열람자 수정 UI 제한, 편집자 정산 제한, 소유자 정산 수정·지급 기록, 변경 이력, 접근 해제 확인. 서버/모바일 화면 육안 확인.
 - 로컬 Chromium 기능 회귀와 28개 화면 폭 검사 통과. 테스트 context는 종료 후 닫았고 실제 외부 게시·송금은 수행하지 않았다.
 - migration 운영 적용·실계정 인증·외부 서비스·운영 도메인 배포와 전체 monorepo CI는 미실행. migration 포함 배포는 통합 담당의 별도 운영 승인 경계다.
+
+## 통합 전 개발 묶음 검증 결과
+
+- 개발 전에 기존 프런트 48 tests, 웹 build, API type-check를 실행해 정상 기준을 확인했다. 추가 외부 패키지는 없다.
+- 프런트 5개 파일 62 tests, 실제 일회성 PostgreSQL API 16 tests 통과. 이전 snapshot/백업, 복수 채널/분류/템플릿, CSV 전량 검증·중복/재실행, 0/미입력 지표를 확인했다.
+- 파일은 사용자/공간 ACL·25MB·100개/500MB 제한·실제 MIME signature·SHA-256 검사를 거친다. 잘못된 MIME/HTML/SVG·초과 업로드·다른 공간 접근·변조된 파일을 거부했다. 실패한 metadata transaction과 quota 초과 시 생성 파일을 정리했다.
+- Chromium: 실제 PNG 업로드·미리보기·버전 추가/이전 버전 다운로드, 생성한 무음 32x32 WebM 업로드·재생 확인. 파일은 테스트용 local adapter로만 처리했다.
+- 같은 브라우저 흐름에서 텍스트 버전 복원·활동 CSV 등록/중복 제외·비교 리포트·지급 예정일·외부 지급 결과 CSV·계정별 알림 읽음을 확인했다. 실제 AI/SNS/지급 호출은 없다.
+- 8개 화면 × 4개 폭(360/390/768/1440) = 32회 layout 검사와 모바일 역할별 공유 화면을 확인했다.
+- PostgreSQL 15 canonical prefix 38까지 준비 후 39번째 media/read-state migration 적용 성공. fingerprint `75835f71568a80334d64a06279a72931b8fbd414273535643bb45bc6da3d65d0`(6,928줄) 일치. 빈 상태 down/up에서 양쪽 fingerprint 일치. 운영 DB는 사용하지 않았다.
+- main 통합·rebase·PR·배포는 수행하지 않았다. 최신 main과 함께 반영할 때 migration 순서와 fingerprint를 다시 검증해야 한다.
+- JSON 백업은 자료/기록용이며 첨부 파일 bytes는 별도로 보관해야 한다. 운영 파일 저장소 및 개인정보 파기 연결은 위 인계 TODO다.
+
+- 최종 웹/API production build와 API type-check, ESLint 통과. migration contract 21 PASS / 0 FAIL, unsafe route guard 위반 0건, 문서 민감정보 검사·diff 검사 통과.
+- 브라우저 harness 종료 후 테스트 schema 잔존 0건 확인. 이번 작업 전용 PostgreSQL 컨테이너·볼륨과 생성한 임시 자격정보·검증 helper를 삭제했다.

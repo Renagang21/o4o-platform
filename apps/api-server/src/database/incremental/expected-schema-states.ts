@@ -322,6 +322,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateExternalAiConnections1792635132325', fingerprint: '4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3', fingerprintLineCount: 6838 },
   // Isolated PostgreSQL 15 canonical bootstrap + all ordered prefixes; no production reads.
   { appliedThrough: 'CreatePartnerSupportSpaces1792886400000', fingerprint: '78d2aee502dffdd04b9b8b075341a23bf51d44e95672e70351f46bfb6f4ef2e5', fingerprintLineCount: 6893 },
+  // Task-isolated PostgreSQL 15, canonical baseline + ordered prefixes; no production reads.
+  { appliedThrough: 'AddPartnerMediaAndReadState1792886500000', fingerprint: '75835f71568a80334d64a06279a72931b8fbd414273535643bb45bc6da3d65d0', fingerprintLineCount: 6928 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

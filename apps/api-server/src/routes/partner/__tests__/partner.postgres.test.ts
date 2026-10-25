@@ -5,11 +5,17 @@ import { DataSource } from "typeorm";
 import { createPartnerSupportRoutes } from "../partner.routes";
 import { emptyPartnerWorkspace } from "../partner.schema";
 import { CreatePartnerSupportSpaces1792886400000 } from "../../../database/migrations/1792886400000-CreatePartnerSupportSpaces";
+import { AddPartnerMediaAndReadState1792886500000 } from "../../../database/migrations/1792886500000-AddPartnerMediaAndReadState";
+import { DiskMediaStore, MAX_MEDIA_BYTES } from "../partner.media";
+import { mkdtemp, rm, writeFile, readdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const url = process.env.PARTNER_TEST_DATABASE_URL;
 const suite = url ? describe : describe.skip;
 suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
   let db: DataSource, app: express.Express;
+  let mediaRoot: string;
   const schema = `partner_it_${randomUUID().replaceAll("-", "")}`;
   const users = {
     owner: randomUUID(),
@@ -52,6 +58,46 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     expect(r.status).toBe(201);
     return r.body.data;
   };
+  const assetSpace = async () => {
+    const s = await create(),
+      w = emptyPartnerWorkspace();
+    const a = {
+      id: randomUUID(),
+      createdAt: new Date().toISOString(),
+      title: "테스트 자료",
+      business: "테스트",
+      channel: "라인" as const,
+      content: "초기 내용",
+      url: "",
+      usage: "직접 제작",
+    };
+    w.assets.push(a);
+    const r = await call("owner").put(`/spaces/${s.id}`, {
+      revision: 0,
+      workspace: w,
+    });
+    expect(r.status).toBe(200);
+    return { space: r.body.data, asset: a };
+  };
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aJ1kAAAAASUVORK5CYII=",
+    "base64",
+  );
+  const upload = (
+    actor: keyof typeof users,
+    space: string,
+    asset: string,
+    bytes = png,
+    mime = "image/png",
+    previous?: string,
+  ) =>
+    request(app)
+      .post(
+        `/partner/spaces/${space}/assets/${asset}/files${previous ? `/${previous}/versions` : ""}`,
+      )
+      .set("x-test-actor", actor)
+      .set("X-Requested-With", "O4O-Partner")
+      .attach("file", bytes, { filename: "테스트.png", contentType: mime });
   beforeAll(async () => {
     const target = new URL(url!);
     if (
@@ -82,13 +128,19 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     await q.connect();
     try {
       await new CreatePartnerSupportSpaces1792886400000().up(q);
+      await new AddPartnerMediaAndReadState1792886500000().up(q);
     } finally {
       await q.release();
     }
+    mediaRoot = await mkdtemp(join(tmpdir(), "partner-media-it-"));
     app = express();
-    app.use("/partner", createPartnerSupportRoutes(db, auth));
+    app.use(
+      "/partner",
+      createPartnerSupportRoutes(db, auth, new DiskMediaStore(mediaRoot)),
+    );
   }, 30000);
   afterAll(async () => {
+    if (mediaRoot) await rm(mediaRoot, { recursive: true, force: true });
     if (db?.isInitialized) {
       await db.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
       await db.destroy();
@@ -387,5 +439,217 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     } finally {
       await q.release();
     }
+  });
+  it("stores authorized file versions, supports byte ranges and denies cross-space access", async () => {
+    const { space, asset } = await assetSpace(),
+      i = await invite(space.id, "viewer");
+    await call("viewer").post("/join", { token: i.token });
+    const first = await upload("owner", space.id, asset.id);
+    expect(first.status).toBe(201);
+    expect(first.body.data.sha256).toHaveLength(64);
+    expect((await upload("viewer", space.id, asset.id)).status).toBe(403);
+    expect(
+      (
+        await call("outsider").get(
+          `/spaces/${space.id}/files/${first.body.data.id}`,
+        )
+      ).status,
+    ).toBe(404);
+    const downloaded = await call("viewer").get(
+      `/spaces/${space.id}/files/${first.body.data.id}`,
+    );
+    expect(downloaded.status).toBe(200);
+    expect(downloaded.body).toEqual(png);
+    expect(downloaded.headers["x-content-type-options"]).toBe("nosniff");
+    const partial = await call("viewer")
+      .get(`/spaces/${space.id}/files/${first.body.data.id}`)
+      .set("Range", "bytes=0-3");
+    expect(partial.status).toBe(206);
+    expect(partial.body).toEqual(png.subarray(0, 4));
+    expect(
+      (
+        await call("owner")
+          .get(`/spaces/${space.id}/files/${first.body.data.id}`)
+          .set("Range", "bytes=999999-")
+      ).status,
+    ).toBe(416);
+    const second = await upload(
+      "owner",
+      space.id,
+      asset.id,
+      png,
+      "image/png",
+      first.body.data.id,
+    );
+    expect(second.status).toBe(201);
+    expect(second.body.data.version).toBe(2);
+    expect(second.body.data.group_id).toBe(first.body.data.group_id);
+    expect(
+      (
+        await call("owner").put(`/spaces/${space.id}`, {
+          revision: 1,
+          workspace: emptyPartnerWorkspace(),
+        })
+      ).status,
+    ).toBe(409);
+    expect(
+      (
+        await call("owner")
+          .delete(`/spaces/${space.id}/files/${second.body.data.id}`)
+          .set("X-Requested-With", "O4O-Partner")
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await call("owner").get(
+          `/spaces/${space.id}/files/${first.body.data.id}`,
+        )
+      ).status,
+    ).toBe(404);
+    expect(await readdir(join(mediaRoot, space.id))).toHaveLength(0);
+  });
+  it("rejects MIME spoofing, HTML/SVG, excess upload and unconfigured storage", async () => {
+    const { space, asset } = await assetSpace();
+    expect(
+      (
+        await upload(
+          "owner",
+          space.id,
+          asset.id,
+          Buffer.from('<svg onload="alert(1)"/>'),
+          "image/png",
+        )
+      ).status,
+    ).toBe(415);
+    expect(
+      (await upload("owner", space.id, asset.id, png, "video/mp4")).status,
+    ).toBe(415);
+    expect(
+      (
+        await upload(
+          "owner",
+          space.id,
+          asset.id,
+          Buffer.alloc(MAX_MEDIA_BYTES + 1),
+          "image/png",
+        )
+      ).status,
+    ).toBe(413);
+    const disabled = express();
+    disabled.use("/partner", createPartnerSupportRoutes(db, auth));
+    expect(
+      (
+        await request(disabled)
+          .post(`/partner/spaces/${space.id}/assets/${asset.id}/files`)
+          .set("x-test-actor", "owner")
+          .set("X-Requested-With", "O4O-Partner")
+          .attach("file", png, {
+            filename: "fixture.png",
+            contentType: "image/png",
+          })
+      ).status,
+    ).toBe(503);
+  });
+  it("does not serve changed disk contents and cleans a failed metadata transaction", async () => {
+    const { space, asset } = await assetSpace();
+    const file = await upload("owner", space.id, asset.id);
+    expect(file.status).toBe(201);
+    await writeFile(join(mediaRoot, space.id, file.body.data.id), "tampered");
+    expect(
+      (
+        await call("owner").get(
+          `/spaces/${space.id}/files/${file.body.data.id}`,
+        )
+      ).status,
+    ).toBe(503);
+    await db.query(
+      `CREATE FUNCTION fail_media_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'audit unavailable'; END $$`,
+    );
+    await db.query(
+      "CREATE TRIGGER fail_media_audit BEFORE INSERT ON partner_support_events FOR EACH ROW EXECUTE FUNCTION fail_media_audit()",
+    );
+    try {
+      expect((await upload("owner", space.id, asset.id)).status).toBe(503);
+      expect(await readdir(join(mediaRoot, space.id))).toHaveLength(1);
+    } finally {
+      await db.query("DROP TRIGGER fail_media_audit ON partner_support_events");
+      await db.query("DROP FUNCTION fail_media_audit()");
+    }
+  });
+  it("records content versions and keeps financial audit private from viewers", async () => {
+    const { space, asset } = await assetSpace(),
+      i = await invite(space.id, "viewer");
+    await call("viewer").post("/join", { token: i.token });
+    const w = space.workspace;
+    w.assets[0].content = "수정한 내용";
+    expect(
+      (
+        await call("owner").put(`/spaces/${space.id}`, {
+          revision: 1,
+          workspace: w,
+        })
+      ).status,
+    ).toBe(200);
+    const versions = await call("viewer").get(
+      `/spaces/${space.id}/assets/${asset.id}/versions`,
+    );
+    expect(versions.status).toBe(200);
+    expect(versions.body.data.map((v: any) => v.asset.content)).toEqual([
+      "수정한 내용",
+      "초기 내용",
+    ]);
+    expect(
+      (
+        await call("outsider").get(
+          `/spaces/${space.id}/assets/${asset.id}/versions`,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (await call("viewer").get(`/spaces/${space.id}/events`)).status,
+    ).toBe(403);
+  });
+  it("keeps notifications and read cursors scoped to the account and space", async () => {
+    const { space } = await assetSpace(),
+      i = await invite(space.id, "viewer");
+    await call("viewer").post("/join", { token: i.token });
+    const notes = await call("viewer").get("/notifications"),
+      own = notes.body.data.find((n: any) => n.id === space.id);
+    expect(own.unread).toBeGreaterThan(0);
+    expect(
+      (
+        await call("outsider").post(`/spaces/${space.id}/read`, {
+          cursor: own.cursor,
+        })
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await call("viewer").post(`/spaces/${space.id}/read`, {
+          cursor: own.cursor,
+        })
+      ).status,
+    ).toBe(200);
+    const after = (await call("viewer").get("/notifications")).body.data.find(
+      (n: any) => n.id === space.id,
+    );
+    expect(after.unread).toBe(0);
+    expect(
+      (await call("owner").get("/notifications")).body.data.find(
+        (n: any) => n.id === space.id,
+      ).unread,
+    ).toBeGreaterThan(0);
+  });
+  it("enforces aggregate media quota without leaving the rejected object on disk", async () => {
+    const { space, asset } = await assetSpace();
+    const id = randomUUID();
+    await db.query(
+      `INSERT INTO partner_support_files(id,space_id,asset_id,group_id,version,name,mime,size,sha256,created_by) VALUES($1,$2,$3,$1,1,'quota-fixture','image/png',$4,$5,$6)`,
+      [id, space.id, asset.id, 500 * 1024 * 1024, "0".repeat(64), users.owner],
+    );
+    const result = await upload("owner", space.id, asset.id);
+    expect(result.status).toBe(409);
+    expect(result.body.code).toBe("MEDIA_QUOTA");
+    expect(await readdir(join(mediaRoot, space.id))).toHaveLength(0);
   });
 });

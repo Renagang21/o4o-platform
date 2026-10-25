@@ -14,7 +14,8 @@ type Field = {
     | "date"
     | "channel"
     | "proposal"
-    | "creator";
+    | "creator"
+    | "asset";
   optional?: boolean;
 };
 const definitions: Record<Collection, Field[]> = {
@@ -28,6 +29,14 @@ const definitions: Record<Collection, Field[]> = {
     { key: "contact", label: "외부 문의처 주소", type: "url", optional: true },
   ],
   creators: [
+    {
+      key: "channelProfiles",
+      label: "추가 채널 (채널명 | 주소, 한 줄씩)",
+      type: "textarea",
+      optional: true,
+    },
+    { key: "language", label: "활동 언어", optional: true },
+    { key: "region", label: "활동 지역", optional: true },
     { key: "name", label: "활동 이름" },
     { key: "channel", label: "활동 채널", type: "channel" },
     { key: "topic", label: "활동 분야·소개", type: "textarea" },
@@ -39,6 +48,8 @@ const definitions: Record<Collection, Field[]> = {
     },
   ],
   assets: [
+    { key: "folder", label: "자료 분류", optional: true },
+    { key: "tags", label: "태그 (쉼표로 구분)", optional: true },
     { key: "title", label: "자료 제목" },
     { key: "business", label: "제공자·브랜드" },
     { key: "channel", label: "활용 채널", type: "channel" },
@@ -47,6 +58,25 @@ const definitions: Record<Collection, Field[]> = {
     { key: "usage", label: "사용 범위·출처", type: "textarea" },
   ],
   activities: [
+    { key: "assetId", label: "연결 콘텐츠", type: "asset", optional: true },
+    {
+      key: "likes",
+      label: "직접 확인한 좋아요",
+      type: "number",
+      optional: true,
+    },
+    {
+      key: "comments",
+      label: "직접 확인한 댓글",
+      type: "number",
+      optional: true,
+    },
+    {
+      key: "shares",
+      label: "직접 확인한 공유",
+      type: "number",
+      optional: true,
+    },
     { key: "proposalId", label: "홍보 제안", type: "proposal" },
     { key: "creatorId", label: "홍보자", type: "creator" },
     { key: "url", label: "게시물 주소", type: "url" },
@@ -59,6 +89,8 @@ const definitions: Record<Collection, Field[]> = {
     },
   ],
   settlements: [
+    { key: "dueDate", label: "지급 예정일", type: "date", optional: true },
+    { key: "externalReference", label: "외부 지급 참조", optional: true },
     { key: "proposalId", label: "홍보 제안", type: "proposal" },
     { key: "creatorId", label: "홍보자", type: "creator" },
     { key: "memo", label: "지급 내역 설명" },
@@ -119,9 +151,34 @@ export default function RecordEditor({
         }}
       >
         <fieldset disabled={disabled}>
+          {target.kind === "assets" && (
+            <label className="check-label">
+              <input
+                type="checkbox"
+                name="isTemplate"
+                defaultChecked={"isTemplate" in row && row.isTemplate}
+              />
+              재사용 템플릿으로 보관
+            </label>
+          )}
           {definitions[target.kind].map((f) => {
             const id = `${prefix}-${f.key}`,
-              value = (row as unknown as Record<string, unknown>)[f.key];
+              value =
+                f.key === "channelProfiles"
+                  ? "channelProfiles" in row
+                    ? row.channelProfiles
+                        ?.map((p) => `${p.channel} | ${p.url}`)
+                        .join("\n")
+                    : ""
+                  : f.key === "tags"
+                    ? "tags" in row
+                      ? row.tags?.join(", ")
+                      : ""
+                    : ["likes", "comments", "shares"].includes(f.key)
+                      ? "metrics" in row
+                        ? row.metrics?.[f.key as "likes"]
+                        : ""
+                      : (row as unknown as Record<string, unknown>)[f.key];
             const props = {
               id,
               name: f.key,
@@ -136,10 +193,11 @@ export default function RecordEditor({
                 </label>
                 {f.type === "textarea" ? (
                   <textarea {...props} rows={4} maxLength={20000} />
-                ) : ["channel", "proposal", "creator"].includes(
+                ) : ["channel", "proposal", "creator", "asset"].includes(
                     f.type || "",
                   ) ? (
                   <select {...props}>
+                    {f.optional && <option value="">연결 안 함</option>}
                     {f.type === "channel"
                       ? channels.map((c) => <option key={c}>{c}</option>)
                       : (f.type === "proposal"
@@ -147,10 +205,15 @@ export default function RecordEditor({
                               id: p.id,
                               title: p.title,
                             }))
-                          : workspace.creators.map((c) => ({
-                              id: c.id,
-                              title: c.name,
-                            }))
+                          : f.type === "asset"
+                            ? workspace.assets.map((a) => ({
+                                id: a.id,
+                                title: a.title,
+                              }))
+                            : workspace.creators.map((c) => ({
+                                id: c.id,
+                                title: c.name,
+                              }))
                         ).map((o) => (
                           <option key={o.id} value={o.id}>
                             {o.title}

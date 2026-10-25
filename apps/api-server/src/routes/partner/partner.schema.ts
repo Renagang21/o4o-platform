@@ -66,6 +66,12 @@ export const workspaceSchema = z
             channel,
             topic: content,
             portfolio: url,
+            channelProfiles: z
+              .array(z.object({ channel, url: requiredUrl }).strict())
+              .max(12)
+              .optional(),
+            language: z.string().max(100).optional(),
+            region: z.string().max(100).optional(),
           })
           .strict(),
       )
@@ -81,6 +87,9 @@ export const workspaceSchema = z
             content,
             url,
             usage: content,
+            folder: z.string().max(100).optional(),
+            tags: z.array(z.string().trim().min(1).max(30)).max(10).optional(),
+            isTemplate: z.boolean().optional(),
           })
           .strict(),
       )
@@ -94,6 +103,31 @@ export const workspaceSchema = z
             creatorId: id,
             url: requiredUrl,
             publishedAt: date,
+            assetId: id.nullable().optional(),
+            metrics: z
+              .object({
+                likes: z
+                  .number()
+                  .int()
+                  .min(0)
+                  .max(Number.MAX_SAFE_INTEGER)
+                  .nullable(),
+                comments: z
+                  .number()
+                  .int()
+                  .min(0)
+                  .max(Number.MAX_SAFE_INTEGER)
+                  .nullable(),
+                shares: z
+                  .number()
+                  .int()
+                  .min(0)
+                  .max(Number.MAX_SAFE_INTEGER)
+                  .nullable(),
+                source: z.enum(["manual", "import"]),
+              })
+              .strict()
+              .optional(),
             views: z
               .number()
               .int()
@@ -115,6 +149,8 @@ export const workspaceSchema = z
             amount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
             status: z.enum(["recorded", "paid"]),
             paidAt: z.string().datetime({ offset: true }).nullable(),
+            dueDate: date.nullable().optional(),
+            externalReference: z.string().max(250).optional(),
           })
           .strict(),
       )
@@ -142,6 +178,10 @@ export const workspaceSchema = z
       if ((s.status === "paid") !== (s.paidAt !== null))
         ctx.addIssue({ code: "custom", message: "INVALID_PAYMENT_RECORD" });
     }
+    const assets = new Set(w.assets.map((a) => a.id));
+    for (const a of w.activities)
+      if (a.assetId && !assets.has(a.assetId))
+        ctx.addIssue({ code: "custom", message: "INVALID_ASSET_REFERENCE" });
   });
 export type PartnerWorkspace = z.infer<typeof workspaceSchema>;
 export const emptyPartnerWorkspace = (): PartnerWorkspace => ({

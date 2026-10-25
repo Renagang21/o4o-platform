@@ -105,6 +105,7 @@ import { CreateCooperativeManagement1792300000000 } from '../migrations/17923000
 import { AddContactInquiryOrganization1792540800000 } from '../migrations/1792540800000-AddContactInquiryOrganization.js';
 import { CreateExternalAiConnections1792635132325 } from '../migrations/1792635132325-CreateExternalAiConnections.js';
 import { CreatePartnerSupportSpaces1792886400000 } from '../migrations/1792886400000-CreatePartnerSupportSpaces.js';
+import { AddPartnerMediaAndReadState1792886500000 } from '../migrations/1792886500000-AddPartnerMediaAndReadState.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -145,6 +146,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddContactInquiryOrganization1792540800000,
   CreateExternalAiConnections1792635132325,
   CreatePartnerSupportSpaces1792886400000,
+  AddPartnerMediaAndReadState1792886500000,
 ];
 
 export function incrementalMigrationNames(): string[] {

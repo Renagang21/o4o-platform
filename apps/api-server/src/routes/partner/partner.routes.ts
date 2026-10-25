@@ -4,6 +4,12 @@ import rateLimit from "express-rate-limit";
 import type { AuthRequest } from "../../middleware/auth.middleware.js";
 import { PartnerError, PartnerService } from "./partner.service.js";
 import {
+  createPartnerMediaRoutes,
+  configuredMediaStore,
+  type DiskMediaStore,
+} from "./partner.media.js";
+import { z } from "zod";
+import {
   createSpaceSchema,
   inviteSchema,
   joinSchema,
@@ -14,10 +20,11 @@ import {
 export function createPartnerSupportRoutes(
   db: DataSource,
   requireAuth: RequestHandler,
+  mediaStore: DiskMediaStore | undefined = configuredMediaStore(),
 ): Router {
   const router = Router(),
     service = new PartnerService(db);
-  router.use(requireAuth, json({ limit: "1mb" }));
+  router.use(requireAuth);
   router.use(
     rateLimit({
       windowMs: 60000,
@@ -34,6 +41,8 @@ export function createPartnerSupportRoutes(
     res.setHeader("Cache-Control", "no-store");
     next();
   });
+  router.use(createPartnerMediaRoutes(db, mediaStore));
+  router.use(json({ limit: "1mb" }));
   router.use((req, res, next) => {
     if (
       !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
@@ -67,7 +76,7 @@ export function createPartnerSupportRoutes(
         return;
       }
       try {
-        for (const key of ["id", "memberId", "inviteId"])
+        for (const key of ["id", "memberId", "inviteId", "assetId"])
           if (req.params[key]) uuidSchema.parse(req.params[key]);
         const data = await fn(userId, req);
         res.status(status).json({ success: true, data });
@@ -92,6 +101,29 @@ export function createPartnerSupportRoutes(
   router.get(
     "/spaces",
     handle((user) => service.list(user)),
+  );
+  router.get(
+    "/notifications",
+    handle((user) => service.notifications(user)),
+  );
+  router.post(
+    "/spaces/:id/read",
+    handle((user, req) =>
+      service.markRead(
+        user,
+        req.params.id,
+        z
+          .object({ cursor: z.string().regex(/^\d{1,18}$/) })
+          .strict()
+          .parse(req.body).cursor,
+      ),
+    ),
+  );
+  router.get(
+    "/spaces/:id/assets/:assetId/versions",
+    handle((user, req) =>
+      service.assetVersions(user, req.params.id, req.params.assetId),
+    ),
   );
   router.post(
     "/spaces",

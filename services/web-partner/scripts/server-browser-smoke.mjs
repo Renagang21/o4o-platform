@@ -130,7 +130,10 @@ try {
     .getByLabel("당사자가 정한 금액 (원)", { exact: true })
     .fill("25000");
   await owner.getByRole("button", { name: "저장하기", exact: true }).click();
-  await owner.getByText("미지급 기록", { exact: true }).waitFor();
+  await owner
+    .getByLabel("정산 목록")
+    .getByText("미지급 기록", { exact: true })
+    .waitFor();
   await owner.getByRole("button", { name: "수정", exact: true }).click();
   const settlementEditor = owner.getByRole("dialog", { name: "기록 수정" });
   await settlementEditor
@@ -180,7 +183,10 @@ try {
     .getByRole("navigation", { name: "주 메뉴" })
     .getByRole("link", { name: "정산 내역", exact: false })
     .click();
-  await editor.getByText("미지급 기록", { exact: true }).waitFor();
+  await editor
+    .getByLabel("정산 목록")
+    .getByText("미지급 기록", { exact: true })
+    .waitFor();
   assert.equal(
     await editor.getByRole("button", { name: "저장하기", exact: true }).count(),
     0,
@@ -246,6 +252,230 @@ try {
   await owner
     .getByRole("heading", { name: "백업에서 가져온 자료", exact: true })
     .waitFor();
+  const resource = owner.locator("article").filter({
+    has: owner.getByRole("heading", {
+      name: "백업에서 가져온 자료",
+      exact: true,
+    }),
+  });
+  await resource.getByText("첨부 파일 · 콘텐츠 버전", { exact: true }).click();
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aJ1kAAAAASUVORK5CYII=",
+    "base64",
+  );
+  await owner.waitForFunction(
+    () =>
+      document.querySelector(".asset-resources input[type=file]") &&
+      !document.querySelector(".asset-resources input[type=file]").disabled,
+  );
+  await resource
+    .getByLabel("이미지·영상 첨부 (25MB 이내)", { exact: true })
+    .setInputFiles({ name: "테스트.png", mimeType: "image/png", buffer: png });
+  await resource.getByText("테스트.png", { exact: true }).waitFor();
+  await resource.getByRole("button", { name: "미리보기", exact: true }).click();
+  await resource.locator("img.media-preview").waitFor();
+  await owner.waitForFunction(
+    () => document.querySelector("img.media-preview")?.naturalWidth > 0,
+  );
+  await resource
+    .getByLabel("다음 버전 파일", { exact: true })
+    .setInputFiles({ name: "테스트.png", mimeType: "image/png", buffer: png });
+  await resource.getByText(/v2 ·/).waitFor();
+  const oldDownload = owner.waitForEvent("download");
+  await resource
+    .getByRole("button", { name: "v1 다운로드", exact: true })
+    .click();
+  assert.equal((await oldDownload).suggestedFilename(), "테스트.png");
+  await resource.getByRole("button", { name: "수정", exact: true }).click();
+  const assetEditor = owner.getByRole("dialog", { name: "기록 수정" });
+  await assetEditor
+    .getByLabel("내용·제품 정보", { exact: true })
+    .fill("새 콘텐츠 버전");
+  await assetEditor.getByLabel(/^태그/).fill("제품, 영상");
+  await assetEditor
+    .getByRole("checkbox", { name: "재사용 템플릿으로 보관" })
+    .check();
+  await assetEditor
+    .getByRole("button", { name: "변경 저장", exact: true })
+    .click();
+  await resource
+    .locator(".content-preview")
+    .filter({ hasText: "새 콘텐츠 버전" })
+    .waitFor();
+  await resource
+    .getByRole("button", { name: "파일·이력 새로고침", exact: true })
+    .click();
+  const previous = resource
+    .locator(".version-row")
+    .filter({ hasText: "검증용 콘텐츠" })
+    .first();
+  owner.once("dialog", (d) => d.accept());
+  await previous
+    .getByRole("button", { name: "이 내용으로 복원", exact: true })
+    .click();
+  await resource
+    .locator(".content-preview")
+    .filter({ hasText: "검증용 콘텐츠" })
+    .waitFor();
+  await viewer
+    .getByRole("button", { name: "서버 자료 다시 불러오기", exact: true })
+    .click();
+  await viewer
+    .getByRole("navigation", { name: "주 메뉴" })
+    .getByRole("link", { name: "콘텐츠 자료실", exact: false })
+    .click();
+  const reader = viewer.locator("article").filter({
+    has: viewer.getByRole("heading", {
+      name: "백업에서 가져온 자료",
+      exact: true,
+    }),
+  });
+  await reader.getByText("첨부 파일 · 콘텐츠 버전", { exact: true }).click();
+  await reader
+    .getByRole("button", { name: "파일 다운로드", exact: true })
+    .waitFor();
+  assert.equal(
+    await reader
+      .getByLabel("이미지·영상 첨부 (25MB 이내)", { exact: true })
+      .count(),
+    0,
+  );
+  await owner
+    .getByRole("navigation", { name: "주 메뉴" })
+    .getByRole("link", { name: "활동 기록", exact: false })
+    .click();
+  await owner.getByText("게시 활동 CSV 일괄 등록", { exact: true }).click();
+  await owner
+    .getByLabel("가져올 홍보 제안", { exact: true })
+    .selectOption({ label: "공유할 제품 소개" });
+  await owner
+    .getByLabel("가져올 홍보자", { exact: true })
+    .selectOption({ label: "공동공간 크리에이터" });
+  const activityCsv = {
+    name: "activities.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(
+      "url,publishedAt,views,likes,comments,shares\nhttps://example.com/imported-post,2026-01-01,0,2,1,0",
+    ),
+  };
+  await owner
+    .getByLabel("활동 CSV 파일", { exact: true })
+    .setInputFiles(activityCsv);
+  await owner.getByText("1건 등록 · 중복 0건 제외", { exact: true }).waitFor();
+  await owner
+    .getByLabel("활동 CSV 파일", { exact: true })
+    .setInputFiles(activityCsv);
+  await owner.getByText("0건 등록 · 중복 1건 제외", { exact: true }).waitFor();
+  await owner
+    .getByRole("navigation", { name: "주 메뉴" })
+    .getByRole("link", { name: "성과 리포트", exact: false })
+    .click();
+  await owner
+    .getByRole("cell", { name: "공유할 제품 소개", exact: true })
+    .waitFor();
+  await owner
+    .getByRole("navigation", { name: "주 메뉴" })
+    .getByRole("link", { name: "정산 내역", exact: false })
+    .click();
+  await owner
+    .getByLabel("홍보 제안", { exact: true })
+    .selectOption({ label: "공유할 제품 소개" });
+  await owner
+    .getByLabel("홍보자", { exact: true })
+    .selectOption({ label: "공동공간 크리에이터 · 인스타그램" });
+  await owner
+    .getByLabel("지급 내역 설명", { exact: true })
+    .fill("CSV 지급 대상");
+  await owner
+    .getByLabel("당사자가 정한 금액 (원)", { exact: true })
+    .fill("5000");
+  await owner
+    .getByLabel("지급 예정일 (선택)", { exact: true })
+    .fill("2026-12-01");
+  await owner.getByRole("button", { name: "저장하기", exact: true }).click();
+  await owner
+    .getByText("공동공간 크리에이터 · CSV 지급 대상", { exact: true })
+    .waitFor();
+  const payoutBackup = owner.waitForEvent("download");
+  await owner.getByRole("button", { name: "자료 백업 ↓", exact: true }).click();
+  const payoutData = JSON.parse(
+      await readFile(await (await payoutBackup).path(), "utf8"),
+    ),
+    payout = payoutData.settlements.find((s) => s.memo === "CSV 지급 대상");
+  assert(payout);
+  await owner.getByText("외부 지급 결과 CSV 가져오기", { exact: true }).click();
+  owner.once("dialog", (d) => d.accept());
+  await owner.getByLabel("지급 결과 CSV 파일", { exact: true }).setInputFiles({
+    name: "payments.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(
+      `settlementId,paidAt,reference\n${payout.id},2026-01-01T00:00:00Z,test-reference`,
+    ),
+  });
+  await owner
+    .getByText("1건의 외부 지급 결과를 기록했습니다.", { exact: true })
+    .waitFor();
+  await viewer
+    .getByRole("button", { name: "공동공간 알림", exact: true })
+    .click();
+  const activeSpaceId = await viewer
+    .getByLabel("이용할 공동공간", { exact: true })
+    .inputValue();
+  const notification = viewer.locator(
+    `.notification-row[data-space-id="${activeSpaceId}"]`,
+  );
+  await notification
+    .getByRole("button", { name: "읽음으로 표시", exact: true })
+    .click();
+  await notification.getByText(/새 변경 0건/).waitFor();
+  await owner
+    .getByRole("navigation", { name: "주 메뉴" })
+    .getByRole("link", { name: "콘텐츠 자료실", exact: false })
+    .click();
+  const mediaAsset = owner
+    .locator("article")
+    .filter({
+      has: owner.getByRole("heading", {
+        name: "백업에서 가져온 자료",
+        exact: true,
+      }),
+    });
+  await mediaAsset
+    .getByText("첨부 파일 · 콘텐츠 버전", { exact: true })
+    .click();
+  await owner.waitForFunction(
+    () =>
+      document.querySelector(".asset-resources input[type=file]") &&
+      !document.querySelector(".asset-resources input[type=file]").disabled,
+  );
+  // Generated test fixture: ffmpeg lavfi solid green, 32x32, VP8, 0.6 seconds, no audio.
+  const video = Buffer.from(
+    "GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAIuEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHWTbuMU6uEElTDZ1OsggEjTbuMU6uEHFO7a1OsggIY7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsCrXsYMPQkBNgIxMYXZmNjEuNy4xMDNXQYxMYXZmNjEuNy4xMDNEiYhAgsAAAAAAABZUrmvIrgEAAAAAAAA/14EBc8WIhXr+Vyb+KJOcgQAitZyDdW5kiIEAhoVWX1ZQOIOBASPjg4QL68IA4JCwgSC6gSCagQJVsIRVuYEBElTDZ/tzc59jwIBnyJlFo4dFTkNPREVSRIeMTGF2ZjYxLjcuMTAzc3PWY8CLY8WIhXr+Vyb+KJNnyKFFo4dFTkNPREVSRIeUTGF2YzYxLjE5LjEwMSBsaWJ2cHhnyKFFo4hEVVJBVElPTkSHkzAwOjAwOjAwLjYwMDAwMDAwMAAfQ7Z18OeBAKO9gQAAgBADAJ0BKiAAIAAARwiFhYiFhIgCAgJ1qgP4A/oCCFkMvQD+/W7z/+K1h1nF/4rf/9Nk8VeM/+mLAKOVgQDIALEBAAEQEAAYABhYL/QACHAAo5WBAZAAsQEAARAQABgAGFgv9AAIcAAcU7trkbuPs4EAt4r3gQHxggGj8IED",
+    "base64",
+  );
+  await mediaAsset
+    .getByLabel("이미지·영상 첨부 (25MB 이내)", { exact: true })
+    .setInputFiles({
+      name: "test-video.webm",
+      mimeType: "video/webm",
+      buffer: video,
+    });
+  const videoCard = mediaAsset
+    .locator(".media-card")
+    .filter({ hasText: "test-video.webm" });
+  await videoCard
+    .getByRole("button", { name: "미리보기", exact: true })
+    .click();
+  await mediaAsset.locator("video.media-preview").waitFor();
+  await mediaAsset.locator("video.media-preview").evaluate(async (el) => {
+    el.muted = true;
+    await el.play();
+  });
+  await owner.waitForFunction(() => {
+    const v = document.querySelector("video.media-preview");
+    return v && v.videoWidth === 32 && v.currentTime > 0;
+  });
+  await mediaAsset.locator("video.media-preview").evaluate((el) => el.pause());
   // Revoke the editor and verify server reads no longer disclose the workspace.
   const member = owner
     .locator(".member-list li")

@@ -29,6 +29,21 @@ API의 CORS에는 `https://partner.neture.co.kr`만 추가했고 wildcard는 사
 - 수동 지급 기록·정산 CSV·소유자 전용 변경 이력
 - JSON 백업과 소유자의 명시적 서버 가져오기
 - 로컬 도구 모드: 브라우저별 저장·오래된 탭 덮어쓰기 방지·손상 데이터 보호
+- 이미지/영상 파일 업로드·보호된 미리보기/다운로드·파일 버전, 텍스트 버전 복원
+- 분류·태그·재사용 템플릿과 보관 자료에서 제작 도구로 이동
+- 복수 채널·활동 언어/지역 프로필, 활동 CSV와 직접 입력 지표 비교 리포트
+- 지급 예정일·등록 월/상태별 명세, 외부 지급 결과 CSV의 전량 검증·재실행 보호
+- 공동공간 변경 알림과 계정별 읽음 cursor
+
+## 파일 저장소
+
+파일 저장소는 기본 OFF다. 로컬 개발은 `PARTNER_MEDIA_DIR`에 전용 절대 경로를 지정해 disk adapter를 사용한다.
+production은 별도 영속 볼륨을 연결하고 `PARTNER_MEDIA_PERSISTENT_VOLUME=true`를 명시한 경우에만 파일 기능이 켜진다.
+여러 API 인스턴스는 같은 저장소를 공유해야 한다. 운영 반영 전 객체 저장소/공유 볼륨·백업·개인정보 파기 정책 연결이 필요하다.
+파일은 public static 경로로 노출하지 않으며 기존 사용자/공간 권한을 매 요청 확인한다. PNG/JPEG/GIF/WebP/MP4/WebM만, 파일당 25MB·공간당 버전 포함 100개/500MB를 허용한다.
+signature/MIME/해시를 검사하고 HTML/SVG는 거부한다. snapshot JSON에 binary/base64를 넣지 않는다.
+첨부 삭제는 모든 파일 버전의 접근을 먼저 해제한다. 디스크 정리에 실패하면 `cleanupPending`과 202를 반환하므로 물리 삭제 완료로 간주하지 않는다.
+JSON 백업에는 첨부 파일 bytes가 포함되지 않는다. 파일은 별도로 내려받아 보관한다.
 
 ## 권한과 저장 경계
 
@@ -43,18 +58,30 @@ API의 CORS에는 `https://partner.neture.co.kr`만 추가했고 wildcard는 사
 
 ## API
 
-기본 경로: `/api/v1/partner-support`. 모든 경로는 기존 `requireAuth`를 통과한다. 변경 요청은 JSON만 허용한다.
+기본 경로: `/api/v1/partner-support`. 모든 경로는 기존 `requireAuth`를 통과한다. 일반 변경은 JSON, 파일 업로드는 단일 multipart 파일과 `X-Requested-With: O4O-Partner`를 사용한다.
 
-| 경로                            | 메서드     | 기능                                   |
-| ------------------------------- | ---------- | -------------------------------------- |
-| `/spaces`                       | GET / POST | 접근 가능한 공간 목록 / 생성           |
-| `/spaces/:id`                   | GET / PUT  | 읽기 / revision을 포함한 snapshot 저장 |
-| `/spaces/:id/members`           | GET        | 참여자 목록                            |
-| `/spaces/:id/members/:memberId` | DELETE     | 소유자가 접근 해제                     |
-| `/spaces/:id/invites`           | GET / POST | 소유자가 초대 조회 / 생성              |
-| `/spaces/:id/invites/:inviteId` | DELETE     | 소유자가 초대 취소                     |
-| `/join`                         | POST       | token을 JSON으로 전달해 일회 참여      |
-| `/spaces/:id/events`            | GET        | 소유자가 최근 변경 이력 조회           |
+| 경로                                                 | 메서드       | 기능                                     |
+| ---------------------------------------------------- | ------------ | ---------------------------------------- |
+| `/spaces`                                            | GET / POST   | 접근 가능한 공간 목록 / 생성             |
+| `/spaces/:id`                                        | GET / PUT    | 읽기 / revision을 포함한 snapshot 저장   |
+| `/spaces/:id/members`                                | GET          | 참여자 목록                              |
+| `/spaces/:id/members/:memberId`                      | DELETE       | 소유자가 접근 해제                       |
+| `/spaces/:id/invites`                                | GET / POST   | 소유자가 초대 조회 / 생성                |
+| `/spaces/:id/invites/:inviteId`                      | DELETE       | 소유자가 초대 취소                       |
+| `/join`                                              | POST         | token을 JSON으로 전달해 일회 참여        |
+| `/spaces/:id/events`                                 | GET          | 소유자가 최근 변경 이력 조회             |
+| `/spaces/:id/assets/:assetId/versions`               | GET          | 참여자가 최근 텍스트 버전 30개 조회      |
+| `/spaces/:id/media-capabilities`                     | GET          | 파일 저장소 사용 가능 상태               |
+| `/spaces/:id/files`                                  | GET          | 공간 내 파일 metadata                    |
+| `/spaces/:id/assets/:assetId/files`                  | POST         | 첨부 파일 등록                           |
+| `/spaces/:id/assets/:assetId/files/:fileId/versions` | POST         | 동일 그룹에 파일 버전 추가               |
+| `/spaces/:id/files/:fileId`                          | GET / DELETE | 권한 검사된 다운로드 / 그룹 전체 삭제    |
+| `/notifications`                                     | GET          | 접근 가능한 공간의 다른 참여자 변경 알림 |
+| `/spaces/:id/read`                                   | POST         | 해당 계정의 확인한 event cursor 기록     |
+
+활동 CSV는 `url,publishedAt,views,likes,comments,shares`, 지급 결과 CSV는 `settlementId,paidAt,reference` 열을 사용한다.
+ISO 지급 시각은 timezone을 포함해야 한다. 파일 전체 검증 후 저장하며 ID 오류/중복·기존 지급 충돌 시 부분 반영하지 않는다.
+지표는 직접 등록/CSV 출처를 표시하고 자동 수집·검증한 성과로 취급하지 않는다.
 
 초대 원문은 생성 시 한 번만 반환하고 DB에는 SHA-256 hash만 보관한다. 초대 fragment는 진입 후 주소에서 제거한다.
 

@@ -62,6 +62,100 @@ afterEach(() => {
 });
 
 describe("Partner의 독립 서비스 흐름", () => {
+  it("복수 채널·언어·지역 프로필을 저장하고 추가 채널로 찾는다", () => {
+    open("creators");
+    input("활동 이름", "테스트 멀티 크리에이터");
+    input("활동 분야·소개", "생활 콘텐츠");
+    input(
+      "추가 채널 (채널명 | 주소, 한 줄씩)",
+      "유튜브 | https://example.com/channel",
+    );
+    input("활동 언어 (선택)", "한국어");
+    input("활동 지역 (선택)", "지역 A");
+    save();
+    const c = loadWorkspace(localStorage).data.creators[0];
+    expect(c.channelProfiles?.[0].channel).toBe("유튜브");
+    expect(c.language).toBe("한국어");
+    input("채널 필터", "유튜브");
+    expect(
+      screen.getByRole("heading", { name: "테스트 멀티 크리에이터" }),
+    ).toBeTruthy();
+  });
+  it("분류·태그·템플릿으로 자료를 찾고 제작 도구에서 재사용한다", async () => {
+    const w = prepared();
+    w.assets = [
+      {
+        id: "a1",
+        createdAt: "2026-01-01T00:00:00Z",
+        title: "템플릿 자료",
+        business: "테스트",
+        channel: "라인",
+        content: "확인된 제품 정보",
+        url: "",
+        usage: "직접 작성",
+        folder: "제품",
+        tags: ["새 자료"],
+        isTemplate: true,
+      },
+      {
+        id: "a2",
+        createdAt: "2026-01-01T00:00:00Z",
+        title: "일반 자료",
+        business: "테스트",
+        channel: "라인",
+        content: "일반 내용",
+        url: "",
+        usage: "직접 작성",
+        folder: "기타",
+      },
+    ];
+    saveWorkspace(localStorage, w);
+    open("library");
+    input("자료 분류 필터", "제품");
+    fireEvent.click(screen.getByRole("checkbox", { name: "템플릿만 보기" }));
+    expect(screen.queryByRole("heading", { name: "일반 자료" })).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "제작 도구에서 활용 ↗" }),
+    );
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText("전달할 사실 정보") as HTMLTextAreaElement)
+          .value,
+      ).toBe("확인된 제품 정보"),
+    );
+  });
+  it("비교 리포트에서 조회수 0과 미입력, 반응 합계를 구분한다", () => {
+    const w = prepared();
+    w.activities = [
+      {
+        id: "a1",
+        createdAt: "2026-01-01T00:00:00Z",
+        proposalId: "p1",
+        creatorId: "c1",
+        url: "https://example.com/one",
+        publishedAt: "2026-01-01",
+        views: 0,
+        metrics: { likes: 2, comments: 1, shares: null, source: "import" },
+      },
+      {
+        id: "a2",
+        createdAt: "2026-01-01T00:00:00Z",
+        proposalId: "p1",
+        creatorId: "c1",
+        url: "https://example.com/two",
+        publishedAt: "2026-01-02",
+        views: null,
+      },
+    ];
+    saveWorkspace(localStorage, w);
+    open("reports");
+    const row = screen.getAllByRole("row")[1];
+    expect(
+      within(row)
+        .getAllByRole("cell")
+        .map((c) => c.textContent),
+    ).toEqual(["테스트 제안", "2", "0", "3", "1"]);
+  });
   it("서버 저장이 성공해야 화면에 반영하고 로컬에는 복사하지 않는다", async () => {
     window.history.replaceState(null, "", "/#creators");
     const saveRemote = vi.fn(async (workspace) => workspace);

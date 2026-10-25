@@ -1,4 +1,21 @@
-import { parseWorkspace, type Workspace } from "./model";
+import { parseWorkspace, type Workspace, type Asset } from "./model";
+export type MediaFile = {
+  id: string;
+  asset_id: string;
+  group_id: string;
+  version: number;
+  name: string;
+  mime: string;
+  size: number;
+  sha256: string;
+  created_at: string;
+};
+export type Notification = {
+  id: string;
+  name: string;
+  cursor: string;
+  unread: number;
+};
 
 export type SpaceRole = "owner" | "editor" | "viewer";
 export type SpaceSummary = {
@@ -52,6 +69,17 @@ const messages: Record<string, string> = {
   RATE_LIMITED: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
   PAYLOAD_TOO_LARGE:
     "공동공간 자료는 1MB 이내로 저장할 수 있습니다. 자료를 백업하고 별도 공동공간으로 나누어 주세요.",
+  MEDIA_NOT_CONFIGURED: "파일 저장소가 아직 연결되지 않았습니다.",
+  MEDIA_UNAVAILABLE: "파일을 이용하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  MEDIA_INTEGRITY_ERROR:
+    "파일 무결성을 확인하지 못했습니다. 새 버전을 등록해 주세요.",
+  MEDIA_UPLOAD_REJECTED:
+    "한 번에 이미지·영상 한 개를 25MB 이내로 선택해 주세요.",
+  UNSUPPORTED_MEDIA:
+    "실제 파일 형식과 일치하는 PNG·JPEG·GIF·WebP·MP4·WebM만 등록할 수 있습니다.",
+  MEDIA_QUOTA:
+    "공동공간 파일은 버전 포함 100개·500MB 이내로 보관할 수 있습니다.",
+  ASSET_HAS_FILES: "첨부 파일을 먼저 삭제한 뒤 자료를 삭제해 주세요.",
 };
 let configuredOrigin =
   import.meta.env.VITE_PARTNER_API_ORIGIN ||
@@ -102,10 +130,14 @@ export async function request<T>(
       credentials: "include",
       cache: "no-store",
       headers: {
-        "Content-Type": "application/json",
+        ...(body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
         "X-Requested-With": "O4O-Partner",
       },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      ...(body === undefined
+        ? {}
+        : { body: body instanceof FormData ? body : JSON.stringify(body) }),
     });
   } catch {
     throw new Error(
@@ -139,6 +171,55 @@ export async function request<T>(
   return payload.data as T;
 }
 export const partnerApi = {
+  files: (id: string) =>
+    request<MediaFile[]>(`/api/v1/partner-support/spaces/${id}/files`),
+  mediaCapabilities: (id: string) =>
+    request<{ enabled: boolean; maxFileBytes: number; mimes: string[] }>(
+      `/api/v1/partner-support/spaces/${id}/media-capabilities`,
+    ),
+  upload: (id: string, assetId: string, file: File, previous?: string) => {
+    const body = new FormData();
+    body.append("file", file);
+    return request<MediaFile>(
+      `/api/v1/partner-support/spaces/${id}/assets/${assetId}/files${previous ? `/${previous}/versions` : ""}`,
+      "POST",
+      body,
+    );
+  },
+  removeFile: (id: string, fileId: string) =>
+    request<{ cleanupPending: boolean }>(
+      `/api/v1/partner-support/spaces/${id}/files/${fileId}`,
+      "DELETE",
+    ),
+  async fileBlob(id: string, fileId: string) {
+    const fetchFile = () =>
+      fetch(
+        `${configuredOrigin}/api/v1/partner-support/spaces/${id}/files/${fileId}`,
+        {
+          credentials: "include",
+          cache: "no-store",
+          headers: { "X-Requested-With": "O4O-Partner" },
+        },
+      );
+    let res = await fetchFile();
+    if (res.status === 401) {
+      await request("/api/v1/auth/refresh", "POST", {}, false);
+      res = await fetchFile();
+    }
+    if (!res.ok) {
+      const p = await res.json().catch(() => null);
+      throw new ApiError(res.status, p?.code || "MEDIA_UNAVAILABLE");
+    }
+    return res.blob();
+  },
+  assetVersions: (id: string, assetId: string) =>
+    request<
+      { id: string; revision: number; createdAt: string; asset: Asset }[]
+    >(`/api/v1/partner-support/spaces/${id}/assets/${assetId}/versions`),
+  notifications: () =>
+    request<Notification[]>("/api/v1/partner-support/notifications"),
+  markRead: (id: string, cursor: string) =>
+    request(`/api/v1/partner-support/spaces/${id}/read`, "POST", { cursor }),
   async me() {
     const data = await request<{
       user: { id: string; name?: string; displayName?: string };

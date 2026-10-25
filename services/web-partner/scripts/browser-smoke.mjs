@@ -196,6 +196,7 @@ try {
       "studio",
       "activities",
       "settlements",
+      "reports",
     ]) {
       await phone.goto(`${origin}/?mode=local#${id}`);
       await phone.getByRole("heading", { level: 1 }).waitFor();
@@ -218,7 +219,7 @@ try {
     .waitFor();
   assert.deepEqual(errors, [], "Browser errors or unexpected external calls");
   console.log(
-    "PASS: create/reload/search, content editing/library download, UTM, activity, manual settlement, CSV/JSON exports, mobile navigation, 28 responsive page checks, no browser errors.",
+    "PASS: create/reload/search, content editing/library download, UTM, activity, manual settlement, CSV/JSON exports, mobile navigation, 32 responsive page checks, no browser errors.",
   );
 } finally {
   for (const context of contexts) await context.close();

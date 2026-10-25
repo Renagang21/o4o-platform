@@ -1263,3 +1263,138 @@ footer > span:last-child {
   padding: 0;
   border: 0;
 }
+
+.asset-resources {
+  margin-top: 18px;
+  border-top: 1px solid #e2e8dc;
+  padding-top: 12px;
+}
+.asset-resources summary,
+.utility-panel summary {
+  font-weight: 650;
+  cursor: pointer;
+  font-size: 12px;
+}
+.asset-resources > div {
+  padding-top: 15px;
+}
+.asset-resources .field {
+  margin-top: 14px;
+}
+.media-card {
+  border: 1px solid #dde5d5;
+  border-radius: 7px;
+  padding: 13px;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.media-preview {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  margin: 15px auto;
+  background: #f0f3eb;
+}
+.file-versions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+.version-row {
+  border-top: 1px solid #e5ebdd;
+  padding: 12px 0;
+  font-size: 11px;
+}
+.version-row > span {
+  color: #89947f;
+}
+.version-row p {
+  margin: 5px 0;
+  white-space: pre-wrap;
+}
+.utility-panel {
+  margin-bottom: 22px;
+}
+.utility-panel > summary {
+  font-size: 15px;
+}
+.utility-panel > .hint {
+  margin-top: 15px;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #739064;
+  font-size: 11px;
+  margin: 10px 0;
+}
+.tag-list a {
+  text-decoration: underline;
+}
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  padding: 10px 0;
+}
+.check-label input,
+.field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  justify-self: start;
+}
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+th,
+td {
+  text-align: left;
+  padding: 13px;
+  border-bottom: 1px solid #e1e8d9;
+  white-space: nowrap;
+}
+th {
+  background: #f1f4eb;
+  color: #627b50;
+}
+.notification-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e2e8dc;
+  font-size: 12px;
+}
+@media (max-width: 620px) {
+  .notification-row {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .utility-panel {
+    padding: 17px;
+  }
+  .asset-resources .button-row {
+    gap: 14px;
+  }
+  .table-scroll {
+    margin: 0 -3px;
+  }
+  th,
+  td {
+    padding: 10px;
+    font-size: 11px;
+  }
+}

@@ -17,6 +17,9 @@ import {
   integer,
   loadWorkspace,
   parseWorkspace,
+  tags as parseTags,
+  channelProfiles,
+  validCalendarDate,
   saveWorkspace,
   settlementCsv,
   STORAGE_KEY,
@@ -26,6 +29,12 @@ import {
   type Workspace,
 } from "./model";
 import RecordEditor, { type Collection, type Editing } from "./RecordEditor";
+import AssetResources from "./AssetResources";
+import {
+  ActivityImporter,
+  PaymentImporter,
+  PerformanceReports,
+} from "./WorkspaceUtilities";
 
 const pages = [
   ["home", "시작하기", "◈"],
@@ -35,9 +44,14 @@ const pages = [
   ["studio", "제작 도구", "✧"],
   ["activities", "활동 기록", "◷"],
   ["settlements", "정산 내역", "₩"],
+  ["reports", "성과 리포트", "▥"],
 ] as const;
 type Page = (typeof pages)[number][0];
 const titles: Record<Page, [string, string]> = {
+  reports: [
+    "기록을 다음 콘텐츠의 힌트로",
+    "게시한 콘텐츠와 직접 등록한 지표를 비교하세요.",
+  ],
   home: [
     "홍보를 함께 만드는 공간",
     "좋은 제품과 나다운 콘텐츠가 만나는 곳. 필요한 도구부터 시작하세요.",
@@ -171,6 +185,7 @@ function FormPanel({
 }
 
 export type RemoteWorkspace = {
+  spaceId?: string;
   workspace: Workspace;
   role: "owner" | "editor" | "viewer";
   name: string;
@@ -200,6 +215,11 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
   const [studioChannel, setStudioChannel] = useState<Channel>("인스타그램");
   const [studioProduct, setStudioProduct] = useState("");
   const [studioBusiness, setStudioBusiness] = useState("");
+  const [studioFacts, setStudioFacts] = useState("");
+  const [folder, setFolder] = useState(""),
+    [templatesOnly, setTemplatesOnly] = useState(false);
+  const [settlementMonth, setSettlementMonth] = useState(""),
+    [settlementStatus, setSettlementStatus] = useState("");
   const [editing, setEditing] = useState<Editing | null>(null);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
@@ -375,10 +395,23 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
     ),
   );
   const creators = workspace.creators.filter((c) =>
-    matches(`${c.name} ${c.topic}`, c.channel),
+    [c.channel, ...(c.channelProfiles || []).map((p) => p.channel)].some((ch) =>
+      matches(`${c.name} ${c.topic} ${c.language || ""} ${c.region || ""}`, ch),
+    ),
   );
-  const assets = workspace.assets.filter((a) =>
-    matches(`${a.title} ${a.business} ${a.content}`, a.channel),
+  const assets = workspace.assets.filter(
+    (a) =>
+      matches(
+        `${a.title} ${a.business} ${a.content} ${(a.tags || []).join(" ")}`,
+        a.channel,
+      ) &&
+      (!folder || a.folder === folder) &&
+      (!templatesOnly || a.isTemplate),
+  );
+  const shownSettlements = workspace.settlements.filter(
+    (s) =>
+      (!settlementMonth || s.createdAt.slice(0, 7) === settlementMonth) &&
+      (!settlementStatus || s.status === settlementStatus),
   );
   const pending = workspace.settlements
     .filter((s) => s.status === "recorded")
@@ -473,6 +506,33 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                     )
                   : input;
       }
+      if (editing.kind === "creators") {
+        updates.channelProfiles = channelProfiles(
+          String(fields.get("channelProfiles") || ""),
+        );
+      }
+      if (editing.kind === "assets") {
+        updates.tags = parseTags(String(fields.get("tags") || ""));
+        updates.isTemplate = fields.has("isTemplate");
+      }
+      if (editing.kind === "settlements")
+        updates.dueDate = fields.get("dueDate")
+          ? validCalendarDate(String(fields.get("dueDate")))
+          : null;
+      if (editing.kind === "activities") {
+        updates.assetId = fields.get("assetId") || null;
+        const value = (key: string) =>
+          fields.get(key) ? integer(String(fields.get(key))) : null;
+        updates.metrics = {
+          likes: value("likes"),
+          comments: value("comments"),
+          shares: value("shares"),
+          source: "manual",
+        };
+        delete updates.likes;
+        delete updates.comments;
+        delete updates.shares;
+      }
       const next = parseWorkspace(
         JSON.stringify({
           ...workspace,
@@ -517,7 +577,9 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                 : JSON.stringify(workspace, null, 2);
               if (!raw) throw new Error("백업할 저장 데이터가 없습니다.");
               download("o4o-partner-workspace.json", raw, "application/json");
-              setNotice("백업 파일을 내려받았습니다.");
+              setNotice(
+                "자료·기록 JSON을 내려받았습니다. 첨부 파일은 별도로 보관해 주세요.",
+              );
             })
           }
         >
@@ -841,6 +903,16 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                           <span className="pill">{c.channel}</span>
                           <h2>{c.name}</h2>
                           <p>{c.topic}</p>
+                          <p className="hint">
+                            {[c.language, c.region].filter(Boolean).join(" · ")}
+                          </p>
+                          <div className="tag-list">
+                            {c.channelProfiles?.map((p, i) => (
+                              <External key={`${p.channel}-${i}`} href={p.url}>
+                                {p.channel}
+                              </External>
+                            ))}
+                          </div>
                           {recordControls("creators", c.id)}
                           {c.portfolio && (
                             <External href={c.portfolio}>
@@ -870,6 +942,11 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                           channel: selectedChannel(f),
                           topic: required(f, "topic"),
                           portfolio: webUrl(text(f, "portfolio"), false),
+                          channelProfiles: channelProfiles(
+                            text(f, "channelProfiles"),
+                          ),
+                          language: text(f, "language"),
+                          region: text(f, "region"),
                         },
                         ...workspace.creators,
                       ],
@@ -884,6 +961,19 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                   </Field>
                   <Field label="활동 분야·소개">
                     <textarea name="topic" required maxLength={2000} rows={4} />
+                  </Field>
+                  <Field label="추가 채널 (채널명 | 주소, 한 줄씩)">
+                    <textarea
+                      name="channelProfiles"
+                      rows={3}
+                      placeholder="유튜브 | https://..."
+                    />
+                  </Field>
+                  <Field label="활동 언어 (선택)">
+                    <input name="language" maxLength={100} />
+                  </Field>
+                  <Field label="활동 지역 (선택)">
+                    <input name="region" maxLength={100} />
                   </Field>
                   <Field label="채널·대표 콘텐츠 주소 (선택)">
                     <input name="portfolio" type="url" placeholder="https://" />
@@ -900,6 +990,31 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
           {page === "library" && (
             <>
               {search}
+              <div className="inline-fields">
+                <Field label="자료 분류 필터">
+                  <select
+                    value={folder}
+                    onChange={(e) => setFolder(e.target.value)}
+                  >
+                    <option value="">전체 분류</option>
+                    {[
+                      ...new Set(
+                        workspace.assets.map((a) => a.folder).filter(Boolean),
+                      ),
+                    ].map((f) => (
+                      <option key={f}>{f}</option>
+                    ))}
+                  </select>
+                </Field>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={templatesOnly}
+                    onChange={(e) => setTemplatesOnly(e.target.checked)}
+                  />
+                  템플릿만 보기
+                </label>
+              </div>
               <div className="split">
                 <section className="record-list" aria-label="콘텐츠 목록">
                   {assets.length ? (
@@ -912,6 +1027,39 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                         <h2>{a.title}</h2>
                         <p className="preserve content-preview">{a.content}</p>
                         {recordControls("assets", a.id)}
+                        <div className="tag-list">
+                          {a.folder && <span className="pill">{a.folder}</span>}
+                          {a.isTemplate && <span className="pill">템플릿</span>}
+                          {a.tags?.map((t) => <span key={t}>#{t}</span>)}
+                        </div>
+                        <button
+                          className="text-button"
+                          onClick={() => {
+                            setStudioProduct(a.title);
+                            setStudioBusiness(a.business);
+                            setStudioChannel(a.channel);
+                            setStudioFacts(a.content);
+                            setDraft("");
+                            location.hash = "studio";
+                          }}
+                        >
+                          제작 도구에서 활용 ↗
+                        </button>
+                        <AssetResources
+                          asset={a}
+                          spaceId={remote?.spaceId}
+                          readOnly={readOnly}
+                          onRestore={(v) =>
+                            persist({
+                              ...workspace,
+                              assets: workspace.assets.map((row) =>
+                                row.id === a.id
+                                  ? { ...v, id: a.id, createdAt: a.createdAt }
+                                  : row,
+                              ),
+                            })
+                          }
+                        />
                         <div className="usage">
                           <strong>사용 범위</strong>
                           <p>{a.usage}</p>
@@ -956,6 +1104,9 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                           content: required(f, "content"),
                           url: webUrl(text(f, "url"), false),
                           usage: required(f, "usage"),
+                          folder: text(f, "folder"),
+                          tags: parseTags(text(f, "tags")),
+                          isTemplate: f.has("isTemplate"),
                         },
                         ...workspace.assets,
                       ],
@@ -981,6 +1132,19 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                   </Field>
                   <Field label="원본 자료 주소 (선택)">
                     <input name="url" type="url" placeholder="https://" />
+                  </Field>
+                  <Field label="자료 분류 (선택)">
+                    <input
+                      name="folder"
+                      maxLength={100}
+                      placeholder="브랜드 · 제품 · 프로젝트"
+                    />
+                  </Field>
+                  <Field label="태그 (쉼표로 구분)">
+                    <input name="tags" maxLength={310} />
+                  </Field>
+                  <Field label="재사용 템플릿으로 보관">
+                    <input name="isTemplate" type="checkbox" />
                   </Field>
                   <Field label="사용 범위·출처">
                     <textarea
@@ -1026,6 +1190,31 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                       });
                     }}
                   >
+                    <Field label="보관 자료에서 시작 (선택)">
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          const a = workspace.assets.find(
+                            (a) => a.id === e.target.value,
+                          );
+                          if (a) {
+                            setStudioProduct(a.title);
+                            setStudioBusiness(a.business);
+                            setStudioChannel(a.channel);
+                            setStudioFacts(a.content);
+                            setDraft("");
+                          }
+                        }}
+                      >
+                        <option value="">자료 선택</option>
+                        {workspace.assets.map((a) => (
+                          <option value={a.id} key={a.id}>
+                            {a.title}
+                            {a.isTemplate ? " · 템플릿" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
                     <Field label="제품·서비스 이름">
                       <input
                         name="product"
@@ -1060,6 +1249,8 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                         name="facts"
                         required
                         maxLength={5000}
+                        value={studioFacts}
+                        onChange={(e) => setStudioFacts(e.target.value)}
                         rows={5}
                         placeholder="제품의 특징과 사용 방법 등 확인된 정보를 입력하세요."
                       />
@@ -1187,93 +1378,171 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
           )}
 
           {page === "activities" && (
-            <div className="split">
-              <section className="record-list" aria-label="활동 목록">
-                {workspace.activities.length ? (
-                  workspace.activities.map((a) => (
-                    <article className="panel record" key={a.id}>
-                      <span className="pill">직접 등록</span>
-                      <h2>
+            <>
+              <ActivityImporter
+                workspace={workspace}
+                disabled={readOnly}
+                onSave={(w) => persist(w)}
+              />
+              <div className="split">
+                <section className="record-list" aria-label="활동 목록">
+                  {workspace.activities.length ? (
+                    workspace.activities.map((a) => (
+                      <article className="panel record" key={a.id}>
+                        <span className="pill">직접 등록</span>
+                        <h2>
+                          {
+                            workspace.proposals.find(
+                              (p) => p.id === a.proposalId,
+                            )?.title
+                          }
+                        </h2>
+                        <p>
+                          {
+                            workspace.creators.find((c) => c.id === a.creatorId)
+                              ?.name
+                          }{" "}
+                          · 게시일 {a.publishedAt}
+                        </p>
+                        <External href={a.url}>게시물 보기</External>
+                        {recordControls("activities", a.id)}
+                        <p className="metric">
+                          {a.views === null
+                            ? "조회수 미입력"
+                            : `조회수 ${a.views.toLocaleString()}회`}
+                          <span>
+                            {a.metrics?.source === "import"
+                              ? "CSV로 가져온 지표 · 자동 검증하지 않은 정보"
+                              : "홍보자 입력 · 자동 검증하지 않은 정보"}
+                          </span>
+                          {a.metrics && (
+                            <span>
+                              좋아요 {a.metrics.likes ?? "미입력"} · 댓글{" "}
+                              {a.metrics.comments ?? "미입력"} · 공유{" "}
+                              {a.metrics.shares ?? "미입력"}
+                            </span>
+                          )}
+                        </p>
+                      </article>
+                    ))
+                  ) : (
+                    <Empty title="게시한 콘텐츠를 기록해 보세요">
+                      게시물 주소와 확인한 결과를 모을 수 있습니다.
+                    </Empty>
+                  )}
+                </section>
+                <FormPanel
+                  title="홍보 활동 기록"
+                  permissionReadOnly={remote?.role === "viewer"}
+                  disabled={readOnly || !hasRelations}
+                  onSubmit={submit((f) =>
+                    persist({
+                      ...workspace,
+                      activities: [
                         {
-                          workspace.proposals.find((p) => p.id === a.proposalId)
-                            ?.title
-                        }
-                      </h2>
-                      <p>
-                        {
-                          workspace.creators.find((c) => c.id === a.creatorId)
-                            ?.name
-                        }{" "}
-                        · 게시일 {a.publishedAt}
-                      </p>
-                      <External href={a.url}>게시물 보기</External>
-                      {recordControls("activities", a.id)}
-                      <p className="metric">
-                        {a.views === null
-                          ? "조회수 미입력"
-                          : `조회수 ${a.views.toLocaleString()}회`}
-                        <span>홍보자 입력 · 자동 검증하지 않은 정보</span>
-                      </p>
-                    </article>
-                  ))
-                ) : (
-                  <Empty title="게시한 콘텐츠를 기록해 보세요">
-                    게시물 주소와 확인한 결과를 모을 수 있습니다.
-                  </Empty>
-                )}
-              </section>
-              <FormPanel
-                title="홍보 활동 기록"
-                permissionReadOnly={remote?.role === "viewer"}
-                disabled={readOnly || !hasRelations}
-                onSubmit={submit((f) =>
-                  persist({
-                    ...workspace,
-                    activities: [
-                      {
-                        ...base(),
-                        ...relation(f),
-                        url: webUrl(required(f, "url")),
-                        publishedAt: calendarDate(required(f, "publishedAt")),
-                        views: text(f, "views")
-                          ? integer(text(f, "views"))
-                          : null,
-                      },
-                      ...workspace.activities,
-                    ],
-                  }),
-                )}
-              >
-                {!hasRelations && (
+                          ...base(),
+                          ...relation(f),
+                          url: webUrl(required(f, "url")),
+                          publishedAt: calendarDate(required(f, "publishedAt")),
+                          assetId: text(f, "assetId") || null,
+                          metrics: {
+                            likes: text(f, "likes")
+                              ? integer(text(f, "likes"))
+                              : null,
+                            comments: text(f, "comments")
+                              ? integer(text(f, "comments"))
+                              : null,
+                            shares: text(f, "shares")
+                              ? integer(text(f, "shares"))
+                              : null,
+                            source: "manual",
+                          },
+                          views: text(f, "views")
+                            ? integer(text(f, "views"))
+                            : null,
+                        },
+                        ...workspace.activities,
+                      ],
+                    }),
+                  )}
+                >
+                  {!hasRelations && (
+                    <p className="hint">
+                      홍보 제안과 홍보자를 먼저 등록해 주세요.
+                    </p>
+                  )}
+                  {relations}
+                  <Field label="게시물 주소">
+                    <input
+                      name="url"
+                      type="url"
+                      required
+                      placeholder="https://"
+                    />
+                  </Field>
+                  <Field label="게시일">
+                    <input name="publishedAt" type="date" required />
+                  </Field>
+                  <Field label="연결 콘텐츠 (선택)">
+                    <select name="assetId">
+                      <option value="">연결 안 함</option>
+                      {workspace.assets.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.title}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <div className="inline-fields">
+                    {[
+                      ["likes", "좋아요"],
+                      ["comments", "댓글"],
+                      ["shares", "공유"],
+                    ].map(([name, title]) => (
+                      <Field key={name} label={`직접 확인한 ${title} (선택)`}>
+                        <input name={name} type="number" min={0} step={1} />
+                      </Field>
+                    ))}
+                  </div>
+                  <Field label="직접 확인한 조회수 (선택)">
+                    <input name="views" type="number" min={0} step={1} />
+                  </Field>
                   <p className="hint">
-                    홍보 제안과 홍보자를 먼저 등록해 주세요.
+                    기록한 수치는 직접 입력한 정보로 표시됩니다. SNS 자동
+                    수집·전환 측정은 연결되지 않았습니다.
                   </p>
-                )}
-                {relations}
-                <Field label="게시물 주소">
-                  <input
-                    name="url"
-                    type="url"
-                    required
-                    placeholder="https://"
-                  />
-                </Field>
-                <Field label="게시일">
-                  <input name="publishedAt" type="date" required />
-                </Field>
-                <Field label="직접 확인한 조회수 (선택)">
-                  <input name="views" type="number" min={0} step={1} />
-                </Field>
-                <p className="hint">
-                  기록한 수치는 직접 입력한 정보로 표시됩니다. SNS 자동
-                  수집·전환 측정은 연결되지 않았습니다.
-                </p>
-              </FormPanel>
-            </div>
+                </FormPanel>
+              </div>
+            </>
           )}
 
+          {page === "reports" && <PerformanceReports workspace={workspace} />}
           {page === "settlements" && (
             <>
+              <PaymentImporter
+                workspace={workspace}
+                disabled={settlementDisabled}
+                onSave={(w) => persist(w)}
+              />
+              <div className="inline-fields">
+                <Field label="정산 등록 월">
+                  <input
+                    type="month"
+                    value={settlementMonth}
+                    onChange={(e) => setSettlementMonth(e.target.value)}
+                  />
+                </Field>
+                <Field label="정산 상태 필터">
+                  <select
+                    value={settlementStatus}
+                    onChange={(e) => setSettlementStatus(e.target.value)}
+                  >
+                    <option value="">전체</option>
+                    <option value="recorded">미지급 기록</option>
+                    <option value="paid">외부 지급 기록</option>
+                  </select>
+                </Field>
+              </div>
               <div className="settlement-summary">
                 <div>
                   <span>미지급으로 등록한 금액</span>
@@ -1286,7 +1555,10 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                     act(() =>
                       download(
                         "partner-settlements.csv",
-                        settlementCsv(workspace),
+                        settlementCsv({
+                          ...workspace,
+                          settlements: shownSettlements,
+                        }),
                         "text/csv;charset=utf-8",
                       ),
                     )
@@ -1302,8 +1574,8 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
               </p>
               <div className="split">
                 <section className="record-list" aria-label="정산 목록">
-                  {workspace.settlements.length ? (
-                    workspace.settlements.map((s) => (
+                  {shownSettlements.length ? (
+                    shownSettlements.map((s) => (
                       <article className="panel record" key={s.id}>
                         <div className="record-top">
                           <span
@@ -1369,6 +1641,12 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                             외부 지급 내역 기록
                           </button>
                         )}
+                        <p className="hint">
+                          {s.dueDate ? `지급 예정일: ${s.dueDate}` : ""}
+                          {s.externalReference
+                            ? ` · 외부 참조: ${s.externalReference}`
+                            : ""}
+                        </p>
                         {recordControls("settlements", s.id)}
                       </article>
                     ))
@@ -1393,6 +1671,10 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                           amount: integer(required(f, "amount"), 1),
                           status: "recorded",
                           paidAt: null,
+                          dueDate: text(f, "dueDate")
+                            ? validCalendarDate(text(f, "dueDate"))
+                            : null,
+                          externalReference: text(f, "externalReference"),
                         },
                         ...workspace.settlements,
                       ],
@@ -1412,6 +1694,12 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                       maxLength={250}
                       placeholder="예: 콘텐츠 제작 활동비"
                     />
+                  </Field>
+                  <Field label="지급 예정일 (선택)">
+                    <input name="dueDate" type="date" />
+                  </Field>
+                  <Field label="외부 지급 참조 (선택)">
+                    <input name="externalReference" maxLength={250} />
                   </Field>
                   <Field label="당사자가 정한 금액 (원)">
                     <input
