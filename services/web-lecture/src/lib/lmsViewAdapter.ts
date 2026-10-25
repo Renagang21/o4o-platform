@@ -16,7 +16,7 @@ import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createLmsLabels, type LmsLearnerPort, type LmsViewConfig, type LmsViewLabels } from '@o4o/lms-ui';
+import { createLmsLabels, readCaptionTracks, type LmsLearnerPort, type LmsViewConfig, type LmsViewLabels } from '@o4o/lms-ui';
 import { learnerApi, type LectureCourse, type LectureEnrollment, type LectureLesson } from '../api/lecture';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
@@ -57,6 +57,7 @@ function toLesson(l: LectureLesson) {
     isPreview: false, // isFree does not bypass the server enrollment/approval boundary.
     attachments: l.attachments ?? [],
     videoUrl: l.videoUrl ?? null,
+    captions: readCaptionTracks(l.metadata?.captions),
     content: l.content ?? null,
   };
 }

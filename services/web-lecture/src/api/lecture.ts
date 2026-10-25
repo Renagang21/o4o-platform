@@ -75,6 +75,7 @@ export interface LectureLesson {
   isPreview?: boolean;
   isFree?: boolean;
   attachments?: LessonAttachment[];
+  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
 }
 
 export interface LectureEnrollment {
@@ -178,6 +179,7 @@ export interface CourseInput {
 }
 export interface LessonInput {
   attachments?: LessonAttachment[];
+  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
   title: string;
   type: LessonType;
   description?: string | null;
