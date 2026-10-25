@@ -3,6 +3,7 @@
 > **상태**: ACTIVE · **작성·갱신**: 2026-10-25 (Asia/Seoul)
 > **범위**: [가격 준비 TODO](../work-orders/TODO-O4O-AI-PRICING-READINESS-V1.md)의 오프라인 운영 준비 도구
 > **기존 운영 증거**: [통합·배포 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)
+> **가격 도구·비용 비교 후속 통합**: [main·배포 CHECK](../checks/CHECK-O4O-AI-PRICING-INTEGRATION-20261025.md). 코드 통합·배포와 실제 요율/운영 설정 적용은 별개다.
 
 ## 1. 무엇을 확인하는가
 
