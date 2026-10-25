@@ -15,11 +15,33 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireSupplier } from '../../../utils/supplier.utils.js';
 import { SupplierCopilotService } from '../services/supplier-copilot.service.js';
+import { createRequireActiveSupplier } from '../middleware/neture-identity.middleware.js';
+import { readOrganizationContext, resolveSupplierForUser } from '../middleware/supplier-context.resolver.js';
+import { explainSupplierOverview } from '../services/supplier-overview-ai.service.js';
+import { AiExtensionError } from '@o4o/ai-core';
 
 export function createSupplierCopilotRouter(dataSource: DataSource): Router {
   const router = Router();
   const requireSupplier = createRequireSupplier(dataSource);
   const service = new SupplierCopilotService(dataSource);
+  router.post('/copilot/ai-overview', requireAuth, createRequireActiveSupplier(dataSource), async (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    if (!req.body || Array.isArray(req.body) || typeof req.body !== 'object' || Object.keys(req.body).length) {
+      res.status(400).json({ success: false, code: 'INVALID_INPUT' }); return;
+    }
+    const actorId = req.user!.id, supplierId = (req as Request & { supplierId: string }).supplierId;
+    const authorize = async () => {
+      const current = await resolveSupplierForUser(dataSource, actorId, readOrganizationContext(req));
+      return current.kind === 'resolved' && current.supplierId === supplierId && current.status === 'ACTIVE';
+    };
+    try {
+      const data = await explainSupplierOverview(dataSource, { actorId, supplierId, authorize });
+      res.json({ success: true, data: { ...data, supplierId } });
+    } catch (error) {
+      const code = error instanceof AiExtensionError ? error.code : 'AI_UNAVAILABLE';
+      res.status(code === 'ACCESS_DENIED' ? 403 : code === 'QUOTA_EXCEEDED' ? 429 : 503).json({ success: false, code });
+    }
+  });
 
   // GET /copilot/kpi
   router.get('/copilot/kpi', requireAuth, requireSupplier, async (req: Request, res: Response) => {

@@ -1,4 +1,4 @@
-import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
+import { createAccountedExtensionRuntime } from '../services/ai-extensions/accounted-runtime.js';
 /**
  * Copilot Engine Service
  *
@@ -87,16 +87,13 @@ export class CopilotEngineService {
         extension, input: { metrics },
         context: { requestId: randomUUID(), serviceId: profile.serviceId, featureId: 'operator-insight', actorId: user.id, audience: 'staff' },
         materials: [], funding: { payer: 'platform' },
-      }, {
-        invoke: async prompt => {
-          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider: target.provider,
-            config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
-            timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
-            meta: { service: profile.serviceId, callerName: extension.id },
-          }, { scope: 'OPERATOR_INSIGHT', serviceKey: profile.serviceId, userId: user.id });
-          return { ...result, provider: result.provider ?? target.provider };
-        },
-      }, {
+      }, createAccountedExtensionRuntime(AppDataSource, {
+        request: { provider: target.provider,
+          config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
+          timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
+          meta: { service: profile.serviceId, callerName: extension.id } },
+        accounting: { scope: 'OPERATOR_INSIGHT', serviceKey: profile.serviceId, userId: user.id },
+      }), {
         // The existing admin guard authorizes caller-submitted aggregates, not domain record access.
         authorize: async context => context.actorId === user.id,
         record: async event => { logger.info('[AI_EXTENSION]', event); },

@@ -2,7 +2,7 @@
  * Creates and drops its own database on a disposable PostgreSQL. Never point it at an application database.
  * Run: O4O_LECTURE_CERT_OPS_PG_PORT=<port> [O4O_LECTURE_CERT_OPS_PG_USER=<superuser>] jest --runTestsByPath <this file>
  */
-import { AddLectureInstructorProfile1792886400000 } from '../database/migrations/1792886400000-AddLectureInstructorProfile';
+import { AddLectureInstructorProfile1792886400001 } from '../database/migrations/1792886400000-AddLectureInstructorProfile';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../database/bootstrap/canonical-schema-baseline.js';
@@ -66,7 +66,7 @@ run('lecture certificate operation history on PostgreSQL', () => {
     await db.query('UPDATE lms_instructor_applications SET bio=$1,expertise=$2 WHERE id=$3', ['소개', '실무', id]);
     expect(await read()).toMatchObject({ bio: '소개', expertise: '실무' });
     await expect(db.query('UPDATE lms_instructor_applications SET bio=$1 WHERE id=$2', ['x'.repeat(3001), id])).rejects.toThrow();
-    await expect(new AddLectureInstructorProfile1792886400000().down({ query: (sql: string) => db.query(sql) } as any)).rejects.toThrow('INSTRUCTOR_PROFILE_DATA_EXISTS');
+    await expect(new AddLectureInstructorProfile1792886400001().down({ query: (sql: string) => db.query(sql) } as any)).rejects.toThrow('INSTRUCTOR_PROFILE_DATA_EXISTS');
     expect(await read()).toMatchObject({ bio: '소개', expertise: '실무' });
   });
 

@@ -1,3 +1,4 @@
+import { createPolicyExtensionRuntime } from '../../../services/ai-extensions/policy-runtime.js';
 import { randomUUID } from "node:crypto";
 import type { DataSource } from "typeorm";
 import {
@@ -62,7 +63,7 @@ export const consultationGuidanceExtension: AiBusinessExtension<
 export function createConsultationGuidanceSelector(
   db: DataSource,
 ): GuidanceSelector {
-  let policy: ReturnType<typeof createPolicyExecutor> | undefined;
+  const policy = createPolicyExecutor(db);
   return async (input, access) => {
     try {
       const result = await runAiExtension(
@@ -86,22 +87,9 @@ export function createConsultationGuidanceSelector(
             audience: "staff",
           },
         },
-        {
-          invoke: async (prompt, context) => {
-            const r = await (policy ??= createPolicyExecutor(db)).execute(
-              "PRODUCT_CONTENT",
-              prompt.systemPrompt,
-              prompt.userPrompt,
-              {
-                maxTokens: 512,
-                temperature: 0,
-                responseMode: "json",
-                userId: context.actorId,
-              },
-            );
-            return { ...r, provider: r.provider ?? "unknown" };
-          },
-        },
+        createPolicyExtensionRuntime(policy, 'PRODUCT_CONTENT', {
+          maxTokens: 512, temperature: 0, responseMode: 'json',
+        }),
         {
           authorize: () => access.authorize(),
           record: (event) => {

@@ -1,7 +1,7 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 /** Additive, nullable applicant fields. Existing applications remain unchanged; no backfill. */
-export class AddLectureInstructorProfile1792886400000 implements MigrationInterface {
-  name = 'AddLectureInstructorProfile1792886400000';
+export class AddLectureInstructorProfile1792886400001 implements MigrationInterface {
+  name = 'AddLectureInstructorProfile1792886400001';
   async up(q: QueryRunner): Promise<void> {
     await q.query('ALTER TABLE lms_instructor_applications ADD COLUMN bio varchar(3000), ADD COLUMN expertise varchar(1000)');
   }

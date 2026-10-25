@@ -25,9 +25,10 @@ const includes = (sources: string[], file: string) => sources.some(source =>
   file === source || file.startsWith(`${source.replace(/\/$/, '')}/`),
 );
 
-it.each(['services/web-lecture', 'services/web-store'])('%s image contains its complete declared workspace dependency graph', directory => {
+it.each(['services/web-lecture', 'services/web-store', 'services/web-pharmacy-coop'])('%s image contains its complete declared workspace dependency graph', directory => {
   const source = fs.readFileSync(path.join(root, directory, 'Dockerfile'), 'utf8');
-  const install = source.indexOf('RUN pnpm install');
+  // The command can be continued below RUN --mount=type=secret (coop's existing Dockerfile).
+  const install = source.indexOf('pnpm install ');
   expect(install).toBeGreaterThan(0);
   const beforeInstall = copySources(source.slice(0, install));
   const allSources = copySources(source);

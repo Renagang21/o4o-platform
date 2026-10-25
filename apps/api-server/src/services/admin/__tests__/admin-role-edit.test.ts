@@ -85,13 +85,10 @@ describe('planAdminRoleEdit — 카탈로그 역할만 차이로 추가·해제'
 });
 
 describe('applyAdminRoleEdit — 해제 안전장치', () => {
-  it('추가만 membership ensure 로 넘기고, 회원 역할은 건드리지 않는다', async () => {
+  it('일반 역할 편집으로 신규 운영 권한을 추가하면 확인 초대가 필요하며 쓰기하지 않는다', async () => {
     getRoleNames.mockResolvedValue(['kpa:store_owner']);
-    const r = await applyAdminRoleEdit('u1', ['community:admin'], SUPER);
-    expect(assignRole).toHaveBeenCalledWith({ userId: 'u1', role: 'community:admin' }, undefined);
-    expect(ensure).toHaveBeenCalledWith('u1', ['community:admin'], undefined);
-    expect(removeRole).not.toHaveBeenCalled();
-    expect(r.remove).toEqual([]);
+    await expect(applyAdminRoleEdit('u1', ['community:admin'], SUPER)).rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+    expect(assignRole).not.toHaveBeenCalled(); expect(ensure).not.toHaveBeenCalled(); expect(removeRole).not.toHaveBeenCalled();
   });
 
   it('서비스 admin 해제는 잠금 해제 경로를 쓰고 super_admin 이면 마지막 admin 도 허용한다', async () => {
@@ -104,7 +101,7 @@ describe('applyAdminRoleEdit — 해제 안전장치', () => {
   it('마지막 admin 이면 403 LAST_ADMIN_PROTECTED 이고 추가를 실행하지 않는다', async () => {
     getRoleNames.mockResolvedValue(['supplier:admin']);
     revokeWithLock.mockResolvedValue({ status: 'last_admin' });
-    await expect(applyAdminRoleEdit('u1', ['funding:admin'], { id: 'x', isPlatformSuperAdmin: false })).rejects.toMatchObject({
+    await expect(applyAdminRoleEdit('u1', [], { id: 'x', isPlatformSuperAdmin: false })).rejects.toMatchObject({
       statusCode: 403,
       code: 'LAST_ADMIN_PROTECTED',
     });

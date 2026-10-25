@@ -3,7 +3,7 @@
  *
  * 이 경로에서 **은퇴한 것**을 회귀로 고정한다.
  *   - 비밀번호 수신 → users.password / service_credentials 생성   (400 PASSWORD_NOT_ALLOWED_HERE)
- *   - 미가입 email 로 신규 user 생성                                (400 USER_SIGNUP_REQUIRED)
+ *   - 미가입 email 로 신규 user 생성                                (400 OPERATOR_INVITATION_REQUIRED)
  * 남는 것은 **기존 사용자에게 역할·membership 을 추가**하는 경로 하나뿐이며, 그 경로도
  * credential 을 만들지 않는다. 대체 경로는 `POST /admin/operator-assignments` · `POST /admin/operator-invitations`.
  *
@@ -182,7 +182,7 @@ describe('createUser — 비밀번호 경로 은퇴', () => {
   });
 
   // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 코드가 OPERATOR_INVITATION_REQUIRED 에서 USER_SIGNUP_REQUIRED 로 바뀌었다.
-  it('미가입 email 이면 user 를 만들지 않고 400 USER_SIGNUP_REQUIRED', async () => {
+  it('미가입 email 이면 user 를 만들지 않고 400 OPERATOR_INVITATION_REQUIRED', async () => {
     const rec = installDataSource({});
     const res = mockRes();
 
@@ -192,7 +192,7 @@ describe('createUser — 비밀번호 경로 은퇴', () => {
     expect(rec.users).toHaveLength(0);
     expect(rec.credentials).toHaveLength(0);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0]).toMatchObject({ code: 'USER_SIGNUP_REQUIRED' });
+    expect(res.json.mock.calls[0][0]).toMatchObject({ code: 'OPERATOR_INVITATION_REQUIRED' });
   });
 
   it('대상 서비스가 모순이면 트랜잭션을 시작조차 하지 않는다', async () => {
@@ -210,53 +210,13 @@ describe('createUser — 비밀번호 경로 은퇴', () => {
   });
 });
 
-// ─── 3. 남은 경로: 기존 사용자 역할 추가 ─────────────────────────────────────
-
-describe('createUser — 기존 사용자에게 서비스 운영자 역할 추가', () => {
-  const EXISTING_USER = { id: 'user-1', email: 'ph-op@example.com' };
-
-  it('User 를 새로 만들지 않고 role·membership 만 추가한다', async () => {
-    const rec = installDataSource({ existingUser: EXISTING_USER });
-    const res = mockRes();
-
-    await new AdminUserController().createUser(body() as any, res);
-
-    expect(rec.users).toHaveLength(0);
-    expect(rec.roles).toEqual([
-      expect.objectContaining({ userId: 'user-1', role: 'lecture:operator', inTransaction: true }),
-    ]);
-    expect(rec.memberships).toHaveLength(1);
-    expect(rec.memberships[0]).toMatchObject({ serviceKey: 'lecture', status: 'active', role: 'operator' });
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
-
-  it('credential 은 어떤 경우에도 만들지 않는다 (NOT_APPLICABLE)', async () => {
-    const rec = installDataSource({ existingUser: EXISTING_USER, existingCredential: null });
-    const res = mockRes();
-
-    await new AdminUserController().createUser(body() as any, res);
-
-    expect(rec.credentials).toHaveLength(0);
-    expect(res.json.mock.calls[0][0]).toMatchObject({
-      isExistingUser: true,
-      passwordPolicy: 'KEEP_EXISTING_PASSWORD',
-      credentialPolicy: 'NOT_APPLICABLE',
-    });
-  });
-
-  it('기존 membership 은 상태를 승격하지 않고 그대로 보고한다', async () => {
-    const rec = installDataSource({
-      existingUser: EXISTING_USER,
-      existingMembership: { userId: 'user-1', serviceKey: 'lecture', status: 'suspended' },
-    });
-    const res = mockRes();
-
-    await new AdminUserController().createUser(body() as any, res);
-
-    expect(rec.memberships).toHaveLength(0); // 생성 0 — 기존 행을 건드리지 않는다
-    expect(res.json.mock.calls[0][0]).toMatchObject({
-      membershipPolicy: 'KEEP_EXISTING_STATUS',
-      membershipStatuses: { 'lecture': 'suspended' },
-    });
+describe('createUser — 기존 사용자도 이메일 조회에 의한 즉시 권한 추가를 거절한다', () => {
+  it('가입 여부와 무관하게 초대 절차가 필요하고 User·역할·서비스 소속·credential을 변경하지 않는다', async () => {
+    const rec = installDataSource({ existingUser: {id:'user-1',email:'operator@example.com'} });
+    const res=mockRes();await new AdminUserController().createUser(body() as any,res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0]).toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
+    expect(rec.users).toHaveLength(0);expect(rec.roles).toHaveLength(0);expect(rec.memberships).toHaveLength(0);expect(rec.credentials).toHaveLength(0);
+    expect(transactionMock).not.toHaveBeenCalled();
   });
 });

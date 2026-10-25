@@ -343,3 +343,5 @@ export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, service
 export type { PublicServiceKey } from './service-entry/PublicServiceEntry';
 export { PublicServiceContact } from './service-entry/PublicServiceContact';
 export { ServiceContactInboxLink, useServiceContactCount } from './service-entry/ServiceContactInboxLink';
+
+export { PendingOperatorInvitations } from './PendingOperatorInvitations';

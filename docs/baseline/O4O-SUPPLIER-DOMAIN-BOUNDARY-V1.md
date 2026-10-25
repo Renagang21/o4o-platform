@@ -10,6 +10,7 @@
 > **소스 계약**: `apps/api-server/src/__tests__/supplier-domain-boundary.spec.ts`
 > **상위 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — 역할 경계가 충돌하면 그 문서가 우선
 > **작성**: 2026-09-26 · **최종 갱신**: 2026-10-17 — [WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1](../work-orders/WO-O4O-SUPPLIER-REGISTRATION-PUBLICATION-SEPARATION-V1.md)
+> **정책 갱신**: 2026-10-24 사용자 승인 — 자기 공급자 집계의 내부 AI 현황 요약 허용. [전체 AI 정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [콘텐츠 운영 원칙 §3](O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md#3-표준-반복-standard-loop).
 
 이 문서는 Supplier 영역을 **더 확장하기 위한 설계서가 아니다.** 여러 WO 를 거쳐 커진 구현을 초기 역할 정의로 수렴시킨 뒤 **경계를 동결한 기록**이다. 새 Supplier 기능 제안은 이 문서의 5축 안에 들어오는지를 먼저 통과해야 한다.
 
@@ -198,7 +199,8 @@ users.businessInfo  = 가입 입력 snapshot — Supplier profile 의 read/write
 ```text
 Supplier → ProductMaster write 금지 (HTTP 직접 create = 0)
 Supplier → 특정 Store 직접 콘텐츠 전송 금지
-Supplier 내부 LLM 호출 금지 (외부 LLM 은 사용자 작업 · O4O 는 prompt/context/apply/save)
+Supplier 내부 LLM: 사용자 명시 요청에 따른 자기 공급자 집계의 현황 설명 허용 (2026-10-24 사용자 결정).
+상품 등록·게시·주문·정산의 자동 실행은 허용하지 않는다. 기존 콘텐츠 창작의 외부 LLM 역할과 검수/저장 책임은 유지한다.
 UNPAID fulfillment 금지 (후불·외상·invoice 기반 무결제 처리 없음)
 O4O 물류 실행 금지 (택배사 API · 3PL · 자동 송장 · 집하 요청 · 배송대행)
 Consumer→Store commerce 복구 금지 (410 경계 유지 — B2B 는 별도 namespace)

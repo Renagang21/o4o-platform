@@ -1,3 +1,5 @@
+import { PendingOperatorInvitations } from '@o4o/shared-space-ui';
+import { api } from '../../lib/apiClient';
 /**
  * ServiceAdminPage — 분회 서비스 관리 (kpa-branch:admin)
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
@@ -344,7 +346,7 @@ function BranchOperatorsPanel() {
         setNotice(`${m.name ?? m.email ?? '회원'} 님의 분회 운영자 지정을 해제했습니다.`);
       } else {
         await designateBranchOperator(branchId, m.userId);
-        setNotice(`${m.name ?? m.email ?? '회원'} 님을 분회 운영자로 지정했습니다.`);
+        setNotice(`${m.name ?? m.email ?? '회원'} 님에게 초대 메일을 보냈습니다. 본인 수락 후 분회 운영자로 활성화됩니다.`);
       }
       load();
     } catch (e) {
@@ -411,7 +413,7 @@ function BranchOperatorsPanel() {
                           m.isOperator ? 'border border-gray-300 text-gray-700' : 'bg-primary-600 text-white'
                         }`}
                       >
-                        {m.isOperator ? '해제' : '운영자 지정'}
+                        {m.isOperator ? '해제' : '운영자 초대'}
                       </button>
                     </td>
                   </tr>
@@ -423,6 +425,7 @@ function BranchOperatorsPanel() {
       ) : (
         <p className="mt-4 text-gray-500">이 분회에 등록된 소속 회원이 없습니다.</p>
       )}
+      {branchId && <PendingOperatorInvitations key={branchId} client={api} kind="branch" scope={branchId} version={members?.length ?? 0} />}
     </section>
   );
 }

@@ -93,11 +93,10 @@ describe('/operators — 비밀번호 표면 0 (§17)', () => {
    *   구 계약은 "직접 지정 · 초대 두 경로만 사용한다" 였다. 이메일 초대 흐름이 은퇴하면서
    *   경로는 **직접 지정 하나**가 됐다. 초대 경로가 되살아나면 여기서 먼저 깨진다.
    */
-  it('직접 지정 한 경로만 사용한다 (초대 경로 부재)', () => {
-    expect(code).toMatch(/\/admin\/operator-assignments['"`]/);
-    expect(code).not.toMatch(/\/admin\/operator-invitations/);
-    // 지정 대상은 email 이 아니라 userId 다 (§5 — email ≠ Identity Key).
-    expect(code).toMatch(/userId:\s*selectedCandidate!\.userId/);
+  it('선택한 사용자 ID 또는 미가입 이메일로 확인 초대를 보내며 즉시 부여하지 않는다', () => {
+    expect(code).toMatch(/\/admin\/service-operator-invitations['"`]/);
+    expect(code).toMatch(/targetUserId:\s*selectedCandidate\.userId/);
+    expect(code).not.toMatch(/post\(['"`]\/admin\/operator-assignments['"`]/);
   });
 });
 

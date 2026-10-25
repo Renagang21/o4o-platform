@@ -22,7 +22,7 @@
 
 입력 정보는 학습자 상세와 운영자 검토 화면에 표시된다. 기존 강의 metadata의 다른 키는 서버의 부분 병합으로 보존된다. 게시된 강의 수정의 재검토 전환과 운영자의 검토·반려·승인 절차는 그대로다. 강사 신청에서는 별도로 소개(선택, 최대 3,000자)와 전문 분야(선택, 최대 1,000자)를 입력할 수 있다. `POST /lms/instructor/apply`의 optional bio/expertise를 서버에서 문자열·길이·NUL 검사와 trim 후 저장한다. 과거 신청·기존 클라이언트의 미입력은 null로 유지한다. 신청자와 pending 상태는 서버가 확정하며 승인 상태·reviewedBy·rejectionReason은 신청 payload로 설정할 수 없다.
 
-이 소개는 운영자의 `/operator/instructors` 검토 화면에 일반 텍스트로 표시되며 강의 professionalInfo나 공개 프로필에 자동 게시되지 않는다. 계정 전환 시 입력 초안을 초기화한다. 저장·전송 실패 시 같은 계정의 입력은 유지하며 기존 약관 동의·중복 신청·운영자 승인 절차를 그대로 따른다. 새 필드를 쓰려면 `AddLectureInstructorProfile1792886400000` incremental migration이 먼저 적용돼야 한다. 개발 브랜치의 구현이며 운영 적용은 별도 통합·배포 절차를 따른다.
+이 소개는 운영자의 `/operator/instructors` 검토 화면에 일반 텍스트로 표시되며 강의 professionalInfo나 공개 프로필에 자동 게시되지 않는다. 계정 전환 시 입력 초안을 초기화한다. 저장·전송 실패 시 같은 계정의 입력은 유지하며 기존 약관 동의·중복 신청·운영자 승인 절차를 그대로 따른다. 새 필드를 쓰려면 `AddLectureInstructorProfile1792886400001` incremental migration이 먼저 적용돼야 한다. 개발 브랜치의 구현이며 운영 적용은 별도 통합·배포 절차를 따른다.
 
 ## 영상·자료
 

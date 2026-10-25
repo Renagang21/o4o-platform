@@ -1,6 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
+> **정책 참조 갱신**: 2026-10-24 — [전체 AI 정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 사용자 승인에 따른 공급자 자체 집계 요약 예외를 §16에 반영. Assistant의 실행·권한 범위는 유지.
 > **작성일**: 2026-10-03 · **개정**: 2026-10-07 Task 이해 · 완료 판정 구현 반영 — §0-1 (8) · §2-1 · §4-3 · §18-2 단계 대응 · §23 L1 · L2 · Memory (`WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1`) · 2026-10-06 Phase E 구현 반영 — §11-2 작업 단위 dispatch · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1`) · 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
@@ -432,7 +433,7 @@ EVOLUTION §5(실제 화면 인계)를 요청 기기와 실행 노드의 관계�
 | 의약품 | O4O 내부 cart · `createOrder()` 의 의약품 거래 차단은 그대로다. 외부 도매 의약품 발주 자동화의 법률 검토는 §17 Gate 대상이다 |
 | 건강 · 병원약국 데이터 | 기존 결정(병원약국 = Local-only)을 유지한다. §9 배치 전환의 예외로 둔다 |
 | AI 의 역할 | PHILOSOPHY §6("AI 는 사람의 검수 없이 최종 기준을 결정하지 않는다")을 유지한다. PHILOSOPHY 개정은 이 문서의 범위가 아니다 |
-| 공급자 역할 | Supplier Domain §9(Supplier 내부 LLM 호출 금지)를 유지한다. 공급자 역할 사용자에 대한 Assistant 적용 범위를 이 문서가 넓히지 않는다 |
+| 공급자 역할 | [Supplier Domain §9](O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md#9-금지선)의 경계를 따른다. 2026-10-24 승인한 자기 공급자 집계의 요청 기반 내부 AI 요약은 해당 현황 host의 예외다. 공급자 역할 사용자에 대한 Assistant의 실행 범위를 이 문서가 넓히지 않는다 |
 
 V2 와 이 정본들이 직접 충돌하는 새 사실이 확인되면 구현을 멈추고 결정을 올린다.
 

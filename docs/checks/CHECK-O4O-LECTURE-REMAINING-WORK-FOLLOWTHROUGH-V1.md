@@ -68,7 +68,7 @@
 
 사용자의 “남은 부분도 진행, 작업을 작게 나누지 말라” 지시에 따라 T07 저장 필드·migration·API·신청 화면·운영자 검토·검증을 같은 branch에 포함했다. 이번 지시는 개발·격리 검증·push 범위이며 운영 migration 적용은 수행하지 않는다.
 
-- `InstructorApplication.bio/expertise` nullable varchar(3000/1000)와 `AddLectureInstructorProfile1792886400000`를 incremental manifest에 추가했다. baseline·과거 migration은 변경하지 않는다. 과거 null 신청을 유지하고 데이터 backfill·승인·역할 변경을 하지 않는다.
+- `InstructorApplication.bio/expertise` nullable varchar(3000/1000)와 `AddLectureInstructorProfile1792886400001`를 incremental manifest에 추가했다. baseline·과거 migration은 변경하지 않는다. 과거 null 신청을 유지하고 데이터 backfill·승인·역할 변경을 하지 않는다.
 - 서버는 optional plain text의 타입·trim·길이·NUL을 검사한다. 요청의 userId/status/reviewedBy로 신청자를 바꾸거나 승인을 우회하지 못한다. 오류는 transaction·약관 기록 전에 거부한다. 입력 생략의 기존 API 호출도 유지한다.
 - 신청 화면에서 소개·전문 분야를 입력하고 실패 시 보존한다. 계정 변경은 keyed form으로 초안을 초기화한다. 운영자 목록은 검토용 일반 텍스트로 표시하며 HTML을 실행하지 않는다. 공개 강사 프로필·강의 professionalInfo에 자동 복사하지 않는다.
 - DB rollback은 non-null 신청자 데이터가 있으면 거부한다. 스키마 rollback으로 내용을 삭제하지 않고 기존 API 코드와 nullable 컬럼을 유지하는 경로를 사용한다.
@@ -107,3 +107,7 @@ PostgreSQL 15.18 바이너리는 테스트용으로 repo 밖에 준비했으며 
 구현 TODO T04~T08과 재현 가능한 검사 도구는 완료다. T02는 Windows PC 접근·세션 소유자 확인이 필요하고, T03은 실제 로그인용 계정·사용자 공유 브라우저가 없으며, T09는 실제 운영 미디어 자료가 제공되지 않아 미완료다. 이전 “PG15 미설치” 제한은 이번 임시 cluster 준비로 해소됐다. 운영 migration 적용·PR·병합·배포는 이번 push 범위에서 실행하지 않는다.
 
 문서 정합: 강사 신청 보류 설명을 구현·배포 전제와 구분해 갱신했고 TODO·로컬 검증 안내를 함께 보완했다. canonical index·과거 기록물 일괄 수정 없음.
+
+## 통합 준비 — 최신 main migration 순서 보존
+
+사용자가 현재 branch의 통합·migration·배포·실제 사용 검증을 지시했다. main `4ee5a8ecda`를 merge하면서 기존 main의 운영자 초대 migration과 epoch가 겹침을 확인했다. 아직 main/운영에 반영되지 않은 Lecture migration만 `AddLectureInstructorProfile1792886400001`로 조정하고, main manifest/fingerprint를 보존한 뒤 마지막에 추가했다. PostgreSQL 15.18에서 모든 main prefix 일치, 새 fingerprint `ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb`(6903 lines), empty down/up, fixture DB 0개 정리를 확인했다. 이전 6871-line fingerprint는 main 초대 schema 통합 전 검사 기록이다.

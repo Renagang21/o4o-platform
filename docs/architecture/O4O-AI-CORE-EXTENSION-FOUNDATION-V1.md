@@ -1,12 +1,14 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-24 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-25 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
+> 전체 업무 재정비 준비: [단일 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [업무·코드 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
 > 조사 기준: `3c95dc170103f739a3e3a33b20f85350ae0ecef5`. 코드 존재는 현행 사업 기능이라는 증거가 아니다.
 
 **현재 범위:** 기존 Core/업무 Extension·가격/quota·Runtime/editor 정비는 main에 통합됐으며 승인된 quota migration·7개 서비스 배포가 완료됐다.
 현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. 관리자 조회 단계·모델 관리·사용처별 선택과 삭제 보호의 반영 상태는 §12/§12-1/§12-2에서 구분한다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
+업무 재정비의 추가 연결과 2026-10-25 main·운영 반영 증거는 §14-1에서 구분한다.
 공통 기반 적용은 모든 전문 route의 비용 이관·모든 화면 AI UI·실계정 업무 검증 완료를 뜻하지 않는다.
 
 ## 1. 최초 조사 당시 구조·문제 (2026-10-13)
@@ -245,3 +247,44 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 공통 질의 정책을 직접 사용하는 커뮤니티 수동·예약 뉴스 생성은 개별 사용처 모델 지정에 연결되지 않았다. 따라서 관리 가능한 사용처를 모두 다른 모델로 지정해도 공통 질의 정책의 모델 참조는 유지한다. 기존 공통 정책에서 모델을 명시적으로 바꾼 뒤에만 이전 참조를 해제한다. 모델 삭제가 정책을 자동 수정하거나 뉴스의 provider·과금·권한 계약을 바꾸지 않는다(2026-10-24 PR #792 통합 리뷰 보완).
 
 [PR #792](https://github.com/Renagang21/o4o-platform/pull/792)는 main `c99123518fe74099b9f471f06cdd90bf7c5709de`에 병합됐다. 이후 문서만 추가한 `abb602b9569217abf2e20de155e2f60210da5d50`을 대상으로 [Delivery 40074053472](https://github.com/Renagang21/o4o-platform/actions/runs/40074053472)가 API·관리자 verified rollout과 최종 serving SHA 검증을 성공했고 `production=success / DEPLOYED`로 확정했다. 이 시점의 배포 증거를 이후 live 상태나 실제 운영 모델 저장·유료 공급자 시험 호출의 증거로 확대하지 않는다. 새로운 schema·migration 파일이나 dependency 변경은 없고, 기존 표준 배포의 migration Job은 성공했다.
+
+## 13. 전체 AI 업무 Core + Extension 재정비 준비 (2026-10-24)
+
+[정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)와 [업무 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)는 main `7f3d783cc2`에서 시작해 최종 점검 중 `355d77e861`까지 재대조한 구현 전 준비다. 사용자 업무 1~11 및 추가 업무를 코드·문서에 연결했다. 이번 변경은 문서만이며 새로운 runtime 계약·권한·모델/가격 정책·메뉴·운영 설정을 적용하지 않는다. §11/§12의 완료/운영 기록은 당시 증거로 유지한다.
+
+기존 `AiBusinessExtension`·`runAiExtension`·host authorize/record·모델 관리·회계/quota·편집기·외부 AI adapter를 재사용한다. 상품 지식/등록, 콘텐츠 제작/재사용, 현황/운영, 자료 기반 지원, 교육/커뮤니티, 개인 자동화는 정비할 업무 묶음이며 새 기반/패키지 개수를 뜻하지 않는다.
+
+- Core는 공통 실행·문맥·권한 callback·이력과 runtime 계약을 유지하고, 업무 Extension은 자료·출력·업무 규칙을 담당한다. 서버가 기존 도메인 권한으로 자료를 구성하고 저장·게시·주문 확인은 기존 업무 API가 수행한다.
+- 첫 후속 적용은 기존 현황 설명 Extension에 매장/공급자의 허용 지표를 연결하는 것으로 계획한다. 매장 도우미의 화면 문맥·입력과 실제 지표 조회를 구분하며 관리자 Copilot API의 guard를 일반 사용자에게 낮추지 않는다.
+- 자료 버전·출처·집계 시각은 우선 업무 입력/host에서 검증한다. Core 필드·상태 변경 도구·공통 저장소를 선제적으로 추가하지 않는다. 현재 실행기는 read/draft이며 새 실행 도구는 별도 수용 기준이 필요하다.
+- 사용처별 모델 지정과 비용/한도·중지 연결은 별도 검증한다. 최근 뉴스·상담·전문 호출과 사용처 목록의 대응, 약국 사업/분회/협력 모임의 업무 문맥 정합은 TODO에 남겼다. 전체 호출의 이관 완료로 해석하지 않는다.
+- 상품 DB는 기존 [상품 정정 작업공간](../guides/products/O4O-ADMIN-PRODUCT-CORRECTION-WORKSPACE-V1.md)을 재사용하고 AI 보완 초안과 공식 반영을 분리한다. [전문 정보 원칙](../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)의 목적별 구성·상품 사실/전문 참고정보·근거 구분을 유지한다. 전문 주제를 일괄 제외하거나 기존 QR 자료를 공식 DB로 자동 채택하지 않는다.
+
+후속 순서는 공통 정합/첫 적용 → 상품·콘텐츠 → 운영·협력 모임 → 상담·교육·자동화 정합이다. 각 단계는 전체 소비처·권한·원본/초안 소유·비용·오류 회귀를 확인한 뒤 전환한다. 실제 구현·main 통합·실계정 및 운영 검증은 후속 실행 결과로만 완료 표시한다.
+
+## 14. 업무 공통 연결과 첫 적용 — 개발 branch (2026-10-24)
+
+사용자 후속 지시로 같은 [TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 S1~S4를 연속 작업했다. 아래는 `wo/ai-work-extension-preparation`의 구현 상태다. §11/§12의 main·운영 완료 기록과 구분하며 이번 변경은 push까지만 인계한다. 검증·잔여 범위는 [CHECK](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)를 따른다.
+
+공통 실행은 기존 `AiBusinessExtension`/`runAiExtension`을 유지한다. 서버의 [policy runtime](../../apps/api-server/src/services/ai-extensions/policy-runtime.ts)은 기존 `AiPolicyExecutorService`에, [accounted runtime](../../apps/api-server/src/services/ai-extensions/accounted-runtime.ts)은 기존 모델 선택과 `executeAccountedAi`에 연결하는 조립 함수다. 공급자 adapter·quota·원장·Task·Memory를 새로 만들지 않는다. 번역 2종·상담 게시 문단 선택·LMS·운영자 설명·Copilot·뉴스가 같은 조립 경로를 재사용한다. 각 host의 허용 자료·기존 시간 제한/재시도·대체 응답·저장은 유지한다.
+
+| 실제 업무 | 자료·권한·결과 | 정책·모델 |
+|---|---|---|
+| 매장 홈 현황 설명 | 기존 매장 guard와 현재 owner/허용 직원 관계로 선택 매장 집계만 조회. `null`과 확인된 0건을 구분. 응답 전 권한 재확인 | STORE_INSIGHT, `store.overview` 모델 지정. 서버 host의 기존 serviceKey를 canonical 서비스로 확인해 비용 귀속 |
+| 공급자 홈 현황 설명 | ACTIVE인 자기 공급자 식별을 재확인하고 기존 KPI의 수치만 조회. 사용자가 요청할 때만 실행 | OPERATOR_INSIGHT, `supplier.overview` 모델 지정 |
+| 약국 경영 협력 모임 현황 설명 | 해당 모임의 현행 admin/operator 역할로 회원 상태 집계만 조회. 개인 원문과 다른 모임 자료 제외 | OPERATOR_INSIGHT, `cooperative.overview` 모델 지정 |
+| 상품 정정 검토 초안 | 기존 super_admin·작업 묶음 revision·task·원문 fingerprint 검증. 별도 제안 미리보기 → 사용자 선택으로 편집 폼에 삽입 → 기존 저장. 공식 상품 자동 변경 없음 | 기존 PRODUCT_CONTENT 모델·한도 공유. `product.correction-draft`는 같은 정책의 사용처 alias |
+
+세 현황 host는 기존 `operator-insight` Extension과 공통 화면 패널을 사용한다. 자료 조회 전·Core 실행 직전·응답 전달 전 권한을 검사한다. UI는 자동 요청/재시도하지 않고 범위 변경 시 늦은 응답을 폐기한다. AI 설명·제안은 기존 처리 API의 실행 성공 증거가 아니다. 공급자 자체 집계의 내부 AI 요약은 [콘텐츠 운영 원칙 §3](../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md#3-표준-반복-standard-loop)·[Supplier 경계](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md)에 사용자 승인을 반영했다. 공급자 창작·외부 계정 책임과 자동 업무 처리 경계는 유지한다.
+
+상품 태그 호출에는 PRODUCT_TAGGING 예약·정산을, Assistant의 이해/완료 검증 호출에는 인증된 사용자 기준 SERVICE_QUERY 예약·정산을 연결했다. 전자는 기존 서버 작업의 actor를 추정하지 않아 전역/scope 한도만 적용하며 사용자별 귀속은 후속이다. 뉴스는 공통 질의 모델·활성 설정과 기존 삭제 참조 보호를 유지한다. 관리 목록의 뉴스·상담 문단 선택·OCR 및 새 업무 연결은 실행/운영/청구 완료 표시와 다르다. OCR은 전문 Google Vision API로 표시하며 생성형 모델 선택과 공통 비용 연결은 미지원이다.
+
+이번 지원 부담 주체는 기존 platform이다. 다른 payer는 명시적으로 거부하며 store/user/external-account 청구 구현 완료를 뜻하지 않는다. Home·계획·화면 판독·멀티모달 직접 transport, Qwen 편집·TTS·전문 OCR의 전체 비용/중지 이관과 상태 변경 도구 확대는 TODO에 남긴다. schema/migration·운영 모델·가격·인증 설정은 변경하지 않았다.
+
+### 14-1. main 통합·운영 반영 (2026-10-25)
+
+[PR #805](https://github.com/Renagang21/o4o-platform/pull/805)는 main `8de024e92cb071790408ca403e110abb4cc29d61`에 병합됐다. PR/main CI와 CodeQL, PR SonarCloud 분석을 확인했고 자동 리뷰의 정산 상세·정책 표시 P2 2건을 같은 branch에서 수정·회귀한 뒤 병합했다. STORE_INSIGHT 상세는 실제 reservation의 service/month에 귀속하며 기존 기본 service·정산 총액/확정·결제는 유지한다. 관리 목록은 카탈로그에서 scope 정책 조회 대상을 모아 새 현황 3종의 저장 모델·활성/중지 설정을 표시한다.
+
+같은 SHA의 API·관리자·Neture·약국 사업 웹은 기존 Delivery로, 매장 웹은 Dockerfile 변경에 따른 기존 통제 promote로 verified 배포됐다. 협력 모임 웹은 기존 비공개 서비스의 frontend-only 경로로 배포해 Ready·비공개 HTTP·100% 트래픽을 확인했고 조합/회원 fixture 등록은 건너뛰었다. API 표준 migration Job은 성공했으며 이번 변경에는 새 migration/DDL·운영 모델/가격·credential·IAM/DNS 변경이 없다.
+
+확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.

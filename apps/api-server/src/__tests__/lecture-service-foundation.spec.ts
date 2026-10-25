@@ -70,7 +70,7 @@ describe('Lecture Service Foundation', () => {
     const migrationsDir = resolve(ROOT, 'database/migrations');
     // The authorized profile change is schema-only; service reference seed remains a CLI.
     const lectureMigrations = readdirSync(migrationsDir).filter((f) => /Lecture/i.test(f));
-    expect(lectureMigrations).toEqual(['1792886400000-AddLectureInstructorProfile.ts']);
+    expect(lectureMigrations).toEqual(['1792886400001-AddLectureInstructorProfile.ts']);
     const profileMigration = readFileSync(resolve(migrationsDir, lectureMigrations[0]), 'utf8');
     expect(profileMigration).toContain('ALTER TABLE lms_instructor_applications ADD COLUMN bio');
     expect(profileMigration).not.toMatch(/\b(?:INSERT\s+INTO|UPDATE\s+[a-z_]|DELETE\s+FROM)\b/i);

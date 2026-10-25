@@ -85,8 +85,8 @@ describe('운영자 직접 지정 — 후보 검색 응답 계약', () => {
     });
 
     it('frontend 는 선택한 후보의 userId 를 전송한다 (email 을 지정 인자로 쓰지 않는다)', () => {
-      expect(page).toMatch(/operator-assignments'/);
-      expect(page).toMatch(/userId:/);
+      expect(page).toMatch(/service-operator-invitations'/);
+      expect(page).toMatch(/targetUserId:\s*selectedCandidate\.userId/);
       // 지정 payload 에 email 을 넣지 않는다 — email 은 Identity Key 가 아니다.
       expect(page).not.toMatch(/operator-assignments',\s*\{[^}]*email/);
     });

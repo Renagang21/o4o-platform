@@ -1,3 +1,6 @@
+const mockTokens:string[]=[];
+jest.mock('../../email.service.js',()=>({emailService:{sendEmail:jest.fn(async(o:any)=>{const token=String(o.text).match(/#token=([a-f0-9]{64})/)?.[1];if(token)mockTokens.push(token);return {success:true};})}}));
+import { ServiceOperatorInvitationService } from '../service-operator-invitation.service.js';
 import "reflect-metadata";
 import { randomUUID } from "node:crypto";
 import { createCarePharmReviewDb } from "../../../__tests__/support/carepharm-review-db.js";
@@ -46,15 +49,20 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
    CREATE TABLE demo_accounts(user_id uuid,is_active boolean);
    CREATE TABLE semi_franchises(id uuid DEFAULT gen_random_uuid(),key text,status text);
    CREATE TABLE cooperatives(semi_franchise_id uuid);
-   CREATE TABLE action_logs(service_key text,user_id uuid,action_key text,source text,status text,meta jsonb);`);
+   CREATE TABLE action_logs(service_key text,user_id uuid,action_key text,source text,status text,meta jsonb);
+   CREATE TABLE service_operator_invitations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),invited_email text,service_key text,role text,
+     target_user_id uuid,purpose text,status text DEFAULT 'pending',expires_at timestamptz,accepted_user_id uuid,invited_by_user_id uuid,
+     created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now(),accepted_at timestamptz,token_hash text,
+     scope_type text DEFAULT 'platform',scope_key text DEFAULT '');
+   CREATE UNIQUE INDEX pending_invite ON service_operator_invitations(lower(invited_email),service_key,role,scope_type,scope_key) WHERE status='pending';`);
   });
   afterAll(async () => {
     if (db) await db.close();
   });
   beforeEach(async () => {
-    jest.clearAllMocks();
+    jest.clearAllMocks();mockTokens.length=0;
     await db.ds.query(
-      "TRUNCATE users,service_memberships,role_assignments,linked_accounts,demo_accounts,semi_franchises,cooperatives,action_logs",
+      "TRUNCATE service_operator_invitations,users,service_memberships,role_assignments,linked_accounts,demo_accounts,semi_franchises,cooperatives,action_logs",
     );
     await db.ds.query(
       `INSERT INTO users(id,name,email,status) VALUES($1,'Admin','admin@example.invalid','active'),($2,'Candidate','candidate@example.invalid','active')`,
@@ -81,6 +89,13 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
         [key],
       );
   }
+  async function inviteAndAccept(a:string,key:string,u:string) {
+    const pending=await s.change(a,key,u,true);
+    expect(pending).toMatchObject({invited:true,assigned:false});
+    expect(await db.ds.query('SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active',[u,delegationScope(key).operatorRole])).toHaveLength(0);
+    await new ServiceOperatorInvitationService(db.ds).accept(mockTokens[mockTokens.length-1],u);
+    return pending;
+  }
   it.each(Object.keys(OPERATOR_DELEGATION_SCOPES))(
     "%s admin assigns and revokes only its own operator",
     async (key) => {
@@ -91,7 +106,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
           (p: any) => p.userId,
         ),
       ).toEqual([target]);
-      const out = await s.change(actor, key, target, true);
+      const out = await inviteAndAccept(actor,key,target);
       expect(out.role).toBe(c.operatorRole);
       expect(roleAssignmentService.assignRole).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -159,13 +174,10 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
     },
   );
-  it("Google link is required and failed input does not write", async () => {
-    await setup();
-    await db.ds.query("DELETE FROM linked_accounts");
-    await expect(
-      s.change(actor, "funding", target, true),
-    ).rejects.toMatchObject({ code: "GOOGLE_LINK_REQUIRED" });
-    expect(await db.ds.query("SELECT * FROM action_logs")).toHaveLength(0);
+  it("an email-only verified active member can accept a service-admin invitation", async () => {
+    await setup();await db.ds.query("DELETE FROM linked_accounts");
+    await inviteAndAccept(actor,"funding",target);
+    expect(roleAssignmentService.assignRole).toHaveBeenCalledTimes(1);
   });
   it("protects fixed Demo target roles", async () => {
     await setup();
@@ -176,7 +188,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
   });
   it("preserves Admin and foreign-service roles when revoking an operator", async () => {
     await setup();
-    await s.change(actor, "funding", target, true);
+    await inviteAndAccept(actor,"funding",target);
     await db.ds.query(
       `INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'funding:admin',true),($1,'supplier:operator',true)`,
       [target],
@@ -193,7 +205,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
   });
   it("permits removal after a target service suspension", async () => {
     await setup();
-    await s.change(actor, "funding", target, true);
+    await inviteAndAccept(actor,"funding",target);
     await db.ds.query(
       `UPDATE service_memberships SET status='suspended' WHERE user_id=$1`,
       [target],
@@ -201,12 +213,11 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     await s.change(actor, "funding", target, false);
     expect((await s.list(actor, "funding")).operators).toHaveLength(0);
   });
-  it("idempotent assignment leaves validity and audit intact", async () => {
-    await setup();
-    await s.change(actor, "funding", target, true);
-    await s.change(actor, "funding", target, true);
+  it('existing operators are not asked to reaccept and their audit stays intact',async()=>{
+    await setup();await inviteAndAccept(actor,'funding',target);
+    await expect(s.change(actor,'funding',target,true)).rejects.toMatchObject({code:'OPERATOR_ALREADY_ACTIVE'});
     expect(roleAssignmentService.assignRole).toHaveBeenCalledTimes(1);
-    expect(await db.ds.query("SELECT * FROM action_logs")).toHaveLength(1);
+    expect(await db.ds.query('SELECT * FROM action_logs')).toHaveLength(1);
   });
   it("expired admin has no authority; scheduled operator requires explicit review", async () => {
     await setup();
@@ -241,7 +252,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       `ALTER TABLE action_logs ADD CONSTRAINT deny_audit CHECK(false)`,
     );
     try {
-      await expect(s.change(actor, "funding", target, true)).rejects.toThrow();
+      await expect(inviteAndAccept(actor,"funding",target)).rejects.toThrow();
       expect(
         await db.ds.query("SELECT * FROM role_assignments WHERE user_id=$1", [
           target,
@@ -253,7 +264,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
   });
   it("search filters both current operators and candidates, escaping wildcards", async () => {
     await setup();
-    await s.change(actor, "funding", target, true);
+    await inviteAndAccept(actor,"funding",target);
     expect((await s.list(actor, "funding", "no-match")).operators).toHaveLength(
       0,
     );
@@ -281,7 +292,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       expect((await s.list(actor, key, "Candidate")).candidates).toHaveLength(
         1,
       );
-      await s.change(actor, key, target, true);
+      await inviteAndAccept(actor,key,target);
       expect((await s.list(actor, key)).operators).toHaveLength(1);
       expect((await s.list(actor, key)).operators[0].membershipStatus).toBe(
         "active",
@@ -335,7 +346,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     "%s shows %s account operator unavailable but allows role removal",
     async (key, state) => {
       await setup(key);
-      await s.change(actor, key, target, true);
+      await inviteAndAccept(actor,key,target);
       if (state === "inactive")
         await db.ds.query('UPDATE users SET "isActive"=false WHERE id=$1', [
           target,
@@ -360,18 +371,12 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
   it('self-change protection uses canonical UUID casing',async()=>{
     await setup();await expect(s.change(actor,'funding',actor.toUpperCase(),true)).rejects.toMatchObject({code:'SELF_OPERATOR_CHANGE_FORBIDDEN'});
   });
-  it("same target parallel assignment produces a single active role and audit", async () => {
-    await setup();
-    await Promise.all([
-      s.change(actor, "funding", target, true),
-      s.change(actor, "funding", target, true),
-    ]);
-    expect(
-      await db.ds.query(
-        "SELECT * FROM role_assignments WHERE user_id=$1 AND is_active",
-        [target],
-      ),
-    ).toHaveLength(1);
-    expect(await db.ds.query("SELECT * FROM action_logs")).toHaveLength(1);
+  it('parallel invitations yield one pending request and one accepted grant',async()=>{
+    await setup();const results=await Promise.allSettled([s.change(actor,'funding',target,true),s.change(actor,'funding',target,true)]);
+    expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    expect(await db.ds.query('SELECT * FROM role_assignments WHERE user_id=$1',[target])).toHaveLength(0);
+    await new ServiceOperatorInvitationService(db.ds).accept(mockTokens[0],target);
+    expect(await db.ds.query('SELECT * FROM role_assignments WHERE user_id=$1 AND is_active',[target])).toHaveLength(1);
+    expect(await db.ds.query('SELECT * FROM action_logs')).toHaveLength(1);
   });
 });
