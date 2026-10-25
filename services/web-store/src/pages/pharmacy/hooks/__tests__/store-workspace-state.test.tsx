@@ -35,6 +35,7 @@ const m = vi.hoisted(() => ({
   available: vi.fn(),
   apply: vi.fn(),
   clear: vi.fn(),
+  readTablets: vi.fn(),
 }));
 vi.mock("../../../../api/signageSchedule", () => ({
   fetchSchedules: m.schedules,
@@ -73,6 +74,7 @@ vi.mock("../../../../api/channelProducts", () => ({
 vi.mock("../../../../api/tabletDisplays", () => ({
   applyCurrentScreenSet: m.apply,
   clearCurrentScreenSet: m.clear,
+  fetchTablets: m.readTablets,
 }));
 const notify = vi.fn();
 it.each([
@@ -110,6 +112,7 @@ beforeEach(() => {
     slug: { canChange: true },
   });
   m.products.mockResolvedValue([]);
+  m.readTablets.mockResolvedValue([{ id: 'tablet-A', currentScreenSetId: 'next' }]);
   m.available.mockResolvedValue([]);
   m.placements.mockResolvedValue({ data: { items: [] } });
   m.scans.mockResolvedValue({ data: { byPlacement: [] } });
@@ -391,7 +394,7 @@ it("channel overview refresh and product switching ignore older responses", asyn
   });
   expect(result.current.channelProducts[0]?.id).toBe("B");
 });
-function useTabletFixture(previous: string | null = "old") {
+function useTabletFixture(previous: string | null = "old", isCurrent = () => true) {
   const [tablets, setTablets] = useState<Tablet[]>([
     { id: "tablet-A", name: "Counter", currentScreenSetId: previous } as Tablet,
   ]);
@@ -402,6 +405,7 @@ function useTabletFixture(previous: string | null = "old") {
       setTablets,
       { next: { name: "Next" } },
       setToast,
+      isCurrent,
     ),
     tablets,
     toast,
@@ -446,6 +450,34 @@ it("tablet failed apply preserves the current screen and duplicate calls do not 
   expect(result.current.toast?.message).toContain("지금 적용할 수 없는");
   await act(() => result.current.handleApplyToTablet("next", "tablet-A"));
   expect(m.apply).toHaveBeenCalledTimes(2);
+});
+
+it('does not let an earlier undo overwrite a later application in the same session', async () => {
+  const { result } = renderHook(() => useTabletFixture());
+  await act(() => result.current.handleApplyToTablet('next', 'tablet-A'));
+  const oldUndo = result.current.toast!.action!.onClick;
+  await act(() => result.current.handleApplyToTablet('later', 'tablet-A'));
+  await act(async () => { await oldUndo(); });
+  expect(m.apply).toHaveBeenCalledTimes(2); expect(result.current.tablets[0].currentScreenSetId).toBe('later');
+  expect(result.current.toast?.message).toContain('이후 화면 변경');
+});
+it('refuses undo when the currently stored screen was changed elsewhere', async () => {
+  const { result } = renderHook(() => useTabletFixture());
+  await act(() => result.current.handleApplyToTablet('next', 'tablet-A'));
+  m.readTablets.mockResolvedValueOnce([{ id: 'tablet-A', currentScreenSetId: 'other-screen' }]);
+  await act(async () => { await result.current.toast!.action!.onClick(); });
+  expect(m.apply).toHaveBeenCalledTimes(1); expect(result.current.toast?.message).toContain('현재 저장된 화면이 변경');
+});
+it('does not start an undo write after a store change while checking the current screen', async () => {
+  let current = true;
+  const { result } = renderHook(() => useTabletFixture('old', () => current));
+  await act(() => result.current.handleApplyToTablet('next', 'tablet-A'));
+  const pending = deferred<Tablet[]>(); m.readTablets.mockReturnValueOnce(pending.promise);
+  let task: unknown;
+  act(() => { task = result.current.toast!.action!.onClick(); });
+  current = false;
+  await act(async () => { pending.resolve([{ id: 'tablet-A', currentScreenSetId: 'next' } as Tablet]); await task; });
+  expect(m.apply).toHaveBeenCalledTimes(1);
 });
 
 it("a playlist bulk response cannot clear a different selected playlist draft", async () => {
