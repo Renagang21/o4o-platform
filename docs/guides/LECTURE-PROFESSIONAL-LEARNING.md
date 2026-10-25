@@ -28,7 +28,13 @@
 
 기존 `Lesson.attachments`의 자료 이름·HTTPS 주소를 강사가 연결한다(최대 20개). 학습자는 보호된 레슨 응답에 포함된 자료 링크를 새 창으로 열 수 있다. 공개 목차에는 자료 링크를 넣지 않는다. 외부 URL 자체를 보호하거나 파일을 업로드하는 새 시스템은 제공하지 않는다. 실행 가능한 URL scheme은 학습 링크로 렌더하지 않는다.
 
-`isFree`를 학습 권한을 우회하는 미리보기로 해석하지 않는다. 공개 목차와 샘플 영상 공개는 별개의 계약이며, 샘플 영상 공개 확대는 보류했다.
+사용자가 비로그인 미리보기를 승인했다. 영상 차시 편집에서 “미리보기 공개 (비로그인 포함)”를 선택하면 기존 `isFree` 필드로 저장한다. 강의가 `lecture`·`published`·`public`이고 차시가 `video`·발행·`isFree=true`일 때만 아래 전용 공개 경로에서 제공한다. draft·회원 전용·종료·타 서비스·다른 강의의 차시는 공개하지 않는다.
+
+- 목록: `GET /api/v1/lms/courses/:courseId/previews` — id·제목·학습 시간만 제공
+- 영상: `GET /api/v1/lms/courses/:courseId/previews/:lessonId` — id·제목·학습 시간·안전한 HTTPS 영상 URL만 제공
+- 화면: 강의 상세의 무료 미리보기 링크 → `/courses/:courseId/preview/:lessonId`
+
+기존 공개 목차 whitelist와 보호 lesson API는 변경하지 않는다. 미리보기 응답에 본문·교재·metadata·퀴즈·자막 URL·진도는 포함하지 않는다. 시청은 enrollment·bookmark·progress·수료를 생성하거나 갱신하지 않는다. 발행 취소·미리보기 해제 후 새 요청은 차단되지만 이미 공개된 외부 파일 URL을 회수하는 기능은 아니다. 제공자 측 미디어 공개·접근 정책을 확인한 자료만 지정한다.
 
 ## 이어보기와 수료 판정
 

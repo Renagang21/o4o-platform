@@ -25,6 +25,7 @@ run(['exec', 'jest', '--runInBand', '--runTestsByPath',
   'src/__tests__/lecture-certificate-renewal-expiry.spec.ts',
   'src/__tests__/lms-completion-certificate-chain.spec.ts',
   'src/__tests__/lecture-public-curriculum.spec.ts',
+  'src/__tests__/lecture-public-preview.spec.ts',
   'src/__tests__/lecture-playback-boundary.spec.ts',
 ], fileURLToPath(new URL('../../apps/api-server/', import.meta.url)));
 if (synthetic) {

@@ -19,17 +19,19 @@ try {
   const video = await readFile(media);
   server = await createServer({ root, configFile: false, plugins: [react(), {
     name: 'lecture-caption-fixture',
-    resolveId(id) { if (id === '/__caption-fixture.tsx') return id; },
-    load(id) { if (id === '/__caption-fixture.tsx') return `
+    resolveId(id, importer) { if (id === '../../lib/apiClient' && importer?.endsWith('/PublicPreview.tsx')) return '/__preview-api.ts'; if (id === '/__caption-fixture.tsx') return id; },
+    load(id) { if (id === '/__preview-api.ts') return `export const api={get:async path=>{const r=await fetch('/api/v1'+path);if(!r.ok)throw new Error('fixture HTTP failure');return {data:await r.json()}}};`; if (id === '/__caption-fixture.tsx') return `
       import React, {useRef,useState} from 'react'; import {createRoot} from 'react-dom/client';
       import {ResumeVideo} from '/packages/lms-ui/src/views/ResumeVideo.tsx';
       import {LessonMediaFields} from '/services/web-lecture/src/components/LessonMediaFields.tsx';
       import '/services/web-lecture/src/index.css';
+      import {BrowserRouter,Routes,Route} from 'react-router-dom';
+      import PreviewPage,{PublicPreviewList} from '/services/web-lecture/src/pages/learner/PublicPreview.tsx';
       const track={src:'https://media.example.invalid/ko.vtt',srcLang:'ko',label:'한국어'};
       function App(){const ref=useRef(null);const [value,setValue]=useState({title:'fixture',type:'video',metadata:{captions:[track]}});return <main style={{maxWidth:900,margin:'auto',padding:12}}><h1>자막 합성 검증</h1><ResumeVideo videoRef={ref} src="https://media.example.invalid/fixture.webm" captions={value.metadata.captions} enabled={false} courseId="fixture" lessonId="fixture" port={{}} onTimeUpdate={()=>{}}/><LessonMediaFields value={value} onChange={setValue}/></main>};
-      createRoot(document.getElementById('root')).render(<App/>);`; },
+      createRoot(document.getElementById('root')).render(<BrowserRouter><Routes><Route path="/__caption-smoke" element={<App/>}/><Route path="/courses/c" element={<PublicPreviewList courseId="c"/>}/><Route path="/courses/:courseId/preview/:lessonId" element={<PreviewPage/>}/></Routes></BrowserRouter>);`; },
     configureServer(s) { s.middlewares.use(async (req, res, next) => {
-      if (req.url !== '/__caption-smoke') return next();
+      if (req.url !== '/__caption-smoke' && !req.url?.startsWith('/courses/c')) return next();
       try { const html=await s.transformIndexHtml('/__caption-smoke', '<html><head><meta name="viewport" content="width=device-width,initial-scale=1"/></head><body><div id="root"></div><script type="module" src="/__caption-fixture.tsx"></script></body></html>'); res.setHeader('Content-Type','text/html');res.end(html); }
       catch(e){next(e);}
     }); },
@@ -50,6 +52,27 @@ try {
     if (await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth) || errors.length) throw new Error(`Browser failure at ${width}px: ${errors.join(';')}`);
     await page.getByRole('button',{name:'자막 1 삭제'}).click();
     if (await page.locator('track').count()) throw new Error('Caption removal failed');
-    console.log(`PASS: ${width}px actual synthetic video/WebVTT load, caption edit/remove, no page errors/overflow`);await page.close();
+    console.log(`PASS: ${width}px actual synthetic video/WebVTT load, caption edit/remove, no page errors/overflow`);
+    let listAttempts=0;const protectedCalls=[];
+    await page.route('**/api/v1/**', route=>{
+      const path=new URL(route.request().url()).pathname;
+      if(route.request().method()!=='GET'||!path.includes('/previews'))protectedCalls.push(path);
+      if(path.endsWith('/previews')&&++listAttempts===1)return route.fulfill({status:503,contentType:'application/json',body:'{}'});
+      const data=path.endsWith('/previews')?{items:[{id:'l',title:'Sample',duration:1}]}:{preview:{id:'l',title:'Sample',duration:1,videoUrl:'https://media.example.invalid/fixture.webm'}};
+      return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({data})});
+    });
+    await page.goto(`http://127.0.0.1:${address.port}/courses/c`);
+    await page.getByRole('button',{name:'미리보기 다시 조회'}).click();
+    await page.getByRole('link',{name:'Sample 미리보기'}).click();
+    await page.getByRole('heading',{name:'Sample'}).waitFor();
+    await page.locator('video').evaluate(element=>{void element.play().catch(()=>{});});
+    await page.waitForFunction(()=>document.querySelector('video')?.currentTime>0);
+    await page.goto(`http://127.0.0.1:${address.port}/courses/c/preview/l`);
+    await page.getByRole('heading',{name:'Sample'}).waitFor();
+    await page.getByRole('link',{name:'강의 소개로'}).click();
+    await page.getByRole('link',{name:'Sample 미리보기'}).waitFor();
+    if(protectedCalls.length||errors.length||await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw new Error('Public preview regression');
+    console.log(`PASS: ${width}px unsigned preview list 503/retry, menu/direct URL/back navigation, no protected API or write calls`);
+    await page.close();
   }
 } finally { await browser?.close();await server?.close();await rm(scratch,{recursive:true,force:true}); }

@@ -178,6 +178,7 @@ export interface CourseInput {
   requiresApproval?: boolean;
 }
 export interface LessonInput {
+  isFree?: boolean;
   attachments?: LessonAttachment[];
   metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
   title: string;

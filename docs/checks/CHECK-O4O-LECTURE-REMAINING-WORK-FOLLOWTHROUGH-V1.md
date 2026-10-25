@@ -55,3 +55,11 @@
 ## Push 전 main 위치
 
 검증 도중 origin/main이 `8de024e92c`로 이동했다(기준 대비 9 commits). 변경 경로를 대조해 이번 수정 파일과 직접 겹침은 없었다. 이번 역할은 push까지이므로 다른 작업을 자동 병합하지 않았다. 통합 담당은 최신 main과 CI를 다시 확인한다.
+
+## 후속 결정 반영 — 비로그인 미리보기
+
+사용자가 비로그인 공개를 선택해 같은 branch에 후속 구현했다. 기존 isFree를 강사 편집기의 명시적 미리보기 설정에 연결하고, 기존 보호 lesson 경로와 분리한 공개 목록·단일 영상 endpoint 및 공개 화면을 추가했다. 서버는 단일 JOIN read에서 lecture/published/public 및 차시 발행/video/isFree를 모두 요구한다. 목록은 id/title/duration, 영상은 여기에 안전한 HTTPS videoUrl만 제공한다. 본문·교재·metadata·자막·정답·진도는 공개하지 않는다. 미리보기는 수강/북마크/진도/수료 write를 호출하지 않는다. 보호 route의 requireAuth/requireEnrollment는 그대로다. 공통 view 계약을 더 변경하지 않고 Lecture wrapper에 목록 링크를 추가했다.
+
+검증: Lecture Vitest 79/79(19 files), 공개 미리보기/목차/rate-limit/접근 계약 API Jest 45/45(4 suites), api-server type-check·lecture-web build·변경 파일 ESLint 통과. 실제 서비스 SQL을 격리 PGlite에 적용해 공개 1건·비공개/초안/종료/타 서비스/차시 미발행/미리보기 미지정/퀴즈 거부 및 교차 강의 거부 총 9사례를 확인했다. PG15·운영 DB 검증이 아니다. Chromium 390/1440에서 합성 영상 재생·목록 503 재시도·링크 진입·직접 URL·소개 복귀·보호 API/쓰기 호출 없음·pageerror/overflow 없음을 확인했다.
+
+첫 Vitest 실패는 테스트 beforeEach가 mock 함수를 반환해 종료 hook으로 실행된 fixture 오류였고, void hook으로 바꿔 재실행했다. 타입 검사에서 새 controller의 BaseController 상속과 프런트 응답 타입 누락을 수정하고 검사·빌드를 재실행했다. 이전의 미리보기 결정 대기는 이 사용자 답변으로 해소됐다. 실계정·운영 자료·강사 신청 schema·Windows 정리는 계속 미완료다.

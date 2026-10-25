@@ -24,7 +24,7 @@ node scripts/lecture/verify-isolated.mjs --postgres-port 55439
 node scripts/lecture/browser-captions-smoke.mjs
 ```
 
-ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 실제 text track cue 로딩·편집·삭제·390/1440px 넘침을 검사한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
+ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 실제 text track cue 로딩·편집·삭제·390/1440px 넘침과 비로그인 미리보기 목록 503→재시도·링크 진입·직접 URL·소개 복귀를 검사한다. 미리보기에서 보호 API·쓰기 요청이 발생하지 않는지도 확인한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
 
 ## 실제 로그인·역할별 흐름
 
@@ -42,7 +42,8 @@ ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`
 | 6 | 준비된 completed 미발급 fixture 수동 발급 | 미발급 목록 제외·중복 409·이력, 완료 상태 유지 |
 | 7 | 갱신·수정·폐기와 재시도 | 동일 operationId 적용 1회, 월말/윤년, 이력 전후 상태·페이지 조회 |
 | 8 | 학습자/공개 수료증 응답 | 내부 폐기 사유·처리자 미노출, 타인·타 서비스·비로그인 차단 |
-| 9 | 390px·1440px 브라우저 | 메뉴 진입·직접 URL·키보드·toast·실제 API·콘솔·가로 넘침 |
+| 9 | 비로그인 미리보기 | public/published/video/isFree 설정, 비공개·초안·타 서비스·타 강의 차단, 본문·교재·진도 응답 없음 |
+| 10 | 390px·1440px 브라우저 | 메뉴 진입·직접 URL·키보드·toast·실제 API·콘솔·가로 넘침 |
 
 서버 오류 주입과 자동 발급 실패 fixture는 격리 환경에서만 수행한다. 갱신이 폐기 수료증을 다시 유효하게 만드는 기존 규칙은 이번에 변경하지 않았다. 테스트용 발급물을 실제 자격·법정 이수 인정으로 취급하지 않는다.
 
