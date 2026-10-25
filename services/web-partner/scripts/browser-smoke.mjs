@@ -33,7 +33,7 @@ try {
     } else await route.continue();
   });
   const visit = async (id) => {
-    await page.goto(`${origin}/#${id}`);
+    await page.goto(`${origin}/?mode=local#${id}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
   };
   await visit("home");
@@ -62,6 +62,13 @@ try {
   await page
     .getByRole("heading", { name: "생활 제품 콘텐츠", exact: true })
     .waitFor();
+  await page.getByRole("button", { name: "수정", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "기록 수정" });
+  await editor
+    .getByLabel("제품·홍보 소개", { exact: true })
+    .fill("수정한 제품 정보");
+  await editor.getByRole("button", { name: "변경 저장", exact: true }).click();
+  await page.getByText("수정한 제품 정보", { exact: true }).waitFor();
   await page.getByLabel("검색", { exact: true }).fill("없는 검색어");
   await page.getByText("검색 결과가 없습니다", { exact: true }).waitFor();
   await visit("creators");
@@ -190,7 +197,7 @@ try {
       "activities",
       "settlements",
     ]) {
-      await phone.goto(`${origin}/#${id}`);
+      await phone.goto(`${origin}/?mode=local#${id}`);
       await phone.getByRole("heading", { level: 1 }).waitFor();
       const overflow = await phone.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
@@ -199,7 +206,7 @@ try {
     }
   }
   await phone.setViewportSize({ width: 390, height: 844 });
-  await phone.goto(`${origin}/#home`);
+  await phone.goto(`${origin}/?mode=local#home`);
   await phone.screenshot({ path: "/tmp/partner-mobile.png", fullPage: true });
   await phone
     .getByRole("navigation", { name: "주 메뉴" })

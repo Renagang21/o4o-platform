@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import App from "./App";
 import {
   emptyWorkspace,
@@ -55,6 +62,125 @@ afterEach(() => {
 });
 
 describe("Partner의 독립 서비스 흐름", () => {
+  it("서버 저장이 성공해야 화면에 반영하고 로컬에는 복사하지 않는다", async () => {
+    window.history.replaceState(null, "", "/#creators");
+    const saveRemote = vi.fn(async (workspace) => workspace);
+    render(
+      <App
+        remote={{
+          workspace: emptyWorkspace(),
+          role: "owner",
+          name: "테스트 공동공간",
+          save: saveRemote,
+        }}
+      />,
+    );
+    input("활동 이름", "서버 홍보자");
+    input("활동 분야·소개", "제품 소개");
+    save();
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "서버 홍보자" })).toBeTruthy(),
+    );
+    expect(saveRemote).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+  it("서버 충돌 시 입력을 지우거나 성공으로 표시하지 않는다", async () => {
+    window.history.replaceState(null, "", "/#creators");
+    render(
+      <App
+        remote={{
+          workspace: emptyWorkspace(),
+          role: "owner",
+          name: "테스트 공동공간",
+          save: async () => {
+            throw new Error("변경 충돌");
+          },
+        }}
+      />,
+    );
+    input("활동 이름", "작성 중인 홍보자");
+    input("활동 분야·소개", "제품 소개");
+    save();
+    await waitFor(() =>
+      expect(screen.getByRole("alert").textContent).toBe("변경 충돌"),
+    );
+    expect((screen.getByLabelText("활동 이름") as HTMLInputElement).value).toBe(
+      "작성 중인 홍보자",
+    );
+    expect(
+      screen.queryByRole("heading", { name: "작성 중인 홍보자" }),
+    ).toBeNull();
+  });
+  it("열람자는 자료를 수정하지 못하고 편집자도 정산을 변경하지 못한다", () => {
+    window.history.replaceState(null, "", "/#proposals");
+    const view = render(
+      <App
+        remote={{
+          workspace: prepared(),
+          role: "viewer",
+          name: "테스트",
+          save: vi.fn(),
+        }}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "저장하기" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "수정" })).toBeNull();
+    view.unmount();
+    window.history.replaceState(null, "", "/#settlements");
+    render(
+      <App
+        remote={{
+          workspace: prepared(),
+          role: "editor",
+          name: "테스트",
+          save: vi.fn(),
+        }}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "저장하기" })).toBeNull();
+  });
+  it("기록을 수정하되 ID와 생성 시각을 유지한다", () => {
+    saveWorkspace(localStorage, prepared());
+    open("creators");
+    fireEvent.click(screen.getByRole("button", { name: "수정" }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("활동 이름"), {
+      target: { value: "수정한 이름" },
+    });
+    fireEvent.submit(
+      within(dialog)
+        .getByRole("button", { name: "변경 저장" })
+        .closest("form")!,
+    );
+    const saved = loadWorkspace(localStorage).data.creators[0];
+    expect(saved.name).toBe("수정한 이름");
+    expect(saved.id).toBe("c1");
+    expect(saved.createdAt).toBe(prepared().creators[0].createdAt);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+  it("연결된 활동이 있는 제안을 삭제해 기록을 끊지 않는다", () => {
+    const data = prepared();
+    saveWorkspace(localStorage, {
+      ...data,
+      activities: [
+        {
+          id: "a1",
+          createdAt: "2026-01-01T00:00:00Z",
+          proposalId: "p1",
+          creatorId: "c1",
+          url: "https://example.com/post",
+          publishedAt: "2026-01-01",
+          views: null,
+        },
+      ],
+    });
+    open("proposals");
+    fireEvent.click(screen.getByRole("button", { name: "삭제" }));
+    expect(screen.getByRole("alert").textContent).toContain(
+      "삭제할 수 없습니다",
+    );
+    expect(loadWorkspace(localStorage).data.proposals).toHaveLength(1);
+  });
   it("빈 작업공간과 로컬 저장 범위를 보여준다", () => {
     open("home");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(

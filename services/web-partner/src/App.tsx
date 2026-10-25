@@ -2,6 +2,7 @@ import {
   cloneElement,
   useEffect,
   useId,
+  useRef,
   useState,
   type FormEvent,
   type ReactElement,
@@ -15,6 +16,7 @@ import {
   emptyWorkspace,
   integer,
   loadWorkspace,
+  parseWorkspace,
   saveWorkspace,
   settlementCsv,
   STORAGE_KEY,
@@ -23,6 +25,7 @@ import {
   type Channel,
   type Workspace,
 } from "./model";
+import RecordEditor, { type Collection, type Editing } from "./RecordEditor";
 
 const pages = [
   ["home", "시작하기", "◈"],
@@ -134,12 +137,24 @@ function FormPanel({
   children,
   onSubmit,
   disabled,
+  permissionReadOnly = false,
 }: {
   title: string;
   children: ReactNode;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   disabled: boolean;
+  permissionReadOnly?: boolean;
 }) {
+  if (permissionReadOnly)
+    return (
+      <aside className="panel form-panel">
+        <h2>이용 권한 안내</h2>
+        <p className="hint">
+          현재 권한으로는 이 기록을 추가하거나 수정할 수 없습니다. 등록된 자료와
+          내역을 확인할 수 있습니다.
+        </p>
+      </aside>
+    );
   return (
     <aside className="panel form-panel">
       <h2>{title}</h2>
@@ -155,8 +170,15 @@ function FormPanel({
   );
 }
 
-export default function App() {
+export type RemoteWorkspace = {
+  workspace: Workspace;
+  role: "owner" | "editor" | "viewer";
+  name: string;
+  save: (workspace: Workspace) => Promise<Workspace>;
+};
+export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
   const [initial] = useState(() => {
+    if (remote) return { data: remote.workspace, error: "" };
     try {
       return loadWorkspace(window.localStorage);
     } catch {
@@ -178,6 +200,11 @@ export default function App() {
   const [studioChannel, setStudioChannel] = useState<Channel>("인스타그램");
   const [studioProduct, setStudioProduct] = useState("");
   const [studioBusiness, setStudioBusiness] = useState("");
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const readOnly = !!initial.error || saving || remote?.role === "viewer";
+  const settlementDisabled = readOnly || (!!remote && remote.role !== "owner");
 
   useEffect(() => {
     const changed = () => {
@@ -194,21 +221,43 @@ export default function App() {
     document.title = `${pages.find(([id]) => id === page)?.[1]} · O4O Partner`;
   }, [page]);
 
-  const act = (work: () => void) => {
+  const act = (work: () => void | Promise<void>) => {
     setNotice("");
     setError(initial.error);
-    try {
-      work();
-    } catch (e) {
+    const report = (e: unknown) => {
       setError(
         e instanceof Error
           ? e.message
           : "처리하지 못했습니다. 다시 시도해 주세요.",
       );
+    };
+    try {
+      const result = work();
+      if (result instanceof Promise) void result.catch(report);
+    } catch (e) {
+      report(e);
     }
   };
   const persist = (next: Workspace, message = "저장했습니다.") => {
     if (initial.error) throw new Error(initial.error);
+    if (remote) {
+      if (remote.role === "viewer")
+        throw new Error("이 공동공간은 열람만 할 수 있습니다.");
+      if (savingRef.current)
+        throw new Error("저장 중입니다. 잠시 기다려 주세요.");
+      savingRef.current = true;
+      setSaving(true);
+      return remote
+        .save(next)
+        .then((saved) => {
+          setWorkspace(saved);
+          setNotice(message);
+        })
+        .finally(() => {
+          savingRef.current = false;
+          setSaving(false);
+        });
+    }
     const current = loadWorkspace(window.localStorage);
     if (current.error) throw new Error(current.error);
     if (JSON.stringify(current.data) !== JSON.stringify(workspace))
@@ -226,11 +275,16 @@ export default function App() {
     setNotice(message);
   };
   const submit =
-    (save: (f: FormData) => void) => (event: FormEvent<HTMLFormElement>) => {
+    (save: (f: FormData) => void | Promise<void>) =>
+    (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const form = event.currentTarget;
       act(() => {
-        save(new FormData(form));
+        const result = save(new FormData(form));
+        if (result instanceof Promise)
+          return result.then(() => {
+            form.reset();
+          });
         form.reset();
       });
     };
@@ -340,8 +394,109 @@ export default function App() {
     }
   };
 
+  const recordControls = (kind: Collection, id: string) => {
+    if (readOnly || (kind === "settlements" && settlementDisabled)) return null;
+    return (
+      <div className="record-controls">
+        <button
+          className="text-button"
+          onClick={() => {
+            setError("");
+            setEditing({ kind, id });
+          }}
+        >
+          수정
+        </button>
+        <button
+          className="text-button"
+          onClick={() =>
+            act(() => {
+              if (
+                ["proposals", "creators"].includes(kind) &&
+                [...workspace.activities, ...workspace.settlements].some(
+                  (row) =>
+                    kind === "proposals"
+                      ? row.proposalId === id
+                      : row.creatorId === id,
+                )
+              )
+                throw new Error(
+                  "활동·정산 기록에서 사용하는 항목은 삭제할 수 없습니다.",
+                );
+              if (
+                !window.confirm(
+                  "이 기록을 삭제할까요? 연결된 외부 게시물이나 실제 지급 내역은 변경되지 않습니다.",
+                )
+              )
+                return;
+              return persist(
+                {
+                  ...workspace,
+                  [kind]: workspace[kind].filter((row) => row.id !== id),
+                },
+                "기록을 삭제했습니다.",
+              );
+            })
+          }
+        >
+          삭제
+        </button>
+      </div>
+    );
+  };
+  const editSave = (fields: FormData) =>
+    act(() => {
+      if (!editing) return;
+      if (editing.kind === "settlements" && settlementDisabled)
+        throw new Error("정산 내역은 소유자만 변경할 수 있습니다.");
+      const original = workspace[editing.kind].find(
+        (row) => row.id === editing.id,
+      );
+      if (!original) throw new Error("수정할 기록을 찾지 못했습니다.");
+      const updates: Record<string, unknown> = {};
+      for (const [key, value] of fields.entries()) {
+        const input = String(value).trim();
+        updates[key] =
+          key === "amount"
+            ? integer(input, 1)
+            : key === "views"
+              ? input
+                ? integer(input)
+                : null
+              : key === "publishedAt"
+                ? calendarDate(input)
+                : ["url", "contact", "destination", "portfolio"].includes(key)
+                  ? webUrl(
+                      input,
+                      key === "destination" ||
+                        (key === "url" && editing.kind === "activities"),
+                    )
+                  : input;
+      }
+      const next = parseWorkspace(
+        JSON.stringify({
+          ...workspace,
+          [editing.kind]: workspace[editing.kind].map((row) =>
+            row.id === original.id ? { ...row, ...updates } : row,
+          ),
+        }),
+      );
+      const result = persist(next, "기록을 수정했습니다.");
+      if (result instanceof Promise) return result.then(() => setEditing(null));
+      setEditing(null);
+    });
   return (
     <div className="app">
+      {editing && (
+        <RecordEditor
+          target={editing}
+          workspace={workspace}
+          disabled={saving}
+          error={error}
+          onSave={editSave}
+          onClose={() => setEditing(null)}
+        />
+      )}
       <a className="skip" href="#main">
         본문으로 이동
       </a>
@@ -398,9 +553,24 @@ export default function App() {
           <div className="local-banner">
             <span className="status-dot" />
             <span>
-              <strong>로컬 작업공간</strong> · 자료는 이 브라우저에만
-              저장됩니다. 다른 사용자와의 공유·로그인·송금은 아직 연결되지
-              않았습니다.
+              {remote ? (
+                <>
+                  <strong>{remote.name}</strong> · 서버 공동공간 ·{" "}
+                  {remote.role === "owner"
+                    ? "소유자"
+                    : remote.role === "editor"
+                      ? "편집자"
+                      : "열람자"}{" "}
+                  · 참여자가 자료·활동·정산 내역을 함께 볼 수 있습니다. 정산
+                  변경은 소유자만 가능합니다.
+                </>
+              ) : (
+                <>
+                  <strong>로컬 작업공간</strong> · 자료는 이 브라우저에만
+                  저장됩니다. 다른 사용자와의 공유·로그인·송금은 아직 연결되지
+                  않았습니다.
+                </>
+              )}
             </span>
           </div>
           {notice && (
@@ -554,6 +724,7 @@ export default function App() {
                         <p className="overline">{p.business}</p>
                         <h2>{p.title}</h2>
                         <p className="preserve">{p.description}</p>
+                        {recordControls("proposals", p.id)}
                         <div className="record-actions">
                           <External href={p.destination}>
                             제품·서비스 보기
@@ -578,7 +749,8 @@ export default function App() {
                 </section>
                 <FormPanel
                   title="홍보 제안 등록"
-                  disabled={!!initial.error}
+                  permissionReadOnly={remote?.role === "viewer"}
+                  disabled={readOnly}
                   onSubmit={submit((f) =>
                     persist({
                       ...workspace,
@@ -669,6 +841,7 @@ export default function App() {
                           <span className="pill">{c.channel}</span>
                           <h2>{c.name}</h2>
                           <p>{c.topic}</p>
+                          {recordControls("creators", c.id)}
                           {c.portfolio && (
                             <External href={c.portfolio}>
                               대표 콘텐츠 보기
@@ -685,7 +858,8 @@ export default function App() {
                 </section>
                 <FormPanel
                   title="홍보자 프로필 등록"
-                  disabled={!!initial.error}
+                  permissionReadOnly={remote?.role === "viewer"}
+                  disabled={readOnly}
                   onSubmit={submit((f) =>
                     persist({
                       ...workspace,
@@ -737,6 +911,7 @@ export default function App() {
                         </div>
                         <h2>{a.title}</h2>
                         <p className="preserve content-preview">{a.content}</p>
+                        {recordControls("assets", a.id)}
                         <div className="usage">
                           <strong>사용 범위</strong>
                           <p>{a.usage}</p>
@@ -767,7 +942,8 @@ export default function App() {
                 </section>
                 <FormPanel
                   title="콘텐츠 자료 등록"
-                  disabled={!!initial.error}
+                  permissionReadOnly={remote?.role === "viewer"}
+                  disabled={readOnly}
                   onSubmit={submit((f) =>
                     persist({
                       ...workspace,
@@ -816,8 +992,9 @@ export default function App() {
                     />
                   </Field>
                   <p className="hint">
-                    현재는 이 브라우저의 자료실입니다. 초대와 사용자 간 공유는
-                    후속 연결 예정입니다.
+                    {remote
+                      ? "이 공동공간의 참여자가 함께 이용하는 자료실입니다."
+                      : "이 브라우저의 자료실입니다. 서버 공동공간을 선택하면 참여자와 공유할 수 있습니다."}
                   </p>
                 </FormPanel>
               </div>
@@ -911,7 +1088,7 @@ export default function App() {
                         </button>
                         <button
                           className="button primary"
-                          disabled={!!initial.error || !draft.trim()}
+                          disabled={readOnly || !draft.trim()}
                           onClick={() =>
                             act(() => {
                               if (
@@ -921,7 +1098,7 @@ export default function App() {
                                 throw new Error(
                                   "제품과 제공자 이름을 입력해 주세요.",
                                 );
-                              persist(
+                              return persist(
                                 {
                                   ...workspace,
                                   assets: [
@@ -1030,6 +1207,7 @@ export default function App() {
                         · 게시일 {a.publishedAt}
                       </p>
                       <External href={a.url}>게시물 보기</External>
+                      {recordControls("activities", a.id)}
                       <p className="metric">
                         {a.views === null
                           ? "조회수 미입력"
@@ -1046,7 +1224,8 @@ export default function App() {
               </section>
               <FormPanel
                 title="홍보 활동 기록"
-                disabled={!!initial.error || !hasRelations}
+                permissionReadOnly={remote?.role === "viewer"}
+                disabled={readOnly || !hasRelations}
                 onSubmit={submit((f) =>
                   persist({
                     ...workspace,
@@ -1159,7 +1338,7 @@ export default function App() {
                         ) : (
                           <button
                             className="button secondary"
-                            disabled={!!initial.error}
+                            disabled={settlementDisabled}
                             onClick={() =>
                               act(() => {
                                 if (
@@ -1167,7 +1346,7 @@ export default function App() {
                                     "외부에서 실제 지급한 내역을 기록할까요? 이 버튼은 송금하지 않습니다.",
                                   )
                                 )
-                                  persist(
+                                  return persist(
                                     {
                                       ...workspace,
                                       settlements: workspace.settlements.map(
@@ -1190,6 +1369,7 @@ export default function App() {
                             외부 지급 내역 기록
                           </button>
                         )}
+                        {recordControls("settlements", s.id)}
                       </article>
                     ))
                   ) : (
@@ -1200,7 +1380,8 @@ export default function App() {
                 </section>
                 <FormPanel
                   title="지급 내역 등록"
-                  disabled={!!initial.error || !hasRelations}
+                  permissionReadOnly={!!remote && remote.role !== "owner"}
+                  disabled={settlementDisabled || !hasRelations}
                   onSubmit={submit((f) =>
                     persist({
                       ...workspace,
@@ -1254,7 +1435,11 @@ export default function App() {
           <footer>
             <span>o4o partner.</span>
             <p>사업자와 크리에이터를 위한 홍보 지원 서비스</p>
-            <span>첫 개발 버전 · 브라우저 로컬 저장</span>
+            <span>
+              {remote
+                ? "서버 공동공간 · 실제 송금은 별도 처리"
+                : "브라우저 로컬 저장"}
+            </span>
           </footer>
         </main>
       </div>
