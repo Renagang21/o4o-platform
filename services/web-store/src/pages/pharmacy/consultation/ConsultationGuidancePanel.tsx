@@ -43,6 +43,7 @@ export function ConsultationGuidancePanel({
   onStopReading,
   voice,
   inquiry,
+  onProduct,
 }: {
   organizationId: string;
   mode: string;
@@ -58,6 +59,7 @@ export function ConsultationGuidancePanel({
   onStopReading: () => void;
   voice: { text: string; sequence: number } | null;
   inquiry?: string;
+  onProduct?: (product: ConsultationProduct) => void;
 }) {
   const [intent, setIntent] = useState<GuidanceIntent>("help"),
     [question, setQuestion] = useState(""),
@@ -197,6 +199,7 @@ export function ConsultationGuidancePanel({
   const pick = (p: ConsultationProduct) => {
     generation.current++;
     setSelected(p);
+    onProduct?.(p);
     setChoose(false);
     setResult(null);
     void prepare({
@@ -298,6 +301,10 @@ export function ConsultationGuidancePanel({
           >
             다른 상품 선택
           </button>
+          <a className="inline-flex min-h-12 items-center text-sm text-teal-800 underline" target="_blank" rel="noreferrer"
+            href={`/store/products/multilingual/${selected.kind}/${encodeURIComponent(selected.id)}?${new URLSearchParams({ name: selected.name, store: organizationId })}`}>
+            상품 안내 자료 확인·보완 ↗
+          </a>
         </div>
       )}
       {busy && (

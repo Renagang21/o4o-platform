@@ -234,3 +234,28 @@ export async function prepareConsultationGuidance(input: {
     throw new Error("상담 안내 응답을 확인하지 못했습니다.");
   return r.data;
 }
+
+export interface ConsultationSupportPoint { text: string; sourceIds: string[] }
+export interface ConsultationSupportResult {
+  organizationId: string;
+  mode: string;
+  productId: string;
+  productKind: string;
+  state: 'ready' | 'empty' | 'verified';
+  message?: string;
+  sourceVersion?: string;
+  sources?: Array<{ id: string; kind: string; title: string }>;
+  brief?: { productFacts: ConsultationSupportPoint[]; professionalNotes: ConsultationSupportPoint[];
+    nextQuestion: string | null; customerDraft: ConsultationSupportPoint };
+}
+export async function prepareConsultationSupport(input: {
+  mode: string; productKind: string; productId: string; question?: string;
+  reference?: { text: string; source: string; reviewed: boolean };
+  verifyOnly?: boolean; sourceVersion?: string; stationId?: string; epoch?: string;
+}): Promise<ConsultationSupportResult> {
+  const r = await coreApiClient.post<Envelope<ConsultationSupportResult>>(`${CONSULTATION_BASE}/consultation-support`, input);
+  if (!r.success || !['ready', 'empty', 'verified'].includes(r.data?.state) ||
+    (r.data.state === 'ready' && (!r.data.brief || !r.data.sourceVersion || !Array.isArray(r.data.sources))))
+    throw new Error('판단 지원 응답을 확인하지 못했습니다.');
+  return r.data;
+}

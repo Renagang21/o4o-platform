@@ -15,6 +15,8 @@ import {
   ConsultationIncomingReply,
 } from "./consultation/ConsultationStationPanel";
 import { ConsultationGuidancePanel } from "./consultation/ConsultationGuidancePanel";
+import { ConsultationSupportPanel } from './consultation/ConsultationSupportPanel';
+import type { ConsultationProduct } from './consultation/ConsultationProducts';
 import { coreApiClient } from "../../api/client";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUnifiedStore } from "../../contexts/StoreContext";
@@ -122,6 +124,7 @@ function Consultation({
     sequence: number;
   } | null>(null);
   const [guidanceReset, setGuidanceReset] = useState(0);
+  const [supportProduct, setSupportProduct] = useState<ConsultationProduct | null>(null);
   const voiceSequence = useRef(0);
   const voiceTarget = useRef<"guidance" | "sentence">("sentence");
   const [pendingVoice, setPendingVoice] =
@@ -185,6 +188,7 @@ function Consultation({
       clearDrafts();
       setGuidanceVoice(null);
       setGuidanceReset((value) => value + 1);
+      setSupportProduct(null);
       setBusy(false);
       focusReply.current = false;
       dialog.current?.close();
@@ -247,6 +251,7 @@ function Consultation({
     setReplyLanguage("");
     setGuidanceVoice(null);
     setGuidanceReset((value) => value + 1);
+    setSupportProduct(null);
     setError("");
     setBusy(false);
     setPendingVoice(null);
@@ -479,6 +484,7 @@ function Consultation({
               mode={mode}
               language={language}
               supportAllowed={context.supportAllowed === true}
+              onProduct={setSupportProduct}
               locked={station.busy}
               room={connected}
               onShare={(id) =>
@@ -508,6 +514,18 @@ function Consultation({
                   : undefined
               }
             />
+          )}
+          {current?.allowed && current.professional && context.supportAllowed === true && (
+            <ConsultationSupportPanel key={`support:${organizationId}:${mode}:${guidanceReset}`}
+              organizationId={organizationId} mode={mode} product={supportProduct} room={connected}
+              locked={station.busy || speech.listening}
+              onAccessDenied={() => { clear(); setContext(null); setRetry(value => value + 1); }}
+              inquiry={direction === 'to-staff' ? result?.translation || (inputLanguage === 'ko' ? text : '') : undefined}
+              onUseDraft={(words) => {
+                speech.reset(); version.current++; setBusy(false); setError('');
+                setDirection('to-customer'); receiveText('to-customer', words);
+                input.current?.closest('section')?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+              }} />
           )}
           {!current?.allowed ? (
             <p className="rounded border bg-amber-50 p-4">

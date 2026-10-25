@@ -34,6 +34,7 @@ beforeEach(() => {
   HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
   synthesis.getVoices.mockReturnValue(['ko-KR', 'en-US', 'ja-JP'].map(lang => ({ lang })));
   state.get.mockImplementation(async () => ({ success: true, data: { organizationId: state.org,
+    supportAllowed: true,
     languages: [{ key: 'en', label: 'English' }, { key: 'ja', label: 'Japanese' }], phrases: [{ key: 'welcome', text: '안녕하세요.' }],
     modes: [{ key: 'counter-pharmacist', label: '매대 약사 상담', entitled: true, allowed: true, professional: true },
       { key: 'floor-staff', label: '매장 직원 응대', entitled: true, allowed: true, professional: false }] } }));
