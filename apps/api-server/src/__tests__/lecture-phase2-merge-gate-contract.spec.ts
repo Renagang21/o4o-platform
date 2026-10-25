@@ -1388,3 +1388,21 @@ describe('정적 계약', () => {
     expect(mw).toContain('WHERE a.id = $1');
   });
 });
+
+
+describe('course tag input errors are client errors', () => {
+  it.each([undefined, [], ['#', ' '], ['x'.repeat(31)]])('rejects unusable tags %j before saving', async (tags) => {
+    const res = makeRes();
+    await CourseController.createCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: { title: 'new', tags } }), res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.code).toBe('COURSE_VALIDATION_ERROR');
+    expect(savedCourse).toBeNull();
+  });
+  it('does not downgrade unexpected database failures to 400', async () => {
+    const cs: any = CourseService.getInstance();
+    cs.courseRepository.save = async () => { throw new Error('database unavailable'); };
+    const res = makeRes();
+    await CourseController.createCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: { title: 'new', tags: ['valid'] } }), res);
+    expect(res.statusCode).toBe(500);
+  });
+});

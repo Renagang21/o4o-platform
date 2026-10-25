@@ -1,4 +1,5 @@
 import type { ConsultationGuidanceService } from "./services/consultation-guidance.js";
+import type { ConsultationSupportService } from './services/consultation-support.js';
 import { Router, type Request, type RequestHandler } from "express";
 import type { DataSource } from "typeorm";
 import rateLimit from "express-rate-limit";
@@ -44,6 +45,7 @@ export function consultationWorkspaceRoutes(
   store: RequestHandler[],
   admin: RequestHandler[],
   guidance?: ConsultationGuidanceService,
+  support?: ConsultationSupportService,
 ) {
   const router = Router(),
     layouts = new ConsultationLayoutService(db);
@@ -104,6 +106,15 @@ export function consultationWorkspaceRoutes(
         };
       }),
     );
+  if (support) router.post('/pharmacy/consultation-support', ...store, limits(30), handle(async req => {
+    const organizationId = org(req), input = req.body ?? {};
+    if (input.stationId !== undefined)
+      await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
+    const data = await support.prepare(req.user!.id!, organizationId, input);
+    if (input.stationId !== undefined)
+      await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
+    return { ...data, organizationId, mode: input.mode, productId: input.productId, productKind: input.productKind };
+  }));
   router.get(
     "/pharmacy/consultation-layout",
     ...store,

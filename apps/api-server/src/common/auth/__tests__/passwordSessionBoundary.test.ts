@@ -251,3 +251,39 @@ it('community demotion/revocation uses current roles with the same admin token',
   injectOperatorServiceScope(req, mockRes(), jest.fn());
   expect(req.serviceScope.serviceKeys).toEqual([]);
 });
+
+
+describe('optional authentication membership parity', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    findOne.mockImplementation(async () => ({ ...USER }));
+    getRoleNames.mockResolvedValue([]);
+  });
+  it.each(['lecture', 'neture', 'kpa-society', 'k-cosmetics'])('%s: verified human sessions keep membership evidence', async (serviceKey) => {
+    const memberships = [{ serviceKey, status: 'active' }];
+    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey, memberships });
+    for (const authenticate of [requireAuth, optionalAuth]) {
+      const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+      const next = jest.fn();
+      await authenticate(req, mockRes(), next);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(req.user.memberships).toEqual(memberships);
+    }
+  });
+  it('a token without membership claims cannot inherit evidence from a loaded user', async () => {
+    findOne.mockResolvedValue({ ...USER, memberships: [{ serviceKey: 'lecture', status: 'active' }] });
+    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'lecture' });
+    const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+    await optionalAuth(req, mockRes(), jest.fn());
+    expect(req.user.memberships).toEqual([]);
+  });
+  it('service tokens with claimed memberships still remain anonymous', async () => {
+    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'service', memberships: [{ serviceKey: 'lecture', status: 'active' }] });
+    const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+    const next = jest.fn();
+    await optionalAuth(req, mockRes(), next);
+    expect(req.user).toBeUndefined();
+    expect(findOne).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1,6 +1,6 @@
 # CHECK — 운영자 초대·수락 및 보존·파기
 
-> **상태:** ACTIVE
+> **상태:** COMPLETED — 아래 운영 반영 결과 기준. 실제 메일·실계정 수락 smoke는 제외.
 > **작성일:** 2026-10-25 (한국시간)
 > **WO:** [동일 #641 연속 Phase](../work-orders/WO-O4O-SERVICE-OPERATOR-EMAIL-CONFIRMATION-V1.md)
 > **정본:** [확정 정책](../baseline/O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)
@@ -47,3 +47,22 @@ Codex P1에 따라 서비스 운영자의 Google 연결 필수 검사를 제거�
 WORKTREE_DISPOSITION: 전용 `/workspace/o4o-wt/operator-invitations-policy-20261025`, 기존 `wo/operator-invitations-integration-20261016` 연속 Phase, main integration 없음, KEEP(후속 CI·review·운영 승인 전).
 
 문서 정합: User Domain·개인정보 보존 정본에 새 승인 정책을 연결하고 canonical index에 등록했다. 과거 WO 결과는 보존하고 위 연속 Phase로 변경점을 명시했다. 게시된 개인정보 처리방침 원문은 변경하지 않았다.
+
+
+## 2026-10-25 운영 반영 결과
+
+앞의 운영 미실행 기록은 개발·사전 검증 시점의 이력이다. 이후 사용자가 새 초대 테이블과 자동 파기의 운영 적용 및 병합·배포를 명시 승인했다.
+
+- [#641](https://github.com/Renagang21/o4o-platform/pull/641)을 정상 PR 경로로 병합했다. 실행 코드의 병합·배포 SHA는 `4ee5a8ecda200a1bddf08d8f00b869e5f4c76806`이다. admin bypass·force push·배포 설정 변경은 없다.
+- [main CI 40158105279](https://github.com/Renagang21/o4o-platform/actions/runs/40158105279)의 CI Gate·API Jest 3분할·Code Quality·관리자/웹 build가 통과했다.
+- 자동 Delivery는 migration·인증 변경을 LEVEL_3로 보류했다. 사용자 승인 범위로 [Promote 40158817327](https://github.com/Renagang21/o4o-platform/actions/runs/40158817327)을 실행했다. 운영 migration 단일 job의 `Run database migrations`가 성공했고, 새 API revision의 전환 전 readiness·전환·전환 후 serving 검증이 모두 통과했다. 신규 초대 테이블과 자동 파기 job을 포함한 API 코드가 운영에 반영됐다.
+- API·관리자·Neture·KPA·강의·매장·분회의 배포와 최종 serving SHA 검증이 성공했다. 해당 SHA의 `production` 상태는 `DEPLOYED`다.
+- [협동조합 프런트엔드 40159263963](https://github.com/Renagang21/o4o-platform/actions/runs/40159263963)은 같은 SHA로 `frontend_only=true`, `apply=false`로 성공했다. 계정/조합 fixture provision은 **skipped**이며, private readiness·인증된 HTML smoke·단일 revision 100% traffic 검증이 통과했다. 공개 IAM·DNS·도메인 노출 범위를 변경하지 않았다.
+- 운영 API `/health/ready` 200, 새 초대 API의 비로그인 요청 401을 확인했다. 실제 Chromium 1440×1000·390×844에서 운영 `/operator-invite`의 메일 링크 안내가 200으로 표시되고 pageerror·초대 API 변경 요청·수평 넘침이 모두 0이었다. TLS 검증을 유지했다.
+- 검증 작업에서 실제 초대 생성·메일 발송·계정 권한 변경·업무 데이터 seed는 수행하지 않았다. 격리 PostgreSQL fixture/컨테이너는 제거했다. 실제 메일 전달·본인 계정 수락 성공을 확인했다고 주장하지 않는다.
+
+### 최종 리뷰 근거
+
+기능 HEAD `699ef1c16a`는 원격 Codex finding0으로 완료됐다. 마지막 HEAD `e49030ed12`의 원격 App 완료 표시는 재요청 후에도 running으로 남았으며 완료로 간주하지 않았다. 통합 담당 Codex가 `699ef1c16a..e49030ed12` 전체 diff를 직접 검토했다. 변경은 Demo source guard 테스트와 이 CHECK 두 파일뿐이며 실행 코드·SQL·manifest·fingerprint 차이는0이다. prepare→target/Demo→INSERT, accept→prove→target/Demo→activate, 분회 초대 위임/직접 grant 부재/해제 전 Demo 검사를 확인했다. 관련11 및 로컬 API3/3 전체2920 PASS, 최종 HEAD 전체 CI PASS, 미해결 스레드0 근거로 추가 변경에 blocker 없음으로 판정했다. 원격 App 상태를 조작하지 않았으며 해당 근거와 사용자 승인을 #641에 기록했다.
+
+문서 정합: 확정 정책은 변경하지 않고 동일 WO의 운영 반영 결과를 추가했다. 게시된 개인정보 처리방침 원문은 변경하지 않았다. 이 후속 문서 기록은 실행 코드에 영향을 주지 않으므로 추가 운영 배포 대상이 아니다.

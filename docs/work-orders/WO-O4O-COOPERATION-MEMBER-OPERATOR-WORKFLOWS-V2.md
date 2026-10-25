@@ -35,14 +35,14 @@
 
 ## Migration과 배포 판정
 
-`CreateCooperationMemberWorkflows1792886400001` 한 개를 incremental manifest와 expected schema state에 append한다.
+`CreateCooperationMemberWorkflows1792886400002` 한 개를 incremental manifest와 expected schema state에 append한다.
 
 - 새 테이블 5개: `cooperation_work_items`, `cooperation_work_revisions`, `cooperation_notice_recipients`, `cooperation_activity_applications`, `cooperation_material_revisions`.
 - 기존 자료 테이블에 개정 번호·분류·교육 링크 추가. 자료 변경 전후 snapshot trigger 적용.
 - 기존 문의 테이블에 인증 소유자·가입 단위·요청 UUID·배정 담당자·처리 기한 추가. 익명 문의 소유권 backfill은 없다.
 - 기존 회원·계정·사업 데이터를 삭제하거나 가입·권한·동의를 seed하지 않는다. 새 테이블에도 기존 account-erasure writer fence를 붙인다. 개인정보 완전 제거는 기존 분류·수동 검토 경계를 유지하며 공유 업무 증적을 임의로 삭제하지 않는다.
 - 빈 로컬 DB에서 down/up을 검증했다. 업무 기록이나 소유권/배정 기록이 있으면 down은 거절하며 forward repair를 요구한다.
-- 격리 PostgreSQL 15에서 기존 prefix 전체와 신규 state를 검증했다. 최종 fingerprint는 `8d4bf317abee4d69567d0c6ad9c2f26c5b806ecb5f415b8eb46dbb9d4b41ea11`, 7,019 lines다. 실제 배포용 `dist/migrate.js`로 새 로컬 DB bootstrap·40개 incremental 적용 및 재실행 PASS.
+- 격리 PostgreSQL 15에서 기존 prefix 전체와 신규 state를 검증했다. 최종 fingerprint는 `54230274de3a1c420410f8e634196fc10edbe2e317a06b7647bf12fe6f8e118b`, 7,021 lines다. 실제 배포용 `dist/migrate.js`로 새 로컬 DB bootstrap·41개 incremental 적용 및 재실행 PASS.
 
 **DEPLOYMENT=MANUAL/GATED**: migration 포함 LEVEL 3다. API migration·API revision을 먼저 검증한 후 웹을 배포해야 한다. 기존 AGENTS §5에 따라 운영 DB DDL/migration 적용은 별도 명시 승인 대상이며, 이 작업에서는 운영 DB에 접속하거나 적용하지 않았다. Pharmcoop은 API 호환성이 확보된 뒤 기존 frontend_only 경로를 사용한다.
 
@@ -56,7 +56,7 @@
 | 격리 SQL·권한·상태 전이·UI 실패 복구·PC/모바일 흐름 | 완료 |
 | migration 계약·격리 canonical runner·원복·재적용 검증 | 완료 |
 | commit·push·PR CI/리뷰 | 작업 branch의 HEAD 및 GitHub 결과로 인계 |
-| main 통합·운영 migration·배포 | 미실행 — 운영 migration 승인 후 수행 |
+| main 통합·운영 migration·배포 | 진행 중 — 사용자의 main 통합·배포 지시로 운영 migration 적용 승인 확인 |
 | 실계정·실매장 운영 검증 | 미실행 |
 
 자료별 임의 공개/세부 대상 확대, LMS 수료 원장·자동 진도 동기화, 실결제·공급가 확정·배송·ERP/POS 분석은 구현 범위에 포함하지 않는다. 관련 교육 링크와 비거래 활동 완료 기록을 교육 수료 증명이나 공급 계약 승인으로 해석하지 않는다. CarePharm 사업자 정보 빈칸·법적 문서 미게시·신규 가입 차단도 그대로 유지한다.

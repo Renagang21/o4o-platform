@@ -1,3 +1,5 @@
+import { executeAccountedNativeAi } from '../../ai-policy/ai-accounted-execution.js';
+import { normalizeAiError } from '../../../utils/ai-provider-runtime.js';
 import type { DataSource, Repository } from 'typeorm';
 import { ProductOcrText } from '../entities/product-ocr-text.entity.js';
 import logger from '../../../utils/logger.js';
@@ -32,6 +34,7 @@ export class ProductOcrService {
     productId: string,
     imageId: string,
     imageUrl: string,
+    actorId?: string,
   ): Promise<ProductOcrText | null> {
     try {
       const accessToken = await this.getAccessToken();
@@ -40,7 +43,7 @@ export class ProductOcrService {
         return null;
       }
 
-      const ocrResult = await this.callVisionApi(imageUrl, accessToken);
+      const ocrResult = await this.callVisionApi(imageUrl, accessToken, actorId);
       if (!ocrResult) {
         logger.info(`[ProductOcr] No text detected in image ${imageId}`);
         return null;
@@ -62,7 +65,7 @@ export class ProductOcrService {
       });
       return await this.ocrRepo.save(entity);
     } catch (error) {
-      logger.error('[ProductOcr] OCR extraction failed:', error);
+      logger.error('[ProductOcr] OCR extraction failed', { productId, imageId, code: normalizeAiError(error).code });
       return null;
     }
   }
@@ -70,7 +73,7 @@ export class ProductOcrService {
   /**
    * 특정 상품의 모든 비대표 이미지에 대해 OCR 수행.
    */
-  async extractAllForProduct(productId: string): Promise<ProductOcrText[]> {
+  async extractAllForProduct(productId: string, actorId?: string): Promise<ProductOcrText[]> {
     try {
       const images = await this.dataSource.query(
         `SELECT id, image_url
@@ -84,7 +87,7 @@ export class ProductOcrService {
 
       const results: ProductOcrText[] = [];
       for (const img of images) {
-        const result = await this.extractAndSave(productId, img.id, img.image_url);
+        const result = await this.extractAndSave(productId, img.id, img.image_url, actorId);
         if (result) results.push(result);
       }
       return results;
@@ -124,6 +127,7 @@ export class ProductOcrService {
   private async callVisionApi(
     imageUrl: string,
     accessToken: string,
+    actorId?: string,
   ): Promise<{ text: string; confidence: number } | null> {
     const body = {
       requests: [{
@@ -136,6 +140,7 @@ export class ProductOcrService {
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
+      const data = await executeAccountedNativeAi(this.dataSource, { kind: 'ocr', provider: 'google-vision', model: 'TEXT_DETECTION', unit: 'image', units: 1 }, { scope: 'PRODUCT_CONTENT', userId: actorId }, async () => {
       const response = await fetch(VISION_API_URL, {
         method: 'POST',
         headers: {
@@ -147,12 +152,13 @@ export class ProductOcrService {
       });
 
       if (!response.ok) {
-        const errText = await response.text().catch(() => '');
-        logger.error(`[ProductOcr] Vision API error ${response.status}: ${errText.slice(0, 300)}`);
-        return null;
+        throw new Error(`Vision provider ${response.status}`);
       }
 
-      const data = await response.json() as VisionApiResponse;
+      const result = await response.json() as VisionApiResponse;
+      if (result.responses?.[0]?.error) throw new Error('Vision annotation failed');
+      return { value: result, usage: { units: 1 } };
+      });
       const annotation = data.responses?.[0]?.fullTextAnnotation;
       if (!annotation?.text) {
         return null;
@@ -180,7 +186,7 @@ export class ProductOcrService {
       if (error instanceof Error && error.name === 'AbortError') {
         logger.error(`[ProductOcr] Vision API timeout after ${REQUEST_TIMEOUT_MS}ms`);
       } else {
-        logger.error('[ProductOcr] Vision API call failed:', error);
+        logger.error('[ProductOcr] Vision API call failed', { code: normalizeAiError(error).code });
       }
       return null;
     } finally {
@@ -239,6 +245,7 @@ export class ProductOcrService {
 
 interface VisionApiResponse {
   responses?: Array<{
+    error?: { code?: number };
     fullTextAnnotation?: {
       text: string;
       pages?: Array<{

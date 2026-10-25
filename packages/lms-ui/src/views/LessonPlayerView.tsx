@@ -463,6 +463,7 @@ export function LessonPlayerView({
               key={`${config.accountId ?? 'anonymous'}:${courseId}:${lessonId}`}
               videoRef={videoRef}
               src={lesson.videoUrl}
+              captions={lesson.captions}
               courseId={courseId}
               lessonId={lessonId}
               enabled={config.isAuthenticated && ['approved', 'in_progress', 'completed'].includes(enrollment?.status ?? '')}

@@ -211,7 +211,7 @@ export class CatalogImportService {
 
   // ==================== Apply Job ====================
 
-  async applyJob(jobId: string, supplierId: string): Promise<{
+  async applyJob(jobId: string, supplierId: string, actorId?: string): Promise<{
     success: boolean;
     data?: { appliedOffers: number; createdMasters: number };
     error?: string;
@@ -342,7 +342,7 @@ export class CatalogImportService {
       }
 
       if (aiContentInputs.length > 0) {
-        this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {
+        this.importCommon.triggerAiContentGeneration(aiContentInputs, actorId).catch((err) => {
           logger.error('[CatalogImport] AI content generation error:', err);
         });
       }

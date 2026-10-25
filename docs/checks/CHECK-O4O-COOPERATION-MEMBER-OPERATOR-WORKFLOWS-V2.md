@@ -26,9 +26,9 @@
 
 - PostgreSQL 15 전용 Docker container를 새로 만들고 loopback에만 바인딩했다. production proxy·Cloud SQL·운영 자격정보는 사용하지 않았다.
 - canonical baseline과 기존 incremental prefix 전체가 해당 expected fingerprint와 일치함을 확인했다.
-- 신규 migration 적용 결과: `8d4bf317abee4d69567d0c6ad9c2f26c5b806ecb5f415b8eb46dbb9d4b41ea11`, 7,019 lines.
-- 빈 상태 down 결과는 직전 schema `b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea`, 6,901 lines로 복원됐다. 재적용은 같은 신규 fingerprint를 반환했다.
-- 실제 배포용으로 빌드한 `dist/migrate.js`를 별도의 새 로컬 DB에 실행했다. bootstrap·40개 incremental·post-migration assertion PASS. 재실행도 schema assertion PASS이며 중복 migration은 없었다.
+- 신규 migration 적용 결과: `54230274de3a1c420410f8e634196fc10edbe2e317a06b7647bf12fe6f8e118b`, 7,021 lines.
+- 빈 상태 down 결과는 직전 schema `ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb`, 6,903 lines로 복원됐다. 재적용은 같은 신규 fingerprint를 반환했다.
+- 실제 배포용으로 빌드한 `dist/migrate.js`를 별도의 새 로컬 DB에 실행했다. bootstrap·41개 incremental·post-migration assertion PASS. 재실행도 schema assertion PASS이며 중복 migration은 없었다.
 - 기존 account-erasure writer fence를 새 테이블 5개 모두에 적용했다. 공유 업무·개인 식별정보의 제거/보존 분류를 자동 승인하거나 새 법정 보존기간을 만들지 않는다. 기존 수동 검토·fail-closed 원칙을 유지한다.
 - API 통합 fixture는 `afterAll`에서 자기 scope·계정·조직·문의·알림·감사/버전 기록을 삭제하고 해당 계정 잔존 0건을 검사한다. 별도 기존 회귀 suite의 schema도 자체 종료 절차로 제거한다. 전용 container/volume은 최종 검증 후 종료·제거한다.
 
@@ -48,7 +48,7 @@
 
 ## 최신 main 반영과 리뷰
 
-- 검증 중 병합된 main `4ee5a8ecda`의 운영자 초대 변경을 보존했다. 이번 migration은 아직 운영 미적용이므로 `1792886400001`로 변경해 초대 migration 다음에 append했다. 위 fingerprint·40개 runner 검증은 이 순서의 실제 결과다.
+- 검증 중 병합된 main `4ee5a8ecda`의 운영자 초대 변경을 보존했다. 이번 migration은 아직 운영 미적용이므로 `1792886400001`로 변경해 초대 migration 다음에 append했다. 이후 통합 요청 시점의 main `c63e370594`에 강의 profile migration이 먼저 반영되어, 이번 migration을 `1792886400002`로 조정했다. 위 fingerprint·41개 runner 검증은 강의 migration 이후 순서의 실제 결과다.
 - 리뷰에서 발견한 모집 대상 회원 정지 후 활동 상태 변경 차단을 수정했다. 약국 단위와 개인 조합원 각각의 실제 SQL 회귀 2건을 추가했고 신규 대상 선택·모집 후 대상 변경의 차단은 유지했다.
 - 재리뷰 지적도 수정했다. CarePharm 지원 메뉴는 선택 약국의 실제 활성 승인 확인 후에만 회원 문의로 연결한다(약국 없음·승인 대기·조회 실패는 공개 문의). 종료된 활동은 immutable 개정 이력에 진행 상태가 있어야 완료 기록을 허용하며 API·운영자 UI 양쪽에 적용했다. 실제 SQL 2건·회원 공간 4건·운영 화면 2건의 회귀를 추가했다.
 - SonarCloud의 명시적 정렬 비교 함수·저장 함수 복잡도 지적은 UUID 정렬 비교 함수 지정과 기존 상태 검증 함수 분리로 정리했다. 동작·schema 변경 없이 관련 모델·SQL 회귀와 API build를 재검증했다.

@@ -1,10 +1,19 @@
 /** Versioned estimates. Rates are policy inputs, never invoices or payment instructions. */
+export type AiNativeKind = 'multimodal' | 'grounding' | 'ocr' | 'tts' | 'text';
+export interface AiNativePriceProfile {
+  maxInputTokens: number;
+  maxOutputTokens: number;
+  unit?: 'image' | 'request' | 'character' | 'search-query';
+  maxUnits?: number;
+  perUnit?: number;
+}
 export interface AiPriceRate {
   provider: string;
   model: string;
   currency: string;
   inputPerMillion: number;
   outputPerMillion: number;
+  native?: Partial<Record<AiNativeKind, AiNativePriceProfile>>;
 }
 export interface AiPriceCatalog {
   version: string;
@@ -13,6 +22,7 @@ export interface AiPriceCatalog {
 export interface AiPriceSnapshot extends AiPriceRate {
   version: string;
   match: 'model' | 'provider-estimate';
+  invocation?: { kind: AiNativeKind; model: string };
 }
 
 /** Compatibility estimates from the old executor, explicitly labeled as provider-wide estimates. */
@@ -84,16 +94,28 @@ export function loadAiPriceCatalog(
     const key = `${rate.provider}|${rate.model}`;
     if (seen.has(key)) throw new Error('AI_PRICING_INVALID');
     seen.add(key);
+    if (rate.native !== undefined) {
+      if (!rate.native || typeof rate.native !== 'object' || Array.isArray(rate.native)) throw new Error('AI_PRICING_INVALID');
+      for (const [kind, profile] of Object.entries(rate.native)) {
+        if (!['multimodal', 'grounding', 'ocr', 'tts', 'text'].includes(kind) || !profile || Object.keys(profile).some(key => !['maxInputTokens', 'maxOutputTokens', 'unit', 'perUnit', 'maxUnits'].includes(key)) ||
+          ![profile.maxInputTokens, profile.maxOutputTokens].every(n => Number.isSafeInteger(n) && n >= 0 && n <= 2_147_483_647) ||
+          (profile.unit !== undefined && !['image', 'request', 'character', 'search-query'].includes(profile.unit)) ||
+          (profile.maxUnits !== undefined && (!Number.isSafeInteger(profile.maxUnits) || profile.maxUnits < 1)) ||
+          (profile.unit === undefined ? profile.perUnit !== undefined : !Number.isFinite(profile.perUnit) || profile.perUnit! < 0))
+          throw new Error('AI_PRICING_INVALID');
+      }
+    }
   }
   return {
     version: catalog.version,
     rates: catalog.rates.map(
-      ({ provider, model, currency, inputPerMillion, outputPerMillion }) => ({
+      ({ provider, model, currency, inputPerMillion, outputPerMillion, native }) => ({
         provider,
         model,
         currency,
         inputPerMillion,
         outputPerMillion,
+        ...(native ? { native: Object.fromEntries(Object.entries(native).map(([kind, profile]) => [kind, { maxInputTokens: profile.maxInputTokens, maxOutputTokens: profile.maxOutputTokens, ...(profile.unit ? { unit: profile.unit, perUnit: profile.perUnit } : {}), ...(profile.maxUnits !== undefined ? { maxUnits: profile.maxUnits } : {}) }])) } : {}),
       }),
     ),
   };

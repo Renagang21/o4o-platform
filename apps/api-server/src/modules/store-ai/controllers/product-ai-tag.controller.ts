@@ -82,12 +82,13 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       }
 
       // Fire-and-forget: AI 태그 생성 → 완료 후 AI 콘텐츠 생성 트리거
-      taggingService.generateTags(product).then(() => {
+      taggingService.generateTags(product, userId).then((generated) => {
+        if (!generated) return;
         // WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1: 태그 생성 완료 → AI 콘텐츠 생성
         import('../services/product-ai-content.service.js').then(({ ProductAiContentService }) => {
           const contentService = new ProductAiContentService(dataSource);
           return loadProductContentInput(dataSource, productId).then((contentInput) => {
-            if (contentInput) contentService.generateAllContents(contentInput).catch(() => {});
+            if (contentInput) contentService.generateAllContents(contentInput, userId).catch(() => {});
           });
         }).catch(() => {});
       }).catch(() => {});
@@ -141,7 +142,7 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
 
       // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: purpose 분기
       const purpose = req.body?.purpose === 'b2b' ? 'b2b' as const : 'b2c' as const;
-      const suggestions = await taggingService.suggestTags(product, purpose);
+      const suggestions = await taggingService.suggestTags(product, purpose, userId);
       res.json({ success: true, data: { suggestions } });
     } catch (error) {
       console.error('[ProductAiTag] suggest error:', error);

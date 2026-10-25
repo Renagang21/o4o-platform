@@ -334,6 +334,7 @@ it("uses selected speech models in the existing TTS adapter without accepting a 
       text: "합성 문장",
       model: "caller-must-not-win",
     }),
+    async (_request, invoke) => (await invoke()).value,
   );
   expect(result.model).toBe("gpt-speech-fixture");
   const body = JSON.parse(

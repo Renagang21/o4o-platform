@@ -9,8 +9,9 @@
  *  - API key 는 기존 resolveAiApiKey(ai_settings → env) 재사용. 응답·로그·오류 메시지에 key 를 싣지 않는다
  *    (Gemini 도 URL `?key=` 대신 헤더로 전달해 access log 노출을 막는다).
  *  - `@o4o/ai-core` text model registry · AIProxyService · ai-model-registry(-tts 제외 정책)는 건드리지 않는다.
- *  - 결과는 audio 바이너리만 반환. DB 저장 · Media Library 등록 · Job attachment 없음(최초 구현).
+ *  - 결과는 audio 바이너리만 반환. 본문/audio 저장 없음; host는 공통 비용 메타데이터만 기록한다.
  */
+import { geminiNativeUsage, type AiNativeInvocation, type AiNativeOutcome } from '../../ai-policy/ai-native-metering.js';
 import { MediaCatalogError } from '../../media/services/media-catalog.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -101,11 +102,15 @@ export class TtsNarrationService {
     private readonly resolveModel: (provider: TtsProvider) => Promise<string> = provider => Promise.resolve(TTS_PROVIDERS[provider].model),
   ) {}
 
-  async synthesize(req: TtsRequest): Promise<TtsResult> {
+  async synthesize(req: TtsRequest, invoke: AiNativeInvocation): Promise<TtsResult> {
     const apiKey = await this.resolveKey(req.provider);
     if (!apiKey) throw new MediaCatalogError('TTS_PROVIDER_NOT_CONFIGURED', 503);
     const spec = { ...TTS_PROVIDERS[req.provider], model: await this.resolveModel(req.provider) };
-    const audio = req.provider === 'openai' ? await this.openai(req, spec, apiKey) : await this.gemini(req, spec, apiKey);
+    const text = req.style ? `${req.style}\n\n${req.text}` : req.text;
+    const audio = await invoke({ kind: 'tts', provider: req.provider, model: spec.model, textBytes: Buffer.byteLength(text, 'utf8'), unit: 'character', units: Array.from(text).length }, async () => {
+      const outcome = req.provider === 'openai' ? await this.openai(req, spec, apiKey) : await this.gemini(req, spec, apiKey);
+      return { ...outcome, usage: { ...outcome.usage, units: Array.from(text).length } };
+    });
     return {
       audio,
       mimeType: req.format === 'mp3' ? 'audio/mpeg' : 'audio/wav',
@@ -120,20 +125,18 @@ export class TtsNarrationService {
     let res: Response;
     try {
       res = await this.fetchImpl(url, init);
-    } catch (err) {
-      logger.error('[TTS] provider request failed', { provider, error: (err as Error)?.message });
+    } catch {
+      logger.error('[TTS] provider request failed', { provider });
       throw new MediaCatalogError('TTS_PROVIDER_UNREACHABLE', 502);
     }
     if (!res.ok) {
-      // 본문은 로그에만, 짧게. 응답에는 status 코드만 — provider 오류 본문에 요청 echo 가 있을 수 있다.
-      const detail = (await res.text().catch(() => '')).slice(0, 300);
-      logger.warn('[TTS] provider returned error', { provider, status: res.status, detail });
+      logger.warn('[TTS] provider returned error', { provider, status: res.status });
       throw new MediaCatalogError(res.status === 429 ? 'TTS_PROVIDER_RATE_LIMITED' : 'TTS_PROVIDER_FAILED', 502);
     }
     return res;
   }
 
-  private async openai(req: TtsRequest, spec: TtsProviderSpec, apiKey: string): Promise<Buffer> {
+  private async openai(req: TtsRequest, spec: TtsProviderSpec, apiKey: string): Promise<AiNativeOutcome<Buffer>> {
     const res = await this.call('openai', 'https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -145,10 +148,10 @@ export class TtsNarrationService {
         response_format: req.format,
       }),
     });
-    return Buffer.from(await res.arrayBuffer());
+    return { value: Buffer.from(await res.arrayBuffer()) };
   }
 
-  private async gemini(req: TtsRequest, spec: TtsProviderSpec, apiKey: string): Promise<Buffer> {
+  private async gemini(req: TtsRequest, spec: TtsProviderSpec, apiKey: string): Promise<AiNativeOutcome<Buffer>> {
     // Gemini TTS 는 스타일을 자연어 지시로 텍스트 앞에 둔다.
     const text = req.style ? `${req.style}\n\n${req.text}` : req.text;
     const res = await this.call(
@@ -167,7 +170,7 @@ export class TtsNarrationService {
       },
     );
     const json = (await res.json().catch(() => null)) as
-      | { candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] }
+      | ({ candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] } & Parameters<typeof geminiNativeUsage>[0])
       | null;
     const inline = json?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
     if (!inline?.data) {
@@ -176,8 +179,8 @@ export class TtsNarrationService {
     }
     const pcm = Buffer.from(inline.data, 'base64');
     const mime = inline.mimeType ?? '';
-    if (mime.startsWith('audio/wav')) return pcm;
+    if (mime.startsWith('audio/wav')) return { value: pcm, usage: geminiNativeUsage(json!) };
     const rate = Number(/rate=(\d+)/.exec(mime)?.[1] ?? 24000);
-    return pcmToWav(pcm, rate);
+    return { value: pcmToWav(pcm, rate), usage: geminiNativeUsage(json!) };
   }
 }

@@ -37,7 +37,7 @@ it("운영자 콘텐츠 QR은 추출 후에도 연결 유형을 잠그고 기존
   render(<StoreQrCreateForms {...handlers} />);
   expect(screen.queryByRole("combobox")).toBeNull();
   expect(screen.getByText("운영자 콘텐츠 연결 QR")).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: "QR 만들기" }));
+  fireEvent.click(screen.getByRole("button", { name: "QR 저장" }));
   expect(handlers.onSave).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole("button", { name: "자료 변경" }));
   expect(handlers.onChangeSource).toHaveBeenCalledOnce();
@@ -51,7 +51,7 @@ it("동영상 QR 저장과 취소는 일반 콘텐츠 처리와 섞이지 않는
       videoTarget={{ id: "video-sample", title: "동영상" }}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "QR 만들기" }));
+  fireEvent.click(screen.getByRole("button", { name: "QR 저장" }));
   expect(handlers.onSave).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole("button", { name: "취소" }));
   expect(handlers.onCancel).toHaveBeenCalledOnce();

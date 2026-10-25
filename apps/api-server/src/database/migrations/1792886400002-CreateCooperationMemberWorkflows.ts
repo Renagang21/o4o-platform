@@ -1,10 +1,10 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 /** Additive workflow records. No membership, legacy notice or contact ownership backfill. */
-export class CreateCooperationMemberWorkflows1792886400001
+export class CreateCooperationMemberWorkflows1792886400002
   implements MigrationInterface
 {
-  name = "CreateCooperationMemberWorkflows1792886400001";
+  name = "CreateCooperationMemberWorkflows1792886400002";
   async up(q: QueryRunner): Promise<void> {
     await q.query(`CREATE TABLE cooperation_work_items (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

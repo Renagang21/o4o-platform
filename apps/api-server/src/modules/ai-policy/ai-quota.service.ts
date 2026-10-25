@@ -36,6 +36,17 @@ export interface AiQuotaReservation {
   warnings: QuotaWarning[];
 }
 type Query = Pick<EntityManager, 'query'>;
+export interface AiQuotaEvaluationRow {
+  layer: string;
+  layerKey: string;
+  limitType: string;
+  period: string;
+  currentValue: number | string;
+  /** Admin snapshots separate held capacity; the runtime SQL already includes it in currentValue. */
+  reservedValue?: number | string;
+  limitValue: number | string;
+  warningThreshold: number | string;
+}
 const LOCK = 'SELECT pg_advisory_xact_lock(1791870, 1)';
 function validUsage(usage: AiQuotaUsage): void {
   if (
@@ -48,6 +59,38 @@ function validUsage(usage: AiQuotaUsage): void {
     usage.cost > 999_999_999_999
   )
     throw new Error('AI_USAGE_INVALID');
+}
+
+/** Match the existing NUMERIC(20,8) ledger precision; binary addition is not a cost-limit comparison. */
+function costUnits(value: number | string): bigint {
+  const decimal = typeof value === 'number' ? value.toFixed(8) : value;
+  if (!/^\d{1,12}(?:\.\d{1,8})?$/.test(decimal)) throw new Error('AI_QUOTA_INVALID');
+  const [whole, fraction = ''] = decimal.split('.');
+  return BigInt(whole) * 100_000_000n + BigInt(fraction.padEnd(8, '0'));
+}
+
+/** Pure admission calculation shared by actual reservation and offline configuration checks. */
+export function evaluateAiQuotaRows(quotas: readonly AiQuotaEvaluationRow[], budget: AiQuotaUsage): QuotaCheckResult {
+  validUsage(budget);
+  const warnings: QuotaWarning[] = [], exceeded: QuotaExceeded[] = [];
+  for (const q of quotas) {
+    if (!['requests', 'tokens', 'cost'].includes(q.limitType) || !['daily', 'monthly'].includes(q.period))
+      throw new Error('AI_QUOTA_INVALID');
+    const current = Number(q.currentValue), held = Number(q.reservedValue ?? 0), limitValue = Number(q.limitValue);
+    if (![current, held, limitValue].every(n => Number.isFinite(n) && n >= 0)) throw new Error('AI_QUOTA_INVALID');
+    const currentValue = current + held;
+    const projected = currentValue + budget[q.limitType as keyof AiQuotaUsage];
+    const projectedCost = q.limitType === 'cost' ? costUnits(q.currentValue) + costUnits(q.reservedValue ?? 0) + costUnits(budget.cost) : null;
+    const limitCost = q.limitType === 'cost' ? costUnits(q.limitValue) : null;
+    const over = projectedCost !== null ? projectedCost > limitCost! : projected > limitValue;
+    const equal = projectedCost !== null ? projectedCost === limitCost : projected === limitValue;
+    const usagePercent = limitValue > 0 ? (projected / limitValue) * 100 : 100;
+    if (over || (equal && budget.requests === 0))
+      exceeded.push({ layer: q.layer, layerKey: q.layerKey, limitType: q.limitType, period: q.period, currentValue, limitValue });
+    else if (usagePercent >= Number(q.warningThreshold))
+      warnings.push({ layer: q.layer, layerKey: q.layerKey, limitType: q.limitType, period: q.period, usagePercent: Math.round(usagePercent * 10) / 10 });
+  }
+  return { allowed: !exceeded.length, warnings, exceeded };
 }
 function periods(now: Date) {
   return [now.toISOString().slice(0, 10), now.toISOString().slice(0, 7)];
@@ -77,7 +120,10 @@ export class AiQuotaService {
       const limitValue = Number(row.limitValue),
         currentValue = Number(row.currentValue),
         reservedValue = Number(row.reservedValue);
-      const projectedValue = currentValue + reservedValue;
+      const admission = evaluateAiQuotaRows([row], { requests: 0, tokens: 0, cost: 0 });
+      const projectedValue = row.limitType === 'cost'
+        ? Number(costUnits(row.currentValue) + costUnits(row.reservedValue)) / 100_000_000
+        : currentValue + reservedValue;
       const usagePercent =
         limitValue > 0
           ? Math.round((projectedValue / limitValue) * 1000) / 10
@@ -90,9 +136,9 @@ export class AiQuotaService {
         projectedValue,
         usagePercent,
         status:
-          projectedValue >= limitValue
+          !admission.allowed
             ? 'exceeded'
-            : usagePercent >= Number(row.warningThreshold)
+            : admission.warnings.length
               ? 'warning'
               : 'ok',
       };
@@ -179,6 +225,7 @@ export class AiQuotaService {
         model: string;
         price: AiPriceSnapshot;
         attempts: number;
+        native?: { kind: string; unit: string | null; units: number | null; usageKnown: boolean; inputTokens?: number | null; outputTokens?: number | null };
       };
     },
   ): Promise<void> {
@@ -219,7 +266,7 @@ export class AiQuotaService {
           cost: 0,
         };
         const status =
-          uncertain.requests || uncertain.tokens || uncertain.cost
+          uncertain.requests || uncertain.tokens || uncertain.cost || receipt.detail?.native?.usageKnown === false
             ? 'pending'
             : 'settled';
         await manager.query(
@@ -379,49 +426,7 @@ export class AiQuotaService {
         OR (q.layer = 'user' AND q.layer_key = $3))`,
       [service, scope, userId ?? null, dailyKey, monthlyKey],
     );
-    const warnings: QuotaWarning[] = [],
-      exceeded: QuotaExceeded[] = [];
-    for (const q of quotas) {
-      if (
-        !['requests', 'tokens', 'cost'].includes(q.limitType) ||
-        !['daily', 'monthly'].includes(q.period)
-      )
-        throw new Error('AI_QUOTA_INVALID');
-      const currentValue = Number(q.currentValue),
-        limitValue = Number(q.limitValue);
-      if (
-        !Number.isFinite(currentValue) ||
-        !Number.isFinite(limitValue) ||
-        currentValue < 0 ||
-        limitValue < 0
-      )
-        throw new Error('AI_QUOTA_INVALID');
-      const projected =
-        currentValue + budget[q.limitType as keyof AiQuotaUsage];
-      const usagePercent =
-        limitValue > 0 ? (projected / limitValue) * 100 : 100;
-      if (
-        projected > limitValue ||
-        (projected === limitValue && budget.requests === 0)
-      )
-        exceeded.push({
-          layer: q.layer,
-          layerKey: q.layerKey,
-          limitType: q.limitType,
-          period: q.period,
-          currentValue,
-          limitValue,
-        });
-      else if (usagePercent >= Number(q.warningThreshold))
-        warnings.push({
-          layer: q.layer,
-          layerKey: q.layerKey,
-          limitType: q.limitType,
-          period: q.period,
-          usagePercent: Math.round(usagePercent * 10) / 10,
-        });
-    }
-    return { allowed: !exceeded.length, warnings, exceeded };
+    return evaluateAiQuotaRows(quotas, budget);
   }
 
   private async increment(

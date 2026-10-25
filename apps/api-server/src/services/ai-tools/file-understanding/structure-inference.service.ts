@@ -15,7 +15,7 @@
  * - HTTP route 없음. 내부 service 함수만.
  */
 
-import { execute } from '@o4o/ai-core';
+import type { execute } from '@o4o/ai-core';
 
 import {
   parseInferenceJson,
@@ -154,14 +154,15 @@ function buildUserPrompt(profile: StructureProfile, schema: TargetSchema): strin
 /**
  * 계약 C — 구조 프로파일 + target schema 를 Gemini 로 해석해 FileStructureInference 를 반환한다.
  * AI 출력은 항상 validateInference 로 정규화 → schema 밖 targetField 는 unmappedColumns 로 강등된다.
+ * Production hosts supply an accounted invocation; standalone callers explicitly own their transport.
  *
  * @throws execute()/JSON.parse 실패를 전파 — 호출측이 재시도·QUESTION 전략을 결정.
  */
-export async function inferFileStructure(request: InferFileStructureRequest): Promise<InferFileStructureResult> {
+export async function inferFileStructure(request: InferFileStructureRequest, invoke: typeof execute): Promise<InferFileStructureResult> {
   const model = await (request.resolveModel ? request.resolveModel() : defaultResolveModel(request.usage ?? 'file.structure'));
   const apiKey = await (request.resolveApiKey ? request.resolveApiKey() : defaultResolveApiKey());
 
-  const result = await execute({
+  const result = await invoke({
     systemPrompt: SYSTEM_PROMPT,
     userPrompt: buildUserPrompt(request.profile, request.targetSchema),
     provider: 'gemini',

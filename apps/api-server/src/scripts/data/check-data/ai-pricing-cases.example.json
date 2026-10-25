@@ -1,0 +1,21 @@
+{
+  "version": "ai-pricing-check-v1",
+  "cases": [
+    { "id": "home-inline", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "multimodal", "provider": "gemini", "model": null, "maxOutputTokens": 2048 } },
+    { "id": "work-vision-gemini", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "multimodal", "provider": "gemini", "model": null, "maxOutputTokens": 800 } },
+    { "id": "work-vision-openai", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "multimodal", "provider": "openai", "model": null, "maxOutputTokens": 800 } },
+    { "id": "work-strong-gemini", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "multimodal", "provider": "gemini", "model": null, "maxOutputTokens": 800 } },
+    { "id": "work-strong-openai", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "multimodal", "provider": "openai", "model": null, "maxOutputTokens": 800 } },
+    { "id": "image-analysis", "scope": "AI_PROXY", "request": { "kind": "multimodal", "provider": "gemini", "model": null, "maxOutputTokens": 1000 } },
+    { "id": "authenticated-research", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "grounding", "provider": "gemini", "model": null, "maxOutputTokens": 2048, "unit": "request", "units": 1 } },
+    { "id": "public-research", "scope": "SERVICE_QUERY", "serviceKey": "neture", "request": { "kind": "grounding", "provider": "gemini", "model": null, "maxOutputTokens": 2048, "unit": "request", "units": 1 } },
+    { "id": "product-ocr", "scope": "PRODUCT_CONTENT", "request": { "kind": "ocr", "provider": "google-vision", "model": "TEXT_DETECTION", "unit": "image", "units": 1 } },
+    { "id": "tts-openai", "scope": "AI_PROXY", "request": { "kind": "tts", "provider": "openai", "model": null, "unit": "character", "units": 2502 } },
+    { "id": "tts-gemini", "scope": "AI_PROXY", "request": { "kind": "tts", "provider": "gemini", "model": null, "unit": "character", "units": 2502 } },
+    { "id": "editing-qwen", "scope": "AI_PROXY", "request": { "kind": "text", "provider": "qwen", "model": null, "textBytes": null, "maxOutputTokens": 4096 } },
+    { "id": "editing-gemini-fallback", "scope": "AI_PROXY", "request": { "kind": "text", "provider": "gemini", "model": "gemini-3.8-flash", "textBytes": null, "maxOutputTokens": 32000 } },
+    { "id": "proxy-gemini", "scope": "AI_PROXY", "request": { "kind": "text", "provider": "gemini", "model": null, "textBytes": null, "maxOutputTokens": 32000 } },
+    { "id": "proxy-openai", "scope": "AI_PROXY", "request": { "kind": "text", "provider": "openai", "model": null, "textBytes": null, "maxOutputTokens": 8192 } },
+    { "id": "proxy-claude", "scope": "AI_PROXY", "request": { "kind": "text", "provider": "claude", "model": null, "textBytes": null, "maxOutputTokens": 8192 } }
+  ]
+}

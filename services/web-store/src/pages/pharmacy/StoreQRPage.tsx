@@ -2,6 +2,8 @@ import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { hasStoreOperationEntry, readStoreOperationEntry, type StoreOperationEntry } from './operations/storeOperationEntry';
 import { StoreOperationReturn } from './operations/StoreExecutionActions';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { readMultilingualQrEntry } from './multilingual/MultilingualChannelActions';
+import { MultilingualQrEntryPanel } from './qr/MultilingualQrEntry';
 import { printQrSelection } from './qr/printQrSelection';
 import { useQrCreation } from './qr/useQrCreation';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -102,6 +104,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const base = storeWorkspaceBase(location.pathname);
   const { key: operationScope } = useStoreOperationScope();
   const operationEntry = readStoreOperationEntry(location.state, operationScope, base, 'qr');
+  const multilingualEntry = readMultilingualQrEntry(location.state, operationScope);
   const consumedEntry = useRef<StoreOperationEntry | null>(null);
   const [focusTarget, setFocusTarget] = useState(true);
   const navigate = useNavigate();
@@ -405,6 +408,11 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     <div style={styles.container}>
       <StoreWorkflowNavigation subject="QR" />
       <StoreOperationReturn entry={operationEntry} />
+      {multilingualEntry && <MultilingualQrEntryPanel key={`${operationScope}:${multilingualEntry.groupId}:${multilingualEntry.locale}`}
+        entry={multilingualEntry} disabled={saving || creating} selected={creating && selectedLibrary?.source === 'mlc' && selectedLibrary.id === multilingualEntry.groupId}
+        isCurrent={isCurrent} onSelect={handleLibrarySelect} />}
+      {!!(location.state as { multilingualQrEntry?: unknown } | null)?.multilingualQrEntry && !multilingualEntry &&
+        <p role="status" className="mb-3 text-sm text-amber-800">선택한 안내의 매장 문맥이 변경되었습니다. 현재 매장에서 자료를 다시 선택해 주세요.</p>}
       {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="mb-3 text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주세요.</p>}
       {operationEntry && !loading && !listError && <div className="mb-3 text-sm text-slate-600">
         {items.some(item => item.id === operationEntry.id) ? <><span>선택한 QR의 배치·출력을 열었습니다. </span>{focusTarget && <button type="button" className="min-h-11 underline" onClick={() => setFocusTarget(false)}>전체 QR 보기</button>}</>
