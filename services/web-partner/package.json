@@ -16,8 +16,6 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "@o4o/auth-react": "workspace:*",
-    "@o4o/auth-client": "workspace:*",
-    "@o4o/auth-utils": "workspace:*",
     "react-router-dom": "7.9.6"
   }
 }

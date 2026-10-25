@@ -184,3 +184,10 @@
 
 - 추가 Codex P2 지적을 반영했다. refresh의 실제 401 인증 실패만 만료로 처리하고, 503/429·네트워크 오류는 그대로 전달한다. 일시 장애가 사용자/공간을 초기화하거나 작성 중 화면을 닫지 않게 하는 오류 분류 수정이며 실제 인증 실패 차단은 유지한다.
 - 503/429·네트워크·실제 만료와 동시 요청의 실패/재시도 복구 5개 회귀를 추가했다. 프런트 총 69 tests·웹 production build·변경 파일 ESLint 통과. API/인증 Core의 오류 계약·재시도 한도·쿠키 정책은 변경하지 않았다.
+
+### 의존성 선언 최소화·GitHub 인증 차단
+
+- 전체 CI의 DECLARED_UNUSED 검사에서 실제 직접 import가 없는 auth-client/auth-utils 중복 선언을 발견했다. Partner의 직접 workspace 의존성은 auth-react만 유지하고, 그 공통 패키지의 기존 peer/전이 의존 경로로 client/utils/types를 해석한다. pnpm closure 5개 프로젝트가 유지됨을 확인했다. 검사나 예외 목록은 수정하지 않았다.
+- scoped frozen/offline install, 전체 배포/판정 단위 테스트 363개, 프런트 69개, 웹 production build 통과. 기존 CI에서 실패한 원인에 대한 수정은 이 후속 커밋에 포함한다.
+- GitHub API가 `401 Bad credentials`를 반환했고 gh auth status에서도 GH_TOKEN이 invalid로 확인되었다. git 원격 조회도 자격정보 부재로 실패했다. 환경 runtime은 running이며 새 outbound identity/secret binding은 없다. 자격정보를 읽거나 다른 계정으로 대체하지 않았다.
+- 이 때문에 마지막으로 push한 `2256ddaf34`의 CI 원격 확인·수정본 push·PR #820 main 병합·운영 배포는 완료하지 못했다. GitHub 연결 재인증 후 같은 작업 브랜치에 수정본을 push하고 required CI·review 상태부터 다시 확인해야 한다. 운영 DB·서비스·IAM·도메인은 변경하지 않았다.
