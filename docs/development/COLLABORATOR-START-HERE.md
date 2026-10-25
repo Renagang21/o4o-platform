@@ -49,6 +49,8 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 2026-10-25 선행 텍스트·전문 호출 정비는 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 병합됐다. 이미지/PDF·화면·검색·OCR·TTS·Qwen·편집/강의 직접 호출을 기존 회계에 연결하며, 관리자 집계의 UUID 비교 오류도 실제 PostgreSQL에서 재현·수정했다. 구현 계약은 [전문 AI TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md), 개발 검증은 [CHECK](../checks/CHECK-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md), 최신 운영 적용 증거는 [후속 통합·배포 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. native 요율/profile 미준비 시 provider 이전에 503으로 거부하므로 코드 배포를 전문 기능의 실제 사용 활성화로 해석하지 않는다. 일반 개발/fixture 테스트에는 운영 key나 유료 호출이 필요하지 않다.
 
+후속 가격·예산 도구는 [운영 준비 guide](../guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)와 [CHECK](../checks/CHECK-O4O-AI-PRICING-READINESS-V1.md)를 따른다. `wo/ai-pricing-readiness`에서 기존 계획/한도 판정으로 파일 표본을 검사하며, 운영 key·DB·유료 호출 없이 실행할 수 있다. 현재 운영 모델·실제 단가/한도·설정 전달과 실사용 활성화는 별도 확인이다. 개발 branch의 결과를 main 배포로 읽지 않는다.
+
 ## 3. 첫 공동개발 대상 — O4O Personal Assistant의 약국 경영 업무 지원
 
 ### 서비스 정의

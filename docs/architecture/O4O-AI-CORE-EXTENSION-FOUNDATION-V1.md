@@ -314,3 +314,9 @@ host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home
 사용자의 후속 main 병합·배포 지시로 §15/§16의 개발 변경을 [PR #811](https://github.com/Renagang21/o4o-platform/pull/811)/main `67654de1fe`에 함께 반영했다. 관리 집계의 UUID 비교에서 불필요한 text cast를 제거했고 실제 PostgreSQL의 UUID·enum·JSONB로 회귀를 추가했다. 새 운영 schema/migration·권한·가격·credential·workflow 변경은 없다.
 
 §15/§16의 미병합 기록은 당시 개발 단계의 증거다. 현재 통합·배포·검증 결과는 [후속 CHECK](../checks/CHECK-O4O-AI-ACCOUNTING-INTEGRATION-20261025.md)를 따른다. 코드 배포에서도 가격 미설정 native 호출의 선차단은 유지한다. 실제 사용 활성화에는 모델별 명시 요율/profile·예산과 사용량 미반환 정산 검증이 필요하며, 유료 호출·외부 계정/매장·사용자 청구 완료로 확장하지 않는다.
+
+## 18. 가격·예산 준비 도구 — 후속 개발 (2026-10-25)
+
+[가격 준비 TODO](../work-orders/TODO-O4O-AI-PRICING-READINESS-V1.md)의 `wo/ai-pricing-readiness`는 기존 가격/native 계획기에 명시 catalog를 전달하고 기존 quota 판정을 순수 함수로 재사용하는 오프라인 CLI를 제공한다. 미확정 모델/요율·native 예산과 보류 포함 quota를 제공 표본에서 검사한다. 가격·원장·모델 선택 기반을 중복 생성하거나 provider·DB를 호출하지 않는다. user quota·현재 모델 해석·실사용/배포는 미검증으로 남긴다.
+
+같은 작업에서 비용 한도 경계의 부동소수점 오판을 원장과 같은 소수 8자리 정수 비교로 보완했다. 원자 예약·locking·scope/service/user·기간·보류/정산·업무 권한은 유지한다. source 실행·검증과 실제 요율/설정 적용은 [운영 준비 guide](../guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)·[CHECK](../checks/CHECK-O4O-AI-PRICING-READINESS-V1.md)를 따른다. 이 개발 기록은 §17 이후의 운영 배포나 실제 전문 기능 활성화 증거가 아니다.

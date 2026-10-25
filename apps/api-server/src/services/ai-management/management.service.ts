@@ -177,7 +177,7 @@ export class AiManagementService {
   ): Configuration {
     if (def.id === 'product.ocr') return {
       state: 'code', provider: 'google-vision', model: 'TEXT_DETECTION', enabled: null,
-      description: '별도 전문 OCR API입니다. 실행 활성·인증·공통 모델 선택/중지·비용 연결은 확인되지 않았습니다.',
+      description: '별도 전문 OCR API이며 이미지 단위 예약·정산에 연결됐습니다. 명시 요율·실행 인증 준비는 별도이고 공통 생성형 모델 선택/중지는 제공하지 않습니다.',
     };
     if (def.selection === "scope") {
       if (policies.state === "unavailable")
