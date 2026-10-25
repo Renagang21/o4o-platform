@@ -46,7 +46,7 @@ it("returns the inventory only to the platform admin and keeps the inventory roo
   expect(reply.body.data.usages).toHaveLength(AI_USAGE_CATALOG.length);
   expect(reply.body.data.usages).toEqual(expect.arrayContaining([
     expect.objectContaining({ id: 'supplier.overview', accounting: 'connected' }),
-    expect.objectContaining({ id: 'product.ocr', accounting: 'unconnected', modelSelectable: false }),
+    expect.objectContaining({ id: 'product.ocr', accounting: 'connected', modelSelectable: false }),
   ]));
   expect(reply.headers["cache-control"]).toBe("private, no-store");
   await request(app)

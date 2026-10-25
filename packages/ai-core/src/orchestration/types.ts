@@ -105,6 +105,8 @@ export interface AIProviderConfig {
    * grounding 은 text 응답 경로에서만 동작한다(JSON 강제와 병용 불가). gemini provider 전용.
    */
   grounding?: boolean;
+  /** execute owns retries; direct legacy provider calls retain their existing default. */
+  singleAttempt?: boolean;
 }
 
 /** Provider adapter — all LLM backends implement this */
@@ -138,6 +140,8 @@ export interface AIProviderResponse {
   model: string;
   promptTokens: number;
   completionTokens: number;
+  /** false when a provider omitted or malformed its token measurements. */
+  usageKnown?: boolean;
   /** grounding 요청 시 근거 메타데이터(additive · 비-grounding 응답에는 없음) */
   grounding?: AIGroundingMetadata;
 }

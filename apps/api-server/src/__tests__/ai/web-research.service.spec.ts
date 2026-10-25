@@ -1,3 +1,5 @@
+// Transport fixtures only; real quota/settlement is covered by native-runtime-accounting.spec.ts.
+jest.mock('../../modules/ai-policy/ai-accounted-execution.js', () => ({ executeAccountedNativeAi: async (_db: unknown, _request: unknown, _account: unknown, invoke: () => Promise<{ value: unknown }>) => (await invoke()).value }));
 /**
  * Web Research Service — admin 모델 해석 → grounding end-to-end 통합 테스트
  *

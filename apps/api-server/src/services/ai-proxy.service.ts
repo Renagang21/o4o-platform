@@ -1,3 +1,6 @@
+import { executeAccountedNativeAi } from '../modules/ai-policy/ai-accounted-execution.js';
+import { geminiNativeUsage, openAiNativeUsage, type AiNativeUsage } from '../modules/ai-policy/ai-native-metering.js';
+import { normalizeAiError, isAiAccountingError } from '../utils/ai-provider-runtime.js';
 import { isReasoningGenerationModel } from '@o4o/ai-core';
 import { ModelControlService } from './ai-management/model-controls.js';
 /**
@@ -41,10 +44,10 @@ interface GeminiHttpResult {
     promptTokenCount?: number;
     candidatesTokenCount?: number;
     totalTokenCount?: number;
+    thoughtsTokenCount?: number;
   };
 }
 import { AppDataSource } from '../database/connection.js';
-import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: provider×surface guardrail gate
 import { resolveEditingProvider, EDITING_MODEL_FALLBACK } from '../utils/ai-editing-model-resolver.js';
@@ -130,7 +133,7 @@ class AIProxyService {
       });
 
       // 3. Call provider with retry
-      const response = await this.callProviderWithRetry(request, requestId);
+      const response = await this.callProviderWithRetry(request, requestId, userId);
 
       const duration = Date.now() - startTime;
 
@@ -144,19 +147,6 @@ class AIProxyService {
         usage: response.usage,
       });
 
-      // Save usage log to database
-      await this.saveUsageLog({
-        userId,
-        provider: request.provider as UsageProvider,
-        model: request.model,
-        requestId,
-        promptTokens: response.usage?.promptTokens || 0,
-        completionTokens: response.usage?.completionTokens || 0,
-        totalTokens: response.usage?.totalTokens || 0,
-        durationMs: duration,
-        status: AIUsageStatus.SUCCESS,
-      });
-
       return response;
 
     } catch (error: any) {
@@ -167,20 +157,8 @@ class AIProxyService {
         userId,
         provider: request.provider,
         model: request.model,
-        error: error.message,
+        code: normalizeAiError(error).code,
         duration: `${duration}ms`,
-      });
-
-      // Save error log to database
-      await this.saveUsageLog({
-        userId,
-        provider: request.provider as UsageProvider,
-        model: request.model,
-        requestId,
-        durationMs: duration,
-        status: AIUsageStatus.ERROR,
-        errorMessage: error.message || 'Unknown error',
-        errorType: error.type || 'UNKNOWN_ERROR',
       });
 
       throw error;
@@ -311,14 +289,16 @@ class AIProxyService {
    */
   private async callProviderWithRetry(
     request: AIGenerateRequest,
-    requestId: string
+    requestId: string,
+    userId: string,
   ): Promise<AIGenerateResponse> {
     let lastError: any;
 
     for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
       try {
-        return await this.callProvider(request, requestId);
+        return await this.accountAttempt(request, userId, () => this.callProvider(request, requestId), value => ({ inputTokens: value.usage?.promptTokens, outputTokens: value.usage?.completionTokens }));
       } catch (error: any) {
+        if (isAiAccountingError(normalizeAiError(error).code)) throw error;
         lastError = error;
 
         // Don't retry on validation or non-retryable errors
@@ -344,7 +324,7 @@ class AIProxyService {
           retryAfter: error.retryAfter ?? null,
           errorType: error.type,
           rateLimitCooldown: error.type === 'RATE_LIMIT_ERROR' ? true : undefined,
-          error: error.message,
+          code: normalizeAiError(error).code,
         });
 
         // Wait before retry
@@ -428,8 +408,7 @@ class AIProxyService {
       }
 
       if (!response.ok) {
-        const error = await response.json();
-        throw this.createError('PROVIDER_ERROR', error.error?.message || 'OpenAI API error', false);
+        throw this.createError('PROVIDER_ERROR', 'OpenAI API error', false);
       }
 
       const data: OpenAIResponse = await response.json();
@@ -537,27 +516,18 @@ class AIProxyService {
         throw this.createError('RATE_LIMIT_ERROR', 'Gemini rate limit exceeded', true, retryAfter);
       }
       if (response.status === 503) {
-        // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: preserve upstream 503 details (truncated, no secrets)
+        // Keep retry metadata without copying upstream response content.
         const retryAfter = this.parseRetryAfter(response.headers.get('Retry-After'));
-        let upstreamMessage = '';
-        try {
-          const text = await response.text();
-          upstreamMessage = text.slice(0, 200);
-        } catch {
-          // body may already be consumed or unreadable; ignore
-        }
         logger.warn('Gemini upstream 503', {
           requestId,
           model,
           status: 503,
           retryAfter: retryAfter ?? null,
-          upstreamMessage: upstreamMessage || null,
         });
         throw this.createError('PROVIDER_ERROR', 'Gemini service unavailable', true, retryAfter);
       }
       if (!response.ok) {
-        const error = await response.json();
-        throw this.createError('PROVIDER_ERROR', error.error?.message || 'Gemini API error', false);
+        throw this.createError('PROVIDER_ERROR', 'Gemini API error', false);
       }
 
       const data: GeminiResponse = await response.json();
@@ -576,16 +546,15 @@ class AIProxyService {
           const jsonContent = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
           parsed = JSON.parse(jsonContent);
         }
-      } catch (parseError: any) {
+      } catch {
         logger.error('Failed to parse Gemini response', {
           requestId,
           model,
-          content: content.substring(0, 500),
-          error: parseError.message,
+          code: 'INVALID_RESPONSE',
         });
         throw this.createError(
           'PROVIDER_ERROR',
-          `Invalid JSON response from Gemini: ${parseError.message}`,
+          'Invalid JSON response from Gemini',
           false
         );
       }
@@ -605,7 +574,7 @@ class AIProxyService {
     request: AIGenerateRequest,
     requestId: string
   ): Promise<AIGenerateResponse> {
-    const { content, parsed, model, usageMetadata } = await this.fetchGeminiContent(request, requestId);
+    const { parsed, model, usageMetadata } = await this.fetchGeminiContent(request, requestId);
 
     // Debug logging — blocks format check
     logger.info('Gemini AI Response Format Debug', {
@@ -650,7 +619,6 @@ class AIProxyService {
       logger.error('Invalid Gemini response format', {
         requestId,
         model,
-        parsed: JSON.stringify(parsed).substring(0, 500),
       });
       throw this.createError(
         'PROVIDER_ERROR',
@@ -664,8 +632,8 @@ class AIProxyService {
       provider: 'gemini',
       model,
       usage: {
-        promptTokens: usageMetadata?.promptTokenCount,
-        completionTokens: usageMetadata?.candidatesTokenCount,
+        promptTokens: geminiNativeUsage({ usageMetadata }).inputTokens,
+        completionTokens: geminiNativeUsage({ usageMetadata }).outputTokens,
         totalTokens: usageMetadata?.totalTokenCount,
       },
       result: normalizedResult,
@@ -702,10 +670,11 @@ class AIProxyService {
       if (apiKey) {
         try {
           logger.info('generateEditingRawContent: routing to qwen (Singapore)', { surface: opts.surface, model, requestId });
-          return await this.fetchQwenRawContent({ ...request, model }, requestId, apiKey, baseUrl);
+          return await this.fetchQwenRawContent({ ...request, model }, requestId, apiKey, baseUrl, userId);
         } catch (err: any) {
+          if (isAiAccountingError(normalizeAiError(err).code)) throw err;
           logger.warn('generateEditingRawContent: qwen transport failed — gemini fallback', {
-            surface: opts.surface, model, requestId, error: err?.message,
+            surface: opts.surface, model, requestId, code: normalizeAiError(err).code,
           });
         }
       } else {
@@ -718,7 +687,7 @@ class AIProxyService {
         provider, surface: opts.surface, requestId,
       });
     }
-    return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId, opts.usage ?? 'editor.content');
+    return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId, opts.usage ?? 'editor.content', true);
   }
 
   /**
@@ -727,19 +696,20 @@ class AIProxyService {
    *
    * - guardrail 통과 surface(pop/qr/blog) + admin 이 qwen 모델 선택 + QWEN_API_KEY 존재 시에만 도달.
    * - 실패는 호출부(generateEditingRawContent)가 catch → Gemini fallback.
-   * - AIUsageLog provider enum(OPENAI/GEMINI/CLAUDE)에 qwen 미포함 → 본 실험은 logger 기록만
-   *   (DB usage log qwen 지원은 enum migration 동반 후속).
+   * - Qwen provider는 기존 reservation receipt에 그대로 기록한다. legacy log enum을 위장하거나 변경하지 않는다.
    */
   private async fetchQwenRawContent(
     req: { systemPrompt: string; userPrompt: string; temperature?: number; maxTokens?: number; model: string },
     requestId: string,
     apiKey: string,
     baseUrl: string,
+    userId: string,
   ): Promise<AIRawContentResponse> {
     const { systemPrompt, userPrompt, temperature = 0.5, maxTokens = 4096, model } = req;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);
     try {
+      const data = await executeAccountedNativeAi(AppDataSource, { kind: 'text', provider: 'qwen', model, textBytes: Buffer.byteLength(systemPrompt + userPrompt, 'utf8'), maxOutputTokens: maxTokens }, { scope: 'AI_PROXY', userId }, async () => {
       const response = await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
@@ -761,12 +731,12 @@ class AIProxyService {
         throw this.createError('RATE_LIMIT_ERROR', 'Qwen rate limit exceeded', true);
       }
       if (!response.ok) {
-        let upstream = '';
-        try { upstream = (await response.text()).slice(0, 200); } catch { /* ignore */ }
-        throw this.createError('PROVIDER_ERROR', `Qwen API error (${response.status}): ${upstream}`, false);
+        throw this.createError('PROVIDER_ERROR', `Qwen API error (${response.status})`, false);
       }
 
-      const data: any = await response.json();
+      const result: any = await response.json();
+      return { value: result, usage: openAiNativeUsage(result) };
+      });
       const content: string | undefined = data?.choices?.[0]?.message?.content;
       if (!content) {
         throw this.createError('PROVIDER_ERROR', 'No response from Qwen', false);
@@ -820,6 +790,7 @@ class AIProxyService {
     userId: string,
     requestId: string,
     usage = 'editor.content',
+    canonicalFallback = false,
   ): Promise<AIRawContentResponse> {
     const startTime = Date.now();
 
@@ -827,7 +798,10 @@ class AIProxyService {
       throw this.createError('VALIDATION_ERROR', 'generateRawContent only supports gemini provider', false);
     }
 
-    request = await this.prepareManagedRequest(request, usage);
+    if (canonicalFallback) {
+      if (request.model !== EDITING_MODEL_FALLBACK) throw this.createError('VALIDATION_ERROR', 'Invalid canonical fallback model', false);
+      this.validateRequest(request);
+    } else request = await this.prepareManagedRequest(request, usage);
 
     const promptSize = (request.systemPrompt + request.userPrompt).length;
     logger.info('AI raw content request started', {
@@ -845,9 +819,10 @@ class AIProxyService {
 
     for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
       try {
-        rawResult = await this.fetchGeminiContent(request, requestId);
+        rawResult = await this.accountAttempt(request, userId, () => this.fetchGeminiContent(request, requestId), value => geminiNativeUsage(value));
         break;
       } catch (error: any) {
+        if (isAiAccountingError(normalizeAiError(error).code)) throw error;
         lastError = error;
         if (error.retryable === false) break;
         if (attempt === this.MAX_RETRIES) break;
@@ -862,7 +837,7 @@ class AIProxyService {
           retryAfter: error.retryAfter ?? null,
           errorType: error.type,
           rateLimitCooldown: error.type === 'RATE_LIMIT_ERROR' ? true : undefined,
-          error: error.message,
+          code: normalizeAiError(error).code,
         });
         await this.sleep(backoff);
       }
@@ -876,18 +851,8 @@ class AIProxyService {
         userId,
         provider: request.provider,
         model: request.model,
-        error: lastError?.message,
+        code: normalizeAiError(lastError).code,
         duration: `${duration}ms`,
-      });
-      await this.saveUsageLog({
-        userId,
-        provider: request.provider as UsageProvider,
-        model: request.model,
-        requestId,
-        durationMs: duration,
-        status: AIUsageStatus.ERROR,
-        errorMessage: lastError?.message || 'Unknown error',
-        errorType: lastError?.type || 'UNKNOWN_ERROR',
       });
       throw lastError;
     }
@@ -901,25 +866,14 @@ class AIProxyService {
       duration: `${duration}ms`,
     });
 
-    await this.saveUsageLog({
-      userId,
-      provider: request.provider as UsageProvider,
-      model: request.model,
-      requestId,
-      promptTokens: rawResult.usageMetadata?.promptTokenCount || 0,
-      completionTokens: rawResult.usageMetadata?.candidatesTokenCount || 0,
-      totalTokens: rawResult.usageMetadata?.totalTokenCount || 0,
-      durationMs: duration,
-      status: AIUsageStatus.SUCCESS,
-    });
 
     return {
       success: true,
       provider: 'gemini',
       model: rawResult.model,
       usage: {
-        promptTokens: rawResult.usageMetadata?.promptTokenCount,
-        completionTokens: rawResult.usageMetadata?.candidatesTokenCount,
+        promptTokens: geminiNativeUsage(rawResult).inputTokens,
+        completionTokens: geminiNativeUsage(rawResult).outputTokens,
         totalTokens: rawResult.usageMetadata?.totalTokenCount,
       },
       parsed: rawResult.parsed as Record<string, any>,
@@ -974,8 +928,7 @@ class AIProxyService {
       }
 
       if (!response.ok) {
-        const error = await response.json();
-        throw this.createError('PROVIDER_ERROR', error.error?.message || 'Claude API error', false);
+        throw this.createError('PROVIDER_ERROR', 'Claude API error', false);
       }
 
       const data: ClaudeResponse = await response.json();
@@ -1087,35 +1040,19 @@ class AIProxyService {
     };
   }
 
-  /**
-   * Save usage log to database
-   * Handles both success and error logs
-   */
-  private async saveUsageLog(logData: Partial<AIUsageLog>): Promise<void> {
-    try {
-      if (!AppDataSource.isInitialized) {
-        logger.warn('Database not initialized, skipping usage log save');
-        return;
-      }
-
-      const usageLogRepo = AppDataSource.getRepository(AIUsageLog);
-      const log = usageLogRepo.create(logData);
-      await usageLogRepo.save(log);
-
-      logger.debug('AI usage log saved', {
-        userId: logData.userId,
-        provider: logData.provider,
-        status: logData.status,
-        tokens: logData.totalTokens,
-      });
-    } catch (error: any) {
-      // Don't throw - usage logging failure shouldn't break AI generation
-      logger.error('Failed to save AI usage log', {
-        error: error.message,
-        userId: logData.userId,
-      });
-    }
+  /** Keep legacy provider transports/backoff; every actual attempt uses the existing ledger. */
+  private async accountAttempt<T>(request: AIGenerateRequest, userId: string, invoke: () => Promise<T>, measure: (value: T) => AiNativeUsage): Promise<T> {
+    await this.getApiKey(request.provider);
+    return executeAccountedNativeAi(AppDataSource, {
+      kind: 'text', provider: request.provider, model: request.model,
+      textBytes: Buffer.byteLength(request.systemPrompt + request.userPrompt, 'utf8'),
+      maxOutputTokens: request.maxTokens ?? (request.provider === 'gemini' ? 32000 : 8192),
+    }, { scope: 'AI_PROXY', userId }, async () => {
+      const value = await invoke();
+      return { value, usage: measure(value) };
+    });
   }
+
 }
 
 export const aiProxyService = AIProxyService.getInstance();

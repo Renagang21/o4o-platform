@@ -212,12 +212,13 @@ API: `POST /api/ai/content` (`apps/api-server/src/routes/ai-proxy.routes.ts`)
 | `AIProxyService.generateRawContent()` | JSON 구조형 AI 응답 (`/api/ai/content`용) | 동일 |
 | `AiPolicyExecutorService.execute()` | 정책 기반 실행 (retry, usage logging) | `apps/api-server/src/modules/ai-policy/` |
 | `AiContentModal` | 편집기 내 AI UX | `packages/content-editor/src/components/` |
-| `POST /api/ai/home-chat` | **Home AI canonical endpoint** (텍스트 전용) | `apps/api-server/src/routes/ai-proxy.routes.ts` |
+| `POST /api/ai/home-chat` | **Home AI canonical endpoint** (텍스트·기존 첨부 해석) | `apps/api-server/src/routes/ai-proxy.routes.ts` |
 | `buildHomeChatSystemPrompt()` 외 | Home AI 프롬프트·검증 (순수 함수) | `apps/api-server/src/services/ai-prompts/homeChat.ts` |
 | `@o4o/ai-core execute()` | Home AI 실행 (정책 executor 미경유 — §11.6) | `packages/ai-core/` |
+| `AiAccountedExecution.invoke()/invokeNative()` | 확인된 활성 텍스트·전문 transport의 호출 전 예약/정산 (개발 branch — §11.6) | `apps/api-server/src/modules/ai-policy/ai-accounted-execution.ts` |
 | `resolveWorkScopeStore()` | Home AI 의 서버측 store 재확정 | `apps/api-server/src/utils/work-scope-store-resolution.ts` |
 
-모든 LLM 호출은 `AIProxyService` 또는 `AiPolicyExecutorService`를 통해 실행됨.
+기존 `AIProxyService`·`AiPolicyExecutorService`와 직접 Core/native transport 소비처를 조사해, 확인된 활성 경로를 같은 `AiAccountedExecution`의 예약/정산에 연결했다. 이 개발 상태의 main/운영 반영·전문 가격 준비 경계는 §11.6을 따른다. 사용 여부 미확인 legacy 경로까지 연결 완료로 해석하지 않는다.
 Frontend에서 LLM API 직접 호출 없음 (WO-O4O-AI-SECURITY-APIKEY-REMEDIATION).
 
 ---
@@ -226,7 +227,7 @@ Frontend에서 LLM API 직접 호출 없음 (WO-O4O-AI-SECURITY-APIKEY-REMEDIATI
 
 ### 장점
 
-- AI 실행 인프라 완전 통합 (키 해석, retry, usage logging 공통화)
+- 확인된 활성 경로의 키 해석·시도별 예약/정산을 기존 공통 기반으로 연결
 - 편집기 기반 UX — 사용자는 편집 위치를 벗어나지 않음
 - 공통 Home 에 단일 업무 진입점 존재 (2026-09) — 서비스별 화면을 먼저 고르지 않아도 질문 가능
 - HUB와 AI 간 결합 최소화 (텍스트 브리지만 존재)
@@ -375,18 +376,20 @@ store 가 `resolved` 여도 system prompt 에는
 
 ### 11.6 비용 · 사용량 현재 상태
 
+2026-10-25 [텍스트 회계 후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-ACCOUNTING-COMPLETION-V1.md)와 이를 포함하는 [전문 호출 회계 TODO](../work-orders/TODO-O4O-AI-SPECIALIZED-RUNTIME-ACCOUNTING-V1.md)의 `wo/ai-specialized-runtime-accounting` 개발 상태를 반영한다. main/운영 적용은 아직 별도이며 실제 유료 호출·운영 한도 검증을 완료한 기록이 아니다. 전문 경로는 명시 모델 가격/profile 준비 전 provider 호출을 차단하므로 운영 설정 확인 없이 배포 가능으로 판단하지 않는다.
+
 | 항목 | 현재 |
 |---|---|
 | rate limit | 있음 — `dynamicLimiter('free')` (60초 / 10회) |
 | maxTokens | 있음 — 2048 |
 | input length 제한 | 있음 — 2000자 (`HOME_CHAT_MAX_MESSAGE_LENGTH`, `/api/ai/query` 와 동일) |
 | retry 제한 | 있음 — `maxAttempts: 1` |
-| **토큰 사용량 DB 집계** | **없음** |
+| **텍스트 토큰 사용량 DB 집계** | 기존 `executeAccountedAi` → `ai_usage_logs`·예약/정산에 연결 |
+| 호출 전 quota | 텍스트와 native 모두 `SERVICE_QUERY/neture`·인증 사용자 한도. 클라이언트 WorkScope와 청구 귀속을 혼동하지 않음 |
+| 이미지·PDF native 해석 | 기존 native transport를 `executeAccountedNativeAi` 예약/정산에 연결. 관리 목록은 connected이며 명시 모델 가격/profile이 없으면 503으로 선차단. 사용량 누락은 예산 보류 |
 | **conversation 원문 저장** | **없음** |
 
-Home AI 는 `@o4o/ai-core execute()` 를 직접 호출하며 `AiPolicyExecutorService` 를 경유하지 않는다.
-따라서 편집기·파이프라인 경로와 달리 **`ai_usage_logs` 에 기록이 남지 않는다.**
-비용/사용량 telemetry 는 향후 후속 과제로 둔다(§14).
+Home AI는 텍스트의 기존 `executeAccountedAi`를 통해 Core를 소비하고 native transport도 같은 원장을 사용하며 모델 선택·업무 권한 경로를 유지한다. 별도 scope 정책 실행기로 바꾸거나 SERVICE_QUERY 질의 중지 설정이 홈에도 적용된다고 표시하지 않는다. 한도 초과는 429, 한도 DB/가격 장애는 503으로 거부하며 자동 유료 재시도를 유도하지 않는다. 원장에는 본문 없는 사용자·모델·사용량·비용 메타데이터만 남기고, 사용량이 누락되면 무료 사용으로 확정하지 않는다. V0의 직접 호출·미집계는 이 연결 이전의 상태다.
 
 ### 11.7 Conversation 상태 (V0 계약)
 
@@ -397,7 +400,7 @@ message persistence   = 없음
 ```
 
 두 번째 질문은 이전 질문의 문맥을 **자동으로 기억하지 않는다.**
-이는 결함이 아니라 **V0 계약의 일부**다 (DB write 0 을 유지하기 위한 의도적 설계).
+이는 결함이 아니라 **대화 원문을 영속화하지 않는 V0 계약의 일부**다. 비용·사용량 메타데이터 기록은 conversation/message 저장과 구분한다.
 대화 맥락 유지가 필요해지면 별도 WO 로 다룬다.
 
 ---
