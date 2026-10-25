@@ -1,3 +1,4 @@
+import { recordOperatorRevocation } from './operator-invitation-retention.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { resolveNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
 import { resolveCanonicalServiceKey } from "@o4o/security-core";
@@ -137,7 +138,10 @@ export class ServiceOperatorManagementService {
         AND (u.name ILIKE $2 OR u.email ILIKE $2) ORDER BY u.email,u.id LIMIT 30`,
               [scope.membershipKey, pattern, scope.membershipKey === "neture"],
             );
+      const invitations=await m.query(`SELECT id,invited_email,role,status,expires_at FROM service_operator_invitations
+        WHERE scope_type='service' AND scope_key=$1 AND status='pending' AND expires_at>now() ORDER BY created_at DESC LIMIT 200`,[scope.key]);
       return {
+        invitations,
         scope: scope.key,
         role: scope.operatorRole,
         operators: operators.slice(0, 200),
@@ -146,53 +150,29 @@ export class ServiceOperatorManagementService {
       };
     });
   }
-  async change(actor: string, key: string, userId: string, assign: boolean) {
-    const scope = delegationScope(key);
-    if (!uuid.test(userId))
-      throw new OperationError(
-        400,
-        "INVALID_USER_ID",
-        "대상 사용자를 선택해 주세요.",
-      );
-    userId = userId.toLowerCase();
-    const result = await this.db.transaction(async (m) => {
-      await this.authorize(m, actor, scope);
-      if (actor === userId)
-        throw new OperationError(
-          409,
-          "SELF_OPERATOR_CHANGE_FORBIDDEN",
-          "자기 역할은 다른 Admin에게 요청하세요.",
-        );
-      // Same lock as every canonical operator writer; includes preflight and audit ownership.
-      await lockOperatorAssignments(m, userId);
-      await demoAccountService.assertNotDemoAccount(userId, m);
-      let changed = false;
-      if (assign) {
+  async validateInvitationGrant(m: EntityManager, actor: string, key: string, target?: string) {
+    const scope=delegationScope(key);
+    await this.authorize(m,actor,scope);
+    if (!target) return;
+    if (actor===target) throw new OperationError(409,'SELF_OPERATOR_CHANGE_FORBIDDEN','자기 역할은 다른 Admin에게 요청하세요.');
+    await lockOperatorAssignments(m,target);
+    await demoAccountService.assertNotDemoAccount(target,m);
+
         const targets = await m.query(
           `SELECT u.id FROM users u WHERE u.id=$1 AND u.status IN ('active','approved')
           AND u."isActive"=true AND u."isEmailVerified"=true FOR SHARE OF u`,
-          [userId],
+          [target],
         );
-        if (!targets.length || !(await this.membershipActive(m, userId, scope)))
+        if (!targets.length || !(await this.membershipActive(m, target, scope)))
           throw new OperationError(
             409,
             "ACTIVE_SERVICE_MEMBER_REQUIRED",
             "승인된 활성 서비스 회원만 지정할 수 있습니다.",
           );
-        const google = await m.query(
-          `SELECT id FROM linked_accounts WHERE "userId"=$1 AND provider='google' FOR SHARE`,
-          [userId],
-        );
-        if (!google.length)
-          throw new OperationError(
-            409,
-            "GOOGLE_LINK_REQUIRED",
-            "본인의 Google 계정 연결 후 지정할 수 있습니다.",
-          );
         const [prior] = await m.query(
           `SELECT is_active,valid_from,valid_until FROM role_assignments
           WHERE user_id=$1 AND role=$2 ORDER BY is_active DESC,assigned_at DESC,id DESC LIMIT 1 FOR UPDATE`,
-          [userId, scope.operatorRole],
+          [target, scope.operatorRole],
         );
         if (
           prior &&
@@ -207,27 +187,42 @@ export class ServiceOperatorManagementService {
             "유효기간이 설정된 역할입니다. 전체 관리자에게 기간 검토를 요청하세요.",
           );
         }
-        if (!prior?.is_active) {
-          await roleAssignmentService.assignRole(
-            {
-              userId,
-              role: scope.operatorRole,
-              assignedBy: actor,
-              ...(prior?.valid_until
-                ? { validUntil: new Date(prior.valid_until) }
-                : {}),
-            },
-            m,
-          );
-          changed = true;
-        }
-      } else {
+    if (prior?.is_active) throw new OperationError(409,'OPERATOR_ALREADY_ACTIVE','이미 활성 운영자입니다.');
+  }
+  async change(actor: string, key: string, userId: string, assign: boolean) {
+    const scope = delegationScope(key);
+    if (!uuid.test(userId))
+      throw new OperationError(
+        400,
+        "INVALID_USER_ID",
+        "대상 사용자를 선택해 주세요.",
+      );
+    userId = userId.toLowerCase();
+    if (assign) {
+      const { ServiceOperatorInvitationService }=await import('./service-operator-invitation.service.js');
+      const invitation=await new ServiceOperatorInvitationService(this.db).create({actorId:actor,targetUserId:userId,
+        serviceKey:scope.membershipKey,role:scope.operatorRole,scopeType:'service',scopeKey:key});
+      return {userId,scope:key,role:scope.operatorRole,assigned:false,changed:false,invited:true,invitationId:invitation.id};
+    }
+    const result = await this.db.transaction(async (m) => {
+      await this.authorize(m, actor, scope);
+      if (actor === userId)
+        throw new OperationError(
+          409,
+          "SELF_OPERATOR_CHANGE_FORBIDDEN",
+          "자기 역할은 다른 Admin에게 요청하세요.",
+        );
+      // Same lock as every canonical operator writer; includes preflight and audit ownership.
+      await lockOperatorAssignments(m, userId);
+      await demoAccountService.assertNotDemoAccount(userId, m);
+      let changed = false;
+
         changed = await roleAssignmentService.removeRole(
           userId,
           scope.operatorRole,
           m,
         );
-      }
+      if (changed) await recordOperatorRevocation(m,actor,userId,scope.membershipKey,scope.operatorRole,'service',key);
       if (changed)
         await recordOperation(
           m,

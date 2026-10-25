@@ -7,15 +7,13 @@ import BusinessOperatorAssignments from './BusinessOperatorAssignments';
  * WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1 (canonical DataTable + ActionBar
  *   + BulkResultModal + BaseDetailDrawer, RowActionMenu Edit + Revoke)
  * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §1·§15·§17
- *   운영자 onboarding 이 Google Identity 기준으로 바뀌었다. **관리자는 더 이상 타인의
+ *   운영자 onboarding은 이메일 초대·확인 수락을 사용한다. **관리자는 더 이상 타인의
  *   비밀번호를 만들거나 재설정하지 않는다.** 이 화면에서 사라진 것:
  *     - 등록 폼의 비밀번호 입력 · 초기 서비스 비밀번호 · 비밀번호 정책 검증
  *     - 행 액션 "서비스 비밀번호 변경" 모달
  *     - `POST /admin/users` 를 통한 신규 계정 생성
- *   대신 한 경로만 남는다:
- *     기존 Google 사용자 검색·선택 → `POST /admin/operator-assignments` (userId 로 지정)
- *
- * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 초대 경로(B)는 은퇴했다. 미가입자는 먼저 Google 로 O4O 에 가입한 뒤 지정 대상이 된다.
+ *   운영자 지정은 기존 사용자 선택 또는 미가입 이메일 초대 → 메일 확인·수락을 거친다.
+ *   기존 지정자는 권한을 유지하며 같은 화면에서 확인 메일을 받는다.
  *
  * 구조:
  * - 목록: 운영 권한(assignment row) 단일
@@ -39,6 +37,7 @@ import type { ActionBarAction } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import PageHeader from '@/components/common/PageHeader';
+import OperatorInvitationsPanel, { type Invite } from './OperatorInvitationsPanel';
 import {
   flattenUsersToAssignments,
   type AdminUserDto,
@@ -107,12 +106,11 @@ function BusinessLedgerCell({ serviceKey, ledger }: { serviceKey: string; ledger
 
 
 /**
- * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 경로는 **지정 하나**다.
- *   이미 O4O 에 있고 Google 이 연결된 사용자에게 권한을 준다(즉시 반영).
- *   미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다 — 이메일 초대 흐름은 은퇴했다.
+ * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 신규 권한은 초대와 본인 수락 뒤 활성화한다.
+ *   기존 계정은 ID로 선택하고 미가입자는 이메일로 초대한다.
  */
 
-/** 지정 후보 — 서버가 Google 연결 여부까지 함께 준다(연결 없으면 지정 대상이 아니다). */
+/** 초대 후보 — Google 연결 여부는 참고 정보이며 서비스 운영자 초대를 제한하지 않는다. */
 interface OperatorCandidate {
   userId: string;
   email: string;
@@ -164,6 +162,9 @@ export default function OperatorsPage() {
   const [selectedCandidate, setSelectedCandidate] = useState<OperatorCandidate | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [invitations, setInvitations] = useState<Invite[] | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [invitationVersion, setInvitationVersion] = useState(0);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
   // 사업 원장(semi_franchises) — 계정 상태와 별개. 실패는 '미등록'과 구분해 보여준다.
@@ -282,6 +283,7 @@ export default function OperatorsPage() {
     setCandidateQuery('');
     setCandidates([]);
     setSelectedCandidate(null);
+    setInviteEmail('');
     setFormErrors({});
     setShowModal(true);
   };
@@ -314,6 +316,7 @@ export default function OperatorsPage() {
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
     setSelectedCandidate(null);
+    setInviteEmail('');
     setCandidates([]);
     setCandidateQuery('');
     setFormErrors({});
@@ -369,9 +372,8 @@ export default function OperatorsPage() {
     if (!targetServiceKey) errors.targetService = '대상 서비스를 선택하세요.';
     else if (!targetRole) errors.roles = '역할을 선택하세요.';
 
-    if (!selectedCandidate) errors.candidate = '대상 사용자를 검색해서 선택하세요.';
-    else if (!selectedCandidate.hasGoogleLink) {
-      errors.candidate = 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 연결을 마친 뒤 지정할 수 있습니다.';
+    if (!selectedCandidate && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim())) {
+      errors.candidate = '기존 사용자를 선택하거나 미가입자의 초대 이메일을 입력하세요.';
     }
 
     setFormErrors(errors);
@@ -389,7 +391,7 @@ export default function OperatorsPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           name: `${formData.lastName} ${formData.firstName}`.trim(),
-          roles: formData.roles,
+
         });
         toast.success('운영자 정보가 수정되었습니다.');
         closeModal();
@@ -407,32 +409,15 @@ export default function OperatorsPage() {
       const canonicalServiceKey = resolveCanonicalServiceKey(targetRole.split(':')[0]);
       const serviceLabel = SERVICES[targetServiceKey as keyof typeof SERVICES]?.label ?? targetServiceKey;
 
-      {
-        // 직접 지정 — 대상은 언제나 userId 다.
-        const res = await authClient.api.post('/admin/operator-assignments', {
-          userId: selectedCandidate!.userId,
-          serviceKey: canonicalServiceKey,
-          role: targetRole,
-        });
-        const membershipPolicy = res?.data?.data?.membershipPolicy;
-        const statuses: Record<string, string> = res?.data?.data?.membershipStatuses ?? {};
-        const status = membershipPolicy === 'CREATED' ? 'active' : statuses[canonicalServiceKey];
-        const nextStep = status === 'active'
-          ? '서비스 가입은 활성 상태입니다. 대상자에게 재로그인한 뒤 해당 서비스 운영 화면에 접근되는지 확인하도록 안내하세요.'
-          : status === 'pending'
-            ? '서비스 가입은 승인 대기 상태로 유지됩니다. 해당 서비스 회원관리에서 가입 승인 후 운영 화면 접근을 확인하세요.'
-            : status === 'suspended'
-              ? '서비스 가입은 정지 상태로 유지됩니다. 정지 사유를 확인하고 해당 서비스 회원관리에서 복구 여부를 처리해야 운영할 수 있습니다.'
-              : status === 'rejected'
-                ? '서비스 가입은 반려 상태로 유지됩니다. 반려 사유를 확인하고 해당 서비스의 재신청·승인 절차를 처리해야 운영할 수 있습니다.'
-                : status === 'withdrawn'
-                  ? '서비스 가입은 탈퇴 상태로 유지됩니다. 전체 관리자 또는 해당 서비스 관리자(admin)가 회원 복구 여부를 처리해야 운영할 수 있습니다.'
-                  : '서비스 가입 상태를 확인하지 못했습니다. 해당 서비스 회원관리에서 가입 상태를 확인한 뒤 대상자의 운영 화면 접근을 확인하세요.';
-        setAssignmentNotice(`${serviceLabel} 운영 권한을 부여했습니다. ${nextStep}`);
-        toast.success('운영 권한을 부여했습니다. 화면의 가입 상태·후속 처리 안내를 확인하세요.');
-        closeModal();
-        fetchUsers();
-      }
+      await authClient.api.post('/admin/service-operator-invitations', {
+        ...(selectedCandidate ? { targetUserId: selectedCandidate.userId } : { email: inviteEmail.trim() }),
+        serviceKey: canonicalServiceKey, role: targetRole,
+      });
+      setAssignmentNotice(`${serviceLabel} 운영자 확인 메일을 보냈습니다. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
+      toast.success('운영자 확인 메일을 보냈습니다.');
+      setInvitationVersion(v => v + 1);
+      closeModal();
+      fetchUsers();
     } catch (err: any) {
       const code = err?.response?.data?.code;
       const msg = err?.response?.data?.error || err?.response?.data?.message || '저장에 실패했습니다.';
@@ -514,6 +499,15 @@ export default function OperatorsPage() {
 
   const columns: ListColumnDef<AssignmentRow>[] = [
     {
+      key: 'emailConfirmation', header: '이메일 확인', width: '130px',
+      render: (_, row) => {
+        if (!CATALOG_ROLE_VALUES.has(row.role)) return <span>대상 아님</span>;
+        if (!invitations) return <span>확인 상태 미조회</span>;
+        const invite = invitations.find(i => (i.target_user_id === row.userId || i.accepted_user_id === row.userId) && i.role === row.role);
+        return <span>{!invite ? '기존 권한 유지' : invite.status === 'accepted' ? '확인 완료' : invite.status === 'cancelled' ? '확인 취소' : invite.expired ? '확인 만료' : '확인 대기'}</span>;
+      },
+    },
+    {
       key: 'service',
       header: 'Service',
       width: '130px',
@@ -593,7 +587,7 @@ export default function OperatorsPage() {
           actions={[
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
             // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17:
-            //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 Google 로 로그인하며
+            //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 본인 계정으로 로그인하며
             //   관리자가 타인의 비밀번호를 만들거나 재설정하는 경로는 존재하지 않는다.
             { key: 'revoke', label: `권한 해제 (${row.roleMeta.label})`, variant: 'danger', onClick: () => handleRevokeRole(row) },
           ]}
@@ -634,7 +628,7 @@ export default function OperatorsPage() {
         <StatCard label="Operator Roles" value={stats.operators} color="text-blue-600" Icon={Shield} />
       </div>
 
-      {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 대기 탭 은퇴 — 이 화면은 운영 권한(role_assignments) 하나만 보여준다. */}
+      {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
       <>
       {/* FilterBar */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
@@ -731,6 +725,8 @@ export default function OperatorsPage() {
 
       </>
 
+
+      <OperatorInvitationsPanel version={invitationVersion} onLoaded={setInvitations} />
 
       {/* Bulk 결과 모달 */}
       <BulkResultModal
@@ -832,8 +828,8 @@ export default function OperatorsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 유형 선택 은퇴 — 경로는 "기존 사용자 지정" 하나다.
-                  미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다. */}
+              {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 기존 사용자 선택과 미가입 이메일 초대를 구분한다.
+                  미가입자는 이메일 초대 후 본인이 가입·수락한다. */}
 
               {/* 대상 —
                   WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §1·§5·§7
@@ -851,6 +847,11 @@ export default function OperatorsPage() {
                 </div>
               ) : (
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">미가입자 초대 이메일</label>
+                  <input type="email" aria-label="미가입자 초대 이메일" value={inviteEmail}
+                    onChange={e => { setInviteEmail(e.target.value); setSelectedCandidate(null); }}
+                    className="w-full rounded border p-2 mb-3" placeholder="operator@example.com" />
+                  <p className="text-xs text-gray-500 mb-2">가입자는 아래에서 선택하세요. 이메일로 기존 계정을 자동 연결하지 않습니다.</p>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     대상 사용자 <span className="text-red-500">*</span>
                   </label>
@@ -895,14 +896,14 @@ export default function OperatorsPage() {
                           key={c.userId}
                           className={`flex items-start gap-2 p-2 text-sm cursor-pointer ${
                             selectedCandidate?.userId === c.userId ? 'bg-blue-50' : 'hover:bg-gray-50'
-                          } ${c.hasGoogleLink ? '' : 'opacity-70'}`}
+                          } `}
                         >
                           <input
                             type="radio"
                             name="candidate"
                             className="mt-1 text-blue-600"
                             checked={selectedCandidate?.userId === c.userId}
-                            disabled={!c.hasGoogleLink}
+
                             onChange={() => {
                               setSelectedCandidate(c);
                               setFormErrors((prev) => ({ ...prev, candidate: '' }));
@@ -914,7 +915,7 @@ export default function OperatorsPage() {
                             {/* 연결 없는 사용자를 목록에서 숨기지 않는다 — 왜 지정할 수 없는지 보이게 한다. */}
                             {!c.hasGoogleLink && (
                               <div className="mt-0.5 text-xs text-amber-700">
-                                Google 계정 미연결 — 본인이 연결을 마쳐야 지정할 수 있습니다.
+                                Google 계정 미연결 — 이메일 계정으로도 확인·수락할 수 있습니다.
                               </div>
                             )}
                           </div>
@@ -931,7 +932,7 @@ export default function OperatorsPage() {
                   )}
                   <p className="mt-1 text-xs text-slate-500">
                     검색 결과가 없으면 이름·이메일과 검색어를 먼저 확인하세요. 공통 계정이 없다면 본인이 가입하고,
-                    기존 계정에 Google이 연결되지 않았다면 본인이 계정 설정에서 연결한 뒤 지정하세요.
+                    이메일 계정도 본인 인증과 초대 수락을 완료하면 서비스 운영 권한을 받을 수 있습니다.
                     해당 서비스의 사전 가입은 지정의 필수 조건이 아닙니다.
                   </p>
                 </div>
@@ -1077,7 +1078,7 @@ export default function OperatorsPage() {
               ) : (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Roles <span className="text-red-500">*</span>
+                  보유 권한 (조회 전용 — 추가는 초대, 해제는 행 메뉴)
                 </label>
                 {formErrors.roles && (
                   <p className="mb-2 text-sm text-red-500 flex items-center gap-1">
@@ -1123,6 +1124,7 @@ export default function OperatorsPage() {
                                 <input
                                   type="checkbox"
                                   checked={selected}
+                                  disabled
                                   onChange={() => toggleRole(role.value)}
                                   className="mt-0.5 rounded border-gray-300 text-blue-600"
                                 />
@@ -1160,7 +1162,7 @@ export default function OperatorsPage() {
                     || (!editingUserId
                         && (!targetServiceKey
                             || !targetRole
-                            || !selectedCandidate?.hasGoogleLink))
+                            || (!selectedCandidate && !inviteEmail.trim())))
                   }
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                 >
@@ -1172,7 +1174,7 @@ export default function OperatorsPage() {
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      {editingUserId ? '운영자 수정' : '권한 부여'}
+                      {editingUserId ? '운영자 수정' : '확인 메일 보내기'}
                     </>
                   )}
                 </button>

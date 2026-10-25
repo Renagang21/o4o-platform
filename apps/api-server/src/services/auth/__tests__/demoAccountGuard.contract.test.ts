@@ -135,12 +135,13 @@ describe('Demo 계정 보호 계약', () => {
     ['controllers/admin/AdminUserController.ts', /isDemoAccount\(user\.id\)/, /applyAdminRoleEdit\(user\.id/],
     ['controllers/UserManagementController.ts', /isDemoAccount\(/, /applyAdminRoleEdit\(/],
     ['routes/admin/platform-accounts.routes.ts', /isDemoAccount\(/, /assignRole\(/],
-    ['services/admin/operator-assignment.service.ts', /assertNotDemoAccount\(/, /assignRole\(/],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.target\(\s*m,\s*input\.targetUserId,\s*scope\s*\)/, /INSERT INTO service_operator_invitations/, 'async prepare('],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.prove\(m, i, userId\)/, /activateInvitation\(/, 'async accept('],
     ['modules/auth/controllers/auth-account.controller.ts', /assertNotDemoAccount\(/, /UPDATE role_assignments/],
     ['modules/lms/controllers/InstructorController.ts', /isDemoAccount\(/, /repo\.save\(/, 'async approveApplication('],
     ['modules/neture/services/operator-registration.service.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
     ['services/kpa-branch/branch-lifecycle.service.ts', /isDemoAccount\(request\.requester_user_id/, /UPDATE branch_creation_requests\s+SET status = 'slug_conflict'/],
-    ['services/kpa-branch/branch-operator-designation.service.ts', /rejectDemoAccount\(userId\)/, /roleAssignmentService\.assignRole\(/],
+    ['services/kpa-branch/branch-operator-designation.service.ts', /rejectDemoAccount\(userId\)/, /roleAssignmentService\.removeRole\(/, 'async release('],
     // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
     // routes/kpa/controllers/member.controller.ts 는 WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 4-a 에서 /kpa/members 와 함께 제거(소비처 0).
     // role · membership · ownership 해제/변경
@@ -152,6 +153,27 @@ describe('Demo 계정 보호 계약', () => {
     ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
     ['controllers/operator/MembershipConsoleController.ts', /rejectDemoAccountTarget\(|isDemoAccount\(/, /UPDATE service_memberships/],
   ];
+
+  it('retired direct operator assignment performs no role or identity writes', () => {
+    const source = read('services/admin/operator-assignment.service.ts');
+    const assignment = source.slice(source.indexOf('async assign('));
+    expect(assignment).toContain("throw new OperatorAssignmentError('OPERATOR_INVITATION_REQUIRED')");
+    expect(assignment).not.toMatch(/assignRole\(|\.save\(|\.query\(|\.transaction\(/);
+    const target = read('services/admin/service-operator-invitation.service.ts');
+    expect(target).toContain('await demoAccountService.assertNotDemoAccount(id, m)');
+  });
+
+  it('consent delegates preserve the Demo target check instead of granting directly', () => {
+    const source=read('services/admin/service-operator-invitation.service.ts');
+    const proof=source.slice(source.indexOf('private async prove('),source.indexOf('async inspect('));
+    expect(proof).toMatch(/await this\.target\(m, userId, this\.scope\(invite\)\)/);
+    const branch=read('services/kpa-branch/branch-operator-designation.service.ts');
+    const designation=branch.slice(branch.indexOf('async designate('),branch.indexOf('async release('));
+    expect(designation).toContain('ServiceOperatorInvitationService');expect(designation).toContain('.create(');
+    expect(designation).not.toMatch(/roleAssignmentService\.assignRole\(/);
+    const eligibility=branch.slice(branch.indexOf('async validateInvitationGrant('),branch.indexOf('async designate('));
+    expect(eligibility).toContain('await this.rejectDemoAccount(target)');
+  });
 
   it('D5 이메일 · role · ownership write 경로에 판정이 write 보다 앞에 있다', () => {
     const problems: string[] = [];

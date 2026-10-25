@@ -1,3 +1,5 @@
+import { invitationFailure } from '../services/admin/operator-invitation-error.js';
+import { ServiceOperatorInvitationError } from '../services/admin/service-operator-invitation.service.js';
 import { Router, type RequestHandler } from "express";
 import type { DataSource } from "typeorm";
 import { ServiceOperatorManagementService } from "../services/admin/service-operator-management.service.js";
@@ -47,6 +49,7 @@ export function createServiceOperatorManagementRoutes(
               );
         res.json({ success: true, data });
       } catch (error) {
+        if (error instanceof ServiceOperatorInvitationError) { invitationFailure(res,error); return; }
         if (error instanceof OperationError)
           res
             .status(error.status)

@@ -1,3 +1,5 @@
+import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
+import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import { Router, type Request } from "express";
 import type { DataSource } from "typeorm";
@@ -40,6 +42,7 @@ export function cooperativeManagementRoutes(db: DataSource) {
       try {
         res.json({ success: true, data: await fn(req) });
       } catch (error) {
+        if (error instanceof ServiceOperatorInvitationError) { invitationFailure(res,error); return; }
         if (error instanceof NeturePharmacyError || error instanceof PolicyAcceptanceError)
           res
             .status(error.httpStatus)

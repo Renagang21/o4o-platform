@@ -204,7 +204,7 @@ export class MailTransportService {
    * Send email via transporter with timeout
    * Returns nodemailer send info on success
    */
-  async send(mailOptions: Mail.Options): Promise<any> {
+  async send(mailOptions: Mail.Options, ephemeral = false): Promise<any> {
     const sendPromise = this._transporter!.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Email send timeout')), 30000)
@@ -213,6 +213,7 @@ export class MailTransportService {
     const info = await Promise.race([sendPromise, timeoutPromise]);
 
     // Log in development mode
+    if (ephemeral) { return info; }
     if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
       this.logger.info('Development email sent:', {
         to: mailOptions.to,

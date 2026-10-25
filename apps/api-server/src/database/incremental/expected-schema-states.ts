@@ -322,8 +322,10 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateExternalAiConnections1792635132325', fingerprint: '4a3cdac0e841e2e089f9c48ae34ee7a78c3c3b97182a4222ffe782959b4af8f3', fingerprintLineCount: 6838 },
   // Isolated PostgreSQL 15: all prior prefixes and empty down/up verified.
   { appliedThrough: 'CreateStoreConsultationStations1792815861315', fingerprint: 'd9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb', fingerprintLineCount: 6869 },
+  // Isolated PostgreSQL 15: preserve all main prefixes, append operator invitation consent/privacy schema.
+  { appliedThrough: 'CreateServiceOperatorInvitations1792886400000', fingerprint: 'b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea', fingerprintLineCount: 6901 },
   // Isolated PostgreSQL 15: prior prefixes, empty down/up, and workflow integration verified.
-  { appliedThrough: 'CreateCooperationMemberWorkflows1792886400000', fingerprint: '408c3a1d78a15ec917c0f8ed56d4595a189d029827abd061252d882f51cc7a8d', fingerprintLineCount: 6987 },
+  { appliedThrough: 'CreateCooperationMemberWorkflows1792886400001', fingerprint: '8d4bf317abee4d69567d0c6ad9c2f26c5b806ecb5f415b8eb46dbb9d4b41ea11', fingerprintLineCount: 7019 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

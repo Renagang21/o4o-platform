@@ -26,9 +26,9 @@
 
 - PostgreSQL 15 전용 Docker container를 새로 만들고 loopback에만 바인딩했다. production proxy·Cloud SQL·운영 자격정보는 사용하지 않았다.
 - canonical baseline과 기존 incremental prefix 전체가 해당 expected fingerprint와 일치함을 확인했다.
-- 신규 migration 적용 결과: `408c3a1d78a15ec917c0f8ed56d4595a189d029827abd061252d882f51cc7a8d`, 6,987 lines.
-- 빈 상태 down 결과는 직전 schema `d9efd020a690bca6564c919b57bb52c54e01043da657e2b2cd179a76294209fb`, 6,869 lines로 복원됐다. 재적용은 같은 신규 fingerprint를 반환했다.
-- 실제 배포용으로 빌드한 `dist/migrate.js`를 별도의 새 로컬 DB에 실행했다. bootstrap·39개 incremental·post-migration assertion PASS. 재실행도 schema assertion PASS이며 중복 migration은 없었다.
+- 신규 migration 적용 결과: `8d4bf317abee4d69567d0c6ad9c2f26c5b806ecb5f415b8eb46dbb9d4b41ea11`, 7,019 lines.
+- 빈 상태 down 결과는 직전 schema `b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea`, 6,901 lines로 복원됐다. 재적용은 같은 신규 fingerprint를 반환했다.
+- 실제 배포용으로 빌드한 `dist/migrate.js`를 별도의 새 로컬 DB에 실행했다. bootstrap·40개 incremental·post-migration assertion PASS. 재실행도 schema assertion PASS이며 중복 migration은 없었다.
 - 기존 account-erasure writer fence를 새 테이블 5개 모두에 적용했다. 공유 업무·개인 식별정보의 제거/보존 분류를 자동 승인하거나 새 법정 보존기간을 만들지 않는다. 기존 수동 검토·fail-closed 원칙을 유지한다.
 - API 통합 fixture는 `afterAll`에서 자기 scope·계정·조직·문의·알림·감사/버전 기록을 삭제하고 해당 계정 잔존 0건을 검사한다. 별도 기존 회귀 suite의 schema도 자체 종료 절차로 제거한다. 전용 container/volume은 최종 검증 후 종료·제거한다.
 
@@ -42,7 +42,7 @@
 4. 운영자가 자료 분류·교육 링크를 저장 → 회원에게 새 개정 번호와 HTTPS 교육 진입 표시.
 5. 두 역할의 화면에서 페이지 오류·가로 넘침 0건 확인. 계정/가입 권한은 별도 실제 SQL 통합 검증과 조합했다.
 
-초기 브라우저 harness의 상대 locator와 select의 exact-label 지정 때문에 대기가 만료됐고 locator를 수정했다. 합성 HTTP 도메인에서는 `crypto.randomUUID`가 secure-context API이므로 해당 loopback preview 호스트만 secure-origin으로 취급하도록 Chromium test flag를 적용했다. production HTTPS·인증을 우회하거나 제품의 인증/암호 설정을 바꾸지 않았다.
+초기 브라우저 harness의 상대 locator와 select의 exact-label 지정 및 sticky header 아래 자동 스크롤 때문에 대기가 만료됐고 locator를 수정했다. 합성 HTTP 도메인에서는 `crypto.randomUUID`가 secure-context API이므로 해당 loopback preview 호스트만 secure-origin으로 취급하도록 Chromium test flag를 적용했다. production HTTPS·인증을 우회하거나 제품의 인증/암호 설정을 바꾸지 않았다.
 
 스크립트·결과 JSON·캡처는 클라우드 로컬 `.onboarding/cooperation-v2-*`에 둔다. 합성 API 브라우저 결과를 실계정·운영 API·실기기 검증으로 표현하지 않는다.
 

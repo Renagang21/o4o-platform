@@ -24,6 +24,9 @@ const db: {
   rawSql: string[];
 } = { orgs: [], requests: [], branchMemberships: [], serviceMemberships: [], assignedRoles: [], rawSql: [] };
 
+const mockPrepareInvitation=jest.fn(async (_m:any,input:any)=>({invite:{id:'pending-invitation',...input},url:'https://neture.co.kr/operator-invite#token=synthetic'}));
+const mockDeliverInvitation=jest.fn(async(p:any)=>p.invite);
+jest.mock('../../admin/service-operator-invitation.service.js',()=>({ServiceOperatorInvitationService:class {prepare=mockPrepareInvitation;deliver=mockDeliverInvitation;}}));
 let seq = 0;
 const uid = () => `id-${++seq}`;
 
@@ -124,6 +127,7 @@ const REQUESTER = 'u-requester';
 const REVIEWER = 'u-branch-admin';
 
 beforeEach(() => {
+  mockPrepareInvitation.mockClear();mockDeliverInvitation.mockClear();
   db.orgs = [];
   db.requests = [];
   db.branchMemberships = [];
@@ -283,15 +287,12 @@ describe('개설 승인 — 검사 2회차 + 첫 운영자 3축', () => {
     });
   });
 
-  it('신청자에게 **운영자 역할**이 생긴다 (운영자인가)', async () => {
-    const r = await ask();
-    await service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER });
-
-    expect(db.assignedRoles).toEqual([
-      { userId: REQUESTER, role: KPA_BRANCH_OPERATOR_ROLE, assignedBy: REVIEWER, viaService: true },
-    ]);
+  it('approves branch membership but waits for the first operator to accept an invitation',async()=>{
+    const r=await ask();await service.approveCreation({requestId:r.id,reviewerUserId:REVIEWER});
+    expect(db.assignedRoles).toEqual([]);
+    expect(mockPrepareInvitation).toHaveBeenCalledWith(manager,expect.objectContaining({actorId:REVIEWER,targetUserId:REQUESTER,scopeType:'branch',scopeKey:db.orgs[0].id,role:KPA_BRANCH_OPERATOR_ROLE}));
+    expect(mockDeliverInvitation).toHaveBeenCalledTimes(1);
   });
-
   it('역할은 canonical 경로로만 준다 — role_assignments 직접 SQL 은 0건', async () => {
     const r = await ask();
     await service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER });

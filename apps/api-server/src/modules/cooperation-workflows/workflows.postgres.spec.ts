@@ -40,7 +40,7 @@ import { CooperationSupportService } from "./support.service.js";
 import { resolveInboxScope } from "../contact-inquiry/inbox-scope.js";
 import { SemiFranchiseContentService } from "../neture-pharmacy/services/semi-franchise-content.service.js";
 import { requireMember } from "./access.js";
-import { CreateCooperationMemberWorkflows1792886400000 } from "../../database/migrations/1792886400000-CreateCooperationMemberWorkflows.js";
+import { CreateCooperationMemberWorkflows1792886400001 } from "../../database/migrations/1792886400001-CreateCooperationMemberWorkflows.js";
 const enabled = process.env.COOPERATION_WORKFLOW_PG_PORT;
 const suite = enabled ? describe : describe.skip;
 suite("isolated PostgreSQL cooperation member/operator workflows", () => {
@@ -594,7 +594,7 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
   it("retains workflow evidence on rollback and registers the existing account-erasure write fence on every new table", async () => {
     const runner = mockDb.createQueryRunner();
     await expect(
-      new CreateCooperationMemberWorkflows1792886400000().down(runner),
+      new CreateCooperationMemberWorkflows1792886400001().down(runner),
     ).rejects.toThrow("must be retained");
     await runner.release();
     const rows = await mockDb.query(

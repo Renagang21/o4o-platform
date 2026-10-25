@@ -16,7 +16,7 @@
  * 메일 링크의 1회용 토큰은 URL fragment(`#token=`)로 받고, 읽은 즉시 주소창에서 지운다
  * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
  */
-import { useLayoutEffect, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
@@ -31,6 +31,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
+import { operatorInvitationReturnPath, recoverOperatorInvitationContinuation } from '../../lib/operatorInvitationReturn';
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -55,7 +56,7 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle?: str
 function useAuthLinks(): EmailAuthLinks {
   const navigate = useNavigate();
   return {
-    login: '/login',
+    login: operatorInvitationReturnPath() === '/operator-invite' ? '/login?returnTo=%2Foperator-invite' : '/login',
     signup: '/signup',
     findId: '/find-id',
     forgotPassword: '/forgot-password',
@@ -94,7 +95,7 @@ export function SignupPage() {
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
   if (isLoading) return null;
-  if (isAuthenticated) return <Navigate to="/" replace />;
+  if (isAuthenticated) return <Navigate to={operatorInvitationReturnPath()} replace />;
   return (
     <AuthCard title="회원가입" subtitle="이메일로 가입하거나 Google 계정으로 계속합니다">
       <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
@@ -108,14 +109,14 @@ export function SignupPage() {
       {/* 미등록 Google 계정은 이 버튼에서 약관 동의 → 계정 생성까지 간다(로그인 모달과 같은 계약). */}
       <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
         returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
-        onSuccess={() => { navigate('/', { replace: true }); }} />
+        onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
       <GoogleContinue<User>
         getSignupTerms={() => authClient.getSignupTerms()}
                   getConfig={getGoogleAuthConfig}
         loginWithGoogle={loginWithGoogle}
         signupWithGoogle={signupWithGoogle}
         onStart={() => setGoogleError(null)}
-        onSuccess={() => { setGoogleError(null); navigate('/', { replace: true }); }}
+        onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath(), { replace: true }); }}
         onError={({ message }) => setGoogleError(message)}
         termsHref="/terms"
         privacyHref="/privacy"
@@ -128,11 +129,19 @@ export function SignupPage() {
 }
 
 export function VerifyEmailPage() {
+  const [, refreshContinuation] = useState(0);
+  const verificationApi = useMemo(() => ({
+    verifyEmail: async (token: string) => {
+      const result = await authClient.verifyEmail(token);
+      if (await recoverOperatorInvitationContinuation()) refreshContinuation(value => value + 1);
+      return result;
+    },
+  }), []);
   const token = useOneTimeToken();
   const links = useAuthLinks();
   return (
     <AuthCard title="이메일 확인">
-      <VerifyEmailView api={authClient} token={token} links={links} />
+      <VerifyEmailView api={verificationApi} token={token} links={links} />
     </AuthCard>
   );
 }

@@ -2,8 +2,8 @@
  * 운영자 지정 · 초대 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §5·§7·§15·§20
  *
  * 관리자(platform:super_admin)가 쓰는 두 경로:
- *   (A) 직접 지정  — 이미 Google 로 로그인하는 O4O 사용자를 **userId 로** 골라 역할 부여
- *   (B) 초대       — 미가입자에게 이메일로 초대를 보내고, 수락 시점에 Identity 가 확정된다
+ *   (A) 기존 사용자 선택 — **userId 로** 고른 대상에게 확인 초대 메일 발송
+ *   (B) 미가입자 초대 — 가입·로그인과 메일 수락 후 지정 확정 (전용 초대 라우트)
  *
  * 이 컨트롤러는 비밀번호를 만들지도 받지도 않는다.
  * 감사 로그에는 raw invite token · Google ID token · Google sub 를 넣지 않는다(§20).
@@ -18,6 +18,7 @@ import {
 } from '../../services/admin/operator-assignment.service.js';
 import { OperatorRoleContractError, ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import logger from '../../utils/logger.js';
+import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
 import { DemoAccountForbiddenError } from '../../services/auth/demo-account.service.js';
 
 let actionLogService: ActionLogService | undefined;
@@ -37,14 +38,15 @@ function audit(serviceKey: string, userId: string | null, actionKey: string, met
 
 function fail(res: Response, error: unknown, context: string): void {
   if (
-    error instanceof OperatorAssignmentError
+    error instanceof ServiceOperatorInvitationError
+    || error instanceof OperatorAssignmentError
     || error instanceof OperatorRoleContractError
     || error instanceof DemoAccountForbiddenError
   ) {
     res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
     return;
   }
-  logger.error(`[OperatorAssignment] ${context} failed`, error);
+  logger.error(`[OperatorAssignment] ${context} failed`, { code: (error as {code?:string})?.code ?? 'UNKNOWN' });
   res.status(500).json({ success: false, error: '요청을 처리하지 못했습니다.' });
 }
 
@@ -74,25 +76,20 @@ export class OperatorAssignmentController {
         return;
       }
       const actorId = req.user?.id ?? null;
-      const result = await operatorAssignmentService.assign({
-        userId: userId.trim(),
-        serviceKey,
-        role,
-        assignedBy: actorId,
+      const { serviceOperatorInvitationService } = await import('../../services/admin/service-operator-invitation.service.js');
+      const result = await serviceOperatorInvitationService.create({
+        targetUserId: userId.trim(), serviceKey, role, actorId: actorId ?? '',
       });
-      audit(result.serviceKey, actorId, 'admin.operator_role_assigned', {
-        targetUserId: result.userId,
-        role: result.role,
-        membershipPolicy: result.membershipPolicy,
+      audit(result.service_key, actorId, 'admin.operator_confirmation_requested', {
+        targetUserId: result.target_user_id, role: result.role,
       });
-      res.json({ success: true, data: result });
+      res.status(202).json({ success: true, data: result });
     } catch (error) {
       fail(res, error, 'assign');
     }
   };
 
-  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 endpoint 4종(list · create · resend · cancel) 은퇴.
-  //   운영자 지정은 위 직접 지정 경로로 일원화한다 — 대상자가 Google 로 가입한 뒤 지정한다.
+  // 모든 신규 지정은 이메일 확인과 수락을 거친다. 실제 역할 부여는 수락 트랜잭션에서만 한다.
 }
 
 export const operatorAssignmentController = new OperatorAssignmentController();

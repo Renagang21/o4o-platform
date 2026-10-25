@@ -27,11 +27,13 @@ function deferred() {
   });
   return { promise, resolve };
 }
+const managementGet = vi.fn();
 const api = { get: vi.fn(), post: vi.fn(), delete: vi.fn() };
 beforeEach(() => {
   vi.resetAllMocks();
   vi.spyOn(window, "confirm").mockReturnValue(true);
-  api.get.mockResolvedValue(snapshot());
+  managementGet.mockResolvedValue(snapshot());
+  api.get.mockImplementation((path: string) => path.startsWith("/service-operator-invitations/") ? Promise.resolve({ data: { data: [] } }) : managementGet(path));
   api.post.mockResolvedValue({ data: { data: {} } });
   api.delete.mockResolvedValue({ data: { data: {} } });
 });
@@ -52,9 +54,9 @@ async function search() {
 }
 it("searches only the selected scope and sends userId without role overrides", async () => {
   await show();
-  api.get.mockResolvedValueOnce(snapshot([], [person]));
+  managementGet.mockResolvedValueOnce(snapshot([], [person]));
   await search();
-  fireEvent.click(screen.getByRole("button", { name: "지정" }));
+  fireEvent.click(screen.getByRole("button", { name: "초대" }));
   await waitFor(() =>
     expect(api.post).toHaveBeenCalledWith(
       "/service-operator-management/funding/operators/target",
@@ -63,35 +65,35 @@ it("searches only the selected scope and sends userId without role overrides", a
   );
   expect(await screen.findByRole("status")).toHaveProperty(
     "textContent",
-    "Operator 권한을 지정했습니다.",
+    "운영자 초대 메일을 보냈습니다. 본인 수락 후 권한이 활성화됩니다.",
   );
 });
-it("a missing Google link disables designation", async () => {
+it("an email-only active member can receive a consent invitation", async () => {
   await show();
-  api.get.mockResolvedValueOnce(
+  managementGet.mockResolvedValueOnce(
     snapshot([], [{ ...person, hasGoogleLink: false }]),
   );
   await search();
   expect(
-    (screen.getByRole("button", { name: "지정" }) as HTMLButtonElement)
+    (screen.getByRole("button", { name: "초대" }) as HTMLButtonElement)
       .disabled,
-  ).toBe(true);
+  ).toBe(false);
 });
 it("cancelled confirmation sends no mutation", async () => {
   await show();
-  api.get.mockResolvedValueOnce(snapshot([], [person]));
+  managementGet.mockResolvedValueOnce(snapshot([], [person]));
   await search();
   vi.mocked(window.confirm).mockReturnValue(false);
-  fireEvent.click(screen.getByRole("button", { name: "지정" }));
+  fireEvent.click(screen.getByRole("button", { name: "초대" }));
   expect(api.post).not.toHaveBeenCalled();
 });
 it("duplicate clicks send one mutation and preserve the search on failure", async () => {
   await show();
-  api.get.mockResolvedValueOnce(snapshot([], [person]));
+  managementGet.mockResolvedValueOnce(snapshot([], [person]));
   await search();
   const d = deferred();
   api.post.mockReturnValue(d.promise);
-  const button = screen.getByRole("button", { name: "지정" });
+  const button = screen.getByRole("button", { name: "초대" });
   fireEvent.click(button);
   fireEvent.click(button);
   expect(api.post).toHaveBeenCalledTimes(1);
@@ -112,21 +114,21 @@ it("duplicate clicks send one mutation and preserve the search on failure", asyn
 });
 it("success with a failed refresh preserves success and removes stale action buttons", async () => {
   await show();
-  api.get.mockResolvedValueOnce(snapshot([], [person]));
+  managementGet.mockResolvedValueOnce(snapshot([], [person]));
   await search();
-  api.get.mockRejectedValueOnce(new Error("조회 실패"));
-  fireEvent.click(screen.getByRole("button", { name: "지정" }));
+  managementGet.mockRejectedValueOnce(new Error("조회 실패"));
+  fireEvent.click(screen.getByRole("button", { name: "초대" }));
   expect(await screen.findByRole("alert")).toHaveProperty(
     "textContent",
     "조회 실패",
   );
-  expect(screen.getByRole("status").textContent).toContain("지정했습니다");
-  expect(screen.queryByRole("button", { name: "지정" })).toBeNull();
+  expect(screen.getByRole("status").textContent).toContain("초대 메일을 보냈습니다");
+  expect(screen.queryByRole("button", { name: "초대" })).toBeNull();
 });
 it("a later search wins over an older response", async () => {
   await show();
   const old = deferred();
-  api.get
+  managementGet
     .mockReturnValueOnce(old.promise)
     .mockResolvedValueOnce(snapshot([], [person]));
   fireEvent.change(screen.getByLabelText("운영자 검색"), {
@@ -137,13 +139,13 @@ it("a later search wins over an older response", async () => {
     target: { value: "대상" },
   });
   fireEvent.click(screen.getByRole("button", { name: "검색" }));
-  await screen.findByRole("button", { name: "지정" });
+  await screen.findByRole("button", { name: "초대" });
   await act(async () => old.resolve(snapshot([], [])));
-  expect(screen.getByRole("button", { name: "지정" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "초대" })).toBeTruthy();
 });
 it("changing scope discards the previous service response", async () => {
   const old = deferred();
-  api.get.mockReturnValueOnce(old.promise).mockResolvedValueOnce(snapshot());
+  managementGet.mockReturnValueOnce(old.promise).mockResolvedValueOnce(snapshot());
   const view = render(<Panel client={api} scope="funding" />);
   view.rerender(<Panel client={api} scope="supplier" />);
   await screen.findByText("지정된 Operator가 없습니다.");
@@ -152,7 +154,7 @@ it("changing scope discards the previous service response", async () => {
   expect(api.get).toHaveBeenCalledWith("/service-operator-management/supplier");
 });
 it("revokes suspended operators without exposing admin removal", async () => {
-  api.get.mockResolvedValueOnce(
+  managementGet.mockResolvedValueOnce(
     snapshot([{ ...person, membershipStatus: "suspended" }]),
   );
   render(<Panel client={api} scope="funding" />);

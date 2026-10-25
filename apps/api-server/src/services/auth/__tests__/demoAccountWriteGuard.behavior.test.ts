@@ -278,7 +278,7 @@ describe('BranchOperatorDesignationService — 운영자 지정 · 해제', () =
 
   it('W1 Demo 를 운영자로 지정하지 않는다 — assignRole 0', async () => {
     mode = 'demo';
-    const err = await service.designate(ORG_ID, USER_ID, 'op-1').catch((e) => e);
+    const err = await service.validateInvitationGrant('op-1',ORG_ID,USER_ID).catch((e) => e);
     expect(err).toBeInstanceOf(BranchOperatorDesignationError);
     expect(err.statusCode).toBe(403);
     expect(mockAssignRole).not.toHaveBeenCalled();
@@ -293,14 +293,14 @@ describe('BranchOperatorDesignationService — 운영자 지정 · 해제', () =
     expect(mockRemoveRole).not.toHaveBeenCalled();
   });
 
-  it('W2 일반 회원은 지정된다', async () => {
-    await expect(service.designate(ORG_ID, USER_ID, 'op-1')).resolves.toEqual({ assigned: true });
-    expect(mockAssignRole).toHaveBeenCalledTimes(1);
+  it('W2 일반 회원은 초대 자격 검증을 통과하지만 즉시 권한은 없다', async () => {
+    await expect(service.validateInvitationGrant('op-1',ORG_ID,USER_ID)).resolves.toBeUndefined();
+    expect(mockAssignRole).not.toHaveBeenCalled();
   });
 
   it('W3 판정 조회 실패 → 예외 · assignRole 0', async () => {
     mode = 'error';
-    await expect(service.designate(ORG_ID, USER_ID, 'op-1')).rejects.toThrow('connection lost');
+    await expect(service.validateInvitationGrant('op-1',ORG_ID,USER_ID)).rejects.toThrow('connection lost');
     expect(mockAssignRole).not.toHaveBeenCalled();
   });
 });

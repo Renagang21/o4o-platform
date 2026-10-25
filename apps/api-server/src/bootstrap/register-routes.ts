@@ -1,3 +1,4 @@
+import { adminServiceOperatorInvitations, serviceOperatorInvitationAcceptance } from '../routes/admin/service-operator-invitations.routes.js';
 import { createHomePresentationRoutes } from '../routes/home-presentation/home-presentation.routes.js';
 /**
  * Route registration extracted from main.ts
@@ -180,6 +181,8 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/users', adminUsersRoutes);
   // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
+  app.use('/api/v1/admin/service-operator-invitations', adminServiceOperatorInvitations);
+  app.use('/api/v1/service-operator-invitations', serviceOperatorInvitationAcceptance);
   app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
   app.use('/api/v1/service-operator-management', createServiceOperatorManagementRoutes(AppDataSource, requireAuth));
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).

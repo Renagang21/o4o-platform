@@ -11,8 +11,8 @@ vi.mock('@o4o/auth-client', () => ({ authClient: { api: {
   post: vi.fn(async () => ({ data: { success: true, data: { membershipPolicy: 'CREATED' } } })), put: vi.fn(), delete: vi.fn(),
 } } }));
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
-describe('four collaborator role assignments', () => {
-  it.each(['pharmacy', 'carepharm', 'megapharm', 'pharmcoop'])('assigns %s without a global Neture role or fabricated membership key', async key => {
+describe('four collaborator consent invitations', () => {
+  it.each(['pharmacy', 'carepharm', 'megapharm', 'pharmcoop'])('invites %s without a global Neture role or fabricated membership key', async key => {
     const view = render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: '서비스 담당자 지정' }));
     for (const target of ['pharmacy', 'carepharm', 'megapharm', 'pharmcoop']) {
@@ -24,9 +24,9 @@ describe('four collaborator role assignments', () => {
     fireEvent.change(screen.getByPlaceholderText(/이메일 또는 이름/), { target: { value: 'operator' } });
     fireEvent.click(screen.getByRole('button', { name: '검색' }));
     fireEvent.click(await screen.findByRole('radio', { name: /Test Operator/ }));
-    fireEvent.click(screen.getByRole('button', { name: /권한 부여/ }));
-    await waitFor(() => expect(authClient.api.post).toHaveBeenCalledWith('/admin/operator-assignments', {
-      userId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_operator`,
+    fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
+    await waitFor(() => expect(authClient.api.post).toHaveBeenCalledWith('/admin/service-operator-invitations', {
+      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_operator`,
     }));
     const parsed = parseRole(`neture:${key}_operator`);
     expect(parsed).toMatchObject({ raw: `neture:${key}_operator`, serviceKey: key, roleKey: 'operator' });
