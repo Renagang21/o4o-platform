@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import App from "./App";
+import { PasswordInput } from "@o4o/auth-react";
 import {
   partnerApi,
   ApiError,
@@ -45,6 +46,7 @@ export default function WorkspacePortal() {
   const [epoch, setEpoch] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [message, setMessage] = useState("");
   const [manage, setManage] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
@@ -69,6 +71,7 @@ export default function WorkspacePortal() {
     return () => window.removeEventListener("hashchange", capture);
   }, []);
   const clearSession = useCallback(() => {
+    setLoginPassword("");
     setNotifications([]);
     setShowNotifications(false);
     setSpaces([]);
@@ -326,8 +329,7 @@ export default function WorkspacePortal() {
                   f = new FormData(el);
                 const email = String(f.get("email") || ""),
                   password = String(f.get("password") || "");
-                (el.elements.namedItem("password") as HTMLInputElement).value =
-                  "";
+                setLoginPassword("");
                 void run(async () => {
                   await partnerApi.login(email, password);
                   await connect();
@@ -344,15 +346,14 @@ export default function WorkspacePortal() {
                   required
                 />
               </label>
-              <label className="field">
-                비밀번호
-                <input
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                />
-              </label>
+              <PasswordInput
+                label="비밀번호"
+                name="password"
+                value={loginPassword}
+                onChange={setLoginPassword}
+                autoComplete="current-password"
+                disabled={busy}
+              />
               <button className="button primary" disabled={busy}>
                 로그인
               </button>

@@ -172,3 +172,10 @@
 - 서버 모드 재진입 시 기존 개인/공간/알림 상태를 먼저 초기화하고 401을 공통 오류 처리로 전달한다. 세션 만료 후 로컬→서버 복귀·재로그인 회귀를 추가했다. 재연결 중 모드 전환을 잠그고 안정된 callback 의존성을 사용한다.
 - snapshot 역직렬화의 활동일은 유효한 달력 날짜만 검사한다. 미래 날짜 제한은 등록/수정 입력에 유지하여 참여자의 시간대 차이로 저장 자료 전체를 거부하지 않는다. 프런트 64 tests·웹 build·32 화면 브라우저 검사·변경 파일 ESLint 통과.
 - GitHub CI console 검사에서 잡힌 테스트 harness의 준비 로그를 console.info로 변경했다. 규칙·제외 범위·baseline은 변경하지 않았다. Sonar가 지적한 고정 /tmp 스크린샷 파일 경로는 mkdtemp로 만든 0700 전용 폴더 안으로 옮겼다. 전체 ESLint 실측 1 error는 기존 baseline 46 이하로 ratchet 통과했다(기존 오류는 임의 수정하지 않았다).
+
+### API 전체 CI 원인 확정·공통 인증 UI 적용
+
+- 최종 CI API shard 1을 로컬에서 동일 설정으로 재현했다. 194 suites / 3,404 tests 통과, 24 suites skip이며 실패 1건은 신규 Partner 화면의 자체 password input이었다. 기존 정본은 이메일 로그인 자체를 금지하지 않고 `@o4o/auth-react`의 `PasswordInput` 한 곳만 사용하도록 요구한다.
+- Partner 화면은 기존 공통 `PasswordInput`을 정상 package export로 소비하도록 변경했다. 공통 소스·인증 API·허용 목록·CI 검사 범위는 변경하지 않았다. 비밀번호는 controlled 상태에서 제출 직후와 세션 초기화 시 비우며 저장하지 않는다.
+- 기존 workspace auth-react/client/utils와 저장소에 이미 등록된 router 7.9.6을 소비하도록 package/lock importer 및 Docker dependency closure를 함께 반영했다. scoped frozen/offline install 성공, 별도 외부 버전 업그레이드는 없다.
+- 원인 검사 `legacy-password-auth-retirement.spec.ts` 48 tests, 프런트 64 tests, 웹 production build·변경 파일 ESLint·새 Docker image build 통과. 로컬 도구 32 화면 검사와 API를 mock한 로그인 화면 4개 폭·공통 보기/숨기기 동작도 확인했다. 실패 원인 발견 후 수정·새 CI로 검증하며 이전 실패를 단순한 flaky로 판정하지 않는다.

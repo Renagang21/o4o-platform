@@ -9,6 +9,7 @@ Node/pnpm 기준과 기본 API/로컬 DB 구성은 루트 `SETUP.md`를 따른�
 기존 O4O API를 로컬 3002번에서 실행하고 승인된 로컬 DB에 migration을 적용한 뒤:
 
 ```bash
+pnpm --filter '@o4o/web-partner^...' run build
 pnpm --filter @o4o/web-partner dev
 pnpm --filter @o4o/web-partner build
 pnpm --dir services/web-partner test
@@ -115,3 +116,5 @@ pnpm --dir services/web-partner test:server-browser
 종료 시 harness를 Ctrl+C로 중단하면 테스트 schema를 삭제한다. 브라우저 context와 테스트 데이터는 격리된다.
 브라우저 실행 파일 기본값은 `/usr/bin/chromium`이며 `CHROMIUM_PATH`로 지정할 수 있다.
 진행 상태·검증 결과·운영 인계 항목은 `docs/work-orders/WO-O4O-PARTNER-SUPPORT-WORKSPACE-V1.md`를 참조한다.
+
+로그인 비밀번호 입력은 기존 `@o4o/auth-react`의 `PasswordInput`을 사용한다. 공통 인증 소스·정책·입력 허용 목록은 변경하지 않는다. 신규 checkout은 위 dependency closure를 먼저 빌드해야 한다.
