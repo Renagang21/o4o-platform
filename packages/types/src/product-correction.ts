@@ -210,17 +210,22 @@ export interface ProductCorrectionProposal {
 }
 
 /** Follow-up operations: review candidates and schedules never mutate product originals. */
+export type ProductDescriptionRenewalField = ProductCorrectionField | 'categoryId' | 'brandId' | 'drugCategory' | 'descriptionSummary';
 export interface ProductDescriptionRenewal {
   id: string;
   productId: string;
   productName: string;
-  proposalId: string;
-  batchId: string;
-  taskId: string;
+  proposalId?: string;
+  batchId?: string;
+  taskId?: string;
   descriptionType: ProductCorrectionRule['descriptionType'];
   language: string;
   descriptionId: string | null;
-  changedFields: ProductCorrectionField[];
+  changedFields: ProductDescriptionRenewalField[];
+  origin?: 'correction' | 'catalog-edit' | 'admin-description';
+  changeEventId?: string;
+  changeActorId?: string | null;
+  sourceChanges?: Array<{ field: ProductDescriptionRenewalField; before: unknown; after: unknown }>;
   purposes: Array<ProductCorrectionRule['purpose']>;
   state: 'pending' | 'in_progress' | 'done' | 'excluded';
   revision: number;

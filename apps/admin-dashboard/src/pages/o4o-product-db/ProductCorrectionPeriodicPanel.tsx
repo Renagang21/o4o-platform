@@ -21,12 +21,28 @@ const changeNames: Record<string, string> = {
   originCountry: '원산지',
   tags: '태그',
   descriptionContent: '설명서 본문',
+  descriptionSummary: '설명서 요약',
+  categoryId: '분류 참조',
+  brandId: '브랜드 참조',
+  drugCategory: '의약품 분류',
 };
 const purposeNames = {
   professional: '전문인용',
   'ai-support': 'AI 판단지원용',
   'consumer-qr': '소비자 QR용',
 };
+const originName = (origin?: string) =>
+  origin === 'catalog-edit'
+    ? '일반 상품 편집'
+    : origin === 'admin-description'
+      ? '관리자 설명서 저장'
+      : '상품 보정 반영';
+const changeValue = (value: unknown) =>
+  value === null || value === undefined
+    ? '(없음)'
+    : Array.isArray(value)
+      ? value.join(', ')
+      : String(value);
 const statusNames: Record<string, string> = {
   queued: '대기',
   running: '점검 중',
@@ -254,8 +270,8 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
             {renewals?.items.map((item) => (
               <div key={item.id} className="break-words rounded border p-2">
                 <p>
-                  {item.productName} · {item.descriptionType}/{item.language} ·{' '}
-                  {statusNames[item.state]}
+                  {item.productName} · {originName(item.origin)} · {item.descriptionType}/
+                  {item.language} · {statusNames[item.state]}
                 </p>
                 <button
                   type="button"
@@ -289,6 +305,25 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                   관련 상품 변경:{' '}
                   {renewal.record.changedFields?.map((f) => changeNames[f]).join(', ')}
                 </p>
+                <p className="break-words text-sm">
+                  변경 경로: {originName(renewal.record.origin)} · 처리자{' '}
+                  {renewal.record.changeActorId ?? '변경 기록 참조'}
+                </p>
+                {!renewal.record.purposes.length && (
+                  <p className="text-sm">
+                    이용 목적이 아직 지정되지 않았습니다. 실제 용도를 선택한 뒤 검토 기록을
+                    저장하세요.
+                  </p>
+                )}
+                {renewal.record.sourceChanges?.map((change) => (
+                  <details key={change.field}>
+                    <summary>{changeNames[change.field]} 변경 내역</summary>
+                    <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words text-sm">
+                      변경 전: {changeValue(change.before)}
+                      {'\n'}변경 후: {changeValue(change.after)}
+                    </pre>
+                  </details>
+                ))}
                 <a
                   className="text-blue-700 underline"
                   href={`/admin/o4o-product-db/masters/${renewal.record.productId}`}

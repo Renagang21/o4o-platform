@@ -234,6 +234,32 @@ describe('상품 정기 관리 4~6번', () => {
       ),
     );
   });
+  it('shows the ordinary edit origin and before/after values, requiring a real purpose before review save', async () => {
+    const ordinary = {
+      ...renewal,
+      purposes: [],
+      origin: 'catalog-edit',
+      changeActorId: 'editor',
+      changedFields: ['specification'],
+      sourceChanges: [{ field: 'specification', before: '500mg', after: '600mg' }],
+    };
+    mocks.api.renewal.mockResolvedValue({
+      record: ordinary,
+      fingerprint: 'a'.repeat(64),
+      productExists: true,
+      description: { id: 'description', content: '원문', summary: null },
+    });
+    await open();
+    fireEvent.click(screen.getByRole('button', { name: /갱신 검토 열기:/ }));
+    await screen.findByText(/변경 경로: 일반 상품 편집/);
+    expect(screen.getByText(/이용 목적이 아직 지정되지 않았습니다/)).toBeInTheDocument();
+    expect(screen.getByText('규격 변경 내역')).toBeInTheDocument();
+    expect(screen.getByText(/변경 전: 500mg/)).toHaveTextContent('변경 후: 600mg');
+    fireEvent.change(screen.getByLabelText('갱신 검토 메모'), { target: { value: '원문 대조' } });
+    expect(screen.getByText('갱신 검토 기록 저장')).toBeDisabled();
+    fireEvent.click(screen.getByLabelText('전문인용'));
+    expect(screen.getByText('갱신 검토 기록 저장')).not.toBeDisabled();
+  });
   it('keeps all write actions disabled without common product DB write access', async () => {
     await open(false);
     expect(screen.getByText('대량 후보 점검 만들기')).toBeDisabled();

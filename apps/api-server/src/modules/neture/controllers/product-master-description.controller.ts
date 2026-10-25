@@ -124,7 +124,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
         descriptionType,
         createdBy: actor,
       });
-      const canonical = await service.setCanonical(candidate.id, actor);
+      const canonical = await service.setCanonical(candidate.id, actor, { trackAdminEdit: true });
 
       res.status(201).json({
         success: true,

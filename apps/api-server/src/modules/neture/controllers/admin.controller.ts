@@ -489,7 +489,7 @@ export function createAdminController(dataSource: DataSource): Router {
   router.patch('/masters/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { id } = req.params;
-      const result = await netureService.updateProductMaster(id, req.body);
+      const result = await netureService.updateProductMaster(id, req.body, req.user?.id ?? null);
       if (!result.success) {
         const status = result.error === 'MASTER_NOT_FOUND' ? 404
           : result.error?.startsWith('IMMUTABLE_FIELD_VIOLATION') ? 403

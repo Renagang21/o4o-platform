@@ -1,3 +1,4 @@
+import { changedProductValues, enqueueProductEditRenewals } from '../product-correction/edit-renewal.service.js';
 /**
  * SharedProductDescriptionService — O4O 공용 상품설명 후보 풀 / canonical 대표 설명
  *
@@ -567,12 +568,27 @@ export class SharedProductDescriptionService {
   async setCanonical(
     id: string,
     actorId?: string | null,
-    opts?: { demotedStatus?: 'candidate' | 'hidden'; audit?: CanonicalReplaceAuditInput },
+    opts?: {
+      demotedStatus?: 'candidate' | 'hidden';
+      audit?: CanonicalReplaceAuditInput;
+      trackAdminEdit?: boolean;
+    },
   ): Promise<SharedProductDescription> {
     const demotedStatus = opts?.demotedStatus ?? 'candidate';
     return this.dataSource.transaction(async (manager) => {
       const repo = manager.getRepository(SharedProductDescription);
-      const target = await repo.findOne({ where: { id } });
+      let target = await repo.findOne({ where: { id } });
+      let editedProductName: string | null = null;
+      if (target && opts?.trackAdminEdit) {
+        // Match the product-first lock order used by correction apply and ordinary edits.
+        const masters = await manager.query(
+          'SELECT name FROM product_masters WHERE id=$1 FOR UPDATE',
+          [target.masterId],
+        );
+        if (!masters[0]) throw new Error('ProductMaster not found');
+        editedProductName = masters[0].name;
+        target = await repo.findOne({ where: { id }, lock: { mode: 'pessimistic_write' } });
+      }
       if (!target) {
         throw new Error('SharedProductDescription not found');
       }
@@ -580,6 +596,24 @@ export class SharedProductDescriptionService {
         throw new Error('Cannot set a deleted description as canonical');
       }
       const targetLanguage = target.language ?? 'ko';
+      let editChanges: ReturnType<typeof changedProductValues> = [];
+      if (opts?.trackAdminEdit) {
+        if (target.status === 'canonical') return target;
+        const previous = await manager.query(
+          `SELECT id,content,summary FROM shared_product_descriptions WHERE master_id=$1 AND description_type=$2 AND COALESCE(language,'ko')=$3 AND status='canonical' AND deleted_at IS NULL ORDER BY updated_at DESC,id LIMIT 1 FOR UPDATE`,
+          [target.masterId, target.descriptionType, targetLanguage],
+        );
+        editChanges = changedProductValues(
+          {
+            descriptionContent: previous[0]?.content ?? null,
+            descriptionSummary: previous[0]?.summary ?? null,
+          },
+          { descriptionContent: target.content, descriptionSummary: target.summary ?? null },
+          ['descriptionContent', 'descriptionSummary'],
+        );
+        if (previous[0] && !editChanges.length)
+          return repo.findOneOrFail({ where: { id: previous[0].id } });
+      }
 
       // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1:
       //   교체 감사 로그를 남기려면 "강등 전"의 기존 canonical id 를 트랜잭션 안에서 먼저 캡처한다.
@@ -602,8 +636,12 @@ export class SharedProductDescriptionService {
         .update(SharedProductDescription)
         .set({ status: demotedStatus, updatedBy: actorId ?? null })
         .where('master_id = :masterId', { masterId: target.masterId })
-        .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
-        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: targetLanguage })
+        .andWhere('description_type = :descriptionType', {
+          descriptionType: target.descriptionType,
+        })
+        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, {
+          language: targetLanguage,
+        })
         .andWhere('status = :status', { status: 'canonical' })
         .andWhere('id != :id', { id })
         .andWhere('deleted_at IS NULL')
@@ -641,6 +679,16 @@ export class SharedProductDescriptionService {
             }),
           );
         }
+      }
+      if (opts?.trackAdminEdit) {
+        await enqueueProductEditRenewals(manager, {
+          productId: saved.masterId,
+          productName: editedProductName!,
+          origin: 'admin-description',
+          actorId: actorId ?? null,
+          changes: editChanges,
+          fallback: { type: saved.descriptionType, language: saved.language ?? 'ko' },
+        });
       }
       return saved;
     });

@@ -75,7 +75,7 @@ export function createProductMasterCreateController(_dataSource: DataSource): Ro
 
       let master = result.data;
       if (Object.keys(ext).length > 0) {
-        const updated = await netureService.updateProductMaster(master.id, ext);
+        const updated = await netureService.updateProductMaster(master.id, ext, (req as Request & { user?: { id?: string } }).user?.id ?? null);
         if (updated?.success && updated.data) master = updated.data;
       }
 
