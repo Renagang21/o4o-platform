@@ -201,8 +201,8 @@ export const learnerApi = {
   getLesson: (lessonId: string) =>
     lmsHttp.get<LmsApiResponse<{ lesson: LectureLesson }>>(`/lms/lessons/${lessonId}`),
   /** 강사 신청 (학습자 = active membership). */
-  applyInstructor: (policyReferences?: EnrollmentPolicyReference[]) =>
-    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply', { policyReferences }),
+  applyInstructor: (policyReferences?: EnrollmentPolicyReference[], profile?: { bio?: string; expertise?: string }) =>
+    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply', { policyReferences, bio: profile?.bio, expertise: profile?.expertise }),
   /** 공개 수료증 검증 (비로그인 허용). */
   verifyCertificate: (verificationCode: string) =>
     lmsHttp.get<LmsApiResponse<any>>(`/lms/certificates/verify/${encodeURIComponent(verificationCode)}`),

@@ -26,6 +26,12 @@ run(['exec', 'jest', '--runInBand', '--runTestsByPath',
   'src/__tests__/lms-completion-certificate-chain.spec.ts',
   'src/__tests__/lecture-public-curriculum.spec.ts',
   'src/__tests__/lecture-public-preview.spec.ts',
+  'src/__tests__/lecture-instructor-profile.spec.ts',
+  'src/__tests__/lecture-instructor-application.spec.ts',
+  'src/__tests__/lecture-phase2-merge-gate-contract.spec.ts',
+  'src/__tests__/lecture-phase2-access-contract.spec.ts',
+  'src/__tests__/canonical-database-bootstrap-incremental-migration-separation.spec.ts',
+  'src/__tests__/database-migration-ownership-startup-health-final-closure.spec.ts',
   'src/__tests__/lecture-playback-boundary.spec.ts',
 ], fileURLToPath(new URL('../../apps/api-server/', import.meta.url)));
 if (synthetic) {

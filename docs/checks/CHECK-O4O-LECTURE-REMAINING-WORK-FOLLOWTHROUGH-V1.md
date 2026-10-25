@@ -63,3 +63,47 @@
 검증: Lecture Vitest 79/79(19 files), 공개 미리보기/목차/rate-limit/접근 계약 API Jest 45/45(4 suites), api-server type-check·lecture-web build·변경 파일 ESLint 통과. 실제 서비스 SQL을 격리 PGlite에 적용해 공개 1건·비공개/초안/종료/타 서비스/차시 미발행/미리보기 미지정/퀴즈 거부 및 교차 강의 거부 총 9사례를 확인했다. PG15·운영 DB 검증이 아니다. Chromium 390/1440에서 합성 영상 재생·목록 503 재시도·링크 진입·직접 URL·소개 복귀·보호 API/쓰기 호출 없음·pageerror/overflow 없음을 확인했다.
 
 첫 Vitest 실패는 테스트 beforeEach가 mock 함수를 반환해 종료 hook으로 실행된 fixture 오류였고, void hook으로 바꿔 재실행했다. 타입 검사에서 새 controller의 BaseController 상속과 프런트 응답 타입 누락을 수정하고 검사·빌드를 재실행했다. 이전의 미리보기 결정 대기는 이 사용자 답변으로 해소됐다. 실계정·운영 자료·강사 신청 schema·Windows 정리는 계속 미완료다.
+
+## 잔여 개발 전체 보완 — 강사 신청 정보와 PostgreSQL 15 검증
+
+사용자의 “남은 부분도 진행, 작업을 작게 나누지 말라” 지시에 따라 T07 저장 필드·migration·API·신청 화면·운영자 검토·검증을 같은 branch에 포함했다. 이번 지시는 개발·격리 검증·push 범위이며 운영 migration 적용은 수행하지 않는다.
+
+- `InstructorApplication.bio/expertise` nullable varchar(3000/1000)와 `AddLectureInstructorProfile1792886400000`를 incremental manifest에 추가했다. baseline·과거 migration은 변경하지 않는다. 과거 null 신청을 유지하고 데이터 backfill·승인·역할 변경을 하지 않는다.
+- 서버는 optional plain text의 타입·trim·길이·NUL을 검사한다. 요청의 userId/status/reviewedBy로 신청자를 바꾸거나 승인을 우회하지 못한다. 오류는 transaction·약관 기록 전에 거부한다. 입력 생략의 기존 API 호출도 유지한다.
+- 신청 화면에서 소개·전문 분야를 입력하고 실패 시 보존한다. 계정 변경은 keyed form으로 초안을 초기화한다. 운영자 목록은 검토용 일반 텍스트로 표시하며 HTML을 실행하지 않는다. 공개 강사 프로필·강의 professionalInfo에 자동 복사하지 않는다.
+- DB rollback은 non-null 신청자 데이터가 있으면 거부한다. 스키마 rollback으로 내용을 삭제하지 않고 기존 API 코드와 nullable 컬럼을 유지하는 경로를 사용한다.
+
+### Shared Module 추가 영향
+
+| 소비처 | 영향 | 검증 |
+|---|---|---|
+| `@o4o/lms-core` InstructorApplication | 선택 필드 추가, 기존 관계·이벤트·역할 계약 불변 | 패키지 build, API type-check, broad LMS 회귀 |
+| InstructorController apply/operator applications | 기존 인증·약관·중복·운영자 guard 유지, optional 값 저장/조회 | 실제 controller+격리 ports 5건, normalize 9건 |
+| InstructorPublicController | 응답 whitelist에 신청 소개 없음, 코드 변경 없음 | source census; 이 경로를 새 공개 API로 등록하지 않음 |
+| learner application/operator UI | 입력·일반 텍스트 검토·계정 분리 | Vitest 및 390/1440px 합성 브라우저 |
+| migration runner/classifier | append-only manifest와 신규 expected state 등록 | 기존 모든 prefix 및 empty down/up, migration contract |
+
+### 최종 실행 결과
+
+| 검사 | 결과 | 범위·정리 |
+|---|---|---|
+| lms-core build·API type-check·Lecture build | 통과 | 기존 번들/Browserslist 경고 유지 |
+| Lecture Vitest | 83/83, 20 files | 신청 입력·실패 유지·계정 전환·HTML 비실행 추가 |
+| 확장 로컬 runner의 선택 API | 254/254, 11 suites | 공개·보호 경계, 신청 controller, 수료 연결·갱신, schema 계약 |
+| 넓은 Lecture/LMS API 회귀 | 458/458, 28 suites | PG 선택 spec 7건은 이 실행에서 skip; 아래 별도 실제 DB 실행으로 확인 |
+| PostgreSQL 15.18 certificate/profile spec | 7/7 | profile null 호환·저장·DB 길이 제한·보존 rollback 거부 포함; 자체 DB 삭제 |
+| PostgreSQL 15.18 operator-inbox fixture | 24/24 | 기존 역할·업무 SQL 회귀, `Fixture cleanup PASS: database count 0` |
+| PostgreSQL 15.18 canonical prefixes | 전체 일치 | 신규 fingerprint `dae222617a25e7bcc91b23ec8fe691798d87ffcdb928b3a730d5ff2f24817343`, 6871 lines; empty down/up 통과 |
+| migration contract | 21 pass / 0 fail | 실제 산출 state 등록; 검사 기준 완화 없음 |
+| Chromium 390/1440px | 통과 | 자막·비로그인 미리보기 및 합성 신청→운영자 검토, pageerror/overflow 없음 |
+| 변경 TS ESLint·문서 민감정보 검사 | 통과 | 오류·민감정보 패턴 0 |
+
+PostgreSQL 15.18 바이너리는 테스트용으로 repo 밖에 준비했으며 workspace dependency/lockfile을 바꾸지 않았다. 독립 loopback cluster만 사용했고, 마지막에 검증 DB 잔존 0개·서버 종료를 확인했다. 운영 DB·실계정·외부 알림을 사용하지 않았다. 합성 browser의 auth/약관/API port는 fixture이며 실제 로그인을 수행한 것으로 표시하지 않는다.
+
+발견·보완: 최초 schema 계약 검사가 expected state 누락을 잡아 실제 PG15 prefix 검증으로 산출·등록했다. 기존 foundation test의 “이름에 Lecture가 있는 migration은 0개” 단언은 이번 승인된 schema-only migration을 구분하지 못했다. 정확한 신규 파일 1개와 데이터 INSERT/UPDATE/DELETE 없음·reference seed CLI 유지를 함께 검사하도록 보완하고 전체 회귀를 재실행했다. 브라우저 auth fixture 초기 연결 오류는 fixture module 우선순위를 수정해 두 화면 크기를 다시 검사했다. 잘못 지정된 넓은 testPathPattern의 범위 밖 테스트 실행은 완료 근거로 쓰지 않았으며 `/src/__tests__/`에 한정한 위 회귀를 기준으로 한다.
+
+### 최종 미완료 조건
+
+구현 TODO T04~T08과 재현 가능한 검사 도구는 완료다. T02는 Windows PC 접근·세션 소유자 확인이 필요하고, T03은 실제 로그인용 계정·사용자 공유 브라우저가 없으며, T09는 실제 운영 미디어 자료가 제공되지 않아 미완료다. 이전 “PG15 미설치” 제한은 이번 임시 cluster 준비로 해소됐다. 운영 migration 적용·PR·병합·배포는 이번 push 범위에서 실행하지 않는다.
+
+문서 정합: 강사 신청 보류 설명을 구현·배포 전제와 구분해 갱신했고 TODO·로컬 검증 안내를 함께 보완했다. canonical index·과거 기록물 일괄 수정 없음.

@@ -24,7 +24,7 @@ node scripts/lecture/verify-isolated.mjs --postgres-port 55439
 node scripts/lecture/browser-captions-smoke.mjs
 ```
 
-ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 실제 text track cue 로딩·편집·삭제·390/1440px 넘침과 비로그인 미리보기 목록 503→재시도·링크 진입·직접 URL·소개 복귀를 검사한다. 미리보기에서 보호 API·쓰기 요청이 발생하지 않는지도 확인한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
+ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`을 자동 사용하거나 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 실행 파일을 지정한다. 일시 WebM과 WebVTT를 브라우저 라우팅으로 제공하고 합성 계정·약관·API fixture를 사용한 신청 소개/전문 분야 입력→운영자 검토 표시와 실제 text track cue 로딩·편집·삭제·390/1440px 넘침 및 비로그인 미리보기 목록 503→재시도·링크 진입·직접 URL·소개 복귀를 검사한다. 미리보기에서 보호 API·쓰기 요청이 발생하지 않는지도 확인한다. 외부 서버·실계정·업무 DB를 호출하지 않는다. 임시 파일과 자체 서버·브라우저는 종료 시 정리한다. 이 성공은 실제 운영 파일의 CORS 검증을 대신하지 않는다.
 
 ## 실제 로그인·역할별 흐름
 
@@ -46,6 +46,14 @@ ffmpeg(libvpx)와 Playwright Chromium이 필요하다. Linux `/usr/bin/chromium`
 | 10 | 390px·1440px 브라우저 | 메뉴 진입·직접 URL·키보드·toast·실제 API·콘솔·가로 넘침 |
 
 서버 오류 주입과 자동 발급 실패 fixture는 격리 환경에서만 수행한다. 갱신이 폐기 수료증을 다시 유효하게 만드는 기존 규칙은 이번에 변경하지 않았다. 테스트용 발급물을 실제 자격·법정 이수 인정으로 취급하지 않는다.
+
+## 강사 신청 migration 적용·검증
+
+신규 nullable `bio varchar(3000)`·`expertise varchar(1000)`는 기존 `lms_instructor_applications`에 추가한다. 과거 행·심사 메모·역할·승인 상태를 갱신하는 backfill은 없다. `INCREMENTAL_MIGRATIONS`와 해당 prefix의 `EXPECTED_SCHEMA_STATES`에 등록돼 있다. canonical baseline이나 과거 migration은 재작성하지 않는다.
+
+로컬 fixture는 baseline+전체 incremental을 적용하고 필드 저장·DB 길이 제한·데이터 보존 rollback 거부를 검사한다. `--postgres-port` runner는 fixture DB를 생성·삭제하고 기존 업무 DB를 바꾸지 않는다. 스키마 prefix 전체·신규 empty down/up 검사는 기존 `pnpm exec tsx scripts/dev/run-operator-inbox-fixture.ts`(SETUP의 고정 loopback 포트·role 기준)를 사용한다.
+
+운영 적용은 push와 별개다. 통합 담당이 최신 main·CI·Codex 및 LEVEL 3 migration 실행 승인 범위를 확인하고 표준 migration Job을 먼저 실행한 뒤 API를 배포한다. 데이터가 생기면 down이 `INSTRUCTOR_PROFILE_DATA_EXISTS`로 거부된다. 코드 rollback 시 nullable 컬럼을 보존할 수 있으며, 신청자 내용을 삭제하는 DB rollback을 강제로 수행하지 않는다. 이 작업은 운영 migration을 실행하지 않았다.
 
 ## 과거 연결 누락 조회
 

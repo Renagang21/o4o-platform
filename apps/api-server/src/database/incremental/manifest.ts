@@ -106,6 +106,8 @@ import { AddContactInquiryOrganization1792540800000 } from '../migrations/179254
 import { CreateExternalAiConnections1792635132325 } from '../migrations/1792635132325-CreateExternalAiConnections.js';
 import { CreateStoreConsultationStations1792815861315 } from '../migrations/1792815861315-CreateStoreConsultationStations.js';
 
+import { AddLectureInstructorProfile1792886400000 } from '../migrations/1792886400000-AddLectureInstructorProfile.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -145,6 +147,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddContactInquiryOrganization1792540800000,
   CreateExternalAiConnections1792635132325,
   CreateStoreConsultationStations1792815861315,
+  AddLectureInstructorProfile1792886400000,
 ];
 
 export function incrementalMigrationNames(): string[] {

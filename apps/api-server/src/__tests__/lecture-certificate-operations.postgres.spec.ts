@@ -2,6 +2,7 @@
  * Creates and drops its own database on a disposable PostgreSQL. Never point it at an application database.
  * Run: O4O_LECTURE_CERT_OPS_PG_PORT=<port> [O4O_LECTURE_CERT_OPS_PG_USER=<superuser>] jest --runTestsByPath <this file>
  */
+import { AddLectureInstructorProfile1792886400000 } from '../database/migrations/1792886400000-AddLectureInstructorProfile';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../database/bootstrap/canonical-schema-baseline.js';
@@ -55,6 +56,18 @@ run('lecture certificate operation history on PostgreSQL', () => {
   afterAll(async () => {
     if (db?.isInitialized) await db.destroy();
     if (admin?.isInitialized) { await admin.query(`DROP DATABASE IF EXISTS ${database}`); await admin.destroy(); }
+  });
+
+  it('instructor profile migration preserves legacy rows, stores bounded text and refuses destructive rollback', async () => {
+    const id = randomUUID();
+    await db.query(`INSERT INTO lms_instructor_applications(id,"userId",status) VALUES($1,$2,'pending')`, [id, learner]);
+    const read = async () => (await db.query('SELECT bio,expertise,status FROM lms_instructor_applications WHERE id=$1', [id]))[0];
+    expect(await read()).toEqual({ bio: null, expertise: null, status: 'pending' });
+    await db.query('UPDATE lms_instructor_applications SET bio=$1,expertise=$2 WHERE id=$3', ['소개', '실무', id]);
+    expect(await read()).toMatchObject({ bio: '소개', expertise: '실무' });
+    await expect(db.query('UPDATE lms_instructor_applications SET bio=$1 WHERE id=$2', ['x'.repeat(3001), id])).rejects.toThrow();
+    await expect(new AddLectureInstructorProfile1792886400000().down({ query: (sql: string) => db.query(sql) } as any)).rejects.toThrow('INSTRUCTOR_PROFILE_DATA_EXISTS');
+    expect(await read()).toMatchObject({ bio: '소개', expertise: '실무' });
   });
 
   it('renew records before/after and months; a repeated operationId applies once', async () => {
