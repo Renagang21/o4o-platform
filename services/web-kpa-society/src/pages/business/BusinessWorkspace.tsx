@@ -53,7 +53,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
     { key: 'materials', label: '자료', to: businessPath(businessKey, 'materials') + storeSearch },
     { key: 'participation', label: '참여 안내', to: businessPath(businessKey, 'participation') + storeSearch },
     { key: 'community', label: '회원 교류', to: businessPath(businessKey, 'forum') + storeSearch },
-    { key: 'support', label: '지원', to: '/contact' },
+    { key: 'support', label: '지원', to: state.access?.canManage ? `/operator/inbox/business/${encodeURIComponent(businessKey)}` : state.access?.allowed ? homePath + storeSearch + '#cooperation-support' : '/contact' },
   ]} />;
   if (memberLayout) return <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{memberNavigation}{operatorNavigation}<Outlet context={state} /></div>;
   return <div className="mx-auto max-w-6xl px-4 py-6">

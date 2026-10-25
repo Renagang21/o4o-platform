@@ -1,0 +1,135 @@
+.cooperation-workflows {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  color: #172b3a;
+  overflow-wrap: anywhere;
+}
+.cooperation-workflows h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.cooperation-workflows h3 {
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+.cooperation-workflows p {
+  line-height: 1.65;
+  margin: 8px 0;
+}
+.cooperation-workflows nav,
+.cooperation-workflows .cw-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.cooperation-workflows .cw-summary span {
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-radius: 8px;
+}
+.cooperation-workflows button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #b6c4d1;
+  border-radius: 8px;
+  background: white;
+  color: #174f8a;
+}
+.cooperation-workflows button[aria-pressed="true"] {
+  background: #174f8a;
+  color: white;
+}
+.cooperation-workflows button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.cooperation-workflows article,
+.cooperation-workflows form,
+.cooperation-workflows .cw-panel {
+  padding: 20px;
+  border: 1px solid #d6e0e8;
+  border-radius: 12px;
+  background: white;
+  min-width: 0;
+  margin-bottom: 12px;
+}
+.cooperation-workflows label {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+.cooperation-workflows input:not([type="checkbox"]),
+.cooperation-workflows textarea,
+.cooperation-workflows select {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #aebdca;
+  border-radius: 6px;
+  padding: 10px;
+  background: white;
+  min-height: 44px;
+}
+.cooperation-workflows textarea {
+  min-height: 110px;
+}
+.cooperation-workflows .cw-check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.cooperation-workflows input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.cooperation-workflows a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #1d4ed8;
+  text-decoration: underline;
+  margin-right: 12px;
+}
+.cooperation-workflows .cw-body {
+  white-space: pre-wrap;
+}
+.cooperation-workflows blockquote {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f1f5f9;
+  border-left: 3px solid #94a3b8;
+}
+.cooperation-workflows .cw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+.cooperation-workflows [role="alert"] {
+  padding: 12px;
+  color: #9f1239;
+  background: #fff1f2;
+  border-radius: 8px;
+}
+.cooperation-workflows fieldset {
+  min-width: 0;
+}
+.cooperation-workflows details {
+  margin-block: 12px;
+}
+.cooperation-workflows summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 10px 0;
+}
+.cooperation-workflows pre {
+  white-space: pre-wrap;
+  max-height: 320px;
+  overflow: auto;
+}
+.cooperation-workflows :focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}

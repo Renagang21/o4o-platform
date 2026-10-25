@@ -179,3 +179,5 @@ export { OperatorNotificationLink, OperatorNotifications } from "./modules/Opera
 
 export { CooperationOperationsOverview } from './modules/CooperationOperationsOverview';
 export type { CooperationWorkArea } from './modules/CooperationOperationsOverview';
+
+export { CooperationOperatorWorkflows } from './modules/CooperationOperatorWorkflows';

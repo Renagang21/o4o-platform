@@ -463,7 +463,7 @@ function OperatorContentsTable({ workspace, contentEditHref }: Readonly<{ worksp
                             label={a.label}
                             action={a.action}
                             disabled={interactionLocked || loading}
-                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
+                            onClick={() => run(c.id, a.label, a.action === 'reject', (reason) => c.revision !== undefined ? api.setContentStatus(sfKey, c.id, a.action, reason, c.revision) : api.setContentStatus(sfKey, c.id, a.action, reason), c.title, a.action === 'reject')}
                           />
                         ))}
                       </div>

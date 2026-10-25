@@ -61,7 +61,7 @@ export function useSemiFranchiseContentEditor(businessKey?: string, returnPath?:
       setMessage({ type: 'error', text: '제목을 입력해 주세요.' });
       return;
     }
-    const input = buildContentInput(form);
+    const input = { ...buildContentInput(form), ...(typeof current?.revision === 'number' ? { expectedRevision: current.revision } : {}) };
     state.saving = true; setSaving(true);
     setMessage(null);
     try {

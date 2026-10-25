@@ -1,3 +1,4 @@
+import { safeEducationUrl } from '@o4o/shared-space-ui';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -42,6 +43,8 @@ function BusinessMaterialRecords({ materialStore }: { materialStore: ReturnType<
     {materialStore.organizationId && !loading && !error && !items.length && <p className="rounded-xl border border-dashed bg-slate-50 px-5 py-12 text-center text-sm text-slate-500">등록된 자료가 없습니다.</p>}
     {items.map(item => <details key={item.id} open={params.get('content') === item.id || undefined} className="my-4 min-w-0 rounded-xl border border-slate-200 bg-white px-4 py-3 sm:px-5">
       <summary className="min-h-11 cursor-pointer break-words py-3 font-semibold leading-7 text-slate-900">{item.title}</summary>
+      {item.revision && <p className="my-3 text-sm">{item.category || '미분류'} · 개정 {item.revision}</p>}
+      {safeEducationUrl(item.educationUrl) && <a href={safeEducationUrl(item.educationUrl)} target="_blank" rel="noopener noreferrer" className="my-3 inline-flex min-h-11 items-center text-blue-700 underline">관련 교육 열기 ↗</a>}
       {item.summary && <p className="my-3 break-words text-sm leading-7 text-slate-600">{item.summary}</p>}
       {item.body && <div className="min-w-0 break-words border-t border-slate-100 pt-4 leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"><ContentRenderer html={item.body} /></div>}
       <div className="mt-4 border-t pt-4"><p className="mb-3 text-sm text-slate-500">내 매장에 복사해 편집할 수 있습니다. 매장이 여러 곳이면 이동 후 사용할 매장을 선택해 주세요.</p><BusinessStoreShortcut businessKey={business.key} contentId={item.id} /></div>

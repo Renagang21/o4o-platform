@@ -28,6 +28,7 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
 beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
   mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
+    if (path.startsWith('/cooperation-workflows/')) return { data: { data: { notices: [], activities: [], totals: { notices: 0, activities: 0 }, pending: { notices: 0, applications: 0 }, materials: { items: [], total: 0 }, support: { items: [], total: 0 } } } };
     if (path.startsWith('/home-presentation/')) return { data: { success: true, data: null } };
     if (path.endsWith('/showcase')) return {data:{data:{businessKey:path.includes('/network-a/') ? 'network-a':'pharmacy',items:[{id:'content:guide',kind:'content',title:'게시된 실제 자료',summary:'사업 자료 요약',body:null}]}}};
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };

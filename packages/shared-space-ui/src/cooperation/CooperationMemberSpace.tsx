@@ -1,3 +1,4 @@
+import { safeEducationUrl, CooperationMemberWorkflows } from './CooperationWorkflows';
 import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '../legal/ServiceEnrollmentPolicyAgreement';
 import type { ReactNode } from 'react';
 import { CooperationMemberHomeLayout, CooperationMemberNavigation } from './CooperationMemberPresentation';
@@ -16,7 +17,7 @@ interface Business { policyScope: string; key: string; name: string; communityKe
 interface Access { kind: string; businessKey?: string; allowed: boolean; canManage: boolean }
 interface StoreAccess { businessKey: string; organizationId: string; allowed: boolean; membershipStatus: string | null }
 interface Membership { key: string; membershipStatus: string | null; reason?: string | null }
-interface Material { id: string; title: string; summary: string | null; body: string | null; semiFranchiseKey: string; tags?: string[] }
+interface Material { revision?: number; category?: string; educationUrl?: string; id: string; title: string; summary: string | null; body: string | null; semiFranchiseKey: string; tags?: string[] }
 const BASE = '/neture/pharmacy';
 interface LoadIssue { message: string; retryable: boolean; login?: boolean; unavailable?: boolean }
 function loadIssue(error: unknown, stage: string): LoadIssue {
@@ -94,7 +95,7 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
       { key: 'materials', label: '자료', to: '/materials' + storeSearch },
       { key: 'participation', label: '참여 안내', to: model.participationPath + storeSearch },
       { key: 'community', label: '회원 교류', to: model.communityPath + storeSearch },
-      { key: 'support', label: '지원', to: '/contact' },
+      { key: 'support', label: '지원', to: state?.access.canManage ? `/operator/inbox/business/${encodeURIComponent(model.key)}` : '/' + storeSearch + '#cooperation-support' },
     ]} />
     {issue && <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
       <p role={issue.unavailable ? 'status' : 'alert'}>{issue.message}</p>
@@ -152,6 +153,7 @@ function SelectedMemberResources({ model, organizationId, client, view, storeSea
         <Link className="block py-3 underline" to="/contact">문의하기</Link>
       </section>
     </>}>
+      {accountId && <CooperationMemberWorkflows client={client} accountId={accountId} kind="business" scopeKey={model.key} organizationId={organizationId} />}
       {homeNews}
       <BusinessHomeShowcase client={client} businessKey={model.key} organizationId={organizationId} accountId={accountId} />
     </CooperationMemberHomeLayout>}
@@ -246,7 +248,7 @@ function Materials({ model, client, guide }: { model: CooperationModel; client: 
     {error ? <><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>다시 시도</button></> : !state || state.scope !== scope ? <p role="status">자료를 불러오고 있습니다…</p> : <>
     <p className="text-sm text-slate-600">{state.total}개 자료{tag && ` · ${tag}`}</p>
     {!state.items.length && <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.'}</p>}
-    {state.items.map(c => <details key={c.id} className="min-w-0 rounded-lg border p-4"><summary className="cursor-pointer break-words font-semibold">{c.title}</summary>{c.summary && <p className="my-3 break-words">{c.summary}</p>}{Array.isArray(c.tags) && <div className="my-3 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} className="min-h-11 rounded-full border px-3 text-sm" onClick={() => filter({ tag: value })}>{value}</button>)}</div>}{c.body && <ContentRenderer html={c.body} />}</details>)}
+    {state.items.map(c => <details key={c.id} className="min-w-0 rounded-lg border p-4"><summary className="cursor-pointer break-words font-semibold">{c.title}</summary>{c.revision && <p className="my-3 text-sm">{c.category || '미분류'} · 개정 {c.revision}</p>}{safeEducationUrl(c.educationUrl) && <a href={safeEducationUrl(c.educationUrl)} target="_blank" rel="noopener noreferrer" className="my-3 inline-flex min-h-11 items-center underline">관련 교육 열기 ↗</a>}{c.summary && <p className="my-3 break-words">{c.summary}</p>}{Array.isArray(c.tags) && <div className="my-3 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} className="min-h-11 rounded-full border px-3 text-sm" onClick={() => filter({ tag: value })}>{value}</button>)}</div>}{c.body && <ContentRenderer html={c.body} />}</details>)}
     {state.total > 20 && <nav aria-label="자료 목록 페이지"><button className="min-h-11" disabled={page === 1} onClick={() => filter({ page: String(page - 1) })}>이전</button><span className="px-4">{page}</span><button className="min-h-11" disabled={page * 20 >= state.total} onClick={() => filter({ page: String(page + 1) })}>다음</button></nav>}
     <p>자료를 가져와 편집·활용하려면 내 약국의 사업 자료를 이용하세요.</p>
     <Link className="inline-flex min-h-11 items-center rounded-lg bg-teal-800 px-4 py-2 text-white" to={`/tools${params.get('store') ? `?store=${encodeURIComponent(params.get('store')!)}` : ''}`}>내 매장 업무 · 이용 안내</Link>

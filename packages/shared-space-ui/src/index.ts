@@ -343,3 +343,5 @@ export { PublicServiceEntry, PUBLIC_SERVICE_ENTRIES, isPublicServiceKey, service
 export type { PublicServiceKey } from './service-entry/PublicServiceEntry';
 export { PublicServiceContact } from './service-entry/PublicServiceContact';
 export { ServiceContactInboxLink, useServiceContactCount } from './service-entry/ServiceContactInboxLink';
+export { CooperationMemberWorkflows, workflowEndpoint, workflowLabels, workflowDate, plainBody, safeEducationUrl, useWorkflowData, WorkflowMessages, WorkflowPager } from './cooperation/CooperationWorkflows';
+export type { WorkflowProps, WorkflowClient } from './cooperation/CooperationWorkflows';

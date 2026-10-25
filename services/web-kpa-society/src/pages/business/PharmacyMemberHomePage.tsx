@@ -7,7 +7,7 @@ import type { ForumPostResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import BusinessHomeFeature from './BusinessHomeFeature';
-import { BusinessHomeShowcase, CooperationMemberHomeLayout } from '@o4o/shared-space-ui';
+import { BusinessHomeShowcase, CooperationMemberHomeLayout, CooperationMemberWorkflows } from '@o4o/shared-space-ui';
 import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 import { businessError, businessPath, communityApiBase } from './api';
 
@@ -93,6 +93,7 @@ export default function PharmacyMemberHomePage() {
       <p className="my-3 text-sm leading-6 text-slate-600">사업 소식과 운영 자료는 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
       <Link className="font-medium text-blue-700" to={membershipPath}>참여 신청 · 상태 확인 →</Link>
     </section> : <>
+      {!access.canManage && user && <CooperationMemberWorkflows client={authClient.api} accountId={user.id} kind="business" scopeKey={business.key} organizationId={materialStore.organizationId} />}
       <section id="business-news" aria-labelledby="notices-title" className="scroll-mt-28 space-y-4">
         <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="사업 소식" to={forumPath} linkLabel="게시판에서 보기" />
         {business.communityKey && <NoticeContent state={currentNotices} pinned={pinnedNotices} recent={recentNotices} forumPath={forumPath} retry={() => setRetryPosts(n => n + 1)} />}
