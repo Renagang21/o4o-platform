@@ -20,6 +20,7 @@ integration('일반 편집→갱신 작업 — isolated PostgreSQL + real reposi
     descriptions: SharedProductDescriptionService;
   let created = false,
     failRenewal = false;
+  let afterCanonicalRead: (() => Promise<void>) | null = null;
   beforeAll(async () => {
     const url = new URL(process.env.CORRECTION_TEST_DATABASE_URL!);
     if (!['localhost', '127.0.0.1'].includes(url.hostname) || url.pathname !== '/correction_review')
@@ -103,7 +104,16 @@ integration('일반 편집→갱신 작업 — isolated PostgreSQL + real reposi
           params?.[2] === 'product_description_renewal'
         )
           throw new Error('synthetic renewal persistence failure');
-        return query(sql, params, structured);
+        const result = await query(sql, params, structured);
+        if (
+          afterCanonicalRead &&
+          sql.startsWith('SELECT id,content,summary FROM shared_product_descriptions')
+        ) {
+          const action = afterCanonicalRead;
+          afterCanonicalRead = null;
+          await action();
+        }
+        return result;
       };
       return runner;
     };
@@ -112,6 +122,7 @@ integration('일반 편집→갱신 작업 — isolated PostgreSQL + real reposi
   });
   beforeEach(async () => {
     failRenewal = false;
+    afterCanonicalRead = null;
     await pool.query('TRUNCATE settings,shared_product_descriptions,product_masters');
     await pool.query(
       "INSERT INTO product_masters(id,name,brand_name,specification,tags,barcode,manufacturer_name,regulatory_type) VALUES($1,'원본 상품','원본 브랜드','500mg','[]','SYNTHETIC','합성 제조사','HEALTH_FUNCTIONAL')",
@@ -298,6 +309,31 @@ integration('일반 편집→갱신 작업 — isolated PostgreSQL + real reposi
     ]);
     await descriptions.setCanonical(row.id, actor, { trackAdminEdit: true });
     expect(await eventCount()).toBe(1);
+  });
+  it('rejects a concurrent untracked promotion after checking an empty canonical group', async () => {
+    await pool.query(
+      "DELETE FROM shared_product_descriptions WHERE description_type='STORE' AND language='ko'",
+    );
+    const ours = await candidate(),
+      theirs = await candidate('<p>다른 관리자의 설명</p>', '다른 요약');
+    afterCanonicalRead = async () => {
+      await pool.query("UPDATE shared_product_descriptions SET status='canonical' WHERE id=$1", [
+        theirs.id,
+      ]);
+    };
+    await expect(
+      descriptions.setCanonical(ours.id, actor, { trackAdminEdit: true }),
+    ).rejects.toMatchObject({ code: 'PRODUCT_SOURCE_CHANGED', status: 409 });
+    expect(
+      (await pool.query('SELECT status FROM shared_product_descriptions WHERE id=$1', [theirs.id]))
+        .rows[0].status,
+    ).toBe('canonical');
+    expect(
+      (await pool.query('SELECT status FROM shared_product_descriptions WHERE id=$1', [ours.id]))
+        .rows[0].status,
+    ).toBe('candidate');
+    expect(await eventCount()).toBe(0);
+    expect(await tasks()).toHaveLength(0);
   });
   it('does not replace canonical or create another review when the same body and summary are saved again', async () => {
     const first = await candidate('<p>원본</p>', '요약');

@@ -26,3 +26,12 @@
 ## 결과
 
 구현·검증을 완료했다. [검증 기록](../checks/CHECK-O4O-PRODUCT-EDIT-RENEWAL-LINK-V1.md)과 [운영 안내](../guides/products/O4O-PRODUCT-EDIT-RENEWAL-LINK-V1.md)를 따른다. 개발 branch를 push하고 종료하며 PR·병합·배포·운영 변경은 수행하지 않는다.
+
+## 동일 WO 후속: main 병합 전 준비
+
+- [x] 최신 main을 개발 branch에 반영하고 기존 worker·AI/OCR 변경 보존
+- [x] 별도 경로의 정본 승격 경합 재현·원자적 취소·HTTP 409 처리
+- [x] 실제 DB·권한·관리자 전체·타입·build 검증 및 기존 선택 통합 42개 실행
+- [x] 배포 위험 LEVEL_3 확인 및 운영 경계 기록
+
+이 후속도 개발 branch push까지다. 정식 PR·CI·main 병합·배포는 통합 담당 단계로 남긴다. 상세 결과는 연결된 CHECK에 추가 기록한다.
