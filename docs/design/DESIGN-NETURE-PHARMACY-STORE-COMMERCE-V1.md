@@ -601,7 +601,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 - 공유 전 현재 역할/기능·상품 활성·게시 자료 버전을 확인한다. 두 기기는 서버 발급 결과 ID로 공유하며 원문이 바뀌거나 비공개가 되면 거절한다. 이미 전달한 자료도 다음 고객 조회에서 현재 자격·게시 상태를 재검사하여 가린다. 한 화면의 고객 dialog도 표시 직전에 비용 없는 원문 재검증을 한다.
 - 기존 상담 행의 현재 준비/공유 JSON만 사용하고 새 schema·장기 이력은 추가하지 않는다. 본문과 질문은 로그·브라우저 저장소·AI Task/Memory에 기록하지 않는다. 이번 개발·검증: [TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md), [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md). 실계정·실제 기기/번역 품질·운영 적용은 개발 완료와 구분한다.
 
-#### 15-8-2. 전문 판단 초안·확인한 자산 재사용 (2026-10-25 개발 branch)
+#### 15-8-2. 전문 판단 초안·확인한 자산 재사용 (2026-10-25 개발·통합 이력)
 
 - 사용자 선택은 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과를 재사용하는 것이다. 기존 [데이터 범위](DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md)를 따른다. 선행 사용성 보완과 이번 연결 코드는 전용 branch에 포함하며 main 반영·배포는 별도다.
 - 약사 모드의 `pharmacy.consultation.support`는 현재 매장 활성 상품의 한국어 게시 자료(기존 대체 언어 처리 포함)와 출처/확인을 갖춘 직접 입력 전문 자료를 사용한다. 상품 사실·전문 참고/판단 사항·확인 질문 최대 하나·고객용 초안을 구분한다. 출처 ID와 인용에 없는 수치를 거부하며 현재 권한/기능·약사 사용 확인/자료 버전을 호출 후 재확인한다. 일반 직원에게 전문 판단 API 권한을 확장하지 않는다.
@@ -610,6 +610,8 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 - 만료 상담 전달 상태 정리 job은 90초 연결 만료·60초 주기·200행 상한·SKIP LOCKED를 사용하며 본문/연결 코드를 비우고 epoch를 바꾼다. 기기 등록·업무 자산은 보존한다. 기본 dry-run이며 운영 쓰기는 `CONSULTATION_STATE_CLEANUP_MODE=apply`로 배포 담당자가 명시 활성화해야 한다. 새로운 일반 보존기간이나 즉시 전체 파기 보장이 아니다.
 
 실행 증거·미확인: [통합 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md) · [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md). 브라우저 합성 API·provider와 격리 PostgreSQL 검증을 운영 계정·실제 음성/기기·전문 품질 검수로 확대 해석하지 않는다.
+
+후속 main 통합·운영 반영: PR #813, main `fda3f672d1`. 위 문단의 branch/push와 기본 dry-run은 당시 개발 단계다. production API의 명시 apply·기존 중지 설정 보존 처리를 포함한 실제 배포/관측 결과는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다. 현재 enabled 값·정리 count/본문 파기와 현장/약사 품질은 확인하지 않았다.
 
 작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md). 실제 외부 AI·실계정·운영 제공 정책·배포 검증은 실행 결과와 구분한다.
 

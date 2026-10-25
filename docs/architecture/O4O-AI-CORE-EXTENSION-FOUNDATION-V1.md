@@ -289,11 +289,13 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 확정 workflow·serving label·공개 준비 상태/웹 응답·무인증 AI 경로 차단 결과는 [CHECK §6-1](../checks/CHECK-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md#6-1-통합배포-확정-결과)에 있다. 공개 smoke는 유료 AI를 요청하거나 업무 데이터를 만들지 않았다. 실제 계정의 AI 품질·요금/한도·업무 완료 검증은 남았으며 §14의 DEFER 범위를 완료로 바꾸지 않는다. 이 기록은 해당 배포 시점의 증거이며 이후 live 상태를 대신하지 않는다.
 
-### 14-2. 내 매장 전문 판단 지원 — 개발 branch (2026-10-25)
+### 14-2. 내 매장 전문 판단 지원 — 개발·통합 이력 (2026-10-25)
 
 `pharmacy.consultation.support`는 약국 도메인의 현재 역할/기능·약사 사용 확인·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
 
-사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md). 이 절은 해당 branch의 개발 기록이며 §14-1의 운영 완료 범위를 확장하지 않는다.
+사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 개발 당시 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도였다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [개발 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md).
+
+후속 사용자 지시로 PR #813을 main `fda3f672d1`에 통합했다. 기존 verified Promote `40183174373`에서 API·Store가 DEPLOYED이며 명시 apply/기존 중지 값 보존 처리와 공개 smoke 13건이 통과했다. 실제 enabled 값·정리 count/본문 파기와 약사/현장 품질은 미관측이며, 실제 provider/업무 검증 완료로 해석하지 않는다. 운영 반영 범위와 한계는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
 
 ## 15. 텍스트 회계 연결 보완 — 개발 branch (2026-10-25)
 
