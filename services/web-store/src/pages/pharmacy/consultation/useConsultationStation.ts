@@ -21,6 +21,7 @@ export function useConsultationStation(
     alive = useRef(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
+    [heartbeatError, setHeartbeatError] = useState(""),
     [conflict, setConflict] = useState(false);
   const [pairing, setPairing] = useState<{
     code: string;
@@ -35,18 +36,22 @@ export function useConsultationStation(
     current.current = data;
     setRoom(data);
   }, []);
-  useEffect(() => {
-    alive.current = true;
+  const release = useCallback(() => {
     generation.current++;
     current.current = null;
     setRoom(null);
     setPairing(null);
-    setError("");
     setConflict(false);
+  }, []);
+  useEffect(() => {
+    alive.current = true;
+    release();
+    setError("");
+    setHeartbeatError("");
     return () => {
       alive.current = false;
     };
-  }, [scope, mode, stationKey]);
+  }, [scope, mode, stationKey, release]);
   const run = useCallback(
     async <T>(operation: () => Promise<T>, accept: (value: T) => void) => {
       if (lock.current) return false;
@@ -54,6 +59,7 @@ export function useConsultationStation(
       lock.current = true;
       setBusy(true);
       setError("");
+      setHeartbeatError("");
       try {
         const value = await operation();
         if (alive.current && generation.current === version) {
@@ -64,6 +70,7 @@ export function useConsultationStation(
         if (alive.current && generation.current === version) {
           setError((e as Error).message);
           setConflict((e as { code?: string }).code === "STATION_IN_USE");
+          if ([401, 403].includes((e as { status?: number }).status ?? 0)) release();
         }
       } finally {
         lock.current = false;
@@ -71,7 +78,7 @@ export function useConsultationStation(
       }
       return false;
     },
-    [],
+    [release],
   );
   const open = useCallback(
     (replace = false) =>
@@ -105,17 +112,15 @@ export function useConsultationStation(
         const data = await stationHeartbeat(captured);
         if (!cancelled && generation.current === version) {
           apply(data);
-          setError("");
+          setHeartbeatError("");
         }
       } catch (e) {
         if (!cancelled && generation.current === version) {
-          setError((e as Error).message);
-          if ((e as { code?: string }).code === "CONSULTATION_CHANGED") {
-            generation.current++;
-            current.current = null;
-            setRoom(null);
-            setPairing(null);
-            setConflict(false);
+          setHeartbeatError((e as Error).message);
+          if ((e as { code?: string }).code === "CONSULTATION_CHANGED" ||
+              [401, 403].includes((e as { status?: number }).status ?? 0)) {
+            setError((e as Error).message);
+            release();
           }
         }
       } finally {
@@ -127,7 +132,7 @@ export function useConsultationStation(
       cancelled = true;
       clearInterval(timer);
     };
-  }, [room?.id, room?.epoch, room?.active, apply]);
+  }, [room?.id, room?.epoch, room?.active, apply, release]);
   const action = useCallback(
     (input: Record<string, unknown>) => {
       const captured = current.current;
@@ -147,5 +152,5 @@ export function useConsultationStation(
     if (!captured?.active) return Promise.resolve(false);
     return run(() => createConsultationPairing(captured), setPairing);
   }, [run]);
-  return { room, busy, error, conflict, pairing, open, action, pair };
+  return { room, busy, error: error || heartbeatError, conflict, pairing, open, action, pair };
 }

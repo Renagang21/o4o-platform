@@ -11,6 +11,7 @@ import {
 import type { GuidanceSelector } from "./consultation-guidance.extension.js";
 import type { ConsultationTranslator } from "./consultation-translator.js";
 import type { StationAuthorization } from "./consultation-stations.js";
+import type { ConsultationSupportSource } from "./consultation-support.extension.js";
 import { StoreStaffSupportService } from "./store-staff-support.js";
 type Json = Record<string, unknown>;
 export type GuidanceIntent =
@@ -479,5 +480,28 @@ export class ConsultationGuidanceService {
         "GUIDANCE_SOURCE_CHANGED",
         "상품 또는 게시 자료가 변경되었습니다. 현재 자료로 다시 준비해 주세요.",
       );
+  }
+
+  async supportMaterial(actor: string, org: string, input: Json) {
+    if (input.mode !== 'counter-pharmacist' && input.mode !== 'floor-pharmacist')
+      fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담 방식과 사용 확인이 필요합니다.');
+    const mode = String(input.mode);
+    await this.access(actor, org, mode);
+    const product = await this.products.product(org, input.productKind, input.productId);
+    const read = () => this.material(org, String(input.productKind), String(input.productId), 'ko');
+    const material = await read();
+    const sourceVersion = digest({ product, material: material?.version ?? null });
+    const authorize = async () => {
+      await this.access(actor, org, mode);
+      const current = await this.products.product(org, input.productKind, input.productId);
+      if (digest({ product: current, material: (await read())?.version ?? null }) !== sourceVersion)
+        fail(409, 'GUIDANCE_SOURCE_CHANGED', '상품 또는 게시 자료가 변경되었습니다. 현재 근거로 다시 준비해 주세요.');
+      return true;
+    };
+    const sources: ConsultationSupportSource[] = (material?.passages ?? []).slice(0, 10).map(passage => ({
+      id: `p${passage.id}`, kind: 'product-fact', title: `${material!.page.title} · ${material!.page.locale}`,
+      text: passage.text,
+    }));
+    return { productName: product.name as string, sources, sourceVersion, authorize };
   }
 }

@@ -29,6 +29,8 @@ const props = {
   supportAllowed: true,
   room: null,
   voice: null,
+  voiceSupported: true,
+  voiceListening: false,
   ...callbacks,
 };
 const output = (body: any) => ({
@@ -239,4 +241,33 @@ it("preserves selected passage IDs when translating without another AI request",
       selection: { sourceVersion: "fixture-source-version", passageIds: [2] },
     }),
   );
+});
+
+it.each(["AI", "translation"])("retries the failed %s operation with the same question, product and passage selection", async (operation) => {
+  render(<ConsultationGuidancePanel {...props} language="ja" />);
+  await selectProduct();
+  fireEvent.change(screen.getByLabelText("상담 안내 요청"), { target: { value: "확인할 질문" } });
+  if (operation === "translation") {
+    fireEvent.click(screen.getByRole("button", { name: "AI로 관련 문단 추리기" }));
+    await screen.findByText("질문에 맞는 게시 문단");
+  }
+  api.post.mockRejectedValueOnce(new Error("temporary preparation failure"));
+  fireEvent.click(screen.getByRole("button", { name: operation === "AI" ? "AI로 관련 문단 추리기" : "선택 언어로 번역 준비" }));
+  await screen.findByText("temporary preparation failure");
+  const failed = api.post.mock.calls[api.post.mock.calls.length - 1][1];
+  const count = api.post.mock.calls.length;
+  fireEvent.click(screen.getByRole("button", { name: "같은 안내 다시 준비" }));
+  await waitFor(() => expect(api.post.mock.calls.length).toBe(count + 1));
+  expect(api.post.mock.calls[api.post.mock.calls.length - 1][1]).toEqual(failed);
+  expect(failed).toMatchObject({ question: "확인할 질문", productId: "product", language: "ja" });
+  if (operation === "translation") expect(failed.selection.passageIds).toEqual([2]);
+});
+
+it("accepts a completed voice request without opening the software keyboard", () => {
+  const view = render(<ConsultationGuidancePanel {...props} />);
+  view.rerender(<ConsultationGuidancePanel {...props} voice={{ text: "음성으로 문의한 내용", sequence: 1 }} />);
+  const input = screen.getByLabelText("상담 안내 요청") as HTMLInputElement;
+  expect(input.value).toBe("음성으로 문의한 내용");
+  expect(document.activeElement).not.toBe(input);
+  expect(api.post).not.toHaveBeenCalled();
 });

@@ -6,6 +6,7 @@ import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { MultilingualChannelActions } from './multilingual/MultilingualChannelActions';
 
 export function StoreMultilingualContentsMyPage() {
   const scope = useStoreOperationScope();
@@ -89,6 +90,7 @@ function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonl
       <h3 className="font-semibold">{result.page.title}</h3><p>{result.page.summary}</p>
       {typeof html === 'string' ? <div className="prose max-w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }} /> : <p className="text-sm">이 형식의 전체 내용은 고객용 보기에서 확인해 주세요.</p>}
     </div>}
+    <MultilingualChannelActions groupId={group.id} locale={locale} published={group.pages.some(p => p.status === 'published')} />
     <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} onPublished={async () => {
       const current = publication.begin();
       const saved = await getStoreMlcGroup(group.id);
