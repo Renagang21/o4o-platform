@@ -225,3 +225,7 @@ S2-2/S4-4의 주요 **코드 연결**은 이번 묶음에 포함했다. 다만 �
 [TODO](TODO-O4O-AI-PRICING-READINESS-V1.md)의 `wo/ai-pricing-readiness`에서 기존 가격/native 계획·quota의 순수 판정을 재사용하는 오프라인 CLI와 검토용 draft·16개 후보 예제·[운영 준비 guide](../guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)를 준비했다. 비용의 정확한 한도 도달을 초과로 오판한 오류도 실제 PostgreSQL에서 재현·수정했다. 현재 모델·단가를 추측하거나 native 요청을 유료 호출하지 않는다.
 
 검증/인계는 [CHECK](../checks/CHECK-O4O-AI-PRICING-READINESS-V1.md)를 따르며 개발 종료점은 push다. 표본/snapshot 통과를 현재 운영 선택·credential·user quota·실사용/배포의 확인으로 바꾸지 않는다. S2-2/S4-4의 실제 운영 가격·한도·계정 검증과 외부 청구는 계속 별도다.
+
+## 16. 가격 도구·비용 비교 main 통합 (2026-10-25)
+
+§15 이후 사용자가 이 공간의 push 작업 전체를 main 병합·배포하도록 지시했다. AI 브랜치 11개 중 이전 10개는 이미 main에 포함돼 있었고, 가격·quota 변경 17개 파일을 PR #815/main `fcae70f142`에 통합했다. 개발 CHECK/TODO의 push-only 범위는 당시 기록으로 보존한다. main CI·배포·서빙/공개 검증은 [후속 CHECK](../checks/CHECK-O4O-AI-PRICING-INTEGRATION-20261025.md)를 따른다. 실제 요율/운영 quota·계정·유료 호출과 S2-2/S4-4의 남은 검증은 별도다.
