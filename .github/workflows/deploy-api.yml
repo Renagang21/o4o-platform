@@ -430,6 +430,19 @@ jobs:
         # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
         skip_install: true
 
+    # Validate only operator-provided/existing prices; never invent rates or clear an existing catalog.
+    - name: Resolve AI pricing catalog (validate and preserve)
+      if: inputs.migrate_only != 'true'
+      env:
+        OPTENV_AI_PRICING_CATALOG: ${{ vars.AI_PRICING_CATALOG }}
+      run: |
+        node scripts/ci/cloud-run-env.mjs optional \
+          --service ${{ env.SERVICE_NAME }} \
+          --names AI_PRICING_CATALOG --require-current true --require-plain true \
+          --out "$RUNNER_TEMP/ai-pricing-candidate"
+        node --import tsx apps/api-server/src/scripts/ai-pricing-environment.ts \
+          --input "$RUNNER_TEMP/ai-pricing-candidate" --out "$RUNNER_TEMP/ai-pricing-env"
+
     - name: Configure Docker for Artifact Registry
       run: |
         gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
@@ -674,6 +687,8 @@ jobs:
         fi
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
+        AI_PRICING_ENV=()
+        if [ -s "$RUNNER_TEMP/ai-pricing-env" ]; then mapfile -d '' AI_PRICING_ENV < "$RUNNER_TEMP/ai-pricing-env"; fi
         CONSULTATION_CLEANUP_ENV=()
         if [ -s "$RUNNER_TEMP/consultation-cleanup-env" ]; then mapfile -d '' CONSULTATION_CLEANUP_ENV < "$RUNNER_TEMP/consultation-cleanup-env"; fi
 
@@ -756,6 +771,7 @@ jobs:
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           "${KAKAO_ENV[@]}" \
           "${OPTIONAL_ENV[@]}" \
+          "${AI_PRICING_ENV[@]}" \
           "${CONSULTATION_CLEANUP_ENV[@]}" \
           "${EXTERNAL_AI_ENV[@]}" \
           "${PAYMENT_ENV[@]}" \

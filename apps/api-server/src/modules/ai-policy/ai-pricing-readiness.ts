@@ -1,6 +1,6 @@
 /** Offline configuration checks. No provider, application connection, settings writes or reservations. */
-import { createHash } from 'node:crypto';
 import { loadAiPriceCatalog, type AiPriceCatalog } from './ai-pricing.js';
+import { fingerprintAiPriceCatalog } from './ai-pricing-observation.js';
 import { prepareNativePlan, type AiNativeRequest } from './ai-native-metering.js';
 import { evaluateAiQuotaRows, type AiQuotaEvaluationRow } from './ai-quota.service.js';
 import { SERVICE_FOR_SCOPE, type AiPolicyScope } from './ai-policy-scope.js';
@@ -17,6 +17,12 @@ export interface AiQuotaSnapshot {
   rows: AiQuotaEvaluationRow[];
   ignoredUserRules: number;
 }
+export interface AiRuntimePricingSnapshot {
+  observedAt: string;
+  state: 'loaded' | 'legacy-estimates' | 'invalid';
+  version: string | null;
+  fingerprint: string | null;
+}
 const invalid = (): never => { throw new Error('AI_PRICING_CHECK_INPUT_INVALID'); };
 function object(input: unknown, keys: readonly string[]): Record<string, unknown> {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !keys.includes(key))) return invalid();
@@ -29,6 +35,34 @@ function text(input: unknown, pattern: RegExp): string {
 function count(input: unknown): number {
   if (!Number.isSafeInteger(input) || (input as number) < 0) return invalid();
   return input as number;
+}
+function observationTime(input: unknown): string {
+  if (typeof input !== 'string' || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/.test(input) || !Number.isFinite(Date.parse(input))) return invalid();
+  if (new Date(input).toISOString().replace('.000Z', 'Z') !== input.replace('.000Z', 'Z')) return invalid();
+  return input;
+}
+
+/** Accept the existing authenticated management response or its curated metadata, never copy unrelated fields. */
+export function parseAiRuntimePricingSnapshot(input: unknown): AiRuntimePricingSnapshot {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return invalid();
+  const response = input as Record<string, unknown>;
+  const data = 'success' in response
+    ? (response.success === true && response.data && typeof response.data === 'object' && !Array.isArray(response.data)
+      ? response.data as Record<string, unknown> : invalid())
+    : object(input, ['observedAt', 'pricing']);
+  const pricing = object(data.pricing, ['state', 'version', 'fingerprint', 'modelRateCount', 'nativeProfileCount', 'currencies', 'code']);
+  if (!['loaded', 'legacy-estimates', 'invalid'].includes(pricing.state as string) ||
+    !Array.isArray(pricing.currencies) || pricing.currencies.some(value => typeof value !== 'string' || !/^[A-Z]{3}$/.test(value))) return invalid();
+  const state = pricing.state as AiRuntimePricingSnapshot['state'];
+  if (state === 'invalid') {
+    if (pricing.version !== null || pricing.fingerprint !== null || pricing.modelRateCount !== null ||
+      pricing.nativeProfileCount !== null || pricing.currencies.length || pricing.code !== 'AI_PRICING_INVALID') return invalid();
+    return { observedAt: observationTime(data.observedAt), state, version: null, fingerprint: null };
+  }
+  if (pricing.code !== null || count(pricing.modelRateCount) < 1) return invalid();
+  count(pricing.nativeProfileCount);
+  return { observedAt: observationTime(data.observedAt), state,
+    version: text(pricing.version, /^[a-zA-Z0-9._-]{1,80}$/), fingerprint: text(pricing.fingerprint, /^[a-f0-9]{64}$/) };
 }
 
 /** A reviewed sample of actual invocations, not a second model selector or a host inventory. */
@@ -83,8 +117,8 @@ function quotaRow(value: unknown): AiQuotaEvaluationRow | null | 'user' {
 /** Accept the existing quota-status fields; user identifiers never leave the parser. */
 export function parseAiQuotaSnapshot(input: unknown): AiQuotaSnapshot {
   const snapshot = object(input, ['observedAt', 'rows']);
-  if (typeof snapshot.observedAt !== 'string' || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/.test(snapshot.observedAt) || !Number.isFinite(Date.parse(snapshot.observedAt)) || !Array.isArray(snapshot.rows) || snapshot.rows.length > 5000) return invalid();
-  if (new Date(snapshot.observedAt).toISOString().replace('.000Z', 'Z') !== snapshot.observedAt.replace('.000Z', 'Z')) return invalid();
+  const observedAt = observationTime(snapshot.observedAt);
+  if (!Array.isArray(snapshot.rows) || snapshot.rows.length > 5000) return invalid();
   const rows: AiQuotaEvaluationRow[] = [];
   let ignoredUserRules = 0;
   const seen = new Set<string>();
@@ -97,11 +131,15 @@ export function parseAiQuotaSnapshot(input: unknown): AiQuotaSnapshot {
     seen.add(key);
     rows.push(row);
   }
-  return { observedAt: snapshot.observedAt, rows, ignoredUserRules };
+  return { observedAt, rows, ignoredUserRules };
 }
 
 const SAFE_ERRORS = new Set(['AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_INVALID', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID', 'AI_USAGE_INVALID', 'AI_QUOTA_INVALID']);
-export function checkAiPricingReadiness(manifest: AiPricingManifest, catalog: AiPriceCatalog, snapshot?: AiQuotaSnapshot) {
+export function checkAiPricingReadiness(manifest: AiPricingManifest, catalog: AiPriceCatalog, snapshot?: AiQuotaSnapshot, runtime?: AiRuntimePricingSnapshot) {
+  const catalogFingerprint = fingerprintAiPriceCatalog(catalog);
+  const runtimePricing = runtime ? { observedAt: runtime.observedAt, catalogVersion: runtime.version,
+    state: runtime.state === 'invalid' ? 'unavailable' as const
+      : runtime.fingerprint === catalogFingerprint && runtime.version === catalog.version ? 'match' as const : 'mismatch' as const } : null;
   const cases = manifest.cases.map(row => {
     const identity = { id: row.id, provider: row.request.provider, model: row.request.model, kind: row.request.kind, scope: row.scope, serviceKey: row.serviceKey };
     try {
@@ -124,11 +162,11 @@ export function checkAiPricingReadiness(manifest: AiPricingManifest, catalog: Ai
     }
   });
   return { kind: 'offline-configuration-check' as const, catalogVersion: catalog.version,
-    catalogFingerprint: createHash('sha256').update(JSON.stringify(catalog)).digest('hex'),
-    status: cases.every(row => row.status === 'passed') ? 'passed' as const : 'blocked' as const,
+    catalogFingerprint, runtimePricing,
+    status: cases.every(row => row.status === 'passed') && (!runtimePricing || runtimePricing.state === 'match') ? 'passed' as const : 'blocked' as const,
     checkedCases: cases.length, cases,
     quotaSnapshot: snapshot ? { observedAt: snapshot.observedAt, ignoredUserRules: snapshot.ignoredUserRules } : null,
-    unverified: [...(!snapshot ? ['QUOTA_CONFIGURATION'] : []), 'CURRENT_RUNTIME_MODEL_SELECTION', 'CREDENTIALS', 'PROVIDER_ACCESS', 'LIVE_USAGE_AND_RESERVATIONS', 'USER_QUOTA', 'DEPLOYMENT'],
+    unverified: [...(!snapshot ? ['QUOTA_CONFIGURATION'] : []), ...(runtimePricing?.state !== 'match' ? ['CURRENT_RUNTIME_PRICE_CATALOG'] : []), 'CURRENT_RUNTIME_MODEL_SELECTION', 'CREDENTIALS', 'PROVIDER_ACCESS', 'LIVE_USAGE_AND_RESERVATIONS', 'USER_QUOTA', 'DEPLOYMENT'],
     notice: '검토한 실행 사례와 제공된 설정/snapshot만 검사합니다. 실제 실행의 원자 예약이나 운영 활성화 확인을 대신하지 않습니다.' };
 }
 

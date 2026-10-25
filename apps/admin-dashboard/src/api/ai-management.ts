@@ -28,6 +28,15 @@ const snapshot = z
     notice: z.string(),
     queryPolicyRead: z.enum(["read", "unavailable"]),
     scopePolicyRead: z.enum(["read", "unavailable"]),
+    pricing: z.object({
+      state: z.enum(['loaded', 'legacy-estimates', 'invalid']),
+      version: z.string().nullable(),
+      fingerprint: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+      modelRateCount: z.number().int().nonnegative().nullable(),
+      nativeProfileCount: z.number().int().nonnegative().nullable(),
+      currencies: z.array(z.string().regex(/^[A-Z]{3}$/)),
+      code: z.literal('AI_PRICING_INVALID').nullable(),
+    }).optional(),
     groups: z.array(
       z.object({
         id: z.string(),

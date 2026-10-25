@@ -9,6 +9,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AiManagement from "../pages/settings/AiManagement";
 import { unifiedApi } from "../api/unified-client";
+import { getAiManagement } from '../api/ai-management';
 
 vi.mock("../api/unified-client", () => ({
   unifiedApi: { raw: { get: vi.fn(), put: vi.fn() } },
@@ -110,6 +111,18 @@ const renderPage = () =>
 beforeEach(() => vi.resetAllMocks());
 
 describe("AI usage inventory and connection status", () => {
+  it('accepts optional observed price metadata without treating it as provider verification and keeps older responses compatible', async () => {
+    const pricing = { state: 'loaded', version: 'synthetic-v1', fingerprint: 'a'.repeat(64),
+      modelRateCount: 1, nativeProfileCount: 1, currencies: ['USD'], code: null };
+    get.mockResolvedValue(reply({ ...snapshot(), pricing }));
+    const data = await getAiManagement();
+    expect(data.pricing).toEqual(pricing);
+    expect(data.usages.every(usage => usage.application === 'unverified')).toBe(true);
+    get.mockResolvedValue(reply(snapshot()));
+    expect((await getAiManagement()).pricing).toBeUndefined();
+    get.mockResolvedValue(reply({ ...snapshot(), pricing: { ...pricing, fingerprint: 'invalid-digest' } }));
+    await expect(getAiManagement()).rejects.toThrow('AI 운영 응답을 확인할 수 없습니다.');
+  });
   it("loads the admin endpoint, filters by names and area, opens a shared policy detail without writes", async () => {
     get.mockResolvedValue(reply(snapshot()));
     renderPage();

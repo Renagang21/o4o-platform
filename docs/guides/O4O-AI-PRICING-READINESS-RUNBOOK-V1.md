@@ -126,3 +126,7 @@ user 규칙은 식별자를 결과에 복사하지 않고 `ignoredUserRules` 건
 보류 정산은 reservation/실제 provider·model·기간·확인된 사용량/무과금 증거를 대조한 뒤 기존 host-only `AiQuotaService.reconcile` 경로로 처리한다. 증거 ID로 중복 처리를 막는다. CLI가 DB를 수정하거나 원장을 재작성하지 않으며 TTL만으로 해제하지 않는다. 운영 증거/원문·사용자 정보를 public CHECK에 복사하지 않는다.
 
 복구 시에는 승인된 기존 배포/설정 복구 경로로 이전 catalog·revision을 회복하고 원장/보류를 보존한다. 가격 오류를 quota 비활성화·임시 무료 가격·새 원장으로 우회하지 않는다.
+
+## 7. 운영 전달·관측 후속 개발
+
+`wo/ai-runtime-operations-readiness`는 기존 optional env로 현재 catalog를 보존·검증하는 배포 source, 기존 관리자 GET의 안전한 process 가격 관측, 이 CLI의 선택적 `--runtime-snapshot` 비교를 준비한다. [운영 적용·실사용 검증 인계](O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)의 순서·한계와 [CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)를 따른다. 이 후속은 main 통합 전 push 인계이며 실제 가격/한도·계정 설정·유료 검증을 실행하지 않았다. metadata 일치를 현재 모델·provider 사용 성공이나 실시간 예약 증거로 확대하지 않는다.

@@ -13,7 +13,8 @@ describe("historical unknown-usage SQL", () => {
       "costEstimated" NUMERIC, "createdAt" TEXT, "requestId" TEXT
     )`);
     database.exec(`CREATE TABLE ai_usage_reservations (
-      provider_request_id TEXT, pricing TEXT, receipt TEXT, scope TEXT, outcome TEXT, status TEXT, actual_cost NUMERIC, created_at TEXT
+      provider_request_id TEXT, pricing TEXT, receipt TEXT, scope TEXT, outcome TEXT, status TEXT, actual_cost NUMERIC, created_at TEXT,
+      reconciliation_id TEXT, reconciliation_usage TEXT
     )`);
     service = new AiManagementService(
       {
@@ -106,7 +107,7 @@ describe("historical unknown-usage SQL", () => {
     expect(result.groups[0].relatedUsages).toHaveLength(2);
   });
   function native(provider: string, known: boolean, units = 1, cost: number | null = 0.05, receiptPresent = true) {
-    database.prepare('INSERT INTO ai_usage_reservations VALUES (?,?,?,?,?,?,?,?)').run('native-request',
+    database.prepare('INSERT INTO ai_usage_reservations(provider_request_id,pricing,receipt,scope,outcome,status,actual_cost,created_at) VALUES (?,?,?,?,?,?,?,?)').run('native-request',
       JSON.stringify([{ provider, invocation: { kind: 'ocr', model: 'native-model' } }]),
       receiptPresent ? JSON.stringify({ provider, model: 'native-model', native: { usageKnown: known, inputTokens: 0, outputTokens: 0, units } }) : null,
       'PRODUCT_CONTENT', receiptPresent ? 'success' : null, known ? 'settled' : receiptPresent ? 'pending' : 'reserved', cost, '2026-10-20T01:00:00.000Z');
@@ -141,6 +142,19 @@ describe("historical unknown-usage SQL", () => {
   it('does not turn a missing native cost into verified free usage', async () => {
     native('google-vision', true, 1, null);
     expect((await query()).total).toMatchObject({ records: 1, unpriced: 1, cost: '0.00000000' });
+  });
+
+  it('distinguishes verified reconciled cost from an unknown input/output breakdown and requires complete evidence state', async () => {
+    native('openai', false, 0, 0);
+    database.exec(`UPDATE ai_usage_reservations SET status='settled', actual_cost=0.02,
+      reconciliation_id='synthetic-proof', reconciliation_usage='{"requests":0,"tokens":15,"cost":0.02}'`);
+    expect((await query()).total).toMatchObject({ unpriced: 0, unmetered: 1, cost: '0.02000000' });
+    database.exec("UPDATE ai_usage_reservations SET reconciliation_usage=NULL");
+    expect((await query()).total.unpriced).toBe(1);
+    database.exec(`UPDATE ai_usage_reservations SET status='pending', reconciliation_usage='{"cost":0.02}'`);
+    expect((await query()).total.unpriced).toBe(1);
+    database.exec("UPDATE ai_usage_reservations SET status='settled', actual_cost=NULL");
+    expect((await query()).total.unpriced).toBe(1);
   });
 
 });
