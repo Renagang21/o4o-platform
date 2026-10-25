@@ -20,10 +20,10 @@
 
 ```bash
 umask 077
-cp docs/examples/ai-pricing-cases.example.json /tmp/o4o-ai-cases.json
+cp apps/api-server/src/scripts/data/check-data/ai-pricing-cases.example.json /tmp/o4o-ai-cases.json
 ```
 
-[예제](../examples/ai-pricing-cases.example.json)는 16개 검토 후보이며 현재 운영 모델 목록이 아니다. 모델과 텍스트 bytes의 `null`은 **반드시 확인해야 하는 미확정 값**이다. 그대로 검사하면 exit 2이며 draft도 만들지 않는다. 미사용 후보는 검토 근거를 따로 남기고 제외한다. 실제 사용 경로를 누락해도 CLI가 자동 발견한 것으로 표시하지 않는다.
+[예제](../../apps/api-server/src/scripts/data/check-data/ai-pricing-cases.example.json)는 16개 검토 후보이며 현재 운영 모델 목록이 아니다. 모델과 텍스트 bytes의 `null`은 **반드시 확인해야 하는 미확정 값**이다. 그대로 검사하면 exit 2이며 draft도 만들지 않는다. 미사용 후보는 검토 근거를 따로 남기고 제외한다. 실제 사용 경로를 누락해도 CLI가 자동 발견한 것으로 표시하지 않는다.
 
 모델은 기존 관리자 선택과 server resolver가 최종 해석한 값을 대조한다. 관리자 snapshot의 `stored/code/runtime` 표기를 최종 실행 모델로 단정하지 않는다. 일반·강화·provider별 화면 계획, 공개/인증 검색, TTS provider별 선택, Qwen 실패 후 canonical Gemini 대체를 각각 확인한다. 모델을 바꾸면 다시 검사한다.
 
