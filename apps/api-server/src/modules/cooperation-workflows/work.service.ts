@@ -89,7 +89,11 @@ export class CooperationWorkService {
       } else if (input.state !== "draft")
         throw invalid("먼저 초안을 저장한 뒤 게시·모집을 시작해 주세요.");
       const source = subjectSource(scope);
-      if (input.targetIds.length) {
+      // Recruitment freezes target identity; later membership changes must not
+      // prevent operators from progressing or closing the historical activity.
+      const keepsActivityTargets =
+        previous?.kind === "activity" && previous.state !== "draft";
+      if (input.targetIds.length && !keepsActivityTargets) {
         const [valid] = await manager.query(
           `SELECT count(*)::int AS count FROM (${source.sql}) members WHERE id=ANY($2::uuid[])`,
           [...source.params, input.targetIds],

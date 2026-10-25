@@ -377,6 +377,56 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
       ),
     ).toHaveLength(0);
   });
+  it.each(["pharmacy", "person"])(
+    "can close a targeted activity after its %s member is suspended",
+    async (kind) => {
+      const scope = kind === "pharmacy" ? business : cooperative;
+      const target = kind === "pharmacy" ? store : person;
+      const membershipSql =
+        kind === "pharmacy"
+          ? "UPDATE semi_franchise_memberships SET status=$1 WHERE semi_franchise_id=$2 AND organization_id=$3"
+          : "UPDATE cooperative_memberships SET status=$1 WHERE cooperative_id=$2 AND user_id=$3";
+      const membershipId = kind === "pharmacy" ? sf : coop;
+      const activity = {
+        ...input,
+        kind: "activity",
+        required: false,
+        targetIds: [target],
+      };
+      await mockDb.query(membershipSql, ["active", membershipId, target]);
+      const draft = await works.save(scope, op, undefined, activity);
+      let current = await works.save(scope, op, draft.id, {
+        ...activity,
+        state: "recruiting",
+        version: 1,
+      });
+      await mockDb.query(membershipSql, ["suspended", membershipId, target]);
+      try {
+        await expect(
+          works.save(scope, op, undefined, activity),
+        ).rejects.toMatchObject({ httpStatus: 400 });
+        await expect(
+          works.save(scope, op, draft.id, {
+            ...activity,
+            state: "active",
+            version: current.version,
+            targetIds: [],
+          }),
+        ).rejects.toMatchObject({ httpStatus: 400 });
+        for (const state of ["active", "ended", "archived"]) {
+          current = await works.save(scope, op, draft.id, {
+            ...activity,
+            state,
+            version: current.version,
+          });
+          expect(current.state).toBe(state);
+          expect(current.target_ids).toEqual([target]);
+        }
+      } finally {
+        await mockDb.query(membershipSql, ["active", membershipId, target]);
+      }
+    },
+  );
   it("keeps rejected requests retryable and serializes application approval with optimistic versions", async () => {
     const activity = { ...input, kind: "activity", required: false };
     const draft = await works.save(business, op, undefined, activity);

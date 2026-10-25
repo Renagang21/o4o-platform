@@ -10,17 +10,17 @@
 
 | 검증 | 결과 |
 |---|---|
-| 신규 API 계약·실제 SQL 통합 | 20건 PASS: 공간·역할·가입 단위 차단, 게시 대상 snapshot·버전별 확인 보존, 중복 확인·문의 접수 방지, 동시 승인 충돌, 반려 후 재신청, 활동 전체 상태 흐름, 기존 자료 편집/승인 개정 충돌·사본 독립성, 대기 필터·private 응답, 대상 0건 게시 rollback, 기록 보유 시 down 거절 |
+| 신규 API 계약·실제 SQL 통합 | 22건 PASS: 공간·역할·가입 단위 차단, 게시 대상 snapshot·버전별 확인 보존, 중복 확인·문의 접수 방지, 동시 승인 충돌, 반려 후 재신청, 활동 전체 상태 흐름, 기존 자료 편집/승인 개정 충돌·사본 독립성, 대기 필터·private 응답, 대상 0건 게시 rollback, 대상 회원 정지 후 활동 진행·종료·보관 가능 및 대상 변경 금지, 기록 보유 시 down 거절 |
 | 기존 자료·선택 약국·진열 실제 SQL 회귀 | 3파일·33건 PASS. 격리된 별도 DB와 suite별 schema 사용. 기존 테스트 fixture에 신규 optional metadata 열을 trailing column으로 추가해 기존 positional INSERT 계약 유지 |
-| shared-space-ui 전체 | 20파일·189건 PASS. 신규 10건은 공지 확인/활동 신청/문의 실패 입력 보존·중복 방지·scope 전환의 늦은 응답 차단·안전한 교육 링크·쓰기 성공과 조회 실패 구분 |
+| shared-space-ui 전체 | 21파일·192건 PASS. 신규 10건은 공지 확인/활동 신청/문의 실패 입력 보존·중복 방지·scope 전환의 늦은 응답 차단·안전한 교육 링크·쓰기 성공과 조회 실패 구분 |
 | operator-core-ui 전체 | 30파일·211건 PASS. 신규 3건은 개인 대상의 초안 저장·배정 충돌 재시도·실패한 초안 보존. 기존 자료 작성·심사 회귀도 포함 |
 | web-kpa-society 전체 | 19파일·140건 PASS |
-| web-neture 전체 | 149파일·1,294건 PASS |
+| web-neture 전체 | 151파일·1,313건 PASS |
 | web-pharmacy-coop 전체 | 11파일·85건 PASS |
 | 제품 build | API `tsc -p tsconfig.build.json`, Pharmacy/MegaPharm·Neture/CarePharm·Pharmcoop 및 Store·Lecture·KPA Branch·Admin 소비 앱 build PASS. 직접 영향 3개 웹은 최종 UI 변경 후 재빌드 |
 | 품질·구조 | 신규 모듈 집중 ESLint 오류/경고 0, migration contract 21 PASS / 0 FAIL, diff·문서 민감정보 검사 PASS |
 
-테스트 수는 중복 실행을 합산하지 않은 1,972건이다. 일부 기존 Neture 펀딩 테스트는 실패 응답 시나리오에서 jsdom network stderr를 출력하지만 assertion은 PASS다. 기존 bundle 크기·Browserslist 경고와 API Jest의 기존 forceExit 안내는 이번 기능 실패로 계산하지 않는다.
+테스트 수는 중복 실행을 합산하지 않은 1,996건이다. 일부 기존 Neture 펀딩 테스트는 실패 응답 시나리오에서 jsdom network stderr를 출력하지만 assertion은 PASS다. 기존 bundle 크기·Browserslist 경고와 API Jest의 기존 forceExit 안내는 이번 기능 실패로 계산하지 않는다.
 
 ## Migration 검증
 
@@ -45,6 +45,12 @@
 초기 브라우저 harness의 상대 locator와 select의 exact-label 지정 및 sticky header 아래 자동 스크롤 때문에 대기가 만료됐고 locator를 수정했다. 합성 HTTP 도메인에서는 `crypto.randomUUID`가 secure-context API이므로 해당 loopback preview 호스트만 secure-origin으로 취급하도록 Chromium test flag를 적용했다. production HTTPS·인증을 우회하거나 제품의 인증/암호 설정을 바꾸지 않았다.
 
 스크립트·결과 JSON·캡처는 클라우드 로컬 `.onboarding/cooperation-v2-*`에 둔다. 합성 API 브라우저 결과를 실계정·운영 API·실기기 검증으로 표현하지 않는다.
+
+## 최신 main 반영과 리뷰
+
+- 검증 중 병합된 main `4ee5a8ecda`의 운영자 초대 변경을 보존했다. 이번 migration은 아직 운영 미적용이므로 `1792886400001`로 변경해 초대 migration 다음에 append했다. 위 fingerprint·40개 runner 검증은 이 순서의 실제 결과다.
+- 리뷰에서 발견한 모집 대상 회원 정지 후 활동 상태 변경 차단을 수정했다. 약국 단위와 개인 조합원 각각의 실제 SQL 회귀 2건을 추가했고 신규 대상 선택·모집 후 대상 변경의 차단은 유지했다.
+- 최신 main 반영 후 공통 UI 2개·직접 소비 앱 3개의 전체 suite와 API 통합, 직접 영향 웹·API build를 다시 확인했다.
 
 ## 소비처와 인계
 
