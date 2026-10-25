@@ -113,3 +113,5 @@ PostgreSQL 15.18 바이너리는 테스트용으로 repo 밖에 준비했으며 
 사용자가 현재 branch의 통합·migration·배포·실제 사용 검증을 지시했다. main `4ee5a8ecda`를 merge하면서 기존 main의 운영자 초대 migration과 epoch가 겹침을 확인했다. 아직 main/운영에 반영되지 않은 Lecture migration만 `AddLectureInstructorProfile1792886400001`로 조정하고, main manifest/fingerprint를 보존한 뒤 마지막에 추가했다. PostgreSQL 15.18에서 모든 main prefix 일치, 새 fingerprint `ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb`(6903 lines), empty down/up, fixture DB 0개 정리를 확인했다. 이전 6871-line fingerprint는 main 초대 schema 통합 전 검사 기록이다.
 
 Codex 통합 리뷰: nullable/잘못된 videoUrl 차시가 미리보기 목록에는 보이지만 단일 조회는 거부하는 불일치를 수정했다. 목록도 동일한 safePreviewVideo 검사를 사용한 뒤 id/title/duration만 반환한다. 목록 URL 비노출·누락/잘못된 주소/credential 주소 제외 회귀 포함 API 8건 통과.
+
+추가 통합 품질 검사: 필수 CI/Codex 통과 이후 SonarCloud의 새 코드 보안 등급 실패를 확인해 병합을 보류했다. 검증 runner는 Windows cmd/pnpm 셸 경유를 제거하고 설치된 Jest/Vitest entry를 현재 Node 실행 파일로 직접 실행하도록 바꿨다. 브라우저 fixture의 단일 행 조건문도 명확히 정리했다. 변경 후 synthetic runner(83+254)와 390/1440px browser 전체 회귀가 통과했으며 Sonar 재검사 결과를 별도로 확인한다.
