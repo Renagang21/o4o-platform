@@ -50,6 +50,9 @@ it('store switch remounts the editor before a delayed save can reload the new st
   fireEvent.click(screen.getByRole('button', { name: '블로그 글 만들기' }));
   fireEvent.change(screen.getByPlaceholderText('게시글 제목'), { target: { value: 'Old title' } }); fireEvent.change(screen.getByLabelText('본문 검사'), { target: { value: 'Body' } });
   fireEvent.click(screen.getByRole('button', { name: '임시 저장' })); api.store = 'B'; rerender(tree()); await screen.findByRole('heading', { name: '블로그 관리' });
+  // Wait for the new store's own initial list read before measuring stale-save effects.
+  await screen.findByText('게시글이 없습니다.');
+  expect(api.list).toHaveBeenCalledTimes(2);
   const count = api.list.mock.calls.length; await act(async () => resolve({ id: 'old' }));
   expect(api.list).toHaveBeenCalledTimes(count); expect(screen.queryByDisplayValue('Old title')).toBeNull();
 });

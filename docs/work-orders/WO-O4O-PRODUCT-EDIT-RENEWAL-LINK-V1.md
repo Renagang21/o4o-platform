@@ -39,3 +39,7 @@
 ## 후속 승인: 병합 전 PR·CI·리뷰
 
 기존 push 종료 후 사용자가 [PR #816](https://github.com/Renagang21/o4o-platform/pull/816)의 생성·CI·리뷰·필요 수정 push를 승인했다. 동일 WO/branch를 유지해 최신 main 호환성 점검을 이어간다. 이전 push-only 문구는 당시 수행 범위의 기록이다. **main 병합·자동 병합·배포는 승인 범위에서 제외되어 보류한다.** 최종 검사는 PR 최신 HEAD를 기준으로 확인하고 상세 이력은 CHECK에 기록한다.
+
+## 후속 승인: main 병합·배포
+
+사용자가 PR #816의 main 병합·배포를 명시적으로 승인했다. 앞의 보류 문구는 당시 수행 범위의 기록이다. 같은 branch에서 최신 main을 반영하고 실제 필수 CI·Codex 검토 후 정상 PR merge한다. 이후 main CI·Delivery 및 필요 시 정확한 SHA의 통제 배포·운영 검증을 수행한다. 운영 상품 보정 실행이나 기준·예약 생성은 포함하지 않는다. 최종 결과는 CHECK 및 PR/Actions 기록에 남긴다.
