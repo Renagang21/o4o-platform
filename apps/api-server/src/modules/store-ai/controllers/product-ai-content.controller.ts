@@ -67,7 +67,7 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
       }
 
       // Fire-and-forget
-      contentService.generateAllContents(product).catch(() => {});
+      contentService.generateAllContents(product, userId).catch(() => {});
 
       res.json({ success: true, message: 'Content generation started for all types' });
     } catch (error) {
@@ -108,7 +108,7 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
       }
 
       // Fire-and-forget
-      contentService.generateContent(product, type as ProductAiContentType).catch(() => {});
+      contentService.generateContent(product, type as ProductAiContentType, userId).catch(() => {});
 
       res.json({ success: true, message: `Content generation started for type: ${type}` });
     } catch (error) {

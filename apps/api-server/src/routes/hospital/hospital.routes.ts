@@ -39,6 +39,9 @@ import { classifyTaskModality } from '../../services/ai-tools/task-modality-rout
 import { runHospitalDrugSurface } from '../../services/ai-tools/hospital-drug-surface.js';
 import { runWebResearch } from '../../services/ai/web-research.service.js';
 import { inferFileStructure } from '../../services/ai-tools/file-understanding/structure-inference.service.js';
+import { AppDataSource } from '../../database/connection.js';
+import { executeAccountedAi } from '../../modules/ai-policy/ai-accounted-execution.js';
+import { normalizeAiError, aiErrorUserMessage, aiErrorHttpStatus, isAiAccountingError } from '../../utils/ai-provider-runtime.js';
 import {
   STRUCTURE_PROFILE_SAMPLE_ROWS,
   COLUMN_STAT_SAMPLE_COUNT,
@@ -242,7 +245,8 @@ export function createHospitalRoutes(): Router {
       return res.status(400).json({ success: false, error: '대상 스키마가 올바르지 않습니다.', code: schemaCheck.code ?? 'TARGET_SCHEMA_INVALID' });
     }
     try {
-      const { inference, model } = await inferFileStructure({ profile, targetSchema, usage: 'hospital.structure' });
+      const { inference, model } = await inferFileStructure({ profile, targetSchema, usage: 'hospital.structure' },
+        request => executeAccountedAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture' }));
       logger.info('hospital file-structure', {
         schemaId: targetSchema.id,
         sheets: profile.sheets.length,
@@ -251,10 +255,13 @@ export function createHospitalRoutes(): Router {
       });
       return res.json({ success: true, data: { inference, model } });
     } catch (error) {
+      const normalized = normalizeAiError(error);
       logger.error('hospital file-structure failed', {
         schemaId: targetSchema.id,
-        error: error instanceof Error ? error.message : String(error),
+        code: normalized.code,
       });
+      if (isAiAccountingError(normalized.code))
+        return res.status(aiErrorHttpStatus(normalized.code)).json({ success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code });
       return res.status(502).json({ success: false, error: '파일 구조를 해석하지 못했습니다.', code: 'FILE_UNDERSTANDING_FAILED' });
     }
   });

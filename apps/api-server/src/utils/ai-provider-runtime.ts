@@ -229,6 +229,9 @@ export async function resolveAiTarget(
  * 이 계층에서 **한 번만** 문자열을 해석해 코드로 바꾼다. 호출부는 코드만 본다.
  */
 export type AiErrorCode =
+  | 'QUOTA_EXCEEDED'
+  | 'AI_QUOTA_UNAVAILABLE'
+  | 'AI_ACCOUNTING_UNAVAILABLE'
   | 'AI_NOT_CONFIGURED'
   | 'INVALID_PROVIDER'
   | 'AUTH_ERROR'
@@ -263,6 +266,12 @@ export function normalizeAiError(error: unknown): NormalizedAiError {
   const raw = typeof (error as { message?: unknown })?.message === 'string'
     ? (error as { message: string }).message
     : String(error ?? '');
+
+  // Server admission failures are not provider rate limits and must not trigger paid retries.
+  if (raw === 'QUOTA_EXCEEDED') return { code: 'QUOTA_EXCEEDED', retryable: false };
+  if (raw === 'AI_QUOTA_UNAVAILABLE') return { code: 'AI_QUOTA_UNAVAILABLE', retryable: false };
+  if (['AI_PRICING_INVALID', 'AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID'].includes(raw))
+    return { code: 'AI_ACCOUNTING_UNAVAILABLE', retryable: false };
 
   // execute() 가 붙이는 접두사 — provider 도달 전 단계.
   if (/AI_NOT_CONFIGURED|not configured/i.test(raw)) {
@@ -299,6 +308,12 @@ export function normalizeAiError(error: unknown): NormalizedAiError {
 /** 코드 → 사용자 문구. 내부 사정(provider·model·key·status)을 드러내지 않는다. */
 export function aiErrorUserMessage(code: AiErrorCode): string {
   switch (code) {
+    case 'QUOTA_EXCEEDED':
+      return 'AI 이용 한도에 도달했습니다. 직접 작업을 계속하거나 이용 한도를 확인해 주세요.';
+    case 'AI_QUOTA_UNAVAILABLE':
+      return 'AI 이용 한도를 확인하지 못했습니다. 이용 상태를 확인한 뒤 다시 요청해 주세요.';
+    case 'AI_ACCOUNTING_UNAVAILABLE':
+      return 'AI 비용 설정을 확인하지 못했습니다. 관리자에게 설정 확인을 요청해 주세요.';
     case 'RATE_LIMIT':
       return '요청이 많아 잠시 후 다시 시도해 주세요.';
     case 'INSUFFICIENT_QUOTA':
@@ -315,4 +330,15 @@ export function aiErrorUserMessage(code: AiErrorCode): string {
     default:
       return '응답을 생성하지 못했습니다. 다시 시도해 주세요.';
   }
+}
+
+export function isAiAccountingError(code: AiErrorCode): boolean {
+  return ['QUOTA_EXCEEDED', 'AI_QUOTA_UNAVAILABLE', 'AI_ACCOUNTING_UNAVAILABLE'].includes(code);
+}
+
+export function aiErrorHttpStatus(code: AiErrorCode): number {
+  if (code === 'QUOTA_EXCEEDED' || code === 'RATE_LIMIT') return 429;
+  if (code === 'TIMEOUT') return 504;
+  if (isAiAccountingError(code) || code === 'INSUFFICIENT_QUOTA') return 503;
+  return 502;
 }

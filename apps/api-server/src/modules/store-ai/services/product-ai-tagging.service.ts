@@ -5,6 +5,7 @@ import { PRODUCT_TAGGING_SYSTEM, PRODUCT_TAGGING_B2B_SYSTEM } from '@o4o/ai-prom
 import { ProductAiTag } from '../entities/product-ai-tag.entity.js';
 import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
 import { buildConfigResolver } from '../../../utils/ai-config-resolver.js';
+import { normalizeAiError } from '../../../utils/ai-provider-runtime.js';
 
 /**
  * ProductAiTaggingService — WO-O4O-PRODUCT-AI-TAGGING-V1
@@ -58,7 +59,7 @@ export class ProductAiTaggingService {
   /**
    * Fire-and-forget: generate AI tags for a product and sync to product_masters.tags.
    */
-  async generateTags(product: ProductTagInput): Promise<void> {
+  async generateTags(product: ProductTagInput, actorId?: string): Promise<boolean> {
     try {
       const userPrompt = this.buildB2cUserPrompt(product);
 
@@ -67,14 +68,14 @@ export class ProductAiTaggingService {
         userPrompt,
         config: this.configResolver,
         meta: { service: 'store', callerName: 'ProductAiTaggingService' },
-      }, { scope: 'PRODUCT_TAGGING' });
+      }, { scope: 'PRODUCT_TAGGING', userId: actorId });
       const parsed = JSON.parse(result.content) as LlmTagResponse;
 
       if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
         console.error('[ProductAiTag] Invalid LLM response: missing tags', {
           productId: product.id,
         });
-        return;
+        return false;
       }
 
       // WO-NETURE-TAG-CATEGORY-INCLUSION-AND-LABEL-CLARITY-FIX-V1: 카테고리 말단 태그 강제 포함
@@ -103,9 +104,11 @@ export class ProductAiTaggingService {
 
       // product_masters.tags 동기화
       await this.syncMasterTags(product.id);
+      return true;
     } catch (error) {
       // Quiet fail: LLM 실패가 상품 데이터에 영향 없음
-      console.error('[ProductAiTag] unexpected error:', error);
+      console.error('[ProductAiTag] generation failed', { productId: product.id, code: normalizeAiError(error).code });
+      return false;
     }
   }
 
@@ -117,6 +120,7 @@ export class ProductAiTaggingService {
   async suggestTags(
     product: ProductTagInput,
     purpose: 'b2c' | 'b2b' = 'b2c',
+    actorId?: string,
   ): Promise<Array<{ tag: string; confidence: number }>> {
     try {
       const systemPrompt = purpose === 'b2b' ? PRODUCT_TAGGING_B2B_SYSTEM : PRODUCT_TAGGING_SYSTEM;
@@ -129,7 +133,7 @@ export class ProductAiTaggingService {
         userPrompt,
         config: this.configResolver,
         meta: { service: 'store', callerName: `ProductAiTaggingService.suggestTags.${purpose}` },
-      }, { scope: 'PRODUCT_TAGGING' });
+      }, { scope: 'PRODUCT_TAGGING', userId: actorId });
       const parsed = JSON.parse(result.content) as LlmTagResponse;
 
       if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
@@ -160,7 +164,7 @@ export class ProductAiTaggingService {
 
       return filtered.slice(0, 8);
     } catch (error) {
-      console.error('[ProductAiTag] suggestTags error:', error);
+      console.error('[ProductAiTag] suggestion failed', { productId: product.id, code: normalizeAiError(error).code });
       return [];
     }
   }

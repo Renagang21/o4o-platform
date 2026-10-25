@@ -34,7 +34,7 @@ import { isSupportedOutputType, buildSystemPrompt, buildUserPrompt, parseRespons
 // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
 
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
-import { execute } from '@o4o/ai-core';
+import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
 import { NETURE_MAIN_MEMBERSHIP_MESSAGES, NETURE_MEMBERSHIP_REQUIRED } from '../modules/neture/services/neture-main-membership.js';
@@ -61,7 +61,7 @@ import { createLlmCompletionVerifier, createLlmTaskUnderstander } from '../servi
 import type { CompletionJudge, ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
 import { selectToolInvocationForRequest, executeAiTool, renderToolContext, computerRequestGap, domRequestGap, pharmacyWebRequestGap, supplierRequestGap, needsLocalDeviceResolution } from '../services/ai-tools/ai-tool-router.js';
 import { AI_TOOL_NAMES, assertToolAllowed, validateToolArguments, findToolDefinition, type VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
-import { resolveAiTarget, normalizeAiError, aiErrorUserMessage } from '../utils/ai-provider-runtime.js';
+import { resolveAiTarget, normalizeAiError, aiErrorUserMessage, aiErrorHttpStatus, isAiAccountingError } from '../utils/ai-provider-runtime.js';
 /** Home AI 타임아웃 — reasoning 계열은 provider 기본 10s 로는 끊긴다. */
 const HOME_CHAT_TIMEOUT_MS = 90_000;
 import { validateHomeChatMessage, homeChatValidationMessage, buildHomeChatSystemPrompt, buildHomeChatUserPrompt, extractHomeChatAnswer, type VerifiedScopeFacts } from '../services/ai-prompts/homeChat.js';
@@ -331,9 +331,9 @@ async function performWorkAgentRun(
       // Task Understanding — 완료 주장은 Assistant 판정기로(조건 ↔ 근거). 직접 /work-agent/run 에는 없다(종전 판정).
       ...(judge ? { judge } : {}),
     },
-    plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
+    plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider, fetch, userId) : createLlmPlanner(AppDataSource, fetch, undefined, false, userId),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
-    { strongPlanner: plannerProvider ? createStrongLlmPlannerForProvider(AppDataSource, plannerProvider) : createStrongLlmPlanner(AppDataSource) },
+    { strongPlanner: plannerProvider ? createStrongLlmPlannerForProvider(AppDataSource, plannerProvider, fetch, userId) : createStrongLlmPlanner(AppDataSource, fetch, userId) },
   );
   // history 에는 행동 종류 · ref · 상태만 있고 입력 텍스트는 뺀다(응답에도 검색어를 되돌리지 않는다).
   const history = result.history.map((h) => ({ step: h.step, kind: h.action.kind, status: h.status, errorCode: h.errorCode ?? null, navigated: h.navigated === true }));
@@ -1273,15 +1273,15 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
 //
 // 계약:
 //   - TEXT RESPONSE ONLY. tool/function calling 없음, 실행 없음.
-//   - **DB write 0.** @o4o/ai-core execute() 는 저장 side-effect 가 없다.
-//     대화 내용은 서버에 남기지 않는다(§9·§41 conversation persistence 금지).
+//   - 대화 내용은 서버에 남기지 않는다(§9·§41 conversation persistence 금지).
+//     텍스트 호출은 기존 quota/비용 원장에 본문 없는 사용량 메타데이터만 기록한다.
 //   - 클라이언트가 보낸 workScope 는 **요청 컨텍스트 힌트**일 뿐 권한 근거가 아니다.
 //     serviceKey/workspace 만 받아 서버가 membership·store 를 다시 확정한다.
 //     클라이언트의 organizationId/storeId 는 읽지도, 프롬프트에 넣지도 않는다.
 //
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1: 본체를 `performHomeChat` 으로 떼어 `POST /api/ai/request` 가 같은
 // 경로를 쓴다. 첨부(이미지 · PDF inline / 문서 · 표 텍스트)는 그 경로에서만 들어오며 **요청 메모리 안에서만** 산다 —
-// 저장 · 로그 없음. `/home-chat` 자체의 계약(텍스트만)은 그대로다.
+// 대화 본문 저장 없음. 비용·사용량 메타데이터만 기존 원장에 기록하며 `/home-chat`은 텍스트 응답을 유지한다.
 // ===========================================
 
 async function performHomeChat(
@@ -1408,8 +1408,9 @@ async function performHomeChat(
     const userPrompt = buildHomeChatUserPrompt(message, renderAttachmentTextBlocks(attachmentParts));
 
     const result = attachmentParts.some((p) => p.kind === 'inline')
-      ? await executeMultimodalChat({ provider, model, apiKey, systemPrompt, userPrompt, parts: attachmentParts, timeoutMs: HOME_CHAT_TIMEOUT_MS })
-      : await execute({
+      ? await executeMultimodalChat({ provider, model, apiKey, systemPrompt, userPrompt, parts: attachmentParts, timeoutMs: HOME_CHAT_TIMEOUT_MS },
+          request => executeAccountedAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId }))
+      : await executeAccountedAi(AppDataSource, {
           systemPrompt,
           userPrompt,
           provider,
@@ -1426,7 +1427,7 @@ async function performHomeChat(
           },
           retry: { maxAttempts: 1 },
           meta: { service: 'o4o-home', callerName: 'home-chat' },
-        });
+        }, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId });
 
     const answer = extractHomeChatAnswer(result.content);
     if (!answer) {
@@ -1470,14 +1471,9 @@ async function performHomeChat(
       userId,
       code: normalized.code,
       retryable: normalized.retryable,
-      error: (error as { message?: string })?.message,
     });
     // INSUFFICIENT_QUOTA 는 429 로 보내지 않는다 — 재시도 안내로 오해되면 안 된다.
-    const status =
-      normalized.code === 'RATE_LIMIT' ? 429
-      : normalized.code === 'TIMEOUT' ? 504
-      : normalized.code === 'INSUFFICIENT_QUOTA' ? 503
-      : 502;
+    const status = aiErrorHttpStatus(normalized.code);
     return { status, body: { success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code } };
   }
 }
@@ -1771,7 +1767,8 @@ router.post('/file-understanding', authenticate, dynamicLimiter('free'), async (
   try {
     const result = await runStructuredFileUnderstanding(bytes, targetSchema, {
       infer: async (profile, injected) => {
-        const r = await inferFileStructure({ profile, targetSchema: injected });
+        const r = await inferFileStructure({ profile, targetSchema: injected },
+          request => executeAccountedAi(AppDataSource, request, { scope: 'SERVICE_QUERY', serviceKey: 'neture', userId }));
         return { inference: r.inference, model: r.model };
       },
     });
@@ -1797,11 +1794,14 @@ router.post('/file-understanding', authenticate, dynamicLimiter('free'), async (
       },
     });
   } catch (error) {
+    const normalized = normalizeAiError(error);
     logger.error('ai file-understanding failed', {
       userId,
       schemaId: targetSchema.id,
-      error: error instanceof Error ? error.message : String(error),
+      code: normalized.code,
     });
+    if (isAiAccountingError(normalized.code))
+      return res.status(aiErrorHttpStatus(normalized.code)).json({ success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code });
     return res.status(502).json({ success: false, error: '파일 구조를 해석하지 못했습니다.', code: 'FILE_UNDERSTANDING_FAILED' });
   }
 });

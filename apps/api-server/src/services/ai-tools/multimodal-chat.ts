@@ -11,7 +11,7 @@
  * 이미지 · PDF base64 는 이 함수의 인자 → 요청 body 로만 흐른다. 로그 · DB · 파일에 쓰지 않는다.
  */
 
-import { execute } from '@o4o/ai-core';
+import type { execute } from '@o4o/ai-core';
 import type { AttachmentPart } from './attachment-reader.js';
 import type { RuntimeProvider } from '../../utils/ai-provider-runtime.js';
 
@@ -37,7 +37,8 @@ export interface MultimodalChatResult {
 export const INLINE_NOT_SUPPORTED_NOTE =
   '(주의: 현재 AI 제공자는 이미지·PDF 첨부를 직접 볼 수 없습니다. 첨부 이미지/PDF 의 내용은 모른다고 답하고, 텍스트로 붙은 자료만 사용하세요.)';
 
-export async function executeMultimodalChat(input: MultimodalChatInput): Promise<MultimodalChatResult> {
+/** Hosts own text-call admission/accounting; the native inline transport remains separate. */
+export async function executeMultimodalChat(input: MultimodalChatInput, invokeText: typeof execute): Promise<MultimodalChatResult> {
   const inline = input.parts.filter((p): p is Extract<AttachmentPart, { kind: 'inline' }> => p.kind === 'inline');
   if (inline.length > 0 && input.provider === 'gemini') {
     const fetchImpl = input.fetchImpl ?? fetch;
@@ -76,7 +77,7 @@ export async function executeMultimodalChat(input: MultimodalChatInput): Promise
   }
 
   const userPrompt = inline.length > 0 ? `${input.userPrompt}\n\n${INLINE_NOT_SUPPORTED_NOTE}` : input.userPrompt;
-  const result = await execute({
+  const result = await invokeText({
     systemPrompt: input.systemPrompt,
     userPrompt,
     provider: input.provider,
