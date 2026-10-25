@@ -65,11 +65,10 @@ const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILIN
   QR: ['services/web-store/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx'],
 };
 const ALL_TARGETS = Object.values(TARGET_SPECIFIC).flat();
-const TASK_BY_GROUP: Record<keyof typeof TARGET_SPECIFIC, string> = {
+const TASK_BY_GROUP: Record<Exclude<keyof typeof TARGET_SPECIFIC, 'MULTILINGUAL'>, string> = {
   BLOG: "task: 'blog'",
   POP: "task: 'pop'",
   PRODUCT_DESCRIPTION: "task: 'product-description'",
-  MULTILINGUAL: "task: 'translate'",
   QR: "task: 'qr'",
 };
 
@@ -155,7 +154,14 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPE
             expect(entry).toMatch(/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/);
             expect(entry).toContain('label={STORE_LLM_ASSIST_LABEL}');
           }
-          expect(src).toContain(TASK_BY_GROUP[group]);
+          if (group === 'MULTILINGUAL') {
+            // Korean source authoring and language translation share the reviewed product assist.
+            // Foreign-language drafts must retain the target-language contract even without a source page.
+            expect(src).toContain("task: activeLocale === 'ko' && !translateSource?.html ? 'product-description' : 'translate'");
+            expect(src).toContain('referenceHtml: translateSource?.html ?? null');
+            expect(src).toContain('sourceLocale: translateSource?.locale ?? null');
+            expect(src).toContain('targetLocale: activeLocale');
+          } else expect(src).toContain(TASK_BY_GROUP[group]);
           expect(src).toContain('onApplyHtml=');
         });
         it('Prompt 전문 복사본 없음 · showInternalAi={false} 유지 · AiContentModal / /api/ai/content 재연결 0', () => {

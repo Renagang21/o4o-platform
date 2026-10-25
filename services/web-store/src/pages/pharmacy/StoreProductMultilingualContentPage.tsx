@@ -447,7 +447,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
             <div>
               <div className="flex items-center justify-between gap-2 mb-1.5">
                 <label className="block text-sm font-medium text-slate-700">본문 (HTML)</label>
-                {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §22~§23: 외부 LLM 번역/현지화(task='translate'). 결과는 이 언어 draft.html 에만 반영 —
+                {/* 한국어 원문 작성과 외부 LLM 번역/현지화. 결과는 이 언어 draft.html 에만 반영 —
                     자동 임시저장·발행·QR 생성 없음(기존 버튼을 사용자가 누른다). */}
               </div>
               {isTargetKind(targetKind) && targetId && <ProductEvidencePicker key={`${targetKind}:${targetId}:${activeLocale}`}
@@ -455,7 +455,8 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
                 onLoaded={setProductEvidence} onInsert={html => setActiveDraft({ html: [activeDraft.html, html].filter(Boolean).join('\n') })} />}
                 {!busy && !unsupported && <ProductDescriptionAssist key={`assist:${group.id}:${activeLocale}`}
                   context={{
-                      task: translateSource?.html ? 'translate' : 'product-description',
+                      // Non-Korean drafts need the translation prompt's explicit target-language instruction, even without a reference.
+                      task: activeLocale === 'ko' && !translateSource?.html ? 'product-description' : 'translate',
                       title: activeDraft.title || title,
                       productName,
                       currentHtml: activeDraft.html,

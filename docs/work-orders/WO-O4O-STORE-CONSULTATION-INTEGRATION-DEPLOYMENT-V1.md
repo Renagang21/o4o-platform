@@ -22,3 +22,11 @@
 정리 apply는 기존 90초 연결 만료 상태의 현재 전달 본문·미확인 답변/연결 코드를 비우고 epoch를 교체하는 범위다. 기기 등록·게시 상품/컨텐츠·업무 자산은 보존한다. 운영자가 설정한 enabled=false는 이번 배포도 보존한다. 원문 장기 이력·새 Core/권한/schema·의존성·IAM/credential·모델 가격 변경은 없다. 운영 실계정 업무/유료 AI와 실제 기기 검수는 이번에 실행하지 않는다.
 
 직접 GCP identity는 주입되지 않았으므로 기존 production/WIF 배포 경로의 검증 결과를 사용한다. 확인할 수 없는 Cloud Logging count를 설정 반영으로 대신 완료 표시하지 않는다. 실제 DB raw 응답·사용자/매장명·계정값은 저장소/공개 로그에 남기지 않는다.
+
+## 통합 CI 보완
+
+PR #813의 첫 HEAD `7bac1d00e1`은 Codex 지적 0건·보안/품질/웹 build 통과 후 전체 API shard 3에서 실패했다(`40177426528`). 같은 shard를 로컬에서 실행해 `store-production-external-llm-realignment-contract.spec.ts`의 단일 실패를 재현했다(1 FAIL·2,908 PASS·331 SKIP). 사용자가 제공한 CI 실패도 같은 검사/수치다. 기존 검사가 모든 다국어 작성의 `task: 'translate'` 리터럴을 요구해 한국어 원문 작성 분기를 인정하지 못했다.
+
+검사는 한국어 원문 작성/번역 분기와 참조/결과 언어 전달을 확인하도록 보완했다. 함께 점검해 외국어 탭에 기준 본문이 없을 때도 결과 언어가 빠지지 않도록 번역 prompt를 유지했다. UI에서 한국어 첫 작성·원문 있는 영어·원문 없는 영어의 실제 guide 생성과 결과의 편집기 반영/자동 저장·발행 없음 3건을 추가했다. 집중 계약 113·다국어 UI 39·Store build·변경 파일 lint PASS. 최신 HEAD로 필수 CI/자동 검토를 다시 확인한다. 검사를 삭제/skip하거나 gate를 낮추지 않았다.
+
+GitHub 로그 호스트 접근은 환경 허용 목록의 403으로 막혀 있다. 기존 도메인을 보존하고 `results-receiver.actions.githubusercontent.com`만 추가한 초안을 저장했으며 적용/게시 완료로 표시하지 않는다. 로컬 재현과 사용자의 로그로 원인을 확인했고 개발·CI 보완은 계속 진행한다.
