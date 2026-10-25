@@ -6,7 +6,7 @@
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-24 (§15-8 독립 실행·한국어/다국어 상담 업무·게시 자료 기반 보조) · 2026-10-21 (§4·6-2 협업체별 업무·공개 모집 주문 조건, §15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-25 (§15-8-2 전문 판단 초안·자산 재사용, 운영 미반영) · 2026-10-24 (§15-8 독립 실행·한국어/다국어 상담 업무·게시 자료 기반 보조) · 2026-10-21 (§4·6-2 협업체별 업무·공개 모집 주문 조건, §15 관리자 설정 통합·회원 이용 자격 조회) · 2026-10-16 (등록·게시·이벤트 분리) · 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 약국 협력사업 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -600,6 +600,16 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 - 상담 중 언어 수정은 같은 상담 세대·기기·미확인 답변을 유지하고 예전 언어의 공유·준비 결과를 비운다. 고객의 미전송 답변은 원래 입력 언어와 함께 유지한다. 언어 변경 전 결과는 다시 준비해야 하며 모드는 종료 후 바꾼다.
 - 공유 전 현재 역할/기능·상품 활성·게시 자료 버전을 확인한다. 두 기기는 서버 발급 결과 ID로 공유하며 원문이 바뀌거나 비공개가 되면 거절한다. 이미 전달한 자료도 다음 고객 조회에서 현재 자격·게시 상태를 재검사하여 가린다. 한 화면의 고객 dialog도 표시 직전에 비용 없는 원문 재검증을 한다.
 - 기존 상담 행의 현재 준비/공유 JSON만 사용하고 새 schema·장기 이력은 추가하지 않는다. 본문과 질문은 로그·브라우저 저장소·AI Task/Memory에 기록하지 않는다. 이번 개발·검증: [TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md), [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-GUIDANCE-WORKFLOW-V1.md). 실계정·실제 기기/번역 품질·운영 적용은 개발 완료와 구분한다.
+
+#### 15-8-2. 전문 판단 초안·확인한 자산 재사용 (2026-10-25 개발 branch)
+
+- 사용자 선택은 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과를 재사용하는 것이다. 기존 [데이터 범위](DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md)를 따른다. 선행 사용성 보완과 이번 연결 코드는 전용 branch에 포함하며 main 반영·배포는 별도다.
+- 약사 모드의 `pharmacy.consultation.support`는 현재 매장 활성 상품의 한국어 게시 자료(기존 대체 언어 처리 포함)와 출처/확인을 갖춘 직접 입력 전문 자료를 사용한다. 상품 사실·전문 참고/판단 사항·확인 질문 최대 하나·고객용 초안을 구분한다. 출처 ID와 인용에 없는 수치를 거부하며 현재 권한/기능·약사 사용 확인/자료 버전을 호출 후 재확인한다. 일반 직원에게 전문 판단 API 권한을 확장하지 않는다.
+- 기존 Core/PRODUCT_CONTENT 정책·quota·회계를 사용한다. 개인 질의 이력·Task·Memory·새 저장 schema는 만들지 않는다. 전문 입력/초안은 현재 화면에만 두고, ‘검토한 고객 설명 사용’은 비용 없는 재확인 뒤 고객 문장 입력만 채운다. 번역/고객 전달은 별도 확인한다.
+- 상품 자료 확인·보완 링크와 기존 원문 불러오기/검토 삽입으로 현재 컨텐츠 초안을 준비한다. 저장/발행·QR 연결·QR 저장을 분리하며 기존 그룹 조회와 발급된 QR 조회 API를 재사용한다. 태블릿/사이니지는 기존 관리 탭으로 연결하고 현재 할당 재확인 후 되돌리기·모바일 미리보기/키보드 접근·저장 순서 변경 후 선택 유지를 보완한다.
+- 만료 상담 전달 상태 정리 job은 90초 연결 만료·60초 주기·200행 상한·SKIP LOCKED를 사용하며 본문/연결 코드를 비우고 epoch를 바꾼다. 기기 등록·업무 자산은 보존한다. 기본 dry-run이며 운영 쓰기는 `CONSULTATION_STATE_CLEANUP_MODE=apply`로 배포 담당자가 명시 활성화해야 한다. 새로운 일반 보존기간이나 즉시 전체 파기 보장이 아니다.
+
+실행 증거·미확인: [통합 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md) · [CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md). 브라우저 합성 API·provider와 격리 PostgreSQL 검증을 운영 계정·실제 음성/기기·전문 품질 검수로 확대 해석하지 않는다.
 
 작업·검증: [TODO](../work-orders/TODO-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md), [CHECK](../checks/CHECK-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md). 실제 외부 AI·실계정·운영 제공 정책·배포 검증은 실행 결과와 구분한다.
 

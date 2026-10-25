@@ -181,7 +181,7 @@ export function StoreQrCreateForms({
               disabled={saving}
               style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? "저장 중..." : "QR 만들기"}
+              {saving ? "저장 중..." : "QR 저장"}
             </button>
           </div>
         </div>
@@ -476,7 +476,7 @@ export function StoreQrCreateForms({
               disabled={saving}
               style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? "저장 중..." : "QR 만들기"}
+              {saving ? "저장 중..." : "QR 저장"}
             </button>
           </div>
         </div>
