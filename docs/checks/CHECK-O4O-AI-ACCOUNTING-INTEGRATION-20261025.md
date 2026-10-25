@@ -25,14 +25,14 @@
 
 현재 `deploy-api.yml`의 Cloud Run 환경 전달에는 `AI_PRICING_CATALOG`가 없다. 기존 text wildcard 추정 catalog에는 native profile도 없다. 따라서 현 배포 정의만으로 이미지/PDF·화면 분석·검색·OCR·TTS·Qwen 가격 준비를 확인할 수 없다. GitHub repository/environment variable metadata API는 현재 integration token에 HTTP 403이며, GCP outbound identity는 연결되어 있지 않다. 값·secret을 읽거나 인증 경계를 우회하지 않았다.
 
-배포 전에 실제 사용 모델별 가격/예산 설정과 전달 경로를 확인하거나, 해당 전문 경로가 미설정으로 차단되는 상태의 제한 배포를 명시적으로 확정해야 한다. 임의의 요율·synthetic 테스트 가격·새 과금 계약·workflow 변경으로 이 조건을 우회하지 않는다. PR 준비와 안전한 검증은 계속 진행한다.
+사용자는 직전 개발 완료 보고의 가격 미설정 시 503·main 미반영 설명 이후 push된 변경을 main에 병합·배포하도록 지시했다. 이번 지시는 현재 코드의 비용 보호 규칙을 포함한 코드 배포로 적용하며 이전 TODO의 일반적인 준비 순서보다 현재 사용자 지시를 우선한다. 따라서 CI/리뷰/정상 Delivery gate를 통과하면 배포하되 **가격 미설정 전문 기능의 실제 사용 활성화까지 완료했다고 주장하지 않는다.** 이 가용성 제한은 진행 보고와 최종 결과에도 명시한다. 임의의 요율·synthetic 테스트 가격·새 과금 계약·workflow 변경으로 비용 보호를 우회하지 않는다.
 
 ## 4. 실행 기록
 
 정상 Delivery 정책은 main CI 후 LEVEL_2 자동 verified 배포, LEVEL_3는 정확한 main SHA의 Promote다. 새 migration source delta는 없으며 기존 비용/quota migration의 과거 적용 증거를 이번 실행으로 다시 주장하지 않는다. read-only Promote dry-run은 현재 main의 serving/risk 판정 확인용이며 실제 배포가 아니다.
 
-PR·CI·review·merge·배포 결과는 확인한 사실만 이 절에 보완한다. 실제 유료 AI 호출·운영 DB 조회/변경·새 가격/한도 저장은 실행하지 않았다.
+통합 PR은 [#811](https://github.com/Renagang21/o4o-platform/pull/811)이다. PR·CI·review·merge·배포 결과는 확인한 사실만 이 절에 보완한다. 실제 유료 AI 호출·운영 DB 조회/변경·새 가격/한도 저장은 실행하지 않았다.
 
 문서 정합: 이번 문서는 선행 개발 CHECK의 push 인계와 후속 main/배포 상태를 구분한다. 원래 개발 검증 기록을 배포 완료로 바꾸지 않는다.
 
-WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-accounting-main-integration-20261025` · `wo/ai-accounting-main-integration-20261025` · base `23717b6dc0` · `KEEP` (PR/배포 준비 조건 미해결).
+WORKTREE_DISPOSITION: `/workspace/o4o-wt/ai-accounting-main-integration-20261025` · `wo/ai-accounting-main-integration-20261025` · base `23717b6dc0` · `KEEP` (PR/배포 결과 확인 전).
