@@ -402,7 +402,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     contents.operatorUpdate(await sfOf(req), req.user!.id, uuidParam(req, 'id'), req.body ?? {})));
   router.post('/operator/semi-franchises/:key/contents/:id/:action', ...businessOperator, handle(async (req) =>
     contents.operatorSetStatus(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
-      actionParam<'publish' | 'archive' | 'reject'>(req, ['publish', 'archive', 'reject']), req.body?.reason)));
+      actionParam<'publish' | 'archive' | 'reject'>(req, ['publish', 'archive', 'reject']), req.body?.reason, req.body?.expectedRevision)));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
   router.use('/pharmacy/staff-support', (_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });

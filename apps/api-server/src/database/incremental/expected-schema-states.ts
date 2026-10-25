@@ -326,6 +326,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateServiceOperatorInvitations1792886400000', fingerprint: 'b893538bce103e0d46f90610f739cb62a39dc8a5d3afeef40babe796e5fd7aea', fingerprintLineCount: 6901 },
   // Isolated PostgreSQL 15.18: main prefixes plus Lecture profile verified after integration.
   { appliedThrough: 'AddLectureInstructorProfile1792886400001', fingerprint: 'ab9f0d3b25e6d170043a5cf0b00ef137d08f2856c3805c43115e20f1b8859ebb', fingerprintLineCount: 6903 },
+  // Isolated PostgreSQL 15: prior prefixes, empty down/up, and workflow integration verified.
+  { appliedThrough: 'CreateCooperationMemberWorkflows1792886400002', fingerprint: '54230274de3a1c420410f8e634196fc10edbe2e317a06b7647bf12fe6f8e118b', fingerprintLineCount: 7021 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

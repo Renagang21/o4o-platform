@@ -339,6 +339,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     const { createOperatorInboxRoutes } = await import('../modules/contact-inquiry/operator-inbox.routes.js');
     app.use('/api/v1/operator-inbox', createOperatorInboxRoutes(dataSource));
+    const { createCooperationWorkflowRoutes } = await import('../modules/cooperation-workflows/routes.js');
+    app.use('/api/v1/cooperation-workflows', createCooperationWorkflowRoutes(dataSource));
 
     // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — 서비스별 문의 조회·답변·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');

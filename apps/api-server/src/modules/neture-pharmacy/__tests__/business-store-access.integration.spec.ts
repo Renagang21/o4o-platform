@@ -24,7 +24,7 @@ local('CarePharm selected pharmacy gate — actual PostgreSQL, no authorization 
       CREATE TABLE role_assignments (user_id uuid, role text, is_active boolean, valid_from timestamptz, valid_until timestamptz);
       CREATE TABLE cooperatives (id uuid, semi_franchise_id uuid, status text);
       CREATE TABLE cooperative_roles (cooperative_id uuid, user_id uuid, revoked_at timestamptz);
-      CREATE TABLE semi_franchise_contents (id uuid PRIMARY KEY, semi_franchise_id uuid, title text, summary text, body text, thumbnail_url text, attachments jsonb, tags jsonb, status text, published_at timestamp, created_at timestamp, updated_at timestamp);
+      CREATE TABLE semi_franchise_contents (id uuid PRIMARY KEY, semi_franchise_id uuid, title text, summary text, body text, thumbnail_url text, attachments jsonb, tags jsonb, status text, published_at timestamp, created_at timestamp, updated_at timestamp, revision integer DEFAULT 1,category text DEFAULT '',education_url text);
     `);
     contents = new SemiFranchiseContentService(fixture.ds, async input => { copied.push(input); return { snapshotId: randomUUID() }; });
   });

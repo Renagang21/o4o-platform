@@ -108,6 +108,7 @@ import { CreateStoreConsultationStations1792815861315 } from '../migrations/1792
 import { CreateServiceOperatorInvitations1792886400000 } from '../migrations/1792886400000-CreateServiceOperatorInvitations.js';
 
 import { AddLectureInstructorProfile1792886400001 } from '../migrations/1792886400001-AddLectureInstructorProfile.js';
+import { CreateCooperationMemberWorkflows1792886400002 } from '../migrations/1792886400002-CreateCooperationMemberWorkflows.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -150,6 +151,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreConsultationStations1792815861315,
   CreateServiceOperatorInvitations1792886400000,
   AddLectureInstructorProfile1792886400001,
+  CreateCooperationMemberWorkflows1792886400002,
 ];
 
 export function incrementalMigrationNames(): string[] {

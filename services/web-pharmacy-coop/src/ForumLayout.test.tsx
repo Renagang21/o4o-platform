@@ -43,14 +43,14 @@ const admin: SessionSnapshot = {
   ],
 };
 function isFrameRead(path: string) {
-  return path.startsWith("/operator-inbox/") || path === "/notifications/unread-count?serviceKey=pharmcoop" || path.endsWith("/footer-legal");
+  return path.startsWith("/cooperation-workflows/cooperative/one/manage?") || path.startsWith("/operator-inbox/") || path === "/notifications/unread-count?serviceKey=pharmcoop" || path.endsWith("/footer-legal");
 }
 function open(path: string, session = admin) {
   const client = {
     get: vi.fn(async (path: string) => ({ data: { data: path === "/operator-inbox/cooperative/one/manage" ? {
       name: "검증 조합", contact: { pending: 1, oldest: null, deliveryAttention: 0 },
       tasks: [{ key: "cooperative-members", label: "개인 가입 검토", count: 2, oldest: null, available: true }, { key: "withdrawals", label: "개인 탈퇴 요청", count: 1, oldest: null, available: true }],
-    } : null } })),
+    } : path.startsWith("/cooperation-workflows/") ? { work: { items: [], total: 0 }, materials: { items: [], total: 0 }, support: { items: [], total: 0, unassigned: 0, overdue: 0 }, subjects: { items: [], total: 0 }, operators: [], summary: { notices: 0, applications: 0 } } : null } })),
     post: vi.fn(),
     patch: vi.fn(),
     put: vi.fn(),

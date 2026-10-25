@@ -17,6 +17,7 @@ import type { SemiFranchiseRow } from './semi-franchise.service.js';
 export const SEMI_FRANCHISE_CONTENT_SOURCE = 'semi-franchise';
 
 export interface ContentInput {
+  expectedRevision?: number;
   title?: string;
   summary?: string | null;
   body?: string | null;
@@ -54,7 +55,7 @@ function cleanContent(input: ContentInput, requireTitle: boolean) {
 }
 
 const VIEW = `
-  SELECT c.id, c.title, c.summary, c.body, c.thumbnail_url AS "thumbnailUrl", c.attachments, c.tags,
+  SELECT c.id, c.revision, c.category, c.education_url AS "educationUrl", c.title, c.summary, c.body, c.thumbnail_url AS "thumbnailUrl", c.attachments, c.tags,
          c.status, c.published_at AS "publishedAt", c.created_at AS "createdAt", c.updated_at AS "updatedAt",
          sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName"
     FROM semi_franchise_contents c
@@ -106,6 +107,8 @@ export class SemiFranchiseContentService {
 
   async operatorUpdate(sf: SemiFranchiseRow, userId: string, id: string, input: ContentInput) {
     const c = cleanContent(input, false);
+    if (input.expectedRevision !== undefined && (!Number.isInteger(input.expectedRevision) || input.expectedRevision < 1))
+      throw new NeturePharmacyError(400, 'INVALID_REVISION', '자료 개정 번호를 확인해 주세요.');
     if (input.title !== undefined && !c.title) {
       throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주세요(300자 이하).');
     }
@@ -118,7 +121,7 @@ export class SemiFranchiseContentService {
           attachments = COALESCE($10::jsonb, attachments),
           tags = COALESCE($11::jsonb, tags),
           updated_by = $12, updated_at = NOW()
-        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status IN ('draft','pending','published')
+        WHERE id = $1::uuid AND semi_franchise_id = $2 AND status IN ('draft','pending','published') AND ($13::integer IS NULL OR revision=$13)
       RETURNING id, status`,
       [
         id, sf.id, c.title ?? null,
@@ -127,24 +130,29 @@ export class SemiFranchiseContentService {
         c.thumbnailUrl !== undefined, c.thumbnailUrl ?? null,
         c.attachments ? JSON.stringify(c.attachments) : null,
         c.tags ? JSON.stringify(c.tags) : null,
-        userId,
+        userId, input.expectedRevision ?? null,
       ],
     ));
-    if (!rows[0]) throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '수정할 수 있는 콘텐츠가 없습니다.');
+    if (!rows[0]) {
+      if (input.expectedRevision !== undefined && (await this.dataSource.query("SELECT id FROM semi_franchise_contents WHERE id=$1 AND semi_franchise_id=$2 AND status IN ('draft','pending','published')", [id,sf.id])).length)
+        throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 입력 내용을 보관하고 다시 조회해 주세요.');
+      throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '수정할 수 있는 콘텐츠가 없습니다.');
+    }
     return rows[0];
   }
 
   /** 게시 · 보관(게시 중단). 보관된 콘텐츠는 약국에 보이지 않지만 이미 만든 매장 사본은 매장 소유로 남는다. */
-  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive' | 'reject', reason?: string) {
+  async operatorSetStatus(sf: SemiFranchiseRow, userId: string, id: string, action: 'publish' | 'archive' | 'reject', reason?: string, expectedRevision?: number) {
     const to = action === 'publish' ? 'published' : action === 'reject' ? 'rejected' : 'archived';
     const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
     if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
       throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
     return this.dataSource.transaction(async manager => {
-      const [current] = await manager.query(`SELECT c.title, c.status, c.created_by, c.source_supplier_id,
+      const [current] = await manager.query(`SELECT c.title, c.status, c.revision, c.created_by, c.source_supplier_id,
         ns.organization_id FROM semi_franchise_contents c LEFT JOIN neture_suppliers ns ON ns.id=c.source_supplier_id
         WHERE c.id=$1 AND c.semi_franchise_id=$2 FOR UPDATE OF c`, [id, sf.id]);
       if (!current) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
+      if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 다시 검토해 주세요.');
       if (!from.includes(current.status) || (action === 'publish' && current.status === 'archived' && current.source_supplier_id))
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
       if (action === 'publish' && current.source_supplier_id) {
@@ -220,6 +228,7 @@ export class SemiFranchiseContentService {
         tags: c.tags,
         semiFranchiseKey: c.semiFranchiseKey,
         semiFranchiseName: c.semiFranchiseName,
+        sourceRevision: c.revision,
         sourceLabel: '세미프랜차이즈',
         capturedAt: new Date().toISOString(),
       },
