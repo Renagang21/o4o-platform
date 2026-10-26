@@ -64,3 +64,8 @@ HEAD `a23f7eb599`의 CI Pipeline/필수 CI Gate와 CodeQL은 통과했으나 Son
 - 보완 후 fresh canonical prepare·실제 PostgreSQL **3 suites/52 tests PASS**, restore CLI/계약 **6 PASS**, migration contract **21/21 PASS**, 변경 파일 ESLint PASS. 실제 GCS·운영 계정·보존기간/파기 설정은 변경하지 않았다.
 
 동일 PR #835를 보완 중 draft로 두고 수정본 push 후 review-ready로 전환한다. 첫 자동 Codex review는 초기 HEAD `a0d09ad53b`에 finding0이었으며, 새 HEAD의 검토를 이전 결과로 대체하지 않는다. 최종 remote 결과는 PR 실제 검사/리뷰 상태로 인계한다.
+
+
+## 2026-10-26 main 통합 후속
+
+사용자가 main 통합·배포를 지시하여 기존 PR #835를 재사용한다. main #837의 개인 메일 migration이 이미 앞서 반영되었으므로, 미배포 인증/privacy migration만 `HardenAuthPrivacyReadiness1793010000000`으로 변경해 45번째에 추가한다. 배포된 기존 44개 prefix와 개인 메일 최종 지문 `0aa797b735eb640d1d35d1066eae9205e0116f869dd1f6d604819c4224cb0759` (7,224 lines)을 보존한다. 통합 지문은 격리 PostgreSQL 15에서 `df843fc3661c3a9415db6628ce1ba10f819030e8b0f761c559f9c6c3f5625bc5` (7,238 lines)로 측정했다. 위의 44번째/7,131 lines 기록은 이전 개발 HEAD의 검증 기록이다. 최종 CI·병합·배포 결과는 PR #835에 후속 기록한다. 실제 계정·파일 파기 또는 파기 flags 변경은 범위에 포함하지 않는다.

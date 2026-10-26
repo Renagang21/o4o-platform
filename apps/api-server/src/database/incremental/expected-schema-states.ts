@@ -331,8 +331,9 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   // Integrated main prefixes and empty down/up verified in isolated PostgreSQL 15.
   { appliedThrough: 'CreatePartnerSupportSpaces1792886600000', fingerprint: '71c8439bec809c03e55cc68068877cb8f39d567afbf203e78254281a191fdc07', fingerprintLineCount: 7080 },
   { appliedThrough: 'AddPartnerMediaAndReadState1792886700000', fingerprint: '4accc1af6999af30ee278a666edeafb6d978b2846ef9876fd2b43e58cc4144a3', fingerprintLineCount: 7117 },
-  // Isolated PostgreSQL 15: all prior prefixes preserved, empty down/up matched.
-  { appliedThrough: 'HardenAuthPrivacyReadiness1792990000000', fingerprint: '564bd3302650f6716d1063790048cfe137fc95561ff22fbbfc3847fb9cc26586', fingerprintLineCount: 7131 },
+  // Preserve deployed main personal-mail prefix; append auth/privacy after it.
+  { appliedThrough: 'CreatePersonalMail1792998000000', fingerprint: '0aa797b735eb640d1d35d1066eae9205e0116f869dd1f6d604819c4224cb0759', fingerprintLineCount: 7224 },
+  { appliedThrough: 'HardenAuthPrivacyReadiness1793010000000', fingerprint: 'df843fc3661c3a9415db6628ce1ba10f819030e8b0f761c559f9c6c3f5625bc5', fingerprintLineCount: 7238 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

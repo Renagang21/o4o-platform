@@ -104,6 +104,8 @@ const PASSWORD_INPUT_ALLOWLIST = [
   //   WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1 · WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1.
   // SMTP 발신 계정 비밀번호/앱 비밀번호 — 메일 전송 자격이며 로그인 축이 아니다.
   'services/web-neture/src/pages/admin/settings/EmailSettingsPage.tsx',
+  // WO-O4O-PERSONAL-MAIL-MCP-V1: 네이버 IMAP 앱 비밀번호 — 외부 수신 연결 자격이며 O4O 로그인 수단이 아니다.
+  'services/web-neture/src/pages/mail/MailAccountConnections.tsx',
   // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 로그인 비밀번호 입력의 **유일한** 공통 컴포넌트
   //   (보기/숨기기 토글 포함). 서비스 화면은 이 컴포넌트를 쓰고 직접 password 입력을 만들지 않는다.
   'packages/auth-react/src/email/PasswordInput.tsx',

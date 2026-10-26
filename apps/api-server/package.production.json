@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
+    "imapflow": "2.9.1",
+    "mailparser": "3.12.4",
     "express": "^4.21.2",
     "cors": "^2.8.5",
     "helmet": "^6.2.0",

@@ -6,7 +6,7 @@ import express from 'express';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { PostgresAuthRateLimitStore, sharedAuthLimiter } from '../auth-rate-limit-store.js';
-import { HardenAuthPrivacyReadiness1792990000000 } from '../../database/migrations/1792990000000-HardenAuthPrivacyReadiness.js';
+import { HardenAuthPrivacyReadiness1793010000000 } from '../../database/migrations/1793010000000-HardenAuthPrivacyReadiness.js';
 
 const integration = process.env.O4O_ERASURE_TEST_PORT === '55469' ? describe : describe.skip;
 integration('shared authentication limits — disposable PostgreSQL only', () => {
@@ -92,7 +92,7 @@ integration('shared authentication limits — disposable PostgreSQL only', () =>
   it('migration rollback refuses to discard an active security window',async()=>{
     await makeStore().reserve('rollback','ip',60_000);
     const q=db.createQueryRunner();await q.startTransaction();
-    try{await expect(new HardenAuthPrivacyReadiness1792990000000().down(q)).rejects.toThrow('ACTIVE_AUTH_RATE_LIMIT_COUNTERS');}
+    try{await expect(new HardenAuthPrivacyReadiness1793010000000().down(q)).rejects.toThrow('ACTIVE_AUTH_RATE_LIMIT_COUNTERS');}
     finally{await q.rollbackTransaction();await q.release();}
     expect((await db.query("SELECT hits FROM auth_rate_limit_counters WHERE scope='rollback'"))[0].hits).toBe(1);
   });

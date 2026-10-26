@@ -6,7 +6,7 @@
 
 ## 적용 순서·범위
 
-main 병합 전의 개발 인계다. 신규 forward migration `HardenAuthPrivacyReadiness1792990000000`은 기존 prefix를 유지하며 인증 counter table과 AI 외 3테이블의 writer fence를 등록한다. 운영 DDL·배포·파기 활성화는 실행하지 않았다. 운영 반영 시 기존 migration job → API readiness → 정상 트래픽 전환 절차를 유지한다. 구 API도 새 schema와 호환되며 새 API를 migration 없이 먼저 기동하면 인증 경로가 503으로 닫힌다. SQL 실패 시 메모리 저장소로 우회하지 않는다.
+main 병합 전의 개발 인계다. 신규 forward migration `HardenAuthPrivacyReadiness1793010000000`은 기존 prefix를 유지하며 인증 counter table과 AI 외 3테이블의 writer fence를 등록한다. 운영 DDL·배포·파기 활성화는 실행하지 않았다. 운영 반영 시 기존 migration job → API readiness → 정상 트래픽 전환 절차를 유지한다. 구 API도 새 schema와 호환되며 새 API를 migration 없이 먼저 기동하면 인증 경로가 503으로 닫힌다. SQL 실패 시 메모리 저장소로 우회하지 않는다.
 
 공유 제한은 이메일/카카오 로그인, Google 로그인/가입, 이메일 가입, 인증 메일, token 소비, 아이디 찾기 IP/입력값에 적용한다. 목적별 scope·기존 횟수/창·성공 응답 제외·429/Retry-After는 유지한다. 일반/AI/업로드 rate limit은 이 변경의 대상이 아니다. 원문 IP·이메일·이름·전화는 저장하지 않고 scope별 SHA-256 digest만 기록한다. 만료 counter는 인증 처리 시 분당 최대 한 번, 200행 단위로 정리한다. 서버 비활동 중 정각 파기나 별도 스케줄러를 보장하지 않는다.
 

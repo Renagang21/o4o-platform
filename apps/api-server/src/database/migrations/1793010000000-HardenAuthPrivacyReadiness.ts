@@ -3,8 +3,8 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 const TABLES = ['cooperatives','member_paid_service_entitlements','store_consultation_stations','auth_rate_limit_counters'] as const;
 
 /** Forward-only schema repair; no account rows, AI tables or production settings are changed. */
-export class HardenAuthPrivacyReadiness1792990000000 implements MigrationInterface {
-  name = 'HardenAuthPrivacyReadiness1792990000000';
+export class HardenAuthPrivacyReadiness1793010000000 implements MigrationInterface {
+  name = 'HardenAuthPrivacyReadiness1793010000000';
   async up(q: QueryRunner): Promise<void> {
     await q.query(`CREATE TABLE public.auth_rate_limit_counters (
       scope varchar(64) NOT NULL,

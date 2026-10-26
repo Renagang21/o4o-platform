@@ -32,6 +32,7 @@ import {
   ExternalAiError,
 } from "../contracts.js";
 import { resolveAccountAccess } from "../../../common/auth/account-access.policy.js";
+import { mailEnabled } from "../../personal-mail/config.js";
 
 export const tokenHash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
@@ -147,12 +148,18 @@ export async function loadConnection(
  * 토큰 endpoint(code · refresh 교환)용 연결 조회. 해제·만료된 연결은 `invalid_grant` 로 답한다 —
  * `invalid_token` 은 토큰 endpoint 오류 코드가 아니어서 클라이언트가 재연결 안내 대신 내부 오류로 표시했다.
  */
-async function loadGrantConnection(db: Queryable, id: string, lock = false): Promise<Connection> {
+async function loadGrantConnection(
+  db: Queryable,
+  id: string,
+  lock = false,
+): Promise<Connection> {
   try {
     return await loadConnection(db, id, lock);
   } catch (error) {
     if (error instanceof InvalidTokenError)
-      throw new InvalidGrantError("O4O 연결이 해제되었거나 만료되었습니다. 다시 연결해 주세요.");
+      throw new InvalidGrantError(
+        "O4O 연결이 해제되었거나 만료되었습니다. 다시 연결해 주세요.",
+      );
     throw error;
   }
 }
@@ -221,7 +228,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         "client_id" | "client_id_issued_at"
       >,
     ): Promise<OAuthClientInformationFull> => {
-      await assertEnabled(this.db);
+      await assertEnabled(this.db, false, false, "any");
       if (
         !client.redirect_uris.length ||
         client.redirect_uris.length > 5 ||
@@ -253,7 +260,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
           "external-ai-client-registration",
         ]);
-        await assertEnabled(db);
+        await assertEnabled(db, false, false, "any");
         const [counts] = await db.query(`SELECT count(*)::int AS total,
           count(*) FILTER (WHERE created_at>now()-interval '1 hour')::int AS recent
           FROM external_ai_clients`);
@@ -280,6 +287,8 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     const values = input.length ? [...new Set(input)] : ["o4o:read"];
     if (
       !values.includes("o4o:read") ||
+      (values.some((v) => v.startsWith("o4o:mail:")) &&
+        (!mailEnabled() || !values.includes("o4o:mail:read"))) ||
       values.some((v) => !(supportedScopes as readonly string[]).includes(v))
     )
       throw new InvalidScopeError("허용되지 않은 기능입니다.");
@@ -294,7 +303,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     params: AuthorizationParams,
     res: Response,
   ) {
-    await assertEnabled(this.db);
+    await assertEnabled(this.db, false, false, "any");
     this.validateResource(params.resource);
     this.validateScopes(params.scopes);
     if (
@@ -308,7 +317,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
         "external-ai-pending-authorization",
       ]);
-      await assertEnabled(db);
+      await assertEnabled(db, false, false, "any");
       // Only expired, unauthenticated pending requests; consent and token rows are retained.
       await db.query(
         "DELETE FROM external_ai_credentials WHERE kind='pending' AND expires_at<=now()",
@@ -377,9 +386,22 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         manager,
         allowedScopes.includes("o4o:draft:write"),
         true,
+        "any",
       );
       const pending = await this.pending(request, manager, true);
       const chosen = this.validateScopes(allowedScopes);
+      if (
+        workspaces.some((id) => id.startsWith("mail:")) &&
+        !chosen.includes("o4o:mail:read")
+      )
+        throw new InvalidScopeError(
+          "메일 계정은 별도 메일 조회 동의가 필요합니다.",
+        );
+      if (
+        chosen.some((scope) => scope.startsWith("o4o:mail:")) &&
+        !workspaces.some((id) => id.startsWith("mail:"))
+      )
+        throw new InvalidScopeError("허용할 개인 메일 계정을 선택해 주세요.");
       if (chosen.some((scope) => !pending.data.scopes.includes(scope)))
         throw new InvalidScopeError("요청 범위를 넘는 기능입니다.");
       if (
@@ -511,7 +533,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
   ) {
     this.validateResource(resource);
     return this.db.transaction(async (manager) => {
-      await assertEnabled(manager, false, true);
+      await assertEnabled(manager, false, true, "any");
       const row = await this.credential(
         manager,
         code,
@@ -521,7 +543,11 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       );
       if (row.consumed_at || redirectUri !== row.data.redirectUri)
         throw new InvalidGrantError("코드 또는 반환 주소가 올바르지 않습니다.");
-      const connection = await loadGrantConnection(manager, row.connection_id, true);
+      const connection = await loadGrantConnection(
+        manager,
+        row.connection_id,
+        true,
+      );
       await manager.query(
         "UPDATE external_ai_credentials SET consumed_at=now() WHERE hash=$1",
         [row.hash],
@@ -537,7 +563,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
   ) {
     this.validateResource(resource);
     const result = await this.db.transaction(async (manager) => {
-      await assertEnabled(manager, false, true);
+      await assertEnabled(manager, false, true, "any");
       const row = await this.credential(
         manager,
         value,
@@ -552,7 +578,11 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         );
         return null;
       }
-      const connection = await loadGrantConnection(manager, row.connection_id, true);
+      const connection = await loadGrantConnection(
+        manager,
+        row.connection_id,
+        true,
+      );
       if (
         requestedScopes &&
         (requestedScopes.length !== connection.scopes.length ||
@@ -572,7 +602,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     return result;
   }
   async verifyAccessToken(value: string): Promise<AuthInfo> {
-    await assertEnabled(this.db);
+    await assertEnabled(this.db, false, false, "any");
     let row;
     try {
       row = await this.credential(this.db, value, "access");

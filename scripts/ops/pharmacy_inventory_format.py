@@ -32,7 +32,7 @@ def project(label, data):
                 raise ValueError('Missing resource name')
             if label == 'url-maps' and item['name'] == 'o4o-global-lb' and not isinstance(item.get('hostRules'), list):
                 raise ValueError('Missing load balancer host rules')
-            if label == 'backends' and item['name'] == 'backend-kpa-society-web' and not isinstance(item.get('backends'), list):
+            if label == 'backends' and item['name'] in {'backend-kpa-society-web', 'backend-pharmacy-business-web'} and not isinstance(item.get('backends'), list):
                 raise ValueError('Missing pharmacy backend groups')
         data = keep_keys(data, URL_KEYS if label == 'url-maps' else BACKEND_KEYS)
     return {'resource': label, 'metadata': data}

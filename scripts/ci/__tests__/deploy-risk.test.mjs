@@ -30,6 +30,13 @@ const graph = buildWorkspaceGraph();
 const files = (...paths) => paths.map((p) => (Array.isArray(p) ? { status: p[0], path: p[1] } : { status: 'M', path: p }));
 const risk = (...paths) => assessRisk(files(...paths), graph);
 
+it('pharmacy deploy registry preserves its selector while resolving only the renamed runtime/image', () => {
+  const pharmacy = DEPLOY_TARGETS.find((target) => target.key === 'kpa-society');
+  assert.equal(pharmacy.service, 'pharmacy-business-web');
+  assert.equal(pharmacy.image, 'gcr.io/netureyoutube/pharmacy-business-web');
+  assert.equal(DEPLOY_TARGETS.some((target) => target.service === 'kpa-society-web'), false);
+});
+
 describe('R. risk_level 분류', () => {
   it('R1 docs-only → LEVEL_1 · 배포 없음', () => {
     const r = risk('docs/checks/CHECK-X.md', 'docs/investigations/IR-Y.md', 'README.md');
