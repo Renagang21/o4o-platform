@@ -48,6 +48,10 @@ gcloud compute url-maps list --project=netureyoutube --format='value(name)'
 
 기존 `dl.google.com`·패키지 설치·GitHub 접근을 유지한다. 도메인 허용은 IAM 권한 부여와 별개다. 실제 endpoint 거부는 필요한 호스트를 확인해 설정에 반영한다.
 
+### GCP Cloud Shell 또는 전용 VM을 사용하는 경우
+
+Cloud Shell에는 gcloud CLI가 제공된다. 프로젝트를 위 값으로 지정하고 해당 로그인 계정의 실제 읽기 권한을 확인한 뒤 같은 조회 명령을 사용할 수 있다. 전용 VM에서는 의도한 서비스 계정과 ADC를 구성하고 권한을 검증한다. 이 경우 Codex 관리 환경 전용 OIC manifest 선택 단계를 그대로 요구하지 않는다. 이미지 빌드는 Cloud Build 등 별도 빌드 환경에서 수행한다. Cloud Build 실행·배포 권한은 읽기 조사 권한과 분리해 실제 필요한 시점에 구성한다.
+
 ## Docker 빌드 환경
 
 현재 관리 환경의 Docker vfs driver는 레이어마다 파일을 복제한다. Neture의 의존 설치 후 COPY 단계에서 filesystem inode 한도 2,097,152개를 소진했다. 빌드는 실패했고 해당 빌드 캐시를 정리해 복구했다.
