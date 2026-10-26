@@ -105,7 +105,7 @@ JWT·membership·사업 서비스 키는 변경하지 않는다. API 정적 CORS
 | 모드 | 실행 계약 |
 |---|---|
 | `cutover-plan` / `cutover` | 소유자 공개 invoker·단일 최신 100% Ready·runtime SA·backend/NEG 소유·두 host 범위를 검사한다. GCP URL map validation과 공개 HTML·JS smoke 후 검토 digest로 pharmacy matcher만 바꾼다. fingerprint 충돌은 쓰기 전에 중지한다. |
-| `rollback-plan` / `rollback` | 옛 Run이 남아 있는 동안 같은 host 범위만 이전 backend로 복귀한다. 다른 matcher는 유지한다. |
+| `rollback-plan` / `rollback` | 옛 Run·NEG·backend가 모두 남아 있는 동안 같은 host 범위만 이전 backend로 복귀한다. 다른 matcher는 유지한다. |
 | `retire-plan` / `retire` | 새 image namespace의 실제 serving을 확인한다. global/regional URL map·backend·NEG를 페이지 끝까지 읽고 옛 참조가 없어야 한다. 전환 후 최소 15분(전파 여유 2분 + 요청 0 관측 10분 + 지표 수집 지연 3분)과 `run.googleapis.com/request_count` 0을 요구한다. backend→NEG→Run 순서로 매번 다시 검증하며 삭제한다. |
 
 plan 계열 중 전환 plan은 GCP의 비변경 URL map validate POST를 포함한다.
@@ -132,5 +132,5 @@ gh workflow run deploy-web-services.yml --ref main \
   -f pharmacy_plan_digest=<reviewed-cutover-sha256>
 ```
 
-후속 코드 로컬 검증: Python 37건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
+후속 코드 로컬 검증: Python 39건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
 새 origin 1개 추가뿐임을 확인했다. 이 절은 코드 구현 기록이며 cutover·정상 배포·retire의 실제 실행 완료를 뜻하지 않는다.

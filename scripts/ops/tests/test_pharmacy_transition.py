@@ -171,6 +171,14 @@ class RoutingTests(unittest.TestCase):
 
 
 class InventoryTests(unittest.TestCase):
+    def test_all_aggregate_scopes_are_explicit(self):
+        api = FakeCloud()
+        with patch.object(api, 'request', return_value={'items': {'global': {'urlMaps': []}}}) as request:
+            self.assertEqual(t.aggregated(api, 'urlMaps', 'urlMaps'), [])
+        query = t.urllib.parse.parse_qs(t.urllib.parse.urlparse(request.call_args.args[1]).query)
+        self.assertEqual(query['includeAllScopes'], ['true'])
+        self.assertEqual(query['returnPartialSuccess'], ['false'])
+
     def test_partial_or_missing_aggregate_is_not_zero_references(self):
         for response in ({'items': {}, 'unreachables': ['region']}, {'items': {'global': {}}},
                          {'items': {}, 'warning': {'code': 'PARTIAL_SUCCESS'}}, {}):
@@ -209,10 +217,21 @@ class ProductionWriteGateTests(unittest.TestCase):
         return patch.object(t.urllib.request, 'urlopen', side_effect=opened)
 
     def test_other_production_writer_is_not_ignored(self):
-        response = {'total_count': 1, 'workflow_runs': [{'id': 2, 'path': '.github/workflows/deploy-api.yml'}]}
-        with patch.dict(t.os.environ, {'PRODUCTION_GATE_TOKEN': 'unit-placeholder', 'GITHUB_RUN_ID': '1', 'GITHUB_SHA': 'a' * 40}), self.gate(response):
-            with self.assertRaisesRegex(ValueError, 'Another production'):
-                t.production_idle()
+        for name in ('deploy-api.yml', 'deploy-cooperative.yml'):
+            response = {'total_count': 1, 'workflow_runs': [{'id': 2, 'path': '.github/workflows/' + name}]}
+            with self.subTest(name=name), patch.dict(t.os.environ, {'PRODUCTION_GATE_TOKEN': 'unit-placeholder', 'GITHUB_RUN_ID': '1', 'GITHUB_SHA': 'a' * 40}), self.gate(response):
+                with self.assertRaisesRegex(ValueError, 'Another production'):
+                    t.production_idle()
+
+    def test_every_existing_production_wif_workflow_is_classified(self):
+        root = Path(__file__).resolve().parents[3]
+        for file in (root / '.github' / 'workflows').glob('*.yml'):
+            source = file.read_text()
+            if 'google-github-actions/auth@' not in source or not t.re.search(r'environment:\s*production', source):
+                continue
+            if file.name == 'gcp-wif-auth-smoke.yml':
+                continue  # Explicitly read-only; never submits a runtime mutation.
+            self.assertIn(file.name, t.PRODUCTION_WORKFLOWS, file.name)
 
     def test_incomplete_run_inventory_is_not_idle(self):
         with patch.dict(t.os.environ, {'PRODUCTION_GATE_TOKEN': 'unit-placeholder', 'GITHUB_RUN_ID': '1', 'GITHUB_SHA': 'a' * 40}), self.gate({'total_count': 1, 'workflow_runs': []}):

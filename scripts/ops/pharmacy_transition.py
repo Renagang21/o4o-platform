@@ -19,7 +19,7 @@ HOSTS = {'pharmacy.neture.co.kr', 'megapharm.neture.co.kr'}
 MATCHER = 'path-matcher-pharmacy'
 CUTOVER_MARKER = MARKER + ';cutover='
 PRODUCTION_WORKFLOWS = {'delivery.yml', 'promote.yml', 'deploy-api.yml', 'deploy-admin.yml',
-                        'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml'}
+                        'deploy-web-services.yml', 'deploy-cooperative.yml', 'pharmacyhub-qr-cutover.yml'}
 OBSERVATION_SECONDS = 600
 PROPAGATION_SECONDS = 120
 INGESTION_SECONDS = 180
@@ -261,7 +261,7 @@ def apply_transition(api, candidate, rollback=False, expected_revision=None):
 def aggregated(api, collection, field):
     output, token = [], None
     for _ in range(100):
-        params = {'returnPartialSuccess': 'false', 'maxResults': 500}
+        params = {'returnPartialSuccess': 'false', 'includeAllScopes': 'true', 'maxResults': 500}
         if token:
             params['pageToken'] = token
         data = api.request('GET', f'{COMPUTE}/aggregated/{collection}?' + urllib.parse.urlencode(params))
