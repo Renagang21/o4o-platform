@@ -247,7 +247,7 @@ export async function createDirectContent(
   body: { title?: unknown; contentJson?: unknown; tags?: unknown; productRef?: unknown; clientContentId?: unknown; expectedRevision?: unknown },
 ): Promise<ContentResult<DirectContentView>> {
   const { title, contentJson, tags, productRef } = body ?? {};
-  if (hasConsultation(contentJson)) return saveConsultationContent(dataSource, organizationId, userId, 'create', String(body.clientContentId ?? ''), body, consultationDependencies);
+  if (hasConsultation(contentJson)) return saveConsultationContent(dataSource, organizationId, userId, 'create', typeof body.clientContentId === 'string' ? body.clientContentId : '', body, consultationDependencies);
 
   if (!title || typeof title !== 'string' || !title.trim()) {
     return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'title은 필수입니다.' };

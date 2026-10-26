@@ -81,6 +81,17 @@ integration('consultation content — actual PostgreSQL atomic save', () => {
   if (result[0].ok) expect(latest.contentJson).toHaveProperty('productConsultation');
   else expect(result[0]).toMatchObject({ code: 'CONTENT_CONFLICT' });
  });
+ it('preserves editor-supported YouTube/Vimeo and structural-only content while removing unsafe embeds', async () => {
+  for (const html of ['<iframe src="https://www.youtube.com/embed/synthetic" allowfullscreen></iframe>',
+    '<iframe src="https://player.vimeo.com/video/123" allowfullscreen></iframe>', '<hr>', '<table><tbody><tr><td></td></tr></tbody></table>']) {
+   const id = randomUUID(); expect(await createDirectContent(db, org, actor, draft(id, html))).toMatchObject({ ok: true });
+   const tag = html.slice(1).split(/[ >]/)[0];
+   expect(JSON.stringify((await read(id)).contentJson)).toContain(tag);
+  }
+  const id = randomUUID();
+  expect(await createDirectContent(db, org, actor, draft(id, '<p>Text</p><iframe src="https://example.invalid/embed" onload="evil()"></iframe>'))).toMatchObject({ ok: true });
+  expect(JSON.stringify((await read(id)).contentJson)).not.toContain('iframe');
+ });
  it('keeps safe image-only content while rejecting an empty sanitized response', async () => {
   expect(await createDirectContent(db, org, actor, draft(randomUUID(), '<img src="https://example.invalid/product.png">'))).toMatchObject({ ok: true });
   expect(await createDirectContent(db, org, actor, draft(randomUUID(), '<script>bad()</script>'))).toMatchObject({ ok: false, code: 'EMPTY_CONSULTATION' });

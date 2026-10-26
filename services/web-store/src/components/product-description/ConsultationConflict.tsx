@@ -1,10 +1,10 @@
 import { PRODUCT_DESCRIPTION_PURPOSE_LABELS } from '@o4o/store-ui-core';
 import { consultationLanguages, readProductConsultation } from './productConsultationDraft';
 import { ContentRenderer } from '@o4o/content-editor';
-export function ConsultationConflict({ saved, acknowledged, disabled, onAcknowledge }: {
+export function ConsultationConflict({ saved, acknowledged, disabled, onAcknowledge }: Readonly<{
   saved: { title?: string; contentJson: Record<string, unknown>; revision?: string }; acknowledged: boolean;
   disabled: boolean; onAcknowledge: () => void;
-}) {
+}>) {
   const context = readProductConsultation(saved.contentJson.productConsultation);
   return <section aria-label="상담자료 수정 충돌" className="my-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
     <p role="alert">다른 저장 내용이 확인됐습니다. 내 작성 내용은 유지했습니다. 최신 저장본을 비교한 뒤 다시 저장하세요.</p>

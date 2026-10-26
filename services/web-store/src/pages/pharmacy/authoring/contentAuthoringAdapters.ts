@@ -277,18 +277,22 @@ export async function createOrUpdateDirect(
 
 /** The client id survives a lost POST response; the server commits body/link atomically. */
 async function persistConsultation(draft: TextContentDraft, record: CreatedContent | null): Promise<VerifiedDirectContent> {
-  const context = draft.consultation!;
-  const html = draft.html.trim();
   const id = record?.id ?? draft.clientContentId;
   if (!id) throw new Error('Missing stable draft id');
   if (record?.conflict && (!record.revision || draft.confirmedRevision !== record.revision)) return {
     ...record, id, title: record.title ?? draft.title, sourceType: 'direct', updatedAt: record.updatedAt ?? '',
     updatedBy: record.updatedBy ?? null, conflict: true, verification: false,
   };
+  const result = await sendConsultation(draft, record, id);
+  if (result.conflict) return result;
+  return verifySavedConsultation(draft, id, result);
+}
+
+async function sendConsultation(draft: TextContentDraft, record: CreatedContent | null, id: string): Promise<VerifiedDirectContent> {
+  const context = draft.consultation!;
   const contentJson = { ...(record?.contentJson ?? { sourceResources: [], generatedBy: 'manual-direct' }),
-    html, productConsultation: context };
+    html: draft.html.trim(), productConsultation: context };
   delete (contentJson as Record<string, unknown>).blocks;
-  let result: VerifiedDirectContent;
   try {
     const response = record
       ? await directContentApi.update(id, { title: draft.title.trim(), tags: draft.tags, contentJson,
@@ -298,18 +302,23 @@ async function persistConsultation(draft: TextContentDraft, record: CreatedConte
         productRef: { sourceType: context.product.sourceType, sourceId: context.product.sourceId },
       });
     if (response.success !== true || response.data?.id !== id) throw new Error('Unconfirmed write');
-    result = response.data;
+    return response.data;
   } catch (error) {
     // A conflict or lost response may have a readable saved row. Never retry under a new id.
     const { status, code } = error as { status?: number; code?: string };
     if (code === 'PRODUCT_LINK_CHANGED') throw error;
     if (status && status < 500 && ![408, 409].includes(status)) throw error;
+    let result: VerifiedDirectContent;
     try { result = await loadDirect(id); } catch { throw error; }
-    if (status === 409) return { ...result, conflict: true, verification: false };
+    return { ...result, conflict: status === 409, verification: false };
   }
+}
+
+async function verifySavedConsultation(draft: TextContentDraft, id: string, result: VerifiedDirectContent): Promise<VerifiedDirectContent> {
+  const context = draft.consultation!;
   try {
     const [saved, linked] = await Promise.all([loadDirect(id), handledProductContentApi.byProduct(context.product.sourceType, context.product.sourceId)]);
-    const same = saved.title === draft.title.trim() && JSON.stringify(saved.tags ?? []) === JSON.stringify(draft.tags) && saved.contentJson.html === html &&
+    const same = saved.title === draft.title.trim() && JSON.stringify(saved.tags ?? []) === JSON.stringify(draft.tags) && saved.contentJson.html === draft.html.trim() &&
       JSON.stringify(readProductConsultation(saved.contentJson.productConsultation)) === JSON.stringify(context);
     const connected = linked.success === true && Array.isArray(linked.data?.items) && linked.data.items.some(item => item.contentId === id);
     return { ...saved, verification: same && connected, conflict: !same };

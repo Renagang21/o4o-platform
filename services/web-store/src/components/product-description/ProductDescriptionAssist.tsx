@@ -10,12 +10,12 @@ import { emptyDescriptionAssist, type DescriptionAssistDraft } from './productCo
 const inputStyle = { width: '100%', minWidth: 0, boxSizing: 'border-box' as const, padding: 8, border: '1px solid #cbd5e1', borderRadius: 6, font: 'inherit' };
 
 /** Optional controlled state lets the store editor persist authoring context with its draft. */
-export function ProductDescriptionAssist({ context, onApplyHtml, value, onChange }: {
+export function ProductDescriptionAssist({ context, onApplyHtml, value, onChange }: Readonly<{
   context: StoreContentLlmContext;
   onApplyHtml: (html: string) => void;
   value?: DescriptionAssistDraft;
   onChange?: (draft: DescriptionAssistDraft) => void;
-}) {
+}>) {
   const id = useId();
   const [local, setLocal] = useState<DescriptionAssistDraft>({ ...emptyDescriptionAssist, purpose: context.purpose ?? 'consumer-qr' });
   const state = value ?? local;

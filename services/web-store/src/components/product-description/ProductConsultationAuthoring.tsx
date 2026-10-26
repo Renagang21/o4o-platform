@@ -4,17 +4,17 @@ import { ProductDescriptionAssist } from './ProductDescriptionAssist';
 import { ProductEvidencePicker, type ProductEvidenceSelection } from './ProductEvidencePicker';
 import { consultationLanguages, type ProductConsultationDraft } from './productConsultationDraft';
 
-export function ProductConsultationAuthoring({ value, title, html, disabled, isCurrent, onChange, onApplyHtml }: {
+export function ProductConsultationAuthoring({ value, title, html, disabled, isCurrent, onChange, onApplyHtml }: Readonly<{
   value: ProductConsultationDraft; title: string; html: string; disabled: boolean; isCurrent: () => boolean;
   onChange: (value: ProductConsultationDraft) => void; onApplyHtml: (html: string) => void;
-}) {
+}>) {
   const [applyError, setApplyError] = useState('');
   const [source, setSource] = useState<ProductEvidenceSelection | null>(null);
   return <fieldset disabled={disabled} className="min-w-0 space-y-3 rounded-lg border border-slate-200 p-3">
     <legend className="px-1 text-sm font-semibold">상품 상담자료</legend>
     <p className="text-sm">상품·근거 확인 → ChatGPT 요청문 복사 → 결과를 편집기에 적용 → 내용 확인 후 저장</p>
     <p className="text-xs text-slate-600">{value.product.name} · 원본 상품과 공개 설명서는 바뀌지 않습니다.</p>
-    <label className="flex flex-wrap items-center gap-2 text-sm">작성 언어
+    <label className="flex flex-wrap items-center gap-2 text-sm"><span>작성 언어</span>
       <select aria-label="상담자료 작성 언어" value={value.language} className="min-h-11 rounded border px-2"
         onChange={e => onChange({ ...value, language: e.target.value as ProductConsultationDraft['language'] })}>
         {Object.entries(consultationLanguages).map(([code, name]) => <option key={code} value={code}>{name}</option>)}

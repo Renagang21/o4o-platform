@@ -1,8 +1,6 @@
 import { ConsultationConflict } from '../../components/product-description/ConsultationConflict';
-import { newProductConsultation, readProductConsultation } from '../../components/product-description/productConsultationDraft';
+import { consultationLanguages, newProductConsultation, readProductConsultation } from '../../components/product-description/productConsultationDraft';
 import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
-import { PRODUCT_DESCRIPTION_PURPOSE_LABELS } from '@o4o/store-ui-core';
-import { consultationLanguages } from '../../components/product-description/productConsultationDraft';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
@@ -35,7 +33,7 @@ import {
 // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
 //   direct 콘텐츠 편집을 o4o 표준 RichTextEditor(@o4o/content-editor)로 통일 — 제작 자료 편집기와 동일 모듈.
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
-import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
+import { PRODUCT_DESCRIPTION_PURPOSE_LABELS, buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { BlockRenderer } from '@o4o/block-renderer';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
@@ -240,9 +238,9 @@ export default function StoreDirectContentPage() {
         </div>
       </div>
 
-      {session.draft.consultation && <p className="mb-3 rounded-lg bg-slate-50 p-3 text-sm" role="status">
+      {session.draft.consultation && <output className="mb-3 block rounded-lg bg-slate-50 p-3 text-sm">
         상품 상담자료 · {session.draft.consultation.product.name} · {PRODUCT_DESCRIPTION_PURPOSE_LABELS[session.draft.consultation.assist.purpose]} · {consultationLanguages[session.draft.consultation.language]}
-      </p>}
+      </output>}
       {session.record?.conflict && <ConsultationConflict saved={session.record}
         acknowledged={session.draft.confirmedRevision === session.record.revision} disabled={saving || deleting}
         onAcknowledge={() => session.changeDraft({ confirmedRevision: session.record?.revision })} />}

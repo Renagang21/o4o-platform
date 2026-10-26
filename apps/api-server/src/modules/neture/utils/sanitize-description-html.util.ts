@@ -23,3 +23,24 @@ const purify = DOMPurify(window as unknown as WindowLike);
 export function sanitizeDescriptionHtml(value?: string | null): string {
   return purify.sanitize(value ?? '').trim();
 }
+
+/** Store editor policy: preserve supported media while removing arbitrary iframe hosts. */
+export function sanitizeRichDescriptionHtml(value: string): string {
+  const clean = purify.sanitize(value, {
+    ADD_TAGS: ['iframe'],
+    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth', 'poster', 'controls', 'preload', 'playsinline'],
+  });
+  const root = window.document.createElement('div');
+  root.innerHTML = clean;
+  for (const iframe of root.querySelectorAll('iframe')) {
+    const src = iframe.getAttribute('src') ?? '';
+    if (!src.startsWith('https://www.youtube.com/embed/') && !src.startsWith('https://player.vimeo.com/video/')) iframe.remove();
+  }
+  return root.innerHTML.trim();
+}
+
+export function isBlankRichDescriptionHtml(value: string): boolean {
+  const root = window.document.createElement('div');
+  root.innerHTML = value;
+  return !root.textContent?.replaceAll('\u00a0', '').trim() && !root.querySelector('img,iframe,video,audio,hr,table');
+}

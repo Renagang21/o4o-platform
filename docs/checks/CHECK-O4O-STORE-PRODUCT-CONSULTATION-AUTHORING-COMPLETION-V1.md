@@ -61,3 +61,13 @@ DB 검증은 12개 동시 생성의 자료1/링크1, 두 수정 중 하나만 �
 API/Core 인증·MCP/OAuth·서버 AI 정책·관리자 상품 정비·정기 worker·외부 연결 설정·공개/QR은 수정하지 않았다. 이 작성 흐름의 추가 구현 잔여는 없으며 운영 적용·외부 직접 연결은 별도 담당/범위다. PR CI·main 병합·배포는 미실행이다. 일반 저장과 새 상담자료 계약의 consumer 차이는 이용 안내에 기록했다.
 
 문서 정합: guide의 응답 유실·서버 충돌 한계를 실제 완성된 계약으로 갱신하고 최초 CHECK 기록은 위에 보존했다. 동일 WO의 후속 완료이므로 기존 branch를 유지했다.
+
+## PR #830 병합 전 리뷰 보완
+
+사용자의 main 병합·배포 지시에 따라 최신 main을 정상 merge하고 PR #830을 생성했다. 최초 HEAD e111793의 CI Gate·API Jest 3분할·권한 guard·CodeQL·관리자/웹 production build는 성공했다. Sonar 신뢰성 등급 D와 신규21건 지적 및 Codex P2 임베드 보존 지적은 병합 전에 해결한다.
+
+편집기의 sanitizeRichHtml 정책과 같은 YouTube/Vimeo iframe·미디어 속성을 새 서버 rich sanitizer에 적용했다. 기존 기본 sanitizeDescriptionHtml의 다른 소비처는 변경하지 않았다. 임의 iframe 호스트·이벤트·script는 계속 차단한다. 원문과 달라져 무한 수정 충돌이 나던 허용 동영상과 구조-only 본문을 보존하며, 본문 존재 판정은 파서 기반으로 정비했다.
+
+Sonar 지적의 중복 import·props readonly·접근성 output/label·중첩 ternary·고정 locale 비교 정렬·객체 검사·async·복잡도·불필요 fallback을 동작 보존 정비했다. 규칙·baseline·workflow·제외 목록은 완화하지 않았다.
+
+리뷰 수정 로컬 검증: 실제 PostgreSQL9개+기존 권한20개=29 PASS, 전체 매장79파일/862 PASS, PC/모바일2 PASS, API/매장 타입·변경 lint·API 모든 bundle PASS. 컨테이너의 임시 schema0 확인 후 정리했다. 공식 최신 PR CI·Sonar·Codex 결과와 최종 배포 사실은 PR 최신 상태에 기록하며, 이 문서는 성공하지 않은 원격 검사를 성공으로 간주하지 않는다.
