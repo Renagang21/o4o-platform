@@ -43,7 +43,7 @@ jobs:
             .
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy kpa-society-web \\
+          gcloud run deploy pharmacy-business-web \\
             --memory=256Mi \\
             --max-instances=5
   deploy-neture:
@@ -95,7 +95,7 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
 
   it('W5 ROLLOUT — ROLLOUT_ARGS · --update-labels 추가(8526b64e1 형태) → rollout 만', () => {
     const head = mutate([
-      ['          gcloud run deploy kpa-society-web \\', '          ROLLOUT_ARGS=()\n          gcloud run deploy kpa-society-web \\'],
+      ['          gcloud run deploy pharmacy-business-web \\', '          ROLLOUT_ARGS=()\n          gcloud run deploy pharmacy-business-web \\'],
       ['            --max-instances=5\n  deploy-neture', '            --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"\n  deploy-neture'],
     ]);
     const a = analyze(head);
@@ -118,7 +118,7 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
 
   it('W9 빌드 환경(checkout · sparse · gcloud 설치) 변경은 배포 방식 — rollout (replay: 6ae232ea1)', () => {
     const head = mutate([
-      ['      - name: Deploy to Cloud Run\n        run: |\n          gcloud run deploy kpa-society-web', '      - uses: actions/checkout@v6\n        with:\n          sparse-checkout: |\n            /*\n            !/apps/api-server/src/scripts/data/\n      - name: Deploy to Cloud Run\n        run: |\n          gcloud run deploy kpa-society-web'],
+      ['      - name: Deploy to Cloud Run\n        run: |\n          gcloud run deploy pharmacy-business-web', '      - uses: actions/checkout@v6\n        with:\n          sparse-checkout: |\n            /*\n            !/apps/api-server/src/scripts/data/\n      - name: Deploy to Cloud Run\n        run: |\n          gcloud run deploy pharmacy-business-web'],
     ]);
     const k = analyze(head)['kpa-society'];
     assert.ok(k.rollout.length >= 3, JSON.stringify(k));
@@ -159,7 +159,7 @@ describe('W+. assessRisk 통합 — 원문 주입 시 workflow 변경이 서비�
   });
 
   it('rollout-only workflow 변경 → 배포 없음 · rollout 기록', () => {
-    const r = run(mutate([['          gcloud run deploy kpa-society-web \\', '          ROLLOUT_ARGS=()\n          gcloud run deploy kpa-society-web \\']]));
+    const r = run(mutate([['          gcloud run deploy pharmacy-business-web \\', '          ROLLOUT_ARGS=()\n          gcloud run deploy pharmacy-business-web \\']]));
     assert.equal(r.deploy_required, false);
     assert.ok(r.services['kpa-society'].rollout.length > 0);
   });

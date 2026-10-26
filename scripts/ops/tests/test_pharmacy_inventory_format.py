@@ -29,7 +29,7 @@ class InventoryProjectionTests(unittest.TestCase):
                          [{'name': 'backend-kpa-society-web', 'backends': [{'group': 'neg-app'}]}])
 
     def test_incomplete_previous_list_projections_are_rejected(self):
-        for label, name in [('url-maps', 'o4o-global-lb'), ('backends', 'backend-kpa-society-web')]:
+        for label, name in [('url-maps', 'o4o-global-lb'), ('backends', 'backend-kpa-society-web'), ('backends', 'backend-pharmacy-business-web')]:
             with self.subTest(label=label), self.assertRaises(ValueError):
                 module.project(label, [{'name': name}])
 

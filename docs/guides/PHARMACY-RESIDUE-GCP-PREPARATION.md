@@ -85,4 +85,16 @@ Cloud Shell에는 gcloud CLI가 제공된다. 프로젝트를 위 값으로 지�
 
 2026-10-26 GitHub WIF 실행 40262910814에서 두 약국 도메인이 기존 `kpa-society-web`까지 연결됨을 확인했다. 직접 셸의 outbound identity 부재와 기존 GitHub 배포 경로는 구분한다. 기존 두 프런트의 통제 배포 40261699942는 성공했다.
 
-앱 소스·package 기술명은 `web-pharmacy-business`로 전환한다. 실제 Cloud Run·이미지·배포 선택 키는 새 자원과 LB 전환 준비 전까지 기존 값을 사용한다. 상세 검증과 잔여 권한은 [현재 WO](../work-orders/WO-O4O-PHARMACY-RESIDUE-SAFE-CLEANUP-V1.md)의 연속 Phase를 따른다. regional serverless NEG 권한은 `compute.regionNetworkEndpointGroups.*`이며 zonal 권한으로 대신 판정하지 않는다. 프로젝트 testIamPermissions 결과의 미확인은 리소스 조건부 권한까지 없다는 확정 판정이 아니다.
+앱 소스·package 기술명은 PR #829에서 `web-pharmacy-business`로 전환·배포됐다. regional serverless NEG 권한은 `compute.regionNetworkEndpointGroups.*`이며 zonal 권한으로 대신 판정하지 않는다. 프로젝트 testIamPermissions 결과의 미확인은 리소스 조건부 권한까지 없다는 확정 판정이 아니다.
+
+## 리소스 준비 완료와 남은 bootstrap
+
+PR #836과 main CI가 통과했고, 기존 GitHub WIF 경로의 plan 40301050063·prepare 40302554490이 성공했다.
+새 `pharmacy-business-web`·`neg-pharmacy-business-web`·`backend-pharmacy-business-web`는 Ready 및 복제 설정 재검증을 마쳤다.
+기존 도메인 연결·옛 리소스·IAM·DB는 준비 단계에서 변경하지 않았다. Codex 환경을 다시 게시하는 것과
+새 서비스 공개 invoker를 소유자가 한 번 설정하는 것은 별개다. 추가 로컬 gcloud 설치 없이 기존 trusted workflow로 진행할 수 있다.
+
+실행 digest·소유자 bootstrap 명령·cutover/rollback/retire 계약과 실제 진행 상태는
+[리소스 전환 WO](../work-orders/WO-O4O-PHARMACY-RESOURCE-TRANSITION-PREPARATION-V1.md)를 따른다.
+일반 배포 선택 키는 호환 유지하고 실제 Run/image/registry/CORS origin을 정렬한다. 공개 접근·도메인 검증·
+참조/요청 0 관측이 남아 있으므로 새 자원 생성만으로 전체 잔재 제거 완료라고 판정하지 않는다.
