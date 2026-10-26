@@ -60,3 +60,6 @@ Gmail 공식 OAuth/scopes와 네이버 도움말의 현재 공개 운영 조건�
 - 신규 migration은 운영 DB에 별도 적용 검토가 필요하다. worker는 기능 OFF에서 메일 테이블 조회를 시작하지 않으며 계정 목록은 테이블 미적용 시 빈 목록이다.
 - API의 15초 wake-up은 best effort다. scale-to-zero 환경의 지속 실행은 별도 `node dist/personal-mail-worker.js --run [--max-ticks 100]` 실행·스케줄이 필요하다. CLI는 기본 100 tick, 최대 1,000 tick, tick 사이 240초 예산으로 제한한다. 이번 변경에는 production worker job/scheduler 생성이 없다.
 - 격리 desktop/mobile 화면·공식 MCP SDK 검증과 실제 사용자 ChatGPT·제공자 OAuth/앱 비밀번호 연결 검증은 구분한다. 현재 개발 증적은 [CHECK](../checks/CHECK-O4O-PERSONAL-MAIL-MCP-V1.md), 원격 최종 HEAD의 CI·리뷰 상태는 해당 PR을 따른다.
+
+
+운영 이미지 계약: API runtime manifest는 메일 연결 library를 개발 manifest와 같은 버전으로 포함한다. bounded worker는 tsup entry·Docker COPY·Docker ignore allowlist에 함께 등록한다. 이미지 빌드는 worker syntax와 IMAP/MIME export 존재를 검사하고, release 전 실제 비루트 컨테이너의 `--help`로 DB·외부 연결 없이 로딩을 확인한다.

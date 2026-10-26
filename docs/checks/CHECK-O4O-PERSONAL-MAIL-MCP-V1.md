@@ -57,3 +57,12 @@ Gmail 공개 OAuth 검증·제한 scope 보안 평가와 네이버 상업용 다
 같은 account ID로 네이버 연결이 복구돼도 실패한 capability와 이전 메타가 남는 재리뷰 지적을 수정했다. 연결 완료는 계정 문맥 세대를 바꿔 capability·자료·이력을 다시 읽으며 기존 선택·본문·확인 문맥을 비운다. 단순 현황 새로고침은 선택을 유지하며 capability를 재조회한다. 재연결 시 이전 requestId도 폐기하는 흐름을 함께 검증해 UI 26개 PASS·Neture production build·ESLint를 확인했다. backend source는 동일하며 제공자 실계정 연결은 수행하지 않았다.
 
 배포 전 공개 읽기 전용 baseline은 API live/ready·Neture 홈 HTTP 200, OAuth metadata의 기존 read/draft 두 scope다. 이는 현재 서빙 계약의 baseline이며 신규 메일 환경 변수의 실제 값이나 실계정 검증 증거는 아니다. 배포 후에도 기본 OFF와 기존 계약 보존을 다시 확인한다.
+
+
+## 5. 운영 이미지 검증
+
+운영 manifest에 메일 runtime dependency 2개가 없고 personal-mail-worker가 Docker COPY·ignore allowlist에 빠진 누락을 배포 전 확인했다. `package.production.json`의 imapflow 2.9.1·mailparser 3.12.4는 API manifest와 동일하다. Dockerfile에 worker 복사·syntax·두 module export 검증을 추가하고 `.dockerignore`는 해당 entry만 추가 허용했다.
+
+실제 이미지 빌드 PASS: `sha256:9c598590cb5756f727a892f7a85853ea6c3e53ccffc6c824a81eb9644e5e64a3`. 비루트 UID 1001에서 네트워크를 끈 채 `node dist/personal-mail-worker.js --help` PASS, worker 파일 존재·임시 CA 파일 미포함 PASS다. DB나 제공자에 연결하지 않았으며 이미지를 외부 registry에 push하지 않았다.
+
+관리형 클라우드 시험의 Dockerfile 사본은 npm 설치 단계에만 기존 CA를 BuildKit secret으로 공급했다. runtime 지시문·TLS 검증은 그대로이며 CA를 이미지에 복사하지 않았다. 읽기 전용 기본 buildx 경로는 작업 전용 `BUILDX_CONFIG`로 해결했고 기존 Docker 인증·프록시를 유지했다. 테스트가 만든 mail template 사본은 원본 hash와 파일 목록이 일치함을 확인한 후 제거했다. 이 기록은 배포 전 이미지 검증이며 실제 운영 migration·serving SHA 증거는 최종 PR 결과를 따른다.

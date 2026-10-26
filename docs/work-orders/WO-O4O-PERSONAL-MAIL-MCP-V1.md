@@ -61,3 +61,10 @@ push 전 최신 `origin/main`과 경로 충돌·migration 순서를 확인한다
 배포 대상은 이번 변경의 API·Neture다. 기존 verified rollout과 전용 migration Job을 사용한다. 신규 `CreatePersonalMail1792998000000`은 개인 메일 계정·OAuth flow·최소 메시지 메타·규칙·작업·항목 6개 테이블과 인덱스·제약을 추가하며 기존 업무 데이터의 수정·삭제 SQL은 없다. 운영 실행 전 명시 승인 필요 여부는 [AGENTS §4-1(f)](../../AGENTS.md)와 [README 배포](../../README.md#배포)를 따른다. 승인 없이 운영 DB를 직접 변경하거나 migration을 우회하지 않는다.
 
 Gmail·네이버 외부 계정/공개 승인·Secret·메일 기능 활성화·개인 메일 worker 스케줄 생성은 이번 code 배포에 포함하지 않는다. 메일 기능은 기본 OFF로 배포하고 기존 공개 OAuth/MCP 계약·API readiness·웹 서빙을 확인한다. 이 단계가 끝날 때까지 worktree는 KEEP이다.
+
+
+### 배포 패키징 최종 보완
+
+사용자가 중지 후 `진행하던 작업을 정비하고 난뒤 배포까지 진행`을 지시해 같은 WO·PR을 이어간다. 이번 배포는 앞서 설명한 개인 메일 6개 신규 테이블 migration과 API·Neture의 기존 verified rollout 범위이며 외부 계정·공개 승인·기능 활성화·신규 worker 인프라는 포함하지 않는다.
+
+운영 이미지의 `package.production.json`에 `imapflow`·`mailparser`가 빠지고, worker가 Docker COPY·ignore allowlist에 포함되지 않은 누락을 확인해 세 파일을 보완했다. 두 dependency는 API 개발 manifest와 동일 버전이며 Docker 빌드가 worker syntax·모듈 export를 검사한다. 관리형 클라우드의 읽기 전용 buildx 경로 문제는 작업 전용 `BUILDX_CONFIG`로 해결했고 Docker 인증·프록시 설정은 유지했다. 실제 이미지 빌드와 비루트 UID 1001의 worker `--help`, 임시 CA 미포함을 검증했다. 임시 mail template 복사는 원본 hash 일치를 확인하고 제거했다.
