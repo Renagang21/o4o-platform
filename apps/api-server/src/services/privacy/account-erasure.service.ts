@@ -4,6 +4,7 @@ import type { DataSource, EntityManager } from 'typeorm';
 import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
+import { ERASURE_WRITER_GAPS_SQL } from './erasure-writer-manifest.js';
 
 // CORE_CHANGE_REQUIRED — explicit code/local approval of WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.
 // Production account/file execution remains opt-in and requires its own approved rollout.
@@ -14,7 +15,7 @@ export type ErasureState = 'pending' | 'processing' | 'review_required' | 'retry
 export interface ErasureResult { operationId: string; state: ErasureState; erased: boolean; reviewCodes: string[]; reviewDueAt: string | null }
 export interface PersonalStorage {
   generation(bucket: string, path: string, ownerId: string): Promise<string | null>;
-  deleteGeneration(bucket: string, path: string, generation: string): Promise<void>;
+  deleteGeneration(bucket: string, path: string, generation: string, ownerId: string): Promise<void>;
 }
 export interface ErasureOptions {
   enabled: boolean;
@@ -84,6 +85,7 @@ export class AccountErasureService {
       AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
       AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
       AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
+      AND NOT EXISTS(${ERASURE_WRITER_GAPS_SQL})
       AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
         AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
     return {enabled:r?.ready===true};
@@ -326,10 +328,7 @@ export class AccountErasureService {
       if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
-    const [missing] = await m.query(`SELECT count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-      WHERE c.relkind='r' AND n.nspname IN ('public','neture','cosmetics')
-      AND c.relname NOT IN ('o4o_schema_baselines','typeorm_migrations') AND c.relname NOT LIKE 'account_erasure_%'
-      AND NOT EXISTS(SELECT 1 FROM pg_trigger tr WHERE tr.tgrelid=c.oid AND tr.tgname='account_erasure_write_fence' AND tr.tgenabled='O')`);
+    const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
     if (missing.n) codes.push('WRITER_MANIFEST_REQUIRES_REFRESH');
     return codes;
   }
@@ -457,7 +456,7 @@ export class AccountErasureService {
           // No external delete before the generation is committed: retry this operation.
           continue;
         }
-        if (generation) await this.options.storage.deleteGeneration(t.bucket,t.object_path,generation);
+        if (generation) await this.options.storage.deleteGeneration(t.bucket,t.object_path,generation,o.subject_id);
         await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
           error_code=NULL,updated_at=now() WHERE id=$1`, [t.id,generation ? 'deleted' : 'already_absent']);
       }

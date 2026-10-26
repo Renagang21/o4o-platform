@@ -331,6 +331,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   // Integrated main prefixes and empty down/up verified in isolated PostgreSQL 15.
   { appliedThrough: 'CreatePartnerSupportSpaces1792886600000', fingerprint: '71c8439bec809c03e55cc68068877cb8f39d567afbf203e78254281a191fdc07', fingerprintLineCount: 7080 },
   { appliedThrough: 'AddPartnerMediaAndReadState1792886700000', fingerprint: '4accc1af6999af30ee278a666edeafb6d978b2846ef9876fd2b43e58cc4144a3', fingerprintLineCount: 7117 },
+  // Isolated PostgreSQL 15: all prior prefixes preserved, empty down/up matched.
+  { appliedThrough: 'HardenAuthPrivacyReadiness1792990000000', fingerprint: '564bd3302650f6716d1063790048cfe137fc95561ff22fbbfc3847fb9cc26586', fingerprintLineCount: 7131 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

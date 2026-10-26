@@ -14,8 +14,16 @@ export const accountErasureStorage: PersonalStorage = {
       return String(metadata.generation);
     } catch (e) { if ((e as { code?: unknown }).code === 404) return null; throw e; }
   },
-  async deleteGeneration(bucket, path, generation) {
-    try { await gcs.bucket(bucket).file(path).delete({ ifGenerationMatch: generation }); }
+  async deleteGeneration(bucket, path, generation, ownerId) {
+    try {
+      // Recheck ownership on every retry, including metadata-only ownership changes.
+      const [metadata] = await gcs.bucket(bucket).file(path).getMetadata();
+      if(String(metadata.metadata?.o4o_owner_user_id ?? '').toLowerCase()!==ownerId.toLowerCase() ||
+        metadata.metadata?.o4o_asset_purpose!=='personal')throw new AccountErasureError('PERSONAL_FILE_OWNERSHIP_REVIEW_REQUIRED',409);
+      if(String(metadata.generation)!==generation)throw new AccountErasureError('PERSONAL_FILE_GENERATION_CHANGED',409);
+      if(!metadata.metageneration)throw new AccountErasureError('PERSONAL_FILE_GENERATION_REQUIRED',409);
+      await gcs.bucket(bucket).file(path,{preconditionOpts:{ifGenerationMatch:generation,ifMetagenerationMatch:metadata.metageneration}}).delete();
+    }
     catch (e) {
       if ((e as { code?: unknown }).code === 412) throw new AccountErasureError('PERSONAL_FILE_GENERATION_CHANGED',409);
       if ((e as { code?: unknown }).code !== 404) throw e;

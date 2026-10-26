@@ -113,6 +113,8 @@ import { CreateCooperationMemberWorkflows1792886400002 } from '../migrations/179
 import { CreatePartnerSupportSpaces1792886600000 } from '../migrations/1792886600000-CreatePartnerSupportSpaces.js';
 import { AddPartnerMediaAndReadState1792886700000 } from '../migrations/1792886700000-AddPartnerMediaAndReadState.js';
 
+import { HardenAuthPrivacyReadiness1792990000000 } from '../migrations/1792990000000-HardenAuthPrivacyReadiness.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -157,6 +159,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateCooperationMemberWorkflows1792886400002,
   CreatePartnerSupportSpaces1792886600000,
   AddPartnerMediaAndReadState1792886700000,
+  HardenAuthPrivacyReadiness1792990000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
