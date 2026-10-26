@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import ProductCorrectionWorkerStatus from './ProductCorrectionWorkerStatus';
 import type {
   ProductCorrectionBatchResult,
   ProductCorrectionMatch,
@@ -240,6 +241,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
           )}
           {dashboard && (
             <div className="space-y-2 rounded border p-3" aria-label="통합 관리 현황">
+              <ProductCorrectionWorkerStatus dashboard={dashboard} />
               <p>
                 설명서 갱신 대기 {dashboard.renewalOpen} · 근거 대기 작업기록{' '}
                 {dashboard.evidenceWaiting} · 변경안 검토 대기 {dashboard.proposalPending} · 검토 후
