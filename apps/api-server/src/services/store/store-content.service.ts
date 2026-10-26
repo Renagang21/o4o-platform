@@ -1,3 +1,4 @@
+import { directContentRevision, hasConsultation, saveConsultationContent } from './consultation-content.js';
 /**
  * Store Content Service — "매장 콘텐츠"(kpa_store_contents) 목록 + direct 콘텐츠 CRUD 공통 로직
  *
@@ -96,7 +97,7 @@ function parseProductRef(raw: unknown): ParsedProductRef {
  * 미존재/타 매장이면 ok=false.
  */
 export async function resolveProductForLink(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
   sourceType: 'listing' | 'local',
   sourceId: string,
@@ -118,7 +119,7 @@ export async function resolveProductForLink(
 }
 
 async function clearProductLink(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
   contentId: string,
 ): Promise<void> {
@@ -139,7 +140,7 @@ export type ProductRefPlan =
  * (잘못된 productRef 로 콘텐츠가 먼저 저장되는 orphan 방지).
  */
 export async function prepareProductRef(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
   raw: unknown,
 ): Promise<{ ok: true; plan: ProductRefPlan; error?: undefined } | { ok: false; error: string; plan?: undefined }> {
@@ -156,7 +157,7 @@ export async function prepareProductRef(
 }
 
 export async function applyProductRefPlan(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
   contentId: string,
   plan: ProductRefPlan,
@@ -218,6 +219,7 @@ export interface DirectContentView {
   tags: string[];
   updatedAt: Date;
   updatedBy: string | null;
+  revision?: string;
 }
 
 function toDirectView(c: KpaStoreContent, includeOrg = false): DirectContentView {
@@ -230,6 +232,7 @@ function toDirectView(c: KpaStoreContent, includeOrg = false): DirectContentView
     tags: c.tags ?? [],
     updatedAt: c.updated_at,
     updatedBy: c.updated_by,
+    revision: directContentRevision(c),
   };
 }
 
@@ -241,9 +244,10 @@ export async function createDirectContent(
   dataSource: DataSource,
   organizationId: string,
   userId: string,
-  body: { title?: unknown; contentJson?: unknown; tags?: unknown; productRef?: unknown },
+  body: { title?: unknown; contentJson?: unknown; tags?: unknown; productRef?: unknown; clientContentId?: unknown; expectedRevision?: unknown },
 ): Promise<ContentResult<DirectContentView>> {
   const { title, contentJson, tags, productRef } = body ?? {};
+  if (hasConsultation(contentJson)) return saveConsultationContent(dataSource, organizationId, userId, 'create', typeof body.clientContentId === 'string' ? body.clientContentId : '', body, consultationDependencies);
 
   if (!title || typeof title !== 'string' || !title.trim()) {
     return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'title은 필수입니다.' };
@@ -291,7 +295,7 @@ export async function updateDirectContent(
   organizationId: string,
   userId: string,
   id: string,
-  body: { title?: unknown; contentJson?: unknown; tags?: unknown; productRef?: unknown },
+  body: { title?: unknown; contentJson?: unknown; tags?: unknown; productRef?: unknown; clientContentId?: unknown; expectedRevision?: unknown },
 ): Promise<ContentResult<DirectContentView>> {
   const { title, contentJson, tags, productRef } = body ?? {};
 
@@ -300,6 +304,7 @@ export async function updateDirectContent(
     where: { id, organization_id: organizationId, source_type: 'direct' },
   });
   if (!content) return NOT_FOUND;
+  if (hasConsultation(content.content_json) || hasConsultation(contentJson)) return saveConsultationContent(dataSource, organizationId, userId, 'update', id, body, consultationDependencies);
 
   const prepared = await prepareProductRef(dataSource, organizationId, productRef);
   if (!prepared.ok) {
@@ -312,12 +317,18 @@ export async function updateDirectContent(
   if (tags !== undefined) content.tags = normalizeTags(tags);
   content.updated_by = userId;
 
-  const saved = await repo.save(content);
-
-  // productRef 미전송 → 기존 link 유지 / null → 제거 / 객체 → 교체.
-  await applyProductRefPlan(dataSource, organizationId, saved.id, prepared.plan);
-
-  return { ok: true, data: toDirectView(saved) };
+  // A legacy edit that read before adoption must not overwrite newly guarded consultation data.
+  return dataSource.transaction(async manager => {
+    const currentRepo = manager.getRepository(KpaStoreContent);
+    const result = await currentRepo.createQueryBuilder().update(KpaStoreContent).set({
+      title: content.title, content_json: content.content_json, tags: content.tags, updated_by: userId,
+    }).where('id=:id AND organization_id=:org AND source_type=:source', { id, org: organizationId, source: 'direct' })
+      .andWhere("NOT (content_json ? :contextKey)", { contextKey: 'productConsultation' }).execute();
+    if (!result.affected) return { ok: false, status: 409, code: 'CONTENT_CONFLICT', message: '자료가 변경됐습니다. 최신 내용을 다시 확인해 주세요.' };
+    await applyProductRefPlan(manager, organizationId, id, prepared.plan);
+    const saved = await currentRepo.findOneByOrFail({ id, organization_id: organizationId });
+    return { ok: true, data: toDirectView(saved) };
+  });
 }
 
 /** DELETE — direct 콘텐츠 삭제 (물리 삭제, 원본 동작 유지) */
@@ -335,3 +346,9 @@ export async function deleteDirectContent(
   await repo.remove(content);
   return { ok: true, data: { deleted: true, id } };
 }
+
+const consultationDependencies = {
+  prepare: prepareProductRef,
+  link: applyProductRefPlan,
+  view: (row: KpaStoreContent) => toDirectView(row, true),
+};

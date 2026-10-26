@@ -1,3 +1,7 @@
+import { ConsultationConflict } from '../../components/product-description/ConsultationConflict';
+import { consultationLanguages, newProductConsultation, readProductConsultation } from '../../components/product-description/productConsultationDraft';
+import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
@@ -15,7 +19,7 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 
 import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   Edit2,
@@ -29,12 +33,12 @@ import {
 // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
 //   direct 콘텐츠 편집을 o4o 표준 RichTextEditor(@o4o/content-editor)로 통일 — 제작 자료 편집기와 동일 모듈.
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
-import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
+import { PRODUCT_DESCRIPTION_PURPOSE_LABELS, buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { BlockRenderer } from '@o4o/block-renderer';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
-import { emptyTextDraft, loadDirect, saveDirect, removeDirect, textDraftFromRecord } from './authoring/contentAuthoringAdapters';
+import { consultationSaveError, emptyTextDraft, loadDirect, saveDirect, removeDirect, textDraftFromRecord } from './authoring/contentAuthoringAdapters';
 import { parseDirectBlocks } from './authoring/contentAuthoringModels';
 import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
@@ -50,14 +54,27 @@ export default function StoreDirectContentPage() {
 
   const { organizationId } = useStoreOrganizationId();
   const serviceKey = getActiveServiceKey();
+  const { key: operationScope, isCurrent } = useStoreOperationScope();
+  const location = useLocation();
+  const entry = location.state as { consultationProduct?: unknown; consultationScope?: string } | null;
+  const legacyContext = entry?.consultationScope === operationScope ? readProductConsultation({
+    ...newProductConsultation({ sourceType: 'local', sourceId: '', name: '' }), product: entry.consultationProduct,
+  }) : undefined;
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const session = useContentAuthoringSession({
     organizationId, serviceKey, target: `direct:${id ?? ''}`, initialDraft: emptyTextDraft,
     load: () => id ? loadDirect(id) : Promise.reject(new Error('Missing content')),
-    toDraft: textDraftFromRecord,
+    toDraft: record => ({ ...textDraftFromRecord(record),
+      ...(legacyContext && !record.contentJson.productConsultation ? { consultation: legacyContext } : {}) }),
     persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
-    onSaved: (_record, unchanged) => { if (unchanged) setEditing(false); },
+    saveErrorMessage: consultationSaveError,
+    onSaved: (saved, unchanged, visible) => {
+      if (!visible) return;
+      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하세요.', false); return; }
+      if (saved.verification === false) { session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false); return; }
+      if (session.draft.confirmedRevision) session.changeDraft({ confirmedRevision: undefined });
+      if (unchanged) setEditing(false); },
     onRemoved: () => navigate(backPath, { replace: true, state: returnState }),
   });
   const { record: content, loading, error, saving, deleting, reload: fetchContent, save: handleSave, remove: handleDelete } = session;
@@ -221,6 +238,12 @@ export default function StoreDirectContentPage() {
         </div>
       </div>
 
+      {session.draft.consultation && <output className="mb-3 block rounded-lg bg-slate-50 p-3 text-sm">
+        상품 상담자료 · {session.draft.consultation.product.name} · {PRODUCT_DESCRIPTION_PURPOSE_LABELS[session.draft.consultation.assist.purpose]} · {consultationLanguages[session.draft.consultation.language]}
+      </output>}
+      {session.record?.conflict && <ConsultationConflict saved={session.record}
+        acknowledged={session.draft.confirmedRevision === session.record.revision} disabled={saving || deleting}
+        onAcknowledge={() => session.changeDraft({ confirmedRevision: session.record?.revision })} />}
       <StoreAiSlot label="안내 편집" />
       {/* Content area */}
       {editing ? (
@@ -229,7 +252,10 @@ export default function StoreDirectContentPage() {
         <div className="bg-white border border-slate-200 rounded-lg p-2 mb-4">
           {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 적용 시 initialHtml(편집기 value)·editorContent(저장값) 동시 갱신 */}
           <div className="mb-2">
-            <LlmAssistPanel
+            {session.draft.consultation ? <ProductConsultationAuthoring key={`${operationScope}:${id}`}
+              value={session.draft.consultation} title={editTitle} html={editorContent.html}
+              disabled={saving || deleting} isCurrent={isCurrent}
+              onChange={consultation => session.changeDraft({ consultation })} onApplyHtml={setEditorInitialHtml} /> : <LlmAssistPanel
               label={STORE_LLM_ASSIST_LABEL}
               contextLabel="매장 직접 작성 콘텐츠 — 현재 내용을 다듬거나 새로 씁니다"
               guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
@@ -242,7 +268,7 @@ export default function StoreDirectContentPage() {
               currentHtml={editorContent.html}
               onApplyHtml={setEditorInitialHtml}
               onNotify={(message, kind) => showToast(message, kind === 'success')}
-            />
+            />}
           </div>
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
