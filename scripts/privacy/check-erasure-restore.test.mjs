@@ -35,17 +35,23 @@ test('rejects malformed, future, expired and incomplete evidence without treatin
 
 test('CLI preserves pass/review/invalid exit codes and never echoes private parse errors',async()=>{
  const {mkdtemp,writeFile,rm}=await import('node:fs/promises');
- const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {spawnSync}=await import('node:child_process');
+ const {tmpdir}=await import('node:os');const {join,resolve}=await import('node:path');const {spawnSync}=await import('node:child_process');
  const directory=await mkdtemp(join(tmpdir(),'o4o-restore-review-'));
  try{
-  const current=new Date();const snapshotFile=join(directory,'snapshot.json'),ledgerFile=join(directory,'ledger.json');
+  const current=new Date();const snapshotFile=join(directory,'snapshot.json'),ledgerFile=join(directory,'current-erasure-ledger.json');
   const s={version:1,kind:'automatic_backup',createdAt:new Date(current.getTime()-86_400_000).toISOString(),subjectHashes:[subject]};
   const l={version:1,complete:true,capturedAt:current.toISOString(),coverageFrom:new Date(current.getTime()-2*86_400_000).toISOString(),completed:[]};
   await writeFile(snapshotFile,JSON.stringify(s),{mode:0o600});await writeFile(ledgerFile,JSON.stringify(l),{mode:0o600});
-  const run=()=>spawnSync(process.execPath,['scripts/privacy/check-erasure-restore.mjs',snapshotFile,ledgerFile],{encoding:'utf8'});
+  const script=resolve('scripts/privacy/check-erasure-restore.mjs');
+  const run=(args=[])=>spawnSync(process.execPath,[script,...args],{encoding:'utf8',cwd:directory});
   let r=run();assert.equal(r.status,0);assert.equal(JSON.parse(r.stdout).restoreApproved,false);
   l.completed=[{subjectHash:subject,completedAt:new Date(current.getTime()-3600_000).toISOString(),expiresAt:new Date(current.getTime()+365*86_400_000).toISOString()}];
   await writeFile(ledgerFile,JSON.stringify(l));r=run();assert.equal(r.status,1);assert.equal(JSON.parse(r.stdout).conflictingSubjects,1);
   await writeFile(ledgerFile,'{"private":"DO_NOT_ECHO_THIS');r=run();assert.equal(r.status,2);assert.ok(!r.stderr.includes('DO_NOT_ECHO_THIS'));assert.equal(r.stdout,'');
+  r=run(['../../private.json']);assert.equal(r.status,2);
+  const {symlink,unlink}=await import('node:fs/promises');
+  await unlink(ledgerFile);await symlink(snapshotFile,ledgerFile);r=run();assert.equal(r.status,2);
+  await unlink(ledgerFile);await writeFile(ledgerFile,JSON.stringify(l));
+  await unlink(snapshotFile);await symlink(ledgerFile,snapshotFile);r=run();assert.equal(r.status,2);
  }finally{await rm(directory,{recursive:true,force:true});}
 });

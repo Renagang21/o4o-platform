@@ -25,6 +25,7 @@ export interface ErasureOptions {
   personalBuckets: readonly string[];
   storage?: PersonalStorage;
 }
+type ErasureFileTask = {id:string;bucket:string;object_path:string;generation:string|null};
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
 const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
@@ -447,20 +448,23 @@ export class AccountErasureService {
       if (o.state === 'completed') return;
       await this.assertTarget(m,o.subject_id);
       const tasks = await m.query("SELECT * FROM account_erasure_file_tasks WHERE operation_id=$1 AND state IN ('pending','retry_required') FOR UPDATE", [operationId]);
-      for (const t of tasks) {
-        if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED', 503);
-        const generation = t.generation ?? await this.options.storage.generation(t.bucket,t.object_path,o.subject_id);
-        // Persist generation before external deletion in a separate durable step below.
-        if (!t.generation && generation) {
-          await m.query("UPDATE account_erasure_file_tasks SET generation=$2,attempts=attempts+1 WHERE id=$1", [t.id,generation]);
-          // No external delete before the generation is committed: retry this operation.
-          continue;
-        }
-        if (generation) await this.options.storage.deleteGeneration(t.bucket,t.object_path,generation,o.subject_id);
-        await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
-          error_code=NULL,updated_at=now() WHERE id=$1`, [t.id,generation ? 'deleted' : 'already_absent']);
-      }
+      // One QueryRunner and the durable two-pass contract require sequential task processing.
+      await tasks.reduce((pending:Promise<void>,task:ErasureFileTask) =>
+        pending.then(() => this.removeFileTask(m,task,o.subject_id)),Promise.resolve());
     });
+  }
+
+  private async removeFileTask(m:EntityManager,task:ErasureFileTask,ownerId:string):Promise<void> {
+    if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED',503);
+    const generation=task.generation ?? await this.options.storage.generation(task.bucket,task.object_path,ownerId);
+    if(!task.generation && generation){
+      // Persist in this transaction; external deletion happens only after this commit.
+      await m.query("UPDATE account_erasure_file_tasks SET generation=$2,attempts=attempts+1 WHERE id=$1",[task.id,generation]);
+      return;
+    }
+    if(generation)await this.options.storage.deleteGeneration(task.bucket,task.object_path,generation,ownerId);
+    await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
+      error_code=NULL,updated_at=now() WHERE id=$1`,[task.id,generation ? 'deleted':'already_absent']);
   }
 
   private async finish(operationId: string,actorId: string): Promise<void> {

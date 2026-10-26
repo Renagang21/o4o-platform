@@ -28,8 +28,11 @@ avatar는 기존 개인 bucket·owner/purpose proof와 durable content generatio
 ledger는 복원 후보 내부의 오래된 원장이 아니라 **현재 운영의 최소 삭제 증빙**에서 추출한다. `account_erasure_audit_events`의 완료 action·subject_hash·occurred_at·expires_at를 사용하고, snapshot 이전부터 capture 시점까지의 누락 없는 범위를 증명해야 한다. 단순 비활성화나 검토 중 operation을 completed 증빙으로 만들지 않는다. 복원 snapshot은 users.id를 해시하여 후보를 추출한다. 승인된 readonly 접속을 사용하고 export 파일은 제한된 사적 경로에 보관·정리한다.
 
 ```sh
-node scripts/privacy/check-erasure-restore.mjs /private/snapshot.json /private/current-erasure-ledger.json
+# 권한이 제한된 증빙 폴더를 현재 디렉터리로 선택한 뒤 절대 도구 경로로 실행
+node /path/to/o4o-platform/scripts/privacy/check-erasure-restore.mjs
 ```
+
+입력 파일명은 현재 증빙 폴더의 `snapshot.json`·`current-erasure-ledger.json`으로 고정한다. 경로 인자를 받지 않고 심볼릭 링크·일반 파일이 아닌 입력을 거부하며 같은 descriptor에서 크기 제한·내용 읽기를 수행한다.
 
 검사는 UTC 시간·자동 백업 7일/수동 export 30일·5분 이내의 현재 ledger·범위·최소 증빙 만료를 검증한다. 출력에는 식별자/digest를 넣지 않고 합계만 제공한다. 입력당 16MiB/10만 subject로 제한한다. 더 큰 자료는 별도 검토하며 제한을 생략해 실행하지 않는다.
 

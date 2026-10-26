@@ -47,7 +47,10 @@ try{
   try{
    // Full Core regression assumes unchanged domains are fenced. These temporary fixture-only
    // triggers do not repair AI/other-domain source or establish operational readiness.
-   for(const table of gaps){await db.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${quote(table.schema)}.${quote(table.name)} FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`);added.push(table);}
+   if(gaps.length){
+    await db.query(gaps.map(table=>`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${quote(table.schema)}.${quote(table.name)} FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`).join(';\n'));
+    added.push(...gaps);
+   }
    const root=fileURLToPath(new URL('../../',import.meta.url));
    const code=await new Promise((accept,reject)=>{
     const child=spawn(process.execPath,['node_modules/jest/bin/jest.js','--config','apps/api-server/jest.config.cjs','--runInBand','--testTimeout=15000','--runTestsByPath',
@@ -59,7 +62,7 @@ try{
    });
    process.exitCode=code;
   }finally{
-   for(const table of added)await db.query(`DROP TRIGGER account_erasure_write_fence ON ${quote(table.schema)}.${quote(table.name)}`);
+   if(added.length)await db.query(added.map(table=>`DROP TRIGGER account_erasure_write_fence ON ${quote(table.schema)}.${quote(table.name)}`).join(';\n'));
    await assertCanonical();
   }
  }

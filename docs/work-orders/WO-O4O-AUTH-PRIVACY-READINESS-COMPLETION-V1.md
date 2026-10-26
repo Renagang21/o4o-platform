@@ -36,3 +36,5 @@ GCS 실제 ownership tag·version/soft-delete·cache·IAM·backup/export 보존 
 최신 main #831을 정상 merge했고 PR #835에서 CI/검토를 진행한다. 전용 fixture 도구의 fresh prepare·3 suites/51 tests와 canonical 지문 복구를 확인했다. main 병합·auto-merge·운영 반영은 미실행이다.
 
 최종 writer event 검사·restore kind 검증 보완 후 재현 도구의3 suites/52 tests와 restore6 tests가 통과했다. canonical 지문 복구를 확인했으며 원격 검사는 PR #835에서 추적한다.
+
+Sonar의 CLI 경로 읽기 보안 지적과 순차 await 지적을 같은 PR에서 보완했다. 고정 입력·symlink 거부, 순차 파일 작업과 transaction DDL batch를 실제 PG52/restore6 및 동일 canonical 지문으로 재검증했다. 검사 기준·보존 정책·운영 flags는 바꾸지 않았다.

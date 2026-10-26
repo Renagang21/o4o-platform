@@ -52,3 +52,15 @@ production DB·실계정·실제 GCS·OAuth·backup 복원은 실행하지 않�
 동일명/함수뿐 아니라 BEFORE + ROW + INSERT/UPDATE event가 모두 있는지 writer 준비 조건을 강화했다. AFTER 또는 INSERT 전용 trigger를 거부하는 실제 PG 회귀를 추가했다. 복원 kind는 명시 Map에서만 조회해 prototype 이름을 알려진 backup 종류로 오인하지 않는다.
 
 보완 후 저장된 fixture 도구의 verify **3 suites / 52 tests PASS**(공유 제한7 + readiness5 + 기존 제거40), canonical 지문 복구 PASS. 복원 검사/CLI **6 PASS**. 위 초기51회차·개별4회차와 중복 합산하지 않는다. 파기 flags·운영 DDL·실제 파일/계정은 변경하지 않았다. 원격 필수 CI·CodeQL·리뷰 결과와 최신 HEAD는 PR #835에서 확인하며 main 병합 전 인계한다.
+
+
+## Sonar 보안·품질 지적 후속
+
+HEAD `a23f7eb599`의 CI Pipeline/필수 CI Gate와 CodeQL은 통과했으나 Sonar는 C Security Rating으로 실패했다. annotation 7건 중 2건은 복원 CLI의 경로 인자 파일 읽기였고 5건은 순차 await 지적이었다. 검사 기준·제외·보안 판정은 변경하지 않았다.
+
+- CLI는 경로 인자를 받지 않고 private cwd의 두 고정 JSON 파일만 읽는다. O_NOFOLLOW가 없는 환경·symlink·일반 파일이 아닌 입력을 거부하고, 같은 descriptor의 크기/변경 여부와 제한된 읽기를 확인한다. 실제 CLI의 경로 인자 거부·두 입력의 symlink 거부와 기존 종료0/1/2·오류 비밀 비노출을 검증했다.
+- migration과 fixture DDL은 같은 transaction의 단일 명령 batch로 실행한다. 파일 작업은 단일 QueryRunner의 순차 Promise chain과 per-task helper를 사용해 durable generation commit 전 외부 삭제 금지·실패 시 rollback/retry 순서를 유지한다. 병렬 실행으로 바꾸지 않았다.
+- metadata fingerprint helper가 transaction search_path를 변경하는 조건도 확인하여 counter/DDL의 schema를 public으로 명시했다. empty down/up은 기존/신규 지문 모두 일치한다.
+- 보완 후 fresh canonical prepare·실제 PostgreSQL **3 suites/52 tests PASS**, restore CLI/계약 **6 PASS**, migration contract **21/21 PASS**, 변경 파일 ESLint PASS. 실제 GCS·운영 계정·보존기간/파기 설정은 변경하지 않았다.
+
+동일 PR #835를 보완 중 draft로 두고 수정본 push 후 review-ready로 전환한다. 첫 자동 Codex review는 초기 HEAD `a0d09ad53b`에 finding0이었으며, 새 HEAD의 검토를 이전 결과로 대체하지 않는다. 최종 remote 결과는 PR 실제 검사/리뷰 상태로 인계한다.

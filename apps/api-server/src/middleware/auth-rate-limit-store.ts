@@ -22,7 +22,7 @@ export class PostgresAuthRateLimitStore {
   async reserve(scope: string, key: string, windowMs: number): Promise<AuthLimitLease> {
     const digest = createHash('sha256').update(scope).update('\0').update(key).digest('hex');
     const row = await this.bounded(async manager => {
-      const [result] = await manager.query(`INSERT INTO auth_rate_limit_counters(scope,key_digest,hits,reset_at)
+      const [result] = await manager.query(`INSERT INTO public.auth_rate_limit_counters(scope,key_digest,hits,reset_at)
         VALUES($1,$2,1,date_trunc('milliseconds',statement_timestamp()) + $3 * interval '1 millisecond')
         ON CONFLICT(scope,key_digest) DO UPDATE SET
           hits=CASE WHEN auth_rate_limit_counters.reset_at <= statement_timestamp() THEN 1
@@ -37,8 +37,8 @@ export class PostgresAuthRateLimitStore {
     if (Date.now() >= this.nextCleanup) {
       this.nextCleanup = Date.now() + 60_000;
       try {
-        await this.bounded(manager => manager.query(`DELETE FROM auth_rate_limit_counters WHERE (scope,key_digest) IN
-          (SELECT scope,key_digest FROM auth_rate_limit_counters WHERE reset_at <= statement_timestamp()
+        await this.bounded(manager => manager.query(`DELETE FROM public.auth_rate_limit_counters WHERE (scope,key_digest) IN
+          (SELECT scope,key_digest FROM public.auth_rate_limit_counters WHERE reset_at <= statement_timestamp()
             ORDER BY reset_at LIMIT 200 FOR UPDATE SKIP LOCKED)`));
       } catch { logger.warn('[auth-rate-limit] expired counter maintenance unavailable'); }
     }
@@ -47,7 +47,7 @@ export class PostgresAuthRateLimitStore {
 
   async release(lease: AuthLimitLease): Promise<void> {
     // A slow successful response must never decrement a later window's failures.
-    await this.bounded(manager => manager.query(`UPDATE auth_rate_limit_counters SET hits=GREATEST(hits-1,0)
+    await this.bounded(manager => manager.query(`UPDATE public.auth_rate_limit_counters SET hits=GREATEST(hits-1,0)
       WHERE scope=$1 AND key_digest=$2 AND reset_at=$3`, [lease.scope,lease.digest,lease.resetAt]));
   }
 }

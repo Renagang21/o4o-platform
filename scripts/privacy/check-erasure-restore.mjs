@@ -2,7 +2,7 @@
  * complete export of CURRENT minimum erasure evidence, never that snapshot's old ledger.
  * This command neither restores nor deletes anything and never approves a restoration.
  */
-import { readFileSync, statSync } from 'node:fs';
+import { openSync, fstatSync, readSync, closeSync, constants } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const DAY = 86_400_000;
@@ -43,15 +43,25 @@ export function checkErasureRestore(snapshot, ledger, now = new Date()) {
     restoreApproved:false,scope:'subject UUID digests only; file/domain/backup review and explicit restore approval remain required'};
 }
 
-function input(path) {
-  if (!path || statSync(path).size>16*1024*1024) throw new Error('INVALID_RESTORE_INPUT');
-  return JSON.parse(readFileSync(path,'utf8'));
+function input(filename) {
+  if(!constants.O_NOFOLLOW)throw new Error('SYMLINK_GUARD_UNAVAILABLE');
+  const descriptor=openSync(filename,constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const stat=fstatSync(descriptor);
+    if(!stat.isFile() || stat.size>16*1024*1024)throw new Error('INVALID_RESTORE_INPUT');
+    const bytes=Buffer.alloc(stat.size+1);
+    const length=readSync(descriptor,bytes,0,bytes.length,null);
+    const after=fstatSync(descriptor);
+    if(length!==stat.size || after.size!==stat.size || after.mtimeMs!==stat.mtimeMs)throw new Error('RESTORE_INPUT_CHANGED');
+    return JSON.parse(bytes.subarray(0,length).toString('utf8'));
+  } finally { closeSync(descriptor); }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    if (process.argv.length!==4) throw new Error('USAGE: node scripts/privacy/check-erasure-restore.mjs snapshot.json current-erasure-ledger.json');
-    const result = checkErasureRestore(input(process.argv[2]),input(process.argv[3]));
+    if (process.argv.length!==2) throw new Error('NO_PATH_ARGUMENTS_ALLOWED');
+    // The operator chooses a private working directory. No CLI argument becomes a file path.
+    const result = checkErasureRestore(input('snapshot.json'),input('current-erasure-ledger.json'));
     process.stdout.write(JSON.stringify(result)+'\n');
     process.exitCode=result.recordCheck==='pass' ? 0 : 1;
   } catch {
