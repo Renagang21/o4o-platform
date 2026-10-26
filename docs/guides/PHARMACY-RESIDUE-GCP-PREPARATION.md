@@ -19,6 +19,10 @@
 
 프로젝트·리전 제안값과 아래 API 도메인은 환경 설정 초안에 저장했다. 초안 저장은 현재 실행 환경 적용·인증 연결·게시 완료를 뜻하지 않는다. 기존 install_script/start_skill·GitHub·패키지 레지스트리 허용 목록은 보존했다.
 
+## 기존 GitHub Actions 경로
+
+`gcp-wif-auth-smoke.yml`의 읽기 전용 실행 40257349330이 성공했다. 기존 GitHub Actions는 WIF로 GCP를 인증하며 Cloud SDK를 제공한다. 이 경로를 사용하는 배포 작업은 현재 셸의 직접 GCP 인증 연결 없이도 진행할 수 있다. LB 전환·새 서비스 IAM 등의 권한은 기존 배포 권한과 별도로 확인해야 한다. 아래 환경 보완은 현재 셸에서 직접 조회·작업하려는 경우에 적용한다.
+
 ## 보완 순서
 
 1. 환경 설정에서 Google Cloud outbound identity를 연결한다. 지원되는 Workload Identity Federation 또는 지정 서비스 계정 impersonation을 사용하고 연결 alias·프로젝트를 명확히 한다.

@@ -12,7 +12,8 @@
 - [x] 기존 CI·배포 판정 회귀: 282 PASS.
 - [x] Docker 이미지 빌드 시도·실패 원인 확인·이번 빌드 캐시 정리.
 - [x] 프로젝트·리전·인증·CLI·네트워크·빌드 환경 준비 조건 문서화.
-- [ ] GCP 실제 연결 조사와 Cloud Run/LB 전환: 명시적인 GCP identity 연결·CLI·운영 인벤토리 필요.
+- [x] 기존 GitHub Actions GCP WIF 읽기 인증 검증: run 40257349330 SUCCESS.
+- [ ] Cloud Run/LB 전체 연결 조사·이름 전환: 현재 셸의 직접 GCP 접근과 기존 GitHub Actions 인증 경로를 구분하고 필요한 자원별 권한을 확인한다.
 - [ ] 디렉터리·패키지·Cloud Run 새 기술 이름 확정과 소비처 일괄 전환.
 - [ ] 서비스 키 정리: 공통 계정(neture)·사업 원장 경계에 맞춘 별도 데이터/세션 전환 검토.
 
@@ -41,3 +42,8 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 ## 환경·운영 잔여
 
 [GCP 준비 안내](../guides/PHARMACY-RESIDUE-GCP-PREPARATION.md)에 설정표, 초기 읽기 권한, 실제 접근 확인 명령, Cloud Run/LB 전환·복구 순서를 기록한다. 기존 CHECK의 과거 시점 기록은 유지한다. 환경 준비만으로 사업 식별·데이터 전환 문제가 해결되는 것은 아니다.
+
+
+## 통합 진행
+
+사용자의 직접 진행 지시에 따라 기존 GitHub Actions 인증·배포 경로로 PR 검증·main 통합·통제 배포를 진행한다. 현재 셸의 gcloud/identity 부재가 기존 GitHub Actions 배포 경로의 부재를 뜻하지 않는다. 최신 main의 Partner 변경을 정상 merge하고 기존 배포 판정 282개를 다시 통과했다. 동시에 실행 중인 다른 작업의 운영 배포가 끝난 뒤 해당 SHA의 실제 서비스별 영향을 확인해 순차 배포한다. 새로운 운영 DB 변경·IAM/LB 변경이나 현재 서비스 삭제를 이 기록만으로 실행하지 않는다.
