@@ -129,4 +129,4 @@ user 규칙은 식별자를 결과에 복사하지 않고 `ignoredUserRules` 건
 
 ## 7. 운영 전달·관측 후속 개발
 
-`wo/ai-runtime-operations-readiness`는 기존 optional env로 현재 catalog를 보존·검증하는 배포 source, 기존 관리자 GET의 안전한 process 가격 관측, 이 CLI의 선택적 `--runtime-snapshot` 비교를 준비한다. [운영 적용·실사용 검증 인계](O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)의 순서·한계와 [CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)를 따른다. 이 후속은 main 통합 전 push 인계이며 실제 가격/한도·계정 설정·유료 검증을 실행하지 않았다. metadata 일치를 현재 모델·provider 사용 성공이나 실시간 예약 증거로 확대하지 않는다.
+`wo/ai-runtime-operations-readiness`는 기존 optional env로 현재 catalog를 보존·검증하는 배포 source, 기존 관리자 GET의 안전한 process 가격 관측, 이 CLI의 선택적 `--runtime-snapshot` 비교를 준비했다. [운영 적용·실사용 검증 인계](O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)의 순서·한계를 따른다. 개발 단계의 [CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)는 당시 push 인계 증거이며, 이후 PR #824/main 통합·배포 결과는 [2026-10-26 CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-INTEGRATION-20261026.md)를 따른다. 실제 가격/한도·계정 설정·유료 검증은 별도다. metadata 일치를 현재 모델·provider 사용 성공이나 실시간 예약 증거로 확대하지 않는다.
