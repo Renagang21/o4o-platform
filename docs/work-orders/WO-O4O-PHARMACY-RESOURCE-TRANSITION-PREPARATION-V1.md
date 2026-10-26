@@ -24,9 +24,9 @@ Cloud Run은 제자리 rename이 불가능하므로 새 private 리소스를 준
 - [x] plan은 GET만 사용. prepare도 새 Run·NEG·backend POST만 사용하고 기존 자원/IAM/도메인은 변경하지 않는다.
 - [x] 설정·비밀값·IAM 구성원·응답 원문은 출력하지 않고 메모리에서만 처리한다.
 - [x] 충돌·source drift·동일 plan 재시도·쓰기 경계 회귀 검증.
-- [ ] PR·CI·Codex gate 확인 → 정상 main 병합 → 정확한 main SHA CI 확인.
-- [ ] plan을 실행하고 실제 source·digest 검토 후 prepare 실행.
-- [ ] 새 private 리소스 readiness·연결 확인.
+- [x] PR·CI·Codex gate 확인 → 정상 main 병합 → 정확한 main SHA CI 확인.
+- [x] plan을 실행하고 실제 source·digest 검토 후 prepare 실행.
+- [x] 새 private 리소스 readiness·연결 확인.
 - [ ] 소유자의 최초 invoker 설정 이후 도메인 smoke·전환·롤백·잔여 참조/트래픽 확인 및 옛 자원 정리.
 
 ## 실행
@@ -62,4 +62,33 @@ URL map을 함께 정렬한다. 기존 backend로 즉시 복귀할 수 있도록
 ## 검증 기록
 
 로컬 focused Python 17건 및 CI 관련 Node 테스트 374건(배포 workflow gate 90건 포함) PASS.
-실제 GCP 준비 실행 결과는 실행 뒤 추가한다. 이 기록은 생성·전환 완료를 의미하지 않는다.
+## 실제 실행 결과 (2026-10-26)
+
+- PR [#836](https://github.com/Renagang21/o4o-platform/pull/836) 정상 merge:
+  `fc3177e2236e52dfdb3887ba8d55e0b4ffeb656d`.
+- PR CI 40294290627·SonarCloud·CodeQL PASS, 최종 head Codex 지적 0건·미해결 thread 0건.
+- main CI [40300897463](https://github.com/Renagang21/o4o-platform/actions/runs/40300897463) PASS.
+  Delivery 40302341477은 `NO_DEPLOY`이며 기존 앱 image 배포는 실행하지 않았다.
+- 읽기 전용 plan [40301050063](https://github.com/Renagang21/o4o-platform/actions/runs/40301050063) PASS.
+  검토 digest: `f6ade0cac8d012e535e37f730fa44acb8163d163056d6659c0eb20012c3ab4ed`.
+- prepare [40302554490](https://github.com/Renagang21/o4o-platform/actions/runs/40302554490) PASS:
+  `pharmacy-business-web`, `neg-pharmacy-business-web`, `backend-pharmacy-business-web` 생성 완료.
+  Run Ready와 생성 후 설정 재조회 비교를 통과했다.
+- 복제 source는 `kpa-society-web-02296-cep`이며 앱 image는 기존 #829 merge
+  `7166005df54231e00999673fecdf83e596e1bb3a`의 immutable digest를 재사용했다.
+  새 준비 workflow의 main SHA와 앱 serving SHA는 서로 다른 식별자다.
+- 기존 LB routing·IAM·옛 리소스·DB는 변경하지 않았다. 기존 `pharmacy.neture.co.kr`의 HTML·동일 host JS는 200.
+  `megapharm.neture.co.kr`은 Codex 프록시의 CONNECT 403으로 HTTP smoke 미검증이며 성공으로 판정하지 않았다.
+
+새 서비스의 최초 공개 invoker 설정은 아직 미실행이다. 소유자가 다음 명령을 실행한 뒤
+도메인 검증·전환·참조/트래픽 확인·옛 자원 정리를 이어간다. 배포 계정에 IAM 변경 권한을
+확대하지 않고 기존 bootstrap 경계를 따른다.
+
+```sh
+gcloud run services add-iam-policy-binding pharmacy-business-web \
+  --project=netureyoutube --region=asia-northeast3 \
+  --member=allUsers --role=roles/run.invoker
+```
+
+worktree disposition은 `KEEP`이다. 소유자 bootstrap 및 후속 전환이 남았으며,
+준비 실행을 전체 잔재 제거·도메인 전환 완료로 보고하지 않는다.
