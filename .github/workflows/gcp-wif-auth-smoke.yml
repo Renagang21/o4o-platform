@@ -85,7 +85,7 @@ jobs:
             --project=netureyoutube --region=asia-northeast3 \
             --format='json(metadata.name,status.latestReadyRevisionName,status.traffic,status.url,spec.template.spec.serviceAccountName,spec.template.spec.containers[0].image)' | emit_metadata cloud-run
           gcloud compute url-maps list --project=netureyoutube \
-            --format='json(name,hostRules,pathMatchers.name,pathMatchers.defaultService,pathMatchers.pathRules.service,pathMatchers.pathRules.paths)' | emit_metadata url-maps
+            --format='json(name,hostRules.hosts,hostRules.pathMatcher,pathMatchers.name,pathMatchers.defaultService,pathMatchers.pathRules.service,pathMatchers.pathRules.paths)' | emit_metadata url-maps
           gcloud compute backend-services list --project=netureyoutube --global \
             --format='json(name,backends.group)' | emit_metadata backends
           gcloud compute network-endpoint-groups list --project=netureyoutube \
