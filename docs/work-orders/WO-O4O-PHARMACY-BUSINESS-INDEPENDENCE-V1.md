@@ -135,6 +135,8 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 - Cloud Run 이름 `kpa-society-web` · 앱 디렉터리 `services/web-kpa-society` · 서비스 키 `kpa-society` 이름. 인프라 변경은 사용자 승인 후.
 - 2026-10-25 진행(branch `wo/pharmacy-stage6-name-residue`): Lecture 전용 병합(`42dddc91b5`)이 약국 앱을 함께 배포한 원인은 약국 앱 `package.json` 에 남은 import 0건 선언 9개(`@o4o/lms-ui` 등, 단계 4-a 잔재)였다. 선언 · Dockerfile · alias 를 실제 의존에 맞췄고 판정 회귀 테스트를 추가했다. 명칭 잔재 목록 · 처리 여부 · Cloud Run 이름 전환안(미실행)은 [CHECK-O4O-PHARMACY-APP-NAME-RESIDUE-AND-DEPLOY-SCOPE-V1](../checks/CHECK-O4O-PHARMACY-APP-NAME-RESIDUE-AND-DEPLOY-SCOPE-V1.md). 디렉터리 · Cloud Run · 서비스 키 이름은 새 이름 결정 전이라 유지한다.
 
+- 2026-10-26 후속: 남은 약국 앱 hub-core/utils·Neture operator-core Docker COPY 6줄을 제거했다. 기존 CI·배포 판정 282개와 의존 closure 검사는 통과했지만 이미지 빌드는 관리 환경 vfs의 inode 소진으로 실패해 캐시를 정리했다. GCP 인증·CLI·네트워크·빌드 환경 준비와 운영 이름 전환 잔여는 [WO-O4O-PHARMACY-RESIDUE-SAFE-CLEANUP-V1](WO-O4O-PHARMACY-RESIDUE-SAFE-CLEANUP-V1.md)에 연결한다. 운영 이름·서비스 키·리소스 삭제는 미실행이다.
+
 ## 중지 조건 (이 WO 에서 예상되는 것)
 
 - DB schema · migration 필요 (단계 2 · 3 의 사업별 약관 저장, 사업 범위 컬럼).
