@@ -5,6 +5,7 @@ import os
 import sys
 
 PERMISSIONS = (
+    'monitoring.timeSeries.list',
     'run.services.create', 'run.services.get', 'run.services.update', 'run.services.delete',
     'run.services.getIamPolicy', 'run.services.setIamPolicy',
     'compute.urlMaps.get', 'compute.urlMaps.update', 'compute.urlMaps.validate',

@@ -17,12 +17,12 @@ on:
   workflow_dispatch:
     inputs:
       pharmacy_preparation:
-        description: 'none=normal deploy; plan/prepare=private pharmacy replacement only (no IAM or live routing change)'
+        description: 'none=normal deploy; fixed pharmacy preparation/cutover/rollback/retirement (no IAM or DB writes)'
         type: choice
-        options: [none, plan, prepare]
+        options: [none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire]
         default: none
       pharmacy_plan_digest:
-        description: 'prepare only: exact SHA256 digest from the reviewed plan run'
+        description: 'mutating pharmacy modes: exact SHA256 digest from their reviewed plan run'
         required: false
       service:
         description: 'Service to deploy (all, partner, neture, kpa-society, lecture, store, kpa-branch, hospital-pharmacy)'
@@ -398,7 +398,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          echo "Building kpa-society-web Docker image..."
+          echo "Building pharmacy-business-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
           # Build from repo root with Dockerfile path (for workspace packages)
@@ -407,12 +407,12 @@ jobs:
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \
             -f services/web-pharmacy-business/Dockerfile \
-            -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
-            -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
+            -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-business-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-business-web:latest \
             .
 
-          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG}
-          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest
+          docker push gcr.io/${{ env.PROJECT_ID }}/pharmacy-business-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/pharmacy-business-web:latest
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
@@ -420,7 +420,7 @@ jobs:
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
-          service: kpa-society-web
+          service: pharmacy-business-web
 
       - name: Deploy to Cloud Run
         run: |
@@ -428,10 +428,10 @@ jobs:
           ROLLOUT_ARGS=()
           if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
-          echo "Deploying kpa-society-web to Cloud Run..."
+          echo "Deploying pharmacy-business-web to Cloud Run..."
 
-          gcloud run deploy kpa-society-web \
-            --image=gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${{ github.sha }} \
+          gcloud run deploy pharmacy-business-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/pharmacy-business-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
@@ -442,7 +442,7 @@ jobs:
             --min-instances=0 \
             --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"
 
-          echo "kpa-society-web deployed successfully!"
+          echo "pharmacy-business-web deployed successfully!"
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
@@ -450,17 +450,23 @@ jobs:
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
-          service: kpa-society-web
+          service: pharmacy-business-web
           paths: '/'
 
       - name: Verify deployment
         run: |
-          SERVICE_URL=$(gcloud run services describe kpa-society-web \
+          SERVICE_URL=$(gcloud run services describe pharmacy-business-web \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
           echo "Service URL: ${SERVICE_URL}"
+
+      - name: Require canonical pharmacy routing before reporting deployment success
+        run: |
+          set -euo pipefail
+          export PHARMACY_CLOUDSDK_ROOT="$(gcloud info --format='value(installation.sdk_root)')"
+          python3 scripts/ops/pharmacy_transition.py --phase assert-route
 
   deploy-lecture:
     needs: [detect-changes, ci-gate]
@@ -939,7 +945,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
       github.triggering_actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false' &&
-      (inputs.pharmacy_preparation == 'plan' || inputs.pharmacy_preparation == 'prepare')
+      contains(fromJSON('["plan","prepare","cutover-plan","cutover","rollback-plan","rollback","retire-plan","retire"]'), inputs.pharmacy_preparation)
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 40
@@ -976,14 +982,18 @@ jobs:
           skip_install: true
       - name: Test private preparation safety contracts
         run: python3 -m unittest discover -s scripts/ops/tests -p 'test_pharmacy*.py'
-      - name: Plan or prepare private replacement (no cutover)
+      - name: Run fixed pharmacy resource operation
         env:
           PREPARATION_MODE: ${{ inputs.pharmacy_preparation }}
           PREPARATION_DIGEST: ${{ inputs.pharmacy_plan_digest }}
+          PRODUCTION_GATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           export PHARMACY_CLOUDSDK_ROOT="$(gcloud info --format='value(installation.sdk_root)')"
-          python3 scripts/ops/pharmacy_prepare.py --mode "$PREPARATION_MODE" --expected-plan "$PREPARATION_DIGEST"
+          case "$PREPARATION_MODE" in
+            plan|prepare) python3 scripts/ops/pharmacy_prepare.py --mode "$PREPARATION_MODE" --expected-plan "$PREPARATION_DIGEST" ;;
+            *) python3 scripts/ops/pharmacy_transition.py --phase "$PREPARATION_MODE" --expected-plan "$PREPARATION_DIGEST" ;;
+          esac
 
   summary:
     # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §21:
@@ -1013,7 +1023,7 @@ jobs:
           echo "  - DEPLOY_FREEZE: '${{ vars.DEPLOY_FREEZE }}' · ci-gate: ${{ needs.ci-gate.result }}"
           echo "  - partner-web: ${{ needs.detect-changes.outputs.partner }}"
           echo "  - neture-web: ${{ needs.detect-changes.outputs.neture }}"
-          echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
+          echo "  - pharmacy-business-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - lecture-web: ${{ needs.detect-changes.outputs.lecture }}"
           echo "  - store-web: ${{ needs.detect-changes.outputs.store }}"
           echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"

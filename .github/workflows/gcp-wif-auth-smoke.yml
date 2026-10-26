@@ -90,7 +90,7 @@ jobs:
             python3 scripts/ops/pharmacy_inventory_format.py "$1"
           }
           # Explicit projections exclude environment values, secret versions, private IPs and IAM policy member lists.
-          gcloud run services describe kpa-society-web \
+          gcloud run services describe pharmacy-business-web \
             --project=netureyoutube --region=asia-northeast3 \
             --format='json(metadata.name,status.latestReadyRevisionName,status.traffic,status.url,spec.template.spec.serviceAccountName,spec.template.spec.containers[0].image)' | emit_metadata cloud-run
           gcloud compute url-maps list --project=netureyoutube \
