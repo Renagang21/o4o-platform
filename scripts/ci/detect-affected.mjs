@@ -141,6 +141,9 @@ const NON_RUNTIME_GLOBAL_PREFIXES = [
   // 배포 · 소스 은퇴한 앱 디렉터리 — workspace 에서 빠져 매핑이 없지만 어떤 Dockerfile 도 COPY 하지 않는다.
   // 없으면 소스 삭제 diff 가 "매핑 불가" 로 전 서비스 fallback 배포가 된다 (WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1).
   'services/signage-player-web/',
+  // 약국 앱은 web-pharmacy-business로 이동했다. 옛 소스는 이미지 소비처 0이며
+  // 새 경로는 WEB_SERVICES/실제 graph로 계속 판정한다(앱 자체를 제외하지 않는다).
+  'services/web-kpa-society/',
 ];
 /** root 최상위 문서(README · AGENTS · CLAUDE · SETUP · CHANGELOG) · root 로컬 도구 스크립트(*.cmd) */
 const NON_RUNTIME_GLOBAL_ROOT = /^[^/]+\.(md|cmd)$/i;

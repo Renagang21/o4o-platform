@@ -87,3 +87,8 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 ### 남은 운영 기술명 전환
 
 프로젝트 `netureyoutube`, 리전 `asia-northeast3`의 기존 WIF로 읽기와 기존 서비스 배포는 가능하다. 프로젝트 범위 사전 조회에서 신규 backend create/get/update 및 Cloud Run setIamPolicy는 확인되지 않았다. 조건부 리소스 권한 여부는 별도 확인해야 한다. regional NEG 권한은 수정된 점검을 main 반영 후 재조회한다. 신규 서비스·NEG/backend 준비와 최초 공개 invoker 설정, LB 전환·복구 검증을 완료하기 전 기존 활성 자원을 삭제하지 않는다. 기존 WIF에 Owner/Editor를 부여하는 방식으로 해결하지 않는다.
+
+
+### 배포 범위 재검증 보완
+
+이동 diff의 옛 경로가 workspace에 없어서 전체 서비스 unknown fallback을 만드는 것을 발견했다. 옛 디렉터리는 모든 현행 Docker/빌드 소비처에서 제거됐으므로 기존 퇴역 경로 목록에 정확한 prefix로 등록한다. 새 `web-pharmacy-business` 경로는 현행 registry와 dependency graph에서 계속 배포 판정하며, 새 경로·옛 경로가 함께 있는 이동도 약국 앱만 영향받는다. 미지의 workspace fallback, 실제 API 변경과 LEVEL_3 auth 통제는 유지한다. 경로 소비처 0·옛 manifest 부재 및 위 경계를 회귀 시험으로 확인한다. 이는 약국 앱을 배포 대상에서 제외하는 예외가 아니다.

@@ -31,7 +31,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -1306,4 +1306,31 @@ test('J18. 정기 full Jest workflow 가 존재하고 선별하지 않는다 (§
     assert.ok(!new RegExp(forbidden, 'i').test(wf.replace(/^\s*#.*$/gm, '')),
       `scheduled full Jest 는 ${forbidden} 과 연결하지 않는다`);
   }
+});
+
+
+test('pharmacy workspace move: old source is unreachable; new app remains deployable', () => {
+  assert.equal(existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/package.json')), false);
+  assert.equal(graph.byDir.get('services/web-pharmacy-business'), '@o4o/web-pharmacy-business');
+  const moved = parseFileList('R\tservices/web-kpa-society/src/App.tsx\nR\tservices/web-pharmacy-business/src/App.tsx');
+  const web = classifyWebDeploy(moved, graph);
+  assert.deepEqual(onOf(web), ['kpa-society']);
+  assert.equal(web.fallback, false);
+  assert.equal(classifyApiDeploy(moved, graph).api_deploy_affected, false);
+  const tracked = spawnSync('git', ['ls-files', '-z', '--', '**/Dockerfile', 'Dockerfile'], { cwd: REPO_ROOT, encoding: 'utf8' });
+  assert.equal(tracked.status, 0);
+  for (const file of tracked.stdout.split('\0').filter((p) => /(^|\/)Dockerfile$/.test(p))) {
+    const docker = readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    assert.ok(!docker.includes('services/web-kpa-society/'), file);
+  }
+  const deploy = readFileSync(path.join(REPO_ROOT, '.github/workflows/deploy-web-services.yml'), 'utf8');
+  assert.ok(!deploy.includes('services/web-kpa-society/'));
+  assert.ok(deploy.includes('services/web-pharmacy-business/Dockerfile'));
+});
+
+test('pharmacy workspace move does not mask unknown workspaces or API changes', () => {
+  const unknown = webOf(['M\tservices/web-unknown-new-app/src/App.tsx']);
+  assert.ok(Object.values(unknown.services).every(Boolean));
+  assert.equal(classifyApiDeploy(parseFileList('M\tservices/web-unknown-new-app/src/App.tsx'), graph).api_deploy_affected, true);
+  assert.equal(classifyApiDeploy(parseFileList('D\tservices/web-kpa-society/src/App.tsx\nM\tapps/api-server/src/main.ts'), graph).api_deploy_affected, true);
 });
