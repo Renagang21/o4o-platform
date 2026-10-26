@@ -75,3 +75,5 @@ Sonar 지적의 중복 import·props readonly·접근성 output/label·중첩 te
 후속 Codex 재검토는 HTML 탭의 작은따옴표 등 원문 직렬화 차이가 실제 저장 성공을 충돌로 오인하는 사례를 지적했다. 상담자료의 전송과 재조회 비교 모두 기존 sanitizeRichHtml 정책으로 정규화했다. 본문 실질 변경·실제 revision 충돌 검사는 유지한다. 실제 HTML 탭 입력→저장 완료를 PC/모바일 시나리오에 추가했다. 이 수정의 로컬 전체 매장79파일/863개·집중42개(중복)·PC/모바일2개·매장 타입/lint/build가 PASS이며 API 코드는 직전29개 검증 이후 변경하지 않았다. 최신 공식 검사는 새 push HEAD에서 다시 확인한다.
 
 HTML 정규화 HEAD의 Codex는 지적 없음으로 완료됐다. Sonar의 기존21건은 해소됐지만 iframe ADD_TAGS 포괄 허용에 대한 보안 지적1건이 추가되어, 해당 설정을 제거했다. 서버는 허용 호스트를 먼저 검증하고 호출별 임의 marker의 비활성 proxy에서 모든 속성을 기본 DOMPurify로 정제한 뒤 검증된 iframe만 복원한다. 위조 marker·임의 호스트·srcdoc·onload 차단과 허용 iframe 속성 직렬화 일치를 실제 DB 회귀에 포함했다. 추가 보완의 관련29개·API 타입/lint/build PASS, schema0 확인 후 전용 테스트 컨테이너 정리. 규칙 예외나 보안 gate 완화는 하지 않았다.
+
+후속 리뷰에서 문단 안 iframe의 임시 div가 HTML 재파싱 시 문단을 닫는 사례를 확인하여 inline span으로 교체했다. 문단 앞뒤 텍스트·iframe의 부모/형제 구조가 생성과 수정 모두 동일하게 저장되는 실제 DB 회귀를 추가했다. 관련 DB·기존 권한30개 PASS, 임시 schema0 확인 후 전용 컨테이너를 정리했다. 공식 최신 검사는 최종 push HEAD 기준으로 확인한다.

@@ -36,7 +36,7 @@ export function sanitizeRichDescriptionHtml(value: string): string {
     // A random per-call marker cannot be supplied by the input. Sanitize every attribute
     // on a harmless element, then construct only the verified external embed.
     const marker = randomUUID();
-    const proxy = window.document.createElement('div');
+    const proxy = window.document.createElement('span');
     for (const attr of iframe.attributes) proxy.setAttribute(attr.name, attr.value);
     proxy.setAttribute('data-o4o-embed', marker);
     embeds.set(marker, src);
