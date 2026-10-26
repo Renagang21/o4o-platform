@@ -4,6 +4,7 @@ import type { DataSource, EntityManager } from 'typeorm';
 import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
+import { ERASURE_WRITER_GAPS_SQL } from './erasure-writer-manifest.js';
 
 // CORE_CHANGE_REQUIRED — explicit code/local approval of WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.
 // Production account/file execution remains opt-in and requires its own approved rollout.
@@ -14,7 +15,7 @@ export type ErasureState = 'pending' | 'processing' | 'review_required' | 'retry
 export interface ErasureResult { operationId: string; state: ErasureState; erased: boolean; reviewCodes: string[]; reviewDueAt: string | null }
 export interface PersonalStorage {
   generation(bucket: string, path: string, ownerId: string): Promise<string | null>;
-  deleteGeneration(bucket: string, path: string, generation: string): Promise<void>;
+  deleteGeneration(bucket: string, path: string, generation: string, ownerId: string): Promise<void>;
 }
 export interface ErasureOptions {
   enabled: boolean;
@@ -24,6 +25,7 @@ export interface ErasureOptions {
   personalBuckets: readonly string[];
   storage?: PersonalStorage;
 }
+type ErasureFileTask = {id:string;bucket:string;object_path:string;generation:string|null};
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
 const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
@@ -84,6 +86,7 @@ export class AccountErasureService {
       AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
       AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
       AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
+      AND NOT EXISTS(${ERASURE_WRITER_GAPS_SQL})
       AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
         AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
     return {enabled:r?.ready===true};
@@ -326,10 +329,7 @@ export class AccountErasureService {
       if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
-    const [missing] = await m.query(`SELECT count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-      WHERE c.relkind='r' AND n.nspname IN ('public','neture','cosmetics')
-      AND c.relname NOT IN ('o4o_schema_baselines','typeorm_migrations') AND c.relname NOT LIKE 'account_erasure_%'
-      AND NOT EXISTS(SELECT 1 FROM pg_trigger tr WHERE tr.tgrelid=c.oid AND tr.tgname='account_erasure_write_fence' AND tr.tgenabled='O')`);
+    const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
     if (missing.n) codes.push('WRITER_MANIFEST_REQUIRES_REFRESH');
     return codes;
   }
@@ -448,20 +448,23 @@ export class AccountErasureService {
       if (o.state === 'completed') return;
       await this.assertTarget(m,o.subject_id);
       const tasks = await m.query("SELECT * FROM account_erasure_file_tasks WHERE operation_id=$1 AND state IN ('pending','retry_required') FOR UPDATE", [operationId]);
-      for (const t of tasks) {
-        if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED', 503);
-        const generation = t.generation ?? await this.options.storage.generation(t.bucket,t.object_path,o.subject_id);
-        // Persist generation before external deletion in a separate durable step below.
-        if (!t.generation && generation) {
-          await m.query("UPDATE account_erasure_file_tasks SET generation=$2,attempts=attempts+1 WHERE id=$1", [t.id,generation]);
-          // No external delete before the generation is committed: retry this operation.
-          continue;
-        }
-        if (generation) await this.options.storage.deleteGeneration(t.bucket,t.object_path,generation);
-        await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
-          error_code=NULL,updated_at=now() WHERE id=$1`, [t.id,generation ? 'deleted' : 'already_absent']);
-      }
+      // One QueryRunner and the durable two-pass contract require sequential task processing.
+      await tasks.reduce((pending:Promise<void>,task:ErasureFileTask) =>
+        pending.then(() => this.removeFileTask(m,task,o.subject_id)),Promise.resolve());
     });
+  }
+
+  private async removeFileTask(m:EntityManager,task:ErasureFileTask,ownerId:string):Promise<void> {
+    if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED',503);
+    const generation=task.generation ?? await this.options.storage.generation(task.bucket,task.object_path,ownerId);
+    if(!task.generation && generation){
+      // Persist in this transaction; external deletion happens only after this commit.
+      await m.query("UPDATE account_erasure_file_tasks SET generation=$2,attempts=attempts+1 WHERE id=$1",[task.id,generation]);
+      return;
+    }
+    if(generation)await this.options.storage.deleteGeneration(task.bucket,task.object_path,generation,ownerId);
+    await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
+      error_code=NULL,updated_at=now() WHERE id=$1`,[task.id,generation ? 'deleted':'already_absent']);
   }
 
   private async finish(operationId: string,actorId: string): Promise<void> {

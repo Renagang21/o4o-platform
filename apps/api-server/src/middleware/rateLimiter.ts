@@ -2,16 +2,16 @@
  * Rate Limiter Middleware
  *
  * WO-O4O-REDIS-SESSIONSYNC-REMOVAL-AND-MEMORYSTORE-DECOMMISSION-V1
- * - Redis store 제거. 메모리 기반 rate limiting 만 사용한다.
+ * - Redis store는 은퇴했다. 일반 제한은 메모리, 인증 제한은 공유 PostgreSQL을 사용한다.
  *   (Redis store 는 6주간 incr/eval 명령 0건으로 실사용이 없었다.)
  */
 
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
 import { createHash } from 'node:crypto';
 import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
-import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
+import { authRateLimitStore, sharedAuthLimiter } from './auth-rate-limit-store.js';
 import { Request, Response, NextFunction } from 'express';
-import logger from '../utils/logger.js';
 
 // 기본 레이트 리밋 설정
 export const defaultLimiter = rateLimit({
@@ -72,15 +72,19 @@ export const ipBurstLimiter = rateLimit({
 
 // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-5: 이메일·비밀번호 인증 경로 제한.
 //   키는 신뢰 가능한 클라이언트 IP(`getTrustedClientIp`) — 프록시 IP 하나로 전원이 묶이지 않는다.
-//   ⚠ 메모리 저장소다(Redis 은퇴). Cloud Run 인스턴스마다 따로 센다 — 인스턴스 N 개면 실제 상한은 N 배.
-//     대입 공격의 근본 방어는 bcrypt 비용(1회 수백 ms)과 일반화된 실패 응답이며, 이 제한은 그 위의 상한이다.
+//   운영/개발은 PostgreSQL 원자 카운터를 공유한다. 저장소 미준비/장애 시 인증을 503으로 거부한다.
+//   NODE_ENV=test의 기존 단위 fixture만 독립 메모리 저장소를 사용하며 공유 store는 별도 실제 PG 검증한다.
 function emailAuthLimiter(
+  scope: string,
   windowMs: number,
   max: number,
   message: string,
   keyGenerator: (req: Request) => string = (req) => getTrustedClientIp(req),
   skipSuccessfulRequests = false,
 ) {
+  if (process.env.NODE_ENV !== 'test') {
+    return sharedAuthLimiter(authRateLimitStore, {scope,windowMs,max,message,key:keyGenerator,skipSuccessfulRequests});
+  }
   return rateLimit({
     windowMs,
     max,
@@ -98,9 +102,10 @@ function emailAuthLimiter(
 //   신뢰 클라이언트 IP 키 · `{ success:false, code:'RATE_LIMITED' }` 계약을 맞추지 못한다.
 //   실패 = 응답 status ≥ 400(express-rate-limit 기본 판정). 성공(2xx)은 자기 카운트를 되돌릴 뿐
 //   앞선 실패를 지우지 않는다 — 실패는 창(15분)이 끝날 때까지 유지(`strictLimiter` 와 같은 정책).
-/** 이메일 로그인 limiter — 각 호출이 별도 저장소를 갖는다(테스트는 새로 만든다) */
-export function createEmailLoginLimiter() {
+/** 동일 scope는 인스턴스 간 공유한다. 단위 fixture만 별도 메모리 저장소를 사용한다. */
+export function createEmailLoginLimiter(scope = 'email-login') {
   return emailAuthLimiter(
+    scope,
     15 * 60 * 1000,
     5,
     '로그인 실패가 너무 많습니다. 15분 뒤 다시 시도해 주세요.',
@@ -112,18 +117,18 @@ export function createEmailLoginLimiter() {
 /** 로그인 — IP 당 15분 실패 5회 (성공 로그인은 세지 않음) */
 export const emailLoginLimiter = createEmailLoginLimiter();
 
-/** Independent buckets keep Google attempts from exhausting email/Kakao login quotas.
- * TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1: same existing per-instance policy.
+/** Independent shared buckets keep Google attempts from exhausting email/Kakao login quotas.
  */
 export function createGoogleAuthLimiters() {
   return {
-    login: createEmailLoginLimiter(),
-    signup: emailAuthLimiter(60 * 60 * 1000, 10, '가입 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.'),
+    login: createEmailLoginLimiter('google-login'),
+    signup: emailAuthLimiter('google-signup',60 * 60 * 1000, 10, '가입 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.'),
   };
 }
 
 /** 가입 — IP 당 1시간 10회 */
 export const emailSignupLimiter = emailAuthLimiter(
+  'email-signup',
   60 * 60 * 1000,
   10,
   '가입 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
@@ -131,6 +136,7 @@ export const emailSignupLimiter = emailAuthLimiter(
 
 /** 메일 발송(확인 재발송 · 비밀번호 찾기) — IP 당 1시간 10회 */
 export const emailMailLimiter = emailAuthLimiter(
+  'email-mail',
   60 * 60 * 1000,
   10,
   '메일 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
@@ -138,6 +144,7 @@ export const emailMailLimiter = emailAuthLimiter(
 
 /** 토큰 소비(확인 · 재설정) · 비밀번호 변경 — IP 당 15분 30회 */
 export const emailTokenLimiter = emailAuthLimiter(
+  'email-token',
   15 * 60 * 1000,
   30,
   '요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
@@ -161,11 +168,11 @@ export function findLoginIdInputKey(body: unknown): string {
   return `findid:${createHash('sha256').update(`${name}\u0000${phone}`, 'utf8').digest('hex')}`;
 }
 
-/** 아이디 찾기 limiter 한 쌍 — 각 호출이 별도 저장소를 갖는다(테스트는 새로 만든다) */
+/** 아이디 찾기의 IP/입력값은 서로 다른 공유 scope다. */
 export function createFindLoginIdLimiters() {
   return {
-    ip: emailAuthLimiter(FIND_LOGIN_ID_WINDOW_MS, 10, FIND_LOGIN_ID_MESSAGE),
-    input: emailAuthLimiter(FIND_LOGIN_ID_WINDOW_MS, 5, FIND_LOGIN_ID_MESSAGE, (req) => findLoginIdInputKey(req.body)),
+    ip: emailAuthLimiter('find-id-ip',FIND_LOGIN_ID_WINDOW_MS, 10, FIND_LOGIN_ID_MESSAGE),
+    input: emailAuthLimiter('find-id-input',FIND_LOGIN_ID_WINDOW_MS, 5, FIND_LOGIN_ID_MESSAGE, (req) => findLoginIdInputKey(req.body)),
   };
 }
 
