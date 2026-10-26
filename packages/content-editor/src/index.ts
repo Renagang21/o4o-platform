@@ -10,6 +10,8 @@ export { hasStoreDescriptionMarkup } from './components';
 // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
 //   공용 LLM 작업 보조 패널(복사/붙여넣기 안내 전용 — LLM API 호출·계정 연동·대화 저장 없음)
 export { LlmAssistPanel } from './components';
+export { buildContentAuthoringGuide } from './components/content-authoring-guide';
+export type { ContentReferenceMaterial } from './components/content-authoring-guide';
 export type { LlmAssistPanelProps } from './components';
 export { sanitizeHtml, sanitizeRichHtml, isBlankHtml } from './sanitize';
 export { handleClipboardPaste, compressImage } from './utils/handleImagePaste';

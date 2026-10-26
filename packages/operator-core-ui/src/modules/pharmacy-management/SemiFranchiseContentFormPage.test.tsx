@@ -4,9 +4,46 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 import Page from './SemiFranchiseContentFormPage';
 const api = vi.hoisted(() => ({ getContent: vi.fn(), updateContent: vi.fn(), createContent: vi.fn() }));
 vi.mock('./api', () => ({ neturePharmacyOperatorApi: api, STATUS_CLASS: {}, STATUS_LABEL: {} }));
-vi.mock('@o4o/content-editor', () => ({ RichTextEditor: ({ value, onChange }: any) => <textarea value={value} onChange={event => onChange({ html: event.target.value })} /> }));
+vi.mock('@o4o/content-editor', async (importOriginal) => ({ ...(await importOriginal<typeof import('@o4o/content-editor')>()), RichTextEditor: ({ value, onChange }: any) => <textarea value={value} onChange={event => onChange({ html: event.target.value })} /> }));
 beforeEach(() => vi.resetAllMocks());
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+
+it('applies reviewed external AI HTML to the body without saving or changing title and tags', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  api.getContent.mockResolvedValue({ ...content('기존 제목'), body: '<p>기존 본문</p>', summary: '기존 요약', tags: ['기존 태그'] });
+  show(); await screen.findByDisplayValue('기존 제목');
+  fireEvent.click(screen.getByRole('button', { name: '외부 AI로 콘텐츠 작업' }));
+  fireEvent.change(screen.getByLabelText('결과 HTML 붙여넣기'), { target: { value: '<p>검토한 콘텐츠</p>' } });
+  fireEvent.click(screen.getByRole('button', { name: '결과 미리보기' }));
+  fireEvent.click(screen.getByRole('checkbox', { name: '결과와 사실·이용 범위를 확인했습니다' }));
+  fireEvent.click(screen.getByRole('button', { name: '편집기에 넣기' }));
+  fireEvent.click(screen.getAllByRole('button', { name: '닫기' })[0]);
+  expect(screen.getByDisplayValue('<p>검토한 콘텐츠</p>')).toBeTruthy();
+  expect(screen.getByDisplayValue('기존 제목')).toBeTruthy();
+  expect(screen.getByDisplayValue('기존 요약')).toBeTruthy();
+  expect(screen.getByDisplayValue('기존 태그')).toBeTruthy();
+  expect(api.updateContent).not.toHaveBeenCalled();
+  api.updateContent.mockResolvedValue(undefined);
+  fireEvent.click(screen.getByRole('button', { name: '수정 저장' })); await screen.findByText('목록 복귀');
+  expect(api.updateContent).toHaveBeenCalledWith('a', 'one', expect.objectContaining({ body: '<p>검토한 콘텐츠</p>' }));
+});
+
+it('removes pending external AI work when changing to another business', async () => {
+  api.getContent.mockResolvedValue(content('업무 문서')); show(); await screen.findByDisplayValue('업무 문서');
+  fireEvent.click(screen.getByRole('button', { name: '외부 AI로 콘텐츠 작업' }));
+  fireEvent.change(screen.getByLabelText('결과 HTML 붙여넣기'), { target: { value: '<p>이전 업무 초안</p>' } });
+  fireEvent.click(screen.getByRole('button', { name: '다른 사업' }));
+  await screen.findByDisplayValue('업무 문서');
+  expect(screen.queryByRole('dialog')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '외부 AI로 콘텐츠 작업' }));
+  expect((screen.getByLabelText('결과 HTML 붙여넣기') as HTMLTextAreaElement).value).toBe('');
+});
+
+it('does not expose the authoring entry for archived material', async () => {
+  api.getContent.mockResolvedValue({ ...content('보관 자료'), status: 'archived' }); show();
+  await screen.findByText(/보관되거나 반려된 콘텐츠는 수정할 수 없습니다/);
+  expect(screen.queryByRole('button', { name: '외부 AI로 콘텐츠 작업' })).toBeNull();
+});
 it('adds and removes the quick guide flag without losing other tags', async () => {
   api.getContent.mockResolvedValue({ ...content('직원 안내'), tags: ['기존 자료'] });
   show(); await screen.findByDisplayValue('직원 안내');

@@ -236,6 +236,7 @@ export default function ProductionMaterialEditorPage() {
           }} onApplyHtml={setEditorInitialHtml} />
         ) : (
         <LlmAssistPanel
+          contextKey={`${organizationId}:${getActiveServiceKey()}:production:${editId ?? `new:${location.key}`}`} disabled={saving}
           label={STORE_LLM_ASSIST_LABEL}
           contextLabel="매장 제작 자료 — 새로 작성하거나 현재 내용을 다듬습니다"
           guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({

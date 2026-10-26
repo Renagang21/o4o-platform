@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 export default defineConfig({
+  esbuild: { jsx: 'automatic' },
   test: {
     environment: 'jsdom',
     globals: true,
@@ -19,6 +20,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Match the production Vite alias for browser-safe source utility imports.
+      '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core'),
     }
   }
 });

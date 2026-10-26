@@ -184,6 +184,8 @@ export default function StoreContentEditPage() {
           {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 매장 편집본(kpa_store_contents)만 갱신, 원본 snapshot 불변 */}
           <div className="mb-2">
             <LlmAssistPanel
+              contextKey={`${organizationId}:${getActiveServiceKey()}:snapshot:${snapshotId}`}
+              disabled={saving}
               label={STORE_LLM_ASSIST_LABEL}
               contextLabel="매장 편집본 — 가져온 콘텐츠를 우리 매장에 맞게 다듬습니다 (원본은 바뀌지 않습니다)"
               guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
