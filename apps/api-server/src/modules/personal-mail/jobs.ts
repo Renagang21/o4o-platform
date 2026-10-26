@@ -120,11 +120,14 @@ export class MailJobService {
       [accountId],
     );
   }
-  async list(userId: string, accountId: string) {
+  async list(userId: string, accountId: string, page = 1) {
     await ownedAccount(this.db, userId, accountId);
     const jobs: MailJob[] = await this.db.query(
-      "SELECT * FROM personal_mail_jobs WHERE user_id=$1 AND account_id=$2 ORDER BY created_at DESC LIMIT 50",
-      [userId, accountId],
+      `SELECT * FROM personal_mail_jobs WHERE user_id=$1 AND account_id=$2
+      ORDER BY CASE WHEN kind<>'automatic' AND status IN ('preview','pending','running','paused','failed') THEN 0
+        WHEN status IN ('preview','pending','running','paused','failed') THEN 1 ELSE 2 END,
+        created_at DESC,id DESC LIMIT 50 OFFSET $3`,
+      [userId, accountId, (page - 1) * 50],
     );
     return Promise.all(jobs.map((job) => describeJob(this.db, job)));
   }

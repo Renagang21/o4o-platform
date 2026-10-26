@@ -63,7 +63,7 @@ export class PersonalMailToolService {
         case "get_mail_message":
           return accounts.read(userId, input.accountId, input.messageId);
         case "list_mail_jobs":
-          return { jobs: await jobs.list(userId, input.accountId) };
+          return { jobs: await jobs.list(userId, input.accountId, input.page) };
         case "get_mail_job":
           return jobs.read(userId, input.accountId, input.jobId);
         case "prepare_mail_cleanup":

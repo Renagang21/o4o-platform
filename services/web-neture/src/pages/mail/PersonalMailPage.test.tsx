@@ -200,6 +200,55 @@ describe("personal mail end-to-end screen contract", () => {
     expect((confirm as HTMLButtonElement).disabled).toBe(true);
     expect(personalMailApi.confirm).not.toHaveBeenCalled();
   });
+  it("pages older job history while keeping the selected job available for resume", async () => {
+    const older: MailJob = {
+      ...preview,
+      id: "older-job",
+      status: "paused",
+      action: "archive",
+      total: 73,
+      confirmationToken: undefined,
+    };
+    vi.mocked(personalMailApi.jobs).mockImplementation(async (_id, page = 1) =>
+      page === 1
+        ? Array.from({ length: 50 }, (_, i) => ({
+            ...preview,
+            id: `history-${i}`,
+            action: "archive",
+            status: "completed",
+            total: i + 1,
+          }))
+        : [older],
+    );
+    vi.mocked(personalMailApi.job).mockResolvedValue(older);
+    vi.mocked(personalMailApi.control).mockResolvedValue({
+      ...older,
+      status: "pending",
+    });
+    view();
+    const next = await screen.findByRole("button", { name: "다음 작업" });
+    await waitFor(() =>
+      expect((next as HTMLButtonElement).disabled).toBe(false),
+    );
+    fireEvent.click(next);
+    const olderButton = await screen.findByRole("button", {
+      name: "보관 · 73 메일 · paused",
+    });
+    fireEvent.click(olderButton);
+    await screen.findByRole("button", { name: "내 권한으로 재개" });
+    expect(personalMailApi.jobs).toHaveBeenCalledWith("account-a", 2);
+    fireEvent.click(screen.getByRole("button", { name: "이전 작업" }));
+    await waitFor(() =>
+      expect(personalMailApi.jobs).toHaveBeenLastCalledWith("account-a", 1),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "내 권한으로 재개" }));
+    await waitFor(() =>
+      expect(personalMailApi.control).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "older-job" }),
+        "resume",
+      ),
+    );
+  });
   it("requires a separate target/count acknowledgment before executing the immutable preview", async () => {
     view();
     const sender = await screen.findByRole("checkbox", {

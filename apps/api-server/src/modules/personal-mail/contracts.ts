@@ -71,7 +71,12 @@ export const mailToolSchemas = {
     .strict(),
   prepare_mail_cleanup: selectionSchema,
   prepare_mail_rule: ruleSchema,
-  list_mail_jobs: z.object({ accountId: uuid }).strict(),
+  list_mail_jobs: z
+    .object({
+      accountId: uuid,
+      page: z.number().int().min(1).max(10000).default(1),
+    })
+    .strict(),
   get_mail_job: z.object({ accountId: uuid, jobId: uuid }).strict(),
   control_mail_job: z
     .object({

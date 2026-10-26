@@ -25,6 +25,7 @@ import {
 } from "../../api/personalMail";
 import { MailJobReview } from "./MailJobReview";
 import { MailAccountConnections } from "./MailAccountConnections";
+import { MailJobHistory } from "./MailJobHistory";
 
 function MailManager() {
   const ruleControls = useRef<HTMLDivElement>(null);
@@ -38,7 +39,7 @@ function MailManager() {
     [accountId, setAccountId] = useState(params.get("accountId") ?? "");
   const [senders, setSenders] = useState<MailSender[]>([]),
     [rules, setRules] = useState<MailRule[]>([]),
-    [jobs, setJobs] = useState<MailJob[]>([]);
+    [historyVersion, setHistoryVersion] = useState(0);
   const [selected, setSelected] = useState<string[]>([]),
     [page, setPage] = useState(1),
     [action, setAction] = useState<MailAction>("archive");
@@ -83,15 +84,14 @@ function MailManager() {
   const refresh = useCallback(async () => {
     if (!accountId || !availability?.enabled) return;
     const current = epoch.current;
-    const [senderData, ruleData, jobData] = await Promise.all([
+    const [senderData, ruleData] = await Promise.all([
       personalMailApi.senders(accountId, page),
       personalMailApi.rules(accountId),
-      personalMailApi.jobs(accountId),
     ]);
     if (current !== epoch.current) return;
     setSenders(senderData.senders);
     setRules(ruleData);
-    setJobs(jobData);
+    setHistoryVersion((value) => value + 1);
   }, [accountId, page, availability?.enabled]);
   const invalidateRequests = useCallback(() => {
     epoch.current++;
@@ -136,14 +136,6 @@ function MailManager() {
     if (!accountId || !availability?.enabled) return;
     const current = epoch.current;
     const timer = setInterval(() => {
-      void personalMailApi
-        .jobs(accountId)
-        .then((rows) => {
-          if (epoch.current === current) setJobs(rows);
-        })
-        .catch((e) => {
-          if (epoch.current === current) setError(mailErrorMessage(e));
-        });
       if (job && ["pending", "running"].includes(job.status))
         void personalMailApi
           .job(accountId, job.id)
@@ -315,7 +307,6 @@ function MailManager() {
                     await personalMailApi.disconnect(accountId);
                     setSenders([]);
                     setRules([]);
-                    setJobs([]);
                     setJob(null);
                     setMessages([]);
                     setBody(null);
@@ -569,25 +560,17 @@ function MailManager() {
               onControl={(command) => void perform(() => control(command))}
             />
           )}
-          <section className="space-y-3 rounded-xl border bg-white p-5">
-            <h2 className="font-semibold">작업 이력</h2>
-            {!jobs.length && <p>아직 요청한 작업이 없습니다.</p>}
-            {jobs.map((row) => (
-              <button
-                className="block w-full rounded border p-3 text-left"
-                key={row.id}
-                disabled={busy}
-                onClick={() =>
-                  void perform(async () =>
-                    setJob(await personalMailApi.job(accountId, row.id)),
-                  )
-                }
-              >
-                {mailActionLabels[row.action]} · {row.total}{" "}
-                {row.kind === "rule" ? "발신처" : "메일"} · {row.status}
-              </button>
-            ))}
-          </section>
+          <MailJobHistory
+            key={accountId}
+            accountId={accountId}
+            version={historyVersion}
+            busy={busy}
+            onSelect={(row) =>
+              void perform(async () =>
+                setJob(await personalMailApi.job(accountId, row.id)),
+              )
+            }
+          />
           <section className="space-y-2 rounded-xl border bg-white p-5">
             <h2 className="font-semibold">발신처 규칙 {rules.length}개</h2>
             {rules.map((row) => (

@@ -30,6 +30,8 @@ worker는 DB lease와 항목 transaction으로 중복 실행을 막고, 실패 �
 
 미완료 사용자 제안 50개 한도는 cleanup/rule에 적용하며 자동 실행 backlog는 제외한다. 사용자 단위 advisory lock으로 서로 다른 계정의 동시 제안도 직렬화한다. 메일 MCP 내부의 계정·작업 서비스는 현재 transaction manager를 사용해 권한 lock을 유지하면서 추가 pool 연결을 기다리지 않는다.
 
+작업 목록은 미완료 사용자 작업, 미완료 자동 작업, 완료 이력 순으로 표시한다. 브라우저 `GET /api/personal-mail/accounts/:accountId/jobs`와 MCP `list_mail_jobs`의 `page`는 기본 1, 최대 10,000이며 페이지마다 50개를 반환한다. 같은 시각의 이력은 ID로 순서를 고정한다. 이력 화면은 페이지를 옮겨도 선택한 작업의 실행 확인·중단·재개를 유지한다.
+
 ## 3. API·MCP·화면
 
 - 기존 브라우저 인증의 `/api/personal-mail`: 설정 준비 상태, Gmail 연결 시작/완료, 네이버 앱 비밀번호 연결, 계정 조회/해제, 수집·발신처/규칙·작업·본문 조회, preview·승인·중단/재개.

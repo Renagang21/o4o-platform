@@ -95,7 +95,8 @@ export const personalMailApi = {
       `${accountPath(id)}/messages/${encodeURIComponent(messageId)}`,
     ),
   rules: (id: string) => get<MailRule[]>(`${accountPath(id)}/rules`),
-  jobs: (id: string) => get<MailJob[]>(`${accountPath(id)}/jobs`),
+  jobs: (id: string, page = 1) =>
+    get<MailJob[]>(`${accountPath(id)}/jobs`, { page }),
   job: (id: string, jobId: string) =>
     get<MailJob>(`${accountPath(id)}/jobs/${encodeURIComponent(jobId)}`),
   prepare: (

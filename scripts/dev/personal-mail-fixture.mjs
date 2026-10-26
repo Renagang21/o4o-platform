@@ -723,6 +723,77 @@ export async function runPersonalMailChecks({ db, check }) {
       },
     );
     await check(
+      "unfinished user jobs stay visible and API/MCP history pages reach jobs beyond automatic backlog",
+      async () => {
+        const older = await jobs.prepare(
+          user,
+          {
+            accountId: a.id,
+            senders: ["notice@example.invalid"],
+            action: "important",
+            requestId: randomUUID(),
+          },
+          "cleanup",
+        );
+        await confirm(older);
+        await db.query(
+          "UPDATE personal_mail_jobs SET created_at=now()-interval '2 days' WHERE id=$1",
+          [older.id],
+        );
+        const history = Array.from({ length: 121 }, () => randomUUID());
+        await db.query(
+          `INSERT INTO personal_mail_jobs(id,account_id,user_id,request_id,fingerprint,kind,action,status,generation,total,confirmed_at,confirmation_expires_at)
+          SELECT ids.id,a.id,a.user_id,ids.id,repeat('b',64),'automatic','archive','paused',a.generation,1,now(),now() FROM personal_mail_accounts a CROSS JOIN unnest($2::uuid[]) ids(id) WHERE a.id=$1`,
+          [a.id, history],
+        );
+        await db.query(
+          "INSERT INTO personal_mail_job_items(job_id,provider_id) SELECT id,'history-fixture' FROM unnest($1::uuid[]) ids(id)",
+          [history],
+        );
+        try {
+          const first = await jobs.list(user, a.id, 1);
+          assert.ok(
+            first.some((j) => j.id === older.id),
+            "old pending user work remains on the first page",
+          );
+          const seen = new Set();
+          for (let page = 1; page <= 4; page++)
+            for (const job of await jobs.list(user, a.id, page))
+              seen.add(job.id);
+          assert.ok(
+            history.every((id) => seen.has(id)),
+            "all older automatic jobs are reachable",
+          );
+          const expected = await jobs.list(user, a.id, 2);
+          const sdk = await invoke(g, "list_mail_jobs", {
+            accountId: a.id,
+            page: 2,
+          });
+          assert.equal(sdk.isError, undefined);
+          assert.deepEqual(
+            sdk.structuredContent.jobs.map((j) => j.id),
+            expected.map((j) => j.id),
+          );
+          const web = await browser(`/accounts/${a.id}/jobs?page=2`);
+          assert.equal(web.status, 200);
+          assert.deepEqual(
+            web.data.data.map((j) => j.id),
+            expected.map((j) => j.id),
+          );
+          assert.equal(
+            (await browser(`/accounts/${a.id}/jobs?page=0`)).status,
+            400,
+          );
+        } finally {
+          await db.query(
+            "DELETE FROM personal_mail_jobs WHERE id=ANY($1::uuid[])",
+            [history],
+          );
+          await jobs.control(user, a.id, older.id, "cancel");
+        }
+      },
+    );
+    await check(
       "new mail follows the approved rule and keep stops future cleanup",
       async () => {
         remote.get(a.id).set("m4", {

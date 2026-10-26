@@ -232,7 +232,17 @@ export function createPersonalMailRoutes(
     run(async (req, res, user) =>
       res.json({
         success: true,
-        data: await jobs.list(user, parseAccount(req)),
+        data: await jobs.list(
+          user,
+          parseAccount(req),
+          z.coerce
+            .number()
+            .int()
+            .min(1)
+            .max(10000)
+            .default(1)
+            .parse(req.query.page),
+        ),
       }),
     ),
   );

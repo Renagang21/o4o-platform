@@ -14,10 +14,10 @@ Node 22.18.0·pnpm 10.25.0, 전용 `wo/personal-mail-mcp` worktree, loopback Pos
 | API 컴파일 | PASS — `pnpm --filter @o4o/api-server build` |
 | 배포용 API bundle | PASS — `tsup --config tsup.config.ts`, main/migrate/product-correction-worker/personal-mail-worker entry syntax·신규 CLI `--help`. compile 산출물의 database 2,420개 해시 일치 복원 확인 |
 | API focused Jest | 6 suites·53 tests PASS — personal-mail contracts, external-ai 기존 단위 시험, opaque-field middleware |
-| UI Vitest | 3 files·22 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
+| UI Vitest | 3 files·23 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
 | Neture production build | PASS — `pnpm --filter @o4o/web-neture build` |
 | Migration contract | 21 PASS·0 FAIL — `node scripts/db/check-migration-contract.mjs` |
-| PG·공식 MCP SDK 통합 | 기존 콘텐츠 69개 + 메일 32개 = 101 PASS — `node scripts/dev/run-external-ai-fixture.mjs` |
+| PG·공식 MCP SDK 통합 | 기존 콘텐츠 69개 + 메일 33개 = 102 PASS — `node scripts/dev/run-external-ai-fixture.mjs` |
 | 실제 Chromium desktop/mobile | 2 PASS — 같은 script의 `--personal-mail-only --browser`; 화면 진입·메뉴·건수 확인·승인 전 비활성·실행 완료·가로 넘침·pageerror 확인 |
 | 변경 업무 source ESLint | 오류·경고 0. 저장소의 기존 ESLint ignore deprecation 안내는 별도 |
 | 의존성 advisory | `pnpm audit --prod`에서 신규 imapflow/mailparser 경로 advisory 0. 저장소 전체의 기존 low 32/moderate 169/high 141/critical 4는 이 작업에서 해결하지 않음 |
@@ -34,6 +34,7 @@ UI 시험 명령은 저장소 루트에서 `pnpm exec vitest run --config servic
 - 연결 해제는 credential·metadata·규칙·작업·대상을 cascade 파기한다. 기존 최소 감사 기록은 보존 정책을 따른다. 기능 OFF·키 누락에서도 본인만 해제할 수 있다.
 - PR #837의 P1/P2 리뷰를 반영했다. 자동 작업 실행 직전 규칙 ID·revision·action을 대조해 keep/동일 action의 revision 변경 후 옛 대기 작업을 취소하고, 별도 승인 cleanup은 실행되는 PG 시험을 추가했다. 수신함 발신처가 0개여도 기존 규칙에서 선택·keep 전환·재승인을 할 수 있는 UI 시험도 추가했다.
 - 재리뷰의 backlog·pool 지적도 반영했다. 자동 작업 50개가 있어도 새 규칙·cleanup preview가 가능하고, 사용자 제안 49개에서 복수 계정 동시 제안 시 하나만 50번째로 허용되는 PG 시험을 추가했다. pool 최대 연결 1개에서 동시 MCP 업무 조회·쓰기·본문 읽기가 정상 완료되는 별도 DataSource 시험도 통과했다. 실제 MCP endpoint·scope 검증은 기존 통합 시험을 함께 유지한다.
+- 이력 접근 지적도 반영했다. 자동 작업 121건이 더 최신이어도 오래된 미완료 사용자 작업이 첫 페이지에 남고, 나머지 이력이 API·공식 MCP SDK의 page로 모두 조회되는 PG 시험을 추가했다. 화면의 이력 페이지 변경 후에도 선택한 작업을 재개하는 UI 시험과 desktop/mobile Chromium도 다시 통과했다.
 - 최초 원격 CI는 신규 worker entry의 console.log 금지 검사에서 실패했다. 기존 worker와 같은 `process.stdout.write`로 정해진 CLI 도움말·집계만 출력하도록 수정했으며 해당 guard를 로컬 통과했다. 최종 원격 결과는 PR의 최신 SHA를 따른다.
 - 이후 API shard 1의 상세 로그 다운로드가 클라우드에서 차단돼 동일 묶음을 로컬 재현했다. `legacy-password-auth-retirement.spec.ts`가 네이버 앱 비밀번호 입력을 로그인 password로 분류하는 실패를 확인했다. 기존 SMTP 외부 credential과 같은 목적으로 `MailAccountConnections.tsx` 한 경로만 allowlist에 추가했다. O4O 로그인 경로·해시 저장·공통 PasswordInput 정책은 변경하지 않는다. 수정 후 해당 정적 계약과 기존 메일 UI의 비밀값 파기 시험을 확인한다.
 - 로컬 재현 묶음은 194 suites·3,407 tests PASS, 해당 guard 1 case만 실패, 26 suites·349 tests skip이었다. 수정 후 guard 48 tests PASS와 메일 화면 7 tests PASS를 별도 실행했다. 원격 실패 묶음을 한 번 재실행했지만 원인을 확인한 뒤 코드로 수정했으며, 최종 source의 CI 결과로 판정한다.
