@@ -20,6 +20,7 @@ on:
         default: false
 
 permissions:
+  contents: read
   id-token: write
 
 concurrency:
@@ -34,6 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Checkout read-only inventory helpers
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            scripts/ops/pharmacy_inventory_format.py
+            scripts/ops/pharmacy_permission_preflight.py
+          sparse-checkout-cone-mode: false
+
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v3
         with:
@@ -78,16 +87,23 @@ jobs:
           set -euo pipefail
           # Bounded non-secret notices are readable through the GitHub Checks API as well as job logs.
           emit_metadata() {
-            python3 -c 'import json,sys; data=json.load(sys.stdin); payload=json.dumps({"resource":sys.argv[1],"metadata":data},separators=(",",":")); assert len(payload)<60000,"Inventory record too large"; print("::notice title=Pharmacy runtime inventory::"+payload.replace("%","%25").replace("\r","%0D").replace("\n","%0A"))' "$1"
+            python3 scripts/ops/pharmacy_inventory_format.py "$1"
           }
           # Explicit projections exclude environment values, secret versions, private IPs and IAM policy member lists.
           gcloud run services describe kpa-society-web \
             --project=netureyoutube --region=asia-northeast3 \
             --format='json(metadata.name,status.latestReadyRevisionName,status.traffic,status.url,spec.template.spec.serviceAccountName,spec.template.spec.containers[0].image)' | emit_metadata cloud-run
           gcloud compute url-maps list --project=netureyoutube \
-            --format='json(name,hostRules.hosts,hostRules.pathMatcher,pathMatchers.name,pathMatchers.defaultService,pathMatchers.pathRules.service,pathMatchers.pathRules.paths)' | emit_metadata url-maps
+            --format='json(name,hostRules,pathMatchers,defaultService,defaultUrlRedirect,defaultRouteAction)' | emit_metadata url-maps
           gcloud compute backend-services list --project=netureyoutube --global \
-            --format='json(name,backends.group)' | emit_metadata backends
+            --format='json(name,backends)' | emit_metadata backends
           gcloud compute network-endpoint-groups list --project=netureyoutube \
             --format='json(name,region,networkEndpointType,cloudRun.service)' | emit_metadata negs
           echo 'PHARMACY_RUNTIME_INVENTORY_PASS (metadata only)'
+
+      - name: Pharmacy project permission preflight (read-only)
+        if: inputs.pharmacy_inventory == true
+        run: |
+          set -euo pipefail
+          sdk_root="$(gcloud info --format='value(installation.sdk_root)')"
+          PHARMACY_CLOUDSDK_ROOT="$sdk_root" python3 scripts/ops/pharmacy_permission_preflight.py

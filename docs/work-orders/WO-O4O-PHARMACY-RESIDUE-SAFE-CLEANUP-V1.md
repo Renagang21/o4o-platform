@@ -52,3 +52,13 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 ## 운영 인벤토리 선택 실행
 
 기존 `gcp-wif-auth-smoke.yml`에 기본 false인 `pharmacy_inventory` 입력을 추가했다. owner·production ref·기존 WIF 주체는 그대로다. 명시 실행 시 약국 앱의 서비스/이미지/트래픽, URL map→backend→serverless NEG 연결 메타데이터만 조회한다. env 값·secret version·DB·IAM 주체 목록은 조회하지 않는다. 조회 오류를 숨기지 않으며 새 IAM 권한을 스스로 부여하지 않는다. 실제 인벤토리 결과는 main 반영 후 이 입력으로 검증한다.
+
+## 실제 운영 인벤토리 조회 보완
+
+- 동일 WO의 연속 Phase로 기존 작업 branch를 유지한다. PR #826은 main `7e9c1c99d6`에 반영됐다.
+- 실행 40260257433은 인증과 Cloud Run/LB/NEG의 읽기 조회에 성공했다. Cloud Run은 `kpa-society-web-02290-keq`에 트래픽100%를 확인했다.
+- 다만 gcloud의 반복 필드에 대한 최초 projection은 URL map/backend의 하위 연결을 반환하지 않고 이름만 반환했다. 이를 전체 연결 확인 완료로 취급하지 않는다.
+- 후속 수정은 URL map/backend의 상위 필드를 받아 표준 Python formatter에서 필요한 routing/group 필드만 whitelist 출력한다. description·header 값 등의 자유문은 제외하고, 대상 LB/backend의 필수 하위 필드가 없으면 실패한다.
+- formatter 5 tests PASS: 하위 연결·weighted backend 참조 보존, 불필요한 필드 제외, 불완전 응답 거절, notice round-trip/크기 제한, 입력 형태 검증. 실제 연결 재확인은 main 반영 후 같은 선택 입력으로 실행한다.
+
+- 추가 사전 점검은 기존 WIF ADC를 Google-auth SDK로 사용해 프로젝트 `testIamPermissions`만 호출한다. 토큰 출력·IAM policy 주체 목록 조회·역할 부여는 하지 않는다. 신규 서비스·LB 전환에 필요한 project 범위 권한의 확인/미확인 목록을 출력한다. 이 결과는 resource 조건부·개별 리소스 권한 검증을 대체하지 않는다. formatter5개와 권한 응답 검증2개, 총7개 Python 테스트가 통과했다.
