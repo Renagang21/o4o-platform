@@ -39,7 +39,7 @@ gh workflow run gcp-wif-auth-smoke.yml --repo Renagang21/o4o-platform --ref main
 
 ```sh
 gcloud version
-gcloud run services describe kpa-society-web \
+gcloud run services describe pharmacy-business-web \
   --project=netureyoutube --region=asia-northeast3 \
   --format='value(metadata.name,status.latestReadyRevisionName)'
 gcloud compute url-maps list --project=netureyoutube --format='value(name)'
@@ -98,3 +98,22 @@ PR #836과 main CI가 통과했고, 기존 GitHub WIF 경로의 plan 40301050063
 [리소스 전환 WO](../work-orders/WO-O4O-PHARMACY-RESOURCE-TRANSITION-PREPARATION-V1.md)를 따른다.
 일반 배포 선택 키는 호환 유지하고 실제 Run/image/registry/CORS origin을 정렬한다. 공개 접근·도메인 검증·
 참조/요청 0 관측이 남아 있으므로 새 자원 생성만으로 전체 잔재 제거 완료라고 판정하지 않는다.
+
+
+## 공개 권한 설정 후 운영 전환 (2026-10-26)
+
+소유자의 최초 공개 invoker 설정을 재확인했고, cutover 40327360298이 두 약국 도메인의
+matcher를 `backend-pharmacy-business-web`로 전환했다. 새 Run과 두 host의 JS digest 비교를 통과했다.
+약국 단독 Promote 40328112383도 성공해 새 이미지 namespace와 revision의 실제 serving을 확인했다.
+API·Admin은 이 Promote에서 선택하지 않았다. 사용자 직접 로그인·기본 화면·메뉴 조회 정상도 확인했다.
+
+홈·로그인 390/1440px는 새 배포 후 HTTP 200·가로 넘침 및 페이지 JS 예외 0이었다.
+자동 브라우저에서 Google SDK host는 403이어서 Google OAuth는 미검증이다.
+현재 직접 셸의 GCP identity를 추측해 사용하지 않고, 검증된 기존 GitHub WIF 경로로 진행했다.
+위 준비 단계의 잔여 bootstrap 안내와 최신 실행 상태는 구분하며, 최종 정리 결과는 리소스 전환 WO를 따른다.
+
+
+최종 삭제 검사는 Actions 대기 후 GitHub API 401로 결과 조회가 중단됐다.
+이는 추가 GCP 역할이나 Codex 프로젝트·리전 값의 문제가 아니다. GitHub 연결을 복구한 뒤
+현재 상태·검사 digest를 새로 검토해야 하며, `retire`는 아직 요청하지 않았다.
+상세 대기 run과 재개 조건은 리소스 전환 WO의 인증 중단 기록을 따른다.
