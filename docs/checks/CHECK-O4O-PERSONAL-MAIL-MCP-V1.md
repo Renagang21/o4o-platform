@@ -14,10 +14,10 @@ Node 22.18.0·pnpm 10.25.0, 전용 `wo/personal-mail-mcp` worktree, loopback Pos
 | API 컴파일 | PASS — `pnpm --filter @o4o/api-server build` |
 | 배포용 API bundle | PASS — `tsup --config tsup.config.ts`, main/migrate/product-correction-worker/personal-mail-worker entry syntax·신규 CLI `--help`. compile 산출물의 database 2,420개 해시 일치 복원 확인 |
 | API focused Jest | 6 suites·53 tests PASS — personal-mail contracts, external-ai 기존 단위 시험, opaque-field middleware |
-| UI Vitest | 3 files·21 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
+| UI Vitest | 3 files·22 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
 | Neture production build | PASS — `pnpm --filter @o4o/web-neture build` |
 | Migration contract | 21 PASS·0 FAIL — `node scripts/db/check-migration-contract.mjs` |
-| PG·공식 MCP SDK 통합 | 기존 콘텐츠 69개 + 메일 29개 = 98 PASS — `node scripts/dev/run-external-ai-fixture.mjs` |
+| PG·공식 MCP SDK 통합 | 기존 콘텐츠 69개 + 메일 30개 = 99 PASS — `node scripts/dev/run-external-ai-fixture.mjs` |
 | 실제 Chromium desktop/mobile | 2 PASS — 같은 script의 `--personal-mail-only --browser`; 화면 진입·메뉴·건수 확인·승인 전 비활성·실행 완료·가로 넘침·pageerror 확인 |
 | 변경 업무 source ESLint | 오류·경고 0. 저장소의 기존 ESLint ignore deprecation 안내는 별도 |
 | 의존성 advisory | `pnpm audit --prod`에서 신규 imapflow/mailparser 경로 advisory 0. 저장소 전체의 기존 low 32/moderate 169/high 141/critical 4는 이 작업에서 해결하지 않음 |
@@ -32,6 +32,8 @@ UI 시험 명령은 저장소 루트에서 `pnpm exec vitest run --config servic
 - OAuth flow의 `DELETE RETURNING` 원시 결과 형식에 의존하던 문제를 발견해 현재 사용자에 묶인 `SELECT FOR UPDATE` 후 소비하도록 수정했다. 잘못된 사용자·PKCE·일회 사용을 외부 호출 없이 검증했다.
 - Gmail HTTP fixture는 metadata/body·갱신·상태 재확인·429/오류를, TLS-IMAP fixture는 인증·SPECIAL-USE/MOVE·UIDVALIDITY·bounded MIME·기능 미지원 거부를 검증한다. 인증서 검증을 끄지 않았으며 COPY/DELETE/EXPUNGE 대체 실행은 없다.
 - 연결 해제는 credential·metadata·규칙·작업·대상을 cascade 파기한다. 기존 최소 감사 기록은 보존 정책을 따른다. 기능 OFF·키 누락에서도 본인만 해제할 수 있다.
+- PR #837의 P1/P2 리뷰를 반영했다. 자동 작업 실행 직전 규칙 ID·revision·action을 대조해 keep/동일 action의 revision 변경 후 옛 대기 작업을 취소하고, 별도 승인 cleanup은 실행되는 PG 시험을 추가했다. 수신함 발신처가 0개여도 기존 규칙에서 선택·keep 전환·재승인을 할 수 있는 UI 시험도 추가했다.
+- 최초 원격 CI는 신규 worker entry의 console.log 금지 검사에서 실패했다. 기존 worker와 같은 `process.stdout.write`로 정해진 CLI 도움말·집계만 출력하도록 수정했으며 해당 guard를 로컬 통과했다. 최종 원격 결과는 PR의 최신 SHA를 따른다.
 - 첫 browser 실행의 Vite CJS 로딩 오류, fixture cwd 때문에 누락된 Tailwind 스타일, ‘완료 0’을 완료로 오인하던 assertion을 수정했다. 실제 앱의 스타일과 loopback API를 사용해 승인 응답·완료/건너뜀 건수·대기 0까지 재확인했다. 기존 CDN font stylesheet만 로컬 빈 CSS로 대체하고 외부 요청은 차단했다. 실제 계정 인증 시험은 아니다.
 - Neture의 기존 `tsc -b` node project 설정 오류는 범위 밖이다. 정식 `build`의 `tsc && vite build`를 통과했으며 잘못된 진단 명령이 생성한 자기 임시 산출물은 제거했다. 기존 Browserslist 갱신 안내·bundle 크기 경고를 신규 오류로 숨기거나 무관하게 수정하지 않았다.
 

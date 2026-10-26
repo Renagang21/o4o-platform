@@ -15,7 +15,12 @@ export interface MailJob {
   kind: "cleanup" | "rule" | "automatic";
   action: MailAction;
   status: string;
-  proposal: { senders?: string[]; category?: string };
+  proposal: {
+    senders?: string[];
+    category?: string;
+    ruleId?: string;
+    ruleRevision?: number;
+  };
   include_important: boolean;
   generation: number;
   total: number;

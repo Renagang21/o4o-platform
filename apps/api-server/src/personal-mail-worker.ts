@@ -7,8 +7,8 @@ import { requireMailEnabled } from "./modules/personal-mail/config.js";
 async function main() {
   const args = process.argv.slice(2);
   if (args.length === 1 && args[0] === "--help") {
-    console.log(
-      "Usage: node dist/personal-mail-worker.js --run [--max-ticks 100]",
+    process.stdout.write(
+      "Usage: node dist/personal-mail-worker.js --run [--max-ticks 100]\n",
     );
     return;
   }
@@ -61,13 +61,13 @@ async function main() {
       if (result.status === "worked") await next();
     }
     await next();
-    console.log(
+    process.stdout.write(
       JSON.stringify({
         code: "PERSONAL_MAIL_WORKER_COMPLETED",
         ticks,
         processed,
         synced,
-      }),
+      }) + "\n",
     );
   } finally {
     process.off("SIGTERM", stop);

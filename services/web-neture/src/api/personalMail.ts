@@ -121,6 +121,8 @@ export const personalMailApi = {
     ),
 };
 const messages: Record<string, string> = {
+  MAIL_RULE_CHANGED:
+    "발신처 규칙이 변경되어 대기 중이던 자동 작업을 취소했습니다.",
   MAIL_CONFIRMATION_EXPIRED:
     "검토 시간이 지났습니다. 대상을 새로 확인해 주세요.",
   MAIL_ACCOUNT_CHANGED: "계정 연결이 바뀌었습니다. 대상을 새로 확인해 주세요.",

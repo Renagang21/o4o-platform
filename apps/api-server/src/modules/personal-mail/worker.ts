@@ -217,6 +217,36 @@ export class PersonalMailWorker {
       try {
         if (job.generation !== account.generation)
           throw new MailError("MAIL_ACCOUNT_CHANGED", 409);
+        if (job.kind === "automatic") {
+          // Account lock serializes rule confirmation with execution. A new rule cannot inherit old queued authority.
+          const [rule] = await db.query(
+            "SELECT id FROM personal_mail_rules WHERE id=$1 AND account_id=$2 AND revision=$3 AND action=$4 AND action<>'keep'",
+            [
+              job.proposal.ruleId,
+              account.id,
+              job.proposal.ruleRevision,
+              job.action,
+            ],
+          );
+          if (!rule) {
+            await db.query(
+              "UPDATE personal_mail_job_items SET status='skipped',result='rule_changed' WHERE job_id=$1 AND status='pending'",
+              [job.id],
+            );
+            await db.query(
+              "UPDATE personal_mail_jobs SET status='cancelled',last_error='MAIL_RULE_CHANGED',lease_token=NULL,lease_until=NULL,updated_at=now() WHERE id=$1",
+              [job.id],
+            );
+            await recordOperation(
+              db,
+              "personal-mail",
+              job.user_id,
+              "mail.job.cancelled",
+              { accountId: account.id, jobId: job.id, reason: "rule_changed" },
+            );
+            return 1;
+          }
+        }
         if (job.source_connection_id) {
           const connection = await mailDelegation(
             db,

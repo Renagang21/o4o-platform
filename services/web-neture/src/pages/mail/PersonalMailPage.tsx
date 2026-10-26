@@ -27,6 +27,7 @@ import { MailJobReview } from "./MailJobReview";
 import { MailAccountConnections } from "./MailAccountConnections";
 
 function MailManager() {
+  const ruleControls = useRef<HTMLDivElement>(null);
   const [params] = useSearchParams();
   const [availability, setAvailability] = useState<{
     enabled: boolean;
@@ -341,7 +342,10 @@ function MailManager() {
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
-                checked={!!senders.length && selected.length === senders.length}
+                checked={
+                  !!senders.length &&
+                  senders.every((row) => selected.includes(row.sender))
+                }
                 disabled={busy || !senders.length}
                 onChange={(e) =>
                   setSelected(
@@ -412,7 +416,18 @@ function MailManager() {
                 다음 발신처
               </button>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div
+              ref={ruleControls}
+              tabIndex={-1}
+              role="group"
+              aria-label="선택 발신처 규칙 설정"
+              className="flex flex-wrap gap-4"
+            >
+              {!!selected.length && (
+                <p className="w-full break-all text-sm">
+                  선택한 발신처: {selected.join(", ")}
+                </p>
+              )}
               <label>
                 처리 방식{" "}
                 <select
@@ -576,10 +591,26 @@ function MailManager() {
           <section className="space-y-2 rounded-xl border bg-white p-5">
             <h2 className="font-semibold">발신처 규칙 {rules.length}개</h2>
             {rules.map((row) => (
-              <p key={row.id} className="break-all">
-                {row.sender} · {mailActionLabels[row.action]} · {row.category}
-                {row.delegated ? " · 외부 AI 연결 승인 규칙" : ""}
-              </p>
+              <div key={row.id} className="space-y-2 rounded border p-3">
+                <p className="break-all">
+                  {row.sender} · {mailActionLabels[row.action]} · {row.category}
+                  {row.delegated ? " · 외부 AI 연결 승인 규칙" : ""}
+                </p>
+                <button
+                  className="rounded border px-3 py-2"
+                  disabled={busy || !availability?.enabled}
+                  aria-label={`${row.sender} 규칙 변경`}
+                  onClick={() => {
+                    setSelected([row.sender]);
+                    setAction(row.action);
+                    setCategory(row.category);
+                    ruleControls.current?.scrollIntoView?.({ block: "center" });
+                    ruleControls.current?.focus({ preventScroll: true });
+                  }}
+                >
+                  규칙 변경
+                </button>
+              </div>
             ))}
           </section>
         </>

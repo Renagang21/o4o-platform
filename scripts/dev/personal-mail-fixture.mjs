@@ -514,6 +514,93 @@ export async function runPersonalMailChecks({ db, check }) {
       },
     );
     await check(
+      "queued automatic jobs recheck changed rule revisions; explicit cleanup snapshots remain valid",
+      async () => {
+        for (const change of ["keep", "archive"]) {
+          const sender = `queued-${change}@example.invalid`;
+          const original = await jobs.prepare(
+            user,
+            {
+              accountId: a.id,
+              senders: [sender],
+              action: "archive",
+              category: "work",
+              requestId: randomUUID(),
+            },
+            "rule",
+          );
+          await confirm(original);
+          for (const suffix of ["1", "2"])
+            remote
+              .get(a.id)
+              .set(`${change}-${suffix}`, {
+                id: `${change}-${suffix}`,
+                sender,
+                receivedAt: new Date(Date.now() + 1000),
+                important: false,
+                inbox: true,
+              });
+          await db.query(
+            "UPDATE personal_mail_accounts SET next_sync_at=now() WHERE id=$1",
+            [a.id],
+          );
+          await worker.tick();
+          const waiting = await db.query(
+            "SELECT id FROM personal_mail_jobs WHERE account_id=$1 AND kind='automatic' AND status='pending' AND proposal->>'ruleId'=(SELECT id::text FROM personal_mail_rules WHERE account_id=$1 AND sender=$2)",
+            [a.id, sender],
+          );
+          assert.ok(waiting.length > 0, "fixture has queued automatic work");
+          const remaining = [...remote.get(a.id).values()].find(
+            (m) => m.sender === sender && m.inbox,
+          );
+          const manual = await jobs.prepare(
+            user,
+            {
+              accountId: a.id,
+              senders: [sender],
+              action: "important",
+              requestId: randomUUID(),
+            },
+            "cleanup",
+          );
+          await confirm(manual);
+          const revised = await jobs.prepare(
+            user,
+            {
+              accountId: a.id,
+              senders: [sender],
+              action: change,
+              category: "personal",
+              requestId: randomUUID(),
+            },
+            "rule",
+          );
+          await confirm(revised);
+          await drain(12);
+          assert.equal(
+            remote.get(a.id).get(remaining.id).inbox,
+            true,
+            "old automatic authority cannot move this message",
+          );
+          assert.equal(
+            remote.get(a.id).get(remaining.id).important,
+            true,
+            "explicitly confirmed cleanup is preserved",
+          );
+          assert.equal(
+            (await jobs.read(user, a.id, manual.id)).status,
+            "completed",
+          );
+          for (const queued of waiting) {
+            const job = await jobs.read(user, a.id, queued.id);
+            assert.equal(job.status, "cancelled");
+            assert.equal(job.lastError, "MAIL_RULE_CHANGED");
+            assert.equal(job.counts.pending, 0);
+          }
+        }
+      },
+    );
+    await check(
       "new mail follows the approved rule and keep stops future cleanup",
       async () => {
         remote.get(a.id).set("m4", {
@@ -848,15 +935,13 @@ export async function runPersonalMailChecks({ db, check }) {
       },
     );
     if (browserFixture) {
-      remote
-        .get(a.id)
-        .set("m9", {
-          id: "m9",
-          sender: "notice@example.invalid",
-          receivedAt: new Date(),
-          important: false,
-          inbox: true,
-        });
+      remote.get(a.id).set("m9", {
+        id: "m9",
+        sender: "notice@example.invalid",
+        receivedAt: new Date(),
+        important: false,
+        inbox: true,
+      });
       await db.query(
         "UPDATE personal_mail_accounts SET next_sync_at=now() WHERE id=$1",
         [a.id],

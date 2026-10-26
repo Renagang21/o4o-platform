@@ -141,6 +141,65 @@ describe("personal mail end-to-end screen contract", () => {
     expect(personalMailApi.capabilities).not.toHaveBeenCalled();
     expect(screen.queryByRole("button", { name: "Gmail 연결" })).toBeNull();
   });
+  it("can change an existing rule to keep even when its inbox is empty, with a new confirmation", async () => {
+    vi.mocked(personalMailApi.senders).mockResolvedValue({
+      senders: [],
+      page: 1,
+      scope: "indexed_inbox",
+    });
+    vi.mocked(personalMailApi.rules).mockResolvedValue([
+      {
+        id: "rule-a",
+        sender: "notice@example.invalid",
+        action: "trash",
+        category: "promotion",
+        revision: 2,
+        delegated: false,
+      },
+    ]);
+    const rulePreview: MailJob = {
+      ...preview,
+      kind: "rule",
+      action: "keep",
+      proposal: { senders: ["notice@example.invalid"], category: "personal" },
+    };
+    vi.mocked(personalMailApi.prepare).mockResolvedValue(rulePreview);
+    vi.mocked(personalMailApi.job).mockResolvedValue(rulePreview);
+    view();
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "notice@example.invalid 규칙 변경",
+      }),
+    );
+    expect(
+      (screen.getByLabelText("처리 방식") as HTMLSelectElement).value,
+    ).toBe("trash");
+    expect(
+      (screen.getByLabelText("규칙 분류") as HTMLSelectElement).value,
+    ).toBe("promotion");
+    fireEvent.change(screen.getByLabelText("처리 방식"), {
+      target: { value: "keep" },
+    });
+    fireEvent.change(screen.getByLabelText("규칙 분류"), {
+      target: { value: "personal" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "향후 규칙 검토" }));
+    await waitFor(() =>
+      expect(personalMailApi.prepare).toHaveBeenCalledWith(
+        "rule",
+        expect.objectContaining({
+          senders: ["notice@example.invalid"],
+          action: "keep",
+          category: "personal",
+        }),
+      ),
+    );
+    const confirm = await screen.findByRole("button", {
+      name: "확인한 규칙 활성화",
+    });
+    expect((confirm as HTMLButtonElement).disabled).toBe(true);
+    expect(personalMailApi.confirm).not.toHaveBeenCalled();
+  });
   it("requires a separate target/count acknowledgment before executing the immutable preview", async () => {
     view();
     const sender = await screen.findByRole("checkbox", {
