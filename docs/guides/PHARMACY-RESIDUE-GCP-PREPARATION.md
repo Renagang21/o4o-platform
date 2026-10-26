@@ -21,7 +21,12 @@
 
 ## 기존 GitHub Actions 경로
 
-`gcp-wif-auth-smoke.yml`의 읽기 전용 실행 40257349330이 성공했다. 기존 GitHub Actions는 WIF로 GCP를 인증하며 Cloud SDK를 제공한다. 이 경로를 사용하는 배포 작업은 현재 셸의 직접 GCP 인증 연결 없이도 진행할 수 있다. LB 전환·새 서비스 IAM 등의 권한은 기존 배포 권한과 별도로 확인해야 한다. 아래 환경 보완은 현재 셸에서 직접 조회·작업하려는 경우에 적용한다.
+`gcp-wif-auth-smoke.yml`의 읽기 전용 실행 40257349330이 성공했다. 기존 GitHub Actions는 WIF로 GCP를 인증하며 Cloud SDK를 제공한다. 이 경로를 사용하는 배포 작업은 현재 셸의 직접 GCP 인증 연결 없이도 진행할 수 있다. LB 전환·새 서비스 IAM 등의 권한은 기존 배포 권한과 별도로 확인해야 한다. 아래 환경 보완은 현재 셸에서 직접 조회·작업하려는 경우에 적용한다. main에 인벤토리 입력이 반영된 뒤 다음 선택 실행으로 Cloud Run/LB 메타데이터를 조사할 수 있다. 출력은 고정 projection이며 실제 권한 오류를 숨기지 않는다.
+
+```sh
+gh workflow run gcp-wif-auth-smoke.yml --repo Renagang21/o4o-platform --ref main -f pharmacy_inventory=true
+```
+
 
 ## 보완 순서
 

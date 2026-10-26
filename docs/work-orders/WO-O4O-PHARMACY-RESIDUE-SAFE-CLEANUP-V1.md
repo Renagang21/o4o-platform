@@ -47,3 +47,8 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 ## 통합 진행
 
 사용자의 직접 진행 지시에 따라 기존 GitHub Actions 인증·배포 경로로 PR 검증·main 통합·통제 배포를 진행한다. 현재 셸의 gcloud/identity 부재가 기존 GitHub Actions 배포 경로의 부재를 뜻하지 않는다. 최신 main의 Partner 변경을 정상 merge하고 기존 배포 판정 282개를 다시 통과했다. 동시에 실행 중인 다른 작업의 운영 배포가 끝난 뒤 해당 SHA의 실제 서비스별 영향을 확인해 순차 배포한다. 새로운 운영 DB 변경·IAM/LB 변경이나 현재 서비스 삭제를 이 기록만으로 실행하지 않는다.
+
+
+## 운영 인벤토리 선택 실행
+
+기존 `gcp-wif-auth-smoke.yml`에 기본 false인 `pharmacy_inventory` 입력을 추가했다. owner·production ref·기존 WIF 주체는 그대로다. 명시 실행 시 약국 앱의 서비스/이미지/트래픽, URL map→backend→serverless NEG 연결 메타데이터만 조회한다. env 값·secret version·DB·IAM 주체 목록은 조회하지 않는다. 조회 오류를 숨기지 않으며 새 IAM 권한을 스스로 부여하지 않는다. 실제 인벤토리 결과는 main 반영 후 이 입력으로 검증한다.
