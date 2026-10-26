@@ -46,10 +46,13 @@ function observationTime(input: unknown): string {
 export function parseAiRuntimePricingSnapshot(input: unknown): AiRuntimePricingSnapshot {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return invalid();
   const response = input as Record<string, unknown>;
-  const data = 'success' in response
-    ? (response.success === true && response.data && typeof response.data === 'object' && !Array.isArray(response.data)
-      ? response.data as Record<string, unknown> : invalid())
-    : object(input, ['observedAt', 'pricing']);
+  let data: Record<string, unknown>;
+  if ('success' in response) {
+    if (response.success !== true || !response.data || typeof response.data !== 'object' || Array.isArray(response.data)) return invalid();
+    data = response.data as Record<string, unknown>;
+  } else {
+    data = object(input, ['observedAt', 'pricing']);
+  }
   const pricing = object(data.pricing, ['state', 'version', 'fingerprint', 'modelRateCount', 'nativeProfileCount', 'currencies', 'code']);
   if (!['loaded', 'legacy-estimates', 'invalid'].includes(pricing.state as string) ||
     !Array.isArray(pricing.currencies) || pricing.currencies.some(value => typeof value !== 'string' || !/^[A-Z]{3}$/.test(value))) return invalid();
@@ -137,9 +140,11 @@ export function parseAiQuotaSnapshot(input: unknown): AiQuotaSnapshot {
 const SAFE_ERRORS = new Set(['AI_PRICING_NOT_CONFIGURED', 'AI_PRICING_INVALID', 'AI_PRICING_CURRENCY_UNSUPPORTED', 'AI_POLICY_INVALID', 'AI_USAGE_INVALID', 'AI_QUOTA_INVALID']);
 export function checkAiPricingReadiness(manifest: AiPricingManifest, catalog: AiPriceCatalog, snapshot?: AiQuotaSnapshot, runtime?: AiRuntimePricingSnapshot) {
   const catalogFingerprint = fingerprintAiPriceCatalog(catalog);
-  const runtimePricing = runtime ? { observedAt: runtime.observedAt, catalogVersion: runtime.version,
-    state: runtime.state === 'invalid' ? 'unavailable' as const
-      : runtime.fingerprint === catalogFingerprint && runtime.version === catalog.version ? 'match' as const : 'mismatch' as const } : null;
+  let runtimeState: 'unavailable' | 'match' | 'mismatch' = 'unavailable';
+  if (runtime && runtime.state !== 'invalid') {
+    runtimeState = runtime.fingerprint === catalogFingerprint && runtime.version === catalog.version ? 'match' : 'mismatch';
+  }
+  const runtimePricing = runtime ? { observedAt: runtime.observedAt, catalogVersion: runtime.version, state: runtimeState } : null;
   const cases = manifest.cases.map(row => {
     const identity = { id: row.id, provider: row.request.provider, model: row.request.model, kind: row.request.kind, scope: row.scope, serviceKey: row.serviceKey };
     try {

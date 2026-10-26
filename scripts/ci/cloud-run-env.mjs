@@ -63,7 +63,7 @@ export function assertPlainEnvKnown(service, names) {
 }
 
 export function workflowMaskValue(value) {
-  return value.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+  return value.replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
 }
 
 /** 현재 값을 반드시 알아야 하는 묶음: 조회 실패면 배포를 멈춘다. */

@@ -26,7 +26,7 @@ export function observeAiPricingCatalog(value = ''): AiPricingObservation {
       fingerprint: fingerprintAiPriceCatalog(catalog),
       modelRateCount: catalog.rates.length,
       nativeProfileCount: catalog.rates.reduce((total, rate) => total + Object.keys(rate.native ?? {}).length, 0),
-      currencies: [...new Set(catalog.rates.map(rate => rate.currency))].sort(),
+      currencies: [...new Set(catalog.rates.map(rate => rate.currency))].sort((left, right) => left.localeCompare(right)),
       code: null,
     };
   } catch {
