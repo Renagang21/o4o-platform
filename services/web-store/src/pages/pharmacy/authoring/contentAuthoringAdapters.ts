@@ -1,3 +1,4 @@
+import { sanitizeRichHtml } from '@o4o/content-editor';
 import { readProductConsultation, type ProductConsultationDraft } from '../../../components/product-description/productConsultationDraft';
 import { apiClient } from "../../../api/client";
 import {
@@ -275,6 +276,8 @@ export async function createOrUpdateDirect(
      };
 }
 
+const normalizeConsultationHtml = (html: string) => sanitizeRichHtml(html).trim();
+
 /** The client id survives a lost POST response; the server commits body/link atomically. */
 async function persistConsultation(draft: TextContentDraft, record: CreatedContent | null): Promise<VerifiedDirectContent> {
   const id = record?.id ?? draft.clientContentId;
@@ -291,7 +294,7 @@ async function persistConsultation(draft: TextContentDraft, record: CreatedConte
 async function sendConsultation(draft: TextContentDraft, record: CreatedContent | null, id: string): Promise<VerifiedDirectContent> {
   const context = draft.consultation!;
   const contentJson = { ...(record?.contentJson ?? { sourceResources: [], generatedBy: 'manual-direct' }),
-    html: draft.html.trim(), productConsultation: context };
+    html: normalizeConsultationHtml(draft.html), productConsultation: context };
   delete (contentJson as Record<string, unknown>).blocks;
   try {
     const response = record
@@ -318,7 +321,7 @@ async function verifySavedConsultation(draft: TextContentDraft, id: string, resu
   const context = draft.consultation!;
   try {
     const [saved, linked] = await Promise.all([loadDirect(id), handledProductContentApi.byProduct(context.product.sourceType, context.product.sourceId)]);
-    const same = saved.title === draft.title.trim() && JSON.stringify(saved.tags ?? []) === JSON.stringify(draft.tags) && saved.contentJson.html === draft.html.trim() &&
+    const same = saved.title === draft.title.trim() && JSON.stringify(saved.tags ?? []) === JSON.stringify(draft.tags) && typeof saved.contentJson.html === 'string' && normalizeConsultationHtml(saved.contentJson.html) === normalizeConsultationHtml(draft.html) &&
       JSON.stringify(readProductConsultation(saved.contentJson.productConsultation)) === JSON.stringify(context);
     const connected = linked.success === true && Array.isArray(linked.data?.items) && linked.data.items.some(item => item.contentId === id);
     return { ...saved, verification: same && connected, conflict: !same };

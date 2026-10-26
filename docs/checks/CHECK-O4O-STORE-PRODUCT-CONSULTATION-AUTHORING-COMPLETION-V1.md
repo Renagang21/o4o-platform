@@ -71,3 +71,5 @@ API/Core 인증·MCP/OAuth·서버 AI 정책·관리자 상품 정비·정기 wo
 Sonar 지적의 중복 import·props readonly·접근성 output/label·중첩 ternary·고정 locale 비교 정렬·객체 검사·async·복잡도·불필요 fallback을 동작 보존 정비했다. 규칙·baseline·workflow·제외 목록은 완화하지 않았다.
 
 리뷰 수정 로컬 검증: 실제 PostgreSQL9개+기존 권한20개=29 PASS, 전체 매장79파일/862 PASS, PC/모바일2 PASS, API/매장 타입·변경 lint·API 모든 bundle PASS. 컨테이너의 임시 schema0 확인 후 정리했다. 공식 최신 PR CI·Sonar·Codex 결과와 최종 배포 사실은 PR 최신 상태에 기록하며, 이 문서는 성공하지 않은 원격 검사를 성공으로 간주하지 않는다.
+
+후속 Codex 재검토는 HTML 탭의 작은따옴표 등 원문 직렬화 차이가 실제 저장 성공을 충돌로 오인하는 사례를 지적했다. 상담자료의 전송과 재조회 비교 모두 기존 sanitizeRichHtml 정책으로 정규화했다. 본문 실질 변경·실제 revision 충돌 검사는 유지한다. 실제 HTML 탭 입력→저장 완료를 PC/모바일 시나리오에 추가했다. 이 수정의 로컬 전체 매장79파일/863개·집중42개(중복)·PC/모바일2개·매장 타입/lint/build가 PASS이며 API 코드는 직전29개 검증 이후 변경하지 않았다. 최신 공식 검사는 새 push HEAD에서 다시 확인한다.

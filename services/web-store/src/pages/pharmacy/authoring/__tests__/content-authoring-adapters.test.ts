@@ -382,3 +382,13 @@ it('a changed product link is not treated as an overwriteable revision conflict'
  await expect(saveDirect(direct.id, { title: 'Mine', html: '<p>Mine</p>', tags: [], consultation }, direct)).rejects.toBe(error);
  expect(api.getDirect).not.toHaveBeenCalled(); expect(consultationSaveError(error)).toContain('상품 연결이 변경');
 });
+
+it('normalizes raw HTML quotes before sending and comparing successful saved content', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
+ const draft = { clientContentId: 'created', title: 'Raw HTML', html: "<p style='color:red'>Body</p>", tags: [], consultation };
+ const html = '<p style="color:red">Body</p>';
+ api.getDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created', title: draft.title, tags: [], contentJson: { html, productConsultation: consultation } } });
+ api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: 'created' }] } });
+ expect(await createOrUpdateDirect(draft, null, consultation.product)).toMatchObject({ verification: true, conflict: false });
+ expect(api.create.mock.calls[0][1].contentJson.html).toBe(html);
+});

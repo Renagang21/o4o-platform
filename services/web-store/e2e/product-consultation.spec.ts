@@ -95,4 +95,11 @@ test('product consultation source → ChatGPT prompt/result → linked save → 
  await expect(page.getByRole('button', { name: '수정', exact: true })).toBeVisible();
  expect(saved!.contentJson.productConsultation.product.sourceId).toBe(product);
  expect(creates).toBe(1); expect(updates).toBe(2); expect(errors).toEqual([]);
+ await page.getByRole('button', { name: '수정', exact: true }).click();
+ await page.getByRole('button', { name: 'HTML', exact: true }).click();
+ await page.getByPlaceholder('HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으세요...').fill("<p style='color:red'>HTML 직접 입력 결과</p>");
+ await page.getByRole('button', { name: '저장', exact: true }).click();
+ await expect(page.getByRole('button', { name: '수정', exact: true })).toBeVisible();
+ expect(saved!.contentJson.html).toBe('<p style="color:red">HTML 직접 입력 결과</p>');
+ expect(creates).toBe(1); expect(updates).toBe(3); expect(errors).toEqual([]);
 });
