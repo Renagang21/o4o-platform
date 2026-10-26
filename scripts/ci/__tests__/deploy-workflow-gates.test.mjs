@@ -354,6 +354,18 @@ describe('GCP 인증 = WIF — 장기 SA key 0', () => {
     assert.match(wf, /^ {4}environment: production$/m);
     assert.doesNotMatch(wf, /secrets\.|gcloud run deploy|update-traffic|jobs execute|print-access-token|print-identity-token|token_format/);
   });
+
+  it('pharmacy inventory is opt-in and permits only projected read-only resource queries', () => {
+    const wf = read(SMOKE);
+    assert.match(wf, /pharmacy_inventory:\n[\s\S]*?type: boolean\n\s+default: false/);
+    const inventory = wf.slice(wf.indexOf('      - name: Pharmacy runtime inventory'));
+    assert.match(inventory, /if: inputs\.pharmacy_inventory == true/);
+    const commands = [...inventory.matchAll(/^\s+gcloud (\S+ \S+ \S+)/gm)].map(m => m[1]);
+    assert.deepEqual(commands, ['run services describe', 'compute url-maps list', 'compute backend-services list', 'compute network-endpoint-groups list']);
+    assert.equal(count(inventory, /--format='json\(/g), 4);
+    assert.doesNotMatch(inventory, /--format=['"]?json['"]?(?:\s|$)|containers\[0\]\.env|secrets\.|get-iam-policy/);
+  });
+
 });
 
 // WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1
