@@ -393,14 +393,43 @@ export class ProductCorrectionPeriodicService {
       return null;
     }
   }
-  /** Best-effort in-process tick; no product writes, external messages, or AI calls. */
-  async tick(now = new Date()) {
+  /** Transaction-scoped DB mutex also coordinates independent job processes; cursor rows remain durable. */
+  async tick(now = new Date(), source: 'server' | 'job' = 'server') {
+    const started = Date.now();
+    try {
+      return await this.db.transaction(async (guard) => {
+        const lock = await guard.query('SELECT pg_try_advisory_xact_lock(825104, 1) AS claimed');
+        if (!lock[0]?.claimed) return { status: 'busy' as const, pagesProcessed: 0, schedulesStarted: 0 };
+        const result = await this.processTick(now);
+        await this.recordHeartbeat({ lastTickAt: now.toISOString(), lastSucceededAt: new Date().toISOString(),
+          lastStartedAt: now.toISOString(), lastDurationMs: Date.now() - started, source,
+          lastErrorCode: null, ...result });
+        return { status: 'completed' as const, ...result };
+      });
+    } catch (error) {
+      try {
+        await this.recordHeartbeat({ lastFailedAt: new Date().toISOString(), lastErrorCode: 'WORKER_TICK_FAILED', source });
+      } catch { /* A database outage must not hide the original failure. */ }
+      throw error;
+    }
+  }
+  private recordHeartbeat(value: Record<string, unknown>) {
+    return this.db.query(
+      `INSERT INTO settings(key,type,value,description) VALUES($1,'product_correction_worker',$2::jsonb,'상품 관리 worker 상태')
+       ON CONFLICT(key) DO UPDATE SET value=settings.value || EXCLUDED.value,"updatedAt"=NOW()`,
+      [heartbeatKey, JSON.stringify(value)],
+    );
+  }
+  private async processTick(now: Date) {
+    let schedulesStarted = 0, pagesProcessed = 0;
     for (let i = 0; i < 4; i++) {
       const schedule = await this.startDue(now);
       if (!schedule) break;
+      schedulesStarted++;
     }
     for (let i = 0; i < 4; i++) {
       if (!(await this.step())) break;
+      pagesProcessed++;
     }
     const day = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     const existing = await this.db.query('SELECT 1 FROM settings WHERE key=$1 AND type=$2', [
@@ -424,10 +453,7 @@ export class ProductCorrectionPeriodicService {
           '미처리 상품 관리 작업이 있습니다. 갱신·근거·승인·실패·예약 지연 현황을 확인하세요.',
         );
     }
-    await this.db.query(
-      `INSERT INTO settings(key,type,value,description) VALUES($1,'product_correction_worker',$2::jsonb,'상품 관리 worker 상태') ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value,"updatedAt"=NOW()`,
-      [heartbeatKey, JSON.stringify({ lastTickAt: now.toISOString() })],
-    );
+    return { schedulesStarted, pagesProcessed };
   }
   async notices(page = 1) {
     return this.list<ProductCorrectionNotice>(NOTICE, page);
@@ -482,6 +508,7 @@ export class ProductCorrectionPeriodicService {
       ...stats,
       evidenceWaiting: evidence[0].total as number,
       lastTickAt: heartbeat[0]?.value?.lastTickAt ?? null,
+      worker: heartbeat[0]?.value ?? null,
     };
   }
 }

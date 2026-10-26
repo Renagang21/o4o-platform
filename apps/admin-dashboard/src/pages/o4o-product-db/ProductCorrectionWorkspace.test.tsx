@@ -87,6 +87,22 @@ async function createWork() {
   await screen.findByLabelText('보완 초안');
 }
 describe('관리자 상품 보정 작업', () => {
+  it('loads editable operational templates without saving and preserves explicit purpose selection', async () => {
+    render(<ProductCorrectionWorkspace />);
+    await screen.findByRole('option', { name: '수치 기준 · v1' });
+    fireEvent.change(screen.getByLabelText('설명서 이용 목적'), { target: { value: 'professional' } });
+    fireEvent.click(screen.getByText('함량과 1일 기준량 근거 확인 초안 사용'));
+    expect(screen.getByLabelText('기준 이름')).toHaveValue('함량과 1일 기준량 근거 확인');
+    expect(screen.getByLabelText('설명서 이용 목적')).toHaveValue('professional');
+    expect(screen.getByLabelText('기준 사용')).not.toBeChecked();
+    expect(mocks.api.saveRule).not.toHaveBeenCalled();
+    expect(mocks.api.preview).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText('검토·보완 지침'), { target: { value: '관리자가 보완한 근거 기준' } });
+    mocks.api.saveRule.mockResolvedValue({ ...rule, instructions: '관리자가 보완한 근거 기준', enabled: false });
+    fireEvent.click(screen.getByText('기준 저장'));
+    await waitFor(() => expect(mocks.api.saveRule).toHaveBeenCalledWith(expect.objectContaining({ purpose: 'professional', enabled: false, instructions: '관리자가 보완한 근거 기준' }), undefined));
+  });
+
   it('requests a separate AI proposal without overwriting edits or saving official data', async () => {
     mocks.api.aiDraft.mockResolvedValue({ draft: '합성 AI 검토안', missingEvidence: ['전체 원문 확인'], taskId: 'task-1', batchRevision: 1, sourceFingerprint: product.fingerprint });
     render(<ProductCorrectionWorkspace />);

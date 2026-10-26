@@ -60,8 +60,10 @@ RUN echo "Cache bust: ${CACHEBUST}"
 # Copy the bundled application (tsup creates bundled entry points)
 # - main.js: API Server entry (Cloud Run Service)
 # - migrate.js: Migration CLI entry (Cloud Run Job)
+# - product-correction-worker.js: Explicit bounded correction job (no HTTP/migration startup)
 COPY --chown=o4oapi:nodejs dist/main.js ./dist/main.js
 COPY --chown=o4oapi:nodejs dist/main.js.map ./dist/main.js.map
+COPY --chown=o4oapi:nodejs dist/product-correction-worker.js ./dist/product-correction-worker.js
 COPY --chown=o4oapi:nodejs dist/migrate.js ./dist/migrate.js
 COPY --chown=o4oapi:nodejs dist/migrate.js.map ./dist/migrate.js.map
 COPY --chown=o4oapi:nodejs dist/scripts/provision-test-cooperative.js ./dist/provision-test-cooperative.js
