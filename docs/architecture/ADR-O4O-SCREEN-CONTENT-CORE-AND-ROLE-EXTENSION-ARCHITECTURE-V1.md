@@ -47,7 +47,7 @@
 
 ```text
 [제작 — 매장 소유]
- web-kpa-society/TabletScreenSetManager (빌더 UI, KPA 카피/3단계/템플릿5)
+ web-pharmacy-business/TabletScreenSetManager (빌더 UI, KPA 카피/3단계/템플릿5)
    → PUT /store/screen-sets/:id/blocks   (full-replace, blocks=jsonb config)
    → POST /store/screen-sets/preview     (미저장 draft resolve, DB write 0)
         블록 8종: idle_media·content_list·product_list·product_content·

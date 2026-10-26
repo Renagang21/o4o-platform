@@ -228,5 +228,5 @@ export interface LmsHttpClient {
 - Scope guard 설계: [LMS-SCOPE-GUARD.md](LMS-SCOPE-GUARD.md)
 - 현 패키지: [packages/lms-client/](../../packages/lms-client/)
 - 서비스별 lms.ts:
-  - [services/web-kpa-society/src/api/lms.ts](../../services/web-kpa-society/src/api/lms.ts)
+  - [services/web-pharmacy-business/src/api/lms.ts](../../services/web-pharmacy-business/src/api/lms.ts)
   - [services/web-k-cosmetics/src/api/lms.ts](../../services/web-k-cosmetics/src/api/lms.ts)

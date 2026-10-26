@@ -301,9 +301,9 @@ function runLint() {
  * type-check 직전에 빌드한다. dist 가 없거나 stale 하면 소스에 export 가 멀쩡히 있어도
  * 소비처에서 TS2459(declares locally, but it is not exported) + 그 여파의 TS7006(implicit any)
  * 가 발생한다. 실제 사례: `@o4o/content-editor` 의 `LlmAssistPanel` 을
- * `@o4o/tablet-screen-set-editor` 가 import → web-kpa-society · web-neture type-check 실패.
+ * `@o4o/tablet-screen-set-editor` 가 import → web-pharmacy-business · web-neture type-check 실패.
  *
- * - 참조 경로: web-kpa-society · web-pharmacy-hub 는 tsconfig paths 로,
+ * - 참조 경로: web-pharmacy-business · web-pharmacy-hub 는 tsconfig paths 로,
  *   web-neture · tablet-screen-set-editor 는 package.json "types" 로 dist 를 가리킨다.
  * - 위 `packages` 목록과 달리 `npx tsc` 로 빌드할 수 없다(tsup 기반)므로 자체 build script 를 쓴다.
  * - 루트 `pnpm run build:packages` 체인에는 이미 포함되어 CI 는 영향을 받지 않는다.
@@ -412,7 +412,7 @@ function runTypeCheckFrontend() {
   // Type check frontend apps only (skip api-server)
 
   // 'ecommerce' dead entry 제거, 자동 탐색으로 전환.
-  // 과거에는 services/ 가 web-kpa-society 1개만 검사해 나머지 운영 서비스가 전부 빠져 있었다.
+  // 과거에는 services/ 가 web-pharmacy-business 1개만 검사해 나머지 운영 서비스가 전부 빠져 있었다.
   const targets = [
     ...discoverWorkspaces('apps').filter((rel) => rel !== 'apps/api-server'),
     ...discoverWorkspaces('services'),

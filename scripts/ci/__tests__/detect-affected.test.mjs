@@ -31,7 +31,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -1070,7 +1070,7 @@ test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency
 /**
  * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 단계 6 — §23 의 반대 방향(약국 앱 한정).
  *
- * 단계 4-a 에서 옛 KPA 화면을 지운 뒤에도 `services/web-kpa-society/package.json` 에
+ * 단계 4-a 에서 옛 KPA 화면을 지운 뒤에도 `services/web-pharmacy-business/package.json` 에
  * `@o4o/lms-ui` · `@o4o/lms-client` 등 9개 선언이 남아, Lecture 전용 변경(42dddc91b,
  * `packages/lms-ui`)이 약국 앱을 함께 배포했다. 판정기는 선언 graph 를 정본으로 보므로
  * 쓰지 않는 선언을 남기지 않는 것으로 막는다. 예외 목록은 두지 않는다.
@@ -1117,8 +1117,8 @@ test('§23c. Lecture 전용 package 변경은 약국 앱을 배포하지 않고,
     ])),
     ['lecture'],
   );
-  assert.equal(webOf(['M\tservices/web-kpa-society/src/App.tsx']).services['kpa-society'], true);
-  assert.equal(webOf(['M\tservices/web-kpa-society/package.json']).services['kpa-society'], true);
+  assert.equal(webOf(['M\tservices/web-pharmacy-business/src/App.tsx']).services['kpa-society'], true);
+  assert.equal(webOf(['M\tservices/web-pharmacy-business/package.json']).services['kpa-society'], true);
   for (const pkg of ['@o4o/shared-space-ui', '@o4o/auth-react', '@o4o/store-ui-core']) {
     assert.ok(consumersOf(pkg).includes('kpa-society'), `전제: 약국 앱은 ${pkg} 를 쓴다`);
     const v = webOf([`M\t${graph.byName.get(pkg).dir}/src/index.ts`]);
@@ -1306,4 +1306,31 @@ test('J18. 정기 full Jest workflow 가 존재하고 선별하지 않는다 (§
     assert.ok(!new RegExp(forbidden, 'i').test(wf.replace(/^\s*#.*$/gm, '')),
       `scheduled full Jest 는 ${forbidden} 과 연결하지 않는다`);
   }
+});
+
+
+test('pharmacy workspace move: old source is unreachable; new app remains deployable', () => {
+  assert.equal(existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/package.json')), false);
+  assert.equal(graph.byDir.get('services/web-pharmacy-business'), '@o4o/web-pharmacy-business');
+  const moved = parseFileList('R\tservices/web-kpa-society/src/App.tsx\nR\tservices/web-pharmacy-business/src/App.tsx');
+  const web = classifyWebDeploy(moved, graph);
+  assert.deepEqual(onOf(web), ['kpa-society']);
+  assert.equal(web.fallback, false);
+  assert.equal(classifyApiDeploy(moved, graph).api_deploy_affected, false);
+  const tracked = spawnSync('git', ['ls-files', '-z', '--', '**/Dockerfile', 'Dockerfile'], { cwd: REPO_ROOT, encoding: 'utf8' });
+  assert.equal(tracked.status, 0);
+  for (const file of tracked.stdout.split('\0').filter((p) => /(^|\/)Dockerfile$/.test(p))) {
+    const docker = readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    assert.ok(!docker.includes('services/web-kpa-society/'), file);
+  }
+  const deploy = readFileSync(path.join(REPO_ROOT, '.github/workflows/deploy-web-services.yml'), 'utf8');
+  assert.ok(!deploy.includes('services/web-kpa-society/'));
+  assert.ok(deploy.includes('services/web-pharmacy-business/Dockerfile'));
+});
+
+test('pharmacy workspace move does not mask unknown workspaces or API changes', () => {
+  const unknown = webOf(['M\tservices/web-unknown-new-app/src/App.tsx']);
+  assert.ok(Object.values(unknown.services).every(Boolean));
+  assert.equal(classifyApiDeploy(parseFileList('M\tservices/web-unknown-new-app/src/App.tsx'), graph).api_deploy_affected, true);
+  assert.equal(classifyApiDeploy(parseFileList('D\tservices/web-kpa-society/src/App.tsx\nM\tapps/api-server/src/main.ts'), graph).api_deploy_affected, true);
 });

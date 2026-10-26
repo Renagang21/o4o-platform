@@ -79,3 +79,10 @@ Cloud Shell에는 gcloud CLI가 제공된다. 프로젝트를 위 값으로 지�
 ## 환경 준비만으로 해결되지 않는 것
 
 `kpa-society` 키는 DB·JWT·membership·역할·콘텐츠 범위에 연결돼 있다. 사업 이름으로 일괄 치환하거나 새 사업별 서비스 키를 만들지 않는다. 기존 약국 사업 독립 WO의 D1/D5에 따라 공통 계정 `neture`와 `semi_franchises` 사업 원장으로 정렬하는 전환 설계가 먼저 필요하다. 데이터 건수·법적 보존·기존 세션·API 소비처를 조사해 migration/데이터 정리 대상을 구체화하고 승인 범위를 확인한다.
+
+
+## 확인된 접근과 단계별 이름
+
+2026-10-26 GitHub WIF 실행 40262910814에서 두 약국 도메인이 기존 `kpa-society-web`까지 연결됨을 확인했다. 직접 셸의 outbound identity 부재와 기존 GitHub 배포 경로는 구분한다. 기존 두 프런트의 통제 배포 40261699942는 성공했다.
+
+앱 소스·package 기술명은 `web-pharmacy-business`로 전환한다. 실제 Cloud Run·이미지·배포 선택 키는 새 자원과 LB 전환 준비 전까지 기존 값을 사용한다. 상세 검증과 잔여 권한은 [현재 WO](../work-orders/WO-O4O-PHARMACY-RESIDUE-SAFE-CLEANUP-V1.md)의 연속 Phase를 따른다. regional serverless NEG 권한은 `compute.regionNetworkEndpointGroups.*`이며 zonal 권한으로 대신 판정하지 않는다. 프로젝트 testIamPermissions 결과의 미확인은 리소스 조건부 권한까지 없다는 확정 판정이 아니다.

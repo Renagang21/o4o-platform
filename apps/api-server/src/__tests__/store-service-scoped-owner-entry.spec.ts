@@ -150,7 +150,7 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
 });
 
 describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 경로는 보존', () => {
-  const kpa = read('services/web-kpa-society/src/App.tsx');
+  const kpa = read('services/web-pharmacy-business/src/App.tsx');
 
   /** 한 줄 또는 여러 줄에 걸친 <Route path=P ...> 선언의 element 영역 */
   const routeDecl = (src: string, pathAttr: string) => {
@@ -186,7 +186,7 @@ describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 �
 });
 
 describe('KPA 앱 — 매장 handoff는 서비스 경로로, 활성화 flag 없음', () => {
-  const kpa = read('services/web-kpa-society/src/App.tsx');
+  const kpa = read('services/web-pharmacy-business/src/App.tsx');
   it('handoff api 는 toKpaScopedStorePath 를 거친다', () => {
     expect(kpa).toContain('const scopedPath = toKpaScopedStorePath(returnPath);');
     expect(kpa).toContain('kpaStoreServicesApi.resolveWorkspaceEntryUrl(scopedPath)');

@@ -730,7 +730,7 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
 
 
-새 호스트 `pharmacy.neture.co.kr` = `web-kpa-society`(serviceKey `kpa-society`).
+새 호스트 `pharmacy.neture.co.kr` = `web-pharmacy-business`(serviceKey `kpa-society`).
 
 | PH 콘텐츠 | 현재 (PH) | 새 호스트 대응 | 권장 위치 · 필요한 변경 |
 |---|---|---|---|
@@ -796,7 +796,7 @@ pathRules:
 | `/foreign-visitor/affiliate/:shortCode` | 존재(공개) | shortCode 전역 조회 → 같은 제휴 매장 | 그대로 |
 
 판정: **차단 격차 없음**. 아래 1 은 **해당 경로의 302 전환 전 해결 조건**이며 이 PR 에서 해결했다. 2~4 는 1단계 302 → 검증 → 301 전환 전에 웹 서비스 정비 트랙이 확인 · 정리할 조건(이 PR 범위 밖, 기존 KPA 화면 동작):
-1. ~~제휴 페이지 "매장 안내 보기" 가 은퇴한 `/store/{slug}` 로 연결돼 404~~ → **해결(2026-10-06)**: 매장 공개 storefront 는 `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` 로 폐지된 기능이므로 링크를 제거하고 PH 화면과 같은 안내 문구(상품별 QR 안내 · 직원 문의)만 표시(`services/web-kpa-society/.../ForeignVisitorAffiliatePublicLandingPage.tsx`).
+1. ~~제휴 페이지 "매장 안내 보기" 가 은퇴한 `/store/{slug}` 로 연결돼 404~~ → **해결(2026-10-06)**: 매장 공개 storefront 는 `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` 로 폐지된 기능이므로 링크를 제거하고 PH 화면과 같은 안내 문구(상품별 QR 안내 · 직원 문의)만 표시(`services/web-pharmacy-business/.../ForeignVisitorAffiliatePublicLandingPage.tsx`).
 2. product QR "제품 보기" 가 B2C 비공개 상품이면 404(상품 요약 · 설명서는 화면 안에 표시됨, §16-2).
 3. link QR 은 자동 이동 대신 안내 카드 표시 · 대상 콘텐츠가 삭제된 page QR 은 `/content/:id` 로 떨어짐 — PH 와 동작 차이.
 4. 다국어 · 제휴 화면의 서비스명 표기가 "KPA-Society" — Neture 약국 기준 문구 정비.

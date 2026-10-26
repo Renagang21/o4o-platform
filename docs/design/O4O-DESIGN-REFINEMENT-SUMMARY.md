@@ -122,9 +122,9 @@
 
 | 리스트 | 카드 구성 | 파일 |
 |--------|----------|------|
-| Forum | 제목(고정+댓글), 태그, 작성자·날짜+조회·좋아요·댓글 | `web-kpa-society/.../ForumListPage.tsx` |
-| Content 문서 | 제목, 작성자·날짜+조회·좋아요 | `web-kpa-society/.../ContentListPage.tsx` |
-| Content 코스 | 제목, 날짜·분량+상태배지 | `web-kpa-society/.../ContentListPage.tsx` |
+| Forum | 제목(고정+댓글), 태그, 작성자·날짜+조회·좋아요·댓글 | `web-pharmacy-business/.../ForumListPage.tsx` |
+| Content 문서 | 제목, 작성자·날짜+조회·좋아요 | `web-pharmacy-business/.../ContentListPage.tsx` |
+| Content 코스 | 제목, 날짜·분량+상태배지 | `web-pharmacy-business/.../ContentListPage.tsx` |
 | Resources | 파일배지+제목, 등록자·날짜·조회, 가져가기 버튼 | `shared-space-ui/.../ResourcesHubTemplate.tsx` |
 
 ---

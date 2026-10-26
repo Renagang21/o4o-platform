@@ -233,7 +233,7 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 로컬 /store/* 화면은 제거됐고 전부 내 매장으로 이전한다.
   it('pharmacy 의 /store 트리는 로컬 화면 없이 내 매장 handoff 하나다', () => {
-    const app = readRepo('services/web-kpa-society/src/App.tsx');
+    const app = readRepo('services/web-pharmacy-business/src/App.tsx');
     expect(app).not.toContain('<Route path="/store/workspace"');
     expect(app).toContain('<Route path="/store/*" element={<KpaUnifiedStoreHandoff />} />');
   });
@@ -249,7 +249,7 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
 });
 
 describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 보존)', () => {
-  const kpa = readRepo('services/web-kpa-society/src/App.tsx');
+  const kpa = readRepo('services/web-pharmacy-business/src/App.tsx');
 
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 로컬 매장 화면 · PharmacyGuard 제거 → handoff 는 무조건이다.
   it('pharmacy 는 /store · /hub · /store-hub 를 조건 없이 내 매장으로 이전한다', () => {
@@ -263,14 +263,14 @@ describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 
 
   it('송출 화면(TV)은 내 매장의 chrome-free 최상위 route 로 간다 — 로컬 재생 화면 없음', () => {
     expect(kpa).not.toContain('SignagePlaybackPage');
-    expect(readRepo('services/web-kpa-society/src/lib/unifiedStoreScope.ts')).toContain(String.raw`signage\/play`);
+    expect(readRepo('services/web-pharmacy-business/src/lib/unifiedStoreScope.ts')).toContain(String.raw`signage\/play`);
     expect(readRepo('services/web-store/src/App.tsx')).toContain('${S}/marketing/signage/play/:playlistId');
   });
 
   // handoff 가 무조건이 되어 활성화 build 입력은 Dockerfile · 배포 workflow · 타입 선언에서 제거됐다.
   it('handoff 활성화 build 입력(VITE_UNIFIED_STORE_HANDOFF)이 남아 있지 않다', () => {
-    expect(readRepo('services/web-kpa-society/Dockerfile')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
-    expect(readRepo('services/web-kpa-society/src/vite-env.d.ts')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('services/web-pharmacy-business/Dockerfile')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
+    expect(readRepo('services/web-pharmacy-business/src/vite-env.d.ts')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
     expect(readRepo('.github/workflows/deploy-web-services.yml')).not.toContain('VITE_UNIFIED_STORE_HANDOFF');
   });
 

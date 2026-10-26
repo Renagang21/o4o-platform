@@ -41,7 +41,7 @@ const QR_ENTITY = 'apps/api-server/src/routes/platform/entities/store-qr-code.en
 const CONTENT_SOURCE_MIGRATION =
   'apps/api-server/src/database/migrations/20270327000000-AddStoreQrContentSource.ts';
 const SHARED_VIEWER = 'packages/tablet-kiosk-core/src/PublicScreenSetViewer.tsx';
-const KPA_LANDING = 'services/web-kpa-society/src/pages/qr/QrLandingPage.tsx';
+const KPA_LANDING = 'services/web-pharmacy-business/src/pages/qr/QrLandingPage.tsx';
 
 /** 분류 SQL 은 컬럼 이름만 받는 순수 문자열 생성기다. */
 const classifySql = () =>

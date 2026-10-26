@@ -185,10 +185,10 @@ describe('Lecture 서비스 wrapper — 카드형 목록 (KPA/KCos 목록 화면
 
   it('KPA / K-Cosmetics 의 LMS 목록·강사 프로필 화면은 삭제되었다 (§14)', () => {
     for (const rel of [
-      'services/web-kpa-society/src/pages/courses',
-      'services/web-kpa-society/src/pages/instructors',
-      'services/web-kpa-society/src/pages/lms',
-      'services/web-kpa-society/src/components/education',
+      'services/web-pharmacy-business/src/pages/courses',
+      'services/web-pharmacy-business/src/pages/instructors',
+      'services/web-pharmacy-business/src/pages/lms',
+      'services/web-pharmacy-business/src/components/education',
       'services/web-k-cosmetics/src/pages/lms',
     ]) {
       expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);

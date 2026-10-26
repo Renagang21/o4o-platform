@@ -38,11 +38,11 @@ const staged = (lines: string[]) => ({ O4O_STAGED_NAME_STATUS: lines.join('\n') 
 
 /** 431526533 사고 재현용 — 다른 세션이 삭제로 stage 했던 KPA 파일 5건 */
 const KPA_FOREIGN_DELETIONS = [
-  'D\tservices/web-kpa-society/src/components/ServiceBanner.tsx',
-  'D\tservices/web-kpa-society/src/components/platform/PlatformFooter.tsx',
-  'D\tservices/web-kpa-society/src/components/platform/PlatformHeader.tsx',
-  'D\tservices/web-kpa-society/src/components/platform/ServiceCard.tsx',
-  'D\tservices/web-kpa-society/src/pages/mypage/AnnualReportFormPage.tsx',
+  'D\tservices/web-pharmacy-business/src/components/ServiceBanner.tsx',
+  'D\tservices/web-pharmacy-business/src/components/platform/PlatformFooter.tsx',
+  'D\tservices/web-pharmacy-business/src/components/platform/PlatformHeader.tsx',
+  'D\tservices/web-pharmacy-business/src/components/platform/ServiceCard.tsx',
+  'D\tservices/web-pharmacy-business/src/pages/mypage/AnnualReportFormPage.tsx',
 ];
 
 describe('§18 staged scope guard — 내 범위만 커밋한다', () => {
@@ -68,10 +68,10 @@ describe('§18 staged scope guard — 내 범위만 커밋한다', () => {
     const r = runNode(
       SCOPE_GUARD,
       ['docs/checks'],
-      staged(['A\tdocs/checks/SOME-CHECK.md', 'M\tservices/web-kpa-society/src/App.tsx']),
+      staged(['A\tdocs/checks/SOME-CHECK.md', 'M\tservices/web-pharmacy-business/src/App.tsx']),
     );
     expect(r.status).toBe(1);
-    expect(r.stderr).toContain('services/web-kpa-society/src/App.tsx');
+    expect(r.stderr).toContain('services/web-pharmacy-business/src/App.tsx');
   });
 
   it('범위 밖 staged 삭제는 실패 + 삭제라는 사실을 경고한다', () => {
@@ -116,7 +116,7 @@ describe('§18 staged scope guard — 내 범위만 커밋한다', () => {
 
 describe('§18 literal consumer census — raw-source 소비처를 놓치지 않는다', () => {
   it('수정 대상 파일 경로로 검색하면 raw-source spec 이 소비처로 잡힌다(§20 a0f8cc48c 재현)', () => {
-    const r = runNode(LITERAL_CENSUS, ['--source', 'services/web-kpa-society/src/App.tsx']);
+    const r = runNode(LITERAL_CENSUS, ['--source', 'services/web-pharmacy-business/src/App.tsx']);
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('RAW_SOURCE_CONTRACT');
     // 이 spec 자신이 navigation.ts 를 readFileSync 하는 소비처다.

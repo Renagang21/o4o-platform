@@ -62,6 +62,6 @@ describe('§5 view — StoreChannelsView 자산 통제 축은 optional 이다', 
     //   View 본체(store-ui-core) 정리는 후속 후보다(공통 모듈 — 이번 범위 밖).
     expect(existsSync(join(REPO, 'services/web-store/src/services/kcos/pages/store/StoreChannelsPage.tsx'))).toBe(false);
     // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 매장 화면은 제거됐다(매장 = store.neture.co.kr).
-    expect(existsSync(join(REPO, 'services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx'))).toBe(false);
+    expect(existsSync(join(REPO, 'services/web-pharmacy-business/src/pages/pharmacy/StoreChannelsPage.tsx'))).toBe(false);
   });
 });

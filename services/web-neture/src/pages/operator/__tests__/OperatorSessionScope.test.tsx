@@ -9,8 +9,8 @@ vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: vi.fn() }));
 vi.mock('@o4o/content-editor', () => ({ RichTextEditor: () => <div>본문 편집기</div> }));
 import NeturePage from '../OperatorSemiFranchisePage';
 import NetureEditor from '../SemiFranchiseContentFormPage';
-import { PharmacyOperatorPage as PharmacyPage, PharmacyOperatorContentPage as PharmacyEditor } from '../../../../../web-kpa-society/src/pages/business/PharmacyOperatorPages';
-vi.mock('../../../../../web-kpa-society/src/contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }), authClient: { api: mocks } }));
+import { PharmacyOperatorPage as PharmacyPage, PharmacyOperatorContentPage as PharmacyEditor } from '../../../../../web-pharmacy-business/src/pages/business/PharmacyOperatorPages';
+vi.mock('../../../../../web-pharmacy-business/src/contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }), authClient: { api: mocks } }));
 const envelope = (data: unknown) => ({ data: { success: true, data } });
 const sf = { key: 'pharmacy', name: '담당 사업 A', status: 'active', community_key: 'business:pharmacy' };
 describe.each([['Neture compatibility', NeturePage, NetureEditor], ['Pharmacy', PharmacyPage, PharmacyEditor]] as const)('%s operator account scope', (_label, Page, Editor) => {

@@ -8,7 +8,7 @@
  *   npx vitest run --config services/web-hospital-pharmacy/vitest.config.mjs
  *
  * 루트에 이미 설치된 vitest 를 그대로 쓴다 — 이 서비스에 테스트 의존성을 추가하지 않는다
- * (package.json · lockfile 무변경, web-kpa-society 와 같은 방식). 테스트는 src 밖(tests/)에 두어
+ * (package.json · lockfile 무변경, web-pharmacy-business 와 같은 방식). 테스트는 src 밖(tests/)에 두어
  * 서비스 `tsc -b`·Docker 빌드에 섞이지 않게 한다.
  */
 import { defineConfig } from 'vitest/config';

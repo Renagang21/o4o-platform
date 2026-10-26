@@ -19,9 +19,9 @@ const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf-8');
 const stripComments = (src: string) =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-const KPA_HOME = 'services/web-kpa-society/src/pages/CommunityHomePage.tsx';
-const KPA_HEADER = 'services/web-kpa-society/src/components/KpaGlobalHeader.tsx';
-const KPA_FOOTER = 'services/web-kpa-society/src/components/Footer.tsx';
+const KPA_HOME = 'services/web-pharmacy-business/src/pages/CommunityHomePage.tsx';
+const KPA_HEADER = 'services/web-pharmacy-business/src/components/KpaGlobalHeader.tsx';
+const KPA_FOOTER = 'services/web-pharmacy-business/src/components/Footer.tsx';
 
 // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 커뮤니티 홈(CommunityHomePage)은 제거됐다 — pharmacy 홈은 회원 홈이다.
 //   공통 컨테이너 CommunityServiceHome 자체의 계약은 아래 §4 service-neutral 검사가 지킨다.
@@ -92,15 +92,15 @@ describe('공통 부품 service-neutral (§4)', () => {
 
 describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
   const GONE = [
-    'services/web-kpa-society/src/contexts/OrganizationContext.tsx',
-    'services/web-kpa-society/src/types/pharmacist.ts',
-    'services/web-kpa-society/src/components/ServiceBanner.tsx',
-    'services/web-kpa-society/src/components/platform/PlatformHeader.tsx',
-    'services/web-kpa-society/src/components/platform/PlatformFooter.tsx',
-    'services/web-kpa-society/src/components/platform/ServiceCard.tsx',
-    'services/web-kpa-society/src/pages/mypage/AnnualReportFormPage.tsx',
+    'services/web-pharmacy-business/src/contexts/OrganizationContext.tsx',
+    'services/web-pharmacy-business/src/types/pharmacist.ts',
+    'services/web-pharmacy-business/src/components/ServiceBanner.tsx',
+    'services/web-pharmacy-business/src/components/platform/PlatformHeader.tsx',
+    'services/web-pharmacy-business/src/components/platform/PlatformFooter.tsx',
+    'services/web-pharmacy-business/src/components/platform/ServiceCard.tsx',
+    'services/web-pharmacy-business/src/pages/mypage/AnnualReportFormPage.tsx',
     // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 안내 페이지 layout 도 함께 제거됐다.
-    'services/web-kpa-society/src/components/platform/InfoPageLayout.tsx',
+    'services/web-pharmacy-business/src/components/platform/InfoPageLayout.tsx',
   ];
 
   for (const p of GONE) {
@@ -110,6 +110,6 @@ describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
   }
 
   it('KPA App 에 OrganizationProvider 가 되살아나지 않는다', () => {
-    expect(read('services/web-kpa-society/src/App.tsx')).not.toContain('OrganizationProvider');
+    expect(read('services/web-pharmacy-business/src/App.tsx')).not.toContain('OrganizationProvider');
   });
 });

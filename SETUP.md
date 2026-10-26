@@ -322,7 +322,7 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 | `pnpm install --frozen-lockfile` + `build:packages` | lockfile drift = 실패 |
 | `type-check:frontend` · `typecheck:app-store-packages` · api-server `type-check` | api-server 는 사전 빌드 후 실행 (아래 주의) |
 | ESLint ratchet · 정적 guard | unsafe route · TypeORM entity registry · bootstrap/migration 계약 · `console.log`(`apps/**`) |
-| Vitest | admin-dashboard · 공통 packages · 서비스별(web-neture · web-kpa-society · web-kpa-branch 등) — 각 `vitest.config.mjs` 를 루트에서 실행 |
+| Vitest | admin-dashboard · 공통 packages · 서비스별(web-neture · web-pharmacy-business · web-kpa-branch 등) — 각 `vitest.config.mjs` 를 루트에서 실행 |
 | Jest | 일부 packages · api-server (3 shard, `@o4o/api-server^...` 사전 빌드) |
 | 앱 빌드 | 변경 범위에 따른 admin/영향 있는 web production build. 실제 실행·생략 범위는 CI affected 판정에 따르며 배포 Docker 빌드는 별도 |
 
@@ -443,7 +443,7 @@ netstat -ano | findstr :5432    :: 로컬 PostgreSQL
 netstat -ano | findstr :5442    :: Cloud SQL Auth Proxy
 netstat -ano | findstr :5173
 netstat -ano | findstr :3002    :: 로컬 API
-netstat -ano | findstr :3000    :: web-neture (web-kpa-society 도 3000 — 동시에 하나만)
+netstat -ano | findstr :3000    :: web-neture (web-pharmacy-business 도 3000 — 동시에 하나만)
 taskkill /PID <PID> /F
 ```
 로컬 PostgreSQL이 `5432`를 점유하므로 프록시는 `5442`를 사용합니다.

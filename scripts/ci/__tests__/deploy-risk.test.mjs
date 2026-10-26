@@ -343,3 +343,18 @@ describe('D. shadow would-be 결정', () => {
     assert.ok(s.services.every((x) => 'serving_sha' in x && 'would_be' in x));
   });
 });
+
+
+describe('pharmacy app source move deployment boundaries', () => {
+  it('attributes moved auth runtime to pharmacy only and preserves LEVEL_3', () => {
+    const r = risk(['R', 'services/web-kpa-society/src/contexts/AuthContext.tsx'], ['R', 'services/web-pharmacy-business/src/contexts/AuthContext.tsx']);
+    assert.deepEqual(r.affected_services, ['kpa-society']);
+    assert.equal(r.risk_level, LEVEL_3);
+    assert.equal(r.services.api.affected, false);
+    assert.equal(r.services.admin.affected, false);
+  });
+  it('does not hide real API runtime changes alongside the move', () => {
+    const r = risk(['R', 'services/web-kpa-society/src/App.tsx'], ['R', 'services/web-pharmacy-business/src/App.tsx'], 'apps/api-server/src/main.ts');
+    assert.deepEqual(r.affected_services, ['api', 'kpa-society']);
+  });
+});
