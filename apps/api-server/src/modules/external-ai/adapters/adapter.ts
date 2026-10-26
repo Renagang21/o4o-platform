@@ -12,6 +12,8 @@ export interface DraftInput {
   title?: string;
   language: string;
   productId?: string;
+  productSource?: "local" | "listing";
+  contentKey?: string;
   contentId?: string;
   expectedRevision?: string;
 }

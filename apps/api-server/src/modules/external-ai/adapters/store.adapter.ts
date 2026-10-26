@@ -15,8 +15,13 @@ import {
   type LibraryFailure,
 } from "../../../services/store/store-library.service.js";
 import { listHandledProducts } from "../../../services/store/store-handled-products.service.js";
-import { ExternalAiError, type Workspace } from "../contracts.js";
+import {
+  ExternalAiError,
+  productContentTools,
+  type Workspace,
+} from "../contracts.js";
 import { tokenHash } from "../auth/oauth-provider.js";
+import { StoreProductContentAdapter } from "./store-product-content.adapter.js";
 import {
   assertAccount,
   assertTerms,
@@ -28,6 +33,7 @@ import {
 } from "./adapter.js";
 
 export class StoreAdapter {
+  private readonly productContents = new StoreProductContentAdapter();
   constructor(readonly db: DataSource) {}
   async workspaces(
     userId: string,
@@ -58,6 +64,7 @@ export class StoreAdapter {
         kind: "store",
         writable: true,
         destinations: ["store_document"],
+        productContentTools: [...productContentTools],
         products: true,
       });
     }
@@ -139,6 +146,7 @@ export class StoreAdapter {
       return {
         product: local,
         source: "store_local",
+        ...(await this.productContents.context(db, id, "local", productId)),
         notice:
           "매장이 입력한 자료이며 표준 상품 사실로 검증된 정보가 아닙니다.",
       };
@@ -155,6 +163,7 @@ export class StoreAdapter {
     return {
       product: listing,
       descriptions,
+      ...(await this.productContents.context(db, id, "listing", productId)),
       notice:
         "상품 정본과 매장 입력 내용은 출처가 다릅니다. 없는 사실을 만들지 마세요.",
     };
@@ -191,6 +200,8 @@ export class StoreAdapter {
     contentId: string,
     lock = false,
   ) {
+    if (destination === "store_product_content")
+      return this.productContents.content(db, id, contentId, lock);
     if (destination !== "store_document")
       throw new ExternalAiError("DESTINATION_FORBIDDEN", 403);
     const [row] = await db.query(
@@ -213,6 +224,8 @@ export class StoreAdapter {
     };
   }
   async save(db: EntityManager, userId: string, id: string, input: DraftInput) {
+    if (input.destination === "store_product_content")
+      return this.productContents.save(db, userId, id, input);
     if (input.destination !== "store_document")
       throw new ExternalAiError("DESTINATION_FORBIDDEN", 403);
     const content = cleanBody(input),

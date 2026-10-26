@@ -4,8 +4,12 @@ import { useUnifiedStore } from "../contexts/StoreContext";
 import { StoreGate } from "../components/StoreGate";
 
 /** A deep link selects only a store already authorized by the existing work-scope API. */
-export default function ExternalAiDraftEntry() {
-  const { id } = useParams();
+export default function ExternalAiDraftEntry({
+  productContent = false,
+}: {
+  productContent?: boolean;
+}) {
+  const { id, targetKind, targetId } = useParams();
   const [params] = useSearchParams();
   const target = params.get("organizationId");
   const store = useUnifiedStore();
@@ -26,7 +30,13 @@ export default function ExternalAiDraftEntry() {
     );
   if (store.status === "loading")
     return <p role="status">약국 이용 권한을 확인하고 있습니다…</p>;
-  if (!allowed || !target || !id)
+  if (
+    !allowed ||
+    !target ||
+    !id ||
+    (productContent &&
+      (!targetId || !["local", "listing"].includes(targetKind ?? "")))
+  )
     return (
       <p role="alert">
         이 약국의 자료를 열 수 없습니다. 내 매장 이용 권한을 확인해 주세요.
@@ -34,10 +44,8 @@ export default function ExternalAiDraftEntry() {
     );
   if (store.status !== "ready" || store.organizationId !== target)
     return <p role="status">선택한 약국으로 이동하고 있습니다…</p>;
-  return (
-    <Navigate
-      replace
-      to={`/store/library/production-materials/${encodeURIComponent(id)}/edit`}
-    />
-  );
+  const destination = productContent
+    ? `/store/products/multilingual/${targetKind}/${encodeURIComponent(targetId!)}?${new URLSearchParams({ groupId: id, locale: params.get("locale") ?? "ko" })}`
+    : `/store/library/production-materials/${encodeURIComponent(id)}/edit`;
+  return <Navigate replace to={destination} />;
 }

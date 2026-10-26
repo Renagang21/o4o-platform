@@ -41,6 +41,17 @@ beforeEach(() => {
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockResolvedValue(undefined) } });
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+it('opens the language named by an external AI deep link without saving or publishing', async () => {
+  api.get.mockResolvedValue(group({ pages: [localePage('ko', 'Korean draft'), localePage('en', 'English draft')] }));
+  editor('/store/products/multilingual/local/local-a?groupId=group&locale=en');
+  await waitFor(() => expect((screen.getByLabelText('언어별 제목') as HTMLInputElement).value).toBe('English draft'));
+  expect(api.page).not.toHaveBeenCalled(); expect(api.key).not.toHaveBeenCalled();
+});
+it('falls back to the group default for an unavailable requested language', async () => {
+  api.get.mockResolvedValue(group({ pages: [localePage('ko', 'Korean draft')] }));
+  editor('/store/products/multilingual/local/local-a?groupId=group&locale=ar');
+  await waitFor(() => expect((screen.getByLabelText('언어별 제목') as HTMLInputElement).value).toBe('Korean draft'));
+});
 async function openImport() { render(wrap(<HubMultilingualContentLibraryPage />)); fireEvent.click(await screen.findByRole('button', { name: '가져오기' })); await screen.findByLabelText('연결할 제품'); }
 it.each([
   ['Korean source authoring', 'ko', false],
