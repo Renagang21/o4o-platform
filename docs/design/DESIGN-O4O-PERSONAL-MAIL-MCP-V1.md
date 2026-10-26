@@ -35,6 +35,7 @@ worker는 DB lease와 항목 transaction으로 중복 실행을 막고, 실패 �
 - 기존 브라우저 인증의 `/api/personal-mail`: 설정 준비 상태, Gmail 연결 시작/완료, 네이버 앱 비밀번호 연결, 계정 조회/해제, 수집·발신처/규칙·작업·본문 조회, preview·승인·중단/재개.
 - Gmail은 전용 client 설정·state·PKCE·최소 메일 권한 검증을 사용한다. 브라우저 callback에서 코드를 바로 자격정보로 저장하지 않고 현재 O4O 사용자 세션으로 완료한다.
 - 네이버는 고정 `imap.naver.com:993`, TLS 인증서 검증·시간/크기 제한, 사용자 제공 앱 비밀번호로 연결한다. 임의 host/port 입력을 받지 않는다.
+- 네이버 앱 비밀번호는 [Identity 정본](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md)의 O4O 로그인 수단이 아니다. 기존 SMTP·API secret 입력과 같이 연결 전용 컴포넌트 한 곳을 legacy password 재유입 검사에서 구분하며, 공통 로그인 비밀번호 컴포넌트·계정 저장 경로와 섞지 않는다. 브라우저 영속 저장을 하지 않고 성공·실패 모두 입력을 비운다.
 - MCP 범위: 기존 `o4o:read`에 더해 `o4o:mail:read`, `o4o:mail:manage`, `o4o:mail:body`. manage/body는 mail:read를 요구한다. `o4o:draft:write`로 메일 실행은 불가하다.
 - 메일 계정 동의는 `mail:<accountId>`로 명시 선택한다. 기존 4종 콘텐츠 workspace·관리자 targets 계약을 확장하지 않는다. 기존 콘텐츠 도구는 콘텐츠 workspace에서만 작동한다.
 - 메일 도구는 계정/발신처/작업/선택 본문 조회, 규칙/일괄 작업 제안, 승인된 작업 재개·중단을 제공한다. 브라우저 확인 없이 정리나 향후 자동 규칙을 활성화하지 않는다.

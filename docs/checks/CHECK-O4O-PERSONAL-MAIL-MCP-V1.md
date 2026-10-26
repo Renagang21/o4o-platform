@@ -35,6 +35,8 @@ UI 시험 명령은 저장소 루트에서 `pnpm exec vitest run --config servic
 - PR #837의 P1/P2 리뷰를 반영했다. 자동 작업 실행 직전 규칙 ID·revision·action을 대조해 keep/동일 action의 revision 변경 후 옛 대기 작업을 취소하고, 별도 승인 cleanup은 실행되는 PG 시험을 추가했다. 수신함 발신처가 0개여도 기존 규칙에서 선택·keep 전환·재승인을 할 수 있는 UI 시험도 추가했다.
 - 재리뷰의 backlog·pool 지적도 반영했다. 자동 작업 50개가 있어도 새 규칙·cleanup preview가 가능하고, 사용자 제안 49개에서 복수 계정 동시 제안 시 하나만 50번째로 허용되는 PG 시험을 추가했다. pool 최대 연결 1개에서 동시 MCP 업무 조회·쓰기·본문 읽기가 정상 완료되는 별도 DataSource 시험도 통과했다. 실제 MCP endpoint·scope 검증은 기존 통합 시험을 함께 유지한다.
 - 최초 원격 CI는 신규 worker entry의 console.log 금지 검사에서 실패했다. 기존 worker와 같은 `process.stdout.write`로 정해진 CLI 도움말·집계만 출력하도록 수정했으며 해당 guard를 로컬 통과했다. 최종 원격 결과는 PR의 최신 SHA를 따른다.
+- 이후 API shard 1의 상세 로그 다운로드가 클라우드에서 차단돼 동일 묶음을 로컬 재현했다. `legacy-password-auth-retirement.spec.ts`가 네이버 앱 비밀번호 입력을 로그인 password로 분류하는 실패를 확인했다. 기존 SMTP 외부 credential과 같은 목적으로 `MailAccountConnections.tsx` 한 경로만 allowlist에 추가했다. O4O 로그인 경로·해시 저장·공통 PasswordInput 정책은 변경하지 않는다. 수정 후 해당 정적 계약과 기존 메일 UI의 비밀값 파기 시험을 확인한다.
+- 로컬 재현 묶음은 194 suites·3,407 tests PASS, 해당 guard 1 case만 실패, 26 suites·349 tests skip이었다. 수정 후 guard 48 tests PASS와 메일 화면 7 tests PASS를 별도 실행했다. 원격 실패 묶음을 한 번 재실행했지만 원인을 확인한 뒤 코드로 수정했으며, 최종 source의 CI 결과로 판정한다.
 - 첫 browser 실행의 Vite CJS 로딩 오류, fixture cwd 때문에 누락된 Tailwind 스타일, ‘완료 0’을 완료로 오인하던 assertion을 수정했다. 실제 앱의 스타일과 loopback API를 사용해 승인 응답·완료/건너뜀 건수·대기 0까지 재확인했다. 기존 CDN font stylesheet만 로컬 빈 CSS로 대체하고 외부 요청은 차단했다. 실제 계정 인증 시험은 아니다.
 - Neture의 기존 `tsc -b` node project 설정 오류는 범위 밖이다. 정식 `build`의 `tsc && vite build`를 통과했으며 잘못된 진단 명령이 생성한 자기 임시 산출물은 제거했다. 기존 Browserslist 갱신 안내·bundle 크기 경고를 신규 오류로 숨기거나 무관하게 수정하지 않았다.
 

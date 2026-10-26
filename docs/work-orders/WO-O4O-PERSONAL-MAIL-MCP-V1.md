@@ -44,4 +44,6 @@ PR #837 리뷰 후 자동 작업은 실행 직전 현재 규칙 ID·revision·ac
 
 재리뷰에서는 자동 backlog와 사용자 제안 한도를 분리하고 사용자 단위 lock으로 복수 계정 동시 요청을 제한했다. 메일 MCP의 내부 업무 서비스는 현재 transaction manager를 재사용한다. 자동 작업 50건이 있는 경우와 연결 1개인 풀에서 동시 조회·제안·본문 읽기를 추가 검증했다.
 
+전체 CI의 legacy password 재유입 검사와 네이버 앱 비밀번호 입력의 충돌도 로컬 재현했다. SMTP credential과 같은 외부 서비스 연결 입력으로 정확히 한 컴포넌트를 구분하며 O4O 로그인 정책·계정 축을 변경하지 않는다.
+
 push 전 최신 `origin/main`과 경로 충돌·migration 순서를 확인한다. 병합 전 작업 branch/worktree는 KEEP이며 main 병합·배포·운영 migration은 실행하지 않는다. 공개 운영 전에 제공자 승인·개인정보 고지, 전용 설정/키와 worker 스케줄, 실계정 연결·해제 검증을 검토한다.
