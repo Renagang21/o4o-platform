@@ -66,4 +66,12 @@ WORKTREE_DISPOSITION: `wo/user-ai-product-content` / `/workspace/o4o-wt/user-ai-
 
 `260eb9fbc1`의 전체 CI `40272034057`·CodeQL `40272034012`와 Codex code review는 성공/지적 없음이었으며 Sonar 실패는 별도로 수정했다. 수정 후 로컬 API 48·Store DOM 48·실제 PG/SDK 69건과 타입/lint가 다시 통과했다. 69건에는 독립 시나리오 병렬 실행·순차 한도 경계·응답 헤더 부재·감사 rollback 검증이 포함된다. 시험 DB 삭제 후 잔존 0을 확인했다. 최종 커밋의 외부 검사 결과는 PR 상태와 완료 보고에서 따로 확정한다.
 
+수정 source `39b05bba2f`의 Sonar check `121413699108`은 Quality Gate PASS, 신규 이슈 0·주석 0·Security Hotspots 0·신규 중복 0%였다. 검사 제외나 이슈 수용 처리로 통과시킨 결과가 아니다. 이후 main을 반영한 최종 HEAD의 검사도 따로 확인한다.
+
+검토 중 main에 [PR #830](https://github.com/Renagang21/o4o-platform/pull/830)의 상담자료 저작 기능 `68268d19f6`가 반영됐다. 자기 변경 21개 경로와 직접 충돌은 없지만 공통 sanitizer·ProductDescriptionAssist·ProductEvidencePicker가 바뀌어 main을 자기 branch에 정상 merge했다. 자기 기능 파일의 내용 보존과 새 main 포함을 확인했다. main branch에는 쓰지 않았다.
+
+새 저작 기능은 기존 `kpa_store_contents.content_json.productConsultation`과 상품 연결 원장을 사용한다. 이번 MCP 도구의 소비자용 `store_multilingual_product_content_groups/pages`와 다른 목적이다. 새로운 상담자료 원장이나 별도 제작 기반을 만들지 않는다. 전문/직원용 작성 맥락을 MCP로 확장할 때는 기존 `saveConsultationContent` 계약을 재사용할 대상이며 이번 소비자용 도구로 자동 전환하지 않는다. [저작 안내](../guides/products/O4O-STORE-PRODUCT-CONSULTATION-AUTHORING-V1.md)를 참조한다. 기존 strict sanitizer 함수는 그대로이고 추가 rich sanitizer는 별도 저작 계약이다. 편집 도움 컴포넌트의 새 controlled props는 optional이어서 기존 호출을 유지한다.
+
+통합 후 API 6 suites / 58 tests(기존 48 + 상담자료 실제 PG 10), Store 6 files / 61 tests, MCP 실제 PG/SDK 69건과 API/웹 타입 검사가 통과했다. 새 PG 시험의 전용 DB 이름을 처음 잘못 지정한 실행은 변경 전 안전 가드에서 중단됐으며 PASS로 계산하지 않았다. 해당 시험이 요구하는 loopback `consultation_review` DB를 자기 container에 생성해 재실행했다. 종료 후 시험 schema와 두 시험 DB의 잔존 0을 확인했다. 새 main의 업무 메타 계약과 기존 MCP 소비자 페이지 저장을 서로 덮어쓰지 않는다.
+
 이번 종료점은 병합 직전이다. main merge·auto-merge·운영 배포 dispatch·운영 데이터 시험은 실행하지 않는다. 실제 ChatGPT·desktop/mobile browser·MFDS 원천 검증의 위 미완료 범위도 유지한다. 사용자 지시 없이 이 제한을 배포 승인으로 확대하지 않는다.

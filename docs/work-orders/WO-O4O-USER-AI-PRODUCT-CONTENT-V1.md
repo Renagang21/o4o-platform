@@ -5,6 +5,7 @@
 > **개발 착수 기준**: main `7e9c1c99d661867b05e6fc95cb10180f64604043` · push 전 대조 main `792b3d0f6e12de0d50b5112376027fcd0b4fd512`(추가 운영 파일 5개, 자기 변경 경로와 중첩 없음)
 > **작업 공간**: `wo/user-ai-product-content`. 개발 담당은 로컬 검증·commit·push 후 통합 담당에게 인계한다.
 > **추가 사용자 지시**: 2026-10-26 “main 병합 전까지 진행” — 같은 branch의 PR·CI·리뷰를 준비하고 main 병합·auto-merge·배포는 실행하지 않는다.
+> **병합 전 재정렬**: main `68268d19f6`(PR #830)의 상담자료 저작 기능을 자기 branch에 정상 merge. 기존 MCP 소비자용 다국어 원장과 새 상담자료 저작 원장의 역할을 구분해 함께 검증한다.
 
 ## 1. 확정 범위와 재사용
 
@@ -30,7 +31,9 @@
 - [x] OAuth SDK raw IPv6 key override 제거. 기존 Express trust proxy 정책과 SDK 기본 서브넷 키 재사용, 검증 비활성화 없음.
 - [ ] 실제 desktop/mobile browser 검증. Chromium 다운로드가 환경 네트워크 정책의 HTTP 403으로 차단됨. DOM 검증 48건과 구분.
 - [x] 추가 사용자 지시에 따라 기존 PR 중복 여부·현재 main ruleset 확인 후 [PR #832](https://github.com/Renagang21/o4o-platform/pull/832) 생성. auto-merge 미설정.
-- [ ] 최종 HEAD의 필수 CI Gate·CodeQL·품질 검사·Codex blocker·미해결 thread·main 충돌 상태 확인. 결과는 PR 검사와 완료 보고에서 전달한다.
+- [x] 필수 CI·CodeQL·Codex·Sonar 검증 경로 실행과 같은 PR에서 품질 지적 처리. 최종 HEAD의 정확한 결과는 PR 검사·완료 보고에 기록한다.
+- [x] 새 main과 통합한 로컬 API 58건·공유 편집기 61건·PG/MCP 69건 검증. 상담자료용 전용 DB와 MCP 시험 DB의 잔존 0 확인.
+- [ ] 실제 병합 실행 시점의 HEAD·main·필수 검사·미해결 thread 재확인. 이번 지시에서는 병합하지 않는다.
 - [ ] main 통합·운영 배포·실사용 확인. 이번 “병합 전까지” 지시의 실행 범위 밖이다.
 
 개발 결과와 인계: [CHECK](../checks/CHECK-O4O-USER-AI-PRODUCT-CONTENT-V1.md). 개발 HEAD·push 결과는 완료 보고에서 전달한다. 코드와 검증 기록의 push가 전체 인계서의 메일/카카오 개발 또는 실제 사용자 검증 완료를 뜻하지 않는다.
