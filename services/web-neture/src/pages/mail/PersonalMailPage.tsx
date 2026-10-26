@@ -37,6 +37,7 @@ function MailManager() {
   } | null>(null);
   const [accounts, setAccounts] = useState<MailAccount[]>([]),
     [accountId, setAccountId] = useState(params.get("accountId") ?? "");
+  const [connectionVersion, setConnectionVersion] = useState(0);
   const [senders, setSenders] = useState<MailSender[]>([]),
     [rules, setRules] = useState<MailRule[]>([]),
     [historyVersion, setHistoryVersion] = useState(0);
@@ -93,6 +94,12 @@ function MailManager() {
     setRules(ruleData);
     setHistoryVersion((value) => value + 1);
   }, [accountId, page, availability?.enabled]);
+  const refreshCapabilities = useCallback(async () => {
+    if (!accountId || !availability?.enabled) return;
+    const current = epoch.current;
+    const result = await personalMailApi.capabilities(accountId);
+    if (current === epoch.current) setCapabilities(result);
+  }, [accountId, availability?.enabled]);
   const invalidateRequests = useCallback(() => {
     epoch.current++;
   }, []);
@@ -102,6 +109,7 @@ function MailManager() {
     setMessages([]);
     setBody(null);
     setJob(null);
+    pendingRequest.current = null;
     setCapabilities(null);
     setError("");
     if (!accountId || !availability?.enabled) return;
@@ -109,14 +117,9 @@ function MailManager() {
     void refresh().catch((e) => {
       if (!cancelled) setError(mailErrorMessage(e));
     });
-    void personalMailApi
-      .capabilities(accountId)
-      .then((result) => {
-        if (!cancelled) setCapabilities(result);
-      })
-      .catch((e) => {
-        if (!cancelled) setError(mailErrorMessage(e));
-      });
+    void refreshCapabilities().catch((e) => {
+      if (!cancelled) setError(mailErrorMessage(e));
+    });
     const requestedJob = params.get("jobId");
     if (requestedJob)
       void personalMailApi
@@ -131,7 +134,15 @@ function MailManager() {
       cancelled = true;
       invalidateRequests();
     };
-  }, [accountId, refresh, params, availability?.enabled, invalidateRequests]);
+  }, [
+    accountId,
+    connectionVersion,
+    refresh,
+    refreshCapabilities,
+    params,
+    availability?.enabled,
+    invalidateRequests,
+  ]);
   useEffect(() => {
     if (!accountId || !availability?.enabled) return;
     const current = epoch.current;
@@ -240,7 +251,11 @@ function MailManager() {
       <MailAccountConnections
         gmailAvailable={availability.gmailConfigured}
         naverAvailable={availability.naverConfigured}
-        onChanged={refreshAccounts}
+        onChanged={async () => {
+          await refreshAccounts();
+          // Reconnecting keeps the account ID but invalidates the old selection, body and confirmation context.
+          setConnectionVersion((value) => value + 1);
+        }}
       />
       {!!accounts.length && (
         <section className="space-y-4 rounded-xl border bg-white p-5">
@@ -289,6 +304,7 @@ function MailManager() {
                 void perform(async () => {
                   await refresh();
                   await refreshAccounts();
+                  await refreshCapabilities();
                 })
               }
             >

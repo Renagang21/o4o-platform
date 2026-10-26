@@ -4,6 +4,7 @@
 > **사용자 지시**: TODO 작성 → 문서·코드로 보완 → 개발 → main 병합 전까지. 작은 작업으로 중단하지 않고 개인 메일 서비스와 MCP를 한 묶음으로 완성한다.
 > **근거**: HANDOFF-O4O-USER-AI-AND-MAIL-SERVICES-V1의 3·4단계. 기존 상품 콘텐츠는 PR #832 병합·API/Store 배포 완료, 실제 ChatGPT/브라우저 검증은 미완료.
 > **개발 기준**: main `7166005df54231e00999673fecdf83e596e1bb3a` · branch `wo/personal-mail-mcp`
+> **후속 지시**: 2026-10-26 사용자 `main 병합 배포` — 초기 개발 종료 경계를 §5 통합·배포 준비로 확장한다. 운영 DDL 실행의 명시 승인 경계는 유지한다.
 
 ## 1. 초기 TODO — 조사 결과로 보완
 
@@ -38,7 +39,7 @@
 
 ## 4. 개발 결과와 인계
 
-[검증 기록](../checks/CHECK-O4O-PERSONAL-MAIL-MCP-V1.md)에 명령·시험 환경·실패 보완·검증 한계를 모았다. 기존 콘텐츠 69개와 메일 33개 통합 시험, API 53개·UI 23개, 별도 desktop/mobile Chromium 2개를 통과했다. 브라우저는 격리 인증 fixture이며 실제 O4O/ChatGPT 로그인이나 Gmail·네이버 승인 완료를 뜻하지 않는다.
+[검증 기록](../checks/CHECK-O4O-PERSONAL-MAIL-MCP-V1.md)에 명령·시험 환경·실패 보완·검증 한계를 모았다. 기존 콘텐츠 69개와 메일 33개 통합 시험, API 53개·UI 26개, 별도 desktop/mobile Chromium 2개를 통과했다. 브라우저는 격리 인증 fixture이며 실제 O4O/ChatGPT 로그인이나 Gmail·네이버 승인 완료를 뜻하지 않는다.
 
 PR #837 리뷰 후 자동 작업은 실행 직전 현재 규칙 ID·revision·action을 재검증하고 바뀐 권한으로 대기 작업을 실행하지 않도록 보완했다. 별도 승인된 cleanup snapshot은 유지한다. 수신함이 비어도 기존 규칙에서 발신처를 선택해 다시 검토·변경할 수 있다. 두 회귀 시험을 추가했고 신규 worker CLI의 출력도 기존 stdout 규칙에 맞췄다.
 
@@ -49,3 +50,14 @@ PR #837 리뷰 후 자동 작업은 실행 직전 현재 규칙 ID·revision·ac
 이력 목록도 보완했다. 미완료 사용자 작업을 자동 backlog보다 먼저 표시하고 브라우저·MCP·화면에 50개 단위 이력 페이지를 제공한다. 이력 페이지와 선택한 작업의 검토·제어는 별도로 유지한다. 자동 작업 121건 아래의 오래된 작업 조회와 화면 페이지 이동 후 재개를 검증했다.
 
 push 전 최신 `origin/main`과 경로 충돌·migration 순서를 확인한다. 병합 전 작업 branch/worktree는 KEEP이며 main 병합·배포·운영 migration은 실행하지 않는다. 공개 운영 전에 제공자 승인·개인정보 고지, 전용 설정/키와 worker 스케줄, 실계정 연결·해제 검증을 검토한다.
+
+
+## 5. Main 통합·배포 준비
+
+최신 main `fc3177e2236e52dfdb3887ba8d55e0b4ffeb656d`의 운영 도구 변경 6개 파일은 작업 경로와 겹치지 않았다. 공개된 작업 branch에 main을 merge하고 기존 작업 53개 파일의 blob 보존, migration contract 21 PASS를 확인했다. PR #837을 재사용하며 최신 source의 CI·Codex·Sonar·미해결 스레드를 확인해 main으로 병합한다. 실행 결과·최종 SHA는 PR과 완료 보고를 따른다.
+
+병합 전 재리뷰의 같은 계정 재연결 문제를 수정했다. 계정 ID가 유지돼도 연결 세대를 갱신해 capability·발신처·규칙·이력을 다시 읽고 기존 선택·본문·확인 문맥을 비운다. 현황 새로고침은 선택을 보존하며 capability도 다시 읽는다. 재연결·일시 장애 복구·재연결 후 불확실한 이전 requestId 재사용 방지 UI 3개 시험을 추가했다.
+
+배포 대상은 이번 변경의 API·Neture다. 기존 verified rollout과 전용 migration Job을 사용한다. 신규 `CreatePersonalMail1792998000000`은 개인 메일 계정·OAuth flow·최소 메시지 메타·규칙·작업·항목 6개 테이블과 인덱스·제약을 추가하며 기존 업무 데이터의 수정·삭제 SQL은 없다. 운영 실행 전 명시 승인 필요 여부는 [AGENTS §4-1(f)](../../AGENTS.md)와 [README 배포](../../README.md#배포)를 따른다. 승인 없이 운영 DB를 직접 변경하거나 migration을 우회하지 않는다.
+
+Gmail·네이버 외부 계정/공개 승인·Secret·메일 기능 활성화·개인 메일 worker 스케줄 생성은 이번 code 배포에 포함하지 않는다. 메일 기능은 기본 OFF로 배포하고 기존 공개 OAuth/MCP 계약·API readiness·웹 서빙을 확인한다. 이 단계가 끝날 때까지 worktree는 KEEP이다.

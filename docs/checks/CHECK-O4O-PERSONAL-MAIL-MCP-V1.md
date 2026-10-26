@@ -14,7 +14,7 @@ Node 22.18.0·pnpm 10.25.0, 전용 `wo/personal-mail-mcp` worktree, loopback Pos
 | API 컴파일 | PASS — `pnpm --filter @o4o/api-server build` |
 | 배포용 API bundle | PASS — `tsup --config tsup.config.ts`, main/migrate/product-correction-worker/personal-mail-worker entry syntax·신규 CLI `--help`. compile 산출물의 database 2,420개 해시 일치 복원 확인 |
 | API focused Jest | 6 suites·53 tests PASS — personal-mail contracts, external-ai 기존 단위 시험, opaque-field middleware |
-| UI Vitest | 3 files·23 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
+| UI Vitest | 3 files·26 tests PASS — PersonalMailPage, ExternalAiMailConsent, 기존 MyPageHub |
 | Neture production build | PASS — `pnpm --filter @o4o/web-neture build` |
 | Migration contract | 21 PASS·0 FAIL — `node scripts/db/check-migration-contract.mjs` |
 | PG·공식 MCP SDK 통합 | 기존 콘텐츠 69개 + 메일 33개 = 102 PASS — `node scripts/dev/run-external-ai-fixture.mjs` |
@@ -49,4 +49,11 @@ Gmail 공개 OAuth 검증·제한 scope 보안 평가와 네이버 상업용 다
 
 기존 ChatGPT 공개 제출 문서는 여전히 준비 DRAFT다. 이번에는 현행 도구 수와 메일 기본 OFF만 주석으로 정합했으며 실제 제출·공개 승인을 주장하지 않는다. 카카오·SIWC·공개 앱 심사·결제·운영 설정 변경은 수행하지 않았다.
 
-원격 CI·리뷰의 최종 source SHA와 결과는 해당 PR 및 완료 보고로 인계한다. main 병합·auto-merge·배포는 하지 않고 branch/worktree를 KEEP한다.
+원격 CI·리뷰의 최종 source SHA와 결과는 해당 PR 및 완료 보고로 인계한다. 개발 단계 종료 시 main 병합·auto-merge·배포는 미실행했으며, 2026-10-26 후속 사용자 지시의 통합·배포 준비는 아래 §4와 WO §5를 따른다.
+
+
+## 4. 통합 준비 재검증
+
+같은 account ID로 네이버 연결이 복구돼도 실패한 capability와 이전 메타가 남는 재리뷰 지적을 수정했다. 연결 완료는 계정 문맥 세대를 바꿔 capability·자료·이력을 다시 읽으며 기존 선택·본문·확인 문맥을 비운다. 단순 현황 새로고침은 선택을 유지하며 capability를 재조회한다. 재연결 시 이전 requestId도 폐기하는 흐름을 함께 검증해 UI 26개 PASS·Neture production build·ESLint를 확인했다. backend source는 동일하며 제공자 실계정 연결은 수행하지 않았다.
+
+배포 전 공개 읽기 전용 baseline은 API live/ready·Neture 홈 HTTP 200, OAuth metadata의 기존 read/draft 두 scope다. 이는 현재 서빙 계약의 baseline이며 신규 메일 환경 변수의 실제 값이나 실계정 검증 증거는 아니다. 배포 후에도 기본 OFF와 기존 계약 보존을 다시 확인한다.

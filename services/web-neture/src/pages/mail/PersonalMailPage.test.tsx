@@ -321,6 +321,165 @@ describe("personal mail end-to-end screen contract", () => {
     expect(JSON.stringify(localStorage)).not.toContain(secret);
     expect(JSON.stringify(sessionStorage)).not.toContain(secret);
   });
+  it("reloads capabilities and account data after reconnecting the same account ID", async () => {
+    vi.mocked(personalMailApi.accounts).mockResolvedValue([
+      {
+        id: "account-a",
+        provider: "naver",
+        address: "owner@example.invalid",
+        state: "reconnect",
+        syncCompletedAt: null,
+        syncing: false,
+      },
+    ]);
+    vi.mocked(personalMailApi.capabilities).mockRejectedValueOnce({
+      response: { data: { code: "MAIL_RECONNECT_REQUIRED" } },
+    });
+    vi.mocked(personalMailApi.naver).mockResolvedValue(undefined);
+    view();
+    fireEvent.click(
+      await screen.findByRole("checkbox", { name: "notice@example.invalid" }),
+    );
+    await screen.findByText("메일 계정을 다시 연결해 주세요.");
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "기존 메일 정리 검토",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    vi.mocked(personalMailApi.accounts).mockResolvedValue([
+      {
+        id: "account-a",
+        provider: "naver",
+        address: "owner@example.invalid",
+        state: "active",
+        syncCompletedAt: null,
+        syncing: false,
+      },
+    ]);
+    vi.mocked(personalMailApi.senders).mockResolvedValue({
+      senders: [
+        {
+          sender: "fresh@example.invalid",
+          count: 1,
+          important: 0,
+          latestAt: "2026-10-26",
+          ruleAction: "keep",
+          category: "general",
+        },
+      ],
+      page: 1,
+      scope: "indexed_inbox",
+    });
+    const password = screen.getByLabelText("네이버 앱 비밀번호");
+    fireEvent.change(screen.getByLabelText("네이버 메일 주소"), {
+      target: { value: "owner@example.invalid" },
+    });
+    fireEvent.change(password, { target: { value: crypto.randomUUID() } });
+    fireEvent.click(screen.getByRole("button", { name: "네이버 연결" }));
+    const fresh = await screen.findByRole("checkbox", {
+      name: "fresh@example.invalid",
+    });
+    await waitFor(() =>
+      expect(personalMailApi.capabilities).toHaveBeenCalledTimes(2),
+    );
+    expect(
+      (screen.getByLabelText("관리할 메일 계정") as HTMLSelectElement).value,
+    ).toBe("account-a");
+    expect(
+      screen.queryByRole("checkbox", { name: "notice@example.invalid" }),
+    ).toBeNull();
+    expect((password as HTMLInputElement).value).toBe("");
+    fireEvent.click(fresh);
+    await waitFor(() =>
+      expect(
+        (
+          screen.getByRole("button", {
+            name: "기존 메일 정리 검토",
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBe(false),
+    );
+  });
+  it("starts a fresh proposal identity after reconnecting the same account generation", async () => {
+    vi.mocked(personalMailApi.accounts).mockResolvedValue([
+      {
+        id: "account-a",
+        provider: "naver",
+        address: "owner@example.invalid",
+        state: "active",
+        syncCompletedAt: null,
+        syncing: false,
+      },
+    ]);
+    vi.mocked(personalMailApi.prepare).mockRejectedValueOnce(
+      new Error("uncertain request"),
+    );
+    vi.mocked(personalMailApi.naver).mockResolvedValue(undefined);
+    view();
+    fireEvent.click(
+      await screen.findByRole("checkbox", { name: "notice@example.invalid" }),
+    );
+    const prepare = screen.getByRole("button", { name: "기존 메일 정리 검토" });
+    await waitFor(() =>
+      expect((prepare as HTMLButtonElement).disabled).toBe(false),
+    );
+    fireEvent.click(prepare);
+    await screen.findByRole("alert");
+    const previous = vi.mocked(personalMailApi.prepare).mock.calls[0][1]
+      .requestId;
+    fireEvent.change(screen.getByLabelText("네이버 메일 주소"), {
+      target: { value: "owner@example.invalid" },
+    });
+    fireEvent.change(screen.getByLabelText("네이버 앱 비밀번호"), {
+      target: { value: crypto.randomUUID() },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "네이버 연결" }));
+    await waitFor(() =>
+      expect(personalMailApi.capabilities).toHaveBeenCalledTimes(2),
+    );
+    const sender = screen.getByRole("checkbox", {
+      name: "notice@example.invalid",
+    });
+    expect((sender as HTMLInputElement).checked).toBe(false);
+    fireEvent.click(sender);
+    await waitFor(() =>
+      expect((prepare as HTMLButtonElement).disabled).toBe(false),
+    );
+    fireEvent.click(prepare);
+    await waitFor(() =>
+      expect(personalMailApi.prepare).toHaveBeenCalledTimes(2),
+    );
+    expect(
+      vi.mocked(personalMailApi.prepare).mock.calls[1][1].requestId,
+    ).not.toBe(previous);
+  });
+  it("refreshes recovered capabilities without discarding the current sender selection", async () => {
+    vi.mocked(personalMailApi.capabilities).mockRejectedValueOnce({
+      response: { data: { code: "MAIL_RECONNECT_REQUIRED" } },
+    });
+    view();
+    const sender = await screen.findByRole("checkbox", {
+      name: "notice@example.invalid",
+    });
+    await screen.findByText("메일 계정을 다시 연결해 주세요.");
+    fireEvent.click(sender);
+    fireEvent.click(screen.getByRole("button", { name: "현황 새로고침" }));
+    await waitFor(() =>
+      expect(personalMailApi.capabilities).toHaveBeenCalledTimes(2),
+    );
+    expect((sender as HTMLInputElement).checked).toBe(true);
+    await waitFor(() =>
+      expect(
+        (
+          screen.getByRole("button", {
+            name: "기존 메일 정리 검토",
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBe(false),
+    );
+  });
   it("does not treat a confirmation URL or prior acknowledgment as approval of another job", () => {
     const onConfirm = vi.fn(),
       onControl = vi.fn();

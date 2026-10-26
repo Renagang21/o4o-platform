@@ -41,6 +41,7 @@ worker는 DB lease와 항목 transaction으로 중복 실행을 막고, 실패 �
 - MCP 범위: 기존 `o4o:read`에 더해 `o4o:mail:read`, `o4o:mail:manage`, `o4o:mail:body`. manage/body는 mail:read를 요구한다. `o4o:draft:write`로 메일 실행은 불가하다.
 - 메일 계정 동의는 `mail:<accountId>`로 명시 선택한다. 기존 4종 콘텐츠 workspace·관리자 targets 계약을 확장하지 않는다. 기존 콘텐츠 도구는 콘텐츠 workspace에서만 작동한다.
 - 메일 도구는 계정/발신처/작업/선택 본문 조회, 규칙/일괄 작업 제안, 승인된 작업 재개·중단을 제공한다. 브라우저 확인 없이 정리나 향후 자동 규칙을 활성화하지 않는다.
+- 같은 account ID 재연결도 새로운 계정 문맥으로 처리해 capability·메타를 다시 읽고 기존 선택·본문·확인 상태와 불확실한 이전 requestId를 비운다. 현황 새로고침은 선택한 작업을 보존하며 capability도 재조회한다.
 - `/mypage/mail`에서 일반 회원과 매장 사용자 모두 자신의 계정 연결·발신처 선택·규칙·대상 확인·진행/오류·해제를 처리한다. 기존 My Home navigation의 모든 소비처와 외부 AI 동의 화면을 함께 회귀 검증한다.
 
 ## 4. 운영과 검증 경계
