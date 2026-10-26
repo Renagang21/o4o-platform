@@ -45,7 +45,6 @@ import {
   issuerOnAuthorizationRedirects,
   withIssuerIdentification,
 } from "./auth/issuer-identification.js";
-import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
 
 type Handler = (req: Request, res: Response) => Promise<unknown>;
 const wrap =
@@ -283,7 +282,6 @@ export function createExternalAiRoutes(
         rateLimit: {
           windowMs: 15 * 60 * 1000,
           max: 100,
-          keyGenerator: getTrustedClientIp,
         },
       },
       clientRegistrationOptions: {
@@ -291,7 +289,6 @@ export function createExternalAiRoutes(
         rateLimit: {
           windowMs: 60 * 60 * 1000,
           max: 20,
-          keyGenerator: getTrustedClientIp,
         },
       },
     });

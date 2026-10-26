@@ -4,6 +4,7 @@ import { InvalidTokenError } from "@modelcontextprotocol/sdk/server/auth/errors.
 import {
   toolSchemas,
   writeTools,
+  productContentTools,
   ExternalAiError,
   type ToolName,
 } from "../contracts.js";
@@ -33,7 +34,12 @@ export class ExternalAiToolService {
   ): Promise<unknown> {
     const parsed = toolSchemas[name].safeParse(raw);
     if (!parsed.success) throw new ExternalAiError("INVALID_TOOL_INPUT");
-    const input = parsed.data as Record<string, unknown>,
+    const productContent = productContentTools.has(name);
+    const input = (
+        productContent
+          ? { ...parsed.data, destination: "store_product_content" }
+          : parsed.data
+      ) as Record<string, unknown>,
       write = writeTools.has(name);
     try {
       return await this.db.transaction(async (db) => {
@@ -62,13 +68,15 @@ export class ExternalAiToolService {
         const workspaceId = input.workspaceId as string;
         if (!connection.workspaces.includes(workspaceId))
           throw new ExternalAiError("WORKSPACE_FORBIDDEN", 403);
-        const { adapter, id } = await this.registry.authorize(
+        const { adapter, id, kind } = await this.registry.authorize(
           connection.userId,
           workspaceId,
           write,
           db,
           settings,
         );
+        if (productContent && kind !== "store")
+          throw new ExternalAiError("DESTINATION_FORBIDDEN", 403);
         this.registry.resolve(
           workspaceId,
           input.destination as string | undefined,
@@ -101,6 +109,7 @@ export class ExternalAiToolService {
               connection.userId,
             );
           case "get_content_draft":
+          case "get_product_content":
             return adapter.content(
               db,
               id,
@@ -190,7 +199,10 @@ export class ExternalAiToolService {
           })
           .catch(() => undefined);
       if (error instanceof ExternalAiError) throw error;
-      throw new ExternalAiError(code, code === "CONNECTION_REVOKED" ? 401 : 503);
+      throw new ExternalAiError(
+        code,
+        code === "CONNECTION_REVOKED" ? 401 : 503,
+      );
     }
   }
 }

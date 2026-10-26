@@ -5,6 +5,8 @@ import {
   searchInput,
   settingsSchema,
   workspaceIdSchema,
+  saveProductContentInput,
+  updateProductContentInput,
 } from "../contracts.js";
 import {
   readSettings,
@@ -14,6 +16,84 @@ import {
 
 const id = "6a1d6827-55a5-4f17-9f5f-a1546729aafe";
 describe("external AI authority and persistence inputs", () => {
+  const productDraft = {
+    workspaceId: `store:${id}`,
+    productId: id,
+    productSource: "local",
+    language: "ko",
+    title: "Consumer draft",
+    content: "<p>Reviewed facts</p>",
+    requestId: id,
+  };
+  it("requires explicit product identity and accepts only the existing seven content locales", () => {
+    for (const language of ["ko", "en", "zh", "ja", "vi", "th", "id"])
+      expect(
+        saveProductContentInput.safeParse({ ...productDraft, language })
+          .success,
+      ).toBe(true);
+    expect(
+      saveProductContentInput.safeParse({
+        ...productDraft,
+        productSource: undefined,
+      }).success,
+    ).toBe(false);
+    expect(
+      saveProductContentInput.safeParse({
+        ...productDraft,
+        productSource: "master",
+      }).success,
+    ).toBe(false);
+    expect(
+      saveProductContentInput.safeParse({ ...productDraft, language: "ar" })
+        .success,
+    ).toBe(false);
+  });
+  it("never accepts publication, ownership, provider or recipient fields on product writes", () => {
+    for (const field of [
+      "status",
+      "isPublic",
+      "publicKey",
+      "userId",
+      "organizationId",
+      "apiKey",
+      "recipient",
+    ])
+      expect(
+        saveProductContentInput.safeParse({
+          ...productDraft,
+          [field]: "injected",
+        }).success,
+      ).toBe(false);
+  });
+  it("binds product updates to a page and revision without permitting language or target changes", () => {
+    const update = {
+      workspaceId: `store:${id}`,
+      contentId: id,
+      title: "Replacement",
+      content: "<p>Replacement</p>",
+      requestId: id,
+      expectedRevision: "revision",
+    };
+    expect(updateProductContentInput.safeParse(update).success).toBe(true);
+    expect(
+      updateProductContentInput.safeParse({
+        ...update,
+        expectedRevision: undefined,
+      }).success,
+    ).toBe(false);
+    for (const field of [
+      "language",
+      "productId",
+      "productSource",
+      "groupId",
+      "contentKey",
+      "status",
+    ])
+      expect(
+        updateProductContentInput.safeParse({ ...update, [field]: "changed" })
+          .success,
+      ).toBe(false);
+  });
   it("never enables delegation without a stored setting", async () => {
     const db = { query: jest.fn().mockResolvedValue([]) };
     expect((await readSettings(db as never)).settings.enabled).toBe(false);

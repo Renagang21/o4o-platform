@@ -2,6 +2,7 @@
 
 > 상태: ACTIVE · 작성일: 2026-10-22 · 구현/운영 완료 상태는 [TODO](../work-orders/TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md) 참조.
 > 사용자 결정: 본인 외부 AI에서 콘텐츠 제작, O4O는 자료·권한·저장 제공. 외부 구독/모델/사용량/비용 수집 제외.
+> 최종 갱신: 2026-10-26 — 상품별 소비자 콘텐츠 초안 계약(§10). 개발·통합·실사용 상태는 [해당 WO](../work-orders/WO-O4O-USER-AI-PRODUCT-CONTENT-V1.md)에서 구분한다.
 
 ## 1. 경계와 구조
 
@@ -107,7 +108,7 @@ SDK client HTTP round-trip과 격리 PostgreSQL로 PKCE/code 재사용/resource/
 
 ## 8. 공개 연결 등록의 저장 상한
 
-공식 SDK의 IP당 시간당 20회 제한을 명시하고 기존 trusted-client-IP 판정을 사용한다.
+공식 SDK의 시간당 20회 제한을 명시한다. 기존 Express 신뢰 proxy 판정을 통과한 `req.ip`에 SDK 기본 IPv6 서브넷 키를 적용한다. raw IPv6 주소별 키로 제한을 우회하거나 SDK의 IPv6 검증을 끄지 않는다.
 추가로 PostgreSQL transaction/advisory lock으로 전체 클라이언트 1,000개, 전체 신규 등록 시간당 100개를
 제한한다. 서버 인스턴스가 늘거나 동시에 요청되어도 이 저장 상한을 넘기지 않는다. 기존 연결의 인증·해제는
 등록 상한과 별개다. 한도에 도달하면 신규 등록을 거절하며 기존 연결을 임의로 삭제하지 않는다.
@@ -136,3 +137,26 @@ DB의 동일 사용자 lock 및 기존 멱등 요청 메타데이터를 사용�
 
 오류 메타데이터는 최대 1년/최근 1,000건으로 제한하고, 저장 상한 초과의 반복 요청은 새 오류 행을 만들지 않는다.
 MCP 인증 오류의 SDK protocol 헤더에는 ASCII 문구를 사용하고, 사용자 도구 오류 안내는 한국어로 유지한다.
+
+## 10. 매장 상품별 소비자 콘텐츠 초안
+
+기존 8개 도구의 입력은 유지하고 같은 MCP에 아래 3개 도구를 추가한다. 별도 MCP 서버·인증·저장 원장·LLM 호출을 만들지 않는다.
+`list_workspaces.destinations`는 기존 일반 초안 도구의 저장처 목록을 유지하고, 매장 workspace의 `productContentTools`로 상품 전용 도구를 안내한다. 기존 도구가 받지 않는 저장처를 일반 저장처 목록에 넣지 않는다.
+
+| 도구 | 입력과 책임 |
+|---|---|
+| `save_product_content_draft` | 매장 workspace, 검색 결과 productId/source(local/listing), language(기존 7개), contentKey(기본 default), title/HTML, requestId. 기존 상품별 다국어 원장에 새 비공개 언어 페이지 생성 |
+| `get_product_content` | 매장 workspace, 페이지 contentId. groupId/상품/언어/상태/본문/revision/기존 편집 주소 조회 |
+| `update_product_content_draft` | 매장 workspace, 페이지 contentId, title/HTML, expectedRevision, requestId. 상품·언어·공개 상태 변경 없이 비공개 HTML 수정 |
+
+`store_document`는 여전히 일반 자료함이며 productId를 받지 않는다. 공급자 `store_description`과 매장 상품별 콘텐츠는 다른 도메인이다. 직접 등록 상품의 `detail_html`은 기존 조회·수동 편집 계약을 유지한다.
+
+소비자용 콘텐츠는 `store_multilingual_product_content_groups/pages`를 재사용한다. 웹과 MCP가 같은 상품 소유 확인·페이지 저장 함수를 사용한다. 현재 매장 소속과 상품 활성 상태를 확인하고 쓰기는 기존 다국어 업무 기능 자격을 재검사한다. 연결 자체에 새 유료 제한을 두지 않는다. 기존 웹처럼 허용된 매장의 자료 읽기는 기능 자격 종료 후에도 보존한다.
+
+새 도구는 group/page가 draft이고 공개키·published 언어가 없는 경우에만 쓴다. 기존 언어의 create는 덮어쓰지 않으며, update는 최신 revision을 요구하고 비HTML 형식을 변환하지 않는다. 언어별 제목/본문 이외의 요약·자산·버튼·메타데이터는 update에서 보존한다. 기존 웹과의 동시 변경은 revision/행 잠금으로 확인한다. 공개·QR 생성은 기존 화면의 사용자 검토 단계다.
+
+상품 context에 기존 페이지의 식별자·언어·contentKey와 작성 경계를 제공한다. 상품 사실·전문 참고·소비자 안내를 구분하고, 운영 MFDS 연결이 검증됐다고 추정하지 않는다. 기존 MFDS 원천 매칭이나 상품 원장 수정은 이 연결 기능에 포함하지 않는다.
+
+저장/수정은 기존 quota와 연결별 24시간 requestId 계약을 사용한다. 업무 감사는 기존 `recordOperation`으로 본문 없는 상품/페이지/언어 식별자만 같은 transaction에 기록한다. 감사 실패 시 콘텐츠와 멱등 기록도 rollback한다. 이 기록은 빈 `SecurityAuditService.persistEvent`에 의존하지 않는다.
+
+편집 URL은 기존 Store 진입 컴포넌트에서 접근 가능한 매장 목록을 대조한 뒤 기존 상품별 편집기로 연결한다. groupId와 대상 상품을 기존 편집기가 다시 대조하고, 요청한 언어가 있으면 그 페이지를 연다. 실제 계정·ChatGPT·desktop/mobile browser 검증은 코드·격리 DB 검증과 별도로 보고한다. 공개 제출 준비 자료의 기존 8개 도구 목록은 실제 제출 전에 이 추가 계약과 대조해야 하며, 공개 등록 완료를 뜻하지 않는다.
