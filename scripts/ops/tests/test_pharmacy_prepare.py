@@ -129,7 +129,18 @@ class PreparationTests(unittest.TestCase):
                          [('POST', p.RUN), ('POST', p.NEG), ('POST', p.BACKEND)])
         self.assertEqual(api.writes[0][2]['metadata']['name'], p.NEW)
         api.writes.clear()
+        # Cloud Run may canonicalize a project ID namespace to the project number.
+        api.resources[f'{p.RUN}/{p.NEW}']['metadata']['namespace'] = '123456789'
         p.ensure_targets(api, plan, fingerprint, True)
+        self.assertEqual(api.writes, [])
+
+    def test_same_owner_label_does_not_allow_iam_annotation_drift(self):
+        plan, fingerprint = p.make_plan(*fixtures())
+        current = deepcopy(plan['service'])
+        current['metadata']['annotations']['run.googleapis.com/invoker-iam-disabled'] = 'true'
+        api = FakeAPI({f'{p.RUN}/{p.NEW}': current})
+        with self.assertRaises(ValueError):
+            p.ensure_targets(api, plan, fingerprint, True)
         self.assertEqual(api.writes, [])
 
 

@@ -146,6 +146,8 @@ def ensure_targets(api, plan, fingerprint, apply):
     if current is not None:
         if (current.get('metadata', {}).get('labels', {}).get('o4o-preparation') != fingerprint[:40]
                 or not matches(current.get('metadata', {}), {k: v for k, v in desired['metadata'].items() if k != 'namespace'})
+                or metadata(current.get('metadata', {}))['annotations'] != desired['metadata']['annotations']
+                or metadata(current.get('spec', {}).get('template', {}).get('metadata', {}))['annotations'] != desired['spec']['template']['metadata']['annotations']
                 or not matches(current.get('spec', {}), desired['spec'])):
             raise ValueError('Target Run service exists with different ownership or configuration')
     missing_service = current is None
@@ -208,6 +210,7 @@ def main():
             raise ValueError('Live source changed since review; run plan again')
         ensure_targets(api, plan, fingerprint, args.mode == 'prepare')
     summary = {'mode': args.mode, 'plan_digest': fingerprint, 'source_revision': ready,
+               'immutable_image': plan['service']['spec']['template']['spec']['containers'][0]['image'],
                'target_service': NEW, 'target_neg': plan['neg']['name'],
                'target_backend': plan['backend']['name'],
                'live_routing_changed': False, 'iam_changed': False,
