@@ -169,6 +169,17 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     assert.ok(job.indexOf('--enforce') < job.indexOf('google-github-actions/auth'));
   });
 
+  it('pharmacy deployments use the new runtime/image and verify canonical routing before success', () => {
+    const wf = read(DEPLOY[1]);
+    const deploy = wf.split('\n  deploy-kpa-society:')[1].split('\n  deploy-lecture:')[0];
+    assert.match(deploy, /gcloud run deploy pharmacy-business-web/);
+    assert.match(deploy, /--image=gcr\.io\/\$\{\{ env\.PROJECT_ID \}\}\/pharmacy-business-web:/);
+    assert.doesNotMatch(deploy, /kpa-society-web/);
+    assert.ok(deploy.indexOf('--phase assert-route') > deploy.indexOf('phase: finish'));
+    assert.match(wf, /options: \[none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire\]/);
+    assert.match(wf, /pharmacy_transition\.py --phase "\$PREPARATION_MODE" --expected-plan "\$PREPARATION_DIGEST"/);
+  });
+
   it('api migrate_only 도 freeze 가 적용된다', () => {
     const job = /\n {2}build-and-deploy:[\s\S]*?\n {4}if: >-\n([\s\S]*?)\n\n/.exec(read(DEPLOY[0]))?.[1] ?? '';
     assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && inputs\.migrate_only == 'true'\) \|\|/);

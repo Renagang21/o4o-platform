@@ -1,4 +1,4 @@
-# 약국 프런트 GCP 리소스 전환 준비
+# 약국 프런트 GCP 리소스 전환·정리
 
 > **상태**: ACTIVE
 > **작성일**: 2026-10-26
@@ -27,6 +27,8 @@ Cloud Run은 제자리 rename이 불가능하므로 새 private 리소스를 준
 - [x] PR·CI·Codex gate 확인 → 정상 main 병합 → 정확한 main SHA CI 확인.
 - [x] plan을 실행하고 실제 source·digest 검토 후 prepare 실행.
 - [x] 새 private 리소스 readiness·연결 확인.
+- [x] 새 배포 대상·image namespace·배포 registry·정적 CORS origin·읽기 인벤토리 소비처 정렬 구현.
+- [x] fixed cutover/rollback/retire 모드와 optimistic-lock·공개 JS 검증·실패 시 복귀·참조/요청 수 검사 구현.
 - [ ] 소유자의 최초 invoker 설정 이후 도메인 smoke·전환·롤백·잔여 참조/트래픽 확인 및 옛 자원 정리.
 
 ## 실행
@@ -92,3 +94,43 @@ gcloud run services add-iam-policy-binding pharmacy-business-web \
 
 worktree disposition은 `KEEP`이다. 소유자 bootstrap 및 후속 전환이 남았으며,
 준비 실행을 전체 잔재 제거·도메인 전환 완료로 보고하지 않는다.
+
+## 후속 전환·정리 구현 (같은 WO의 연속 phase)
+
+PR #838은 실행 기록과 후속 전환 코드를 함께 반영하는 연속 phase다. 배포 선택 키
+`kpa-society`는 호환 유지하고, 실제 Run·image·serving registry 대상만 `pharmacy-business-web`로 정렬한다.
+JWT·membership·사업 서비스 키는 변경하지 않는다. API 정적 CORS 목록은 기존 Run origin 하나를
+같은 프로젝트의 새 Run origin 하나로 바꾸며 pharmacy·megapharm 등 나머지 origin과 credentials 정책은 유지한다.
+
+| 모드 | 실행 계약 |
+|---|---|
+| `cutover-plan` / `cutover` | 소유자 공개 invoker·단일 최신 100% Ready·runtime SA·backend/NEG 소유·두 host 범위를 검사한다. GCP URL map validation과 공개 HTML·JS smoke 후 검토 digest로 pharmacy matcher만 바꾼다. fingerprint 충돌은 쓰기 전에 중지한다. |
+| `rollback-plan` / `rollback` | 옛 Run이 남아 있는 동안 같은 host 범위만 이전 backend로 복귀한다. 다른 matcher는 유지한다. |
+| `retire-plan` / `retire` | 새 image namespace의 실제 serving을 확인한다. global/regional URL map·backend·NEG를 페이지 끝까지 읽고 옛 참조가 없어야 한다. 전환 후 최소 15분(전파 여유 2분 + 요청 0 관측 10분 + 지표 수집 지연 3분)과 `run.googleapis.com/request_count` 0을 요구한다. backend→NEG→Run 순서로 매번 다시 검증하며 삭제한다. |
+
+plan 계열 중 전환 plan은 GCP의 비변경 URL map validate POST를 포함한다.
+각 변경 모드는 해당 plan의 SHA256을 요구하며 현재 main·CI·owner·freeze gate와 다른 production workflow의
+실행 상태를 확인한다. 부분 목록·권한 오류·지표 읽기 실패를 참조/요청 0으로 대체하지 않는다.
+`monitoring.timeSeries.list`는 읽기 preflight에 추가한다. 공개 invoker와 지표 읽기 권한이 실제로
+확인되기 전에는 전환·삭제 성공으로 기록하지 않는다.
+
+전환 후 HTML·동일 host JS digest가 새 Run과 다르면 제한된 재시도 후 이전 backend로 복귀한다.
+다른 세션이 pharmacy matcher까지 바꾼 경우에는 그 변경을 덮어쓰지 않는다. 성공 시 새 backend의
+소유 description에 전환 시각을 남긴다. 일반 pharmacy 배포도 마지막에 실제 canonical routing을 확인하므로,
+복귀 상태에서 새 Run만 배포된 것을 운영 도메인 반영 완료로 보고하지 않는다.
+
+실행 순서는 `cutover-plan`→검토 digest의 `cutover`→현재 main의 정상 API·pharmacy verified rollout→
+15분 이상 안정 관측→`retire-plan`→검토 digest의 `retire`다. API 배포에는 이번 alias 외의 변경이나
+미승인 migration이 섞이지 않았는지 실제 serving→target 범위로 확인한다. 옛 image/revision의 역사 버전은
+활성 Run/LB 3개 리소스 삭제와 구분하며 참조 중인 artifact를 일괄 파기하지 않는다.
+
+```sh
+gh workflow run deploy-web-services.yml --ref main \
+  -f service=kpa-society -f pharmacy_preparation=cutover-plan
+gh workflow run deploy-web-services.yml --ref main \
+  -f service=kpa-society -f pharmacy_preparation=cutover \
+  -f pharmacy_plan_digest=<reviewed-cutover-sha256>
+```
+
+후속 코드 로컬 검증: Python 37건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
+새 origin 1개 추가뿐임을 확인했다. 이 절은 코드 구현 기록이며 cutover·정상 배포·retire의 실제 실행 완료를 뜻하지 않는다.

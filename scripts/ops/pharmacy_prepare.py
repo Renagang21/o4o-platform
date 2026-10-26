@@ -4,6 +4,7 @@ Only the trusted web deploy workflow invokes this CLI. Raw configuration remains
 in memory; diagnostics deliberately exclude API bodies, env and credentials.
 """
 import argparse
+from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
 import json
@@ -127,11 +128,16 @@ class API:
         return response.json()
 
     def compute_create(self, collection, body):
-        op = self.request('POST', collection, body)
+        scope = f'regions/{REGION}' if collection == NEG else 'global'
+        self.compute_operation('POST', collection, body, scope)
+
+    def compute_operation(self, method, url, body=None, scope='global'):
+        if scope not in ('global', f'regions/{REGION}'):
+            raise ValueError('Unexpected Compute operation scope')
+        op = self.request(method, url, body)
         name = op.get('name', '')
         if not re.fullmatch(r'operation-[a-zA-Z0-9-]+', name):
             raise RuntimeError('Unexpected Compute operation identifier')
-        scope = f'regions/{REGION}' if collection == NEG else 'global'
         for _ in range(90):
             current = self.request('GET', f'{COMPUTE}/{scope}/operations/{name}')
             if current.get('status') == 'DONE':
@@ -140,6 +146,28 @@ class API:
                 return
             time.sleep(2)
         raise RuntimeError('Compute operation timed out; inspect owned target before retry')
+
+
+@contextmanager
+def cloud_api():
+    sdk_root = Path(os.environ.get('PHARMACY_CLOUDSDK_ROOT', ''))
+    vendor = sdk_root / 'lib' / 'third_party'
+    if not sdk_root.is_absolute() or not vendor.is_dir():
+        raise RuntimeError('Trusted Cloud SDK library unavailable')
+    sys.path.insert(0, str(vendor))
+    import google.auth
+    from google.auth.transport.requests import AuthorizedSession
+    credentials, _ = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
+    with AuthorizedSession(credentials) as session:
+        yield API(session)
+
+
+def emit_summary(title, summary):
+    payload = json.dumps({'resource': title.replace(' ', '-'), 'metadata': summary}, separators=(',', ':'))
+    escaped = payload.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+    print('::notice title=Pharmacy ' + title + '::' + escaped)
+    with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+        output.write('\n```json\n' + json.dumps(summary, indent=2) + '\n```\n')
 
 
 def ensure_targets(api, plan, fingerprint, apply):
@@ -189,16 +217,7 @@ def main():
     args = parser.parse_args()
     if args.mode == 'prepare' and not re.fullmatch(r'[0-9a-f]{64}', args.expected_plan):
         raise ValueError('prepare requires the exact reviewed 64-character plan digest')
-    sdk_root = Path(os.environ.get('PHARMACY_CLOUDSDK_ROOT', ''))
-    vendor = sdk_root / 'lib' / 'third_party'
-    if not sdk_root.is_absolute() or not vendor.is_dir():
-        raise RuntimeError('Trusted Cloud SDK library unavailable')
-    sys.path.insert(0, str(vendor))
-    import google.auth
-    from google.auth.transport.requests import AuthorizedSession
-    credentials, _ = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    with AuthorizedSession(credentials) as session:
-        api = API(session)
+    with cloud_api() as api:
         source = api.request('GET', f'{RUN}/{OLD}')
         ready = source.get('status', {}).get('latestReadyRevisionName', '')
         if not re.fullmatch(r'kpa-society-web-[a-z0-9-]+', ready):
@@ -220,10 +239,7 @@ def main():
                'live_routing_changed': False, 'iam_changed': False,
                'private_resources_ready': args.mode == 'prepare',
                'next_step': 'Owner grants new service roles/run.invoker to allUsers before routed smoke'}
-    payload = json.dumps({'resource': 'private-preparation', 'metadata': summary}, separators=(',', ':'))
-    print('::notice title=Pharmacy private preparation::' + payload.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
-    with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
-        output.write('\n```json\n' + json.dumps(summary, indent=2) + '\n```\n')
+    emit_summary('private preparation', summary)
 
 
 if __name__ == '__main__':
