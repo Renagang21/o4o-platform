@@ -55,4 +55,4 @@
 
 검증 범위·실행 결과·운영 미실행과 인증 blocker는 [CHECK](../checks/CHECK-O4O-AI-CONTENT-WORKFLOW-COMPLETION-V1.md)를 따른다. 실제 공급자/운영자 자료를 생성하거나 외부 계정·유료 모델을 호출하지 않았다.
 
-구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`를 정상 Git 경로로 push하고 `git ls-remote`에서 같은 SHA를 확인했다. 최종 fetch·원격 main은 시작 기준 `b9526fb78d`와 같았다. 중간 Git fetch와 GitHub CLI API 조회는 인증 오류가 있었지만 이후 Git fetch/push는 성공했다. CLI API의 401은 별도로 남았으며 자격정보를 읽거나 교체하지 않았다. PR CI·리뷰는 미실행/미확인이고 main 통합·배포는 이번 범위 밖이다. 최종 문서 인계 commit은 branch HEAD를 따른다.
+구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`를 정상 Git 경로로 push하고 `git ls-remote`에서 같은 SHA를 확인했다. 최종 fetch·원격 main은 시작 기준 `b9526fb78d`와 같았다. 중간 Git fetch와 GitHub CLI API 조회는 인증 오류가 있었지만 이후 Git fetch/push는 성공했다. 이후 동일 CLI의 `gh api user`도 정상 응답해 인증 복구를 확인했다. 자격정보를 읽거나 교체하지 않았다. PR CI·리뷰는 미실행/미확인이고 main 통합·배포는 이번 범위 밖이다. 최종 문서 인계 commit은 branch HEAD를 따른다.

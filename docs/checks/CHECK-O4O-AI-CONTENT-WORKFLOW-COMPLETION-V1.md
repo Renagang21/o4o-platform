@@ -38,7 +38,7 @@ WO에 현재 KEEP/CONNECT/FIX와 Consumer Impact Matrix를 기록했다. 현행 
 
 ## 4. Git·원격 상태
 
-중간 원격 확인에서 Git fetch와 GitHub CLI API 인증이 실패했으나, 일반 Git push는 성공했다. 구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`와 원격 branch SHA 일치, 이후 정상 fetch 및 시작 기준과 같은 원격 main `b9526fb78d`를 확인했다. GitHub CLI API의 HTTP 401은 별도 경로의 미해결 상태이며 PR CI·리뷰를 통과했다고 보고하지 않는다. 최종 문서 인계 commit은 branch HEAD를 따른다. main 병합·배포는 미실행이고 개발·로컬 검증·push 범위로 이번 기록을 완료한다.
+중간 원격 확인에서 Git fetch와 GitHub CLI API 인증이 실패했으나, 일반 Git push는 성공했다. 구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`와 원격 branch SHA 일치, 이후 정상 fetch 및 시작 기준과 같은 원격 main `b9526fb78d`를 확인했다. 동일 CLI의 `gh api user`도 이후 정상 응답해 인증 복구를 확인했다. PR CI·리뷰는 로컬 검증과 별도로 확인해야 하며 통과했다고 보고하지 않는다. 최종 문서 인계 commit은 branch HEAD를 따른다. main 병합·배포는 미실행이고 개발·로컬 검증·push 범위로 이번 기록을 완료한다.
 
 WORKTREE_DISPOSITION: `wo/ai-content-workflow-completion` / 기준 main `b9526fb78d` / 개발·push 완료·추후 PR/CI·main 통합 필요 / verdict KEEP. 다른 세션의 worktree·branch는 수정하지 않는다.
 
