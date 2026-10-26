@@ -90,3 +90,13 @@ smoke: local synthetic desktop/mobile PASS; production NOT_RUN
 other session usage: none observed in isolated environment
 verdict: KEEP (main integration/deployment pending)
 ```
+
+## main 병합 전 통합 준비 — 2026-10-26
+
+사용자 지시: **main 병합 전까지** 진행. 병합·auto-merge·배포는 실행하지 않는다.
+
+- 원 개발 commit `ecd36934ef`를 유지하고 최신 main `792b3d0f6e`를 작업 branch에 충돌 없이 병합했다(merge commit `2be1f4b80a`).
+- upstream Partner 기능·기존 migration·배포 설정은 main의 기존 변경이며 이 PR의 추가 변경이 아니다. main 대비 이 작업의 범위는 Store 블로그 제거 및 관련 테스트·이 기록이다.
+- [PR #831](https://github.com/Renagang21/o4o-platform/pull/831) 생성, Codex review 요청, PR CI 실행. 최종 CI·리뷰 상태는 PR의 해당 HEAD checks/review를 기준으로 확인한다.
+- 작업 branch는 원격에 보존하며 최종 승인 전까지 KEEP. main 반영·운영 배포 상태는 계속 NOT_RUN이다.
+- 위 초기 `CI: NOT_RUN`은 개발 완료 commit 당시 상태다. 이 절부터 PR CI가 실행되며 운영 검증을 뜻하지 않는다.
