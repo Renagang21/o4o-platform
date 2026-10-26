@@ -1,3 +1,8 @@
+import {
+  parseUsage,
+  parseBlocks,
+  qrImageUrl,
+} from "@o4o/store-ui-core/content/publishedContent";
 /**
  * PrintContentPage — 인쇄 최적화 콘텐츠 뷰
  *
@@ -12,68 +17,18 @@
  * - QR 코드 포함 (usage.qr.enabled 시)
  */
 
-import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { publishedAssetsApi, type PublishedAssetItem } from '../../api/assetSnapshot';
-
-interface ContentBlock {
-  type: 'text' | 'image' | 'link';
-  value: string;
-  label?: string;
-}
-
-interface UsageSettings {
-  displayMode: string;
-  cta: { enabled: boolean; label: string; url: string; target: string };
-  qr: { enabled: boolean };
-  print: { enabled: boolean };
-}
-
-function parseBlocks(json: Record<string, unknown>): ContentBlock[] {
-  if (Array.isArray(json.blocks)) {
-    return (json.blocks as ContentBlock[]).map(b => ({
-      type: b.type || 'text',
-      value: b.value || '',
-      label: b.label,
-    }));
-  }
-  const blocks: ContentBlock[] = [];
-  if (typeof json.body === 'string' || typeof json.content === 'string') {
-    blocks.push({ type: 'text', value: (json.body || json.content || '') as string });
-  }
-  if (typeof json.imageUrl === 'string' && json.imageUrl) {
-    blocks.push({ type: 'image', value: json.imageUrl as string });
-  }
-  if (typeof json.linkUrl === 'string' && json.linkUrl) {
-    blocks.push({ type: 'link', value: json.linkUrl as string, label: (json.linkLabel || '') as string });
-  }
-  return blocks;
-}
-
-function parseUsage(json: Record<string, unknown>): UsageSettings {
-  const raw = (json.usage || {}) as Partial<UsageSettings>;
-  return {
-    displayMode: (raw.displayMode as string) || 'default',
-    cta: {
-      enabled: raw.cta?.enabled || false,
-      label: raw.cta?.label || '',
-      url: raw.cta?.url || '',
-      target: raw.cta?.target || '_blank',
-    },
-    qr: { enabled: raw.qr?.enabled || false },
-    print: { enabled: raw.print?.enabled || false },
-  };
-}
-
-function qrImageUrl(data: string, size = 160): string {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
-}
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Loader2, AlertCircle } from "lucide-react";
+import {
+  publishedAssetsApi,
+  type PublishedAssetItem,
+} from "../../api/assetSnapshot";
 
 export default function PrintContentPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
   const [searchParams] = useSearchParams();
-  const orgId = searchParams.get('org');
+  const orgId = searchParams.get("org");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,20 +36,20 @@ export default function PrintContentPage() {
 
   useEffect(() => {
     if (!snapshotId || !orgId) {
-      setError('필수 파라미터가 누락되었습니다');
+      setError("필수 파라미터가 누락되었습니다");
       setLoading(false);
       return;
     }
     publishedAssetsApi
       .get(orgId, snapshotId)
-      .then(res => {
+      .then((res) => {
         if (res.success && res.data) {
           setAsset(res.data);
         } else {
-          setError('콘텐츠를 찾을 수 없습니다');
+          setError("콘텐츠를 찾을 수 없습니다");
         }
       })
-      .catch(() => setError('콘텐츠를 불러올 수 없습니다'))
+      .catch(() => setError("콘텐츠를 불러올 수 없습니다"))
       .finally(() => setLoading(false));
   }, [snapshotId, orgId]);
 
@@ -118,7 +73,9 @@ export default function PrintContentPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <AlertCircle className="w-8 h-8 text-slate-300 mb-3" />
-        <p className="text-sm text-slate-500">{error || '콘텐츠를 찾을 수 없습니다'}</p>
+        <p className="text-sm text-slate-500">
+          {error || "콘텐츠를 찾을 수 없습니다"}
+        </p>
       </div>
     );
   }
@@ -161,29 +118,56 @@ export default function PrintContentPage() {
         </div>
 
         {/* Title */}
-        <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', color: '#0f172a' }}>
+        <h1
+          style={{
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+            color: "#0f172a",
+          }}
+        >
           {asset.title}
         </h1>
 
         {/* Content Blocks */}
         {blocks.map((block, idx) => {
-          if (block.type === 'image') {
+          if (block.type === "image") {
             return (
-              <div key={idx} style={{ marginBottom: '16px' }}>
-                <img src={block.value} alt="" style={{ maxWidth: '100%', height: 'auto' }} />
+              <div key={idx} style={{ marginBottom: "16px" }}>
+                <img
+                  src={block.value}
+                  alt=""
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
               </div>
             );
           }
-          if (block.type === 'text') {
+          if (block.type === "text") {
             return (
-              <p key={idx} style={{ fontSize: '14px', lineHeight: '1.8', color: '#334155', whiteSpace: 'pre-wrap', marginBottom: '12px' }}>
+              <p
+                key={idx}
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "1.8",
+                  color: "#334155",
+                  whiteSpace: "pre-wrap",
+                  marginBottom: "12px",
+                }}
+              >
                 {block.value}
               </p>
             );
           }
-          if (block.type === 'link') {
+          if (block.type === "link") {
             return (
-              <p key={idx} style={{ fontSize: '13px', color: '#2563eb', marginBottom: '8px' }}>
+              <p
+                key={idx}
+                style={{
+                  fontSize: "13px",
+                  color: "#2563eb",
+                  marginBottom: "8px",
+                }}
+              >
                 {block.label || block.value}: {block.value}
               </p>
             );
@@ -193,21 +177,40 @@ export default function PrintContentPage() {
 
         {/* QR Code for print */}
         {usage.qr.enabled && (
-          <div style={{ marginTop: '32px', paddingTop: '16px', borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
-            <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '8px' }}>QR 코드로 온라인에서 확인하세요</p>
+          <div
+            style={{
+              marginTop: "32px",
+              paddingTop: "16px",
+              borderTop: "1px solid #e2e8f0",
+              textAlign: "center",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "11px",
+                color: "#94a3b8",
+                marginBottom: "8px",
+              }}
+            >
+              QR 코드로 온라인에서 확인하세요
+            </p>
             <img
-              src={qrImageUrl(publicUrl)}
+              src={qrImageUrl(publicUrl, 160)}
               alt="QR Code"
-              style={{ width: '120px', height: '120px', margin: '0 auto' }}
+              style={{ width: "120px", height: "120px", margin: "0 auto" }}
             />
-            <p style={{ fontSize: '10px', color: '#94a3b8', marginTop: '4px' }}>{publicUrl}</p>
+            <p style={{ fontSize: "10px", color: "#94a3b8", marginTop: "4px" }}>
+              {publicUrl}
+            </p>
           </div>
         )}
 
         {/* CTA URL for print */}
         {usage.cta.enabled && usage.cta.url && (
-          <div style={{ marginTop: '16px', fontSize: '12px', color: '#64748b' }}>
-            {usage.cta.label || '자세히 보기'}: {usage.cta.url}
+          <div
+            style={{ marginTop: "16px", fontSize: "12px", color: "#64748b" }}
+          >
+            {usage.cta.label || "자세히 보기"}: {usage.cta.url}
           </div>
         )}
       </div>

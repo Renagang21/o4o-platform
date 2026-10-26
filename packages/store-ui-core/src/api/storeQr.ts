@@ -1,3 +1,4 @@
+import type { QrScreenSet } from "@o4o/tablet-kiosk-core";
 /** Shared store client implementation; service transports remain in the app adapters. */
 import { STORE_QR_EXPORT_PRESETS } from "../components/qr/storeQrOperationModel";
 import type { JsonApiClient } from "./transport";
@@ -134,11 +135,9 @@ export function parseFilename(
   return m?.[1]?.trim() || fallback;
 }
 
-export function createStoreQrClient({
-  apiClient,
-}: {
-  apiClient: JsonApiClient;
-}) {
+export function createStoreQrClient<
+  Landing extends QrLandingData = QrLandingData,
+>({ apiClient }: { apiClient: JsonApiClient }) {
   async function getStoreQrCodes(opts?: {
     page?: number;
     limit?: number;
@@ -201,9 +200,7 @@ export function createStoreQrClient({
     return apiClient.get(`/pharmacy/qr/${qrId}/analytics`);
   }
 
-  async function listQrPlacements(
-    qrId: string,
-  ): Promise<{
+  async function listQrPlacements(qrId: string): Promise<{
     success: boolean;
     data: { items: StoreQrPlacementDto[]; activeCount: number };
   }> {
@@ -238,9 +235,7 @@ export function createStoreQrClient({
     );
   }
 
-  async function getQrPlacementAnalytics(
-    qrId: string,
-  ): Promise<{
+  async function getQrPlacementAnalytics(qrId: string): Promise<{
     success: boolean;
     data: { byPlacement: QrPlacementScanRow[] };
   }> {
@@ -264,7 +259,13 @@ export function createStoreQrClient({
     return apiClient.post(`/pharmacy/qr/${qrId}/clone`, body ?? {});
   }
 
+  async function getQrLandingData(
+    slug: string,
+  ): Promise<{ success: boolean; data: Landing }> {
+    return apiClient.get(`/qr/public/${slug}`);
+  }
   return {
+    getQrLandingData,
     getStoreQrCodes,
     createStoreQrCode,
     updateStoreQrCode,
@@ -278,4 +279,82 @@ export function createStoreQrClient({
     getStorePlacementAnalytics,
     cloneQrCode,
   };
+}
+
+export interface QrLandingData {
+  id: string;
+  title: string;
+  description: string | null;
+  landingType: string;
+  landingTargetId: string | null;
+  slug: string;
+  organizationId: string;
+  imageUrl: string | null;
+  libraryItemTitle: string | null;
+  storeSlug: string | null;
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: landingType='video' 일 때 store_videos 사본의 외부 URL.
+  videoUrl?: string | null;
+  // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: landingType='page' 일 때 콘텐츠 본문 inline 데이터.
+  //   content_hub(kpa_contents) 만 해석 — 그 외 page ref 는 null(기존 redirect 폴백).
+  pageContent?: QrPageContent | null;
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page 콘텐츠 하단 상담 요청 버튼 노출 설정.
+  consultationCtaEnabled?: boolean;
+  consultationCtaLabel?: string | null;
+  // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: landingType='screen_set' 일 때 태블릿과 동일한 sections.
+  //   모바일 뷰어(PublicScreenSetViewer)는 이 sections 를 세로형으로 렌더하되 idle_media(대기영상)는 제외한다.
+  screenSet?: QrScreenSet | null;
+}
+
+export function createQrExportClient({
+  getApiBase,
+  getAccessToken,
+}: {
+  getApiBase: () => string;
+  getAccessToken: () => string | null;
+}) {
+  async function fetchQrExportBlob(
+    id: string,
+    format: QrExportFormat,
+    preset?: QrExportPreset,
+  ): Promise<{ blob: Blob; filename: string }> {
+    const token = getAccessToken();
+    const params = new URLSearchParams({ format });
+    if (preset) params.set("preset", preset);
+    const res = await fetch(
+      `${getApiBase()}/pharmacy/qr/${id}/export?${params}`,
+      {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      },
+    );
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error?.message || `QR export 실패 (${res.status})`);
+    }
+    const blob = await res.blob();
+    const ext = format === "pdf" ? "pdf" : format;
+    const filename = parseFilename(
+      res.headers.get("Content-Disposition"),
+      `qr-${id}.${ext}`,
+    );
+    return { blob, filename };
+  }
+  async function downloadQrExport(
+    id: string,
+    format: QrExportFormat,
+    preset?: QrExportPreset,
+  ): Promise<void> {
+    const { blob, filename } = await fetchQrExportBlob(id, format, preset);
+    const url = URL.createObjectURL(blob);
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+  return { fetchQrExportBlob, downloadQrExport };
 }

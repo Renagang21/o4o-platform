@@ -335,3 +335,134 @@ it("preserves the Store consultation revision contract through the shared client
   });
   expect(put).toHaveBeenCalledWith("/store-contents/direct/content", body);
 });
+
+import { createQrExportClient } from "../storeQr";
+import {
+  createStoreLibraryClient,
+  type LibraryListParams,
+  type LibrarySource,
+} from "../assetSnapshot";
+import {
+  parseBlocks,
+  parseUsage,
+  qrImageUrl,
+} from "../../content/publishedContent";
+
+describe("remaining shared adapter boundaries", () => {
+  it("resolves QR export context and token per request and preserves UTF-8 filenames", async () => {
+    let base = "/api/v1/kpa";
+    let token = "first";
+    const fetcher = vi
+      .fn()
+      .mockImplementation(
+        async () =>
+          new Response("pdf-data", {
+            headers: {
+              "Content-Disposition":
+                "attachment; filename*=UTF-8''" +
+                encodeURIComponent("약국.pdf"),
+            },
+          }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const api = createQrExportClient({
+      getApiBase: () => base,
+      getAccessToken: () => token,
+    });
+    const first = await api.fetchQrExportBlob("qr", "pdf", "a4");
+    expect(first.filename).toBe("약국.pdf");
+    expect(await first.blob.text()).toBe("pdf-data");
+    expect(fetcher.mock.calls[0]).toEqual([
+      "/api/v1/kpa/pharmacy/qr/qr/export?format=pdf&preset=a4",
+      { headers: { Authorization: "Bearer first" } },
+    ]);
+    base = "/api/v1/neture";
+    token = "second";
+    await api.fetchQrExportBlob("other", "svg");
+    expect(fetcher.mock.calls[1]).toEqual([
+      "/api/v1/neture/pharmacy/qr/other/export?format=svg",
+      { headers: { Authorization: "Bearer second" } },
+    ]);
+  });
+  it("keeps QR error handling and fallback filenames without an authorization header when logged out", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(reply({ error: { message: "not allowed" } }, 403))
+      .mockResolvedValueOnce(new Response("image"));
+    vi.stubGlobal("fetch", fetcher);
+    const api = createQrExportClient({
+      getApiBase: () => "/api/v1/kpa",
+      getAccessToken: () => null,
+    });
+    await expect(api.fetchQrExportBlob("id", "png")).rejects.toThrow(
+      "not allowed",
+    );
+    expect((await api.fetchQrExportBlob("id", "png")).filename).toBe(
+      "qr-id.png",
+    );
+    expect(fetcher.mock.calls[0][1]).toEqual({ headers: {} });
+  });
+  it("applies business filtering only through the Store adapter extension", async () => {
+    const get = vi
+      .fn()
+      .mockResolvedValue({ success: true, data: { items: [] } });
+    const post = vi.fn().mockResolvedValue({ success: true });
+    const client = { get, post } as unknown as JsonApiClient;
+    const pharmacy = createStoreLibraryClient({ apiClient: client });
+    type StoreParams = LibraryListParams<LibrarySource | "franchise"> & {
+      business?: string;
+    };
+    const store = createStoreLibraryClient<never, StoreParams>({
+      apiClient: client,
+      extendQuery: (params, query) => {
+        if (params?.business) query.business = params.business;
+      },
+    });
+    await pharmacy.listContents({ source: "mine", tag: "literal_%" });
+    expect(get.mock.calls[0]).toEqual([
+      "/store-library/contents",
+      { source: "mine", tag: "literal_%" },
+    ]);
+    await store.listContents({
+      source: "franchise",
+      business: "business-id",
+      page: 2,
+    });
+    expect(get.mock.calls[1]).toEqual([
+      "/store-library/contents",
+      { page: "2", source: "franchise", business: "business-id" },
+    ]);
+    await pharmacy.reimportSource("content /one");
+    expect(post).toHaveBeenCalledWith(
+      "/store-contents/content%20%2Fone/reimport-source",
+      {},
+    );
+    expect(get).toHaveBeenCalledTimes(2);
+  });
+  it("preserves public block fallbacks, usage defaults and each view QR size", () => {
+    expect(
+      parseBlocks({
+        body: "body",
+        imageUrl: "/one.png",
+        linkUrl: "/link",
+        linkLabel: "link",
+      }),
+    ).toEqual([
+      { type: "text", value: "body" },
+      { type: "image", value: "/one.png" },
+      { type: "link", value: "/link", label: "link" },
+    ]);
+    expect(parseUsage({}).cta).toEqual({
+      enabled: false,
+      label: "",
+      url: "",
+      target: "_blank",
+    });
+    expect(qrImageUrl("https://example.invalid/?a=1", 160)).toContain(
+      "size=160x160&data=https%3A",
+    );
+    expect(qrImageUrl("https://example.invalid/", 200)).toContain(
+      "size=200x200",
+    );
+  });
+});

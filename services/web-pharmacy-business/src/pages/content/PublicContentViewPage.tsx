@@ -1,3 +1,9 @@
+import type { UsageSettings } from '@o4o/store-ui-core/content/publishedContent';
+import {
+  parseUsage,
+  parseBlocks,
+  qrImageUrl,
+} from "@o4o/store-ui-core/content/publishedContent";
 /**
  * PublicContentViewPage — 공개 콘텐츠 렌더링
  *
@@ -13,68 +19,24 @@
  *   - print: 인쇄 버튼 표시
  */
 
-import { useEffect, useState } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Loader2, AlertCircle, ExternalLink, Printer, QrCode } from 'lucide-react';
-import { publishedAssetsApi, type PublishedAssetItem } from '../../api/assetSnapshot';
-
-interface ContentBlock {
-  type: 'text' | 'image' | 'link';
-  value: string;
-  label?: string;
-}
-
-interface UsageSettings {
-  displayMode: 'default' | 'banner' | 'landing';
-  cta: { enabled: boolean; label: string; url: string; target: '_blank' | '_self' };
-  qr: { enabled: boolean };
-  print: { enabled: boolean };
-}
-
-function parseUsage(json: Record<string, unknown>): UsageSettings {
-  const raw = (json.usage || {}) as Partial<UsageSettings>;
-  return {
-    displayMode: raw.displayMode || 'default',
-    cta: {
-      enabled: raw.cta?.enabled || false,
-      label: raw.cta?.label || '',
-      url: raw.cta?.url || '',
-      target: raw.cta?.target || '_blank',
-    },
-    qr: { enabled: raw.qr?.enabled || false },
-    print: { enabled: raw.print?.enabled || false },
-  };
-}
-
-function parseBlocks(json: Record<string, unknown>): ContentBlock[] {
-  if (Array.isArray(json.blocks)) {
-    return (json.blocks as ContentBlock[]).map(b => ({
-      type: b.type || 'text',
-      value: b.value || '',
-      label: b.label,
-    }));
-  }
-  const blocks: ContentBlock[] = [];
-  if (typeof json.body === 'string' || typeof json.content === 'string') {
-    blocks.push({ type: 'text', value: (json.body || json.content || '') as string });
-  }
-  if (typeof json.imageUrl === 'string' && json.imageUrl) {
-    blocks.push({ type: 'image', value: json.imageUrl as string });
-  }
-  if (typeof json.linkUrl === 'string' && json.linkUrl) {
-    blocks.push({ type: 'link', value: json.linkUrl as string, label: (json.linkLabel || '') as string });
-  }
-  return blocks;
-}
-
-function qrImageUrl(data: string, size = 200): string {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
-}
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import {
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+  Printer,
+  QrCode,
+} from "lucide-react";
+import {
+  publishedAssetsApi,
+  type PublishedAssetItem,
+} from "../../api/assetSnapshot";
 
 export default function PublicContentViewPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
   const [searchParams] = useSearchParams();
-  const orgId = searchParams.get('org');
+  const orgId = searchParams.get("org");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,21 +44,21 @@ export default function PublicContentViewPage() {
 
   useEffect(() => {
     if (!snapshotId || !orgId) {
-      setError('필수 파라미터가 누락되었습니다');
+      setError("필수 파라미터가 누락되었습니다");
       setLoading(false);
       return;
     }
     setLoading(true);
     publishedAssetsApi
       .get(orgId, snapshotId)
-      .then(res => {
+      .then((res) => {
         if (res.success && res.data) {
           setAsset(res.data);
         } else {
-          setError('콘텐츠를 찾을 수 없습니다');
+          setError("콘텐츠를 찾을 수 없습니다");
         }
       })
-      .catch(() => setError('콘텐츠를 불러올 수 없습니다'))
+      .catch(() => setError("콘텐츠를 불러올 수 없습니다"))
       .finally(() => setLoading(false));
   }, [snapshotId, orgId]);
 
@@ -112,8 +74,12 @@ export default function PublicContentViewPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
         <AlertCircle className="w-8 h-8 text-slate-300 mb-3" />
-        <p className="text-sm text-slate-500">{error || '콘텐츠를 찾을 수 없습니다'}</p>
-        <Link to="/" className="mt-4 text-sm text-blue-600 hover:underline">홈으로</Link>
+        <p className="text-sm text-slate-500">
+          {error || "콘텐츠를 찾을 수 없습니다"}
+        </p>
+        <Link to="/" className="mt-4 text-sm text-blue-600 hover:underline">
+          홈으로
+        </Link>
       </div>
     );
   }
@@ -122,12 +88,12 @@ export default function PublicContentViewPage() {
   const usage = parseUsage(contentJson);
   const blocks = parseBlocks(contentJson);
   const pageUrl = window.location.href;
-  const imageBlock = blocks.find(b => b.type === 'image');
-  const textBlocks = blocks.filter(b => b.type === 'text');
-  const linkBlocks = blocks.filter(b => b.type === 'link');
+  const imageBlock = blocks.find((b) => b.type === "image");
+  const textBlocks = blocks.filter((b) => b.type === "text");
+  const linkBlocks = blocks.filter((b) => b.type === "link");
 
   // Banner mode: hero image + overlay title + CTA
-  if (usage.displayMode === 'banner') {
+  if (usage.displayMode === "banner") {
     return (
       <div className="min-h-screen bg-white">
         {/* Hero */}
@@ -143,7 +109,9 @@ export default function PublicContentViewPage() {
           )}
           <div className="absolute inset-0 bg-black/40 flex items-end">
             <div className="max-w-3xl mx-auto w-full px-6 pb-10">
-              <h1 className="text-3xl font-bold text-white leading-tight">{asset.title}</h1>
+              <h1 className="text-3xl font-bold text-white leading-tight">
+                {asset.title}
+              </h1>
             </div>
           </div>
         </div>
@@ -151,22 +119,36 @@ export default function PublicContentViewPage() {
         {/* Body */}
         <div className="max-w-3xl mx-auto px-6 py-10">
           {textBlocks.map((b, i) => (
-            <p key={i} className="text-base text-slate-700 leading-relaxed whitespace-pre-wrap mb-4">{b.value}</p>
+            <p
+              key={i}
+              className="text-base text-slate-700 leading-relaxed whitespace-pre-wrap mb-4"
+            >
+              {b.value}
+            </p>
           ))}
           {linkBlocks.map((b, i) => (
-            <a key={i} href={b.value} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm mb-2">
+            <a
+              key={i}
+              href={b.value}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm mb-2"
+            >
               {b.label || b.value} <ExternalLink className="w-3.5 h-3.5" />
             </a>
           ))}
-          <ContentFooter usage={usage} pageUrl={pageUrl} snapshotId={snapshotId!} />
+          <ContentFooter
+            usage={usage}
+            pageUrl={pageUrl}
+            snapshotId={snapshotId!}
+          />
         </div>
       </div>
     );
   }
 
   // Landing mode: full-screen sections
-  if (usage.displayMode === 'landing') {
+  if (usage.displayMode === "landing") {
     return (
       <div className="min-h-screen bg-white">
         {/* Title Section */}
@@ -180,7 +162,7 @@ export default function PublicContentViewPage() {
                 rel="noopener noreferrer"
                 className="inline-block mt-6 px-8 py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 transition-colors"
               >
-                {usage.cta.label || '자세히 보기'}
+                {usage.cta.label || "자세히 보기"}
               </a>
             )}
           </div>
@@ -189,7 +171,11 @@ export default function PublicContentViewPage() {
         {/* Image Section */}
         {imageBlock && (
           <section className="py-0">
-            <img src={imageBlock.value} alt="" className="w-full max-h-[600px] object-cover" />
+            <img
+              src={imageBlock.value}
+              alt=""
+              className="w-full max-h-[600px] object-cover"
+            />
           </section>
         )}
 
@@ -198,7 +184,12 @@ export default function PublicContentViewPage() {
           <section className="py-16 px-6">
             <div className="max-w-3xl mx-auto">
               {textBlocks.map((b, i) => (
-                <p key={i} className="text-lg text-slate-700 leading-relaxed whitespace-pre-wrap mb-6">{b.value}</p>
+                <p
+                  key={i}
+                  className="text-lg text-slate-700 leading-relaxed whitespace-pre-wrap mb-6"
+                >
+                  {b.value}
+                </p>
               ))}
             </div>
           </section>
@@ -209,8 +200,13 @@ export default function PublicContentViewPage() {
           <section className="py-10 px-6 bg-slate-50">
             <div className="max-w-3xl mx-auto flex flex-col gap-3">
               {linkBlocks.map((b, i) => (
-                <a key={i} href={b.value} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                <a
+                  key={i}
+                  href={b.value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                >
                   {b.label || b.value} <ExternalLink className="w-4 h-4" />
                 </a>
               ))}
@@ -221,7 +217,11 @@ export default function PublicContentViewPage() {
         {/* Footer utilities */}
         <section className="py-12 px-6">
           <div className="max-w-3xl mx-auto">
-            <ContentFooter usage={usage} pageUrl={pageUrl} snapshotId={snapshotId!} />
+            <ContentFooter
+              usage={usage}
+              pageUrl={pageUrl}
+              snapshotId={snapshotId!}
+            />
           </div>
         </section>
       </div>
@@ -233,20 +233,40 @@ export default function PublicContentViewPage() {
     <div className="min-h-screen bg-slate-50 py-10 px-4">
       <article className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {imageBlock && (
-          <img src={imageBlock.value} alt={asset.title} className="w-full h-auto max-h-[400px] object-cover" />
+          <img
+            src={imageBlock.value}
+            alt={asset.title}
+            className="w-full h-auto max-h-[400px] object-cover"
+          />
         )}
         <div className="p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-6">{asset.title}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-6">
+            {asset.title}
+          </h1>
           {textBlocks.map((b, i) => (
-            <p key={i} className="text-base text-slate-700 leading-relaxed whitespace-pre-wrap mb-4">{b.value}</p>
+            <p
+              key={i}
+              className="text-base text-slate-700 leading-relaxed whitespace-pre-wrap mb-4"
+            >
+              {b.value}
+            </p>
           ))}
           {linkBlocks.map((b, i) => (
-            <a key={i} href={b.value} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm mb-2">
+            <a
+              key={i}
+              href={b.value}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm mb-2"
+            >
               {b.label || b.value} <ExternalLink className="w-3.5 h-3.5" />
             </a>
           ))}
-          <ContentFooter usage={usage} pageUrl={pageUrl} snapshotId={snapshotId!} />
+          <ContentFooter
+            usage={usage}
+            pageUrl={pageUrl}
+            snapshotId={snapshotId!}
+          />
         </div>
       </article>
     </div>
@@ -265,25 +285,28 @@ function ContentFooter({
   pageUrl: string;
   snapshotId: string;
 }) {
-  const showFooter = usage.cta.enabled || usage.qr.enabled || usage.print.enabled;
+  const showFooter =
+    usage.cta.enabled || usage.qr.enabled || usage.print.enabled;
   if (!showFooter) return null;
 
   return (
     <div className="mt-8 pt-6 border-t border-slate-100 space-y-6">
       {/* CTA */}
-      {usage.cta.enabled && usage.cta.url && usage.displayMode !== 'landing' && (
-        <div className="flex justify-center">
-          <a
-            href={usage.cta.url}
-            target={usage.cta.target}
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            {usage.cta.label || '자세히 보기'}
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </div>
-      )}
+      {usage.cta.enabled &&
+        usage.cta.url &&
+        usage.displayMode !== "landing" && (
+          <div className="flex justify-center">
+            <a
+              href={usage.cta.url}
+              target={usage.cta.target}
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              {usage.cta.label || "자세히 보기"}
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        )}
 
       {/* QR */}
       {usage.qr.enabled && (
@@ -293,7 +316,7 @@ function ContentFooter({
             QR 코드
           </div>
           <img
-            src={qrImageUrl(pageUrl)}
+            src={qrImageUrl(pageUrl, 200)}
             alt="QR Code"
             className="w-[160px] h-[160px] border border-slate-200 rounded-lg p-1"
           />

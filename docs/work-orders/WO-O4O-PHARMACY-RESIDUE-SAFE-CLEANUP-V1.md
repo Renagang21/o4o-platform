@@ -127,3 +127,14 @@ Sonar 제외 범위·중복률 기준·merge gate는 변경하지 않는다. 상
 main `68268d19f6`의 Store 콘텐츠 저장 보완과 assetSnapshot 경로가 겹쳤다. 이동 전 파일로 되돌리지 않고 공통 `DirectContentItem.revision` 및 `directContentApi.update.expectedRevision`에 upstream의 선택 필드를 반영한다. 어댑터는 공통 구현을 계속 사용한다. revision payload 전달·응답 보존 회귀를 추가하고 최신 main 기준 Store 빌드·테스트와 리뷰를 다시 확인한다. upstream API 변경의 배포 상태는 자신의 변경과 구분하고 공유 운영 배포는 직렬화한다.
 
 최신 main 병합 후 재검증: Store build PASS · Vitest 79 files/863 PASS, store-ui-core 146 PASS(추가 revision 계약1개 포함). 로컬 실제 빌드의 로그인 화면 390/1440px × 약국/Store 4건은 JS 예외0·가로 넘침0이다. API를 모두 가로챈 anonymous 화면 smoke이며 운영 로그인·OAuth 성공으로 보고하지 않는다.
+
+
+### Sonar 잔여 4.5% 후속 정리
+
+Sonar check 121412078613(HEAD 741c1ba241)은 19.7% → 4.5%로 감소했으나 기준3%에는 미달했다. 사용자 추가 목록의 잔여714행을 기준으로 QR export/landing 타입·메서드, 자료함 feed 타입·메서드, 상품 빠른 편집의 동일 field section, 공개/인쇄 콘텐츠 파서를 추가 공통화한다.
+
+- QR은 앱별 base/token provider를 주입하며 요청마다 읽는다. PH 상품 요약 타입은 base interface 확장으로 남기고, 파일 내보내기의 blob·UTF-8 filename·fallback·오류·다운로드 정리는 공통 구현을 쓴다.
+- 자료함은 기본 source 타입을 유지하고 Store의 franchise/business 필터와 부가 응답 타입만 확장한다. PH가 business 필터를 보내도록 바꾸지 않는다.
+- 상품 편집의 공유 범위는 동일 section 두 개뿐이다. Store의 read/write 경합 방지·저장 잠금·취소 정책·재시도 및 각 앱의 grid/fieldset은 wrapper에 유지한다.
+- 공개/인쇄 콘텐츠는 동일 순수 파서만 공유한다. 페이지별 조회 effect, CTA, 인쇄, QR 크기(200/160)는 그대로다.
+- 재검증: PH build/148 tests PASS · Store build/863 tests PASS · store-ui-core150 tests PASS · API 계약35 suites/903 tests PASS · 변경 파일 ESLint 오류0. 추가 계약4개가 QR 동적 문맥/토큰·파일명/실패, business filter 확장, 공개 파서/QR 규격을 검증한다. 최종 Sonar 통과는 새 HEAD의 실제 결과를 기다린다.
