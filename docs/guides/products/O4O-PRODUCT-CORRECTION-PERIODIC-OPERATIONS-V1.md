@@ -67,6 +67,6 @@ P2·우선순위 4~6번·일반 편집 연결은 PR #816으로 함께 main에 �
 
 서버가 처리 중인 원본은 조회 전용이다. 실제 원본 변경은 별도 P2 명시적 승인·선택 반영 또는 기존 편집 경로에서만 수행한다. 이번 개발 검증은 세션 전용 합성 DB·fixture이며 운영 계정·상품·예약을 만들지 않았다.
 
-## 후속 독립 실행·상품별 연결 (개발 branch, 미병합)
+## 후속 독립 실행·상품별 연결 (PR #822·#823 배포 완료)
 
-[정기 운영 완성 안내](O4O-PRODUCT-DB-RECURRING-OPERATIONS-COMPLETION-V1.md)에 기준 초안·상품별 자료/이력·DB tick 잠금·독립 worker와 준비 조건을 정리했다. 외부 Job/Scheduler를 실제 설정하기 전에는 위 서버 휴면 한계가 운영에서 해소됐다고 주장하지 않는다. 이번 후속은 PR CI·검토까지이며 main 병합·배포·운영 인프라 설정은 하지 않는다.
+[정기 운영 완성 안내](O4O-PRODUCT-DB-RECURRING-OPERATIONS-COMPLETION-V1.md)에 기준 초안·상품별 자료/이력·DB tick 잠금·독립 worker와 준비 조건을 정리했다. 외부 Job/Scheduler를 실제 설정하기 전에는 위 서버 휴면 한계가 운영에서 해소됐다고 주장하지 않는다. 이번 후속 기능은 PR #822·#823과 공식 Promote 40249872295로 배포됐으며 운영 인프라 설정은 미실행이다. [운영 준비 안내](O4O-PRODUCT-DB-OPERATIONAL-READINESS-V1.md)를 따른다.
