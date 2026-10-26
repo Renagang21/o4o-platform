@@ -131,7 +131,7 @@ main `68268d19f6`의 Store 콘텐츠 저장 보완과 assetSnapshot 경로가 �
 
 ### Sonar 잔여 4.5% 후속 정리
 
-Sonar check 121412078613(HEAD 741c1ba241)은 19.7% → 4.5%로 감소했으나 기준3%에는 미달했다. 사용자 추가 목록의 잔여714행을 기준으로 QR export/landing 타입·메서드, 자료함 feed 타입·메서드, 상품 빠른 편집의 동일 field section, 공개/인쇄 콘텐츠 파서를 추가 공통화한다.
+Sonar check 121412078613(HEAD 741c1ba241)은 19.7% → 4.5%로 감소했으나 기준3%에는 미달했다. 사용자 추가 목록의 잔여614행을 기준으로 QR export/landing 타입·메서드, 자료함 feed 타입·메서드, 상품 빠른 편집의 동일 field section, 공개/인쇄 콘텐츠 파서를 추가 공통화한다.
 
 - QR은 앱별 base/token provider를 주입하며 요청마다 읽는다. PH 상품 요약 타입은 base interface 확장으로 남기고, 파일 내보내기의 blob·UTF-8 filename·fallback·오류·다운로드 정리는 공통 구현을 쓴다.
 - 자료함은 기본 source 타입을 유지하고 Store의 franchise/business 필터와 부가 응답 타입만 확장한다. PH가 business 필터를 보내도록 바꾸지 않는다.
