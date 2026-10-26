@@ -138,3 +138,10 @@ Sonar check 121412078613(HEAD 741c1ba241)은 19.7% → 4.5%로 감소했으나 �
 - 상품 편집의 공유 범위는 동일 section 두 개뿐이다. Store의 read/write 경합 방지·저장 잠금·취소 정책·재시도 및 각 앱의 grid/fieldset은 wrapper에 유지한다.
 - 공개/인쇄 콘텐츠는 동일 순수 파서만 공유한다. 페이지별 조회 effect, CTA, 인쇄, QR 크기(200/160)는 그대로다.
 - 재검증: PH build/148 tests PASS · Store build/863 tests PASS · store-ui-core150 tests PASS · API 계약35 suites/903 tests PASS · 변경 파일 ESLint 오류0. 추가 계약4개가 QR 동적 문맥/토큰·파일명/실패, business filter 확장, 공개 파서/QR 규격을 검증한다. 최종 Sonar 통과는 새 HEAD의 실제 결과를 기다린다.
+
+
+### Sonar 3.1% 마무리 · 타 공간 삭제 보존
+
+HEAD `847c4a7640`의 CI Gate는 PASS였으나 Sonar는 신규 중복3.1%(기준3%)로 실패했다. 공개/인쇄 페이지의 중복된 asset 조회 상태를 공통 `usePublishedAsset` 훅으로 추출한다. 식별자/응답/오류 메시지 및 공개 화면의 reload 로딩 표시와 인쇄 화면의 기존 표시 차이를 유지하고, 인쇄 effect·렌더·QR 규격은 페이지에 남긴다.
+
+사용자가 타 공간에서 수행했다고 확인한 약국 앱 파일100개 삭제는 복구·stage·commit 하지 않는다. 이번 단계 전후 삭제 경로 목록이 동일한 것을 확인했다. 해당 로컬 checkout에는 앱 전체 build 입력이 없으므로 전체 앱 빌드 재실행으로 PASS를 주장하지 않는다. 새 훅6개 계약 테스트·isolated strict type-check·변경 파일 ESLint는 PASS이며, 전체 빌드/회귀는 의도적 로컬 삭제를 포함하지 않은 GitHub clean checkout의 CI로 확인한다.

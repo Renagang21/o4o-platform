@@ -1,4 +1,5 @@
-import type { UsageSettings } from '@o4o/store-ui-core/content/publishedContent';
+import { usePublishedAsset } from "@o4o/store-ui-core/content/usePublishedAsset";
+import type { UsageSettings } from "@o4o/store-ui-core/content/publishedContent";
 import {
   parseUsage,
   parseBlocks,
@@ -19,7 +20,6 @@ import {
  *   - print: 인쇄 버튼 표시
  */
 
-import { useEffect, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import {
   Loader2,
@@ -28,39 +28,18 @@ import {
   Printer,
   QrCode,
 } from "lucide-react";
-import {
-  publishedAssetsApi,
-  type PublishedAssetItem,
-} from "../../api/assetSnapshot";
+import { publishedAssetsApi } from "../../api/assetSnapshot";
 
 export default function PublicContentViewPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
   const [searchParams] = useSearchParams();
   const orgId = searchParams.get("org");
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [asset, setAsset] = useState<PublishedAssetItem | null>(null);
-
-  useEffect(() => {
-    if (!snapshotId || !orgId) {
-      setError("필수 파라미터가 누락되었습니다");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    publishedAssetsApi
-      .get(orgId, snapshotId)
-      .then((res) => {
-        if (res.success && res.data) {
-          setAsset(res.data);
-        } else {
-          setError("콘텐츠를 찾을 수 없습니다");
-        }
-      })
-      .catch(() => setError("콘텐츠를 불러올 수 없습니다"))
-      .finally(() => setLoading(false));
-  }, [snapshotId, orgId]);
+  const { loading, error, asset } = usePublishedAsset(
+    publishedAssetsApi.get,
+    snapshotId,
+    orgId,
+  );
 
   if (loading) {
     return (

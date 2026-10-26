@@ -1,3 +1,4 @@
+import { usePublishedAsset } from "@o4o/store-ui-core/content/usePublishedAsset";
 import {
   parseUsage,
   parseBlocks,
@@ -17,41 +18,22 @@ import {
  * - QR 코드 포함 (usage.qr.enabled 시)
  */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Loader2, AlertCircle } from "lucide-react";
-import {
-  publishedAssetsApi,
-  type PublishedAssetItem,
-} from "../../api/assetSnapshot";
+import { publishedAssetsApi } from "../../api/assetSnapshot";
 
 export default function PrintContentPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
   const [searchParams] = useSearchParams();
   const orgId = searchParams.get("org");
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [asset, setAsset] = useState<PublishedAssetItem | null>(null);
-
-  useEffect(() => {
-    if (!snapshotId || !orgId) {
-      setError("필수 파라미터가 누락되었습니다");
-      setLoading(false);
-      return;
-    }
-    publishedAssetsApi
-      .get(orgId, snapshotId)
-      .then((res) => {
-        if (res.success && res.data) {
-          setAsset(res.data);
-        } else {
-          setError("콘텐츠를 찾을 수 없습니다");
-        }
-      })
-      .catch(() => setError("콘텐츠를 불러올 수 없습니다"))
-      .finally(() => setLoading(false));
-  }, [snapshotId, orgId]);
+  const { loading, error, asset } = usePublishedAsset(
+    publishedAssetsApi.get,
+    snapshotId,
+    orgId,
+    false,
+  );
 
   // Auto-print when content is loaded
   useEffect(() => {
