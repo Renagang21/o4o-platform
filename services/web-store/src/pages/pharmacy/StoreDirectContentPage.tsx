@@ -256,6 +256,7 @@ export default function StoreDirectContentPage() {
               value={session.draft.consultation} title={editTitle} html={editorContent.html}
               disabled={saving || deleting} isCurrent={isCurrent}
               onChange={consultation => session.changeDraft({ consultation })} onApplyHtml={setEditorInitialHtml} /> : <LlmAssistPanel
+              contextKey={`${organizationId}:${getActiveServiceKey()}:direct:${id}`} disabled={saving || deleting}
               label={STORE_LLM_ASSIST_LABEL}
               contextLabel="매장 직접 작성 콘텐츠 — 현재 내용을 다듬거나 새로 씁니다"
               guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({

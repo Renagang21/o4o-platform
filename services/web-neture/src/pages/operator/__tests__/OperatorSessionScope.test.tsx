@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({ user: { id: 'operator-a' } as { id: string } |
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));
 vi.mock('../../../lib/apiClient', () => ({ api: mocks, authClient: { api: mocks } }));
 vi.mock('@o4o/auth-react', () => ({ requestServiceHandoff: vi.fn() }));
-vi.mock('@o4o/content-editor', () => ({ RichTextEditor: () => <div>본문 편집기</div> }));
+vi.mock('@o4o/content-editor', async (importOriginal) => ({ ...(await importOriginal<typeof import('@o4o/content-editor')>()), RichTextEditor: () => <div>본문 편집기</div> }));
 import NeturePage from '../OperatorSemiFranchisePage';
 import NetureEditor from '../SemiFranchiseContentFormPage';
 import { PharmacyOperatorPage as PharmacyPage, PharmacyOperatorContentPage as PharmacyEditor } from '../../../../../web-pharmacy-business/src/pages/business/PharmacyOperatorPages';

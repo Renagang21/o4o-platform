@@ -9,7 +9,7 @@
  *   보관된 콘텐츠는 수정할 수 없다(API 가 404 로 거부).
  */
 import { Link } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, buildContentAuthoringGuide } from '@o4o/content-editor';
 import { getCooperationExtension } from '@o4o/shared-space-ui';
 import { useSemiFranchiseContentEditor } from './useSemiFranchiseContentEditor';
 import { INPUT, Message, PageHeader, StatusBadge } from './PharmacyCommerceUi';
@@ -100,6 +100,18 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">본문</label>
+              <div className="mb-3">
+                <LlmAssistPanel contextKey={scope} disabled={saving}
+                  label="외부 AI로 콘텐츠 작업" contextLabel="협력사업 회원 약국용 자료 — 초안 적용 후 별도 저장"
+                  guideText={({ additionalInstruction }) => buildContentAuthoringGuide({
+                    contextLabel: '협력사업 회원 약국용 콘텐츠', title: form.title, additionalInstruction,
+                  })}
+                  referenceMaterials={[
+                    { id: 'summary', title: '현재 요약', text: form.summary },
+                    { id: 'body', title: '현재 본문', text: form.body },
+                  ].filter(material => material.text.trim())}
+                  currentHtml={form.body} onApplyHtml={html => set('body', html)} />
+              </div>
               <div className="overflow-hidden rounded-md border border-gray-300">
                 <RichTextEditor
                   value={form.body}

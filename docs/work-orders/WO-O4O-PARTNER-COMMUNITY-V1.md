@@ -54,3 +54,12 @@ Partner의 기존 초대형 자료·활동·정산 공동공간과 회원 커뮤
 - **DEPLOYMENT = MANUAL/GATED · 미실행.** 신규 migration·identity·운영 역할을 포함하므로 main CI와 정상 migration/verified 배포 경로를 따른다. 이번 신규 migration의 운영 적용, 실제 운영자 중앙 초대·본인 수락, 실계정 로그인·handoff·이용 안내 확인은 별도 실행 결과가 필요하다. 역할 카탈로그 생성은 사용자에게 역할을 부여한 것이 아니다.
 - 기존 Partner 사이트의 앞선 배포 성공과 이번 커뮤니티 코드의 운영 반영을 혼동하지 않는다. 실제 법률 문서를 작성·게시하거나 운영 계정·외부 송금·SNS/AI 연동을 생성하지 않았다.
 - WORKTREE_DISPOSITION: KEEP — 미배포 후속 통합·실계정 검증에 필요. 기존 root checkout과 다른 세션 작업은 정리하지 않는다.
+
+
+## main 통합·배포 착수 — 2026-10-26
+
+사용자 후속 지시 `Main 병합 배포`에 따라 신규 community migration을 포함한 정상 통합·운영 배포를 진행한다. 별도 운영 계정 생성·사용자에게 운영 역할 부여는 이 지시로 추정하지 않는다.
+
+- 최신 main `64a7cd474e`와 own branch를 통합했다. incoming main의 `HardenAuthPrivacyReadiness1793010000000`을 보존하고 community migration을 그 다음으로 배치했다. 충돌 해소 범위는 manifest와 schema state 등록이며 기존 main migration/지문을 덮어쓰지 않았다.
+- 새 일회성 PostgreSQL 15에서 baseline과 **46개 incremental prefix**를 재검증했다. 앞선 main 지문은 모두 일치하며 통합 후 최종 fingerprint는 `69ceb8e5089ee579f9b0f9bc905c10c1795ef59de69d03566ab33043c1b1957e`·7319 lines다. 빈 down/up 복원·실제 신규 5개 테이블 erasure fence 차단도 재검증했다. 이전 45개 prefix 기록은 통합 전 상태의 이력이다.
+- PR의 required CI·Codex blocker·main 위치를 확인한 뒤 정상 PR merge를 사용한다. 배포는 main exact-SHA CI 성공 → standard Promote → migration Job → API verified rollout → Partner/관리자 웹 verified rollout 및 실제 canonical URL 읽기 검증 순서다. freeze/ref/IAM/required CI는 우회하지 않는다. 실제 실행 결과는 후속 기록으로 구분한다.
