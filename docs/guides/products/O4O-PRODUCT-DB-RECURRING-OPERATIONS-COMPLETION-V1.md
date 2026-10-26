@@ -1,7 +1,7 @@
 # 상품 DB 정기 운영 완성 V1
 
 > **상태**: ACTIVE · **작성일**: 2026-10-25
-> **구현 상태**: 이번 개발 branch의 미병합 변경. 기존 PR #816의 운영 배포와 구분.
+> **구현 상태**: PR #822·#823 main 병합 및 공식 Promote 40249872295 API·관리자 배포 완료. 외부 Job/Scheduler 연결은 미실행. [운영 준비](O4O-PRODUCT-DB-OPERATIONAL-READINESS-V1.md) 참조.
 > **작업**: [통합 TODO](../../work-orders/WO-O4O-PRODUCT-DB-RECURRING-OPERATIONS-COMPLETION-V1.md) · [검증](../../checks/CHECK-O4O-PRODUCT-DB-RECURRING-OPERATIONS-COMPLETION-V1.md)
 
 ## 관리자 운영 흐름
@@ -45,7 +45,7 @@ help는 DB를 열지 않는다. --run 없는 요청, 미지정 DB 환경, 잘못
 
 ## 운영 인계 — 아직 실행하지 않은 항목
 
-이번 범위는 main 병합 전까지이며 Cloud Run Job/Scheduler/IAM/비밀/운영 예약은 생성·변경하지 않았다. **독립 entry가 있다는 사실만으로 Cloud Run 휴면 중 정시 실행이 보장되지는 않는다.**
+기능은 main 병합·배포됐으나 Cloud Run Job/Scheduler/IAM/비밀/운영 예약은 이 작업에서 생성·변경하지 않았다. **독립 entry가 있다는 사실만으로 Cloud Run 휴면 중 정시 실행이 보장되지는 않는다.**
 
 향후 별도 통합·배포 단계에서 다음을 확인해 연결한다.
 
