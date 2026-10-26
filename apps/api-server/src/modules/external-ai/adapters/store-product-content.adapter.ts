@@ -281,10 +281,12 @@ export class StoreProductContentAdapter {
       db,
       userId,
       organizationId,
-      page.id,
-      group.id,
-      input.productId,
-      input.language,
+      {
+        id: page.id,
+        groupId: group.id,
+        productId: input.productId,
+        language: input.language,
+      },
       "created",
     );
     return this.content(db, organizationId, page.id);
@@ -317,16 +319,7 @@ export class StoreProductContentAdapter {
       },
       userId,
     );
-    await this.audit(
-      db,
-      userId,
-      organizationId,
-      page.id,
-      page.groupId,
-      page.productId,
-      page.language,
-      "updated",
-    );
+    await this.audit(db, userId, organizationId, page, "updated");
     return this.content(db, organizationId, page.id);
   }
 
@@ -334,10 +327,9 @@ export class StoreProductContentAdapter {
     db: EntityManager,
     userId: string,
     organizationId: string,
-    contentId: string,
-    groupId: string,
-    productId: string,
-    language: string,
+    identity: Readonly<
+      Pick<ProductPage, "id" | "groupId" | "productId" | "language">
+    >,
     operation: "created" | "updated",
   ) {
     return recordOperation(
@@ -348,10 +340,10 @@ export class StoreProductContentAdapter {
       {
         channel: "external_ai",
         organizationId,
-        contentId,
-        groupId,
-        productId,
-        language,
+        contentId: identity.id,
+        groupId: identity.groupId,
+        productId: identity.productId,
+        language: identity.language,
       },
     );
   }

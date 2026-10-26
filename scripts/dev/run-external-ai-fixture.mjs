@@ -142,6 +142,7 @@ async function tests(db) {
   settings.chatgptEnabled = true;
   settings.targets.supplier = { read: true, write: true };
   const app = express();
+  app.disable("x-powered-by");
   // Loopback-only proxy fixture for the SDK IPv6 subnet rate-limit regression.
   app.set("trust proxy", 1);
   app.use(express.json());
@@ -860,21 +861,26 @@ async function tests(db) {
     await check(
       "SDK registration groups trusted IPv6 addresses by subnet and keeps other subnets independent",
       async () => {
-        for (let i = 1; i <= 21; i++) {
-          const response = await fetch(new URL("/register", base), {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              "x-forwarded-for": `2001:db8:abcd:1200::${i.toString(16)}`,
-            },
-            body: JSON.stringify({
-              client_name: "Fixture IPv6",
-              redirect_uris: [config.redirectUris[0]],
-              token_endpoint_auth_method: "none",
+        // Each response must precede the next attempt to verify the exact rate-limit boundary.
+        await Array.from({ length: 21 }, (_, index) => index + 1).reduce(
+          (previous, i) =>
+            previous.then(async () => {
+              const response = await fetch(new URL("/register", base), {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                  "x-forwarded-for": `2001:db8:abcd:1200::${i.toString(16)}`,
+                },
+                body: JSON.stringify({
+                  client_name: "Fixture IPv6",
+                  redirect_uris: [config.redirectUris[0]],
+                  token_endpoint_auth_method: "none",
+                }),
+              });
+              assert.equal(response.status, i <= 20 ? 201 : 429);
             }),
-          });
-          assert.equal(response.status, i <= 20 ? 201 : 429);
-        }
+          Promise.resolve(),
+        );
         const otherSubnet = await fetch(new URL("/register", base), {
           method: "POST",
           headers: {

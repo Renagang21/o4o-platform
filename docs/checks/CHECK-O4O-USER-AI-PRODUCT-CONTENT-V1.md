@@ -62,4 +62,8 @@ WORKTREE_DISPOSITION: `wo/user-ai-product-content` / `/workspace/o4o-wt/user-ai-
 
 병합 전 자체 검토에서는 신규 fixture의 문자열 정렬 두 곳에 비교 함수를 명시했다. 테스트 자료의 영문 메타데이터 키 비교이며 상품 저장·권한·배포 동작은 변경하지 않는다. 문서 민감정보·링크·staged 범위와 fixture 문법을 재확인하고 같은 PR에 반영한다.
 
+후속 `260eb9fbc1`의 Sonar check `121408800495`는 신규 Security B로 실패했다. GitHub annotations에서 이번 변경의 16개 지적을 확보했다. 시험용 Express 서버의 버전 응답 헤더를 제거하고 HTTP에서 헤더 부재를 검증한다. 독립된 공개 상태 시험·정리 대상은 대상별 Promise로 묶고, IPv6 한도 경계 검사는 Promise chain으로 응답 순서를 유지한다. 감사 인자는 식별자 DTO로 묶어 본문 없는 메타 계약을 유지하고 React props는 readonly로 명시한다. 규칙 제외·등급 변경 없이 수정한 최종 HEAD에서 검증한다.
+
+`260eb9fbc1`의 전체 CI `40272034057`·CodeQL `40272034012`와 Codex code review는 성공/지적 없음이었으며 Sonar 실패는 별도로 수정했다. 수정 후 로컬 API 48·Store DOM 48·실제 PG/SDK 69건과 타입/lint가 다시 통과했다. 69건에는 독립 시나리오 병렬 실행·순차 한도 경계·응답 헤더 부재·감사 rollback 검증이 포함된다. 시험 DB 삭제 후 잔존 0을 확인했다. 최종 커밋의 외부 검사 결과는 PR 상태와 완료 보고에서 따로 확정한다.
+
 이번 종료점은 병합 직전이다. main merge·auto-merge·운영 배포 dispatch·운영 데이터 시험은 실행하지 않는다. 실제 ChatGPT·desktop/mobile browser·MFDS 원천 검증의 위 미완료 범위도 유지한다. 사용자 지시 없이 이 제한을 배포 승인으로 확대하지 않는다.

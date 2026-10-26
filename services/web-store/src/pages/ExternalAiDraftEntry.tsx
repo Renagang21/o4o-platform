@@ -7,7 +7,7 @@ import { StoreGate } from "../components/StoreGate";
 export default function ExternalAiDraftEntry({
   productContent = false,
 }: {
-  productContent?: boolean;
+  readonly productContent?: boolean;
 }) {
   const { id, targetKind, targetId } = useParams();
   const [params] = useSearchParams();

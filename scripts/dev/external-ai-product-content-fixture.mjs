@@ -69,6 +69,7 @@ export async function runProductContentChecks({
     });
   const mcp = new Client({ name: "product-content-fixture", version: "1.0.0" });
   const app = express();
+  app.disable("x-powered-by");
   app.use(express.json());
   app.use(
     "/api/v1/kpa",
@@ -160,6 +161,7 @@ export async function runProductContentChecks({
         assert.ok(link.pathname.endsWith(`/local/${product}/${saved.groupId}`));
         const response = await fetch(`${web}/${saved.groupId}`);
         assert.equal(response.status, 200);
+        assert.equal(response.headers.get("x-powered-by"), null);
         const group = (await response.json()).data;
         assert.equal(group.targetId, product);
         const [storedGroup] = await db.query(
@@ -382,49 +384,48 @@ export async function runProductContentChecks({
     await check(
       "published, archived, public-key and non-HTML content are never changed by product tools",
       async () => {
-        for (const mode of [
-          "published-page",
-          "archived-group",
-          "public-key",
-          "non-html",
-        ]) {
-          const page = await exec(
-            "save_product_content_draft",
-            input({ contentKey: mode }),
-          );
-          if (mode === "published-page")
-            await db.query(
-              "UPDATE store_multilingual_product_content_pages SET status='published' WHERE id=$1",
-              [page.id],
-            );
-          if (mode === "archived-group")
-            await db.query(
-              "UPDATE store_multilingual_product_content_groups SET status='archived' WHERE id=$1",
-              [page.groupId],
-            );
-          if (mode === "public-key")
-            await db.query(
-              "UPDATE store_multilingual_product_content_groups SET public_key=$2 WHERE id=$1",
-              [page.groupId, randomUUID().replaceAll("-", "")],
-            );
-          if (mode === "non-html")
-            await db.query(
-              "UPDATE store_multilingual_product_content_pages SET content_format='blocks' WHERE id=$1",
-              [page.id],
-            );
-          const blocked = await get(page.id);
-          assert.equal(blocked.editable, false);
-          await assert.rejects(update(blocked), /CONTENT_NOT_EDITABLE/);
-          if (mode !== "non-html")
-            await assert.rejects(
-              exec(
+        await Promise.all(
+          ["published-page", "archived-group", "public-key", "non-html"].map(
+            async (mode) => {
+              const page = await exec(
                 "save_product_content_draft",
-                input({ contentKey: mode, language: "ja" }),
-              ),
-              /CONTENT_NOT_EDITABLE/,
-            );
-          assert.equal((await get(page.id)).revision, blocked.revision);
-        }
+                input({ contentKey: mode }),
+              );
+              if (mode === "published-page")
+                await db.query(
+                  "UPDATE store_multilingual_product_content_pages SET status='published' WHERE id=$1",
+                  [page.id],
+                );
+              if (mode === "archived-group")
+                await db.query(
+                  "UPDATE store_multilingual_product_content_groups SET status='archived' WHERE id=$1",
+                  [page.groupId],
+                );
+              if (mode === "public-key")
+                await db.query(
+                  "UPDATE store_multilingual_product_content_groups SET public_key=$2 WHERE id=$1",
+                  [page.groupId, randomUUID().replaceAll("-", "")],
+                );
+              if (mode === "non-html")
+                await db.query(
+                  "UPDATE store_multilingual_product_content_pages SET content_format='blocks' WHERE id=$1",
+                  [page.id],
+                );
+              const blocked = await get(page.id);
+              assert.equal(blocked.editable, false);
+              await assert.rejects(update(blocked), /CONTENT_NOT_EDITABLE/);
+              if (mode !== "non-html")
+                await assert.rejects(
+                  exec(
+                    "save_product_content_draft",
+                    input({ contentKey: mode, language: "ja" }),
+                  ),
+                  /CONTENT_NOT_EDITABLE/,
+                );
+              assert.equal((await get(page.id)).revision, blocked.revision);
+            },
+          ),
+        );
       },
     );
     await check(
@@ -515,17 +516,19 @@ export async function runProductContentChecks({
         "UPDATE external_ai_connections SET revoked_at=now() WHERE id=ANY($1::uuid[])",
         [clonedGrants],
       );
-    for (const { master, listing } of listingFixtures) {
-      await db.query(
-        "DELETE FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND target_kind='listing' AND target_id=$2",
-        [store, listing],
-      );
-      await db.query(
-        "DELETE FROM organization_product_listings WHERE id=$1 AND organization_id=$2",
-        [listing, store],
-      );
-      await db.query("DELETE FROM product_masters WHERE id=$1", [master]);
-    }
+    await Promise.all(
+      listingFixtures.map(async ({ master, listing }) => {
+        await db.query(
+          "DELETE FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND target_kind='listing' AND target_id=$2",
+          [store, listing],
+        );
+        await db.query(
+          "DELETE FROM organization_product_listings WHERE id=$1 AND organization_id=$2",
+          [listing, store],
+        );
+        await db.query("DELETE FROM product_masters WHERE id=$1", [master]);
+      }),
+    );
     await db.query("UPDATE organizations SET metadata=$2::jsonb WHERE id=$1", [
       businessOrg,
       JSON.stringify(business.metadata),
