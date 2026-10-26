@@ -236,9 +236,9 @@ describe('공통 View 순수성', () => {
 
 describe('KPA — 옛 콘텐츠/자료실 화면 제거 (WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7)', () => {
   it.each([
-    'services/web-kpa-society/src/pages/contents/ContentListPage.tsx',
-    'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',
-    'services/web-kpa-society/src/pages/resources/ResourcesHubPage.tsx',
+    'services/web-pharmacy-business/src/pages/contents/ContentListPage.tsx',
+    'services/web-pharmacy-business/src/pages/contents/ContentDetailPage.tsx',
+    'services/web-pharmacy-business/src/pages/resources/ResourcesHubPage.tsx',
   ])('%s 는 존재하지 않는다 (필요 시 pharmacy.neture.co.kr 에서 새로 만든다)', (p) => {
     expect(fs.existsSync(path.join(REPO_ROOT, p))).toBe(false);
   });

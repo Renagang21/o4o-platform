@@ -72,7 +72,6 @@ env:
   VITE_API_BASE_URL: https://api.neture.co.kr
   # Service-specific API URLs (same-origin for cookie auth)
   VITE_API_URL_KPA_SOCIETY: https://api.neture.co.kr
-  VITE_KPA_URL: https://kpa-society-web-3e3aws7zqa-du.a.run.app
   # WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: per-service canonical URL injected as build-arg.
   # Values mirror apps/api-server/src/config/service-catalog.ts O4O_SERVICES[].domain.
   VITE_SERVICE_URL_NETURE: https://neture.co.kr
@@ -398,7 +397,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \
-            -f services/web-kpa-society/Dockerfile \
+            -f services/web-pharmacy-business/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
             .

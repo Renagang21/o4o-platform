@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllEnvs());
 describe.each(['store', 'pharmacy'])('%s refresh endpoint configuration', service => {
   const load = () => service === 'store'
     ? import('../../../../services/web-store/src/api/token-refresh')
-    : import('../../../../services/web-kpa-society/src/api/token-refresh');
+    : import('../../../../services/web-pharmacy-business/src/api/token-refresh');
 
   it('keeps same-origin /api/v1 when no API base is configured', async () => {
     vi.stubEnv('VITE_API_BASE_URL', '');

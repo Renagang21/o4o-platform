@@ -3,6 +3,7 @@ import "reflect-metadata";
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import { once } from "node:events";
+import { runProductContentChecks } from "./external-ai-product-content-fixture.mjs";
 import { DataSource } from "typeorm";
 import express from "express";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -141,6 +142,9 @@ async function tests(db) {
   settings.chatgptEnabled = true;
   settings.targets.supplier = { read: true, write: true };
   const app = express();
+  app.disable("x-powered-by");
+  // Loopback-only proxy fixture for the SDK IPv6 subnet rate-limit regression.
+  app.set("trust proxy", 1);
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   const server = app.listen(0, "127.0.0.1");
@@ -358,7 +362,7 @@ async function tests(db) {
             }),
           );
           const list = await mcp.listTools();
-          assert.equal(list.tools.length, 8);
+          assert.equal(list.tools.length, 11);
           const result = await mcp.callTool({
             name: "search_products",
             arguments: { workspaceId: supplierA },
@@ -745,7 +749,7 @@ async function tests(db) {
             }),
           );
           const list = await mcp.listTools();
-          assert.equal(list.tools.length, 8);
+          assert.equal(list.tools.length, 11);
           assert.ok(list.tools.some((t) => t.name === "save_content_draft"));
           const denied = await mcp.callTool({
             name: "save_content_draft",
@@ -854,6 +858,44 @@ async function tests(db) {
       },
     );
     await expandedTests(db, tools, provider, registerAndAuthorize, base, post);
+    await check(
+      "SDK registration groups trusted IPv6 addresses by subnet and keeps other subnets independent",
+      async () => {
+        // Each response must precede the next attempt to verify the exact rate-limit boundary.
+        await Array.from({ length: 21 }, (_, index) => index + 1).reduce(
+          (previous, i) =>
+            previous.then(async () => {
+              const response = await fetch(new URL("/register", base), {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                  "x-forwarded-for": `2001:db8:abcd:1200::${i.toString(16)}`,
+                },
+                body: JSON.stringify({
+                  client_name: "Fixture IPv6",
+                  redirect_uris: [config.redirectUris[0]],
+                  token_endpoint_auth_method: "none",
+                }),
+              });
+              assert.equal(response.status, i <= 20 ? 201 : 429);
+            }),
+          Promise.resolve(),
+        );
+        const otherSubnet = await fetch(new URL("/register", base), {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-forwarded-for": "2001:db8:abcd:1300::1",
+          },
+          body: JSON.stringify({
+            client_name: "Fixture separate IPv6",
+            redirect_uris: [config.redirectUris[0]],
+            token_endpoint_auth_method: "none",
+          }),
+        });
+        assert.equal(otherSubnet.status, 201);
+      },
+    );
     await check(
       "SDK rejects repeated public registration before more rows are stored",
       async () => {
@@ -1299,6 +1341,21 @@ async function expandedTests(db, tools, provider, register, base, post) {
     requestId: randomUUID(),
   });
   let storeDraft, orgDraft, communityDraft, coopDraft;
+  await runProductContentChecks({
+    db,
+    check,
+    exec,
+    resource: provider.resource,
+    ownerGrant,
+    owner,
+    store,
+    storeId,
+    orgId,
+    businessOrg,
+    product,
+    foreignProduct,
+    foreignStore,
+  });
   await check(
     "all workspace kinds use live permissions; selected grants never expand",
     async () => {

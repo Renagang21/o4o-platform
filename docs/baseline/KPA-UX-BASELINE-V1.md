@@ -46,7 +46,7 @@ KPA Society 서비스의 3개 서비스 영역(KPA-a, KPA-b, KPA-c) 모두에
 | Activity Log | content.recentItems + forum.recentPosts 병합, 시간순 | `operatorApi.getSummary()` |
 | Quick Actions | 6개 (콘텐츠, 시그니지, 미디어, 포럼, 스마트디스플레이, 설정) | Static |
 
-- **파일**: `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx`
+- **파일**: `services/web-pharmacy-business/src/pages/operator/KpaOperatorDashboard.tsx`
 - **커밋**: `bf41b174f` (Operator UX Core Freeze v1 시점)
 
 ### Admin 4-Block
@@ -68,7 +68,7 @@ KPA Society 서비스의 3개 서비스 영역(KPA-a, KPA-b, KPA-c) 모두에
 | Activity Log | content.recentItems + forum.recentPosts 병합, 시간순 | `operatorApi.getSummary()` |
 | Quick Actions | 6개 (콘텐츠, 시그니지, 미디어, 포럼, 스마트디스플레이, 설정) | Static |
 
-- **파일**: `services/web-kpa-society/src/pages/branch-operator/BranchOperatorDashboard.tsx`
+- **파일**: `services/web-pharmacy-business/src/pages/branch-operator/BranchOperatorDashboard.tsx`
 - **커밋**: `7beb12e91`
 
 ### Admin 4-Block
@@ -81,7 +81,7 @@ KPA Society 서비스의 3개 서비스 영역(KPA-a, KPA-b, KPA-c) 모두에
 | Structure Actions | 6개 (회원, 신상신고, 연회비, 공지, 임원, 설정) | Static |
 
 - **4-Block 외부**: 회계 현황 섹션 (단식부기 + AI 분석 + 엑셀 다운로드)
-- **파일**: `services/web-kpa-society/src/pages/branch-admin/DashboardPage.tsx`
+- **파일**: `services/web-pharmacy-business/src/pages/branch-admin/DashboardPage.tsx`
 - **커밋**: `7beb12e91`
 
 ---
@@ -98,7 +98,7 @@ KPA Society 서비스의 3개 서비스 영역(KPA-a, KPA-b, KPA-c) 모두에
 | Activity Log | 대기 요청 상세 (최대 10건, 타입 라벨 표시) | `joinRequestApi.getPending()` |
 | Quick Actions | 6개 (회원, 분회, 조직요청, 위원회, 서비스신청, 설정) | Static |
 
-- **파일**: `services/web-kpa-society/src/pages/admin/KpaOperatorDashboardPage.tsx`
+- **파일**: `services/web-pharmacy-business/src/pages/admin/KpaOperatorDashboardPage.tsx`
 - **커밋**: `dda8ccb5f`
 
 ### Admin 4-Block
@@ -110,7 +110,7 @@ KPA Society 서비스의 3개 서비스 영역(KPA-a, KPA-b, KPA-c) 모두에
 | Governance Alerts | 미처리 승인, 분회 부재, 회원 부재 경고 | Rule-based |
 | Structure Actions | 6개 (분회, 회원, 임원, 조직요청, 공지, 설정) | Static |
 
-- **파일**: `services/web-kpa-society/src/pages/admin/AdminDashboardPage.tsx`
+- **파일**: `services/web-pharmacy-business/src/pages/admin/AdminDashboardPage.tsx`
 - **커밋**: `dda8ccb5f`
 
 ---

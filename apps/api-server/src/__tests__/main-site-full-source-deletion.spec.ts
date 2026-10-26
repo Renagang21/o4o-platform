@@ -168,8 +168,8 @@ describe('WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1', () => {
       expect(hits.map((f) => path.relative(REPO_ROOT, f))).toEqual([]);
     });
 
-    it('web-kpa-society 는 main-site 를 참조하지 않는다 (소유권 분리 확인)', () => {
-      const kpa = path.join(REPO_ROOT, 'services', 'web-kpa-society', 'src');
+    it('web-pharmacy-business 는 main-site 를 참조하지 않는다 (소유권 분리 확인)', () => {
+      const kpa = path.join(REPO_ROOT, 'services', 'web-pharmacy-business', 'src');
       if (!fs.existsSync(kpa)) return;
       const hits = walk(kpa)
         .filter((f) => /\.(ts|tsx)$/.test(f))

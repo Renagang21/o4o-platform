@@ -479,9 +479,9 @@ const columns: O4OColumn<T>[] = [
 | 우선순위 | 파일 | 서비스 | 특징 |
 |---------|------|--------|------|
 | **1순위** | `apps/admin-dashboard/src/pages/neture/ProductApprovalQueuePage.tsx` | Admin | **WO-O4O-PRODUCT-APPROVAL-CANONICAL-COMPLETION-V1 완성** — _select+_actions(system:'last') + selectedPendingCount 필터 + 승인/거절 별도 BulkResultModal + 실제 batch API |
-| **2순위** | `services/web-kpa-society/src/pages/operator/ContentManagementPage.tsx` | KPA | publish/archive/delete 3종 bulk + group 분리 + visible 조건 |
+| **2순위** | `services/web-pharmacy-business/src/pages/operator/ContentManagementPage.tsx` | KPA | publish/archive/delete 3종 bulk + group 분리 + visible 조건 |
 | **3순위** | `services/web-neture/src/pages/operator/OperatorProductApprovalPage.tsx` | Neture | batch-approve/batch-reject + real batch API |
-| **4순위** | `services/web-kpa-society/src/pages/operator/OperatorLmsCoursesPage.tsx` | KPA | LMS 도메인 표준 |
+| **4순위** | `services/web-pharmacy-business/src/pages/operator/OperatorLmsCoursesPage.tsx` | KPA | LMS 도메인 표준 |
 
 ### CANONICAL TARGET (전환 목표)
 
@@ -501,7 +501,7 @@ const columns: O4OColumn<T>[] = [
 |------|--------|---------|
 | ~~`apps/admin-dashboard/src/pages/dropshipping/*` 4건~~ | ~~Admin~~ | **삭제됨** — `WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1` |
 | `apps/admin-dashboard/src/pages/users/UsersListClean.tsx` | Admin | ActionBar + BulkResultModal |
-| `services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx` | KPA | BulkResultModal |
+| `services/web-pharmacy-business/src/pages/operator/OperatorResourcesPage.tsx` | KPA | BulkResultModal |
 
 ### LEGACY (구조 전환 필요)
 

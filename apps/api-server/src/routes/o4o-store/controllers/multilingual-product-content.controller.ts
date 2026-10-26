@@ -18,17 +18,15 @@ import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { generateQrSvg } from '../../../services/qr-print.service.js';
 import { getServicePublicOrigin } from '../../../config/service-catalog.js';
+import { STORE_PRODUCT_CONTENT_LOCALES, STORE_PRODUCT_TARGET_KINDS,
+  storeProductContentTargetExists, upsertStoreProductContentPage } from '../../../services/store/store-product-content.service.js';
 
 type AuthMiddleware = RequestHandler;
 
 type Locale = 'ko' | 'en' | 'zh' | 'ja' | 'vi' | 'th' | 'id';
-type TargetKind = 'local' | 'listing';
-type ContentFormat = 'blocks' | 'html' | 'image_sequence' | 'json';
-type Status = 'draft' | 'published' | 'archived';
-type SourceType = 'store_created' | 'operator_hub' | 'supplier_offline_imported';
 
-const LOCALES = ['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'] as const;
-const TARGET_KINDS = ['local', 'listing'] as const;
+const LOCALES = STORE_PRODUCT_CONTENT_LOCALES;
+const TARGET_KINDS = STORE_PRODUCT_TARGET_KINDS;
 const CONTENT_FORMATS = ['blocks', 'html', 'image_sequence', 'json'] as const;
 const STATUSES = ['draft', 'published', 'archived'] as const;
 const SOURCE_TYPES = ['store_created', 'operator_hub', 'supplier_offline_imported'] as const;
@@ -57,37 +55,6 @@ function asString(value: unknown, maxLength: number): string | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   return trimmed.slice(0, maxLength);
-}
-
-async function assertTargetBelongsToStore(
-  dataSource: DataSource,
-  organizationId: string,
-  serviceKey: string | undefined,
-  targetKind: TargetKind,
-  targetId: string,
-): Promise<boolean> {
-  if (targetKind === 'local') {
-    const rows = await dataSource.query(
-      `SELECT 1 FROM store_local_products
-       WHERE id = $1 AND organization_id = $2 AND is_active = true
-       LIMIT 1`,
-      [targetId, organizationId],
-    );
-    return rows.length > 0;
-  }
-
-  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: service_key 조건 제거.
-  // 소유 경계는 organization_id (Boundary Policy: Store Ops=organizationId) 이며,
-  // 취급상품 목록의 진실 소스(store-handled-products.routes.ts)도 organization_id + is_active 로만
-  // listing 을 조회한다. listing.service_key 는 'kpa-society' 로 저장돼 있어 mount serviceKey('kpa')와
-  // 불일치(알려진 kpa≠kpa-society 함정) → service_key 를 강제하면 자기 매장 상품인데도 매칭 실패한다.
-  const rows = await dataSource.query(
-    `SELECT 1 FROM organization_product_listings
-     WHERE id = $1 AND organization_id = $2 AND is_active = true
-     LIMIT 1`,
-    [targetId, organizationId],
-  );
-  return rows.length > 0;
 }
 
 async function loadGroupWithPages(
@@ -636,7 +603,7 @@ export function createMultilingualProductContentController(
       }
 
       // 1. Target must belong to this store.
-      const targetOk = await assertTargetBelongsToStore(dataSource, organizationId, serviceKey, targetKind, targetId);
+      const targetOk = await storeProductContentTargetExists(dataSource, organizationId, targetKind, targetId);
       if (!targetOk) {
         res.status(404).json({ success: false, error: { code: 'TARGET_NOT_FOUND', message: 'Target product not found for this store' } });
         return;
@@ -747,7 +714,7 @@ export function createMultilingualProductContentController(
         return;
       }
 
-      const targetOk = await assertTargetBelongsToStore(dataSource, organizationId, serviceKey, targetKind, targetId);
+      const targetOk = await storeProductContentTargetExists(dataSource, organizationId, targetKind, targetId);
       if (!targetOk) {
         res.status(404).json({ success: false, error: { code: 'TARGET_NOT_FOUND', message: 'Target product not found for this store' } });
         return;
@@ -846,39 +813,9 @@ export function createMultilingualProductContentController(
         return;
       }
 
-      await dataSource.query(
-        `INSERT INTO store_multilingual_product_content_pages
-           (group_id, locale, title, summary, content_format, content, assets, buttons, status, is_default, sort_order, metadata, created_by_user_id)
-         VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8::jsonb, $9, $10, $11, $12::jsonb, $13)
-         ON CONFLICT (group_id, locale)
-         DO UPDATE SET
-           title = EXCLUDED.title,
-           summary = EXCLUDED.summary,
-           content_format = EXCLUDED.content_format,
-           content = EXCLUDED.content,
-           assets = EXCLUDED.assets,
-           buttons = EXCLUDED.buttons,
-           status = EXCLUDED.status,
-           is_default = EXCLUDED.is_default,
-           sort_order = EXCLUDED.sort_order,
-           metadata = EXCLUDED.metadata,
-           updated_at = now()`,
-        [
-          groupId,
-          locale,
-          title,
-          summary,
-          contentFormat,
-          JSON.stringify(content),
-          JSON.stringify(assets),
-          JSON.stringify(buttons),
-          status,
-          isDefault,
-          sortOrder,
-          JSON.stringify(metadata),
-          userId || null,
-        ],
-      );
+      await upsertStoreProductContentPage(dataSource, groupId, locale, {
+        title, summary, contentFormat, content, assets, buttons, status, isDefault, sortOrder, metadata,
+      }, userId);
 
       const data = await loadGroupWithPages(dataSource, groupId, organizationId);
       res.json({ success: true, data });

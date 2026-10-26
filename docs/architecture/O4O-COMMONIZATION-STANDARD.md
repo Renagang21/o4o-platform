@@ -137,7 +137,7 @@ core
 
 | 서비스 | 경로 | 프레임 상 지위 | 공통화 범위 | 성숙도 |
 |--------|------|----------------|-------------|--------|
-| **KPA-Society** | `services/web-kpa-society` | **공통 서비스 프레임 + 약국·약사·의약품 extension** — 현재 기준 구현을 가장 많이 보유 | 전체 | `MATURE_REFERENCE` |
+| **KPA-Society** | `services/web-pharmacy-business` | **공통 서비스 프레임 + 약국·약사·의약품 extension** — 현재 기준 구현을 가장 많이 보유 | 전체 | `MATURE_REFERENCE` |
 | **K-Cosmetics** | `services/web-k-cosmetics` | **공통 서비스 프레임 + 화장품 매장·화장품 extension** — KPA 와 **동일 지위** | 전체 | `MATURE_SHARED_CORE_CONSUMER` |
 | **Neture** | `services/web-neture` | **공급자 중심 독립 서비스**(O4O 공급자 서비스 + O4O 대표 진입 홈) + 넓은 공통 소비 | **부분 채택** — §3.1 | `INDEPENDENT_APP_WITH_SHARED_CORES` |
 | **PharmacyHub** | `services/web-pharmacy-hub` | **공통 매장 경영 프레임 + 공급자 직결 B2B 구매·주문·결제 extension** | **adoption 초기** — §3.3 | `NEW_SERVICE_EARLY_ADOPTION` |

@@ -229,7 +229,7 @@ render: (_v, row) => (
 
 ## 6. Canonical 적용 완료 페이지
 
-### KPA Society (`services/web-kpa-society`)
+### KPA Society (`services/web-pharmacy-business`)
 
 | 페이지 | 파일명 | 적용 내용 |
 |--------|--------|-----------|

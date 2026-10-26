@@ -38,7 +38,7 @@ const SUPPLIER_SET = 'apps/api-server/src/routes/o4o-store/controllers/supplier-
 // WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
 //   뷰어를 @o4o/tablet-kiosk-core 로 승격했다(KPA·PharmacyHub 공용). 검사 대상 계약은 그대로다.
 const KPA_VIEWER = 'packages/tablet-kiosk-core/src/PublicScreenSetViewer.tsx';
-const KPA_TABLET_API = 'services/web-kpa-society/src/api/tabletDisplays.ts';
+const KPA_TABLET_API = 'services/web-pharmacy-business/src/api/tabletDisplays.ts';
 const PRODUCT_LIST_RESOLVE = 'apps/api-server/src/routes/platform/store-public/store-public-product-list-resolve.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,6 +69,7 @@ describe('§2 product_content 은퇴 — 쓰기·resolve·렌더 경로 0', () =
   it('KPA 뷰어·API 타입에 렌더 분기가 없다', () => {
     expect(stripComments(read(KPA_VIEWER))).not.toContain('product_content');
     expect(stripComments(read(KPA_TABLET_API))).not.toContain('product_content');
+    expect(stripComments(read('packages/store-ui-core/src/api/tabletDisplays.ts'))).not.toContain('product_content');
   });
 
   it('의약품 가드는 방어적으로 계속 수집한다 (CHECK 축소와 무관하게 안전 판정을 좁히지 않는다)', () => {

@@ -1,3 +1,40 @@
+import type {
+  PublicMlcResolve,
+  StoreMlcGroup,
+  StoreMlcGroupDetail,
+  StoreMlcHubResponse,
+  StoreMlcLocale,
+  StoreMlcPageDetail,
+  StoreMlcSummaryItem,
+  StoreMlcTargetKind,
+} from "@o4o/store-ui-core/api/multilingualProductContentStore";
+import {
+  STORE_MLC_LOCALES,
+  createStoreMlcClient,
+} from "@o4o/store-ui-core/api/multilingualProductContentStore";
+export {
+  STORE_MLC_LOCALES,
+  STORE_MLC_LOCALE_LABELS,
+} from "@o4o/store-ui-core/api/multilingualProductContentStore";
+export type {
+  PublicMlcPage,
+  PublicMlcResolve,
+  StoreMlcContentFormat,
+  StoreMlcCreateGroupInput,
+  StoreMlcGroup,
+  StoreMlcGroupDetail,
+  StoreMlcHubItem,
+  StoreMlcHubResponse,
+  StoreMlcImportInput,
+  StoreMlcLocale,
+  StoreMlcPage,
+  StoreMlcPageDetail,
+  StoreMlcPageInput,
+  StoreMlcStatus,
+  StoreMlcSummaryItem,
+  StoreMlcTargetKind,
+} from "@o4o/store-ui-core/api/multilingualProductContentStore";
+
 /**
  * Store Multilingual Product Content API Client — KPA store-owner
  *
@@ -15,77 +52,12 @@
  * 권한 (backend 검증): kpa:store_owner
  */
 
-import { storeScopedFetch } from './storeScopedFetch';
-import { getActiveServicePrefix } from '../lib/serviceContext';
+import { getActiveServicePrefix } from "../lib/serviceContext";
+import { storeScopedFetch } from "./storeScopedFetch";
 
 function getApiBase(): string {
-  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const base = import.meta.env.VITE_API_BASE_URL || "";
   return `${base}/api/v1/${getActiveServicePrefix()}/pharmacy/multilingual-product-contents`;
-}
-
-export type StoreMlcLocale = 'ko' | 'en' | 'zh' | 'ja' | 'vi' | 'th' | 'id';
-export type StoreMlcTargetKind = 'local' | 'listing';
-export type StoreMlcStatus = 'draft' | 'published' | 'archived';
-export type StoreMlcContentFormat = 'blocks' | 'html' | 'image_sequence' | 'json';
-
-export const STORE_MLC_LOCALES: StoreMlcLocale[] = ['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'];
-export const STORE_MLC_LOCALE_LABELS: Record<StoreMlcLocale, string> = {
-  ko: '한국어',
-  en: 'English',
-  zh: '中文',
-  ja: '日本語',
-  vi: 'Tiếng Việt',
-  th: 'ภาษาไทย',
-  id: 'Bahasa',
-};
-
-export interface StoreMlcHubItem {
-  id: string;
-  serviceKey: string;
-  contentKey: string;
-  title: string;
-  description?: string | null;
-  defaultLocale: StoreMlcLocale;
-  publishedAt?: string | null;
-  updatedAt: string;
-  locales: StoreMlcLocale[];
-  localeCount: number;
-}
-
-export interface StoreMlcHubResponse {
-  data: StoreMlcHubItem[];
-  meta: { page: number; limit: number; total: number; totalPages: number };
-}
-
-export interface StoreMlcPage {
-  id: string;
-  groupId: string;
-  locale: StoreMlcLocale;
-  title: string;
-  summary?: string | null;
-  contentFormat: string;
-  status: StoreMlcStatus;
-  isDefault: boolean;
-  sortOrder: number;
-  updatedAt: string;
-}
-
-export interface StoreMlcGroup {
-  id: string;
-  organizationId: string;
-  serviceKey?: string | null;
-  targetKind: StoreMlcTargetKind;
-  targetId: string;
-  contentKey: string;
-  title: string;
-  defaultLocale: StoreMlcLocale;
-  sourceType: string;
-  sourceRefId?: string | null;
-  status: StoreMlcStatus;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-  pages: StoreMlcPage[];
 }
 
 /**
@@ -93,27 +65,35 @@ export interface StoreMlcGroup {
  * Issuing the public key (POST .../public-key) promotes saved `draft` pages to `published`, so a group is
  * publishable when it is not archived and has at least one non-archived saved page.
  */
-export function hasPublishableMlcPage(group: Pick<StoreMlcGroup, 'status' | 'pages'> | null | undefined): boolean {
-  return !!group && group.status !== 'archived' && group.pages.some(p => p.status === 'draft' || p.status === 'published');
+export function hasPublishableMlcPage(
+  group: Pick<StoreMlcGroup, "status" | "pages"> | null | undefined,
+): boolean {
+  return (
+    !!group &&
+    group.status !== "archived" &&
+    group.pages.some((p) => p.status === "draft" || p.status === "published")
+  );
 }
 
 /** Summary rows already exclude archived groups; `locales` lists only non-archived pages. */
-export function hasPublishableMlcSummary(summary: Pick<StoreMlcSummaryItem, 'status' | 'locales'> | null | undefined): boolean {
-  return !!summary && summary.status !== 'archived' && Array.isArray(summary.locales) && summary.locales.length > 0;
-}
-
-export interface StoreMlcImportInput {
-  sourceGroupId: string;
-  targetKind: StoreMlcTargetKind;
-  targetId: string;
-  contentKey?: string;
+export function hasPublishableMlcSummary(
+  summary: Pick<StoreMlcSummaryItem, "status" | "locales"> | null | undefined,
+): boolean {
+  return (
+    !!summary &&
+    summary.status !== "archived" &&
+    Array.isArray(summary.locales) &&
+    summary.locales.length > 0
+  );
 }
 
 async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
-  const res = await storeScopedFetch(url, options, 'application/json');
+  const res = await storeScopedFetch(url, options, "application/json");
   const json = await res.json().catch(() => null);
   if (!res.ok || json?.success !== true || json.data == null) {
-    const error = new Error('다국어 콘텐츠 요청을 완료하지 못했습니다. 다시 시도해 주세요.') as Error & { code?: string; status: number };
+    const error = new Error(
+      "다국어 콘텐츠 요청을 완료하지 못했습니다. 다시 시도해 주세요.",
+    ) as Error & { code?: string; status: number };
     error.status = res.status;
     error.code = json?.error?.code || json?.code;
     throw error;
@@ -122,131 +102,71 @@ async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
 }
 
 /** HUB: published 운영자 원본 탐색 */
-export async function listMlcHub(
-  params?: { page?: number; limit?: number; search?: string },
-): Promise<StoreMlcHubResponse> {
+export async function listMlcHub(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}): Promise<StoreMlcHubResponse> {
   const query = new URLSearchParams();
-  if (params?.page) query.set('page', String(params.page));
-  if (params?.limit) query.set('limit', String(params.limit));
-  if (params?.search) query.set('search', params.search);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  const json = await authFetch(`${getApiBase()}/hub${qs ? `?${qs}` : ''}`);
-  if (!Array.isArray(json.data) || !Number.isSafeInteger(json.meta?.total) || json.meta.total < 0)
-    throw new Error('제공 자료 목록을 확인하지 못했습니다. 다시 시도해 주세요.');
+  const json = await authFetch(`${getApiBase()}/hub${qs ? `?${qs}` : ""}`);
+  if (
+    !Array.isArray(json.data) ||
+    !Number.isSafeInteger(json.meta?.total) ||
+    json.meta.total < 0
+  )
+    throw new Error(
+      "제공 자료 목록을 확인하지 못했습니다. 다시 시도해 주세요.",
+    );
   return { data: json.data, meta: json.meta };
 }
 
-/** 가져오기 = 복사 (운영자 원본 → store-scoped copy, target 바인딩) */
-export async function importMlcFromHub(input: StoreMlcImportInput): Promise<StoreMlcGroup> {
-  const json = await authFetch(`${getApiBase()}/import`, { method: 'POST', body: JSON.stringify(input) });
-  return json.data;
-}
-
 /** 내 매장 다국어 콘텐츠 목록 */
-export async function listMyMlcGroups(
-  params?: { targetKind?: StoreMlcTargetKind; targetId?: string; includeArchived?: boolean },
-): Promise<StoreMlcGroup[]> {
+export async function listMyMlcGroups(params?: {
+  targetKind?: StoreMlcTargetKind;
+  targetId?: string;
+  includeArchived?: boolean;
+}): Promise<StoreMlcGroup[]> {
   const query = new URLSearchParams();
-  if (params?.targetKind) query.set('targetKind', params.targetKind);
-  if (params?.targetId) query.set('targetId', params.targetId);
-  if (params?.includeArchived) query.set('includeArchived', 'true');
+  if (params?.targetKind) query.set("targetKind", params.targetKind);
+  if (params?.targetId) query.set("targetId", params.targetId);
+  if (params?.includeArchived) query.set("includeArchived", "true");
   const qs = query.toString();
-  const json = await authFetch(`${getApiBase()}${qs ? `?${qs}` : ''}`);
-  if (!Array.isArray(json.data) || json.data.some((g: StoreMlcGroup) => !g?.id || typeof g.title !== 'string' || !g.targetId || !['local', 'listing'].includes(g.targetKind) || !STORE_MLC_LOCALES.includes(g.defaultLocale) || !Array.isArray(g.pages)))
-    throw new Error('내 매장 콘텐츠 목록을 확인하지 못했습니다.');
+  const json = await authFetch(`${getApiBase()}${qs ? `?${qs}` : ""}`);
+  if (
+    !Array.isArray(json.data) ||
+    json.data.some(
+      (g: StoreMlcGroup) =>
+        !g?.id ||
+        typeof g.title !== "string" ||
+        !g.targetId ||
+        !["local", "listing"].includes(g.targetKind) ||
+        !STORE_MLC_LOCALES.includes(g.defaultLocale) ||
+        !Array.isArray(g.pages),
+    )
+  )
+    throw new Error("내 매장 콘텐츠 목록을 확인하지 못했습니다.");
   return json.data;
-}
-
-/**
- * 상품별 다국어 콘텐츠 연결 상태 요약 (목록 배지용)
- * WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1
- */
-export interface StoreMlcSummaryItem {
-  groupId: string;
-  targetKind: StoreMlcTargetKind;
-  targetId: string;
-  title: string;
-  status: StoreMlcStatus;
-  sourceType: string;
-  defaultLocale: StoreMlcLocale;
-  updatedAt: string;
-  locales: StoreMlcLocale[];
-  localeCount: number;
-  publishedLocaleCount: number;
-}
-
-/** targetId → 요약 매핑 (N+1 없이 목록 배지 렌더) */
-export async function getMlcSummaryMap(
-  targetKind: StoreMlcTargetKind,
-): Promise<Map<string, StoreMlcSummaryItem>> {
-  const json = await authFetch(`${getApiBase()}/summary?targetKind=${encodeURIComponent(targetKind)}`);
-  const items: StoreMlcSummaryItem[] = json.data ?? [];
-  const map = new Map<string, StoreMlcSummaryItem>();
-  for (const item of items) {
-    if (item?.targetId) map.set(item.targetId, item);
-  }
-  return map;
 }
 
 /** 언어 fallback resolve (검증용) */
 export async function resolveMlc(
   groupId: string,
   locale: StoreMlcLocale,
-): Promise<{ group: StoreMlcGroup; page: StoreMlcPageDetail & { resolvedLocale: StoreMlcLocale; fallbackReason: string | null }; requestedLocale: StoreMlcLocale | null }> {
+): Promise<{
+  group: StoreMlcGroup;
+  page: StoreMlcPageDetail & {
+    resolvedLocale: StoreMlcLocale;
+    fallbackReason: string | null;
+  };
+  requestedLocale: StoreMlcLocale | null;
+}> {
   const json = await authFetch(
     `${getApiBase()}/${encodeURIComponent(groupId)}/resolve?locale=${encodeURIComponent(locale)}`,
   );
-  return json.data;
-}
-
-/* ─── WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 매장 저작(store-created) ─── */
-
-/** 편집용 상세 페이지 (본문 content 포함) — GET/create/upsert 응답의 pages 형태 */
-export interface StoreMlcPageDetail extends StoreMlcPage {
-  content: Record<string, unknown>;
-  assets: Array<Record<string, unknown>>;
-  buttons: Array<Record<string, unknown>>;
-  metadata?: Record<string, unknown>;
-}
-
-/** 편집용 상세 그룹 (pages 에 content 포함) */
-export interface StoreMlcGroupDetail extends Omit<StoreMlcGroup, 'pages'> {
-  pages: StoreMlcPageDetail[];
-}
-
-export interface StoreMlcCreateGroupInput {
-  targetKind: StoreMlcTargetKind;
-  targetId: string;
-  title: string;
-  defaultLocale?: StoreMlcLocale;
-  contentKey?: string;
-}
-
-export interface StoreMlcPageInput {
-  title: string;
-  summary?: string;
-  contentFormat?: StoreMlcContentFormat;
-  content?: Record<string, unknown>;
-  status?: StoreMlcStatus;
-  isDefault?: boolean;
-  sortOrder?: number;
-}
-
-/** 단건 그룹 조회 (초안 본문까지 hydrate) — 저작 편집기 로드용 */
-export async function getStoreMlcGroup(groupId: string): Promise<StoreMlcGroupDetail> {
-  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}`);
-  return json.data;
-}
-
-/**
- * 그룹 생성/갱신 (target+contentKey 기준 upsert, source_type='store_created').
- * 이미 존재하면 title/defaultLocale 등만 갱신하고 pages 는 보존한다.
- */
-export async function createStoreMlcGroup(input: StoreMlcCreateGroupInput): Promise<StoreMlcGroupDetail> {
-  const json = await authFetch(`${getApiBase()}`, {
-    method: 'POST',
-    body: JSON.stringify({ sourceType: 'store_created', ...input }),
-  });
   return json.data;
 }
 
@@ -255,73 +175,14 @@ export async function updateStoreMlcGroup(
   groupId: string,
   input: { title: string; defaultLocale: StoreMlcLocale },
 ): Promise<StoreMlcGroupDetail> {
-  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}`, {
-    method: 'PATCH', body: JSON.stringify(input),
-  });
-  return json.data;
-}
-
-/** 언어별 page upsert (한국어/중국어 각각 HTML) */
-export async function upsertStoreMlcPage(
-  groupId: string,
-  locale: StoreMlcLocale,
-  input: StoreMlcPageInput,
-): Promise<StoreMlcGroupDetail> {
   const json = await authFetch(
-    `${getApiBase()}/${encodeURIComponent(groupId)}/pages/${encodeURIComponent(locale)}`,
-    { method: 'PUT', body: JSON.stringify(input) },
+    `${getApiBase()}/${encodeURIComponent(groupId)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    },
   );
   return json.data;
-}
-
-/** 언어별 page 발행/초안 토글 */
-export async function setStoreMlcPageStatus(
-  groupId: string,
-  locale: StoreMlcLocale,
-  status: StoreMlcStatus,
-): Promise<StoreMlcGroupDetail> {
-  const json = await authFetch(
-    `${getApiBase()}/${encodeURIComponent(groupId)}/pages/${encodeURIComponent(locale)}/status`,
-    { method: 'PATCH', body: JSON.stringify({ status }) },
-  );
-  return json.data;
-}
-
-/* ─── WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1 ─── */
-
-/** public/QR 키 발급(idempotent) — store-owner 가 고객용 링크/QR 를 요청할 때 */
-export async function ensureMlcPublicKey(groupId: string): Promise<{ publicKey: string; url: string }> {
-  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}/public-key`, { method: 'POST' });
-  return json.data;
-}
-
-/** 발급된 키 기준 landing URL + QR SVG (프론트 QR 의존성 없이 백엔드 생성) */
-export async function getMlcQr(groupId: string): Promise<{ publicKey: string; url: string; svg: string }> {
-  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}/qr`);
-  return json.data;
-}
-
-export interface PublicMlcPage {
-  locale: StoreMlcLocale;
-  title: string;
-  summary?: string | null;
-  contentFormat: string;
-  content: Record<string, unknown>;
-  assets: Array<Record<string, unknown>>;
-  buttons: Array<Record<string, unknown>>;
-  updatedAt: string;
-}
-
-export interface PublicMlcResolve {
-  title: string;
-  targetKind: StoreMlcTargetKind;
-  contentKey: string;
-  defaultLocale: StoreMlcLocale;
-  requestedLocale: StoreMlcLocale | null;
-  resolvedLocale: StoreMlcLocale | null;
-  fallbackUsed: boolean;
-  availableLocales: StoreMlcLocale[];
-  page: PublicMlcPage | null;
 }
 
 /** 비인증 public landing resolve (고객용) — 토큰 없이 호출 */
@@ -329,8 +190,8 @@ export async function resolvePublicMlc(
   publicKey: string,
   locale?: StoreMlcLocale,
 ): Promise<PublicMlcResolve> {
-  const base = import.meta.env.VITE_API_BASE_URL || '';
-  const qs = locale ? `?locale=${encodeURIComponent(locale)}` : '';
+  const base = import.meta.env.VITE_API_BASE_URL || "";
+  const qs = locale ? `?locale=${encodeURIComponent(locale)}` : "";
   const res = await fetch(
     `${base}/api/v1/${getActiveServicePrefix()}/public/multilingual-product-contents/${encodeURIComponent(publicKey)}${qs}`,
   );
@@ -344,3 +205,14 @@ export async function resolvePublicMlc(
   }
   return json.data;
 }
+
+export const {
+  importMlcFromHub,
+  getMlcSummaryMap,
+  getStoreMlcGroup,
+  createStoreMlcGroup,
+  upsertStoreMlcPage,
+  setStoreMlcPageStatus,
+  ensureMlcPublicKey,
+  getMlcQr,
+} = createStoreMlcClient({ getApiBase, authFetch });

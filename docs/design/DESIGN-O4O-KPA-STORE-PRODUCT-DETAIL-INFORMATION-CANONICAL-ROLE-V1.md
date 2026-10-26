@@ -96,7 +96,7 @@ WO §7 권장안 = 코드 현실과 일치. canonical "상품 상세정보"의 �
 
 WO §9 판정: **A(통합 후 은퇴) ~ B(즉시 은퇴) 사이. 실질 B 에 가까움.**
 
-> (2026-10-04 정합) **실행 완료** — 2026-07-27 즉시 은퇴(B) 구현: 컴포넌트 제거 · `/store/execution/product-info` 는 `/store/handled-products` 로 redirect ([`CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1`](../checks/CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1.md) · `services/web-kpa-society/src/App.tsx` `execution/product-info` Navigate). 아래 §8.3 · §11 의 후속 항목은 이 기준으로 읽는다.
+> (2026-10-04 정합) **실행 완료** — 2026-07-27 즉시 은퇴(B) 구현: 컴포넌트 제거 · `/store/execution/product-info` 는 `/store/handled-products` 로 redirect ([`CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1`](../checks/CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1.md) · `services/web-pharmacy-business/src/App.tsx` `execution/product-info` Navigate). 아래 §8.3 · §11 의 후속 항목은 이 기준으로 읽는다.
 
 근거:
 - 상품 비결속 자유 HTML → **§6.1(상품 결속 필수) 위반** → canonical "상품 상세정보" 로 인정 불가.

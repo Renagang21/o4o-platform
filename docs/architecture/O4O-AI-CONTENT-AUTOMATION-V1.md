@@ -14,7 +14,7 @@
 
 본 문서는 O4O 플랫폼의 AI 기반 콘텐츠/강의 제작 자동화 흐름을 단일 기준으로 정리한다. 콘텐츠 작성 / 단일 레슨 초안 / 강의 구조 후보 / 레슨 본문 생성의 4가지 흐름이 어떻게 구성되어 있는지, 어떤 API·컴포넌트가 사용되며 어디까지가 V1 범위이고 어디부터가 후속 작업인지 선을 긋는다.
 
-**기준 서비스**: KPA-Society (`services/web-kpa-society`).
+**기준 서비스**: KPA-Society (`services/web-pharmacy-business`).
 K-Cosmetics 는 본 문서 범위 외 — 동일 흐름을 적용하려면 별도 WO 필요.
 
 ---
@@ -210,7 +210,7 @@ Props:
 ### 3.2 `CourseStructureAiModal` (KPA 전용)
 
 **역할**: 강의 구조 후보 생성 + 선택 + 본문 HTML 초안 생성을 한 모달에서 처리.
-**파일**: [services/web-kpa-society/src/pages/instructor/courses/CourseStructureAiModal.tsx](../../services/web-kpa-society/src/pages/instructor/courses/CourseStructureAiModal.tsx)
+**파일**: [services/web-pharmacy-business/src/pages/instructor/courses/CourseStructureAiModal.tsx](../../services/web-pharmacy-business/src/pages/instructor/courses/CourseStructureAiModal.tsx)
 
 Props:
 ```ts
@@ -246,7 +246,7 @@ Props:
 ### 3.3 `LessonModal` (CourseEditPage 내부)
 
 **역할**: 단일 레슨 신규/편집 모달 — V1 AI 보조 진입점.
-**파일**: [services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx](../../services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx)
+**파일**: [services/web-pharmacy-business/src/pages/instructor/courses/CourseEditPage.tsx](../../services/web-pharmacy-business/src/pages/instructor/courses/CourseEditPage.tsx)
 
 V1 보조 영역:
 ```
@@ -263,7 +263,7 @@ V1 보조 영역:
 
 ### 3.4 `CourseEditPage` 연결 흐름
 
-**파일**: [CourseEditPage.tsx](../../services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx)
+**파일**: [CourseEditPage.tsx](../../services/web-pharmacy-business/src/pages/instructor/courses/CourseEditPage.tsx)
 
 진입점:
 - 레슨 목록 헤더: `🧱 AI로 강의 구조 만들기` → `setStructureModalOpen(true)`
@@ -420,8 +420,8 @@ lmsInstructorApi.createLesson(courseId, payload) — 항목별 순차
 | V3 본문 생성 | fallback HTML escape (`&` `<` `>` 모두) — 본 WO 에서 보강 | PASS (수정 적용) |
 | V3 본문 생성 | `courseTitle` prop 전달 (`form.title || course.title`) | PASS |
 | 빌드 | `apps/api-server` `tsc --noEmit` | PASS |
-| 빌드 | `services/web-kpa-society` `tsc --noEmit` | PASS |
-| 빌드 | `services/web-kpa-society` `vite build` | PASS |
+| 빌드 | `services/web-pharmacy-business` `tsc --noEmit` | PASS |
+| 빌드 | `services/web-pharmacy-business` `vite build` | PASS |
 
 ### 8.2 라이브 브라우저 smoke (사용자 책임)
 

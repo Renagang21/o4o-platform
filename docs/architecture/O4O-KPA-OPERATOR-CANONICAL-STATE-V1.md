@@ -174,7 +174,7 @@ KPA-Society 의 회원 데이터 4축은 다음과 같이 명확히 분리되어
 
 ### 3.2 activity_type 라벨 매핑 (canonical)
 
-`ACTIVITY_TYPE_LABELS` (`services/web-kpa-society/src/contexts/AuthContext.tsx`):
+`ACTIVITY_TYPE_LABELS` (`services/web-pharmacy-business/src/contexts/AuthContext.tsx`):
 
 | 키 | 라벨 |
 |---|---|
@@ -194,7 +194,7 @@ KPA-Society 의 회원 데이터 4축은 다음과 같이 명확히 분리되어
 
 ## 4. MemberManagementPage canonical 상태
 
-[`/operator/members`](../../services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx) — KPA operator 의 핵심 화면.
+[`/operator/members`](../../services/web-pharmacy-business/src/pages/operator/MemberManagementPage.tsx) — KPA operator 의 핵심 화면.
 
 ### 4.1 컬럼 구조
 
@@ -263,7 +263,7 @@ bulk delete / bulk role 변경은 본 canonical 단계에서 **명시적 미도�
 
 ## 5. AuditLogPage canonical 상태
 
-[`/operator/audit-logs`](../../services/web-kpa-society/src/pages/operator/AuditLogPage.tsx) — admin scope (kpa:admin / platform:super_admin) 전용.
+[`/operator/audit-logs`](../../services/web-pharmacy-business/src/pages/operator/AuditLogPage.tsx) — admin scope (kpa:admin / platform:super_admin) 전용.
 
 ### 5.1 컬럼 구조
 

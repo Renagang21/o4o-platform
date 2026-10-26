@@ -98,7 +98,7 @@ WO §3.3 은 이 테이블을 "`StoreProductDescriptionsPage` 가 표준 상품�
    ([product-candidate.service.ts:463](../../apps/api-server/src/modules/neture/services/product-candidate.service.ts#L463) · [store-tablet.routes.ts:995](../../apps/api-server/src/routes/platform/store-tablet.routes.ts#L995)).
 
 3. **제품 정책이 이미 "매장은 표준 상품 설명을 쓰지 않는다"고 화면에서 안내한다.**
-   [StoreProductDescriptionsPage.tsx](../../services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx) 안내문:
+   [StoreProductDescriptionsPage.tsx](../../services/web-pharmacy-business/src/pages/pharmacy/StoreProductDescriptionsPage.tsx) 안내문:
    > 상품설명은 **O4O 공용 상품 DB 기준**으로 관리됩니다. … 약국 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 **콘텐츠 만들기**에서 별도 콘텐츠로 제작하세요.
 
 **확정 역할:** `store_product_profiles` = 표시명(`display_name`) override + legacy description fallback.
@@ -170,7 +170,7 @@ masterId   : sourceType==='listing' 일 때만 존재 (product_masters.id)
 호출부 (3서비스 동일 계약):
 
 ```text
-KPA   services/web-kpa-society/src/api/productAiContent.ts
+KPA   services/web-pharmacy-business/src/api/productAiContent.ts
 KCos  services/web-k-cosmetics/src/api/productAiContent.ts
       → 세 파일 모두 coreApiClient.get(`/products/${productId}/ai-contents`) 동일
 ```

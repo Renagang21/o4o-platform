@@ -26,8 +26,8 @@ it('other service entry points cannot restore role editing or advertise the remo
   expect(neture).not.toContain('<RoleManagementPage');
   expect(neture).toContain('<Route path="/admin/roles" element={<Navigate to="/admin" replace />} />');
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 옛 운영/관리 화면(OperatorRoutes · operatorMenuGroups)은 제거됐다.
-  expect(existsSync(resolve(process.cwd(), '../..', 'services/web-kpa-society/src/routes/OperatorRoutes.tsx'))).toBe(false);
-  expect(readRepo('services/web-kpa-society/src/App.tsx')).not.toContain('RoleManagementPage');
+  expect(existsSync(resolve(process.cwd(), '../..', 'services/web-pharmacy-business/src/routes/OperatorRoutes.tsx'))).toBe(false);
+  expect(readRepo('services/web-pharmacy-business/src/App.tsx')).not.toContain('RoleManagementPage');
   for (const app of ['web-neture']) {
     const menu = readRepo(`services/${app}/src/config/operatorMenuGroups.ts`);
     expect(menu).not.toMatch(/label: '역할 관리/);

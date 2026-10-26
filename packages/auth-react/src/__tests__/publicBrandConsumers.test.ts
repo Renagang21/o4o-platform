@@ -20,7 +20,7 @@ const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
 
 const APPS = [
   { app: 'web-neture', host: 'https://neture.co.kr/', favicon: '/favicon.png' },
-  { app: 'web-kpa-society', host: 'https://pharmacy.neture.co.kr/', favicon: '/favicon.png' },
+  { app: 'web-pharmacy-business', host: 'https://pharmacy.neture.co.kr/', favicon: '/favicon.png' },
   { app: 'web-store', host: 'https://store.neture.co.kr/', favicon: '/favicon.svg' },
   { app: 'web-lecture', host: 'https://study.neture.co.kr/', favicon: '/favicon.svg' },
   // kpa-branch: 같은 index.html 이 분회 path · 분회 자체 도메인에도 서빙 → 고정 og:url 을 두지 않는다
@@ -60,16 +60,16 @@ describe.each(APPS)('$app — 공개 브랜드 진입 파일', ({ app, host, fav
 
 describe('pharmacy — 표시 이름 O4O 약국', () => {
   it('index.html · manifest 가 O4O 약국', () => {
-    const html = read('services/web-kpa-society/index.html');
+    const html = read('services/web-pharmacy-business/index.html');
     expect(html).toContain('<title>O4O 약국 — 약국의 정보와 업무를 하나로 연결합니다</title>');
     expect(html).toContain('<meta property="og:site_name" content="O4O 약국" />');
-    const manifest = JSON.parse(read('services/web-kpa-society/public/manifest.json'));
+    const manifest = JSON.parse(read('services/web-pharmacy-business/public/manifest.json'));
     expect(manifest.name).toBe('O4O 약국');
     expect(manifest.short_name).toBe('O4O 약국');
   });
 
   it('legacy asset 은 즉시 삭제하지 않는다', () => {
-    expect(existsSync(resolve(ROOT, 'services/web-kpa-society/public/favicon.png'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'services/web-pharmacy-business/public/favicon.png'))).toBe(true);
   });
 });
 
@@ -80,7 +80,7 @@ describe('pharmacy — 표시 이름 O4O 약국', () => {
 describe('O4O 홈 — 세션 복구 중 비활성(authLoading) 연결', () => {
   const SHELLS = [
     'services/web-neture/src/components/NetureGlobalHeader.tsx',
-    'services/web-kpa-society/src/components/KpaGlobalHeader.tsx',
+    'services/web-pharmacy-business/src/components/KpaGlobalHeader.tsx',
     'services/web-kpa-branch/src/layouts/BranchLayout.tsx',
     'services/web-kpa-branch/src/layouts/DirectoryShell.tsx',
     'services/web-lecture/src/components/SiteShell.tsx',

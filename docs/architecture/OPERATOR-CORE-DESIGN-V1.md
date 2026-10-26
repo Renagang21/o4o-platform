@@ -274,7 +274,7 @@ export interface OperatorStoresListProps<T extends OperatorStoreBase = OperatorS
 → 각 서비스가 `StoresApi` 인터페이스를 구현한 어댑터 생성:
 
 ```ts
-// services/web-kpa-society/src/api/stores-adapter.ts (예시)
+// services/web-pharmacy-business/src/api/stores-adapter.ts (예시)
 import { apiClient } from './client';
 import type { StoresApi } from '@o4o/operator-core-ui/modules/stores';
 
@@ -293,7 +293,7 @@ LMS V2 의 `createLmsLearnerClient(http)` 와 동일 패턴.
 서비스 별 terminology / color scheme:
 
 ```ts
-// services/web-kpa-society/src/config/stores.ts (예시)
+// services/web-pharmacy-business/src/config/stores.ts (예시)
 export const kpaStoresConfig: StoresConfig = {
   serviceKey: 'kpa-society',
   terminology: { storeLabel: '약국', storeHubLabel: '약국 운영 허브' },
@@ -499,6 +499,6 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
   - 신설 예정: `packages/operator-core-ui/`
   - 기반: [`packages/operator-ux-core/`](../../packages/operator-ux-core/)
 - 서비스별 Stores 페이지 (마이그레이션 대상):
-  - [services/web-kpa-society/src/pages/operator/OperatorStoresPage.tsx](../../services/web-kpa-society/src/pages/operator/OperatorStoresPage.tsx)
+  - [services/web-pharmacy-business/src/pages/operator/OperatorStoresPage.tsx](../../services/web-pharmacy-business/src/pages/operator/OperatorStoresPage.tsx)
   - [services/web-k-cosmetics/src/pages/operator/StoresPage.tsx](../../services/web-k-cosmetics/src/pages/operator/StoresPage.tsx)
 - 다음 단계: `WO-O4O-OPERATOR-STORES-CORE-EXTRACTION-V1`

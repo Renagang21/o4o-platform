@@ -129,7 +129,7 @@ describe('Adoption — 서비스 wrapper 가 공통 View 를 쓴다', () => {
   // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA ServiceGuidePage wrapper 도 제거됐다 — 현재 GuideServiceIntroPage 를 소비하는 wrapper 는 없다.
   it('옛 KPA 서비스 소개 wrapper 와 KPA guide copy 는 존재하지 않는다', () => {
-    expect(existsSync(resolve(ROOT, 'services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx'))).toBe(false);
+    expect(existsSync(resolve(ROOT, 'services/web-pharmacy-business/src/pages/service-guide/ServiceGuidePage.tsx'))).toBe(false);
     expect(existsSync(resolve(ROOT, 'packages/shared-space-ui/src/guide/copy/kpa.ts'))).toBe(false);
     expect(read('packages/shared-space-ui/src/guide/index.ts')).not.toContain("from './copy/kpa.js'");
   });
@@ -139,7 +139,7 @@ describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 /guide · /service-guide 화면을 두지 않는다.
   //   남은 /guide/* 는 web-store GuideBackLink 가 404 가 되지 않게 홈으로 보내는 호환 이동 하나뿐이다.
   it('KPA(pharmacy) App 에 guide · service-guide 화면 route 가 없다 (홈 호환 이동만)', () => {
-    const src = read('services/web-kpa-society/src/App.tsx');
+    const src = read('services/web-pharmacy-business/src/App.tsx');
     expect(src).not.toMatch(/path="\/?service-guide(\/|")/);
     const guideRoutes = src.match(/<Route path="\/?guide[^"]*"[^\n]*/g) ?? [];
     expect(guideRoutes).toEqual(['<Route path="/guide/*" element={<Navigate to="/" replace />} />']);

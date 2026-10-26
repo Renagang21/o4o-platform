@@ -16,7 +16,7 @@ import type { ContentAdapter, Queryable } from "./adapter.js";
 type Kind = Workspace["kind"];
 const destinations: Record<Kind, string[]> = {
   supplier: ["library_document", "store_description"],
-  store: ["store_document"],
+  store: ["store_document", "store_product_content"],
   organization: ["business_content"],
   community: ["community_post"],
 };

@@ -145,7 +145,7 @@ requireCosmeticsScope('k-cosmetics:store_owner')
 
 ```
 DB: stores (table)          ← canonical
-  web-kpa-society: pharmacy ← display alias
+  web-pharmacy-business: pharmacy ← display alias
   web-k-cosmetics: store    ← canonical with display
 ```
 

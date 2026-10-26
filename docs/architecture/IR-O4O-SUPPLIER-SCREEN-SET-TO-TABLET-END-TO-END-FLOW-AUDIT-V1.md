@@ -17,7 +17,7 @@
         └ origin='supplier', service_key='kpa', 공개 URL·QR 없음. draft/active/archived.
                     │  (게시 = active + hub_target_store_type)
                     ▼
-[매장 / web-kpa-society]
+[매장 / web-pharmacy-business]
   2. 약국 운영 허브 → 타블렛 화면(/store-hub/screen-set) → [공급자 제공] 탭 탐색
   3. 행 클릭 → 상세·미리보기 → "내 타블렛 콘텐츠로 가져오기"
         └ importSupplierTemplate → origin='store' 독립 사본 생성(값 복사, 코너 미적용)
@@ -99,7 +99,7 @@
 ## 9. 다음 WO 필요 여부
 
 - **기능 구현 WO 불필요**: 데이터·기능 단절이 없어 긴급 구현 대상 없음. 마지막 연결은 이미 코드로 완결.
-- **권장 UX WO 1개(소규모 프론트, 선택)**: D-1(필수) + D-3/D-4/D-5(권장)을 묶은 **매장 태블릿 last-mile UX 정리** WO. 백엔드·스키마 무변경, web-kpa-society 프론트 한정. 사용자 판단으로 착수.
+- **권장 UX WO 1개(소규모 프론트, 선택)**: D-1(필수) + D-3/D-4/D-5(권장)을 묶은 **매장 태블릿 last-mile UX 정리** WO. 백엔드·스키마 무변경, web-pharmacy-business 프론트 한정. 사용자 판단으로 착수.
 - 이번 IR 자체는 후속 WO 를 자동 착수하지 않음(핸드오프 전용).
 
 ## 10. 코드·DB·배포 변경 0 확인

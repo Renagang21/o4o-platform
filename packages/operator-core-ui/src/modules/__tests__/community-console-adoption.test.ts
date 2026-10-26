@@ -17,8 +17,8 @@ const B21_WRAPPERS = [
 
 // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 운영자 화면은 제거됐다 — pharmacy 운영 화면이 필요하면 새로 만든다.
 const KPA_RETIRED_WRAPPERS = [
-  'services/web-kpa-society/src/pages/operator/CommunityManagementPage.tsx',
-  'services/web-kpa-society/src/pages/operator/OperatorContentHubPage.tsx',
+  'services/web-pharmacy-business/src/pages/operator/CommunityManagementPage.tsx',
+  'services/web-pharmacy-business/src/pages/operator/OperatorContentHubPage.tsx',
 ];
 
 const SHARED_VIEWS = [

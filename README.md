@@ -35,7 +35,7 @@ pnpm workspace 기준이며, 대상 범위는 `pnpm-workspace.yaml`에 정의되
 ```
 o4o-platform/
 ├── apps/          # 애플리케이션 (admin-dashboard, api-server, main-site, ...)
-├── services/      # 서비스별 웹 (web-kpa-society, web-neture,
+├── services/      # 서비스별 웹 (web-pharmacy-business, web-neture,
 │                  #               web-account, ...)
 ├── packages/      # 공유 패키지 (types, ui, auth-client, *-core 등)
 ├── extensions/    # 확장 모듈

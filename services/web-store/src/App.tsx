@@ -255,6 +255,7 @@ export function WorkspaceApp() {
       <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
       <Route path="/external-ai/drafts/:id" element={<ExternalAiDraftEntry />} />
+      <Route path="/external-ai/product-contents/:targetKind/:targetId/:id" element={<ExternalAiDraftEntry productContent />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/operator/inbox" element={<OperatorInboxPage />} />
       <Route path="/operator/pharmacy-memberships" element={<PharmacyReviewAccess />} />

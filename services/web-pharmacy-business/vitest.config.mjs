@@ -1,0 +1,34 @@
+/**
+ * web-pharmacy-business 테스트 설정
+ *
+ * WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1:
+ *   KPA 에는 테스트 실행 경로가 없어서 "관심상품 행 → canonical cart payload" 및
+ *   "주문 가능 판정" 계약이 코드 리뷰로만 지켜지고 있었다. 이 축은 잘못되면 조용히
+ *   미승인 offer 나 이벤트오퍼 축이 B2B 주문 경로로 새어 들어가므로 CI 에서 고정한다.
+ *
+ * 실행: 저장소 루트에서
+ *   npx vitest run --config services/web-pharmacy-business/vitest.config.mjs
+ *
+ * 루트에 이미 설치된 vitest 를 그대로 쓴다 — 이 서비스에 테스트 의존성을 추가하지 않는다
+ * (package.json · lockfile 무변경). `services/web-vitest.config.mjs` 와 동일한 방식이다.
+ */
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  esbuild: { jsx: 'automatic' },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 공통 패키지(@o4o/operator-ux-core)가 루트 node_modules 의
+    // react-router 를, 서비스가 자기 node_modules 의 사본을 쓰면 Link 가 MemoryRouter 컨텍스트를 못 찾는다
+    // (useContext null). 한 인스턴스로 접는다 — 의존성 추가 아님.
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['services/web-pharmacy-business/src/**/*.test.{ts,tsx}'],
+    passWithNoTests: false,
+  },
+});
