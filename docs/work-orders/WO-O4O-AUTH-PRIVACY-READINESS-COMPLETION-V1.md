@@ -19,7 +19,7 @@
 - [x] avatar의 삭제 재시도에서도 현재 소유/purpose·content generation·metadata generation을 확인. 미분류 첨부·사업/타인 자료는 계속 검토 상태이며 자동 삭제 범위를 늘리지 않음.
 - [x] 7일 restore fence만으로 30일 export를 안전하다고 판단하지 않도록 현재 최소 삭제 증빙과 복원 후보를 비교하는 읽기 전용 도구·검증 추가. 실제 복원/삭제 승인 기능 아님.
 - [x] 실제 격리 PostgreSQL·다중 인스턴스/동시성·장애·migration 지문/down-up·기존 인증/삭제/공통 소비처·build 검증.
-- [ ] 과거 기록은 보존하고 현행 정책의 구현 설명만 실제 범위로 정합화. 최종 CHECK·commit/push·PR 최신 HEAD 검증 후 main 병합 전 종료.
+- [x] 과거 기록을 보존하고 현행 정책의 구현 설명만 실제 범위로 정합화. CHECK·commit/push·PR #835 생성. 원격 최종 HEAD의 검사 결과는 PR 실제 상태로 인계하며 main 병합 전 종료.
 
 ## Shared Module Change Verification
 
@@ -34,3 +34,5 @@ GCS 실제 ownership tag·version/soft-delete·cache·IAM·backup/export 보존 
 ## 통합 검증 진행
 
 최신 main #831을 정상 merge했고 PR #835에서 CI/검토를 진행한다. 전용 fixture 도구의 fresh prepare·3 suites/51 tests와 canonical 지문 복구를 확인했다. main 병합·auto-merge·운영 반영은 미실행이다.
+
+최종 writer event 검사·restore kind 검증 보완 후 재현 도구의3 suites/52 tests와 restore6 tests가 통과했다. canonical 지문 복구를 확인했으며 원격 검사는 PR #835에서 추적한다.

@@ -45,3 +45,10 @@ production DB·실계정·실제 GCS·OAuth·backup 복원은 실행하지 않�
 - 이 저장된 도구의 fresh prepare와 verify를 실제 실행했다. **3 suites / 51 tests PASS**(공유 제한7 + readiness4 + 기존 제거40). 다른 도메인의 fixture-only trigger를 finally에서 제거하고 신규 canonical 지문 복구를 확인했다. 위 개별 실행과 중복 합산하지 않는다.
 - 운영 이미지 결과를 기동한 합성 로그인 smoke와 graceful shutdown을 확인했다. 테스트 사용자/사업 데이터나 실제 provider 호출은 없다.
 - PR [#835](https://github.com/Renagang21/o4o-platform/pull/835)는 OPEN으로 생성했다. 원격 CI/검토 완료 판정은 최종 push HEAD를 기준으로 후속 확인한다. auto-merge·main 병합·배포를 실행하지 않는다.
+
+
+## 최종 자체 점검 보완
+
+동일명/함수뿐 아니라 BEFORE + ROW + INSERT/UPDATE event가 모두 있는지 writer 준비 조건을 강화했다. AFTER 또는 INSERT 전용 trigger를 거부하는 실제 PG 회귀를 추가했다. 복원 kind는 명시 Map에서만 조회해 prototype 이름을 알려진 backup 종류로 오인하지 않는다.
+
+보완 후 저장된 fixture 도구의 verify **3 suites / 52 tests PASS**(공유 제한7 + readiness5 + 기존 제거40), canonical 지문 복구 PASS. 복원 검사/CLI **6 PASS**. 위 초기51회차·개별4회차와 중복 합산하지 않는다. 파기 flags·운영 DDL·실제 파일/계정은 변경하지 않았다. 원격 필수 CI·CodeQL·리뷰 결과와 최신 HEAD는 PR #835에서 확인하며 main 병합 전 인계한다.

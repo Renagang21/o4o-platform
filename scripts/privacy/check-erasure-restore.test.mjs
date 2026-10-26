@@ -24,6 +24,7 @@ test('backup retention distinguishes 7-day automatic snapshots and 30-day manual
  assert.throws(()=>checkErasureRestore({...snapshot(),kind:'automatic_backup'},ledger(),now));
  assert.throws(()=>checkErasureRestore({...snapshot(),createdAt:'2026-09-01T00:00:00Z'},ledger(),now));
  assert.throws(()=>checkErasureRestore({...snapshot(),kind:'unknown'},ledger(),now));
+ for(const kind of ['toString','constructor','__proto__'])assert.throws(()=>checkErasureRestore({...snapshot(),kind},ledger(),now));
 });
 test('rejects malformed, future, expired and incomplete evidence without treating it as a pass',()=>{
  for(const patch of [{subjectHash:'raw-user@example.invalid'},{completedAt:'2026-10-27T00:00:00Z'},{expiresAt:'2026-10-25T00:00:00Z'},{completedAt:'not-a-date'}]){

@@ -7,6 +7,7 @@ import { pathToFileURL } from 'node:url';
 
 const DAY = 86_400_000;
 const HASH = /^[a-f0-9]{64}$/;
+const SNAPSHOT_DAYS = new Map([['automatic_backup',7],['manual_export',30]]);
 const instant = value => {
   if (typeof value !== 'string' || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{1,3})?Z$/.test(value) || !Number.isFinite(Date.parse(value))) {
     throw new Error('INVALID_EVIDENCE_TIMESTAMP');
@@ -24,7 +25,7 @@ export function checkErasureRestore(snapshot, ledger, now = new Date()) {
   const time = now.getTime();
   if (!Number.isFinite(time)) throw new Error('INVALID_REVIEW_TIME');
   if (snapshot?.version !== 1 || ledger?.version !== 1 || ledger.complete !== true) throw new Error('COMPLETE_CURRENT_LEDGER_REQUIRED');
-  const days = { automatic_backup:7, manual_export:30 }[snapshot.kind];
+  const days = SNAPSHOT_DAYS.get(snapshot.kind);
   if (!days) throw new Error('UNKNOWN_BACKUP_KIND');
   const created = instant(snapshot.createdAt), captured = instant(ledger.capturedAt), from = instant(ledger.coverageFrom);
   if (created > time || created < time-days*DAY) throw new Error('SNAPSHOT_RETENTION_REVIEW_REQUIRED');

@@ -2,7 +2,7 @@
  * Rate Limiter Middleware
  *
  * WO-O4O-REDIS-SESSIONSYNC-REMOVAL-AND-MEMORYSTORE-DECOMMISSION-V1
- * - Redis store 제거. 메모리 기반 rate limiting 만 사용한다.
+ * - Redis store는 은퇴했다. 일반 제한은 메모리, 인증 제한은 공유 PostgreSQL을 사용한다.
  *   (Redis store 는 6주간 incr/eval 명령 0건으로 실사용이 없었다.)
  */
 

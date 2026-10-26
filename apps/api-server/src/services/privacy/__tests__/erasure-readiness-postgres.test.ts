@@ -53,4 +53,15 @@ integration('erasure readiness — disposable schema and synthetic accounts',()=
     finally{await db.query('DROP TABLE fixture_new_domain_writer');}
     expect(await service().capabilities()).toEqual({enabled:true});
   });
+  it('the right function on an AFTER or insert-only trigger is not a complete writer fence',async()=>{
+    for(const events of ['AFTER INSERT OR UPDATE','BEFORE INSERT']){
+      await db.query('DROP TRIGGER account_erasure_write_fence ON cooperatives');
+      await db.query(`CREATE TRIGGER account_erasure_write_fence ${events} ON cooperatives FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`);
+      try{expect(await service().capabilities()).toEqual({enabled:false});}
+      finally{
+        await db.query('DROP TRIGGER account_erasure_write_fence ON cooperatives');
+        await db.query('CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON cooperatives FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()');
+      }
+    }
+  });
 });
