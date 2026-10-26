@@ -2,6 +2,7 @@ import { newProductConsultation } from '../../../../components/product-descripti
 import { beforeEach, expect, it, vi } from "vitest";
 import {
   createOrUpdateDirect,
+  consultationSaveError,
   emptySnapshotDraft,
   loadDirect,
   loadMaterial,
@@ -327,8 +328,8 @@ it('product consultation saves its context and verifies both body and the actual
  const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture product' });
  consultation.assist.purpose = 'professional'; consultation.language = 'en';
  consultation.assist.facts = 'Confirmed amount'; consultation.assist.factSource = 'Manufacturer, reviewed today';
- const draft = { title: 'Consultation', html: '<p>Reviewed draft</p>', tags: [], consultation };
- api.getDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created', title: draft.title, contentJson: { html: draft.html, productConsultation: consultation } } });
+ const draft = { clientContentId: 'created', title: 'Consultation', html: '<p>Reviewed draft</p>', tags: [], consultation };
+ api.getDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created', title: draft.title, tags: draft.tags, contentJson: { html: draft.html, productConsultation: consultation } } });
  api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: 'created' }] } });
  const saved = await createOrUpdateDirect(draft, null, consultation.product);
  expect(saved.verification).toBe(true);
@@ -338,7 +339,7 @@ it('product consultation saves its context and verifies both body and the actual
 });
 it('an unconfirmed product link keeps the created id and retry updates rather than duplicates', async () => {
  const consultation = newProductConsultation({ sourceType: 'listing', sourceId: '00000000-0000-4000-8000-000000000002', name: 'Fixture' });
- const draft = { title: 'New', html: '<p>Body</p>', tags: [], consultation };
+ const draft = { clientContentId: 'created', title: 'New', html: '<p>Body</p>', tags: [], consultation };
  api.getDirect.mockRejectedValue(new Error('Readback unavailable'));
  const saved = await createOrUpdateDirect(draft, null, consultation.product);
  expect(saved).toMatchObject({ id: 'created', verification: false });
@@ -350,4 +351,34 @@ it('a successful response with different saved body cannot confirm consultation 
  const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
  api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: direct.id }] } });
  expect((await saveDirect(direct.id, { title: direct.title, html: '<p>New</p>', tags: [], consultation }, direct)).verification).toBe(false);
+});
+
+it('recovers a lost create response with the same stable id and never issues a second create', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
+ const draft = { clientContentId: 'created', title: 'Recovered', html: '<p>Body</p>', tags: [], consultation };
+ api.create.mockRejectedValueOnce(new Error('Response lost'));
+ api.getDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created', title: draft.title, tags: draft.tags, contentJson: { html: draft.html, productConsultation: consultation }, revision: 'a'.repeat(64) } });
+ api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: 'created' }] } });
+ expect(await createOrUpdateDirect(draft, null, consultation.product)).toMatchObject({ id: 'created', verification: true });
+ expect(api.create.mock.calls[0][1].clientContentId).toBe('created'); expect(api.create).toHaveBeenCalledOnce();
+});
+it('a revision conflict requires explicit acknowledgement before another update', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
+ const draft = { title: 'Mine', html: '<p>Mine</p>', tags: [], consultation };
+ const latest = { ...direct, revision: 'b'.repeat(64), contentJson: { html: '<p>Other</p>', productConsultation: consultation } };
+ api.saveDirect.mockRejectedValueOnce(Object.assign(new Error('Conflict'), { status: 409 })); api.getDirect.mockResolvedValue({ success: true, data: latest });
+ const conflicted = await saveDirect(direct.id, draft, { ...direct, revision: 'a'.repeat(64) });
+ expect(conflicted.conflict).toBe(true);
+ await saveDirect(direct.id, draft, conflicted); expect(api.saveDirect).toHaveBeenCalledOnce();
+ api.saveDirect.mockResolvedValueOnce({ success: true, data: latest });
+ await saveDirect(direct.id, { ...draft, confirmedRevision: latest.revision }, conflicted);
+ expect(api.saveDirect).toHaveBeenCalledTimes(2); expect(api.saveDirect.mock.calls[1][1].expectedRevision).toBe(latest.revision);
+});
+
+it('a changed product link is not treated as an overwriteable revision conflict', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
+ const error = Object.assign(new Error('Link changed'), { status: 409, code: 'PRODUCT_LINK_CHANGED' });
+ api.saveDirect.mockRejectedValueOnce(error);
+ await expect(saveDirect(direct.id, { title: 'Mine', html: '<p>Mine</p>', tags: [], consultation }, direct)).rejects.toBe(error);
+ expect(api.getDirect).not.toHaveBeenCalled(); expect(consultationSaveError(error)).toContain('상품 연결이 변경');
 });

@@ -1,3 +1,5 @@
+import { ConsultationConflict } from '../../components/product-description/ConsultationConflict';
+import { newProductConsultation, readProductConsultation } from '../../components/product-description/productConsultationDraft';
 import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
 import { PRODUCT_DESCRIPTION_PURPOSE_LABELS } from '@o4o/store-ui-core';
 import { consultationLanguages } from '../../components/product-description/productConsultationDraft';
@@ -19,7 +21,7 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 
 import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   Edit2,
@@ -38,7 +40,7 @@ import { BlockRenderer } from '@o4o/block-renderer';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
-import { emptyTextDraft, loadDirect, saveDirect, removeDirect, textDraftFromRecord } from './authoring/contentAuthoringAdapters';
+import { consultationSaveError, emptyTextDraft, loadDirect, saveDirect, removeDirect, textDraftFromRecord } from './authoring/contentAuthoringAdapters';
 import { parseDirectBlocks } from './authoring/contentAuthoringModels';
 import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
@@ -55,16 +57,25 @@ export default function StoreDirectContentPage() {
   const { organizationId } = useStoreOrganizationId();
   const serviceKey = getActiveServiceKey();
   const { key: operationScope, isCurrent } = useStoreOperationScope();
+  const location = useLocation();
+  const entry = location.state as { consultationProduct?: unknown; consultationScope?: string } | null;
+  const legacyContext = entry?.consultationScope === operationScope ? readProductConsultation({
+    ...newProductConsultation({ sourceType: 'local', sourceId: '', name: '' }), product: entry.consultationProduct,
+  }) : undefined;
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const session = useContentAuthoringSession({
     organizationId, serviceKey, target: `direct:${id ?? ''}`, initialDraft: emptyTextDraft,
     load: () => id ? loadDirect(id) : Promise.reject(new Error('Missing content')),
-    toDraft: textDraftFromRecord,
+    toDraft: record => ({ ...textDraftFromRecord(record),
+      ...(legacyContext && !record.contentJson.productConsultation ? { consultation: legacyContext } : {}) }),
     persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
+    saveErrorMessage: consultationSaveError,
     onSaved: (saved, unchanged, visible) => {
       if (!visible) return;
+      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하세요.', false); return; }
       if (saved.verification === false) { session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false); return; }
+      if (session.draft.confirmedRevision) session.changeDraft({ confirmedRevision: undefined });
       if (unchanged) setEditing(false); },
     onRemoved: () => navigate(backPath, { replace: true, state: returnState }),
   });
@@ -232,6 +243,9 @@ export default function StoreDirectContentPage() {
       {session.draft.consultation && <p className="mb-3 rounded-lg bg-slate-50 p-3 text-sm" role="status">
         상품 상담자료 · {session.draft.consultation.product.name} · {PRODUCT_DESCRIPTION_PURPOSE_LABELS[session.draft.consultation.assist.purpose]} · {consultationLanguages[session.draft.consultation.language]}
       </p>}
+      {session.record?.conflict && <ConsultationConflict saved={session.record}
+        acknowledged={session.draft.confirmedRevision === session.record.revision} disabled={saving || deleting}
+        onAcknowledge={() => session.changeDraft({ confirmedRevision: session.record?.revision })} />}
       <StoreAiSlot label="안내 편집" />
       {/* Content area */}
       {editing ? (

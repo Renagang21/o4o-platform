@@ -1,3 +1,4 @@
+import { ConsultationConflict } from '../../components/product-description/ConsultationConflict';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
@@ -32,7 +33,7 @@ import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
-import { createOrUpdateDirect, emptyTextDraft, validateNewContent, type CreatedContent, type TextContentDraft } from './authoring/contentAuthoringAdapters';
+import { consultationSaveError, createOrUpdateDirect, emptyTextDraft, validateNewContent, type CreatedContent, type TextContentDraft } from './authoring/contentAuthoringAdapters';
 import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
@@ -68,12 +69,14 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   const showEditor = !product || composing;
   const session = useContentAuthoringSession<TextContentDraft, CreatedContent>({
     organizationId, serviceKey: getActiveServiceKey(), target: `create:${product?.sourceType ?? ''}:${product?.sourceId ?? ''}`,
-    enabled: open, initialDraft: { ...emptyTextDraft, ...(product ? { consultation: newProductConsultation(product) } : {}) },
+    enabled: open, initialDraft: { ...emptyTextDraft, ...(product ? { consultation: newProductConsultation(product), clientContentId: crypto.randomUUID() } : {}) },
     toDraft: () => emptyTextDraft,
     persist: (draft, record) => createOrUpdateDirect(draft, record, product),
     validate: validateNewContent,
+    saveErrorMessage: consultationSaveError,
     onSaved: (saved, unchanged, visible) => {
       if (!visible) return;
+      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하세요.', false); return; }
       if (saved.verification === false) {
         session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false);
         return;
@@ -97,7 +100,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   };
   const openLinkedContent = (item: LinkedContentItem) => {
     const path = productGuidanceEditPath(item, base);
-    if (path && isCurrent() && canLeave()) navigate(path, { state: returnState, replace: !!productReturn });
+    if (path && isCurrent() && canLeave()) navigate(path, { state: { ...returnState, consultationProduct: product, consultationScope: scope }, replace: !!productReturn });
   };
   if (!open) return null;
 
@@ -129,6 +132,9 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
               </span>
             </div>
           )}
+          {session.record?.conflict && <ConsultationConflict saved={session.record}
+            acknowledged={session.draft.confirmedRevision === session.record.revision} disabled={saving}
+            onAcknowledge={() => session.changeDraft({ confirmedRevision: session.record?.revision })} />}
           {product && <ProductGuidanceContext product={product} compact={showEditor} disabled={saving} onOpenContent={openLinkedContent} />}
           {showEditor ? <>
           <p style={styles.guideHint}>

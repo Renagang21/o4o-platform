@@ -13,6 +13,7 @@ interface Options<D, R> {
   toDraft: (record: R) => D;
   persist: (draft: D, record: R | null) => Promise<R>;
   validate?: (draft: D) => string | null;
+  saveErrorMessage?: (error: unknown) => string;
   remove?: (record: R) => Promise<void>;
   onSaved?: (record: R, unchanged: boolean, visible: boolean) => void;
   onRemoved?: () => void;
@@ -197,11 +198,11 @@ export function useContentAuthoringSession<D, R>(options: Options<D, R>) {
         });
       }
       config.onSaved?.(saved, unchanged, visible);
-    } catch {
+    } catch (error) {
       if (isCurrent() && hasContext() && epoch === viewEpoch.current)
         setNotice({
           ok: false,
-          message:
+          message: config.saveErrorMessage?.(error) ??
             "저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주세요.",
         });
     } finally {
