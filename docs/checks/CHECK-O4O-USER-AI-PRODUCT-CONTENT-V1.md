@@ -1,7 +1,7 @@
 # 사용자 주도 외부 AI 상품 콘텐츠 개발 검증·통합 인계
 
 > **상태**: ACTIVE · **작성일**: 2026-10-26 · **최종 갱신**: 2026-10-26
-> **범위**: [개발 WO](../work-orders/WO-O4O-USER-AI-PRODUCT-CONTENT-V1.md)의 1·2단계 코드·격리 검증. 실사용·통합·운영 배포는 별도
+> **범위**: [개발 WO](../work-orders/WO-O4O-USER-AI-PRODUCT-CONTENT-V1.md)의 1·2단계 코드·격리 검증 및 추가 지시에 따른 병합 전 PR 준비. 실사용·main 병합·운영 배포는 별도
 > **구조 계약**: [기존 외부 AI 설계 §10](../design/DESIGN-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md#10-매장-상품별-소비자-콘텐츠-초안)
 
 ## 1. 개발한 기능과 보호 경계
@@ -37,12 +37,12 @@
 - 사용자가 실사용 대상으로 시험 약국 경영자 계정과 현재 로그인된 본인 ChatGPT를 지정했다. 이 클라우드에는 사용자 브라우저 연결과 현행 `docs/local/TEST-ACCOUNTS.local.md`가 없다. 계정 정보를 요청하거나 과거 Demo로 대체하지 않았고 실제 ChatGPT 연결·쓰기·해제를 실행하지 않았다.
 - 로컬 실제 browser 검사도 미실행이다. Chromium headless shell 다운로드가 `Domain forbidden` HTTP 403으로 차단됐다. 정책·proxy/TLS를 우회하지 않았다. 위 48건은 DOM 회귀이며 desktop/mobile browser 결과가 아니다.
 - 운영 MFDS 근거 연결의 사실 정확성은 이번 격리 상품 검증으로 확정하지 않는다. 코드에서는 매장 상품 ID/source·소유·master 연결을 지키며 참고자료와 소비자 문안을 구분한다. 실제 자료 대조는 해당 권한과 원천 자료가 있는 실사용 검증 범위다.
-- PR·PR CI·Codex 원격 review·main 병합·배포·운영 DB write·설정/Secret·외부 계정 연결·공개 제출은 실행하지 않았다. 개발 담당의 기존 종료 경계는 push 후 인계다.
+- 개발 push 시점에는 PR·PR CI·Codex 원격 review를 실행하지 않았다. 이후 사용자의 병합 전 준비 지시로 PR 단계는 §5에서 이어간다. main 병합·배포·운영 DB write·설정/Secret·외부 계정 연결·공개 제출은 실행하지 않는다.
 - 메일 서비스·메일 MCP 권한·카카오 채널/PlayMCP·SIWC를 구현 완료로 표시하지 않는다. 다음 순서와 외부 조건은 WO §4를 따른다.
 
 ## 4. 통합 담당 및 실사용 인계
 
-착수 main은 `7e9c1c99d6`, push 전 확인 main은 `792b3d0f6e`다. 그 사이 5개 변경 경로는 별도 운영 정리이며 자기 코드·schema·lockfile과 중첩이 없다. 개발 branch는 `wo/user-ai-product-content`이며 최종 HEAD/push 결과는 완료 보고에서 전달한다. PR을 개발 공간에서 만들지 않는다. 통합 담당은 동일 변경의 기존 PR 유무를 확인하고 현재 main 위의 HEAD·required CI·Codex·미해결 thread를 검토한다.
+착수 main은 `7e9c1c99d6`, push 전 확인 main은 `792b3d0f6e`다. 그 사이 5개 변경 경로는 별도 운영 정리이며 자기 코드·schema·lockfile과 중첩이 없다. 개발 branch는 `wo/user-ai-product-content`, 최초 push HEAD는 `6b33f85b8728debb90558f38202c891b0097b210`이다. 이후 사용자 지시로 PR 준비를 진행하며 최종 HEAD/push 결과는 완료 보고에서 전달한다. 같은 branch를 재사용하고 중복 PR을 만들지 않는다.
 
 운영 API의 마지막 확인 근거는 기존 [Promote 40257061836](https://github.com/Renagang21/o4o-platform/actions/runs/40257061836)의 `c16d024420` serving 대조 성공이다. 이 개발의 새 코드가 운영에 있다는 뜻이 아니다. 현 시점의 정확한 Cloud Run revision 이름/트래픽은 이 환경에서 독립 조회하지 않았으므로 UNKNOWN이다. 조회 시 main `792b3d0f6e`의 production 상태는 partner의 LEVEL_3 보류였으며 전체 서비스 배포 완료로 해석하지 않는다.
 
@@ -53,3 +53,13 @@
 문서 정합: ACTIVE 외부 AI 설계에 새 계약과 기존 destinations 호환을 반영했다. 기존 공개 제출 DRAFT의 8개 도구 목록은 실제 제출 전에 11개 계약과 대조해야 한다. 과거 CHECK/Demo 기록·canonical index·운영 공개 정책은 고치지 않았다.
 
 WORKTREE_DISPOSITION: `wo/user-ai-product-content` / `/workspace/o4o-wt/user-ai-product-content`는 push 후 KEEP. 통합·실사용 후속 수정에 필요하며 다른 worktree는 보존한다.
+
+## 5. 사용자 추가 지시: main 병합 전 준비
+
+2026-10-26 사용자가 “main 병합 전까지 진행”을 지시했다. 기존 개발 branch에서 [PR #832](https://github.com/Renagang21/o4o-platform/pull/832)를 생성했다. 중복 PR 0건을 확인했고, main `792b3d0f6e`와 충돌이 없으며 auto-merge는 설정하지 않았다. 현재 ruleset을 실제 조회해 PR과 GitHub Actions `CI Gate`가 필수임을 확인했다. human approval 필수 수는 0이며 우회 권한을 사용하지 않는다.
+
+최초 source `6b33f85b87`의 Codex 자동 code review는 완료·지적 없음이었다. [최초 CI](https://github.com/Renagang21/o4o-platform/actions/runs/40271479524)와 [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/40271479572)는 해당 HEAD의 실행 기록이며 이후 수정 HEAD의 성공 증거로 대신하지 않는다. 최종 HEAD의 CI·품질·리뷰·미해결 thread와 main 대비 상태는 PR의 실제 검사 및 완료 보고에서 확인한다. 취소되거나 superseded된 실행을 PASS로 합산하지 않는다.
+
+병합 전 자체 검토에서는 신규 fixture의 문자열 정렬 두 곳에 비교 함수를 명시했다. 테스트 자료의 영문 메타데이터 키 비교이며 상품 저장·권한·배포 동작은 변경하지 않는다. 문서 민감정보·링크·staged 범위와 fixture 문법을 재확인하고 같은 PR에 반영한다.
+
+이번 종료점은 병합 직전이다. main merge·auto-merge·운영 배포 dispatch·운영 데이터 시험은 실행하지 않는다. 실제 ChatGPT·desktop/mobile browser·MFDS 원천 검증의 위 미완료 범위도 유지한다. 사용자 지시 없이 이 제한을 배포 승인으로 확대하지 않는다.

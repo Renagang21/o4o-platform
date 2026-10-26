@@ -468,7 +468,7 @@ export async function runProductContentChecks({
         assert.ok(audits.length > 0);
         for (const { meta } of audits)
           assert.deepEqual(
-            Object.keys(meta).sort(),
+            Object.keys(meta).sort((left, right) => left.localeCompare(right)),
             [
               "channel",
               "organizationId",
@@ -476,7 +476,7 @@ export async function runProductContentChecks({
               "groupId",
               "productId",
               "language",
-            ].sort(),
+            ].sort((left, right) => left.localeCompare(right)),
           );
       },
     );
