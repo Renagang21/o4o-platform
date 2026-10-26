@@ -36,3 +36,12 @@ production DB·실계정·실제 GCS·OAuth·backup 복원은 실행하지 않�
 읽기 전용 복원 검사 입력은 현재 최소 증빙과 snapshot에서 권한 있는 운영자가 완전하게 준비해야 한다. 입력이 임의로 누락됐는지 외부 원장을 검증하는 도구가 아니며 `restoreApproved:false`를 항상 반환한다. 계정 UUID digest 비교가 모든 파일·도메인의 복원 안전성을 증명하지 않는다.
 
 문서 정합: 보유기간 정책의 과거 FK fallback/계정-GCS 미연동 설명만 실제 구현 범위로 정합화했다. 보유기간·공개 처리방침 원문·canonical index·과거 CHECK는 변경하지 않았다. PR 결과와 최종 통합 기준은 후속 절에 기록한다.
+
+
+## 재현 도구·최신 main 통합 후속
+
+- 기존 블로그 제거 PR #831/main `5f778c3a18`을 작업 branch에 정상 merge했다. 충돌 없으며 이번 API 변경과 겹치지 않는다. 다른 작업의 삭제·메뉴 변경은 보존했다.
+- 저장소에 전용 fixture 도구 `scripts/privacy/verify-auth-privacy-fixture.mjs`를 추가했다. 사용자 자료가 없는 전용 빈 DB에서만 prepare하고, verify는 소유 표식·canonical 지문·사용자0을 검사한다. `.env`와 임의 DB 주소를 읽지 않는다.
+- 이 저장된 도구의 fresh prepare와 verify를 실제 실행했다. **3 suites / 51 tests PASS**(공유 제한7 + readiness4 + 기존 제거40). 다른 도메인의 fixture-only trigger를 finally에서 제거하고 신규 canonical 지문 복구를 확인했다. 위 개별 실행과 중복 합산하지 않는다.
+- 운영 이미지 결과를 기동한 합성 로그인 smoke와 graceful shutdown을 확인했다. 테스트 사용자/사업 데이터나 실제 provider 호출은 없다.
+- PR [#835](https://github.com/Renagang21/o4o-platform/pull/835)는 OPEN으로 생성했다. 원격 CI/검토 완료 판정은 최종 push HEAD를 기준으로 후속 확인한다. auto-merge·main 병합·배포를 실행하지 않는다.

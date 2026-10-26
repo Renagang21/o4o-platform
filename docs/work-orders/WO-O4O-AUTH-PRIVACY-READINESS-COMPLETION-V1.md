@@ -30,3 +30,7 @@
 GCS 실제 ownership tag·version/soft-delete·cache·IAM·backup/export 보존 및 복원 훈련, 실제 일반 계정/OAuth는 사용자 운영 검증이다. 미분류 도메인이 남으면 capability는 비활성으로 유지한다. 새 readiness 통과를 운영 파기 활성화 승인으로 표시하지 않는다.
 
 개발 검증은 [CHECK](../checks/CHECK-O4O-AUTH-PRIVACY-READINESS-COMPLETION-V1.md)에 기록한다. main 병합/운영 실행을 개발 완료 수치에 포함하지 않는다.
+
+## 통합 검증 진행
+
+최신 main #831을 정상 merge했고 PR #835에서 CI/검토를 진행한다. 전용 fixture 도구의 fresh prepare·3 suites/51 tests와 canonical 지문 복구를 확인했다. main 병합·auto-merge·운영 반영은 미실행이다.

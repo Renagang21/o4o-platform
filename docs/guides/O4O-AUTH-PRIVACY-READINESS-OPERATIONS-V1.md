@@ -34,3 +34,15 @@ node scripts/privacy/check-erasure-restore.mjs /private/snapshot.json /private/c
 검사는 UTC 시간·자동 백업 7일/수동 export 30일·5분 이내의 현재 ledger·범위·최소 증빙 만료를 검증한다. 출력에는 식별자/digest를 넣지 않고 합계만 제공한다. 입력당 16MiB/10만 subject로 제한한다. 더 큰 자료는 별도 검토하며 제한을 생략해 실행하지 않는다.
 
 종료 코드 0은 **현재 증빙과 계정 UUID 충돌 없음**만 뜻하며 `restoreApproved:false`다. 충돌은 1, 불완전/오래된/잘못된 입력은 2다. 이 도구는 DB/GCS 복원·삭제·repair·승인을 수행하지 않는다. 실제 파일/사업 자료·법정 기록·복원 후 재삭제 및 세션 차단 검증은 별도 운영 절차를 유지한다.
+
+## 재현 가능한 격리 PostgreSQL 검증
+
+개발용 PostgreSQL 15의 **전용 빈 DB** `o4o_erasure_fixture`, 사용자 `agent`, loopback port `55469`를 준비한다. 기존 사용자/개발 DB나 운영 프록시 포트를 사용하지 않는다. 저장소 root에서 다음 명령을 사용한다. 도구는 `.env`를 읽지 않고 연결 대상을 고정하며, prepare는 비어 있지 않은 DB를 거부한다. verify는 전용 DB 소유 표식·정확한 canonical 지문·사용자 행0을 확인한 뒤에만 합성 자료를 생성/정리하는 suite를 실행한다.
+
+```sh
+node --import tsx scripts/privacy/verify-auth-privacy-fixture.mjs --prepare
+node --import tsx scripts/privacy/verify-auth-privacy-fixture.mjs --verify
+node --test scripts/privacy/check-erasure-restore.test.mjs
+```
+
+기존 Core 회귀를 위해 다른 도메인의 fenced 전제는 전용 DB에만 임시 준비하고 finally에서 제거·canonical 지문 복구를 확인한다. AI 구현/운영 schema를 수리한 증거가 아니다. 실패 중단 시 전용 container/DB만 확인·정리한다. 실제 계정/기존 자료가 있는 DB에 이 fixture 도구를 적용하지 않는다. PostgreSQL을 준비하는 container와 test 데이터는 이 작업 전용으로 만들고 검증 후 제거한다.
