@@ -1,10 +1,15 @@
 import { z } from "zod";
 import {
+  mailScopes,
+  mailToolSchemas,
+  mailWriteTools,
+} from "../personal-mail/contracts.js";
+import {
   STORE_PRODUCT_CONTENT_LOCALES,
   STORE_PRODUCT_TARGET_KINDS,
 } from "../../services/store/store-product-content.service.js";
 
-export const scopes = ["o4o:read", "o4o:draft:write"] as const;
+export const scopes = ["o4o:read", "o4o:draft:write", ...mailScopes] as const;
 export const targetKinds = [
   "supplier",
   "store",
@@ -85,7 +90,7 @@ export const workspaceIdSchema = z.union([
   z
     .string()
     .regex(
-      /^(store|organization|community):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      /^(store|organization|community|mail):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
     ),
 ]);
 export const workspaceInput = z
@@ -185,6 +190,7 @@ export const productContentTools = new Set<string>([
   "update_product_content_draft",
 ]);
 export const toolSchemas = {
+  ...mailToolSchemas,
   list_workspaces: z.object({}).strict(),
   search_products: searchInput,
   get_product_context: productInput,
@@ -199,6 +205,7 @@ export const toolSchemas = {
 };
 export type ToolName = keyof typeof toolSchemas;
 export const writeTools = new Set<ToolName>([
+  ...mailWriteTools,
   "save_content_draft",
   "update_content_draft",
   "save_product_content_draft",

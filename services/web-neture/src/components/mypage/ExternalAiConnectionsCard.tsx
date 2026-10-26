@@ -32,7 +32,13 @@ export default function ExternalAiConnectionsCard() {
     try {
       await revokeExternalConnection(id);
       setItems((current) => current?.filter((item) => item.id !== id) ?? []);
-      setMessage("연결을 해제했습니다. 저장된 콘텐츠는 유지됩니다.");
+      setMessage(
+        items
+          ?.find((item) => item.id === id)
+          ?.scopes.some((scope) => scope.startsWith("o4o:mail:"))
+          ? "연결을 해제했습니다. 위임된 메일 작업·규칙은 중단되며 이미 처리된 메일은 되돌리지 않습니다."
+          : "연결을 해제했습니다. 저장된 콘텐츠는 유지됩니다.",
+      );
     } catch {
       setMessage("연결을 해제하지 못했습니다. 다시 시도해 주세요.");
     } finally {
@@ -67,6 +73,15 @@ export default function ExternalAiConnectionsCard() {
           <p className="text-sm">
             자료 조회
             {item.scopes.includes("o4o:draft:write") ? " · 초안 저장·수정" : ""}
+            {item.scopes.includes("o4o:mail:read")
+              ? " · 개인 메일 현황 조회"
+              : ""}
+            {item.scopes.includes("o4o:mail:manage")
+              ? " · 메일 정리 제안·승인 작업 관리"
+              : ""}
+            {item.scopes.includes("o4o:mail:body")
+              ? " · 선택 메일 본문 전달"
+              : ""}
           </p>
           {item.createdAt && (
             <p className="text-sm text-gray-600">

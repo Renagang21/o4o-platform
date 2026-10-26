@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import { once } from "node:events";
 import { runProductContentChecks } from "./external-ai-product-content-fixture.mjs";
+import { runPersonalMailChecks } from './personal-mail-fixture.mjs';
 import { DataSource } from "typeorm";
 import express from "express";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -2291,7 +2292,10 @@ async function main() {
     await db.initialize();
     try {
       await bootstrap(db);
-      if (!process.argv.includes("--inspect-new-state")) await tests(db);
+      if (!process.argv.includes("--inspect-new-state")) {
+        if(!process.argv.includes('--personal-mail-only'))await tests(db);
+        await runPersonalMailChecks({db,check});
+      }
     } finally {
       await db.destroy();
     }

@@ -61,9 +61,11 @@ RUN echo "Cache bust: ${CACHEBUST}"
 # - main.js: API Server entry (Cloud Run Service)
 # - migrate.js: Migration CLI entry (Cloud Run Job)
 # - product-correction-worker.js: Explicit bounded correction job (no HTTP/migration startup)
+# - personal-mail-worker.js: Explicit bounded mailbox job (feature OFF by default)
 COPY --chown=o4oapi:nodejs dist/main.js ./dist/main.js
 COPY --chown=o4oapi:nodejs dist/main.js.map ./dist/main.js.map
 COPY --chown=o4oapi:nodejs dist/product-correction-worker.js ./dist/product-correction-worker.js
+COPY --chown=o4oapi:nodejs dist/personal-mail-worker.js ./dist/personal-mail-worker.js
 COPY --chown=o4oapi:nodejs dist/migrate.js ./dist/migrate.js
 COPY --chown=o4oapi:nodejs dist/migrate.js.map ./dist/migrate.js.map
 COPY --chown=o4oapi:nodejs dist/scripts/provision-test-cooperative.js ./dist/provision-test-cooperative.js
@@ -85,6 +87,8 @@ COPY --chown=o4oapi:nodejs mail-templates ./templates/email
 RUN ls -la /app/dist/
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
 RUN ls -la /app/dist/migrate.js || (echo "CRITICAL: dist/migrate.js not found!" && exit 1)
+RUN node --check dist/personal-mail-worker.js \
+    && node --input-type=module -e "const [imap,mime]=await Promise.all([import('imapflow'),import('mailparser')]); if(typeof imap.ImapFlow!=='function'||typeof mime.simpleParser!=='function') throw new Error('PERSONAL_MAIL_RUNTIME_CONTRACT_INVALID')"
 RUN ls -la /app/dist/database/migrations/*.js | head -5 || echo "WARNING: No migrations found"
 
 # Ownership guard — 과거 `chown -R o4oapi:nodejs /app` 와 동치임을 빌드 실패로 강제한다.
