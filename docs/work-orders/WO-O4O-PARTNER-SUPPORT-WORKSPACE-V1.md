@@ -211,3 +211,26 @@
 GitHub Actions 상세 로그 저장소 `results-receiver.actions.githubusercontent.com`와 Sonar 상세 API `sonarcloud.io`가 환경 허용 목록에 없어 403으로 차단된다. 기존 custom domain·preset·스크립트·credential requirement를 보존하고 두 host만 추가한 환경 초안을 저장했다. 도구 결과는 `saved`, `requires_publish: true`다. 저장은 실행 환경 반영/Publish가 아니다.
 
 환경 설정에서 초안을 검토·저장·Publish한 후 GitHub 로그와 Sonar 상세 조회를 재시도한다. 웹 실패 로그를 확인해 최초 Cloud Run 서비스 설정 또는 권한 문제인지 판정한 뒤 같은 verified 경로로 재개한다. 원인을 확인하기 위해 CI/freeze/ref/IAM 경계를 완화하지 않는다. 운영 영속 미디어 저장소·파일 파기/백업 정책 및 실계정 end-to-end 검증은 앞의 인계 TODO에 남아 있다.
+
+
+## 2026-10-26 로그 접근 복구·Partner 최초 생성
+
+- 환경 Publish 후 GitHub Actions 로그의 실제 Azure Blob 저장소까지 접근됨을 확인했다. 추가 환경 게시 요청 없이 실패 원인을 진단할 수 있다. 최초 실패 로그는 `Cannot find service [partner-web]`로, 기존 서비스가 없어 verified plan의 traffic 조회가 실패한 것이었다.
+- 최신 main `7166005df54231e00999673fecdf83e596e1bb3a`의 CI gate를 유지해 [최초 생성 실행](https://github.com/Renagang21/o4o-platform/actions/runs/40284397817)을 완료했다. 기존 revision/traffic이 없는 새 서비스의 초기 생성에 한해 문서화된 수동 `legacy` 모드를 사용했다. 서비스 `partner-web`·초기 revision `partner-web-00001-v9m` 생성이 성공했다. 공개 IAM 부여는 이 실행에 포함되지 않으며, 이 결과를 verified/public 배포 성공으로 간주하지 않는다.
+- 이어서 [정상 verified 재실행](https://github.com/Renagang21/o4o-platform/actions/runs/40284778536)에서 기존 traffic 조회와 새 revision `partner-web-00002-jaf`의 0% 배포까지 성공했다. tag URL HTTP smoke는 403으로 실패하여 traffic switch는 실행되지 않았다. 첫 revision이 기존 분배를 유지한다.
+- 배포 SA의 `run.developer` 권한은 최초 서비스 생성은 허용하지만 공개 IAM 설정은 허용하지 않는다는 [기존 운영 경계](../checks/CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.md#4-새-서비스-최초-생성-시)를 적용한다. 현재 환경에도 별도 GCP outbound identity가 없어 소유자 권한으로 IAM을 대신 변경할 수 없다. SA에 run.admin을 추가하거나 invoker 검사 우회는 하지 않는다.
+
+### 소유자 1회 작업
+
+GCP 프로젝트 권한이 있는 계정의 Cloud Shell에서 다음을 실행해야 공개 HTTP 검증을 계속할 수 있다. 대상은 Partner 정적 웹 서비스 하나이며 API/공동공간의 기존 인증 권한을 변경하지 않는다.
+
+```sh
+gcloud run services add-iam-policy-binding partner-web   --region=asia-northeast3   --project=netureyoutube   --member=allUsers   --role=roles/run.invoker
+```
+
+- [x] 서비스 생성·CI gate·새 revision 0% 배포 확인
+- [ ] 소유자의 공개 invoker 부여 후 verified HTTP smoke·traffic switch 재실행
+- [ ] `partner.neture.co.kr`의 기존 HTTPS/LB·DNS 연결 확인 (서비스 생성만으로 도메인이 연결되었다고 보고하지 않는다)
+- [ ] 영속 파일 저장소·실계정 검증·앞서 남긴 Sonar advisory 상세 검토
+
+이 단계에서 웹은 생성된 비공개 서비스이며 사용자에게 공개된 Partner 사이트의 배포 완료가 아니다. main 통합과 운영 API 배포의 이전 성공 결과는 유지된다.
