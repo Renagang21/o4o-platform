@@ -36,6 +36,12 @@
 └── automation-repo-setup.yml # 저장소 설정 자동화
 ```
 
+## GitHub App 토큰 발급
+
+`node scripts/ops/github-app-token.mjs check`는 설정된 App의 단기 설치 토큰을 발급·검증·폐기한다.
+명령마다 새 토큰을 사용하며 App 설정·비밀키 파일 연결이 먼저 필요하다.
+사용법과 owner-only 배포 경계는 [발급 도구 안내](../docs/guides/GITHUB-APP-TOKEN-ISSUER.md)를 따른다.
+
 ## 개발 스크립트
 
 > **로컬 개발 절차의 정본은 [SETUP.md](../SETUP.md) 입니다.**
