@@ -169,6 +169,33 @@ class RoutingTests(unittest.TestCase):
             t.apply_transition(api, t.candidate_map(api.map, t.NEW, t.NEW))
         self.assertEqual([url for _, url, _ in api.writes], [f'{t.BACKEND}/backend-{t.NEW}'])
 
+    def test_rollback_plan_does_not_require_current_broken_domains(self):
+        api = FakeCloud(t.NEW)
+        service, revision, image = current_revision()
+        service['status']['url'] = 'https://kpa-society-web-fixed.a.run.app'
+        api.resources[f'{t.BACKEND}/backend-{t.OLD}']['loadBalancingScheme'] = 'EXTERNAL_MANAGED'
+        def smoke(url):
+            if url in {'https://' + h for h in t.HOSTS}:
+                raise ValueError('Current domains unavailable')
+            return 'healthy-old-asset'
+        with patch.object(t, 'stable_revision', return_value=(service, revision, image)), patch.object(t, 'validate_map'), patch.object(t, 'public_smoke', side_effect=smoke) as public:
+            plan, _, _, _, _, _ = t.transition_plan(api, rollback=True)
+        self.assertEqual(plan['mode'], 'rollback')
+        self.assertEqual(public.call_args_list, [unittest.mock.call(service['status']['url'])])
+        self.assertEqual(api.writes, [])
+
+    def test_failed_rollback_postcheck_keeps_recovery_target(self):
+        api = FakeCloud(t.NEW)
+        def smoke(url):
+            if url in {'https://' + h for h in t.HOSTS}:
+                raise ValueError('Shared domain outage')
+            return 'healthy-old-asset'
+        with patch.object(t, 'production_idle'), patch.object(t, 'stable_revision', current_revision), patch.object(t, 'public_smoke', smoke):
+            with self.assertRaisesRegex(RuntimeError, 'recovery target retained'):
+                t.apply_transition(api, t.candidate_map(api.map, t.NEW, t.OLD), rollback=True)
+        t.routed_matcher(api.map, t.OLD)
+        self.assertEqual([url for _, url, _ in api.writes], [t.MAP])
+
 
 class InventoryTests(unittest.TestCase):
     def test_all_aggregate_scopes_are_explicit(self):

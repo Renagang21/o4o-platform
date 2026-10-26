@@ -132,5 +132,5 @@ gh workflow run deploy-web-services.yml --ref main \
   -f pharmacy_plan_digest=<reviewed-cutover-sha256>
 ```
 
-후속 코드 로컬 검증: Python 39건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
+후속 코드 로컬 검증: Python 41건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
 새 origin 1개 추가뿐임을 확인했다. 이 절은 코드 구현 기록이며 cutover·정상 배포·retire의 실제 실행 완료를 뜻하지 않는다.

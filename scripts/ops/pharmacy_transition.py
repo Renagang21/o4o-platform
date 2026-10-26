@@ -205,8 +205,9 @@ def transition_plan(api, rollback=False):
         raise ValueError('Replacement ownership marker unavailable')
     validate_map(api, candidate, backend.get('loadBalancingScheme'))
     public_smoke(service['status']['url'])
-    for host in sorted(HOSTS):
-        public_smoke('https://' + host)
+    if not rollback:
+        for host in sorted(HOSTS):
+            public_smoke('https://' + host)
     plan = {'mode': 'rollback' if rollback else 'cutover', 'map_fingerprint': url_map['fingerprint'],
             'target_revision': revision['metadata']['name'], 'image': image,
             'target_identity': service['metadata']['uid'],
@@ -244,6 +245,8 @@ def apply_transition(api, candidate, rollback=False, expected_revision=None):
                     raise
                 time.sleep(5)
     except Exception:
+        if rollback:
+            raise RuntimeError('Rollback routing applied; canonical smoke remains unhealthy; recovery target retained') from None
         if already_routed:
             raise RuntimeError('Existing routing failed public smoke; no routing write submitted') from None
         # Restore only our pharmacy matcher; preserve unrelated concurrent map edits.
