@@ -321,3 +321,17 @@ describe("shared content conversion compatibility", () => {
     ).toEqual({ type: "text" });
   });
 });
+
+it("preserves the Store consultation revision contract through the shared client", async () => {
+  const updated = { id: "content", revision: "r2" };
+  const put = vi.fn().mockResolvedValue({ success: true, data: updated });
+  const api = createAssetSnapshotClients({
+    apiClient: { put } as unknown as JsonApiClient,
+  });
+  const body = { title: "edited", expectedRevision: "r1" };
+  await expect(api.directContentApi.update("content", body)).resolves.toEqual({
+    success: true,
+    data: updated,
+  });
+  expect(put).toHaveBeenCalledWith("/store-contents/direct/content", body);
+});

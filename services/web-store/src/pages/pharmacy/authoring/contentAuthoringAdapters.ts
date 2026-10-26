@@ -1,6 +1,9 @@
+import { sanitizeRichHtml } from '@o4o/content-editor';
+import { readProductConsultation, type ProductConsultationDraft } from '../../../components/product-description/productConsultationDraft';
 import { apiClient } from "../../../api/client";
 import {
   directContentApi,
+  handledProductContentApi,
   storeContentApi,
   type DirectContentItem,
   type StoreContentData,
@@ -23,7 +26,11 @@ import {
   type ProductionTarget,
 } from "../productionTargets";
 
+export type VerifiedDirectContent = DirectContentItem & { verification?: boolean; conflict?: boolean };
 export interface TextContentDraft {
+  clientContentId?: string;
+  confirmedRevision?: string;
+  consultation?: ProductConsultationDraft;
   title: string;
   html: string;
   tags: string[];
@@ -39,7 +46,9 @@ export interface MaterialDraft {
   category: ProductionTarget | null;
   description?: string;
 }
-export interface CreatedContent {
+export interface CreatedContent extends Partial<DirectContentItem> {
+  verification?: boolean;
+  conflict?: boolean;
   id: string;
   contentJson: Record<string, unknown>;
 }
@@ -64,6 +73,7 @@ export const textDraftFromRecord = (
   title: record.title,
   html: directContentJsonToHtml(record.contentJson),
   tags: Array.isArray(record.tags) ? record.tags : [],
+  consultation: readProductConsultation(record.contentJson.productConsultation),
 });
 export const snapshotDraftFromRecord = (
   record: StoreContentData,
@@ -130,7 +140,7 @@ export async function saveSnapshot(
     throw new Error("Snapshot not saved");
   return response.data;
 }
-export async function loadDirect(id: string): Promise<DirectContentItem> {
+export async function loadDirect(id: string): Promise<VerifiedDirectContent> {
   const response = await directContentApi.get(id);
   if (response.success !== true || !response.data || response.data.id !== id)
     throw new Error("Unconfirmed direct content");
@@ -140,11 +150,13 @@ export async function saveDirect(
   id: string,
   draft: TextContentDraft,
   record: DirectContentItem | null,
-): Promise<DirectContentItem> {
+): Promise<VerifiedDirectContent> {
   if (!record) throw new Error("Content not loaded");
+  if (draft.consultation) return persistConsultation(draft, record);
   const contentJson: Record<string, unknown> = {
     ...record.contentJson,
     html: draft.html,
+    ...(draft.consultation ? { productConsultation: draft.consultation } : {}),
   };
   delete contentJson.blocks;
   const response = await directContentApi.update(id, {
@@ -218,12 +230,14 @@ export async function createOrUpdateDirect(
   record: CreatedContent | null,
   product?: ContentProductReference | null,
 ): Promise<CreatedContent> {
+  if (draft.consultation) return persistConsultation({ ...draft, html: draft.html.trim() }, record);
   const contentJson = {
     ...(record?.contentJson ?? {
       sourceResources: [],
       generatedBy: "manual-direct",
     }),
     html: draft.html.trim(),
+    ...(draft.consultation ? { productConsultation: draft.consultation } : {}),
   };
   if (record) {
     const response = await directContentApi.update(record.id, {
@@ -237,7 +251,8 @@ export async function createOrUpdateDirect(
       response.data.id !== record.id
     )
       throw new Error("Content not saved");
-    return { id: response.data.id, contentJson: response.data.contentJson };
+    return { id: response.data.id, contentJson: response.data.contentJson,
+       };
   }
   const response = await apiClient.post<{
     success: boolean;
@@ -257,5 +272,73 @@ export async function createOrUpdateDirect(
   });
   if (response.success !== true || !response.data?.id)
     throw new Error("Content not created");
-  return { id: response.data.id, contentJson: response.data.contentJson ?? contentJson };
+  return { id: response.data.id, contentJson: response.data.contentJson ?? contentJson,
+     };
+}
+
+const normalizeConsultationHtml = (html: string) => sanitizeRichHtml(html).trim();
+
+/** The client id survives a lost POST response; the server commits body/link atomically. */
+async function persistConsultation(draft: TextContentDraft, record: CreatedContent | null): Promise<VerifiedDirectContent> {
+  const id = record?.id ?? draft.clientContentId;
+  if (!id) throw new Error('Missing stable draft id');
+  if (record?.conflict && (!record.revision || draft.confirmedRevision !== record.revision)) return {
+    ...record, id, title: record.title ?? draft.title, sourceType: 'direct', updatedAt: record.updatedAt ?? '',
+    updatedBy: record.updatedBy ?? null, conflict: true, verification: false,
+  };
+  const result = await sendConsultation(draft, record, id);
+  if (result.conflict) return result;
+  return verifySavedConsultation(draft, id, result);
+}
+
+async function sendConsultation(draft: TextContentDraft, record: CreatedContent | null, id: string): Promise<VerifiedDirectContent> {
+  const context = draft.consultation!;
+  const contentJson = { ...(record?.contentJson ?? { sourceResources: [], generatedBy: 'manual-direct' }),
+    html: normalizeConsultationHtml(draft.html), productConsultation: context };
+  delete (contentJson as Record<string, unknown>).blocks;
+  try {
+    const response = record
+      ? await directContentApi.update(id, { title: draft.title.trim(), tags: draft.tags, contentJson,
+        expectedRevision: record.conflict ? draft.confirmedRevision : record.revision })
+      : await apiClient.post<{ success: boolean; data: DirectContentItem }>('/store-contents', {
+        title: draft.title.trim(), tags: draft.tags, contentJson, clientContentId: id,
+        productRef: { sourceType: context.product.sourceType, sourceId: context.product.sourceId },
+      });
+    if (response.success !== true || response.data?.id !== id) throw new Error('Unconfirmed write');
+    return response.data;
+  } catch (error) {
+    // A conflict or lost response may have a readable saved row. Never retry under a new id.
+    const { status, code } = error as { status?: number; code?: string };
+    if (code === 'PRODUCT_LINK_CHANGED') throw error;
+    if (status && status < 500 && ![408, 409].includes(status)) throw error;
+    let result: VerifiedDirectContent;
+    try { result = await loadDirect(id); } catch { throw error; }
+    return { ...result, conflict: status === 409, verification: false };
+  }
+}
+
+async function verifySavedConsultation(draft: TextContentDraft, id: string, result: VerifiedDirectContent): Promise<VerifiedDirectContent> {
+  const context = draft.consultation!;
+  try {
+    const [saved, linked] = await Promise.all([loadDirect(id), handledProductContentApi.byProduct(context.product.sourceType, context.product.sourceId)]);
+    const same = saved.title === draft.title.trim() && JSON.stringify(saved.tags ?? []) === JSON.stringify(draft.tags) && typeof saved.contentJson.html === 'string' && normalizeConsultationHtml(saved.contentJson.html) === normalizeConsultationHtml(draft.html) &&
+      JSON.stringify(readProductConsultation(saved.contentJson.productConsultation)) === JSON.stringify(context);
+    const connected = linked.success === true && Array.isArray(linked.data?.items) && linked.data.items.some(item => item.contentId === id);
+    return { ...saved, verification: same && connected, conflict: !same };
+  } catch { return { ...result, verification: false }; }
+}
+
+export function consultationSaveError(error: unknown): string {
+  const code = (error as { code?: string })?.code;
+  const messages: Record<string, string> = {
+    PRODUCT_LINK_CHANGED: '상품 연결이 변경됐습니다. 입력을 보관한 뒤 상품 목록에서 자료를 다시 열어 주세요.',
+    INVALID_PRODUCT_REF: '현재 매장의 상품을 확인할 수 없습니다. 상품의 사용 상태와 매장 선택을 확인해 주세요.',
+    INVALID_CONSULTATION: '상품·목적·언어·근거 입력을 확인해 주세요. 작성 내용은 유지했습니다.',
+    EMPTY_CONSULTATION: '저장할 본문을 입력해 주세요.',
+    NOT_FOUND: '자료를 찾을 수 없습니다. 입력을 보관한 뒤 자료함에서 다시 확인해 주세요.',
+    CONTENT_CONFLICT: '다른 저장본이 있습니다. 최신 자료를 불러오지 못했으므로 입력을 유지했습니다. 다시 시도해 주세요.',
+  };
+  const status = (error as { status?: number })?.status;
+  if (!code && (status === 401 || status === 403)) return '로그인과 현재 매장 접근 권한을 다시 확인해 주세요. 입력은 유지했습니다.';
+  return (code && messages[code]) || '저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주세요.';
 }

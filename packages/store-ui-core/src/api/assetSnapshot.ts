@@ -130,6 +130,7 @@ export interface StoreContentData {
 }
 
 export interface DirectContentItem {
+  revision?: string;
   id: string;
   sourceType: "direct";
   title: string;
@@ -382,6 +383,7 @@ export function createAssetSnapshotClients({
         title?: string;
         contentJson?: Record<string, unknown>;
         tags?: string[];
+        expectedRevision?: string;
       },
     ) =>
       apiClient.put<{ success: boolean; data: DirectContentItem }>(

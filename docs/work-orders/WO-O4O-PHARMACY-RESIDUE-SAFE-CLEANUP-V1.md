@@ -120,3 +120,10 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 새 계약은 refresh 1회/재거절/403/네트워크 오류, 조직·기기 헤더와 쓰기 payload, 요청 시점 서비스 전환, 공개 kiosk 쿠키 정책, API 오류 전달·localProducts 보존, 영상 공개/idle 옵션, 블록 왕복과 attributes fallback을 실제 함수로 확인한다. 패키지 소스만 바꿨다는 이유로 한 앱의 테스트로 끝내지 않았다.
 
 Sonar 제외 범위·중복률 기준·merge gate는 변경하지 않는다. 상세 조회의 기존 CloudFront 403과 별개로 GitHub Checks의 새 실제 결과로 통과 여부를 판정한다. 운영 DB·IAM·LB·기존 Cloud Run 삭제는 이 단계에서 수행하지 않는다.
+
+
+### main #830 통합 시 공통 클라이언트 계약 보존
+
+main `68268d19f6`의 Store 콘텐츠 저장 보완과 assetSnapshot 경로가 겹쳤다. 이동 전 파일로 되돌리지 않고 공통 `DirectContentItem.revision` 및 `directContentApi.update.expectedRevision`에 upstream의 선택 필드를 반영한다. 어댑터는 공통 구현을 계속 사용한다. revision payload 전달·응답 보존 회귀를 추가하고 최신 main 기준 Store 빌드·테스트와 리뷰를 다시 확인한다. upstream API 변경의 배포 상태는 자신의 변경과 구분하고 공유 운영 배포는 직렬화한다.
+
+최신 main 병합 후 재검증: Store build PASS · Vitest 79 files/863 PASS, store-ui-core 146 PASS(추가 revision 계약1개 포함). 로컬 실제 빌드의 로그인 화면 390/1440px × 약국/Store 4건은 JS 예외0·가로 넘침0이다. API를 모두 가로챈 anonymous 화면 smoke이며 운영 로그인·OAuth 성공으로 보고하지 않는다.
