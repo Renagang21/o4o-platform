@@ -1,6 +1,8 @@
+import { readProductConsultation, type ProductConsultationDraft } from '../../../components/product-description/productConsultationDraft';
 import { apiClient } from "../../../api/client";
 import {
   directContentApi,
+  handledProductContentApi,
   storeContentApi,
   type DirectContentItem,
   type StoreContentData,
@@ -23,7 +25,9 @@ import {
   type ProductionTarget,
 } from "../productionTargets";
 
+export type VerifiedDirectContent = DirectContentItem & { verification?: boolean };
 export interface TextContentDraft {
+  consultation?: ProductConsultationDraft;
   title: string;
   html: string;
   tags: string[];
@@ -40,6 +44,7 @@ export interface MaterialDraft {
   description?: string;
 }
 export interface CreatedContent {
+  verification?: boolean;
   id: string;
   contentJson: Record<string, unknown>;
 }
@@ -64,6 +69,7 @@ export const textDraftFromRecord = (
   title: record.title,
   html: directContentJsonToHtml(record.contentJson),
   tags: Array.isArray(record.tags) ? record.tags : [],
+  consultation: readProductConsultation(record.contentJson.productConsultation),
 });
 export const snapshotDraftFromRecord = (
   record: StoreContentData,
@@ -130,7 +136,7 @@ export async function saveSnapshot(
     throw new Error("Snapshot not saved");
   return response.data;
 }
-export async function loadDirect(id: string): Promise<DirectContentItem> {
+export async function loadDirect(id: string): Promise<VerifiedDirectContent> {
   const response = await directContentApi.get(id);
   if (response.success !== true || !response.data || response.data.id !== id)
     throw new Error("Unconfirmed direct content");
@@ -140,11 +146,12 @@ export async function saveDirect(
   id: string,
   draft: TextContentDraft,
   record: DirectContentItem | null,
-): Promise<DirectContentItem> {
+): Promise<VerifiedDirectContent> {
   if (!record) throw new Error("Content not loaded");
   const contentJson: Record<string, unknown> = {
     ...record.contentJson,
     html: draft.html,
+    ...(draft.consultation ? { productConsultation: draft.consultation } : {}),
   };
   delete contentJson.blocks;
   const response = await directContentApi.update(id, {
@@ -154,7 +161,7 @@ export async function saveDirect(
   });
   if (response.success !== true || !response.data || response.data.id !== id)
     throw new Error("Content not saved");
-  return response.data;
+  return { ...response.data, ...(draft.consultation ? { verification: await verifyConsultation(response.data.id, draft) } : {}) };
 }
 export async function removeDirect(record: DirectContentItem): Promise<void> {
   const response = await directContentApi.remove(record.id);
@@ -224,6 +231,7 @@ export async function createOrUpdateDirect(
       generatedBy: "manual-direct",
     }),
     html: draft.html.trim(),
+    ...(draft.consultation ? { productConsultation: draft.consultation } : {}),
   };
   if (record) {
     const response = await directContentApi.update(record.id, {
@@ -237,7 +245,8 @@ export async function createOrUpdateDirect(
       response.data.id !== record.id
     )
       throw new Error("Content not saved");
-    return { id: response.data.id, contentJson: response.data.contentJson };
+    return { id: response.data.id, contentJson: response.data.contentJson,
+      ...(draft.consultation ? { verification: await verifyConsultation(response.data.id, { ...draft, html: draft.html.trim() }) } : {}) };
   }
   const response = await apiClient.post<{
     success: boolean;
@@ -257,5 +266,20 @@ export async function createOrUpdateDirect(
   });
   if (response.success !== true || !response.data?.id)
     throw new Error("Content not created");
-  return { id: response.data.id, contentJson: response.data.contentJson ?? contentJson };
+  return { id: response.data.id, contentJson: response.data.contentJson ?? contentJson,
+    ...(draft.consultation ? { verification: await verifyConsultation(response.data.id, { ...draft, html: draft.html.trim() }) } : {}) };
+}
+
+/** Keep the saved id even if readback fails: retry updates that row rather than creating another. */
+async function verifyConsultation(id: string, draft: TextContentDraft): Promise<boolean> {
+  const context = draft.consultation;
+  if (!context) return false;
+  try {
+    const [saved, linked] = await Promise.all([
+      loadDirect(id), handledProductContentApi.byProduct(context.product.sourceType, context.product.sourceId),
+    ]);
+    return saved.title === draft.title.trim() && saved.contentJson.html === draft.html &&
+      JSON.stringify(readProductConsultation(saved.contentJson.productConsultation)) === JSON.stringify(context) &&
+      linked.success === true && Array.isArray(linked.data?.items) && linked.data.items.some(item => item.contentId === id);
+  } catch { return false; }
 }

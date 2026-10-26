@@ -1,3 +1,7 @@
+import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
+import { PRODUCT_DESCRIPTION_PURPOSE_LABELS } from '@o4o/store-ui-core';
+import { consultationLanguages } from '../../components/product-description/productConsultationDraft';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 /**
@@ -50,6 +54,7 @@ export default function StoreDirectContentPage() {
 
   const { organizationId } = useStoreOrganizationId();
   const serviceKey = getActiveServiceKey();
+  const { key: operationScope, isCurrent } = useStoreOperationScope();
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const session = useContentAuthoringSession({
@@ -57,7 +62,10 @@ export default function StoreDirectContentPage() {
     load: () => id ? loadDirect(id) : Promise.reject(new Error('Missing content')),
     toDraft: textDraftFromRecord,
     persist: (draft, record) => saveDirect(id!, draft, record), remove: removeDirect,
-    onSaved: (_record, unchanged) => { if (unchanged) setEditing(false); },
+    onSaved: (saved, unchanged, visible) => {
+      if (!visible) return;
+      if (saved.verification === false) { session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false); return; }
+      if (unchanged) setEditing(false); },
     onRemoved: () => navigate(backPath, { replace: true, state: returnState }),
   });
   const { record: content, loading, error, saving, deleting, reload: fetchContent, save: handleSave, remove: handleDelete } = session;
@@ -221,6 +229,9 @@ export default function StoreDirectContentPage() {
         </div>
       </div>
 
+      {session.draft.consultation && <p className="mb-3 rounded-lg bg-slate-50 p-3 text-sm" role="status">
+        상품 상담자료 · {session.draft.consultation.product.name} · {PRODUCT_DESCRIPTION_PURPOSE_LABELS[session.draft.consultation.assist.purpose]} · {consultationLanguages[session.draft.consultation.language]}
+      </p>}
       <StoreAiSlot label="안내 편집" />
       {/* Content area */}
       {editing ? (
@@ -229,7 +240,10 @@ export default function StoreDirectContentPage() {
         <div className="bg-white border border-slate-200 rounded-lg p-2 mb-4">
           {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 적용 시 initialHtml(편집기 value)·editorContent(저장값) 동시 갱신 */}
           <div className="mb-2">
-            <LlmAssistPanel
+            {session.draft.consultation ? <ProductConsultationAuthoring key={`${operationScope}:${id}`}
+              value={session.draft.consultation} title={editTitle} html={editorContent.html}
+              disabled={saving || deleting} isCurrent={isCurrent}
+              onChange={consultation => session.changeDraft({ consultation })} onApplyHtml={setEditorInitialHtml} /> : <LlmAssistPanel
               label={STORE_LLM_ASSIST_LABEL}
               contextLabel="매장 직접 작성 콘텐츠 — 현재 내용을 다듬거나 새로 씁니다"
               guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
@@ -242,7 +256,7 @@ export default function StoreDirectContentPage() {
               currentHtml={editorContent.html}
               onApplyHtml={setEditorInitialHtml}
               onNotify={(message, kind) => showToast(message, kind === 'success')}
-            />
+            />}
           </div>
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}

@@ -6,7 +6,8 @@ import { useLatestStoreRequest } from '../../pages/pharmacy/hooks/useLatestStore
 
 export interface ProductEvidenceSelection { html: string; title: string; source: string }
 /** Reads the existing product source; inserting it changes only the current editor draft. */
-export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, onLoaded, onInsert }: {
+export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, onLoaded, onInsert, mode = 'body' }: {
+  mode?: 'body' | 'evidence';
   kind: 'local' | 'listing'; id: string; locale: string; disabled: boolean; isCurrent: () => boolean;
   onLoaded: (evidence: ProductEvidenceSelection) => void; onInsert: (html: string) => void;
 }) {
@@ -52,8 +53,8 @@ export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, o
       <div className="prose max-h-60 max-w-full overflow-auto rounded border p-3" dangerouslySetInnerHTML={{ __html: evidence.html }} />
       <button type="button" disabled={busy || disabled || didInsert} className="min-h-11 rounded border px-3 text-sm"
         onClick={() => { if (isCurrent() && !inserted.current) { inserted.current = true; setDidInsert(true); onInsert(evidence.html); } }}>
-        {didInsert ? '원문을 본문에 추가했습니다' : '확인한 원문을 본문에 추가'}</button>
-      <p className="text-xs text-slate-500">현재 작성 내용 뒤에 추가합니다. 저장·발행은 내용을 확인한 뒤 별도로 진행합니다.</p>
+        {mode === 'evidence' ? (didInsert ? '원문을 근거에 적용했습니다' : '확인한 원문을 상품 사실 근거로 사용') : (didInsert ? '원문을 본문에 추가했습니다' : '확인한 원문을 본문에 추가')}</button>
+      <p className="text-xs text-slate-500">{mode === 'evidence' ? '요청문에 사용할 상품 사실 근거로 가져옵니다. 본문과 원본 상품은 변경하지 않습니다.' : '현재 작성 내용 뒤에 추가합니다. 저장·발행은 내용을 확인한 뒤 별도로 진행합니다.'}</p>
     </div>}
   </details>;
 }

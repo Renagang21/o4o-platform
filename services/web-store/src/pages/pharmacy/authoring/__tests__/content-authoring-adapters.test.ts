@@ -1,3 +1,4 @@
+import { newProductConsultation } from '../../../../components/product-description/productConsultationDraft';
 import { beforeEach, expect, it, vi } from "vitest";
 import {
   createOrUpdateDirect,
@@ -29,8 +30,10 @@ const api = vi.hoisted(() => ({
   createAsset: vi.fn(),
   saveAsset: vi.fn(),
   create: vi.fn(),
+  links: vi.fn(),
 }));
 vi.mock("../../../../api/assetSnapshot", () => ({
+  handledProductContentApi: { byProduct: api.links },
   storeContentApi: { get: api.getSnapshot, save: api.saveSnapshot },
   directContentApi: {
     get: api.getDirect,
@@ -318,4 +321,33 @@ it('server-returned creation metadata is preserved when follow-up edits are save
 it("clearing an existing material category sends null to the update API", async () => {
   await saveMaterial({ title: "Fixture", html: "<p>Material</p>", category: null }, asset, "A");
   expect(api.saveAsset).toHaveBeenCalledWith("asset", expect.objectContaining({ category: null }));
+});
+
+it('product consultation saves its context and verifies both body and the actual product link', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture product' });
+ consultation.assist.purpose = 'professional'; consultation.language = 'en';
+ consultation.assist.facts = 'Confirmed amount'; consultation.assist.factSource = 'Manufacturer, reviewed today';
+ const draft = { title: 'Consultation', html: '<p>Reviewed draft</p>', tags: [], consultation };
+ api.getDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created', title: draft.title, contentJson: { html: draft.html, productConsultation: consultation } } });
+ api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: 'created' }] } });
+ const saved = await createOrUpdateDirect(draft, null, consultation.product);
+ expect(saved.verification).toBe(true);
+ expect(api.create.mock.calls[0][1].productRef).toEqual({ sourceType: 'local', sourceId: consultation.product.sourceId });
+ expect(api.create.mock.calls[0][1].contentJson.productConsultation).toEqual(consultation);
+ expect(textDraftFromRecord((await loadDirect('created'))).consultation).toEqual(consultation);
+});
+it('an unconfirmed product link keeps the created id and retry updates rather than duplicates', async () => {
+ const consultation = newProductConsultation({ sourceType: 'listing', sourceId: '00000000-0000-4000-8000-000000000002', name: 'Fixture' });
+ const draft = { title: 'New', html: '<p>Body</p>', tags: [], consultation };
+ api.getDirect.mockRejectedValue(new Error('Readback unavailable'));
+ const saved = await createOrUpdateDirect(draft, null, consultation.product);
+ expect(saved).toMatchObject({ id: 'created', verification: false });
+ api.saveDirect.mockResolvedValue({ success: true, data: { ...direct, id: 'created' } });
+ await createOrUpdateDirect(draft, saved, consultation.product);
+ expect(api.create).toHaveBeenCalledOnce(); expect(api.saveDirect.mock.calls[0][0]).toBe('created');
+});
+it('a successful response with different saved body cannot confirm consultation completion', async () => {
+ const consultation = newProductConsultation({ sourceType: 'local', sourceId: '00000000-0000-4000-8000-000000000001', name: 'Fixture' });
+ api.links.mockResolvedValue({ success: true, data: { items: [{ contentId: direct.id }] } });
+ expect((await saveDirect(direct.id, { title: direct.title, html: '<p>New</p>', tags: [], consultation }, direct)).verification).toBe(false);
 });

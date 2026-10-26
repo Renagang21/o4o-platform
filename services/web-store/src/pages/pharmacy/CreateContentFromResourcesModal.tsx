@@ -25,7 +25,8 @@ import { useStoreLibraryRoute } from './library/useStoreLibraryRoute';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Save, Loader2 } from 'lucide-react';
-import { ProductDescriptionAssist } from '../../components/product-description/ProductDescriptionAssist';
+import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
+import { newProductConsultation } from '../../components/product-description/productConsultationDraft';
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -67,11 +68,16 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   const showEditor = !product || composing;
   const session = useContentAuthoringSession<TextContentDraft, CreatedContent>({
     organizationId, serviceKey: getActiveServiceKey(), target: `create:${product?.sourceType ?? ''}:${product?.sourceId ?? ''}`,
-    enabled: open, initialDraft: emptyTextDraft,
+    enabled: open, initialDraft: { ...emptyTextDraft, ...(product ? { consultation: newProductConsultation(product) } : {}) },
     toDraft: () => emptyTextDraft,
     persist: (draft, record) => createOrUpdateDirect(draft, record, product),
     validate: validateNewContent,
-    onSaved: (saved, unchanged) => {
+    onSaved: (saved, unchanged, visible) => {
+      if (!visible) return;
+      if (saved.verification === false) {
+        session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false);
+        return;
+      }
       onCreated?.(saved.id);
       if (unchanged) navigate(`${base}/content/direct/${saved.id}`, { state: returnState, replace: !!productReturn });
     },
@@ -151,9 +157,10 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
             {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM(사용자 ChatGPT 등) 작업 — Prompt 는 store-ui-core 순수 함수, 결과는 편집기로만 */}
             <div style={{ marginBottom: 8 }}>
               {product ? (
-                <ProductDescriptionAssist key={`${product.sourceType}:${product.sourceId}`} context={{
-                  task: 'product-description', title, currentHtml: editorHtml, productName: product.name,
-                }} onApplyHtml={setEditorHtml} />
+                <ProductConsultationAuthoring key={`${scope}:${product.sourceType}:${product.sourceId}`}
+                  value={session.draft.consultation ?? newProductConsultation(product)} title={title} html={editorHtml}
+                  disabled={saving} isCurrent={isCurrent}
+                  onChange={consultation => session.changeDraft({ consultation })} onApplyHtml={setEditorHtml} />
               ) : (
               <LlmAssistPanel
                 label={STORE_LLM_ASSIST_LABEL}
