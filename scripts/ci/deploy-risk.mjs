@@ -57,6 +57,7 @@ const AR = `${REGION}-docker.pkg.dev/${PROJECT_ID}/o4o-api`;
 
 /** web key → Cloud Run 서비스 이름 (deploy-web-services.yml 의 `gcloud run deploy <name>`) */
 const WEB_CLOUD_RUN = {
+  partner: 'partner-web',
   neture: 'neture-web',
   'kpa-society': 'kpa-society-web',
   lecture: 'lecture-web',

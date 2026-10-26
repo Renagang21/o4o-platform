@@ -122,6 +122,7 @@ import { createSignageRoutes, createSignagePublicRoutes } from '../routes/signag
 // → docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
 import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.js';
 import { createExternalAiRoutes } from '../modules/external-ai/external-ai.routes.js';
+import { createPartnerSupportRoutes } from '../routes/partner/partner.routes.js';
 
 // ============================================================================
 // PHASE 1: Core routes — registered BEFORE server listen
@@ -223,6 +224,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
 // PHASE 2: Domain routes — registered AFTER DB init (inside startServer)
 // ============================================================================
 export async function registerDomainRoutes(app: Application, dataSource: DataSource): Promise<void> {
+  app.use('/api/v1/partner-support', createPartnerSupportRoutes(dataSource, requireAuth));
   // Delegation is separate from platform login; module settings default to OFF.
   const externalAi=createExternalAiRoutes(dataSource);
   app.use(externalAi.router);

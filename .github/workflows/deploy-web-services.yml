@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, kpa-society, lecture, store, kpa-branch, hospital-pharmacy)'
+        description: 'Service to deploy (all, partner, neture, kpa-society, lecture, store, kpa-branch, hospital-pharmacy)'
         required: false
         default: 'all'
       # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §24 — 판정 재현 전용.
@@ -116,6 +116,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
+      partner: ${{ steps.changes.outputs.partner }}
       neture: ${{ steps.changes.outputs.neture }}
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
       lecture: ${{ steps.changes.outputs.lecture }}
@@ -145,6 +146,7 @@ jobs:
           if [ -n "${{ inputs.service }}" ]; then
             SERVICE="${{ inputs.service }}"
             if [ "$SERVICE" = "all" ]; then
+              echo "partner=true" >> $GITHUB_OUTPUT
               echo "neture=true" >> $GITHUB_OUTPUT
               echo "kpa-society=true" >> $GITHUB_OUTPUT
               echo "lecture=true" >> $GITHUB_OUTPUT
@@ -152,6 +154,7 @@ jobs:
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
               echo "hospital-pharmacy=true" >> $GITHUB_OUTPUT
             else
+              echo "partner=$( [ "$SERVICE" = 'partner' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "lecture=$( [ "$SERVICE" = 'lecture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
@@ -639,6 +642,99 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)"
 
+  deploy-partner:
+    needs: [detect-changes, ci-gate]
+    # WO-O4O-PARTNER-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.partner == 'true'
+    runs-on: ubuntu-latest
+    # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
+    #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
+    #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
+    #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
+    #   와 ci-gate(수동 실행 = 소유자만)다.
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG="${{ github.sha }}"
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_PARTNER_API_ORIGIN=https://api.neture.co.kr \
+            -f services/web-partner/Dockerfile \
+            -t gcr.io/${{ env.PROJECT_ID }}/partner-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/partner-web:latest \
+            .
+          docker push gcr.io/${{ env.PROJECT_ID }}/partner-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/partner-web:latest
+      # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
+      - name: Record traffic before deploy (verified rollout)
+        if: inputs.rollout_mode == 'verified'
+        uses: ./.github/actions/cloud-run-verified-rollout
+        with:
+          phase: plan
+          service: partner-web
+
+      - name: Deploy to Cloud Run
+        run: |
+          # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
+          ROLLOUT_ARGS=()
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+
+          gcloud run deploy partner-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/partner-web:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --service-account=${{ env.RUNTIME_SA }} \
+            --platform=managed \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"
+
+      # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
+      - name: Smoke new revision and switch traffic (verified rollout)
+        if: inputs.rollout_mode == 'verified'
+        uses: ./.github/actions/cloud-run-verified-rollout
+        with:
+          phase: finish
+          service: partner-web
+          paths: '/'
+
+      - name: Verify deployment
+        run: |
+          gcloud run services describe partner-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)"
+
   deploy-store:
     needs: [detect-changes, ci-gate]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
@@ -838,6 +934,7 @@ jobs:
     needs:
       - detect-changes
       - ci-gate
+      - deploy-partner
       - deploy-neture
       - deploy-kpa-society
       - deploy-lecture
@@ -856,6 +953,7 @@ jobs:
           # 아래 값은 **변경 판정**이다. 실제 배포 여부는 각 deploy-* job 결과(skipped = 배포 0)로 본다.
           echo "Change detection (not deploy result):"
           echo "  - DEPLOY_FREEZE: '${{ vars.DEPLOY_FREEZE }}' · ci-gate: ${{ needs.ci-gate.result }}"
+          echo "  - partner-web: ${{ needs.detect-changes.outputs.partner }}"
           echo "  - neture-web: ${{ needs.detect-changes.outputs.neture }}"
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - lecture-web: ${{ needs.detect-changes.outputs.lecture }}"
