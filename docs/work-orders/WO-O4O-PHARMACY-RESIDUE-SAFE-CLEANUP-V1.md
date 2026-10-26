@@ -92,3 +92,31 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 ### 배포 범위 재검증 보완
 
 이동 diff의 옛 경로가 workspace에 없어서 전체 서비스 unknown fallback을 만드는 것을 발견했다. 옛 디렉터리는 모든 현행 Docker/빌드 소비처에서 제거됐으므로 기존 퇴역 경로 목록에 정확한 prefix로 등록한다. 새 `web-pharmacy-business` 경로는 현행 registry와 dependency graph에서 계속 배포 판정하며, 새 경로·옛 경로가 함께 있는 이동도 약국 앱만 영향받는다. 미지의 workspace fallback, 실제 API 변경과 LEVEL_3 auth 통제는 유지한다. 경로 소비처 0·옛 manifest 부재 및 위 경계를 회귀 시험으로 확인한다. 이는 약국 앱을 배포 대상에서 제외하는 예외가 아니다.
+
+
+## PR #829 Sonar 중복 해소 — 동일 WO 연속 Phase
+
+사용자가 전달한 Sonar 신규 코드 목록에서 2,358행이 모두 이동한 약국 앱 아래에 있었다. 주요 대상은 web-store와 복제된 API 클라이언트 6개, theme/Tailwind, LoadingSpinner, 영상·블록 변환이었다. 단순 이름 이동으로 기존 사본이 신규 코드 중복으로 드러났다. 단, 분석기가 과거 이력을 어떤 방식으로 처리했는지는 단정하지 않는다.
+
+### TODO·구현
+
+- [x] 두 앱의 동일 구현과 서비스별 차이를 TypeScript 선언 단위로 대조.
+- [x] 동일 API 타입·메서드를 store-ui-core의 subpath client factory로 옮기고 두 앱 모두 채택. asset library의 franchise 필터·부가 응답, 다국어 콘텐츠의 Store 응답 검증, 화면 저장 시 조직 헤더 캡처 등 차이는 각 어댑터에 유지.
+- [x] 서비스 주소·인증·요청을 앱에서 주입. PH의 기존 401 1회 refresh JSON transport는 공통 구현 하나로 사용하고, Store의 별도 인증·응답 검증은 그대로 둔다. 공개 kiosk의 Store credentials=omit/cache=no-store와 약국의 기존 fetch 옵션을 각각 유지.
+- [x] 두 앱의 테마·spinner·Tailwind 토큰·블록 변환을 공통화. 앱별 Tailwind content 배열은 보존. 영상 변환은 tablet-kiosk-core로 옮기고 idle 변환에서도 같은 ID 추출을 사용하되 공개/idle URL 옵션은 분리 유지.
+- [x] 공통화로 역방향 서비스 import나 새 서비스 키를 만들지 않음. store-ui-core에 이미 세 소비 앱의 closure에 있던 tablet-kiosk-core 타입 의존 하나만 명시. 새 외부 의존 버전·snapshot 변경 없음. block-renderer/API/Admin에는 이번 공통화 runtime 변경 없음.
+- [ ] PR #829 최종 HEAD의 CI·Codex·Sonar 재확인 후 정상 병합·main CI·현재 Delivery 정책에 따른 배포 및 실제 serving SHA 확인.
+
+### Shared Module Change Verification
+
+| 소비처 | 검증 |
+|---|---|
+| 약국 앱 | tsc+Vite build PASS, Vitest 148 PASS |
+| Store | tsc build+Vite build PASS, Vitest 77 files / 851 PASS |
+| Neture | tsc+Vite build PASS, Vitest 151 files / 1,313 PASS |
+| store-ui-core | Vitest 9 files / 145 PASS(새 동작 계약 21개) |
+| API raw-source·서비스 경계 소비 계약 | Jest 35 suites / 903 PASS |
+
+새 계약은 refresh 1회/재거절/403/네트워크 오류, 조직·기기 헤더와 쓰기 payload, 요청 시점 서비스 전환, 공개 kiosk 쿠키 정책, API 오류 전달·localProducts 보존, 영상 공개/idle 옵션, 블록 왕복과 attributes fallback을 실제 함수로 확인한다. 패키지 소스만 바꿨다는 이유로 한 앱의 테스트로 끝내지 않았다.
+
+Sonar 제외 범위·중복률 기준·merge gate는 변경하지 않는다. 상세 조회의 기존 CloudFront 403과 별개로 GitHub Checks의 새 실제 결과로 통과 여부를 판정한다. 운영 DB·IAM·LB·기존 Cloud Run 삭제는 이 단계에서 수행하지 않는다.

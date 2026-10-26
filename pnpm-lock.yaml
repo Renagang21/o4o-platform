@@ -2124,6 +2124,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../operator-ux-core
+      '@o4o/tablet-kiosk-core':
+        specifier: workspace:*
+        version: link:../tablet-kiosk-core
       '@o4o/ui':
         specifier: workspace:*
         version: link:../ui

@@ -69,6 +69,7 @@ describe('§2 product_content 은퇴 — 쓰기·resolve·렌더 경로 0', () =
   it('KPA 뷰어·API 타입에 렌더 분기가 없다', () => {
     expect(stripComments(read(KPA_VIEWER))).not.toContain('product_content');
     expect(stripComments(read(KPA_TABLET_API))).not.toContain('product_content');
+    expect(stripComments(read('packages/store-ui-core/src/api/tabletDisplays.ts'))).not.toContain('product_content');
   });
 
   it('의약품 가드는 방어적으로 계속 수집한다 (CHECK 축소와 무관하게 안전 판정을 좁히지 않는다)', () => {
