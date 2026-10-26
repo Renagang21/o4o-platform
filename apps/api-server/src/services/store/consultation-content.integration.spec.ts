@@ -101,13 +101,15 @@ integration('consultation content — actual PostgreSQL atomic save', () => {
   expect(JSON.stringify((await read(markerId)).contentJson)).not.toContain('iframe');
  });
  it('preserves inline embed parent and sibling structure through save and update', async () => {
-  const html = '<p>Before<iframe src="https://www.youtube.com/embed/synthetic"></iframe>After</p>';
+  for (const fallback of ['', '\n', 'Fallback <b>raw text</b>']) {
+  const html = `<p>Before<iframe src="https://www.youtube.com/embed/synthetic">${fallback}</iframe>After</p>`;
   const id = randomUUID(), input = draft(id, html);
   expect(await createDirectContent(db, org, actor, input)).toMatchObject({ ok: true });
   const saved = await read(id);
   expect(saved.contentJson).toHaveProperty('html', html);
   expect(await updateDirectContent(db, org, actor, id, { ...input, expectedRevision: saved.revision })).toMatchObject({ ok: true });
   expect((await read(id)).contentJson).toHaveProperty('html', html);
+  }
  });
  it('keeps safe image-only content while rejecting an empty sanitized response', async () => {
   expect(await createDirectContent(db, org, actor, draft(randomUUID(), '<img src="https://example.invalid/product.png">'))).toMatchObject({ ok: true });

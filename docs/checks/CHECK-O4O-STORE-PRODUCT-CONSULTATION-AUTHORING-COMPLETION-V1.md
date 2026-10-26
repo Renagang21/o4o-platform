@@ -77,3 +77,5 @@ Sonar 지적의 중복 import·props readonly·접근성 output/label·중첩 te
 HTML 정규화 HEAD의 Codex는 지적 없음으로 완료됐다. Sonar의 기존21건은 해소됐지만 iframe ADD_TAGS 포괄 허용에 대한 보안 지적1건이 추가되어, 해당 설정을 제거했다. 서버는 허용 호스트를 먼저 검증하고 호출별 임의 marker의 비활성 proxy에서 모든 속성을 기본 DOMPurify로 정제한 뒤 검증된 iframe만 복원한다. 위조 marker·임의 호스트·srcdoc·onload 차단과 허용 iframe 속성 직렬화 일치를 실제 DB 회귀에 포함했다. 추가 보완의 관련29개·API 타입/lint/build PASS, schema0 확인 후 전용 테스트 컨테이너 정리. 규칙 예외나 보안 gate 완화는 하지 않았다.
 
 후속 리뷰에서 문단 안 iframe의 임시 div가 HTML 재파싱 시 문단을 닫는 사례를 확인하여 inline span으로 교체했다. 문단 앞뒤 텍스트·iframe의 부모/형제 구조가 생성과 수정 모두 동일하게 저장되는 실제 DB 회귀를 추가했다. 관련 DB·기존 권한30개 PASS, 임시 schema0 확인 후 전용 컨테이너를 정리했다. 공식 최신 검사는 최종 push HEAD 기준으로 확인한다.
+
+iframe 내부 개행·fallback도 원래 raw text를 별도 보관하고 textContent로만 복원해 클라이언트와 일치시켰다. 내부 내용을 HTML로 파싱하거나 innerHTML에 넣지 않는다. 빈 내부/개행/태그처럼 보이는 raw text의 생성·수정 회귀를 포함한 관련30개·API 타입/lint/build PASS다. 직전 HEAD의 Sonar gate는 PASS(보안 hotspot0)였으며 최종 HEAD의 CI·리뷰는 다시 확인한다.

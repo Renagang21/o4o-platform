@@ -29,7 +29,7 @@ export function sanitizeDescriptionHtml(value?: string | null): string {
 export function sanitizeRichDescriptionHtml(value: string): string {
   const root = window.document.createElement('div');
   root.innerHTML = value;
-  const embeds = new Map<string, string>();
+  const embeds = new Map<string, { src: string; text: string }>();
   for (const iframe of root.querySelectorAll('iframe')) {
     const src = iframe.getAttribute('src') ?? '';
     if (!allowedEmbed(src)) { iframe.remove(); continue; }
@@ -39,20 +39,22 @@ export function sanitizeRichDescriptionHtml(value: string): string {
     const proxy = window.document.createElement('span');
     for (const attr of iframe.attributes) proxy.setAttribute(attr.name, attr.value);
     proxy.setAttribute('data-o4o-embed', marker);
-    embeds.set(marker, src);
+    embeds.set(marker, { src, text: iframe.textContent ?? '' });
     iframe.replaceWith(proxy);
   }
   root.innerHTML = purify.sanitize(root.innerHTML, {
     ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth', 'poster', 'controls', 'preload', 'playsinline'],
   });
   for (const proxy of root.querySelectorAll('[data-o4o-embed]')) {
-    const src = embeds.get(proxy.getAttribute('data-o4o-embed') ?? '');
-    if (!src || !allowedEmbed(src)) continue;
+    const embed = embeds.get(proxy.getAttribute('data-o4o-embed') ?? '');
+    if (!embed || !allowedEmbed(embed.src)) continue;
     const iframe = window.document.createElement('iframe');
     for (const attr of proxy.attributes) {
       if (attr.name !== 'data-o4o-embed') iframe.setAttribute(attr.name, attr.value);
     }
-    iframe.setAttribute('src', src);
+    iframe.setAttribute('src', embed.src);
+    // iframe fallback is raw text, never parsed or assigned as HTML.
+    iframe.textContent = embed.text;
     proxy.replaceWith(iframe);
   }
   return root.innerHTML.trim();
