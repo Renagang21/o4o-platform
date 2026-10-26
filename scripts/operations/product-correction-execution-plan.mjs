@@ -1,5 +1,4 @@
 /** Offline plan only. Never invokes a cloud CLI, network, credentials or database. */
-import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const fail = () => { throw new Error('INVALID_PLAN: 프로젝트·digest·실행 계정·DB secret 참조·예산을 확인하세요.'); };
@@ -9,12 +8,12 @@ export function executionPlan(config) {
   const keys = ['project', 'region', 'job', 'image', 'workerAccount', 'invokerAccount', 'cloudSqlInstance', 'database', 'username', 'passwordSecret', 'intervalMinutes', 'maxSeconds', 'maxTicks', 'timeoutSeconds'];
   if (Object.keys(config).some(key => !keys.includes(key)) || keys.some(key => !(key in config))) fail();
   const { project, region, job, image, workerAccount, invokerAccount, cloudSqlInstance, database, username, passwordSecret, intervalMinutes, maxSeconds, maxTicks, timeoutSeconds } = config;
-  if (!matches(project, /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/) || !matches(region, /^[a-z]+-[a-z]+[0-9]$/) || !matches(job, /^[a-z][a-z0-9-]{0,61}[a-z0-9]$/)) fail();
-  if (!matches(image, new RegExp(`^${region}-docker\\.pkg\\.dev/${project}/[a-z0-9_-]+/[a-z0-9_-]+@sha256:[a-f0-9]{64}$`))) fail();
-  const account = new RegExp(`^[a-z][a-z0-9-]{4,28}[a-z0-9]@${project}\\.iam\\.gserviceaccount\\.com$`);
+  if (!matches(project, /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/) || !matches(region, /^[a-z]+-[a-z]+\d$/) || !matches(job, /^[a-z][a-z0-9-]{0,61}[a-z0-9]$/)) fail();
+  if (!matches(image, new RegExp(String.raw`^${region}-docker\.pkg\.dev/${project}/[a-z0-9_-]+/[a-z0-9_-]+@sha256:[a-f0-9]{64}$`))) fail();
+  const account = new RegExp(String.raw`^[a-z][a-z0-9-]{4,28}[a-z0-9]@${project}\.iam\.gserviceaccount\.com$`);
   if (!matches(workerAccount, account) || !matches(invokerAccount, account) || workerAccount === invokerAccount) fail();
-  if (!matches(cloudSqlInstance, new RegExp(`^${project}:${region}:[a-z][a-z0-9-]{0,97}$`)) || !matches(database, /^[a-zA-Z_][a-zA-Z0-9_]{0,62}$/) || !matches(username, /^[a-zA-Z_][a-zA-Z0-9_]{0,62}$/)) fail();
-  if (!passwordSecret || Object.keys(passwordSecret).sort().join(',') !== 'name,version' || !matches(passwordSecret.name, /^[a-zA-Z0-9_-]{1,255}$/) || !matches(passwordSecret.version, /^[1-9][0-9]*$/)) fail();
+  if (!matches(cloudSqlInstance, new RegExp(`^${project}:${region}:[a-z][a-z0-9-]{0,97}$`)) || !matches(database, /^[a-zA-Z_]\w{0,62}$/) || !matches(username, /^[a-zA-Z_]\w{0,62}$/)) fail();
+  if (!passwordSecret || Object.keys(passwordSecret).sort((a, b) => a.localeCompare(b, 'en')).join(',') !== 'name,version' || !matches(passwordSecret.name, /^[a-zA-Z0-9_-]{1,255}$/) || !matches(passwordSecret.version, /^[1-9]\d*$/)) fail();
   if (![5, 10, 15, 20, 30, 60].includes(intervalMinutes) || !Number.isInteger(maxSeconds) || maxSeconds < 1 || maxSeconds > 600 || !Number.isInteger(maxTicks) || maxTicks < 1 || maxTicks > 1000 || !Number.isInteger(timeoutSeconds) || timeoutSeconds < maxSeconds + 60 || timeoutSeconds > 3600) fail();
   const name = `projects/${project}/locations/${region}/jobs/${job}`;
   return {
@@ -49,11 +48,18 @@ export function executionPlan(config) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (process.argv.length === 3 && process.argv[2] === '--help') {
-    process.stdout.write('Usage: node scripts/operations/product-correction-execution-plan.mjs --config <local.json>\nOffline PLAN_ONLY; no cloud or DB operation.\n');
+    process.stdout.write('Usage: node scripts/operations/product-correction-execution-plan.mjs --stdin < local.json\nOffline PLAN_ONLY; no cloud or DB operation.\n');
   } else {
     try {
-      if (process.argv.length !== 4 || process.argv[2] !== '--config') fail();
-      process.stdout.write(JSON.stringify(executionPlan(JSON.parse(readFileSync(process.argv[3], 'utf8'))), null, 2) + '\n');
+      if (process.argv.length !== 3 || process.argv[2] !== '--stdin') fail();
+      const chunks = [];
+      let bytes = 0;
+      for await (const chunk of process.stdin) {
+        bytes += chunk.length;
+        if (bytes > 65536) fail();
+        chunks.push(chunk);
+      }
+      process.stdout.write(JSON.stringify(executionPlan(JSON.parse(Buffer.concat(chunks).toString('utf8'))), null, 2) + '\n');
     } catch { console.error('INVALID_PLAN: 설정 파일과 필수 참조를 확인하세요. 비밀 값은 입력하지 마세요.'); process.exitCode = 1; }
   }
 }

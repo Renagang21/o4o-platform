@@ -33,3 +33,13 @@ test('unknown execution flags fail closed without echoing user input', () => {
  const result=spawnSync(process.execPath,['scripts/operations/product-correction-execution-plan.mjs','--apply','sensitive-input'],{encoding:'utf8'});
  assert.equal(result.status,1);assert.doesNotMatch(result.stderr,/sensitive-input/);
 });
+test('stdin creates a plan without opening a caller-selected file', () => {
+ const result=spawnSync(process.execPath,['scripts/operations/product-correction-execution-plan.mjs','--stdin'],{encoding:'utf8',input:JSON.stringify(fixture())});
+ assert.equal(result.status,0); assert.equal(JSON.parse(result.stdout).mode,'PLAN_ONLY');
+});
+test('oversized or malformed input is rejected without echoing content', () => {
+ for (const input of ['sensitive-input', 'x'.repeat(65537)]) {
+  const result=spawnSync(process.execPath,['scripts/operations/product-correction-execution-plan.mjs','--stdin'],{encoding:'utf8',input});
+  assert.equal(result.status,1);assert.doesNotMatch(result.stderr,/sensitive-input|xxxxx/);
+ }
+});

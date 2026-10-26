@@ -25,10 +25,10 @@ P1/P2·설명서 갱신·예약 관리·일반 편집 연결은 PR #816, 기준 
 
 ```sh
 node scripts/operations/product-correction-execution-plan.mjs --help
-node scripts/operations/product-correction-execution-plan.mjs --config /tmp/product-correction-plan.local.json
+node scripts/operations/product-correction-execution-plan.mjs --stdin < /tmp/product-correction-plan.local.json
 ```
 
-도구는 로컬 JSON만 읽으며 CLI·네트워크·DB·credential을 호출하지 않는다. 출력은 `PLAN_ONLY`, `applied:false`다. `--apply`를 지원하지 않는다. 결과는 검토용이며 그대로 적용하는 배포 명령이 아니다.
+도구는 최대 64KiB의 표준입력 JSON만 읽으며 임의 파일 경로를 받지 않는다. 클라우드 CLI·네트워크·DB·credential을 호출하지 않는다. 출력은 `PLAN_ONLY`, `applied:false`다. `--apply`를 지원하지 않는다. 결과는 검토용이며 그대로 적용하는 배포 명령이 아니다.
 
 설정 필수 항목:
 
