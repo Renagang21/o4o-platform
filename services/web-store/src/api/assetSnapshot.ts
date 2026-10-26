@@ -282,6 +282,7 @@ export const storeContentApi = {
 // ─── Direct Content API (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1) ──────
 
 export interface DirectContentItem {
+  revision?: string;
   id: string;
   sourceType: 'direct';
   title: string;
@@ -306,7 +307,7 @@ export const directContentApi = {
     ),
 
   /** direct 콘텐츠 수정 */
-  update: (id: string, body: { title?: string; contentJson?: Record<string, unknown>; tags?: string[] }) =>
+  update: (id: string, body: { title?: string; contentJson?: Record<string, unknown>; tags?: string[]; expectedRevision?: string }) =>
     apiClient.put<{ success: boolean; data: DirectContentItem }>(
       `/store-contents/direct/${id}`,
       body,

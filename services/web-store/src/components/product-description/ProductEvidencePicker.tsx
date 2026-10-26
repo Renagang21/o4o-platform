@@ -6,7 +6,8 @@ import { useLatestStoreRequest } from '../../pages/pharmacy/hooks/useLatestStore
 
 export interface ProductEvidenceSelection { html: string; title: string; source: string }
 /** Reads the existing product source; inserting it changes only the current editor draft. */
-export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, onLoaded, onInsert }: {
+export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, onLoaded, onInsert, mode = 'body' }: {
+  mode?: 'body' | 'evidence';
   kind: 'local' | 'listing'; id: string; locale: string; disabled: boolean; isCurrent: () => boolean;
   onLoaded: (evidence: ProductEvidenceSelection) => void; onInsert: (html: string) => void;
 }) {
@@ -40,6 +41,8 @@ export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, o
     } catch { if (current() && isCurrent()) setError('상품 원문을 불러오지 못했습니다. 현재 작성 내용은 유지했습니다.'); }
     finally { lock.current = false; if (current() && isCurrent()) setBusy(false); }
   };
+  const evidenceLabel = didInsert ? '원문을 근거에 적용했습니다' : '확인한 원문을 상품 사실 근거로 사용';
+  const bodyLabel = didInsert ? '원문을 본문에 추가했습니다' : '확인한 원문을 본문에 추가';
   return <details className="rounded-lg border border-slate-200 p-3">
     <summary className="min-h-11 cursor-pointer content-center text-sm font-medium">저장된 상품 원문 확인·가져오기</summary>
     <button type="button" className="mt-2 min-h-11 rounded border px-3 text-sm" disabled={busy || disabled} onClick={() => void read()}>
@@ -52,8 +55,8 @@ export function ProductEvidencePicker({ kind, id, locale, disabled, isCurrent, o
       <div className="prose max-h-60 max-w-full overflow-auto rounded border p-3" dangerouslySetInnerHTML={{ __html: evidence.html }} />
       <button type="button" disabled={busy || disabled || didInsert} className="min-h-11 rounded border px-3 text-sm"
         onClick={() => { if (isCurrent() && !inserted.current) { inserted.current = true; setDidInsert(true); onInsert(evidence.html); } }}>
-        {didInsert ? '원문을 본문에 추가했습니다' : '확인한 원문을 본문에 추가'}</button>
-      <p className="text-xs text-slate-500">현재 작성 내용 뒤에 추가합니다. 저장·발행은 내용을 확인한 뒤 별도로 진행합니다.</p>
+        {mode === 'evidence' ? evidenceLabel : bodyLabel}</button>
+      <p className="text-xs text-slate-500">{mode === 'evidence' ? '요청문에 사용할 상품 사실 근거로 가져옵니다. 본문과 원본 상품은 변경하지 않습니다.' : '현재 작성 내용 뒤에 추가합니다. 저장·발행은 내용을 확인한 뒤 별도로 진행합니다.'}</p>
     </div>}
   </details>;
 }

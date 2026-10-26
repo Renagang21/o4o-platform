@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 /**
  * Backend-safe HTML sanitizer (jsdom + DOMPurify)
  *
@@ -22,4 +23,49 @@ const purify = DOMPurify(window as unknown as WindowLike);
  */
 export function sanitizeDescriptionHtml(value?: string | null): string {
   return purify.sanitize(value ?? '').trim();
+}
+
+/** Store editor policy: preserve supported media while removing arbitrary iframe hosts. */
+export function sanitizeRichDescriptionHtml(value: string): string {
+  const root = window.document.createElement('div');
+  root.innerHTML = value;
+  const embeds = new Map<string, { src: string; text: string }>();
+  for (const iframe of root.querySelectorAll('iframe')) {
+    const src = iframe.getAttribute('src') ?? '';
+    if (!allowedEmbed(src)) { iframe.remove(); continue; }
+    // A random per-call marker cannot be supplied by the input. Sanitize every attribute
+    // on a harmless element, then construct only the verified external embed.
+    const marker = randomUUID();
+    const proxy = window.document.createElement('span');
+    for (const attr of iframe.attributes) proxy.setAttribute(attr.name, attr.value);
+    proxy.setAttribute('data-o4o-embed', marker);
+    embeds.set(marker, { src, text: iframe.textContent ?? '' });
+    iframe.replaceWith(proxy);
+  }
+  root.innerHTML = purify.sanitize(root.innerHTML, {
+    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth', 'poster', 'controls', 'preload', 'playsinline'],
+  });
+  for (const proxy of root.querySelectorAll('[data-o4o-embed]')) {
+    const embed = embeds.get(proxy.getAttribute('data-o4o-embed') ?? '');
+    if (!embed || !allowedEmbed(embed.src)) continue;
+    const iframe = window.document.createElement('iframe');
+    for (const attr of proxy.attributes) {
+      if (attr.name !== 'data-o4o-embed') iframe.setAttribute(attr.name, attr.value);
+    }
+    iframe.setAttribute('src', embed.src);
+    // iframe fallback is raw text, never parsed or assigned as HTML.
+    iframe.textContent = embed.text;
+    proxy.replaceWith(iframe);
+  }
+  return root.innerHTML.trim();
+}
+
+function allowedEmbed(src: string): boolean {
+  return src.startsWith('https://www.youtube.com/embed/') || src.startsWith('https://player.vimeo.com/video/');
+}
+
+export function isBlankRichDescriptionHtml(value: string): boolean {
+  const root = window.document.createElement('div');
+  root.innerHTML = value;
+  return !root.textContent?.replaceAll('\u00a0', '').trim() && !root.querySelector('img,iframe,video,audio,hr,table');
 }
