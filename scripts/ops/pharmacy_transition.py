@@ -254,7 +254,9 @@ def apply_transition(api, candidate, rollback=False, expected_revision=None):
         if routed_matcher(current, target) != routed_matcher(candidate, target):
             raise RuntimeError('Post-cutover smoke failed and pharmacy routing changed concurrently; automatic rollback withheld') from None
         restore = candidate_map(current, target, source)
-        production_idle()
+        # Compensation belongs to the already-authorized operation. A later main
+        # commit/queued delivery must not strand our failed route in production.
+        # Exact matcher comparison above and the fresh fingerprint protect other writers.
         api.compute_operation('PATCH', MAP, {k: restore[k] for k in ('fingerprint', 'pathMatchers', 'tests') if k in restore})
         routed_matcher(api.request('GET', MAP), source)
         raise RuntimeError('Post-cutover smoke failed; previous backend routing restored') from None

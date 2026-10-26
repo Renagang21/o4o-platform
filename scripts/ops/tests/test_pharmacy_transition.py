@@ -163,6 +163,16 @@ class RoutingTests(unittest.TestCase):
                 t.apply_transition(api, t.candidate_map(api.map, t.OLD, t.NEW))
         self.assertEqual(len(api.writes), 1)
 
+    def test_owned_compensation_is_not_stranded_by_later_main_activity(self):
+        api = FakeCloud()
+        def smoke(url):
+            return 'mismatch' if url in {'https://' + h for h in t.HOSTS} else 'expected'
+        with patch.object(t, 'production_idle', side_effect=[None, ValueError('Later main activity')]) as gate, patch.object(t, 'stable_revision', current_revision), patch.object(t, 'public_smoke', smoke):
+            with self.assertRaisesRegex(RuntimeError, 'previous backend routing restored'):
+                t.apply_transition(api, t.candidate_map(api.map, t.OLD, t.NEW))
+        self.assertEqual(gate.call_count, 1)
+        t.routed_matcher(api.map, t.OLD)
+
     def test_successful_route_can_resume_without_repeating_patch(self):
         api = FakeCloud(t.NEW)
         with patch.object(t, 'production_idle'), patch.object(t, 'stable_revision', current_revision), patch.object(t, 'public_smoke', return_value='asset'):
