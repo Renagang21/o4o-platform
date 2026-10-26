@@ -137,7 +137,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
       const wf = read(file);
       const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
-      const expected = file.endsWith('web-services.yml') ? 8 : 2; // web: ci-gate 1 + deploy 7 · api/admin: ci-gate 1 + deploy 1
+      const expected = file.endsWith('web-services.yml') ? 9 : 2; // web: ci-gate 1 + deploy 7 + private preparation 1
       assert.equal(deployIfs, expected);
       assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
       assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');
@@ -152,6 +152,32 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
 
   it('web concurrency 는 서비스 입력별 group', () => {
     assert.match(read(DEPLOY[1]), /group: deploy-web-\$\{\{ inputs\.service \|\| 'all' \}\}/);
+  });
+
+  it('private pharmacy preparation requires owner/main/freeze/CI and skips all regular deployments', () => {
+    const wf = read(DEPLOY[1]);
+    assert.match(wf, /detect-changes:\n {4}if: \(inputs\.pharmacy_preparation \|\| 'none'\) == 'none'/);
+    const job = wf.split('\n  pharmacy-private-preparation:')[1].split('\n  summary:')[0];
+    assert.match(job, /github\.ref == 'refs\/heads\/main'/);
+    assert.match(job, /github\.triggering_actor == github\.repository_owner/);
+    assert.match(job, /vars\.DEPLOY_FREEZE == 'false'/);
+    assert.match(job, /--wait-seconds 1800 --enforce/);
+    assert.match(job, /test "\$PREPARATION_SERVICE" = 'kpa-society'/);
+    assert.match(job, /test "\$\(gh api [^\n]+\)" = "\$GITHUB_SHA"/);
+    assert.match(job, /--mode "\$PREPARATION_MODE" --expected-plan "\$PREPARATION_DIGEST"/);
+    assert.doesNotMatch(job, /allow-unauthenticated|set-iam-policy|update-traffic|url-maps import/);
+    assert.ok(job.indexOf('--enforce') < job.indexOf('google-github-actions/auth'));
+  });
+
+  it('pharmacy deployments use the new runtime/image and verify canonical routing before success', () => {
+    const wf = read(DEPLOY[1]);
+    const deploy = wf.split('\n  deploy-kpa-society:')[1].split('\n  deploy-lecture:')[0];
+    assert.match(deploy, /gcloud run deploy pharmacy-business-web/);
+    assert.match(deploy, /--image=gcr\.io\/\$\{\{ env\.PROJECT_ID \}\}\/pharmacy-business-web:/);
+    assert.doesNotMatch(deploy, /kpa-society-web/);
+    assert.ok(deploy.indexOf('--phase assert-route') > deploy.indexOf('phase: finish'));
+    assert.match(wf, /options: \[none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire\]/);
+    assert.match(wf, /pharmacy_transition\.py --phase "\$PREPARATION_MODE" --expected-plan "\$PREPARATION_DIGEST"/);
   });
 
   it('api migrate_only 도 freeze 가 적용된다', () => {

@@ -17,6 +17,10 @@ export default function ExternalAiConsentPage() {
   const [data, setData] = useState<ConsentInfo | null>(null),
     [selected, setSelected] = useState<string[]>([]),
     [write, setWrite] = useState(false),
+    [mailRead,setMailRead] = useState(false),
+    [mailManage,setMailManage] = useState(false),
+    [mailBody,setMailBody] = useState(false),
+    [selectedMail,setSelectedMail] = useState<string[]>([]),
     [replaceExisting, setReplaceExisting] = useState(true);
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -27,6 +31,7 @@ export default function ExternalAiConsentPage() {
     setData(null);
     setSelected([]);
     setWrite(false);
+    setMailRead(false);setMailManage(false);setMailBody(false);setSelectedMail([]);
     setReplaceExisting(true);
     setMessage("");
     getExternalConsent(request)
@@ -50,8 +55,8 @@ export default function ExternalAiConsentPage() {
       const redirect = approve
         ? await approveExternalConsent(
             request,
-            selected,
-            write ? ["o4o:read", "o4o:draft:write"] : ["o4o:read"],
+            [...selected,...(mailRead?selectedMail:[])],
+            ['o4o:read',...(write?['o4o:draft:write']:[]),...(mailRead?['o4o:mail:read']:[]),...(mailRead&&mailManage?['o4o:mail:manage']:[]),...(mailRead&&mailBody?['o4o:mail:body']:[])],
             (data?.existingConnections ?? 0) > 0 && replaceExisting,
           )
         : await denyExternalConsent(request);
@@ -165,6 +170,16 @@ export default function ExternalAiConsentPage() {
                   계정 설정에서 해제할 수 있습니다.
                 </p>
               </fieldset>
+              {data.scopes.includes('o4o:mail:read')&&<fieldset disabled={busy} className="space-y-3 rounded border p-4">
+                <legend>개인 메일 별도 동의</legend>
+                <p className="text-sm">콘텐츠 초안 권한과 별개입니다. 아래에서 선택한 본인 메일 계정만 AI에 연결합니다.</p>
+                <label className="flex items-center gap-2"><input type="checkbox" checked={mailRead} onChange={e=>{setMailRead(e.target.checked);if(!e.target.checked){setMailManage(false);setMailBody(false);setSelectedMail([]);}}}/>메일 목록·발신처·처리 현황 조회</label>
+                {data.scopes.includes('o4o:mail:manage')&&<label className="flex items-center gap-2"><input type="checkbox" checked={mailManage} disabled={!mailRead} onChange={e=>setMailManage(e.target.checked)}/>정리·규칙 제안과 직접 승인한 작업 관리</label>}
+                {data.scopes.includes('o4o:mail:body')&&<label className="flex items-center gap-2"><input type="checkbox" checked={mailBody} disabled={!mailRead} onChange={e=>setMailBody(e.target.checked)}/>선택한 메일 본문을 연결한 AI에 전달</label>}
+                <p className="text-sm text-gray-600">본문에는 개인정보가 포함될 수 있습니다. 일괄 정리와 자동 규칙은 O4O 확인 화면에서 대상과 건수를 직접 승인해야 합니다.</p>
+                {(data.mailAccounts??[]).map(account=><label key={account.id} className="flex items-start gap-2"><input type="checkbox" checked={selectedMail.includes(account.id)} disabled={!mailRead} onChange={e=>setSelectedMail(current=>e.target.checked?[...current,account.id]:current.filter(id=>id!==account.id))}/><span className="break-all">{account.name}</span></label>)}
+                {!data.mailAccounts?.length&&<p>연결 가능한 개인 메일 계정이 없습니다. My Home의 개인 메일 관리에서 먼저 연결하세요.</p>}
+              </fieldset>}
               {(data.existingConnections ?? 0) > 0 && (
                 <fieldset
                   disabled={busy}
@@ -193,7 +208,7 @@ export default function ExternalAiConsentPage() {
               )}
               <div className="flex flex-wrap gap-3">
                 <button
-                  disabled={busy || !selected.length}
+                  disabled={busy || (!selected.length && (!mailRead || !selectedMail.length)) || (mailRead && !selectedMail.length)}
                   className="rounded bg-blue-600 px-4 py-3 text-white disabled:opacity-50"
                   onClick={() => void complete(true)}
                 >

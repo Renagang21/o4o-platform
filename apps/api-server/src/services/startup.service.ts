@@ -8,6 +8,7 @@ import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
 import { consultationStateCleanupJob } from '../jobs/consultation-state-cleanup.job.js';
+import { personalMailJob } from '../jobs/personal-mail.job.js';
 import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
@@ -221,6 +222,7 @@ export class StartupService {
       privacyRetentionJob.start();
       operatorInvitationRetentionJob.start();
       consultationStateCleanupJob.start();
+      personalMailJob.start();
       logger.info('✅ Privacy Retention Job started');
 
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
@@ -316,6 +318,7 @@ export class StartupService {
       operatorInvitationRetentionJob.stop();
       productCorrectionJob.stop();
       consultationStateCleanupJob.stop();
+      personalMailJob.stop();
       communityNewsJob.stop();
       storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');

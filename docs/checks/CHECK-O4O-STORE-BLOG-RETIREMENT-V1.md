@@ -1,6 +1,6 @@
 # Store 블로그 관리 기능 제거
 
-> **상태**: COMPLETED — 코드 제거·로컬 검증 완료, main 통합·배포 미실행
+> **상태**: COMPLETED — 개발·main 통합·Store 운영 배포 완료. 실계정 운영 화면 검증은 별도.
 > **작성일**: 2026-10-26 (Asia/Seoul)
 > **근거**: 사용자의 Store 블로그 기능 불필요 판정 및 제거 지시
 > **기준**: origin/main `59abadb4b2e61e2a1a277a8162f6cdd4f7e5e297`
@@ -69,7 +69,7 @@ Pharmacy 앱에는 `StoreBlogPage`·`StoreBlogPostPage` 공개 화면이 있고 
 
 과거 WO/CHECK의 당시 블로그 구현·배포 기록은 변경하지 않았다. 현재 Store 제거 범위와 잔존 공통 소비처를 이 기록에서 구분한다. 공통 정본의 플랫폼 블로그 계약 전체를 폐기했다고 표시하지 않는다.
 
-## 최종 검증 및 Git 상태
+## 개발 완료 당시 검증 및 Git 상태
 
 - `pnpm --filter store-web exec vitest run --maxWorkers=1`: 76 files / 844 tests PASS.
 - `pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath ...`: 소스 계약 3 suites / 106 tests PASS.
@@ -106,3 +106,39 @@ verdict: KEEP (main integration/deployment pending)
 검증 중 main에 PR #830 상품·상담 편집 작업이 병합되어 `68268d19f6`를 추가 반영했다(merge `68c7b523c4`). 편집 어댑터는 자동 병합됐고 main 대비 블로그 과거 분류 호환성 변경만 남는 것을 확인했다. 기존 상담 저장 검증·충돌 처리 로직은 보존한다.
 
 첫 PR CI `40271537930`은 CI Gate·API 3분할·웹/관리자 빌드·코드 품질 모두 성공했고 CodeQL·SonarCloud도 통과했다. Sonar의 비차단 경고 1건(자료 선택기의 중첩 검색 안내 삼항식)은 소스별 문자열 매핑으로 정리했다. main 추가 반영과 이 보완 뒤의 최종 커밋에서 CI·리뷰를 다시 확인하며, 최종 상태는 PR #831에 기록한다. main 병합·배포는 계속 미실행이다.
+
+## main 병합 및 Store 배포 완료 — 2026-10-26 (Asia/Seoul)
+
+사용자가 앞선 병합 전 제한을 해제하고 main 병합·배포 진행을 승인했다. 이 절이 현재 통합·배포 상태이며, 위 NOT_RUN 표기는 각 기록 당시의 상태다.
+
+### 최종 소스와 통합
+
+- 최신 main `7166005df54231e00999673fecdf83e596e1bb3a`의 약국 앱 디렉터리 전환·공통 API 정리·외부 AI 연계를 작업 branch에 충돌 없이 반영했다. 이 upstream 변경은 이번 PR의 추가 변경이 아니다.
+- 최종 개발 HEAD: `114bb777e16416672454765b5cd55472b5cd4cc6`.
+- [PR #831](https://github.com/Renagang21/o4o-platform/pull/831): 정상 merge. merge SHA = `5f778c3a1893ddf2fe724cde1560c1e974a8466c`. bypass·직접 main push·force push 없음.
+- 최종 HEAD Codex review 완료, finding 0, 미해결 thread 0. Sonar annotation 0.
+- [PR CI 40285407657](https://github.com/Renagang21/o4o-platform/actions/runs/40285407657): CI Gate·API 3분할·코드 품질·웹/관리자 빌드 PASS.
+- [main CI 40286566058](https://github.com/Renagang21/o4o-platform/actions/runs/40286566058): SUCCESS, CI Gate·API 3분할·코드 품질·웹/관리자 빌드 PASS.
+- 최신 통합 소스 로컬 Store 전체 78 files / 861 tests PASS, TypeScript·Vite build PASS. 최종 빌드 합성 API desktop/mobile 8개 관측 PASS.
+
+### 실제 운영 배포
+
+- 배포 방식: LEVEL 2, 기존 Delivery 자동 verified rollout. promote 수동 실행 없음.
+- [Delivery 40287730193](https://github.com/Renagang21/o4o-platform/actions/runs/40287730193): **SUCCESS**.
+- 대상: **Store (`store-web`)만**. API·Admin·Partner·Neture·약국 협업체 앱·Lecture·Branch·Hospital Pharmacy는 SKIPPED.
+- Store 배포 job `121455886913`: 이미지 build/push → 기존 트래픽 기록 → Cloud Run deploy → 새 revision smoke/트래픽 전환 → 배포 후 검증 모두 SUCCESS.
+- 마지막 `Report (serving SHA · commit status)` SUCCESS. 실제 serving SHA가 배포 소스 `5f778c3a1893ddf2fe724cde1560c1e974a8466c`와 일치함을 정상 workflow가 검증했다.
+- GitHub commit status `production`: **success**, `DEPLOYED · deploy: store`.
+- 운영 DB migration·직접 DB write·실제 업무 데이터 생성·메일 발송 없음.
+
+### 검증 한계와 환경 보완
+
+- 운영 계정으로 메뉴·자료함을 직접 탐색하는 검증은 미실행이다. 앞의 브라우저 결과는 최종 빌드/localhost의 합성 계정·API 결과다.
+- 이 cloud 세션에서 Store 공개 도메인 접속은 HTTP proxy CONNECT 403으로 차단됐다. revision 이름을 얻기 위한 Actions 로그 다운로드도 Forbidden으로 실패해, 별도 revision 이름/직접 도메인 HTTP·JS 성공 결과를 기록하지 않는다. job metadata·최종 live serving SHA report·production status의 성공과 구분한다.
+- 기존 custom 허용 목록을 보존하고 `store.neture.co.kr`만 추가한 환경 설정 초안을 정상 저장했다. `requires_publish=true`이며, 저장은 현재 세션 적용/게시를 뜻하지 않는다. 환경 설정에서 저장·게시 후 직접 도메인 smoke를 수행할 수 있다. proxy 우회·IAM/인증/CI 설정 변경은 하지 않았다.
+
+### 정리 및 판정
+
+- 이번 검증의 localhost preview와 browser process는 종료했고, 작업 생성 운영 데이터는 없다.
+- cloud의 기존 격리 checkout은 보존한다. main에 병합된 feature branch는 완료 상태이며, 배포 기록은 별도 docs-only branch에서 통합한다.
+- 판정: **개발·main 통합·Store 배포 완료**. 직접 운영 계정/브라우저 검증은 미실행으로 유지한다. 공통 공개 블로그·서버·원장 전체 폐기를 완료한 것으로 해석하지 않는다.

@@ -121,6 +121,7 @@ function MyHomeContent({ view }: { view: View }) {
                   value: `${homeEntryStoreOrganizationIds(entry.data!).length}개 매장 · 사업 요약과 방문 통계`,
                 }] : []),
                 { to: "/mypage/settings", title: "계정 설정", value: "프로필·로그인 설정" },
+                { to: '/mypage/mail', title: '개인 메일 관리', value: '내 메일 계정·발신처 규칙·정리 현황' },
               ].map(item => <Link key={item.to} to={item.to} className="rounded-lg border border-slate-100 p-3 no-underline hover:border-blue-400">
                 <span className="font-medium text-blue-700">{item.title} →</span>
                 <span className="mt-1 block text-xs text-slate-500">{item.value}</span>
