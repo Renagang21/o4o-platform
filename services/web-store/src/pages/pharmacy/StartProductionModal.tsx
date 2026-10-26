@@ -8,7 +8,7 @@ import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigati
  * 공통 컴포넌트(@o4o/store-ui-core)를 KPA 설정으로 감싼 thin wrapper.
  *
  * KPA 설정:
- *   - targets: PRODUCTION_TARGET_CATALOG (4개 제작 대상)
+ *   - targets: PRODUCTION_TARGET_CATALOG (3개 제작 대상)
  *   - getTemplates: getTemplatesForTarget (KPA template registry)
  *
  * 활성 사용처: StoreLibraryContentsPage (KPA 자료함 > 콘텐츠).

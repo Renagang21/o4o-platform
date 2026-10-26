@@ -12,13 +12,13 @@
  *   자료 없이 유형만 고르던 ProductionTypeSelectorModal 은 활성 진입점 0 으로 삭제되었다.
  *   제작 시작 진입은 "자료함 > 콘텐츠에서 자료 선택 후 시작" 단일 흐름으로 수렴한다.
  *
- * 4유형 화이트리스트 고정: POP / QR 코드 / 블로그 / 상품 상세설명
+ * 제작 유형: POP / QR 코드 / 상품 상세설명
  * 디지털 사이니지는 의도적 제외 (KPA Signage 구조 freeze 보호).
  *
  * Router state 표준:
  *   navigate(meta.route, { state: buildProductionState({ target, source?, selectedTemplateId? }) })
  *
- * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
+ * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage)은
  * source.items.length === 0 일 때 메뉴 직접 진입과 동일하게 동작 (early return 처리됨).
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
@@ -31,7 +31,7 @@
  *   buildProductionState()에 selectedTemplateId 인자 추가.
  */
 
-import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
+import { Megaphone, QrCode, FileText, type LucideIcon } from 'lucide-react';
 // WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1:
 //   ProductionOutputConstraints 는 @o4o/types/production-template canonical.
 //   productionTemplates.ts 는 re-export 를 유지하므로 경로 변경 불필요.
@@ -135,20 +135,6 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
       maxBodyLength: 150,
       allowedLengths: ['short'],
       requiredFields: ['title', 'shortText'],
-    },
-  },
-  {
-    key: 'blog',
-    label: '블로그',
-    description: '공개 콘텐츠 게시물',
-    Icon: BookOpen,
-    iconColor: '#16a34a',
-    route: '/store/content/blog',
-    templateCategory: 'blog',
-    supportsTemplates: true,
-    defaultTemplateId: 'blog-health-professional',
-    outputConstraints: {
-      requiredFields: ['html', 'title', 'summary'],
     },
   },
   {

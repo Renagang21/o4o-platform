@@ -4,21 +4,20 @@
  * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1
  *
  * 목적:
- *   모든 제작 target(POP/QR/블로그/상품설명)은 template 기반으로 생성된다.
+ *   모든 제작 target(POP/QR/상품설명)은 template 기반으로 생성된다.
  *   - AI는 빈 상태 생성기가 아니라 template를 채우는 역할
  *   - template = 콘텐츠 구조 + 문장 구조 + 레이아웃 + 출력 제약
- *   - 모든 후속 WO(POP/QR/Blog/ProductDesc)는 이 registry를 기준으로 확장
+ *   - 모든 후속 WO(POP/QR/ProductDesc)는 이 registry를 기준으로 확장
  *
  * 이번 WO 범위:
  *   - Registry 구조 SSOT 확립
- *   - 10개 seed template 등록 (구조 검증 목적, 디자인 완성 단계 아님)
+ *   - 7개 seed template 등록 (구조 검증 목적, 디자인 완성 단계 아님)
  *   - target별 outputConstraints 정의
  *   - AiContentModal templateId 연결 준비
  *   - RichTextEditor starterHtml 연결 준비
  *
  * 후속 WO:
  *   WO-O4O-POP-TEMPLATE-WORKFLOW-V1 — A4/A5/카드 layout template + PDF renderer 반영
- *   WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1 — blog starter HTML + RichTextEditor 자동 주입
  *   WO-O4O-QR-TEMPLATE-WORKFLOW-V1   — QR landing template + output constraint 강제
  *   WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1 — 상품설명 RichTextEditor 교체
  */
@@ -127,86 +126,6 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '<p><strong>효능·효과:</strong> 여기에 효능을 입력하세요.</p>' +
       '<p><strong>복용 방법:</strong> 복용 방법을 입력하세요.</p>' +
       '<p><strong>주의사항:</strong> 주의사항을 입력하세요.</p>',
-  },
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // 블로그 (3개)
-  // ──────────────────────────────────────────────────────────────────────────
-
-  {
-    id: 'blog-health-professional',
-    target: 'blog',
-    name: '전문 정보형',
-    description: '전문적인 건강·의약 정보를 체계적으로 전달하는 블로그 스타일',
-    style: '전문형',
-    tags: ['blog', 'health', 'professional', 'structured'],
-    forcedOptions: { length: 'long', tone: 'professional' },
-    outputConstraints: {
-      requiredFields: ['html', 'title', 'summary'],
-    },
-    systemPromptOverride:
-      '전문적인 건강·의약 정보를 체계적으로 전달하는 약국 블로그 글을 작성합니다. ' +
-      '도입부(개요) → 핵심 내용(h2 섹션 2-3개) → 실천 방법 → 마무리 구조를 따르세요. ' +
-      '출처 근거를 명시하고, 과장된 효능 표현을 피합니다. ' +
-      '독자가 신뢰할 수 있는 전문가 관점의 글을 작성하세요.',
-    starterHtml:
-      '<h2>개요</h2>' +
-      '<p>이 글에서 다룰 내용을 간단히 소개합니다.</p>' +
-      '<h2>주요 내용</h2>' +
-      '<p>핵심 정보를 여기에 작성합니다.</p>' +
-      '<h2>실천 방법</h2>' +
-      '<p>독자가 실천할 수 있는 구체적인 방법을 안내합니다.</p>' +
-      '<h2>마무리</h2>' +
-      '<p>핵심 내용을 요약하고 마무리합니다.</p>',
-  },
-
-  {
-    id: 'blog-consumer-friendly',
-    target: 'blog',
-    name: '소비자 친화형',
-    description: '일반 소비자가 쉽게 읽을 수 있는 친근한 블로그 스타일',
-    style: '친근형',
-    tags: ['blog', 'consumer', 'friendly', 'easy-read'],
-    forcedOptions: { length: 'medium', tone: 'friendly' },
-    outputConstraints: {
-      requiredFields: ['html', 'title', 'summary'],
-    },
-    systemPromptOverride:
-      '일반 소비자가 쉽게 읽고 공감할 수 있는 약국 블로그 글을 작성합니다. ' +
-      '전문 용어는 쉬운 말로 풀어쓰고, 실생활과 연결되는 예시를 활용하세요. ' +
-      '친근한 어투(~세요, ~합니다)를 유지하며, 독자가 행동으로 이어질 수 있도록 ' +
-      '마지막에 간단한 실천 팁을 포함하세요.',
-    starterHtml:
-      '<h2>안녕하세요, 약사입니다 😊</h2>' +
-      '<p>오늘은 여러분이 궁금해하셨던 내용을 쉽게 설명해 드리겠습니다.</p>' +
-      '<h2>이런 경우에 도움이 돼요</h2>' +
-      '<p>여기에 내용을 입력하세요.</p>' +
-      '<h2>이렇게 해보세요</h2>' +
-      '<ul><li>실천 팁 1</li><li>실천 팁 2</li></ul>',
-  },
-
-  {
-    id: 'blog-pharmacist-column',
-    target: 'blog',
-    name: '약사 칼럼형',
-    description: '약사의 경험과 관점을 담은 전문 칼럼 스타일',
-    style: '칼럼형',
-    tags: ['blog', 'column', 'pharmacist', 'opinion'],
-    forcedOptions: { length: 'long', tone: 'professional' },
-    outputConstraints: {
-      requiredFields: ['html', 'title', 'summary'],
-    },
-    systemPromptOverride:
-      '약사의 전문 지식과 현장 경험을 담은 칼럼 형식의 블로그 글을 작성합니다. ' +
-      '서론(문제 제기 또는 현장 이야기) → 전문가 관점 → 독자에게 전하는 메시지 구조를 따르세요. ' +
-      '1인칭 관점을 활용하여 신뢰감을 높이고, 독자가 공감할 수 있는 사례를 포함하세요.',
-    starterHtml:
-      '<h2>약사로서 자주 받는 질문이 있습니다</h2>' +
-      '<p>칼럼 도입부를 여기에 작성합니다.</p>' +
-      '<h2>전문가로서의 관점</h2>' +
-      '<p>전문적인 내용을 여기에 작성합니다.</p>' +
-      '<h2>여러분께 전하고 싶은 말</h2>' +
-      '<p>마무리 메시지를 여기에 작성합니다.</p>',
   },
 
   // ──────────────────────────────────────────────────────────────────────────

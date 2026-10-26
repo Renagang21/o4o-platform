@@ -82,7 +82,6 @@ export function useQrCreation(
   const selectLibrary = (item: AssetSelectorResult) => {
     revision.current++;
     const link =
-      item.source === "blog" ||
       item.source === "mlc" ||
       item.assetType === "external-link";
     setTarget({ kind: "library", item });

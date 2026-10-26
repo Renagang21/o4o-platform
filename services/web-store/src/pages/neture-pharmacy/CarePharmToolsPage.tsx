@@ -104,7 +104,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
         {[
           { title: '공급제품 · 발주', description: '협업체 공급가격과 조건을 확인하고 필요한 제품을 발주합니다.', to: SUPPLY, label: '공급제품 보기' },
           { title: '회원자료 활용', description: '게시된 자료를 내 매장 사본으로 가져와 우리 약국에 맞게 편집합니다.', to: MATERIALS, label: '회원자료 가져오기' },
-          { title: '안내물 만들기', description: '회원자료를 POP·블로그에 활용하고, 제품·매장 콘텐츠의 정보 QR을 관리합니다.', to: '#carepharm-production', label: '제작 도구 보기' },
+          { title: '안내물 만들기', description: '회원자료를 POP에 활용하고, 제품·매장 콘텐츠의 정보 QR을 관리합니다.', to: '#carepharm-production', label: '제작 도구 보기' },
         ].map(item => <article key={item.title} className="min-w-0 rounded-xl border bg-white p-5">
           <h2 className="text-lg font-semibold">{item.title}</h2><p className="mb-4 mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
           {item.to.startsWith('#') ? <a className={actionClass} href={item.to}>{item.label}</a> : <Link className={actionClass} to={item.to}>{item.label}</Link>}
@@ -125,13 +125,12 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
 
       <section id="carepharm-production" aria-labelledby="carepharm-production-heading" className="scroll-mt-24 rounded-xl border bg-white p-5">
         <h2 id="carepharm-production-heading" className="text-lg font-semibold">내 매장 안내물 제작</h2>
-        <p className="my-3 text-sm leading-6 text-slate-600">회원자료를 가져온 뒤 내 자료함에서 편집하고 POP·블로그 제작에 활용하세요. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다.</p>
+        <p className="my-3 text-sm leading-6 text-slate-600">회원자료를 가져온 뒤 내 자료함에서 편집하고 POP 제작에 활용하세요. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다.</p>
         <p className="mb-4 text-sm leading-6 text-slate-600">정보 QR은 제품이나 매장에서 직접 만든 콘텐츠 등 지원되는 대상을 선택해 연결합니다.</p>
         <div className="flex flex-wrap gap-3">
           <Link className={actionClass} to="/store/library/contents">내 자료함 · 편집</Link>
           <Link className={actionClass} to="/store/marketing/pop-v2">POP 만들기</Link>
           <Link className={actionClass} to="/store/marketing/qr">정보 QR 관리</Link>
-          <Link className={actionClass} to="/store/content/blog">블로그 만들기</Link>
         </div>
       </section>
 

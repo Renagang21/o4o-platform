@@ -790,8 +790,6 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         //   QR 대상 범위 확장 — '운영자 콘텐츠'(kpa_contents ready) 소스 탭 활성화.
         enableContentHubSource
         // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
-        //   '블로그'(store_blog_posts) 소스 탭 활성화 — 내 매장 제작자료 중 블로그를 link 형 QR 로 연결.
-        enableBlogSource
         // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
         //   '다국어 제품 콘텐츠' 소스 탭 활성화 — publicKey 발급 후 공개 landing 으로 link 연결.
         enableMlcSource
