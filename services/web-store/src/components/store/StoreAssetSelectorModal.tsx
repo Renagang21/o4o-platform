@@ -394,7 +394,7 @@ export function StoreAssetSelectorModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={source === 'content' ? '콘텐츠 검색...' : source === 'mlc' ? '다국어 제품 콘텐츠 검색...' : '자산 검색...'}
+              placeholder={{ asset: '자산 검색...', content: '콘텐츠 검색...', mlc: '다국어 제품 콘텐츠 검색...' }[source]}
               style={styles.searchInput}
             />
           </div>

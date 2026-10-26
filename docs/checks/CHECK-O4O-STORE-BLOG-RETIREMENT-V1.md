@@ -100,3 +100,9 @@ verdict: KEEP (main integration/deployment pending)
 - [PR #831](https://github.com/Renagang21/o4o-platform/pull/831) 생성, Codex review 요청, PR CI 실행. 최종 CI·리뷰 상태는 PR의 해당 HEAD checks/review를 기준으로 확인한다.
 - 작업 branch는 원격에 보존하며 최종 승인 전까지 KEEP. main 반영·운영 배포 상태는 계속 NOT_RUN이다.
 - 위 초기 `CI: NOT_RUN`은 개발 완료 commit 당시 상태다. 이 절부터 PR CI가 실행되며 운영 검증을 뜻하지 않는다.
+
+### 최종 통합 기준 갱신
+
+검증 중 main에 PR #830 상품·상담 편집 작업이 병합되어 `68268d19f6`를 추가 반영했다(merge `68c7b523c4`). 편집 어댑터는 자동 병합됐고 main 대비 블로그 과거 분류 호환성 변경만 남는 것을 확인했다. 기존 상담 저장 검증·충돌 처리 로직은 보존한다.
+
+첫 PR CI `40271537930`은 CI Gate·API 3분할·웹/관리자 빌드·코드 품질 모두 성공했고 CodeQL·SonarCloud도 통과했다. Sonar의 비차단 경고 1건(자료 선택기의 중첩 검색 안내 삼항식)은 소스별 문자열 매핑으로 정리했다. main 추가 반영과 이 보완 뒤의 최종 커밋에서 CI·리뷰를 다시 확인하며, 최종 상태는 PR #831에 기록한다. main 병합·배포는 계속 미실행이다.
