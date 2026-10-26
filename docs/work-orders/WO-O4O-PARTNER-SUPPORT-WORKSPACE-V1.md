@@ -234,3 +234,14 @@ gcloud run services add-iam-policy-binding partner-web   --region=asia-northeast
 - [ ] 영속 파일 저장소·실계정 검증·앞서 남긴 Sonar advisory 상세 검토
 
 이 단계에서 웹은 생성된 비공개 서비스이며 사용자에게 공개된 Partner 사이트의 배포 완료가 아니다. main 통합과 운영 API 배포의 이전 성공 결과는 유지된다.
+
+
+## 2026-10-26 소유자 공개 IAM 적용·verified 웹 전환 완료
+
+- 사용자가 PowerShell에서 `partner-web`의 `allUsers → roles/run.invoker` 부여 성공 결과를 제공했다. Bash 줄바꿈 대신 한 줄 명령을 안내했다. 배포 SA 권한 확대는 하지 않았다.
+- 최신 main `40d61a54f5eb5f505dcb97597e1af71f0be045da`의 [CI](https://github.com/Renagang21/o4o-platform/actions/runs/40318317863) 성공, Partner runtime 및 verified rollout action 변경 없음, 다른 서비스의 준비 실행 종료를 확인한 뒤 Partner 하나만 정상 verified 모드로 실행했다.
+- [Partner verified 배포](https://github.com/Renagang21/o4o-platform/actions/runs/40319774841) 성공. 새 revision `partner-web-00003-zod`의 0% 배포·tag URL 공개 HTTP smoke 통과 후 해당 revision에 100% traffic이 전환됐다. 기존 pinned traffic 방식을 유지했고 workflow 최종 검증 단계도 성공했다.
+- 운영 읽기 확인: API readiness HTTP 200, 비인증 Partner 공간 API HTTP 401. 업무 데이터 생성·실제 계정 로그인·미디어 저장소 설정은 수행하지 않았다.
+- [최근 읽기 전용 GCP inventory](https://github.com/Renagang21/o4o-platform/actions/runs/40318435851)의 기존 `o4o-global-lb` host rule에는 `partner.neture.co.kr`이 없고 Partner 전용 backend/NEG도 없다. 현재 도메인 HTTPS probe는 환경 프록시 CONNECT 403으로 차단되어 DNS/인증서의 실제 상태는 확정하지 않았다.
+- **완료 범위:** main 통합·API 배포·Partner Cloud Run 공개 verified 배포/트래픽 전환. **남은 범위:** canonical 도메인의 LB backend/NEG/host rule·TLS/DNS 연결 및 실제 URL 검증. 현재 cloud 환경에 GCP 소유자 identity가 없어 이 연결을 임의 계정이나 권한 우회로 변경하지 않는다. Cloud Run 기본 URL의 HTTP 성공을 canonical 도메인과 실제 로그인 흐름의 성공으로 보고하지 않는다.
+- 기존 PR #833을 최신 main과 merge해 같은 WO 연속 branch에 push했다. 문서 PR CI는 통과했으나 Codex summary가 이전 HEAD의 running 상태에 머물러 있어 완료 review로 간주하지 않고 보존한다. 배포 runtime 변경은 이미 병합된 PR #820의 코드이며 문서 PR 대기와 구분한다.
