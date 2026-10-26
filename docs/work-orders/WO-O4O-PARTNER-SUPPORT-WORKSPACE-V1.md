@@ -245,3 +245,12 @@ gcloud run services add-iam-policy-binding partner-web   --region=asia-northeast
 - [최근 읽기 전용 GCP inventory](https://github.com/Renagang21/o4o-platform/actions/runs/40318435851)의 기존 `o4o-global-lb` host rule에는 `partner.neture.co.kr`이 없고 Partner 전용 backend/NEG도 없다. 현재 도메인 HTTPS probe는 환경 프록시 CONNECT 403으로 차단되어 DNS/인증서의 실제 상태는 확정하지 않았다.
 - **완료 범위:** main 통합·API 배포·Partner Cloud Run 공개 verified 배포/트래픽 전환. **남은 범위:** canonical 도메인의 LB backend/NEG/host rule·TLS/DNS 연결 및 실제 URL 검증. 현재 cloud 환경에 GCP 소유자 identity가 없어 이 연결을 임의 계정이나 권한 우회로 변경하지 않는다. Cloud Run 기본 URL의 HTTP 성공을 canonical 도메인과 실제 로그인 흐름의 성공으로 보고하지 않는다.
 - 기존 PR #833을 최신 main과 merge해 같은 WO 연속 branch에 push했다. 문서 PR CI는 통과했으나 Codex summary가 이전 HEAD의 running 상태에 머물러 있어 완료 review로 간주하지 않고 보존한다. 배포 runtime 변경은 이미 병합된 PR #820의 코드이며 문서 PR 대기와 구분한다.
+
+
+## 2026-10-26 Partner canonical 도메인 연결·공개 HTTP 검증 완료
+
+- 소유자 실행 결과로 Partner DNS A/CNAME 반영, `cm-cert-partner-v1`의 `AUTHORIZED`·`ACTIVE`, 기존 `o4o-main-cert-map` 및 `o4o-global-lb`의 Partner 전용 host/path matcher 연결을 확인했다. 공인 주소·DNS 인증 값·자격정보는 기록하지 않는다.
+- 초기 `backend-partner-web`은 `backends: null`이었다. HTTPS 생성 기본값 `portName=https`가 Serverless NEG 연결을 막았다. 빈 문자열을 통한 gcloud/API 제거 안내는 실패했으며 성공으로 기록하지 않는다. 최종적으로 `protocol=HTTP`·`portName=http`로 변경한 뒤 `neg-partner-web` 연결이 성공한 소유자 조회 결과를 확인했다. 외부 TLS는 기존 HTTPS frontend가 처리한다.
+- 연결 전파 중 기존 Neture HTML, 이어서 `503 no healthy upstream`이 관측됐으나 재조회 후 `https://partner.neture.co.kr`에서 HTTP 200 및 정확한 제목 `O4O Partner · 홍보를 함께 만드는 공간`을 확인했다. 응답의 실제 JS `/assets/index-BM5EfQdE.js`와 CSS `/assets/index-uhGZgtIE.css`도 각각 HTTP 200이다. 인증서 검증과 환경 프록시를 유지했다.
+- 공개 도메인 HTTP/HTML·정적 자산 검증은 완료했다. 운영 desktop/mobile browser smoke는 기본 Playwright browser binary 미설치, 시스템 Chromium 대체 실행의 프록시 CA 신뢰 오류로 완료하지 못했다. TLS 검증을 끄지 않았다. 앞선 로컬 responsive 검증과 운영 브라우저 검증을 구분한다.
+- 실제 계정 로그인·서버 공동공간의 업무 동작·운영 영속 파일 저장소는 여전히 별도 검증/연결 대상이다. 운영 업무 데이터는 생성하지 않았다. 문서 PR #833은 배포 코드와 별개이며 기존 Codex review running 상태를 완료로 간주하지 않는다.
