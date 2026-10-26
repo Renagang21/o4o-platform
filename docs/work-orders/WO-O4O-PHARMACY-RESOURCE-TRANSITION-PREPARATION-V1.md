@@ -197,3 +197,29 @@ GitHub 연결 복구 후 두 읽기 run의 실제 결과를 먼저 확인하고,
 
 `WORKTREE_DISPOSITION`: `KEEP` — 동일 WO의 정리·운영 검증 closure가 남아 있다.
 다른 공간의 의도된 파일 삭제 100건 및 기준 checkout은 변경하지 않았다.
+
+
+### 연결 복구 후 재개 (2026-10-27, Asia/Seoul)
+
+별도 사용자 재인증 절차를 실행하지 않고 기존 GitHub 연결을 재조회했으며 API·fetch·push가 정상 동작했다.
+이전 로컬 문서 commit `40169d34e9`와 최신 main 통합 commit `28896374ad`를 작업 branch에 push했다.
+두 이전 검사 run은 실제로 실행됐고 모두 관측 구간의 옛 Run 요청이 남아 있어 실패했음을 확인했다.
+당시 조회 불가와 실제 검사 실패 원인을 구분한다.
+
+새 main `b9526fb78de1b223b7d2bbeba3c288cdcb9ae5c8`의 관련 ops/workflow 변경은 없음을 확인했다.
+`retire-plan` 40401845372는 정확한 main CI gate 통과 후 PASS했다.
+이번 실행은 API·Admin·DB migration을 배포하지 않는다.
+
+
+최신 main CI 40400146764 PASS, 새 plan 40401845372 PASS:
+관측 구간의 옛 Run 요청 0·완전한 참조 검사·삭제 대상 3개를 확인했다.
+검토 digest는 `90f53879728ac8d6471208e5bfe3abaf716f69b781a3bb47d6fcf408836d48d8`이다.
+Delivery 40402838997 종료 후 이 digest로 `retire` 40403134358을 요청했다.
+실행은 `Another production workflow is active; no next write submitted`로 실패했다.
+전체 삭제 성공은 미확인이며 다음 시도 전 실제 잔여 자원부터 재조회해야 한다.
+
+이어진 GitHub 조회·Git 연결은 다시 인증 실패했다. CLI는 환경의 `GH_TOKEN`을 인증에 사용하며
+유효하지 않다고 보고했다. `gh auth refresh --hostname github.com`도 실행했으나
+환경 토큰 사용 중에는 CLI 저장 credential을 갱신할 수 없다는 안내로 종료됐다.
+주입된 credential을 임의로 해제·대체하거나 별도 계정으로 우회하지 않았다.
+현재 연결 복구와 운영 writer 종료 후 새 plan으로 재검증해야 한다.
