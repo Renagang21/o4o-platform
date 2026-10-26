@@ -2585,6 +2585,9 @@ importers:
 
   services/web-partner:
     dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
       '@o4o/auth-react':
         specifier: workspace:*
         version: link:../../packages/auth-react

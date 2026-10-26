@@ -1,3 +1,9 @@
+import {
+  getAccessToken,
+  getRefreshToken,
+  storeTokens,
+  clearStoredTokens,
+} from "@o4o/auth-client";
 import { parseWorkspace, type Workspace, type Asset } from "./model";
 export type MediaFile = {
   id: string;
@@ -49,6 +55,21 @@ export type AuditEvent = {
   };
 };
 const messages: Record<string, string> = {
+  COMMUNITY_MEMBERSHIP_REQUIRED:
+    "파트너 커뮤니티 가입과 이용 상태를 확인해 주세요.",
+  COMMUNITY_MEMBERSHIP_MANAGED:
+    "커뮤니티 이용 상태는 운영자에게 확인해 주세요.",
+  COMMUNITY_OPERATOR_REQUIRED: "Partner 운영 권한이 필요합니다.",
+  COMMUNITY_AUTHOR_REQUIRED: "본인이 작성한 글·댓글만 변경할 수 있습니다.",
+  COMMUNITY_NOT_FOUND: "현재 열람할 수 없는 글·댓글·게시판입니다.",
+  COMMUNITY_SELF_ACTION: "본인의 이용 상태는 변경할 수 없습니다.",
+  COMMUNITY_COMMENT_LIMIT:
+    "댓글 수 제한에 도달했습니다. 새 글로 이야기를 이어가세요.",
+  ENROLLMENT_POLICY_REQUIRED:
+    "서비스 약관이 변경되었습니다. 페이지를 새로 열고 다시 확인해 주세요.",
+  POLICY_UNAVAILABLE:
+    "서비스 이용 안내를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
+  ACCOUNT_NOT_ACTIVE: "O4O 계정의 이메일 확인과 이용 상태를 확인해 주세요.",
   UNAUTHENTICATED: "로그인이 필요합니다. 다시 로그인해 주세요.",
   SPACE_NOT_FOUND:
     "접근할 수 없는 공동공간입니다. 권한이 변경되었는지 확인해 주세요.",
@@ -101,7 +122,47 @@ if (configuredOrigin) {
     throw new Error("Partner API 주소 설정을 확인해 주세요.");
   configuredOrigin = u.origin;
 }
+export const PARTNER_API_ORIGIN = configuredOrigin;
+const sessionHeaders = (): Record<string, string> => {
+  const token = getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 let refreshing: Promise<boolean> | null = null;
+async function refreshSession(): Promise<boolean> {
+  if (!refreshing) {
+    const oldToken = getAccessToken(),
+      refreshToken = oldToken ? getRefreshToken() : null;
+    refreshing = request<{
+      tokens?: { accessToken: string; refreshToken?: string };
+    }>(
+      "/api/v1/auth/refresh",
+      "POST",
+      refreshToken ? { refreshToken, includeLegacyTokens: true } : {},
+      false,
+    )
+      .then(
+        (data) => {
+          if (oldToken && getAccessToken() === oldToken) {
+            if (!data.tokens?.accessToken)
+              throw new Error("로그인 갱신 응답을 확인하지 못했습니다.");
+            storeTokens(data.tokens);
+          }
+          return true;
+        },
+        (error: unknown) => {
+          if (error instanceof ApiError && error.status === 401) {
+            if (getAccessToken() === oldToken) clearStoredTokens();
+            return false;
+          }
+          throw error;
+        },
+      )
+      .finally(() => {
+        refreshing = null;
+      });
+  }
+  return refreshing;
+}
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -134,6 +195,7 @@ export async function request<T>(
           ? {}
           : { "Content-Type": "application/json" }),
         "X-Requested-With": "O4O-Partner",
+        ...(!path.includes("/auth/email/login") ? sessionHeaders() : {}),
       },
       ...(body === undefined
         ? {}
@@ -151,19 +213,7 @@ export async function request<T>(
       path.includes(p),
     )
   ) {
-    if (!refreshing)
-      refreshing = request("/api/v1/auth/refresh", "POST", {}, false)
-        .then(
-          () => true,
-          (error: unknown) => {
-            if (error instanceof ApiError && error.status === 401) return false;
-            throw error;
-          },
-        )
-        .finally(() => {
-          refreshing = null;
-        });
-    if (await refreshing) return request<T>(path, method, body, false);
+    if (await refreshSession()) return request<T>(path, method, body, false);
   }
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload || payload.success === false)
@@ -201,12 +251,12 @@ export const partnerApi = {
         {
           credentials: "include",
           cache: "no-store",
-          headers: { "X-Requested-With": "O4O-Partner" },
+          headers: { "X-Requested-With": "O4O-Partner", ...sessionHeaders() },
         },
       );
     let res = await fetchFile();
     if (res.status === 401) {
-      await request("/api/v1/auth/refresh", "POST", {}, false);
+      if (!(await refreshSession())) throw new ApiError(401, "UNAUTHENTICATED");
       res = await fetchFile();
     }
     if (!res.ok) {
@@ -230,13 +280,20 @@ export const partnerApi = {
     if (!data?.user?.id) throw new ApiError(401, "UNAUTHENTICATED");
     return data.user;
   },
-  login: (email: string, password: string) =>
-    request("/api/v1/auth/email/login", "POST", {
+  login: async (email: string, password: string) => {
+    const result = await request("/api/v1/auth/email/login", "POST", {
       email,
       password,
       includeLegacyTokens: false,
-    }),
-  logout: () => request("/api/v1/auth/logout", "POST", {}),
+    });
+    clearStoredTokens();
+    return result;
+  },
+  logout: async () => {
+    const result = await request("/api/v1/auth/logout", "POST", {});
+    clearStoredTokens();
+    return result;
+  },
   list: () => request<SpaceSummary[]>("/api/v1/partner-support/spaces"),
   create: (name: string) =>
     request<ServerSpace>("/api/v1/partner-support/spaces", "POST", { name }),

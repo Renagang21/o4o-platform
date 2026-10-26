@@ -2,6 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { waitFor } from "@testing-library/react";
 import { ApiError, partnerApi, request } from "./api";
 import { emptyWorkspace } from "./model";
+import {
+  storeTokens,
+  clearStoredTokens,
+  getAccessToken,
+  getRefreshToken,
+} from "@o4o/auth-client";
 
 const response = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), {
@@ -9,10 +15,83 @@ const response = (status: number, body: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 afterEach(() => {
+  clearStoredTokens();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 describe("Partner cookie API client", () => {
+  it("uses the shared handoff session and refreshes that session instead of an unrelated cookie session", async () => {
+    const first = crypto.randomUUID(),
+      refresh = crypto.randomUUID(),
+      next = crypto.randomUUID(),
+      nextRefresh = crypto.randomUUID();
+    storeTokens({ accessToken: first, refreshToken: refresh });
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(response(401, { code: "UNAUTHENTICATED" }))
+      .mockResolvedValueOnce(
+        response(200, {
+          success: true,
+          data: { tokens: { accessToken: next, refreshToken: nextRefresh } },
+        }),
+      )
+      .mockResolvedValueOnce(response(200, { success: true, data: [] }));
+    vi.stubGlobal("fetch", fetch);
+    expect(await partnerApi.list()).toEqual([]);
+    expect(fetch.mock.calls[0][1].headers.Authorization).toBe(
+      `Bearer ${first}`,
+    );
+    expect(JSON.parse(fetch.mock.calls[1][1].body)).toMatchObject({
+      refreshToken: refresh,
+      includeLegacyTokens: true,
+    });
+    expect(fetch.mock.calls[2][1].headers.Authorization).toBe(`Bearer ${next}`);
+    expect(getAccessToken()).toBe(next);
+    expect(getRefreshToken()).toBe(nextRefresh);
+  });
+  it("clears a previous handoff identity only after a successful direct cookie login", async () => {
+    storeTokens({
+      accessToken: crypto.randomUUID(),
+      refreshToken: crypto.randomUUID(),
+    });
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(response(200, { success: true, data: {} }));
+    vi.stubGlobal("fetch", fetch);
+    await partnerApi.login("member@example.invalid", crypto.randomUUID());
+    expect(fetch.mock.calls[0][1].headers.Authorization).toBeUndefined();
+    expect(getAccessToken()).toBeNull();
+    expect(getRefreshToken()).toBeNull();
+  });
+  it("does not restore handoff tokens if logout cleared storage while refresh was in flight", async () => {
+    storeTokens({
+      accessToken: crypto.randomUUID(),
+      refreshToken: crypto.randomUUID(),
+    });
+    let resolve: (r: Response) => void = () => {};
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(response(401, { code: "UNAUTHENTICATED" }))
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((r) => {
+            resolve = r;
+          }),
+      )
+      .mockResolvedValueOnce(response(200, { success: true, data: [] }));
+    vi.stubGlobal("fetch", fetch);
+    const result = partnerApi.list();
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    clearStoredTokens();
+    resolve(
+      response(200, {
+        success: true,
+        data: { tokens: { accessToken: crypto.randomUUID() } },
+      }),
+    );
+    await result;
+    expect(getAccessToken()).toBeNull();
+  });
   it("uses cookie credentials and JSON without copying credentials into browser storage", async () => {
     const fetch = vi
       .fn()
@@ -60,47 +139,81 @@ describe("Partner cookie API client", () => {
       fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh")),
     ).toHaveLength(1);
   });
-  it.each([503, 429])("preserves refresh %i failures instead of reporting a session expiry", async (status) => {
-    const fetch = vi.fn()
-      .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
-      .mockResolvedValueOnce(response(status, { code: "AUTH_TEMPORARILY_UNAVAILABLE" }));
-    vi.stubGlobal("fetch", fetch);
-    await expect(partnerApi.list()).rejects.toMatchObject({ status, code: "AUTH_TEMPORARILY_UNAVAILABLE" });
-    expect(fetch).toHaveBeenCalledTimes(2);
-  });
+  it.each([503, 429])(
+    "preserves refresh %i failures instead of reporting a session expiry",
+    async (status) => {
+      const fetch = vi
+        .fn()
+        .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+        .mockResolvedValueOnce(
+          response(status, { code: "AUTH_TEMPORARILY_UNAVAILABLE" }),
+        );
+      vi.stubGlobal("fetch", fetch);
+      await expect(partnerApi.list()).rejects.toMatchObject({
+        status,
+        code: "AUTH_TEMPORARILY_UNAVAILABLE",
+      });
+      expect(fetch).toHaveBeenCalledTimes(2);
+    },
+  );
   it("preserves a refresh network failure without converting it to 401", async () => {
-    const fetch = vi.fn().mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
       .mockRejectedValueOnce(new TypeError("network"));
     vi.stubGlobal("fetch", fetch);
-    await expect(partnerApi.list()).rejects.toThrow("서버에 연결하지 못했습니다");
+    await expect(partnerApi.list()).rejects.toThrow(
+      "서버에 연결하지 못했습니다",
+    );
     expect(fetch).toHaveBeenCalledTimes(2);
   });
   it("still reports actual refresh authentication rejection as session expiry", async () => {
-    vi.stubGlobal("fetch", vi.fn()
-      .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
-      .mockResolvedValueOnce(response(401, { code: "REFRESH_TOKEN_EXPIRED" })));
-    await expect(partnerApi.list()).rejects.toMatchObject({ status: 401, code: "INVALID_TOKEN" });
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(response(401, { code: "INVALID_TOKEN" }))
+        .mockResolvedValueOnce(
+          response(401, { code: "REFRESH_TOKEN_EXPIRED" }),
+        ),
+    );
+    await expect(partnerApi.list()).rejects.toMatchObject({
+      status: 401,
+      code: "INVALID_TOKEN",
+    });
   });
   it("releases a failed single-flight refresh so a later retry can recover", async () => {
-    let refreshed = false, retrying = false;
+    let refreshed = false,
+      retrying = false;
     const fetch = vi.fn(async (url: string) => {
       if (url.includes("/auth/refresh")) {
-        if (!retrying) return response(503, { code: "AUTH_TEMPORARILY_UNAVAILABLE" });
+        if (!retrying)
+          return response(503, { code: "AUTH_TEMPORARILY_UNAVAILABLE" });
         refreshed = true;
         return response(200, { success: true, data: {} });
       }
-      return refreshed ? response(200, { success: true, data: [] }) : response(401, { code: "INVALID_TOKEN" });
+      return refreshed
+        ? response(200, { success: true, data: [] })
+        : response(401, { code: "INVALID_TOKEN" });
     });
     vi.stubGlobal("fetch", fetch);
-    const outcomes = await Promise.allSettled([partnerApi.list(), partnerApi.list()]);
+    const outcomes = await Promise.allSettled([
+      partnerApi.list(),
+      partnerApi.list(),
+    ]);
     for (const result of outcomes) {
       expect(result.status).toBe("rejected");
-      if (result.status === "rejected") expect(result.reason).toMatchObject({ status: 503 });
+      if (result.status === "rejected")
+        expect(result.reason).toMatchObject({ status: 503 });
     }
-    expect(fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh"))).toHaveLength(1);
+    expect(
+      fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh")),
+    ).toHaveLength(1);
     retrying = true;
     expect(await partnerApi.list()).toEqual([]);
-    expect(fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh"))).toHaveLength(2);
+    expect(
+      fetch.mock.calls.filter(([url]) => url.includes("/auth/refresh")),
+    ).toHaveLength(2);
   });
   it("does not retry invalid login or expose server error details", async () => {
     const fetch = vi.fn().mockResolvedValue(

@@ -333,6 +333,7 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'AddPartnerMediaAndReadState1792886700000', fingerprint: '4accc1af6999af30ee278a666edeafb6d978b2846ef9876fd2b43e58cc4144a3', fingerprintLineCount: 7117 },
   // WO-O4O-PERSONAL-MAIL-MCP-V1 — isolated PG15 baseline and all prior prefixes verified first.
   { appliedThrough: 'CreatePersonalMail1792998000000', fingerprint: '0aa797b735eb640d1d35d1066eae9205e0116f869dd1f6d604819c4224cb0759', fingerprintLineCount: 7224 },
+  { appliedThrough: 'CreatePartnerCommunity1793020000000', fingerprint: '8aca35f9a08b2f7ebb165240d8d0057e23f7e43eed4606ce7cf61b9cab4c1f01', fingerprintLineCount: 7305 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
