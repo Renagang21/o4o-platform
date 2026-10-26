@@ -1,7 +1,7 @@
 # AI 운영 적용·실사용 검증 인계
 
 > **상태**: ACTIVE · **작성일**: 2026-10-25
-> **적용 범위**: [운영 준비 TODO](../work-orders/TODO-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)의 코드·검증 인계. 이 branch는 main 통합 전이며 실제 적용/실사용 완료를 뜻하지 않는다
+> **적용 범위**: [운영 준비 TODO](../work-orders/TODO-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)의 코드·검증 인계. main 통합·배포 결과는 [2026-10-26 CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-INTEGRATION-20261026.md)를 따른다. 실제 요율/한도·계정 설정·유료 실사용 완료와 구분한다
 > **기존 기준**: [가격 표본·draft·quota 검사](O4O-AI-PRICING-READINESS-RUNBOOK-V1.md) · [AI 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md) · [배포 정책](../../README.md#배포)
 
 ## 1. 통합 전에 확정할 입력
@@ -20,7 +20,7 @@
 
 ## 2. 준비한 설정의 전달
 
-이 branch의 `deploy-api.yml`은 기존 optional env를 이용해 `AI_PRICING_CATALOG`를 다음처럼 준비한다. 이 문서는 repository/environment variable을 변경하거나 배포를 실행한 기록이 아니다.
+`deploy-api.yml`은 기존 optional env를 이용해 `AI_PRICING_CATALOG`를 다음처럼 준비한다. 이 절은 설정 전달 계약이며 repository/environment variable을 변경한 기록이 아니다. 실제 코드 배포 증거는 위 CHECK에서 확인한다.
 
 | 관측 | 동작 |
 |---|---|

@@ -338,3 +338,9 @@ host는 기존 인증·업무 권한으로 확보한 actor만 전달한다. Home
 [후속 TODO](../work-orders/TODO-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)의 `wo/ai-runtime-operations-readiness`는 기존 가격 parser/fingerprint·optional env·관리 GET·사전 점검 CLI를 연결한다. 새 Core/원장·모델 registry를 만들지 않고 요율·credential 원문 없는 process 관측과 파일 표본의 일치/불일치를 구분한다. 모델/계정·provider·실시간 user quota는 계속 미검증이다. 기존 host의 증거 정산 뒤 확정 비용과 미계측 상세의 관리 표시도 실제 PG에서 재현·보완했다.
 
 기존 모델 제어·policy·권한 callback·원자 예약/보류/정산·관리 집계를 합성 transport와 실제 격리 DB로 검증했다. workflow는 검토 가능한 source 변경이며 실제 운영 설정·유료 호출·main/배포는 수행하지 않았다. 이번 사용자 종료 범위는 통합 전 push이며 [운영 검증 인계](../guides/O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)·[CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)를 다음 단계에서 사용한다.
+
+### 19-1. 운영 준비 코드 main 통합·배포 검증 (2026-10-26)
+
+후속 사용자 지시로 §19의 개발 변경을 [PR #824](https://github.com/Renagang21/o4o-platform/pull/824)/main `38bb2d8e28`에 통합했다. workflow의 가격 검증·현재 값 보존 경로를 검토하고 Sonar 지적 6개를 처리했으며, 최종 source에서 필수 CI·CodeQL·Codex·Sonar를 통과했다. 개발 시점 COMPLETED 기록은 당시 증거로 보존하며 main CI·실제 배포/서빙·공개 점검 결과는 [통합 CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-INTEGRATION-20261026.md)를 따른다.
+
+가격 metadata와 snapshot 비교는 실제 모델·provider·사용자 quota/비용·업무 저장 성공의 증거를 대신하지 않는다. 요율·한도값을 새로 정하거나 credential·결제 설정을 변경하지 않았다. 실제 입력과 계정/예산·자료 권한·정리 계획을 확정한 뒤 [운영 검증 guide](../guides/O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)를 따른다.

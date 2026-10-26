@@ -235,3 +235,9 @@ S2-2/S4-4의 주요 **코드 연결**은 이번 묶음에 포함했다. 다만 �
 사용자는 다음 운영 준비/검증을 진행하되 main 통합 전까지로 범위를 지정했다. [후속 TODO](TODO-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md)의 branch에서 실제 가격 전달/관측·기존 CLI 비교·모델 선택부터 관리 집계까지의 격리 DB 검증을 준비한다. 증거 정산 비용이 계속 미산정으로 표시된 문제도 보완했다. workflow의 set/carry/omit·현재 조회/가격 검증과 기존 계정/권한·예약/정산 경계를 유지한다.
 
 코드/로컬 검증은 [CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-READINESS-V1.md), 운영 입력·계정·예산·복구와 미검증 항목은 [운영 검증 인계](../guides/O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)를 따른다. 이 후속은 main/배포·실제 가격/한도/credential 변경·유료 호출의 완료가 아니며 S2-2/S4-4는 운영 검증 대기로 남긴다. 상품 정정/설명 갱신과 협력 모임의 다른 담당 구현을 다시 만들지 않는다.
+
+## 18. 운영 준비 코드 main 통합·배포 검증 (2026-10-26)
+
+후속 사용자 지시로 §17의 23개 경로를 PR #824/main `38bb2d8e28`에 통합했다. 최종 source의 필수 CI·CodeQL·Codex·Sonar를 통과했고, 가격 전달 workflow의 보존/검증과 기존 배포 gate를 검토했다. main CI·배포·서빙과 공개 점검은 [통합 CHECK](../checks/CHECK-O4O-AI-RUNTIME-OPERATIONS-INTEGRATION-20261026.md)를 따른다. 개발 시점 COMPLETED CHECK/TODO는 보존한다.
+
+실제 요율/native profile·현재 quota·계정/예산·역할별 업무/유료 provider·보류/증거 정산의 운영 검증은 계속 남아 있다. 코드 통합·배포로 S2-2/S4-4 또는 운영 준비 TODO O1~O5 전체를 완료 처리하지 않는다. [운영 guide](../guides/O4O-AI-RUNTIME-OPERATIONS-VERIFICATION-V1.md)의 입력·증거·정리 범위를 따른다.
