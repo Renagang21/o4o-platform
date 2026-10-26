@@ -61,5 +61,5 @@ URL map을 함께 정렬한다. 기존 backend로 즉시 복귀할 수 있도록
 
 ## 검증 기록
 
-로컬 focused Python 16건 및 CI 관련 Node 테스트 374건(배포 workflow gate 90건 포함) PASS.
+로컬 focused Python 17건 및 CI 관련 Node 테스트 374건(배포 workflow gate 90건 포함) PASS.
 실제 GCP 준비 실행 결과는 실행 뒤 추가한다. 이 기록은 생성·전환 완료를 의미하지 않는다.

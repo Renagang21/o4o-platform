@@ -71,6 +71,8 @@ def make_plan(service, revision, neg, backend, url_map, policy):
     if neg.get('networkEndpointType') != 'SERVERLESS' or neg.get('cloudRun') != {'service': OLD}:
         raise ValueError('Source NEG topology changed')
     groups = backend.get('backends', [])
+    if backend.get('securityPolicy') or backend.get('edgeSecurityPolicy') or backend.get('region'):
+        raise ValueError('Source has a security-policy attachment or regional scope requiring a separate reviewed clone procedure')
     expected_group = f'{NEG}/neg-{OLD}'
     if len(groups) != 1 or groups[0].get('group', '').replace('https://www.googleapis.com/', 'https://compute.googleapis.com/') != expected_group:
         raise ValueError('Source backend topology changed')
@@ -100,10 +102,10 @@ def make_plan(service, revision, neg, backend, url_map, policy):
     target_neg = {'name': f'neg-{NEW}', 'description': MARKER,
                   'networkEndpointType': 'SERVERLESS', 'cloudRun': {'service': NEW}}
     target_backend = deepcopy(backend)
-    for key in ('id', 'kind', 'creationTimestamp', 'selfLink', 'fingerprint', 'usedBy'):
+    for key in ('id', 'kind', 'creationTimestamp', 'selfLink', 'fingerprint', 'usedBy', 'securityPolicy', 'edgeSecurityPolicy', 'region'):
         target_backend.pop(key, None)
     target_backend.update(name=f'backend-{NEW}', description=MARKER)
-    target_backend['backends'][0]['group'] = f'{NEG}/neg-{NEW}'
+    target_backend['backends'][0]['group'] = groups[0]['group'].rsplit('/', 1)[0] + f'/neg-{NEW}'
     plan = {'source_revision': ready, 'service': target, 'neg': target_neg, 'backend': target_backend,
             'live_url_map_fingerprint': url_map.get('fingerprint')}
     fingerprint = digest(plan)
@@ -176,6 +178,8 @@ def ensure_targets(api, plan, fingerprint, apply):
             raise RuntimeError('Private Run readiness timed out; live routing is unchanged')
         for collection, body in pending:
             api.compute_create(collection, body)
+        # Creation success alone does not prove settings were retained by the API.
+        ensure_targets(api, plan, fingerprint, False)
 
 
 def main():

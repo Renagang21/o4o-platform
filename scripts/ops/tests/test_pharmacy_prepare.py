@@ -114,6 +114,12 @@ class PreparationTests(unittest.TestCase):
         p.ensure_targets(api, plan, fingerprint, False)
         self.assertEqual(api.writes, [])
 
+    def test_cloud_armor_attachment_is_not_silently_dropped(self):
+        values = fixtures()
+        values[3]['securityPolicy'] = 'source-policy'
+        with self.assertRaises(ValueError):
+            p.make_plan(*values)
+
     def test_foreign_backend_collision_fails_before_any_creation(self):
         plan, fingerprint = p.make_plan(*fixtures())
         api = FakeAPI({f'{p.BACKEND}/backend-{p.NEW}': {'description': 'foreign'}})
