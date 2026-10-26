@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 /**
  * Backend-safe HTML sanitizer (jsdom + DOMPurify)
  *
@@ -26,17 +27,39 @@ export function sanitizeDescriptionHtml(value?: string | null): string {
 
 /** Store editor policy: preserve supported media while removing arbitrary iframe hosts. */
 export function sanitizeRichDescriptionHtml(value: string): string {
-  const clean = purify.sanitize(value, {
-    ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth', 'poster', 'controls', 'preload', 'playsinline'],
-  });
   const root = window.document.createElement('div');
-  root.innerHTML = clean;
+  root.innerHTML = value;
+  const embeds = new Map<string, string>();
   for (const iframe of root.querySelectorAll('iframe')) {
     const src = iframe.getAttribute('src') ?? '';
-    if (!src.startsWith('https://www.youtube.com/embed/') && !src.startsWith('https://player.vimeo.com/video/')) iframe.remove();
+    if (!allowedEmbed(src)) { iframe.remove(); continue; }
+    // A random per-call marker cannot be supplied by the input. Sanitize every attribute
+    // on a harmless element, then construct only the verified external embed.
+    const marker = randomUUID();
+    const proxy = window.document.createElement('div');
+    for (const attr of iframe.attributes) proxy.setAttribute(attr.name, attr.value);
+    proxy.setAttribute('data-o4o-embed', marker);
+    embeds.set(marker, src);
+    iframe.replaceWith(proxy);
+  }
+  root.innerHTML = purify.sanitize(root.innerHTML, {
+    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth', 'poster', 'controls', 'preload', 'playsinline'],
+  });
+  for (const proxy of root.querySelectorAll('[data-o4o-embed]')) {
+    const src = embeds.get(proxy.getAttribute('data-o4o-embed') ?? '');
+    if (!src || !allowedEmbed(src)) continue;
+    const iframe = window.document.createElement('iframe');
+    for (const attr of proxy.attributes) {
+      if (attr.name !== 'data-o4o-embed') iframe.setAttribute(attr.name, attr.value);
+    }
+    iframe.setAttribute('src', src);
+    proxy.replaceWith(iframe);
   }
   return root.innerHTML.trim();
+}
+
+function allowedEmbed(src: string): boolean {
+  return src.startsWith('https://www.youtube.com/embed/') || src.startsWith('https://player.vimeo.com/video/');
 }
 
 export function isBlankRichDescriptionHtml(value: string): boolean {
