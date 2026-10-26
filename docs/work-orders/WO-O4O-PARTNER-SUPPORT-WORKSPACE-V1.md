@@ -73,7 +73,7 @@
 
 ## TODO — 외부 연결과 운영 인계
 
-- [ ] 최신 main 통합 시 migration 순서·fingerprint 재검증: 마지막 fetch의 `c63e370594`에서 동일 manifest/expected-state 파일이 변경되었다. 이번 fingerprint는 준비된 checkout의 prefix를 검증한 값이며, 통합 담당은 병합 후 격리 PostgreSQL에서 새 순서로 재산출·검증해야 한다. 자동 merge/reset은 수행하지 않았다.
+- [x] 최신 main 통합과 migration 순서·fingerprint 재검증 완료. main 병합·운영 API 결과는 2026-10-26 실행 기록 참조.
 - [ ] 실제 O4O 개발용 계정의 기존 인증 미들웨어·약관·세션 정책 end-to-end 검증
 - [ ] 운영 영속 스토리지·공유 볼륨/객체 저장소 연결 및 개인정보 파기·백업 정책 검증 (로컬 파일 저장·파일/텍스트 버전은 구현·격리 검증 완료)
 - [ ] 외부 전환 수집·검증 출처·기간·중복 처리
@@ -148,7 +148,7 @@
 - [x] 격리 PostgreSQL 15 canonical bootstrap과 기존 41개 prefix 일치, 신규 42/43번째 적용·빈 상태 down/up 확인
 - [x] 신규 공간 fingerprint `3d408172c0b5a9b2d548ed5584248d08e61e6bf2e9eb40ee4961a0e57414c8f5` (7,076줄), media/read fingerprint `418afd534087a5c269051506237b6b3bf69c9ad9ef160fddfd138dbda6b7ec4f` (7,111줄) 재산출
 - [x] Partner 웹의 신규 Docker/nginx, affected/CD registry·동일 freeze/CI/verified 배포 job 등록. 기존 6개 웹 소비처의 배포 gate 유지
-- [ ] 통합 빌드·회귀 검사 완료 후 작업 브랜치 push, PR required CI·review 확인과 main 병합
+- [x] 통합 빌드·회귀 검사, 수정본 push, PR required CI·review 확인과 main 병합 완료 (#820)
 - [ ] 운영 migration 2개 실행 승인·정상 배포, 공개 URL·serving SHA 확인
 
 첫 Partner 웹 서비스가 운영에 없다면 기존 배포 계정은 IAM을 변경할 수 없으므로 서비스 공개 접근 부여·도메인 연결은 소유자 최초 설정이 필요하다. 첫 서비스/serving SHA를 알 수 없는 경우 Promote는 fail-closed이며 기존 검증 gate를 완화하지 않는다. 파일 업로드는 운영 영속 저장소 설정 전 비활성 상태를 유지한다. 운영 임시 디스크에 저장하도록 설정하지 않는다.
@@ -191,3 +191,23 @@
 - scoped frozen/offline install, 전체 배포/판정 단위 테스트 363개, 프런트 69개, 웹 production build 통과. 기존 CI에서 실패한 원인에 대한 수정은 이 후속 커밋에 포함한다.
 - GitHub API가 `401 Bad credentials`를 반환했고 gh auth status에서도 GH_TOKEN이 invalid로 확인되었다. git 원격 조회도 자격정보 부재로 실패했다. 환경 runtime은 running이며 새 outbound identity/secret binding은 없다. 자격정보를 읽거나 다른 계정으로 대체하지 않았다.
 - 이 때문에 마지막으로 push한 `2256ddaf34`의 CI 원격 확인·수정본 push·PR #820 main 병합·운영 배포는 완료하지 못했다. GitHub 연결 재인증 후 같은 작업 브랜치에 수정본을 push하고 required CI·review 상태부터 다시 확인해야 한다. 운영 DB·서비스·IAM·도메인은 변경하지 않았다.
+
+
+## 2026-10-26 main 통합·운영 API 배포 실행 기록
+
+사용자 후속 지시 `main으로 머지 , 배포`에 따라 기존 PR #820과 같은 작업을 이어 진행했다. GitHub API 계정 확인·git fetch/push·PR 병합·workflow dispatch가 성공해 기존 401 차단이 해소됐음을 확인했다.
+
+- [x] 로컬에 보관된 의존성 수정본 push, 최신 main `59abadb4b2` 통합. 로컬 프런트 69 tests·영향도/배포 관련 368 tests·웹 build 통과.
+- [x] [PR #820](https://github.com/Renagang21/o4o-platform/pull/820) 정상 merge. main 반영 SHA `c16d0244206df91f9f50433bf3285b6fb6969fc6`. main ruleset의 required CI Gate 통과, Codex 미해결 스레드 0건을 확인했다. admin bypass는 사용하지 않았다.
+- [x] [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/40256071842) 성공. API Jest 3개 shard·품질 검사·웹/관리자 빌드 통과. SonarCloud advisory의 reliability/security C 실패는 해소되지 않았으며 필수 CI 통과와 구분한다. 상세 Sonar API 접근은 환경 네트워크 403으로 차단됐다.
+- [x] [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/40257061836)의 API build-and-deploy 성공. 표준 `Run database migrations` 단계, 0% revision readiness, traffic 전환, 전환 후 verify, serving SHA report가 모두 성공했다. 운영 DB 직접 접속·임의 repair는 수행하지 않았다.
+- [x] 운영 읽기 검증: API `/health/ready` HTTP 200, `/api/v1/partner-support/spaces` 비로그인 HTTP 401. 실제 계정 로그인·업무 데이터 생성 테스트는 하지 않았다.
+- [ ] Partner 웹 배포: Promote는 serving SHA 불명으로 보류했다. [소유자 수동 verified 배포](https://github.com/Renagang21/o4o-platform/actions/runs/40257810659)를 같은 SHA로 실행해 Docker build/push와 CI gate는 성공했지만, `Record traffic before deploy`가 실패했다. Cloud Run deploy·smoke·traffic switch는 skipped다. `legacy` 전환이나 IAM 변경은 수행하지 않았다.
+
+준비된 Partner 웹 image: `gcr.io/netureyoutube/partner-web:c16d0244206df91f9f50433bf3285b6fb6969fc6`. 웹 build 실패가 아니라 기존 서비스 traffic 조회 실패이며, 서비스 미생성/권한 등 정확한 원인은 상세 로그 확인 전 확정하지 않는다.
+
+### 남은 외부 차단과 환경 초안
+
+GitHub Actions 상세 로그 저장소 `results-receiver.actions.githubusercontent.com`와 Sonar 상세 API `sonarcloud.io`가 환경 허용 목록에 없어 403으로 차단된다. 기존 custom domain·preset·스크립트·credential requirement를 보존하고 두 host만 추가한 환경 초안을 저장했다. 도구 결과는 `saved`, `requires_publish: true`다. 저장은 실행 환경 반영/Publish가 아니다.
+
+환경 설정에서 초안을 검토·저장·Publish한 후 GitHub 로그와 Sonar 상세 조회를 재시도한다. 웹 실패 로그를 확인해 최초 Cloud Run 서비스 설정 또는 권한 문제인지 판정한 뒤 같은 verified 경로로 재개한다. 원인을 확인하기 위해 CI/freeze/ref/IAM 경계를 완화하지 않는다. 운영 영속 미디어 저장소·파일 파기/백업 정책 및 실계정 end-to-end 검증은 앞의 인계 TODO에 남아 있다.
