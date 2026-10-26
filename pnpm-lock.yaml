@@ -2665,6 +2665,21 @@ importers:
         specifier: ^5.0.0
         version: 5.4.19(@types/node@24.10.1)(lightningcss@1.30.2)(terser@5.44.1)
 
+  services/web-partner:
+    dependencies:
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: 7.9.6
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+
   services/web-pharmacy-coop:
     dependencies:
       '@o4o/ai-components':

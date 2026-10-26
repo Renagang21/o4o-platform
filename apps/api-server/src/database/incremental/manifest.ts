@@ -110,6 +110,9 @@ import { CreateServiceOperatorInvitations1792886400000 } from '../migrations/179
 import { AddLectureInstructorProfile1792886400001 } from '../migrations/1792886400001-AddLectureInstructorProfile.js';
 import { CreateCooperationMemberWorkflows1792886400002 } from '../migrations/1792886400002-CreateCooperationMemberWorkflows.js';
 
+import { CreatePartnerSupportSpaces1792886600000 } from '../migrations/1792886600000-CreatePartnerSupportSpaces.js';
+import { AddPartnerMediaAndReadState1792886700000 } from '../migrations/1792886700000-AddPartnerMediaAndReadState.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -152,6 +155,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateServiceOperatorInvitations1792886400000,
   AddLectureInstructorProfile1792886400001,
   CreateCooperationMemberWorkflows1792886400002,
+  CreatePartnerSupportSpaces1792886600000,
+  AddPartnerMediaAndReadState1792886700000,
 ];
 
 export function incrementalMigrationNames(): string[] {

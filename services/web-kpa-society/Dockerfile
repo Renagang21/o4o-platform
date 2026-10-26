@@ -27,7 +27,6 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
-COPY packages/hub-core/package.json ./packages/hub-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
@@ -37,7 +36,6 @@ COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/block-renderer/package.json ./packages/block-renderer/
 COPY packages/slide-app/package.json ./packages/slide-app/
 COPY packages/content-core/package.json ./packages/content-core/
-COPY packages/utils/package.json ./packages/utils/
 COPY packages/account-ui/package.json ./packages/account-ui/
 
 # Copy service package.json
@@ -58,7 +56,6 @@ COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
-COPY packages/hub-core/ ./packages/hub-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
@@ -68,7 +65,6 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/block-renderer/ ./packages/block-renderer/
 COPY packages/slide-app/ ./packages/slide-app/
 COPY packages/content-core/ ./packages/content-core/
-COPY packages/utils/ ./packages/utils/
 COPY packages/account-ui/ ./packages/account-ui/
 
 # Copy service source

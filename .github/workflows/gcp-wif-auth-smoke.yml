@@ -2,7 +2,7 @@ name: GCP WIF Auth Smoke
 
 # WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1 — GitHub OIDC → WIF → github-actions SA 인증만 검증한다 (read-only).
 #
-#   배포 · revision 변경 · DB · secret version 접근 0. 선택 입력은 설정/Secret Manager resource 이름만 조회한다. 출력은 인증 주체 · project id · serving revision 이름뿐이다
+#   배포 · revision 변경 · DB · secret version 접근 0. 선택 입력은 설정/Secret Manager 이름 또는 약국 Cloud Run/LB 연결 메타데이터만 조회한다.
 #   (OIDC token · access token · credential 파일 내용은 출력하지 않는다).
 #   WIF provider 조건: repository_id · owner_id · environment=production · ref(main · deploy/*) ·
 #   event(workflow_run · workflow_dispatch — dispatch 는 소유자만) · 허용 workflow(이 파일 포함).
@@ -10,12 +10,17 @@ name: GCP WIF Auth Smoke
 on:
   workflow_dispatch:
     inputs:
+      pharmacy_inventory:
+        description: 'Read-only pharmacy Cloud Run/LB/NEG metadata; no values, secrets, DB, or resource changes'
+        type: boolean
+        default: false
       kakao_metadata:
         description: '카카오 설정 이름·존재 여부만 조회 (secret version 접근 0)'
         type: boolean
         default: false
 
 permissions:
+  contents: read
   id-token: write
 
 concurrency:
@@ -30,6 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Checkout read-only inventory helpers
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            scripts/ops/pharmacy_inventory_format.py
+            scripts/ops/pharmacy_permission_preflight.py
+          sparse-checkout-cone-mode: false
+
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v3
         with:
@@ -67,3 +80,30 @@ jobs:
           matches=$(printf '%s\n' "$resources" | grep -i kakao || true)
           if [ -n "$matches" ]; then printf '%s\n' "$matches"; else echo 'No Kakao-named Secret Manager resource found'; fi
           echo 'KAKAO_METADATA_READ_PASS (names only; app registration and usable values remain unverified)'
+
+      - name: Pharmacy runtime inventory (read-only metadata)
+        if: inputs.pharmacy_inventory == true
+        run: |
+          set -euo pipefail
+          # Bounded non-secret notices are readable through the GitHub Checks API as well as job logs.
+          emit_metadata() {
+            python3 scripts/ops/pharmacy_inventory_format.py "$1"
+          }
+          # Explicit projections exclude environment values, secret versions, private IPs and IAM policy member lists.
+          gcloud run services describe kpa-society-web \
+            --project=netureyoutube --region=asia-northeast3 \
+            --format='json(metadata.name,status.latestReadyRevisionName,status.traffic,status.url,spec.template.spec.serviceAccountName,spec.template.spec.containers[0].image)' | emit_metadata cloud-run
+          gcloud compute url-maps list --project=netureyoutube \
+            --format='json(name,hostRules,pathMatchers,defaultService,defaultUrlRedirect,defaultRouteAction)' | emit_metadata url-maps
+          gcloud compute backend-services list --project=netureyoutube --global \
+            --format='json(name,backends)' | emit_metadata backends
+          gcloud compute network-endpoint-groups list --project=netureyoutube \
+            --format='json(name,region,networkEndpointType,cloudRun.service)' | emit_metadata negs
+          echo 'PHARMACY_RUNTIME_INVENTORY_PASS (metadata only)'
+
+      - name: Pharmacy project permission preflight (read-only)
+        if: inputs.pharmacy_inventory == true
+        run: |
+          set -euo pipefail
+          sdk_root="$(gcloud info --format='value(installation.sdk_root)')"
+          PHARMACY_CLOUDSDK_ROOT="$sdk_root" python3 scripts/ops/pharmacy_permission_preflight.py
