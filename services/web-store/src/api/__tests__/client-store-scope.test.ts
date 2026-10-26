@@ -1,4 +1,3 @@
-import { createBlogPost } from '../blogStaff';
 import { getPharmacyInfo } from '../pharmacyInfo';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiClient } from '../client';
@@ -92,7 +91,6 @@ describe('shared request store scope', () => {
     }
   });
   it.each([
-    ['blog draft', () => createBlogPost('fixture-store', { title: 'Fixture title', content: 'Fixture body' })],
     ['standard product', () => registerStandardProductToStore('synthetic-master')],
     ['product request', () => submitProductRequest({ productName: 'synthetic', classification: 'synthetic' })],
     ['template copy', () => importOperatorTemplate('synthetic-template')],

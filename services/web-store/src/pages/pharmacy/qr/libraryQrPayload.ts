@@ -20,7 +20,7 @@ export function buildLibraryQrPayload(
   const isPageReference =
     library.source === "content-hub" || library.source === "direct-content";
   const isPublicLinkReference =
-    library.source === "blog" || library.source === "mlc";
+    library.source === "mlc";
   return {
     title: draft.title.trim() || library.title,
     description: draft.description.trim() || undefined,

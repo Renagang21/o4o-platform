@@ -90,22 +90,11 @@ export function ChannelPublicUrlCard({
     guidanceLink: string | null;
   } => {
     if (channelType === "B2C") {
-      // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
-      //   자체몰 홈(/store/:slug) route 는 은퇴했다. 다만 slug 자체는 QR(/qr/:slug) ·
-      //   태블릿(/tablet/:slug) · 매장 블로그(/store/:slug/blog) 공용 식별자이므로
-      //   주소 표시·변경 UI 는 유지하고, 열기/복사 대상만 살아 있는 매장 블로그로 옮긴다.
-      if (!orgCode)
-        return {
-          url: null,
-          label: "매장 공개",
-          guidance: null,
-          guidanceLink: null,
-        };
       return {
-        url: `${origin}/store/${encodeURIComponent(orgCode)}/blog`,
+        url: null,
         label: "매장 공개",
-        guidance: null,
-        guidanceLink: null,
+        guidance: "Store의 블로그 관리 기능은 종료되었습니다. 매장 안내는 QR·태블릿을 이용해 주세요.",
+        guidanceLink: "/store/marketing/qr",
       };
     }
     if (channelType === "TABLET") {
@@ -145,8 +134,8 @@ export function ChannelPublicUrlCard({
     }
   };
 
-  // No slug case for B2C/TABLET
-  if ((channelType === "B2C" || channelType === "TABLET") && !orgCode) {
+  // Tablet requires a public slug.
+  if (channelType === "TABLET" && !orgCode) {
     return (
       <div className="flex flex-wrap items-center gap-3 p-4 mb-6 rounded-lg border border-amber-200 bg-amber-50">
         <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
@@ -168,7 +157,7 @@ export function ChannelPublicUrlCard({
     );
   }
 
-  // KIOSK guidance (보류 안내)
+  // Retired or deferred channel guidance.
   if (guidance) {
     return (
       <div className="flex flex-wrap items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-slate-50">
@@ -188,7 +177,7 @@ export function ChannelPublicUrlCard({
     );
   }
 
-  // B2C / TABLET with valid URL — WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode
+  // TABLET with valid URL — WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode
   return (
     <div className="flex flex-wrap items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
       <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
@@ -207,7 +196,7 @@ export function ChannelPublicUrlCard({
         {editing ? (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[14px] font-mono text-slate-500 truncate">
-              {origin}/store/
+              {origin}/tablet/
             </span>
             <input
               type="text"
@@ -229,7 +218,7 @@ export function ChannelPublicUrlCard({
         <div className="text-xs text-slate-400 mt-1">
           {editing
             ? "저장 후 기존 주소는 자동으로 새 주소로 이동합니다 (1회 변경 가능)"
-            : "이 주소(약국 코드)는 QR·태블릿·매장 블로그가 함께 사용합니다"}
+            : "이 주소(약국 코드)는 QR·태블릿이 함께 사용합니다"}
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-1.5 flex-shrink-0">

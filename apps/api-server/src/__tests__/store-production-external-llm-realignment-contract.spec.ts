@@ -48,10 +48,7 @@ const VIEW_POP = 'packages/store-ui-core/src/components/pop-staff/StorePopStaffV
 const VIEW_PD = 'packages/store-ui-core/src/components/product-descriptions/StoreProductDescriptionsView.tsx';
 
 /** WO 2 CHECK 기준 TARGET_SPECIFIC 13 (fresh census 2026-09-18 — drift 0) */
-const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILINGUAL' | 'QR', string[]> = {
-  BLOG: [
-    'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
-  ],
+const TARGET_SPECIFIC: Record<'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILINGUAL' | 'QR', string[]> = {
   POP: [
     'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
   ],
@@ -66,7 +63,6 @@ const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILIN
 };
 const ALL_TARGETS = Object.values(TARGET_SPECIFIC).flat();
 const TASK_BY_GROUP: Record<Exclude<keyof typeof TARGET_SPECIFIC, 'MULTILINGUAL'>, string> = {
-  BLOG: "task: 'blog'",
   POP: "task: 'pop'",
   PRODUCT_DESCRIPTION: "task: 'product-description'",
   QR: "task: 'qr'",
@@ -139,8 +135,8 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (B) 공통 Vie
 
 describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPECIFIC 13 external LLM entry', () => {
   // 13 → 10: K-Cosmetics 3개(Blog · POP · 상품설명)는 앱 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-  it('활성 KPA census = 6', () => {
-    expect(ALL_TARGETS).toHaveLength(6);
+  it('활성 Store census = 5 (블로그 기능 종료)', () => {
+    expect(ALL_TARGETS).toHaveLength(5);
     for (const rel of ALL_TARGETS) expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(true);
   });
 

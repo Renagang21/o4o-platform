@@ -30,7 +30,6 @@ const STORE_FILES = [
   'services/web-store/src/pages/pharmacy/StoreDirectContentPage.tsx',
   'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',
   'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
-  'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
   'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
   'services/web-store/src/pages/pharmacy/StoreLocalProductsPage.tsx',
   'services/web-store/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
