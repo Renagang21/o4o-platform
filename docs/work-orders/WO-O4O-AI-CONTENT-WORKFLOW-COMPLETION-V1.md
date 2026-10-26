@@ -1,6 +1,6 @@
 # O4O AI 콘텐츠 제작·편집·저장 흐름 정비
 
-> 상태: ACTIVE · 작성일: 2026-10-26
+> 상태: COMPLETED · 작성일: 2026-10-26
 > 근거: 사용자 지시 — 상품 DB·공급자 등록은 다른 에이전트가 진행하므로 제외하고, 다음 콘텐츠 업무를 작은 회차로 나누지 않고 진행.
 > 기준 main: `b9526fb78d` · branch: `wo/ai-content-workflow-completion`
 > 종료 범위: 조사·TODO 보완·개발·검증·commit/push. main 병합·배포는 수행하지 않는다.
@@ -18,7 +18,7 @@
 - [x] 구현 범위와 공용 변경의 전체 소비처 영향도를 이 문서에 구체화한다.
 - [x] 확인된 누락과 편집 상태·잘못된 성공 표시·안전하지 않은 결과 적용 문제를 보완한다.
 - [x] 실제 UI/API 경계의 focused 회귀, 영향 패키지/서비스 build·lint, desktop/mobile 격리 browser smoke를 수행한다.
-- [ ] 검증·미실행·문서 정합·인계 경계를 CHECK에 기록하고 자기 변경만 commit/push한다.
+- [x] 검증·미실행·문서 정합·인계 경계를 CHECK에 기록하고 자기 변경만 commit/push한다.
 
 ## 3. 재사용 기준
 
@@ -55,4 +55,4 @@
 
 검증 범위·실행 결과·운영 미실행과 인증 blocker는 [CHECK](../checks/CHECK-O4O-AI-CONTENT-WORKFLOW-COMPLETION-V1.md)를 따른다. 실제 공급자/운영자 자료를 생성하거나 외부 계정·유료 모델을 호출하지 않았다.
 
-작업 시작 때 Git fetch는 성공했으나 최종 원격 확인에서 `gh api user`와 main 조회가 HTTP 401 Bad credentials로 실패했다. 자격정보를 읽거나 교체하지 않았다. 로컬 변경·검증·commit을 먼저 완료하고 원격 인증 복구 후 최신 main/영향 범위를 확인해 같은 작업 branch를 정상 push한다. main 통합·배포는 이번 범위 밖이다.
+구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`를 정상 Git 경로로 push하고 `git ls-remote`에서 같은 SHA를 확인했다. 최종 fetch·원격 main은 시작 기준 `b9526fb78d`와 같았다. 중간 Git fetch와 GitHub CLI API 조회는 인증 오류가 있었지만 이후 Git fetch/push는 성공했다. CLI API의 401은 별도로 남았으며 자격정보를 읽거나 교체하지 않았다. PR CI·리뷰는 미실행/미확인이고 main 통합·배포는 이번 범위 밖이다. 최종 문서 인계 commit은 branch HEAD를 따른다.

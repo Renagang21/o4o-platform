@@ -1,6 +1,6 @@
 # O4O AI 콘텐츠 제작·편집·저장 흐름 검증
 
-> 상태: ACTIVE · 작성일: 2026-10-26
+> 상태: COMPLETED · 작성일: 2026-10-26
 > 작업: [WO·TODO·소비처 영향도](../work-orders/WO-O4O-AI-CONTENT-WORKFLOW-COMPLETION-V1.md)
 > 기준 main: `b9526fb78d` · branch: `wo/ai-content-workflow-completion`
 
@@ -38,6 +38,8 @@ WO에 현재 KEEP/CONNECT/FIX와 Consumer Impact Matrix를 기록했다. 현행 
 
 ## 4. Git·원격 상태
 
-최종 fetch와 GitHub CLI 인증이 HTTP 401 Bad credentials로 실패했다. 작업 시작 시 main 조회 성공과 현재 인증 실패를 구분한다. 이 상태에서 최신 원격 SHA·push·PR CI/리뷰를 확인했다고 보고하지 않는다. 작업 branch의 로컬 commit을 보존하며 인증 복구 후 같은 branch를 정상 push해야 한다. main 병합·배포는 미실행이다. 원격 인계가 남아 있으므로 이 CHECK는 ACTIVE다.
+중간 원격 확인에서 Git fetch와 GitHub CLI API 인증이 실패했으나, 일반 Git push는 성공했다. 구현 commit `7e2daf0e99a4ac297dbd2d69142783079276a6d2`와 원격 branch SHA 일치, 이후 정상 fetch 및 시작 기준과 같은 원격 main `b9526fb78d`를 확인했다. GitHub CLI API의 HTTP 401은 별도 경로의 미해결 상태이며 PR CI·리뷰를 통과했다고 보고하지 않는다. 최종 문서 인계 commit은 branch HEAD를 따른다. main 병합·배포는 미실행이고 개발·로컬 검증·push 범위로 이번 기록을 완료한다.
 
-WORKTREE_DISPOSITION: `wo/ai-content-workflow-completion` / 기준 main `b9526fb78d` / 원격 인증 복구·push·추후 통합 필요 / verdict KEEP. 다른 세션의 worktree·branch는 수정하지 않는다.
+WORKTREE_DISPOSITION: `wo/ai-content-workflow-completion` / 기준 main `b9526fb78d` / 개발·push 완료·추후 PR/CI·main 통합 필요 / verdict KEEP. 다른 세션의 worktree·branch는 수정하지 않는다.
+
+자기 localhost fixture server는 종료했고 운영 DB·외부 계정·공유 runtime은 변경하지 않았다. staged scope·git diff --check·docs 민감정보 검사(4266 files) PASS, 기준 checkout clean을 확인했다.
