@@ -24,7 +24,8 @@ fixture('native usage aggregation on isolated PostgreSQL', () => {
     )`);
     await db.query(`CREATE TABLE ai_usage_reservations (
       provider_request_id uuid, pricing jsonb, receipt jsonb, scope text,
-      outcome text, status text, actual_cost numeric(20,8), created_at timestamptz
+      outcome text, status text, actual_cost numeric(20,8), created_at timestamptz,
+      reconciliation_id varchar(100), reconciliation_usage jsonb
     )`);
     service = new AiManagementService(db, {});
   });
@@ -40,7 +41,7 @@ fixture('native usage aggregation on isolated PostgreSQL', () => {
   async function pair(outcome: 'success' | 'error') {
     const known = outcome === 'success';
     await db.query(`INSERT INTO ai_usage_logs VALUES ('gemini','fixture-model','AI_PROXY',$1,10,20,0.05,$2,$3)`, [outcome, requestId, at]);
-    await db.query(`INSERT INTO ai_usage_reservations VALUES ($1,$2::jsonb,$3::jsonb,'AI_PROXY',$4,$5,$6,$7)`, [
+    await db.query(`INSERT INTO ai_usage_reservations(provider_request_id,pricing,receipt,scope,outcome,status,actual_cost,created_at) VALUES ($1,$2::jsonb,$3::jsonb,'AI_PROXY',$4,$5,$6,$7)`, [
       requestId, JSON.stringify([{ provider: 'gemini', invocation: { kind: 'multimodal', model: 'fixture-model' } }]),
       JSON.stringify({ provider: 'gemini', model: 'fixture-model', native: { usageKnown: known, inputTokens: known ? 10 : null, outputTokens: known ? 20 : null } }),
       outcome, known ? 'settled' : 'pending', known ? 0.05 : 0, at,
@@ -58,11 +59,11 @@ fixture('native usage aggregation on isolated PostgreSQL', () => {
     expect((await usage()).total).toMatchObject({ records: 1, errors: 1, successes: 0, unmetered: 1, unpriced: 1, cost: '0.00000000' });
   });
   it('includes unit-priced OCR and crashed Qwen without casting them to the legacy provider enum', async () => {
-    await db.query(`INSERT INTO ai_usage_reservations VALUES (NULL,$1::jsonb,$2::jsonb,'PRODUCT_CONTENT','success','settled',0.05,$3)`, [
+    await db.query(`INSERT INTO ai_usage_reservations(provider_request_id,pricing,receipt,scope,outcome,status,actual_cost,created_at) VALUES (NULL,$1::jsonb,$2::jsonb,'PRODUCT_CONTENT','success','settled',0.05,$3)`, [
       JSON.stringify([{ provider: 'google-vision', invocation: { kind: 'ocr', model: 'TEXT_DETECTION' } }]),
       JSON.stringify({ provider: 'google-vision', model: 'TEXT_DETECTION', native: { usageKnown: true, inputTokens: 0, outputTokens: 0, units: 1 } }), at,
     ]);
-    await db.query(`INSERT INTO ai_usage_reservations VALUES (NULL,$1::jsonb,NULL,'AI_PROXY',NULL,'reserved',NULL,$2)`, [
+    await db.query(`INSERT INTO ai_usage_reservations(provider_request_id,pricing,receipt,scope,outcome,status,actual_cost,created_at) VALUES (NULL,$1::jsonb,NULL,'AI_PROXY',NULL,'reserved',NULL,$2)`, [
       JSON.stringify([{ provider: 'qwen', invocation: { kind: 'text', model: 'fixture-qwen' } }]), at,
     ]);
     const result = await usage();

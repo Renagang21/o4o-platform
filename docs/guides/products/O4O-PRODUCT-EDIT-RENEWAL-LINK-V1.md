@@ -1,7 +1,7 @@
 # 기존 상품·설명서 편집의 갱신 검토 연결 V1
 
 > **상태**: ACTIVE · **작성일**: 2026-10-25
-> **구현 상태**: 개발 브랜치 구현·로컬 검증. main 병합·운영 배포 전.
+> **구현 상태**: PR #816 main 병합·운영 배포 완료. [배포 근거](https://github.com/Renagang21/o4o-platform/pull/816#issuecomment-6397672779).
 > **근거**: 기존 일반 편집 경로의 변경을 갱신 작업에 연결하고 검증·push까지 한 번에 진행하라는 사용자 지시.
 > **선행**: [보정 후속 운영](O4O-PRODUCT-CORRECTION-PERIODIC-OPERATIONS-V1.md) · [실행 WO](../../work-orders/WO-O4O-PRODUCT-EDIT-RENEWAL-LINK-V1.md)
 
@@ -40,10 +40,10 @@
 
 기존 settings에 product-correction:edit-event:<UUID>의 실제 변경 이벤트와 기존 renewal/notice 기록을 저장한다. 이벤트에는 변경 경로·처리자·시각·실제 전후 값을 보존하며 같은 이벤트 ID의 중복 전달도 막는다. ProductMaster 스키마에 설명서 FK를 추가하지 않는다. migration·외부 메시지 발송·운영 데이터 보정은 없다.
 
-이 branch는 최신 main 23717b6dc0에 미병합 상품 관리 선행 c88dbaf014를 포함한다. 최신 초대 보관 worker와 상품 정기 관리 worker를 모두 유지했다. 이번 결과는 push까지이며 PR 생성·main 병합·운영 배포를 의미하지 않는다.
+이 branch는 최신 main 23717b6dc0에 미병합 상품 관리 선행 c88dbaf014를 포함한다. 최신 초대 보관 worker와 상품 정기 관리 worker를 모두 유지했다. 초기 개발은 push까지였으며 후속 사용자 승인으로 PR #816 main 병합·운영 배포를 완료했다.
 
 ## 통합 전 점검 보완 (2026-10-25)
 
 개발 branch에 최신 main 67654de1fec1df5e50646d10155ead035e19c701을 추가 반영했다. 관리자 설명서 저장 중 별도 승격으로 새로운 정본이 생기면 먼저 저장된 설명서를 보존하고 PRODUCT_SOURCE_CHANGED / HTTP 409로 저장을 취소한다. 최신 정본을 다시 확인한 뒤 저장해야 한다. 실패한 저장의 변경 이벤트·갱신 작업은 남기지 않으며 앞서 생성한 미적용 candidate 처리 원칙은 유지한다.
 
-로컬 전체 검증과 배포 위험 점검은 [검증 기록](../../checks/CHECK-O4O-PRODUCT-EDIT-RENEWAL-LINK-V1.md)에 기록한다. 상품 정기 worker의 DB 쓰기로 배포 위험은 LEVEL_3이며, 통합 담당의 정식 PR·CI·리뷰 및 통제된 배포 절차를 거쳐야 한다. 이번 작업은 개발 branch push까지다.
+로컬 전체 검증과 배포 위험 점검은 [검증 기록](../../checks/CHECK-O4O-PRODUCT-EDIT-RENEWAL-LINK-V1.md)에 기록한다. 상품 정기 worker의 DB 쓰기로 배포 위험은 LEVEL_3이며, 통합 담당의 정식 PR·CI·리뷰 및 통제된 배포 절차를 거쳐야 한다. 해당 후속도 이후 PR #816으로 함께 배포했다. 새로운 정기 운영 완성 변경은 별도 미병합 안내를 따른다.

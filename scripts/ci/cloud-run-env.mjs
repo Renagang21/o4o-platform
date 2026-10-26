@@ -25,6 +25,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -44,10 +45,25 @@ export function currentPlainEnv(service) {
   return out;
 }
 
-/** gcloud 가 쉼표를 목록 구분자로 쓰므로 값에 쉼표가 있으면 `^@@^` 구분자 문법을 쓴다. */
+/** gcloud 목록 구문에 값이 섞이지 않도록 쉼표 값에는 충돌하지 않는 구분자를 쓴다. */
 export function setEnvFlag(name, value) {
   if (!/^[A-Z_][A-Z0-9_]*$/.test(name)) throw new Error(`env 이름 형식 오류: ${name}`);
-  return value.includes(',') ? `--set-env-vars=^@@^${name}=${value}` : `--set-env-vars=${name}=${value}`;
+  if (typeof value !== 'string' || value.includes('\0')) throw new Error('env 값 형식 오류');
+  if (!value.includes(',')) return `--set-env-vars=${name}=${value}`;
+  let delimiter = value.includes('@@') ? `O4O_${createHash('sha256').update(value).digest('hex')}` : '@@';
+  while (value.includes(delimiter)) delimiter += '_';
+  return `--set-env-vars=^${delimiter}^${name}=${value}`;
+}
+
+/** A selected secret reference is not an absent plain value; never silently drop or convert it. */
+export function assertPlainEnvKnown(service, names) {
+  const entries = service?.spec?.template?.spec?.containers?.[0]?.env ?? [];
+  if (entries.some(entry => names.includes(entry?.name) && entry.valueFrom))
+    throw new Error('현재 env가 plain 값이 아닙니다 — 연결 방식을 검토한 뒤 배포하세요.');
+}
+
+export function workflowMaskValue(value) {
+  return value.replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
 }
 
 /** 현재 값을 반드시 알아야 하는 묶음: 조회 실패면 배포를 멈춘다. */
@@ -78,12 +94,13 @@ function main() {
   // 서비스 조회 실패 = 현재 값을 모름 → carry 없이 set/omit 만 (빈 값은 여전히 만들지 않는다)
   const service = out.status === 0 ? JSON.parse(out.stdout || 'null') : null;
   assertCurrentKnown(service, args['require-current'] === 'true');
+  if (args['require-plain'] === 'true') assertPlainEnvKnown(service, names);
   if (!service) console.log(`⚠️ ${args.service} describe 실패 — carry 없이 판정`);
 
   const plan = planOptionalEnv(names, provided, service);
   const flags = [];
   for (const p of plan) {
-    if (p.action === 'carry') console.log(`::add-mask::${p.value}`);
+    if (p.action === 'carry') console.log(`::add-mask::${workflowMaskValue(p.value)}`);
     if (p.action !== 'omit') flags.push(setEnvFlag(p.name, p.value));
     console.log(`optional env ${p.name}: ${p.action}${p.action === 'omit' ? ' (정의 없음 — 빈 값으로 덮지 않음)' : ''}`);
   }

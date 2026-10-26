@@ -121,6 +121,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
     [intervalDays, setIntervalDays] = useState(30),
     [nextDue, setNextDue] = useState('');
   const [notices, setNotices] = useState<Awaited<ReturnType<typeof api.notices>> | null>(null);
+  const linkedRenewal = new URLSearchParams(window.location.search).get('renewal');
   const active = useRef(true),
     locked = useRef(false);
   useEffect(() => {
@@ -222,6 +223,14 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
       </button>
       {error && <p role="alert">{error} 입력 중인 검토 내용은 유지됩니다.</p>}
       {notice && <p role="status">{notice}</p>}
+      {linkedRenewal && /^[A-Za-z0-9:._-]{1,250}$/.test(linkedRenewal) && (
+        <button type="button" className={button} disabled={busy} onClick={() => void run(async () => {
+          await refresh();
+          if (!active.current) return;
+          setOpened(true);
+          await openRenewal(linkedRenewal);
+        })}>연결된 설명서 갱신 검토 열기</button>
+      )}
       {opened && (
         <>
           {refreshedAt && (
@@ -241,10 +250,15 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                 {dashboard.bulkFailed} · 예약 도래·지연 {dashboard.scheduleDue} · 미확인 알림{' '}
                 {dashboard.noticeUnread}
               </p>
+              {dashboard.worker && <p className="text-sm">
+                최근 실행: {dashboard.worker.source === 'job' ? '독립 정기 작업' : 'API 서버'} ·
+                최근 성공 {date(dashboard.worker.lastSucceededAt)} · 최근 실패 {date(dashboard.worker.lastFailedAt)}
+                {dashboard.worker.lastErrorCode && ' · 작업 실패: 다음 실행 또는 실행 오류를 확인하세요.'}
+              </p>}
               <p>
-                마지막 서버 점검: {date(dashboard.lastTickAt)} (한국시간). 서버 실행 중 약 1분
-                간격으로 처리합니다. 서버가 쉬는 동안 정시 실행을 보장하지 않으며 부팅 후 지연
-                회차를 확인합니다.
+                마지막 서버/독립 작업 점검: {date(dashboard.lastTickAt)} (한국시간). 기본 서버 실행은 약 1분
+                간격이며 휴면 중 정시 실행을 보장하지 않습니다. 독립 정기 호출의 활성화 여부는
+                운영 설정을 확인하세요.
               </p>
             </div>
           )}

@@ -4,11 +4,37 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { assertCurrentKnown, currentPlainEnv, planOptionalEnv, resolveOptionalEnv, setEnvFlag } from '../cloud-run-env.mjs';
+import { assertCurrentKnown, assertPlainEnvKnown, currentPlainEnv, planOptionalEnv, resolveOptionalEnv, setEnvFlag, workflowMaskValue } from '../cloud-run-env.mjs';
 
 const svc = (env) => ({ spec: { template: { spec: { containers: [{ env }] } } } });
 
 describe('optional env', () => {
+  it('가격 catalog를 제공하면 set·미제공이면 carry·둘 다 없으면 omit하며 secret 연결은 누락으로 처리하지 않는다', () => {
+    const name = 'AI_PRICING_CATALOG';
+    const current = svc([{ name, value: 'existing-reviewed-catalog' }]);
+    assert.deepEqual(planOptionalEnv([name], { [name]: 'new-reviewed-catalog' }, current), [{ name, action: 'set', value: 'new-reviewed-catalog' }]);
+    assert.deepEqual(planOptionalEnv([name], {}, current), [{ name, action: 'carry', value: 'existing-reviewed-catalog' }]);
+    assert.deepEqual(planOptionalEnv([name], {}, svc([])), [{ name, action: 'omit' }]);
+    assert.doesNotThrow(() => assertPlainEnvKnown(current, [name]));
+    assert.throws(() => assertPlainEnvKnown(svc([{ name, valueFrom: { secretKeyRef: { name: 'fixture-reference' } } }]), [name]));
+    assert.doesNotThrow(() => assertPlainEnvKnown(svc([{ name: 'OTHER_SECRET', valueFrom: { secretKeyRef: {} } }]), [name]));
+  });
+
+  it('가격 JSON의 쉼표·기존 delimiter가 다른 env flag를 만들지 않으며 NUL은 거부한다', () => {
+    const value = JSON.stringify({ version: 'fixture', models: ['synthetic@@model', 'synthetic-second'] });
+    const flag = setEnvFlag('AI_PRICING_CATALOG', value);
+    const prefix = '--set-env-vars=^';
+    assert.ok(flag.startsWith(prefix));
+    const rest = flag.slice(prefix.length), boundary = rest.indexOf('^');
+    const delimiter = rest.slice(0, boundary), assignment = rest.slice(boundary + 1);
+    assert.ok(!value.includes(delimiter));
+    assert.deepEqual(assignment.split(delimiter), [`AI_PRICING_CATALOG=${value}`]);
+    assert.throws(() => setEnvFlag('AI_PRICING_CATALOG', 'first\0--set-env-vars=OTHER=value'));
+  });
+
+  it('여러 줄 값의 mask 등록이 로그 명령이나 raw 다음 줄로 해석되지 않는다', () => {
+    assert.equal(workflowMaskValue('first%\r\n::notice::not-a-command'), 'first%25%0D%0A::notice::not-a-command');
+  });
   it('정의 없음 · 현재도 빈 값 → omit (빈 문자열을 만들지 않는다)', () => {
     assert.deepEqual(resolveOptionalEnv('', ''), { action: 'omit' });
     assert.deepEqual(resolveOptionalEnv(undefined, undefined), { action: 'omit' });

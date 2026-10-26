@@ -1,18 +1,18 @@
 /** File/env input only. Importing this CLI never initializes the application or calls providers. */
-import { open } from 'node:fs/promises';
-import { constants } from 'node:fs';
+import { readAiPricingFile } from './ai-pricing-files.js';
 import { loadAiPriceCatalog } from './ai-pricing.js';
-import { checkAiPricingReadiness, draftAiPriceCatalog, parseAiPricingManifest, parseAiQuotaSnapshot } from './ai-pricing-readiness.js';
+import { checkAiPricingReadiness, draftAiPriceCatalog, parseAiPricingManifest, parseAiQuotaSnapshot, parseAiRuntimePricingSnapshot } from './ai-pricing-readiness.js';
 
-interface Options { manifest: string; catalog?: string; quota?: string; draft: boolean }
+interface Options { manifest: string; catalog?: string; quota?: string; runtime?: string; draft: boolean }
 const invalid = (): never => { throw new Error('AI_PRICING_CHECK_INPUT_INVALID'); };
 const HELP = `AI pricing/quota offline configuration check
-  node --import tsx apps/api-server/src/scripts/ai-pricing-readiness.ts --manifest <cases.json> [--catalog <catalog.json>] [--quota-snapshot <quota.json>]
+  node --import tsx apps/api-server/src/scripts/ai-pricing-readiness.ts --manifest <cases.json> [--catalog <catalog.json>] [--quota-snapshot <quota.json>] [--runtime-snapshot <management.json>]
   node --import tsx apps/api-server/src/scripts/ai-pricing-readiness.ts --manifest <cases.json> [--catalog <catalog.json>] --draft
 
 Without --catalog, reads only AI_PRICING_CATALOG from this process (no .env loading).
 --draft prints an unfinished review document, never approved/default provider prices.
 No DB/provider/credential/deployment calls or writes. Snapshot success is not live admission.
+--runtime-snapshot compares the observed server catalog fingerprint, not model selection or provider access.
 Exit: 0 = supplied checks passed / draft produced; 1 = blocked; 2 = invalid input.
 `;
 function options(args: readonly string[]): Options {
@@ -24,31 +24,17 @@ function options(args: readonly string[]): Options {
     if (seen.has(flag)) return invalid();
     seen.add(flag);
     if (flag === '--draft') { draft = true; continue; }
-    if (!['--manifest', '--catalog', '--quota-snapshot'].includes(flag)) return invalid();
+    if (!['--manifest', '--catalog', '--quota-snapshot', '--runtime-snapshot'].includes(flag)) return invalid();
     const value = args[++i];
     if (!value || value.startsWith('--')) return invalid();
     values.set(flag, value);
   }
   const manifest = values.get('--manifest');
-  if (!manifest || (draft && values.has('--quota-snapshot'))) return invalid();
-  return { manifest, catalog: values.get('--catalog'), quota: values.get('--quota-snapshot'), draft };
+  if (!manifest || (draft && (values.has('--quota-snapshot') || values.has('--runtime-snapshot')))) return invalid();
+  return { manifest, catalog: values.get('--catalog'), quota: values.get('--quota-snapshot'), runtime: values.get('--runtime-snapshot'), draft };
 }
-const MAX_BYTES = 2 * 1024 * 1024;
 async function readJson(path: string): Promise<unknown> {
-  const file = await open(path, constants.O_RDONLY | constants.O_NONBLOCK);
-  try {
-    const info = await file.stat();
-    if (!info.isFile() || info.size > MAX_BYTES) return invalid();
-    const bytes = Buffer.alloc(MAX_BYTES + 1);
-    let size = 0;
-    while (size < bytes.length) {
-      const read = await file.read(bytes, size, bytes.length - size, null);
-      if (!read.bytesRead) break;
-      size += read.bytesRead;
-    }
-    if (size > MAX_BYTES) return invalid();
-    return JSON.parse(bytes.subarray(0, size).toString('utf8'));
-  } finally { await file.close(); }
+  return JSON.parse((await readAiPricingFile(path)).toString('utf8'));
 }
 
 export async function runAiPricingReadinessCli(
@@ -68,7 +54,8 @@ export async function runAiPricingReadinessCli(
       return 0;
     }
     const snapshot = opts.quota ? parseAiQuotaSnapshot(await readJson(opts.quota)) : undefined;
-    const report = checkAiPricingReadiness(manifest, catalog, snapshot);
+    const runtime = opts.runtime ? parseAiRuntimePricingSnapshot(await readJson(opts.runtime)) : undefined;
+    const report = checkAiPricingReadiness(manifest, catalog, snapshot, runtime);
     write(JSON.stringify(report) + '\n');
     return report.status === 'passed' ? 0 : 1;
   } catch (error) {

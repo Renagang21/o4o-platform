@@ -1,4 +1,5 @@
 import type { DataSource } from "typeorm";
+import { observeAiPricingCatalog } from '../../modules/ai-policy/ai-pricing-observation.js';
 import { getServiceName } from "../../config/service-catalog.js";
 import {
   GEMINI_CANONICAL_MODEL,
@@ -159,6 +160,7 @@ export class AiManagementService {
     });
     return {
       observedAt: new Date().toISOString(),
+      pricing: observeAiPricingCatalog(this.env.AI_PRICING_CATALOG ?? ''),
       groups,
       usages,
       providers,
@@ -273,7 +275,8 @@ export class AiManagementService {
       `WITH recorded AS (
       SELECT l.provider::text AS provider, l.model, l.scope, l.status::text AS status, l."promptTokens", l."completionTokens", l."costEstimated",
         (l."promptTokens" IS NULL OR l."completionTokens" IS NULL
-          OR (l."promptTokens" = 0 AND l."completionTokens" = 0)) AS usage_unknown
+          OR (l."promptTokens" = 0 AND l."completionTokens" = 0)) AS usage_unknown,
+        false AS price_reconciled
       FROM ai_usage_logs l WHERE l."createdAt" >= $1 AND l."createdAt" < $2
         AND NOT EXISTS (SELECT 1 FROM ai_usage_reservations r
           WHERE r.provider_request_id = l."requestId" AND r.pricing->0->'invocation' IS NOT NULL)
@@ -284,7 +287,8 @@ export class AiManagementService {
         COALESCE((r.receipt->'native'->>'inputTokens')::bigint, 0) AS "promptTokens",
         COALESCE((r.receipt->'native'->>'outputTokens')::bigint, 0) AS "completionTokens",
         r.actual_cost AS "costEstimated",
-        NOT COALESCE((r.receipt->'native'->>'usageKnown')::boolean, false) AS usage_unknown
+        NOT COALESCE((r.receipt->'native'->>'usageKnown')::boolean, false) AS usage_unknown,
+        (r.status = 'settled' AND r.reconciliation_id IS NOT NULL AND r.reconciliation_usage IS NOT NULL) AS price_reconciled
       FROM ai_usage_reservations r WHERE r.created_at >= $1 AND r.created_at < $2
         AND r.pricing->0->'invocation' IS NOT NULL AND r.status IN ('reserved','pending','settled')
       )
@@ -292,7 +296,7 @@ export class AiManagementService {
       COUNT(*)::text AS records,
       COUNT(*) FILTER (WHERE status = 'success')::text AS successes,
       COUNT(*) FILTER (WHERE status = 'error')::text AS errors,
-      COUNT(*) FILTER (WHERE "costEstimated" IS NULL OR usage_unknown)::text AS unpriced,
+      COUNT(*) FILTER (WHERE "costEstimated" IS NULL OR (usage_unknown AND NOT price_reconciled))::text AS unpriced,
       COUNT(*) FILTER (WHERE usage_unknown)::text AS unmetered,
       COALESCE(SUM("promptTokens"), 0)::text AS input,
       COALESCE(SUM("completionTokens"), 0)::text AS output,

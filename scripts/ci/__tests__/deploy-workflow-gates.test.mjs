@@ -16,6 +16,31 @@ const read = (p) => readFileSync(path.join(ROOT, p), 'utf-8');
 const DEPLOY = ['.github/workflows/deploy-api.yml', '.github/workflows/deploy-web-services.yml', '.github/workflows/deploy-admin.yml'];
 const count = (text, re) => (text.match(re) ?? []).length;
 
+describe('AI 가격 catalog는 현재 값을 보존하고 검증 후 기존 API 배포에만 전달한다', () => {
+  it('가격 검증은 운영 image push·migration 전에 실행하며 migrate-only에는 적용하지 않는다', () => {
+    const wf = read(DEPLOY[0]);
+    const name = '- name: Resolve AI pricing catalog (validate and preserve)';
+    const section = wf.slice(wf.indexOf(name), wf.indexOf('\n    - name:', wf.indexOf(name) + name.length));
+    assert.match(section, /if: inputs\.migrate_only != 'true'/);
+    assert.match(section, /OPTENV_AI_PRICING_CATALOG: \$\{\{ vars\.AI_PRICING_CATALOG \}\}/);
+    assert.match(section, /--names AI_PRICING_CATALOG --require-current true --require-plain true/);
+    assert.match(section, /node --import tsx apps\/api-server\/src\/scripts\/ai-pricing-environment\.ts/);
+    assert.ok(wf.indexOf('- name: Set up Cloud SDK') < wf.indexOf(name));
+    assert.ok(wf.indexOf(name) < wf.indexOf('- name: Build and Push Docker image'));
+    assert.ok(wf.indexOf(name) < wf.indexOf('- name: Run database migrations'));
+    assert.doesNotMatch(section, /inputPerMillion|outputPerMillion|GEMINI_API_KEY|OPENAI_API_KEY/);
+  });
+  it('현재 조회와 validator의 서로 다른 입력/출력 파일을 사용하고 검증한 NUL flag만 deploy에 넣는다', () => {
+    const wf = read(DEPLOY[0]);
+    assert.match(wf, /--out "\$RUNNER_TEMP\/ai-pricing-candidate"/);
+    assert.match(wf, /--input "\$RUNNER_TEMP\/ai-pricing-candidate" --out "\$RUNNER_TEMP\/ai-pricing-env"/);
+    const deploy = /- name: Deploy to Cloud Run([\s\S]*?)(?=\n {4}- name:)/.exec(wf)?.[1] ?? '';
+    assert.match(deploy, /mapfile -d '' AI_PRICING_ENV < "\$RUNNER_TEMP\/ai-pricing-env"/);
+    assert.match(deploy, /gcloud run deploy[\s\S]*"\$\{AI_PRICING_ENV\[@\]\}"/);
+    assert.doesNotMatch(deploy, /AI_PRICING_CATALOG=\$\{\{/);
+  });
+});
+
 describe('상담 정리 운영 설정은 기존 verified API 배포 경로에서만 연결한다', () => {
   it('현재 중지 설정을 조회해 보존하고 조회 실패면 배포를 멈춘다', () => {
     const wf = read(DEPLOY[0]);

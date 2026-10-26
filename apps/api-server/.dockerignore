@@ -13,6 +13,8 @@
 # - migrate.js: Migration CLI entry (Cloud Run Job)
 !dist/main.js
 !dist/main.js.map
+# Bounded product correction Job entry (copied by Dockerfile)
+!dist/product-correction-worker.js
 !dist/migrate.js
 !dist/migrate.js.map
 

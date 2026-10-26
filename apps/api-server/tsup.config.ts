@@ -50,9 +50,9 @@ const jsToTsPlugin: Plugin = {
  * - Output ESM format for Node.js 22+
  */
 export default defineConfig({
-  // Bundle main.ts (API server) and migrate.ts (migration CLI)
-  // Separate entry points - Service vs Job in Cloud Run
-  entry: ['src/main.ts', 'src/migrate.ts', 'src/scripts/provision-test-cooperative.ts'],
+  // Separate API server, migration CLI, provisioning and bounded correction worker entries.
+  // The correction worker is not the migration job and does not start an HTTP server.
+  entry: ['src/main.ts', 'src/migrate.ts', 'src/scripts/provision-test-cooperative.ts', 'src/product-correction-worker.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',
