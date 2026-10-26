@@ -90,6 +90,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   const [defaultLocale, setDefaultLocale] = useState<StoreMlcLocale>('ko');
 
   const [activeLocale, setActiveLocale] = useState<StoreMlcLocale>('ko');
+  const [requestedLocale] = useState(() => searchParams.get('locale'));
   const [drafts, setDrafts] = useState<Record<string, PageDraft>>({});
   const [productEvidence, setProductEvidence] = useState<ProductEvidenceSelection | null>(null);
 
@@ -109,8 +110,9 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
       next[loc] = draftFromPage(g.pages.find((p) => p.locale === loc));
     }
     setDrafts(next);
-    setActiveLocale(g.defaultLocale);
-  }, []);
+    const requestedPage = g.pages.find(p => p.locale === requestedLocale);
+    setActiveLocale(requestedPage?.locale ?? g.defaultLocale);
+  }, [requestedLocale]);
 
   const verifyGroup = useCallback((value: StoreMlcGroupDetail) => {
     if (!value?.id || value.targetKind !== targetKind || value.targetId !== targetId || !Array.isArray(value.pages))

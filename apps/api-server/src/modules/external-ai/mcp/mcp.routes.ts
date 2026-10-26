@@ -31,20 +31,30 @@ const descriptions: Record<ToolName, string> = {
     "내 비공개 문서·상품 설명서·사업 자료·게시글 초안을 수정합니다. 최신 revision이 필요하며 공개/검수 중인 문서는 수정하지 않습니다.",
   get_content_draft:
     "내 저장 결과와 최신 revision, O4O에서 여는 주소를 확인합니다.",
+  get_product_content:
+    "내 매장 상품별·언어별 콘텐츠 페이지를 읽고 상태, 최신 revision, 편집 주소를 확인합니다. contentId는 페이지 id이며 groupId가 아닙니다.",
+  save_product_content_draft:
+    "사용자 요청에 따라 내 매장 상품에 연결된 소비자용 안내 HTML을 기존 다국어 편집기에 비공개 초안으로 저장합니다. 상품 사실과 전문 참고자료를 구분하고 의학적 사실을 추정하지 마세요. search_products의 productId와 source를 사용합니다. 기존 페이지는 덮어쓰지 않으며 공개·QR 생성은 하지 않습니다.",
+  update_product_content_draft:
+    "내 매장의 비공개 상품 안내 HTML 초안만 수정합니다. get_product_content의 최신 revision이 필요합니다. 상품·언어를 바꾸거나 공개/사용 중인 자료를 수정하지 않습니다.",
 };
 const recovery: Record<string, string> = {
   DESTINATION_FORBIDDEN:
     "list_workspaces의 destinations에 표시된 저장처를 선택하세요.",
   PRODUCT_LINK_NOT_SUPPORTED:
-    "이 저장처는 상품 연결 필드를 지원하지 않습니다. 상품 사실은 본문에 출처와 함께 작성하세요.",
+    "이 저장처는 상품 연결 필드를 지원하지 않습니다. 매장 상품별 소비자 안내는 save_product_content_draft를 사용하고, 일반 문서는 상품 사실을 본문에 출처와 함께 작성하세요.",
   CONTENT_CONFLICT:
-    "get_content_draft로 최신 내용과 revision을 조회한 뒤 사용자의 수정 의도를 확인해 다시 저장하세요.",
+    "일반 초안은 get_content_draft, 상품별 콘텐츠는 get_product_content로 최신 내용과 revision을 조회한 뒤 사용자의 수정 의도를 확인해 다시 저장하세요.",
+  PRODUCT_CONTENT_ALREADY_EXISTS:
+    "상품 조회 결과의 productContents에서 기존 페이지 id를 확인하고 get_product_content로 읽은 뒤, 비공개 HTML 초안이면 최신 revision으로 update_product_content_draft를 사용하세요.",
+  SERVICE_FEATURE_REQUIRED:
+    "해당 매장의 기존 다국어 콘텐츠 업무 이용 자격을 O4O에서 확인하세요. 외부 AI 연결 동의와 업무 기능 이용 자격은 별개입니다.",
   DESCRIPTION_ALREADY_EXISTS_USE_UPDATE:
     "get_product_context에서 기존 작업행을 확인하고 draft인 경우에만 최신 revision으로 수정하세요.",
   MASTER_NOT_LINKED:
     "상품 정본에 연결되지 않았습니다. 사용자에게 자료함 문서(library_document)로 저장할지 확인하세요.",
   CONTENT_NOT_EDITABLE:
-    "공개되었거나 검수 중인 자료입니다. 기존 O4O 화면에서 상태를 확인하세요.",
+    "공개·검수·사용 중이거나 외부 수정이 허용되지 않는 자료입니다. 기존 O4O 화면에서 상태와 형식을 확인하세요.",
   EXTERNAL_AI_DISABLED: "현재 해당 연결 또는 기능이 중지되어 있습니다.",
   WORKSPACE_FORBIDDEN:
     "이 작업공간을 이용할 권한이 없습니다. list_workspaces에서 현재 허용 공간을 확인하세요.",
@@ -142,7 +152,9 @@ export function createMcpRouter(
             inputSchema: toolSchemas[name].shape as ZodRawShape,
             annotations: {
               readOnlyHint: !writeTools.has(name),
-              destructiveHint: name === "update_content_draft",
+              destructiveHint:
+                name === "update_content_draft" ||
+                name === "update_product_content_draft",
               idempotentHint: true,
               openWorldHint: false,
             },

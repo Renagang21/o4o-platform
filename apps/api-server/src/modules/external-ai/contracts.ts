@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  STORE_PRODUCT_CONTENT_LOCALES,
+  STORE_PRODUCT_TARGET_KINDS,
+} from "../../services/store/store-product-content.service.js";
 
 export const scopes = ["o4o:read", "o4o:draft:write"] as const;
 export const targetKinds = [
@@ -50,6 +54,7 @@ export interface Workspace {
   kind: (typeof targetKinds)[number];
   destinations?: string[];
   products?: boolean;
+  productContentTools?: string[];
   writable: boolean;
 }
 export interface Connection {
@@ -145,6 +150,40 @@ export const updateInput = contentInput
   .extend({ ...body, expectedRevision: z.string().min(1).max(100) })
   .omit({ language: true })
   .strict();
+export const productContentInput = workspaceInput
+  .extend({
+    contentId: z
+      .string()
+      .uuid()
+      .describe("상품별 콘텐츠 페이지의 id. groupId와 다릅니다."),
+  })
+  .strict();
+export const saveProductContentInput = workspaceInput
+  .extend({
+    productId: productInput.shape.productId,
+    productSource: z
+      .enum(STORE_PRODUCT_TARGET_KINDS)
+      .describe("search_products가 반환한 source(local/listing)"),
+    language: z.enum(STORE_PRODUCT_CONTENT_LOCALES).default("ko"),
+    contentKey: z.string().trim().min(1).max(80).default("default"),
+    title: body.title.unwrap(),
+    content: body.content,
+    requestId: body.requestId,
+  })
+  .strict();
+export const updateProductContentInput = productContentInput
+  .extend({
+    title: body.title.unwrap(),
+    content: body.content,
+    expectedRevision: z.string().min(1).max(100),
+    requestId: body.requestId,
+  })
+  .strict();
+export const productContentTools = new Set<string>([
+  "get_product_content",
+  "save_product_content_draft",
+  "update_product_content_draft",
+]);
 export const toolSchemas = {
   list_workspaces: z.object({}).strict(),
   search_products: searchInput,
@@ -154,9 +193,14 @@ export const toolSchemas = {
   save_content_draft: saveInput,
   update_content_draft: updateInput,
   get_content_draft: contentInput,
+  get_product_content: productContentInput,
+  save_product_content_draft: saveProductContentInput,
+  update_product_content_draft: updateProductContentInput,
 };
 export type ToolName = keyof typeof toolSchemas;
 export const writeTools = new Set<ToolName>([
   "save_content_draft",
   "update_content_draft",
+  "save_product_content_draft",
+  "update_product_content_draft",
 ]);
