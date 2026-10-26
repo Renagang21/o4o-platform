@@ -7,7 +7,7 @@ import { RetiredServiceNotice, StoreAgreementGate, useRetiredOnlyStore, StoreWor
 
 const SOURCES = [
   ['content', '일반 콘텐츠'], ['supplier-library', '공급자 공개 자료'],
-  ['multilingual-product-contents', '다국어 상품 안내'], ['blog', '블로그'], ['pop', 'POP'],
+  ['multilingual-product-contents', '다국어 상품 안내'], ['pop', 'POP'],
   ['qr', 'QR 자료'], ['video', '동영상'], ['signage', '사이니지'], ['screen-set', '태블릿 화면'],
 ];
 

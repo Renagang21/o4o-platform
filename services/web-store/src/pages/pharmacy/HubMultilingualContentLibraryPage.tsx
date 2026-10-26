@@ -84,7 +84,7 @@ function HubLibrarySession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>
       <header className="mb-6 pb-5 border-b-2 border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900">제공 자료 다국어 상품 콘텐츠</h1>
         {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 사본 정책 안내 표준화.
-            ⚠ 다른 HUB 자원(블로그/POP/QR/동영상/사이니지)과 정책이 다르다 —
+            ⚠ 다른 HUB 자원(POP/QR/동영상/사이니지)과 정책이 다르다 —
             backend import 가 (organization_id, target_kind, target_id, content_key) 기준
             ON CONFLICT DO UPDATE 이므로 **새 사본이 아니라 기존 사본을 덮어쓴다**.
             따라서 "새 사본이 생성됩니다" 문구를 쓰지 않는다. */}

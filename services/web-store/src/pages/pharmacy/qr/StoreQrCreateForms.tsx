@@ -17,8 +17,6 @@ const ASSET_TYPE_LABELS: Record<string, string> = {
   file: "파일",
   content: "콘텐츠",
   "external-link": "외부 링크",
-  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 대상 배지
-  blog: "블로그",
   // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 배지
   mlc: "다국어 제품",
 };

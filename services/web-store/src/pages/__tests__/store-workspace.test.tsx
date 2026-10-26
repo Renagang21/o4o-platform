@@ -309,10 +309,10 @@ it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고
   </Routes></MemoryRouter>);
   await screen.findByRole('heading', {name:'저장한 안내 목록'});
   expect(screen.getByRole('link', { name: '상품에서 만들기' }).getAttribute('href')).toBe(base + '/my-products');
-  expect(screen.getByRole('link', {name:'블로그'}).closest('details')?.open).toBe(false);
+  expect(screen.queryByRole('link', {name:'블로그'})).toBeNull();
   expect(screen.getByRole('heading', {name:'저장한 안내 목록'})).toBeTruthy();
   fireEvent.click(screen.getByText('전체 업무'));
-  expect(screen.getByRole('link', { name: '블로그' }).getAttribute('href')).toBe(base + '/content/blog');
+  expect(screen.queryByRole('link', { name: '블로그' })).toBeNull();
   fireEvent.click(screen.getByRole('link', { name: '매장 운영' }));
   expect(screen.queryByText('준비 중')).toBeNull();
   expect(await screen.findByRole('heading', {name:'매장 운영'})).toBeTruthy();

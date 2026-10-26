@@ -205,8 +205,8 @@ export async function saveMaterial(
   const response = record
     ? await updateStoreExecutionAsset(record.id, {
         ...payload,
-        // Unknown legacy categories remain untouched; a cleared known chip is explicit.
-        ...(draft.category === null && PRODUCTION_TARGET_CATALOG.some(item => item.key === record.category)
+        // Retired blog materials still support clearing their known category; unrelated legacy values stay untouched.
+        ...(draft.category === null && (record.category === "blog" || PRODUCTION_TARGET_CATALOG.some(item => item.key === record.category))
           ? { category: null } : {}),
       })
     : await createStoreExecutionAsset({
