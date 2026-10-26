@@ -1,4 +1,10 @@
 import { randomUUID } from "node:crypto";
+import { PersonalMailToolService } from "../../personal-mail/tool.service.js";
+import {
+  mailToolSchemas,
+  type MailToolName,
+} from "../../personal-mail/contracts.js";
+import type { ProviderFactory } from "../../personal-mail/accounts.js";
 import type { DataSource } from "typeorm";
 import { InvalidTokenError } from "@modelcontextprotocol/sdk/server/auth/errors.js";
 import {
@@ -24,6 +30,7 @@ export class ExternalAiToolService {
   constructor(
     readonly db: DataSource,
     webOrigin: URL,
+    readonly mailProviderFactory?: ProviderFactory,
   ) {
     this.registry = new AdapterRegistry(db, webOrigin);
   }
@@ -32,6 +39,11 @@ export class ExternalAiToolService {
     raw: unknown,
     connectionId: string,
   ): Promise<unknown> {
+    if (Object.prototype.hasOwnProperty.call(mailToolSchemas, name))
+      return new PersonalMailToolService(
+        this.db,
+        this.mailProviderFactory,
+      ).execute(name as MailToolName, raw, connectionId);
     const parsed = toolSchemas[name].safeParse(raw);
     if (!parsed.success) throw new ExternalAiError("INVALID_TOOL_INPUT");
     const productContent = productContentTools.has(name);
@@ -43,7 +55,12 @@ export class ExternalAiToolService {
       write = writeTools.has(name);
     try {
       return await this.db.transaction(async (db) => {
-        const settings = await assertEnabled(db, write, true);
+        const settings = await assertEnabled(
+          db,
+          write,
+          true,
+          name === "list_workspaces" ? "any" : "content",
+        );
         const connection = await loadConnection(db, connectionId, true);
         if (
           !connection.scopes.includes("o4o:read") ||
