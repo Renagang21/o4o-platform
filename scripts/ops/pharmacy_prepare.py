@@ -202,7 +202,7 @@ def main():
             source, api.request('GET', revision_url), api.request('GET', f'{NEG}/neg-{OLD}'),
             api.request('GET', f'{BACKEND}/backend-{OLD}'),
             api.request('GET', f'{COMPUTE}/global/urlMaps/o4o-global-lb'),
-            api.request('GET', f'{RUN}/{OLD}:getIamPolicy'),
+            api.request('GET', f'https://run.googleapis.com/v1/projects/{PROJECT}/locations/{REGION}/services/{OLD}:getIamPolicy'),
         )
         if args.mode == 'prepare' and fingerprint != args.expected_plan:
             raise ValueError('Live source changed since review; run plan again')
