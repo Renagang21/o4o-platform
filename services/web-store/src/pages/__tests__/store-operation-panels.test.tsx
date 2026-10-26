@@ -24,7 +24,7 @@ vi.mock("../../api/storeHub", () => ({ updateStoreSlug: mocks.update }));
 afterEach(cleanup);
 beforeEach(() => vi.clearAllMocks());
 
-it.each(["B2C", "TABLET"] as const)(
+it.each(["TABLET"] as const)(
   "공개 %s 주소가 작업 호스트를 가리키지 않는다",
   (channelType) => {
     render(
@@ -41,9 +41,7 @@ it.each(["B2C", "TABLET"] as const)(
     expect(
       screen.getByRole("link", { name: "열기" }).getAttribute("href"),
     ).toBe(
-      channelType === "B2C"
-        ? "https://pharmacy.neture.co.kr/store/sample-slug/blog"
-        : "https://pharmacy.neture.co.kr/tablet/sample-slug",
+      "https://pharmacy.neture.co.kr/tablet/sample-slug",
     );
     expect(
       (screen.getByRole("button", { name: "주소 변경" }) as HTMLButtonElement)
@@ -58,7 +56,7 @@ it("주소 저장 실패는 공개 URL을 바꾸지 않고 수정 입력을 유�
   render(
     <MemoryRouter>
       <ChannelPublicUrlCard
-        channelType="B2C"
+        channelType="TABLET"
         orgCode="original"
         canChangeSlug
         showToast={notify}
@@ -303,4 +301,12 @@ it("닫힌 태블릿 영상 대화상자는 열었던 버튼으로 포커스를 
   fireEvent.click(close);
   expect(screen.queryByRole("dialog")).toBeNull();
   expect(document.activeElement).toBe(trigger);
+});
+
+it.each([null, "sample-slug"])("종료된 블로그 공개 링크와 주소 복사는 제공하지 않는다: %s", orgCode => {
+  render(<MemoryRouter><ChannelPublicUrlCard channelType="B2C" orgCode={orgCode} canChangeSlug showToast={vi.fn()} onSlugChanged={vi.fn()} /></MemoryRouter>);
+  expect(screen.getByText(/블로그 관리 기능은 종료/)).toBeTruthy();
+  expect(screen.queryByRole("link", { name: "열기" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "복사" })).toBeNull();
+  expect(screen.getByRole("link", { name: "이동" }).getAttribute("href")).toBe("/store/marketing/qr");
 });

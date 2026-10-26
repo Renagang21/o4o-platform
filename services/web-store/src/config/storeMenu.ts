@@ -28,7 +28,6 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '매장 경영지원', items: [
       { key: 'product-descriptions', label: '상품 설명',       subPath: '/marketing/product-descriptions' },
-      { key: 'content-blog',         label: '블로그',          subPath: '/content/blog' },
       { key: 'pop',                  label: 'POP',             subPath: '/marketing/pop-v2' },
       { key: 'qr',                   label: 'QR-code',         subPath: '/marketing/qr' },
       { key: 'tablet-displays',      label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },

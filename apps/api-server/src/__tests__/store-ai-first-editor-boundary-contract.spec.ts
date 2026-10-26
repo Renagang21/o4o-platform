@@ -28,7 +28,6 @@ const TOOLBAR = 'packages/content-editor/src/components/Toolbar.tsx';
 const STORE_DIRECT_CONSUMERS = [
   // Store (store.neture.co.kr — WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면 제거 후 정본)
   'services/web-store/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
-  'services/web-store/src/pages/pharmacy/PharmacyBlogPage.tsx',
   'services/web-store/src/pages/pharmacy/PharmacyPopPage.tsx',
   'services/web-store/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
   'services/web-store/src/pages/pharmacy/StoreContentEditPage.tsx',

@@ -40,7 +40,6 @@ const commerceKeys = new Set([
 ]);
 const studioKeys = new Set([
   "product-descriptions",
-  "content-blog",
   "pop",
   "qr",
   "tablet-displays",
@@ -259,7 +258,6 @@ export function workspaceGroups(
                 "signage-playlist",
                 "signage-videos",
                 "pop",
-                "content-blog",
               ],
             ),
           ]

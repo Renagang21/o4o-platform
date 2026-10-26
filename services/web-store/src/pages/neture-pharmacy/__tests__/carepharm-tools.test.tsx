@@ -36,9 +36,10 @@ it('connects actual supply, material, production and order routes without unplan
   expect(screen.getByRole('link', { name: '회원자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents?business=carepharm');
   expect(screen.getByRole('link', { name: material.title }).getAttribute('href')).toBe('/store/pharmacy/contents?business=carepharm&content=material-a');
   expect(state.list).toHaveBeenCalledWith({ sf: 'carepharm', page: 1, limit: 3 });
-  for (const [name, href] of [['POP 만들기', '/store/marketing/pop-v2'], ['정보 QR 관리', '/store/marketing/qr'], ['블로그 만들기', '/store/content/blog'], ['내 자료함 · 편집', '/store/library/contents']]) {
+  for (const [name, href] of [['POP 만들기', '/store/marketing/pop-v2'], ['정보 QR 관리', '/store/marketing/qr'], ['내 자료함 · 편집', '/store/library/contents']]) {
     expect(screen.getByRole('link', { name }).getAttribute('href')).toBe(href);
   }
+  expect(screen.queryByRole('link', { name: '블로그 만들기' })).toBeNull();
   expect(screen.queryByText(/CGM|무료혈당기|Study|상담/)).toBeNull();
 });
 it('discards an old pharmacy late response during a store switch', async () => {

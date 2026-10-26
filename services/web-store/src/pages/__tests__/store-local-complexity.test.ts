@@ -59,7 +59,7 @@ describe("QR authoring payload preserves source contracts", () => {
       expect(payload.libraryItemId).toBeUndefined();
     },
   );
-  it.each(["blog", "mlc"] as const)(
+  it.each(["mlc"] as const)(
     "%s keeps the public URL and excludes page-only consultation options",
     (source) => {
       const payload = buildLibraryQrPayload({

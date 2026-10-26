@@ -1090,7 +1090,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       ) : null)}
 
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1:
-          블로그 카드 섹션 제거. 블로그는 콘텐츠 채널로 별도 메뉴(/store/content/blog)에서 관리. */}
+          블로그 기능은 종료되어 별도 관리 진입을 제공하지 않는다. */}
 
       {/* ─── Add Product Modal ───────────────────── */}
       {currentChannel && (

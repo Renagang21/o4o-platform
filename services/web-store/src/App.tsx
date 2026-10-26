@@ -79,7 +79,6 @@ const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletD
 const TabletRequestsPage = named(() => import('./pages/pharmacy/TabletRequestsPage'), 'TabletRequestsPage');
 const MarketingAnalyticsPage = named(() => import('./pages/pharmacy/MarketingAnalyticsPage'), 'MarketingAnalyticsPage');
 const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
-const PharmacyBlogPage = named(() => import('./pages/pharmacy/PharmacyBlogPage'), 'PharmacyBlogPage');
 const PharmacyPopPage = named(() => import('./pages/pharmacy/PharmacyPopPage'), 'PharmacyPopPage');
 const PharmacyVideoPage = named(() => import('./pages/pharmacy/PharmacyVideoPage'), 'PharmacyVideoPage');
 const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
@@ -103,7 +102,6 @@ const ForeignVisitorPartnerQrCodesPage = named(() => import('./pages/pharmacy/Fo
 // ── 매장 HUB ─────────────────────────────────────────────────────────────────
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
 const HubContentLibraryPage = named(() => import('./pages/pharmacy/HubContentLibraryPage'), 'HubContentLibraryPage');
-const HubBlogLibraryPage = named(() => import('./pages/pharmacy/HubBlogLibraryPage'), 'HubBlogLibraryPage');
 const HubPopLibraryPage = named(() => import('./pages/pharmacy/HubPopLibraryPage'), 'HubPopLibraryPage');
 const HubQrLibraryPage = named(() => import('./pages/pharmacy/HubQrLibraryPage'), 'HubQrLibraryPage');
 const HubVideoLibraryPage = named(() => import('./pages/pharmacy/HubVideoLibraryPage'), 'HubVideoLibraryPage');
@@ -190,7 +188,7 @@ function storeChildRoutes() {
         <Route path="library/production-materials/new" element={<Navigate to={`${S}/library/contents`} replace />} />
         <Route path="library/production-materials/:id/edit" element={<ProductionMaterialEditorPage />} />
         <Route path="content" element={<StoreAssetsPage />} />
-        <Route path="content/blog" element={<PharmacyBlogPage />} />
+        <Route path="content/blog" element={<Navigate to={`${S}/library/contents`} replace />} />
         <Route path="content/pop" element={<PharmacyPopPage />} />
         <Route path="content/video" element={<PharmacyVideoPage />} />
         <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
@@ -318,7 +316,7 @@ export function WorkspaceApp() {
         <Route path="cart" element={<Navigate to={`${S}${PP.cart}`} replace />} />
         <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
         <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />
-        <Route path="blog" element={<HubBlogLibraryPage />} />
+        <Route path="blog" element={<Navigate to={`${S}/library/contents`} replace />} />
         <Route path="pop" element={<HubPopLibraryPage />} />
         <Route path="qr" element={<HubQrLibraryPage />} />
         <Route path="video" element={<HubVideoLibraryPage />} />
@@ -341,7 +339,7 @@ function LegacyHubRedirect() {
   const { pathname, search, hash } = useLocation();
   const rest = pathname.replace(/^\/(?:store-hub|hub)\/?/, '');
   const destinations: Record<string, string> = { b2b: `${S}${PP.supply}`, 'event-offers': `${S}${PP.supply}`, cart: `${S}${PP.cart}` };
-  const sources = ['content', 'supplier-library', 'multilingual-product-contents', 'blog', 'pop', 'qr', 'video', 'signage', 'screen-set'];
+  const sources = ['content', 'supplier-library', 'multilingual-product-contents', 'pop', 'qr', 'video', 'signage', 'screen-set'];
   const destination = destinations[rest] || (sources.includes(rest.split('/')[0]) ? `${S}/library/${rest}` : `${S}${PP.contents}`);
   return <Navigate to={`${destination}${search}${hash}`} replace />;
 }
