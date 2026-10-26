@@ -767,6 +767,7 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
  * **어떤 package 를 쓰는지는 절대 적지 않는다.** 의존성은 workspace graph 가 정본이다.
  */
 export const WEB_SERVICES = [
+  { key: 'partner', dir: 'services/web-partner' },
   { key: 'neture', dir: 'services/web-neture' },
   { key: 'kpa-society', dir: 'services/web-kpa-society' },
   { key: 'lecture', dir: 'services/web-lecture' },
