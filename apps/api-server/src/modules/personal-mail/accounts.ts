@@ -98,7 +98,7 @@ export async function mailWorkspaces(db: MailDb, userId: string) {
 }
 export class MailAccountService {
   constructor(
-    readonly db: DataSource,
+    readonly db: DataSource | EntityManager,
     readonly factory: ProviderFactory = defaultProvider,
   ) {}
   async list(userId: string) {

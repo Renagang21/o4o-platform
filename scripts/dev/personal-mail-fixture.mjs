@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import { once } from "node:events";
 import express from "express";
+import { DataSource } from "typeorm";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { MailAccountService } from "../../apps/api-server/dist/modules/personal-mail/accounts.js";
 import { MailJobService } from "../../apps/api-server/dist/modules/personal-mail/jobs.js";
 import { PersonalMailWorker } from "../../apps/api-server/dist/modules/personal-mail/worker.js";
+import { PersonalMailToolService } from "../../apps/api-server/dist/modules/personal-mail/tool.service.js";
 import { MailError } from "../../apps/api-server/dist/modules/personal-mail/contracts.js";
 import { createPersonalMailRoutes } from "../../apps/api-server/dist/modules/personal-mail/routes.js";
 import { createExternalAiRoutes } from "../../apps/api-server/dist/modules/external-ai/external-ai.routes.js";
@@ -531,15 +533,13 @@ export async function runPersonalMailChecks({ db, check }) {
           );
           await confirm(original);
           for (const suffix of ["1", "2"])
-            remote
-              .get(a.id)
-              .set(`${change}-${suffix}`, {
-                id: `${change}-${suffix}`,
-                sender,
-                receivedAt: new Date(Date.now() + 1000),
-                important: false,
-                inbox: true,
-              });
+            remote.get(a.id).set(`${change}-${suffix}`, {
+              id: `${change}-${suffix}`,
+              sender,
+              receivedAt: new Date(Date.now() + 1000),
+              important: false,
+              inbox: true,
+            });
           await db.query(
             "UPDATE personal_mail_accounts SET next_sync_at=now() WHERE id=$1",
             [a.id],
@@ -597,6 +597,128 @@ export async function runPersonalMailChecks({ db, check }) {
             assert.equal(job.lastError, "MAIL_RULE_CHANGED");
             assert.equal(job.counts.pending, 0);
           }
+        }
+      },
+    );
+    await check(
+      "automatic backlog cannot block new user rules; manual proposal quota still applies",
+      async () => {
+        const backlog = Array.from({ length: 50 }, () => randomUUID());
+        await db.query(
+          `INSERT INTO personal_mail_jobs(id,account_id,user_id,request_id,fingerprint,kind,action,status,generation,total,confirmed_at,confirmation_expires_at)
+          SELECT ids.id,a.id,a.user_id,ids.id,repeat('a',64),'automatic','archive','paused',a.generation,1,now(),now() FROM personal_mail_accounts a CROSS JOIN unnest($2::uuid[]) ids(id) WHERE a.id=$1`,
+          [a.id, backlog],
+        );
+        const input = {
+          accountId: a.id,
+          senders: ["quota@example.invalid"],
+          action: "keep",
+          category: "general",
+          requestId: randomUUID(),
+        };
+        let extraAccount;
+        try {
+          const rule = await jobs.prepare(user, input, "rule");
+          assert.equal(rule.status, "preview");
+          const cleanup = await jobs.prepare(
+            user,
+            {
+              ...input,
+              senders: ["notice@example.invalid"],
+              action: "important",
+              includeImportant: true,
+              requestId: randomUUID(),
+            },
+            "cleanup",
+          );
+          assert.equal(cleanup.status, "preview");
+          const [{ n }] = await db.query(
+            "SELECT count(*)::int AS n FROM personal_mail_jobs WHERE user_id=$1 AND kind<>'automatic' AND status IN ('preview','pending','running','paused','failed')",
+            [user],
+          );
+          assert.ok(n < 49);
+          await db.query(
+            "UPDATE personal_mail_jobs SET kind='cleanup' WHERE id=ANY($1::uuid[])",
+            [backlog.slice(0, 49 - n)],
+          );
+          extraAccount = await accounts.save(
+            user,
+            "gmail",
+            "quota-extra@example.invalid",
+            { accessToken: randomUUID() },
+          );
+          const proposals = await Promise.allSettled([
+            jobs.prepare(user, { ...input, requestId: randomUUID() }, "rule"),
+            jobs.prepare(
+              user,
+              { ...input, accountId: extraAccount.id, requestId: randomUUID() },
+              "rule",
+            ),
+          ]);
+          assert.equal(
+            proposals.filter((p) => p.status === "fulfilled").length,
+            1,
+          );
+          assert.equal(
+            proposals.find((p) => p.status === "rejected").reason.code,
+            "MAIL_JOB_LIMIT",
+          );
+          assert.equal(
+            (
+              await db.query(
+                "SELECT count(*)::int AS n FROM personal_mail_jobs WHERE user_id=$1 AND kind<>'automatic' AND status IN ('preview','pending','running','paused','failed')",
+                [user],
+              )
+            )[0].n,
+            50,
+          );
+        } finally {
+          if (extraAccount) await accounts.disconnect(user, extraAccount.id);
+          await db.query(
+            "DELETE FROM personal_mail_jobs WHERE id=ANY($1::uuid[])",
+            [backlog],
+          );
+        }
+      },
+    );
+    await check(
+      "concurrent mail tools reuse one pooled connection including nested writes and body reads",
+      async () => {
+        const single = new DataSource({
+          ...db.options,
+          extra: { ...db.options.extra, max: 1, connectionTimeoutMillis: 1500 },
+          synchronize: false,
+          migrationsRun: false,
+          installExtensions: false,
+        });
+        await single.initialize();
+        try {
+          const tools = new PersonalMailToolService(single, factory);
+          const results = await Promise.all([
+            tools.execute("list_mail_accounts", {}, g.id),
+            tools.execute("list_mail_rules", { accountId: a.id }, g.id),
+            tools.execute(
+              "prepare_mail_rule",
+              {
+                accountId: a.id,
+                senders: ["pooled@example.invalid"],
+                action: "keep",
+                requestId: randomUUID(),
+              },
+              g.id,
+            ),
+            tools.execute(
+              "get_mail_message",
+              { accountId: a.id, messageId: "m2" },
+              g.id,
+            ),
+          ]);
+          assert.equal(results.length, 4);
+          assert.equal(results[2].status, "preview");
+          assert.equal(typeof results[3].text, "string");
+          assert.ok(single.driver.master.totalCount <= 1);
+        } finally {
+          await single.destroy();
         }
       },
     );

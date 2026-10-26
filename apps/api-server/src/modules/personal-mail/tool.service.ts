@@ -36,8 +36,8 @@ export class PersonalMailToolService {
         mailWriteTools.has(name),
         name === "get_mail_message",
       );
-      const accounts = new MailAccountService(this.db, this.factory),
-        jobs = new MailJobService(this.db),
+      const accounts = new MailAccountService(db, this.factory),
+        jobs = new MailJobService(db),
         userId = connection.userId;
       switch (name) {
         case "list_mail_accounts":

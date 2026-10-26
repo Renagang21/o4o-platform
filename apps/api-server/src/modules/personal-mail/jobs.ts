@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { DataSource } from "typeorm";
+import type { DataSource, EntityManager } from "typeorm";
 import { recordOperation } from "../../services/operations/operation-audit.js";
 import { ownedAccount, mailConfirmUrl, type MailDb } from "./accounts.js";
 import { confirmationToken, validConfirmation } from "./credentials.js";
@@ -90,7 +90,7 @@ export interface ProposalInput {
   category?: string;
 }
 export class MailJobService {
-  constructor(readonly db: DataSource) {}
+  constructor(readonly db: DataSource | EntityManager) {}
   async messages(userId: string, accountId: string, sender?: string, page = 1) {
     await ownedAccount(this.db, userId, accountId);
     return this.db.query(
@@ -143,8 +143,9 @@ export class MailJobService {
     sourceConnectionId: string | null = null,
   ) {
     return this.db.transaction(async (db) => {
+      // One user's request deduplication and proposal quota also span different connected accounts.
       await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
-        `mail-request:${userId}:${input.requestId}`,
+        `mail-proposals:${userId}`,
       ]);
       const account = await ownedAccount(db, userId, input.accountId, true);
       if (sourceConnectionId) {
@@ -189,7 +190,7 @@ export class MailJobService {
         return describeJob(db, existing);
       }
       const [{ count }] = await db.query(
-        "SELECT count(*)::int AS count FROM personal_mail_jobs WHERE user_id=$1 AND status IN ('preview','pending','running','paused','failed')",
+        "SELECT count(*)::int AS count FROM personal_mail_jobs WHERE user_id=$1 AND kind<>'automatic' AND status IN ('preview','pending','running','paused','failed')",
         [userId],
       );
       if (count >= 50) throw new MailError("MAIL_JOB_LIMIT", 429);

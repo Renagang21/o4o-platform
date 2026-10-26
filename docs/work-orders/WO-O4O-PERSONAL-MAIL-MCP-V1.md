@@ -38,8 +38,10 @@
 
 ## 4. 개발 결과와 인계
 
-[검증 기록](../checks/CHECK-O4O-PERSONAL-MAIL-MCP-V1.md)에 명령·시험 환경·실패 보완·검증 한계를 모았다. 기존 콘텐츠 69개와 메일 30개 통합 시험, API 53개·UI 22개, 별도 desktop/mobile Chromium 2개를 통과했다. 브라우저는 격리 인증 fixture이며 실제 O4O/ChatGPT 로그인이나 Gmail·네이버 승인 완료를 뜻하지 않는다.
+[검증 기록](../checks/CHECK-O4O-PERSONAL-MAIL-MCP-V1.md)에 명령·시험 환경·실패 보완·검증 한계를 모았다. 기존 콘텐츠 69개와 메일 32개 통합 시험, API 53개·UI 22개, 별도 desktop/mobile Chromium 2개를 통과했다. 브라우저는 격리 인증 fixture이며 실제 O4O/ChatGPT 로그인이나 Gmail·네이버 승인 완료를 뜻하지 않는다.
 
 PR #837 리뷰 후 자동 작업은 실행 직전 현재 규칙 ID·revision·action을 재검증하고 바뀐 권한으로 대기 작업을 실행하지 않도록 보완했다. 별도 승인된 cleanup snapshot은 유지한다. 수신함이 비어도 기존 규칙에서 발신처를 선택해 다시 검토·변경할 수 있다. 두 회귀 시험을 추가했고 신규 worker CLI의 출력도 기존 stdout 규칙에 맞췄다.
+
+재리뷰에서는 자동 backlog와 사용자 제안 한도를 분리하고 사용자 단위 lock으로 복수 계정 동시 요청을 제한했다. 메일 MCP의 내부 업무 서비스는 현재 transaction manager를 재사용한다. 자동 작업 50건이 있는 경우와 연결 1개인 풀에서 동시 조회·제안·본문 읽기를 추가 검증했다.
 
 push 전 최신 `origin/main`과 경로 충돌·migration 순서를 확인한다. 병합 전 작업 branch/worktree는 KEEP이며 main 병합·배포·운영 migration은 실행하지 않는다. 공개 운영 전에 제공자 승인·개인정보 고지, 전용 설정/키와 worker 스케줄, 실계정 연결·해제 검증을 검토한다.

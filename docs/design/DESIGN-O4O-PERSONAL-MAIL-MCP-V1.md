@@ -28,6 +28,8 @@ worker는 DB lease와 항목 transaction으로 중복 실행을 막고, 실패 �
 
 자동 작업은 실제 실행 직전에 현재 계정의 규칙 ID·revision·action을 재검증한다. keep 전환·규칙 수정·규칙 소실 후 대기 중이던 옛 자동 작업은 취소하며, 별도로 건수 확인·승인한 cleanup snapshot은 유지한다. 수신함에 메일이 없어도 기존 규칙 목록에서 다시 선택해 새 승인을 거쳐 변경할 수 있다.
 
+미완료 사용자 제안 50개 한도는 cleanup/rule에 적용하며 자동 실행 backlog는 제외한다. 사용자 단위 advisory lock으로 서로 다른 계정의 동시 제안도 직렬화한다. 메일 MCP 내부의 계정·작업 서비스는 현재 transaction manager를 사용해 권한 lock을 유지하면서 추가 pool 연결을 기다리지 않는다.
+
 ## 3. API·MCP·화면
 
 - 기존 브라우저 인증의 `/api/personal-mail`: 설정 준비 상태, Gmail 연결 시작/완료, 네이버 앱 비밀번호 연결, 계정 조회/해제, 수집·발신처/규칙·작업·본문 조회, preview·승인·중단/재개.
