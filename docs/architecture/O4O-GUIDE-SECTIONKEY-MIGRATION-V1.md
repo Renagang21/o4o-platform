@@ -25,12 +25,12 @@
 
 | 파일 | pageKey |
 |------|---------|
-| `web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx` | `lms.course.editor` |
-| `web-kpa-society/src/pages/signage/PlaylistEditorPage.tsx` | `signage.playlist.manager` |
-| `web-kpa-society/src/pages/contents/ContentWritePage.tsx` | `content.document.editor` |
-| `web-kpa-society/src/pages/resources/ResourceWritePage.tsx` | `content.resource.editor` |
-| `web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` | `store.channel.editor` |
-| `web-kpa-society/src/pages/operator/ForumDeleteRequestsPage.tsx` | `forum.request.management` |
+| `web-pharmacy-business/src/pages/instructor/courses/CourseEditPage.tsx` | `lms.course.editor` |
+| `web-pharmacy-business/src/pages/signage/PlaylistEditorPage.tsx` | `signage.playlist.manager` |
+| `web-pharmacy-business/src/pages/contents/ContentWritePage.tsx` | `content.document.editor` |
+| `web-pharmacy-business/src/pages/resources/ResourceWritePage.tsx` | `content.resource.editor` |
+| `web-pharmacy-business/src/pages/pharmacy/StoreChannelsPage.tsx` | `store.channel.editor` |
+| `web-pharmacy-business/src/pages/operator/ForumDeleteRequestsPage.tsx` | `forum.request.management` |
 
 ### K-Cosmetics (4개)
 

@@ -648,7 +648,7 @@ WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
   사용자에게 부분 실패로 보이지 않도록 **작업대에서 담기 전에 이벤트오퍼 혼재를 차단**한다. 이는 §13-6 의 "frontend 선판단 금지" 에 대한
   **명시적 예외**이며, 자격 판정이 아니라 **축 혼재 방지**다. 서버 판정을 완화하지 않는다.
 
-계약 고정: `services/web-kpa-society/src/utils/worktableCart.ts` +
+계약 고정: `services/web-pharmacy-business/src/utils/worktableCart.ts` +
 `src/utils/__tests__/worktableCart.test.ts` (CI `ci-pipeline.yml` 에서 실행).
 
 ### 13-9. 확정 경로는 **담긴 축**이 결정한다 (2026-09-03)

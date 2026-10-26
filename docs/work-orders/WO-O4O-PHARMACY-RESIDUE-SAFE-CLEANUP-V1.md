@@ -62,3 +62,28 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 - formatter 5 tests PASS: 하위 연결·weighted backend 참조 보존, 불필요한 필드 제외, 불완전 응답 거절, notice round-trip/크기 제한, 입력 형태 검증. 실제 연결 재확인은 main 반영 후 같은 선택 입력으로 실행한다.
 
 - 추가 사전 점검은 기존 WIF ADC를 Google-auth SDK로 사용해 프로젝트 `testIamPermissions`만 호출한다. 토큰 출력·IAM policy 주체 목록 조회·역할 부여는 하지 않는다. 신규 서비스·LB 전환에 필요한 project 범위 권한의 확인/미확인 목록을 출력한다. 이 결과는 resource 조건부·개별 리소스 권한 검증을 대체하지 않는다. formatter5개와 권한 응답 검증2개, 총7개 Python 테스트가 통과했다.
+
+
+## 연속 Phase: 앱 디렉터리·패키지 이름 전환
+
+이 절은 앞 절의 실행 당시 기록을 대체하지 않고 이후 결과를 추가한다. 같은 WO의 연속 Phase로 기존 branch를 유지한다.
+
+- PR #826은 main `7e9c1c99d6`에 병합했고 Promote 40261699942에서 Neture와 약국 앱의 이미지 빌드·smoke·트래픽 전환이 성공했다. 두 공개 도메인의 HTML과 주 JS asset은 200이다. 전체 production 상태의 Partner LEVEL_3 hold는 별개이며 해제하지 않았다.
+- PR #828은 main `792b3d0f6e`에 병합했고 main CI 40262900391이 통과했다. 읽기 전용 인벤토리 40262910814에서 실제 연결을 확인했다: `pharmacy.neture.co.kr` 및 `megapharm.neture.co.kr` → `o4o-global-lb` → `backend-kpa-society-web` → `neg-kpa-society-web` → `kpa-society-web`. 기존 서비스는 삭제 가능한 미사용 자원이 아니다.
+- 기술 이름을 `services/web-pharmacy-business`, `@o4o/web-pharmacy-business`로 정한다. 119개 tracked 앱 파일을 이동하고 Docker·pnpm importer·CI matrix·영향도 detector·테스트의 실제 파일 경로와 현행 안내 링크를 함께 전환한다. 신규 사업 서비스 키를 만드는 변경이 아니다.
+- 소비처 0인 workflow `VITE_KPA_URL`을 제거한다. Cloud Run/이미지/배포 선택 키와 API serviceKey·JWT·membership·역할은 이번 단계에서 유지한다. 일반 소스의 과거 출처 주석과 과거 WO/CHECK는 사실 기록으로 남기므로 KPA literal 전체 0건을 완료 기준으로 삼지 않는다.
+- lockfile은 pnpm으로 재생성한 뒤 무관한 peer snapshot 변경을 제외했다. YAML 구조 비교로 importer 키 이동 외 dependency·snapshot 변경 0을 확인했고 frozen 설치를 다시 통과했다.
+- 권한 사전 점검은 regional serverless NEG에 맞게 `compute.regionNetworkEndpointGroups.*`를 사용한다. zonal `compute.networkEndpointGroups.*` 결과로 regional 권한을 판정하지 않는다. global/regional operation 조회도 확인한다.
+
+### Shared Module Change Verification — 경로 소비처
+
+- shared runtime의 동작·export를 바꾸지 않는다. comment-only 공통 런타임 파일 14개는 원문 유지했다. 변경된 공통 패키지 테스트와 다른 프런트의 상대 import는 이동한 파일의 실제 경로를 가리킨다.
+- 관련 workspace package 빌드와 약국 앱 `tsc + vite build`: PASS. frozen 설치: PASS.
+- 약국 앱 Vitest: 20 files / 148 tests PASS. 변경 경로 소비 API Jest: 21 suites / 505 tests PASS.
+- 변경된 공통 패키지(auth-client/auth-react/operator-core-ui/shared-space-ui) 및 Neture 경로 소비 테스트: 모두 PASS.
+- CI/deploy Node 회귀: 283 PASS. 인벤토리 formatter·권한 응답·regional NEG 계약 Python: 8 PASS.
+- DB 접속·migration·seed·IAM 부여·LB 변경·기존 서비스 삭제는 수행하지 않았다. 새 경로의 CI 이미지 빌드·정상 통합·통제 배포는 아래 후속 실행 결과로 확인한다.
+
+### 남은 운영 기술명 전환
+
+프로젝트 `netureyoutube`, 리전 `asia-northeast3`의 기존 WIF로 읽기와 기존 서비스 배포는 가능하다. 프로젝트 범위 사전 조회에서 신규 backend create/get/update 및 Cloud Run setIamPolicy는 확인되지 않았다. 조건부 리소스 권한 여부는 별도 확인해야 한다. regional NEG 권한은 수정된 점검을 main 반영 후 재조회한다. 신규 서비스·NEG/backend 준비와 최초 공개 invoker 설정, LB 전환·복구 검증을 완료하기 전 기존 활성 자원을 삭제하지 않는다. 기존 WIF에 Owner/Editor를 부여하는 방식으로 해결하지 않는다.

@@ -9,7 +9,7 @@ PERMISSIONS = (
     'run.services.getIamPolicy', 'run.services.setIamPolicy',
     'compute.urlMaps.get', 'compute.urlMaps.update', 'compute.urlMaps.validate',
     'compute.backendServices.create', 'compute.backendServices.get', 'compute.backendServices.update', 'compute.backendServices.delete',
-    'compute.networkEndpointGroups.create', 'compute.networkEndpointGroups.get', 'compute.networkEndpointGroups.delete', 'compute.networkEndpointGroups.use',
+    'compute.regionNetworkEndpointGroups.create', 'compute.regionNetworkEndpointGroups.get', 'compute.regionNetworkEndpointGroups.delete', 'compute.regionNetworkEndpointGroups.use', 'compute.regionOperations.get', 'compute.globalOperations.get',
 )
 
 

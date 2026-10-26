@@ -61,6 +61,13 @@ class PermissionResponseTests(unittest.TestCase):
         self.assertIn('run.services.setIamPolicy', result['missing'])
         self.assertEqual(set(result['granted']) | set(result['missing']), set(self.permissions.PERMISSIONS))
 
+    def test_permissions_target_regional_serverless_negs(self):
+        required = self.permissions.PERMISSIONS
+        self.assertIn('compute.regionNetworkEndpointGroups.create', required)
+        self.assertIn('compute.regionNetworkEndpointGroups.delete', required)
+        self.assertIn('compute.regionOperations.get', required)
+        self.assertFalse(any(item.startswith('compute.networkEndpointGroups.') for item in required))
+
     def test_unrequested_permissions_and_wrong_shapes_are_rejected(self):
         for data in [{'permissions': ['unexpected.permission']}, {'permissions': 'run.services.get'}]:
             with self.subTest(data=data), self.assertRaises(ValueError):

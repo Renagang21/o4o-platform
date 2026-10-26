@@ -39,7 +39,7 @@ jobs:
             --platform linux/amd64 \\
             --build-arg VITE_SERVICE_URL=\${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \\
             --build-arg VITE_UNIFIED_STORE_HANDOFF=\${{ env.VITE_UNIFIED_STORE_HANDOFF }} \\
-            -f services/web-kpa-society/Dockerfile \\
+            -f services/web-pharmacy-business/Dockerfile \\
             .
       - name: Deploy to Cloud Run
         run: |

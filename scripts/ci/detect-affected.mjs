@@ -769,7 +769,7 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
 export const WEB_SERVICES = [
   { key: 'partner', dir: 'services/web-partner' },
   { key: 'neture', dir: 'services/web-neture' },
-  { key: 'kpa-society', dir: 'services/web-kpa-society' },
+  { key: 'kpa-society', dir: 'services/web-pharmacy-business' },
   { key: 'lecture', dir: 'services/web-lecture' },
   { key: 'store', dir: 'services/web-store' },
   { key: 'kpa-branch', dir: 'services/web-kpa-branch' },

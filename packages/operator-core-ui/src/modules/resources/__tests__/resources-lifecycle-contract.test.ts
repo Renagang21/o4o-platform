@@ -66,7 +66,7 @@ describe('default lifecycle = 기존 3 service 현행 behavior (§5)', () => {
   // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA OperatorResourcesPage wrapper 도 제거됐다(default lifecycle 소비 wrapper 0).
   it('옛 KPA 운영자 자료실 wrapper 는 존재하지 않는다', () => {
-    expect(existsSync(resolve(ROOT, 'services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx'))).toBe(false);
+    expect(existsSync(resolve(ROOT, 'services/web-pharmacy-business/src/pages/operator/OperatorResourcesPage.tsx'))).toBe(false);
   });
 });
 

@@ -8,7 +8,7 @@
  *   G5 조회 실패 → 차단 쪽(기존 안내)
  *   helper: next → 링크 매핑 · 응답 형식 검증
  *
- * 실행: 저장소 루트에서 `npx vitest run --config services/web-kpa-society/vitest.config.mjs`
+ * 실행: 저장소 루트에서 `npx vitest run --config services/web-pharmacy-business/vitest.config.mjs`
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';

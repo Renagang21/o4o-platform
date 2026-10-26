@@ -6,7 +6,7 @@
  * - og:url · canonical = pharmacy.neture.co.kr 기준
  * - 사용자 제작 brand asset 은 자리만 — 투입 전에는 참조하지 않는다
  *
- * 실행: 저장소 루트에서 `npx vitest run --config services/web-kpa-society/vitest.config.mjs`
+ * 실행: 저장소 루트에서 `npx vitest run --config services/web-pharmacy-business/vitest.config.mjs`
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import {

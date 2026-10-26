@@ -3,7 +3,7 @@
 > **Status: FROZEN (Aspirational Standard)**
 > **Date: 2026-04-28**
 > **WO: WO-O4O-TABLE-STANDARD-BASELINE-V1**
-> **Reference Implementation: `services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx`**
+> **Reference Implementation: `services/web-pharmacy-business/src/pages/operator/OperatorResourcesPage.tsx`**
 
 ---
 

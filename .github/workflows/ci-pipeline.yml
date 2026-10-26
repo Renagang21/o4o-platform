@@ -321,8 +321,8 @@ jobs:
     # KPA 에도 테스트 실행 경로가 없었다 — 이 축은 잘못되면 미승인 offer 나 이벤트오퍼 축이
     # 조용히 B2B 주문 경로로 새어 들어간다.
     # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
-    - name: Run tests (web-kpa-society Vitest)
-      run: npx vitest run --config services/web-kpa-society/vitest.config.mjs
+    - name: Run tests (web-pharmacy-business Vitest)
+      run: npx vitest run --config services/web-pharmacy-business/vitest.config.mjs
 
     - name: Run tests and build (web-pharmacy-coop)
       run: |

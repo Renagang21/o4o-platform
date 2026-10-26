@@ -260,7 +260,7 @@ B2B / B2C 자동 fallback 은 금지한다.
 
 
 ```text
-canonical picker = services/web-kpa-society/src/components/store/StoreAssetSelectorModal.tsx
+canonical picker = services/web-pharmacy-business/src/components/store/StoreAssetSelectorModal.tsx
                    (asset / content-hub / blog / mlc / direct-content — 5 source)
 ```
 

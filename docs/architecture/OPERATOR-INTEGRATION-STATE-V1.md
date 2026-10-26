@@ -164,7 +164,7 @@
 
 ### 4.3 문제점 #2 — **라우팅 구조 불일치**
 
-- KPA: `services/web-kpa-society/src/OperatorRoutes.tsx` 별도 파일 (lazy 로딩 + 가독성)
+- KPA: `services/web-pharmacy-business/src/OperatorRoutes.tsx` 별도 파일 (lazy 로딩 + 가독성)
 
 **정책**: 신규 라우트 추가 시 KPA 패턴(별도 `OperatorRoutes.tsx`) 권장. K-Cos 의 분리는 별도 정리 WO.
 
@@ -283,5 +283,5 @@ KPA만 `OperatorRoutes.tsx` 별도. K-Cos는 App.tsx 인라인. 정리 가능하
 - 공통화 정의 표준: [O4O-COMMONIZATION-STANDARD.md](O4O-COMMONIZATION-STANDARD.md)
 - 기존 패키지: [packages/operator-ux-core/](../../packages/operator-ux-core/), [packages/admin-ux-core/](../../packages/admin-ux-core/)
 - 서비스별 operator 페이지:
-  - [services/web-kpa-society/src/pages/operator/](../../services/web-kpa-society/src/pages/operator/)
+  - [services/web-pharmacy-business/src/pages/operator/](../../services/web-pharmacy-business/src/pages/operator/)
   - [services/web-k-cosmetics/src/pages/operator/](../../services/web-k-cosmetics/src/pages/operator/)

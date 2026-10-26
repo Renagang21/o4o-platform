@@ -247,12 +247,12 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (E) non-Store · content-ed
     }
   });
   it('KPA 옛 Community 작성 화면(ContentWritePage)은 제거됐다 — /content/* route 없음 (D7)', () => {
-    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx'))).toBe(false);
-    expect(read('services/web-kpa-society/src/App.tsx')).not.toContain('<ContentWritePage');
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-pharmacy-business/src/pages/contents/ContentWritePage.tsx'))).toBe(false);
+    expect(read('services/web-pharmacy-business/src/App.tsx')).not.toContain('<ContentWritePage');
   });
   it('aiDescription read 경로 불변 — store-qr.service · store-library-feed.controller · QrLandingPage', () => {
     expect(read('apps/api-server/src/services/store/store-qr.service.ts')).toContain("aiDescription");
     expect(read('apps/api-server/src/routes/o4o-store/controllers/store-library-feed.controller.ts')).toContain("content_json->'aiDescription'->>'mode'");
-    expect(read('services/web-kpa-society/src/pages/qr/QrLandingPage.tsx')).toContain('descriptionHtml');
+    expect(read('services/web-pharmacy-business/src/pages/qr/QrLandingPage.tsx')).toContain('descriptionHtml');
   });
 });

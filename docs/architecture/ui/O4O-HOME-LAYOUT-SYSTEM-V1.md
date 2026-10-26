@@ -272,7 +272,7 @@ export function NewSection({ items }) {
 KPA Society가 이 시스템의 **기준 구현(canonical implementation)**이다.
 
 ```tsx
-// services/web-kpa-society/src/pages/CommunityHomePage.tsx
+// services/web-pharmacy-business/src/pages/CommunityHomePage.tsx
 <PageHero>
   <HeroBannerSection ads={...} />          {/* full-bleed 캐러셀 */}
 </PageHero>

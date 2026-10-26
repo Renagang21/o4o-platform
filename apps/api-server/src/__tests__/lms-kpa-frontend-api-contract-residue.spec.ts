@@ -29,11 +29,11 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')
 // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA appreciation client(api/appreciation.ts)와
 //   소비 화면(forum · contents · mypage)은 옛 KPA 화면 제거로 삭제됐다. 재도입 시 이 계약을 다시 세운다.
 const KPA_APPRECIATION_RETIRED = [
-  'services/web-kpa-society/src/api/appreciation.ts',
-  'services/web-kpa-society/src/pages/forum/ForumDetailPage.tsx',
-  'services/web-kpa-society/src/pages/forum/ForumListPage.tsx',
-  'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',
-  'services/web-kpa-society/src/pages/mypage/MyDashboardPage.tsx',
+  'services/web-pharmacy-business/src/api/appreciation.ts',
+  'services/web-pharmacy-business/src/pages/forum/ForumDetailPage.tsx',
+  'services/web-pharmacy-business/src/pages/forum/ForumListPage.tsx',
+  'services/web-pharmacy-business/src/pages/contents/ContentDetailPage.tsx',
+  'services/web-pharmacy-business/src/pages/mypage/MyDashboardPage.tsx',
 ];
 
 describe('KPA appreciation client — 제거됨 (D7)', () => {

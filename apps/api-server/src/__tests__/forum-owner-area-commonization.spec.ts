@@ -66,9 +66,9 @@ interface OwnerPage {
 // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA-Society 마이페이지 포럼 소유자 2화면(285 + 381)과
 //   forumOwnerAdapter 는 옛 KPA 화면 제거로 삭제됐다 — census 에서 제외하고 부재를 아래에서 고정한다.
 const KPA_RETIRED_OWNER_FILES = [
-  'services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx',
-  'services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx',
-  'services/web-kpa-society/src/api/forumOwnerAdapter.ts',
+  'services/web-pharmacy-business/src/pages/mypage/MyForumDashboardPage.tsx',
+  'services/web-pharmacy-business/src/pages/mypage/ForumMemberManagementPage.tsx',
+  'services/web-pharmacy-business/src/api/forumOwnerAdapter.ts',
 ];
 
 const DASHBOARD_PAGES: OwnerPage[] = [
@@ -271,7 +271,7 @@ describe('accent 주입과 Tailwind 스캔', () => {
   });
 
   it('소유 서비스 3곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
-    for (const svc of ['web-kpa-society', 'web-neture',]) {
+    for (const svc of ['web-pharmacy-business', 'web-neture',]) {
       const config = read(`services/${svc}/tailwind.config.js`);
       expect(`${svc}:${config.includes('packages/shared-space-ui/src')}`).toBe(`${svc}:true`);
     }

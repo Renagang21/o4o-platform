@@ -27,7 +27,7 @@ const HANDOFF_PAGES = [
   'services/web-store/src/pages/HandoffPage.tsx',
   'services/web-lecture/src/pages/HandoffPage.tsx',
   'services/web-kpa-branch/src/pages/HandoffPage.tsx',
-  'services/web-kpa-society/src/pages/HandoffPage.tsx',
+  'services/web-pharmacy-business/src/pages/HandoffPage.tsx',
 ];
 
 /** 주석은 위반이 아니다 — 경위를 적은 문장까지 잡으면 가드가 무력화된다. */

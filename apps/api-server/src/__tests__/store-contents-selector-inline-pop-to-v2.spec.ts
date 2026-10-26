@@ -34,7 +34,7 @@ const stripComments = (s: string) =>
     .join('\n');
 
 // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: KPA 로컬 /store/* 화면은 제거됐다 — 같은 화면의 정본은 store.neture.co.kr(web-store).
-const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
+const KPA = join(REPO, 'services', 'web-pharmacy-business', 'src');
 const STORE = join(REPO, 'services', 'web-store', 'src');
 
 // ─────────────────────────────────────────────────────────────────────────────

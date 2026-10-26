@@ -123,7 +123,7 @@ HUB
 | `/resources` | - | Phase 2 예정 |
 | `/lms` | - | Phase 2 예정 |
 
-**공유 유틸:** `services/web-kpa-society/src/utils/ai-clipboard.ts`
+**공유 유틸:** `services/web-pharmacy-business/src/utils/ai-clipboard.ts`
 - `stripHtml(html)` — HTML 태그 + 엔티티 디코딩
 - `blocksToText(blocks)` — KPA/TipTap 블록 배열 → plain text
 - `buildAiClipboardText(items)` — 포맷 조립

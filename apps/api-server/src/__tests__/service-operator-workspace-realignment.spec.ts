@@ -186,15 +186,15 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
 describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => {
   it('KPA 옛 운영 화면(메뉴 · 대시보드 · layout)은 제거됐고 App.tsx 에 /operator 대시보드 route 가 없다 (D7)', () => {
     for (const p of [
-      'services/web-kpa-society/src/config/operatorMenuGroups.ts',
-      'services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx',
-      'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
-      'services/web-kpa-society/src/routes/OperatorRoutes.tsx',
+      'services/web-pharmacy-business/src/config/operatorMenuGroups.ts',
+      'services/web-pharmacy-business/src/pages/operator/KpaOperatorDashboard.tsx',
+      'services/web-pharmacy-business/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
+      'services/web-pharmacy-business/src/routes/OperatorRoutes.tsx',
     ]) {
       expect([p, existsSync(resolve(REPO, p))]).toEqual([p, false]);
     }
     // 옛 진입(/operator · /admin)은 대시보드 없이 사업 운영 화면으로 보내는 호환 이동만 남는다.
-    const app = readFileSync(resolve(REPO, 'services/web-kpa-society/src/App.tsx'), 'utf8');
+    const app = readFileSync(resolve(REPO, 'services/web-pharmacy-business/src/App.tsx'), 'utf8');
     expect(app).not.toContain('OperatorRoutes');
     expect(app).toContain('<Route path="/operator/*" element={<Navigate to="/operator/semi-franchises" replace />} />');
     expect(app).toContain('<Route path="/admin/*" element={<Navigate to="/operator/semi-franchises" replace />} />');
@@ -203,14 +203,14 @@ describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => 
   });
 
   it('삭제된 화면을 가리키는 외부 진입은 404 대신 현행 화면으로 이동한다 (D7)', () => {
-    const app = readFileSync(resolve(REPO, 'services/web-kpa-society/src/App.tsx'), 'utf8');
+    const app = readFileSync(resolve(REPO, 'services/web-pharmacy-business/src/App.tsx'), 'utf8');
     // 문의 알림 · Neture 문의 화면의 /operator/collaboration-requests → 사업 문의함
     expect(app).toContain('<Route path="/operator/collaboration-requests" element={<Navigate to={`/operator/inbox/business/${BUSINESS_SITE.key}`} replace />} />');
     // 회원 알림 targetUrl '/mypage' · web-store GuideBackLink 의 /guide/*
     expect(app).toContain('<Route path="/mypage/*" element={<Navigate to="/" replace />} />');
     expect(app).toContain('<Route path="/guide/*" element={<Navigate to="/" replace />} />');
     // 인라인 본문 없는 page QR 은 삭제된 /content/:id 로 보내지 않는다
-    const qr = readFileSync(resolve(REPO, 'services/web-kpa-society/src/pages/qr/QrLandingPage.tsx'), 'utf8');
+    const qr = readFileSync(resolve(REPO, 'services/web-pharmacy-business/src/pages/qr/QrLandingPage.tsx'), 'utf8');
     expect(qr).not.toContain('navigate(`/content/');
   });
 });

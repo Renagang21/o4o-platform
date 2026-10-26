@@ -22,7 +22,7 @@ packages/store-core/             ← 공유 Data Engine (Types + KPI + Insights)
 
   └─ pages/store/*, pharmacy/*
 
-services/web-kpa-society/
+services/web-pharmacy-business/
   └─ pages/pharmacy/*
 
 services/web-k-cosmetics/

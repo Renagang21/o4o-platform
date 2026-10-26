@@ -7,7 +7,7 @@
  *   가 `signage_forced_content` 를 UNION 할 때 `target_surface` 를 필터하지 않았다.
  *   그 결과 태블릿 전용(`tablet_idle`) forced content 가 사이니지 재생 목록에
  *   섞여 들어갔다. 이 경로는 dead code 가 아니다 —
- *   `services/web-kpa-society` 의 `/public/signage` (PublicSignagePage) 가
+ *   `services/web-pharmacy-business` 의 `/public/signage` (PublicSignagePage) 가
  *   실제로 소비하는 무인증 재생 endpoint 다.
  *
  * 고정하는 계약 (surface truth table):

@@ -1070,7 +1070,7 @@ test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency
 /**
  * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 단계 6 — §23 의 반대 방향(약국 앱 한정).
  *
- * 단계 4-a 에서 옛 KPA 화면을 지운 뒤에도 `services/web-kpa-society/package.json` 에
+ * 단계 4-a 에서 옛 KPA 화면을 지운 뒤에도 `services/web-pharmacy-business/package.json` 에
  * `@o4o/lms-ui` · `@o4o/lms-client` 등 9개 선언이 남아, Lecture 전용 변경(42dddc91b,
  * `packages/lms-ui`)이 약국 앱을 함께 배포했다. 판정기는 선언 graph 를 정본으로 보므로
  * 쓰지 않는 선언을 남기지 않는 것으로 막는다. 예외 목록은 두지 않는다.
@@ -1117,8 +1117,8 @@ test('§23c. Lecture 전용 package 변경은 약국 앱을 배포하지 않고,
     ])),
     ['lecture'],
   );
-  assert.equal(webOf(['M\tservices/web-kpa-society/src/App.tsx']).services['kpa-society'], true);
-  assert.equal(webOf(['M\tservices/web-kpa-society/package.json']).services['kpa-society'], true);
+  assert.equal(webOf(['M\tservices/web-pharmacy-business/src/App.tsx']).services['kpa-society'], true);
+  assert.equal(webOf(['M\tservices/web-pharmacy-business/package.json']).services['kpa-society'], true);
   for (const pkg of ['@o4o/shared-space-ui', '@o4o/auth-react', '@o4o/store-ui-core']) {
     assert.ok(consumersOf(pkg).includes('kpa-society'), `전제: 약국 앱은 ${pkg} 를 쓴다`);
     const v = webOf([`M\t${graph.byName.get(pkg).dir}/src/index.ts`]);

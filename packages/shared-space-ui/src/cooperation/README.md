@@ -20,8 +20,8 @@ cooperation-member-presentation.css 공통 메뉴·PC 2열·모바일 참여 상
 
 | 사업 | 앱 | 가입 단위 | 기존 인증 이동 |
 |---|---|---|---|
-| pharmacy | web-kpa-society | 약국 조직 | kpa-society transport alias → neture 세션 |
-| megapharm | web-kpa-society | 약국 조직 | 자기 호스트의 공통 계정 로그인 |
+| pharmacy | web-pharmacy-business | 약국 조직 | kpa-society transport alias → neture 세션 |
+| megapharm | web-pharmacy-business | 약국 조직 | 자기 호스트의 공통 계정 로그인 |
 | carepharm | web-neture | 약국 조직 | carepharm transport alias → neture 세션 |
 | pharmcoop | web-pharmacy-coop | 조합별 개인 | 자기 호스트 로그인·조합 선택 |
 

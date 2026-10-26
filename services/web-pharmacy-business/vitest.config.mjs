@@ -1,5 +1,5 @@
 /**
- * web-kpa-society 테스트 설정
+ * web-pharmacy-business 테스트 설정
  *
  * WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1:
  *   KPA 에는 테스트 실행 경로가 없어서 "관심상품 행 → canonical cart payload" 및
@@ -7,7 +7,7 @@
  *   미승인 offer 나 이벤트오퍼 축이 B2B 주문 경로로 새어 들어가므로 CI 에서 고정한다.
  *
  * 실행: 저장소 루트에서
- *   npx vitest run --config services/web-kpa-society/vitest.config.mjs
+ *   npx vitest run --config services/web-pharmacy-business/vitest.config.mjs
  *
  * 루트에 이미 설치된 vitest 를 그대로 쓴다 — 이 서비스에 테스트 의존성을 추가하지 않는다
  * (package.json · lockfile 무변경). `services/web-vitest.config.mjs` 와 동일한 방식이다.
@@ -28,7 +28,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    include: ['services/web-kpa-society/src/**/*.test.{ts,tsx}'],
+    include: ['services/web-pharmacy-business/src/**/*.test.{ts,tsx}'],
     passWithNoTests: false,
   },
 });

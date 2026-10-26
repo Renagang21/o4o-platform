@@ -115,8 +115,8 @@ describe('CMS legacy media → Media V2 정본화', () => {
 
     it('두 웹 서비스에 dashboard-assets 프런트 소비자가 없다 (signal 제외)', () => {
       for (const f of [
-        join(SERVICES, 'web-kpa-society', 'src', 'api', 'dashboard.ts'),
-        join(SERVICES, 'web-kpa-society', 'src', 'pages', 'dashboard', 'MyContentPage.tsx'),
+        join(SERVICES, 'web-pharmacy-business', 'src', 'api', 'dashboard.ts'),
+        join(SERVICES, 'web-pharmacy-business', 'src', 'pages', 'dashboard', 'MyContentPage.tsx'),
         join(SERVICES, 'web-neture', 'src', 'lib', 'api', 'dashboardCopy.ts'),
         join(SERVICES, 'web-neture', 'src', 'pages', 'dashboard', 'MyContentPage.tsx'),
       ]) {
@@ -135,7 +135,7 @@ describe('CMS legacy media → Media V2 정본화', () => {
     });
 
     it('제거된 딥링크는 compatibility 화면 없이 상위 경로로만 보낸다', () => {
-      const kpa = read(join(SERVICES, 'web-kpa-society', 'src', 'App.tsx'));
+      const kpa = read(join(SERVICES, 'web-pharmacy-business', 'src', 'App.tsx'));
       // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: pharmacy 는 옛 /my-content 딥링크도 두지 않는다(404).
       expect(kpa).not.toMatch(/path="\/my-content"/);
       expect(kpa).not.toMatch(/MyContentPage/);

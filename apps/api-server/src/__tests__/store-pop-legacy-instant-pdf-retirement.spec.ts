@@ -25,7 +25,7 @@ const codeOnly = (s: string) =>
     .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
     .join('\n');
 
-const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
+const KPA = join(REPO, 'services', 'web-pharmacy-business', 'src');
 const CORE = join(REPO, 'packages', 'store-ui-core', 'src');
 const GUIDE = join(REPO, 'packages', 'shared-space-ui', 'src', 'guide', 'copy');
 

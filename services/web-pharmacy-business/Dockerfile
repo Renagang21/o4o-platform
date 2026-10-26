@@ -2,7 +2,7 @@
 # Cloud Run 호환 정적 파일 서빙
 #
 # NOTE: 이 Dockerfile은 모노레포 루트에서 빌드 컨텍스트로 실행됩니다.
-# docker build -f services/web-kpa-society/Dockerfile .
+# docker build -f services/web-pharmacy-business/Dockerfile .
 
 # Build stage
 FROM node:20-alpine AS builder
@@ -39,13 +39,13 @@ COPY packages/content-core/package.json ./packages/content-core/
 COPY packages/account-ui/package.json ./packages/account-ui/
 
 # Copy service package.json
-COPY services/web-kpa-society/package.json ./services/web-kpa-society/
+COPY services/web-pharmacy-business/package.json ./services/web-pharmacy-business/
 
 # Install dependencies
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts로 prepare 자동 빌드 skip.
 # packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
-RUN pnpm install --filter @o4o/web-kpa-society... --ignore-scripts
+RUN pnpm install --filter @o4o/web-pharmacy-business... --ignore-scripts
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -68,7 +68,7 @@ COPY packages/content-core/ ./packages/content-core/
 COPY packages/account-ui/ ./packages/account-ui/
 
 # Copy service source
-COPY services/web-kpa-society/ ./services/web-kpa-society/
+COPY services/web-pharmacy-business/ ./services/web-pharmacy-business/
 
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
@@ -89,17 +89,17 @@ ARG VITE_SERVICE_URL=https://pharmacy.neture.co.kr
 ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 
 # Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
-WORKDIR /app/services/web-kpa-society
+WORKDIR /app/services/web-pharmacy-business
 RUN npx vite build
 
 # Production stage - nginx for static files + API proxy
 FROM nginx:alpine AS runner
 
 # Copy nginx configuration
-COPY services/web-kpa-society/nginx.conf /etc/nginx/conf.d/default.conf
+COPY services/web-pharmacy-business/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built files
-COPY --from=builder /app/services/web-kpa-society/dist /usr/share/nginx/html
+COPY --from=builder /app/services/web-pharmacy-business/dist /usr/share/nginx/html
 
 # Cloud Run uses PORT env variable (nginx.conf listens on 8080)
 EXPOSE 8080
