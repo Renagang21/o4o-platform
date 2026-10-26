@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import App from "./App";
 import { PasswordInput } from "@o4o/auth-react";
 import {
@@ -28,7 +34,9 @@ const eventNames: Record<string, string> = {
   member_removed: "참여자 제외",
 };
 
-export default function WorkspacePortal() {
+export default function WorkspacePortal({
+  onSessionChange,
+}: { onSessionChange?: (inviteToken?: string) => void } = {}) {
   const [mode, setMode] = useState<"local" | "server">(() =>
     new URLSearchParams(location.search).get("mode") === "local"
       ? "local"
@@ -84,33 +92,38 @@ export default function WorkspacePortal() {
     snapshot.current = null;
     setInviteLink("");
   }, []);
-  const run = useCallback(async (work: () => Promise<void>) => {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    setBusy(true);
-    setError("");
-    setMessage("");
-    try {
-      await work();
-    } catch (e) {
-      if (e instanceof ApiError && e.status === 401) {
-        clearSession();
+  const run = useCallback(
+    async (work: () => Promise<void>) => {
+      if (busyRef.current) return;
+      busyRef.current = true;
+      setBusy(true);
+      setError("");
+      setMessage("");
+      try {
+        await work();
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 401) {
+          clearSession();
+        }
+        if (e instanceof ApiError && e.code === "SPACE_NOT_FOUND") {
+          setSelected(null);
+          snapshot.current = null;
+          setManage(false);
+          setInviteLink("");
+          setMembers([]);
+          setInvites([]);
+          setEvents([]);
+        }
+        setError(
+          e instanceof Error ? e.message : "요청을 처리하지 못했습니다.",
+        );
+      } finally {
+        busyRef.current = false;
+        setBusy(false);
       }
-      if (e instanceof ApiError && e.code === "SPACE_NOT_FOUND") {
-        setSelected(null);
-        snapshot.current = null;
-        setManage(false);
-        setInviteLink("");
-        setMembers([]);
-        setInvites([]);
-        setEvents([]);
-      }
-      setError(e instanceof Error ? e.message : "요청을 처리하지 못했습니다.");
-    } finally {
-      busyRef.current = false;
-      setBusy(false);
-    }
-  }, [clearSession]);
+    },
+    [clearSession],
+  );
   const connect = useCallback(async () => {
     clearSession();
     const u = await partnerApi.me();
@@ -118,8 +131,7 @@ export default function WorkspacePortal() {
     setSpaces(await partnerApi.list());
   }, [clearSession]);
   useEffect(() => {
-    if (mode === "server")
-      void run(connect);
+    if (mode === "server") void run(connect);
     // Each explicit mode entry revalidates the cookie session. No login mutation on mount.
   }, [mode, run, connect]);
   const choose = async (id: string) => {
@@ -216,6 +228,7 @@ export default function WorkspacePortal() {
             onClick={() =>
               void run(async () => {
                 await partnerApi.logout();
+                onSessionChange?.();
                 setUser(null);
                 setSelected(null);
                 snapshot.current = null;
@@ -332,6 +345,10 @@ export default function WorkspacePortal() {
                 setLoginPassword("");
                 void run(async () => {
                   await partnerApi.login(email, password);
+                  if (onSessionChange) {
+                    onSessionChange(joinToken);
+                    return;
+                  }
                   await connect();
                 });
               }}

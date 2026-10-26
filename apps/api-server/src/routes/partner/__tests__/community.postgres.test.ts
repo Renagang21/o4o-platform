@@ -426,6 +426,50 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
         ),
       ).toBe(true);
     });
+    it("rejects concurrent, stale and missing report resolutions without phantom audit events", async () => {
+      const a = await account(true),
+        op1 = await account(true, true),
+        op2 = await account(true, true),
+        id = await post(a);
+      await call(a).post(`/posts/${id}/reports`, { reason: "경합 확인" });
+      const [report] = await db.query(
+        "SELECT id FROM partner_community_reports WHERE post_id=$1",
+        [id],
+      );
+      const results = await Promise.all([
+        call(op1).patch(`/operator/reports/${report.id}`, {
+          revision: 0,
+          resolution: "첫 운영자 처리",
+        }),
+        call(op2).patch(`/operator/reports/${report.id}`, {
+          revision: 0,
+          resolution: "다른 운영자 처리",
+        }),
+      ]);
+      expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+      expect(
+        (
+          await call(op1).patch(`/operator/reports/${report.id}`, {
+            revision: 0,
+            resolution: "과거 revision 재시도",
+          })
+        ).status,
+      ).toBe(409);
+      expect(
+        (
+          await call(op1).patch(`/operator/reports/${randomUUID()}`, {
+            revision: 0,
+            resolution: "존재하지 않는 신고",
+          })
+        ).status,
+      ).toBe(409);
+      expect(
+        await db.query(
+          "SELECT id FROM partner_community_events WHERE kind='report_resolved' AND target_id=$1",
+          [report.id],
+        ),
+      ).toHaveLength(1);
+    });
     it("enforces member status changes immediately and rejects stale/self actions", async () => {
       const a = await account(true),
         op = await account(true, true),
@@ -455,10 +499,20 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
         (await call(op).patch(`/operator/members/${op}`, input)).status,
       ).toBe(403);
     });
-    it('refuses rollback once community data exists and leaves posts intact',async()=>{
-      const user=await account(true),id=await post(user),q=db.createQueryRunner();await q.connect();await q.startTransaction();
-      try {await expect(new CreatePartnerCommunity1793020000000().down(q)).rejects.toThrow('PARTNER_COMMUNITY_IN_USE');}
-      finally {await q.rollbackTransaction();await q.release();}
+    it("refuses rollback once community data exists and leaves posts intact", async () => {
+      const user = await account(true),
+        id = await post(user),
+        q = db.createQueryRunner();
+      await q.connect();
+      await q.startTransaction();
+      try {
+        await expect(
+          new CreatePartnerCommunity1793020000000().down(q),
+        ).rejects.toThrow("PARTNER_COMMUNITY_IN_USE");
+      } finally {
+        await q.rollbackTransaction();
+        await q.release();
+      }
       expect((await call(user).get(`/posts/${id}`)).status).toBe(200);
     });
     it("registers erasure write fences for all new tables", async () => {

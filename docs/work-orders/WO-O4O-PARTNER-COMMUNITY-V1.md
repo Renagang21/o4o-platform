@@ -63,3 +63,7 @@ Partner의 기존 초대형 자료·활동·정산 공동공간과 회원 커뮤
 - 최신 main `64a7cd474e`와 own branch를 통합했다. incoming main의 `HardenAuthPrivacyReadiness1793010000000`을 보존하고 community migration을 그 다음으로 배치했다. 충돌 해소 범위는 manifest와 schema state 등록이며 기존 main migration/지문을 덮어쓰지 않았다.
 - 새 일회성 PostgreSQL 15에서 baseline과 **46개 incremental prefix**를 재검증했다. 앞선 main 지문은 모두 일치하며 통합 후 최종 fingerprint는 `69ceb8e5089ee579f9b0f9bc905c10c1795ef59de69d03566ab33043c1b1957e`·7319 lines다. 빈 down/up 복원·실제 신규 5개 테이블 erasure fence 차단도 재검증했다. 이전 45개 prefix 기록은 통합 전 상태의 이력이다.
 - PR의 required CI·Codex blocker·main 위치를 확인한 뒤 정상 PR merge를 사용한다. 배포는 main exact-SHA CI 성공 → standard Promote → migration Job → API verified rollout → Partner/관리자 웹 verified rollout 및 실제 canonical URL 읽기 검증 순서다. freeze/ref/IAM/required CI는 우회하지 않는다. 실제 실행 결과는 후속 기록으로 구분한다.
+
+- 통합 점검에서 작업공간 내부 로그인/로그아웃 후 상위 커뮤니티 header의 세션이 남는 문제를 수정했다. 성공한 계정 변경 후 사이트 세션을 재확인하고 로그인 중 보관한 초대 fragment는 유지한다. 초기 인증 확인 중에는 상위 로그아웃을 막는다. 신규 회귀 테스트 2개를 추가했다.
+
+- PR #841 Codex P2 신고 처리 finding을 반영했다. PostgreSQL UPDATE의 TypeORM tuple 길이를 행 수로 오인하지 않도록 UPDATE RETURNING을 CTE SELECT로 반환하고, open 상태·revision이 실제로 일치한 경우에만 처리 이력을 기록한다. 동시/과거 revision/존재하지 않는 신고에 대한 회귀 테스트를 추가했다.

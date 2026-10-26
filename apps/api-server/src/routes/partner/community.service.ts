@@ -433,7 +433,7 @@ export class PartnerCommunityService {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, true);
       const rows = await m.query(
-        "UPDATE partner_community_reports SET status='resolved',resolution=$3,revision=revision+1 WHERE id=$1 AND revision=$2 RETURNING id",
+        "WITH updated AS (UPDATE partner_community_reports SET status='resolved',resolution=$3,revision=revision+1 WHERE id=$1 AND revision=$2 AND status='open' RETURNING id) SELECT id FROM updated",
         [id, revision, resolution],
       );
       if (!rows.length) fail(409, "REVISION_CONFLICT");

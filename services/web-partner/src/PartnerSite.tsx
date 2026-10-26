@@ -20,6 +20,13 @@ import CommunityOperator from "./CommunityOperator";
 
 export type Run = (work: () => Promise<void>) => Promise<void>;
 export type PartnerUser = { id: string; name?: string; displayName?: string };
+const resyncWorkspaceSession = (token?: string) => {
+  window.location.replace(
+    token && /^[a-f0-9]{64}$/.test(token)
+      ? `/workspace#join=${token}`
+      : "/workspace",
+  );
+};
 const date = (s: string) => new Date(s).toLocaleString("ko-KR");
 export default function PartnerSite() {
   const nav = useNavigate(),
@@ -142,7 +149,7 @@ export default function PartnerSite() {
               <span>{user.displayName || user.name || "회원"}</span>
               <button
                 className="button quiet"
-                disabled={busy}
+                disabled={busy || !ready}
                 onClick={() =>
                   void run(async () => {
                     await partnerApi.logout();
@@ -175,7 +182,7 @@ export default function PartnerSite() {
         )}
         {!ready && <p role="status">계정 연결을 확인하고 있습니다…</p>}
         {workspace ? (
-          <WorkspacePortal />
+          <WorkspacePortal onSessionChange={resyncWorkspaceSession} />
         ) : loginPage ? (
           <section className="community-auth panel">
             <h1>O4O 계정 로그인</h1>
