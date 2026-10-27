@@ -1421,7 +1421,7 @@ const DATA_HEADER = '## 로컬 데이터 상태\n';
 function renderDataFailure(data: Record<string, unknown>): string {
   const code = String(data.errorCode ?? '');
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
-    return DATA_HEADER + '- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+    return DATA_HEADER + '- 이 PC의 연결 프로그램이 제한 시간 안에 응답하지 않았습니다.';
   }
   if (code === LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE || code === LOCAL_AGENT_ERROR.DATA_DB_NOT_READY) {
     return DATA_HEADER + '- 이 PC의 로컬 데이터 저장소를 사용할 수 없습니다.';
@@ -1431,7 +1431,7 @@ function renderDataFailure(data: Record<string, unknown>): string {
     return DATA_HEADER + '- 이 PC의 로컬 데이터 업데이트가 실패해 로컬 데이터 기능을 시작할 수 없습니다. 기존 데이터와 백업은 보존되어 있습니다.';
   }
   if (code === LOCAL_AGENT_ERROR.DATA_DB_SCHEMA_TOO_NEW) {
-    return DATA_HEADER + '- 이 PC의 로컬 데이터가 현재 에이전트보다 새로운 버전입니다. 에이전트를 업데이트해야 합니다.';
+    return DATA_HEADER + '- 이 PC의 로컬 데이터가 현재 PC 연결 프로그램보다 새로운 버전입니다. PC 연결 프로그램을 업데이트해야 합니다.';
   }
   if (code === LOCAL_AGENT_ERROR.DATA_DB_INTEGRITY_FAILED) {
     return DATA_HEADER + '- 이 PC의 로컬 데이터 파일 검사에 실패했습니다. 데이터를 자동으로 초기화하지 않았으며 복구 절차가 필요합니다.';
@@ -1447,7 +1447,7 @@ function renderDataFailure(data: Record<string, unknown>): string {
   }
   return (
     DATA_HEADER +
-    '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 로컬 데이터를 확인할 수 없습니다.\n' +
+    '- 현재 이 PC가 연결되어 있지 않아 로컬 데이터를 확인할 수 없습니다.\n' +
     '- 추측해서 답하지 마세요.'
   );
 }
@@ -1464,7 +1464,7 @@ function renderDataHealth(data: Record<string, unknown>): string {
         : data.migrationStatus === 'failed'
           ? ' 스키마 갱신에 실패했습니다.'
           : data.migrationStatus === 'too_new'
-            ? ' 에이전트보다 새로운 스키마입니다.'
+            ? ' PC 연결 프로그램보다 새로운 스키마입니다.'
             : '';
   // V1 §29 — 백업 요약(개수·최근 시각). 경로·파일명은 data 에 애초에 없다.
   const backups =
@@ -1576,7 +1576,7 @@ function renderComputerFailure(data: Record<string, unknown>, displayName: strin
   return (
     renderWindowFailure(data, displayName) ??
     COMPUTER_HEADER +
-      '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 화면을 조작할 수 없습니다.\n' +
+      '- 현재 이 PC가 연결되어 있지 않아 화면을 조작할 수 없습니다.\n' +
       '- 추측해서 답하지 마세요.'
   );
 }
@@ -1622,7 +1622,7 @@ function renderSiteStatus(data: Record<string, unknown>): string {
     return (
       renderBrowserFailure(data, displayName) ??
       '## 사이트 상태\n' +
-        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 확인할 수 없습니다.\n' +
+        '- 현재 이 PC가 연결되어 있지 않아 확인할 수 없습니다.\n' +
         '- 추측해서 답하지 마세요.'
     );
   }
@@ -1646,7 +1646,7 @@ function renderOpenSite(data: Record<string, unknown>): string {
     return (
       renderBrowserFailure(data, displayName) ??
       '## 사이트 상태\n' +
-        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 사이트를 열 수 없습니다.\n' +
+        '- 현재 이 PC가 연결되어 있지 않아 사이트를 열 수 없습니다.\n' +
         '- 추측해서 답하지 마세요.'
     );
   }
@@ -1715,7 +1715,7 @@ function renderWindowFailure(data: Record<string, unknown>, displayName: string)
     );
   }
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
-    return '## 프로그램 상태\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+    return '## 프로그램 상태\n- 이 PC의 연결 프로그램이 제한 시간 안에 응답하지 않았습니다.';
   }
   return null;
 }
@@ -1726,7 +1726,7 @@ function renderFindApplication(data: Record<string, unknown>): string {
     return (
       renderWindowFailure(data, displayName) ??
       '## 프로그램 상태\n' +
-        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 확인할 수 없습니다.\n' +
+        '- 현재 이 PC가 연결되어 있지 않아 확인할 수 없습니다.\n' +
         '- 추측해서 답하지 마세요.'
     );
   }
@@ -1740,7 +1740,7 @@ function renderActivateWindow(data: Record<string, unknown>): string {
     return (
       renderWindowFailure(data, displayName) ??
       '## 프로그램 상태\n' +
-        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 창을 활성화할 수 없습니다.\n' +
+        '- 현재 이 PC가 연결되어 있지 않아 창을 활성화할 수 없습니다.\n' +
         '- 추측해서 답하지 마세요.'
     );
   }
@@ -1750,7 +1750,7 @@ function renderActivateWindow(data: Record<string, unknown>): string {
 
 function renderLocalAgentStatus(data: Record<string, unknown>): string {
   const notConnected =
-    '## 로컬 에이전트 상태\n- 현재 이 PC의 Local Work Agent가 연결되어 있지 않습니다.\n' +
+    '## PC 연결 상태\n- 현재 이 PC가 연결되어 있지 않습니다.\n' +
     '- PC의 실제 상태·파일·프로그램 정보는 확인할 수 없습니다. 추측해서 답하지 마세요.';
 
   if (data.connected !== true) {
@@ -1759,8 +1759,8 @@ function renderLocalAgentStatus(data: Record<string, unknown>): string {
 
   const name = (data.deviceName as string) || '이 PC';
   return (
-    '## 로컬 에이전트 상태\n' +
-    `- 연결됨: ${name} (${String(data.platform)}, agent ${String(data.agentVersion)})`
+    '## PC 연결 상태\n' +
+    `- 연결됨: ${name} (${String(data.platform)}, 프로그램 ${String(data.agentVersion)})`
   );
 }
 
@@ -1769,11 +1769,11 @@ function renderLocalSystemInfo(data: Record<string, unknown>): string {
     const code = String(data.errorCode ?? '');
     // 오류 코드를 사용자에게 그대로 노출하지 않는다. 상황별 문장으로 바꾼다.
     if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
-      return '## 로컬 시스템 정보\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+      return '## 로컬 시스템 정보\n- 이 PC의 연결 프로그램이 제한 시간 안에 응답하지 않았습니다.';
     }
     return (
       '## 로컬 시스템 정보\n' +
-      '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 정보를 확인할 수 없습니다.\n' +
+      '- 현재 이 PC가 연결되어 있지 않아 정보를 확인할 수 없습니다.\n' +
       '- 추측해서 답하지 마세요.'
     );
   }
@@ -1783,7 +1783,7 @@ function renderLocalSystemInfo(data: Record<string, unknown>): string {
     info.osName ? `- 운영체제: ${info.osName}` : null,
     info.osVersion ? `- 버전: ${info.osVersion}` : null,
     info.architecture ? `- 아키텍처: ${info.architecture}` : null,
-    info.agentVersion ? `- 에이전트 버전: ${info.agentVersion}` : null,
+    info.agentVersion ? `- PC 연결 프로그램 버전: ${info.agentVersion}` : null,
   ].filter(Boolean);
 
   if (lines.length === 0) {

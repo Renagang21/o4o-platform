@@ -106,14 +106,14 @@ export default function LocalAgentCard() {
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-gray-900">이 PC 연결</h3>
           <p className="mt-1 text-sm text-gray-600">
-            이 PC 에서 실행 중인 Local Work Agent 를 현재 계정에 연결합니다. 입력할 코드는 없습니다.
+            O4O 업무 도우미가 이 PC를 사용할 수 있도록 PC 연결 프로그램을 현재 계정에 연결합니다. 입력할 코드는 없습니다.
           </p>
 
           <div className="mt-4">
             {status === 'checking' && (
               <p className="flex items-center gap-2 text-sm text-gray-500">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Local Work Agent 를 확인하는 중입니다...
+                PC 연결 프로그램을 확인하는 중입니다...
               </p>
             )}
 
@@ -139,7 +139,7 @@ export default function LocalAgentCard() {
                 className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {status === 'pairing' && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                {status === 'pairing' ? 'Local Agent 연결 중...' : '이 PC 연결'}
+                {status === 'pairing' ? '이 PC 연결 중...' : '이 PC 연결'}
               </button>
             )}
           </div>
