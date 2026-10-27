@@ -59,21 +59,23 @@
 
 | 항목 | 준비안 |
 |---|---|
-| 표시 이름 | O4O 콘텐츠 연결 |
-| 영문 표시 이름 | O4O Content Connection |
-| 짧은 소개 | 내 약국 자료로 콘텐츠 초안을 만들고 O4O에 저장하세요. |
-| 영문 짧은 소개 | Read pharmacy materials and save private drafts in O4O. |
+| 표시 이름 | O4O 서비스 연결 — 사용자 선택 |
+| 영문 표시 이름 후보 | O4O Service Connect — 사용자 최종 확인 전 |
+| 짧은 소개 | ChatGPT에서 내 O4O 자료를 활용하고, 작업 결과를 O4O에 저장하세요. — 사용자 확정 |
+| 영문 짧은 소개 후보 | Use your O4O materials in ChatGPT and save your work back to O4O. |
 | 분류 후보 | Productivity — 실제 포털 선택지 확인 후 확정 |
 | 개발자 표시 이름 | 인증된 개인 명의의 포털 허용 표시명 확정 필요. 조직 관리용 이름을 실명으로 대체 입력하지 않는다. |
 | 제공 지역·언어 | 한국어 중심 문안 준비. 제공 국가·포털 언어 항목은 사용자 확정 필요 |
 
+짧은 소개에는 사용자 표현을 사용하고, 저장 결과의 비공개 상태·사용자 검토·자동 게시 미지원은 상세 설명과 저장 안내에 명시한다. 소개 문구 변경으로 실제 제공 도구나 첫 출시 범위를 확대하지 않는다.
+
 ### 한국어 설명
 
-O4O 콘텐츠 연결은 ChatGPT에서 사용자가 허용한 약국 작업공간의 상품과 참고 자료를 찾고, 작성한 내용을 O4O의 비공개 초안으로 저장·수정하도록 돕습니다. 기존 O4O 계정으로 로그인하고 이용할 약국과 조회·저장 권한을 선택하세요. 저장한 초안은 O4O 편집 화면에서 검토하고 계속 작업할 수 있습니다. 콘텐츠 자동 게시·상품 정본 변경·주문·결제·개인별 진단이나 복약 결정은 제공하지 않습니다. 환자·고객 식별정보나 개인 건강정보를 요청문과 자료에 포함하지 마세요. 연결은 O4O 내 계정에서 해제할 수 있습니다.
+O4O 서비스 연결은 ChatGPT에서 사용자가 허용한 약국 작업공간의 상품과 참고 자료를 찾고, 작성한 내용을 O4O의 비공개 초안으로 저장·수정하도록 돕습니다. 기존 O4O 계정으로 로그인하고 이용할 약국과 조회·저장 권한을 선택하세요. 저장한 초안은 O4O 편집 화면에서 검토하고 계속 작업할 수 있습니다. 콘텐츠 자동 게시·상품 정본 변경·주문·결제·개인별 진단이나 복약 결정은 제공하지 않습니다. 환자·고객 식별정보나 개인 건강정보를 요청문과 자료에 포함하지 마세요. 연결은 O4O 내 계정에서 해제할 수 있습니다.
 
 ### English description
 
-O4O Content Connection helps you find products and reference materials in pharmacy workspaces you authorize, then save and revise private drafts in O4O. Sign in with your existing O4O account and choose a pharmacy and read or draft permissions. Review saved content in the O4O editor. The connection does not publish content, change the shared product database, place orders, process payments, or make individual diagnosis or medication decisions. Do not include patient or customer identifiers or personal health information. You can disconnect from your O4O account settings.
+O4O Service Connect helps you find products and reference materials in pharmacy workspaces you authorize, then save and revise private drafts in O4O. Sign in with your existing O4O account and choose a pharmacy and read or draft permissions. Review saved content in the O4O editor. The connection does not publish content, change the shared product database, place orders, process payments, or make individual diagnosis or medication decisions. Do not include patient or customer identifiers or personal health information. You can disconnect from your O4O account settings.
 
 ### 시작 요청문 후보
 
@@ -125,7 +127,7 @@ SPA의 HTTP 200은 실제 본문 렌더·문의 접수·법적 내용 확인을 
 
 - 준비 완료: 용어 구분, 출시 목표 8개와 실제 코드 계약의 차이 명시, 국·영문 소개·요청문, 로고 원본 후보·brief, URL 도달/route 확인, 시험 시나리오·합성 자료 명세·촬영 순서.
 - 외부 확인 필요: 공식 제출 규격·포털과 인증 결과, 실제 활성 도구/운영 버전, 공개 정책·지원 담당, 심사 계정 접근, 원본 데이터 정확성·기존 연결 cleanup.
-- 사용자에게 다음 단계로 보여 줄 선택: 표시 이름 ‘O4O 콘텐츠 연결’과 기존 파란 O4O 로고 후보. 결정 전에 인증된 실명·지원 담당·국가를 추측하지 않는다.
+- 사용자 선택 반영: 표시 이름은 ‘O4O 서비스 연결’, 짧은 소개는 ‘ChatGPT에서 내 O4O 자료를 활용하고, 작업 결과를 O4O에 저장하세요.’로 정한다. 영문명·로고·개발자 공개명·지원 담당·국가는 별도 확정한다. 앱 디렉터리 유사 이름과 브랜드·상표 충돌 가능성은 아직 확인하지 않았다.
 - 실제 앱 제출·공개, 코드/설정·DB·외부 계정 변경, 새 기능 개발·배포는 이번 준비 작업에 포함하지 않는다. DEPLOYMENT = NOT_APPLICABLE.
 
 문서 정합: 과거 준비 문서의 ZIP·plugin.json 단정은 재확인 대상으로 분리한다. API를 앱으로 일괄 치환하거나 과거 CHECK를 현재 결과로 다시 쓰지 않는다.
