@@ -61,6 +61,6 @@ Main은 JSON 사본을 transient state로 읽는다. 계정/업무공간 변경�
 
 ## 5. 배포 단위·회귀
 
-PC agent와 Main Docker는 독립 배포 단위다. 브라우저가 `tools/`를 직접 import하지 않도록 순수 contract·선언의 동일 사본을 각각 둔다. `pharmacy-data.test.mjs`가 양쪽을 byte 단위로 비교하며 기존 CI의 agent blocking 명령에 이 suite만 추가했다. 새 CI job·permission·secret·배포 설정은 없다.
+PC agent와 Main Docker는 독립 배포 단위지만 순수 데이터 계약은 agent의 `pharmacy-order-contract.mjs` 한 곳에 둔다. Main은 얇은 re-export로 같은 모듈을 소비한다. Main Docker에는 이 순수 계약과 타입 선언 2개만 COPY하며 agent I/O 코드·credential·실행 설정은 포함하지 않는다. Node/브라우저가 동일 export를 참조하고 Docker 입력에 두 파일이 포함되는 회귀를 추가했다. 기존 CI blocking 명령에 suite만 추가했으며 새 CI job·permission·secret·배포 제어 변경은 없다.
 
 회귀에서 기존 generic Dataset의 무키 import가 같은 밀리초의 batch id를 재사용해 행을 덮어쓰는 문제가 재현됐다. 기존 명시 key와 저장 행은 유지하고 새 무키 batch만 UUID를 사용한다. 고정 시각의 두 import가 각각 보존되는 결정적 회귀를 추가했다. 약국 계약은 이 일반 무키 경로에 의존하지 않고 별도의 명시 원본 행 키를 필수로 한다.

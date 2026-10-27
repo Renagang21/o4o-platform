@@ -1,2 +1,2 @@
-// Mirrors the PC runtime's pure contract; pharmacy-data.test.mjs checks byte-for-byte parity.
+// Main and PC runtime consume the same pure contract through this service boundary.
 export * from './contract.mjs';

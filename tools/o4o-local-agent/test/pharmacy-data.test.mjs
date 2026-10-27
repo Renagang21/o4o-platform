@@ -161,13 +161,15 @@ test('saved Mapping profile is reused only within the same owner, source program
   assert.throws(() => pharmacyMapping(owner, 'product', 'other-program', 'product-v1'), /없습니다/);
 });
 
-test('standalone browser/agent contracts and declarations are byte-identical (no Docker cross-directory dependency)', () => {
-  for (const extension of ['mjs', 'd.mts']) {
-    const server = fs.readFileSync(new URL('../src/pharmacy-order-contract.' + extension, import.meta.url), 'utf8');
-    const browser = fs.readFileSync(new URL('../../../services/web-neture/src/lib/pharmacy/contract.' + extension, import.meta.url), 'utf8');
-    assert.equal(browser, server);
-  }
+test('browser and standalone PC runtime resolve one pure contract; Docker includes only its two source files', async () => {
+  const agent = await import('../src/pharmacy-order-contract.mjs');
+  const browser = await import('../../../services/web-neture/src/lib/pharmacy/contract.mjs');
+  assert.deepEqual(Object.keys(browser), Object.keys(agent));
+  for (const key of Object.keys(agent)) assert.equal(browser[key], agent[key]);
+  const docker = fs.readFileSync(new URL('../../../services/web-neture/Dockerfile', import.meta.url), 'utf8');
+  assert.match(docker, /COPY tools\/o4o-local-agent\/src\/pharmacy-order-contract\.mjs tools\/o4o-local-agent\/src\/pharmacy-order-contract\.d\.mts \.\/tools\/o4o-local-agent\/src\//);
 });
+
 test('a directly confirmed receipt is retained; repeat automation and destructive edits require a new sheet', () => {
   importSample(); const confirmed = sheet('receipt_recorded'); confirmed.data.receipt_reference = 'fixture-receipt'; confirmed.data.receipt_at = stamp;
   importPharmacyRecords(owner, { format: PHARMACY_FORMAT, records: [confirmed] }, 1, 'user');
