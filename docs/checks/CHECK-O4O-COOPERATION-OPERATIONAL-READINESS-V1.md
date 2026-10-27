@@ -187,3 +187,52 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 배포 후 두 공개 홈과 새 `/assets/index-DEh5rNzw.js`가 모두 200이다. 배포 전 파일은 `/assets/index-CDrFRRNd.js`였으며, 새 공개 bundle에 「가입 상태를 확인할 약국」이 포함된 것도 확인했다. 실행 중인 운영 계정의 신청·탈퇴 쓰기는 수행하지 않았다. 실계정 양방향/실장치 검증의 잔여 조건은 앞 절과 같다.
 
 후속 기록은 문서 전용 변경이며 별도 runtime 배포 대상이 아니다. 운영 개통 전체 상태는 ACTIVE를 유지한다.
+
+
+## 2026-10-27 테스트 조합 실제 등록 착수
+
+사용자가 테스트 조합의 실제 등록·연합회 목록 노출을 요청하고, 점주 테스트 계정을 해당 조합 관리자, 공급자 테스트 계정을 개인 조합원으로 명시 선택했다. 값은 기록하지 않으며 환경 연결 `O4O_TEST_STOREOWNER_EMAIL`·`O4O_TEST_SUPPLIER_EMAIL`을 사용한다.
+
+대상은 기존 등록 도구의 `test` / `coop-test` 하나다. 조합 관리자 역할과 개인 회원 active 자격만 연결하고 기존 약국·공급자·플랫폼 역할은 변경하지 않는다. 사용자가 계속 표시해 확인하려는 테스트 조합의 설정 등록이며, 주문·결제·공지·문의 등 일회성 업무 데이터를 생성하지 않는다.
+
+기존 workflow가 dispatch 계정 선택값을 후속 step의 env 로그에 그대로 노출할 수 있어 실행 전에 runner masking 단계를 추가한다. 계정값은 event 파일에서 읽어 마스킹 명령으로만 전달하며 실패 시 등록 전에 중단한다. 기존 main HEAD·green CI·동일 SHA serving API·실제 API image digest 고정·dry-run·transaction·충돌 검사 경계는 완화하지 않는다. 권한·DB 구조·의존성 변경은 없다.
+
+마스킹 helper의 원문/정규화 계정, workflow 명령 escape, 누락/잘못된 입력의 출력 전 거절 테스트 3개 PASS. 아직 운영 조합 등록은 실행하지 않았다. 통합·사전 점검·등록·공개/계정별 조회 결과를 본 절에 추가한다.
+
+
+### 테스트 조합 등록 완료·권한 검증
+
+2026-10-27 사용자 지정 계정 연결과 실제 등록을 완료했다. 운영 기준 SHA는 `34c57fed2d2718a378276755a4805c050f5cd52b`다.
+
+| 단계 | 결과 |
+|---|---|
+| 마스킹 보완 [PR #856](https://github.com/Renagang21/o4o-platform/pull/856) | main 통합 완료, CI Gate·Codex 지적 없음·SonarCloud PASS |
+| [main CI 40498015680](https://github.com/Renagang21/o4o-platform/actions/runs/40498015680) | PASS |
+| [API verified 배포 40498060741](https://github.com/Renagang21/o4o-platform/actions/runs/40498060741) | PASS — 기존 동일 SHA gate를 유지하기 위한 표준 재배포. API 코드·migration 추가 없음 |
+| [사전 점검 40500292786](https://github.com/Renagang21/o4o-platform/actions/runs/40500292786) | `apply=false`, `frontend_only=false`, PASS. masking·동일 SHA API image pin·등록 조건/충돌 검사 성공, frontend 배포 skipped |
+| [실제 등록·앱 배포 40500586717](https://github.com/Renagang21/o4o-platform/actions/runs/40500586717) | `apply=true`, `frontend_only=false`, PASS. 등록 Job·revision readiness·private frontend smoke·검토 revision 트래픽 100% 검증 성공 |
+
+등록 대상은 `test` 조합과 `coop-test` 사업이다. 승인된 점주 테스트 계정에는 **해당 조합 local admin**, 승인된 공급자 테스트 계정에는 **개인 회원 active**를 연결했다. 계정 생성·비밀번호 변경·전역/연합회 권한 부여는 없다. 개인 조합원 자격을 약국 조직 가입으로 복사하지 않았다.
+
+실제 API로 다음을 확인했다. 개인 식별자·계정값·원문 응답은 공개 기록에서 제외했다.
+
+| 검증 | 관측 |
+|---|---|
+| 공개 directory | 200, 0건 → 1건. `slug=test`, `businessKey=coop-test` 일치 |
+| 두 지정 계정 로그인 | 모두 200, 기존 활성·이메일 인증 계정 사용 |
+| 조합 관리자 | 해당 조합 admin 확인, 업무 관리·역할 목록·회원 목록 조회 200 |
+| 개인 회원 | active 개인 가입, 회원 업무 조회 200, `subjectType=person` |
+| 개인 회원의 관리 접근 | 업무 관리·역할 목록 각각 403 |
+| 개인 회원에 약국 조직 header를 덧붙인 접근 | 403 — 개인 가입 단위와 약국 단위 혼합 거절 |
+| 기존 권한/매장 | 등록 전후 원래 global roles와 접근 약국/역할 fingerprint 일치, 두 계정 모두 기존 매장 연결 유지 |
+| 연합회 권한 | 두 계정 모두 연합회 역할 없음 유지 |
+
+운영 HTML/JS와 실제 공개 API 데이터를 사용해 1440/390 폭 브라우저에서 카드 1개·빈 목록 안내 제거·`조합 공간 방문 → /test`·개별 조합 제목을 확인했다. 두 시나리오 PASS, page error 0, 개별 조합 화면 가로 넘침 없음, mobile screenshot 육안 확인.
+
+클라우드의 HTTP 허용 목록에는 직접 API host가 없어 브라우저 검증은 허용된 Pharmacy 동일 출처 API proxy로 연결하는 테스트 transport override를 사용했다. 첫 cross-origin proxy 시도는 proxy의 중복 CORS 헤더 때문에 실패했고 동일 출처 테스트 연결로 정정했다. 운영 데이터·응답·자격 판정은 합성하지 않았다. 직접 API host의 네트워크/CORS 검증으로 확대하지 않는다. 임시 HTTP 파일과 browser context는 종료 시 정리했다.
+
+공개 진입은 [연합회](https://pharmcoop.neture.co.kr/) → [테스트 조합](https://pharmcoop.neture.co.kr/test), 해당 조합 관리는 `/test/operator`다. `/operator`는 별도 연합회 권한 공간이다. 이미 열린 연합회 페이지에는 새로고침이 필요하다.
+
+이 조합은 사용자가 계속 표시해 확인하도록 요청한 테스트 공간 설정으로 유지한다. 이번 작업에서 주문·결제·공지·문의 등의 일회성 테스트 업무 데이터는 생성하지 않았다. 정상 인증의 보안/감사 기록은 정책에 따라 보존한다. 실제 법정정보·약관 게시와 일반 신규 가입 개통을 완료한 것으로 처리하지 않는다.
+
+**문서 정합:** 이전의 계정 미지정·공개 조합 0건·테스트 등록 미실행 표는 당시 관측으로 보존한다. 이번 등록으로 Pharmcoop 테스트 조합 및 두 지정 계정 연결 항목을 해소했다. 다른 사업의 운영자·약관·실매장 항목은 남아 전체 WO는 ACTIVE다.

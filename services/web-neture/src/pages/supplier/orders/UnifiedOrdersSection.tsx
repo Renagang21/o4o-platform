@@ -9,6 +9,14 @@ import {
 } from './presentation';
 import { styles } from './styles';
 
+function pageLabel(page: number, total: number, pageSize: number, loading: boolean, error: boolean) {
+  if (loading) return `${page}페이지 확인 중`;
+  if (error) return `${page}페이지 · 조회 실패`;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (page > totalPages) return `${page}페이지 · 이전 페이지 확인`;
+  return `${page} / ${totalPages} 페이지`;
+}
+
 // 통합 주문 보기 섹션 (읽기) — neture_orders + checkout_orders
 export function UnifiedOrdersSection({
   orders,
@@ -18,6 +26,9 @@ export function UnifiedOrdersSection({
   total,
   sourceFilter,
   onChangeFilter,
+  page,
+  pageSize,
+  onChangePage,
 }: {
   orders: UnifiedSupplierOrder[];
   loading: boolean;
@@ -26,6 +37,9 @@ export function UnifiedOrdersSection({
   total: number;
   sourceFilter: 'all' | 'neture' | 'checkout';
   onChangeFilter: (f: 'all' | 'neture' | 'checkout') => void;
+  page: number;
+  pageSize: number;
+  onChangePage: (page: number) => void;
 }) {
   const FILTERS: Array<{ key: 'all' | 'neture' | 'checkout'; label: string }> =
     [
@@ -41,7 +55,7 @@ export function UnifiedOrdersSection({
           <h2 style={styles.unifiedTitle}>통합 주문 보기</h2>
           <p style={styles.unifiedSubtitle}>
             Neture 주문과 이벤트 오퍼·서비스 주문을 한 곳에서 확인합니다.
-            {error ? ' (읽기 전용)' : ` (읽기 전용 · 총 ${total}건)`}
+            {loading || error ? ' (읽기 전용)' : ` (읽기 전용 · 총 ${total}건)`}
           </p>
         </div>
         <div style={styles.filterRow}>
@@ -83,7 +97,7 @@ export function UnifiedOrdersSection({
           </button>
         </div>
       ) : orders.length === 0 ? (
-        <div style={styles.unifiedEmpty}>표시할 주문이 없습니다.</div>
+        <div style={styles.unifiedEmpty}>{page > 1 ? '이 페이지에 표시할 주문이 없습니다. 이전 페이지로 이동해 주세요.' : '표시할 주문이 없습니다.'}</div>
       ) : (
         <div style={styles.unifiedList}>
           {orders.map((o) => {
@@ -160,6 +174,16 @@ export function UnifiedOrdersSection({
             );
           })}
         </div>
+      )}
+
+      {(total > pageSize || page > 1) && (
+        <nav aria-label="통합 주문 페이지" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 16 }}>
+          <button type="button" className="disabled:opacity-40 disabled:cursor-not-allowed" aria-label="통합 주문 이전 페이지" disabled={loading || page === 1} onClick={() => onChangePage(page - 1)} style={{ minHeight: 44, padding: '8px 12px' }}>이전</button>
+          <span aria-live="polite">
+            {pageLabel(page, total, pageSize, loading, error)}
+          </span>
+          <button type="button" className="disabled:opacity-40 disabled:cursor-not-allowed" aria-label="통합 주문 다음 페이지" disabled={loading || error || page * pageSize >= total} onClick={() => onChangePage(page + 1)} style={{ minHeight: 44, padding: '8px 12px' }}>다음</button>
+        </nav>
       )}
 
       <p style={styles.unifiedFootnote}>
