@@ -64,7 +64,7 @@ export async function installPackage({source,home,dataHome,programs=null,allowNe
    mkdir(stage);
    for(const name of [...Object.keys(manifest.files),'release.json']){const output=path.join(stage,...name.split('/'));mkdir(path.dirname(output));fs.copyFileSync(path.join(source,...name.split('/')),output,fs.constants.COPYFILE_EXCL);}
    verifyPackage(stage);
-   if(fs.existsSync(slot)){damaged=path.join(home,'versions','.damaged-'+manifest.releaseId+'-'+randomUUID());fs.renameSync(slot,damaged);}
+   if(fs.existsSync(slot)){const quarantine=path.join(home,'versions','.damaged-'+manifest.releaseId+'-'+randomUUID());fs.renameSync(slot,quarantine);damaged=quarantine;}
    fs.renameSync(stage,slot);
   }
   await preflight(slot,dataHome);await beforeActivate();
