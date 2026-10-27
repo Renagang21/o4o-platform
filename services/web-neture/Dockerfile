@@ -85,6 +85,9 @@ COPY packages/screen-content-core/ ./packages/screen-content-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
 COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 
+# Pure pharmacy data contract shared by Main and the standalone PC runtime (no agent I/O code).
+COPY tools/o4o-local-agent/src/pharmacy-order-contract.mjs tools/o4o-local-agent/src/pharmacy-order-contract.d.mts ./tools/o4o-local-agent/src/
+
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
