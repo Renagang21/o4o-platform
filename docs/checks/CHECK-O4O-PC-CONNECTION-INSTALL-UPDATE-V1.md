@@ -21,6 +21,7 @@ UI의 ‘최신’은 실제 health의 releaseId·프로그램 버전·SQLite re
 - 손상 파일·허용 밖 credential 경로·symlink/junction·설치 충돌·데이터 위치 변경·실행 중/불명 PC 거절, 기존 버전 및 pointer 보존 확인 PASS.
 - 설치/배포 무관 source SHA만 달라질 때 releaseId 동일·다운로드 filename/hash 구분 확인 PASS.
 - UI/다운로드/기존 LNA/약국 준비 회귀 27개 PASS. 오래된 연결 PC·버전번호만 일치·DB 미준비를 완료로 표시하지 않는지, size/SHA256 실패 시 파일 제공 중단, manifest 재확인을 검증했다.
+- Chromium desktop 1280px/mobile 390px에서 실제 약 34MB ZIP 다운로드·SHA256 검증·파일명·가로 overflow 없음·page error 없음 확인 PASS. 합성 공개 manifest를 사용한 로컬 화면 확인이며 운영 로그인/실제 PC 연결 증거는 아니다.
 - frontend typecheck·production names-profile build PASS. CI gate/affected scope 관련 local suite PASS. 의존성/lockfile 변경 없음.
 
 새 worktree의 패키지 dist 누락으로 최초 UI suite 하나가 resolve 실패했고, source가 동일한 기존 패키지 build 산출물을 준비한 뒤 전체 관련 suite를 다시 실행해 통과했다. 실패를 실행 성공으로 계산하지 않았다.
