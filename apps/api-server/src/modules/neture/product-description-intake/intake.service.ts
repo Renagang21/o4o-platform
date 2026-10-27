@@ -4,7 +4,8 @@ import { SharedProductDescriptionService } from '../services/shared-product-desc
 import { DescriptionIntakeError, descriptionFingerprint, prepareDescriptionEntries, type DescriptionEntry } from './contracts.js';
 import { findDescriptionTargets } from './lookup.service.js';
 
-export const DESCRIPTION_INTAKE_LABEL = 'PRODUCT_DESCRIPTION_RESOURCE_V1';
+import { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
+export { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
 interface Resource {
   entry: DescriptionEntry; fingerprint: string;
   origin?: { organizationId: string; contentId: string; revision: string; actor: string };

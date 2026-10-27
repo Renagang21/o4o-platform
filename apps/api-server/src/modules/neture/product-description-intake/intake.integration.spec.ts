@@ -1,3 +1,5 @@
+import { ProductCandidateService } from '../services/product-candidate.service.js';
+import { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
 import { randomUUID } from 'node:crypto';
 import { DataSource, Entity, PrimaryColumn, Column } from 'typeorm';
 import { Pool } from 'pg';
@@ -125,6 +127,32 @@ integration('description intake — isolated PostgreSQL', () => {
     expect(rejected.reason).toMatchObject({ code: 'DESCRIPTION_CANONICAL_CHANGED' });
     const canonical = await db.query("SELECT id FROM shared_product_descriptions WHERE master_id=$1 AND description_type='B2B' AND language='ko' AND status='canonical'", [master]);
     expect(canonical).toHaveLength(1);
+  });
+
+  it('isolates private description resources from every generic operator candidate read/write path', async () => {
+    const generic = new ProductCandidateService(db);
+    const submitted = await service.submit({ entries: [entry({ content: '<p>Private review body</p>' })] }, actor);
+    const id = submitted.items[0].id, before = await service.detail(id);
+    const normal = await generic.createCandidate({ sourceType: 'operator_import', candidateName: 'Synthetic generic candidate' });
+    const labeled = await generic.createCandidate({ sourceType: 'external_api', sourceLabel: 'SYNTHETIC_PUBLIC_DATA', candidateName: 'Synthetic labeled candidate' });
+    for (const filter of [{ scopeServiceKeys: ['kpa-society'] }, { scopeServiceKeys: null }, { sourceLabel: DESCRIPTION_INTAKE_LABEL }]) {
+      const result = await generic.findCandidates(filter);
+      expect(result.items.some(row => row.id === id)).toBe(false);
+      if ('sourceLabel' in filter) expect(result).toEqual({ items: [], total: 0 });
+      else expect(result.items.map(row => row.id)).toEqual(expect.arrayContaining([normal.id, labeled.id]));
+    }
+    expect(await generic.getCandidate(id)).toBeNull();
+    await expect(generic.getConflictInfo(id)).rejects.toThrow('CANDIDATE_NOT_FOUND');
+    await expect(generic.rejectCandidate(id, 'Not allowed', actor)).rejects.toThrow('CANDIDATE_NOT_FOUND');
+    await expect(generic.archiveCandidate(id, actor)).rejects.toThrow('CANDIDATE_NOT_FOUND');
+    for (const action of ['archive', 'ignore', 'manual_review'] as const) {
+      const result = await generic.bulkAction([id, normal.id, labeled.id], action, actor);
+      expect(result.updated).toBe(2); expect((await service.detail(id)).revision).toBe(before.revision);
+    }
+    expect(await generic.getCandidate(normal.id)).not.toBeNull();
+    await expect(generic.createCandidate({ sourceType: 'operator_import', sourceLabel: DESCRIPTION_INTAKE_LABEL })).rejects.toThrow('INVALID_DESCRIPTION_RESOURCE_NAMESPACE');
+    await expect(generic.createCandidate({ sourceType: 'operator_import', rawPayload: { descriptionResource: {} } })).rejects.toThrow('INVALID_DESCRIPTION_RESOURCE_NAMESPACE');
+    expect((await service.detail(id)).entry.content).toBe('<p>Private review body</p>');
   });
 
 });
