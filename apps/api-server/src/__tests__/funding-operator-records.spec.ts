@@ -53,3 +53,12 @@ it('reports one current participant after withdrawal/replacement while preservin
   expect(data.summary).toMatchObject({totalCount:1,recordCount:2,withdrawnCount:1,productCount:1,pendingCount:1});
   expect(data.participants.map((p:any)=>p.withdrawn)).toEqual([true,false]);
 });
+
+it('preserves the history data array while adding bounded page metadata', async () => {
+  ds.query.mockReset().mockResolvedValueOnce([{ id: 'participant' }]).mockResolvedValueOnce(Array.from({ length: 51 }, (_, n) => ({ id: String(n) })));
+  const res = response();
+  await Controller.participantHistory({ params: { id: '10000000-0000-4000-8000-000000000001', participantId: '20000000-0000-4000-8000-000000000001' }, query: { page: '2' } } as any, res);
+  const result = res.json.mock.calls[0][0];
+  expect(result).toMatchObject({ success: true, page: 2, hasMore: true });
+  expect(Array.isArray(result.data)).toBe(true); expect(result.data).toHaveLength(50);
+});

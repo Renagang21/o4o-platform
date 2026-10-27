@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import FundingParticipantsSection, { fundingParticipantFilters } from './FundingParticipantsSection';
 
-const participant: any = { id: 'fixture-participant', name: '샘플 참여자', type: 'store_owner', rewardType: 'product', rewardStatus: 'pending', joinedAt: '2026-10-01T00:00:00Z', paymentStatus: 'paid', paidAmount: 12000, paidAt: '2026-10-01T00:00:00Z', confirmedAt: '2026-10-11T00:00:00Z', paymentReference: 'fixture-reference', paymentNote: '기존 메모' };
+const participant: any = { id: 'fixture-participant', paymentVersion: 0, name: '샘플 참여자', type: 'store_owner', rewardType: 'product', rewardStatus: 'pending', joinedAt: '2026-10-01T00:00:00Z', paymentStatus: 'paid', paidAmount: 12000, paidAt: '2026-10-01T00:00:00Z', confirmedAt: '2026-10-11T00:00:00Z', paymentReference: 'fixture-reference', paymentNote: '기존 메모' };
 const save = vi.fn();
 const props = () => ({ participants: [participant], totalCount: 1, trialStatus: 'recruiting' as const, filter: 'all' as const, paymentFilter: '' as const, onFilterChange: vi.fn(), onPaymentFilterChange: vi.fn(), onExport: vi.fn(), exportLoading: false, onToggleRewardStatus: vi.fn(), updatingId: null, onPaymentStatusChange: save, updatingPaymentId: null, loading: false, error: '', onRetry: vi.fn() });
 beforeEach(() => { vi.clearAllMocks(); save.mockResolvedValue(true); });
@@ -26,14 +26,14 @@ it.each(['입금 확인 취소'])('%s preserves amount/reference/date and record
   fireEvent.change(screen.getByLabelText('처리 사유 (선택)'), { target: { value: '테스트 사유' } });
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
   await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
-  expect(save.mock.calls[0][1]).toEqual({ paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: '테스트 사유' });
+  expect(save.mock.calls[0][1]).toEqual({ version: 0, paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: '테스트 사유' });
 });
 
 it.each(['입금 확인 취소'])('%s with no reason clears the obsolete confirmation note', async action => {
   render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: action }));
   fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
   await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
-  expect(save.mock.calls[0][1]).toEqual({ paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: null });
+  expect(save.mock.calls[0][1]).toEqual({ version: 0, paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: null });
 });
 
 it('a refunded record can be reconfirmed and cleared note/reference are explicit null', async () => {
@@ -90,4 +90,15 @@ it('marks withdrawn history while the heading counts only current participants',
  render(<FundingParticipantsSection {...props()} totalCount={0} participants={[{...participant,withdrawn:true}]}/>);
  expect(screen.getByText('펀딩 참여자 (0명)')).toBeTruthy();expect(screen.getAllByText('참여 철회').length).toBeGreaterThan(0);
  expect(screen.queryByText('아직 참여자가 없습니다.')).toBeNull();
+});
+
+it('keeps the version of the opened form instead of silently accepting a refreshed record', async () => {
+  const p = props();
+  const view = render(<FundingParticipantsSection {...p} participants={[participant]} />);
+  fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
+  view.rerender(<FundingParticipantsSection {...p} participants={[{ ...participant, paymentVersion: 1, paidAmount: 13000 }]} />);
+  expect(screen.getByRole('alert').textContent).toContain('현황이 변경');
+  expect((screen.getByRole('button', { name: '기록 저장' }) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
+  expect((screen.getByLabelText('입금 확인 금액 (원)') as HTMLInputElement).value).toBe('13000');
 });

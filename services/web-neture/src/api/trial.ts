@@ -144,6 +144,7 @@ export interface TrialParticipant {
   settlementRemainder: number | null;
   settlementNote: string | null;
   // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+  paymentVersion: number;
   paymentStatus: PaymentStatus;
   paymentMethod: string | null;
   paymentProvider: string | null;
@@ -241,6 +242,10 @@ export interface Participation {
 export type CreditProcessStatus = 'not_applicable' | 'pending' | 'planned' | 'completed';
 
 export interface ParticipationInfo {
+  paymentStatus?: PaymentStatus;
+  paidAmount?: number | null;
+  paidAt?: string | null;
+  confirmedAt?: string | null;
   withdrawn?:boolean; refundedAmount?:number;refundedAt?:string|null;
   id: string;
   trialId: string;
@@ -524,6 +529,7 @@ export async function updateParticipantSettlementStatus(
  *   - confirmedAt 미지정 + paymentStatus='paid' → 백엔드가 자동 stamp
  */
 export interface UpdateParticipantPaymentInput {
+  version: number;
   paymentStatus: PaymentStatus;
   paymentMethod?: string | null;
   paymentProvider?: string | null;
@@ -535,6 +541,7 @@ export interface UpdateParticipantPaymentInput {
 }
 
 export interface UpdateParticipantPaymentResult {
+  paymentVersion: number;
   id: string;
   paymentStatus: PaymentStatus;
   paymentMethod: string | null;

@@ -51,3 +51,16 @@ it('a failed post-write detail read locks subsequent writes until read-only reco
   expect(result.current.refreshRequired).toBe(false); expect(result.current.savedBeforeRefresh).toBe(false);
   expect(api.status).toHaveBeenCalledTimes(1);
 });
+
+it('requires a read-only refresh after a version conflict and never retries the write automatically', async () => {
+  api.detail.mockResolvedValue({ id: 'fixture' }); api.participants.mockResolvedValue({ participants: [], summary: {} }); api.kpi.mockResolvedValue(null);
+  api.payment.mockRejectedValue({ response: { data: { code: 'PAYMENT_VERSION_CONFLICT', message: '다시 조회' } } });
+  const { result } = renderHook(() => useFundingOperatorWorkflow('fixture'));
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  await act(async () => { expect(await result.current.handlePaymentStatusChange({ id: 'p' } as any, { paymentStatus: 'paid', version: 0 })).toBe(false); });
+  expect(result.current.refreshRequired).toBe(true);
+  await act(async () => { expect(await result.current.handlePaymentStatusChange({ id: 'p' } as any, { paymentStatus: 'paid', version: 0 })).toBe(false); });
+  expect(api.payment).toHaveBeenCalledTimes(1);
+  await act(async () => { await result.current.refresh(); });
+  expect(result.current.refreshRequired).toBe(false); expect(api.payment).toHaveBeenCalledTimes(1);
+});

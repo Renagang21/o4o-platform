@@ -45,6 +45,7 @@ type PaymentRow = {
   id: string; paymentStatus: string; paymentMethod: string | null; paymentProvider: string | null;
   paymentReference: string | null; paymentNote: string | null; paidAmount: string | number | null;
   paidAt: Date | null; confirmedAt: Date | null; updatedAt: Date | null;
+  offlineState?: { version?: number; refundAmount?: number };
 };
 const date = (value: Date | null) => value ? new Date(value).toISOString() : null;
 const amount = (value: string | number | null) => value == null ? null : Number(value);
@@ -54,6 +55,9 @@ export class FundingPaymentRecordService {
 
   async update(trialId: string, participantId: string, actorId: string, input: Record<string, unknown>) {
     const status = validatePaymentRecord(input);
+    if (!Number.isSafeInteger(input.version) || Number(input.version) < 0) {
+      throw new FundingError(400, 'PAYMENT_VERSION_REQUIRED', '최신 참여자 현황을 다시 조회한 뒤 저장해 주세요.');
+    }
     return this.ds.transaction(async manager => {
       await manager.query('SELECT id FROM market_trials WHERE id=$1 FOR UPDATE',[trialId]);
       const [before]: PaymentRow[] = await manager.query(
@@ -64,6 +68,10 @@ export class FundingPaymentRecordService {
       );
       if (!before) throw new FundingError(404, 'PARTICIPANT_NOT_FOUND', '이 펀딩의 참여자를 찾을 수 없습니다.');
 
+      const version = before.offlineState?.version ?? 0;
+      if (version !== input.version) {
+        throw new FundingError(409, 'PAYMENT_VERSION_CONFLICT', '다른 처리로 현황이 변경됐습니다. 다시 조회하고 입력 내용을 확인해 주세요.');
+      }
       const refund=Number((before as PaymentRow & {offlineState?:{refundAmount?:number}}).offlineState?.refundAmount??0);
       if (status === 'refunded' && refund === 0) {
         throw new FundingError(409,'OFFLINE_REFUND_RECORD_REQUIRED','환급 완료는 오프라인 사후 처리에서 누적 환급액·처리일·사유와 함께 기록해 주세요.');
@@ -76,6 +84,8 @@ export class FundingPaymentRecordService {
       const recordedStatus = refund > 0 ? (refund === nextAmount ? 'refunded' : 'paid') : status;
       const values: unknown[] = [recordedStatus];
       const sets = ['"paymentStatus" = $1'];
+      values.push(version + 1);
+      sets.push(`"offlineState" = jsonb_set(COALESCE("offlineState", '{}'::jsonb), '{version}', to_jsonb($2::integer))`);
       for (const field of optionalFields) {
         const value = input[field];
         if (field === 'paidAt' || field === 'confirmedAt' || value === undefined) continue;
@@ -114,7 +124,7 @@ export class FundingPaymentRecordService {
       });
       await refreshFundingAmount(manager,trialId);
       return {
-        ...after, paidAmount: amount(after.paidAmount), paidAt: date(after.paidAt),
+        ...after, paymentVersion: version + 1, paidAmount: amount(after.paidAmount), paidAt: date(after.paidAt),
         confirmedAt: date(after.confirmedAt), updatedAt: date(after.updatedAt),
       };
     });
