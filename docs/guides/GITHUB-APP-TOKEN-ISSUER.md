@@ -78,6 +78,10 @@ HTTPS credential helper를 사용하지 않으므로 SSH 접속 전에 차단한
 기존 인증 헤더를 지우거나 덮어쓰지 않으며 설정 이름의 존재만 확인한다. 빈 값이나 인증 외의
 추가 헤더도 보수적으로 충돌로 취급하므로, 그런 설정이 있는 환경은 먼저 관리자가 별도로 정리해야 한다.
 
+Git 명령은 `git push origin ...`처럼 동작 바로 다음에 remote 이름을 지정한다.
+`insteadOf`/`pushInsteadOf`까지 해석한 remote URL이 대상 저장소의 HTTPS이고
+userinfo·query·fragment가 없는지 발급 전에 확인한다. URL에 저장된 다른 credential은 사용하지 않는다.
+
 ## 운영 배포와의 경계
 
 App installation token의 실행 주체는 **App bot**이다. 저장소 소유자 사용자와 동일하지 않다.

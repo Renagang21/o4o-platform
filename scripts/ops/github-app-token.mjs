@@ -129,6 +129,26 @@ export function checkGitAuthConfig(env = process.env, run = spawnSync) {
   if (result.status === 0) fail('Existing Git HTTP extraHeader configuration conflicts with explicit App identity.');
 }
 
+export function checkGitRemote(command, env = process.env, run = spawnSync) {
+  const remote = command[2];
+  if (!remote || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(remote)) {
+    fail('Specify a named Git remote immediately after fetch/push/ls-remote.');
+  }
+  const args = ['remote', 'get-url', '--all', ...(command[1] === 'push' ? ['--push'] : []), remote];
+  // get-url expands insteadOf/pushInsteadOf. Captured URLs never enter diagnostics.
+  const result = run('git', args, { env, encoding: 'utf8', maxBuffer: 65536 });
+  if (result.error || result.status !== 0 || !result.stdout?.trim()) fail('Cannot verify the selected Git remote.');
+  const valid = result.stdout.trim().split(/\r?\n/).every(value => {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && url.hostname === 'github.com' && !url.port
+        && !url.username && !url.password && !url.search && !url.hash
+        && url.pathname.replace(/\/$/, '').replace(/\.git$/, '').toLowerCase() === '/' + REPOSITORY.toLowerCase();
+    } catch { return false; }
+  });
+  if (!valid) fail('Git remote must be credential-free HTTPS for exactly the configured repository.');
+}
+
 export function childEnvironment(token, env = process.env) {
   // Explicit opt-in identity selection happens in CLI; no parent/global config changes.
   if (env.GIT_ALLOW_PROTOCOL !== undefined && !env.GIT_ALLOW_PROTOCOL.split(':').includes('https')) {
@@ -179,7 +199,10 @@ export function parse(args) {
 export function main(args, dependencies = {}) {
   const { mode, profile, command } = parse(args);
   const env = dependencies.env || process.env;
-  if (mode === 'exec' && command[0] === 'git') checkGitAuthConfig(env, dependencies.configRun || spawnSync);
+  if (mode === 'exec' && command[0] === 'git') {
+    checkGitAuthConfig(env, dependencies.configRun || spawnSync);
+    checkGitRemote(command, env, dependencies.configRun || spawnSync);
+  }
   const config = configuration(env);
   const key = (dependencies.loadKey || loadKey)(config.keyFile);
   const api = dependencies.api || request;

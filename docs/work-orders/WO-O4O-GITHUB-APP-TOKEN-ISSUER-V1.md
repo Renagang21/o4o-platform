@@ -49,3 +49,5 @@ scp형/ssh://형 모두 SSH 프로그램 실행 전에 차단하는 실제 Git �
 추가 리뷰의 기존 Git Authorization extraHeader 우회도 발급 전 설정 이름 검사로 차단했다.
 범용/host별/저장소 경로별 extraHeader와 설정 조회 오류의 실제 Git 회귀를 추가했다.
 헤더 값은 읽거나 출력하지 않고 기존 설정을 유지한다.
+
+같은 신원 검사를 remote의 실제 해석 URL로 확대해 URL 내 credential·다른 host/repository·SSH를 발급 전에 거부한다.

@@ -5,7 +5,7 @@ import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { configuration, loadKey, jwt, issue, request, checkGitAuthConfig, childEnvironment, main, parse, PROFILES, REPOSITORY } from './github-app-token.mjs';
+import { configuration, loadKey, jwt, issue, request, checkGitAuthConfig, checkGitRemote, childEnvironment, main, parse, PROFILES, REPOSITORY } from './github-app-token.mjs';
 
 const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const config = { appId: '123', installationId: '456', keyFile: '/not-a-real-secret.pem' };
@@ -182,6 +182,21 @@ test('configured HTTP headers cannot override explicit App identity, and configu
     }
     assert.throws(() => checkGitAuthConfig(base, () => ({ status: 2 })), /Cannot verify/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('resolved push URLs cannot select embedded credentials, another host, or another repository', () => {
+  const git = ['git', 'push', 'origin', 'wo/fixture'];
+  const run = url => (bin, args) => {
+    assert.deepEqual(args, ['remote', 'get-url', '--all', '--push', 'origin']);
+    return { status: 0, stdout: url + '\n' };
+  };
+  checkGitRemote(git, {}, run('https://github.com/Renagang21/o4o-platform.git'));
+  for (const url of ['https://user:synthetic-private-value@github.com/Renagang21/o4o-platform.git',
+    'https://other-host.test/Renagang21/o4o-platform.git', 'https://github.com/Renagang21/other.git',
+    'git@github.com:Renagang21/o4o-platform.git', 'https://github.com/Renagang21/o4o-platform.git?auth=synthetic-private-value']) {
+    assert.throws(() => checkGitRemote(git, {}, run(url)), e => /credential-free HTTPS/.test(e.message) && !e.message.includes('synthetic-private-value'));
+  }
+  assert.throws(() => checkGitRemote(['git','push','--all']), /named Git remote/);
 });
 
 test('each command gets a fresh lease and revokes even after child failure; metadata omits token', () => {
