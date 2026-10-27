@@ -98,3 +98,75 @@ Pharmacy/MegaPharm과 CarePharm의 공개 JS가 전환 전 파일에서 변경�
 ## 문서 정합
 
 기존 V2의 COMPLETED는 개발·통합·배포 완료이며 실계정·실매장 검증은 별도라고 명시돼 있어 모순이 아니다. 과거 기록과 canonical index를 다시 쓰지 않았다. 본 작업은 운영 개통 미완료를 ACTIVE로 추적한다.
+
+## 2026-10-27 후속 — main 병합 전 가입 대상 정합 검증
+
+### 범위와 구현
+
+사용자 「진행하자 main병합 전까지」에 따른 후속 작업이다. 기준 main `e96c4a7934`, 작업 branch `wo/cooperation-opening-validation-20261027`. 앞 절의 PR #844/#846 배포는 이전 변경의 완료 증거이며, 아래 새 변경의 main 반영·배포를 뜻하지 않는다.
+
+Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태 조회·신청·탈퇴 요청에 전달하지 않는 결함을 확인했다. 기존 API는 선택 조직 header를 지원하지만 이 화면은 생략하고 있었다.
+
+- 현재 계정의 접근 가능 목록에서 owner/admin/manager 약국을 선택한다. 사업 미가입 약국도 신청할 수 있어야 하므로 활성 사업 회원만 고르는 자료함 selector로 대체하지 않았다.
+- 하나면 자동 선택하되 잘못된 명시적 선택을 다른 약국으로 바꾸지 않는다. 여러 개면 선택 전 가입 조회·신청·탈퇴를 시작하지 않는다. 직원 전용 목록에는 경영자 가입 조작을 제공하지 않는다.
+- 가입 조회·신청·탈퇴 모두 기존 `X-Store-Organization-Id`로 같은 약국을 전달한다. 기존 다른 POST 소비처의 동작은 유지한다.
+- 약국/계정/사업 전환 시 입력·동의·상태를 분리하고 이전 응답을 버린다. 처리 중 selector를 잠그되 외부 URL 전환 후 새 약국의 selector가 잠긴 채 남지 않도록 한다. 다른 query와 hash도 보존하며 참여자 게시판 진입에도 선택 약국을 유지한다.
+- 담당 운영자 안내에는 회원용 약국 선택을 요구하지 않는다. CarePharm의 기존 scoped client와 Pharmcoop 개인 가입 코드는 변경하지 않았다. 서버 권한·API endpoint·schema·dependency·CI 설정 변경은 없다.
+
+직접 소비처는 Pharmacy/MegaPharm 앱의 `/my/participation`과 기존 `/businesses/:businessKey/participation`이다. 로컬 `businessApi.post`의 다른 소비처는 사업 게시판 작성·가입 요청·댓글·좋아요·게시판 관리이며, 선택 인자를 주지 않은 기존 호출 형태를 유지한다.
+
+### 검증
+
+| 항목 | 결과 |
+|---|---|
+| Pharmacy Business 전체 | 21 files / 160 tests PASS — 새 회귀 11개 포함 |
+| shared-space-ui 전체 | 23 files / 206 tests PASS |
+| operator-core-ui 전체 | 30 files / 217 tests PASS |
+| Pharmcoop 전체 | 11 files / 85 tests PASS |
+| 합계 | 668 tests PASS |
+| Pharmacy Business production build | PASS |
+| 변경 파일 ESLint·diff 검사 | PASS |
+| 문서 민감정보 검사 | PASS |
+
+새 회귀는 미선택·명시적 타 약국·직원 전용·목록 조회 실패/복구·미게시 약관 차단·지정 약국 신청/탈퇴·변경 시 입력/동의 초기화·이전 응답 무시를 확인한다. 기존 테스트의 모든 header 포함 조회를 active로 고정하던 mock을 제거하고 자료함 fixture의 가입 상태를 개별 지정했다.
+
+초기 회귀 실행에서 약국 선택 시 hash가 사라지는 것을 발견해 URL 갱신을 보완했다. mock 변경으로 드러난 자료함 fixture 누락 2건도 정정한 뒤 전체 검증했다. 첫 ESLint의 기존 effect dependency 경고를 정리했고 최종 검사에는 경고가 없다.
+
+실제 Pharmacy/MegaPharm 빌드 산출물을 loopback preview로 실행했다. 모든 외부 요청을 가로채 합성 API만 연결했으며 운영 자격증명이나 업무 데이터는 사용하지 않았다. 두 host × 1440/390 폭, 총 4개 시나리오 PASS:
+
+- 다중 약국에서 선택 전 가입 조회 0건
+- 약국 A의 신청→pending, 약국 B의 기존 active 조회→탈퇴 요청
+- 모든 조회/쓰기의 선택 조직 header 일치, 이전 약국 상태 제거
+- query/hash 보존, page error 0, 가로 넘침 없음; mobile screenshot 육안 확인
+
+로컬 합성 API 상태 전이 결과이며 실제 운영 신청·승인·탈퇴를 수행한 것은 아니다. 실계정 양방향 업무·실장치 음성 검증의 완료 증거로 사용하지 않는다.
+
+### 실제 환경 재확인과 잔여 입력
+
+정상 HTTPS와 지정 점주 Secret으로 읽기만 재확인했다. 인증의 보안/감사 기록은 정책에 따라 보존하며 사업 데이터 쓰기는 없다.
+
+| 항목 | 이번 관측 |
+|---|---|
+| 네 공개 홈 | 모두 200 |
+| 세 사업의 가입 정책 | 각각 503 |
+| 세 사업 terms/privacy | 총 6개 경로 모두 404 |
+| 공개 cooperatives | 200, 0건 — 전체 DB에 조합이 없다는 결론 아님 |
+| 지정 점주 | 로그인·접근 매장 조회 200, owner 매장 1개 |
+| 점주의 Pharmacy/MegaPharm/CarePharm 업무 읽기 | 모두 200, 업무·자료 응답 구조 확인 |
+| 직원 | 이전 401 이후 Secret 정정 확인이 없어 이번 재로그인 미실행 |
+| 운영자·개인 조합원 | 지정 계정 Secret 미연결, 실계정 검증 미실행 |
+
+운영자와 개인 조합원 Secret 연결·테스트 대상 지정은 사용자 입력 대기다. 기능/직원 허용/담당 운영자/공개 조합 설정은 확인 경로를 정리했으나 실제 설정값까지 검증하지 못했다. 실제 회사 정보 없는 CarePharm 초안은 빈칸 유지이며 게시하지 않았다. 운영 데이터·role·조합 등록·약관 게시·신청/탈퇴·문의/공지/활동의 운영 쓰기는 수행하지 않았다.
+
+[개통 검증 절차](../guides/O4O-COOPERATION-OPENING-VALIDATION-V1.md)에 계정/가입 단위, 기존 운영 설정 진입, 공지·자료·활동·지원의 양방향 확인, 운영 쓰기 사전조건과 실제 장치 검증 기준을 묶었다.
+
+### 전달 상태
+
+이번 변경은 검증·commit·push까지만 진행한다. PR 생성·main 병합·자동 병합·배포는 미실행이다. 개통 전체 상태는 ACTIVE를 유지한다. 최종 빌드로 브라우저 4개 시나리오를 재실행해 모두 통과했다. 본 작업 preview만 종료했고 loopback 4311 포트 종료를 확인했다. 이번 작업은 DB container를 생성하지 않았다. 원격 branch 일치는 push 후 별도로 확인한다.
+
+문서 정합: 이전 배포 완료 기록을 유지하면서 새 미배포 변경과 개통 미완료를 분리했다. canonical index·과거 완료 상태 변경은 없다.
+
+
+### PR #851 리뷰 보완
+
+사용자가 main 통합·배포를 승인한 후 최신 main의 펀딩 변경을 충돌 없이 반영했다. Codex가 신청 중 외부 약국 전환 후 원래 약국으로 돌아오면 이전 pending marker 때문에 selector가 잠기는 문제를 지적했다. 회귀를 확장해 수정 전 1개 실패를 재현했고, 선택 약국 변경 시 marker를 정리하도록 보완했다. 이전 요청이 새 화면을 갱신하지 않는 기존 경계는 유지한다. 최종 CI·리뷰·배포 결과는 후속 기록으로 추가한다.

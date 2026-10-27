@@ -35,3 +35,14 @@ Pharmacy·MegaPharm·CarePharm·Pharmcoop의 공지·자료·참여·지원에�
 ## 검증과 인계
 
 상세 근거·미확인 범위·전달 상태는 [CHECK](../checks/CHECK-O4O-COOPERATION-OPERATIONAL-READINESS-V1.md)에 기록한다. 남은 운영 입력은 별도 소규모 개발로 쪼개지 않고 이 작업의 개통 항목으로 추적한다.
+
+
+## 2026-10-27 후속 — 가입 대상 정합과 개통 검증 준비
+
+사용자 「진행하자 main병합 전까지」에 따라 최신 main `e96c4a7934`에서 `wo/cooperation-opening-validation-20261027` branch를 시작했다. 준비된 격리 클라우드 checkout을 사용하며 이전 배포 기록 branch는 재사용하지 않는다.
+
+가입·운영 설정 점검과 운영자↔회원 검증을 함께 진행하되, 이번 종료점은 검증·commit·push다. PR 생성·main 병합·자동 병합·배포와 운영 데이터 쓰기는 수행하지 않는다.
+
+Pharmacy/MegaPharm 참여 화면이 URL의 선택 약국을 가입 조회·신청·탈퇴에 전달하지 않는 문제를 보완한다. 실제 접근 가능한 경영 단위의 약국 선택을 선행하고 기존 API header로 같은 조직을 전달한다. CarePharm의 기존 선택 흐름과 Pharmcoop 개인 가입은 유지한다. 신규 schema·role·정책·API endpoint를 추가하지 않는다.
+
+실계정·약관 입력이 없는 항목은 완료로 바꾸지 않는다. 검증 순서·운영 설정 확인 위치·완료 기준은 [운영 개통 절차](../guides/O4O-COOPERATION-OPENING-VALIDATION-V1.md)에 정리한다.
