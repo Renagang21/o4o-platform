@@ -72,7 +72,26 @@
 
 ## 전달·정리 상태
 
-현재 변경의 main 통합·운영 배포는 아직 실행하지 않았다. 작업 branch는 `wo/cooperation-operational-validation-20261027`이다. 로컬 검증 완료를 운영 반영 완료로 표시하지 않는다.
+[PR #844](https://github.com/Renagang21/o4o-platform/pull/844)를 main에 병합했다. 배포 기준 SHA는 `fd0ea63f014c155b2b5dc7259e1fed6eb50ae0c4`다. 작업 branch는 `wo/cooperation-operational-validation-20261027`이며, 배포 기록은 후속 문서 branch로 반영한다.
+
+- PR 최종 HEAD `1160d395ed65c555400e7f4bb05eb6ccbb11860d`: CI Gate·CodeQL·SonarCloud PASS, Codex 리뷰 완료/지적 없음, 미해결 스레드 0건.
+- 초기 SonarCloud의 props readonly 2건·map callback 1건을 수정했고 관련 20개 테스트를 jsdom에서 다시 통과했다. 처음 root Vitest 실행은 DOM 환경 누락으로 실패해 올바른 jsdom 환경에서 재실행했다. 실패를 제품 결함으로 확대하지 않았다.
+- [main CI 40445728861](https://github.com/Renagang21/o4o-platform/actions/runs/40445728861): PASS.
+- [자동 Delivery 40446808867](https://github.com/Renagang21/o4o-platform/actions/runs/40446808867): 완료. 공유 UI 변경은 LEVEL_3 승인 대기 판정.
+- [Promote 40446999749](https://github.com/Renagang21/o4o-platform/actions/runs/40446999749): `services=neture,kpa-society`, PASS. 양쪽 verified rollout의 새 revision smoke·트래픽 전환·배포 확인과 최종 serving SHA report 성공.
+- [Pharmcoop 40445750897](https://github.com/Renagang21/o4o-platform/actions/runs/40445750897): `apply=false`, `frontend_only=true`, PASS. API 호환성 확인·private frontend smoke·reviewed revision 트래픽 100% 검증 성공. 조합/회원 등록 단계는 미실행.
+- API·migration은 배포하지 않았다. 다른 웹 호스트는 이번 승격에서 선택하지 않았다. 전역 production commit status의 NOT_SELECTED/pending은 미선택 호스트가 남은 표시이며, 요청한 두 호스트와 Pharmcoop 배포 실패를 뜻하지 않는다.
+
+2026-10-27 배포 후 확인:
+
+| 공개 공간 | 홈 | 로드한 JS | JS 응답 |
+|---|---|---|---|
+| Pharmacy | 200 | `/assets/index-CDrFRRNd.js` | 200 |
+| MegaPharm | 200 | `/assets/index-CDrFRRNd.js` | 200 |
+| CarePharm | 200 | `/assets/index-B6g209nv.js` | 200 |
+| Pharmcoop | 200 | `/assets/index-DqjcKuME.js` | 200 |
+
+Pharmacy/MegaPharm과 CarePharm의 공개 JS가 전환 전 파일에서 변경된 것도 확인했다. Pharmcoop은 앞서 완료된 배포의 JS를 다시 확인했다. 배포 후 인증 화면의 실계정 양방향 쓰기·실장치 브라우저 검증은 수행하지 않았으며 앞선 격리 브라우저 검증으로 대신 완료 처리하지 않는다.
 
 격리 SQL fixture는 synthetic 사용자·업무·인증 문의 잔존 0건을 확인했다. 본 작업 label을 확인한 PostgreSQL container와 연결 anonymous volume을 제거했고, 본 작업 preview만 종료했다. loopback 4311·4312·4313·55479 포트 종료를 확인했다. 다른 리소스는 정리하지 않았다.
 
