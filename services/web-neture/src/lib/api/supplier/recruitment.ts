@@ -138,6 +138,21 @@ export const supplierRecruitmentApi = {
     }
   },
 
+  async confirmSupplyPrice(id: string, supplyUnitPrice: number): Promise<{
+    success: boolean; error?: string; message?: string;
+    data?: { id: string; supplyUnitPrice: number; idempotent: boolean };
+  }> {
+    const unavailable = {success: false, error: 'SUPPLY_PRICE_CONFIRMATION_UNAVAILABLE',
+      message: '확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주세요.'};
+    try {
+      const response = await api.patch(`/neture/seller-recruitment/recruitments/${id}/supply-price`, {supplyUnitPrice});
+      return typeof response.data?.success === 'boolean' ? response.data : unavailable;
+    } catch (error: any) {
+      const data = error?.response?.data;
+      return {success: false, error: data?.error || unavailable.error, message: data?.message || unavailable.message};
+    }
+  },
+
   async create(input: {
     masterId: string;
     // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
@@ -146,6 +161,7 @@ export const supplierRecruitmentApi = {
     serviceKeys?: string[];
     commissionRate?: number;
     consumerPrice?: number;
+    supplyUnitPrice?: number;
     shopUrl?: string;
     imageUrl?: string;
   }): Promise<{

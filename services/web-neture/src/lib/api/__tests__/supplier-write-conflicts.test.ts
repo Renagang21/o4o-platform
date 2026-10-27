@@ -23,3 +23,17 @@ describe('supplier write conflict transport', () => {
     expect(transport.patch).toHaveBeenCalledWith('/neture/supplier/inventory/fixture-offer', data);
   });
 });
+
+describe('recruitment supply price transport',()=>{
+  it('preserves a price conflict for deliberate reload instead of reporting a successful save',async()=>{
+    const {supplierRecruitmentApi}=await import('../supplier/recruitment');
+    transport.patch.mockRejectedValue({response:{status:409,data:{error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주세요.'}}});
+    expect(await supplierRecruitmentApi.confirmSupplyPrice('fixture',1000)).toEqual({success:false,error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주세요.'});
+    expect(transport.patch).toHaveBeenCalledWith('/neture/seller-recruitment/recruitments/fixture/supply-price',{supplyUnitPrice:1000});
+  });
+  it.each([undefined,{}, {success:'yes'}])('treats a malformed confirmation response as unconfirmed: %j',async data=>{
+    const {supplierRecruitmentApi}=await import('../supplier/recruitment');
+    transport.patch.mockResolvedValue({data});
+    expect(await supplierRecruitmentApi.confirmSupplyPrice('fixture',1000)).toMatchObject({success:false,error:'SUPPLY_PRICE_CONFIRMATION_UNAVAILABLE'});
+  });
+});
