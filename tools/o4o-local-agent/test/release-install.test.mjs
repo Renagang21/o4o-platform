@@ -81,7 +81,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
  assert.equal(await runningAgent(),false);
  const src=fileURLToPath(new URL('../src/',import.meta.url));const release=fileURLToPath(new URL('../release/',import.meta.url));
  const files=fs.readdirSync(src).filter(n=>/\.(mjs|ps1|mts)$/.test(n)).map(n=>['src/'+n,fs.readFileSync(path.join(src,n))]);
- for(const n of ['install.mjs','install-core.mjs','launch.mjs','Install.cmd'])files.push([n,fs.readFileSync(path.join(release,n))]);
+ for(const n of ['install.mjs','install-core.mjs','launch.mjs','Install.cmd'])files.push([n,execFileSync('git',['show',`HEAD:tools/o4o-local-agent/release/${n}`])]);
  const packaged=assembleRelease({sourceSha,files,runtime:fs.readFileSync(process.execPath),runtimeLicense:fs.readFileSync(path.join(path.dirname(process.execPath),'LICENSE'))}),source=writePackage(packaged,'windows package'),options=target();
  delete options.preflight;
  const result=await installPackage({source,...options});const slot=installedSlot(options.home);
@@ -100,4 +100,10 @@ test('Windows packaged runtime starts and health proves its release and data rea
   assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.4.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,8);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
  }finally{child.kill();await new Promise(resolve=>child.once('exit',resolve));}
+ const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
+ execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
+   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},
+   windowsVerbatimArguments:true,input:'Y\r\n',stdio:['pipe','pipe','pipe'],timeout:60000,
+ });
+ assert.ok(fs.existsSync(path.join(freshData,'local.db')));assert.equal(verifyPackage(installedSlot(freshHome)).releaseId,result.releaseId);
 });
