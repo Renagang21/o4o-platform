@@ -1,4 +1,4 @@
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?worker&url';
 import { MANUAL_LIMITS, validateManual, type ManualDocument } from './knowledge';
 /** Lazy loading avoids charging the main bundle for PDF parsing. No provider or server request. */
 export async function importManualPdf(file: File, program: string): Promise<ManualDocument> {
