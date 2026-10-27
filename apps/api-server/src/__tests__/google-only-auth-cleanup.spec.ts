@@ -178,10 +178,12 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(code).not.toMatch(/'\/verify'/);
     });
 
-    it('운영자 직접 지정 경로', () => {
+    it('운영자 지정 경로는 중앙 Admin 전용 카탈로그를 사용한다', () => {
       const f = path.join(SRC, 'controllers/admin/OperatorAssignmentController.ts');
       expect(fs.existsSync(f)).toBe(true);
-      expect(codeOnly(read(f))).toMatch(/ASSIGNABLE_OPERATOR_ROLES/);
+      const code = codeOnly(read(f));
+      expect(code).toMatch(/roles:\s*ASSIGNABLE_SERVICE_ADMIN_ROLES/);
+      expect(code).not.toMatch(/roles:\s*ASSIGNABLE_OPERATOR_ROLES\b/);
     });
 
     it('guest-auth 경로', () => {

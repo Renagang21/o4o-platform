@@ -45,6 +45,13 @@ import {
   issuerOnAuthorizationRedirects,
   withIssuerIdentification,
 } from "./auth/issuer-identification.js";
+import { mailEnabled } from "../personal-mail/config.js";
+import {
+  mailWorkspaces,
+  ownedAccount,
+  type ProviderFactory,
+} from "../personal-mail/accounts.js";
+import { MailError } from "../personal-mail/contracts.js";
 
 type Handler = (req: Request, res: Response) => Promise<unknown>;
 const wrap =
@@ -59,6 +66,7 @@ const userId = (req: Request) => {
 export function createExternalAiRoutes(
   db: DataSource,
   config: ConnectionConfig | null = connectionConfig(),
+  mailProviderFactory?: ProviderFactory,
 ) {
   const root = Router(),
     management = Router(),
@@ -69,8 +77,11 @@ export function createExternalAiRoutes(
         db,
         config,
         async (userId, workspaces, write, manager) => {
-          for (const workspaceId of workspaces)
-            await adapter!.authorize(userId, workspaceId, write, manager);
+          for (const workspaceId of workspaces) {
+            if (workspaceId.startsWith("mail:"))
+              await ownedAccount(manager, userId, workspaceId.slice(5));
+            else await adapter!.authorize(userId, workspaceId, write, manager);
+          }
         },
       )
     : null;
@@ -150,6 +161,7 @@ export function createExternalAiRoutes(
       const workspaces = adapter
         ? await adapter.workspaces(userId(req)).catch(() => [])
         : [];
+      const mail = mailEnabled() ? await mailWorkspaces(db, userId(req)) : [];
       res.json({
         success: true,
         data: rows.map((row) => ({
@@ -157,7 +169,7 @@ export function createExternalAiRoutes(
           workspaces: undefined,
           workspaceNames: row.workspaces.map(
             (id: string) =>
-              workspaces.find((w) => w.id === id)?.name ??
+              [...workspaces, ...mail].find((w) => w.id === id)?.name ??
               "이용 권한이 변경된 작업공간",
           ),
         })),
@@ -182,7 +194,7 @@ export function createExternalAiRoutes(
       const request = z.string().parse(req.query.request),
         pending = await provider.pending(request);
       const client = await provider.clientsStore.getClient(pending.client_id);
-      const settings = await assertEnabled(db);
+      const settings = await assertEnabled(db, false, false, "any");
       const workspaces = (
         await adapter.workspaces(userId(req), db, settings)
       ).map((w) => ({
@@ -201,6 +213,10 @@ export function createExternalAiRoutes(
           clientName: client?.client_name ?? "외부 AI",
           scopes: pending.data.scopes,
           workspaces,
+          mailAccounts:
+            mailEnabled() && pending.data.scopes.includes("o4o:mail:read")
+              ? await mailWorkspaces(db, userId(req))
+              : [],
           existingConnections: existing?.n ?? 0,
         },
       });
@@ -214,22 +230,28 @@ export function createExternalAiRoutes(
         .object({
           request: z.string(),
           workspaces: z.array(workspaceIdSchema).min(1).max(50),
-          scopes: z.array(z.enum(scopes)).min(1).max(2),
+          scopes: z.array(z.enum(scopes)).min(1).max(scopes.length),
           replaceExisting: z.boolean().optional(),
         })
         .strict()
         .parse(req.body);
-      const settings = await assertEnabled(db);
+      const settings = await assertEnabled(db, false, false, "any");
       const available = await adapter.workspaces(userId(req), db, settings);
+      const availableMail = mailEnabled()
+        ? await mailWorkspaces(db, userId(req))
+        : [];
       if (
         new Set(body.workspaces).size !== body.workspaces.length ||
         body.workspaces.some(
           (id) =>
-            !available.some(
-              (w) =>
-                w.id === id &&
-                (w.writable || !body.scopes.includes("o4o:draft:write")),
-            ),
+            !(id.startsWith("mail:")
+              ? body.scopes.includes("o4o:mail:read") &&
+                availableMail.some((w) => w.id === id)
+              : available.some(
+                  (w) =>
+                    w.id === id &&
+                    (w.writable || !body.scopes.includes("o4o:draft:write")),
+                )),
         )
       )
         throw new ExternalAiError("WORKSPACE_FORBIDDEN", 403);
@@ -263,12 +285,16 @@ export function createExternalAiRoutes(
     const authServer = {
       provider,
       issuerUrl: config!.issuer,
-      scopesSupported: [...scopes],
+      scopesSupported: scopes.filter(
+        (scope) => !scope.startsWith("o4o:mail:") || mailEnabled(),
+      ),
     };
     // RFC 9207: advertise and return `iss` so ChatGPT can use its stable redirect URI.
     root.use(
       "/.well-known/oauth-authorization-server",
-      metadataHandler(withIssuerIdentification(createOAuthMetadata(authServer))),
+      metadataHandler(
+        withIssuerIdentification(createOAuthMetadata(authServer)),
+      ),
     );
     root.use(
       "/authorize",
@@ -297,7 +323,10 @@ export function createExternalAiRoutes(
   // MCP must not pass through user.use(requireAuth). Return a separate root entry for it.
   const combined = Router();
   if (provider)
-    combined.use("/api/external-ai/mcp", createMcpRouter(db, provider));
+    combined.use(
+      "/api/external-ai/mcp",
+      createMcpRouter(db, provider, mailProviderFactory),
+    );
   combined.use(root);
   combined.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
@@ -305,7 +334,8 @@ export function createExternalAiRoutes(
         _next(error);
         return;
       }
-      const known = error instanceof ExternalAiError;
+      const known =
+        error instanceof ExternalAiError || error instanceof MailError;
       res
         .status(known ? error.status : error instanceof ZodError ? 400 : 503)
         .json({

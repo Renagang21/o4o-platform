@@ -347,3 +347,6 @@ export { ServiceContactInboxLink, useServiceContactCount } from './service-entry
 export { PendingOperatorInvitations } from './PendingOperatorInvitations';
 export { CooperationMemberWorkflows, workflowEndpoint, workflowLabels, workflowDate, plainBody, safeEducationUrl, useWorkflowData, WorkflowMessages, WorkflowPager } from './cooperation/CooperationWorkflows';
 export type { WorkflowProps, WorkflowClient } from './cooperation/CooperationWorkflows';
+
+export { CooperationMaterialAttachments } from "./cooperation/CooperationMaterialAttachments";
+export { CooperationMaterialDetails } from "./cooperation/CooperationWorkflows";

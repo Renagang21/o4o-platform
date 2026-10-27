@@ -10,13 +10,14 @@
  * - document: RichTextEditor 기반 blocks 입력
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { supplierApi } from '../../lib/api';
 import { SUPPLIER_LIBRARY_ITEM_NOT_FOUND } from '../../lib/api/supplier';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, buildContentAuthoringGuide } from '@o4o/content-editor';
 import type { EditorContent } from '@o4o/content-editor';
+import { useAuth } from '../../contexts/AuthContext';
 
 type ContentType = 'media' | 'document';
 
@@ -50,6 +51,12 @@ const initialFormData: FormData = {
 };
 
 export default function SupplierLibraryFormPage() {
+  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  return user ? <SupplierLibraryForm key={`${user.id}:${id ?? 'new'}`} /> : null;
+}
+
+function SupplierLibraryForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
@@ -58,6 +65,10 @@ export default function SupplierLibraryFormPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const saveInFlight = useRef(false);
+  const loadAttempt = useRef(0);
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
   //   수정 대상 조회 상태. error(조회 실패) 와 not-found(대상 없음) 를 분리한다.
   // WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1:
@@ -73,10 +84,12 @@ export default function SupplierLibraryFormPage() {
   //   목록 pagination 위치와 무관하게 대상을 조회한다. 목록 API 는 호출하지 않는다.
   const loadItem = useCallback(async () => {
     if (!isEditMode || !id) return;
+    const attempt = ++loadAttempt.current;
     setLoading(true);
     setLoadState('loading');
     try {
       const item = await supplierApi.getLibraryItem(id);
+      if (!mounted.current || attempt !== loadAttempt.current) return;
       const isDocument = item.contentType === 'document';
       const existingHtml = isDocument
         ? ((item.blocks?.[0] as Record<string, unknown>)?.content as string) || ''
@@ -95,10 +108,11 @@ export default function SupplierLibraryFormPage() {
       });
       setLoadState('success');
     } catch (e: any) {
+      if (!mounted.current || attempt !== loadAttempt.current) return;
       // 404(미존재·타인 소유)만 not-found. 그 외 조회 실패는 error 로 분리한다.
       setLoadState(e?.message === SUPPLIER_LIBRARY_ITEM_NOT_FOUND ? 'not-found' : 'error');
     } finally {
-      setLoading(false);
+      if (mounted.current && attempt === loadAttempt.current) setLoading(false);
     }
   }, [id, isEditMode]);
 
@@ -116,6 +130,7 @@ export default function SupplierLibraryFormPage() {
   };
 
   const handleSubmit = async () => {
+    if (saveInFlight.current || (isEditMode && loadState !== 'success')) return;
     // 공통 검증
     if (!formData.title.trim()) {
       setError('제목을 입력하세요.');
@@ -150,53 +165,60 @@ export default function SupplierLibraryFormPage() {
       }
     }
 
+    saveInFlight.current = true;
     setSaving(true);
     setError(null);
 
-    let result;
-    if (formData.contentType === 'media') {
-      const mediaPayload = {
-        title: formData.title.trim(),
-        description: formData.description.trim() || undefined,
-        fileUrl: formData.fileUrl.trim(),
-        fileName: formData.fileName.trim(),
-        fileSize: Number(formData.fileSize),
-        mimeType: formData.mimeType.trim(),
-        category: formData.category.trim() || undefined,
-        isPublic: formData.isPublic,
-        contentType: 'media',
-      };
-      if (isEditMode && id) {
-        result = await supplierApi.updateLibraryItem(id, mediaPayload);
+    try {
+      let result;
+      if (formData.contentType === 'media') {
+        const mediaPayload = {
+          title: formData.title.trim(),
+          description: formData.description.trim() || undefined,
+          fileUrl: formData.fileUrl.trim(),
+          fileName: formData.fileName.trim(),
+          fileSize: Number(formData.fileSize),
+          mimeType: formData.mimeType.trim(),
+          category: formData.category.trim() || undefined,
+          isPublic: formData.isPublic,
+          contentType: 'media',
+        };
+        if (isEditMode && id) {
+          result = await supplierApi.updateLibraryItem(id, mediaPayload);
+        } else {
+          result = await supplierApi.createLibraryItem(mediaPayload);
+        }
       } else {
-        result = await supplierApi.createLibraryItem(mediaPayload);
+        const documentPayload = {
+          title: formData.title.trim(),
+          description: formData.description.trim() || undefined,
+          category: formData.category.trim() || undefined,
+          isPublic: formData.isPublic,
+          contentType: 'document',
+          blocks: [{ type: 'html', content: formData.documentHtml }],
+        };
+        if (isEditMode && id) {
+          result = await supplierApi.updateLibraryItem(id, documentPayload);
+        } else {
+          result = await supplierApi.createLibraryItem(documentPayload);
+        }
       }
-    } else {
-      const documentPayload = {
-        title: formData.title.trim(),
-        description: formData.description.trim() || undefined,
-        category: formData.category.trim() || undefined,
-        isPublic: formData.isPublic,
-        contentType: 'document',
-        blocks: [{ type: 'html', content: formData.documentHtml }],
-      };
-      if (isEditMode && id) {
-        result = await supplierApi.updateLibraryItem(id, documentPayload);
+
+      if (!mounted.current) return;
+      if (result.success) {
+        navigate('/supplier/library');
       } else {
-        result = await supplierApi.createLibraryItem(documentPayload);
+        setError(result.error || '저장에 실패했습니다.');
       }
-    }
-
-    setSaving(false);
-
-    if (result.success) {
-      navigate('/supplier/library');
-    } else {
-      setError(result.error || '저장에 실패했습니다.');
+    } catch {
+      if (mounted.current) setError('저장에 실패했습니다. 작성 내용은 유지됩니다. 다시 시도해 주세요.');
+    } finally {
+      saveInFlight.current = false;
+      if (mounted.current) setSaving(false);
     }
   };
 
-  if (loading) {
+  if (loading || (isEditMode && loadState === 'idle')) {
     return (
       <div style={{ padding: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
         <Loader2 size={24} className="animate-spin" style={{ color: '#2563eb' }} />
@@ -293,7 +315,7 @@ export default function SupplierLibraryFormPage() {
       )}
 
       {/* Form */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <fieldset disabled={saving} style={{ display: 'flex', flexDirection: 'column', gap: '20px', border: 0, padding: 0, margin: 0, minWidth: 0 }}>
 
         {/* 유형 선택 */}
         <div>
@@ -417,12 +439,26 @@ export default function SupplierLibraryFormPage() {
         {formData.contentType === 'document' && (
           <div>
             <label style={labelStyle}>문서 본문 <span style={{ color: '#dc2626' }}>*</span></label>
+            <div style={{ marginBottom: 12 }}>
+              <LlmAssistPanel contextKey={`supplier-library:${id ?? 'new'}`} disabled={saving}
+                label="외부 AI로 문서 작업" contextLabel="공급자 자료함 문서 — 편집 후 원본 저장"
+                guideText={({ additionalInstruction }) => buildContentAuthoringGuide({
+                  contextLabel: '공급자 자료함 문서', title: formData.title, additionalInstruction,
+                })}
+                referenceMaterials={[
+                  { id: 'description', title: '이 문서의 설명', text: formData.description },
+                  { id: 'current', title: '현재 문서 본문', text: formData.documentHtml },
+                ].filter(material => material.text.trim())}
+                currentHtml={formData.documentHtml} onApplyHtml={html => handleChange('documentHtml', html)} />
+            </div>
             <div style={{ border: '1px solid #d1d5db', borderRadius: '6px', overflow: 'hidden' }}>
               <RichTextEditor
                 value={formData.documentHtml}
                 onChange={handleEditorChange}
                 placeholder="문서 내용을 입력하세요..."
                 preset="compact"
+                showInternalAi={false}
+                editable={!saving}
                 minHeight="300px"
               />
             </div>
@@ -494,7 +530,7 @@ export default function SupplierLibraryFormPage() {
             취소
           </button>
         </div>
-      </div>
+      </fieldset>
     </div>
   );
 }

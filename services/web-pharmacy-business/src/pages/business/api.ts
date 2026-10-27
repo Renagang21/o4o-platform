@@ -21,6 +21,7 @@ export interface BusinessMembership {
   reason: string | null;
 }
 export interface BusinessContent {
+  attachments?: unknown;
   revision?: number;
   category?: string;
   educationUrl?: string;

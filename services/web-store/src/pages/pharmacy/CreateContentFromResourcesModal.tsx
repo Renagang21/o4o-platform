@@ -169,6 +169,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
                   onChange={consultation => session.changeDraft({ consultation })} onApplyHtml={setEditorHtml} />
               ) : (
               <LlmAssistPanel
+                contextKey={`${scope}:create`} disabled={saving}
                 label={STORE_LLM_ASSIST_LABEL}
                 contextLabel="매장 콘텐츠 본문 — 새로 작성하거나 현재 내용을 다듬습니다"
                 guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({

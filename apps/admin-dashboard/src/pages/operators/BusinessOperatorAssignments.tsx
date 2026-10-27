@@ -75,8 +75,7 @@ export default function BusinessOperatorAssignments() {
       </summary>
       <p className="mt-2 text-sm text-gray-600">
         과거 개별 지정과 기타 사업의 담당자를 관리합니다.
-        Pharmacy·CarePharm·MegaPharm·연합회의 새 Admin·Operator 지정은 위 권한
-        지정 기능을 사용하세요.
+        Pharmacy·CarePharm·MegaPharm·연합회의 새 Admin 지정은 위 권한 지정 기능을, Operator 지정은 해당 서비스의 Admin 화면을 사용하세요.
       </p>
       {error && (
         <p role="alert" className="my-2 text-red-700">

@@ -74,3 +74,13 @@ it('현재 사업에 미가입인 다른 약국은 자료 선택 후보에서 �
   expect(screen.queryByRole('option', { name: '미가입 약국 B' })).toBeNull();
   expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
 });
+
+it('게시 자료의 본문과 첨부자료를 같은 선택 약국에서 열람한다', async () => {
+  transport.post.mockClear();
+  transport.get.mockResolvedValue({ data: { data: { items: [{ ...item, attachments: [{ name: '약국 체크리스트', url: 'https://example.invalid/checklist.pdf' }] }], total: 1 } } });
+  mount();
+  const attachment = await screen.findByRole('link', { name: '약국 체크리스트' });
+  expect(attachment.getAttribute('href')).toBe('https://example.invalid/checklist.pdf');
+  expect(screen.getByText('샘플 본문')).toBeTruthy();
+  expect(transport.post).not.toHaveBeenCalled();
+});

@@ -1,4 +1,5 @@
 import type { DataSource, EntityManager } from "typeorm";
+import { mailEnabled } from "../../personal-mail/config.js";
 import {
   defaultSettings,
   ExternalAiError,
@@ -53,14 +54,18 @@ export async function assertEnabled(
   db: Queryable,
   write = false,
   lock = false,
+  mode: "content" | "mail" | "any" = "content",
 ) {
   const { settings } = await readSettings(db, lock);
   if (
     !settings.enabled ||
     !settings.chatgptEnabled ||
-    !Object.values(settings.targets).some(
-      (target) => target.read && (!write || target.write),
-    )
+    !(mode === "mail"
+      ? mailEnabled()
+      : Object.values(settings.targets).some(
+          (target) => target.read && (!write || target.write),
+        ) ||
+        (mode === "any" && !write && mailEnabled()))
   ) {
     throw new ExternalAiError("EXTERNAL_AI_DISABLED", 403);
   }

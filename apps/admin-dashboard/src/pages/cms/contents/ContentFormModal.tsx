@@ -15,7 +15,7 @@ import cmsAPI, { CmsContent, ContentType } from '@/lib/cms';
 //   backend 허용 MIME 에 zip 이 없어 accept 목록에서 `.zip` 을 뺐다.
 //   (`uploadImageForEditor` 는 아래 에디터 이미지 업로드용 import 를 그대로 재사용한다.)
 import toast from 'react-hot-toast';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, buildContentAuthoringGuide } from '@o4o/content-editor';
 // WO-O4O-ADMIN-CMS-BROWSER-IMPORT-CRASH-FIX-V1:
 //   루트 배럴(@o4o/forum-core)은 backend export 와 `import { Router } from 'express'` 를 포함해
 //   브라우저 번들에서 런타임 크래시를 일으킨다. 필요한 두 함수만 클라이언트 안전 경로에서 직접 가져온다.
@@ -406,6 +406,20 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     본문 (Rich Editor)
                   </label>
+                  <div className="mb-3">
+                    <LlmAssistPanel contextKey={`cms:${content?.id ?? 'new'}:${formData.serviceKey}:${formData.type}`}
+                      disabled={saving || uploading || !isHydrated} label="외부 AI로 콘텐츠 작업"
+                      contextLabel="CMS 본문 — 편집 후 기존 저장·게시 절차 이용"
+                      guideText={({ additionalInstruction }) => buildContentAuthoringGuide({
+                        contextLabel: '서비스 운영 CMS 콘텐츠', title: formData.title, additionalInstruction,
+                      })}
+                      referenceMaterials={[
+                        { id: 'summary', title: '현재 요약', text: formData.summary },
+                        { id: 'body', title: '현재 본문', text: formData.editorHtml },
+                      ].filter(material => material.text.trim())}
+                      currentHtml={formData.editorHtml}
+                      onApplyHtml={editorHtml => setFormData(prev => ({ ...prev, editorHtml }))} />
+                  </div>
                   <div className="border border-gray-300 rounded-md overflow-hidden">
                     <RichTextEditor
                       value={formData.editorHtml}

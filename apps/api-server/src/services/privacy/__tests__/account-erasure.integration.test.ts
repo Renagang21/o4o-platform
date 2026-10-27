@@ -251,7 +251,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     fail=false;const last=await service(storage).resume(first.operationId,completingAdmin.id);expect(last.erased).toBe(true);
     const audit=await db.query('SELECT action,actor_key FROM account_erasure_audit_events WHERE operation_id=$1 ORDER BY action',[first.operationId]);
     expect(audit).toEqual([{action:'completed',actor_key:completingAdmin.id},{action:'requested',actor_key:fixtureAdminId}]);
-    expect(storage.generation).toHaveBeenCalledTimes(1);expect(storage.deleteGeneration).toHaveBeenLastCalledWith('fixture-private','personal-avatar.png','7');
+    expect(storage.generation).toHaveBeenCalledTimes(1);expect(storage.deleteGeneration).toHaveBeenLastCalledWith('fixture-private','personal-avatar.png','7',u.id);
     const [f]=await db.query('SELECT bucket,object_path,generation,state FROM account_erasure_file_tasks');
     expect(f).toEqual({bucket:null,object_path:null,generation:null,state:'deleted'});
     expect(await db.query('SELECT id FROM account_erasure_file_tasks')).toHaveLength(1);

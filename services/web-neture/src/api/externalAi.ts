@@ -19,6 +19,7 @@ export interface ConsentInfo {
   }>;
   /** 같은 앱으로 이미 쓰는 활성 연결 수 — 재연결이면 이전 연결을 바꿀지 사용자가 고른다 */
   existingConnections?: number;
+  mailAccounts?: Array<{id:string;name:string;kind:'personal_mail';writable:boolean}>;
 }
 export async function listExternalConnections(): Promise<ExternalConnection[]> {
   const result = await api.get(`${base}/connections`);

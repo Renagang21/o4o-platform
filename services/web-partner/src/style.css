@@ -1398,3 +1398,19 @@ th {
     font-size: 11px;
   }
 }
+
+/* Partner public entry and opt-in member community. */
+.partner-header {display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 4vw;background:#fff;border-bottom:1px solid var(--line,#dce5df);flex-wrap:wrap}
+.partner-brand {font-weight:800;font-size:23px;color:#153e35;text-decoration:none}
+.partner-header nav,.community-tabs {display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.partner-header nav a {text-decoration:none;font-weight:650;color:#31584a}
+.community-shell {max-width:1320px;margin:0 auto;padding:28px 24px 60px;min-height:75vh}
+.community-hero {padding:40px 0 32px}.community-hero h1 {font-size:clamp(32px,4vw,52px);line-height:1.2;letter-spacing:-.04em;margin:12px 0 20px}
+.community-grid {display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,3fr);gap:24px;align-items:start;margin:24px 0}
+.community-grid>*,.community-shell .panel {min-width:0}.community-grid aside nav {display:grid;gap:16px;margin:20px 0 32px}
+.community-board-cards {display:grid;gap:16px}.community-auth {max-width:520px;margin:40px auto}.community-auth form {display:grid;gap:16px;margin-bottom:24px}
+.community-body {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;margin:20px 0}.community-list-item {padding:20px 0;border-bottom:1px solid #e0e8e3;overflow-wrap:anywhere}.community-list-item>a {font-size:19px;font-weight:650}
+.community-comment {padding:18px 0;border-top:1px solid #dce5df}.community-comment .community-body {margin:8px 0}
+.community-search {display:flex;gap:10px;align-items:end;margin:20px 0}.community-search label {display:grid;gap:8px;flex:1}.community-check {display:flex;gap:10px;align-items:flex-start;margin:18px 0}.community-check input {width:auto;flex:0 0 auto;margin-top:5px}
+.community-tabs {margin:16px 0}.community-operation {border:2px solid #31584a;margin:20px 0}.community-footer {padding:28px 24px;text-align:center;color:#63726a;border-top:1px solid #dce5df}.community-shell textarea {max-width:100%}
+@media(max-width:700px) {.partner-header {padding:16px;gap:16px}.partner-header nav {order:3;width:100%;gap:20px;font-size:14px}.community-shell {padding:20px 16px 40px}.community-grid {grid-template-columns:1fr;gap:16px}.community-grid aside nav {display:flex;flex-wrap:wrap;gap:16px;margin:12px 0 20px}.community-hero {padding:24px 0}.community-search {align-items:stretch;flex-direction:column}.community-grid .panel {padding:20px}.community-tabs {gap:8px}}

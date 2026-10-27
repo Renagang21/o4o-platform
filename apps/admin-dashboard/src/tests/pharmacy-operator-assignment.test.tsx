@@ -20,15 +20,15 @@ describe('four collaborator consent invitations', () => {
     }
     fireEvent.click(view.container.querySelector(`input[name="target-service"][value="${key}"]`)!);
     expect(screen.getByRole('radio', { name: new RegExp(`neture:${key}_admin`) })).toBeTruthy();
-    fireEvent.click(screen.getByRole('radio', { name: new RegExp(`neture:${key}_operator`) }));
+    fireEvent.click(screen.getByRole('radio', { name: new RegExp(`neture:${key}_admin`) }));
     fireEvent.change(screen.getByPlaceholderText(/이메일 또는 이름/), { target: { value: 'operator' } });
     fireEvent.click(screen.getByRole('button', { name: '검색' }));
     fireEvent.click(await screen.findByRole('radio', { name: /Test Operator/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() => expect(authClient.api.post).toHaveBeenCalledWith('/admin/service-operator-invitations', {
-      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_operator`,
+      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_admin`,
     }));
-    const parsed = parseRole(`neture:${key}_operator`);
-    expect(parsed).toMatchObject({ raw: `neture:${key}_operator`, serviceKey: key, roleKey: 'operator' });
+    const parsed = parseRole(`neture:${key}_admin`);
+    expect(parsed).toMatchObject({ raw: `neture:${key}_admin`, serviceKey: key, roleKey: 'admin' });
   });
 });

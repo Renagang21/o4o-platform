@@ -96,6 +96,15 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     await new ServiceOperatorInvitationService(db.ds).accept(mockTokens[mockTokens.length-1],u);
     return pending;
   }
+  it("excludes active Demo candidates in both name and email matches but keeps ordinary users", async () => {
+    await setup("partner-support");
+    expect((await s.list(actor,"partner-support","candidate")).candidates.map((p:any)=>p.userId)).toEqual([target]);
+    await db.ds.query("INSERT INTO demo_accounts(user_id,is_active) VALUES($1,true)",[target]);
+    expect((await s.list(actor,"partner-support","candidate")).candidates).toEqual([]);
+    expect((await s.list(actor,"partner-support","example.invalid")).candidates.map((p:any)=>p.userId)).not.toContain(target);
+    await db.ds.query("UPDATE demo_accounts SET is_active=false WHERE user_id=$1",[target]);
+    expect((await s.list(actor,"partner-support","candidate")).candidates.map((p:any)=>p.userId)).toEqual([target]);
+  });
   it.each(Object.keys(OPERATOR_DELEGATION_SCOPES))(
     "%s admin assigns and revokes only its own operator",
     async (key) => {

@@ -151,6 +151,7 @@ export default function SupplierRecruitmentsPage() {
           ? <span className="text-emerald-700 font-medium">{r.applications.approved}</span>
           : <span className="text-slate-400">0</span>,
     },
+    { key:'supplyUnitPrice',header:'모집 공급가',render:(_v,r)=><span>{r.supplyUnitPrice ? `${r.supplyUnitPrice.toLocaleString()}원` : '공급가 미확정'}</span> },
     {
       key: 'createdAt',
       header: '생성일',

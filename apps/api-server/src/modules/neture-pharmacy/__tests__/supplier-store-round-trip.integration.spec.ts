@@ -1,3 +1,8 @@
+import { SellerRecruitmentService } from '../../neture/services/seller-recruitment.service.js';
+import { SellerRecruitment } from '../../neture/entities/SellerRecruitment.entity.js';
+import { SellerRecruitmentApplication } from '../../neture/entities/SellerRecruitmentApplication.entity.js';
+import { confirmRecruitmentSupplyPrice } from '../../neture/services/recruitment-supply-price.service.js';
+import { getSupplyOption } from '../services/supply-access.js';
 import { fixtureBusinessPolicies } from './fixtures/business-policies.js';
 import { OrganizationStore } from '../../store-core/entities/organization-store.entity.js';
 import { ServiceProduct } from '../../../routes/kpa/entities/service-product.entity.js';
@@ -80,7 +85,7 @@ integration('supplier → store → payment → shipment → settlement (real Po
   beforeAll(async () => {
     ds = new DataSource({ type: 'postgres', url: databaseUrl,
       entities: [OrganizationStore, ServiceProduct, OrganizationProductListing, ProductMaster, ProductCategory, Brand, RepresentativeProduct, ProductImage,
-        ProductIdentifier, ProductDrugExtension, NetureSupplier, SupplierProductOffer,
+        ProductIdentifier, ProductDrugExtension, NetureSupplier, SupplierProductOffer, SellerRecruitment, SellerRecruitmentApplication,
         ServiceAudiencePolicy, OfferServiceApproval, OfferServicePrice, NetureSupplierRegulatedCategory,
         CheckoutOrder, CheckoutPayment, OrderLog, NetureOrder, NetureOrderItem, NetureProduct],
       synchronize: false, logging: false });
@@ -405,4 +410,45 @@ integration('supplier → store → payment → shipment → settlement (real Po
     expect(await listed(publicOffer)).toHaveLength(1);
     expect(await listed(serviceOffer)).toHaveLength(1);
   });
+  it('creates a priced general recruitment, preserves its price through status writes, and checks out a real store order',async()=>{
+    await ds.query("UPDATE supplier_product_offers SET distribution_type='PRIVATE',is_active=true,approval_status='APPROVED',stock_quantity=100 WHERE id=$1",[offerId]);
+    const [offer]=await ds.query('SELECT master_id FROM supplier_product_offers WHERE id=$1',[offerId]);
+    const service=new SellerRecruitmentService();
+    const created=await service.createRecruitment(supplierUserId,{masterId:offer.master_id,serviceKeys:['neture'],supplyUnitPrice:6150,consumerPrice:99999});
+    expect(created.success).toBe(true);const id=created.data!.id;
+    const publicRow=(await service.getRecruitments({publicOnly:true})).find(r=>r.id===id);
+    expect(publicRow).toBeDefined();expect(publicRow).not.toHaveProperty('supplyUnitPrice');
+    expect((await service.getSupplierRecruitments(supplierUserId)).find(r=>r.id===id)).toMatchObject({supplyUnitPrice:6150,recruitmentKind:'public'});
+    await service.closeRecruitment(id,supplierUserId);await service.reopenRecruitment(id,supplierUserId);
+    expect((await ds.query('SELECT supply_unit_price FROM seller_recruitments WHERE id=$1',[id]))[0].supply_unit_price).toBe(6150);
+    expect(await getSupplyOption(ds,organizationId,'recruitment',id)).toBeNull();
+    const application=await service.createApplication(id,ownerId,'Synthetic owner',organizationId);
+    await service.approveApplication(application.id,supplierUserId);
+    expect((await service.getRecruitmentApplications(id,supplierUserId))!.recruitment).toMatchObject({supplyUnitPrice:6150,recruitmentKind:'public'});
+    const cart=new PharmacyCartService(ds,new EventOfferService(ds),(dto,manager)=>checkoutService.createOrder(dto,manager));
+    await cart.add(ownerId,organizationId,{kind:'recruitment',id,quantity:2});
+    const checkout=await cart.checkout(ownerId,organizationId);
+    expect(checkout.failedItems).toEqual([]);
+    const [order]=await ds.query('SELECT items,metadata FROM checkout_orders WHERE "sellerOrganizationId"=$1 ORDER BY "createdAt" DESC LIMIT 1',[organizationId]);
+    expect(order.items[0]).toMatchObject({unitPrice:6150,quantity:2});
+    expect(order.metadata.receiverDetermined).toBe(false);
+    await expect(confirmRecruitmentSupplyPrice(ds,supplierUserId,id,7000)).rejects.toMatchObject({code:'SUPPLY_PRICE_ALREADY_CONFIRMED'});
+    const [retained]=await ds.query('SELECT items FROM checkout_orders WHERE "sellerOrganizationId"=$1 ORDER BY "createdAt" DESC LIMIT 1',[organizationId]);
+    expect(retained.items[0].unitPrice).toBe(6150);
+    await expect(confirmRecruitmentSupplyPrice(ds,supplierUserId,id,6150)).resolves.toMatchObject({idempotent:true});
+  });
+
+  it('preserves unpriced creation by an older client without inferring the general product price',async()=>{
+    const [master]=await ds.query("INSERT INTO product_masters(name,regulatory_name,manufacturer_name,regulatory_type,status) VALUES($1,$1,'Synthetic manufacturer','GENERAL','ACTIVE') RETURNING id",[`Legacy-${tag}`]);
+    const offer=await new SupplierOfferRegistrationService().createSupplierOfferFromExistingMaster(supplierId,{masterId:master.id,consumerShortDescription:'Synthetic legacy price',priceGeneral:9900});
+    expect(offer.success).toBe(true);
+    await ds.query("UPDATE supplier_product_offers SET distribution_type='PRIVATE' WHERE id=$1",[offer.data!.id]);
+    const service=new SellerRecruitmentService();
+    const created=await service.createRecruitment(supplierUserId,{masterId:master.id,serviceKey:'neture',consumerPrice:99999});
+    expect(created.success).toBe(true);
+    const [row]=await ds.query('SELECT supply_unit_price,consumer_price FROM seller_recruitments WHERE id=$1',[created.data!.id]);
+    expect(row.supply_unit_price).toBeNull();expect(Number(row.consumer_price)).toBe(99999);
+    expect((await service.getSupplierRecruitments(supplierUserId)).find(r=>r.id===created.data!.id)?.supplyUnitPrice).toBeNull();
+  });
+
 });
