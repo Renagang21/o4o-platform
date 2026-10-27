@@ -219,6 +219,9 @@ jobs:
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
 
+    - name: Test GitHub App token issuer (isolated, no credentials)
+      run: node --test scripts/ops/github-app-token.test.mjs
+
     # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
     # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.
     # 로컬 SQLite 계약(node:sqlite DatabaseSync, key/setting allowlist, 임의 SQL·파일 부재)을
