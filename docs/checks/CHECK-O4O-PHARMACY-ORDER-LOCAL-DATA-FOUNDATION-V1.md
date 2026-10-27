@@ -78,3 +78,24 @@ Codex의 추가 P2(다중 거래처 시트의 접수 상태)를 반영해 접수
 
 
 Sonar의 새 코드 중복률 31.5% 실패를 확인해 동일 계약 사본을 제거했다. 순수 계약은 agent 한 곳에 두고 Main은 re-export한다. Main Docker의 빌드 입력에 순수 계약·선언 두 파일만 추가했다. agent I/O·credential·Node 런타임은 웹에 포함하지 않는다. Node/브라우저 export 동일성과 Docker 입력을 검증하며, Sonar 기준·제외 설정은 변경하지 않았다.
+
+
+## 6. 최종 통합·운영 배포 결과
+
+- PR: [#853](https://github.com/Renagang21/o4o-platform/pull/853), 최종 검증 HEAD `154005b1f1b4a48fda25f9f3093b1a7eed21c3e0`.
+- PR [CI 40483067473](https://github.com/Renagang21/o4o-platform/actions/runs/40483067473)·CodeQL 성공. Sonar 품질 gate 성공, 새 코드 중복률 **0.0%**. 기준/제외 설정을 낮추지 않았다. Codex 최종 리뷰 완료, 새 지적/미해결 0.
+- main 병합 SHA: `82e38f070edc7ad8a2ec1c9e6a44d9a37346e793`. [main CI 40484601195](https://github.com/Renagang21/o4o-platform/actions/runs/40484601195)·[CodeQL 40484601126](https://github.com/Renagang21/o4o-platform/actions/runs/40484601126) 성공.
+- 자동 [Delivery 40486191860](https://github.com/Renagang21/o4o-platform/actions/runs/40486191860)는 Neture Docker 입력 변경을 LEVEL 3으로 보류했다. 사용자 배포 지시와 owner 실행 계정·기술 gate 확인 후 기존 [Promote 40486461692](https://github.com/Renagang21/o4o-platform/actions/runs/40486461692)를 **services=neture**로 실행했다.
+- Promote 성공. Neture 배포·새 리비전 smoke·트래픽 전환·최종 serving SHA report 모두 성공. 신규 migration·운영 DB 직접 변경 없음. 무관한 hospital-pharmacy는 선택에서 제외한 대기를 유지했으므로 전체 production 상태 pending을 Main 배포 실패로 해석하지 않는다.
+- 운영 Main HTTP 200, API readiness HTTP 200. 운영 HTML이 참조하는 실제 `/assets/index-BrXPdnos.js`에서 주문 시트/계약/수정 export/기존 입력 보존/재접수 방지 표식 5개와 JavaScript MIME을 확인했다. 로그인·유료 모델·실제 주문·결제 시험은 실행하지 않았다.
+- PC 업데이트 ZIP은 이 main의 tracked agent source/guide/design만 포함한다. 격리 폴더에 풀어 실제 `index.mjs data pharmacy status`로 SQLite 작업공간 bootstrap PASS. 사용자 DB·credential·원본 매뉴얼은 포함하지 않았고 실제 사용자 PC에 적용하지 않았다.
+- 실제 약국 Excel Mapping·로그인된 지오영 절차·Windows 조작·실계정 AI 품질/비용은 후속 실사용 검증 항목이다.
+
+이 마지막 문서 정합 변경은 같은 WO의 연속 종료 기록이며 런타임 코드 변경이 없으므로 `DEPLOYMENT = NOT_APPLICABLE`이다. 위 runtime serving SHA가 실제 배포 증거이며 문서-only main SHA로 재배포를 요구하지 않는다.
+
+WORKTREE_DISPOSITION (최종 인계)
+
+- 이번 작업 branch는 main 통합 완료 후 문서 정합만 이어 진행한다.
+- verdict: KEEP — 실제 export Mapping 및 사용자 PC 업데이트 확인에 필요한 검증 소스·빌드 보존. 다른 작업트리·branch·staging은 정리하지 않음.
+
+문서 정합: 개발 시점 기록은 보존하고 운영 guide의 현재 안내와 이 최종 결과를 연결했다. canonical index·플랫폼 정책은 변경하지 않았다.
