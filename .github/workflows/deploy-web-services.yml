@@ -278,6 +278,14 @@ jobs:
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
 
+      - name: Set up pinned Node for PC distribution
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+
+      - name: Build verified Windows PC distribution
+        run: node tools/o4o-local-agent/release/build-release.mjs --source-sha "$GITHUB_SHA" --out services/web-neture/public/downloads/pc-connection
+
       - name: Build and push Docker image
         run: |
           echo "Building neture-web Docker image..."

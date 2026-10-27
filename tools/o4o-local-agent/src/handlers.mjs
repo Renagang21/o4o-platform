@@ -60,7 +60,8 @@ import {
 } from './browser-dom-limits.mjs';
 import { runDomUnit, validateDomRunUnitArgs } from './browser-dom-unit.mjs';
 
-export const AGENT_VERSION = '0.3.0';
+import { PC_AGENT_VERSION } from './release-info.mjs';
+export const AGENT_VERSION = PC_AGENT_VERSION;
 
 /** 서버 계약(local-agent-protocol.ts)의 action 이름과 반드시 일치해야 한다. */
 export const ACTIONS = {

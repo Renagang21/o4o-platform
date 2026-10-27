@@ -19,6 +19,7 @@
  * 원인 판정 자체는 `api/localAgent` 의 순수 함수 한 곳에만 있다.
  */
 
+import PcProgramUpdate from './PcProgramUpdate';
 import { useCallback, useEffect, useState } from 'react';
 import { Loader2, Monitor, CheckCircle2, AlertCircle } from 'lucide-react';
 import {
@@ -109,6 +110,7 @@ export default function LocalAgentCard() {
             O4O 업무 도우미가 이 PC를 사용할 수 있도록 PC 연결 프로그램을 현재 계정에 연결합니다. 입력할 코드는 없습니다.
           </p>
 
+          <PcProgramUpdate health={health} onVerify={() => void refresh()} disabled={status === 'checking' || status === 'pairing'} />
           <div className="mt-4">
             {status === 'checking' && (
               <p className="flex items-center gap-2 text-sm text-gray-500">
