@@ -236,15 +236,15 @@ export async function connectThisPc(health: LocalAgentHealth): Promise<ConnectOu
 export function describeLocalAgentUnavailable(reason: LocalAgentUnavailableReason): string {
   switch (reason) {
     case 'AGENT_NOT_RUNNING':
-      return 'Local Work Agent가 실행되고 있지 않습니다. Agent를 실행한 뒤 다시 연결해 주세요.';
+      return 'PC 연결 프로그램이 실행되고 있지 않습니다. 프로그램을 실행한 뒤 다시 연결해 주세요.';
     case 'PERMISSION_REQUIRED':
       return '브라우저에서 이 PC 연결 권한을 허용해 주세요. 권한을 허용한 뒤 다시 연결을 눌러 주세요.';
     case 'CONNECTION_FAILED':
-      return '이 PC의 Local Work Agent에 연결할 수 없습니다. Agent 실행 상태를 확인한 뒤 다시 시도해 주세요.';
+      return '이 PC의 연결 프로그램에 연결할 수 없습니다. 프로그램 실행 상태를 확인한 뒤 다시 시도해 주세요.';
     case 'INDETERMINATE':
     default:
       // 브라우저가 원인을 알려주지 않았다. 둘 다 짚어 주고 확정하지 않는다 (§8).
-      return 'Agent가 실행 중이 아니거나 브라우저 연결 권한이 필요합니다. Agent 실행 상태와 브라우저 연결 권한을 확인한 뒤 다시 연결해 주세요.';
+      return 'PC 연결 프로그램이 실행 중이 아니거나 브라우저 연결 권한이 필요합니다. 프로그램 실행 상태와 브라우저 연결 권한을 확인한 뒤 다시 연결해 주세요.';
   }
 }
 
