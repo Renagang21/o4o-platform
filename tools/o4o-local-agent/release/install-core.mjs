@@ -50,19 +50,23 @@ export async function installPackage({source,home,dataHome,programs=null,allowNe
  const manifest=verifyPackage(source);if(await probe())throw Error('CLOSE_PC_PROGRAM_FIRST');
  mkdir(home);mkdir(path.join(home,'versions'));
  const lock=path.join(home,'.install.lock');let fd;try{fd=fs.openSync(lock,'wx',0o600);}catch{throw Error('ANOTHER_INSTALL_RUNNING');}
- const stage=path.join(home,'versions','.stage-'+randomUUID());let activated=false;
+ const stage=path.join(home,'versions','.stage-'+randomUUID());let activated=false,damaged=null;
+ const slot=path.join(home,'versions',manifest.releaseId);
  try{
   const pointer=path.join(home,'current.json'),launcher=path.join(home,'Start.cmd');
   for(const file of [pointer,launcher])if(fs.existsSync(file))plain(file);
   if(fs.existsSync(launcher)&&!fs.existsSync(pointer))throw Error('UNRECOGNIZED_INSTALLATION');
-  if(fs.existsSync(pointer)){installedSlot(home);const prior=JSON.parse(fs.readFileSync(pointer,'utf8'));if(prior.dataHome!==dataHome)throw Error('DATA_LOCATION_CHANGED');}
+  if(fs.existsSync(pointer)){const prior=JSON.parse(fs.readFileSync(pointer,'utf8'));if(prior.format!=='o4o-pc-install-v1'||!ID.test(prior.releaseId)||!path.isAbsolute(prior.dataHome??''))throw Error('INVALID_INSTALLED_RELEASE');if(prior.dataHome!==dataHome)throw Error('DATA_LOCATION_CHANGED');}
   if(!allowNewData&&!fs.existsSync(path.join(dataHome,'local.db'))&&!fs.existsSync(path.join(dataHome,'credentials.json')))throw Error('NEW_INSTALL_CONFIRMATION_REQUIRED');
-  const slot=path.join(home,'versions',manifest.releaseId);
-  if(!fs.existsSync(slot)){
+  let valid=false;
+  if(fs.existsSync(slot)){plain(slot,true);try{verifyPackage(slot);valid=true;}catch{/* Damaged code is quarantined, never executed or used as package input. */}}
+  if(!valid){
    mkdir(stage);
    for(const name of [...Object.keys(manifest.files),'release.json']){const output=path.join(stage,...name.split('/'));mkdir(path.dirname(output));fs.copyFileSync(path.join(source,...name.split('/')),output,fs.constants.COPYFILE_EXCL);}
-   verifyPackage(stage);fs.renameSync(stage,slot);
-  }else verifyPackage(slot);
+   verifyPackage(stage);
+   if(fs.existsSync(slot)){damaged=path.join(home,'versions','.damaged-'+manifest.releaseId+'-'+randomUUID());fs.renameSync(slot,damaged);}
+   fs.renameSync(stage,slot);
+  }
   await preflight(slot,dataHome);await beforeActivate();
   const previousPointer=fs.existsSync(pointer)?fs.readFileSync(pointer):null,previousLauncher=fs.existsSync(launcher)?fs.readFileSync(launcher):null;
   const next=JSON.stringify({format:'o4o-pc-install-v1',releaseId:manifest.releaseId,version:manifest.version,dataHome});
@@ -77,5 +81,8 @@ export async function installPackage({source,home,dataHome,programs=null,allowNe
   let shortcut=false;
   if(programs){try{mkdir(programs);const target=path.join(programs,'O4O PC 연결.cmd');if(fs.existsSync(target))plain(target);atomic(target,start);shortcut=true;}catch{/* Installation is valid; the local Start.cmd remains usable. */}}
   return {version:manifest.version,releaseId:manifest.releaseId,activated,shortcut,started:false};
- }finally{removeStage(stage);fs.closeSync(fd);fs.unlinkSync(lock);}
+ }finally{
+  try{if(damaged&&!activated){removeStage(slot);fs.renameSync(damaged,slot);}removeStage(stage);}
+  finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+ }
 }

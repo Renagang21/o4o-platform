@@ -108,3 +108,17 @@ test('Windows packaged runtime starts and health proves its release and data rea
  });
  assert.ok(fs.existsSync(path.join(freshData,'local.db')));assert.equal(verifyPackage(installedSlot(freshHome)).releaseId,result.releaseId);
 });
+
+test('verified packages repair missing/corrupt installed code while preserving data and failed-repair pointer',async()=>{
+ const options=target(),one=writePackage(fixture()),two=writePackage(fixture('two'),'second');await installPackage({source:one,...options});
+ fs.mkdirSync(options.dataHome);const credential=randomBytes(32);fs.writeFileSync(path.join(options.dataHome,'credentials.json'),credential);
+ const slot=installedSlot(options.home),index=path.join(slot,'src/index.mjs');fs.writeFileSync(index,'broken');
+ const pointer=fs.readFileSync(path.join(options.home,'current.json'));
+ await assert.rejects(installPackage({source:one,...options,preflight:()=>{throw Error('BACKUP_FAILED');}}),/BACKUP_FAILED/);
+ assert.equal(fs.readFileSync(index,'utf8'),'broken');assert.deepEqual(fs.readFileSync(path.join(options.home,'current.json')),pointer);
+ await installPackage({source:one,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture().manifest.releaseId);
+ assert.ok(fs.readdirSync(path.join(options.home,'versions')).some(n=>n.startsWith('.damaged-')));
+ fs.unlinkSync(index);await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture('two').manifest.releaseId);
+ fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.4.0');
+ assert.deepEqual(fs.readFileSync(path.join(options.dataHome,'credentials.json')),credential);
+});
