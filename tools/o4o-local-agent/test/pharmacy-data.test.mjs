@@ -201,3 +201,12 @@ test('invalid files never echo raw content and incomplete CSV exports fail befor
   assert.equal(readPharmacyWorkspace(owner).revision, 0);
   assert.throws(() => mapPharmacyCsv({ csvText: 'code,name,kind\n1,"unclosed,unknown', kind: 'product', program: 'fixture', keyColumn: 'code', columnMapping: { code: 'program_code', name: 'name', kind: 'kind' } }), /따옴표/);
 });
+
+test('pack measure changes cannot retroactively rewrite purchase quantities in either source or user lane', () => {
+  importSample(); const changed = sample(); changed.records.find(r => r.kind === 'pack').data.units_per_pack = 1000;
+  assert.throws(() => importPharmacyRecords(owner, changed, 1), /새 포장 식별자/);
+  const pack = changed.records.find(r => r.kind === 'pack');
+  assert.throws(() => importPharmacyRecords(owner, { format: PHARMACY_FORMAT, records: [pack] }, 1, 'user'), /새 포장 식별자/);
+  assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity, 1000);
+  assert.equal(readPharmacyWorkspace(owner).revision, 1);
+});

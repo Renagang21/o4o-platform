@@ -48,6 +48,12 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
       const old = latest.user.find(v => key(v) === key(r));
       if (r.kind === 'sheet' && old?.data.status === 'receipt_recorded' && !isDeepStrictEqual(old.data, r.data)) throw Error('접수 확인 시트는 수정하지 않습니다. 새 시트를 작성하세요.');
     }
+    const currentPacks = new Map(effective(latest).records.filter(r => r.kind === 'pack').map(r => [r.data.id, r.data]));
+    for (const r of incoming) if (r.kind === 'pack') {
+      const previous = currentPacks.get(r.data.id);
+      // Existing purchases refer to this identity. Changing its measure would rewrite historical quantities.
+      if (previous && ['product_id', 'base_unit', 'units_per_pack'].some(field => previous[field] !== r.data[field])) throw Error('기존 포장의 상품·환산 기준은 바꾸지 않습니다. 새 포장 식별자로 구분하세요.');
+    }
     next[lane] = merge(next[lane], incoming);
     // Validate source lane even when a user override masks an imported row.
     validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) });
