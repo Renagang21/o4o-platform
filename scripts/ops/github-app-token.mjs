@@ -198,7 +198,9 @@ export function parse(args) {
   if (mode === 'check' && command.length) fail('Check does not execute commands.');
   if (mode === 'exec') {
     if (!selected) fail('Explicit --use-app-identity is required; no automatic token fallback.');
-    const allowed = { gh: ['api', 'pr', 'run', 'workflow', 'repo', 'issue'], git: ['fetch', 'push', 'ls-remote'] };
+    // Higher-level gh commands can invoke Git with their own hidden transports.
+    // Use the HTTP API entry point; direct Git commands pass separate validation.
+    const allowed = { gh: ['api'], git: ['fetch', 'push', 'ls-remote'] };
     if (!Object.hasOwn(allowed, command[0]) || !allowed[command[0]].includes(command[1])
         || command.some(a => a === '--hostname' || a.startsWith('--hostname='))) {
       fail('Only approved gh/git commands on github.com may receive the token.');

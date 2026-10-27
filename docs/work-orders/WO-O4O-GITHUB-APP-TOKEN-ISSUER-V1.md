@@ -53,3 +53,5 @@ scp형/ssh://형 모두 SSH 프로그램 실행 전에 차단하는 실제 Git �
 같은 신원 검사를 remote의 실제 해석 URL로 확대해 URL 내 credential·다른 host/repository·SSH를 발급 전에 거부한다.
 추가 P2의 `GIT_CONFIG_PARAMETERS` 우선순위도 발급 전 거부로 해결했다. 검사 경로를 바꾸는
 `GIT_CONFIG`와 Git HTTP의 netrc 암묵 신원도 보수적으로 거부하고 기존 credential은 수정하지 않는다.
+간접 Git 실행이 있는 gh 명령의 추가 P2는 `gh api`만 허용하는 범위 축소로 해결했다.
+repo clone·PR create/checkout 등은 발급 전에 거부하고, 직접 Git 명령만 별도 검증을 거쳐 허용한다.

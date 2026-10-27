@@ -120,7 +120,8 @@ test('transport keeps credentials off argv, retains proxy/TLS, refuses redirects
 
 test('identity selection is explicit and token-printing/auth or shell commands are rejected', () => {
   assert.throws(() => parse(['exec', '--', 'gh', 'api', '/repos/' + REPOSITORY]), /Explicit/);
-  for (const command of [['sh', '-c', 'env'], ['gh', 'auth', 'token'], ['gh', 'api', '--hostname=other-host', '/'], ['git', '-c', 'anything']]) {
+  for (const command of [['sh', '-c', 'env'], ['gh', 'auth', 'token'], ['gh', 'repo', 'clone', REPOSITORY],
+    ['gh', 'pr', 'checkout', '1'], ['gh', 'pr', 'create'], ['gh', 'api', '--hostname=other-host', '/'], ['git', '-c', 'anything']]) {
     assert.throws(() => parse(['exec', '--use-app-identity', '--', ...command]), /approved/);
   }
   assert.equal(parse(['exec', '--use-app-identity', '--profile', 'author', '--', 'git', 'push', 'origin', 'wo/example']).profile, 'author');

@@ -14,7 +14,7 @@
 재확인하며 범위가 다르면 토큰을 폐기한다. 토큰/JWT는 메모리와 curl stdin에서만 처리하고,
 명령 인자·출력·파일에 기록하지 않는다. 기존 proxy·CA·TLS 검증을 유지하며 redirect는 따르지 않는다.
 
-`exec --use-app-identity`는 명시적으로 선택한 `gh` 또는 `git` 자식 프로세스에만 App 토큰을
+`exec --use-app-identity`는 명시적으로 선택한 `gh api` 또는 `git fetch/push/ls-remote` 자식 프로세스에만 App 토큰을
 전달한다. 기존 shell의 `GH_TOKEN`, Git credential 저장소 및 Codex 연결은 변경하지 않는다.
 신뢰하는 명령에만 사용한다. 자식 명령은 인증 환경을 전달받으므로 자체 로그/후크의 비밀정보
 취급도 확인한다. 도구는 `gh auth token`·임의 shell 실행을 허용하지 않는다.
@@ -85,6 +85,10 @@ userinfo·query·fragment가 없는지 발급 전에 확인한다. URL에 저장
 상속된 `GIT_CONFIG_PARAMETERS`·`GIT_CONFIG` 설정은 검사 대상/우선순위를 바꿀 수 있어 실행 전에
 거부한다. Git HTTP가 별도 신원을 선택할 수 있는 netrc 설정도 파일 내용은 읽지 않고 존재만 검사해
 거부한다. 도구가 사용자·플랫폼 credential 파일이나 정책 변수를 해제하지 않는다.
+
+Git을 간접 실행하는 `gh repo clone`·`gh pr create/checkout/merge` 등은 지원하지 않는다.
+GitHub 작업은 Git 동작이 없는 `gh api`로 실행한다. author profile의 PR 작성도 REST API 요청으로
+수행할 수 있다. 직접 Git 명령만 위 인증·remote 검사 후 허용한다.
 
 ## 운영 배포와의 경계
 
