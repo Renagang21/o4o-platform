@@ -67,7 +67,7 @@ const CRITERIA_COMPLETION: CompletionContract = Object.freeze({ requires: 'crite
 /**
  * 판단 근거의 자리(V2 §0-1-1 · §0-1-2). 순서는 가까운 근거부터이며 모두 비구속(binding:false)이다.
  *   own_experience   — 이 사용자 · 매장의 검증된 Experience. 결정적 실행을 허락할 수 있는 유일한 근거.
- *   knowledge        — Manual · 문서(미검증 주장). 아직 배선되지 않았다.
+ *   knowledge        — Manual · 문서(미검증 주장). 초기 계획에서는 unavailable; /request가 검증한 발췌가 있으면 실행 직전 request-scoped intent에서만 available로 조립한다. 검증된 경험/실행 권한이 아니다.
  *   shared_candidate — 다른 사용자에서 반복 검증된 방법. 추천 후보일 뿐 결정적 실행을 허락하지 않는다. 아직 배선되지 않았다.
  *   discovery        — 근거가 없거나 어긋나면 현재 화면에서 직접 찾는다.
  */

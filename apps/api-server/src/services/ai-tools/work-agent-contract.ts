@@ -1,3 +1,4 @@
+import type { ManualReference } from './manual-knowledge.js';
 /**
  * Goal-Driven Multimodal Work Agent V0 — Goal · Observation · Plan · Action · Result · Takeover 계약 (순수)
  *
@@ -854,6 +855,8 @@ export interface CompletionVerdict {
 export type CompletionJudge = (claim: { evidence: ExecutionEvidence[]; via: 'done' | 'goal_sufficiently_advanced' }) => Promise<CompletionVerdict>;
 
 export interface ExecutionIntent {
+  /** Request-only untrusted manual excerpts. Not memory, execution authority or replay steps. */
+  manualReferences?: readonly ManualReference[];
   version: 1;
   /** 이 지시를 낸 Task(없으면 Task 저장이 실패한 실행 — 지시는 그대로 유효). */
   taskId: string | null;

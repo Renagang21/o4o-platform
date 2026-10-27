@@ -225,6 +225,14 @@ Strong Discovery 는 V1 에서 최상위 진입점이었다. V2 에서는 **Assi
 
 ---
 
+### 7-2. Main 매뉴얼 참고 연결 (2026-10-27 구현 범위)
+
+Main에서 사용자가 선택한 PDF를 브라우저 안에서 해석하고 계정별 로컬 자료함에 보관한다. 관련 페이지 발췌만 기존 `/api/ai/request`의 home-chat 또는 Work Planner에 미검증 `user_file` 근거로 전달한다. 발췌는 요청 동안만 사용하며 Task·서버 DB·로그에 저장하지 않는다. 초기 계획의 Knowledge는 기본 unavailable이고 검증된 발췌가 있을 때만 실행 직전의 intent에 available로 조립된다. 이것으로 Experienced 실행 권한이나 Skill 승격은 생기지 않는다.
+
+원본 설명과 사용자 화면 일치/차이 보고를 분리한다. 보고는 다음 검색의 참고이며 실제 run 성공 검증을 대신하지 않는다. 기존 Experience·교정·재생 경로는 유지한다. 기기 간 자료 이동은 명시적 내보내기/가져오기이며 Cloud 동기화나 외부 ingress가 아니다. 실제 프로그램 등재·실 PC 조작·유료 모델 품질 검증과 구분한다. 절차/한도는 [사용자 테스트 guide](../guides/O4O-ASSISTANT-MANUAL-USER-TEST-V1.md), 검증과 미실행 범위는 [WO](../work-orders/WO-O4O-ASSISTANT-MANUAL-KNOWLEDGE-V1.md)를 따른다. 이 문단은 구현 범위이며 main 병합·운영 적용의 증거가 아니다.
+
+---
+
 ## 8. 수행자 수준 — Strong → Lower-cost → Deterministic
 
 ### 8-1. 역할 (model-agnostic · V1 §1-2 승계)

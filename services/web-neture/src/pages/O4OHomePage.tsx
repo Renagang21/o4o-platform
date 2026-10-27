@@ -1,3 +1,6 @@
+import { useManualLibrary } from '../lib/manuals/useManualLibrary';
+import { ManualLibraryPanel, ManualReferences } from '../components/home/ManualLibraryPanel';
+import type { ManualReference } from '../lib/manuals/knowledge';
 import { api as homePresentationApi } from '../lib/apiClient';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 /**
@@ -41,6 +44,10 @@ const AUTOMATION_INTRO_SEEN_KEY = 'neture:automation:intro-seen:v1';
 export default function O4OHomePage() {
   const { user, isAuthenticated, isLoading: authLoading, logout, pendingPolicyAcceptances } = useAuth();
   const { openLoginModal } = useLoginModal();
+  const manuals = useManualLibrary(isAuthenticated ? user?.id ?? null : null);
+  const [manualReferencesUsed, setManualReferencesUsed] = useState<ManualReference[]>([]);
+  const [manualSearchEmpty, setManualSearchEmpty] = useState(false);
+  const [manualTaskQuery, setManualTaskQuery] = useState('');
   // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
   const hasPendingTerms = (pendingPolicyAcceptances?.length ?? 0) > 0;
   const canUseHomeWorkspace = isAuthenticated && !!user && !hasPendingTerms;
@@ -131,6 +138,9 @@ export default function O4OHomePage() {
     setConfirm(null);
     setResumeAnchor(null);
     setMaintenanceOpen(false);
+    setManualReferencesUsed([]);
+    setManualSearchEmpty(false);
+    setManualTaskQuery('');
     setAttachmentsUsed([]);
   };
   const userId = user?.id ?? null;
@@ -183,7 +193,7 @@ export default function O4OHomePage() {
 
   const trimmed = input.trim();
   // 매장 scope 해석 중에는 불완전한 컨텍스트로 보내지 않는다(§12).
-  const blocked = pending || isResolvingStore;
+  const blocked = pending || isResolvingStore || manuals.busy;
 
   /**
    * 단일 실행. 질문 · 파일 분석 · 웹/PC 작업의 구분은 서버 라우터가 한다(§4·§5).
@@ -214,14 +224,20 @@ export default function O4OHomePage() {
     const anchor = resumeAnchor;
     const runId = anchor?.runId;
     const resumeTargetId = anchor?.targetId ?? undefined;
+    const manualReferences = manuals.references(runId ? `${manualTaskQuery} ${text}` : text);
+    if (!runId) setManualTaskQuery(text);
+    setManualReferencesUsed([]);
+    setManualSearchEmpty(manuals.selected.length > 0 && manualReferences.length === 0);
     try {
-      const result: UnifiedRequestResult = await sendUnifiedRequest({ text, attachments, workScope, runId, resumeTargetId, routeHint });
+      const result: UnifiedRequestResult = await sendUnifiedRequest({ text, attachments, workScope, runId, resumeTargetId, routeHint, ...(manualReferences.length ? { manualReferences } : {}) });
       if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
       if (result.kind === 'confirm') {
         // 실행하지 않았다. 입력 · 첨부는 그대로 두고 [진행] 을 기다린다.
         setConfirm({ text, message: result.confirm.message });
         return;
       }
+      setManualReferencesUsed(manualReferences);
+      if (manualReferences.length) void manuals.used(manualReferences);
       setInput('');
       setAttachments([]);
       setAttachError(null);
@@ -411,6 +427,9 @@ export default function O4OHomePage() {
         </div>
       </form>
 
+      {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
+      {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
+      {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}
       <div className="mt-2 w-full max-w-xl text-left">
         <button type="button" disabled={blocked} aria-expanded={maintenanceOpen} onClick={() => setMaintenanceOpen(value => !value)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40">데이터 정비</button>
       </div>

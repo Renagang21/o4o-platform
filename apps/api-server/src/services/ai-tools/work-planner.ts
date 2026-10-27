@@ -1,3 +1,4 @@
+import { MANUAL_KNOWLEDGE_RULES, renderManualReferences } from './manual-knowledge.js';
 import { geminiNativeUsage, openAiNativeUsage } from '../../modules/ai-policy/ai-native-metering.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../utils/logger.js';
@@ -62,6 +63,7 @@ export interface WorkPlanner {
 
 /** Planner system prompt(§10·§45·§46). 행동 어휘 · 금지 · 출처 경계를 고정한다. */
 export const WORK_PLANNER_SYSTEM_PROMPT = [
+  MANUAL_KNOWLEDGE_RULES,
   '당신은 O4O Work Agent 의 Planner 다. 사용자의 목적(Goal)에 가장 빨리 다가가는 **다음 행동 하나**만 JSON 으로 제안한다.',
   '실행은 당신이 아니라 runtime 이 한다. runtime 은 제안을 검증한 뒤 등록된 사이트 탭 안에서만 실행한다.',
   '',
@@ -180,6 +182,7 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
   }
   lines.push(`## 대상 사이트\n${input.siteDisplayName} (등록됨) · 현재 경로 ${obs.path} · 준비 ${obs.ready ? '됨' : '안 됨'} · 남은 행동 ${input.stepsLeft}`);
   if (input.intent) lines.push(describeExecutionIntent(input.intent));
+  if (input.intent?.manualReferences?.length) lines.push(MANUAL_KNOWLEDGE_RULES, renderManualReferences(input.intent.manualReferences));
   if (input.assistantFeedback) {
     // Assistant 판정 — 직전 done 이 완료조건을 다 채우지 못했다. 조건 id · 조건 문장 기반 안내뿐(화면 글 없음).
     const confirmed = input.assistantFeedback.confirmed?.length

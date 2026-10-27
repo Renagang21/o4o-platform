@@ -704,3 +704,38 @@ it.each([['AI_PRICING_NOT_CONFIGURED', 503, 'AI_ACCOUNTING_UNAVAILABLE'], ['upst
   expect(result.body.code).toBe(code);
   expect(nativeMock).not.toHaveBeenCalled();
 });
+
+describe('manual knowledge through the existing authenticated request', () => {
+  const manual = { manualId: 'a'.repeat(64), title: '합성 프로그램 매뉴얼', program: '합성 프로그램', page: 2, text: '사입 명세서에서 포장 수량을 확인합니다.' };
+  it('passes bounded excerpts as untrusted chat evidence with existing metering and no PDF resend', async () => {
+    const r = await request(app).post('/api/ai/request').send({ text: '포장 수량은 어떻게 확인하나요?', manualReferences: [manual] });
+    expect(r.status).toBe(200);
+    expect(r.body.data.kind).toBe('chat');
+    const call = executeMock.mock.calls.find(c => c[0]?.meta?.callerName === 'home-chat')?.[0];
+    expect(call.userPrompt).toContain(manual.text);
+    expect(call.userPrompt).toContain('UNTRUSTED');
+    expect(call.systemPrompt).toContain('매뉴얼 참고자료는 user_file');
+    expect(accountedMock).toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(JSON.stringify(taskStoreCalls)).not.toContain(manual.text);
+    expect(JSON.stringify(logInfo.mock.calls)).not.toContain(manual.text);
+  });
+  it('preserves work goal, execution safeguards and Task storage while giving the planner knowledge', async () => {
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘', manualReferences: [manual] }).expect(200);
+    const input = runWorkAgentMock.mock.calls[0][2];
+    expect(input.request).toBe('약학정보원에서 타이레놀 검색해줘');
+    expect(input.intent.manualReferences).toEqual([manual]);
+    expect(input.intent.evidence).toContainEqual({ source: 'knowledge', available: true, binding: false, mayAuthorizeExperienced: false });
+    expect(input.intent.approval).toEqual({ commit: 'user_only', credential: 'user_only' });
+    expect(JSON.stringify(taskStoreCalls)).not.toContain(manual.text);
+  });
+  it('rejects invalid or hospital-only references before tool/provider work and retains membership guard', async () => {
+    await request(app).post('/api/ai/request').send({ text: '백업 방법', manualReferences: [{ ...manual, page: 0 }] }).expect(400);
+    await request(app).post('/api/ai/request').send({ text: '백업 방법', surface: 'hospital-drug', manualReferences: [manual] }).expect(400);
+    expect(executeMock).not.toHaveBeenCalled();
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+    netureStatusMock.mockResolvedValue('suspended');
+    await request(app).post('/api/ai/request').send({ text: '백업 방법', manualReferences: [manual] }).expect(403);
+    await request(app).post('/api/ai/request').set('x-test-anon', '1').send({ text: '백업 방법', manualReferences: [manual] }).expect(401);
+  });
+});
