@@ -34,6 +34,8 @@
  */
 
 import fs from 'node:fs';
+import { PHARMACY_LIMITS, PHARMACY_FORMAT, orderPreparationRequest } from './pharmacy-order-contract.mjs';
+import { readPharmacyWorkspace, importPharmacyRecords, pharmacySummary, mapPharmacyCsv, pharmacyMapping } from './pharmacy-data.mjs';
 import { DatabaseSync } from 'node:sqlite';
 import {
   bootstrapLocalDb, closeLocalDb, openLocalDb, localDbHealth,
@@ -122,6 +124,40 @@ export async function runDataCommand(argv, print = (m) => console.log(m)) {
   const sub = args._[0];
   try {
     switch (sub) {
+      case 'pharmacy': {
+        if (!requireReady(print)) return 2;
+        const action = args._[1];
+        const owner = args.owner;
+        // status reports counts only. Original exports and requests are written only to explicit local output files.
+        if (action === 'status') { print(JSON.stringify(pharmacySummary(owner))); return 0; }
+        if (action === 'export' || action === 'request') {
+          const { revision, bundle } = readPharmacyWorkspace(owner);
+          if (typeof args.out !== 'string') throw Error('--out 파일을 지정하세요.');
+          const output = action === 'export' ? JSON.stringify(bundle, null, 2) : orderPreparationRequest(bundle, args.sheet, args.supplier, args.mode ?? 'prepare');
+          fs.writeFileSync(args.out, output, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+          print(JSON.stringify({ written: true, revision })); return 0;
+        }
+        if (action === 'import' || action === 'map-csv') {
+          if (typeof args.file !== 'string' || fs.statSync(args.file).size > PHARMACY_LIMITS.fileBytes) throw Error('--file은 8MB 이내여야 합니다.');
+          const raw = fs.readFileSync(args.file, 'utf8');
+          if (action === 'map-csv') {
+            if (typeof args.out !== 'string') throw Error('--out 파일을 지정하세요.');
+            const mapping = args.map ? parseMap(args.map) : pharmacyMapping(owner, args.kind, args.program, args.profile);
+            const records = mapPharmacyCsv({ csvText: raw, kind: args.kind, program: args.program, keyColumn: args.key, columnMapping: mapping });
+            fs.writeFileSync(args.out, JSON.stringify({ format: PHARMACY_FORMAT, records }, null, 2), { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+            if (args.profile && args.map) pharmacyMapping(owner, args.kind, args.program, args.profile, mapping);
+            print(JSON.stringify({ mapped: records.length, written: true, applied: false })); return 0;
+          }
+          const revision = typeof args.revision === 'string' && /^\d+$/.test(args.revision) ? Number(args.revision) : NaN;
+          if (!Number.isSafeInteger(revision)) throw Error('--revision에 status의 최신 revision을 지정하세요.');
+          let payload; try { payload = JSON.parse(raw); } catch { throw Error('약국 업무 JSON 형식을 확인하세요.'); }
+          // Existing pre-write backup; failure stops before any business data mutation.
+          createBackup(openLocalDb(), 'manual');
+          print(JSON.stringify(importPharmacyRecords(owner, payload, revision, args.mode ?? 'program'))); return 0;
+        }
+        throw Error('data pharmacy status|map-csv|import|export|request 명령을 사용하세요.');
+      }
+
       case 'status': {
         const state = boot();
         const h = localDbHealth({ backupSummary });
