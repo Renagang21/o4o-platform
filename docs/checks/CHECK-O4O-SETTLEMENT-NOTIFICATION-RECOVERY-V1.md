@@ -41,3 +41,9 @@
 문서 정합: TODO의 조사 계약·실행 결과와 이 CHECK·이용 안내를 맞췄다. 과거 완료 기록·canonical index·보존기간·금융 정책은 변경하지 않았다. 새 작업은 기존 클라우드 격리 checkout을 재사용하고 전용 branch에서 수행했다. WORKTREE_DISPOSITION=KEEP(사용자 지정 개발 인계·클라우드 단일 checkout 보존).
 
 종료 fetch에서 origin/main=60bec2ef4f(PR #851)를 확인했다. 기준 이후 funding/cooperation 변경이며 수정 경로·migration registry 중복은 없다. 이 branch의 검증 기준은 e96c4a7934이며 최신 main 통합 및 통합 후 검증은 미실행이다.
+
+## 후속 main 통합 검사 (2026-10-27)
+
+사용자의 main 병합·배포 지시로 통합을 재개했다. 최신 main 82e38f070e를 전용 branch에 병합했다. 통합 HEAD 85867d5ffc에서 Neture 163 files / 1,405 PASS, 정산 관련 API 3 suites / 116 PASS, API 타입·API/Neture production build·migration contract21 PASS를 확인했다.
+
+PR #854의 전체 CI에서 supplier-domain-boundary의 수신자 source 검사 실패를 로컬에서도 재현했다(40 PASS / 1 FAIL). 실제 producer를 기존 command에서 새 notification service로 옮긴 변경에 맞춰 command의 위임과 새 producer의 canonical owner resolver 사용을 함께 검사하도록 보완했다. 수신자 판정·실제 DB 테스트·기존 권한 정책은 변경하지 않았다. 수정 후 공급자 경계41건과 lint·문서 민감정보 검사가 통과했다. 전체 CI 재검증 및 병합·배포 결과는 PR과 종료 보고를 따른다.
