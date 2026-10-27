@@ -50,3 +50,5 @@ DB 검사는 세션 소유 label의 신규 PostgreSQL 16 컨테이너와 loopbac
 ## 통합 검토 보완 (2026-10-27)
 
 사용자의 main 병합·배포 지시 후 PR #845를 생성했다. main의 자동화 입력·협력사업 자료 변경을 충돌 없이 결합했다. Codex P2 1건은 신규 지정용 Admin 목록이 조회용 카탈로그에도 적용돼 기존 Operator의 수락 상태를 `대상 아님`으로 표시하던 문제다. 조회·읽기 전용 편집의 전체 역할 카탈로그와 신규 초대 Admin allowlist를 분리했다. 기존 Operator의 수락 완료·기존 권한 유지 표시와 중앙 신규 지정 제외를 포함한 관리자 4 files / 24 tests 및 관리자 production build를 통과했다. 집중 lint 오류/신규 경고 0이다. 이 절은 검토 수정 기록이며 실제 배포 완료를 뜻하지 않는다.
+
+PR CI의 API 2/3 분할 실패는 과거 인증 정리 spec이 중앙 controller의 옛 `ASSIGNABLE_OPERATOR_ROLES` 문자열을 요구하는 문제를 로컬 동일 분할에서 재현해 확인했다. 중앙 신규 지정은 Admin 전용이어야 하므로 새 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 응답을 요구하고 옛 전체 지정 목록 응답은 금지하도록 계약 검사를 맞췄다. runtime 권한 검사를 완화하지 않았다. CI 1/3·3/3, 코드 품질·관리자/웹 build는 해당 HEAD에서 통과했다.
