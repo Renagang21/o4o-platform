@@ -28,7 +28,7 @@ import BusinessOperatorAssignments from './BusinessOperatorAssignments';
  * 자매: docs/investigations/IR-O4O-ADMIN-ROLE-LIST-SERVICE-CENTRIC-UX-AUDIT-V1.md
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle, UserX, Search } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -58,6 +58,7 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 //   `@/lib/password-policy` import 를 제거했다. 이 화면에는 비밀번호 입력 자체가 없다.
 import {
   ASSIGNABLE_ROLES,
+  ASSIGNABLE_ROLE_VALUES,
   OPERATOR_ROLE_CATALOG,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
@@ -70,6 +71,8 @@ import {
   type BusinessLedgerState,
   type BusinessLedgerStatus,
 } from '@/lib/business-ledger';
+
+const SERVICE_ADMIN_ROLE_VALUES = new Set(ASSIGNABLE_ROLE_VALUES);
 
 const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
   loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
@@ -166,16 +169,15 @@ export default function OperatorsPage() {
   const [invitations, setInvitations] = useState<Invite[] | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitationVersion, setInvitationVersion] = useState(0);
+  const [showOperatorAssignments, setShowOperatorAssignments] = useState(false);
+  const acceptedInvitationSnapshot = useRef<string | null>(null);
+  const userLoadSequence = useRef(0);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
   // 사업 원장(semi_franchises) — 계정 상태와 별개. 실패는 '미등록'과 구분해 보여준다.
   const [businessLedger, setBusinessLedger] = useState<BusinessLedgerState>({ status: 'loading' });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchBusinessLedger = async () => {
+  const fetchBusinessLedger = useCallback(async () => {
     setBusinessLedger({ status: 'loading' });
     try {
       const response = await authClient.api.get('/neture/admin/semi-franchises');
@@ -186,7 +188,7 @@ export default function OperatorsPage() {
         message: err?.response?.data?.error || err?.message || '사업 원장을 조회하지 못했습니다.',
       });
     }
-  };
+  }, []);
 
   /**
    * 운영자 목록 조회.
@@ -201,11 +203,13 @@ export default function OperatorsPage() {
    *     - 재조회 실패 시 **기존 목록을 비우지 않는다**(마지막으로 성공한 화면을 유지).
    *     - HTTP 200 이지만 `success:false` 이거나 배열이 아닌 응답도 **실패로 판정**한다.
    */
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    const sequence = ++userLoadSequence.current;
     void fetchBusinessLedger();
     try {
       setLoading(true);
       const response = await authClient.api.get('/admin/users', { params: { limit: 1000 } });
+      if (sequence !== userLoadSequence.current) return;
 
       // 200 인데 실패를 실은 응답을 성공으로 오인하지 않는다.
       if (response.data?.success === false) {
@@ -227,6 +231,7 @@ export default function OperatorsPage() {
       setUsers(raw as AdminUserDto[]);
       setLoadError(null);
     } catch (err: any) {
+      if (sequence !== userLoadSequence.current) return;
       const msg =
         err?.response?.data?.error ||
         err?.response?.data?.message ||
@@ -236,14 +241,38 @@ export default function OperatorsPage() {
       toast.error(msg);
       // 기존 목록은 유지한다 — 비우면 "권한 0건" 과 구분되지 않는다.
     } finally {
-      setLoading(false);
+      if (sequence === userLoadSequence.current) setLoading(false);
     }
-  };
+  }, [fetchBusinessLedger]);
 
-  // assignment-row flatMap + operator-only preset filter
+  const refreshAssignments = useCallback(() => {
+    void fetchUsers();
+    setInvitationVersion(v => v + 1);
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    void fetchUsers();
+    // Returning from acceptance in another tab must refresh both views.
+    window.addEventListener('focus', refreshAssignments);
+    return () => window.removeEventListener('focus', refreshAssignments);
+  }, [fetchUsers, refreshAssignments]);
+
+  const handleInvitationsLoaded = useCallback((rows: Invite[] | null) => {
+    setInvitations(rows);
+    if (!rows) return;
+    const accepted = rows.filter(row => row.status === 'accepted')
+      .map(row => `${row.id}:${row.accepted_user_id}:${row.role}`).sort().join('|');
+    const previous = acceptedInvitationSnapshot.current;
+    acceptedInvitationSnapshot.current = accepted;
+    if (previous !== null && previous !== accepted) void fetchUsers();
+  }, [fetchUsers]);
+
+  // Central Admin view by default; existing delegated assignments are opt-in.
   const allRows = useMemo<AssignmentRow[]>(
-    () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role) && row.parsedRole.serviceKey !== 'platform'),
-    [users],
+    () => flattenUsersToAssignments(users).filter((row) =>
+      isOperatorRole(row.role) && row.parsedRole.serviceKey !== 'platform' &&
+      (showOperatorAssignments || SERVICE_ADMIN_ROLE_VALUES.has(row.role))),
+    [users, showOperatorAssignments],
   );
 
   const filteredRows = useMemo<AssignmentRow[]>(() => {
@@ -603,13 +632,13 @@ export default function OperatorsPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="서비스 관리자·운영자"
-        subtitle="서비스별 담당자를 지정하고 운영 권한을 관리합니다."
+        title="서비스 관리자"
+        subtitle="서비스별 Admin을 지정합니다. Operator 지정은 해당 서비스 관리자가 담당합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
           { id: 'add', label: '서비스 담당자 지정', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
-          { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
+          { id: 'refresh', label: 'Refresh', onClick: refreshAssignments, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
 
@@ -623,10 +652,10 @@ export default function OperatorsPage() {
       )}
 
       {/* Stats — WO-O4O-ADMIN-OPERATORS-REDUNDANT-ACTIVE-KPI-REMOVE-V1: Active KPI 제거 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <StatCard label="Operators" value={stats.users} color="text-gray-900" Icon={Users} />
-        <StatCard label="Admin Roles" value={stats.admins} color="text-orange-600" Icon={Shield} />
-        <StatCard label="Operator Roles" value={stats.operators} color="text-blue-600" Icon={Shield} />
+      <div className={`grid grid-cols-1 ${showOperatorAssignments ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mb-4`}>
+        <StatCard label="표시 계정" value={stats.users} color="text-gray-900" Icon={Users} />
+        <StatCard label="Admin 권한" value={stats.admins} color="text-orange-600" Icon={Shield} />
+        {showOperatorAssignments && <StatCard label="기존 Operator 권한" value={stats.operators} color="text-blue-600" Icon={Shield} />}
       </div>
 
       {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
@@ -638,15 +667,26 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: 'All Services', options: [...getServiceOptions().filter(option => option.value !== 'platform'), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
-            { key: 'role', placeholder: 'All Operator Roles', options: operatorRoleOptions },
+            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions().filter(option => option.value !== 'platform'), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
+            { key: 'role', placeholder: '역할 전체', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
           onFilterChange={(k, v) => setFacets((prev) => ({ ...prev, [k]: v } as Facets))}
         />
       </div>
 
-      <p className="mb-4 rounded border bg-white p-4 text-sm">서비스별 Admin을 지정합니다. Operator 신규 지정은 해당 서비스 Admin이 자기 서비스에서 처리합니다. 기존 역할 조회·회수는 유지합니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+      <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
+        <p>서비스별 Admin을 지정합니다. Operator 신규 지정은 해당 서비스 Admin이 자기 서비스에서 처리합니다. 기본 목록에는 서비스 Admin만 표시합니다. 초대를 수락한 뒤에는 목록을 새로고침해 주세요. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={showOperatorAssignments} onChange={e => {
+            setShowOperatorAssignments(e.target.checked);
+            setSelectedIds(new Set());
+            setFacets(previous => ({ ...previous, role: '' }));
+          }} />
+          기존 Operator 권한 함께 보기
+        </label>
+        <p className="text-gray-600">기존 Operator 권한은 유지되며, 함께 보기에서 조회·회수할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
+      </div>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
       <BusinessOperatorAssignments />
 
@@ -727,7 +767,7 @@ export default function OperatorsPage() {
       </>
 
 
-      <OperatorInvitationsPanel version={invitationVersion} onLoaded={setInvitations} />
+      <OperatorInvitationsPanel version={invitationVersion} onLoaded={handleInvitationsLoaded} />
 
       {/* Bulk 결과 모달 */}
       <BulkResultModal

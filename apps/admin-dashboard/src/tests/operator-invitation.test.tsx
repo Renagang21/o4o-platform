@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   cleanup,
+  act,
   fireEvent,
   render,
   screen,
@@ -23,6 +24,62 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe('operator invitation admin UI', () => {
+  it('does not let an older list response remove a newly accepted administrator', async () => {
+    let finishInitial!: (value: unknown) => void;
+    const initial = new Promise(resolve => { finishInitial = resolve; });
+    let reads = 0;
+    h.get.mockImplementation((path: string) => {
+      if (path === '/admin/users') {
+        if (++reads === 1) return initial;
+        return Promise.resolve({ data: { success: true, users: [{ id: 'new-admin', name: 'Latest Accepted Admin', roles: ['partner-support:admin'], isActive: true }] } });
+      }
+      return Promise.resolve({ data: { data: [] } });
+    });
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    await waitFor(() => expect(reads).toBe(1));
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+    expect(await screen.findByText('Latest Accepted Admin')).toBeTruthy();
+    await act(async () => finishInitial({ data: { success: true, users: [] } }));
+    expect(screen.getByText('Latest Accepted Admin')).toBeTruthy();
+  });
+
+  it('shows service Admin by default and keeps existing Operator assignments behind an explicit view', async () => {
+    h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
+      ? { success: true, users: [
+        { id: 'admin-fixture', name: 'Partner Admin Fixture', roles: ['partner-support:admin'], isActive: true },
+        { id: 'operator-fixture', name: 'Operator Fixture', roles: ['partner-support:operator'], isActive: true },
+      ] }
+      : { data: [] } }));
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    expect(await screen.findByText('Partner Admin Fixture')).toBeTruthy();
+    expect(screen.queryByText('Operator Fixture')).toBeNull();
+    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
+    expect(await screen.findByText('Operator Fixture')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
+    expect(screen.queryByText('Operator Fixture')).toBeNull();
+    expect(h.post).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the assignments when an invitation-list refresh observes acceptance', async () => {
+    let accepted = false;
+    h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
+      ? { success: true, users: accepted ? [{ id: 'new-admin', name: 'Accepted Partner Admin', roles: ['partner-support:admin'], isActive: true }] : [] }
+      : { data: path.includes('service-operator-invitations') ? [{
+        id: 'invitation-fixture', role: 'partner-support:admin', purpose: 'assignment',
+        status: accepted ? 'accepted' : 'pending', expired: false,
+        accepted_user_id: accepted ? 'new-admin' : null, target_user_id: null,
+        invited_email: accepted ? null : 'invite@example.test', expires_at: '2099-01-01',
+      }] : [] } }));
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    await screen.findByText('확인 대기');
+    expect(screen.queryByText('Accepted Partner Admin')).toBeNull();
+    accepted = true;
+    fireEvent.click(screen.getByRole('button', { name: '목록 새로고침' }));
+    expect(await screen.findByText('Accepted Partner Admin')).toBeTruthy();
+    expect(screen.getAllByText('확인·수락 완료').length).toBeGreaterThan(0);
+    expect(h.post).not.toHaveBeenCalled();
+  });
+
   it('invites an unregistered email without selecting or requiring a Google-linked user', async () => {
     h.get.mockImplementation(async (path: string) => ({
       data:
@@ -68,6 +125,7 @@ describe('operator invitation admin UI', () => {
       ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',email:'operator@example.test',roles:['partner-support:operator'],isActive:true}] }
       : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'service',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    fireEvent.click(await screen.findByLabelText('기존 Operator 권한 함께 보기'));
     expect(await screen.findByText(accepted ? '확인 완료' : '기존 권한 유지')).toBeTruthy();
     expect(screen.queryByText('대상 아님')).toBeNull();
   });
