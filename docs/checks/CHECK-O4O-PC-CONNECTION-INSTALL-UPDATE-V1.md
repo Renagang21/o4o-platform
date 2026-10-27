@@ -53,3 +53,5 @@ GitHub 인증 복구 후 CI 40507085958의 API Jest 1/3 실패를 확인했다. 
 PR #858은 e724dfb976으로 main 병합했고 main CI 40600642545·CodeQL, Neture Promote 40602009269의 revision smoke/traffic switch가 통과했다. 그러나 공개 manifest는 정상인데 ZIP 전체 다운로드는 HTTP 500, 같은 파일의 100-byte Range 요청은 HTTP 206이었다. ZIP 33,873,012 bytes가 non-streaming HTTP 32 MiB 한도를 넘는다. 서빙 성공만으로 설치 배포 완료라고 판단하지 않고 실제 다운로드 실패를 확인했다.
 
 별도 worktree/branch에서 ZIP level 9 압축과 생성 산출물의 32 MiB 미만 검사만 보완한다. 실행 파일·SQLite·연결 정보·설치/권한/health 계약은 동일하다. 압축이 어려운 32 MiB payload도 발행을 거절하는 회귀를 추가한다. 새 PR/CI/배포 및 운영 전체 ZIP 다운로드·해시 확인으로 종료한다.
+
+실제 Node 22.18 압축기는 level 9 단독으로도 한도를 초과해 새 size guard가 발행을 거절했다. `level: 9, memLevel: 6`으로 실제 공식 Node 패키지 33,518,114 bytes(32 MiB 미만)를 생성했다. releaseId ecb640bbafc3은 동일해 실행 프로그램 내용이 바뀌지 않았음을 확인했다. 운영 전체 다운로드 재검증은 새 배포 후 수행한다.
