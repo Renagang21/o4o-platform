@@ -669,8 +669,16 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       // PHASE-E-TASK-UNIT-DISPATCH-V1: 작업 단위 loop(순수 — 단계마다 기존 단발 DOM 실행을 deps 로 받아 부른다.
       // import 는 한도 사본 두 개뿐이고 프로세스 · net 수단은 없다).
       './browser-dom-unit.mjs',
+      // PC installer: fixed build metadata only; no process/network/credential access.
+      './release-info.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
+    const releaseInfo = readAgent('release-info.mjs');
+    expect([...releaseInfo.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1])).toEqual(['node:fs']);
+    expect(releaseInfo).toContain("new URL('./build-info.json',import.meta.url)");
+    for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'node:net', 'node:http', 'process.env', 'process.argv', 'credentials']) {
+      expect(releaseInfo).not.toContain(forbidden);
+    }
     for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {
       expect(code).not.toContain(forbidden);
     }

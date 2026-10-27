@@ -41,3 +41,9 @@ Windows PR CI(40500335521)의 `PC installer Windows` job PASS: 별도 Node PATH 
 PR CI 40503793107에서 Windows/web/admin build/CodeQL은 통과했으나 API Jest 1/3 및 Sonar gate가 실패했다. 상세 로그·Sonar API는 환경 egress 제한으로 접근할 수 없었고 GitHub annotations로 확인 가능한 분기 복잡도·await/문장 구분 문제를 정리했다. 해당 실패를 성공으로 계산하지 않으며 후속 HEAD에서 전체 CI/분석을 다시 확인한다. 로컬 UI 재검증 최초 명령의 jsdom 옵션 누락(document undefined)은 실행 옵션 수정 후 27개 재실행으로 확인했다.
 
 후속 Sonar annotations에서 패키지 생성 명령의 PATH 검색을 확인하여 Linux delivery runner의 `/usr/bin/git`·`/usr/bin/curl` 고정 경로로 바꾸었다. ZIP member 검사와 설치 단계의 복잡도·중첩 callback도 정리했다. 새 분석 결과에서 gate 통과 여부를 확인한다.
+
+## 4. 병합 재개 시 검증
+
+GitHub 인증 복구 후 CI 40507085958의 API Jest 1/3 실패를 확인했다. 로컬에서 `local-agent-runtime.spec.ts`의 handler import allowlist에 신규 `release-info.mjs`가 빠진 동일 실패를 재현했다. 고정 build metadata 모듈을 허용 목록에 반영하고 fs import 한정·고정 build-info URL·프로세스/네트워크/환경변수/credential 접근 금지를 함께 검증했다. 수정 후 해당 suite 64개 PASS. 실제 runtime·pairing 경계 변경은 없다.
+
+최종 runtime source bd799bc24c의 Windows CI·CodeQL·웹/관리자 빌드·코드 품질 검사 PASS, Sonar gate PASS(0 security hotspots, 0.0% duplication), Codex review 미해결 사항 없음. 고정 executable 경로로 공식 Node 포함 ZIP 재생성 및 공개 manifest SHA256·ZIP CRC·내부 46개 파일 hash·Node MZ/LICENSE 대조 PASS. 새 테스트 commit의 전체 CI와 main 병합·배포는 별도로 확인한다.
