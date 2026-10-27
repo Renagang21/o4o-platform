@@ -13,6 +13,7 @@ import { resolve } from 'node:path';
 
 import {
   ASSIGNABLE_ROLES,
+  CATALOG_ROLE_VALUES,
   ASSIGNABLE_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
   findRoleOption,
@@ -32,13 +33,12 @@ function readServerRoles(): string[] {
 
 describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => {
   it('화면 카탈로그와 서버 allowlist 가 같은 집합·같은 순서다', () => {
-    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles());
+    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles().filter(role => /(?:[:_])admin$/.test(role)));
   });
 
-  it('커뮤니티는 Admin과 Operator를 각각 지정할 수 있다', () => {
+  it('커뮤니티는 Admin만 지정하고 Operator는 서비스에 위임한다', () => {
     expect(ASSIGNABLE_ROLES.community.map(({ value, label }) => ({ value, label }))).toEqual([
       { value: 'community:admin', label: 'Admin' },
-      { value: 'community:operator', label: 'Operator' },
     ]);
   });
 
@@ -56,9 +56,9 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
     }
   });
 
-  it.each(['pharmacy','carepharm','megapharm','pharmcoop'])('%s는 두 운영 역할이 있고 타 사업 역할을 포함하지 않는다', key => {
-    expect(ASSIGNABLE_ROLES[key].map(option => option.value)).toEqual([`neture:${key}_admin`, `neture:${key}_operator`]);
-    expect(ASSIGNABLE_ROLES[key].map(option => option.label)).toEqual(['Admin', 'Operator']);
+  it.each(['pharmacy','carepharm','megapharm','pharmcoop'])('%s는 Admin만 있고 타 사업 역할을 포함하지 않는다', key => {
+    expect(ASSIGNABLE_ROLES[key].map(option => option.value)).toEqual([`neture:${key}_admin`]);
+    expect(ASSIGNABLE_ROLES[key].map(option => option.label)).toEqual(['Admin']);
   });
 
   it('역할 값에 중복이 없다', () => {
@@ -102,4 +102,10 @@ describe('/operators — 비밀번호 표면 0 (§17)', () => {
 
 it('퇴역 서비스 PH·K-Cosmetics 역할은 신규 지정 목록에 없다', () => {
  expect(ASSIGNABLE_ROLE_VALUES.some(role => /^(pharmacy-hub|cosmetics|k-cosmetics):/.test(role))).toBe(false);
+});
+
+it('keeps Operator roles in the read-only catalog without reintroducing central grants', () => {
+  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('partner-support:operator');
+  expect(CATALOG_ROLE_VALUES.has('partner-support:operator')).toBe(true);
+  expect(findRoleOption('partner-support:operator')?.label).toBe('Operator');
 });

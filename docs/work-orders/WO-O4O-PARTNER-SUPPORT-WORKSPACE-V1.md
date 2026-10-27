@@ -211,3 +211,46 @@
 GitHub Actions 상세 로그 저장소 `results-receiver.actions.githubusercontent.com`와 Sonar 상세 API `sonarcloud.io`가 환경 허용 목록에 없어 403으로 차단된다. 기존 custom domain·preset·스크립트·credential requirement를 보존하고 두 host만 추가한 환경 초안을 저장했다. 도구 결과는 `saved`, `requires_publish: true`다. 저장은 실행 환경 반영/Publish가 아니다.
 
 환경 설정에서 초안을 검토·저장·Publish한 후 GitHub 로그와 Sonar 상세 조회를 재시도한다. 웹 실패 로그를 확인해 최초 Cloud Run 서비스 설정 또는 권한 문제인지 판정한 뒤 같은 verified 경로로 재개한다. 원인을 확인하기 위해 CI/freeze/ref/IAM 경계를 완화하지 않는다. 운영 영속 미디어 저장소·파일 파기/백업 정책 및 실계정 end-to-end 검증은 앞의 인계 TODO에 남아 있다.
+
+
+## 2026-10-26 로그 접근 복구·Partner 최초 생성
+
+- 환경 Publish 후 GitHub Actions 로그의 실제 Azure Blob 저장소까지 접근됨을 확인했다. 추가 환경 게시 요청 없이 실패 원인을 진단할 수 있다. 최초 실패 로그는 `Cannot find service [partner-web]`로, 기존 서비스가 없어 verified plan의 traffic 조회가 실패한 것이었다.
+- 최신 main `7166005df54231e00999673fecdf83e596e1bb3a`의 CI gate를 유지해 [최초 생성 실행](https://github.com/Renagang21/o4o-platform/actions/runs/40284397817)을 완료했다. 기존 revision/traffic이 없는 새 서비스의 초기 생성에 한해 문서화된 수동 `legacy` 모드를 사용했다. 서비스 `partner-web`·초기 revision `partner-web-00001-v9m` 생성이 성공했다. 공개 IAM 부여는 이 실행에 포함되지 않으며, 이 결과를 verified/public 배포 성공으로 간주하지 않는다.
+- 이어서 [정상 verified 재실행](https://github.com/Renagang21/o4o-platform/actions/runs/40284778536)에서 기존 traffic 조회와 새 revision `partner-web-00002-jaf`의 0% 배포까지 성공했다. tag URL HTTP smoke는 403으로 실패하여 traffic switch는 실행되지 않았다. 첫 revision이 기존 분배를 유지한다.
+- 배포 SA의 `run.developer` 권한은 최초 서비스 생성은 허용하지만 공개 IAM 설정은 허용하지 않는다는 [기존 운영 경계](../checks/CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.md#4-새-서비스-최초-생성-시)를 적용한다. 현재 환경에도 별도 GCP outbound identity가 없어 소유자 권한으로 IAM을 대신 변경할 수 없다. SA에 run.admin을 추가하거나 invoker 검사 우회는 하지 않는다.
+
+### 소유자 1회 작업
+
+GCP 프로젝트 권한이 있는 계정의 Cloud Shell에서 다음을 실행해야 공개 HTTP 검증을 계속할 수 있다. 대상은 Partner 정적 웹 서비스 하나이며 API/공동공간의 기존 인증 권한을 변경하지 않는다.
+
+```sh
+gcloud run services add-iam-policy-binding partner-web   --region=asia-northeast3   --project=netureyoutube   --member=allUsers   --role=roles/run.invoker
+```
+
+- [x] 서비스 생성·CI gate·새 revision 0% 배포 확인
+- [ ] 소유자의 공개 invoker 부여 후 verified HTTP smoke·traffic switch 재실행
+- [ ] `partner.neture.co.kr`의 기존 HTTPS/LB·DNS 연결 확인 (서비스 생성만으로 도메인이 연결되었다고 보고하지 않는다)
+- [ ] 영속 파일 저장소·실계정 검증·앞서 남긴 Sonar advisory 상세 검토
+
+이 단계에서 웹은 생성된 비공개 서비스이며 사용자에게 공개된 Partner 사이트의 배포 완료가 아니다. main 통합과 운영 API 배포의 이전 성공 결과는 유지된다.
+
+
+## 2026-10-26 소유자 공개 IAM 적용·verified 웹 전환 완료
+
+- 사용자가 PowerShell에서 `partner-web`의 `allUsers → roles/run.invoker` 부여 성공 결과를 제공했다. Bash 줄바꿈 대신 한 줄 명령을 안내했다. 배포 SA 권한 확대는 하지 않았다.
+- 최신 main `40d61a54f5eb5f505dcb97597e1af71f0be045da`의 [CI](https://github.com/Renagang21/o4o-platform/actions/runs/40318317863) 성공, Partner runtime 및 verified rollout action 변경 없음, 다른 서비스의 준비 실행 종료를 확인한 뒤 Partner 하나만 정상 verified 모드로 실행했다.
+- [Partner verified 배포](https://github.com/Renagang21/o4o-platform/actions/runs/40319774841) 성공. 새 revision `partner-web-00003-zod`의 0% 배포·tag URL 공개 HTTP smoke 통과 후 해당 revision에 100% traffic이 전환됐다. 기존 pinned traffic 방식을 유지했고 workflow 최종 검증 단계도 성공했다.
+- 운영 읽기 확인: API readiness HTTP 200, 비인증 Partner 공간 API HTTP 401. 업무 데이터 생성·실제 계정 로그인·미디어 저장소 설정은 수행하지 않았다.
+- [최근 읽기 전용 GCP inventory](https://github.com/Renagang21/o4o-platform/actions/runs/40318435851)의 기존 `o4o-global-lb` host rule에는 `partner.neture.co.kr`이 없고 Partner 전용 backend/NEG도 없다. 현재 도메인 HTTPS probe는 환경 프록시 CONNECT 403으로 차단되어 DNS/인증서의 실제 상태는 확정하지 않았다.
+- **완료 범위:** main 통합·API 배포·Partner Cloud Run 공개 verified 배포/트래픽 전환. **남은 범위:** canonical 도메인의 LB backend/NEG/host rule·TLS/DNS 연결 및 실제 URL 검증. 현재 cloud 환경에 GCP 소유자 identity가 없어 이 연결을 임의 계정이나 권한 우회로 변경하지 않는다. Cloud Run 기본 URL의 HTTP 성공을 canonical 도메인과 실제 로그인 흐름의 성공으로 보고하지 않는다.
+- 기존 PR #833을 최신 main과 merge해 같은 WO 연속 branch에 push했다. 문서 PR CI는 통과했으나 Codex summary가 이전 HEAD의 running 상태에 머물러 있어 완료 review로 간주하지 않고 보존한다. 배포 runtime 변경은 이미 병합된 PR #820의 코드이며 문서 PR 대기와 구분한다.
+
+
+## 2026-10-26 Partner canonical 도메인 연결·공개 HTTP 검증 완료
+
+- 소유자 실행 결과로 Partner DNS A/CNAME 반영, `cm-cert-partner-v1`의 `AUTHORIZED`·`ACTIVE`, 기존 `o4o-main-cert-map` 및 `o4o-global-lb`의 Partner 전용 host/path matcher 연결을 확인했다. 공인 주소·DNS 인증 값·자격정보는 기록하지 않는다.
+- 초기 `backend-partner-web`은 `backends: null`이었다. HTTPS 생성 기본값 `portName=https`가 Serverless NEG 연결을 막았다. 빈 문자열을 통한 gcloud/API 제거 안내는 실패했으며 성공으로 기록하지 않는다. 최종적으로 `protocol=HTTP`·`portName=http`로 변경한 뒤 `neg-partner-web` 연결이 성공한 소유자 조회 결과를 확인했다. 외부 TLS는 기존 HTTPS frontend가 처리한다.
+- 연결 전파 중 기존 Neture HTML, 이어서 `503 no healthy upstream`이 관측됐으나 재조회 후 `https://partner.neture.co.kr`에서 HTTP 200 및 정확한 제목 `O4O Partner · 홍보를 함께 만드는 공간`을 확인했다. 응답의 실제 JS `/assets/index-BM5EfQdE.js`와 CSS `/assets/index-uhGZgtIE.css`도 각각 HTTP 200이다. 인증서 검증과 환경 프록시를 유지했다.
+- 공개 도메인 HTTP/HTML·정적 자산 검증은 완료했다. 운영 desktop/mobile browser smoke는 기본 Playwright browser binary 미설치, 시스템 Chromium 대체 실행의 프록시 CA 신뢰 오류로 완료하지 못했다. TLS 검증을 끄지 않았다. 앞선 로컬 responsive 검증과 운영 브라우저 검증을 구분한다.
+- 실제 계정 로그인·서버 공동공간의 업무 동작·운영 영속 파일 저장소는 여전히 별도 검증/연결 대상이다. 운영 업무 데이터는 생성하지 않았다. 문서 PR #833은 배포 코드와 별개이며 기존 Codex review running 상태를 완료로 간주하지 않는다.

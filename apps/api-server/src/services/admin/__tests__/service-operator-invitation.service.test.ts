@@ -94,7 +94,13 @@ it('never sends mail when invitation creation commits unsuccessfully', async () 
   const mail=jest.fn(async()=>true), query=jest.fn(async()=>[]);let calls=0;
   const db={query,transaction:async(callback:any)=>{calls++;const value=await callback({query});if(calls===2)throw new Error('Synthetic commit failure');return value;}};
   const service=new ServiceOperatorInvitationService(db as any,mail,()=>NOW);
-  jest.spyOn(service,'prepare').mockResolvedValue({invite:{id:OTHER,invited_email:'fixture@example.test',role:'lecture:operator'} as any,url:'https://neture.co.kr/operator-invite#token=fixture'});
-  await expect(service.create({actorId:USER,email:'fixture@example.test',serviceKey:'lecture',role:'lecture:operator'})).rejects.toThrow('Synthetic commit failure');
+  jest.spyOn(service,'prepare').mockResolvedValue({invite:{id:OTHER,invited_email:'fixture@example.test',role:'lecture:admin'} as any,url:'https://neture.co.kr/operator-invite#token=fixture'});
+  await expect(service.create({actorId:USER,email:'fixture@example.test',serviceKey:'lecture',role:'lecture:admin'})).rejects.toThrow('Synthetic commit failure');
   expect(service.prepare).toHaveBeenCalledTimes(1);expect(mail).not.toHaveBeenCalled();
+});
+
+it.each(['lecture:operator', 'partner-support:operator', 'neture:pharmacy_operator'])('central invitation rejects %s before DB or mail', async role => {
+  const h = harness();
+  await expect(h.service.create({ actorId: USER, targetUserId: OTHER, serviceKey: role.startsWith('neture:') ? 'neture' : role.split(':')[0], role })).rejects.toMatchObject({ code: 'ROLE_NOT_ASSIGNABLE' });
+  expect(h.db.transaction).not.toHaveBeenCalled();
 });

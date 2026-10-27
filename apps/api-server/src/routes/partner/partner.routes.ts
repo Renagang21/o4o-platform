@@ -9,6 +9,7 @@ import {
   type DiskMediaStore,
 } from "./partner.media.js";
 import { z } from "zod";
+import { createPartnerCommunityRoutes } from './community.routes.js';
 import {
   createSpaceSchema,
   inviteSchema,
@@ -24,6 +25,7 @@ export function createPartnerSupportRoutes(
 ): Router {
   const router = Router(),
     service = new PartnerService(db);
+  router.use('/community',createPartnerCommunityRoutes(db,requireAuth));
   router.use(requireAuth);
   router.use(
     rateLimit({

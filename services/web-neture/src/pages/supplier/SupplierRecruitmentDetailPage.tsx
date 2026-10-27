@@ -6,8 +6,9 @@
  * 공급자 본인 모집의 신청자 목록을 확인하고 승인/반려한다.
  * 승인은 기존 승인 API(ownership + C bridge backend)를 재사용한다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import RecruitmentSupplyPricePanel from '../../components/supplier/RecruitmentSupplyPricePanel';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { supplierRecruitmentApi, SUPPLIER_RECRUITMENT_NOT_FOUND, type RecruitmentDetail } from '../../lib/api/supplier';
 
@@ -62,24 +63,27 @@ export default function SupplierRecruitmentDetailPage() {
   //   404(모집 없음) 와 일시 조회 실패(500/네트워크) 를 구분한다. 전자는 "모집 없음",
   //   후자는 재시도 가능한 오류 상태로 표면화한다.
   const [loadError, setLoadError] = useState(false);
+  const loadEpoch=useRef(0);
 
   const load = useCallback(async () => {
     if (!recruitmentId) return;
+    const epoch=++loadEpoch.current;
     setLoading(true);
     setNotFound(false);
     setLoadError(false);
     try {
       const data = await supplierRecruitmentApi.getApplications(recruitmentId);
-      setDetail(data);
+      if(epoch===loadEpoch.current)setDetail(data);
     } catch (e: any) {
+      if(epoch!==loadEpoch.current)return;
       if (e?.message === SUPPLIER_RECRUITMENT_NOT_FOUND) setNotFound(true);
       else setLoadError(true);
     } finally {
-      setLoading(false);
+      if(epoch===loadEpoch.current)setLoading(false);
     }
   }, [recruitmentId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   const handleApprove = async (applicationId: string) => {
     setBusyId(applicationId);
@@ -161,6 +165,8 @@ export default function SupplierRecruitmentDetailPage() {
       <button type="button" onClick={() => navigate('/supplier/recruitments')} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
         <ArrowLeft className="w-4 h-4" /> 모집 현황
       </button>
+
+      <RecruitmentSupplyPricePanel key={r.id} recruitment={r} onReload={()=>void load()} onConfirmed={price=>setDetail(current=>current?.recruitment.id===r.id ? {...current,recruitment:{...current.recruitment,supplyUnitPrice:price}}:current)} />
 
       {/* 모집 요약 */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 mb-5">

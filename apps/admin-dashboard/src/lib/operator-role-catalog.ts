@@ -21,7 +21,7 @@ export interface OperatorRoleOption {
 }
 
 /** 서비스(role prefix) → 부여 가능한 역할. 화면 표시 순서가 이 순서다. */
-export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
+export const OPERATOR_ROLE_CATALOG: Record<string, OperatorRoleOption[]> = {
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
@@ -40,6 +40,10 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       label: '분회 서비스 관리자',
       description: '분회 개설 승인 · 가입 승인 · 개별 분회 운영자 지정 (분회 서비스 화면에서)',
     },
+  ],
+  'partner-support': [
+    { value: 'partner-support:admin', label: 'Admin', description: 'Partner 서비스 관리자' },
+    { value: 'partner-support:operator', label: 'Operator', description: 'Partner 회원·게시판·콘텐츠 운영' },
   ],
   community: [
     {
@@ -91,18 +95,23 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
   ],
 };
 
-/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_OPERATOR_ROLES` 와 같은 순서·같은 집합이어야 한다. */
+/** 전체관리자는 Admin만 지정한다. 기존 Operator 조회·권한 회수는 별도 목록에서 유지한다. */
+export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
+  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+);
+
+/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
 export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABLE_ROLES).flatMap((rs) =>
   rs.map((r) => r.value),
 );
 
 /** 등록 카탈로그에 존재하는 role 집합 (편집 시 비카탈로그 role 보존 판정용) */
-export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(ASSIGNABLE_ROLE_VALUES);
+export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(Object.values(OPERATOR_ROLE_CATALOG).flatMap(roles => roles.map(role => role.value)));
 
 export const REGISTRABLE_SERVICE_KEYS: readonly string[] = Object.keys(ASSIGNABLE_ROLES);
 
 export function findRoleOption(role: string): OperatorRoleOption | undefined {
-  return ASSIGNABLE_ROLE_VALUES.includes(role)
-    ? Object.values(ASSIGNABLE_ROLES).flat().find((r) => r.value === role)
+  return CATALOG_ROLE_VALUES.has(role)
+    ? Object.values(OPERATOR_ROLE_CATALOG).flat().find((r) => r.value === role)
     : undefined;
 }

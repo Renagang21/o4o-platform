@@ -576,6 +576,7 @@ export default function SupplierProductsPage() {
       {/* WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1 */}
       {recruitModalProduct && (
         <RecruitmentCreateModal
+          key={recruitModalProduct.masterId}
           product={recruitModalProduct}
           onClose={() => setRecruitModalProduct(null)}
           onCreated={() => showToast('판매자 모집이 생성되었습니다.')}

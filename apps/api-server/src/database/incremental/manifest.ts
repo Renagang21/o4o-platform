@@ -115,6 +115,7 @@ import { AddPartnerMediaAndReadState1792886700000 } from '../migrations/17928867
 import { CreatePersonalMail1792998000000 } from '../migrations/1792998000000-CreatePersonalMail.js';
 
 import { HardenAuthPrivacyReadiness1793010000000 } from '../migrations/1793010000000-HardenAuthPrivacyReadiness.js';
+import { CreatePartnerCommunity1793020000000 } from '../migrations/1793020000000-CreatePartnerCommunity.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -162,6 +163,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddPartnerMediaAndReadState1792886700000,
   CreatePersonalMail1792998000000,
   HardenAuthPrivacyReadiness1793010000000,
+  CreatePartnerCommunity1793020000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

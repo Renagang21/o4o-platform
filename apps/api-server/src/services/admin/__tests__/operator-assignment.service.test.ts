@@ -41,7 +41,8 @@ function makeHarness(opts: {
     leftJoin: () => qb,
     select: () => qb,
     addSelect: () => qb,
-    where: () => qb,
+    where: jest.fn(() => qb),
+    andWhere: jest.fn(() => qb),
     orderBy: () => qb,
     limit: jest.fn(() => qb),
     getRawMany: jest.fn(async () => opts.rawRows ?? []),
@@ -150,4 +151,11 @@ it('legacy central assignment refuses immediate writes without consuming cached 
   await expect(h.service.assign({userId:USER.id,serviceKey:'neture',role:'neture:operator'}))
     .rejects.toMatchObject({code:'OPERATOR_INVITATION_REQUIRED'});
   expect(h.dataSource.transaction).not.toHaveBeenCalled();
+});
+
+it('candidate search excludes registry Demo accounts before applying the result limit and keeps search predicates grouped', async () => {
+  const h = makeHarness();
+  await h.service.searchCandidates('re');
+  expect(h.qb.where).toHaveBeenCalledWith('(u.email ILIKE :q OR u.name ILIKE :q)', { q: '%re%' });
+  expect(h.qb.andWhere).toHaveBeenCalledWith('NOT EXISTS (SELECT 1 FROM demo_accounts da WHERE da.user_id = u.id AND da.is_active)');
 });

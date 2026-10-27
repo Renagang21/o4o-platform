@@ -9,7 +9,7 @@ const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest
 beforeEach(() => jest.clearAllMocks());
 function transport() {
   const t = new MailTransportService({ logger });
-  Object.assign(t, { _isEnabled: true, _isInitialized: true, _transporter: { sendMail: jest.fn(async () => ({ messageId: 'fixture' })) } });
+  Object.assign(t, { _isEnabled: true, _isInitialized: true, _transporter: { sendMail: jest.fn(async () => ({ messageId: 'fixture', accepted: [recipient], rejected: [] })) } });
   return t;
 }
 it('ephemeral delivery stores neither EmailLog nor recipient/secret in application logs', async () => {
@@ -37,10 +37,24 @@ it('ephemeral transport errors cannot retain recipients or proof in audit or ret
 });
 it('ordinary business mail retains its existing audit behavior', async () => {
   const t = transport();
-  jest.spyOn(t, 'send').mockResolvedValue({ messageId: 'fixture' });
+  jest.spyOn(t, 'send').mockResolvedValue({ messageId: 'fixture', accepted: [recipient], rejected: [] });
   const audit = jest.spyOn(t, 'logEmail').mockResolvedValue();
   const facade = Object.create(MailService.prototype) as MailService;
   Object.assign(facade, { transport: t });
   expect(await facade.sendEmail({ to: recipient, subject: 'Business receipt', text: 'Fixture' })).toEqual({ success: true });
   expect(audit).toHaveBeenCalledWith(recipient, expect.any(String), 'Business receipt', 'sent', 'fixture', 'custom');
+});
+
+it.each([{ messageId: 'fixture', accepted: [], rejected: [recipient] }, { messageId: 'fixture' }])('does not report SMTP rejection or a non-delivering transport as success', async info => {
+  jest.useFakeTimers();
+  try {
+    const t = transport();
+    Object.assign(t, { _transporter: { sendMail: jest.fn(async () => info) } });
+    const audit = jest.spyOn(t, 'logEmail');
+    const facade = Object.create(MailService.prototype) as MailService;
+    Object.assign(facade, { transport: t });
+    expect(await facade.sendEmail({ to: recipient, subject: 'Invitation', text: secret, ephemeral: true })).toMatchObject({ success: false });
+    expect(audit).not.toHaveBeenCalled();
+    expect(JSON.stringify(Object.values(logger).map(fn => fn.mock.calls))).not.toContain(recipient);
+  } finally { jest.clearAllTimers(); jest.useRealTimers(); }
 });

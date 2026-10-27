@@ -1,3 +1,4 @@
+import { confirmRecruitmentSupplyPrice } from '../../neture/services/recruitment-supply-price.service.js';
 import { randomUUID } from 'crypto';
 import { createCarePharmReviewDb } from '../../../__tests__/support/carepharm-review-db.js';
 import { getSupplyOption, listSupplyOptions } from '../services/supply-access.js';
@@ -31,7 +32,7 @@ local('Store cooperation — actual local SQL, fixture actor and order creator',
       CREATE TABLE organization_product_listings(id uuid PRIMARY KEY, offer_id uuid, organization_id uuid, event_price int, start_at timestamp, end_at timestamp,
         total_quantity int, per_store_limit int, per_order_limit int, service_key text, source_type text, status text, is_active boolean);
       CREATE TABLE seller_recruitments(id uuid PRIMARY KEY, product_id text, product_name text, seller_id text, seller_name text, semi_franchise_id uuid,
-        supply_unit_price int, consumer_price int, exposure_status text, status text, service_id text, created_at timestamp DEFAULT now());
+        supply_unit_price int, consumer_price int, exposure_status text, status text, service_id text, updated_at timestamp DEFAULT now(), created_at timestamp DEFAULT now());
       CREATE TABLE seller_recruitment_applications(id uuid DEFAULT gen_random_uuid(), recruitment_id uuid, applicant_organization_id uuid, status text);
       CREATE TABLE store_cart_items(id uuid DEFAULT gen_random_uuid(), buyer_id uuid, organization_id uuid, service_key text, source_type text, supplier_id uuid,
         supplier_product_offer_id uuid, supply_proposal_id uuid, event_offer_id uuid, seller_recruitment_id uuid, organization_product_listing_id uuid, product_name text, quantity int,
@@ -88,6 +89,41 @@ local('Store cooperation — actual local SQL, fixture actor and order creator',
     await fixture.ds.query('UPDATE seller_recruitment_applications SET status=$1 WHERE recruitment_id=$2',[status,publicRecruitment]);
     const result = await cart.checkout(actor,store);
     expect(result.failedItems[0].code).toBe('SUPPLY_OPTION_NOT_AVAILABLE'); expect(created).toHaveLength(0);
+  });
+  it('confirms an unpriced public recruitment once under real concurrent requests, then uses the same store cart', async()=>{
+    await fixture.ds.query('UPDATE seller_recruitments SET supply_unit_price=null WHERE id=$1',[publicRecruitment]);
+    expect(await getSupplyOption(fixture.ds,store,'recruitment',publicRecruitment)).toBeNull();
+    const results=await Promise.allSettled([1800,2200].map(price=>confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,price)));
+    expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    expect(results.find(r=>r.status==='rejected')).toMatchObject({reason:{code:'SUPPLY_PRICE_ALREADY_CONFIRMED'}});
+    const winner=results.find(r=>r.status==='fulfilled') as PromiseFulfilledResult<{supplyUnitPrice:number}>;
+    const price=winner.value.supplyUnitPrice;
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,price)).resolves.toMatchObject({idempotent:true});
+    await cart.add(actor,store,{kind:'recruitment',id:publicRecruitment});
+    expect((await cart.checkout(actor,store)).failedItems).toEqual([]);
+    expect(created[0].items[0].unitPrice).toBe(price);
+    expect(await getSupplyOption(fixture.ds,otherStore,'recruitment',publicRecruitment)).toBeNull();
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,9999)).rejects.toMatchObject({code:'SUPPLY_PRICE_ALREADY_CONFIRMED'});
+    expect(created[0].items[0].unitPrice).toBe(price);
+  });
+  it('does not grant an applicant approval merely by confirming a price',async()=>{
+    await fixture.ds.query('UPDATE seller_recruitments SET supply_unit_price=null WHERE id=$1',[publicRecruitment]);
+    await fixture.ds.query("UPDATE seller_recruitment_applications SET status='pending' WHERE recruitment_id=$1",[publicRecruitment]);
+    await confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,2000);
+    expect(await getSupplyOption(fixture.ds,store,'recruitment',publicRecruitment)).toBeNull();
+  });
+  it.each(['kpa-society','neture-pharmacy'])('never reclassifies an unpriced legacy %s recruitment by writing a price',async service=>{
+    await fixture.ds.query('UPDATE seller_recruitments SET supply_unit_price=null,service_id=$2 WHERE id=$1',[publicRecruitment,service]);
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,2000)).rejects.toMatchObject({code:'SUPPLY_PRICE_TARGET_UNSUPPORTED'});
+    expect((await fixture.ds.query('SELECT supply_unit_price FROM seller_recruitments WHERE id=$1',[publicRecruitment]))[0].supply_unit_price).toBeNull();
+  });
+  it('does not expose a foreign recruitment or change a closed recruitment',async()=>{
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,randomUUID(),publicRecruitment,1000)).rejects.toMatchObject({code:'NOT_FOUND'});
+    await fixture.ds.query("UPDATE seller_recruitments SET supply_unit_price=null,status='closed' WHERE id=$1",[publicRecruitment]);
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,1000)).rejects.toMatchObject({code:'RECRUITMENT_CLOSED'});
+  });
+  it.each([null,true,'100',0,-1,1.5,2147483648])('refuses an invalid supply price %j without updating a row',async price=>{
+    await expect(confirmRecruitmentSupplyPrice(fixture.ds,supplierUser,publicRecruitment,price)).rejects.toMatchObject({code:'INVALID_SUPPLY_PRICE'});
   });
   it('never substitutes a general price or grants a missing business membership', async () => {
     await fixture.ds.query('UPDATE seller_recruitments SET supply_unit_price=null WHERE id=$1',[publicRecruitment]);

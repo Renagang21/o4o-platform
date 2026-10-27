@@ -1,7 +1,7 @@
 /**
  * 운영자 역할 카탈로그 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §16
  *
- * 운영 권한 부여(직접 지정 · 초대) 대상이 되는 role 의 **서버 allowlist** 다.
+ * 운영 역할의 조회·위임·회수에 사용하는 서버 카탈로그다. 중앙의 신규 초대는 아래 Admin 전용 allowlist로 제한한다.
  * 종전에는 이 목록이 admin-dashboard `OperatorsPage.ASSIGNABLE_ROLES` 에만 있어서
  * 서버가 임의 role 문자열을 그대로 받았다. 부여 계약이 Identity 계약이 된 이상
  * 서버가 스스로 판정해야 한다(프런트 신뢰 금지).
@@ -32,6 +32,8 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   //   (`/kpa-branch/admin/branches/:branchId/operators`). Admin 은 서비스 범위 운영자만 지정한다.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 전체 관리자(개설 신청 승인). 개별 커뮤니티 운영은
   //   community_memberships 의 개체 역할로만 하며 서비스 Operator는 개설 심사만 담당한다.
+  'partner-support:admin',
+  'partner-support:operator',
   'community:admin',
   'community:operator',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
@@ -98,4 +100,14 @@ export function resolveOperatorRole(role: unknown, serviceKey: unknown): Operato
     );
   }
   return { serviceKey: derived, role: roleValue };
+}
+
+/** Central console grants service Admin only; existing Operator roles remain readable/revocable. */
+export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role => /(?:[:_])admin$/.test(role));
+export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): OperatorRoleResolution {
+  const resolved = resolveOperatorRole(role, serviceKey);
+  if (!ASSIGNABLE_SERVICE_ADMIN_ROLES.includes(resolved.role)) {
+    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하세요.');
+  }
+  return resolved;
 }

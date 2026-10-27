@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  CooperationMaterialAttachments,
+  CooperationMaterialDetails,
   workflowDate,
   workflowLabels,
   plainBody,
@@ -729,7 +731,7 @@ function Material({
         {workflowLabels[item.status] || item.status} · 개정 {item.revision} ·{" "}
         {workflowDate(item.updated_at)}
       </p>
-      <p className="cw-body">{plainBody(item.summary || item.body)}</p>
+      <CooperationMaterialDetails summary={item.summary} body={item.body} attachments={item.attachments} />
       {editHref && <a href={editHref}>본문·첨부·게시 편집 →</a>}
       <label>
         자료 분류
@@ -798,6 +800,7 @@ function Material({
                 분류 {revision.snapshot.category || "미분류"} · 첨부{" "}
                 {revision.snapshot.attachments?.length || 0}개
               </p>
+              <CooperationMaterialAttachments attachments={revision.snapshot.attachments} />
             </details>
           ))}
         </div>

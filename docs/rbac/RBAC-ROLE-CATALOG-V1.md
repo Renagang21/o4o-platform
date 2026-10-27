@@ -189,3 +189,17 @@ Google 연결 계정만 지정하며, 신규 계정 생성·타인 비밀번호 
 한 사람은 조합마다 다른 역할을 가질 수 있다. 자기 역할 해제·마지막 사용 가능한 admin 해제를 막고, 역할/회원 상태 종료는 다른 조합·약국 조직·매장 권한에 영향을 주지 않는다.
 개별 조합 배정 대상은 기존 활성·이메일 인증 계정이다. 위의 공통 관리자 Google 연결 조건은 연합회 전역 역할 지정 경로의 조건이며 local 조합 역할의 필수 조건으로 확대하지 않는다.
 상세: [협동조합 권한 설계](../design/DESIGN-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1.md).
+
+
+### 신규 Partner 지원 서비스 — 2026-10-26
+
+사용자 승인 범위: `partner.neture.co.kr`의 로그인·운영자·별도 가입형 커뮤니티를 함께 구현한다. 서비스 identity와 role prefix는 모두 **`partner-support`**다. 은퇴한 `partner`·`neture:partner`·Legacy Partner 관계를 복원하지 않는다.
+
+| 역할 | 범위 | 부여 경로 |
+|---|---|---|
+| `partner-support:admin` | Partner 커뮤니티 일상 운영 | 기존 중앙 운영자 초대·본인 수락 |
+| `partner-support:operator` | Partner 커뮤니티 일상 운영 | 기존 중앙 운영자 초대·본인 수락 |
+
+현 단계의 두 역할은 활성 공통 계정·이메일 확인·활성 `service_memberships(service_key=partner-support)`와 현재 유효한 중앙 역할 배정을 모두 요구한다. 글·댓글/신고·게시판·회원 정지/해제·최소 운영 이력을 처리하며 플랫폼 계정 삭제·타 서비스 권한·협의/계약/보상 판정 권한은 주지 않는다. 가입 회원이나 작업공간 소유자는 이 역할을 받지 않는다. 일반 회원은 별도 가입 API에서 명시적으로 참여한다. 범용 service join 경로는 사용하지 않으며 다른 서비스 가입을 이용 자격으로 합성하지 않는다.
+
+개발·검증·push, 실제 운영자 지정·초대 수락, 운영 migration·배포는 [Partner 커뮤니티 WO](../work-orders/WO-O4O-PARTNER-COMMUNITY-V1.md)에서 구분한다.

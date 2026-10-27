@@ -39,6 +39,7 @@ import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
 import { DEFAULT_SEMI_FRANCHISE_KEY, PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
+import { validRecruitmentSupplyPrice } from './recruitment-supply-price.service.js';
 import { isPublicRecruitment } from '../../neture-pharmacy/services/recruitment-target.js';
 
 /**
@@ -184,7 +185,7 @@ export class SellerRecruitmentService {
     recruitment.exposureReviewedAt = new Date();
     recruitment.exposureReviewedBy = operatorUserId;
     recruitment.exposureReviewNote = note?.trim() || null;
-    await this.recruitmentRepo.save(recruitment);
+    await this.recruitmentRepo.update(recruitment.id, {exposureStatus:decision,exposureReviewedAt:recruitment.exposureReviewedAt,exposureReviewedBy:operatorUserId,exposureReviewNote:recruitment.exposureReviewNote});
     logger.info(`[SellerRecruitmentService] recruitment exposure ${decision}: ${recruitmentId} by ${operatorUserId}`);
     return { success: true as const, data: { id: recruitment.id, exposureStatus: decision } };
   }
@@ -228,6 +229,7 @@ export class SellerRecruitmentService {
       serviceName: r.serviceName || '',
       commissionRate: Number(r.commissionRate),
       consumerPrice: Number(r.consumerPrice),
+      supplyUnitPrice: r.supplyUnitPrice ?? null,
       status: r.status,
       semiFranchiseId: r.semiFranchiseId,
       recruitmentKind: isPublicRecruitment(r) ? 'public' : 'semi-franchise',
@@ -246,7 +248,7 @@ export class SellerRecruitmentService {
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_FOUND' };
     if (recruitment.status !== RecruitmentStatus.CLOSED) {
       recruitment.status = RecruitmentStatus.CLOSED;
-      await this.recruitmentRepo.save(recruitment);
+      await this.recruitmentRepo.update(recruitment.id, {status: RecruitmentStatus.CLOSED});
       logger.info(`[SellerRecruitmentService] Recruitment closed: ${recruitment.id}`);
     }
     return { success: true as const, data: { id: recruitment.id, status: recruitment.status } };
@@ -258,7 +260,7 @@ export class SellerRecruitmentService {
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_FOUND' };
     if (recruitment.status !== RecruitmentStatus.RECRUITING) {
       recruitment.status = RecruitmentStatus.RECRUITING;
-      await this.recruitmentRepo.save(recruitment);
+      await this.recruitmentRepo.update(recruitment.id, {status: RecruitmentStatus.RECRUITING});
       logger.info(`[SellerRecruitmentService] Recruitment reopened: ${recruitment.id}`);
     }
     return { success: true as const, data: { id: recruitment.id, status: recruitment.status } };
@@ -270,7 +272,7 @@ export class SellerRecruitmentService {
    */
   async createRecruitment(
     supplierUserId: string,
-    input: { masterId?: string; serviceKey?: string; serviceKeys?: string[]; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
+    input: { masterId?: string; serviceKey?: string; serviceKeys?: string[]; commissionRate?: number; consumerPrice?: number; supplyUnitPrice?: number; shopUrl?: string; imageUrl?: string },
   ) {
     const masterId = (input.masterId || '').trim();
     const rawKeys = (input.serviceKeys && input.serviceKeys.length > 0)
@@ -279,6 +281,10 @@ export class SellerRecruitmentService {
     const serviceKeys = [...new Set(rawKeys.map((k) => (k || '').trim()).filter(Boolean))];
     if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
     if (serviceKeys.length === 0) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
+    if (input.supplyUnitPrice !== undefined) {
+      if (!validRecruitmentSupplyPrice(input.supplyUnitPrice)) return { success:false as const,error:'INVALID_SUPPLY_PRICE' };
+      if (serviceKeys.some(key => key !== 'neture')) return { success:false as const,error:'SUPPLY_PRICE_TARGET_UNSUPPORTED' };
+    }
 
     // offer 해소 (master_id + 이 사용자의 canonical 공급자 집합). PRIVATE·APPROVED 우선.
     // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id = $2` → listOwnedSupplierIds.
@@ -326,6 +332,7 @@ export class SellerRecruitmentService {
           sellerName: offer.seller_name || '공급자',
           serviceId: k,
           consumerPrice,
+          supplyUnitPrice: input.supplyUnitPrice ?? null,
           commissionRate,
           shopUrl: input.shopUrl?.trim() || undefined,
           imageUrl: input.imageUrl?.trim() || undefined,
@@ -468,9 +475,9 @@ export class SellerRecruitmentService {
               COALESCE(org.name, (SELECT o.name FROM organization_members om
                  JOIN organizations o ON o.id = om.organization_id
                WHERE a.applicant_organization_id IS NULL
-                 AND om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1)) AS organization_name
+                 AND om.user_id::text = a.applicant_id::text AND om.left_at IS NULL LIMIT 1)) AS organization_name
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
-       LEFT JOIN users u ON u.id = a.applicant_id
+       LEFT JOIN users u ON u.id::text = a.applicant_id::text
        LEFT JOIN organizations org ON org.id = a.applicant_organization_id
        WHERE a.recruitment_id = $1
        ORDER BY a.applied_at DESC`,
@@ -486,6 +493,7 @@ export class SellerRecruitmentService {
         serviceName: recruitment.serviceName || '',
         commissionRate: Number(recruitment.commissionRate),
         consumerPrice: Number(recruitment.consumerPrice),
+        supplyUnitPrice: recruitment.supplyUnitPrice ?? null,
         status: recruitment.status,
         recruitmentKind: isPublicRecruitment(recruitment) ? 'public' : 'semi-franchise',
         exposureStatus: recruitment.exposureStatus,
