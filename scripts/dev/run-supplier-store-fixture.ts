@@ -95,7 +95,8 @@ async function run() {
       const apiRoot = fileURLToPath(new URL('../../apps/api-server/', import.meta.url));
       const jestEntry = createRequire(new URL('../../apps/api-server/package.json', import.meta.url)).resolve('jest/bin/jest');
       child = spawn(process.execPath, [jestEntry, '--runInBand',
-        '--runTestsByPath', 'src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts'],
+        '--runTestsByPath', 'src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts',
+        'src/modules/neture/__tests__/settlement-notification.integration.spec.ts'],
       { cwd: apiRoot, stdio: 'inherit', env: { ...process.env, NODE_ENV: 'test' } });
       child.once('error', reject);
       child.once('close', (code) => {
@@ -105,6 +106,21 @@ async function run() {
         else resolve();
       });
     });
+    const finalDb = new DataSource({ ...options, database });
+    await finalDb.initialize();
+    try {
+      const runner = finalDb.createQueryRunner();
+      await runner.startTransaction();
+      try {
+        const actual = await computeSchemaFingerprint(runner);
+        const expected = expectedSchemaStateFor(INCREMENTAL_MIGRATIONS.length);
+        if (!expected || actual.hash !== expected.fingerprint || actual.lineCount !== expected.fingerprintLineCount) {
+          throw new Error('Fixture schema was not restored after tests');
+        }
+        await runner.rollbackTransaction();
+      } finally { await runner.release(); }
+    } finally { await finalDb.destroy(); }
+    console.log('Fixture schema restored after tests PASS.');
     console.log('Fixture tests PASS.');
   } finally {
     try {

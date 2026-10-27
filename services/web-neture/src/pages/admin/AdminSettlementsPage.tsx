@@ -15,6 +15,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { RowActionMenu } from '@o4o/ui';
+import SettlementNotificationRecovery,{SettlementNotificationStatus} from './SettlementNotificationRecovery';
 import { Calculator } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
@@ -103,6 +104,8 @@ export default function AdminSettlementsPage() {
   const [calculating, setCalculating] = useState(false);
   const [calcMessage, setCalcMessage] = useState('');
 
+  const [notificationRefresh,setNotificationRefresh]=useState(0);
+
   // Action loading
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -153,7 +156,7 @@ export default function AdminSettlementsPage() {
     void toggleExpand(next ?? expandedId ?? '');
   }, [expandedId, toggleExpand]);
 
-  const renderSettlementDetail = useCallback(() => {
+  const renderSettlementOrders = useCallback(() => {
     if (detailLoading) return <p style={styles.detailLoading}>주문 정보 불러오는 중...</p>;
     if (!detail || detail.orders.length === 0) return <p style={styles.detailLoading}>주문 정보가 없습니다.</p>;
     return (
@@ -181,6 +184,8 @@ export default function AdminSettlementsPage() {
       </table>
     );
   }, [detail, detailLoading]);
+
+  const renderSettlementDetail=useCallback(()=><div>{expandedId&&<SettlementNotificationStatus key={expandedId} settlementId={expandedId} refreshKey={notificationRefresh}/>}{renderSettlementOrders()}</div>,[expandedId,renderSettlementOrders,notificationRefresh]);
 
   const columns: ListColumnDef<Settlement>[] = [
     { key: 'supplier_name', header: '공급자', minWidth: 140, render: (_v, s) => s.supplier_name || s.supplier_id.slice(0, 8) },
@@ -261,7 +266,7 @@ export default function AdminSettlementsPage() {
     setActionLoading(id);
     const ok = await adminSettlementApi.pay(id);
     setActionLoading(null);
-    if (ok) fetchData();
+    if (ok) {setNotificationRefresh(v=>v+1);void fetchData();}
     else toast.error('지급 처리 실패');
   }, [fetchData]);
 
@@ -358,6 +363,8 @@ export default function AdminSettlementsPage() {
           </button>
         ))}
       </div>
+
+      <SettlementNotificationRecovery refreshKey={notificationRefresh}/>
 
       {/* Settlement List */}
       {loading ? (

@@ -2,8 +2,7 @@ import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../c
 import type { DataSource } from 'typeorm';
 import { SettlementOrderConflictError } from './settlement-order-conflict.error.js';
 import logger from '../../../utils/logger.js';
-import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
-import { notificationService } from '../../../services/NotificationService.js';
+import { SettlementNotificationService } from './settlement-notification.service.js';
 
 const PLATFORM_FEE_RATE = 0.1;
 const getPlatformFeeRate = () => PLATFORM_FEE_RATE;
@@ -229,7 +228,10 @@ export class SettlementCommandService {
     const result = await this.dataSource.query(
       `WITH changed AS (UPDATE neture_settlements SET ${setClauses.join(', ')}
        WHERE id = $${paramIdx} AND status = 'approved'
-       RETURNING *) SELECT * FROM changed`,
+       RETURNING *), queued AS (
+         INSERT INTO neture_settlement_notification_jobs(settlement_id) SELECT id FROM changed
+         ON CONFLICT(settlement_id) DO NOTHING RETURNING settlement_id
+       ) SELECT * FROM changed`,
       params,
     );
 
@@ -239,42 +241,9 @@ export class SettlementCommandService {
 
     logger.info(`[Neture Settlement] Settlement ${settlementId} paid`);
 
-    // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
-    // 정산 완료(approved → paid) 알림 — 단일 수신자(정산 대상 공급자 본인)에게 fire-and-forget.
-    // 지급 성공 후에만 발송하고, 알림 실패가 지급 결과에 영향을 주지 않도록 try/catch. 금액·계좌 등은 metadata 에 넣지 않는다.
-    await this.notifySupplierSettlementPaid(result[0]?.supplier_id, settlementId);
-
+    // The paid transition and pending job committed together. Delivery is independently recoverable.
+    try { await new SettlementNotificationService(this.dataSource).retry(settlementId); }
+    catch { logger.warn('[Neture Settlement] notification pending; reload recovery status'); }
     return { success: true, data: result[0] };
-  }
-
-  /**
-   * 정산 완료 알림 (fire-and-forget).
-   * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 수신자 = 공급자 사업자 본인 =
-   *   현재 organization_members(owner) 전부. owner 가 없을 때만 legacy user_id fallback.
-   * targetUrl 은 canonical `/supplier/settlements`(목록; 정산 상세 route 부재). 공급자는 활성 상태이므로 guard 통과.
-   */
-  private async notifySupplierSettlementPaid(
-    supplierId: string | null | undefined,
-    settlementId: string,
-  ): Promise<void> {
-    if (!supplierId) return;
-    try {
-      const recipients = await listSupplierOwnerUserIds(this.dataSource, supplierId);
-      for (const userId of recipients) {
-        await notificationService.createNotification({
-          userId,
-          // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축 §11):
-          //   legacy 'custom' → canonical 'settlement.paid' 수렴.
-          //   새 notification transport 는 만들지 않고 기존 notificationService 를 그대로 쓴다.
-          type: 'settlement.paid',
-          title: '정산이 완료되었습니다',
-          message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.',
-          serviceKey: 'neture',
-          metadata: { settlementId, status: 'paid', targetUrl: '/supplier/settlements' },
-        });
-      }
-    } catch (err) {
-      logger.warn('[Neture Settlement] Failed to send settlement-paid notification', err);
-    }
   }
 }

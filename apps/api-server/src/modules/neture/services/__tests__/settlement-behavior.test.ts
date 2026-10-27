@@ -10,6 +10,8 @@ jest.mock('../../../../utils/logger.js', () => ({
   __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
 }));
 
+const mockRetry=jest.fn();
+jest.mock('../settlement-notification.service.js',()=>({SettlementNotificationService:jest.fn().mockImplementation(()=>({retry:mockRetry}))}));
 const owners = listSupplierOwnerUserIds as jest.Mock;
 const notify = notificationService.createNotification as jest.Mock;
 const supplierId = 'fixture-supplier';
@@ -26,6 +28,7 @@ let service: NetureSettlementService;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockRetry.mockReset().mockResolvedValue({state:'delivered'});
   owners.mockReset().mockResolvedValue(['fixture-owner-a', 'fixture-owner-b']);
   notify.mockReset().mockResolvedValue({});
   query = jest.fn();
@@ -270,74 +273,33 @@ describe('settlement commands: transition gates, generated bind markers and fail
   });
 });
 
-describe('settlement-paid notification: owners, privacy, sequencing and failure policy', () => {
-  it('successful payment resolves canonical owners using the same DataSource and minimal metadata', async () => {
-    query.mockResolvedValue([row]);
-    await service.paySettlement(settlementId);
-    expect(owners).toHaveBeenCalledWith(source, supplierId);
-    expect(notify.mock.calls.map((call) => call[0])).toEqual(['fixture-owner-a', 'fixture-owner-b'].map((userId) => ({
-      userId, type: 'settlement.paid', title: '정산이 완료되었습니다',
-      message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.', serviceKey: 'neture',
-      metadata: { settlementId, status: 'paid', targetUrl: '/supplier/settlements' },
-    })));
+describe('settlement-paid notification: atomic queue and independent delivery',()=>{
+  it('enqueues in the same statement as the approved→paid transition and starts delivery afterwards',async()=>{
+    query.mockResolvedValue([row]);expect(await service.paySettlement(settlementId)).toEqual({success:true,data:row});
+    expect(query.mock.calls[0][0]).toContain('INSERT INTO neture_settlement_notification_jobs(settlement_id) SELECT id FROM changed');
+    expect(query).toHaveBeenCalledTimes(1);expect(mockRetry).toHaveBeenCalledWith(settlementId);
   });
-
-  it('a repeat payment without a changed approved row does not notify twice', async () => {
-    query.mockResolvedValueOnce([row]).mockResolvedValueOnce([]);
-    expect(await service.paySettlement(settlementId)).toEqual({ success: true, data: row });
-    expect(await service.paySettlement(settlementId)).toBeNull();
-    expect(owners).toHaveBeenCalledTimes(1);
-    expect(notify).toHaveBeenCalledTimes(2);
+  it('a repeated pay without a changed row does not request delivery twice',async()=>{
+    query.mockResolvedValueOnce([row]).mockResolvedValueOnce([]);await service.paySettlement(settlementId);expect(await service.paySettlement(settlementId)).toBeNull();expect(mockRetry).toHaveBeenCalledTimes(1);
   });
-
-  it('missing supplier skips owner resolution without failing the changed payment', async () => {
-    const missing = { id: settlementId };
-    query.mockResolvedValue([missing]);
-    expect(await service.paySettlement(settlementId)).toEqual({ success: true, data: missing });
-    expect(owners).not.toHaveBeenCalled();
+  it('queue write failure propagates and never starts delivery',async()=>{
+    query.mockRejectedValue(Error('Fixture queue failure'));await expect(service.paySettlement(settlementId)).rejects.toThrow('Fixture queue failure');expect(mockRetry).not.toHaveBeenCalled();
   });
-
-  it('no owner produces no notification and still returns payment success', async () => {
-    query.mockResolvedValue([row]);
-    owners.mockResolvedValue([]);
-    expect(await service.paySettlement(settlementId)).toEqual({ success: true, data: row });
-    expect(notify).not.toHaveBeenCalled();
+  it('a durable storage failure does not undo the paid result',async()=>{
+    query.mockResolvedValue([row]);mockRetry.mockResolvedValue({state:'failed',lastErrorCode:'NOTIFICATION_STORAGE_FAILED'});
+    expect(await service.paySettlement(settlementId)).toEqual({success:true,data:row});expect(query).toHaveBeenCalledTimes(1);
   });
-
-  it('owner resolution failure is swallowed after the payment write', async () => {
-    const error = new Error('Fixture owner failure');
-    query.mockResolvedValue([row]);
-    owners.mockRejectedValue(error);
-    expect(await service.paySettlement(settlementId)).toEqual({ success: true, data: row });
-    expect(logger.warn).toHaveBeenCalledWith('[Neture Settlement] Failed to send settlement-paid notification', error);
-    expect(notify).not.toHaveBeenCalled();
+  it('no current owner remains independently recoverable and does not fail the paid result',async()=>{
+    query.mockResolvedValue([row]);mockRetry.mockResolvedValue({state:'failed',lastErrorCode:'NO_CURRENT_OWNER'});
+    expect(await service.paySettlement(settlementId)).toEqual({success:true,data:row});
   });
-
-  it('notification failure is swallowed and preserves existing stop-on-first-failure order', async () => {
-    const error = new Error('Fixture notification failure');
-    query.mockResolvedValue([row]);
-    notify.mockRejectedValueOnce(error);
-    expect(await service.paySettlement(settlementId)).toEqual({ success: true, data: row });
-    expect(notify).toHaveBeenCalledTimes(1);
-    expect(notify.mock.calls[0][0].userId).toBe('fixture-owner-a');
-    expect(logger.warn).toHaveBeenCalledWith('[Neture Settlement] Failed to send settlement-paid notification', error);
+  it('an uncertain delivery transaction preserves payment and logs no raw error details',async()=>{
+    query.mockResolvedValue([row]);mockRetry.mockRejectedValue(Error('private fixture details'));
+    expect(await service.paySettlement(settlementId)).toEqual({success:true,data:row});expect(logger.warn).toHaveBeenCalledWith('[Neture Settlement] notification pending; reload recovery status');
   });
-
-  it('payment waits for its existing notification helper before resolving', async () => {
-    let begin!: () => void;
-    let finish!: () => void;
-    const started = new Promise<void>((resolve) => { begin = resolve; });
-    const pending = new Promise<void>((resolve) => { finish = resolve; });
-    query.mockResolvedValue([row]);
-    owners.mockResolvedValue(['fixture-owner-a']);
-    notify.mockImplementation(() => { begin(); return pending; });
-    let resolved = false;
-    const paying = service.paySettlement(settlementId).then((result) => { resolved = true; return result; });
-    await started;
-    await Promise.resolve();
-    expect(resolved).toBe(false);
-    expect(query).toHaveBeenCalledTimes(1);
-    finish();
-    expect(await paying).toEqual({ success: true, data: row });
+  it('payment waits for the initial delivery attempt without running the paid statement twice',async()=>{
+    let begin!:()=>void,finish!:()=>void;const started=new Promise<void>(r=>{begin=r;});const pending=new Promise<void>(r=>{finish=r;});
+    query.mockResolvedValue([row]);mockRetry.mockImplementation(()=>{begin();return pending;});let resolved=false;
+    const paying=service.paySettlement(settlementId).then(result=>{resolved=true;return result;});await started;expect(resolved).toBe(false);expect(query).toHaveBeenCalledTimes(1);finish();expect(await paying).toEqual({success:true,data:row});
   });
 });
