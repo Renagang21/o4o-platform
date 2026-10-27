@@ -11,6 +11,7 @@ import { Route, Navigate } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
+const DescriptionIntakePage = lazy(() => import('@/pages/o4o-product-db/DescriptionIntakePage'));
 const ProductDbLayout = lazy(() => import('@/pages/o4o-product-db/ProductDbLayout'));
 const ProductDbOverviewPage = lazy(() => import('@/pages/o4o-product-db/ProductDbOverviewPage'));
 const ProductCandidatesPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidatesPage'));
@@ -46,6 +47,7 @@ export function O4OProductDbRoutes() {
       }
     >
       <Route index element={<Navigate to="overview" replace />} />
+      <Route path="description-intake" element={<DescriptionIntakePage />} />
       <Route path="overview" element={<ProductDbOverviewPage />} />
       <Route path="candidates" element={<ProductCandidatesPage />} />
       <Route path="candidates/:id" element={<ProductCandidateDetailPage />} />
