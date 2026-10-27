@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), user: { id: 'owner' } as { id: string } | null }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } }) : path === '/neture/pharmacy/semi-franchises' && (config as { headers?: unknown })?.headers ? Promise.resolve({ data: { data: ['pharmacy','other'].map(key => ({ key, membershipStatus: 'active' })) } }) : mocks.get(path, config), post: mocks.post } } }));
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } }) : mocks.get(path, config), post: mocks.post } } }));
 import BusinessWorkspace from '../BusinessWorkspace';
 import BusinessParticipationPage from '../BusinessParticipationPage';
 import BusinessMaterialsPage from '../BusinessMaterialsPage';
@@ -34,6 +34,7 @@ afterEach(cleanup);
 describe('사업 서비스의 참가자 공간', () => {
   it('다른 사업 키는 기존 사업 경로·정보·자료 범위를 유지한다', async () => {
     mocks.get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/semi-franchises')) return response([{ key: 'other', membershipStatus: 'active' }]);
       if (path.endsWith('/businesses/other')) return response({ ...business, key: 'other', name: '다른 사업', communityKey: 'business:other' });
       if (path.endsWith('/access')) return response({ ...access, businessKey: 'other', allowed: true });
       if (path.endsWith('/store/contents')) return response({ items: [], total: 0 });
@@ -80,7 +81,7 @@ describe('사업 서비스의 참가자 공간', () => {
     fireEvent.click(screen.getByRole('button', { name: '참여 신청' }));
     await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/pharmacy/apply', {
       acceptedConditions: true, conditions: '참여 조건', note: '', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })),
-    }));
+    }, { headers: { 'X-Store-Organization-Id': 'store-a' } }));
   });
   it('담당 운영자에게 약국 소유자 전용 가입 조회를 요구하지 않는다', async () => {
     mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, canManage: true } : business));
@@ -98,6 +99,7 @@ describe('사업 서비스의 참가자 공간', () => {
 describe('게시판 미개설 사업의 권한', () => {
   it('승인된 참가자는 게시판 연결 없이도 사업 자료를 조회한다', async () => {
     mocks.get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/semi-franchises')) return response([{ key: 'pharmacy', membershipStatus: 'active' }]);
       if (path.endsWith('/businesses/pharmacy')) return response({ ...business, communityKey: 'business:pharmacy' });
       if (path.endsWith('/communities/business%3Apharmacy/access')) return response({ ...access, allowed: true });
       if (path.endsWith('/store/contents')) return response({ items: [], total: 0 });
