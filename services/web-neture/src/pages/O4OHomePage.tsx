@@ -310,6 +310,7 @@ export default function O4OHomePage() {
         PC · 모바일 같은 구조 — 공간만 tailwind 반응형으로 줄어든다.
       */}
       <form
+        aria-labelledby="home-ai-title"
         onSubmit={handleSubmit}
         onDragOver={(e) => {
           e.preventDefault();
@@ -637,7 +638,7 @@ export default function O4OHomePage() {
       <main className="flex flex-1 flex-col items-center px-4 pb-16 [word-break:keep-all]">
         <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
         <section aria-labelledby="home-ai-title" className="mt-6 flex w-full flex-col items-center text-center">
-          <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
+          <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O 업무 도우미</h2>
           <p className="mt-2 mb-0 text-sm text-slate-500">{canUseHomeWorkspace ? '무엇을 도와드릴까요?' : '질문하거나 필요한 업무를 요청할 수 있습니다.'}</p>
           {canUseHomeWorkspace && netureGateStatus ? (
             <NetureMembershipNotice status={netureGateStatus} />

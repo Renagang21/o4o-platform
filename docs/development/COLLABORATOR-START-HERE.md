@@ -1,7 +1,7 @@
 # COLLABORATOR-START-HERE
 
 > **대상**: O4O 에 새로 참여하는 사람 공동개발자 · **일자**: 2026-09-30
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-25 — AI 공통 회계 통합·전문 기능 가격 준비 경계 반영
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-27 — O4O 업무 도우미·O4O Service AI Agent 명칭 정합 (AI 공통 회계·전문 기능 가격 준비 경계 유지)
 > 기술 교육 문서가 아니다. **"O4O 가 무엇을 중요하게 보는가, 이 저장소를 어떻게 읽어야 하는가, 어디부터 보면 되는가"** 만 다룬다.
 > 규칙의 원문은 각 정본 문서에 있고, 이 문서는 그 문서들을 가리키기만 한다.
 
@@ -51,11 +51,11 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 가격·예산 도구는 [운영 준비 guide](../guides/O4O-AI-PRICING-READINESS-RUNBOOK-V1.md)를 따른다. 기존 계획/한도 판정으로 파일 표본을 검사하며, 운영 key·DB·유료 호출 없이 실행할 수 있다. [개발 CHECK](../checks/CHECK-O4O-AI-PRICING-READINESS-V1.md)는 당시 push 단계의 기록이고, 이후 main 통합·배포 관측은 [후속 CHECK](../checks/CHECK-O4O-AI-PRICING-INTEGRATION-20261025.md)에 있다. 현재 운영 모델·실제 단가/한도·설정 전달과 실사용 활성화는 별도 확인이다.
 
-## 3. 첫 공동개발 대상 — O4O Personal Assistant의 약국 경영 업무 지원
+## 3. 첫 공동개발 대상 — O4O 업무 도우미의 약국 경영 업무 지원
 
 ### 서비스 정의
 
-**O4O Personal Assistant**는 사용자별 하나의 AI 업무 비서다. 사용자의 업무 목적과 상황을 이해하고, 필요한 업무를 계획·수행·검증하며, 업무 경험과 사용자 교정을 다음 작업에 활용한다. **완전 자동화가 아니라 실제 업무시간 절감**이 목표다.
+**O4O 업무 도우미**(공식 영문 **O4O Personal Assistant**)는 사용자별 하나의 업무 도우미다. 사용자의 업무 목적과 상황을 이해하고, 필요한 업무를 계획·수행·검증하며, 업무 경험과 사용자 교정을 다음 작업에 활용한다. **완전 자동화가 아니라 실제 업무시간 절감**이 목표다.
 
 첫 공동개발 대상은 **O4O를 이용하는 약국 경영자의 일상적인 반복업무**이며, 진입점은 `neture.co.kr` 메인의 자연어 채팅이다. 특정 웹사이트나 PC 프로그램 하나를 자동화하는 제품으로 정의하지 않는다.
 
@@ -70,11 +70,13 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 | 용어 | 의미 |
 |---|---|
-| **O4O Personal Assistant** | 사용자별 하나의 공통 AI 업무 비서. 의도·Task·업무 맥락·기억·실행 조정·결과 확인을 담당 |
-| **O4O Service AI Agent** | 각 O4O 서비스의 업무·데이터에 특화하는 전문 AI 기능. 공통 질의/요약·기존 업무 Extension 기반을 재사용해 확대하며, Personal Assistant와 연계하고 별도 개인 비서를 강제하지 않음 |
-| **O4O Local Agent** | 사용자 PC의 브라우저·Windows 프로그램·로컬 자원을 활용하는 **실행 도구**. Personal Assistant 자체가 아님 |
+| **O4O 업무 도우미 / O4O Personal Assistant** | 사용자별 하나의 공통 업무 도우미. 의도·Task·업무 맥락·기억·실행 조정·결과 확인을 담당 |
+| **O4O Service AI Agent** | 각 서비스 AI의 대표 명칭. 각 O4O 서비스의 업무·데이터에 특화하는 전문 AI 기능. 공통 질의/요약·기존 업무 Extension 기반을 재사용해 확대하며, Personal Assistant와 연계하고 별도 개인 비서를 강제하지 않음 |
+| **PC 연결 프로그램** | 사용자 PC의 브라우저·Windows 프로그램·로컬 자원을 활용하는 **실행 도구**. 별도 제품명으로 노출하지 않으며 `이 PC 연결`·`PC 연결 상태`로 안내. `O4O Local Agent` / `Local Work Agent`는 내부 명칭이고 도우미 자체가 아님 |
 | **Execution Layer / Node** | API·브라우저·MCP·RPA 등 실행 수단과 PC·클라우드 등 실행 장소 |
 | **Experience / Skill** | 실제 업무 수행과 사용자 교정에서 얻는 경험, 검증을 거쳐 재사용하는 수행 능력 |
+
+대표·서비스 AI·PC 실행 도구의 명칭은 구조 정본 §0-2의 2026-10-27 사용자 결정을 따른다. 내부 endpoint·type·통신·저장 식별자는 명칭 정비로 변경하지 않는다.
 
 **구조 정본:** [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md). 과거 [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md)은 SUPERSEDED이므로 신규 설계의 기준으로 사용하지 않는다.
 
@@ -107,7 +109,7 @@ monorepo 전체를 먼저 분석할 필요는 없다. **`services/web-neture` �
 | 로그인 후 업무 진입 패널 | [services/web-neture/src/components/home/HomeEntryPanel.tsx](../../services/web-neture/src/components/home/HomeEntryPanel.tsx) |
 | API client | [services/web-neture/src/lib/apiClient.ts](../../services/web-neture/src/lib/apiClient.ts) (`@o4o/auth-client`) |
 
-메인에는 O4O Personal Assistant로 이어지는 AI 입력 경로가 이미 있다. 위 완료 기록과 담당 업무의 최신 CHECK에서 적용/검증 범위를 확인한다. 적용 업무·자료·도구 범위는 사용자와 정하며, 코드 존재나 배포 성공만으로 실계정 업무 검증을 완료로 간주하지 않는다.
+메인에는 O4O 업무 도우미로 이어지는 AI 입력 경로가 이미 있다. 위 완료 기록과 담당 업무의 최신 CHECK에서 적용/검증 범위를 확인한다. 적용 업무·자료·도구 범위는 사용자와 정하며, 코드 존재나 배포 성공만으로 실계정 업무 검증을 완료로 간주하지 않는다.
 
 그 다음은 **구현에 실제로 필요할 때만** 따라간다.
 
@@ -165,7 +167,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 3. [README.md](../../README.md) — 기여 · Production 변경 원칙
 4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB. 공동개발 로컬환경(로컬 API + web-neture, 운영 credential 불필요)은 [§3-1](../../SETUP.md#3-1-공동개발-로컬환경--로컬-api--web-neture)
 5. [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](../baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)
-6. O4O Personal Assistant 약국 경영 업무 자동화 1차 개발범위 — 현행 구현 조사 후 확정
+6. O4O 업무 도우미 약국 경영 업무 자동화 1차 개발범위 — 현행 구현 조사 후 확정
 7. [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) — AI 업무 비서의 현재 구조 정본
 8. [AI Core + Extension 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md) — 공통 계약·현재 코드 위치·적용 완료/후속 범위. [최종 통합·배포 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)는 운영 증거
 9. 필요할 때: [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) — 전체 정본 지도. 특히 역할 경계는 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), 매장 commerce 경계는 [O4O-STORE-COMMERCE-BOUNDARY-V1](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)

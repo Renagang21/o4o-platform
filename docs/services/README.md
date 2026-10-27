@@ -1,7 +1,7 @@
 # O4O 서비스 색인
 
 > **상태**: ACTIVE
-> **작성일**: 2025-12 · **최종 갱신**: 2026-10-22 (Lecture 전문 강의 안내 연결)
+> **작성일**: 2025-12 · **최종 갱신**: 2026-10-23 (MegaPharm 요구사항 문서 연결)
 > **근거 WO/IR**: WO-O4O-DOCS-ONBOARDING-ENTRY-V1
 
 O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. 서비스 정의를 여기 복제하지 않는다.
@@ -49,6 +49,7 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 |---|---|
 | `_core/apps/*/app-definition.md` | 2025-12 작성된 Core APP 정의. **현행과 다를 수 있다.** 8개 중 `dropshipping-core` · `ecommerce-core` · `pharmaceutical-core` 는 대응 패키지가 없다. 공통 구조의 현행 기준은 [CANONICAL-INDEX §6](../CANONICAL-INDEX.md) |
 | `cosmetics/service-definition.md` · `cosmetics/openapi.yaml` | K-Cosmetics 서비스 정의 · OpenAPI 계약 (`scripts/generators/openapi-types-generator.ts` 가 읽는다) |
+| [MegaPharm 요구사항과 O4O 지원 범위](megapharm/MEGAPHARM-REQUIREMENTS-AND-O4O-SUPPORT-V1.md) | DRAFT — 창고형·대형약국 사업 요구, 기존 지원, 개발·계획 상태와 추가 개발 후보. 개발 범위·정책 확정 문서는 아님 |
 
 ## 4. 새 서비스를 추가할 때
 

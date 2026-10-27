@@ -29,7 +29,10 @@ Cloud Run은 제자리 rename이 불가능하므로 새 private 리소스를 준
 - [x] 새 private 리소스 readiness·연결 확인.
 - [x] 새 배포 대상·image namespace·배포 registry·정적 CORS origin·읽기 인벤토리 소비처 정렬 구현.
 - [x] fixed cutover/rollback/retire 모드와 optimistic-lock·공개 JS 검증·실패 시 복귀·참조/요청 수 검사 구현.
-- [ ] 소유자의 최초 invoker 설정 이후 도메인 smoke·전환·롤백·잔여 참조/트래픽 확인 및 옛 자원 정리.
+- [x] 소유자의 최초 공개 invoker 설정과 새 Run·두 도메인 HTML/JS smoke 확인.
+- [x] 검토 digest로 도메인 전환 및 전환 후 JS 일치 확인.
+- [x] 홈·로그인 390/1440px 화면 재검증, 사용자 직접 로그인·기본 화면·메뉴 조회 확인.
+- [ ] 새 image namespace 정상 verified rollout 및 옛 자원 참조/트래픽 0 확인 후 정리.
 
 ## 실행
 
@@ -138,3 +141,85 @@ fingerprint로 복구하므로, 이후 main 이동·다른 배포의 대기 때�
 
 후속 코드 로컬 검증: Python 42건·Node CI 계약 376건 PASS. CORS literal delta는 옛 Run origin 1개 삭제·
 새 origin 1개 추가뿐임을 확인했다. 이 절은 코드 구현 기록이며 cutover·정상 배포·retire의 실제 실행 완료를 뜻하지 않는다.
+
+
+## 운영 전환 실행 기록 (2026-10-26, Asia/Seoul)
+
+이 절은 위 준비 단계 기록 이후의 상태다. 소유자가 새 Run의 공개 invoker를 설정했고,
+배포 계정에는 `run.services.setIamPolicy`를 추가하지 않았다. 읽기 인벤토리
+[40325679922](https://github.com/Renagang21/o4o-platform/actions/runs/40325679922)에서
+필요한 Compute·Run·Monitoring 권한을 확인했다.
+
+- plan 40323390642 이후 첫 cutover 40325461609는 계획 변경을 감지해 쓰기 전에 중지했다.
+  다른 공간의 공유 운영 배포가 끝난 뒤 상태를 다시 읽고 진행했다.
+- 새 plan [40326812701](https://github.com/Renagang21/o4o-platform/actions/runs/40326812701) PASS.
+  digest: `2d92dacaa5e6e210170e5a3b40a9f4ae3d19c34bf46bc7d14bfb1fe3c8a131a5`.
+- cutover [40327360298](https://github.com/Renagang21/o4o-platform/actions/runs/40327360298) PASS.
+  main `e18664f89a8e4a1533bfa5103b648ef491ec2956`의 정확한 CI green을 확인하고 실행했다.
+  pharmacy·megapharm 두 host의 matcher를 새 backend로 전환했고 다른 matcher는 유지했다.
+  새 Run `pharmacy-business-web-00001-4zd`와 두 도메인의 실제 JS digest가 일치했다.
+- 전환 직후 브라우저의 데스크톱 홈 요청 1회가 502였으며 다음 전체 재검사는 4/4 HTTP 200.
+  홈·로그인 각 390/1440px에서 가로 넘침·페이지 JS 예외가 없었다.
+  실제 upstream 응답을 TLS 검증한 Playwright 요청으로 전달했으며 API mock은 사용하지 않았다.
+  자동 브라우저에는 Google SDK 로드 오류가 보였으므로 Google OAuth 성공은 검증하지 않았다.
+- 사용자가 자신의 브라우저에서 실제 로그인·기본 화면 진입·기존 메뉴 조회 정상이라고 확인했다.
+  계정·세션·개인정보는 수집하거나 저장소에 복사하지 않았다.
+- 약국 단독 Promote dry-run 40327753635 PASS. 실제 Promote 40328112383은
+  `services=kpa-society`만 선택했고 API·Admin 배포는 건너뛰었다. 다른 공간의 API·Neture 배포
+  40325558878은 이 작업이 실행한 배포가 아니며 별도로 구분한다.
+
+- 약국 단독 verified rollout [40328112383](https://github.com/Renagang21/o4o-platform/actions/runs/40328112383) PASS.
+  읽기 인벤토리 [40328820753](https://github.com/Renagang21/o4o-platform/actions/runs/40328820753)에서
+  `pharmacy-business-web-00002-sip` 단일 최신 Ready revision의 트래픽 100%와
+  `gcr.io/netureyoutube/pharmacy-business-web:e18664f89a8e4a1533bfa5103b648ef491ec2956`을 재확인했다.
+  전환 전 앱 SHA 이후 약국 프런트·관련 공통 UI/auth 경로의 소스 차이는 없었다.
+- 새 이미지 배포 후 홈·로그인 × 390/1440px는 4/4 HTTP 200, 가로 넘침·페이지 JS 예외 0.
+  로그인 화면의 `accounts.google.com/gsi/client`는 이 환경에서 403이며 관련 console 오류가 있었다.
+  이 외 검사한 HTTP 요청 오류는 없었다. Google OAuth 미검증을 전체 콘솔 오류 0으로 대체하지 않는다.
+
+옛 리소스 정리는 아직 진행 중이다. DB 접속·업무 데이터 생성·보정은 수행하지 않았다.
+
+
+### 삭제 검사 대기 및 GitHub 인증 중단
+
+최소 관측 시간 후 `retire-plan`을 요청했으나 40329765855는 작업 0개 상태로 5분 이상 대기했다.
+본인 읽기 전용 run의 취소 요청에 GitHub는 아직 실행 큐에 들어가지 않았다는 409를 반환했다.
+읽기 전용 재시도 40330771368도 마지막 조회에서는 queued였다. 이어진 조회가
+`401 Bad credentials`로 바뀌어 두 run의 최신 결과·요청 수·참조 검사 결과를 확인하지 못했다.
+
+`retire` 쓰기 모드는 한 번도 요청하지 않았다. 옛 backend·NEG·Run 삭제와 quiet-window 요청 0은
+미확인이며, 전체 정리 완료로 판정하지 않는다. 이 작업의 DB 접속·데이터 보정·생성도 없다.
+
+GitHub 연결 복구 후 두 읽기 run의 실제 결과를 먼저 확인하고, stale 대기 run이 남았으면
+본인 run만 정리한다. 현재 main·CI·freeze·다른 runtime writer·새 serving을 다시 확인하고
+새 `retire-plan`의 참조 완전성·실제 요청 0·digest를 검토한 뒤 `retire`를 진행한다.
+이때도 기존 이미지/비활성 revision 이력과 사업 serviceKey는 별도 범위로 유지한다.
+
+`WORKTREE_DISPOSITION`: `KEEP` — 동일 WO의 정리·운영 검증 closure가 남아 있다.
+다른 공간의 의도된 파일 삭제 100건 및 기준 checkout은 변경하지 않았다.
+
+
+### 연결 복구 후 재개 (2026-10-27, Asia/Seoul)
+
+별도 사용자 재인증 절차를 실행하지 않고 기존 GitHub 연결을 재조회했으며 API·fetch·push가 정상 동작했다.
+이전 로컬 문서 commit `40169d34e9`와 최신 main 통합 commit `28896374ad`를 작업 branch에 push했다.
+두 이전 검사 run은 실제로 실행됐고 모두 관측 구간의 옛 Run 요청이 남아 있어 실패했음을 확인했다.
+당시 조회 불가와 실제 검사 실패 원인을 구분한다.
+
+새 main `b9526fb78de1b223b7d2bbeba3c288cdcb9ae5c8`의 관련 ops/workflow 변경은 없음을 확인했다.
+`retire-plan` 40401845372는 정확한 main CI gate 통과 후 PASS했다.
+이번 실행은 API·Admin·DB migration을 배포하지 않는다.
+
+
+최신 main CI 40400146764 PASS, 새 plan 40401845372 PASS:
+관측 구간의 옛 Run 요청 0·완전한 참조 검사·삭제 대상 3개를 확인했다.
+검토 digest는 `90f53879728ac8d6471208e5bfe3abaf716f69b781a3bb47d6fcf408836d48d8`이다.
+Delivery 40402838997 종료 후 이 digest로 `retire` 40403134358을 요청했다.
+실행은 `Another production workflow is active; no next write submitted`로 실패했다.
+전체 삭제 성공은 미확인이며 다음 시도 전 실제 잔여 자원부터 재조회해야 한다.
+
+이어진 GitHub 조회·Git 연결은 다시 인증 실패했다. CLI는 환경의 `GH_TOKEN`을 인증에 사용하며
+유효하지 않다고 보고했다. `gh auth refresh --hostname github.com`도 실행했으나
+환경 토큰 사용 중에는 CLI 저장 credential을 갱신할 수 없다는 안내로 종료됐다.
+주입된 credential을 임의로 해제·대체하거나 별도 계정으로 우회하지 않았다.
+현재 연결 복구와 운영 writer 종료 후 새 plan으로 재검증해야 한다.
