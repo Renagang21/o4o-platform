@@ -63,6 +63,14 @@ describe('operator invitation admin UI', () => {
       ),
     ).toBe(false);
   });
+  it.each([true, false])('shows Operator consent or preserved rights in the central read-only list (accepted=%s)', async accepted => {
+    h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
+      ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',email:'operator@example.test',roles:['partner-support:operator'],isActive:true}] }
+      : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'service',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    expect(await screen.findByText(accepted ? '확인 완료' : '기존 권한 유지')).toBeTruthy();
+    expect(screen.queryByText('대상 아님')).toBeNull();
+  });
   it('distinguishes confirmation pending, accepted and expired and offers resend/cancel', async () => {
     const base = {
       role: 'lecture:operator',

@@ -13,6 +13,7 @@ import { resolve } from 'node:path';
 
 import {
   ASSIGNABLE_ROLES,
+  CATALOG_ROLE_VALUES,
   ASSIGNABLE_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
   findRoleOption,
@@ -101,4 +102,10 @@ describe('/operators — 비밀번호 표면 0 (§17)', () => {
 
 it('퇴역 서비스 PH·K-Cosmetics 역할은 신규 지정 목록에 없다', () => {
  expect(ASSIGNABLE_ROLE_VALUES.some(role => /^(pharmacy-hub|cosmetics|k-cosmetics):/.test(role))).toBe(false);
+});
+
+it('keeps Operator roles in the read-only catalog without reintroducing central grants', () => {
+  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('partner-support:operator');
+  expect(CATALOG_ROLE_VALUES.has('partner-support:operator')).toBe(true);
+  expect(findRoleOption('partner-support:operator')?.label).toBe('Operator');
 });

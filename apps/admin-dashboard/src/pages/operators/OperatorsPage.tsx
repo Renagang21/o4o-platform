@@ -58,6 +58,7 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 //   `@/lib/password-policy` import 를 제거했다. 이 화면에는 비밀번호 입력 자체가 없다.
 import {
   ASSIGNABLE_ROLES,
+  OPERATOR_ROLE_CATALOG,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
@@ -1103,7 +1104,7 @@ export default function OperatorsPage() {
                   </div>
                 )}
                 <div className="space-y-4 max-h-80 overflow-y-auto border rounded-lg p-3">
-                  {Object.entries(ASSIGNABLE_ROLES).map(([serviceKey, roles]) => {
+                  {Object.entries(OPERATOR_ROLE_CATALOG).map(([serviceKey, roles]) => {
                     const meta = SERVICES[serviceKey as keyof typeof SERVICES];
                     return (
                       <div key={serviceKey} className="border-b pb-3 last:border-0 last:pb-0">

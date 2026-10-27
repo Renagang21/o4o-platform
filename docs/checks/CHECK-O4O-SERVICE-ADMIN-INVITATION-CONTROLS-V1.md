@@ -46,3 +46,7 @@ DB 검사는 세션 소유 label의 신규 PostgreSQL 16 컨테이너와 loopbac
 `WORKTREE_DISPOSITION`: 전용 worktree/branch **KEEP** — 병합 전 후속 수정·검토용. 다른 세션 checkout·worktree는 변경하지 않았다.
 
 문서 정합: 사용자 결정에 따른 관리자 역할·초대 정책 2건 갱신. 과거 CHECK·canonical index·Frozen 원문 변경 없음.
+
+## 통합 검토 보완 (2026-10-27)
+
+사용자의 main 병합·배포 지시 후 PR #845를 생성했다. main의 자동화 입력·협력사업 자료 변경을 충돌 없이 결합했다. Codex P2 1건은 신규 지정용 Admin 목록이 조회용 카탈로그에도 적용돼 기존 Operator의 수락 상태를 `대상 아님`으로 표시하던 문제다. 조회·읽기 전용 편집의 전체 역할 카탈로그와 신규 초대 Admin allowlist를 분리했다. 기존 Operator의 수락 완료·기존 권한 유지 표시와 중앙 신규 지정 제외를 포함한 관리자 4 files / 24 tests 및 관리자 production build를 통과했다. 집중 lint 오류/신규 경고 0이다. 이 절은 검토 수정 기록이며 실제 배포 완료를 뜻하지 않는다.

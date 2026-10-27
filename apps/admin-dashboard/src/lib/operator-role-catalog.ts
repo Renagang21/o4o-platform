@@ -21,7 +21,7 @@ export interface OperatorRoleOption {
 }
 
 /** 서비스(role prefix) → 부여 가능한 역할. 화면 표시 순서가 이 순서다. */
-const SERVICE_OPERATION_ROLES: Record<string, OperatorRoleOption[]> = {
+export const OPERATOR_ROLE_CATALOG: Record<string, OperatorRoleOption[]> = {
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
@@ -97,7 +97,7 @@ const SERVICE_OPERATION_ROLES: Record<string, OperatorRoleOption[]> = {
 
 /** 전체관리자는 Admin만 지정한다. 기존 Operator 조회·권한 회수는 별도 목록에서 유지한다. */
 export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
-  Object.entries(SERVICE_OPERATION_ROLES).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
 );
 
 /** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
@@ -106,12 +106,12 @@ export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABL
 );
 
 /** 등록 카탈로그에 존재하는 role 집합 (편집 시 비카탈로그 role 보존 판정용) */
-export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(ASSIGNABLE_ROLE_VALUES);
+export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(Object.values(OPERATOR_ROLE_CATALOG).flatMap(roles => roles.map(role => role.value)));
 
 export const REGISTRABLE_SERVICE_KEYS: readonly string[] = Object.keys(ASSIGNABLE_ROLES);
 
 export function findRoleOption(role: string): OperatorRoleOption | undefined {
-  return ASSIGNABLE_ROLE_VALUES.includes(role)
-    ? Object.values(ASSIGNABLE_ROLES).flat().find((r) => r.value === role)
+  return CATALOG_ROLE_VALUES.has(role)
+    ? Object.values(OPERATOR_ROLE_CATALOG).flat().find((r) => r.value === role)
     : undefined;
 }
