@@ -1,3 +1,4 @@
+import type { ManualReference } from '../manuals/knowledge';
 /**
  * Unified AI Request — client
  *
@@ -176,6 +177,7 @@ export type UnifiedRequestResult =
   | { kind: 'confirm'; route: string; reason: string; confirm: { message: string; target: { targetType: 'browser_site' | 'windows_app'; displayName: string } } };
 
 export interface UnifiedRequestInput {
+  manualReferences?: readonly ManualReference[];
   text: string;
   attachments: readonly PendingAttachment[];
   workScope: WorkScope;
@@ -206,8 +208,8 @@ export interface UnifiedRequestInput {
  * 그때는 "서버 업데이트 대기" 를 알린다. API 가 배포되면 이 분기는 자연히 타지 않는다.
  */
 async function legacyHomeChatFallback(input: UnifiedRequestInput): Promise<UnifiedRequestResult> {
-  if (input.attachments.length > 0 || input.runId || input.routeHint) {
-    throw new UnifiedRequestError('서버가 아직 파일 첨부 · 작업 이어가기를 지원하는 버전으로 업데이트되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'UNIFIED_REQUEST_UNAVAILABLE', 404);
+  if (input.attachments.length > 0 || input.runId || input.routeHint || input.manualReferences?.length) {
+    throw new UnifiedRequestError('서버가 아직 파일 첨부 · 매뉴얼 참조 · 작업 이어가기를 지원하는 버전으로 업데이트되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'UNIFIED_REQUEST_UNAVAILABLE', 404);
   }
   const chat = await sendHomeChat(input.text, input.workScope);
   return { kind: 'chat', route: 'chat', reason: 'legacy_fallback', chat };
@@ -218,6 +220,7 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
   try {
     const res = await api.post(`${API_BASE_URL}/api/ai/request`, {
       text: input.text,
+      ...(input.manualReferences?.length ? { manualReferences: input.manualReferences } : {}),
       ...(attachments.length > 0 ? { attachments } : {}),
       ...(input.runId ? { runId: input.runId } : {}),
       ...(input.runId && input.resumeTargetId ? { targetHint: input.resumeTargetId } : {}),

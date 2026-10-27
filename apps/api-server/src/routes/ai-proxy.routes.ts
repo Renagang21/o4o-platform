@@ -1,3 +1,4 @@
+import { validateManualReferences, renderManualReferences, MANUAL_KNOWLEDGE_RULES } from '../services/ai-tools/manual-knowledge.js';
 import { ModelControlService } from '../services/ai-management/model-controls.js';
 import { buildHomeChatToolPresentation } from './ai-proxy/home-chat-tool-presentation.js';
 import { fetchUrlText, fetchUrlContent, deriveTitleFromBlocks, detectUsageConditions, UsageWarning } from "./ai-proxy/url-content.js";
@@ -310,6 +311,14 @@ async function performWorkAgentRun(
   const runnable = await checkWorkAgentRunnable(userId, body);
   if ('reply' in runnable) return runnable.reply;
   const { toolCtx } = runnable;
+  const manualCheck = validateManualReferences(body.manualReferences);
+  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' } };
+  if (intent && manualCheck.references.length) intent = {
+    ...intent,
+    manualReferences: manualCheck.references,
+    evidence: intent.evidence.map(item => item.source === 'knowledge' ? { ...item, available: true } : item),
+  };
+
 
   // Capability C(Task Modality Router) — per-task provider. Work Agent 로 온 Goal 은 실행 표면(등재 대상 · 화면 캡처 · UI 어휘)이
   // 있으면 screen 이고, screen 은 openai(Astra vision planner · Capability B)로 간다. 전역 AI_DEFAULT_PROVIDER 는 그대로(gemini).
@@ -1313,6 +1322,10 @@ async function performHomeChat(
     return { status: 400, body: { success: false, error: homeChatValidationMessage(code), code } };
   }
   const message = validation.message;
+  const manualCheck = validateManualReferences(reqBody.manualReferences);
+  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' } };
+  const manualReferences = manualCheck.references;
+
 
   // ── 신뢰 경계: 클라이언트 workScope 에서 **축 힌트만** 취한다 ──────────────
   const clientScope = (reqBody.workScope ?? {}) as Record<string, unknown>;
@@ -1422,8 +1435,9 @@ async function performHomeChat(
 
     // tool 결과는 system prompt 뒤에 **요약 문장으로만** 덧붙인다(구조체 통째 전달 금지).
     const basePrompt = buildHomeChatSystemPrompt(facts);
-    const systemPrompt = toolContextBlock ? `${basePrompt}\n\n${toolContextBlock}` : basePrompt;
-    const userPrompt = buildHomeChatUserPrompt(message, renderAttachmentTextBlocks(attachmentParts));
+    const toolPrompt = toolContextBlock ? `${basePrompt}\n\n${toolContextBlock}` : basePrompt;
+    const systemPrompt = manualReferences.length ? `${toolPrompt}\n\n${MANUAL_KNOWLEDGE_RULES}` : toolPrompt;
+    const userPrompt = buildHomeChatUserPrompt(message, [renderAttachmentTextBlocks(attachmentParts), renderManualReferences(manualReferences)].filter(Boolean).join("\n\n"));
 
     const result = attachmentParts.some((p) => p.kind === 'inline')
       ? await executeMultimodalChat({ provider, model, apiKey, systemPrompt, userPrompt, parts: attachmentParts, timeoutMs: HOME_CHAT_TIMEOUT_MS },
@@ -1634,6 +1648,12 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
     return res.status(400).json({ success: false, error: unifiedAttachmentErrorMessage(code, attachmentCheck.errorName), code });
   }
   const attachments = attachmentCheck.attachments;
+  const manualCheck = validateManualReferences(body.manualReferences);
+  if (!manualCheck.ok || (body.surface === 'hospital-drug' && manualCheck.references.length > 0)) {
+    return res.status(400).json({ success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' });
+  }
+  const manualReferences = manualCheck.references;
+
 
   const runId = typeof body.runId === 'string' && body.runId.length > 0 ? body.runId : undefined;
   const routeHint = body.routeHint === 'work' ? 'work' : undefined;
@@ -1696,7 +1716,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
 
   if (decision.route === 'work') {
     const image = firstImageAttachment(attachments);
-    const workBody: Record<string, unknown> = { request: text };
+    const workBody: Record<string, unknown> = { request: text, ...(manualReferences.length ? { manualReferences } : {}) };
     if (image) workBody.image = image;
     // 재개는 원래 run 의 대상을 상속한다 — work-agent/run 의 기존 targetHint 를 재개 요청에서만 전달한다(FIX-V1 §2-B).
     if (runId) workBody.runId = runId;
@@ -1730,7 +1750,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
     });
   }
 
-  const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider }, attachments);
+  const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider, manualReferences }, attachments);
   if (reply.status !== 200) return res.status(reply.status).json(reply.body);
   return res.json({ success: true, data: { kind: 'chat', route: decision.route, reason: decision.reason, chat: reply.body.data } });
 });

@@ -101,3 +101,19 @@ describe('unified request — 배포 간극 fallback (API 에 /request 가 아�
     chatSpy.mockRestore();
   });
 });
+
+describe('manual excerpts use the existing request without silent legacy fallback', () => {
+  it('sends selected reference separately from user text and rejects old-server fallback', async () => {
+    const mod = await import('../apiClient');
+    const { sendUnifiedRequest } = await import('../ai/unified-request');
+    const post = vi.spyOn(mod.api, 'post');
+    const manual = { manualId: 'a'.repeat(64), title: '합성', program: '합성', page: 2, text: '사입 명세서' };
+    post.mockResolvedValueOnce({ data: { data: { kind: 'chat', chat: { message: '안내' } } } });
+    const input = { text: '사입 방법', attachments: [], workScope: { serviceKey: 'neture', workspace: 'home' } as any, manualReferences: [manual] };
+    await sendUnifiedRequest(input);
+    expect(post).toHaveBeenLastCalledWith(expect.stringContaining('/api/ai/request'), expect.objectContaining({ text: input.text, manualReferences: [manual] }));
+    post.mockRejectedValueOnce({ response: { status: 404, data: {} } });
+    await expect(sendUnifiedRequest(input)).rejects.toMatchObject({ code: 'UNIFIED_REQUEST_UNAVAILABLE' });
+    post.mockRestore();
+  });
+});
