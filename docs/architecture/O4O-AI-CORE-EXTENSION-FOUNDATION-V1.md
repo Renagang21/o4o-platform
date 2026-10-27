@@ -1,6 +1,6 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-25 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-27 (명칭 정합) · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
 > 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
 > 전체 업무 재정비 준비: [단일 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md) · [업무·코드 연결 조사](../investigations/IR-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)
@@ -10,6 +10,8 @@
 현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. 관리자 조회 단계·모델 관리·사용처별 선택과 삭제 보호의 반영 상태는 §12/§12-1/§12-2에서 구분한다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
 업무 재정비의 추가 연결과 2026-10-25 main·운영 반영 증거는 §14-1에서 구분한다.
 공통 기반 적용은 모든 전문 route의 비용 이관·모든 화면 AI UI·실계정 업무 검증 완료를 뜻하지 않는다.
+
+**사용자 명칭 (2026-10-27):** 대표는 **O4O 업무 도우미 / O4O Personal Assistant**, 각 서비스 AI의 대표 명칭은 **O4O Service AI Agent**다. PC 실행 도구는 별도 제품명 없이 연결 행동·상태로 안내한다. 역할·내부 계약은 [Assistant V2 §0-2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md#0-2-사용자-명칭-2026-10-27-사용자-확정)를 따른다. 새 Core·Assistant·Task·Memory를 만드는 결정이 아니다.
 
 ## 1. 최초 조사 당시 구조·문제 (2026-10-13)
 

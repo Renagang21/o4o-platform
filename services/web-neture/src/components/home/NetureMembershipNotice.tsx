@@ -4,7 +4,7 @@ import type { NetureServiceUsageStatus } from '../../lib/home-entry';
 const COPY: Record<Exclude<NetureServiceUsageStatus, 'active'>, { title: string; body: string }> = {
   none: {
     title: '이메일 확인이 필요합니다',
-    body: '이메일 확인을 마치면 AI 업무 도우미를 이용할 수 있습니다. 연결 서비스는 별도로 가입합니다.',
+    body: '이메일 확인을 마치면 O4O 업무 도우미를 이용할 수 있습니다. 연결 서비스는 별도로 가입합니다.',
   },
   pending: {
     title: '이메일 또는 계정 상태를 확인해 주세요',
@@ -16,7 +16,7 @@ const COPY: Record<Exclude<NetureServiceUsageStatus, 'active'>, { title: string;
   },
   suspended: {
     title: 'Neture 이용이 정지된 상태입니다',
-    body: '정지 기간에는 AI 업무 도우미를 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주세요.',
+    body: '정지 기간에는 O4O 업무 도우미를 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주세요.',
   },
   withdrawn: {
     title: 'Neture 가입이 해지된 상태입니다',

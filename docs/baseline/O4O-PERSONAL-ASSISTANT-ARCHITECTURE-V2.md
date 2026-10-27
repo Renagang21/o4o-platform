@@ -1,6 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
+> **명칭 갱신**: 2026-10-27 — 사용자 확정 대표·서비스 AI 명칭과 PC 실행 도구 안내를 §0-2에 반영. 구조·실행 계약은 유지.
 > **정책 참조 갱신**: 2026-10-24 — [전체 AI 정비 TODO](../work-orders/TODO-O4O-AI-WORK-EXTENSION-REALIGNMENT-V1.md)의 사용자 승인에 따른 공급자 자체 집계 요약 예외를 §16에 반영. Assistant의 실행·권한 범위는 유지.
 > **작성일**: 2026-10-03 · **개정**: 2026-10-07 Task 이해 · 완료 판정 구현 반영 — §0-1 (8) · §2-1 · §4-3 · §18-2 단계 대응 · §23 L1 · L2 · Memory (`WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1`) · 2026-10-06 Phase E 구현 반영 — §11-2 작업 단위 dispatch · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1`) · 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
@@ -15,7 +16,7 @@
 
 ## 0. 두 원칙
 
-> **P1. O4O 의 최상위 제품은 Automation 이 아니라 Personal Work Assistant 다.**
+> **P1. O4O 의 최상위 제품은 Automation 이 아니라 O4O 업무 도우미(O4O Personal Assistant) 다.**
 > 사용자의 업무 의도와 상황을 이해하고, 필요한 업무정보와 경험을 기억하며, 업무를 계획 · 수행 · 검증한다. RPA · Computer Use · API · MCP · Skill · Worker · 개별 PC 는 이 비서가 필요에 따라 고르는 하위 실행 수단이다.
 
 > **P2. Assistant 의 기억은 업무 주체에 귀속되고, PC 는 기억의 소유자가 아니라 필요할 때 선택되는 Execution Node 다.**
@@ -47,6 +48,15 @@
 8. **개인 Experience ≠ 조직 정책** (2026-10-07). 개별 사용자의 Correction · Preferred · Avoid 를 조직 전체의 실행 규칙으로 **자동 승격하지 않는다.** ORGANIZATION 소유 Task 여도 방법 기억(검증된 방법 · 도움 · 교정)은 **요청자 개인**에 귀속되고 그 사람의 다음 Task 에서만 근거가 된다. 업무 run · 재개 구조 · Task type 이력은 Task 소유 주체를 따른다(6). 조직이 모두에게 적용하려는 방법은 개인 Experience 가 아니라 **명시적 조직 정책**으로 따로 정하는 채널이어야 한다 — 아직 없다(§24). 소유 주체를 알 수 없는 이전 기억은 승격하지 않는다.
 
 **설계 금지**: 다수 사용자의 성공 경로를 모아 하나의 표준 Workflow 로 만들고 모든 사용자에게 적용하는 설계. "가장 많이 성공한 경로" 는 추천 근거이지 정답이 아니다.
+
+---
+
+### 0-2. 사용자 명칭 (2026-10-27 사용자 확정)
+
+- **대표 명칭: O4O 업무 도우미. 공식 영문: O4O Personal Assistant.** 기존 `Personal Work Assistant` 표현은 이 제품을 가리켰으며 신규 사용자 안내에는 확정 표기를 사용한다.
+- **각 서비스 AI의 대표 명칭: O4O Service AI Agent.** 해당 서비스의 업무·자료에 특화한 AI이며 기존 Core + 업무 Extension 기반을 재사용한다. 공통 도우미와 연계하지만 사용자별 Assistant·Task·Memory 체계를 별도로 복제하지 않는다.
+- **PC 실행 도구는 별도 제품명으로 노출하지 않는다.** 사용자에게는 `이 PC 연결`, `PC 연결 프로그램`, `PC 연결 상태`처럼 행동·상태로 안내한다. 문서·코드의 `O4O Local Agent` / `Local Work Agent`는 내부 실행 도구를 뜻하며 없애는 기능이 아니다.
+- 이 결정은 명칭과 설명의 정합이다. 기존 API·통신·오류 코드·저장 키·Task/run 및 권한·승인·실행 계약은 유지한다. 과거 실행 기록의 명칭은 당시 기록으로 보존한다.
 
 ---
 
