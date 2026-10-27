@@ -1334,3 +1334,10 @@ test('pharmacy workspace move does not mask unknown workspaces or API changes', 
   assert.equal(classifyApiDeploy(parseFileList('M\tservices/web-unknown-new-app/src/App.tsx'), graph).api_deploy_affected, true);
   assert.equal(classifyApiDeploy(parseFileList('D\tservices/web-kpa-society/src/App.tsx\nM\tapps/api-server/src/main.ts'), graph).api_deploy_affected, true);
 });
+
+ test('PC package source/installer-only changes deploy Neture without other services', () => {
+  for (const status of ['A', 'M', 'D']) for (const file of ['tools/o4o-local-agent/src/handlers.mjs', 'tools/o4o-local-agent/release/install-core.mjs']) {
+    assert.deepEqual(onOf(webOf([`${status}\t${file}`])), ['neture']);
+  }
+  assert.deepEqual(onOf(webOf(['M\ttools/o4o-local-agent/test/release-install.test.mjs', 'M\ttools/o4o-local-agent/README.md'])), []);
+});

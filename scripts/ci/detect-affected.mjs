@@ -918,6 +918,13 @@ export function classifyWebDeploy(changedFiles, graph, opts = {}) {
       continue;
     }
 
+    // Neture ships a generated Windows package from these tracked inputs.
+    // Keep this before the generic tools/ exclusion; agent-only releases must refresh Main.
+    if (hasPrefix(file, ['tools/o4o-local-agent/src/', 'tools/o4o-local-agent/release/'])) {
+      mark('neture', `neture PC 설치 패키지 입력 변경: ${file}`);
+      continue;
+    }
+
     if (hasPrefix(file, WEB_DEPLOY_NEUTRAL_PREFIXES)) {
       reasons.push(`Web 이미지 빌드 미참여 경로 — 무영향: ${file}`);
       continue;

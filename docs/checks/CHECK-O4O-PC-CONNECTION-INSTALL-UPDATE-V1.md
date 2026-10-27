@@ -26,8 +26,10 @@ UI의 ‘최신’은 실제 health의 releaseId·프로그램 버전·SQLite re
 
 새 worktree의 패키지 dist 누락으로 최초 UI suite 하나가 resolve 실패했고, source가 동일한 기존 패키지 build 산출물을 준비한 뒤 전체 관련 suite를 다시 실행해 통과했다. 실패를 실행 성공으로 계산하지 않았다.
 
-## 3. 실제 실행·배포 확인 예정
+## 3. 실제 실행·배포 확인
 
 Windows CI는 실제 bundled node.exe 패키지를 만들고 기존 SQLite preflight·Install.cmd(시스템 PATH에 별도 Node 없이)·시작 메뉴 파일·agent 실행·health의 release/data readiness를 확인한다. CI Gate가 이 job을 기다리도록 연결했다. Windows VM은 실제 사용자 PC 적용 증거가 아니다.
 
 운영 배포 후 Main의 release.json·ZIP SHA256·내부 release/files·upstream Node/LICENSE를 확인한다. 실제 사용자 PC가 이 클라우드에 연결된 상태는 아니므로 사용자 설치 실행과 health 재확인 전에는 실제 PC 적용 완료라고 보고하지 않는다. Chrome Extension/native host 기존 등록·실제 약국 프로그램·지오영 로그인·실 주문/결제는 이번 설치 확인 범위 밖이다.
+
+Windows PR CI(40500335521)의 `PC installer Windows` job PASS: 별도 Node PATH 없이 Install.cmd, 신규 설치 동의, 한글 경로 Start.cmd, 실제 health releaseId/version/SQLite ready/schema를 확인했다. 사용자 PC 적용 증거와는 구분한다. 리뷰에서 발견한 agent-only 변경 배포 누락을 Neture artifact input 판정과 deploy-risk 회귀로 보완했다. 최종 HEAD의 CI·리뷰 및 운영 배포는 별도로 확인한다.
