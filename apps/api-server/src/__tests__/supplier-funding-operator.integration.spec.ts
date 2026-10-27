@@ -112,14 +112,19 @@ fixture("isolated supplier review and funding operations", () => {
     expect(triggers).toEqual([{ tgenabled: "O" }]);
     expect(await db.runMigrations({ transaction: "each" })).toEqual([]);
     await runner.startTransaction();
-    const LastMigration = INCREMENTAL_MIGRATIONS.at(-1)!;
-    await new LastMigration().down(runner);
-    const previous = await computeSchemaFingerprint(runner);
-    expect(previous.hash).toBe(EXPECTED_SCHEMA_STATES.at(-2)!.fingerprint);
-    await new LastMigration().up(runner);
-    expect((await computeSchemaFingerprint(runner)).hash).toBe(fp.hash);
-    await runner.rollbackTransaction();
-    await runner.release();
+    try {
+      const LastMigration = INCREMENTAL_MIGRATIONS.at(-1)!;
+      await new LastMigration().down(runner);
+      const previous = await computeSchemaFingerprint(runner);
+      expect(previous.hash).toBe(EXPECTED_SCHEMA_STATES.at(-2)!.fingerprint);
+      // Fingerprinting changes transaction-local search_path; restore the migration runner context.
+      await runner.query('SET LOCAL search_path TO DEFAULT');
+      await new LastMigration().up(runner);
+      expect((await computeSchemaFingerprint(runner)).hash).toBe(fp.hash);
+    } finally {
+      await runner.rollbackTransaction();
+      await runner.release();
+    }
   });
   it("supports request → supplier submit → operator resolution while preserving approval state", async () => {
     await db.query(
@@ -234,7 +239,7 @@ fixture("isolated supplier review and funding operations", () => {
     );
     const after = await service.list({ type: "fulfillment_pending" });
     expect(after.items).toHaveLength(0);
-    const history = await service.history(ids.trial, ids.participant);
+    const { items: history } = await service.history(ids.trial, ids.participant);
     expect(history[0]).toMatchObject({
       beforeStatus: "pending",
       afterStatus: "fulfilled",

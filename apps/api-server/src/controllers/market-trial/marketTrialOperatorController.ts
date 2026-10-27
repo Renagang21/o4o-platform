@@ -143,8 +143,8 @@ export class MarketTrialOperatorController {
       if (![req.params.id, req.params.participantId].every(id => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id))) throw new FundingError(400, 'INVALID_PARTICIPANT_ID', '대상 정보를 확인해 주세요.');
       const ds = MarketTrialOperatorController.dataSource;
       if (!ds) throw new Error('DataSource unavailable');
-      const data = await new FundingOperatorExceptionsService(ds).history(req.params.id, req.params.participantId);
-      return res.json({ success: true, data });
+      const data = await new FundingOperatorExceptionsService(ds).history(req.params.id, req.params.participantId, req.query.page ?? 1);
+      return res.json({ success: true, data: data.items, page: data.page, hasMore: data.hasMore });
     } catch (error) {
       if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       return res.status(500).json({ success: false, message: '처리 이력을 조회하지 못했습니다.' });
@@ -435,6 +435,7 @@ export class MarketTrialOperatorController {
         settlementRemainder: string | null;
         settlementNote: string | null;
         // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+        paymentVersion: number;
         paymentStatus: string;
         paymentMethod: string | null;
         paymentProvider: string | null;
@@ -466,6 +467,7 @@ export class MarketTrialOperatorController {
            p."settlementRemainder",
            p."settlementNote",
            COALESCE(p."paymentStatus", 'unpaid') AS "paymentStatus",
+           COALESCE((p."offlineState"->>'version')::integer,0) AS "paymentVersion",
            p."paymentMethod",
            p."paymentProvider",
            p."paymentReference",
@@ -552,6 +554,7 @@ export class MarketTrialOperatorController {
               settlementRemainder: r.settlementRemainder != null ? Number(r.settlementRemainder) : null,
               settlementNote: r.settlementNote || null,
               // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+              paymentVersion: r.paymentVersion,
               paymentStatus: r.paymentStatus,
               paymentMethod: r.paymentMethod || null,
               paymentProvider: r.paymentProvider || null,

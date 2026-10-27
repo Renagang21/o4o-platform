@@ -35,12 +35,12 @@ export async function refreshFundingAmount(m: EntityManager, id: string) {
 }
 export class FundingOfflineOperationsService {
   constructor(private readonly db: DataSource) {}
-  async snapshot(id: string, page = 1) {
+  async snapshot(id: string, page = 1, historyPage = 1) {
     if (
       !uuid.test(id) ||
       !Number.isSafeInteger(page) ||
       page < 1 ||
-      page > 10000
+      page > 10000 || !Number.isSafeInteger(historyPage) || historyPage < 1 || historyPage > 10000
     )
       return fail(400, "펀딩과 페이지를 확인해 주세요.");
     const [trial] = await this.db.query(
@@ -73,8 +73,8 @@ export class FundingOfflineOperationsService {
     const history = await this.db.query(
       `SELECT id,user_id AS "actorId",created_at AS at,meta->>'participantId' AS "participantId",meta->>'action' AS action,
    meta->>'reason' AS reason,meta->'before' AS before,meta->'after' AS after FROM action_logs
-   WHERE service_key='funding' AND action_key='funding.offline_operation' AND status='success' AND meta->>'trialId'=$1 ORDER BY created_at DESC,id DESC LIMIT 30`,
-      [id],
+   WHERE service_key='funding' AND action_key='funding.offline_operation' AND status='success' AND meta->>'trialId'=$1 ORDER BY created_at DESC,id DESC LIMIT 31 OFFSET $2`,
+      [id, (historyPage - 1) * 30],
     );
     return {
       trial,
@@ -82,7 +82,9 @@ export class FundingOfflineOperationsService {
       participants: rows.slice(0, 30),
       hasMore: rows.length > 30,
       page,
-      history,
+      history: history.slice(0, 30),
+      historyPage,
+      historyHasMore: history.length > 30,
     };
   }
   async update(
