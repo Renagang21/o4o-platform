@@ -142,6 +142,14 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
         await db.destroy();
       }
     });
+    it("distinguishes service Admin from Operator using current membership and role validity", async () => {
+      const user = await account(true, true);
+      expect((await call(user).get("/membership")).body.data).toMatchObject({operator:true,admin:false});
+      await db.query("UPDATE role_assignments SET role='partner-support:admin' WHERE user_id=$1", [user]);
+      expect((await call(user).get("/membership")).body.data).toMatchObject({operator:true,admin:true});
+      await db.query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1", [user]);
+      expect((await call(user).get("/membership")).body.data).toMatchObject({operator:false,admin:false});
+    });
     it("exposes board descriptions, never member posts or member lists before login", async () => {
       const r = await call().get("/boards");
       expect(r.status).toBe(200);
@@ -171,6 +179,7 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
       expect((await call(user).get("/membership")).body.data).toEqual({
         status: null,
         operator: false,
+        admin: false,
       });
       expect(
         (await call(user).get(`/boards/${boards[0].id}/posts`)).status,

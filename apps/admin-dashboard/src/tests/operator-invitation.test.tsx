@@ -44,7 +44,8 @@ describe('operator invitation admin UI', () => {
         'input[name="target-service"][value="community"]',
       )!,
     );
-    fireEvent.click(screen.getByRole('radio', { name: /community:operator/ }));
+    expect(screen.queryByRole('radio', { name: /community:operator/ })).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: /community:admin/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() =>
       expect(h.post).toHaveBeenCalledWith(
@@ -52,7 +53,7 @@ describe('operator invitation admin UI', () => {
         {
           email: 'new@example.com',
           serviceKey: 'community',
-          role: 'community:operator',
+          role: 'community:admin',
         },
       ),
     );
@@ -61,6 +62,14 @@ describe('operator invitation admin UI', () => {
         ([path]) => path === '/admin/operator-assignments',
       ),
     ).toBe(false);
+  });
+  it.each([true, false])('shows Operator consent or preserved rights in the central read-only list (accepted=%s)', async accepted => {
+    h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
+      ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',email:'operator@example.test',roles:['partner-support:operator'],isActive:true}] }
+      : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'service',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    expect(await screen.findByText(accepted ? '확인 완료' : '기존 권한 유지')).toBeTruthy();
+    expect(screen.queryByText('대상 아님')).toBeNull();
   });
   it('distinguishes confirmation pending, accepted and expired and offers resend/cancel', async () => {
     const base = {
