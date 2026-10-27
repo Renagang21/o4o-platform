@@ -37,3 +37,5 @@ Windows PR CI(40500335521)의 `PC installer Windows` job PASS: 별도 Node PATH 
 손상/삭제된 기존 코드로 정상 재설치를 막지 않도록 pointer·데이터 경로 검증과 기존 코드 무결성 검증을 분리했다. 동일 버전 손상 slot은 별도 `.damaged-*`로 보존 후 검증된 새 코드로 교체하며, preflight 실패 시 기존 slot/pointer로 복귀한다. 손상·누락·다른 버전 갱신·데이터 보존 회귀를 추가했다.
 
 설치기 강제 종료 시 영구 lock 파일로 후속 업데이트가 막히지 않도록 Windows OS 소유 named-pipe mutex로 변경했다(명령 수신/HTTP API 없음). 프로세스 종료 시 커널이 잠금을 해제하며 동시 설치 거절과 강제 종료 후 재획득을 실제 자식 프로세스로 검증한다. Linux 테스트는 abstract socket을 사용한다.
+
+PR CI 40503793107에서 Windows/web/admin build/CodeQL은 통과했으나 API Jest 1/3 및 Sonar gate가 실패했다. 상세 로그·Sonar API는 환경 egress 제한으로 접근할 수 없었고 GitHub annotations로 확인 가능한 분기 복잡도·await/문장 구분 문제를 정리했다. 해당 실패를 성공으로 계산하지 않으며 후속 HEAD에서 전체 CI/분석을 다시 확인한다. 로컬 UI 재검증 최초 명령의 jsdom 옵션 누락(document undefined)은 실행 옵션 수정 후 27개 재실행으로 확인했다.

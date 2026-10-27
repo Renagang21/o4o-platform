@@ -150,6 +150,11 @@ async function readJsonBody(req) {
  * @param {() => { ready: boolean, schemaVersion: number, backups: number }} [options.localDataSummary]  LOCAL-DATA-RUNTIME V1 §64 — 경로 없는 요약
  * @param {(message: string, extra?: unknown) => void} options.log
  */
+function releaseHealth(releaseId) {
+  if (typeof releaseId === 'string' && /^[a-f0-9]{64}$/.test(releaseId)) return { releaseId };
+  return {};
+}
+
 export function startLocalServer({ agentVersion, releaseId = null, isConnected, onPair, localDataSummary, automationSummary, log }) {
   const nonces = createNonceStore();
 
@@ -192,7 +197,7 @@ export function startLocalServer({ agentVersion, releaseId = null, isConnected, 
         {
           ok: true,
           agentVersion,
-          ...(typeof releaseId === 'string' && /^[a-f0-9]{64}$/.test(releaseId) ? { releaseId } : {}),
+          ...releaseHealth(releaseId),
           // 사용자 이름 · 경로 · IP · 설치 프로그램 목록 등은 담지 않는다 (V0 §21).
           connected: isConnected(),
           nonce: nonces.issue(),
