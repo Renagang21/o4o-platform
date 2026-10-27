@@ -172,3 +172,17 @@ it("preserves draft text after a failed save and sends no speculative publish", 
   );
   expect(client.post.mock.calls[0][1]).toMatchObject({ state: "draft" });
 });
+
+it('lets operators review the complete member material and attachment before changing its classification', async () => {
+  const client = api();
+  const current = data();
+  current.materials = { items: [{ id: 'material', title: '운영 자료', summary: '자료 요약', body: '<p>운영자가 검토할 본문</p>', revision: 2, attachments: [{ name: '검토 첨부', url: 'https://example.invalid/review.pdf' }] }] as any, total: 1 };
+  client.get.mockResolvedValue({ data: { data: current } });
+  render(tree(client));
+  await screen.findByRole('button', { name: '새 공지' });
+  fireEvent.click(screen.getByRole('button', { name: '자료 개정·교육' }));
+  fireEvent.click(await screen.findByText('자료 내용·첨부 보기'));
+  expect(screen.getByText('운영자가 검토할 본문')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '검토 첨부' }).getAttribute('href')).toBe('https://example.invalid/review.pdf');
+  expect(client.post).not.toHaveBeenCalled();
+});

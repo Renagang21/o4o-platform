@@ -219,3 +219,20 @@ it("keeps a successful write distinct from a failed refresh and retries only the
   await waitFor(() => expect(api.get).toHaveBeenCalledTimes(3));
   expect(api.post).toHaveBeenCalledTimes(1);
 });
+
+it.each([
+  ['pharmacy', 'store-a'], ['megapharm', 'store-a'], ['carepharm', 'store-a'], ['pharmcoop', undefined],
+])('lets %s members read the full operator material and open its attachment without changing membership scope', async (key, organization) => {
+  const api = client();
+  const data = payload();
+  data.materials = { items: [{ id: 'material', title: '업무 준비 자료', summary: '짧은 요약', body: '<p>요약에 없는 필수 준비사항</p>', revision: 2, attachments: [{ name: '현장 체크리스트', url: 'https://example.invalid/checklist.pdf' }] }] as any, total: 1 };
+  api.get.mockResolvedValue(envelope(data));
+  render(tree(api, 'reader', key, organization));
+  await screen.findByText('필수 확인 안내');
+  fireEvent.click(screen.getByRole('button', { name: '자료·교육' }));
+  fireEvent.click(screen.getByText('자료 내용·첨부 보기'));
+  expect(screen.getByText('요약에 없는 필수 준비사항')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '현장 체크리스트' }).getAttribute('href')).toBe('https://example.invalid/checklist.pdf');
+  expect(api.get.mock.calls[0][1].headers['X-Store-Organization-Id']).toBe(organization ?? '');
+  expect(api.post).not.toHaveBeenCalled();
+});
