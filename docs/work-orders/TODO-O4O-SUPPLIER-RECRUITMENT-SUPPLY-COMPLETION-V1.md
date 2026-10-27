@@ -39,3 +39,8 @@
 [CHECK](../checks/CHECK-O4O-SUPPLIER-RECRUITMENT-SUPPLY-COMPLETION-V1.md)에 소비처·계약·실제 검증·기존 main 실패를 분리했다. PostgreSQL 공급/격리 21건 및 canonical 실제 왕복 10건 PASS, fixture DB/schema 잔존0과 task 컨테이너 제거를 확인했다. 기존 API 경계74건·새 HTTP9건·최종 웹 관련28건·PC/mobile 재시도 및 API/웹 빌드 PASS다. 기존 AI 작성 테스트7건의 mock export 누락은 미해결로 보고한다. 전체 웹/원격 CI가 green이라고 선언하지 않는다.
 
 사용자가 지정한 종료점에 따라 같은 작업 묶음의 commit·명시 branch push·원격 일치 확인으로 인계한다. 최종 commit SHA는 종료 보고를 따른다. main 병합·배포·운영 DB·실거래 변경은 하지 않는다. WORKTREE_DISPOSITION=KEEP(개발 인계·클라우드 단일 관리 checkout 보존).
+
+
+## 통합·배포 지시와 초기 실패 원인 정정
+
+사용자의 추가 main 병합→배포 지시에 따라 동일 branch와 PR #847에서 통합을 진행한다. 최신 main #845를 정상 merge했다. 이전에 main의 AI mock 누락으로 적은 7건 실패는 원인 분류가 부정확했다. 해당 테스트의 partial mock은 공통 패키지 실제 export를 읽으며, 정본 `build:packages` 뒤 테스트 소스 수정 없이 해당 파일8건·전체 Neture158 files/1,371건이 PASS했다. 오래된 산출물로 인한 개발 환경 문제로 정정하며 미해결 코드 결함으로 남기지 않는다. 초기 실행 기록·assertion은 보존한다. 최종 CI·리뷰·병합·배포 결과는 PR #847에 기록한다.
