@@ -44,7 +44,7 @@ export class PartnerCommunityService {
     if (member && membership?.status !== "active")
       fail(403, "COMMUNITY_MEMBERSHIP_REQUIRED");
     if (operator && !roles.length) fail(403, "COMMUNITY_OPERATOR_REQUIRED");
-    return { status: membership?.status ?? null, operator: roles.length > 0 };
+    return { status: membership?.status ?? null, operator: roles.length > 0, admin: roles.some((r: { role: string }) => r.role === "partner-support:admin") };
   }
   status(user: string) {
     return this.db.transaction((m) => this.identity(m, user, false));

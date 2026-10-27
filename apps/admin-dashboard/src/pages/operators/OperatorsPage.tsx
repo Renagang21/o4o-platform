@@ -413,8 +413,8 @@ export default function OperatorsPage() {
         ...(selectedCandidate ? { targetUserId: selectedCandidate.userId } : { email: inviteEmail.trim() }),
         serviceKey: canonicalServiceKey, role: targetRole,
       });
-      setAssignmentNotice(`${serviceLabel} 운영자 확인 메일을 보냈습니다. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
-      toast.success('운영자 확인 메일을 보냈습니다.');
+      setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주세요. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
+      toast.success('운영자 확인 메일 발송을 요청했습니다.');
       setInvitationVersion(v => v + 1);
       closeModal();
       fetchUsers();
@@ -645,7 +645,7 @@ export default function OperatorsPage() {
         />
       </div>
 
-      <p className="mb-4 rounded border bg-white p-4 text-sm">서비스별 Admin·Operator를 지정·해제합니다. 각 서비스 Admin은 자기 서비스에서 Operator를 관리할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+      <p className="mb-4 rounded border bg-white p-4 text-sm">서비스별 Admin을 지정합니다. Operator 신규 지정은 해당 서비스 Admin이 자기 서비스에서 처리합니다. 기존 역할 조회·회수는 유지합니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
       <BusinessOperatorAssignments />
 

@@ -44,7 +44,7 @@ export interface OperatorAssignmentResult {
   membershipStatuses: Record<string, string>;
 }
 
-/** 관리자 검색 결과 — Google 연결 여부까지 함께 준다(연결 없으면 지정 대상이 될 수 없다). */
+/** 관리자 검색 결과 — Google 연결 여부는 참고값이며 Demo 계정은 제외한다. */
 export interface OperatorCandidate {
   userId: string;
   email: string;
@@ -61,7 +61,7 @@ export class OperatorAssignmentService {
 
   /**
    * 지정 후보 검색 — 관리자가 사람을 **고르기** 위한 목록이다.
-   * Google 연결이 없는 사용자도 숨기지 않고 `hasGoogleLink:false` 참고값으로 보여준다
+   * Google 연결이 없는 일반 사용자도 `hasGoogleLink:false` 참고값으로 보여준다. Demo는 원장에서 제외한다
    * (숨기면 "검색해도 안 나온다" 는 이유를 알 수 없게 된다).
    */
   async searchCandidates(query: string, limit = 20): Promise<OperatorCandidate[]> {
@@ -73,7 +73,8 @@ export class OperatorAssignmentService {
       .leftJoin(LinkedAccount, 'la', 'la."userId" = u.id AND la.provider = :provider', { provider: 'google' })
       .select(['u.id AS id', 'u.email AS email', 'u.name AS name'])
       .addSelect('la.id IS NOT NULL', 'has_google')
-      .where('u.email ILIKE :q OR u.name ILIKE :q', { q: `%${q}%` })
+      .where('(u.email ILIKE :q OR u.name ILIKE :q)', { q: `%${q.replace(/[\\%_]/g, "\\$&")}%` })
+      .andWhere('NOT EXISTS (SELECT 1 FROM demo_accounts da WHERE da.user_id = u.id AND da.is_active)')
       .orderBy('u.email', 'ASC')
       .limit(Math.min(limit, 50))
       .getRawMany<{ id: string; email: string; name: string | null; has_google: boolean }>();

@@ -21,7 +21,7 @@ export interface OperatorRoleOption {
 }
 
 /** 서비스(role prefix) → 부여 가능한 역할. 화면 표시 순서가 이 순서다. */
-export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
+const SERVICE_OPERATION_ROLES: Record<string, OperatorRoleOption[]> = {
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
@@ -95,7 +95,12 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
   ],
 };
 
-/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_OPERATOR_ROLES` 와 같은 순서·같은 집합이어야 한다. */
+/** 전체관리자는 Admin만 지정한다. 기존 Operator 조회·권한 회수는 별도 목록에서 유지한다. */
+export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
+  Object.entries(SERVICE_OPERATION_ROLES).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+);
+
+/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
 export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABLE_ROLES).flatMap((rs) =>
   rs.map((r) => r.value),
 );

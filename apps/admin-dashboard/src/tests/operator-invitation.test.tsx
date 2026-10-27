@@ -44,7 +44,8 @@ describe('operator invitation admin UI', () => {
         'input[name="target-service"][value="community"]',
       )!,
     );
-    fireEvent.click(screen.getByRole('radio', { name: /community:operator/ }));
+    expect(screen.queryByRole('radio', { name: /community:operator/ })).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: /community:admin/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() =>
       expect(h.post).toHaveBeenCalledWith(
@@ -52,7 +53,7 @@ describe('operator invitation admin UI', () => {
         {
           email: 'new@example.com',
           serviceKey: 'community',
-          role: 'community:operator',
+          role: 'community:admin',
         },
       ),
     );

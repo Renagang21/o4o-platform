@@ -59,6 +59,10 @@ const messages: Record<string, string> = {
     "파트너 커뮤니티 가입과 이용 상태를 확인해 주세요.",
   COMMUNITY_MEMBERSHIP_MANAGED:
     "커뮤니티 이용 상태는 운영자에게 확인해 주세요.",
+  SERVICE_ADMIN_REQUIRED: "해당 서비스의 활성 Admin 권한이 필요합니다.",
+  INVITATION_RESEND_TOO_SOON: "재발송은 이전 발송 1분 후 가능합니다.",
+  INVITATION_MAIL_FAILED: "초대는 저장됐지만 메일 발송을 확인하지 못했습니다. 1분 후 재발송해 주세요.",
+  DEMO_ACCOUNT_FORBIDDEN: "Demo 계정은 운영자로 지정할 수 없습니다.",
   COMMUNITY_OPERATOR_REQUIRED: "Partner 운영 권한이 필요합니다.",
   COMMUNITY_AUTHOR_REQUIRED: "본인이 작성한 글·댓글만 변경할 수 있습니다.",
   COMMUNITY_NOT_FOUND: "현재 열람할 수 없는 글·댓글·게시판입니다.",
