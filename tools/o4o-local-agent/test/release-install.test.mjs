@@ -83,6 +83,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
  const files=fs.readdirSync(src).filter(n=>/\.(mjs|ps1|mts)$/.test(n)).map(n=>['src/'+n,fs.readFileSync(path.join(src,n))]);
  for(const n of ['install.mjs','install-core.mjs','launch.mjs','Install.cmd'])files.push([n,execFileSync('git',['show',`HEAD:tools/o4o-local-agent/release/${n}`])]);
  const packaged=assembleRelease({sourceSha,files,runtime:fs.readFileSync(process.execPath),runtimeLicense:fs.readFileSync(path.join(path.dirname(process.execPath),'LICENSE'))}),source=writePackage(packaged,'windows package'),options=target();
+ options.home+='-한글 경로';options.dataHome+='-한글 데이터';
  delete options.preflight;
  const result=await installPackage({source,...options});const slot=installedSlot(options.home);
  const system=process.env.SystemRoot;
@@ -91,7 +92,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
    windowsVerbatimArguments:true,stdio:['ignore','pipe','pipe'],timeout:60000,
  });
  assert.ok(fs.existsSync(path.join(root,'roaming','Microsoft','Windows','Start Menu','Programs','O4O PC 연결.cmd')));
- const child=spawn(path.join(slot,'runtime','node.exe'),[path.join(slot,'src','index.mjs'),'run'],{cwd:slot,env:{...process.env,O4O_AGENT_HOME:options.dataHome},stdio:'ignore'});
+ const child=spawn(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(options.home,'Start.cmd')}""`],{cwd:slot,env:{...process.env,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,stdio:'ignore'});
  try{
   let health;for(let n=0;n<40;n++){
    try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
@@ -99,7 +100,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
   }
   assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.4.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,8);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
- }finally{child.kill();await new Promise(resolve=>child.once('exit',resolve));}
+ }finally{const exited=new Promise(resolve=>child.once('exit',resolve));execFileSync(path.join(system,'System32','taskkill.exe'),['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});await exited;}
  const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
  execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
    env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},

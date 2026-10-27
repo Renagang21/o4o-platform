@@ -66,7 +66,7 @@ export async function installPackage({source,home,dataHome,programs=null,allowNe
   await preflight(slot,dataHome);await beforeActivate();
   const previousPointer=fs.existsSync(pointer)?fs.readFileSync(pointer):null,previousLauncher=fs.existsSync(launcher)?fs.readFileSync(launcher):null;
   const next=JSON.stringify({format:'o4o-pc-install-v1',releaseId:manifest.releaseId,version:manifest.version,dataHome});
-  const start=Buffer.from(`@echo off\r\nsetlocal DisableDelayedExpansion\r\nset "O4O_AGENT_HOME=${dataHome}"\r\n"${path.join(slot,'runtime','node.exe')}" "${path.join(slot,'launch.mjs')}"\r\nif errorlevel 1 pause\r\n`);
+  const start=Buffer.from(`@echo off\r\nchcp 65001 >nul\r\nsetlocal DisableDelayedExpansion\r\nset "O4O_AGENT_HOME=${dataHome}"\r\n"${path.join(slot,'runtime','node.exe')}" "${path.join(slot,'launch.mjs')}"\r\nif errorlevel 1 pause\r\n`);
   try{
    atomic(pointer,next);atomic(launcher,start);activated=true;
   }catch(error){
