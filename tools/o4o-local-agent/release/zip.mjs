@@ -20,7 +20,7 @@ export function zip(files) {
     )
       throw new Error("Invalid release path");
     const filename = Buffer.from(name),
-      compressed = deflateRawSync(data),
+      compressed = deflateRawSync(data, { level: 9, memLevel: 6 }),
       checksum = crc(data);
     const local = Buffer.alloc(30);
     local.writeUInt32LE(0x04034b50);
