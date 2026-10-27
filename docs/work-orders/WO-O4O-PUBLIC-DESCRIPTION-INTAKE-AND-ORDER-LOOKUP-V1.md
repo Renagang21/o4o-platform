@@ -86,3 +86,5 @@ PR #861 Codex P1 검토에서, 기존 운영자 상품 후보 API가 `service_ke
 CI의 관리자 정보구조 회귀 검사가 새 화면 탭과 사이드바 정본의 불일치를 발견했다. 관리자 메뉴 SSOT와 permission map에 같은 진입점을 추가하고, 직접 URL도 기존 백엔드와 같은 플랫폼 관리자 경계로 제한했다. 소비처는 관리자 `useAdminMenu`·`AdminSidebar`·메뉴 진단 화면과 메뉴/권한 계약 테스트이며, 다른 서비스의 메뉴·공용 패키지는 이 설정을 import하지 않는다. 기존 메뉴의 역할은 변경하지 않았다. 사이드바/탭 1:1, 신규 메뉴의 플랫폼 역할, 직접 URL 보호, 전체 클릭 수 증가를 계약 테스트에 반영했다.
 
 메뉴 보완 후 관리자 전체 Vitest 42개 파일·517건, TypeScript 검사·production build를 통과했다. 실제 `AdminSidebar`와 메뉴 SSOT·permission map을 이용한 합성 세션에서 1440px·390px 사이드바→신규 화면 진입과 서비스 운영자에게 해당 메뉴가 표시되지 않는 것을 확인했다. page error는 없었다. 운영 로그인 검증으로 간주하지 않는다.
+
+API 전체 회귀의 실패는 관리자 Product DB mount 목록이 14개로 고정되어 새 라우터(15번째)를 누락한 계약 목록 불일치였다. 목록을 실제 신규 경로까지 확장하고 신규 라우터의 `requireAdmin` floor·로컬 역할 배열 부재·4개 write 경로의 `requireProductDbWrite`를 함께 검사하도록 보완했다. 기존 검사 항목은 유지했으며 관련 실제 HTTP/정적 권한 테스트 122건이 통과했다.

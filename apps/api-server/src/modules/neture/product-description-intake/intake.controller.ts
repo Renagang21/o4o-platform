@@ -12,7 +12,8 @@ import logger from '../../../utils/logger.js';
 const revision = z.string().regex(/^[a-f0-9]{64}$/);
 export function createDescriptionIntakeController(db: DataSource): Router {
   const router = Router(), service = new DescriptionIntakeService(db);
-  router.use(authenticate, requireAdmin);
+  router.use(authenticate);
+  router.use(requireAdmin);
   const handle = (task: (req: Request) => Promise<unknown>) => async (req: Request, res: Response) => {
     try { res.json({ success: true, data: await task(req) }); }
     catch (error) {
