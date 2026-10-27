@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./cooperation-workflows.css";
+import { CooperationMaterialAttachments } from "./CooperationMaterialAttachments";
 export interface WorkflowClient {
   get(path: string, config?: any): Promise<{ data: any }>;
   post?(path: string, body: any, config?: any): Promise<unknown>;
@@ -341,9 +342,7 @@ function MemberWorkflows(props: WorkflowProps) {
                       {item.category || "미분류"} · 개정 {item.revision} ·{" "}
                       {workflowDate(item.updated_at)}
                     </p>
-                    <p className="cw-body">
-                      {plainBody(item.summary || item.body)}
-                    </p>
+                    <CooperationMaterialDetails summary={item.summary} body={item.body} attachments={item.attachments} />
                     {safeEducationUrl(item.education_url) && (
                       <a
                         href={safeEducationUrl(item.education_url)}
@@ -605,4 +604,18 @@ function MemberInquiryForm({
       <button type="submit">문의 접수</button>
     </form>
   );
+}
+
+
+/** Keep the published full text reachable even when the material has a short summary. */
+export function CooperationMaterialDetails({ summary, body, attachments }: { summary?: string | null; body?: string | null; attachments?: unknown }) {
+  const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
+  return <>
+    {summary && <p className="cw-body">{plainBody(summary)}</p>}
+    {(body || hasAttachments) ? <details>
+      <summary>자료 내용·첨부 보기</summary>
+      {body && <p className="cw-body">{plainBody(body)}</p>}
+      <CooperationMaterialAttachments attachments={attachments} />
+    </details> : <p>등록된 본문·첨부자료가 없습니다.</p>}
+  </>;
 }
