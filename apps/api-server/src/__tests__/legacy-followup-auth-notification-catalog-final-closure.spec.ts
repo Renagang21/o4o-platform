@@ -90,8 +90,9 @@ describe('WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-
     });
 
     it('정산 완료 알림은 custom 이 아니라 settlement.paid 를 쓴다', () => {
-      const src = read('modules', 'neture', 'services', 'settlement-command.service.ts');
-      expect(src).toContain(`type: 'settlement.paid'`);
+      const src = read('modules', 'neture', 'services', 'settlement-notification.service.ts');
+      expect(src).toContain(`'settlement.paid'`);
+      expect(src).toContain('INSERT INTO notifications');
       expect(src).not.toContain(`type: 'custom'`);
     });
 

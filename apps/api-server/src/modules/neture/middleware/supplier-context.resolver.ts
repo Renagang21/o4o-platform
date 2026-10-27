@@ -236,7 +236,7 @@ export async function listOwnedSupplierIds(
  * owner 가 하나도 없을 때만 legacy `neture_suppliers.user_id` 로 fallback(경고).
  */
 export async function listSupplierOwnerUserIds(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   supplierId: string | null | undefined,
 ): Promise<string[]> {
   if (!supplierId) return [];

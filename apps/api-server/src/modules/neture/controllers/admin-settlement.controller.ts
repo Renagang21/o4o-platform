@@ -23,6 +23,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
+import { SettlementNotificationService, SettlementNotificationError } from '../services/settlement-notification.service.js';
 import { NetureSettlementService } from '../services/neture-settlement.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -33,6 +34,31 @@ export function createAdminSettlementController(dataSource: DataSource): Router 
   const settlementService = new NetureSettlementService(dataSource);
 
   const adminGuard = requireNetureScope('neture:admin');
+
+  const notifications=new SettlementNotificationService(dataSource);
+  const notificationError=(res:Response,error:unknown)=>{
+    if(error instanceof SettlementNotificationError)return res.status(error.status).json({success:false,error:error.code});
+    logger.warn('[Neture Settlement] notification recovery unavailable');
+    return res.status(503).json({success:false,error:'SETTLEMENT_NOTIFICATION_UNAVAILABLE',message:'알림 처리 결과를 확인하지 못했습니다. 상태를 다시 조회해 주세요.'});
+  };
+  router.get('/settlements/notification-jobs',requireAuth,adminGuard,async(req,res)=>{
+    const state=req.query.state??'failed',page=Number(req.query.page??1),limit=Number(req.query.limit??20);
+    if(typeof state!=='string'||!['pending','failed'].includes(state)||(req.query.page!==undefined&&typeof req.query.page!=='string')||(req.query.limit!==undefined&&typeof req.query.limit!=='string') || !Number.isInteger(page)||page<1||page>1000000||!Number.isInteger(limit)||limit<1||limit>100){
+      return res.status(400).json({success:false,error:'VALIDATION_ERROR'});
+    }
+    try{return res.json({success:true,data:await notifications.list(state as 'failed'|'pending',page,limit)});}
+    catch(error){return notificationError(res,error);}
+  });
+  router.get('/settlements/:id/notification',requireAuth,adminGuard,async(req,res)=>{
+    if(!UUID_REGEX.test(req.params.id))return res.status(400).json({success:false,error:'VALIDATION_ERROR'});
+    try{return res.json({success:true,data:await notifications.getStatus(req.params.id)});}
+    catch(error){return notificationError(res,error);}
+  });
+  router.post('/settlements/:id/notification/retry',requireAuth,adminGuard,async(req,res)=>{
+    if(!UUID_REGEX.test(req.params.id))return res.status(400).json({success:false,error:'VALIDATION_ERROR'});
+    try{return res.json({success:true,data:await notifications.retry(req.params.id)});}
+    catch(error){return notificationError(res,error);}
+  });
 
   // ==================== Admin Settlement Management (WO-O4O-SETTLEMENT-ENGINE-V1) ====================
 
@@ -187,8 +213,8 @@ export function createAdminSettlementController(dataSource: DataSource): Router 
         return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in "approved" status' });
       }
       res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error paying settlement:', error);
+    } catch {
+      logger.error('[Neture API] Error paying settlement; reload current payment status');
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay settlement' });
     }
   });

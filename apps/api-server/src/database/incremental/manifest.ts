@@ -117,6 +117,8 @@ import { CreatePersonalMail1792998000000 } from '../migrations/1792998000000-Cre
 import { HardenAuthPrivacyReadiness1793010000000 } from '../migrations/1793010000000-HardenAuthPrivacyReadiness.js';
 import { CreatePartnerCommunity1793020000000 } from '../migrations/1793020000000-CreatePartnerCommunity.js';
 
+import { CreateSettlementNotificationJobs1793087685658 } from '../migrations/1793087685658-CreateSettlementNotificationJobs.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -164,6 +166,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreatePersonalMail1792998000000,
   HardenAuthPrivacyReadiness1793010000000,
   CreatePartnerCommunity1793020000000,
+  CreateSettlementNotificationJobs1793087685658,
 ];
 
 export function incrementalMigrationNames(): string[] {
