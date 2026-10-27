@@ -48,3 +48,8 @@ Local Agent 일반 사용자 설치는 현재 Node 기반 설치·페어링이�
 ## 5. 검증·인계
 
 검증 결과·Git 상태·미확인 범위는 [CHECK](../checks/CHECK-O4O-PHARMACY-ORDER-LOCAL-DATA-FOUNDATION-V1.md)에 기록한다. 원본 사용자 자료·매뉴얼 전문·credential·실 주문 데이터는 공개 Git에 넣지 않는다.
+
+
+## 6. 후속 사용자 지시의 통합·배포 완료
+
+사용자가 동일 공간에 main 병합·배포를 명시적으로 지시해 통합 담당으로 진행했다. PR #853은 `82e38f070e`로 병합됐고 main CI·CodeQL이 통과했다. Main의 순수 계약 Docker 입력 변경은 LEVEL 3으로 판정돼 표준 Promote의 `services=neture`만 실행했다. Main 배포·트래픽 전환·최종 서빙 SHA 검증·운영 HTTP/JS 확인이 완료됐다. 기존 hospital-pharmacy는 선택에서 제외한 대기를 유지했다. PC 소스 ZIP은 정확한 병합 main에서 생성·격리 bootstrap 검증했으며 실제 PC 자동 업데이트는 하지 않았다. 동일 WO의 연속 종료 단계로 같은 branch에서 안내·검증 문서만 정합화한다. 상세 실행 증거는 CHECK의 마지막 절을 따른다.
