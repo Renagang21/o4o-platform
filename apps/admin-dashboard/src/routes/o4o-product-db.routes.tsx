@@ -9,6 +9,7 @@
 
 import { Route, Navigate } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
+import { PLATFORM_ADMIN_ROLES } from '@/config/rolePermissions';
 import { Suspense, lazy } from 'react';
 
 const DescriptionIntakePage = lazy(() => import('@/pages/o4o-product-db/DescriptionIntakePage'));
@@ -33,6 +34,10 @@ const PageLoader = () => (
   </div>
 );
 
+function DescriptionIntakeRoute() {
+  return <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]}><DescriptionIntakePage /></AdminProtectedRoute>;
+}
+
 export function O4OProductDbRoutes() {
   return [
     <Route
@@ -47,7 +52,7 @@ export function O4OProductDbRoutes() {
       }
     >
       <Route index element={<Navigate to="overview" replace />} />
-      <Route path="description-intake" element={<DescriptionIntakePage />} />
+      <Route path="description-intake" element={<DescriptionIntakeRoute />} />
       <Route path="overview" element={<ProductDbOverviewPage />} />
       <Route path="candidates" element={<ProductCandidatesPage />} />
       <Route path="candidates/:id" element={<ProductCandidateDetailPage />} />
