@@ -133,3 +133,7 @@ test('terminated installer releases OS mutex and preserves real concurrent exclu
  }finally{const exited=new Promise(resolve=>child.once('exit',resolve));child.kill('SIGKILL');await exited;}
  const unlock=await acquireInstallLock(home);await unlock();
 });
+
+test('oversized non-streaming download cannot be published even with maximum ZIP compression',()=>{
+ assert.throws(()=>assembleRelease({sourceSha,files:[],runtime:randomBytes(32*1024*1024),runtimeLicense:Buffer.from('fixture license')}),/32 MiB HTTP download limit/);
+});

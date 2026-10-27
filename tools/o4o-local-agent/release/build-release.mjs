@@ -51,6 +51,10 @@ export function assembleRelease({ sourceSha, files, runtime, runtimeLicense }) {
   };
   payload.set("release.json", Buffer.from(JSON.stringify(internal, null, 2)));
   const archive = zip([...payload]);
+  // Cloud Run non-streaming HTTP responses must fit below 32 MiB.
+  if (archive.length >= 32 * 1024 * 1024) {
+    throw new Error("PC installer exceeds the 32 MiB HTTP download limit");
+  }
   const filename = `o4o-pc-connection-${sourceSha.slice(0, 12)}-${releaseId.slice(0, 12)}.zip`;
   return {
     archive,

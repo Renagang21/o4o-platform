@@ -47,3 +47,9 @@ PR CI 40503793107에서 Windows/web/admin build/CodeQL은 통과했으나 API Je
 GitHub 인증 복구 후 CI 40507085958의 API Jest 1/3 실패를 확인했다. 로컬에서 `local-agent-runtime.spec.ts`의 handler import allowlist에 신규 `release-info.mjs`가 빠진 동일 실패를 재현했다. 고정 build metadata 모듈을 허용 목록에 반영하고 fs import 한정·고정 build-info URL·프로세스/네트워크/환경변수/credential 접근 금지를 함께 검증했다. 수정 후 해당 suite 64개 PASS. 실제 runtime·pairing 경계 변경은 없다.
 
 최종 runtime source bd799bc24c의 Windows CI·CodeQL·웹/관리자 빌드·코드 품질 검사 PASS, Sonar gate PASS(0 security hotspots, 0.0% duplication), Codex review 미해결 사항 없음. 고정 executable 경로로 공식 Node 포함 ZIP 재생성 및 공개 manifest SHA256·ZIP CRC·내부 46개 파일 hash·Node MZ/LICENSE 대조 PASS. 새 테스트 commit의 전체 CI와 main 병합·배포는 별도로 확인한다.
+
+## 5. 운영 다운로드 크기 보완
+
+PR #858은 e724dfb976으로 main 병합했고 main CI 40600642545·CodeQL, Neture Promote 40602009269의 revision smoke/traffic switch가 통과했다. 그러나 공개 manifest는 정상인데 ZIP 전체 다운로드는 HTTP 500, 같은 파일의 100-byte Range 요청은 HTTP 206이었다. ZIP 33,873,012 bytes가 non-streaming HTTP 32 MiB 한도를 넘는다. 서빙 성공만으로 설치 배포 완료라고 판단하지 않고 실제 다운로드 실패를 확인했다.
+
+별도 worktree/branch에서 ZIP level 9 압축과 생성 산출물의 32 MiB 미만 검사만 보완한다. 실행 파일·SQLite·연결 정보·설치/권한/health 계약은 동일하다. 압축이 어려운 32 MiB payload도 발행을 거절하는 회귀를 추가한다. 새 PR/CI/배포 및 운영 전체 ZIP 다운로드·해시 확인으로 종료한다.
