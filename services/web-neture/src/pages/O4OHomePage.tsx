@@ -27,6 +27,7 @@ import { useHomeEntry } from '../lib/home-entry';
 import { NetureMembershipNotice } from '../components/home/NetureMembershipNotice';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
+import AutomationDataMaintenance from '../components/home/AutomationDataMaintenance';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../lib/footerLegal';
 import ServiceDiscovery from '../components/home/ServiceDiscovery';
@@ -49,6 +50,7 @@ export default function O4OHomePage() {
   const { workScope, isResolvingStore } = useWorkScope();
 
   const [input, setInput] = useState('');
+  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
   const [question, setQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +130,7 @@ export default function O4OHomePage() {
     setWorkResult(null);
     setConfirm(null);
     setResumeAnchor(null);
+    setMaintenanceOpen(false);
     setAttachmentsUsed([]);
   };
   const userId = user?.id ?? null;
@@ -196,6 +199,7 @@ export default function O4OHomePage() {
       return;
     }
     setPending(true);
+    setMaintenanceOpen(false);
     setError(null);
     setQuestion(text);
     setAnswer(null);
@@ -406,6 +410,19 @@ export default function O4OHomePage() {
           </button>
         </div>
       </form>
+
+      <div className="mt-2 w-full max-w-xl text-left">
+        <button type="button" disabled={blocked} aria-expanded={maintenanceOpen} onClick={() => setMaintenanceOpen(value => !value)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40">데이터 정비</button>
+      </div>
+      {maintenanceOpen && <AutomationDataMaintenance
+        goal={resumeAnchor ? question ?? '' : ''}
+        neededInput={resumeAnchor ? workResult?.neededInput : null}
+        draft={input}
+        resuming={!!resumeAnchor}
+        disabled={blocked}
+        onClose={() => setMaintenanceOpen(false)}
+        onApply={text => { setInput(text); setConfirm(null); setMaintenanceOpen(false); }}
+      />}
 
       {/* 첨부 chip — 종류별 아이콘 하나로 같은 목록. 제거만 가능. */}
       {attachments.length > 0 && (
