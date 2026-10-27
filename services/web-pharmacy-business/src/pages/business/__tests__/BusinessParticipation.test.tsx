@@ -103,6 +103,9 @@ it('clears consent and draft input when a different pharmacy is selected, even a
   await act(async () => reject(new Error('Old request')));
   expect(screen.queryByRole('alert')).toBeNull();
   expect(mocks.post).toHaveBeenCalledTimes(1);
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-a' } });
+  await screen.findByText('privacy · 버전 1');
+  expect((screen.getByRole('combobox') as HTMLSelectElement).disabled).toBe(false);
 });
 it('keeps enrollment disabled when the selected business policies are unavailable', async () => {
   const initial = mocks.get.getMockImplementation()!;

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { businessApi } from './api';
 
@@ -14,6 +14,10 @@ export function BusinessParticipationStore({ children }: Readonly<{
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [pendingStore, setPendingStore] = useState<string | null>(null);
+  const requested = params.get('store');
+  const selected = requested ? stores?.find(store => store.organizationId === requested)?.organizationId : stores?.length === 1 ? stores[0].organizationId : undefined;
+  // History navigation unmounts the old form; its pending marker must not lock a later visit.
+  useLayoutEffect(() => { setPendingStore(null); }, [selected]);
   useEffect(() => {
     let alive = true;
     setStores(null); setError(false);
@@ -28,8 +32,6 @@ export function BusinessParticipationStore({ children }: Readonly<{
   if (error) return <section className="rounded-xl border bg-white p-6"><p role="alert">약국 목록을 확인하지 못했습니다. 가입 상태는 아직 확인되지 않았습니다.</p><button type="button" className="min-h-11 text-blue-700" onClick={() => setRetry(value => value + 1)}>약국 목록 다시 확인</button></section>;
   if (!stores) return <p role="status">가입 상태를 확인할 약국을 불러오고 있습니다…</p>;
   if (!stores.length) return <section className="rounded-xl border bg-white p-6"><p>가입 신청·탈퇴는 해당 약국의 경영 권한이 필요합니다.</p><a className="inline-flex min-h-11 items-center text-blue-700" href="https://store.neture.co.kr/start-pharmacy">내 매장 신청 · 소속 확인</a></section>;
-  const requested = params.get('store');
-  const selected = requested ? stores.find(store => store.organizationId === requested)?.organizationId : stores.length === 1 ? stores[0].organizationId : undefined;
   return <>
     <label className="mb-4 block">가입 상태를 확인할 약국
       <select aria-label="가입 상태를 확인할 약국" disabled={pendingStore === selected} className="mt-2 block w-full rounded-lg border bg-white p-3" value={selected ?? ''} onChange={event => {
