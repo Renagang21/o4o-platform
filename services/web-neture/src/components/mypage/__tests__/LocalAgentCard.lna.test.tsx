@@ -225,7 +225,7 @@ describe('보안 경계 — 이 카드가 하지 않는 일', () => {
     await screen.findByText('이 PC 연결됨');
 
     for (const [url, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
-      expect(String(url).startsWith('http://127.0.0.1:47821/')).toBe(true);
+      expect(String(url).startsWith('http://127.0.0.1:47821/') || String(url) === '/downloads/pc-connection/release.json').toBe(true);
       expect(init.credentials).toBe('omit');
     }
   });

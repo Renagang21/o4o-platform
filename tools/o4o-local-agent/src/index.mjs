@@ -28,6 +28,7 @@ import { buildHeartbeatReport } from './node-report.mjs';
 import { createBackup, backupSummary } from './local-db-backup.mjs';
 import { automationSummary } from './windows-automation-safety.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
+import { installedReleaseId } from './release-info.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 import { startBridgeRelay } from './bridge-relay.mjs';
 import { nextPollDelayMs } from './poll-schedule.mjs';
@@ -187,6 +188,7 @@ async function commandRun() {
 
   await startLocalServer({
     agentVersion: AGENT_VERSION,
+    releaseId: installedReleaseId(),
     isConnected: () => Boolean(state.creds),
     onPair: (grant) => submitPairingGrant(grant, state),
     // /health 에 실리는 요약(§64) — 준비 여부 · schema version · 백업 수뿐. 경로 없음(§30).
