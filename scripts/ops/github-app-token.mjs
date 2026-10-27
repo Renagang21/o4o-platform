@@ -122,7 +122,12 @@ export function issue(config, key, profile, api = request, now = Date.now()) {
 
 export function childEnvironment(token, env = process.env) {
   // Explicit opt-in identity selection happens in CLI; no parent/global config changes.
-  const child = { ...env, GH_TOKEN: token, GH_HOST: 'github.com' };
+  if (env.GIT_ALLOW_PROTOCOL !== undefined && !env.GIT_ALLOW_PROTOCOL.split(':').includes('https')) {
+    fail('Inherited Git transport policy does not permit HTTPS.');
+  }
+  // SSH bypasses HTTPS credential helpers and would silently select an SSH user.
+  // Narrow the child transport policy; never execute an inherited SSH identity.
+  const child = { ...env, GH_TOKEN: token, GH_HOST: 'github.com', GIT_ALLOW_PROTOCOL: 'https' };
   const count = Number(child.GIT_CONFIG_COUNT || 0);
   if (!Number.isInteger(count) || count < 0 || count > 100) fail('Unexpected inherited Git config count.');
   const entries = [

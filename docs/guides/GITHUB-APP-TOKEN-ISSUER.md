@@ -70,6 +70,11 @@ node scripts/ops/github-app-token.mjs exec --use-app-identity --profile author -
 `check`는 토큰을 발급·검증·폐기하고 저장소·profile·만료 시각·폐기 여부만 출력한다.
 App 설정 미완료나 GitHub API 오류는 비밀값·응답 원문 없이 실패한다.
 
+Git 명령은 HTTPS remote만 지원한다. `git@github.com:...` 및 `ssh://...` remote는
+HTTPS credential helper를 사용하지 않으므로 SSH 접속 전에 차단한다. 필요한 경우 사용자가
+해당 작업공간의 remote를 HTTPS로 설정한 뒤 실행한다. 기존 SSH 키로 자동 전환하지 않는다.
+부모 환경의 Git transport 제한이 HTTPS를 허용하지 않으면 그 제한도 유지하며 실패한다.
+
 ## 운영 배포와의 경계
 
 App installation token의 실행 주체는 **App bot**이다. 저장소 소유자 사용자와 동일하지 않다.

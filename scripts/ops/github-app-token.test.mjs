@@ -155,6 +155,18 @@ test('real Git credential protocol receives only the selected child token', () =
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test('SSH remotes cannot silently select another identity and inherited restrictions remain effective', () => {
+  assert.throws(() => childEnvironment(fixtureToken, { GIT_ALLOW_PROTOCOL: 'file' }), /transport policy/);
+  const child = childEnvironment(fixtureToken, { ...process.env, GIT_ALLOW_PROTOCOL: 'https:ssh', GIT_SSH_COMMAND: 'o4o-ssh-must-not-run' });
+  assert.equal(child.GIT_ALLOW_PROTOCOL, 'https');
+  for (const remote of ['git@github.com:Renagang21/o4o-platform.git', 'ssh://git@github.com/Renagang21/o4o-platform.git']) {
+    const result = spawnSync('git', ['ls-remote', remote], { env: child, encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /transport 'ssh' not allowed/);
+    assert.ok(!result.stderr.includes('o4o-ssh-must-not-run'));
+  }
+});
+
 test('each command gets a fresh lease and revokes even after child failure; metadata omits token', () => {
   const { api, calls } = fixture();
   let output = '';
