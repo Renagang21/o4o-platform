@@ -23,9 +23,28 @@ export function useSupplierOrders() {
   );
   const [unifiedLoading, setUnifiedLoading] = useState(true);
   const [unifiedTotal, setUnifiedTotal] = useState(0);
-  const [sourceFilter, setSourceFilter] = useState<
+  const [unifiedPage, setUnifiedPageState] = useState(1);
+  const unifiedPageSize = 20;
+  const [sourceFilter, setSourceFilterState] = useState<
     'all' | 'neture' | 'checkout'
   >('all');
+
+  const setUnifiedPage = useCallback((page: number) => {
+    if (!Number.isSafeInteger(page) || page < 1 || page === unifiedPage) return;
+    unifiedRequest.current += 1;
+    setUnifiedLoading(true);
+    setUnifiedError(false);
+    setUnifiedPageState(page);
+  }, [unifiedPage]);
+
+  const setSourceFilter = useCallback((source: 'all' | 'neture' | 'checkout') => {
+    if (source === sourceFilter && unifiedPage === 1) return;
+    unifiedRequest.current += 1;
+    setUnifiedLoading(true);
+    setUnifiedError(false);
+    setSourceFilterState(source);
+    setUnifiedPageState(1);
+  }, [sourceFilter, unifiedPage]);
 
   // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
   //   두 조회는 실패 시 throw 한다. 요약과 통합 목록은 서로 독립 영역이므로 각각 오류 상태를 가진다.
@@ -52,8 +71,8 @@ export function useSupplierOrders() {
     setUnifiedError(false);
     try {
       const result = await supplierApi.getUnifiedOrders({
-        page: 1,
-        limit: 20,
+        page: unifiedPage,
+        limit: unifiedPageSize,
         source: sourceFilter,
       });
       if (request !== unifiedRequest.current) return;
@@ -67,7 +86,7 @@ export function useSupplierOrders() {
     } finally {
       if (request === unifiedRequest.current) setUnifiedLoading(false);
     }
-  }, [sourceFilter]);
+  }, [sourceFilter, unifiedPage]);
 
   useEffect(() => {
     fetchSummary();
@@ -89,6 +108,9 @@ export function useSupplierOrders() {
     unifiedOrders,
     unifiedLoading,
     unifiedTotal,
+    unifiedPage,
+    unifiedPageSize,
+    setUnifiedPage,
     sourceFilter,
     setSourceFilter,
     fetchSummary,
