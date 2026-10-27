@@ -98,12 +98,6 @@ ESLint, 도메인/화면 테스트 29개 통과. Chromium에서 두 조합 전�
 
 ## 테스트 조합 운영 연결 절차
 
-**2026-10-27 운영 확인:** `테스트 협동조합` 등록과 지정 관리자·개인 회원 연결을 완료했다.
-연합회 목록에서 `/test`로 진입하며 해당 조합 관리 주소는 `/test/operator`다.
-등록·배포·권한 경계 및 검증 범위는 [운영 CHECK](../../docs/checks/CHECK-O4O-COOPERATION-OPERATIONAL-READINESS-V1.md)의 「테스트 조합 등록 완료·권한 검증」을 따른다.
-아래 절차는 이후 재점검/운영 연결을 위한 것이며 현재 조합이 미등록이라는 뜻이 아니다.
-
-
 `CreateCooperativeMemberships1792216000000`은 조합 디렉토리와 개인 조합원 원장을 추가한다.
 스키마 migration은 기존 API 배포의 전용 migration Job에서만 실행한다. 데이터 등록은 별도이며
 migration 자체가 계정·권한·예시 조합을 생성하지 않는다.
