@@ -46,3 +46,8 @@ Pharmacy·MegaPharm·CarePharm·Pharmcoop의 공지·자료·참여·지원에�
 Pharmacy/MegaPharm 참여 화면이 URL의 선택 약국을 가입 조회·신청·탈퇴에 전달하지 않는 문제를 보완한다. 실제 접근 가능한 경영 단위의 약국 선택을 선행하고 기존 API header로 같은 조직을 전달한다. CarePharm의 기존 선택 흐름과 Pharmcoop 개인 가입은 유지한다. 신규 schema·role·정책·API endpoint를 추가하지 않는다.
 
 실계정·약관 입력이 없는 항목은 완료로 바꾸지 않는다. 검증 순서·운영 설정 확인 위치·완료 기준은 [운영 개통 절차](../guides/O4O-COOPERATION-OPENING-VALIDATION-V1.md)에 정리한다.
+
+
+### 후속 통합·배포
+
+사용자의 「MAIN 병합 배포까지 진행」으로 위 후속 변경의 통합 범위가 승인됐다. PR #851을 main `60bec2ef4f8bdb228653a66a828c3f7b363b8a35`에 병합하고 Pharmacy/MegaPharm의 `pharmacy-business-web`에 배포했다. 최종 CI·리뷰 및 공개 JS 확인 결과는 CHECK의 「PR #851 통합·배포 결과」에 기록한다. 실계정·약관·실장치 개통 조건이 남아 전체 상태는 ACTIVE다.

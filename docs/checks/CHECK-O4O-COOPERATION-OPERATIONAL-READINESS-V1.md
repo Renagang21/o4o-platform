@@ -170,3 +170,20 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 ### PR #851 리뷰 보완
 
 사용자가 main 통합·배포를 승인한 후 최신 main의 펀딩 변경을 충돌 없이 반영했다. Codex가 신청 중 외부 약국 전환 후 원래 약국으로 돌아오면 이전 pending marker 때문에 selector가 잠기는 문제를 지적했다. 회귀를 확장해 수정 전 1개 실패를 재현했고, 선택 약국 변경 시 marker를 정리하도록 보완했다. 이전 요청이 새 화면을 갱신하지 않는 기존 경계는 유지한다. 최종 CI·리뷰·배포 결과는 후속 기록으로 추가한다.
+
+
+## 2026-10-27 PR #851 통합·배포 결과
+
+사용자 「MAIN 병합 배포까지 진행」에 따라 앞 절의 push 종료 경계 이후 통합·배포를 진행했다. [PR #851](https://github.com/Renagang21/o4o-platform/pull/851)의 main merge SHA는 `60bec2ef4f8bdb228653a66a828c3f7b363b8a35`다.
+
+- 최종 PR HEAD `8be89a4af671458a4fd4a54719a10604c5d02d12`: CI Gate·CodeQL·SonarCloud PASS. Codex 재리뷰는 추가 지적 없음, 기존 지적 스레드 해결 확인. 이전 커밋의 CI는 수정 후 대체되어 이 작업에서 취소했으며 최종 HEAD의 성공을 기준으로 판정했다.
+- 리뷰 보완 후 확장된 참여 회귀 11개·Lint·production build PASS. 선택 약국 재방문 시 잠김을 수정 전 실패/수정 후 성공으로 확인했다.
+- [main CI 40473082273](https://github.com/Renagang21/o4o-platform/actions/runs/40473082273): PASS.
+- [Delivery 40474459408](https://github.com/Renagang21/o4o-platform/actions/runs/40474459408): 완료, LEVEL_3 판정.
+- [Promote 40474710232](https://github.com/Renagang21/o4o-platform/actions/runs/40474710232): `services=kpa-society`, PASS. 실제 Cloud Run 서비스는 현행 설정의 `pharmacy-business-web`이다. 새 revision smoke·트래픽 전환·배포 확인·최종 serving SHA report가 성공했다.
+
+이번 코드의 runtime 소비처인 Pharmacy/MegaPharm 호스트만 승격했다. API·migration·Neture/CarePharm·Pharmcoop은 이번 작업에서 배포하지 않았다. 전역 production status의 NOT_SELECTED/pending은 미선택 호스트의 남은 판정이며 이번 대상 배포 실패가 아니다. 전체 서비스 배포 완료로 확대하지 않는다.
+
+배포 후 두 공개 홈과 새 `/assets/index-DEh5rNzw.js`가 모두 200이다. 배포 전 파일은 `/assets/index-CDrFRRNd.js`였으며, 새 공개 bundle에 「가입 상태를 확인할 약국」이 포함된 것도 확인했다. 실행 중인 운영 계정의 신청·탈퇴 쓰기는 수행하지 않았다. 실계정 양방향/실장치 검증의 잔여 조건은 앞 절과 같다.
+
+후속 기록은 문서 전용 변경이며 별도 runtime 배포 대상이 아니다. 운영 개통 전체 상태는 ACTIVE를 유지한다.
