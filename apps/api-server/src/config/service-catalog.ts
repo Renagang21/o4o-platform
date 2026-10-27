@@ -247,6 +247,16 @@ export const O4O_SERVICES: O4OService[] = [
    * Legacy entity/catalog approvals do not grant service membership.
    */
   {
+    key: 'partner-support',
+    name: 'O4O Partner',
+    nameKo: '파트너',
+    domain: 'partner.neture.co.kr',
+    description: '홍보 도구와 파트너 커뮤니티',
+    // Dedicated opt-in community endpoint records its own guidelines/policy evidence.
+    joinEnabled: false,
+    workspace: OPERATOR_ONLY_WORKSPACE,
+  },
+  {
     key: 'community',
     name: 'O4O Community',
     nameKo: '커뮤니티',

@@ -4,7 +4,7 @@ import { PolicyAcceptanceError } from './policy-acceptance.service.js';
 import { readCurrentPolicyDocument, recordPublishedPolicyEvidence, type CurrentPolicyDocument, type PolicyEvidence, type PolicyReference } from './policy-document-evidence.service.js';
 
 export interface EnrollmentPolicyReference extends PolicyReference { documentType: 'terms' | 'privacy' }
-export const ENROLLMENT_POLICY_SERVICES: ReadonlySet<string> = new Set(['supplier', 'kpa-society', 'community', 'funding', 'lecture']);
+export const ENROLLMENT_POLICY_SERVICES: ReadonlySet<string> = new Set(['supplier', 'kpa-society', 'community', 'funding', 'lecture', 'partner-support']);
 
 export function isEnrollmentPolicySlug(serviceKey: string, documentType: string, slug: unknown): boolean {
   return (ENROLLMENT_POLICY_SERVICES.has(serviceKey) || isBusinessPolicyScope(serviceKey)) && ['terms', 'privacy'].includes(documentType) && slug === `${serviceKey}-service-${documentType}`;

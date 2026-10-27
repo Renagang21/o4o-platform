@@ -21,6 +21,7 @@ export const SERVICE_KEYS = [
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1:
   //   커뮤니티 서비스. role prefix = canonical service_key = 'community' (security-core self-map).
   // 서비스 Admin/Operator와 개별 커뮤니티 membership 운영자는 별도 권한이다.
+  'partner-support',
   'community',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
   'supplier',
@@ -41,6 +42,7 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
   'kpa-branch': { key: 'kpa-branch', label: '분회', badgeClass: 'text-sky-700 bg-sky-50' },
+  'partner-support': { key: 'partner-support', label: '파트너', badgeClass: 'text-emerald-700 bg-emerald-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
   supplier: { key: 'supplier', label: '공급자', badgeClass: 'text-amber-700 bg-amber-50' },
   funding: { key: 'funding', label: '유통참여형 펀딩', badgeClass: 'text-lime-700 bg-lime-50' },

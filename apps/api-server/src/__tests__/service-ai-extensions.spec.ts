@@ -8,7 +8,8 @@ import { createOperatorInsightExtension } from '../services/ai-extensions/operat
 const profiles = listServiceAiProfiles();
 it('covers every current canonical service without maintaining a second service identity list', () => {
   expect(profiles.map(p => p.serviceId)).toEqual(O4O_SERVICES.filter(s => !isRetiredRoleValue(s.key)).map(s => s.key));
-  expect(profiles).toHaveLength(8);
+  expect(profiles).toHaveLength(9);
+  expect(resolveServiceAiProfile('partner-support')?.constraints.join(' ')).toContain('협의·계약·보상 판정에 관여하지 않는다');
   expect(resolveServiceAiProfile('kpa')?.serviceId).toBe('kpa-society');
 });
 it.each(['cosmetics', 'k-cosmetics', 'pharmacy-hub', 'siteguide', 'unknown', '', null, {}])('does not revive retired/unrecognized service %p', service => {

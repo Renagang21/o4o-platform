@@ -41,6 +41,10 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       description: '분회 개설 승인 · 가입 승인 · 개별 분회 운영자 지정 (분회 서비스 화면에서)',
     },
   ],
+  'partner-support': [
+    { value: 'partner-support:admin', label: 'Admin', description: 'Partner 서비스 관리자' },
+    { value: 'partner-support:operator', label: 'Operator', description: 'Partner 회원·게시판·콘텐츠 운영' },
+  ],
   community: [
     {
       value: 'community:admin',
