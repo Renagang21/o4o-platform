@@ -40,7 +40,7 @@ export type CommunityPolicy = {
   content: string;
   version: number;
 };
-export type Membership = { status: string | null; operator: boolean };
+export type Membership = { status: string | null; operator: boolean; admin?: boolean };
 export type CommunityReport = {
   id: string;
   post_id: string;

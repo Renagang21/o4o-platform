@@ -14,6 +14,7 @@ import {
 /** Explicit delegation scopes. No client-supplied role, prefix, or membership key. */
 export const OPERATOR_DELEGATION_SCOPES = {
   neture: "neture",
+  "partner-support": "partner-support",
   supplier: "supplier",
   funding: "funding",
   community: "community",
@@ -135,6 +136,7 @@ export class ServiceOperatorManagementService {
         FROM users u LEFT JOIN service_memberships sm ON sm.user_id=u.id AND sm.service_key=$1
         WHERE u.status IN ('active','approved') AND u."isActive"=true AND u."isEmailVerified"=true
         AND (sm.status='active' OR ($3 AND (sm.status IS NULL OR sm.status NOT IN ('suspended','withdrawn'))))
+        AND NOT EXISTS (SELECT 1 FROM demo_accounts da WHERE da.user_id=u.id AND da.is_active)
         AND (u.name ILIKE $2 OR u.email ILIKE $2) ORDER BY u.email,u.id LIMIT 30`,
               [scope.membershipKey, pattern, scope.membershipKey === "neture"],
             );

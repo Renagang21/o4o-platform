@@ -59,7 +59,7 @@ integration(
       service.create({
         targetUserId: target,
         serviceKey: 'lecture',
-        role: 'lecture:operator',
+        role: 'lecture:admin',
         actorId: admin,
       });
     beforeAll(async () => {
@@ -195,13 +195,13 @@ integration(
         ]),
       ).toHaveLength(0);
       await expect(service.inspect(token(), target)).resolves.toMatchObject({
-        role: 'lecture:operator',
+        role: 'lecture:admin',
       });
       const result = await service.accept(token(), target);
       expect(result).toMatchObject({ membershipPolicy: 'CREATED' });
       expect(
         await query(
-          "SELECT * FROM role_assignments WHERE user_id=$1 AND role='lecture:operator'",
+          "SELECT * FROM role_assignments WHERE user_id=$1 AND role='lecture:admin'",
           [target],
         ),
       ).toHaveLength(1);
@@ -218,7 +218,7 @@ integration(
       const invite = await service.create({
         email: 'new@fixture.invalid',
         serviceKey: 'lecture',
-        role: 'lecture:operator',
+        role: 'lecture:admin',
         actorId: admin,
       });
       expect(invite.target_user_id).toBeNull();
@@ -236,7 +236,7 @@ integration(
         service.create({
           email: 'operator@fixture.invalid',
           serviceKey: 'lecture',
-          role: 'lecture:operator',
+          role: 'lecture:admin',
           actorId: admin,
         }),
       ).rejects.toMatchObject({ code: 'USER_SELECTION_REQUIRED' });
@@ -251,7 +251,7 @@ integration(
       expect((await service.list(admin))[0].status).toBe('pending');
     });
     it('does not require existing operators to reconfirm or change their membership', async () => {
-      await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'lecture:operator',true)",[target]);
+      await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'lecture:admin',true)",[target]);
       await expect(create()).rejects.toMatchObject({code:'OPERATOR_ALREADY_ACTIVE'});
       expect(assignRole).not.toHaveBeenCalled();
       expect(await query('SELECT * FROM service_memberships WHERE user_id=$1',[target])).toHaveLength(0);
@@ -294,7 +294,7 @@ integration(
       expect(await service.list(admin)).toEqual([expect.objectContaining({ status: 'pending' })]);
       expect(assignRole).not.toHaveBeenCalled();
     });
-    it('resending rotates the hash and expiry, invalidating the previous link', async () => {
+    it('resending rotates the hash and invalidates the previous link', async () => {
       const invite = await create();
       const old = token();
       now = new Date(now.getTime() + 61_000);
@@ -303,7 +303,7 @@ integration(
         code: 'INVALID_OR_EXPIRED_INVITATION',
       });
       await expect(service.accept(token(), target)).resolves.toMatchObject({
-        role: 'lecture:operator',
+        role: 'lecture:admin',
       });
     });
     it('failed resend keeps durable state and permits an explicit later retry', async () => {
@@ -319,7 +319,7 @@ integration(
       sendOK = true;
       now = new Date(now.getTime() + 61_000);
       await service.manage(invite.id, admin, 'resend');
-      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:operator' });
+      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:admin' });
     });
     it('an authorized new admin can re-endorse an invitation after the original inviter loses authority', async () => {
       const invite = await create();
@@ -334,7 +334,7 @@ integration(
       now = new Date(now.getTime() + 61_000);
       await service.manage(invite.id, other, 'resend');
       await expect(service.accept(token(), target)).resolves.toMatchObject({
-        role: 'lecture:operator',
+        role: 'lecture:admin',
       });
     });
     it('expires pending links and rejects cancelled links', async () => {
@@ -349,14 +349,41 @@ integration(
         code: 'INVALID_OR_EXPIRED_INVITATION',
       });
     });
-    it('blocks duplicate pending mail and early resend', async () => {
+    it('blocks early resend even through repeated creation', async () => {
       const invite = await create();
       await expect(create()).rejects.toMatchObject({
-        code: 'INVITATION_ALREADY_PENDING',
+        code: 'INVITATION_RESEND_TOO_SOON',
       });
       await expect(
         service.manage(invite.id, admin, 'resend'),
       ).rejects.toMatchObject({ code: 'INVITATION_RESEND_TOO_SOON' });
+    });
+    it('keeps legacy central Operator invitations cancellable but refuses new acceptance or resend', async () => {
+      const oldToken = 'b'.repeat(64);
+      const [legacy] = await query(`INSERT INTO service_operator_invitations(invited_email,service_key,role,purpose,target_user_id,invited_by_user_id,token_hash,expires_at,created_at,updated_at)
+        SELECT email,'lecture','lecture:operator','assignment',id,$2,$3,$4,$5,$5 FROM users WHERE id=$1 RETURNING id`,
+        [target,admin,createHash('sha256').update(oldToken).digest('hex'),new Date(now.getTime()+86400000),new Date(now.getTime()-61000)]);
+      await expect(service.accept(oldToken,target)).rejects.toMatchObject({code:'ROLE_NOT_ASSIGNABLE'});
+      await expect(service.manage(legacy.id,admin,'resend')).rejects.toMatchObject({code:'ROLE_NOT_ASSIGNABLE'});
+      await expect(service.manage(legacy.id,admin,'cancel')).resolves.toMatchObject({status:'cancelled'});
+      expect(assignRole).not.toHaveBeenCalled();
+    });
+    it('resends from repeated creation without acceptance and preserves ID/deadline', async () => {
+      const original = await create(), old = token();
+      now = new Date(now.getTime() + 61_000);
+      const resent = await create();
+      expect(resent.id).toBe(original.id);
+      expect(new Date(resent.expires_at)).toEqual(new Date(original.expires_at));
+      expect(mails).toHaveLength(2);
+      await expect(service.accept(old, target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
+      await expect(service.accept(token(), target)).resolves.toMatchObject({role:'lecture:admin'});
+    });
+    it('retries failed first mail from the original creation screen', async () => {
+      sendOK = false;
+      await expect(create()).rejects.toMatchObject({code:'INVITATION_MAIL_FAILED'});
+      now = new Date(now.getTime() + 61_000); sendOK = true;
+      await expect(create()).resolves.toMatchObject({status:'pending'});
+      expect(await query('SELECT id FROM service_operator_invitations')).toHaveLength(1);
     });
     it('replaces an expired pending invitation without needing its list position', async () => {
       const old = await create();
@@ -367,7 +394,7 @@ integration(
       expect((await query('SELECT status FROM service_operator_invitations WHERE id=$1', [old.id]))[0].status).toBe('expired');
       await expect(service.accept(oldToken, target)).rejects.toMatchObject({ code: 'INVALID_OR_EXPIRED_INVITATION' });
       expect(assignRole).not.toHaveBeenCalled();
-      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:operator' });
+      await expect(service.accept(token(), target)).resolves.toMatchObject({ role: 'lecture:admin' });
     });
     it('rechecks inviter authority and target active status when accepting', async () => {
       await create();
@@ -409,7 +436,7 @@ integration(
       await service.create({
         targetUserId: other,
         serviceKey: 'lecture',
-        role: 'lecture:operator',
+        role: 'lecture:admin',
         actorId: admin,
       });
       const erasure = new AccountErasureService(db, {
@@ -442,7 +469,7 @@ integration(
       await service.create({
         email: 'new@fixture.invalid',
         serviceKey: 'lecture',
-        role: 'lecture:operator',
+        role: 'lecture:admin',
         actorId: admin,
       });
       const id = await user('new@fixture.invalid');
@@ -475,7 +502,7 @@ integration(
       const invitation = await service.create({
         targetUserId: other,
         serviceKey: 'lecture',
-        role: 'lecture:operator',
+        role: 'lecture:admin',
         actorId: target,
       });
       await query(
@@ -515,7 +542,7 @@ integration(
       await expect(service.accept(token(),other)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
       expect(
         await query(
-          "SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:operator' AND is_active=true",
+          "SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:admin' AND is_active=true",
           [other],
         ),
       ).toHaveLength(0);
@@ -533,7 +560,7 @@ integration(
         service.create({
           targetUserId: target,
           serviceKey: 'neture',
-          role: 'lecture:operator',
+          role: 'lecture:admin',
           actorId: admin,
         }),
       ).rejects.toMatchObject({ code: 'SERVICE_KEY_MISMATCH' });
@@ -565,7 +592,7 @@ integration(
       expect(outcomes.filter(r=>r.status==='fulfilled')).toHaveLength(1);
       const [row]=await query('SELECT status,invited_email,token_hash FROM service_operator_invitations WHERE id=$1',[i.id]);
       expect(row.invited_email).toBeNull();expect(row.token_hash).toBeNull();
-      expect(await query("SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:operator' AND is_active=true",[target]))
+      expect(await query("SELECT id FROM role_assignments WHERE user_id=$1 AND role='lecture:admin' AND is_active=true",[target]))
         .toHaveLength(row.status==='accepted'?1:0);
     });
     it('rechecks a service-admin inviter at acceptance instead of trusting creation-time authority',async()=>{
@@ -585,7 +612,7 @@ integration(
     it('erases the expired requested secret even behind a cleanup backlog',async()=>{
       const i=await create(),t=token();now=new Date(new Date(i.expires_at).getTime()+1);
       await query(`INSERT INTO service_operator_invitations(invited_email,service_key,role,purpose,status,token_hash,expires_at,created_at)
-        SELECT 'backlog-'||n||'@fixture.invalid','lecture','lecture:operator','assignment','pending',lpad(n::text,64,'0'),$1::timestamptz-interval '1 day',$1::timestamptz-interval '8 days' FROM generate_series(1,501) n`,[now]);
+        SELECT 'backlog-'||n||'@fixture.invalid','lecture','lecture:admin','assignment','pending',lpad(n::text,64,'0'),$1::timestamptz-interval '1 day',$1::timestamptz-interval '8 days' FROM generate_series(1,501) n`,[now]);
       await expect(service.accept(t,target)).rejects.toMatchObject({code:'INVALID_OR_EXPIRED_INVITATION'});
       expect((await query('SELECT invited_email,token_hash,status FROM service_operator_invitations WHERE id=$1',[i.id]))[0]).toEqual({invited_email:null,token_hash:null,status:'expired'});
     });
@@ -608,37 +635,37 @@ integration(
     });
     it('allows a verified email-only account to inspect and explicitly accept a service operator invitation',async()=>{
       await query('DELETE FROM linked_accounts WHERE "userId"=$1',[target]);
-      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:admin'});
       expect(assignRole).not.toHaveBeenCalled();await service.inspect(token(),target);await service.accept(token(),target);
       expect(assignRole).toHaveBeenCalledTimes(1);
     });
     it('lets an invited unregistered recipient sign up with email only and then consent',async()=>{
-      await service.create({actorId:admin,email:'new-email-only@fixture.invalid',serviceKey:'lecture',role:'lecture:operator'});
+      await service.create({actorId:admin,email:'new-email-only@fixture.invalid',serviceKey:'lecture',role:'lecture:admin'});
       const recipient=await user('new-email-only@fixture.invalid');await query('DELETE FROM linked_accounts WHERE "userId"=$1',[recipient]);
       await service.inspect(token(),recipient);expect(assignRole).not.toHaveBeenCalled();await service.accept(token(),recipient);
       expect(assignRole).toHaveBeenCalledTimes(1);
     });
     it('still refuses an unverified email-only recipient before granting any privilege',async()=>{
-      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:admin'});
       await query('DELETE FROM linked_accounts WHERE "userId"=$1',[target]);await query('UPDATE users SET "isEmailVerified"=false WHERE id=$1',[target]);
       await expect(service.accept(token(),target)).rejects.toMatchObject({code:'ACCOUNT_INACTIVE'});expect(assignRole).not.toHaveBeenCalled();
     });
     it('does not overwrite a role granted by another admin while the invitation was pending',async()=>{
-      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:admin'});
       const until=new Date('2099-01-01T00:00:00Z');
-      await query("INSERT INTO role_assignments(user_id,role,is_active,assigned_by,valid_until) VALUES($1,'lecture:operator',true,$2,$3)",[target,admin,until]);
+      await query("INSERT INTO role_assignments(user_id,role,is_active,assigned_by,valid_until) VALUES($1,'lecture:admin',true,$2,$3)",[target,admin,until]);
       await expect(service.accept(token(),target)).rejects.toMatchObject({code:'OPERATOR_ALREADY_ACTIVE'});
       expect(assignRole).not.toHaveBeenCalled();
-      const [row]=await query("SELECT assigned_by,valid_until FROM role_assignments WHERE user_id=$1 AND role='lecture:operator'",[target]);
+      const [row]=await query("SELECT assigned_by,valid_until FROM role_assignments WHERE user_id=$1 AND role='lecture:admin'",[target]);
       expect(row.assigned_by).toBe(admin);expect(new Date(row.valid_until).getTime()).toBe(until.getTime());
     });
     it.each([true,false])('requires schedule review rather than silently changing an active=%s scheduled role',async(active)=>{
-      await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'lecture:operator',$2,'2099-01-01')",[target,active]);
-      await expect(service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'})).rejects.toMatchObject({code:'OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED'});
+      await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'lecture:admin',$2,'2099-01-01')",[target,active]);
+      await expect(service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:admin'})).rejects.toMatchObject({code:'OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED'});
       expect(mails).toHaveLength(0);expect(assignRole).not.toHaveBeenCalled();
     });
     it('rollback refuses stored consent evidence and leaves the table intact',async()=>{
-      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:operator'});
+      await service.create({actorId:admin,targetUserId:target,serviceKey:'lecture',role:'lecture:admin'});
       const q=db.createQueryRunner();await q.startTransaction();
       try { await expect(new CreateServiceOperatorInvitations1792886400000().down(q)).rejects.toThrow('empty table'); }
       finally { await q.rollbackTransaction();await q.release(); }

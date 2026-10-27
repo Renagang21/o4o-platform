@@ -233,7 +233,7 @@ export default function PartnerSite() {
             {!ready ? (
               <p>운영 권한 확인 중…</p>
             ) : membership.operator ? (
-              <CommunityOperator user={user!} busy={busy} run={run} />
+              <CommunityOperator key={user!.id} user={user!} busy={busy} run={run} admin={membership.admin === true} />
             ) : (
               <section className="panel">
                 <h1>Partner 운영 관리</h1>

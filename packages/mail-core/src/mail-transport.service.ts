@@ -213,7 +213,15 @@ export class MailTransportService {
     const info = await Promise.race([sendPromise, timeoutPromise]);
 
     // Log in development mode
-    if (ephemeral) { return info; }
+    if (ephemeral) {
+      // SMTP acceptance is required: a messageId alone (including JSON transport) is not delivery evidence.
+      const accepted = (info as { accepted?: unknown }).accepted;
+      const rejected = (info as { rejected?: unknown }).rejected;
+      if (!Array.isArray(accepted) || !accepted.length || (Array.isArray(rejected) && rejected.length)) {
+        throw new Error('Ephemeral email was not accepted by SMTP');
+      }
+      return info;
+    }
     if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
       this.logger.info('Development email sent:', {
         to: mailOptions.to,

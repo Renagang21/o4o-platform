@@ -1,3 +1,4 @@
+import { resolveServiceAdminRole } from "../../config/operator-role-catalog.js";
 import { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
 import {
   retainOperatorInvitations,
@@ -19,6 +20,7 @@ import { AppDataSource } from "../../database/connection.js";
 import type { User } from "../../modules/auth/entities/User.js";
 import { getServiceOrigin } from "../../config/service-catalog.js";
 import { demoAccountService } from "../auth/demo-account.service.js";
+import logger from "../../utils/logger.js";
 import { invalidateRoles } from "../../modules/auth/utils/role-cache.js";
 
 export { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
@@ -65,8 +67,10 @@ async function defaultMailer(
     to,
     ephemeral: true,
     subject: `[O4O] ${action}`,
-    text: `${role} ${action} 요청입니다. 로그인 또는 가입 후 본인 계정과 서비스 역할을 확인하고 수락하세요.\n${url}\n7일 내 사용 가능하며 요청하지 않은 초대는 수락하지 마세요. 수락·취소·만료 시 초대용 이메일·토큰을 파기하고 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.`,
+    text: `${role} ${action} 요청입니다. 로그인 또는 가입 후 본인 계정과 서비스 역할을 확인하고 수락하세요.\n${url}\n최초 초대 발급 후 7일에 만료되며 재발송해도 만료는 연장되지 않습니다. 요청하지 않은 초대는 수락하지 마세요. 수락·취소·만료 시 초대용 이메일·토큰을 파기하고 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.`,
   });
+  if (result.success) logger.info("[OperatorInvitation] SMTP accepted invitation mail");
+  else logger.warn("[OperatorInvitation] Invitation mail delivery not confirmed");
   return result.success;
 }
 
@@ -187,6 +191,7 @@ export class ServiceOperatorInvitationService {
   }
   async create(input: InviteInput): Promise<OperatorInvite> {
     // Validate the catalog before touching a transaction.
+    if (!input.scopeType || input.scopeType === "platform") resolveServiceAdminRole(input.role, input.serviceKey);
     invitationScope(
       input.scopeType,
       input.scopeKey,
@@ -202,6 +207,7 @@ export class ServiceOperatorInvitationService {
     m: EntityManager,
     input: InviteInput,
   ): Promise<PreparedInvitation> {
+    if (!input.scopeType || input.scopeType === "platform") resolveServiceAdminRole(input.role, input.serviceKey);
     const scope = invitationScope(
       input.scopeType,
       input.scopeKey,
@@ -245,11 +251,16 @@ export class ServiceOperatorInvitationService {
       ],
     );
     const pending = await m.query(
-      `SELECT id FROM service_operator_invitations WHERE lower(invited_email)=$1
+      `SELECT ${COLUMNS} FROM service_operator_invitations WHERE lower(invited_email)=$1
       AND service_key=$2 AND role=$3 AND scope_type=$4 AND scope_key=$5 AND status='pending' FOR UPDATE`,
       [email, scope.service_key, scope.role, scope.scope_type, scope.scope_key],
     );
-    if (pending.length) fail("INVITATION_ALREADY_PENDING");
+    if (pending.length) {
+      const prior = pending[0] as OperatorInvite;
+      // Same permission and same selected account only. Never rebind another pending invitation.
+      if ((prior.target_user_id ?? null) !== (user?.id ?? null)) fail("INVITATION_ACCOUNT_MISMATCH", 403);
+      return this.rotate(m, prior, input.actorId);
+    }
     const token = randomBytes(32).toString("hex"),
       now = this.now(),
       expires = new Date(now.getTime() + 7 * 86400_000);
@@ -347,24 +358,22 @@ export class ServiceOperatorInvitationService {
         )
           fail("INVITATION_ACCOUNT_MISMATCH", 403);
       }
-      if (this.now().getTime() - new Date(row.updated_at).getTime() < 60_000)
-        fail("INVITATION_RESEND_TOO_SOON", 429);
-      // Resending changes the secret, not the original seven-day personal-data deadline.
-      const token = randomBytes(32).toString("hex");
-      const [invite] = invitationReturningRows<OperatorInvite>(
-        await m.query(
-          `UPDATE service_operator_invitations SET token_hash=$2,invited_by_user_id=$3,updated_at=$4 WHERE id=$1 RETURNING ${COLUMNS}`,
-          [id, hash(token), actor, this.now()],
-        ),
-      );
-      return {
-        invite,
-        url: `${getServiceOrigin("neture")}/operator-invite#token=${token}`,
-      };
+      if (row.scope_type === "platform") resolveServiceAdminRole(row.role, row.service_key);
+      return this.rotate(m, row, actor);
     });
     return result.url
       ? this.deliver(result as PreparedInvitation)
       : result.invite;
+  }
+  private async rotate(m: EntityManager, row: OperatorInvite, actor: string): Promise<PreparedInvitation> {
+    if (this.now().getTime() - new Date(row.updated_at).getTime() < 60_000)
+      fail("INVITATION_RESEND_TOO_SOON", 429);
+    const token = randomBytes(32).toString("hex");
+    const [invite] = invitationReturningRows<OperatorInvite>(await m.query(
+      `UPDATE service_operator_invitations SET token_hash=$2,invited_by_user_id=$3,updated_at=$4 WHERE id=$1 RETURNING ${COLUMNS}`,
+      [row.id, hash(token), actor, this.now()],
+    ));
+    return { invite, url: `${getServiceOrigin("neture")}/operator-invite#token=${token}` };
   }
   private async prove(
     m: EntityManager,
@@ -474,6 +483,7 @@ export class ServiceOperatorInvitationService {
       );
       if (!i || i.status !== "pending" || new Date(i.expires_at) <= this.now())
         fail("INVALID_OR_EXPIRED_INVITATION", 400);
+      if (i.scope_type === "platform") resolveServiceAdminRole(i.role, i.service_key);
       const user = await this.prove(m, i, userId),
         scope = this.scope(i);
       await this.requireUnassignedRole(m, scope, user.id);

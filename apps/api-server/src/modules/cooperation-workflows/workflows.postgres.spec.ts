@@ -622,6 +622,27 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
       [coopSf],
     );
   });
+  it.each([["staff", 403], ["manager", 200]])(
+    "keeps pharmacy workflow authorization tied to the current organization role: %s",
+    async (role, status) => {
+      await mockDb.query("UPDATE organization_members SET role=$1 WHERE user_id=$2 AND organization_id=$3", [role, member, store]);
+      try {
+        expect((await get(base + "/member", member, store)).status).toBe(status);
+        if (role === "staff") expect((await post(base + "/support", member, { subject: "합성 문의", message: "회원 업무 범위를 확인하는 합성 문의입니다.", privacyConsent: true, requestId: randomUUID() }, store)).status).toBe(403);
+      } finally {
+        await mockDb.query("UPDATE organization_members SET role='owner' WHERE user_id=$1 AND organization_id=$2", [member, store]);
+      }
+    },
+  );
+  it.each(["pharmacy", "person"])("does not keep %s workflow access after the account's service membership is withdrawn", async kind => {
+    const user = kind === "pharmacy" ? member : person;
+    await mockDb.query("UPDATE service_memberships SET status='withdrawn' WHERE user_id=$1 AND service_key='neture'", [user]);
+    try {
+      expect((await get((kind === "pharmacy" ? base : coopBase) + "/member", user, kind === "pharmacy" ? store : undefined)).status).toBe(403);
+    } finally {
+      await mockDb.query("UPDATE service_memberships SET status='active' WHERE user_id=$1 AND service_key='neture'", [user]);
+    }
+  });
   it("paginates target units and application/confirmation details without silently dropping members", async () => {
     const draft = await works.save(business, op, undefined, input);
     const notice = await works.save(business, op, draft.id, {

@@ -1,3 +1,4 @@
+import PartnerOperatorManagement from "./PartnerOperatorManagement";
 import { useEffect, useState } from "react";
 import {
   communityApi,
@@ -29,10 +30,12 @@ const eventLabels: Record<string, string> = {
 const blank = { name: "", description: "", operatorOnly: false, active: true };
 export default function CommunityOperator({
   user,
+  admin = false,
   busy,
   run,
 }: {
   user: PartnerUser;
+  admin?: boolean;
   busy: boolean;
   run: Run;
 }) {
@@ -90,6 +93,7 @@ export default function CommunityOperator({
           영역입니다.
         </p>
       </div>
+      {admin && <PartnerOperatorManagement userId={user.id} />}
       <nav className="community-tabs" aria-label="운영 메뉴">
         {[
           ["reports", "신고 처리"],
@@ -117,7 +121,7 @@ export default function CommunityOperator({
       </nav>
       <p className="hint">
         최근 100건을 표시합니다. 운영 조치는 현재 권한을 확인하고 사유와 함께
-        기록합니다. 운영자 지정·회수는 중앙 관리자 초대·수락 체계를 이용합니다.
+        기록합니다. Admin은 이 서비스에서 Operator를 초대·회수합니다. Admin 지정은 전체관리자가 담당합니다.
       </p>
       {loadError && (
         <p role="alert" className="message failure">
