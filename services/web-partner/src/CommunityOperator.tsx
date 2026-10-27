@@ -47,11 +47,29 @@ export default function CommunityOperator({
       work: (reason: string) => Promise<unknown>;
     } | null>(null),
     [reason, setReason] = useState("");
+  const [loadError, setLoadError] = useState("");
   const reload = async () => {
     setData(await communityApi.overview());
+    setLoadError("");
   };
   useEffect(() => {
-    void run(reload);
+    let active = true;
+    void communityApi.overview().then(
+      (value) => {
+        if (active) setData(value);
+      },
+      (error) => {
+        if (active)
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "운영 자료를 불러오지 못했습니다.",
+          );
+      },
+    );
+    return () => {
+      active = false;
+    };
   }, []);
   const ask = (label: string, work: (reason: string) => Promise<unknown>) => {
     setAction({ label, work });
@@ -101,7 +119,14 @@ export default function CommunityOperator({
         최근 100건을 표시합니다. 운영 조치는 현재 권한을 확인하고 사유와 함께
         기록합니다. 운영자 지정·회수는 중앙 관리자 초대·수락 체계를 이용합니다.
       </p>
-      {!data && <p role="status">운영 자료를 불러오고 있습니다…</p>}
+      {loadError && (
+        <p role="alert" className="message failure">
+          {loadError}
+        </p>
+      )}
+      {!data && !loadError && (
+        <p role="status">운영 자료를 불러오고 있습니다…</p>
+      )}
       {action && (
         <form
           className="panel community-operation"

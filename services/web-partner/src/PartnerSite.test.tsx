@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import PartnerSite from "./PartnerSite";
+import CommunityOperator from "./CommunityOperator";
 import { communityApi } from "./community-api";
 import { ApiError, partnerApi } from "./api";
 vi.mock("./community-api", () => ({
@@ -70,6 +71,46 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe("Partner public entry, login, opt-in and community", () => {
+  it("loads operator data even while a separate global mutation is busy", async () => {
+    vi.mocked(communityApi.overview).mockResolvedValue({
+      boards: [],
+      members: [],
+      posts: [],
+      reports: [],
+      events: [],
+    });
+    const mutationGate = vi.fn();
+    render(<CommunityOperator user={user} busy={true} run={mutationGate} />);
+    await screen.findByRole("heading", { name: "신고 목록" });
+    expect(communityApi.overview).toHaveBeenCalledTimes(1);
+    expect(mutationGate).not.toHaveBeenCalled();
+  });
+  it("shows an operator load error and supports a manual retry instead of indefinite loading", async () => {
+    vi.mocked(communityApi.overview)
+      .mockRejectedValueOnce(new Error("조회 일시 실패"))
+      .mockResolvedValue({
+        boards: [],
+        members: [],
+        posts: [],
+        reports: [],
+        events: [],
+      });
+    render(
+      <CommunityOperator
+        user={user}
+        busy={false}
+        run={async (work) => {
+          await work();
+        }}
+      />,
+    );
+    await screen.findByRole("alert");
+    expect(screen.queryByText("운영 자료를 불러오고 있습니다…")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "새로고침" }));
+    await screen.findByRole("heading", { name: "신고 목록" });
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   it("shows a public community introduction without implicitly enrolling a visitor", async () => {
     mount();
     await screen.findByText("로그인하고 참여하기");

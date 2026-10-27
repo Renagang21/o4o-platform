@@ -21,11 +21,12 @@ import CommunityOperator from "./CommunityOperator";
 export type Run = (work: () => Promise<void>) => Promise<void>;
 export type PartnerUser = { id: string; name?: string; displayName?: string };
 const resyncWorkspaceSession = (token?: string) => {
-  window.location.replace(
+  const target =
     token && /^[a-f0-9]{64}$/.test(token)
       ? `/workspace#join=${token}`
-      : "/workspace",
-  );
+      : "/workspace";
+  window.history.replaceState(null, "", target);
+  window.location.reload();
 };
 const date = (s: string) => new Date(s).toLocaleString("ko-KR");
 export default function PartnerSite() {

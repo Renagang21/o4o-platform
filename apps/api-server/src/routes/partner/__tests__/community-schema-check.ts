@@ -51,12 +51,12 @@ async function main() {
       }
       await q.commitTransaction();
     }
-    console.log(
+    process.stdout.write(
       JSON.stringify({
         prefixesVerified: INCREMENTAL_MIGRATIONS.length,
         fingerprint: final.hash,
         lineCount: final.lineCount,
-      }),
+      }) + "\n",
     );
     const previous = EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length - 1];
     await q.startTransaction();
@@ -103,7 +103,7 @@ async function main() {
     ] as [string, unknown[]][]) {
       await assert.rejects(q.query(sql, params), /ACCOUNT_ERASURE_PENDING/);
     }
-    console.log("PARTNER_COMMUNITY_DOWN_UP_AND_ERASURE_FENCES_PASS");
+    process.stdout.write("PARTNER_COMMUNITY_DOWN_UP_AND_ERASURE_FENCES_PASS\n");
   } finally {
     if (q.isTransactionActive) await q.rollbackTransaction();
     await q.release();

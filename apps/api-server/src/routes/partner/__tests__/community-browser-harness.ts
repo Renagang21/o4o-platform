@@ -75,7 +75,7 @@ async function main() {
   });
   app.use("/api/v1/partner-support", createPartnerSupportRoutes(db, identity));
   const server = app.listen(3002, "127.0.0.1", () =>
-    console.log("PARTNER_COMMUNITY_BROWSER_HARNESS_READY"),
+    process.stdout.write("PARTNER_COMMUNITY_BROWSER_HARNESS_READY\n"),
   );
   const stop = () =>
     server.close(() => {

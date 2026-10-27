@@ -67,3 +67,9 @@ Partner의 기존 초대형 자료·활동·정산 공동공간과 회원 커뮤
 - 통합 점검에서 작업공간 내부 로그인/로그아웃 후 상위 커뮤니티 header의 세션이 남는 문제를 수정했다. 성공한 계정 변경 후 사이트 세션을 재확인하고 로그인 중 보관한 초대 fragment는 유지한다. 초기 인증 확인 중에는 상위 로그아웃을 막는다. 신규 회귀 테스트 2개를 추가했다.
 
 - PR #841 Codex P2 신고 처리 finding을 반영했다. PostgreSQL UPDATE의 TypeORM tuple 길이를 행 수로 오인하지 않도록 UPDATE RETURNING을 CTE SELECT로 반환하고, open 상태·revision이 실제로 일치한 경우에만 처리 이력을 기록한다. 동시/과거 revision/존재하지 않는 신고에 대한 회귀 테스트를 추가했다.
+
+- 두 번째 Codex P2 초기 조회 finding을 반영해 운영 화면의 첫 읽기를 전역 mutation gate와 분리했다. 조회 오류는 표시하고 재조회할 수 있으며, busy 중 진입/실패 후 재시도 테스트를 추가했다. 초대 fragment가 바뀌는 로그인은 same-document 이동만으로 끝나지 않도록 주소 갱신 후 명시적으로 reload한다.
+
+- 전체 CI에서 CLI helper의 console.log 금지 검사와 서비스 AI 카탈로그의 기존 8개 고정 기대값 실패를 확인했다. helper는 기존 CLI처럼 stdout으로 출력하며, 새 canonical service를 포함한 기대값과 Partner 업무 경계를 공통 서비스 profile 소비처에 추가했다. CI 예외·gate 완화는 하지 않는다. 실제 외부 AI 호출이나 provider 설정 변경은 없다.
+
+- 통합 수정본 검증: 프런트 84 tests/build, PostgreSQL API 31 tests, 공통 서비스 AI profile 55 tests PASS. 실제 Chromium 390px에서 작업공간 로그아웃 후 상위 운영 메뉴 제거, 초대 fragment를 보존한 재로그인 후 운영 메뉴 복귀를 확인했다. 인증은 loopback fixture adapter이며 실계정 검증과 구분한다.
