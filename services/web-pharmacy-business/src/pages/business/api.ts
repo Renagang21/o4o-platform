@@ -38,8 +38,10 @@ export const businessApi = {
     const response = await authClient.api.get(path, { params, ...(organizationId ? { headers: { 'X-Store-Organization-Id': organizationId } } : {}) });
     return response.data.data as T;
   },
-  async post<T>(path: string, body: unknown): Promise<T> {
-    const response = await authClient.api.post(path, body);
+  async post<T>(path: string, body: unknown, organizationId?: string): Promise<T> {
+    const response = organizationId
+      ? await authClient.api.post(path, body, { headers: { 'X-Store-Organization-Id': organizationId } })
+      : await authClient.api.post(path, body);
     return response.data.data as T;
   },
 };

@@ -76,3 +76,21 @@ it("keeps fulfillment obligations after fulfilled → closed but not for failed 
   expect(sql).toContain(`'[{"from":"fulfilled","to":"closed"}]'::jsonb`);
   expect(sql).not.toMatch(/IN \([^)]*'closed'/);
 });
+
+it('pages all participant operation families without projecting private payment metadata', async () => {
+  const rows = Array.from({ length: 51 }, (_, n) => ({ id: String(n), action: 'funding.offline_operation' }));
+  const ds: any = { query: jest.fn().mockResolvedValueOnce([{ id: 'p' }]).mockResolvedValueOnce(rows) };
+  const result = await new FundingOperatorExceptionsService(ds).history('trial', 'p', '2');
+  expect(result).toMatchObject({ page: 2, hasMore: true });
+  expect(result.items).toHaveLength(50);
+  const [sql, params] = ds.query.mock.calls[1];
+  expect(params).toEqual(['trial', 'p', 50]);
+  expect(sql).toContain("service_key = 'funding' AND action_key = 'funding.offline_operation'");
+  expect(sql).not.toContain('paymentReference'); expect(sql).not.toContain('paymentNote');
+  expect(sql).not.toMatch(/SELECT\s+\*/);
+});
+it.each([0, -1, 1.5, 'bad', 10001])('rejects history page %p before reading data', async page => {
+  const ds: any = { query: jest.fn() };
+  await expect(new FundingOperatorExceptionsService(ds).history('trial', 'p', page)).rejects.toMatchObject({ status: 400 });
+  expect(ds.query).not.toHaveBeenCalled();
+});

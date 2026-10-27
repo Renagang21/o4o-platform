@@ -1,0 +1,189 @@
+import { useEffect, useRef, useState } from 'react';
+import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../../lib/ai/home-chat';
+import {
+  PHARMACY_FORMAT, PHARMACY_LIMITS, parsePharmacyBundle, validatePharmacyBundle, groupOrderLines, sheetReceipts, orderPreparationRequest, packTotal,
+  type PharmacyBundle, type PharmacyEntry, type OrderSheet, type OrderLine, type Supplier,
+} from '../../lib/pharmacy/order';
+
+const uid = () => crypto.randomUUID();
+const initial = (): PharmacyBundle => ({ format: PHARMACY_FORMAT, records: [{ kind: 'sheet', data: { id: uid(), title: '주문 준비', lines: [], status: 'draft' } }] });
+const errorText = (e: unknown) => e instanceof Error ? e.message : '자료를 확인해 주세요.';
+const download = (value: unknown, filename: string) => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }));
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+/** A transient work sheet, not a parallel server ledger. Explicit files bridge to the existing PC SQLite CLI. */
+export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onApply }: Readonly<{ disabled: boolean; resuming: boolean; draft?: string; onApply: (text: string) => void }>) {
+  const [bundle, setBundle] = useState(initial);
+  const [edited, setEdited] = useState<PharmacyEntry[]>([]);
+  const [selected, setSelected] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [busy, setBusy] = useState(false);
+  const alive = useRef(true);
+  const lastPrepared = useRef({ text: '', base: '' });
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const sheets = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'sheet'}> => r.kind === 'sheet');
+  const sheet = sheets.find(r => r.data.id === selected)?.data ?? sheets[0]?.data;
+  const suppliers = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'supplier'}> => r.kind === 'supplier');
+  const products = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'product'}> => r.kind === 'product');
+  const packs = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'pack'}> => r.kind === 'pack');
+  const [supplierName, setSupplierName] = useState('');
+  const [site, setSite] = useState('');
+  const [name, setName] = useState('');
+  const [productId, setProductId] = useState('');
+  const [packId, setPackId] = useState('');
+  const [packLabel, setPackLabel] = useState('');
+  const [count, setCount] = useState('');
+  const [supplierId, setSupplierId] = useState('');
+  const [receipt, setReceipt] = useState('');
+  const [receiptSupplier, setReceiptSupplier] = useState('');
+  const receipts = sheet ? sheetReceipts(sheet) : [];
+  const pendingSuppliers = sheet ? groupOrderLines(sheet).filter(g => g.supplierId && !receipts.some(r => r.supplier_id === g.supplierId)).map(g => g.supplierId) : [];
+  const nextReceiptSupplier = pendingSuppliers.includes(receiptSupplier) ? receiptSupplier : pendingSuppliers[0] ?? '';
+  const [stockProduct, setStockProduct] = useState('');
+  const [stockQuantity, setStockQuantity] = useState('');
+  const [stockUnit, setStockUnit] = useState('');
+  const [stockConfirmed, setStockConfirmed] = useState(false);
+  const blocked = disabled || busy;
+  function save(entry: PharmacyEntry) {
+    const matches = (r: PharmacyEntry) => r.kind === entry.kind && r.data.id === entry.data.id;
+    const records = bundle.records.some(matches) ? bundle.records.map(r => matches(r) ? entry : r) : [...bundle.records, entry];
+    const next = validatePharmacyBundle({ format: PHARMACY_FORMAT, records });
+    setBundle(next); setEdited(old => [...old.filter(r => r.kind !== entry.kind || r.data.id !== entry.data.id), entry]);
+    setNotice('현재 화면에 반영했습니다. 보관하려면 파일로 내보내세요.');
+  }
+  function attempt(action: () => void) { setError(''); setNotice(''); try { action(); } catch (e) { setError(errorText(e)); } }
+  function updateSheet(next: OrderSheet) { save({ kind: 'sheet', data: next }); }
+  function editLine(lineId: string) {
+    const line = sheet?.lines.find(l => l.id === lineId); if (!line || !sheet) return;
+    setName(line.product_name); setProductId(line.product_id ?? ''); setPackId(line.pack_id ?? ''); setPackLabel(line.pack_label); setCount(line.pack_count === null ? '' : String(line.pack_count)); setSupplierId(line.supplier_id ?? '');
+    // Keep the original until replacement succeeds; the editor carries its id.
+    setEditingLine(lineId);
+  }
+  const [editingLine, setEditingLine] = useState('');
+  function addLine() {
+    if (!sheet) return;
+    if (editingLine && !sheet.lines.some(l => l.id === editingLine)) throw Error('편집하던 행이 삭제됐습니다. 입력을 확인하고 새 행으로 추가하세요.');
+    const line: OrderLine = { id: editingLine || uid(), product_name: name.trim(), pack_label: packLabel.trim(), pack_count: count === '' ? null : Number(count), ...(supplierId ? { supplier_id: supplierId } : {}), ...(productId ? { product_id: productId } : {}), ...(packId ? { pack_id: packId } : {}) };
+    updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: editingLine ? sheet.lines.map(l => l.id === editingLine ? line : l) : [...sheet.lines, line] });
+    setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); setEditingLine('');
+  }
+  function deleteLine(lineId: string) {
+    if (!sheet) return;
+    updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: sheet.lines.filter(l => l.id !== lineId) });
+    if (editingLine === lineId) { setEditingLine(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); }
+  }
+  function prepare(supplier: string, mode: 'prepare'|'availability') {
+    if (!sheet || resuming) throw Error('진행 중인 질문에 먼저 답하거나 업무를 마친 뒤 새 주문 요청을 준비하세요.');
+    const request = orderPreparationRequest(bundle, sheet.id, supplier, mode);
+    const base = draft === lastPrepared.current.text ? lastPrepared.current.base : draft.trim();
+    const text = base ? `${base}\n${request}` : request;
+    if (text.length > HOME_CHAT_MAX_MESSAGE_LENGTH) throw Error('기존 입력을 유지했습니다. 입력창 내용을 먼저 정리한 뒤 주문 요청을 준비하세요.');
+    lastPrepared.current = { text, base }; onApply(text);
+    setNotice('입력창에만 반영했습니다. 요청 내용을 확인하고 실행하세요.');
+  }
+  return <details className="mt-3 w-full max-w-xl rounded-xl border border-slate-200 bg-white p-4 text-left text-sm text-slate-700">
+    <summary className="cursor-pointer font-semibold">약국 주문 준비</summary>
+    <div className="mt-3 space-y-3">
+      <p>빈 시트에서 시작할 수 있습니다. 구매·주문 내역은 약국 프로그램에서 내보낸 자료를 PC 연결 프로그램으로 가져옵니다. 전표 촬영·OCR은 사용하지 않습니다.</p>
+      <p className="text-xs">이 화면은 자동 저장되지 않습니다. 계정·업무공간 전환이나 새로고침 전에 내보내세요. 로그인·최종 주문·결제는 직접 진행합니다.</p>
+      <label className="block">PC 자료함 JSON 가져오기
+        <input type="file" accept=".json,application/json" disabled={blocked} onChange={async e => {
+          const file = e.currentTarget.files?.[0]; e.currentTarget.value = ''; if (!file) return;
+          setError(''); setBusy(true);
+          try {
+            if (file.size > PHARMACY_LIMITS.fileBytes) throw Error('자료 파일은 8MB 이내로 준비하세요.');
+            const parsed = parsePharmacyBundle(await file.text()); if (!alive.current) return;
+            if (bundle.records.some(r => r.kind !== 'sheet' || r.data.lines.length) || edited.length) throw Error('현재 자료를 먼저 내보내고 새로고침한 뒤 가져오세요. 기존 작업을 덮어쓰지 않습니다.');
+            setBundle(parsed.records.some(r => r.kind === 'sheet') ? parsed : { ...parsed, records: [...parsed.records, ...initial().records] });
+            setSelected(''); setNotice('자료를 읽었습니다. 프로그램 출처와 상품·포장 연결을 확인하세요.');
+          } catch (e) { if (alive.current) setError(errorText(e)); }
+          finally { if (alive.current) setBusy(false); }
+        }} className="mt-1 block w-full" />
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" disabled={blocked} onClick={() => attempt(() => download(validatePharmacyBundle(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">전체 자료 내보내기</button>
+        <button type="button" disabled={blocked || !edited.length} onClick={() => attempt(() => download({ format: PHARMACY_FORMAT, records: edited }, 'o4o-pharmacy-user-edits.private.json'))} className="rounded border px-2 py-1">PC 반영용 수정 내보내기</button>
+      </div>
+      <p className="text-xs">내보낸 파일에는 약국 업무 자료가 포함됩니다. 본인의 PC·계정에서만 사용하세요. 수정 파일은 기존 SQLite 자료에 병합하며 원본 프로그램 내역을 대체하지 않습니다.</p>
+      <fieldset disabled={blocked} className="space-y-2 rounded border p-3">
+        <legend>거래처 추가</legend>
+        <label className="block">거래처명<input aria-label="새 거래처명" value={supplierName} maxLength={200} onChange={e => setSupplierName(e.target.value)} className="block w-full rounded border p-2" /></label>
+        <label className="block">주문 사이트 주소<input aria-label="새 주문 사이트" value={site} maxLength={500} placeholder="https://order.geoweb.kr/Member/Login" onChange={e => setSite(e.target.value)} className="block w-full rounded border p-2" /></label>
+        <button type="button" disabled={!supplierName.trim()} onClick={() => attempt(() => {
+          const supplier: Supplier = { id: uid(), name: supplierName.trim(), enabled: true, payment_timing: 'unknown', payment_required: null, ...(site.trim() ? { order_site_url: site.trim() } : {}) };
+          save({ kind: 'supplier', data: supplier }); setSupplierId(supplier.id); setSupplierName(''); setSite('');
+        })} className="rounded border px-2 py-1">거래처 추가</button>
+      </fieldset>
+      {suppliers.map(({ data: s }) => <fieldset key={s.id} disabled={blocked} className="space-y-2 rounded border p-3">
+        <legend>{s.name}</legend>
+        <p className="break-all">{s.order_site_url ?? '주문 사이트 미확인'} — 사이트 주소 등록은 자동화 지원·로그인 확인이 아닙니다.</p>
+        <label className="block">결제 시점<select aria-label={`${s.name} 결제 시점`} value={s.payment_timing} onChange={e => attempt(() => save({ kind: 'supplier', data: { ...s, payment_timing: e.target.value as Supplier['payment_timing'], terms_checked_at: new Date().toISOString() } }))} className="ml-2 rounded border p-1"><option value="unknown">미확인</option><option value="deferred">후불</option><option value="at_order">주문 시</option></select></label>
+        <label className="block">주문 접수에 결제 필요<select aria-label={`${s.name} 결제 필요`} value={s.payment_required === null ? 'unknown' : String(s.payment_required)} onChange={e => attempt(() => save({ kind: 'supplier', data: { ...s, payment_required: e.target.value === 'unknown' ? null : e.target.value === 'true', terms_checked_at: new Date().toISOString() } }))} className="ml-2 rounded border p-1"><option value="unknown">미확인</option><option value="true">예</option><option value="false">아니오</option></select></label>
+      </fieldset>)}
+      {products.length > 0 && <fieldset disabled={blocked} className="space-y-2 rounded border p-3">
+        <legend>필요한 상품만 실물 재고 확인</legend>
+        <label className="block">재고 확인 상품<select value={stockProduct} onChange={e => { setStockProduct(e.target.value); setStockConfirmed(false); }} className="block w-full rounded border p-2"><option value="">선택</option>{products.map(r => <option key={r.data.id} value={r.data.id}>{r.data.name}</option>)}</select></label>
+        <label className="block">실물 확인 수량<input type="number" min="0" value={stockQuantity} onChange={e => { setStockQuantity(e.target.value); setStockConfirmed(false); }} className="block w-full rounded border p-2" /></label>
+        <label className="block">실물 수량 단위<input maxLength={200} value={stockUnit} onChange={e => { setStockUnit(e.target.value); setStockConfirmed(false); }} className="block w-full rounded border p-2" /></label>
+        <label className="flex gap-2"><input type="checkbox" checked={stockConfirmed} onChange={e => setStockConfirmed(e.target.checked)} />실물을 직접 확인했습니다</label>
+        <button type="button" disabled={!stockProduct || stockQuantity === '' || !stockUnit.trim() || !stockConfirmed} onClick={() => attempt(() => {
+          save({ kind: 'stock', data: { id: uid(), product_id: stockProduct, quantity: Number(stockQuantity), unit: stockUnit.trim(), confidence: 'confirmed', observed_at: new Date().toISOString() } });
+          setStockConfirmed(false);
+        })} className="rounded border px-2 py-1">현재 확인 재고 기록</button>
+        <p className="text-xs">프로그램 재고·추정 재고와 별도로 보관합니다. 전체 상품 재고조사는 필요하지 않습니다.</p>
+      </fieldset>}
+      {sheets.length > 1 && <label className="block">주문 시트<select value={sheet?.id ?? ''} onChange={e => { setSelected(e.target.value); setEditingLine(''); setReceipt(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); }} disabled={blocked} className="ml-2 rounded border p-1">{sheets.map(r => <option key={r.data.id} value={r.data.id}>{r.data.title}</option>)}</select></label>}
+      <button type="button" disabled={blocked} onClick={() => attempt(() => {
+        const next: OrderSheet = { id: uid(), title: `주문 준비 ${sheets.length + 1}`, lines: [], status: 'draft' };
+        save({ kind: 'sheet', data: next }); setSelected(next.id); setEditingLine(''); setReceipt(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount('');
+      })} className="rounded border px-2 py-1">새 주문 시트</button>
+      {sheet && <>
+        {receipts.map(r => <p key={r.supplier_id} className="break-words">직접 확인한 접수: {suppliers.find(s => s.data.id === r.supplier_id)?.data.name} / {r.reference} / {r.confirmed_at}</p>)}
+        <p>상태: {{draft: '작성 중', prepared: '준비 확인', handed_over: '사용자에게 인계', receipt_recorded: '외부 접수 직접 확인'}[sheet.status]}</p>
+        <fieldset disabled={blocked || receipts.length > 0} className="space-y-2 rounded border p-3">
+          <legend>{editingLine ? '주문 행 수정' : '주문 상품 추가'}</legend>
+          {products.length > 0 && <label className="block">가져온 상품<select aria-label="가져온 상품" value={productId} onChange={e => { setProductId(e.target.value); setPackId(''); setPackLabel(''); setName(products.find(r => r.data.id === e.target.value)?.data.name ?? ''); }} className="block w-full rounded border p-2"><option value="">직접 입력</option>{products.map(r => <option key={r.data.id} value={r.data.id}>{r.data.name} ({r.data.program_code})</option>)}</select></label>}
+          <label className="block">상품명<input value={name} maxLength={200} onChange={e => { setName(e.target.value); setProductId(''); setPackId(''); }} className="block w-full rounded border p-2" /></label>
+          {productId && <label className="block">등록된 포장<select value={packId} onChange={e => { setPackId(e.target.value); setPackLabel(packs.find(r => r.data.id === e.target.value)?.data.label ?? ''); }} className="block w-full rounded border p-2"><option value="">직접 확인</option>{packs.filter(r => r.data.product_id === productId).map(r => <option key={r.data.id} value={r.data.id}>{r.data.label}</option>)}</select></label>}
+          <label className="block">포장규격<input value={packLabel} maxLength={200} onChange={e => { setPackLabel(e.target.value); setPackId(''); }} className="block w-full rounded border p-2" /></label>
+          <label className="block">포장 개수<input type="number" min="1" max="1000000" step="1" value={count} onChange={e => setCount(e.target.value)} className="block w-full rounded border p-2" /></label>
+          <label className="block">거래처<select value={supplierId} onChange={e => setSupplierId(e.target.value)} className="block w-full rounded border p-2"><option value="">미정</option>{suppliers.filter(r => r.data.enabled).map(r => <option key={r.data.id} value={r.data.id}>{r.data.name}</option>)}</select></label>
+          <button type="button" disabled={!name.trim()} onClick={() => attempt(addLine)} className="rounded border px-2 py-1">{editingLine ? '수정 반영' : '주문 행 추가'}</button>
+        </fieldset>
+        {groupOrderLines(sheet).map(g => <section key={g.supplierId} className="space-y-2 rounded border p-3">
+          <h3 className="font-semibold">{suppliers.find(r => r.data.id === g.supplierId)?.data.name ?? '거래처 미정'}</h3>
+          <ul className="space-y-2">{g.lines.map(l => { const pack = packs.find(r => r.data.id === l.pack_id)?.data; return <li key={l.id} className="break-words">
+            {l.product_name} / {l.pack_label || '포장 미확인'} / {l.pack_count ?? '수량 미확인'}포장
+            {pack && l.pack_count !== null && <span> = {packTotal(pack, l.pack_count)}{pack.base_unit}</span>}
+            {l.product_id && l.pack_id && l.supplier_id && <label className="mt-1 block">직접 확인한 주문 가능 여부
+              <select aria-label={`${l.product_name} 주문 가능 여부`} value="" disabled={blocked} onChange={e => {
+                const state = e.target.value as 'available'|'out_of_stock'|'unconfirmed';
+                if (!state) return;
+                attempt(() => save({ kind: 'availability', data: { id: uid(), product_id: l.product_id!, pack_id: l.pack_id!, supplier_id: l.supplier_id!, state, source: 'user_observed', observed_at: new Date().toISOString() } }));
+              }} className="ml-2 rounded border p-1"><option value="">조회 화면을 확인한 뒤 선택</option><option value="available">주문 가능 표시 확인</option><option value="out_of_stock">품절 표시 확인</option><option value="unconfirmed">확인 불가·검색 결과 없음</option></select>
+            </label>}
+            <div className="mt-1 flex gap-2"><button type="button" disabled={blocked || receipts.length > 0} onClick={() => editLine(l.id)} className="rounded border px-2 py-1">행 수정</button><button type="button" disabled={blocked || receipts.length > 0} onClick={() => attempt(() => deleteLine(l.id))} className="rounded border px-2 py-1">행 삭제</button></div>
+          </li>; })}</ul>
+          {g.supplierId && <div className="flex flex-wrap gap-2"><button type="button" disabled={blocked || resuming || receipts.some(r => r.supplier_id === g.supplierId)} onClick={() => attempt(() => prepare(g.supplierId, 'availability'))} className="rounded border px-2 py-1">품절 확인 요청 준비</button><button type="button" disabled={blocked || resuming || receipts.some(r => r.supplier_id === g.supplierId)} onClick={() => attempt(() => prepare(g.supplierId, 'prepare'))} className="rounded border px-2 py-1">주문 요청 준비</button></div>}
+        </section>)}
+        <p className="text-xs">검색 결과가 없으면 ‘확인 불가’입니다. 조회 시점의 정보이며 실시간 재고가 아닙니다. 미지원 사이트는 사용자가 진행하면서 기존 질문·교정 흐름으로 절차를 보완합니다.</p>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={blocked || sheet.status !== 'draft'} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'prepared' }))} className="rounded border px-2 py-1">상품·규격·수량 준비 확인</button>
+          <button type="button" disabled={blocked || sheet.status !== 'prepared'} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'handed_over' }))} className="rounded border px-2 py-1">직접 주문하도록 인계</button>
+        </div>
+        {sheet.status === 'handed_over' && <div><label className="block">접수 확인 거래처<select value={nextReceiptSupplier} disabled={blocked} onChange={e => { setReceiptSupplier(e.target.value); setReceipt(''); }} className="block w-full rounded border p-2">{pendingSuppliers.map(id => <option key={id} value={id}>{suppliers.find(s => s.data.id === id)?.data.name}</option>)}</select></label><label className="block">직접 확인한 외부 접수번호<input value={receipt} maxLength={200} disabled={blocked} onChange={e => setReceipt(e.target.value)} className="block w-full rounded border p-2" /><button type="button" disabled={blocked || !receipt.trim()} onClick={() => attempt(() => {
+            if (!nextReceiptSupplier) throw Error('접수 확인 거래처를 선택하세요.');
+            const nextReceipts = [...receipts, { supplier_id: nextReceiptSupplier, reference: receipt.trim(), confirmed_at: new Date().toISOString() }];
+            updateSheet({ id: sheet.id, title: sheet.title, lines: sheet.lines, status: nextReceipts.length === groupOrderLines(sheet).length ? 'receipt_recorded' : 'handed_over', receipts: nextReceipts });
+            setReceipt(''); setReceiptSupplier('');
+          })} className="mt-2 rounded border px-2 py-1">외부 주문 접수 직접 확인</button></label></div>}
+      </>}
+      {bundle.records.some(r => r.kind === 'stock' || r.kind === 'availability') && <details><summary>수량·품절 확인 이력</summary><ul className="mt-2 space-y-2">{bundle.records.filter(r => r.kind === 'stock' || r.kind === 'availability').map(r => <li key={`${r.kind}:${r.data.id}`} className="break-words">
+        {r.kind === 'stock' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{confirmed:'실물 확인',program:'프로그램 재고',estimated:'추정 재고',unknown:'미확인'}[r.data.confidence]} / ${r.data.quantity ?? '미확인'}${r.data.unit ?? ''} / ${r.data.observed_at}` : r.kind === 'availability' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{available:'주문 가능',out_of_stock:'품절',unconfirmed:'확인 불가'}[r.data.state]} / ${suppliers.find(v => v.data.id === r.data.supplier_id)?.data.name} / ${r.data.observed_at}` : ''}
+      </li>)}</ul></details>}
+      {notice && <p role="status">{notice}</p>}{error && <p role="alert">{error}</p>}
+    </div>
+  </details>;
+}

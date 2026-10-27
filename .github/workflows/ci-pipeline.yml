@@ -241,7 +241,7 @@ jobs:
         scripts/deployment/pharmacy-hub-reference-batches.test.mjs
 
     - name: Run tests (o4o-local-agent node:test)
-      run: node --test tools/o4o-local-agent/test/local-db.test.mjs tools/o4o-local-agent/test/native-bridge.test.mjs tools/o4o-local-agent/test/browser-dom.test.mjs
+      run: node --test tools/o4o-local-agent/test/local-db.test.mjs tools/o4o-local-agent/test/native-bridge.test.mjs tools/o4o-local-agent/test/browser-dom.test.mjs tools/o4o-local-agent/test/pharmacy-data.test.mjs
 
     - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
       run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1

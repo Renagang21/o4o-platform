@@ -836,6 +836,10 @@ export const LocalImportRepository = {
 
 /** import mapping 프로파일. 최소한 — 자동 추론을 과하게 만들지 않는다. */
 export const LocalMappingRepository = {
+  latest({ sourceType, profileName }) {
+    const row = openLocalDb().prepare('SELECT column_mapping FROM local_mappings WHERE source_type=? AND profile_name=? ORDER BY rowid DESC LIMIT 1').get(String(sourceType), String(profileName));
+    return row ? JSON.parse(row.column_mapping) : null;
+  },
   save({ sourceType, profileName, columnMapping }) {
     openLocalDb()
       .prepare(
@@ -849,6 +853,7 @@ export const LocalMappingRepository = {
 /** dataset 단위 행 저장(V1 §31~§39). 이름은 규칙 안의 식별자만 — 테이블 이름이 아니라 행의 라벨이다. */
 export const DATASET_NAME_RE = /^[a-z][a-z0-9_]{0,63}$/;
 export const FIELD_NAME_RE = /^[a-z][a-z0-9_]{0,63}$/;
+const PHARMACY_DATASET_RE = /^pharmacy_[a-f0-9]{48}$/;
 
 export const LocalDatasetRepository = {
   get(name) {
@@ -875,6 +880,7 @@ export const LocalDatasetRepository = {
   search({ dataset, field, value, match = 'contains', limit = 50 }) {
     const ds = String(dataset ?? '');
     const f = String(field ?? '');
+    if (PHARMACY_DATASET_RE.test(ds)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'pharmacy data requires explicit local owner selection');
     if (!DATASET_NAME_RE.test(ds)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, `bad dataset: ${ds}`);
     if (!FIELD_NAME_RE.test(f)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, `bad field: ${f}`);
     const v = String(value ?? '');
@@ -889,6 +895,34 @@ export const LocalDatasetRepository = {
           .prepare('SELECT row_key, data FROM local_dataset_rows WHERE dataset=? AND instr(lower(json_extract(data, ?)), lower(?))>0 ORDER BY rowid LIMIT ?')
           .all(ds, jsonPath, v, cap);
     return rows.map((r) => ({ rowKey: r.row_key, ...JSON.parse(r.data) }));
+  },
+};
+
+/** Pharmacy work data uses existing Dataset storage, schema v8 unchanged. SQL remains in this module.
+ * A scoped workspace row is atomic and revision checked across CLI processes. No arbitrary SQL/paths.
+ */
+export const LocalPharmacyWorkspaceRepository = {
+  read(dataset) {
+    if (!PHARMACY_DATASET_RE.test(dataset)) throw new Error('Invalid pharmacy owner scope');
+    const row = openLocalDb().prepare('SELECT data FROM local_dataset_rows WHERE dataset=? AND row_key=?').get(dataset, 'workspace');
+    if (!row) return { revision: 0, imported: [], user: [] };
+    try { return JSON.parse(row.data); } catch { throw new Error('PHARMACY_DATA_INVALID: 백업과 자료 형식을 확인하세요.'); }
+  },
+  update(dataset, expectedRevision, update) {
+    if (!PHARMACY_DATASET_RE.test(dataset)) throw new Error('Invalid pharmacy owner scope');
+    const db = openLocalDb();
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      const latest = this.read(dataset);
+      if (!Number.isSafeInteger(expectedRevision) || expectedRevision !== latest.revision) throw new Error('PHARMACY_REVISION_CONFLICT: 최신 자료를 다시 확인하세요.');
+      const next = { ...update(latest), revision: latest.revision + 1 };
+      const stamp = nowIso();
+      db.prepare('INSERT INTO local_datasets(name,key_field,fields,row_count,created_at,updated_at) VALUES(?, ?, ?, 1, ?, ?) ON CONFLICT(name) DO UPDATE SET updated_at=excluded.updated_at')
+        .run(dataset, 'workspace', JSON.stringify(['revision', 'imported', 'user']), stamp, stamp);
+      db.prepare('INSERT INTO local_dataset_rows(dataset,row_key,data,imported_at) VALUES(?, ?, ?, ?) ON CONFLICT(dataset,row_key) DO UPDATE SET data=excluded.data,imported_at=excluded.imported_at')
+        .run(dataset, 'workspace', JSON.stringify(next), stamp);
+      db.exec('COMMIT'); return next;
+    } catch (error) { db.exec('ROLLBACK'); throw error; }
   },
 };
 
@@ -1635,7 +1669,7 @@ export const IMPORT_MAX_TEXT_LENGTH = 64 * 1024 * 1024;
 function validateImportRequest({ csvText, dataset, columnMapping, requiredFields, keyField }) {
   if (typeof csvText !== 'string') throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'csvText must be text');
   if (csvText.length > IMPORT_MAX_TEXT_LENGTH) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'csv too large');
-  if (typeof dataset !== 'string' || !DATASET_NAME_RE.test(dataset)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'bad dataset name');
+  if (typeof dataset !== 'string' || !DATASET_NAME_RE.test(dataset) || PHARMACY_DATASET_RE.test(dataset)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'bad or reserved dataset name');
   if (!columnMapping || typeof columnMapping !== 'object' || Array.isArray(columnMapping) || Object.keys(columnMapping).length === 0) {
     throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, 'columnMapping required');
   }
@@ -1712,7 +1746,7 @@ export function applyImport(request) {
   const mode = request.mode === 'replace' ? 'replace' : 'merge';
   const keyField = preview.keyField;
   const ts = nowIso();
-  const importId = ts.replace(/[-:.TZ]/g, '').slice(0, 17);
+  const importId = randomUUID(); // separate batches must not collide within the same millisecond
 
   const result = withTransaction((db) => {
     const existing = db.prepare('SELECT name, key_field, fields FROM local_datasets WHERE name=?').get(request.dataset);

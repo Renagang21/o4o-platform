@@ -5,7 +5,7 @@ import type { PaymentStatus, TrialParticipant, TrialStatus, UpdateParticipantPay
 import type { ParticipantFilter } from './fundingOperatorModel';
 export { fundingParticipantFilters } from './fundingOperatorModel';
 
-type Form = { id: string; action: 'confirm' | 'refund' | 'reset'; amount: string; reference: string; note: string };
+type Form = { version: number; id: string; action: 'confirm' | 'refund' | 'reset'; amount: string; reference: string; note: string };
 type Props = {
   disabled?: boolean;
   participants: TrialParticipant[]; totalCount: number; trialStatus: TrialStatus;
@@ -31,16 +31,16 @@ export default function FundingParticipantsSection(props: Props) {
   const [form, setForm] = useState<Form | null>(null);
   const busy = !!props.disabled || props.updatingPaymentId !== null || props.updatingId !== null;
   const open = (p: TrialParticipant, action: Form['action']) => setForm({
-    id: p.id, action, amount: p.paidAmount == null ? '' : String(p.paidAmount),
+    version: p.paymentVersion, id: p.id, action, amount: p.paidAmount == null ? '' : String(p.paidAmount),
     reference: p.paymentReference || '', note: action === 'confirm' ? p.paymentNote || '' : '',
   });
   const save = async (p: TrialParticipant) => {
-    if (!form || busy || invalidAmount(form.amount)) return;
+    if (!form || busy || form.version !== p.paymentVersion || invalidAmount(form.amount)) return;
     const input: UpdateParticipantPaymentInput = form.action === 'confirm' ? {
-      paymentStatus: 'paid', paymentMethod: 'manual_transfer', paymentProvider: 'internal',
+      version: form.version, paymentStatus: 'paid', paymentMethod: 'manual_transfer', paymentProvider: 'internal',
       paidAmount: form.amount.trim() ? Number(form.amount) : null,
       paymentReference: form.reference.trim() || null, paymentNote: form.note.trim() || null,
-    } : { paymentStatus: form.action === 'refund' ? 'refunded' : 'unpaid', paymentNote: form.note.trim() || null };
+    } : { version: form.version, paymentStatus: form.action === 'refund' ? 'refunded' : 'unpaid', paymentNote: form.note.trim() || null };
     if (await props.onPaymentStatusChange(p, input)) setForm(null);
   };
   const paymentVisible = ['recruiting', 'development', 'outcome_confirming', 'fulfilled', 'closed'].includes(props.trialStatus);
@@ -91,6 +91,7 @@ export default function FundingParticipantsSection(props: Props) {
               {props.participants.map(p => {
                 const status = p.paymentStatus ?? 'unpaid';
                 const selected = form?.id === p.id ? form : null;
+                const stale = selected !== null && selected.version !== p.paymentVersion;
                 return <article key={p.id} className="border border-gray-200 rounded-lg p-3">
                   <div className="flex flex-wrap items-center gap-2 mb-2"><strong className="text-sm min-w-0 break-all">{p.name}</strong>{p.withdrawn && <span className="text-xs text-amber-700">참여 철회</span>}
                     <span className="text-xs text-gray-600">{PAYMENT_STATUS_LABELS[status]}</span>
@@ -121,8 +122,9 @@ export default function FundingParticipantsSection(props: Props) {
                     <label className="block text-xs text-gray-600">{selected.action === 'confirm' ? '운영자 메모 (선택)' : '처리 사유 (선택)'}
                       <textarea className={field} disabled={busy} value={selected.note} onChange={e => setForm({ ...selected, note: e.target.value })} /></label>
                     {selected.action !== 'confirm' && <p className="text-xs text-gray-500 my-2">최초 입금 확인일·금액·송금 참조는 이력으로 보존합니다.</p>}
+                    {stale && <p role="alert">현황이 변경됐습니다. 위의 입금 확인·정정 버튼으로 최신 값을 다시 열어 주세요.</p>}
                     {invalidAmount(selected.amount) && <p role="alert" className="text-xs text-red-600 my-2">금액은 0 이상, 소수점 두 자리까지 입력해 주세요.</p>}
-                    <div className="flex gap-2 mt-3"><button type="submit" className={button} disabled={busy || invalidAmount(selected.amount)}>{busy ? '저장 중...' : '기록 저장'}</button>
+                    <div className="flex gap-2 mt-3"><button type="submit" className={button} disabled={busy || stale || invalidAmount(selected.amount)}>{busy ? '저장 중...' : '기록 저장'}</button>
                       <button type="button" className={button} disabled={busy} onClick={() => setForm(null)}>취소</button></div>
                   </form>}
                 </article>;

@@ -1,13 +1,27 @@
 import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBusiness } from './BusinessWorkspace';
+import { useAuth } from '../../contexts/AuthContext';
+import { BusinessParticipationStore } from './BusinessParticipationStore';
 import { businessApi, businessPath, businessError, pharmacyApiBase, type BusinessMembership } from './api';
 
 const STATUS: Record<string, string> = { active: '참여 중', pending: '승인 대기', rejected: '신청 반려', suspended: '이용 정지', terminated: '탈퇴' };
 
 export default function BusinessParticipationPage() {
   const { business, access } = useBusiness();
+  const { user } = useAuth();
+  const scope = `${user?.id}:${business.key}`;
+  if (access?.canManage) return <ParticipationForm key={scope} />;
+  return <BusinessParticipationStore key={scope}>{(organizationId, onBusyChange) =>
+    <ParticipationForm key={`${scope}:${organizationId}`} organizationId={organizationId} onBusyChange={onBusyChange} />
+  }</BusinessParticipationStore>;
+}
+
+function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organizationId?: string; onBusyChange?: (busy: boolean) => void }>) {
+  const { business, access } = useBusiness();
+  const current = useRef(false);
+  useLayoutEffect(() => { current.current = true; return () => { current.current = false; }; }, []);
   const agreement = useServiceEnrollmentPolicies(business.policyScope, () => businessApi.get(`/neture/businesses/${encodeURIComponent(business.key)}/legal/enrollment-policies`), business.key);
   const [conditions, setConditions] = useState(business.registrationConditions ?? '');
   const [membership, setMembership] = useState<BusinessMembership | null>(null);
@@ -22,36 +36,37 @@ export default function BusinessParticipationPage() {
     let alive = true;
     setLoading(true); setError(''); setApplicationError(false); setMembership(null); setAccepted(false); setConditions(business.registrationConditions ?? '');
     if (access?.canManage) { setLoading(false); return; }
-    businessApi.get<BusinessMembership[]>(`${pharmacyApiBase}/semi-franchises`)
+    businessApi.get<BusinessMembership[]>(`${pharmacyApiBase}/semi-franchises`, undefined, organizationId)
       .then(rows => { if (alive) setMembership(rows.find(row => row.key === business.key) ?? null); })
       .catch(e => { if (alive) setError(businessError(e)); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [business.key, access?.canManage, version]);
+  }, [business.key, business.registrationConditions, access?.canManage, organizationId, version]);
   const apply = async () => {
     if (!accepted || !agreement.ready || busy || !membership) return;
-    setBusy(true); setError(''); setApplicationError(true);
+    setBusy(true); onBusyChange?.(true); setError(''); setApplicationError(true);
     try {
       await businessApi.post(`${pharmacyApiBase}/semi-franchises/${encodeURIComponent(business.key)}/apply`, {
         acceptedConditions: true, conditions, note, policyReferences: agreement.references,
-      });
-      setVersion(n => n + 1);
+      }, organizationId);
+      if (current.current) setVersion(n => n + 1);
     } catch (e: any) {
+      if (!current.current) return;
       const code = e.response?.data?.error?.code ?? e.response?.data?.code;
       if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(code)) agreement.reload();
       if (code === 'CONDITIONS_CHANGED') {
         setAccepted(false);
-        try { const fresh = await businessApi.get<{ key: string; registrationConditions?: string }>(`${pharmacyApiBase}/businesses/${encodeURIComponent(business.key)}`); if (fresh.key !== business.key) throw new Error('Wrong business'); setConditions(fresh.registrationConditions ?? ''); setError('참여 조건이 변경되었습니다. 입력 내용은 유지됩니다. 최신 조건을 다시 확인해 주세요.'); }
-        catch { setError('최신 참여 조건을 불러오지 못했습니다. 다시 확인해 주세요.'); }
+        try { const fresh = await businessApi.get<{ key: string; registrationConditions?: string }>(`${pharmacyApiBase}/businesses/${encodeURIComponent(business.key)}`); if (!current.current) return; if (fresh.key !== business.key) throw new Error('Wrong business'); setConditions(fresh.registrationConditions ?? ''); setError('참여 조건이 변경되었습니다. 입력 내용은 유지됩니다. 최신 조건을 다시 확인해 주세요.'); }
+        catch { if (current.current) setError('최신 참여 조건을 불러오지 못했습니다. 다시 확인해 주세요.'); }
       } else setError(businessError(e));
     }
-    finally { setBusy(false); }
+    finally { if (current.current) { setBusy(false); onBusyChange?.(false); } }
   };
   const withdraw = async () => {
     if (busy || !window.confirm(membership?.membershipStatus === 'pending' ? '참여 신청을 취소하시겠습니까?' : '사업에서 탈퇴하시겠습니까?')) return;
-    setBusy(true); setError('');
-    try { await businessApi.post(`${pharmacyApiBase}/semi-franchises/${encodeURIComponent(business.key)}/withdraw`, {}); window.location.reload(); }
-    catch (e) { setError(businessError(e)); setBusy(false); }
+    setBusy(true); onBusyChange?.(true); setError('');
+    try { await businessApi.post(`${pharmacyApiBase}/semi-franchises/${encodeURIComponent(business.key)}/withdraw`, {}, organizationId); if (current.current) window.location.reload(); }
+    catch (e) { if (current.current) { setError(businessError(e)); setBusy(false); onBusyChange?.(false); } }
   };
   return <section className="rounded-xl border bg-white p-6">
     <h2 className="text-lg font-semibold">참여 신청 · 이용 상태</h2>
@@ -69,7 +84,7 @@ export default function BusinessParticipationPage() {
       </div>}
       {!membership && !access?.canManage && <a href="https://store.neture.co.kr/start-pharmacy" className="text-blue-700">내 매장(약국) 신청 · 승인 상태 확인</a>}
       {membership && ['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <button type="button" disabled={busy} onClick={withdraw} className="mt-4 mr-4 text-red-700">{membership.membershipStatus === 'pending' ? '신청 취소' : '탈퇴'}</button>}
-      {access?.allowed && <Link to={businessPath(business.key, 'forum')} className="mt-4 inline-block text-blue-700">참여자 게시판 이용하기 →</Link>}
+      {access?.allowed && <Link to={businessPath(business.key, 'forum') + (organizationId ? `?store=${encodeURIComponent(organizationId)}` : '')} className="mt-4 inline-block text-blue-700">참여자 게시판 이용하기 →</Link>}
       {access?.canManage && <Link to="/operator/semi-franchises" className="ml-4 text-blue-700">사업 운영 · 가입 심사</Link>}
     </>}
   </section>;

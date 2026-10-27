@@ -30,6 +30,7 @@ import { useHomeEntry } from '../lib/home-entry';
 import { NetureMembershipNotice } from '../components/home/NetureMembershipNotice';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
+import PharmacyOrderPanel from '../components/home/PharmacyOrderPanel';
 import AutomationDataMaintenance from '../components/home/AutomationDataMaintenance';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../lib/footerLegal';
@@ -428,6 +429,7 @@ export default function O4OHomePage() {
         </div>
       </form>
 
+      {canUseHomeWorkspace && <PharmacyOrderPanel key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} />}
       {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
       {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
       {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}

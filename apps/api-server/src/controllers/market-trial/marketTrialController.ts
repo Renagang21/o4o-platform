@@ -312,6 +312,16 @@ export class MarketTrialController {
         return res.json({ success: true, data: [] });
       }
 
+      const offlineRows: Array<{ id: string; withdrawn: boolean; refundedAmount: string; refundedAt: string | null }> = await MarketTrialController.dataSource!.query(
+        `SELECT id, COALESCE(("offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
+        COALESCE(("offlineState"->>'refundAmount')::numeric,0) AS "refundedAmount", "offlineState"->>'refundedAt' AS "refundedAt"
+        FROM market_trial_participants WHERE "participantId"=$1 AND id=ANY($2::uuid[])`,
+        [userId, participations.map(p => p.id)],
+      );
+      const offlineById = new Map(offlineRows.map(row => [
+        row.id, { ...row, refundedAmount: Number(row.refundedAmount) },
+      ]));
+
       // Batch-fetch trial data for all participations
       const trialIds = participations.map((p) => p.marketTrialId);
       const trials = await MarketTrialController.trialRepo
@@ -326,6 +336,7 @@ export class MarketTrialController {
         const settlementCalc = trial ? calcSettlementForParticipant(p, trial) : null;
         return {
           ...toParticipationDTO(p),
+          ...(offlineById.get(p.id) ?? {}),
           ...settlementCalc,
           trial: trial ? {
             id: trial.id,
@@ -457,7 +468,7 @@ export class MarketTrialController {
     const rows=await MarketTrialController.dataSource!.query(`SELECT COALESCE(("offlineState"->>'withdrawn')::boolean,false) AS withdrawn,
       COALESCE(("offlineState"->>'refundAmount')::numeric,0) AS "refundedAmount","offlineState"->>'refundedAt' AS "refundedAt"
       FROM market_trial_participants WHERE id=$1 AND "participantId"=$2`,[id,userId]);
-    return rows?.[0]??{withdrawn:false,refundedAmount:0,refundedAt:null};
+    return rows?.[0] ? { ...rows[0], refundedAmount: Number(rows[0].refundedAmount) } : {withdrawn:false,refundedAmount:0,refundedAt:null};
   }
   static async getParticipation(req: AuthRequest, res: Response) {
     try {
@@ -885,6 +896,10 @@ function toParticipationDTO(p: MarketTrialParticipant): any {
     role: p.participantType,
     rewardType: p.rewardType || 'cash',
     rewardStatus: p.rewardStatus,
+    paymentStatus: p.paymentStatus || 'unpaid',
+    paidAmount: p.paidAmount == null ? null : Number(p.paidAmount),
+    paidAt: p.paidAt ? new Date(p.paidAt).toISOString() : null,
+    confirmedAt: p.confirmedAt ? new Date(p.confirmedAt).toISOString() : null,
     // Phase 2 settlement fields
     settlementChoice: p.settlementChoice ?? null,
     settlementStatus: p.settlementStatus || 'pending',

@@ -91,9 +91,13 @@ fixture("offline funding on disposable local PostgreSQL", () => {
         EXPECTED_SCHEMA_STATES.at(-1)!.fingerprintLineCount,
       );
       await new AddFundingOfflineState1792212000000().down(q);
-      expect((await computeSchemaFingerprint(q)).hash).toBe(
-        EXPECTED_SCHEMA_STATES.at(-2)!.fingerprint,
-      );
+      // Later migrations now follow offline-state: down is not the previous manifest state.
+      expect((await computeSchemaFingerprint(q)).hash).not.toBe(fp.hash);
+      expect(
+        await q.query(
+          `SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('market_trials','market_trial_participants') AND column_name='offlineState'`,
+        ),
+      ).toEqual([]);
       await new AddFundingOfflineState1792212000000().up(q);
       expect((await computeSchemaFingerprint(q)).hash).toBe(fp.hash);
     } finally {
@@ -140,7 +144,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       trial,
       participant,
       actor,
-      { paymentStatus: "paid", paidAmount: 100 },
+      { version: 1, paymentStatus: "paid", paidAmount: 100 },
     );
     const state = await service.snapshot(trial);
     expect(Number(state.totals.netAmount)).toBe(100);
@@ -148,6 +152,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     expect(state.trial.status).toBe("recruiting");
     await expect(
       new FundingPaymentRecordService(db).update(trial, participant, actor, {
+        version: 2,
         paymentStatus: "refunded",
       }),
     ).rejects.toMatchObject({
@@ -196,13 +201,13 @@ fixture("offline funding on disposable local PostgreSQL", () => {
   it("withdraws once and preserves the recorded money until an actual refund is recorded", async () => {
     await service.update(trial, participant, actor, {
       action: "withdraw",
-      version: 1,
+      version: 2,
       reason: "참여자 철회 요청 확인",
     });
     await expect(
       service.update(trial, participant, actor, {
         action: "withdraw",
-        version: 1,
+        version: 2,
         reason: "중복 철회",
       }),
     ).rejects.toMatchObject({ status: 409 });
@@ -227,21 +232,22 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       reason: "오프라인 환급 확인·정정",
     });
   it("supports partial/full refund and correction without exceeding deposits", async () => {
-    await refund(40, 2);
+    await refund(40, 3);
     expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(60);
-    await expect(refund(101, 3)).rejects.toMatchObject({ status: 400 });
-    await refund(100, 3);
+    await expect(refund(101, 4)).rejects.toMatchObject({ status: 400 });
+    await refund(100, 4);
     expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(0);
     expect((await service.snapshot(trial)).participants[0].paymentStatus).toBe(
       "refunded",
     );
-    await refund(50, 4);
+    await refund(50, 5);
     expect(Number((await service.snapshot(trial)).totals.netAmount)).toBe(50);
     expect((await service.snapshot(trial)).participants[0].paymentStatus).toBe(
       "paid",
     );
     await expect(
       new FundingPaymentRecordService(db).update(trial, participant, actor, {
+        version: 6,
         paymentStatus: "paid",
         paidAmount: 40,
       }),
@@ -255,13 +261,13 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       `CREATE TRIGGER fixture_fail_offline BEFORE INSERT ON action_logs FOR EACH ROW EXECUTE FUNCTION public.fail_offline_audit()`,
     );
     try {
-      await expect(refund(60, 5)).rejects.toThrow("fixture audit unavailable");
+      await expect(refund(60, 6)).rejects.toThrow("fixture audit unavailable");
     } finally {
       await db.query("DROP TRIGGER fixture_fail_offline ON action_logs");
       await db.query("DROP FUNCTION public.fail_offline_audit()");
     }
     const s = await service.snapshot(trial);
-    expect(s.participants[0].offlineState.version).toBe(5);
+    expect(s.participants[0].offlineState.version).toBe(6);
     expect(Number(s.totals.netAmount)).toBe(50);
     expect(Number(s.trial.currentAmount)).toBe(50);
   });
@@ -276,7 +282,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     await expect(
       service.update(trial, participant, actor, {
         action: "refund",
-        version: 5,
+        version: 6,
         amount: -1,
         reason: "잘못된 금액",
       }),
@@ -284,7 +290,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     await expect(
       service.update(trial, participant, actor, {
         action: "refund",
-        version: 5,
+        version: 6,
         amount: 10,
         processedAt: "2026-02-30T00:00:00Z",
         reason: "잘못된 날짜",
@@ -327,9 +333,13 @@ fixture("offline funding on disposable local PostgreSQL", () => {
   it("preserves net deposits when correcting payment after a partial refund", async () => {
     const payment = new FundingPaymentRecordService(db);
     await expect(
-      payment.update(trial, participant, actor, { paymentStatus: "unpaid" }),
+      payment.update(trial, participant, actor, {
+        version: 6,
+        paymentStatus: "unpaid",
+      }),
     ).rejects.toMatchObject({ status: 409 });
     await payment.update(trial, participant, actor, {
+      version: 6,
       paymentStatus: "refunded",
       paidAmount: 120,
     });
@@ -342,7 +352,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     const command = {
       action: "pledge",
       amount: 100,
-      version: 5,
+      version: 7,
       reason: "동시 정정 검증",
     };
     const results = await Promise.allSettled([
@@ -357,7 +367,7 @@ fixture("offline funding on disposable local PostgreSQL", () => {
     ).toEqual([409]);
     expect(
       (await service.snapshot(trial)).participants[0].offlineState.version,
-    ).toBe(6);
+    ).toBe(8);
   });
   it("closes a recruitment only after an explicit target-missed decision", async () => {
     const id = "50000000-0000-4000-8000-000000000001";
@@ -556,5 +566,153 @@ fixture("offline funding on disposable local PostgreSQL", () => {
       query.mockRestore();
       repository.mockRestore();
     }
+  });
+  it("allows one concurrent payment revision and rejects an offline action based on its old version", async () => {
+    const t = "a0000000-0000-4000-8000-000000000001",
+      p = "b0000000-0000-4000-8000-000000000001";
+    await db.query(
+      `INSERT INTO market_trials(id,title,status,"supplierId","targetAmount","trialPeriodDays","trialUnitPrice","fundingStartAt","fundingEndAt") VALUES ($1,'동시 수정 격리','recruiting',$2,100,30,100,now(),now()+interval '1 day')`,
+      [t, actor],
+    );
+    await db.query(
+      `INSERT INTO market_trial_participants(id,"marketTrialId","participantId","participantType","paymentStatus","rewardStatus","contributionAmount") VALUES ($1,$2,$3,'store_owner','unpaid','pending',0)`,
+      [p, t, actor],
+    );
+    const payment = new FundingPaymentRecordService(db);
+    const results = await Promise.allSettled(
+      [100, 120].map((paidAmount) =>
+        payment.update(t, p, actor, {
+          version: 0,
+          paymentStatus: "paid",
+          paidAmount,
+        }),
+      ),
+    );
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    expect(
+      results
+        .filter((r) => r.status === "rejected")
+        .map((r: any) => r.reason.code),
+    ).toEqual(["PAYMENT_VERSION_CONFLICT"]);
+    const state = (await service.snapshot(t)).participants[0];
+    expect(state.offlineState.version).toBe(1);
+    await expect(
+      payment.update(t, p, actor, { paymentStatus: "paid", paidAmount: 90 }),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      payment.update(t, p, actor, {
+        version: 0,
+        paymentStatus: "paid",
+        paidAmount: 90,
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      service.update(t, p, actor, {
+        version: 0,
+        action: "withdraw",
+        reason: "오래된 철회",
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    await service.update(t, p, actor, {
+      version: 1,
+      action: "refund",
+      amount: 20,
+      processedAt: "2026-10-20T00:00:00Z",
+      reason: "격리 환급",
+    });
+    await expect(
+      payment.update(t, p, actor, {
+        version: 1,
+        paymentStatus: "paid",
+        paidAmount: 90,
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    const logs = await new FundingOperatorExceptionsService(db).history(t, p);
+    expect(logs.items.map((row: any) => row.action)).toEqual([
+      "funding.offline_operation",
+      "neture.operator.market_trial_payment_change",
+    ]);
+    expect(logs.items[0]).toMatchObject({
+      offlineAction: "refund",
+      afterRefundAmount: "20",
+    });
+    expect(logs.hasMore).toBe(false);
+    expect(Number((await service.snapshot(t)).participants[0].paidAmount)).toBe(
+      Number(state.paidAmount),
+    );
+    await db.query(
+      `CREATE FUNCTION public.fail_payment_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action_key='neture.operator.market_trial_payment_change' THEN RAISE EXCEPTION 'fixture payment audit unavailable'; END IF; RETURN NEW; END $$`,
+    );
+    await db.query(
+      `CREATE TRIGGER fixture_fail_payment BEFORE INSERT ON action_logs FOR EACH ROW EXECUTE FUNCTION public.fail_payment_audit()`,
+    );
+    try {
+      await expect(
+        payment.update(t, p, actor, {
+          version: 2,
+          paymentStatus: "paid",
+          paidAmount: 150,
+        }),
+      ).rejects.toThrow("fixture payment audit unavailable");
+    } finally {
+      await db.query("DROP TRIGGER fixture_fail_payment ON action_logs");
+      await db.query("DROP FUNCTION public.fail_payment_audit()");
+    }
+    const unchanged = (await service.snapshot(t)).participants[0];
+    expect(unchanged.offlineState.version).toBe(2);
+    expect(Number(unchanged.paidAmount)).toBe(Number(state.paidAmount));
+    expect(
+      (await new FundingOperatorExceptionsService(db).history(t, p)).items,
+    ).toHaveLength(2);
+  });
+  it("pages unified and trial-level history beyond the old limits without exposing raw payment metadata", async () => {
+    for (let n = 0; n < 61; n++) {
+      await db.query(
+        `INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('funding',$1,'funding.offline_operation','manual','success',$2::jsonb)`,
+        [
+          actor,
+          JSON.stringify({
+            trialId: trial,
+            participantId: participant,
+            action: "refund",
+            reason: "합성 이력",
+            before: { refundAmount: 0 },
+            after: { refundAmount: 1 },
+            paymentReference: "private-reference",
+            paymentNote: "private-note",
+          }),
+        ],
+      );
+    }
+    const history = new FundingOperatorExceptionsService(db);
+    const first = await history.history(trial, participant),
+      second = await history.history(trial, participant, 2);
+    expect(first.items).toHaveLength(50);
+    expect(first.hasMore).toBe(true);
+    expect(second.items.length).toBeGreaterThan(0);
+    expect(second.hasMore).toBe(false);
+    expect(
+      first.items.some((a: any) =>
+        second.items.some((b: any) => a.id === b.id),
+      ),
+    ).toBe(false);
+    expect(JSON.stringify([...first.items, ...second.items])).not.toContain(
+      "private-reference",
+    );
+    expect(JSON.stringify(first.items)).not.toContain("private-note");
+    const a = await service.snapshot(trial, 1, 1),
+      b = await service.snapshot(trial, 1, 2),
+      c = await service.snapshot(trial, 1, 3);
+    expect(a.historyHasMore).toBe(true);
+    expect(b.historyHasMore).toBe(true);
+    expect(c.historyHasMore).toBe(false);
+    expect(
+      new Set(
+        [...a.history, ...b.history, ...c.history].map((row: any) => row.id),
+      ).size,
+    ).toBe(a.history.length + b.history.length + c.history.length);
+    await expect(service.snapshot(trial, 1, 0)).rejects.toMatchObject({
+      status: 400,
+    });
   });
 });

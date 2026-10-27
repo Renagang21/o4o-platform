@@ -23,6 +23,10 @@ export interface FundingException {
   types: string[];
 }
 export interface FundingHistoryItem {
+  offlineAction?: string | null;
+  reason?: string | null;
+  beforeRefundAmount?: string | null;
+  afterRefundAmount?: string | null;
   id: string;
   action: string;
   actorId: string | null;
@@ -50,12 +54,13 @@ export const fundingExceptionsApi = {
   async history(
     trialId: string,
     participantId: string,
-  ): Promise<FundingHistoryItem[]> {
+    page = 1,
+  ): Promise<{ items: FundingHistoryItem[]; page: number; hasMore: boolean }> {
     const res = await api.get(
-      `${base}/${encodeURIComponent(trialId)}/participants/${encodeURIComponent(participantId)}/history`,
+      `${base}/${encodeURIComponent(trialId)}/participants/${encodeURIComponent(participantId)}/history?page=${page}`,
     );
     if (!res.data?.success || !Array.isArray(res.data.data))
       throw new Error("처리 이력을 조회하지 못했습니다.");
-    return res.data.data;
+    return { items: res.data.data, page: res.data.page ?? page, hasMore: res.data.hasMore === true };
   },
 };
