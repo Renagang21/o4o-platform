@@ -47,6 +47,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22.18.0"
+      - name: Mask cooperative account selectors before any step environment is logged
+        if: ${{ !inputs.frontend_only }}
+        run: node scripts/ci/mask-cooperative-accounts.mjs
       - name: Pin reviewed main HEAD and green CI
         env:
           GH_TOKEN: ${{ github.token }}
