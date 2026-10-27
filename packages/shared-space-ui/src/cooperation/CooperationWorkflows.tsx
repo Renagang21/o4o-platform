@@ -608,7 +608,7 @@ function MemberInquiryForm({
 
 
 /** Keep the published full text reachable even when the material has a short summary. */
-export function CooperationMaterialDetails({ summary, body, attachments }: { summary?: string | null; body?: string | null; attachments?: unknown }) {
+export function CooperationMaterialDetails({ summary, body, attachments }: Readonly<{ summary?: string | null; body?: string | null; attachments?: unknown }>) {
   const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
   return <>
     {summary && <p className="cw-body">{plainBody(summary)}</p>}

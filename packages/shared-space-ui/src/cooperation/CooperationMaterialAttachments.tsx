@@ -18,9 +18,9 @@ function attachmentLink(value: unknown, index: number) {
 }
 
 /** Present attachments already returned by the membership-scoped material API; never fetch them automatically. */
-export function CooperationMaterialAttachments({ attachments }: { attachments?: unknown }) {
+export function CooperationMaterialAttachments({ attachments }: Readonly<{ attachments?: unknown }>) {
   if (!Array.isArray(attachments) || !attachments.length) return null;
-  const links = attachments.map(attachmentLink);
+  const links = attachments.map((attachment, index) => attachmentLink(attachment, index));
   return <section className="cooperation-material-attachments" aria-label="첨부자료">
     <p><strong>첨부자료</strong></p>
     <ul>{links.map((link, index) => link && <li key={`${link.url}:${index}`}>
