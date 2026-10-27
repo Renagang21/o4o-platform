@@ -14,6 +14,7 @@ export interface SupplierRecruitment {
   serviceName: string;
   commissionRate: number;
   consumerPrice: number;
+  supplyUnitPrice?: number | null;
   status: string;
   // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태 (읽기 전용 표시)
   exposureStatus: RecruitmentExposureStatus;
@@ -49,6 +50,7 @@ export interface RecruitmentDetail {
     serviceName: string;
     commissionRate: number;
     consumerPrice: number;
+  supplyUnitPrice?: number | null;
     status: string;
     // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태 (읽기 전용 표시)
     exposureStatus: RecruitmentExposureStatus;

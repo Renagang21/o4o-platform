@@ -28,6 +28,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import type { SellerRecruitmentService } from '../services/seller-recruitment.service.js';
 import { RecruitmentStatus } from '../entities/index.js';
+import { confirmRecruitmentSupplyPrice, RecruitmentSupplyPriceError } from '../services/recruitment-supply-price.service.js';
 import logger from '../../../utils/logger.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
@@ -133,12 +134,14 @@ export function createSellerRecruitmentController(deps: {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
       // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: serviceKeys[](복수) + serviceKey 하위호환
-      const { masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, shopUrl, imageUrl } = req.body || {};
+      const { masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, supplyUnitPrice, shopUrl, imageUrl } = req.body || {};
       const result = await service.createRecruitment(userId, {
-        masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, shopUrl, imageUrl,
+        masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, supplyUnitPrice, shopUrl, imageUrl,
       });
       if (!result.success) {
         const map: Record<string, [number, string]> = {
+          INVALID_SUPPLY_PRICE: [400, '공급가는 1~2,147,483,647원의 정수로 입력해 주세요.'],
+          SUPPLY_PRICE_TARGET_UNSUPPORTED: [400, '공급가 확정은 Neture 일반 공개 모집에서만 가능합니다.'],
           MASTER_ID_REQUIRED: [400, '제품 정보가 필요합니다.'],
           SERVICE_KEY_REQUIRED: [400, '모집 대상 서비스를 선택해 주세요.'],
           OFFER_NOT_FOUND: [404, '등록된 제품(공급 오퍼)을 찾을 수 없습니다.'],
@@ -152,6 +155,31 @@ export function createSellerRecruitmentController(deps: {
     } catch (error) {
       logger.error('[SellerRecruitment API] Error creating recruitment:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create recruitment' });
+    }
+  });
+
+  router.patch('/recruitments/:recruitmentId/supply-price', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    const userId=req.user?.id;
+    if (!userId) return unauthorized(res);
+    if (!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(req.params.recruitmentId)) {
+      return res.status(400).json({success:false,error:'INVALID_RECRUITMENT_ID',message:'모집 정보가 올바르지 않습니다.'});
+    }
+    try {
+      const data=await confirmRecruitmentSupplyPrice(AppDataSource,userId,req.params.recruitmentId,req.body?.supplyUnitPrice);
+      return res.json({success:true,data});
+    } catch(error) {
+      if (error instanceof RecruitmentSupplyPriceError) {
+        const messages:Record<string,string>={
+          INVALID_SUPPLY_PRICE:'공급가는 1~2,147,483,647원의 정수로 입력해 주세요.',
+          NOT_FOUND:'모집을 찾을 수 없습니다.',
+          SUPPLY_PRICE_TARGET_UNSUPPORTED:'공급가 확정은 Neture 일반 공개 모집에서만 가능합니다.',
+          SUPPLY_PRICE_ALREADY_CONFIRMED:'이미 다른 공급가로 확정되었습니다. 최신 모집 정보를 확인해 주세요.',
+          RECRUITMENT_CLOSED:'마감된 모집입니다. 모집 재개 후 공급가를 확정해 주세요.',
+        };
+        return res.status(error.status).json({success:false,error:error.code,message:messages[error.code]});
+      }
+      logger.error('[SellerRecruitment API] Supply price confirmation failed');
+      return res.status(500).json({success:false,error:'INTERNAL_ERROR',message:'확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주세요.'});
     }
   });
 

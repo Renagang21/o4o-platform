@@ -4,18 +4,14 @@
  * WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
  *
  * 제품 목록 행에서 "판매자 모집 연결" 선택 시 열림. PRIVATE 유통 제품만 생성 가능(backend 검증).
- * 가격 구조 변경 없음 — commissionRate/consumerPrice 는 모집 commission/참조값.
+ * 일반 공개 모집 공급가는 명시적으로 확정한다. commissionRate/consumerPrice는 기존 참조값이다.
  */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { supplierRecruitmentApi } from '../../lib/api/supplier';
 
-// 모집 대상 서비스 후보 (약국 대상은 의약품/규제 상품 시 backend 가 gate)
-const SERVICE_OPTIONS: Array<{ key: string; label: string; pharmacy: boolean }> = [
-  { key: 'kpa-society', label: 'KPA Society (약국)', pharmacy: true },
-  { key: 'k-cosmetics', label: 'K-Cosmetics', pharmacy: false },
-  { key: 'neture', label: 'Neture', pharmacy: false },
-];
+// 현재 일반 공개 모집의 공급가 확정 대상. 종료된 서비스의 기존 모집은 목록에서 보존한다.
+const SERVICE_OPTIONS = [{key:'neture',label:'Neture'}];
 
 interface Props {
   product: { masterId: string; name: string; regulatoryType?: string; distributionType?: string };
@@ -23,20 +19,19 @@ interface Props {
   onCreated?: () => void;
 }
 
-// WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
-//   규제(의약품 계열) 상품은 약국 대상 서비스에만 모집 가능 — 프론트도 반영(백엔드 gate 가 최종 방어).
-const REGULATED_TYPES = ['DRUG', 'QUASI_DRUG', 'MEDICAL_DEVICE', 'HEALTH_FUNCTIONAL'];
-
 export default function RecruitmentCreateModal({ product, onClose, onCreated }: Props) {
-  // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: 복수 서비스 선택
+  // 새 공급가 확정은 현재 Neture 일반 모집에만 연결한다.
   const [serviceKeys, setServiceKeys] = useState<string[]>([]);
   const [commissionRate, setCommissionRate] = useState('');
   const [consumerPrice, setConsumerPrice] = useState('');
+  const [supplyUnitPrice,setSupplyUnitPrice]=useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const mounted=useRef(true);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
 
   const notPrivate = product.distributionType && product.distributionType !== 'PRIVATE';
-  const isRegulated = !!product.regulatoryType && REGULATED_TYPES.includes(product.regulatoryType);
+
 
   const toggleService = (key: string) => {
     setError(null);
@@ -49,13 +44,18 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
       setError('모집할 서비스를 한 개 이상 선택해 주세요.');
       return;
     }
+    const price=Number(supplyUnitPrice);
+    if(!supplyUnitPrice.trim() || !Number.isInteger(price) || price<=0 || price>2147483647){setError('공급가는 1~2,147,483,647원의 정수로 입력해 주세요.');return;}
+    if(submitting)return;
     setSubmitting(true);
     const result = await supplierRecruitmentApi.create({
       masterId: product.masterId,
+      supplyUnitPrice:price,
       serviceKeys,
       commissionRate: commissionRate ? Number(commissionRate) : undefined,
       consumerPrice: consumerPrice ? Number(consumerPrice) : undefined,
     });
+    if(!mounted.current)return;
     setSubmitting(false);
     if (result.success) {
       onCreated?.();
@@ -70,7 +70,7 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <h3 className="text-base font-semibold text-slate-800">판매자 모집 생성</h3>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+          <button type="button" onClick={onClose} disabled={submitting} aria-label="모집 작성 닫기" className="text-slate-400 hover:text-slate-600"><X aria-hidden="true" className="w-5 h-5" /></button>
         </div>
 
         <div className="px-6 py-4 space-y-4">
@@ -88,10 +88,10 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">모집할 서비스 <span className="text-red-500">*</span> <span className="text-xs font-normal text-slate-400">(복수 선택 가능)</span></label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">모집할 서비스 <span className="text-red-500">*</span></label>
             <div className="space-y-1.5">
               {SERVICE_OPTIONS.map((s) => {
-                const disabled = isRegulated && !s.pharmacy;
+                const disabled = submitting;
                 const checked = serviceKeys.includes(s.key);
                 return (
                   <label
@@ -112,34 +112,39 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
                       className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                     />
                     <span>{s.label}</span>
-                    {disabled && <span className="ml-auto text-xs">약국 전용 상품 — 선택 불가</span>}
+
                   </label>
                 );
               })}
             </div>
             <p className="mt-1 text-xs text-slate-400">
-              {isRegulated
-                ? '의약품·규제 상품은 약국 대상 서비스(KPA)에만 모집할 수 있습니다.'
-                : '여러 서비스를 선택하면 서비스별로 일반 공개 모집이 생성됩니다. 운영자 노출 승인은 필요하지 않습니다.'}
+              가격과 참여 승인이 갖춰진 모집은 약국의 기존 상품 주문에서 이용합니다. 수취 주체·결제 가능 여부는 별도로 확인합니다.
             </p>
+          </div>
+
+          <div>
+            <label htmlFor="recruitment-supply-price" className="block text-sm font-medium text-slate-700">모집 공급가 (원)</label>
+            <input id="recruitment-supply-price" type="number" min={1} max={2147483647} step={1} value={supplyUnitPrice} disabled={submitting}
+              onChange={e=>setSupplyUnitPrice(e.target.value)} className="mt-1 w-full rounded border border-slate-200 p-2" />
+            <p className="mt-1 text-xs text-slate-500">이번 모집의 공급가를 직접 확정합니다. 소비자가·일반 상품가와 별개이며 확정 후 이 화면에서 변경할 수 없습니다.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">수수료율 (%)</label>
+              <label htmlFor="recruitment-commission" className="block text-sm font-medium text-slate-700 mb-1.5">수수료율 (%)</label>
               <input
-                type="number" min={0} max={100} step="0.01"
-                value={commissionRate}
+                disabled={submitting} type="number" min={0} max={100} step="0.01"
+                id="recruitment-commission" value={commissionRate}
                 onChange={(e) => setCommissionRate(e.target.value)}
                 placeholder="예: 10"
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">소비자가 (참조)</label>
+              <label htmlFor="recruitment-consumer-price" className="block text-sm font-medium text-slate-700 mb-1.5">소비자가 (참조)</label>
               <input
-                type="number" min={0}
-                value={consumerPrice}
+                disabled={submitting} type="number" min={0}
+                id="recruitment-consumer-price" value={consumerPrice}
                 onChange={(e) => setConsumerPrice(e.target.value)}
                 placeholder="선택"
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -147,11 +152,11 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
         </div>
 
         <div className="px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
+          <button type="button" onClick={onClose} disabled={submitting} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
           <button
             type="button"
             onClick={handleSubmit}
