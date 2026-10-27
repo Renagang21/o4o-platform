@@ -88,3 +88,5 @@ CI의 관리자 정보구조 회귀 검사가 새 화면 탭과 사이드바 정
 메뉴 보완 후 관리자 전체 Vitest 42개 파일·517건, TypeScript 검사·production build를 통과했다. 실제 `AdminSidebar`와 메뉴 SSOT·permission map을 이용한 합성 세션에서 1440px·390px 사이드바→신규 화면 진입과 서비스 운영자에게 해당 메뉴가 표시되지 않는 것을 확인했다. page error는 없었다. 운영 로그인 검증으로 간주하지 않는다.
 
 API 전체 회귀의 실패는 관리자 Product DB mount 목록이 14개로 고정되어 새 라우터(15번째)를 누락한 계약 목록 불일치였다. 목록을 실제 신규 경로까지 확장하고 신규 라우터의 `requireAdmin` floor·로컬 역할 배열 부재·4개 write 경로의 `requireProductDbWrite`를 함께 검사하도록 보완했다. 기존 검사 항목은 유지했으며 관련 실제 HTTP/정적 권한 테스트 122건이 통과했다.
+
+SonarCloud의 신뢰성 지적은 기본 문자열 정렬·한 줄 조건문 등 표기에서 발생했다. fingerprint·UUID lock·바코드의 기존 UTF-16 이진 정렬을 명시적 비교 함수로 보존했으며, locale 정렬로 기존 hash를 바꾸지 않는다. 기존 hash 상수 회귀와 GS1 ASCII 29 구분자 검증을 추가했다. 조건문 종료를 명시하고 상태 메시지는 native `output`으로 표시했다. 관련 API/권한 98건·관리자 39건·매장 4건, API/관리자/매장 production build, 실제 1,205개 offline 입력 검증을 다시 통과했다. 데이터베이스 트랜잭션과 가져오기 batch의 순차 await는 원자성과 요청량 제한을 위해 유지한다.

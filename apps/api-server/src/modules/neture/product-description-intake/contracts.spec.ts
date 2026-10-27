@@ -1,13 +1,17 @@
-import { barcodeForms, normalizeProductBarcode, prepareDescriptionEntries } from './contracts.js';
+import { barcodeForms, descriptionFingerprint, normalizeProductBarcode, prepareDescriptionEntries } from './contracts.js';
 const entry = { key: 'synthetic', name: 'Synthetic product', content: '<p>Ingredient and use</p>', barcodes: ['08806541001115'], source: { kind: 'government', currentness: 'retrieved', checkedOn: '2026-10-27', references: [{ url: 'https://nedrug.mfds.go.kr/example' }] } };
 describe('public description intake boundary', () => {
   it('validates GTIN and normalizes filler zeros and GS1 AI(01), preserving real packaging indicators', () => {
     expect(normalizeProductBarcode('08806541001115')).toBe('8806541001115');
     expect(normalizeProductBarcode('(01)08806541001115(17)271231')).toBe('8806541001115');
     expect(normalizeProductBarcode(']d2010880654100111517271231')).toBe('8806541001115');
+    expect(normalizeProductBarcode('0108806541001115' + String.fromCharCode(29) + '21SERIAL')).toBe('8806541001115');
     expect(normalizeProductBarcode('18806541001112')).toBe('18806541001112');
     expect(barcodeForms('8806541001115')).not.toContain('18806541001112');
     for (const code of ['1436', '8806541001114', 'POS000001', '8806541001115x']) expect(normalizeProductBarcode(code)).toBeNull();
+  });
+  it('preserves persisted fingerprint ordering for mixed-case and underscore keys', () => {
+    expect(descriptionFingerprint({ z: 1, A: 2, a: 3, _: 4 })).toBe('ed418da6525ed72504754bb0c5ccbdbee53c8ce02c05fc49a30be41e50bb424d');
   });
   it('does not store empty, image-only or script-only descriptions', () => {
     const result = prepareDescriptionEntries({ entries: ['<p>&nbsp;&#8203;</p>', '<img src="https://example.com/image">', '<script>bad()</script>'].map(content => ({ ...entry, content })) });

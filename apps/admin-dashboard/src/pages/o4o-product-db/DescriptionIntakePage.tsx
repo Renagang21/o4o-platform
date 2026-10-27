@@ -22,7 +22,8 @@ export default function DescriptionIntakePage() {
   const show = (d: IntakeDetail) => { setDetail(d); setBody(d.entry.content); setSelected([]); setArchived(false); setNote(''); };
   const run = async (task: () => Promise<void>) => { setBusy(true); setMessage(''); try { await task(); } catch { setMessage('처리하지 못했습니다. 최신 자료를 다시 열어 입력·선택·변경 여부를 확인하세요.'); } finally { setBusy(false); } };
   const open = (id: string) => { const key = ++generation.current; void run(async () => { const d = await api.detail(id); if (generation.current === key) show(d); }); };
-  const loadFile = (file: File | undefined) => { if (!file) return; void run(async () => {
+  const loadFile = (file: File | undefined) => { if (!file) { return; }
+    void run(async () => {
     setEntries([]); setPreview([]); setProgress('');
     if (file.size > 40 * 1024 * 1024) throw new Error('File too large');
     const result = readPublicDescriptionCatalog(JSON.parse(await file.text()), purpose, language);
@@ -59,7 +60,7 @@ export default function DescriptionIntakePage() {
       <output className="block" aria-live="polite">{progress}</output>
       {preview.length > 0 && <div className="max-h-72 overflow-auto"><p>연결 후보 있음 {preview.filter(i => i.targets.length).length}개 · 미연결 {preview.filter(i => !i.targets.length).length}개</p>{preview.map((item, i) => <div key={`${item.entry.key}:${i}`} className="border-t py-2">{item.entry.name} · {item.targets.length}개 상품 후보 · 기존 설명 {item.targets.filter(t => t.canonical).length}개 · {item.entry.source.currentness === 'archived' ? '보관자료 / 현행성 미확인' : item.entry.source.kind}</div>)}</div>}
     </section>
-    <p role="status" className="text-blue-800">{message}</p>
+    <output className="block text-blue-800">{message}</output>
     <section className="space-y-3">
       <div className="flex flex-wrap gap-3 items-center"><h3 className="font-semibold">설명 검토 ({total})</h3><select aria-label="검토 상태" value={status} disabled={busy} onChange={e => { setStatus(e.target.value); setPage(1); }}>{[['pending', '대기'], ['reviewing', '검토 중'], ['matched', '반영 완료'], ['rejected', '제외'], ['all', '전체']].map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select><button className={button} disabled={busy} onClick={() => void list()}>새로고침</button></div>
       <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">

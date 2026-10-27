@@ -1,7 +1,7 @@
 import type { DataSource, EntityManager } from 'typeorm';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
-import { DescriptionIntakeError, descriptionFingerprint, prepareDescriptionEntries, type DescriptionEntry } from './contracts.js';
+import { DescriptionIntakeError, compareDescriptionKeys, descriptionFingerprint, prepareDescriptionEntries, type DescriptionEntry } from './contracts.js';
 import { findDescriptionTargets } from './lookup.service.js';
 
 import { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
@@ -18,7 +18,7 @@ const fail = (code: string, status = 409): never => { throw new DescriptionIntak
 
 /** An intake resource is not a new master. Only explicit approval can change canonical descriptions. */
 export class DescriptionIntakeService {
-  constructor(private db: DataSource) {}
+  constructor(private readonly db: DataSource) {}
   async preview(raw: unknown) {
     const prepared = prepareDescriptionEntries(raw);
     const targets = await findDescriptionTargets(this.db, prepared.entries);
@@ -83,7 +83,7 @@ export class DescriptionIntakeService {
       if (!['pending', 'reviewing'].includes(row.candidateStatus)) fail('DESCRIPTION_RESOURCE_CLOSED');
       const resource = resourceOf(row), entry = resource.entry;
       if (entry.source.currentness === 'archived' && !input.acknowledgeArchived) fail('ARCHIVED_SOURCE_ACK_REQUIRED', 400);
-      const selected = [...new Set(input.targets.map(t => t.masterId))].sort();
+      const selected = [...new Set(input.targets.map(t => t.masterId))].sort(compareDescriptionKeys);
       if (!selected.length || selected.length !== input.targets.length) fail('DESCRIPTION_TARGET_REQUIRED', 400);
       // Serialize against ordinary master/description edits before reading optimistic canonical revisions.
       const locked: Array<{ id: string }> = await manager.query("SELECT id FROM product_masters WHERE id=ANY($1::uuid[]) AND status='ACTIVE' ORDER BY id FOR UPDATE", [selected]);

@@ -6,16 +6,27 @@ export class DescriptionIntakeError extends Error {
   constructor(public code: string, public status = 400) { super(code); }
 }
 
+/** Preserve the UTF-16 binary ordering used by existing fingerprints, independently of server locale. */
+export function compareDescriptionKeys(left: string, right: string): number {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+}
+function isRawGs1(value: string): boolean {
+  // ASCII 29 is the GS1 group separator; keep it out of the regex character set.
+  return /^01\d{14}/u.test(value) && (value.length === 16 || /^(17|15|10|21)/u.test(value.slice(16)) || value.charCodeAt(16) === 29);
+}
+
 /** GTIN filler zero is removable; a real GTIN-14 packaging indicator is not. */
 export function normalizeProductBarcode(raw: string): string | null {
   let value = raw.trim().replace(/^\]d2/, '');
   const bracketed = /^\(01\)(\d{14})(?:$|\()/u.exec(value);
   if (bracketed) value = bracketed[1];
-  else if (/^01\d{14}(?:$|(?:17|15|10|21|\x1d))/u.test(value)) value = value.slice(2, 16);
+  else if (isRawGs1(value)) value = value.slice(2, 16);
   if (!/^\d+$/.test(value) || ![8, 12, 13, 14].includes(value.length)) return null;
   const digits = [...value].map(Number);
   let sum = digits.pop()!;
-  digits.reverse().forEach((digit, i) => { sum += digit * (i % 2 === 0 ? 3 : 1); });
+  digits.reverse();
+  digits.forEach((digit, i) => { sum += digit * (i % 2 === 0 ? 3 : 1); });
   if (sum % 10) return null;
   return value.length === 14 && value.startsWith('0') ? value.slice(1) : value;
 }
@@ -67,7 +78,7 @@ export const intakeBatchSchema = z.object({ entries: z.array(descriptionEntrySch
 export function descriptionFingerprint(value: unknown): string {
   function ordered(input: unknown): unknown {
     if (Array.isArray(input)) return input.map(ordered);
-    if (input && typeof input === 'object') return Object.fromEntries(Object.keys(input).sort().map(key => [key, ordered((input as Record<string, unknown>)[key])]));
+    if (input && typeof input === 'object') return Object.fromEntries(Object.keys(input).sort(compareDescriptionKeys).map(key => [key, ordered((input as Record<string, unknown>)[key])]));
     return input;
   }
   return createHash('sha256').update(JSON.stringify(ordered(value))).digest('hex');
@@ -84,7 +95,7 @@ export function prepareDescriptionEntries(raw: unknown): { entries: DescriptionE
     const codes = input.barcodes.map(normalizeProductBarcode);
     if (codes.some(code => !code)) throw new DescriptionIntakeError('INVALID_BARCODE');
     entries.push({ ...input, content, summary: input.summary ? sanitizeDescriptionHtml(input.summary) || null : null,
-      barcodes: [...new Set(codes as string[])].sort(),
+      barcodes: [...new Set(codes as string[])].sort(compareDescriptionKeys),
       source: { ...input.source, references: [...input.source.references].sort((a, b) => a.url.localeCompare(b.url)) },
     });
   }

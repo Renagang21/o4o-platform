@@ -31,9 +31,9 @@ export function ProductDescriptionLookup() {
       <label>검색 기준<select aria-label="설명 검색 기준" className="block rounded border p-2" value={mode} onChange={e => { clear(); setMode(e.target.value); setQuery(''); }}><option value="barcode">바코드</option><option value="name">상품명</option></select></label>
       <label className="grow">{mode === 'barcode' ? '바코드' : '상품명'}<input aria-label="설명 검색어" className="block rounded border p-2 w-full" value={query} maxLength={mode === 'barcode' ? 128 : 500} onChange={e => { clear(); setQuery(e.target.value); }} /></label>
       <label>설명 목적<select aria-label="조회할 설명 목적" className="block rounded border p-2" value={type} onChange={e => { clear(); setType(e.target.value); }}><option value="B2B">전문인 상담 (B2B)</option><option value="STORE">매장 안내 (STORE)</option></select></label>
-      <button disabled={busy || !query.trim()} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-40">{busy ? '조회 중…' : '설명 조회'}</button>
+      <button type="submit" disabled={busy || !query.trim()} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-40">{busy ? '조회 중…' : '설명 조회'}</button>
     </form>
-    <p role="status">{message}</p>
+    <output className="block">{message}</output>
     {items.length > 0 && !selected && <ul className="space-y-2">{items.map(item => <li key={item.id}><button type="button" className="rounded border p-2 text-left w-full" onClick={() => setSelected(item)}>{item.name} · {item.manufacturer} · {item.barcode} · {item.canonical ? '설명 있음' : '해당 목적·언어 설명 없음'}</button></li>)}</ul>}
     {selected && <article className="space-y-2"><h3 className="font-semibold">{selected.name} · {selected.manufacturer}</h3>
       {items.length > 1 && <button className="underline" onClick={() => setSelected(null)}>다른 후보 선택</button>}

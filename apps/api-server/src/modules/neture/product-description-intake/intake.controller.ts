@@ -24,7 +24,9 @@ export function createDescriptionIntakeController(db: DataSource): Router {
     }
   };
   const actor = (req: Request) => { const id = (req as Request & { user?: { id?: string } }).user?.id;
-    if (!id) throw new DescriptionIntakeError('AUTH_REQUIRED', 401); return id; };
+    if (!id) { throw new DescriptionIntakeError('AUTH_REQUIRED', 401); }
+    return id;
+  };
   const id = (req: Request) => z.string().uuid().parse(req.params.id);
   router.post('/preview', handle(req => service.preview(req.body)));
   router.post('/', requireProductDbWrite, handle(req => service.submit(req.body, actor(req))));
