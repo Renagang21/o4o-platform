@@ -19,3 +19,10 @@
 ## 3. 현재 결과
 
 PR·CI·리뷰·병합·배포 진행 중. 개발/로컬 검증 기록은 [WO](../work-orders/WO-O4O-ASSISTANT-MANUAL-KNOWLEDGE-V1.md), 사용자 테스트 절차는 [guide](../guides/O4O-ASSISTANT-MANUAL-USER-TEST-V1.md)를 따른다. 실제 모델 품질·유료 비용·유팜/PMPLUS Windows 조작은 별도 범위다.
+
+
+## 4. PR 리뷰 보완
+
+PR #849의 Codex P2 두 건을 확인했다. (1) 탭별 snapshot 전체 덮어쓰기 대신, 최신 자료 읽기·수정·쓰기를 하나의 IndexedDB readwrite 트랜잭션으로 실행한다. PDF/JSON 해석은 트랜잭션 밖에서 준비하고, 저장 직전에는 최신 문서에 변경만 적용한다. 사용 횟수 갱신이 다른 탭의 추가·교정·삭제를 되돌리지 않는다. (2) 개별 PDF 12MB와 자료함 JSON 64MB 한도를 분리해 정상 허용된 10개 문서를 UTF-8/JSON escape 확장까지 포함해 다시 가져올 수 있게 했다.
+
+실제 두 Chromium 탭의 IndexedDB에서 자료 추가·보완 후 다른 탭 사용 횟수 갱신, 동시 42회 증분, 삭제 비복원, 다른 계정 분리를 검증해 PASS했다. 재현 명령: `O4O_BROWSER_EXECUTABLE=/usr/bin/chromium node scripts/checks/assistant-manual-storage.browser.mjs`. 한글 70만 자 문서 6개의 12MB 초과 자료함을 내보낸 JSON으로 복원하는 회귀와 최악의 escape 크기 상한도 추가했다. 원문 매뉴얼이나 실제 사용자 자료를 회귀에 넣지 않았다.

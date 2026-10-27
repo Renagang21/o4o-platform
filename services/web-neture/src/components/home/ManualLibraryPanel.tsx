@@ -17,7 +17,7 @@ export function ManualLibraryPanel({ library, disabled }: { library: ManualLibra
     <fieldset disabled={disabled || library.busy || !library.ready} className="min-w-0 space-y-3">
       <label className="block text-sm">프로그램 이름 (생략하면 파일명 사용)<input className="mt-1 w-full rounded border p-2" maxLength={80} value={program} onChange={e => setProgram(e.target.value)} /></label>
       <label className="block text-sm">매뉴얼 PDF 또는 내보낸 자료함 가져오기<input className="mt-1 block w-full max-w-full text-xs" type="file" accept="application/pdf,.pdf,.crdownload,application/json,.json" onChange={e => { const file = e.target.files?.[0]; e.target.value = ''; if (file) void library.importFile(file, program); }} /></label>
-      <p className="text-xs text-slate-500">PDF 최대 12MB·400쪽, 최대 10개. 원본 PDF는 서버에 업로드하지 않습니다. 암호 PDF·글자 없는 스캔본은 지원하지 않습니다.</p>
+      <p className="text-xs text-slate-500">PDF 최대 12MB·400쪽, 최대 10개. 내보낸 자료함 JSON은 최대 64MB. 원본 PDF는 서버에 업로드하지 않습니다. 암호 PDF·글자 없는 스캔본은 지원하지 않습니다.</p>
       {library.documents.length === 0 && <p className="text-sm text-slate-600">등록된 매뉴얼이 없습니다. 파일을 가져온 뒤 사용할 매뉴얼을 선택해 주세요.</p>}
       <ul className="space-y-2">{library.documents.map(doc => <li key={doc.id} className="rounded border p-2 text-sm">
         <label className="flex items-start gap-2"><input type="checkbox" checked={library.selected.includes(doc.id)} onChange={() => library.toggle(doc.id)} /><span className="min-w-0 break-words">{doc.title} · {doc.program}<span className="block text-xs text-slate-500">{doc.pages.length}쪽 · 참조 응답 {doc.uses}회</span></span></label>

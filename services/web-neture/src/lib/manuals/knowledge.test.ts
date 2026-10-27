@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { searchManuals, validateManual, type ManualDocument } from './knowledge';
+import { searchManuals, validateManual, parseManualLibrary, MANUAL_LIMITS, type ManualDocument } from './knowledge';
 const doc: ManualDocument = { id: 'a'.repeat(64), title: '합성 매뉴얼', program: '합성 프로그램', importedAt: '2026-10-27', uses: 0, reports: {}, pages: [{ page: 1, text: '소개 화면' }, { page: 2, text: '약품 사입 명세서는 거래처와 포장단위, 수량, 포장 단가를 확인합니다.' }, { page: 3, text: '백업은 환경설정 메뉴에서 합니다.' }] };
 describe('manual evidence retrieval', () => {
   it('uses only explicitly selected documents and retrieves matching pages with provenance', () => {
@@ -25,4 +25,17 @@ describe('manual evidence retrieval', () => {
     expect(() => validateManual({ ...doc, id: '../another-account' })).toThrow();
     expect(validateManual({ ...doc, owner: 'forged', verified: true })).not.toHaveProperty('verified');
   });
+});
+
+
+it('round-trips a valid Korean library larger than the individual PDF limit', () => {
+  const documents = Array.from({ length: 6 }, (_, i) => ({ ...doc, id: i.toString(16).padStart(64, '0'), pages: [{ page: 1, text: '가'.repeat(700_000) }] }));
+  const exported = JSON.stringify({ format: 'o4o-manual-library-v1', documents });
+  const bytes = new TextEncoder().encode(exported).byteLength;
+  expect(bytes).toBeGreaterThan(MANUAL_LIMITS.bytes);
+  expect(bytes).toBeLessThan(MANUAL_LIMITS.libraryBytes);
+  expect(parseManualLibrary(exported).map(d => d.pages[0].text.length)).toEqual(Array(6).fill(700_000));
+  // JSON escaping can require six bytes for each UTF-16 code unit, including report text.
+  const worstCase = MANUAL_LIMITS.documents * (MANUAL_LIMITS.characters * 6 + MANUAL_LIMITS.pages * (300 * 6 + 100) + 4000);
+  expect(worstCase).toBeLessThan(MANUAL_LIMITS.libraryBytes);
 });

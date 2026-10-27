@@ -10,7 +10,7 @@ export interface ManualReference {
   manualId: string; title: string; program: string; page: number; text: string;
   userReport?: { state: 'matches' | 'differs'; note: string };
 }
-export const MANUAL_LIMITS = { bytes: 12 * 1024 * 1024, pages: 400, characters: 800_000, documents: 10, references: 4, excerpt: 1400 } as const;
+export const MANUAL_LIMITS = { bytes: 12 * 1024 * 1024, libraryBytes: 64 * 1024 * 1024, pages: 400, characters: 800_000, documents: 10, references: 4, excerpt: 1400 } as const;
 const normalize = (s: string) => s.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim();
 function tokens(s: string): Set<string> {
   const words = normalize(s).match(/[\p{L}\p{N}]+/gu) ?? [];
@@ -58,4 +58,12 @@ export function searchManuals(documents: readonly ManualDocument[], selected: re
     if (seen.has(key)) return false;
     seen.add(key); return true;
   }).slice(0, MANUAL_LIMITS.references).map(c => c.reference);
+}
+
+
+/** The full 10-document library may exceed the per-PDF byte limit after UTF-8/JSON encoding. */
+export function parseManualLibrary(text: string): ManualDocument[] {
+  const data = JSON.parse(text) as { format?: string; documents?: unknown[] } | null;
+  if (!data || data.format !== 'o4o-manual-library-v1' || !Array.isArray(data.documents) || data.documents.length > MANUAL_LIMITS.documents) throw Error('O4O 매뉴얼 자료함 파일이 아니거나 문서 한도를 초과했습니다.');
+  return data.documents.map(validateManual);
 }
