@@ -90,9 +90,18 @@ it('preserves the existing composer draft and refuses overflow without calling o
   const apply = vi.fn(); const view = render(<PharmacyOrderPanel disabled={false} resuming={false} draft="기존 요청" onApply={apply} />);
   addSupplier(); addLine(); fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
   expect(apply.mock.calls[0][0]).toMatch(/^기존 요청\n외부 거래처/);
+  const prepared = apply.mock.calls[0][0];
+  view.rerender(<PharmacyOrderPanel disabled={false} resuming={false} draft={prepared} onApply={apply} />);
+  fireEvent.click(screen.getByRole('button', { name: '행 수정' }));
+  fireEvent.change(screen.getByLabelText('포장 개수'), { target: { value: '3' } });
+  fireEvent.click(screen.getByRole('button', { name: '수정 반영' }));
+  fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
+  expect(apply.mock.calls[1][0]).toMatch(/^기존 요청\n외부 거래처/);
+  expect(apply.mock.calls[1][0]).toContain('3포장');
+  expect(apply.mock.calls[1][0]).not.toContain('2포장');
   view.rerender(<PharmacyOrderPanel disabled={false} resuming={false} draft={'가'.repeat(2000)} onApply={apply} />);
   fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
-  expect(apply).toHaveBeenCalledOnce(); expect(screen.getByRole('alert').textContent).toContain('기존 입력을 유지');
+  expect(apply).toHaveBeenCalledTimes(2); expect(screen.getByRole('alert').textContent).toContain('기존 입력을 유지');
 });
 
 it('keeps the first imported sheet selected when updating it among multiple sheets', async () => {

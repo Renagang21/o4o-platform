@@ -21,7 +21,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const alive = useRef(true);
-  const lastPrepared = useRef('');
+  const lastPrepared = useRef({ text: '', base: '' });
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const sheets = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'sheet'}> => r.kind === 'sheet');
   const sheet = sheets.find(r => r.data.id === selected)?.data ?? sheets[0]?.data;
@@ -77,9 +77,10 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   function prepare(supplier: string, mode: 'prepare'|'availability') {
     if (!sheet || resuming) throw Error('진행 중인 질문에 먼저 답하거나 업무를 마친 뒤 새 주문 요청을 준비하세요.');
     const request = orderPreparationRequest(bundle, sheet.id, supplier, mode);
-    const text = draft && draft !== lastPrepared.current ? `${draft.trim()}\n${request}` : request;
+    const base = draft === lastPrepared.current.text ? lastPrepared.current.base : draft.trim();
+    const text = base ? `${base}\n${request}` : request;
     if (text.length > HOME_CHAT_MAX_MESSAGE_LENGTH) throw Error('기존 입력을 유지했습니다. 입력창 내용을 먼저 정리한 뒤 주문 요청을 준비하세요.');
-    lastPrepared.current = text; onApply(text);
+    lastPrepared.current = { text, base }; onApply(text);
     setNotice('입력창에만 반영했습니다. 요청 내용을 확인하고 실행하세요.');
   }
   return <details className="mt-3 w-full max-w-xl rounded-xl border border-slate-200 bg-white p-4 text-left text-sm text-slate-700">
