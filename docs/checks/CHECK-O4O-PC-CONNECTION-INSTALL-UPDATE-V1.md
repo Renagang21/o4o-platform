@@ -16,7 +16,7 @@ UI의 ‘최신’은 실제 health의 releaseId·프로그램 버전·SQLite re
 
 ## 2. 로컬 확인
 
-- installer/ZIP 테스트 10개 PASS. Windows runtime E2E 1개는 Linux에서 명시 skip하며 Windows CI에서 실행한다.
+- installer/ZIP 테스트 11개 PASS. Windows runtime E2E 1개는 Linux에서 명시 skip하며 Windows CI에서 실행한다.
 - 기존 SQLite v8에 합성 dataset을 넣고 backup/bootstrap을 거친 뒤 원본 행·선행 0·credential 바이트 보존 확인 PASS. 실제 계정·사용자 DB는 쓰지 않았다.
 - 손상 파일·허용 밖 credential 경로·symlink/junction·설치 충돌·데이터 위치 변경·실행 중/불명 PC 거절, 기존 버전 및 pointer 보존 확인 PASS.
 - 설치/배포 무관 source SHA만 달라질 때 releaseId 동일·다운로드 filename/hash 구분 확인 PASS.
@@ -35,3 +35,5 @@ Windows CI는 실제 bundled node.exe 패키지를 만들고 기존 SQLite prefl
 Windows PR CI(40500335521)의 `PC installer Windows` job PASS: 별도 Node PATH 없이 Install.cmd, 신규 설치 동의, 한글 경로 Start.cmd, 실제 health releaseId/version/SQLite ready/schema를 확인했다. 사용자 PC 적용 증거와는 구분한다. 리뷰에서 발견한 agent-only 변경 배포 누락을 Neture artifact input 판정과 deploy-risk 회귀로 보완했다. 최종 HEAD의 CI·리뷰 및 운영 배포는 별도로 확인한다.
 
 손상/삭제된 기존 코드로 정상 재설치를 막지 않도록 pointer·데이터 경로 검증과 기존 코드 무결성 검증을 분리했다. 동일 버전 손상 slot은 별도 `.damaged-*`로 보존 후 검증된 새 코드로 교체하며, preflight 실패 시 기존 slot/pointer로 복귀한다. 손상·누락·다른 버전 갱신·데이터 보존 회귀를 추가했다.
+
+설치기 강제 종료 시 영구 lock 파일로 후속 업데이트가 막히지 않도록 Windows OS 소유 named-pipe mutex로 변경했다(명령 수신/HTTP API 없음). 프로세스 종료 시 커널이 잠금을 해제하며 동시 설치 거절과 강제 종료 후 재획득을 실제 자식 프로세스로 검증한다. Linux 테스트는 abstract socket을 사용한다.

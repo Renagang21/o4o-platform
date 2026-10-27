@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { assembleRelease } from '../release/build-release.mjs';
 import { zip, member } from '../release/zip.mjs';
-import { installPackage, verifyPackage, installedSlot } from '../release/install-core.mjs';
+import { installPackage, verifyPackage, installedSlot, acquireInstallLock } from '../release/install-core.mjs';
 import { bootstrapLocalDb, closeLocalDb, applyImport, LocalDatasetRepository } from '../src/local-db.mjs';
 let root;
 beforeEach(()=>{root=fs.mkdtempSync(path.join(os.tmpdir(),'o4o-release-'));});
@@ -61,7 +61,7 @@ test('data relocation, path overlap and concurrent installer are rejected',async
  const source=writePackage(fixture()),options=target();await installPackage({source,...options});
  await assert.rejects(installPackage({source,...options,dataHome:options.home}),/UNSAFE_INSTALL_LOCATION/);
  await assert.rejects(installPackage({source,...options,dataHome:path.join(root,'different')}),/DATA_LOCATION_CHANGED/);
- fs.writeFileSync(path.join(options.home,'.install.lock'),'fixture');await assert.rejects(installPackage({source,...options}),/ANOTHER_INSTALL/);
+ const unlock=await acquireInstallLock(options.home);try{await assert.rejects(installPackage({source,...options}),/ANOTHER_INSTALL/);}finally{await unlock();}
 });
 test('failed activation preparation retains previous installation and new version does not delete old code',async()=>{
  const options=target(),one=writePackage(fixture()),two=writePackage(fixture('two'),'second');await installPackage({source:one,...options});
@@ -121,4 +121,15 @@ test('verified packages repair missing/corrupt installed code while preserving d
  fs.unlinkSync(index);await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture('two').manifest.releaseId);
  fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.4.0');
  assert.deepEqual(fs.readFileSync(path.join(options.dataHome,'credentials.json')),credential);
+});
+
+test('terminated installer releases OS mutex and preserves real concurrent exclusion',async()=>{
+ const home=path.join(root,'mutex');fs.mkdirSync(home);
+ const module=new URL('../release/install-core.mjs',import.meta.url).href;
+ const child=spawn(process.execPath,['--input-type=module','-e',`import {acquireInstallLock} from ${JSON.stringify(module)};await acquireInstallLock(${JSON.stringify(home)});console.log('locked');`],{stdio:['ignore','pipe','pipe']});
+ try{
+  await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);child.once('exit',()=>reject(Error('mutex child exited early')));});
+  await assert.rejects(acquireInstallLock(home),/ANOTHER_INSTALL/);
+ }finally{const exited=new Promise(resolve=>child.once('exit',resolve));child.kill('SIGKILL');await exited;}
+ const unlock=await acquireInstallLock(home);await unlock();
 });

@@ -44,12 +44,23 @@ export function installedSlot(home){
  if(current.format!=='o4o-pc-install-v1'||!ID.test(current.releaseId))throw Error('INVALID_INSTALLED_RELEASE');
  plain(path.join(home,'versions'),true);const slot=path.join(home,'versions',current.releaseId);const manifest=verifyPackage(slot);if(manifest.releaseId!==current.releaseId)throw Error('INVALID_INSTALLED_RELEASE');return slot;
 }
+// OS-owned mutex: process termination releases it; no persistent lock file to strand updates.
+// Windows named pipe / Linux abstract socket accepts no commands and is closed after installation.
+export function acquireInstallLock(home){
+ const key=digest(canonical(home).toLowerCase());
+ const name=process.platform==='win32'?'\\\\.\\pipe\\o4o-pc-install-'+key:'\0o4o-pc-install-'+key;
+ return new Promise((resolve,reject)=>{
+  const server=net.createServer(socket=>socket.destroy());
+  server.once('error',error=>reject(Error(error.code==='EADDRINUSE'?'ANOTHER_INSTALL_RUNNING':'INSTALL_LOCK_UNAVAILABLE')));
+  server.listen(name,()=>resolve(()=>new Promise((done,fail)=>server.close(error=>error?fail(error):done()))));
+ });
+}
 export async function installPackage({source,home,dataHome,programs=null,allowNewData=false,probe=runningAgent,preflight=dataPreflight,beforeActivate=()=>{}}){
  source=canonical(source);home=canonical(home);dataHome=canonical(dataHome);
  if(overlap(home,dataHome)||overlap(home,source)||(programs&&overlap(dataHome,canonical(programs)))||/[\r\n"%]/.test(home+dataHome))throw Error('UNSAFE_INSTALL_LOCATION');
  const manifest=verifyPackage(source);if(await probe())throw Error('CLOSE_PC_PROGRAM_FIRST');
  mkdir(home);mkdir(path.join(home,'versions'));
- const lock=path.join(home,'.install.lock');let fd;try{fd=fs.openSync(lock,'wx',0o600);}catch{throw Error('ANOTHER_INSTALL_RUNNING');}
+ const unlock=await acquireInstallLock(home);
  const stage=path.join(home,'versions','.stage-'+randomUUID());let activated=false,damaged=null;
  const slot=path.join(home,'versions',manifest.releaseId);
  try{
@@ -83,6 +94,6 @@ export async function installPackage({source,home,dataHome,programs=null,allowNe
   return {version:manifest.version,releaseId:manifest.releaseId,activated,shortcut,started:false};
  }finally{
   try{if(damaged&&!activated){removeStage(slot);fs.renameSync(damaged,slot);}removeStage(stage);}
-  finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+  finally{await unlock();}
  }
 }
