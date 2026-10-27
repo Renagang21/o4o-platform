@@ -59,3 +59,8 @@ WORKTREE_DISPOSITION
 - verdict: KEEP — 미병합 개발 branch이며 후속 실제 export Mapping·통합 수정에 필요. 다른 세션 worktree·branch·staging은 변경하지 않음.
 
 문서 정합: 이 WO의 설계·guide·검증 기록을 연결했다. 플랫폼 canonical index·업무 정책·과거 기록은 수정하지 않았다.
+
+
+## 5. 사용자 후속 지시: main 통합·배포
+
+2026-10-27 사용자가 이번 공간에 main 병합·배포를 명시적으로 지시했다. 위 개발 담당 종료 기록 이후의 통합 단계다. 최신 main `7566982ff5`를 같은 작업 branch에 정상 merge했으며 충돌은 없었다. 실제 ruleset은 PR·CI Gate 필수, 필수 human approval 0으로 확인했다. 새 migration·운영 데이터 변경·실 약국 PC 원격 업데이트는 하지 않는다. PR의 CI·Codex 리뷰를 통과한 뒤 main 병합·Delivery·운영 Main 검증을 수행한다. 최종 병합 SHA·실행 링크·배포/미배포 범위는 병합된 PR 설명과 비공개 인계 기록에 남긴다.
