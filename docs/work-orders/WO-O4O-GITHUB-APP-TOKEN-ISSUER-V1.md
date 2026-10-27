@@ -46,3 +46,6 @@ PR #842의 SSH remote가 기존 SSH 신원을 선택할 수 있다는 지적을 
 자식 Git transport를 HTTPS로 제한하고 기존 제한이 HTTPS를 금지하면 실패한다.
 scp형/ssh://형 모두 SSH 프로그램 실행 전에 차단하는 실제 Git 회귀를 추가했다.
 기존 설치 토큰·부모 credential·원격 URL을 자동으로 수정하지 않는다.
+추가 리뷰의 기존 Git Authorization extraHeader 우회도 발급 전 설정 이름 검사로 차단했다.
+범용/host별/저장소 경로별 extraHeader와 설정 조회 오류의 실제 Git 회귀를 추가했다.
+헤더 값은 읽거나 출력하지 않고 기존 설정을 유지한다.

@@ -5,7 +5,7 @@ import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { configuration, loadKey, jwt, issue, request, childEnvironment, main, parse, PROFILES, REPOSITORY } from './github-app-token.mjs';
+import { configuration, loadKey, jwt, issue, request, checkGitAuthConfig, childEnvironment, main, parse, PROFILES, REPOSITORY } from './github-app-token.mjs';
 
 const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const config = { appId: '123', installationId: '456', keyFile: '/not-a-real-secret.pem' };
@@ -165,6 +165,23 @@ test('SSH remotes cannot silently select another identity and inherited restrict
     assert.match(result.stderr, /transport 'ssh' not allowed/);
     assert.ok(!result.stderr.includes('o4o-ssh-must-not-run'));
   }
+});
+
+test('configured HTTP headers cannot override explicit App identity, and configuration errors fail closed', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'o4o-app-header-test-'));
+  try {
+    const base = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null', GIT_CONFIG_COUNT: '0' };
+    const run = (bin, args, opts) => spawnSync(bin, args, { ...opts, cwd: dir });
+    checkGitAuthConfig(base, run);
+    for (const key of ['http.extraHeader', 'http.https://github.com/.extraheader', 'http.https://github.com/Renagang21/o4o-platform/.extraheader']) {
+      const conflicting = { ...base, GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: key, GIT_CONFIG_VALUE_0: 'Authorization: Basic synthetic-secret-value' };
+      assert.throws(() => checkGitAuthConfig(conflicting, run), e => /extraHeader/.test(e.message) && !e.message.includes('synthetic-secret-value'));
+      assert.throws(() => main(['exec', '--use-app-identity', '--', 'git', 'push', 'origin', 'wo/fixture'], {
+        env: conflicting, configRun: run, api: () => assert.fail('No token may be issued before identity validation'),
+      }), /extraHeader/);
+    }
+    assert.throws(() => checkGitAuthConfig(base, () => ({ status: 2 })), /Cannot verify/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test('each command gets a fresh lease and revokes even after child failure; metadata omits token', () => {

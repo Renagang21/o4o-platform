@@ -120,6 +120,15 @@ export function issue(config, key, profile, api = request, now = Date.now()) {
   }
 }
 
+export function checkGitAuthConfig(env = process.env, run = spawnSync) {
+  // Query names only: existing Authorization values must never enter diagnostics.
+  // Conservatively refuse all extraHeader configurations, including URL scopes.
+  const result = run('git', ['config', '--name-only', '--get-regexp', '^http(\\..*)?\\.extraheader$'],
+    { env, stdio: 'ignore' });
+  if (result.error || ![0, 1].includes(result.status)) fail('Cannot verify inherited Git authentication configuration.');
+  if (result.status === 0) fail('Existing Git HTTP extraHeader configuration conflicts with explicit App identity.');
+}
+
 export function childEnvironment(token, env = process.env) {
   // Explicit opt-in identity selection happens in CLI; no parent/global config changes.
   if (env.GIT_ALLOW_PROTOCOL !== undefined && !env.GIT_ALLOW_PROTOCOL.split(':').includes('https')) {
@@ -170,6 +179,7 @@ export function parse(args) {
 export function main(args, dependencies = {}) {
   const { mode, profile, command } = parse(args);
   const env = dependencies.env || process.env;
+  if (mode === 'exec' && command[0] === 'git') checkGitAuthConfig(env, dependencies.configRun || spawnSync);
   const config = configuration(env);
   const key = (dependencies.loadKey || loadKey)(config.keyFile);
   const api = dependencies.api || request;

@@ -74,6 +74,9 @@ Git 명령은 HTTPS remote만 지원한다. `git@github.com:...` 및 `ssh://...`
 HTTPS credential helper를 사용하지 않으므로 SSH 접속 전에 차단한다. 필요한 경우 사용자가
 해당 작업공간의 remote를 HTTPS로 설정한 뒤 실행한다. 기존 SSH 키로 자동 전환하지 않는다.
 부모 환경의 Git transport 제한이 HTTPS를 허용하지 않으면 그 제한도 유지하며 실패한다.
+기존 Git `http.extraHeader` 및 URL별 extraHeader 설정이 있으면 발급 전에 실행을 거부한다.
+기존 인증 헤더를 지우거나 덮어쓰지 않으며 설정 이름의 존재만 확인한다. 빈 값이나 인증 외의
+추가 헤더도 보수적으로 충돌로 취급하므로, 그런 설정이 있는 환경은 먼저 관리자가 별도로 정리해야 한다.
 
 ## 운영 배포와의 경계
 
