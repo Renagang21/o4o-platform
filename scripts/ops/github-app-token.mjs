@@ -5,6 +5,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { homedir } from 'node:os';
 
 export const REPOSITORY = 'Renagang21/o4o-platform';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -121,6 +122,16 @@ export function issue(config, key, profile, api = request, now = Date.now()) {
 }
 
 export function checkGitAuthConfig(env = process.env, run = spawnSync) {
+  // These can outrank GIT_CONFIG_COUNT or make `git config` inspect a different file.
+  if (env.GIT_CONFIG_PARAMETERS?.trim() || env.GIT_CONFIG?.trim()) {
+    fail('Inherited explicit Git configuration conflicts with App identity verification.');
+  }
+  // Git's HTTP backend can consult netrc before asking the selected helper.
+  // Check presence only, never inspect credential file contents.
+  const home = env.HOME || env.USERPROFILE || homedir();
+  if (env.NETRC || ['.netrc', '_netrc'].some(name => existsSync(resolve(home, name)))) {
+    fail('Existing netrc configuration conflicts with explicit App identity.');
+  }
   // Query names only: existing Authorization values must never enter diagnostics.
   // Conservatively refuse all extraHeader configurations, including URL scopes.
   const result = run('git', ['config', '--name-only', '--get-regexp', '^http(\\..*)?\\.extraheader$'],

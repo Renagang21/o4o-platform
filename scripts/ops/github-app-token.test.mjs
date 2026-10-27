@@ -199,6 +199,21 @@ test('resolved push URLs cannot select embedded credentials, another host, or an
   assert.throws(() => checkGitRemote(['git','push','--all']), /named Git remote/);
 });
 
+test('inherited explicit configuration and netrc are rejected before token issuance', () => {
+  for (const inherited of [
+    { GIT_CONFIG_PARAMETERS: "'credential.helper=synthetic-private-value'" },
+    { GIT_CONFIG: '/synthetic/custom-config' }, { NETRC: '/synthetic/netrc' },
+  ]) {
+    assert.throws(() => checkGitAuthConfig(inherited, () => assert.fail('Must fail before reading Git configuration')),
+      e => !e.message.includes('synthetic-private-value'));
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'o4o-app-netrc-test-'));
+  try {
+    writeFileSync(join(dir, '.netrc'), 'synthetic-fixture-only', { mode: 0o600 });
+    assert.throws(() => checkGitAuthConfig({ HOME: dir }), /netrc/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('each command gets a fresh lease and revokes even after child failure; metadata omits token', () => {
   const { api, calls } = fixture();
   let output = '';

@@ -82,6 +82,10 @@ Git 명령은 `git push origin ...`처럼 동작 바로 다음에 remote 이름�
 `insteadOf`/`pushInsteadOf`까지 해석한 remote URL이 대상 저장소의 HTTPS이고
 userinfo·query·fragment가 없는지 발급 전에 확인한다. URL에 저장된 다른 credential은 사용하지 않는다.
 
+상속된 `GIT_CONFIG_PARAMETERS`·`GIT_CONFIG` 설정은 검사 대상/우선순위를 바꿀 수 있어 실행 전에
+거부한다. Git HTTP가 별도 신원을 선택할 수 있는 netrc 설정도 파일 내용은 읽지 않고 존재만 검사해
+거부한다. 도구가 사용자·플랫폼 credential 파일이나 정책 변수를 해제하지 않는다.
+
 ## 운영 배포와의 경계
 
 App installation token의 실행 주체는 **App bot**이다. 저장소 소유자 사용자와 동일하지 않다.
