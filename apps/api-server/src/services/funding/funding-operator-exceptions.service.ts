@@ -58,7 +58,10 @@ export class FundingOperatorExceptionsService {
     );
     return { items: rows.slice(0, 30), hasMore: rows.length > 30, page };
   }
-  async history(trialId: string, participantId: string) {
+  async history(trialId: string, participantId: string, inputPage: unknown = 1) {
+    const page = Number(inputPage);
+    if (!Number.isSafeInteger(page) || page < 1 || page > 10000)
+      throw new FundingError(400, 'INVALID_HISTORY_PAGE', '이력 페이지를 확인해 주세요.');
     const [target] = await this.ds.query(
       'SELECT id FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2',
       [participantId, trialId],
@@ -70,15 +73,21 @@ export class FundingOperatorExceptionsService {
         "이 펀딩의 참여자가 아닙니다.",
       );
     // Explicit field projection: never expose payment reference/note or arbitrary action-log metadata.
-    return this.ds.query(
+    const rows = await this.ds.query(
       `SELECT id, action_key AS action, user_id AS "actorId", created_at AS at,
       meta->>'beforeStatus' AS "beforeStatus", meta->>'afterStatus' AS "afterStatus",
       meta->>'beforeAmount' AS "beforeAmount", meta->>'afterAmount' AS "afterAmount",
-      meta->'referenceChanged' AS "referenceChanged", meta->'noteChanged' AS "noteChanged"
-      FROM action_logs WHERE service_key = 'neture' AND status = 'success' AND meta->>'trialId' = $1 AND meta->>'participantId' = $2
-      AND action_key IN ('neture.operator.market_trial_payment_change','neture.operator.market_trial_reward_change')
-      ORDER BY created_at DESC, id DESC LIMIT 50`,
-      [trialId, participantId],
+      meta->'referenceChanged' AS "referenceChanged", meta->'noteChanged' AS "noteChanged",
+      CASE WHEN action_key='funding.offline_operation' THEN meta->>'action' END AS "offlineAction",
+      CASE WHEN action_key='funding.offline_operation' THEN meta->>'reason' END AS reason,
+      CASE WHEN action_key='funding.offline_operation' THEN meta->'before'->>'refundAmount' END AS "beforeRefundAmount",
+      CASE WHEN action_key='funding.offline_operation' THEN meta->'after'->>'refundAmount' END AS "afterRefundAmount"
+      FROM action_logs WHERE status = 'success' AND meta->>'trialId' = $1 AND meta->>'participantId' = $2
+      AND ((service_key = 'neture' AND action_key IN ('neture.operator.market_trial_payment_change','neture.operator.market_trial_reward_change'))
+        OR (service_key = 'funding' AND action_key = 'funding.offline_operation'))
+      ORDER BY created_at DESC, id DESC LIMIT 51 OFFSET $3`,
+      [trialId, participantId, (page - 1) * 50],
     );
+    return { items: rows.slice(0, 50), page, hasMore: rows.length > 50 };
   }
 }

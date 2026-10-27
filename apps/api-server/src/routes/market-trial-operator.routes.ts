@@ -46,7 +46,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.patch('/forum-sync-failures/:failureId/resolve', MarketTrialOperatorController.resolveForumSyncFailure);
   router.get('/:id/offline-operations', async (req, res) => {
     try {
-      const data = await new FundingOfflineOperationsService(AppDataSource).snapshot(req.params.id, Number(req.query.page ?? 1));
+      const data = await new FundingOfflineOperationsService(AppDataSource).snapshot(req.params.id, Number(req.query.page ?? 1), Number(req.query.historyPage ?? 1));
       res.json({ success: true, data });
     } catch (error) {
       res.status(error instanceof FundingError ? error.status : 500).json({ success: false, message: error instanceof FundingError ? error.message : '운영 기록 조회 실패' });

@@ -123,6 +123,9 @@ export function useFundingOperatorWorkflow(id: string) {
     try {
       await write();
     } catch (error) {
+      if (current() && (error as { response?: { data?: { code?: string } } })?.response?.data?.code === 'PAYMENT_VERSION_CONFLICT') {
+        needsRefresh.current = true; setRefreshRequired(true);
+      }
       if (current()) setError(message(error, fallback));
       if (current()) { writeLock.current = false; setPending(false); setUpdatingId(null); setUpdatingPaymentId(null); }
       return false;

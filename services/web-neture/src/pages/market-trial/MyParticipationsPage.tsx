@@ -1,3 +1,4 @@
+import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 /**
  * MyParticipationsPage — Neture 내 유통참여형 펀딩(Market Trial) 참여 내역
  *
@@ -204,7 +205,11 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {([
-                  ['참여금', fmt(detail.contributionAmount)],
+                  ['약정 참여금', fmt(detail.contributionAmount)],
+                  ['입금 확인 상태', PAYMENT_STATUS_LABELS[detail.paymentStatus ?? 'unpaid']],
+                  ['입금 확인 금액', fmt(detail.paidAmount)],
+                  ['최초 입금 확인일', detail.paidAt ? new Date(detail.paidAt).toLocaleString('ko-KR') : '미확인'],
+                  ['마지막 확인일', detail.confirmedAt ? new Date(detail.confirmedAt).toLocaleString('ko-KR') : '미확인'],
                   ['참여 철회', detail.withdrawn?'철회 기록됨':'참여 유지'],
                   ['누적 환급 기록',fmt(detail.refundedAmount??0)],
                   ['리워드', detail.rewardRate != null ? `+${detail.rewardRate}%` : '–'],
@@ -534,8 +539,10 @@ export function MyParticipationsPage() {
                   }}
                 >
                   <span style={{ color: '#4B5563' }}>
-                    참여금 <strong style={{ color: '#1F2937' }}>{fmt(p.contributionAmount)}</strong>
+                    약정 참여금 <strong style={{ color: '#1F2937' }}>{fmt(p.contributionAmount)}</strong>
                   </span>
+                  <span>{PAYMENT_STATUS_LABELS[p.paymentStatus ?? 'unpaid']} · 확인 금액 {fmt(p.paidAmount)}</span>
+                  <span>{p.withdrawn ? '참여 철회' : '참여 유지'} · 누적 환급 기록 {fmt(p.refundedAmount ?? 0)}</span>
                   {p.rewardRate != null && p.rewardRate > 0 && (
                     <span style={{ color: '#7C3AED', fontWeight: 600 }}>리워드 +{p.rewardRate}%</span>
                   )}

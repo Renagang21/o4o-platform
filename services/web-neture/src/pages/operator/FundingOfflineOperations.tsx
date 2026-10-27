@@ -1,3 +1,4 @@
+import FundingOfflineHistory from './FundingOfflineHistory';
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../lib/apiClient";
 type State = {
@@ -23,6 +24,8 @@ type Snapshot = {
   participants: Participant[];
   page: number;
   hasMore: boolean;
+  historyPage?: number;
+  historyHasMore?: boolean;
   history: {
     id: string;
     actorId: string;
@@ -379,23 +382,7 @@ export default function FundingOfflineOperations({
               {busy ? "저장 중…" : "오프라인 처리 기록 저장"}
             </button>
           </fieldset>
-          <h3 className="font-semibold">최근 처리 이력 (최대 30건)</h3>
-          {!data.history?.length && <p>조회된 이력이 없습니다.</p>}
-          {data.history?.map((h) => (
-            <div key={h.id} className="rounded border p-2 text-sm break-words">
-              <p>
-                {labels[h.action] ?? h.action} ·{" "}
-                {new Date(h.at).toLocaleString("ko-KR")} · 처리자 {h.actorId}
-              </p>
-              <p>
-                {h.participantId ? `참여 기록 ${h.participantId}` : "펀딩 전체"}{" "}
-                · {h.reason}
-              </p>
-              {h.after.refundAmount != null && (
-                <p>누적 환급 {h.after.refundAmount}원</p>
-              )}
-            </div>
-          ))}
+          <FundingOfflineHistory id={id} initial={data.history} hasMore={data.historyHasMore === true} participantPage={page} />
         </>
       )}
     </section>

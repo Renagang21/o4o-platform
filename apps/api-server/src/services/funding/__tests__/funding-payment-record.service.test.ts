@@ -20,8 +20,19 @@ beforeEach(() => {
 });
 
 describe('offline payment record and audit transaction', () => {
+  it.each([undefined, null, -1, 0.5, '0'])('rejects a missing or invalid version %p before a transaction', async version => {
+    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', version })).rejects.toMatchObject({ status: 400, code: 'PAYMENT_VERSION_REQUIRED' });
+    expect(ds.createQueryRunner).not.toHaveBeenCalled();
+  });
+  it('rejects a stale payment form without writes or an audit row', async () => {
+    manager.query.mockReset().mockResolvedValueOnce([{ id: 'project' }]).mockResolvedValueOnce([{ ...original, offlineState: { version: 2, refundAmount: 50 } }]);
+    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paidAmount: 9000, version: 1 })).rejects.toMatchObject({ status: 409, code: 'PAYMENT_VERSION_CONFLICT' });
+    expect(manager.query).toHaveBeenCalledTimes(2);
+    expect(audit.insert).not.toHaveBeenCalled();
+    expect(runner.rollbackTransaction).toHaveBeenCalled();
+  });
   it('rejects a cached-client refund status without a recorded offline refund', async () => {
-    await expect(new FundingPaymentRecordService(ds).update('project','participant',actor,{paymentStatus:'refunded'})).rejects.toMatchObject({status:409,code:'OFFLINE_REFUND_RECORD_REQUIRED'});
+    await expect(new FundingPaymentRecordService(ds).update('project','participant',actor,{version:0,paymentStatus:'refunded'})).rejects.toMatchObject({status:409,code:'OFFLINE_REFUND_RECORD_REQUIRED'});
     expect(manager.query).toHaveBeenCalledTimes(2);
     expect(audit.insert).not.toHaveBeenCalled();
     expect(runner.rollbackTransaction).toHaveBeenCalledTimes(1);
@@ -29,7 +40,7 @@ describe('offline payment record and audit transaction', () => {
   });
 
   it('locks the trial before its participant and records actual returned values before commit', async () => {
-    const result = await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid' });
+    const result = await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus: 'paid' });
     expect(manager.query.mock.calls[1]).toEqual([expect.stringContaining('FOR UPDATE'), ['participant', 'project']]);
     expect(manager.query.mock.calls[2][0]).toContain('WITH updated AS (UPDATE');
     expect(manager.query.mock.calls[2][0]).toContain('SELECT * FROM updated');
@@ -45,14 +56,14 @@ describe('offline payment record and audit transaction', () => {
 
   it('audit failure rolls the payment transaction back and never reports success', async () => {
     audit.insert.mockRejectedValue(new Error('fixture audit unavailable'));
-    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'unpaid' })).rejects.toThrow('fixture audit unavailable');
+    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus: 'unpaid' })).rejects.toThrow('fixture audit unavailable');
     expect(runner.rollbackTransaction).toHaveBeenCalledTimes(1);
     expect(runner.commitTransaction).not.toHaveBeenCalled(); expect(runner.release).toHaveBeenCalledTimes(1);
   });
 
   it('explicit null amount is audited as null using the persisted row', async () => {
     manager.query.mockReset().mockResolvedValueOnce([{id: "project"}]).mockResolvedValueOnce([original]).mockResolvedValueOnce([{ ...after, paidAmount: null }]);
-    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paidAmount: null });
+    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus: 'paid', paidAmount: null });
     expect(audit.insert.mock.calls[0][0].meta.afterAmount).toBeNull();
     const [sql, values] = manager.query.mock.calls[2];
     expect(sql).toContain('"paidAt" = COALESCE("paidAt",'); expect(values).toContain(null);
@@ -60,7 +71,7 @@ describe('offline payment record and audit transaction', () => {
   });
 
   it.each(['unpaid', 'canceled'])('%s correction preserves first date, amount and reference when omitted', async paymentStatus => {
-    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus });
+    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus });
     const sql = manager.query.mock.calls[2][0].split('RETURNING')[0];
     expect(sql).not.toContain('"paidAt" ='); expect(sql).not.toContain('"paidAmount" ='); expect(sql).not.toContain('"paymentReference" =');
     expect(sql).toContain('"confirmedAt" =');
@@ -68,12 +79,12 @@ describe('offline payment record and audit transaction', () => {
 
   it('a participant belonging to another trial cannot be changed or audited', async () => {
     manager.query.mockReset().mockResolvedValueOnce([{id: "project"}]).mockResolvedValueOnce([]);
-    await expect(new FundingPaymentRecordService(ds).update('other-project', 'participant', actor, { paymentStatus: 'paid' })).rejects.toMatchObject({ status: 404 });
+    await expect(new FundingPaymentRecordService(ds).update('other-project', 'participant', actor, { version: 0, paymentStatus: 'paid' })).rejects.toMatchObject({ status: 404 });
     expect(manager.query).toHaveBeenCalledTimes(2); expect(audit.insert).not.toHaveBeenCalled(); expect(runner.rollbackTransaction).toHaveBeenCalled();
   });
 
   it('binds private text with node-postgres while masking TypeORM query parameters', async () => {
-    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paymentReference: original.paymentReference, paymentNote: original.paymentNote });
+    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus: 'paid', paymentReference: original.paymentReference, paymentNote: original.paymentNote });
     const values = manager.query.mock.calls[2][1];
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentReference);
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentNote);
@@ -90,7 +101,7 @@ describe('existing payment column validation', () => {
     { paymentNote: 'fixture\0invalid' },
     { paymentNote: {} }, { paymentReference: 'x'.repeat(256) }, { paymentMethod: 'x'.repeat(51) }, { paymentProvider: [] },
   ])('rejects malformed inputs without starting a transaction: %j', async input => {
-    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', ...input })).rejects.toMatchObject({ status: 400 });
+    await expect(new FundingPaymentRecordService(ds).update('project', 'participant', actor, { version: 0, paymentStatus: 'paid', ...input })).rejects.toMatchObject({ status: 400 });
     expect(ds.createQueryRunner).not.toHaveBeenCalled();
   });
   it.each([0, 0.01, 12000, 9999999999.99, null])('accepts valid decimal or nullable amount %s', paidAmount => {

@@ -55,3 +55,27 @@ it('keeps supplier recruitment totals at one seat after a replacement joins', as
   const res=response();await MarketTrialController.getSupplierTrialResults({params:{id:'project'},user:{id:'owner'}} as any,res);
   expect(res.json.mock.calls[0][0].data.summary).toMatchObject({totalCount:1,recruitRate:100,recordCount:2,withdrawnCount:1,productCount:1});
 });
+
+it('returns only the authenticated participant’s payment confirmation without private operator fields', async () => {
+  const p = { id: 'own-record', marketTrialId: 'project', participantId: 'own-user', participantType: 'store_owner', rewardStatus: 'pending', paymentStatus: 'paid', paidAmount: '120', paidAt: new Date('2026-10-01'), confirmedAt: new Date('2026-10-02'), paymentReference: 'private-reference', paymentNote: 'private-note', createdAt: new Date('2026-10-01') };
+  participants.findOne.mockResolvedValue(p);
+  const res = response();
+  await MarketTrialController.getParticipation({ params: { id: 'project' }, user: { id: 'own-user' } } as any, res);
+  expect(participants.findOne).toHaveBeenCalledWith({ where: { marketTrialId: 'project', participantId: 'own-user' } });
+  const data = res.json.mock.calls[0][0].data;
+  expect(data).toMatchObject({ paymentStatus: 'paid', paidAmount: 120, paidAt: '2026-10-01T00:00:00.000Z', confirmedAt: '2026-10-02T00:00:00.000Z' });
+  expect(data).not.toHaveProperty('paymentReference'); expect(data).not.toHaveProperty('paymentNote'); expect(data).not.toHaveProperty('actorId');
+});
+
+it('batches the authenticated participant’s refund and withdrawal summary without exposing operator data', async () => {
+  participants.find.mockResolvedValue([{ id: 'own-record', marketTrialId: 'project', participantId: 'own-user', createdAt: new Date('2026-10-01'), paymentStatus: 'paid', paidAmount: '120', paymentNote: 'private-note' }]);
+  ds.query.mockResolvedValue([{ id: 'own-record', withdrawn: true, refundedAmount: '20', refundedAt: '2026-10-20' }]);
+  const builder: any = { where: jest.fn().mockReturnThis(), getMany: jest.fn().mockResolvedValue([{ ...record, id: 'project' }]) };
+  repo.createQueryBuilder.mockReturnValue(builder);
+  const res = response();
+  await MarketTrialController.getMyParticipations({ user: { id: 'own-user' } } as any, res);
+  expect(ds.query).toHaveBeenCalledWith(expect.stringContaining('WHERE "participantId"=$1 AND id=ANY($2::uuid[])'), ['own-user', ['own-record']]);
+  const own = res.json.mock.calls[0][0].data[0];
+  expect(own).toMatchObject({ withdrawn: true, refundedAmount: 20, paidAmount: 120 });
+  expect(own).not.toHaveProperty('paymentNote');
+});
