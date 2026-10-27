@@ -161,7 +161,7 @@ describe('로그인 후 — 가입 서비스 우선', () => {
   expect(screen.getByRole("heading", { name: "전체 서비스" })).toBeTruthy();
   expect(screen.queryByTestId("entry-panel")).toBeNull();
   expect(screen.queryByTestId("home-composer")).toBeNull();
-  expect(before(document.querySelector(".home-hero-frame")!, screen.getByRole("heading", { name: "O4O AI" }))).toBe(true);
+  expect(before(document.querySelector(".home-hero-frame")!, screen.getByRole("heading", { name: "O4O 업무 도우미" }))).toBe(true);
   expect(screen.queryByTestId("home-google-start")).toBeNull();
   expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
 });
@@ -174,7 +174,7 @@ it.each([false, true])('places a single full-width Hero, then AI and services (a
   expect(document.querySelectorAll('.home-hero-frame')).toHaveLength(1);
   expect(hero).toBeTruthy();
   expect(before(hero!, screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
-  expect(screen.getByRole('heading', { level: 2, name: 'O4O AI' })).toBeTruthy();
+  expect(screen.getByRole('heading', { level: 2, name: 'O4O 업무 도우미' })).toBeTruthy();
   expect(before(hero!, screen.getByTestId('home-composer'))).toBe(true);
   if (signedIn) expect(before(screen.getByTestId('home-composer'), screen.getByTestId('entry-panel'))).toBe(true);
   expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);

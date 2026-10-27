@@ -39,10 +39,10 @@ import LocalAgentCard from '../LocalAgentCard';
 
 /** §5 가 정한 세 문장 + §8 이 허용한 중립 문장. 문구는 여기서만 정의한다. */
 const MESSAGE = {
-  A_NOT_RUNNING: 'Local Work Agent가 실행되고 있지 않습니다.',
+  A_NOT_RUNNING: 'PC 연결 프로그램이 실행되고 있지 않습니다.',
   B_PERMISSION: '브라우저에서 이 PC 연결 권한을 허용해 주세요.',
-  C_GENERIC: '이 PC의 Local Work Agent에 연결할 수 없습니다.',
-  NEUTRAL: 'Agent가 실행 중이 아니거나 브라우저 연결 권한이 필요합니다.',
+  C_GENERIC: '이 PC의 연결 프로그램에 연결할 수 없습니다.',
+  NEUTRAL: 'PC 연결 프로그램이 실행 중이 아니거나 브라우저 연결 권한이 필요합니다.',
 };
 
 /**
