@@ -1,5 +1,7 @@
 # O4O 외부 ChatGPT 연결 공개 등록 준비 자료
 
+> **2026-10-27 제출 준비 재정리:** 지금 사용할 문안·출시 목표·미확인 사항은 [첫 출시 준비](DESIGN-O4O-CHATGPT-FIRST-RELEASE-PREPARATION-V1.md)를 먼저 읽는다. 아래 ZIP/plugin.json·정확한 시험 수·아이콘 규격·도메인 challenge 안내는 10월 24일 작성 당시의 기록이며, 이번 회차에서 현행 공식 요구로 재확인하지 못했다. 공식 제출 페이지는 HTTPS CONNECT 403으로 조회 실패했다. 과거 플러그인 잔재라고 확정하거나 검증된 현재 업로드 절차로 사용하지 않는다. 공식 안내/포털 대조 전 실제 ZIP 조립·업로드는 보류한다.
+
 > **2026-10-26 개발 정합:** 본 문서의 8개 도구·제출 예시는 당시 DRAFT다. 현재 콘텐츠 도구는 11개다. 신규 [개인 메일 계약](DESIGN-O4O-PERSONAL-MAIL-MCP-V1.md)은 기본 OFF이며 활성화 시 10개 도구와 별도 메일 동의를 추가한다. 공개 제출 전 활성 계약·시연·개인정보 고지·Gmail/네이버 조건을 다시 검증한다. 메일 개발 완료를 제출·공개 승인으로 해석하지 않는다.
 
 > **상태**: DRAFT · **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
@@ -12,16 +14,16 @@
 
 이번 준비 작업은 코드·운영 DB·Secret·관리자 허용 설정을 바꾸지 않는다. 현재 공개 소개 범위는 **약국 매장의 자료 조회와 비공개 초안 저장·수정**이다. 공급자·협력조직·커뮤니티 adapter가 있다는 사실로 이 대상들의 운영 활성화·심사 검증 완료를 주장하지 않는다.
 
-## 2. 2026-10-24 공식 문서에서 확인한 등록 형식
+## 2. 2026-10-24에 기록한 등록 형식 — 현행 절차 재확인 필요
 
-확인한 공식 주소:
+당시 확인 대상으로 기록한 주소(2026-10-27 본문·redirect 재확인 실패):
 
 - [제출 절차](https://developers.openai.com/plugins/deploy/submission)
 - [패키지 작성·OAuth 설정](https://developers.openai.com/plugins/build/plugins)
 - [공개 등록 지침](https://developers.openai.com/plugins/plugin-guidelines)
 - [MCP 인증](https://developers.openai.com/plugins/build/auth)
 
-기존 apps-sdk 제출·지침 주소는 위 plugins 문서로 이동한다. 현재 안내는 ChatGPT와 Codex가 공유하는 plugin directory에 원격 MCP를 포함한 **ZIP 패키지**를 올리는 절차다. 서비스의 사용자 명칭은 계속 “O4O 콘텐츠 연결”로 사용할 수 있다.
+당시 문서는 apps-sdk 주소가 plugins 문서로 이동하고 공유 plugin directory에 원격 MCP를 포함한 ZIP을 제출한다고 기록했다. 이 이동과 제출 형식은 현재 미확인이다. 아래 표·JSON은 그때의 조립 초안으로 보관하며 실제 제출 규격으로 사용하기 전에 공식 안내와 대조한다. 서비스의 사용자 명칭 후보는 “O4O 콘텐츠 연결”이다.
 
 | 항목 | 현재 공식 안내 | O4O 적용 |
 |---|---|---|
