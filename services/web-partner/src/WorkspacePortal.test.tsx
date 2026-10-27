@@ -39,6 +39,21 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe("공동공간 진입", () => {
+  it("clears workspace and parent session state even when logout fails", async () => {
+    const changed = vi.fn();
+    vi.mocked(partnerApi.logout).mockRejectedValue(
+      new ApiError(503, "REQUEST_FAILED"),
+    );
+    render(<WorkspacePortal onSessionChange={changed} />);
+    await screen.findByRole("button", { name: "공동공간 만들기" });
+    fireEvent.click(screen.getByRole("button", { name: "로그아웃" }));
+    await screen.findByRole("button", { name: "로그인", exact: true });
+    expect(changed).toHaveBeenCalledWith({
+      type: "signed-out",
+      error: expect.any(String),
+    });
+  });
+
   it("성공한 로그아웃을 상위 사이트에 알려 커뮤니티 세션도 함께 갱신한다", async () => {
     const changed = vi.fn();
     vi.mocked(partnerApi.logout).mockResolvedValue({});
@@ -70,7 +85,12 @@ describe("공동공간 진입", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "로그인", exact: true }),
     );
-    await waitFor(() => expect(changed).toHaveBeenCalledWith(token));
+    await waitFor(() =>
+      expect(changed).toHaveBeenCalledWith({
+        type: "signed-in",
+        inviteToken: token,
+      }),
+    );
   });
 
   it("StrictMode에서도 초대 코드를 유지하고 주소에서 제거하며 자동 참여하지 않는다", async () => {

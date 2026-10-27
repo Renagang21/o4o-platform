@@ -185,17 +185,20 @@ export async function request<T>(
   retry = true,
 ): Promise<T> {
   let response: Response;
+  const token = path.includes("/auth/email/login") ? null : getAccessToken();
+  const handoffSession =
+    !!token || (path.includes("/auth/logout") && !!getRefreshToken());
   try {
     response = await fetch(`${configuredOrigin}${path}`, {
       method,
-      credentials: "include",
+      credentials: handoffSession ? "omit" : "include",
       cache: "no-store",
       headers: {
         ...(body instanceof FormData
           ? {}
           : { "Content-Type": "application/json" }),
         "X-Requested-With": "O4O-Partner",
-        ...(!path.includes("/auth/email/login") ? sessionHeaders() : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       ...(body === undefined
         ? {}
@@ -249,7 +252,7 @@ export const partnerApi = {
       fetch(
         `${configuredOrigin}/api/v1/partner-support/spaces/${id}/files/${fileId}`,
         {
-          credentials: "include",
+          credentials: getAccessToken() ? "omit" : "include",
           cache: "no-store",
           headers: { "X-Requested-With": "O4O-Partner", ...sessionHeaders() },
         },
@@ -290,9 +293,16 @@ export const partnerApi = {
     return result;
   },
   logout: async () => {
-    const result = await request("/api/v1/auth/logout", "POST", {});
-    clearStoredTokens();
-    return result;
+    const refreshToken = getRefreshToken();
+    try {
+      return await request(
+        "/api/v1/auth/logout",
+        "POST",
+        refreshToken ? { refreshToken } : {},
+      );
+    } finally {
+      clearStoredTokens();
+    }
   },
   list: () => request<SpaceSummary[]>("/api/v1/partner-support/spaces"),
   create: (name: string) =>

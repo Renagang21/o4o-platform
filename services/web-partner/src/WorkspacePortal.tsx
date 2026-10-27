@@ -34,9 +34,12 @@ const eventNames: Record<string, string> = {
   member_removed: "참여자 제외",
 };
 
+export type WorkspaceSessionChange =
+  | { type: "signed-in"; inviteToken: string }
+  | { type: "signed-out"; error?: string };
 export default function WorkspacePortal({
   onSessionChange,
-}: { onSessionChange?: (inviteToken?: string) => void } = {}) {
+}: { onSessionChange?: (change: WorkspaceSessionChange) => void } = {}) {
   const [mode, setMode] = useState<"local" | "server">(() =>
     new URLSearchParams(location.search).get("mode") === "local"
       ? "local"
@@ -227,18 +230,26 @@ export default function WorkspacePortal({
             disabled={busy}
             onClick={() =>
               void run(async () => {
-                await partnerApi.logout();
-                onSessionChange?.();
-                setUser(null);
-                setSelected(null);
-                snapshot.current = null;
-                setSpaces([]);
-                setInviteLink("");
-                setMembers([]);
-                setEvents([]);
-                setInvites([]);
-                setNotifications([]);
-                setShowNotifications(false);
+                let failure: unknown;
+                try {
+                  await partnerApi.logout();
+                } catch (error) {
+                  failure = error;
+                  throw error;
+                } finally {
+                  clearSession();
+                  onSessionChange?.({
+                    type: "signed-out",
+                    ...(failure
+                      ? {
+                          error:
+                            failure instanceof Error
+                              ? failure.message
+                              : "로그아웃 요청을 완료하지 못했습니다.",
+                        }
+                      : {}),
+                  });
+                }
               })
             }
           >
@@ -346,7 +357,10 @@ export default function WorkspacePortal({
                 void run(async () => {
                   await partnerApi.login(email, password);
                   if (onSessionChange) {
-                    onSessionChange(joinToken);
+                    onSessionChange({
+                      type: "signed-in",
+                      inviteToken: joinToken,
+                    });
                     return;
                   }
                   await connect();

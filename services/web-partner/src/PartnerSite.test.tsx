@@ -71,6 +71,25 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe("Partner public entry, login, opt-in and community", () => {
+  it("clears the visible member session and operator menu even when server logout fails", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership).mockResolvedValue({
+      status: "active",
+      operator: true,
+    });
+    vi.mocked(partnerApi.logout).mockRejectedValue(
+      new ApiError(503, "REQUEST_FAILED"),
+    );
+    mount();
+    await screen.findByRole("link", { name: "운영 관리" });
+    fireEvent.click(screen.getByRole("button", { name: "로그아웃" }));
+    await screen.findByRole("alert");
+    expect(screen.queryByRole("link", { name: "운영 관리" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "로그인", exact: true }),
+    ).toBeTruthy();
+  });
+
   it("loads operator data even while a separate global mutation is busy", async () => {
     vi.mocked(communityApi.overview).mockResolvedValue({
       boards: [],

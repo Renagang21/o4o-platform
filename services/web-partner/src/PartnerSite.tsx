@@ -7,7 +7,9 @@ import {
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PasswordInput } from "@o4o/auth-react";
-import WorkspacePortal from "./WorkspacePortal";
+import WorkspacePortal, {
+  type WorkspaceSessionChange,
+} from "./WorkspacePortal";
 import { ApiError, partnerApi } from "./api";
 import {
   communityApi,
@@ -126,6 +128,16 @@ export default function PartnerSite() {
       nav("/community");
     });
   };
+  const onWorkspaceSessionChange = (change: WorkspaceSessionChange) => {
+    if (change.type === "signed-in") {
+      resyncWorkspaceSession(change.inviteToken);
+      return;
+    }
+    setUser(null);
+    setMembership({ status: null, operator: false });
+    setError(change.error ?? "");
+    nav("/community");
+  };
   const workspace =
     location.pathname.startsWith("/workspace") ||
     location.hash.startsWith("#join=") ||
@@ -153,10 +165,13 @@ export default function PartnerSite() {
                 disabled={busy || !ready}
                 onClick={() =>
                   void run(async () => {
-                    await partnerApi.logout();
-                    setUser(null);
-                    setMembership({ status: null, operator: false });
-                    nav("/community");
+                    try {
+                      await partnerApi.logout();
+                    } finally {
+                      setUser(null);
+                      setMembership({ status: null, operator: false });
+                      nav("/community");
+                    }
                   })
                 }
               >
@@ -183,7 +198,7 @@ export default function PartnerSite() {
         )}
         {!ready && <p role="status">계정 연결을 확인하고 있습니다…</p>}
         {workspace ? (
-          <WorkspacePortal onSessionChange={resyncWorkspaceSession} />
+          <WorkspacePortal onSessionChange={onWorkspaceSessionChange} />
         ) : loginPage ? (
           <section className="community-auth panel">
             <h1>O4O 계정 로그인</h1>

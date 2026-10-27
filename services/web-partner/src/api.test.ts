@@ -20,6 +20,46 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("Partner cookie API client", () => {
+  it("logs out an expired handoff session with its refresh token and without parent-domain cookies", async () => {
+    const token = crypto.randomUUID(),
+      refresh = crypto.randomUUID();
+    storeTokens({ accessToken: token, refreshToken: refresh });
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(response(200, { success: true, data: {} }));
+    vi.stubGlobal("fetch", fetch);
+    await partnerApi.logout();
+    const [, options] = fetch.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({ refreshToken: refresh });
+    expect(options.credentials).toBe("omit");
+    expect(options.headers.Authorization).toBe(`Bearer ${token}`);
+    expect(getAccessToken()).toBeNull();
+    expect(getRefreshToken()).toBeNull();
+  });
+  it("forgets local handoff credentials even when the server rejects logout", async () => {
+    storeTokens({
+      accessToken: crypto.randomUUID(),
+      refreshToken: crypto.randomUUID(),
+    });
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(response(503, { code: "REQUEST_FAILED" }));
+    vi.stubGlobal("fetch", fetch);
+    await expect(partnerApi.logout()).rejects.toMatchObject({ status: 503 });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(getAccessToken()).toBeNull();
+    expect(getRefreshToken()).toBeNull();
+  });
+  it("keeps the cookie logout transport for a direct email session", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(response(200, { success: true, data: {} }));
+    vi.stubGlobal("fetch", fetch);
+    await partnerApi.logout();
+    expect(fetch.mock.calls[0][1].credentials).toBe("include");
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({});
+  });
+
   it("uses the shared handoff session and refreshes that session instead of an unrelated cookie session", async () => {
     const first = crypto.randomUUID(),
       refresh = crypto.randomUUID(),
@@ -48,6 +88,8 @@ describe("Partner cookie API client", () => {
     expect(fetch.mock.calls[2][1].headers.Authorization).toBe(`Bearer ${next}`);
     expect(getAccessToken()).toBe(next);
     expect(getRefreshToken()).toBe(nextRefresh);
+    expect(fetch.mock.calls[0][1].credentials).toBe("omit");
+    expect(fetch.mock.calls[1][1].credentials).toBe("omit");
   });
   it("clears a previous handoff identity only after a successful direct cookie login", async () => {
     storeTokens({

@@ -73,3 +73,5 @@ Partner의 기존 초대형 자료·활동·정산 공동공간과 회원 커뮤
 - 전체 CI에서 CLI helper의 console.log 금지 검사와 서비스 AI 카탈로그의 기존 8개 고정 기대값 실패를 확인했다. helper는 기존 CLI처럼 stdout으로 출력하며, 새 canonical service를 포함한 기대값과 Partner 업무 경계를 공통 서비스 profile 소비처에 추가했다. CI 예외·gate 완화는 하지 않는다. 실제 외부 AI 호출이나 provider 설정 변경은 없다.
 
 - 통합 수정본 검증: 프런트 84 tests/build, PostgreSQL API 31 tests, 공통 서비스 AI profile 55 tests PASS. 실제 Chromium 390px에서 작업공간 로그아웃 후 상위 운영 메뉴 제거, 초대 fragment를 보존한 재로그인 후 운영 메뉴 복귀를 확인했다. 인증은 loopback fixture adapter이며 실계정 검증과 구분한다.
+
+- 세 번째 Codex P2 handoff 로그아웃 finding을 반영했다. 로그아웃 본문에 저장된 refresh token을 전달하고 실패해도 공유 저장 상태·회원/작업공간 UI를 정리한다. bearer 기반 handoff 요청/갱신/로그아웃은 credentials omit으로 보내 부모 도메인의 다른 계정 쿠키를 보내거나 덮어쓰지 않으며, 명시적 이메일 로그인과 쿠키 세션은 기존 include 전략을 유지한다.
