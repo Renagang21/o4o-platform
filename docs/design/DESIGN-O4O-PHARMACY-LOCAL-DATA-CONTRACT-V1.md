@@ -34,7 +34,7 @@ user: PharmacyEntry[]       # 사용자 초안·관찰·교정 (원본과 별도
 | stock | product, quantity/unit, confirmed/program/estimated/unknown, observed_at | 미확인=null, 0 아님. 실제 확인·프로그램·추정을 섞어 최신 재고라 단정하지 않음 |
 | availability | product/pack/supplier, available/out_of_stock/unconfirmed, source, observed_at | 검색 없음=unconfirmed. 시점 관찰이지 실시간 재고 정본 아님. 실제 Adapter 수집은 아직 미연결 |
 | balance | supplier, purchases, unpaid, observed_at | 프로그램 거래장의 판단 사본. 결제/회계 원장·자동 송금 없음 |
-| sheet | title, lines, status, 선택 receipt evidence | Task·외부 원장과 다른 업무 초안. receipt_recorded는 사용자가 접수번호·시점을 직접 확인해야 함 |
+| sheet | title, lines, status, 선택 receipt evidence | Task·외부 원장과 다른 업무 초안. 거래처별 receipts에 접수번호·시점 보관, 전체 거래처 확인 후 receipt_recorded |
 
 모든 연결은 식별자로만 한다. pack이 다른 product에 속하거나 존재하지 않는 supplier를 참조하면 전체 저장을 거절한다. 같은 이름의 다른 포장·다른 거래처를 섞지 않는다. 기존 pack id의 상품·기준 단위·환산 수량은 변경하지 않는다. 규격 변경은 새 pack id로 구분해 과거 구매량이 재수집/교정으로 바뀌지 않게 한다. 초안에는 미정 거래처/수량이 가능하지만 준비 확인은 거래처·포장·양의 정수 수량이 필요하다. 자동 주문량 추천은 하지 않는다.
 
@@ -56,7 +56,7 @@ Main은 JSON 사본을 transient state로 읽는다. 계정/업무공간 변경�
 
 거래처별 1~10행만 기존 요청창에 준비한다. 매뉴얼 선택·기존 인증·scope·quota·planner·COMMIT gate는 그대로다. 신규 모델/API 비용 경로는 없지만 사용자가 기존 요청을 실행하면 기존 요금·quota가 적용된다. 사이트 주소 저장은 browser allowlist를 확대하지 않는다. 사용자 직접 로그인→실제 작업 관찰→질문·교정→Experience 후보→검증이라는 기존 경로를 따른다. 성공 증거 없이 공통 Workflow/Skill로 승격하지 않는다.
 
-외부 도매 사이트가 주문의 원장이다. 사이트 로그인·주문 최종 제출·결제는 사용자 직접 수행이다. 실행 요청의 성공·인계와 주문 접수를 같은 상태로 합치지 않는다. 실제 접수·결제·Windows UIA 조작을 이번 자동 테스트에서 수행하지 않는다.
+외부 도매 사이트가 주문의 원장이다. 사이트 로그인·주문 최종 제출·결제는 사용자 직접 수행이다. 실행 요청의 성공·인계와 주문 접수를 같은 상태로 합치지 않는다. 부분 접수는 해당 거래처의 중복 요청만 막고 미접수 거래처를 계속 진행한다. 확인된 증거·행은 보존하며 모든 거래처를 확인해야 전체 접수 상태가 된다. 실제 접수·결제·Windows UIA 조작을 이번 자동 테스트에서 수행하지 않는다.
 
 
 ## 5. 배포 단위·회귀

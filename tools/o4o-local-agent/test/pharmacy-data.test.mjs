@@ -210,3 +210,19 @@ test('pack measure changes cannot retroactively rewrite purchase quantities in e
   assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity, 1000);
   assert.equal(readPharmacyWorkspace(owner).revision, 1);
 });
+
+test('per-supplier receipts preserve evidence while allowing remaining supplier work',()=>{
+  importSample(); const second={kind:'supplier',data:{...sample().records.find(r=>r.kind==='supplier').data,id:'s2'}};
+  const work=sheet('handed_over'); work.data.lines.push({...work.data.lines[0],id:'l2',supplier_id:'s2'});
+  work.data.receipts=[{supplier_id:'s1',reference:'receipt-a',confirmed_at:stamp}];
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[second,work]},1,'user');
+  assert.throws(()=>orderPreparationRequest(readPharmacyWorkspace(owner).bundle,'sheet1','s1'),/접수/);
+  assert.match(orderPreparationRequest(readPharmacyWorkspace(owner).bundle,'sheet1','s2'),/주문 준비/);
+  const erased=structuredClone(work); erased.data.receipts=[];
+  assert.throws(()=>importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[erased]},2,'user'),/접수 확인 시트/);
+  const ambiguous=structuredClone(work);delete ambiguous.data.receipts;ambiguous.data.status='receipt_recorded';ambiguous.data.receipt_reference='ambiguous';ambiguous.data.receipt_at=stamp;
+  assert.throws(()=>importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[ambiguous]},2,'user'),/거래처별/);
+  work.data.receipts.push({supplier_id:'s2',reference:'receipt-b',confirmed_at:stamp});work.data.status='receipt_recorded';
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[work]},2,'user');
+  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='sheet').data.receipts.length,2);
+});

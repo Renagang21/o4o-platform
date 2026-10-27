@@ -3,7 +3,8 @@ export interface Product { id: string; name: string; program: string; program_co
 export interface Pack { id: string; product_id: string; label: string; base_unit: string; units_per_pack: number; preferred?: boolean }
 export interface Supplier { id: string; name: string; program_code?: string; common_company_id?: string; order_site_url?: string; enabled: boolean; priority?: 'primary'|'secondary'; payment_timing: 'deferred'|'at_order'|'unknown'; payment_required: boolean|null; payment_method?: string; terms_checked_at?: string; last_trade_at?: string }
 export interface OrderLine { id: string; product_name: string; product_id?: string; supplier_id?: string; pack_id?: string; pack_label: string; pack_count: number|null }
-export interface OrderSheet { id: string; title: string; lines: OrderLine[]; status: 'draft'|'prepared'|'handed_over'|'receipt_recorded'; receipt_reference?: string; receipt_at?: string }
+export interface SupplierReceipt { supplier_id: string; reference: string; confirmed_at: string }
+export interface OrderSheet { id: string; title: string; lines: OrderLine[]; status: 'draft'|'prepared'|'handed_over'|'receipt_recorded'; receipts?: SupplierReceipt[]; receipt_reference?: string; receipt_at?: string }
 export interface PharmacyDataMap {
  product: Product; pack: Pack; supplier: Supplier; sheet: OrderSheet;
  purchase: { document_type: 'purchase'|'order'|'return'; id: string; supplier_id: string; product_id: string; pack_id: string; pack_count: number; purchased_at: string };
@@ -26,3 +27,5 @@ export function parsePharmacyBundle(text: string): PharmacyBundle;
 export function groupOrderLines(sheet: OrderSheet): { supplierId: string; lines: OrderLine[] }[];
 export function packTotal(pack: Pack, count: number): number;
 export function orderPreparationRequest(bundle: PharmacyBundle, sheetId: string, supplierId: string, mode?: 'prepare'|'availability'): string;
+
+export function sheetReceipts(sheet: OrderSheet): SupplierReceipt[];

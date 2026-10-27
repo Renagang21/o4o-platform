@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { LocalPharmacyWorkspaceRepository, LocalMappingRepository, parseCsv, mapImportRows } from './local-db.mjs';
-import { PHARMACY_FORMAT, PHARMACY_LIMITS, validatePharmacyBundle, validatePharmacyRecord, packTotal } from './pharmacy-order-contract.mjs';
+import { PHARMACY_FORMAT, PHARMACY_LIMITS, validatePharmacyBundle, validatePharmacyRecord, packTotal, sheetReceipts } from './pharmacy-order-contract.mjs';
 const key = r => `${r.kind}:${r.data.id}`;
 function scope(owner) {
   // Explicit owner selection on a locally trusted CLI; NOT an authentication or authorization token.
@@ -46,6 +46,12 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
     }
     if (mode === 'user') for (const r of incoming) {
       const old = latest.user.find(v => key(v) === key(r));
+      if (r.kind === 'sheet' && old) for (const receipt of sheetReceipts(old.data)) {
+        const nextReceipt = sheetReceipts(r.data).find(v => v.supplier_id === receipt.supplier_id);
+        const oldLines = old.data.lines.filter(l => l.supplier_id === receipt.supplier_id);
+        const newLines = r.data.lines.filter(l => l.supplier_id === receipt.supplier_id);
+        if (!isDeepStrictEqual(receipt, nextReceipt) || !isDeepStrictEqual(oldLines, newLines)) throw Error('접수 확인 시트의 거래처 증거·주문 행은 수정하지 않습니다. 새 시트를 작성하세요.');
+      }
       if (r.kind === 'sheet' && old?.data.status === 'receipt_recorded' && !isDeepStrictEqual(old.data, r.data)) throw Error('접수 확인 시트는 수정하지 않습니다. 새 시트를 작성하세요.');
     }
     const currentPacks = new Map(effective(latest).records.filter(r => r.kind === 'pack').map(r => [r.data.id, r.data]));

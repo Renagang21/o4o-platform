@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../../lib/ai/home-chat';
 import {
-  PHARMACY_FORMAT, PHARMACY_LIMITS, parsePharmacyBundle, validatePharmacyBundle, groupOrderLines, orderPreparationRequest, packTotal,
+  PHARMACY_FORMAT, PHARMACY_LIMITS, parsePharmacyBundle, validatePharmacyBundle, groupOrderLines, sheetReceipts, orderPreparationRequest, packTotal,
   type PharmacyBundle, type PharmacyEntry, type OrderSheet, type OrderLine, type Supplier,
 } from '../../lib/pharmacy/order';
 
@@ -37,13 +37,18 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   const [count, setCount] = useState('');
   const [supplierId, setSupplierId] = useState('');
   const [receipt, setReceipt] = useState('');
+  const [receiptSupplier, setReceiptSupplier] = useState('');
+  const receipts = sheet ? sheetReceipts(sheet) : [];
+  const pendingSuppliers = sheet ? groupOrderLines(sheet).filter(g => g.supplierId && !receipts.some(r => r.supplier_id === g.supplierId)).map(g => g.supplierId) : [];
+  const nextReceiptSupplier = pendingSuppliers.includes(receiptSupplier) ? receiptSupplier : pendingSuppliers[0] ?? '';
   const [stockProduct, setStockProduct] = useState('');
   const [stockQuantity, setStockQuantity] = useState('');
   const [stockUnit, setStockUnit] = useState('');
   const [stockConfirmed, setStockConfirmed] = useState(false);
   const blocked = disabled || busy;
   function save(entry: PharmacyEntry) {
-    const records = [...bundle.records.filter(r => r.kind !== entry.kind || r.data.id !== entry.data.id), entry];
+    const matches = (r: PharmacyEntry) => r.kind === entry.kind && r.data.id === entry.data.id;
+    const records = bundle.records.some(matches) ? bundle.records.map(r => matches(r) ? entry : r) : [...bundle.records, entry];
     const next = validatePharmacyBundle({ format: PHARMACY_FORMAT, records });
     setBundle(next); setEdited(old => [...old.filter(r => r.kind !== entry.kind || r.data.id !== entry.data.id), entry]);
     setNotice('현재 화면에 반영했습니다. 보관하려면 파일로 내보내세요.');
@@ -59,9 +64,15 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   const [editingLine, setEditingLine] = useState('');
   function addLine() {
     if (!sheet) return;
+    if (editingLine && !sheet.lines.some(l => l.id === editingLine)) throw Error('편집하던 행이 삭제됐습니다. 입력을 확인하고 새 행으로 추가하세요.');
     const line: OrderLine = { id: editingLine || uid(), product_name: name.trim(), pack_label: packLabel.trim(), pack_count: count === '' ? null : Number(count), ...(supplierId ? { supplier_id: supplierId } : {}), ...(productId ? { product_id: productId } : {}), ...(packId ? { pack_id: packId } : {}) };
     updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: editingLine ? sheet.lines.map(l => l.id === editingLine ? line : l) : [...sheet.lines, line] });
     setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); setEditingLine('');
+  }
+  function deleteLine(lineId: string) {
+    if (!sheet) return;
+    updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: sheet.lines.filter(l => l.id !== lineId) });
+    if (editingLine === lineId) { setEditingLine(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); }
   }
   function prepare(supplier: string, mode: 'prepare'|'availability') {
     if (!sheet || resuming) throw Error('진행 중인 질문에 먼저 답하거나 업무를 마친 뒤 새 주문 요청을 준비하세요.');
@@ -128,9 +139,9 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         save({ kind: 'sheet', data: next }); setSelected(next.id); setEditingLine(''); setReceipt(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount('');
       })} className="rounded border px-2 py-1">새 주문 시트</button>
       {sheet && <>
-        {sheet.status === 'receipt_recorded' && <p className="break-words">직접 확인한 접수: {sheet.receipt_reference} / {sheet.receipt_at}. 추가 주문은 새 시트로 시작하세요.</p>}
+        {receipts.map(r => <p key={r.supplier_id} className="break-words">직접 확인한 접수: {suppliers.find(s => s.data.id === r.supplier_id)?.data.name} / {r.reference} / {r.confirmed_at}</p>)}
         <p>상태: {{draft: '작성 중', prepared: '준비 확인', handed_over: '사용자에게 인계', receipt_recorded: '외부 접수 직접 확인'}[sheet.status]}</p>
-        <fieldset disabled={blocked || sheet.status === 'receipt_recorded'} className="space-y-2 rounded border p-3">
+        <fieldset disabled={blocked || receipts.length > 0} className="space-y-2 rounded border p-3">
           <legend>{editingLine ? '주문 행 수정' : '주문 상품 추가'}</legend>
           {products.length > 0 && <label className="block">가져온 상품<select aria-label="가져온 상품" value={productId} onChange={e => { setProductId(e.target.value); setPackId(''); setPackLabel(''); setName(products.find(r => r.data.id === e.target.value)?.data.name ?? ''); }} className="block w-full rounded border p-2"><option value="">직접 입력</option>{products.map(r => <option key={r.data.id} value={r.data.id}>{r.data.name} ({r.data.program_code})</option>)}</select></label>}
           <label className="block">상품명<input value={name} maxLength={200} onChange={e => { setName(e.target.value); setProductId(''); setPackId(''); }} className="block w-full rounded border p-2" /></label>
@@ -152,16 +163,21 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
                 attempt(() => save({ kind: 'availability', data: { id: uid(), product_id: l.product_id!, pack_id: l.pack_id!, supplier_id: l.supplier_id!, state, source: 'user_observed', observed_at: new Date().toISOString() } }));
               }} className="ml-2 rounded border p-1"><option value="">조회 화면을 확인한 뒤 선택</option><option value="available">주문 가능 표시 확인</option><option value="out_of_stock">품절 표시 확인</option><option value="unconfirmed">확인 불가·검색 결과 없음</option></select>
             </label>}
-            <div className="mt-1 flex gap-2"><button type="button" disabled={blocked || sheet.status === 'receipt_recorded'} onClick={() => editLine(l.id)} className="rounded border px-2 py-1">행 수정</button><button type="button" disabled={blocked || sheet.status === 'receipt_recorded'} onClick={() => attempt(() => updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: sheet.lines.filter(v => v.id !== l.id) }))} className="rounded border px-2 py-1">행 삭제</button></div>
+            <div className="mt-1 flex gap-2"><button type="button" disabled={blocked || receipts.length > 0} onClick={() => editLine(l.id)} className="rounded border px-2 py-1">행 수정</button><button type="button" disabled={blocked || receipts.length > 0} onClick={() => attempt(() => deleteLine(l.id))} className="rounded border px-2 py-1">행 삭제</button></div>
           </li>; })}</ul>
-          {g.supplierId && <div className="flex flex-wrap gap-2"><button type="button" disabled={blocked || resuming || sheet.status === 'receipt_recorded'} onClick={() => attempt(() => prepare(g.supplierId, 'availability'))} className="rounded border px-2 py-1">품절 확인 요청 준비</button><button type="button" disabled={blocked || resuming || sheet.status === 'receipt_recorded'} onClick={() => attempt(() => prepare(g.supplierId, 'prepare'))} className="rounded border px-2 py-1">주문 요청 준비</button></div>}
+          {g.supplierId && <div className="flex flex-wrap gap-2"><button type="button" disabled={blocked || resuming || receipts.some(r => r.supplier_id === g.supplierId)} onClick={() => attempt(() => prepare(g.supplierId, 'availability'))} className="rounded border px-2 py-1">품절 확인 요청 준비</button><button type="button" disabled={blocked || resuming || receipts.some(r => r.supplier_id === g.supplierId)} onClick={() => attempt(() => prepare(g.supplierId, 'prepare'))} className="rounded border px-2 py-1">주문 요청 준비</button></div>}
         </section>)}
         <p className="text-xs">검색 결과가 없으면 ‘확인 불가’입니다. 조회 시점의 정보이며 실시간 재고가 아닙니다. 미지원 사이트는 사용자가 진행하면서 기존 질문·교정 흐름으로 절차를 보완합니다.</p>
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={blocked || sheet.status !== 'draft'} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'prepared' }))} className="rounded border px-2 py-1">상품·규격·수량 준비 확인</button>
           <button type="button" disabled={blocked || sheet.status !== 'prepared'} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'handed_over' }))} className="rounded border px-2 py-1">직접 주문하도록 인계</button>
         </div>
-        {sheet.status === 'handed_over' && <label className="block">직접 확인한 외부 접수번호<input value={receipt} maxLength={200} disabled={blocked} onChange={e => setReceipt(e.target.value)} className="block w-full rounded border p-2" /><button type="button" disabled={blocked || !receipt.trim()} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'receipt_recorded', receipt_reference: receipt.trim(), receipt_at: new Date().toISOString() }))} className="mt-2 rounded border px-2 py-1">외부 주문 접수 직접 확인</button></label>}
+        {sheet.status === 'handed_over' && <div><label className="block">접수 확인 거래처<select value={nextReceiptSupplier} disabled={blocked} onChange={e => { setReceiptSupplier(e.target.value); setReceipt(''); }} className="block w-full rounded border p-2">{pendingSuppliers.map(id => <option key={id} value={id}>{suppliers.find(s => s.data.id === id)?.data.name}</option>)}</select></label><label className="block">직접 확인한 외부 접수번호<input value={receipt} maxLength={200} disabled={blocked} onChange={e => setReceipt(e.target.value)} className="block w-full rounded border p-2" /><button type="button" disabled={blocked || !receipt.trim()} onClick={() => attempt(() => {
+            if (!nextReceiptSupplier) throw Error('접수 확인 거래처를 선택하세요.');
+            const nextReceipts = [...receipts, { supplier_id: nextReceiptSupplier, reference: receipt.trim(), confirmed_at: new Date().toISOString() }];
+            updateSheet({ id: sheet.id, title: sheet.title, lines: sheet.lines, status: nextReceipts.length === groupOrderLines(sheet).length ? 'receipt_recorded' : 'handed_over', receipts: nextReceipts });
+            setReceipt(''); setReceiptSupplier('');
+          })} className="mt-2 rounded border px-2 py-1">외부 주문 접수 직접 확인</button></label></div>}
       </>}
       {bundle.records.some(r => r.kind === 'stock' || r.kind === 'availability') && <details><summary>수량·품절 확인 이력</summary><ul className="mt-2 space-y-2">{bundle.records.filter(r => r.kind === 'stock' || r.kind === 'availability').map(r => <li key={`${r.kind}:${r.data.id}`} className="break-words">
         {r.kind === 'stock' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{confirmed:'실물 확인',program:'프로그램 재고',estimated:'추정 재고',unknown:'미확인'}[r.data.confidence]} / ${r.data.quantity ?? '미확인'}${r.data.unit ?? ''} / ${r.data.observed_at}` : r.kind === 'availability' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{available:'주문 가능',out_of_stock:'품절',unconfirmed:'확인 불가'}[r.data.state]} / ${suppliers.find(v => v.data.id === r.data.supplier_id)?.data.name} / ${r.data.observed_at}` : ''}

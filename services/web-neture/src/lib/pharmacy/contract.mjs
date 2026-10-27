@@ -12,7 +12,7 @@ const fields = {
   stock: ['id', 'product_id', 'quantity', 'unit', 'confidence', 'observed_at'],
   availability: ['id', 'supplier_id', 'product_id', 'pack_id', 'state', 'observed_at', 'source', 'site_product_code'],
   balance: ['id', 'supplier_id', 'purchases', 'unpaid', 'observed_at'],
-  sheet: ['id', 'title', 'lines', 'status', 'receipt_reference', 'receipt_at'],
+  sheet: ['id', 'title', 'lines', 'status', 'receipts', 'receipt_reference', 'receipt_at'],
 };
 const fail = m => { throw Error(m); };
 const object = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -58,8 +58,24 @@ export function validatePharmacyRecord(kind, input) {
       if (r.status !== 'draft' && (!l.supplier_id || !l.pack_label.trim() || l.pack_count === null)) fail('거래처·포장규격·수량 확인이 필요합니다.');
     }
     if (r.status !== 'draft' && !r.lines.length) fail('빈 시트는 준비 완료로 표시할 수 없습니다.');
-    if (r.status === 'receipt_recorded' && (!r.receipt_reference?.trim() || !r.receipt_at)) fail('실제 외부 접수번호·확인 시점을 직접 입력하세요.');
-    if (r.status !== 'receipt_recorded' && (r.receipt_reference !== undefined || r.receipt_at !== undefined)) fail('접수 확인 전에는 접수 증거를 저장할 수 없습니다.');
+    const suppliers = new Set(r.lines.map(l => l.supplier_id).filter(Boolean));
+    if (r.receipts !== undefined) {
+      if (!Array.isArray(r.receipts) || r.receipts.length > PHARMACY_LIMITS.lines) fail('거래처별 접수 기록을 확인하세요.');
+      const seenReceipts = new Set();
+      for (const receipt of r.receipts) {
+        keys(receipt, ['supplier_id', 'reference', 'confirmed_at']);
+        if (!suppliers.has(receipt.supplier_id) || seenReceipts.has(receipt.supplier_id) || !text(receipt.reference) || !receipt.reference.trim() || !instant(receipt.confirmed_at)) fail('거래처별 접수번호·확인 시점을 확인하세요.');
+        seenReceipts.add(receipt.supplier_id);
+      }
+    }
+    // Legacy single-supplier evidence remains readable; it must never stand for several suppliers.
+    if (r.receipt_reference !== undefined || r.receipt_at !== undefined) {
+      if (suppliers.size !== 1 || r.receipts !== undefined || !text(r.receipt_reference) || !r.receipt_reference.trim() || !instant(r.receipt_at)) fail('거래처별 접수번호·확인 시점을 직접 입력하세요.');
+    }
+    const receipts = sheetReceipts(r);
+    if (r.status === 'receipt_recorded' && (!receipts.length || receipts.length !== suppliers.size)) fail('모든 거래처의 실제 외부 접수번호·확인 시점을 직접 입력하세요.');
+    if (receipts.length && !['handed_over', 'receipt_recorded'].includes(r.status)) fail('사용자 인계 후 거래처별 접수를 확인하세요.');
+    if (receipts.length && receipts.length === suppliers.size && r.status !== 'receipt_recorded') fail('전체 거래처 접수 확인 상태를 확인하세요.');
   }
   return r;
 }
@@ -106,6 +122,11 @@ export function parsePharmacyBundle(text) {
   let parsed; try { parsed = JSON.parse(text); } catch { fail('약국 업무 JSON 형식을 확인하세요.'); }
   return validatePharmacyBundle(parsed);
 }
+export function sheetReceipts(sheet) {
+  if (Array.isArray(sheet.receipts)) return sheet.receipts;
+  const suppliers = [...new Set(sheet.lines.map(l => l.supplier_id).filter(Boolean))];
+  return sheet.receipt_reference && sheet.receipt_at && suppliers.length === 1 ? [{ supplier_id: suppliers[0], reference: sheet.receipt_reference, confirmed_at: sheet.receipt_at }] : [];
+}
 export function groupOrderLines(sheet) { const groups = new Map(); for (const l of sheet.lines) { const key = l.supplier_id ?? ''; groups.set(key, [...(groups.get(key) ?? []), l]); } return [...groups].map(([supplierId, lines]) => ({ supplierId, lines })); }
 export function packTotal(pack, count) {
   const decimal = String(pack.units_per_pack);
@@ -119,7 +140,7 @@ export function orderPreparationRequest(bundle, sheetId, supplierId, mode = 'pre
   const validated = validatePharmacyBundle(bundle);
   const sheet = validated.records.find(r => r.kind === 'sheet' && r.data.id === sheetId)?.data;
   const supplier = validated.records.find(r => r.kind === 'supplier' && r.data.id === supplierId)?.data;
-  if (sheet?.status === 'receipt_recorded') fail('이미 접수를 확인한 시트입니다. 새 주문 시트를 작성하세요.');
+  if (sheet && (sheet.status === 'receipt_recorded' || sheetReceipts(sheet).some(r => r.supplier_id === supplierId))) fail('이미 접수를 확인한 시트입니다. 새 주문 시트를 작성하세요.');
   if (!sheet || !supplier?.enabled || !['prepare', 'availability'].includes(mode)) fail('주문 시트와 거래처를 확인하세요.');
   const lines = sheet.lines.filter(l => l.supplier_id === supplierId);
   if (!lines.length || lines.length > PHARMACY_LIMITS.requestLines || lines.some(l => l.pack_count === null || !l.pack_label.trim())) fail('한 번에 포장·수량을 확인한 1~10개 상품을 요청하세요.');
