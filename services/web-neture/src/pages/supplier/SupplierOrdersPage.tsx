@@ -18,7 +18,7 @@ import { UnifiedOrdersSection } from './orders/UnifiedOrdersSection';
 import { styles } from './orders/styles';
 
 export default function SupplierOrdersPage() {
-  const { data, loading, summaryError, unifiedError, expandedService, unifiedOrders, unifiedLoading, unifiedTotal, sourceFilter, setSourceFilter, fetchSummary, fetchUnified, toggleExpand } = useSupplierOrders();
+  const { data, loading, summaryError, unifiedError, expandedService, unifiedOrders, unifiedLoading, unifiedTotal, unifiedPage, unifiedPageSize, setUnifiedPage, sourceFilter, setSourceFilter, fetchSummary, fetchUnified, toggleExpand } = useSupplierOrders();
 
   return (
     <div>
@@ -105,6 +105,9 @@ export default function SupplierOrdersPage() {
         total={unifiedTotal}
         sourceFilter={sourceFilter}
         onChangeFilter={setSourceFilter}
+        page={unifiedPage}
+        pageSize={unifiedPageSize}
+        onChangePage={setUnifiedPage}
       />
 
       {/* Service List */}

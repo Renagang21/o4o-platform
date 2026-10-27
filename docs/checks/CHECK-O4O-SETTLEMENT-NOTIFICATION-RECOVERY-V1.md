@@ -47,3 +47,11 @@
 사용자의 main 병합·배포 지시로 통합을 재개했다. 최신 main 82e38f070e를 전용 branch에 병합했다. 통합 HEAD 85867d5ffc에서 Neture 163 files / 1,405 PASS, 정산 관련 API 3 suites / 116 PASS, API 타입·API/Neture production build·migration contract21 PASS를 확인했다.
 
 PR #854의 전체 CI에서 supplier-domain-boundary의 수신자 source 검사 실패를 로컬에서도 재현했다(40 PASS / 1 FAIL). 실제 producer를 기존 command에서 새 notification service로 옮긴 변경에 맞춰 command의 위임과 새 producer의 canonical owner resolver 사용을 함께 검사하도록 보완했다. 수신자 판정·실제 DB 테스트·기존 권한 정책은 변경하지 않았다. 수정 후 공급자 경계41건과 lint·문서 민감정보 검사가 통과했다. 전체 CI 재검증 및 병합·배포 결과는 PR과 종료 보고를 따른다.
+
+## 운영 배포 완료 후속 (2026-10-27)
+
+사용자가 공급자 검수 진행을 지시해, 앞서 안내한 migration 포함 API·Neture 배포를 이어 실행했다. PR #854 main 병합 SHA는 bdfd9b5ff5415b30486e5ff2b2e8343de0b67653이다. 이 SHA의 CI40490191604·CodeQL40490191566이 SUCCESS이며 main/실행 계정/다른 활성 배포 없음과 검증된 범위 불변을 확인했다.
+
+[Promote 40493809035](https://github.com/Renagang21/o4o-platform/actions/runs/40493809035), services=api,neture, dry_run=false: SUCCESS. 운영 migration Job 단계, API readiness·traffic switch, Neture verified smoke·traffic switch, 최종 serving SHA 확인 단계가 모두 성공했다. 운영 DB 직접 접속·별도 GCP 토큰·freeze 변경·수동 알림 재처리·실제 지급은 수행하지 않았다. 이 증거는 정식 workflow의 성공이며 별도 GCP revision 수기 조회나 migration 실행 건수 원문 추출을 주장하지 않는다.
+
+배포 후 공개 API readiness·웹 URL·정적 JS/CSS·비로그인 API401을 GET으로 확인해 11/11 PASS다. 전역 production status의 NOT_SELECTED/pending은 api,neture 이외 미선택 서비스 보류이며 이번 대상 배포 실패가 아니다. 실계정 검수는 기준 계정 파일 부재로 미실행이다. [후속 공급자 검수 CHECK](CHECK-O4O-SUPPLIER-INTEGRATED-FLOW-VERIFICATION-V1.md)에 상세 범위를 기록했다. 새 페이지 이동 보완은 별도 개발 branch이며 이 배포에 포함하지 않았다.
