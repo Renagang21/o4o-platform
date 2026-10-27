@@ -39,3 +39,5 @@ Windows PR CI(40500335521)의 `PC installer Windows` job PASS: 별도 Node PATH 
 설치기 강제 종료 시 영구 lock 파일로 후속 업데이트가 막히지 않도록 Windows OS 소유 named-pipe mutex로 변경했다(명령 수신/HTTP API 없음). 프로세스 종료 시 커널이 잠금을 해제하며 동시 설치 거절과 강제 종료 후 재획득을 실제 자식 프로세스로 검증한다. Linux 테스트는 abstract socket을 사용한다.
 
 PR CI 40503793107에서 Windows/web/admin build/CodeQL은 통과했으나 API Jest 1/3 및 Sonar gate가 실패했다. 상세 로그·Sonar API는 환경 egress 제한으로 접근할 수 없었고 GitHub annotations로 확인 가능한 분기 복잡도·await/문장 구분 문제를 정리했다. 해당 실패를 성공으로 계산하지 않으며 후속 HEAD에서 전체 CI/분석을 다시 확인한다. 로컬 UI 재검증 최초 명령의 jsdom 옵션 누락(document undefined)은 실행 옵션 수정 후 27개 재실행으로 확인했다.
+
+후속 Sonar annotations에서 패키지 생성 명령의 PATH 검색을 확인하여 Linux delivery runner의 `/usr/bin/git`·`/usr/bin/curl` 고정 경로로 바꾸었다. ZIP member 검사와 설치 단계의 복잡도·중첩 callback도 정리했다. 새 분석 결과에서 gate 통과 여부를 확인한다.

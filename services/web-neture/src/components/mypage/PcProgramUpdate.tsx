@@ -90,12 +90,14 @@ export default function PcProgramUpdate({
         </p>
       )}
       {status === "current" && (
-        <p role="status" className="text-emerald-700">
+        <output className="block text-emerald-700">
           최신 프로그램과 데이터 준비 상태를 확인했습니다.
-        </p>
+        </output>
       )}
       {status === "update" && (
-        <p role="status">현재 실행 중인 프로그램은 업데이트가 필요합니다.</p>
+        <output className="block">
+          현재 실행 중인 프로그램은 업데이트가 필요합니다.
+        </output>
       )}
       {status === "unknown" && (
         <p>

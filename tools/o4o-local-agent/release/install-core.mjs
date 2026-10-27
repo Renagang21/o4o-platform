@@ -4,6 +4,11 @@ import os from "node:os";
 import net from "node:net";
 import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
+function compareNames(a, b) {
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const ID = /^[a-f0-9]{64}$/;
 const allowed = (name) =>
@@ -95,7 +100,7 @@ export function verifyPackage(source) {
   }
   const code = Object.entries(manifest.files)
     .filter(([name]) => name !== "src/build-info.json")
-    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    .sort(([a], [b]) => compareNames(a, b));
   if (
     digest(
       JSON.stringify({
@@ -191,6 +196,11 @@ export function installedSlot(home) {
 }
 // OS-owned mutex: process termination releases it; no persistent lock file to strand updates.
 // Windows named pipe / Linux abstract socket accepts no commands and is closed after installation.
+function closeLock(server) {
+  return new Promise((resolve, reject) =>
+    server.close((error) => (error ? reject(error) : resolve())),
+  );
+}
 export function acquireInstallLock(home) {
   const key = digest(canonical(home).toLowerCase());
   const name =
@@ -208,14 +218,7 @@ export function acquireInstallLock(home) {
         ),
       ),
     );
-    server.listen(name, () =>
-      resolve(
-        () =>
-          new Promise((done, fail) =>
-            server.close((error) => (error ? fail(error) : done())),
-          ),
-      ),
-    );
+    server.listen(name, () => resolve(() => closeLock(server)));
   });
 }
 function validateLocations(source, home, dataHome, programs) {

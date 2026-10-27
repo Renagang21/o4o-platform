@@ -7,6 +7,12 @@ import { pathToFileURL } from "node:url";
 import { zip, member } from "./zip.mjs";
 import { PC_AGENT_VERSION } from "../src/release-info.mjs";
 import { SCHEMA_VERSION } from "../src/local-db.mjs";
+function compareNames(a, b) {
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+// Distribution build runs on the Linux delivery runner; never resolve executables through PATH.
 export const NODE_VERSION = "22.18.0";
 export const sha256 = (bytes) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -21,7 +27,7 @@ export function assembleRelease({ sourceSha, files, runtime, runtimeLicense }) {
   const code = Array.from(payload, ([name, bytes]) => [
     name,
     sha256(bytes),
-  ]).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  ]).sort(([a], [b]) => compareNames(a, b));
   const releaseId = sha256(
     JSON.stringify({ version: PC_AGENT_VERSION, node: NODE_VERSION, code }),
   );
@@ -62,7 +68,7 @@ export function assembleRelease({ sourceSha, files, runtime, runtimeLicense }) {
   };
 }
 function gitFile(sha, name) {
-  return execFileSync("git", ["show", `${sha}:${name}`], {
+  return execFileSync("/usr/bin/git", ["show", `${sha}:${name}`], {
     maxBuffer: 5 * 1024 * 1024,
   });
 }
@@ -73,7 +79,7 @@ export function buildRelease({ sourceSha, out }) {
       base = `https://nodejs.org/dist/v${NODE_VERSION}/`;
     const fetchFile = (name, file) =>
       execFileSync(
-        "curl",
+        "/usr/bin/curl",
         [
           "--fail",
           "--silent",
@@ -112,7 +118,7 @@ export function buildRelease({ sourceSha, out }) {
     if (runtime.subarray(0, 2).toString() !== "MZ")
       throw new Error("Windows runtime is invalid");
     const tracked = execFileSync(
-      "git",
+      "/usr/bin/git",
       [
         "ls-tree",
         "-r",

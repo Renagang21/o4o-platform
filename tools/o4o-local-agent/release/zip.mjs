@@ -14,7 +14,7 @@ export function zip(files) {
   let offset = 0;
   for (const [name, data] of files) {
     if (
-      !/^[a-zA-Z0-9_.\/-]+$/.test(name) ||
+      !/^[a-zA-Z0-9_./-]+$/.test(name) ||
       name.split("/").includes("..") ||
       name.startsWith("/")
     )
@@ -80,36 +80,35 @@ export function member(archive, name) {
       .subarray(cursor + 46, cursor + 46 + length)
       .toString();
     if (found === name) {
-      const size = archive.readUInt32LE(cursor + 24),
-        compressed = archive.readUInt32LE(cursor + 20),
-        method = archive.readUInt16LE(cursor + 10),
-        offset = archive.readUInt32LE(cursor + 42);
-      if (
-        size > 150 * 1024 * 1024 ||
-        archive.readUInt32LE(offset) !== 0x04034b50
-      )
-        throw new Error("Invalid runtime member");
-      const start =
-        offset +
-        30 +
-        archive.readUInt16LE(offset + 26) +
-        archive.readUInt16LE(offset + 28);
-      const raw = archive.subarray(start, start + compressed);
-      const bytes =
-        method === 8
-          ? inflateRawSync(raw, { maxOutputLength: 150 * 1024 * 1024 })
-          : method === 0
-            ? raw
-            : null;
-      if (
-        !bytes ||
-        bytes.length !== size ||
-        crc(bytes) !== archive.readUInt32LE(cursor + 16)
-      )
-        throw new Error("Runtime ZIP integrity failed");
-      return bytes;
+      return runtimeMember(archive, cursor);
     }
     cursor += 46 + length + extra + comment;
   }
   throw new Error("Runtime executable absent");
+}
+
+function runtimeMember(archive, cursor) {
+  const size = archive.readUInt32LE(cursor + 24),
+    compressed = archive.readUInt32LE(cursor + 20),
+    method = archive.readUInt16LE(cursor + 10),
+    offset = archive.readUInt32LE(cursor + 42);
+  if (size > 150 * 1024 * 1024 || archive.readUInt32LE(offset) !== 0x04034b50)
+    throw new Error("Invalid runtime member");
+  const start =
+    offset +
+    30 +
+    archive.readUInt16LE(offset + 26) +
+    archive.readUInt16LE(offset + 28);
+  const raw = archive.subarray(start, start + compressed);
+  let bytes = null;
+  if (method === 8)
+    bytes = inflateRawSync(raw, { maxOutputLength: 150 * 1024 * 1024 });
+  else if (method === 0) bytes = raw;
+  if (
+    !bytes ||
+    bytes.length !== size ||
+    crc(bytes) !== archive.readUInt32LE(cursor + 16)
+  )
+    throw new Error("Runtime ZIP integrity failed");
+  return bytes;
 }
