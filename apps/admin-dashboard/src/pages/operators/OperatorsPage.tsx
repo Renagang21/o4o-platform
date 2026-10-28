@@ -261,7 +261,7 @@ export default function OperatorsPage() {
     setInvitations(rows);
     if (!rows) return;
     const accepted = rows.filter(row => row.status === 'accepted')
-      .map(row => `${row.id}:${row.accepted_user_id}:${row.role}`).sort().join('|');
+      .map(row => `${row.id}:${row.accepted_user_id}:${row.role}`).sort((a, b) => a.localeCompare(b)).join('|');
     const previous = acceptedInvitationSnapshot.current;
     acceptedInvitationSnapshot.current = accepted;
     if (previous !== null && previous !== accepted) void fetchUsers();
@@ -683,7 +683,7 @@ export default function OperatorsPage() {
             setSelectedIds(new Set());
             setFacets(previous => ({ ...previous, role: '' }));
           }} />
-          기존 Operator 권한 함께 보기
+          <span>기존 Operator 권한 함께 보기</span>
         </label>
         <p className="text-gray-600">기존 Operator 권한은 유지되며, 함께 보기에서 조회·회수할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
       </div>

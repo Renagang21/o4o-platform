@@ -3,7 +3,7 @@ import { getService } from '../../config/service-catalog.js';
 
 /** Presentation only: never used to decide scope, identity, or authority. */
 export function invitationScopeLabel(role: string, serviceKey?: string): string {
-  const business = role.match(/^neture:([^:]+)_(?:admin|operator)$/)?.[1];
+  const business = /^neture:([^:]+)_(?:admin|operator)$/.exec(role)?.[1];
   const businessLabels: Record<string, string> = {
     pharmacy: '약국 협력사업',
     carepharm: 'CarePharm · 만성질환관리',
