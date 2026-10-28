@@ -23,12 +23,13 @@ WORKDIR /app
 # Copy the production package.json (external dependencies only)
 # Full API version with all runtime dependencies
 COPY package.production.json ./package.json
+COPY package.production-lock.json ./package-lock.json
 
 # Install production dependencies only
 # Using npm for simplicity in Docker (no pnpm workspace complexity)
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    npm install --omit=dev --ignore-scripts \
+    npm ci --omit=dev --ignore-scripts \
     && npm cache clean --force
 
 # -----------------------------------------------------------------------------

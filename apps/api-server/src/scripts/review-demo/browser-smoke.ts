@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdtemp } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { chromium, type Page } from "@playwright/test";
 
 export async function createReviewBrowser() {
+  const artifacts = await mkdtemp(join(tmpdir(), "o4o-review-artifacts-"));
   const browser = await chromium.launch({
     executablePath:
       process.env.REVIEW_DEMO_CHROMIUM_PATH || "/usr/bin/chromium",
@@ -53,10 +56,9 @@ export async function createReviewBrowser() {
       assert.ok(completed);
       assert.equal(completed.status(), 200);
     } catch {
-      await mkdir("/tmp/o4o-review-artifacts", { recursive: true });
       await target
         .screenshot({
-          path: "/tmp/o4o-review-artifacts/login-failure.png",
+          path: join(artifacts, "login-failure.png"),
           mask: [target.locator("input")],
         })
         .catch(() => {});
@@ -146,9 +148,8 @@ export async function createReviewBrowser() {
           ),
         ),
       );
-      await mkdir("/tmp/o4o-review-artifacts", { recursive: true });
       await editor.screenshot({
-        path: "/tmp/o4o-review-artifacts/private-draft-editor.png",
+        path: join(artifacts, "private-draft-editor.png"),
         fullPage: true,
       });
       console.log(

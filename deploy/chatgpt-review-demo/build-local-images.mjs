@@ -42,6 +42,10 @@ try {
     join(root, "apps/api-server/package.production.json"),
     join(api, "package.production.json"),
   );
+  cpSync(
+    join(root, "apps/api-server/package.production-lock.json"),
+    join(api, "package.production-lock.json"),
+  );
   cpSync(join(root, "apps/api-server/src/assets"), join(api, "src/assets"), {
     recursive: true,
   });
