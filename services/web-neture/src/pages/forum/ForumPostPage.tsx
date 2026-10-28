@@ -117,7 +117,14 @@ function canEditForumContent(readOnly: boolean, isAdmin: boolean, userId: string
   return !readOnly && (isAdmin || (!!userId && authorId === userId));
 }
 
-export function ForumPostPage({ basePath = '/forum', canModerate = false, readOnly = false, pinPost }: { basePath?: string; canModerate?: boolean; readOnly?: boolean; pinPost?: (id: string, pin: boolean) => Promise<void> } = {}) {
+interface ForumPostPageProps { basePath?: string; canModerate?: boolean; readOnly?: boolean; pinPost?: (id: string, pin: boolean) => Promise<void> }
+export function ForumPostPage(props: ForumPostPageProps = {}) {
+  const { slug } = useParams<{ slug: string }>();
+  const { user, isAuthenticated } = useAuth();
+  const scope = JSON.stringify([props.basePath, slug, user?.id, isAuthenticated, user?.roles, props.readOnly, props.canModerate]);
+  return <ForumPostDetail key={scope} {...props} />;
+}
+function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = false, pinPost }: ForumPostPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -132,6 +139,11 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+  const [commentsLoadError, setCommentsLoadError] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [mutationBusy, setMutationBusy] = useState(false);
+  const interactionProcessing = useRef(false);
+  const beginInteraction = useLatestRequest(`${basePath}:${slug}`);
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -168,7 +180,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
   };
 
   const handlePin = async () => {
-    if (!post || (!communityKey && !pinPost) || !canModerate || readOnly || pinProcessing.current || pinNeedsRefresh) return;
+    if (!post || (!communityKey && !pinPost) || !canModerate || readOnly || pinProcessing.current || interactionProcessing.current || pinNeedsRefresh) return;
     pinProcessing.current = true;
     const current = beginPin();
     setPinBusy(true); setPinNotice(null); setPinError(null);
@@ -230,11 +242,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
         setPost(response.data);
         setLikeCount(response.data.likeCount || 0);
 
-        // Fetch comments
-        const commentsResponse = await fetchForumComments(response.data.id);
-        if (current() && commentsResponse.success) {
-          setComments(commentsResponse.data.map(toDisplayComment));
-        }
+        await loadComments(response.data.id, current);
       } catch (err) {
         console.error('Error loading post:', err);
         if (current()) setError('게시글을 불러오지 못했습니다.');
@@ -246,65 +254,79 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
     loadPost();
   }, [slug, basePath, beginLoad]);
 
+  async function loadComments(postId: string, current: () => boolean) {
+    setCommentsLoading(true); setCommentsLoadError(false);
+    try {
+      const result = await fetchForumComments(postId);
+      if (!result.success) throw new Error('Comment read failed');
+      if (current()) setComments(result.data.map(toDisplayComment));
+    } catch {
+      if (current()) setCommentsLoadError(true);
+    } finally { if (current()) setCommentsLoading(false); }
+  }
+
   const handleDeletePost = async () => {
-    if (pinProcessing.current || !post || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-    const result = await deleteForumPost(post.id);
-    if (result.success) {
-      navigate(basePath);
-    } else {
-      toast.error(result.error || '게시글 삭제에 실패했습니다.');
-    }
+    if (readOnly || interactionProcessing.current || pinProcessing.current || !post || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, post.authorId) || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    interactionProcessing.current = true; setMutationBusy(true);
+    const current = beginInteraction();
+    try {
+      const result = await deleteForumPost(post.id);
+      if (!current()) return;
+      if (result.success) navigate(basePath);
+      else toast.error(result.error || '게시글 삭제에 실패했습니다.');
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); } }
   };
 
   const handleUpdateComment = async (commentId: string, content: string) => {
-    const result = await updateForumComment(commentId, content);
-    if (result.success && result.data) {
+    const comment = comments.find(item => item.id === commentId);
+    if (!comment || !canEditForumContent(readOnly, isAdmin, currentUserId, comment.authorId)) throw new Error('댓글 수정 권한을 확인해 주세요.');
+    if (interactionProcessing.current || pinProcessing.current) throw new Error('진행 중인 처리가 끝난 뒤 다시 시도해 주세요.');
+    interactionProcessing.current = true; setMutationBusy(true);
+    const current = beginInteraction();
+    try {
+      const result = await updateForumComment(commentId, content);
+      if (!current()) return;
+      if (!result.success || !result.data) throw new Error(result.error || '댓글 수정에 실패했습니다.');
       setComments(prev => prev.map(c => c.id === commentId ? toDisplayComment(result.data!) : c));
-    } else {
-      toast.error(result.error || '댓글 수정에 실패했습니다.');
-    }
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); } }
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
-    const result = await deleteForumComment(commentId);
-    if (result.success) {
+    const comment = comments.find(item => item.id === commentId);
+    if (readOnly || !comment || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, comment.authorId) || interactionProcessing.current || pinProcessing.current || !confirm('댓글을 삭제하시겠습니까?')) return;
+    interactionProcessing.current = true; setMutationBusy(true);
+    const current = beginInteraction();
+    try {
+      const result = await deleteForumComment(commentId);
+      if (!current()) return;
+      if (!result.success) throw new Error(result.error || '댓글 삭제에 실패했습니다.');
       setComments(prev => prev.filter(c => c.id !== commentId));
-    } else {
-      toast.error(result.error || '댓글 삭제에 실패했습니다.');
-    }
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); } }
   };
 
   const handleLike = async () => {
-    if (readOnly || !post || isLiking) return;
-    if (!isAuthenticated) {
-      openLoginModal();
-      return;
-    }
-    setIsLiking(true);
-    const result = await toggleForumPostLike(post.id);
-    if (result.success && result.data) {
-      setLikeCount(result.data.likeCount);
-      setIsLiked(result.data.isLiked);
-    }
-    setIsLiking(false);
+    if (readOnly || !post || interactionProcessing.current || pinProcessing.current) return;
+    if (!isAuthenticated) { openLoginModal(); return; }
+    interactionProcessing.current = true; setMutationBusy(true); setIsLiking(true);
+    const current = beginInteraction();
+    try {
+      const result = await toggleForumPostLike(post.id);
+      if (!current()) return;
+      if (result.success && result.data) { setLikeCount(result.data.likeCount); setIsLiked(result.data.isLiked); }
+      else toast.error(result.error || '좋아요 처리에 실패했습니다.');
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); setIsLiking(false); } }
   };
 
   const handleSubmitComment = async () => {
-    if (!post || !commentText.trim() || isSubmitting) return;
-
-    setIsSubmitting(true);
-    setCommentError(null);
-    const result = await createForumComment(post.id, commentText.trim());
-
-    if (result.success && result.data) {
-      setComments(prev => [...prev, toDisplayComment(result.data!)]);
-      setCommentText('');
-    } else {
-      // Keep input content, show inline error
-      setCommentError(result.error || '댓글 작성에 실패했습니다.');
-    }
-    setIsSubmitting(false);
+    if (readOnly || !isAuthenticated || !post || post.isLocked || post.allowComments === false || !commentText.trim() || interactionProcessing.current || pinProcessing.current) return;
+    interactionProcessing.current = true; setMutationBusy(true); setIsSubmitting(true); setCommentError(null);
+    const current = beginInteraction();
+    try {
+      const result = await createForumComment(post.id, commentText.trim());
+      if (!current()) return;
+      if (result.success && result.data) { setComments(prev => [...prev, toDisplayComment(result.data!)]); setCommentText(''); }
+      else setCommentError(result.error || '댓글 작성에 실패했습니다.');
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); setIsSubmitting(false); } }
   };
 
   if (isLoading || loadedScope !== `${basePath}:${slug}`) {
@@ -382,14 +404,15 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
                 </button>
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
-                    {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                    {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh || mutationBusy} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                     {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
                     >수정</button>}
                     <button
                       style={{ ...styles.moreMenuItem, color: '#dc2626' }}
-                      onClick={() => { setShowActionMenu(false); handleDeletePost(); }}
+                      disabled={mutationBusy || pinBusy}
+                      onClick={() => { setShowActionMenu(false); void handleDeletePost(); }}
                     >
                       삭제
                     </button>
@@ -399,9 +422,9 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
             ) : (
               /* Desktop: inline actions */
               <>
-                {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh || mutationBusy} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                 {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
-                <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
+                <button style={{ ...styles.actionBtn, color: '#dc2626' }} disabled={mutationBusy || pinBusy} onClick={() => void handleDeletePost()}>삭제</button>
               </>
             )
           ) : null
@@ -456,7 +479,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
         <ForumLikeButton
           liked={isLiked}
           count={likeCount}
-          disabled={isLiking || readOnly}
+          disabled={isLiking || mutationBusy || readOnly}
           onClick={handleLike}
           compact={isMobile}
         />
@@ -465,15 +488,16 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
       {/* Comments Section */}
       <section style={styles.commentsSection}>
         <h3 style={styles.commentsTitle}>
-          댓글 {comments.length}개
+          댓글{!commentsLoadError && !commentsLoading ? ` ${comments.length}개` : ''}
         </h3>
 
         {/* Comment Form */}
-        {!readOnly && <ForumCommentForm
+        {!readOnly && (post.isLocked || post.allowComments === false) && <p>이 게시글은 댓글 작성이 제한되어 있습니다.</p>}
+        {!readOnly && !post.isLocked && post.allowComments !== false && <ForumCommentForm
           value={commentText}
           onChange={(v) => { setCommentText(v); setCommentError(null); }}
           onSubmit={handleSubmitComment}
-          submitting={isSubmitting}
+          submitting={isSubmitting || mutationBusy}
           authenticated={isAuthenticated}
           error={commentError}
           placeholder="댓글을 입력하세요..."
@@ -491,7 +515,9 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
         />}
 
         {/* Comments List — 인라인 수정/삭제는 공통 부품이 제공, mutation 은 서비스 adapter 소유 */}
-        <ForumCommentList
+        {commentsLoading && <p role="status">댓글을 불러오는 중입니다…</p>}
+        {commentsLoadError && <div role="alert"><p>댓글을 불러오지 못했습니다.</p><button type="button" onClick={() => post && void loadComments(post.id, beginLoad())}>댓글 다시 불러오기</button></div>}
+        {!commentsLoading && !commentsLoadError && <ForumCommentList
           comments={comments.map((c) => ({
             id: c.id,
             authorName: c.authorName,
@@ -500,13 +526,14 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
             isAuthor: canEditForumContent(readOnly, isAdmin, currentUserId, c.authorId),
             canDelete: canModerate && !readOnly,
           }))}
+          key={`${basePath}:${slug}`}
           onEditComment={handleUpdateComment}
           onDeleteComment={handleDeleteComment}
           compact={isMobile}
           accentColor={PRIMARY_COLOR}
           emptyMessage="아직 댓글이 없습니다."
           emptyDescription="의견을 나누면 더 깊은 대화가 시작됩니다."
-        />
+        />}
       </section>
 
       {/* Footer */}

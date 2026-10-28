@@ -12,7 +12,7 @@
  * - content 는 기본 plain text(whitespace-pre-wrap). html 렌더가 필요하면 `renderContent` 로 주입.
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 
 export interface ForumCommentListItem {
@@ -77,18 +77,33 @@ function CommentRow({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
   const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [error, setError] = useState('');
+  const processing = useRef(false);
 
   const builtInActions = !renderCommentActions && (comment.isAuthor || comment.canDelete) && (onEditComment || onDeleteComment);
 
   const handleSave = async () => {
-    if (!draft.trim() || saving || !onEditComment) return;
-    setSaving(true);
+    if (!draft.trim() || processing.current || !onEditComment) return;
+    processing.current = true;
+    setSaving(true); setError('');
     try {
       await onEditComment(comment.id, draft.trim());
       setEditing(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '댓글을 저장하지 못했습니다. 다시 시도해 주세요.');
     } finally {
+      processing.current = false;
       setSaving(false);
     }
+  };
+
+  const handleDelete = async () => {
+    if (processing.current || !onDeleteComment) return;
+    processing.current = true; setRemoving(true); setError('');
+    try { await onDeleteComment(comment.id); }
+    catch (e) { setError(e instanceof Error ? e.message : '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
+    finally { processing.current = false; setRemoving(false); }
   };
 
   const actionBtn: CSSProperties = compact
@@ -110,8 +125,10 @@ function CommentRow({
             {comment.isAuthor && onEditComment && (
               <button
                 type="button"
+                disabled={removing}
                 style={actionBtn}
                 onClick={() => {
+                  setError('');
                   setDraft(comment.content);
                   setEditing(true);
                 }}
@@ -123,25 +140,28 @@ function CommentRow({
               <button
                 type="button"
                 style={{ ...actionBtn, color: '#dc2626' }}
-                onClick={() => onDeleteComment(comment.id)}
+                disabled={removing}
+                onClick={() => void handleDelete()}
               >
-                삭제
+                {removing ? '삭제 중...' : '삭제'}
               </button>
             )}
           </div>
         ) : null}
       </div>
 
+      {error && <p role="alert" style={{ color: '#dc2626', marginTop: 8 }}>{error}</p>}
       {editing ? (
         <div style={{ marginTop: 8 }}>
           <textarea
             style={styles.textarea}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            disabled={saving}
+            onChange={(e) => { setDraft(e.target.value); setError(''); }}
             rows={3}
           />
           <div style={styles.editActions}>
-            <button type="button" style={actionBtn} onClick={() => setEditing(false)}>
+            <button type="button" style={actionBtn} disabled={saving} onClick={() => { setEditing(false); setError(''); }}>
               취소
             </button>
             <button
