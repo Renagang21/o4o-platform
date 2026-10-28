@@ -52,3 +52,32 @@ DB 검사는 세션 소유 label의 신규 PostgreSQL 16 컨테이너와 loopbac
 사용자의 main 병합·배포 지시 후 PR #845를 생성했다. main의 자동화 입력·협력사업 자료 변경을 충돌 없이 결합했다. Codex P2 1건은 신규 지정용 Admin 목록이 조회용 카탈로그에도 적용돼 기존 Operator의 수락 상태를 `대상 아님`으로 표시하던 문제다. 조회·읽기 전용 편집의 전체 역할 카탈로그와 신규 초대 Admin allowlist를 분리했다. 기존 Operator의 수락 완료·기존 권한 유지 표시와 중앙 신규 지정 제외를 포함한 관리자 4 files / 24 tests 및 관리자 production build를 통과했다. 집중 lint 오류/신규 경고 0이다. 이 절은 검토 수정 기록이며 실제 배포 완료를 뜻하지 않는다.
 
 PR CI의 API 2/3 분할 실패는 과거 인증 정리 spec이 중앙 controller의 옛 `ASSIGNABLE_OPERATOR_ROLES` 문자열을 요구하는 문제를 로컬 동일 분할에서 재현해 확인했다. 중앙 신규 지정은 Admin 전용이어야 하므로 새 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 응답을 요구하고 옛 전체 지정 목록 응답은 금지하도록 계약 검사를 맞췄다. runtime 권한 검사를 완화하지 않았다. CI 1/3·3/3, 코드 품질·관리자/웹 build는 해당 HEAD에서 통과했다.
+
+## 실사용 안내·수락 후 목록 갱신 보완 (2026-10-27)
+
+상태: `wo/operator-invitation-mail-guidance` 개발·로컬 검증 완료. 이 절은 운영 반영 완료를 뜻하지 않는다. 기준은 `origin/main` `12c86c8109`이다.
+
+- 초대 메일의 내부 role 문자열 대신 서비스 카탈로그 기반 서비스명과 관리자/운영자 명칭을 표시한다. HTML 버튼과 일반 텍스트 fallback, 기존 회원 로그인/신규 가입·이메일 인증/최종 확인·수락 절차, 초대 화면 복귀 방법을 제공한다. fragment URL, 최초 7일 만료, 달력 1년 최소 이력과 ephemeral 비기록은 유지한다.
+- 중앙 목록은 기존 Admin allowlist를 재사용해 서비스 Admin을 기본 표시하고, 기존 Operator는 명시적 함께 보기로 조회·회수한다. 기존 역할을 삭제·변경하지 않는다.
+- 헤더 새로고침과 창 포커스 복귀 시 사용자 권한·초대 목록을 함께 조회한다. 초대 목록이 새 수락을 관측하면 사용자 권한도 다시 조회한다. 이전 사용자 조회가 늦게 끝나 최신 수락 결과를 비우는 경쟁 조건도 차단한다.
+- 초대 확인의 서비스명도 동일 표시 helper를 사용해 Partner를 사람이 읽을 수 있게 표시한다. 분회·개별 조합의 실제 scopeName 조회는 유지한다. 인가·계정 연결·수락 API 계약·DB 스키마·의존성·lockfile 변경 없음.
+
+검증:
+
+| 검사 | 결과 |
+|---|---|
+| API | 메일 렌더링·HTML escape·fragment 보존·privacy 9 tests, 기존 초대 서비스/라우트 16 tests 통과 |
+| 관리자 UI | 5 files / 30 tests 통과. Admin 기본 표시, 기존 Operator opt-in, 새 수락 관측 후 목록 갱신, 늦은 응답 무시 포함 |
+| 타입·빌드 | API 타입 검사·production build, 관리자 타입 검사·production build, 관련 workspace 의존 패키지 빌드 통과 |
+| lint | 루트 flat config 정본으로 변경 실행/테스트 파일 검사 오류 0. 기존 invitation service 미사용 scope 인자 warning 1건 유지 |
+| 브라우저 | 합성 API/계정만 사용한 Chromium 1440×1000 / 390×1000에서 관리자 표시·함께 보기·새 수락 갱신·메일 버튼/fragment 검증. API write 0, page error 0, 관리자 body overflow 0. 실제 캡처 확인 |
+
+합성 메일 미리보기와 캡처는 저장소 밖에 보관했다. 임시 preview 진입 파일 3개와 소유 Vite 프로세스는 정리했다. 설치 중 node-gyp 기본 캐시 경로가 쓰기 불가하여 workspace 캐시를 지정해 frozen-lockfile 설치를 완료했다. 보호 파일 변경 없음.
+
+한계: 운영 DB의 실제 수락 계정·역할 상태는 이 환경에서 직접 조회하지 않았다. 재현한 목록 stale/응답 역전 경로를 수정한 것이며 실제 계정의 누락 원인을 DB까지 확정했다는 뜻이 아니다. 실제 SMTP/메일 재발송/운영 계정·권한 변경을 테스트하지 않았다. PR CI·병합·배포는 이 개발 검증에 포함되지 않는다.
+
+문서 정합: [초대 정본](../baseline/O4O-OPERATOR-INVITATION-CONSENT-AND-RETENTION-V1.md)에 사용자 요청의 메일 안내·Admin 기본 목록·수락 후 갱신 경계를 반영했다. `WORKTREE_DISPOSITION=KEEP` — 통합 전 전용 작업공간·branch 보존.
+
+### PR #860 통합 검증 보완 (2026-10-28)
+
+사용자가 main 병합·배포를 요청하여 동일 작업공간에서 통합을 진행한다. 첫 CI에서 기존 사업 원장 테스트가 기본 Operator 표시를 가정하고 있었고, 인증 정리 정적 계약은 새 순수 메일 renderer 파일을 허용 목록에 포함하지 않아 실패했다. 사업 원장 검증은 기존 Operator 함께 보기를 명시적으로 선택한 뒤 유지하며, 인증 정리 계약에는 승인된 표시 전용 renderer 파일 하나만 추가했다. runtime 인가·역할·DB 경계를 완화하지 않았다. 이 절은 CI 수정 기록이며 배포 완료를 뜻하지 않는다.

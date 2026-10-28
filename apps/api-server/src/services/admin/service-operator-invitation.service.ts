@@ -1,4 +1,5 @@
 import { resolveServiceAdminRole } from "../../config/operator-role-catalog.js";
+import { buildOperatorInvitationMail, invitationScopeLabel } from './operator-invitation-mail.js';
 import { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
 import {
   retainOperatorInvitations,
@@ -62,12 +63,10 @@ async function defaultMailer(
   confirmation: boolean,
 ): Promise<boolean> {
   const { emailService } = await import("../email.service.js");
-  const action = confirmation ? "기존 운영자 지정 확인" : "운영자 초대 수락";
   const result = await emailService.sendEmail({
     to,
     ephemeral: true,
-    subject: `[O4O] ${action}`,
-    text: `${role} ${action} 요청입니다. 로그인 또는 가입 후 본인 계정과 서비스 역할을 확인하고 수락하세요.\n${url}\n최초 초대 발급 후 7일에 만료되며 재발송해도 만료는 연장되지 않습니다. 요청하지 않은 초대는 수락하지 마세요. 수락·취소·만료 시 초대용 이메일·토큰을 파기하고 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.`,
+    ...buildOperatorInvitationMail(url, role, confirmation),
   });
   if (result.success) logger.info("[OperatorInvitation] SMTP accepted invitation mail");
   else logger.warn("[OperatorInvitation] Invitation mail delivery not confirmed");
@@ -410,22 +409,7 @@ export class ServiceOperatorInvitationService {
       if (!i || i.status !== "pending" || new Date(i.expires_at) <= this.now())
         fail("INVALID_OR_EXPIRED_INVITATION", 400);
       await this.prove(m, i, userId);
-      const labels: Record<string, string> = {
-        neture: "Neture",
-        supplier: "공급자 서비스",
-        funding: "펀딩 서비스",
-        community: "커뮤니티",
-        lecture: "강의 서비스",
-        "kpa-society": "KPA 서비스",
-        "kpa-branch": "분회 서비스",
-        pharmacy: "약국 서비스",
-        carepharm: "CarePharm",
-        megapharm: "MegaPharm",
-        pharmcoop: "약국 협업 연합",
-      };
-      const business = i.role.match(/^neture:([^:]+)_(?:admin|operator)$/)?.[1];
-      let scopeName: string | undefined =
-        labels[business || i.scope_key || i.service_key];
+      let scopeName: string | undefined = invitationScopeLabel(i.role, i.service_key);
       if (i.scope_type === "branch" || i.scope_type === "cooperative") {
         const table =
           i.scope_type === "branch" ? "kpa_organizations" : "cooperatives";
