@@ -22,6 +22,12 @@ export interface WorkAgentStep {
   navigated: boolean;
 }
 
+/** Only a server-confirmed, pre-action PC preparation failure opens Main setup. */
+export function requiresPcSetup(work: WorkAgentResult): boolean {
+  return ['LOCAL_AGENT_NO_DEVICE', 'LOCAL_AGENT_OFFLINE'].includes(work.errorCode ?? '')
+    && work.stepCount === 0 && Array.isArray(work.history) && work.history.length === 0;
+}
+
 /**
  * 대상 준비 요약(안전 필드만) — 서버 `target` 을 그대로 받는다.
  * `targetType` 으로 등재 사이트(browser_site)인지 Windows 프로그램(windows_app)인지 구분해

@@ -32,9 +32,10 @@ import {
 
 type Status = 'checking' | 'unavailable' | 'ready' | 'pairing' | 'connected';
 
-export default function LocalAgentCard() {
+export default function LocalAgentCard({ onBusyChange }: Readonly<{ onBusyChange?: (busy: boolean) => void }> = {}) {
   const [status, setStatus] = useState<Status>('checking');
   const [health, setHealth] = useState<LocalAgentHealth | null>(null);
+  useEffect(() => { onBusyChange?.(status === 'checking' || status === 'pairing'); }, [status, onBusyChange]);
   const [message, setMessage] = useState<string | null>(null);
 
   /** 승인권을 받아 agent 에게 건넨다. 성공하면 완료, 실패하면 이유를 문장으로 보여준다. */
