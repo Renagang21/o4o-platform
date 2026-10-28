@@ -7,16 +7,35 @@ it('reports an old connected PC as needing update and requires matching running 
  vi.stubGlobal('fetch',vi.fn().mockImplementation(async()=>({ok:true,json:async()=>release})));
  const verify=vi.fn(),health={agentVersion:'0.3.0',connected:true,nonce:'fixture'};
  const view=render(<PcProgramUpdate health={health} onVerify={verify}/>);
- await screen.findByText('현재 실행 중인 프로그램은 업데이트가 필요합니다.');
- expect(screen.queryByText('최신 프로그램과 데이터 준비 상태를 확인했습니다.')).toBeNull();
+ await screen.findByText('업데이트가 필요합니다.');
+ expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
  view.rerender(<PcProgramUpdate health={{...health,agentVersion:'0.4.0',releaseId:release.releaseId,localData:{ready:true,schemaVersion:8}}} onVerify={verify}/>);
- expect(screen.getByText('최신 프로그램과 데이터 준비 상태를 확인했습니다.')).toBeTruthy();
- fireEvent.click(screen.getByRole('button',{name:'설치·업데이트 후 다시 확인'}));expect(verify).toHaveBeenCalledOnce();
+ expect(screen.getByText('최신 프로그램입니다.')).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'연결 확인'}));expect(verify).toHaveBeenCalledOnce();
  await waitFor(()=>expect(fetch).toHaveBeenCalledTimes(2));
 });
 it('unreachable PC is unknown rather than up-to-date; failed manifest can be retried',async()=>{
  const fetcher=vi.fn().mockRejectedValueOnce(Error('offline')).mockResolvedValue({ok:true,json:async()=>release});vi.stubGlobal('fetch',fetcher);
  render(<PcProgramUpdate health={null} onVerify={vi.fn()}/>);await screen.findByRole('alert');
- fireEvent.click(screen.getByRole('button',{name:'설치·업데이트 후 다시 확인'}));
- await screen.findByText('배포 버전 0.4.0');expect(screen.queryByText('최신 프로그램과 데이터 준비 상태를 확인했습니다.')).toBeNull();
+ fireEvent.click(screen.getByRole('button',{name:'연결하기'}));
+ await screen.findByText('버전 0.4.0');expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
+});
+
+it('one install button downloads the verified launcher without claiming installation or connecting automatically',async()=>{
+ const {createHash,webcrypto}=await import('node:crypto');
+ const payload=new TextEncoder().encode('@echo off\r\nrem synthetic installer');
+ const setup={filename:release.filename.replace('.zip','-setup.cmd'),bytes:payload.length,sha256:createHash('sha256').update(payload).digest('hex')};
+ vi.stubGlobal('crypto',webcrypto);
+ vi.stubGlobal('URL',{createObjectURL:vi.fn().mockReturnValue('blob:fixture'),revokeObjectURL:vi.fn()});
+ const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+ vi.stubGlobal('fetch',vi.fn().mockImplementation(async(url:string)=>url.endsWith('release.json')?{ok:true,json:async()=>({...release,setup})}:new Response(payload)));
+ const verify=vi.fn();render(<PcProgramUpdate health={null} onVerify={verify}/>);
+ await waitFor(()=>expect(screen.getByRole('button',{name:'설치하기'}).hasAttribute('disabled')).toBe(false));
+ fireEvent.click(screen.getByRole('button',{name:'설치하기'}));
+ await screen.findByRole('status');
+ expect(click).toHaveBeenCalledOnce();expect(click.mock.instances[0].download).toBe(setup.filename);
+ expect(verify).not.toHaveBeenCalled();expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
+ expect(screen.queryByText(/압축을 풀고/)).toBeNull();
+ fireEvent.click(screen.getByRole('button',{name:'연결하기'}));expect(verify).toHaveBeenCalledOnce();
+ click.mockRestore();
 });

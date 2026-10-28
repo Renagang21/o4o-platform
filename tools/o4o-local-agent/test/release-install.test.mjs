@@ -107,6 +107,23 @@ test('Windows packaged runtime starts and health proves its release and data rea
    windowsVerbatimArguments:true,input:'Y\r\n',stdio:['pipe','pipe','pipe'],timeout:60000,
  });
  assert.ok(fs.existsSync(path.join(freshData,'local.db')));assert.equal(verifyPackage(installedSlot(freshHome)).releaseId,result.releaseId);
+ // Window mode on an existing installation needs no terminal input and starts
+ // the installed runtime automatically. First-install GUI consent is not bypassed.
+ const freshSlot=installedSlot(freshHome),runtime=path.join(freshSlot,'runtime','node.exe');
+ try {
+  execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
+   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+  });
+  let health;
+  for(let n=0;n<40;n++) {
+   try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
+   await new Promise(resolve=>setTimeout(resolve,250));
+  }
+  assert.equal(health?.releaseId,result.releaseId);assert.equal(health?.localData?.ready,true);
+ } finally {
+  execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',"Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe'});
+ }
+
 });
 
 test('verified packages repair missing/corrupt installed code while preserving data and failed-repair pointer',async()=>{
@@ -136,4 +153,36 @@ test('terminated installer releases OS mutex and preserves real concurrent exclu
 
 test('oversized non-streaming download cannot be published even with maximum ZIP compression',()=>{
  assert.throws(()=>assembleRelease({sourceSha,files:[],runtime:randomBytes(32*1024*1024),runtimeLicense:Buffer.from('fixture license')}),/32 MiB HTTP download limit/);
+});
+
+test('click installer pins a same-origin package and publishes its own verifiable digest',()=>{
+ const result=fixture();
+ assert.equal(result.manifest.setup.filename,result.manifest.filename.replace('.zip','-setup.cmd'));
+ const digest=execFileSync(process.execPath,['--input-type=module','-e',"import{createHash}from'node:crypto';let b=[];for await(const c of process.stdin)b.push(c);console.log(createHash('sha256').update(Buffer.concat(b)).digest('hex'))"],{input:result.setup,encoding:'utf8'}).trim();
+ assert.equal(result.manifest.setup.sha256,digest);
+ assert.equal(result.manifest.setup.bytes,result.setup.length);
+ const script=result.setup.toString('utf8');
+ assert.ok(script.includes(`https://neture.co.kr/downloads/pc-connection/${result.manifest.filename}`));
+ assert.ok(script.includes(result.manifest.sha256));
+ assert.ok(!/ExecutionPolicy|EncodedCommand|RunAs|127\.0\.0\.1/.test(script));
+});
+
+test('Windows click launcher handles Korean paths and rejects corruption before executing a package', {skip:process.platform!=='win32',timeout:120000},()=>{
+ const result=assembleRelease({sourceSha,files:[['install.mjs',Buffer.from("import fs from 'node:fs';if(!process.argv.includes('--window'))process.exit(1);fs.writeFileSync(process.env.O4O_SETUP_TEST_MARKER,'started');")]],runtime:fs.readFileSync(process.execPath),runtimeLicense:Buffer.from('fixture license')});
+ const archive=path.join(root,'fixture.zip'),launcher=path.join(root,'설치 파일.cmd'),marker=path.join(root,'marker');
+ fs.writeFileSync(archive,result.archive);
+ // Replace only network transport in a private test copy. The real cmd prologue,
+ // PowerShell size/hash/extraction and Node invocation remain unchanged.
+ const script=result.setup.toString('utf8').replace(/function Receive-Package\([\s\S]*?(?=function Expand-VerifiedPackage)/,
+   `function Receive-Package([string]$target) { Copy-Item -LiteralPath '${archive.replaceAll("'","''")}' -Destination $target }\r\n`);
+ fs.writeFileSync(launcher,script);
+ const system=process.env.SystemRoot;
+ const run=()=>execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${launcher}""`],{
+  env:{...process.env,O4O_SETUP_TEST_MARKER:marker,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,input:'\r\n',timeout:60000,
+ });
+ run();assert.equal(fs.readFileSync(marker,'utf8'),'started');fs.unlinkSync(marker);
+ const corrupt=Buffer.from(result.archive);corrupt[40]^=1;fs.writeFileSync(archive,corrupt);
+ assert.throws(run);assert.equal(fs.existsSync(marker),false);
+ fs.writeFileSync(archive,result.archive.subarray(0,result.archive.length-1));
+ assert.throws(run);assert.equal(fs.existsSync(marker),false);
 });

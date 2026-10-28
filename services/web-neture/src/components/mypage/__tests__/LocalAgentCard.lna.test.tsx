@@ -96,10 +96,10 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '연결하기' }));
 
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
-    expect(screen.getByText('이 PC 가 연결되었습니다.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '연결 확인' })).toBeTruthy();
   });
 
   it('2. agent 미실행(권한은 허용됨) → Agent 실행 안내가 나온다', async () => {
@@ -149,7 +149,7 @@ describe('§12 LNA 안내 UX', () => {
       ),
     );
 
-    await userEvent.click(screen.getByRole('button', { name: '다시 연결' }));
+    await userEvent.click(screen.getByRole('button', { name: '연결하기' }));
 
     // 버튼 한 번으로 재관측 + 연결까지 끝난다 (§7).
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
@@ -186,7 +186,7 @@ describe('§12 LNA 안내 UX', () => {
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
     // 이미 연결된 상태에서 승인권을 새로 발급하지 않는다.
     expect(apiPost).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: '이 PC 연결' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '연결하기' })).toBeNull();
   });
 
   it('실패해도 1회용 nonce 를 재사용하지 않는다 (replay 여지 0)', async () => {
@@ -200,12 +200,11 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '연결하기' }));
 
     expect(await screen.findByText(/연결 승인 시간이 지났습니다/)).toBeTruthy();
     // 실패한 nonce 로 다시 누를 수 있는 버튼을 남기지 않는다. 남은 경로는 재관측뿐이다.
-    expect(screen.queryByRole('button', { name: '이 PC 연결' })).toBeNull();
-    expect(screen.getByRole('button', { name: '다시 연결' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: '연결하기' })).toHaveLength(1);
   });
 });
 
@@ -221,7 +220,7 @@ describe('보안 경계 — 이 카드가 하지 않는 일', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '연결하기' }));
     await screen.findByText('이 PC 연결됨');
 
     for (const [url, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
