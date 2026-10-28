@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 type Client = { get(path: string): Promise<unknown> };
 /** Server-confirmed inbox access: null is unconfirmed/denied; zero is allowed.
- * Scoped to the current account/service, refreshed on focus and every 30 seconds. */
+ * Scoped to the current account/service. A 403 pauses polling until a focus recheck
+ * or a scope change; allowed accounts still refresh every 30 seconds. */
 export function useServiceContactCount({
   client,
   serviceKey,
@@ -22,6 +23,7 @@ export function useServiceContactCount({
     if (!enabled || !accountId) return;
     let active = true;
     let sequence = 0;
+    let pollingDenied = false;
     const read = async () => {
       const request = ++sequence;
       try {
@@ -30,16 +32,23 @@ export function useServiceContactCount({
         )) as { data?: { data?: { newCount?: number } } };
         const count = response.data?.data?.newCount;
         if (!active || request !== sequence) return;
+        pollingDenied = false;
         if (typeof count === "number" && Number.isInteger(count) && count >= 0)
           setValue({ scope, count });
         else setValue(null);
-      } catch {
-        if (active && request === sequence) setValue(null);
+      } catch (error) {
+        if (!active || request !== sequence) return;
+        // Keep server authorization as the authority. Focus can detect a later grant
+        // without sending the same denied request on every polling interval.
+        pollingDenied =
+          (error as { response?: { status?: number } } | null)?.response
+            ?.status === 403;
+        setValue(null);
       }
     };
     void read();
     const timer = setInterval(() => {
-      if (document.visibilityState !== "hidden") void read();
+      if (!pollingDenied && document.visibilityState !== "hidden") void read();
     }, 30000);
     window.addEventListener("focus", read);
     return () => {
