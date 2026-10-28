@@ -3,6 +3,7 @@ import { authClient } from '@o4o/auth-client';
 
 export type Invite = {
   scope_type?: string;
+  scope_key?: string;
   target_user_id: string | null;
   accepted_user_id: string | null;
   id: string;
@@ -98,12 +99,12 @@ export default function OperatorInvitationsPanel({
                 timeZone: 'Asia/Seoul',
               })}
             </span>
-            {row.status === 'pending' && row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) && <span>이전 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.</span>}
+            {row.status === 'pending' && row.scope_type === 'platform' && row.scope_key !== 'o4o-direct' && /(?:[:_])operator$/.test(row.role) && <span>이전 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.</span>}
             {row.status === 'pending' && !row.expired && (
               <>
                 <button
-                  disabled={busy || row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role)}
-                  title={row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) ? '이전 중앙 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.' : undefined}
+                  disabled={busy || row.scope_type === 'platform' && row.scope_key !== 'o4o-direct' && /(?:[:_])operator$/.test(row.role)}
+                  title={row.scope_type === 'platform' && row.scope_key !== 'o4o-direct' && /(?:[:_])operator$/.test(row.role) ? '이전 중앙 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.' : undefined}
                   onClick={() => void manage(row.id, 'resend')}
                 >
                   재발송

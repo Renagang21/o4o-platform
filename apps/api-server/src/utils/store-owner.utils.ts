@@ -1,3 +1,4 @@
+import {hasApprovedPharmacist} from '../services/qualifications/pharmacist-qualification.service.js';
 import { resolveApprovedStoreMemberOrganization } from './store-member-access.js';
 /**
  * Store Owner Utilities
@@ -122,6 +123,13 @@ export interface StoreOwnerCheckResult {
   resolution: StoreOrganizationResolution;
   /** 게시된 매장 경영자 계약 미승낙 시 server-side workspace 차단 근거. */
   pendingAgreement?: PendingPolicyAcceptance | null;
+  qualificationRequired?: boolean;
+}
+
+async function lacksUnscopedPharmacyQualification(db:DataSource,userId:string,serviceKey:StoreOwnerServiceKey|undefined,organizationId:string|null):Promise<boolean>{
+  if(serviceKey || !organizationId)return false;
+  const [organization]=await db.query('SELECT type FROM organizations WHERE id=$1',[organizationId]);
+  return organization?.type==='pharmacy' && !await hasApprovedPharmacist(db,userId);
 }
 
 export async function isStoreOwner(
@@ -161,6 +169,7 @@ export async function isStoreOwner(
     if (resolution.status === 'none') {
       return { isOwner: false, organizationId: null, memberRole: '', resolution, pendingAgreement: null };
     }
+    if(!await hasApprovedPharmacist(dataSource,userId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
     const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(
       userId, resolveCanonicalServiceKey(serviceKey), dataSource,
     );
@@ -211,6 +220,7 @@ export async function isStoreOwner(
   //   조직 선택은 공통 해석기가 담당한다. serviceKey 가 있으면 그 서비스에 등록된
   //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
   const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
+  if(await lacksUnscopedPharmacyQualification(dataSource,userId,serviceKey,resolution.organizationId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
   const agreementServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
   const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey, dataSource);
   const pendingAgreement = pendingAgreements[0] ?? null;
@@ -230,6 +240,14 @@ export async function isStoreOwner(
  * @param serviceKey  지정 시 해당 서비스 role 만 통과 (cross-service leakage 차단).
  *                    미지정 시 모든 서비스 store_owner role 허용 (back-compat).
  */
+function storeOwnerRejection({isOwner,organizationId,resolution,pendingAgreement,qualificationRequired}:StoreOwnerCheckResult){
+  if(resolution.status==='ambiguous')return {status:409,body:{success:false,error:'연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',code:'AMBIGUOUS_STORE_CONNECTION'}};
+  if(qualificationRequired)return {status:403,body:{success:false,code:'PHARMACIST_QUALIFICATION_REQUIRED',error:'약국 경영 업무에는 승인된 약사 자격이 필요합니다. My Home 설정에서 자격 신청·상태를 확인해 주세요.'}};
+  if(pendingAgreement)return {status:428,body:{success:false,error:'매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',code:'STORE_OWNER_AGREEMENT_REQUIRED',pendingPolicyAcceptances:[pendingAgreement]}};
+  if(!isOwner || !organizationId)return {status:403,body:{success:false,error:'Store owner access required',code:'STORE_OWNER_REQUIRED'}};
+  return null;
+}
+
 export function createRequireStoreOwner(
   dataSource: DataSource,
   serviceKey?: StoreOwnerServiceKey,
@@ -301,47 +319,14 @@ export function createRequireStoreOwner(
       }
     }
 
-    const { isOwner, organizationId, memberRole, resolution, pendingAgreement } = await isStoreOwner(
+    const { isOwner, organizationId, memberRole, resolution, pendingAgreement, qualificationRequired } = await isStoreOwner(
       dataSource,
       user.id,
       serviceKey,
       readPreferredStoreOrganizationId(req),
     );
-    // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
-    //   같은 서비스 후보가 2개 이상이면 하나를 골라 통과시키지 않는다.
-    //   Pharmacy-Hub 전용 seam 과 같은 코드·같은 상태코드(409)로 응답한다.
-    if (resolution.status === 'ambiguous') {
-      res.status(409).json({
-        success: false,
-        error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',
-        code: 'AMBIGUOUS_STORE_CONNECTION',
-      });
-      return;
-    }
-    if (pendingAgreement) {
-      res.status(428).json({
-        success: false,
-        error: '매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',
-        code: 'STORE_OWNER_AGREEMENT_REQUIRED',
-        pendingPolicyAcceptances: [pendingAgreement],
-      });
-      return;
-    }
-    // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
-    //   organizationId 미해석(= 매장 조직 미연결) 사용자를 통과시키지 않는다.
-    //   기존에는 role 만 있으면 통과 후 req.organizationId = null 이 되어 하위 핸들러가
-    //   organization_id IS NULL 로 조회(0건)하거나 NOT NULL 위반으로 500 을 냈다.
-    //   auth-context.middleware 의 requireStoreAuth 는 이미 동일 정책(`!isOwner || !organizationId`)이며
-    //   이쪽만 어긋나 있었다. 프로덕션 실측상 kpa/cosmetics 의 active store_owner 는
-    //   전원 조직을 보유하므로(각 5/1/2, 미보유 0) 기존 서비스 동작 변화 0.
-    if (!isOwner || !organizationId) {
-      res.status(403).json({
-        success: false,
-        error: 'Store owner access required',
-        code: 'STORE_OWNER_REQUIRED',
-      });
-      return;
-    }
+    const rejection=storeOwnerRejection({isOwner,organizationId,memberRole,resolution,pendingAgreement,qualificationRequired});
+    if(rejection){res.status(rejection.status).json(rejection.body);return;}
 
     req.organizationId = organizationId as any;
     req.authContext = {

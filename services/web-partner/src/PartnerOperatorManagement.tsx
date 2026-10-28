@@ -4,6 +4,7 @@ import { request } from "./api";
 type Person = { userId: string; name: string | null; email: string };
 type Invite = { id: string; invited_email: string | null; expires_at: string };
 type Snapshot = {
+  centralManagementRequired?: boolean;
   operators: Person[];
   candidates: Person[];
   invitations: Invite[];
@@ -80,6 +81,7 @@ export default function PartnerOperatorManagement({
         ? "메일 재발송을 요청했습니다. 이전 링크는 사용할 수 없습니다."
         : "초대를 취소했습니다.",
     );
+  if(data?.centralManagementRequired)return <section><p>O4O 직영 운영자 지정·회수는 중앙 Admin이 처리합니다.</p><a href="https://admin.neture.co.kr/operators">통합 관리자에서 운영 권한 관리</a></section>;
   return (
     <section className="panel" aria-label="Partner Operator 관리">
       <h2>Operator 지정 · 해제</h2>

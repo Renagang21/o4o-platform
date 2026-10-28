@@ -58,6 +58,8 @@ export interface OperatorLmsCoursesConfig {
   detailPath?: (id: string) => string;
   /** Drawer 내 상세 링크 라벨. 기본 '강의 페이지 이동'. */
   detailLinkLabel?: string;
+  /** Hide irreversible actions in delegated operating workspaces. Default preserves existing hosts. */
+  disableHardDelete?: boolean;
 }
 
 export interface OperatorLmsCoursesManagerProps {
@@ -341,7 +343,7 @@ export function OperatorLmsCoursesManager({ config }: OperatorLmsCoursesManagerP
       loading: batch.loading,
       group: 'danger',
       tooltip: '선택된 종료 강의를 일괄 완전 삭제합니다 (되돌릴 수 없음)',
-      visible: selectedArchivedCount > 0,
+      visible: config.disableHardDelete !== true && selectedArchivedCount > 0,
       confirm: {
         title: '일괄 완전 삭제',
         message: `${selectedArchivedCount}개 종료 강의를 완전 삭제합니다.\n레슨, 수강 기록, 수료증 등 모든 관련 데이터가 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.`,
@@ -416,7 +418,7 @@ export function OperatorLmsCoursesManager({ config }: OperatorLmsCoursesManagerP
             unpublish: () => handleUnpublish(row),
             archive: () => handleArchive(row),
             'hard-delete': () => handleHardDelete(row),
-          }, { icons: COURSE_ACTION_ICONS })}
+          }, { icons: COURSE_ACTION_ICONS }).filter(action => config.disableHardDelete !== true || action.key !== 'hard-delete')}
         />
       ),
     },

@@ -1,3 +1,4 @@
+import PharmacistQualificationCard from '../../components/mypage/PharmacistQualificationCard';
 /**
  * MySettingsPage - 설정 (경량 모드)
  *
@@ -78,6 +79,7 @@ export default function MySettingsPage() {
         notify={{ success: toast.success, error: toast.error }}
         onLogout={logout}
       />
+      <PharmacistQualificationCard key={user.id}/>
       <SocialAccountConnections client={authClient} />
       <ExternalAiConnectionsCard key={user.id} />
       <PasswordSecuritySettings client={authClient} notify={{ success: toast.success }} onSessionEnded={() => openLoginModal('/mypage/settings')} />

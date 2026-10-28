@@ -336,6 +336,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'HardenAuthPrivacyReadiness1793010000000', fingerprint: 'df843fc3661c3a9415db6628ce1ba10f819030e8b0f761c559f9c6c3f5625bc5', fingerprintLineCount: 7238 },
   { appliedThrough: 'CreatePartnerCommunity1793020000000', fingerprint: '69ceb8e5089ee579f9b0f9bc905c10c1795ef59de69d03566ab33043c1b1957e', fingerprintLineCount: 7319 },
   { appliedThrough: 'CreateSettlementNotificationJobs1793087685658', fingerprint: '4bd5d4e71e2656241a20e63fc226cbc571228dd4634294f0d3772bb3bff115e1', fingerprintLineCount: 7338 },
+  { appliedThrough: 'AllowCentralOperatingDelegation1793164501481', fingerprint: '87885d94fe587b71f64fc1f59a20ae6677bf6c6ab5b0f079fe0f8cd362e6658c', fingerprintLineCount: 7338 },
+  { appliedThrough: 'AddPharmacistQualificationDecisions1793165158540', fingerprint: '0834c1f1d5911e4a12ef86b24997a4b3038685d46821edfcc99020802fd0a986', fingerprintLineCount: 7344 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

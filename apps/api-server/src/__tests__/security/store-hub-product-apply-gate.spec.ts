@@ -46,6 +46,8 @@ function buildApp(opts: {
     getRepository: () => ({ create: (x: any) => x, save: async (x: any) => x, findOne: async () => null }),
     query: async (sql: string, params: any[] = []) => {
       calls.push({ sql, params });
+      // This owner fixture has an independently reviewed pharmacist credential.
+      if (sql.includes('FROM kpa_pharmacist_profiles') && sql.includes('AS approved')) return [{ approved: true }];
       // requirePharmacyOwner(createRequireStoreOwner → isStoreOwner) 는 실제로 실행시킨다.
       // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
       //   isStoreOwner() 가 role_assignments 앞에서 service_memberships(active) 를 먼저 본다.

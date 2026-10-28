@@ -2,14 +2,19 @@ import type { DataSource } from 'typeorm';
 import { NeturePharmacyError } from '../constants.js';
 type Executor = Pick<DataSource, 'query'>;
 
-/** Store-scoped owner confirmation is not a new global licence verification record. */
+/** Professional use requires personal verified qualification AND permission in this store. */
 export async function consultationProfessionalConfirmed(db: Executor, userId: string, organizationId: string) {
   try {
     const rows = await db.query(`SELECT
       EXISTS(SELECT 1 FROM organization_members WHERE user_id=$1 AND organization_id=$2 AND left_at IS NULL
         AND metadata ? 'pharmacyPharmacistConfirmed' AND jsonb_typeof(metadata->'pharmacyPharmacistConfirmed') IS DISTINCT FROM 'boolean') AS invalid,
       EXISTS(SELECT 1 FROM organization_members WHERE user_id=$1 AND organization_id=$2 AND left_at IS NULL
-        AND role IN ('owner','staff') AND metadata->'pharmacyPharmacistConfirmed'='true'::jsonb) AS confirmed`, [userId, organizationId]);
+        AND role IN ('owner','staff') AND metadata->'pharmacyPharmacistConfirmed'='true'::jsonb)
+      AND EXISTS(SELECT 1 FROM kpa_pharmacist_profiles p JOIN users u ON u.id=p.user_id
+        WHERE p.user_id=$1 AND p.qualification_status='approved' AND p.license_verified=true AND NULLIF(BTRIM(p.license_number),'') IS NOT NULL
+        AND p.verified_at IS NOT NULL AND p.verified_by IS NOT NULL
+        AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved')
+        AND NOT EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))) AS confirmed`, [userId, organizationId]);
     if (rows.length !== 1 || rows[0].invalid === true || typeof rows[0].confirmed !== 'boolean') throw new Error('Invalid confirmation');
     return rows[0].confirmed;
   } catch {

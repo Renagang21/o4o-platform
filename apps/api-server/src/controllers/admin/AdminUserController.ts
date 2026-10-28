@@ -1,3 +1,4 @@
+import { CENTRAL_OPERATION_ROLES } from '../../config/operator-role-catalog.js';
 import { respondErasure } from '../../services/privacy/account-erasure.http.js';
 /**
  * @core O4O_PLATFORM_CORE — Approval
@@ -222,9 +223,11 @@ export class AdminUserController {
       // WO-OPERATOR-FIX-V1: Fetch roles for all users in batch
       const userIds = users.map(u => u.id);
       const roleMap: Record<string, string[]> = {};
+      const centralRoleMap: Record<string, string[]> = {};
       if (userIds.length > 0) {
         const roleRows = await AppDataSource.query(
-          `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles
+          `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles,
+             ARRAY_AGG(role ORDER BY role) FILTER (WHERE scope_type='o4o-direct') AS central_roles
            FROM role_assignments
            WHERE user_id = ANY($1) AND is_active = true
              AND (valid_from IS NULL OR valid_from <= CURRENT_TIMESTAMP)
@@ -234,6 +237,7 @@ export class AdminUserController {
         );
         for (const row of roleRows) {
           roleMap[row.user_id] = (row.roles || []).filter((value: string) => !isRetiredRoleValue(value));
+          centralRoleMap[row.user_id] = (row.central_roles || []).filter((value: string) => CENTRAL_OPERATION_ROLES.includes(value));
         }
       }
 
@@ -242,6 +246,7 @@ export class AdminUserController {
       const sanitizedUsers = users.map(user => ({
         ...sanitizeAdminUser(user),
         roles: roleMap[user.id] || [],
+        centralDelegationRoles: centralRoleMap[user.id] || [],
         role: (roleMap[user.id] || [])[0] || 'user'
       }));
 

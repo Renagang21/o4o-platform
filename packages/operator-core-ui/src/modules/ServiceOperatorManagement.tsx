@@ -15,6 +15,7 @@ interface Person {
   effective?: boolean;
 }
 interface Snapshot {
+  centralManagementRequired?: boolean;
   role: string;
   operators: Person[];
   candidates: Person[];
@@ -110,6 +111,7 @@ function OperatorManagementPanel({
       if (mounted.current) setBusy(false);
     }
   }
+  if (data?.centralManagementRequired) return <section><h2>{title}</h2><p>O4O 직영 업무의 운영자 지정·회수는 중앙 Admin이 처리합니다.</p><a href="https://admin.neture.co.kr/operators">통합 관리자에서 운영 권한 관리</a></section>;
   return (
     <section className="space-y-4 rounded-lg border bg-white p-5">
       <h2 className="text-xl font-semibold">{title}</h2>

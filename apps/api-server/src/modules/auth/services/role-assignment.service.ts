@@ -1,3 +1,4 @@
+import { CENTRAL_OPERATION_ROLES } from '../../../config/operator-role-catalog.js';
 /**
  * @core O4O_PLATFORM_CORE — RBAC
  * Core Service: RoleAssignmentService (RBAC SSOT)
@@ -29,6 +30,12 @@ export interface AssignRoleInput {
   assignedBy?: string;
   validFrom?: Date;
   validUntil?: Date;
+  /** CORE_CHANGE_REQUIRED: unified central delegation via existing scope column; forward CHECK extension, no new role. */
+  scopeType?: 'global' | 'o4o-direct';
+}
+
+function assertCentralDelegationInput({scopeType,role,assignedBy}:AssignRoleInput):void {
+  if (scopeType === 'o4o-direct' && (!CENTRAL_OPERATION_ROLES.includes(role) || !assignedBy)) throw new Error('INVALID_CENTRAL_DELEGATION');
 }
 
 export class RoleAssignmentService {
@@ -129,10 +136,11 @@ export class RoleAssignmentService {
    *   Operator 쓰기는 manager 생략 시 내부 transaction을 사용하며, 다른 역할은 기존 동작을 유지한다.
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
-    const { userId, role, assignedBy, validFrom, validUntil } = input;
+    const { userId, role, assignedBy, validFrom, validUntil, scopeType } = input;
+    assertCentralDelegationInput(input);
     if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     // F10 §3.2 bug fix: all operator grant paths share the transaction lock, including callers without a manager.
-    if (isOperatorAssignmentRole(role)) {
+    if (isOperatorAssignmentRole(role) || CENTRAL_OPERATION_ROLES.includes(role)) {
       if (!manager) {
         const saved = await AppDataSource.transaction(tx => this.assignRole(input, tx));
         invalidateRoles(userId.toLowerCase()); // invalidate again after this transaction commits
@@ -191,6 +199,13 @@ export class RoleAssignmentService {
       );
     }
 
+    // Central provenance applies to Admin and Operator; preserve unrelated organization scopes.
+    if (scopeType === 'o4o-direct') {
+      if (assignment.scopeId) throw new Error('INVALID_CENTRAL_DELEGATION_SCOPE');
+      assignment.scopeType = 'o4o-direct';
+    } else if (assignment.scopeType === 'o4o-direct') {
+      assignment.scopeType = 'global';
+    }
     const saved = await repository.save(assignment);
     invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
     return saved;
@@ -232,7 +247,7 @@ export class RoleAssignmentService {
    *   행을 지우지 않고 이력을 남긴다.
    */
   async removeRole(userId: string, role: string, manager?: EntityManager): Promise<boolean> {
-    if (isOperatorAssignmentRole(role)) {
+    if (isOperatorAssignmentRole(role) || CENTRAL_OPERATION_ROLES.includes(role)) {
       if (!manager) {
         const removed = await AppDataSource.transaction(tx => this.removeRole(userId, role, tx));
         invalidateRoles(userId.toLowerCase());

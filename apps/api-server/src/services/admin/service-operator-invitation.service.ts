@@ -1,4 +1,4 @@
-import { resolveServiceAdminRole } from "../../config/operator-role-catalog.js";
+import { resolvePlatformInvitationRole, CENTRAL_DELEGATION_SCOPE } from "../../config/operator-role-catalog.js";
 import { buildOperatorInvitationMail, invitationScopeLabel } from './operator-invitation-mail.js';
 import { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
 import {
@@ -54,6 +54,7 @@ export type InvitationMailer = (
   url: string,
   role: string,
   confirmation: boolean,
+  centralDelegation?: boolean,
 ) => Promise<boolean>;
 
 async function defaultMailer(
@@ -61,12 +62,13 @@ async function defaultMailer(
   url: string,
   role: string,
   confirmation: boolean,
+  centralDelegation = false,
 ): Promise<boolean> {
   const { emailService } = await import("../email.service.js");
   const result = await emailService.sendEmail({
     to,
     ephemeral: true,
-    ...buildOperatorInvitationMail(url, role, confirmation),
+    ...buildOperatorInvitationMail(url, role, confirmation, centralDelegation),
   });
   if (result.success) logger.info("[OperatorInvitation] SMTP accepted invitation mail");
   else logger.warn("[OperatorInvitation] Invitation mail delivery not confirmed");
@@ -114,7 +116,7 @@ export class ServiceOperatorInvitationService {
         {
           scope_type: "platform",
           scope_key: "",
-          role: "lecture:operator",
+          role: "lecture:admin",
           service_key: "lecture",
         },
         actorId,
@@ -180,17 +182,18 @@ export class ServiceOperatorInvitationService {
   ) {
     if (scope.scope_type === "cooperative") return; // Cooperative-specific writer validates its own scoped role rows.
     const [prior] = await m.query(
-      `SELECT is_active,(valid_from>now()) AS starts_later,(valid_until<now()) AS ended FROM role_assignments
+      `SELECT scope_id,scope_type,(valid_until IS NOT NULL) AS scheduled_end,is_active,(valid_from>now()) AS starts_later,(valid_until<now()) AS ended FROM role_assignments
       WHERE user_id=$1 AND role=$2 ORDER BY is_active DESC,assigned_at DESC,id DESC LIMIT 1 FOR SHARE`,
       [target, scope.role],
     );
-    if (prior && (prior.starts_later || prior.ended))
+    if (scope.scope_key === CENTRAL_DELEGATION_SCOPE && prior?.scope_id) fail('OPERATOR_ROLE_SCOPE_REVIEW_REQUIRED');
+    if (prior && (prior.starts_later || prior.ended || scope.scope_key === CENTRAL_DELEGATION_SCOPE && prior.scheduled_end))
       fail("OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED");
-    if (prior?.is_active) fail("OPERATOR_ALREADY_ACTIVE");
+    if (prior?.is_active && !(scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE && prior.scope_type !== CENTRAL_DELEGATION_SCOPE)) fail("OPERATOR_ALREADY_ACTIVE");
   }
   async create(input: InviteInput): Promise<OperatorInvite> {
     // Validate the catalog before touching a transaction.
-    if (!input.scopeType || input.scopeType === "platform") resolveServiceAdminRole(input.role, input.serviceKey);
+    if (!input.scopeType || input.scopeType === "platform") resolvePlatformInvitationRole(input.role, input.serviceKey, input.scopeKey);
     invitationScope(
       input.scopeType,
       input.scopeKey,
@@ -206,7 +209,7 @@ export class ServiceOperatorInvitationService {
     m: EntityManager,
     input: InviteInput,
   ): Promise<PreparedInvitation> {
-    if (!input.scopeType || input.scopeType === "platform") resolveServiceAdminRole(input.role, input.serviceKey);
+    if (!input.scopeType || input.scopeType === "platform") resolvePlatformInvitationRole(input.role, input.serviceKey, input.scopeKey);
     const scope = invitationScope(
       input.scopeType,
       input.scopeKey,
@@ -293,6 +296,7 @@ export class ServiceOperatorInvitationService {
         p.url,
         p.invite.role,
         false,
+        p.invite.scope_type === 'platform' && p.invite.scope_key === CENTRAL_DELEGATION_SCOPE,
       );
     } catch {
       /* Never log recipient/token/transport errors. */
@@ -357,7 +361,7 @@ export class ServiceOperatorInvitationService {
         )
           fail("INVITATION_ACCOUNT_MISMATCH", 403);
       }
-      if (row.scope_type === "platform") resolveServiceAdminRole(row.role, row.service_key);
+      if (row.scope_type === "platform") resolvePlatformInvitationRole(row.role, row.service_key, row.scope_key);
       return this.rotate(m, row, actor);
     });
     return result.url
@@ -397,6 +401,7 @@ export class ServiceOperatorInvitationService {
     role: string;
     purpose: string;
     scopeName?: string;
+    centralDelegation?: boolean;
   }> {
     if (!/^[a-f0-9]{64}$/.test(token))
       fail("INVALID_OR_EXPIRED_INVITATION", 400);
@@ -423,6 +428,7 @@ export class ServiceOperatorInvitationService {
         serviceKey: i.service_key,
         role: i.role,
         purpose: i.purpose,
+        centralDelegation: i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE,
         ...(scopeName ? { scopeName } : {}),
       };
     });
@@ -467,7 +473,7 @@ export class ServiceOperatorInvitationService {
       );
       if (!i || i.status !== "pending" || new Date(i.expires_at) <= this.now())
         fail("INVALID_OR_EXPIRED_INVITATION", 400);
-      if (i.scope_type === "platform") resolveServiceAdminRole(i.role, i.service_key);
+      if (i.scope_type === "platform") resolvePlatformInvitationRole(i.role, i.service_key, i.scope_key);
       const user = await this.prove(m, i, userId),
         scope = this.scope(i);
       await this.requireUnassignedRole(m, scope, user.id);

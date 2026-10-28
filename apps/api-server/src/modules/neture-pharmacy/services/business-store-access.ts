@@ -1,3 +1,4 @@
+import {hasApprovedPharmacist} from '../../../services/qualifications/pharmacist-qualification.service.js';
 import { NeturePharmacyError } from '../constants.js';
 
 type Executor = { query(sql: string, params: unknown[]): Promise<any[]> };
@@ -23,7 +24,7 @@ export async function resolveBusinessStoreAccess(exec: Executor, userId: string,
   if (!row) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '선택한 약국의 사업 이용 자격을 확인할 수 없습니다.');
   return {
     businessKey: row.businessKey as string, organizationId,
-    allowed: row.businessStatus === 'active' && row.pharmacyStatus === 'active' && row.membershipStatus === 'active',
+    allowed: await hasApprovedPharmacist(exec,userId) && row.businessStatus === 'active' && row.pharmacyStatus === 'active' && row.membershipStatus === 'active',
     membershipStatus: (row.membershipStatus ?? null) as string | null,
   };
 }

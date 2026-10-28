@@ -28,7 +28,8 @@ const MAIN_SITE_URL = 'https://neture.co.kr/';
 
 const Login: FC = () => {
   
-  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin, sessionConflict, logout } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, user, sessionConflict } = useAuth();
+  const isPlatformAdmin = user?.roles?.includes('platform:super_admin') === true;
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -71,43 +72,17 @@ const Login: FC = () => {
 
   // 이미 인증된 관리자는 홈으로 리다이렉트
   useEffect(() => {
-    if (isAuthenticated && isAdmin) {
+    if (isAuthenticated && isPlatformAdmin) {
       toast.success('이미 로그인되어 있습니다.');
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isPlatformAdmin]);
 
   if (isAuthenticated) {
-    if (isAdmin) {
+    if (isPlatformAdmin) {
       return <Navigate to={fromLocation} replace />;
     } else {
-      // 일반 사용자가 관리자 페이지에 접근하려는 경우
-      return (
-        <div className="min-h-screen bg-o4o-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md w-full space-y-8">
-            <div className="o4o-login-footnote text-center">
-              <div className="mx-auto h-16 w-16 bg-red-500 rounded-full flex items-center justify-center">
-                <AlertTriangle className="h-8 w-8 text-white" />
-              </div>
-              <h2 className="mt-6 text-center text-3xl font-bold text-o4o-text-primary">
-                접근 권한 없음
-              </h2>
-              <p className="mt-2 text-center text-sm text-o4o-text-secondary">
-                관리자 권한이 필요합니다
-              </p>
-              {/* WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: '/' 는 이 admin 앱으로 되돌아오는 막다른 길이었다 —
-                  O4O 대표 사이트로 보내고, 다른 계정으로 다시 로그인할 수 있게 로그아웃을 둔다. */}
-              <div className="mt-4 flex justify-center gap-4">
-                <a href={MAIN_SITE_URL} className="text-admin-blue hover:text-admin-blue-dark">
-                  O4O 메인 사이트로 이동
-                </a>
-                <button type="button" onClick={logout} className="text-admin-blue hover:text-admin-blue-dark">
-                  다른 계정으로 로그인
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+      // The server checks Google proof and explicit central delegation before rendering any work.
+      return <Navigate to="/operations" replace />;
     }
   }
 

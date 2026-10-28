@@ -141,6 +141,7 @@ describe('약국(kpa) — 내 매장(약국) 신청 원장이 매장 게이트�
     const activeRoles = opts.activeRoles ?? [];
     return {
       query: jest.fn(async (sql: string, params: any[] = []) => {
+        if (sql.includes('FROM kpa_pharmacist_profiles') && sql.includes('AS approved')) return [{ approved: true }];
         if (sql.includes('neture_pharmacy_memberships')) {
           const roles = params[1] as string[];
           return ledger
@@ -188,12 +189,13 @@ describe('약국(kpa) — 내 매장(약국) 신청 원장이 매장 게이트�
     },
   );
 
-  it('isStoreOwner(kpa) 는 service_memberships / role_assignments 게이트 질의를 하지 않는다', async () => {
+  it('isStoreOwner(kpa) 는 옛 서비스 가입/역할 대신 원장과 개인 자격·공통 제재를 검사한다', async () => {
     const ds = makeLedgerDataSource([{ organization_id: 'org-pharmacy', status: 'active', member_role: 'owner' }]);
     await isStoreOwner(ds, 'u1', 'kpa');
     const sqls = sqlOf(ds);
     expect(sqls.some((q) => q.includes('neture_pharmacy_memberships'))).toBe(true);
-    expect(sqls.some((q) => q.includes('service_memberships'))).toBe(false);
+    expect(sqls.some((q) => q.includes('kpa_pharmacist_profiles') && q.includes('qualification_status'))).toBe(true);
+    expect(sqls.filter(q => q.includes('service_memberships')).every(q => q.includes('kpa_pharmacist_profiles') && q.includes("service_key='neture'"))).toBe(true);
     expect(sqls.some((q) => q.includes('role_assignments'))).toBe(false);
     // 옛 서비스 연결(enrollment/slug) 후보도 보지 않는다.
     expect(sqls.some((q) => q.includes('organization_service_enrollments'))).toBe(false);

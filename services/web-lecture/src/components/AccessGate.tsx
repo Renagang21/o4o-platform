@@ -1,7 +1,7 @@
 /**
  * Lecture 접근 경계 (프론트 1차 필터) — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §7
  *
- *   learner    = active lecture membership (role 불요)
+ *   learner    = common account (server checks live account/verification/sanctions)
  *   instructor = membership + lecture:instructor
  *   operator   = membership + lecture:operator | lecture:admin
  *
@@ -32,6 +32,10 @@ export function hasAreaRole(area: AccessArea, roles?: string[]): boolean {
 export function canAccess(area: AccessArea, user: { roles?: string[]; memberships?: { serviceKey: string; status: string }[] } | null): boolean {
   if (!user) return false;
   if ((user.roles ?? []).includes('platform:super_admin')) return true;
+  if (area === 'learner') {
+    const status = user.memberships?.find(m => m.serviceKey === SERVICE_KEY)?.status;
+    return !status || ['active', 'pending', 'rejected'].includes(status);
+  }
   return hasLectureMembership(user.memberships) && hasAreaRole(area, user.roles);
 }
 
@@ -48,7 +52,7 @@ export default function AccessGate({ area }: { area: AccessArea }) {
     return <Card title={config.title}><p>로그인이 필요합니다.</p><Link className="button-link" to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link></Card>;
   }
   if ((user.roles ?? []).includes('platform:super_admin')) return <Outlet />;
-  if (!hasLectureMembership(user.memberships)) {
+  if (area !== 'learner' && !hasLectureMembership(user.memberships) || area === 'learner' && !canAccess(area, user)) {
     // 로그인은 됐고 강의 서비스 이용 자격만 없다 — 공개 강의와 이용 문의로 안내한다 (자동 가입 없음)
     // WO-O4O-LECTURE-HANDOFF-NONMEMBER-UX-V1
     const status = user.memberships?.find((m) => m.serviceKey === SERVICE_KEY)?.status;

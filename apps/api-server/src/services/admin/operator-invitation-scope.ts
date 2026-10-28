@@ -1,6 +1,7 @@
 import type { EntityManager } from "typeorm";
 import {
-  resolveOperatorRole,
+  CENTRAL_DELEGATION_SCOPE,
+  resolvePlatformInvitationRole,
   OperatorRoleContractError,
 } from "../../config/operator-role-catalog.js";
 import { roleAssignmentService } from "../../modules/auth/services/role-assignment.service.js";
@@ -25,10 +26,11 @@ export function invitationScope(
   service: string,
 ): InvitationScope {
   if (kind === "platform") {
-    const r = resolveOperatorRole(role, service);
+    if (key !== '' && key !== CENTRAL_DELEGATION_SCOPE) throw new Error('INVALID_INVITATION_SCOPE');
+    const r = resolvePlatformInvitationRole(role, service, key);
     return {
       scope_type: kind,
-      scope_key: "",
+      scope_key: key,
       role: r.role,
       service_key: r.serviceKey,
     };
@@ -70,7 +72,7 @@ export async function authorizeInvitation(
   target?: string,
 ) {
   if (scope.scope_type === "platform") {
-    resolveOperatorRole(scope.role, scope.service_key);
+    resolvePlatformInvitationRole(scope.role, scope.service_key, scope.scope_key);
     const rows = await m.query(
       `SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
       WHERE u.id=$1 AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved')
@@ -117,7 +119,8 @@ export async function activateInvitation(
     );
   }
   await roleAssignmentService.assignRole(
-    { userId: target, role: scope.role, assignedBy: actor },
+    { userId: target, role: scope.role, assignedBy: actor,
+      scopeType: scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE ? CENTRAL_DELEGATION_SCOPE : 'global' },
     m,
   );
   if (scope.scope_type === "platform")

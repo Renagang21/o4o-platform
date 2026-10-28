@@ -50,6 +50,8 @@ const makeDataSource = () => {
   });
   const base = stub.dataSource.query;
   stub.dataSource.query = jest.fn(async (sql: string, params: any[] = []) => {
+    // This store owner has a separately approved pharmacist credential.
+    if (sql.includes('FROM kpa_pharmacist_profiles') && sql.includes('AS approved')) return [{ approved: true }];
     // Feature gating queries are distinct from the store organization ledger lookup.
     if (sql.includes('SELECT status FROM neture_pharmacy_memberships')) {
       return LEDGER_ACTIVE_ORGS.includes(params[0]) ? [{ status: 'active' }] : [];

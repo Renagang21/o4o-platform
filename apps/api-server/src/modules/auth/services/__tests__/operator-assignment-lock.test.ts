@@ -58,7 +58,6 @@ it("opens a transaction for an operator revocation without a supplied manager", 
   expect(mockManager.query).toHaveBeenCalledTimes(1);
 });
 it.each([
-  "neture:admin",
   "platform:super_admin",
   "neture:supplier",
   "kpa:store_owner",
@@ -71,3 +70,10 @@ it.each([
     expect(mockManager.query).not.toHaveBeenCalled();
   },
 );
+
+it.each(['neture:admin','supplier:admin','neture:pharmcoop_admin'])("serializes direct Admin %s with central consent and revocation",async role=>{
+ expect(isOperatorAssignmentRole(role)).toBe(false); // Existing concurrency classifier still means Operator.
+ await new RoleAssignmentService().assignRole({userId:'target',role});
+ expect(AppDataSource.transaction).toHaveBeenCalledTimes(1);
+ expect(mockManager.query).toHaveBeenCalledWith(expect.stringContaining('pg_advisory_xact_lock'),['operator-assignment:target']);
+});

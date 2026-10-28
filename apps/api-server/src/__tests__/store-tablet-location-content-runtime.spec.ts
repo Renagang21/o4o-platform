@@ -102,6 +102,8 @@ function makeDataSource(state: State) {
     if (s.includes('FROM organization_members WHERE user_id = $1 AND organization_id = $2')) {
       return state.members.some((m) => m.user_id === params[0] && m.organization_id === params[1] && ['owner', 'admin', 'manager'].includes(m.role)) ? [{ '?column?': 1 }] : [];
     }
+    // Screen-set owner fixture has an independently reviewed pharmacist credential.
+    if (s.includes('FROM kpa_pharmacist_profiles') && s.includes('AS approved')) return [{ approved: true }];
     if (s.includes('role_assignments')) return [];
     if (s.includes('service_memberships')) return [];
     if (s.includes('organization_service_enrollments')) return [];
@@ -344,6 +346,7 @@ describe('경영자 — 복제 · description', () => {
     const inner = ds.query;
     ds.query = jest.fn(async (sql: string, params: any[] = []) => {
       const s = sql.replace(/\s+/g, ' ');
+      if (s.includes('FROM kpa_pharmacist_profiles') && s.includes('AS approved')) return [{ approved: true }];
       if (s.includes('service_memberships')) return [{ ok: 1 }];
       if (s.includes('role_assignments')) return [{ ok: 1 }];
       if (s.includes('organization_service_enrollments')) return [{ organization_id: ORG, role: 'owner' }];
