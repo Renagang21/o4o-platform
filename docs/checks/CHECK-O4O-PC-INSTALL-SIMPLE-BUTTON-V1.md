@@ -1,6 +1,6 @@
 # PC 간편 설치 버튼 검증
 
-> 상태: ACTIVE · 작성일: 2026-10-29
+> 상태: COMPLETED · 작성일: 2026-10-29
 > 범위: Main 첫 자동화·내 정보의 PC 설치 안내와 기존 설치기 재사용. main 병합·배포는 이번 개발 완료 판정과 구분한다.
 
 ## 변경
@@ -33,3 +33,19 @@
 - `40774560743` Windows job도 FAIL. TAP가 stdout annotation을 주석으로 감싸 원인 출력이 check annotation에 나타나지 않아 기존 Windows 테스트 명령에 `--test-reporter=spec`을 지정했다. 테스트 자체나 판정·권한·배포 설정은 그대로다.
 
 - `40775244464`에서 간편 launcher 시험만 실패함을 확인했다. `40775591656`에서 정확한 원인 확인: 제한된 PATH/상속된 PowerShell 모듈 경로에서 `Get-FileHash`를 찾지 못했다. 별도 모듈 autoload 없이 .NET SHA256·ZipFile·디렉터리 API·명시적 assembly load를 쓰도록 교정했다. 기존 패키지 설치·보존·window mode 자동 실행 시험은 통과했다. 오류 확인을 마친 이전 branch CI는 새 HEAD 검증으로 대체하면서 취소했으며 PASS로 계산하지 않는다.
+
+## 최종 검증 결과
+
+- 소스 `0344e72b3599421b8bf856364db1fbb43dbc14ad`, branch CI `40776132106`: **PC installer Windows PASS**. 이 소스의 Windows 전용 skip 조건은 모두 해제되며 총 15개 시험을 실행한다. 실제 cmd → PowerShell → 검증·압축 해제 → packaged Node 실행 경로를 한글 경로에서 확인했다. 네트워크 전송만 합성 ZIP 복사로 대체하며, 손상·잘린 ZIP은 실행 전 거절한다. 실제 사용자 PC의 보안 경고·GUI 동의 클릭은 별도 NOT_RUN이다.
+- 공식 Node checksum 검증 후 실제 배포 패키지를 생성했다. ZIP **33,518,838 bytes**(<32 MiB), 간편 설치 파일 **4,061 bytes**, 내부 46개 파일 hash·ZIP CRC·source SHA·release identity와 두 배포 파일의 크기·SHA256 검증 PASS. releaseId `4554be24d8ef2f90ab2c4852f032970349f04ed563f14ce10f9e393217a1b0e4`.
+- 마지막 UI 변경 이후 focused 28 PASS·TypeScript noEmit·ESLint·production names build·desktop/mobile fixture browser smoke 재확인. 로그와 스크린샷·후보 패키지는 저장소 밖 비공개 작업 자료에 보관한다.
+- 후보 설치 파일은 고정된 Main ZIP URL을 사용하므로 해당 소스의 운영 배포 전에는 사용자 설치용으로 제공하지 않는다. 이번 개발에서 main 병합·운영 배포는 하지 않는다.
+
+- 최종 branch CI [40776132106](https://github.com/Renagang21/o4o-platform/actions/runs/40776132106) **SUCCESS / CI Gate PASS**: Windows 설치, API Jest 3개 shard, 코드 품질, web production build, admin build 모두 통과했다. 이 실행은 위 코드 SHA 기준이며, 그 뒤에는 이 CHECK의 결과 기록만 추가한다. PR CI·Codex review·main 병합·배포는 이번 완료 범위가 아니며 실행하지 않았다.
+
+## 인계 / 작업공간
+
+- branch: `wo/pc-install-simple-button`
+- base: `2f4da2e188` · 검증 코드: `0344e72b3599421b8bf856364db1fbb43dbc14ad`
+- main integration: NOT_RUN · deployment: NOT_RUN · actual user PC smoke: NOT_RUN
+- WORKTREE_DISPOSITION: **KEEP** — main 병합 전 수정·통합에 필요한 본 작업 전용 공간과 push한 branch를 보존한다. 다른 작업공간·branch는 변경하지 않았다.
