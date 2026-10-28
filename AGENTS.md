@@ -42,8 +42,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 구현 요청이면 승인된 안전 범위 안에서 불필요한 중간 승인 없이 완료까지 진행한다.
 - 이미 명시적으로 승인된 변경 범위를 같은 이유로 기계적으로 다시 승인받지 않는다.
   승인된 범위 안의 조사 · 수정 · 검증 · review finding 처리 · 스레드 정리 · 상태 조회는 스스로 판단해 진행한다.
-  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 개발 담당의 기본 종료점은 검증 · commit · push 후 통합 담당에게 인계하는 것이다.
-  **PR 생성부터 CI·리뷰 운영 · 병합 · 배포 · 운영 변경까지는 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다**(§4-1(e)·(f)).
+  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 개발 담당의 기본 종료점은 **main 병합 직전까지**다. 로컬 검증 · commit · push · 기존 PR 재사용 또는 PR 생성 · CI·리뷰 지적 보완을 완료하고 병합 준비 상태로 통합 담당에게 인계한다.
+  **main 병합 · auto-merge 설정 · 배포 · 운영 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다**(§4-1(e)·(f)).
 - 새롭게 발견된 범위 확대나 미승인 위험 변경은 해당 변경 전에 중지하고 보고한다.
 - 범위 밖 문제는 임의 수정하지 않고 보고한다. 무관한 build/test 실패도 임의로 고치지 않는다.
 - 기존 코드 패턴을 우선하고 과도한 추상화·리팩터링을 피한다. 코딩 컨벤션은 [README.md](README.md)를 따른다.
@@ -57,7 +57,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - **세션 격리 · worktree · branch · main 통합 · 공유 runtime 직렬화**는 아래 §4-1 이 저장소 공통 정본이다
   (사람 · Claude Code · Codex · 그 밖의 coding agent 전원 적용).
 - **stage · commit · push 안전**은 §4-2 와 [O4O-GIT-PARALLEL-WORK-SAFETY-V1](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md).
-  그 문서의 "공유 `main` 직접 작업" 전제와 §4-1 이 다르면 §4-1 이 우선한다.
+  그 문서의 "공유 `main` 직접 작업" 전제 또는 개발 담당의 종료 범위·PR 책임이 §4-1 과 다르면 §4-1 이 우선한다.
 
 ### 4-1. Parallel Session / Worktree Policy
 
@@ -119,14 +119,15 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 
 - 자기 worktree 에서 `git fetch origin` 으로 차이를 보는 것은 자유다.
 - 앞서갔다고 **자동으로 merge · rebase · reset · cherry-pick 하지 않는다.** 충돌 여부 · 통합 필요성 · 현재 통합 정책을
-  먼저 확인한다. 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
+  먼저 확인한다. main 병합 준비와 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
 
 **(e) main 통합 — PR merge · 기술 gate 충족 후**
 
 ```text
-개발 담당: 작업 → 로컬 검증 → commit / push → branch · commit SHA · 검증 결과 · 미해결 사항 인계 → 종료
-통합 담당: 인계 branch / HEAD 확인 → 기존 PR 재사용 또는 PR 생성 → required CI PASS → Codex blocker 없음 = integration-ready
-→ 순차 PR merge → post-merge 확인 → 현재 Delivery 정책에 따른 배포 · 검증 → 결과 보고
+개발 담당: 작업 → 로컬 검증 → commit / push → 기존 PR 재사용 또는 PR 생성 → CI · Codex 리뷰 · 지적 보완
+→ required CI PASS · 미해결 blocker 없음 = main 병합 직전 준비 완료 → PR · HEAD · 검증 결과 인계
+통합 담당: 인계 PR / HEAD · 최신 main · 기술 gate 최종 확인 → 순차 PR merge
+→ post-merge 확인 → 현재 Delivery 정책에 따른 배포 · 검증 → 결과 보고
 ```
 
 - **기술 gate 는 실제 `main` ruleset 이다.** 설정값은 이 문서에 고정하지 않고 통합 직전 read-only 로 확인한다
@@ -134,9 +135,9 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   삭제 · non-fast-forward 금지 · **필수 human approval 0** · admin bypass 가능. 합의 규칙: [README — 기여](README.md#기여).
 - **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.**
   owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
-- **개발 담당은 로컬 검증 · commit · push까지만 수행하고 통합 담당에게 인계한다.** PR 생성 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 수행하지 않는다. 통합 담당의 수정 요청을 받은 경우에도 같은 작업 branch에서 수정 · 검증 · commit · push 후 새 HEAD를 재인계한다. 추가 수정용 PR을 별도로 만들지 않는다.
-- **사용자가 해당 공간을 통합 담당으로 명시적으로 지정한 경우에만** PR 생성 · 검토 · CI 및 Codex 리뷰 운영 · 순차 병합 · post-merge 확인 · 배포 결과 검증을 진행한다. 작업별 기존 PR이 있으면 재사용하고 동일 변경의 중복 PR을 만들지 않는다. 지정은 세션 문맥에서 확인하며 계정·branch 이름이나 CI 성공만으로 추정하지 않는다. HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 확인하고 §5의 미승인 위험 변경 경계를 유지한다.
-- 통합 담당이 해결하지 못하는 코드 문제는 원인 · 실패 근거 · 수정 범위를 해당 개발 담당에게 전달한다. 개발 담당의 수정 push 후 통합 담당이 재검증한다.
+- **개발 담당은 main 병합 직전까지 수행한다.** 로컬 검증 · commit · push에 이어 기존 PR 재사용 또는 PR 생성, CI·Codex 리뷰 운영, 지적 보완과 재검증까지 완료한다. PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 수행하지 않는다. 추가 수정은 같은 작업 branch와 기존 PR에 반영하고 새 HEAD의 CI·리뷰 상태를 검증한 뒤 재인계한다. 동일 변경의 중복 PR이나 추가 수정용 PR을 별도로 만들지 않는다.
+- **사용자가 해당 공간을 통합 담당으로 명시적으로 지정한 경우에만** main 병합 · auto-merge 설정 · post-merge 확인 · 배포 결과 검증을 진행한다. 개발 담당이 인계한 기존 PR을 재사용하고, PR이 없는 인계라면 예외 상태와 누락 사유를 확인한 뒤 생성한다. 지정은 세션 문맥에서 확인하며 계정·branch 이름이나 CI 성공만으로 추정하지 않는다. HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 최종 확인하고 §5의 미승인 위험 변경 경계를 유지한다.
+- 통합 담당의 최종 확인에서 코드 문제가 발견되면 원인 · 실패 근거 · 수정 범위를 개발 담당에게 전달한다. 개발 담당은 같은 branch·PR에서 수정 · push · CI·리뷰 재검증까지 완료하고, 통합 담당은 새 HEAD의 병합 준비 상태를 최종 확인한다.
 - **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
   보안 · 권한 · DB · 공통 Core 변경, 또는 사용자가 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
   서로의 상시 승인자가 되지 않는다.
@@ -179,8 +180,9 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 **(i) 생명주기 · 종료 정리**
 
 ```text
-개발 담당: 최신 origin/main → 전용 worktree + branch → 작업 → 로컬 검증 → commit / push → 인계
-통합 담당: 기존 PR 재사용 또는 PR 생성 → CI · Codex → main 통합(PR merge) → post-merge CI → (필요 시) deploy / smoke
+개발 담당: 최신 origin/main → 전용 worktree + branch → 작업 → 로컬 검증 → commit / push
+→ 기존 PR 재사용 또는 PR 생성 → CI · Codex 리뷰 · 지적 보완 → main 병합 직전 상태로 인계
+통합 담당: PR / HEAD · 기술 gate 최종 확인 → main 통합(PR merge) → post-merge CI → (필요 시) deploy / smoke
 → 개발 담당에게 결과 전달 → 종료 정리(아래) → 트랙 종료
 ```
 
@@ -237,8 +239,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - 커밋 후 `git show --stat --oneline HEAD`로 실제 포함 경로를 확인한다.
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
   공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
-- 개발 담당의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 작업 branch 에 push됨 + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계**다. PR 생성은 개발 담당의 완료 조건이 아니다. PR 미생성으로 PR CI가 실행되지 않았다면 미실행으로 명시한다. 이미 확인한 CI 실패나 미해결 사항을 숨기지 않으며, 통합 담당의 수정 요청에는 같은 branch에 추가 push 후 재인계한다. 미해결 실패를 integration-ready로 보고하지 않는다.
-  **개발 담당의 기본 종료점은 push 후 인계이며, PR 생성부터는 통합 담당의 책임이다.** 통합 담당으로 명시적으로 지정된 공간만 §4-1(e)·(f)에 따라 PR 생성 · CI·리뷰 운영 · 병합 · post-merge 확인 · 필요한 배포 검증까지 진행한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+- 개발 담당의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 작업 branch push 완료 + 기존 PR 재사용 또는 PR 생성 완료 + 인계 HEAD의 required CI PASS + Codex 리뷰 지적 보완 및 미해결 blocker 없음 + 저장소 · branch · PR · commit SHA · 변경 요약 · 검증 결과 인계**다. push만으로 종료하지 않는다. CI·리뷰가 진행 중이면 완료까지 추적하고, 실행 불가나 범위 밖 실패가 있으면 원인과 미해결 항목을 명시하여 병합 준비 완료와 구분한다. 추가 수정도 같은 branch·PR에 push하고 새 HEAD의 검증을 완료한다.
+  **개발 담당의 기본 종료점은 main 병합 직전의 준비 완료 상태다.** 통합 담당으로 명시적으로 지정된 공간만 §4-1(e)·(f)에 따라 최종 gate 확인 · main 병합 · post-merge 확인 · 필요한 배포 검증을 진행한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 - 병합 전 branch/worktree는 후속 수정에 필요하므로 보존한다. 통합 담당의 병합 결과를 받은 뒤 §4-1(i)의 조건을 확인해 자기 작업공간만 정리한다.
 
 ## 5. 위험 변경 / 사용자 확인
