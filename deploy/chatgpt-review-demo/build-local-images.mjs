@@ -55,6 +55,7 @@ try {
     { recursive: true },
   );
   cpSync(join(root, "apps/api-server/Dockerfile"), join(api, "Dockerfile"));
+  cpSync(join(root, "apps/api-server/.dockerignore"), join(api, ".dockerignore"));
   const certificate = process.env.CODEX_PROXY_CERT;
   const trust =
     certificate && existsSync(certificate)

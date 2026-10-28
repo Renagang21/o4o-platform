@@ -22,6 +22,7 @@
 # Cooperative test provisioning Job entry (bundled by tsup)
 !dist/scripts
 !dist/scripts/provision-test-cooperative.js
+!dist/scripts/provision-chatgpt-review-demo.js
 
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database
@@ -36,6 +37,7 @@
 
 # Allow production dependencies manifest
 !package.production.json
+!package.production-lock.json
 
 # Allow Dockerfile
 !Dockerfile

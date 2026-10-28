@@ -38,7 +38,10 @@
 - 브라우저 테스트는 상단 로그인 버튼과 form submit을 구분하고, Store 로그인 안내 링크를 통해 원래 편집기로 복귀하는 실제 동선을 사용했다.
 - 오래된 eslintrc 호출은 현행 설정과 맞지 않았다. 규칙 변경 없이 root flat config의 scoped lint로 확인했다.
 - 첫 PR CI에서 새 단위 테스트의 node:test/Jest 실행기 충돌을 재현했다. Jest 정본으로 통일해 2 suites/7 tests가 통과했다.
-- 보안 분석 지적에 따라 브라우저 artifact는 mkdtemp의 전용 디렉터리로 분리하고, 웹 이미지는 명시적 비특권 사용자 및 root 소유 정적 파일을 사용한다. API runtime은 검증된 이미지의 실제 해석 버전을 lockfile로 고정해 npm ci로 설치한다. 수정 후 이미지·Compose 재검증 및 새 HEAD CI 결과는 별도로 확인한다.
+- 보안 분석 지적에 따라 브라우저 artifact는 mkdtemp의 전용 디렉터리로 분리하고, 웹 이미지는 명시적 비특권 사용자 및 root 소유 정적 파일을 사용한다. API runtime은 검증된 이미지의 실제 해석 버전을 lockfile로 고정해 npm ci로 설치한다. 수정 후 이미지 build·Compose 재실행과 API 10개/브라우저 3개 동선이 다시 통과했다. 새 HEAD CI 결과는 별도로 확인한다.
+- PR #871의 Codex 리뷰에서 운영 API .dockerignore가 신규 COPY 입력을 제외하는 문제를 찾았다. lockfile/심사 CLI 허용 항목을 추가했고 실제 apps/api-server context에서 두 COPY 입력을 빌드해 포함 여부를 검증했다. 로컬 빌더도 같은 .dockerignore를 사용하게 했다.
+
+작업 PR: https://github.com/Renagang21/o4o-platform/pull/871 — CI와 자동 리뷰의 최신 결과는 해당 PR에서 확인한다.
 
 ## 남은 작업과 외부 조건
 
