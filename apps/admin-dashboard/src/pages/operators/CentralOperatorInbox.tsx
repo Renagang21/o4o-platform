@@ -11,7 +11,7 @@ export default function CentralOperatorInbox({
     () => ({
       get: async (path: string) => {
         const r = await authClient.api.get(path);
-        if (!path.endsWith("/summary") || !Array.isArray(r.data?.data?.tasks))
+        if (!path.endsWith("/manage") || !Array.isArray(r.data?.data?.tasks))
           return r;
         return {
           ...r,
