@@ -365,3 +365,10 @@ describe('pharmacy app source move deployment boundaries', () => {
     assert.deepEqual(r.affected_services, ['api', 'kpa-society']);
   });
 });
+
+it('agent-only release inputs require Neture deployment while agent tests/docs do not', () => {
+ for (const file of ['tools/o4o-local-agent/src/handlers.mjs', 'tools/o4o-local-agent/release/build-release.mjs']) {
+  const r=risk(file); assert.equal(r.deploy_required,true); assert.deepEqual(r.affected_services,['neture']);
+ }
+ assert.equal(risk('tools/o4o-local-agent/test/release-install.test.mjs','tools/o4o-local-agent/README.md').deploy_required,false);
+});

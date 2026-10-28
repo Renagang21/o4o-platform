@@ -179,8 +179,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
       const candidate = await service.createCandidate(input);
       return res.status(201).json({ success: true, data: candidate });
     } catch (error) {
-      logger.error('[ProductCandidate] create error:', error);
-      return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+      return handleMutationError(res, error, 'create');
     }
   }) as RequestHandler);
 

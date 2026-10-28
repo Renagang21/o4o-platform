@@ -25,6 +25,13 @@ export function sanitizeDescriptionHtml(value?: string | null): string {
   return purify.sanitize(value ?? '').trim();
 }
 
+/** Importing product knowledge requires actual text, not an empty editor or an unread image. */
+export function hasProductDescriptionText(value: string): boolean {
+  const root = window.document.createElement('div');
+  root.innerHTML = value;
+  return !!root.textContent?.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '');
+}
+
 /** Store editor policy: preserve supported media while removing arbitrary iframe hosts. */
 export function sanitizeRichDescriptionHtml(value: string): string {
   const root = window.document.createElement('div');

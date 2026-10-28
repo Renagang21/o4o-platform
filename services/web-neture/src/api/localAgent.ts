@@ -46,6 +46,8 @@ export const LOCAL_AGENT_ORIGIN = 'http://127.0.0.1:47821';
 const PROBE_TIMEOUT_MS = 3000;
 
 export interface LocalAgentHealth {
+  releaseId?: string;
+  localData?: { ready: boolean; schemaVersion: number };
   agentVersion: string;
   connected: boolean;
   nonce: string;
@@ -164,6 +166,8 @@ export async function probeLocalAgent(): Promise<ProbeOutcome> {
         agentVersion: String(body.agentVersion ?? ''),
         connected: Boolean(body.connected),
         nonce: body.nonce,
+        ...(typeof body.releaseId === 'string' && /^[a-f0-9]{64}$/.test(body.releaseId) ? { releaseId: body.releaseId } : {}),
+        ...(body.localData && typeof body.localData.ready === 'boolean' && Number.isInteger(body.localData.schemaVersion) ? { localData: { ready: body.localData.ready, schemaVersion: body.localData.schemaVersion } } : {}),
       },
     };
   } catch {

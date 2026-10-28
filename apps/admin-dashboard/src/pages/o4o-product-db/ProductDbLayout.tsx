@@ -22,6 +22,7 @@ const TABS = [
   { to: 'masters', label: '기본 상품' },
   // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1: 공급자 매장용 설명서 검수
   { to: 'supplier-store-descriptions', label: '설명서 검수' },
+  { to: 'description-intake', label: '공개자료·매장 제안' },
   { to: 'image-quality', label: '이미지 상태' },
   { to: 'maintenance', label: '데이터 정비' },
 ];
@@ -34,17 +35,17 @@ export default function ProductDbLayout() {
         <h1 className="text-2xl font-bold text-gray-900">O4O 상품 DB</h1>
       </div>
       <p className="text-sm text-gray-500 mb-4">
-        정부/공공데이터 기반 기본 상품 DB (조회 전용)
+        상품 정보·공개 근거·설명서를 검토하고 정비합니다.
       </p>
 
       <div className="border-b border-gray-200 mb-6">
-        <nav className="flex gap-1">
+        <nav className="flex gap-1 overflow-x-auto">
           {TABS.map((t) => (
             <NavLink
               key={t.to}
               to={t.to}
               className={({ isActive }) =>
-                `px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                `shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
                   isActive
                     ? 'border-admin-blue text-admin-blue'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

@@ -1,3 +1,6 @@
+import { z } from 'zod';
+import { normalizeProductBarcode } from '../product-description-intake/contracts.js';
+import { findDescriptionTargets } from '../product-description-intake/lookup.service.js';
 /**
  * ProductLibraryController — WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1
  *
@@ -121,6 +124,26 @@ export function createProductLibraryController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[ProductLibrary] Error searching products:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to search products' });
+    }
+  });
+
+  // Read-only counseling lookup. Never selects an order offer or creates a product.
+  router.get('/products/library/description-lookup', requireAuth, async (req: Request, res: Response) => {
+    const parsed = z.object({ barcode: z.string().trim().max(128).optional(), name: z.string().trim().max(500).optional(),
+      descriptionType: z.enum(['B2B', 'B2C', 'STORE', 'SUPPLIER_STORE']).default('B2B'),
+      language: z.enum(['ko', 'en', 'ja', 'zh']).default('ko') }).strict().safeParse(req.query);
+    if (!parsed.success || (!parsed.data.barcode && !parsed.data.name)) {
+      res.status(400).json({ success: false, code: 'DESCRIPTION_LOOKUP_INPUT_REQUIRED' }); return;
+    }
+    const input = parsed.data, barcode = input.barcode ? normalizeProductBarcode(input.barcode) : null;
+    if (input.barcode && !barcode) { res.status(400).json({ success: false, code: 'INVALID_BARCODE' }); return; }
+    try {
+      const [items] = await findDescriptionTargets(dataSource, [{ ...input, name: barcode ? '' : input.name ?? '', barcodes: barcode ? [barcode] : [], identifiers: {} }]);
+      const state = !items.length ? 'not_found' : barcode && items.length === 1 && items[0].canonical ? 'matched' : 'candidates';
+      res.json({ success: true, data: { state, items, descriptionType: input.descriptionType, language: input.language } });
+    } catch (error) {
+      logger.error('[description-lookup] failed', error);
+      res.status(500).json({ success: false, code: 'DESCRIPTION_LOOKUP_FAILED' });
     }
   });
 

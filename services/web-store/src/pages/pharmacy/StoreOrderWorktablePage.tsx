@@ -1,3 +1,4 @@
+import { ProductDescriptionLookup } from '../../components/product-description/ProductDescriptionLookup';
 /**
  * StoreOrderWorktablePage — 관심상품 주문 작업대
  *
@@ -294,6 +295,7 @@ export function StoreOrderWorktablePage() {
     return (
       <div style={S.container}>
         <Header />
+        <ProductDescriptionLookup />
         <div style={S.stateCenter}>
           <Package size={48} style={{ color: colors.neutral300 }} />
           <p style={{ color: colors.neutral700, fontSize: '15px', fontWeight: 600, marginTop: '16px' }}>
@@ -313,6 +315,7 @@ export function StoreOrderWorktablePage() {
   return (
     <div style={S.container}>
       <Header />
+      <ProductDescriptionLookup />
 
       <div className="grid grid-cols-1 gap-6 mt-5 items-start lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* ── Left: Table ── */}

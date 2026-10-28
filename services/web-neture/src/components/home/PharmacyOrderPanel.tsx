@@ -86,6 +86,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   return <details className="mt-3 w-full max-w-xl rounded-xl border border-slate-200 bg-white p-4 text-left text-sm text-slate-700">
     <summary className="cursor-pointer font-semibold">약국 주문 준비</summary>
     <div className="mt-3 space-y-3">
+      <p><a href="/mypage" target="_blank" rel="noopener noreferrer" className="underline">이 PC 연결·프로그램 업데이트 (새 탭)</a></p>
       <p>빈 시트에서 시작할 수 있습니다. 구매·주문 내역은 약국 프로그램에서 내보낸 자료를 PC 연결 프로그램으로 가져옵니다. 전표 촬영·OCR은 사용하지 않습니다.</p>
       <p className="text-xs">이 화면은 자동 저장되지 않습니다. 계정·업무공간 전환이나 새로고침 전에 내보내세요. 로그인·최종 주문·결제는 직접 진행합니다.</p>
       <label className="block">PC 자료함 JSON 가져오기
