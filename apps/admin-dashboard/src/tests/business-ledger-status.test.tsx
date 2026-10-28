@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import OperatorsPage from '../pages/operators/OperatorsPage';
@@ -36,6 +36,8 @@ describe('business ledger status is separate from account status', () => {
     const care = rowOf('care@example.invalid');
     expect(care.textContent).toContain('Active');
     expect(care.querySelector('a')?.getAttribute('href')).toBe('/admin/pharmacy-service-settings?register=carepharm');
+    expect(screen.queryByText('mega@example.invalid')).toBeNull();
+    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
     expect(rowOf('mega@example.invalid').textContent).toContain('사업 마감');
     expect(rowOf('neture@example.invalid').textContent).not.toMatch(/사업 (미등록|운영|마감)/);
     expect(authClient.api.post).not.toHaveBeenCalled();

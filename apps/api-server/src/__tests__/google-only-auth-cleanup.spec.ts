@@ -139,6 +139,7 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
         path.join('routes','admin','service-operator-invitations.routes.ts'),
         path.join('routes','service-operator-management.routes.ts'),
         path.join('services','admin','operator-invitation-error.ts'),
+        path.join('services','admin','operator-invitation-mail.ts'),
         path.join('services','admin','operator-invitation-retention.ts'),
         path.join('services','admin','service-operator-invitation.service.ts'),
         path.join('services','admin','service-operator-management.service.ts'),
