@@ -46,6 +46,7 @@ it("does not turn incomplete contact profile metadata into a new approval requir
   mock.post.mockResolvedValue({ data: { success: true } });
   vi.spyOn(window, "confirm").mockReturnValue(true);
   render(<CentralSupplierReview />);
+  expect(screen.getByRole("link",{name:"신청 정보·사업자등록증 검토"})).toHaveAttribute("href","https://supplier.neture.co.kr/operator/suppliers");
   const approve = await screen.findByRole("button", { name: "승인" });
   expect(approve).not.toBeDisabled();
   fireEvent.click(approve);
