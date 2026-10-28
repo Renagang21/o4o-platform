@@ -9,7 +9,8 @@
 
 `community.neture.co.kr`는 community 저장 범위를 사용하는 하나의 독립서비스다.
 최신 main `188da14235`의 V2 정책에서는 일반 참여에 공통 계정을 사용하며 별도 서비스 가입 승인을 일괄 요구하지 않는다.
-명시적 서비스 정지·탈퇴와 전문 자격·사업 참여·조직 경계는 유지한다. 과거 pending/rejected 이력을 이유로
+명시적 서비스 정지·탈퇴와 전문 자격·사업 참여·조직 경계는 유지한다. 구 화면의 별도 서비스 가입 신청 폼·enrollment-policy 조회·승인 대기 안내는 제거했다.
+과거 pending/rejected 이력을 이유로
 정상 공통 계정의 일반 참여를 차단하거나 과거 원장을 일괄 active로 바꾸지 않는다.
 공개 방문자는 명시적으로 공개된 항목만 열람하고, 글·댓글·쓰기는 기존 서버의 현재 이용 자격 판정을 따른다.
 
@@ -39,6 +40,7 @@ Admin 민감 조치와 일반 Operator 업무, 독립 사업자·협업체의 �
 |---|---|
 | Neture 구 `pages/CommunityPage.tsx` | 삭제. 유일 UI route는 /community이며 HostBoundary가 먼저 현행 forum으로 전달하므로 구 홈은 실행되지 않음. 다른 import·문자열 소비처 조사 후 제거 |
 | /community 주소 | 보존. 기존 HostBoundary의 canonical 호스트 전달·query/hash·세션 handoff 유지, route fallback도 현행 forum으로 연결 |
+| CommunityWorkspace의 옛 가입 폼·/communities/join client 호출·약관 조회 | 삭제. 최신 resolver의 canJoin은 모든 현행 공간에서 false이며 일반 참여는 공통 계정. 서버의 기존 응답/호환 API 계약은 변경하지 않음 |
 | fetchPinnedPosts 별도 helper | 삭제. 같은 목록을 중복 조회·페이지 뒤 필터링하던 경로를 단일 scoped 조회와 표시 분리로 대체. 다른 호출자 없음 |
 | communityAdmin의 public 광고/스폰서 API export | 삭제. public export는 호출자 0. 실제 사용되는 관리 client·타입·공통 콘솔은 보존 |
 | 구 Neture 광고/스폰서 관리 wrapper | 재사용. 살아 있는 route·공통 콘솔 및 정적 소비 계약이 있으므로 이름만으로 삭제하지 않음. 독립 커뮤니티 Hero 운영과 혼동하지 않음 |

@@ -28,7 +28,7 @@ export default function CommunityPublicPostsPage() {
   return <main className="mx-auto max-w-4xl px-4 py-8 [overflow-wrap:anywhere]">
     <Link to="/" className="text-sm text-blue-700">커뮤니티 홈</Link>
     <h1 className="mt-4 text-2xl font-semibold">{current?.post?.title ?? `${current?.name ?? '커뮤니티'} · 공개 게시글`}</h1>
-    <p className="mt-3 text-sm text-slate-600">운영자가 공개 지정한 글만 볼 수 있습니다. 회원 활동과 댓글은 가입 승인 후 회원 게시판에서 이용해 주세요.</p>
+    <p className="mt-3 text-sm text-slate-600">운영자가 공개 지정한 글만 볼 수 있습니다. 회원 활동과 댓글은 로그인 후 이용 자격을 확인하고 회원 게시판에서 이용해 주세요.</p>
     <Link to={`/communities/${encodeURIComponent(communityKey)}/forum`} className="mt-3 inline-block text-sm text-blue-700">회원 게시판 · 이용 자격 확인 →</Link>
     {loadedScope !== scope && <output className="mt-6 block" aria-live="polite">공개 게시글을 불러오고 있습니다…</output>}
     {currentError && <div className="mt-6" role="alert"><p>{currentError}</p><button type="button" className="mt-3 min-h-11 text-blue-700" onClick={() => setRetry(n => n + 1)}>다시 시도</button></div>}

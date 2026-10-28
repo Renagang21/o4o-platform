@@ -67,3 +67,17 @@ main 미병합 상태에서는 후속 통합을 위해 전용 branch/worktree를
 API 계약 3 suites / 29 tests, 콘솔 채택 6 tests가 다시 통과했다.
 브라우저 검증한 ForumPage·forumApi·shared-space-ui·ui 소스는 통합 전후 차이 0이다.
 최종 PR CI·리뷰 결과는 최신 HEAD의 PR 설명에 기록한다.
+
+### V2 일반 참여 UI 잔재
+
+최신 resolver의 현행 모든 공간이 canJoin=false인데도 Workspace의 예전 서비스 가입 폼·정책 조회·가입 POST와
+공개 화면의 가입 승인 안내가 남아 있었다. 해당 client 경로를 제거하고 공통 로그인/현재 자격 확인으로 안내한다.
+서비스 정지·탈퇴, 계정 부적격, 사업 자격과 중앙 운영 경계는 그대로 유지한다. 서버의 응답·호환 API는 바꾸지 않았다.
+예전 별도 가입 신청/대기/재시도 테스트는 공통 계정, 과거 pending/rejected, 비로그인, 부적격,
+정지/탈퇴, 운영자 표시의 현재 계약으로 대체했다. 최종 검증 결과는 PR의 최신 HEAD를 따른다.
+
+V2 잔재 정리 후 Neture 전체 169 files / 1,441 tests와 TypeScript·production build가 통과했다.
+공통 참여 서버 계약 23 tests 및 client Workspace 관련 15 tests가 통과했다.
+실제 Workspace에 모의 인증·접근 응답과 하위 화면 경계를 주입한 로컬 Playwright는
+1440px·390px에서 common/pending/rejected/guest/suspended/withdrawn/inactive 14개 시나리오가 통과했다.
+가입 폼 재노출 없음, 업무 write 0, page error·화면 넘침 0이며 실제 OAuth·운영 계정 검증과 구분한다.
