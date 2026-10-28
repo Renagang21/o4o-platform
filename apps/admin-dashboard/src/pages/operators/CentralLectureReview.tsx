@@ -45,6 +45,7 @@ export default function CentralLectureReview({
   return (
     <section>
       <Link to="/operations/lecture/courses">강의 심사 목록</Link>
+      <a className="ml-4 text-blue-700 underline" href={`https://study.neture.co.kr/operator/courses/${encodeURIComponent(courseId)}/review`}>영상·첨부·본문을 포함한 전체 학습 자료 검토</a>
       {error && <p role="alert">{error}</p>}
       {review && (
         <>

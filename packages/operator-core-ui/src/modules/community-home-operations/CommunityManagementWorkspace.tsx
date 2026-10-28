@@ -292,7 +292,7 @@ export default function CommunityManagementWorkspace({
             </ul>
           ) : (
             <label className="my-3 block">
-              확인 문구 ‘완전 삭제’ 입력
+              확인 문구 ‘완전 삭제’ 입력{" "}
               <input
                 aria-label="삭제 확인 문구"
                 value={confirmation}
