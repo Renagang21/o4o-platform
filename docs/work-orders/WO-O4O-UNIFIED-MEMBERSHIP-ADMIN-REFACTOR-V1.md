@@ -22,7 +22,7 @@
 - [x] forward migration 2개 준비, 임시 DB 전체 적용·재실행·fingerprint·status 검증.
 - [x] 정본·코드 정합, 미결 정책·운영 적용 영향 기록.
 - [x] 범위 검사·commit·push, 최신 main을 작업 브랜치에 반영하고 PR #867 생성.
-- [x] 자동 리뷰 지적 3건 수정 및 회귀 검증·스레드 정리. CI Gate의 현재 상태는 아래 PR에서 확인하고 main 병합 전 인계.
+- [x] 자동 리뷰 지적 4건 수정 및 회귀 검증·스레드 정리. CI Gate의 현재 상태는 아래 PR에서 확인하고 main 병합 전 인계.
 
 ## 구현과 재사용
 
@@ -78,6 +78,7 @@ forward migration만 추가했다. 과거 migration·baseline·기존 fingerprin
 - 서비스 역할까지 true인 공유 `isAdmin` 표시 값을 중앙 진입에 쓰지 않고, 초기 `/`·로그인 복귀는 정확한 `platform:super_admin` 여부로 전체 관리자/중앙 작업공간을 구분한다. 실제 브라우저의 대표 진입도 검증했다.
 - 관리자 중앙 진입 API는 별도 인가 미들웨어로 보호하여 앞으로 추가되는 endpoint도 같은 검사를 상속한다. 인벤토리 예외 추가·검사 완화는 하지 않았다.
 - 추가 리뷰에서 고정 상세 경로의 `:area` 누락을 확인했다. 회원/강의 상세 ID가 있는 경로의 업무 영역을 명시적으로 해석하고, 상세 진입·타 서비스 위임 차단 단위 테스트 및 PC/모바일 강의 상세 브라우저 검증을 추가했다.
+- 인박스 이동은 중앙에 대응 화면이 있는 정확한 목록 경로만 바꾼다. query/fragment 또는 상세·복구 경로는 기존 서비스 호스트와 조건을 보존하여 펀딩 입금·환급·포럼 예외 처리 기능을 잃지 않는다. 실제 task 주소 형태와 미지원 상세 경로 회귀 테스트를 추가했다.
 - 수정 source의 ESLint 오류 0, 문서 민감정보·상대 링크·whitespace·stage 범위 검사 통과. 기존 무관한 경고 baseline은 변경하지 않았다.
 - 현재 HEAD의 required `CI Gate`, CodeQL, Codex 최신 검토 상태는 PR의 Checks/Review를 정본으로 확인한다. 이 문서는 향후 바뀌는 CI 상태를 고정 성공으로 복제하지 않는다. 리뷰 보완은 같은 branch/PR에서만 수행한다.
 - 격리 PostgreSQL fixture는 검증 종료 후 완전 제거한다. 운영 계정·데이터·credential에는 변경이 없다. 작업 worktree/branch는 main 미병합이므로 KEEP이다. 통합 담당의 별도 지시 없이 병합·auto-merge·배포·운영 migration을 하지 않는다.

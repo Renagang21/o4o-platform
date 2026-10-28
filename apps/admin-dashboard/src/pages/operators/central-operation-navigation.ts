@@ -23,25 +23,29 @@ export function centralTaskHref(service: string, href: string): string {
   try {
     const url = new URL(href, origin);
     if (url.origin !== origin || url.protocol !== "https:") return fallback;
+    // Queries/fragments can select specialist tabs and recovery workflows not present centrally.
+    if (url.search || url.hash) return url.href;
     const path = url.pathname;
     let area: string | undefined;
-    if (path.includes("/service-members") || path.includes("/operator/members"))
-      area = "members";
-    if (path.includes("/operator/inbox")) area = "inbox";
     if (
-      service === "neture" &&
-      path.startsWith("/operator/pharmacy-memberships")
+      [
+        "/service-members",
+        "/operator/service-members",
+        "/operator/members",
+      ].includes(path)
     )
+      area = "members";
+    if (path === "/operator/inbox") area = "inbox";
+    if (service === "neture" && path === "/operator/pharmacy-memberships")
       area = "pharmacies";
-    if (service === "supplier" && path.startsWith("/operator/suppliers"))
+    if (service === "supplier" && path === "/operator/suppliers")
       area = "suppliers";
-    if (service === "funding" && path.startsWith("/operator/market-trial"))
+    if (service === "funding" && path === "/operator/market-trial")
       area = "funding";
-    if (service === "lecture" && path.startsWith("/operator/courses"))
-      area = "courses";
-    if (service === "community" && path.startsWith("/operator/community/home"))
+    if (service === "lecture" && path === "/operator/courses") area = "courses";
+    if (service === "community" && path === "/operator/community/home")
       area = "editorial";
-    if (service === "community" && path.includes("/communities/boards"))
+    if (service === "community" && path === "/communities/boards")
       area = "boards";
     if (service === "partner-support" && path === "/operator") area = "members";
     return area
