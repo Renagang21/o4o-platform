@@ -64,7 +64,7 @@ export default function CentralFundingReview() {
     {
       key: "title",
       header: "펀딩",
-      render: (_, row) => <span>{row.title}</span>,
+      render: (_, row) => <a className="text-blue-700 underline" href={`https://funding.neture.co.kr/operator/market-trial/${encodeURIComponent(row.id)}`}>{row.title} · 신청 상세 검토</a>,
     },
     {
       key: "status",
