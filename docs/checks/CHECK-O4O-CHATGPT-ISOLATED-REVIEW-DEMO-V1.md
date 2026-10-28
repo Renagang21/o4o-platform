@@ -43,7 +43,7 @@
 - 상품 콘텐츠 신규 3개 도구 실행은 이 검증에 포함하지 않았다.
 - API 권한 거부 3개와 제출용 모델 비호출 negative prompt 3개는 다르다. 실제 ChatGPT 호출 선택은 아직 검증하지 않았다.
 - 공개 HTTPS API/Neture/Store, 별도 공개 DB/runtime identity, 시연 영상 URL은 아직 준비하지 않았다. 운영 DB/Cloud 서비스/포털 제출 상태는 변경하지 않았다. localhost/placeholder를 제출하지 않는다.
-- GitHub native fetch/gh는 HTTP 401로 실패했다. 공개 main 조회 성공은 쓰기·PR·CI·배포 권한 복구를 의미하지 않는다.
+- 초기 GitHub fetch/gh는 HTTP 401로 실패했으나 이후 인증이 복구되어 main fetch와 작업 branch push가 성공했다. PR/CI 상태와 공개 배포 완료는 별도로 확인한다.
 - 공통 My Home handoff의 운영 origin 고정은 변경하지 않았다. 검증된 reviewer 동선은 데모 로그인→동의→도구가 반환한 데모 편집기이며, 다른 이동까지 검증됐다고 보고하지 않는다.
 
 문서 정합: [WO](../work-orders/WO-O4O-CHATGPT-ISOLATED-REVIEW-DEMO-V1.md)와 [README](../../deploy/chatgpt-review-demo/README.md)에 구현/실행/미완료 경계를 기록했다. 운영 자격 정책은 변경하지 않았다.

@@ -23,13 +23,13 @@
 - [x] Neture/Store UI의 로그인·동의·편집기 검증(로컬 Chromium)
 - [x] API/Neture/Store 이미지 build 및 전체 Compose 기능·브라우저 재검증
 - [ ] 상품 콘텐츠 3개 도구 실행
-- [x] 코드 검증 및 로컬 commit 준비
-- [ ] push·PR/CI·review (GitHub 인증 실패)
+- [x] 코드 검증·로컬 commit·작업 branch push
+- [ ] PR/CI·review
 - [ ] 별도 공개 HTTPS 배포 및 5+3 실제 사례 검증
 - [ ] 시연 영상과 제출 ZIP/reviewer 안내 갱신
 
 ## 실행 상태
 
-GitHub native Git fetch와 gh 인증 조회는 인증 오류(HTTP 401)로 실패했다. 공개 HTTP 조회는 성공해 확보된 main의 최신성을 확인했으나 push/PR/배포 권한 복구를 의미하지 않는다. 별도 공개 HTTPS 인프라와 심사용 시연 URL도 아직 확보하지 않았다. 실제 실행 결과는 검증 후 CHECK에 기록한다.
+초기 GitHub native Git fetch와 gh 조회는 HTTP 401로 실패했으나 인증 복구 후 main fetch 및 작업 branch push가 성공했다. PR/CI와 공개 배포 상태는 별도로 추적한다. 별도 공개 HTTPS 인프라와 심사용 시연 URL도 아직 확보하지 않았다. 실제 실행 결과는 검증 후 CHECK에 기록한다.
 
 상세 실행·공개 전환 절차: [격리 Demo README](../../deploy/chatgpt-review-demo/README.md). 실제 결과: [CHECK](../checks/CHECK-O4O-CHATGPT-ISOLATED-REVIEW-DEMO-V1.md).
