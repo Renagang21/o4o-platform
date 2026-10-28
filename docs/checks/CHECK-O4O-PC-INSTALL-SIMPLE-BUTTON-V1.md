@@ -31,3 +31,5 @@
 - 최초 branch CI `40774144411`의 Windows job FAIL. GitHub 로그 보관 호스트 접근 제한으로 전체 로그를 받지 못해, 합성 데이터만 쓰는 설치기 테스트에 제한 길이 실패 annotation을 추가했다. 이후 실행에서 원인을 확인하고 교정한다. 최초 실패는 완료 근거가 아니다.
 
 - `40774560743` Windows job도 FAIL. TAP가 stdout annotation을 주석으로 감싸 원인 출력이 check annotation에 나타나지 않아 기존 Windows 테스트 명령에 `--test-reporter=spec`을 지정했다. 테스트 자체나 판정·권한·배포 설정은 그대로다.
+
+- `40775244464`에서 간편 launcher 시험만 실패함을 확인했다. `40775591656`에서 정확한 원인 확인: 제한된 PATH/상속된 PowerShell 모듈 경로에서 `Get-FileHash`를 찾지 못했다. 별도 모듈 autoload 없이 .NET SHA256·ZipFile·디렉터리 API·명시적 assembly load를 쓰도록 교정했다. 기존 패키지 설치·보존·window mode 자동 실행 시험은 통과했다. 오류 확인을 마친 이전 branch CI는 새 HEAD 검증으로 대체하면서 취소했으며 PASS로 계산하지 않는다.

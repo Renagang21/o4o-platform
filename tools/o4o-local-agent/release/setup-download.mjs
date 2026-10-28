@@ -26,7 +26,7 @@ $downloadUrl = 'https://neture.co.kr/downloads/pc-connection/${manifest.filename
 $expectedHash = '${manifest.sha256}'
 $expectedBytes = ${manifest.bytes}
 function Receive-Package([string]$target) {
-  Add-Type -AssemblyName System.Net.Http
+  [void][Reflection.Assembly]::LoadWithPartialName('System.Net.Http')
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   $handler = [Net.Http.HttpClientHandler]::new()
   $handler.AllowAutoRedirect = $false
@@ -55,14 +55,19 @@ function Receive-Package([string]$target) {
   }
 }
 function Expand-VerifiedPackage([string]$archive, [string]$destination) {
-  if ((Get-Item -LiteralPath $archive).Length -ne $expectedBytes) { throw 'PACKAGE_SIZE_MISMATCH' }
-  if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedHash) { throw 'PACKAGE_HASH_MISMATCH' }
-  Expand-Archive -LiteralPath $archive -DestinationPath $destination
+  if ([IO.FileInfo]::new($archive).Length -ne $expectedBytes) { throw 'PACKAGE_SIZE_MISMATCH' }
+  $hasher = [Security.Cryptography.SHA256]::Create()
+  $file = [IO.File]::OpenRead($archive)
+  try { $actualHash = [BitConverter]::ToString($hasher.ComputeHash($file)).Replace('-', '').ToLowerInvariant() }
+  finally { $file.Dispose(); $hasher.Dispose() }
+  if ($actualHash -ne $expectedHash) { throw 'PACKAGE_HASH_MISMATCH' }
+  [void][Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem')
+  [IO.Compression.ZipFile]::ExtractToDirectory($archive, $destination)
 }
 $temporary = Join-Path ([IO.Path]::GetTempPath()) ('o4o-setup-' + [Guid]::NewGuid().ToString('N'))
 try {
   if (-not [Environment]::Is64BitOperatingSystem -or -not [Environment]::Is64BitProcess -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') { throw 'WINDOWS_X64_REQUIRED' }
-  New-Item -ItemType Directory -Path $temporary | Out-Null
+  [void][IO.Directory]::CreateDirectory($temporary)
   Write-Host 'O4O PC 연결을 설치합니다. 잠시 기다려 주세요.'
   $archive = Join-Path $temporary 'package.zip'
   $package = Join-Path $temporary 'package'
@@ -76,7 +81,7 @@ try {
   Write-Host '설치를 마치지 못했습니다. 인터넷 연결과 열린 PC 연결 프로그램을 확인한 뒤 다시 설치해 주세요.'
   exit 1
 } finally {
-  if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
+  if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
 }
 `.replace(/\n/g, "\r\n"),
     "utf8",

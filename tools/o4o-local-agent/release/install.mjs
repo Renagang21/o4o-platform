@@ -55,7 +55,7 @@ try {
           [
             "-NoProfile",
             "-Command",
-            "Add-Type -AssemblyName PresentationFramework; $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC인가요? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주세요.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
+            "[void][Reflection.Assembly]::LoadWithPartialName('PresentationFramework'); $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC인가요? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주세요.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
           ],
           { encoding: "utf8" },
         ).trim() === "yes";
