@@ -52,6 +52,7 @@ import {
   type ProviderFactory,
 } from "../personal-mail/accounts.js";
 import { MailError } from "../personal-mail/contracts.js";
+import { createExternalAiDomainVerificationRouter } from "./domain-verification.js";
 
 type Handler = (req: Request, res: Response) => Promise<unknown>;
 const wrap =
@@ -71,6 +72,7 @@ export function createExternalAiRoutes(
   const root = Router(),
     management = Router(),
     user = Router();
+  root.use(createExternalAiDomainVerificationRouter(config?.issuer));
   const adapter = config ? new AdapterRegistry(db, config.webOrigin) : null;
   const provider = config
     ? new ExternalAiOAuthProvider(
