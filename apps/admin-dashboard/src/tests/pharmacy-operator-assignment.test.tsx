@@ -26,7 +26,7 @@ describe('four collaborator consent invitations', () => {
     fireEvent.click(await screen.findByRole('radio', { name: /Test Operator/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() => expect(authClient.api.post).toHaveBeenCalledWith('/admin/service-operator-invitations', {
-      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_admin`,
+      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_admin`, centralDelegation: key==='pharmcoop',
     }));
     const parsed = parseRole(`neture:${key}_admin`);
     expect(parsed).toMatchObject({ raw: `neture:${key}_admin`, serviceKey: key, roleKey: 'admin' });

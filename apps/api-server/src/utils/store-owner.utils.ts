@@ -1,3 +1,4 @@
+import {hasApprovedPharmacist} from '../services/qualifications/pharmacist-qualification.service.js';
 import { resolveApprovedStoreMemberOrganization } from './store-member-access.js';
 /**
  * Store Owner Utilities
@@ -122,6 +123,7 @@ export interface StoreOwnerCheckResult {
   resolution: StoreOrganizationResolution;
   /** 게시된 매장 경영자 계약 미승낙 시 server-side workspace 차단 근거. */
   pendingAgreement?: PendingPolicyAcceptance | null;
+  qualificationRequired?: boolean;
 }
 
 export async function isStoreOwner(
@@ -161,6 +163,7 @@ export async function isStoreOwner(
     if (resolution.status === 'none') {
       return { isOwner: false, organizationId: null, memberRole: '', resolution, pendingAgreement: null };
     }
+    if(!await hasApprovedPharmacist(dataSource,userId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
     const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(
       userId, resolveCanonicalServiceKey(serviceKey), dataSource,
     );
@@ -211,6 +214,10 @@ export async function isStoreOwner(
   //   조직 선택은 공통 해석기가 담당한다. serviceKey 가 있으면 그 서비스에 등록된
   //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
   const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
+  if(!serviceKey && resolution.organizationId){
+    const [organization]=await dataSource.query('SELECT type FROM organizations WHERE id=$1',[resolution.organizationId]);
+    if(organization?.type==='pharmacy' && !await hasApprovedPharmacist(dataSource,userId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
+  }
   const agreementServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
   const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey, dataSource);
   const pendingAgreement = pendingAgreements[0] ?? null;
@@ -301,7 +308,7 @@ export function createRequireStoreOwner(
       }
     }
 
-    const { isOwner, organizationId, memberRole, resolution, pendingAgreement } = await isStoreOwner(
+    const { isOwner, organizationId, memberRole, resolution, pendingAgreement, qualificationRequired } = await isStoreOwner(
       dataSource,
       user.id,
       serviceKey,
@@ -318,6 +325,7 @@ export function createRequireStoreOwner(
       });
       return;
     }
+    if(qualificationRequired){res.status(403).json({success:false,code:'PHARMACIST_QUALIFICATION_REQUIRED',error:'약국 경영 업무에는 승인된 약사 자격이 필요합니다. My Home 설정에서 자격 신청·상태를 확인해 주세요.'});return;}
     if (pendingAgreement) {
       res.status(428).json({
         success: false,

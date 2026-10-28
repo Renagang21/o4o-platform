@@ -41,8 +41,11 @@ describe('independent community membership and ownership', () => {
       .toMatchObject({ allowed: true, canManage: true, forumStorageCodes: ['community'] });
     expect(exec.query.mock.calls.every(([, args]) => !args?.includes('neture'))).toBe(true);
   });
-  it.each(['pending', 'suspended', 'withdrawn', 'rejected'])('denies service state %s even with an operator role', async status => {
+  it.each(['suspended', 'withdrawn'])('denies service state %s even with an operator role', async status => {
     expect(await resolveCommunityWorkspace(database(status) as never, { id: 'user' }, 'community')).toMatchObject({ allowed: false, canManage: false });
+  });
+  it.each([null,'pending','rejected'])('common participation does not require ordinary service approval: %s',async status=>{
+    expect(await resolveCommunityWorkspace(database(status) as never,{id:'user'},'community')).toMatchObject({allowed:true,canJoin:false,canManage:false});
   });
   it.each(['neture:admin', 'kpa:admin', 'supplier:admin'])('does not inherit moderation from %s', async role => {
     expect(await resolveCommunityWorkspace(database('active', role) as never, { id: 'user' }, 'community')).toMatchObject({ allowed: true, canManage: false });

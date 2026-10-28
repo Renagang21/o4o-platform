@@ -13,7 +13,7 @@ export interface RoleAssignment {
   id: string;
   userId: string;
   role: string;
-  scopeType?: 'global' | 'organization';
+  scopeType?: 'global' | 'organization' | 'o4o-direct'; // Central service delegation does not imply organization permissions.
   scopeId?: string;
   isActive: boolean;
   validFrom?: Date;

@@ -1,3 +1,4 @@
+import {hasApprovedPharmacist} from '../../../services/qualifications/pharmacist-qualification.service.js';
 import { BUSINESS_OPERATOR_PREDICATE, hasBusinessOperatorAccess } from './business-operator-access.js';
 import { recordOperation } from '../../../services/operations/operation-audit.js';
 import { hasCooperativeOperatorAccess } from './cooperative-operator-access.js';
@@ -53,6 +54,7 @@ export class SemiFranchiseService {
       JOIN neture_pharmacy_memberships npm ON npm.organization_id=om.organization_id AND npm.status='active'
       WHERE om.user_id=$1 AND om.organization_id=$2 AND om.left_at IS NULL AND om.role IN ('owner','admin','manager')
       FOR SHARE OF om,npm`, [userId, organizationId]);
+    if(owner&&!await hasApprovedPharmacist(m,userId))throw new NeturePharmacyError(403,'PHARMACIST_QUALIFICATION_REQUIRED','약국 경영자의 약사 자격 승인을 확인해 주세요.');
     if (!owner) throw new NeturePharmacyError(403, 'BUSINESS_APPLICANT_REQUIRED', '협업체 가입 신청·탈퇴는 해당 약국의 경영자급 권한이 필요합니다.');
   }
 

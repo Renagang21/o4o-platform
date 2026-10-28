@@ -130,7 +130,12 @@ export class PharmacistProfilePromotionService {
       } else if (filled.length) {
         await manager.query(
           `UPDATE kpa_pharmacist_profiles
-              SET license_number = $2, activity_type = $3, updated_at = now()
+              SET qualification_status = CASE WHEN license_number IS DISTINCT FROM $2 THEN 'unrequested' ELSE qualification_status END,
+                  qualification_reason = CASE WHEN license_number IS DISTINCT FROM $2 THEN NULL ELSE qualification_reason END,
+                  license_verified = CASE WHEN license_number IS DISTINCT FROM $2 THEN false ELSE license_verified END,
+                  verified_at = CASE WHEN license_number IS DISTINCT FROM $2 THEN NULL ELSE verified_at END,
+                  verified_by = CASE WHEN license_number IS DISTINCT FROM $2 THEN NULL ELSE verified_by END,
+                  license_number = $2, activity_type = $3, updated_at = now()
             WHERE id = $1`,
           [cur.id, nextLicense, nextActivity],
         );

@@ -13,6 +13,7 @@ import { resolve } from 'node:path';
 
 import {
   ASSIGNABLE_ROLES,
+  CENTRAL_OPERATION_ROLES,
   CATALOG_ROLE_VALUES,
   ASSIGNABLE_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
@@ -33,12 +34,13 @@ function readServerRoles(): string[] {
 
 describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => {
   it('화면 카탈로그와 서버 allowlist 가 같은 집합·같은 순서다', () => {
-    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles().filter(role => /(?:[:_])admin$/.test(role)));
+    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles().filter(role => CENTRAL_OPERATION_ROLES.has(role) || /(?:[:_])admin$/.test(role)));
   });
 
-  it('커뮤니티는 Admin만 지정하고 Operator는 서비스에 위임한다', () => {
+  it('직영 커뮤니티의 Admin과 Operator를 중앙에서 위임한다', () => {
     expect(ASSIGNABLE_ROLES.community.map(({ value, label }) => ({ value, label }))).toEqual([
       { value: 'community:admin', label: 'Admin' },
+      { value: 'community:operator', label: 'Operator' },
     ]);
   });
 
@@ -56,7 +58,7 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
     }
   });
 
-  it.each(['pharmacy','carepharm','megapharm','pharmcoop'])('%s는 Admin만 있고 타 사업 역할을 포함하지 않는다', key => {
+  it.each(['pharmacy','carepharm','megapharm'])('%s는 Admin만 있고 타 사업 역할을 포함하지 않는다', key => {
     expect(ASSIGNABLE_ROLES[key].map(option => option.value)).toEqual([`neture:${key}_admin`]);
     expect(ASSIGNABLE_ROLES[key].map(option => option.label)).toEqual(['Admin']);
   });
@@ -104,8 +106,10 @@ it('퇴역 서비스 PH·K-Cosmetics 역할은 신규 지정 목록에 없다', 
  expect(ASSIGNABLE_ROLE_VALUES.some(role => /^(pharmacy-hub|cosmetics|k-cosmetics):/.test(role))).toBe(false);
 });
 
-it('keeps Operator roles in the read-only catalog without reintroducing central grants', () => {
-  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('partner-support:operator');
+it('permits direct Partner duties without granting independent business operators', () => {
+  expect(ASSIGNABLE_ROLE_VALUES).toContain('partner-support:operator');
+  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('neture:megapharm_operator');
+  expect(CENTRAL_OPERATION_ROLES.has('neture:carepharm_admin')).toBe(false);
   expect(CATALOG_ROLE_VALUES.has('partner-support:operator')).toBe(true);
   expect(findRoleOption('partner-support:operator')?.label).toBe('Operator');
 });

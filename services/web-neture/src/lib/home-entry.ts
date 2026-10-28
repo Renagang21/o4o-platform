@@ -106,6 +106,7 @@ export const NONE_SERVICE_STATES: NetureServiceStates = {
 
 /** `GET /work-scope/operator-services` 응답 1건 (apps/api-server/src/utils/service-tenant.resolver.ts OperatorServiceMembership) */
 export interface EntryOperatorService {
+  centralEntry?: boolean;
   serviceKey: string;
   serviceName: string;
   scope: 'admin' | 'operator';
@@ -617,6 +618,10 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     if (!svc.workspaceAvailable) continue;
     const key = svc.serviceKey;
     if (RETIRED_SERVICE_KEYS.has(key)) continue;
+    if(svc.centralEntry===true){
+      operator.push({id:`operator:${key}`,label:svc.serviceName,note:'통합 운영',action:{kind:'public',href:`https://admin.neture.co.kr/operations/${encodeURIComponent(key)}/members`}});
+      continue;
+    }
     const note = svc.scope === 'admin' ? '관리자' : undefined;
     const label = byKey.has(key) ? nameOf(key) : svc.serviceName;
     if (key === 'neture') {
@@ -664,7 +669,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   }
   const netureOperator = data.operatorServices?.some((s) => s.serviceKey === 'neture' && s.workspaceAvailable);
   if (netureOperator || isPlatformAdmin) {
-    store.push({ id: 'store:management', label: '내 매장 신청 심사', action: { kind: 'internal', to: '/operator/pharmacy-memberships' } });
+    store.push({ id: 'store:management', label: '내 매장 신청 심사', action: data.operatorServices?.some(s=>s.serviceKey==='neture' && s.centralEntry===true) ? {kind:'public',href:'https://admin.neture.co.kr/operations/neture/pharmacies'} : { kind: 'internal', to: '/operator/pharmacy-memberships' } });
   }
 
   const itemsOf: Record<WorkspaceKey, EntryItem[]> = { community, store, supplier, operator };

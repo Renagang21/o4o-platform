@@ -30,10 +30,11 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
   if (typeof key !== 'string' || !key) return null;
   if (key === 'community') {
     const member = user?.id ? await readCommunityServiceMembership(exec, user.id) : null;
-    const allowed = member?.eligible === true && member.status === 'active';
+    // General community participation uses the common account; explicit service sanctions remain effective.
+    const allowed = member?.eligible === true && (!member.status || ['active', 'pending', 'rejected'].includes(member.status));
     return { communityKey: 'community', name: '커뮤니티', kind: 'independent', allowed,
       canManage: allowed && await hasCommunityServiceOperator(exec, user!.id!),
-      canJoin: member?.eligible === true && (!member.status || member.status === 'rejected'),
+      canJoin: false,
       membershipStatus: member?.status ?? null, communityStatus: 'active',
       reason: allowed ? null : !user?.id ? 'AUTH_REQUIRED' : !member?.eligible ? 'ACCOUNT_NOT_ACTIVE' : 'COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED',
       forumStorageCodes: ['community'] };

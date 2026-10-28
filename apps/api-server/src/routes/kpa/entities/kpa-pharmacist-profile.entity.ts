@@ -35,6 +35,13 @@ export class KpaPharmacistProfile {
   @Column({ type: 'boolean', default: false })
   license_verified!: boolean;
 
+  /** Common credential decision, independent of branch/business enrollment and users.status. */
+  @Column({ type: 'varchar', length: 16, default: 'unrequested' })
+  qualification_status!: 'unrequested' | 'pending' | 'approved' | 'rejected' | 'revoked';
+
+  @Column({ type: 'text', nullable: true })
+  qualification_reason!: string | null;
+
   @Column({ type: 'varchar', length: 50, nullable: true })
   activity_type!: string | null;
 

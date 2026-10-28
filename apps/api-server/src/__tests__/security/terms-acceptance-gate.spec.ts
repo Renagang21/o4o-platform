@@ -63,6 +63,8 @@ async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
     if (q.includes('AND service_key = $2')) return publishedRows.filter((r) => ofType(r) && r.service_key === params[1]);
     return publishedRows.filter(ofType);
   }
+  // This agreement fixture is a manually verified pharmacy owner; qualification denial is tested separately.
+  if (q.includes('FROM kpa_pharmacist_profiles') && q.includes('AS approved')) return [{ approved: true }];
   if (q.includes('FROM neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ '?column?': 1 }] : [];
   if (q.includes('LEFT JOIN semi_franchises')) return semiFranchiseRows;
   if (q.includes('JOIN neture_suppliers s')) return supplierCandidateRows;

@@ -102,7 +102,7 @@ export function resolveOperatorRole(role: unknown, serviceKey: unknown): Operato
   return { serviceKey: derived, role: roleValue };
 }
 
-/** Central console grants service Admin only; existing Operator roles remain readable/revocable. */
+/** Legacy/independent grants remain Admin-only; direct central delegation uses resolvePlatformInvitationRole. */
 export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role => /(?:[:_])admin$/.test(role));
 export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): OperatorRoleResolution {
   const resolved = resolveOperatorRole(role, serviceKey);
@@ -110,4 +110,24 @@ export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): Ope
     throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하세요.');
   }
   return resolved;
+}
+
+/** Central delegation provenance, not a platform role. Independent business roles are excluded. */
+export const CENTRAL_DELEGATION_SCOPE = 'o4o-direct';
+export const CENTRAL_SERVICE_PREFIXES = ['neture', 'supplier', 'funding', 'lecture', 'community', 'partner-support'] as const;
+export const CENTRAL_OPERATION_ROLES: readonly string[] = Object.freeze([
+  ...CENTRAL_SERVICE_PREFIXES.flatMap(prefix => [`${prefix}:admin`, `${prefix}:operator`]),
+  'neture:pharmcoop_admin', 'neture:pharmcoop_operator',
+]);
+export function resolveCentralOperationRole(role: unknown, serviceKey: unknown) {
+  const resolved = resolveOperatorRole(role, serviceKey);
+  if (!CENTRAL_OPERATION_ROLES.includes(resolved.role)) {
+    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', 'O4O 직영 업무만 중앙에 위임할 수 있습니다.');
+  }
+  return resolved;
+}
+export function resolvePlatformInvitationRole(role: unknown, serviceKey: unknown, scopeKey = '') {
+  return scopeKey === CENTRAL_DELEGATION_SCOPE
+    ? resolveCentralOperationRole(role, serviceKey)
+    : resolveServiceAdminRole(role, serviceKey);
 }
