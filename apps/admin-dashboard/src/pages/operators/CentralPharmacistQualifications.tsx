@@ -198,7 +198,7 @@ export default function CentralPharmacistQualifications({
             처리
           </p>
           <label className="block">
-            신청자에게 안내할 확인·반려 사유
+            신청자에게 안내할 확인·반려 사유{" "}
             <textarea
               required
               maxLength={2000}
@@ -219,6 +219,7 @@ export default function CentralPharmacistQualifications({
             </label>
           )}
           <button
+            type="submit"
             disabled={
               busy ||
               !reason.trim() ||

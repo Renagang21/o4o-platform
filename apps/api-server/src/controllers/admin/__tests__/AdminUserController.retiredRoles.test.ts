@@ -30,8 +30,8 @@ it('lists only current assignments without mutating historical DB rows or accoun
   await new AdminUserController().getUsers({ query: {} } as any, res);
   expect(res.status).not.toHaveBeenCalled();
   expect(res.json.mock.calls[0][0].users).toEqual([
-    { ...users[0], roles: ['platform:super_admin', 'kpa-branch:operator'], role: 'platform:super_admin' },
-    { ...users[1], roles: [], role: 'user' },
+    { ...users[0], roles: ['platform:super_admin', 'kpa-branch:operator'], role: 'platform:super_admin', centralDelegationRoles: [] },
+    { ...users[1], roles: [], role: 'user', centralDelegationRoles: [] },
   ]);
   expect(historicalRoles).toHaveLength(4);
   expect(mockQuery).toHaveBeenCalledTimes(1);

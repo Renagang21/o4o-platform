@@ -34,6 +34,10 @@ export interface AssignRoleInput {
   scopeType?: 'global' | 'o4o-direct';
 }
 
+function assertCentralDelegationInput({scopeType,role,assignedBy}:AssignRoleInput):void {
+  if (scopeType === 'o4o-direct' && (!CENTRAL_OPERATION_ROLES.includes(role) || !assignedBy)) throw new Error('INVALID_CENTRAL_DELEGATION');
+}
+
 export class RoleAssignmentService {
   private repository: Repository<RoleAssignment>;
 
@@ -133,7 +137,7 @@ export class RoleAssignmentService {
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil, scopeType } = input;
-    if (scopeType === 'o4o-direct' && (!CENTRAL_OPERATION_ROLES.includes(role) || !assignedBy)) throw new Error('INVALID_CENTRAL_DELEGATION');
+    assertCentralDelegationInput(input);
     if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     // F10 §3.2 bug fix: all operator grant paths share the transaction lock, including callers without a manager.
     if (isOperatorAssignmentRole(role) || CENTRAL_OPERATION_ROLES.includes(role)) {

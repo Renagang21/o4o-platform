@@ -152,7 +152,7 @@ export default function PartnerCommunityOperator({
         >
           <h2>{action.label}</h2>
           <label className="field">
-            처리 사유
+            처리 사유{" "}
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -415,7 +415,7 @@ export default function PartnerCommunityOperator({
           >
             <h2>{editing ? "게시판 수정" : "게시판 만들기"}</h2>
             <label className="field">
-              게시판 이름
+              게시판 이름{" "}
               <input
                 required
                 maxLength={80}
@@ -424,7 +424,7 @@ export default function PartnerCommunityOperator({
               />
             </label>
             <label className="field">
-              게시판 소개
+              게시판 소개{" "}
               <textarea
                 maxLength={500}
                 value={board.description}
@@ -440,7 +440,7 @@ export default function PartnerCommunityOperator({
                 onChange={(e) =>
                   setBoard({ ...board, operatorOnly: e.target.checked })
                 }
-              />
+              />{" "}
               운영자만 글 작성
             </label>
             <label className="community-check">
@@ -450,11 +450,11 @@ export default function PartnerCommunityOperator({
                 onChange={(e) =>
                   setBoard({ ...board, active: e.target.checked })
                 }
-              />
+              />{" "}
               게시판 운영
             </label>
             <label className="field">
-              변경 사유
+              변경 사유{" "}
               <textarea
                 required
                 maxLength={1000}

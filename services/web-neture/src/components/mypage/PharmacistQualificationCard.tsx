@@ -80,7 +80,7 @@ export default function PharmacistQualificationCard() {
         }}
       >
         <label className="my-3 block">
-          본인 약사 면허번호
+          본인 약사 면허번호{" "}
           <input
             className="ml-3 rounded border p-2"
             aria-label="약사 면허번호"
@@ -100,6 +100,7 @@ export default function PharmacistQualificationCard() {
           본인의 면허 정보이며, 변경 시 기존 자격은 다시 검토받는 데 동의합니다.
         </label>
         <button
+          type="submit"
           className="mt-3 rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50"
           disabled={busy || !value || !confirmed || !license.trim()}
         >

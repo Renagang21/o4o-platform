@@ -14,6 +14,7 @@ jest.mock("../../../database/connection.js", () => ({
 import { PharmacistProfilePromotionService } from "../../kpa-branch/PharmacistProfilePromotionService.js";
 import { DataSource, Entity, PrimaryColumn } from "typeorm";
 import { RoleAssignment } from "../../../modules/auth/entities/RoleAssignment.js";
+import { MembershipApprovalService } from "../../approval/MembershipApprovalService.js";
 import { RoleAssignmentService } from "../../../modules/auth/services/role-assignment.service.js";
 @Entity("users")
 class User {
@@ -50,7 +51,9 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       await db.query(`CREATE SCHEMA ${schema}`);
       await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,status text,"isActive" boolean,"isEmailVerified" boolean,name text DEFAULT 'Synthetic member');
       CREATE TABLE role_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid,role text,is_active boolean,scope_type text,valid_from timestamp,valid_until timestamp,scope_id uuid,assigned_at timestamp DEFAULT now(),assigned_by uuid,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now(),CONSTRAINT chk_org_scope CHECK ((scope_type='global' AND scope_id IS NULL) OR (scope_type='organization' AND scope_id IS NOT NULL) OR scope_type IS NULL));
-      CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
+      CREATE TABLE service_memberships(user_id uuid,service_key text,status text,id uuid DEFAULT gen_random_uuid(),role text DEFAULT 'member',updated_at timestamp DEFAULT now());
+      CREATE TABLE demo_accounts(user_id uuid,is_active boolean);
+      CREATE TABLE kpa_members(user_id uuid,license_number text,status text,identity_status text,organization_id uuid,updated_at timestamp DEFAULT now());
       CREATE TABLE organization_members(user_id uuid,organization_id uuid,left_at timestamp,role text,metadata jsonb);
       CREATE TABLE action_logs(service_key text,user_id uuid,action_key text,source text,status text,meta jsonb);
       CREATE TABLE kpa_pharmacist_profiles(user_id uuid UNIQUE,license_number text,license_verified boolean,verified_at timestamp,verified_by uuid,id uuid DEFAULT gen_random_uuid(),activity_type text,updated_at timestamp DEFAULT now())`);
@@ -71,7 +74,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
     });
     beforeEach(async () => {
       await db.query(
-        "TRUNCATE users,role_assignments,service_memberships,organization_members,kpa_pharmacist_profiles,action_logs",
+        "TRUNCATE users,role_assignments,service_memberships,organization_members,kpa_pharmacist_profiles,action_logs,kpa_members,demo_accounts",
       );
       await db.query(
         `INSERT INTO users(id,status,"isActive","isEmailVerified") VALUES($1,'active',true,true)`,
@@ -426,6 +429,63 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         ).status,
       ).toBe("rejected");
       expect(await hasApprovedPharmacist(db, user)).toBe(false);
+      expect(
+        (await db.query("SELECT status FROM users WHERE id=$1", [user]))[0]
+          .status,
+      ).toBe("active");
+    });
+    it("service withdrawal preserves a manually approved common credential and other memberships under the real CHECK constraints", async () => {
+      await professional();
+      await db.query(
+        "INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'kpa-society','active'),($1,'lecture','active')",
+        [user],
+      );
+      await db.query(
+        "INSERT INTO kpa_members(user_id,license_number,status,identity_status) VALUES($1,'synthetic-license','active','active')",
+        [user],
+      );
+      const before = (
+        await db.query(
+          "SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1",
+          [user],
+        )
+      )[0];
+      const result = await db.transaction((manager) =>
+        new MembershipApprovalService().withdrawMembership({
+          userId: user,
+          withdrawnBy: reviewer,
+          isPlatformAdmin: false,
+          serviceKeys: ["kpa-society"],
+          manager,
+        }),
+      );
+      expect(result?.inactivatedMemberships).toBe(1);
+      expect(
+        (
+          await db.query(
+            "SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1",
+            [user],
+          )
+        )[0],
+      ).toEqual(before);
+      expect(await hasApprovedPharmacist(db, user)).toBe(true);
+      expect(
+        await db.query(
+          "SELECT service_key,status FROM service_memberships WHERE user_id=$1 ORDER BY service_key",
+          [user],
+        ),
+      ).toEqual([
+        { service_key: "kpa-society", status: "withdrawn" },
+        { service_key: "lecture", status: "active" },
+      ]);
+      expect(
+        (
+          await db.query(
+            "SELECT status,license_number FROM kpa_members WHERE user_id=$1",
+            [user],
+          )
+        )[0],
+      ).toEqual({ status: "withdrawn", license_number: null });
       expect(
         (await db.query("SELECT status FROM users WHERE id=$1", [user]))[0]
           .status,

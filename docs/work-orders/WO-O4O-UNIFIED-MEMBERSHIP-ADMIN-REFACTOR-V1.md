@@ -95,3 +95,12 @@ forward migration만 추가했다. 과거 migration·baseline·기존 fingerprin
 ## 문서 정합
 
 운영 책임 V2에 수동 자격 승인 확정·현재 위임 구현·운영 미반영 상태를 반영하고, 관리자 정책 및 인증/membership 정본의 적용 관계를 연결했다. 2026-10-27 중앙 Admin-only 지정 정책은 O4O 직영 범위에서 대체하고 독립 사업은 유지한다. 과거 IR·WO·CHECK 및 Frozen 본문은 다시 쓰지 않았다.
+
+## 병합 전 추가 검증 · 2026-10-28
+
+사용자의 main 병합·배포 요청 후 최종 gate에서 추가 발견한 항목을 같은 PR에서 보완했다.
+
+- CI shard 1의 실패는 관리자 목록 DTO의 새 `centralDelegationRoles` 필드가 기존 retired-role 테스트 기대값에 빠진 원인이었다. 퇴역 역할 제외·계정 상태 보존 조건은 유지하며 기대값을 정합화했다.
+- 서비스 탈퇴의 기존 공통 면허 NULL 처리 경로를 제거했다. 서비스별 `kpa_members` 정리만 유지하며 공통 개인 자격·승인 사유·감사 근거는 자격 전용 처리로 분리한다. 실제 CHECK 제약이 적용된 임시 PostgreSQL에서 승인 자격 보존·서비스 탈퇴·다른 서비스 유지까지 23 tests 통과했다.
+- 정적 분석 지적의 역할 입력 검증·매장 거절 응답·중앙 task 매핑을 작은 함수/명시적 표로 분리하고, JSX label의 공백 및 submit 의도를 명시했다. 권한·인가 조건 완화나 검사 제외는 하지 않았다.
+- Admin 46 files / 544 tests, Partner 7 files / 92 tests, 자격 카드 3 tests 및 API typecheck 통과. 새 HEAD의 최종 CI·재리뷰는 PR Checks에서 확인한다.

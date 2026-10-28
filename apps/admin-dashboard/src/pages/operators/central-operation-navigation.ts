@@ -15,6 +15,23 @@ const origins: Record<string, string> = {
   community: "https://community.neture.co.kr",
   "partner-support": "https://partner.neture.co.kr",
 };
+const commonAreas: Record<string, string> = {
+  "/service-members": "members",
+  "/operator/service-members": "members",
+  "/operator/members": "members",
+  "/operator/inbox": "inbox",
+};
+const taskAreas: Record<string, Record<string, string>> = {
+  neture: { "/operator/pharmacy-memberships": "pharmacies" },
+  supplier: { "/operator/suppliers": "suppliers" },
+  funding: { "/operator/market-trial": "funding" },
+  lecture: { "/operator/courses": "courses" },
+  community: {
+    "/operator/community/home": "editorial",
+    "/communities/boards": "boards",
+  },
+  "partner-support": { "/operator": "members" },
+};
 /** Known work goes centrally; retained specialist screens keep their original host rather than becoming broken admin-relative links. */
 export function centralTaskHref(service: string, href: string): string {
   const fallback = `/operations/${encodeURIComponent(service)}/members`;
@@ -25,29 +42,8 @@ export function centralTaskHref(service: string, href: string): string {
     if (url.origin !== origin || url.protocol !== "https:") return fallback;
     // Queries/fragments can select specialist tabs and recovery workflows not present centrally.
     if (url.search || url.hash) return url.href;
-    const path = url.pathname;
-    let area: string | undefined;
-    if (
-      [
-        "/service-members",
-        "/operator/service-members",
-        "/operator/members",
-      ].includes(path)
-    )
-      area = "members";
-    if (path === "/operator/inbox") area = "inbox";
-    if (service === "neture" && path === "/operator/pharmacy-memberships")
-      area = "pharmacies";
-    if (service === "supplier" && path === "/operator/suppliers")
-      area = "suppliers";
-    if (service === "funding" && path === "/operator/market-trial")
-      area = "funding";
-    if (service === "lecture" && path === "/operator/courses") area = "courses";
-    if (service === "community" && path === "/operator/community/home")
-      area = "editorial";
-    if (service === "community" && path === "/communities/boards")
-      area = "boards";
-    if (service === "partner-support" && path === "/operator") area = "members";
+    const area =
+      commonAreas[url.pathname] ?? taskAreas[service]?.[url.pathname];
     return area
       ? `/operations/${encodeURIComponent(service)}/${area}`
       : url.href;
