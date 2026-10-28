@@ -9,7 +9,7 @@
  *   - 역할 목록을 컨트롤러마다 다시 선언하지 않는다 — 정본은 `requireAdmin` 하나다.
  *   - 서비스 운영자의 제안·등록 요청·후보 큐레이션은 서비스 API 에서 계속 동작해야 한다.
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import express from 'express';
 import request from 'supertest';
@@ -129,7 +129,6 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
   describe('권한 선언 계약', () => {
     const srcRoot = resolve(__dirname, '../../');
     const src = (p: string) => readFileSync(resolve(srcRoot, p), 'utf8');
-    const controllerDir = resolve(srcRoot, 'modules/neture/controllers');
 
     /** `/api/v1/admin/o4o-product-db/*` 아래 mount 되는 컨트롤러 (register-routes.ts 기준) */
     const PRODUCT_DB_CONTROLLERS = [
@@ -147,7 +146,9 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
       'product-master-note.controller.ts',
       'product-master-status.controller.ts',
       'product-usage-links.controller.ts',
-    ];
+    ].map(file => `modules/neture/controllers/${file}`).concat(
+      'modules/neture/product-description-intake/intake.controller.ts',
+    );
 
     it('mount 목록이 register-routes.ts 와 일치한다', () => {
       const routes = src('bootstrap/register-routes.ts');
@@ -160,12 +161,12 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
     });
 
     it.each(PRODUCT_DB_CONTROLLERS)('%s 는 router floor 로 requireAdmin 을 쓴다', (file) => {
-      const s = src(`modules/neture/controllers/${file}`);
+      const s = src(file);
       expect(s).toContain('router.use(requireAdmin);');
     });
 
     it.each(PRODUCT_DB_CONTROLLERS)('%s 는 자체 역할 배열을 선언하지 않는다', (file) => {
-      const s = src(`modules/neture/controllers/${file}`);
+      const s = src(file);
       // 서비스 역할을 나열한 로컬 허용 목록이 남아 있으면 안 된다.
       expect(s).not.toMatch(/const\s+\w*ADMIN_ROLES\s*=\s*\[/);
       expect(s).not.toContain("'cosmetics:admin'");
@@ -173,10 +174,9 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
     });
 
     it('컨트롤러 디렉터리 전체에 product-db 용 역할 배열 잔재가 없다', () => {
-      const offenders = readdirSync(controllerDir)
-        .filter((f) => PRODUCT_DB_CONTROLLERS.includes(f))
+      const offenders = PRODUCT_DB_CONTROLLERS
         .filter((f) => /'(?:cosmetics|kpa-society|neture):(?:admin|operator)'/.test(
-          readFileSync(resolve(controllerDir, f), 'utf8'),
+          src(f),
         ));
       expect(offenders).toEqual([]);
     });
@@ -197,6 +197,10 @@ describe('공통 Product DB 정본 = platform:super_admin 단독', () => {
 
     /** 공통 정본을 바꾸는 write route 는 명시 guard 를 유지한다 (다층 방어). */
     const GUARDED: Array<[string, string]> = [
+      ['modules/neture/product-description-intake/intake.controller.ts', "router.post('/'"],
+      ['modules/neture/product-description-intake/intake.controller.ts', "router.patch('/:id'"],
+      ['modules/neture/product-description-intake/intake.controller.ts', "router.post('/:id/approve'"],
+      ['modules/neture/product-description-intake/intake.controller.ts', "router.post('/:id/reject'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.patch('/renewals/:id'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.post('/bulk'"],
       ['modules/neture/controllers/product-correction.controller.ts', "router.post('/bulk/:id/control'"],

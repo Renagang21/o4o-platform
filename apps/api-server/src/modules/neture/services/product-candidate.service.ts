@@ -15,7 +15,8 @@
  */
 
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
-import { IsNull, In } from 'typeorm';
+import { IsNull, In, Raw } from 'typeorm';
+import { DESCRIPTION_INTAKE_LABEL } from '../product-description-intake/namespace.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import type {
@@ -40,6 +41,9 @@ import { promoteOne, promotionFieldsFromCandidate } from '../drug-import/drug-ma
 import { DbPromotionMasterStore } from '../drug-import/drug-master-promotion-apply.db.js';
 // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
 import { ensureProductLandingForMaster } from './product-landing.service.js';
+
+// These rows share storage, not the generic queue's service-level read/write authority.
+const outsideDescriptionIntake = () => Raw(alias => `(${alias} IS NULL OR ${alias} <> :descriptionIntakeLabel)`, { descriptionIntakeLabel: DESCRIPTION_INTAKE_LABEL });
 
 /** classification 에 부착하는 drug extension 요약 (표시용 — 권한 아님) */
 export interface CandidateDrugExtensionSummary {
@@ -124,6 +128,8 @@ export class ProductCandidateService {
 
   /** 후보 생성 (status=pending, match_status=unmatched). 매칭은 별도 호출. */
   async createCandidate(input: CreateCandidateInput): Promise<ProductCandidate> {
+    if (input.sourceLabel === DESCRIPTION_INTAKE_LABEL || Object.hasOwn(input.rawPayload ?? {}, 'descriptionResource'))
+      throw new Error('INVALID_DESCRIPTION_RESOURCE_NAMESPACE');
     const normalized =
       input.identifierType && input.identifierValue
         ? normalizeIdentifier(input.identifierType, input.identifierValue)
@@ -154,7 +160,7 @@ export class ProductCandidateService {
   }
 
   async getCandidate(id: string): Promise<ProductCandidate | null> {
-    return this.repo.findOne({ where: { id, deletedAt: IsNull() } });
+    return this.repo.findOne({ where: { id, deletedAt: IsNull(), sourceLabel: outsideDescriptionIntake() } });
   }
 
   /**
@@ -251,6 +257,7 @@ export class ProductCandidateService {
     const qb = this.repo
       .createQueryBuilder('pc')
       .where(where)
+      .andWhere('(pc.source_label IS NULL OR pc.source_label <> :descriptionIntakeLabel)', { descriptionIntakeLabel: DESCRIPTION_INTAKE_LABEL })
       .orderBy('pc.created_at', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
@@ -358,7 +365,7 @@ export class ProductCandidateService {
     if (!nextStatus) throw new Error('INVALID_ACTION');
 
     const result = await this.repo.update(
-      { id: In(ids), deletedAt: IsNull() },
+      { id: In(ids), deletedAt: IsNull(), sourceLabel: outsideDescriptionIntake() },
       { candidateStatus: nextStatus, reviewedBy: reviewedBy ?? null, reviewedAt: new Date() },
     );
     return { updated: result.affected ?? 0, status: nextStatus };

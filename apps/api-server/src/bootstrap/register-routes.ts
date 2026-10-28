@@ -605,6 +605,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master STORE Description routes:', masterDescError);
     }
 
+    // Public-source description intake uses existing candidates; no automatic master creation.
+    const { createDescriptionIntakeController } = await import('../modules/neture/product-description-intake/intake.controller.js');
+    app.use('/api/v1/admin/o4o-product-db/description-intake', createDescriptionIntakeController(dataSource));
+
     // 24-e2g-1c. Register Operator Supplier STORE Description Review Queue (공급자 매장용 설명서 최소 검수 큐)
     //           (WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1)
     try {

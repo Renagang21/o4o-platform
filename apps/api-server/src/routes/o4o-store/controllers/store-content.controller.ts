@@ -1,3 +1,5 @@
+import { submitStoreDescriptionContribution } from '../../../modules/neture/product-description-intake/store-contribution.service.js';
+import { DescriptionIntakeError } from '../../../modules/neture/product-description-intake/contracts.js';
 /**
  * Store Content Controller — 매장 전용 콘텐츠 편집
  *
@@ -618,6 +620,21 @@ export function createStoreContentController(
 
   // ─────────────────────────────────────────────────────────────────────────
   // direct 콘텐츠 전용 CRUD (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1)
+  router.post('/direct/:id/product-contribution', requireAuth, withContentUser(async (req, res, userId) => {
+    if (!validateDirectContentId(req.params.id, res)) return;
+    const organizationId = await requireContentOwner(req, res, userId, '매장 소유자만 상품 설명을 제안할 수 있습니다.');
+    if (!organizationId) return;
+    try {
+      const data = await submitStoreDescriptionContribution(dataSource, organizationId, userId, req.params.id, req.body);
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      if (error instanceof DescriptionIntakeError) {
+        res.status(error.status).json({ success: false, error: { code: error.code, message: '저장된 상담자료·상품 연결을 다시 확인해 주세요.' } }); return;
+      }
+      res.status(500).json({ success: false, error: { code: 'CONTRIBUTION_FAILED', message: '설명서 제안에 실패했습니다.' } });
+    }
+  }));
+
   // NOTE: /direct/:id 라우트는 /:snapshotId 보다 먼저 등록해야 한다.
   // ─────────────────────────────────────────────────────────────────────────
 

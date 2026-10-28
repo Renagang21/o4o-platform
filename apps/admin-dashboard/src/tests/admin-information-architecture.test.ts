@@ -58,6 +58,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin/o4o-product-db/store-requests',
     '/admin/o4o-product-db/masters',
     '/admin/o4o-product-db/supplier-store-descriptions',
+    '/admin/o4o-product-db/description-intake',
     '/admin/o4o-product-db/image-quality',
     '/admin/o4o-product-db/maintenance',
     // Content
@@ -233,6 +234,7 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
     'core-points',
     'platform-hub',
     'ops-metrics',
+    'o4o-product-db-description-intake',
   ];
 
   it.each(PLATFORM_ONLY_MENUS)('%s 메뉴가 platform 경계로 게이트된다', (menuId) => {
@@ -243,6 +245,16 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
 
   it.each(PLATFORM_ONLY_MENUS)('%s 는 실제 메뉴 트리에 존재한다 (고아 설정 방지)', (menuId) => {
     expect(menuIds).toContain(menuId);
+  });
+
+  it('공개자료 설명 검토의 직접 URL도 platform 경계로 게이트된다', () => {
+    const routes = read('routes/o4o-product-db.routes.tsx');
+    const at = routes.indexOf('path="description-intake"');
+    expect(at).toBeGreaterThan(-1);
+    expect(routes.slice(at, at + 150)).toContain('element={<DescriptionIntakeRoute />}');
+    const guard = routes.indexOf('function DescriptionIntakeRoute()');
+    expect(guard).toBeGreaterThan(-1);
+    expect(routes.slice(guard, guard + 250)).toContain('requiredRoles={[...PLATFORM_ADMIN_ROLES]}');
   });
 
   it('platform 전용 route 가 legacy 역할을 통과시키지 않는다', () => {

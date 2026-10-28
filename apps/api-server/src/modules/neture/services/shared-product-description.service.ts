@@ -12,7 +12,7 @@ import { changedProductValues, enqueueProductEditRenewals } from '../product-cor
  * - soft delete 우선. product_ai_contents 는 건드리지 않는다.
  */
 
-import type { DataSource, Repository } from 'typeorm';
+import type { DataSource, EntityManager, Repository } from 'typeorm';
 import { SharedProductDescription } from '../entities/SharedProductDescription.entity.js';
 import { SharedProductDescriptionAuditLog } from '../entities/SharedProductDescriptionAuditLog.entity.js';
 
@@ -21,7 +21,7 @@ import { SharedProductDescriptionAuditLog } from '../entities/SharedProductDescr
 
 /** eligibility 판정식 dry-run (write 0). */
 export async function bulkCanonicalDryRunQuery(
-  dataSource: DataSource,
+  dataSource: DataSource | EntityManager,
   sourceType = 'mfds_easy_drug',
 ): Promise<BulkCanonicalDryRun> {
   const base: Array<Record<string, string>> = await dataSource.query(
@@ -82,7 +82,7 @@ export async function bulkCanonicalDryRunQuery(
 
 /** eligibility 와 **동일 WHERE** 로 set-based UPDATE 승격. 멱등(canonical 재실행 제외). */
 export async function bulkCanonicalApplyQuery(
-  dataSource: DataSource,
+  dataSource: DataSource | EntityManager,
   sourceType: string,
   actorId: string | null,
 ): Promise<number> {
@@ -182,7 +182,7 @@ export interface WithdrawSupplierStoreDraftResult {
 export class SharedProductDescriptionService {
   private repo: Repository<SharedProductDescription>;
 
-  constructor(private dataSource: DataSource) {
+  constructor(private dataSource: DataSource | EntityManager) {
     this.repo = dataSource.getRepository(SharedProductDescription);
   }
 

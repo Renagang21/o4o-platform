@@ -1,3 +1,4 @@
+import { ProductDescriptionContribution } from '../../components/product-description/ProductDescriptionContribution';
 import { ConsultationConflict } from '../../components/product-description/ConsultationConflict';
 import { consultationLanguages, newProductConsultation, readProductConsultation } from '../../components/product-description/productConsultationDraft';
 import { ProductConsultationAuthoring } from '../../components/product-description/ProductConsultationAuthoring';
@@ -241,6 +242,7 @@ export default function StoreDirectContentPage() {
       {session.draft.consultation && <output className="mb-3 block rounded-lg bg-slate-50 p-3 text-sm">
         상품 상담자료 · {session.draft.consultation.product.name} · {PRODUCT_DESCRIPTION_PURPOSE_LABELS[session.draft.consultation.assist.purpose]} · {consultationLanguages[session.draft.consultation.language]}
       </output>}
+      {!editing && !!content.contentJson.productConsultation && <ProductDescriptionContribution id={content.id} revision={content.revision ?? ''} disabled={saving || deleting || !!content.conflict} />}
       {session.record?.conflict && <ConsultationConflict saved={session.record}
         acknowledged={session.draft.confirmedRevision === session.record.revision} disabled={saving || deleting}
         onAcknowledge={() => session.changeDraft({ confirmedRevision: session.record?.revision })} />}

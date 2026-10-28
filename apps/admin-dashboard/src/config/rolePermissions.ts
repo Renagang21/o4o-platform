@@ -156,6 +156,10 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
+    menuId: 'o4o-product-db-description-intake',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
     menuId: 'o4o-product-db-image-quality',
     roles: [...PLATFORM_ADMIN_ROLES]
   },

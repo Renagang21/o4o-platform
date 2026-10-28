@@ -209,6 +209,12 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/admin/o4o-product-db/supplier-store-descriptions',
       },
       {
+        id: 'o4o-product-db-description-intake',
+        label: '공개자료·매장 제안',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/description-intake',
+      },
+      {
         id: 'o4o-product-db-image-quality',
         label: '이미지 상태',
         icon: <Image className="w-4 h-4" />,
