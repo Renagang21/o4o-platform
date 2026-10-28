@@ -58,6 +58,7 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 //   `@/lib/password-policy` import 를 제거했다. 이 화면에는 비밀번호 입력 자체가 없다.
 import {
   ASSIGNABLE_ROLES,
+  CENTRAL_OPERATION_ROLES,
   ASSIGNABLE_ROLE_VALUES,
   OPERATOR_ROLE_CATALOG,
   CATALOG_ROLE_VALUES,
@@ -442,6 +443,7 @@ export default function OperatorsPage() {
       await authClient.api.post('/admin/service-operator-invitations', {
         ...(selectedCandidate ? { targetUserId: selectedCandidate.userId } : { email: inviteEmail.trim() }),
         serviceKey: canonicalServiceKey, role: targetRole,
+        centralDelegation: CENTRAL_OPERATION_ROLES.has(targetRole),
       });
       setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주세요. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
       toast.success('운영자 확인 메일 발송을 요청했습니다.');
@@ -528,6 +530,12 @@ export default function OperatorsPage() {
   }, [batch, bulkRevokeRoles, selectedIds]);
 
   const columns: ListColumnDef<AssignmentRow>[] = [
+    {
+      key: 'centralDelegation', header: '중앙 위임', width: '130px',
+      render: (_, row) => CENTRAL_OPERATION_ROLES.has(row.role)
+        ? <span title="실제 중앙 진입은 Google 로그인과 현재 계정·서비스 상태를 추가 확인합니다.">{row.user.centralDelegationRoles?.includes(row.role) ? '중앙 위임 기록' : '서비스 역할 · 미위임'}</span>
+        : <span>자체 운영</span>,
+    },
     {
       key: 'emailConfirmation', header: '이메일 확인', width: '130px',
       render: (_, row) => {
@@ -633,7 +641,7 @@ export default function OperatorsPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
         title="서비스 관리자"
-        subtitle="서비스별 Admin을 지정합니다. Operator 지정은 해당 서비스 관리자가 담당합니다."
+        subtitle="직영 업무의 Admin·Operator를 초대하고 운영 범위를 위임합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
@@ -676,7 +684,7 @@ export default function OperatorsPage() {
       </div>
 
       <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
-        <p>서비스별 Admin을 지정합니다. Operator 신규 지정은 해당 서비스 Admin이 자기 서비스에서 처리합니다. 기본 목록에는 서비스 Admin만 표시합니다. 초대를 수락한 뒤에는 목록을 새로고침해 주세요. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+        <p>직영 서비스의 Admin·Operator는 초대 수락 후 중앙 업무를 위임받습니다. 독립 사업 Operator는 해당 사업에서 지정합니다. 서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대를 수락한 뒤에는 목록을 새로고침해 주세요. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={showOperatorAssignments} onChange={e => {
             setShowOperatorAssignments(e.target.checked);

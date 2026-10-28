@@ -106,6 +106,8 @@ function makeDataSource() {
   const listOrgParams: string[] = [];
   const dataSource = {
     query: jest.fn(async (sql: string, params: any[] = []) => {
+      // This owner fixture has an independently reviewed pharmacist credential.
+      if (sql.includes('FROM kpa_pharmacist_profiles') && sql.includes('AS approved')) return [{ approved: true }];
       // 0) membership 게이트
       //    WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7:
       //    isStoreOwner() 가 role 조회 앞에서 active membership 을 확인한다.

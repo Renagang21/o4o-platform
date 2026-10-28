@@ -2588,6 +2588,9 @@ importers:
 
   services/web-partner:
     dependencies:
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client

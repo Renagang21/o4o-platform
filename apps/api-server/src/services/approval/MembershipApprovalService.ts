@@ -1216,7 +1216,7 @@ export class MembershipApprovalService {
       //   - kpa_members.license_number 는 Partial UNIQUE index (NULL/'' 제외) 보유
       //     → 탈퇴 회원이 license 를 계속 점유하면 재가입(본인 또는 다른 약사) 시
       //       /check-license 가 차단 (status 무관 unique 정책 — IR §4)
-      //   - kpa_pharmacist_profiles.license_number 도 일관성 위해 같이 NULL
+      //   - 공통 kpa_pharmacist_profiles는 개인 자격 원장이다. 서비스 탈퇴로 변경하지 않는다.
       //   정책: active/pending/suspended/rejected 회원의 license 는 절대 변경하지 않음
       //          (위 WHERE status NOT IN ('withdrawn') 가드로 이중 보호)
       const hasKpaSociety = affectedServiceKeys.includes('kpa-society');
@@ -1231,13 +1231,9 @@ export class MembershipApprovalService {
           [userId]
         );
 
-        // kpa_pharmacist_profiles 의 license 도 일관성 정리 (SSOT mirror)
-        await queryRunner.query(
-          `UPDATE kpa_pharmacist_profiles
-           SET license_number = NULL, updated_at = NOW()
-           WHERE user_id = $1 AND license_number IS NOT NULL`,
-          [userId]
-        );
+        // Unified membership: service withdrawal is not credential revocation.
+        // Keep the common licence, manual decision, evidence audit and other service eligibility.
+
       }
 
       // STEP4: organization_members — service-scoped 정리

@@ -8,7 +8,7 @@ import { CourseListView, type CourseCardView } from '@o4o/lms-ui';
 import { learnerApi, type LectureCourse } from '../../api/lecture';
 import { LECTURE_ACCENT, coursePath } from '../../lib/lmsViewAdapter';
 import { useAuth } from '../../contexts/AuthContext';
-import { hasLectureMembership } from '../../components/AccessGate';
+import { canAccess } from '../../components/AccessGate';
 import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
 import { INQUIRY_URL, STUDY_HERO } from '../../config/service';
@@ -54,11 +54,11 @@ export default function CoursesPage() {
       setTotalPages(res.pagination?.totalPages ?? res.totalPages ?? 1);
       setTotal(res.pagination?.total ?? res.data?.length ?? 0);
     } catch { if (request === requestId.current) setError(true); } finally { if (request === requestId.current) setLoading(false); }
-  }, [page, query, isAuthenticated, user?.id]);
-  useEffect(() => { void load(); return () => { requestId.current += 1; }; }, [load]);
+  }, [page, query]);
+  useEffect(() => { void load(); return () => { requestId.current += 1; }; }, [load, isAuthenticated, user?.id]);
 
-  const gate = isAuthenticated && !hasLectureMembership(user?.memberships)
-    ? <div className="notice">로그인은 되어 있지만 O4O 강의 서비스 이용 자격이 없어 공개 강의만 볼 수 있습니다. 수강 신청은 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
+  const gate = isAuthenticated && !canAccess('learner',user)
+    ? <div className="notice">강의 이용 상태를 확인해 주세요. 이용 정지·탈퇴 또는 계정 확인 문제는 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
     : !isAuthenticated
       ? <div className="notice">회원 전용 강의와 수강 신청은 <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link> 후 이용할 수 있습니다.</div>
       : null;

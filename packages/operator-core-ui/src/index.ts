@@ -181,3 +181,12 @@ export { CooperationOperationsOverview } from './modules/CooperationOperationsOv
 export type { CooperationWorkArea } from './modules/CooperationOperationsOverview';
 
 export { CooperationOperatorWorkflows } from './modules/CooperationOperatorWorkflows';
+
+// Shared existing community editorial workflow, using each host's authenticated transport.
+export { default as CommunityHomeManagementPage } from './modules/community-home-operations/CommunityHomeManagementPage';
+export { CommunityNewsCollectionPanel } from './modules/community-home-operations/CommunityNewsCollectionPanel';
+export { CommunityNewsReviewPanel } from './modules/community-home-operations/CommunityNewsReviewPanel';
+export * from './modules/community-home-operations/communityHomeApi';
+export { default as CommunityManagementWorkspace } from './modules/community-home-operations/CommunityManagementWorkspace';
+export { default as PartnerCommunityOperator } from './modules/partner-community-operations/PartnerCommunityOperator';
+export * from './modules/partner-community-operations/community-api';

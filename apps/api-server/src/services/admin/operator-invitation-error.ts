@@ -19,6 +19,7 @@ export class ServiceOperatorInvitationError extends Error {
             "사용할 수 없는 계정입니다. 계정 상태를 확인하세요.",
           GOOGLE_LINK_REQUIRED:
             "Google 계정을 연결한 뒤 운영자 초대를 수락하세요.",
+          OPERATOR_ROLE_SCOPE_REVIEW_REQUIRED: "조직 범위가 설정된 역할입니다. 중앙 위임 전에 권한 범위를 검토해 주세요.",
           OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED:
             "유효기간이 설정된 역할입니다. 전체 관리자에게 기간 검토를 요청하세요.",
           OPERATOR_ALREADY_ACTIVE:

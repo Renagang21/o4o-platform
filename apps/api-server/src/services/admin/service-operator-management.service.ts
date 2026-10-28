@@ -1,3 +1,4 @@
+import { CENTRAL_OPERATION_ROLES } from '../../config/operator-role-catalog.js';
 import { recordOperatorRevocation } from './operator-invitation-retention.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { resolveNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
@@ -143,6 +144,7 @@ export class ServiceOperatorManagementService {
       const invitations=await m.query(`SELECT id,invited_email,role,status,expires_at FROM service_operator_invitations
         WHERE scope_type='service' AND scope_key=$1 AND status='pending' AND expires_at>now() ORDER BY created_at DESC LIMIT 200`,[scope.key]);
       return {
+        centralManagementRequired: CENTRAL_OPERATION_ROLES.includes(scope.operatorRole),
         invitations,
         scope: scope.key,
         role: scope.operatorRole,
@@ -154,6 +156,7 @@ export class ServiceOperatorManagementService {
   }
   async validateInvitationGrant(m: EntityManager, actor: string, key: string, target?: string) {
     const scope=delegationScope(key);
+    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하세요.');
     await this.authorize(m,actor,scope);
     if (!target) return;
     if (actor===target) throw new OperationError(409,'SELF_OPERATOR_CHANGE_FORBIDDEN','자기 역할은 다른 Admin에게 요청하세요.');
@@ -193,6 +196,7 @@ export class ServiceOperatorManagementService {
   }
   async change(actor: string, key: string, userId: string, assign: boolean) {
     const scope = delegationScope(key);
+    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하세요.');
     if (!uuid.test(userId))
       throw new OperationError(
         400,

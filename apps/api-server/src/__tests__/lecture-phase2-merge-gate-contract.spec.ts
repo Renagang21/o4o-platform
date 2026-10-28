@@ -66,6 +66,7 @@ jest.mock('../database/connection.js', () => ({
       return {};
     },
     query: jest.fn(async (sql: string, params: any[] = []) => {
+      if (sql.includes('account_status')) return [{account_status:'active',account_active:true,email_verified:true,membership_status:null}];
       if (sql.includes('FROM lms_lessons WHERE id')) {
         const l = lessons[params[0]];
         return l ? [{ courseId: l.courseId }] : [];
@@ -276,7 +277,7 @@ let certIssues: string[] = [];
 // ─────────────────────────────────────────────────────────────────────────────
 // P1-1 members visibility
 // ─────────────────────────────────────────────────────────────────────────────
-describe('P1-1 members visibility — 로그인만으로는 members 강의를 열지 않는다', () => {
+describe('members visibility — common account eligibility, separate from enrollment', () => {
   it('GET /courses/:id · 비로그인 · public → 200', async () => {
     const res = makeRes();
     await CourseController.getCourse(makeReq({ params: { id: 'lec-pub' } }), res);
@@ -290,21 +291,19 @@ describe('P1-1 members visibility — 로그인만으로는 members 강의를 �
     expect(res.body.code).toBe('MEMBERS_ONLY');
     expect(JSON.stringify(res.body)).not.toContain('L members');
   });
-  it('GET /courses/:id · 로그인 · lecture membership 없음 · members → 403 LECTURE_MEMBERSHIP_REQUIRED (제목·설명 비노출)', async () => {
+  it('verified common account can read a member course without duplicate service signup', async () => {
     const res = makeRes();
     await CourseController.getCourse(makeReq({ id: 'u-nomember', member: false, params: { id: 'lec-mem' } }), res);
-    expect(res.statusCode).toBe(403);
-    expect(res.body.code).toBe('LECTURE_MEMBERSHIP_REQUIRED');
-    expect(JSON.stringify(res.body)).not.toContain('L members');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.course.title).toBe('L members');
   });
-  it('GET /courses/:id · KPA membership 만 있는 로그인 사용자 · members → 403 (타 서비스 membership 은 Lecture 를 열지 않는다)', async () => {
+  it('unrelated service membership is not the source of common learner eligibility', async () => {
     memberships.push({ user_id: 'u-kpa', service_key: 'kpa-society', status: 'active' });
     const req = makeReq({ id: 'u-kpa', roles: ['kpa:member'], params: { id: 'lec-mem' } });
     req.user.memberships = [{ serviceKey: 'kpa-society', status: 'active' }];
     const res = makeRes();
     await CourseController.getCourse(req, res);
-    expect(res.statusCode).toBe(403);
-    expect(res.body.code).toBe('LECTURE_MEMBERSHIP_REQUIRED');
+    expect(res.statusCode).toBe(200);
   });
   it('GET /courses/:id · active lecture membership · members → 200', async () => {
     const res = makeRes();
@@ -322,11 +321,11 @@ describe('P1-1 members visibility — 로그인만으로는 members 강의를 �
     await CourseController.listCourses(makeReq({ query: { visibility: 'members' } }), makeRes());
     expect(listFilters[0].visibility).toBe('public');
   });
-  it('GET /courses 목록 · 로그인 · membership 없음 → visibility=public 강제 (members 강의 목록 제외)', async () => {
+  it('verified common learners can browse members courses without separate service signup', async () => {
     await CourseController.listCourses(makeReq({ id: 'u-nomember', query: { visibility: 'members' } }), makeRes());
-    expect(listFilters[0].visibility).toBe('public');
+    expect(listFilters[0].visibility).toBe('members');
     await CourseController.listCourses(makeReq({ id: 'u-nomember2', query: {} }), makeRes());
-    expect(listFilters[1].visibility).toBe('public');
+    expect(listFilters[1].visibility).toBeUndefined();
   });
   it('GET /courses 목록 · active lecture membership → 클라이언트 visibility 필터 유지(전체 허용)', async () => {
     await CourseController.listCourses(makeReq({ id: 'u-mem', member: true, query: {} }), makeRes());
@@ -953,7 +952,7 @@ describe('9차 P2-10 평가 조회의 소유자 면제도 현재 role + active m
   it('membership 이 없는 소유 강사 → 면제 없음 · 403 MEMBERSHIP_NOT_FOUND', async () => {
     const { res, passed } = await run(makeReq({ id: 'inst', roles: ['lecture:instructor'], params: { lessonId: 'les-paid' } }));
     expect(passed).toBe(false);
-    expect(res.body.code).toBe('MEMBERSHIP_NOT_FOUND');
+    expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
   });
   it('membership 없는 stale lecture:admin → 면제 없음', async () => {
     expect((await run(makeReq({ id: 'adm', roles: ['lecture:admin'], params: { lessonId: 'les-paid' } }))).passed).toBe(false);
@@ -1027,7 +1026,7 @@ describe('7차 P2-8 lesson quiz/assignment 조회에도 강의 접근 정책', (
     const { res, passed } = await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-paid' } }));
     expect(passed).toBe(false);
     expect(res.statusCode).toBe(403);
-    expect(res.body.code).toBe('MEMBERSHIP_NOT_FOUND');
+    expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
   });
   it('membership 은 있으나 유료 강의에 등록하지 않은 회원 → 403 ENROLLMENT_REQUIRED', async () => {
     const { res, passed } = await run(makeReq({ id: 'u-mem', member: true, params: { lessonId: 'les-paid' } }));

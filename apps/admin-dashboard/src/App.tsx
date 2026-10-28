@@ -1,3 +1,4 @@
+import CentralOperationsPage from './pages/operators/CentralOperationsPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AdminProtectedRoute } from '@o4o/auth-context';
 import { adminAuthClient as ssoClient } from '@/lib/auth-client';
@@ -114,6 +115,10 @@ function App() {
             <Routes>
             {/* 공개 라우트 — 로그인, 미리보기, 에디터, 스토어프론트, 디버그 */}
             {PublicRoutes()}
+            <Route path="/operations" element={<CentralOperationsPage />} />
+            <Route path="/operations/:serviceKey/:area" element={<CentralOperationsPage />} />
+            <Route path="/operations/:serviceKey/courses/:courseId" element={<CentralOperationsPage />} />
+            <Route path="/operations/:serviceKey/members/:userId" element={<CentralOperationsPage />} />
 
             {/* 보호된 관리자 라우트들 */}
             {/*

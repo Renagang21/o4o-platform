@@ -1,5 +1,7 @@
 # O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1
 
+> **2026-10-28 부분 정책 대체**: 공통 회원·자격 분리, 일반 가입 단순화 및 직영 승인·운영 주체는 [운영 책임 정본 V2](O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md)를 우선한다. 약사 전용 기능의 보호 구현·검증 전 관련 가입 제한을 제거하지 않는다. 독립 사업의 참여 승인·데이터 경계·자기 업무는 유지하며 기존 membership을 일괄 제거하지 않는다. 아래 과거 구현 설명은 운영 반영 기록으로 보존한다. 구현 범위·검증·운영 미반영 상태는 [통합 구현 WO](../work-orders/WO-O4O-UNIFIED-MEMBERSHIP-ADMIN-REFACTOR-V1.md)에서 구분한다. 공통 약사 자격은 위임된 중앙 담당자의 근거 확인·사유 기록 후 수동 승인하며 일반 계정 상태와 분리한다.
+
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE · **확정일**: 2026-10-07 · **최종 갱신**: 2026-10-21 (공개 진입·문의 정책; PR #750 main 통합·운영 배포 완료 — 검증 한계는 [구현·검증 WO](../work-orders/WO-O4O-PUBLIC-ENTRY-CONTACT-UNIFICATION-V1.md) 참조) · 2026-10-11 (My Home 계정 설정 적용 관계 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`)

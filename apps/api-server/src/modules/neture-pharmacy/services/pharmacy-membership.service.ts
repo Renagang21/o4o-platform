@@ -11,7 +11,7 @@ import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentP
  *
  * - 신청: 조직(type='pharmacy') + owner 관계 + 원장(pending) 을 한 트랜잭션에.
  * - 자격 확인: 운영자가 원장의 사업자번호 · 약사 면허번호를 검토(operator_review). 자동 검증 · 점수 없음.
- * - kpa-society 가입 · kpa_members · kpa_pharmacist_profiles 를 읽지 않는다(재해석 금지).
+ * - KPA 가입은 자격으로 재해석하지 않는다. 공통 약사 자격 승인과 약국 경영 권한은 별도로 검사한다.
  * - 신청 · 승인(재활성화 포함) 시 Neture 메인 가입 active 를 확인한다(neture-main-membership.ts).
  * - 매장 판정은 원장 status='active' 가 한다. 승인 시 role 기반 소비처용 표식(neture:store_owner 등)을 붙이고
  *   정지 · 종료 시 거둔다(provisioner). 표식 실패는 원장 판정에 영향 없음.
@@ -233,6 +233,10 @@ export class PharmacyMembershipService {
       if (next === 'active') {
         // 승인 · 재활성화 시점의 **현재** Neture 가입 상태를 확인한다(신청 이후 바뀌었을 수 있다).
         await assertNetureMainMembershipActive(m, current.applicant_user_id, 'applicant');
+        const qualified = await m.query(`SELECT id FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved'
+          AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND BTRIM(license_number)=BTRIM($2) FOR SHARE`,
+          [current.applicant_user_id,current.pharmacist_license_number]);
+        if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주세요.');
         const [proof] = await m.query(`SELECT d.id FROM organizations o JOIN kyc_documents d ON d.id::text = o.metadata->'businessProfile'->>'businessRegistrationDocumentId' WHERE o.id = $1 AND d.user_id = $2 AND d."documentType" = 'business_registration' AND d."verificationStatus" IN ('PENDING','VERIFIED')`, [current.organization_id, current.applicant_user_id]);
         if (!proof) throw new NeturePharmacyError(409, 'DOCUMENT_REQUIRED', '사업자등록증 사본을 확인한 뒤 승인해 주세요.');
       }

@@ -23,8 +23,9 @@ adminServiceOperatorInvitationsRouter.get('/', async (req:AuthRequest, res) => {
 });
 adminServiceOperatorInvitationsRouter.post('/', async (req: AuthRequest, res) => {
   try {
-    const { email, targetUserId, serviceKey, role } = req.body ?? {};
+    const { email, targetUserId, serviceKey, role, centralDelegation } = req.body ?? {};
     if (
+      (centralDelegation !== undefined && typeof centralDelegation !== 'boolean') ||
       (email !== undefined && typeof email !== 'string') ||
       (targetUserId !== undefined && typeof targetUserId !== 'string') ||
       typeof serviceKey !== 'string' ||
@@ -45,6 +46,7 @@ adminServiceOperatorInvitationsRouter.post('/', async (req: AuthRequest, res) =>
           serviceKey,
           role,
           actorId: req.user!.id,
+          ...(centralDelegation === true ? { scopeKey: 'o4o-direct' } : {}),
         }),
       });
   } catch (e) {

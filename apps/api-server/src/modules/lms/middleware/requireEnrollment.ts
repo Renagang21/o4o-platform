@@ -7,13 +7,13 @@
  *
  * PUBLIC  강의 → membership 불요. 단 isPaid·requiresApproval 이면 enrollment 는 여전히 필요하다
  *                (9차 P1-18 — "공개 + 승인 필요" 강의의 무승인 제출 방지).
- * MEMBERS 강의 → active lecture membership 필수 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §7)
+ * MEMBERS 강의 → 정상 공통 계정 + 명시적 강의 이용 정지·탈퇴 검사 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §7)
  *   그 위에 아래 정책 순서대로 적용:
  *   1. isPaid=true        → 승인된 Enrollment 필수 (결제 강의)
  *   2. requiresApproval=true → 승인된 Enrollment 필수 (강사 승인 강의)
  *   3. 그 외              → membership 만으로 통과 (무료·승인불필요 회원제)
  *
- * 종전 "MEMBERS = 로그인만" 판정은 Lecture membership boundary 결함이라 제거했다.
+ * 단순 로그인만으로 통과하지 않는다. 현재 DB의 계정·이메일·이용 상태와 아래 실제 enrollment를 검사한다.
  */
 
 import type { Request, Response, NextFunction } from 'express';
@@ -29,6 +29,7 @@ import {
 } from '../utils/lms-service-scope.js';
 import {
   resolveLectureMembershipStatus,
+  resolveLectureLearnerStatus,
   isPlatformSuperAdmin,
   hasLectureAdminRole,
   hasLectureInstructorRole,
@@ -206,10 +207,10 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
         return next();
       }
 
-      // MEMBERS 강의: active lecture membership 이 선행 조건이다 (role 불요 · break-glass 만 예외).
+      // MEMBERS 강의: 공통 계정 자격과 서비스 이용 제재를 DB로 확인한다. enrollment 조건은 별도 유지.
       // PUBLIC 강의는 membership 을 요구하지 않는다 — 다만 아래 enrollment 판정은 건너뛰지 않는다.
       if (course.visibility !== CourseVisibility.PUBLIC && !isPlatformSuperAdmin(req)) {
-        const membershipStatus = await resolveLectureMembershipStatus(req);
+        const membershipStatus = await resolveLectureLearnerStatus(req);
         if (membershipStatus === 'not_found') {
           return res.status(403).json({
             success: false,

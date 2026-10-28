@@ -21,7 +21,7 @@ function escapeHtml(value: string): string {
 }
 
 /** Pure rendering. No logging, persistence, tracking, or invitation URL mutation. */
-export function buildOperatorInvitationMail(url: string, role: string, confirmation: boolean) {
+export function buildOperatorInvitationMail(url: string, role: string, confirmation: boolean, centralDelegation = false) {
   const scope = invitationScopeLabel(role);
   const roleLabel = /(?:[:_])admin$/.test(role) ? '관리자' : '운영자';
   const title = `${scope} ${roleLabel} ${confirmation ? '지정 확인' : '초대'}`;
@@ -33,6 +33,7 @@ export function buildOperatorInvitationMail(url: string, role: string, confirmat
     '기존 회원은 초대받은 계정으로 로그인하세요. 처음 이용한다면 이 메일을 받은 이메일 주소로 가입하세요. 이메일·비밀번호로 가입한 경우에는 가입 확인 메일의 이메일 인증도 완료해 주세요.',
     '로그인 후 초대 화면에서 대상 서비스와 역할, 수락할 계정을 확인하고 ‘이 계정으로 확인·수락’을 누르세요.',
   ];
+  if (centralDelegation) steps.push('O4O 직영 운영 업무의 중앙 위임 초대입니다. 수락 후 https://admin.neture.co.kr/operations 에서 Google로 로그인하세요. 이메일·카카오 계정은 먼저 My Home 계정 설정에서 본인 확인을 거쳐 Google 계정을 연결하세요. 이메일 일치만으로 자동 연결되지 않습니다. 일반 서비스 역할이나 독립 사업 운영 권한과는 별개입니다.');
   const continuation = '가입이나 이메일 인증만으로 초대 수락이 완료되지는 않습니다. 가입·인증 후 초대 화면이 보이지 않으면 이 메일의 버튼을 다시 눌러 주세요.';
   const validity = '초대는 처음 발급한 날부터 7일 동안 유효하며, 재발송해도 만료일은 연장되지 않습니다. 여러 메일을 받았다면 가장 최근 메일의 링크를 이용해 주세요.';
   const privacy = '본인에게 온 초대 링크를 다른 사람에게 전달하지 마세요. 요청하지 않았거나 맡기로 하지 않은 역할이라면 수락하지 않아도 됩니다. 수락·취소·만료 시 초대용 이메일과 토큰을 파기하고, 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.';

@@ -114,6 +114,8 @@ export class RoleAssignment {
    *
    * - global: 전역 권한 (모든 리소스에 대한 권한)
    * - organization: 조직 권한 (특정 조직에 대한 권한)
+   * - o4o-direct: 중앙 Admin의 직영 업무 위임 출처. 서비스 role·membership 검사 유지,
+   *   조직 권한 또는 플랫폼 전역 역할을 부여하는 값이 아니다.
    *
    * organization-core가 ALTER TABLE로 추가하는 컬럼이나,
    * 단일 Entity 관리를 위해 여기서 명시적 선언.

@@ -1,10 +1,11 @@
+import { getNetureMainMembershipStatus } from '../../neture/services/neture-main-membership.js';
 /**
  * Lecture Access Guards — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2
  *
  * LMS runtime 의 유일한 Application Service 는 `O4O 강의 (lecture)` 다.
  * 본 모듈은 LMS 라우터가 쓰는 세 층의 접근 계약을 한 곳에 둔다.
  *
- *   Learner    = service_memberships(service_key='lecture', status='active')  — role 없음
+ *   Learner    = verified common account, preserving explicit lecture sanctions  — role 없음
  *   Instructor = active lecture membership + `lecture:instructor`
  *   Operator   = active lecture membership + `lecture:operator` (⊂ `lecture:admin`)
  *   Admin      = active lecture membership + `lecture:admin`
@@ -85,8 +86,18 @@ export async function resolveLectureMembershipStatus(
   return 'active';
 }
 
+/** Common learner access does not grant operator/instructor membership or course enrollment. */
+export async function resolveLectureLearnerStatus(req: Request): Promise<'active' | 'not_found' | 'inactive'> {
+  const user = (req as any).user;
+  if (!user?.id) return 'not_found';
+  if (!AppDataSource.isInitialized) return 'inactive'; // never trust a client/JWT snapshot as qualification
+  if (await getNetureMainMembershipStatus(AppDataSource, user.id) !== 'active') return 'inactive';
+  const status = await getServiceMembershipStatusFromDb(AppDataSource, user.id, SERVICE_KEYS.LECTURE);
+  return ['none', 'active', 'pending', 'rejected'].includes(status) ? 'active' : 'inactive';
+}
+
 /**
- * Learner 층: active lecture membership 만 요구한다 (role 불요).
+ * Learner 층: 정상 공통 계정을 요구한다. 서비스 정지·탈퇴와 실제 수강 조건은 유지한다.
  * 수강 신청 · 진행 · 퀴즈/과제 제출 · 내 수강/수료 조회 · 강사 신청에 건다.
  */
 export const requireLectureLearner: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -101,7 +112,7 @@ export const requireLectureLearner: RequestHandler = async (req: Request, res: R
   }
 
   try {
-    const status = await resolveLectureMembershipStatus(req);
+    const status = await resolveLectureLearnerStatus(req);
     if (status === 'not_found') {
       res.status(403).json({
         success: false,
@@ -132,7 +143,7 @@ export const requireLectureLearner: RequestHandler = async (req: Request, res: R
 export async function isActiveLectureLearner(req: Request): Promise<boolean> {
   if (!(req as any).user?.id) return false;
   if (isPlatformSuperAdmin(req)) return true;
-  return (await resolveLectureMembershipStatus(req)) === 'active';
+  return (await resolveLectureLearnerStatus(req)) === 'active';
 }
 
 /**

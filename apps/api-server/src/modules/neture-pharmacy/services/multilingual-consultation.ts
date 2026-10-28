@@ -59,7 +59,7 @@ export class MultilingualConsultationService {
       if (pharmacies.length !== 1 || pharmacies[0].status !== 'active') throw new NeturePharmacyError(403, 'PHARMACY_ACCESS_REQUIRED', '내 매장 승인을 확인해 주세요.');
       await this.features.require(userId, organizationId, mode.feature);
       if (mode.professional && !await this.deps.professional(userId, organizationId)) {
-        throw new NeturePharmacyError(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담 사용 확인이 필요합니다.');
+        throw new NeturePharmacyError(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '본인의 약사 자격 검증과 이 약국의 상담 업무 허가가 필요합니다.');
       }
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;

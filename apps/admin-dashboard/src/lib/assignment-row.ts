@@ -25,6 +25,8 @@ export interface AdminUserDto {
   username?: string;
   email?: string;
   roles?: string[];
+  /** Current recorded central provenance; effective entry still checks Google and membership. */
+  centralDelegationRoles?: string[];
   /** legacy fallback: roles[0] || 'user' */
   role?: string;
   isActive?: boolean;

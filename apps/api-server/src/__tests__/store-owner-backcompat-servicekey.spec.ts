@@ -121,7 +121,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
   it('kpa(약국 매장) route 는 JWT membership 이 타 서비스뿐이어도 원장 active 조직이면 통과한다', async () => {
     // 큐: [원장 기반 후보] → (매장 경영자 계약 게시 문서 0)
-    const dataSource = makeDataSource([[{ organization_id: 'org-pharmacy', role: 'owner' }]]);
+    const dataSource = makeDataSource([[{ organization_id: 'org-pharmacy', role: 'owner' }], [{ approved: true }]]);
     const guard = createRequireStoreOwner(dataSource, 'kpa');
     const res = makeRes();
     const next = jest.fn();

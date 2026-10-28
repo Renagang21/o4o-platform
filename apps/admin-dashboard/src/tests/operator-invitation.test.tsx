@@ -43,7 +43,7 @@ describe('operator invitation admin UI', () => {
     expect(screen.getByText('Latest Accepted Admin')).toBeTruthy();
   });
 
-  it('shows service Admin by default and keeps existing Operator assignments behind an explicit view', async () => {
+  it('shows direct Admin and Operator assignments while preserving historical rights', async () => {
     h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
       ? { success: true, users: [
         { id: 'admin-fixture', name: 'Partner Admin Fixture', roles: ['partner-support:admin'], isActive: true },
@@ -52,11 +52,7 @@ describe('operator invitation admin UI', () => {
       : { data: [] } }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
     expect(await screen.findByText('Partner Admin Fixture')).toBeTruthy();
-    expect(screen.queryByText('Operator Fixture')).toBeNull();
-    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
     expect(await screen.findByText('Operator Fixture')).toBeTruthy();
-    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
-    expect(screen.queryByText('Operator Fixture')).toBeNull();
     expect(h.post).not.toHaveBeenCalled();
   });
 
@@ -101,7 +97,7 @@ describe('operator invitation admin UI', () => {
         'input[name="target-service"][value="community"]',
       )!,
     );
-    expect(screen.queryByRole('radio', { name: /community:operator/ })).toBeNull();
+    expect(screen.getByRole('radio', { name: /community:operator/ })).toBeTruthy();
     fireEvent.click(screen.getByRole('radio', { name: /community:admin/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() =>
@@ -111,6 +107,7 @@ describe('operator invitation admin UI', () => {
           email: 'new@example.com',
           serviceKey: 'community',
           role: 'community:admin',
+          centralDelegation: true,
         },
       ),
     );

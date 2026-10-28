@@ -289,6 +289,15 @@ export class AnnualReportMembershipSyncService {
           args.push(p.after);
           sets.push(`"${p.column}" = $${args.length}`);
         }
+        // A changed identity claim must be verified again; annual-report approval is not licence verification.
+        if (license) {
+          const parameter = `$${profileSets.findIndex(p => p.column === 'license_number') + 1}`;
+          sets.push(`qualification_status = CASE WHEN license_number IS DISTINCT FROM ${parameter} THEN 'unrequested' ELSE qualification_status END`);
+          sets.push(`qualification_reason = CASE WHEN license_number IS DISTINCT FROM ${parameter} THEN NULL ELSE qualification_reason END`);
+          sets.push(`license_verified = CASE WHEN license_number IS DISTINCT FROM ${parameter} THEN false ELSE license_verified END`);
+          sets.push(`verified_at = CASE WHEN license_number IS DISTINCT FROM ${parameter} THEN NULL ELSE verified_at END`);
+          sets.push(`verified_by = CASE WHEN license_number IS DISTINCT FROM ${parameter} THEN NULL ELSE verified_by END`);
+        }
         args.push(member.profile_id, member.user_id);
         // 대상은 언제나 신고서 주인의 profile 이다. 요청자(운영자) id 를 쓰지 않는다.
         await manager.query(

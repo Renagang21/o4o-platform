@@ -1,3 +1,4 @@
+import { CENTRAL_OPERATION_ROLES, CENTRAL_DELEGATION_SCOPE } from '../config/operator-role-catalog.js';
 import { findActiveStoreMemberCandidates } from './store-member-access.js';
 /**
  * Service Tenant Foundation — Service Identity · Store↔Service · Operator↔Service 해석기 (read-only)
@@ -359,6 +360,8 @@ export type OperatorScopeLevel = 'admin' | 'operator';
  * 서비스별 scope guard 의 접근 정책(role + membership 둘 다 필요)과 같은 결합이다.
  */
 export interface OperatorServiceMembership {
+  /** Explicit central delegation only; presentation metadata, never authorization. */
+  centralEntry?: boolean;
   /** canonical service key */
   serviceKey: string;
   serviceName: string;
@@ -371,6 +374,7 @@ export interface OperatorServiceMembership {
 
 interface OperatorRoleRow {
   role: string;
+  scope_type?: string;
 }
 
 /**
@@ -389,11 +393,12 @@ export async function resolveOperatorServices(
   if (!userId) return [];
 
   const rows = (await dataSource.query(
-    `SELECT role
+    `SELECT role, scope_type
        FROM role_assignments
       WHERE user_id = $1
         AND is_active = true
         AND (role LIKE '%:admin' OR role LIKE '%:operator')
+        AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now())
       ORDER BY role`,
     [userId],
   )) as OperatorRoleRow[];
@@ -420,6 +425,7 @@ export async function resolveOperatorServices(
       scope,
       workspaceMode: capability.workspaceMode,
       workspaceAvailable: capability.operatorWorkspaceEnabled,
+      ...(rows.some(r=>r.scope_type===CENTRAL_DELEGATION_SCOPE && CENTRAL_OPERATION_ROLES.includes(r.role) && [`${resolveRolePrefixFromCanonicalServiceKey(serviceKey)}:admin`,`${resolveRolePrefixFromCanonicalServiceKey(serviceKey)}:operator`].includes(r.role)) ? {centralEntry:true} : {}),
     });
   }
   return result.sort((a, b) => (a.serviceKey < b.serviceKey ? -1 : a.serviceKey > b.serviceKey ? 1 : 0));

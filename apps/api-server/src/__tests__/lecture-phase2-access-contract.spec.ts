@@ -15,6 +15,7 @@ jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     get isInitialized() { return true; },
     query: jest.fn(async (_sql: string, params: any[] = []) => {
+      if (_sql.includes('account_status')) return [{account_status:'active',account_active:true,email_verified:true,membership_status:null}];
       const [userId, serviceKey] = params;
       return memberships
         .filter((m) => m.user_id === userId && m.service_key === serviceKey)
@@ -69,23 +70,23 @@ describe('Learner 층 — requireLectureLearner', () => {
     dbActive();
     expect((await run(requireLectureLearner, makeReq([], ACTIVE))).allowed).toBe(true);
   });
-  it('membership 없음 → 403 MEMBERSHIP_NOT_FOUND', async () => {
+  it('normal common account needs no separate learner membership', async () => {
     const r = await run(requireLectureLearner, makeReq([], []));
-    expect(r).toEqual({ allowed: false, status: 403, code: 'MEMBERSHIP_NOT_FOUND' });
+    expect(r.allowed).toBe(true);
   });
   it('JWT 는 active 이지만 DB 가 suspended → 403 MEMBERSHIP_NOT_ACTIVE (정지 즉시성)', async () => {
     dbSuspended();
     const r = await run(requireLectureLearner, makeReq([], ACTIVE));
     expect(r).toEqual({ allowed: false, status: 403, code: 'MEMBERSHIP_NOT_ACTIVE' });
   });
-  it('JWT 스냅샷이 inactive → 403 MEMBERSHIP_NOT_ACTIVE', async () => {
+  it('uses current database rather than an obsolete inactive learner snapshot', async () => {
     const r = await run(requireLectureLearner, makeReq([], SUSPENDED));
-    expect(r.code).toBe('MEMBERSHIP_NOT_ACTIVE');
+    expect(r.allowed).toBe(true);
   });
-  it('KPA / KCos / PH active membership 은 Lecture 학습 권한을 열지 않는다 (§15)', async () => {
+  it('unrelated roles do not matter for ordinary common-account learning', async () => {
     memberships.push({ user_id: 'u1', service_key: 'kpa-society', status: 'active' });
     const r = await run(requireLectureLearner, makeReq(['kpa:member'], [{ serviceKey: 'kpa-society', status: 'active' }]));
-    expect(r.code).toBe('MEMBERSHIP_NOT_FOUND');
+    expect(r.allowed).toBe(true);
   });
   it('platform:super_admin break-glass 는 통과', async () => {
     expect((await run(requireLectureLearner, makeReq(['platform:super_admin'], []))).allowed).toBe(true);

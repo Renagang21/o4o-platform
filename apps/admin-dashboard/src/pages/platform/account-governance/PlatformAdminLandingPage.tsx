@@ -2,8 +2,9 @@ import { Link } from 'react-router-dom';
 import { Users, UserCog, ArrowRight } from 'lucide-react';
 
 const CARDS = [
+  { icon: UserCog, title: '직영 통합 운영', description: '위임받은 직영 서비스의 회원·약국·강의·문의 업무를 처리합니다.', to: '/operations' },
   { icon: UserCog, title: '전체 관리자 계정', description: '관리자 계정을 조회하고 활성 상태를 관리합니다.', to: '/settings/admin-accounts' },
-  { icon: Users, title: '사용자 조회', description: '전체 계정 현황을 확인합니다. 서비스별 회원·이용 업무는 해당 서비스에서 처리합니다.', to: '/admin/platform/users' },
+  { icon: Users, title: '사용자 조회', description: '전체 계정 현황을 확인합니다. 직영 업무는 통합 운영, 독립 사업 업무는 해당 사업에서 처리합니다.', to: '/admin/platform/users' },
   { icon: UserCog, title: '서비스 관리자·운영자', description: '서비스별 관리자와 운영자를 지정하거나 권한을 해제합니다.', to: '/operators' },
 ];
 

@@ -1,5 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
+> **부분 SUPERSEDED (2026-10-28)**: 직영 운영 주체·지정 경로·화면 위치 및 일반 서비스 가입 조건은 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V2](O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) §1~6이 대체한다. §0의 기술 상태 확인 전용·서비스 Admin의 Operator 지정·서비스 호스트 운영 서술은 직영 범위에서 대체된다. 독립 사업·자기 업무·콘텐츠 경로·퇴역 계약·§9 실행 규칙과 그 밖의 유효한 계약은 유지한다. 아래 본문은 보존하며 새 정책의 구현 완료를 뜻하지 않는다.
+
 > **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
 
 

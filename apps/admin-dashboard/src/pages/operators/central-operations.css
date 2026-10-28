@@ -1,0 +1,96 @@
+/* Central adapters keep their own form styling; shared service hosts retain theirs. */
+.central-qualification button,
+.central-partner-operations .button {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: white;
+}
+.central-qualification button:disabled,
+.central-partner-operations button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.central-qualification textarea {
+  display: block;
+  width: 100%;
+  min-height: 100px;
+}
+.central-qualification textarea,
+.central-qualification select,
+.central-partner-operations input:not([type="checkbox"]),
+.central-partner-operations textarea,
+.central-partner-operations select {
+  max-width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px;
+  background: white;
+}
+.central-qualification nav,
+.central-partner-operations .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+.central-partner-operations .community-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 3fr);
+  gap: 24px;
+  align-items: start;
+  margin: 24px 0;
+}
+.central-partner-operations .panel {
+  min-width: 0;
+  padding: 20px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+.central-partner-operations .community-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.central-partner-operations .community-list-item,
+.central-partner-operations .community-comment {
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-wrap: anywhere;
+}
+.central-partner-operations .field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.central-partner-operations .community-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.central-partner-operations .community-check {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+}
+.central-partner-operations .community-operation {
+  border: 2px solid #31584a;
+  margin: 20px 0;
+}
+.central-partner-operations .hint {
+  font-size: 14px;
+  color: #475569;
+}
+.central-partner-operations .failure {
+  color: #b91c1c;
+}
+@media (max-width: 700px) {
+  .central-partner-operations .community-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
