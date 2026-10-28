@@ -8,7 +8,7 @@
 - 사용자 안내를 설치하기 → 받은 파일 열기 → 연결하기로 단축하고 버전·문제 해결은 접는다.
 - 배포 빌드가 ZIP과 함께 작은 `-setup.cmd` 파일·크기·SHA256을 생성한다. 브라우저가 설치 파일을 검증하고, 설치 파일은 고정 Main HTTPS ZIP 주소·크기·SHA256을 검증한 다음 압축 해제·기존 설치기를 실행한다.
 - 신규 데이터 생성 확인은 창의 예/아니요 버튼으로 제공한다. 자동 동의하지 않는다. 설치 후 설치된 프로그램을 실행한다. 웹 연결은 사용자 클릭에 의한 기존 grant·nonce·브라우저 권한 흐름이다.
-- 기존 ZIP·터미널 설치, 실행 중 설치 차단, 데이터·credential 보존, backup·schema·release identity 판정은 유지한다. 새 API·권한·DB·의존성·CI 설정은 없다.
+- 기존 ZIP·터미널 설치, 실행 중 설치 차단, 데이터·credential 보존, backup·schema·release identity 판정은 유지한다. 새 API·권한·DB·의존성은 없다. 기존 Windows job의 테스트 출력 형식만 spec으로 바꾸며 테스트·권한·gate·배포 경로는 바꾸지 않는다.
 - 기준: [설치 가이드](../guides/O4O-PC-CONNECTION-INSTALL-UPDATE-V1.md), [Assistant V2 §11](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md). 요청 기기와 실행 PC는 다르며 일반 대화·가능한 원격 실행에 로컬 설치를 강제하지 않는다.
 
 ## 검증
@@ -29,3 +29,5 @@
 ## Windows 실행 확인
 
 - 최초 branch CI `40774144411`의 Windows job FAIL. GitHub 로그 보관 호스트 접근 제한으로 전체 로그를 받지 못해, 합성 데이터만 쓰는 설치기 테스트에 제한 길이 실패 annotation을 추가했다. 이후 실행에서 원인을 확인하고 교정한다. 최초 실패는 완료 근거가 아니다.
+
+- `40774560743` Windows job도 FAIL. TAP가 stdout annotation을 주석으로 감싸 원인 출력이 check annotation에 나타나지 않아 기존 Windows 테스트 명령에 `--test-reporter=spec`을 지정했다. 테스트 자체나 판정·권한·배포 설정은 그대로다.
