@@ -14,7 +14,9 @@
 - [x] 44자 소개는 상세 설명에 보존, 사용자 승인 한국어 부제 ‘내 O4O 자료 활용과 작업 결과 저장’ 21자로 확정
 - [x] 사용자 승인: 영문명 O4O Service Connect·영문 부제 Use O4O data and save work 확정
 - [ ] 영문 base listing·한국어 번역·개발자 identity의 실제 포털 대조
-- [ ] MCP authentication reference로 정확한 auth 필드와 현재 서버 설정 검증
+- [x] 공식 문서 직접 HTTP 200 조회 복구, DCR auth 필드·공개 OAuth metadata 확인
+- [x] 개인 정보를 공개 Git에서 제외한 private draft ZIP 조립, 기본 길이·로고·archive 검사
+- [ ] 실제 업로드 후 publisher·MCP scan·도메인 검증, 전체 schema/포털 결과 확인
 - [x] 사용자 선택 반영: 앱 이름 ‘O4O 서비스 연결’, 소개 ‘ChatGPT에서 내 O4O 자료를 활용하고, 작업 결과를 O4O에 저장하세요.’
 - [x] 사용자 승인: 새 Neture N 로고를 변경 없이 사용 — [확정 PNG](../design/assets/neture-n-logo.png)
 - [x] 2026-10-28: 확정 이름·한 줄 소개에 맞춰 상세 소개와 이용 안내의 국·영문 검토안 작성

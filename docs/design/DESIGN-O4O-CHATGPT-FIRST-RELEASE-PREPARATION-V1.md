@@ -56,6 +56,14 @@
 - 기존 시험 5+3 명세를 전용 심사 계정으로 실행하고 영상·자료 유지 계획을 확정한다. 일반 관리자 권한을 제공하거나 인증을 약화하지 않는다.
 - 완성 자료와 scan 결과를 사용자에게 제시한 뒤 실제 심사 제출, 승인 후 별도 공개를 진행한다.
 
+### 2026-10-28 직접 접속 복구와 업로드 초안
+
+이후 공식 auth·package·submission 문서의 HTTPS 조회가 HTTP 200으로 성공했다. package 안내의 MCP auth 절에서 auth.type=oauth·client.mode=dcr·baseScopes와 discovery 사용 형식을 직접 확인했다. 공개 운영 OAuth metadata도 GET 200으로 issuer·authorize/token/register·read/draft scope·S256·RFC 9207을 확인했다. 실제 로그인·연결 발급이나 업무 데이터 접근은 하지 않았다. JSON schema 호스트 agent-plugins.org 직접 조회는 아직 CONNECT 403이므로 전체 schema validation 통과로 주장하지 않는다.
+
+사용자 화면에서 업로드 창의 Individual developer identity 선택을 확인했다. 선택한 신원은 개인 정보이므로 공개 Git에는 기록하지 않는다. 승인된 이름·부제·소개·로고와 합성 정상5/거부3 명세, DCR MCP 선언을 포함한 private draft ZIP을 저장소 밖 `/workspace/o4o-registration-private/`에 조립했다. 파일은 루트 plugin.json·mcp.json·assets/logo.png이며 client credential·심사 계정 자격정보·가짜 영상 URL은 넣지 않았다. 개발자 표시명이 포털 identity와 정확히 일치하는지는 업로드 후 확인한다.
+
+문구 길이·도구 예시 수·아이콘 크기/용량·ZIP integrity는 검사했다. 공개 URL의 제출자 정합, 실제 도구 scan·도메인 challenge·전용 심사 계정 및 5+3 실행·영상·국가 선택은 남아 있다. 현재 자료는 초안 업로드를 위한 준비물이며 실제 업로드·심사 제출·공개를 완료하지 않았다. ZIP을 공개 Git에 올려 다운로드 문제를 해결하지 않는다.
+
 ## 3. 첫 출시 목표와 서버 정합 조건
 
 첫 출시 문안은 약국 상품·자료 조회와 비공개 초안 저장·수정에 한정한다. 공급자·조합·커뮤니티·상품별 다국어 페이지·메일 기능은 첫 출시의 검증 완료 기능으로 소개하지 않는다.
