@@ -17,7 +17,7 @@ function test(name, options, run) {
  return nodeTest(name,options,async(t)=>{
   try{return await run(t);}catch(error){
    if(process.env.GITHUB_ACTIONS==='true'){
-    const message=(String(error.stack||error)+'\n'+String(error.stderr||'')).slice(0,5000).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
+    const message=(String(error.stack||error)+'\n'+String(error.stderr||'')+'\n'+String(error.stdout||'')).slice(0,5000).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
     console.log('::error title=PC installer test::'+name+': '+message);
    }
    throw error;

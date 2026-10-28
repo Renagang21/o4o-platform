@@ -72,6 +72,7 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'INSTALL_NOT_COMPLETED' }
   Write-Host '원래 화면으로 돌아가 연결하기를 눌러 주세요.'
 } catch {
+  if ($env:GITHUB_ACTIONS -eq 'true') { Write-Host ('O4O_SETUP_ERROR: ' + $_.Exception.Message) }
   Write-Host '설치를 마치지 못했습니다. 인터넷 연결과 열린 PC 연결 프로그램을 확인한 뒤 다시 설치해 주세요.'
   exit 1
 } finally {
