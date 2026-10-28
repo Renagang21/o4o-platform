@@ -2,9 +2,9 @@
 
 - 상태: ACTIVE
 - 작성일: 2026-10-28
-- 기준 main: `7322f3897d`
+- 최초 기준 main: `7322f3897d` · 후속 통합 기준: `188da14235` (#867)
 - 범위: 구현·문서 정합·검증·PR CI/리뷰 완료 후 main 병합 전 인계. 병합·배포 미실행.
-- 정책: [역할별 업무공간 §5](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 모듈 변경](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
+- 정책: [운영 책임·일반 가입 V2](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md), [V1의 유효한 경계](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 모듈 변경](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
 
 ## 실행 TODO
 
@@ -24,7 +24,7 @@ commit/push·PR 생성·필수 CI·Codex 리뷰 지적 보완·최종 HEAD 검�
 
 ## 유지 경계
 
-현재 community는 자체 서비스 회원과 Admin/Operator가 운영하는 독립서비스다.
+현재 community는 독립서비스 저장 경계를 유지한다. V2에 따라 일반 참여는 공통 계정을 사용하며 직영 운영은 중앙 위임·업무별 권한으로 구분한다.
 폐기된 업종별 카탈로그·개별 community 가입/개설 모델을 복구하지 않는다.
 기존 Forum 공통 컴포넌트·사업 회원 공간·펀딩·소유 게시판 관리·내 글은 재사용한다.
 과거 DB 테이블·migration·보안상 retired 원장 차단·운영 삭제 증거는 이 코드 정리로 삭제하지 않는다.

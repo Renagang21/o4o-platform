@@ -1,7 +1,8 @@
 /**
  * 운영자 역할 카탈로그 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §16
  *
- * 운영 역할의 조회·위임·회수에 사용하는 서버 카탈로그다. 중앙의 신규 초대는 아래 Admin 전용 allowlist로 제한한다.
+ * 운영 역할의 조회·위임·회수에 사용하는 서버 카탈로그다. 직영 중앙 위임은 중앙 허용 목록을,
+ * 독립 서비스 지정은 기존 Admin allowlist를 사용한다(resolvePlatformInvitationRole).
  * 종전에는 이 목록이 admin-dashboard `OperatorsPage.ASSIGNABLE_ROLES` 에만 있어서
  * 서버가 임의 role 문자열을 그대로 받았다. 부여 계약이 Identity 계약이 된 이상
  * 서버가 스스로 판정해야 한다(프런트 신뢰 금지).

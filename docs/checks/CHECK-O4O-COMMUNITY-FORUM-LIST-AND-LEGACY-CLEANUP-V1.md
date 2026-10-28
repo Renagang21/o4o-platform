@@ -2,7 +2,7 @@
 
 - 상태: ACTIVE
 - 작성일: 2026-10-28
-- 기준 main: `7322f3897d`
+- 최초 기준 main: `7322f3897d` · 후속 통합 기준: `188da14235` (#867)
 - 작업: [TODO](../work-orders/TODO-O4O-COMMUNITY-FORUM-LIST-AND-LEGACY-CLEANUP-V1.md)
 - 현행 안내·삭제 판정: [가이드](../guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md)
 - 종료 범위: main 병합 전. 배포·운영 데이터 변경 미실행.
@@ -56,3 +56,14 @@ DB 테이블·migration·운영 삭제 도구·법정/감사 자료는 삭제하
 운영 가입·승인·글쓰기·중재·초기 콘텐츠 게시 및 AI 호출은 수행하지 않았다.
 주문 상세·출고·공급자 격리의 앞선 보류 검수는 이 작업으로 다시 열지 않는다.
 main 미병합 상태에서는 후속 통합을 위해 전용 branch/worktree를 보존한다.
+
+## 최신 main 반영
+
+개발 중 #867의 통합 회원·중앙 운영 정책이 main에 반영되어 충돌 없이 정상 merge했다.
+운영 책임과 일반 가입 안내를 V2에 맞춰 보완했다. 일반 커뮤니티 참여에는 별도 가입 승인 일괄 조건을 붙이지 않고,
+명시적 서비스 제재·사업/조직·전문 자격·운영 API membership은 기존 서버 계약을 유지한다.
+중앙 Google·직영 위임과 단순 서비스 역할은 구분한다. #867의 migration/lockfile은 이미 main에 속한 변경으로
+이번 PR의 추가 변경이 아니며, 운영 실행은 수행하지 않았다. 최신 main 반영 후 Neture 전체 169개 파일 / 1,439 tests, TypeScript·production build,
+API 계약 3 suites / 29 tests, 콘솔 채택 6 tests가 다시 통과했다.
+브라우저 검증한 ForumPage·forumApi·shared-space-ui·ui 소스는 통합 전후 차이 0이다.
+최종 PR CI·리뷰 결과는 최신 HEAD의 PR 설명에 기록한다.
