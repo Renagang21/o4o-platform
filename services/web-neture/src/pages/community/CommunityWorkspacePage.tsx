@@ -1,6 +1,5 @@
 import { cooperationDestination } from '@o4o/shared-space-ui';
 import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
-import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
 import CommunityPublicReadManager from './CommunityPublicReadManager';
@@ -31,13 +30,14 @@ export interface CommunityWorkspace {
   reason: string | null;
 }
 
-function membershipMessage(status: string | null): string {
+function membershipMessage(status: string | null, authenticated: boolean): string {
   const messages: Record<string, string> = {
-    pending: '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.',
     suspended: '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.',
     withdrawn: '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.',
   };
-  return messages[status ?? ''] ?? '커뮤니티 서비스에 가입 신청하고 운영자 승인 후 참여할 수 있습니다.';
+  return messages[status ?? ''] ?? (authenticated
+    ? '커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주세요.'
+    : '공통 계정으로 로그인하면 커뮤니티에 참여할 수 있습니다.');
 }
 
 type WorkspaceView = 'hub' | 'posts' | 'write' | 'post' | 'mine' | 'request' | 'owned' | 'members';
@@ -50,7 +50,6 @@ function Workspace({ view }: { view: WorkspaceView }) {
   const { communityKey = 'community' } = useParams();
   const nativeBusiness = CURRENT_HOST_PROFILE === 'carepharm' && communityKey === 'business:carepharm';
   const { user, isAuthenticated } = useAuth();
-  const agreement = useServiceEnrollmentPolicies('community', async () => nativeBusiness ? [] : (await api.get('/public/services/community/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${communityKey}`);
   const navigate = useNavigate();
   const location = useLocation();
   const [moveRetry, setMoveRetry] = useState(0);
@@ -92,14 +91,6 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {!workspace.businessKey && <><p>사업 정보를 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.</p><button type="button" onClick={() => setVersion(n => n + 1)}>사업 정보 다시 확인</button></>}
   </section>;
 
-  const join = async () => {
-    if (nativeBusiness || communityKey !== 'community' || workspace?.kind !== 'independent') return;
-    if (!agreement.ready || busy) return;
-    setBusy(true); setError('');
-    try { await api.post('/communities/join', { policyReferences: agreement.references }); setVersion(v => v + 1); }
-    catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code)) agreement.reload(); setError(e.response?.data?.error || '가입 신청에 실패했습니다. 내 프로필의 닉네임과 이용 상태를 확인해 주세요.'); }
-    finally { setBusy(false); }
-  };
   const createBoard = async () => {
     setBusy(true); setError('');
     try {
@@ -116,10 +107,8 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {workspace && (!nativeBusiness || nativeAccess) && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
       {!nativeBusiness && <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>}
-      <p className="my-4">{membershipMessage(workspace.membershipStatus)}</p>
+      <p className="my-4">{nativeBusiness ? '이 사업의 참여 자격을 확인할 수 없습니다. 해당 사업 운영자에게 문의해 주세요.' : membershipMessage(workspace.membershipStatus, isAuthenticated)}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
-      {!nativeBusiness && workspace.canJoin && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
-      {!nativeBusiness && workspace.canJoin && <button type="button" disabled={busy || !agreement.ready} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}
       {workspace.reason === 'ACCOUNT_NOT_ACTIVE' && <Link to="/mypage">내 계정 확인</Link>}
     </section>}
     {nativeBusiness && nativeAccess && !workspace?.allowed && <Link to="/my/participation">서비스 참여 신청 · 상태 확인</Link>}

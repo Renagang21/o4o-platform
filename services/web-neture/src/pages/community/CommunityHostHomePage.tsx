@@ -191,7 +191,7 @@ export default function CommunityHostHomePage() {
                   to="/communities/community/forum"
                   className="font-medium text-emerald-700 underline"
                 >
-                  로그인·가입 및 이용 상태 확인
+                  로그인·이용 자격 확인
                 </Link>{" "}
                 후 이용해 주세요.
               </aside>

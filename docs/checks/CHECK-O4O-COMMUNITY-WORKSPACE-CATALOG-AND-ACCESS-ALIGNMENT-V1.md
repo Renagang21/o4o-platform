@@ -1,5 +1,8 @@
 # CHECK-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [커뮤니티 현행 구현 안내](../guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md) · **표기일**: 2026-10-28
+> 업종별 카탈로그·개별 커뮤니티 가입/운영 모델은 현행 요구사항이 아니다. 아래 상태·본문·실행 결과는 당시 이력으로 보존하며, 재사용되는 공통 기능은 대체 문서의 판정을 따른다.
+
 > **WO**: `WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1` (실행본 §1–§43, 사용자 확정 · 2026-09-16)
 > **일자**: 2026-09-16 · **기준 main**: `68c18634a` (Service Operator CLOSED 이후 · fresh census)
 > **성격**: Community Identity ≠ Service Identity 분리 · Community Catalog(SSOT 1, 초기 3) · 참여 자격 resolver · 공통 Forum Core 의 communityKey 컨텍스트 채택 · Industry Community 폐기. 새 테이블 0 · migration 0 · schema 변경 0 · 새 membership 테이블 0 · policy engine 0 · Forum/Content/Resources/LMS Core 복제 0 · RBAC 변경 0 · 프로덕션 write 0.
