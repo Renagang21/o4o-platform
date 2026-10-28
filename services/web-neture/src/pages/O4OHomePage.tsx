@@ -16,7 +16,7 @@ import { UserCircle, Loader2, ArrowUp, Plus, Paperclip, HardDrive, FileText, Ima
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
-import { nextResumeAnchor, type ResumeAnchor, type WorkAgentResult } from '../lib/ai/work-agent';
+import { nextResumeAnchor, requiresPcSetup, type ResumeAnchor, type WorkAgentResult } from '../lib/ai/work-agent';
 import {
   addPendingAttachments,
   sendUnifiedRequest,
@@ -31,6 +31,7 @@ import { NetureMembershipNotice } from '../components/home/NetureMembershipNotic
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
 import PharmacyOrderPanel from '../components/home/PharmacyOrderPanel';
+import AutomationPcSetup from '../components/home/AutomationPcSetup';
 import AutomationDataMaintenance from '../components/home/AutomationDataMaintenance';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../lib/footerLegal';
@@ -90,6 +91,12 @@ export default function O4OHomePage() {
   const [workResult, setWorkResult] = useState<WorkAgentResult | null>(null);
   const [confirm, setConfirm] = useState<{ text: string; message: string } | null>(null);
   const [resumeAnchor, setResumeAnchor] = useState<ResumeAnchor | null>(null);
+  const [pcSetup, setPcSetup] = useState<{ context: string; request: { text: string; routeHint?: 'work' } | null } | null>(null);
+  const setupContext = JSON.stringify([user?.id, workScope]);
+  const setupContextRef = useRef(setupContext);
+  setupContextRef.current = setupContext;
+  useEffect(() => { setPcSetup(null); }, [setupContext]);
+  const activePcSetup = pcSetup?.context === setupContext ? pcSetup : null;
   const [attachmentsUsed, setAttachmentsUsed] = useState<{ name: string; kind: string; readable: boolean }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const plusMenuRef = useRef<HTMLDivElement>(null);
@@ -138,6 +145,7 @@ export default function O4OHomePage() {
     setWorkResult(null);
     setConfirm(null);
     setResumeAnchor(null);
+    setPcSetup(null);
     setMaintenanceOpen(false);
     setManualReferencesUsed([]);
     setManualSearchEmpty(false);
@@ -151,7 +159,6 @@ export default function O4OHomePage() {
       prevUserIdRef.current = userId;
       resetAiState();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
   useEffect(() => {
     if (!accountMenuOpen && !plusMenuOpen) return;
@@ -210,6 +217,7 @@ export default function O4OHomePage() {
       return;
     }
     setPending(true);
+    setPcSetup(null);
     setMaintenanceOpen(false);
     setError(null);
     setQuestion(text);
@@ -222,6 +230,7 @@ export default function O4OHomePage() {
     setOpenedSite(null);
     setLoginReady(false);
     const gen = aiGenRef.current;
+    const requestContext = setupContext;
     const anchor = resumeAnchor;
     const runId = anchor?.runId;
     const resumeTargetId = anchor?.targetId ?? undefined;
@@ -236,6 +245,14 @@ export default function O4OHomePage() {
         // 실행하지 않았다. 입력 · 첨부는 그대로 두고 [진행] 을 기다린다.
         setConfirm({ text, message: result.confirm.message });
         return;
+      }
+      if (result.kind === 'work' && requiresPcSetup(result.work)) {
+        if (setupContextRef.current !== requestContext) return;
+        setWorkResult(result.work);
+        setResumeAnchor(nextResumeAnchor(anchor, result.work));
+        setInput(text);
+        setPcSetup({ context: requestContext, request: { text, routeHint } });
+        return; // Keep attachments/draft; never replay automatically after installation.
       }
       setManualReferencesUsed(manualReferences);
       if (manualReferences.length) void manuals.used(manualReferences);
@@ -429,7 +446,13 @@ export default function O4OHomePage() {
         </div>
       </form>
 
-      {canUseHomeWorkspace && <PharmacyOrderPanel key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} />}
+      {canUseHomeWorkspace && <div className="mt-3 w-full max-w-xl text-left">
+        <button type="button" disabled={blocked} onClick={() => setPcSetup({ context: setupContext, request: null })} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">PC 연결 준비</button>
+      </div>}
+      {canUseHomeWorkspace && activePcSetup && <AutomationPcSetup key={`pc-setup:${setupContext}`} disabled={blocked} hasRequest={!!activePcSetup.request} canContinue={!!trimmed}
+        onClose={() => setPcSetup(null)}
+        onContinue={() => { const request = activePcSetup.request; if (request) void submit(trimmed, trimmed === request.text ? request.routeHint : undefined); }} />}
+      {canUseHomeWorkspace && <PharmacyOrderPanel key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} onPcSetup={() => setPcSetup({ context: setupContext, request: null })} />}
       {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
       {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
       {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}
@@ -516,7 +539,7 @@ export default function O4OHomePage() {
             </div>
           )}
           {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome/프로그램에 그대로 있다. */}
-          {workResult && !pending && (
+          {workResult && !pending && !activePcSetup && (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800" data-testid="home-composer-work-result">
               <p className="m-0 whitespace-pre-wrap">{workResult.message}</p>
               <p className="m-0 mt-2 text-xs text-slate-500">
@@ -524,7 +547,7 @@ export default function O4OHomePage() {
                 {workResult.takeover ? ` · 인계 사유 ${workResult.takeover.reason}` : ''}
                 {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
               </p>
-              {workResult.progress === 'needs_user' && !workResult.resumable && (
+              {workResult.progress === 'needs_user' && !workResult.resumable && !requiresPcSetup(workResult) && (
                 <p className="m-0 mt-2 text-sm text-slate-700">
                   {workResult.target?.targetType === 'windows_app'
                     ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
