@@ -298,5 +298,6 @@ it("새 댓글 작성 중 재조회 버튼은 기존 작성 요청을 방해하�
     (screen.getByPlaceholderText("댓글을 입력하세요...") as HTMLTextAreaElement)
       .value,
   ).toBe("");
+  expect(screen.getByText("새 댓글", { exact: true })).toBeTruthy();
   expect((retry as HTMLButtonElement).disabled).toBe(false);
 });

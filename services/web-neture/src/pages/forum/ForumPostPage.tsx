@@ -520,7 +520,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
         {/* Comments List — 인라인 수정/삭제는 공통 부품이 제공, mutation 은 서비스 adapter 소유 */}
         {commentsLoading && <p role="status">댓글을 불러오는 중입니다…</p>}
         {commentsLoadError && <div role="alert"><p>댓글을 불러오지 못했습니다.</p><button type="button" disabled={mutationBusy || commentsLoading} onClick={() => post && void loadComments(post.id, beginLoad())}>댓글 다시 불러오기</button></div>}
-        {!commentsLoading && !commentsLoadError && <ForumCommentList
+        {!commentsLoading && (!commentsLoadError || comments.length > 0) && <ForumCommentList
           comments={comments.map((c) => ({
             id: c.id,
             authorName: c.authorName,
