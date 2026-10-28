@@ -1,6 +1,6 @@
 # WO-O4O-UNIFIED-MEMBERSHIP-ADMIN-REFACTOR-V1
 
-> **상태**: ACTIVE · 구현·로컬 검증 완료 후 PR/CI 인계 준비
+> **상태**: COMPLETED · 개발·로컬 검증·commit/push 및 PR 인계 범위. main 미병합
 > **작성일**: 2026-10-28 · **최종 갱신**: 2026-10-28 (Asia/Seoul)
 > **기준**: [운영 책임 V2](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) · 사용자 전체 구현 지시 및 수동 약사 자격 승인 결정
 > **실행 경계**: 하나의 TODO·개발 브랜치. main 병합·운영 DB 변경·migration 운영 적용·배포 없음.
@@ -21,7 +21,8 @@
 - [x] 관련 UI 소비처 테스트·빌드, PC/모바일 합성 browser 검증.
 - [x] forward migration 2개 준비, 임시 DB 전체 적용·재실행·fingerprint·status 검증.
 - [x] 정본·코드 정합, 미결 정책·운영 적용 영향 기록.
-- [ ] 최종 범위 검사·commit·push, 최신 main 통합 후 PR/CI 결과 기록 및 main 병합 전 인계.
+- [x] 범위 검사·commit·push, 최신 main을 작업 브랜치에 반영하고 PR #867 생성.
+- [x] 자동 리뷰 지적 2건 수정 및 회귀 검증·스레드 정리. CI Gate의 현재 상태는 아래 PR에서 확인하고 main 병합 전 인계.
 
 ## 구현과 재사용
 
@@ -63,10 +64,22 @@ forward migration만 추가했다. 과거 migration·baseline·기존 fingerprin
 
 - PostgreSQL 권한·자격 통합 검증 22 tests 통과(실제 TypeORM writer 포함): 일반 역할의 중앙 자동 승격 거부, 독립 역할 제외, 복수 위임·부분 회수·membership 제재·기간 만료, 약사 직원의 선택 매장 경계, 자격 신청·반려·재신청·승인·취소, 자기 승인·중복 면허·오래된 버전·정지 계정 승인 차단, 면허 변경 무효화.
 - migration: 새 canonical bootstrap+49 incremental 전체 적용, 재실행 no-op, status-only `DB_WRITES=0`, 최종 fingerprint `0834c1f1d5911e4a12ef86b24997a4b3038685d46821edfcc99020802fd0a986`(7,344행) 일치. migration contract 21 pass / 0 fail. fingerprint 첫 수집 시 UNREGISTERED 거부를 확인하고 실제 값 등록 후 별도 빈 DB에서 재검증했다.
-- API 관련 회귀 26 suites / 372 tests 통과(추가 fixture 미제공 조건부 4 suites / 132 tests 제외). 이후 약국 계약·관리자 조회·실DB 자격 검증 4 suites / 152 tests 통과. 정식 role writer 회귀 5 suites / 57 tests도 통과했다. 전체 API suite에서 새 자격 검사가 추가된 계약·태블릿의 기존 정상 owner fixture 2건을 발견해 승인 자격을 명시하고 각각 재검증했다. 전체 suite 및 PR/CI 결과는 최종 인계에 추가한다.
+- API 관련 회귀 26 suites / 372 tests 통과(추가 fixture 미제공 조건부 4 suites / 132 tests 제외). 이후 약국 계약·관리자 조회·실DB 자격 검증 4 suites / 152 tests 통과. 정식 role writer 회귀 5 suites / 57 tests도 통과했다. 전체 API suite를 실행하면서 기존 owner fixture의 자격 누락과 관리자 guard 인벤토리를 발견해 보완했다. 최초 전체 실행은 599 suites 통과 / 12 실패 / 66 제외(개발 중 소스 변경 전 결과 포함)였고, 수정된 안정 소스에서 실패했던 12 suites / 280 tests를 모두 재실행해 통과했다. 단일 최신 HEAD 전체 실행의 최종 판정은 PR의 CI 3 shards를 따른다. 제외된 DB·실사용 fixture 시나리오를 통과로 계산하지 않았다.
 - Admin 44 files / 525 tests 통과. Neture 167 files / 1,423 tests와 새 본인 자격 UI 3 tests 통과. shared operator UI 30 files / 217 tests, Partner 7 files / 92 tests, Lecture 20 files / 83 tests 통과.
 - API·Admin typecheck, Admin·Neture·Partner·Lecture production build 통과. 기존 chunk 크기/Browserslist 경고는 유지한다.
 - Chromium 합성 API browser: PC 1,440px·모바일 390px에서 중앙 진입·타 업무 직접 URL 차단·실시간 회수·전체 관리자 영역 차단·면허 근거/사유를 포함한 승인 동작 6 tests 통과. 개발 서버 파일 갱신 중 navigation abort가 한 번 발생하여 갱신 종료 후 재실행했다. 실제 SSO·cookie cross-domain 왕복을 검증한 것은 아니다.
+
+## PR·리뷰·인계
+
+[PR #867](https://github.com/Renagang21/o4o-platform/pull/867) · 브랜치 `wo/unified-membership-admin`. `7322f3897dfbdfb57f49ce0d67b1bdfb02c071ee`까지 main의 독립 변경을 충돌 없이 이 개발 브랜치에 반영했다. main 브랜치 변경은 아니다.
+
+- 최초 리뷰의 공급자 `activationReady` 오해는 수정했다. 이 값은 프로필 보완 안내로만 사용하고 실제 승인은 기존 서버의 사업자 정보·증빙 조건이 결정한다. 불완전 연락처 프로필의 승인 버튼/요청 회귀 검증을 추가했다.
+- 60초/focus 중앙 위임 재검증 시 동일 사용자의 업무 폼을 유지하고, 실제 위임 거부·인증 실패·사용자 변경에만 해당 업무를 제거한다. 작성 중 사유 보존·회수 후 제거 테스트를 추가했다.
+- 서비스 역할까지 true인 공유 `isAdmin` 표시 값을 중앙 진입에 쓰지 않고, 초기 `/`·로그인 복귀는 정확한 `platform:super_admin` 여부로 전체 관리자/중앙 작업공간을 구분한다. 실제 브라우저의 대표 진입도 검증했다.
+- 관리자 중앙 진입 API는 별도 인가 미들웨어로 보호하여 앞으로 추가되는 endpoint도 같은 검사를 상속한다. 인벤토리 예외 추가·검사 완화는 하지 않았다.
+- 수정 source의 ESLint 오류 0, 문서 민감정보·상대 링크·whitespace·stage 범위 검사 통과. 기존 무관한 경고 baseline은 변경하지 않았다.
+- 현재 HEAD의 required `CI Gate`, CodeQL, Codex 최신 검토 상태는 PR의 Checks/Review를 정본으로 확인한다. 이 문서는 향후 바뀌는 CI 상태를 고정 성공으로 복제하지 않는다. 리뷰 보완은 같은 branch/PR에서만 수행한다.
+- 격리 PostgreSQL fixture는 검증 종료 후 완전 제거한다. 운영 계정·데이터·credential에는 변경이 없다. 작업 worktree/branch는 main 미병합이므로 KEEP이다. 통합 담당의 별도 지시 없이 병합·auto-merge·배포·운영 migration을 하지 않는다.
 
 ## 미결 사업 정책·범위 밖
 
