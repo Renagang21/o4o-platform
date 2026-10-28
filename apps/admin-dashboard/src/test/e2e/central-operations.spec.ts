@@ -156,6 +156,38 @@ for (const viewport of [
         ),
       ).toBe(true);
     });
+    test("opens a delegated course detail route with its fixed courses area", async ({
+      page,
+    }) => {
+      await fixture(page, ["lecture:operator"]);
+      await page.route(
+        "**/api/v1/lms/operator/courses/synthetic-course/review",
+        (route) =>
+          route.fulfill({
+            json: {
+              success: true,
+              data: {
+                course: {
+                  title: "합성 강의 검토",
+                  description: "심사 자료",
+                  status: "pending",
+                  isPaid: false,
+                  requiresApproval: false,
+                },
+                curriculum: [],
+              },
+            },
+          }),
+      );
+      await page.goto("/operations/lecture/courses/synthetic-course");
+      await expect(
+        page.getByRole("heading", { name: "합성 강의 검토" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "강의 심사 목록" }),
+      ).toBeVisible();
+      await expect(page.locator("main [role=alert]")).toHaveCount(0);
+    });
     test("service roles alone cannot enter the central or platform administration", async ({
       page,
     }) => {

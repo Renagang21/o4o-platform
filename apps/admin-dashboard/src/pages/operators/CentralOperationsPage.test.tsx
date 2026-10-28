@@ -21,9 +21,12 @@ vi.mock("@o4o/auth-context", () => ({
   }),
 }));
 vi.mock("@o4o/operator-core-ui/modules/members", () => ({
-  ServiceMembersWorkspace: ({ serviceKey }: any) => (
+  ServiceMembersWorkspace: ({ serviceKey, userId }: any) => (
     <div>
-      <p>members:{serviceKey}</p>
+      <p>
+        members:{serviceKey}
+        {userId ? `:${userId}` : ""}
+      </p>
       <input aria-label="작성 중" />
     </div>
   ),
@@ -40,6 +43,9 @@ vi.mock("@o4o/operator-core-ui", () => ({
 vi.mock("@o4o/operator-core-ui/modules/pharmacy-management", () => ({
   PharmacyMembershipReviewPage: () => null,
 }));
+vi.mock("./CentralLectureReview", () => ({
+  default: ({ courseId }: any) => <p>course:{courseId}</p>,
+}));
 import CentralOperationsPage from "./CentralOperationsPage";
 afterEach(() => {
   cleanup();
@@ -50,6 +56,14 @@ function view(path = "/operations") {
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/operations" element={<CentralOperationsPage />} />
+        <Route
+          path="/operations/:serviceKey/courses/:courseId"
+          element={<CentralOperationsPage />}
+        />
+        <Route
+          path="/operations/:serviceKey/members/:userId"
+          element={<CentralOperationsPage />}
+        />
         <Route
           path="/operations/:serviceKey/:area"
           element={<CentralOperationsPage />}
@@ -101,4 +115,35 @@ it("preserves unsaved work during successful background delegation checks and re
     "유효한 업무 위임",
   );
   expect(screen.queryByLabelText("작성 중")).toBeNull();
+});
+
+it.each([
+  [
+    "/operations/supplier/members/synthetic-member",
+    "supplier:operator",
+    "members:supplier:synthetic-member",
+  ],
+  [
+    "/operations/lecture/courses/synthetic-course",
+    "lecture:operator",
+    "course:synthetic-course",
+  ],
+])(
+  "resolves the fixed business area of detail route %s",
+  async (path, role, content) => {
+    mock.get.mockResolvedValueOnce({ data: { data: { roles: [role] } } });
+    view(path);
+    expect(await screen.findByText(content)).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+  },
+);
+it("does not let a detail-route area bypass service delegation", async () => {
+  mock.get.mockResolvedValueOnce({
+    data: { data: { roles: ["supplier:operator"] } },
+  });
+  view("/operations/lecture/courses/synthetic-course");
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "위임되지 않은 업무",
+  );
+  expect(screen.queryByText("course:synthetic-course")).toBeNull();
 });

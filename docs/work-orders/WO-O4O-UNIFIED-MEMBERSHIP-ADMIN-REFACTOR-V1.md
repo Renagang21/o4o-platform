@@ -22,7 +22,7 @@
 - [x] forward migration 2개 준비, 임시 DB 전체 적용·재실행·fingerprint·status 검증.
 - [x] 정본·코드 정합, 미결 정책·운영 적용 영향 기록.
 - [x] 범위 검사·commit·push, 최신 main을 작업 브랜치에 반영하고 PR #867 생성.
-- [x] 자동 리뷰 지적 2건 수정 및 회귀 검증·스레드 정리. CI Gate의 현재 상태는 아래 PR에서 확인하고 main 병합 전 인계.
+- [x] 자동 리뷰 지적 3건 수정 및 회귀 검증·스레드 정리. CI Gate의 현재 상태는 아래 PR에서 확인하고 main 병합 전 인계.
 
 ## 구현과 재사용
 
@@ -67,7 +67,7 @@ forward migration만 추가했다. 과거 migration·baseline·기존 fingerprin
 - API 관련 회귀 26 suites / 372 tests 통과(추가 fixture 미제공 조건부 4 suites / 132 tests 제외). 이후 약국 계약·관리자 조회·실DB 자격 검증 4 suites / 152 tests 통과. 정식 role writer 회귀 5 suites / 57 tests도 통과했다. 전체 API suite를 실행하면서 기존 owner fixture의 자격 누락과 관리자 guard 인벤토리를 발견해 보완했다. 최초 전체 실행은 599 suites 통과 / 12 실패 / 66 제외(개발 중 소스 변경 전 결과 포함)였고, 수정된 안정 소스에서 실패했던 12 suites / 280 tests를 모두 재실행해 통과했다. 단일 최신 HEAD 전체 실행의 최종 판정은 PR의 CI 3 shards를 따른다. 제외된 DB·실사용 fixture 시나리오를 통과로 계산하지 않았다.
 - Admin 44 files / 525 tests 통과. Neture 167 files / 1,423 tests와 새 본인 자격 UI 3 tests 통과. shared operator UI 30 files / 217 tests, Partner 7 files / 92 tests, Lecture 20 files / 83 tests 통과.
 - API·Admin typecheck, Admin·Neture·Partner·Lecture production build 통과. 기존 chunk 크기/Browserslist 경고는 유지한다.
-- Chromium 합성 API browser: PC 1,440px·모바일 390px에서 중앙 진입·타 업무 직접 URL 차단·실시간 회수·전체 관리자 영역 차단·면허 근거/사유를 포함한 승인 동작 6 tests 통과. 개발 서버 파일 갱신 중 navigation abort가 한 번 발생하여 갱신 종료 후 재실행했다. 실제 SSO·cookie cross-domain 왕복을 검증한 것은 아니다.
+- Chromium 합성 API browser: PC 1,440px·모바일 390px에서 중앙 진입·타 업무 직접 URL 차단·실시간 회수·전체 관리자 영역 차단·면허 근거/사유를 포함한 승인·강의 상세 진입 동작 8 tests 통과. 개발 서버 파일 갱신 중 navigation abort가 한 번 발생하여 갱신 종료 후 재실행했다. 실제 SSO·cookie cross-domain 왕복을 검증한 것은 아니다.
 
 ## PR·리뷰·인계
 
@@ -77,6 +77,7 @@ forward migration만 추가했다. 과거 migration·baseline·기존 fingerprin
 - 60초/focus 중앙 위임 재검증 시 동일 사용자의 업무 폼을 유지하고, 실제 위임 거부·인증 실패·사용자 변경에만 해당 업무를 제거한다. 작성 중 사유 보존·회수 후 제거 테스트를 추가했다.
 - 서비스 역할까지 true인 공유 `isAdmin` 표시 값을 중앙 진입에 쓰지 않고, 초기 `/`·로그인 복귀는 정확한 `platform:super_admin` 여부로 전체 관리자/중앙 작업공간을 구분한다. 실제 브라우저의 대표 진입도 검증했다.
 - 관리자 중앙 진입 API는 별도 인가 미들웨어로 보호하여 앞으로 추가되는 endpoint도 같은 검사를 상속한다. 인벤토리 예외 추가·검사 완화는 하지 않았다.
+- 추가 리뷰에서 고정 상세 경로의 `:area` 누락을 확인했다. 회원/강의 상세 ID가 있는 경로의 업무 영역을 명시적으로 해석하고, 상세 진입·타 서비스 위임 차단 단위 테스트 및 PC/모바일 강의 상세 브라우저 검증을 추가했다.
 - 수정 source의 ESLint 오류 0, 문서 민감정보·상대 링크·whitespace·stage 범위 검사 통과. 기존 무관한 경고 baseline은 변경하지 않았다.
 - 현재 HEAD의 required `CI Gate`, CodeQL, Codex 최신 검토 상태는 PR의 Checks/Review를 정본으로 확인한다. 이 문서는 향후 바뀌는 CI 상태를 고정 성공으로 복제하지 않는다. 리뷰 보완은 같은 branch/PR에서만 수행한다.
 - 격리 PostgreSQL fixture는 검증 종료 후 완전 제거한다. 운영 계정·데이터·credential에는 변경이 없다. 작업 worktree/branch는 main 미병합이므로 KEEP이다. 통합 담당의 별도 지시 없이 병합·auto-merge·배포·운영 migration을 하지 않는다.

@@ -46,7 +46,9 @@ const memberApi = {
 export default function CentralOperationsPage() {
   const { isAuthenticated, isLoading, user, logout } = useAuth();
   const identityId = String(user?.id ?? "");
-  const { serviceKey, userId, area, courseId } = useParams();
+  const { serviceKey, userId, area: routeArea, courseId } = useParams();
+  const area =
+    routeArea ?? (courseId ? "courses" : userId ? "members" : undefined);
   const navigate = useNavigate();
   const [grant, setGrant] = useState<{
     userId: string;
