@@ -1,6 +1,6 @@
 # O4O ChatGPT 앱 첫 출시 준비
 
-> **상태**: DRAFT · **작성일**: 2026-10-27 · **최종 갱신**: 2026-10-27 (Asia/Seoul)
+> **상태**: DRAFT · **작성일**: 2026-10-27 · **최종 갱신**: 2026-10-28 (Asia/Seoul)
 > **사용자 지시**: 신원 인증 심사 중 등록 절차·문서를 정리하고 소개·로고·심사 자료를 준비한다. 첫 등록 이후 기능을 확장한다.
 > **범위**: 등록 준비 문안과 확인 목록. 실제 제출·심사 승인·공개·운영 변경의 완료 증거가 아니다.
 > **관련 기록**: [기존 준비 자료](DESIGN-O4O-CHATGPT-PUBLIC-SUBMISSION-PACK-V1.md) · [등록 TODO](../work-orders/TODO-O4O-CHATGPT-PUBLIC-SUBMISSION-V1.md) · [실사용 CHECK §9](../checks/CHECK-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md#9-운영-실제-chatgpt-최종-실사용-검증-2026-10-24)
@@ -69,13 +69,32 @@
 
 짧은 소개에는 사용자 표현을 사용하고, 저장 결과의 비공개 상태·사용자 검토·자동 게시 미지원은 상세 설명과 저장 안내에 명시한다. 소개 문구 변경으로 실제 제공 도구나 첫 출시 범위를 확대하지 않는다.
 
-### 한국어 설명
+### 한국어 상세 소개 — 2026-10-28 검토안
 
-O4O 서비스 연결은 ChatGPT에서 사용자가 허용한 약국 작업공간의 상품과 참고 자료를 찾고, 작성한 내용을 O4O의 비공개 초안으로 저장·수정하도록 돕습니다. 기존 O4O 계정으로 로그인하고 이용할 약국과 조회·저장 권한을 선택하세요. 저장한 초안은 O4O 편집 화면에서 검토하고 계속 작업할 수 있습니다. 콘텐츠 자동 게시·상품 정본 변경·주문·결제·개인별 진단이나 복약 결정은 제공하지 않습니다. 환자·고객 식별정보나 개인 건강정보를 요청문과 자료에 포함하지 마세요. 연결은 O4O 내 계정에서 해제할 수 있습니다.
+O4O 서비스 연결은 ChatGPT와 내 O4O 작업공간을 이어 줍니다. O4O에 있는 상품 정보와 참고 자료를 활용해 내용을 정리하고, 작성한 결과를 O4O에 저장해 작업을 이어 갈 수 있습니다.
 
-### English description
+기존 O4O 계정으로 로그인한 뒤 연결할 작업공간과 자료 조회·저장 권한을 선택하세요. 첫 출시에서는 약국 작업공간의 상품·자료 조회와 제작 자료 저장·수정을 지원합니다.
 
-O4O Service Connect helps you find products and reference materials in pharmacy workspaces you authorize, then save and revise private drafts in O4O. Sign in with your existing O4O account and choose a pharmacy and read or draft permissions. Review saved content in the O4O editor. The connection does not publish content, change the shared product database, place orders, process payments, or make individual diagnosis or medication decisions. Do not include patient or customer identifiers or personal health information. You can disconnect from your O4O account settings.
+저장한 결과는 자동으로 게시되지 않습니다. O4O에서 내용을 확인하고 수정한 뒤 활용할 수 있으며, 연결은 O4O 내 계정에서 언제든 해제할 수 있습니다.
+
+### 이용 안내 — 상세 소개와 함께 제공할 초안
+
+- 기존 O4O 계정과 해당 작업공간의 이용 권한이 필요합니다. 연결에 동의한 범위 안에서만 자료를 조회하거나 저장합니다.
+- 주문·결제·상품 정본 변경·자동 게시·개인별 진단이나 복약 결정은 지원하지 않습니다.
+- 환자·고객 식별정보나 개인 건강정보를 요청문과 참고 자료에 포함하지 마세요.
+- 연결을 해제해도 이미 O4O에 저장한 결과와 외부 ChatGPT 대화가 함께 삭제되는 것은 아닙니다.
+
+‘비공개 초안’을 대표 소개의 중심 표현으로 쓰지 않되, 저장 결과는 기존 계약의 비공개 제작 자료이며 자동 게시되지 않는다는 사실을 유지한다. 이용 안내를 별도 포털 항목으로 제공할 수 있는지는 현행 제출 화면에서 확인하고, 필요한 제한을 실제 제출 자료에서 빠뜨리지 않는다. 이 상세 소개는 사용자 검토안이며 승인·제출된 문안이 아니다.
+
+### English description — 한국어 검토안 대응 초안
+
+O4O Service Connect brings your O4O workspace into ChatGPT. Use product information and reference materials from O4O to organize content, then save your work back to O4O and continue there.
+
+Sign in with your existing O4O account and choose a workspace and read or save permissions. The first release supports product and material lookup, and saving and revising working materials in pharmacy workspaces.
+
+Saved work is not published automatically. Review and edit it in O4O before using it. You can disconnect at any time from your O4O account settings.
+
+Usage notes: An existing O4O account and access to the selected workspace are required. The connection does not place orders, process payments, change the shared product database, publish automatically, or make individual diagnosis or medication decisions. Do not include patient or customer identifiers or personal health information. Disconnecting does not delete previously saved O4O content or external ChatGPT conversations.
 
 ### 시작 요청문 후보
 
