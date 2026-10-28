@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # =============================================================================
 # O4O API Server - Cloud Run Dockerfile
 # =============================================================================
@@ -25,7 +26,9 @@ COPY package.production.json ./package.json
 
 # Install production dependencies only
 # Using npm for simplicity in Docker (no pnpm workspace complexity)
-RUN npm install --omit=dev --ignore-scripts \
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install --omit=dev --ignore-scripts \
     && npm cache clean --force
 
 # -----------------------------------------------------------------------------
@@ -69,6 +72,7 @@ COPY --chown=o4oapi:nodejs dist/personal-mail-worker.js ./dist/personal-mail-wor
 COPY --chown=o4oapi:nodejs dist/migrate.js ./dist/migrate.js
 COPY --chown=o4oapi:nodejs dist/migrate.js.map ./dist/migrate.js.map
 COPY --chown=o4oapi:nodejs dist/scripts/provision-test-cooperative.js ./dist/provision-test-cooperative.js
+COPY --chown=o4oapi:nodejs dist/scripts/provision-chatgpt-review-demo.js ./dist/provision-chatgpt-review-demo.js
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)

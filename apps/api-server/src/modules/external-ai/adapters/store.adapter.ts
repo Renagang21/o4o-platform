@@ -33,8 +33,10 @@ import {
 } from "./adapter.js";
 
 export class StoreAdapter {
-  private readonly productContents = new StoreProductContentAdapter();
-  constructor(readonly db: DataSource) {}
+  private readonly productContents: StoreProductContentAdapter;
+  constructor(readonly db: DataSource, readonly storeOrigin = new URL('https://store.neture.co.kr')) {
+    this.productContents = new StoreProductContentAdapter(storeOrigin);
+  }
   async workspaces(
     userId: string,
     db: Queryable = this.db,
@@ -220,7 +222,7 @@ export class StoreAdapter {
       status: editable ? "private_material" : "in_use_or_uneditable",
       revision: tokenHash(JSON.stringify({ ...row, inUse: !!qr })),
       destination,
-      openUrl: `https://store.neture.co.kr/external-ai/drafts/${contentId}?organizationId=${encodeURIComponent(id)}`,
+      openUrl: new URL(`/external-ai/drafts/${contentId}?organizationId=${encodeURIComponent(id)}`, this.storeOrigin).href,
     };
   }
   async save(db: EntityManager, userId: string, id: string, input: DraftInput) {

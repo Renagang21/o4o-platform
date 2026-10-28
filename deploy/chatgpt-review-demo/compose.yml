@@ -1,0 +1,104 @@
+name: o4o-chatgpt-review-demo
+
+x-api-environment: &api-environment
+  NODE_ENV: ${REVIEW_DEMO_NODE_ENV:-production}
+  PORT: "8080"
+  GRACEFUL_STARTUP: "false"
+  DB_HOST: review-db
+  DB_PORT: "5432"
+  DB_USERNAME: o4o_review_demo
+  DB_NAME: o4o_chatgpt_review_demo
+  DB_PASSWORD: ${REVIEW_DEMO_DB_PASSWORD:?Use a dedicated review secret}
+  ALLOW_REMOTE_DB: "true"
+  REVIEW_DEMO_ENVIRONMENT: isolated
+  REVIEW_DEMO_DB_HOST: review-db
+  REVIEW_DEMO_DB_PORT: "5432"
+  REVIEW_DEMO_DB_USERNAME: o4o_review_demo
+  REVIEW_DEMO_DB_NAME: o4o_chatgpt_review_demo
+  REVIEW_DEMO_DB_PASSWORD: ${REVIEW_DEMO_DB_PASSWORD:?Use a dedicated review secret}
+  JWT_SECRET: ${REVIEW_DEMO_JWT_SECRET:?Use a dedicated review secret}
+  JWT_REFRESH_SECRET: ${REVIEW_DEMO_JWT_REFRESH_SECRET:?Use a dedicated review secret}
+  JWT_ISSUER: o4o-chatgpt-review-demo
+  JWT_AUDIENCE: o4o-chatgpt-review-demo
+  COOKIE_DOMAIN: ""
+  CORS_ORIGIN: ${REVIEW_DEMO_WEB_ORIGIN:?Set the review web origin},${REVIEW_DEMO_STORE_ORIGIN:?Set the review store origin}
+  EXTERNAL_AI_ISSUER_URL: ${REVIEW_DEMO_API_ORIGIN:?Set the review API origin}
+  EXTERNAL_AI_WEB_ORIGIN: ${REVIEW_DEMO_WEB_ORIGIN:?Set the review web origin}
+  EXTERNAL_AI_ADMIN_ORIGIN: ${REVIEW_DEMO_WEB_ORIGIN:?Set the review web origin}
+  EXTERNAL_AI_STORE_ORIGIN: ${REVIEW_DEMO_STORE_ORIGIN:?Set the review store origin}
+  EXTERNAL_AI_REDIRECT_URIS: ${REVIEW_DEMO_REDIRECT_URIS:?Set reviewed client callbacks}
+  EXTERNAL_AI_CREDENTIAL_KEY: ${REVIEW_DEMO_CREDENTIAL_KEY:?Use a dedicated review secret}
+  EMAIL_SERVICE_ENABLED: "false"
+  PERSONAL_MAIL_ENABLED: "false"
+
+services:
+  review-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: o4o_chatgpt_review_demo
+      POSTGRES_USER: o4o_review_demo
+      POSTGRES_PASSWORD: ${REVIEW_DEMO_DB_PASSWORD:?Use a dedicated review secret}
+    ports: ["127.0.0.1:55459:5432"]
+    volumes:
+      - review-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/001-review-marker.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U o4o_review_demo -d o4o_chatgpt_review_demo",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  migrate:
+    image: ${REVIEW_DEMO_API_IMAGE:?Build the review API image from this branch}
+    environment: *api-environment
+    depends_on:
+      review-db: { condition: service_healthy }
+    command:
+      [
+        "sh",
+        "-c",
+        "node dist/provision-chatgpt-review-demo.js --check-environment && node dist/migrate.js",
+      ]
+  provision:
+    image: ${REVIEW_DEMO_API_IMAGE:?Build the review API image from this branch}
+    environment:
+      <<: *api-environment
+      REVIEW_DEMO_PASSWORD: ${REVIEW_DEMO_PASSWORD:?Supply the private reviewer password}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    command: ["node", "dist/provision-chatgpt-review-demo.js", "--apply"]
+  api:
+    image: ${REVIEW_DEMO_API_IMAGE:?Build the review API image from this branch}
+    environment: *api-environment
+    depends_on:
+      provision: { condition: service_completed_successfully }
+    ports: ["127.0.0.1:13002:8080"]
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8080/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  web:
+    profiles: [ui]
+    image: ${REVIEW_DEMO_WEB_IMAGE:-o4o-chatgpt-review-web:local}
+    ports: ["127.0.0.1:13000:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+  store:
+    profiles: [ui]
+    image: ${REVIEW_DEMO_STORE_IMAGE:-o4o-chatgpt-review-store:local}
+    ports: ["127.0.0.1:13001:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+volumes:
+  review-data:

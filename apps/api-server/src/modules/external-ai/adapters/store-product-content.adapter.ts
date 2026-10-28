@@ -44,6 +44,7 @@ interface ProductPage {
 
 /** StoreAdapter supplies current workspace authorization; this boundary adds existing product/feature policy. */
 export class StoreProductContentAdapter {
+  constructor(readonly storeOrigin = new URL('https://store.neture.co.kr')) {}
   async context(
     db: Queryable,
     organizationId: string,
@@ -173,7 +174,7 @@ export class StoreProductContentAdapter {
         page.status === "draft" &&
         page.contentFormat === "html",
       revision: tokenHash(JSON.stringify(page)),
-      openUrl: `https://store.neture.co.kr/external-ai/product-contents/${page.productSource}/${page.productId}/${page.groupId}?organizationId=${encodeURIComponent(organizationId)}&locale=${encodeURIComponent(page.language)}`,
+      openUrl: new URL(`/external-ai/product-contents/${page.productSource}/${page.productId}/${page.groupId}?organizationId=${encodeURIComponent(organizationId)}&locale=${encodeURIComponent(page.language)}`, this.storeOrigin).href,
     };
   }
 

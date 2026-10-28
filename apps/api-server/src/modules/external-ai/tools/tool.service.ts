@@ -31,8 +31,9 @@ export class ExternalAiToolService {
     readonly db: DataSource,
     webOrigin: URL,
     readonly mailProviderFactory?: ProviderFactory,
+    storeOrigin?: URL,
   ) {
-    this.registry = new AdapterRegistry(db, webOrigin);
+    this.registry = new AdapterRegistry(db, webOrigin, storeOrigin);
   }
   async execute(
     name: ToolName,
