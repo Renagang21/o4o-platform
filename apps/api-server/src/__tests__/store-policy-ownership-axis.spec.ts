@@ -37,6 +37,8 @@ function makeDataSource(opts: {
   const calls: Array<{ sql: string; params: unknown[] }> = [];
   const query = jest.fn(async (sql: string, params: unknown[] = []): Promise<Row[]> => {
     calls.push({ sql, params });
+    // This test isolates store identity; the fixture pharmacist has been manually verified.
+    if (sql.includes('FROM kpa_pharmacist_profiles') && sql.includes('AS approved')) return [{ approved: true }];
     if (sql.includes('service_memberships')) {
       return opts.hasActiveMembership === false ? [] : [{ '?column?': 1 }];
     }

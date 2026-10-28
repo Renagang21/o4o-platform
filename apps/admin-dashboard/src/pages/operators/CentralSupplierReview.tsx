@@ -89,7 +89,7 @@ export default function CentralSupplierReview() {
         row.status === "PENDING" ? (
           <div className="flex gap-3">
             <button
-              disabled={busy || row.activationReady !== true}
+              disabled={busy}
               onClick={() => void act(row, "approve")}
             >
               승인
@@ -98,7 +98,7 @@ export default function CentralSupplierReview() {
               반려
             </button>
             {row.activationReady !== true && (
-              <span>서류·기본 정보 보완 필요</span>
+              <span>프로필 보완 안내 · 승인 조건은 서버에서 확인합니다.</span>
             )}
           </div>
         ) : null,

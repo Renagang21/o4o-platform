@@ -28,7 +28,8 @@ const MAIN_SITE_URL = 'https://neture.co.kr/';
 
 const Login: FC = () => {
   
-  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin, sessionConflict } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, user, sessionConflict } = useAuth();
+  const isPlatformAdmin = user?.roles?.includes('platform:super_admin') === true;
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -71,13 +72,13 @@ const Login: FC = () => {
 
   // 이미 인증된 관리자는 홈으로 리다이렉트
   useEffect(() => {
-    if (isAuthenticated && isAdmin) {
+    if (isAuthenticated && isPlatformAdmin) {
       toast.success('이미 로그인되어 있습니다.');
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isPlatformAdmin]);
 
   if (isAuthenticated) {
-    if (isAdmin) {
+    if (isPlatformAdmin) {
       return <Navigate to={fromLocation} replace />;
     } else {
       // The server checks Google proof and explicit central delegation before rendering any work.

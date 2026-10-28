@@ -61,7 +61,7 @@ for (const viewport of [
         "supplier:operator",
         "funding:operator",
       ]);
-      await page.goto("/operations");
+      await page.goto("/");
       await expect(
         page.getByRole("heading", { name: "O4O 통합 운영" }),
       ).toBeVisible();

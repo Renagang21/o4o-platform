@@ -1,5 +1,11 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 const mock = vi.hoisted(() => ({
   get: vi.fn(),
@@ -15,7 +21,12 @@ vi.mock("@o4o/auth-context", () => ({
   }),
 }));
 vi.mock("@o4o/operator-core-ui/modules/members", () => ({
-  ServiceMembersWorkspace: ({ serviceKey }: any) => <p>members:{serviceKey}</p>,
+  ServiceMembersWorkspace: ({ serviceKey }: any) => (
+    <div>
+      <p>members:{serviceKey}</p>
+      <input aria-label="작성 중" />
+    </div>
+  ),
 }));
 vi.mock("@o4o/operator-core-ui", () => ({
   OperatorInbox: () => null,
@@ -72,4 +83,22 @@ it("rejects an undelegated direct URL despite a valid grant for another service"
   await waitFor(() =>
     expect(screen.getByRole("alert")).toHaveTextContent("위임되지 않은 업무"),
   );
+});
+
+it("preserves unsaved work during successful background delegation checks and removes it on revocation", async () => {
+  mock.get.mockResolvedValue({
+    data: { data: { roles: ["supplier:operator"] } },
+  });
+  view("/operations/supplier/members");
+  const input = await screen.findByLabelText("작성 중");
+  fireEvent.change(input, { target: { value: "작성 중인 사유" } });
+  fireEvent(window, new Event("focus"));
+  await waitFor(() => expect(mock.get).toHaveBeenCalledTimes(2));
+  expect(screen.getByLabelText("작성 중")).toHaveValue("작성 중인 사유");
+  mock.get.mockRejectedValueOnce(new Error("revoked"));
+  fireEvent(window, new Event("focus"));
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "유효한 업무 위임",
+  );
+  expect(screen.queryByLabelText("작성 중")).toBeNull();
 });

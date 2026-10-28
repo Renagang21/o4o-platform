@@ -8,8 +8,11 @@ import { centralOperationRoles } from "../../services/admin/central-operation-ac
 
 /** Separate central entry proof; domain APIs retain their own service and organization guards. */
 export const centralOperationAccessRouter = Router();
-centralOperationAccessRouter.use(authenticate);
-centralOperationAccessRouter.get("/", async (req: AuthRequest, res) => {
+async function requireCentralOperation(
+  req: AuthRequest,
+  res: import("express").Response,
+  next: import("express").NextFunction,
+) {
   res.setHeader("Cache-Control", "private, no-store");
   if ((req as AuthRequest & { authMethod?: string }).authMethod !== "google") {
     res.status(403).json({ success: false, code: "GOOGLE_SESSION_REQUIRED" });
@@ -23,10 +26,18 @@ centralOperationAccessRouter.get("/", async (req: AuthRequest, res) => {
         .json({ success: false, code: "CENTRAL_DELEGATION_REQUIRED" });
       return;
     }
-    res.json({ success: true, data: { roles } });
+    res.locals.centralOperationRoles = roles;
+    next();
   } catch {
     res
       .status(503)
       .json({ success: false, code: "CENTRAL_ACCESS_UNAVAILABLE" });
   }
+}
+centralOperationAccessRouter.use(authenticate, requireCentralOperation);
+centralOperationAccessRouter.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    data: { roles: res.locals.centralOperationRoles },
+  });
 });

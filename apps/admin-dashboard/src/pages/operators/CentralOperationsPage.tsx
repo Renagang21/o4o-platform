@@ -57,7 +57,6 @@ export default function CentralOperationsPage() {
   const [error, setError] = useState("");
   const load = useCallback(async () => {
     const seq = ++sequence.current;
-    setGrant(null);
     setError("");
     try {
       const response = await authClient.api.get("/operator/central-access");
@@ -66,10 +65,12 @@ export default function CentralOperationsPage() {
       if (seq === sequence.current)
         setGrant({ userId: identityId, roles: response.data.data.roles });
     } catch {
-      if (seq === sequence.current)
+      if (seq === sequence.current) {
+        setGrant(null);
         setError(
           "Google 로그인과 중앙 관리자의 유효한 업무 위임이 필요합니다.",
         );
+      }
     }
   }, [identityId]);
   useEffect(() => {
