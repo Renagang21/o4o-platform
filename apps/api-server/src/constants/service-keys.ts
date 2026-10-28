@@ -41,9 +41,9 @@ export const SERVICE_KEYS = {
   /**
    * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 서비스.
    *
-   * 개별 커뮤니티는 `communities` 개체이고, 이 키는 그 **위의 서비스 축**이다
-   * (진입 자격 · 전체 관리자 `community:admin`). 개별 커뮤니티 운영은 개체 역할
-   * (`community_memberships.role='operator'`)이며 서비스 역할(`community:admin`/`:operator`)과 별개다.
+   * community.neture.co.kr의 독립서비스 키. 자체 service_memberships와
+   * community:admin/operator로 운영한다. 과거 개별 커뮤니티 개설·가입·운영 역할은
+   * 신규 서비스 자격으로 사용하지 않는다(역할별 업무공간 정본 §5).
    */
   COMMUNITY: 'community',
   /**

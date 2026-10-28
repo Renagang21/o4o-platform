@@ -16,7 +16,6 @@ import { ForumListTemplate, ForumListToolbar, ForumListInfoBar } from '@o4o/shar
 import type { ForumListFilterChip } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
-  fetchPinnedPosts,
   fetchForumCategories,
   normalizePostType,
   getAuthorName,
@@ -115,7 +114,6 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   }, []);
 
   // Load posts when filters/page change
-  const filterKey = `${boardSlug}|${categoriesLoaded}|${searchQuery}|${categoryFilter}|${typeFilter}|${tagFilter}|${sortBy}|${currentPage}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -130,47 +128,28 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
       setError(null);
 
       try {
-        const isFiltering = !!searchQuery || !!categoryFilter || !!tagFilter || sortBy !== 'latest';
+        const res = await fetchForumPosts({
+          search: searchQuery || undefined,
+          categoryId: categoryFilter || undefined,
+          type: typeFilter || undefined,
+          tag: tagFilter || undefined,
+          sortBy,
+          page: currentPage,
+          limit: PAGE_SIZE,
+        });
+        if (cancelled) return;
 
-        if (isFiltering) {
-          const res = await fetchForumPosts({
-            search: searchQuery || undefined,
-            categoryId: categoryFilter || undefined,
-            tag: tagFilter || undefined,
-            sortBy,
-            page: currentPage,
-            limit: PAGE_SIZE,
-          });
-          if (cancelled) return;
-
-          setPinnedPosts([]);
-          let results = res.data.map(p => toDisplayPost(p, basePath));
-          if (typeFilter) results = results.filter(p => p.postType === typeFilter);
-
-          setPosts(results);
-          setTotalCount(typeFilter ? results.length : res.totalCount);
-          setTotalPages(Math.max(1, Math.ceil((typeFilter ? results.length : res.totalCount) / PAGE_SIZE)));
-        } else {
-          const [pinnedRes, postsRes] = await Promise.all([
-            currentPage === 1 ? fetchPinnedPosts(5) : Promise.resolve([]),
-            fetchForumPosts({ page: currentPage, limit: PAGE_SIZE }),
-          ]);
-          if (cancelled) return;
-
-          const pinned = (pinnedRes as ApiForumPost[]).map(p => toDisplayPost(p, basePath));
-          setPinnedPosts(currentPage === 1 ? pinned : []);
-
-          const pinnedIds = new Set(pinned.map(p => p.id));
-          let regular = postsRes.data
-            .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
-            .map(p => toDisplayPost(p, basePath));
-
-          if (typeFilter) regular = regular.filter(p => p.postType === typeFilter);
-
-          setPosts(regular);
-          setTotalCount(postsRes.totalCount);
-          setTotalPages(Math.max(1, Math.ceil(postsRes.totalCount / PAGE_SIZE)));
-        }
+        const rows = res.data.map(p => toDisplayPost(p, basePath));
+        // Split presentation only after the server has filtered and paginated.
+        // Excess pins and later-page pins remain in the regular table.
+        const pinned = !hasFilters && currentPage === 1
+          ? rows.filter(p => p.isPinned).slice(0, 5)
+          : [];
+        const pinnedIds = new Set(pinned.map(p => p.id));
+        setPinnedPosts(pinned);
+        setPosts(rows.filter(p => !pinnedIds.has(p.id)));
+        setTotalCount(res.totalCount);
+        setTotalPages(Math.max(1, Math.ceil(res.totalCount / PAGE_SIZE)));
       } catch {
         if (!cancelled) setError('게시글을 불러오지 못했습니다.');
       } finally {
@@ -180,7 +159,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
 
     load();
     return () => { cancelled = true; };
-  }, [filterKey]);
+  }, [basePath, boardSlug, categoriesLoaded, searchQuery, categoryFilter, typeFilter, tagFilter, sortBy, currentPage, hasFilters]);
 
   const handlePostClick = (post: DisplayPost) => navigate(post.routeTo);
 

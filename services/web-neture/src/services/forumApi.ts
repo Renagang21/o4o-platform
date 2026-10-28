@@ -253,6 +253,7 @@ export async function fetchForumPosts(params: {
   page?: number;
   limit?: number;
   isPinned?: boolean;
+  type?: ForumPostType;
   search?: string;
   /** WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 태그 정확 일치 (서버 `:tag = ANY(post.tags)`) */
   tag?: string;
@@ -265,6 +266,8 @@ export async function fetchForumPosts(params: {
     if (params.isPinned !== undefined) {
       posts = posts.filter(p => p.isPinned === params.isPinned);
     }
+
+    if (params.type) posts = posts.filter(p => normalizePostType(p.type) === params.type);
 
     if (params.search) {
       const q = params.search.toLowerCase();
@@ -300,6 +303,8 @@ export async function fetchForumPosts(params: {
     if (params.search) queryParams.append('search', params.search);
     if (params.tag) queryParams.append('tag', params.tag);
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params.type) queryParams.append('type', params.type);
+    if (params.isPinned !== undefined) queryParams.append('isPinned', String(params.isPinned));
 
     const response = await api.get(`${forumBase()}/posts?${queryParams}`);
     const data = response.data;
@@ -308,25 +313,12 @@ export async function fetchForumPosts(params: {
       throw new Error(data.error || 'Failed to fetch posts');
     }
 
-    // Filter pinned if needed (API doesn't have isPinned filter)
-    if (params.isPinned !== undefined) {
-      data.data = data.data.filter((p: ForumPost) => p.isPinned === params.isPinned);
-    }
-
     return data;
   } catch (error) {
     console.error('Error fetching forum posts:', error);
     // Preserve the access/network failure; recursive retries would never reach mock mode.
     throw error;
   }
-}
-
-/**
- * Fetch pinned posts
- */
-export async function fetchPinnedPosts(limit: number = 2): Promise<ForumPost[]> {
-  const response = await fetchForumPosts({ isPinned: true, limit });
-  return response.data;
 }
 
 /**

@@ -1,7 +1,7 @@
 # O4O 서비스 색인
 
 > **상태**: ACTIVE
-> **작성일**: 2025-12 · **최종 갱신**: 2026-10-23 (MegaPharm 요구사항 문서 연결)
+> **작성일**: 2025-12 · **최종 갱신**: 2026-10-28 (커뮤니티 현행 구현 안내 연결)
 > **근거 WO/IR**: WO-O4O-DOCS-ONBOARDING-ENTRY-V1
 
 O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. 서비스 정의를 여기 복제하지 않는다.
@@ -20,7 +20,8 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 | serviceKey | 웹 앱 | 기준 문서 |
 |---|---|---|
 | `neture` | `services/web-neture` | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](../baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) · [SUPPLIER-DOMAIN-BOUNDARY](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) · [NETURE-DISTRIBUTION-ENGINE-FREEZE](../baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
-| `community` · `supplier` · `funding` | `services/web-neture` (호스트별 프로필 — `src/lib/hostProfile.ts`) | 각 키는 **해당 영역의 운영자 범위**다. 근거: [WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md). 공급자 사업자 본인의 인가는 SUPPLIER-DOMAIN-BOUNDARY 가 정한다 |
+| `community` | `services/web-neture` (community 호스트 프로필) | 독립 커뮤니티 서비스. [역할별 업무공간 §5](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) · [현행 구현·레거시 판정 안내](../guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md) |
+| `supplier` · `funding` | `services/web-neture` (호스트별 프로필 — `src/lib/hostProfile.ts`) | 각 키는 **해당 영역의 운영자 범위**다. 근거: [WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md). 공급자 사업자 본인의 인가는 SUPPLIER-DOMAIN-BOUNDARY 가 정한다 |
 | `kpa-society` | `services/web-kpa-society` | [KPA-SOCIETY-SERVICE-STRUCTURE](../baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) · [KPA-UX-BASELINE](../baseline/KPA-UX-BASELINE-V1.md) · [KPA-ROLE-MATRIX](../baseline/KPA-ROLE-MATRIX-V1.md) · [KPA-SIGNAGE-STRUCTURE](../baseline/KPA-SIGNAGE-STRUCTURE-V1.md) |
 | `kpa-branch` | `services/web-kpa-branch` | 약사회 분회 홈페이지 — 주소 의미는 [SUBDOMAIN-SERVICE-SEMANTICS](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2. 역할 · 접근 정본은 [KPA-BRANCH-ROLE-MATRIX](../baseline/KPA-BRANCH-ROLE-MATRIX-V1.md)(2026-10-06). 그 밖의 구조 정본 없음 — catalog 주석과 [SERVICE-IDENTITY CHECK](../checks/CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md) |
 | `k-cosmetics` | 없음 — 독립 웹 앱은 퇴역 1차-A, web-store 기능 화면 · `/api/v1/cosmetics` 는 1차-B(PR #339)로 삭제(`/work/k-cosmetics/*` 는 종료 안내만) | **퇴역 결정(2026-10-05) · 운영 runtime 제거 완료** — [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14. 퇴역 잔여 계약 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) (2026-10-07 · 구 COSMETICS-DOMAIN-RULES 는 SUPERSEDED). `cosmetics/service-definition.md` 는 퇴역 이전 기록(stale — "운영중" · 제거된 기능 열거)이라 기준 문서가 아니다 |

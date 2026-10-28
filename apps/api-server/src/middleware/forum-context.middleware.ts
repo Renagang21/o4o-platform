@@ -23,13 +23,11 @@ export interface ForumContext {
   /** Organization UUID — null means global (admin-dashboard) */
   organizationId?: string | null;
   /**
-   * Community boundary key — WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1
-   *
-   * 논리 Community Identity (`config/community-catalog.ts` 의 key: 'pharmacy' | 'cosmetics' | 'o4o-general' | …).
-   * 지정되면 `serviceCode` 대신 이 값이 읽기·쓰기 경계다: ForumControllerBase 가 catalog 의
-   * `forumStorageCodes`(원장 `forum_category_requests.service_code` 집합) 로 해석한다 — KPA 와
-   * Pharmacy-Hub 진입이 같은 'pharmacy' 를 보는 이유. Community ≠ Service 이므로 이 값으로
-   * 운영자 권한을 추론하지 않는다 (moderation 은 forum 의 service_code 로 그대로 판정).
+   * 서버가 검증한 커뮤니티/사업 공간의 경계 키.
+   * 독립서비스는 community, 사업 회원 공간은 검증된 사업별 저장 범위를 사용한다.
+   * 과거 pharmacy/cosmetics/o4o-general은 차단용 tombstone이며 현재 카탈로그가 아니다.
+   * 키 문자열만으로 회원·운영 자격을 추론하지 않는다. 활성 소속·역할·사업 권한은
+   * 각 resolver가 확인하고 ForumControllerBase의 저장 범위 필터를 유지한다.
    */
   communityKey?: string;
   /**
