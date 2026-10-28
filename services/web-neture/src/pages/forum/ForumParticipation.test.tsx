@@ -240,3 +240,63 @@ it("삭제 중 중복 클릭은 요청을 반복하지 않는다", async () => {
   await act(async () => release({ success: true }));
   await screen.findByText("목록 화면");
 });
+
+it("댓글 재조회와 새 댓글 작성을 직렬화하여 늦은 조회의 덮어쓰기를 막는다", async () => {
+  let release!: (value: unknown) => void;
+  m.comments
+    .mockRejectedValueOnce(new Error("조회 실패"))
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+  m.create.mockResolvedValue({
+    success: true,
+    data: { ...comment, content: "새 댓글" },
+  });
+  mount();
+  fireEvent.click(
+    await screen.findByRole("button", { name: "댓글 다시 불러오기" }),
+  );
+  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하세요..."), {
+    target: { value: "새 댓글" },
+  });
+  const submit = screen.getByRole("button", { name: "댓글 조회 중..." });
+  expect((submit as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(submit);
+  expect(m.create).not.toHaveBeenCalled();
+  await act(async () => release({ success: true, data: [] }));
+  fireEvent.click(screen.getByRole("button", { name: "댓글 작성" }));
+  await screen.findByText("새 댓글");
+  expect(m.create).toHaveBeenCalledOnce();
+});
+it("새 댓글 작성 중 재조회 버튼은 기존 작성 요청을 방해하지 않는다", async () => {
+  let release!: (value: unknown) => void;
+  m.comments.mockRejectedValueOnce(new Error("조회 실패"));
+  m.create.mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        release = resolve;
+      }),
+  );
+  mount();
+  const retry = await screen.findByRole("button", {
+    name: "댓글 다시 불러오기",
+  });
+  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하세요..."), {
+    target: { value: "새 댓글" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "댓글 작성" }));
+  expect((retry as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(retry);
+  expect(m.comments).toHaveBeenCalledOnce();
+  await act(async () =>
+    release({ success: true, data: { ...comment, content: "새 댓글" } }),
+  );
+  expect(
+    (screen.getByPlaceholderText("댓글을 입력하세요...") as HTMLTextAreaElement)
+      .value,
+  ).toBe("");
+  expect((retry as HTMLButtonElement).disabled).toBe(false);
+});

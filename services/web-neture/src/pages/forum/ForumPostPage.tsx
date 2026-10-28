@@ -143,6 +143,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
   const interactionProcessing = useRef(false);
+  const commentsReading = useRef(false);
   const beginInteraction = useLatestRequest(`${basePath}:${slug}`);
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -255,6 +256,8 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
   }, [slug, basePath, beginLoad]);
 
   async function loadComments(postId: string, current: () => boolean) {
+    if (commentsReading.current || interactionProcessing.current) return;
+    commentsReading.current = true;
     setCommentsLoading(true); setCommentsLoadError(false);
     try {
       const result = await fetchForumComments(postId);
@@ -262,7 +265,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
       if (current()) setComments(result.data.map(toDisplayComment));
     } catch {
       if (current()) setCommentsLoadError(true);
-    } finally { if (current()) setCommentsLoading(false); }
+    } finally { if (current()) { commentsReading.current = false; setCommentsLoading(false); } }
   }
 
   const handleDeletePost = async () => {
@@ -318,7 +321,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
   };
 
   const handleSubmitComment = async () => {
-    if (readOnly || !isAuthenticated || !post || post.isLocked || post.allowComments === false || !commentText.trim() || interactionProcessing.current || pinProcessing.current) return;
+    if (readOnly || !isAuthenticated || !post || post.isLocked || post.allowComments === false || !commentText.trim() || commentsReading.current || interactionProcessing.current || pinProcessing.current) return;
     interactionProcessing.current = true; setMutationBusy(true); setIsSubmitting(true); setCommentError(null);
     const current = beginInteraction();
     try {
@@ -497,13 +500,13 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
           value={commentText}
           onChange={(v) => { setCommentText(v); setCommentError(null); }}
           onSubmit={handleSubmitComment}
-          submitting={isSubmitting || mutationBusy}
+          submitting={isSubmitting || mutationBusy || commentsLoading}
           authenticated={isAuthenticated}
           error={commentError}
           placeholder="댓글을 입력하세요..."
           rows={4}
           submitLabel="댓글 작성"
-          submittingLabel="작성 중..."
+          submittingLabel={commentsLoading ? '댓글 조회 중...' : isSubmitting ? '작성 중...' : '처리 중...'}
           compact={isMobile}
           accentColor={PRIMARY_COLOR}
           style={styles.commentForm}
@@ -516,7 +519,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
 
         {/* Comments List — 인라인 수정/삭제는 공통 부품이 제공, mutation 은 서비스 adapter 소유 */}
         {commentsLoading && <p role="status">댓글을 불러오는 중입니다…</p>}
-        {commentsLoadError && <div role="alert"><p>댓글을 불러오지 못했습니다.</p><button type="button" onClick={() => post && void loadComments(post.id, beginLoad())}>댓글 다시 불러오기</button></div>}
+        {commentsLoadError && <div role="alert"><p>댓글을 불러오지 못했습니다.</p><button type="button" disabled={mutationBusy || commentsLoading} onClick={() => post && void loadComments(post.id, beginLoad())}>댓글 다시 불러오기</button></div>}
         {!commentsLoading && !commentsLoadError && <ForumCommentList
           comments={comments.map((c) => ({
             id: c.id,

@@ -47,20 +47,24 @@
 
 ### Smoke result
 
-수정된 실제 상세·작성기·공통 댓글·공개 설정 컴포넌트와 production CSS에 로컬 합성 API를 주입했다. PC 1440px·모바일 390px 각각 11시나리오, 총 22개 PASS. 댓글 재조회·늦은 작성/삭제/좋아요·실패한 수정 재시도·댓글 제한·편집 재조회·없는 게시판·타인 편집·편집 대상 전환·미저장 공개 선택 안내를 확인했다. page error 0·overflow 0. 외부 요청을 차단했으며 쓰기는 fixture 메모리에서만 발생했다.
+수정된 실제 상세·작성기·공통 댓글·공개 설정 컴포넌트와 production CSS에 로컬 합성 API를 주입했다. PC 1440px·모바일 390px 각각 12시나리오, 총 24개 PASS. 댓글 재조회·늦은 작성/삭제/좋아요·실패한 수정 재시도·댓글 제한·편집 재조회·없는 게시판·타인 편집·편집 대상 전환·미저장 공개 선택 안내를 확인했다. page error 0·overflow 0. 외부 요청을 차단했으며 쓰기는 fixture 메모리에서만 발생했다.
 
 ## 검증
 
 - `pnpm install --frozen-lockfile`, `pnpm run build:packages`: PASS. lockfile 변경 없음.
-- Neture 전체: 171 files / 1,455 tests PASS. focused 8 files / 45 tests는 이 결과의 부분집합.
+- Neture 전체: 최초 171 files / 1,455 tests PASS. 리뷰 보완 후 171 files / 1,457 tests 재검증 PASS.
 - shared-space-ui 전체: 23 files / 212 tests PASS.
 - API 기존 계약: 6 suites / 133 tests PASS. 일반 참여·제재·댓글/작성자/중재·공개 열람·중앙 진입·펀딩 격리, 실제 DB 미사용.
 - Neture TypeScript·production build: PASS. Vite 기존 큰 chunk/Browserslist 안내는 유지.
-- 변경 코드 ESLint: 오류·경고 0. 브라우저 22시나리오 PASS.
+- 변경 코드 ESLint: 오류·경고 0. 브라우저 24시나리오 PASS.
 - 별도 추가한 `tsc -p packages/shared-space-ui/tsconfig.json --noEmit`: FAIL. 변경하지 않은 `cooperation/CooperationMemberSpace.test.tsx:79`의 Testing Library `exact` 옵션과 `legal/__tests__/ServiceEnrollmentPolicyAgreement.test.tsx:11`의 mock callback 타입 오류. 두 파일은 기준 main 대비 diff 0이며 범위 밖이므로 수정하지 않았다. 이 검사를 통과로 계산하지 않는다.
-- docs 민감정보·diff·staged 범위 검사는 최종 commit 전에 실행한다. PR CI/Codex는 최신 HEAD의 PR 체크를 따른다.
+- docs 민감정보·diff·staged 범위 검사 PASS. PR CI/Codex는 최신 HEAD의 PR 체크를 따른다.
 
 ## 미실행·인계
 
 실제 계정 OAuth·운영 글/댓글 작성·수정·삭제·심사·서비스 제재·공개 설정 변경은 미실행. 운영에서 빈 게시판에 초기 콘텐츠를 생성하지 않았다. 로컬 합성 fixture가 실제 업무 데이터 검수를 대신하지 않는다. AI와 유료 외부 호출은 제외한다.
 main 병합·auto-merge·배포는 하지 않으며 후속 통합을 위해 전용 branch/worktree를 보존한다. 이전 #868의 병합 전 TODO/CHECK는 당시 기록으로 보존하고 배포 후속 기록은 해당 PR을 따른다.
+
+## 리뷰 보완 — 댓글 재조회·작성 경합
+
+Codex가 댓글 재조회 중 새 댓글 작성이 먼저 끝나면 늦은 GET 응답이 새 댓글을 지울 수 있음을 지적했다. 재조회 중에는 댓글 제출을 막고, 작성 처리 중에는 재조회 버튼과 실제 조회 시작을 막도록 기존 화면에서 직렬화했다. 진행 문구는 조회/작성/다른 처리로 구분한다. 양방향 경합 테스트 2개와 PC/모바일 경합 브라우저 검증을 추가했다. 최종 원격 CI·리뷰 결과는 같은 PR의 최신 HEAD에서 확인한다.
