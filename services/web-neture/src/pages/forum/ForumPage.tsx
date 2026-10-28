@@ -316,6 +316,8 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
             <p style={s.emptyTitle}>검색 결과가 없습니다</p>
             <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
           </>
+        ) : pinnedPosts.length ? (
+          <p className="text-sm text-slate-500">이 페이지의 글은 위 고정 목록에 표시되어 있습니다.</p>
         ) : (
           <>
             <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>

@@ -96,3 +96,12 @@ it("resets the page and preserves search when changing type", async () => {
   );
   expect(screen.getByText("검색 결과 45건")).toBeTruthy();
 });
+
+it("does not describe a pinned-only page as an empty forum", async () => {
+  rows = [row(1, "announcement", true), row(2, "question", true)];
+  mount();
+  await screen.findByText("샘플 글 1");
+  expect(screen.getByText("샘플 글 2")).toBeTruthy();
+  expect(screen.queryByText("아직 등록된 글이 없습니다")).toBeNull();
+  expect(screen.getByText("총 2개의 게시글")).toBeTruthy();
+});
