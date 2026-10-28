@@ -107,6 +107,8 @@ export default function CentralSupplierReview() {
   return (
     <section>
       <h2 className="text-xl font-bold">공급자 등록 심사</h2>
+      <a className="block my-3 text-blue-700 underline" href="https://supplier.neture.co.kr/operator/suppliers">신청 정보·사업자등록증 검토</a>
+      <p>전문 심사 화면에서 공급자를 선택해 신청 정보와 증빙을 확인한 뒤 승인·반려해 주세요.</p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
