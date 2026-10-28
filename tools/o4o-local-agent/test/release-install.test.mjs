@@ -1,4 +1,4 @@
-import { test, beforeEach, afterEach } from 'node:test';
+import { test as nodeTest, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -10,6 +10,20 @@ import { assembleRelease } from '../release/build-release.mjs';
 import { zip, member } from '../release/zip.mjs';
 import { installPackage, verifyPackage, installedSlot, acquireInstallLock } from '../release/install-core.mjs';
 import { bootstrapLocalDb, closeLocalDb, applyImport, LocalDatasetRepository } from '../src/local-db.mjs';
+// Emit bounded diagnostics through GitHub check annotations as well as job logs.
+// This suite uses only synthetic data; no environment or credentials are logged.
+function test(name, options, run) {
+ if(typeof options==='function'){run=options;options={};}
+ return nodeTest(name,options,async(t)=>{
+  try{return await run(t);}catch(error){
+   if(process.env.GITHUB_ACTIONS==='true'){
+    const message=(String(error.stack||error)+'\n'+String(error.stderr||'')).slice(0,5000).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
+    console.log('::error title=PC installer test::'+name+': '+message);
+   }
+   throw error;
+  }
+ });
+}
 let root;
 beforeEach(()=>{root=fs.mkdtempSync(path.join(os.tmpdir(),'o4o-release-'));});
 afterEach(()=>{closeLocalDb();fs.rmSync(root,{recursive:true,force:true});});

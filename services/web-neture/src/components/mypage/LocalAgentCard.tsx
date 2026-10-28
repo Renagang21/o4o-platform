@@ -21,7 +21,7 @@
 
 import PcProgramUpdate from "./PcProgramUpdate";
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Monitor, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Monitor, CheckCircle2 } from "lucide-react";
 import {
   connectThisPc,
   describeConnectFailure,
@@ -97,6 +97,9 @@ export default function LocalAgentCard({
     void refresh();
   }, [refresh]);
 
+  const [failureSummary, ...failureHelp] = (message ?? "")
+    .replace("다시 연결을", "연결하기를")
+    .split(". ");
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-5">
       <div className="flex items-start gap-3">
@@ -124,16 +127,20 @@ export default function LocalAgentCard({
             )}
 
             {status === "unavailable" && message && (
-              <details className="text-sm text-gray-500">
-                <summary className="cursor-pointer">연결이 안 되나요?</summary>
-                <p className="mt-2">
-                  <AlertCircle
-                    className="mt-0.5 h-4 w-4 shrink-0 text-amber-500"
-                    aria-hidden
-                  />
-                  {message}
+              <div className="text-sm text-gray-600">
+                <p>
+                  {failureSummary}
+                  {failureHelp.length > 0 ? "." : ""}
                 </p>
-              </details>
+                {failureHelp.length > 0 && (
+                  <details className="mt-2 text-gray-500">
+                    <summary className="cursor-pointer">
+                      연결이 안 되나요?
+                    </summary>
+                    <p className="mt-2">{failureHelp.join(". ")}</p>
+                  </details>
+                )}
+              </div>
             )}
 
             {status === "connected" && (

@@ -25,3 +25,7 @@
 - 초기 UI 수정 중 JSX 교체 범위 오류로 transform 실패 → 올바른 render 범위로 교정.
 - 새 worktree의 workspace dist 부재로 Main 테스트 import 실패 → frozen 의존성 설치 후 해당 workspace 의존 패키지를 빌드하고 재실행.
 - 원인 교정 뒤 focused suite 전체를 재실행했다. 앞 실패를 PASS로 취급하지 않는다.
+
+## Windows 실행 확인
+
+- 최초 branch CI `40774144411`의 Windows job FAIL. GitHub 로그 보관 호스트 접근 제한으로 전체 로그를 받지 못해, 합성 데이터만 쓰는 설치기 테스트에 제한 길이 실패 annotation을 추가했다. 이후 실행에서 원인을 확인하고 교정한다. 최초 실패는 완료 근거가 아니다.
