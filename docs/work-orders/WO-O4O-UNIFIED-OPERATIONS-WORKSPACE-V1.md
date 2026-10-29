@@ -1,6 +1,6 @@
 # WO-O4O-UNIFIED-OPERATIONS-WORKSPACE-V1
 
-> **상태**: ACTIVE
+> **상태**: IMPLEMENTED_AND_DEPLOYED · 실제 Google 로그인·사람의 면허 확인은 별도 검증
 > **작성일**: 2026-10-28 (Asia/Seoul)
 > **기준**: main `872cbc73fdcdc261dc77c6ccf0f2e5ffd4a87c9d`, [운영 책임 V2](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md)
 > **범위**: 사용자 요청에 따른 통합 운영 UI·UX, 전체 회원 표준 목록, 알림, 직영 운영 메뉴 통합, 메뉴별 업무 위임. 하나의 TODO·작업 브랜치에서 진행한다.
@@ -17,7 +17,7 @@
 - [x] 메뉴 노출·직접 URL·실제 업무 API에서 동일한 위임 범위를 검사한다. 만료·회수·자기 권한 확대·타 서비스·독립 조직 접근을 검증한다.
 - [x] 직영 운영 메뉴의 실제 기능을 기존 API·화면·공유 모듈을 우선 재사용하여 중앙에 연결한다. 외부 링크만으로 통합 완료 처리하지 않는다.
 - [x] 일반 회원·개별 사업자 자기 업무 및 독립 협업체의 자체 운영·데이터 격리를 유지한다.
-- [ ] 관련 테스트·typecheck·빌드·desktop/mobile 브라우저 검증, 문서 정합, 리뷰 및 CI 보완을 완료한다.
+- [x] 관련 테스트·typecheck·빌드·desktop/mobile 브라우저 검증, 문서 정합, 리뷰 및 CI 보완을 완료한다.
 
 
 ## 정책·실행 경계
@@ -100,3 +100,13 @@
 
 - 최종 소스 커밋 `2402566076`의 SonarCloud Code Analysis가 success로 완료됐다. Security/Reliability 지적 보완 후 기준을 낮추지 않고 통과했으며, CodeQL·운영자 PostgreSQL integration·영향 프런트 production build도 통과했다. 해당 시점 required CI Gate는 전체 회귀 종료 대기이므로 전체 CI 완료와 구분한다.
 - 병합 준비 중 최신 main의 PC 설치 개선과 CarePharm 전환 검증 기록을 충돌 없이 반영한다. 이 통합 HEAD의 최종 CI·리뷰 결과와 운영 migration 실행 경계는 별도로 확인한다.
+
+
+### 운영 반영 완료 (2026-10-29)
+
+- 사용자에게 `central_operation_menu_grants` 생성 migration과 기존 데이터 일괄 수정 없음의 범위를 제시했고, 사용자가 해당 migration을 포함한 배포를 명시 승인했다. 현재 사용자·생성 데이터가 테스트용이고 상품 DB가 주요 보존 대상이라는 설명도 받았다. 이는 데이터 초기화·일괄 삭제 지시로 해석하지 않았으며 이번 작업에서 기존 데이터 정리·삭제는 수행하지 않았다.
+- [PR #878](https://github.com/Renagang21/o4o-platform/pull/878), main `307e86ffe7b5901f27b375e1cbcebf3003cf15bb`에 병합했다. PR의 CI Gate·SonarCloud·CodeQL과 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/40827719950)·CodeQL이 통과했다. 두 자동 리뷰 지적도 회귀 검증 후 해결했다.
+- [Promote #40831099641](https://github.com/Renagang21/o4o-platform/actions/runs/40831099641) 성공. migration Job `o4o-api-migrations-5t5hh`가 성공했고 API 선행 verified rollout 후 관리자와 6개 웹을 배포했다. 최종 report에서 8개 대상의 serving SHA가 모두 위 main SHA와 일치했다.
+- 공개 read-only 확인: `admin.neture.co.kr/operations` HTTP 200, API `/health/ready` HTTP 200, 비로그인 `/api/v1/operator/central-access` HTTP 401. 로그인 없는 접근 차단과 배포 상태만 확인한 것이며 실제 Google OAuth·사용자별 메뉴 위임·면허 근거 확인 및 승인 조작을 수행한 결과가 아니다.
+- 실제 운영 업무 데이터 생성·가짜 자격 승인·계정 삭제는 실행하지 않았다. 새 설정 테이블에는 기존 역할·초대 데이터를 backfill하지 않았다. 사용자·상품 DB 초기화나 중요 상품 권한 확대는 이번 실행에 포함하지 않았다.
+- 상세 배포 revision·검증 한계는 [운영 반영 CHECK](../checks/CHECK-O4O-UNIFIED-MEMBERSHIP-ADMIN-DELIVERY-V1.md)의 운영자 정비 절을 따른다. 앞선 네트워크 차단·실패·대기 기록은 당시 결과로 보존한다.
