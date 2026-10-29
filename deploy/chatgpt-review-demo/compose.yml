@@ -69,7 +69,13 @@ services:
       REVIEW_DEMO_PASSWORD: ${REVIEW_DEMO_PASSWORD:?Supply the private reviewer password}
     depends_on:
       migrate: { condition: service_completed_successfully }
-    command: ["node", "dist/provision-chatgpt-review-demo.js", "--apply"]
+    command:
+      [
+        "node",
+        "dist/provision-chatgpt-review-demo.js",
+        "--apply",
+        "--enable-product-content",
+      ]
   api:
     image: ${REVIEW_DEMO_API_IMAGE:?Build the review API image from this branch}
     environment: *api-environment

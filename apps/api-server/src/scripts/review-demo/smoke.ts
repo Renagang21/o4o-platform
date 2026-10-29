@@ -22,6 +22,7 @@ const clients: Client[] = [],
   registrations: string[] = [],
   drafts: string[] = [];
 const requestIds = [randomUUID(), randomUUID(), randomUUID()];
+const productContentKey = `review-smoke-${randomUUID()}`;
 let jwt = "",
   passed = 0;
 let browser:
@@ -232,6 +233,61 @@ try {
   assert.notEqual(updated.data.revision, retrieved.data.revision);
   assert.equal(updated.data.status, "private_material");
   pass("P5 retrieve and update using latest revision");
+  const productInput = {
+    workspaceId,
+    productId: reviewIds.product,
+    productSource: "local",
+    contentKey: productContentKey,
+    language: "ko",
+    title: "심사용 합성 안내판 설명",
+    content: "<p>비의약품 합성 안내판의 소비자 안내 초안입니다.</p>",
+    requestId: randomUUID(),
+  };
+  const productSaved = await call(
+    client,
+    "save_product_content_draft",
+    productInput,
+  );
+  assert.equal(
+    productSaved.error,
+    false,
+    `product save: ${productSaved.data.code}`,
+  );
+  assert.equal(productSaved.data.status, "draft");
+  assert.equal(productSaved.data.groupStatus, "draft");
+  assert.equal(productSaved.data.editable, true);
+  assert.equal(
+    new URL(productSaved.data.openUrl).origin,
+    process.env.REVIEW_DEMO_STORE_ORIGIN,
+  );
+  const productRetry = await call(
+    client,
+    "save_product_content_draft",
+    productInput,
+  );
+  assert.equal(productRetry.error, false);
+  assert.equal(productRetry.data.id, productSaved.data.id);
+  pass("product content: private save and idempotent retry");
+  const productRead = await call(client, "get_product_content", {
+    workspaceId,
+    contentId: productSaved.data.id,
+  });
+  assert.equal(productRead.error, false);
+  assert.equal(productRead.data.id, productSaved.data.id);
+  assert.equal(productRead.data.content.html, productInput.content);
+  pass("product content: retrieve exact synthetic product page");
+  const productUpdated = await call(client, "update_product_content_draft", {
+    workspaceId,
+    contentId: productSaved.data.id,
+    title: "심사용 합성 안내판 설명 수정",
+    content: "<p>검토 전 비공개 상태로 수정한 안내문입니다.</p>",
+    expectedRevision: productRead.data.revision,
+    requestId: randomUUID(),
+  });
+  assert.equal(productUpdated.error, false);
+  assert.equal(productUpdated.data.status, "draft");
+  assert.notEqual(productUpdated.data.revision, productRead.data.revision);
+  pass("product content: update using latest revision without publishing");
   const readonly = await grant(["o4o:read"]);
   const denied = await call(readonly, "save_content_draft", {
     ...input,
@@ -279,6 +335,20 @@ try {
         "DELETE FROM store_execution_assets WHERE id=ANY($1::uuid[]) AND organization_id=$2",
         [drafts, reviewIds.store],
       );
+      await manager.query(
+        `DELETE FROM store_multilingual_product_content_pages WHERE group_id IN
+         (SELECT id FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND content_key=$2)`,
+        [reviewIds.store, productContentKey],
+      );
+      await manager.query(
+        "DELETE FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND content_key=$2",
+        [reviewIds.store, productContentKey],
+      );
+      const [remainingProducts] = await manager.query(
+        "SELECT count(*)::int AS n FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND content_key=$2",
+        [reviewIds.store, productContentKey],
+      );
+      assert.equal(remainingProducts.n, 0);
       const [remaining] = await manager.query(
         "SELECT count(*)::int AS n FROM store_execution_assets WHERE id=ANY($1::uuid[])",
         [drafts],

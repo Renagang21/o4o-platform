@@ -22,7 +22,7 @@
 - [x] 실제 SDK 핵심 8개 도구 조회·비공개 저장·최신 revision 수정 및 조직 격리 검증
 - [x] Neture/Store UI의 로그인·동의·편집기 검증(로컬 Chromium)
 - [x] API/Neture/Store 이미지 build 및 전체 Compose 기능·브라우저 재검증
-- [ ] 상품 콘텐츠 3개 도구 실행
+- [x] 상품 콘텐츠 3개 도구 실행 및 테스트 페이지/그룹 정리 (2026-10-29)
 - [x] 코드 검증·로컬 commit·작업 branch push
 - [ ] PR/CI·review
 - [ ] 별도 공개 HTTPS 배포 및 5+3 실제 사례 검증

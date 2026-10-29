@@ -10,6 +10,7 @@
 - 계정: `reviewer@example.invalid` — 합성 심사 전용 계정. 별도 보관한 `REVIEW_DEMO_PASSWORD`로 이메일/비밀번호 로그인한다. fixture actor에는 비밀번호나 운영자 역할을 주지 않는다.
 - 약국: 합성 테스트 약국 1곳, 비의약품 합성 안내판 1개, 합성 참고 자료 1개. 전문 자격 행은 실제 승인이 아닌 격리 fixture임을 이름·면허 문자열·사유로 명시한다.
 - 권한: 해당 약국의 조회·비공개 초안 저장/수정만. 운영 DB 및 관리자 접근 권한 없음. 메일 제공자와 결제 수단을 연결하지 않는다.
+- 상품 콘텐츠: `--enable-product-content`는 준비된 합성 계정·약국·fixture actor를 다시 확인한 뒤 기존 기능 자격 서비스를 통해 데모 이용 자격만 부여한다. 실제 결제나 구독은 생성하지 않는다. Compose provision은 이 옵션을 사용한다. 기존 계정 비밀번호와 작성 결과를 바꾸지 않고, 이미 활성화된 자격은 write 없이 유지한다.
 - `--apply` 없이는 데이터 생성 없음. 동일 marker version으로 재실행하면 기존 계정·비밀번호·작성 결과를 덮어쓰지 않는다. 파괴적 reset CLI를 제공하지 않는다.
 
 ## 로컬 준비
@@ -33,9 +34,9 @@ node --env-file=deploy/chatgpt-review-demo/.env deploy/chatgpt-review-demo/run-l
 REVIEW_DEMO_BROWSER_SMOKE=1 node --env-file=deploy/chatgpt-review-demo/.env --import tsx apps/api-server/src/scripts/review-demo/smoke.ts
 ```
 
-브라우저 검증에는 Linux의 `/usr/bin/chromium`과 저장소의 Playwright 의존성이 필요하다. 위 smoke 명령은 전체 Compose 실행 후에도 동일하게 사용한다. API 10개 검사와 브라우저 로그인·동의·편집기 동선을 컨테이너 구성에서도 통과했다.
+브라우저 검증에는 Linux의 `/usr/bin/chromium`과 저장소의 Playwright 의존성이 필요하다. 위 smoke 명령은 전체 Compose 실행 후에도 동일하게 사용한다. API 13개 검사와 브라우저 로그인·동의·일반 초안 편집기 동선을 검사한다. 상품 콘텐츠 편집기의 UI 동선은 별도 확인 대상이다.
 
-이 smoke는 실제 이메일 로그인·DCR·PKCE·동의·토큰 교환과 핵심 8개 MCP 도구의 P1~P5, 읽기 전용/다른 작업공간/이전 revision 거부를 검사한다. 발견된 11개 도구 중 상품 콘텐츠 3개 실행, 실제 ChatGPT 모델의 호출 선택 및 제출용 negative prompt 3개는 이 결과에 포함하지 않는다. 테스트 초안·DCR/연결/credential은 종료 시 정리하고 합성 기준 fixture와 보안 로그는 유지한다.
+이 smoke는 실제 이메일 로그인·DCR·PKCE·동의·토큰 교환과 11개 MCP 도구를 실행한다. P1~P5, 상품 콘텐츠 비공개 저장·조회·수정·동일 요청 재시도, 읽기 전용/다른 작업공간/이전 revision 거부를 검사한다. 실제 ChatGPT 모델의 호출 선택 및 제출용 negative prompt 3개는 이 결과에 포함하지 않는다. 테스트 일반 초안·상품 콘텐츠 페이지/그룹·DCR/연결/credential은 종료 시 정리하고 합성 기준 fixture와 보안 로그는 유지한다.
 
 DB의 외부 노출은 loopback `55459`, API는 loopback `13002`뿐이다. 다른 checkout의 기존 개발 DB와 volume을 공유하지 않는다. localhost 주소는 내부 검증용이며 OpenAI 심사 URL로 제출할 수 없다.
 
@@ -47,7 +48,7 @@ DB의 외부 노출은 loopback `55459`, API는 loopback `13002`뿐이다. 다�
 2. 각 UI의 `VITE_API_BASE_URL`을 데모 API로 빌드한다. API issuer/web/admin/store origin도 실제 데모 HTTPS 주소로 설정한다. `EXTERNAL_AI_STORE_ORIGIN`은 저장 결과가 운영 편집기로 향하지 않게 한다.
 3. `NODE_ENV=production`, host-only cookie, 데모 전용 JWT/refresh/credential keys와 실제 ChatGPT callback allowlist를 사용한다. SMTP·메일·결제·운영 스토리지 credential은 공급하지 않는다.
 4. 별도 DB에도 marker와 같은 전용 DB/role을 사용한다. 인증 URL·동의·작업공간·초안 열기·로그아웃까지 운영 호스트로 이동하지 않는지 브라우저 검증한다.
-5. 5개 정상/3개 비적용·거부 사례를 실제 실행하고, 비공개 초안·revision·조직 간 격리를 검증한다. 새 상품 콘텐츠 도구는 별도 검증 전 PASS로 기록하지 않는다.
+5. 5개 정상/3개 비적용·거부 사례를 실제 실행하고, 비공개 초안·revision·조직 간 격리를 검증한다. 공개 환경에서 11개 API 도구와 상품 콘텐츠 편집기 UI를 다시 검증한다.
 6. 실제 시연을 녹화해 접근 가능한 URL을 준비한다. 그 후 기존 제출 ZIP의 MCP URL과 reviewer 안내를 실제 데모 값으로 갱신한다. placeholder URL을 제출하지 않는다.
 
 공개 호스트, UI 이미지, Cloud 권한·배포·시연 URL은 이 구성 파일만으로 확보되지 않는다. PR/CI와 별도 인프라 준비/검증이 완료되기 전에는 심사 준비 완료로 보고하지 않는다.
