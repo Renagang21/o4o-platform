@@ -9,6 +9,7 @@
 [Main 리팩터링 TODO](../work-orders/TODO-O4O-MAIN-AUTOMATION-EVOLUTION-V1.md)의 개발 branch에서 SQLite v9로 이행한다. 배포 사실은 해당 CHECK/배포 기록으로 별도 확인한다. 기존 migration·backup과 `local-db.mjs` 단일 SQL 접근점을 유지한다.
 
 - `local_pharmacy_workspaces`: 소유 범위별 revision.
+- `local_pharmacy_sync_conflicts`: 다른 로컬 ID가 같은 상품코드/원본 키를 가리키면 서버 batch를 별도 보존한다. 의존 행도 유효 자료에 넣지 않고 cursor를 유지하며 Mapping 확인을 기다린다. 자동 ID 병합은 하지 않는다.
 - `local_pharmacy_records`: dataset·원본/교정 lane·kind·id별 행, payload와 증분 동기화 version/mutation/dirty. 전체 workspace JSON 재저장을 대체한다.
 - `local_pharmacy_sync`: 허가 epoch·cursor·최근 동기화·오류. 네트워크 전송은 별도 worker이며 DB 접근 모듈에 자격정보를 넣지 않는다.
 

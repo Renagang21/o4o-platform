@@ -547,6 +547,12 @@ export const MIGRATIONS = Object.freeze([
         CREATE INDEX idx_pharmacy_kind ON local_pharmacy_records(dataset,kind,id);
         CREATE INDEX idx_pharmacy_period ON local_pharmacy_records(dataset,kind,json_extract(payload,'$.data.period_from'));
         CREATE UNIQUE INDEX uq_pharmacy_source ON local_pharmacy_records(dataset,kind,json_extract(payload,'$.origin.program'),json_extract(payload,'$.origin.source_key')) WHERE lane='imported';
+        CREATE TABLE local_pharmacy_sync_conflicts (
+          dataset TEXT NOT NULL REFERENCES local_pharmacy_workspaces(dataset),
+          lane TEXT NOT NULL,kind TEXT NOT NULL,id TEXT NOT NULL,
+          payload TEXT NOT NULL CHECK(json_valid(payload)),server_version INTEGER NOT NULL,
+          PRIMARY KEY(dataset,lane,kind,id)
+        );
         CREATE TABLE local_pharmacy_sync (
           dataset TEXT PRIMARY KEY REFERENCES local_pharmacy_workspaces(dataset),
           epoch TEXT NOT NULL, cursor INTEGER NOT NULL DEFAULT 0,
@@ -1039,6 +1045,7 @@ export const LocalPharmacySyncRepository = {
       db.prepare('INSERT OR IGNORE INTO local_pharmacy_workspaces(dataset,revision) VALUES(?,0)').run(dataset);
       const old = db.prepare('SELECT epoch FROM local_pharmacy_sync WHERE dataset=?').get(dataset);
       if (old?.epoch !== epoch) {
+        db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=?').run(dataset);
         db.prepare('UPDATE local_pharmacy_records SET dirty=1,server_version=0,mutation_id=lower(hex(randomblob(16))) WHERE dataset=?').run(dataset);
         db.prepare('INSERT INTO local_pharmacy_sync(dataset,epoch,cursor) VALUES(?,?,0) ON CONFLICT(dataset) DO UPDATE SET epoch=excluded.epoch,cursor=0,synced_at=NULL,error=NULL').run(dataset, epoch);
       }
@@ -1049,7 +1056,8 @@ export const LocalPharmacySyncRepository = {
     pharmacyScope(dataset);
     const db=openLocalDb(),state=db.prepare('SELECT epoch,cursor,synced_at,error FROM local_pharmacy_sync WHERE dataset=?').get(dataset) ?? null;
     const counts=db.prepare('SELECT COALESCE(SUM(dirty=1),0) AS pending,COALESCE(SUM(dirty=2),0) AS conflicts FROM local_pharmacy_records WHERE dataset=?').get(dataset);
-    return {...state,pending:Number(counts.pending),conflicts:Number(counts.conflicts)};
+    const held=db.prepare('SELECT count(*) AS count FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset);
+    return {...state,pending:Number(counts.pending),conflicts:Number(counts.conflicts)+Number(held.count)};
   },
   pending(dataset) {
     pharmacyScope(dataset);
@@ -1067,13 +1075,26 @@ export const LocalPharmacySyncRepository = {
           server_version=MAX(server_version,?) WHERE dataset=? AND lane=? AND kind=? AND id=?`)
           .run(row.mutationId, row.version, dataset, row.lane, row.kind, row.id);
       }
+      // A different local ID for one source identity needs Mapping review. Hold the
+      // complete incoming batch so dependent rows cannot refer to a rejected product.
+      const collisions=[];
+      for(const row of changes){
+        if(row.entry.kind==='product')collisions.push(...db.prepare("SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND kind='product' AND id<>? AND json_extract(payload,'$.data.program')=? AND json_extract(payload,'$.data.program_code')=?").all(dataset,row.entry.data.id,row.entry.data.program,row.entry.data.program_code));
+        if(row.lane==='imported' && row.entry.origin)collisions.push(...db.prepare("SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND lane='imported' AND kind=? AND id<>? AND json_extract(payload,'$.origin.program')=? AND json_extract(payload,'$.origin.source_key')=?").all(dataset,row.entry.kind,row.entry.data.id,row.entry.origin.program,row.entry.origin.source_key));
+      }
+      if(collisions.length){
+        for(const row of changes)db.prepare(`INSERT INTO local_pharmacy_sync_conflicts(dataset,lane,kind,id,payload,server_version) VALUES(?,?,?,?,?,?) ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,server_version=excluded.server_version WHERE excluded.server_version>=local_pharmacy_sync_conflicts.server_version`).run(dataset,row.lane,row.entry.kind,row.entry.data.id,JSON.stringify(row),row.version);
+        for(const row of collisions)db.prepare('UPDATE local_pharmacy_records SET dirty=2 WHERE dataset=? AND lane=? AND kind=? AND id=?').run(dataset,row.lane,row.kind,row.id);
+        db.prepare("UPDATE local_pharmacy_sync SET synced_at=?,error='CONFLICT' WHERE dataset=?").run(nowIso(),dataset);
+        db.exec('COMMIT');return {conflicts:collisions.length,more};
+      }
       let conflicts = 0, changed = false;
       const put = db.prepare(`INSERT INTO local_pharmacy_records(dataset,lane,kind,id,payload,local_revision,server_version,mutation_id,dirty,updated_at)
         VALUES(?,?,?,?,?,0,?,?,0,?) ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,
         server_version=excluded.server_version,mutation_id=excluded.mutation_id,dirty=0,updated_at=excluded.updated_at`);
       for (const row of changes) {
         const old = db.prepare('SELECT payload,dirty,server_version FROM local_pharmacy_records WHERE dataset=? AND lane=? AND kind=? AND id=?').get(dataset, row.lane, row.entry.kind, row.entry.data.id);
-        if (old && Number(old.server_version) >= row.version) continue;
+        if (old && Number(old.server_version) >= row.version) {db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=? AND lane=? AND kind=? AND id=? AND server_version<=?').run(dataset,row.lane,row.entry.kind,row.entry.data.id,old.server_version);continue;}
         const payload = JSON.stringify(row.entry);
         if (old?.dirty && !isDeepStrictEqual(JSON.parse(old.payload), row.entry)) {
           // Preserve the local edit, quarantine it from automatic retransmission.
@@ -1081,7 +1102,8 @@ export const LocalPharmacySyncRepository = {
           db.prepare('UPDATE local_pharmacy_records SET dirty=2,server_version=? WHERE dataset=? AND lane=? AND kind=? AND id=?').run(row.version,dataset,row.lane,row.entry.kind,row.entry.data.id);
           conflicts++;continue;
         }
-        put.run(dataset, row.lane, row.entry.kind, row.entry.data.id, payload, row.version, row.mutationId, nowIso()); changed = true;
+        put.run(dataset, row.lane, row.entry.kind, row.entry.data.id, payload, row.version, row.mutationId, nowIso());
+        db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=? AND lane=? AND kind=? AND id=? AND server_version<=?').run(dataset,row.lane,row.entry.kind,row.entry.data.id,row.version); changed = true;
       }
       if (changed) db.prepare('UPDATE local_pharmacy_workspaces SET revision=revision+1 WHERE dataset=?').run(dataset);
       // Conflicted payloads remain locally visible and are never overwritten automatically.

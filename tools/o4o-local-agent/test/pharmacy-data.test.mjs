@@ -366,3 +366,18 @@ test('PC read keeps rows and summary revision in one SQLite snapshot across a co
  try{const read=await runAction('local.data.pharmacy_read',{}, {owner,kind:'supplier',limit:10});assert.equal(read.status,'success');assert.equal(read.data.records[0].data.name,'합성 거래처');assert.equal(read.data.revision,1);assert.throws(()=>importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...read.data.records[0].data,payment_timing:'at_order'}}]},read.data.revision,'user'),/REVISION_CONFLICT/);}finally{db.prepare=prepare;other.close();}
  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'동시 변경');
 });
+
+test('different IDs for one program code quarantine the remote batch without poisoning local references',async()=>{
+ const {LocalPharmacySyncRepository:journal,openLocalDb}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const product=sample().records[0],remote={...product,data:{...product.data,id:'remote-product'},origin:{...product.origin,source_key:'remote-product'}};
+ const stock=entry('stock',{id:'remote-stock',product_id:'remote-product',quantity:null,confidence:'unknown',observed_at:stamp});
+ const changes=[{lane:'imported',entry:stock,version:10,mutationId:crypto.randomUUID()},{lane:'imported',entry:remote,version:11,mutationId:crypto.randomUUID()}];
+ const result=journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.ok(result.conflicts>0);assert.equal(journal.state(dataset).cursor,0);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.length,9);assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='remote-product'),false);
+ assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
+ assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...sample().records[2].data,name:'후속 교정'}}]},readPharmacyWorkspace(owner).revision,'user');
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'후속 교정');
+ journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
+});
