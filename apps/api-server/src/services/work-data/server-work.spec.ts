@@ -26,6 +26,7 @@ it('rejects invented workspaces and unrequested writes before domain mutations',
  await runServerContentWork(db,'user-fixture','내 매장 자료 보여줘',{},async()=>JSON.stringify({action:'materials',workspace:'store:other',query:''}));
  expect(authorize).not.toHaveBeenCalled();
  await runServerContentWork(db,'user-fixture','내 매장 자료 보여줘',{},async()=>JSON.stringify({action:'draft',workspace:'store:fixture',destination:'store_document',title:'초안',content:'내용'}));
+ await runServerContentWork(db,'user-fixture','내 매장 초안 문서를 읽어줘',{},async()=>JSON.stringify({action:'draft',workspace:'store:fixture',destination:'store_document',title:'초안',content:'내용'}));
  expect(save).not.toHaveBeenCalled();
 });
 it('rechecks write authorization in the saving transaction and creates only a draft',async()=>{

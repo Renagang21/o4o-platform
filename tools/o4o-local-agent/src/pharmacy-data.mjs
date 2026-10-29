@@ -74,6 +74,7 @@ export function pharmacySummary(owner) {
   const sync=LocalPharmacySyncRepository.state(scope(owner));
   return { ...summary, sync:{pending:sync.pending,conflicts:sync.conflicts,lastSyncedAt:sync.synced_at??null,error:sync.error??null}, counts: Object.fromEntries(PHARMACY_KINDS.map(k => [k, summary.counts[k] ?? 0])), schema: 'pharmacy_rows_v1', externalExecutionSupported: false };
 }
+export function pharmacyRead(owner,options) { return LocalPharmacyWorkspaceRepository.snapshot(()=>({...pharmacyPage(owner,options),...pharmacySummary(owner)})); }
 export function pharmacyPage(owner, options) { return LocalPharmacyWorkspaceRepository.page(scope(owner), options); }
 export const pharmacyDataset = scope;
 

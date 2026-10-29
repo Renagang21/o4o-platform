@@ -951,7 +951,7 @@ export const LocalDatasetRepository = {
   },
 };
 
-/** Pharmacy work data uses existing Dataset storage, schema v8 unchanged. SQL remains in this module.
+/** Pharmacy work data uses normalized Dataset storage, schema v9. SQL remains in this module.
  * A scoped workspace row is atomic and revision checked across CLI processes. No arbitrary SQL/paths.
  */
 const pharmacyScope = dataset => {
@@ -961,21 +961,29 @@ const pharmacyScope = dataset => {
 const pharmacyEffective = `r.dataset=? AND (r.lane='user' OR NOT EXISTS
   (SELECT 1 FROM local_pharmacy_records u WHERE u.dataset=r.dataset AND u.lane='user' AND u.kind=r.kind AND u.id=r.id))`;
 export const LocalPharmacyWorkspaceRepository = {
+  snapshot(read) {
+    const db=openLocalDb();db.exec('SAVEPOINT pharmacy_read_snapshot');
+    try{const result=read();db.exec('RELEASE pharmacy_read_snapshot');return result;}
+    catch(error){db.exec('ROLLBACK TO pharmacy_read_snapshot');db.exec('RELEASE pharmacy_read_snapshot');throw error;}
+  },
   revision(dataset) {
     pharmacyScope(dataset);
     return Number(openLocalDb().prepare('SELECT revision FROM local_pharmacy_workspaces WHERE dataset=?').get(dataset)?.revision ?? 0);
   },
   read(dataset) {
     pharmacyScope(dataset);
+    return this.snapshot(()=>{
     const records = openLocalDb().prepare('SELECT lane,payload FROM local_pharmacy_records WHERE dataset=? ORDER BY kind,id').all(dataset);
     return { revision: this.revision(dataset),
       imported: records.filter(r => r.lane === 'imported').map(r => JSON.parse(r.payload)),
       user: records.filter(r => r.lane === 'user').map(r => JSON.parse(r.payload)) };
+    });
   },
   page(dataset, { kind, after = '', limit = 200 } = {}) {
     pharmacyScope(dataset);
     if (kind !== undefined && !['product','pack','supplier','purchase','usage','sale','stock','availability','balance','sheet'].includes(kind)) throw Error('PHARMACY_KIND_INVALID');
     if (typeof after !== 'string' || after.length > 100 || !Number.isSafeInteger(limit) || limit < 1 || limit > 500) throw Error('PHARMACY_PAGE_INVALID');
+    return this.snapshot(()=>{
     const filter = kind ? ' AND r.kind=?' : '';
     const rows = openLocalDb().prepare(`SELECT r.kind,r.id,r.payload FROM local_pharmacy_records r WHERE ${pharmacyEffective}
       ${filter} AND (r.kind||':'||r.id)>? ORDER BY r.kind,r.id LIMIT ?`).all(dataset, ...(kind ? [kind] : []), after, limit + 1);
@@ -983,6 +991,7 @@ export const LocalPharmacyWorkspaceRepository = {
     while(page.length>1 && Buffer.byteLength(JSON.stringify(page.map(r=>JSON.parse(r.payload))))>900*1024)page.pop();
     return { revision: this.revision(dataset), records: page.map(r => JSON.parse(r.payload)),
       next: rows.length > page.length ? page.at(-1).kind + ':' + page.at(-1).id : null };
+    });
   },
   summary(dataset) {
     pharmacyScope(dataset);

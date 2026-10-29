@@ -358,3 +358,11 @@ test('authenticated command contract reaches SQLite, backs up program imports, a
   const failed=await runAction('local.data.pharmacy_write',{}, {owner,mode:'restore',records:[invalid,{kind:'product',data:{...product.data,id:'p2',program_code:'002'}}],expectedRevision:1});
   assert.notEqual(failed.status,'success');assert.deepEqual(readPharmacyWorkspace(owner),before);
  });
+
+test('PC read keeps rows and summary revision in one SQLite snapshot across a concurrent writer',async()=>{
+ const {openLocalDb}=await import('../src/local-db.mjs');const {DatabaseSync}=await import('node:sqlite');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');const {runAction}=await import('../src/handlers.mjs');
+ importSample();const db=openLocalDb(),other=new DatabaseSync(path.join(home,'local.db'));const prepare=db.prepare.bind(db);let written=false;
+ db.prepare=sql=>{const statement=prepare(sql);if(sql.startsWith('SELECT r.kind,r.id,r.payload')){const all=statement.all.bind(statement);statement.all=(...args)=>{const rows=all(...args);if(!written){written=true;other.exec('BEGIN IMMEDIATE');const supplier=sample().records.find(r=>r.kind==='supplier');supplier.data.name='동시 변경';other.prepare("UPDATE local_pharmacy_records SET payload=? WHERE dataset=? AND lane='imported' AND kind='supplier'").run(JSON.stringify(supplier),pharmacyDataset(owner));other.prepare('UPDATE local_pharmacy_workspaces SET revision=revision+1 WHERE dataset=?').run(pharmacyDataset(owner));other.exec('COMMIT');}return rows;};}return statement;};
+ try{const read=await runAction('local.data.pharmacy_read',{}, {owner,kind:'supplier',limit:10});assert.equal(read.status,'success');assert.equal(read.data.records[0].data.name,'합성 거래처');assert.equal(read.data.revision,1);assert.throws(()=>importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...read.data.records[0].data,payment_timing:'at_order'}}]},read.data.revision,'user'),/REVISION_CONFLICT/);}finally{db.prepare=prepare;other.close();}
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'동시 변경');
+});

@@ -193,15 +193,17 @@ describe('connected pharmacy work data',()=>{
   expect(screen.queryByText('합성 거래처',{selector:'legend'})).toBeNull();
   expect(screen.queryByRole('button',{name:'수정 취소하고 최신 자료 불러오기'})).toBeNull();
  });
- it('restores a mixed file in one request bound to the selected PC and owner',async()=>{
+ it('restores mixed files in bounded sequential requests bound to one PC and owner',async()=>{
   const deviceId='44444444-4444-4444-8444-444444444444';
   const records=[{kind:'product',data:{id:'p',name:'합성 상품',program:'fixture',program_code:'001',kind:'dispensing'}},{kind:'stock',data:{id:'st',product_id:'p',quantity:null,confidence:'unknown',observed_at:'2026-10-29T00:00:00Z'},origin:{program:'fixture',source_key:'st',collected_at:'2026-10-29T00:00:00Z'}}];
+  for(let i=0;i<1001;i++)records.push({kind:'product',data:{id:'extra'+i,name:'추가 상품',program:'fixture',program_code:'extra'+i,kind:'dispensing'}} as any);
+  let revision=7;
   vi.mocked(workDataRequest).mockClear();
   vi.mocked(workDataRequest).mockImplementation(async(action)=>{
     if(action==='status')return permission as any;
     if(action==='method-sharing')return {enabled:false} as any;
     if(action==='pc-read')return {revision:7,deviceId,owner:permission.owner} as any;
-    if(action==='save')return {revision:8,deviceId,owner:permission.owner} as any;
+    if(action==='save')return {revision:++revision,deviceId,owner:permission.owner} as any;
     return {} as any;
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
@@ -209,8 +211,8 @@ describe('connected pharmacy work data',()=>{
   await screen.findByText(/파일을 미리 보고 있어요/);
   fireEvent.click(screen.getByRole('button',{name:'현재 자료를 PC에 보관'}));await screen.findByText(/PC에 저장했어요/);
   const saves=vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save');
-  expect(saves).toHaveLength(1);expect(saves[0][2]).toMatchObject({mode:'restore',expectedRevision:7,deviceId,expectedOwner:permission.owner});
-  expect((saves[0][2] as any).records).toEqual(expect.arrayContaining(records));
+  expect(saves).toHaveLength(2);for(const [index,call] of saves.entries()){expect(call[2]).toMatchObject({mode:'restore',expectedRevision:7+index,deviceId,expectedOwner:permission.owner});expect((call[2] as any).records.length).toBeLessThanOrEqual(1000);}
+  expect(saves.flatMap(call=>(call[2] as any).records)).toEqual(expect.arrayContaining(records));
  });
  it('keeps the editor usable and queues a later edit while the first save is in flight',async()=>{
   let release!:()=>void;let saves=0;

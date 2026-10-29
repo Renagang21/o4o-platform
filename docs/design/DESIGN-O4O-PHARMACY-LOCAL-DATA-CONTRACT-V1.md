@@ -16,7 +16,7 @@ v8의 `row_key='workspace'` 원본은 정식 migration으로 이전하고 복구
 
 소유 dataset 이름은 `pharmacy_` + `SHA256(owner).slice(0,48)`이며 owner는 `user:<id>` 또는 `organization:<id>`다. CLI 문자열은 인증이 아니다. Main API와 PC session API는 실제 계정·조직 소속을 다시 확인한다. generic dataset 통로는 이 scoped 이름을 계속 거부한다.
 
-8MB·10,000개는 한 번 가져오는 배치의 보호 한도이며 전체 누적 보관량이 아니다. 조회는 페이지로 나누고 주문 작업은 필요한 catalog/시트만 불러온다. 환자·처방 원본을 축적하거나 전체 이력을 AI에 무제한 보내지 않는다.
+기존 단일 JSON의 8MB·10,000개는 전송 배치 한도이며 전체 누적 보관량이 아니다. Main의 화면 자료 내보내기는 큰 자료를 참조가 완결된 작은 part들로 구성한 JSON 파일 하나로 묶는다(archive 최대 64MB, part 최대 1,000개/850KiB). 기존 단일 JSON도 읽으며, 같은 PC/owner에 revision을 이어 part별 원자 복원한다. 이는 현재 불러온 자료의 보관이며 구매·사용량·판매·거래장 전체 백업을 뜻하지 않는다. 조회는 페이지로 나누고 주문 작업은 필요한 catalog/시트만 불러온다. 환자·처방 원본을 축적하거나 전체 이력을 AI에 무제한 보내지 않는다.
 
 서버에는 명시 동의를 받은 업무 사본만 저장한다. 허가 epoch·행 version·멱등 mutation으로 재전송과 동시 수정을 구분하고 철회 시 서버 사본을 삭제한다. PC 원본은 유지한다. PC session을 이용한 증분 업로드와 서버 수정의 PC 반영은 기존 인증을 재사용한다. 기본 미동의 상태의 Main↔PC 명령도 기존 서버 명령 큐를 일시 경유하므로 “서버를 전혀 거치지 않는다”고 안내하지 않는다. 일시 전달과 지속 업무 사본 보관은 구분한다. Task·Memory·실제 외부 주문 원장을 대체하지 않는다.
 
@@ -46,7 +46,7 @@ v8의 `row_key='workspace'` 원본은 정식 migration으로 이전하고 복구
 
 동일 kind/id는 merge(upsert)이며 같은 source_key의 id 변경·중복·이전 collected_at은 거절한다. imported lane을 다시 수집해도 user lane의 거래 조건·초안·관찰은 남는다. user view는 같은 kind/id의 전체 사용자 record가 우선한다. 따라서 source 갱신과 충돌하는 교정은 사용자가 원본과 비교해 재검토해야 하며 자동 충돌 해결로 위장하지 않는다. 구매·사용·판매·거래장 내역을 사용자 lane에 손으로 만들어 넣는 것을 거절한다.
 
-CLI import는 기존 backup을 만든 뒤 revision 검사·원자 저장한다. export 파일은 명시적 경로에만, 기존 파일을 덮어쓰지 않고 기록한다. 콘솔에는 원문 대신 개수·상태만 출력한다. Mapping은 `local_mappings`에 소유자+program+kind+profile로 구분해 재사용한다.
+CLI import는 기존 backup을 만든 뒤 revision 검사·원자 저장한다. PC 조회의 행·revision·summary는 같은 SQLite 읽기 snapshot을 사용한다. export 파일은 명시적 경로에만, 기존 파일을 덮어쓰지 않고 기록한다. 콘솔에는 원문 대신 개수·상태만 출력한다. Mapping은 `local_mappings`에 소유자+program+kind+profile로 구분해 재사용한다.
 
 ## 4. 실행·학습·기기 경계
 

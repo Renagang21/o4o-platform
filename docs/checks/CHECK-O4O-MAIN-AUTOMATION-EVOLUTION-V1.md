@@ -18,11 +18,11 @@
 
 | 검증 | 실제 결과 | 범위/한계 |
 |---|---|---|
-| native 전체 `node --test tools/o4o-local-agent/test/*.test.mjs` | 215건 중 213 PASS · Windows 2 SKIP | 격리 SQLite/합성 bridge. 실제 사용자 PC와 구분 |
+| native 전체 `node --test tools/o4o-local-agent/test/*.test.mjs` | 216건 중 214 PASS · Windows 2 SKIP | 격리 SQLite/합성 bridge. 실제 사용자 PC와 구분 |
 | SQLite 누적/이행/동기화 | PASS | 12,000개 누적·페이지 조회, 원본/교정·중복·revision, v8 이행/손상 rollback/백업, grant 없는 무전송·재전송·철회, in-flight 수정 보존·충돌 격리 |
 | PostgreSQL 15 전용 fixture | 13 PASS · 생성 DB 삭제 확인 | baseline/모든 prefix fingerprint·신규 empty down/up, 허가/철회·소유권·멱등성·충돌·교정·단위별 집계·추천 선택 동의, HTTP의 합성 인증 principal과 Task 타인/만료 차단 |
 | Main 주문 준비 Vitest | 15 PASS | 기존 주문 준비/직접 접수 경계, 자동 저장 실패 입력 보존·반복 재시도 중지·사용자 재시도, 두 종류 동의 분리 |
-| Main home/첨부/재개 관련 Vitest | 8 suite · 69 PASS | 위 15건을 포함. 중복 합산하지 않음 |
+| Main home/첨부/재개 관련 Vitest | 9 suite · 71 PASS | 위 15건을 포함. 중복 합산하지 않음 |
 | Main 실제 Chromium | desktop/mobile PASS | 전체 Main 화면·보관 선택·자동 저장·기기 전환 서버 조회·가로 넘침/페이지 오류 없음. 합성 API이며 실제 PC/사이트 아님 |
 | 서버 콘텐츠 실행 unit | 8 PASS | 기존 adapter 재사용, 미승인 공간·요청하지 않은 쓰기 거절, 저장 transaction에서 권한 재검사 |
 | API 확장 회귀/최종 타입·build·정적 guard | 확장 회귀 23 suite · 407 PASS. 리뷰 보완 API 3 suite · 68 PASS. API 타입/Main build·guard PASS | 최신 main 정렬 후 인계 HEAD에서 재확인 |
@@ -37,9 +37,11 @@
 - Codex P2: 재고·품절 확인 이력은 별도 영역에서 종류별 100건/페이지로 조회한다. 재조회·다음 페이지·새로 접속한 모바일에서 저장한 기록 복원을 검증했다. 이전 연결의 비동기 응답은 generation으로 폐기한다.
 - 재리뷰 P2: 조회/집계의 권한·동의 검사도 이미 확보한 transaction manager를 사용한다. pool max 1에서 동시 조회/집계 8건이 완료되는 격리 DB 회귀를 추가했다. 커뮤니티 Block[] 본문은 기존 `blocksToText`와 텍스트 변환으로 응답하며 실제 helper를 사용한 문단 변환을 검증했다.
 - CI shard 2/3의 `local-data-bridge` 기대 목록을 새 두 데이터 명령과 맞췄다. 임의 SQL/파일 경로·접미사 차단은 유지하며 focused 27건이 통과했다. CI 묶음 전체는 새 HEAD에서 다시 확인한다.
-- 추가 리뷰 P2: 제목으로 본문을 요청하면 검색의 실제 ID를 사용해 같은 요청에서 본문까지 읽는다. 단일 결과/명확한 제목 일치는 추가 모델 호출 없이 진행하고, 모호한 결과는 제목을 포함한 후속 요청 예시로 연결한다.
+- 추가 리뷰 P2: PC 행·revision·handler summary는 하나의 SQLite 읽기 snapshot에서 반환한다. 별도 연결의 동시 commit 뒤에도 이전 행에는 이전 revision만 붙고 stale 저장이 거부된다.
+- 추가 리뷰 P2: 1만 건 초과 화면 자료는 참조가 포함된 제한된 part들로 구성한 JSON 파일 하나로 내보낸다. 기존 단일 JSON도 유지하며 Main이 같은 PC/owner/revision에 순차 복원한다. 12,001건 roundtrip·part별 참조/크기·중복 내용 충돌 차단과 순차 UI 요청을 검증했다.
+- 추가 리뷰 P2: 제목으로 본문을 요청하면 검색의 실제 ID를 사용해 같은 요청에서 본문까지 읽는다. 단일 결과/명확한 제목 일치는 추가 모델 호출 없이 진행하고, 모호한 결과는 제목을 포함한 후속 요청 예시로 연결한다. 제목에 초안이 포함된 조회는 새 초안 저장 허가로 취급하지 않는다.
 - 추가 리뷰 P2: 사용자가 동일한 충돌 자료를 명시적으로 다시 가져오면 해당 행만 확인된 서버 version 기준의 전송 대기로 복구한다. 무관한 충돌과 일반 중복 가져오기는 유지한다. 파일 내보내기는 화면에 조회한 부분 자료임을 버튼·본문에 명시하며 프로그램 전체 backup으로 표시하지 않는다.
-- 추가 리뷰 P2: PC 파일 반영은 두 lane을 분할하지 않고 기존 단일 SQLite update transaction에 함께 반영한다. 원본 키·접수 증거·포장 기준·revision 검사를 유지하며 교차 참조 성공·전체 rollback·사전 백업과 UI 단일 요청을 검증했다.
+- 추가 리뷰 P2: PC 파일 반영은 두 lane을 분할하지 않고 각 part의 기존 단일 SQLite update transaction에 함께 반영한다. 원본 키·접수 증거·포장 기준·revision 검사를 유지하며 교차 참조 성공·전체 rollback·사전 백업과 UI 단일 요청을 검증했다.
 - 추가 리뷰 P2: v8 각 lane의 형식 검증은 유지하되 참조는 두 lane을 합친 유효 자료에서 검증한다. user 상품을 참조하는 imported 재고의 이행 성공·실제 dangling 참조의 rollback을 검증했다.
 - 추가 리뷰 P2: 저장 충돌 시 수정 내용을 보존하고 명시적인 수정 취소·최신 재조회 경로를 제공한다. 재조회 실패 시 입력을 유지하는 회귀를 검증했다. Sonar 주석의 JSON fence 정규식은 trim/접두·접미 검사로 대체하고 browser screenshot은 mkdtemp 전용 디렉터리에 저장한다. 상세 Sonar 중복률/등급은 후속 HEAD 결과로 확인한다.
 - 자동 저장 중에도 다음 입력을 허용하고 새 교정은 후속 저장으로 보낸다. 파일 미리보기는 이전 PC/서버 연결과 분리하여 다른 자료에 자동 저장되지 않게 한다.

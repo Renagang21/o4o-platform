@@ -1,5 +1,5 @@
 import { validatePharmacyCommand } from './pharmacy-order-contract.mjs';
-import { pharmacyPage, pharmacySummary, importPharmacyRecords } from './pharmacy-data.mjs';
+import { pharmacyRead, pharmacySummary, importPharmacyRecords } from './pharmacy-data.mjs';
 /**
  * Local Work Agent — action handler (§21·§28)
  *
@@ -1238,8 +1238,8 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_GET_META]: { validate: validateGetMetaArgs, run: (args) => dataGetMeta(args) },
   [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
   [ACTIONS.DATA_QUERY]: { validate: validateDataQueryArgs, run: (args) => dataQuery(args) },
-  [ACTIONS.DATA_PHARMACY_READ]: { validate: args => validatePharmacyCommand('read', args), run: args => ({ status:'success',data:{ ...pharmacyPage(args.owner, args), ...pharmacySummary(args.owner) } }) },
-  [ACTIONS.DATA_PHARMACY_WRITE]: { validate: args => validatePharmacyCommand('write', args), run: args => { if(args.mode==='program'||args.mode==='restore')createBackup(openLocalDb(),'manual');importPharmacyRecords(args.owner, {format: 'o4o-pharmacy-work-v1', records:args.records}, args.expectedRevision, args.mode); return {status:'success',data:pharmacySummary(args.owner)}; } },
+  [ACTIONS.DATA_PHARMACY_READ]: { validate: args => validatePharmacyCommand('read', args), run: args => ({ status:'success',data:pharmacyRead(args.owner,args) }) },
+  [ACTIONS.DATA_PHARMACY_WRITE]: { validate: args => validatePharmacyCommand('write', args), run: args => { if(args.mode==='program'||args.mode==='restore')createBackup(openLocalDb(),'manual');const saved=importPharmacyRecords(args.owner, {format: 'o4o-pharmacy-work-v1', records:args.records}, args.expectedRevision, args.mode); return {status:'success',data:{...pharmacySummary(args.owner),revision:saved.revision}}; } },
   [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
   [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE]: { validate: validateCandidateSaveArgs, run: (args) => dataCandidateSave(args) },

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../../lib/ai/home-chat';
 import {
-  PHARMACY_FORMAT, PHARMACY_LIMITS, parsePharmacyBundle, validatePharmacyBundle, groupOrderLines, sheetReceipts, orderPreparationRequest, packTotal,
+  PHARMACY_FORMAT, validatePharmacyBundle, groupOrderLines, sheetReceipts, orderPreparationRequest, packTotal,
   type PharmacyBundle, type PharmacyEntry, type OrderSheet, type OrderLine, type Supplier,
 } from '../../lib/pharmacy/order';
 
+import { PHARMACY_ARCHIVE_BYTES, parsePharmacyFile, pharmacyExportFile, pharmacyTransferParts } from '../../lib/pharmacy/archive';
 import type { WorkScope } from '../../lib/work-scope';
 import { loadWorkingData, workDataRequest, type WorkDataSnapshot, type WorkDataConsent } from '../../lib/pharmacy/work-data';
 
@@ -12,7 +13,7 @@ const uid = () => crypto.randomUUID();
 const initial = (): PharmacyBundle => ({ format: PHARMACY_FORMAT, records: [{ kind: 'sheet', data: { id: uid(), title: '주문 준비', lines: [], status: 'draft' } }] });
 const errorText = (e: unknown) => e instanceof Error ? e.message : '자료를 확인해 주세요.';
 const download = (value: unknown, filename: string) => {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }));
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 function mergeHistory(old:PharmacyBundle,records:PharmacyEntry[],edited:PharmacyEntry[]):PharmacyBundle {
@@ -84,6 +85,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         location:'server',epoch:storage.consent.epoch,changes:pending.map(entry=>({lane:'user',entry,expectedVersion:storage.versions?.[entry.kind+':'+entry.data.id]?.lane==='user'?storage.versions[entry.kind+':'+entry.data.id].version:0,mutationId:crypto.randomUUID()})),
       }:{mode:'user',records:pending,expectedRevision:storage.revision,deviceId:storage.deviceId,expectedOwner:storage.consent.owner});
       if(!alive.current)return;
+      dataGeneration.current++;
       setStorage(old=>{if(!old)return old;const versions={...old.versions};for(const row of result.accepted??[])versions[row.kind+':'+row.id]={lane:row.lane,version:row.version};return {...old,revision:result.revision??old.revision,versions};});
       setEdited(old=>old.filter(entry=>!pending.includes(entry)));setNotice('저장했어요.');
     }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+( /CONFLICT|충돌|revision/i.test(errorText(e))?' 자료가 바뀌었어요. 수정 내용을 내보내거나 취소한 뒤 최신 자료를 불러와 주세요.':' 다시 저장할 수 있어요.')+' 입력한 내용은 유지했어요.');}}
@@ -95,8 +97,11 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     setBusy(true);setError('');let saved=0;
     try {
       let current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('pc-read',workScope);
-      current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('save',workScope,{mode:'restore',records:bundle.records,expectedRevision:current.revision,deviceId:current.deviceId,expectedOwner:current.owner});
-      saved=bundle.records.length;if(!alive.current)return;
+      const parts=pharmacyTransferParts(bundle);
+      for(const [index,part] of parts.entries()){
+        current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('save',workScope,{mode:'restore',records:part.records,expectedRevision:current.revision,deviceId:current.deviceId,expectedOwner:current.owner});
+        saved+=part.records.length;if(!alive.current)return;setNotice(`${index+1}/${parts.length} 묶음을 PC에 반영했어요…`);
+      }
       const permission=await workDataRequest<WorkDataConsent>('status',workScope);
       if(!alive.current)return;if(permission.owner!==current.owner)throw Error('업무 범위가 바뀌었어요. 자료를 다시 확인해 주세요.');setEdited([]);setStorage({location:'pc',deviceId:current.deviceId,revision:current.revision,consent:permission,records:bundle.records,next:null,counts:{}});
       setNotice('PC에 저장했어요. 서버 보관을 허용했다면 연결 중에 함께 동기화해요.');
@@ -214,8 +219,8 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           const file = e.currentTarget.files?.[0]; e.currentTarget.value = ''; if (!file) return;
           setError(''); setBusy(true);
           try {
-            if (file.size > PHARMACY_LIMITS.fileBytes) throw Error('자료 파일은 8MB 이내로 준비하세요.');
-            const parsed = parsePharmacyBundle(await file.text()); if (!alive.current) return;
+            if (file.size > PHARMACY_ARCHIVE_BYTES) throw Error('자료 파일은 64MB 이내로 준비하세요.');
+            const parsed = parsePharmacyFile(await file.text()); if (!alive.current) return;
             if ((!storage && bundle.records.some(r => r.kind !== 'sheet' || r.data.lines.length)) || edited.length) throw Error('현재 자료를 먼저 내보내고 새로고침한 뒤 가져오세요. 기존 작업을 덮어쓰지 않습니다.');
             dataGeneration.current++;setStorage(null);setHistoryLoaded(false);setHistoryPages({});
             setBundle(parsed.records.some(r => r.kind === 'sheet') ? parsed : { ...parsed, records: [...parsed.records, ...initial().records] });
@@ -227,7 +232,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       {workScope && <button type="button" disabled={blocked || !!storage} onClick={()=>void importToPc()} className="rounded bg-blue-700 px-3 py-2 text-white">현재 자료를 PC에 보관</button>}
       <p className="text-xs">화면에 불러온 상품·거래처·포장·주문 시트와 조회한 이력만 파일에 담아요. 구매·사용량·판매·거래장 원본은 연결된 PC·서버에 보관돼요.</p>
       <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={blocked} onClick={() => attempt(() => download(validatePharmacyBundle(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">화면 자료 내보내기</button>
+        <button type="button" disabled={blocked} onClick={() => attempt(() => download(pharmacyExportFile(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">화면 자료 내보내기</button>
         <button type="button" disabled={blocked || !edited.length} onClick={() => attempt(() => download({ format: PHARMACY_FORMAT, records: edited }, 'o4o-pharmacy-user-edits.private.json'))} className="rounded border px-2 py-1">PC 반영용 수정 내보내기</button>
       </div>
       <p className="text-xs">내보낸 파일에는 약국 업무 자료가 포함됩니다. 본인의 PC·계정에서만 사용하세요. 수정 파일은 기존 SQLite 자료에 병합하며 원본 프로그램 내역을 대체하지 않습니다.</p>
