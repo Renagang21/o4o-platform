@@ -55,7 +55,7 @@ export function validatePcRelease(value: unknown): PcRelease {
       !/^[a-f0-9]{64}$/.test(r.setup.sha256 ?? "") ||
       !Number.isSafeInteger(r.setup.bytes) ||
       r.setup.bytes <= 0 ||
-      r.setup.bytes > 64 * 1024)
+      r.setup.bytes >= 32 * 1024 * 1024)
   )
     throw new Error("설치 파일을 확인하지 못했습니다.");
   return r as PcRelease;

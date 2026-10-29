@@ -1,57 +1,55 @@
-/** Small Windows launcher. Downloads only the exact, hash-pinned release built beside it. */
-export function setupDownload(manifest) {
+import { createHash } from "node:crypto";
+
+/** One offline Windows installer: readable batch/PowerShell header + verified ZIP + footer. */
+export function setupDownload(manifest, archive) {
   if (
     !/^o4o-pc-connection-[a-f0-9]{12}-[a-f0-9]{12}\.zip$/.test(
       manifest.filename,
     ) ||
     !/^[a-f0-9]{64}$/.test(manifest.sha256) ||
-    !Number.isSafeInteger(manifest.bytes) ||
-    manifest.bytes <= 0 ||
-    manifest.bytes >= 32 * 1024 * 1024
+    !Buffer.isBuffer(archive) ||
+    archive.length !== manifest.bytes ||
+    archive.length <= 0 ||
+    createHash("sha256").update(archive).digest("hex") !== manifest.sha256
   )
     throw Error("INVALID_SETUP_RELEASE");
-  return Buffer.from(
+  const header = Buffer.from(
     `@echo off
 setlocal DisableDelayedExpansion
 chcp 65001 >nul
 set "O4O_SETUP_FILE=%~f0"
-"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoLogo -NoProfile -Command "$text=[IO.File]::ReadAllText($env:O4O_SETUP_FILE,[Text.Encoding]::UTF8); & ([scriptblock]::Create($text.Substring($text.LastIndexOf('# O4O_SETUP_SCRIPT')+18)))"
+"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoLogo -NoProfile -Command "$f=[IO.File]::OpenRead($env:O4O_SETUP_FILE); $r=[IO.BinaryReader]::new($f); if($f.Length -lt 16){throw 'Invalid installer'}; $f.Position=$f.Length-16; $footer=$r.ReadBytes(16); if([Text.Encoding]::ASCII.GetString($footer,0,8) -ne 'O4OPKG1!'){throw 'Invalid installer'}; $n=[BitConverter]::ToInt64($footer,8); if($n -le 0 -or $n -gt 16384 -or $n -gt $f.Length-16){throw 'Invalid installer'}; $f.Position=0; $text=[Text.Encoding]::UTF8.GetString($r.ReadBytes([int]$n)); $r.Dispose(); & ([scriptblock]::Create($text.Substring($text.LastIndexOf('# O4O_SETUP_SCRIPT')+18)))"
 set "O4O_SETUP_EXIT=%ERRORLEVEL%"
 if not "%O4O_SETUP_EXIT%"=="0" pause
 exit /b %O4O_SETUP_EXIT%
 # O4O_SETUP_SCRIPT
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
-$downloadUrl = 'https://neture.co.kr/downloads/pc-connection/${manifest.filename}'
 $expectedHash = '${manifest.sha256}'
 $expectedBytes = ${manifest.bytes}
-function Receive-Package([string]$target) {
-  [void][Reflection.Assembly]::LoadWithPartialName('System.Net.Http')
-  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  $handler = [Net.Http.HttpClientHandler]::new()
-  $handler.AllowAutoRedirect = $false
-  $client = [Net.Http.HttpClient]::new($handler)
-  $client.Timeout = [TimeSpan]::FromMinutes(3)
-  $cancel = [Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
-  $response = $null; $inputStream = $null; $outputStream = $null
+function Copy-EmbeddedPackage([string]$target) {
+  $source = [IO.File]::OpenRead($env:O4O_SETUP_FILE)
+  $outputStream = $null
   try {
-    $response = $client.GetAsync($downloadUrl, [Net.Http.HttpCompletionOption]::ResponseHeadersRead, $cancel.Token).GetAwaiter().GetResult()
-    if ([int]$response.StatusCode -ne 200) { throw 'DOWNLOAD_FAILED' }
-    $inputStream = $response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
+    $reader = [IO.BinaryReader]::new($source)
+    $source.Position = $source.Length - 16
+    $footer = $reader.ReadBytes(16)
+    if ([Text.Encoding]::ASCII.GetString($footer, 0, 8) -ne 'O4OPKG1!') { throw 'INVALID_PACKAGE_FOOTER' }
+    $offset = [BitConverter]::ToInt64($footer, 8)
+    if ($offset -le 0 -or $offset -gt 16384 -or $source.Length -ne $offset + $expectedBytes + 16) { throw 'PACKAGE_SIZE_MISMATCH' }
+    $source.Position = $offset
     $outputStream = [IO.File]::Open($target, [IO.FileMode]::CreateNew)
     $buffer = New-Object byte[] 65536
-    $total = 0
-    while (($read = $inputStream.ReadAsync($buffer, 0, $buffer.Length, $cancel.Token).GetAwaiter().GetResult()) -gt 0) {
-      $total += $read
-      if ($total -gt $expectedBytes) { throw 'PACKAGE_TOO_LARGE' }
+    $remaining = $expectedBytes
+    while ($remaining -gt 0) {
+      $read = $source.Read($buffer, 0, [Math]::Min($remaining, $buffer.Length))
+      if ($read -le 0) { throw 'TRUNCATED_PACKAGE' }
       $outputStream.Write($buffer, 0, $read)
+      $remaining -= $read
     }
   } finally {
     if ($outputStream) { $outputStream.Dispose() }
-    if ($inputStream) { $inputStream.Dispose() }
-    if ($response) { $response.Dispose() }
-    $client.Dispose()
-    $cancel.Dispose()
+    $source.Dispose()
   }
 }
 function Expand-VerifiedPackage([string]$archive, [string]$destination) {
@@ -71,14 +69,14 @@ try {
   Write-Host 'O4O PC 연결을 설치합니다. 잠시 기다려 주세요.'
   $archive = Join-Path $temporary 'package.zip'
   $package = Join-Path $temporary 'package'
-  Receive-Package $archive
+  Copy-EmbeddedPackage $archive
   Expand-VerifiedPackage $archive $package
   & (Join-Path $package 'runtime/node.exe') (Join-Path $package 'install.mjs') --window
   if ($LASTEXITCODE -ne 0) { throw 'INSTALL_NOT_COMPLETED' }
   Write-Host '설치가 끝났습니다. O4O 화면에서 연결 상태를 확인해 주세요.'
 } catch {
   if ($env:GITHUB_ACTIONS -eq 'true') { Write-Host ('O4O_SETUP_ERROR: ' + $_.Exception.Message) }
-  Write-Host '설치를 마치지 못했습니다. 인터넷 연결과 열린 PC 연결 프로그램을 확인한 뒤 다시 설치해 주세요.'
+  Write-Host '설치를 마치지 못했습니다. 열린 PC 연결 프로그램을 종료한 뒤 다시 설치해 주세요. 파일이 손상됐다면 O4O에서 다시 받아 주세요.'
   exit 1
 } finally {
   if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
@@ -86,4 +84,12 @@ try {
 `.replace(/\n/g, "\r\n"),
     "utf8",
   );
+  if (header.length > 16384) throw Error("INSTALLER_HEADER_TOO_LARGE");
+  const footer = Buffer.alloc(16);
+  footer.write("O4OPKG1!", 0, "ascii");
+  footer.writeBigInt64LE(BigInt(header.length), 8);
+  const installer = Buffer.concat([header, archive, footer]);
+  if (installer.length >= 32 * 1024 * 1024)
+    throw Error("PC installer exceeds the 32 MiB HTTP download limit");
+  return installer;
 }

@@ -68,7 +68,7 @@ export function assembleRelease({ sourceSha, files, runtime, runtimeLicense }) {
     sha256: sha256(archive),
     bytes: archive.length,
   };
-  const setup = setupDownload(manifest);
+  const setup = setupDownload(manifest, archive);
   return {
     archive,
     setup,

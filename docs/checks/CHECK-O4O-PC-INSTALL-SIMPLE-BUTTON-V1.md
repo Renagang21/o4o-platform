@@ -64,3 +64,7 @@
 - 현재·기준 checkout에 테스트 계정 SSOT가 없어 실제 로그인 및 사용자 PC 파일 열기·보안창 검증은 NOT_RUN. 운영 main 병합·배포는 이 보완에서 실행하지 않는다.
 
 - PR 첫 HEAD `1689768`의 API shard 3 FAIL을 로컬 `local-agent-oneclick-pairing.spec.ts`에서 재현했다(24 PASS / 1 FAIL). 쿠키 생략 소스 검사(`/credentials: 'omit'/`)가 새 helper의 큰따옴표 표기를 세지 못한 원인이며 실제 `credentials: omit` 동작은 같았다. 기존 작은따옴표 표기를 복원한다. 보안 assertion과 검사 강도는 그대로 유지한다.
+
+- 후속 Codex P2는 다운로드한 bootstrap이 다음 웹 배포에서 사라지는 SHA별 ZIP URL을 참조하는 문제였다. 영구 저장소·권한·새 build dependency를 추가하지 않고 ZIP을 간편 설치 파일에 바이너리로 직접 포함하는 방식으로 해소한다. 헤더만 읽어 실행하고 포함 ZIP의 footer·길이·SHA256을 검증한 뒤 기존 설치기를 실행한다. Base64 확장 없이 두 산출물 모두 32 MiB 미만을 강제한다. 실행 시 네트워크 다운로드가 없다.
+- Windows 시험은 전송 stub을 제거하고 생성한 설치 파일 그대로만 실행하도록 보강했다. 외부 ZIP 파일 없이 실행되고, 포함 ZIP 손상·footer 잘림은 실행 전에 차단해야 한다. Linux 13 PASS/Windows 전용 2 SKIP 및 focused 33 PASS, native footer/포함 ZIP roundtrip·무결성·전체 설치 파일 HTTP 크기 제한을 확인했다. 변경 후 Windows PR CI는 별도로 확인한다.
+- 쿠키 검사 교정 후 로컬 API shard 3 전체: **203 suite PASS / 23 SKIP, 2,988 test PASS / 411 SKIP**. 기존 검사 assertion은 변경하지 않았다.
