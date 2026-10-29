@@ -176,7 +176,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     assert.match(deploy, /--image=gcr\.io\/\$\{\{ env\.PROJECT_ID \}\}\/pharmacy-business-web:/);
     assert.doesNotMatch(deploy, /kpa-society-web/);
     assert.ok(deploy.indexOf('--phase assert-route') > deploy.indexOf('phase: finish'));
-    assert.match(wf, /options: \[none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire\]/);
+    assert.match(wf, /options: \[none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire, carepharm-plan, carepharm-cutover, carepharm-rollback-plan, carepharm-rollback\]/);
     assert.match(wf, /pharmacy_transition\.py --phase "\$PREPARATION_MODE" --expected-plan "\$PREPARATION_DIGEST"/);
   });
 

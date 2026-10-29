@@ -1,3 +1,5 @@
+import CarePharmHomePage from './pages/carepharm/CarePharmHomePage';
+import { CarePharmNewsView, HomePresentationEditor } from '@o4o/shared-space-ui';
 import { BusinessContactPage, BusinessInboxPage } from './pages/contact/BusinessContactPages';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
 import { BUSINESS_SITE } from './config/businessSite';
@@ -103,6 +105,18 @@ const SERVICE_NAME = BUSINESS_SITE.name;
  * 변경:
  *   URL 변경 없음 → URL과 화면 흐름 정렬, 북마크/공유 가능
  */
+function CarePharmForumRedirect() {
+  const location = useLocation();
+  const { communityKey } = useParams();
+  if (communityKey !== 'business:carepharm') return <NotFound />;
+  const suffix = location.pathname.replace(/^\/communities\/business(?:%3[aA]|:)carepharm\/forum/, '');
+  return <Navigate to={'/community' + suffix + location.search + location.hash} replace />;
+}
+function CarePharmHomeEditor() {
+  const { user } = useAuth();
+  return <Layout serviceName="CarePharm"><HomePresentationEditor key={user?.id} surface="carepharm" client={pharmacyManagementAuthClient.api} /></Layout>;
+}
+
 function LoginRoute() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -279,13 +293,20 @@ function App() {
         <TermsAcceptanceGate>
         <Suspense fallback={<PageLoader />}>
         <Routes>
+          {BUSINESS_SITE.key === 'carepharm' && <>
+            <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CarePharmHomePage /></Layout>} />
+            <Route path="/news/:noticeId" element={<Layout serviceName={SERVICE_NAME}><CarePharmNewsView client={pharmacyManagementAuthClient.api} /></Layout>} />
+            {(['participation', 'materials', 'tools'] as const).map(view => <Route key={view} path={view === 'participation' ? '/my/participation' : '/' + view} element={<Layout serviceName={SERVICE_NAME}><CarePharmHomePage view={view} /></Layout>} />)}
+            <Route path="/communities/:communityKey/forum/*" element={<CarePharmForumRedirect />} />
+            <Route path="/operator/home-presentation/carepharm" element={<RoleGuard allowedRoles={['neture:operator', 'neture:admin', ...pharmacyCollaboratorRoles('carepharm')]} enforceMembership={false}><CarePharmHomeEditor /></RoleGuard>} />
+          </>}
           {/* 사업 화면 — 호스트 사업(BUSINESS_SITE.key) · /businesses/:businessKey */}
           <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey={BUSINESS_SITE.key} memberLayout /></Layout>}>
-            <Route path="/" element={<PharmacyMemberHomePage />} />
-            <Route path="/my/participation" element={<BusinessParticipationPage />} />
-            <Route path="/home-presentation" element={<BusinessHomePresentationPage />} />
-            <Route path="/materials" element={<BusinessMaterialsPage />} />
-            <Route path="/tools" element={<BusinessToolsPage />} />
+            {BUSINESS_SITE.key !== 'carepharm' && <Route path="/" element={<PharmacyMemberHomePage />} />}
+            {BUSINESS_SITE.key !== 'carepharm' && <Route path="/my/participation" element={<BusinessParticipationPage />} />}
+            <Route path="/home-presentation" element={BUSINESS_SITE.key === 'carepharm' ? <Navigate to="/operator/home-presentation/carepharm" replace /> : <BusinessHomePresentationPage />} />
+            {BUSINESS_SITE.key !== 'carepharm' && <Route path="/materials" element={<BusinessMaterialsPage />} />}
+            {BUSINESS_SITE.key !== 'carepharm' && <Route path="/tools" element={<BusinessToolsPage />} />}
             <Route path="/community" element={<BusinessForumBoundary />}>
               <Route index element={<BusinessForumPage />} />
               <Route path="posts" element={<BusinessForumPage />} />

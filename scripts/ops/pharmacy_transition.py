@@ -97,7 +97,8 @@ def stable_revision(api, name):
                and not b.get('condition') for b in policy.get('bindings', [])):
         raise ValueError('Owner public invoker bootstrap is required before transition')
     image = revision.get('status', {}).get('imageDigest', '')
-    if not re.fullmatch(r'gcr\.io/netureyoutube/(?:kpa-society-web|pharmacy-business-web)@sha256:[0-9a-f]{64}', image):
+    image_names = 'neture-web' if name == 'neture-web' else '(?:kpa-society-web|pharmacy-business-web)'
+    if not re.fullmatch(r'gcr\.io/netureyoutube/' + image_names + r'@sha256:[0-9a-f]{64}', image):
         raise ValueError('Unexpected frontend immutable image')
     return service, revision, image
 
@@ -415,13 +416,24 @@ def apply_retirement(api, plan):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--phase', required=True, choices=('cutover-plan', 'cutover', 'rollback-plan', 'rollback', 'retire-plan', 'retire', 'assert-route'))
+    parser.add_argument('--phase', required=True, choices=('cutover-plan', 'cutover', 'rollback-plan', 'rollback', 'retire-plan', 'retire', 'assert-route', 'carepharm-plan', 'carepharm-cutover', 'carepharm-rollback-plan', 'carepharm-rollback'))
     parser.add_argument('--expected-plan', default='')
     args = parser.parse_args()
-    apply = args.phase in ('cutover', 'rollback', 'retire')
+    apply = args.phase in ('cutover', 'rollback', 'retire', 'carepharm-cutover', 'carepharm-rollback')
     if apply and not re.fullmatch(r'[0-9a-f]{64}', args.expected_plan):
         raise ValueError('Mutation requires the exact reviewed plan digest')
     with cloud_api() as api:
+        if args.phase.startswith('carepharm-'):
+            import carepharm_transition as care
+            plan, fingerprint, original = care.plan(api, rollback='rollback' in args.phase)
+            if apply:
+                if fingerprint != args.expected_plan:
+                    raise ValueError('CarePharm plan changed after review')
+                care.apply(api, plan, original)
+            emit_summary('CarePharm transition', {'phase': args.phase, 'plan_digest': fingerprint,
+                         'applied': apply, 'target_revision': plan['target_revision'],
+                         'iam_changed': False, 'database_writes': False})
+            return
         if args.phase == 'assert-route':
             routed_matcher(api.request('GET', MAP), NEW)
             return
