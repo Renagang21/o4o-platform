@@ -104,7 +104,7 @@ export function resolveOperatorRole(role: unknown, serviceKey: unknown): Operato
   return { serviceKey: derived, role: roleValue };
 }
 
-/** Legacy/independent grants remain Admin-only; direct central delegation uses resolvePlatformInvitationRole. */
+/** The platform administrator assigns service Admins only, including direct central delegation. */
 export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role => /(?:[:_])admin$/.test(role));
 export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): OperatorRoleResolution {
   const resolved = resolveOperatorRole(role, serviceKey);
@@ -129,7 +129,8 @@ export function resolveCentralOperationRole(role: unknown, serviceKey: unknown) 
   return resolved;
 }
 export function resolvePlatformInvitationRole(role: unknown, serviceKey: unknown, scopeKey = '') {
+  const resolved = resolveServiceAdminRole(role, serviceKey);
   return scopeKey === CENTRAL_DELEGATION_SCOPE
-    ? resolveCentralOperationRole(role, serviceKey)
-    : resolveServiceAdminRole(role, serviceKey);
+    ? resolveCentralOperationRole(resolved.role, resolved.serviceKey)
+    : resolved;
 }

@@ -14,7 +14,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { ASSIGNABLE_OPERATOR_ROLES, resolveOperatorRole } from '../operator-role-catalog.js';
+import { ASSIGNABLE_OPERATOR_ROLES, resolveOperatorRole, resolvePlatformInvitationRole, resolveCentralOperationRole } from '../operator-role-catalog.js';
 
 const SRC = path.resolve(__dirname, '..', '..');
 const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf-8');
@@ -76,5 +76,15 @@ describe('커뮤니티 — 전체 관리자만 만들고 전역 operator 는 만
 
   it('platform:* 은 여전히 부여 대상이 아니다', () => {
     expect(ASSIGNABLE_OPERATOR_ROLES.some((r) => r.startsWith('platform:'))).toBe(false);
+  });
+});
+
+
+describe('중앙 지정은 직영 위임을 포함해 Admin 전용', () => {
+  it.each(['lecture:admin', 'community:admin', 'supplier:admin', 'neture:pharmcoop_admin'])('%s의 직영 위임을 유지한다', role => {
+    expect(resolvePlatformInvitationRole(role, role.split(':')[0], 'o4o-direct').role).toBe(role);
+  });
+  it('기존 중앙 Operator 권한의 해석은 보존한다', () => {
+    expect(resolveCentralOperationRole('lecture:operator', 'lecture').role).toBe('lecture:operator');
   });
 });

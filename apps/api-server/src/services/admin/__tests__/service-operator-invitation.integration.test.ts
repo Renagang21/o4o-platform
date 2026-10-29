@@ -64,16 +64,16 @@ integration(
         actorId: admin,
       });
     it('keeps selected central menus through proof and acceptance in the role transaction', async () => {
-      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       const preview = await service.inspect(token(),target);
       expect(preview).toMatchObject({centralDelegation:true,menuKeys:['lecture.instructors']});
       await service.accept(token(),target);
       const rows = await query(`SELECT ra.scope_type,g.menu_keys,g.invitation_id FROM role_assignments ra
-        JOIN central_operation_menu_grants g ON g.assignment_id=ra.id WHERE ra.user_id=$1 AND ra.role='lecture:operator'`,[target]);
+        JOIN central_operation_menu_grants g ON g.assignment_id=ra.id WHERE ra.user_id=$1 AND ra.role='lecture:admin'`,[target]);
       expect(rows).toEqual([{scope_type:'o4o-direct',menu_keys:['lecture.instructors'],invitation_id:null}]);
     });
     it('rejects cross-service duties and menu selection on ordinary invitations before persisting an invite',async()=>{
-      await expect(service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['supplier.suppliers']})).rejects.toMatchObject({status:400});
+      await expect(service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['supplier.suppliers']})).rejects.toMatchObject({status:400});
       await expect(service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,menuKeys:['lecture.instructors']})).rejects.toMatchObject({statusCode:400});
       expect((await query('SELECT 1 FROM service_operator_invitations WHERE target_user_id=$1',[target])).length).toBe(0);
     });
@@ -373,11 +373,12 @@ integration(
         service.manage(invite.id, admin, 'resend'),
       ).rejects.toMatchObject({ code: 'INVITATION_RESEND_TOO_SOON' });
     });
-    it('keeps legacy central Operator invitations cancellable but refuses new acceptance or resend', async () => {
+    it.each(['', 'o4o-direct'])('keeps legacy central Operator invitations cancellable but refuses new acceptance or resend (scope=%s)', async scopeKey => {
       const oldToken = 'b'.repeat(64);
       const [legacy] = await query(`INSERT INTO service_operator_invitations(invited_email,service_key,role,purpose,target_user_id,invited_by_user_id,token_hash,expires_at,created_at,updated_at)
         SELECT email,'lecture','lecture:operator','assignment',id,$2,$3,$4,$5,$5 FROM users WHERE id=$1 RETURNING id`,
         [target,admin,createHash('sha256').update(oldToken).digest('hex'),new Date(now.getTime()+86400000),new Date(now.getTime()-61000)]);
+      await query('UPDATE service_operator_invitations SET scope_key=$2 WHERE id=$1', [legacy.id, scopeKey]);
       await expect(service.accept(oldToken,target)).rejects.toMatchObject({code:'ROLE_NOT_ASSIGNABLE'});
       await expect(service.manage(legacy.id,admin,'resend')).rejects.toMatchObject({code:'ROLE_NOT_ASSIGNABLE'});
       await expect(service.manage(legacy.id,admin,'cancel')).resolves.toMatchObject({status:'cancelled'});
@@ -448,9 +449,9 @@ integration(
     });
     it('account erasure removes the target contact/confirmation and preserves a peer invitation', async () => {
       await create();
-      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       await service.accept(token(),target);
-      await service.create({targetUserId:target,serviceKey:'funding',role:'funding:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['funding.funding']});
+      await service.create({targetUserId:target,serviceKey:'funding',role:'funding:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['funding.funding']});
       await service.create({
         targetUserId: other,
         serviceKey: 'lecture',
@@ -496,7 +497,7 @@ integration(
       expect(evidence[0].meta).not.toHaveProperty('targetUserId');
     });
     it('reviews a grant identifier copied into another account instead of silently deleting the peer record', async () => {
-      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       await service.accept(token(),target);
       const [grant]=await query('SELECT id FROM central_operation_menu_grants');
       await query(`INSERT INTO notifications("userId",type,title,message) VALUES($1,'custom','Synthetic reference',$2)`,[other,grant.id]);
@@ -510,9 +511,9 @@ integration(
       expect(await query('SELECT message FROM notifications WHERE "userId"=$1 AND message=$2',[other,grant.id])).toHaveLength(1);
     });
     it.each([{unexpected:{contact:'synthetic@example.invalid'}},{scope:{contact:'synthetic@example.invalid'}}])('keeps unknown audit payload %j subject to review instead of classifying it as menu evidence',async extra=>{
-      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       await service.accept(token(),target);
-      const payload={targetUserId:target,role:'lecture:operator',menuKeys:['lecture.instructors'],...extra};
+      const payload={targetUserId:target,role:'lecture:admin',menuKeys:['lecture.instructors'],...extra};
       const [log]=await query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('lecture',$1,'operator.central_menu_grants_changed','manual','success',$2::jsonb) RETURNING id`,[admin,JSON.stringify(payload)]);
       await query("INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','suspended')",[target]);
       await query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='lecture'",[target]);
@@ -531,7 +532,7 @@ integration(
     });
     it('supports inviter and recipient erasure in sequence without losing the retained audit event',async()=>{
       await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[target]);
-      await service.create({targetUserId:other,serviceKey:'lecture',role:'lecture:operator',actorId:target,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.create({targetUserId:other,serviceKey:'lecture',role:'lecture:admin',actorId:target,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       await service.accept(token(),other);
       const [before]=await query("SELECT id,created_at FROM action_logs WHERE user_id=$1 AND action_key='admin.service_operator_assigned'",[target]);
       await query('UPDATE role_assignments SET is_active=false WHERE user_id=$1',[target]);
@@ -539,7 +540,7 @@ integration(
       const erasure=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'synthetic-system',personalBuckets:[]});
       expect(await erasure.request(target,admin)).toMatchObject({state:'completed',erased:true,reviewCodes:[]});
       expect(await query('SELECT id FROM central_operation_menu_grants')).toHaveLength(1);
-      expect(await query("SELECT assigned_by,is_active FROM role_assignments WHERE user_id=$1 AND role='lecture:operator'",[other])).toEqual([{assigned_by:null,is_active:true}]);
+      expect(await query("SELECT assigned_by,is_active FROM role_assignments WHERE user_id=$1 AND role='lecture:admin'",[other])).toEqual([{assigned_by:null,is_active:true}]);
       await query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='lecture'",[other]);
       expect(await erasure.request(other,admin)).toMatchObject({state:'completed',erased:true});
       const [after]=await query('SELECT created_at,user_id,meta FROM action_logs WHERE id=$1',[before.id]);
