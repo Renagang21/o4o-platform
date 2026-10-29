@@ -22,29 +22,30 @@ export function readPharmacyWorkspace(owner) {
   return { revision: state.revision, bundle: effective(state), importedCount: state.imported.length, userCount: state.user.length };
 }
 export function importPharmacyRecords(owner, input, expectedRevision, mode = 'program') {
-  if (!['program', 'user'].includes(mode)) throw Error('가져오기 구분을 확인하세요.');
+  if (!['program', 'user', 'restore'].includes(mode)) throw Error('가져오기 구분을 확인하세요.');
   // Validate each row first; references may point to records already present locally.
   if (input?.format !== PHARMACY_FORMAT || !Array.isArray(input.records) || input.records.length > PHARMACY_LIMITS.records || Object.keys(input).some(k => !['format', 'records'].includes(k))) throw Error('약국 업무 자료 형식을 확인하세요.');
   const incoming = input.records.map(r => ({ ...r, data: validatePharmacyRecord(r.kind, r.data) }));
   const state = LocalPharmacyWorkspaceRepository.update(scope(owner), expectedRevision, latest => {
     const next = { imported: latest.imported, user: latest.user };
-    const lane = mode === 'program' ? 'imported' : 'user';
+    const imported=mode==='program'?incoming:mode==='restore'?incoming.filter(r=>r.origin):[];
+    const user=mode==='user'?incoming:mode==='restore'?incoming.filter(r=>!r.origin):[];
     if (incoming.some(r => r.kind === 'availability' && r.data.source !== 'user_observed')) throw Error('검증된 Adapter 결과 자동 수집은 아직 연결되지 않았습니다. 직접 관찰 결과만 기록하세요.');
     if (mode === 'program' && incoming.some(r => !r.origin)) throw Error('프로그램 자료에는 원본 키·수집 시점이 필요합니다.');
-    if (mode === 'user' && incoming.some(r => ['purchase', 'usage', 'sale', 'balance'].includes(r.kind))) throw Error('구매·사용량·판매·거래장 내역은 약국 프로그램 자료로 가져오세요.');
+    if (user.some(r => ['purchase', 'usage', 'sale', 'balance'].includes(r.kind))) throw Error('구매·사용량·판매·거래장 내역은 약국 프로그램 자료로 가져오세요.');
     const ids = new Set();
     for (const r of incoming) { if (ids.has(key(r))) throw Error('중복 행 식별자입니다.'); ids.add(key(r)); }
     // Reject source-key rebinding and older snapshots rather than silently duplicating/rewinding program records.
     const sourceKey = r => JSON.stringify([r.kind, r.origin?.program, r.origin?.source_key]);
     const originalsById = new Map(latest.imported.map(r => [key(r), r]));
     const originalsBySource = new Map(latest.imported.map(r => [sourceKey(r), r]));
-    if (mode === 'program') for (const r of incoming) {
+    for (const r of imported) {
       const old = originalsById.get(key(r));
       const sameSource = originalsBySource.get(sourceKey(r));
       if (sameSource && key(sameSource) !== key(r)) throw Error('원본 행 키의 로컬 id가 바뀌었습니다. Mapping을 확인하세요.');
       if (old && (old.origin?.program !== r.origin?.program || old.origin?.source_key !== r.origin?.source_key || Date.parse(r.origin?.collected_at) < Date.parse(old.origin?.collected_at))) throw Error('원본 연결 변경 또는 과거 수집 자료입니다.');
     }
-    if (mode === 'user') for (const r of incoming) {
+    for (const r of user) {
       const old = latest.user.find(v => key(v) === key(r));
       if (r.kind === 'sheet' && old) for (const receipt of sheetReceipts(old.data)) {
         const nextReceipt = sheetReceipts(r.data).find(v => v.supplier_id === receipt.supplier_id);
@@ -60,7 +61,8 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
       // Existing purchases refer to this identity. Changing its measure would rewrite historical quantities.
       if (previous && ['product_id', 'base_unit', 'units_per_pack'].some(field => previous[field] !== r.data[field])) throw Error('기존 포장의 상품·환산 기준은 바꾸지 않습니다. 새 포장 식별자로 구분하세요.');
     }
-    next[lane] = merge(next[lane], incoming);
+    next.imported = merge(next.imported, imported);
+    next.user = merge(next.user, user);
     // Validate source lane even when a user override masks an imported row.
     validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) }, { batch: false });
     validateState(next); return next;

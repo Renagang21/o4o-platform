@@ -158,7 +158,7 @@ export function validatePharmacyCommand(mode, raw) {
     if (mode === 'read') {
       if ((raw.kind !== undefined && !PHARMACY_KINDS.includes(raw.kind)) || (raw.after !== undefined && (typeof raw.after !== 'string' || raw.after.length>100)) || (raw.limit !== undefined && (!Number.isSafeInteger(raw.limit) || raw.limit<1 || raw.limit>500))) return {ok:false};
     } else {
-      if (!['program','user'].includes(raw.mode) || !Number.isSafeInteger(raw.expectedRevision) || raw.expectedRevision<0 || !Array.isArray(raw.records)
+      if (!['program','user','restore'].includes(raw.mode) || !Number.isSafeInteger(raw.expectedRevision) || raw.expectedRevision<0 || !Array.isArray(raw.records)
         || new TextEncoder().encode(JSON.stringify(raw.records)).byteLength>PHARMACY_LIMITS.fileBytes) return {ok:false};
       validatePharmacyBundle({format:PHARMACY_FORMAT,records:raw.records},{links:false});
     }

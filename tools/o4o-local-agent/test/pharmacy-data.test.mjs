@@ -336,3 +336,16 @@ test('authenticated command contract reaches SQLite, backs up program imports, a
  assert.equal((await runAction('local.data.pharmacy_read',{}, {owner,sql:'SELECT 1'})).status,'denied');
  assert.equal((await runAction('local.data.pharmacy_read',{}, {owner:'user:other',limit:1})).data.records.length,0);
 });
+
+ test('mixed file restore commits cross-lane references once and rolls back all rows on invalid links',async()=>{
+  const {runAction}=await import('../src/handlers.mjs');
+  const product={kind:'product',data:sample().records[0].data};
+  const stock=sample().records.find(r=>r.kind==='stock');
+  const result=await runAction('local.data.pharmacy_write',{}, {owner,mode:'restore',records:[stock,product],expectedRevision:0});
+  assert.equal(result.status,'success');assert.equal(readPharmacyWorkspace(owner).revision,1);
+  assert.equal(readPharmacyWorkspace(owner).importedCount,1);assert.equal(readPharmacyWorkspace(owner).userCount,1);assert.ok(listBackups().length>0);
+  const before=readPharmacyWorkspace(owner);
+  const invalid={...stock,data:{...stock.data,id:'missing-stock',product_id:'missing-product'}};
+  const failed=await runAction('local.data.pharmacy_write',{}, {owner,mode:'restore',records:[invalid,{kind:'product',data:{...product.data,id:'p2',program_code:'002'}}],expectedRevision:1});
+  assert.notEqual(failed.status,'success');assert.deepEqual(readPharmacyWorkspace(owner),before);
+ });

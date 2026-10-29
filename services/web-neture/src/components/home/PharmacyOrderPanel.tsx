@@ -95,12 +95,8 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     setBusy(true);setError('');let saved=0;
     try {
       let current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('pc-read',workScope);
-      const groups=[{mode:'program',records:bundle.records.filter(r=>r.origin)},{mode:'user',records:bundle.records.filter(r=>!r.origin)}];
-      for(const group of groups){
-        if(!group.records.length)continue;
-        current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('save',workScope,{...group,expectedRevision:current.revision,deviceId:current.deviceId,expectedOwner:current.owner});
-        saved+=group.records.length;if(!alive.current)return;
-      }
+      current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('save',workScope,{mode:'restore',records:bundle.records,expectedRevision:current.revision,deviceId:current.deviceId,expectedOwner:current.owner});
+      saved=bundle.records.length;if(!alive.current)return;
       const permission=await workDataRequest<WorkDataConsent>('status',workScope);
       if(!alive.current)return;if(permission.owner!==current.owner)throw Error('업무 범위가 바뀌었어요. 자료를 다시 확인해 주세요.');setEdited([]);setStorage({location:'pc',deviceId:current.deviceId,revision:current.revision,consent:permission,records:bundle.records,next:null,counts:{}});
       setNotice('PC에 저장했어요. 서버 보관을 허용했다면 연결 중에 함께 동기화해요.');
