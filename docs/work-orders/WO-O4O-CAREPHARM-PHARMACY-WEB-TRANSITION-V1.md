@@ -30,3 +30,7 @@ CarePharm은 `semi_franchises.key=carepharm`·약국 조직 가입·기존 scope
 - ESLint 오류 0. App의 기존 hook dependency warning 2건은 이번 변경 밖이며 그대로 유지한다. 기존 번들 크기 warning은 build 실패가 아니다.
 
 CI·리뷰·통합·운영 전환·삭제 결과는 후속 실행 뒤 갱신한다. 이전 조사에서 old_request_count=0이었어도 삭제 실행 직전에 새 retire-plan을 다시 검토한다.
+
+### 병합 후 법정 문서 URL 호환 보완
+
+PR #875/main `089e3156a3` 통합 뒤 기존 CarePharm의 `/terms`와 약국 웹의 `/policy` 경로 차이를 추가 확인했다. CarePharm 호스트에서 `/terms`를 기존 약국 법정 문서 컴포넌트의 alias로 연결해 동일한 `carepharm` 사업 약관 원장을 읽고 URL의 query/hash를 보존한다. 운영 전환 전에 같은 WO의 후속 검증·통합으로 반영한다. 기존 Neture 어댑터는 계속 서비스·복구 가능하므로 그 사이 CarePharm 연결은 바꾸지 않는다.
