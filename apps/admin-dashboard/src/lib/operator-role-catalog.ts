@@ -95,13 +95,13 @@ export const OPERATOR_ROLE_CATALOG: Record<string, OperatorRoleOption[]> = {
   ],
 };
 
-/** Direct operating duties may be delegated centrally; independent business operators remain local. */
+/** Existing direct-operation roles remain recognizable for access and history. */
 export const CENTRAL_OPERATION_ROLES = new Set([
   ...['neture', 'supplier', 'funding', 'lecture', 'community', 'partner-support'].flatMap(prefix => [`${prefix}:admin`, `${prefix}:operator`]),
   'neture:pharmcoop_admin', 'neture:pharmcoop_operator',
 ]);
 export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
-  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => CENTRAL_OPERATION_ROLES.has(role.value) || /(?:[:_])admin$/.test(role.value))]),
+  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
 );
 
 /** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
