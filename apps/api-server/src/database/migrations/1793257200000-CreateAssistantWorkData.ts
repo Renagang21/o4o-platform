@@ -34,9 +34,17 @@ export class CreateAssistantWorkData1793257200000 implements MigrationInterface 
       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       enabled boolean NOT NULL DEFAULT false,updated_at timestamptz NOT NULL DEFAULT now()
     )`);
+    for(const table of ['assistant_work_data_consents','assistant_work_data_records','assistant_method_sharing_consents']) {
+      await q.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON public.${table}
+        FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`);
+    }
     await q.query(`COMMENT ON TABLE assistant_work_data_records IS 'User-permitted business copies for assistance; no credentials, patient records or execution traces. Revocation deletes cloud copies.'`);
   }
   async down(q: QueryRunner): Promise<void> {
+    await q.query('LOCK TABLE assistant_work_data_records,assistant_work_data_consents,assistant_method_sharing_consents IN ACCESS EXCLUSIVE MODE');
+    for(const table of ['assistant_work_data_records','assistant_work_data_consents','assistant_method_sharing_consents']) {
+      if((await q.query(`SELECT 1 FROM ${table} LIMIT 1`)).length)throw new Error('Assistant work copies or consents exist; rollback requires a reviewed data migration.');
+    }
     await q.query('DROP TABLE assistant_method_sharing_consents');
     await q.query('DROP TABLE assistant_work_data_records');
     await q.query('DROP TABLE assistant_work_data_consents');

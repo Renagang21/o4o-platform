@@ -132,6 +132,7 @@ jest.mock('../services/assistant/assistant-task-store.js', () => {
 });
 
 import router from '../routes/ai-proxy.routes.js';
+import * as serverContentWork from '../services/work-data/server-work.js';
 import { AI_TOOL_NAMES } from '../services/ai-tools/ai-tool-contract.js';
 
 const app = express();
@@ -188,6 +189,14 @@ beforeEach(() => {
 });
 
 describe('POST /api/ai/request', () => {
+  it.each([['QUOTA_EXCEEDED',429],['AI_QUOTA_UNAVAILABLE',503]])('server work preserves %s admission without falling back to PC',async(code,status)=>{
+    const server=jest.spyOn(serverContentWork,'runServerContentWork').mockRejectedValueOnce(new Error(String(code)));
+    try{
+      const result=await request(app).post('/api/ai/request').send({text:'내 매장 문서를 찾아줘'});
+      expect(result.status).toBe(status);expect(result.body.code).toBe(code);expect(runWorkAgentMock).not.toHaveBeenCalled();
+    }finally{server.mockRestore();}
+  });
+
   it('비로그인 401 · 빈 text 400', async () => {
     expect((await request(app).post('/api/ai/request').set('x-test-anon', '1').send({ text: 'x' })).status).toBe(401);
     const empty = await request(app).post('/api/ai/request').send({ text: '   ' });

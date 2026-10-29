@@ -56,11 +56,13 @@
 
 검증 기록: [CHECK](../checks/CHECK-O4O-MAIN-AUTOMATION-EVOLUTION-V1.md). 실제 약국 export Mapping/실계정/사용자 PC/모델 품질은 별도 증거가 필요하며 아래 NOT_RUN에 남긴다.
 
+추가 검증 보완: Codex의 다중 PC source 고정·재고/품절 이력 복원 지적을 반영한다. 신규 서버 사본/추천 동의의 계정 삭제 writer fence·개인 purge·조직 보존도 검증하며, 기존 main의 13개 writer gap은 CHECK의 범위 밖 격차로 남긴다. 운영 정책을 임의 변경하지 않는다.
+
 ## 7. 검증과 종료
 
 - [x] 격리 SQLite: 기존 v8 이행, 누적 10,000개 초과, 중복 재수집, 원본/교정 보존, 참조·수량, 충돌·실패 rollback, 배치 조회, 업로드 재시도.
 - [x] 격리 서버 DB/HTTP: 무동의 업로드 거부, 소유자/조직 격리, 철회·삭제·stale epoch·멱등성·충돌, PC offline 서버 읽기. 운영 DB/실계정으로 대체하지 않는다.
-- [ ] 요청/학습: PC 없는 서버 업무, 모르는 접점의 최소 도움, 같은 Task 재개, 사용자가 고친 방법의 검증·재사용, 실패/무진전 중지, 권한/최종 확정 경계.
+- [x] 요청/학습: PC 없는 서버 업무, 모르는 접점의 최소 도움, 같은 Task 재개, 사용자가 고친 방법의 검증·재사용, 실패/무진전 중지, 권한/최종 확정 경계.
 - [x] desktop/mobile 브라우저: 자료 준비→보관 선택→다른 접점 조회/초안→수정/재개 흐름. synthetic와 실제 PC·실사이트 증거 구분.
 - [ ] 영향 있는 타입·lint·build·native Windows·계약 회귀, 문서 민감정보/링크 점검. 계정/기기·실제 약국 파일이 없어 실행하지 못한 검증은 NOT_RUN.
 - [ ] commit/push·기존 PR 1개·인계 HEAD CI Gate PASS·Codex 리뷰/finding 보완. merge·auto-merge·배포·운영 DB 적용은 하지 않는다.

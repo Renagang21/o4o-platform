@@ -172,6 +172,45 @@ describe('connected pharmacy work data',()=>{
   await new Promise(resolve=>setTimeout(resolve,800));expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save')).toHaveLength(attempts);
   fail=false;fireEvent.click(screen.getByRole('button',{name:'자료 저장'}));await screen.findByText('저장했어요.');
  });
+ it('keeps the editor usable and queues a later edit while the first save is in flight',async()=>{
+  let release!:()=>void;let saves=0;
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>{
+    if(action==='status')return permission as any;
+    if(action==='method-sharing')return {enabled:false} as any;
+    if(action==='save'){saves++;if(saves===1)await new Promise<void>(resolve=>{release=resolve;});return {accepted:[]} as any;}
+    return {} as any;
+  });
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  addSupplier();await waitFor(()=>expect(saves).toBe(1));
+  expect(screen.getByLabelText('새 거래처명').hasAttribute('disabled')).toBe(false);
+  fireEvent.change(screen.getByLabelText('새 거래처명'),{target:{value:'다음 합성 거래처'}});
+  fireEvent.click(screen.getByRole('button',{name:'거래처 추가'}));release();
+  await waitFor(()=>expect(saves).toBe(2),{timeout:3000});
+  expect(screen.getByText('다음 합성 거래처',{selector:'legend'})).toBeTruthy();
+  const writes=vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save');
+  expect((writes[1][2]?.changes as any[]).map(row=>row.entry.data.name)).toEqual(['다음 합성 거래처']);
+ });
+ it('reloads saved stock and availability through bounded history pages',async()=>{
+  vi.mocked(workDataRequest).mockClear();
+  const product={kind:'product',data:{id:'p1',name:'합성 상품',program:'fixture',program_code:'001',kind:'dispensing'}};
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[product,{kind:'supplier',data:{id:'s1',name:'합성 거래처',enabled:true,payment_timing:'unknown',payment_required:null}},{kind:'pack',data:{id:'k1',product_id:'p1',label:'100정',base_unit:'정',units_per_pack:100,preferred:true}}] as any,next:null,counts:{stock:2,availability:1},versions:{}});
+  vi.mocked(workDataRequest).mockImplementation(async(action,_scope,body)=>{
+    if(action==='status')return permission as any;
+    if(action==='method-sharing')return {enabled:false} as any;
+    if(action==='read')return {location:'server',consent:permission,records:body?.kind==='stock'?[{kind:'stock',data:{id:body.after?'stock2':'stock1',product_id:'p1',quantity:body.after?20:10,unit:'정',confidence:'confirmed',observed_at:'2026-10-29T00:00:00Z'}}]:[{kind:'availability',data:{id:'av1',product_id:'p1',supplier_id:'s1',pack_id:'k1',state:'out_of_stock',source:'user_observed',observed_at:'2026-10-29T00:00:00Z'}}],versions:{},next:body?.kind==='stock'&&!body.after?'stock:stock1':null,counts:{}} as any;
+    return {} as any;
+  });
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'이력 다시 조회'}));
+  await screen.findByText(/실물 확인 \/ 10정/);await screen.findByText(/합성 상품: 품절 \/ 합성 거래처/);
+  fireEvent.click(screen.getByRole('button',{name:'이력 더 보기'}));await screen.findByText(/실물 확인 \/ 20정/);
+  expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='read').every(call=>call[2]?.limit===100)).toBe(true);
+  expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='read'&&call[2]?.kind==='availability')).toHaveLength(1);
+ });
  it('keeps business mirroring and method sharing as separate explicit choices',async()=>{
   vi.mocked(workDataRequest).mockClear();
   vi.mocked(workDataRequest).mockImplementation(async(action,_scope,body)=>action==='status'?{...permission,enabled:false} as any:action==='consent'?{...permission,enabled:body?.enabled} as any:{enabled:false} as any);

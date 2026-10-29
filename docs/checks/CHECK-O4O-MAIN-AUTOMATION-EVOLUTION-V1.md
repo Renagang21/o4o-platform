@@ -20,16 +20,25 @@
 |---|---|---|
 | native 전체 `node --test tools/o4o-local-agent/test/*.test.mjs` | 214건 중 212 PASS · Windows 2 SKIP | 격리 SQLite/합성 bridge. 실제 사용자 PC와 구분 |
 | SQLite 누적/이행/동기화 | PASS | 12,000개 누적·페이지 조회, 원본/교정·중복·revision, v8 이행/손상 rollback/백업, grant 없는 무전송·재전송·철회, in-flight 수정 보존·충돌 격리 |
-| PostgreSQL 15 전용 fixture | 9 PASS · 생성 DB 삭제 확인 | baseline/모든 prefix fingerprint·신규 empty down/up, 허가/철회·소유권·멱등성·충돌·교정·단위별 집계·추천 선택 동의, HTTP의 합성 인증 principal과 Task 타인/만료 차단 |
-| Main 주문 준비 Vitest | 11 PASS | 기존 주문 준비/직접 접수 경계, 자동 저장 실패 입력 보존·반복 재시도 중지·사용자 재시도, 두 종류 동의 분리 |
-| Main home/첨부/재개 관련 Vitest | 8 suite · 65 PASS | 위 11건을 포함. 중복 합산하지 않음 |
+| PostgreSQL 15 전용 fixture | 12 PASS · 생성 DB 삭제 확인 | baseline/모든 prefix fingerprint·신규 empty down/up, 허가/철회·소유권·멱등성·충돌·교정·단위별 집계·추천 선택 동의, HTTP의 합성 인증 principal과 Task 타인/만료 차단 |
+| Main 주문 준비 Vitest | 13 PASS | 기존 주문 준비/직접 접수 경계, 자동 저장 실패 입력 보존·반복 재시도 중지·사용자 재시도, 두 종류 동의 분리 |
+| Main home/첨부/재개 관련 Vitest | 8 suite · 67 PASS | 위 13건을 포함. 중복 합산하지 않음 |
 | Main 실제 Chromium | desktop/mobile PASS | 전체 Main 화면·보관 선택·자동 저장·기기 전환 서버 조회·가로 넘침/페이지 오류 없음. 합성 API이며 실제 PC/사이트 아님 |
 | 서버 콘텐츠 실행 unit | 5 PASS | 기존 adapter 재사용, 미승인 공간·요청하지 않은 쓰기 거절, 저장 transaction에서 권한 재검사 |
-| API 확장 회귀/최종 타입·build·정적 guard | 초기 확장 회귀 21 suite PASS, 발견된 2 suite 보완·재검증 PASS. API 타입/Main build·guard PASS | 최신 main 정렬 후 인계 HEAD에서 재확인 |
+| API 확장 회귀/최종 타입·build·정적 guard | 확장 회귀 23 suite · 407 PASS. 리뷰 보완 API 3 suite · 68 PASS. API 타입/Main build·guard PASS | 최신 main 정렬 후 인계 HEAD에서 재확인 |
 | Windows native 설치/runtime | NOT_RUN (로컬 Linux) | PR Windows runner 결과로 별도 확인 예정 |
 | 실계정·실제 모델·약국 export Mapping·실제 주문 사이트 | NOT_RUN | 현행 계정 SSOT 파일이 현재/기준 checkout에 없음. 이전 계정/운영 credential로 대체하지 않음 |
 
 합성 테스트는 실제 계정이나 비용·모델 품질·모든 업무 완결성 검증으로 승격하지 않는다. 매뉴얼은 기존 브라우저 자료함/요청 발췌 경로를 유지하며 업무 자료 보관 동의를 PDF·매뉴얼 동기화 동의로 확대하지 않는다. 미등재 외부 사이트의 자동 조작은 무제한 허용하지 않았다. 처음 만난 접점은 현재 자료로 가능한 안내를 하고 실제 화면·메뉴·사용 중인 주문 주소의 최소 도움으로 이어간다.
+
+## 리뷰 보완과 범위 밖 기존 격차
+
+- Codex P1: 최초 조회의 `deviceId`와 owner를 받아 후속 페이지·저장·파일 반영에 고정한다. 요청마다 기존 사용자 기기 원장으로 권한/active/online을 재확인하며 다른 PC로 fallback하지 않는다. 같은 revision을 가진 PC 두 대의 heartbeat 우선순위 변경·오프라인·다른 사용자·실제 PostgreSQL 명령 왕복을 검증했다.
+- Codex P2: 재고·품절 확인 이력은 별도 영역에서 종류별 100건/페이지로 조회한다. 재조회·다음 페이지·새로 접속한 모바일에서 저장한 기록 복원을 검증했다. 이전 연결의 비동기 응답은 generation으로 폐기한다.
+- 자동 저장 중에도 다음 입력을 허용하고 새 교정은 후속 저장으로 보낸다. 파일 미리보기는 이전 PC/서버 연결과 분리하여 다른 자료에 자동 저장되지 않게 한다.
+- 새 세 테이블은 기존 계정 삭제 writer fence에 연결했다. 개인 서버 사본/추천 동의의 domain review·purge와 FK를 검증하고, 조직 사본은 유지하며 탈퇴자의 `granted_by`만 NULL로 정리한다. 데이터가 있는 schema down은 거부한다.
+
+**기존 main의 격차 — 이번 변경으로 해결했다고 보고하지 않음:** 격리 PostgreSQL에서 이번 migration 이전/이후의 writer gap을 비교하면 기존 13개이며 이번 추가는 0개다. `ai_usage_reservations`, `external_ai_settings/connections/clients/credentials/requests/errors`, `personal_mail_accounts/oauth_flows/messages/rules/jobs/job_items`가 해당한다. 운영 DB 상태를 조회한 결과가 아니다. 이 상태에서는 기존 공개 계정 삭제의 준비 판정이 false로 유지된다. 격리 테스트는 이 fail-closed 판정을 확인한 뒤 새 도메인의 scan/purge/FK만 분리해 검증했다. 전체 계정 삭제 완료 PASS로 승격하지 않았고, 기존 테이블의 보존 정책·writer fence를 임의 변경하지 않았다.
 
 ## Shared Module Change Verification
 
@@ -38,7 +47,7 @@
 - Module: 순수 약국 자료 계약, PC 명령/capability, Assistant ExecutionIntent의 선택적 추천.
 - Package: 새 공통 Core/package 없음. 기존 Node/Main/API 경계에서 재사용.
 - Direct consumers: `tools/o4o-local-agent`, `web-neture`, `api-server`.
-- Indirect consumers: Main Assistant를 쓰는 기존 화면. 선택 필드는 종전 실행·완료/권한 계약을 바꾸지 않는다.
+- Indirect consumers: Main Assistant를 쓰는 기존 화면·기존 계정 삭제의 새 도메인 owner 목록. 선택 필드는 종전 실행·완료/권한 계약을 바꾸지 않는다.
 
 ### Consumer impact matrix
 
@@ -46,7 +55,7 @@
 |---|---:|---|---|---|
 | PC Node | 직접 | v9·누적 자료·동의된 증분 sync·0.5.0 capability | native suite·기존 installer 계약 | Linux PASS / Windows 후속 |
 | Main Neture | 직접 | 자료 연결·자동 저장·별도 동의·대기 업무 선택 | Vitest·desktop/mobile Chromium·build | 화면/build PASS |
-| API Assistant | 직접 | 서버 업무/집계·권한·공개 방법 추천·일시 명령 | PG fixture·unit·기존 runtime 회귀 | fixture/unit PASS / 확장 회귀 보완 PASS |
+| API Assistant / 새 업무 사본의 삭제 경계 | 직접 | 서버 업무/집계·권한·공개 방법 추천·일시 명령 | PG fixture·unit·기존 runtime 회귀 | fixture/unit PASS / 확장 회귀 보완 PASS |
 | KPA/K-Cosmetics 등의 매장 menu/layout | 해당 없음 | 공통 메뉴·역할 map·가시성 정책 변경 없음 | 소비처/route 검색 | 이번 UI 범위 밖 |
 | 병원약국 surface | 간접 | 기존 분기가 새 Main 콘텐츠 분기보다 우선 | unified-request HTTP 회귀 | PASS |
 | Chrome Extension | 간접 | 새 명령은 Node data handler 전용. DOM/site allowlist 변경 없음 | native bridge/DOM 계약 회귀 | PASS |

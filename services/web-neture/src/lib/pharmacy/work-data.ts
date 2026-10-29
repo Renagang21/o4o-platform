@@ -5,6 +5,8 @@ import type { PharmacyEntry } from './order';
 
 export interface WorkDataConsent { enabled: boolean; epoch: string | null; owner: string; updatedAt: string | null }
 export interface WorkDataSnapshot {
+  deviceId?: string;
+  owner?: string;
   sync?: {pending:number;conflicts:number;lastSyncedAt:string|null;error:string|null};
   updatedAt?:string|null;
   location: 'pc' | 'server'; revision?: number; consent: WorkDataConsent;
@@ -28,8 +30,8 @@ export async function loadWorkingData(workScope:WorkScope,onProgress?:(count:num
   for(const kind of ['product','supplier','pack','sheet']) {
     let after:string|null=null;
     do {
-      const page:WorkDataSnapshot=await workDataRequest<WorkDataSnapshot>('read',workScope,{kind,after,limit:500});
-      if(result && (page.location!==result.location || page.consent.epoch!==result.consent.epoch || page.revision!==result.revision))throw Error('자료가 바뀌었어요. 다시 불러와 주세요.');
+      const page:WorkDataSnapshot=await workDataRequest<WorkDataSnapshot>('read',workScope,{kind,after,limit:500,...(result?{location:result.location,...(result.deviceId?{deviceId:result.deviceId}:{})}:{})});
+      if(result && (page.location!==result.location || page.deviceId!==result.deviceId || page.consent.owner!==result.consent.owner || page.consent.epoch!==result.consent.epoch || page.revision!==result.revision))throw Error('자료가 바뀌었어요. 다시 불러와 주세요.');
       result=page;records.push(...page.records);Object.assign(versions,page.versions);onProgress?.(records.length);
       if(page.next===after && after)throw Error('자료의 다음 페이지를 확인하지 못했어요.');
       after=page.next;

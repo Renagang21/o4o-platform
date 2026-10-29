@@ -1707,6 +1707,8 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
       },renderManualReferences(manualReferences));
       return res.json({success:true,data:{kind:'chat',route:'server',reason:'server_content',taskId:outcome.taskId,chat:{message:outcome.message,scope:{workspace:'server',serviceKey:'neture',storeStatus:null}}}});
     }catch(error){
+      const admission=normalizeAiError(error);
+      if(isAiAccountingError(admission.code))return res.status(aiErrorHttpStatus(admission.code)).json({success:false,code:admission.code,error:aiErrorUserMessage(admission.code)});
       const status=typeof (error as any)?.status==='number'?(error as any).status:503;
       return res.status(status).json({success:false,code:'SERVER_WORK_UNAVAILABLE',error:'서버 업무를 마치지 못했어요. 권한과 자료 상태를 확인한 뒤 다시 요청해 주세요.'});
     }

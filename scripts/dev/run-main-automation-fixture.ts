@@ -1,3 +1,4 @@
+import { ERASURE_WRITER_GAPS_SQL } from '../../apps/api-server/src/services/privacy/erasure-writer-manifest.js';
 /** Own disposable loopback database only; always remove it after bootstrap/test. */
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
@@ -73,16 +74,21 @@ async function run() {
         for (const ext of CANONICAL_SCHEMA_BASELINE_META.requiredExtensions)
           await q.query(`CREATE EXTENSION "${ext.name}" WITH SCHEMA "${ext.schema}"`);
         for (const sql of CANONICAL_SCHEMA_BASELINE_STATEMENTS) { checkInterrupted(); await q.query(sql); }
+        let baselineWriterGaps:number[]=[];
         for (let i = 0; i <= INCREMENTAL_MIGRATIONS.length; i++) {
           checkInterrupted();
           const actual = await computeSchemaFingerprint(q), expected = expectedSchemaStateFor(i);
           if (!expected || actual.hash !== expected.fingerprint || actual.lineCount !== expected.fingerprintLineCount)
             throw new Error(`Fixture schema mismatch at prefix ${i}`);
+          if(i===INCREMENTAL_MIGRATIONS.length-1)baselineWriterGaps=(await q.query(ERASURE_WRITER_GAPS_SQL)).map(row=>Number(row.oid)).sort((a,b)=>a-b);
           if (i < INCREMENTAL_MIGRATIONS.length) {
             await q.query('SET LOCAL search_path TO public');
             await new INCREMENTAL_MIGRATIONS[i]().up(q);
           }
         }
+        const finalWriterGaps=(await q.query(ERASURE_WRITER_GAPS_SQL)).map(row=>Number(row.oid)).sort((a,b)=>a-b);
+        if(JSON.stringify(baselineWriterGaps)!==JSON.stringify(finalWriterGaps))throw new Error('Main work-data migration introduced an erasure writer gap');
+        console.log(`Fixture writer fences: baseline gaps ${baselineWriterGaps.length}; added gaps 0. Baseline gaps are not repaired here.`);
         const newest=new INCREMENTAL_MIGRATIONS[INCREMENTAL_MIGRATIONS.length-1]();
         await q.query('SET LOCAL search_path TO public');await newest.down(q);
         const previous=await computeSchemaFingerprint(q),previousExpected=expectedSchemaStateFor(INCREMENTAL_MIGRATIONS.length-1);

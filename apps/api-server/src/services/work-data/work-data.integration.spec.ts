@@ -1,9 +1,14 @@
+import { ERASURE_WRITER_GAPS_SQL } from '../privacy/erasure-writer-manifest.js';
+import { CreateAssistantWorkData1793257200000 } from '../../database/migrations/1793257200000-CreateAssistantWorkData.js';
+import { AccountErasureService } from '../privacy/account-erasure.service.js';
+import { pcWorkData } from './work-data-bridge.js';
+import { submitCommandResult } from '../local-agent/local-agent-service.js';
 import express from 'express';
 import request from 'supertest';
 import { createWorkDataRouter } from '../../routes/ai-proxy/work-data.routes.js';
 jest.mock('../../middleware/auth.middleware.js',()=>({authenticate:(req,res,next)=>{const id=req.headers['x-fixture-user'];if(!id)return res.status(401).json({success:false});req.user={id};next();}}));
 import 'reflect-metadata';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { methodSharing, sharedMethodCandidates } from './shared-methods.js';
 import { WorkDataService, assertWorkDataOwner } from './work-data.service.js';
@@ -93,6 +98,66 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    const other=await request(app).post('/work-data/tasks').set('x-fixture-user',ids[1]).send({});expect(other.body.data).toEqual([]);
    await db.query("UPDATE work_run_coordination SET expires_at=now()-interval '1 second' WHERE run_id=$1",[run]);
    expect((await request(app).post('/work-data/tasks').set('x-fixture-user',ids[0]).send({})).body.data).toEqual([]);
+ });
+ it('keeps the real PostgreSQL command transport bound to the original authorized PC',async()=>{
+   const a=randomUUID(),b=randomUUID();
+   const capabilities=JSON.stringify({browser:false,windowsUia:false,localData:true,ownerScopedLedger:true,taskUnit:false,pharmacyData:true});
+   await db.query(`INSERT INTO local_agent_devices(id,user_id,platform,agent_version,status,last_seen_at,capabilities,credential_hash) VALUES($1,$3,'win32','0.5.0','active',now(),$4::jsonb,$5),($2,$3,'win32','0.5.0','active',now()-interval '1 second',$4::jsonb,$6)`,[a,b,ids[0],capabilities,randomBytes(32).toString('hex'),randomBytes(32).toString('hex')]);
+   async function read(bound?:string){
+     const operation=pcWorkData(db,ids[0],owner,'read',{limit:1},bound);operation.catch(()=>{});
+     let command:any;
+     for(let attempt=0;attempt<100;attempt++){
+       [command]=await db.query(`SELECT command_id,device_id FROM local_agent_commands WHERE user_id=$1 AND status='pending' AND tool_name='assistant.work_data.read' ORDER BY issued_at DESC LIMIT 1`,[ids[0]]);
+       if(command)break;await new Promise(resolve=>setTimeout(resolve,10));
+     }
+     if(!command){await operation;throw Error('Fixture PC command missing');}
+     expect(command.device_id).toBe(a);
+     await submitCommandResult(db,a,{commandId:command.command_id,status:'success',data:{revision:7,records:[],counts:{},next:null}} as any);
+     return operation;
+   }
+   const initial=await read();expect(initial.deviceId).toBe(a);
+   await db.query("UPDATE local_agent_devices SET last_seen_at=now()-interval '10 seconds' WHERE id=$1",[a]);
+   await read(initial.deviceId);
+   await db.query("UPDATE local_agent_devices SET last_seen_at=now()-interval '5 minutes' WHERE id=$1",[a]);
+   await expect(pcWorkData(db,ids[0],owner,'read',{},a)).rejects.toMatchObject({code:'LOCAL_AGENT_OFFLINE'});
+   await expect(pcWorkData(db,ids[1],{key:'user:'+ids[1],userId:ids[1],organizationId:null},'read',{},a)).rejects.toMatchObject({code:'WORK_DATA_PC_SOURCE_UNAVAILABLE'});
+   expect((await db.query('SELECT result_data FROM local_agent_commands WHERE device_id=$1',[a])).every(row=>row.result_data===null)).toBe(true);
+ });
+ it('fences new domain tables and removes personal copies while preserving organizational copies',async()=>{
+   const target=randomUUID(),admin=ids[0],targetOwner={key:'user:'+target,userId:target,organizationId:null};
+   await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified") VALUES($1,$2,'Isolated work-copy erasure','active',true,true)`,[target,target+'@fixture.invalid']);
+   await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[admin]);
+   const grant=await service.setConsent(target,targetOwner,true);
+   await service.sync(target,targetOwner.key,grant.epoch,[change()]);await methodSharing(db,target,true);
+   const organization={key:'organization:'+org,userId:null,organizationId:org};
+   await service.setConsent(ids[0],organization,true);
+   await db.query('UPDATE assistant_work_data_consents SET granted_by=$1 WHERE owner_key=$2',[target,organization.key]);
+   await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'neture','member','suspended')",[target]);
+   const erasure=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'isolated-synthetic-system',personalBuckets:[]});
+   const gaps=await db.query(`SELECT gap.oid::regclass::text AS table_name FROM (${ERASURE_WRITER_GAPS_SQL}) gap`);
+   expect(gaps.filter(row=>['assistant_work_data_consents','assistant_work_data_records','assistant_method_sharing_consents'].includes(row.table_name))).toEqual([]);
+   // Current main has unrelated pre-existing writer gaps. Never repair or bypass
+   // their production gate as part of this domain change. Exercise the reviewed
+   // domain scan/purge in this disposable fixture; do not call it full erasure PASS.
+   if(gaps.length){
+     await expect(erasure.request(target,admin)).rejects.toMatchObject({code:'ACCOUNT_ERASURE_MIGRATION_REQUIRED'});
+     expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target]))[0].isActive).toBe(true);
+   }
+   const [subject]=await db.query('SELECT * FROM users WHERE id=$1',[target]);
+   const codes=await (erasure as any).reviewManifest(db.manager,subject);
+   expect(codes).toEqual(gaps.length?['WRITER_MANIFEST_REQUIRES_REFRESH']:[]);
+   await db.transaction(async manager=>{await (erasure as any).removePrivateRows(manager,target);await manager.query('DELETE FROM users WHERE id=$1',[target]);});
+   expect(await db.query('SELECT id FROM users WHERE id=$1',[target])).toHaveLength(0);
+   expect(await db.query('SELECT owner_key FROM assistant_work_data_consents WHERE owner_key=$1',[targetOwner.key])).toHaveLength(0);
+   expect(await db.query('SELECT id FROM assistant_work_data_records WHERE owner_key=$1',[targetOwner.key])).toHaveLength(0);
+   expect(await db.query('SELECT user_id FROM assistant_method_sharing_consents WHERE user_id=$1',[target])).toHaveLength(0);
+   expect((await db.query('SELECT enabled,granted_by FROM assistant_work_data_consents WHERE owner_key=$1',[organization.key]))[0]).toEqual({enabled:true,granted_by:null});
+ });
+ it('refuses a populated schema rollback without deleting existing work copies',async()=>{
+   const q=db.createQueryRunner();await q.startTransaction();
+   try{await expect(new CreateAssistantWorkData1793257200000().down(q)).rejects.toThrow('reviewed data migration');}
+   finally{await q.rollbackTransaction();await q.release();}
+   expect((await db.query('SELECT count(*)::int AS n FROM assistant_work_data_records'))[0].n).toBeGreaterThan(0);
  });
  it('checks membership for organization writes and deletes cloud copies on revoke',async()=>{
    const organization={key:'organization:'+org,userId:null,organizationId:org};

@@ -11,6 +11,8 @@ export const workDataMessage: Record<string,string>={
   WORK_DATA_CONSENT_REQUIRED:'서버 보관을 허용하면 이 자료를 어디서나 사용할 수 있어요.',
   WORK_DATA_FORBIDDEN:'이 자료를 이용할 권한을 확인해 주세요.',
   WORK_DATA_CONFLICT:'다른 곳에서 자료가 바뀌었어요. 최신 자료를 다시 확인해 주세요. 입력한 내용은 유지됩니다.',
+  WORK_DATA_PC_SOURCE_UNAVAILABLE:'자료를 불러온 PC를 다시 연결해 주세요. 다른 PC의 자료로 바꾸지 않았어요.',
+  WORK_DATA_PC_SOURCE_REQUIRED:'자료를 다시 불러온 뒤 저장해 주세요.',
   PC_PROGRAM_UPDATE_REQUIRED:'PC 연결 프로그램을 업데이트해 주세요.',
   LOCAL_AGENT_NO_DEVICE:'자료가 있는 PC를 연결해 주세요.',
   LOCAL_AGENT_OFFLINE:'자료가 있는 PC가 꺼져 있어요. 서버 보관을 허용한 자료는 PC 없이 사용할 수 있어요.',
@@ -47,7 +49,7 @@ export function createWorkDataRouter(db: DataSource) {
   }));
   router.post('/pc-read',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
-    return pcWorkData(db,req.user.id,owner,'read',{limit:1});
+    return pcWorkData(db,req.user.id,owner,'read',{limit:1},req.body?.deviceId);
   }));
   router.post('/analysis',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
@@ -55,7 +57,7 @@ export function createWorkDataRouter(db: DataSource) {
   }));
   router.post('/read',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
-    return readWorkData(db,req.user.id,owner,{...(req.body?.kind?{kind:req.body.kind}:{}),...(req.body?.after?{after:req.body.after}:{}),limit:req.body?.limit??100});
+    return readWorkData(db,req.user.id,owner,{...(req.body?.kind?{kind:req.body.kind}:{}),...(req.body?.after?{after:req.body.after}:{}),limit:req.body?.limit??100,...(req.body?.deviceId!==undefined?{deviceId:req.body.deviceId}:{}),...(req.body?.location!==undefined?{location:req.body.location}:{})});
   }));
   router.post('/save',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
@@ -71,7 +73,9 @@ export function createWorkDataRouter(db: DataSource) {
     }
     // Program-file collection is committed on the PC first, then journaled for
     // optional cloud sync. Neither browser nor AI supplies a PC file path.
-    return pcWorkData(db,req.user.id,owner,'write',{mode:req.body?.mode??'user',expectedRevision:req.body?.expectedRevision,records:req.body?.records});
+    if(req.body?.expectedOwner!==owner.key)throw new WorkDataError('WORK_DATA_CONFLICT',409);
+    if(!req.body?.deviceId)throw new WorkDataError('WORK_DATA_PC_SOURCE_REQUIRED');
+    return pcWorkData(db,req.user.id,owner,'write',{mode:req.body?.mode??'user',expectedRevision:req.body?.expectedRevision,records:req.body?.records},req.body.deviceId);
   }));
   return router;
 }
