@@ -14,7 +14,8 @@ function boundSources(input: ConsultationSupportSource[]): ConsultationSupportSo
     remaining -= text.length;
     sources.push({ ...source, text, title: source.title + (text.length < source.text.length ? ' · 일부' : '') });
   }
-  if (sources.length + (reference ? 1 : 0) < input.length && sources.length) sources[sources.length - 1].title += ' · 일부 근거 생략';
+  const last = sources.at(-1);
+  if (sources.length + (reference ? 1 : 0) < input.length && last) last.title += ' · 일부 근거 생략';
   return reference ? [...sources, reference] : sources;
 }
 

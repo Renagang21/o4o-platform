@@ -15,6 +15,20 @@ import type { ConsultationSupportSource } from "./consultation-support.extension
 import { StoreStaffSupportService } from "./store-staff-support.js";
 import { readStoreProductAiContext } from '../../neture/product-description-intake/ai-context.service.js';
 type Json = Record<string, unknown>;
+function approvedAiSupportSources(ai: Awaited<ReturnType<typeof readStoreProductAiContext>>): ConsultationSupportSource[] {
+  if (ai?.state !== 'structured' || !ai.description) return [];
+  const sources: ConsultationSupportSource[] = [];
+  let remaining = 18000, factId = 11, referenceId = 2;
+  for (const section of ai.description.sections.slice(0, 10)) {
+    if (!remaining) break;
+    const text = section.text.slice(0, Math.min(5000, remaining)); remaining -= text.length;
+    const fact = section.kind === 'product-fact';
+    const partial = text.length < section.text.length ? ' · 일부' : '';
+    sources.push({ id: fact ? `p${factId++}` : `r${referenceId++}`, kind: fact ? 'product-fact' : 'professional-reference',
+      title: `O4O B2B · ${section.kind} · ${section.title} · ${ai.description.source?.currentness ?? '출처 확인 필요'}${partial}`, text });
+  }
+  return sources;
+}
 export type GuidanceIntent =
   | "find-product"
   | "location"
@@ -489,8 +503,9 @@ export class ConsultationGuidanceService {
     const mode = String(input.mode);
     await this.access(actor, org, mode);
     const productId = typeof input.productId === 'string' ? input.productId : '';
-    const product = await this.products.product(org, input.productKind, productId);
-    const read = () => this.material(org, String(input.productKind), productId, 'ko');
+    const productKind = typeof input.productKind === 'string' ? input.productKind : '';
+    const product = await this.products.product(org, productKind, productId);
+    const read = () => this.material(org, productKind, productId, 'ko');
     const material = await read();
     const readAi = () => input.productKind === 'listing'
       ? readStoreProductAiContext(this.db, org, productId, 'ko') : Promise.resolve(null);
@@ -509,15 +524,7 @@ export class ConsultationGuidanceService {
     }));
     // Only approved, typed B2B sections enter this existing request. Never consume STORE/QR,
     // unpublished candidates or a legacy HTML body as proven product facts.
-    if (ai?.state === 'structured' && ai.description) {
-      let remaining = 18000, factId = 11, referenceId = 2;
-      for (const section of ai.description.sections.slice(0, 10)) {
-        if (!remaining) break;
-        const text = section.text.slice(0, Math.min(5000, remaining)); remaining -= text.length;
-        sources.push({ id: section.kind === 'product-fact' ? `p${factId++}` : `r${referenceId++}`, kind: section.kind === 'product-fact' ? 'product-fact' : 'professional-reference',
-          title: `O4O B2B · ${section.kind} · ${section.title} · ${ai.description.source?.currentness ?? '출처 확인 필요'}${text.length < section.text.length ? ' · 일부' : ''}`, text });
-      }
-    }
+    sources.push(...approvedAiSupportSources(ai));
     return { productName: product.name as string, sources, sourceVersion, authorize };
   }
 }
