@@ -66,7 +66,7 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
     // Validate source lane even when a user override masks an imported row.
     validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) }, { batch: false });
     validateState(next); return next;
-  });
+  }, incoming.map(r=>(mode==='program' || (mode==='restore' && r.origin)?'imported':'user')+':'+key(r)));
   return { revision: state.revision, records: effective(state).records.length, imported: state.imported.length, user: state.user.length };
 }
 export function pharmacySummary(owner) {

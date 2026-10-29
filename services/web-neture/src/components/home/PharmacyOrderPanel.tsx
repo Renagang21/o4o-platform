@@ -225,8 +225,9 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         }} className="mt-1 block w-full" />
       </label>
       {workScope && <button type="button" disabled={blocked || !!storage} onClick={()=>void importToPc()} className="rounded bg-blue-700 px-3 py-2 text-white">현재 자료를 PC에 보관</button>}
+      <p className="text-xs">화면에 불러온 상품·거래처·포장·주문 시트와 조회한 이력만 파일에 담아요. 구매·사용량·판매·거래장 원본은 연결된 PC·서버에 보관돼요.</p>
       <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={blocked} onClick={() => attempt(() => download(validatePharmacyBundle(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">전체 자료 내보내기</button>
+        <button type="button" disabled={blocked} onClick={() => attempt(() => download(validatePharmacyBundle(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">화면 자료 내보내기</button>
         <button type="button" disabled={blocked || !edited.length} onClick={() => attempt(() => download({ format: PHARMACY_FORMAT, records: edited }, 'o4o-pharmacy-user-edits.private.json'))} className="rounded border px-2 py-1">PC 반영용 수정 내보내기</button>
       </div>
       <p className="text-xs">내보낸 파일에는 약국 업무 자료가 포함됩니다. 본인의 PC·계정에서만 사용하세요. 수정 파일은 기존 SQLite 자료에 병합하며 원본 프로그램 내역을 대체하지 않습니다.</p>

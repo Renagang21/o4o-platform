@@ -320,6 +320,15 @@ test('conflicting local edit is preserved and quarantined rather than automatica
  assert.equal(result.conflicts,1);assert.equal(journal.state(dataset).conflicts,1);
  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='product').data.name,'합성 상품');
  assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+ const purchase=journal.pending(dataset).find(r=>r.entry.kind==='purchase');
+ journal.apply(dataset,epoch,{accepted:[],changes:[{...purchase,entry:{...purchase.entry,data:{...purchase.entry.data,pack_count:3}},version:11}],cursor:11,more:false});
+ assert.equal(journal.state(dataset).conflicts,2);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
+ assert.equal(journal.state(dataset).conflicts,1); // The unrelated product remains quarantined.
+ const retried=journal.pending(dataset).find(r=>r.entry.kind==='purchase');assert.equal(retried.expectedVersion,11);assert.notEqual(retried.mutationId,purchase.mutationId);
+ assert.equal(retried.entry.data.pack_count,purchase.entry.data.pack_count);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
+ assert.equal(journal.pending(dataset).find(r=>r.entry.kind==='purchase').mutationId,retried.mutationId);
 });
 
 test('authenticated command contract reaches SQLite, backs up program imports, and returns only bounded typed data',async()=>{

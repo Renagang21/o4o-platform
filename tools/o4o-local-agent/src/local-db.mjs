@@ -991,7 +991,7 @@ export const LocalPharmacyWorkspaceRepository = {
     return { revision: this.revision(dataset), counts: Object.fromEntries(rows.map(r => [r.kind, Number(r.count)])),
       importedCount: Number(lanes.find(r => r.lane === 'imported')?.count ?? 0), userCount: Number(lanes.find(r => r.lane === 'user')?.count ?? 0) };
   },
-  update(dataset, expectedRevision, update) {
+  update(dataset, expectedRevision, update, reconfirm = []) {
     pharmacyScope(dataset);
     const db = openLocalDb(); db.exec('BEGIN IMMEDIATE');
     try {
@@ -999,6 +999,8 @@ export const LocalPharmacyWorkspaceRepository = {
       if (!Number.isSafeInteger(expectedRevision) || expectedRevision !== latest.revision) throw new Error('PHARMACY_REVISION_CONFLICT: 최신 자료를 다시 확인하세요.');
       const next = { ...update(latest), revision: latest.revision + 1 };
       db.prepare('INSERT INTO local_pharmacy_workspaces(dataset,revision) VALUES(?,?) ON CONFLICT(dataset) DO UPDATE SET revision=excluded.revision').run(dataset, next.revision);
+      const explicit=new Set(reconfirm);
+      const quarantined=new Set(db.prepare('SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND dirty=2').all(dataset).map(r=>r.lane+':'+r.kind+':'+r.id));
       const put = db.prepare(`INSERT INTO local_pharmacy_records(dataset,lane,kind,id,payload,local_revision,mutation_id,dirty,updated_at)
         VALUES(?,?,?,?,?,?,?,1,?) ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,
         local_revision=excluded.local_revision,mutation_id=excluded.mutation_id,dirty=1,updated_at=excluded.updated_at`);
@@ -1006,7 +1008,7 @@ export const LocalPharmacyWorkspaceRepository = {
         const previous = new Map(latest[lane].map(e => [e.kind + ':' + e.data.id, JSON.stringify(e)]));
         for (const entry of next[lane]) {
           const payload = JSON.stringify(entry);
-          if (previous.get(entry.kind + ':' + entry.data.id) === payload) continue;
+          if (previous.get(entry.kind + ':' + entry.data.id) === payload && !(explicit.has(lane+':'+entry.kind+':'+entry.data.id) && quarantined.has(lane+':'+entry.kind+':'+entry.data.id))) continue;
           put.run(dataset, lane, entry.kind, entry.data.id, payload, next.revision, randomUUID(), nowIso());
         }
       }

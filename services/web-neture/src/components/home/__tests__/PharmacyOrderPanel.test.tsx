@@ -20,6 +20,8 @@ describe('pharmacy order preparation', () => {
   it('starts empty without inventory, prepares a request without executing, and requires direct receipt evidence', () => {
     const apply = vi.fn(); render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={apply} />);
     expect(screen.getByText(/OCR은 사용하지/)).toBeTruthy();
+    expect(screen.getByRole('button',{name:'화면 자료 내보내기'})).toBeTruthy();expect(screen.queryByRole('button',{name:'전체 자료 내보내기'})).toBeNull();
+    expect(screen.getByText(/조회한 이력만 파일에 담아요/)).toBeTruthy();
     addSupplier(); addLine(); fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
     expect(apply).toHaveBeenCalledOnce(); expect(apply.mock.calls[0][0]).toContain('합성 상품 / 500정 / 2포장');
     expect(apply.mock.calls[0][0]).toContain('최종 제출·결제는 사용자가 직접');
