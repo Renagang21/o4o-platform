@@ -81,7 +81,17 @@ try {
   Write-Host '설치를 마치지 못했습니다. 열린 PC 연결 프로그램을 종료한 뒤 다시 설치해 주세요. 파일이 손상됐다면 O4O에서 다시 받아 주세요.'
   exit 1
 } finally {
-  if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
+  # Windows can briefly retain the exited runtime image (for example during scanning).
+  # Retry only our own random extraction directory; never terminate processes.
+  for ($attempt = 0; $attempt -lt 25; $attempt++) {
+    try {
+      if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
+      break
+    } catch {
+      if ($attempt -eq 24) { Write-Host '임시 설치 파일 정리를 마치지 못했습니다. 설치 결과는 위 안내를 확인해 주세요.' }
+      else { [Threading.Thread]::Sleep(200) }
+    }
+  }
 }
 `.replace(/\n/g, "\r\n"),
     "utf8",

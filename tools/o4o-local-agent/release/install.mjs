@@ -108,11 +108,10 @@ try {
     const expected = verifyPackage(slot);
     const child = spawn(
       path.join(slot, "runtime", "node.exe"),
-      [path.join(slot, "launch.mjs")],
+      [path.join(slot, "launch.mjs"), "--console"],
       {
         cwd: slot,
         detached: true,
-        windowsHide: true,
         stdio: "ignore",
         env: { ...process.env, O4O_AGENT_HOME: targets.dataHome },
       },
@@ -123,7 +122,7 @@ try {
     });
     child.unref();
     // A spawned process is not proof of a usable runtime. Keep errors visible in
-    // this installer while the detached background process stays console-free.
+    // this installer while the detached runtime has its own readable, closeable console.
     const deadline = Date.now() + 30000;
     let ready = false;
     while (Date.now() < deadline) {
@@ -153,7 +152,7 @@ try {
     }
     if (!ready) throw new Error("PC_START_NOT_CONFIRMED");
     console.log(
-      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주세요. 검은 실행 창을 계속 열어 둘 필요는 없습니다.",
+      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주세요. 새로 열린 PC 연결 창은 켜 두세요. 종료하려면 그 창에서 Ctrl+C를 누르세요.",
     );
   } else {
     console.log(
