@@ -28,3 +28,13 @@ describe('PC published release',()=>{
   }
  });
 });
+
+it('prefers the hash-checked click installer, with legacy ZIP compatibility',async()=>{
+ const setup={filename:release.filename.replace('.zip','-setup.cmd'),sha256:release.sha256,bytes:bytes.length};
+ const next=validatePcRelease({...release,setup});
+ vi.stubGlobal('crypto',webcrypto);const fetcher=vi.fn().mockResolvedValue(new Response(bytes));vi.stubGlobal('fetch',fetcher);
+ await downloadPcRelease(next,new AbortController().signal);
+ expect(fetcher.mock.calls[0][0]).toBe('/downloads/pc-connection/'+setup.filename);
+ for(const patch of [{filename:'https://example.com/setup.cmd'},{sha256:'wrong'},{bytes:32*1024*1024},{filename:'other.cmd'},{bytes:0}])
+  expect(()=>validatePcRelease({...release,setup:{...setup,...patch}})).toThrow();
+});

@@ -852,7 +852,8 @@ jobs:
       with:
         node-version: '22.18.0'
     - name: Verify installation, data preservation and packaged runtime health
-      run: node --test tools/o4o-local-agent/test/release-install.test.mjs
+      # Readable output also preserves bounded failure annotations from this suite.
+      run: node --test --test-reporter=spec tools/o4o-local-agent/test/release-install.test.mjs
 
   ci-gate:
     name: CI Gate
