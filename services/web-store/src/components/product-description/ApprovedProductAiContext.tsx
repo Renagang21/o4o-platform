@@ -24,7 +24,7 @@ export function ApprovedProductAiContext({ listingId, language, disabled, isCurr
     <p className="text-sm">등록 상품의 승인된 AI 상담자료를 조회합니다. QR 설명서는 이 자료와 별도로 관리됩니다.</p>
     <button type="button" className="min-h-11 rounded border px-3" disabled={disabled || busy} onClick={() => void read()}>AI 상담자료 불러오기</button>
     {error && <p role="alert">{error}</p>}
-    {value?.state === 'missing' && <p role="status">이 언어의 승인된 AI 상담자료가 없습니다. 공개 근거를 확인해 작성한 자료는 관리자에게 제안할 수 있습니다.</p>}
+    {value?.state === 'missing' && <output className="block">이 언어의 승인된 AI 상담자료가 없습니다. 공개 근거를 확인해 작성한 자료는 관리자에게 제안할 수 있습니다.</output>}
     {description && <div className="min-w-0 space-y-2 break-words">
       <p>{value?.name} · {value?.language} · {value?.state === 'structured' ? '구조화 자료' : '기존 미분류 자료'}</p>
       <p className="text-xs">{description.source ? `${sourceKinds[description.source.kind] ?? '출처 확인 필요'} · ${sourceStates[description.source.currentness] ?? '현행성 확인 필요'} · ${description.source.checkedOn ?? '확인일 미상'}` : '연결된 근거 정보 없음'}{description.truncated ? ' · 원문 일부' : ''}</p>

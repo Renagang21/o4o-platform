@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { readProductWorkbook, previewStoreExcel } from './store-excel-preview.js';
+import { MAX_EXCEL_PRODUCTS, readProductWorkbook, previewStoreExcel } from './store-excel-preview.js';
 import { prepareDescriptionEntries } from './contracts.js';
 function workbook(rows: unknown[][]) {
   const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(rows));
@@ -9,13 +9,20 @@ describe('store product input boundaries', () => {
   it('returns headers only until columns are explicitly selected and never writes a preview', async () => {
     const db = { query: jest.fn() };
     const result = await previewStoreExcel(db as never, 'store', workbook([['상품명', '가격'], ['비공개 POS 이름', 'PRIVATE']]));
-    expect(result).toEqual({ columns: [{ index: 0, label: '상품명' }, { index: 1, label: '가격' }], rows: [] });
+    expect(result).toEqual({ headerRow: 0, columns: [{ index: 0, label: '상품명' }, { index: 1, label: '가격' }], rows: [] });
     expect(db.query).not.toHaveBeenCalled();
     await expect(previewStoreExcel(db as never, 'store', workbook([['name'], ['A']]), { nameColumn: 8, language: 'ko' })).rejects.toMatchObject({ code: 'INVALID_COLUMNS' });
   });
   it('rejects oversized sheets rather than silently truncating them', () => {
-    expect(() => readProductWorkbook(workbook([['상품명'], ...Array.from({ length: 2001 }, () => ['A'])]))).toThrow('TOO_MANY_PRODUCTS');
+    expect(() => readProductWorkbook(workbook([['상품명'], ...Array.from({ length: MAX_EXCEL_PRODUCTS + 1 }, () => ['A'])]))).toThrow('TOO_MANY_PRODUCTS');
     expect(() => readProductWorkbook(Buffer.alloc(0))).toThrow('FILE_SIZE_LIMIT');
+  });
+  it('detects a POS header below title/blank rows and supports explicit header selection', () => {
+    const file = workbook([['합성 품목 현황'], [], ['품목코드', '관리번호(바코드)', '품목명'], ['PRIVATE-POS', '08806541001115', '합성 상품']]);
+    const parsed = readProductWorkbook(file);
+    expect(parsed.headerRow).toBe(2); expect(parsed.columns[1].label).toBe('관리번호(바코드)'); expect(parsed.rows).toHaveLength(1);
+    expect(readProductWorkbook(file, 0).headerRow).toBe(0);
+    expect(() => readProductWorkbook(file, 20)).toThrow('INVALID_HEADER_ROW');
   });
   it('requires declared sources for typed facts and never treats arbitrary sections as official references', () => {
     const source = { kind: 'manufacturer', currentness: 'retrieved', references: [{ url: 'https://example.com/product' }] };

@@ -14,7 +14,7 @@ beforeEach(() => { vi.clearAllMocks(); state.current = true; vi.spyOn(window, 'c
 const columns = [{ index: 0, label: '바코드' }, { index: 1, label: '상품명' }];
 const row = { row: 2, barcode: '8806541001115', name: 'POS 이름', state: 'review', candidates: [{ id: 'master', name: '정본 이름', barcode: '8806541001115', manufacturer: '제조사', matchedBy: 'barcode', hasAiDescription: false, registered: false }] };
 async function preview(rows = [row]) {
-  state.preview.mockResolvedValueOnce({ columns, rows: [] }).mockResolvedValueOnce({ columns, rows });
+  state.preview.mockResolvedValueOnce({ headerRow: 0, columns, rows: [] }).mockResolvedValueOnce({ headerRow: 0, columns, rows });
   render(<StoreProductExcelDialog open onClose={vi.fn()} onRegistered={vi.fn()} />);
   fireEvent.change(screen.getByLabelText('상품 엑셀 파일'), { target: { files: [new File(['synthetic'], 'products.xlsx')] } });
   await screen.findByRole('button', { name: '기존 상품·AI 자료 대조' });
@@ -37,7 +37,7 @@ it('discards an old-store response and never starts subsequent writes after the 
   state.preview.mockReturnValue(new Promise(r => { resolve = r; }));
   render(<StoreProductExcelDialog open onClose={vi.fn()} onRegistered={vi.fn()} />);
   fireEvent.change(screen.getByLabelText('상품 엑셀 파일'), { target: { files: [new File(['synthetic'], 'products.xlsx')] } });
-  state.current = false; resolve({ columns, rows: [row] });
+  state.current = false; resolve({ headerRow: 0, columns, rows: [row] });
   await waitFor(() => expect(state.preview).toHaveBeenCalledTimes(1));
   expect(screen.queryByLabelText('2행 상품 선택')).toBeNull(); expect(state.register).not.toHaveBeenCalled();
 });

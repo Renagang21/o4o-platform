@@ -98,19 +98,20 @@ export class DescriptionIntakeService {
       }
       const descriptions = new SharedProductDescriptionService(manager);
       const applied: NonNullable<Resource['applied']> = [];
-      for (const masterId of selected) {
+      await selected.reduce(async (previous, masterId) => {
+        await previous;
         const current = targets.find(t => t.id === masterId)!.canonical;
         if (current?.content === entry.content && (current.summary ?? null) === entry.summary &&
             descriptionFingerprint(current.source) === descriptionFingerprint(entry.source) &&
             descriptionFingerprint(current.aiSections ?? []) === descriptionFingerprint(entry.aiSections ?? [])) {
-          applied.push({ masterId, descriptionId: current.id }); continue;
+          applied.push({ masterId, descriptionId: current.id }); return;
         }
         const candidate = await descriptions.createCandidate({ masterId, content: entry.content, summary: entry.summary,
           descriptionType: entry.descriptionType, language: entry.language, sourceType: entry.source.kind === 'user_contribution' ? 'store_contribution' : 'operator',
           sourceRefId: row.id, createdBy: actor });
         const canonical = await descriptions.setCanonical(candidate.id, actor, { trackAdminEdit: true, replaceSourceReference: true });
         applied.push({ masterId, descriptionId: canonical.id });
-      }
+      }, Promise.resolve());
       resource.applied = applied;
       row.rawPayload = { descriptionResource: resource }; row.candidateStatus = 'matched';
       row.matchedProductMasterId = applied[0]?.masterId ?? null; row.reviewedBy = actor; row.reviewedAt = new Date();

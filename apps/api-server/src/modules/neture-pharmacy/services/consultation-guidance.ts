@@ -488,11 +488,12 @@ export class ConsultationGuidanceService {
       fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담 방식과 사용 확인이 필요합니다.');
     const mode = String(input.mode);
     await this.access(actor, org, mode);
-    const product = await this.products.product(org, input.productKind, input.productId);
-    const read = () => this.material(org, String(input.productKind), String(input.productId), 'ko');
+    const productId = typeof input.productId === 'string' ? input.productId : '';
+    const product = await this.products.product(org, input.productKind, productId);
+    const read = () => this.material(org, String(input.productKind), productId, 'ko');
     const material = await read();
     const readAi = () => input.productKind === 'listing'
-      ? readStoreProductAiContext(this.db, org, String(input.productId), 'ko') : Promise.resolve(null);
+      ? readStoreProductAiContext(this.db, org, productId, 'ko') : Promise.resolve(null);
     const ai = await readAi();
     const sourceVersion = digest({ product, material: material?.version ?? null, ai });
     const authorize = async () => {
@@ -509,11 +510,11 @@ export class ConsultationGuidanceService {
     // Only approved, typed B2B sections enter this existing request. Never consume STORE/QR,
     // unpublished candidates or a legacy HTML body as proven product facts.
     if (ai?.state === 'structured' && ai.description) {
-      let remaining = 20000;
+      let remaining = 18000, factId = 11, referenceId = 2;
       for (const section of ai.description.sections.slice(0, 10)) {
         if (!remaining) break;
         const text = section.text.slice(0, Math.min(5000, remaining)); remaining -= text.length;
-        sources.push({ id: `b${sources.length}`, kind: section.kind === 'product-fact' ? 'product-fact' : 'professional-reference',
+        sources.push({ id: section.kind === 'product-fact' ? `p${factId++}` : `r${referenceId++}`, kind: section.kind === 'product-fact' ? 'product-fact' : 'professional-reference',
           title: `O4O B2B · ${section.kind} · ${section.title} · ${ai.description.source?.currentness ?? '출처 확인 필요'}${text.length < section.text.length ? ' · 일부' : ''}`, text });
       }
     }
