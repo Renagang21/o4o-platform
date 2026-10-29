@@ -62,3 +62,5 @@
 - Chromium desktop 1440/mobile 390 fixture smoke PASS. 실제 컴포넌트에 합성 manifest/설치 파일·health/grant/pair를 주입했다. 버튼 배경 구분·연결 확인 시 다운로드 0회·친숙한 파일명·다운로드 뒤 파일 열기 안내·실행 감지 뒤 추가 클릭 없이 grant/pair 각 1회·업무 요청 자동 실행 0회·mobile localhost 관측 0회·pageerror/가로 넘침 0. 전후 스크린샷 육안 확인.
 - Linux 설치기 **13 PASS / Windows 전용 2 SKIP**. TypeScript·production names build·변경 UI/API ESLint로 검증한다. Windows 최종 실행과 PR CI·Codex 결과는 해당 branch PR의 Checks·최종 인계 설명을 기준으로 확인한다. 로컬 결과를 PR CI로 대신하지 않는다.
 - 현재·기준 checkout에 테스트 계정 SSOT가 없어 실제 로그인 및 사용자 PC 파일 열기·보안창 검증은 NOT_RUN. 운영 main 병합·배포는 이 보완에서 실행하지 않는다.
+
+- PR 첫 HEAD `1689768`의 API shard 3 FAIL을 로컬 `local-agent-oneclick-pairing.spec.ts`에서 재현했다(24 PASS / 1 FAIL). 쿠키 생략 소스 검사(`/credentials: 'omit'/`)가 새 helper의 큰따옴표 표기를 세지 못한 원인이며 실제 `credentials: omit` 동작은 같았다. 기존 작은따옴표 표기를 복원한다. 보안 assertion과 검사 강도는 그대로 유지한다.

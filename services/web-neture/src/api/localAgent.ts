@@ -227,7 +227,7 @@ export async function connectThisPc(
       ...(signal ? { signal } : {}),
       // application/json 이라 단순 요청이 아니다 — preflight 를 강제해 origin 검사를 통과시킨다.
       headers: { "Content-Type": "application/json" },
-      credentials: "omit",
+      credentials: 'omit',
       body: JSON.stringify({ grant, nonce: health.nonce }),
     });
     const body = await res.json().catch(() => null);
