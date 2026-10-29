@@ -111,7 +111,7 @@ try {
       child.once("error", reject);
     });
     child.unref();
-    console.log("설치가 끝났습니다. 원래 화면에서 연결하기를 눌러 주세요.");
+    console.log("설치가 끝났습니다. O4O 화면에서 연결 상태를 확인해 주세요.");
   } else {
     console.log(
       result.shortcut

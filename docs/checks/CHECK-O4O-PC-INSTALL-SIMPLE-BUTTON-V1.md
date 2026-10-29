@@ -49,3 +49,16 @@
 - base: `2f4da2e188` · 검증 코드: `0344e72b3599421b8bf856364db1fbb43dbc14ad`
 - main integration: NOT_RUN · deployment: NOT_RUN · actual user PC smoke: NOT_RUN
 - WORKTREE_DISPOSITION: **KEEP** — main 병합 전 수정·통합에 필요한 본 작업 전용 공간과 push한 branch를 보존한다. 다른 작업공간·branch는 변경하지 않았다.
+
+## 사용자 피드백에 따른 설치·연결 추가 보완 — 2026-10-29
+
+동일 미병합 작업의 후속 보완이므로 `wo/pc-install-simple-button` branch와 전용 작업공간을 유지했다. 최신 main `9fe9fa7e41`을 published branch에 merge해 준비했다. 사용자가 첨부한 운영 화면의 배포 manifest는 `2f4da2e188`이며 setup 항목이 없는 기존 ZIP 방식이었다. 이전 개발 완료가 운영 반영 완료를 뜻하지 않는다.
+
+- 버튼을 파란 **설치 파일 받기**와 테두리 **이미 설치했어요 · 연결 확인**으로 구분한다. 다운로드 파일명은 **O4O-PC-Setup.cmd**이다. 받은 뒤에는 재다운로드를 작은 보조 동작으로 내리고 파일 열기를 주 안내로 보여 준다. 연결 확인은 다운로드하지 않는다.
+- 사용자에게 미리 알린 설치 파일 받기 동작 후에만 최대 10분의 로컬 상태 관측을 시작한다. 실제 실행 release identity·버전·데이터 준비가 배포본과 맞아야 기존 연결을 한 번 요청한다. 옛 프로그램·손상 데이터로 자동 연결하지 않는다. 일반 카드 진입만으로 자동 연결하지 않는다.
+- 자동 연결 중지·unmount·계정 전환은 진행 중 승인권 요청·PC 전달을 중단한다. 늦은 health/승인권 응답이 다른 문맥에서 연결을 시작하지 않는다. 내 정보 카드는 user key로 분리한다. UI 내부 helper에 선택적 AbortSignal만 추가했으며 서버 API·nonce·권한·Core·DB·인증 계약을 바꾸지 않는다.
+- 재확인 중 표시와 재확인 실패 안내를 노출한다. 설치 후 자동 연결에 맞게 설치기의 마지막 안내를 정정했다. 업무 요청은 자동 실행하지 않는다.
+- focused Vitest **33 PASS**: 설치 후 자동 연결 1회·옛 release 거절·관측 중지·unmount 후 늦은 응답 무시·취소 후 승인권 전달 0회·기존 LNA·Main 첫 요청 보존·검증 다운로드 회귀.
+- Chromium desktop 1440/mobile 390 fixture smoke PASS. 실제 컴포넌트에 합성 manifest/설치 파일·health/grant/pair를 주입했다. 버튼 배경 구분·연결 확인 시 다운로드 0회·친숙한 파일명·다운로드 뒤 파일 열기 안내·실행 감지 뒤 추가 클릭 없이 grant/pair 각 1회·업무 요청 자동 실행 0회·mobile localhost 관측 0회·pageerror/가로 넘침 0. 전후 스크린샷 육안 확인.
+- Linux 설치기 **13 PASS / Windows 전용 2 SKIP**. TypeScript·production names build·변경 UI/API ESLint로 검증한다. Windows 최종 실행과 PR CI·Codex 결과는 해당 branch PR의 Checks·최종 인계 설명을 기준으로 확인한다. 로컬 결과를 PR CI로 대신하지 않는다.
+- 현재·기준 checkout에 테스트 계정 SSOT가 없어 실제 로그인 및 사용자 PC 파일 열기·보안창 검증은 NOT_RUN. 운영 main 병합·배포는 이 보완에서 실행하지 않는다.

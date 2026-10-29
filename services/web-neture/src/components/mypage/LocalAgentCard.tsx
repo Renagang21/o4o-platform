@@ -20,7 +20,7 @@
  */
 
 import PcProgramUpdate from "./PcProgramUpdate";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Monitor, CheckCircle2 } from "lucide-react";
 import {
   connectThisPc,
@@ -40,25 +40,51 @@ export default function LocalAgentCard({
   useEffect(() => {
     onBusyChange?.(status === "checking" || status === "pairing");
   }, [status, onBusyChange]);
+  const active = useRef(true);
+  const pairingRequest = useRef<AbortController | null>(null);
+  const probeSequence = useRef(0);
+  const [manualChecks, setManualChecks] = useState(0);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+      pairingRequest.current?.abort();
+    };
+  }, []);
   const [message, setMessage] = useState<string | null>(null);
 
   /** 승인권을 받아 agent 에게 건넨다. 성공하면 완료, 실패하면 이유를 문장으로 보여준다. */
-  const pair = useCallback(async (target: LocalAgentHealth) => {
-    setStatus("pairing");
-    setMessage(null);
-
-    const outcome = await connectThisPc(target);
-    if (!outcome.ok) {
-      // nonce 는 1회용이다. 실패한 nonce 를 들고 다시 누르게 두지 않는다.
-      setHealth(null);
-      setStatus("unavailable");
-      setMessage(describeConnectFailure(outcome.code));
-      return;
-    }
-    setStatus("connected");
-    setHealth({ ...target, connected: true });
-    setMessage(null);
-  }, []);
+  const pair = useCallback(
+    async (target: LocalAgentHealth, signal?: AbortSignal) => {
+      if (!active.current || signal?.aborted || pairingRequest.current)
+        return false;
+      const request = new AbortController();
+      pairingRequest.current = request;
+      const cancel = () => request.abort();
+      signal?.addEventListener("abort", cancel, { once: true });
+      setStatus("pairing");
+      setMessage(null);
+      try {
+        const outcome = await connectThisPc(target, request.signal);
+        if (!active.current || request.signal.aborted) return false;
+        if (!outcome.ok) {
+          setHealth(null);
+          setStatus("unavailable");
+          setMessage(describeConnectFailure(outcome.code));
+          return false;
+        }
+        setStatus("connected");
+        setHealth({ ...target, connected: true });
+        setMessage(null);
+        return true;
+      } finally {
+        signal?.removeEventListener("abort", cancel);
+        if (pairingRequest.current === request) pairingRequest.current = null;
+        if (active.current && request.signal.aborted) setStatus("unavailable");
+      }
+    },
+    [],
+  );
 
   /**
    * 지금 상태를 다시 관측한다.
@@ -68,11 +94,13 @@ export default function LocalAgentCard({
    */
   const refresh = useCallback(
     async (autoPair = false) => {
+      const sequence = ++probeSequence.current;
       setStatus("checking");
       setMessage(null);
       setHealth(null);
 
       const probe = await probeLocalAgent();
+      if (!active.current || sequence !== probeSequence.current) return;
       if (!probe.ok) {
         setStatus("unavailable");
         setMessage(describeLocalAgentUnavailable(probe.reason));
@@ -115,7 +143,15 @@ export default function LocalAgentCard({
 
           <PcProgramUpdate
             health={health}
-            onVerify={() => void refresh(true)}
+            onVerify={() => {
+              setManualChecks((value) => value + 1);
+              void refresh(true);
+            }}
+            onConnectReady={pair}
+            onInstallStarted={() => {
+              setMessage(null);
+              setManualChecks(0);
+            }}
             disabled={status === "checking" || status === "pairing"}
           />
           <div className="mt-4">
@@ -127,7 +163,16 @@ export default function LocalAgentCard({
             )}
 
             {status === "unavailable" && message && (
-              <div className="text-sm text-gray-600">
+              <div
+                key={manualChecks}
+                role="status"
+                className="text-sm text-gray-600"
+              >
+                {manualChecks > 0 && (
+                  <p className="mb-1 font-medium">
+                    다시 확인했지만 아직 연결되지 않았어요.
+                  </p>
+                )}
                 <p>
                   {failureSummary}
                   {failureHelp.length > 0 ? "." : ""}

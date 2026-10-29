@@ -72,7 +72,7 @@ export default function MySettingsPage() {
       ]}
     >
       <div className="mb-6">
-        <LocalAgentCard />
+        <LocalAgentCard key={user.id} />
       </div>
 
       <AccountSecuritySettings
