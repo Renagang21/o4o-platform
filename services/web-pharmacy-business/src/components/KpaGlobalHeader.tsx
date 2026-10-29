@@ -75,7 +75,7 @@ export function KpaGlobalHeader() {
   // Explicit legacy business assignees have the same server-confirmed contact access.
   const newContacts = useServiceContactCount({client:authClient.api,serviceKey:BUSINESS_SITE.key === 'pharmacy'?'kpa-society':BUSINESS_SITE.key,accountId:user?.id,enabled:!!user && !isLoading});
   const contactAllowed = newContacts !== null;
-  if (contactAllowed) computedNav.push({label:newContacts?`문의 관리 · 새 문의 ${newContacts}`:'문의 관리',href:`https://neture.co.kr/operator/service-contact/${BUSINESS_SITE.key==='pharmacy'?'kpa-society':BUSINESS_SITE.key}`});
+  if (contactAllowed) computedNav.push({label:newContacts?`문의 관리 · 새 문의 ${newContacts}`:'문의 관리',href:BUSINESS_SITE.key === 'carepharm' ? '/operator/inbox/business/carepharm' : `https://neture.co.kr/operator/service-contact/${BUSINESS_SITE.key==='pharmacy'?'kpa-society':BUSINESS_SITE.key}`});
 
   if (!computedNav.some(item => item.href === '/contact')) computedNav.push({label:'Contact Us',href:'/contact'});
 
