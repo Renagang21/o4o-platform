@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import {
   installPackage,
   locations,
@@ -106,23 +106,19 @@ try {
     console.log("[4/4] PC 연결 프로그램을 실행하고 응답을 확인합니다.");
     const slot = installedSlot(targets.home);
     const expected = verifyPackage(slot);
-    const child = spawn(
-      path.join(process.env.SystemRoot || "C:\\Windows", "System32", "cmd.exe"),
+    execFileSync(
+      powershell,
       [
-        "/d",
-        "/v:off",
-        "/s",
-        "/c",
-        '"start "O4O PC 연결" /D "%O4O_RUN_CWD%" "%O4O_RUN_NODE%" "%O4O_RUN_ENTRY%" --console"',
+        "-NoProfile",
+        "-Command",
+        '$ErrorActionPreference="Stop"; $p=[Diagnostics.ProcessStartInfo]::new(); $p.FileName=$env:O4O_RUN_NODE; $p.Arguments=([char]34 + $env:O4O_RUN_ENTRY + [char]34); $p.WorkingDirectory=$env:O4O_RUN_CWD; $p.UseShellExecute=$true; $p.WindowStyle=[Diagnostics.ProcessWindowStyle]::Normal; [void][Diagnostics.Process]::Start($p)',
       ],
       {
-        cwd: slot,
         windowsHide: true,
-        windowsVerbatimArguments: true,
-        stdio: "ignore",
-        // Fixed command, quoted environment selectors: no user text in cmd code.
-        // `start` creates a real console with normal Ctrl+C handling. A detached
-        // process with NUL streams can otherwise leave no readable/usable console.
+        stdio: "pipe",
+        timeout: 10000,
+        // ShellExecute creates a normal, independent console with usable standard
+        // streams. Environment selectors keep paths out of PowerShell source.
         env: {
           ...process.env,
           O4O_AGENT_HOME: targets.dataHome,
@@ -132,11 +128,6 @@ try {
         },
       },
     );
-    await new Promise((resolve, reject) => {
-      child.once("spawn", resolve);
-      child.once("error", reject);
-    });
-    child.unref();
     // A spawned process is not proof of a usable runtime. Keep errors visible in
     // this installer while the detached runtime has its own readable, closeable console.
     const deadline = Date.now() + 30000;
@@ -181,6 +172,13 @@ try {
     );
   }
 } catch (error) {
+  if (process.env.GITHUB_ACTIONS === "true")
+    console.error(
+      "PC_INSTALL_ERROR: " +
+        (error.code ||
+          error.message?.match(/^[A-Z_]+$/)?.[0] ||
+          "START_OR_INSTALL_FAILED"),
+    );
   console.error(
     (installed
       ? "설치는 끝났지만 실행하지 못했습니다. 시작 메뉴의 O4O PC 연결을 열어 주세요."
