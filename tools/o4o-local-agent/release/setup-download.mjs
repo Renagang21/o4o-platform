@@ -66,10 +66,12 @@ $temporary = Join-Path ([IO.Path]::GetTempPath()) ('o4o-setup-' + [Guid]::NewGui
 try {
   if (-not [Environment]::Is64BitOperatingSystem -or -not [Environment]::Is64BitProcess -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') { throw 'WINDOWS_X64_REQUIRED' }
   [void][IO.Directory]::CreateDirectory($temporary)
-  Write-Host 'O4O PC 연결을 설치합니다. 잠시 기다려 주세요.'
+  Write-Host 'O4O PC 연결을 설치합니다. 이 창에서 진행 단계를 확인해 주세요.'
   $archive = Join-Path $temporary 'package.zip'
   $package = Join-Path $temporary 'package'
+  Write-Host '[1/4] 받은 설치 파일을 확인합니다.'
   Copy-EmbeddedPackage $archive
+  Write-Host '[2/4] 설치 파일을 검증하고 압축을 풉니다.'
   Expand-VerifiedPackage $archive $package
   & (Join-Path $package 'runtime/node.exe') (Join-Path $package 'install.mjs') --window
   if ($LASTEXITCODE -ne 0) { throw 'INSTALL_NOT_COMPLETED' }
@@ -79,7 +81,17 @@ try {
   Write-Host '설치를 마치지 못했습니다. 열린 PC 연결 프로그램을 종료한 뒤 다시 설치해 주세요. 파일이 손상됐다면 O4O에서 다시 받아 주세요.'
   exit 1
 } finally {
-  if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
+  # Windows can briefly retain the exited runtime image (for example during scanning).
+  # Retry only our own random extraction directory; never terminate processes.
+  for ($attempt = 0; $attempt -lt 25; $attempt++) {
+    try {
+      if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
+      break
+    } catch {
+      if ($attempt -eq 24) { Write-Host '임시 설치 파일 정리를 마치지 못했습니다. 설치 결과는 위 안내를 확인해 주세요.' }
+      else { [Threading.Thread]::Sleep(200) }
+    }
+  }
 }
 `.replace(/\n/g, "\r\n"),
     "utf8",
