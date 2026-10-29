@@ -294,6 +294,7 @@ function App() {
         <Suspense fallback={<PageLoader />}>
         <Routes>
           {BUSINESS_SITE.key === 'carepharm' && <>
+            <Route path="/terms" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
             <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CarePharmHomePage /></Layout>} />
             <Route path="/news/:noticeId" element={<Layout serviceName={SERVICE_NAME}><CarePharmNewsView client={pharmacyManagementAuthClient.api} /></Layout>} />
             {(['participation', 'materials', 'tools'] as const).map(view => <Route key={view} path={view === 'participation' ? '/my/participation' : '/' + view} element={<Layout serviceName={SERVICE_NAME}><CarePharmHomePage view={view} /></Layout>} />)}
