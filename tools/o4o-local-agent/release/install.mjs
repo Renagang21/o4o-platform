@@ -3,7 +3,12 @@ import fs from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawn } from "node:child_process";
-import { installPackage, locations, installedSlot } from "./install-core.mjs";
+import {
+  installPackage,
+  locations,
+  installedSlot,
+  verifyPackage,
+} from "./install-core.mjs";
 let installed = false;
 const windowMode = process.argv.includes("--window");
 const powershell = path.join(
@@ -57,7 +62,7 @@ try {
             "-Command",
             "[void][Reflection.Assembly]::LoadWithPartialName('PresentationFramework'); $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC인가요? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주세요.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
           ],
-          { encoding: "utf8" },
+          { encoding: "utf8", windowsHide: true },
         ).trim() === "yes";
     } else {
       const prompt = createInterface({
@@ -85,6 +90,9 @@ try {
     } else console.log("새 PC 설치를 진행합니다.");
   }
   if (process.exitCode) process.exit(process.exitCode);
+  console.log(
+    "[3/4] 프로그램과 기존 데이터를 확인하고 설치합니다. 잠시 기다려 주세요.",
+  );
   const result = await installPackage({
     source: path.dirname(fileURLToPath(import.meta.url)),
     ...targets,
@@ -95,13 +103,16 @@ try {
   );
   installed = true;
   if (windowMode) {
+    console.log("[4/4] PC 연결 프로그램을 실행하고 응답을 확인합니다.");
     const slot = installedSlot(targets.home);
+    const expected = verifyPackage(slot);
     const child = spawn(
       path.join(slot, "runtime", "node.exe"),
       [path.join(slot, "launch.mjs")],
       {
         cwd: slot,
         detached: true,
+        windowsHide: true,
         stdio: "ignore",
         env: { ...process.env, O4O_AGENT_HOME: targets.dataHome },
       },
@@ -111,7 +122,39 @@ try {
       child.once("error", reject);
     });
     child.unref();
-    console.log("설치가 끝났습니다. O4O 화면에서 연결 상태를 확인해 주세요.");
+    // A spawned process is not proof of a usable runtime. Keep errors visible in
+    // this installer while the detached background process stays console-free.
+    const deadline = Date.now() + 30000;
+    let ready = false;
+    while (Date.now() < deadline) {
+      try {
+        const response = await fetch("http://127.0.0.1:47821/health", {
+          headers: { Origin: "https://neture.co.kr" },
+          redirect: "error",
+          signal: AbortSignal.timeout(1000),
+        });
+        if (response.ok) {
+          const health = await response.json();
+          if (
+            health.ok &&
+            health.releaseId === result.releaseId &&
+            health.agentVersion === result.version &&
+            health.localData?.ready === true &&
+            health.localData.schemaVersion === expected.dataSchemaVersion
+          ) {
+            ready = true;
+            break;
+          }
+        }
+      } catch {
+        /* Starting up; bounded retry, without printing local responses. */
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (!ready) throw new Error("PC_START_NOT_CONFIRMED");
+    console.log(
+      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주세요. 검은 실행 창을 계속 열어 둘 필요는 없습니다.",
+    );
   } else {
     console.log(
       result.shortcut

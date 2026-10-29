@@ -8,7 +8,7 @@ try {
   const child = spawn(
     path.join(slot, "runtime", "node.exe"),
     [path.join(slot, "src", "index.mjs"), "run"],
-    { cwd: slot, stdio: "inherit", env: process.env },
+    { cwd: slot, stdio: "inherit", windowsHide: true, env: process.env },
   );
   child.once("error", () => {
     console.error("PC 연결 프로그램을 실행하지 못했습니다.");
