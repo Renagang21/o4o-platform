@@ -86,6 +86,7 @@ function Consultation({
   stationKey: string;
 }>) {
   const [context, setContext] = useState<Context | null>(null);
+  const [contextLoading, setContextLoading] = useState(true);
   const [mode, setMode] = useState("");
   const [language, setLanguage] = useState("en");
   const [replyLanguage, setReplyLanguage] = useState("");
@@ -188,6 +189,7 @@ function Consultation({
   useEffect(() => {
     let cancelled = false;
     setContext(null);
+    setContextLoading(true);
     setError("");
     coreApiClient
       .get<{ success: boolean; data: Context }>(`${base}/context`)
@@ -224,7 +226,7 @@ function Consultation({
       .catch((cause: { code?: string }) => {
         if (!cancelled)
           setError(consultationAccessError(cause?.code) ?? "상담 이용 상태를 확인하지 못했습니다. 다시 시도해 주세요.");
-      });
+      }).finally(() => { if (!cancelled) setContextLoading(false); });
     return () => {
       cancelled = true;
     };
@@ -401,9 +403,13 @@ function Consultation({
           {speech.message}
         </output>
       )}
-      {!context && !error && (
+      {!context && !error && (contextLoading ? (
         <output className="block">상담 이용 상태를 확인하는 중…</output>
-      )}
+      ) : <section aria-label="상담 이용 상태 재확인" className="space-y-3 rounded border p-4">
+        <p>상담 이용 상태를 다시 확인해 주세요.</p>
+        <ConsultationMyHomeLink />
+        <button type="button" className="min-h-11 rounded border px-3 py-2" onClick={() => { clear(); setRetry(value => value + 1); }}>이용 상태 다시 확인</button>
+      </section>)}
       {context && (
         <>
           <details className="rounded-xl border bg-white px-4">

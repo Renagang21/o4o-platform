@@ -194,4 +194,10 @@ it('clears private drafts after an explicit access denial and offers recheck rat
   expect(screen.queryByRole('region', { name: '문장 번역' })).toBeNull();
   expect(screen.getByRole('button', { name: '다시 확인' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'My Home' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '새 상담 · 내용 지우기' }));
+  expect(screen.queryByText('상담 이용 상태를 확인하는 중…')).toBeNull();
+  expect(screen.getByRole('region', { name: '상담 이용 상태 재확인' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '이용 상태 다시 확인' }));
+  await screen.findByRole('region', { name: '문장 번역' });
+  expect((translation().getByRole('textbox') as HTMLTextAreaElement).value).toBe('');
 });
