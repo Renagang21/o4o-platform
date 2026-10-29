@@ -127,7 +127,7 @@ export function DataTable<T extends Record<string, any>>({
   // selectable → _select 체크박스 컬럼 자동 생성
   // BaseTable은 col.key === '_select' 인 컬럼에 select-all 헤더를 자동 생성한다.
   // body 체크박스는 이 래퍼에서 render로 제공한다.
-  if (selectable) {
+  if (selectable && !o4oColumns.some(column => column.key === '_select')) {
     o4oColumns.unshift({
       key: '_select',
       header: '',

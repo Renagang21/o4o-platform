@@ -7,6 +7,7 @@ import {CENTRAL_OPERATION_MENUS,OperatorCapability} from '@o4o/types';
 import {OperatorAreaShell,DEFAULT_OPERATOR_DOMAIN_IA,type OperatorDomainIAConfig} from '@o4o/operator-ux-core';
 import type {OperatorGroupKey,OperatorMenuItem} from '@o4o/ui';
 import CentralOperationOverview from './CentralOperationOverview';
+import CentralOperationDirectory from './CentralOperationDirectory';
 import CentralOperationNotifications from './CentralOperationNotifications';
 import {centralOperationAreas} from './central-operation-navigation';
 import {renderCentralOperation} from './central-operation-renderers';
@@ -125,6 +126,7 @@ export default function CentralOperationsPage() {
     displayOrder: allowed.map(([key]) => key),
     groupOrder: Object.fromEntries(allowed.map(([key]) => [key, ['users', 'content', 'products', 'system']])),
     topPinnedGroups: ['dashboard'],
+    collapsibleDomains: true,
   };
   return (
     <OperatorAreaShell menuItems={sidebar} capabilities={Object.values(OperatorCapability)} domainIAConfig={domainIA} menuLabel="통합 운영 메뉴" header={
@@ -137,6 +139,7 @@ export default function CentralOperationsPage() {
       </header>}
     >
       {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
+      {!serviceKey && <CentralOperationNotifications key={`panel:${user.id}`} variant="panel" scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {serviceKey && <nav aria-label="서비스 운영 업무" className="mb-5 flex flex-wrap gap-2 border-b pb-4">
         {visibleMenus.filter(menu => menu.service === serviceKey).map(menu => <Link key={menu.key} aria-current={area === menu.area ? 'page' : undefined} className={`rounded border px-3 py-2 text-sm ${area === menu.area ? 'bg-blue-700 text-white' : 'bg-white text-slate-700'}`} to={`/operations/${serviceKey}/${menu.area}`}>{menu.label}</Link>)}
       </nav>}
@@ -145,15 +148,7 @@ export default function CentralOperationsPage() {
           {renderCentralOperation({service:serviceKey,area,actorId:identityId,roles,menuKeys,courseId,id,userId,search:location.search,navigate})}
         </div>
       ) : (
-        <section className="grid gap-4 md:grid-cols-2">
-          {allowed.map(([key, name]) => (
-            <section className="rounded-xl border bg-white p-5 shadow-sm" key={key}>
-              <h2 className="mb-3 text-lg font-semibold">{name}</h2>
-              <ul className="grid gap-2">{visibleMenus.filter(menu => menu.service === key).map(menu => <li key={menu.key}><Link className="block rounded border px-3 py-2 text-blue-700 hover:bg-blue-50" to={`/operations/${key}/${menu.area}`}>{menu.label}</Link></li>)}</ul>
-            </section>
-          ))}
-          {!allowed.length && <p>현재 연결된 운영 업무가 없습니다.</p>}
-        </section>
+        <CentralOperationDirectory services={allowed} menus={visibleMenus} />
       )}
     </OperatorAreaShell>
   );
