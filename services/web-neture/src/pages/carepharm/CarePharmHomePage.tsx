@@ -35,8 +35,8 @@ export default function CarePharmHomePage({ view = 'home' }: { view?: Cooperatio
   const memberSpace = <CooperationMemberSpace model={extension.model} materialsGuide={extension.materials} client={api}
     accountId={isAuthenticated ? user?.id : undefined} view={view} homeNews={isAuthenticated ? memberNews : undefined}
     onLogin={() => openLoginModal(location.pathname + location.search)}
-    onEnterStore={() => requestServiceHandoff(api, {
-      workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(extension.model.storePath)}`,
+    onEnterStore={(path) => requestServiceHandoff(api, {
+      workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: path ?? `/select-store?returnTo=${encodeURIComponent(extension.model.storePath)}`,
     })} />;
   if (view !== 'home') return view === 'tools' ? <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">{memberSpace}<CarePharmWorkspaces /></div> : memberSpace;
   if (isAuthenticated) return <div className="carepharm-home mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-8">
