@@ -97,3 +97,6 @@
 
 - Sonar 공개 API 진단을 GitHub CI에서 수집하여 Security/Reliability 지적 22건을 확인했다. 정렬 비교 함수를 명시하고, 비동기 조회의 처리 의도를 분명히 하며, 목록/모달의 키보드 진입·닫기를 보완했다. 공급자 품목군 조회 실패는 빈 목록으로 숨기지 않고 재조회할 수 있고 이전 공급자의 늦은 응답은 무시한다. 조사 도구는 외부 명령/PATH 의존을 제거하고 출력 위치를 `.tmp/central-operation-census/surfaces.json`로 고정하여 임의 경로 인자를 거부한다. 진단 로그는 고정 문구만 출력하고 상세는 artifact에 둔다. 검사 기준·문제 상태를 낮추거나 예외 처리하지 않았다. 최종 Sonar 재분석 결과는 대기다.
 - 보완 후 공유 운영 UI 221건, 원래 Neture 운영/Admin 화면 237건, 중앙 UI 34건, 접근 PostgreSQL 29건 PASS. PC/mobile 브라우저를 펀딩 키보드 상세 진입까지 12개 합성 시나리오로 확장해 PASS를 확인했다. 조사 도구의 고정 출력과 임의 경로 거부를 실제 실행으로 검증했으며 모집단 1,324개 소스/165개 route/14개 메뉴·탭이 유지됐다.
+
+- 최종 소스 커밋 `2402566076`의 SonarCloud Code Analysis가 success로 완료됐다. Security/Reliability 지적 보완 후 기준을 낮추지 않고 통과했으며, CodeQL·운영자 PostgreSQL integration·영향 프런트 production build도 통과했다. 해당 시점 required CI Gate는 전체 회귀 종료 대기이므로 전체 CI 완료와 구분한다.
+- 병합 준비 중 최신 main의 PC 설치 개선과 CarePharm 전환 검증 기록을 충돌 없이 반영한다. 이 통합 HEAD의 최종 CI·리뷰 결과와 운영 migration 실행 경계는 별도로 확인한다.
