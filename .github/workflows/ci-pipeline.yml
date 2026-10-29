@@ -222,6 +222,22 @@ jobs:
     - name: Test GitHub App token issuer (isolated, no credentials)
       run: node --test scripts/ops/github-app-token.test.mjs
 
+    - name: Collect public Sonar PR findings (read-only diagnostics)
+      if: always() && github.event_name == 'pull_request'
+      continue-on-error: true
+      env:
+        SONAR_PR_NUMBER: ${{ github.event.pull_request.number }}
+        SONAR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: node scripts/ci/read-sonar-pr-findings.mjs
+    - name: Upload Sonar PR diagnostics
+      if: always() && github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: sonar-pr-findings
+        path: sonar-pr-findings.json
+        if-no-files-found: ignore
+        retention-days: 7
+
     # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
     # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.
     # 로컬 SQLite 계약(node:sqlite DatabaseSync, key/setting allowlist, 임의 SQL·파일 부재)을

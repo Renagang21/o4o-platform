@@ -45,6 +45,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
   /** 1차 정비 후 사이드바 경로 전체. 제거한 4개 독립 진입점의 회귀를 방지한다. */
   const EXPECTED_PATHS = [
     '/admin',
+    '/operations',
     '/admin/platform/hub',
     '/admin/platform',
     '/admin/pharmacy-service-settings',

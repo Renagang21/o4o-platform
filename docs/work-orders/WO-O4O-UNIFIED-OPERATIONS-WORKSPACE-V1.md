@@ -86,3 +86,7 @@
 - 추가 검증: Admin 승인·철회 실패 후 사유 보존/재시도 2건, 원래 호스트의 가입 관계 정리 2건 PASS. 두 Admin 업무는 별도 메뉴이며 Operator 발급 차단·업무 간 분리의 실제 PostgreSQL 회귀를 포함한 접근 suite 27건 PASS. Admin 최신 typecheck·production build와 문서 민감정보 검사 PASS.
 - 실제 CI 실패 14개 suite를 재현해 fixture의 비중앙 역할 조회와 shared 구현 경로 검증을 정비했다. 재현 suite 중 11개는 첫 보완에서 통과했고 남은 4개 재검증 83건도 PASS(중복 범위 포함). 배포 영향도 회귀 83건 PASS. 최신 원격 CI 결과는 아직 대기다.
 - SonarCloud는 첫 HEAD에서 새 코드 Security C/Reliability D를 보고했다. GitHub annotations를 수집했으며 SonarCloud 상세 API는 HTTP 403으로 직접 확인하지 못했다. 필수 CI와 구별하여 추적하고 분석 완료로 표기하지 않는다.
+
+- 관리자 전체 회귀를 실행하여 50개 파일 554건 PASS를 확인했다. 중앙 진입이 추가된 메뉴/route 계약, Operator 기본 표시 및 초대의 메뉴 범위를 현재 정책으로 검증했다. App의 layout/404 catch-all은 퇴역 화면의 실제 존재 근거로 계산하지 않는다.
+- 브라우저 검증을 PC/mobile의 전체 72개 업무 링크 노출까지 확장하여 합성 시나리오 10건 PASS. 실제 Google 로그인을 대신하지 않는다.
+- Sonar 진단은 CI에서 공개 API를 읽고 코드 지적 필드만 artifact에 남긴다. 인증키를 추가하지 않고 author/contact를 제외하며 기존 Quality Gate나 문제 상태를 변경하지 않는다. 조회 실패는 unavailable로 기록한다. 운영 환경 변경과 무관하다.
