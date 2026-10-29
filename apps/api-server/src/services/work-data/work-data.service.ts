@@ -155,8 +155,13 @@ export class WorkDataService {
             AND (($5='imported' AND r.lane='imported') OR (${visibleLane})) LIMIT 1`,[ownerKey,entry.data.id,entry.data.program,entry.data.program_code,lane]);
           if(duplicates.length)throw new WorkDataError('WORK_DATA_PRODUCT_CODE_CONFLICT',409);
         }
+        if(lane==='imported' && entry.origin){
+          const duplicates=await db.query(`SELECT 1 FROM assistant_work_data_records WHERE owner_key=$1 AND lane='imported' AND kind=$2 AND id<>$3
+            AND entry->'origin'->>'program'=$4 AND entry->'origin'->>'source_key'=$5 LIMIT 1`,[ownerKey,entry.kind,entry.data.id,entry.origin.program,entry.origin.source_key]);
+          if(duplicates.length)throw new WorkDataError('WORK_DATA_SOURCE_CONFLICT',409);
+        }
         assertReplacement(previous,entry,lane);
-        await validateReferences(db,ownerKey,entry,changes.map(c=>c.entry));
+        await validateReferences(db,ownerKey,entry,changes);
         const [saved]=await db.query(`INSERT INTO assistant_work_data_records(owner_key,lane,kind,id,entry,mutation_id) VALUES($1,$2,$3,$4,$5::jsonb,$6)
           ON CONFLICT(owner_key,lane,kind,id) DO UPDATE SET entry=excluded.entry,mutation_id=excluded.mutation_id,
           version=nextval('assistant_work_data_version_seq'),updated_at=now() RETURNING version`,[ownerKey,lane,entry.kind,entry.data.id,JSON.stringify(entry),mutationId]);
@@ -177,8 +182,17 @@ function assertReplacement(old: PharmacyEntry | undefined, next: PharmacyEntry, 
     if(!equal(receipt,sheetReceipts(next.data).find(r=>r.supplier_id===receipt.supplier_id)) || !equal(old.data.lines.filter(l=>l.supplier_id===receipt.supplier_id),next.data.lines.filter(l=>l.supplier_id===receipt.supplier_id))) throw new WorkDataError('WORK_DATA_RECEIPT_CONFLICT',409);
   }
 }
-async function validateReferences(db: Db, owner: string, entry: PharmacyEntry, batch: PharmacyEntry[]) {
-  const needed=new Map<string,PharmacyEntry>();batch.forEach(e=>needed.set(key(e),e));needed.set(key(entry),entry);
+async function validateReferences(db: Db, owner: string, entry: PharmacyEntry, batch: WorkDataMutation[]) {
+  if(entry.kind==='supplier' && !entry.data.enabled){
+    const sheets=await db.query(`SELECT r.lane,r.entry FROM assistant_work_data_records r WHERE ${effective} AND r.kind='sheet' AND r.entry->'data'->>'status'='prepared'
+      AND EXISTS(SELECT 1 FROM jsonb_array_elements(r.entry->'data'->'lines') l WHERE l->>'supplier_id'=$2) LIMIT 101`,[owner,entry.data.id]);
+    for(const sheet of sheets){
+      const replacement=batch.find(c=>c.lane==='user' && c.entry.kind==='sheet' && c.entry.data.id===sheet.entry.data.id)?.entry
+        ?? (sheet.lane==='user'?sheet.entry:batch.find(c=>c.entry.kind==='sheet' && c.entry.data.id===sheet.entry.data.id)?.entry??sheet.entry);
+      if(replacement.data.status==='prepared' && replacement.data.lines.some((line:{supplier_id?:string})=>line.supplier_id===entry.data.id))throw new WorkDataError('WORK_DATA_REFERENCE_CONFLICT',409);
+    }
+  }
+  const needed=new Map<string,PharmacyEntry>();batch.forEach(c=>needed.set(key(c.entry),c.entry));needed.set(key(entry),entry);
   const refs=(e:PharmacyEntry)=>[e.data,...(e.kind==='sheet'?e.data.lines:[])].flatMap(d=>['product','pack','supplier'].flatMap(k=>d[k+'_id']?[[k,String(d[k+'_id'])]]:[]));
   for(let round=0;round<2;round++){
     const wanted=[...needed.values()].flatMap(refs).filter(([k,id])=>!needed.has(k+':'+id));

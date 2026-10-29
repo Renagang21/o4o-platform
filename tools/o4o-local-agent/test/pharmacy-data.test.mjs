@@ -422,3 +422,16 @@ test('out-of-order server references stay staged while the cursor and local work
  assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='local-supplier'),true);
  assert.equal(journal.state(dataset).conflicts,0);assert.equal(journal.state(dataset).pending,1); // Only the unrelated local edit awaits upload.
 });
+
+test('remote supplier disable preserves prepared sheets until an explicit draft edit resolves the dependency',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const accepted=journal.pending(dataset).map((row,index)=>({lane:row.lane,kind:row.entry.kind,id:row.entry.data.id,mutationId:row.mutationId,version:index+1}));
+ journal.apply(dataset,epoch,{accepted,changes:[],cursor:9,more:false});importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('prepared')]},1,'user');
+ const supplier=sample().records.find(r=>r.kind==='supplier');supplier.data.enabled=false;
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[{lane:'imported',entry:supplier,version:50,mutationId:crypto.randomUUID()}],cursor:50,more:false});
+ assert.ok(result.conflicts>0);assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,true);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('draft')]},readPharmacyWorkspace(owner).revision,'user');
+ journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:50,more:false});
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,false);assert.equal(journal.state(dataset).conflicts,0);
+});

@@ -1040,6 +1040,14 @@ export const LocalPharmacyWorkspaceRepository = {
 
 function pharmacyRemoteCollisions(db,dataset,row,incoming) {
       const collisions=[];
+        if(row.entry.kind==='supplier' && !row.entry.data.enabled){
+          const overlay=db.prepare("SELECT payload FROM local_pharmacy_records WHERE dataset=? AND lane='user' AND kind='supplier' AND id=?").get(dataset,row.entry.data.id);
+          if(row.lane==='user' || !overlay || !JSON.parse(overlay.payload).data.enabled){
+            const prepared=db.prepare(`SELECT 1 FROM local_pharmacy_records r WHERE ${pharmacyEffective} AND r.kind='sheet' AND json_extract(r.payload,'$.data.status')='prepared'
+              AND EXISTS(SELECT 1 FROM json_each(r.payload,'$.data.lines') l WHERE json_extract(l.value,'$.supplier_id')=?) LIMIT 1`).get(dataset,row.entry.data.id);
+            if(prepared)collisions.push({lane:row.lane,kind:row.entry.kind,id:row.entry.data.id,holdOnly:true});
+          }
+        }
         if(row.entry.kind==='pack'){
           const packs=db.prepare("SELECT lane,kind,id,payload FROM local_pharmacy_records WHERE dataset=? AND kind='pack' AND id=?").all(dataset,row.entry.data.id);
           for(const pack of packs)if(['product_id','base_unit','units_per_pack'].some(field=>JSON.parse(pack.payload).data[field]!==row.entry.data[field]))collisions.push(pack);
@@ -1060,6 +1068,7 @@ function pharmacyReferencesReady(db,dataset,entry) {
   for(const row of data){
     for(const kind of ['product','pack','supplier'])if(row[kind+'_id'] && !get(kind,row[kind+'_id']))return false;
     if(row.pack_id && get('pack',row.pack_id).product_id!==row.product_id)return false;
+    if(entry.kind==='sheet' && entry.data.status==='prepared' && row!==entry.data && !get('supplier',row.supplier_id)?.enabled)return false;
   }
   return true;
 }
@@ -1120,7 +1129,7 @@ export const LocalPharmacySyncRepository = {
         const collisions=pharmacyRemoteCollisions(db,dataset,row,incoming);
         if(collisions.length){
           const identity=collisions.some(item=>!item.pendingOnly);stage(row,identity?'IDENTITY':'DEPENDENCY');
-          for(const item of collisions)if(!item.pendingOnly)db.prepare('UPDATE local_pharmacy_records SET dirty=2 WHERE dataset=? AND lane=? AND kind=? AND id=?').run(dataset,item.lane,item.kind,item.id);
+          for(const item of collisions)if(!item.pendingOnly && !item.holdOnly)db.prepare('UPDATE local_pharmacy_records SET dirty=2 WHERE dataset=? AND lane=? AND kind=? AND id=?').run(dataset,item.lane,item.kind,item.id);
           if(identity){conflictKeys.add(row.lane+':'+row.entry.kind+':'+row.entry.data.id);conflicts=conflictKeys.size;}return false;
         }
         if(!pharmacyReferencesReady(db,dataset,row.entry)){stage(row,'DEPENDENCY');return false;}

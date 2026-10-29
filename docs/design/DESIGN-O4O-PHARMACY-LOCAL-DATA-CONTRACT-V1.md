@@ -9,7 +9,7 @@
 [Main 리팩터링 TODO](../work-orders/TODO-O4O-MAIN-AUTOMATION-EVOLUTION-V1.md)의 개발 branch에서 SQLite v9로 이행한다. 배포 사실은 해당 CHECK/배포 기록으로 별도 확인한다. 기존 migration·backup과 `local-db.mjs` 단일 SQL 접근점을 유지한다.
 
 - `local_pharmacy_workspaces`: 소유 범위별 revision.
-- `local_pharmacy_sync_conflicts`: 다른 로컬 ID가 같은 상품코드/원본 키를 가리키거나 포장 환산 기준이 충돌·미확인이면 서버 충돌 행을 별도 보존한다. 참조가 늦게 도착하는 행은 DEPENDENCY 대기로 구분하며 수신 cursor는 계속 전진한다. 참조가 완성되면 제한된 재검사로 자동 반영하고, 실제 상품 ID/환산 기준 충돌은 Mapping 확인을 기다린다. 자동 ID 병합은 하지 않는다.
+- `local_pharmacy_sync_conflicts`: 다른 로컬 ID가 같은 상품코드/원본 키를 가리키거나 포장 환산 기준이 충돌·미확인이면 서버 충돌 행을 별도 보존한다. 참조가 늦게 도착하는 행은 DEPENDENCY 대기로 구분하며 수신 cursor는 계속 전진한다. 참조가 완성되면 제한된 재검사로 자동 반영한다. 준비 시트의 거래처 비활성처럼 기존 참조를 무효화하는 변경도 보호하며, 실제 상품 ID/환산 기준 충돌은 Mapping 확인을 기다린다. 자동 ID 병합은 하지 않는다.
 - `local_pharmacy_records`: dataset·원본/교정 lane·kind·id별 행, payload와 증분 동기화 version/mutation/dirty. 전체 workspace JSON 재저장을 대체한다.
 - `local_pharmacy_sync`: 허가 epoch·cursor·최근 동기화·오류. 네트워크 전송은 별도 worker이며 DB 접근 모듈에 자격정보를 넣지 않는다.
 
@@ -19,7 +19,7 @@ v8의 `row_key='workspace'` 원본은 정식 migration으로 이전하고 복구
 
 기존 단일 JSON의 8MB·10,000개는 전송 배치 한도이며 전체 누적 보관량이 아니다. Main 화면/PC CLI의 자료 내보내기는 큰 자료를 참조가 완결된 작은 part들로 구성한 JSON 파일 하나로 묶는다(archive 최대 64MB, part 최대 1,000개/850KiB). 기존 단일 JSON도 읽으며, 같은 PC/owner에 revision을 이어 part별 원자 복원한다. Main은 현재 화면에 불러온 자료를 보관한다. PC CLI export는 해당 소유 범위의 전체 업무 자료를 같은 묶음 계약으로 보관한다. 조회는 페이지로 나누고 주문 작업은 필요한 catalog/시트만 불러온다. 환자·처방 원본을 축적하거나 전체 이력을 AI에 무제한 보내지 않는다.
 
-서버에는 명시 동의를 받은 업무 사본만 저장한다. 허가 epoch·행 version·멱등 mutation으로 재전송과 동시 수정을 구분하고 철회 시 서버 사본을 삭제한다. PC 원본은 유지한다. PC session을 이용한 증분 업로드와 서버 수정의 PC 반영은 기존 인증을 재사용한다. 기본 미동의 상태의 Main↔PC 명령도 기존 서버 명령 큐를 일시 경유하므로 “서버를 전혀 거치지 않는다”고 안내하지 않는다. 일시 전달과 지속 업무 사본 보관은 구분한다. Task·Memory·실제 외부 주문 원장을 대체하지 않는다.
+서버에는 명시 동의를 받은 업무 사본만 저장한다. 허가 epoch·행 version·멱등 mutation으로 재전송과 동시 수정을 구분하고 철회 시 서버 사본을 삭제한다. PC 원본은 유지한다. 원본 키/상품코드/역참조 충돌은 명시적인 409로 돌려 기존 사용자 도움·내려받기 격리 경로에 연결한다. PC session을 이용한 증분 업로드와 서버 수정의 PC 반영은 기존 인증을 재사용한다. 기본 미동의 상태의 Main↔PC 명령도 기존 서버 명령 큐를 일시 경유하므로 “서버를 전혀 거치지 않는다”고 안내하지 않는다. 일시 전달과 지속 업무 사본 보관은 구분한다. Task·Memory·실제 외부 주문 원장을 대체하지 않는다.
 
 ## 2. 논리 데이터·정합성
 

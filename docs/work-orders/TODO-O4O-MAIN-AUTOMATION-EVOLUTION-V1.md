@@ -56,7 +56,7 @@
 
 검증 기록: [CHECK](../checks/CHECK-O4O-MAIN-AUTOMATION-EVOLUTION-V1.md). 실제 약국 export Mapping/실계정/사용자 PC/모델 품질은 별도 증거가 필요하며 아래 NOT_RUN에 남긴다.
 
-추가 검증 보완: Codex의 다중 PC source 고정·재고/품절 이력 복원 지적을 반영한다. 신규 서버 사본/추천 동의의 계정 삭제 writer fence·개인 purge·조직 보존도 검증하며, 기존 main의 13개 writer gap은 CHECK의 범위 밖 격차로 남긴다. 운영 정책을 임의 변경하지 않는다.
+추가 검증 보완: Codex의 다중 PC source 고정·재고/품절 이력 복원 지적을 반영한다. 신규 서버 사본/추천 동의의 계정 삭제 writer fence·개인 purge·조직 보존도 검증하며, 기존 main의 13개 writer gap은 CHECK의 범위 밖 격차로 남긴다. 운영 정책을 임의 변경하지 않는다. 원본 키 중복의 409 연결, 준비 시트의 역참조 보호, 여러 페이지 참조 대기·자동 반영도 실제 PostgreSQL/SQLite로 보완 검증한다.
 
 ## 7. 검증과 종료
 

@@ -75,6 +75,26 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    expect(analysis.movement.find(r=>r.movement==='purchase').quantity).toBe('200');
    expect(analysis.movement.find(r=>r.movement==='return').quantity).toBe('-100');
  });
+ it('returns typed source conflicts for suppliers and purchases with aliased local IDs',async()=>{
+   const {epoch}=await service.consent(ids[0],owner);
+   for(const kind of ['supplier','purchase']){
+     const [original]=await db.query("SELECT entry FROM assistant_work_data_records WHERE owner_key=$1 AND lane='imported' AND kind=$2 LIMIT 1",[owner.key,kind]);
+     const alias={...original.entry,data:{...original.entry.data,id:'alias-'+kind}};
+     await expect(service.sync(ids[0],owner.key,epoch,[{lane:'imported',entry:alias,expectedVersion:0,mutationId:randomUUID()}])).rejects.toMatchObject({code:'WORK_DATA_SOURCE_CONFLICT',status:409});
+     expect(await db.query('SELECT 1 FROM assistant_work_data_records WHERE owner_key=$1 AND id=$2',[owner.key,alias.data.id])).toHaveLength(0);
+   }
+ });
+ it('preserves prepared-sheet validity and permits an explicit atomic demotion with supplier disable',async()=>{
+   const {epoch}=await service.consent(ids[0],owner);
+   const sheet={kind:'sheet',data:{id:'reverse-sheet',title:'합성 준비 시트',status:'prepared',lines:[{id:'line1',product_id:'p1',supplier_id:'s1',pack_id:'k1',product_name:'합성 상품',pack_label:'100정',pack_count:1}]}};
+   const added=await service.sync(ids[0],owner.key,epoch,[{lane:'user',entry:sheet,expectedVersion:0,mutationId:randomUUID()}]);
+   const [supplier]=await db.query("SELECT entry,version FROM assistant_work_data_records WHERE owner_key=$1 AND lane='imported' AND kind='supplier' AND id='s1'",[owner.key]);
+   const disable={lane:'imported',entry:{...supplier.entry,data:{...supplier.entry.data,enabled:false}},expectedVersion:Number(supplier.version),mutationId:randomUUID()};
+   await expect(service.sync(ids[0],owner.key,epoch,[disable])).rejects.toMatchObject({code:'WORK_DATA_REFERENCE_CONFLICT',status:409});
+   expect((await service.query(ids[0],owner,{kind:'supplier'})).records.find(r=>r.data.id==='s1')?.data).toMatchObject({enabled:true});
+   await service.sync(ids[0],owner.key,epoch,[disable,{lane:'user',entry:{...sheet,data:{...sheet.data,status:'draft'}},expectedVersion:added.accepted[0].version,mutationId:randomUUID()}]);
+   expect((await service.query(ids[0],owner,{kind:'supplier'})).records.find(r=>r.data.id==='s1')?.data).toMatchObject({enabled:false});
+ });
  it('pages mixed-case and punctuation IDs without gaps or duplicate cursors',async()=>{
    const idsToSave=['a','A','_a','a_','a-1','a1','aA','aa'];
    const {epoch}=await service.consent(ids[0],owner);
