@@ -13,6 +13,10 @@ import { expectedSchemaStateFor } from '../../apps/api-server/src/database/incre
 import { computeSchemaFingerprint } from '../../apps/api-server/src/database/bootstrap/schema-fingerprint.js';
 
 const database = 'o4o_main_automation_integration';
+function assertFingerprint(actual:Awaited<ReturnType<typeof computeSchemaFingerprint>>,prefix:number,message:string) {
+  const expected=expectedSchemaStateFor(prefix);
+  if(!expected || actual.hash!==expected.fingerprint || actual.lineCount!==expected.fingerprintLineCount)throw new Error(message);
+}
 async function run() {
   const raw = process.env.MAIN_AUTOMATION_IT_DATABASE_URL;
   if (!raw) throw new Error('Dedicated fixture URL required');
@@ -77,9 +81,8 @@ async function run() {
         let baselineWriterGaps:number[]=[];
         for (let i = 0; i <= INCREMENTAL_MIGRATIONS.length; i++) {
           checkInterrupted();
-          const actual = await computeSchemaFingerprint(q), expected = expectedSchemaStateFor(i);
-          if (!expected || actual.hash !== expected.fingerprint || actual.lineCount !== expected.fingerprintLineCount)
-            throw new Error(`Fixture schema mismatch at prefix ${i}`);
+          const actual = await computeSchemaFingerprint(q);
+          assertFingerprint(actual,i,`Fixture schema mismatch at prefix ${i}`);
           if(i===INCREMENTAL_MIGRATIONS.length-1)baselineWriterGaps=(await q.query(ERASURE_WRITER_GAPS_SQL)).map(row=>Number(row.oid)).sort((a,b)=>a-b);
           if (i < INCREMENTAL_MIGRATIONS.length) {
             await q.query('SET LOCAL search_path TO public');
@@ -125,10 +128,7 @@ async function run() {
       await runner.startTransaction();
       try {
         const actual = await computeSchemaFingerprint(runner);
-        const expected = expectedSchemaStateFor(INCREMENTAL_MIGRATIONS.length);
-        if (!expected || actual.hash !== expected.fingerprint || actual.lineCount !== expected.fingerprintLineCount) {
-          throw new Error('Fixture schema was not restored after tests');
-        }
+        assertFingerprint(actual,INCREMENTAL_MIGRATIONS.length,'Fixture schema was not restored after tests');
         await runner.rollbackTransaction();
       } finally { await runner.release(); }
     } finally { await finalDb.destroy(); }

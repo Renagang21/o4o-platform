@@ -165,6 +165,10 @@ export function validatePharmacyCommand(mode, raw) {
     return {ok:true,args:structuredClone(raw)};
   } catch {return {ok:false};}
 }
+function pickSyncStatus(sync) {
+  if(!object(sync) || !Number.isSafeInteger(sync.pending) || sync.pending<0 || !Number.isSafeInteger(sync.conflicts) || sync.conflicts<0)return null;
+  return {pending:sync.pending,conflicts:sync.conflicts,lastSyncedAt:instant(sync.lastSyncedAt)?sync.lastSyncedAt:null,error:['CONFLICT','CONSENT_REQUIRED','UNAVAILABLE'].includes(sync.error)?sync.error:null};
+}
 export function pickPharmacyResult(raw) {
   if (!object(raw)) return {};
   try {
@@ -177,7 +181,7 @@ export function pickPharmacyResult(raw) {
       out.next=typeof raw.next==='string'&&raw.next.length<=100?raw.next:null;
     }
     if(object(raw.counts))out.counts=Object.fromEntries(PHARMACY_KINDS.map(k=>[k,Number.isSafeInteger(raw.counts[k])&&raw.counts[k]>=0?raw.counts[k]:0]));
-    if(object(raw.sync) && Number.isSafeInteger(raw.sync.pending) && raw.sync.pending>=0 && Number.isSafeInteger(raw.sync.conflicts) && raw.sync.conflicts>=0)out.sync={pending:raw.sync.pending,conflicts:raw.sync.conflicts,lastSyncedAt:instant(raw.sync.lastSyncedAt)?raw.sync.lastSyncedAt:null,error:['CONFLICT','CONSENT_REQUIRED','UNAVAILABLE'].includes(raw.sync.error)?raw.sync.error:null};
+    const sync=pickSyncStatus(raw.sync);if(sync)out.sync=sync;
     return out;
   }catch{return {};}
 }

@@ -1,5 +1,10 @@
 /** Main UI in real desktop/mobile Chromium. Synthetic API only; no accounts, PC or ordering site. */
 import assert from 'node:assert/strict';
+import { mkdtemp, chmod } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const screenshots=await mkdtemp(join(tmpdir(),'o4o-main-browser-'));
+await chmod(screenshots,0o700);
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { chromium } from '@playwright/test';
@@ -63,7 +68,7 @@ try{
   await page.getByText('수량·품절 확인 이력',{exact:true}).click();
   await page.getByText(/실물 확인 \/ 10정/).waitFor();await page.getByText(/합성 상품: 품절 \/ 합성 거래처/).waitFor();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false,label+' overflow');
-  await page.screenshot({path:'/tmp/o4o-main-evolution-'+label+'.png',fullPage:true});assert.deepEqual(errors,[],label+' page errors');assert.equal(await page.getByRole('alert').count(),0,label+' UI alerts');
+  await page.screenshot({path:join(screenshots,label+'.png'),fullPage:true});assert.deepEqual(errors,[],label+' page errors');assert.equal(await page.getByRole('alert').count(),0,label+' UI alerts');
   await context.close();console.log(label+': Main entry, data connection, consent/autosave or cross-device server read, no overflow PASS');
  }
  assert.equal(requests.filter(r=>r.path.endsWith('/work-data/consent')).length,1);

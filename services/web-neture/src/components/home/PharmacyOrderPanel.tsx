@@ -15,6 +15,13 @@ const download = (value: unknown, filename: string) => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
+function mergeHistory(old:PharmacyBundle,records:PharmacyEntry[],edited:PharmacyEntry[]):PharmacyBundle {
+  const key=(entry:PharmacyEntry)=>entry.kind+':'+entry.data.id;
+  const rows=new Map(old.records.map(entry=>[key(entry),entry]));
+  const dirty=new Set(edited.map(key));
+  for(const entry of records)if(!dirty.has(key(entry)))rows.set(key(entry),entry);
+  return {format:PHARMACY_FORMAT,records:[...rows.values()]};
+}
 /** Existing PC SQLite work data, with an explicitly consented server mirror. */
 export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onApply, onPcSetup, workScope }: Readonly<{ disabled: boolean; resuming: boolean; draft?: string; onApply: (text: string) => void; onPcSetup?: () => void; workScope?: WorkScope }>) {
   const [bundle, setBundle] = useState(initial);
@@ -50,18 +57,19 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         records.push(...page.records);Object.assign(versions,page.versions);next[kind]=page.next;
       }
       if(!alive.current || generation!==dataGeneration.current)return;
-      setBundle(old=>{const rows=new Map(old.records.map(entry=>[entry.kind+':'+entry.data.id,entry]));const dirty=new Set(editedRef.current.map(entry=>entry.kind+':'+entry.data.id));for(const entry of records)if(!dirty.has(entry.kind+':'+entry.data.id))rows.set(entry.kind+':'+entry.data.id,entry);return {format:PHARMACY_FORMAT,records:[...rows.values()]};});
+      setBundle(old=>mergeHistory(old,records,editedRef.current));
       setStorage(old=>old?{...old,versions:{...old.versions,...versions}}:old);
       setHistoryPages(next);setHistoryLoaded(true);
     }catch(error){if(alive.current && generation===dataGeneration.current)setError(errorText(error));}
     finally{historyBusy.current=false;if(alive.current)setHistoryLoading(false);}
   }
-  async function load() {
-    if(!workScope || edited.length)return;
+  async function load(discardEdits=false) {
+    if(!workScope || (edited.length && !discardEdits))return;
     dataGeneration.current++;setHistoryLoaded(false);setHistoryPages({});
     setBusy(true);setError('');
     try { const loaded=await loadWorkingData(workScope, count=>{if(!alive.current)throw Error('중단');setNotice(`${count.toLocaleString()}개 자료를 불러왔어요…`);});if(!alive.current)return;
       setStorage(loaded);setConsent(loaded.consent);
+      if(discardEdits){setEdited([]);setSaveFailed(false);}
       setBundle({format:PHARMACY_FORMAT,records:loaded.records.some(r=>r.kind==='sheet')?loaded.records:[...loaded.records,...initial().records]});
       setNotice(loaded.location==='server'?'서버 자료를 불러왔어요. PC가 꺼져 있어도 이용할 수 있어요.':'PC 자료를 불러왔어요. 수정 내용은 PC에 저장해요.');
     }catch(e){if(alive.current)setError(errorText(e));}
@@ -78,7 +86,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       if(!alive.current)return;
       setStorage(old=>{if(!old)return old;const versions={...old.versions};for(const row of result.accepted??[])versions[row.kind+':'+row.id]={lane:row.lane,version:row.version};return {...old,revision:result.revision??old.revision,versions};});
       setEdited(old=>old.filter(entry=>!pending.includes(entry)));setNotice('저장했어요.');
-    }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+' 입력한 내용은 유지했어요.');}}
+    }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+( /CONFLICT|충돌|revision/i.test(errorText(e))?' 자료가 바뀌었어요. 수정 내용을 내보내거나 취소한 뒤 최신 자료를 불러와 주세요.':' 다시 저장할 수 있어요.')+' 입력한 내용은 유지했어요.');}}
     finally{saving.current=false;if(alive.current)setPersisting(false);}
   },[workScope,storage,edited]);
   async function importToPc() {
@@ -193,6 +201,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       {workScope && <section className="space-y-2 rounded border p-3">
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={blocked || edited.length>0} onClick={()=>void load()} className="rounded bg-blue-700 px-3 py-2 text-white">PC·서버 자료 불러오기</button>
+          {saveFailed && <button type="button" disabled={blocked || persisting} onClick={()=>void load(true)} className="rounded border border-red-600 px-3 py-2 text-red-700">수정 취소하고 최신 자료 불러오기</button>}
           <button type="button" disabled={blocked || persisting || !storage || !edited.length} onClick={()=>void persist()} className="rounded bg-blue-700 px-3 py-2 text-white">자료 저장</button>
         </div>
         <p>{storage?`보관 위치: ${storage.location==='server'?'서버 · PC와 동기화':'이 PC'}`:'PC 자료는 기본적으로 PC에 보관해요.'}</p>

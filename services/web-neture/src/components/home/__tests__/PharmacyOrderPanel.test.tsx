@@ -172,6 +172,25 @@ describe('connected pharmacy work data',()=>{
   await new Promise(resolve=>setTimeout(resolve,800));expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save')).toHaveLength(attempts);
   fail=false;fireEvent.click(screen.getByRole('button',{name:'자료 저장'}));await screen.findByText('저장했어요.');
  });
+ it('retains conflicted edits until explicit discard and allows reloading without refresh',async()=>{
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>{
+    if(action==='status')return permission as any;
+    if(action==='method-sharing')return {enabled:false} as any;
+    if(action==='save')throw Error('WORK_DATA_CONFLICT');
+    return {} as any;
+  });
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  addSupplier();await screen.findByRole('alert');
+  expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
+  vi.mocked(loadWorkingData).mockRejectedValueOnce(Error('합성 재조회 실패'));
+  fireEvent.click(screen.getByRole('button',{name:'수정 취소하고 최신 자료 불러오기'}));await screen.findByText('합성 재조회 실패');
+  expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'수정 취소하고 최신 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  expect(screen.queryByText('합성 거래처',{selector:'legend'})).toBeNull();
+  expect(screen.queryByRole('button',{name:'수정 취소하고 최신 자료 불러오기'})).toBeNull();
+ });
  it('keeps the editor usable and queues a later edit while the first save is in flight',async()=>{
   let release!:()=>void;let saves=0;
   vi.mocked(workDataRequest).mockClear();
