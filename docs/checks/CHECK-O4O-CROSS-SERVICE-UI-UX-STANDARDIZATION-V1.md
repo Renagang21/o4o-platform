@@ -3,7 +3,8 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-10-29
 > **작업**: [UI·UX 정비 TODO](../work-orders/WO-O4O-CROSS-SERVICE-UI-UX-STANDARDIZATION-V1.md)
-> **기준 main**: `75f798ef24a66545b233c63d26ba9fdbb89cc499`
+> **최초 검증 main**: `75f798ef24a66545b233c63d26ba9fdbb89cc499`
+> **최종 정렬 main**: `f2e8b678a8e95c9c7f344b6f01f32ede73c0a8b1`
 > **branch**: `wo/cross-service-ui-ux-standardization`
 
 ## 1. 결과와 경계
@@ -77,3 +78,12 @@ Git HTTPS 조회는 성공했다. 그러나 `gh pr list`·ruleset 조회는 Forb
 ## 7. 문서 정합
 
 헤더 표준의 과거 완료 범위를 현행 전체 적용으로 오인하지 않도록 보완했고, 공개 탐색 정본에 사용자 승인 Hero 홍보·광고주·자동 넘김·운영 책임을 반영했다. 과거 CHECK/WO를 다시 쓰거나 Partner의 운영 상태를 추측해 활성화하지 않았다.
+
+
+## 8. 최신 main 정렬·원격 보존
+
+- push 전 최신 main의 상담 복구 PR #885를 확인했다. 변경 대상이 겹치지 않아 아직 push하지 않은 자기 branch를 `f2e8b678a8` 위로 rebase했다. main 자체를 변경하지 않았다.
+- 정렬 후 `CustomerConsultationPage.test.tsx` 16개 PASS와 `store-web build` PASS를 추가 확인했다. 위 3,380개에 중복 합산하지 않는다.
+- 구현 commit `20cf1c327819c1735b40293fafb538558aa8e043`의 전용 branch push가 성공했다. GitHub가 반환한 PR 생성 경로는 `https://github.com/Renagang21/o4o-platform/pull/new/wo/cross-service-ui-ux-standardization`이며 실제 PR 번호/생성 증거가 아니다.
+- PR 본문 초안은 로컬 `/tmp/o4o-ui-pr.md`에 준비했다. API 목적지 차단 때문에 PR 생성·실제 ruleset·필수 CI·Codex 리뷰는 미확인이다. access token을 새로 요구하거나 main 보호를 우회하지 않는다.
+- WORKTREE_DISPOSITION: 이번 작업 worktree와 branch는 후속 PR/CI 보완에 필요하므로 KEEP. 작업용 worktree와 기준 checkout의 추적 파일은 clean을 확인하며 다른 세션의 자원은 정리하지 않는다.

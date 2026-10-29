@@ -40,7 +40,8 @@
 - [x] 소비처별 typecheck/build와 desktop/mobile browser smoke
 - [x] 공유 모듈 Consumer Impact Matrix 및 기존 route/role/capability 회귀
 - [x] 문서 정합·민감정보 검사·tracked/untracked 변경 범위 확인
-- [ ] 자체 diff 검토·리뷰 지적 보완·commit/push·PR·현재 HEAD 필수 CI 확인
+- [x] 자체 diff 검토·로컬 보완·commit/push
+- [ ] PR 생성·원격 리뷰 지적 보완·현재 HEAD 필수 CI 확인 — `api.github.com` CONNECT 403 차단
 
 ## 5. 현 시점
 
@@ -98,3 +99,8 @@
 - `@o4o/ui`는 dist 소비이므로 소스 변경 후 다시 빌드하고 여섯 앱 bundle을 재검증했다. source 테스트만 통과하고 오래된 dist를 검증하지 않도록 했다.
 - 공급자 업무는 공개 소개 대신 기존 `/supplier/dashboard`, 복수 매장은 `/select-store`로 전달하고 `returnTo`까지 확인한다.
 - 운영자 편집 preview는 자동 넘김을 끄며, 예약·광고주·URL·service scope·동시 수정 계약은 유지한다.
+
+
+### 최종 main 정렬과 인계
+
+최초 기준은 위 `75f798ef24`이며 push 전 `f2e8b678a8`로 자기 branch만 rebase했다. 관련 상담 복구 테스트 16개와 매장 build를 재검증했다. 구현 commit `20cf1c3278`의 원격 push는 성공했다. PR·CI·원격 리뷰는 API 네트워크 차단 해소 후 같은 branch에서 계속한다. [CHECK §8](../checks/CHECK-O4O-CROSS-SERVICE-UI-UX-STANDARDIZATION-V1.md#8-최신-main-정렬원격-보존)에 증거와 한계를 기록했다.
