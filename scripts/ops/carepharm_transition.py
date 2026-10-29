@@ -1,6 +1,7 @@
 """Fixed CarePharm host routing only. No Run, IAM, DB or other host mutations."""
 from copy import deepcopy
 import os
+import json
 import re
 import time
 
@@ -8,6 +9,8 @@ HOST = 'carepharm.neture.co.kr'
 MATCHER = 'path-matcher-carepharm'
 NETURE_MATCHER = 'path-matcher-neture'
 NETURE_BACKEND = 'backend-neture-web-http'
+VERIFY_SECONDS = 180
+VERIFY_ATTEMPTS = 36
 
 
 def host_matcher(url_map):
@@ -98,20 +101,32 @@ def apply(api, record, original):
     t.production_idle()
     fields = ('fingerprint', 'hostRules', 'pathMatchers', 'tests')
     api.compute_operation('PATCH', t.MAP, {k: candidate[k] for k in fields if k in candidate})
+    deadline = time.monotonic() + VERIFY_SECONDS
     try:
-        for attempt in range(12):
+        for attempt in range(VERIFY_ATTEMPTS):
+            stage, observation = 'route', {}
             try:
                 if host_matcher(api.request('GET', t.MAP)) != host_matcher(candidate):
                     raise ValueError('CarePharm route verification failed')
+                stage = 'revision'
                 if t.stable_revision(api, target)[1]['metadata']['name'] != record['target_revision']:
                     raise ValueError('CarePharm target revision changed during verification')
-                if t.public_smoke('https://' + HOST) != record['asset']:
+                stage = 'public-bundle'
+                if t.public_smoke('https://' + HOST, observation) != record['asset']:
                     raise ValueError('CarePharm public bundle differs from the target')
                 return
             except (ValueError, RuntimeError):
-                if attempt == 11:
+                expired = attempt == VERIFY_ATTEMPTS - 1 or time.monotonic() >= deadline
+                if attempt == 0 or expired:
+                    # Emit only controlled routing stages, HTTP status and public asset hashes.
+                    # No response body, exception text, credentials or redirect URL is recorded.
+                    payload = json.dumps({'stage': stage, 'attempt': attempt + 1,
+                                          'expected_bundle_sha256': record['asset'],
+                                          'observation': observation}, separators=(',', ':'))
+                    print('::notice title=CarePharm verification::' + payload.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
+                if expired:
                     raise
-                time.sleep(5)
+                time.sleep(min(5, max(0, deadline - time.monotonic())))
     except Exception:
         # Compensate only if our exact topology remains; never overwrite another writer.
         current = api.request('GET', t.MAP)
