@@ -1,10 +1,49 @@
 /* Central adapters keep their own form styling; shared service hosts retain theirs. */
-.central-qualification button,
+.central-qualification button:not([class]),
 .central-partner-operations .button {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   padding: 8px 12px;
   background: white;
+}
+.central-service-work .card,
+.central-service-work .panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  padding: 20px;
+  margin: 16px 0;
+}
+.central-service-work .field {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+.central-service-work .field input,
+.central-service-work .field textarea,
+.central-service-work .field select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px;
+  max-width: 100%;
+}
+.central-service-work .list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.central-service-work .btn {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+}
+.central-service-work .btn-primary {
+  color: white;
+  background: #1d4ed8;
+}
+.central-service-work .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .central-qualification button:disabled,
 .central-partner-operations button:disabled {

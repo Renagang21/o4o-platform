@@ -5,6 +5,8 @@
  */
 
 export { ContactInquiryAdminPage } from './ContactInquiryAdminPage';
+export { LegacyEducationRequestsPanel } from './LegacyEducationRequestsPanel';
+export { useLegacyEducationRequests, type LegacyEducationHttpClient } from './useLegacyEducationRequests';
 export { CONTACT_STATUSES } from './types';
 export type {
   ContactInquiryApi,

@@ -1,3 +1,5 @@
+import { centralRequestAuthMethod } from '../../middleware/central-operation-menu.middleware.js';
+import { assertCentralOperationRequest } from '../../services/admin/central-operation-menu-grants.js';
 import type { RequestHandler } from "express";
 import type { DataSource, EntityManager } from "typeorm";
 import {
@@ -126,6 +128,7 @@ export function scopeGuard(ds: DataSource, scope: InboxScope): RequestHandler {
             });
           return;
         }
+        await assertCentralOperationRequest(ds,req.user!.id,'community',['community.inbox'],centralRequestAuthMethod(req));
         next();
       } catch (error) {
         next(error);
@@ -140,7 +143,9 @@ export function scopeGuard(ds: DataSource, scope: InboxScope): RequestHandler {
       if (scope.kind === "cooperative")
         await management.requireLocal(ds, req.user!.id, scope.cooperativeId!);
       else if (scope.key === "pharmcoop" && scope.kind === "service")
-        await management.requireFederation(ds, req.user!.id);
+        { await management.requireFederation(ds, req.user!.id, false, 'inbox');
+          await assertCentralOperationRequest(ds,req.user!.id,'pharmcoop',['pharmcoop.inbox'],centralRequestAuthMethod(req)); }
+
       else
         await new SemiFranchiseService(ds).requireOperatorOf(
           req.user!.id,
@@ -211,7 +216,7 @@ export async function assertInboxWriter(
   } else if (scope.kind === "service" && scope.key === "pharmcoop") {
     await new CooperativeManagementService(
       manager.connection,
-    ).requireFederation(manager, actor);
+    ).requireFederation(manager, actor, false, 'inbox');
   } else {
     const recipients = await inboxRecipients(manager, scope);
     if (!recipients.some((r) => r.userId === actor)) {

@@ -1,3 +1,5 @@
+import { notifyQualification } from './pharmacist-qualification-notifications.js';
+import { assertCentralOperationMenu } from '../admin/central-operation-menu-grants.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { getNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
 import { centralOperationRoles } from "../admin/central-operation-access.js";
@@ -38,7 +40,7 @@ const denied = () =>
     "QUALIFICATION_REVIEWER_REQUIRED",
     "중앙의 약사 자격 검토 업무 위임이 필요합니다.",
   );
-async function reviewer(m: Exec, actor: string, lock = false) {
+async function reviewer(m: Exec, actor: string, lock = false, areas = ['qualifications']) {
   const roles = await centralOperationRoles(m, actor, lock);
   if (
     !roles.some((role) =>
@@ -48,6 +50,7 @@ async function reviewer(m: Exec, actor: string, lock = false) {
     )
   )
     throw denied();
+  await assertCentralOperationMenu(m, actor, 'neture', areas.map(area => `neture.${area}`));
 }
 async function account(m: Exec, user: string) {
   const rows = await m.query(
@@ -142,6 +145,7 @@ export class PharmacistQualificationService {
         "qualification.pharmacist_requested",
         { targetUserId: user },
       );
+      await notifyQualification(m,user,'pending',true);
       const [row] = await m.query(
         `SELECT ${columns} FROM kpa_pharmacist_profiles p WHERE p.user_id=$1`,
         [user],
@@ -149,9 +153,9 @@ export class PharmacistQualificationService {
       return row;
     });
   }
-  async list(actor: string, status: string, page: number) {
-    await reviewer(this.db, actor);
-    if (!PHARMACIST_QUALIFICATION_STATUSES.includes(status as any))
+  async list(actor: string, status: string, page: number, search = "", directory = false) {
+    await reviewer(this.db, actor, false, directory ? ['members'] : ['qualifications']);
+    if (status !== "all" && !PHARMACIST_QUALIFICATION_STATUSES.includes(status as any))
       throw new OperationError(
         400,
         "INVALID_STATUS",
@@ -159,13 +163,31 @@ export class PharmacistQualificationService {
       );
     const offset =
       (Math.max(1, Math.min(100000, Math.floor(page) || 1)) - 1) * 20;
-    const rows = await this.db.query(
-      `SELECT ${columns},COALESCE(NULLIF(u.name,''),'회원') AS name
-   FROM kpa_pharmacist_profiles p JOIN users u ON u.id=p.user_id
-   WHERE p.qualification_status=$1 ORDER BY p.updated_at,p.user_id LIMIT 21 OFFSET $2`,
-      [status, offset],
+    const query = search.trim().slice(0, 100);
+    const matches = `($1='' OR u.id::text=$1 OR strpos(lower(COALESCE(u.name,'')),lower($1))>0 OR strpos(lower(COALESCE(u.email,'')),lower($1))>0)`;
+    const grouped: Array<{ status: string; count: string | number }> = await this.db.query(
+      `SELECT COALESCE(p.qualification_status,'unrequested') AS status,COUNT(*) AS count
+       FROM users u LEFT JOIN kpa_pharmacist_profiles p ON p.user_id=u.id
+       WHERE ${matches} GROUP BY COALESCE(p.qualification_status,'unrequested')`,
+      [query],
     );
-    return { items: rows.slice(0, 20), hasNext: rows.length > 20 };
+    const counts: Record<string, number> = { all: 0 };
+    for (const key of PHARMACIST_QUALIFICATION_STATUSES) counts[key] = 0;
+    for (const group of grouped) {
+      const count = Number(group.count);
+      counts[group.status] = count;
+      counts.all += count;
+    }
+    const selection = directory ? columns.replace('p.license_number AS "licenseNumber"','NULL::text AS "licenseNumber"').replace('p.qualification_reason AS reason','NULL::text AS reason').replace('p.verified_at AS "approvedAt"','NULL::timestamp AS "approvedAt"') : columns;
+    const rows = await this.db.query(
+      `SELECT ${selection.replace('p.user_id AS "userId"', 'u.id AS "userId"').replace('p.qualification_status AS status', "COALESCE(p.qualification_status,'unrequested') AS status")},
+       COALESCE(NULLIF(u.name,''),'회원') AS name,u.email,u.status AS "accountStatus"
+       FROM users u LEFT JOIN kpa_pharmacist_profiles p ON p.user_id=u.id
+       WHERE ${matches} AND ($2='all' OR COALESCE(p.qualification_status,'unrequested')=$2)
+       ORDER BY p.updated_at DESC NULLS LAST,u.id LIMIT 21 OFFSET $3`,
+      [query, status, offset],
+    );
+    return { items: rows.slice(0, 20), hasNext: rows.length > 20, counts };
   }
   async decide(
     actor: string,
@@ -278,6 +300,7 @@ export class PharmacistQualificationService {
           reason,
         },
       );
+      await notifyQualification(m,target,status);
       const [row] = await m.query(
         `SELECT ${columns} FROM kpa_pharmacist_profiles p WHERE p.user_id=$1`,
         [target],

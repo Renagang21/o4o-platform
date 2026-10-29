@@ -118,6 +118,8 @@ function App() {
             <Route path="/operations" element={<CentralOperationsPage />} />
             <Route path="/operations/:serviceKey/:area" element={<CentralOperationsPage />} />
             <Route path="/operations/:serviceKey/courses/:courseId" element={<CentralOperationsPage />} />
+            <Route path="/operations/:serviceKey/funding/:id" element={<CentralOperationsPage />} />
+            <Route path="/operations/:serviceKey/service-members/:userId" element={<CentralOperationsPage />} />
             <Route path="/operations/:serviceKey/members/:userId" element={<CentralOperationsPage />} />
 
             {/* 보호된 관리자 라우트들 */}

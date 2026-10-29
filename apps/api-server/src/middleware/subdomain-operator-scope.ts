@@ -1,3 +1,5 @@
+import { CENTRAL_OPERATION_SERVICES, type CentralOperationService } from '@o4o/types';
+import { withCentralOperationMenus } from './central-operation-menu.middleware.js';
 /**
  * 서브도메인 전체 운영자 경계 — 공통 구성
  *
@@ -37,5 +39,6 @@ export function createSubdomainOperatorScope(serviceKey: ServiceKey, blockedPref
       [`${serviceKey}:operator`]: [`${serviceKey}:operator`, `${serviceKey}:admin`],
     },
   };
-  return { config, guard: createMembershipScopeGuard(config) };
+  const guard = createMembershipScopeGuard(config);
+  return { config, guard: (CENTRAL_OPERATION_SERVICES as readonly string[]).includes(serviceKey) ? withCentralOperationMenus(serviceKey as CentralOperationService, guard) : guard };
 }

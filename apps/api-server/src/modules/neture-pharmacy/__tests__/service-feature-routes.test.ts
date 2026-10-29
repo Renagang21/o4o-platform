@@ -1,3 +1,4 @@
+jest.mock('../../../database/connection.js',()=>({AppDataSource:{query:jest.fn(async()=>[])}}));
 import express from 'express';
 import request from 'supertest';
 import { createNeturePharmacyRoutes } from '../neture-pharmacy.routes.js';

@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { authClient } from "@o4o/auth-client";
+import { DataTable, type ListColumnDef } from "@o4o/operator-ux-core";
+import { ActionBar, BaseDetailDrawer } from "@o4o/ui";
 type Qualification = {
   userId: string;
   name: string;
+  email?: string;
+  accountStatus?: string;
   licenseNumber: string | null;
   status: string;
   reason: string | null;
-  version: string;
+  version: string | null;
 };
 const labels: Record<string, string> = {
   pending: "검토 대기",
-  unrequested: "기존 자료 · 재확인 필요",
+  unrequested: "미신청 · 기존 자료",
   approved: "승인",
   rejected: "반려",
   revoked: "승인 취소",
@@ -18,13 +22,25 @@ const labels: Record<string, string> = {
 const base = "/qualifications/pharmacist/review";
 export default function CentralPharmacistQualifications({
   actorId,
+  directory = false,
+  initialQuery = "",
+  onReview,
 }: {
   actorId: string;
+  directory?: boolean;
+  initialQuery?: string;
+  onReview?: (userId: string) => void;
 }) {
   const [rows, setRows] = useState<Qualification[]>([]),
-    [status, setStatus] = useState("pending"),
+    [status, setStatus] = useState("all"),
     [page, setPage] = useState(1),
     [hasNext, setHasNext] = useState(false);
+  const [detail, setDetail] = useState<Qualification | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery);
+  const [loading, setLoading] = useState(true);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
@@ -38,20 +54,25 @@ export default function CentralPharmacistQualifications({
     sequence = useRef(0);
   const load = useCallback(async () => {
     const seq = ++sequence.current;
+    setLoading(true);
+    setSelectedKeys(new Set());
     setRows([]);
     setError("");
     try {
-      const r = await authClient.api.get(base, { params: { status, page } });
-      if (!Array.isArray(r.data?.data?.items)) throw new Error();
+      const r = await authClient.api.get(base, { params: { status, page, q: query, ...(directory ? { view: "members" } : {}) } });
+      if (!Array.isArray(r.data?.data?.items)) throw new Error("INVALID_QUALIFICATION_LIST");
       if (seq === sequence.current) {
         setRows(r.data.data.items);
         setHasNext(r.data.data.hasNext === true);
+        setCounts(r.data.data.counts ?? {});
       }
     } catch {
       if (seq === sequence.current)
         setError("약사 자격 신청을 불러오지 못했습니다.");
+    } finally {
+      if (seq === sequence.current) setLoading(false);
     }
-  }, [status, page]);
+  }, [status, page, query, directory]);
   useEffect(() => {
     setSelected(null);
     setReason("");
@@ -70,6 +91,25 @@ export default function CentralPharmacistQualifications({
     setChecked(false);
     setNotice("");
   };
+  const selectedRows = rows.filter((row) => selectedKeys.has(row.userId));
+  const canApprove = (row: Qualification) => Boolean(row.version && row.licenseNumber && row.status !== "approved" && row.userId !== actorId);
+  const selectedRow = selectedRows.length === 1 ? selectedRows[0] : undefined;
+  const actions = (row: Qualification) => (
+    <div className="flex flex-wrap gap-2">
+      {row.status !== "approved" && row.licenseNumber && <button type="button" disabled={busy || !canApprove(row)} onClick={() => choose(row, "approve")}>승인 검토</button>}
+      {row.version && ["pending", "unrequested"].includes(row.status) && <button type="button" disabled={busy} onClick={() => choose(row, "reject")}>반려</button>}
+      {row.status === "approved" && <button type="button" disabled={busy} onClick={() => choose(row, "revoke")}>승인 취소</button>}
+      {!row.version && <span className="text-slate-500">본인 자격 신청 필요</span>}
+    </div>
+  );
+  const columns: ListColumnDef<Qualification>[] = [
+    { key: "name", header: "회원", stickyOnMobile: true, render: (_value, row) => <div><strong>{row.name}</strong>{row.email && <p className="text-sm text-slate-500">{row.email}</p>}</div> },
+    { key: "accountStatus", header: "계정 상태", render: (value) => value ?? "확인 필요" },
+    { key: "status", header: "약사 자격", render: (value) => labels[value] ?? "확인 필요" },
+    { key: "licenseNumber", header: "면허번호", render: (value) => value || "미등록" },
+    { key: "reason", header: "처리 사유", render: (value) => value || "—" },
+    { key: "actions", header: "검토", render: (_value, row) => actions(row) },
+  ];
   const decide = async () => {
     if (
       !selected ||
@@ -111,64 +151,32 @@ export default function CentralPharmacistQualifications({
   };
   return (
     <section className="central-qualification space-y-4">
-      <h2 className="text-xl font-bold">공통 약사 자격 검토</h2>
+      <h2 className="text-xl font-bold">{directory ? "전체 공통 회원" : "전체 회원·약사 자격 검토"}</h2>
       <p>
-        면허 근거를 별도로 확인한 뒤 처리 사유를 기록합니다. 기존 분회·약국 승인
-        자료는 자동으로 자격 승인되지 않습니다.
+        {directory ? 'O4O 공통 계정과 자격 상태를 조회합니다. 전문 자격과 사업 참여 승인은 별도로 유지됩니다.' : <>면허 근거를 별도로 확인한 뒤 처리 사유를 기록합니다. 기존 분회·약국 승인
+        자료는 자동으로 자격 승인되지 않습니다.</>}
       </p>
-      <label>
-        검토 상태{" "}
-        <select
-          value={status}
-          disabled={busy}
-          onChange={(e) => {
-            setPage(1);
-            setStatus(e.target.value);
-          }}
-        >
-          {Object.entries(labels).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button disabled={busy} onClick={() => void load()}>
+      <nav role="tablist" aria-label="자격 검토 상태" className="flex flex-wrap gap-2">
+        {Object.entries({ all: "전체 회원", ...labels }).map(([key, label]) => <button type="button" role="tab" key={key} aria-selected={status === key} disabled={busy} className={`rounded border px-3 py-2 ${status === key ? "bg-blue-700 text-white" : "bg-white"}`} onClick={() => { setPage(1); setStatus(key); }}>{label}{counts[key] !== undefined ? ` (${counts[key]})` : ""}</button>)}
+      </nav>
+      <form className="flex flex-wrap gap-2" onSubmit={(event) => { event.preventDefault(); setPage(1); setQuery(search.trim()); }}>
+        <input aria-label="회원 이름·이메일 검색" className="rounded border p-2" value={search} disabled={busy} onChange={(event) => setSearch(event.target.value)} placeholder="이름·이메일 검색" />
+        <button type="submit" disabled={busy}>검색</button>
+      </form>
+      <button type="button" disabled={busy || loading} onClick={() => void load()}>
         새로고침
       </button>
       {error && <p role="alert">{error}</p>}
-      {notice && <p role="status">{notice}</p>}
-      <ul>
-        {rows.map((row) => (
-          <li key={row.userId} className="my-3 rounded border bg-white p-4">
-            <h3>
-              {row.name} · {labels[row.status]}
-            </h3>
-            <p>면허번호: {row.licenseNumber || "미등록"}</p>
-            {row.reason && <p>처리 사유: {row.reason}</p>}
-            <div className="mt-3 flex gap-4">
-              {row.status !== "approved" && row.licenseNumber && (
-                <button
-                  disabled={busy || row.userId === actorId}
-                  onClick={() => choose(row, "approve")}
-                >
-                  승인 검토
-                </button>
-              )}
-              {["pending", "unrequested"].includes(row.status) && (
-                <button disabled={busy} onClick={() => choose(row, "reject")}>
-                  반려
-                </button>
-              )}
-              {row.status === "approved" && (
-                <button disabled={busy} onClick={() => choose(row, "revoke")}>
-                  승인 취소
-                </button>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+      {notice && <output className="block rounded border border-green-200 bg-green-50 p-3">{notice}</output>}
+      {!directory && selectedKeys.size > 0 && <ActionBar selectedCount={selectedKeys.size} onClearSelection={() => setSelectedKeys(new Set())} actions={[
+        { key: "approve", label: "선택 회원 승인 검토", disabled: busy || !selectedRow || !canApprove(selectedRow), onClick: () => { if (selectedRow) choose(selectedRow, "approve"); } },
+        { key: "reject", label: "선택 회원 반려 검토", disabled: busy || !selectedRow?.version || !["pending", "unrequested"].includes(selectedRow.status), onClick: () => { if (selectedRow) choose(selectedRow, "reject"); } },
+        { key: "revoke", label: "선택 회원 승인 취소", disabled: busy || selectedRow?.status !== "approved", onClick: () => { if (selectedRow) choose(selectedRow, "revoke"); } },
+      ]} />}
+      {directory && selectedKeys.size > 0 && <ActionBar selectedCount={selectedKeys.size} onClearSelection={() => setSelectedKeys(new Set())} actions={[{key:'review',label:'선택 회원 상세',disabled:!selectedRow,onClick:()=>{if(selectedRow)setDetail(selectedRow);}}]} />}
+      {selectedKeys.size > 1 && <p className="text-sm text-slate-600">면허 근거와 사유를 회원별로 확인하도록 검토할 회원 한 명을 선택해 주세요.</p>}
+      <DataTable<Qualification> tableId={directory ? "central-common-members" : "central-pharmacist-qualifications"} columns={directory ? columns.filter(column => !["licenseNumber", "reason", "actions"].includes(column.key)) : columns} data={rows} rowKey="userId" loading={loading} emptyMessage={error ? "조회에 실패했습니다. 새로고침으로 다시 확인해 주세요." : "현재 조건에 해당하는 회원이 없습니다."} onRowClick={directory ? row => setDetail(row) : undefined} selectable selectedKeys={selectedKeys} onSelectionChange={(keys) => { if (!busy) setSelectedKeys(keys); }} reorderable persistState columnVisibility />
+      {directory && <BaseDetailDrawer open={!!detail} title="공통 회원 상세" onClose={() => setDetail(null)}>{detail && <section className="space-y-3"><p>{detail.name} · {detail.email}</p><p>계정 상태: {detail.accountStatus}</p><p>약사 자격: {labels[detail.status] ?? detail.status}</p>{onReview && <button type="button" onClick={() => onReview(detail.userId)}>약사 자격 검토로 이동</button>}</section>}</BaseDetailDrawer>}
       <nav>
         <button disabled={busy || page === 1} onClick={() => setPage(page - 1)}>
           이전

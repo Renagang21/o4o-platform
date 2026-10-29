@@ -1,25 +1,15 @@
-import "./central-operations.css";
-import CentralPharmacistQualifications from "./CentralPharmacistQualifications";
-import { centralOperationAreas } from "./central-operation-navigation";
-import CentralOperatorInbox from "./CentralOperatorInbox";
-import CentralLectureReview from "./CentralLectureReview";
-import CentralFederationOperations from "./CentralFederationOperations";
-import CentralSupplierReview from "./CentralSupplierReview";
-import CentralFundingReview from "./CentralFundingReview";
-import {
-  CommunityHomeManagementPage,
-  CommunityManagementWorkspace,
-  createCommunityHomeApi,
-} from "@o4o/operator-core-ui";
-import { PharmacyMembershipReviewPage } from "@o4o/operator-core-ui/modules/pharmacy-management";
-import CentralLectureCourses from "./CentralLectureCourses";
-import CentralPartnerModeration from "./CentralPartnerModeration";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "@o4o/auth-context";
-import { authClient } from "@o4o/auth-client";
-import { ServiceMembersWorkspace } from "@o4o/operator-core-ui/modules/members";
-
+import './central-operations.css';
+import {useCallback,useEffect,useRef,useState} from 'react';
+import {Link,Navigate,useNavigate,useParams,useLocation} from 'react-router-dom';
+import {useAuth} from '@o4o/auth-context';
+import {authClient} from '@o4o/auth-client';
+import {CENTRAL_OPERATION_MENUS,OperatorCapability} from '@o4o/types';
+import {OperatorAreaShell,DEFAULT_OPERATOR_DOMAIN_IA,type OperatorDomainIAConfig} from '@o4o/operator-ux-core';
+import type {OperatorGroupKey,OperatorMenuItem} from '@o4o/ui';
+import CentralOperationOverview from './CentralOperationOverview';
+import CentralOperationNotifications from './CentralOperationNotifications';
+import {centralOperationAreas} from './central-operation-navigation';
+import {renderCentralOperation} from './central-operation-renderers';
 const SERVICES = [
   ["neture", "약국·공통 운영"],
   ["supplier", "공급자"],
@@ -29,30 +19,19 @@ const SERVICES = [
   ["partner-support", "파트너"],
   ["pharmcoop", "협동조합 연합회"],
 ] as const;
-const editorialApi = createCommunityHomeApi(authClient.api);
-const memberApi = {
-  get: (path: string) => authClient.api.get(path).then((result) => result.data),
-  post: (path: string, data?: unknown) =>
-    authClient.api.post(path, data).then((result) => result.data),
-  put: (path: string, data?: unknown) =>
-    authClient.api.put(path, data).then((result) => result.data),
-  patch: (path: string, data?: unknown) =>
-    authClient.api.patch(path, data).then((result) => result.data),
-  delete: (path: string) =>
-    authClient.api.delete(path).then((result) => result.data),
-};
-
 /** Independent entry: never expose the platform-admin layout to service Operators. */
 export default function CentralOperationsPage() {
   const { isAuthenticated, isLoading, user, logout } = useAuth();
   const identityId = String(user?.id ?? "");
-  const { serviceKey, userId, area: routeArea, courseId } = useParams();
+  const { serviceKey, userId, area: routeArea, courseId, id } = useParams();
+  const location = useLocation();
   const area =
-    routeArea ?? (courseId ? "courses" : userId ? "members" : undefined);
+    routeArea ?? (id ? "funding" : courseId ? "courses" : userId ? (location.pathname.includes("/service-members/") ? "service-members" : "members") : undefined);
   const navigate = useNavigate();
   const [grant, setGrant] = useState<{
     userId: string;
     roles: string[];
+    menuKeys: string[];
   } | null>(null);
   const roles = grant?.userId === String(user?.id) ? grant.roles : null;
   const sequence = useRef(0);
@@ -62,10 +41,10 @@ export default function CentralOperationsPage() {
     setError("");
     try {
       const response = await authClient.api.get("/operator/central-access");
-      if (!Array.isArray(response.data?.data?.roles))
+      if (!Array.isArray(response.data?.data?.roles) || !Array.isArray(response.data?.data?.menuKeys))
         throw new Error("INVALID_RESPONSE");
       if (seq === sequence.current)
-        setGrant({ userId: identityId, roles: response.data.data.roles });
+        setGrant({ userId: identityId, roles: response.data.data.roles, menuKeys: response.data.data.menuKeys });
     } catch {
       if (seq === sequence.current) {
         setGrant(null);
@@ -104,18 +83,19 @@ export default function CentralOperationsPage() {
       </main>
     );
   if (!roles) return <p role="status">위임 업무 확인 중…</p>;
+  const menuKeys = grant?.userId === identityId ? grant.menuKeys : [];
+  const visibleMenus = CENTRAL_OPERATION_MENUS.filter(menu => menuKeys.includes(menu.key) && centralOperationAreas[menu.service]?.includes(menu.area));
   const isPlatform = roles.includes("platform:super_admin");
   const allowed = SERVICES.filter(([key]) =>
-    key === "pharmcoop"
+    isPlatform || (key === "pharmcoop"
       ? roles.some((role) =>
           ["neture:pharmcoop_admin", "neture:pharmcoop_operator"].includes(
             role,
           ),
         )
-      : isPlatform ||
-        roles.includes(`${key}:admin`) ||
-        roles.includes(`${key}:operator`),
-  );
+      : roles.includes(`${key}:admin`) ||
+        roles.includes(`${key}:operator`)),
+  ).filter(([key]) => visibleMenus.some(menu => menu.service === key));
   if (serviceKey && !allowed.some(([key]) => key === serviceKey))
     return (
       <main className="p-6">
@@ -130,114 +110,51 @@ export default function CentralOperationsPage() {
         <Link to="/operations">업무 목록</Link>
       </main>
     );
+  if (serviceKey && !menuKeys.includes(`${serviceKey}.${area ?? ''}`)) return <main className="p-6"><p role="alert">위임되지 않은 업무 메뉴입니다.</p><Link to="/operations">업무 목록</Link></main>;
+  const groupKeys = { members: 'users', service: 'content', business: 'products', settings: 'system' } as const;
+  const sidebar: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
+    dashboard: [{ label: '운영 홈·알림', path: '/operations', exact: true }],
+  };
+  for (const menu of visibleMenus) {
+    const group = groupKeys[menu.group];
+    (sidebar[group] ??= []).push({ label: menu.label, path: `/operations/${menu.service}/${menu.area}`, domain: menu.service });
+  }
+  const domainIA: OperatorDomainIAConfig = {
+    ...DEFAULT_OPERATOR_DOMAIN_IA,
+    labels: Object.fromEntries(allowed.map(([key, label]) => [key, { label, emoji: '' }])),
+    displayOrder: allowed.map(([key]) => key),
+    groupOrder: Object.fromEntries(allowed.map(([key]) => [key, ['users', 'content', 'products', 'system']])),
+    topPinnedGroups: ['dashboard'],
+  };
   return (
-    <main className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <header className="mb-6 flex flex-wrap items-center gap-4">
+    <OperatorAreaShell menuItems={sidebar} capabilities={Object.values(OperatorCapability)} domainIAConfig={domainIA} menuLabel="통합 운영 메뉴" header={
+      <header className="flex flex-wrap items-center gap-4 border-b bg-white px-4 py-4 md:px-8">
         <h1 className="text-2xl font-bold">O4O 통합 운영</h1>
         <Link to="/operations">위임 업무</Link>
+        <CentralOperationNotifications key={user.id} scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />
         {isPlatform && <Link to="/admin">전체 관리자</Link>}
         <button onClick={logout}>로그아웃</button>
-      </header>
-      {serviceKey && serviceKey !== "pharmcoop" && (
-        <nav className="mb-4 flex flex-wrap gap-4">
-          <Link to={`/operations/${serviceKey}/members`}>회원 관리</Link>
-          <Link to={`/operations/${serviceKey}/inbox`}>알림·문의</Link>
-          {serviceKey === "community" && (
-            <>
-              <Link to="/operations/community/editorial">
-                공지·콘텐츠·자료 운영
-              </Link>
-              <Link to="/operations/community/boards">게시판 운영</Link>
-            </>
-          )}
-          {serviceKey === "neture" && (
-            <>
-              <Link to="/operations/neture/pharmacies">약국 신청 심사</Link>
-              <Link to="/operations/neture/qualifications">약사 자격 검토</Link>
-            </>
-          )}
-          {serviceKey === "supplier" && (
-            <Link to="/operations/supplier/suppliers">공급자 심사</Link>
-          )}
-          {serviceKey === "funding" && (
-            <Link to="/operations/funding/funding">펀딩 심사</Link>
-          )}
-          {serviceKey === "lecture" && (
-            <Link to="/operations/lecture/courses">강의 심사</Link>
-          )}
-        </nav>
-      )}
-      {serviceKey === "pharmcoop" ? (
-        <CentralFederationOperations
-          key={user.id}
-          canDecide={roles.includes("neture:pharmcoop_admin")}
-        />
-      ) : serviceKey && area === "inbox" ? (
-        <CentralOperatorInbox
-          key={`${user.id}:${serviceKey}`}
-          serviceKey={serviceKey}
-        />
-      ) : serviceKey === "supplier" && area === "suppliers" ? (
-        <CentralSupplierReview key={user.id} />
-      ) : serviceKey === "funding" && area === "funding" ? (
-        <CentralFundingReview key={user.id} />
-      ) : serviceKey === "community" && area === "boards" ? (
-        <CommunityManagementWorkspace
-          api={authClient.api}
-          kind="boards"
-          key={user.id}
-        />
-      ) : serviceKey === "community" && area === "editorial" ? (
-        <CommunityHomeManagementPage
-          api={editorialApi}
-          publicOrigin="https://community.neture.co.kr"
-          key={user.id}
-        />
-      ) : serviceKey === "neture" && area === "qualifications" ? (
-        <CentralPharmacistQualifications
-          key={user.id}
-          actorId={String(user.id)}
-        />
-      ) : serviceKey === "neture" && area === "pharmacies" ? (
-        <PharmacyMembershipReviewPage key={user.id} />
-      ) : serviceKey === "lecture" && area === "courses" && courseId ? (
-        <CentralLectureReview
-          key={`${user.id}:${courseId}`}
-          courseId={courseId}
-        />
-      ) : serviceKey === "lecture" && area === "courses" ? (
-        <CentralLectureCourses key={user.id} />
-      ) : serviceKey === "partner-support" ? (
-        <CentralPartnerModeration
-          key={user.id}
-          userId={String(user.id)}
-          admin={roles.includes("partner-support:admin") || isPlatform}
-        />
-      ) : serviceKey ? (
-        <ServiceMembersWorkspace
-          key={`${user.id}:${serviceKey}:${userId ?? ""}`}
-          serviceKey={serviceKey}
-          basePath={`/operations/${serviceKey}/members`}
-          api={memberApi}
-          roles={roles}
-          userId={userId}
-          navigate={navigate}
-          allowDestructiveActions={false}
-        />
+      </header>}
+    >
+      {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
+      {serviceKey && <nav aria-label="서비스 운영 업무" className="mb-5 flex flex-wrap gap-2 border-b pb-4">
+        {visibleMenus.filter(menu => menu.service === serviceKey).map(menu => <Link key={menu.key} aria-current={area === menu.area ? 'page' : undefined} className={`rounded border px-3 py-2 text-sm ${area === menu.area ? 'bg-blue-700 text-white' : 'bg-white text-slate-700'}`} to={`/operations/${serviceKey}/${menu.area}`}>{menu.label}</Link>)}
+      </nav>}
+      {serviceKey && area ? (
+        <div key={`${identityId}:${serviceKey}:${area}:${courseId ?? id ?? userId ?? ''}`}>
+          {renderCentralOperation({service:serviceKey,area,actorId:identityId,roles,menuKeys,courseId,id,userId,search:location.search,navigate})}
+        </div>
       ) : (
         <section className="grid gap-4 md:grid-cols-2">
           {allowed.map(([key, name]) => (
-            <Link
-              className="rounded border bg-white p-5"
-              key={key}
-              to={`/operations/${key}/${key === "pharmcoop" ? "federation" : "members"}`}
-            >
-              {name} {key === "pharmcoop" ? "가입·참여 운영" : "회원 관리"}
-            </Link>
+            <section className="rounded-xl border bg-white p-5 shadow-sm" key={key}>
+              <h2 className="mb-3 text-lg font-semibold">{name}</h2>
+              <ul className="grid gap-2">{visibleMenus.filter(menu => menu.service === key).map(menu => <li key={menu.key}><Link className="block rounded border px-3 py-2 text-blue-700 hover:bg-blue-50" to={`/operations/${key}/${menu.area}`}>{menu.label}</Link></li>)}</ul>
+            </section>
           ))}
           {!allowed.length && <p>현재 연결된 운영 업무가 없습니다.</p>}
         </section>
       )}
-    </main>
+    </OperatorAreaShell>
   );
 }

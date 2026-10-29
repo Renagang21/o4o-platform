@@ -243,6 +243,15 @@ export function inboxTaskSources(scope: InboxScope): TaskSource[] {
     );
   if (scope.key === "neture") {
     add(
+      "pharmacist-qualifications", "약사 자격 검토 대기",
+      "https://admin.neture.co.kr/operations/neture/qualifications",
+      "kpa_pharmacist_profiles", "qualification_status='pending'", "updated_at",
+    );
+    add(
+      "pharmacy-applications", "약국·매장 신청 심사",
+      "/operator/pharmacy-memberships", "neture_pharmacy_memberships", "status='pending'",
+    );
+    add(
       "product-review",
       "상품 승인 대기",
       "/operator/product-approvals",

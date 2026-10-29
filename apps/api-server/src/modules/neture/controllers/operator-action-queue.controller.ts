@@ -1,3 +1,6 @@
+import {CENTRAL_OPERATION_MENUS} from '@o4o/types';
+import {centralServiceMenuRestrictions,centralOperationMenuKeys} from '../../../services/admin/central-operation-menu-grants.js';
+import {centralOperationRoles} from '../../../services/admin/central-operation-access.js';
 /**
  * Neture Operator Action Queue Controller
  *
@@ -57,8 +60,12 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
   /**
    * GET /operator/actions
    */
-  router.get('/actions', async (_req: Request, res: Response): Promise<void> => {
+  router.get('/actions', async (req: Request, res: Response): Promise<void> => {
     try {
+      const actor=(req as AuthenticatedRequest).user!.id;
+      const restricted=await centralServiceMenuRestrictions(dataSource,actor,'neture');
+      const keys=restricted===null ? null : await centralOperationMenuKeys(dataSource,actor,await centralOperationRoles(dataSource,actor));
+      const allowWork=(key:string)=>keys===null || keys.includes(key);
       // WO-NETURE-CURATION-PHASE1: uncuratedRow 제거
       // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: pendingProductsRow(OSA) 제거
       const [
@@ -66,24 +73,24 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         pendingSuppliersRow,
         unreadMessagesRow,
       ] = await Promise.all([
-        dataSource.query(
+        allowWork('neture.applications') ? dataSource.query(
           `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
            FROM service_memberships
            WHERE service_key = 'neture' AND status = 'pending'`,
-        ),
-        dataSource.query(
+        ) : Promise.resolve([{cnt:0,oldest:null}]),
+        allowWork('supplier.suppliers') ? dataSource.query(
           `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
            FROM neture_suppliers
            WHERE status = 'PENDING'`,
-        ),
-        dataSource.query(
+        ) : Promise.resolve([{cnt:0,oldest:null}]),
+        allowWork('neture.legacy-contact') ? dataSource.query(
           // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1:
           // neture_contact_messages 는 SnakeNamingStrategy 미적용(connection.ts) 시점에 생성되어
           // 물리 컬럼이 quoted camelCase("createdAt") 이다. created_at 참조 시 500.
           `SELECT COUNT(*)::int AS cnt, MIN("createdAt") AS oldest
            FROM neture_contact_messages
            WHERE status != 'resolved'`,
-        ),
+        ) : Promise.resolve([{cnt:0,oldest:null}]),
       ]);
 
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
@@ -190,7 +197,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         pendingInquiries: unreadMessages,
         activeProducts,
         pendingRegs,
-      }, (_req as AuthenticatedRequest).user?.id ?? '');
+      }, (req as AuthenticatedRequest).user?.id ?? '');
 
       const aiItems: ActionQueueItem[] = aiRaw.map((a) => ({
         id: a.id,
@@ -212,7 +219,11 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
       // ── Merge: dedupe by type (AI wins when duplicate) ──
       const systemTypes = new Set(systemItems.map((i) => i.type));
       const uniqueAi = aiItems.filter((a) => !systemTypes.has(a.type));
-      const merged = [...systemItems, ...uniqueAi];
+      const merged = [...systemItems, ...uniqueAi].filter(item=> {
+        if(keys===null)return true;
+        const path=item.actionUrl.split('?')[0];
+        return CENTRAL_OPERATION_MENUS.some(menu=>keys.includes(menu.key)&&menu.sourcePaths.includes(path));
+      });
 
       // Sort: priority → confidence → count
       const pOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };

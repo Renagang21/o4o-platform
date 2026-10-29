@@ -1,4 +1,12 @@
+import type { TrialStatus, Trial, CreateTrialPayload, UpdateTrialPayload, TrialResults, Participation, ParticipationInfo, ParticipationInfoDetail, MyParticipationSummary, FundingForumAccess } from '@o4o/operator-core-ui/modules/funding-operations';
+import { createFundingOperatorApi } from '@o4o/operator-core-ui/modules/funding-operations';
+import { api, API_BASE_URL } from '../lib/apiClient';
 import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
+
+export type { TrialStatus, TrialProductRef, Trial, OperatorTrial, SettlementStatus, PaymentStatus, TrialParticipant, ParticipantSummary, ParticipantListResponse, CreateTrialPayload, UpdateTrialPayload, TrialResultsSummary, TrialResults, Participation, CreditProcessStatus, ParticipationInfo, ParticipationInfoDetail, MyParticipationSummary, ConvertTrialPayload, TrialConversionResult, ProductSearchItem, ProductSearchResponse, ParticipantFilters, UpdateParticipantPaymentInput, UpdateParticipantPaymentResult, ForumSyncStage, ForumSyncSeverity, ForumSyncFailure, ForumSyncFailureListResponse, MarketTrialKpiSnapshot, MarketTrialDetailKpi, FundingForumAccess } from '@o4o/operator-core-ui/modules/funding-operations';
+
+export { PAYMENT_STATUS_LABELS } from '@o4o/operator-core-ui/modules/funding-operations';
+
 /**
  * Trial API Client
  *
@@ -6,7 +14,7 @@ import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
  * WO-O4O-MARKET-TRIAL-PHASE1-V1: Supplier create/submit + Operator approval
  */
 
-import { api, API_BASE_URL } from '../lib/apiClient';
+
 
 /**
  * WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
@@ -25,261 +33,57 @@ function marketTrialCommerceDisabled(message: string): never {
 // Types
 // ============================================================================
 
-export type TrialStatus =
-  | 'draft' | 'submitted' | 'recruiting'
-  | 'development' | 'outcome_confirming' | 'fulfilled' | 'closed';
+
 
 /**
  * WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2:
  * 펀딩에 연결된 공급자 등록 제품(ProductMaster) 표시용 요약. 가격/재고 미포함.
  */
-export interface TrialProductRef {
-  id: string;
-  name: string;
-  regulatoryType: string | null;
-  drugCategory: string | null;
-  manufacturerName: string | null;
-}
 
-export interface Trial {
-  id: string;
-  title: string;
-  // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1 / DISPLAY-V2:
-  // 참고한 등록 제품의 optional legacy reference. 주문·가격·개설 조건이 아니다.
-  productId?: string | null;
-  product?: TrialProductRef | null;
-  // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
-  oneLiner?: string | null;
-  // WO-MARKET-TRIAL-VIDEO-FIELD-V1
-  videoUrl?: string | null;
-  description?: string;
-  // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
-  salesScenarioContent?: string | null;
-  supplierId: string;
-  supplierName?: string;
-  status: TrialStatus;
-  reviewStatus?: string;
-  reviewReason?: string | null;
-  forumPending?: boolean;
-  outcomeSnapshot?: {
-    expectedType: 'product' | 'cash';
-    description: string;
-    quantity?: number;
-    note?: string;
-  };
-  eligibleRoles?: string[];
-  rewardOptions?: string[];
-  maxParticipants?: number;
-  currentParticipants: number;
-  startDate?: string;
-  endDate?: string;
-  trialPeriodDays?: number;
-  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
-  targetAmount?: number | null;
-  currentAmount?: number;
-  trialUnitPrice?: number | null;
-  rewardRate?: number;
-  amountRate?: number | null;
-  recruitRate?: number | null;
-  // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1
-  forumPostId?: string;
-  settlementPreview?: {
-    totalAmount: number;
-    productQty: number;
-    remainder: number;
-  } | null;
-  createdAt: string;
-  updatedAt?: string;
-}
 
-export interface OperatorTrial extends Trial {
-  forumReady?: boolean;
-  forumLink?: {
-    forumPostId?: string;
-    forumId?: string;
-    slug: string | null;
-    url: string;
-  } | null;
-}
+
+
+
 
 // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
-export type SettlementStatus =
-  | 'pending' | 'choice_pending' | 'choice_completed' | 'offline_review' | 'offline_settled';
+
 
 // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
-export type PaymentStatus =
-  | 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded';
+
 
 // WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-PAYMENT-LEDGER-V1:
 // 온라인 결제가 아니라 운영자 오프라인 입금 확인 기준 용어.
-export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  unpaid: '입금 전',
-  pending: '입금 확인 대기',
-  paid: '입금 확인 완료',
-  failed: '입금 확인 실패',
-  canceled: '참여 취소',
-  refunded: '환불 처리됨',
-};
 
-export interface TrialParticipant {
-  id: string;
-  withdrawn?: boolean;
-  name: string;
-  type: string;
-  rewardType: string | null;
-  rewardStatus: string;
-  organizationId: string | null;
-  joinedAt: string;
-  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
-  contributionAmount: number;
-  rewardRate: number;
-  totalSettlementAmount: number;
-  trialUnitPrice: number | null;
-  estimatedProductQty: number | null;
-  estimatedRemainder: number | null;
-  settlementStatus: SettlementStatus;
-  settlementChoice: 'product' | 'cash' | null;
-  settlementAmount: number | null;
-  settlementProductQty: number | null;
-  settlementRemainder: number | null;
-  settlementNote: string | null;
-  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
-  paymentVersion: number;
-  paymentStatus: PaymentStatus;
-  paymentMethod: string | null;
-  paymentProvider: string | null;
-  paymentReference: string | null;
-  paidAmount: number | null;
-  paidAt: string | null;
-  confirmedAt: string | null;
-  paymentNote: string | null;
-  updatedAt: string;
-}
 
-export interface ParticipantSummary {
-  recordCount?: number;
-  withdrawnCount?: number;
-  totalCount: number;
-  productCount: number;
-  cashCount: number;
-  fulfilledCount: number;
-  pendingCount: number;
-  fulfillmentRate: number;
-  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
-  settlementPendingCount: number;
-  choicePendingCount: number;
-  choiceCompletedCount: number;
-  offlineReviewCount: number;
-  offlineSettledCount: number;
-}
 
-export interface ParticipantListResponse {
-  summary: ParticipantSummary;
-  participants: TrialParticipant[];
-}
 
-export interface CreateTrialPayload {
-  title: string;
-  // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 공급자 상품(ProductMaster id) soft 참조
-  productId?: string | null;
-  // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
-  oneLiner?: string;
-  // WO-MARKET-TRIAL-VIDEO-FIELD-V1
-  videoUrl?: string;
-  description?: string;
-  // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
-  salesScenarioContent?: string;
-  outcomeSnapshot?: {
-    expectedType: 'product' | 'cash';
-    description: string;
-    quantity?: number;
-    note?: string;
-  };
-  maxParticipants?: number;
-  fundingStartAt: string;
-  fundingEndAt: string;
-  trialPeriodDays: number;
-  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
-  targetAmount?: number;
-  trialUnitPrice?: number;
-  rewardRate?: number;
-}
+
+
+
+
+
 
 /** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
-export type UpdateTrialPayload = Partial<CreateTrialPayload>;
 
-export interface TrialResultsSummary {
-  totalCount: number;
-  productCount: number;
-  cashCount: number;
-  fulfilledCount: number;
-  pendingCount: number;
-  fulfillmentRate: number;
-  recruitRate: number | null;
-}
 
-export interface TrialResults {
-  forum?: { id: string; slug: string } | null;
-  trial: Trial;
-  summary: TrialResultsSummary;
-  forumPostId: string | null;
-}
 
-export interface Participation {
-  id: string;
-  trialId: string;
-  userId: string;
-  rewardType: 'cash' | 'product';
-  rewardStatus: 'pending' | 'fulfilled';
-  createdAt: string;
-}
+
+
+
+
 
 // ============================================================================
 // WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1: Participant types
 // (KPA-Society marketTrial.ts → Neture canonical 이식)
 // ============================================================================
 
-export type CreditProcessStatus = 'not_applicable' | 'pending' | 'planned' | 'completed';
 
-export interface ParticipationInfo {
-  paymentStatus?: PaymentStatus;
-  paidAmount?: number | null;
-  paidAt?: string | null;
-  confirmedAt?: string | null;
-  withdrawn?:boolean; refundedAmount?:number;refundedAt?:string|null;
-  id: string;
-  trialId: string;
-  participantId: string;
-  role: string;
-  rewardType: 'cash' | 'product';
-  rewardStatus: 'pending' | 'fulfilled';
-  joinedAt: string;
-}
 
-export interface ParticipationInfoDetail extends ParticipationInfo {
-  settlementChoice: 'product' | 'cash' | null;
-  settlementStatus: SettlementStatus;
-  settlementAmount: number | null;
-  settlementProductQty: number | null;
-  settlementRemainder: number | null;
-  creditProcessStatus: CreditProcessStatus;
-  settlementNote: string | null;
-  contributionAmount?: number;
-  rewardRate?: number;
-  totalSettlementAmount?: number;
-  trialUnitPrice?: number | null;
-  estimatedProductQty?: number | null;
-  estimatedRemainder?: number | null;
-}
 
-export interface MyParticipationSummary extends ParticipationInfoDetail {
-  trial?: {
-    id: string;
-    title: string;
-    status: TrialStatus;
-    supplierName?: string;
-  };
-}
+
+
+
+
 
 // WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
 // ShippingAddress / Fulfillment 타입 제거 (content-only — 주문/발송 축 제거).
@@ -387,39 +191,15 @@ export async function getSupplierTrialResults(trialId: string): Promise<TrialRes
 // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
 // ============================================================================
 
-export interface ConvertTrialPayload {
-  /** Link to existing ProductMaster (A안) */
-  productId?: string;
-  /** Create new ProductMaster (B안) */
-  productName?: string;
-}
 
-export interface TrialConversionResult {
-  trial: OperatorTrial;
-  conversionResult: {
-    productId: string;
-    productName: string;
-    productRewardCount: number;
-    note: string | null;
-  };
-}
+
+
 
 // WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: convertTrialToProduct 제거 (content-only, 호출처 0).
 
-export interface ProductSearchItem {
-  id: string;
-  name: string;
-  supplierName: string;
-  categoryName: string;
-  regulatoryType: string;
-  isActive: boolean;
-  createdAt: string;
-}
 
-export interface ProductSearchResponse {
-  data: ProductSearchItem[];
-  meta: { total: number; page: number; limit: number };
-}
+
+
 
 // WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: searchProductsForConversion 제거 (content-only, 호출처 0).
 
@@ -434,51 +214,21 @@ export interface ProductSearchResponse {
 // Neture Operator API — 1차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1)
 // ============================================================================
 
-export async function getOperatorTrials(status?: string): Promise<OperatorTrial[]> {
-  const params = status ? `?status=${status}` : '';
-  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial${params}`);
-  return data.data || data;
-}
 
-export async function getOperatorTrialDetail(trialId: string): Promise<OperatorTrial> {
-  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}`);
-  return data.data || data;
-}
 
-export async function approveTrialFirst(trialId: string): Promise<OperatorTrial> {
-  const { data } = await api.patch(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/approve`);
-  return data.data || data;
-}
 
-export async function rejectTrialFirst(trialId: string, reason: string): Promise<OperatorTrial> {
-  const { data } = await api.patch(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/reject`, { reason });
-  return data.data || data;
-}
+
+
+
+
 
 /**
  * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 참여자 목록 JSON (인라인 표시)
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1: 필터 지원 추가
  */
-export interface ParticipantFilters {
-  rewardType?: 'product' | 'cash';
-  rewardStatus?: 'pending' | 'fulfilled';
-  paymentStatus?: PaymentStatus;
-}
 
-export async function getOperatorTrialParticipants(
-  trialId: string,
-  filters?: ParticipantFilters,
-): Promise<ParticipantListResponse> {
-  const params = new URLSearchParams();
-  if (filters?.rewardType) params.append('rewardType', filters.rewardType);
-  if (filters?.rewardStatus) params.append('rewardStatus', filters.rewardStatus);
-  if (filters?.paymentStatus) params.append('paymentStatus', filters.paymentStatus);
-  const qs = params.toString();
-  const { data } = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants${qs ? `?${qs}` : ''}`,
-  );
-  return data.data || data;
-}
+
+
 
 // WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: updateParticipantConversionStatus 제거 (content-only).
 
@@ -486,37 +236,14 @@ export async function getOperatorTrialParticipants(
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:
  * 참여자 이행 상태 변경
  */
-export async function updateParticipantRewardStatus(
-  trialId: string,
-  participantId: string,
-  rewardStatus: 'pending' | 'fulfilled',
-): Promise<{ id: string; rewardType: string | null; rewardStatus: string }> {
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/reward-status`,
-    { rewardStatus },
-  );
-  return data.data || data;
-}
+
 
 /**
  * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1:
  * 운영자 participant 정산 상태 변경
  * 허용 전이: pending→choice_pending, choice_completed→offline_review, offline_review→offline_settled
  */
-export async function updateParticipantSettlementStatus(
-  trialId: string,
-  participantId: string,
-  settlementStatus: SettlementStatus,
-  settlementNote?: string,
-): Promise<{ id: string; settlementStatus: SettlementStatus; settlementNote: string | null; updatedAt: string | null }> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/settlement-status`,
-    { settlementStatus, ...(settlementNote !== undefined && { settlementNote }) },
-  );
-  return data.data || data;
-}
+
 
 /**
  * WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1:
@@ -528,45 +255,11 @@ export async function updateParticipantSettlementStatus(
  *   - paymentProvider 권장값: 'internal' (수기) / 'toss' / 'kakao' 등 (향후)
  *   - confirmedAt 미지정 + paymentStatus='paid' → 백엔드가 자동 stamp
  */
-export interface UpdateParticipantPaymentInput {
-  version: number;
-  paymentStatus: PaymentStatus;
-  paymentMethod?: string | null;
-  paymentProvider?: string | null;
-  paymentReference?: string | null;
-  paidAmount?: number | null;
-  paidAt?: string | null;       // ISO datetime
-  confirmedAt?: string | null;  // ISO datetime
-  paymentNote?: string | null;
-}
 
-export interface UpdateParticipantPaymentResult {
-  paymentVersion: number;
-  id: string;
-  paymentStatus: PaymentStatus;
-  paymentMethod: string | null;
-  paymentProvider: string | null;
-  paymentReference: string | null;
-  paidAmount: number | null;
-  paidAt: string | null;
-  confirmedAt: string | null;
-  paymentNote: string | null;
-  updatedAt: string | null;
-}
 
-export async function updateParticipantPaymentStatus(
-  trialId: string,
-  participantId: string,
-  input: UpdateParticipantPaymentInput,
-): Promise<UpdateParticipantPaymentResult> {
-  // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1: 오프라인 입금(payment) 확인 재활성화
-  // (settlement·매장 진열·전환은 content-only 로 계속 차단). 입금 확인 기록일 뿐 온라인 결제 아님.
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/payment-status`,
-    input,
-  );
-  return data.data || data;
-}
+
+
+
 
 // WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: createListingFromTrialParticipant 제거 (content-only).
 
@@ -574,107 +267,34 @@ export async function updateParticipantPaymentStatus(
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:
  * Trial 단위 상태 전환
  */
-export async function updateTrialStatus(trialId: string, status: TrialStatus): Promise<OperatorTrial> {
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/status`,
-    { status },
-  );
-  return data.data || data;
-}
+
 
 /**
  * WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1: 참여자 CSV 다운로드
  */
-export async function exportParticipantsCSV(trialId: string, filters?: ParticipantFilters): Promise<void> {
-  const params = new URLSearchParams();
-  for (const [field, value] of Object.entries(filters || {})) if (value) params.set(field, value);
-  const query = params.toString();
-  const response = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export${query ? `?${query}` : ''}`,
-    { responseType: 'blob' },
-  );
-  const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
-  const url = window.URL.createObjectURL(blob);
-  const disposition = response.headers['content-disposition'] || '';
-  const utf8Name = disposition.match(/filename\*=UTF-8''([^;]+)/i);
-  const fallback = disposition.match(/filename="([^"]+)"/i);
-  let filename = fallback?.[1] || `market-trial-${trialId}-participants.csv`;
-  if (utf8Name) { try { filename = decodeURIComponent(utf8Name[1]); } catch { /* Use ASCII fallback. */ } }
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+
 
 // ============================================================================
 // WO-MONITOR-1: 포럼 연계 실패 API
 // ============================================================================
 
-export type ForumSyncStage = 'category_check' | 'forum_post_create' | 'forum_mapping_save';
-export type ForumSyncSeverity = 'critical' | 'warning';
 
-export interface ForumSyncFailure {
-  id: string;
-  trialId: string;
-  trialTitle: string;
-  stage: ForumSyncStage;
-  severity: ForumSyncSeverity;
-  errorMessage: string;
-  occurredAt: string;
-  resolvedAt: string | null;
-  resolutionNote: string | null;
-}
 
-export interface ForumSyncFailureListResponse {
-  data: ForumSyncFailure[];
-  meta: { total: number; page: number; limit: number };
-}
 
-export async function getForumSyncFailures(params?: {
-  trialId?: string;
-  resolved?: 'true' | 'false';
-  page?: number;
-  limit?: number;
-}): Promise<ForumSyncFailureListResponse> {
-  const sp = new URLSearchParams();
-  if (params?.trialId) sp.set('trialId', params.trialId);
-  if (params?.resolved) sp.set('resolved', params.resolved);
-  if (params?.page) sp.set('page', String(params.page));
-  if (params?.limit) sp.set('limit', String(params.limit));
-  const qs = sp.toString();
-  const { data } = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/forum-sync-failures${qs ? `?${qs}` : ''}`,
-  );
-  return data;
-}
 
-export async function resolveForumSyncFailure(
-  failureId: string,
-  note?: string,
-): Promise<ForumSyncFailure> {
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/forum-sync-failures/${failureId}/resolve`,
-    { note },
-  );
-  return data.data || data;
-}
+
+
+
+
+
+
 
 /**
  * WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1
  * 포럼 공고 게시 재시도 (운영자 전용 · 멱등).
  * 이미 게시된 trial 은 already_linked 로 응답하며 중복 생성하지 않는다.
  */
-export async function retryTrialForumSync(
-  trialId: string,
-): Promise<{ status: 'created' | 'already_linked'; forumId: string }> {
-  const { data } = await api.post(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/forum-sync/retry`,
-  );
-  return data.data || data;
-}
+
 
 // ============================================================================
 // Shipping / Fulfillment (existing)
@@ -689,55 +309,13 @@ export async function retryTrialForumSync(
 // Analytics / KPI (WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1)
 // ============================================================================
 
-export interface MarketTrialKpiSnapshot {
-  totalTrials: number;
-  recruitingTrials: number;
-  developmentTrials: number;
-  outcomeConfirmingTrials: number;
-  fulfilledTrials: number;
-  closedTrials: number;
-  successfulTrials: number;
-  failedTrials: number;
-  successRate: number | null;
-  totalParticipants: number;
-  totalRecruitingAmount: number;
-  totalPaidAmount: number;
-  paidParticipantCount: number;
-  refundCount: number;
-  paymentCompletionRate: number | null;
-  averageAchievementRate: number | null;
-}
 
-export interface MarketTrialDetailKpi {
-  trialId: string;
-  status: string;
-  achievementRate: number | null;
-  participationRate: number | null;
-  participantCount: number;
-  paidParticipantCount: number;
-  unpaidParticipantCount: number;
-  failedPaymentCount: number;
-  refundCount: number;
-  paymentCompletionRate: number | null;
-  totalPaidAmount: number;
-  recruitingRemainingDays: number | null;
-  recruitingProgressPercent: number | null;
-  closeReason: string | null;
-}
 
-export async function getOperatorMarketTrialKpi(): Promise<MarketTrialKpiSnapshot> {
-  const { data } = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/kpi`,
-  );
-  return data.data || data;
-}
 
-export async function getOperatorTrialKpi(trialId: string): Promise<MarketTrialDetailKpi> {
-  const { data } = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/kpi`,
-  );
-  return data.data || data;
-}
+
+
+
+
 
 const FUNDING_ORGANIZATION_KEY = 'funding_supplier_org';
 export function selectFundingOrganization(id: string) { if (id) window.sessionStorage.setItem(FUNDING_ORGANIZATION_KEY, id); else window.sessionStorage.removeItem(FUNDING_ORGANIZATION_KEY); }
@@ -757,8 +335,10 @@ export async function getFundingCreatorParticipants(id: string): Promise<{ id: s
   const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/creator-participants`);
   return data.data;
 }
-export interface FundingForumAccess { forum: { id: string; slug: string } | null; canRead: boolean; canWrite: boolean; canManage: boolean; canModerate: boolean; member: boolean; participant: boolean; }
+
 export async function getFundingForumAccess(id: string): Promise<FundingForumAccess> {
   const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/forum-access`);
   return data.data;
 }
+
+export const { getOperatorTrials, getOperatorTrialDetail, approveTrialFirst, rejectTrialFirst, getOperatorTrialParticipants, updateParticipantRewardStatus, updateParticipantSettlementStatus, updateParticipantPaymentStatus, updateTrialStatus, exportParticipantsCSV, getForumSyncFailures, resolveForumSyncFailure, retryTrialForumSync, getOperatorMarketTrialKpi, getOperatorTrialKpi } = createFundingOperatorApi(api);
