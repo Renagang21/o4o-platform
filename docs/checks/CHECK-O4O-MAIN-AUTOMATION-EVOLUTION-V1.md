@@ -26,7 +26,7 @@
 | Main 실제 Chromium | desktop/mobile PASS | 전체 Main 화면·보관 선택·자동 저장·기기 전환 서버 조회·가로 넘침/페이지 오류 없음. 합성 API이며 실제 PC/사이트 아님 |
 | 서버 콘텐츠 실행 unit | 8 PASS | 기존 adapter 재사용, 미승인 공간·요청하지 않은 쓰기 거절, 저장 transaction에서 권한 재검사 |
 | API 확장 회귀/최종 타입·build·정적 guard | 확장 회귀 23 suite · 407 PASS. 리뷰 보완 API 3 suite · 68 PASS. API 타입/Main build·guard PASS | 최신 main 정렬 후 인계 HEAD에서 재확인 |
-| Windows native 설치/runtime | NOT_RUN (로컬 Linux) | PR Windows runner 결과로 별도 확인 예정 |
+| Windows native 설치/runtime | PR Windows runner PASS · 로컬 2 SKIP | 사용자 Windows PC와 구분. 최종 인계 HEAD의 검사 상태는 PR 참조 |
 | 실계정·실제 모델·약국 export Mapping·실제 주문 사이트 | NOT_RUN | 현행 계정 SSOT 파일이 현재/기준 checkout에 없음. 이전 계정/운영 credential로 대체하지 않음 |
 
 합성 테스트는 실제 계정이나 비용·모델 품질·모든 업무 완결성 검증으로 승격하지 않는다. 매뉴얼은 기존 브라우저 자료함/요청 발췌 경로를 유지하며 업무 자료 보관 동의를 PDF·매뉴얼 동기화 동의로 확대하지 않는다. 미등재 외부 사이트의 자동 조작은 무제한 허용하지 않았다. 처음 만난 접점은 현재 자료로 가능한 안내를 하고 실제 화면·메뉴·사용 중인 주문 주소의 최소 도움으로 이어간다.
@@ -68,7 +68,7 @@
 
 | 소비처 | 사용 여부 | 변경 영향 | 검증 방식 | 결과 |
 |---|---:|---|---|---|
-| PC Node | 직접 | v9·누적 자료·동의된 증분 sync·0.5.0 capability | native suite·기존 installer 계약 | Linux PASS / Windows 후속 |
+| PC Node | 직접 | v9·누적 자료·동의된 증분 sync·0.5.0 capability | native suite·기존 installer 계약 | Linux PASS / PR Windows PASS |
 | Main Neture | 직접 | 자료 연결·자동 저장·별도 동의·대기 업무 선택 | Vitest·desktop/mobile Chromium·build | 화면/build PASS |
 | API Assistant / 새 업무 사본의 삭제 경계 | 직접 | 서버 업무/집계·권한·공개 방법 추천·일시 명령 | PG fixture·unit·기존 runtime 회귀 | fixture/unit PASS / 확장 회귀 보완 PASS |
 | KPA/K-Cosmetics 등의 매장 menu/layout | 해당 없음 | 공통 메뉴·역할 map·가시성 정책 변경 없음 | 소비처/route 검색 | 이번 UI 범위 밖 |
@@ -93,4 +93,4 @@
 
 Evolution §25의 오래된 census 표를 당시 조사 링크와 현재 원칙으로 교체했다. Personal Assistant·Memory placement·약국 자료 설계·SETUP의 관련 안내를 이번 개발 계약과 맞췄다. 과거 WO/CHECK의 당시 실행 증거는 다시 쓰지 않았다. 적용된 운영 정책·배포 상태로 오인하지 않게 TODO/branch 구현·미검증 범위를 구분한다.
 
-PR·인계 HEAD·CI Gate·Codex review는 최종 검증 후 기록한다. merge·auto-merge·배포·운영 DB 적용은 수행하지 않는다.
+PR [#883](https://github.com/Renagang21/o4o-platform/pull/883)의 인계 HEAD·CI Gate·Codex review를 최종 상태로 확인한다. main `75f798ef24`까지 작업 branch에 정렬했고 자동화 파일의 겹침은 없다. Sonar 보안 등급 실패는 해소됐지만 앞선 HEAD의 중복률 5.2%는 미통과이며, 상세 조회는 환경 네트워크 허용이 필요하다. 최종 외부 검사 결과는 PR에 기록한다. merge·auto-merge·배포·운영 DB 적용은 수행하지 않는다.
