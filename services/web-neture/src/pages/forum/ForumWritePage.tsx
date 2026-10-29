@@ -22,6 +22,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
@@ -69,7 +70,13 @@ function forumWriteHeading(isEditMode: boolean, communityLabel: string | undefin
   return { title: '의견 남기기', description: 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.' };
 }
 
-export function ForumWritePage({
+export function ForumWritePage(props: ForumWritePageProps = {}) {
+  const { user, isAuthenticated } = useAuth();
+  const [params] = useSearchParams();
+  const scope = JSON.stringify([props.backPath, props.categorySlug, props.writingContext, props.allowAnnouncement, params.toString(), user?.id, isAuthenticated]);
+  return <ForumWriter key={scope} {...props} />;
+}
+function ForumWriter({
   communityLabel,
   categorySlug = 'neture-forum',
   backPath,
@@ -99,7 +106,7 @@ export function ForumWritePage({
   useEffect(() => {
     if (isEditMode) return;
     let alive = true;
-    if (writingContext === 'carepharm') { setForumId(''); setTargetForum(null); setAvailableForums([]); }
+    setForumId(''); setTargetForum(null); setAvailableForums([]);
     fetchForumCategories()
       .then((res) => {
         if (!alive) return;
@@ -117,10 +124,9 @@ export function ForumWritePage({
           }
           return;
         }
-        const matched =
-          (forumSlugParam ? items.find((item) => item?.slug === forumSlugParam) : undefined)
-          || items.find((item) => item?.slug === categorySlug)
-          || items[0];
+        const matched = forumSlugParam
+          ? items.find((item) => item?.slug === forumSlugParam)
+          : items.find((item) => item?.slug === categorySlug) || items[0];
         if (matched?.id) {
           setForumId(String(matched.id));
           const tags: string[] = Array.isArray(matched.tags)
@@ -143,7 +149,10 @@ export function ForumWritePage({
 
   const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
-  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isLoadingPost, setIsLoadingPost] = useState(isEditMode);
+  const [editReady, setEditReady] = useState(false);
+  const [editRetry, setEditRetry] = useState(0);
+  const beginSave = useLatestRequest(`${backPath}:${editPostId}:${user?.id}`);
   const [error, setError] = useState<string | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState<string | null>(null);
@@ -170,49 +179,42 @@ export function ForumWritePage({
     return () => { live = false; };
   }, [libraryId, isAuthenticated, user?.id]);
 
-  // Load existing post data for edit mode
+  // Never expose an editor with unconfirmed data, or accept an earlier target's response.
   useEffect(() => {
-    async function loadPostForEdit() {
-      if (!editPostId) return;
-      setIsLoadingPost(true);
-      try {
-        const response = await fetchForumPostBySlug(editPostId);
-        if (response?.data) {
-          setTitle(response.data.title);
-          setEditSlug(response.data.slug);
-          setEditStatus(response.data.status);
-          const html = typeof response.data.content === 'string'
-            ? response.data.content : blocksToHtml(response.data.content);
-          setEditorHtml(html);
-          setShowContactOnPost(response.data.showContactOnPost || false);
-        } else {
-          setError('수정할 게시글을 찾을 수 없습니다.');
-        }
-      } catch (err) {
-        console.error('Error loading post for edit:', err);
-        setError('게시글을 불러오지 못했습니다.');
-      } finally {
-        setIsLoadingPost(false);
+    if (!editPostId || !isAuthenticated) return;
+    let alive = true;
+    setIsLoadingPost(true); setEditReady(false); setError(null);
+    fetchForumPostBySlug(editPostId).then(response => {
+      if (!alive) return;
+      if (!response?.data) { setError('수정할 게시글을 찾을 수 없습니다.'); return; }
+      if (/^\/(?:communities|market-trial)\//.test(backPath ?? '') && response.data.authorId !== user?.id) {
+        setError('본인이 작성한 게시글만 수정할 수 있습니다.'); return;
       }
-    }
-    loadPostForEdit();
-  }, [editPostId]);
+      setTitle(response.data.title); setEditSlug(response.data.slug); setEditStatus(response.data.status);
+      const html = typeof response.data.content === 'string' ? response.data.content : blocksToHtml(response.data.content);
+      setEditorHtml(html); setShowContactOnPost(response.data.showContactOnPost || false); setEditReady(true);
+    }).catch(() => { if (alive) setError('게시글을 불러오지 못했습니다.'); })
+      .finally(() => { if (alive) setIsLoadingPost(false); });
+    return () => { alive = false; };
+  }, [editPostId, editRetry, isAuthenticated, user?.id, backPath]);
 
   // Load contact settings on mount (only for authenticated users)
   useEffect(() => {
+    let alive = true;
     async function loadContactSettings() {
       if (!isAuthenticated) return;
 
       try {
         const settings = await fetchUserContactSettings();
-        setContactSettings(settings);
+        if (alive) setContactSettings(settings);
       } catch (err) {
         console.error('Error loading contact settings:', err);
       }
     }
 
     loadContactSettings();
-  }, [isAuthenticated]);
+    return () => { alive = false; };
+  }, [isAuthenticated, user?.id]);
 
   // 비로그인 시 로그인 안내
   if (!isAuthenticated) {
@@ -243,10 +245,11 @@ export function ForumWritePage({
   // 기존 update 흐름(htmlToBlocks → updateForumPost → basePath redirect)을 그대로 보존한다.
   // update payload 는 기존과 동일(showContactOnPost 미포함 — contact edit 영속화는 별도 WO 범위).
   async function handleUpdateSubmit(payload: ForumWriteFormPayload) {
-    if (!editPostId) return;
+    if (!editPostId || !editReady) return;
+    const current = beginSave();
     const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
     if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
-      setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)');
+      setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
       return;
     }
     setError(null);
@@ -260,6 +263,7 @@ export function ForumWritePage({
         content: blocks,
         categorySlug: categorySlug,
       });
+      if (!current()) return;
       if (response.success && response.data) {
         navigate(`${base}/${postSegment}/${response.data.slug}`);
       } else {
@@ -267,19 +271,20 @@ export function ForumWritePage({
       }
     } catch (err) {
       console.error('Error updating post:', err);
-      setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
   // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: ForumWriteForm create 제출 핸들러.
   // 기존 create 흐름(htmlToBlocks → createForumPost → basePath redirect, contact payload)을 그대로 보존한다.
   async function handleCreateSubmit(payload: ForumWriteFormPayload) {
+    const current = beginSave();
     if (libraryId && (!libraryReady || !publicationConfirmed)) {
       setError('원본을 확인하고 커뮤니티 공개 범위 확인에 동의해 주세요.'); return;
     }
     const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
     if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
-      setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)');
+      setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
       return;
     }
     setError(null);
@@ -287,7 +292,7 @@ export function ForumWritePage({
       const blocks = htmlToBlocks(payload.editorHtml);
       const base = (backPath || '/forum').replace(/\/$/, '');
       if (!forumId) {
-        setError('현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해주세요.');
+        setError(forumSlugParam ? '지정한 게시판을 확인할 수 없습니다. 목록에서 게시판을 다시 선택해 주세요.' : '현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해주세요.');
         return;
       }
       const response = await createForumPost({
@@ -299,6 +304,7 @@ export function ForumWritePage({
         ...(selectedClassification ? { tags: [selectedClassification] } : {}),
         showContactOnPost: hasContactInfo ? showContactOnPost : false,
       });
+      if (!current()) return;
       if (response.success && response.data) {
         navigate(`${base}/${postSegment}/${response.data.slug}`);
       } else {
@@ -306,7 +312,7 @@ export function ForumWritePage({
       }
     } catch (err) {
       console.error('Error submitting post:', err);
-      setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
@@ -331,6 +337,12 @@ export function ForumWritePage({
       </div>
     );
   }
+
+  if (isEditMode && !editReady) return <section style={styles.container}>
+    <p role="alert">{error || '수정할 게시글을 확인하지 못했습니다.'}</p>
+    <button type="button" onClick={() => setEditRetry(n => n + 1)}>게시글 다시 불러오기</button>
+    <Link to={backPath || '/forum'}>목록으로</Link>
+  </section>;
 
   return (
     <div style={styles.container}>
@@ -410,7 +422,7 @@ export function ForumWritePage({
           theme="blue"
           onCancel={handleCancel}
           onSubmit={isEditMode ? handleUpdateSubmit : handleCreateSubmit}
-          onInvalid={() => setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)')}
+          onInvalid={() => setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`)}
           renderContentMeta={({ textLength }) => (
             <div style={styles.charCount}>
               {textLength}자

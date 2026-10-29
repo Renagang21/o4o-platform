@@ -9,6 +9,7 @@
  */
 
 import type { GlobalHeaderNavItem } from '@o4o/ui';
+import { BUSINESS_SITE } from './businessSite';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 로그인 상태와 무관하게 항상 노출. About은 마지막에 위치.
@@ -20,7 +21,13 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
  */
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
-export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
+export const KPA_BASE_NAV: GlobalHeaderNavItem[] = BUSINESS_SITE.key === 'carepharm' ? [
+  { label: '협업체 소개', href: '/#about' },
+  { label: '공지·안내', href: '/#news' },
+  { label: '회원 커뮤니티', href: '/communities/business%3Acarepharm/forum' },
+  { label: '자료실', href: '/materials' },
+  { label: '참여 안내', href: '/my/participation' },
+] : [
   { label: '사업 소식', href: '/#business-news' },
   { label: '운영 자료', href: '/materials' },
   { label: '제품 정보', href: '/#business-products' },

@@ -37,7 +37,7 @@ function BoardSetting({ communityKey, board, posts, api, publicOrigin }: { commu
       <p className="mt-3 text-sm text-amber-800">현재 및 앞으로 게시되는 이 게시판의 글 본문을 로그인 없이 볼 수 있습니다. 회원 정보와 댓글은 공개되지 않습니다.</p> : mode === 'selected' && <div className="mt-3">
         <p className="mb-2 text-sm text-slate-600">게시된 글만 선택하세요. 선택한 글의 제목과 본문이 공개됩니다(최대 100개).</p>
         <ul className="max-h-72 space-y-2 overflow-y-auto">{posts.map(post => <li key={post.id}><label className="flex items-start gap-2 text-sm">
-          <input type="checkbox" className="mt-1 shrink-0" checked={ids.includes(post.id)} onChange={e => setIds(old => e.target.checked ? [...old, post.id] : old.filter(id => id !== post.id))} />{post.title}
+          <input type="checkbox" className="mt-1 shrink-0" checked={ids.includes(post.id)} onChange={e => { setIds(old => e.target.checked ? [...old, post.id] : old.filter(id => id !== post.id)); setMessage(''); }} />{post.title}
         </label></li>)}</ul>
         {!posts.length && <p className="text-sm text-slate-500">선택할 게시글이 없습니다.</p>}
         {unlistedIds.length > 0 && <div className="mt-3 rounded border bg-slate-50 p-3">

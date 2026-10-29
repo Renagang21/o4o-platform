@@ -15,13 +15,14 @@
 import { setMeta, setCanonical } from '@o4o/shared-space-ui';
 import type { PageSeoConfig, SeoRegistry } from '@o4o/shared-space-ui';
 import { PHARMACY_DISPLAY_NAME, PHARMACY_ORIGIN } from './brand';
+import { BUSINESS_SITE } from './businessSite';
 
 /**
  * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1:
  * 표시 이름 = O4O 약국, 대표 주소 = pharmacy.neture.co.kr (index.html 정적 title · description 과 같은 값).
  */
-export const PHARMACY_HOME_TITLE = `${PHARMACY_DISPLAY_NAME} — 약국의 정보와 업무를 하나로 연결합니다`;
-export const PHARMACY_HOME_DESCRIPTION = '제품 정보와 콘텐츠를 활용하고, 매장 운영과 고객 서비스를 더 편리하게 시작하세요.';
+export const PHARMACY_HOME_TITLE = BUSINESS_SITE.key === 'carepharm' ? 'CarePharm — 만성질환관리 약국 협업체' : `${PHARMACY_DISPLAY_NAME} — 약국의 정보와 업무를 하나로 연결합니다`;
+export const PHARMACY_HOME_DESCRIPTION = BUSINESS_SITE.key === 'carepharm' ? '만성질환 관리 자료와 현장 경험을 함께 나누고 내 약국에서 활용합니다.' : '제품 정보와 콘텐츠를 활용하고, 매장 운영과 고객 서비스를 더 편리하게 시작하세요.';
 
 export const KPA_SEO_DEFAULTS: PageSeoConfig = {
   title: PHARMACY_HOME_TITLE,
@@ -48,8 +49,8 @@ export const kpaSeoRegistry: SeoRegistry = {
   },
   // WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7: 옛 KPA 공개 화면(/forum · /resources · /content · /guide · /about)은 삭제했다.
   '/contact': {
-    title: '협업과 연결 — O4O 약국',
-    description: 'O4O 약국 협업 안내.',
+    title: `협업과 연결 — ${PHARMACY_DISPLAY_NAME}`,
+    description: `${PHARMACY_DISPLAY_NAME} 협업 안내.`,
     ogType: 'website',
   },
 };

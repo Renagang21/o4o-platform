@@ -68,3 +68,9 @@ describe('explicit public read screens', () => {
     await screen.findByText('선택한 공개 범위를 저장했습니다.');
   });
 });
+it('저장 후 공개 글 선택을 바꾸면 이전 저장 완료 안내를 지운다', async () => {
+ mocks.get.mockResolvedValue({data:{data:{boards:[{id:'board',name:'샘플 게시판',forumType:'open',publicRead:{mode:'selected',postIds:[post.id]}}],posts:[{...post,forumId:'board'}]}}});mocks.put.mockResolvedValue({});
+ render(<MemoryRouter><Manager communityKey="fixture"/></MemoryRouter>);fireEvent.click(screen.getByText('운영자 · 비로그인 공개 설정'));
+ const checkbox=await screen.findByRole('checkbox',{name:post.title});fireEvent.click(screen.getByRole('button',{name:'공개 설정 저장'}));await screen.findByText('선택한 공개 범위를 저장했습니다.');fireEvent.click(checkbox);
+ expect(screen.queryByText('선택한 공개 범위를 저장했습니다.')).toBeNull();expect(mocks.put).toHaveBeenCalledOnce();
+});
