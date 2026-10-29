@@ -509,10 +509,10 @@ integration(
       expect(await query('SELECT id FROM central_operation_menu_grants WHERE id=$1',[grant.id])).toHaveLength(1);
       expect(await query('SELECT message FROM notifications WHERE "userId"=$1 AND message=$2',[other,grant.id])).toHaveLength(1);
     });
-    it('keeps unknown audit fields subject to review instead of classifying them as menu evidence',async()=>{
+    it.each([{unexpected:{contact:'synthetic@example.invalid'}},{scope:{contact:'synthetic@example.invalid'}}])('keeps unknown audit payload %j subject to review instead of classifying it as menu evidence',async extra=>{
       await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
       await service.accept(token(),target);
-      const payload={targetUserId:target,role:'lecture:operator',menuKeys:['lecture.instructors'],unexpected:{contact:'synthetic@example.invalid'}};
+      const payload={targetUserId:target,role:'lecture:operator',menuKeys:['lecture.instructors'],...extra};
       const [log]=await query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('lecture',$1,'operator.central_menu_grants_changed','manual','success',$2::jsonb) RETURNING id`,[admin,JSON.stringify(payload)]);
       await query("INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','suspended')",[target]);
       await query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='lecture'",[target]);

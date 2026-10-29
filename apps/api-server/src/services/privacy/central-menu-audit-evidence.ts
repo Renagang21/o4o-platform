@@ -6,6 +6,7 @@ export const CENTRAL_MENU_AUDIT_SQL = `r.source='manual' AND r.status='success'
     OR (r.action_key='admin.service_operator_assigned' AND r.meta->>'scope'='o4o-direct'))
   AND jsonb_typeof(r.meta)='object'
   AND r.meta - ARRAY['scope','targetUserId','role','menuKeys','reason','actorKey','subjectKey'] = '{}'::jsonb
+  AND (NOT (r.meta ? 'scope') OR r.meta->>'scope'='o4o-direct')
   AND (NOT (r.meta ? 'reason') OR jsonb_typeof(r.meta->'reason')='string')
   AND (NOT (r.meta ? 'actorKey') OR (jsonb_typeof(r.meta->'actorKey')='string' AND r.meta->>'actorKey' ~ '^[0-9a-f]{64}$'))
   AND (NOT (r.meta ? 'subjectKey') OR (jsonb_typeof(r.meta->'subjectKey')='string' AND r.meta->>'subjectKey' ~ '^[0-9a-f]{64}$'))

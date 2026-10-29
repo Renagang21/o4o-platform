@@ -90,3 +90,5 @@
 - 관리자 전체 회귀를 실행하여 50개 파일 554건 PASS를 확인했다. 중앙 진입이 추가된 메뉴/route 계약, Operator 기본 표시 및 초대의 메뉴 범위를 현재 정책으로 검증했다. App의 layout/404 catch-all은 퇴역 화면의 실제 존재 근거로 계산하지 않는다.
 - 브라우저 검증을 PC/mobile의 전체 72개 업무 링크 노출까지 확장하여 합성 시나리오 10건 PASS. 실제 Google 로그인을 대신하지 않는다.
 - Sonar 진단은 CI에서 공개 API를 읽고 코드 지적 필드만 artifact에 남긴다. 인증키를 추가하지 않고 author/contact를 제외하며 기존 Quality Gate나 문제 상태를 변경하지 않는다. 조회 실패는 unavailable로 기록한다. 운영 환경 변경과 무관하다.
+
+- 수동 삭제 코드 검토에서 형식 검증 대상 `scope`에 임의 객체가 들어갈 수 있는 경우를 발견했다. 알려진 `o4o-direct` 값 또는 필드 부재만 허용하여, 자유 형식 scope 안의 식별정보는 자동 최소화 대상에서 제외하고 기존 review_required로 남긴다. 회귀를 추가한 초대/삭제 PostgreSQL 53건 PASS.
