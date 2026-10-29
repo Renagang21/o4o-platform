@@ -4,7 +4,7 @@
 > 범위: Main의 요청/실행·약국 업무 데이터·사용자 도움/경험 연결. 종료: 검증·PR·리뷰 완료, main 병합 전.
 > 사용자 결정: 이번 대화의 다섯 기본 원칙과 후속 정정(누적 업무 데이터·최소 질문·사용 중 발전·사용자 자유)을 우선한다.
 > 시작 main: `307e86ffe7b5901f27b375e1cbcebf3003cf15bb`
-> 병합 준비 기준 main: `75f798ef24` (PR #884 관리자 역할 변경을 작업 branch에 충돌 없이 반영. 자동화 변경 파일과 겹침 없음)
+> 병합 준비 기준 main: `13a199c1cd` (최신 main을 작업 branch에 충돌 없이 반영. 자동화 구현 파일과 겹침 없음)
 
 ## 1. 목적과 재사용
 
@@ -66,3 +66,11 @@
 - [x] desktop/mobile 브라우저: 자료 준비→보관 선택→다른 접점 조회/초안→수정/재개 흐름. synthetic와 실제 PC·실사이트 증거 구분.
 - [ ] 영향 있는 타입·lint·build·native Windows·계약 회귀, 문서 민감정보/링크 점검. 계정/기기·실제 약국 파일이 없어 실행하지 못한 검증은 NOT_RUN.
 - [ ] commit/push·기존 PR 1개·인계 HEAD CI Gate PASS·Codex 리뷰/finding 보완. merge·auto-merge·배포·운영 DB 적용은 하지 않는다.
+
+
+## 8. Sonar 중복 제거 보완
+
+- [x] 환경 허용 목록 적용 확인. 직접 API의 CloudFront 403과 환경 차단을 구분하고 GitHub 공식 검사 결과를 확인한다.
+- [x] 4.4% 중복의 주요 원인인 두 PostgreSQL fixture의 수명주기를 공통 도구로 모은다. 고정 DB/포트, 기존 DB 거부, 소유권 marker, interrupt·cleanup·schema 검증은 유지한다.
+- [x] Main 15건, URL 범위 거부 2건, 실제 기존 DB 보존·정리 검증. 공급자/매장 consumer는 변경 전후 동일한 12 PASS/10 자격 fixture 실패로 분리하며 업무 규칙을 바꾸지 않는다.
+- [ ] 같은 PR의 새 HEAD에서 Sonar·CI Gate·Codex 리뷰를 확인한다. 최종 외부 상태는 PR의 인계 증거로 기록한다.

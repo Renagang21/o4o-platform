@@ -55,11 +55,19 @@
 
 **기존 main의 격차 — 이번 변경으로 해결했다고 보고하지 않음:** 격리 PostgreSQL에서 이번 migration 이전/이후의 writer gap을 비교하면 기존 13개이며 이번 추가는 0개다. `ai_usage_reservations`, `external_ai_settings/connections/clients/credentials/requests/errors`, `personal_mail_accounts/oauth_flows/messages/rules/jobs/job_items`가 해당한다. 운영 DB 상태를 조회한 결과가 아니다. 이 상태에서는 기존 공개 계정 삭제의 준비 판정이 false로 유지된다. 격리 테스트는 이 fail-closed 판정을 확인한 뒤 새 도메인의 scan/purge/FK만 분리해 검증했다. 전체 계정 삭제 완료 PASS로 승격하지 않았고, 기존 테이블의 보존 정책·writer fence를 임의 변경하지 않았다.
 
+## Sonar 중복 제거 보완
+
+- 기존 코드 HEAD `f115d26969`의 공식 Sonar 보고는 새 코드 중복률 4.4%(기준 3%)였다. 환경 허용 목록은 적용됐으며 직접 API는 외부 CloudFront 403을 반환한다. 환경 설정 추가 적용 대기로 안내하던 내용은 대체한다.
+- 문자열 차이를 무시한 로컬 비교로 Main/공급자–매장 PostgreSQL fixture의 중복 생성·bootstrap·child·정리 코드를 확인했다. `disposable-postgres-fixture.ts`로 모으고 두 실행 진입점은 기존 고정 profile을 사용한다. 분석 제외·threshold·CI gate를 변경하지 않았다.
+- Main 실제 PostgreSQL 15 PASS, URL/port/database guard 2 PASS. 이미 있는 DB의 소유 marker와 DB가 유지되는 거부 경로도 실제 실행했고, 테스트 sentinel은 소유권 확인 후 삭제해 잔존 0개를 확인했다.
+- 공급자–매장 consumer: 변경 전 원본 wrapper와 변경 후 모두 12 PASS/10 FAIL이다. 동일한 10개 사례가 공통 약사 자격 fixture 누락(`PHARMACIST_QUALIFICATION_REQUIRED`)으로 실패하며 두 실행 모두 DB 정리는 PASS다. 공통화로 새로 생긴 실패가 아니며 자격 guard/공급자 업무 코드를 완화하지 않았다. 이 consumer 전체를 PASS로 기록하지 않는다.
+- 공통 도구의 두 고정 URL·포트(55439/55432), 사용자/비밀번호 존재 검사, query/hash 거부, 기존 DB 거부, 무작위 소유 marker, 강제 연결 종료 없는 정리, 모든 schema prefix·최종 fingerprint 검사와 Main 추가 down/up·writer fence 검증은 유지한다.
+
 ## Shared Module Change Verification
 
 ### Changed shared module
 
-- Module: 순수 약국 자료 계약, PC 명령/capability, Assistant ExecutionIntent의 선택적 추천.
+- Module: 순수 약국 자료 계약, PC 명령/capability, Assistant ExecutionIntent의 선택적 추천, 격리 PostgreSQL 테스트 수명주기 도구.
 - Package: 새 공통 Core/package 없음. 기존 Node/Main/API 경계에서 재사용.
 - Direct consumers: `tools/o4o-local-agent`, `web-neture`, `api-server`.
 - Indirect consumers: Main Assistant를 쓰는 기존 화면·기존 계정 삭제의 새 도메인 owner 목록. 선택 필드는 종전 실행·완료/권한 계약을 바꾸지 않는다.
@@ -73,6 +81,8 @@
 | API Assistant / 새 업무 사본의 삭제 경계 | 직접 | 서버 업무/집계·권한·공개 방법 추천·일시 명령 | PG fixture·unit·기존 runtime 회귀 | fixture/unit PASS / 확장 회귀 보완 PASS |
 | KPA/K-Cosmetics 등의 매장 menu/layout | 해당 없음 | 공통 메뉴·역할 map·가시성 정책 변경 없음 | 소비처/route 검색 | 이번 UI 범위 밖 |
 | 병원약국 surface | 간접 | 기존 분기가 새 Main 콘텐츠 분기보다 우선 | unified-request HTTP 회귀 | PASS |
+| Main PG fixture | 직접 | 공통 수명주기 + 기존 추가 schema 검증 | 실제 PG/guard/기존 DB 보존 | 15 PASS + guard PASS |
+| 공급자–매장 PG fixture | 직접 | 같은 공통 수명주기, 기존 업무 테스트 경로 유지 | 변경 전후 실제 PG 비교 | 동일 12 PASS/10 기존 자격 fixture FAIL; 정리 PASS |
 | Chrome Extension | 간접 | 새 명령은 Node data handler 전용. DOM/site allowlist 변경 없음 | native bridge/DOM 계약 회귀 | PASS |
 
 ### Route / role / capability check
@@ -93,4 +103,4 @@
 
 Evolution §25의 오래된 census 표를 당시 조사 링크와 현재 원칙으로 교체했다. Personal Assistant·Memory placement·약국 자료 설계·SETUP의 관련 안내를 이번 개발 계약과 맞췄다. 과거 WO/CHECK의 당시 실행 증거는 다시 쓰지 않았다. 적용된 운영 정책·배포 상태로 오인하지 않게 TODO/branch 구현·미검증 범위를 구분한다.
 
-PR [#883](https://github.com/Renagang21/o4o-platform/pull/883)의 인계 HEAD·CI Gate·Codex review를 최종 상태로 확인한다. main `75f798ef24`까지 작업 branch에 정렬했고 자동화 파일의 겹침은 없다. Sonar 보안 등급 실패는 해소됐지만 앞선 HEAD의 중복률 5.2%는 미통과이며, 상세 조회는 환경 네트워크 허용이 필요하다. 최종 외부 검사 결과는 PR에 기록한다. merge·auto-merge·배포·운영 DB 적용은 수행하지 않는다.
+PR [#883](https://github.com/Renagang21/o4o-platform/pull/883)의 인계 HEAD·CI Gate·Codex review를 최종 상태로 확인한다. main `13a199c1cd`까지 작업 branch에 정렬했고 자동화 파일의 겹침은 없다. 환경의 Sonar 허용 목록은 적용됐고 보안 등급 실패는 해소됐다. 4.4% 중복의 검증 도구 공통화 후 새 HEAD의 공식 Sonar 결과를 확인한다. 최종 외부 검사 결과는 PR에 기록한다. merge·auto-merge·배포·운영 DB 적용은 수행하지 않는다.

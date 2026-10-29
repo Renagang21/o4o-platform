@@ -412,12 +412,15 @@ finally 실행을 보장할 수 없으므로 중단 시 소유권과 잔여 DB�
 ```bash
 pnpm run build:api-deps
 pnpm exec tsx scripts/dev/run-main-automation-fixture.ts
+pnpm exec tsx --test scripts/dev/disposable-postgres-fixture.test.ts
 node --test tools/o4o-local-agent/test/*.test.mjs
 pnpm exec vitest run --config services/web-neture/vitest.config.mjs services/web-neture/src/components/home/__tests__/PharmacyOrderPanel.test.tsx
 node scripts/checks/main-automation.browser.mjs
 ```
 
 fixture는 자체 생성 DB의 소유권 marker를 확인하고 baseline·전체 incremental prefix·새 migration의 empty down/up·업무 자료/허가/기기 재개 HTTP 계약을 검증한 뒤 DB를 삭제합니다. `Fixture tests PASS`와 `Fixture cleanup PASS: database count 0`을 모두 확인합니다. browser script는 실제 Chromium(기본 `/usr/bin/chromium`, 다른 경로는 `O4O_BROWSER_EXECUTABLE`)에서 Main의 PC·모바일 화면을 합성 API로 검증하며 외부 계정·주문 사이트·실제 PC를 사용하지 않습니다. 이 결과는 실계정·실제 모델/Windows 사용자 PC 검증을 대체하지 않습니다.
+
+두 PostgreSQL fixture 진입점은 `scripts/dev/disposable-postgres-fixture.ts`의 수명주기를 재사용합니다. 각 고정 URL 변수·포트·DB명과 Main의 추가 writer fence/empty down-up 검증은 유지합니다. 공통 도구의 URL·포트·DB명 혼용 거부 검사는 위 `tsx --test` 명령으로 확인합니다.
 
 ### Git 절차
 
