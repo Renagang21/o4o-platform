@@ -272,18 +272,20 @@ test('v8 migration preserves legacy and user lanes; malformed legacy rolls back 
  const {DatabaseSync}=await import('node:sqlite');
  const {MIGRATIONS}=await import('../src/local-db.mjs');
  const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
- for(const malformed of [false,true]){
+ for(const scenario of ['valid','malformed','cross-lane','dangling']){
+  const malformed=['malformed','dangling'].includes(scenario);
   closeLocalDb();fs.rmSync(path.join(home,'local.db'),{force:true});
   const raw=new DatabaseSync(path.join(home,'local.db'));
   for(const migration of MIGRATIONS.filter(m=>m.version<=8)){
     migration.up(raw);raw.prepare('INSERT INTO local_schema_migrations(version,name,applied_at) VALUES(?,?,?)').run(migration.version,migration.name,stamp);
   }
-  const dataset=pharmacyDataset(owner),legacy={revision:7,imported:sample().records,user:malformed?[{kind:'supplier',data:{}}]:[{kind:'supplier',data:{...sample().records[2].data,name:'이전 교정'}}]};
+  const dataset=pharmacyDataset(owner),legacy={revision:7,imported:sample().records,user:scenario==='malformed'?[{kind:'supplier',data:{}}]:[{kind:'supplier',data:{...sample().records[2].data,name:'이전 교정'}}]};
+  if(scenario==='cross-lane' || scenario==='dangling'){legacy.imported=[sample().records.find(r=>r.kind==='stock')];legacy.user=scenario==='cross-lane'?[{kind:'product',data:sample().records[0].data}]:[];}
   raw.prepare('INSERT INTO local_datasets(name,fields,row_count,created_at,updated_at) VALUES(?,?,1,?,?)').run(dataset,'[]',stamp,stamp);
   raw.prepare('INSERT INTO local_dataset_rows(dataset,row_key,data,imported_at) VALUES(?,?,?,?)').run(dataset,'workspace',JSON.stringify(legacy),stamp);raw.close();
   const result=bootstrapLocalDb({backup:(db,reason)=>createBackup(db,reason)});
   assert.equal(result.ready,!malformed);assert.ok(listBackups().length>0);
-  if(!malformed){assert.equal(readPharmacyWorkspace(owner).revision,7);assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'이전 교정');}
+  if(!malformed){const workspace=readPharmacyWorkspace(owner);assert.equal(workspace.revision,7);if(scenario==='cross-lane'){assert.equal(workspace.bundle.records.find(r=>r.kind==='stock').data.product_id,'p1');assert.equal(workspace.bundle.records.find(r=>r.kind==='product').data.id,'p1');}else assert.equal(workspace.bundle.records.find(r=>r.kind==='supplier').data.name,'이전 교정');}
   closeLocalDb();const check=new DatabaseSync(path.join(home,'local.db'),{readOnly:true});
   assert.deepEqual(JSON.parse(check.prepare('SELECT data FROM local_dataset_rows WHERE dataset=?').get(dataset).data),legacy);
   assert.equal(check.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v,malformed?8:9);check.close();

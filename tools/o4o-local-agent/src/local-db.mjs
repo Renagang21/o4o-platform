@@ -562,7 +562,7 @@ export const MIGRATIONS = Object.freeze([
         const state = JSON.parse(row.data);
         if (!Number.isSafeInteger(state.revision) || !Array.isArray(state.imported) || !Array.isArray(state.user)) throw Error('PHARMACY_LEGACY_STATE_INVALID');
         if(state.revision<0 || state.user.some(entry=>['purchase','usage','sale','balance'].includes(entry?.kind)))throw Error('PHARMACY_LEGACY_STATE_INVALID');
-        validatePharmacyBundle({format:PHARMACY_FORMAT,records:state.imported},{batch:false});
+        validatePharmacyBundle({format:PHARMACY_FORMAT,records:state.imported},{batch:false,links:false});
         validatePharmacyBundle({format:PHARMACY_FORMAT,records:state.user},{batch:false,links:false});
         const visible=new Map(state.imported.map(entry=>[entry.kind+':'+entry.data.id,entry]));
         for(const entry of state.user)visible.set(entry.kind+':'+entry.data.id,entry);
