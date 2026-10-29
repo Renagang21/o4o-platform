@@ -24,6 +24,9 @@ class User {
 }
 import { randomUUID } from "node:crypto";
 import { centralOperationRoles } from "../central-operation-access.js";
+import express from 'express';
+import request from 'supertest';
+import {centralScopedNetureRequest,centralOperationRequest} from '../../../middleware/central-operation-menu.middleware.js';
 import { consultationProfessionalConfirmed } from "../../../modules/neture-pharmacy/services/consultation-professional.js";
 
 const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
@@ -119,6 +122,41 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       await expect(assertCentralOperationRequest(db,user,'neture',['neture.membership-cleanup'],'google')).resolves.toBeUndefined();
       await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-members'],'google')).rejects.toMatchObject({status:403});
       await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-approval-management'],'google')).rejects.toMatchObject({status:403});
+    });
+    it('never skips a central Neture duty check through a query-selected service',async()=>{
+      await role('neture:operator');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['neture.members'] FROM role_assignments WHERE user_id=$1`,[user]);
+      const handler=jest.fn((_req,res)=>res.json({success:true}));
+      const app=express();
+      app.use((req,_res,next)=>{Object.assign(req,{user:{id:user},authMethod:req.header('x-method')??'google',serviceScope:{isPlatformAdmin:false,serviceKeys:req.header('x-empty-scope')?[]:['neture','kpa-society'],rolePrefixes:['neture','kpa']}});next();});
+      app.use(centralScopedNetureRequest(db));
+      app.post('/api/v1/operator/product-candidates/:id/reject',handler);
+      for(const query of ['serviceKey=lecture','serviceKey=kpa-society','serviceKey=neture','all=true','serviceKey=all','']) {
+        const result=await request(app).post(`/api/v1/operator/product-candidates/fixture/reject?${query}`);
+        expect(result.status).toBe(403);
+        expect(result.body.code).toBe('CENTRAL_MENU_NOT_DELEGATED');
+      }
+      expect(handler).not.toHaveBeenCalled();
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=lecture').set('x-empty-scope','yes')).status).toBe(403);
+      expect(handler).not.toHaveBeenCalled();
+      await db.query("UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.candidates']");
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=lecture').set('x-method','password')).body.code).toBe('CENTRAL_GOOGLE_REQUIRED');
+      expect(handler).not.toHaveBeenCalled();
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=neture')).status).toBe(200);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+    it('lets supplier governance read the funding precondition without granting approval commands',async()=>{
+      await role('supplier:admin');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['supplier.governance'] FROM role_assignments WHERE user_id=$1`,[user]);
+      const app=express(),read=jest.fn((_req,res)=>res.json({items:[]})),write=jest.fn((_req,res)=>res.sendStatus(200));
+      app.use((req,_res,next)=>{Object.assign(req,{user:{id:user},authMethod:'google'});next();});
+      app.use(centralOperationRequest('supplier',undefined,db));
+      app.get('/api/v1/neture/operator/suppliers/fixture/active-fundings',read);
+      app.post('/api/v1/neture/operator/suppliers/fixture/approve',write);
+      expect((await request(app).get('/api/v1/neture/operator/suppliers/fixture/active-fundings')).status).toBe(200);
+      expect(read).toHaveBeenCalledTimes(1);
+      expect((await request(app).post('/api/v1/neture/operator/suppliers/fixture/approve')).status).toBe(403);
+      expect(write).not.toHaveBeenCalled();
     });
     it('limits menus per assignment, rejects cross-service grants, and detects concurrent edits', async () => {
       await role('lecture:operator');

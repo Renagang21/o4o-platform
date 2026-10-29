@@ -1,4 +1,4 @@
-import { resolveOperatorScope, type ServiceScope } from '../utils/serviceScope.js';
+import type { ServiceScope } from '../utils/serviceScope.js';
 import type { Request, RequestHandler } from 'express';
 import type { CentralOperationService } from '@o4o/types';
 import { AppDataSource } from '../database/connection.js';
@@ -26,6 +26,7 @@ export function centralApiMenus(service: CentralOperationService, req: Pick<Requ
   if (service === 'funding' && /\/neture\/operator\/market-trial(?:\/|$)/.test(path)) return menu('funding');
   if (service === 'supplier') {
     if (/\/neture\/admin\/suppliers(?:\/|$)/.test(path)) return menu('governance');
+    if (req.method === 'GET' && /\/neture\/operator\/suppliers\/[^/]+\/active-fundings$/.test(path)) return ['supplier.suppliers','supplier.governance'];
     if (/\/neture\/operator\/supplier/.test(path)) return menu('suppliers');
   }
   if (service === 'lecture') {
@@ -122,8 +123,9 @@ export function centralScopedNetureRequest(db: Parameters<typeof assertCentralOp
   return (req,res,next) => {
     const scope = (req as Request & {serviceScope?:ServiceScope}).serviceScope;
     if (!scope) { res.status(503).json({success:false,code:'SERVICE_SCOPE_UNAVAILABLE'}); return; }
-    const resolved = resolveOperatorScope(scope,req.query);
-    if (!resolved || (resolved.serviceKeys !== null && !resolved.serviceKeys.includes('neture'))) return next();
+    // Query/data scope cannot remove a current central assignment from authorization,
+    // including ID-based writes. The restriction itself checks DB provenance and
+    // preserves the existing gate for actors without a central Neture assignment.
     return restrict(req,res,next);
   };
 }
