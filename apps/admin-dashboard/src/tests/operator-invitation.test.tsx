@@ -44,16 +44,18 @@ describe('operator invitation admin UI', () => {
     expect(screen.getByText('Latest Accepted Admin')).toBeTruthy();
   });
 
-  it('shows direct Admin and Operator assignments while preserving historical rights', async () => {
+  it('shows only Admin rows for mixed-role users and preserves existing Operator rights', async () => {
     h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
       ? { success: true, users: [
-        { id: 'admin-fixture', name: 'Partner Admin Fixture', roles: ['partner-support:admin'], isActive: true },
+        { id: 'admin-fixture', name: 'Partner Admin Fixture', roles: ['partner-support:admin', 'partner-support:operator', 'community:admin', 'kpa-branch:operator'], isActive: true },
         { id: 'operator-fixture', name: 'Operator Fixture', roles: ['partner-support:operator'], isActive: true },
       ] }
       : { data: [] } }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
-    expect(await screen.findByText('Partner Admin Fixture')).toBeTruthy();
-    expect(await screen.findByText('Operator Fixture')).toBeTruthy();
+    await waitFor(() => expect(screen.getAllByText('Partner Admin Fixture')).toHaveLength(2));
+    expect(screen.queryByText('Operator Fixture')).toBeNull();
+    expect(screen.queryByLabelText('Operator 권한 함께 보기')).toBeNull();
+    expect(screen.queryByText('Operator 권한')).toBeNull();
     expect(h.post).not.toHaveBeenCalled();
   });
 
@@ -98,7 +100,7 @@ describe('operator invitation admin UI', () => {
         'input[name="target-service"][value="community"]',
       )!,
     );
-    expect(screen.getByRole('radio', { name: /community:operator/ })).toBeTruthy();
+    expect(screen.queryByRole('radio', { name: /community:operator/ })).toBeNull();
     fireEvent.click(screen.getByRole('radio', { name: /community:admin/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() =>
@@ -119,14 +121,23 @@ describe('operator invitation admin UI', () => {
       ),
     ).toBe(false);
   });
-  it.each([true, false])('shows Operator consent or preserved rights in the central read-only list (accepted=%s)', async accepted => {
+  it.each([true, false])('does not restore an Operator row after invitation refresh (accepted=%s)', async accepted => {
     h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
-      ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',email:'operator@example.test',roles:['partner-support:operator'],isActive:true}] }
-      : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'service',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
+      ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',roles:['partner-support:operator'],isActive:true}] }
+      : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'platform',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
-    expect((await screen.findByLabelText('Operator 권한 함께 보기') as HTMLInputElement).checked).toBe(true);
-    expect(await screen.findByText(accepted ? '확인 완료' : '기존 권한 유지')).toBeTruthy();
-    expect(screen.queryByText('대상 아님')).toBeNull();
+    await screen.findByRole('button', {name:'목록 새로고침'});
+    fireEvent.click(screen.getByRole('button', {name:'Refresh'}));
+    await waitFor(() => expect(h.get.mock.calls.filter(([path]) => path === '/admin/users').length).toBeGreaterThan(1));
+    expect(screen.queryByText('Synthetic Operator')).toBeNull();
+    expect(h.post).not.toHaveBeenCalled();
+  });
+  it('keeps historical direct Operator invitations cancellable but disables resend', async () => {
+    h.get.mockResolvedValue({data:{data:[{id:'legacy-direct',role:'lecture:operator',scope_type:'platform',scope_key:'o4o-direct',status:'pending',expired:false,expires_at:'2099-01-01'}]}});
+    render(<OperatorInvitationsPanel version={0} onLoaded={vi.fn()} />);
+    expect((await screen.findByRole('button',{name:'재발송'}) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button',{name:'초대 취소'}));
+    await waitFor(() => expect(h.post).toHaveBeenCalledWith('/admin/service-operator-invitations/legacy-direct/cancel'));
   });
   it('distinguishes confirmation pending, accepted and expired and offers resend/cancel', async () => {
     const base = {
