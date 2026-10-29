@@ -61,3 +61,10 @@
 ### CI 상시 검증
 
 격리 PostgreSQL 서비스에서 canonical schema의 모든 incremental prefix를 확인한 뒤 초대·메뉴 위임·계정 제거 통합 suite를 실행하는 CI job을 추가했다. `CI Gate`의 필수 upstream으로 연결하여 opt-in DB 테스트가 기본 suite에서 skip되는 것만으로 완료 판정하지 않는다. DB는 runner의 disposable 서비스이며 외부 메일·운영 credential을 사용하지 않는다. 로컬에서 취소된 실행 권한 요청 때문에 미실행한 추가 회귀는 CI 결과로 확인하며 PASS로 미리 기록하지 않는다.
+
+### 현재 작업 상태 (2026-10-29)
+
+- 구현 커밋 `3dd137433a`, 최신 main의 커뮤니티 정비 통합 커밋 `2f5fc0fcd8`. main에서 제거한 공개 community API를 공유 모듈에서 복원하지 않도록 충돌을 해소했다.
+- 후속 보완: 위임 감사기록의 두 당사자를 차례로 제거하는 경우, 미분류 감사 payload 보호, 이메일만 지정한 초대의 메뉴 설정 정리, 잘못된 메뉴 설정 대상 UUID 입력 검증. 추가 PostgreSQL 회귀는 실행 권한 요청 취소로 미완료이며 이전 49건 PASS와 구분한다.
+- 현재 관리자 UI 34건 PASS, API/Admin typecheck PASS, frozen lockfile의 offline 검증 PASS. 해당 검증에 실패했다고 적힌 로컬 기록 중 `spawnSync git EPERM`은 샌드박스 실행 제한이며 코드 PASS로 바꾸어 기록하지 않는다.
+- GitHub push/PR 게시 시도는 네트워크 차단으로 실패했고 추가 네트워크 권한도 허용되지 않았다. 원격 CI·리뷰·main 병합·운영 migration·배포는 아직 수행하지 않았다. 기능 대조표 전체의 최종 판정도 남아 있으므로 병합 준비 완료라고 하지 않는다.

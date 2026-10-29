@@ -522,6 +522,26 @@ integration(
       expect(result.reviewCodes).toContain('REVIEW:public.action_logs');
       expect((await query('SELECT meta FROM action_logs WHERE id=$1',[log.id]))[0].meta).toEqual(payload);
     });
+    it('supports inviter and recipient erasure in sequence without losing the retained audit event',async()=>{
+      await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[target]);
+      await service.create({targetUserId:other,serviceKey:'lecture',role:'lecture:operator',actorId:target,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      await service.accept(token(),other);
+      const [before]=await query("SELECT id,created_at FROM action_logs WHERE user_id=$1 AND action_key='admin.service_operator_assigned'",[target]);
+      await query('UPDATE role_assignments SET is_active=false WHERE user_id=$1',[target]);
+      await query("INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','suspended'),($2,'neture','suspended')",[target,other]);
+      const erasure=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'synthetic-system',personalBuckets:[]});
+      expect(await erasure.request(target,admin)).toMatchObject({state:'completed',erased:true});
+      expect(await query('SELECT id FROM central_operation_menu_grants')).toHaveLength(1);
+      await query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='lecture'",[other]);
+      expect(await erasure.request(other,admin)).toMatchObject({state:'completed',erased:true});
+      const [after]=await query('SELECT created_at,user_id,meta FROM action_logs WHERE id=$1',[before.id]);
+      expect(after.created_at).toEqual(before.created_at);
+      expect(after.user_id).toBeNull();
+      expect(after.meta.actorKey).toBe(createHash('sha256').update(target).digest('hex'));
+      expect(after.meta.subjectKey).toBe(createHash('sha256').update(other).digest('hex'));
+      expect(after.meta).not.toHaveProperty('targetUserId');
+      expect(await query('SELECT id FROM central_operation_menu_grants')).toHaveLength(0);
+    });
     it('erasure also removes an email-only invitation created before signup', async () => {
       await service.create({
         email: 'new@fixture.invalid',

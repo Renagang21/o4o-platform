@@ -19,7 +19,7 @@ adminServiceOperatorInvitationsRouter.use(authenticate, requireRole(['platform:s
 const menus = new CentralOperationMenuGrantService(AppDataSource);
 adminServiceOperatorInvitationsRouter.get('/menu-grants', async (req: AuthRequest, res) => {
   try {
-    if (typeof req.query.userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(req.query.userId) || typeof req.query.role !== 'string') {
+    if (typeof req.query.userId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.query.userId) || typeof req.query.role !== 'string') {
       res.status(400).json({ success: false, code: 'INVALID_CENTRAL_MENU_INPUT' }); return;
     }
     res.json({ success: true, data: await menus.read(req.user!.id, req.query.userId, req.query.role) });
@@ -28,7 +28,7 @@ adminServiceOperatorInvitationsRouter.get('/menu-grants', async (req: AuthReques
 adminServiceOperatorInvitationsRouter.patch('/menu-grants', async (req: AuthRequest, res) => {
   try {
     const { userId, role, menuKeys, reason, version } = req.body ?? {};
-    if (typeof userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(userId) || typeof role !== 'string' || !(version === null || typeof version === 'string')) {
+    if (typeof userId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId) || typeof role !== 'string' || !(version === null || typeof version === 'string')) {
       res.status(400).json({ success: false, code: 'INVALID_CENTRAL_MENU_INPUT' }); return;
     }
     res.json({ success: true, data: await menus.update(req.user!.id, userId, role, { menuKeys, reason, version }) });
