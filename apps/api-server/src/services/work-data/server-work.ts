@@ -1,3 +1,5 @@
+import type { Block } from '@o4o/types';
+import { parse as parseHtml } from 'node-html-parser';
 import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
 import type { DataSource } from 'typeorm';
 import { z } from 'zod';
@@ -47,10 +49,11 @@ export async function runServerContentWork(db:DataSource,userId:string,text:stri
     return resolved.adapter.save(manager,userId,resolved.id,{destination:draft.destination,title:draft.title,content:draft.content,language:'ko'});
   });}
   await updateAssistantTask(db,{taskId:task.taskId,requestedByUserId:userId,status:'completed',targetKind:'server',taskTypeKey:write?'content_draft':'content_read'});
-  const value=result as {items?:Array<{title?:string;contentType?:string}>;title?:string;content?:string;description?:string};
+  const value=result as {items?:Array<{title?:string;contentType?:string}>;title?:string;content?:string|Block[];description?:string};
+  const body=Array.isArray(value?.content)?(await import('@o4o/forum-core')).blocksToText(value.content):value?.content;
   const output=Array.isArray(value?.items)
     ? value.items.length?value.items.map((item,index)=>`${index+1}. ${item.title??'제목 없는 자료'}${item.contentType?' ('+item.contentType+')':''}`).join('\n'):'해당 조건의 자료를 찾지 못했어요.'
-    : [value?.title,value?.description,value?.content].filter(v=>typeof v==='string').join('\n').slice(0,24000);
+    : [value?.title,value?.description,typeof body==='string'?parseHtml(body).textContent:body].filter(v=>typeof v==='string').join('\n').slice(0,24000);
   return {message:write?'초안을 저장했어요. 해당 업무공간에서 검토해 주세요. 공개·게시는 진행하지 않았어요.':'조회한 자료입니다.\n'+output,taskId:task.taskId};
  }catch(error){await updateAssistantTask(db,{taskId:task.taskId,requestedByUserId:userId,status:'blocked'});throw error;}
 }

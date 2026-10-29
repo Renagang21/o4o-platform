@@ -65,9 +65,9 @@ function ownerOf(row: any): WorkDataOwner { return {key:row.owner_key,userId:row
 function consentOf(row: any) { return row ? { enabled: row.enabled, epoch: row.epoch, owner: row.owner_key, updatedAt: row.updated_at } : { enabled:false,epoch:null,owner:null,updatedAt:null }; }
 export class WorkDataService {
   constructor(readonly db: DataSource) {}
-  async consent(userId: string, owner: WorkDataOwner) {
-    await assertWorkDataOwner(this.db,userId,owner,false);
-    const [row] = await this.db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1',[owner.key]);
+  async consent(userId: string, owner: WorkDataOwner, db: Db = this.db) {
+    await assertWorkDataOwner(db,userId,owner,false);
+    const [row] = await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1',[owner.key]);
     return { ...consentOf(row), owner: owner.key };
   }
   async setConsent(userId: string, owner: WorkDataOwner, enabled: boolean) {
@@ -95,8 +95,7 @@ export class WorkDataService {
   async query(userId: string, owner: WorkDataOwner, options: { kind?: string; after?: string; limit?: number } = {}) {
     return this.db.transaction(async db=>{
     await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
-    await assertWorkDataOwner(this.db,userId,owner,false);
-    const consent = await this.consent(userId,owner);
+    const consent = await this.consent(userId,owner,db);
     if (!consent.enabled) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
     const {kind,after='',limit=200} = options;
     if ((kind !== undefined && !PHARMACY_KINDS.includes(kind as any)) || typeof after !== 'string' || after.length>100 || !Number.isSafeInteger(limit) || limit<1 || limit>500) throw new WorkDataError('WORK_DATA_PAGE_INVALID');
@@ -114,7 +113,7 @@ export class WorkDataService {
   async analysis(userId:string,owner:WorkDataOwner) {
     return this.db.transaction(async db=>{
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
-      const consent=await this.consent(userId,owner);
+      const consent=await this.consent(userId,owner,db);
       if(!consent.enabled)throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
       // Work on normalized copies. Aggregate by unit; never add unlike measures.
       const movement=await db.query(`WITH e AS (SELECT r.kind,r.id,r.entry->'data' AS d FROM assistant_work_data_records r WHERE ${effective})

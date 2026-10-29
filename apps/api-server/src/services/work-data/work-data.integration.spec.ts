@@ -159,6 +159,15 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    finally{await q.rollbackTransaction();await q.release();}
    expect((await db.query('SELECT count(*)::int AS n FROM assistant_work_data_records'))[0].n).toBeGreaterThan(0);
  });
+ it('reads and analyzes concurrently with a single pool connection',async()=>{
+   const limited=new DataSource({type:'postgres',url:raw,extra:{max:1,connectionTimeoutMillis:500}});
+   await limited.initialize();
+   try{
+     const scoped=new WorkDataService(limited);
+     const results=await Promise.all(Array.from({length:8},(_,i)=>i%2?scoped.analysis(ids[0],owner):scoped.query(ids[0],owner,{limit:1})));
+     expect(results).toHaveLength(8);expect(results.every(result=>result.location==='server')).toBe(true);
+   }finally{await limited.destroy();}
+ });
  it('checks membership for organization writes and deletes cloud copies on revoke',async()=>{
    const organization={key:'organization:'+org,userId:null,organizationId:org};
    await expect(service.setConsent(ids[1],organization,true)).rejects.toMatchObject({code:'WORK_DATA_FORBIDDEN'});
