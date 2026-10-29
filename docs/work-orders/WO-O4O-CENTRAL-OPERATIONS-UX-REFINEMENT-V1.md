@@ -80,8 +80,8 @@
 - [x] F1 관련 UI/공통 sidebar/문의 API adapter/백엔드 집계 테스트가 요구 B~E를 실제로 검증한다. 기존 테스트의 요구 변경도 함께 대조한다.
 - [x] F2 필요한 패키지 빌드, 관리자·관련 웹 호스트 타입 검사/빌드, API 타입 검사와 문서 민감정보·diff 범위 검사를 수행한다.
 - [x] F3 합성 데이터로 desktop/mobile 브라우저에서 서비스 접기·약국 2열·선택→상단 작업·문의 부분 실패·알림 읽음·빈값/오류를 확인한다. 새 데이터의 운영 write는 하지 않는다.
-- [ ] F4 셀프 리뷰 후 같은 branch/PR의 CI·Codex 리뷰 지적을 해결한다. 최신 HEAD의 required CI와 미해결 스레드를 확인한다.
-- [ ] F5 이 문서에 검증 명령/결과/잔여 한계를 채우고 commit·push·PR을 인계한다. **main 미병합·미배포**, 작업용 branch/worktree 보존을 보고한다.
+- [x] F4 셀프 리뷰 후 같은 branch/PR의 CI·Codex 리뷰 지적을 해결한다. 최신 HEAD의 required CI와 미해결 스레드를 확인한다.
+- [x] F5 이 문서에 검증 명령/결과/잔여 한계를 채우고 commit·push·PR을 인계한다. **main 미병합·미배포**, 작업용 branch/worktree 보존을 보고한다.
 
 ## 5. 계획 검증 후 확정할 구현 규칙
 
@@ -111,7 +111,7 @@
 | 실행 | 결과 |
 | --- | --- |
 | `pnpm run build:packages` | PASS — 기존 공통 의존성 사전 빌드 |
-| `pnpm --filter @o4o/admin-dashboard exec vitest run --maxWorkers=2` | 55 files / 571 tests PASS |
+| `pnpm --filter @o4o/admin-dashboard exec vitest run --maxWorkers=2` | 55 files / 572 tests PASS |
 | `pnpm exec vitest run --config packages/operator-core-ui/vitest.config.mjs --maxWorkers=2` | 33 files / 223 tests PASS (API adapter 2건 포함) |
 | `pnpm exec vitest run --config services/web-neture/vitest.config.mjs services/web-neture/src/pages/operator/OperatorContactMessagesPage.test.tsx --maxWorkers=2` | 1 file / 7 tests PASS |
 | API Jest: `central-operation-overview.test.ts`, `central-operation-access.routes.test.ts` | 2 suites / 12 tests PASS |
@@ -119,7 +119,7 @@
 | 문서 링크·TODO ID·실제 경로 검사, `git diff --check` | PASS |
 | `node scripts/check-doc-sensitive.mjs docs/work-orders/WO-O4O-CENTRAL-OPERATIONS-UX-REFINEMENT-V1.md` | PASS — 새 문서 1건 |
 
-검증 수는 중복 재실행을 합산하지 않는다. 로컬 813건은 위 서로 다른 네 테스트 범위의 합계다. CI 결과는 최신 PR HEAD에서 별도로 확인한다.
+검증 수는 중복 재실행을 합산하지 않는다. 로컬 814건은 위 서로 다른 네 테스트 범위의 합계다. CI 결과는 최신 PR HEAD에서 별도로 확인한다.
 
 브라우저: Chromium의 합성 fixture로 desktop 1440, tablet 768, mobile 390 폭을 확인했다. 서비스 제목 접기·모바일 ESC·약국 전체 폭/2열 그룹·공급자 아래 배치·선택 작업 표시·선택 모아보기 종료·알림 읽음과 벨 동기화·선택 문의만 patch·메모 보존·브라우저 오류 없음 PASS. mobile은 대기/알림/문의 표가 컨테이너 폭 안에 들어오는 것도 재검증했다. desktop/mobile에 문의 부분 실패를 주입하여 성공 ID를 재전송하지 않고 실패 ID만 재시도함을 확인했고, 집계 요청 실패 시 0건 summary를 만들지 않음을 확인했다.
 
@@ -130,3 +130,15 @@
 선행 문서 검사: 상대 링크 대상 존재, TODO ID 중복 없음, 핵심 구현/기존 API 경로 존재 확인. A5는 이 계획 대조의 완료이며 B~F 구현 완료와 구분한다.
 
 공통 선택 컬럼 소비처 대조: TS AST로 `_select` 명시 컬럼 11개를 확인했으며 render 없는 선언은 0개였다. 기본 자동 생성/커스텀 단일 생성 테스트와 공통 운영 UI 223건을 함께 통과했다.
+
+
+PR 추적: [#886](https://github.com/Renagang21/o4o-platform/pull/886), 작업 branch `wo/operations-list-notifications`. 최신 main `f2e8b678a8`의 별도 상담 화면 변경은 경로가 겹치지 않음을 확인하고 작업 branch에 동기화했다. main 자체의 병합·배포는 하지 않았다.
+
+리뷰 보완: 알림을 열어 업무 화면으로 이동한 뒤 홈 패널이 unmount되더라도 읽음 저장 성공 이벤트를 남아 있는 header 벨에 전달하도록 수정했다(`870323878f`). 패널 unmount 후 지연 응답을 완료하는 회귀 테스트를 추가했고 알림 7건·관리자 전체 572건·관리자 타입 검사 PASS. 기존 scope의 응답이 새 scope의 상태/안내를 덮지 않는 보호는 유지한다.
+
+CI 이력: 첫 실행 `40879006309`에서 관리자/관련 웹 빌드·PostgreSQL 통합·API Jest 3개 shard는 통과했으나, 작업 외 기존 `auth-react/socialAuth.test.tsx`의 비동기 fixture 초기화 테스트가 실패했다. 동일 기존 파일은 로컬 별도 실행 8건 PASS였으며 범위 밖 코드를 수정하지 않았다. 최종 required CI와 Codex 재리뷰는 PR의 최신 HEAD로 확인하며, 이전 HEAD의 성공을 최종 gate로 대체하지 않는다.
+
+
+최종 코드 검증: `870323878f24130a93212d4b9afe244eed901bdf`에서 [CI Pipeline 40881654950](https://github.com/Renagang21/o4o-platform/actions/runs/40881654950)의 **CI Gate PASS**. API Jest 3개 shard·Code Quality·관리자/관련 웹 빌드·PostgreSQL 통합·문서 guard가 모두 통과했고 CodeQL·Guard Static Analysis·SonarCloud도 PASS. Codex 재리뷰는 같은 HEAD에서 추가 지적 없이 완료됐으며 기존 지적 스레드는 해결했다. F4/F5는 이 코드 검증 및 인계 기록 기준으로 닫았으며, 본 문서 정리 commit 이후의 실제 인계 HEAD도 PR #886에서 required CI·리뷰·미해결 스레드를 재확인한다. 최종 인계 댓글이 해당 HEAD와 결과를 연결한다.
+
+인계 상태: main 미병합·auto-merge 미설정·미배포. 작업 branch/worktree는 **KEEP** — PR 병합 전 후속 수정을 위해 보존한다. 코드/문서 작업 경로 외 변경은 stage하지 않았다. 문서 정합: 현행 표준 리스트·공통 모듈·역할별 업무공간 정본을 구현/검증과 대조했으며 별도 canonical 정책 변경은 없다.
