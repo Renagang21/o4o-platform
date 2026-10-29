@@ -8,7 +8,7 @@ afterEach(() => { cleanup(); vi.resetAllMocks(); });
 const mode = { key: 'counter-pharmacist', label: '약사', professional: true, entitled: true, allowed: false };
 it('distinguishes confirmed entitlement from combined qualification and store checks without guessing the missing condition', () => {
   const reload = vi.fn(); render(<ConsultationAccessNotice mode={mode} onReload={reload} />);
-  expect(screen.getByText(/어느 조건이 부족한지는 이 응답만으로/)).toBeTruthy();
+  expect(screen.getByText(/둘 중 하나라도 확인되지 않으면/)).toBeTruthy();
   expect(screen.getByText(/중앙 담당자의 면허 근거 검토/)).toBeTruthy();
   expect(screen.getByRole('link', { name: '내 매장으로' }).getAttribute('href')).toBe('/store/workspace/use');
   expect(state.post).not.toHaveBeenCalled();
