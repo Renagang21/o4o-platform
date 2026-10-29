@@ -70,17 +70,16 @@ it.each([
 ])("never treats independent/retired %s as a central duty", (role) => {
   expect(() => resolveCentralOperationRole(role, role.split(":")[0])).toThrow();
 });
-it("a legacy platform invitation is not upgraded into new central consent", () => {
+it("central invitations require Admin even with explicit delegation provenance", () => {
   expect(() =>
     resolvePlatformInvitationRole("supplier:operator", "supplier", ""),
   ).toThrow();
+  expect(() =>
+    resolvePlatformInvitationRole("supplier:operator", "supplier", "o4o-direct"),
+  ).toThrow();
   expect(
-    resolvePlatformInvitationRole(
-      "supplier:operator",
-      "supplier",
-      "o4o-direct",
-    ),
-  ).toMatchObject({ role: "supplier:operator", serviceKey: "supplier" });
+    resolvePlatformInvitationRole("supplier:admin", "supplier", "o4o-direct"),
+  ).toMatchObject({ role: "supplier:admin", serviceKey: "supplier" });
 });
 
 it("does not turn an unrelated organization role into a global role", async () => {
