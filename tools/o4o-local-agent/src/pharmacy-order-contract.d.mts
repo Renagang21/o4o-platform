@@ -33,3 +33,8 @@ export function validatePharmacyCommand(mode: 'read'|'write', raw: unknown): {ok
 export function pickPharmacyResult(raw: unknown): Record<string,any>;
 
 export function normalizeOrderSiteUrl(value: unknown): string;
+
+export const PHARMACY_ARCHIVE_BYTES: number;
+export function pharmacyTransferParts(bundle: PharmacyBundle): PharmacyBundle[];
+export function pharmacyExportFile(bundle: PharmacyBundle): unknown;
+export function parsePharmacyFile(text: string): PharmacyBundle;

@@ -320,6 +320,8 @@ test('conflicting local edit is preserved and quarantined rather than automatica
  assert.equal(result.conflicts,1);assert.equal(journal.state(dataset).conflicts,1);
  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='product').data.name,'합성 상품');
  assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+ const agreedPack=journal.pending(dataset).find(r=>r.entry.kind==='pack');
+ journal.apply(dataset,epoch,{accepted:[{lane:agreedPack.lane,kind:'pack',id:agreedPack.entry.data.id,mutationId:agreedPack.mutationId,version:9}],changes:[],cursor:0,more:false});
  const purchase=journal.pending(dataset).find(r=>r.entry.kind==='purchase');
  journal.apply(dataset,epoch,{accepted:[],changes:[{...purchase,entry:{...purchase.entry,data:{...purchase.entry.data,pack_count:3}},version:11}],cursor:11,more:false});
  assert.equal(journal.state(dataset).conflicts,2);
@@ -380,4 +382,29 @@ test('different IDs for one program code quarantine the remote batch without poi
  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...sample().records[2].data,name:'후속 교정'}}]},readPharmacyWorkspace(owner).revision,'user');
  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'후속 교정');
  journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
+});
+
+test('pack measure conflicts hold dependent server purchases across repeated batches',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const pack=sample().records.find(r=>r.kind==='pack');pack.data.units_per_pack=100;
+ const purchase=sample().records.find(r=>r.kind==='purchase');purchase.data.id='server-purchase';purchase.origin.source_key='server-purchase';
+ const remotePurchase={lane:'imported',entry:purchase,version:11,mutationId:crypto.randomUUID()};
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[remotePurchase,{lane:'imported',entry:pack,version:10,mutationId:crypto.randomUUID()}],cursor:11,more:false});
+ assert.ok(result.conflicts>0);assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='server-purchase'),false);
+ journal.apply(dataset,epoch,{accepted:[],changes:[{...remotePurchase,version:12}],cursor:12,more:false});assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(journal.state(dataset).cursor,0);
+});
+
+test('PC CLI accumulated export restores more than 10,000 source rows under another owner',async()=>{
+ const records=Array.from({length:10001},(_,i)=>entry('supplier',{id:'supplier'+i,name:'합성 거래처 '+i,enabled:true,payment_timing:'unknown',payment_required:null}));
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:records.slice(0,10000)},0);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:records.slice(10000)},1);
+ const file=path.join(home,'large-export.json'),target='organization:fixture-restore';const output=[];
+ assert.equal(await runDataCommand(['pharmacy','export','--owner',owner,'--out',file],m=>output.push(m)),0);
+ assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',file,'--revision','0'],m=>output.push(m)),0);
+ assert.equal(pharmacySummary(target).counts.supplier,10001);assert.equal(readPharmacyWorkspace(target).bundle.records.length,10001);
+ const malformed=path.join(home,'malformed.json');fs.writeFileSync(malformed,'DO_NOT_PRINT_FIXTURE_BODY');
+ assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',malformed,'--revision','11'],m=>output.push(m)),2);
+ assert.equal(output.join('').includes('DO_NOT'),false);assert.equal(output.join('').includes('합성 거래처'),false);
 });
