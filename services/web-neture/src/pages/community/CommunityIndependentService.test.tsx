@@ -1,12 +1,10 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-const state = vi.hoisted(() => ({ user: { id: 'member' } as {id:string}|null, get: vi.fn(), post: vi.fn(), reload: vi.fn() }));
+const state = vi.hoisted(() => ({ user: { id: 'member' } as {id:string}|null, get: vi.fn(), post: vi.fn() }));
 vi.mock('../../contexts', () => ({ useAuth: () => ({ user: state.user, isAuthenticated: !!state.user }) }));
 vi.mock('../../lib/apiClient', () => ({ api: { get: state.get, post: state.post } }));
 vi.mock('@o4o/shared-space-ui', () => ({
- useServiceEnrollmentPolicies: () => ({ ready: true, references: [], reload: state.reload }),
- ServiceEnrollmentPolicyAgreement: () => <p>서비스 약관 확인</p>,
  ServiceHomeHero: () => null, ServiceHomePromotion: () => null,
  cooperationDestination: () => ({ origin: 'https://pharmacy.neture.co.kr', returnPath: '/businesses/x/forum', serviceKey: 'kpa-society' }),
 }));
@@ -25,33 +23,40 @@ let membershipStatus: string|null;
 let canManage: boolean;
 beforeEach(() => {
  vi.clearAllMocks(); state.user = {id:'member'}; membershipStatus = null; canManage = false;
- state.get.mockImplementation(async () => ({data:{data:{communityKey:'community',name:'커뮤니티',kind:'independent',allowed:membershipStatus==='active',canJoin:!membershipStatus,canManage,membershipStatus,communityStatus:'active',reason:null}}}));
- state.post.mockImplementation(async () => { membershipStatus='pending'; return {data:{success:true}}; });
+ state.get.mockImplementation(async () => ({data:{data:{communityKey:'community',name:'커뮤니티',kind:'independent',allowed:!!state.user && !['suspended','withdrawn','inactive'].includes(membershipStatus ?? ''),canJoin:false,canManage,membershipStatus,communityStatus:'active',reason:null}}}));
 });
 afterEach(cleanup);
 describe('independent community participation workspace', () => {
- it('shows one service without the former directory or community creation workflow', async () => {
+ it('lets a common account participate without the retired enrollment workflow', async () => {
   render(<MemoryRouter><Workspace /></MemoryRouter>);
-  await screen.findByRole('button',{name:'가입 신청'});
+  await screen.findByText('서비스 게시판');
   expect(state.get).toHaveBeenCalledWith('/communities/community/access');
+  expect(screen.queryByRole('button',{name:'가입 신청'})).toBeNull();
   expect(screen.queryByText('약사 커뮤니티')).toBeNull();
   expect(screen.queryByText('화장품 커뮤니티')).toBeNull();
-  expect(screen.queryByText('커뮤니티 개설 신청 · 운영')).toBeNull();
+  expect(state.post).not.toHaveBeenCalled();
  });
- it('requests only service membership and reloads pending status', async () => {
+ it.each(['pending','rejected'])('does not block a common account with a historical %s membership', async status => {
+  membershipStatus=status;
   render(<MemoryRouter><Workspace /></MemoryRouter>);
-  fireEvent.click(await screen.findByRole('button',{name:'가입 신청'}));
-  await screen.findByText('가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.');
-  expect(state.post).toHaveBeenCalledWith('/communities/join',{policyReferences:[]});
+  await screen.findByText('서비스 게시판');
   expect(screen.queryByRole('button',{name:'가입 신청'})).toBeNull();
+  expect(state.post).not.toHaveBeenCalled();
  });
- it('allows retry after failed enrollment and refreshes stale policy references', async () => {
-  state.post.mockRejectedValueOnce({response:{data:{code:'ENROLLMENT_POLICY_REQUIRED',error:'서비스 약관을 다시 확인하세요'}}});
+ it('asks guests to log in and never restores the retired join form from a stale flag', async () => {
+  state.user=null;
+  state.get.mockResolvedValue({data:{data:{communityKey:'community',name:'커뮤니티',kind:'independent',allowed:false,canJoin:true,canManage:false,membershipStatus:null}}});
   render(<MemoryRouter><Workspace /></MemoryRouter>);
-  fireEvent.click(await screen.findByRole('button',{name:'가입 신청'}));
-  await screen.findByText('서비스 약관을 다시 확인하세요');
-  expect(state.reload).toHaveBeenCalledTimes(1);
-  await waitFor(()=>expect((screen.getByRole('button',{name:'가입 신청'}) as HTMLButtonElement).disabled).toBe(false));
+  await screen.findByText('공통 계정으로 로그인하면 커뮤니티에 참여할 수 있습니다.');
+  expect(screen.getByRole('link',{name:'로그인'})).toBeTruthy();
+  expect(screen.queryByRole('button',{name:'가입 신청'})).toBeNull();
+  expect(state.post).not.toHaveBeenCalled();
+ });
+ it('does not treat an ineligible account as a pending service approval', async () => {
+  membershipStatus='inactive';
+  render(<MemoryRouter><Workspace /></MemoryRouter>);
+  await screen.findByText('커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주세요.');
+  expect(screen.queryByText('서비스 게시판')).toBeNull();
  });
  it.each(['suspended','withdrawn'])('does not offer re-enrollment for %s', async status => {
   membershipStatus=status;

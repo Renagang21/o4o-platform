@@ -66,7 +66,6 @@ import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10:
 //   운영자 초대 수락(공개). 초대받은 사람은 아직 계정이 없을 수 있으므로 인증 게이트 밖에 둔다.
-import CommunityPage from './pages/CommunityPage';
 // WO-O4O-COMMON-HOME-PHASE1-V1: O4O 전체 대표 진입점 (`/`)
 import O4OHomePage from './pages/O4OHomePage';
 import {
@@ -724,8 +723,6 @@ function App() {
                 WO-O4O-NETURE-UI-REFACTORING-V1
             ================================================================ */}
             <Route element={<NetureLayout />}>
-              {/* WO-O4O-COMMON-HOME-PHASE1-V1: `/` 에 있던 CommunityPage 를 이동.
-                  페이지 자체는 복제하지 않고 같은 컴포넌트를 그대로 사용한다. */}
               {/* 서브도메인 대표 화면 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10 */}
               {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierServiceEntry />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
@@ -755,7 +752,8 @@ function App() {
               <Route path="/communities/:communityKey/forum/request" element={<CommunityWorkspacePage view="request" />} />
               <Route path="/communities/:communityKey/forum/owned" element={<CommunityWorkspacePage view="owned" />} />
               <Route path="/communities/:communityKey/forum/owned/:forumId/members" element={<CommunityWorkspacePage view="members" />} />
-              <Route path="/community" element={<CommunityPage />} />
+              {/* HostBoundary preserves the legacy URL query/hash and performs service handoff. */}
+              <Route path="/community" element={<Navigate to="/communities/community/forum" replace />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
               <Route path="/mypage/mail" element={<PersonalMailPage />} />

@@ -1,12 +1,10 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-const state = vi.hoisted(() => ({ user: { id: 'member' } as {id:string}|null, get: vi.fn(), post: vi.fn(), patch: vi.fn(), reload: vi.fn() }));
+const state = vi.hoisted(() => ({ user: { id: 'member' } as {id:string}|null, get: vi.fn(), post: vi.fn(), patch: vi.fn() }));
 vi.mock('../../contexts', () => ({ useAuth: () => ({ user: state.user, isAuthenticated: !!state.user }) }));
 vi.mock('../../lib/apiClient', () => ({ api: { get: state.get, post: state.post, patch: state.patch } }));
 vi.mock('@o4o/shared-space-ui', () => ({
- useServiceEnrollmentPolicies: () => ({ ready: true, references: [], reload: state.reload }),
- ServiceEnrollmentPolicyAgreement: () => <p>서비스 약관 확인</p>,
  ServiceHomeHero: () => null, ServiceHomePromotion: () => null,
  cooperationDestination: () => ({ origin: 'https://pharmacy.neture.co.kr', returnPath: '/businesses/x/forum', serviceKey: 'kpa-society' }),
 }));

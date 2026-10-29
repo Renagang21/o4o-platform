@@ -55,3 +55,18 @@ it('funding posts always use the exact project API, even with mock mode enabled'
   await fetchForumPosts({ page: 1 });
   expect(get).toHaveBeenCalledWith(`/funding/${id}/forum/posts?page=1`);
 });
+
+it.each([
+  ['/communities/community/forum/posts', '/communities/community/forum/posts'],
+  ['/communities/business%3Acarepharm/forum/posts', '/communities/business%3Acarepharm/forum/posts'],
+  ['/market-trial/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/forum', '/funding/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/forum/posts'],
+])('sends existing server type/pinned filters before pagination for %s', async (pathname, endpoint) => {
+  window.history.replaceState({}, '', pathname);
+  get.mockResolvedValue({ data: { success: true, data: [{ id: 'server-row' }], totalCount: 41 } });
+  const result = await fetchForumPosts({ page: 2, limit: 20, type: 'question', isPinned: false });
+  const url = new URL(get.mock.calls[0][0], 'https://fixture.invalid');
+  expect(url.pathname).toBe(endpoint);
+  expect(Object.fromEntries(url.searchParams)).toEqual({ page: '2', limit: '20', type: 'question', isPinned: 'false' });
+  expect(result.data).toEqual([{ id: 'server-row' }]);
+  expect(result.totalCount).toBe(41);
+});

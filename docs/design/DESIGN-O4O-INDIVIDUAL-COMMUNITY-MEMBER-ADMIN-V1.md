@@ -1,5 +1,8 @@
 # 개별 커뮤니티 admin/operator 및 회원 제재 설계
 
+> **상태**: SUPERSEDED · **대체 문서**: [커뮤니티 현행 구현 안내](../guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md) · **표기일**: 2026-10-28
+> 업종별 카탈로그·개별 커뮤니티 가입/운영 모델은 현행 요구사항이 아니다. 아래 상태·본문·실행 결과는 당시 이력으로 보존하며, 재사용되는 공통 기능은 대체 문서의 판정을 따른다.
+
 > **상태**: IMPLEMENTED · 작업 branch 구현·로컬 검증 · 운영 적용 대기
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 개별 admin/operator·회원 제재 설계 지시 · [후속 TODO](../work-orders/WO-O4O-COMMUNITY-OPERATOR-MEMBER-FOLLOWUP-V1.md)

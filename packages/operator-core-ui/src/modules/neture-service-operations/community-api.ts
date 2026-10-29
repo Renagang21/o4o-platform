@@ -4,7 +4,6 @@
  * WO-O4O-NETURE-COMMUNITY-OPERATOR-MANAGEMENT-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  *
- * Public: getHeroAds, getPageAds, getSponsors
  * Operator: CRUD for ads and sponsors
  */
 
@@ -69,20 +68,6 @@ async function del(path: string): Promise<void> {
   await api.delete(`/neture${path}`);
 }
 
-// ==================== Public API ====================
-
-const communityApi = {
-  async getHeroAds() {
-    return get<{ ads: CommunityAd[] }>('/community/ads?type=hero');
-  },
-  async getPageAds() {
-    return get<{ ads: CommunityAd[] }>('/community/ads?type=page');
-  },
-  async getSponsors() {
-    return get<{ sponsors: CommunitySponsor[] }>('/community/sponsors');
-  },
-};
-
 // ==================== Operator API ====================
 
 const communityManageApi = {
@@ -120,5 +105,5 @@ const communityManageApi = {
   },
 };
 
-return {communityApi,communityManageApi};
+return {communityManageApi};
 }

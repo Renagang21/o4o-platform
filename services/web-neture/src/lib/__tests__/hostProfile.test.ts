@@ -198,3 +198,9 @@ it('keeps only the CarePharm operator entry native without claiming other Neture
   expect(decideHost('carepharm', loc('/operator/members'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/operator/members' });
   expect(decideHost('main', loc('/operator'))).toEqual({ kind: 'stay' });
 });
+
+it.each(['main', 'supplier', 'funding', 'community', 'carepharm'] as const)('retains the legacy community address handoff on %s without the retired home view', profile => {
+  expect(decideHost(profile, loc('/community', '?type=question&page=2', '#posts'))).toEqual({
+    kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum?type=question&page=2#posts',
+  });
+});
