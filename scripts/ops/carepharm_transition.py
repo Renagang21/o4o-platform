@@ -2,6 +2,7 @@
 from copy import deepcopy
 import os
 import json
+import socket
 import re
 import time
 
@@ -11,6 +12,16 @@ NETURE_MATCHER = 'path-matcher-neture'
 NETURE_BACKEND = 'backend-neture-web-http'
 VERIFY_SECONDS = 180
 VERIFY_ATTEMPTS = 36
+
+
+
+def frontdoor_comparison():
+    """Compare public DNS endpoints without logging either address set."""
+    try:
+        addresses = lambda host: {row[4][0] for row in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)}
+        return addresses(HOST) == addresses('pharmacy.neture.co.kr')
+    except OSError:
+        return None
 
 
 def host_matcher(url_map):
@@ -122,7 +133,8 @@ def apply(api, record, original):
                     # No response body, exception text, credentials or redirect URL is recorded.
                     payload = json.dumps({'stage': stage, 'attempt': attempt + 1,
                                           'expected_bundle_sha256': record['asset'],
-                                          'observation': observation}, separators=(',', ':'))
+                                          'observation': observation,
+                                          'same_pharmacy_frontdoor': frontdoor_comparison()}, separators=(',', ':'))
                     print('::notice title=CarePharm verification::' + payload.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
                 if expired:
                     raise

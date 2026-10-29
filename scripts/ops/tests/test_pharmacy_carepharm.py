@@ -24,6 +24,11 @@ def topology():
 
 
 class Routing(unittest.TestCase):
+    def setUp(self):
+        resolver = patch.object(c.socket, 'getaddrinfo', return_value=[(None, None, None, None, ('127.0.0.1', 443))])
+        resolver.start()
+        self.addCleanup(resolver.stop)
+
     def test_cutover_splits_only_carepharm_and_updates_its_test(self):
         source = topology()
         candidate = c.candidate_map(source, NEW, OLD)
@@ -157,3 +162,9 @@ class Routing(unittest.TestCase):
         self.assertEqual(observed['html_status'], 403)
         self.assertNotIn('private-response-text', json.dumps(observed))
         self.assertNotIn('private-body', json.dumps(observed))
+
+    def test_dns_diagnostic_reports_only_comparison_and_handles_failure(self):
+        with patch.object(c.socket, 'getaddrinfo', side_effect=[[(None, None, None, None, ('127.0.0.1', 443))], [(None, None, None, None, ('127.0.0.2', 443))]]):
+            self.assertFalse(c.frontdoor_comparison())
+        with patch.object(c.socket, 'getaddrinfo', side_effect=OSError('resolver failure')):
+            self.assertIsNone(c.frontdoor_comparison())
