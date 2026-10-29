@@ -270,7 +270,7 @@ export default function PcProgramUpdate({
             를 여세요. 목록이 안 보이면 <strong>Ctrl+J</strong>를 누르세요.
           </p>
           <p className="font-medium text-blue-900">
-            저장은 완료됐어요. 설치하려면 받은 파일을 열어야 해요.
+            저장 후 받은 파일을 열어야 설치가 시작돼요.
           </p>
           <p>압축 해제·설치·프로그램 실행은 자동으로 진행돼요.</p>
         </div>
