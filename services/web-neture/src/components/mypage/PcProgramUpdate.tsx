@@ -30,6 +30,24 @@ export default function PcProgramUpdate({
     [downloaded, setDownloaded] = useState(false),
     [waiting, setWaiting] = useState(false),
     [notice, setNotice] = useState("");
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [connectionStage, setConnectionStage] = useState<
+    "waiting" | "ready" | "connecting" | "connected"
+  >("waiting");
+  const [waitingReason, setWaitingReason] = useState<
+    "unknown" | "permission" | "update"
+  >("unknown");
+  const waitStarted = useRef(0);
+  // Time describes observation, never an invented installation percentage.
+  useEffect(() => {
+    if (!waiting) return;
+    const updateElapsed = () =>
+      setElapsed(Math.floor((Date.now() - waitStarted.current) / 1000));
+    updateElapsed();
+    const timer = setInterval(updateElapsed, 1000);
+    return () => clearInterval(timer);
+  }, [waiting]);
   const installationRequest = useRef<AbortController | null>(null);
   const active = useRef(true),
     request = useRef<AbortController | null>(null);
@@ -74,7 +92,17 @@ export default function PcProgramUpdate({
     const publishedRelease = release;
     const connect = onConnectReady;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const deadline = Date.now() + 10 * 60 * 1000;
+    const deadline = waitStarted.current + 10 * 60 * 1000;
+    const timeout = setTimeout(
+      () => {
+        controller.abort();
+        setNotice(
+          "10분 동안 연결을 확인하지 못해 자동 확인을 멈췄어요. 받은 파일과 브라우저 권한을 확인한 뒤 연결 확인을 눌러 주세요.",
+        );
+        setWaiting(false);
+      },
+      Math.max(0, deadline - Date.now()),
+    );
     async function observe() {
       const probe = await probeLocalAgent();
       if (controller.signal.aborted || !active.current) return;
@@ -95,8 +123,11 @@ export default function PcProgramUpdate({
           return;
         }
         if (state === "current") {
+          setConnectionStage("connecting");
+          setNotice("프로그램을 확인했어요. 이 계정에 연결하고 있어요.");
           const connected = await connect(probe.health, controller.signal);
           if (controller.signal.aborted || !active.current) return;
+          setConnectionStage(connected ? "connected" : "ready");
           setNotice(
             connected
               ? "설치와 PC 연결을 확인했어요."
@@ -106,10 +137,19 @@ export default function PcProgramUpdate({
           return;
         }
       }
+      setWaitingReason(
+        probe.ok
+          ? "update"
+          : probe.reason === "PERMISSION_REQUIRED"
+            ? "permission"
+            : "unknown",
+      );
       setNotice(
         !probe.ok && probe.reason === "PERMISSION_REQUIRED"
           ? "브라우저에서 PC 연결 허용을 눌러 주세요."
-          : "프로그램이 켜지면 자동으로 연결해요.",
+          : probe.ok
+            ? "이전 프로그램이 실행 중이에요. 종료한 뒤 받은 설치 파일을 열어 주세요."
+            : "PC 프로그램 실행을 기다리고 있어요.",
       );
       timer = setTimeout(check, 2000);
     }
@@ -124,6 +164,7 @@ export default function PcProgramUpdate({
     return () => {
       controller.abort();
       clearTimeout(timer);
+      clearTimeout(timeout);
       if (installationRequest.current === controller)
         installationRequest.current = null;
     };
@@ -138,11 +179,21 @@ export default function PcProgramUpdate({
     stopWaiting();
     setNotice("");
     setBusy(true);
+    setDownloadProgress(0);
+    setConnectionStage("waiting");
+    setWaitingReason("unknown");
     setError("");
     const controller = new AbortController();
     request.current = controller;
     try {
-      const file = await downloadPcRelease(release, controller.signal);
+      const file = await downloadPcRelease(
+        release,
+        controller.signal,
+        (received, total) => {
+          if (active.current && !controller.signal.aborted)
+            setDownloadProgress(Math.floor((received / total) * 100));
+        },
+      );
       if (!active.current) return;
       const url = URL.createObjectURL(file);
       const anchor = document.createElement("a");
@@ -152,7 +203,9 @@ export default function PcProgramUpdate({
       setDownloaded(true);
       onInstallStarted?.();
       if (release.setup && onConnectReady) {
-        setNotice("프로그램이 켜지면 자동으로 연결해요.");
+        setNotice("PC 프로그램 실행을 기다리고 있어요.");
+        waitStarted.current = Date.now();
+        setElapsed(0);
         setWaiting(true);
       }
       const revokeUrl = URL.revokeObjectURL.bind(URL);
@@ -194,15 +247,35 @@ export default function PcProgramUpdate({
     <div className="space-y-3 rounded-xl bg-blue-50 p-4">
       {status === "update" && <p>프로그램 업데이트가 필요해요.</p>}
       {!downloaded && downloadButton}
-      {downloaded && release?.setup ? (
+      {busy && (
+        <div className="space-y-1">
+          <p role="status">
+            {downloadProgress < 100
+              ? `설치 파일 다운로드 ${downloadProgress}%`
+              : "다운로드 완료 · 파일 안전 확인 중…"}
+          </p>
+          <progress
+            aria-label="설치 파일 다운로드"
+            value={downloadProgress}
+            max={100}
+            className="h-2 w-full accent-blue-600"
+          />
+        </div>
+      )}
+      {downloaded && release?.setup && connectionStage === "waiting" ? (
         <div role="status" className="space-y-2">
           <p className="font-semibold">이제 받은 파일을 열어 주세요.</p>
           <p>
             브라우저 오른쪽 위 다운로드(↓)에서 <strong>O4O-PC-Setup.cmd</strong>
-            를 여세요.
+            를 여세요. 목록이 안 보이면 <strong>Ctrl+J</strong>를 누르세요.
+          </p>
+          <p className="font-medium text-blue-900">
+            저장 후 받은 파일을 열어야 설치가 시작돼요.
           </p>
           <p>압축 해제·설치·프로그램 실행은 자동으로 진행돼요.</p>
         </div>
+      ) : connectionStage !== "waiting" ? (
+        <p>PC 프로그램 실행을 확인했어요.</p>
       ) : (
         <p>
           {release?.setup ? (
@@ -245,6 +318,101 @@ export default function PcProgramUpdate({
         <p role="alert">
           데이터 확인이 필요합니다. 기존 데이터를 지우지 말고 문의해 주세요.
         </p>
+      )}
+      {downloaded && release?.setup && onConnectReady && (
+        <div
+          className="space-y-3 rounded-xl border border-blue-100 p-4"
+          aria-label="PC 연결 진행 단계"
+        >
+          <ol className="space-y-2">
+            {[
+              { label: "설치 파일 받기", done: true, current: false },
+              {
+                label: "받은 파일 열기 · 설치",
+                done: connectionStage !== "waiting",
+                current: waiting && connectionStage === "waiting",
+              },
+              {
+                label: "이 계정에 PC 연결",
+                done: connectionStage === "connected",
+                current: waiting && connectionStage === "connecting",
+              },
+            ].map((step, index) => (
+              <li
+                key={step.label}
+                aria-current={step.current ? "step" : undefined}
+                className={`flex items-center gap-2 ${step.done ? "text-emerald-700" : step.current ? "font-semibold text-blue-800" : "text-gray-500"}`}
+              >
+                <span
+                  aria-hidden
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border"
+                >
+                  {step.done ? "✓" : index + 1}
+                </span>
+                {step.label}
+                <span className="ml-auto text-xs">
+                  {step.done
+                    ? "완료"
+                    : step.current
+                      ? index === 1
+                        ? "파일 열기 필요"
+                        : "연결 중"
+                      : "대기"}
+                </span>
+              </li>
+            ))}
+          </ol>
+          {waiting && (
+            <>
+              <p className="text-xs text-gray-600">
+                연결 확인 경과 {Math.floor(elapsed / 60)}분 {elapsed % 60}초 ·
+                최대 10분 자동 확인
+              </p>
+              {connectionStage === "waiting" && (
+                <p className="text-xs text-gray-600">
+                  설치 진행률은 이 화면에서 확인할 수 없어요. 파일을 열었다면
+                  설치 창을 확인해 주세요.
+                </p>
+              )}
+              {connectionStage === "connecting" && elapsed >= 60 && (
+                <p
+                  role="status"
+                  className="rounded-lg bg-amber-50 p-3 text-amber-900"
+                >
+                  프로그램은 실행 중이지만 계정 연결 응답이 늦어지고 있어요.
+                  브라우저의 PC 연결 권한을 확인해 주세요. 자동 연결을 중지한 뒤
+                  다시 확인할 수도 있어요.
+                </p>
+              )}
+              {connectionStage === "waiting" &&
+                (elapsed >= 60 || waitingReason !== "unknown") && (
+                  <div
+                    role="status"
+                    className="space-y-1 rounded-lg bg-amber-50 p-3 text-amber-900"
+                  >
+                    <p className="font-semibold">
+                      {waitingReason === "permission"
+                        ? "브라우저의 PC 연결 권한을 확인해 주세요."
+                        : waitingReason === "update"
+                          ? "이전 프로그램을 종료해 주세요."
+                          : "아직 프로그램 응답이 없어요. 기다리기만 해서는 설치되지 않아요."}
+                    </p>
+                    <p>
+                      다운로드(↓)에서 O4O-PC-Setup.cmd를 열고, 보안 확인과 설치
+                      확인 창을 확인해 주세요.
+                    </p>
+                    {elapsed >= 180 && (
+                      <p>
+                        3분 이상 응답이 없어요. 설치 창에 오류가 있는지 확인해
+                        주세요. 설치 창이 끝났다면 시작 메뉴의 O4O PC 연결을
+                        실행해 주세요.
+                      </p>
+                    )}
+                  </div>
+                )}
+            </>
+          )}
+        </div>
       )}
       {notice && (
         <p role="status" className="flex items-start gap-2 text-blue-800">
