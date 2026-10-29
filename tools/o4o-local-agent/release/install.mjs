@@ -107,13 +107,29 @@ try {
     const slot = installedSlot(targets.home);
     const expected = verifyPackage(slot);
     const child = spawn(
-      path.join(slot, "runtime", "node.exe"),
-      [path.join(slot, "launch.mjs"), "--console"],
+      path.join(process.env.SystemRoot || "C:\\Windows", "System32", "cmd.exe"),
+      [
+        "/d",
+        "/v:off",
+        "/s",
+        "/c",
+        '"start "O4O PC 연결" /D "%O4O_RUN_CWD%" "%O4O_RUN_NODE%" "%O4O_RUN_ENTRY%" --console"',
+      ],
       {
         cwd: slot,
-        detached: true,
+        windowsHide: true,
+        windowsVerbatimArguments: true,
         stdio: "ignore",
-        env: { ...process.env, O4O_AGENT_HOME: targets.dataHome },
+        // Fixed command, quoted environment selectors: no user text in cmd code.
+        // `start` creates a real console with normal Ctrl+C handling. A detached
+        // process with NUL streams can otherwise leave no readable/usable console.
+        env: {
+          ...process.env,
+          O4O_AGENT_HOME: targets.dataHome,
+          O4O_RUN_CWD: slot,
+          O4O_RUN_NODE: path.join(slot, "runtime", "node.exe"),
+          O4O_RUN_ENTRY: path.join(slot, "launch.mjs"),
+        },
       },
     );
     await new Promise((resolve, reject) => {

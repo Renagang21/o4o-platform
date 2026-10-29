@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { verifyPackage } from "./install-core.mjs";
 try {
   const slot = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +16,11 @@ try {
     handles.push(input);
     const output = fs.openSync("\\\\.\\CONOUT$", "w");
     handles.push(output);
+    execFileSync(
+      path.join(process.env.SystemRoot || "C:\\Windows", "System32", "cmd.exe"),
+      ["/d", "/c", "chcp", "65001"],
+      { stdio: [input, output, output], windowsHide: true },
+    );
     fs.writeSync(
       output,
       "O4O PC 연결 프로그램 실행 중\r\n이 창을 켜 두고 O4O 화면으로 돌아가세요.\r\n업데이트하거나 종료하려면 이 창에서 Ctrl+C를 누르세요.\r\n\r\n",
