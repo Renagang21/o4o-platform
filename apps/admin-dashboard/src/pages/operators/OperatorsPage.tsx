@@ -49,7 +49,6 @@ import {
   SERVICES,
   getRoleOptions,
   getServiceOptions,
-  isOperatorRole,
   parseRole,
 } from '@/lib/rbac-catalog';
 // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
@@ -62,7 +61,6 @@ import {
   ASSIGNABLE_ROLES,
   CENTRAL_OPERATION_ROLES,
   ASSIGNABLE_ROLE_VALUES,
-  OPERATOR_ROLE_CATALOG,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
@@ -174,7 +172,6 @@ export default function OperatorsPage() {
   const [invitations, setInvitations] = useState<Invite[] | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitationVersion, setInvitationVersion] = useState(0);
-  const [showOperatorAssignments, setShowOperatorAssignments] = useState(true);
   const acceptedInvitationSnapshot = useRef<string | null>(null);
   const userLoadSequence = useRef(0);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
@@ -272,12 +269,11 @@ export default function OperatorsPage() {
     if (previous !== null && previous !== accepted) void fetchUsers();
   }, [fetchUsers]);
 
-  // Central Admin view by default; existing delegated assignments are opt-in.
+  // Central assignment management is Admin-only; existing Operator grants remain untouched.
   const allRows = useMemo<AssignmentRow[]>(
     () => flattenUsersToAssignments(users).filter((row) =>
-      isOperatorRole(row.role) && row.parsedRole.serviceKey !== 'platform' &&
-      (showOperatorAssignments || SERVICE_ADMIN_ROLE_VALUES.has(row.role))),
-    [users, showOperatorAssignments],
+      SERVICE_ADMIN_ROLE_VALUES.has(row.role)),
+    [users],
   );
 
   const filteredRows = useMemo<AssignmentRow[]>(() => {
@@ -301,11 +297,9 @@ export default function OperatorsPage() {
   const stats = useMemo(() => {
     const uniqueUsers = new Set(allRows.map((r) => r.userId));
     const adminCount = allRows.filter((r) => r.parsedRole.roleKey === 'admin' || r.parsedRole.roleKey === 'super_admin').length;
-    const operatorCount = allRows.filter((r) => r.parsedRole.roleKey === 'operator').length;
     return {
       users: uniqueUsers.size,
       admins: adminCount,
-      operators: operatorCount,
     };
   }, [allRows]);
 
@@ -647,7 +641,7 @@ export default function OperatorsPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
         title="서비스 관리자"
-        subtitle="직영 업무의 Admin·Operator를 초대하고 운영 범위를 위임합니다."
+        subtitle="서비스 Admin을 지정하고 운영 범위를 관리합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
@@ -666,10 +660,9 @@ export default function OperatorsPage() {
       )}
 
       {/* Stats — WO-O4O-ADMIN-OPERATORS-REDUNDANT-ACTIVE-KPI-REMOVE-V1: Active KPI 제거 */}
-      <div className={`grid grid-cols-1 ${showOperatorAssignments ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mb-4`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <StatCard label="표시 계정" value={stats.users} color="text-gray-900" Icon={Users} />
         <StatCard label="Admin 권한" value={stats.admins} color="text-orange-600" Icon={Shield} />
-        {showOperatorAssignments && <StatCard label="Operator 권한" value={stats.operators} color="text-blue-600" Icon={Shield} />}
       </div>
 
       {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
@@ -690,16 +683,8 @@ export default function OperatorsPage() {
       </div>
 
       <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
-        <p>직영 서비스의 Admin·Operator는 초대 수락 후 중앙 업무를 위임받습니다. 독립 사업 Operator는 해당 사업에서 지정합니다. 서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대를 수락한 뒤에는 목록을 새로고침해 주세요. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={showOperatorAssignments} onChange={e => {
-            setShowOperatorAssignments(e.target.checked);
-            setSelectedIds(new Set());
-            setFacets(previous => ({ ...previous, role: '' }));
-          }} />
-          <span>Operator 권한 함께 보기</span>
-        </label>
-        <p className="text-gray-600">중앙 위임된 Operator는 행 메뉴에서 업무를 설정하고 권한을 회수할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
+        <p>전체 관리자에서는 서비스 Admin만 지정·관리합니다. Operator는 해당 서비스 Admin이 관리하며 기존 Operator 권한은 유지됩니다. 직영 서비스 Admin은 초대 수락 후 위임받은 중앙 업무를 이용합니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+        <p className="text-gray-600">서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대 수락 후 목록을 새로고침해 주세요. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
       </div>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
       <BusinessOperatorAssignments />
@@ -1161,7 +1146,7 @@ export default function OperatorsPage() {
                   </div>
                 )}
                 <div className="space-y-4 max-h-80 overflow-y-auto border rounded-lg p-3">
-                  {Object.entries(OPERATOR_ROLE_CATALOG).map(([serviceKey, roles]) => {
+                  {Object.entries(ASSIGNABLE_ROLES).map(([serviceKey, roles]) => {
                     const meta = SERVICES[serviceKey as keyof typeof SERVICES];
                     return (
                       <div key={serviceKey} className="border-b pb-3 last:border-0 last:pb-0">

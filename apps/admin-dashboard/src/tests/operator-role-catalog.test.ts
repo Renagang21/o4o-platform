@@ -34,13 +34,12 @@ function readServerRoles(): string[] {
 
 describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => {
   it('화면 카탈로그와 서버 allowlist 가 같은 집합·같은 순서다', () => {
-    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles().filter(role => CENTRAL_OPERATION_ROLES.has(role) || /(?:[:_])admin$/.test(role)));
+    expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles().filter(role => /(?:[:_])admin$/.test(role)));
   });
 
-  it('직영 커뮤니티의 Admin과 Operator를 중앙에서 위임한다', () => {
+  it('직영 커뮤니티도 중앙에서는 Admin만 지정한다', () => {
     expect(ASSIGNABLE_ROLES.community.map(({ value, label }) => ({ value, label }))).toEqual([
       { value: 'community:admin', label: 'Admin' },
-      { value: 'community:operator', label: 'Operator' },
     ]);
   });
 
@@ -106,8 +105,10 @@ it('퇴역 서비스 PH·K-Cosmetics 역할은 신규 지정 목록에 없다', 
  expect(ASSIGNABLE_ROLE_VALUES.some(role => /^(pharmacy-hub|cosmetics|k-cosmetics):/.test(role))).toBe(false);
 });
 
-it('permits direct Partner duties without granting independent business operators', () => {
-  expect(ASSIGNABLE_ROLE_VALUES).toContain('partner-support:operator');
+it('assigns only Admins while retaining existing Operator role metadata', () => {
+  expect(ASSIGNABLE_ROLE_VALUES).toContain('partner-support:admin');
+  expect(ASSIGNABLE_ROLE_VALUES.every(role => /(?:[:_])admin$/.test(role))).toBe(true);
+  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('partner-support:operator');
   expect(ASSIGNABLE_ROLE_VALUES).not.toContain('neture:megapharm_operator');
   expect(CENTRAL_OPERATION_ROLES.has('neture:carepharm_admin')).toBe(false);
   expect(CATALOG_ROLE_VALUES.has('partner-support:operator')).toBe(true);
