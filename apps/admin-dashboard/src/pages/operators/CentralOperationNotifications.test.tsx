@@ -29,7 +29,7 @@ it('shows an unavailable state instead of an empty success and retries only the 
   fireEvent.click(screen.getByRole('button',{name:'알림 새로고침'}));
   await screen.findByText('표시할 읽지 않은 알림이 없습니다.');expect(api.post).not.toHaveBeenCalled();
 });
-it('rejects late data from a revoked scope and does not refresh after a completed write on unmount',async()=>{
+it('rejects late data from a revoked scope',async()=>{
   let finish!:(v:unknown)=>void;
   api.get.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;})).mockResolvedValue({data:{data:{notifications:[],unreadCount:0}}});
   const v=render(<MemoryRouter><Page variant="panel" scopeKey="old"/></MemoryRouter>);
@@ -62,4 +62,23 @@ it.each([
  fireEvent.click(await screen.findByRole('button',{name:/업무 알림 one/}));
  expect(screen.getByTestId('notification-route').textContent).toBe(expected);
  await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/notifications/read',{notificationIds:['one']}));
+});
+
+function NavigationHarness() {
+  const location = useLocation();
+  return <><Page scopeKey="scope" />{location.pathname === '/' && <Page variant="panel" scopeKey="scope" />}<RouteProbe /></>;
+}
+it('refreshes the surviving header after navigation unmounts a panel with a pending read', async () => {
+  let read = false;
+  let finish!: (value: unknown) => void;
+  api.get.mockImplementation(async () => ({ data: { data: { notifications: [{ ...item('one', read), metadata: { targetUrl: '/operator/suppliers' } }], unreadCount: read ? 0 : 1 } } }));
+  api.post.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  render(<MemoryRouter><NavigationHarness /></MemoryRouter>);
+  await screen.findByLabelText('읽지 않은 알림 1건');
+  fireEvent.click(await screen.findByRole('button', { name: /업무 알림 one/ }));
+  expect(screen.getByTestId('notification-route').textContent).toBe('/operations/supplier/suppliers');
+  expect(screen.queryByRole('region', { name: '운영자 알림 목록' })).toBeNull();
+  await act(async () => { read = true; finish({ data: { success: true } }); });
+  await waitFor(() => expect(screen.queryByLabelText('읽지 않은 알림 1건')).toBeNull());
+  expect(api.get).toHaveBeenCalledTimes(3);
 });

@@ -60,8 +60,9 @@ export default function CentralOperationNotifications({ scopeKey, variant = 'bel
       if (response.data?.success !== true) throw new Error('NOTIFICATION_READ_FAILED');
       if (lifecycle.current.mounted && lifecycle.current.scope === scopeKey) {
         setSelected(new Set()); setNotice(`${eligible.length}개 알림을 읽음으로 표시했습니다. 업무의 승인·처리 상태는 바뀌지 않습니다.`);
-        window.dispatchEvent(new Event(CHANGED));
       }
+      // The panel may unmount during navigation; surviving consumers still need a fresh query.
+      window.dispatchEvent(new Event(CHANGED));
     } catch { if (lifecycle.current.mounted && lifecycle.current.scope === scopeKey) setError('알림의 읽음 상태를 저장하지 못했습니다. 다시 조회해 주세요.'); }
     finally { lock.current = false; if (lifecycle.current.mounted) setWriting(false); }
   };
