@@ -39,7 +39,8 @@ import { CooperationMaterialService } from "./material.service.js";
 import { CooperationSupportService } from "./support.service.js";
 import { resolveInboxScope } from "../contact-inquiry/inbox-scope.js";
 import { SemiFranchiseContentService } from "../neture-pharmacy/services/semi-franchise-content.service.js";
-import { requireMember } from "./access.js";
+import { requireMember, assertOperator } from "./access.js";
+import { ContactReplyService } from "../contact-inquiry/contact-reply.service.js";
 import { CreateCooperationMemberWorkflows1792886400002 } from "../../database/migrations/1792886400002-CreateCooperationMemberWorkflows.js";
 const enabled = process.env.COOPERATION_WORKFLOW_PG_PORT;
 const suite = enabled ? describe : describe.skip;
@@ -122,6 +123,14 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
       await mockDb.query(
         "INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','active')",
         [id],
+      );
+    // Only pharmacy-unit actors need approved professional qualification.
+    // Keep the personal cooperative member unqualified to guard that boundary.
+    for (const id of [member, second])
+      await mockDb.query(
+        `INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,verified_at,verified_by,qualification_status,qualification_reason)
+         VALUES($1,$2,true,now(),$3,'approved','Synthetic qualification evidence reviewed')`,
+        [id, "SYNTHETIC-" + id, op],
       );
     for (const id of [receiver, otherReceiver, store, otherStore, coopOrg])
       await mockDb.query(
@@ -260,6 +269,10 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
         await m.query(`DELETE FROM ${table} WHERE user_id=ANY($1::uuid[])`, [
           users,
         ]);
+      await m.query(
+        "DELETE FROM kpa_pharmacist_profiles WHERE user_id=ANY($1::uuid[])",
+        [users],
+      );
       await m.query("DELETE FROM organizations WHERE id=ANY($1::uuid[])", [
         organizations,
       ]);
@@ -277,6 +290,36 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
     expect((await get(coopBase + "/member", second)).status).toBe(403);
     expect((await get(coopBase + "/member", person, store)).status).toBe(403);
     expect((await get(base + "/member", member, store)).status).toBe(200);
+  });
+  it("requires current pharmacist qualification for pharmacy workflows without imposing it on personal cooperative members", async () => {
+    await mockDb.query(
+      "UPDATE kpa_pharmacist_profiles SET qualification_status='revoked' WHERE user_id=$1",
+      [member],
+    );
+    try {
+      expect((await get(base + "/member", member, store)).status).toBe(403);
+      expect(
+        (
+          await post(
+            base + "/support",
+            member,
+            {
+              subject: "자격 철회 경계",
+              message: "철회된 자격으로 문의를 생성할 수 없습니다.",
+              privacyConsent: true,
+              requestId: randomUUID(),
+            },
+            store,
+          )
+        ).status,
+      ).toBe(403);
+      expect((await get(coopBase + "/member", person)).status).toBe(200);
+    } finally {
+      await mockDb.query(
+        "UPDATE kpa_pharmacist_profiles SET qualification_status='approved' WHERE user_id=$1",
+        [member],
+      );
+    }
   });
   it("publishes a target snapshot, records pharmacy confirmation and preserves prior versions", async () => {
     const draft = await works.save(business, op, undefined, input);
@@ -894,4 +937,101 @@ suite("isolated PostgreSQL cooperation member/operator workflows", () => {
       [sf],
     );
   });
+  it.each(["pharmacy", "person"])(
+    "connects %s support reception, assignment, delivery and member visibility",
+    async (kind) => {
+      const personal = kind === "person";
+      if (personal)
+        await mockDb.query(
+          "UPDATE cooperative_memberships SET status='active' WHERE cooperative_id=$1 AND user_id=$2",
+          [coop, person],
+        );
+      const scope = personal ? cooperative : business;
+      const root = personal ? coopBase : base;
+      const user = personal ? person : member;
+      const organization = personal ? undefined : store;
+      const created = await post(
+        root + "/support",
+        user,
+        {
+          subject: "격리 지원 연결 검증",
+          message: "운영자 답변과 회원 표시를 함께 확인합니다.",
+          privacyConsent: true,
+          requestId: randomUUID(),
+        },
+        organization,
+      );
+      expect(created.status).toBe(200);
+      const id = created.body.data.id;
+      const before = await support.operatorList(scope);
+      const inquiry = before.items.find((item: any) => item.id === id);
+      expect(inquiry).toBeDefined();
+      expect(
+        (
+          await post(`${root}/manage/support/${id}`, op, {
+            version: inquiry.version,
+            assignedTo: op,
+            dueAt: "2026-01-01T00:00:00Z",
+          })
+        ).status,
+      ).toBe(200);
+      const failedSend = jest.fn(async () => ({ success: false }));
+      const replies = new ContactReplyService(mockDb, failedSend);
+      const replyScope = {
+        organizationId: scope.organizationId,
+        name: scope.name,
+        authorize: (manager: any) => assertOperator(manager, scope, op),
+      };
+      expect(
+        (
+          await replies.reply(
+            scope.serviceKey,
+            id,
+            op,
+            {
+              requestId: randomUUID(),
+              message: "발송 실패 답변은 회원에게 보이지 않아야 합니다.",
+            },
+            replyScope,
+          )
+        ).status,
+      ).toBe("failed");
+      let own = await get(root + "/member", user, organization);
+      expect(
+        own.body.data.support.items.find((item: any) => item.id === id).replies,
+      ).toEqual([]);
+      const sent = jest.fn(async () => ({ success: true }));
+      const successful = new ContactReplyService(mockDb, sent);
+      const input = {
+        requestId: randomUUID(),
+        message: "접수한 지원 문의의 처리가 완료되었습니다.",
+      };
+      for (let attempt = 0; attempt < 2; attempt++)
+        expect(
+          (await successful.reply(scope.serviceKey, id, op, input, replyScope))
+            .status,
+        ).toBe("sent");
+      expect(sent).toHaveBeenCalledTimes(1);
+      own = await get(root + "/member", user, organization);
+      const visible = own.body.data.support.items.find(
+        (item: any) => item.id === id,
+      );
+      expect(visible.status).toBe("answered");
+      expect(visible.replies).toEqual([
+        expect.objectContaining({ message: input.message }),
+      ]);
+      const after = await support.operatorList(scope);
+      expect(after.pending).toBe(before.pending - 1);
+      expect(after.overdue).toBe(before.overdue);
+      const foreign = await get(
+        root + "/member",
+        personal ? member : second,
+        personal ? undefined : otherStore,
+      );
+      expect(foreign.status).toBe(200);
+      expect(
+        foreign.body.data.support.items.some((item: any) => item.id === id),
+      ).toBe(false);
+    },
+  );
 });
