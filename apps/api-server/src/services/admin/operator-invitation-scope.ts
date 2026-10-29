@@ -70,9 +70,10 @@ export async function authorizeInvitation(
   scope: InvitationScope,
   actor: string,
   target?: string,
+  cancelling = false,
 ) {
   if (scope.scope_type === "platform") {
-    resolvePlatformInvitationRole(scope.role, scope.service_key, scope.scope_key);
+    if (!cancelling) resolvePlatformInvitationRole(scope.role, scope.service_key, scope.scope_key);
     const rows = await m.query(
       `SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
       WHERE u.id=$1 AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved')

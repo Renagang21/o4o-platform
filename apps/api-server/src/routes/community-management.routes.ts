@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../middleware/central-operation-menu.middleware.js';
 import { Router, type RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -9,7 +10,7 @@ import { CommunityManagementError, listManagedCommunityBoards, setCommunityBoard
 /** Independent community only. Business spaces and retired catalog codes cannot enter this mount. */
 export function createCommunityManagementRoutes(authenticate: RequestHandler) {
   const router = Router();
-  router.use('/community/management', apiLimiter, authenticate);
+  router.use('/community/management', apiLimiter, authenticate, centralOperationRequest('community'));
   router.param('id', (req, res, next, id) => {
     if (!/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(id)) { res.status(400).json({ success:false, code:'INVALID_RESOURCE_ID', error:'대상을 확인해 주세요.' }); return; }
     next();
@@ -30,7 +31,7 @@ export function createCommunityManagementRoutes(authenticate: RequestHandler) {
     router.get(`/community/management/${kind}/:id/deletion-plan`, run(req => AppDataSource.transaction('REPEATABLE READ', m => planCommunityDeletion(m, req.user!.id, kind, req.params.id))));
     router.delete(`/community/management/${kind}/:id`, run(req => {
       return AppDataSource.transaction('SERIALIZABLE', async m => {
-        await requireCommunityManager(m, req.user!.id, true);
+        await requireCommunityManager(m, req.user!.id, true, `erase-${kind}`);
         if (kind === 'members') await demoAccountService.assertNotDemoAccount(req.params.id, m);
         return applyCommunityDeletion(m, req.user!.id, kind, req.params.id, req.body?.expectedDigest);
       });

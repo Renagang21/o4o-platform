@@ -1,3 +1,4 @@
+import {centralMenusForRole} from '@o4o/types';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   cleanup,
@@ -108,6 +109,7 @@ describe('operator invitation admin UI', () => {
           serviceKey: 'community',
           role: 'community:admin',
           centralDelegation: true,
+          menuKeys: centralMenusForRole('community:admin').map(menu=>menu.key),
         },
       ),
     );
@@ -122,7 +124,7 @@ describe('operator invitation admin UI', () => {
       ? { success: true, users: [{id:'operator-fixture',name:'Synthetic Operator',email:'operator@example.test',roles:['partner-support:operator'],isActive:true}] }
       : { data: path.includes('service-operator-invitations') && accepted ? [{id:'accepted',role:'partner-support:operator',purpose:'assignment',scope_type:'service',accepted_user_id:'operator-fixture',target_user_id:null,invited_email:null,status:'accepted',expired:false,expires_at:'2026-11-01'}] : [] } }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
-    fireEvent.click(await screen.findByLabelText('기존 Operator 권한 함께 보기'));
+    expect((await screen.findByLabelText('Operator 권한 함께 보기') as HTMLInputElement).checked).toBe(true);
     expect(await screen.findByText(accepted ? '확인 완료' : '기존 권한 유지')).toBeTruthy();
     expect(screen.queryByText('대상 아님')).toBeNull();
   });

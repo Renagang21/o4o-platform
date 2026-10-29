@@ -33,6 +33,7 @@ export default function PartnerCommunityOperator({
   user,
   api: communityApi,
   operatorManagement,
+  allowedTabs,
   admin = false,
   busy,
   run,
@@ -40,12 +41,13 @@ export default function PartnerCommunityOperator({
   user: PartnerUser;
   api: PartnerCommunityApi;
   operatorManagement?: ReactNode;
+  allowedTabs?: readonly string[];
   admin?: boolean;
   busy: boolean;
   run: Run;
 }) {
   const [data, setData] = useState<OperatorOverview | null>(null),
-    [tab, setTab] = useState("reports"),
+    [tab, setTab] = useState(allowedTabs?.[0] ?? "reports"),
     [post, setPost] = useState<CommunityPost | null>(null);
   const [board, setBoard] = useState(blank),
     [editing, setEditing] = useState<CommunityBoard | null>(null),
@@ -79,6 +81,8 @@ export default function PartnerCommunityOperator({
       active = false;
     };
   }, [communityApi]);
+  const canOpen = (area: string) => (!allowedTabs || allowedTabs.includes(area)) && (!data?.availableAreas || data.availableAreas.includes(area));
+  const visibleTab = canOpen(tab) ? tab : (data?.availableAreas ?? ['reports','posts','members','boards','events']).find(canOpen);
   const ask = (label: string, work: (reason: string) => Promise<unknown>) => {
     setAction({ label, work });
     setReason("");
@@ -86,7 +90,7 @@ export default function PartnerCommunityOperator({
   const viewPost = (id: string) =>
     void run(async () => {
       setPost(await communityApi.detail(id, true));
-      setTab("posts");
+      if (canOpen("posts")) setTab("posts");
     });
   return (
     <section>
@@ -106,10 +110,10 @@ export default function PartnerCommunityOperator({
           ["members", "회원 관리"],
           ["boards", "게시판 관리"],
           ["events", "운영 이력"],
-        ].map(([id, label]) => (
+        ].filter(([id]) => canOpen(id)).map(([id, label]) => (
           <button
             key={id}
-            className={`button ${tab === id ? "primary" : "quiet"}`}
+            className={`button ${visibleTab === id ? "primary" : "quiet"}`}
             disabled={busy}
             onClick={() => setTab(id)}
           >
@@ -175,7 +179,7 @@ export default function PartnerCommunityOperator({
           </div>
         </form>
       )}
-      {data && tab === "reports" && (
+      {data && visibleTab === "reports" && (
         <div className="panel">
           <h2>신고 목록</h2>
           {!data.reports.length && <p>접수된 신고가 없습니다.</p>}
@@ -217,7 +221,8 @@ export default function PartnerCommunityOperator({
           ))}
         </div>
       )}
-      {data && tab === "posts" && (
+      {post && visibleTab === 'reports' && <article className="panel"><h2>{post.title}</h2><p className="community-body">{post.body}</p>{post.comments?.map(comment => <p key={comment.id} className="community-body">{comment.body}</p>)}</article>}
+      {data && visibleTab === "posts" && (
         <div className="community-grid">
           <div className="panel">
             <h2>최근 게시글</h2>
@@ -311,7 +316,7 @@ export default function PartnerCommunityOperator({
           )}
         </div>
       )}
-      {data && tab === "members" && (
+      {data && visibleTab === "members" && (
         <section className="panel">
           <h2>커뮤니티 회원</h2>
           {data.members.map((m) => (
@@ -355,7 +360,7 @@ export default function PartnerCommunityOperator({
           ))}
         </section>
       )}
-      {data && tab === "boards" && (
+      {data && visibleTab === "boards" && (
         <div className="community-grid">
           <section className="panel">
             <h2>게시판 목록</h2>
@@ -468,7 +473,7 @@ export default function PartnerCommunityOperator({
           </form>
         </div>
       )}
-      {data && tab === "events" && (
+      {data && visibleTab === "events" && (
         <section className="panel">
           <h2>운영·활동 이력</h2>
           {data.events.map((e) => (

@@ -1,13 +1,14 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { useSupplierApprovalWorkflow } from '../useSupplierApprovalWorkflow';
+import { SupplierBindings } from '../SupplierBindings';
 import type { AdminSupplier } from '../../../lib/api';
 const api = vi.hoisted(() => ({ approveSupplier: vi.fn(), rejectSupplier: vi.fn(), updateBasicInfo: vi.fn(), batchProcess: vi.fn() }));
-vi.mock('../../../lib/api', () => ({ operatorSupplierApi: api, PROFILE_FIELD_LABELS: {} }));
+vi.mock('../../../lib/api/admin', () => ({ operatorSupplierApi: api, adminSupplierApi: {}, PROFILE_FIELD_LABELS: {} }));
 const supplier = { id: 'fixture-a', name: '합성 공급자', status: 'PENDING', createdAt: '2026-01-01' } as AdminSupplier;
 const refresh = vi.fn();
 const clear = vi.fn();
-const setup = () => renderHook(() => useSupplierApprovalWorkflow([supplier], new Set([supplier.id]), clear, refresh));
+const setup = () => renderHook(() => useSupplierApprovalWorkflow([supplier], new Set([supplier.id]), clear, refresh), { wrapper: SupplierBindings });
 beforeEach(() => { vi.resetAllMocks(); });
 afterEach(cleanup);
 it('serializes same-tick single approval, batch and save requests and keeps the captured drawer', async () => {

@@ -28,3 +28,23 @@ describe('PC published release',()=>{
   }
  });
 });
+
+it('prefers the hash-checked click installer, with legacy ZIP compatibility',async()=>{
+ const setup={filename:release.filename.replace('.zip','-setup.cmd'),sha256:release.sha256,bytes:bytes.length};
+ const next=validatePcRelease({...release,setup});
+ vi.stubGlobal('crypto',webcrypto);const fetcher=vi.fn().mockResolvedValue(new Response(bytes));vi.stubGlobal('fetch',fetcher);
+ await downloadPcRelease(next,new AbortController().signal);
+ expect(fetcher.mock.calls[0][0]).toBe('/downloads/pc-connection/'+setup.filename);
+ for(const patch of [{filename:'https://example.com/setup.cmd'},{sha256:'wrong'},{bytes:32*1024*1024},{filename:'other.cmd'},{bytes:0}])
+  expect(()=>validatePcRelease({...release,setup:{...setup,...patch}})).toThrow();
+});
+
+it('reports actual streamed byte progress and still rejects a file with a bad hash',async()=>{
+ vi.stubGlobal('crypto',webcrypto);
+ const progress=vi.fn();
+ const response=()=>new Response(new ReadableStream({start(controller){controller.enqueue(bytes.slice(0,4));controller.enqueue(bytes.slice(4));controller.close();}}));
+ vi.stubGlobal('fetch',vi.fn().mockImplementation(async()=>response()));
+ await downloadPcRelease(release,new AbortController().signal,progress);
+ expect(progress.mock.calls).toEqual([[0,bytes.length],[4,bytes.length],[bytes.length,bytes.length]]);
+ await expect(downloadPcRelease({...release,sha256:'0'.repeat(64)},new AbortController().signal,progress)).rejects.toThrow('검증에 실패');
+});

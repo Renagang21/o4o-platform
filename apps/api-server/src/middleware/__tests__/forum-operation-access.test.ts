@@ -1,11 +1,11 @@
-jest.mock('../../database/connection.js', () => ({ AppDataSource: {} }));
+jest.mock('../../database/connection.js', () => ({ AppDataSource: { query: jest.fn(async () => []) } }));
 jest.mock('../../utils/service-membership.js', () => ({ getServiceMembershipStatusFromDb: jest.fn() }));
 import { getServiceMembershipStatusFromDb } from '../../utils/service-membership.js';
 import { forumOperationAccess } from '../forum-operation-access.js';
 const membership = getServiceMembershipStatusFromDb as jest.Mock;
 async function access(tier: 'operator' | 'admin', service: string, roles: string[]) {
   const next = jest.fn(); const res: any = { status: jest.fn(), json: jest.fn() }; res.status.mockReturnValue(res);
-  await forumOperationAccess(tier)({ _serviceCode: service, user: { id: 'fixture', roles } } as any, res, next);
+  await forumOperationAccess(tier)({ originalUrl: `/api/v1/forum/${tier === 'admin' ? 'admin/forums/deleted' : 'operator/categories'}`, method: 'GET', _serviceCode: service, user: { id: 'fixture', roles } } as any, res, next);
   return { res, next };
 }
 beforeEach(() => { membership.mockReset(); membership.mockResolvedValue('active'); });

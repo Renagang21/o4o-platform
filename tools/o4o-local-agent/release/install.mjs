@@ -2,7 +2,22 @@ import path from "node:path";
 import fs from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
-import { installPackage, locations } from "./install-core.mjs";
+import { execFileSync } from "node:child_process";
+import {
+  installPackage,
+  locations,
+  installedSlot,
+  verifyPackage,
+} from "./install-core.mjs";
+let installed = false;
+const windowMode = process.argv.includes("--window");
+const powershell = path.join(
+  process.env.SystemRoot || "C:\\Windows",
+  "System32",
+  "WindowsPowerShell",
+  "v1.0",
+  "powershell.exe",
+);
 const messages = {
   CLOSE_PC_PROGRAM_FIRST:
     "진행 중 업무를 마친 뒤 열린 PC 연결 프로그램을 정상 종료하고 다시 실행해 주세요.",
@@ -37,21 +52,35 @@ try {
     !fs.existsSync(path.join(targets.dataHome, "local.db")) &&
     !fs.existsSync(path.join(targets.dataHome, "credentials.json"))
   ) {
-    const prompt = createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    try {
+    if (windowMode) {
+      // Same consent as the terminal installer, expressed as buttons. Default is No.
       allowNewData =
-        (
-          await prompt.question(
-            "처음 설치하는 PC입니까? 기존 PC를 업데이트하는 경우 N을 선택하세요. [Y/N] ",
+        execFileSync(
+          powershell,
+          [
+            "-NoProfile",
+            "-Command",
+            "[void][Reflection.Assembly]::LoadWithPartialName('PresentationFramework'); $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC인가요? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주세요.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
+          ],
+          { encoding: "utf8", windowsHide: true },
+        ).trim() === "yes";
+    } else {
+      const prompt = createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+      try {
+        allowNewData =
+          (
+            await prompt.question(
+              "처음 설치하는 PC입니까? 기존 PC를 업데이트하는 경우 N을 선택하세요. [Y/N] ",
+            )
           )
-        )
-          .trim()
-          .toLowerCase() === "y";
-    } finally {
-      prompt.close();
+            .trim()
+            .toLowerCase() === "y";
+      } finally {
+        prompt.close();
+      }
     }
     if (!allowNewData) {
       console.log(
@@ -61,6 +90,9 @@ try {
     } else console.log("새 PC 설치를 진행합니다.");
   }
   if (process.exitCode) process.exit(process.exitCode);
+  console.log(
+    "[3/4] 프로그램과 기존 데이터를 확인하고 설치합니다. 잠시 기다려 주세요.",
+  );
   const result = await installPackage({
     source: path.dirname(fileURLToPath(import.meta.url)),
     ...targets,
@@ -69,17 +101,88 @@ try {
   console.log(
     `PC 연결 프로그램 ${result.version} 적용 완료. 기존 데이터와 계정 연결 정보는 유지됩니다.`,
   );
-  console.log(
-    result.shortcut
-      ? "시작 메뉴의 O4O PC 연결을 실행해 주세요."
-      : "설치 폴더의 Start.cmd를 실행해 주세요.",
-  );
-  console.log(
-    "Main의 이 PC 연결에서 다시 확인을 눌러 실제 버전과 데이터 준비 상태를 확인하세요. 실행 확인 전에는 업데이트 완료로 표시하지 않습니다.",
-  );
+  installed = true;
+  if (windowMode) {
+    console.log("[4/4] PC 연결 프로그램을 실행하고 응답을 확인합니다.");
+    const slot = installedSlot(targets.home);
+    const expected = verifyPackage(slot);
+    execFileSync(
+      powershell,
+      [
+        "-NoProfile",
+        "-Command",
+        '$ErrorActionPreference="Stop"; $p=[Diagnostics.ProcessStartInfo]::new(); $p.FileName=$env:O4O_RUN_NODE; $p.Arguments=([char]34 + $env:O4O_RUN_ENTRY + [char]34); $p.WorkingDirectory=$env:O4O_RUN_CWD; $p.UseShellExecute=$true; $p.WindowStyle=[Diagnostics.ProcessWindowStyle]::Normal; [void][Diagnostics.Process]::Start($p)',
+      ],
+      {
+        windowsHide: true,
+        stdio: "pipe",
+        timeout: 10000,
+        // ShellExecute creates a normal, independent console with usable standard
+        // streams. Environment selectors keep paths out of PowerShell source.
+        env: {
+          ...process.env,
+          O4O_AGENT_HOME: targets.dataHome,
+          O4O_RUN_CWD: slot,
+          O4O_RUN_NODE: path.join(slot, "runtime", "node.exe"),
+          O4O_RUN_ENTRY: path.join(slot, "launch.mjs"),
+        },
+      },
+    );
+    // A spawned process is not proof of a usable runtime. Keep errors visible in
+    // this installer while the detached runtime has its own readable, closeable console.
+    const deadline = Date.now() + 30000;
+    let ready = false;
+    while (Date.now() < deadline) {
+      try {
+        const response = await fetch("http://127.0.0.1:47821/health", {
+          headers: { Origin: "https://neture.co.kr" },
+          redirect: "error",
+          signal: AbortSignal.timeout(1000),
+        });
+        if (response.ok) {
+          const health = await response.json();
+          if (
+            health.ok &&
+            health.releaseId === result.releaseId &&
+            health.agentVersion === result.version &&
+            health.localData?.ready === true &&
+            health.localData.schemaVersion === expected.dataSchemaVersion
+          ) {
+            ready = true;
+            break;
+          }
+        }
+      } catch {
+        /* Starting up; bounded retry, without printing local responses. */
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (!ready) throw new Error("PC_START_NOT_CONFIRMED");
+    console.log(
+      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주세요. 새로 열린 PC 연결 창은 켜 두세요. 종료하려면 그 창에서 Ctrl+C를 누르세요.",
+    );
+  } else {
+    console.log(
+      result.shortcut
+        ? "시작 메뉴의 O4O PC 연결을 실행해 주세요."
+        : "설치 폴더의 Start.cmd를 실행해 주세요.",
+    );
+    console.log(
+      "Main의 이 PC 연결에서 다시 확인을 눌러 실제 버전과 데이터 준비 상태를 확인하세요. 실행 확인 전에는 업데이트 완료로 표시하지 않습니다.",
+    );
+  }
 } catch (error) {
+  if (process.env.GITHUB_ACTIONS === "true")
+    console.error(
+      "PC_INSTALL_ERROR: " +
+        (error.code ||
+          error.message?.match(/^[A-Z_]+$/)?.[0] ||
+          "START_OR_INSTALL_FAILED"),
+    );
   console.error(
-    messages[error.message] ||
+    (installed
+      ? "설치는 끝났지만 실행하지 못했습니다. 시작 메뉴의 O4O PC 연결을 열어 주세요."
+      : messages[error.message]) ||
       "설치를 완료하지 못했습니다. 기존 데이터를 보존한 채 중단했습니다. 패키지를 다시 내려받아 확인해 주세요.",
   );
   process.exitCode = 1;

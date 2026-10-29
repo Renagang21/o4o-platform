@@ -2,6 +2,8 @@ import express from "express";
 import request from "supertest";
 jest.mock("../../../database/connection.js", () => ({ AppDataSource: {} }));
 const roles = jest.fn();
+const menuKeys = jest.fn().mockResolvedValue(['supplier.suppliers']);
+jest.mock('../../../services/admin/central-operation-menu-grants.js', () => ({ centralOperationMenuKeys: (...args: unknown[]) => menuKeys(...args) }));
 jest.mock("../../../services/admin/central-operation-access.js", () => ({
   centralOperationRoles: (...args: unknown[]) => roles(...args),
 }));

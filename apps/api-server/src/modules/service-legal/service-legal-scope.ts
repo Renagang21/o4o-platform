@@ -1,3 +1,5 @@
+import { CENTRAL_OPERATION_SERVICES, type CentralOperationService } from '@o4o/types';
+import { withCentralOperationMenus } from '../../middleware/central-operation-menu.middleware.js';
 /**
  * Service Legal — cross-service scope guard + 공통 상수
  *
@@ -90,7 +92,8 @@ const GUARD_BY_SERVICE_KEY: Record<
 > = Object.fromEntries(
   (SUPPORTED_LEGAL_SERVICE_KEYS as readonly LegalServiceKey[]).map((sk) => {
     const config = CONFIG_BY_SERVICE_KEY[sk];
-    return [sk, { requireScope: createMembershipScopeGuard(config), rolePrefix: config.serviceKey }];
+    const guard = createMembershipScopeGuard(config);
+    return [sk, { requireScope: (CENTRAL_OPERATION_SERVICES as readonly string[]).includes(sk) ? withCentralOperationMenus(sk as CentralOperationService, guard) : guard, rolePrefix: config.serviceKey }];
   }),
 ) as Record<LegalServiceKey, { requireScope: (scope: string) => RequestHandler; rolePrefix: string }>;
 

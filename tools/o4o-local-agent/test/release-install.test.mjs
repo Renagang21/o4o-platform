@@ -1,15 +1,30 @@
-import { test, beforeEach, afterEach } from 'node:test';
+import { test as nodeTest, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, createHash } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { assembleRelease } from '../release/build-release.mjs';
+import { setupDownload } from '../release/setup-download.mjs';
 import { zip, member } from '../release/zip.mjs';
 import { installPackage, verifyPackage, installedSlot, acquireInstallLock } from '../release/install-core.mjs';
 import { bootstrapLocalDb, closeLocalDb, applyImport, LocalDatasetRepository } from '../src/local-db.mjs';
+// Emit bounded diagnostics through GitHub check annotations as well as job logs.
+// This suite uses only synthetic data; no environment or credentials are logged.
+function test(name, options, run) {
+ if(typeof options==='function'){run=options;options={};}
+ return nodeTest(name,options,async(t)=>{
+  try{return await run(t);}catch(error){
+   if(process.env.GITHUB_ACTIONS==='true'){
+    const message=(String(error.stack||error)+'\n'+String(error.stderr||'')+'\n'+String(error.stdout||'')).slice(0,5000).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
+    console.log('::error title=PC installer test::'+name+': '+message);
+   }
+   throw error;
+  }
+ });
+}
 let root;
 beforeEach(()=>{root=fs.mkdtempSync(path.join(os.tmpdir(),'o4o-release-'));});
 afterEach(()=>{closeLocalDb();fs.rmSync(root,{recursive:true,force:true});});
@@ -107,6 +122,36 @@ test('Windows packaged runtime starts and health proves its release and data rea
    windowsVerbatimArguments:true,input:'Y\r\n',stdio:['pipe','pipe','pipe'],timeout:60000,
  });
  assert.ok(fs.existsSync(path.join(freshData,'local.db')));assert.equal(verifyPackage(installedSlot(freshHome)).releaseId,result.releaseId);
+ // Window mode on an existing installation needs no terminal input and starts
+ // the installed runtime automatically. First-install GUI consent is not bypassed.
+ const freshSlot=installedSlot(freshHome),runtime=path.join(freshSlot,'runtime','node.exe');
+ try {
+  const installOutput=execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
+   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+  });
+  assert.match(installOutput.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
+  let health;
+  for(let n=0;n<40;n++) {
+   try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
+   await new Promise(resolve=>setTimeout(resolve,250));
+  }
+  assert.equal(health?.releaseId,result.releaseId);assert.equal(health?.localData?.ready,true);
+ } finally {
+  execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',"Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe'});
+ }
+
+ // A child which spawns but immediately fails must never be reported ready.
+ const brokenFiles=files.map(([name,bytes])=>[name,name==='src/index.mjs'?Buffer.concat([Buffer.from("if (process.argv[2] === 'run') process.exit(23);\n"),bytes]):bytes]);
+ const broken=assembleRelease({sourceSha,files:brokenFiles,runtime:fs.readFileSync(process.execPath),runtimeLicense:Buffer.from('fixture license')});
+ const brokenSource=writePackage(broken,'startup failure');
+ assert.throws(()=>execFileSync(path.join(brokenSource,'runtime','node.exe'),[path.join(brokenSource,'install.mjs'),'--window'],{
+   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+ }),error=>{
+   assert.equal(error.status,1);assert.doesNotMatch(error.stdout.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
+   assert.match(error.stderr.toString('utf8'),/설치는 끝났지만 실행하지 못했습니다/);return true;
+ });
+ assert.equal(await runningAgent(),false);
+
 });
 
 test('verified packages repair missing/corrupt installed code while preserving data and failed-repair pointer',async()=>{
@@ -136,4 +181,37 @@ test('terminated installer releases OS mutex and preserves real concurrent exclu
 
 test('oversized non-streaming download cannot be published even with maximum ZIP compression',()=>{
  assert.throws(()=>assembleRelease({sourceSha,files:[],runtime:randomBytes(32*1024*1024),runtimeLicense:Buffer.from('fixture license')}),/32 MiB HTTP download limit/);
+ const payload=Buffer.alloc(32*1024*1024-1024);
+ assert.throws(()=>setupDownload({...fixture().manifest,bytes:payload.length,sha256:createHash('sha256').update(payload).digest('hex')},payload),/32 MiB HTTP download limit/);
+});
+
+test('offline installer embeds its exact hash-pinned ZIP without relying on a later deployment',()=>{
+ const result=fixture();
+ assert.equal(result.manifest.setup.filename,result.manifest.filename.replace('.zip','-setup.cmd'));
+ const footer=result.setup.subarray(-16);assert.equal(footer.subarray(0,8).toString(),'O4OPKG1!');
+ const offset=Number(footer.readBigInt64LE(8));
+ const embedded=result.setup.subarray(offset,-16);assert.deepEqual(embedded,result.archive);
+ assert.equal(result.manifest.setup.bytes,result.setup.length);
+ assert.equal(createHash('sha256').update(result.setup).digest('hex'),result.manifest.setup.sha256);
+ const header=result.setup.subarray(0,offset).toString('utf8');
+ assert.ok(header.includes(result.manifest.sha256));
+ assert.ok(!/https?:|HttpClient|ExecutionPolicy|EncodedCommand|RunAs|127\.0\.0\.1/.test(header));
+ assert.equal(verifyPackage(writePackage({...result,archive:embedded})).releaseId,result.manifest.releaseId);
+});
+
+test('Windows offline installer handles Korean paths and rejects corrupt/truncated embedded packages', {skip:process.platform!=='win32',timeout:120000},()=>{
+ const result=assembleRelease({sourceSha,files:[['install.mjs',Buffer.from("import fs from 'node:fs';if(!process.argv.includes('--window'))process.exit(1);fs.writeFileSync(process.env.O4O_SETUP_TEST_MARKER,'started');")]],runtime:fs.readFileSync(process.execPath),runtimeLicense:Buffer.from('fixture license')});
+ const launcher=path.join(root,'설치 파일.cmd'),marker=path.join(root,'marker');
+ // Execute exactly the generated bytes. No external archive, transport stub or
+ // web deployment is available to this installer; all executable content is embedded.
+ fs.writeFileSync(launcher,result.setup);
+ const system=process.env.SystemRoot;
+ const run=()=>execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${launcher}""`],{
+  env:{...process.env,O4O_SETUP_TEST_MARKER:marker,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,input:'\r\n',timeout:60000,
+ });
+ run();assert.equal(fs.readFileSync(marker,'utf8'),'started');fs.unlinkSync(marker);
+ const corrupt=Buffer.from(result.setup);const offset=Number(corrupt.readBigInt64LE(corrupt.length-8));corrupt[offset+40]^=1;fs.writeFileSync(launcher,corrupt);
+ assert.throws(run);assert.equal(fs.existsSync(marker),false);
+ fs.writeFileSync(launcher,result.setup.subarray(0,result.setup.length-1));
+ assert.throws(run);assert.equal(fs.existsSync(marker),false);
 });

@@ -1,3 +1,6 @@
+import { centralRequestAuthMethod } from '../middleware/central-operation-menu.middleware.js';
+import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
+import { OperationError } from '../services/operations/operation-audit.js';
 import { Router, type RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -55,6 +58,10 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
     const user = await currentCommunityUser(req as AuthRequest);
     const workspace = await resolveCommunityWorkspace(AppDataSource, user, req.params.communityKey);
     if (!workspace?.allowed) { res.status(403).json({ success: false, code: 'COMMUNITY_ACCESS_REQUIRED' }); return; }
+    if (workspace.communityKey === 'community' && (req.query.review === 'true' || req.method === 'PATCH')) {
+      try { await assertCentralOperationRequest(AppDataSource,user!.id!,'community',['community.forums'],centralRequestAuthMethod(req)); }
+      catch(error) { if(error instanceof OperationError) { res.status(error.status).json({success:false,code:error.code,error:error.message}); return; } throw error; }
+    }
     const reviewer = { id: user!.id!, name: (req as AuthRequest).user?.name, email: (req as AuthRequest).user?.email };
     const body = bodyOf(req);
     let result: any;
@@ -86,6 +93,10 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
   }));
 
   router.post('/:communityKey/boards', apiLimiter, authenticate, asyncHandler(async (req, res) => {
+    if (req.params.communityKey === 'community') {
+      try { await assertCentralOperationRequest(AppDataSource,(req as AuthRequest).user!.id,'community',['community.forums'],centralRequestAuthMethod(req)); }
+      catch(error) { if(error instanceof OperationError) { res.status(error.status).json({success:false,code:error.code,error:error.message}); return; } throw error; }
+    }
     const user = await currentCommunityUser(req as AuthRequest);
     const board = await AppDataSource.transaction(async (m) => {
       const workspace = await resolveCommunityWorkspace(m, user, req.params.communityKey);

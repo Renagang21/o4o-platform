@@ -22,7 +22,7 @@ cooperation-member-presentation.css 공통 메뉴·PC 2열·모바일 참여 상
 |---|---|---|---|
 | pharmacy | web-pharmacy-business | 약국 조직 | kpa-society transport alias → neture 세션 |
 | megapharm | web-pharmacy-business | 약국 조직 | 자기 호스트의 공통 계정 로그인 |
-| carepharm | web-neture | 약국 조직 | carepharm transport alias → neture 세션 |
+| carepharm | web-pharmacy-business (전환 구현, 운영 결과는 아래 WO 참조) | 약국 조직 | carepharm transport alias → neture 세션 |
 | pharmcoop | web-pharmacy-coop | 조합별 개인 | 자기 호스트 로그인·조합 선택 |
 
 `COOPERATION_EXTENSIONS`는 네 사업의 표현 설정이다. 기존 `COOPERATION_MODELS`는 지원되는 두 handoff transport의 호환 목록이므로 이 둘의 key 개수는 다르다. extension 등록만으로 handoff alias·가입·역할·제공 기능을 생성하지 않는다.
@@ -34,3 +34,5 @@ cooperation-member-presentation.css 공통 메뉴·PC 2열·모바일 참여 상
 회원 홈의 `CooperationMemberHomeLayout`은 참여/지원 summary와 본문을 표시 slot으로 받는다. `CooperationMemberNavigation`은 각 앱이 실제 경로·현재 권한에 따라 구성한 링크만 표시하며 홈과 소식 anchor를 구분한다. 약국 선택 query와 조합 slug/preview는 호출 앱이 보존한다. Pharmcoop은 이 표시 모듈만 사용하고 약국 조직 가입용 `CooperationMemberSpace`를 사용하지 않는다. 관련 1단계 범위는 [회원 홈 WO](../../../../docs/work-orders/WO-O4O-COOPERATION-MEMBER-HOME-LAYOUT-V1.md)를 따른다.
 
 검증: 저장소 루트에서 `pnpm exec vitest run --config packages/shared-space-ui/vitest.config.mjs`. 영향 소비 앱과 운영 UI 테스트·빌드를 함께 실행한다. 이번 범위와 결과는 [WO](../../../../docs/work-orders/WO-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md), [CHECK](../../../../docs/checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)를 따른다.
+
+CarePharm 홈·공지 표시 구현은 `carepharm/`에서 재사용한다. Neture의 얇은 어댑터는 운영 전환 복구용 소비처다. 실제 도메인 전환·옛 자원 제거 결과는 [전환 WO](../../../../docs/work-orders/WO-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1.md)에서 확인한다.

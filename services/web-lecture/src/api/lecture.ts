@@ -1,3 +1,6 @@
+import type { Paginated, LectureCourse, LectureLesson, LectureEnrollment, LectureQuiz, UpsertQuizDto, LectureAssignment, LectureSubmission, InstructorApplication, CourseInput, LessonInput } from '@o4o/operator-core-ui/modules/lecture-operations';
+export type { CourseStatus, LessonType, CourseVisibility, Pagination, Paginated, ProfessionalInfo, LessonAttachment, LectureCourse, LectureLesson, LectureEnrollment, LectureCertificate, QuizQuestionDraft, LectureQuiz, UpsertQuizDto, LectureAssignment, LectureSubmission, InstructorApplication, CourseInput, LessonInput, OperatorCourseReviewLesson, OperatorCourseReview, MissingCertificate, CertificateState, CertificateOperation } from '@o4o/operator-core-ui/modules/lecture-operations';
+import { createLectureOperatorApi } from '@o4o/operator-core-ui/modules/lecture-operations';
 import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * O4O 강의 (lecture) — LMS API 계층
@@ -24,172 +27,33 @@ export const lmsHttp: LmsHttpClient = {
 
 // ─── 공통 타입 (백엔드 LMS Core 응답 형태) ─────────────────────────────────
 
-export type CourseStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
-export type LessonType = 'video' | 'article' | 'quiz' | 'assignment';
-export type CourseVisibility = 'public' | 'members';
 
-export interface Pagination { total: number; page: number; limit: number; totalPages: number }
-export type Paginated<T> = { success: boolean; data: T[]; pagination?: Pagination };
 
-export interface ProfessionalInfo { audience?: string; outcomes?: string; prerequisites?: string; instructorBio?: string; expertise?: string; reviewedAt?: string }
-export interface LessonAttachment { name: string; url: string; type: string; size: number }
 
-export interface LectureCourse {
-  metadata?: Record<string, unknown> & { professionalInfo?: ProfessionalInfo };
-  id: string;
-  title: string;
-  description: string | null;
-  thumbnail: string | null;
-  status: CourseStatus;
-  visibility: CourseVisibility;
-  contentKind?: string;
-  category?: string | null;
-  serviceKey?: string | null;
-  instructorId: string;
-  instructorName?: string | null;
-  instructor?: { id: string; name?: string | null } | null;
-  duration?: number;
-  lessonCount?: number;
-  enrollmentCount?: number;
-  currentEnrollments?: number;
-  requiresApproval: boolean;
-  isPaid: boolean;
-  tags?: string[] | null;
-  rejectionReason?: string | null;
-  createdAt: string;
-  updatedAt?: string;
-  publishedAt?: string | null;
-}
 
-export interface LectureLesson {
-  id: string;
-  courseId: string;
-  title: string;
-  description: string | null;
-  type: LessonType;
-  content: string | null;
-  videoUrl: string | null;
-  order: number;
-  duration: number;
-  isPublished?: boolean;
-  isPreview?: boolean;
-  isFree?: boolean;
-  attachments?: LessonAttachment[];
-  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
-}
 
-export interface LectureEnrollment {
-  id: string;
-  courseId: string;
-  userId: string;
-  status: string;
-  /** 서버(Enrollment entity)의 영속 필드는 `progressPercentage`. `progress` 는 구 응답 호환용. */
-  progressPercentage?: number;
-  progress?: number;
-  completedLessons?: number;
-  metadata?: { completedLessonIds?: string[] } | null;
-  course?: Pick<LectureCourse, 'id' | 'title' | 'thumbnail' | 'lessonCount'> | null;
-  user?: { id: string; email?: string; name?: string | null } | null;
-  createdAt?: string;
-}
 
-export interface LectureCertificate {
-  id: string;
-  certificateNumber: string;
-  courseId: string;
-  userId: string;
-  status?: string;
-  issuedAt: string;
-  expiresAt?: string | null;
-  verificationCode?: string;
-  course?: { id: string; title: string } | null;
-  user?: { id: string; name?: string | null; email?: string } | null;
-}
 
-export interface QuizQuestionDraft {
-  /**
-   * 4차 P1-14: 기존 문항의 id 는 편집·저장 왕복에서 반드시 보존한다.
-   * 채점은 attempt 의 questionId ↔ quiz.questions[].id 매칭이고 updateQuiz 는 배열을 그대로 저장하므로,
-   * id 를 빼고 저장하면 기존 제출이 전부 오답 처리된다. 새 문항만 id 없이 보낸다(서버가 발급).
-   */
-  id?: string;
-  question: string;
-  type: 'single' | 'multi' | 'text';
-  options: string[];
-  answer: string | string[];
-  points: number;
-  order: number;
-}
-export interface LectureQuiz {
-  id: string;
-  lessonId: string;
-  courseId: string;
-  title: string;
-  description?: string;
-  questions: Array<QuizQuestionDraft & { id: string }>;
-  passingScore: number;
-  isPublished?: boolean;
-}
-export interface UpsertQuizDto {
-  lessonId: string;
-  courseId: string;
-  title: string;
-  description?: string;
-  questions: QuizQuestionDraft[];
-  passingScore: number;
-  isPublished?: boolean;
-}
-export interface LectureAssignment {
-  id: string;
-  lessonId: string;
-  instructions: string | null;
-  dueDate: string | null;
-  maxScore?: number | null;
-}
-export interface LectureSubmission {
-  id: string;
-  userId: string;
-  content: string | null;
-  submittedAt: string | null;
-  gradingStatus?: string | null;
-  score?: number | null;
-  feedback?: string | null;
-  userName?: string | null;
-  gradedAt?: string | null;
-}
-export interface InstructorApplication {
-  id: string;
-  userId: string;
-  status: 'pending' | 'approved' | 'rejected' | string;
-  bio?: string | null;
-  expertise?: string | null;
-  createdAt: string;
-  reviewNote?: string | null;
-  user?: { id: string; name?: string | null; email?: string } | null;
-}
 
-export interface CourseInput {
-  metadata?: { professionalInfo?: ProfessionalInfo };
-  title: string;
-  description: string;
-  thumbnail?: string | null;
-  tags?: string[];
-  visibility?: CourseVisibility;
-  requiresApproval?: boolean;
-}
-export interface LessonInput {
-  isFree?: boolean;
-  attachments?: LessonAttachment[];
-  metadata?: Record<string, unknown> & { captions?: import('@o4o/lms-ui').LmsCaptionTrack[] };
-  title: string;
-  type: LessonType;
-  description?: string | null;
-  content?: string | null;
-  videoUrl?: string | null;
-  order?: number;
-  duration?: number;
-  isPublished?: boolean;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ─── Learner (공통 client 재사용) ─────────────────────────────────────────────
 
@@ -264,81 +128,14 @@ export const instructorApi = {
 
 
 /** 운영자 검토 화면 응답 (GET /lms/operator/courses/:courseId/review) — read-only. */
-export interface OperatorCourseReviewLesson {
-  id: string;
-  title: string;
-  description: string | null;
-  type: string;
-  order: number;
-  duration: number | null;
-  isPublished: boolean;
-  isFree: boolean;
-  videoUrl: string | null;
-  attachments: Array<{ name: string; url: string; type: string; size: number }>;
-  content: Record<string, unknown> | null;
-  hasQuiz: boolean;
-  quizQuestionCount: number;
-  hasAssignment: boolean;
-}
-export interface OperatorCourseReview {
-  course: {
-    professionalInfo?: ProfessionalInfo;
-    id: string;
-    title: string;
-    description: string | null;
-    status: CourseStatus;
-    visibility: string;
-    instructorId: string;
-    isPaid: boolean;
-    requiresApproval: boolean;
-    rejectionReason: string | null;
-    thumbnail: string | null;
-    createdAt: string | null;
-    updatedAt: string | null;
-  };
-  curriculum: OperatorCourseReviewLesson[];
-  readOnly: true;
-}
 
-export interface MissingCertificate { enrollmentId: string; userId: string; courseId: string; userName?: string; courseTitle: string }
-export interface CertificateState { isValid?: boolean; expiresAt?: string | null }
+
+
+
+
 /** 운영자 전용 수료증 처리 이력 (발급·갱신·수정·폐기). 학습자·공개 검증 응답에는 포함되지 않는다. */
-export interface CertificateOperation {
-  actorId: string | null; at: string; action: 'issue' | 'renew' | 'update' | 'revoke';
-  reason: string | null; before: CertificateState | null; after: CertificateState | null;
-  months?: number | null; changedFields?: string[] | null; trigger?: 'operator' | 'completion' | null;
-}
-export const operatorApi = {
-  missingCertificates: (search = '') => lmsHttp.get<LmsApiResponse<{ items: MissingCertificate[] }>>('/lms/operator/certificates/missing', { search }),
-  courses: (params?: { status?: string; search?: string; page?: number; limit?: number; contentKind?: string }) =>
-    lmsHttp.get<Paginated<LectureCourse>>('/lms/operator/courses', { contentKind: 'all', ...(params ?? {}) }),
-  /** 운영자 검토 전용 read-only 조회 (11차 P2) — 수강 등록·write 없음. */
-  review: (id: string) =>
-    lmsHttp.get<LmsApiResponse<OperatorCourseReview>>(`/lms/operator/courses/${id}/review`),
-  approve: (id: string) => lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/approve`),
-  reject: (id: string, reason: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/reject`, { reason }),
-  publish: (id: string) => lmsHttp.post<LmsApiResponse<unknown>>(`/lms/courses/${id}/publish`),
-  unpublish: (id: string) => lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/unpublish`),
-  archive: (id: string) => lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/archive`),
 
-  applications: (params?: { status?: string; page?: number; limit?: number }) =>
-    lmsHttp.get<Paginated<InstructorApplication>>('/lms/instructor/applications', params),
-  approveApplication: (id: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/instructor/applications/${id}/approve`),
-  rejectApplication: (id: string, reason?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/instructor/applications/${id}/reject`, { reason }),
-
-  issueCertificate: (dto: { userId: string; courseId: string; enrollmentId?: string }) =>
-    lmsHttp.post<LmsApiResponse<{ certificate: LectureCertificate }>>('/lms/certificates/issue', dto),
-  certificateOperations: (id: string, page = 1) =>
-    lmsHttp.get<LmsApiResponse<{ operations: CertificateOperation[]; page: number; hasMore: boolean }>>(`/lms/certificates/${id}/operations`, { page }),
-  /** operationId: 같은 요청의 재시도는 이력·변경을 한 번만 남긴다. */
-  revokeCertificate: (id: string, reason?: string, operationId?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/revoke`, { reason, ...(operationId ? { operationId } : {}) }),
-  renewCertificate: (id: string, months?: number, operationId?: string) =>
-    lmsHttp.post<LmsApiResponse<unknown>>(`/lms/certificates/${id}/renew`, { ...(months ? { months } : {}), ...(operationId ? { operationId } : {}) }),
-};
+export const operatorApi = createLectureOperatorApi(lmsHttp);
 
 /** 백엔드 오류 메시지 추출 (axios envelope `{ success:false, error, code }`). */
 export function errorMessage(err: unknown, fallback: string): string {

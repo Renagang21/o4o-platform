@@ -1,3 +1,5 @@
+import { centralMenusForRole } from '@o4o/types';
+import { CentralMenuSelection, CentralMenuGrantEditor } from './CentralMenuGrants';
 import UsersListClean from '../users/UsersListClean';
 import BusinessOperatorAssignments from './BusinessOperatorAssignments';
 /**
@@ -160,6 +162,8 @@ export default function OperatorsPage() {
   // 등록이 나가고(과거 KPA 고정 결함), 화면 표시와 실제 serviceKey 가 어긋날 수 있다.
   const [targetServiceKey, setTargetServiceKey] = useState<string>('');
   const [targetRole, setTargetRole] = useState<string>('');
+  const [menuKeys, setMenuKeys] = useState<string[]>([]);
+  const [menuTarget, setMenuTarget] = useState<{ userId: string; role: string } | null>(null);
   // (A) 지정 경로 — 사람을 **검색해서 고른다**. 이메일을 타이핑해 넣지 않는다(email ≠ Identity Key).
   const [candidateQuery, setCandidateQuery] = useState('');
   const [candidates, setCandidates] = useState<OperatorCandidate[]>([]);
@@ -170,7 +174,7 @@ export default function OperatorsPage() {
   const [invitations, setInvitations] = useState<Invite[] | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitationVersion, setInvitationVersion] = useState(0);
-  const [showOperatorAssignments, setShowOperatorAssignments] = useState(false);
+  const [showOperatorAssignments, setShowOperatorAssignments] = useState(true);
   const acceptedInvitationSnapshot = useRef<string | null>(null);
   const userLoadSequence = useRef(0);
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
@@ -444,6 +448,7 @@ export default function OperatorsPage() {
         ...(selectedCandidate ? { targetUserId: selectedCandidate.userId } : { email: inviteEmail.trim() }),
         serviceKey: canonicalServiceKey, role: targetRole,
         centralDelegation: CENTRAL_OPERATION_ROLES.has(targetRole),
+        ...(CENTRAL_OPERATION_ROLES.has(targetRole) ? { menuKeys } : {}),
       });
       setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주세요. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
       toast.success('운영자 확인 메일 발송을 요청했습니다.');
@@ -624,6 +629,7 @@ export default function OperatorsPage() {
         <RowActionMenu
           actions={[
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
+            ...(row.user.centralDelegationRoles?.includes(row.role) ? [{ key: 'menus', label: '위임 업무 설정', onClick: () => setMenuTarget({ userId: row.userId, role: row.role }) }] : []),
             // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17:
             //   "서비스 비밀번호 변경" 액션을 제거했다. 운영자는 본인 계정으로 로그인하며
             //   관리자가 타인의 비밀번호를 만들거나 재설정하는 경로는 존재하지 않는다.
@@ -663,7 +669,7 @@ export default function OperatorsPage() {
       <div className={`grid grid-cols-1 ${showOperatorAssignments ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mb-4`}>
         <StatCard label="표시 계정" value={stats.users} color="text-gray-900" Icon={Users} />
         <StatCard label="Admin 권한" value={stats.admins} color="text-orange-600" Icon={Shield} />
-        {showOperatorAssignments && <StatCard label="기존 Operator 권한" value={stats.operators} color="text-blue-600" Icon={Shield} />}
+        {showOperatorAssignments && <StatCard label="Operator 권한" value={stats.operators} color="text-blue-600" Icon={Shield} />}
       </div>
 
       {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
@@ -691,9 +697,9 @@ export default function OperatorsPage() {
             setSelectedIds(new Set());
             setFacets(previous => ({ ...previous, role: '' }));
           }} />
-          <span>기존 Operator 권한 함께 보기</span>
+          <span>Operator 권한 함께 보기</span>
         </label>
-        <p className="text-gray-600">기존 Operator 권한은 유지되며, 함께 보기에서 조회·회수할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
+        <p className="text-gray-600">중앙 위임된 Operator는 행 메뉴에서 업무를 설정하고 권한을 회수할 수 있습니다. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
       </div>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
       <BusinessOperatorAssignments />
@@ -791,6 +797,8 @@ export default function OperatorsPage() {
         }}
         title="운영자 권한 해제 결과"
       />
+
+      {menuTarget && <CentralMenuGrantEditor key={`${menuTarget.userId}:${menuTarget.role}`} {...menuTarget} onClose={() => setMenuTarget(null)} onSaved={() => { toast.success('위임 업무를 저장했습니다.'); void fetchUsers(); }} />}
 
       {/* 상세 Drawer (조회 전용) — row click 진입 */}
       <BaseDetailDrawer
@@ -1095,7 +1103,7 @@ export default function OperatorsPage() {
                                 type="radio"
                                 name="target-role"
                                 checked={targetRole === role.value}
-                                onChange={() => setTargetRole(role.value)}
+                                onChange={() => { setTargetRole(role.value); setMenuKeys(centralMenusForRole(role.value).map(menu => menu.key)); }}
                                 className="mt-0.5 text-blue-600"
                               />
                               <div>
@@ -1119,6 +1127,7 @@ export default function OperatorsPage() {
                     )}
                   </div>
 
+                  {CENTRAL_OPERATION_ROLES.has(targetRole) && <CentralMenuSelection role={targetRole} value={menuKeys} onChange={setMenuKeys} disabled={submitting} />}
                   <p className="text-xs text-slate-500">
                     플랫폼 계정(<code>platform:super_admin</code>)은 서비스 운영자 등록 대상이 아닙니다 —
                     <b> 설정 &gt; 관리자 계정</b> 화면에서 관리합니다.

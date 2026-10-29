@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import { zip, member } from "./zip.mjs";
+import { setupDownload } from "./setup-download.mjs";
 import { PC_AGENT_VERSION } from "../src/release-info.mjs";
 import { SCHEMA_VERSION } from "../src/local-db.mjs";
 function compareNames(a, b) {
@@ -56,18 +57,28 @@ export function assembleRelease({ sourceSha, files, runtime, runtimeLicense }) {
     throw new Error("PC installer exceeds the 32 MiB HTTP download limit");
   }
   const filename = `o4o-pc-connection-${sourceSha.slice(0, 12)}-${releaseId.slice(0, 12)}.zip`;
+  const manifest = {
+    format: "o4o-pc-release-v1",
+    releaseId,
+    version: PC_AGENT_VERSION,
+    sourceSha,
+    nodeVersion: NODE_VERSION,
+    dataSchemaVersion: SCHEMA_VERSION,
+    filename,
+    sha256: sha256(archive),
+    bytes: archive.length,
+  };
+  const setup = setupDownload(manifest, archive);
   return {
     archive,
+    setup,
     manifest: {
-      format: "o4o-pc-release-v1",
-      releaseId,
-      version: PC_AGENT_VERSION,
-      sourceSha,
-      nodeVersion: NODE_VERSION,
-      dataSchemaVersion: SCHEMA_VERSION,
-      filename,
-      sha256: sha256(archive),
-      bytes: archive.length,
+      ...manifest,
+      setup: {
+        filename: filename.replace(".zip", "-setup.cmd"),
+        sha256: sha256(setup),
+        bytes: setup.length,
+      },
     },
   };
 }
@@ -159,6 +170,10 @@ export function buildRelease({ sourceSha, out }) {
     });
     fs.mkdirSync(out, { recursive: true });
     fs.writeFileSync(path.join(out, result.manifest.filename), result.archive);
+    fs.writeFileSync(
+      path.join(out, result.manifest.setup.filename),
+      result.setup,
+    );
     fs.writeFileSync(
       path.join(out, "release.json"),
       JSON.stringify(result.manifest, null, 2),

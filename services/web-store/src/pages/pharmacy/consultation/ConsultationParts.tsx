@@ -29,7 +29,7 @@ function modeLabel(mode: Mode) {
   if (mode.allowed) return mode.label;
   return (
     mode.label +
-    (mode.entitled ? " · 약사 사용 확인 필요" : " · 제공 자격 필요")
+    (mode.entitled ? " · 개인 약사 자격·약국 업무 허용 확인 필요" : " · 제공 자격 필요")
   );
 }
 export function ConsultationSelectors({

@@ -1,3 +1,5 @@
+import { assertCentralOperationMenu } from '../admin/central-operation-menu-grants.js';
+import { OperationError } from '../operations/operation-audit.js';
 import { createHash } from 'node:crypto';
 import type { EntityManager } from 'typeorm';
 import { hasCommunityServiceOperator } from './community-service-operator-access.js';
@@ -8,15 +10,16 @@ export class CommunityManagementError extends Error {
 }
 const fail = (status: number, code: string, message: string): never => { throw new CommunityManagementError(status, code, message); };
 const uuid = /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
-export async function requireCommunityManager(db: Exec, actor: string, admin = false) {
+export async function requireCommunityManager(db: Exec, actor: string, admin = false, area: string | string[] = 'boards') {
   if (!await hasCommunityServiceOperator(db, actor, admin)) fail(403, admin ? 'COMMUNITY_ADMIN_REQUIRED' : 'COMMUNITY_OPERATOR_REQUIRED', '커뮤니티 서비스의 활성 운영 권한이 필요합니다.');
+  try { await assertCentralOperationMenu(db,actor,'community',(Array.isArray(area) ? area : [area]).map(key => `community.${key}`)); } catch(error) { if(error instanceof OperationError) fail(error.status,error.code,error.message); throw error; }
 }
 async function audit(db: Exec, actor: string, action: string, meta: unknown) {
   await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta)
     VALUES('community',$1,$2,'manual','success',$3::jsonb)`, [actor, action, JSON.stringify(meta)]);
 }
 export async function listManagedCommunityBoards(db: Exec, actor: string) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, ['boards','erase-boards']);
   return db.query(`SELECT id,name,status FROM forum_category_requests
     WHERE service_code='community' AND organization_id IS NULL AND status IN ('completed','archived') ORDER BY name,id`);
 }
@@ -170,7 +173,7 @@ async function deletionBoundaryBlockers(db: Exec, kind: CommunityDeletionKind, i
 
 /** Plan and apply use the same scope, content snapshot and external-reference checks. */
 async function deletionSnapshot(db: Exec, actor: string, kind: CommunityDeletionKind, id: string) {
-  await requireCommunityManager(db, actor, true);
+  await requireCommunityManager(db, actor, true, `erase-${kind}`);
   if (!uuid.test(id)) fail(400, 'INVALID_RESOURCE_ID', '대상을 확인해 주세요.');
   const {target,blockers} = kind === 'boards' ? await boardDeletionTarget(db,id) : await memberDeletionTarget(db,actor,id);
   const {posts,predicates} = deletionScope(kind);

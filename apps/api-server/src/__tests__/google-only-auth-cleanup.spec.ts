@@ -146,6 +146,7 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
         path.join('services','kpa-branch','branch-lifecycle.service.ts'),
         path.join('services','kpa-branch','branch-operator-designation.service.ts'),
         path.join('services','privacy','account-erasure.service.ts'),
+        path.join('services','privacy','central-menu-grant-ownership.ts'),
       ].sort());
       expect(fs.existsSync(path.join(SRC,'services','admin','operator-invitation.service.ts'))).toBe(false);
     });
