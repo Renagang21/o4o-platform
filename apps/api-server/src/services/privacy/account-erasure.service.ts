@@ -45,6 +45,7 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   member_qualifications: ['user_id'], qualification_requests: ['user_id'], kyc_documents: ['user_id'],
   instructor_profiles: ['user_id'], forum_bookmark: ['userId'], forum_like: ['userId'],
   forum_notifications: ['userId'], forum_category_members: ['user_id'],
+  assistant_method_sharing_consents:['user_id'], assistant_work_data_consents:['user_id'],
   assistant_run_frames: ['user_id'], assistant_procedural_patterns: ['user_id'], assistant_tasks: ['requested_by_user_id'],
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
@@ -247,7 +248,7 @@ export class AccountErasureService {
     const shortTokens=tokens.filter(v=>v.length<2);
     // Search attributed identifier values, not JSON column/key names or another actor’s profile.
     const leaf=(alias:string, attributionOnly=false)=>`jsonb_path_query_array(to_jsonb(${alias})
-      ${attributionOnly ? "- 'assigned_by'" : ''}
+      ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
     // Provider IDs belong to a namespace. Unattributed copies still need domain review,
@@ -275,8 +276,8 @@ export class AccountErasureService {
       // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
       // Node memory even when many genuine candidates require namespace/domain inspection.
       await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
-        SELECT (to_jsonb(r) ${attributionOnly ? "- 'assigned_by'" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
-        jsonb_path_query_array(to_jsonb(r) ${attributionOnly ? "- 'assigned_by'" : ''},'$.** ? (@.type() == "string")')::text
+        SELECT (to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''},'$.** ? (@.type() == "string")')::text
         ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
           `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
       try {
@@ -304,6 +305,9 @@ export class AccountErasureService {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      // Personal work copies cascade with the user's consent row; organizational
+      // copies are reviewed independently and never erased as the grant actor's data.
+      if(t.schema_name==='public' && t.table_name==='assistant_work_data_records')predicate="r.owner_key='user:'||$1::text";
       if (t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants') {
         predicate = CENTRAL_MENU_GRANT_OWNER_SQL;
       }
@@ -336,7 +340,7 @@ export class AccountErasureService {
       }
       // The grant belongs to user_id. assigned_by is attribution only and its
       // existing ON DELETE SET NULL FK clears it; every other field is still scanned.
-      const roleAttribution = t.schema_name === 'public' && t.table_name === 'role_assignments';
+      const roleAttribution = t.schema_name === 'public' && ['role_assignments','assistant_work_data_consents'].includes(t.table_name);
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
         WHERE $1::text IS NOT NULL AND (${leaf('r',roleAttribution)}::text ~* ANY($2::text[]) OR ${leaf('r',roleAttribution)} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);

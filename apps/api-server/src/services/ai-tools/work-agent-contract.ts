@@ -855,6 +855,8 @@ export interface CompletionVerdict {
 export type CompletionJudge = (claim: { evidence: ExecutionEvidence[]; via: 'done' | 'goal_sufficiently_advanced' }) => Promise<CompletionVerdict>;
 
 export interface ExecutionIntent {
+  /** Opted-in, label-free aggregate recommendations; never authorize replay. */
+  sharedCandidates?: Array<{taskKey?:string;stage:string;strategy:import('./work-assistance.js').Strategy;contributors:number;verified:number}>;
   /** Request-only untrusted manual excerpts. Not memory, execution authority or replay steps. */
   manualReferences?: readonly ManualReference[];
   version: 1;

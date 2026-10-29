@@ -340,7 +340,7 @@ test('H1. run_unit: 확장 미연결이면 실행 없이 실패 · 형상 밖 �
   assert.equal(unknown.status, 'denied');
   assert.equal(site.calls.length, 0);
   assert.ok(handlers.listAllowedActions().includes('local.browser.dom.run_unit'));
-  assert.equal(handlers.AGENT_VERSION, '0.3.0');
+  assert.equal(handlers.AGENT_VERSION, '0.5.0');
 });
 
 test('H2. run_unit 의 각 단계는 단발 action 과 같은 bridge type 으로만 나간다', async () => {

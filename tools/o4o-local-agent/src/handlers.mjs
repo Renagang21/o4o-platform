@@ -1,3 +1,5 @@
+import { validatePharmacyCommand } from './pharmacy-order-contract.mjs';
+import { pharmacyRead, pharmacySummary, importPharmacyRecords } from './pharmacy-data.mjs';
 /**
  * Local Work Agent — action handler (§21·§28)
  *
@@ -43,8 +45,8 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
-import { backupSummary } from './local-db-backup.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError, openLocalDb } from './local-db.mjs';
+import { backupSummary, createBackup } from './local-db-backup.mjs';
 import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs, takeOwnerKey } from './work-assistance.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
@@ -105,6 +107,8 @@ export const ACTIONS = {
   DATA_SET_SETTING: 'local.data.set_setting',
   // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §5 — dataset 필드 하나를 값으로 찾는 좁은 조회.
   DATA_QUERY: 'local.data.query',
+  DATA_PHARMACY_READ: 'local.data.pharmacy_read',
+  DATA_PHARMACY_WRITE: 'local.data.pharmacy_write',
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
   DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
@@ -739,7 +743,7 @@ const WORK_RUN_TEXT_MAX = 500;
 
 function sanitizeWorkRunText(value) {
   if (typeof value !== 'string') return undefined;
-  const cleaned = value.replace(/[ -]/g, ' ').trim();
+  const cleaned = value.replace(/[\0-]/g, ' ').trim();
   if (cleaned.length === 0) return undefined;
   return cleaned.slice(0, WORK_RUN_TEXT_MAX);
 }
@@ -1234,6 +1238,8 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_GET_META]: { validate: validateGetMetaArgs, run: (args) => dataGetMeta(args) },
   [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
   [ACTIONS.DATA_QUERY]: { validate: validateDataQueryArgs, run: (args) => dataQuery(args) },
+  [ACTIONS.DATA_PHARMACY_READ]: { validate: args => validatePharmacyCommand('read', args), run: args => ({ status:'success',data:pharmacyRead(args.owner,args) }) },
+  [ACTIONS.DATA_PHARMACY_WRITE]: { validate: args => validatePharmacyCommand('write', args), run: args => { if(args.mode==='program'||args.mode==='restore')createBackup(openLocalDb(),'manual');const saved=importPharmacyRecords(args.owner, {format: 'o4o-pharmacy-work-v1', records:args.records}, args.expectedRevision, args.mode); return {status:'success',data:{...pharmacySummary(args.owner),revision:saved.revision}}; } },
   [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
   [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE]: { validate: validateCandidateSaveArgs, run: (args) => dataCandidateSave(args) },
@@ -1372,7 +1378,7 @@ export async function runAction(action, context, args) {
       return await dataHandler.run(checked.args);
     } catch (err) {
       // 예외 원문(경로·스택)을 밖으로 내보내지 않는다 — 코드만. bootstrap 실패는 그 원인 코드(V1 §58).
-      return { status: 'failed', errorCode: err instanceof LocalDbError ? err.code : 'LOCAL_DB_NOT_AVAILABLE' };
+      return { status: 'failed', errorCode: err instanceof LocalDbError ? err.code : String(err?.message).startsWith('PHARMACY_REVISION_CONFLICT') ? 'PHARMACY_REVISION_CONFLICT' : 'LOCAL_DB_NOT_AVAILABLE' };
     }
   }
 

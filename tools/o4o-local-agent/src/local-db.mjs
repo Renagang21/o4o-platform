@@ -1,3 +1,5 @@
+import { PHARMACY_FORMAT, validatePharmacyBundle } from './pharmacy-order-contract.mjs';
+import { isDeepStrictEqual } from 'node:util';
 /**
  * Local Work Agent — 로컬 데이터 런타임 (Local Data Runtime V1)
  *
@@ -31,7 +33,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 하지 않는 것 (V0 §31~§37 · V1 §5·§15·§40·§44)
  *
- * - cloud 업로드 · 원본 테이블 동기화 · 자동 복제: 없음. 이 파일에 http/fetch 가 없다.
+ * - 네트워크 전송: 이 파일에는 없다. 허가된 업무 사본 동기화는 pharmacy-sync.mjs가 이 저장소의 journal을 사용한다.
  * - 임의 SQL 실행 tool: 없음. 서버·AI·사용자 입력이 SQL 문자열로 오는 통로가 없다 —
  *   migration 은 이 파일에 체크인된 코드뿐이다(§14·§15).
  * - credential/비밀번호/쿠키/토큰을 DB 정체성으로 쓰지 않는다 — local_db_id 는 무작위 UUID 다.
@@ -193,8 +195,7 @@ export const MIGRATIONS = Object.freeze([
       //   run_id        — runtime 이 발급한 logical run 식별자(cloud coordination 과 동일 값).
       //   status        — active | waiting_for_user | completed | taken_over | expired.
       //   target_id     — 등재 대상(browser_site/windows_app) 식별자. 없으면 NULL.
-      //   goal_summary  — semantic 목표 요약(사용자가 입력한 업무 문장, 짧게). 이것은 사용자 PC 의
-      //                   자기 데이터이므로 정본으로 담는다.
+      //   goal_summary  — legacy compatibility column; v9 clears it and new writes are NULL.
       //   note          — 재개용 semantic 메모(예: 마지막 질문 요지). 짧은 텍스트만.
       // 저장 금지(§검증 D · 조건 6): 이미지 · screenshot · raw DOM 전문 · credential/token ·
       //   개인정보/환자정보 · 화면 전체 텍스트 dump. 이 테이블에 그런 컬럼은 없다.
@@ -524,6 +525,65 @@ export const MIGRATIONS = Object.freeze([
       `);
     },
   },
+  {
+    version: 9,
+    name: 'pharmacy_incremental_work_data_v1',
+    up(db) {
+      db.exec(`
+        CREATE TABLE local_pharmacy_workspaces (
+          dataset TEXT PRIMARY KEY, revision INTEGER NOT NULL DEFAULT 0
+        );
+        CREATE TABLE local_pharmacy_records (
+          dataset TEXT NOT NULL REFERENCES local_pharmacy_workspaces(dataset),
+          lane TEXT NOT NULL CHECK(lane IN ('imported','user')),
+          kind TEXT NOT NULL, id TEXT NOT NULL,
+          payload TEXT NOT NULL CHECK(json_valid(payload)),
+          local_revision INTEGER NOT NULL, server_version INTEGER NOT NULL DEFAULT 0,
+          mutation_id TEXT NOT NULL, dirty INTEGER NOT NULL DEFAULT 1,
+          updated_at TEXT NOT NULL,
+          PRIMARY KEY(dataset,lane,kind,id)
+        );
+        CREATE INDEX idx_pharmacy_dirty ON local_pharmacy_records(dataset,dirty,lane,kind,id);
+        CREATE INDEX idx_pharmacy_kind ON local_pharmacy_records(dataset,kind,id);
+        CREATE INDEX idx_pharmacy_period ON local_pharmacy_records(dataset,kind,json_extract(payload,'$.data.period_from'));
+        CREATE UNIQUE INDEX uq_pharmacy_source ON local_pharmacy_records(dataset,kind,json_extract(payload,'$.origin.program'),json_extract(payload,'$.origin.source_key')) WHERE lane='imported';
+        CREATE TABLE local_pharmacy_sync_conflicts (
+          dataset TEXT NOT NULL REFERENCES local_pharmacy_workspaces(dataset),
+          lane TEXT NOT NULL,kind TEXT NOT NULL,id TEXT NOT NULL,
+          payload TEXT NOT NULL CHECK(json_valid(payload)),server_version INTEGER NOT NULL,
+          reason TEXT NOT NULL DEFAULT 'IDENTITY' CHECK(reason IN ('IDENTITY','DEPENDENCY')),checked_at TEXT NOT NULL DEFAULT '',
+          PRIMARY KEY(dataset,lane,kind,id)
+        );
+        CREATE INDEX idx_pharmacy_staged_retry ON local_pharmacy_sync_conflicts(dataset,checked_at,server_version);
+        CREATE TABLE local_pharmacy_sync (
+          dataset TEXT PRIMARY KEY REFERENCES local_pharmacy_workspaces(dataset),
+          epoch TEXT NOT NULL, cursor INTEGER NOT NULL DEFAULT 0,
+          synced_at TEXT, error TEXT
+        );
+      `);
+      const insertWorkspace = db.prepare('INSERT INTO local_pharmacy_workspaces(dataset,revision) VALUES(?,?)');
+      const insertRecord = db.prepare('INSERT INTO local_pharmacy_records(dataset,lane,kind,id,payload,local_revision,mutation_id,updated_at) VALUES(?,?,?,?,?,?,?,?)');
+      // Keep the v8 JSON intact as recovery evidence. v9 readers use only the
+      // normalized rows; old agents already refuse a newer schema.
+      for (const row of db.prepare("SELECT dataset,data FROM local_dataset_rows WHERE row_key='workspace'").all()) {
+        if (!/^pharmacy_[a-f0-9]{48}$/.test(row.dataset)) continue;
+        const state = JSON.parse(row.data);
+        if (!Number.isSafeInteger(state.revision) || !Array.isArray(state.imported) || !Array.isArray(state.user)) throw Error('PHARMACY_LEGACY_STATE_INVALID');
+        if(state.revision<0 || state.user.some(entry=>['purchase','usage','sale','balance'].includes(entry?.kind)))throw Error('PHARMACY_LEGACY_STATE_INVALID');
+        validatePharmacyBundle({format:PHARMACY_FORMAT,records:state.imported},{batch:false,links:false});
+        validatePharmacyBundle({format:PHARMACY_FORMAT,records:state.user},{batch:false,links:false});
+        const visible=new Map(state.imported.map(entry=>[entry.kind+':'+entry.data.id,entry]));
+        for(const entry of state.user)visible.set(entry.kind+':'+entry.data.id,entry);
+        validatePharmacyBundle({format:PHARMACY_FORMAT,records:[...visible.values()]},{batch:false});
+        insertWorkspace.run(row.dataset, state.revision);
+        for (const lane of ['imported', 'user']) for (const entry of state[lane]) {
+          if (!entry?.data?.id || typeof entry.kind !== 'string') throw Error('PHARMACY_LEGACY_ROW_INVALID');
+          insertRecord.run(row.dataset, lane, entry.kind, entry.data.id, JSON.stringify(entry), state.revision, randomUUID(), nowIso());
+        }
+      }
+      db.exec('UPDATE local_work_runs SET goal_summary=NULL');
+    },
+  },
 ]);
 
 /** DB 스키마 버전 = 체크인된 마지막 migration 의 version(§11). 따로 손으로 올리지 않는다. */
@@ -740,6 +800,7 @@ function seedMeta(db) {
 
 /** 닫는다 — 재기동 검증 · 복원 전에. 다음 openLocalDb/bootstrap 이 다시 세운다. */
 export function closeLocalDb() {
+  workRunGoals.clear();
   if (cachedDb) {
     try { cachedDb.close(); } catch { /* ignore */ }
     cachedDb = null;
@@ -898,35 +959,210 @@ export const LocalDatasetRepository = {
   },
 };
 
-/** Pharmacy work data uses existing Dataset storage, schema v8 unchanged. SQL remains in this module.
+/** Pharmacy work data uses normalized Dataset storage, schema v9. SQL remains in this module.
  * A scoped workspace row is atomic and revision checked across CLI processes. No arbitrary SQL/paths.
  */
+const pharmacyScope = dataset => {
+  if (!PHARMACY_DATASET_RE.test(dataset)) throw new Error('Invalid pharmacy owner scope');
+  return dataset;
+};
+const pharmacyEffective = `r.dataset=? AND (r.lane='user' OR NOT EXISTS
+  (SELECT 1 FROM local_pharmacy_records u WHERE u.dataset=r.dataset AND u.lane='user' AND u.kind=r.kind AND u.id=r.id))`;
 export const LocalPharmacyWorkspaceRepository = {
-  read(dataset) {
-    if (!PHARMACY_DATASET_RE.test(dataset)) throw new Error('Invalid pharmacy owner scope');
-    const row = openLocalDb().prepare('SELECT data FROM local_dataset_rows WHERE dataset=? AND row_key=?').get(dataset, 'workspace');
-    if (!row) return { revision: 0, imported: [], user: [] };
-    try { return JSON.parse(row.data); } catch { throw new Error('PHARMACY_DATA_INVALID: 백업과 자료 형식을 확인하세요.'); }
+  snapshot(read) {
+    const db=openLocalDb();db.exec('SAVEPOINT pharmacy_read_snapshot');
+    try{const result=read();db.exec('RELEASE pharmacy_read_snapshot');return result;}
+    catch(error){db.exec('ROLLBACK TO pharmacy_read_snapshot');db.exec('RELEASE pharmacy_read_snapshot');throw error;}
   },
-  update(dataset, expectedRevision, update) {
-    if (!PHARMACY_DATASET_RE.test(dataset)) throw new Error('Invalid pharmacy owner scope');
-    const db = openLocalDb();
-    db.exec('BEGIN IMMEDIATE');
+  revision(dataset) {
+    pharmacyScope(dataset);
+    return Number(openLocalDb().prepare('SELECT revision FROM local_pharmacy_workspaces WHERE dataset=?').get(dataset)?.revision ?? 0);
+  },
+  read(dataset) {
+    pharmacyScope(dataset);
+    return this.snapshot(()=>{
+    const records = openLocalDb().prepare('SELECT lane,payload FROM local_pharmacy_records WHERE dataset=? ORDER BY kind,id').all(dataset);
+    return { revision: this.revision(dataset),
+      imported: records.filter(r => r.lane === 'imported').map(r => JSON.parse(r.payload)),
+      user: records.filter(r => r.lane === 'user').map(r => JSON.parse(r.payload)) };
+    });
+  },
+  page(dataset, { kind, after = '', limit = 200 } = {}) {
+    pharmacyScope(dataset);
+    if (kind !== undefined && !['product','pack','supplier','purchase','usage','sale','stock','availability','balance','sheet'].includes(kind)) throw Error('PHARMACY_KIND_INVALID');
+    if (typeof after !== 'string' || after.length > 100 || !Number.isSafeInteger(limit) || limit < 1 || limit > 500) throw Error('PHARMACY_PAGE_INVALID');
+    return this.snapshot(()=>{
+    const filter = kind ? ' AND r.kind=?' : '';
+    const rows = openLocalDb().prepare(`SELECT r.kind,r.id,r.payload FROM local_pharmacy_records r WHERE ${pharmacyEffective}
+      ${filter} AND (r.kind||':'||r.id)>? ORDER BY r.kind,r.id LIMIT ?`).all(dataset, ...(kind ? [kind] : []), after, limit + 1);
+    const page = rows.slice(0, limit);
+    while(page.length>1 && Buffer.byteLength(JSON.stringify(page.map(r=>JSON.parse(r.payload))))>900*1024)page.pop();
+    return { revision: this.revision(dataset), records: page.map(r => JSON.parse(r.payload)),
+      next: rows.length > page.length ? page.at(-1).kind + ':' + page.at(-1).id : null };
+    });
+  },
+  summary(dataset) {
+    pharmacyScope(dataset);
+    const rows = openLocalDb().prepare(`SELECT r.kind,COUNT(*) AS count FROM local_pharmacy_records r WHERE ${pharmacyEffective} GROUP BY r.kind`).all(dataset);
+    const lanes = openLocalDb().prepare('SELECT lane,COUNT(*) AS count FROM local_pharmacy_records WHERE dataset=? GROUP BY lane').all(dataset);
+    return { revision: this.revision(dataset), counts: Object.fromEntries(rows.map(r => [r.kind, Number(r.count)])),
+      importedCount: Number(lanes.find(r => r.lane === 'imported')?.count ?? 0), userCount: Number(lanes.find(r => r.lane === 'user')?.count ?? 0) };
+  },
+  update(dataset, expectedRevision, update, reconfirm = []) {
+    pharmacyScope(dataset);
+    const db = openLocalDb(); db.exec('BEGIN IMMEDIATE');
     try {
       const latest = this.read(dataset);
       if (!Number.isSafeInteger(expectedRevision) || expectedRevision !== latest.revision) throw new Error('PHARMACY_REVISION_CONFLICT: 최신 자료를 다시 확인하세요.');
       const next = { ...update(latest), revision: latest.revision + 1 };
-      const stamp = nowIso();
-      db.prepare('INSERT INTO local_datasets(name,key_field,fields,row_count,created_at,updated_at) VALUES(?, ?, ?, 1, ?, ?) ON CONFLICT(name) DO UPDATE SET updated_at=excluded.updated_at')
-        .run(dataset, 'workspace', JSON.stringify(['revision', 'imported', 'user']), stamp, stamp);
-      db.prepare('INSERT INTO local_dataset_rows(dataset,row_key,data,imported_at) VALUES(?, ?, ?, ?) ON CONFLICT(dataset,row_key) DO UPDATE SET data=excluded.data,imported_at=excluded.imported_at')
-        .run(dataset, 'workspace', JSON.stringify(next), stamp);
+      db.prepare('INSERT INTO local_pharmacy_workspaces(dataset,revision) VALUES(?,?) ON CONFLICT(dataset) DO UPDATE SET revision=excluded.revision').run(dataset, next.revision);
+      const explicit=new Set(reconfirm);
+      const quarantined=new Set(db.prepare('SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND dirty=2').all(dataset).map(r=>r.lane+':'+r.kind+':'+r.id));
+      const put = db.prepare(`INSERT INTO local_pharmacy_records(dataset,lane,kind,id,payload,local_revision,mutation_id,dirty,updated_at)
+        VALUES(?,?,?,?,?,?,?,1,?) ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,
+        local_revision=excluded.local_revision,mutation_id=excluded.mutation_id,dirty=1,updated_at=excluded.updated_at`);
+      for (const lane of ['imported','user']) {
+        const previous = new Map(latest[lane].map(e => [e.kind + ':' + e.data.id, JSON.stringify(e)]));
+        for (const entry of next[lane]) {
+          const payload = JSON.stringify(entry);
+          if (previous.get(entry.kind + ':' + entry.data.id) === payload && !(explicit.has(lane+':'+entry.kind+':'+entry.data.id) && quarantined.has(lane+':'+entry.kind+':'+entry.data.id))) continue;
+          put.run(dataset, lane, entry.kind, entry.data.id, payload, next.revision, randomUUID(), nowIso());
+          if(explicit.has(lane+':'+entry.kind+':'+entry.data.id))db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=? AND lane=? AND kind=? AND id=?').run(dataset,lane,entry.kind,entry.data.id);
+        }
+      }
+      db.prepare(`INSERT INTO local_datasets(name,key_field,fields,row_count,created_at,updated_at) VALUES(?,'id','[]',?,?,?)
+        ON CONFLICT(name) DO UPDATE SET row_count=excluded.row_count,updated_at=excluded.updated_at`)
+        .run(dataset, next.imported.length + next.user.length, nowIso(), nowIso());
       db.exec('COMMIT'); return next;
     } catch (error) { db.exec('ROLLBACK'); throw error; }
   },
 };
 
-/** same-run resume 정본 원장(PHASE 1). 고정 쿼리만 — 임의 SQL 통로 없음. */
+function pharmacyRemoteCollisions(db,dataset,row,incoming) {
+      const collisions=[];
+        if(row.entry.kind==='supplier' && !row.entry.data.enabled){
+          const overlay=db.prepare("SELECT payload FROM local_pharmacy_records WHERE dataset=? AND lane='user' AND kind='supplier' AND id=?").get(dataset,row.entry.data.id);
+          if(row.lane==='user' || !overlay || !JSON.parse(overlay.payload).data.enabled){
+            const prepared=db.prepare(`SELECT 1 FROM local_pharmacy_records r WHERE ${pharmacyEffective} AND r.kind='sheet' AND json_extract(r.payload,'$.data.status')='prepared'
+              AND EXISTS(SELECT 1 FROM json_each(r.payload,'$.data.lines') l WHERE json_extract(l.value,'$.supplier_id')=?) LIMIT 1`).get(dataset,row.entry.data.id);
+            if(prepared)collisions.push({lane:row.lane,kind:row.entry.kind,id:row.entry.data.id,holdOnly:true});
+          }
+        }
+        if(row.entry.kind==='pack'){
+          const packs=db.prepare("SELECT lane,kind,id,payload FROM local_pharmacy_records WHERE dataset=? AND kind='pack' AND id=?").all(dataset,row.entry.data.id);
+          for(const pack of packs)if(['product_id','base_unit','units_per_pack'].some(field=>JSON.parse(pack.payload).data[field]!==row.entry.data[field]))collisions.push(pack);
+        }
+        const packIds=[row.entry.data.pack_id,...(row.entry.kind==='sheet'?row.entry.data.lines.map(line=>line.pack_id):[])].filter(Boolean);
+        for(const id of packIds){
+          const pack=db.prepare("SELECT lane,kind,id,dirty,server_version,payload FROM local_pharmacy_records WHERE dataset=? AND kind='pack' AND id=? ORDER BY CASE lane WHEN 'user' THEN 0 ELSE 1 END LIMIT 1").get(dataset,id);
+          const matchingPack=incoming.find(change=>change.entry.kind==='pack' && change.entry.data.id===id);
+          if(pack && (pack.dirty===2 || (pack.server_version===0 && !matchingPack)))collisions.push({...pack,pendingOnly:pack.dirty===1});
+        }
+        if(row.entry.kind==='product')collisions.push(...db.prepare("SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND kind='product' AND id<>? AND json_extract(payload,'$.data.program')=? AND json_extract(payload,'$.data.program_code')=?").all(dataset,row.entry.data.id,row.entry.data.program,row.entry.data.program_code));
+        if(row.lane==='imported' && row.entry.origin)collisions.push(...db.prepare("SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND lane='imported' AND kind=? AND id<>? AND json_extract(payload,'$.origin.program')=? AND json_extract(payload,'$.origin.source_key')=?").all(dataset,row.entry.kind,row.entry.data.id,row.entry.origin.program,row.entry.origin.source_key));
+      return collisions;
+}
+function pharmacyReferencesReady(db,dataset,entry) {
+  const data=[entry.data,...(entry.kind==='sheet'?entry.data.lines:[])];
+  const get=(kind,id)=>{const row=db.prepare(`SELECT r.payload FROM local_pharmacy_records r WHERE ${pharmacyEffective} AND r.kind=? AND r.id=? ORDER BY CASE lane WHEN 'user' THEN 0 ELSE 1 END LIMIT 1`).get(dataset,kind,id);return row?JSON.parse(row.payload).data:null;};
+  for(const row of data){
+    for(const kind of ['product','pack','supplier'])if(row[kind+'_id'] && !get(kind,row[kind+'_id']))return false;
+    if(row.pack_id && get('pack',row.pack_id).product_id!==row.product_id)return false;
+    if(entry.kind==='sheet' && entry.data.status==='prepared' && row!==entry.data && !get('supplier',row.supplier_id)?.enabled)return false;
+  }
+  return true;
+}
+
+/** Only the authenticated sync worker uses this journal; never exposed as generic SQL. */
+export const LocalPharmacySyncRepository = {
+  configure(dataset, epoch) {
+    pharmacyScope(dataset);
+    if (typeof epoch !== 'string' || !/^[a-zA-Z0-9_-]{16,80}$/.test(epoch)) throw Error('PHARMACY_SYNC_EPOCH_INVALID');
+    const db = openLocalDb(); db.exec('BEGIN IMMEDIATE');
+    try {
+      db.prepare('INSERT OR IGNORE INTO local_pharmacy_workspaces(dataset,revision) VALUES(?,0)').run(dataset);
+      const old = db.prepare('SELECT epoch FROM local_pharmacy_sync WHERE dataset=?').get(dataset);
+      if (old?.epoch !== epoch) {
+        db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=?').run(dataset);
+        db.prepare('UPDATE local_pharmacy_records SET dirty=1,server_version=0,mutation_id=lower(hex(randomblob(16))) WHERE dataset=?').run(dataset);
+        db.prepare('INSERT INTO local_pharmacy_sync(dataset,epoch,cursor) VALUES(?,?,0) ON CONFLICT(dataset) DO UPDATE SET epoch=excluded.epoch,cursor=0,synced_at=NULL,error=NULL').run(dataset, epoch);
+      }
+      db.exec('COMMIT');
+    } catch (error) { db.exec('ROLLBACK'); throw error; }
+  },
+  state(dataset) {
+    pharmacyScope(dataset);
+    const db=openLocalDb(),state=db.prepare('SELECT epoch,cursor,synced_at,error FROM local_pharmacy_sync WHERE dataset=?').get(dataset) ?? null;
+    const counts=db.prepare('SELECT COALESCE(SUM(dirty=1),0) AS pending,COALESCE(SUM(dirty=2),0) AS conflicts FROM local_pharmacy_records WHERE dataset=?').get(dataset);
+    const held=db.prepare("SELECT count(*) AS count FROM local_pharmacy_sync_conflicts WHERE dataset=? AND reason='DEPENDENCY'").get(dataset);
+    const conflicts=db.prepare("SELECT count(*) AS count FROM (SELECT lane,kind,id FROM local_pharmacy_records WHERE dataset=? AND dirty=2 UNION SELECT lane,kind,id FROM local_pharmacy_sync_conflicts WHERE dataset=? AND reason='IDENTITY')").get(dataset,dataset);
+    return {...state,pending:Number(counts.pending)+Number(held.count),conflicts:Number(conflicts.count)};
+  },
+  pending(dataset) {
+    pharmacyScope(dataset);
+    return openLocalDb().prepare(`SELECT lane,kind,id,payload,server_version,mutation_id FROM local_pharmacy_records WHERE dataset=? AND dirty=1
+      ORDER BY CASE kind WHEN 'product' THEN 0 WHEN 'supplier' THEN 1 WHEN 'pack' THEN 2 ELSE 3 END,lane,kind,id LIMIT 100`).all(dataset)
+      .map(r => ({ lane: r.lane, entry: JSON.parse(r.payload), expectedVersion: Number(r.server_version), mutationId: r.mutation_id }));
+  },
+  apply(dataset, epoch, { accepted, changes, cursor, more }) {
+    pharmacyScope(dataset);
+    const db = openLocalDb(); db.exec('BEGIN IMMEDIATE');
+    try {
+      if (this.state(dataset)?.epoch !== epoch) throw Error('PHARMACY_SYNC_STALE_EPOCH');
+      for (const row of accepted) {
+        db.prepare(`UPDATE local_pharmacy_records SET dirty=CASE WHEN mutation_id=? THEN 0 ELSE dirty END,
+          server_version=MAX(server_version,?) WHERE dataset=? AND lane=? AND kind=? AND id=?`)
+          .run(row.mutationId, row.version, dataset, row.lane, row.kind, row.id);
+      }
+      let conflicts=0,changed=false;const conflictKeys=new Set();
+      const stage=(row,reason)=>db.prepare(`INSERT INTO local_pharmacy_sync_conflicts(dataset,lane,kind,id,payload,server_version,reason) VALUES(?,?,?,?,?,?,?)
+        ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,server_version=excluded.server_version,reason=excluded.reason,
+        checked_at=CASE WHEN excluded.server_version>local_pharmacy_sync_conflicts.server_version THEN '' ELSE local_pharmacy_sync_conflicts.checked_at END
+        WHERE excluded.server_version>=local_pharmacy_sync_conflicts.server_version`).run(dataset,row.lane,row.entry.kind,row.entry.data.id,JSON.stringify(row),row.version,reason);
+      const clear=(row)=>db.prepare('DELETE FROM local_pharmacy_sync_conflicts WHERE dataset=? AND lane=? AND kind=? AND id=? AND server_version<=?').run(dataset,row.lane,row.entry.kind,row.entry.data.id,row.version);
+      const put=db.prepare(`INSERT INTO local_pharmacy_records(dataset,lane,kind,id,payload,local_revision,server_version,mutation_id,dirty,updated_at)
+        VALUES(?,?,?,?,?,0,?,?,0,?) ON CONFLICT(dataset,lane,kind,id) DO UPDATE SET payload=excluded.payload,
+        server_version=excluded.server_version,mutation_id=excluded.mutation_id,dirty=0,updated_at=excluded.updated_at`);
+      const applyRow=(row,incoming)=>{
+        const old=db.prepare('SELECT payload,dirty,server_version FROM local_pharmacy_records WHERE dataset=? AND lane=? AND kind=? AND id=?').get(dataset,row.lane,row.entry.kind,row.entry.data.id);
+        if(old && Number(old.server_version)>=row.version){if(old.dirty!==2)clear(row);return false;}
+        const collisions=pharmacyRemoteCollisions(db,dataset,row,incoming);
+        if(collisions.length){
+          const identity=collisions.some(item=>!item.pendingOnly);stage(row,identity?'IDENTITY':'DEPENDENCY');
+          for(const item of collisions)if(!item.pendingOnly && !item.holdOnly)db.prepare('UPDATE local_pharmacy_records SET dirty=2 WHERE dataset=? AND lane=? AND kind=? AND id=?').run(dataset,item.lane,item.kind,item.id);
+          if(identity){conflictKeys.add(row.lane+':'+row.entry.kind+':'+row.entry.data.id);conflicts=conflictKeys.size;}return false;
+        }
+        if(!pharmacyReferencesReady(db,dataset,row.entry)){stage(row,'DEPENDENCY');return false;}
+        if(old?.dirty && !isDeepStrictEqual(JSON.parse(old.payload),row.entry)){
+          db.prepare('UPDATE local_pharmacy_records SET dirty=2,server_version=? WHERE dataset=? AND lane=? AND kind=? AND id=?').run(row.version,dataset,row.lane,row.entry.kind,row.entry.data.id);
+          stage(row,'IDENTITY');conflictKeys.add(row.lane+':'+row.entry.kind+':'+row.entry.data.id);conflicts=conflictKeys.size;return false;
+        }
+        put.run(dataset,row.lane,row.entry.kind,row.entry.data.id,JSON.stringify(row.entry),row.version,row.mutationId,nowIso());clear(row);changed=true;return true;
+      };
+      const rank=row=>['product','supplier'].includes(row.entry.kind)?0:row.entry.kind==='pack'?1:2;
+      for(const row of [...changes].sort((a,b)=>rank(a)-rank(b)))applyRow(row,changes);
+      // Staged references can arrive on later pages. Retry a bounded, rotating set;
+      // the cursor advances because every received row is durably preserved.
+      for(let pass=0;pass<3;pass++){
+        const pending=db.prepare('SELECT payload,lane,kind,id FROM local_pharmacy_sync_conflicts WHERE dataset=? ORDER BY checked_at,server_version LIMIT 200').all(dataset);
+        let progress=false;
+        for(const item of pending){progress=applyRow(JSON.parse(item.payload),[])||progress;db.prepare('UPDATE local_pharmacy_sync_conflicts SET checked_at=? WHERE dataset=? AND lane=? AND kind=? AND id=?').run(nowIso(),dataset,item.lane,item.kind,item.id);}
+        if(!progress)break;
+      }
+      if (changed) db.prepare('UPDATE local_pharmacy_workspaces SET revision=revision+1 WHERE dataset=?').run(dataset);
+      // Local conflicts remain visible; unresolved remote rows are staged separately.
+      db.prepare('UPDATE local_pharmacy_sync SET cursor=MAX(cursor,?),synced_at=?,error=? WHERE dataset=?')
+        .run(cursor, nowIso(), this.state(dataset).conflicts ? 'CONFLICT' : null, dataset);
+      db.exec('COMMIT'); return { conflicts, more };
+    } catch (error) { db.exec('ROLLBACK'); throw error; }
+  },
+  fail(dataset, code) {
+    pharmacyScope(dataset);
+    openLocalDb().prepare('UPDATE local_pharmacy_sync SET error=? WHERE dataset=?').run(code, dataset);
+  },
+};
+
+/** Node execution structure; Assistant Task/coordination remain the cross-device authority. */
 export const WORK_RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 export const WORK_RUN_STATUSES = Object.freeze(['active', 'waiting_for_user', 'completed', 'taken_over', 'expired']);
 /** semantic 요약 필드는 짧게만 담는다 — 화면 dump·raw 데이터 유입 방지(§검증 D). */
@@ -938,12 +1174,21 @@ function clampWorkRunText(value) {
   return s.length > WORK_RUN_TEXT_CAP ? s.slice(0, WORK_RUN_TEXT_CAP) : s;
 }
 
+// Request text lives only in bounded process memory for same-process replay resume.
+// After restart, structural context survives and execution returns to discovery.
+const workRunGoals=new Map();
+function volatileGoal(runId,value) {
+  for(const [key,row] of workRunGoals)if(row.until<Date.now())workRunGoals.delete(key);
+  if(value!=null){workRunGoals.set(runId,{value:clampWorkRunText(value),until:Date.now()+30*60*1000});while(workRunGoals.size>100)workRunGoals.delete(workRunGoals.keys().next().value);}
+  return workRunGoals.get(runId)?.value??null;
+}
 export const LocalWorkRunRepository = {
   /** logical run 생성/갱신(idempotent). 재개 요청이 같은 runId 로 다시 와도 안전하다. */
   upsert({ runId, status, targetId, goalSummary, note, ownerKey }) {
     const id = String(runId);
     const st = WORK_RUN_STATUSES.includes(status) ? status : 'active';
     const now = nowIso();
+    volatileGoal(id,goalSummary);
     openLocalDb()
       .prepare(
         'INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, owner_key, created_at, updated_at) ' +
@@ -951,7 +1196,7 @@ export const LocalWorkRunRepository = {
           'ON CONFLICT(run_id) DO UPDATE SET ' +
           'status=excluded.status, ' +
           'target_id=COALESCE(excluded.target_id, local_work_runs.target_id), ' +
-          'goal_summary=COALESCE(excluded.goal_summary, local_work_runs.goal_summary), ' +
+          'goal_summary=NULL, ' +
           'note=excluded.note, ' +
           'owner_key=COALESCE(excluded.owner_key, local_work_runs.owner_key), ' +
           'updated_at=excluded.updated_at',
@@ -960,7 +1205,7 @@ export const LocalWorkRunRepository = {
         id,
         st,
         targetId == null ? null : String(targetId),
-        clampWorkRunText(goalSummary),
+        null,
         clampWorkRunText(note),
         ownerKey ?? null,
         now,
@@ -972,6 +1217,7 @@ export const LocalWorkRunRepository = {
   setStatus(runId, status, note) {
     const st = WORK_RUN_STATUSES.includes(status) ? status : null;
     if (!st) return { ok: false };
+    if(!['active','waiting_for_user'].includes(st))workRunGoals.delete(String(runId));
     const hasNote = note !== undefined;
     openLocalDb()
       .prepare(
@@ -1245,7 +1491,7 @@ export const LocalWorkflowCandidateRepository = {
  * Run context(Experience Model V1 Phase 2 · WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1).
  * QUESTION 으로 멈출 때 원래 업무의 **구조**(task · stage · 무엇을 물었나 · 방법 · 재생 위치)를 남기고,
  * 같은 runId 로 재개될 때 그 구조를 돌려준다 — 짧은 답변이 새 업무 목표가 되지 않게 한다.
- * 원문 · 값은 저장하지 않는다. 재생 재개는 이 PC 에서 원래 요청(goal_summary)으로 Candidate 를 다시 대조하고,
+ * 원문 · 값은 저장하지 않는다. 재생 재개는 이 PC 에서 프로세스 메모리의 요청으로 Candidate 를 다시 대조하고,
  * 막혔던 자리만 이번 답(slotValue — 저장하지 않음)으로 채워 돌려준다.
  */
 export const LocalWorkRunContextRepository = {
@@ -1293,15 +1539,15 @@ export const LocalWorkRunContextRepository = {
   },
 };
 
-/** 원래 요청(goal_summary)으로 Candidate 템플릿을 다시 대조 → 막힌 단계의 자리만 새 값으로 바꿔 채운다. 실패하면 null. */
+/** 프로세스 메모리의 요청으로 Candidate 템플릿을 다시 대조 → 막힌 단계의 자리만 새 값으로 바꿔 채운다. 실패하면 null. */
 function rederiveReplaySteps(db, ctx, runId, slotValue) {
   if (!slotValue || slotValue.length > WORKFLOW_VALUE_MAX) return null;
-  const run = db.prepare('SELECT goal_summary FROM local_work_runs WHERE run_id=?').get(runId);
+  const request=volatileGoal(runId);
   const cand = db
     .prepare("SELECT request_template, steps_json FROM local_workflow_candidates WHERE candidate_id=? AND target_id=? AND status='active'")
     .get(String(ctx.replay_candidate_id), String(ctx.target_id));
-  if (!run?.goal_summary || !cand) return null;
-  const values = matchWorkflowTemplate(cand.request_template, run.goal_summary);
+  if (!request || !cand) return null;
+  const values = matchWorkflowTemplate(cand.request_template, request);
   if (!values) return null;
   let steps;
   try { steps = JSON.parse(cand.steps_json); } catch { return null; }

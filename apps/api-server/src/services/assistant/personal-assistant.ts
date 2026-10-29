@@ -1,3 +1,4 @@
+import { sharedMethodCandidates } from '../work-data/shared-methods.js';
 /**
  * O4O Personal Assistant — 업무 요청의 Task 경계 (Phase A)
  *
@@ -445,6 +446,15 @@ export async function runAssistantWorkTask(
     ...plan.intent,
     node: { ownerKey: nodeOwner ? nodeLedgerOwnerKey(nodeOwner.scope, nodeOwner.ownerId) : null, preferredDeviceIds },
   };
+
+  // Shared methods are sanitized recommendations only, never replay authority.
+  const sharedTarget = task?.targetId ?? resolveWorkTarget(String(input.workBody.request??''))?.targetId;
+  if(sharedTarget) {
+    try {
+      const candidates=await sharedMethodCandidates(dataSource,input.userId,sharedTarget,intent.taskTypeHint);
+      if(candidates.length){intent.sharedCandidates=candidates;intent.evidence=intent.evidence.map(e=>e.source==='shared_candidate'?{...e,available:true,mayAuthorizeExperienced:false}:e);}
+    }catch{/* Recommendation availability must not block the user's work. */}
+  }
 
   // ── Task → Execution (실행 지시와 함께 위임 · 화면 판단은 Execution 이 한다) ──
   const reply = judge ? await execute(input.userId, input.workBody, intent, judge) : await execute(input.userId, input.workBody, intent);
