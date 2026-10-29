@@ -108,29 +108,42 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def public_smoke(origin):
+def public_smoke(origin, observation=None):
     parsed = urllib.parse.urlparse(origin)
     run_host = re.fullmatch(r'(?:infra-rename---)?(?:pharmacy-business-web|kpa-society-web|neture-web)-[a-z0-9-]+\.(?:a\.run\.app|asia-northeast3\.run\.app)', parsed.hostname or '')
     if parsed.scheme != 'https' or parsed.username or parsed.password or parsed.port or parsed.path not in ('', '/') or not (parsed.hostname in HOSTS | {'carepharm.neture.co.kr'} or run_host):
         raise ValueError('Unexpected public smoke origin')
     opener = urllib.request.build_opener(NoRedirect())
-    def get(url):
+    def get(url, stage):
         try:
             with opener.open(url, timeout=30) as response:
+                if observation is not None:
+                    observation[stage + '_status'] = response.status
+                    age = getattr(response, 'headers', {}).get('Age', '')
+                    if re.fullmatch(r'[0-9]{1,10}', str(age)):
+                        observation[stage + '_cache_age'] = int(age)
                 body = response.read(5_000_001)
                 if response.status != 200 or len(body) > 5_000_000:
                     raise ValueError('Public frontend response failed its status or size contract')
                 return body
         except (urllib.error.URLError, OSError) as error:
             status = error.code if isinstance(error, urllib.error.HTTPError) else 'network'
+            if observation is not None:
+                observation[stage + '_status'] = status
+                observation[stage + '_error_type'] = type(getattr(error, 'reason', error)).__name__[:48]
             raise ValueError(f'Public frontend smoke failed for {parsed.hostname} ({status}); response withheld') from None
-    html = get(origin.rstrip('/') + '/')
+    html = get(origin.rstrip('/') + '/', 'html')
     if b'<html' not in html.lower() and b'<!doctype html' not in html.lower():
         raise ValueError('Public frontend did not return HTML')
     scripts = re.findall(rb'<script[^>]+src="(/assets/[A-Za-z0-9_./-]+\.js)"', html)
     if not scripts or b'..' in scripts[0]:
         raise ValueError('No same-origin primary frontend JS asset')
-    return hashlib.sha256(get(origin.rstrip('/') + scripts[0].decode())).hexdigest()
+    if observation is not None:
+        observation['script_path'] = scripts[0].decode()[:256]
+    fingerprint = hashlib.sha256(get(origin.rstrip('/') + scripts[0].decode(), 'script')).hexdigest()
+    if observation is not None:
+        observation['bundle_sha256'] = fingerprint
+    return fingerprint
 
 
 def production_idle():

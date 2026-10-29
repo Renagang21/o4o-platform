@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch, Mock
 import io
 import hashlib
+import json
 sys.path.insert(0, str(Path(__file__).parents[1]))
 import carepharm_transition as c
 import pharmacy_transition as t
@@ -23,6 +24,11 @@ def topology():
 
 
 class Routing(unittest.TestCase):
+    def setUp(self):
+        resolver = patch.object(c.socket, 'getaddrinfo', return_value=[(None, None, None, None, ('127.0.0.1', 443))])
+        resolver.start()
+        self.addCleanup(resolver.stop)
+
     def test_cutover_splits_only_carepharm_and_updates_its_test(self):
         source = topology()
         candidate = c.candidate_map(source, NEW, OLD)
@@ -84,7 +90,7 @@ class Routing(unittest.TestCase):
             def request(self, method, url): return deepcopy(self.map)
             def compute_operation(self, method, url, body): self.writes.append(body); self.map.update(deepcopy(body))
         api = API()
-        def changed_smoke(url):
+        def changed_smoke(url, observation=None):
             api.map['hostRules'][0]['hosts'].append('new.example.test')
             raise ValueError('failed')
         record = {'candidate': candidate, 'mode': 'carepharm-cutover', 'target_revision': 'ready', 'asset': 'expected'}
@@ -120,9 +126,45 @@ class Routing(unittest.TestCase):
             opener = Mock()
             opener.open.side_effect = [Response(b'<html><script src="/assets/index-fixed.js"></script></html>'), Response(b'fixture-js')]
             with patch.object(t.urllib.request, 'build_opener', return_value=opener):
-                self.assertEqual(t.public_smoke(origin), hashlib.sha256(b'fixture-js').hexdigest())
+                observation = {}
+                self.assertEqual(t.public_smoke(origin, observation), hashlib.sha256(b'fixture-js').hexdigest())
+                self.assertEqual(observation['html_status'], 200)
+                self.assertEqual(observation['script_status'], 200)
+                self.assertEqual(observation['script_path'], '/assets/index-fixed.js')
             self.assertEqual([call.args[0] for call in opener.open.call_args_list], [origin + '/', origin + '/assets/index-fixed.js'])
         for origin in ['https://carepharm.neture.co.kr.evil.test', 'http://carepharm.neture.co.kr', 'https://carepharm.neture.co.kr/private', 'https://user@carepharm.neture.co.kr', 'https://carepharm.neture.co.kr:8443']:
             with patch.object(t.urllib.request, 'build_opener') as opener:
                 with self.assertRaises(ValueError): t.public_smoke(origin)
                 opener.assert_not_called()
+
+    def test_delayed_edge_propagation_succeeds_without_rollback(self):
+        original = topology(); candidate = c.candidate_map(original, NEW, OLD)
+        class API:
+            def __init__(self): self.map = deepcopy(original); self.writes = []
+            def request(self, method, url): return deepcopy(self.map)
+            def compute_operation(self, method, url, body): self.writes.append(body); self.map.update(deepcopy(body))
+        api = API()
+        record = {'candidate': candidate, 'mode': 'carepharm-cutover', 'target_revision': 'ready', 'asset': 'expected'}
+        with patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'ready'}}, 'digest')), patch.object(t, 'production_idle'), patch.object(t, 'public_smoke', side_effect=['old'] * 15 + ['expected']) as smoke, patch.object(c.time, 'sleep'), patch('sys.stdout', new_callable=io.StringIO) as output:
+            c.apply(api, record, original)
+            self.assertEqual(smoke.call_count, 16)
+        self.assertEqual(len(api.writes), 1)
+        self.assertEqual(c.host_matcher(api.map), c.host_matcher(candidate))
+        self.assertIn('public-bundle', output.getvalue())
+
+    def test_http_observation_keeps_body_and_exception_text_out_of_logs(self):
+        import urllib.error
+        opener = Mock()
+        opener.open.side_effect = urllib.error.HTTPError('https://' + c.HOST, 403, 'private-response-text', {}, io.BytesIO(b'private-body'))
+        observed = {}
+        with patch.object(t.urllib.request, 'build_opener', return_value=opener):
+            with self.assertRaises(ValueError): t.public_smoke('https://' + c.HOST, observed)
+        self.assertEqual(observed['html_status'], 403)
+        self.assertNotIn('private-response-text', json.dumps(observed))
+        self.assertNotIn('private-body', json.dumps(observed))
+
+    def test_dns_diagnostic_reports_only_comparison_and_handles_failure(self):
+        with patch.object(c.socket, 'getaddrinfo', side_effect=[[(None, None, None, None, ('127.0.0.1', 443))], [(None, None, None, None, ('127.0.0.2', 443))]]):
+            self.assertFalse(c.frontdoor_comparison())
+        with patch.object(c.socket, 'getaddrinfo', side_effect=OSError('resolver failure')):
+            self.assertIsNone(c.frontdoor_comparison())
