@@ -1,6 +1,6 @@
 import { CENTRAL_OPERATION_MENUS } from '@o4o/types';
 export const centralOperationAreas: Record<string, readonly string[]> = {
-  neture: ["service-members", "cleanup", "category-mapping", "settlements", "notifications", "ai-report", "community-advertising", "analytics", "stores", "actions", "product-approvals", "candidates", "products", "service-product-approvals", "applications", "legacy-contact", "cms", "orders", "members", "inbox", "pharmacies", "qualifications", "home", "legal", "contact-settings", "guides", "forums", "forum-delete", "forum-deleted", "forum-analytics"],
+  neture: ["membership-cleanup", "service-approval-management", "service-members", "cleanup", "category-mapping", "settlements", "notifications", "ai-report", "community-advertising", "analytics", "stores", "actions", "product-approvals", "candidates", "products", "service-product-approvals", "applications", "legacy-contact", "cms", "orders", "members", "inbox", "pharmacies", "qualifications", "home", "legal", "contact-settings", "guides", "forums", "forum-delete", "forum-deleted", "forum-analytics"],
   supplier: ["members", "inbox", "suppliers", "governance", "home", "legal", "contact-settings"],
   funding: ["members", "inbox", "funding", "home", "legal", "contact-settings"],
   lecture: ["members", "inbox", "courses", "instructors", "certificates", "contact", "home", "contact-settings", "legal"],

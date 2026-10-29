@@ -15,3 +15,6 @@ export * from './settlement-notification';
 export * from './settlement-types';
 export {default as AdminSettlementsPage} from './AdminSettlementsPage';
 export {default as SettlementNotificationRecovery,SettlementNotificationStatus} from './SettlementNotificationRecovery';
+
+export {default as AdminMemberManagementPage} from './AdminMemberManagementPage';
+export {AdminMemberDeleteModal} from './AdminMemberDeleteModal';

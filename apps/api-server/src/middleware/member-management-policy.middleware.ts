@@ -1,4 +1,5 @@
 import { CENTRAL_OPERATION_SERVICES, type CentralOperationService } from '@o4o/types';
+import { centralApiMenus } from './central-operation-menu.middleware.js';
 import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../services/operations/operation-audit.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
@@ -25,7 +26,10 @@ export async function requireActiveOperatorScope(req: Request, res: Response, ne
     const permitted: string[] = [];
     for (const key of scope.serviceKeys) {
       try {
-        if ((CENTRAL_OPERATION_SERVICES as readonly string[]).includes(key)) await assertCentralOperationRequest(AppDataSource,(req as any).user.id,key as CentralOperationService,[`${key}.${key === 'neture' ? 'service-members' : 'members'}`, ...(key === 'community' && req.method === 'GET' ? ['community.erase-members'] : [])], (req as any).authMethod);
+        if ((CENTRAL_OPERATION_SERVICES as readonly string[]).includes(key)) {
+          const menus = key === 'neture' ? centralApiMenus('neture',req) : [`${key}.members`, ...(key === 'community' && req.method === 'GET' ? ['community.erase-members'] : [])];
+          await assertCentralOperationRequest(AppDataSource,(req as any).user.id,key as CentralOperationService,menus, (req as any).authMethod);
+        }
         permitted.push(key);
       } catch (error) { if (!(error instanceof OperationError && error.status === 403)) throw error; }
     }

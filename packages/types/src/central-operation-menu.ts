@@ -23,6 +23,7 @@ const item = (
 export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('neture', 'members', '공통 회원 관리', 'members', []),
   item('neture', 'service-members', 'O4O 서비스 회원·이용 상태', 'members', ['/operator/users','/operator/members']),
+  item('neture', 'membership-cleanup', '서비스 가입 관계 정리', 'members', ['/admin/members'], 'admin'),
   item('neture', 'qualifications', '약사 자격 검토', 'members', []),
   item('neture', 'applications', '기존 서비스 가입 검토', 'members', ['/operator/applications']),
   item('neture', 'pharmacies', '약국·매장 신청 심사', 'members', ['/operator/pharmacy-memberships']),
@@ -41,6 +42,7 @@ export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('neture', 'products', '서비스 상품 현황', 'business', ['/operator/all-registered-products']),
   item('neture', 'product-approvals', '상품 취급 승인', 'business', ['/operator/product-approvals']),
   item('neture', 'service-product-approvals', '서비스별 상품 승인', 'business', ['/operator/product-service-approvals']),
+  item('neture', 'service-approval-management', '서비스 상품 승인·철회 관리', 'business', ['/admin/service-approvals'], 'admin'),
   item('neture', 'candidates', '상품 후보 검토', 'business', ['/operator/product-candidates']),
   item('neture', 'stores', '매장 관리', 'business', ['/operator/stores']),
   item('neture', 'settlements', 'B2B 정산·알림 복구', 'business', ['/admin/settlements'], 'admin'),

@@ -15,7 +15,10 @@ export function centralApiMenus(service: CentralOperationService, req: Pick<Requ
   const menu = (area: string) => [`${service}.${area}`];
   if (path.includes('/home-presentation/')) return menu('home');
   if (/\/operator-inbox\//.test(path)) return menu('inbox');
-  if (service === 'neture' && /\/operator\/members(?:\/|$)/.test(path)) return menu('service-members');
+  if (service === 'neture' && /\/operator\/members(?:\/|$)/.test(path)) {
+    if (req.method === 'DELETE' && new URL(req.originalUrl,'http://localhost').searchParams.get('mode') === 'hard') return menu('membership-cleanup');
+    return req.method === 'GET' ? ['neture.service-members','neture.membership-cleanup'] : menu('service-members');
+  }
   if (/\/service-members(?:\/|$)|\/operator\/members(?:\/|$)/.test(path)) return service === 'community' && req.method === 'GET' ? ['community.members','community.erase-members'] : menu('members');
   if (/\/admin\/services\/[^/]+\/(?:legal-profile|policies)/.test(path)) return menu('legal');
   if (/\/admin\/services\/[^/]+\/contact-settings/.test(path)) return menu('contact-settings');
@@ -41,6 +44,7 @@ export function centralApiMenus(service: CentralOperationService, req: Pick<Requ
     if (/\/community\/(?:management|operator)\/(?:boards|members)/.test(path)) return menu('boards');
   }
   if (service === 'neture') {
+    if (/\/neture\/admin\/service-approvals(?:\/|$)/.test(path)) return menu('service-approval-management');
     if (/\/neture\/admin\/settlements(?:\/|$)/.test(path)) return menu('settlements');
     if (/\/neture\/community\/manage(?:\/|$)/.test(path)) return menu('community-advertising');
     if (/\/neture\/operator\/approval-analytics$/.test(path)) return menu('service-product-approvals');
@@ -99,10 +103,16 @@ export function withCentralOperationMenus(service: CentralOperationService, exis
   return scope => {
     const guard = existing(scope);
     if (!/:(admin|operator)$/.test(scope)) return guard;
-    return (req,res,next) => guard(req,res,error => {
-      if (error) { next(error); return; }
-      return restrict(req,res,next);
-    });
+    return async (req,res,next) => {
+      // Preserve the guard's awaitable lifecycle through the additional lookup.
+      // Express callbacks do not automatically await a promise returned by next.
+      let restriction: Promise<unknown> | undefined;
+      await guard(req,res,error => {
+        if (error) { next(error); return; }
+        restriction = Promise.resolve(restrict(req,res,next));
+      });
+      await restriction;
+    };
   };
 }
 

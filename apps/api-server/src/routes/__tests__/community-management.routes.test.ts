@@ -32,7 +32,8 @@ it('cannot select business/retired service management through path or body',asyn
  for(const key of ['business:fixture','pharmacy','cosmetics','o4o-general'])expect((await request(app()).delete(`/communities/${key}/management/boards/${id}`).set('x-test-user','yes').send({serviceCode:'community'})).status).toBe(404);
  expect(query).not.toHaveBeenCalled();
 });
-it('rejects malformed resource identifiers without a database query',async()=>{
+it('rejects malformed resource identifiers without business data reads or writes',async()=>{
  expect((await request(app()).delete('/communities/community/management/members/invalid').set('x-test-user','yes')).status).toBe(400);
- expect(query).not.toHaveBeenCalled();
+ expect(query).toHaveBeenCalledTimes(1);
+ expect(query.mock.calls[0][0]).toContain('SELECT 1 FROM role_assignments WHERE user_id=$1 AND scope_type=$2');
 });

@@ -1,0 +1,33 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react';
+import Page from './AdminServiceApprovalPage';
+import {createAdminServiceApprovalApi} from './admin-service-approval-api';
+afterEach(cleanup);
+const row={id:'fixture',productName:'Synthetic product',supplierName:'Synthetic supplier',sellerOrg:'',serviceId:'neture',status:'APPROVED',requestedAt:'2026-10-29'};
+it('preserves a failed revocation reason for an explicit retry and uses the original admin API',async()=>{
+ const http={get:vi.fn().mockResolvedValue({data:{data:[row]}}),post:vi.fn().mockRejectedValueOnce(new Error('synthetic')).mockResolvedValueOnce({})};
+ render(<Page api={createAdminServiceApprovalApi(http as any)}/>);
+ await screen.findByText(row.productName);
+ fireEvent.click(screen.getByTitle('더보기'));
+ fireEvent.click(screen.getAllByRole('button',{name:'철회',exact:true}).at(-1)!);
+ const dialog=screen.getByRole('dialog',{name:'서비스 철회'});
+ fireEvent.change(within(dialog).getByRole('textbox'),{target:{value:'Synthetic review reason'}});
+ fireEvent.click(within(dialog).getByRole('button',{name:'철회',exact:true}));
+ await screen.findByRole('alert');
+ expect((within(dialog).getByRole('textbox') as HTMLTextAreaElement).value).toBe('Synthetic review reason');
+ fireEvent.click(within(dialog).getByRole('button',{name:'철회',exact:true}));
+ await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
+ expect(http.post).toHaveBeenCalledTimes(2);
+ expect(http.post).toHaveBeenLastCalledWith('/neture/admin/service-approvals/fixture/revoke',{reason:'Synthetic review reason'});
+ expect(http.get).toHaveBeenCalledTimes(2);
+});
+it('distinguishes a failed list from an empty list and provides read-only recovery',async()=>{
+ const http={get:vi.fn().mockRejectedValueOnce(new Error('synthetic')).mockResolvedValueOnce({data:{data:[row]}}),post:vi.fn()};
+ render(<Page api={createAdminServiceApprovalApi(http as any)}/>);
+ await screen.findByRole('alert');
+ expect(screen.queryByText('등록된 서비스 승인 요청이 없습니다')).toBeNull();
+ fireEvent.click(screen.getByRole('button',{name:'목록 다시 조회'}));
+ await screen.findByText(row.productName);
+ expect(screen.queryByRole('alert')).toBeNull();
+ expect(http.post).not.toHaveBeenCalled();
+});

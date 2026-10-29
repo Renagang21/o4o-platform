@@ -1,3 +1,4 @@
+import { createAdminServiceApprovalApi } from '@o4o/operator-core-ui/modules/neture-product-operations';
 import { createNetureServiceApi } from '@o4o/operator-core-ui/modules/neture-service-operations';
 import { createSupplierOperatorApi } from '@o4o/operator-core-ui/modules/supplier-operations';
 import { api } from './client.js';
@@ -161,52 +162,8 @@ export const adminMasterApi = {
 
 // ==================== Admin Service Approval ====================
 
-export interface ServiceApproval {
-  id: string;
-  productName: string;
-  supplierName: string;
-  sellerOrg: string;
-  serviceId: string;
-  status: string;
-  requestedAt: string;
-  decidedAt?: string;
-  rejectReason?: string;
-}
-
-export const adminServiceApprovalApi = {
-  async getServiceApprovals(status?: string): Promise<ServiceApproval[]> {
-    try {
-      const qs = status ? `?status=${status}` : '';
-      const response = await api.get(`/neture/admin/service-approvals${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch service approvals:', error);
-      return [];
-    }
-  },
-
-  async approveServiceApproval(id: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/approve`);
-      return true;
-    } catch { return false; }
-  },
-
-  async rejectServiceApproval(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/reject`, { reason });
-      return true;
-    } catch { return false; }
-  },
-
-  async revokeServiceApproval(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/revoke`, { reason });
-      return true;
-    } catch { return false; }
-  },
-};
+export type {ServiceApproval} from '@o4o/operator-core-ui/modules/neture-product-operations';
+export const adminServiceApprovalApi = createAdminServiceApprovalApi(api);
 
 // (은퇴) Admin Commission · Admin Partner Settlement · Admin Partner Monitoring — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 

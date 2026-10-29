@@ -1,5 +1,5 @@
 import { CreateCentralOperationMenuGrants1793186241009 } from '../../../database/migrations/1793186241009-CreateCentralOperationMenuGrants.js';
-import { CentralOperationMenuGrantService, centralOperationMenuKeys, assertCentralOperationMenu, assertCentralOperationRequest } from '../central-operation-menu-grants.js';
+import { CentralOperationMenuGrantService, centralOperationMenuKeys, assertCentralOperationMenu, assertCentralOperationRequest,validateCentralMenuKeys } from '../central-operation-menu-grants.js';
 import { AddPharmacistQualificationDecisions1793165158540 } from "../../../database/migrations/1793165158540-AddPharmacistQualificationDecisions.js";
 import {
   PharmacistQualificationService,
@@ -110,6 +110,15 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       expect(directory.items[0]).toMatchObject({userId:user,licenseNumber:null,reason:null,status:'pending'});
       await expect(service.list(user,'all',1)).rejects.toMatchObject({status:403});
       await expect(service.decide(user,user,{action:'reject',reason:'Synthetic decision',version:directory.items[0].version})).rejects.toMatchObject({status:403});
+    });
+    it('keeps relationship cleanup and approval revocation as distinct Admin duties',async()=>{
+      expect(()=>validateCentralMenuKeys('neture:operator',['neture.membership-cleanup'])).toThrow();
+      expect(()=>validateCentralMenuKeys('neture:operator',['neture.service-approval-management'])).toThrow();
+      await role('neture:admin');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['neture.membership-cleanup'] FROM role_assignments WHERE user_id=$1`,[user]);
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.membership-cleanup'],'google')).resolves.toBeUndefined();
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-members'],'google')).rejects.toMatchObject({status:403});
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-approval-management'],'google')).rejects.toMatchObject({status:403});
     });
     it('limits menus per assignment, rejects cross-service grants, and detects concurrent edits', async () => {
       await role('lecture:operator');

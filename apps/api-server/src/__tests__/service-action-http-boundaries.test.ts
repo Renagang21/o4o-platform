@@ -8,7 +8,7 @@ jest.mock('../middleware/auth.middleware.js', () => ({
   ...jest.requireActual('../common/middleware/auth/authorization.middleware.js'),
   requireAuth: (req: any, res: any, next: any) => req.user ? next() : res.status(401).json({ code: 'UNAUTHORIZED' }),
 }));
-jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true } }));
+jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true, query: jest.fn(async () => []) } }));
 jest.mock('../utils/service-membership.js', () => ({ getServiceMembershipStatusFromDb: jest.fn() }));
 jest.mock('../modules/auth/services/role-assignment.service.js', () => ({ roleAssignmentService: { hasAnyRole: jest.fn(async (id: string) => id === 'platform'), getActiveRoles: jest.fn(async () => []) } }));
 jest.mock('../services/checkout.service.js', () => ({ checkoutService: {} }));

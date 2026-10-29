@@ -16,3 +16,6 @@ export {default as ProductCandidateReviewPage} from './ProductCandidateReviewPag
 export {default as OperatorProductApprovalPage} from './OperatorProductApprovalPage';
 export * from './catalog-options';
 export {default as ProductDataCleanupPage} from './ProductDataCleanupPage';
+
+export * from './admin-service-approval-api';
+export {default as AdminServiceApprovalPage} from './AdminServiceApprovalPage';

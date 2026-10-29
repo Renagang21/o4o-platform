@@ -35,7 +35,7 @@ jest.mock('../product-db-write-authority.js', () => ({
   },
 }));
 jest.mock('../../../../utils/serviceScope.js', () => ({
-  injectServiceScope: (_req: express.Request, _res: express.Response, next: express.NextFunction) => next(),
+  injectServiceScope: (req: express.Request, _res: express.Response, next: express.NextFunction) => { (req as any).serviceScope={serviceKeys:['neture'],rolePrefixes:['neture'],isPlatformAdmin:false};next(); },
   resolveOperatorScope: () => null,
   logCrossServiceQuery: () => undefined,
   PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE: { success: false, error: 'SCOPE_REQUIRED' },
@@ -68,7 +68,7 @@ const URL = `/api/v1/operator/product-candidates/${CID}/promote-supplier`;
 function makeApp() {
   const app = express();
   app.use(express.json());
-  app.use('/api/v1/operator/product-candidates', createProductCandidateController({} as unknown as DataSource));
+  app.use('/api/v1/operator/product-candidates', createProductCandidateController({query:jest.fn(async()=>[])} as unknown as DataSource));
   return app;
 }
 

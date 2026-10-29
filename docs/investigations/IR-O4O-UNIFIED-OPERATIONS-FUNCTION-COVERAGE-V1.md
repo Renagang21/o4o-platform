@@ -236,3 +236,189 @@ JSX AST에서 운영·관리 route 선언 164개를 추출했다. 별도 route �
 - 메뉴 제한은 기존 role assignment 또는 수락 전 초대에 종속한다. 새로운 전역 Operator 역할/회원 원장을 만들지 않는다. 초대 수락과 메뉴 제한 이전은 같은 transaction이며 현재 서비스 역할·membership·조직 검사를 대체하지 않는다.
 - 새 migration은 격리 PostgreSQL 15의 기존 50개 schema 상태와 신규 empty down/up/reapply로 검증했다. 새 테이블에도 현행 account-erasure writer fence를 적용한다. 운영 DB에는 적용하지 않았다.
 - 체크리스트/metadata 등록, native 화면 연결, 실제 API 인가, desktop/mobile 브라우저 검증을 각각 완료해야 전체 완료다. 위 route 표의 대조 중 항목을 외부 링크 제공이나 예시 화면 몇 개로 완료 처리하지 않는다.
+
+## 2026-10-29 최신 main 대조 결과
+
+기존 모집단 표는 당시 조사 기록으로 유지한다. 아래 표는 최신 main 통합 이후의 별도 대조 결과다. 중앙 native 연결은 기존 화면·API를 재사용했다는 의미이며, 실제 Google 로그인이나 모든 운영 데이터 조합의 검증 완료를 뜻하지 않는다.
+
+현재 1,324개 소스에서 관리 경로 165개, 별칭 23개와 메뉴·탭 정의 14곳을 확인했다. 직영 native 메뉴 72개는 catalog·실제 renderer·내비게이션의 집합 일치 테스트로 대조했다. Partner의 신고/글/회원/게시판/이력은 단일 route 내부의 별도 메뉴이며 아래 route 수와 합산하지 않는다.
+
+| # | 현재 화면 위치 | 처리·권한 경계 | 중앙 업무 또는 유지 대상 |
+| --- | --- | --- | --- |
+| 1 | `services/web-kpa-branch/src/App.tsx:97` · `operator/site` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 2 | `services/web-kpa-branch/src/App.tsx:98` · `operator/posts` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 3 | `services/web-kpa-branch/src/App.tsx:99` · `operator/domains` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 4 | `services/web-kpa-branch/src/App.tsx:100` · `operator/annual-reports` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 5 | `services/web-kpa-branch/src/App.tsx:101` · `operator/fees` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 6 | `services/web-kpa-branch/src/App.tsx:102` · `operator/education` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 7 | `services/web-kpa-branch/src/App.tsx:103` · `operator/members` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 8 | `services/web-kpa-branch/src/App.tsx:104` · `operator/events` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 9 | `services/web-kpa-branch/src/App.tsx:105` · `operator/officers` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 10 | `services/web-lecture/src/App.tsx:72` · `/operator/operators` | 지정 관리 재사용 | `중앙 /admin/operators; 직영 위임만 중앙 Admin 관리` |
+| 11 | `services/web-lecture/src/App.tsx:74` · `/operator` | 중앙 native 연결 | `lecture.courses` |
+| 12 | `services/web-lecture/src/App.tsx:75` · `/operator/home-presentation` | 중앙 native 연결 | `lecture.home` |
+| 13 | `services/web-lecture/src/App.tsx:76` · `/operator/inbox` | 중앙 native 연결 | `lecture.inbox` |
+| 14 | `services/web-lecture/src/App.tsx:77` · `/operator/members` | 중앙 native 연결 | `lecture.members` |
+| 15 | `services/web-lecture/src/App.tsx:78` · `/operator/members/:id` | 중앙 native 연결 | `lecture.members` |
+| 16 | `services/web-lecture/src/App.tsx:80` · `/operator/courses/:courseId/review` | 중앙 native 연결 | `lecture.courses` |
+| 17 | `services/web-lecture/src/App.tsx:81` · `/operator/contact` | 중앙 native 연결 | `lecture.contact` |
+| 18 | `services/web-lecture/src/App.tsx:82` · `/operator/instructors` | 중앙 native 연결 | `lecture.instructors` |
+| 19 | `services/web-lecture/src/App.tsx:83` · `/operator/certificates` | 중앙 native 연결 | `lecture.certificates` |
+| 20 | `services/web-neture/src/App.tsx:770` · `/operator/service-contact/:serviceKey/settings` | 중앙 native 연결 | `직영 서비스별 *.contact-settings` |
+| 21 | `services/web-neture/src/App.tsx:771` · `/operator/service-contact/:serviceKey` | 중앙 native 연결 | `직영 서비스별 *.inbox` |
+| 22 | `services/web-neture/src/App.tsx:772` · `/operator/inbox/open/:kind/:scopeKey` | 범위별 진입 유지 | `직영 알림은 중앙 업무로 연결; 사업별 알림은 기존 사업 범위` |
+| 23 | `services/web-neture/src/App.tsx:773` · `/operator/inbox/business/:businessKey` | 범위별 진입 유지 | `직영 알림은 중앙 업무로 연결; 사업별 알림은 기존 사업 범위` |
+| 24 | `services/web-neture/src/App.tsx:1072` · `/admin` | 중앙 홈 재사용 | `/operations` |
+| 25 | `services/web-neture/src/App.tsx:1073` · `/admin/users` | 중앙 native 연결 | `neture.service-members` |
+| 26 | `services/web-neture/src/App.tsx:1074` · `/admin/users/:id` | 중앙 native 연결 | `neture.service-members` |
+| 27 | `services/web-neture/src/App.tsx:1075` · `/admin/stores` | 중앙 native 연결 | `neture.stores` |
+| 28 | `services/web-neture/src/App.tsx:1076` · `/admin/orders` | 중앙 native 연결 | `neture.orders` |
+| 29 | `services/web-neture/src/App.tsx:1079` · `/admin/ai-report` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 30 | `services/web-neture/src/App.tsx:1080` · `/admin/settings/notifications` | 중앙 native 연결 | `neture.notifications` |
+| 31 | `services/web-neture/src/App.tsx:1082` · `/admin/applications` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 32 | `services/web-neture/src/App.tsx:1083` · `/admin/community` | 중앙 native 연결 | `neture.forums` |
+| 33 | `services/web-neture/src/App.tsx:1084` · `/admin/forum-delete-requests` | 중앙 native 연결 | `neture.forum-delete` |
+| 34 | `services/web-neture/src/App.tsx:1086` · `/admin/forum-deleted` | 중앙 native 연결 | `neture.forum-deleted` |
+| 35 | `services/web-neture/src/App.tsx:1087` · `/admin/forum-analytics` | 중앙 native 연결 | `neture.forum-analytics` |
+| 36 | `services/web-neture/src/App.tsx:1089` · `/admin/all-products` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 37 | `services/web-neture/src/App.tsx:1090` · `/admin/ai-card-report` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 38 | `services/web-neture/src/App.tsx:1091` · `/admin/ai-operations` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 39 | `services/web-neture/src/App.tsx:1093` · `/admin/homepage-cms` | 중앙 native 연결 | `neture.cms` |
+| 40 | `services/web-neture/src/App.tsx:1094` · `/admin/analytics` | 중앙 native 연결 | `neture.analytics` |
+| 41 | `services/web-neture/src/App.tsx:1096` · `/admin/category-mapping-rules` | 중앙 native 연결 | `neture.category-mapping` |
+| 42 | `services/web-neture/src/App.tsx:1097` · `/admin/roles` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 43 | `services/web-neture/src/App.tsx:1098` · `/admin/categories` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 44 | `services/web-neture/src/App.tsx:1099` · `/admin/brands` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 45 | `services/web-neture/src/App.tsx:1100` · `/admin/product-cleanup` | 중앙 native 연결 | `neture.cleanup` |
+| 46 | `services/web-neture/src/App.tsx:1101` · `/admin/product-service-approvals` | 중앙 native 연결 | `neture.service-product-approvals` |
+| 47 | `services/web-neture/src/App.tsx:1103` · `/admin/actions` | 중앙 native 연결 | `neture.actions` |
+| 48 | `services/web-neture/src/App.tsx:1106` · `/admin/members` | 중앙 native 연결 | `neture.membership-cleanup` |
+| 49 | `services/web-neture/src/App.tsx:1107` · `/admin/operators` | 지정 관리 재사용 | `중앙 /admin/operators; 독립 사업의 자체 지정은 유지` |
+| 50 | `services/web-neture/src/App.tsx:1108` · `/admin/contact-messages` | 중앙 native 연결 | `neture.legacy-contact` |
+| 51 | `services/web-neture/src/App.tsx:1109` · `/admin/service-approvals` | 중앙 native 연결 | `neture.service-approval-management` |
+| 52 | `services/web-neture/src/App.tsx:1111` · `/admin/masters` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 53 | `services/web-neture/src/App.tsx:1112` · `/admin/catalog-import` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 54 | `services/web-neture/src/App.tsx:1113` · `/admin/catalog-import/csv` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 55 | `services/web-neture/src/App.tsx:1114` · `/admin/catalog-import/history` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 56 | `services/web-neture/src/App.tsx:1115` · `/admin/settlements` | 중앙 native 연결 | `neture.settlements` |
+| 57 | `services/web-neture/src/App.tsx:1116` · `/admin/community-admin` | 중앙 native 연결 | `neture.community-advertising` |
+| 58 | `services/web-neture/src/App.tsx:1117` · `/admin/ai-admin` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 59 | `services/web-neture/src/App.tsx:1118` · `/admin/ai-admin/engines` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 60 | `services/web-neture/src/App.tsx:1119` · `/admin/ai-admin/policy` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 61 | `services/web-neture/src/App.tsx:1120` · `/admin/ai-admin/cost` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 62 | `services/web-neture/src/App.tsx:1121` · `/admin/ai-admin/context-assets` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 63 | `services/web-neture/src/App.tsx:1122` · `/admin/ai-admin/context-assets/new` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 64 | `services/web-neture/src/App.tsx:1123` · `/admin/ai-admin/context-assets/:id/edit` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 65 | `services/web-neture/src/App.tsx:1124` · `/admin/ai-admin/composition-rules` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 66 | `services/web-neture/src/App.tsx:1125` · `/admin/ai-card-rules` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 67 | `services/web-neture/src/App.tsx:1126` · `/admin/ai-business-pack` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 68 | `services/web-neture/src/App.tsx:1127` · `/admin/settings/email` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 69 | `services/web-neture/src/App.tsx:1128` · `/admin/settings/legal-terms` | 중앙 native 연결 | `neture.legal` |
+| 70 | `services/web-neture/src/App.tsx:1130` · `/admin/settings/contact` | 중앙 native 연결 | `직영 서비스별 *.contact-settings` |
+| 71 | `services/web-neture/src/App.tsx:1133` · `/admin/semi-franchises` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 72 | `services/web-neture/src/App.tsx:1134` · `/admin/pharmacy-service-settings` | 전체 관리자 업무 보존 | `기존 플랫폼/상품 DB/AI/메일 관리 경계 유지; 서비스 Operator 위임 제외` |
+| 73 | `services/web-neture/src/App.tsx:1153` · `/admin/admin-suppliers` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 74 | `services/web-neture/src/App.tsx:1155` · `/admin/supplier-quality` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 75 | `services/web-neture/src/App.tsx:1156` · `/operator/legal/supplier` | 중앙 native 연결 | `supplier.legal` |
+| 76 | `services/web-neture/src/App.tsx:1157` · `/admin/supplier-governance` | 중앙 native 연결 | `supplier.governance` |
+| 77 | `services/web-neture/src/App.tsx:1158` · `/admin/supplier-governance/operators` | 지정 관리 재사용 | `중앙 /admin/operators; 독립 사업의 자체 지정은 유지` |
+| 78 | `services/web-neture/src/App.tsx:1166` · `/operator/supplier-quality` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 79 | `services/web-neture/src/App.tsx:1168` · `/operator/inbox/supplier` | 중앙 native 연결 | `supplier.inbox` |
+| 80 | `services/web-neture/src/App.tsx:1169` · `/operator/service-members/supplier` | 중앙 native 연결 | `supplier.members` |
+| 81 | `services/web-neture/src/App.tsx:1170` · `/operator/service-members/supplier/:id` | 중앙 native 연결 | `supplier.members` |
+| 82 | `services/web-neture/src/App.tsx:1171` · `/operator/home-presentation/supplier` | 중앙 native 연결 | `supplier.home` |
+| 83 | `services/web-neture/src/App.tsx:1172` · `/operator/suppliers` | 중앙 native 연결 | `supplier.suppliers` |
+| 84 | `services/web-neture/src/App.tsx:1180` · `/admin/market-trial` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 85 | `services/web-neture/src/App.tsx:1181` · `/operator/inbox/funding` | 중앙 native 연결 | `funding.inbox` |
+| 86 | `services/web-neture/src/App.tsx:1182` · `/operator/service-members/funding` | 중앙 native 연결 | `funding.members` |
+| 87 | `services/web-neture/src/App.tsx:1183` · `/operator/service-members/funding/:id` | 중앙 native 연결 | `funding.members` |
+| 88 | `services/web-neture/src/App.tsx:1184` · `/operator/legal/funding` | 중앙 native 연결 | `funding.legal` |
+| 89 | `services/web-neture/src/App.tsx:1185` · `/operator/home-presentation/funding` | 중앙 native 연결 | `funding.home` |
+| 90 | `services/web-neture/src/App.tsx:1186` · `/operator/market-trial/operators` | 지정 관리 재사용 | `중앙 /admin/operators; 독립 사업의 자체 지정은 유지` |
+| 91 | `services/web-neture/src/App.tsx:1187` · `/operator/market-trial` | 중앙 native 연결 | `funding.funding` |
+| 92 | `services/web-neture/src/App.tsx:1188` · `/operator/market-trial/:id` | 중앙 native 연결 | `funding.funding` |
+| 93 | `services/web-neture/src/App.tsx:1195` · `/operator/inbox/community` | 중앙 native 연결 | `community.inbox` |
+| 94 | `services/web-neture/src/App.tsx:1196` · `/operator/service-members/community` | 중앙 native 연결 | `community.members` |
+| 95 | `services/web-neture/src/App.tsx:1197` · `/operator/service-members/community/:id` | 중앙 native 연결 | `community.members` |
+| 96 | `services/web-neture/src/App.tsx:1198` · `/operator/home-presentation/community` | 중앙 native 연결 | `community.home` |
+| 97 | `services/web-neture/src/App.tsx:1199` · `/operator/communities/home` | 중앙 native 연결 | `community.editorial` |
+| 98 | `services/web-neture/src/App.tsx:1200` · `/operator/communities` | 중앙 native 연결 | `community.forums` |
+| 99 | `services/web-neture/src/App.tsx:1201` · `/operator/communities/boards` | 중앙 native 연결 | `community.boards` |
+| 100 | `services/web-neture/src/App.tsx:1203` · `/operator/forum-delete` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 101 | `services/web-neture/src/App.tsx:1204` · `/operator/forum-delete-requests` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 102 | `services/web-neture/src/App.tsx:1205` · `/admin/forum-delete-requests` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 103 | `services/web-neture/src/App.tsx:1213` · `/operator/legal/community` | 중앙 native 연결 | `community.legal` |
+| 104 | `services/web-neture/src/App.tsx:1214` · `/admin/communities` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 105 | `services/web-neture/src/App.tsx:1215` · `/admin/communities/operators` | 지정 관리 재사용 | `중앙 /admin/operators; 독립 사업의 자체 지정은 유지` |
+| 106 | `services/web-neture/src/App.tsx:1216` · `/admin/communities/members` | 중앙 native 연결 | `community.erase-members` |
+| 107 | `services/web-neture/src/App.tsx:1217` · `/admin/communities/boards` | 중앙 native 연결 | `community.erase-boards` |
+| 108 | `services/web-neture/src/App.tsx:1218` · `/admin/forum-deleted` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 109 | `services/web-neture/src/App.tsx:1232` · `/operator` | 중앙 홈 재사용 | `/operations` |
+| 110 | `services/web-neture/src/App.tsx:1233` · `/operator/inbox/neture` | 중앙 native 연결 | `neture.inbox` |
+| 111 | `services/web-neture/src/App.tsx:1236` · `/operator/members` | 중앙 native 연결 | `neture.service-members` |
+| 112 | `services/web-neture/src/App.tsx:1237` · `/operator/members/:id` | 중앙 native 연결 | `neture.service-members` |
+| 113 | `services/web-neture/src/App.tsx:1238` · `/operator/users` | 중앙 native 연결 | `neture.service-members` |
+| 114 | `services/web-neture/src/App.tsx:1239` · `/operator/users/:id` | 중앙 native 연결 | `neture.service-members` |
+| 115 | `services/web-neture/src/App.tsx:1240` · `/operator/stores` | 중앙 native 연결 | `neture.stores` |
+| 116 | `services/web-neture/src/App.tsx:1241` · `/operator/orders` | 중앙 native 연결 | `neture.orders` |
+| 117 | `services/web-neture/src/App.tsx:1242` · `/operator/ai-report` | 중앙 native 연결 | `neture.ai-report` |
+| 118 | `services/web-neture/src/App.tsx:1243` · `/operator/settings/notifications` | 중앙 native 연결 | `neture.notifications` |
+| 119 | `services/web-neture/src/App.tsx:1244` · `/operator/applications` | 중앙 native 연결 | `neture.applications` |
+| 120 | `services/web-neture/src/App.tsx:1245` · `/operator/community` | 중앙 native 연결 | `neture.forums` |
+| 121 | `services/web-neture/src/App.tsx:1247` · `/operator/forum-delete` | 중앙 native 연결 | `neture.forum-delete` |
+| 122 | `services/web-neture/src/App.tsx:1249` · `/operator/forum-delete-requests` | 중앙 native 연결 | `neture.forum-delete` |
+| 123 | `services/web-neture/src/App.tsx:1250` · `/operator/forum-analytics` | 중앙 native 연결 | `neture.forum-analytics` |
+| 124 | `services/web-neture/src/App.tsx:1252` · `/operator/supply` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 125 | `services/web-neture/src/App.tsx:1253` · `/operator/all-products` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 126 | `services/web-neture/src/App.tsx:1254` · `/operator/all-registered-products` | 중앙 native 연결 | `neture.products` |
+| 127 | `services/web-neture/src/App.tsx:1259` · `/operator/ai-card-report` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 128 | `services/web-neture/src/App.tsx:1260` · `/operator/ai-operations` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 129 | `services/web-neture/src/App.tsx:1263` · `/operator/home-presentation/neture` | 중앙 native 연결 | `neture.home` |
+| 130 | `services/web-neture/src/App.tsx:1264` · `/operator/home-presentation/carepharm` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 131 | `services/web-neture/src/App.tsx:1265` · `/operator/homepage-cms` | 중앙 native 연결 | `neture.cms` |
+| 132 | `services/web-neture/src/App.tsx:1267` · `/operator/guide-contents` | 중앙 native 연결 | `neture.guides` |
+| 133 | `services/web-neture/src/App.tsx:1268` · `/operator/analytics` | 중앙 native 연결 | `neture.analytics` |
+| 134 | `services/web-neture/src/App.tsx:1269` · `/operator/category-mapping-rules` | 중앙 native 연결 | `neture.category-mapping` |
+| 135 | `services/web-neture/src/App.tsx:1271` · `/operator/product-service-approvals` | 중앙 native 연결 | `neture.service-product-approvals` |
+| 136 | `services/web-neture/src/App.tsx:1272` · `/operator/product-approvals` | 중앙 native 연결 | `neture.product-approvals` |
+| 137 | `services/web-neture/src/App.tsx:1274` · `/operator/product-candidates` | 중앙 native 연결 | `neture.candidates` |
+| 138 | `services/web-neture/src/App.tsx:1276` · `/operator/actions` | 중앙 native 연결 | `neture.actions` |
+| 139 | `services/web-neture/src/App.tsx:1279` · `/operator/contact-messages` | 중앙 native 연결 | `neture.legacy-contact` |
+| 140 | `services/web-neture/src/App.tsx:1281` · `/operator/pharmacy-memberships` | 중앙 native 연결 | `neture.pharmacies` |
+| 141 | `services/web-neture/src/App.tsx:1282` · `/operator/product-cleanup` | 중앙 native 연결 | `neture.cleanup` |
+| 142 | `services/web-neture/src/App.tsx:1283` · `/operator/semi-franchises` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 143 | `services/web-neture/src/App.tsx:1284` · `/operator/semi-franchises/:key/contents/new` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 144 | `services/web-neture/src/App.tsx:1285` · `/operator/semi-franchises/:key/contents/:id/edit` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 145 | `services/web-neture/src/App.tsx:1315` · `/workspace/admin` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 146 | `services/web-neture/src/App.tsx:1316` · `/workspace/admin/*` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 147 | `services/web-neture/src/App.tsx:1317` · `/workspace/operator` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 148 | `services/web-pharmacy-business/src/App.tsx:302` · `/operator/home-presentation/carepharm` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 149 | `services/web-pharmacy-business/src/App.tsx:352` · `/operator/semi-franchises` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 150 | `services/web-pharmacy-business/src/App.tsx:353` · `/operator/semi-franchises/:key/contents/new` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 151 | `services/web-pharmacy-business/src/App.tsx:354` · `/operator/semi-franchises/:key/contents/:id/edit` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 152 | `services/web-pharmacy-business/src/App.tsx:356` · `/operator/collaboration-requests` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 153 | `services/web-pharmacy-business/src/App.tsx:357` · `/operator/*` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 154 | `services/web-pharmacy-business/src/App.tsx:358` · `/admin/*` | 별칭 보존 | `원래 목적지 유지; 독립 업무를 중앙 위임으로 전환하지 않음` |
+| 155 | `services/web-pharmacy-business/src/App.tsx:386` · `/operator/inbox/business/:businessKey` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 156 | `services/web-pharmacy-coop/src/App.tsx:143` · `operator/inbox` | 중앙 native 연결 | `pharmcoop.inbox` |
+| 157 | `services/web-pharmacy-coop/src/App.tsx:145` · `operator` | 중앙 native 연결 | `pharmcoop.federation` |
+| 158 | `services/web-pharmacy-coop/src/App.tsx:146` · `operator/home-presentation` | 중앙 native 연결 | `pharmcoop.home` |
+| 159 | `services/web-pharmacy-coop/src/App.tsx:161` · `:cooperativeSlug/operator/inbox` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 160 | `services/web-pharmacy-coop/src/App.tsx:175` · `:cooperativeSlug/operator` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 161 | `services/web-pharmacy-coop/src/App.tsx:176` · `:cooperativeSlug/operator/home-presentation` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 162 | `services/web-pharmacy-coop/src/App.tsx:180` · `:cooperativeSlug/operator/contents/new` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 163 | `services/web-pharmacy-coop/src/App.tsx:184` · `:cooperativeSlug/operator/contents/:id/edit` | 독립 사업·자기 업무 유지 | `기존 사업/분회/조합 소속·역할과 비공개 범위 유지` |
+| 164 | `services/web-store/src/App.tsx:260` · `/operator/inbox` | 자기 업무 유지 | `매장 업무 알림 범위 유지` |
+| 165 | `services/web-store/src/App.tsx:261` · `/operator/pharmacy-memberships` | 중앙 native 연결 | `neture.pharmacies` |
+
+### 원장·API·화면의 대조 근거
+
+- `central-operation-renderers.tsx`와 `central-operation-menu.ts`: 메뉴별 원본 공유 모듈·직접 경로. 각 모듈의 transport factory가 원래 API를 사용한다. `central-operation-menu.middleware.ts`는 실제 API 요청을 업무로 분류하고 `central-operation-menu-grants.ts`가 현재 역할·위임·Google proof를 검사한다.
+- 회원·자격: 공통 directory/면허 심사와 서비스 membership을 구별한다. `ServiceMembersWorkspace`의 서비스 탈퇴와 `AdminMemberManagementPage`의 Neture 가입 관계 정리는 별도다. `mode=hard`만 Admin 업무 메뉴로 검사하며 공통 계정·타 서비스 관계를 삭제하지 않는다.
+- 상품: 일반 취급/서비스별 상품 검토와 기존 Admin 상품 승인·철회 API는 별도다. 카테고리·브랜드·마스터·일괄등록 및 전역 상품 DB의 중요 업무는 기존 관리자 경계를 유지한다. 공통 상품 DB의 새 Operator 위임은 하지 않았다.
+- 강의·공급자·펀딩: `lecture-operations`, `supplier-operations`, `funding-operations`의 원본 상세·서류·수료·참여자·입금·환급·복구 패널을 재사용한다. 승인뿐 아니라 원래 처리 lifecycle/동시성/실패 후 재시도 테스트를 유지했다.
+- 커뮤니티: 공개 설정·게시판·포럼·삭제 점검·신고·편집/홈/자료/뉴스를 기존 모듈로 연결했다. 최신 main의 공개 글 선택 변경 시 완료 안내 초기화를 공유 화면에도 반영했다. 원래 조직별 비공개 범위와 본인 소유 업무는 유지한다.
+- Partner: 단일 화면의 5개 업무 탭과 overview 응답·명령을 위임 범위로 제한한다. 연합회와 개별 조합은 `requireFederation`/`requireLocal` 및 slug로 구별하며 중앙 역할만으로 개별 조합·MegaPharm·CarePharm·분회 내부 권한을 만들지 않는다.
+- 플랫폼 AI·메일·상품 DB 설정은 서비스의 일상 Operator 업무와 구분하여 기존 보호 화면을 보존했다. 이 항목을 중앙 native 메뉴 구현이나 서비스 Operator 위임 완료로 계산하지 않는다.
+
+최종 테스트·CI·배포 결과는 통합 운영 WO에 시점별로 기록한다. 자동 census는 동작 검증을 대체하지 않는다.

@@ -74,7 +74,8 @@ describe('B. Neture admin 전용 승인 표면이 은퇴했다', () => {
   it('admin 승인 API client method 가 없다 (operator client 는 보존)', () => {
     const api = read('services/web-neture/src/lib/api/admin.ts');
     expect(api).not.toContain('export const adminProductApi');
-    expect(api).toContain('export const operatorSupplierApi');
+    expect(api).toContain('export const { operatorSupplierApi, adminSupplierApi } = createSupplierOperatorApi(api)');
+    expect(read('packages/operator-core-ui/src/modules/supplier-operations/api.ts')).toContain('operatorSupplierApi');
     expect(read('services/web-neture/src/lib/api/index.ts')).not.toContain('adminProductApi');
 
     const supplierList = read('apps/admin-dashboard/src/pages/neture/SupplierListPage.tsx');
