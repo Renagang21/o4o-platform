@@ -253,8 +253,9 @@ export default function HomepageCmsPage() {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <button type="button" aria-label="콘텐츠 편집 배경 닫기" className="absolute inset-0 h-full w-full cursor-default bg-transparent" onClick={() => setShowModal(false)} />
+          <div className="relative z-10 bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900">{editId ? '콘텐츠 수정' : '콘텐츠 추가'}</h2>
               <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">

@@ -3,10 +3,22 @@
 import ts from 'typescript';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-const output = process.argv[2];
-if (!output) throw new Error('Usage: node scripts/audit/census-central-operation-surfaces.mjs /absolute/artifact.json');
-const files = execFileSync('rg', ['--files', 'services', 'packages/operator-core-ui/src', '-g', '*.tsx', '-g', '*.ts'], { encoding: 'utf8' }).trim().split('\n').filter(file => !/(?:__tests__|\.(?:test|spec)\.)/.test(file)).sort();
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../../',import.meta.url));
+if (process.argv.length !== 2) throw new Error('Usage: node scripts/audit/census-central-operation-surfaces.mjs (no path arguments)');
+const output = path.join(root,'.tmp','central-operation-census','surfaces.json');
+const files = [];
+const excluded = new Set(['node_modules','dist','build','coverage','tmp','__tests__','test-results','playwright-report']);
+function collect(directory) {
+  for (const entry of fs.readdirSync(directory,{withFileTypes:true})) {
+    if (entry.isSymbolicLink() || entry.name.startsWith('.') || excluded.has(entry.name)) continue;
+    const absolute=path.join(directory,entry.name);
+    if(entry.isDirectory()) collect(absolute);
+    else if(entry.isFile() && /[.]tsx?$/.test(entry.name) && !/[.](test|spec)[.]/.test(entry.name)) files.push(path.relative(root,absolute));
+  }
+}
+for(const directory of ['services','packages/operator-core-ui/src']) collect(path.join(root,directory));
+files.sort((left,right)=>left.localeCompare(right));
 const routes = [], controls = [];
 const compact = node => node?.getText().replace(/\s+/g, ' ') ?? '';
 const opening = node => ts.isJsxElement(node) ? node.openingElement : ts.isJsxSelfClosingElement(node) ? node : null;
@@ -14,15 +26,15 @@ const attr = (node, key) => node.attributes.properties.find(item => ts.isJsxAttr
 const literal = node => node && ts.isStringLiteral(node) ? node.text : node && ts.isJsxExpression(node) && node.expression && ts.isStringLiteral(node.expression) ? node.expression.text : null;
 function resolveSource(base, target) {
   if (!target.startsWith('.')) return target;
-  const stem = path.resolve(path.dirname(base), target);
+  const stem = path.resolve(root,path.dirname(base), target);
   for (const suffix of ['', '.tsx', '.ts', '/index.tsx', '/index.ts']) {
     const candidate = stem + suffix;
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return path.relative(process.cwd(), candidate);
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return path.relative(root, candidate);
   }
   return null;
 }
 for (const file of files) {
-  const source = fs.readFileSync(file, 'utf8');
+  const source = fs.readFileSync(path.join(root,file), 'utf8');
   if (!/<Route\b|\b(?:tabs|TABS|SCOPED_MENU|UNIFIED_MENU|pages|menuItems|tabItems)\b/.test(source)) continue;
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const imports = new Map();

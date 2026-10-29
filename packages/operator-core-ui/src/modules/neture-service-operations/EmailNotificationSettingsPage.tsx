@@ -73,7 +73,7 @@ export default function EmailNotificationSettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    fetchSettings();
+    void fetchSettings();
   }, []);
 
   const fetchSettings = async () => {

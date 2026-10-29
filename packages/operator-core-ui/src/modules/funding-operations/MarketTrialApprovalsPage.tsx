@@ -126,11 +126,11 @@ function TrialsPanel() {
   const beginTrials = useLatestRequest('funding-operator-list');
 
   useEffect(() => {
-    loadKpi();
+    void loadKpi();
   }, []);
 
   useEffect(() => {
-    loadTrials();
+    void loadTrials();
   }, [filter]);
 
   const loadKpi = async () => {
@@ -270,6 +270,9 @@ function TrialCard({ trial, onClick }: { trial: OperatorTrial; onClick: () => vo
   return (
     <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();onClick();}}}
       className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm cursor-pointer transition"
     >
       <div className="flex items-start justify-between gap-2">

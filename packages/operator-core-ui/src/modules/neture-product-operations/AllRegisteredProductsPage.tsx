@@ -73,8 +73,9 @@ function DescriptionPreviewModal({
   const title = mode === 'short' ? '간단 설명 미리보기' : '상세 설명 미리보기';
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+      <button type="button" aria-label="미리보기 배경 닫기" className="absolute inset-0 h-full w-full cursor-default bg-transparent" onClick={onClose} />
+      <div className="relative z-10 bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
@@ -131,8 +132,9 @@ function TagsPreviewModal({
 }) {
   const tags = Array.isArray(offer.tags) ? offer.tags : [];
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+      <button type="button" aria-label="미리보기 배경 닫기" className="absolute inset-0 h-full w-full cursor-default bg-transparent" onClick={onClose} />
+      <div className="relative z-10 bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-slate-800">태그 ({tags.length}개)</h3>

@@ -131,12 +131,12 @@ export default function CentralOperationsPage() {
       <header className="flex flex-wrap items-center gap-4 border-b bg-white px-4 py-4 md:px-8">
         <h1 className="text-2xl font-bold">O4O 통합 운영</h1>
         <Link to="/operations">위임 업무</Link>
-        <CentralOperationNotifications key={user.id} scopeKey={[...roles, ...menuKeys].sort().join('|')} />
+        <CentralOperationNotifications key={user.id} scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />
         {isPlatform && <Link to="/admin">전체 관리자</Link>}
         <button onClick={logout}>로그아웃</button>
       </header>}
     >
-      {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort().join('|')} />}
+      {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {serviceKey && <nav aria-label="서비스 운영 업무" className="mb-5 flex flex-wrap gap-2 border-b pb-4">
         {visibleMenus.filter(menu => menu.service === serviceKey).map(menu => <Link key={menu.key} aria-current={area === menu.area ? 'page' : undefined} className={`rounded border px-3 py-2 text-sm ${area === menu.area ? 'bg-blue-700 text-white' : 'bg-white text-slate-700'}`} to={`/operations/${serviceKey}/${menu.area}`}>{menu.label}</Link>)}
       </nav>}

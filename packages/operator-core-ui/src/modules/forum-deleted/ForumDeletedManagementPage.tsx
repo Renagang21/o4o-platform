@@ -439,7 +439,7 @@ export function ForumDeletedManagementPage({ client: forumAdminApi, operatorDele
       {/* ── 완전 삭제 모달 ── */}
       {hdTarget && (
         <>
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => { setHdTarget(null); setHdCheck(null); }} />
+          <button type="button" aria-label="포럼 완전 삭제 창 닫기" className="fixed inset-0 bg-black/60 z-40" onClick={() => { setHdTarget(null); setHdCheck(null); }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-rose-200 bg-rose-50 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">

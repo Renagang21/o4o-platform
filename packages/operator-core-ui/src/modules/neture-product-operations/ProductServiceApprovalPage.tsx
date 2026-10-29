@@ -627,6 +627,8 @@ export default function ProductServiceApprovalPage() {
                   <div
                     className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center"
                     onClick={() => setDrawerItem(item)}
+                    role="button" tabIndex={0} aria-label={`상품 이미지 상세: ${item.productName}`}
+                    onKeyDown={event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();setDrawerItem(item);}}}
                   >
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -690,7 +692,7 @@ export default function ProductServiceApprovalPage() {
                   </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-1.5 shrink-0">
                   {item.approvalStatus === 'pending' ? (
                     <>
                       {hasPermitRisk(item) && (
@@ -740,7 +742,7 @@ export default function ProductServiceApprovalPage() {
 
                 {/* Priority badges + Quality flags + Progress bar */}
                 {(item.isStale || item.isLowQualitySupplier || qualityFlags.length > 0 || score < 100) && (
-                  <div className="mt-2 ml-[68px] flex items-center gap-3" onClick={() => setDrawerItem(item)}>
+                  <div className="mt-2 ml-[68px] flex items-center gap-3" onClick={() => setDrawerItem(item)} role="button" tabIndex={0} aria-label={`상품 품질 상세: ${item.productName}`} onKeyDown={event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();setDrawerItem(item);}}}>
                     <div className="flex flex-wrap gap-1">
                       {item.isStale && (
                         <span className="text-[11px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-medium" title="48시간 이상 승인 대기">

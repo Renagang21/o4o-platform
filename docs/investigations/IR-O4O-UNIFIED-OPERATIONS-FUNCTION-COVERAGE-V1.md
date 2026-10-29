@@ -208,7 +208,7 @@ JSX AST에서 운영·관리 route 선언 164개를 추출했다. 별도 route �
 
 ## 확장 대조와 누락 방지 기준
 
-`node scripts/audit/census-central-operation-surfaces.mjs /absolute/artifact.json`으로 재현한다. 서비스·공유 UI의 TypeScript/TSX 파일을 읽고 React Router의 상위 경로·가드·조건 분기와 별도 메뉴/탭 선언도 기록한다. 최초 확장 실행은 1,231개 소스, 관리 경로 선언 164개(이전 주소 23개), 메뉴/탭 정의 14곳이다. 위 표는 기준 main의 위치를 보존한다. 이후 공유 모듈 추출로 바뀐 소비처는 아래 실행 메모에서 추적한다.
+`node scripts/audit/census-central-operation-surfaces.mjs`로 재현한다. 출력은 저장소의 `.tmp/central-operation-census/surfaces.json`에 고정하며 임의 경로 인자는 거부한다. 서비스·공유 UI의 TypeScript/TSX 파일을 읽고 React Router의 상위 경로·가드·조건 분기와 별도 메뉴/탭 선언도 기록한다. 최초 확장 실행은 1,231개 소스, 관리 경로 선언 164개(이전 주소 23개), 메뉴/탭 정의 14곳이다. 위 표는 기준 main의 위치를 보존한다. 이후 공유 모듈 추출로 바뀐 소비처는 아래 실행 메모에서 추적한다.
 
 자동 추출만으로 전수 검증을 완료했다고 판정하지 않는다. computed path, 별도 컴포넌트에 정의된 상대 경로, 화면 내부 상태/모달/복구 기능, backend만 남은 기능은 수동 대조한다. 특히 Partner의 `/operator` 내부 다섯 업무와 조합별 `:cooperativeSlug/operator/*`, 분회의 별도 slug 컨텍스트를 일반 전역 서비스 메뉴로 합치지 않는다.
 

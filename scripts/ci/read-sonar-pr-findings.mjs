@@ -23,4 +23,4 @@ try {
   process.exitCode=1;
 }
 await writeFile('sonar-pr-findings.json',JSON.stringify(report,null,2)+'\n');
-console.log(JSON.stringify({status:report.status,total:report.total,collected:report.issues.length,error:report.error ?? null}));
+console.log(report.status==='collected' ? 'Sonar diagnostics collected; see the artifact for findings.' : 'Sonar diagnostics unavailable; see the artifact for the reason.');

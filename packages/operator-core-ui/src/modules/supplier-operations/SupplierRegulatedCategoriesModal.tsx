@@ -5,6 +5,7 @@
  * O4O 는 법적 허가를 인증하지 않으며, 내부 등록 가능 상태만 관리한다.
  */
 import { useEffect, useState } from 'react';
+import {useLatestRequest} from '../../common/operation-support/useLatestRequest';
 import { X, Download, Loader2 } from 'lucide-react';
 import { REGULATED_CATEGORY_LABELS, REGULATED_CATEGORY_STATUS_LABELS, type SupplierRegulatedCategory, type RegulatedCategory, type RegulatedCategoryStatus } from './types';
 
@@ -42,17 +43,27 @@ export default function SupplierRegulatedCategoriesModal({ supplierId, supplierN
   const [busy, setBusy] = useState<RegulatedCategory | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [loadError,setLoadError]=useState(false);
+  const beginLoad=useLatestRequest(supplierId);
 
   const load = async () => {
+    const current=beginLoad();
+    if(!current()) return;
     setLoading(true);
-    const data = await api.listRegulatedCategories(supplierId);
-    setRows(data);
-    setNotes(Object.fromEntries(data.map((r) => [r.category, r.reviewNote || ''])));
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const data = await api.listRegulatedCategories(supplierId);
+      if(current()) {
+        setRows(data);
+        setNotes(Object.fromEntries(data.map((r) => [r.category, r.reviewNote || ''])));
+      }
+    } catch { if(current()) {setLoadError(true);setError('품목군을 불러오지 못했습니다. 다시 조회해 주세요.');} }
+    finally {if(current()) setLoading(false);}
   };
 
   useEffect(() => {
-    load();
+    setRows([]);setNotes({});setError(null);
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supplierId]);
 
@@ -92,6 +103,8 @@ export default function SupplierRegulatedCategoriesModal({ supplierId, supplierN
         <div className="px-6 py-4 overflow-y-auto space-y-3">
           {loading ? (
             <div className="py-10 text-center text-slate-400 text-sm">불러오는 중...</div>
+          ) : loadError ? (
+            <button type="button" onClick={()=>{setError(null);void load();}}>품목군 다시 조회</button>
           ) : rows.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">신청한 품목군이 없습니다.</div>
           ) : (
@@ -150,7 +163,7 @@ export default function SupplierRegulatedCategoriesModal({ supplierId, supplierN
               </div>
             ))
           )}
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
         </div>
 
         <div className="px-6 py-3 border-t border-slate-100 text-right">

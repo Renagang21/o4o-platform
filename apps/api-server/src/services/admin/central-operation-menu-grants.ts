@@ -13,7 +13,7 @@ export function validateCentralMenuKeys(role: string, input: unknown): string[] 
   const allowed = new Set(centralMenusForRole(role).map(menu => menu.key));
   if (!Array.isArray(input) || input.length > 256 || input.some(key => typeof key !== 'string' || !allowed.has(key)) || role === 'platform:super_admin')
     throw new OperationError(400, 'INVALID_CENTRAL_MENU_GRANTS', '해당 서비스 역할에 위임할 수 있는 업무 메뉴를 선택해 주세요.');
-  return [...new Set(input)].sort();
+  return [...new Set(input)].sort((left,right)=>left.localeCompare(right));
 }
 
 /** Existing explicit central assignments retain their service duties until an Admin narrows them. */
