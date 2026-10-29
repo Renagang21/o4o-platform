@@ -1,7 +1,7 @@
 # 사용자 AI로 매장 상품 상담자료 작성 V1
 
 > 상태: ACTIVE · 작성일: 2026-10-26 (Asia/Seoul)
-> 구현: 개발 branch, 운영 미배포. [작업](../../work-orders/WO-O4O-STORE-PRODUCT-CONSULTATION-AUTHORING-COMPLETION-V1.md)
+> 구현: PR #830으로 main 통합 완료. 운영 반영 여부는 해당 통합·배포 기록으로 별도 확인한다. [작업](../../work-orders/WO-O4O-STORE-PRODUCT-CONSULTATION-AUTHORING-COMPLETION-V1.md)
 
 1. 내 매장 상품에서 안내 작성으로 진입한다. 기존 안내를 확인하고 새 안내 작성 또는 기존 자료 수정 중 하나를 선택한다.
 2. 새 안내의 상품 상담자료 영역에서 저장된 상품 원문을 불러온 뒤 **확인한 원문을 상품 사실 근거로 사용**을 누른다. 불러오기만으로 본문/근거를 교체하지 않는다. 기존 입력이 있으면 교체를 확인한다. 긴 원문은 최대 20,000자이므로 필요한 부분을 확인·보완한다.

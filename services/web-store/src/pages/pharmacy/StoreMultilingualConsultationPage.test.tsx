@@ -73,7 +73,7 @@ it('keeps input on translation failure, supports retry and distinguishes failed 
 it('keeps professional modes unavailable when only a service entitlement exists', async () => {
   render(<Page />); const select = await screen.findByLabelText('상담 방식');
   fireEvent.click(screen.getByText(/상담 방식·고객 언어 ·/));
-  expect((within(select).getByRole('option', { name: '매대 약사 상담 · 약사 사용 확인 필요' }) as HTMLOptionElement).disabled).toBe(true);
+  expect((within(select).getByRole('option', { name: '매대 약사 상담 · 개인 약사 자격·약국 업무 허용 확인 필요' }) as HTMLOptionElement).disabled).toBe(true);
 });
 it('clears the customer utterance when leaving the browser page', async () => {
   render(<Page />); await screen.findByLabelText('안내 문구');
@@ -171,4 +171,27 @@ it('clears expired consultation drafts and offers a fresh explicit open after ta
     expect(screen.queryByText('Translated words')).toBeNull();
     expect((screen.getByLabelText('상담 방식') as HTMLSelectElement).disabled).toBe(false);
   } finally { cleanup(); vi.useRealTimers(); }
+});
+
+it('rechecks blocked modes after settings change without issuing a translation or changing permissions', async () => {
+  state.get.mockResolvedValueOnce({ ...context(), data: { ...context().data, modes: modes.map(m => ({ ...m, allowed: false })) } });
+  render(<Page />); await screen.findByRole('region', { name: '상담 이용 조건 안내' });
+  expect(state.post).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: '이용 상태 다시 확인' }));
+  await screen.findByLabelText('안내 문구');
+  expect(state.get).toHaveBeenCalledTimes(2);
+  expect(state.post).not.toHaveBeenCalled();
+});
+
+it('clears private drafts after an explicit access denial and offers recheck rather than another translation', async () => {
+  render(<Page />); await screen.findByLabelText('안내 문구');
+  fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
+  fireEvent.change(translation().getByRole('textbox'), { target: { value: 'Transient customer words' } });
+  state.post.mockRejectedValueOnce({ status: 403, code: 'PHARMACIST_CONFIRMATION_REQUIRED' });
+  fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+  await screen.findByRole('alert');
+  expect(screen.queryByDisplayValue('Transient customer words')).toBeNull();
+  expect(screen.queryByRole('region', { name: '문장 번역' })).toBeNull();
+  expect(screen.getByRole('button', { name: '다시 확인' })).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'My Home' })).toBeTruthy();
 });

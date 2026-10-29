@@ -1,10 +1,10 @@
+import { ConsultationAccessNotice, ConsultationMyHomeLink, consultationAccessError } from './consultation/ConsultationAccessNotice';
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ConsultationSelectors,
   ConsultationInput,
   TranslationResult,
   CustomerDialog,
-  type Mode,
   type Context,
   type Result,
 } from "./consultation/ConsultationParts";
@@ -27,23 +27,9 @@ import {
 } from "./useConsultationDrafts";
 
 const base = "/neture/pharmacy/multilingual-consultation";
-function unavailableModeMessage(mode?: Mode) {
-  return mode?.entitled
-    ? "약사 상담 사용 확인이 필요합니다."
-    : "약국의 제공 기능과 My Home에서 허용한 근무자 이용 범위를 확인해 주세요.";
-}
 function translationErrorMessage(code?: string) {
-  if (code === "CONSULTATION_QUOTA_EXCEEDED")
-    return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
-  if (
-    [
-      "SERVICE_FEATURE_REQUIRED",
-      "STORE_ACCESS_REQUIRED",
-      "PHARMACIST_CONFIRMATION_REQUIRED",
-    ].includes(code ?? "")
-  )
-    return "상담 이용 권한이 변경됐습니다. 이용 상태를 다시 확인해 주세요.";
-  return "번역을 완료하지 못했습니다. 입력 문장을 유지했습니다. 다시 시도해 주세요.";
+  if (code === "CONSULTATION_QUOTA_EXCEEDED") return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
+  return consultationAccessError(code) ?? "번역을 완료하지 못했습니다. 입력 문장을 유지했습니다. 다시 시도해 주세요.";
 }
 function matchingResult(
   data: Result,
@@ -235,9 +221,9 @@ function Consultation({
         setLanguage(data.languages[0].key);
         setPhrase(data.phrases[0]?.key ?? "");
       })
-      .catch(() => {
+      .catch((cause: { code?: string }) => {
         if (!cancelled)
-          setError("상담 이용 상태를 확인하지 못했습니다. 다시 시도해 주세요.");
+          setError(consultationAccessError(cause?.code) ?? "상담 이용 상태를 확인하지 못했습니다. 다시 시도해 주세요.");
       });
     return () => {
       cancelled = true;
@@ -318,8 +304,11 @@ function Consultation({
       setResult(data);
     } catch (error_) {
       if (alive.current && request === version.current) {
-        const value = error_ as { code?: string };
-        setError(translationErrorMessage(value.code));
+        const value = error_ as { code?: string; status?: number };
+        if (value?.status === 401 || value?.status === 403) {
+          clear(); setContext(null);
+          setError(consultationAccessError(value?.code) ?? '상담 이용 권한이 변경됐습니다. 이용 상태를 다시 확인해 주세요.');
+        } else setError(translationErrorMessage(value?.code));
       }
     } finally {
       if (alive.current && request === version.current) setBusy(false);
@@ -380,6 +369,7 @@ function Consultation({
           className="rounded border border-red-200 bg-red-50 p-3 text-red-800"
         >
           <p>{error}</p>
+          {!context && <ConsultationMyHomeLink />}
           {!context && (
             <button
               type="button"
@@ -528,9 +518,7 @@ function Consultation({
               }} />
           )}
           {!current?.allowed ? (
-            <p className="rounded border bg-amber-50 p-4">
-              {unavailableModeMessage(current)}
-            </p>
+            <ConsultationAccessNotice mode={current} onReload={() => { clear(); setRetry(value => value + 1); }} />
           ) : (
             <section
               className="space-y-4 rounded-xl border bg-white p-4"

@@ -1,0 +1,37 @@
+# CHECK — 상담 이용 안내·설정 연결 정합성 보완 V1
+
+- 작성일: 2026-10-29
+- 기준 main: `307e86ffe7`
+- 범위: [TODO](../work-orders/TODO-O4O-CONSULTATION-ACCESS-GUIDANCE-V1.md) · [이용 안내](../guides/O4O-CONSULTATION-ACCESS-GUIDANCE-V1.md)
+- 종료점: 개발·검증·단일 PR, main 병합 전. PR의 최종 CI·리뷰 결과는 PR에서 확인한다.
+
+## 보완
+
+기존 상담 context의 entitled/allowed 값은 기능 제공과 약사 모드 이용 여부를 나타내지만, 개인 자격과 약국별 업무 허용 중 무엇이 부족한지는 알려주지 않는다. 기존 응답으로 확정할 수 없는 사유는 추정하지 않는다. 개인의 승인된 약사 자격과 해당 약국의 업무 허용이 별도 조건임을 표시하고 기존 My Home 인증 handoff로 계정·자격·근무자 설정 확인을 연결했다.
+
+제공 기능 미충족, 개인 자격/약국별 확인 필요, 약국 접근 거부, 자격 조회 실패를 기존 코드가 확정한 범위에서 구분한다. 조회 실패를 자격 반려로 바꾸지 않는다. My Home 이동 실패는 기존 공통 버튼의 오류·재시도를 사용한다. 설정 확인 후 상태 재조회는 입력/음성을 초기화하는 기존 clear 동작을 사용한다.
+
+번역 응답이 명시적으로 401/403이면 현재 입력·번역과 context를 비우고 재확인 단계로 돌아간다. 일반 네트워크 오류는 입력 보존·명시 재시도를 유지한다. API·권한·역할·schema·의존성·공통 Core·공통 버튼 구현을 변경하지 않았다. UI가 기능을 허용하거나 설정을 자동 저장하지 않는다.
+
+## 문서·소비처
+
+- 약국 설계 §15-8과 상담 데이터 범위의 현행 설명을 V2 §2의 개인 자격+약국별 허용 기준으로 정렬했다. 과거 CHECK/TODO의 당시 결과는 재작성하지 않는다.
+- 상담자료 작성 안내의 개발 branch 표기를 실제 PR #830 main 통합 사실과 맞췄다. 이번에 운영 배포 상태를 새로 확인했다고 표시하지 않는다.
+- MyHomeButton은 Store RootShell과 동일한 AuthClient.api 어댑터를 사용한다. 공통 모듈·다른 소비처는 변경하지 않았다. 독립 직원 상담 화면에서도 기존 로그인 handoff·오류 안내를 재사용한다.
+
+## 검증과 한계
+
+검증은 현재 작업공간의 단위/화면 테스트와 합성 API 브라우저 fixture로 수행한다. 운영 계정·DB 쓰기·기기 pairing·AI provider·배포를 실행하지 않는다. 실제 태블릿·두 화면 재연결·현장 마이크·언어 품질·권한 회수의 운영 검수는 완료로 바꾸지 않는다.
+
+상담 원문을 영구 이력·Task/Memory로 축적하지 않는다. 개인 약사 자격의 새 심사 API나 별도 역할 체계도 추가하지 않는다.
+
+## 실행 결과
+
+- frozen offline install·build:packages PASS. 의존/lockfile 변경 없음.
+- Store 전체 80파일·873개 PASS. 상태 재조회, 명시 접근 거부 시 초안 폐기, 일반 실패 입력 보존, 자격/기능 안내·handoff 오류 재시도 포함.
+- Store TypeScript·production build PASS. 기존 chunk 크기 안내 유지.
+- 실제 변경 컴포넌트+합성 API transport Chromium 1440px/390px: 이용 제한 안내 → My Home 이동 실패 안내 → 상태 재조회 → 허용된 직원 모드 진입 PASS. 가로 overflow·page error 0. 실제 운영 인증·자격 설정·AI 호출은 아님.
+- 변경 production 코드·새 안내 테스트 ESLint 오류·경고 0. 기존 상담 페이지 테스트 파일의 미변경 heartbeat fixture에는 prefer-const 1건이 남아 있으며 이번 회귀에서 통과했다.
+- 문서 6개 민감정보 검사·diff check PASS. 최초 빌드에서 미사용 타입·AuthClient 어댑터 오류를 확인해 기존 RootShell과 같은 AuthClient.api로 수정 후 전체 테스트·타입·빌드·브라우저 재통과.
+
+문서 정합: V2 기준과 현행 설계/이용 안내 정렬. 과거 CHECK는 보존. 최종 PR 기술 gate는 PR 완료 기록으로 확정한다.
