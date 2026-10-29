@@ -246,7 +246,8 @@ export class AccountErasureService {
     });
     const shortTokens=tokens.filter(v=>v.length<2);
     // Search attributed identifier values, not JSON column/key names or another actor’s profile.
-    const leaf=(alias:string)=>`jsonb_path_query_array(to_jsonb(${alias})
+    const leaf=(alias:string, attributionOnly=false)=>`jsonb_path_query_array(to_jsonb(${alias})
+      ${attributionOnly ? "- 'assigned_by'" : ''}
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
     // Provider IDs belong to a namespace. Unattributed copies still need domain review,
@@ -269,13 +270,13 @@ export class AccountErasureService {
       }
       return false;
     };
-    const providerReview=async(table:string, exclusion:string):Promise<boolean> => {
+    const providerReview=async(table:string, exclusion:string, attributionOnly=false):Promise<boolean> => {
       if(!identities.providers.length)return false;
       // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
       // Node memory even when many genuine candidates require namespace/domain inspection.
       await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
-        SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
-        jsonb_path_query_array(to_jsonb(r),'$.** ? (@.type() == "string")')::text
+        SELECT (to_jsonb(r) ${attributionOnly ? "- 'assigned_by'" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(to_jsonb(r) ${attributionOnly ? "- 'assigned_by'" : ''},'$.** ? (@.type() == "string")')::text
         ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
           `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
       try {
@@ -333,10 +334,13 @@ export class AccountErasureService {
         }
         continue;
       }
+      // The grant belongs to user_id. assigned_by is attribution only and its
+      // existing ON DELETE SET NULL FK clears it; every other field is still scanned.
+      const roleAttribution = t.schema_name === 'public' && t.table_name === 'role_assignments';
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
-        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
+        WHERE $1::text IS NOT NULL AND (${leaf('r',roleAttribution)}::text ~* ANY($2::text[]) OR ${leaf('r',roleAttribution)} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution)) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
