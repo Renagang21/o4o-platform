@@ -275,6 +275,9 @@ importers:
       '@o4o-apps/content-core':
         specifier: workspace:^
         version: link:../../packages/content-core
+      '@o4o/account-ui':
+        specifier: workspace:*
+        version: link:../../packages/account-ui
       '@o4o/ai-prompts':
         specifier: workspace:*
         version: link:../../packages/ai-prompts
@@ -314,6 +317,9 @@ importers:
       '@o4o/security-core':
         specifier: workspace:*
         version: link:../../packages/security-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/slide-app':
         specifier: workspace:*
         version: link:../../packages/slide-app
@@ -1809,6 +1815,12 @@ importers:
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../error-handling
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../lms-client
+      '@o4o/lms-ui':
+        specifier: workspace:*
+        version: link:../lms-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../operator-ux-core
@@ -1821,6 +1833,9 @@ importers:
       '@o4o/ui':
         specifier: workspace:*
         version: link:../ui
+      axios:
+        specifier: ^1.10.0
+        version: 1.13.2
       lucide-react:
         specifier: '>=0.300.0'
         version: 0.523.0(react@19.2.0)
@@ -2588,15 +2603,15 @@ importers:
 
   services/web-partner:
     dependencies:
-      '@o4o/operator-core-ui':
-        specifier: workspace:*
-        version: link:../../packages/operator-core-ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
       '@o4o/auth-react':
         specifier: workspace:*
         version: link:../../packages/auth-react
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       react:
         specifier: 19.2.0
         version: 19.2.0

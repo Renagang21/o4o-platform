@@ -1,3 +1,5 @@
+import { CentralOperationMenuGrantService } from '../../services/admin/central-operation-menu-grants.js';
+import { AppDataSource } from '../../database/connection.js';
 import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
 import { Router } from 'express';
 import {
@@ -14,6 +16,24 @@ export { invitationFailure } from '../../services/admin/operator-invitation-erro
 const adminServiceOperatorInvitationsRouter = Router();
 export { adminServiceOperatorInvitationsRouter as adminServiceOperatorInvitations };
 adminServiceOperatorInvitationsRouter.use(authenticate, requireRole(['platform:super_admin']), apiLimiter);
+const menus = new CentralOperationMenuGrantService(AppDataSource);
+adminServiceOperatorInvitationsRouter.get('/menu-grants', async (req: AuthRequest, res) => {
+  try {
+    if (typeof req.query.userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(req.query.userId) || typeof req.query.role !== 'string') {
+      res.status(400).json({ success: false, code: 'INVALID_CENTRAL_MENU_INPUT' }); return;
+    }
+    res.json({ success: true, data: await menus.read(req.user!.id, req.query.userId, req.query.role) });
+  } catch (error) { invitationFailure(res, error); }
+});
+adminServiceOperatorInvitationsRouter.patch('/menu-grants', async (req: AuthRequest, res) => {
+  try {
+    const { userId, role, menuKeys, reason, version } = req.body ?? {};
+    if (typeof userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(userId) || typeof role !== 'string' || !(version === null || typeof version === 'string')) {
+      res.status(400).json({ success: false, code: 'INVALID_CENTRAL_MENU_INPUT' }); return;
+    }
+    res.json({ success: true, data: await menus.update(req.user!.id, userId, role, { menuKeys, reason, version }) });
+  } catch (error) { invitationFailure(res, error); }
+});
 adminServiceOperatorInvitationsRouter.get('/', async (req:AuthRequest, res) => {
   try {
     res.json({ success: true, data: await service.list(req.user!.id) });
@@ -23,7 +43,7 @@ adminServiceOperatorInvitationsRouter.get('/', async (req:AuthRequest, res) => {
 });
 adminServiceOperatorInvitationsRouter.post('/', async (req: AuthRequest, res) => {
   try {
-    const { email, targetUserId, serviceKey, role, centralDelegation } = req.body ?? {};
+    const { email, targetUserId, serviceKey, role, centralDelegation, menuKeys } = req.body ?? {};
     if (
       (centralDelegation !== undefined && typeof centralDelegation !== 'boolean') ||
       (email !== undefined && typeof email !== 'string') ||
@@ -46,6 +66,7 @@ adminServiceOperatorInvitationsRouter.post('/', async (req: AuthRequest, res) =>
           serviceKey,
           role,
           actorId: req.user!.id,
+          ...(menuKeys !== undefined ? { menuKeys } : {}),
           ...(centralDelegation === true ? { scopeKey: 'o4o-direct' } : {}),
         }),
       });

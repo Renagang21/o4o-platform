@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import Page from './OperatorContactMessagesPage';
 const api = vi.hoisted(() => ({ list: vi.fn(), bulkMarkRead: vi.fn() }));
-vi.mock('../../lib/api', () => ({ operatorContactApi: api }));
+vi.mock('../../lib/api/admin', () => ({ operatorContactApi: api, operatorRegistrationApi: {}, adminSettlementApi: {} }));
 const row = { id: 'fixture', name: '합성 문의자', contactType: 'supplier', status: 'new', createdAt: '2026-01-01' };
 const result = { items: [row], pagination: { page: 1, limit: 20, total: 1, totalPages: 1 } };
 beforeEach(() => { vi.resetAllMocks(); api.list.mockResolvedValue(result); });

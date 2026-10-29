@@ -59,6 +59,7 @@ export type PartnerCommunityReport = {
   resolution: string | null;
 };
 export type PartnerCommunityOverview = {
+  availableAreas?: string[];
   boards: PartnerCommunityBoard[];
   members: {
     id: string;

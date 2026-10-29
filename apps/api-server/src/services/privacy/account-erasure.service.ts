@@ -5,6 +5,8 @@ import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
 import { ERASURE_WRITER_GAPS_SQL } from './erasure-writer-manifest.js';
+import { CENTRAL_MENU_GRANT_OWNER_SQL } from './central-menu-grant-ownership.js';
+import { CENTRAL_MENU_AUDIT_SUBJECT_SQL, minimizeCentralMenuAudit } from './central-menu-audit-evidence.js';
 
 // CORE_CHANGE_REQUIRED — explicit code/local approval of WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.
 // Production account/file execution remains opt-in and requires its own approved rollout.
@@ -200,9 +202,11 @@ export class AccountErasureService {
     const ids = new Set<string>([userId]);
     for (const t of await this.tables(m)) {
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const where = owners?.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
+      const where = t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants'
+        ? CENTRAL_MENU_GRANT_OWNER_SQL
+        : owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
       if (!where || !t.columns.includes('id')) continue;
-      const rows = await m.query(`SELECT id FROM public.${quote(t.table_name)} WHERE ${where}`, [userId]);
+      const rows = await m.query(`SELECT r.id FROM public.${quote(t.table_name)} r WHERE ${where}`, [userId]);
       for (const r of rows) if (UUID.test(String(r.id))) ids.add(r.id);
     }
     for (const id of ids) await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,reference_id,key_hash)
@@ -299,6 +303,12 @@ export class AccountErasureService {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      if (t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants') {
+        predicate = CENTRAL_MENU_GRANT_OWNER_SQL;
+      }
+      if (t.schema_name === 'public' && t.table_name === 'action_logs') {
+        predicate = `COALESCE((${CENTRAL_MENU_AUDIT_SUBJECT_SQL}),false)`;
+      }
       if (t.schema_name === 'public' && t.table_name === 'service_operator_invitations') {
         predicate = `(${predicate}) OR (r.target_user_id IS NULL AND lower(r.invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
         // Typed invitation ownership: preserve peer invitations. The inviter FK is attribution only
@@ -360,6 +370,14 @@ export class AccountErasureService {
 
   private async removePrivateRows(m: EntityManager, userId: string): Promise<void> {
     const tables = await this.tables(m);
+    if (tables.some(t => t.schema_name === 'public' && t.table_name === 'action_logs')) {
+      await minimizeCentralMenuAudit(m,userId,hash(userId));
+    }
+    // Remove only this subject's settings before role parents disappear or invitations
+    // become retained anonymous events. A peer's invitation/grant remains untouched.
+    if (tables.some(t => t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants')) {
+      await m.query(`DELETE FROM central_operation_menu_grants r WHERE ${CENTRAL_MENU_GRANT_OWNER_SQL}`, [userId]);
+    }
     for (const [table, owners] of Object.entries(PRIVATE_OWNERS)) {
       const t = tables.find(x => x.schema_name === 'public' && x.table_name === table);
       if (!t) continue;

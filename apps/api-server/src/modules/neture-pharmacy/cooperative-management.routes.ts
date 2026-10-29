@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
 import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
 import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
@@ -18,6 +19,7 @@ export function cooperativeManagementRoutes(db: DataSource) {
   const router = Router();
   const service = new CooperativeManagementService(db);
   router.use(requireAuth);
+  router.use('/federation', centralOperationRequest('pharmcoop',()=>['pharmcoop.federation'],db));
   router.use((_req, res, next) => {
     res.setHeader("Cache-Control", "private, no-store");
     next();

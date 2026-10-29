@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import { NeturePharmacyError } from "../../modules/neture-pharmacy/constants.js";
 import { CooperativeManagementService } from "../../modules/neture-pharmacy/services/cooperative-management.service.js";
 import { requireSupplierScope } from "../../middleware/supplier-service-scope.middleware.js";
@@ -138,8 +139,8 @@ export function createHomePresentationRoutes(ds: DataSource) {
     if (req.params.surface === "pharmcoop") {
       res.setHeader("Cache-Control", "private, no-store");
       void cooperativeManagement
-        .requireFederation(ds, req.user!.id)
-        .then(() => next())
+        .requireFederation(ds, req.user!.id, false, 'home')
+        .then(() => centralOperationRequest('pharmcoop',()=>['pharmcoop.home'],ds)(req,res,next))
         .catch(() =>
           res.status(403).json({
             success: false,

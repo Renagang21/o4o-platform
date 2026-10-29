@@ -81,8 +81,10 @@ pharmacistQualificationsRouter.get(
     google(req);
     return service().list(
       req.user!.id,
-      typeof req.query.status === "string" ? req.query.status : "pending",
+      typeof req.query.status === "string" ? req.query.status : "all",
       Number(req.query.page ?? 1),
+      typeof req.query.q === "string" ? req.query.q : "",
+      req.query.view === 'members',
     );
   }),
 );

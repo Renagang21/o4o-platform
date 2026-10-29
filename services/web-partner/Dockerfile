@@ -15,6 +15,8 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
+COPY packages/lms-client/package.json ./packages/lms-client/
 COPY services/web-partner/package.json ./services/web-partner/
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
@@ -29,6 +31,8 @@ COPY packages/ui/ ./packages/ui/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
+COPY packages/lms-ui/ ./packages/lms-ui/
+COPY packages/lms-client/ ./packages/lms-client/
 COPY services/web-partner/ ./services/web-partner/
 RUN pnpm --filter @o4o/types build && pnpm --filter @o4o/auth-utils build && pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build && pnpm --filter @o4o/content-editor build

@@ -1,3 +1,4 @@
+import { centralScopedNetureRequest } from '../../../middleware/central-operation-menu.middleware.js';
 /**
  * ProductCandidateController — Product Candidate Review Queue (Phase 3)
  *
@@ -67,6 +68,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
   router.use(authenticate);
   router.use(requireRole(OPERATOR_ROLES));
   router.use(injectServiceScope);
+  router.use(centralScopedNetureRequest(dataSource));
 
   // GET / — 후보 목록 (scope 적용)
   router.get('/', (async (req: Request, res: Response) => {

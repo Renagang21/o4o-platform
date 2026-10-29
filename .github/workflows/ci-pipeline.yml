@@ -854,10 +854,52 @@ jobs:
     - name: Verify installation, data preservation and packaged runtime health
       run: node --test tools/o4o-local-agent/test/release-install.test.mjs
 
+  central-operator-integration:
+    name: Central operator PostgreSQL integration
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true'
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U agent -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
+    - uses: ./.github/actions/setup-build-env
+      with:
+        build-packages: 'false'
+        strict-lockfile: 'true'
+    - name: Build API dependency closure
+      run: pnpm run build:api-deps
+    - name: Verify every schema prefix in a fresh disposable database
+      env:
+        OPERATOR_INVITE_TEST_PORT: '55432'
+      run: pnpm exec tsx scripts/dev/prepare-service-operator-invitation-fixture.ts
+    - name: Verify invitation, menu delegation and account erasure transactions
+      env:
+        OPERATOR_INVITE_TEST_PORT: '55432'
+      run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/admin/__tests__/service-operator-invitation.integration.test.ts
+
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows]
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration]
     if: always()
     timeout-minutes: 5
     steps:

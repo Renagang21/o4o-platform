@@ -1,3 +1,4 @@
+import { withCentralOperationMenus } from './central-operation-menu.middleware.js';
 /**
  * O4O Lecture Service Scope Guard — Phase 1 Foundation.
  * 일반 학습자는 role이 아니라 service_memberships(service_key='lecture')로 판정한다.
@@ -18,4 +19,4 @@ export const LECTURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   },
 };
 
-export const requireLectureScope = createMembershipScopeGuard(LECTURE_SCOPE_CONFIG);
+export const requireLectureScope = withCentralOperationMenus('lecture', createMembershipScopeGuard(LECTURE_SCOPE_CONFIG));

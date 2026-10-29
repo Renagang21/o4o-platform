@@ -1,3 +1,5 @@
+import { assertCentralOperationMenu } from '../../../services/admin/central-operation-menu-grants.js';
+import { OperationError } from '../../../services/operations/operation-audit.js';
 import { recordOperatorRevocation } from '../../../services/admin/operator-invitation-retention.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
@@ -52,20 +54,22 @@ async function usable(exec: Exec, id: string) {
 export async function federationRole(
   exec: Exec,
   id: string,
+  allowPlatform = true,
 ): Promise<CooperativeRole | null> {
   const rows = await exec.query(
     `SELECT role FROM role_assignments WHERE user_id=$1
-    AND role IN ('neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true
+    AND role IN ('platform:super_admin','neture:pharmcoop_admin','neture:pharmcoop_operator') AND is_active=true
+    AND ($2::boolean OR role<>'platform:super_admin')
     AND (valid_from IS NULL OR valid_from<=CURRENT_TIMESTAMP)
     AND (valid_until IS NULL OR valid_until>=CURRENT_TIMESTAMP) FOR SHARE`,
-    [id],
+    [id,allowPlatform],
   );
   if (
     !rows.length ||
     (await getNetureMainMembershipStatus(exec, id)) !== "active"
   )
     return null;
-  return rows.some((r: { role: string }) => r.role === "neture:pharmcoop_admin")
+  return rows.some((r: { role: string }) => ['platform:super_admin', 'neture:pharmcoop_admin'].includes(r.role))
     ? "admin"
     : "operator";
 }
@@ -89,10 +93,12 @@ export async function cooperativeRole(
 /** All mutations lock the cooperative before checking current roles and writing an audit event. */
 export class CooperativeManagementService {
   constructor(private readonly db: DataSource) {}
-  async requireFederation(exec: Exec, actor: string, admin = false) {
+  async requireFederation(exec: Exec, actor: string, admin = false, area = 'federation', allowPlatform = true) {
     await usable(exec, actor);
-    const role = await federationRole(exec, actor);
+    const role = await federationRole(exec, actor, allowPlatform);
     if (!role || (admin && role !== "admin")) throw denied();
+    try { await assertCentralOperationMenu(exec,actor,'pharmcoop',[`pharmcoop.${area}`]); }
+    catch(error) { if (error instanceof OperationError) throw new NeturePharmacyError(error.status,error.code,error.message); throw error; }
     return role;
   }
   async requireLocal(exec: Exec, actor: string, coop: string, admin = false) {
@@ -285,7 +291,7 @@ export class CooperativeManagementService {
   async validateInvitationGrant(m: Exec, actor: string, coop: string, role: string, target?: string) {
     if (!['admin','operator'].includes(role)) throw invalid();
     await this.lock(m,coop);
-    if (role==='admin') await this.requireFederation(m,actor,true);
+    if (role==='admin') await this.requireFederation(m,actor,true,'federation',false);
     else await this.requireLocal(m,actor,coop,true);
     if (!target) return;
     await usable(m,target);
@@ -311,7 +317,7 @@ export class CooperativeManagementService {
           "COOPERATIVE_ROLE_NOT_FOUND",
           "역할을 찾을 수 없습니다.",
         );
-      if (row.role === "admin") await this.requireFederation(m, actor, true);
+      if (row.role === "admin") await this.requireFederation(m, actor, true, 'federation', false);
       else await this.requireLocal(m, actor, coop, true);
       if (row.user_id === actor)
         throw new NeturePharmacyError(

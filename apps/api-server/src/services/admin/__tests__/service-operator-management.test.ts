@@ -49,7 +49,7 @@ it("rejects stale/non-admin authority before candidate reads", async () => {
   await expect(s.list("actor", "funding", "someone")).rejects.toMatchObject({
     status: 403,
   });
-  expect(query).toHaveBeenCalledTimes(1);
+  expect(query.mock.calls.some(([, args]) => Array.isArray(args) && args.includes('someone'))).toBe(false);
 });
 function app() {
   const a = express();

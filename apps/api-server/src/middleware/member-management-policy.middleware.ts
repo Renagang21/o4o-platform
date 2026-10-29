@@ -1,3 +1,6 @@
+import { CENTRAL_OPERATION_SERVICES, type CentralOperationService } from '@o4o/types';
+import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
+import { OperationError } from '../services/operations/operation-audit.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import type { Request, Response, NextFunction } from 'express';
 import { extractServiceScope, type ServiceScope } from '../utils/serviceScope.js';
@@ -19,6 +22,16 @@ export async function requireActiveOperatorScope(req: Request, res: Response, ne
       res.status(403).json({ success: false, code: 'SERVICE_MEMBERSHIP_REQUIRED', error: '해당 서비스의 활성 가입이 필요합니다.' });
       return;
     }
+    const permitted: string[] = [];
+    for (const key of scope.serviceKeys) {
+      try {
+        if ((CENTRAL_OPERATION_SERVICES as readonly string[]).includes(key)) await assertCentralOperationRequest(AppDataSource,(req as any).user.id,key as CentralOperationService,[`${key}.${key === 'neture' ? 'service-members' : 'members'}`, ...(key === 'community' && req.method === 'GET' ? ['community.erase-members'] : [])], (req as any).authMethod);
+        permitted.push(key);
+      } catch (error) { if (!(error instanceof OperationError && error.status === 403)) throw error; }
+    }
+    scope.serviceKeys = permitted;
+    scope.rolePrefixes = scope.rolePrefixes.filter(prefix => permitted.includes(resolveCanonicalServiceKey(prefix)));
+    if (!permitted.length) { res.status(403).json({success:false,code:'CENTRAL_MENU_NOT_DELEGATED',error:'회원 관리 업무를 위임받지 않았습니다.'}); return; }
     next();
   } catch {
     res.status(503).json({ success: false, code: 'SERVICE_SCOPE_UNAVAILABLE', error: '서비스 권한을 확인하지 못했습니다.' });

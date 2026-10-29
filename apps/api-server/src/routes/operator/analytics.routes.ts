@@ -1,3 +1,4 @@
+import { centralScopedNetureRequest } from '../../middleware/central-operation-menu.middleware.js';
 /**
  * Operator Analytics Routes
  *
@@ -54,6 +55,7 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
   const router = Router();
 
   router.use(authenticate, requireOperatorOrAdmin, injectServiceScope);
+  router.use(centralScopedNetureRequest(dataSource));
 
   /**
    * GET /api/v1/operator/analytics/summary

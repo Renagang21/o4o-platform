@@ -1,4 +1,4 @@
-vi.mock('./FundingOfflineOperations',()=>({default:({disabled}:{disabled?:boolean})=><button disabled={disabled}>오프라인 기록 검증</button>}));
+vi.mock('../../../../../packages/operator-core-ui/src/modules/funding-operations/FundingOfflineOperations',()=>({default:({disabled}:{disabled?:boolean})=><button disabled={disabled}>오프라인 기록 검증</button>}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
