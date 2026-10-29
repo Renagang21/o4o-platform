@@ -40,6 +40,7 @@ import { deriveProductClassification, classificationToFilter } from '../../../mo
 import { assertDrugActionAllowed } from '../../../modules/neture/guards/drug-access.guard.js';
 import logger from '../../../utils/logger.js';
 import { deriveListingServiceKeyFromMemberships } from '../../../utils/listing-service-key.js';
+import { registerStoreProductAiRoutes } from './store-product-ai.controller.js';
 
 // ─────────────────────────────────────────────────────
 // WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1
@@ -79,6 +80,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   const listingRepo = dataSource.getRepository(OrganizationProductListing);
   const imageStorageService = new ImageStorageService();
   const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource);
+  registerStoreProductAiRoutes(router, dataSource, requireStoreOwner as RequestHandler);
   const netureService = new NetureService();
 
   // ─── GET /search — 제품 검색 (ProductMaster 기반) ────────────────────

@@ -13,6 +13,7 @@ import type { ConsultationTranslator } from "./consultation-translator.js";
 import type { StationAuthorization } from "./consultation-stations.js";
 import type { ConsultationSupportSource } from "./consultation-support.extension.js";
 import { StoreStaffSupportService } from "./store-staff-support.js";
+import { readStoreProductAiContext } from '../../neture/product-description-intake/ai-context.service.js';
 type Json = Record<string, unknown>;
 export type GuidanceIntent =
   | "find-product"
@@ -490,11 +491,14 @@ export class ConsultationGuidanceService {
     const product = await this.products.product(org, input.productKind, input.productId);
     const read = () => this.material(org, String(input.productKind), String(input.productId), 'ko');
     const material = await read();
-    const sourceVersion = digest({ product, material: material?.version ?? null });
+    const readAi = () => input.productKind === 'listing'
+      ? readStoreProductAiContext(this.db, org, String(input.productId), 'ko') : Promise.resolve(null);
+    const ai = await readAi();
+    const sourceVersion = digest({ product, material: material?.version ?? null, ai });
     const authorize = async () => {
       await this.access(actor, org, mode);
       const current = await this.products.product(org, input.productKind, input.productId);
-      if (digest({ product: current, material: (await read())?.version ?? null }) !== sourceVersion)
+      if (digest({ product: current, material: (await read())?.version ?? null, ai: await readAi() }) !== sourceVersion)
         fail(409, 'GUIDANCE_SOURCE_CHANGED', '상품 또는 게시 자료가 변경되었습니다. 현재 근거로 다시 준비해 주세요.');
       return true;
     };
@@ -502,6 +506,17 @@ export class ConsultationGuidanceService {
       id: `p${passage.id}`, kind: 'product-fact', title: `${material!.page.title} · ${material!.page.locale}`,
       text: passage.text,
     }));
+    // Only approved, typed B2B sections enter this existing request. Never consume STORE/QR,
+    // unpublished candidates or a legacy HTML body as proven product facts.
+    if (ai?.state === 'structured' && ai.description) {
+      let remaining = 20000;
+      for (const section of ai.description.sections.slice(0, 10)) {
+        if (!remaining) break;
+        const text = section.text.slice(0, Math.min(5000, remaining)); remaining -= text.length;
+        sources.push({ id: `b${sources.length}`, kind: section.kind === 'product-fact' ? 'product-fact' : 'professional-reference',
+          title: `O4O B2B · ${section.kind} · ${section.title} · ${ai.description.source?.currentness ?? '출처 확인 필요'}${text.length < section.text.length ? ' · 일부' : ''}`, text });
+      }
+    }
     return { productName: product.name as string, sources, sourceVersion, authorize };
   }
 }

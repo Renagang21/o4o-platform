@@ -18,4 +18,10 @@ describe('prepared public description file adapter', () => {
  it('rejects missing evidence rather than fabricating a source', () => {
   expect(() => readPublicDescriptionCatalog(catalog([{ ...description, source_evidence_ids: ['missing'] }]), 'B2B', 'ko')).toThrow();
  });
+ it('preserves typed AI sections and leaves old section semantics unclassified', () => {
+  const section = { key: 'one', title: '성분', kind: 'product-fact', text: '확인한 성분', referenceUrls: [evidence[0].source_url] };
+  const result = readPublicDescriptionCatalog(catalog([{ ...description, aiSections: [section] }]), 'B2B', 'ko');
+  expect(result.entries[0].aiSections).toEqual([section]);
+  expect(readPublicDescriptionCatalog(catalog([description]), 'B2B', 'ko').entries[0].aiSections?.[0].kind).toBe('unclassified');
+ });
 });
