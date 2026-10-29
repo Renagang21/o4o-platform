@@ -45,3 +45,22 @@ it('includes real block-to-text conversion for stored community-style material b
  const result=await runServerContentWork(db,'user-fixture','내 매장 문서를 읽어줘',{},async()=>JSON.stringify({action:'material',workspace:'store:fixture',id:'11111111-1111-4111-8111-111111111111'}));
  expect(result.message).toContain('첫 번째 본문');expect(result.message).toContain('두 번째 본문');expect(result.message).not.toContain('<p>');
 });
+
+it('reads the real search result without requiring the user to know its UUID',async()=>{
+ const id='11111111-1111-4111-8111-111111111111';
+ materials.mockResolvedValue({items:[{id,title:'찾은 문서'}]});material.mockResolvedValue({title:'찾은 문서',content:'본문 전체'});
+ const generate=jest.fn(async()=>JSON.stringify({action:'materials',workspace:'store:fixture',query:'찾은 문서'}));
+ const result=await runServerContentWork(db,'user-fixture','내 매장 자료함에서 찾은 문서를 읽어줘',{},generate);
+ expect(material).toHaveBeenCalledWith(db,'fixture',id,'user-fixture');expect(result.message).toContain('본문 전체');expect(generate).toHaveBeenCalledTimes(1);
+});
+it('asks for a title when search is ambiguous and resolves an explicit title on the next request',async()=>{
+ const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222';
+ materials.mockResolvedValue({items:[{id:a,title:'운영 안내'},{id:b,title:'주문 안내'}]});
+ const generate=async()=>JSON.stringify({action:'materials',workspace:'store:fixture',query:'안내'});
+ const ambiguous=await runServerContentWork(db,'user-fixture','내 매장 자료함 안내 내용을 읽어줘',{},generate);
+ expect(material).not.toHaveBeenCalled();expect(ambiguous.message).toContain('[제목] 읽어줘');
+ material.mockResolvedValue({title:'주문 안내',content:'선택한 본문'});
+ const selected=await runServerContentWork(db,'user-fixture','O4O 합성 매장 자료함에서 주문 안내 읽어줘',{},generate);
+ expect(isServerContentRequest('O4O 합성 매장 자료함에서 주문 안내 읽어줘')).toBe(true);
+ expect(material).toHaveBeenCalledWith(db,'fixture',b,'user-fixture');expect(selected.message).toContain('선택한 본문');
+});
