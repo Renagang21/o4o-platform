@@ -1,6 +1,6 @@
 # WO-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1
 
-> **상태**: ACTIVE · **작성일**: 2026-10-29
+> **상태**: COMPLETED · **작성일**: 2026-10-29
 > **사용자 승인**: CarePharm을 약국 협업체 공통 웹으로 이전하고 기존 약국 자원을 제거하는 조사 결과에 대해 판단하여 진행. 개발·검증·main 통합·배포·CarePharm 연결 전환·옛 Run/backend/NEG 제거 및 검증까지.
 > **경계**: 기존 사업·회원·자료·세션·권한 유지. DB/migration·IAM 변경·다른 사업 데이터 변경 없음.
 
@@ -10,10 +10,10 @@
 - [x] 기존 CarePharm 표시 컴포넌트 재사용과 약국 웹의 호스트·라우트·공개/회원/운영 기능 연결
 - [x] CarePharm만 분리하는 계획/digest·참조 보존·검증 실패 복구를 기존 운영 CLI에 연결
 - [x] Pharmacy/MegaPharm·Neture·공통 소비처 회귀와 desktop/mobile fixture 검증
-- [ ] 동일 PR의 CI·리뷰 지적 보완 후 main 통합 및 웹 배포
-- [ ] 새 계획 검토 후 CarePharm host만 pharmacy-business-web으로 전환·공개 검증
-- [ ] 옛 자원 요청 0·완전한 참조 검사 후 kpa-society-web/backend/NEG 제거
-- [ ] 현재 구조 문서와 실제 결과 정합·종료 정리
+- [x] 동일 PR의 CI·리뷰 지적 보완 후 main 통합 및 웹 배포
+- [x] 새 계획 검토 후 CarePharm host만 pharmacy-business-web으로 전환·공개 검증
+- [x] 옛 자원 요청 0·완전한 참조 검사 후 kpa-society-web/backend/NEG 제거
+- [x] 현재 구조 문서와 실제 결과 정합·종료 정리
 
 ## 보존 계약
 
@@ -37,6 +37,15 @@ PR #875/main `089e3156a3` 통합 뒤 기존 CarePharm의 `/terms`와 약국 웹�
 
 ### 운영 공개 검증 실패·자동 복구와 관측 보완
 
-최종 main `41c56441e4` CI·Delivery는 성공했다. plan 40815953975/40816900946은 동일한 최종 약국 이미지·리비전을 확인했다. cutover 40816164897/40817043556은 공개 검증 실패 후 이전 라우팅으로 자동 복구했다. 첫 복구 뒤 읽기 인벤토리 40816769118에서 모든 host→backend가 전환 전과 동일함을 확인했다. 옛 Run/backend/NEG는 삭제하지 않았다.
+당시 main `41c56441e4` CI·Delivery는 성공했다. plan 40815953975/40816900946은 동일한 약국 이미지·리비전을 확인했다. cutover 40816164897/40817043556은 공개 검증 실패 후 이전 라우팅으로 자동 복구했다. 첫 복구 뒤 읽기 인벤토리 40816769118에서 모든 host→backend가 전환 전과 동일함을 확인했다. 이 두 전환 시도 시점에는 옛 Run/backend/NEG를 삭제하지 않았다.
 
 기존 오류는 공개 HTTP·번들·리비전 중 어느 조건의 실패인지 숨겼으므로 원인을 확정하지 않는다. 원문·credential·redirect URL 없이 검사 단계·HTTP status·공개 JS 경로/hash만 기록하도록 보완한다. 새 matcher의 반영 지연을 관측할 시간을 최대 약 3분으로 늘리되 정상 URL의 번들 일치 조건과 실패 복구·동시 변경 거부는 유지한다. 캐시 우회 결과로 정상 URL 검증을 대체하지 않는다. 이 보완 main의 CI 뒤 기존 owner/main/CI/freeze를 거치는 약국 웹 verified 정비 재배포로 정확한 main 이미지 조건을 맞춘 후 새 plan을 검토한다.
+
+### 최종 운영 실행
+
+- PR #875·#876·#877을 main에 통합했다. 최종 코드 main `cdfaf4f63bc5dd80de5b0128a69b792ee8ed8452`의 CI 40819515358·CodeQL 40819515324·Delivery 40820627468 성공. 약국 웹 verified 정비 배포 40819656787 성공, `pharmacy-business-web-00038-wuq` 확인.
+- 옛 자원은 CarePharm 복구 대상인 Neture와 독립이다. 새 retire-plan 40818421465에서 요청 0·참조 검사를 확인하고 retire 40818605154로 `kpa-society-web`·`backend-kpa-society-web`·`neg-kpa-society-web`을 제거했다. old_resource_count=0, IAM/DB 쓰기 없음. 독립 인벤토리 40818963586에서 backend/NEG 부재와 다른 host 연결 보존을 확인했다.
+- 새 carepharm-plan 40820925905의 digest `018da90d11d50caf66bb9aa38cfe70625fcac29ff1ccfd1c86cbb74777b90f5d`를 검토하고 cutover 40821072947을 실행했다. **SUCCESS·applied=true**, 목표 리비전 `pharmacy-business-web-00038-wuq`, IAM/DB 쓰기 없음.
+- 최종 전환의 첫 공개 관측은 HTML/JS 200이지만 기존 Neture bundle이었다. 이후 정상 CarePharm URL의 bundle이 목표 약국 앱 hash와 일치해 성공했다. 이는 이번 실행에서 전환 직후 응답 반영 지연이 있었음을 보여주며, 앞선 두 실패의 원인을 소급 확정하지 않는다.
+- 운영 결과·서비스 구분·검증 한계는 [CHECK](../checks/CHECK-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1.md)에 기록한다. 운영 스크립트 최종 로컬 검증은 53 tests PASS.
+- 독립 읽기 인벤토리 40821484252 성공. 전환 전 전체 host→backend와 비교해 **CarePharm 한 host만** `backend-neture-web-http`에서 `backend-pharmacy-business-web`으로 변경됐고, 옛 backend/NEG 부재와 새 리비전 100% traffic을 확인했다.
