@@ -21,7 +21,7 @@ export const PHARMACY_FORMAT: 'o4o-pharmacy-work-v1';
 export const PHARMACY_KINDS: readonly PharmacyKind[];
 export const PHARMACY_LIMITS: Readonly<{ fileBytes: number; records: number; lines: number; requestLines: number }>;
 export function validatePharmacyRecord<K extends PharmacyKind>(kind: K, input: unknown): PharmacyDataMap[K];
-export function validatePharmacyBundle(value: unknown): PharmacyBundle;
+export function validatePharmacyBundle(value: unknown, options?: { batch?: boolean; links?: boolean }): PharmacyBundle;
 export function validatePharmacyLinks(records: PharmacyEntry[]): void;
 export function parsePharmacyBundle(text: string): PharmacyBundle;
 export function groupOrderLines(sheet: OrderSheet): { supplierId: string; lines: OrderLine[] }[];
@@ -29,3 +29,7 @@ export function packTotal(pack: Pack, count: number): number;
 export function orderPreparationRequest(bundle: PharmacyBundle, sheetId: string, supplierId: string, mode?: 'prepare'|'availability'): string;
 
 export function sheetReceipts(sheet: OrderSheet): SupplierReceipt[];
+export function validatePharmacyCommand(mode: 'read'|'write', raw: unknown): {ok:boolean;args?:Record<string,any>};
+export function pickPharmacyResult(raw: unknown): Record<string,any>;
+
+export function normalizeOrderSiteUrl(value: unknown): string;

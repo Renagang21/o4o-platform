@@ -405,6 +405,20 @@ finally 실행을 보장할 수 없으므로 중단 시 소유권과 잔여 DB�
 - 순증 차단이지 1:1 동일성 판정이 아닙니다(1건 고치고 1건 추가하면 통과).
 - baseline 이 0 이 되면 스크립트를 제거하고 `pnpm run lint` 단독 실행으로 되돌립니다.
 
+### Main 자동화의 격리 검증
+
+`MAIN_AUTOMATION_IT_DATABASE_URL`은 `127.0.0.1:55439/o4o_main_automation_integration` 전용 PostgreSQL 15 URL로 비공개 환경에서만 설정합니다. 해당 DB는 없는 상태여야 하며 로컬 전용 role에 생성/삭제 권한이 필요합니다. 기존 개발·운영 DB URL을 사용하지 않습니다. 값은 문서·로그에 출력하지 않습니다.
+
+```bash
+pnpm run build:api-deps
+pnpm exec tsx scripts/dev/run-main-automation-fixture.ts
+node --test tools/o4o-local-agent/test/*.test.mjs
+pnpm exec vitest run --config services/web-neture/vitest.config.mjs services/web-neture/src/components/home/__tests__/PharmacyOrderPanel.test.tsx
+node scripts/checks/main-automation.browser.mjs
+```
+
+fixture는 자체 생성 DB의 소유권 marker를 확인하고 baseline·전체 incremental prefix·새 migration의 empty down/up·업무 자료/허가/기기 재개 HTTP 계약을 검증한 뒤 DB를 삭제합니다. `Fixture tests PASS`와 `Fixture cleanup PASS: database count 0`을 모두 확인합니다. browser script는 실제 Chromium(기본 `/usr/bin/chromium`, 다른 경로는 `O4O_BROWSER_EXECUTABLE`)에서 Main의 PC·모바일 화면을 합성 API로 검증하며 외부 계정·주문 사이트·실제 PC를 사용하지 않습니다. 이 결과는 실계정·실제 모델/Windows 사용자 PC 검증을 대체하지 않습니다.
+
 ### Git 절차
 
 **worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —

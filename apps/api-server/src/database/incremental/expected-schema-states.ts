@@ -340,6 +340,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'AddPharmacistQualificationDecisions1793165158540', fingerprint: '0834c1f1d5911e4a12ef86b24997a4b3038685d46821edfcc99020802fd0a986', fingerprintLineCount: 7344 },
   // Isolated PostgreSQL 15: all prior prefixes and new empty down/up/reapply + erasure writer fence verified.
   { appliedThrough: 'CreateCentralOperationMenuGrants1793186241009', fingerprint: '3e6030d5fdd3fe6805d43ecb93c813084432d776ab0f26c11d8077eae28b1b0b', fingerprintLineCount: 7362 },
+  // Isolated PostgreSQL 15: optional Main work-data mirrors, prefix and empty down/up verified.
+  { appliedThrough: 'CreateAssistantWorkData1793257200000', fingerprint: '8d22e2d57ccb3c5e9c7addaca729b6e2ebb28eb507b9a87713e6c5b7374d98b7', fingerprintLineCount: 7402 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

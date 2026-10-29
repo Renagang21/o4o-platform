@@ -29,8 +29,8 @@ afterEach(() => { closeLocalDb(); fs.rmSync(home, { recursive: true, force: true
 const importSample = () => importPharmacyRecords(owner, sample(), 0);
 const sheet = (status = 'draft') => ({ kind: 'sheet', data: { id: 'sheet1', title: '합성 발주 초안', status, lines: [{ id: 'l1', product_id: 'p1', product_name: '합성 상품', supplier_id: 's1', pack_id: 'k1', pack_label: '500정', pack_count: 2 }] } });
 
-test('existing v8 Dataset stores all program domains; repeated imports do not duplicate purchases', () => {
-  assert.equal(SCHEMA_VERSION, 8); importSample(); importPharmacyRecords(owner, sample(), 1);
+test('normalized Dataset stores all program domains; repeated imports do not duplicate purchases', () => {
+  assert.equal(SCHEMA_VERSION, 9); importSample(); importPharmacyRecords(owner, sample(), 1);
   assert.equal(pharmacySummary(owner).counts.purchase, 1);
   assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity, 1000);
   assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r => r.kind === 'product').data.program_code, '0001');
@@ -227,4 +227,110 @@ test('per-supplier receipts preserve evidence while allowing remaining supplier 
   work.data.receipts.push({supplier_id:'s2',reference:'receipt-b',confirmed_at:stamp});work.data.status='receipt_recorded';
   importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[work]},2,'user');
   assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='sheet').data.receipts.length,2);
+});
+
+test('more than 10000 useful rows accumulate across bounded imports and remain pageable', async () => {
+  const { pharmacyPage } = await import('../src/pharmacy-data.mjs');
+  for (let batch=0;batch<3;batch++) {
+    const records=Array.from({length:4000},(_,i)=>entry('product',{id:`p${batch*4000+i}`,name:'합성 상품',program:'fixture-program',program_code:String(batch*4000+i),kind:'dispensing'}));
+    importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records},batch);
+  }
+  assert.equal(pharmacySummary(owner).counts.product,12000);
+  let after='',total=0;
+  do { const page=pharmacyPage(owner,{kind:'product',after,limit:500}); total+=page.records.length;after=page.next; } while(after);
+  assert.equal(total,12000);
+});
+
+test('sync acknowledgement cannot erase a newer local edit; reordered JSON is equal', async () => {
+  const { LocalPharmacySyncRepository: journal }=await import('../src/local-db.mjs');
+  const { pharmacyDataset }=await import('../src/pharmacy-data.mjs');
+  const dataset=pharmacyDataset(owner), epoch=crypto.randomUUID();
+  importSample();journal.configure(dataset,epoch);
+  const pending=journal.pending(dataset),original=pending.find(r=>r.entry.kind==='supplier');
+  const replacement={kind:'supplier',data:{...original.entry.data,name:'교정 거래처'}};
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[replacement]},1,'user');
+  const user=journal.pending(dataset).find(r=>r.lane==='user');
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{...replacement,data:{...replacement.data,name:'두 번째 교정'}}]},2,'user');
+  journal.apply(dataset,epoch,{accepted:[{lane:'user',kind:'supplier',id:'s1',mutationId:user.mutationId,version:3}],changes:[],cursor:3,more:false});
+  const next=journal.pending(dataset).find(r=>r.lane==='user');
+  assert.equal(next.entry.data.name,'두 번째 교정');assert.equal(next.expectedVersion,3);
+  const reordered={origin:original.entry.origin,data:original.entry.data,kind:original.entry.kind};
+  const applied=journal.apply(dataset,epoch,{accepted:[],changes:[{...original,entry:reordered,version:4}],cursor:4,more:false});
+  assert.equal(applied.conflicts,0);
+  journal.configure(dataset,crypto.randomUUID());
+  assert.throws(()=>journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:4,more:false}),/STALE_EPOCH/);
+});
+
+
+test('actual order entry accepts relative ReturnUrl but rejects credentials and external redirects', async()=>{
+ const {normalizeOrderSiteUrl}=await import('../src/pharmacy-order-contract.mjs');
+ assert.equal(normalizeOrderSiteUrl('https://order.geoweb.kr/Member/Login?ReturnUrl=%2f'),'https://order.geoweb.kr/Member/Login?ReturnUrl=%2f');
+ for(const value of ['https://example.com/?token=secret','https://example.com/?ReturnUrl=https%3A%2F%2Fother.example.com','https://127.0.0.1/order','https://example.com/?ReturnUrl=%2F%2Fevil.example.com','https://example.com/?ReturnUrl=%2Flogin%3Ftoken%3Dx'])assert.throws(()=>normalizeOrderSiteUrl(value));
+});
+
+test('v8 migration preserves legacy and user lanes; malformed legacy rolls back with backup', async()=>{
+ const {DatabaseSync}=await import('node:sqlite');
+ const {MIGRATIONS}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ for(const malformed of [false,true]){
+  closeLocalDb();fs.rmSync(path.join(home,'local.db'),{force:true});
+  const raw=new DatabaseSync(path.join(home,'local.db'));
+  for(const migration of MIGRATIONS.filter(m=>m.version<=8)){
+    migration.up(raw);raw.prepare('INSERT INTO local_schema_migrations(version,name,applied_at) VALUES(?,?,?)').run(migration.version,migration.name,stamp);
+  }
+  const dataset=pharmacyDataset(owner),legacy={revision:7,imported:sample().records,user:malformed?[{kind:'supplier',data:{}}]:[{kind:'supplier',data:{...sample().records[2].data,name:'이전 교정'}}]};
+  raw.prepare('INSERT INTO local_datasets(name,fields,row_count,created_at,updated_at) VALUES(?,?,1,?,?)').run(dataset,'[]',stamp,stamp);
+  raw.prepare('INSERT INTO local_dataset_rows(dataset,row_key,data,imported_at) VALUES(?,?,?,?)').run(dataset,'workspace',JSON.stringify(legacy),stamp);raw.close();
+  const result=bootstrapLocalDb({backup:(db,reason)=>createBackup(db,reason)});
+  assert.equal(result.ready,!malformed);assert.ok(listBackups().length>0);
+  if(!malformed){assert.equal(readPharmacyWorkspace(owner).revision,7);assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'이전 교정');}
+  closeLocalDb();const check=new DatabaseSync(path.join(home,'local.db'),{readOnly:true});
+  assert.deepEqual(JSON.parse(check.prepare('SELECT data FROM local_dataset_rows WHERE dataset=?').get(dataset).data),legacy);
+  assert.equal(check.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v,malformed?8:9);check.close();
+ }
+});
+
+test('background mirror uploads only current grants, retries safely, and stops after revocation',async()=>{
+ const {createPharmacySync}=await import('../src/pharmacy-sync.mjs');
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();let allowed=false,offline=false;const epoch=crypto.randomUUID(),calls=[];
+ const worker=createPharmacySync({post:async(path,body)=>{
+  calls.push({path,body});
+  if(path.endsWith('grants'))return {status:200,payload:{data:allowed?[{owner,epoch}]:[]}};
+  if(offline)return {status:0,payload:null};
+  return {status:200,payload:{success:true,data:{accepted:body.changes.map((r,i)=>({lane:r.lane,kind:r.entry.kind,id:r.entry.data.id,mutationId:r.mutationId,version:i+1})),changes:[],cursor:9,more:false}}};
+ }});
+ await worker.tick('fixture',true);assert.equal(calls.length,1);
+ allowed=true;offline=true;await worker.tick('fixture',true);assert.equal(journal.pending(pharmacyDataset(owner)).length,9);
+ offline=false;await worker.tick('fixture',true);assert.equal(journal.pending(pharmacyDataset(owner)).length,0);
+ const uploads=calls.filter(r=>r.path.endsWith('sync')).length;
+ allowed=false;await worker.tick('fixture',true);assert.equal(calls.filter(r=>r.path.endsWith('sync')).length,uploads);
+ assert.equal(calls.some(r=>JSON.stringify(r.body).includes('fixture-program') && !r.path.endsWith('sync')),false);
+});
+
+test('conflicting local edit is preserved and quarantined rather than automatically overwriting the server',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();importSample();journal.configure(dataset,epoch);
+ const row=journal.pending(dataset).find(r=>r.entry.kind==='product');
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[{...row,entry:{...row.entry,data:{...row.entry.data,name:'서버 교정'}},version:10}],cursor:10,more:false});
+ assert.equal(result.conflicts,1);assert.equal(journal.state(dataset).conflicts,1);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='product').data.name,'합성 상품');
+ assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+});
+
+test('authenticated command contract reaches SQLite, backs up program imports, and returns only bounded typed data',async()=>{
+ const {runAction}=await import('../src/handlers.mjs');
+ const {pickPharmacyResult}=await import('../src/pharmacy-order-contract.mjs');
+ const write=await runAction('local.data.pharmacy_write',{}, {owner,mode:'program',records:sample().records,expectedRevision:0});
+ assert.equal(write.status,'success');assert.equal(write.data.revision,1);assert.ok(listBackups().length>0);
+ const read=await runAction('local.data.pharmacy_read',{}, {owner,kind:'purchase',limit:1});
+ assert.equal(read.status,'success');assert.equal(read.data.records.length,1);assert.equal(read.data.records[0].kind,'purchase');
+ const clean=pickPharmacyResult({...read.data,credential:'must-not-pass',sync:{pending:0,conflicts:0,lastSyncedAt:null,error:'raw-detail'}});
+ assert.equal('credential' in clean,false);assert.equal(clean.sync.error,null);
+ const stale=await runAction('local.data.pharmacy_write',{}, {owner,mode:'user',records:[],expectedRevision:0});
+ assert.equal(stale.status,'failed');assert.equal(stale.errorCode,'PHARMACY_REVISION_CONFLICT');
+ assert.equal((await runAction('local.data.pharmacy_read',{}, {owner,sql:'SELECT 1'})).status,'denied');
+ assert.equal((await runAction('local.data.pharmacy_read',{}, {owner:'user:other',limit:1})).data.records.length,0);
 });

@@ -1,8 +1,8 @@
-/** Domain operations on existing Dataset storage. Only local CLI calls these; no new cloud read/write action. */
+/** Domain operations on existing Dataset storage. CLI and authenticated Main-to-PC commands share these operations. */
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
-import { LocalPharmacyWorkspaceRepository, LocalMappingRepository, parseCsv, mapImportRows } from './local-db.mjs';
-import { PHARMACY_FORMAT, PHARMACY_LIMITS, validatePharmacyBundle, validatePharmacyRecord, packTotal, sheetReceipts } from './pharmacy-order-contract.mjs';
+import { LocalPharmacyWorkspaceRepository, LocalPharmacySyncRepository, LocalMappingRepository, parseCsv, mapImportRows } from './local-db.mjs';
+import { PHARMACY_FORMAT, PHARMACY_KINDS, PHARMACY_LIMITS, validatePharmacyBundle, validatePharmacyRecord, packTotal, sheetReceipts } from './pharmacy-order-contract.mjs';
 const key = r => `${r.kind}:${r.data.id}`;
 function scope(owner) {
   // Explicit owner selection on a locally trusted CLI; NOT an authentication or authorization token.
@@ -10,11 +10,11 @@ function scope(owner) {
   return 'pharmacy_' + createHash('sha256').update(owner).digest('hex').slice(0, 48);
 }
 function merge(a, b) { return [...new Map([...a, ...b].map(r => [key(r), r])).values()]; }
-function effective(state) { return validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(state.imported, state.user) }); }
+function effective(state) { return validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(state.imported, state.user) }, { batch: false }); }
 function validateState(state) {
   // Original program copies remain separate from user-owned corrections. Re-import cannot erase corrections.
   const bundle = effective(state);
-  if (Buffer.byteLength(JSON.stringify(state)) > PHARMACY_LIMITS.fileBytes) throw Error('약국 업무 자료가 8MB를 넘습니다.');
+  // Byte/row limits apply to transfers, never the accumulated workspace.
   return bundle;
 }
 export function readPharmacyWorkspace(owner) {
@@ -62,16 +62,19 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
     }
     next[lane] = merge(next[lane], incoming);
     // Validate source lane even when a user override masks an imported row.
-    validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) });
+    validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) }, { batch: false });
     validateState(next); return next;
   });
   return { revision: state.revision, records: effective(state).records.length, imported: state.imported.length, user: state.user.length };
 }
 export function pharmacySummary(owner) {
-  const { revision, bundle, importedCount, userCount } = readPharmacyWorkspace(owner);
-  const counts = Object.fromEntries(['product', 'pack', 'supplier', 'purchase', 'usage', 'sale', 'stock', 'availability', 'balance', 'sheet'].map(k => [k, bundle.records.filter(r => r.kind === k).length]));
-  return { revision, counts, importedCount, userCount, schema: 'dataset_contract_v1', externalExecutionSupported: false };
+  const summary = LocalPharmacyWorkspaceRepository.summary(scope(owner));
+  const sync=LocalPharmacySyncRepository.state(scope(owner));
+  return { ...summary, sync:{pending:sync.pending,conflicts:sync.conflicts,lastSyncedAt:sync.synced_at??null,error:sync.error??null}, counts: Object.fromEntries(PHARMACY_KINDS.map(k => [k, summary.counts[k] ?? 0])), schema: 'pharmacy_rows_v1', externalExecutionSupported: false };
 }
+export function pharmacyPage(owner, options) { return LocalPharmacyWorkspaceRepository.page(scope(owner), options); }
+export const pharmacyDataset = scope;
+
 export function pharmacyPurchaseTotals(owner) {
   const { bundle } = readPharmacyWorkspace(owner);
   const packs = new Map(bundle.records.filter(r => r.kind === 'pack').map(r => [r.data.id, r.data]));

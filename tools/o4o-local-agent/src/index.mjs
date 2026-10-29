@@ -1,3 +1,4 @@
+import { createPharmacySync } from './pharmacy-sync.mjs';
 /**
  * O4O Local Work Agent — 진입점
  *
@@ -66,6 +67,7 @@ async function apiPost(pathname, body, sessionToken) {
   try {
     res = await fetch(`${API_BASE}${pathname}`, {
       method: 'POST',
+      signal: AbortSignal.timeout(30000),
       headers,
       body: JSON.stringify(body ?? {}),
     });
@@ -209,6 +211,7 @@ async function commandRun() {
   const bridge = await startBridgeRelay({ log });
   const context = { deviceName: process.env.O4O_AGENT_DEVICE_NAME || '내 PC', bridge };
   let sessionToken = null;
+  const pharmacySync = createPharmacySync({ post: apiPost, log });
   let backoff = RECONNECT_MIN_MS;
   let running = true;
   /** 마지막으로 명령을 받아 처리한 시각. 이것에서 멀어질수록 heartbeat 간격이 idle(5 s)로 돌아간다. */
@@ -286,6 +289,7 @@ async function commandRun() {
     }
 
     backoff = RECONNECT_MIN_MS;
+    if(dbState.ready) void pharmacySync.tick(sessionToken);
     const commands = payload.data?.commands ?? [];
     for (const command of commands) {
       await handleCommand(command, context, sessionToken);

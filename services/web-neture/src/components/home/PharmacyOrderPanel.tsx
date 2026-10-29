@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../../lib/ai/home-chat';
 import {
   PHARMACY_FORMAT, PHARMACY_LIMITS, parsePharmacyBundle, validatePharmacyBundle, groupOrderLines, sheetReceipts, orderPreparationRequest, packTotal,
   type PharmacyBundle, type PharmacyEntry, type OrderSheet, type OrderLine, type Supplier,
 } from '../../lib/pharmacy/order';
+
+import type { WorkScope } from '../../lib/work-scope';
+import { loadWorkingData, workDataRequest, type WorkDataSnapshot, type WorkDataConsent } from '../../lib/pharmacy/work-data';
 
 const uid = () => crypto.randomUUID();
 const initial = (): PharmacyBundle => ({ format: PHARMACY_FORMAT, records: [{ kind: 'sheet', data: { id: uid(), title: '주문 준비', lines: [], status: 'draft' } }] });
@@ -12,17 +15,84 @@ const download = (value: unknown, filename: string) => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
-/** A transient work sheet, not a parallel server ledger. Explicit files bridge to the existing PC SQLite CLI. */
-export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onApply, onPcSetup }: Readonly<{ disabled: boolean; resuming: boolean; draft?: string; onApply: (text: string) => void; onPcSetup?: () => void }>) {
+/** Existing PC SQLite work data, with an explicitly consented server mirror. */
+export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onApply, onPcSetup, workScope }: Readonly<{ disabled: boolean; resuming: boolean; draft?: string; onApply: (text: string) => void; onPcSetup?: () => void; workScope?: WorkScope }>) {
   const [bundle, setBundle] = useState(initial);
   const [edited, setEdited] = useState<PharmacyEntry[]>([]);
   const [selected, setSelected] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const [storage, setStorage] = useState<WorkDataSnapshot | null>(null);
+  const [sharing,setSharing]=useState(false);
+  const [consent, setConsent] = useState<WorkDataConsent | null>(null);
+  const saving = useRef(false);
+  const [saveFailed,setSaveFailed]=useState(false);
   const alive = useRef(true);
+  async function load() {
+    if(!workScope || edited.length)return;
+    setBusy(true);setError('');
+    try { const loaded=await loadWorkingData(workScope, count=>{if(!alive.current)throw Error('중단');setNotice(`${count.toLocaleString()}개 자료를 불러왔어요…`);});if(!alive.current)return;
+      setStorage(loaded);setConsent(loaded.consent);
+      setBundle({format:PHARMACY_FORMAT,records:loaded.records.some(r=>r.kind==='sheet')?loaded.records:[...loaded.records,...initial().records]});
+      setNotice(loaded.location==='server'?'서버 자료를 불러왔어요. PC가 꺼져 있어도 이용할 수 있어요.':'PC 자료를 불러왔어요. 수정 내용은 PC에 저장해요.');
+    }catch(e){if(alive.current)setError(errorText(e));}
+    finally{if(alive.current)setBusy(false);}
+  }
+  const persist=useCallback(async()=>{
+    if(!workScope || !storage || !edited.length || saving.current)return;
+    saving.current=true;setSaveFailed(false);setBusy(true);setError('');
+    const pending=edited.slice(0,100);
+    try {
+      const result=await workDataRequest<any>('save',workScope,storage.location==='server'?{
+        location:'server',epoch:storage.consent.epoch,changes:pending.map(entry=>({lane:'user',entry,expectedVersion:storage.versions?.[entry.kind+':'+entry.data.id]?.lane==='user'?storage.versions[entry.kind+':'+entry.data.id].version:0,mutationId:crypto.randomUUID()})),
+      }:{mode:'user',records:pending,expectedRevision:storage.revision});
+      if(!alive.current)return;
+      setStorage(old=>{if(!old)return old;const versions={...old.versions};for(const row of result.accepted??[])versions[row.kind+':'+row.id]={lane:row.lane,version:row.version};return {...old,revision:result.revision??old.revision,versions};});
+      setEdited(old=>old.filter(entry=>!pending.includes(entry)));setNotice('저장했어요.');
+    }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+' 입력한 내용은 유지했어요.');}}
+    finally{saving.current=false;if(alive.current)setBusy(false);}
+  },[workScope,storage,edited]);
+  async function importToPc() {
+    if(!workScope || !bundle.records.length)return;
+    setBusy(true);setError('');let saved=0;
+    try {
+      let current=await workDataRequest<{revision:number}>('pc-read',workScope);
+      const groups=[{mode:'program',records:bundle.records.filter(r=>r.origin)},{mode:'user',records:bundle.records.filter(r=>!r.origin)}];
+      for(const group of groups){
+        if(!group.records.length)continue;
+        current=await workDataRequest<{revision:number}>('save',workScope,{...group,expectedRevision:current.revision});
+        saved+=group.records.length;if(!alive.current)return;
+      }
+      const permission=await workDataRequest<WorkDataConsent>('status',workScope);
+      if(!alive.current)return;setEdited([]);setStorage({location:'pc',revision:current.revision,consent:permission,records:bundle.records,next:null,counts:{}});
+      setNotice('PC에 저장했어요. 서버 보관을 허용했다면 연결 중에 함께 동기화해요.');
+    }catch(error){if(alive.current)setError((saved?`${saved}건을 PC에 반영했어요. 나머지 자료를 확인해 주세요. `:'')+errorText(error)+' 현재 화면과 파일은 유지돼요.');}
+    finally{if(alive.current)setBusy(false);}
+  }
+  async function changeConsent(enabled:boolean) {
+    if(!workScope || edited.length)return;
+    setBusy(true);setError('');
+    try {const next=await workDataRequest<WorkDataConsent>('consent',workScope,{enabled});if(!alive.current)return;setConsent(next);setStorage(old=>enabled && old?.location==='pc'?{...old,consent:next}:null);setNotice(enabled?'서버 보관을 허용했어요. PC가 연결되면 자료가 동기화돼요.':'서버 보관을 해제하고 서버 업무 자료를 삭제했어요. PC 자료는 유지돼요.');}
+    catch(e){if(alive.current)setError(errorText(e));}finally{if(alive.current)setBusy(false);}
+  }
+  useEffect(()=>{
+    let active=true;
+    if(workScope)void Promise.all([workDataRequest<WorkDataConsent>('status',workScope),workDataRequest<{enabled:boolean}>('method-sharing',workScope)]).then(([permission,sharing])=>{if(active){setConsent(permission);setSharing(sharing.enabled);}}).catch(()=>{});
+    return()=>{active=false;};
+  },[workScope]);
   const lastPrepared = useRef({ text: '', base: '' });
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  useEffect(()=>{
+    if(!storage || !edited.length || busy || saveFailed)return;
+    const timer=setTimeout(()=>void persist(),600);
+    return()=>clearTimeout(timer);
+  },[storage,edited,busy,saveFailed,persist]);
+  useEffect(()=>{
+    if(!edited.length)return;
+    const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
+    window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);
+  },[edited.length]);
   const sheets = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'sheet'}> => r.kind === 'sheet');
   const sheet = sheets.find(r => r.data.id === selected)?.data ?? sheets[0]?.data;
   const suppliers = bundle.records.filter((r): r is Extract<PharmacyEntry, {kind: 'supplier'}> => r.kind === 'supplier');
@@ -49,9 +119,10 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   function save(entry: PharmacyEntry) {
     const matches = (r: PharmacyEntry) => r.kind === entry.kind && r.data.id === entry.data.id;
     const records = bundle.records.some(matches) ? bundle.records.map(r => matches(r) ? entry : r) : [...bundle.records, entry];
-    const next = validatePharmacyBundle({ format: PHARMACY_FORMAT, records });
+    const next = validatePharmacyBundle({ format: PHARMACY_FORMAT, records },{batch:false});
     setBundle(next); setEdited(old => [...old.filter(r => r.kind !== entry.kind || r.data.id !== entry.data.id), entry]);
-    setNotice('현재 화면에 반영했습니다. 보관하려면 파일로 내보내세요.');
+    setSaveFailed(false);
+    setNotice(storage?'수정 내용을 저장하고 있어요.':'현재 화면에 반영했어요. PC·서버 자료를 연결하거나 파일로 보관해 주세요.');
   }
   function attempt(action: () => void) { setError(''); setNotice(''); try { action(); } catch (e) { setError(errorText(e)); } }
   function updateSheet(next: OrderSheet) { save({ kind: 'sheet', data: next }); }
@@ -88,7 +159,21 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     <div className="mt-3 space-y-3">
       <p>{onPcSetup ? <button type="button" disabled={blocked} onClick={onPcSetup} className="underline">PC 설치·연결 준비</button> : <a href="/mypage" target="_blank" rel="noopener noreferrer" className="underline">이 PC 연결·프로그램 업데이트 (새 탭)</a>}</p>
       <p>빈 시트에서 시작할 수 있습니다. 구매·주문 내역은 약국 프로그램에서 내보낸 자료를 PC 연결 프로그램으로 가져옵니다. 전표 촬영·OCR은 사용하지 않습니다.</p>
-      <p className="text-xs">이 화면은 자동 저장되지 않습니다. 계정·업무공간 전환이나 새로고침 전에 내보내세요. 로그인·최종 주문·결제는 직접 진행합니다.</p>
+      <p className="text-xs">연결한 자료의 수정은 자동 저장해요. 저장 실패 안내가 있으면 다시 시도해 주세요. 연결 전 작업은 파일로 보관할 수 있어요. 로그인·최종 주문·결제는 직접 진행합니다.</p>
+      {workScope && <section className="space-y-2 rounded border p-3">
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={blocked || edited.length>0} onClick={()=>void load()} className="rounded bg-blue-700 px-3 py-2 text-white">PC·서버 자료 불러오기</button>
+          <button type="button" disabled={blocked || !storage || !edited.length} onClick={()=>void persist()} className="rounded bg-blue-700 px-3 py-2 text-white">자료 저장</button>
+        </div>
+        <p>{storage?`보관 위치: ${storage.location==='server'?'서버 · PC와 동기화':'이 PC'}`:'PC 자료는 기본적으로 PC에 보관해요.'}</p>
+        {storage?.sync && <p className="text-xs">동기화 대기 {storage.sync.pending}건 · 충돌 {storage.sync.conflicts}건{storage.sync.lastSyncedAt?` · 마지막 확인 ${new Date(storage.sync.lastSyncedAt).toLocaleString()}`:''}</p>}
+        {storage?.sync?.conflicts ? <p role="alert">PC 수정과 서버 수정이 달라 자동 반영을 멈췄어요. 양쪽 내용은 보존돼요. 사용할 내용을 확인하고 수정해 주세요.</p>:null}
+        {storage?.updatedAt && <p className="text-xs">자료 수정 시각: {new Date(storage.updatedAt).toLocaleString()}</p>}
+        <label className="flex items-start gap-2"><input type="checkbox" checked={consent?.enabled??false} disabled={blocked || edited.length>0} onChange={e=>void changeConsent(e.target.checked)} />어디서나 이용하도록 업무 자료를 서버에도 보관</label>
+        <p className="text-xs">상품·거래처·주문·집계 자료를 보관해요. 해제하면 서버 사본은 삭제되고 PC 자료는 유지돼요. 로그인 정보와 환자 자료는 보내지 않아요.</p>
+        {busy && <p role="status">자료를 확인하고 있어요…</p>}
+      </section>}
+      {workScope && <label className="flex items-start gap-2 text-xs"><input type="checkbox" checked={sharing} disabled={blocked} onChange={async e=>{const enabled=e.target.checked;setBusy(true);try{const next=await workDataRequest<{enabled:boolean}>('method-sharing',workScope,{enabled});if(alive.current)setSharing(next.enabled);}catch(error){if(alive.current)setError(errorText(error));}finally{if(alive.current)setBusy(false);}}} />검증된 동작 순서를 다른 사용자의 추천에 활용하도록 허용 (문장·거래 값·화면 글 제외)</label>}
       <label className="block">PC 자료함 JSON 가져오기
         <input type="file" accept=".json,application/json" disabled={blocked} onChange={async e => {
           const file = e.currentTarget.files?.[0]; e.currentTarget.value = ''; if (!file) return;
@@ -103,6 +188,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           finally { if (alive.current) setBusy(false); }
         }} className="mt-1 block w-full" />
       </label>
+      {workScope && <button type="button" disabled={blocked || !!storage} onClick={()=>void importToPc()} className="rounded bg-blue-700 px-3 py-2 text-white">현재 자료를 PC에 보관</button>}
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={blocked} onClick={() => attempt(() => download(validatePharmacyBundle(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">전체 자료 내보내기</button>
         <button type="button" disabled={blocked || !edited.length} onClick={() => attempt(() => download({ format: PHARMACY_FORMAT, records: edited }, 'o4o-pharmacy-user-edits.private.json'))} className="rounded border px-2 py-1">PC 반영용 수정 내보내기</button>

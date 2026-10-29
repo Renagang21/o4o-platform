@@ -27,6 +27,7 @@ export function buildHeartbeatReport({ agentVersion, extensionConnected, platfor
       localData: dbReady && hasLocalData === true,
       ownerScopedLedger: dbReady && Number(dbState.schemaVersion) >= OWNER_SCOPED_LEDGER_MIN_SCHEMA,
       taskUnit: extensionConnected === true,
+      pharmacyData: dbReady && Number(dbState.schemaVersion) >= 9,
     },
   };
 }
