@@ -1,3 +1,4 @@
+import { ServiceSpaceSwitcher } from '@o4o/auth-react';
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
 import { useServiceContactCount } from '@o4o/shared-space-ui';
 /**
@@ -119,7 +120,7 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
          로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
-      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />{isAuthenticated && user && showInbox && <OperatorInboxLink requireAccess={CURRENT_HOST_PROFILE === 'carepharm'} key={`${user.id}:${inboxScope}`} client={api} endpoint={`/operator-inbox/${inboxScope}`} href={inboxHref}/>}</span>}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><ServiceSpaceSwitcher api={api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={isLoading} /><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />{isAuthenticated && user && showInbox && <OperatorInboxLink requireAccess={CURRENT_HOST_PROFILE === 'carepharm'} key={`${user.id}:${inboxScope}`} client={api} endpoint={`/operator-inbox/${inboxScope}`} href={inboxHref}/>}</span>}
       utilitySlot={
         <>
           {isAuthenticated && user && (

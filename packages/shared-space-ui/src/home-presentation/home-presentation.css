@@ -648,3 +648,7 @@
   --hero-ink: #194c40; --hero-muted: #426858; --hero-primary: #226c59; --hero-on-primary: #fff;
   --hero-paper: #fff; --hero-soft: #d5eadc; --hero-line: #9fc3ae; --hero-art-ink: #194c40;
 }
+.home-hero .home-hero-controls{flex-wrap:wrap}
+.home-hero .home-hero-count{white-space:nowrap;flex-shrink:0}
+.home-hero-motion-note{font-size:12px;line-height:1.5}
+@media(max-width:640px){.home-hero-motion-note{flex-basis:100%;text-align:right}}

@@ -1,3 +1,4 @@
+import { ServiceSpaceSwitcher } from '@o4o/auth-react';
 /**
  * BranchLayout — 분회 홈페이지 고정 템플릿 셸 ('classic')
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -172,7 +173,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
           <div className="flex items-center gap-3 text-sm">
             {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료
                 WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: O4O 홈은 로그인 여부와 무관하게 보인다 (KPA 정체성은 그대로, 작은 유틸리티). */}
-            <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" /></span>
+            <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><ServiceSpaceSwitcher api={authClient.api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} /><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" /></span>
             {isAuthenticated ? (
               <ServiceAccountMenu key={user?.id} displayName={user?.name || '사용자'} email={user?.email} onLogout={logout}>
                 {canUseMemberArea && <Link to={`${basePath}/mypage`}>내 정보</Link>}
