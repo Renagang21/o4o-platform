@@ -375,7 +375,7 @@ test('different IDs for one program code quarantine the remote batch without poi
  const product=sample().records[0],remote={...product,data:{...product.data,id:'remote-product'},origin:{...product.origin,source_key:'remote-product'}};
  const stock=entry('stock',{id:'remote-stock',product_id:'remote-product',quantity:null,confidence:'unknown',observed_at:stamp});
  const changes=[{lane:'imported',entry:stock,version:10,mutationId:crypto.randomUUID()},{lane:'imported',entry:remote,version:11,mutationId:crypto.randomUUID()}];
- const result=journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.ok(result.conflicts>0);assert.equal(journal.state(dataset).cursor,0);
+ const result=journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.ok(result.conflicts>0);assert.equal(journal.state(dataset).cursor,11);
  assert.equal(readPharmacyWorkspace(owner).bundle.records.length,9);assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='remote-product'),false);
  assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
  assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
@@ -393,7 +393,7 @@ test('pack measure conflicts hold dependent server purchases across repeated bat
  const result=journal.apply(dataset,epoch,{accepted:[],changes:[remotePurchase,{lane:'imported',entry:pack,version:10,mutationId:crypto.randomUUID()}],cursor:11,more:false});
  assert.ok(result.conflicts>0);assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
  assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='server-purchase'),false);
- journal.apply(dataset,epoch,{accepted:[],changes:[{...remotePurchase,version:12}],cursor:12,more:false});assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(journal.state(dataset).cursor,0);
+ journal.apply(dataset,epoch,{accepted:[],changes:[{...remotePurchase,version:12}],cursor:12,more:false});assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(journal.state(dataset).cursor,12);
 });
 
 test('PC CLI accumulated export restores more than 10,000 source rows under another owner',async()=>{
@@ -407,4 +407,18 @@ test('PC CLI accumulated export restores more than 10,000 source rows under anot
  const malformed=path.join(home,'malformed.json');fs.writeFileSync(malformed,'DO_NOT_PRINT_FIXTURE_BODY');
  assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',malformed,'--revision','11'],m=>output.push(m)),2);
  assert.equal(output.join('').includes('DO_NOT'),false);assert.equal(output.join('').includes('합성 거래처'),false);
+});
+
+test('out-of-order server references stay staged while the cursor and local work continue',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const row=(kind,version)=>({lane:'imported',entry:sample().records.find(r=>r.kind===kind),version,mutationId:crypto.randomUUID()});
+ const first=journal.apply(dataset,epoch,{accepted:[],changes:[row('purchase',1),row('pack',2)],cursor:2,more:true});
+ assert.equal(first.conflicts,0);assert.equal(journal.state(dataset).cursor,2);assert.equal(journal.state(dataset).pending,2);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,0);
+ const supplier={kind:'supplier',data:{id:'local-supplier',name:'로컬 교정',enabled:true,payment_timing:'unknown',payment_required:null}};
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[supplier]},0,'user');
+ journal.apply(dataset,epoch,{accepted:[],changes:[row('supplier',3)],cursor:3,more:true});assert.equal(readPharmacyWorkspace(owner).bundle.records.length,2);
+ journal.apply(dataset,epoch,{accepted:[],changes:[row('product',4)],cursor:4,more:false});
+ assert.equal(journal.state(dataset).cursor,4);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,5);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='local-supplier'),true);
+ assert.equal(journal.state(dataset).conflicts,0);assert.equal(journal.state(dataset).pending,1); // Only the unrelated local edit awaits upload.
 });
