@@ -9,7 +9,7 @@ export default function BusinessHomePresentationPage() {
   return (
     <HomePresentationEditor
       key={business.key}
-      surface="pharmacy"
+      surface={business.key === 'carepharm' ? 'carepharm' : 'pharmacy'}
       businessKey={business.key}
       client={authClient.api}
     />

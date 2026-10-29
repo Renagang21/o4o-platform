@@ -23,9 +23,9 @@ CarePharm은 `semi_franchises.key=carepharm`·약국 조직 가입·기존 scope
 
 ## 개발 검증 (운영 전환 전)
 
-- Pharmacy build·161 tests PASS. 기존 Neture 전체 172 files/1,464 tests, CarePharm 집중 57 tests PASS.
+- Pharmacy build·169 tests PASS. 기존 Neture 전체 172 files/1,464 tests, CarePharm 집중 57 tests PASS.
 - shared-space-ui 23 files/212 tests PASS. Neture·Pharmcoop build PASS.
-- 운영 Python 48 tests 및 workflow gate/diff tests PASS. 전환은 CarePharm host만 분리하고 기존 pharmacy/megapharm 삭제 검사 topology를 유지한다. drift 시 쓰기 거부, 공개 검증 실패 시 이전 연결 복구, 동시 변경 시 타인의 설정 덮어쓰기 금지를 검증했다.
+- 운영 Python 50 tests 및 workflow gate/diff tests PASS. 전환은 CarePharm host만 분리하고 기존 pharmacy/megapharm 삭제 검사 topology를 유지한다. drift 시 쓰기 거부, 공개 검증 실패 시 이전 연결 복구, 동시 변경 시 타인의 설정 덮어쓰기 금지를 검증했다.
 - 실제 빌드 산출물의 익명 desktop/mobile fixture browser 경로 검사를 수행했다. production API·로그인·업무 데이터 write는 사용하지 않았다. 실제 계정 파일은 이 checkout과 기준 checkout에 없어 실계정 로그인·역할별 운영 검증을 완료로 주장하지 않는다.
 - ESLint 오류 0. App의 기존 hook dependency warning 2건은 이번 변경 밖이며 그대로 유지한다. 기존 번들 크기 warning은 build 실패가 아니다.
 

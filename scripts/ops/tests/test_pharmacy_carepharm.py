@@ -3,7 +3,9 @@ from copy import deepcopy
 from pathlib import Path
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+import io
+import hashlib
 sys.path.insert(0, str(Path(__file__).parents[1]))
 import carepharm_transition as c
 import pharmacy_transition as t
@@ -110,3 +112,17 @@ class Routing(unittest.TestCase):
             self.assertEqual([m for m, _ in api.calls if m != 'GET'], ['POST'])
         with patch.dict(c.os.environ, {'GITHUB_SHA': 'c' * 40}), patch.object(t, 'stable_revision', return_value=stable):
             with self.assertRaisesRegex(ValueError, 'exact reviewed main image'): c.plan(API())
+
+    def test_real_public_smoke_accepts_carepharm_and_bounded_recovery_host(self):
+        class Response(io.BytesIO):
+            status = 200
+        for origin in ['https://carepharm.neture.co.kr', 'https://neture-web-3e3aws7zqa-du.a.run.app']:
+            opener = Mock()
+            opener.open.side_effect = [Response(b'<html><script src="/assets/index-fixed.js"></script></html>'), Response(b'fixture-js')]
+            with patch.object(t.urllib.request, 'build_opener', return_value=opener):
+                self.assertEqual(t.public_smoke(origin), hashlib.sha256(b'fixture-js').hexdigest())
+            self.assertEqual([call.args[0] for call in opener.open.call_args_list], [origin + '/', origin + '/assets/index-fixed.js'])
+        for origin in ['https://carepharm.neture.co.kr.evil.test', 'http://carepharm.neture.co.kr', 'https://carepharm.neture.co.kr/private', 'https://user@carepharm.neture.co.kr', 'https://carepharm.neture.co.kr:8443']:
+            with patch.object(t.urllib.request, 'build_opener') as opener:
+                with self.assertRaises(ValueError): t.public_smoke(origin)
+                opener.assert_not_called()

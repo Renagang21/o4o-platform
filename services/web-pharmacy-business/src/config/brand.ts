@@ -1,3 +1,4 @@
+import { getCooperationExtension } from '@o4o/shared-space-ui';
 import { BUSINESS_SITE } from './businessSite';
 /**
  * pharmacy.neture.co.kr 표시 브랜드 — WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
@@ -12,7 +13,7 @@ import { BUSINESS_SITE } from './businessSite';
  */
 
 export const PHARMACY_DISPLAY_NAME = BUSINESS_SITE.name;
-export const PHARMACY_ORIGIN = BUSINESS_SITE.key === 'carepharm' ? 'https://carepharm.neture.co.kr' : BUSINESS_SITE.key === 'megapharm' ? 'https://megapharm.neture.co.kr' : 'https://pharmacy.neture.co.kr';
+export const PHARMACY_ORIGIN = getCooperationExtension(BUSINESS_SITE.key)?.model.origin ?? 'https://pharmacy.neture.co.kr';
 export const PHARMACY_ACCENT = '#2563eb';
 
 /** 공용 헤더 브랜드 (GlobalHeader `brand`) */

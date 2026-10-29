@@ -110,8 +110,8 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def public_smoke(origin):
     parsed = urllib.parse.urlparse(origin)
-    run_host = re.fullmatch(r'(?:infra-rename---)?(?:pharmacy-business-web|kpa-society-web)-[a-z0-9-]+\.(?:a\.run\.app|asia-northeast3\.run\.app)', parsed.hostname or '')
-    if parsed.scheme != 'https' or parsed.username or parsed.password or parsed.port or parsed.path not in ('', '/') or not (parsed.hostname in HOSTS or run_host):
+    run_host = re.fullmatch(r'(?:infra-rename---)?(?:pharmacy-business-web|kpa-society-web|neture-web)-[a-z0-9-]+\.(?:a\.run\.app|asia-northeast3\.run\.app)', parsed.hostname or '')
+    if parsed.scheme != 'https' or parsed.username or parsed.password or parsed.port or parsed.path not in ('', '/') or not (parsed.hostname in HOSTS | {'carepharm.neture.co.kr'} or run_host):
         raise ValueError('Unexpected public smoke origin')
     opener = urllib.request.build_opener(NoRedirect())
     def get(url):
