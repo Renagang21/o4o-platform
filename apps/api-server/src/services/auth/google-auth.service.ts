@@ -144,6 +144,7 @@ export interface GoogleSignupConsents {
   marketing?: boolean;
   phone: string;
   name: string;
+  nickname?: string;
 }
 
 export interface GoogleAuthRequestMeta {
@@ -364,6 +365,7 @@ export class GoogleAuthService {
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email,
       name: consents.name.trim(),
+      nickname: consents.nickname?.trim() || undefined,
       phone: normalizePhoneDigits(consents.phone),
       status: UserStatus.ACTIVE,
       isActive: true,

@@ -108,11 +108,14 @@ describe('supplier lifecycle contracts', () => {
     expect(save).not.toHaveBeenCalled();
   });
 
-  it('approval rejects unowned or unavailable business evidence before any write', async () => {
-    (AppDataSource.query as jest.Mock).mockResolvedValue([]);
-    expect(await service.approveSupplier(supplier.id, 'fixture-operator')).toEqual({ success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' });
-    expect(AppDataSource.query).toHaveBeenCalledWith(expect.stringContaining('user_id = $2'), ['fixture-document', 'fixture-user']);
-    expect(save).not.toHaveBeenCalled();
+  it('approval permits missing optional business details and evidence', async () => {
+    supplier.businessRegistrationDocumentId = null;
+    supplier.representativeName = null;
+    supplier.businessType = null;
+    supplier.businessItem = null;
+    expect(await service.approveSupplier(supplier.id, 'fixture-operator')).toMatchObject({ success: true });
+    expect(AppDataSource.query).not.toHaveBeenCalledWith(expect.stringContaining('kyc_documents'), expect.anything());
+    expect(roleAssignmentService.assignRole).toHaveBeenCalled();
   });
 
   it('approval grants only the existing scoped role and sends a single canonical notification', async () => {
@@ -198,13 +201,18 @@ describe('supplier lifecycle contracts', () => {
     expect(events).toEqual(['assign-role', 'commit', 'notify']);
   });
 
-  it.each(['membership', 'proof'])('reactivation rejects invalid %s without any state or role write', async (gate) => {
+  it('reactivation still rejects an ineligible account', async () => {
     locked.status = 'INACTIVE';
-    if (gate === 'membership') (getNetureMainMembershipStatus as jest.Mock).mockResolvedValue('pending');
-    else { const answer = query.getMockImplementation()!; query.mockImplementation((sql: string) => sql.includes('JOIN kyc_documents') ? [] : answer(sql)); }
-    expect(await service.reactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: false, error: gate === 'membership' ? 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' : 'BUSINESS_REGISTRATION_REQUIRED' });
+    (getNetureMainMembershipStatus as jest.Mock).mockResolvedValue('pending');
+    expect(await service.reactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: false, error: 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' });
     expect(updates()).toHaveLength(0);
     expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
+  });
+
+  it('reactivation does not require optional evidence', async () => {
+    locked.status = 'INACTIVE';
+    expect(await service.reactivateSupplier(supplier.id, 'fixture-admin', 'Fixture reason')).toMatchObject({ success: true });
+    expect(query.mock.calls.some(([sql]) => sql.includes('kyc_documents'))).toBe(false);
   });
 
   it.each(['deactivateSupplier', 'reactivateSupplier'] as const)('%s rolls back when the role write fails and sends no notification', async method => {

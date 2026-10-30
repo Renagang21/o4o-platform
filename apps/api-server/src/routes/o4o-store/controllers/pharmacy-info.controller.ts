@@ -92,6 +92,7 @@ export function createPharmacyInfoController(
     }
 
     const meta = (org.metadata as Record<string, any>) || {};
+    const hasContact = (key: string) => Object.prototype.hasOwnProperty.call(meta, key);
 
     // Resolve slug from platform_store_slugs (SSOT)
     const slugService = new StoreSlugService(dataSource);
@@ -110,14 +111,14 @@ export function createPharmacyInfoController(
       businessEmail: meta.businessEmail || null,
       contactEmail: meta.contactEmail || null,
       ownerPhone: meta.ownerPhone || null,
-      ceoName: meta.ceoName || null,
+      ceoName: hasContact('ceoName') ? (meta.ceoName || null) : (meta.businessProfile?.representativeName || null),
       contactName: meta.contactName || null,
       managerPhone: meta.managerPhone || null,
       storeSlug: slugRecord?.slug ?? null,
       // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
       //   P2/P4 fields — users.businessInfo SSOT 에서 항상 별도 조회 (아래 블록)
-      businessType: null,
-      businessItem: null,
+      businessType: meta.businessProfile?.businessType || null,
+      businessItem: meta.businessProfile?.businessCategory || null,
       businessEntityType: null,
       businessStartDate: null,
     };
@@ -133,8 +134,8 @@ export function createPharmacyInfoController(
         );
         const biz = user?.businessInfo;
         if (biz) {
-          data.businessType = biz.businessType || null;
-          data.businessItem = biz.businessItem || null;
+          if ('businessType' in biz) data.businessType = biz.businessType || null;
+          if ('businessItem' in biz) data.businessItem = biz.businessItem || null;
           data.businessEntityType = biz.businessEntityType || null;
           data.businessStartDate = biz.businessStartDate || null;
         }
@@ -156,8 +157,8 @@ export function createPharmacyInfoController(
         if (request) {
           if (!data.phone && request.pharmacy_phone) data.phone = request.pharmacy_phone;
           if (!data.businessNumber && request.business_number) data.businessNumber = request.business_number;
-          if (!data.ownerPhone && request.owner_phone) data.ownerPhone = request.owner_phone;
-          if (!data.taxInvoiceEmail && request.tax_invoice_email) data.taxInvoiceEmail = request.tax_invoice_email;
+          if (!hasContact('ownerPhone') && !data.ownerPhone && request.owner_phone) data.ownerPhone = request.owner_phone;
+          if (!hasContact('taxInvoiceEmail') && !data.taxInvoiceEmail && request.tax_invoice_email) data.taxInvoiceEmail = request.tax_invoice_email;
         }
       } catch { /* table may not exist — graceful degradation */ }
 
@@ -174,11 +175,11 @@ export function createPharmacyInfoController(
             //   pharmacy_phone (metadata 하위) 우선, 없으면 대표 phone
             const bizPhone = (biz.metadata?.pharmacy_phone as string | undefined) || biz.phone || null;
             if (!data.phone && bizPhone) data.phone = bizPhone;
-            if (!data.ceoName && biz.ceoName) data.ceoName = biz.ceoName;
-            if (!data.contactName && biz.contactName) data.contactName = biz.contactName;
-            if (!data.managerPhone && biz.managerPhone) data.managerPhone = biz.managerPhone;
+            if (!hasContact('ceoName') && !data.ceoName && biz.ceoName) data.ceoName = biz.ceoName;
+            if (!hasContact('contactName') && !data.contactName && biz.contactName) data.contactName = biz.contactName;
+            if (!hasContact('managerPhone') && !data.managerPhone && biz.managerPhone) data.managerPhone = biz.managerPhone;
             // 누락 필드 보완: taxInvoiceEmail, businessNumber
-            if (!data.taxInvoiceEmail && biz.taxInvoiceEmail) data.taxInvoiceEmail = biz.taxInvoiceEmail;
+            if (!hasContact('taxInvoiceEmail') && !data.taxInvoiceEmail && biz.taxInvoiceEmail) data.taxInvoiceEmail = biz.taxInvoiceEmail;
             if (!data.businessNumber && biz.businessNumber) data.businessNumber = biz.businessNumber;
             // 주소: 구조화 주소 우선, 없으면 레거시 address/address2
             if (!data.addressDetail && biz.storeAddress) {
@@ -321,11 +322,11 @@ export function createPharmacyInfoController(
     const existingMeta = (org.metadata as Record<string, any>) || {};
     org.metadata = {
       ...existingMeta,
-      taxInvoiceEmail: body.taxInvoiceEmail || null,
-      ownerPhone: sanitizePhone(body.ownerPhone),
-      ceoName: body.ceoName?.trim() || null,
-      contactName: body.contactName?.trim() || null,
-      managerPhone: sanitizePhone(body.managerPhone),
+      ...('taxInvoiceEmail' in body ? { taxInvoiceEmail: body.taxInvoiceEmail?.trim() || null } : {}),
+      ...('ownerPhone' in body ? { ownerPhone: sanitizePhone(body.ownerPhone) } : {}),
+      ...('ceoName' in body ? { ceoName: body.ceoName?.trim() || null } : {}),
+      ...('contactName' in body ? { contactName: body.contactName?.trim() || null } : {}),
+      ...('managerPhone' in body ? { managerPhone: sanitizePhone(body.managerPhone) } : {}),
       // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
       //   payload 포함 시에만 merge — 미포함이면 기존 metadata 값 보존(방어적).
       ...('businessEmail' in body ? { businessEmail: (typeof body.businessEmail === 'string' ? body.businessEmail.trim() : '') || null } : {}),

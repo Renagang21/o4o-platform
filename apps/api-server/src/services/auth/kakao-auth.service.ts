@@ -16,7 +16,7 @@ import { kakaoIdentityService, type KakaoIdentityService, type VerifiedKakaoIden
 import { socialFlowService, type SocialFlowService } from './social-flow.service.js';
 import { SocialAuthError } from './social-auth-error.js';
 
-export interface KakaoSignupInput { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+export interface KakaoSignupInput { email: string; name: string; nickname?: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 const uniqueViolation = (error: unknown): boolean => {
   const e = error as { code?: string; driverError?: { code?: string } };
   return (e?.code ?? e?.driverError?.code) === '23505';
@@ -56,7 +56,7 @@ export class KakaoAuthService {
         const duplicate: unknown[] = await manager.query('SELECT 1 FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
         if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주세요.',409);
         const now=new Date();const repo=manager.getRepository(User);
-        const created=repo.create({email,name:input.name.trim(),phone:normalizePhoneDigits(input.phone),
+        const created=repo.create({email,name:input.name.trim(),nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(input.phone),
           status:UserStatus.ACTIVE,isActive:true,isEmailVerified:identity.emailVerified===true&&normalizeLoginEmail(identity.email??'')===email,
           tosAcceptedAt:now,privacyAcceptedAt:now,marketingAccepted:input.consents.marketing===true});
         await repo.save(created);

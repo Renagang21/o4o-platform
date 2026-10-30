@@ -15,7 +15,7 @@ import { apiV1Base } from '../../lib/serviceContext';
  *
  * `/start-pharmacy`(StoreGate 밖 — 매장이 아직 없는 사용자)와 내 매장 메뉴(`/store/pharmacy/membership`) 두 곳에서 연다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../../config/workspace';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,7 +33,7 @@ import { MEMBERSHIP_STATUS_LABEL, StatusBadge, formatDate } from './shared';
 const EMPTY: PharmacyMembershipInput = { pharmacyName: '', businessNumber: '', pharmacistLicenseNumber: '', address: '', phone: '' };
 
 const STATUS_HELP: Record<string, string> = {
-  pending: 'Neture 운영자가 사업자등록증과 약사 면허번호를 확인하고 있습니다. 승인되면 내 매장을 이용할 수 있습니다.',
+  pending: 'Neture 운영자가 약국 정보와 약사 자격를 확인하고 있습니다. 승인되면 내 매장을 이용할 수 있습니다.',
   active: '내 매장(약국) 신청이 승인되었습니다. 내 매장 기본 기능을 이용할 수 있습니다. 세미프랜차이즈는 내 매장에서 따로 가입 신청합니다.',
   rejected: '신청이 반려되었습니다. 정보를 확인한 뒤 다시 신청할 수 있습니다.',
   suspended: '이용이 정지되었습니다. Neture 운영자에게 문의해 주세요.',
@@ -50,6 +50,7 @@ export default function PharmacyMembershipPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [form, setForm] = useState<PharmacyMembershipInput>(EMPTY);
+  const documentInput = useRef<HTMLInputElement>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +88,7 @@ export default function PharmacyMembershipPage() {
 
   const canApply = !membership || membership.status === 'rejected' || membership.status === 'terminated';
   const set = (k: keyof PharmacyMembershipInput) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const ready = agreement.ready && form.pharmacyName.trim() && form.businessNumber.trim() && form.pharmacistLicenseNumber.trim() && form.address?.trim() && form.representativeName?.trim() && form.businessType?.trim() && form.businessCategory?.trim() && form.phone?.trim() && (documentFile || form.businessRegistrationDocumentId);
+  const ready = agreement.ready && form.pharmacyName.trim() && form.businessNumber.trim() && form.pharmacistLicenseNumber.trim();
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -109,6 +110,10 @@ export default function PharmacyMembershipPage() {
       const saved = await neturePharmacyApi.applyMembership({
         policyReferences: agreement.references,
         businessRegistrationDocumentId: documentId,
+        contactName: form.contactName?.trim(),
+        managerPhone: form.managerPhone?.trim(),
+        contactEmail: form.contactEmail?.trim(),
+        taxInvoiceEmail: form.taxInvoiceEmail?.trim(),
         representativeName: form.representativeName?.trim(),
         businessType: form.businessType?.trim(),
         businessCategory: form.businessCategory?.trim(),
@@ -134,7 +139,7 @@ export default function PharmacyMembershipPage() {
     <main className="center-card" data-testid="pharmacy-membership">
       <section className="card">
         <h1>내 매장(약국) 신청</h1>
-        <p>약국 매장을 이용하려면 내 매장(약국) 신청 승인이 필요합니다. 메인 이메일 확인을 마친 뒤 사업자등록증 기재 정보와 사본, 약사 면허번호를 제출해 주세요. 약국 여부는 운영자가 오프라인으로 확인합니다.</p>
+        <p>약국 매장을 이용하려면 내 매장(약국) 신청 승인이 필요합니다. 메인 이메일 확인을 마친 뒤 약국 이름·사업자등록번호·약사 면허번호로 신청할 수 있습니다. 나머지 사업자 정보·담당자 연락처·세금계산서 이메일과 증빙 파일은 선택 사항이며 이후 보완할 수 있습니다. 약국 여부는 운영자가 오프라인으로 확인합니다.</p>
 
         {loading ? (
           <p>가입 상태를 확인하는 중...</p>
@@ -170,19 +175,28 @@ export default function PharmacyMembershipPage() {
                 <input id="business-number" type="text" inputMode="numeric" value={form.businessNumber} onChange={set('businessNumber')} placeholder="000-00-00000" disabled={busy} />
                 <label htmlFor="license-number">약사 면허번호 *</label>
                 <input id="license-number" type="text" value={form.pharmacistLicenseNumber} onChange={set('pharmacistLicenseNumber')} disabled={busy} />
-                <label htmlFor="representative-name">대표자명 *</label>
+                <label htmlFor="representative-name">대표자명 (선택)</label>
                 <input id="representative-name" value={form.representativeName || ''} onChange={set('representativeName')} disabled={busy} />
-                <label htmlFor="business-type">업태 *</label>
+                <label htmlFor="business-type">업태 (선택)</label>
                 <input id="business-type" value={form.businessType || ''} onChange={set('businessType')} disabled={busy} />
-                <label htmlFor="business-category">종목 *</label>
+                <label htmlFor="business-category">종목 (선택)</label>
                 <input id="business-category" value={form.businessCategory || ''} onChange={set('businessCategory')} disabled={busy} />
-                <label htmlFor="registration-document">사업자등록증 사본 *</label>
-                <input id="registration-document" type="file" accept="application/pdf,image/jpeg,image/png" disabled={busy} onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} />
+                <label htmlFor="registration-document">사업자등록증 사본 (선택)</label>
+                <input ref={documentInput} id="registration-document" type="file" accept="application/pdf,image/jpeg,image/png" disabled={busy} onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} />
+                {(documentFile || form.businessRegistrationDocumentId) && <button type="button" disabled={busy} onClick={() => { setDocumentFile(null); if (documentInput.current) documentInput.current.value = ''; setForm((f) => ({ ...f, businessRegistrationDocumentId: null })); }}>증빙 첨부 해제</button>}
                 <p>PDF, JPG, PNG · 최대 10MB. 약사면허증 파일은 받지 않습니다.{form.businessRegistrationDocumentId ? ' 기존 등록증을 재사용합니다.' : ''}</p>
-                <label htmlFor="pharmacy-address">등록증의 사업장 주소 *</label>
+                <label htmlFor="pharmacy-address">등록증의 사업장 주소 (선택)</label>
                 <input id="pharmacy-address" type="text" value={form.address ?? ''} onChange={set('address')} disabled={busy} />
-                <label htmlFor="pharmacy-phone">약국 전화번호 *</label>
+                <label htmlFor="pharmacy-phone">약국 전화번호 (선택)</label>
                 <input id="pharmacy-phone" type="text" value={form.phone ?? ''} onChange={set('phone')} disabled={busy} />
+                <label htmlFor="pharmacy-contactName">담당자 이름 (선택)</label>
+                <input id="pharmacy-contactName" type="text" value={form.contactName ?? ''} onChange={set('contactName')} disabled={busy} />
+                <label htmlFor="pharmacy-managerPhone">담당자 전화번호 (선택)</label>
+                <input id="pharmacy-managerPhone" type="tel" value={form.managerPhone ?? ''} onChange={set('managerPhone')} disabled={busy} />
+                <label htmlFor="pharmacy-contactEmail">담당자 이메일 (선택)</label>
+                <input id="pharmacy-contactEmail" type="email" value={form.contactEmail ?? ''} onChange={set('contactEmail')} disabled={busy} />
+                <label htmlFor="pharmacy-taxInvoiceEmail">세금계산서 이메일 (선택)</label>
+                <input id="pharmacy-taxInvoiceEmail" type="email" value={form.taxInvoiceEmail ?? ''} onChange={set('taxInvoiceEmail')} disabled={busy} />
                 <ServiceEnrollmentPolicyAgreement agreement={agreement} />
                 <button type="submit" disabled={busy || !ready}>
                   {busy ? '처리 중...' : membership ? '다시 신청' : '가입 신청'}

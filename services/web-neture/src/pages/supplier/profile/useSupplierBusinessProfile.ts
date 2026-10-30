@@ -28,6 +28,7 @@ export function useSupplierBusinessProfile() {
   const [businessAddressDetail, setBusinessAddressDetail] = useState('');
   const [managerName, setManagerName] = useState('');
   const [managerPhone, setManagerPhone] = useState('');
+  const [managerEmail, setManagerEmail] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactWebsite, setContactWebsite] = useState('');
@@ -65,6 +66,7 @@ export function useSupplierBusinessProfile() {
     // Section B
     setManagerName(data.managerName || '');
     setManagerPhone(data.managerPhone || '');
+    setManagerEmail(data.managerEmail || '');
     // Section C
     setContactEmail(data.contactEmail || '');
     setContactPhone(data.contactPhone || '');
@@ -100,7 +102,7 @@ export function useSupplierBusinessProfile() {
       setError('상호명을 1~255자로 입력해 주세요.');
       return;
     }
-    if (!isSelectableBusinessEntityType(businessEntityType)) {
+    if (businessEntityType && !isSelectableBusinessEntityType(businessEntityType)) {
       setSaved(false);
       setError('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
       return;
@@ -129,6 +131,7 @@ export function useSupplierBusinessProfile() {
       // Section B
       managerName,
       managerPhone,
+      managerEmail,
       // Section C
       contactEmail,
       contactPhone,
@@ -207,6 +210,8 @@ export function useSupplierBusinessProfile() {
     setManagerName,
     managerPhone,
     setManagerPhone,
+    managerEmail,
+    setManagerEmail,
     contactEmail,
     setContactEmail,
     contactPhone,
