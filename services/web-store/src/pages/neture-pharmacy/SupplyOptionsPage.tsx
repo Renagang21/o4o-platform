@@ -83,11 +83,12 @@ export default function SupplyOptionsPage(props: SupplyPageProps) {
 function SupplyOptionsSession({ navigation }: SupplyPageProps) {
   const [params, setParams] = useSearchParams();
   const { source, explicitBusiness, business, kind, query, page, recruitment } = readSupplyQuery(params);
+  const proposal = params.get('proposal') || '';
   const [q, setQ] = useState(query);
   useEffect(() => { setQ(query); }, [query]);
   const businesses = useStoreBusinesses();
   const change = (values: Record<string, string>) => setParams(previous => {
-    const next = new URLSearchParams(previous); next.delete('page');
+    const next = new URLSearchParams(previous); next.delete('page'); next.delete('proposal');
     for (const [key, value] of Object.entries(values)) { if (value) next.set(key, value); else next.delete(key); }
     return next;
   });
@@ -97,7 +98,13 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
   const [addingKey, setAddingKey] = useState<string | null>(null);
   const addBusy = useRef(false);
 
-  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, ...(explicitBusiness ? { business: explicitBusiness } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE }), [source, explicitBusiness, recruitment, query, page]);
+  const fetchList = useCallback(async () => {
+    if (!proposal) return neturePharmacyApi.listSupplyOptions({ source, ...(explicitBusiness ? { business: explicitBusiness } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE });
+    if (!business || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(proposal)) throw new Error('연결된 공급 제안과 협업체를 확인해 주세요.');
+    const option = await neturePharmacyApi.getSupplyOption('proposal', proposal);
+    if (option.semiFranchiseKey !== business) throw new Error('이 협업체의 공급 제안이 아닙니다.');
+    return { items: [option], total: 1 };
+  }, [source, explicitBusiness, recruitment, query, page, proposal, business]);
   const { items, total, loading, error, load } = useLatestList<SupplyOption>(fetchList, listErrorMessage);
 
 
@@ -135,6 +142,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
     >
       <StoreCommerceNavigation />
       {navigation}
+      {proposal && <div className="mb-4 rounded border p-3"><p>협업체에서 선택한 제안을 현재 약국의 이용 자격으로 다시 확인합니다. 종료·정지되거나 대상 약국이 다르면 이용할 수 없습니다.</p><button type="button" className="min-h-11 text-blue-700" onClick={() => change({})}>이 협업체의 전체 공급 상품 보기</button></div>}
       <StoreBusinessTabs businesses={businesses} value={business} publicSource onChange={key => change({ business: key, source: kind, recruitment: '' })} />
       <details className="mb-4"><summary className="min-h-11 cursor-pointer content-center text-sm">공급 종류 선택</summary>
       <div className="mt-2 flex flex-wrap items-center gap-2" role="tablist" aria-label="공급 경로">

@@ -32,7 +32,14 @@ export function nextProposalStatus(
 }
 
 const PROPOSAL_VIEW = `
-  SELECT sp.id, sp.status, sp.unit_price AS "unitPrice", sp.note, sp.reason,
+  SELECT sp.id, sp.status,
+         CASE WHEN sp.status <> 'approved' THEN 'not_approved'
+           WHEN sf.status <> 'active' THEN 'business_inactive'
+           WHEN spo.deleted_at IS NOT NULL OR spo.is_active IS NOT TRUE OR spo.approval_status <> 'APPROVED' THEN 'offer_unavailable'
+           WHEN ns.status <> 'ACTIVE' THEN 'supplier_inactive'
+           WHEN COALESCE(pm.status, 'ACTIVE') <> 'ACTIVE' THEN 'product_inactive'
+           ELSE 'base_conditions_met' END AS "supplyReadiness",
+         sp.unit_price AS "unitPrice", sp.note, sp.reason,
          sp.target_organization_id AS "targetOrganizationId", tgt.name AS "targetOrganizationName",
          sp.created_at AS "createdAt", sp.decided_at AS "decidedAt", sp.ended_at AS "endedAt",
          sp.decided_by AS "decidedBy", sp.ended_by AS "endedBy", sp.end_reason AS "endReason", sp.terms_snapshot AS "termsSnapshot",

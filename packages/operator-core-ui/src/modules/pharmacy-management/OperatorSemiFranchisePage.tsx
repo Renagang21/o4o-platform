@@ -1,6 +1,6 @@
 import { BusinessOperationsPanel } from './BusinessOperationsPanel';
 import { BusinessHomeShowcaseManager } from './BusinessHomeShowcaseManager';
-import { SupplyProposalTermsSummary, SupplyProposalHistory } from './SupplyProposalDetails';
+import { SupplyProposalTermsSummary, SupplyProposalHistory, SupplyProposalReadiness } from './SupplyProposalDetails';
 /**
  * OperatorSemiFranchisePage — 담당 약국 협력사업 (/operator/semi-franchises)
  *
@@ -261,6 +261,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
                       <StatusBadge status={p.status} />
                       {p.reason && <div className="mt-1 text-xs text-gray-500">{p.reason}</div>}
                       <SupplyProposalHistory proposal={p} />
+                      <SupplyProposalReadiness proposal={p} />
                     </td>
                     <td className={`${TD} min-w-[8rem]`}>
                       <div className="flex flex-wrap gap-1">

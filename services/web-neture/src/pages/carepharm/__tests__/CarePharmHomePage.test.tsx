@@ -322,3 +322,21 @@ it('scrolls to the current home news section after the pharmacy gate replaces it
     else Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
   }
 });
+
+
+it('preserves the selected pharmacy and exact proposal through the shared CarePharm home handoff', async () => {
+  access.allowed = true;
+  const proposal = '11111111-1111-4111-8111-111111111111';
+  const previous = state.get.getMockImplementation()!;
+  state.get.mockImplementation((path: string, config?: unknown) => path.endsWith('/showcase')
+    ? Promise.resolve(response({ businessKey: 'carepharm', items: [{ id: `product:${proposal}`, kind: 'product', title: '합성 공급 제안', summary: null, body: null }] }))
+    : previous(path, config));
+  state.post.mockRejectedValue(new Error('synthetic handoff unavailable'));
+  render(<MemoryRouter initialEntries={['/?store=owned-store']}><CarePharmHomePage /></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '내 약국에서 이 제안 확인' }));
+  await waitFor(() => expect(state.post).toHaveBeenCalled());
+  const payload = state.post.mock.calls[0][1];
+  const target = new URL(payload.returnPath, 'https://store.neture.co.kr');
+  expect(target.searchParams.get('store')).toBe('owned-store');
+  expect(target.searchParams.get('returnTo')).toContain(`proposal=${proposal}`);
+});
