@@ -4,7 +4,7 @@ import { readInboxTasks } from '../../modules/contact-inquiry/inbox-tasks.js';
 import type { InboxScope } from '../../modules/contact-inquiry/inbox-scope.js';
 
 const taskAreas: Record<string, Record<string, string>> = {
-  neture: { 'legacy-contact': 'legacy-contact', 'product-review': 'product-approvals', 'service-product-review': 'service-product-approvals', 'product-candidates': 'candidates', 'pharmacist-qualifications': 'qualifications', 'pharmacy-applications': 'pharmacies' },
+  neture: { 'legacy-contact': 'legacy-contact', 'product-review': 'product-approvals', 'service-product-review': 'service-product-approvals', 'product-candidates': 'candidates', 'product-candidate-intake':'candidates', 'pharmacist-qualifications': 'qualifications', 'pharmacy-applications': 'pharmacies' },
   supplier: { 'supplier-review': 'suppliers', 'supplier-resubmitted': 'suppliers' },
   lecture: { 'lecture-courses': 'courses', 'lecture-instructors': 'instructors', 'lecture-contact': 'contact', 'lecture-legacy-contact': 'contact' },
   community: { 'community-members': 'members', 'community-forums': 'forums' },
@@ -31,7 +31,7 @@ export async function centralOperationOverview(db: Pick<DataSource, 'query'>, us
       }
     }
     const scope: InboxScope = { kind: 'service', key: service, name: service, serviceKey: service, organizationId: null, publicPath: '/contact', managePath: '/operator', taskPath: '/operator' };
-    const serviceTasks = (await readInboxTasks(db, scope)).map(task => ({ ...task, service }));
+    const serviceTasks = (await readInboxTasks(db, scope)).map(task => ({ ...task, service, ...(task.key==='product-candidate-intake' ? {kind:'reference'} : {}) }));
     // The lecture contact screen already counts this same service inbox. Never add it twice.
     if (allowed.has(`${service}.inbox`) && !(service === 'lecture' && allowed.has('lecture.contact'))) {
       const sources = service === 'neture'

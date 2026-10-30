@@ -6,7 +6,7 @@ import { authClient } from '@o4o/auth-client';
 import { centralTaskHref } from './central-operation-navigation';
 import { centralServiceLabel } from './central-operation-labels';
 
-interface Task { key: string; service: string; label: string; href: string; count: number | null; oldest?: string | null; available: boolean }
+interface Task { kind?: 'reference'; key: string; service: string; label: string; href: string; count: number | null; oldest?: string | null; available: boolean }
 type TaskRow = Task & { id: string };
 interface Snapshot { tasks: Task[]; generatedAt: string }
 export default function CentralOperationOverview({ roleKey }: { roleKey: string }) {
@@ -45,9 +45,11 @@ export default function CentralOperationOverview({ roleKey }: { roleKey: string 
     ...task, id: `${task.service}:${task.key}`,
     available: task.available && Number.isSafeInteger(task.count) && task.count! >= 0,
   })).sort((a, b) => Number(b.available && !!b.count) - Number(a.available && !!a.count) || (b.count ?? 0) - (a.count ?? 0)), [current]);
-  const unavailable = tasks.filter(task => !task.available);
-  const pending = tasks.filter(task => task.available && task.count! > 0);
-  const rows = tasks.filter(task => (!service || task.service === service)
+  const references = tasks.filter(task=>task.kind==='reference');
+  const workTasks = tasks.filter(task=>task.kind!=='reference');
+  const unavailable = workTasks.filter(task => !task.available);
+  const pending = workTasks.filter(task => task.available && task.count! > 0);
+  const rows = workTasks.filter(task => (!service || task.service === service)
     && (filter === 'all' || (filter === 'unavailable' ? !task.available : !task.available || task.count! > 0))
     && (!selectedOnly || selected.has(task.id)));
   const activeSelected = rows.filter(task => selected.has(task.id));
@@ -73,6 +75,7 @@ export default function CentralOperationOverview({ roleKey }: { roleKey: string 
       <div aria-label="업무별 대기 바로가기" className="grid gap-3 sm:grid-cols-2">
         {pending.filter(task => !service || task.service === service).map(task => <Link key={task.id} to={centralTaskHref(task.service, task.href)} aria-label={`${task.label} 대기 업무 바로가기`} className="rounded-xl border border-blue-200 bg-white p-4 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><span className="block text-sm font-semibold">{task.label} 처리하기</span><span className="mt-1 block text-xs text-slate-500">{centralServiceLabel(task.service)} · {task.count!.toLocaleString()}건 대기 →</span></Link>)}
       </div>
+      {references.length > 0 && <section aria-label="수집 자료 등록 준비" className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-semibold">수집 자료 등록 준비</h3><p className="text-sm text-slate-600">원천 자료의 미등록 상태입니다. 실제 처리 대기 합계에 포함하지 않습니다.</p>{references.map(task=><Link key={task.id} to={centralTaskHref(task.service,task.href)} className="block rounded border bg-white p-3 text-sm">{task.label} · {task.available ? `${task.count!.toLocaleString()}건` : '조회 확인 필요'} →</Link>)}</section>}
       {unavailable.length > 0 && <p role="alert" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm">일부 업무를 조회하지 못했습니다. 조회 실패는 0건으로 집계하지 않습니다.</p>}
       <div className="flex flex-wrap gap-3"><label className="text-sm">서비스 <select aria-label="대기 업무 서비스" className="rounded border bg-white p-2" value={service} onChange={e => { setService(e.target.value); reset(); }}><option value="">전체 서비스</option>{[...new Set(tasks.map(task => task.service))].map(key => <option key={key} value={key}>{centralServiceLabel(key)}</option>)}</select></label><label className="text-sm">표시 <select aria-label="대기 업무 표시" className="rounded border bg-white p-2" value={filter} onChange={e => { setFilter(e.target.value); reset(); }}><option value="pending">대기·확인 필요</option><option value="all">전체 업무</option><option value="unavailable">조회 실패</option></select></label></div>
       <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={activeSelected.length} onClearSelection={reset} actions={[
