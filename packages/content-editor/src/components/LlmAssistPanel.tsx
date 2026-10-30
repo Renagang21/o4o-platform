@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 /**
  * LlmAssistPanel — 공용 "LLM으로 작업하기" 보조 패널
  *
@@ -279,13 +280,12 @@ function LlmAssistSession({
               {guideIsDynamic && (
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>추가 요청 <span style={{ fontWeight: 400, color: '#9ca3af' }}>(선택)</span></div>
-                  <textarea
+                  <AiRequestInput
+                    aria-label="추가 요청"
                     value={additionalInstruction}
                     onChange={(e) => { setAdditionalInstruction(e.target.value); setCopied(null); }}
-                    rows={2}
                     maxLength={300}
                     placeholder="예: 친근한 말투로 / 3문단 이내로 / 표 형식으로 정리"
-                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                 </div>
               )}

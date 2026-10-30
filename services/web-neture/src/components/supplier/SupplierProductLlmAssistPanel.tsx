@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 /**
  * SupplierProductLlmAssistPanel — 공급자 제품정보 "ChatGPT로 작업" 패널 (외부 LLM First)
  *
@@ -165,12 +166,11 @@ export default function SupplierProductLlmAssistPanel({
                 className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-violet-400 focus:outline-none"
               />
             )}
-            <input
-              type="text"
+            <AiRequestInput
+              aria-label="추가 요청"
               value={additionalInstruction}
               onChange={(e) => setAdditionalInstruction(e.target.value)}
               placeholder="추가 요청 (선택 · 예: 규격은 낱개 기준으로)"
-              className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-violet-400 focus:outline-none"
             />
           </div>
 
