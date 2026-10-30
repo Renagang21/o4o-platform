@@ -25,6 +25,9 @@ export class GoogleLoginRequestDto {
 }
 
 export class GoogleSignupConsentsDto {
+  @IsOptional() @IsString() @MaxLength(50)
+  nickname?: string;
+
   @IsDefined()
   @ValidateNested()
   @Type(() => SignupTermsReferenceDto)

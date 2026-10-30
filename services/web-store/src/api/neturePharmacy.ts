@@ -36,6 +36,10 @@ export interface PharmacyMembershipInput {
   address?: string;
   phone?: string;
   businessRegistrationDocumentId?: string;
+  contactName?: string;
+  managerPhone?: string;
+  contactEmail?: string;
+  taxInvoiceEmail?: string;
   representativeName?: string;
   businessType?: string;
   businessCategory?: string;

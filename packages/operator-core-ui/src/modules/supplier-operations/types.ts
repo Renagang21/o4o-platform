@@ -24,6 +24,7 @@ export interface AdminSupplier {
   // 프로필 완성 상태의 단일 권위 — backend(getMissingProfileFields) 산출. 승인 게이트 아님. 프론트 재계산 금지.
   managerName?: string | null;
   managerPhone?: string | null;
+  managerEmail?: string | null;
   profileComplete?: boolean;
   missingProfileFields?: string[];
   /** @deprecated profileComplete 사용 */

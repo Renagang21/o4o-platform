@@ -45,20 +45,7 @@ export default function SupplierOnboardingFields({
           <FileText className="w-5 h-5 text-gray-500" />
           공급자 서류 및 정산 정보
         </h2>
-        {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1: 단계별 제출 안내 */}
-        <p className="text-xs text-gray-500 mb-3">
-          공급자 승인은 기본 사업자 정보만으로 진행할 수 있습니다. 아래 서류·정산 정보는 단계별로
-          제출하시면 됩니다.
-        </p>
-        <ul className="text-xs text-gray-500 mb-5 space-y-0.5 list-disc list-inside">
-          <li>
-            <span className="font-medium text-gray-700">판매 가능 전</span> — 사업자등록증(PDF)
-          </li>
-          <li>
-            <span className="font-medium text-gray-700">정산 전</span> — 정산은행/계좌/예금주, 통장
-            사본(PDF), 세금계산서 이메일
-          </li>
-        </ul>
+        <p className="text-xs text-gray-500 mb-5">증빙 파일은 선택 사항이며 미제출로 신청·승인이 제한되지 않습니다. 담당자·세금계산서 정보도 나중에 보완할 수 있습니다. 실제 정산에 필요한 계좌 정보는 정산 전에 확인해 주세요.</p>
 
         {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
             조회 실패를 "미입력" 으로 오인시키지 않는다. 입력값은 비우지 않고 안내만 덧붙인다. */}
@@ -85,7 +72,7 @@ export default function SupplierOnboardingFields({
               className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5"
             >
               <Mail className="w-3.5 h-3.5 text-gray-400" />
-              세금계산서 이메일 <span className="text-red-500">*</span>
+              세금계산서 이메일 (선택)
             </label>
             <input
               id={`${fieldId}-field-0`}
@@ -194,7 +181,7 @@ export default function SupplierOnboardingFields({
                 htmlFor={`${fieldId}-field-6`}
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                사업자등록증 PDF <span className="text-red-500">*</span>
+                사업자등록증 PDF (선택)
               </label>
               {onboarding?.businessRegistrationDocument && (
                 <button
@@ -233,7 +220,7 @@ export default function SupplierOnboardingFields({
                 htmlFor={`${fieldId}-field-7`}
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                통장 사본 PDF <span className="text-red-500">*</span>
+                통장 사본 PDF (선택)
               </label>
               {onboarding?.settlementBankbookDocument && (
                 <button

@@ -88,7 +88,7 @@ export class SupplierOnboardingService {
       ? normalizeOptionalText(input.settlementContactEmail)
       : undefined;
 
-    if (taxInvoiceEmail !== undefined && !isValidEmail(taxInvoiceEmail)) {
+    if (taxInvoiceEmail !== undefined && taxInvoiceEmail && !isValidEmail(taxInvoiceEmail)) {
       return { success: false as const, error: 'INVALID_TAX_INVOICE_EMAIL' };
     }
     if (settlementContactEmail !== undefined && settlementContactEmail && !isValidEmail(settlementContactEmail)) {

@@ -12,6 +12,14 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe('pharmacy business entity classification', () => {
+  it('saves optional contact details without an invoice classification', async () => {
+    api.get.mockResolvedValue({ name: '검증 약국', businessEntityType: null });
+    render(<PharmacyInfoPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '수정' }));
+    fireEvent.change(screen.getByLabelText('담당자 전화번호'), { target: { value: '010-0000-0000' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() => expect(api.update).toHaveBeenCalledWith(expect.objectContaining({ managerPhone: '01000000000', businessEntityType: undefined })));
+  });
   it('requires reselecting legacy tax categories and saves an explicit individual choice', async () => {
     render(<PharmacyInfoPage />);
     fireEvent.click(await screen.findByRole('button', { name: '수정' }));
@@ -73,7 +81,7 @@ describe('shared pharmacy information behavior through the Store adapter', () =>
       businessEntityType: 'corporation', phone: '01000000000',
       taxInvoiceEmail: 'invoice@example.invalid', businessEmail: 'business@example.invalid',
       contactEmail: 'contact@example.invalid', addressDetail: { zipCode: '00000', baseAddress: '검증 주소', detailAddress: '검증 상세' } }));
-    expect(api.update.mock.calls[0][0]).not.toHaveProperty('managerPhone');
+    expect(api.update.mock.calls[0][0]).toHaveProperty('managerPhone', '0000000000');
     expect(api.update.mock.calls[0][0]).not.toHaveProperty('businessNumber');
   });
 

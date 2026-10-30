@@ -195,3 +195,19 @@ describe('PUT /pharmacy/info — P2/P4 businessInfo write', () => {
     }));
   });
 });
+
+
+describe('optional organization contacts', () => {
+  it('preserves omitted contacts and permits explicit clearing', async () => {
+    const h = makeHarness();
+    const org = await h.orgRepo.findOne();
+    org.metadata = { contactName: '합성 담당자', managerPhone: '0000000000', contactEmail: 'contact@example.invalid', taxInvoiceEmail: 'tax@example.invalid' };
+    const next = jest.fn();
+    await invoke(h.handler, req({}), makeRes(), next);
+    expect(next).not.toHaveBeenCalled();
+    expect(org.metadata).toMatchObject({ managerPhone: '0000000000', taxInvoiceEmail: 'tax@example.invalid' });
+    await invoke(h.handler, req({ contactName: '', managerPhone: '', contactEmail: '', taxInvoiceEmail: '' }), makeRes(), next);
+    expect(next).not.toHaveBeenCalled();
+    expect(org.metadata).toMatchObject({ contactName: null, managerPhone: null, contactEmail: null, taxInvoiceEmail: null });
+  });
+});

@@ -140,7 +140,7 @@ export function BusinessRegistrationFields({
     ),
     businessEntityType: (
       <div key="businessEntityType">
-        <label htmlFor={entityTypeId} className={labelCls}>사업자 구분<span className="text-red-500"> *</span></label>
+        <label htmlFor={entityTypeId} className={labelCls}>사업자 구분{requiredMark}</label>
         <select
           id={entityTypeId}
           name="businessEntityType"
@@ -148,7 +148,7 @@ export function BusinessRegistrationFields({
           value={entityTypeSelected ? value.businessEntityType : ''}
           onChange={handle('businessEntityType')}
           disabled={disabled}
-          required
+          required={required}
           className={inputCls}
         >
           <option value="">{entityTypePlaceholder}</option>

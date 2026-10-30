@@ -26,6 +26,9 @@ export class SocialProofDto {
   includeLegacyTokens?: boolean;
 }
 export class SocialSignupDto {
+  @IsOptional() @IsString() @MaxLength(50)
+  nickname?: string;
+
   @IsString() @IsNotEmpty() @MaxLength(100)
   token!: string;
   @IsString() @IsNotEmpty() @MaxLength(255)

@@ -110,14 +110,14 @@ export function createPharmacyInfoController(
       businessEmail: meta.businessEmail || null,
       contactEmail: meta.contactEmail || null,
       ownerPhone: meta.ownerPhone || null,
-      ceoName: meta.ceoName || null,
+      ceoName: meta.ceoName || meta.businessProfile?.representativeName || null,
       contactName: meta.contactName || null,
       managerPhone: meta.managerPhone || null,
       storeSlug: slugRecord?.slug ?? null,
       // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
       //   P2/P4 fields — users.businessInfo SSOT 에서 항상 별도 조회 (아래 블록)
-      businessType: null,
-      businessItem: null,
+      businessType: meta.businessProfile?.businessType || null,
+      businessItem: meta.businessProfile?.businessCategory || null,
       businessEntityType: null,
       businessStartDate: null,
     };
@@ -133,8 +133,8 @@ export function createPharmacyInfoController(
         );
         const biz = user?.businessInfo;
         if (biz) {
-          data.businessType = biz.businessType || null;
-          data.businessItem = biz.businessItem || null;
+          if ('businessType' in biz) data.businessType = biz.businessType || null;
+          if ('businessItem' in biz) data.businessItem = biz.businessItem || null;
           data.businessEntityType = biz.businessEntityType || null;
           data.businessStartDate = biz.businessStartDate || null;
         }
@@ -321,11 +321,11 @@ export function createPharmacyInfoController(
     const existingMeta = (org.metadata as Record<string, any>) || {};
     org.metadata = {
       ...existingMeta,
-      taxInvoiceEmail: body.taxInvoiceEmail || null,
-      ownerPhone: sanitizePhone(body.ownerPhone),
-      ceoName: body.ceoName?.trim() || null,
-      contactName: body.contactName?.trim() || null,
-      managerPhone: sanitizePhone(body.managerPhone),
+      ...('taxInvoiceEmail' in body ? { taxInvoiceEmail: body.taxInvoiceEmail?.trim() || null } : {}),
+      ...('ownerPhone' in body ? { ownerPhone: sanitizePhone(body.ownerPhone) } : {}),
+      ...('ceoName' in body ? { ceoName: body.ceoName?.trim() || null } : {}),
+      ...('contactName' in body ? { contactName: body.contactName?.trim() || null } : {}),
+      ...('managerPhone' in body ? { managerPhone: sanitizePhone(body.managerPhone) } : {}),
       // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
       //   payload 포함 시에만 merge — 미포함이면 기존 metadata 값 보존(방어적).
       ...('businessEmail' in body ? { businessEmail: (typeof body.businessEmail === 'string' ? body.businessEmail.trim() : '') || null } : {}),

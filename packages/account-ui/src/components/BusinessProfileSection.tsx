@@ -193,7 +193,7 @@ export function BusinessProfileSection({
 
   const validate = (): string[] => {
     const errs: string[] = [];
-    if (!isSelectableBusinessEntityType(form.businessEntityType)) {
+    if (form.businessEntityType && !isSelectableBusinessEntityType(form.businessEntityType)) {
       errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
     }
     if (form.taxInvoiceEmail && !EMAIL_RE.test(form.taxInvoiceEmail)) {

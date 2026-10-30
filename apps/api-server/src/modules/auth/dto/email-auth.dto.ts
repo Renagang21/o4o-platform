@@ -33,6 +33,9 @@ export class EmailSignupConsentsDto {
 }
 
 export class EmailSignupRequestDto {
+  @IsOptional() @IsString() @MaxLength(50)
+  nickname?: string;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)

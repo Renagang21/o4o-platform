@@ -35,6 +35,10 @@ export interface PharmacyApplicationInput {
   businessNumber: string;
   pharmacistLicenseNumber: string;
   businessRegistrationDocumentId?: string;
+  contactName?: string;
+  managerPhone?: string;
+  contactEmail?: string;
+  taxInvoiceEmail?: string;
   representativeName?: string;
   businessType?: string;
   businessCategory?: string;
@@ -75,17 +79,27 @@ function cleanText(raw: unknown, max: number): string | null {
 }
 
 export function validateApplication(input: Partial<PharmacyApplicationInput>): PharmacyApplicationInput {
+  if (input.businessRegistrationDocumentId != null && (typeof input.businessRegistrationDocumentId !== 'string' || input.businessRegistrationDocumentId.length > 36))
+    throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
   const pharmacyName = cleanText(input.pharmacyName, 255);
   const businessNumber = normalizeBusinessNumber(input.businessNumber);
   const pharmacistLicenseNumber = cleanText(input.pharmacistLicenseNumber, 30);
   if (!pharmacyName) throw new NeturePharmacyError(400, 'INVALID_PHARMACY_NAME', '약국 이름을 입력해 주세요.');
   if (!businessNumber) throw new NeturePharmacyError(400, 'INVALID_BUSINESS_NUMBER', '사업자등록번호 10자리를 입력해 주세요.');
   if (!pharmacistLicenseNumber) throw new NeturePharmacyError(400, 'INVALID_LICENSE_NUMBER', '약사 면허번호를 입력해 주세요.');
+  for (const email of [input.contactEmail, input.taxInvoiceEmail]) {
+    if (email && (typeof email !== 'string' || email.trim().length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())))
+      throw new NeturePharmacyError(400, 'INVALID_EMAIL', '올바른 이메일 주소를 입력해 주세요.');
+  }
   return {
     pharmacyName,
     businessNumber,
     pharmacistLicenseNumber,
     businessRegistrationDocumentId: cleanText(input.businessRegistrationDocumentId, 36) ?? undefined,
+    contactName: cleanText(input.contactName, 100) ?? undefined,
+    managerPhone: cleanText(input.managerPhone, 50) ?? undefined,
+    contactEmail: cleanText(input.contactEmail, 255) ?? undefined,
+    taxInvoiceEmail: cleanText(input.taxInvoiceEmail, 255) ?? undefined,
     representativeName: cleanText(input.representativeName, 100) ?? undefined,
     businessType: cleanText(input.businessType, 100) ?? undefined,
     businessCategory: cleanText(input.businessCategory, 100) ?? undefined,
@@ -93,6 +107,10 @@ export function validateApplication(input: Partial<PharmacyApplicationInput>): P
     phone: cleanText(input.phone, 50),
   };
 }
+
+const BUSINESS_PROFILE_SQL = `COALESCE(o.metadata->'businessProfile', '{}'::jsonb) || jsonb_build_object(
+  'contactName', o.metadata->>'contactName', 'managerPhone', o.metadata->>'managerPhone',
+  'contactEmail', o.metadata->>'contactEmail', 'taxInvoiceEmail', o.metadata->>'taxInvoiceEmail')`;
 
 const SELECT_COLUMNS = `npm.id, npm.organization_id, npm.applicant_user_id, npm.status, npm.pharmacy_name,
   npm.business_number, npm.pharmacist_license_number, npm.applied_at, npm.decided_by, npm.decided_at, npm.reason`;
@@ -106,7 +124,7 @@ export class PharmacyMembershipService {
   /** 사용자가 owner 인 Neture 약국 원장(사용자당 1개). */
   async findMine(userId: string, exec: { query: EntityManager['query'] } = this.dataSource): Promise<PharmacyMembershipRow | null> {
     const rows = await exec.query(
-      `SELECT ${SELECT_COLUMNS}, o.metadata->'businessProfile' AS business_profile, o.address, o.phone
+      `SELECT ${SELECT_COLUMNS}, ${BUSINESS_PROFILE_SQL} AS business_profile, o.address, o.phone
          FROM neture_pharmacy_memberships npm
          JOIN organizations o ON o.id = npm.organization_id
          JOIN organization_members om
@@ -127,12 +145,13 @@ export class PharmacyMembershipService {
       // 신청 자격 = Neture 가입 승인(active). 이 신청은 Neture 원장을 만들거나 바꾸지 않는다.
       await assertNetureMainMembershipActive(m, userId);
 
-      if (!input.businessRegistrationDocumentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.businessRegistrationDocumentId))
-        throw new NeturePharmacyError(400, 'DOCUMENT_REQUIRED', '사업자등록증 사본을 제출해 주세요.');
-      const [document] = await m.query(`SELECT id FROM kyc_documents WHERE id = $1 AND user_id = $2 AND "documentType" = 'business_registration' AND "verificationStatus" IN ('PENDING','VERIFIED')`, [input.businessRegistrationDocumentId, userId]);
-      if (!document) throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
-      if (!input.address || !input.representativeName || !input.businessType || !input.businessCategory || !input.phone)
-        throw new NeturePharmacyError(400, 'BUSINESS_PROFILE_REQUIRED', '사업자등록증의 대표자, 주소, 업태와 종목, 약국 전화번호을 입력해 주세요.');
+      // Evidence is optional. When supplied, retain ownership/type/status validation.
+      if (input.businessRegistrationDocumentId) {
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.businessRegistrationDocumentId))
+          throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
+        const [document] = await m.query(`SELECT id FROM kyc_documents WHERE id = $1 AND user_id = $2 AND "documentType" = 'business_registration' AND "verificationStatus" IN ('PENDING','VERIFIED')`, [input.businessRegistrationDocumentId, userId]);
+        if (!document) throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
+      }
       const existing = await this.findMine(userId, m);
       if (existing && !canReapply(existing.status)) {
         throw new NeturePharmacyError(409, 'ALREADY_APPLIED', '이미 신청했거나 가입된 약국이 있습니다.');
@@ -151,10 +170,11 @@ export class PharmacyMembershipService {
 
       const policies = await recordEnrollmentPolicies(m, userId, 'kpa-society', raw.policyReferences);
       const saveProfile = async (organizationId: string) => m.query(
-        `UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('businessProfile', $2::jsonb) WHERE id = $1`,
+        `UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb || jsonb_build_object('businessProfile', COALESCE(metadata->'businessProfile', '{}'::jsonb) || $2::jsonb) WHERE id = $1`,
         [organizationId, JSON.stringify({ applicationPolicies: policies, businessRegistrationDocumentId: input.businessRegistrationDocumentId,
           businessName: input.pharmacyName, businessNumber: input.businessNumber, representativeName: input.representativeName,
-          businessType: input.businessType, businessCategory: input.businessCategory, address: input.address })],
+          businessType: input.businessType, businessCategory: input.businessCategory, address: input.address }),
+          JSON.stringify({ contactName: input.contactName, managerPhone: input.managerPhone, contactEmail: input.contactEmail, taxInvoiceEmail: input.taxInvoiceEmail })],
       );
       if (existing) {
         await saveProfile(existing.organization_id);
@@ -198,7 +218,7 @@ export class PharmacyMembershipService {
     const where = `($1::text IS NULL OR npm.status = $1)
       AND ($2::text IS NULL OR npm.pharmacy_name ILIKE $2 OR npm.business_number LIKE $2)`;
     const items = await this.dataSource.query(
-      `SELECT ${SELECT_COLUMNS}, o.name AS organization_name, o.address AS organization_address, o.metadata->'businessProfile' AS business_profile
+      `SELECT ${SELECT_COLUMNS}, o.name AS organization_name, o.address AS organization_address, ${BUSINESS_PROFILE_SQL} AS business_profile
          FROM neture_pharmacy_memberships npm
          JOIN organizations o ON o.id = npm.organization_id
         WHERE ${where}
@@ -237,8 +257,7 @@ export class PharmacyMembershipService {
           AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND BTRIM(license_number)=BTRIM($2) FOR SHARE`,
           [current.applicant_user_id,current.pharmacist_license_number]);
         if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주세요.');
-        const [proof] = await m.query(`SELECT d.id FROM organizations o JOIN kyc_documents d ON d.id::text = o.metadata->'businessProfile'->>'businessRegistrationDocumentId' WHERE o.id = $1 AND d.user_id = $2 AND d."documentType" = 'business_registration' AND d."verificationStatus" IN ('PENDING','VERIFIED')`, [current.organization_id, current.applicant_user_id]);
-        if (!proof) throw new NeturePharmacyError(409, 'DOCUMENT_REQUIRED', '사업자등록증 사본을 확인한 뒤 승인해 주세요.');
+
       }
       const [row] = rowsOf(await m.query(
         `UPDATE neture_pharmacy_memberships npm
