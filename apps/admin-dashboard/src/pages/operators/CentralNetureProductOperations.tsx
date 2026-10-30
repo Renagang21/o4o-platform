@@ -17,7 +17,7 @@ const api={...sourceApi,operatorProductCandidateApi:{...candidates,
 const fetchGuidePageContent = async (serviceKey:string,pageKey:string) => (await authClient.api.get('/guide/contents',{params:{serviceKey,pageKey}})).data.data.sections;
 const screens={cleanup:ProductDataCleanupPage,'category-mapping':CategoryMappingRulesPage,'product-approvals':OperatorProductApprovalPage,candidates:ProductCandidateReviewPage,products:AllRegisteredProductsPage,'service-product-approvals':ProductServiceApprovalPage};
 export type CentralNetureProductArea = keyof typeof screens;
-export default function CentralNetureProductOperations({area}: {area:CentralNetureProductArea}) {
+export default function CentralNetureProductOperations({area,menuKeys}: {area:CentralNetureProductArea;menuKeys:readonly string[]}) {
  const {user}=useAuth();const Screen=screens[area];
- return <NetureProductOperationsProvider renderCandidateRegistrationReview={props=><CandidateConflictDrawer {...props} open />} http={authClient.api} fetchGuidePageContent={fetchGuidePageContent} api={api} user={{id:String(user.id),roles:user.roles}}><Screen /></NetureProductOperationsProvider>;
+ return <NetureProductOperationsProvider canOpenProductTrash={menuKeys.includes('neture.cleanup')} renderCandidateRegistrationReview={props=><CandidateConflictDrawer {...props} open />} http={authClient.api} fetchGuidePageContent={fetchGuidePageContent} api={api} user={{id:String(user.id),roles:user.roles}}><Screen /></NetureProductOperationsProvider>;
 }
