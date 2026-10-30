@@ -15,14 +15,14 @@ const work={kind:'work',work:{goal:{goalId:'goal',status:'waiting_for_user',site
 beforeEach(()=>{vi.clearAllMocks();mocks.auth.user={id:'synthetic-user',name:'Synthetic',email:'synthetic@example.invalid',roles:[]};mocks.auth.isAuthenticated=true;mocks.send.mockResolvedValue(work);});
 afterEach(cleanup);
 function prepare(){
- fireEvent.click(screen.getByRole('button',{name:'데이터 정비',exact:true}));
- fireEvent.change(screen.getByLabelText('상품·거래처 또는 작업 대상'),{target:{value:'합성 상품'}});
- fireEvent.change(screen.getByLabelText('확인·수정한 내용'),{target:{value:'500정 2포장'}});
- fireEvent.click(screen.getByRole('button',{name:'입력창에 반영'}));
+ fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'합성 상품은 500정 2포장으로 수정해 주세요'}});
 }
-it('prepares the existing input without automatically executing a request',()=>{
- render(page());fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'기존 업무 입력'}});prepare();
- expect(mocks.send).not.toHaveBeenCalled();expect(screen.getByTestId('home-composer-input')).toHaveProperty('value',expect.stringContaining('기존 업무 입력'));
+it('starts from ordinary conversation without a separate data maintenance menu or form',()=>{
+ render(page());
+ expect(screen.queryByRole('button',{name:'데이터 정비',exact:true})).toBeNull();
+ expect(screen.queryByRole('region',{name:'업무 데이터 정비'})).toBeNull();
+ prepare();expect(mocks.send).not.toHaveBeenCalled();
+ expect(screen.getByTestId('home-composer-input')).toHaveProperty('value','합성 상품은 500정 2포장으로 수정해 주세요');
 });
 it('reuses the waiting run, original target, scope and attachments, including after a transport error',async()=>{
  render(page());fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'상품 준비'}});fireEvent.click(screen.getByTestId('home-composer-submit'));
@@ -36,14 +36,7 @@ it('reuses the waiting run, original target, scope and attachments, including af
  fireEvent.click(screen.getByTestId('home-composer-submit'));await waitFor(()=>expect(mocks.send).toHaveBeenCalledTimes(3));
  expect(mocks.send.mock.calls[2][0].runId).toBe('g_synthetic');
 });
-it('clears maintenance inputs when the account changes',async()=>{
- const view=render(page());fireEvent.click(screen.getByRole('button',{name:'데이터 정비',exact:true}));
- fireEvent.change(screen.getByLabelText('확인·수정한 내용'),{target:{value:'이전 사용자 입력'}});
- mocks.auth.user={...mocks.auth.user,id:'other-synthetic'};view.rerender(page());
- await waitFor(()=>expect(screen.queryByRole('region',{name:'업무 데이터 정비'})).toBeNull());
- fireEvent.click(screen.getByRole('button',{name:'데이터 정비',exact:true}));expect(screen.getByLabelText('확인·수정한 내용')).toHaveProperty('value','');
-});
-it('keeps the existing login gate for a prepared request',()=>{
+it('keeps the existing login gate for an ordinary correction',()=>{
  mocks.auth.isAuthenticated=false;render(page());prepare();fireEvent.click(screen.getByTestId('home-composer-submit'));
  expect(mocks.login).toHaveBeenCalled();expect(mocks.send).not.toHaveBeenCalled();
 });
