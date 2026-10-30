@@ -135,7 +135,7 @@ function toDrawerProduct(p: AdminProduct): SupplierProduct {
 // ─── Component ───
 
 export default function OperatorProductApprovalPage() {
- const {api:{operatorProductApi,productCleanupApi},fetchGuidePageContent} = useNetureProductOperations();
+ const {api:{operatorProductApi,productCleanupApi},fetchGuidePageContent,canOpenProductTrash=false} = useNetureProductOperations();
   const [showTrash, setShowTrash] = useState(false);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -423,7 +423,7 @@ export default function OperatorProductApprovalPage() {
       }
     : undefined;
 
-  if (showTrash) return <div>
+  if (showTrash && canOpenProductTrash) return <div>
     <button type="button" className="mb-3 text-blue-700 underline" onClick={() => { setShowTrash(false); void loadProducts(); }}>상품 승인 목록으로</button>
     <ProductDataCleanupPage initialTab="recycle-bin" />
   </div>;
@@ -433,7 +433,7 @@ export default function OperatorProductApprovalPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 ref={heading} tabIndex={-1} className="text-2xl font-bold text-slate-900">상품 승인 관리</h1>
-        <button type="button" onClick={() => setShowTrash(true)} className="mt-3 border rounded px-3 py-2 text-sm">휴지통 열기</button>
+        {canOpenProductTrash ? <button type="button" onClick={() => setShowTrash(true)} className="mt-3 border rounded px-3 py-2 text-sm">휴지통 열기</button> : <p className="mt-3 text-sm text-slate-500">휴지통 조회·완전 삭제는 접근 권한이 있는 관리자에게 요청해 주세요.</p>}
         <p className="text-sm text-slate-500 mt-1">
           공급자가 등록한 상품을 검토합니다. 보완이 필요하면 반려하고, 잘못 등록된 상품은 삭제합니다.
         </p>

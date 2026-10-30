@@ -14,6 +14,7 @@ export function createNetureProductApi(http: AxiosInstance) {
 export interface NetureProductBindings { http:AxiosInstance; api: ReturnType<typeof createNetureProductApi>; user: {id?: string;roles?: string[]} | null;
  fetchGuidePageContent: (service: string,page: string) => Promise<Record<string,string>>;
  renderCandidateRegistrationReview?: (props:{candidateId:string;onClose:()=>void;onProcessed:()=>void})=>ReactNode;
+ canOpenProductTrash?: boolean;
  renderProductDetail?: (props: ProductDetailProps) => ReactNode; }
 const Context = createContext<NetureProductBindings | null>(null);
 export function NetureProductOperationsProvider({children,...value}: NetureProductBindings & {children:ReactNode}) {return <Context.Provider value={value}>{children}</Context.Provider>;}

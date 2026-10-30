@@ -6,7 +6,7 @@ import { createOperatorProductApiApi } from './operatorProductApi';
 const api = {getProducts:vi.fn(),approveProduct:vi.fn(),rejectProduct:vi.fn(),batchApprove:vi.fn(),batchReject:vi.fn()};
 const trash = {softDelete:vi.fn(),batchSoftDelete:vi.fn()};
 const rows = ['PENDING','APPROVED','REJECTED'].map((approvalStatus,i)=>({id:`offer-${i}`,masterId:`master-${i}`,masterName:`표준 상품 ${i}`,marketingName:`표준 상품 ${i}`,supplierName:'합성 공급자',category:null,distributionType:'PRIVATE',approvalStatus,isActive:false,createdAt:'2026-10-30'}));
-const renderPage=()=>render(<NetureProductOperationsProvider {...{http:{} as any,api:{operatorProductApi:api,productCleanupApi:trash} as any,user:{id:'actor',roles:['platform:super_admin']},fetchGuidePageContent:async()=>({}),renderProductDetail:({product}:any)=>product?<aside role="region" aria-label="합성 상세">{product.name}</aside>:null}}><Page/></NetureProductOperationsProvider>);
+const renderPage=(canOpenProductTrash=true)=>render(<NetureProductOperationsProvider {...{canOpenProductTrash,http:{} as any,api:{operatorProductApi:api,productCleanupApi:trash} as any,user:{id:'actor',roles:['platform:super_admin']},fetchGuidePageContent:async()=>({}),renderProductDetail:({product}:any)=>product?<aside role="region" aria-label="합성 상세">{product.name}</aside>:null}}><Page/></NetureProductOperationsProvider>);
 beforeEach(()=>{vi.resetAllMocks();api.getProducts.mockResolvedValue(rows);trash.batchSoftDelete.mockResolvedValue({moved:3});trash.softDelete.mockResolvedValue({success:true});});
 afterEach(cleanup);
 it('maps the actual operator DTO masterName, preferring it to a stale alias and never replacing it with an ID',async()=>{
@@ -38,4 +38,9 @@ it('locks duplicate submissions and reports a failed delete without losing the s
  renderPage();await screen.findByText('표준 상품 0');fireEvent.click(within(screen.getByRole('table')).getAllByRole('checkbox')[0]);fireEvent.click(screen.getByRole('button',{name:'삭제 (3)'}));
  fireEvent.click(screen.getByRole('button',{name:'3개 삭제'}));fireEvent.click(screen.getByRole('button',{name:'처리 중…'}));expect(trash.batchSoftDelete).toHaveBeenCalledTimes(1);
  finish(Promise.reject(new Error('변경됨')));await screen.findByRole('alert');expect(screen.getByRole('button',{name:'3개 삭제'})).toBeTruthy();
+});
+
+it('keeps the daily delete action but explains restricted trash access without showing a broken entry',async()=>{
+ renderPage(false);await screen.findByText('표준 상품 0');expect(screen.queryByRole('button',{name:'휴지통 열기'})).toBeNull();expect(screen.getByText(/휴지통 조회·완전 삭제는 접근 권한/)).toBeTruthy();
+ fireEvent.click(within(screen.getByRole('table')).getAllByRole('checkbox')[0]);expect(screen.getByRole('button',{name:'삭제 (3)'})).toBeTruthy();
 });
