@@ -68,6 +68,16 @@ node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-3
 재현 도구는 자동 CI에 등록하지 않는다. 전환 준비와 잔여 항목은
 [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../docs/investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)를 따른다.
 
+## API 의존성 빌드 재사용
+
+`.github/actions/api-dependency-build`는 API Jest·PostgreSQL 통합·정기 full Jest가 사용하는 공통 패키지 산출물을 재사용한다.
+동일 입력 fingerprint와 산출물 SHA-256 대조를 통과해야 하며, 캐시 부재·입력 변경·출력 불일치는 기존 전체 의존성 빌드로 돌아간다.
+캐시 서비스 실패도 테스트 생략으로 처리하지 않는다. `CI_BUILD_CACHE_DISABLED=true`는 재사용만 중단하는 rollback 변수다.
+테스트·타입 검사·권한 검증·배포 gate 결과는 재사용하지 않는다. cold 동시 실행에서는 중복 빌드가 남을 수 있다.
+Node 22.18.0 기준으로 CI와 정기 검사 환경을 맞췄다. 실제 절감은 step 실행시간과 cache hit 결과로 확인한다.
+
+월 10만원은 희망 비용 수준이며 지출 상한이 아니다. 이 작업은 비공개 전환이나 계정의 지출 차단 설정을 포함하지 않는다.
+
 ## 공통 액션 구성
 
 `.github/actions/setup-build-env/action.yml` — pnpm/Node 셋업 + 의존성 설치 + 공유 패키지 빌드.

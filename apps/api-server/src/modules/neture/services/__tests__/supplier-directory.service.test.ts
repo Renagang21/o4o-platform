@@ -30,7 +30,7 @@ beforeEach(() => {
   queryBuilder.getMany.mockResolvedValue([supplier]);
   (AppDataSource.getRepository as jest.Mock).mockReturnValue({ findOne, find, createQueryBuilder: jest.fn(() => queryBuilder) });
   (business.getOrgData as jest.Mock).mockResolvedValue({ name: 'Fixture organization' });
-  (business.getOrgDataBatch as jest.Mock).mockResolvedValue(new Map([['fixture-org', { name: 'Fixture organization', business_number: 'fixture-number' }]]));
+  (business.getOrgDataBatch as jest.Mock).mockResolvedValue(new Map([['fixture-org', { name: 'Fixture organization', business_number: 'fixture-number', managerEmail: 'person@example.invalid' }]]));
   (business.getMissingProfileFields as jest.Mock).mockReturnValue(['managerName']);
   (listOwnedSupplierIds as jest.Mock).mockResolvedValue([]);
   (AppDataSource.query as jest.Mock).mockImplementation(async (sql: string) => sql.includes('COUNT(') ? [{ count: 0 }] : []);
@@ -85,13 +85,14 @@ describe('supplier directory contracts', () => {
     expect(queryBuilder.andWhere.mock.calls).toEqual([['supplier.category = :category', { category: 'fixture-category' }], ['supplier.status = :status', { status: 'ACTIVE' }]]);
     const [result] = await service.getSuppliers();
     expect(result).not.toHaveProperty('contactEmail');
+    expect(result).not.toHaveProperty('managerEmail');
     expect(result).not.toHaveProperty('settlementAccountNumber');
   });
 
   it('operator listing masks the account and preserves profile-completion compatibility aliases', async () => {
     (AppDataSource.query as jest.Mock).mockResolvedValue([{ id: 'legacy-user', status: 'active', email: 'fixture-user-email' }]);
     const [result] = await service.getAllSuppliers({ status: 'ACTIVE' as any });
-    expect(result).toMatchObject({ name: 'Fixture organization', businessNumber: 'fixture-number', identityStatus: 'active', userEmail: 'fixture-user-email', settlementAccountNumberMasked: '***-***-7890', profileComplete: false, activationReady: false, missingProfileFields: ['managerName'], missingActivationFields: ['managerName'] });
+    expect(result).toMatchObject({ name: 'Fixture organization', businessNumber: 'fixture-number', managerEmail: 'person@example.invalid', identityStatus: 'active', userEmail: 'fixture-user-email', settlementAccountNumberMasked: '***-***-7890', profileComplete: false, activationReady: false, missingProfileFields: ['managerName'], missingActivationFields: ['managerName'] });
     expect(result).not.toHaveProperty('settlementAccountNumber');
     expect(find).toHaveBeenCalledWith({ where: { status: 'ACTIVE' }, order: { createdAt: 'DESC' } });
   });

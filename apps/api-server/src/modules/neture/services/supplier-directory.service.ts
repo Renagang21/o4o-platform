@@ -188,6 +188,7 @@ export class NetureSupplierDirectoryService {
     // 프로필 완성 상태의 단일 권위 — 승인과 무관한 정보성 필드. 프론트 재계산 금지.
     managerName: string | null;
     managerPhone: string | null;
+    managerEmail: string | null;
     profileComplete: boolean;
     missingProfileFields: string[];
     /** @deprecated profileComplete 사용 (승인 게이트 아님) */
@@ -235,6 +236,7 @@ export class NetureSupplierDirectoryService {
           // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1
           managerName: s.managerName || null,
           managerPhone: s.managerPhone || null,
+          managerEmail: org?.managerEmail || null,
           profileComplete: missing.length === 0,
           missingProfileFields: missing,
           // deprecated 호환 별칭 (승인 게이트 아님)

@@ -37,6 +37,7 @@ concurrency:
 
 env:
   NODE_VERSION: '22.18.0'
+  CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
   # 0. Affected scope 판정
@@ -214,6 +215,7 @@ jobs:
         node --test
         scripts/ci/__tests__/detect-affected.test.mjs
         scripts/ci/__tests__/actions-cost.test.mjs
+        scripts/ci/__tests__/api-build-cache.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
@@ -432,7 +434,7 @@ jobs:
         build-packages: 'false'
 
     - name: Build api-server workspace dependencies
-      run: pnpm --filter '@o4o/api-server^...' run build
+      uses: ./.github/actions/api-dependency-build
 
     # WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §14 · §15
     #
@@ -908,7 +910,7 @@ jobs:
         build-packages: 'false'
         strict-lockfile: 'true'
     - name: Build API dependency closure
-      run: pnpm run build:api-deps
+      uses: ./.github/actions/api-dependency-build
     - name: Verify every schema prefix in a fresh disposable database
       env:
         OPERATOR_INVITE_TEST_PORT: '55432'

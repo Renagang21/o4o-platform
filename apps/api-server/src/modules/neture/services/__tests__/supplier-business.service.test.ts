@@ -84,6 +84,19 @@ describe('supplier business profile behavior', () => {
     expect(findOne).toHaveBeenCalledWith({ where: { id: 'fixture-supplier', status: SupplierStatus.ACTIVE } });
   });
 
+  it('stores private manager email separately from public contact and invoice email', async () => {
+    await service.updateSupplierProfile('fixture-supplier', { managerEmail: ' person@example.invalid ' });
+    const write = txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'));
+    expect(write![1]).toContainEqual(expect.stringContaining('"managerEmail":"person@example.invalid"'));
+    expect(supplier.contactEmail).not.toBe('person@example.invalid');
+    expect(supplier.taxInvoiceEmail).not.toBe('person@example.invalid');
+  });
+
+  it('rejects malformed manager email before writing', async () => {
+    await expect(service.updateSupplierProfile('fixture-supplier', { managerEmail: 'bad email' })).rejects.toMatchObject({ name: 'SupplierProfileEmailInvalidError' });
+    expect(AppDataSource.transaction).not.toHaveBeenCalled();
+  });
+
   it('updates the canonical organization name in the profile transaction', async () => {
     (AppDataSource.query as jest.Mock).mockResolvedValue([{ ...org, name: 'Renamed fixture' }]);
     const result = await service.updateSupplierProfile('fixture-supplier', { name: '  Renamed fixture  ' });

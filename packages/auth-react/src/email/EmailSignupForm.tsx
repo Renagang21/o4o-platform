@@ -30,6 +30,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
   const [policyReload, setPolicyReload] = useState(0);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -45,7 +46,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
   const phoneOk = PHONE_SHAPE.test(phoneDigits);
   const policyOk = checkPasswordPolicy(password).length === 0;
   const confirmOk = confirm.length > 0 && confirm === password;
-  const ready = !!policy && emailOk && name.trim().length > 0 && phoneOk && policyOk && confirmOk && terms && privacy && !submitting;
+  const ready = !!policy && emailOk && name.trim().length > 0 && nickname.trim().length > 0 && phoneOk && policyOk && confirmOk && terms && privacy && !submitting;
 
   if (sentTo) {
     return (
@@ -69,6 +70,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       const res = await api.signupWithEmail({
         email: email.trim(),
         name: name.trim(),
+        nickname: nickname.trim(),
         phone: phoneDigits,
         password,
         consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) },
@@ -87,6 +89,10 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
 
   return (
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="email-signup-form">
+      <div style={styles.field}>
+        <label htmlFor="o4o-signup-nickname" style={styles.label}>닉네임</label>
+        <input id="o4o-signup-nickname" type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} style={styles.input} />
+      </div>
       <div style={styles.field}>
         <label htmlFor="o4o-signup-email" style={styles.label}>이메일 (로그인 아이디)</label>
         <input

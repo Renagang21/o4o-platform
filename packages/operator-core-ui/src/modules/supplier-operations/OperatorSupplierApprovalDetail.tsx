@@ -105,6 +105,7 @@ export function SupplierDetailBody({
           <>
             <Row label="대표자" value={s.representativeName || '-'} />
             <Row label="담당자" value={[s.managerName, s.managerPhone].filter(Boolean).join(' / ') || '-'} />
+            <Row label="담당자 이메일" value={s.managerEmail || '-'} />
             <Row label="사업자번호" value={s.businessNumber || '-'} />
             <Row label="세금계산서" value={s.taxInvoiceEmail || '-'} />
           </>

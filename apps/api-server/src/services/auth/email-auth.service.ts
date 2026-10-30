@@ -219,6 +219,7 @@ export class EmailAuthService {
       const created = repo.create({
         email,
         name,
+        nickname: input.nickname?.trim() || undefined,
         phone,
         status: UserStatus.ACTIVE,
         isActive: true,

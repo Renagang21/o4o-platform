@@ -202,13 +202,20 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
   });
-  it.each(['', 'simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'])(
+  it('allows saving contact information before selecting an invoice business classification', async () => {
+    api.profile.getProfile.mockResolvedValue({ ...profile, businessEntityType: '' });
+    render(<SupplierProfilePage />); await loaded();
+    fireEvent.change(screen.getByLabelText('담당자 이메일'), { target: { value: 'person@example.invalid' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(expect.objectContaining({ managerEmail: 'person@example.invalid', businessEntityType: undefined })));
+  });
+  it.each(['simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'])(
     'requires an explicit individual/corporation choice for %s without guessing', async (legacy) => {
       api.profile.getProfile.mockResolvedValue({ ...profile, businessEntityType: legacy });
       render(<SupplierProfilePage />);
       await loaded();
       const select = screen.getByRole('combobox', { name: /사업자 구분/ }) as HTMLSelectElement;
-      expect(select.required).toBe(true);
+      expect(select.required).toBe(false);
       expect(select.value).toBe('');
       expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
       fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));

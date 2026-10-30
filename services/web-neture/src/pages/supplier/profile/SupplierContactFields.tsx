@@ -14,6 +14,8 @@ export default function SupplierContactFields({
     setManagerName,
     managerPhone,
     setManagerPhone,
+    managerEmail,
+    setManagerEmail,
     contactEmail,
     setContactEmail,
     contactPhone,
@@ -58,6 +60,11 @@ export default function SupplierContactFields({
             />
           </div>
 
+          <div>
+            <label htmlFor={`${fieldId}-manager-email`} className="block text-sm font-medium text-gray-700 mb-1.5">담당자 이메일</label>
+            <input id={`${fieldId}-manager-email`} type="email" value={managerEmail} onChange={(e) => setManagerEmail(e.target.value)} className={inputClass} />
+            <p className="mt-1 text-xs text-gray-500">공개 연락처 및 세금계산서 이메일과 별도로 관리합니다. 나중에 보완할 수 있습니다.</p>
+          </div>
           {/* 담당자 전화번호 */}
           <div>
             <label

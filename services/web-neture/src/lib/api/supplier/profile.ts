@@ -54,6 +54,7 @@ export const supplierProfileApi = {
     businessAddressDetail?: string;
     managerName?: string;
     managerPhone?: string;
+    managerEmail?: string;
     businessType?: string;
     businessItem?: string;
     // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E:

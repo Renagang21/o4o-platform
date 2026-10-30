@@ -11,6 +11,10 @@ export class SupplierProfileEntityTypeInvalidError extends Error {
   }
 }
 
+export class SupplierProfileEmailInvalidError extends Error {
+  constructor() { super('INVALID_MANAGER_EMAIL'); this.name = 'SupplierProfileEmailInvalidError'; }
+}
+
 export class SupplierProfileNameInvalidError extends Error {
   constructor() {
     super('SUPPLIER_PROFILE_NAME_INVALID');
@@ -84,6 +88,7 @@ export class NetureSupplierBusinessService {
       const orgBusinessProfile = (org?.metadata?.businessProfile ?? {}) as {
         businessEntityType?: string | null;
         businessStartDate?: string | null;
+        managerEmail?: string | null;
       };
 
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
@@ -114,6 +119,7 @@ export class NetureSupplierBusinessService {
         businessAddressDetail: addrDetail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
+        managerEmail: org?.metadata?.businessProfile?.managerEmail || null,
         businessType: supplier.businessType || null,
         // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
         //   이전에는 users.businessInfo 에서 읽었으나 **그 키는 한 번도 저장된 적이 없다**(IR §5 —
@@ -163,6 +169,7 @@ export class NetureSupplierBusinessService {
       businessAddressDetail?: string;
       managerName?: string;
       managerPhone?: string;
+      managerEmail?: string;
       businessType?: string;
       businessItem?: string;
       // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E (정책 7):
@@ -204,6 +211,10 @@ export class NetureSupplierBusinessService {
 
       if (data.businessEntityType !== undefined && !isSelectableBusinessEntityType(data.businessEntityType)) {
         throw new SupplierProfileEntityTypeInvalidError();
+      }
+
+      if (data.managerEmail !== undefined && (typeof data.managerEmail !== 'string' || data.managerEmail.length > 255 || (data.managerEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.managerEmail.trim())))) {
+        throw new SupplierProfileEmailInvalidError();
       }
 
       // Existing contact fields
@@ -268,13 +279,13 @@ export class NetureSupplierBusinessService {
       //   이번에는 **migration 0** 으로 `organizations.metadata.businessProfile` 에 둔다
       //   (metadata = 조직 확장 필드 jsonb · DDL 0 · 엔티티 변경 0).
       const businessProfileWriteNeeded =
-        data.businessEntityType !== undefined || data.businessStartDate !== undefined;
+        data.businessEntityType !== undefined || data.businessStartDate !== undefined || data.managerEmail !== undefined;
 
       // §9 silent success 금지:
       //   조직이 연결돼 있지 않으면 canonical 저장 위치 자체가 없다. 조용히 버리지 않고 거부한다.
       if (businessProfileWriteNeeded && !supplier.organizationId) {
         throw new SupplierProfileFieldUnsupportedError(
-          (['businessEntityType', 'businessStartDate'] as const).filter((k) => data[k] !== undefined),
+          (['businessEntityType', 'businessStartDate', 'managerEmail'] as const).filter((k) => data[k] !== undefined),
         );
       }
 
@@ -320,6 +331,7 @@ export class NetureSupplierBusinessService {
               // §D: 사업자등록증 기재사항 — Organization 확장 필드에 저장(migration 0)
               business_profile: businessProfileWriteNeeded
                 ? {
+                    managerEmail: data.managerEmail !== undefined ? (data.managerEmail.trim() || null) : undefined,
                     businessEntityType: data.businessEntityType !== undefined ? (data.businessEntityType || null) : undefined,
                     businessStartDate: data.businessStartDate !== undefined ? (data.businessStartDate || null) : undefined,
                   }
@@ -342,6 +354,7 @@ export class NetureSupplierBusinessService {
       const savedBusinessProfile = (org?.metadata?.businessProfile ?? {}) as {
         businessEntityType?: string | null;
         businessStartDate?: string | null;
+        managerEmail?: string | null;
       };
 
       return {
@@ -355,6 +368,7 @@ export class NetureSupplierBusinessService {
         businessAddressDetail: org?.address_detail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
+        managerEmail: org?.metadata?.businessProfile?.managerEmail || null,
         businessType: supplier.businessType || null,
         businessItem: supplier.businessItem || null,
         // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
@@ -513,18 +527,19 @@ export class NetureSupplierBusinessService {
     business_number: string | null;
     address: string | null;
     phone: string | null;
+    managerEmail: string | null;
   }>> {
-    const map = new Map<string, { name: string; business_number: string | null; address: string | null; phone: string | null }>();
+    const map = new Map<string, { name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null }>();
     if (organizationIds.length === 0) return map;
 
     try {
-      const rows: Array<{ id: string; name: string; business_number: string | null; address: string | null; phone: string | null }> =
+      const rows: Array<{ id: string; name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null }> =
         await AppDataSource.query(
-          `SELECT id, name, business_number, address, phone FROM organizations WHERE id = ANY($1)`,
+          `SELECT id, name, business_number, address, phone, metadata->'businessProfile'->>'managerEmail' AS "managerEmail" FROM organizations WHERE id = ANY($1)`,
           [organizationIds],
         );
       for (const row of rows) {
-        map.set(row.id, { name: row.name, business_number: row.business_number, address: row.address, phone: row.phone });
+        map.set(row.id, { name: row.name, business_number: row.business_number, address: row.address, phone: row.phone, managerEmail: row.managerEmail || null });
       }
     } catch (error) {
       logger.warn('[NetureSupplierService] Org batch read failed:', error);
@@ -542,21 +557,21 @@ export class NetureSupplierBusinessService {
 
 
 
-  /** 판매 가능 전(상품 승인요청) 필수 — 사업자등록증 PDF. */
-  getMissingSaleFields(supplier: NetureSupplier): string[] {
+  /** 호환 API: 증빙 파일 미제출은 판매 자격을 차단하지 않는다. */
+  getMissingSaleFields(_supplier: NetureSupplier): string[] {
     const missing: string[] = [];
-    if (!supplier.businessRegistrationDocumentId) missing.push('businessRegistrationDocument');
+    // Evidence is optional and must not block sale eligibility.
     return missing;
   }
 
 
-  /** 정산 전 필수 — 정산 계좌/통장사본 + 세금계산서 이메일. */
+  /** 실제 정산에 필요한 계좌·세금계산서 이메일. 증빙 파일은 선택. */
   getMissingSettlementFields(supplier: NetureSupplier): string[] {
     const missing: string[] = [];
     if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
     if (!supplier.settlementAccountNumber?.trim()) missing.push('settlementAccountNumber');
     if (!supplier.settlementAccountHolder?.trim()) missing.push('settlementAccountHolder');
-    if (!supplier.settlementBankbookDocumentId) missing.push('settlementBankbookDocument');
+    // Bank statement uploads are optional; settlement account details remain separate.
     if (!supplier.taxInvoiceEmail?.trim()) {
       missing.push('taxInvoiceEmail');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplier.taxInvoiceEmail)) {
