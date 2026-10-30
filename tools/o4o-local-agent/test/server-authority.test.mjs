@@ -65,3 +65,26 @@ test('an old mirror transitions with the same epoch, retaining known versions an
  assert.equal(journal.pending(dataset)[0].expectedVersion,7);
  assert.equal(journal.pending(dataset)[0].entry.data.id,'old');
 });
+
+test('a known source conflict pauses background retries until the owner explicitly retries',async()=>{
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[source('p')]},0);
+ const epoch=randomUUID();let paused=true,uploads=0;
+ const worker=createPharmacySync({post:async(url,body)=>{
+  if(url.endsWith('grants'))return {status:200,payload:{data:[{owner,epoch,storageMode:'transferring',transferError:paused?'WORK_DATA_SOURCE_CONFLICT':null}]}};
+  uploads++;
+  return {status:200,payload:{success:true,data:{accepted:body.changes.map((r,i)=>({lane:r.lane,kind:r.entry.kind,id:r.entry.data.id,mutationId:r.mutationId,version:i+1})),changes:[],cursor:0,more:false,storageMode:body.complete?'server':'transferring'}}};
+ }});
+ await worker.tick('session',true);await worker.tick('session',true);assert.equal(uploads,0);assert.equal(journal.state(dataset).pending,1);
+ paused=false;await worker.tick('session',true);assert.equal(uploads,2);assert.equal(journal.state(dataset).authority,'server');
+});
+
+test('explicitly recollected unchanged references are uploaded with a new dependent purchase',()=>{
+ const supplier={kind:'supplier',data:{id:'s',name:'합성 거래처',enabled:true,payment_timing:'unknown',payment_required:null},origin:source('s').origin};
+ const pack={kind:'pack',data:{id:'pack',product_id:'p',label:'100정',base_unit:'정',units_per_pack:100},origin:source('pack').origin};
+ const refs=[source('p'),supplier,pack];
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:refs},0);
+ journal.configure(dataset,randomUUID(),'server');assert.equal(journal.state(dataset).pending,0);
+ const purchase={kind:'purchase',data:{id:'purchase',document_type:'purchase',product_id:'p',supplier_id:'s',pack_id:'pack',pack_count:1,purchased_at:'2026-10-30T00:00:00Z'},origin:source('purchase').origin};
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[...refs,purchase]},1);
+ assert.deepEqual(journal.pending(dataset).map(r=>r.entry.kind),['product','supplier','pack','purchase']);
+});

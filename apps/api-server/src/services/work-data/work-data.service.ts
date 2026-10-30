@@ -98,8 +98,11 @@ export class WorkDataService {
   }
   async transferFailed(userId:string,deviceId:string,ownerKey:unknown,epoch:unknown,code:string) {
     if(typeof ownerKey!=='string' || typeof epoch!=='string' || !/^[A-Z0-9_]{1,64}$/.test(code))return;
+    const [consent]=await this.db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1 AND epoch::text=$2 AND source_device_id=$3',[ownerKey,epoch,deviceId]);
+    if(!consent)return;
+    await assertWorkDataOwner(this.db,userId,ownerOf(consent),true);
     await this.db.query(`UPDATE assistant_work_data_consents c SET transfer_error=$5 WHERE c.owner_key=$1 AND c.epoch::text=$2
-      AND c.source_device_id=$3 AND c.enabled=true AND c.storage_mode='transferring'
+      AND c.source_device_id=$3 AND c.enabled=true AND c.storage_mode IN ('transferring','server')
       AND EXISTS(SELECT 1 FROM local_agent_devices d WHERE d.id=$3 AND d.user_id=$4 AND d.status='active')`,[ownerKey,epoch,deviceId,userId,code]);
   }
   async grants(userId: string, deviceId?: string) {
@@ -107,7 +110,7 @@ export class WorkDataService {
     if(await getNetureMainMembershipStatus(this.db,userId)!=='active')throw new WorkDataError('WORK_DATA_FORBIDDEN',403);
     const rows = await this.db.query(`SELECT c.* FROM assistant_work_data_consents c WHERE c.enabled=true AND
       (c.user_id=$1 OR EXISTS(SELECT 1 FROM organization_members om WHERE om.organization_id=c.organization_id AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,[userId]);
-    return rows.filter(row=>row.source_device_id===deviceId).map(row => ({ owner:row.owner_key,epoch:row.epoch,storageMode:row.storage_mode }));
+    return rows.filter(row=>row.source_device_id===deviceId).map(row => ({ owner:row.owner_key,epoch:row.epoch,storageMode:row.storage_mode,transferError:row.transfer_error??null }));
   }
   async query(userId: string, owner: WorkDataOwner, options: { kind?: string; after?: string; limit?: number } = {}) {
     return this.db.transaction(async db=>{

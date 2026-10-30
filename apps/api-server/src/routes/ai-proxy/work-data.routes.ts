@@ -47,7 +47,8 @@ export function createWorkDataRouter(db: DataSource) {
   router.post('/status',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
     const status=await service.consent(req.user.id,owner);
-    const sourceOnline=status.sourceDeviceId?(await listUserDevices(db,req.user.id)).some(d=>d.id===status.sourceDeviceId && d.online):undefined;
+    const source=status.sourceDeviceId?(await listUserDevices(db,req.user.id)).find(d=>d.id===status.sourceDeviceId):undefined;
+    const sourceOnline=source?.online;
     return {...status,sourceOnline};
   }));
   router.post('/consent',authenticate,requireNetureMainMembership(db),run(async req=>{

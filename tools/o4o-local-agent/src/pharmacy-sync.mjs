@@ -26,6 +26,7 @@ export function createPharmacySync({ post, log = () => {}, now = Date.now }) {
         if(!['transferring','server'].includes(grant.storageMode))continue;
         const dataset=pharmacyDataset(grant.owner);
         journal.configure(dataset,grant.epoch,grant.storageMode);
+        if(grant.transferError){journal.fail(dataset,'CONFLICT');continue;}
         // Yield to screen work after bounded batches. Further ticks continue the cursor/outbox.
         for(let batch=0;batch<3;batch++) {
           const pending=journal.pending(dataset);

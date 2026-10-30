@@ -82,7 +82,7 @@ router.post('/work-data/sync', authenticateAgent, async (req: AgentRequest,res: 
   res.setHeader('Cache-Control','no-store');
   try {const b=req.body??{};if(b.protocol!=='server-authority-v1')throw new WorkDataError('PC_PROGRAM_UPDATE_REQUIRED',409);res.json({success:true,data:await new WorkDataService(AppDataSource).sync(req.agent.userId,b.owner,b.epoch,b.changes,b.cursor,{deviceId:req.agent.deviceId,complete:b.complete===true})});}
   catch(error){const known=error instanceof WorkDataError;
-    if(known && error.status===409)await new WorkDataService(AppDataSource).transferFailed(req.agent.userId,req.agent.deviceId,req.body?.owner,req.body?.epoch,error.code).catch(()=>{});
+    if(known && (error.status===400 || error.status===409))await new WorkDataService(AppDataSource).transferFailed(req.agent.userId,req.agent.deviceId,req.body?.owner,req.body?.epoch,error.code).catch(()=>{});
     res.status(known?error.status:503).json({success:false,code:known?error.code:'WORK_DATA_UNAVAILABLE'});}
 });
 

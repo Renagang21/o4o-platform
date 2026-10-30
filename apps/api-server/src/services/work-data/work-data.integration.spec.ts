@@ -218,6 +218,10 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    await expect(service.sync(f.user,f.owner.key,epoch,[],0,{deviceId:randomUUID()})).rejects.toMatchObject({code:'WORK_DATA_FORBIDDEN'});
    const first=change();const upload=await service.sync(f.user,f.owner.key,epoch,[first],0,{deviceId:f.device});
    expect(upload.changes).toEqual([]);expect(upload.storageMode).toBe('transferring');
+   await service.transferFailed(f.user,f.device,f.owner.key,epoch,'WORK_DATA_SOURCE_CONFLICT');
+   expect((await service.grants(f.user,f.device))[0].transferError).toBe('WORK_DATA_SOURCE_CONFLICT');
+   expect((await service.setConsent(f.user,f.owner,true,f.device)).epoch).toBe(epoch);
+   expect((await service.grants(f.user,f.device))[0].transferError).toBeNull();
    expect((await service.sync(f.user,f.owner.key,epoch,[first],0,{deviceId:f.device})).accepted[0].version).toBe(upload.accepted[0].version);
    await expect(service.query(f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_TRANSFERRING'});
    await expect(service.analysis(f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_TRANSFERRING'});

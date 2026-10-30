@@ -123,7 +123,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     try {
       // Finish current edits before changing the storage authority. Never silently drop a draft.
       if(edited.length && !(await persist()))return;
-      let deviceId=storage?.location==='pc'?storage.deviceId:undefined;
+      let deviceId=storage?.location==='pc'?storage.deviceId:consent?.sourceDeviceId??undefined;
       if(enabled && fromPc && !deviceId){
         const pc=await workDataRequest<{deviceId:string}>('transition-source',workScope);
         deviceId=pc.deviceId;
@@ -140,7 +140,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       }else setNotice(enabled?'서버로 옮기고 있어요. 자료가 있는 PC를 켜 두세요.':'서버 이용을 중단하고 서버 업무 자료를 삭제했어요. PC 저장 방식으로 되돌리지는 않아요.');
     }catch(error){if(alive.current)setError(errorText(error));}
     finally{if(alive.current)setBusy(false);}
-  },[workScope,disabled,edited,persist,storage,bundle]);
+  },[workScope,disabled,edited,persist,storage,bundle,consent?.sourceDeviceId]);
   useEffect(()=>{
     if(!disabled && !busy && !persisting && queuedTransfer){
       setQueuedTransfer(null);void changeConsent(true,queuedTransfer==='pc');
@@ -277,10 +277,11 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           <p>{consent.transferError?'자료가 달라 이전을 멈췄어요. 기존 자료는 유지돼요.':'서버로 자료를 옮기고 있어요. 완료 후 여기서 이어갈 수 있어요.'}</p>
           {consent.transferredRecords!==undefined && <p>{consent.transferredRecords.toLocaleString()}건을 서버에 보관했어요.</p>}
           {consent.sourceOnline===false && <p>자료가 있는 PC를 켜고 연결 프로그램을 실행해 주세요. 연결되면 계속 진행해요.</p>}
-          {consent.transferError && <p role="alert">서버 자료와 PC 자료의 연결을 확인해야 해요. 같은 요청을 반복해 덮어쓰지 않아요. 전환을 중단하면 서버 이전 자료만 삭제해요.</p>}
+          {consent.transferError && <p role="alert">서버 자료와 PC 자료의 연결을 확인해야 해요. 같은 요청의 자동 반복은 멈췄어요. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
           {!consent.sourceDeviceId && <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true,true)} className="rounded bg-blue-700 px-3 py-2 text-white">자료가 있는 PC 연결하고 계속</button>}
           <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(false)} className="mt-2 underline">전환 중단·서버 자료 삭제</button>
         </div>}
+        {consent?.storageMode==='server' && consent.transferError && <p role="alert">PC에서 받은 새 자료의 연결을 확인해야 해요. 기존 서버 자료는 계속 이용할 수 있어요. <button type="button" disabled={disabled || busy || persisting} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
         {consent?.storageMode==='server' && <button type="button" disabled={disabled || busy || persisting || edited.length>0} onClick={()=>void changeConsent(false)} className="rounded border px-3 py-2">서버 이용 중단·서버 자료 삭제</button>}
         {consent?.storageMode==='server' && !consent.sourceDeviceId && <button type="button" disabled={disabled || busy || persisting} onClick={()=>void changeConsent(true,true)} className="rounded border border-blue-700 px-3 py-2 text-blue-700">프로그램 자료를 수집할 PC 연결</button>}
         {consent?.storageMode==='stopped' && <p role="status">서버 이용을 중단했어요. PC 저장 방식으로 돌아가지는 않아요. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true)} className="underline">동의하고 서버에서 새로 시작</button></p>}

@@ -311,4 +311,17 @@ describe('connected pharmacy work data',()=>{
   await screen.findByText(/이제 서버에 저장해요/);
   expect(vi.mocked(workDataRequest).mock.calls.filter(c=>c[0]==='consent')).toHaveLength(1);
  });
+ it('retries a source conflict only on request and keeps the original collector bound',async()=>{
+  const deviceId='44444444-4444-4444-8444-444444444444';
+  const paused={...permission,sourceDeviceId:deviceId,transferError:'WORK_DATA_SOURCE_CONFLICT'};
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>action==='status'?paused as any:action==='consent'?{...paused,transferError:null} as any:{enabled:false} as any);
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:{...paused,transferError:null},records:[],next:null,counts:{}});
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  await screen.findByRole('button',{name:'확인 후 다시 시도'});
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
+  fireEvent.click(screen.getByRole('button',{name:'확인 후 다시 시도'}));
+  await waitFor(()=>expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent'&&c[2]?.deviceId===deviceId)).toBe(true));
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='transition-source'||c[0]==='pc-read')).toBe(false);
+ });
 });

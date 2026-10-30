@@ -26,4 +26,6 @@
 
 Node pharmacy data/sync/CLI·Main 주문 panel/데이터 API·API browser routes/agent routes/분석·구버전 PC capability·계정 삭제 fence가 소비처다. 다른 서비스의 공통 menu/인증/정산은 변경하지 않는다. 합성 자료만 사용하고 사용자 업로드 엑셀은 공개 저장소/테스트 fixture에 넣지 않는다. 실제 약국 PC/실주문·유료 모델 검증과 격리 검증을 구분한다.
 
-로컬 결과: 실제 PG 18 PASS, API 실행/경험 회귀 8 suites 133 PASS, PC native 220개 중 218 PASS/Windows 전용 2 SKIP, 화면 18 PASS·자료 파일 2 PASS, desktop/mobile Chromium 4흐름 PASS. 서버→PC 병합/staging 실행 코드는 제거하고 전송 확인만 유지한다. 상세·미실행 범위는 [CHECK](../checks/CHECK-O4O-ASSISTANT-SERVER-TRANSITION-V1.md).
+로컬 결과: 실제 PG 18 PASS, API 실행/경험 회귀 8 suites 133 PASS, PC native 222개 중 220 PASS/Windows 전용 2 SKIP, 화면 19 PASS·자료 파일 2 PASS, desktop/mobile Chromium 4흐름 PASS. 서버→PC 병합/staging 실행 코드는 제거하고 전송 확인만 유지한다. 상세·미실행 범위는 [CHECK](../checks/CHECK-O4O-ASSISTANT-SERVER-TRANSITION-V1.md).
+
+리뷰 보완: [PR #888](https://github.com/Renagang21/o4o-platform/pull/888)의 참조 재수집 지적을 실제 SQLite로 재현했다. 서버에서 새로 시작한 후 명시적으로 재수집한 미확인 참조 행은 payload가 같아도 업로드하고, 과거 checkpoint의 자동 복원은 계속 차단한다. 알려진 자료 오류는 권한 재확인 후 기록해 백그라운드 반복을 멈추며, 사용자가 같은 지정 PC로 명시적으로 재시도할 때만 재개한다. 재수집/일시중단/원본 PC 유지 검사를 추가했다.
