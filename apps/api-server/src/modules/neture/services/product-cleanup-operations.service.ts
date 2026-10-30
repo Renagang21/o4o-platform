@@ -22,8 +22,10 @@ export class ProductCleanupOperationsService {
     });
   }
 
-  async remove(offerId: string, mode: 'pending' | 'trash', actorId: string, inputReason: unknown) {
-    const reason = operationReason(inputReason);
+  async remove(offerId: string, mode: 'pending' | 'trash', actorId: string, inputReason?: unknown) {
+    // Trash deletion is explicitly confirmed; manual free text is optional for existing clients.
+    const reason = mode === 'trash' && (inputReason == null || inputReason === '')
+      ? '관리자 휴지통 완전 삭제' : operationReason(inputReason);
     return this.db.transaction(async manager => {
       const [offer] = await manager.query('SELECT id,approval_status,deleted_at FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [offerId]);
       if (!offer) throw new OperationError(404, 'OFFER_NOT_FOUND', '상품을 찾을 수 없습니다.');

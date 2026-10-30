@@ -21,10 +21,19 @@ beforeEach(() => {
   query.mockResolvedValue([]);
 });
 
-it.each([undefined, '', ' ', 1, '\0', 'x'.repeat(2001)])('rejects missing or unbounded destructive reason %p before a transaction', async reason => {
+it.each([undefined, '', ' ', 1, '\0', 'x'.repeat(2001)])('requires a pending-deletion reason and rejects malformed explicit trash reasons %p before a transaction', async reason => {
   expect(() => operationReason(reason)).toThrow();
-  await expect(new ProductCleanupOperationsService(db).remove('offer', 'trash', 'admin', reason)).rejects.toMatchObject({ status: 400 });
+  await expect(new ProductCleanupOperationsService(db).remove('offer', 'pending', 'admin', reason)).rejects.toMatchObject({ status: 400 });
+  if (reason !== undefined && reason !== '') await expect(new ProductCleanupOperationsService(db).remove('offer', 'trash', 'admin', reason)).rejects.toMatchObject({ status: 400 });
   expect(transaction).not.toHaveBeenCalled();
+});
+it('records an automatic reason for a confirmed trash deletion without manual free text', async () => {
+  query.mockImplementation(async sql => sql.includes('FOR UPDATE') ? [{id:'offer',deleted_at:'synthetic-date'}]
+    : sql.includes('AS listings') ? [{listings:0,products:0,approvals:0,carts:0,order_items:0,checkout_orders:0}] : []);
+  expect(await new ProductCleanupOperationsService(db).remove('offer','trash','admin')).toEqual({hardDeleted:true});
+  const audit=query.mock.calls.find(([sql])=>sql.includes('INSERT INTO action_logs'))!;
+  expect(JSON.parse(audit[1][3].toPostgres())).toMatchObject({offerId:'offer',reason:'관리자 휴지통 완전 삭제'});
+  expect(events).toEqual(['commit']);
 });
 it('redacts reason serialization while preserving the exact audit payload for PostgreSQL', async () => {
   query.mockImplementation(async sql => sql.includes('FOR UPDATE') ? [{ id: 'offer', deleted_at: 'date' }] : []);

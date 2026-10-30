@@ -23,11 +23,13 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { ProductCleanupOperationsService } from '../services/product-cleanup-operations.service.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
+import { ProductTrashBatchService } from '../services/product-trash-batch.service.js';
 import logger from '../../../utils/logger.js';
 
 export function createOperatorProductCleanupController(dataSource: DataSource): Router {
   const router = Router();
   const operations = new ProductCleanupOperationsService(dataSource);
+  const trash = new ProductTrashBatchService(dataSource);
   const adminOnly = requireNetureScope('neture:admin') as any;
   const mutation = (run: (req: Request) => Promise<unknown>) => async (req: Request, res: Response) => {
     try { res.json({ success: true, data: await run(req) }); }
@@ -266,6 +268,10 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
    * Soft 삭제 리스트에서만 가능한 완전 삭제
    */
   router.delete('/hard-delete/:offerId', adminOnly, mutation(req => operations.remove(req.params.offerId, 'trash', (req as any).user.id, req.body?.reason)));
+
+  router.post('/batch-soft-delete', mutation(req => trash.move(req.body?.ids, (req as any).user.id)));
+  router.post('/empty-trash/preview', adminOnly, mutation(req => trash.preview((req as any).user.id)));
+  router.post('/empty-trash/execute', adminOnly, mutation(req => trash.empty((req as any).user.id, req.body)));
 
   return router;
 }

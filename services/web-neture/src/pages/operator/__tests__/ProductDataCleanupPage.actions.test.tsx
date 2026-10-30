@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import Page from '../ProductDataCleanupPage';
 const api = vi.hoisted(() => ({ getDuplicateMasters: vi.fn(), getRecycleBin: vi.fn(), restore: vi.fn(), hardDelete: vi.fn(), mergeMasters: vi.fn() }));
 const auth = vi.hoisted(() => ({ id: 'fixture', roles: ['neture:admin'] as string[] }));
@@ -30,18 +30,18 @@ it('read failure is recoverable and never shown as an empty bin', async () => {
   expect(screen.queryByText('휴지통이 비어 있습니다.')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '목록 다시 조회' })); await screen.findByText('합성 상품');
 });
-it('preserves a failed deletion reason and target, locks duplicate submissions, and retries read only after success', async () => {
+it('deletes without a manual reason, preserves failed targets, locks duplicate submissions and retries reads only after success', async () => {
   let finish!: (value: {success: boolean; error?: string}) => void;
   api.hardDelete.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; })).mockResolvedValueOnce({ success: true });
   await bin(); fireEvent.click(screen.getByRole('button', { name: '완전 삭제' }));
-  const reason = screen.getByRole('textbox', { name: '처리 사유' }); fireEvent.change(reason, { target: { value: '보존할 사유' } });
-  fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+  expect(screen.queryByRole('textbox', {name:'처리 사유'})).toBeNull();
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name:'완전 삭제'}));
   fireEvent.click(screen.getByRole('button', { name: '처리 중…' }));
   expect(api.hardDelete).toHaveBeenCalledTimes(1);
   finish({ success: false, error: 'HAS_COMMERCE_REFERENCES' }); await screen.findByRole('alert');
-  expect((reason as HTMLTextAreaElement).value).toBe('보존할 사유');
+  expect(api.hardDelete).toHaveBeenCalledWith('offer');
   api.getRecycleBin.mockRejectedValueOnce(new Error('갱신 실패'));
-  fireEvent.click(screen.getByRole('button', { name: '처리 확인' }));
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name:'완전 삭제'}));
   await screen.findByText('완전 삭제했습니다.'); await screen.findByRole('button', { name: '목록 다시 조회' });
   expect(api.hardDelete).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole('button', { name: '목록 다시 조회' })); await screen.findByText('합성 상품');
