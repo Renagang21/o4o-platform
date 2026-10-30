@@ -549,7 +549,7 @@ describe('14. 연결된 PC 가 여러 대여도 Assistant 가 노드를 고른�
     expect(parseHeartbeatReport({})).toBeNull();
     expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { browser: true } })).toBeNull();
     expect(parseHeartbeatReport({ agentVersion: '../etc', capabilities: caps() })).toBeNull();
-    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { ...caps(), extra: 'x' } })).toEqual({ agentVersion: '0.2.0', capabilities: {...caps(),pharmacyData:false} });
+    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { ...caps(), extra: 'x' } })).toEqual({ agentVersion: '0.2.0', capabilities: {...caps(),pharmacyData:false,serverAuthority:false} });
     expect(parseHeartbeatReport({agentVersion:'0.5.0',capabilities:{...caps(),pharmacyData:true}})?.capabilities.pharmacyData).toBe(true);
     expect(parseHeartbeatReport({agentVersion:'0.5.0',capabilities:{...caps(),pharmacyData:'yes'}})).toBeNull();
   });

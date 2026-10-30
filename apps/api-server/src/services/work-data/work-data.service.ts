@@ -62,41 +62,58 @@ export async function resolveWorkDataOwner(db: DataSource, userId: string, workS
   return owner;
 }
 function ownerOf(row: any): WorkDataOwner { return {key:row.owner_key,userId:row.user_id,organizationId:row.organization_id}; }
-function consentOf(row: any) { return row ? { enabled: row.enabled, epoch: row.epoch, owner: row.owner_key, updatedAt: row.updated_at } : { enabled:false,epoch:null,owner:null,updatedAt:null }; }
+function consentOf(row: any) { return row ? { enabled: row.enabled, epoch: row.epoch, owner: row.owner_key, updatedAt: row.updated_at, storageMode:row.storage_mode, sourceDeviceId:row.source_device_id, transferError:row.transfer_error??null } : { enabled:false,epoch:null,owner:null,updatedAt:null,storageMode:'local',sourceDeviceId:null,transferError:null }; }
+function assertServerReady(consent: ReturnType<typeof consentOf>) {
+  if (!consent.enabled) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
+  if (consent.storageMode!=='server') throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
+}
 export class WorkDataService {
   constructor(readonly db: DataSource) {}
   async consent(userId: string, owner: WorkDataOwner, db: Db = this.db) {
     await assertWorkDataOwner(db,userId,owner,false);
     const [row] = await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1',[owner.key]);
-    return { ...consentOf(row), owner: owner.key };
+    const transferredRecords=row?.storage_mode==='transferring'?Number((await db.query('SELECT count(*)::int AS n FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]))[0].n):undefined;
+    return { ...consentOf(row), owner: owner.key, transferredRecords };
   }
-  async setConsent(userId: string, owner: WorkDataOwner, enabled: boolean) {
+  async setConsent(userId: string, owner: WorkDataOwner, enabled: boolean, sourceDeviceId: string | null = null) {
     if (typeof enabled !== 'boolean') throw new WorkDataError('WORK_DATA_CONSENT_INVALID');
     return this.db.transaction(async db => {
       await assertWorkDataOwner(db,userId,owner,true);
       // Serialize first grant with revoke/sync, including when the row is new.
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
       const [old] = await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1 FOR UPDATE',[owner.key]);
+      if (sourceDeviceId!==null && !/^[a-f0-9-]{36}$/i.test(sourceDeviceId)) throw new WorkDataError('WORK_DATA_PC_SOURCE_INVALID');
+      if (enabled && sourceDeviceId && old?.storage_mode==='stopped') throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
+      if (enabled && old?.enabled && old.source_device_id && sourceDeviceId && old.source_device_id!==sourceDeviceId) throw new WorkDataError('WORK_DATA_PC_SOURCE_UNAVAILABLE',409);
+      const storageMode=!enabled?(old && old.storage_mode!=='local'?'stopped':'local')
+        :old?.enabled?old.storage_mode:sourceDeviceId?'transferring':'server';
+      const source=enabled?(old?.storage_mode==='stopped'?null:old?.source_device_id??sourceDeviceId):old?.source_device_id??null;
       const epoch = old?.enabled === enabled ? old.epoch : randomUUID();
-      const [row] = await db.query(`INSERT INTO assistant_work_data_consents(owner_key,user_id,organization_id,granted_by,epoch,enabled)
-        VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(owner_key) DO UPDATE SET enabled=excluded.enabled,epoch=excluded.epoch,
-        granted_by=excluded.granted_by,updated_at=now() RETURNING *`,[owner.key,owner.userId,owner.organizationId,userId,epoch,enabled]);
+      const [row] = await db.query(`INSERT INTO assistant_work_data_consents(owner_key,user_id,organization_id,granted_by,epoch,enabled,storage_mode,source_device_id)
+        VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(owner_key) DO UPDATE SET enabled=excluded.enabled,epoch=excluded.epoch,
+        granted_by=excluded.granted_by,storage_mode=excluded.storage_mode,source_device_id=excluded.source_device_id,transfer_error=NULL,updated_at=now() RETURNING *`,[owner.key,owner.userId,owner.organizationId,userId,epoch,enabled,storageMode,source]);
       if (!enabled) await db.query('DELETE FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]);
       return consentOf(row);
     });
   }
-  async grants(userId: string) {
+  async transferFailed(userId:string,deviceId:string,ownerKey:unknown,epoch:unknown,code:string) {
+    if(typeof ownerKey!=='string' || typeof epoch!=='string' || !/^[A-Z0-9_]{1,64}$/.test(code))return;
+    await this.db.query(`UPDATE assistant_work_data_consents c SET transfer_error=$5 WHERE c.owner_key=$1 AND c.epoch::text=$2
+      AND c.source_device_id=$3 AND c.enabled=true AND c.storage_mode='transferring'
+      AND EXISTS(SELECT 1 FROM local_agent_devices d WHERE d.id=$3 AND d.user_id=$4 AND d.status='active')`,[ownerKey,epoch,deviceId,userId,code]);
+  }
+  async grants(userId: string, deviceId?: string) {
     await assertAccount(this.db,userId);
     if(await getNetureMainMembershipStatus(this.db,userId)!=='active')throw new WorkDataError('WORK_DATA_FORBIDDEN',403);
     const rows = await this.db.query(`SELECT c.* FROM assistant_work_data_consents c WHERE c.enabled=true AND
       (c.user_id=$1 OR EXISTS(SELECT 1 FROM organization_members om WHERE om.organization_id=c.organization_id AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,[userId]);
-    return rows.map(row => ({ owner:row.owner_key,epoch:row.epoch }));
+    return rows.filter(row=>row.source_device_id===deviceId).map(row => ({ owner:row.owner_key,epoch:row.epoch,storageMode:row.storage_mode }));
   }
   async query(userId: string, owner: WorkDataOwner, options: { kind?: string; after?: string; limit?: number } = {}) {
     return this.db.transaction(async db=>{
     await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
     const consent = await this.consent(userId,owner,db);
-    if (!consent.enabled) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
+    assertServerReady(consent);
     const {kind,after='',limit=200} = options;
     if ((kind !== undefined && !PHARMACY_KINDS.includes(kind as any)) || typeof after !== 'string' || after.length>100 || !Number.isSafeInteger(limit) || limit<1 || limit>500) throw new WorkDataError('WORK_DATA_PAGE_INVALID');
     const args: unknown[] = [owner.key,after,limit+1];
@@ -114,7 +131,7 @@ export class WorkDataService {
     return this.db.transaction(async db=>{
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
       const consent=await this.consent(userId,owner,db);
-      if(!consent.enabled)throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
+      assertServerReady(consent);
       // Work on normalized copies. Aggregate by unit; never add unlike measures.
       const movement=await db.query(`WITH e AS (SELECT r.kind,r.id,r.entry->'data' AS d FROM assistant_work_data_records r WHERE ${effective})
         SELECT e.kind,e.d->>'product_id' AS product_id,e.d->>'supplier_id' AS supplier_id,
@@ -132,7 +149,7 @@ export class WorkDataService {
         notice:'보관된 전체 기간의 자료 집계입니다. 프로그램 주문(order)은 구매 입고량과 별도이며 반품은 음수입니다. 집계만으로 현재 재고나 주문량을 확정하지 않습니다.'};
     });
   }
-  async sync(userId: string, ownerKey: string, epoch: string, raw: unknown, cursor = 0) {
+  async sync(userId: string, ownerKey: string, epoch: string, raw: unknown, cursor = 0, collector?: {deviceId:string;complete?:boolean}) {
     const changes=validateMutations(raw);
     if (!positive(cursor) || typeof ownerKey!=='string' || ownerKey.length>80 || typeof epoch!=='string') throw new WorkDataError('WORK_DATA_SYNC_INVALID');
     return this.db.transaction(async db=>{
@@ -140,6 +157,13 @@ export class WorkDataService {
       const [consent]=await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1 FOR UPDATE',[ownerKey]);
       if (!consent?.enabled || consent.epoch!==epoch) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
       const owner=ownerOf(consent);await assertWorkDataOwner(db,userId,owner,true);
+      if (collector) {
+        if (consent.source_device_id!==collector.deviceId) throw new WorkDataError('WORK_DATA_FORBIDDEN',403);
+        if (consent.storage_mode==='server' && changes.some(c=>c.lane!=='imported')) throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
+        if (collector.complete && (changes.length || consent.storage_mode!=='transferring')) {
+          if (!(collector.complete && !changes.length && consent.storage_mode==='server')) throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
+        }
+      } else assertServerReady(consentOf(consent));
       const accepted: {lane:string;kind:string;id:string;mutationId:string;version:number}[]=[],conflicts: {lane:string;kind:string;id:string;version:number}[]=[];
       for(const change of changes){
         const {lane,entry,expectedVersion,mutationId}=change;
@@ -167,11 +191,11 @@ export class WorkDataService {
           version=nextval('assistant_work_data_version_seq'),updated_at=now() RETURNING version`,[ownerKey,lane,entry.kind,entry.data.id,JSON.stringify(entry),mutationId]);
         accepted.push({lane,kind:entry.kind,id:entry.data.id,mutationId,version:Number(saved.version)});
       }
-      const rows=await db.query('SELECT lane,entry,version,mutation_id FROM assistant_work_data_records WHERE owner_key=$1 AND version>$2 ORDER BY version LIMIT 201',[ownerKey,cursor]);
-      const page=rows.slice(0,200);
-      while(page.length>1 && Buffer.byteLength(JSON.stringify(page))>900*1024)page.pop();
-      return {accepted,conflicts,changes:page.map(r=>({lane:r.lane,entry:r.entry,version:Number(r.version),mutationId:r.mutation_id})),
-        cursor:page.length?Number(page.at(-1).version):cursor,more:rows.length>page.length};
+      if (collector) {
+        await db.query("UPDATE assistant_work_data_consents SET storage_mode=CASE WHEN $2 THEN 'server' ELSE storage_mode END,transfer_error=NULL,updated_at=now() WHERE owner_key=$1",[ownerKey,collector.complete===true]);
+        return {accepted,conflicts,changes:[],cursor:0,more:false,storageMode:collector.complete?'server':consent.storage_mode};
+      }
+      return {accepted,conflicts,changes:[],cursor:0,more:false};
     });
   }
 }

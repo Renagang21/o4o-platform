@@ -1,7 +1,8 @@
 import { ERASURE_WRITER_GAPS_SQL } from '../privacy/erasure-writer-manifest.js';
 import { CreateAssistantWorkData1793257200000 } from '../../database/migrations/1793257200000-CreateAssistantWorkData.js';
 import { AccountErasureService } from '../privacy/account-erasure.service.js';
-import { pcWorkData } from './work-data-bridge.js';
+import { pcWorkData, readWorkData } from './work-data-bridge.js';
+import { AddAssistantStorageAuthority1793322213345 } from '../../database/migrations/1793322213345-AddAssistantStorageAuthority.js';
 import { submitCommandResult } from '../local-agent/local-agent-service.js';
 import express from 'express';
 import request from 'supertest';
@@ -121,13 +122,14 @@ suite('Main business copies on isolated PostgreSQL',()=>{
  });
  it('keeps the real PostgreSQL command transport bound to the original authorized PC',async()=>{
    const a=randomUUID(),b=randomUUID();
+   const localOwner={key:'user:'+ids[2],userId:ids[2],organizationId:null};
    const capabilities=JSON.stringify({browser:false,windowsUia:false,localData:true,ownerScopedLedger:true,taskUnit:false,pharmacyData:true});
-   await db.query(`INSERT INTO local_agent_devices(id,user_id,platform,agent_version,status,last_seen_at,capabilities,credential_hash) VALUES($1,$3,'win32','0.5.0','active',now(),$4::jsonb,$5),($2,$3,'win32','0.5.0','active',now()-interval '1 second',$4::jsonb,$6)`,[a,b,ids[0],capabilities,randomBytes(32).toString('hex'),randomBytes(32).toString('hex')]);
+   await db.query(`INSERT INTO local_agent_devices(id,user_id,platform,agent_version,status,last_seen_at,capabilities,credential_hash) VALUES($1,$3,'win32','0.5.0','active',now(),$4::jsonb,$5),($2,$3,'win32','0.5.0','active',now()-interval '1 second',$4::jsonb,$6)`,[a,b,ids[2],capabilities,randomBytes(32).toString('hex'),randomBytes(32).toString('hex')]);
    async function read(bound?:string){
-     const operation=pcWorkData(db,ids[0],owner,'read',{limit:1},bound);operation.catch(()=>{});
+     const operation=pcWorkData(db,ids[2],localOwner,'read',{limit:1},bound);operation.catch(()=>{});
      let command:any;
      for(let attempt=0;attempt<100;attempt++){
-       [command]=await db.query(`SELECT command_id,device_id FROM local_agent_commands WHERE user_id=$1 AND status='pending' AND tool_name='assistant.work_data.read' ORDER BY issued_at DESC LIMIT 1`,[ids[0]]);
+       [command]=await db.query(`SELECT command_id,device_id FROM local_agent_commands WHERE user_id=$1 AND status='pending' AND tool_name='assistant.work_data.read' ORDER BY issued_at DESC LIMIT 1`,[ids[2]]);
        if(command)break;await new Promise(resolve=>setTimeout(resolve,10));
      }
      if(!command){await operation;throw Error('Fixture PC command missing');}
@@ -139,7 +141,7 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    await db.query("UPDATE local_agent_devices SET last_seen_at=now()-interval '10 seconds' WHERE id=$1",[a]);
    await read(initial.deviceId);
    await db.query("UPDATE local_agent_devices SET last_seen_at=now()-interval '5 minutes' WHERE id=$1",[a]);
-   await expect(pcWorkData(db,ids[0],owner,'read',{},a)).rejects.toMatchObject({code:'LOCAL_AGENT_OFFLINE'});
+   await expect(pcWorkData(db,ids[2],localOwner,'read',{},a)).rejects.toMatchObject({code:'LOCAL_AGENT_OFFLINE'});
    await expect(pcWorkData(db,ids[1],{key:'user:'+ids[1],userId:ids[1],organizationId:null},'read',{},a)).rejects.toMatchObject({code:'WORK_DATA_PC_SOURCE_UNAVAILABLE'});
    expect((await db.query('SELECT result_data FROM local_agent_commands WHERE device_id=$1',[a])).every(row=>row.result_data===null)).toBe(true);
  });
@@ -198,5 +200,54 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    await expect(service.sync(ids[0],owner.key,epoch,[])).rejects.toMatchObject({code:'WORK_DATA_CONSENT_REQUIRED'});
    const renewed=await service.setConsent(ids[0],owner,true);expect(renewed.epoch).not.toBe(epoch);
    await expect(service.sync(ids[0],owner.key,epoch,[])).rejects.toMatchObject({code:'WORK_DATA_CONSENT_REQUIRED'});
+ });
+ async function transitionFixture(){
+   const user=randomUUID(),device=randomUUID();
+   await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified") VALUES($1,$2,'합성 사용자','active',true,true)`,[user,user+'@fixture.invalid']);
+   const capabilities={browser:false,windowsUia:false,localData:true,ownerScopedLedger:true,pharmacyData:true,serverAuthority:true};
+   await db.query(`INSERT INTO local_agent_devices(id,user_id,platform,agent_version,status,last_seen_at,capabilities,credential_hash) VALUES($1,$2,'win32','0.6.0','active',now(),$3::jsonb,$4)`,[device,user,JSON.stringify(capabilities),randomBytes(32).toString('hex')]);
+   return {user,device,owner:{key:'user:'+user,userId:user,organizationId:null}};
+ }
+ it('moves a designated PC once, hides partial data, and rejects reverse/local writes',async()=>{
+   const f=await transitionFixture();
+   const begin=await request(app).post('/work-data/consent').set('x-fixture-user',f.user).send({enabled:true,deviceId:f.device});
+   expect(begin.status).toBe(200);expect(begin.body.data.storageMode).toBe('transferring');
+   const epoch=begin.body.data.epoch;
+   expect(await service.grants(f.user)).toEqual([]);expect(await service.grants(f.user,randomUUID())).toEqual([]);
+   expect((await service.grants(f.user,f.device))[0].storageMode).toBe('transferring');
+   await expect(service.sync(f.user,f.owner.key,epoch,[],0,{deviceId:randomUUID()})).rejects.toMatchObject({code:'WORK_DATA_FORBIDDEN'});
+   const first=change();const upload=await service.sync(f.user,f.owner.key,epoch,[first],0,{deviceId:f.device});
+   expect(upload.changes).toEqual([]);expect(upload.storageMode).toBe('transferring');
+   expect((await service.sync(f.user,f.owner.key,epoch,[first],0,{deviceId:f.device})).accepted[0].version).toBe(upload.accepted[0].version);
+   await expect(service.query(f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_TRANSFERRING'});
+   await expect(service.analysis(f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_TRANSFERRING'});
+   await service.sync(f.user,f.owner.key,epoch,[],0,{deviceId:f.device,complete:true});
+   expect((await service.sync(f.user,f.owner.key,epoch,[],0,{deviceId:f.device,complete:true})).storageMode).toBe('server');
+   expect((await readWorkData(db,f.user,f.owner)).location).toBe('server');
+   await expect(pcWorkData(db,f.user,f.owner,'read',{},f.device)).rejects.toMatchObject({code:'WORK_DATA_NO_LOCAL_RETURN'});
+   await expect(service.sync(f.user,f.owner.key,epoch,[{...change(),lane:'user'}],0,{deviceId:f.device})).rejects.toMatchObject({code:'WORK_DATA_NO_LOCAL_RETURN'});
+   const save=await request(app).post('/work-data/save').set('x-fixture-user',f.user).send({location:'server',epoch,changes:[{lane:'user',entry:{kind:'sheet',data:{id:'mobile',title:'다른 기기 주문 준비',status:'draft',lines:[]}},expectedVersion:0,mutationId:randomUUID()}]});
+   expect(save.status).toBe(200);expect((await service.query(f.user,f.owner)).records.some(r=>r.kind==='sheet')).toBe(true);
+   const stale=await request(app).post('/work-data/save').set('x-fixture-user',f.user).send({deviceId:f.device,expectedOwner:f.owner.key,records:[],expectedRevision:1});
+   expect(stale.status).toBe(409);expect(stale.body.code).toBe('WORK_DATA_NO_LOCAL_RETURN');
+ });
+ it('requires an explicit start choice, refuses old PC capability, and never restores a revoked checkpoint',async()=>{
+   const f=await transitionFixture();
+   expect((await request(app).post('/work-data/consent').set('x-fixture-user',f.user).send({enabled:true})).body.code).toBe('WORK_DATA_STORAGE_CHOICE_REQUIRED');
+   await db.query(`UPDATE local_agent_devices SET capabilities=capabilities-'serverAuthority' WHERE id=$1`,[f.device]);
+   expect((await request(app).post('/work-data/consent').set('x-fixture-user',f.user).send({enabled:true,deviceId:f.device})).body.code).toBe('PC_PROGRAM_UPDATE_REQUIRED');
+   const c=await service.setConsent(f.user,f.owner,true,f.device);
+   await service.sync(f.user,f.owner.key,c.epoch,[change()],0,{deviceId:f.device});
+   expect((await service.setConsent(f.user,f.owner,false)).storageMode).toBe('stopped');
+   await expect(readWorkData(db,f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_STOPPED'});
+   await expect(service.sync(f.user,f.owner.key,c.epoch,[],0,{deviceId:f.device,complete:true})).rejects.toMatchObject({code:'WORK_DATA_CONSENT_REQUIRED'});
+   await expect(service.setConsent(f.user,f.owner,true,f.device)).rejects.toMatchObject({code:'WORK_DATA_NO_LOCAL_RETURN'});
+   const restarted=await service.setConsent(f.user,f.owner,true);expect(restarted.storageMode).toBe('server');expect(restarted.sourceDeviceId).toBeNull();
+   expect((await service.query(f.user,f.owner)).records).toEqual([]);expect(await service.grants(f.user,f.device)).toEqual([]);
+ });
+ it('preserves established server authority when a schema downgrade is requested',async()=>{
+   const q=db.createQueryRunner();await q.startTransaction();
+   try{await expect(new AddAssistantStorageAuthority1793322213345().down(q)).rejects.toThrow('reviewed data migration');}
+   finally{await q.rollbackTransaction();await q.release();}
  });
 });

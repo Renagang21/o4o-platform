@@ -6,9 +6,14 @@ import { requireNetureMainMembership } from '../../middleware/neture-main-member
 import type { AuthRequest } from '../../types/auth.js';
 import { WorkDataService, WorkDataError, resolveWorkDataOwner } from '../../services/work-data/work-data.service.js';
 import { readWorkData, pcWorkData } from '../../services/work-data/work-data-bridge.js';
+import { listUserDevices, resolveTargetDevice } from '../../services/local-agent/local-agent-service.js';
 
 export const workDataMessage: Record<string,string>={
-  WORK_DATA_CONSENT_REQUIRED:'서버 보관을 허용하면 이 자료를 어디서나 사용할 수 있어요.',
+  WORK_DATA_TRANSFERRING:'서버로 자료를 옮기고 있어요. 자료가 있는 PC를 켜 두세요. 완료되면 이어서 이용할 수 있어요.',
+  WORK_DATA_NO_LOCAL_RETURN:'서버에서 계속 작업해 주세요. 이 업무를 다시 PC 저장 방식으로 바꾸지는 않아요.',
+  WORK_DATA_STOPPED:'서버 이용이 중단됐어요. 동의하고 서버에서 새로 시작할 수 있어요.',
+  WORK_DATA_STORAGE_CHOICE_REQUIRED:'이 PC 자료를 옮길지 서버에서 새로 시작할지 선택해 주세요.',
+  WORK_DATA_CONSENT_REQUIRED:'서버 이용에 동의하면 보관된 자료를 어디서나 사용할 수 있어요.',
   WORK_DATA_FORBIDDEN:'이 자료를 이용할 권한을 확인해 주세요.',
   WORK_DATA_CONFLICT:'다른 곳에서 자료가 바뀌었어요. 최신 자료를 다시 확인해 주세요. 입력한 내용은 유지됩니다.',
   WORK_DATA_PC_SOURCE_UNAVAILABLE:'자료를 불러온 PC를 다시 연결해 주세요. 다른 PC의 자료로 바꾸지 않았어요.',
@@ -41,15 +46,36 @@ export function createWorkDataRouter(db: DataSource) {
   }));
   router.post('/status',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
-    return service.consent(req.user.id,owner);
+    const status=await service.consent(req.user.id,owner);
+    const sourceOnline=status.sourceDeviceId?(await listUserDevices(db,req.user.id)).some(d=>d.id===status.sourceDeviceId && d.online):undefined;
+    return {...status,sourceOnline};
   }));
   router.post('/consent',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
-    return service.setConsent(req.user.id,owner,req.body?.enabled);
+    let sourceDeviceId:string|null=null;
+    if(req.body?.enabled===true){
+      const current=await service.consent(req.user.id,owner);
+      if(req.body?.deviceId!==undefined){
+        const device=(await listUserDevices(db,req.user.id)).find(d=>d.id===req.body.deviceId);
+        if(!device?.online)throw new WorkDataError('WORK_DATA_PC_SOURCE_UNAVAILABLE',409);
+        if(device.capabilities?.serverAuthority!==true)throw new WorkDataError('PC_PROGRAM_UPDATE_REQUIRED',409);
+        sourceDeviceId=device.id;
+      }else if(current.storageMode==='local' || (current.storageMode==='transferring' && !current.sourceDeviceId) || current.storageMode==='stopped'){
+        if(req.body?.start!=='empty' || current.storageMode==='transferring')throw new WorkDataError('WORK_DATA_STORAGE_CHOICE_REQUIRED');
+      }
+    }
+    return service.setConsent(req.user.id,owner,req.body?.enabled,sourceDeviceId);
   }));
   router.post('/pc-read',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
     return pcWorkData(db,req.user.id,owner,'read',{limit:1},req.body?.deviceId);
+  }));
+  router.post('/transition-source',authenticate,requireNetureMainMembership(db),run(async req=>{
+    await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
+    const selected=await resolveTargetDevice(db,req.user.id,{need:'pharmacy_data'});
+    if(selected.status!=='ok')throw new WorkDataError(selected.status==='none'?'LOCAL_AGENT_NO_DEVICE':'LOCAL_AGENT_OFFLINE',409);
+    if(selected.device.capabilities?.serverAuthority!==true)throw new WorkDataError('PC_PROGRAM_UPDATE_REQUIRED',409);
+    return {deviceId:selected.device.id};
   }));
   router.post('/analysis',authenticate,requireNetureMainMembership(db),run(async req=>{
     const owner=await resolveWorkDataOwner(db,req.user.id,req.body?.workScope);
