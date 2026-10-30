@@ -46,3 +46,9 @@ it('leaves selected-only mode when the last checked task is cleared',async()=>{
  fireEvent.click(screen.getByRole('button',{name:'선택 업무 모아보기'}));expect(screen.queryByText('약국 검토')).toBeNull();
  fireEvent.click(screen.getByLabelText('공급자 검토 선택'));await screen.findByText('약국 검토');
 });
+it('opens the exact pending candidate queue from its banner and count', async () => {
+  api.get.mockResolvedValue(response([{key:'product-candidates',service:'neture',label:'상품 후보 검토',href:'/operator/product-candidates?status=pending',count:12000,available:true}])); view();
+  const banner=await screen.findByRole('link',{name:'상품 후보 검토 대기 업무 바로가기'});
+  expect(banner.getAttribute('href')).toBe('/operations/neture/candidates?status=pending');
+  expect(screen.getByRole('link',{name:'상품 후보 검토 12000건 처리하기'}).getAttribute('href')).toBe(banner.getAttribute('href'));
+});

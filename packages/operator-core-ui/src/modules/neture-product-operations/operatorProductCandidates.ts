@@ -113,6 +113,8 @@ export interface ProductCandidateListFilter {
   status?: ProductCandidateStatus;
   sourceType?: ProductCandidateSourceType;
   serviceKey?: string;
+  includeShared?: boolean;
+  search?: string;
   organizationId?: string;
   page?: number;
   limit?: number;
@@ -128,6 +130,8 @@ const operatorProductCandidateApi = {
   async list(filter: ProductCandidateListFilter = {}): Promise<ProductCandidateListResult> {
     try {
       const params: Record<string, string | number> = {};
+      if (filter.includeShared) params.includeShared = 'true';
+      if (filter.search) params.search = filter.search;
       if (filter.status) params.status = filter.status;
       if (filter.sourceType) params.sourceType = filter.sourceType;
       if (filter.serviceKey) params.serviceKey = filter.serviceKey;
@@ -140,7 +144,7 @@ const operatorProductCandidateApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[ProductCandidate API] list failed:', error);
-      return { items: [], total: 0 };
+      throw error;
     }
   },
 

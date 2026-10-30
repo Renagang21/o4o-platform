@@ -93,6 +93,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
         search: ((search ?? q) as string | undefined) || undefined,
         serviceKey: serviceKey as string | undefined,
         organizationId: organizationId as string | undefined,
+        includeShared: req.query.includeShared === 'true' && serviceKey === 'neture' && resolved.serviceKeys?.includes('neture') === true,
         scopeServiceKeys: resolved.serviceKeys,
         page: page ? Number(page) : undefined,
         limit: limit ? Number(limit) : undefined,

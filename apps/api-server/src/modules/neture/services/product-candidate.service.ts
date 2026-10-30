@@ -108,6 +108,8 @@ export interface FindCandidatesFilter {
   /** 후보명/제조사/식별자(STTEMNT_NO 등) 부분검색 (ILIKE) */
   search?: string;
   serviceKey?: string;
+  /** Include unassigned common candidates within the explicitly authorized service queue. */
+  includeShared?: boolean;
   organizationId?: string;
   /** operator scope: null = cross-service(platform admin), 배열 = 제한 */
   scopeServiceKeys?: string[] | null;
@@ -248,7 +250,7 @@ export class ProductCandidateService {
     if (filter.sourceType) where.sourceType = filter.sourceType;
     if (filter.sourceLabel) where.sourceLabel = filter.sourceLabel;
     if (filter.organizationId) where.organizationId = filter.organizationId;
-    if (filter.serviceKey) where.serviceKey = filter.serviceKey;
+    if (filter.serviceKey && !filter.includeShared) where.serviceKey = filter.serviceKey;
 
     // operator scope 제한: scopeServiceKeys 가 배열이면 해당 service_key 만 (service_key 명시 필터가 우선)
     const useScope =
@@ -259,8 +261,13 @@ export class ProductCandidateService {
       .where(where)
       .andWhere('(pc.source_label IS NULL OR pc.source_label <> :descriptionIntakeLabel)', { descriptionIntakeLabel: DESCRIPTION_INTAKE_LABEL })
       .orderBy('pc.created_at', 'DESC')
+      .addOrderBy('pc.id', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
+
+    if (filter.serviceKey && filter.includeShared) {
+      qb.andWhere('(pc.service_key = :queueService OR pc.service_key IS NULL)', { queueService: filter.serviceKey });
+    }
 
     if (useScope) {
       qb.andWhere('(pc.service_key = ANY(:keys) OR pc.service_key IS NULL)', {
