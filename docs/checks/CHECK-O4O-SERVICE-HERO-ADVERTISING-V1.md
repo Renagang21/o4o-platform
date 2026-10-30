@@ -1,5 +1,8 @@
 # 서비스별 Hero · 광고 · 운영자 관리 검증
 
+> **진행 현황 안내 (2026-10-30)**: 아래 「통합·운영 검증 대기」는 2026-10-15 개발 당시 기록이다. 후속 [Hero 운영 정비 CHECK](CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)에 기존 CMS 게시 구조를 이어받은 main 통합·2026-10-20 운영 배포 결과가 있다. 실제 운영자 게시·광고 계약·이미지 업로드 검증까지 완료됐다는 뜻은 아니다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 > **작성일**: 2026-10-15 · **상태**: 개발 검증 완료, 통합·운영 검증 대기
 > WO: [WO-O4O-SERVICE-HERO-ADVERTISING-V1](../work-orders/WO-O4O-SERVICE-HERO-ADVERTISING-V1.md)
 

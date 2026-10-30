@@ -1,5 +1,8 @@
 # CHECK-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
 
+> **진행 현황 안내 (2026-10-30)**: 아래 §18~19의 pharmacy·store 배포 보류는 2026-10-07 당시 결과다. 이후 [관리자 정비 CHECK](CHECK-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)의 2026-10-21 누적 main 배포에 API·약국·매장이 포함됐다. 후속 배포가 있다는 사실과 06 polish 항목별 화면 재검증은 구분하며, 로고 자산·실계정 검증·별도 트랙을 자동 완료로 바꾸지 않는다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 > 이 CHECK 는 8개 공개 host 의 대표 화면 디자인과 브랜드를 정비한 결과다. 내용은 O4O 홈 복귀, 공통 Hero·토큰, O4O 약국 표시명, host 별 메타다. 운영 배포 전 코드 완료와 로컬 빌드 smoke 까지를 기록한다.
 
 | 항목 | 값 |
