@@ -188,7 +188,7 @@ describe('대표 홈 가입 서비스 표시', () => {
   const mountServices = (d: HomeEntryData | null, error: string | null = null, loading = false) => render(<MemoryRouter><HomeEntryPanel servicesOnly user={user()} data={d} loading={loading} error={error} onReload={() => {}} /></MemoryRouter>);
   it('가입 서비스와 상태를 구분하고 실제 매장 진입을 보존한다', () => {
     mountServices(data({services:[svc('neture','Neture'),{...svc('lecture','강의'),description:'필요한 강의를 학습합니다.'},svc('kpa-branch','분회','pending')], workspaceStores:[{organizationId:'o1',organizationName:'내 약국',memberRole:'owner'}]}));
-    expect(screen.getByRole('heading',{name:'가입한 서비스'})).toBeTruthy();
+    expect(screen.getByRole('heading',{name:'일상 서비스'})).toBeTruthy();
     expect(screen.getByRole('button',{name:'강의'})).toBeTruthy();
     expect(screen.getByText('필요한 강의를 학습합니다.')).toBeTruthy();
     expect(screen.queryByRole('button',{name:'분회'})).toBeNull();
@@ -203,5 +203,30 @@ describe('대표 홈 가입 서비스 표시', () => {
     view.unmount(); mountServices(null,'조회에 실패했습니다');
     expect(screen.getByRole('button',{name:'다시 불러오기'})).toBeTruthy();
     expect(screen.queryByText(/현재 이용 중인 서비스가 없습니다/)).toBeNull();
+  });
+  it('원본 가입 순서와 무관하게 업무 → 커뮤니티·강의 → 펀딩 → 협력체로 표시한다', () => {
+    mountServices(data({
+      services: [svc('funding', '펀딩'), svc('lecture', '강의'), svc('community', '커뮤니티')],
+      serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } },
+      workspaceStores: [{ organizationId: 'o1', organizationName: '내 약국', memberRole: 'owner' }],
+      businesses: [{ key: 'carepharm', name: 'CarePharm', canParticipate: true }],
+      cooperatives: [{ id: 'coop', slug: 'sample', name: '참여 조합', status: 'active' }],
+    }));
+    expect(screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent)).toEqual(['내 업무', '커뮤니티·강의', '유통참여형 펀딩', '참여한 약국협력체']);
+    const work = screen.getByRole('region', { name: '내 업무' });
+    expect(within(work).getByRole('link', { name: '공급자 서비스' }).getAttribute('href')).toBe('/supplier/dashboard');
+    expect(within(work).getByRole('button', { name: '내 약국' })).toBeTruthy();
+    const community = screen.getByRole('region', { name: '커뮤니티·강의' });
+    expect(within(community).getAllByRole('button').map(b => b.textContent)).toEqual(['커뮤니티', '강의']);
+    const cooperation = screen.getByRole('region', { name: '참여한 약국협력체' });
+    expect(within(cooperation).getByRole('button', { name: /CarePharm/ })).toBeTruthy();
+    expect(within(cooperation).getByRole('link', { name: /참여 조합/ }).getAttribute('href')).toBe('https://pharmcoop.neture.co.kr/sample');
+  });
+  it('매장만 있으면 빈 서비스 안내 없이 업무를 먼저 표시하고 공급자 권한을 추정하지 않는다', () => {
+    mountServices(data({ services: [svc('neture', 'Neture')], communities: [], workspaceStores: [{ organizationId: 'o1', organizationName: '내 약국', memberRole: 'owner' }] }));
+    expect(screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent)).toEqual(['내 업무']);
+    expect(screen.getByRole('button', { name: '내 약국' })).toBeTruthy();
+    expect(screen.queryByText(/현재 이용 중인 서비스가 없습니다/)).toBeNull();
+    expect(screen.queryByRole('link', { name: '공급자 서비스' })).toBeNull();
   });
 });
